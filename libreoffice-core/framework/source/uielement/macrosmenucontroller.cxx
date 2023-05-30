@@ -23,7 +23,6 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <officecfg/Office/Common.hxx>
-#include <toolkit/awt/vclxmenu.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <osl/mutex.hxx>
@@ -74,27 +73,20 @@ void MacrosMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu > cons
     if (bMacrosDisabled)
         return;
 
-    VCLXPopupMenu* pVCLPopupMenu = static_cast<VCLXPopupMenu *>(comphelper::getFromUnoTunnel<VCLXMenu>( rPopupMenu ));
-    PopupMenu*     pPopupMenu    = nullptr;
-
     SolarMutexGuard aSolarMutexGuard;
 
-    resetPopupMenu( rPopupMenu );
-    if ( pVCLPopupMenu )
-        pPopupMenu = static_cast<PopupMenu *>(pVCLPopupMenu->GetMenu());
-
-    if (!pPopupMenu)
-        return;
+    resetPopupMenu(rPopupMenu);
+    assert(rPopupMenu->getItemCount() == 0);
 
     // insert basic
     OUString aCommand(".uno:MacroDialog");
     auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(aCommand, m_aModuleName);
     OUString aDisplayName = vcl::CommandInfoProvider::GetMenuLabelForCommand(aProperties);
-    pPopupMenu->InsertItem( 2, aDisplayName );
-    pPopupMenu->SetItemCommand( 2, aCommand );
+    rPopupMenu->insertItem(2, aDisplayName, 0, 0);
+    rPopupMenu->setCommand(2, aCommand);
 
     // insert providers but not basic or java
-    addScriptItems( pPopupMenu, 4);
+    addScriptItems(rPopupMenu, 4);
 }
 
 // XEventListener
@@ -124,7 +116,7 @@ void SAL_CALL MacrosMenuController::statusChanged( const FeatureStateEvent& )
     }
 }
 
-void MacrosMenuController::addScriptItems( PopupMenu* pPopupMenu, sal_uInt16 startItemId )
+void MacrosMenuController::addScriptItems(const Reference<css::awt::XPopupMenu>& rPopupMenu, sal_uInt16 startItemId)
 {
     static const OUStringLiteral aCmdBase(u".uno:ScriptOrganizer?ScriptOrganizer.Language:string=");
     static const OUStringLiteral ellipsis( u"..." );
@@ -132,6 +124,8 @@ void MacrosMenuController::addScriptItems( PopupMenu* pPopupMenu, sal_uInt16 sta
     sal_uInt16 itemId = startItemId;
     Reference< XContentEnumerationAccess > xEnumAccess( m_xContext->getServiceManager(), UNO_QUERY_THROW );
     Reference< XEnumeration > xEnum = xEnumAccess->createContentEnumeration ( "com.sun.star.script.provider.LanguageScriptProvider" );
+
+    sal_Int16 nPos = rPopupMenu->getItemCount();
 
     while ( xEnum->hasMoreElements() )
     {
@@ -155,8 +149,8 @@ void MacrosMenuController::addScriptItems( PopupMenu* pPopupMenu, sal_uInt16 sta
                 }
                 aCommand += aDisplayName;
                 aDisplayName += ellipsis;
-                pPopupMenu->InsertItem( itemId, aDisplayName );
-                pPopupMenu->SetItemCommand( itemId, aCommand );
+                rPopupMenu->insertItem(itemId, aDisplayName, 0, nPos++);
+                rPopupMenu->setCommand(itemId, aCommand);
                 itemId++;
                 break;
             }

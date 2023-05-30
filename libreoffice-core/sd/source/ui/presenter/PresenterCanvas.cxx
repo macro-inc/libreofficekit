@@ -27,10 +27,10 @@
 #include <basegfx/range/b2drectangle.hxx>
 #include <basegfx/utils/canvastools.hxx>
 #include <com/sun/star/awt/XWindow.hpp>
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <rtl/ref.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
+#include <utility>
 #include <vcl/window.hxx>
 
 using namespace ::com::sun::star;
@@ -43,22 +43,21 @@ namespace sd::presenter {
 /** Wrapper around a sprite that is displayed on a PresenterCanvas.
 */
 namespace {
-    typedef ::cppu::WeakComponentImplHelper <
+    typedef comphelper::WeakComponentImplHelper <
         css::rendering::XCustomSprite
     > PresenterCustomSpriteInterfaceBase;
 
-class PresenterCustomSprite
-    : protected ::cppu::BaseMutex,
-      public PresenterCustomSpriteInterfaceBase
+class PresenterCustomSprite final
+    : public PresenterCustomSpriteInterfaceBase
 {
 public:
     PresenterCustomSprite (
-        const rtl::Reference<PresenterCanvas>& rpCanvas,
+        rtl::Reference<PresenterCanvas> pCanvas,
         const Reference<rendering::XCustomSprite>& rxSprite,
         const Reference<awt::XWindow>& rxBaseWindow);
     PresenterCustomSprite(const PresenterCustomSprite&) = delete;
     PresenterCustomSprite& operator=(const PresenterCustomSprite&) = delete;
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XSprite
 
@@ -102,8 +101,7 @@ PresenterCanvas::PresenterCanvas (
     const Reference<rendering::XCanvas>& rxSharedCanvas,
     const Reference<awt::XWindow>& rxSharedWindow,
     const Reference<awt::XWindow>& rxWindow)
-    : PresenterCanvasInterfaceBase(m_aMutex),
-      mxUpdateCanvas(rxUpdateCanvas),
+    : mxUpdateCanvas(rxUpdateCanvas),
       mxUpdateWindow(rxUpdateWindow),
       mxSharedCanvas(rxSharedCanvas),
       mxSharedWindow(rxSharedWindow),
@@ -123,10 +121,13 @@ PresenterCanvas::~PresenterCanvas()
 {
 }
 
-void SAL_CALL PresenterCanvas::disposing()
+void PresenterCanvas::disposing(std::unique_lock<std::mutex>&)
 {
     if (mxWindow.is())
+    {
         mxWindow->removeWindowListener(this);
+        mxWindow.clear();
+    }
 }
 
 //----- XCanvas ---------------------------------------------------------------
@@ -680,7 +681,7 @@ Reference<rendering::XPolyPolygon2D> PresenterCanvas::UpdateSpriteClip (
 
 void PresenterCanvas::ThrowIfDisposed()
 {
-    if (rBHelper.bDisposed || rBHelper.bInDispose || ! mxSharedCanvas.is())
+    if (m_bDisposed || ! mxSharedCanvas.is())
     {
         throw lang::DisposedException ("PresenterCanvas object has already been disposed",
             static_cast<uno::XWeak*>(this));
@@ -690,18 +691,17 @@ void PresenterCanvas::ThrowIfDisposed()
 //===== PresenterCustomSprite =================================================
 
 PresenterCustomSprite::PresenterCustomSprite (
-    const rtl::Reference<PresenterCanvas>& rpCanvas,
+    rtl::Reference<PresenterCanvas> pCanvas,
     const Reference<rendering::XCustomSprite>& rxSprite,
     const Reference<awt::XWindow>& rxBaseWindow)
-    : PresenterCustomSpriteInterfaceBase(m_aMutex),
-      mpCanvas(rpCanvas),
+    : mpCanvas(std::move(pCanvas)),
       mxSprite(rxSprite),
       mxBaseWindow(rxBaseWindow),
       maPosition(0,0)
 {
 }
 
-void SAL_CALL PresenterCustomSprite::disposing()
+void PresenterCustomSprite::disposing(std::unique_lock<std::mutex>&)
 {
     Reference<XComponent> xComponent (mxSprite, UNO_QUERY);
     mxSprite = nullptr;
@@ -779,7 +779,7 @@ Reference<rendering::XCanvas> PresenterCustomSprite::getContentCanvas()
 
 void PresenterCustomSprite::ThrowIfDisposed()
 {
-    if (rBHelper.bDisposed || rBHelper.bInDispose || ! mxSprite.is())
+    if (m_bDisposed || ! mxSprite.is())
     {
         throw lang::DisposedException ("PresenterCustomSprite object has already been disposed",
             static_cast<uno::XWeak*>(this));

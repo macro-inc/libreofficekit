@@ -22,7 +22,9 @@
 #include <sal/config.h>
 
 #include <sal/types.h>
+#include <o3tl/span.hxx>
 #include <tools/stream.hxx>
+#include <utility>
 #include <vcl/metaactiontypes.hxx>
 #include <cppcanvas/renderer.hxx>
 #include <cppcanvas/canvas.hxx>
@@ -136,9 +138,9 @@ namespace cppcanvas::internal
             // public, since some functors need it, too.
             struct MtfAction
             {
-                MtfAction( const std::shared_ptr<Action>&   rAction,
+                MtfAction( std::shared_ptr<Action>  xAction,
                            sal_Int32                nOrigIndex ) :
-                    mpAction( rAction ),
+                    mpAction(std::move( xAction )),
                     mnOrigIndex( nOrigIndex )
                 {
                 }
@@ -192,7 +194,7 @@ namespace cppcanvas::internal
                                    const OUString&                rString,
                                    int                            nIndex,
                                    int                            nLength,
-                                   o3tl::span<const sal_Int32>    pCharWidths,
+                                   KernArraySpan                pCharWidths,
                                    const ActionFactoryParameters& rParms,
                                    bool                           bSubsettable );
 

@@ -26,27 +26,18 @@
 
 #include <com/sun/star/datatransfer/clipboard/XClipboard.hpp>
 #include <com/sun/star/datatransfer/clipboard/XFlushableClipboard.hpp>
-#include <com/sun/star/i18n/WordType.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/diagnose.h>
-#include <svx/AccessibleTextHelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/svapp.hxx>
-#include <vcl/window.hxx>
 #include <vcl/unohelp2.hxx>
 #include <vcl/settings.hxx>
 
 #include <tools/gen.hxx>
-#include <svl/itemset.hxx>
 
 #include <editeng/editobj.hxx>
-#include <editeng/editdata.hxx>
-#include <editeng/editview.hxx>
-#include <editeng/eeitem.hxx>
-#include <editeng/outliner.hxx>
-#include <editeng/unoedhlp.hxx>
 
 
 #include "accessibility.hxx"
@@ -252,13 +243,13 @@ sal_Int32 SAL_CALL SmGraphicAccessible::getBackground()
     return static_cast<sal_Int32>(nCol);
 }
 
-sal_Int32 SAL_CALL SmGraphicAccessible::getAccessibleChildCount()
+sal_Int64 SAL_CALL SmGraphicAccessible::getAccessibleChildCount()
 {
     return 0;
 }
 
 Reference< XAccessible > SAL_CALL SmGraphicAccessible::getAccessibleChild(
-        sal_Int32 /*i*/ )
+        sal_Int64 /*i*/ )
 {
     throw IndexOutOfBoundsException();  // there is no child...
 }
@@ -272,12 +263,12 @@ Reference< XAccessible > SAL_CALL SmGraphicAccessible::getAccessibleParent()
     return pWin->GetDrawingArea()->get_accessible_parent();
 }
 
-sal_Int32 SAL_CALL SmGraphicAccessible::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL SmGraphicAccessible::getAccessibleIndexInParent()
 {
     SolarMutexGuard aGuard;
 
     // -1 for child not found/no parent (according to specification)
-    sal_Int32 nRet = -1;
+    sal_Int64 nRet = -1;
 
     css::uno::Reference<css::accessibility::XAccessible> xParent(getAccessibleParent());
     if (!xParent)
@@ -291,8 +282,8 @@ sal_Int32 SAL_CALL SmGraphicAccessible::getAccessibleIndexInParent()
         //  iterate over parent's children and search for this object
         if (xParentContext.is())
         {
-            sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-            for (sal_Int32 nChild = 0; (nChild < nChildCount) && (-1 == nRet); ++nChild)
+            sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+            for (sal_Int64 nChild = 0; (nChild < nChildCount) && (-1 == nRet); ++nChild)
             {
                 css::uno::Reference<css::accessibility::XAccessible> xChild(
                     xParentContext->getAccessibleChild(nChild));
@@ -329,38 +320,35 @@ OUString SAL_CALL SmGraphicAccessible::getAccessibleName()
 
 Reference< XAccessibleRelationSet > SAL_CALL SmGraphicAccessible::getAccessibleRelationSet()
 {
-    SolarMutexGuard aGuard;
-    Reference< XAccessibleRelationSet > xRelSet = new utl::AccessibleRelationSetHelper();
-    return xRelSet;   // empty relation set
+    return new utl::AccessibleRelationSetHelper(); // empty relation set
 }
 
-Reference< XAccessibleStateSet > SAL_CALL SmGraphicAccessible::getAccessibleStateSet()
+sal_Int64 SAL_CALL SmGraphicAccessible::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet =
-            new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if (!pWin)
-        pStateSet->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
-        pStateSet->AddState( AccessibleStateType::ENABLED );
-        pStateSet->AddState( AccessibleStateType::FOCUSABLE );
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::FOCUSABLE;
         if (pWin->HasFocus())
-            pStateSet->AddState( AccessibleStateType::FOCUSED );
+            nStateSet |= AccessibleStateType::FOCUSED;
         if (pWin->IsActive())
-            pStateSet->AddState( AccessibleStateType::ACTIVE );
+            nStateSet |= AccessibleStateType::ACTIVE;
         if (pWin->IsVisible())
-            pStateSet->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
         if (pWin->IsReallyVisible())
-            pStateSet->AddState( AccessibleStateType::VISIBLE );
+            nStateSet |= AccessibleStateType::VISIBLE;
         weld::DrawingArea* pDrawingArea = pWin->GetDrawingArea();
         OutputDevice& rDevice = pDrawingArea->get_ref_device();
         if (COL_TRANSPARENT != rDevice.GetBackground().GetColor())
-            pStateSet->AddState( AccessibleStateType::OPAQUE );
+            nStateSet |= AccessibleStateType::OPAQUE;
     }
 
-    return pStateSet;
+    return nStateSet;
 }
 
 Locale SAL_CALL SmGraphicAccessible::getLocale()
@@ -485,7 +473,7 @@ awt::Rectangle SAL_CALL SmGraphicAccessible::getCharacterBounds( sal_Int32 nInde
             weld::DrawingArea* pDrawingArea = pWin->GetDrawingArea();
             OutputDevice& rDevice = pDrawingArea->get_ref_device();
 
-            std::vector<sal_Int32> aXAry;
+            KernArray aXAry;
             rDevice.SetFont( pNode->GetFont() );
             rDevice.GetTextArray( aNodeText, &aXAry, 0, aNodeText.getLength() );
             aTLPos.AdjustX(nNodeIndex > 0 ? aXAry[nNodeIndex - 1] : 0 );
@@ -557,7 +545,7 @@ sal_Int32 SAL_CALL SmGraphicAccessible::getIndexAtPoint( const awt::Point& aPoin
 
                 tools::Long nNodeX = pNode->GetLeft();
 
-                std::vector<sal_Int32> aXAry;
+                KernArray aXAry;
                 rDevice.SetFont( pNode->GetFont() );
                 rDevice.GetTextArray( aTxt, &aXAry, 0, aTxt.getLength() );
                 for (sal_Int32 i = 0;  i < aTxt.getLength()  &&  nRes == -1;  ++i)

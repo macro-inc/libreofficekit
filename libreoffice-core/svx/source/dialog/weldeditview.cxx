@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
@@ -26,10 +28,10 @@
 #include <com/sun/star/accessibility/XAccessibleEventBroadcaster.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <comphelper/lok.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <comphelper/lok.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/fhgtitem.hxx>
 #include <editeng/fontitem.hxx>
@@ -45,8 +47,7 @@
 #include <svtools/optionsdrawinglayer.hxx>
 #include <svx/AccessibleTextHelper.hxx>
 #include <svx/weldeditview.hxx>
-#include <tools/diagnose_ex.h>
-#include <unotools/accessiblestatesethelper.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/canvastools.hxx>
 #include <vcl/cursor.hxx>
 #include <vcl/event.hxx>
@@ -160,13 +161,6 @@ void WeldEditView::Resize()
 
 void WeldEditView::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect)
 {
-    const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
-    Color aBgColor = rStyleSettings.GetWindowColor();
-
-    rRenderContext.SetBackground(aBgColor);
-    if (EditView* pEditView = GetEditView())
-        pEditView->SetBackgroundColor(aBgColor);
-
     DoPaint(rRenderContext, rRect);
 }
 
@@ -237,9 +231,9 @@ void WeldEditView::DoPaint(vcl::RenderContext& rRenderContext, const tools::Rect
         sdr::overlay::OverlaySelection aCursorOverlay(sdr::overlay::OverlayType::Transparent,
                                                       aHighlight, std::move(aLogicRanges), true);
 
-        const drawinglayer::geometry::ViewInformation2D aViewInformation2D(
-            basegfx::B2DHomMatrix(), rRenderContext.GetViewTransformation(),
-            vcl::unotools::b2DRectangleFromRectangle(rRect), nullptr, 0.0);
+        drawinglayer::geometry::ViewInformation2D aViewInformation2D;
+        aViewInformation2D.setViewTransformation(rRenderContext.GetViewTransformation());
+        aViewInformation2D.setViewport(vcl::unotools::b2DRectangleFromRectangle(rRect));
 
         std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> xProcessor(
             drawinglayer::processor2d::createProcessor2DFromOutputDevice(rRenderContext,
@@ -672,7 +666,7 @@ public:
     }
 
     // XAccessibleContext
-    virtual sal_Int32 SAL_CALL getAccessibleChildCount() override
+    virtual sal_Int64 SAL_CALL getAccessibleChildCount() override
     {
         if (m_xTextHelper)
             return m_xTextHelper->GetChildCount();
@@ -680,7 +674,7 @@ public:
     }
 
     virtual css::uno::Reference<css::accessibility::XAccessible>
-        SAL_CALL getAccessibleChild(sal_Int32 i) override
+        SAL_CALL getAccessibleChild(sal_Int64 i) override
     {
         if (m_xTextHelper)
             return m_xTextHelper->GetChild(i);
@@ -697,14 +691,14 @@ public:
         return m_pController->GetDrawingArea()->get_accessible_parent();
     }
 
-    virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override
+    virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override
     {
         SolarMutexGuard aGuard;
         if (!m_pController)
             throw css::uno::RuntimeException();
 
         // -1 for child not found/no parent (according to specification)
-        sal_Int32 nRet = -1;
+        sal_Int64 nRet = -1;
 
         css::uno::Reference<css::accessibility::XAccessible> xParent(getAccessibleParent());
         if (!xParent)
@@ -718,8 +712,8 @@ public:
             //  iterate over parent's children and search for this object
             if (xParentContext.is())
             {
-                sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-                for (sal_Int32 nChild = 0; (nChild < nChildCount) && (-1 == nRet); ++nChild)
+                sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+                for (sal_Int64 nChild = 0; (nChild < nChildCount) && (-1 == nRet); ++nChild)
                 {
                     css::uno::Reference<css::accessibility::XAccessible> xChild(
                         xParentContext->getAccessibleChild(nChild));
@@ -779,35 +773,33 @@ public:
         return m_pController->GetDrawingArea()->get_accessible_relation_set();
     }
 
-    virtual css::uno::Reference<css::accessibility::XAccessibleStateSet>
-        SAL_CALL getAccessibleStateSet() override
+    virtual sal_Int64 SAL_CALL getAccessibleStateSet() override
     {
         SolarMutexGuard aGuard;
-        rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet
-            = new ::utl::AccessibleStateSetHelper;
+        sal_Int64 nStateSet = 0;
 
         if (!m_pController || !m_xTextHelper)
-            pStateSet->AddState(css::accessibility::AccessibleStateType::DEFUNC);
+            nStateSet |= css::accessibility::AccessibleStateType::DEFUNC;
         else
         {
-            pStateSet->AddState(css::accessibility::AccessibleStateType::MULTI_LINE);
-            pStateSet->AddState(css::accessibility::AccessibleStateType::ENABLED);
-            pStateSet->AddState(css::accessibility::AccessibleStateType::EDITABLE);
-            pStateSet->AddState(css::accessibility::AccessibleStateType::FOCUSABLE);
-            pStateSet->AddState(css::accessibility::AccessibleStateType::SELECTABLE);
+            nStateSet |= css::accessibility::AccessibleStateType::MULTI_LINE;
+            nStateSet |= css::accessibility::AccessibleStateType::ENABLED;
+            nStateSet |= css::accessibility::AccessibleStateType::EDITABLE;
+            nStateSet |= css::accessibility::AccessibleStateType::FOCUSABLE;
+            nStateSet |= css::accessibility::AccessibleStateType::SELECTABLE;
             if (m_pController->HasFocus())
-                pStateSet->AddState(css::accessibility::AccessibleStateType::FOCUSED);
+                nStateSet |= css::accessibility::AccessibleStateType::FOCUSED;
             if (m_pController->IsActive())
-                pStateSet->AddState(css::accessibility::AccessibleStateType::ACTIVE);
+                nStateSet |= css::accessibility::AccessibleStateType::ACTIVE;
             if (m_pController->IsVisible())
-                pStateSet->AddState(css::accessibility::AccessibleStateType::SHOWING);
+                nStateSet |= css::accessibility::AccessibleStateType::SHOWING;
             if (m_pController->IsReallyVisible())
-                pStateSet->AddState(css::accessibility::AccessibleStateType::VISIBLE);
+                nStateSet |= css::accessibility::AccessibleStateType::VISIBLE;
             if (COL_TRANSPARENT != m_pEditEngine->GetBackgroundColor())
-                pStateSet->AddState(css::accessibility::AccessibleStateType::OPAQUE);
+                nStateSet |= css::accessibility::AccessibleStateType::OPAQUE;
         }
 
-        return pStateSet;
+        return nStateSet;
     }
 
     virtual css::lang::Locale SAL_CALL getLocale() override
@@ -849,18 +841,22 @@ public:
 
 css::uno::Reference<css::accessibility::XAccessible> WeldEditView::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (!m_xAccessible.is())
         m_xAccessible.set(new WeldEditAccessible(this));
+#endif
     return m_xAccessible;
 }
 
 WeldEditView::~WeldEditView()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (m_xAccessible.is())
     {
         m_xAccessible->ClearWin(); // make Accessible nonfunctional
         m_xAccessible.clear();
     }
+#endif
 }
 
 bool WeldViewForwarder::IsValid() const { return m_rEditAcc.GetEditView() != nullptr; }
@@ -1187,7 +1183,7 @@ SfxItemState WeldTextForwarder::GetItemState(sal_Int32 nPara, sal_uInt16 nWhich)
 LanguageType WeldTextForwarder::GetLanguage(sal_Int32 nPara, sal_Int32 nIndex) const
 {
     EditEngine* pEditEngine = m_rEditAcc.GetEditEngine();
-    return pEditEngine ? pEditEngine->GetLanguage(nPara, nIndex) : LANGUAGE_NONE;
+    return pEditEngine ? pEditEngine->GetLanguage(nPara, nIndex).nLang : LANGUAGE_NONE;
 }
 
 sal_Int32 WeldTextForwarder::GetFieldCount(sal_Int32 nPara) const
@@ -1551,11 +1547,9 @@ void WeldEditView::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     rDevice.SetBackground(aBgColor);
 
     Size aOutputSize(rDevice.PixelToLogic(aSize));
-    aSize = aOutputSize;
-    aSize.setHeight(aSize.Height());
 
     makeEditEngine();
-    m_xEditEngine->SetPaperSize(aSize);
+    m_xEditEngine->SetPaperSize(aOutputSize);
     m_xEditEngine->SetRefDevice(&rDevice);
 
     m_xEditEngine->SetControlWord(m_xEditEngine->GetControlWord() | EEControlBits::MARKFIELDS);
@@ -1565,18 +1559,23 @@ void WeldEditView::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     m_xEditView->SetOutputArea(tools::Rectangle(Point(0, 0), aOutputSize));
 
     m_xEditView->SetBackgroundColor(aBgColor);
+    m_xEditEngine->SetBackgroundColor(aBgColor);
     m_xEditEngine->InsertView(m_xEditView.get());
 
     pDrawingArea->set_cursor(PointerStyle::Text);
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     InitAccessible();
+#endif
 }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 void WeldEditView::InitAccessible()
 {
     if (m_xAccessible.is())
         m_xAccessible->Init(GetEditEngine(), GetEditView());
 }
+#endif
 
 int WeldEditView::GetSurroundingText(OUString& rSurrounding)
 {
@@ -1606,6 +1605,7 @@ void WeldEditView::GetFocus()
 
     weld::CustomWidgetController::GetFocus();
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (m_xAccessible.is())
     {
         // Note: will implicitly send the AccessibleStateType::FOCUSED event
@@ -1613,6 +1613,7 @@ void WeldEditView::GetFocus()
         if (pHelper)
             pHelper->SetFocus();
     }
+#endif
 }
 
 void WeldEditView::LoseFocus()
@@ -1620,6 +1621,7 @@ void WeldEditView::LoseFocus()
     weld::CustomWidgetController::LoseFocus();
     Invalidate(); // redraw without cursor
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (m_xAccessible.is())
     {
         // Note: will implicitly send the AccessibleStateType::FOCUSED event
@@ -1627,6 +1629,7 @@ void WeldEditView::LoseFocus()
         if (pHelper)
             pHelper->SetFocus(false);
     }
+#endif
 }
 
 bool WeldEditView::CanFocus() const { return true; }

@@ -10,7 +10,7 @@
 
 $(eval $(call gb_Library_Library,ucpfile1))
 
-$(eval $(call gb_Library_set_componentfile,ucpfile1,ucb/source/ucp/file/ucpfile1))
+$(eval $(call gb_Library_set_componentfile,ucpfile1,ucb/source/ucp/file/ucpfile1,services))
 
 $(eval $(call gb_Library_use_external,ucpfile1,boost_headers))
 
@@ -23,6 +23,7 @@ $(eval $(call gb_Library_use_libraries,ucpfile1,\
 	sal \
 	tl \
 	ucbhelper \
+	utl \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,ucpfile1,\

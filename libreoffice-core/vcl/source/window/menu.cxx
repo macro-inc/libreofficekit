@@ -17,10 +17,11 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <comphelper/lok.hxx>
+#include <vcl/dialoghelper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/mnemonic.hxx>
 #include <vcl/image.hxx>
@@ -135,8 +136,8 @@ void lclDrawMoreIndicator(vcl::RenderContext& rRenderContext, const tools::Recta
 
     tools::Long heightOrig = height;
 
-    tools::Long x = rRect.Left() + (rRect.getWidth() - width)/2 + 1;
-    tools::Long y = rRect.Top() + (rRect.getHeight() - height)/2 + 1;
+    tools::Long x = rRect.Left() + (rRect.getOpenWidth() - width)/2 + 1;
+    tools::Long y = rRect.Top() + (rRect.getOpenHeight() - height)/2 + 1;
     while( height >= 1)
     {
         rRenderContext.DrawRect( tools::Rectangle( x, y, x + linewidth, y ) );
@@ -467,28 +468,6 @@ void Menu::InsertItem(sal_uInt16 nItemId, const OUString& rStr,
     InsertItem(nItemId, rStr, nItemBits, rIdent, nPos);
     SetItemImage( nItemId, rImage );
 }
-
-void Menu::InsertItem(const OUString& rCommand, const css::uno::Reference<css::frame::XFrame>& rFrame)
-{
-    sal_uInt16 nItemId = GetItemCount() + 1;
-
-    if (rFrame.is())
-    {
-        OUString aModuleName(vcl::CommandInfoProvider::GetModuleIdentifier(rFrame));
-        auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(rCommand, aModuleName);
-        OUString aLabel(CommandInfoProvider::GetPopupLabelForCommand(aProperties));
-        OUString aTooltip(CommandInfoProvider::GetTooltipForCommand(rCommand, aProperties, rFrame));
-        Image aImage(CommandInfoProvider::GetImageForCommand(rCommand, rFrame));
-
-        InsertItem(nItemId, aLabel, aImage);
-        SetHelpText(nItemId, aTooltip);
-    }
-    else
-        InsertItem(nItemId, OUString());
-
-    SetItemCommand(nItemId, rCommand);
-}
-
 
 void Menu::InsertSeparator(const OString &rIdent, sal_uInt16 nPos)
 {
@@ -1352,8 +1331,8 @@ Size Menu::ImplGetNativeCheckAndRadioSize(vcl::RenderContext const & rRenderCont
                                               aCtrlRegion, ControlState::ENABLED, aVal,
                                               aNativeBounds, aNativeContent))
             {
-                rCheckHeight = aNativeBounds.GetHeight();
-                nCheckWidth = aNativeContent.GetWidth();
+                rCheckHeight = aNativeBounds.GetHeight() - 1;
+                nCheckWidth = aNativeContent.GetWidth() - 1;
             }
         }
         if (rRenderContext.IsNativeControlSupported(ControlType::MenuPopup, ControlPart::MenuItemRadioMark))
@@ -1362,8 +1341,8 @@ Size Menu::ImplGetNativeCheckAndRadioSize(vcl::RenderContext const & rRenderCont
                                                       aCtrlRegion, ControlState::ENABLED, aVal,
                                                       aNativeBounds, aNativeContent))
             {
-                rRadioHeight = aNativeBounds.GetHeight();
-                nRadioWidth = aNativeContent.GetWidth();
+                rRadioHeight = aNativeBounds.GetHeight() - 1;
+                nRadioWidth = aNativeContent.GetWidth() - 1;
             }
         }
     }
@@ -1431,11 +1410,11 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
 
     tools::Long nMinMenuItemHeight = nFontHeight;
     tools::Long nCheckHeight = 0, nRadioHeight = 0;
-    Size aMaxSize = ImplGetNativeCheckAndRadioSize(*pWin->GetOutDev(), nCheckHeight, nRadioHeight); // FIXME
-    if( aMaxSize.Height() > nMinMenuItemHeight )
-        nMinMenuItemHeight = aMaxSize.Height();
+    Size aMarkSize = ImplGetNativeCheckAndRadioSize(*pWin->GetOutDev(), nCheckHeight, nRadioHeight);
+    if( aMarkSize.Height() > nMinMenuItemHeight )
+        nMinMenuItemHeight = aMarkSize.Height();
 
-    Size aMaxImgSz;
+    tools::Long aMaxImgWidth = 0;
 
     const StyleSettings& rSettings = pWin->GetSettings().GetStyleSettings();
     if ( rSettings.GetUseImagesInMenus() )
@@ -1452,8 +1431,8 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
                )
             {
                 Size aImgSz = pData->aImage.GetSizePixel();
-                if ( aImgSz.Height() > aMaxImgSz.Height() )
-                    aMaxImgSz.setHeight( aImgSz.Height() );
+                if ( aImgSz.Width() > aMaxImgWidth )
+                    aMaxImgWidth = aImgSz.Width();
                 if ( aImgSz.Height() > nMinMenuItemHeight )
                     nMinMenuItemHeight = aImgSz.Height();
                 break;
@@ -1462,7 +1441,6 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
     }
 
     Size aSz;
-    tools::Long nCheckWidth = 0;
     tools::Long nMaxWidth = 0;
 
     for ( size_t n = pItemList->size(); n; )
@@ -1485,25 +1463,23 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
             // Image:
             if (!IsMenuBar() && ((pData->eType == MenuItemType::IMAGE) || (pData->eType == MenuItemType::STRINGIMAGE)))
             {
-                Size aImgSz = pData->aImage.GetSizePixel();
+                tools::Long aImgHeight = pData->aImage.GetSizePixel().Height();
 
-                aImgSz.AdjustHeight(4 ); // add a border for native marks
-                aImgSz.AdjustWidth(4 ); // add a border for native marks
-                if ( aImgSz.Width() > aMaxImgSz.Width() )
-                    aMaxImgSz.setWidth( aImgSz.Width() );
-                if ( aImgSz.Height() > aMaxImgSz.Height() )
-                    aMaxImgSz.setHeight( aImgSz.Height() );
-                if ( aImgSz.Height() > pData->aSz.Height() )
-                    pData->aSz.setHeight( aImgSz.Height() );
+                aImgHeight += 4; // add a border for native marks
+                if (aImgHeight > pData->aSz.Height())
+                    pData->aSz.setHeight(aImgHeight);
             }
 
             // Check Buttons:
             if (!IsMenuBar() && pData->HasCheck())
             {
-                nCheckWidth = aMaxSize.Width();
                 // checks / images take the same place
                 if( ( pData->eType != MenuItemType::IMAGE ) && ( pData->eType != MenuItemType::STRINGIMAGE ) )
-                    nWidth += nCheckWidth + nExtra * 2;
+                {
+                    nWidth += aMarkSize.Width() + nExtra * 2;
+                    if (aMarkSize.Height() > pData->aSz.Height())
+                        pData->aSz.setHeight(aMarkSize.Height());
+                }
             }
 
             // Text:
@@ -1511,7 +1487,7 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
             {
                 const SalLayoutGlyphs* pGlyphs = pData->GetTextGlyphs(pWin->GetOutDev());
                 tools::Long nTextWidth = pWin->GetOutDev()->GetCtrlTextWidth(pData->aText, pGlyphs);
-                tools::Long nTextHeight = pWin->GetTextHeight();
+                tools::Long nTextHeight = pWin->GetTextHeight() + EXTRAITEMHEIGHT;
 
                 if (IsMenuBar())
                 {
@@ -1544,8 +1520,6 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
 
                 pData->aSz.setHeight( std::max( std::max( nFontHeight, pData->aSz.Height() ), nMinMenuItemHeight ) );
             }
-
-            pData->aSz.AdjustHeight(EXTRAITEMHEIGHT ); // little bit more distance
 
             if (!IsMenuBar())
                 aSz.AdjustHeight(pData->aSz.Height() );
@@ -1585,7 +1559,7 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
         // except on rather small screens
         // TODO: move GetScreenNumber from SystemWindow to Window ?
         // currently we rely on internal privileges
-        unsigned int nDisplayScreen = pWin->ImplGetWindowImpl()->mpFrame->maGeometry.nDisplayScreenNumber;
+        unsigned int nDisplayScreen = pWin->ImplGetWindowImpl()->mpFrame->maGeometry.screen();
         tools::Rectangle aDispRect( Application::GetScreenPosSizePixel( nDisplayScreen ) );
         tools::Long nScreenWidth = aDispRect.GetWidth() >= 800 ? aDispRect.GetWidth() : 800;
         if( nMaxWidth > nScreenWidth/2 )
@@ -1594,11 +1568,11 @@ Size Menu::ImplCalcSize( vcl::Window* pWin )
         sal_uInt16 gfxExtra = static_cast<sal_uInt16>(std::max( nExtra, tools::Long(7) )); // #107710# increase space between checkmarks/images/text
         nImgOrChkPos = static_cast<sal_uInt16>(nExtra);
         tools::Long nImgOrChkWidth = 0;
-        if( aMaxSize.Height() > 0 ) // NWF case
-            nImgOrChkWidth = aMaxSize.Height() + nExtra;
+        if( aMarkSize.Height() > 0 ) // NWF case
+            nImgOrChkWidth = aMarkSize.Height() + nExtra;
         else // non NWF case
             nImgOrChkWidth = nFontHeight/2 + gfxExtra;
-        nImgOrChkWidth = std::max( nImgOrChkWidth, aMaxImgSz.Width() + gfxExtra );
+        nImgOrChkWidth = std::max( nImgOrChkWidth, aMaxImgWidth + gfxExtra );
         nTextPos = static_cast<sal_uInt16>(nImgOrChkPos + nImgOrChkWidth);
         nTextPos = nTextPos + gfxExtra;
 
@@ -1653,9 +1627,11 @@ static void ImplPaintCheckBackground(vcl::RenderContext & rRenderContext, vcl::W
     {
         ImplControlValue    aControlValue;
         aControlValue.setTristateVal(ButtonValue::On);
+        tools::Rectangle r = i_rRect;
+        r.AdjustBottom(1);
 
         bNativeOk = rRenderContext.DrawNativeControl(ControlType::Toolbar, ControlPart::Button,
-                                                     i_rRect,
+                                                     r,
                                                      ControlState::PRESSED | ControlState::ENABLED,
                                                      aControlValue,
                                                      OUString());
@@ -1672,7 +1648,7 @@ static void ImplPaintCheckBackground(vcl::RenderContext & rRenderContext, vcl::W
 static OUString getShortenedString( const OUString& i_rLong, vcl::RenderContext const & rRenderContext, tools::Long i_nMaxWidth )
 {
     sal_Int32 nPos = -1;
-    OUString aNonMnem(OutputDevice::GetNonMnemonicString(i_rLong, nPos));
+    OUString aNonMnem(removeMnemonicFromString(i_rLong, nPos));
     aNonMnem = rRenderContext.GetEllipsisString( aNonMnem, i_nMaxWidth, DrawTextFlags::CenterEllipsis);
     // re-insert mnemonic
     if (nPos != -1)
@@ -1703,7 +1679,7 @@ void Menu::ImplPaintMenuTitle(vcl::RenderContext& rRenderContext, const tools::R
     tools::Rectangle aBgRect(rRect);
     int nOuterSpaceX = ImplGetSVData()->maNWFData.mnMenuFormatBorderX;
     aBgRect.Move(SPACE_AROUND_TITLE, SPACE_AROUND_TITLE);
-    aBgRect.setWidth(aBgRect.getWidth() - 2 * SPACE_AROUND_TITLE - 2 * nOuterSpaceX);
+    aBgRect.setWidth(aBgRect.getOpenWidth() - 2 * SPACE_AROUND_TITLE - 2 * nOuterSpaceX);
     aBgRect.setHeight(nTitleHeight - 2 * SPACE_AROUND_TITLE);
     rRenderContext.DrawRect(aBgRect);
 
@@ -1711,7 +1687,7 @@ void Menu::ImplPaintMenuTitle(vcl::RenderContext& rRenderContext, const tools::R
     Point aTextTopLeft(aBgRect.TopLeft());
     tools::Rectangle aTextBoundRect;
     rRenderContext.GetTextBoundRect( aTextBoundRect, aTitleText );
-    aTextTopLeft.AdjustX((aBgRect.getWidth() - aTextBoundRect.GetSize().Width()) / 2 );
+    aTextTopLeft.AdjustX((aBgRect.getOpenWidth() - aTextBoundRect.GetSize().Width()) / 2 );
     aTextTopLeft.AdjustY((aBgRect.GetHeight() - aTextBoundRect.GetSize().Height()) / 2
                         - aTextBoundRect.Top() );
     rRenderContext.DrawText(aTextTopLeft, aTitleText, 0, aTitleText.getLength());
@@ -1845,10 +1821,6 @@ void Menu::ImplPaint(vcl::RenderContext& rRenderContext, Size const & rSize,
 
                 tools::Rectangle aOuterCheckRect(Point(aPos.X()+nImgOrChkPos, aPos.Y()),
                                           Size(pData->aSz.Height(), pData->aSz.Height()));
-                aOuterCheckRect.AdjustLeft(1 );
-                aOuterCheckRect.AdjustRight( -1 );
-                aOuterCheckRect.AdjustTop(1 );
-                aOuterCheckRect.AdjustBottom( -1 );
 
                 // CheckMark
                 if (!bLayout && !IsMenuBar() && pData->HasCheck())
@@ -2167,7 +2139,7 @@ Menu* Menu::ImplFindMenu( sal_uInt16 nItemId )
     return pSelMenu;
 }
 
-void Menu::RemoveDisabledEntries( bool bCheckPopups, bool bRemoveEmptyPopups )
+void Menu::RemoveDisabledEntries( bool bRemoveEmptyPopups )
 {
     for ( sal_uInt16 n = 0; n < GetItemCount(); n++ )
     {
@@ -2181,7 +2153,7 @@ void Menu::RemoveDisabledEntries( bool bCheckPopups, bool bRemoveEmptyPopups )
         else
             bRemove = !pItem->bEnabled;
 
-        if ( bCheckPopups && pItem->pSubMenu )
+        if ( pItem->pSubMenu )
         {
             pItem->pSubMenu->RemoveDisabledEntries();
             if ( bRemoveEmptyPopups && !pItem->pSubMenu->GetItemCount() )
@@ -2501,6 +2473,9 @@ void MenuBar::ImplDestroy( MenuBar* pMenu, bool bDelete )
         pWindow->disposeOnce();
     }
     pMenu->pWindow = nullptr;
+    if (pMenu->mpSalMenu) {
+        pMenu->mpSalMenu->ShowMenuBar(false);
+    }
 }
 
 bool MenuBar::ImplHandleKeyEvent( const KeyEvent& rKEvent )
@@ -2629,13 +2604,13 @@ bool Menu::HandleMenuCommandEvent( Menu *pMenu, sal_uInt16 nCommandEventId ) con
         return false;
 }
 
-sal_uInt16 MenuBar::AddMenuBarButton( const Image& i_rImage, const Link<MenuBar::MenuBarButtonCallbackArg&,bool>& i_rLink, const OUString& i_rToolTip )
+sal_uInt16 MenuBar::AddMenuBarButton( const Image& i_rImage, const Link<MenuBarButtonCallbackArg&,bool>& i_rLink, const OUString& i_rToolTip )
 {
     MenuBarWindow* pMenuWin = getMenuBarWindow();
     return pMenuWin ? pMenuWin->AddMenuBarButton(i_rImage, i_rLink, i_rToolTip) : 0;
 }
 
-void MenuBar::SetMenuBarButtonHighlightHdl( sal_uInt16 nId, const Link<MenuBar::MenuBarButtonCallbackArg&,bool>& rLink )
+void MenuBar::SetMenuBarButtonHighlightHdl( sal_uInt16 nId, const Link<MenuBarButtonCallbackArg&,bool>& rLink )
 {
     MenuBarWindow* pMenuWin = getMenuBarWindow();
     if (!pMenuWin)
@@ -2708,9 +2683,12 @@ void PopupMenu::ClosePopup(Menu* pMenu)
         p->KillActivePopup(pPopup);
 }
 
-bool PopupMenu::IsInExecute()
+namespace vcl
 {
-    return GetActivePopupMenu() != nullptr;
+    bool IsInPopupMenuExecute()
+    {
+        return PopupMenu::GetActivePopupMenu() != nullptr;
+    }
 }
 
 PopupMenu* PopupMenu::GetActivePopupMenu()
@@ -2767,10 +2745,8 @@ sal_uInt16 PopupMenu::Execute( vcl::Window* pExecWindow, const Point& rPopupPos 
     return Execute( pExecWindow, tools::Rectangle( rPopupPos, rPopupPos ), PopupMenuFlags::ExecuteDown );
 }
 
-sal_uInt16 PopupMenu::Execute( vcl::Window* pExecWindow, const tools::Rectangle& rRect, PopupMenuFlags nFlags )
+static FloatWinPopupFlags lcl_TranslateFlags(PopupMenuFlags nFlags)
 {
-    ENSURE_OR_RETURN( pExecWindow, "PopupMenu::Execute: need a non-NULL window!", 0 );
-
     FloatWinPopupFlags nPopupModeFlags = FloatWinPopupFlags::NONE;
     if ( nFlags & PopupMenuFlags::ExecuteDown )
         nPopupModeFlags = FloatWinPopupFlags::Down;
@@ -2784,7 +2760,13 @@ sal_uInt16 PopupMenu::Execute( vcl::Window* pExecWindow, const tools::Rectangle&
     if (nFlags & PopupMenuFlags::NoMouseUpClose )                      // allow popup menus to stay open on mouse button up
         nPopupModeFlags |= FloatWinPopupFlags::NoMouseUpClose;    // useful if the menu was opened on mousebutton down (eg toolbox configuration)
 
-    return ImplExecute( pExecWindow, rRect, nPopupModeFlags, nullptr, false );
+    return nPopupModeFlags;
+}
+
+sal_uInt16 PopupMenu::Execute( vcl::Window* pExecWindow, const tools::Rectangle& rRect, PopupMenuFlags nFlags )
+{
+    ENSURE_OR_RETURN( pExecWindow, "PopupMenu::Execute: need a non-NULL window!", 0 );
+    return ImplExecute( pExecWindow, rRect, lcl_TranslateFlags(nFlags), nullptr, false );
 }
 
 void PopupMenu::ImplFlushPendingSelect()
@@ -2800,10 +2782,14 @@ void PopupMenu::ImplFlushPendingSelect()
     }
 }
 
-sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::Rectangle& rRect, FloatWinPopupFlags nPopupModeFlags, Menu* pSFrom, bool bPreSelectFirst )
+bool PopupMenu::PrepareRun(const VclPtr<vcl::Window>& pParentWin, tools::Rectangle& rRect,
+                           FloatWinPopupFlags& nPopupModeFlags, Menu* pSFrom,
+                           bool& bRealExecute, VclPtr<MenuFloatingWindow>& pWin)
 {
-    if ( !pSFrom && ( PopupMenu::IsInExecute() || !GetItemCount() ) )
-        return 0;
+    bRealExecute = false;
+    const sal_uInt16 nItemCount = GetItemCount();
+    if (!pSFrom && (vcl::IsInPopupMenuExecute() || !nItemCount))
+        return false;
 
     mpLayoutData.reset();
 
@@ -2815,7 +2801,6 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
     bCanceled = false;
 
     VclPtr<vcl::Window> xFocusId;
-    bool bRealExecute = false;
     if ( !pStartedFrom )
     {
         pSVData->mpWinData->mbNoDeactivate = true;
@@ -2831,25 +2816,24 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
     }
 
     SAL_WARN_IF( ImplGetWindow(), "vcl", "Win?!" );
-    tools::Rectangle aRect( rRect );
-    aRect.SetPos( pW->OutputToScreenPixel( aRect.TopLeft() ) );
+    rRect.SetPos(pParentWin->OutputToScreenPixel(rRect.TopLeft()));
 
+    nPopupModeFlags |= FloatWinPopupFlags::NoKeyClose | FloatWinPopupFlags::AllMouseButtonClose | FloatWinPopupFlags::GrabFocus;
     if (bRealExecute)
         nPopupModeFlags |= FloatWinPopupFlags::NewLevel;
-    nPopupModeFlags |= FloatWinPopupFlags::NoKeyClose | FloatWinPopupFlags::AllMouseButtonClose;
 
     bInCallback = true; // set it here, if Activate overridden
     Activate();
     bInCallback = false;
 
-    if ( pW->isDisposed() )
-        return 0;   // Error
+    if (pParentWin->isDisposed())
+        return false;
 
     if ( bCanceled || bKilled )
-        return 0;
+        return false;
 
-    if ( !GetItemCount() )
-        return 0;
+    if (!nItemCount)
+        return false;
 
     // The flag MenuFlags::HideDisabledEntries is inherited.
     if ( pSFrom )
@@ -2879,10 +2863,10 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
         ImplCallEventListeners(VclEventId::MenuSubmenuChanged, nPos);
     }
 
-    VclPtrInstance<MenuFloatingWindow> pWin( this, pW, WB_BORDER | WB_SYSTEMWINDOW );
+    pWin = VclPtrInstance<MenuFloatingWindow>(this, pParentWin, WB_BORDER | WB_SYSTEMWINDOW);
     if (comphelper::LibreOfficeKit::isActive() && get_id() == "editviewspellmenu")
     {
-        VclPtr<vcl::Window> xNotifierParent = pW->GetParentWithLOKNotifier();
+        VclPtr<vcl::Window> xNotifierParent = pParentWin->GetParentWithLOKNotifier();
         assert(xNotifierParent && xNotifierParent->GetLOKNotifier() && "editview menu without LOKNotifier");
         pWin->SetLOKNotifier(xNotifierParent->GetLOKNotifier());
     }
@@ -2901,9 +2885,9 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
         vcl::Window* pDeskW = pWindow->GetWindow( GetWindowType::RealParent );
         if( ! pDeskW )
             pDeskW = pWindow;
-        Point aDesktopTL( pDeskW->OutputToAbsoluteScreenPixel( aRect.TopLeft() ) );
+        Point aDesktopTL(pDeskW->OutputToAbsoluteScreenPixel(rRect.TopLeft()));
         aDesktopRect = Application::GetScreenPosSizePixel(
-            Application::GetBestScreen( tools::Rectangle( aDesktopTL, aRect.GetSize() ) ));
+            Application::GetBestScreen(tools::Rectangle(aDesktopTL, rRect.GetSize())));
     }
 
     tools::Long nMaxHeight = aDesktopRect.GetHeight();
@@ -2918,8 +2902,8 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
         if ( pRef->GetParent() )
             pRef = pRef->GetParent();
 
-        tools::Rectangle devRect(  pRef->OutputToAbsoluteScreenPixel( aRect.TopLeft() ),
-                            pRef->OutputToAbsoluteScreenPixel( aRect.BottomRight() ) );
+        tools::Rectangle devRect(pRef->OutputToAbsoluteScreenPixel(rRect.TopLeft()),
+                                 pRef->OutputToAbsoluteScreenPixel(rRect.BottomRight()));
 
         tools::Long nHeightAbove = devRect.Top() - aDesktopRect.Top();
         tools::Long nHeightBelow = aDesktopRect.Bottom() - devRect.Bottom();
@@ -2934,7 +2918,7 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
     nMaxHeight = std::max(nMaxHeight, tools::Long(768));
 
     if (pStartedFrom && pStartedFrom->IsMenuBar())
-        nMaxHeight -= pW->GetSizePixel().Height();
+        nMaxHeight -= pParentWin->GetSizePixel().Height();
     sal_Int32 nLeft, nTop, nRight, nBottom;
     pWindow->GetBorder( nLeft, nTop, nRight, nBottom );
     nMaxHeight -= nTop+nBottom;
@@ -2946,43 +2930,34 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
         aSz.setHeight( ImplCalcHeight( nEntries ) );
     }
 
-    // tdf#126054 hold this until after function completes
-    VclPtr<PopupMenu> xThis(this);
-
     pWin->SetFocusId( xFocusId );
     pWin->SetOutputSizePixel( aSz );
-    if ( GetItemCount() )
-    {
-        SalMenu* pMenu = ImplGetSalMenu();
-        if( pMenu && bRealExecute && pMenu->ShowNativePopupMenu( pWin, aRect, nPopupModeFlags | FloatWinPopupFlags::GrabFocus ) )
-        {
-            pWin->StopExecute();
-            pWin->doShutdown();
-            pWindow.disposeAndClear();
-            ImplClosePopupToolBox(pW);
-            ImplFlushPendingSelect();
-            return nSelectedId;
-        }
-        else
-        {
-            pWin->StartPopupMode( aRect, nPopupModeFlags | FloatWinPopupFlags::GrabFocus );
-        }
-        if( pSFrom )
-        {
-            sal_uInt16 aPos;
-            if (pSFrom->IsMenuBar())
-                aPos = static_cast<MenuBarWindow *>(pSFrom->pWindow.get())->GetHighlightedItem();
-            else
-                aPos = static_cast<MenuFloatingWindow *>(pSFrom->pWindow.get())->GetHighlightedItem();
+    return true;
+}
 
-            pWin->SetPosInParent( aPos );  // store position to be sent in SUBMENUDEACTIVATE
-            pSFrom->ImplCallEventListeners( VclEventId::MenuSubmenuActivate, aPos );
-        }
+bool PopupMenu::Run(const VclPtr<MenuFloatingWindow>& pWin, const bool bRealExecute, const bool bPreSelectFirst,
+                    const FloatWinPopupFlags nPopupModeFlags, Menu* pSFrom, const tools::Rectangle& rRect)
+{
+    SalMenu* pMenu = ImplGetSalMenu();
+    if (pMenu && bRealExecute && pMenu->ShowNativePopupMenu(pWin, rRect, nPopupModeFlags))
+        return true;
+
+    pWin->StartPopupMode(rRect, nPopupModeFlags);
+    if (pSFrom)
+    {
+        sal_uInt16 aPos;
+        if (pSFrom->IsMenuBar())
+            aPos = static_cast<MenuBarWindow *>(pSFrom->pWindow.get())->GetHighlightedItem();
+        else
+            aPos = static_cast<MenuFloatingWindow *>(pSFrom->pWindow.get())->GetHighlightedItem();
+
+        pWin->SetPosInParent(aPos);  // store position to be sent in SUBMENUDEACTIVATE
+        pSFrom->ImplCallEventListeners(VclEventId::MenuSubmenuActivate, aPos);
     }
+
     if ( bPreSelectFirst )
     {
-        size_t nCount = pItemList->size();
-        for ( size_t n = 0; n < nCount; n++ )
+        for (size_t n = 0; n < static_cast<size_t>(GetItemCount()); n++)
         {
             MenuItemData* pData = pItemList->GetDataFromPos( n );
             if (  (  pData->bEnabled
@@ -2993,22 +2968,30 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
                && ImplIsSelectable( n )
                )
             {
-                pWin->ChangeHighlightItem( n, false );
+                pWin->ChangeHighlightItem(n, false);
                 break;
             }
         }
     }
-    if ( bRealExecute )
-    {
-        pWin->Execute();
-        if (pWin->isDisposed())
-            return 0;
 
-        xFocusId = pWin->GetFocusId();
+    if (bRealExecute)
+        pWin->Execute();
+
+    return false;
+}
+
+void PopupMenu::FinishRun(const VclPtr<MenuFloatingWindow>& pWin, const VclPtr<vcl::Window>& pParentWin, const bool bRealExecute, const bool bIsNativeMenu)
+{
+    if (!bRealExecute || pWin->isDisposed())
+        return;
+
+    if (!bIsNativeMenu)
+    {
+        VclPtr<vcl::Window> xFocusId = pWin->GetFocusId();
         assert(xFocusId == nullptr && "Focus should already be restored by MenuFloatingWindow::End");
         pWin->ImplEndPopupMode(FloatWinPopupEndFlags::NONE, xFocusId);
 
-        if ( nSelectedId )  // then clean up .. ( otherwise done by TH )
+        if (nSelectedId)  // then clean up .. ( otherwise done by TH )
         {
             PopupMenu* pSub = pWin->GetActivePopup();
             while ( pSub )
@@ -3017,13 +3000,29 @@ sal_uInt16 PopupMenu::ImplExecute( const VclPtr<vcl::Window>& pW, const tools::R
                 pSub = pSub->ImplGetFloatingWindow()->GetActivePopup();
             }
         }
-        pWin->doShutdown();
-        pWindow.disposeAndClear();
-        ImplClosePopupToolBox(pW);
-        ImplFlushPendingSelect();
     }
+    else
+        pWin->StopExecute();
 
-    return bRealExecute ? nSelectedId : 0;
+    pWin->doShutdown();
+    pWindow.disposeAndClear();
+    ImplClosePopupToolBox(pParentWin);
+    ImplFlushPendingSelect();
+}
+
+sal_uInt16 PopupMenu::ImplExecute(const VclPtr<vcl::Window>& pParentWin, const tools::Rectangle& rRect,
+                                  FloatWinPopupFlags nPopupModeFlags, Menu* pSFrom, bool bPreSelectFirst)
+{
+    // tdf#126054 hold this until after function completes
+    VclPtr<PopupMenu> xThis(this);
+    bool bRealExecute = false;
+    tools::Rectangle aRect(rRect);
+    VclPtr<MenuFloatingWindow> pWin;
+    if (!PrepareRun(pParentWin, aRect, nPopupModeFlags, pSFrom, bRealExecute, pWin))
+        return 0;
+    const bool bNative = Run(pWin, bRealExecute, bPreSelectFirst, nPopupModeFlags, pSFrom, aRect);
+    FinishRun(pWin, pParentWin, bRealExecute, bNative);
+    return nSelectedId;
 }
 
 sal_uInt16 PopupMenu::ImplCalcVisEntries( tools::Long nMaxHeight, sal_uInt16 nStartEntry, sal_uInt16* pLastVisible ) const

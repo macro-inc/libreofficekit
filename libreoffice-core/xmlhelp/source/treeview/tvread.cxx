@@ -22,6 +22,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <tvread.hxx>
 #include <expat.h>
@@ -39,6 +40,7 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <unotools/pathoptions.hxx>
 #include <memory>
+#include <utility>
 
 namespace treeview {
 
@@ -500,8 +502,8 @@ TVChildTarget::SearchAndInsert(std::unique_ptr<TVDom> p, TVDom* tvDom)
 Any SAL_CALL
 TVChildTarget::getByName( const OUString& aName )
 {
-    OUString num( aName.copy( 2, aName.getLength()-4 ) );
-    sal_Int32 idx = num.toInt32() - 1;
+    std::u16string_view num( aName.subView( 2, aName.getLength()-4 ) );
+    sal_Int32 idx = o3tl::toInt32(num) - 1;
     if( idx < 0 || Elements.size() <= o3tl::make_unsigned( idx ) )
         throw NoSuchElementException();
 
@@ -523,8 +525,8 @@ TVChildTarget::getElementNames( )
 sal_Bool SAL_CALL
 TVChildTarget::hasByName( const OUString& aName )
 {
-    OUString num( aName.copy( 2, aName.getLength()-4 ) );
-    sal_Int32 idx = num.toInt32() - 1;
+    std::u16string_view num( aName.subView( 2, aName.getLength()-4 ) );
+    sal_Int32 idx = o3tl::toInt32(num) - 1;
     if( idx < 0 || Elements.size() <= o3tl::make_unsigned( idx ) )
         return false;
 
@@ -540,8 +542,8 @@ TVChildTarget::getByHierarchicalName( const OUString& aName )
 
     if( ( idx = aName.indexOf( '/' ) ) != -1 )
     {
-        OUString num( aName.copy( 2, idx-4 ) );
-        sal_Int32 pref = num.toInt32() - 1;
+        std::u16string_view num( aName.subView( 2, idx-4 ) );
+        sal_Int32 pref = o3tl::toInt32(num) - 1;
 
         if( pref < 0 || Elements.size() <= o3tl::make_unsigned( pref ) )
             throw NoSuchElementException();
@@ -559,8 +561,8 @@ TVChildTarget::hasByHierarchicalName( const OUString& aName )
 
     if( ( idx = aName.indexOf( '/' ) ) != -1 )
     {
-        OUString num( aName.copy( 2, idx-4 ) );
-        sal_Int32 pref = num.toInt32() - 1;
+        std::u16string_view num( aName.subView( 2, idx-4 ) );
+        sal_Int32 pref = o3tl::toInt32(num) - 1;
         if( pref < 0 || Elements.size() <= o3tl::make_unsigned( pref ) )
             return false;
 
@@ -761,7 +763,7 @@ TVChildTarget::getHierAccess( const Reference< XMultiServiceFactory >& sProvider
         {
             xHierAccess =
                 Reference< XHierarchicalNameAccess >
-                ( sProvider->createInstanceWithArguments( "com.sun.star.configuration.ConfigurationAccess", { makeAny(OUString::createFromAscii(file)) }),
+                ( sProvider->createInstanceWithArguments( "com.sun.star.configuration.ConfigurationAccess", { Any(OUString::createFromAscii(file)) }),
                   UNO_QUERY );
         }
         catch( const css::uno::Exception& )
@@ -825,9 +827,9 @@ void TVChildTarget::subst( OUString& instpath )
 
 const char aHelpMediaType[] = "application/vnd.sun.star.help";
 
-TreeFileIterator::TreeFileIterator( const OUString& aLanguage )
+TreeFileIterator::TreeFileIterator( OUString aLanguage )
         : m_eState( IteratorState::UserExtensions )
-        , m_aLanguage( aLanguage )
+        , m_aLanguage(std::move( aLanguage ))
 {
     m_xContext = ::comphelper::getProcessComponentContext();
     if( !m_xContext.is() )

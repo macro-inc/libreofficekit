@@ -19,8 +19,10 @@
 
 #include "DataSeriesPointWrapper.hxx"
 #include "Chart2ModelContact.hxx"
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <DataSeries.hxx>
 #include <LinePropertiesHelper.hxx>
 #include <FillProperties.hxx>
 #include <CharacterProperties.hxx>
@@ -37,6 +39,7 @@
 #include "WrappedTextRotationProperty.hxx"
 #include <unonames.hxx>
 
+#include <o3tl/safeint.hxx>
 #include <rtl/math.hxx>
 
 #include <algorithm>
@@ -45,6 +48,7 @@
 #include <com/sun/star/chart/ChartAxisAssign.hpp>
 #include <com/sun/star/chart/ChartErrorCategory.hpp>
 #include <com/sun/star/chart/ChartSymbolType.hpp>
+#include <com/sun/star/chart2/XDataSeries.hpp>
 #include <com/sun/star/drawing/LineJoint.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <com/sun/star/drawing/FillStyle.hpp>
@@ -325,7 +329,7 @@ void WrappedAttachedAxisProperty::setPropertyValue( const Any& rOuterValue, cons
 
     if( bNewAttachedToMainAxis != bOldAttachedToMainAxis)
     {
-        Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+        rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
         if( xDiagram.is() )
             ::chart::DiagramHelper::attachSeriesToAxis( bNewAttachedToMainAxis, xDataSeries, xDiagram, m_spChart2ModelContact->m_xContext, false );
     }
@@ -454,8 +458,8 @@ void WrappedLineStyleProperty::setPropertyToDefault( const Reference< beans::XPr
 namespace chart::wrapper
 {
 
-DataSeriesPointWrapper::DataSeriesPointWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact( spChart2ModelContact )
+DataSeriesPointWrapper::DataSeriesPointWrapper( std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact( std::move(spChart2ModelContact) )
     , m_aEventListenerContainer( m_aMutex )
     , m_eType( DATA_SERIES )
     , m_nSeriesIndexInNewAPI( -1 )
@@ -473,7 +477,11 @@ void SAL_CALL DataSeriesPointWrapper::initialize( const uno::Sequence< uno::Any 
     m_nPointIndex = -1;
     if( aArguments.hasElements() )
     {
-        aArguments[0] >>= m_xDataSeries;
+        uno::Reference<chart2::XDataSeries> xTmp;
+        aArguments[0] >>= xTmp;
+        auto p = dynamic_cast<DataSeries*>(xTmp.get());
+        assert(p);
+        m_xDataSeries = p;
         if( aArguments.getLength() >= 2 )
             aArguments[1] >>= m_nPointIndex;
     }
@@ -493,8 +501,8 @@ void SAL_CALL DataSeriesPointWrapper::initialize( const uno::Sequence< uno::Any 
 DataSeriesPointWrapper::DataSeriesPointWrapper(eType _eType,
                                                sal_Int32 nSeriesIndexInNewAPI ,
                                                sal_Int32 nPointIndex, //ignored for series
-                                               const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-    : m_spChart2ModelContact( spChart2ModelContact )
+                                               std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+    : m_spChart2ModelContact( std::move(spChart2ModelContact) )
     , m_aEventListenerContainer( m_aMutex )
     , m_eType( _eType )
     , m_nSeriesIndexInNewAPI( nSeriesIndexInNewAPI )
@@ -536,24 +544,24 @@ void SAL_CALL DataSeriesPointWrapper::disposing( const lang::EventObject& /*Sour
 
 bool DataSeriesPointWrapper::isSupportingAreaProperties()
 {
-    Reference< chart2::XDataSeries > xSeries( getDataSeries() );
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
-    Reference< chart2::XChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
+    rtl::Reference< DataSeries > xSeries( getDataSeries() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
+    rtl::Reference< ::chart::ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram, xSeries ) );
     sal_Int32 nDimensionCount = DiagramHelper::getDimension( xDiagram );
 
     return ChartTypeHelper::isSupportingAreaProperties( xChartType, nDimensionCount );
 }
 
-Reference< chart2::XDataSeries > DataSeriesPointWrapper::getDataSeries()
+rtl::Reference< DataSeries > DataSeriesPointWrapper::getDataSeries()
 {
-    Reference< chart2::XDataSeries > xSeries( m_xDataSeries );
+    rtl::Reference< DataSeries > xSeries = m_xDataSeries;
     if( !xSeries.is() )
     {
-        Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
-        std::vector< uno::Reference< chart2::XDataSeries > > aSeriesList(
-            ::chart::DiagramHelper::getDataSeriesFromDiagram( xDiagram ) );
+        rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
+        std::vector< rtl::Reference< DataSeries > > aSeriesList =
+            ::chart::DiagramHelper::getDataSeriesFromDiagram( xDiagram );
 
-        if( m_nSeriesIndexInNewAPI >= 0 && m_nSeriesIndexInNewAPI < static_cast<sal_Int32>(aSeriesList.size()) )
+        if( m_nSeriesIndexInNewAPI >= 0 && o3tl::make_unsigned(m_nSeriesIndexInNewAPI) < aSeriesList.size() )
             xSeries = aSeriesList[m_nSeriesIndexInNewAPI];
     }
 
@@ -564,7 +572,7 @@ Reference< beans::XPropertySet > DataSeriesPointWrapper::getDataPointProperties(
 {
     Reference< beans::XPropertySet > xPointProp;
 
-    Reference< chart2::XDataSeries > xSeries( getDataSeries() );
+    rtl::Reference< DataSeries > xSeries( getDataSeries() );
 
     // may throw an IllegalArgumentException
     if( xSeries.is() )
@@ -622,7 +630,7 @@ beans::PropertyState SAL_CALL DataSeriesPointWrapper::getPropertyState( const OU
         {
             if( rPropertyName == "FillColor")
             {
-                Reference< beans::XPropertySet > xSeriesProp( getDataSeries(), uno::UNO_QUERY );
+                rtl::Reference< DataSeries > xSeriesProp = getDataSeries();
                 bool bVaryColorsByPoint = false;
                 if( xSeriesProp.is() && (xSeriesProp->getPropertyValue("VaryColorsByPoint") >>= bVaryColorsByPoint)
                     && bVaryColorsByPoint )
@@ -683,7 +691,7 @@ Any SAL_CALL DataSeriesPointWrapper::getPropertyDefault( const OUString& rProper
         if( nHandle > 0 )
         {
             //always take the series current value as default for points
-            Reference< beans::XPropertySet > xInnerPropertySet( getDataSeries(), uno::UNO_QUERY );
+            rtl::Reference< DataSeries > xInnerPropertySet = getDataSeries();
             if( xInnerPropertySet.is() )
             {
                 const WrappedProperty* pWrappedProperty = getWrappedProperty( rPropertyName );
@@ -704,7 +712,7 @@ Any SAL_CALL DataSeriesPointWrapper::getPropertyDefault( const OUString& rProper
 Reference< beans::XPropertySet > DataSeriesPointWrapper::getInnerPropertySet()
 {
     if( m_eType == DATA_SERIES )
-        return Reference< beans::XPropertySet >( getDataSeries(), uno::UNO_QUERY );
+        return getDataSeries();
     return getDataPointProperties();
 }
 
@@ -841,7 +849,7 @@ Any SAL_CALL DataSeriesPointWrapper::getPropertyValue( const OUString& rProperty
     {
         if( rPropertyName == "FillColor" )
         {
-            Reference< beans::XPropertySet > xSeriesProp( getDataSeries(), uno::UNO_QUERY );
+            rtl::Reference< DataSeries > xSeriesProp = getDataSeries();
             bool bVaryColorsByPoint = false;
             if( xSeriesProp.is() && (xSeriesProp->getPropertyValue("VaryColorsByPoint") >>= bVaryColorsByPoint)
                 && bVaryColorsByPoint )
@@ -849,7 +857,7 @@ Any SAL_CALL DataSeriesPointWrapper::getPropertyValue( const OUString& rProperty
                 uno::Reference< beans::XPropertyState > xPointState( DataSeriesPointWrapper::getDataPointProperties(), uno::UNO_QUERY );
                 if( xPointState.is() && xPointState->getPropertyState("Color") == beans::PropertyState_DEFAULT_VALUE )
                 {
-                    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+                    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
                     if( xDiagram.is() )
                     {
                         Reference< chart2::XColorScheme > xColorScheme( xDiagram->getDefaultColorScheme() );

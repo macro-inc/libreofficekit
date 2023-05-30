@@ -19,18 +19,20 @@ $(call gb_ExternalProject_get_state_target,raptor,build):
 	$(call gb_Trace_StartRange,raptor,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
 		$(if $(filter iOS,$(OS)),LIBS="-liconv") \
-		CFLAGS="$(CFLAGS) $(if $(debug),-g,-O) $(if $(filter TRUE,$(DISABLE_DYNLOADING)),-fvisibility=hidden) \
+		CFLAGS="$(CFLAGS) \
+			$(call gb_ExternalProject_get_build_flags,raptor) \
+			$(if $(filter TRUE,$(DISABLE_DYNLOADING)),-fvisibility=hidden) \
 			$(if $(filter GCCLINUXPOWERPC64,$(COM)$(OS)$(CPUNAME)),-mminimal-toc)" \
 		LDFLAGS=" \
 			$(if $(filter LINUX FREEBSD,$(OS)),-Wl$(COMMA)-z$(COMMA)origin -Wl$(COMMA)-rpath$(COMMA)\\"\$$\$$ORIGIN") \
 			$(if $(SYSBASE),$(if $(filter LINUX SOLARIS,$(OS)),-L$(SYSBASE)/lib -L$(SYSBASE)/usr/lib -lpthread -ldl))" \
-		CPPFLAGS="$(if $(SYSBASE),-I$(SYSBASE)/usr/include)" \
+		CPPFLAGS="$(if $(SYSBASE),-I$(SYSBASE)/usr/include) $(gb_EMSCRIPTEN_CPPFLAGS)" \
 		$(gb_RUN_CONFIGURE) ./configure --disable-gtk-doc \
 			 --enable-parsers="rdfxml ntriples turtle trig guess rss-tag-soup" \
 			--with-www=xml \
 			--without-xslt-config \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
+			$(gb_CONFIGURE_PLATFORMS) \
+			$(if $(CROSS_COMPILING),$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
 			$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 			$(if $(DISABLE_DYNLOADING), \
 				--enable-static --disable-shared \

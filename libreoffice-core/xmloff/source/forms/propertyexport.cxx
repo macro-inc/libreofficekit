@@ -29,7 +29,7 @@
 #include <xmloff/xmlprmap.hxx>
 #include <sax/tools/converter.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/util/Date.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
@@ -95,7 +95,7 @@ namespace xmloff
         assert(bSuccess); (void)bSuccess;
         for (T const & i : std::as_const(anySeq))
         {
-            OUString sValue(implConvertAny(makeAny(i)));
+            OUString sValue(implConvertAny(Any(i)));
             AddAttribute(XML_NAMESPACE_OFFICE, eValueAttName, sValue );
             SvXMLElementExport aValueTag(
                 m_rContext.getGlobalContext(), XML_NAMESPACE_FORM,
@@ -444,11 +444,10 @@ namespace xmloff
     }
 
     void OPropertyExport::exportGenericPropertyAttribute(
-            const sal_uInt16 _nAttributeNamespaceKey, const OUString& _pAttributeName, const char* _pPropertyName)
+            const sal_uInt16 _nAttributeNamespaceKey, const OUString& _pAttributeName, const OUString& sPropertyName)
     {
-        DBG_CHECK_PROPERTY_ASCII_NO_TYPE( _pPropertyName );
+        DBG_CHECK_PROPERTY_NO_TYPE( sPropertyName );
 
-        OUString sPropertyName = OUString::createFromAscii(_pPropertyName);
         exportedProperty(sPropertyName);
 
         Any aCurrentValue = m_xProps->getPropertyValue(sPropertyName);

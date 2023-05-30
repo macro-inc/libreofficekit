@@ -61,7 +61,6 @@
 #include <numrule.hxx>
 #include "sprmids.hxx"
 #include <wwstyles.hxx>
-#include "writerhelper.hxx"
 #include "ww8struc.hxx"
 #include "ww8par.hxx"
 #include "ww8par2.hxx"
@@ -145,12 +144,12 @@ bool wwSectionManager::CurrentSectionIsProtected() const
 
 sal_uInt32 wwSectionManager::GetPageLeft() const
 {
-    return !maSegments.empty() ? maSegments.back().nPgLeft : 0;
+    return !maSegments.empty() ? maSegments.back().m_nPgLeft : 0;
 }
 
 sal_uInt32 wwSectionManager::GetPageRight() const
 {
-    return !maSegments.empty() ? maSegments.back().nPgRight : 0;
+    return !maSegments.empty() ? maSegments.back().m_nPgRight : 0;
 }
 
 sal_uInt32 wwSectionManager::GetPageWidth() const
@@ -175,7 +174,7 @@ sal_uInt16 SwWW8ImplReader::End_Footnote()
     into field results and field commands.
     */
     if (m_bIgnoreText ||
-        m_pPaM->GetPoint()->nNode < m_rDoc.GetNodes().GetEndOfExtras().GetIndex())
+        m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras())
     {
         return 0;
     }
@@ -189,8 +188,8 @@ sal_uInt16 SwWW8ImplReader::End_Footnote()
 
     //Get the footnote character and remove it from the txtnode. We'll
     //replace it with the footnote
-    SwTextNode* pText = m_pPaM->GetNode().GetTextNode();
-    sal_Int32 nPos = m_pPaM->GetPoint()->nContent.GetIndex();
+    SwTextNode* pText = m_pPaM->GetPointNode().GetTextNode();
+    sal_Int32 nPos = m_pPaM->GetPoint()->GetContentIndex();
 
     OUString sChar;
     SwTextFootnote* pFN = nullptr;
@@ -199,13 +198,13 @@ sal_uInt16 SwWW8ImplReader::End_Footnote()
     {
         sChar += OUStringChar(pText->GetText()[--nPos]);
         m_pPaM->SetMark();
-        --m_pPaM->GetMark()->nContent;
-        std::shared_ptr<SwUnoCursor> xLastAnchorCursor(m_pLastAnchorPos ? m_rDoc.CreateUnoCursor(*m_pLastAnchorPos) : nullptr);
-        m_pLastAnchorPos.reset();
+        m_pPaM->GetMark()->AdjustContent(-1);
+        std::shared_ptr<SwUnoCursor> xLastAnchorCursor(m_oLastAnchorPos ? m_rDoc.CreateUnoCursor(*m_oLastAnchorPos) : nullptr);
+        m_oLastAnchorPos.reset();
         m_rDoc.getIDocumentContentOperations().DeleteRange( *m_pPaM );
         m_pPaM->DeleteMark();
         if (xLastAnchorCursor)
-            m_pLastAnchorPos.reset(new SwPosition(*xLastAnchorCursor->GetPoint()));
+            m_oLastAnchorPos.emplace(*xLastAnchorCursor->GetPoint());
         SwFormatFootnote aFootnote(rDesc.meType == MAN_EDN);
         pFN = static_cast<SwTextFootnote*>(pText->InsertItem(aFootnote, nPos, nPos));
     }
@@ -248,13 +247,13 @@ sal_uInt16 SwWW8ImplReader::End_Footnote()
                 pFN->SetNumber(0, 0, sChar);
 
             /*
-                Delete the footnote char from the footnote if its at the beginning
+                Delete the footnote char from the footnote if it's at the beginning
                 as usual. Might not be if the user has already deleted it, e.g.
                 #i14737#
             */
-            SwNodeIndex& rNIdx = m_pPaM->GetPoint()->nNode;
-            rNIdx = pSttIdx->GetIndex() + 1;
-            SwTextNode* pTNd = rNIdx.GetNode().GetTextNode();
+            SwPosition& rPaMPointPos = *m_pPaM->GetPoint();
+            rPaMPointPos.Assign(pSttIdx->GetIndex() + 1);
+            SwTextNode* pTNd = rPaMPointPos.GetNode().GetTextNode();
             if (pTNd && !pTNd->GetText().isEmpty() && !sChar.isEmpty())
             {
                 const OUString &rText = pTNd->GetText();
@@ -270,12 +269,12 @@ sal_uInt16 SwWW8ImplReader::End_Footnote()
                             nFirstLineIndent = pLRSpace->GetTextFirstLineOffset();
                     }
 
-                    m_pPaM->GetPoint()->nContent.Assign( pTNd, 0 );
+                    rPaMPointPos.SetContent(0);
                     m_pPaM->SetMark();
                     // Strip out aesthetic tabs we may have inserted on export #i24762#
                     if (nFirstLineIndent < 0 && rText.getLength() > 1 && rText[1] == 0x09)
-                        ++m_pPaM->GetMark()->nContent;
-                    ++m_pPaM->GetMark()->nContent;
+                        m_pPaM->GetMark()->AdjustContent(1);
+                    m_pPaM->GetMark()->AdjustContent(1);
                     m_xReffingStck->Delete(*m_pPaM);
                     m_rDoc.getIDocumentContentOperations().DeleteRange( *m_pPaM );
                     m_pPaM->DeleteMark();
@@ -303,7 +302,7 @@ tools::Long SwWW8ImplReader::Read_Footnote(WW8PLCFManResult* pRes)
     into field results and field commands.
     */
     if (m_bIgnoreText ||
-        m_pPaM->GetPoint()->nNode < m_rDoc.GetNodes().GetEndOfExtras().GetIndex())
+        m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras())
     {
         return 0;
     }
@@ -591,8 +590,10 @@ static void SetBaseAnlv(SwNumFormat &rNum, WW8_ANLV const &rAV, sal_uInt8 nSwLev
     if( rAV.nfc == 5 || rAV.nfc == 7 )
     {
         OUString sP = "." + rNum.GetSuffix();
-        rNum.SetSuffix( sP );   // ordinal number
+        rNum.SetListFormat("", sP, nSwLevel); // ordinal number
     }
+    else
+        rNum.SetListFormat("", "", nSwLevel);
 }
 
 void SwWW8ImplReader::SetAnlvStrings(SwNumFormat &rNum, int nLevel, WW8_ANLV const &rAV,
@@ -610,8 +611,8 @@ void SwWW8ImplReader::SetAnlvStrings(SwNumFormat &rNum, int nLevel, WW8_ANLV con
     const WW8_FFN* pF = m_xFonts->GetFont(SVBT16ToUInt16(rAV.ftc)); // FontInfo
     bool bListSymbol = pF && ( pF->aFFNBase.chs == 2 );      // Symbol/WingDings/...
 
-    OUStringBuffer sText;
     sal_uInt32 nLen = rAV.cbTextBefore + rAV.cbTextAfter;
+    OUStringBuffer sText(static_cast<sal_Int32>(nLen));
     if (m_bVer67)
     {
         if (nLen > nElements)
@@ -651,10 +652,9 @@ void SwWW8ImplReader::SetAnlvStrings(SwNumFormat &rNum, int nLevel, WW8_ANLV con
             if( bListSymbol )
             {
                 // use cBulletChar for correct mapping on MAC
-                OUStringBuffer aBuf;
-                comphelper::string::padToLength(aBuf, rAV.cbTextBefore
+                sText.setLength(0);
+                comphelper::string::padToLength(sText, rAV.cbTextBefore
                     + rAV.cbTextAfter, cBulletChar);
-                sText = aBuf;
             }
         }
     }
@@ -683,7 +683,7 @@ void SwWW8ImplReader::SetAnlvStrings(SwNumFormat &rNum, int nLevel, WW8_ANLV con
                 if (rAV.cbTextBefore || rAV.cbTextAfter)
                 {
                     rNum.SetBulletChar(
-                        sText.toString().iterateCodePoints(&o3tl::temporary(sal_Int32(0))));
+                        OUString::unacquired(sText).iterateCodePoints(&o3tl::temporary(sal_Int32(0))));
                 }
                 else
                     rNum.SetBulletChar( 0x2190 );
@@ -701,13 +701,11 @@ void SwWW8ImplReader::SetAnlvStrings(SwNumFormat &rNum, int nLevel, WW8_ANLV con
     }
     if( rAV.cbTextAfter )
     {
-        sSuffix = rNum.GetSuffix();
-        sSuffix += sText.copy( rAV.cbTextBefore, rAV.cbTextAfter).makeStringAndClear();
+        sSuffix = rNum.GetSuffix() + sText.subView( rAV.cbTextBefore, rAV.cbTextAfter);
     }
-    if (rAV.cbTextBefore || rAV.cbTextAfter)
-    {
-        rNum.SetListFormat(sPrefix, sSuffix, nLevel);
-    }
+
+    rNum.SetListFormat(sPrefix, sSuffix, nLevel);
+
 // The characters before and after multiple digits do not apply because
 // those are handled differently by the writer and the result is in most
 // cases worse than without.
@@ -720,6 +718,7 @@ void SwWW8ImplReader::SetAnld(SwNumRule* pNumR, WW8_ANLD const * pAD, sal_uInt8 
     bool bOutLine)
 {
     SwNumFormat aNF;
+    aNF.SetListFormat("", "", nSwLevel);
     if (pAD)
     {                                                       // there is an Anld-Sprm
         m_bCurrentAND_fNumberAcross = 0 != pAD->fNumberAcross;
@@ -1042,7 +1041,7 @@ void SwWW8ImplReader::NextAnlLine(const sal_uInt8* pSprm13)
     else
         m_nSwNumLevel = 0xff;                 // no number
 
-    SwTextNode* pNd = m_pPaM->GetNode().GetTextNode();
+    SwTextNode* pNd = m_pPaM->GetPointNode().GetTextNode();
     if (!pNd)
         return;
 
@@ -2068,7 +2067,7 @@ WW8TabDesc::WW8TabDesc(SwWW8ImplReader* pIoClass, WW8_CP nStartCp) :
         //Get the end of row new table positioning data
         WW8_CP nMyStartCp=nStartCp;
         if (m_pIo->SearchRowEnd(pPap, nMyStartCp, m_pIo->m_nInTable))
-            if (m_pIo->ParseTabPos(&aTabPos, pPap))
+            if (SwWW8ImplReader::ParseTabPos(&aTabPos, pPap))
                 pTabPos = &aTabPos;
 
         //Move back to this cell
@@ -2367,7 +2366,7 @@ void wwSectionManager::PrependedInlineNode(const SwPosition &rPos,
 {
     OSL_ENSURE(!maSegments.empty(),
         "should not be possible, must be at least one segment");
-    if ((!maSegments.empty()) && (maSegments.back().maStart == rPos.nNode))
+    if ((!maSegments.empty()) && (maSegments.back().maStart == rPos.GetNode()))
         maSegments.back().maStart.Assign(rNode);
 }
 
@@ -2378,7 +2377,7 @@ void WW8TabDesc::CreateSwTable()
     // if there is already some content on the Node append new node to ensure
     // that this content remains ABOVE the table
     SwPosition* pPoint = m_pIo->m_pPaM->GetPoint();
-    bool bInsNode = pPoint->nContent.GetIndex() != 0;
+    bool bInsNode = pPoint->GetContentIndex() != 0;
     bool bSetMinHeight = false;
 
     /*
@@ -2390,9 +2389,9 @@ void WW8TabDesc::CreateSwTable()
         ? m_pIo->m_xFormatOfJustInsertedApo->GetFormat() : nullptr;
     if (pFormat)
     {
-        const SwPosition* pAPos =
-            pFormat->GetAnchor().GetContentAnchor();
-        if (pAPos && &pAPos->nNode.GetNode() == &pPoint->nNode.GetNode())
+        const SwNode* pAnchorNode =
+            pFormat->GetAnchor().GetAnchorNode();
+        if (pAnchorNode && *pAnchorNode == pPoint->GetNode())
         {
             bInsNode = true;
             bSetMinHeight = true;
@@ -2468,23 +2467,22 @@ void WW8TabDesc::CreateSwTable()
     // contains a Pagedesc. If so that Pagedesc would be moved to the
     // row after the table, that would be wrong. So delete and
     // set later to the table format.
-    if (SwTextNode *const pNd = m_xTmpPos->GetPoint()->nNode.GetNode().GetTextNode())
+    if (SwTextNode *const pNd = m_xTmpPos->GetPoint()->GetNode().GetTextNode())
     {
         if (const SfxItemSet* pSet = pNd->GetpSwAttrSet())
         {
-            SfxPoolItem *pSetAttr = nullptr;
-            const SfxPoolItem* pItem;
-            if (SfxItemState::SET == pSet->GetItemState(RES_BREAK, false, &pItem))
+            std::unique_ptr<SfxPoolItem> pSetAttr;
+
+            if (const SvxFormatBreakItem* pBreakItem = pSet->GetItemIfSet(RES_BREAK, false))
             {
-                pSetAttr = new SvxFormatBreakItem( *static_cast<const SvxFormatBreakItem*>(pItem) );
+                pSetAttr.reset(new SvxFormatBreakItem( *pBreakItem ));
                 pNd->ResetAttr( RES_BREAK );
             }
 
             // eventually set the PageDesc/Break now to the table
             if (pSetAttr)
             {
-                m_aItemSet.Put(*pSetAttr);
-                delete pSetAttr;
+                m_aItemSet.Put(std::move(pSetAttr));
             }
         }
     }
@@ -2651,14 +2649,14 @@ void WW8TabDesc::MergeCells()
                     if( rCell.bVertMerge && !rCell.bVertRestart )
                     {
                         SwPaM aPam( *m_pTabBox->GetSttNd(), 0 );
-                        aPam.GetPoint()->nNode++;
-                        SwTextNode* pNd = aPam.GetNode().GetTextNode();
+                        aPam.GetPoint()->Adjust(SwNodeOffset(1));
+                        SwTextNode* pNd = aPam.GetPointNode().GetTextNode();
                         while( pNd )
                         {
                             pNd->SetCountedInList( false );
 
-                            aPam.GetPoint()->nNode++;
-                            pNd = aPam.GetNode().GetTextNode();
+                            aPam.GetPoint()->Adjust(SwNodeOffset(1));
+                            pNd = aPam.GetPointNode().GetTextNode();
                         }
                     }
 
@@ -2683,7 +2681,7 @@ void WW8TabDesc::MergeCells()
                             }
                             else
                                 break;
-                        pActMGroup->nGroupWidth = nSizCell;
+                        pActMGroup->m_nGroupWidth = nSizCell;
 
                         // locked previously created merge groups,
                         // after determining the size for the new merge group.
@@ -2692,12 +2690,12 @@ void WW8TabDesc::MergeCells()
                         for (;;)
                         {
                             WW8SelBoxInfo* p = FindMergeGroup(
-                                nX1, pActMGroup->nGroupWidth, false );
+                                nX1, pActMGroup->m_nGroupWidth, false );
                             if (p == nullptr)
                             {
                                 break;
                             }
-                            p->bGroupLocked = true;
+                            p->m_bGroupLocked = true;
                         }
 
                         // 3. push to group array
@@ -2738,15 +2736,15 @@ void WW8TabDesc::ParkPaM()
     SwNodeOffset nSttNd = pTabBox2->GetSttIdx() + 1,
               nEndNd = pTabBox2->GetSttNd()->EndOfSectionIndex();
 
-    if (m_pIo->m_pPaM->GetPoint()->nNode != nSttNd)
+    if (m_pIo->m_pPaM->GetPoint()->GetNodeIndex() != nSttNd)
     {
         do
         {
-            m_pIo->m_pPaM->GetPoint()->nNode = nSttNd;
+            m_pIo->m_pPaM->GetPoint()->Assign(nSttNd);
         }
-        while (m_pIo->m_pPaM->GetNode().GetNodeType() != SwNodeType::Text && ++nSttNd < nEndNd);
+        while (m_pIo->m_pPaM->GetPointNode().GetNodeType() != SwNodeType::Text && ++nSttNd < nEndNd);
 
-        m_pIo->m_pPaM->GetPoint()->nContent.Assign(m_pIo->m_pPaM->GetContentNode(), 0);
+        m_pIo->m_pPaM->GetPoint()->SetContent(0);
         m_pIo->m_rDoc.SetTextFormatColl(*m_pIo->m_pPaM, const_cast<SwTextFormatColl*>(m_pIo->m_pDfltTextFormatColl));
     }
 }
@@ -2764,15 +2762,15 @@ void WW8TabDesc::FinishSwTable()
 
     // ofz#38011 drop m_pLastAnchorPos during RedlineStack dtor and restore it afterwards to the same
     // place, or somewhere close if that place got destroyed
-    std::shared_ptr<SwUnoCursor> xLastAnchorCursor(m_pIo->m_pLastAnchorPos ? m_pIo->m_rDoc.CreateUnoCursor(*m_pIo->m_pLastAnchorPos) : nullptr);
-    m_pIo->m_pLastAnchorPos.reset();
+    std::shared_ptr<SwUnoCursor> xLastAnchorCursor(m_pIo->m_oLastAnchorPos ? m_pIo->m_rDoc.CreateUnoCursor(*m_pIo->m_oLastAnchorPos) : nullptr);
+    m_pIo->m_oLastAnchorPos.reset();
 
     SwTableNode* pTableNode = m_pTable->GetTableNode();
     SwDeleteListener aListener(*pTableNode);
     m_pIo->m_xRedlineStack = std::move(mxOldRedlineStack);
 
     if (xLastAnchorCursor)
-        m_pIo->m_pLastAnchorPos.reset(new SwPosition(*xLastAnchorCursor->GetPoint()));
+        m_pIo->m_oLastAnchorPos.emplace(*xLastAnchorCursor->GetPoint());
 
     WW8DupProperties aDup(m_pIo->m_rDoc,m_pIo->m_xCtrlStck.get());
     m_pIo->m_xCtrlStck->SetAttr( *m_pIo->m_pPaM->GetPoint(), 0, false);
@@ -2788,7 +2786,7 @@ void WW8TabDesc::FinishSwTable()
     m_pIo->m_aInsertedTables.InsertTable(*m_pTableNd, *m_pIo->m_pPaM);
 
     if (aListener.WasDeleted())
-        return;
+        throw std::runtime_error("table unexpectedly destroyed by applying redlines");
 
     MergeCells();
 
@@ -2802,7 +2800,7 @@ void WW8TabDesc::FinishSwTable()
         if((1 < groupIt->size()) && groupIt->row(0)[0])
         {
             SwFrameFormat* pNewFormat = groupIt->row(0)[0]->ClaimFrameFormat();
-            pNewFormat->SetFormatAttr(SwFormatFrameSize(SwFrameSize::Variable, groupIt->nGroupWidth, 0));
+            pNewFormat->SetFormatAttr(SwFormatFrameSize(SwFrameSize::Variable, groupIt->m_nGroupWidth, 0));
             const sal_uInt16 nRowSpan = groupIt->rowsCount();
             for (sal_uInt16 n = 0; n < nRowSpan; ++n)
             {
@@ -2854,12 +2852,12 @@ WW8SelBoxInfo* WW8TabDesc::FindMergeGroup(short nX1, short nWidth, bool bExact)
         {
             // the currently inspected group
             WW8SelBoxInfo& rActGroup = *m_MergeGroups[ iGr ];
-            if (!rActGroup.bGroupLocked)
+            if (!rActGroup.m_bGroupLocked)
             {
                 // approximate group boundary with room (tolerance) to the *outside*
-                nGrX1 = rActGroup.nGroupXStart - nTolerance;
-                nGrX2 = rActGroup.nGroupXStart
-                        + rActGroup.nGroupWidth + nTolerance;
+                nGrX1 = rActGroup.m_nGroupXStart - nTolerance;
+                nGrX2 = rActGroup.m_nGroupXStart
+                        + rActGroup.m_nGroupWidth + nTolerance;
 
                 // If box fits report success
 
@@ -2909,7 +2907,7 @@ bool WW8TabDesc::InFirstParaInCell() const
     if (!IsValidCell(GetCurrentCol()))
         return false;
 
-    return m_pIo->m_pPaM->GetPoint()->nNode == m_pTabBox->GetSttIdx() + 1;
+    return m_pIo->m_pPaM->GetPoint()->GetNodeIndex() == m_pTabBox->GetSttIdx() + 1;
 }
 
 void WW8TabDesc::SetPamInCell(short nWwCol, bool bPam)
@@ -2981,14 +2979,14 @@ void WW8TabDesc::SetPamInCell(short nWwCol, bool bPam)
     //want to reset the fmt properties
     SwNodeOffset nSttNd = m_pTabBox->GetSttIdx() + 1,
               nEndNd = m_pTabBox->GetSttNd()->EndOfSectionIndex();
-    if (m_pIo->m_pPaM->GetPoint()->nNode != nSttNd)
+    if (m_pIo->m_pPaM->GetPoint()->GetNodeIndex() != nSttNd)
     {
         do
         {
-            m_pIo->m_pPaM->GetPoint()->nNode = nSttNd;
+            m_pIo->m_pPaM->GetPoint()->Assign(nSttNd);
         }
-        while (m_pIo->m_pPaM->GetNode().GetNodeType() != SwNodeType::Text && ++nSttNd < nEndNd);
-        m_pIo->m_pPaM->GetPoint()->nContent.Assign(m_pIo->m_pPaM->GetContentNode(), 0);
+        while (m_pIo->m_pPaM->GetPointNode().GetNodeType() != SwNodeType::Text && ++nSttNd < nEndNd);
+        m_pIo->m_pPaM->GetPoint()->SetContent(0);
         // Precautionally set now, otherwise the style is not set for cells
         // that are inserted for margin balancing.
         m_pIo->m_rDoc.SetTextFormatColl(*m_pIo->m_pPaM, const_cast<SwTextFormatColl*>(m_pIo->m_pDfltTextFormatColl));
@@ -2997,7 +2995,8 @@ void WW8TabDesc::SetPamInCell(short nWwCol, bool bPam)
     }
 
     // Better to turn Snap to Grid off for all paragraphs in tables
-    SwTextNode *pNd = m_pIo->m_pPaM->GetNode().GetTextNode();
+    SwPosition* pGridPos = m_pIo->m_pPaM->GetPoint();
+    SwTextNode *pNd = pGridPos->GetNode().GetTextNode();
     if(!pNd)
         return;
 
@@ -3010,12 +3009,10 @@ void WW8TabDesc::SetPamInCell(short nWwCol, bool bPam)
     SvxParaGridItem aGridItem( rSnapToGrid );
     aGridItem.SetValue(false);
 
-    SwPosition* pGridPos = m_pIo->m_pPaM->GetPoint();
-
-    const sal_Int32 nEnd = pGridPos->nContent.GetIndex();
-    pGridPos->nContent.Assign(m_pIo->m_pPaM->GetContentNode(), 0);
+    const sal_Int32 nEnd = pGridPos->GetContentIndex();
+    pGridPos->SetContent(0);
     m_pIo->m_xCtrlStck->NewAttr(*pGridPos, aGridItem);
-    pGridPos->nContent.Assign(m_pIo->m_pPaM->GetContentNode(), nEnd);
+    pGridPos->SetContent(nEnd);
     m_pIo->m_xCtrlStck->SetAttr(*pGridPos, RES_PARATR_SNAPTOGRID);
 }
 
@@ -3107,7 +3104,7 @@ void WW8TabDesc::SetTabShades( SwTableBox* pBox, short nWwIdx )
             return;
 
         SwWW8Shade aSh( m_pIo->m_bVer67, rSHD );
-        pBox->GetFrameFormat()->SetFormatAttr(SvxBrushItem(aSh.aColor, RES_BACKGROUND));
+        pBox->GetFrameFormat()->SetFormatAttr(SvxBrushItem(aSh.m_aColor, RES_BACKGROUND));
     }
 }
 
@@ -3245,7 +3242,7 @@ void WW8TabDesc::AdjustNewBand()
 
         SetTabBorders(pBox, j);
 
-        SvxBoxItem aCurrentBox(sw::util::ItemGet<SvxBoxItem>(*(pBox->GetFrameFormat()), RES_BOX));
+        SvxBoxItem aCurrentBox(pBox->GetFrameFormat()->GetFormatAttr(RES_BOX));
         pBox->GetFrameFormat()->SetFormatAttr(aCurrentBox);
 
         SetTabVertAlign(pBox, j);
@@ -3803,7 +3800,10 @@ void WW8RStyle::Set1StyleDefaults()
     }
 }
 
-bool WW8RStyle::PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisStyle, sal_uInt16 nNextStyle)
+bool WW8RStyle::PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisStyle,
+                             sal_uInt16 nNextStyle,
+                             std::map<OUString, sal_Int32>& rParaCollisions,
+                             std::map<OUString, sal_Int32>& rCharCollisions)
 {
     SwFormat* pColl;
     bool bStyExist;
@@ -3812,7 +3812,7 @@ bool WW8RStyle::PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisSty
     {
         // Para-Style
         sw::util::ParaStyleMapper::StyleResult aResult =
-            mpIo->m_aParaStyleMapper.GetStyle(rSI.GetOrgWWName(), eSti);
+            mpIo->m_aParaStyleMapper.GetStyle(rSI.GetOrgWWName(), eSti, rParaCollisions);
         pColl = aResult.first;
         bStyExist = aResult.second;
     }
@@ -3820,7 +3820,7 @@ bool WW8RStyle::PrepareStyle(SwWW8StyInf &rSI, ww::sti eSti, sal_uInt16 nThisSty
     {
         // Char-Style
         sw::util::CharStyleMapper::StyleResult aResult =
-            mpIo->m_aCharStyleMapper.GetStyle(rSI.GetOrgWWName(), eSti);
+            mpIo->m_aCharStyleMapper.GetStyle(rSI.GetOrgWWName(), eSti, rCharCollisions);
         pColl = aResult.first;
         bStyExist = aResult.second;
     }
@@ -3909,7 +3909,9 @@ void WW8RStyle::PostStyle(SwWW8StyInf const &rSI, bool bOldNoImp)
     mpIo->m_nListLevel = MAXLEVEL;
 }
 
-void WW8RStyle::Import1Style( sal_uInt16 nNr )
+void WW8RStyle::Import1Style(sal_uInt16 nNr,
+                             std::map<OUString, sal_Int32>& rParaCollisions,
+                             std::map<OUString, sal_Int32>& rCharCollisions)
 {
     if (nNr >= mpIo->m_vColl.size())
         return;
@@ -3924,14 +3926,14 @@ void WW8RStyle::Import1Style( sal_uInt16 nNr )
     // valid and not NUL and not yet imported
 
     if( rSI.m_nBase < m_cstd && !mpIo->m_vColl[rSI.m_nBase].m_bImported )
-        Import1Style( rSI.m_nBase );
+        Import1Style(rSI.m_nBase, rParaCollisions, rCharCollisions);
 
     mpStStrm->Seek( rSI.m_nFilePos );
 
     sal_uInt16 nSkip;
     OUString sName;
 
-    std::unique_ptr<WW8_STD> xStd(Read1Style(nSkip, &sName));// read Style
+    std::unique_ptr<WW8_STD> xStd(Read1Style(nSkip, &sName)); // read Style
 
     if (xStd)
         rSI.SetOrgWWIdent( sName, xStd->sti );
@@ -3945,10 +3947,12 @@ void WW8RStyle::Import1Style( sal_uInt16 nNr )
         return;
     }
 
-    bool bOldNoImp = PrepareStyle(rSI, static_cast<ww::sti>(xStd->sti), nNr, xStd->istdNext);
+    bool bOldNoImp = PrepareStyle(rSI, static_cast<ww::sti>(xStd->sti),
+                                  nNr, xStd->istdNext,
+                                  rParaCollisions, rCharCollisions);
 
     // if something is interpreted wrong, this should make it work again
-    tools::Long nPos = mpStStrm->Tell();
+    sal_uInt64 nPos = mpStStrm->Tell();
 
     //Variable parts of the STD start at even byte offsets, but "inside
     //the STD", which I take to meaning even in relation to the starting
@@ -4465,6 +4469,9 @@ void WW8RStyle::ImportOldFormatStyles()
 
     if (iMac > nStyles) iMac = nStyles;
 
+    std::map<OUString, sal_Int32> aParaCollisions;
+    std::map<OUString, sal_Int32> aCharCollisions;
+
     for (stcp = 0; stcp < iMac; ++stcp)
     {
         sal_uInt8 stcNext(0), stcBase(0);
@@ -4496,7 +4503,9 @@ void WW8RStyle::ImportOldFormatStyles()
         if (ww::StandardStiIsCharStyle(eSti) && !aPAPXOffsets[stcp].mnSize)
             mpIo->m_vColl[stc].m_bColl = false;
 
-        bool bOldNoImp = PrepareStyle(rSI, eSti, stc, stcNext);
+        bool bOldNoImp = PrepareStyle(rSI, eSti, stc, stcNext,
+                                      aParaCollisions,
+                                      aCharCollisions);
 
         ImportSprms(aPAPXOffsets[stcp].mnOffset, aPAPXOffsets[stcp].mnSize,
             true);
@@ -4514,9 +4523,12 @@ void WW8RStyle::ImportNewFormatStyles()
 {
     ScanStyles();                       // Scan Based On
 
+    std::map<OUString, sal_Int32> aParaCollisions;
+    std::map<OUString, sal_Int32> aCharCollisions;
+
     for (sal_uInt16 i = 0; i < m_cstd; ++i) // import Styles
         if (mpIo->m_vColl[i].m_bValid)
-            Import1Style( i );
+            Import1Style(i, aParaCollisions, aCharCollisions);
 }
 
 void WW8RStyle::Import()

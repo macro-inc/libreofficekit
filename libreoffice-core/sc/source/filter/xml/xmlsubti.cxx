@@ -38,8 +38,6 @@
 #include <com/sun/star/sheet/XSpreadsheetDocument.hpp>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
 
-#include <memory>
-
 using namespace com::sun::star;
 
 ScXMLTabProtectionData::ScXMLTabProtectionData() :
@@ -281,7 +279,7 @@ void ScMyTables::AddMatrixRange(
 bool ScMyTables::IsPartOfMatrix(const ScAddress& rScAddress) const
 {
     if (!maMatrixRangeList.empty())
-        return maMatrixRangeList.In(rScAddress);
+        return maMatrixRangeList.Contains(rScAddress);
     return false;
 }
 

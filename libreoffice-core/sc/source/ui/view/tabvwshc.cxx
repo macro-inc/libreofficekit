@@ -224,9 +224,9 @@ std::shared_ptr<SfxModelessDialogController> ScTabViewShell::CreateRefDialogCont
             else
             {
                 std::map<OUString, ScRangeName*> aRangeMap;
-                for (auto const& itr : m_RangeMap)
+                for (auto& itr : m_RangeMap)
                 {
-                    aRangeMap.insert(std::pair<OUString, ScRangeName*>(itr.first, itr.second.get()));
+                    aRangeMap.insert(std::pair<OUString, ScRangeName*>(itr.first, &itr.second));
                 }
                 xResult = std::make_shared<ScNameDefDlg>(pB, pCW, pParent, GetViewData(), std::move(aRangeMap),
                                 ScAddress(GetViewData().GetCurX(),
@@ -680,9 +680,8 @@ OUString ScTabViewShell::DoAutoSum(bool& rRangeFinder, bool& rSubTotal, const Op
         for ( size_t i = 0; i < nCount; ++i )
         {
             const ScRange & rRange( aMarkRangeList[i] );
-            if ( rDoc.IsBlockEmpty( rRange.aStart.Tab(),
-                 rRange.aStart.Col(), rRange.aStart.Row(),
-                 rRange.aEnd.Col(), rRange.aEnd.Row() ) )
+            if ( rDoc.IsBlockEmpty( rRange.aStart.Col(), rRange.aStart.Row(),
+                     rRange.aEnd.Col(), rRange.aEnd.Row(),  rRange.aStart.Tab() ) )
             {
                 bEmpty = true;
                 break;

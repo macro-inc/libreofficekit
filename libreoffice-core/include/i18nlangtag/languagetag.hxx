@@ -32,7 +32,8 @@
     LanguageTag contains a plain language/country combination or a more
     detailed BCP 47 language tag use LanguageTag::isIsoLocale() instead.
  */
-#define I18NLANGTAG_QLT "qlt"
+#define I18NLANGTAG_QLT_ASCII "qlt"
+inline constexpr OUStringLiteral I18NLANGTAG_QLT = u"qlt";
 
 
 class LanguageTagImpl;
@@ -509,13 +510,19 @@ public:
 
     /** Convert Locale to MS-LangID with fallback.
 
-        @param bResolveSystem
-               If TRUE, resolve an empty language tag denoting the system
-               locale to the real locale used and fallback.
-               If FALSE, return LANGUAGE_SYSTEM for such a tag and do not fallback.
+        Resolves an empty language tag denoting the system
+        locale to LANGUAGE_SYSTEM and does not fallback.
      */
-    static LanguageType convertToLanguageTypeWithFallback( const css::lang::Locale& rLocale,
-                                                           bool bResolveSystem = true );
+    static LanguageType convertToLanguageTypeWithFallback( const css::lang::Locale& rLocale );
+
+    /** Enums to be used with isValidBcp47(). */
+    enum PrivateUse
+    {
+        ALLOW = 0,      ///< Allow all private-use and local-use including (!) 'qlt' local-use.
+        DISALLOW,       ///< Disallow all private-use and 'qlt' local-use, other 'qaa' to 'qtz' local-use are allowed.
+        ALLOW_ART_X     ///< Disallow all private-use and 'qlt' local-use, but allow 'art-x-...' private-use
+                        ///  for artificial constructed languages (and 'art-Latn-x-...' and other scripts).
+    };
 
     /** If rString represents a valid BCP 47 language tag.
 
@@ -529,13 +536,13 @@ public:
                 original string even if that was a valid tag. If rString is not
                 a valid tag, nothing is assigned.
 
-        @param  bDisallowPrivate
-                If TRUE, valid tags according to BCP 47 but reserved for
-                private use, like 'x-...', are not allowed and FALSE is
-                returned in this case.
+        @param  ePrivateUse
+                If PrivateUse::DISALLOW, valid tags according to BCP 47 but
+                reserved for private use, like 'x-...', are not allowed and
+                FALSE is returned in this case.
      */
     static bool         isValidBcp47( const OUString& rString, OUString* o_pCanonicalized,
-                                      bool bDisallowPrivate = false );
+                                      PrivateUse ePrivateUse = PrivateUse::ALLOW );
 
     /** If nLang is a generated on-the-fly LangID */
     static bool         isOnTheFlyID( LanguageType nLang );

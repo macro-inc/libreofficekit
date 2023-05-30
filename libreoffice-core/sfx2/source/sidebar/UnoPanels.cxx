@@ -17,6 +17,7 @@
 #include <com/sun/star/ui/XPanel.hpp>
 #include <sidebar/UnoPanel.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <algorithm>
@@ -24,8 +25,8 @@
 using namespace css;
 using namespace ::sfx2::sidebar;
 
-SfxUnoPanels::SfxUnoPanels(const uno::Reference<frame::XFrame>& rFrame, const OUString& deckId):
-xFrame(rFrame),
+SfxUnoPanels::SfxUnoPanels(uno::Reference<frame::XFrame> _xFrame, const OUString& deckId):
+xFrame(std::move(_xFrame)),
 mDeckId(deckId)
 {
 }
@@ -141,8 +142,6 @@ uno::Any SAL_CALL SfxUnoPanels::getByIndex( sal_Int32 Index )
 // XElementAccess
 uno::Type SAL_CALL SfxUnoPanels::getElementType()
 {
-    SolarMutexGuard aGuard;
-
     return uno::Type();
 }
 

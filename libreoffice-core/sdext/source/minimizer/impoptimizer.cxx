@@ -41,6 +41,7 @@
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 #include <com/sun/star/drawing/XMasterPagesSupplier.hpp>
 #include <com/sun/star/presentation/XPresentationPage.hpp>
+#include <com/sun/star/rendering/XBitmap.hpp>
 #include <com/sun/star/document/XFilter.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/graphic/GraphicType.hpp>
@@ -372,7 +373,7 @@ static void CompressGraphics( ImpOptimizer& rOptimizer, const Reference< XCompon
                 Reference< XGraphic > xGraphic;
                 if ( rGraphic.maUser[ 0 ].mbFillBitmap && rGraphic.maUser[ 0 ].mxPropertySet.is() )
                 {
-                    Reference< XBitmap > xFillBitmap;
+                    Reference< rendering::XBitmap > xFillBitmap;
                     if ( rGraphic.maUser[ 0 ].mxPropertySet->getPropertyValue( "FillBitmap" ) >>= xFillBitmap )
                         xGraphic.set( xFillBitmap, UNO_QUERY_THROW );
                 }
@@ -413,7 +414,7 @@ static void CompressGraphics( ImpOptimizer& rOptimizer, const Reference< XCompon
                             }
                             else if ( rGraphicUser.mxPropertySet.is() )
                             {
-                                Reference< XBitmap > xFillBitmap( xNewGraphic, UNO_QUERY );
+                                Reference< rendering::XBitmap > xFillBitmap( xNewGraphic, UNO_QUERY );
                                 if ( xFillBitmap.is() )
                                 {
                                     awt::Size aSize;
@@ -569,7 +570,8 @@ void ImpOptimizer::Optimize( const Sequence< PropertyValue >& rArguments )
         switch( TKGet( rArgument.Name ) )
         {
             case TK_StatusDispatcher : rArgument.Value >>= mxStatusDispatcher; break;
-            case TK_InformationDialog: rArgument.Value >>= mxInformationDialog; break;
+            case TK_DocumentFrame: rArgument.Value >>= mxDocumentFrame; break;
+            case TK_DialogParentWindow: rArgument.Value >>= mxDialogParentWindow; break;
             case TK_Settings :
             {
                 css::uno::Sequence< css::beans::PropertyValue > aSettings;
@@ -655,7 +657,7 @@ void ImpOptimizer::Optimize( const Sequence< PropertyValue >& rArguments )
         mxModel->unlockControllers();
 
         // clearing undo stack:
-        Reference< XFrame > xFrame( xSelf.is() ? xSelf : mxInformationDialog );
+        Reference< XFrame > xFrame( xSelf.is() ? xSelf : mxDocumentFrame );
         if ( xFrame.is() )
         {
             DispatchURL(mxContext, ".uno:ClearUndoStack", xFrame);
@@ -671,9 +673,9 @@ void ImpOptimizer::Optimize( const Sequence< PropertyValue >& rArguments )
         }
     }
 
-    if ( mxInformationDialog.is() )
+    if ( mxDocumentFrame.is() )
     {
-        InformationDialog aInformationDialog( mxContext, mxInformationDialog, maSaveAsURL, mbOpenNewDocument, nSourceSize, nDestSize, nEstimatedFileSize );
+        InformationDialog aInformationDialog( mxContext, mxDialogParentWindow, maSaveAsURL, mbOpenNewDocument, nSourceSize, nDestSize, nEstimatedFileSize );
         aInformationDialog.execute();
         SetStatusValue( TK_OpenNewDocument, Any( mbOpenNewDocument ) );
         DispatchStatus();

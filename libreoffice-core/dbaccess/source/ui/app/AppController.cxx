@@ -55,7 +55,7 @@
 #include <com/sun/star/sdb/application/DatabaseObject.hpp>
 #include <com/sun/star/sdb/application/DatabaseObjectContainer.hpp>
 #include <com/sun/star/document/XDocumentEventBroadcaster.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <osl/diagnose.h>
 
@@ -63,6 +63,7 @@
 #include <vcl/transfer.hxx>
 #include <svtools/cliplistener.hxx>
 
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/uno3.hxx>
 #include <comphelper/types.hxx>
@@ -157,7 +158,7 @@ class SelectionGuard;
 class SelectionNotifier
 {
 private:
-    ::comphelper::OInterfaceContainerHelper2   m_aSelectionListeners;
+    ::comphelper::OInterfaceContainerHelper3<XSelectionChangeListener> m_aSelectionListeners;
     ::cppu::OWeakObject&                m_rContext;
     sal_Int32                           m_nSelectionNestingLevel;
 
@@ -251,7 +252,7 @@ OApplicationController::OApplicationController(const Reference< XComponentContex
     ,m_aTableCopyHelper(this)
     ,m_nAsyncDrop(nullptr)
     ,m_aSelectContainerEvent( LINK( this, OApplicationController, OnSelectContainer ) )
-    ,m_ePreviewMode(E_PREVIEWNONE)
+    ,m_ePreviewMode(PreviewMode::NONE)
     ,m_eCurrentType(E_NONE)
     ,m_bNeedToReconnect(false)
     ,m_bSuspended( false )
@@ -347,8 +348,7 @@ void SAL_CALL OApplicationController::disposing()
             OUString sUrl = m_xModel->getURL();
             if ( !sUrl.isEmpty() )
             {
-                ::comphelper::NamedValueCollection aArgs( m_xModel->getArgs() );
-                if ( aArgs.getOrDefault( "PickListEntry", true ) )
+                if ( ::comphelper::NamedValueCollection::getOrDefault( m_xModel->getArgs(), u"PickListEntry", true ) )
                 {
                     OUString     aFilter;
                     INetURLObject       aURL( m_xModel->getURL() );
@@ -361,7 +361,7 @@ void SAL_CALL OApplicationController::disposing()
                             aURL.GetURLNoPass( INetURLObject::DecodeMechanism::NONE ),
                             aFilter,
                             getStrippedDatabaseName(),
-                            std::nullopt);
+                            std::nullopt, std::nullopt);
 
                     // add to recent document list
                     if ( aURL.GetProtocol() == INetProtocol::File )
@@ -792,18 +792,18 @@ FeatureState OApplicationController::GetState(sal_uInt16 _nId) const
                 break;
             case SID_DB_APP_DISABLE_PREVIEW:
                 aReturn.bEnabled = true;
-                aReturn.bChecked = getContainer()->getPreviewMode() == E_PREVIEWNONE;
+                aReturn.bChecked = getContainer()->getPreviewMode() == PreviewMode::NONE;
                 break;
             case SID_DB_APP_VIEW_DOCINFO_PREVIEW:
                 {
                     ElementType eType = getContainer()->getElementType();
                     aReturn.bEnabled = (E_REPORT == eType || E_FORM == eType);
-                    aReturn.bChecked = getContainer()->getPreviewMode() == E_DOCUMENTINFO;
+                    aReturn.bChecked = getContainer()->getPreviewMode() == PreviewMode::DocumentInfo;
                 }
                 break;
             case SID_DB_APP_VIEW_DOC_PREVIEW:
                 aReturn.bEnabled = true;
-                aReturn.bChecked = getContainer()->getPreviewMode() == E_DOCUMENT;
+                aReturn.bChecked = getContainer()->getPreviewMode() == PreviewMode::Document;
                 break;
             case ID_BROWSER_UNDO:
                 aReturn.bEnabled = false;
@@ -906,8 +906,7 @@ namespace
         bool bHandled = false;
 
         // try handling the error with an interaction handler
-        ::comphelper::NamedValueCollection aArgs( _rxDocument->getArgs() );
-        Reference< XInteractionHandler > xHandler( aArgs.getOrDefault( "InteractionHandler", Reference< XInteractionHandler >() ) );
+        Reference< XInteractionHandler > xHandler = ::comphelper::NamedValueCollection::getOrDefault( _rxDocument->getArgs(), u"InteractionHandler", Reference< XInteractionHandler >() );
         if ( xHandler.is() )
         {
             rtl::Reference pRequest( new ::comphelper::OInteractionRequest( _rException ) );
@@ -1196,7 +1195,7 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
                 {
                     ElementType eType = getContainer()->getElementType();
                     OUString sName = getContainer()->getQualifiedName( nullptr );
-                    insertHierachyElement(eType,sName);
+                    insertHierarchyElement(eType,sName);
                 }
                 break;
             case ID_NEW_VIEW_DESIGN:
@@ -1212,7 +1211,7 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
 
                         const Reference< XDataSource > xDataSource( m_xDataSource, UNO_QUERY );
                         const Reference< XComponent > xComponent = aDesigner.createNew( xDataSource, aCreationArgs );
-                        onDocumentOpened( OUString(), E_QUERY, E_OPEN_DESIGN, xComponent, nullptr );
+                        onDocumentOpened( OUString(), E_QUERY, ElementOpenMode::Design, xComponent, nullptr );
                     }
                 }
                 break;
@@ -1236,17 +1235,17 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
             case SID_DB_APP_QUERY_EDIT:
             case SID_DB_APP_FORM_EDIT:
             case SID_DB_APP_REPORT_EDIT:
-                doAction( _nId, E_OPEN_DESIGN );
+                doAction( _nId, ElementOpenMode::Design );
                 break;
             case SID_DB_APP_OPEN:
             case SID_DB_APP_TABLE_OPEN:
             case SID_DB_APP_QUERY_OPEN:
             case SID_DB_APP_FORM_OPEN:
             case SID_DB_APP_REPORT_OPEN:
-                doAction( _nId, E_OPEN_NORMAL );
+                doAction( _nId, ElementOpenMode::Normal );
                 break;
             case SID_DB_APP_CONVERTTOVIEW:
-                doAction( _nId, E_OPEN_NORMAL );
+                doAction( _nId, ElementOpenMode::Normal );
                 break;
             case SID_SELECTALL:
                 getContainer()->selectAll();
@@ -1255,7 +1254,7 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
             case SID_DB_APP_DSRELDESIGN:
             {
                 Reference< XComponent > xRelationDesigner;
-                if ( !m_pSubComponentManager->activateSubFrame( OUString(), SID_DB_APP_DSRELDESIGN, E_OPEN_DESIGN, xRelationDesigner ) )
+                if ( !m_pSubComponentManager->activateSubFrame( OUString(), SID_DB_APP_DSRELDESIGN, ElementOpenMode::Design, xRelationDesigner ) )
                 {
                     SharedConnection xConnection( ensureConnection() );
                     if ( xConnection.is() )
@@ -1264,7 +1263,7 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
 
                         const Reference< XDataSource > xDataSource( m_xDataSource, UNO_QUERY );
                         const Reference< XComponent > xComponent = aDesigner.createNew( xDataSource );
-                        onDocumentOpened( OUString(), SID_DB_APP_DSRELDESIGN, E_OPEN_DESIGN, xComponent, nullptr );
+                        onDocumentOpened( OUString(), SID_DB_APP_DSRELDESIGN, ElementOpenMode::Design, xComponent, nullptr );
                     }
                 }
             }
@@ -1318,15 +1317,15 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
                 m_aSelectContainerEvent.Call( reinterpret_cast< void* >( E_REPORT ) );
                 break;
             case SID_DB_APP_DISABLE_PREVIEW:
-                m_ePreviewMode = E_PREVIEWNONE;
+                m_ePreviewMode = PreviewMode::NONE;
                 getContainer()->switchPreview(m_ePreviewMode);
                 break;
             case SID_DB_APP_VIEW_DOCINFO_PREVIEW:
-                m_ePreviewMode = E_DOCUMENTINFO;
+                m_ePreviewMode = PreviewMode::DocumentInfo;
                 getContainer()->switchPreview(m_ePreviewMode);
                 break;
             case SID_DB_APP_VIEW_DOC_PREVIEW:
-                m_ePreviewMode = E_DOCUMENT;
+                m_ePreviewMode = PreviewMode::Document;
                 getContainer()->switchPreview(m_ePreviewMode);
                 break;
             case SID_MAIL_SENDDOC:
@@ -1337,7 +1336,7 @@ void OApplicationController::Execute(sal_uInt16 _nId, const Sequence< PropertyVa
                 }
                 break;
             case SID_DB_APP_SENDREPORTASMAIL:
-                doAction( _nId, E_OPEN_FOR_MAIL );
+                doAction( _nId, ElementOpenMode::Mail );
                 break;
         }
     }
@@ -1693,23 +1692,23 @@ bool OApplicationController::onEntryDoubleClick(const weld::TreeView& rTreeView)
     if (!rTreeView.get_cursor(xHdlEntry.get()))
         return false;
 
-    if (pContainer->isLeaf(rTreeView, *xHdlEntry))
+    if (!pContainer->isLeaf(rTreeView, *xHdlEntry))
+        return false;   // not handled
+
+    try
     {
-        try
-        {
-            // opens a new frame with either the table or the query or report or form or view
-            openElementWithArguments(
-                getContainer()->getQualifiedName(xHdlEntry.get()),
-                getContainer()->getElementType(),
-                E_OPEN_NORMAL,
-                0,
-                ::comphelper::NamedValueCollection() );
-            return true;    // handled
-        }
-        catch(const Exception&)
-        {
-            DBG_UNHANDLED_EXCEPTION("dbaccess");
-        }
+        // opens a new frame with either the table or the query or report or form or view
+        openElementWithArguments(
+            getContainer()->getQualifiedName(xHdlEntry.get()),
+            getContainer()->getElementType(),
+            ElementOpenMode::Normal,
+            0,
+            ::comphelper::NamedValueCollection() );
+        return true;    // handled
+    }
+    catch(const Exception&)
+    {
+        DBG_UNHANDLED_EXCEPTION("dbaccess");
     }
 
     return false;   // not handled
@@ -1748,7 +1747,7 @@ Reference< XComponent > OApplicationController::openElementWithArguments( const 
         return nullptr;
 
     Reference< XComponent > xRet;
-    if ( _eOpenMode == E_OPEN_DESIGN )
+    if ( _eOpenMode == ElementOpenMode::Design )
     {
         // https://bz.apache.org/ooo/show_bug.cgi?id=30382
         getContainer()->showPreview(nullptr);
@@ -1758,7 +1757,7 @@ Reference< XComponent > OApplicationController::openElementWithArguments( const 
     switch ( _eType )
     {
     case E_REPORT:
-        if ( _eOpenMode != E_OPEN_DESIGN )
+        if ( _eOpenMode != ElementOpenMode::Design )
         {
             // reports which are opened in a mode other than design are no sub components of our application
             // component, but standalone documents.
@@ -1795,7 +1794,7 @@ Reference< XComponent > OApplicationController::openElementWithArguments( const 
             ::comphelper::NamedValueCollection aArguments( _rAdditionalArguments );
 
             Any aDataSource;
-            if ( _eOpenMode == E_OPEN_DESIGN )
+            if ( _eOpenMode == ElementOpenMode::Design )
             {
                 bool bAddViewTypeArg = false;
 
@@ -1830,7 +1829,7 @@ Reference< XComponent > OApplicationController::openElementWithArguments( const 
                 pDesigner.reset( new ResultSetBrowser( getORB(), this, m_aCurrentFrame.getFrame(), _eType == E_TABLE ) );
 
                 if ( !aArguments.has( PROPERTY_SHOWMENU ) )
-                    aArguments.put( PROPERTY_SHOWMENU, makeAny( true ) );
+                    aArguments.put( PROPERTY_SHOWMENU, Any( true ) );
 
                 aDataSource <<= getDatabaseName();
             }
@@ -1955,7 +1954,7 @@ Reference< XComponent > OApplicationController::newElement( ElementType _eType, 
     }
 
     if ( xComponent.is() )
-        onDocumentOpened( OUString(), _eType, E_OPEN_DESIGN, xComponent, o_rDocumentDefinition );
+        onDocumentOpened( OUString(), _eType, ElementOpenMode::Design, xComponent, o_rDocumentDefinition );
 
     return xComponent;
 }
@@ -2154,7 +2153,7 @@ void OApplicationController::onSelectionChanged()
 
 void OApplicationController::showPreviewFor(const ElementType _eType,const OUString& _sName)
 {
-    if ( m_ePreviewMode == E_PREVIEWNONE )
+    if ( m_ePreviewMode == PreviewMode::NONE )
         return;
 
     OApplicationView* pView = getContainer();
@@ -2265,7 +2264,7 @@ Any OApplicationController::getCurrentSelection(weld::TreeView& rControl) const
 {
     Sequence< NamedDatabaseObject > aSelection;
     getContainer()->describeCurrentSelectionForControl(rControl, aSelection);
-    return makeAny( aSelection );
+    return Any( aSelection );
 }
 
 vcl::Window* OApplicationController::getMenuParent() const
@@ -2286,7 +2285,6 @@ bool OApplicationController::requestQuickHelp(const void* /*pUserData*/, OUStrin
 bool OApplicationController::requestDrag(const weld::TreeIter& /*rEntry*/)
 {
     bool bSuccess = false;
-    rtl::Reference<TransferableHelper> pTransfer;
 
     OApplicationView* pContainer = getContainer();
     if (pContainer && pContainer->getSelectionCount())
@@ -2324,43 +2322,42 @@ sal_Int8 OApplicationController::queryDrop( const AcceptDropEvent& _rEvt, const 
     sal_Int8 nActionAskedFor = _rEvt.mnAction;
     // check if we're a table or query container
     OApplicationView* pView = getContainer();
-    if ( pView && !isDataSourceReadOnly() )
+    if ( !pView || isDataSourceReadOnly() )
+        return DND_ACTION_NONE;
+
+    ElementType eType = pView->getElementType();
+    if ( eType == E_NONE || (eType == E_TABLE && isConnectionReadOnly()) )
+        return DND_ACTION_NONE;
+
+    // check for the concrete type
+    if(std::any_of(_rFlavors.begin(),_rFlavors.end(),TAppSupportedSotFunctor(eType)))
+        return DND_ACTION_COPY;
+
+    if ( eType != E_FORM && eType != E_REPORT )
+        return DND_ACTION_NONE;
+
+    sal_Int8 nAction = OComponentTransferable::canExtractComponentDescriptor(_rFlavors,eType == E_FORM) ? DND_ACTION_COPY : DND_ACTION_NONE;
+    if ( nAction == DND_ACTION_NONE )
+        return DND_ACTION_NONE;
+
+    auto xHitEntry = pView->getEntry(_rEvt.maPosPixel);
+    if (xHitEntry)
     {
-        ElementType eType = pView->getElementType();
-        if ( eType != E_NONE && (eType != E_TABLE || !isConnectionReadOnly()) )
+        OUString sName = pView->getQualifiedName(xHitEntry.get());
+        if ( !sName.isEmpty() )
         {
-            // check for the concrete type
-            if(std::any_of(_rFlavors.begin(),_rFlavors.end(),TAppSupportedSotFunctor(eType)))
-                return DND_ACTION_COPY;
-            if ( eType == E_FORM || eType == E_REPORT )
+            Reference< XHierarchicalNameAccess > xContainer(getElements(pView->getElementType()),UNO_QUERY);
+            if ( xContainer.is() && xContainer->hasByHierarchicalName(sName) )
             {
-                sal_Int8 nAction = OComponentTransferable::canExtractComponentDescriptor(_rFlavors,eType == E_FORM) ? DND_ACTION_COPY : DND_ACTION_NONE;
-                if ( nAction != DND_ACTION_NONE )
-                {
-                    auto xHitEntry = pView->getEntry(_rEvt.maPosPixel);
-                    if (xHitEntry)
-                    {
-                        OUString sName = pView->getQualifiedName(xHitEntry.get());
-                        if ( !sName.isEmpty() )
-                        {
-                            Reference< XHierarchicalNameAccess > xContainer(getElements(pView->getElementType()),UNO_QUERY);
-                            if ( xContainer.is() && xContainer->hasByHierarchicalName(sName) )
-                            {
-                                Reference< XHierarchicalNameAccess > xHitObject(xContainer->getByHierarchicalName(sName),UNO_QUERY);
-                                if ( xHitObject.is() )
-                                    nAction = nActionAskedFor & DND_ACTION_COPYMOVE;
-                            }
-                            else
-                                nAction = DND_ACTION_NONE;
-                        }
-                    }
-                }
-                return nAction;
+                Reference< XHierarchicalNameAccess > xHitObject(xContainer->getByHierarchicalName(sName),UNO_QUERY);
+                if ( xHitObject.is() )
+                    nAction = nActionAskedFor & DND_ACTION_COPYMOVE;
             }
+            else
+                nAction = DND_ACTION_NONE;
         }
     }
-
-    return DND_ACTION_NONE;
+    return nAction;
 }
 
 sal_Int8 OApplicationController::executeDrop( const ExecuteDropEvent& _rEvt )
@@ -2515,8 +2512,7 @@ void OApplicationController::OnFirstControllerConnected()
     {
         // If the migration just happened, but was not successful, the document is reloaded.
         // In this case, we should not show the warning, again.
-        ::comphelper::NamedValueCollection aModelArgs( m_xModel->getArgs() );
-        if ( aModelArgs.getOrDefault( "SuppressMigrationWarning", false ) )
+        if ( ::comphelper::NamedValueCollection::getOrDefault( m_xModel->getArgs(), u"SuppressMigrationWarning", false ) )
             return;
 
         // also, if the document is read-only, then no migration is possible, and the
@@ -2530,7 +2526,7 @@ void OApplicationController::OnFirstControllerConnected()
         aDetail.Message = DBA_RES(STR_SUB_DOCS_WITH_SCRIPTS_DETAIL);
         aWarning.NextException <<= aDetail;
 
-        Reference< XExecutableDialog > xDialog = ErrorMessageDialog::create( getORB(), "", nullptr, makeAny( aWarning ) );
+        Reference< XExecutableDialog > xDialog = ErrorMessageDialog::create( getORB(), "", nullptr, Any( aWarning ) );
         xDialog->execute();
     }
     catch( const Exception& )
@@ -2616,24 +2612,24 @@ sal_Bool SAL_CALL OApplicationController::attachModel(const Reference< XModel > 
     }
 
     // initial preview mode
-    if ( m_xDataSource.is() )
+    if ( !m_xDataSource )
+        return true;
+
+    try
     {
-        try
+        // to get the 'modified' for the data source
+        ::comphelper::NamedValueCollection aLayoutInfo( m_xDataSource->getPropertyValue( PROPERTY_LAYOUTINFORMATION ) );
+        if ( aLayoutInfo.has( INFO_PREVIEW ) )
         {
-            // to get the 'modified' for the data source
-            ::comphelper::NamedValueCollection aLayoutInfo( m_xDataSource->getPropertyValue( PROPERTY_LAYOUTINFORMATION ) );
-            if ( aLayoutInfo.has( INFO_PREVIEW ) )
-            {
-                const sal_Int32 nPreviewMode( aLayoutInfo.getOrDefault( INFO_PREVIEW, sal_Int32(0) ) );
-                m_ePreviewMode = static_cast< PreviewMode >( nPreviewMode );
-                if ( getView() )
-                    getContainer()->switchPreview( m_ePreviewMode );
-            }
+            const sal_Int32 nPreviewMode( aLayoutInfo.getOrDefault( INFO_PREVIEW, sal_Int32(0) ) );
+            m_ePreviewMode = static_cast< PreviewMode >( nPreviewMode );
+            if ( getView() )
+                getContainer()->switchPreview( m_ePreviewMode );
         }
-        catch( const Exception& )
-        {
-            DBG_UNHANDLED_EXCEPTION("dbaccess");
-        }
+    }
+    catch( const Exception& )
+    {
+        DBG_UNHANDLED_EXCEPTION("dbaccess");
     }
 
     return true;
@@ -2830,7 +2826,7 @@ Any SAL_CALL OApplicationController::getSelection(  )
             }
         }
     }
-    return makeAny( aCurrentSelection );
+    return Any( aCurrentSelection );
 }
 
 }   // namespace dbaui

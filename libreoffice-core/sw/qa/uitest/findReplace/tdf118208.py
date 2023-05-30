@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -15,7 +17,6 @@ class tdf118208(UITestCase):
 
     def test_tdf118208_search_dialog_format_crash(self):
         with self.ui_test.load_file(get_url_for_data_file("tdf118208.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             # 1. Open the attached file.
             # 2. Press ctrl-H to show the search and replace dialog.
             # 3. Press the "Format..."  button.

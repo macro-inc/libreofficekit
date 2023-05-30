@@ -160,6 +160,16 @@
           </info>
         </prop>
       </group>
+      <group oor:name="Grammar">
+        <info>
+          <desc>Specifies the settings for incorrect grammar found with spellchecking.</desc>
+        </info>
+        <prop oor:name="Color" oor:type="xs:int">
+          <info>
+            <desc>Specifies the color of incorrect grammar found with AutoSpellcheck.</desc>
+          </info>
+        </prop>
+      </group>
       <group oor:name="SmartTags">
         <info>
           <desc>Specifies the settings for smart tags.</desc>
@@ -367,6 +377,22 @@
         <prop oor:name="Color" oor:type="xs:int">
           <info>
             <desc>Specifies the color used for automatic page breaks.</desc>
+          </info>
+        </prop>
+      </group>
+      <group oor:name="CalcHiddenColRow">
+        <info>
+          <desc>Specifies the settings used for hidden rows/cols in Calc.</desc>
+        </info>
+        <prop oor:name="IsVisible" oor:type="xs:boolean" oor:nillable="false">
+          <info>
+            <desc>Specifies the visibility of hidden row/col indicator (true = visible).</desc>
+          </info>
+          <value>true</value>
+        </prop>
+        <prop oor:name="Color" oor:type="xs:int">
+          <info>
+            <desc>Specifies the color used for hidden rows/cols.</desc>
           </info>
         </prop>
       </group>

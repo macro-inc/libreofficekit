@@ -22,6 +22,7 @@
 
 #include <strings.hrc>
 #include <dp_backend.h>
+#include <dp_misc.h>
 #include "dp_helpbackenddb.hxx"
 #include <dp_ucb.h>
 #include <rtl/uri.hxx>
@@ -30,6 +31,7 @@
 #include <svl/inettype.hxx>
 #include <unotools/pathoptions.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <o3tl/string_view.hxx>
 
 #if HAVE_FEATURE_XMLHELP
 #include <helpcompiler/compilehelp.hxx>
@@ -390,7 +392,7 @@ void BackendImpl::implProcessHelp(
                         "No help folder";
                     OWeakObject* oWeakThis = this;
                     throw deployment::DeploymentException( OUString(), oWeakThis,
-                                                           makeAny( uno::Exception( aErrStr, oWeakThis ) ) );
+                                                           Any( uno::Exception( aErrStr, oWeakThis ) ) );
                 }
 
                 // Scan languages
@@ -446,9 +448,8 @@ void BackendImpl::implProcessHelp(
                             implCollectXhpFiles( aSubFolderURL, aXhpFileVector );
 
                             // Copy to package (later: move?)
-                            OUString aDestPath = aDestBasePath;
-                            OUString aPureFolderName = aSubFolderURL.copy( nLenLangFolderURL );
-                            aDestPath += aPureFolderName;
+                            std::u16string_view aPureFolderName = aSubFolderURL.subView( nLenLangFolderURL );
+                            OUString aDestPath = aDestBasePath + aPureFolderName;
                             xSFA->copy( aSubFolderURL, aDestPath );
                         }
 
@@ -537,7 +538,7 @@ void BackendImpl::implProcessHelp(
 
                             OWeakObject* oWeakThis = this;
                             throw deployment::DeploymentException( OUString(), oWeakThis,
-                                                                   makeAny( uno::Exception( aErrStr, oWeakThis ) ) );
+                                                                   Any( uno::Exception( aErrStr, oWeakThis ) ) );
                         }
                     }
                 }
@@ -579,8 +580,8 @@ void BackendImpl::implCollectXhpFiles( const OUString& aDir,
             sal_Int32 nLastDot = aURL.lastIndexOf( '.' );
             if( nLastDot != -1 )
             {
-                OUString aExt = aURL.copy( nLastDot + 1 );
-                if( aExt.equalsIgnoreAsciiCase( "xhp" ) )
+                std::u16string_view aExt = aURL.subView( nLastDot + 1 );
+                if( o3tl::equalsIgnoreAsciiCase( aExt, u"xhp" ) )
                     o_rXhpFileVector.push_back( aURL );
             }
         }

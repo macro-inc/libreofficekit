@@ -19,14 +19,16 @@
 #pragma once
 
 #include <com/sun/star/chart2/LegendPosition.hpp>
+#include <com/sun/star/chart2/XFormattedString2.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/uno/Reference.h>
 #include <com/sun/star/uno/Sequence.h>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 #include <vector>
 
 namespace chart { class ChartModel; }
 namespace com::sun::star::beans { class XPropertySet; }
-namespace com::sun::star::chart2 { class XFormattedString2; }
 namespace com::sun::star::drawing { class XShape; }
 namespace com::sun::star::drawing { class XShapes; }
 namespace com::sun::star::lang { class XMultiServiceFactory; }
@@ -56,7 +58,7 @@ struct ViewLegendEntry
     /** The legend symbol that represents a data series or other
         information contained in the legend
      */
-    css::uno::Reference< css::drawing::XShape > aSymbol;
+    rtl::Reference< SvxShapeGroup > xSymbol;
 
     /** The descriptive text for a legend entry.
      */
@@ -70,7 +72,7 @@ struct ViewLegendSymbol
     /** The legend symbol that represents a data series or other
         information contained in the legend
      */
-    css::uno::Reference<css::drawing::XShape> aSymbol;
+    rtl::Reference<SvxShapeGroup> xSymbol;
 };
 
 class LegendEntryProvider
@@ -82,8 +84,7 @@ public:
             const css::awt::Size& rEntryKeyAspectRatio,
             css::chart2::LegendPosition eLegendPosition,
             const css::uno::Reference< css::beans::XPropertySet >& xTextProperties,
-            const css::uno::Reference< css::drawing::XShapes >& xTarget,
-            const css::uno::Reference< css::lang::XMultiServiceFactory >& xShapeFactory,
+            const rtl::Reference<SvxShapeGroupAnyD>& xTarget,
             const css::uno::Reference< css::uno::XComponentContext >& xContext,
             ChartModel& rModel
                 ) = 0;

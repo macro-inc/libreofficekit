@@ -50,7 +50,6 @@
 #include <fldbas.hxx>
 #include <expfld.hxx>
 #include <ddefld.hxx>
-#include <swddetbl.hxx>
 #include <authfld.hxx>
 #include <usrfld.hxx>
 #include <ndindex.hxx>
@@ -380,7 +379,10 @@ void DocumentFieldsManager::RemoveFieldType(size_t nField)
         OSL_ENSURE( !pTmp->HasWriterListeners(), "Dependent fields present!" );
     }
     else
-        (*mpFieldTypes)[nField].release(); // DB fields are ref-counted and delete themselves
+    {
+        // coverity[leaked_storage] - at this point DB fields are ref-counted and delete themselves
+        (*mpFieldTypes)[nField].release();
+    }
 
     mpFieldTypes->erase( mpFieldTypes->begin() + nField );
     m_rDoc.getIDocumentState().SetModified();
@@ -507,8 +509,7 @@ bool DocumentFieldsManager::UpdateField(SwTextField * pDstTextField, SwField & r
     {
         if (m_rDoc.GetIDocumentUndoRedo().DoesUndo())
         {
-            SwPosition aPosition( pDstTextField->GetTextNode() );
-            aPosition.nContent = pDstTextField->GetStart();
+            SwPosition aPosition( pDstTextField->GetTextNode(), pDstTextField->GetStart() );
 
             m_rDoc.GetIDocumentUndoRedo().AppendUndo(
                 std::make_unique<SwUndoFieldFromDoc>( aPosition, *pDstField, rSrcField, pMsgHint, bUpdateFields) );
@@ -529,7 +530,7 @@ bool DocumentFieldsManager::UpdateField(SwTextField * pDstTextField, SwField & r
         case SwFieldIds::Table:
             {
                 const SwTableNode* pTableNd =
-                    m_rDoc.IsIdxInTable(aTableNdIdx);
+                    SwDoc::IsIdxInTable(aTableNdIdx);
                 if( pTableNd )
                 {
                     SwTableFormulaUpdate aTableUpdate( &pTableNd->
@@ -680,7 +681,7 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                 TBL_CALC != static_cast<SwTableFormulaUpdate*>(pHt)->m_eFlags ))
         return ;
 
-    std::unique_ptr<SwCalc, o3tl::default_delete<SwCalc>> pCalc;
+    std::optional<SwCalc> oCalc;
 
     if( pFieldType )
     {
@@ -710,8 +711,8 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                                             static_cast<SwTableFormulaUpdate*>(pHt)->m_pTable )
                         continue;
 
-                    if( !pCalc )
-                        pCalc.reset(new SwCalc( m_rDoc ));
+                    if( !oCalc )
+                        oCalc.emplace( m_rDoc );
 
                     // get the values of all SetExpression fields that are valid
                     // until the table
@@ -727,9 +728,9 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                             SwPosition aPos( *pTableNd );
                             if( GetBodyTextNode( m_rDoc, aPos, *pFrame ) )
                             {
-                                FieldsToCalc( *pCalc, SetGetExpField(
-                                        aPos.nNode, pFormatField->GetTextField(),
-                                        &aPos.nContent, pFrame->GetPhyPageNum()),
+                                FieldsToCalc( *oCalc, SetGetExpField(
+                                        aPos.GetNode(), pFormatField->GetTextField(),
+                                        aPos.GetContentIndex(), pFrame->GetPhyPageNum()),
                                     pLayout);
                             }
                             else
@@ -739,16 +740,15 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                     if( !pFrame )
                     {
                         // create index to determine the TextNode
-                        SwNodeIndex aIdx( rTextNd );
                         SwFrame const*const pFrame2 = ::sw::FindNeighbourFrameForNode(rTextNd);
-                        FieldsToCalc( *pCalc,
-                            SetGetExpField(aIdx, pFormatField->GetTextField(),
-                                nullptr,
+                        FieldsToCalc( *oCalc,
+                            SetGetExpField(rTextNd, pFormatField->GetTextField(),
+                                std::nullopt,
                                 pFrame2 ? pFrame2->GetPhyPageNum() : 0),
                             pLayout);
                     }
 
-                    SwTableCalcPara aPara(*pCalc, pTableNd->GetTable(), pLayout);
+                    SwTableCalcPara aPara(*oCalc, pTableNd->GetTable(), pLayout);
                     pField->CalcField( aPara );
                     if( aPara.IsStackOverflow() )
                     {
@@ -760,7 +760,7 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                         OSL_ENSURE(bResult,
                                 "the chained formula could no be calculated");
                     }
-                    pCalc->SetCalcError( SwCalcError::NONE );
+                    oCalc->SetCalcError( SwCalcError::NONE );
                 }
                 pFormatField->UpdateTextNode(nullptr, pHt);
         }
@@ -781,8 +781,8 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                                             static_cast<SwTableFormulaUpdate*>(pHt)->m_pTable )
                 {
                     double nValue;
-                    if( !pCalc )
-                        pCalc.reset(new SwCalc( m_rDoc ));
+                    if( !oCalc )
+                        oCalc.emplace( m_rDoc );
 
                     // get the values of all SetExpression fields that are valid
                     // until the table
@@ -805,8 +805,8 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                                 SwPosition aPos( *pCNd );
                                 if( GetBodyTextNode( m_rDoc, aPos, *pFrame ) )
                                 {
-                                    FieldsToCalc(*pCalc, SetGetExpField(aPos.nNode,
-                                            nullptr, nullptr, pFrame->GetPhyPageNum()),
+                                    FieldsToCalc(*oCalc, SetGetExpField(aPos.GetNode(),
+                                            nullptr, std::nullopt, pFrame->GetPhyPageNum()),
                                         pLayout);
                                 }
                                 else
@@ -817,14 +817,13 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                     if( !pFrame )
                     {
                         // create index to determine the TextNode
-                        SwNodeIndex aIdx( *pTableNd );
                         SwFrame const*const pFrame2 = ::sw::FindNeighbourFrameForNode(*pTableNd);
-                        FieldsToCalc(*pCalc, SetGetExpField(aIdx, nullptr, nullptr,
+                        FieldsToCalc(*oCalc, SetGetExpField(*pTableNd, nullptr, std::nullopt,
                                 pFrame2 ? pFrame2->GetPhyPageNum() : 0),
                             pLayout);
                     }
 
-                    SwTableCalcPara aPara(*pCalc, pTableNd->GetTable(), pLayout);
+                    SwTableCalcPara aPara(*oCalc, pTableNd->GetTable(), pLayout);
                     pFormula->Calc( aPara, nValue );
 
                     if( aPara.IsStackOverflow() )
@@ -841,14 +840,14 @@ void DocumentFieldsManager::UpdateTableFields( SfxPoolItem* pHt )
                     SwFrameFormat* pFormat = pBox->ClaimFrameFormat();
                     SfxItemSetFixed<RES_BOXATR_BEGIN,RES_BOXATR_END-1> aTmp( m_rDoc.GetAttrPool() );
 
-                    if( pCalc->IsCalcError() )
+                    if( oCalc->IsCalcError() )
                         nValue = DBL_MAX;
                     aTmp.Put( SwTableBoxValue( nValue ));
                     if( SfxItemState::SET != pFormat->GetItemState( RES_BOXATR_FORMAT ))
                         aTmp.Put( SwTableBoxNumFormat( 0 ));
                     pFormat->SetFormatAttr( aTmp );
 
-                    pCalc->SetCalcError( SwCalcError::NONE );
+                    oCalc->SetCalcError( SwCalcError::NONE );
                 }
             }
         }
@@ -929,7 +928,7 @@ void DocumentFieldsManager::UpdateExpFieldsImpl(
             case SwFieldIds::User:
                 {
                     // Entry present?
-                    sal_uInt16 nPos;
+                    sal_uInt32 nPos;
                     const OUString& rNm = pFieldType->GetName();
                     OUString sExpand(const_cast<SwUserFieldType*>(static_cast<const SwUserFieldType*>(pFieldType))->Expand(nsSwGetSetExpType::GSE_STRING, 0, LANGUAGE_SYSTEM));
                     SwHash* pFnd = aHashStrTable.Find( rNm, &nPos );
@@ -1111,7 +1110,7 @@ void DocumentFieldsManager::UpdateExpFieldsImpl(
 
             // Add entry to hash table
             // Entry present?
-            sal_uInt16 nPos;
+            sal_uInt32 nPos;
             HashStr* pFnd = aHashStrTable.Find( rName, &nPos );
             OUString const value(pField->ExpandField(m_rDoc.IsClipBoard(), nullptr));
             if( pFnd )
@@ -1160,7 +1159,7 @@ void DocumentFieldsManager::UpdateExpFieldsImpl(
                     // lookup the field's name
                     aNew = static_cast<SwSetExpFieldType*>(pSField->GetTyp())->GetSetRefName();
                     // Entry present?
-                    sal_uInt16 nPos;
+                    sal_uInt32 nPos;
                     HashStr* pFnd = aHashStrTable.Find( aNew, &nPos );
                     if( pFnd )
                         // Modify entry in the hash table
@@ -1660,7 +1659,7 @@ void DocumentFieldsManager::FieldsToExpand( SwHashTable<HashStr> & rHashTable,
                 // look up the field's name
                 aNew = static_cast<SwSetExpFieldType*>(pSField->GetTyp())->GetSetRefName();
                 // Entry present?
-                sal_uInt16 nPos;
+                sal_uInt32 nPos;
                 SwHash* pFnd = rHashTable.Find( aNew, &nPos );
                 if( pFnd )
                     // modify entry in the hash table
@@ -1677,7 +1676,7 @@ void DocumentFieldsManager::FieldsToExpand( SwHashTable<HashStr> & rHashTable,
 
                 // Insert entry in the hash table
                 // Entry present?
-                sal_uInt16 nPos;
+                sal_uInt32 nPos;
                 HashStr* pFnd = rHashTable.Find( rName, &nPos );
                 OUString const value(pField->ExpandField(m_rDoc.IsClipBoard(), nullptr));
                 if( pFnd )
@@ -1724,10 +1723,10 @@ SwField * DocumentFieldsManager::GetFieldAtPos(const SwPosition & rPos)
 
 SwTextField * DocumentFieldsManager::GetTextFieldAtPos(const SwPosition & rPos)
 {
-    SwTextNode * const pNode = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode * const pNode = rPos.GetNode().GetTextNode();
 
     return (pNode != nullptr)
-        ? pNode->GetFieldTextAttrAt( rPos.nContent.GetIndex(), true )
+        ? pNode->GetFieldTextAttrAt(rPos.GetContentIndex(), ::sw::GetTextAttrMode::Default)
         : nullptr;
 }
 

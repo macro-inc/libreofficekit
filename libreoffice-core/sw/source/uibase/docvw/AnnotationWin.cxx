@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <AnnotationWin.hxx>
 
 #include <PostItMgr.hxx>
@@ -47,6 +49,7 @@
 #include <editeng/outlobj.hxx>
 
 #include <comphelper/lok.hxx>
+#include <comphelper/random.hxx>
 #include <docufld.hxx>
 #include <txtfld.hxx>
 #include <ndtxt.hxx>
@@ -91,7 +94,7 @@ SwAnnotationWin::SwAnnotationWin( SwEditWin& rEditWin,
     : InterimItemWindow(&rEditWin, "modules/swriter/ui/annotation.ui", "Annotation")
     , mrMgr(aMgr)
     , mrView(rEditWin.GetView())
-    , mnEventId(nullptr)
+    , mnDeleteEventId(nullptr)
     , meSidebarPosition(sw::sidebarwindows::SidebarPosition::NONE)
     , mPageBorder(0)
     , mbAnchorRectChanged(false)
@@ -115,9 +118,11 @@ SwAnnotationWin::SwAnnotationWin( SwEditWin& rEditWin,
         mpShadow->setVisible(false);
     }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     mrMgr.ConnectSidebarWinToFrame( *(mrSidebarItem.maLayoutInfo.mpAnchorFrame),
                                   mrSidebarItem.GetFormatField(),
                                   *this );
+#endif
 
     if (SupportsDoubleBuffering())
         // When double-buffering, allow parents to paint on our area. That's
@@ -132,9 +137,10 @@ SwAnnotationWin::~SwAnnotationWin()
 
 void SwAnnotationWin::dispose()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     mrMgr.DisconnectSidebarWinFromFrame( *(mrSidebarItem.maLayoutInfo.mpAnchorFrame),
                                        *this );
-
+#endif
     Disable();
 
     mxSidebarTextControlWin.reset();
@@ -152,8 +158,8 @@ void SwAnnotationWin::dispose()
 
     mxMenuButton.reset();
 
-    if (mnEventId)
-        Application::RemoveUserEvent( mnEventId );
+    if (mnDeleteEventId)
+        Application::RemoveUserEvent(mnDeleteEventId);
 
     mpOutliner.reset();
     mpOutlinerView.reset();
@@ -202,8 +208,11 @@ void SwAnnotationWin::SetResolved(bool resolved)
 {
     bool oldState = IsResolved();
     static_cast<SwPostItField*>(mpFormatField->GetField())->SetResolved(resolved);
-    const SwViewOption* pVOpt = mrView.GetWrtShellPtr()->GetViewOptions();
-    mrSidebarItem.mbShow = !IsResolved() || (pVOpt->IsResolvedPostIts());
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
+        mrSidebarItem.mbShow = !IsResolved() || (pVOpt->IsResolvedPostIts());
+    }
 
     mpTextRangeOverlay.reset();
 
@@ -231,6 +240,26 @@ void SwAnnotationWin::ToggleResolvedForThread()
     mrMgr.LayoutPostIts();
 }
 
+sal_uInt32 SwAnnotationWin::GetParaId()
+{
+    auto pField = static_cast<SwPostItField*>(mpFormatField->GetField());
+    auto nParaId = pField->GetParaId();
+    if (nParaId == 0)
+    {
+        // The parent annotation does not have a paraId. This happens when the annotation was just
+        // created, and not imported. paraIds are regenerated upon export, thus this new paraId
+        // is only generated so that children annotations can refer to it
+        nParaId = CreateUniqueParaId();
+        pField->SetParaId(nParaId);
+    }
+    return nParaId;
+}
+
+sal_uInt32 SwAnnotationWin::CreateUniqueParaId()
+{
+    return comphelper::rng::uniform_uint_distribution(0, std::numeric_limits<sal_uInt32>::max());
+}
+
 void SwAnnotationWin::DeleteThread()
 {
     // Go to the top and delete each comment one by one
@@ -240,11 +269,11 @@ void SwAnnotationWin::DeleteThread()
 
     while(next && next->GetTopReplyNote() == topNote)
     {
-        current->mnEventId = Application::PostUserEvent( LINK( current, SwAnnotationWin, DeleteHdl), nullptr, true );
+        current->mnDeleteEventId = Application::PostUserEvent( LINK( current, SwAnnotationWin, DeleteHdl), nullptr, true );
         current = next;
         next = mrMgr.GetNextPostIt(KEY_PAGEDOWN, current);
     }
-    current->mnEventId = Application::PostUserEvent( LINK( current, SwAnnotationWin, DeleteHdl), nullptr, true );
+    current->mnDeleteEventId = Application::PostUserEvent( LINK( current, SwAnnotationWin, DeleteHdl), nullptr, true );
 }
 
 bool SwAnnotationWin::IsResolved() const
@@ -289,8 +318,7 @@ void SwAnnotationWin::UpdateData()
         if (rUndoRedo.DoesUndo())
         {
             SwTextField *const pTextField = mpFormatField->GetTextField();
-            SwPosition aPosition( pTextField->GetTextNode() );
-            aPosition.nContent = pTextField->GetStart();
+            SwPosition aPosition( pTextField->GetTextNode(), pTextField->GetStart() );
             rUndoRedo.AppendUndo(
                 std::make_unique<SwUndoFieldFromDoc>(aPosition, *pOldField, *mpField, nullptr, true));
         }
@@ -311,23 +339,24 @@ void SwAnnotationWin::UpdateData()
 void SwAnnotationWin::Delete()
 {
     collectUIInformation("DELETE",get_id());
-    if (!mrView.GetWrtShellPtr()->GotoField(*mpFormatField))
+    SwWrtShell* pWrtShell = mrView.GetWrtShellPtr();
+    if (!(pWrtShell && pWrtShell->GotoField(*mpFormatField)))
         return;
 
     if ( mrMgr.GetActiveSidebarWin() == this)
     {
         mrMgr.SetActiveSidebarWin(nullptr);
         // if the note is empty, the previous line will send a delete event, but we are already there
-        if (mnEventId)
+        if (mnDeleteEventId)
         {
-            Application::RemoveUserEvent( mnEventId );
-            mnEventId = nullptr;
+            Application::RemoveUserEvent(mnDeleteEventId);
+            mnDeleteEventId = nullptr;
         }
     }
     // we delete the field directly, the Mgr cleans up the PostIt by listening
     GrabFocusToDocument();
-    mrView.GetWrtShellPtr()->ClearMark();
-    mrView.GetWrtShellPtr()->DelRight();
+    pWrtShell->ClearMark();
+    pWrtShell->DelRight();
 }
 
 void SwAnnotationWin::GotoPos()
@@ -348,11 +377,10 @@ sal_uInt32 SwAnnotationWin::MoveCaret()
 sal_uInt32 SwAnnotationWin::CalcParent()
 {
     SwTextField* pTextField = mpFormatField->GetTextField();
-    SwPosition aPosition( pTextField->GetTextNode() );
-    aPosition.nContent = pTextField->GetStart();
+    SwPosition aPosition( pTextField->GetTextNode(), pTextField->GetStart() );
     SwTextAttr * const pTextAttr =
         pTextField->GetTextNode().GetTextAttrForCharAt(
-            aPosition.nContent.GetIndex() - 1,
+            aPosition.GetContentIndex() - 1,
             RES_TXTATR_ANNOTATION );
     const SwField* pField = pTextAttr ? pTextAttr->GetFormatField().GetField() : nullptr;
     sal_uInt32 nParentId = 0;
@@ -369,11 +397,10 @@ sal_uInt32 SwAnnotationWin::CountFollowing()
 {
     sal_uInt32 aCount = 1;  // we start with 1, so we have to subtract one at the end again
     SwTextField* pTextField = mpFormatField->GetTextField();
-    SwPosition aPosition( pTextField->GetTextNode() );
-    aPosition.nContent = pTextField->GetStart();
+    SwPosition aPosition( pTextField->GetTextNode(), pTextField->GetStart() );
 
     SwTextAttr * pTextAttr = pTextField->GetTextNode().GetTextAttrForCharAt(
-                                        aPosition.nContent.GetIndex() + 1,
+                                        aPosition.GetContentIndex() + 1,
                                         RES_TXTATR_ANNOTATION );
     SwField* pField = pTextAttr
                     ? const_cast<SwField*>(pTextAttr->GetFormatField().GetField())
@@ -382,7 +409,7 @@ sal_uInt32 SwAnnotationWin::CountFollowing()
     {
         aCount++;
         pTextAttr = pTextField->GetTextNode().GetTextAttrForCharAt(
-                                        aPosition.nContent.GetIndex() + aCount,
+                                        aPosition.GetContentIndex() + aCount,
                                         RES_TXTATR_ANNOTATION );
         pField = pTextAttr
                ? const_cast<SwField*>(pTextAttr->GetFormatField().GetField())
@@ -445,8 +472,7 @@ void SwAnnotationWin::InitAnswer(OutlinerParaObject const & rText)
     if (rUndoRedo.DoesUndo())
     {
         SwTextField *const pTextField = mpFormatField->GetTextField();
-        SwPosition aPosition( pTextField->GetTextNode() );
-        aPosition.nContent = pTextField->GetStart();
+        SwPosition aPosition( pTextField->GetTextNode(), pTextField->GetStart() );
         rUndoRedo.AppendUndo(
             std::make_unique<SwUndoFieldFromDoc>(aPosition, *pOldField, *mpField, nullptr, true));
     }

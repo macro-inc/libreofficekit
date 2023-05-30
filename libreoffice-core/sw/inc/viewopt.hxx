@@ -35,42 +35,109 @@ class SwDocShell;
 namespace svtools{ class ColorConfig;}
 enum class SwFillMode;
 
-enum class ViewOptFlags1 : sal_uInt64 {
-    UseHeaderFooterMenu = 0x00000001,
-    Tab           = 0x00000002,
-    Blank         = 0x00000004,
-    HardBlank     = 0x00000008,
-    Paragraph     = 0x00000010,
-    Linebreak     = 0x00000020,
-    Pagebreak     = 0x00000040,
-    Columnbreak   = 0x00000080,
-    SoftHyph      = 0x00000100,
-    Bookmarks     = 0x00000200,
-    Ref           = 0x00000400,
-    FieldName     = 0x00000800,
-    Postits       = 0x00004000,
-    FieldHidden   = 0x00008000,
-    CharHidden    = 0x00010000,
-    Graphic       = 0x00020000,
-    Table         = 0x00040000,
-    Draw          = 0x00080000,
-    Control       = 0x00100000,
-    Crosshair     = 0x00400000,
-    Snap          = 0x00800000,
-    Synchronize   = 0x01000000,
-    GridVisible   = 0x02000000,
-    OnlineSpell   = 0x04000000,
-    TreatSubOutlineLevelsAsContent = 0x08000000,
-    ShowInlineTooltips = 0x10000000, //tooltips on tracked changes
-    ViewMetachars = 0x20000000,
-    Pageback      = 0x40000000,
-    ShowOutlineContentVisibilityButton = 0x80000000,
-    ShowChangesInMargin = 0x100000000, //tracked deletions in margin
-    ShowChangesInMargin2 = 0x200000000 //tracked insertions in margin
+struct ViewOptFlags1
+{
+    bool bUseHeaderFooterMenu : 1;
+    bool bTab : 1;
+    bool bBlank : 1;
+    bool bHardBlank : 1;
+    bool bParagraph : 1;
+    bool bLinebreak : 1;
+    bool bPagebreak : 1;
+    bool bColumnbreak : 1;
+    bool bSoftHyph : 1;
+    bool bBookmarks : 1;
+    bool bRef : 1;
+    bool bFieldName : 1;
+    bool bPostits : 1;
+    bool bFieldHidden : 1;
+    bool bCharHidden : 1;
+    bool bGraphic : 1;
+    bool bTable : 1;
+    bool bDraw : 1;
+    bool bControl : 1;
+    bool bCrosshair : 1;
+    bool bSnap : 1;
+    bool bSynchronize : 1;
+    bool bGridVisible : 1;
+    bool bOnlineSpell : 1;
+    bool bTreatSubOutlineLevelsAsContent : 1;
+    bool bShowInlineTooltips : 1; //tooltips on tracked changes
+    bool bViewMetachars : 1;
+    bool bPageback : 1;
+    bool bShowOutlineContentVisibilityButton : 1;
+    bool bShowChangesInMargin : 1; //tracked deletions in margin
+    bool bShowChangesInMargin2 : 1; //tracked insertions in margin
+
+    ViewOptFlags1()
+        : bUseHeaderFooterMenu(false)
+        , bTab(false)
+        , bBlank(false)
+        , bHardBlank(true)
+        , bParagraph(false)
+        , bLinebreak(false)
+        , bPagebreak(false)
+        , bColumnbreak(false)
+        , bSoftHyph(true)
+        , bBookmarks(false)
+        , bRef(true)
+        , bFieldName(false)
+        , bPostits(true)
+        , bFieldHidden(false)
+        , bCharHidden(false)
+        , bGraphic(true)
+        , bTable(true)
+        , bDraw(true)
+        , bControl(true)
+        , bCrosshair(false)
+        , bSnap(false)
+        , bSynchronize(false)
+        , bGridVisible(false)
+        , bOnlineSpell(false)
+        , bTreatSubOutlineLevelsAsContent(false)
+        , bShowInlineTooltips(false)
+        , bViewMetachars(false)
+        , bPageback(true)
+        , bShowOutlineContentVisibilityButton(false)
+        , bShowChangesInMargin(false)
+        , bShowChangesInMargin2(false)
+    {}
+
+    bool operator==(const ViewOptFlags1& rOther) const
+    {
+        return bUseHeaderFooterMenu == rOther.bUseHeaderFooterMenu
+            && bTab == rOther.bTab
+            && bBlank == rOther.bBlank
+            && bHardBlank == rOther.bHardBlank
+            && bParagraph == rOther.bParagraph
+            && bLinebreak == rOther.bLinebreak
+            && bPagebreak == rOther.bPagebreak
+            && bColumnbreak == rOther.bColumnbreak
+            && bSoftHyph == rOther.bSoftHyph
+            && bBookmarks == rOther.bBookmarks
+            && bRef == rOther.bRef
+            && bFieldName == rOther.bFieldName
+            && bPostits == rOther.bPostits
+            && bFieldHidden == rOther.bFieldHidden
+            && bCharHidden == rOther.bCharHidden
+            && bGraphic == rOther.bGraphic
+            && bTable == rOther.bTable
+            && bDraw == rOther.bDraw
+            && bControl == rOther.bControl
+            && bCrosshair == rOther.bCrosshair
+            && bSnap == rOther.bSnap
+            && bSynchronize == rOther.bSynchronize
+            && bGridVisible == rOther.bGridVisible
+            && bOnlineSpell == rOther.bOnlineSpell
+            && bTreatSubOutlineLevelsAsContent == rOther.bTreatSubOutlineLevelsAsContent
+            && bShowInlineTooltips == rOther.bShowInlineTooltips
+            && bViewMetachars == rOther.bViewMetachars
+            && bPageback == rOther.bPageback
+            && bShowOutlineContentVisibilityButton == rOther.bShowOutlineContentVisibilityButton
+            && bShowChangesInMargin == rOther.bShowChangesInMargin
+            && bShowChangesInMargin2 == rOther.bShowChangesInMargin2;
+    }
 };
-namespace o3tl {
-    template<> struct typed_flags<ViewOptFlags1> : is_typed_flags<ViewOptFlags1, 0x3ffdfcfff> {};
-}
 
 enum class ViewOptCoreFlags2 {
     BlackFont         = 0x0001,
@@ -126,29 +193,63 @@ namespace o3tl {
     template<> struct typed_flags<ViewOptFlags> : is_typed_flags<ViewOptFlags, 0x01ff> {};
 }
 
+struct SwViewColors
+{
+    SwViewColors();
+    SwViewColors(const svtools::ColorConfig& rConfig);
+    bool operator==(const SwViewColors& rOther) const
+    {
+        return m_aDocColor == rOther.m_aDocColor
+            && m_aDocBoundColor == rOther.m_aDocBoundColor
+            && m_aObjectBoundColor == rOther.m_aObjectBoundColor
+            && m_aAppBackgroundColor == rOther.m_aAppBackgroundColor
+            && m_aTableBoundColor == rOther.m_aTableBoundColor
+            && m_aFontColor == rOther.m_aFontColor
+            && m_aIndexShadingsColor == rOther.m_aIndexShadingsColor
+            && m_aLinksColor == rOther.m_aLinksColor
+            && m_aVisitedLinksColor == rOther.m_aVisitedLinksColor
+            && m_aDirectCursorColor == rOther.m_aDirectCursorColor
+            && m_aTextGridColor == rOther.m_aTextGridColor
+            && m_aSpellColor == rOther.m_aSpellColor
+            && m_aGrammarColor == rOther.m_aGrammarColor
+            && m_aSmarttagColor == rOther.m_aSmarttagColor
+            && m_aFieldShadingsColor == rOther.m_aFieldShadingsColor
+            && m_aSectionBoundColor == rOther.m_aSectionBoundColor
+            && m_aPageBreakColor == rOther.m_aPageBreakColor
+            && m_aScriptIndicatorColor == rOther.m_aScriptIndicatorColor
+            && m_aShadowColor == rOther.m_aShadowColor
+            && m_aHeaderFooterMarkColor == rOther.m_aHeaderFooterMarkColor
+            && m_nAppearanceFlags == rOther.m_nAppearanceFlags;
+    }
+    Color m_aDocColor;  // color of document boundaries
+    Color m_aDocBoundColor;  // color of document boundaries
+    Color m_aObjectBoundColor; // color of object boundaries
+    Color m_aAppBackgroundColor; // application background
+    Color m_aTableBoundColor; // color of table boundaries
+    Color m_aFontColor;
+    Color m_aIndexShadingsColor; // background color of indexes
+    Color m_aLinksColor;
+    Color m_aVisitedLinksColor;
+    Color m_aDirectCursorColor;
+    Color m_aTextGridColor;
+    Color m_aSpellColor;     // mark color of online spell checking
+    Color m_aGrammarColor;
+    Color m_aSmarttagColor;
+    Color m_aFieldShadingsColor;
+    Color m_aSectionBoundColor;
+    Color m_aPageBreakColor;
+    Color m_aScriptIndicatorColor;
+    Color m_aShadowColor;
+    Color m_aHeaderFooterMarkColor;
+    ViewOptFlags m_nAppearanceFlags;
+};
+
 class SW_DLLPUBLIC SwViewOption
 {
-    static Color    s_aDocColor;  // color of document boundaries
-    static Color    s_aDocBoundColor;  // color of document boundaries
-    static Color    s_aObjectBoundColor; // color of object boundaries
-    static Color    s_aAppBackgroundColor; // application background
-    static Color    s_aTableBoundColor; // color of table boundaries
-    static Color    s_aFontColor;
-    static Color    s_aIndexShadingsColor; // background color of indexes
-    static Color    s_aLinksColor;
-    static Color    s_aVisitedLinksColor;
-    static Color    s_aDirectCursorColor;
-    static Color    s_aTextGridColor;
-    static Color    s_aSpellColor;     // mark color of online spell checking
-    static Color    s_aSmarttagColor;
-    static Color    s_aFieldShadingsColor;
-    static Color    s_aSectionBoundColor;
-    static Color    s_aPageBreakColor;
-    static Color    s_aScriptIndicatorColor;
-    static Color    s_aShadowColor;
-    static Color    s_aHeaderFooterMarkColor;
+    SwViewColors m_aColorConfig;
+    static SwViewColors s_aInitialColorConfig;
+    OUString m_sThemeName;
 
-    static ViewOptFlags s_nAppearanceFlags;
     static sal_uInt16   s_nPixelTwips;// 1 Pixel == ? Twips
 
     OUString        m_sSymbolFont;        // Symbolfont.
@@ -202,8 +303,32 @@ public:
 
     static void Init(const OutputDevice* pWin);        // Initializing of static data.
 
-    ViewOptFlags1   GetCoreOptions() const {return m_nCoreOptions;}
     inline void     SetUIOptions( const SwViewOption& );
+
+    void SetColorConfig(const SwViewColors& rColorConfig)
+    {
+        m_aColorConfig = rColorConfig;
+    }
+
+    const SwViewColors& GetColorConfig() const
+    {
+        return m_aColorConfig;
+    }
+
+    void SetThemeName(const OUString& rThemeName)
+    {
+        m_sThemeName = rThemeName;
+    }
+
+    OUString GetThemeName() const
+    {
+        return m_sThemeName;
+    }
+
+    static void SetInitialColorConfig(const SwViewColors& rColorConfig)
+    {
+        s_aInitialColorConfig = rColorConfig;
+    }
 
     // Options from nCoreOptions
     bool IsIdle() const
@@ -214,178 +339,226 @@ public:
     // in the wrong place here... Also currently there are many const modifying casts in the code
     // just to call this function on otherwise const objects. Thus declaring it as const now.
     void SetIdle( bool b ) const
-        { m_bIdle = b; }
+    { m_bIdle = b; }
 
     bool IsTab(bool bHard = false) const
-                    {   return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::Tab) &&
-                            ((m_nCoreOptions & ViewOptFlags1::ViewMetachars)||bHard); }
+    {
+        return !m_bReadonly && m_nCoreOptions.bTab && (m_nCoreOptions.bViewMetachars || bHard);
+    }
     void SetTab( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Tab); }
+    {
+        m_nCoreOptions.bTab = b;
+    }
 
     bool IsBlank(bool bHard = false) const
-                    { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::Blank) &&
-                            ((m_nCoreOptions & ViewOptFlags1::ViewMetachars)||bHard); }
-    void SetBlank( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Blank); }
+    {
+        return !m_bReadonly && m_nCoreOptions.bBlank && (m_nCoreOptions.bViewMetachars || bHard);
+    }
+    void SetBlank(bool b)
+    {
+        m_nCoreOptions.bBlank = b;
+    }
 
     bool IsHardBlank() const
-                    { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::HardBlank); }
+    {
+        return !m_bReadonly && (m_nCoreOptions.bHardBlank);
+    }
     void SetHardBlank( bool b )
-        { SetCoreOption(b, ViewOptFlags1::HardBlank); }
+    {
+        m_nCoreOptions.bHardBlank = b;
+    }
 
     bool IsParagraph(bool bHard = false) const
-                    {   return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::Paragraph) &&
-                            ((m_nCoreOptions & ViewOptFlags1::ViewMetachars)||bHard); }
+    {
+        return !m_bReadonly && m_nCoreOptions.bParagraph &&
+                            (m_nCoreOptions.bViewMetachars || bHard);
+    }
     void SetParagraph( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Paragraph); }
+    {
+        m_nCoreOptions.bParagraph = b;
+    }
 
     void SetShowBookmarks(bool const b)
     {
-        SetCoreOption(b, ViewOptFlags1::Bookmarks);
+        m_nCoreOptions.bBookmarks = b;
     }
     bool IsShowBookmarks(bool const bHard = false) const
     {
-        return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::Bookmarks)
+        return !m_bReadonly && (m_nCoreOptions.bBookmarks)
                 && (bHard || IsFieldShadings());
     }
 
     bool IsLineBreak(bool bHard = false) const
-                    {   return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::Linebreak) &&
-                            ((m_nCoreOptions & ViewOptFlags1::ViewMetachars)||bHard); }
+    {
+        return !m_bReadonly && (m_nCoreOptions.bLinebreak) &&
+                            ((m_nCoreOptions.bViewMetachars) || bHard);
+    }
     void SetLineBreak( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Linebreak); }
+    {
+        m_nCoreOptions.bLinebreak = b;
+    }
 
     void SetPageBreak( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Pagebreak); }
+    {
+        m_nCoreOptions.bPagebreak = b;
+    }
 
     void SetColumnBreak( bool b)
-        { SetCoreOption(b, ViewOptFlags1::Columnbreak); }
+    {
+        m_nCoreOptions.bColumnbreak = b;
+    }
 
     bool IsSoftHyph() const
-                    { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::SoftHyph); }
-    void SetSoftHyph( bool b )
-        { SetCoreOption(b, ViewOptFlags1::SoftHyph); }
+    { return !m_bReadonly && (m_nCoreOptions.bSoftHyph); }
 
-    bool IsFieldName() const       { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::FieldName); }
+    void SetSoftHyph( bool b )
+    {
+        m_nCoreOptions.bSoftHyph = b;
+    }
+
+    bool IsFieldName() const
+    { return !m_bReadonly && (m_nCoreOptions.bFieldName); }
+
     void SetFieldName( bool b )
-        { SetCoreOption(b, ViewOptFlags1::FieldName); }
+    {
+        m_nCoreOptions.bFieldName = b;
+    }
 
     bool IsPostIts() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Postits); }
+    {
+        return m_nCoreOptions.bPostits;
+    }
+
     void SetPostIts( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Postits); }
+    {
+        m_nCoreOptions.bPostits = b;
+    }
 
     bool IsResolvedPostIts() const
-        { return bool(m_nUIOptions & ViewOptFlags2::ResolvedPostits); }
-    void SetResolvedPostIts( bool b )
-        { SetUIOption(b, ViewOptFlags2::ResolvedPostits); }
+    { return bool(m_nUIOptions & ViewOptFlags2::ResolvedPostits); }
 
-    static void PaintPostIts( OutputDevice *pOut, const SwRect &rRect,
-                              bool bIsScript );
+    void SetResolvedPostIts( bool b )
+    { SetUIOption(b, ViewOptFlags2::ResolvedPostits); }
+
+    void PaintPostIts( OutputDevice *pOut, const SwRect &rRect,
+                              bool bIsScript ) const;
     static sal_uInt16 GetPostItsWidth( const OutputDevice *pOut );
 
     //show/hide tooltips on tracked changes
     bool IsShowInlineTooltips() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::ShowInlineTooltips); }
+    {
+        return m_nCoreOptions.bShowInlineTooltips;
+    }
+
     void SetShowInlineTooltips( bool b )
-        { SetCoreOption(b, ViewOptFlags1::ShowInlineTooltips); }
+    { m_nCoreOptions.bShowInlineTooltips = b; }
 
     //show/hide tracked deletions in text
     bool IsShowChangesInMargin() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::ShowChangesInMargin); }
+    {
+        return m_nCoreOptions.bShowChangesInMargin;
+    }
+
     void SetShowChangesInMargin( bool b )
-        { SetCoreOption(b, ViewOptFlags1::ShowChangesInMargin); }
+    {
+        m_nCoreOptions.bShowChangesInMargin = b;
+    }
 
     //show/hide tracked insertions in text
     bool IsShowChangesInMargin2() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::ShowChangesInMargin2); }
+    { return m_nCoreOptions.bShowChangesInMargin2; }
+
     void SetShowChangesInMargin2( bool b )
-        { SetCoreOption(b, ViewOptFlags1::ShowChangesInMargin2); }
+    { m_nCoreOptions.bShowChangesInMargin2 = b; }
 
     //show/hide interactive header/footer on top/bottom of pages
     bool IsUseHeaderFooterMenu() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::UseHeaderFooterMenu ); }
+    { return m_nCoreOptions.bUseHeaderFooterMenu; }
     void SetUseHeaderFooterMenu( bool b )
-        { SetCoreOption(b, ViewOptFlags1::UseHeaderFooterMenu); }
+    { m_nCoreOptions.bUseHeaderFooterMenu = b; }
 
     //show/hide outline content visibility button
     bool IsShowOutlineContentVisibilityButton() const;
     void SetShowOutlineContentVisibilityButton(bool b)
-        { SetCoreOption(b, ViewOptFlags1::ShowOutlineContentVisibilityButton); }
+    { m_nCoreOptions.bShowOutlineContentVisibilityButton = b; }
 
     bool IsTreatSubOutlineLevelsAsContent() const;
     void SetTreatSubOutlineLevelsAsContent(bool b)
-        { SetCoreOption(b, ViewOptFlags1::TreatSubOutlineLevelsAsContent); }
-
+    { m_nCoreOptions.bTreatSubOutlineLevelsAsContent = b; }
 
     bool IsShowHiddenChar(bool bHard = false) const
-        { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::CharHidden) &&
-                            ((m_nCoreOptions & ViewOptFlags1::ViewMetachars)||bHard); }
+    { return !m_bReadonly && m_nCoreOptions.bCharHidden &&
+                            (m_nCoreOptions.bViewMetachars || bHard); }
 
     void SetShowHiddenChar( bool b )
-        { SetCoreOption(b, ViewOptFlags1::CharHidden); }
+    { m_nCoreOptions.bCharHidden = b; }
 
     bool IsShowHiddenField() const
-        { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::FieldHidden); }
+    { return !m_bReadonly && m_nCoreOptions.bFieldHidden; }
     void SetShowHiddenField( bool b )
-        { SetCoreOption(b, ViewOptFlags1::FieldHidden); }
+    { m_nCoreOptions.bFieldHidden = b; }
 
     bool IsGraphic() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Graphic); }
+    { return m_nCoreOptions.bGraphic; }
     void SetGraphic( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Graphic); }
+    { m_nCoreOptions.bGraphic = b; }
 
     bool IsPageBack() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Pageback); }
+    { return m_nCoreOptions.bPageback; }
     void SetPageBack( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Pageback); }
+    { m_nCoreOptions.bPageback = b; }
 
     bool IsTable() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Table); }
+    { return m_nCoreOptions.bTable; }
     void SetTable( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Table); }
+    { m_nCoreOptions.bTable = b; }
 
     bool IsDraw() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Draw); }
+    { return m_nCoreOptions.bDraw; }
     void SetDraw( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Draw); }
+    { m_nCoreOptions.bDraw = b; }
 
     bool IsControl() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Control); }
+    { return m_nCoreOptions.bControl; }
     void SetControl( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Control); }
+    { m_nCoreOptions.bControl = b; }
 
     bool IsSnap() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Snap); }
+    { return m_nCoreOptions.bSnap; }
     void SetSnap( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Snap); }
+    { m_nCoreOptions.bSnap = b; }
 
     void SetSnapSize( Size const &rSz ){ m_aSnapSize = rSz; }
     const Size &GetSnapSize() const { return m_aSnapSize; }
 
     bool IsGridVisible() const
-        { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::GridVisible); }
+    { return !m_bReadonly && m_nCoreOptions.bGridVisible; }
     void SetGridVisible( bool b )
-        { SetCoreOption(b, ViewOptFlags1::GridVisible); }
+    { m_nCoreOptions.bGridVisible = b; }
 
     bool IsOnlineSpell() const
-        { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::OnlineSpell); }
-    void SetOnlineSpell( bool b );
+    {
+        return !m_bReadonly && m_nCoreOptions.bOnlineSpell;
+    }
+    void SetOnlineSpell( bool b )
+    {
+        m_nCoreOptions.bOnlineSpell = b;
+    }
 
     bool IsViewMetaChars() const
-        { return !m_bReadonly && (m_nCoreOptions & ViewOptFlags1::ViewMetachars); }
+    { return !m_bReadonly && m_nCoreOptions.bViewMetachars; }
     void SetViewMetaChars( bool b)
-        { SetCoreOption(b, ViewOptFlags1::ViewMetachars); }
+    { m_nCoreOptions.bViewMetachars = b; }
 
     bool IsSynchronize() const
-        {  return bool(m_nCoreOptions & ViewOptFlags1::Synchronize); }
+    {  return m_nCoreOptions.bSynchronize; }
     void SetSynchronize( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Synchronize); }
+    { m_nCoreOptions.bSynchronize = b; }
 
     bool IsCrossHair() const
-        { return bool(m_nCoreOptions & ViewOptFlags1::Crosshair); }
+    { return m_nCoreOptions.bCrosshair; }
     void SetCrossHair( bool b )
-        { SetCoreOption(b, ViewOptFlags1::Crosshair); }
+    { m_nCoreOptions.bCrosshair = b; }
 
     // Options from nCore2Options
     bool IsBlackFont() const
@@ -432,13 +605,6 @@ public:
             m_nCore2Options |= f;
         else
             m_nCore2Options &= ~f;
-    }
-    void SetCoreOption(bool b, ViewOptFlags1 f)
-    {
-        if (b)
-            m_nCoreOptions |= f;
-        else
-            m_nCoreOptions &= ~f;
     }
 
     short GetDivisionX() const   { return m_nDivisionX; }
@@ -641,42 +807,41 @@ public:
     bool        IsShowPlaceHolderFields() const { return m_bShowPlaceHolderFields; }
     void            SetShowPlaceHolderFields(bool bSet) { m_bShowPlaceHolderFields = bSet; }
 
-    static Color&   GetDocColor();
-    static Color&   GetDocBoundariesColor();
-    static Color&   GetAppBackgroundColor();
-    static Color&   GetObjectBoundariesColor();
-    static Color&   GetTableBoundariesColor();
-    static Color&   GetIndexShadingsColor();
-    static Color&   GetLinksColor();
-    static Color&   GetVisitedLinksColor();
-    static Color&   GetDirectCursorColor();
-    static Color&   GetTextGridColor();
-    static Color&   GetSpellColor();
-    static Color&   GetSmarttagColor();
-    static Color&   GetShadowColor();
-    static Color&   GetFontColor();
-    static Color&   GetFieldShadingsColor();
-    static Color&   GetSectionBoundColor();
-    static Color&   GetPageBreakColor();
-    static Color&   GetHeaderFooterMarkColor();
+    const Color& GetDocColor() const;
+    const Color& GetDocBoundariesColor() const;
+    const Color& GetAppBackgroundColor() const;
+    const Color& GetObjectBoundariesColor() const;
+    const Color& GetTableBoundariesColor() const;
+    const Color& GetIndexShadingsColor() const;
+    const Color& GetLinksColor() const;
+    const Color& GetVisitedLinksColor() const;
+    const Color& GetDirectCursorColor() const;
+    const Color& GetTextGridColor() const;
+    const Color& GetSpellColor() const;
+    const Color& GetGrammarColor() const;
+    const Color& GetSmarttagColor() const;
+    const Color& GetShadowColor() const;
+    const Color& GetFontColor() const;
+    const Color& GetFieldShadingsColor() const;
+    const Color& GetSectionBoundColor() const;
+    const Color& GetPageBreakColor() const;
+    const Color& GetHeaderFooterMarkColor() const;
 
-    static bool     IsAppearanceFlag(ViewOptFlags nFlag);
+    bool IsAppearanceFlag(ViewOptFlags nFlag) const;
 
-    static bool     IsDocBoundaries()     {return IsAppearanceFlag(ViewOptFlags::DocBoundaries);}
-    static bool     IsObjectBoundaries()  {return IsAppearanceFlag(ViewOptFlags::ObjectBoundaries);}
-    static bool     IsTableBoundaries()   {return IsAppearanceFlag(ViewOptFlags::TableBoundaries );}
-    static bool     IsIndexShadings()     {return IsAppearanceFlag(ViewOptFlags::IndexShadings   );}
-    static bool     IsLinks()             {return IsAppearanceFlag(ViewOptFlags::Links            );}
-    static bool     IsVisitedLinks()      {return IsAppearanceFlag(ViewOptFlags::VisitedLinks    );}
-    static bool     IsFieldShadings()     {return IsAppearanceFlag(ViewOptFlags::FieldShadings);}
-    static bool     IsSectionBoundaries() {return IsAppearanceFlag(ViewOptFlags::SectionBoundaries);}
-    static bool     IsShadow()            {return IsAppearanceFlag(ViewOptFlags::Shadow           );}
+    bool IsDocBoundaries() const {return IsAppearanceFlag(ViewOptFlags::DocBoundaries);}
+    bool IsObjectBoundaries() const {return IsAppearanceFlag(ViewOptFlags::ObjectBoundaries);}
+    bool IsTableBoundaries() const {return IsAppearanceFlag(ViewOptFlags::TableBoundaries);}
+    bool IsIndexShadings() const {return IsAppearanceFlag(ViewOptFlags::IndexShadings);}
+    bool IsLinks() const {return IsAppearanceFlag(ViewOptFlags::Links);}
+    bool IsVisitedLinks() const {return IsAppearanceFlag(ViewOptFlags::VisitedLinks);}
+    bool IsFieldShadings() const {return IsAppearanceFlag(ViewOptFlags::FieldShadings);}
+    bool IsSectionBoundaries() const {return IsAppearanceFlag(ViewOptFlags::SectionBoundaries);}
+    bool IsShadow() const {return IsAppearanceFlag(ViewOptFlags::Shadow);}
 
-    static void     SetAppearanceFlag(ViewOptFlags nFlag, bool bSet, bool bSaveInConfig = false);
+    void     SetAppearanceFlag(ViewOptFlags nFlag, bool bSet, bool bSaveInConfig = false);
 
-    static void     SetDocBoundaries(bool bSet)   {SetAppearanceFlag(ViewOptFlags::DocBoundaries, bSet);}
-
-    static void     ApplyColorConfigValues(const svtools::ColorConfig& rConfig);
+    void     SetDocBoundaries(bool bSet)   {SetAppearanceFlag(ViewOptFlags::DocBoundaries, bSet);}
 
     // get/set default anchor (0..2); use GetDefaultAnchorType() to convert into RndStdIds::FLY_*
     sal_Int32 GetDefaultAnchor() const
@@ -685,11 +850,14 @@ public:
         { m_nDefaultAnchor = aFlag; }
 
     RndStdIds GetDefaultAnchorType() const;
+
+    // Useful for when getting the current view SwViewOption is not possible otherwise
+    static const SwViewOption& GetCurrentViewOptions();
 };
 
 inline bool SwViewOption::operator==( const SwViewOption &rOpt ) const
 {
-    return IsEqualFlags( rOpt ) && m_nZoom == rOpt.GetZoom();
+    return IsEqualFlags( rOpt ) && m_nZoom == rOpt.GetZoom() && m_aColorConfig == rOpt.m_aColorConfig;
 }
 
 inline void SwViewOption::SetUIOptions( const SwViewOption& rVOpt )

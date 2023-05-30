@@ -34,7 +34,7 @@ namespace skeletonmaker::cpp {
 
 static void generateIncludes(std::ostream & o,
          const std::set< OUString >& interfaces,
-         const OUString & propertyhelper, const bool serviceobject,
+         std::u16string_view propertyhelper, const bool serviceobject,
          const bool supportxcomponent)
 {
     o << "#include \"sal/config.h\"\n";
@@ -51,8 +51,8 @@ static void generateIncludes(std::ostream & o,
         o << "#include \"cppuhelper/implbase" << interfaces.size() << ".hxx\"\n";
     }
 
-    if (propertyhelper.getLength() > 1) {
-        if (propertyhelper == "_")
+    if (propertyhelper.size() > 1) {
+        if (propertyhelper == u"_")
             o << "#include \"cppuhelper/rpopshlp.hxx\"\n";
         else
             o << "#include \"cppuhelper/propertysetmixin.hxx\"\n";
@@ -661,7 +661,7 @@ static OString generateClassDefinition(std::ostream& o,
             "css::uno::RuntimeException);\n";
 
         OStringBuffer buffer(256);
-        buffer.append(parentname.toString());
+        buffer.append(parentname);
         buffer.append("< ");
         std::set< OUString >::const_iterator iter = interfaces.begin();
         while (iter != interfaces.end())

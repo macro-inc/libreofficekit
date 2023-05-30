@@ -43,21 +43,9 @@ SwVbaEventsHelper::~SwVbaEventsHelper()
 {
 }
 
-bool SwVbaEventsHelper::implPrepareEvent( EventQueue& rEventQueue,
-        const EventHandlerInfo& rInfo, const uno::Sequence< uno::Any >& /*rArgs*/ )
+bool SwVbaEventsHelper::implPrepareEvent(EventQueue& /*rEventQueue*/,
+        const EventHandlerInfo& /*rInfo*/, const uno::Sequence<uno::Any>& /*rArgs*/)
 {
-    switch( rInfo.mnEventId )
-    {
-        case DOCUMENT_NEW:
-            rEventQueue.emplace_back(AUTO_NEW );
-        break;
-        case DOCUMENT_OPEN:
-            rEventQueue.emplace_back(AUTO_OPEN );
-        break;
-        case DOCUMENT_CLOSE:
-            rEventQueue.emplace_back(AUTO_CLOSE );
-        break;
-    }
     return true;
 }
 
@@ -92,7 +80,7 @@ sal_Bool SwVbaEventsHelper::supportsService( const OUString& ServiceName )
 }
 css::uno::Sequence< OUString > SwVbaEventsHelper::getSupportedServiceNames()
 {
-    return { "com.sun.star.document.vba.VBATextEventProcessor" };
+    return { "com.sun.star.script.vba.VBATextEventProcessor" };
 }
 
 

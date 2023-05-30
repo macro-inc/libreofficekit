@@ -24,10 +24,10 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <svl/hint.hxx>
-#include <rtl/ustrbuf.hxx>
 
 #include <sdr/contact/viewcontactofsdredgeobj.hxx>
 #include <sdr/properties/connectorproperties.hxx>
+#include <svx/compatflags.hxx>
 #include <svx/sdrhittesthelper.hxx>
 #include <svx/svddrag.hxx>
 #include <svx/svddrgmt.hxx>
@@ -392,7 +392,7 @@ void SdrEdgeObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrEdgeObj::GetObjIdentifier() const
 {
-    return OBJ_EDGE;
+    return SdrObjKind::Edge;
 }
 
 const tools::Rectangle& SdrEdgeObj::GetCurrentBoundRect() const
@@ -730,10 +730,13 @@ XPolygon SdrEdgeObj::ImpCalcEdgeTrack(const XPolygon& rTrack0, SdrObjConnection&
         sal_uInt16 nSiz=rTrack0.GetPointCount();
         nSiz--;
         aPt2=rTrack0[nSiz];
-    } else {
-        if (!m_aOutRect.IsEmpty()) {
-            aPt1=m_aOutRect.TopLeft();
-            aPt2=m_aOutRect.BottomRight();
+    }
+    else
+    {
+        auto aRectangle = getOutRectangle();
+        if (!aRectangle.IsEmpty()) {
+            aPt1 = aRectangle.TopLeft();
+            aPt2 = aRectangle.BottomRight();
         }
     }
 
@@ -747,11 +750,14 @@ XPolygon SdrEdgeObj::ImpCalcEdgeTrack(const XPolygon& rTrack0, SdrObjConnection&
         if (rCon1.pObj==static_cast<SdrObject const *>(this))
         {
             // check, just in case
-            aBoundRect1=m_aOutRect;
+            aBoundRect1 = getOutRectangle();
         }
         else
         {
-            aBoundRect1 = rCon1.pObj->GetCurrentBoundRect();
+            if (getSdrModelFromSdrObject().GetCompatibilityFlag(SdrCompatibilityFlag::ConnectorUseSnapRect))
+                aBoundRect1 = rCon1.pObj->GetSnapRect();
+            else
+                aBoundRect1 = rCon1.pObj->GetCurrentBoundRect();
         }
 
         aBoundRect1.Move(rCon1.aObjOfs.X(),rCon1.aObjOfs.Y());
@@ -774,11 +780,14 @@ XPolygon SdrEdgeObj::ImpCalcEdgeTrack(const XPolygon& rTrack0, SdrObjConnection&
     {
         if (rCon2.pObj==static_cast<SdrObject const *>(this))
         { // check, just in case
-            aBoundRect2=m_aOutRect;
+            aBoundRect2 = getOutRectangle();
         }
         else
         {
-            aBoundRect2 = rCon2.pObj->GetCurrentBoundRect();
+            if (getSdrModelFromSdrObject().GetCompatibilityFlag(SdrCompatibilityFlag::ConnectorUseSnapRect))
+                aBoundRect2 = rCon2.pObj->GetSnapRect();
+            else
+                aBoundRect2 = rCon2.pObj->GetCurrentBoundRect();
         }
 
         aBoundRect2.Move(rCon2.aObjOfs.X(),rCon2.aObjOfs.Y());
@@ -1664,7 +1673,7 @@ void SdrEdgeObj::Reformat()
     }
 }
 
-SdrEdgeObj* SdrEdgeObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrEdgeObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrEdgeObj(rTargetModel, *this);
 }
@@ -1848,16 +1857,16 @@ bool SdrEdgeObj::hasSpecialDrag() const
     return true;
 }
 
-SdrObjectUniquePtr SdrEdgeObj::getFullDragClone() const
+rtl::Reference<SdrObject> SdrEdgeObj::getFullDragClone() const
 {
     // use Clone operator
-    SdrEdgeObj* pRetval(CloneSdrObject(getSdrModelFromSdrObject()));
+    rtl::Reference<SdrEdgeObj> pRetval = SdrObject::Clone(*this, getSdrModelFromSdrObject());
 
     // copy connections for clone, SdrEdgeObj::operator= does not do this
     pRetval->ConnectToNode(true, GetConnectedNode(true));
     pRetval->ConnectToNode(false, GetConnectedNode(false));
 
-    return SdrObjectUniquePtr(pRetval);
+    return pRetval;
 }
 
 bool SdrEdgeObj::beginSpecialDrag(SdrDragStat& rDrag) const
@@ -1992,7 +2001,7 @@ OUString SdrEdgeObj::getSpecialDragComment(const SdrDragStat& rDrag) const
 }
 
 
-basegfx::B2DPolygon SdrEdgeObj::ImplAddConnectorOverlay(SdrDragMethod& rDragMethod, bool bTail1, bool bTail2, bool bDetail) const
+basegfx::B2DPolygon SdrEdgeObj::ImplAddConnectorOverlay(const SdrDragMethod& rDragMethod, bool bTail1, bool bTail2, bool bDetail) const
 {
     basegfx::B2DPolygon aResult;
 
@@ -2408,11 +2417,11 @@ void SdrEdgeObj::NbcShear(const Point& rRef, Degree100 nAngle, double tn, bool b
     }
 }
 
-SdrObjectUniquePtr SdrEdgeObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrEdgeObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
     basegfx::B2DPolyPolygon aPolyPolygon;
     aPolyPolygon.append(pEdgeTrack->getB2DPolygon());
-    SdrObjectUniquePtr pRet = ImpConvertMakeObj(aPolyPolygon, false, bBezier);
+    rtl::Reference<SdrObject> pRet = ImpConvertMakeObj(aPolyPolygon, false, bBezier);
 
     if(bAddText)
     {
@@ -2540,9 +2549,9 @@ Point SdrEdgeObj::GetTailPoint( bool bTail ) const
     else
     {
         if(bTail)
-            return m_aOutRect.TopLeft();
+            return getOutRectangle().TopLeft();
         else
-            return m_aOutRect.BottomRight();
+            return getOutRectangle().BottomRight();
     }
 
 }

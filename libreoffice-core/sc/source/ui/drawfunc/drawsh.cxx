@@ -68,24 +68,23 @@ SFX_IMPL_INTERFACE(ScDrawShell, SfxShell)
 
 namespace
 {
-    void lcl_convertStringArguments(sal_uInt16 nSlot, const std::unique_ptr<SfxItemSet>& pArgs)
+    void lcl_convertStringArguments(sal_uInt16 nSlot, SfxItemSet& rArgs)
     {
         Color aColor;
-        const SfxPoolItem* pItem = nullptr;
 
-        if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_LINE_WIDTH_ARG, false, &pItem))
+        if (const SvxDoubleItem* pWidthItem = rArgs.GetItemIfSet(SID_ATTR_LINE_WIDTH_ARG, false))
         {
-            double fValue = static_cast<const SvxDoubleItem*>(pItem)->GetValue();
+            double fValue = pWidthItem->GetValue();
             // FIXME: different units...
             int nPow = 100;
             int nValue = fValue * nPow;
 
             XLineWidthItem aItem(nValue);
-            pArgs->Put(aItem);
+            rArgs.Put(aItem);
         }
-        else if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_COLOR_STR, false, &pItem))
+        else if (const SfxStringItem* pColorItem = rArgs.GetItemIfSet(SID_ATTR_COLOR_STR, false))
         {
-            OUString sColor = static_cast<const SfxStringItem*>(pItem)->GetValue();
+            OUString sColor = pColorItem->GetValue();
 
             if (sColor == "transparent")
                 aColor = COL_TRANSPARENT;
@@ -97,34 +96,30 @@ namespace
                 case SID_ATTR_LINE_COLOR:
                 {
                     XLineColorItem aLineColorItem(OUString(), aColor);
-                    pArgs->Put(aLineColorItem);
+                    rArgs.Put(aLineColorItem);
                     break;
                 }
 
                 case SID_ATTR_FILL_COLOR:
                 {
                     XFillColorItem aFillColorItem(OUString(), aColor);
-                    pArgs->Put(aFillColorItem);
+                    rArgs.Put(aFillColorItem);
                     break;
                 }
 
                 case SID_ATTR_SHADOW_COLOR:
                 {
                     XColorItem aItem(SDRATTR_SHADOWCOLOR, aColor);
-                    pArgs->Put(aItem);
+                    rArgs.Put(aItem);
                     break;
                 }
             }
         }
-        if (SfxItemState::SET == pArgs->GetItemState(SID_FILL_GRADIENT_JSON, false, &pItem))
+        if (const SfxStringItem* pJSON = rArgs.GetItemIfSet(SID_FILL_GRADIENT_JSON, false))
         {
-            const SfxStringItem* pJSON = static_cast<const SfxStringItem*>(pItem);
-            if (pJSON)
-            {
-                XGradient aGradient = XGradient::fromJSON(pJSON->GetValue());
-                XFillGradientItem aItem(aGradient);
-                pArgs->Put(aItem);
-            }
+            XGradient aGradient = XGradient::fromJSON(pJSON->GetValue());
+            XFillGradientItem aItem(aGradient);
+            rArgs.Put(aItem);
         }
     }
 }
@@ -294,9 +289,9 @@ void ScDrawShell::ExecDrawAttr( SfxRequest& rReq )
 
                 if( pView->AreObjectsMarked() )
                 {
-                    std::unique_ptr<SfxItemSet> pNewArgs = rReq.GetArgs()->Clone();
-                    lcl_convertStringArguments( rReq.GetSlot(), pNewArgs );
-                    pView->SetAttrToMarked( *pNewArgs, false );
+                    SfxItemSet aNewArgs = rReq.GetArgs()->CloneAsValue();
+                    lcl_convertStringArguments( rReq.GetSlot(), aNewArgs );
+                    pView->SetAttrToMarked( aNewArgs, false );
                 }
                 else
                     pView->SetDefaultAttr( *rReq.GetArgs(), false);
@@ -375,7 +370,7 @@ void ScDrawShell::ExecDrawAttr( SfxRequest& rReq )
                             SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
                             std::shared_ptr<SfxRequest> pRequest = std::make_shared<SfxRequest>(rReq);
 
-                            if( pObj->GetObjIdentifier() == OBJ_CAPTION )
+                            if( pObj->GetObjIdentifier() == SdrObjKind::Caption )
                             {
                                 // Caption Itemset
                                 SfxItemSet aNewAttr(pDoc->GetItemPool());
@@ -480,12 +475,12 @@ void ScDrawShell::ExecuteMacroAssign(SdrObject* pObj, weld::Window* pWin)
         return;
 
     const SfxItemSet* pOutSet = pMacroDlg->GetOutputItemSet();
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET != pOutSet->GetItemState( SID_ATTR_MACROITEM, false, &pItem ))
+    const SvxMacroItem* pItem = pOutSet->GetItemIfSet( SID_ATTR_MACROITEM, false );
+    if( !pItem )
         return;
 
     OUString sMacro;
-    const SvxMacro* pMacro = static_cast<const SvxMacroItem*>(pItem)->GetMacroTable().Get( SvMacroItemId::OnClick );
+    const SvxMacro* pMacro = pItem->GetMacroTable().Get( SvMacroItemId::OnClick );
     if ( pMacro )
         sMacro = pMacro->GetMacName();
 
@@ -557,7 +552,7 @@ void ScDrawShell::ExecuteAreaDlg( const SfxRequest& rReq )
     weld::Window* pWin = rViewData.GetDialogParent();
     VclPtr<AbstractSvxAreaTabDialog> pDlg(pFact->CreateSvxAreaTabDialog(
         pWin, &aNewAttr,
-        rViewData.GetDocument().GetDrawLayer(), true));
+        rViewData.GetDocument().GetDrawLayer(), true, false));
 
     pDlg->StartExecuteAsync([=](sal_Int32 nResult){
         if ( nResult == RET_OK )

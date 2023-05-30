@@ -32,7 +32,6 @@
 #include <unotools/syslocale.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <osl/diagnose.h>
-#include <sal/macros.h>
 #include <sal/log.hxx>
 
 #include <string.h>
@@ -299,7 +298,8 @@ FontSubstConfiguration& FontSubstConfiguration::get()
  */
 
 FontSubstConfiguration::FontSubstConfiguration() :
-    maSubstHash( 300 )
+    maSubstHash( 300 ),
+    maLanguageTag("en")
 {
     if (utl::ConfigManager::IsFuzzing())
         return;
@@ -339,6 +339,9 @@ FontSubstConfiguration::FontSubstConfiguration() :
     }
     SAL_INFO("unotools.config", "config provider: " << m_xConfigProvider.is()
             << ", config access: " << m_xConfigAccess.is());
+
+    if( maLanguageTag.isSystemLocale() )
+        maLanguageTag = SvtSysLocale().GetUILanguageTag();
 }
 
 /*
@@ -598,13 +601,13 @@ static bool ImplKillLeading( OUString& rName, const char* const* ppStr )
     return false;
 }
 
-static sal_Int32 ImplIsTrailing( const OUString& rName, const char* pStr )
+static sal_Int32 ImplIsTrailing( std::u16string_view rName, const char* pStr )
 {
-    sal_Int32 nStrLen = static_cast<sal_Int32>(strlen( pStr ));
-    if( nStrLen >= rName.getLength() )
+    size_t nStrLen = strlen( pStr );
+    if( nStrLen >= rName.size() )
         return 0;
 
-    const sal_Unicode* pEndName = rName.getStr() + rName.getLength();
+    const sal_Unicode* pEndName = rName.data() + rName.size();
     const sal_Unicode* pNameStr = pEndName - nStrLen;
     do if( *(pNameStr++) != *(pStr++) )
         return 0;
@@ -882,7 +885,7 @@ FontWeight FontSubstConfiguration::getSubstWeight( const css::uno::Reference< XN
         {
             if( !pLine->isEmpty() )
             {
-                for( weight=SAL_N_ELEMENTS(pWeightNames)-1; weight >= 0; weight-- )
+                for( weight=std::size(pWeightNames)-1; weight >= 0; weight-- )
                     if( pLine->equalsIgnoreAsciiCaseAscii( pWeightNames[weight].pName ) )
                         break;
             }
@@ -909,7 +912,7 @@ FontWidth FontSubstConfiguration::getSubstWidth( const css::uno::Reference< XNam
         {
             if( !pLine->isEmpty() )
             {
-                for( width=SAL_N_ELEMENTS(pWidthNames)-1; width >= 0; width-- )
+                for( width=std::size(pWidthNames)-1; width >= 0; width-- )
                     if( pLine->equalsIgnoreAsciiCaseAscii( pWidthNames[width].pName ) )
                         break;
             }
@@ -1042,13 +1045,8 @@ const FontNameAttr* FontSubstConfiguration::getSubstInfo( const OUString& rFontN
     FontNameAttr aSearchAttr;
     aSearchAttr.Name = aSearchFont;
 
-    LanguageTag aLanguageTag("en");
-
-    if( aLanguageTag.isSystemLocale() )
-        aLanguageTag = SvtSysLocale().GetUILanguageTag();
-
-    ::std::vector< OUString > aFallbacks( aLanguageTag.getFallbackStrings( true));
-    if (aLanguageTag.getLanguage() != "en")
+    ::std::vector< OUString > aFallbacks( maLanguageTag.getFallbackStrings( true));
+    if (maLanguageTag.getLanguage() != "en")
         aFallbacks.emplace_back("en");
 
     for (const auto& rFallback : aFallbacks)

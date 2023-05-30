@@ -73,7 +73,7 @@ ScXMLCalculationSettingsContext::ScXMLCalculationSettingsContext( ScXMLImport& r
             break;
         case XML_ELEMENT( TABLE, XML_NULL_YEAR ):
             sal_Int32 nTemp;
-            ::sax::Converter::convertNumber( nTemp, aIter.toString() );
+            ::sax::Converter::convertNumber( nTemp, aIter.toView() );
             nYear2000 = static_cast<sal_uInt16>(nTemp);
             break;
         case XML_ELEMENT( TABLE, XML_USE_REGULAR_EXPRESSIONS ):
@@ -117,18 +117,18 @@ void SAL_CALL ScXMLCalculationSettingsContext::endFastElement( sal_Int32 /*nElem
     if (!xPropertySet.is())
         return;
 
-    xPropertySet->setPropertyValue( SC_UNO_CALCASSHOWN, uno::makeAny(bCalcAsShown) );
-    xPropertySet->setPropertyValue( SC_UNO_IGNORECASE, uno::makeAny(bIgnoreCase) );
-    xPropertySet->setPropertyValue( SC_UNO_LOOKUPLABELS, uno::makeAny(bLookUpLabels) );
-    xPropertySet->setPropertyValue( SC_UNO_MATCHWHOLE, uno::makeAny(bMatchWholeCell) );
+    xPropertySet->setPropertyValue( SC_UNO_CALCASSHOWN, uno::Any(bCalcAsShown) );
+    xPropertySet->setPropertyValue( SC_UNO_IGNORECASE, uno::Any(bIgnoreCase) );
+    xPropertySet->setPropertyValue( SC_UNO_LOOKUPLABELS, uno::Any(bLookUpLabels) );
+    xPropertySet->setPropertyValue( SC_UNO_MATCHWHOLE, uno::Any(bMatchWholeCell) );
     bool bWildcards, bRegex;
     utl::SearchParam::ConvertToBool( eSearchType, bWildcards, bRegex);
-    xPropertySet->setPropertyValue( SC_UNO_REGEXENABLED, uno::makeAny(bRegex) );
-    xPropertySet->setPropertyValue( SC_UNO_WILDCARDSENABLED, uno::makeAny(bWildcards) );
-    xPropertySet->setPropertyValue( SC_UNO_ITERENABLED, uno::makeAny(bIsIterationEnabled) );
-    xPropertySet->setPropertyValue( SC_UNO_ITERCOUNT, uno::makeAny(nIterationCount) );
-    xPropertySet->setPropertyValue( SC_UNO_ITEREPSILON, uno::makeAny(fIterationEpsilon) );
-    xPropertySet->setPropertyValue( SC_UNO_NULLDATE, uno::makeAny(aNullDate) );
+    xPropertySet->setPropertyValue( SC_UNO_REGEXENABLED, uno::Any(bRegex) );
+    xPropertySet->setPropertyValue( SC_UNO_WILDCARDSENABLED, uno::Any(bWildcards) );
+    xPropertySet->setPropertyValue( SC_UNO_ITERENABLED, uno::Any(bIsIterationEnabled) );
+    xPropertySet->setPropertyValue( SC_UNO_ITERCOUNT, uno::Any(nIterationCount) );
+    xPropertySet->setPropertyValue( SC_UNO_ITEREPSILON, uno::Any(fIterationEpsilon) );
+    xPropertySet->setPropertyValue( SC_UNO_NULLDATE, uno::Any(aNullDate) );
     if (GetScImport().GetDocument())
     {
         ScXMLImport::MutexGuard aGuard(GetScImport());
@@ -150,12 +150,18 @@ ScXMLNullDateContext::ScXMLNullDateContext( ScXMLImport& rImport,
     if (aIter != rAttrList->end())
     {
         util::DateTime aDateTime;
-        ::sax::Converter::parseDateTime(aDateTime, aIter.toString());
-        util::Date aDate;
-        aDate.Day = aDateTime.Day;
-        aDate.Month = aDateTime.Month;
-        aDate.Year = aDateTime.Year;
-        pCalcSet->SetNullDate(aDate);
+        if (::sax::Converter::parseDateTime(aDateTime, aIter.toView()))
+        {
+            util::Date aDate;
+            aDate.Day = aDateTime.Day;
+            aDate.Month = aDateTime.Month;
+            aDate.Year = aDateTime.Year;
+            pCalcSet->SetNullDate(aDate);
+        }
+        else
+        {
+            SAL_WARN("sc.filter","ignoring invalid NullDate '" << aIter.toView() << "'");
+        }
     }
 }
 

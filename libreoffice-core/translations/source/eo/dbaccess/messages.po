@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-06-06 17:38+0000\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
+"PO-Revision-Date: 2022-12-19 14:09+0000\n"
 "Last-Translator: Donald Rogers <donr2648@fastmail.fm>\n"
 "Language-Team: Esperanto <https://translations.documentfoundation.org/projects/libo_ui-master/dbaccessmessages/eo/>\n"
 "Language: eo\n"
@@ -1895,11 +1895,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "Vojprefikso al la kalkultabela dokumento"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "Nomo de la datumfonto ODBC en via sistemo"
+msgid "Name of the ODBC data source"
+msgstr "Nomo de la ODBC-datumfonto"
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -2227,22 +2227,22 @@ msgstr ""
 "Alklaku 'Foliumi' por agordi provizant-specifaj agordoj.\n"
 "Bonvolu kontakti vian sisteman administranton se vi ne certas pri la jenaj agordoj."
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "Agordi konekton al ODBC-datumbazo"
+msgid "Set up a connection to an ODBC data source"
+msgstr "Agordi konekton al ODBC-datumfonto"
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"Tajpi la nomon de la ODBC-datumbazon al kiu konekti.\n"
-"Alklaku 'Foliumi...' por elekti ODBC-datumbazon jam registritan por %PRODUCTNAME.\n"
+"Tajpu la nomon de la ODBC-datumfonto al kiu konekti.\n"
+"Alklaku 'Foliumi...' por elekti ODBC-datumfonton jam registritan en %PRODUCTNAME.\n"
 "Bonvolu kontakti vian sisteman administranton se vi ne certas pri la jenaj agordoj."
 
 #. dmi7n
@@ -2425,158 +2425,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "Detaloj"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr "Aldoni uzanton"
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr "Forigi uzanton"
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr "Ŝanĝi pasvorton"
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "Ĉu vere vi volas forigi la uzanton?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "La datumbazo ne subtenas administradon de uzantoj."
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "La pasvortoj ne kongruas. Bonvolu entajpi la pasvorton denove."
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "Bonvolu noti ke kelkaj datumbazoj eble ne subtenas ĉi tiun kunligan tipon."
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "Enhavas nur tiujn rikordojn, en kiuj la enhavo de la ligitaj kampoj de ambaŭ tabeloj estas samaj."
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "Enhavas ĈIUJN rikordojn el tabelo '%1' sed nur la rikordojn el tabelo '%2', kies valoroj en rilataj kampoj kongruas."
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "Enhavas ĈIUJN rikordojn de '%1' kaj de '%2'."
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr "Enhavas la kartezian produton de ĈIUJ rikordoj de '%1' kaj de '%2'."
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr "La cela datumbazo ne subtenas vidojn."
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr "La cela datumbazo ne subtenas ĉefŝlosilojn."
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr "neniu datumpriskribilo trovita, aŭ neniu datumalira priskribilo povas provizi ĉiujn necesajn informojn"
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr "Nur tabeloj kaj informpetoj estas subtenataj ĉi-momente."
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr "La rezulto de la kopifonto subtenu legosignojn."
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr "Nesubtenata fontkolumna tipo ($type$) je kolumna pozicio $pos$."
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr "Nevalida nombro da pravalorizaj parametroj."
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr "Eraro okazis dum pravalorizado."
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr "Nesubtenata agordo en la kopio de fonta priskribaĵo: $name$."
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr "Por kopii informpeton, via konekto bezonas povi provizi informpetojn."
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr "La donita interaga tenilo estas nevalida."
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr "Ĉi tiu rilato jam ekzistas. Ĉu vi volas redakti ĝin aŭ krei iun novan?"
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "Redakti..."
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "Krei..."
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " - %PRODUCTNAME-Datumbazo: Rilata skizo"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "La datumbazo ne subtenas rilatojn."
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "Kiam vi forigas ĉi tiun tabelon ĉiuj koncernaj rilatoj ankaŭ estos forigataj. Ĉu daŭrigi?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2826,67 +2844,67 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr "Ŝanĝas la larĝon de la aktuala kolumno, aŭ la elektitaj kolumnoj."
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Vojprefikso al la dBASE-dosieroj:"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr "_Krei novan"
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "_Foliumi…"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "Ĝenerala"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "Salutnomo:"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "Pasvorto bezonata"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "Aŭtentokontrolo de uzanto"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "Pelila klaso por JDBC:"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "Testa Klaso"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "Atributoj de JDBC"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
 msgstr "Testa Konekto"
@@ -3024,19 +3042,19 @@ msgid "label"
 msgstr "etikedo"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Vojprefikso al la dBASE-dosieroj:"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr "_Krei novan"
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Foliumi…"
@@ -3661,25 +3679,25 @@ msgid "Path to the dBASE files:"
 msgstr "Vojprefikso al la dBASE-dosieroj:"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr "_Krei novan"
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Foliumi…"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "Pelila klaso por JDBC:"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
 msgstr "Testa klaso"
@@ -5197,37 +5215,25 @@ msgid "User Settings"
 msgstr "Propraj agordaĵoj"
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "Uzanto:"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "Aldoni uzanton..."
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "Ŝanĝi pasvorton..."
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "Forigi uzanton..."
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "Mastrumi"
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "Elekti uzanton"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"
 msgstr "Alirorajtoj por elektita uzanto"

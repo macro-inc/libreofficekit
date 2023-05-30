@@ -19,6 +19,7 @@
 
 #include <comphelper/string.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/stream.hxx>
 #include <tools/debug.hxx>
 #include <tools/color.hxx>
@@ -95,10 +96,10 @@ HTMLOptionEnum<HTMLTableRules> const aTableRulesOptEnums[] =
 };
 
 
-HTMLOption::HTMLOption( HtmlOptionId nTok, const OUString& rToken,
-                        const OUString& rValue )
-    : aValue(rValue)
-    , aToken(rToken)
+HTMLOption::HTMLOption( HtmlOptionId nTok, OUString _aToken,
+                        OUString _aValue )
+    : aValue(std::move(_aValue))
+    , aToken(std::move(_aToken))
     , nToken( nTok )
 {
     DBG_ASSERT( nToken>=HtmlOptionId::BOOL_START && nToken<HtmlOptionId::END,
@@ -542,7 +543,7 @@ HtmlTokenId HTMLParser::ScanText( const sal_Unicode cBreak )
                             else
                             {
                                 // If not scanning a tag return token
-                                aToken += sTmpBuffer;
+                                aToken.append( sTmpBuffer );
                                 sTmpBuffer.setLength(0);
 
                                 if( !aToken.isEmpty() )
@@ -564,7 +565,7 @@ HtmlTokenId HTMLParser::ScanText( const sal_Unicode cBreak )
                                 // Hack: _GetNextChar shall not read the
                                 // next character
                                 if( ';' != nNextCh )
-                                    aToken += " ";
+                                    aToken.append( " " );
                                 if( 1U == cChar )
                                     return HtmlTokenId::NONBREAKSPACE;
                                 else //2U
@@ -719,7 +720,7 @@ HtmlTokenId HTMLParser::ScanText( const sal_Unicode cBreak )
                         if( !aToken.isEmpty() || sTmpBuffer.getLength() > 1 )
                         {
                             // Have seen s.th. aside from blanks?
-                            aToken += sTmpBuffer;
+                            aToken.append( sTmpBuffer );
                             sTmpBuffer.setLength(0);
                             return HtmlTokenId::TEXTTOKEN;
                         }
@@ -753,7 +754,7 @@ HtmlTokenId HTMLParser::ScanText( const sal_Unicode cBreak )
                         !IsParserWorking() )
                     {
                         if( !sTmpBuffer.isEmpty() )
-                            aToken += sTmpBuffer;
+                            aToken.append( sTmpBuffer );
                         return HtmlTokenId::TEXTTOKEN;
                     }
                 } while( rtl::isAsciiAlpha( nNextCh ) || rtl::isAsciiDigit( nNextCh ) );
@@ -766,7 +767,7 @@ HtmlTokenId HTMLParser::ScanText( const sal_Unicode cBreak )
     }
 
     if( !sTmpBuffer.isEmpty() )
-        aToken += sTmpBuffer;
+        aToken.append( sTmpBuffer );
 
     return HtmlTokenId::TEXTTOKEN;
 }
@@ -801,7 +802,7 @@ HtmlTokenId HTMLParser::GetNextRawToken()
                 // Maybe we've reached the end.
 
                 // Save what we have read previously...
-                aToken += sTmpBuffer;
+                aToken.append( sTmpBuffer );
                 sTmpBuffer.setLength(0);
 
                 // and remember position in stream.
@@ -904,9 +905,9 @@ HtmlTokenId HTMLParser::GetNextRawToken()
                 else
                 {
                     // remember "</" , everything else we find in the buffer
-                    aToken += "<";
+                    aToken.append( "<" );
                     if( bOffState )
-                        aToken += "/";
+                        aToken.append( "/" );
 
                     bNextCh = false;
                 }
@@ -974,7 +975,7 @@ HtmlTokenId HTMLParser::GetNextRawToken()
 
         if( !bContinue && !sTmpBuffer.isEmpty() )
         {
-            aToken += sTmpBuffer;
+            aToken.append( sTmpBuffer );
             sTmpBuffer.setLength(0);
         }
 
@@ -1001,7 +1002,7 @@ HtmlTokenId HTMLParser::GetNextToken_()
         // HtmlTokenId::<TOKEN>_OFF generated for HtmlTokenId::<TOKEN>_ON
         nRet = mnPendingOffToken;
         mnPendingOffToken = HtmlTokenId::NONE;
-        aToken.clear();
+        aToken.setLength( 0 );
         return nRet;
     }
 
@@ -1052,13 +1053,17 @@ HtmlTokenId HTMLParser::GetNextToken_()
                     do {
                         sTmpBuffer.appendUtf32( nNextCh );
                         nNextCh = GetNextChar();
+                        if (std::u16string_view(sTmpBuffer) == u"![CDATA[")
+                        {
+                            break;
+                        }
                     } while( '>' != nNextCh && '/' != nNextCh && !rtl::isAsciiWhiteSpace( nNextCh ) &&
                             !linguistic::IsControlChar(nNextCh) &&
                              IsParserWorking() && !rInput.eof() );
 
                     if( !sTmpBuffer.isEmpty() )
                     {
-                        aToken += sTmpBuffer;
+                        aToken.append( sTmpBuffer );
                         sTmpBuffer.setLength(0);
                     }
 
@@ -1075,10 +1080,10 @@ HtmlTokenId HTMLParser::GetNextToken_()
 
                     // Search token in table:
                     sSaveToken = aToken;
-                    aToken = aToken.toAsciiLowerCase();
+                    aToken = aToken.toString().toAsciiLowerCase();
 
-                    if (!maNamespace.isEmpty() && aToken.startsWith(maNamespace))
-                        aToken = aToken.copy(maNamespace.getLength());
+                    if (!maNamespace.isEmpty() && o3tl::starts_with(aToken, maNamespace))
+                        aToken.remove( 0, maNamespace.getLength());
 
                     if( HtmlTokenId::NONE == (nRet = GetHTMLToken( aToken )) )
                         // Unknown control
@@ -1107,7 +1112,7 @@ HtmlTokenId HTMLParser::GetNextToken_()
                         //      and append a blank.
                         aToken = sSaveToken;
                         if( '>'!=nNextCh )
-                            aToken += " ";
+                            aToken.append( " " );
                         sal_uInt64 nCStreamPos = 0;
                         sal_uInt32 nCLineNr = 0;
                         sal_uInt32 nCLinePos = 0;
@@ -1139,21 +1144,57 @@ HtmlTokenId HTMLParser::GetNextToken_()
                             if( !bDone )
                                 nNextCh = GetNextChar();
                         }
-                        aToken = sTmpBuffer.makeStringAndClear();
+                        aToken = sTmpBuffer;
+                        sTmpBuffer.setLength(0);
                         if( !bDone && IsParserWorking() && nCStreamPos )
                         {
                             rInput.Seek( nCStreamPos );
                             SetLineNr( nCLineNr );
                             SetLinePos( nCLinePos );
                             ClearTxtConvContext();
-                            aToken = aToken.copy(0, nCStrLen);
+                            aToken.truncate(nCStrLen);
                             nNextCh = '>';
                         }
+                    }
+                    else if (nRet == HtmlTokenId::CDATA)
+                    {
+                        // Read until the closing ]]>.
+                        bool bDone = false;
+                        while (!bDone && !rInput.eof() && IsParserWorking())
+                        {
+                            if (nNextCh == '>')
+                            {
+                                if (sTmpBuffer.getLength() >= 2)
+                                {
+                                    bDone = sTmpBuffer[sTmpBuffer.getLength() - 2] == ']'
+                                            && sTmpBuffer[sTmpBuffer.getLength() - 1] == ']';
+                                    if (bDone)
+                                    {
+                                        // Ignore ]] at the end.
+                                        sTmpBuffer.setLength(sTmpBuffer.getLength() - 2);
+                                    }
+                                }
+                                if (!bDone)
+                                {
+                                    sTmpBuffer.appendUtf32(nNextCh);
+                                }
+                            }
+                            else if (!linguistic::IsControlChar(nNextCh))
+                            {
+                                sTmpBuffer.appendUtf32(nNextCh);
+                            }
+                            if (!bDone)
+                            {
+                                nNextCh = GetNextChar();
+                            }
+                        }
+                        aToken = sTmpBuffer;
+                        sTmpBuffer.setLength(0);
                     }
                     else
                     {
                         // TokenString not needed anymore
-                        aToken.clear();
+                        aToken.setLength( 0 );
                     }
 
                     // Read until closing '>'
@@ -1165,10 +1206,10 @@ HtmlTokenId HTMLParser::GetNextToken_()
                         // generate pending HtmlTokenId::<TOKEN>_OFF for HtmlTokenId::<TOKEN>_ON
                         // Do not convert this to a single HtmlTokenId::<TOKEN>_OFF
                         // which lead to fdo#56772.
-                        if ((nRet >= HtmlTokenId::ONOFF_START) && aToken.endsWith("/"))
+                        if ((nRet >= HtmlTokenId::ONOFF_START) && o3tl::ends_with(aToken, u"/"))
                         {
                             mnPendingOffToken = static_cast<HtmlTokenId>(static_cast<int>(nRet) + 1);       // HtmlTokenId::<TOKEN>_ON -> HtmlTokenId::<TOKEN>_OFF
-                            aToken = aToken.replaceAt( aToken.getLength()-1, 1, u"");   // remove trailing '/'
+                            aToken.setLength( aToken.getLength()-1 );   // remove trailing '/'
                         }
                         if( sal_Unicode(EOF) == nNextCh && rInput.eof() )
                         {
@@ -1212,7 +1253,7 @@ HtmlTokenId HTMLParser::GetNextToken_()
                         }
                         if( SvParserState::Pending == eState )
                             bReadNextChar = bReadNextCharSave;
-                        aToken.clear();
+                        aToken.setLength( 0 );
                     }
                     else if( '%' == nNextCh )
                     {
@@ -1245,11 +1286,12 @@ HtmlTokenId HTMLParser::GetNextToken_()
                             nRet = HtmlTokenId::TEXTTOKEN;
                             break;
                         }
-                        aToken = aTmpBuffer.makeStringAndClear();
+                        aToken = aTmpBuffer;
+                        aTmpBuffer.setLength(0);
                         if( IsParserWorking() )
                         {
                             sSaveToken = aToken;
-                            aToken.clear();
+                            aToken.setLength( 0 );
                         }
                     }
                     else
@@ -1387,7 +1429,7 @@ void HTMLParser::UnescapeToken()
         bEscape = false;
         if( '\\'==aToken[nPos] && !bOldEscape )
         {
-            aToken = aToken.replaceAt( nPos, 1, u"" );
+            aToken.remove( nPos, 1 );
             bEscape = true;
         }
         else
@@ -1426,7 +1468,7 @@ const HTMLOptions& HTMLParser::GetOptions( HtmlOptionId const *pNoConvertToken )
                 nPos++;
             }
 
-            OUString sName( aToken.copy( nStt, nPos-nStt ) );
+            OUString sName( aToken.subView( nStt, nPos-nStt ) );
 
             // PlugIns require original token name. Convert to lower case only for searching.
             nToken = GetHTMLOption( sName.toAsciiLowerCase() ); // Name is ready
@@ -1477,7 +1519,7 @@ const HTMLOptions& HTMLParser::GetOptions( HtmlOptionId const *pNoConvertToken )
                             case '\r':
                             case '\n':
                                 if( bStripCRLF )
-                                    aToken = aToken.replaceAt( nPos, 1, u"" );
+                                    aToken.remove( nPos, 1 );
                                 else
                                 {
                                     nPos++;
@@ -1492,7 +1534,7 @@ const HTMLOptions& HTMLParser::GetOptions( HtmlOptionId const *pNoConvertToken )
                                 }
                                 else
                                 {
-                                    aToken = aToken.replaceAt( nPos, 1, u"" );
+                                    aToken.remove( nPos, 1 );
                                     bEscape = true;
                                 }
                                 break;
@@ -1549,7 +1591,7 @@ const HTMLOptions& HTMLParser::GetOptions( HtmlOptionId const *pNoConvertToken )
                                 }
                                 else
                                 {
-                                    aToken = aToken.replaceAt( nPos, 1, u"" );
+                                    aToken.remove( nPos, 1 );
                                     bEscape = true;
                                 }
                                 break;
@@ -1568,7 +1610,7 @@ const HTMLOptions& HTMLParser::GetOptions( HtmlOptionId const *pNoConvertToken )
                     }
 
                     if( nLen )
-                        aValue = aToken.copy( nStt, nLen );
+                        aValue = aToken.subView( nStt, nLen );
                 }
             }
 
@@ -1607,7 +1649,7 @@ HtmlTokenId HTMLParser::FilterPRE( HtmlTokenId nToken )
             {
                 using comphelper::string::padToLength;
                 OUStringBuffer aBuf(aToken);
-                aToken = padToLength(aBuf, nSpaces, ' ').makeStringAndClear();
+                aToken = padToLength(aBuf, nSpaces, ' ');
             }
             nPre_LinePos += nSpaces;
             nToken = HtmlTokenId::TEXTTOKEN;
@@ -1791,11 +1833,11 @@ HtmlTokenId HTMLParser::FilterXMP( HtmlTokenId nToken )
             {
                 UnescapeToken();
                 sSaveToken += " ";
-                aToken = sSaveToken + aToken;
+                aToken.insert(0, sSaveToken);
             }
             else
                 aToken = sSaveToken;
-            aToken += ">";
+            aToken.append( ">" );
             nToken = HtmlTokenId::TEXTTOKEN;
         }
         break;
@@ -2020,8 +2062,8 @@ bool HTMLParser::ParseMetaOptionsImpl(
                 if (comphelper::string::getTokenCount(aContent, ';') == 2)
                 {
                     sal_Int32 nIdx{ 0 };
-                    Date aDate(aContent.getToken(0, ';', nIdx).toInt32());
-                    auto nTime = aContent.getToken(0, ';', nIdx).toInt64();
+                    Date aDate(o3tl::toInt32(o3tl::getToken(aContent, 0, ';', nIdx)));
+                    auto nTime = o3tl::toInt64(o3tl::getToken(aContent, 0, ';', nIdx));
                     if (nTime < 0)
                         nTime = o3tl::saturating_toggle_sign(nTime);
                     tools::Time aTime(nTime);
@@ -2064,7 +2106,7 @@ bool HTMLParser::ParseMetaOptionsImpl(
                     try {
                         xUDProps->addProperty(aName,
                             beans::PropertyAttribute::REMOVABLE,
-                            uno::makeAny(aContent));
+                            uno::Any(aContent));
                         AddMetaUserDefined(aName);
                         bChanged = true;
                     } catch (uno::Exception &) {

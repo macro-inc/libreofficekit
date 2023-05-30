@@ -35,14 +35,14 @@ enum class GraphicObjectType
     LineAndFillProperties
 };
 
-class GraphicPropertyItemConverter : public ItemConverter
+class GraphicPropertyItemConverter final : public ItemConverter
 {
 public:
     GraphicPropertyItemConverter(
         const css::uno::Reference< css::beans::XPropertySet > & rPropertySet,
         SfxItemPool& rItemPool,
         SdrModel& rDrawModel,
-        const css::uno::Reference< css::lang::XMultiServiceFactory > & xNamedPropertyContainerFactory,
+        css::uno::Reference< css::lang::XMultiServiceFactory > xNamedPropertyContainerFactory,
         GraphicObjectType eObjectType );
     virtual ~GraphicPropertyItemConverter() override;
 

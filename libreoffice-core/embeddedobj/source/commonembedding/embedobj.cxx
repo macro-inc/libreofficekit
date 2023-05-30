@@ -48,6 +48,7 @@
 #include <commonembobj.hxx>
 #include "embedobj.hxx"
 #include <specialobject.hxx>
+#include <array>
 
 using namespace ::com::sun::star;
 
@@ -71,6 +72,60 @@ awt::Rectangle GetRectangleInterception( const awt::Rectangle& aRect1, const awt
     return aResult;
 }
 
+namespace
+{
+    using IntermediateStatesMap = std::array<std::array<uno::Sequence< sal_Int32 >, NUM_SUPPORTED_STATES>, NUM_SUPPORTED_STATES>;
+    const IntermediateStatesMap & getIntermediateStatesMap()
+    {
+        static const IntermediateStatesMap map = [] () {
+            IntermediateStatesMap tmp;
+
+            // intermediate states
+            // In the following table the first index points to starting state,
+            // the second one to the target state, and the sequence referenced by
+            // first two indexes contains intermediate states, that should be
+            // passed by object to reach the target state.
+            // If the sequence is empty that means that indirect switch from start
+            // state to the target state is forbidden, only if direct switch is possible
+            // the state can be reached.
+
+            tmp[0][2] = { embed::EmbedStates::RUNNING };
+
+            tmp[0][3] = { embed::EmbedStates::RUNNING,
+                                                embed::EmbedStates::INPLACE_ACTIVE };
+
+            tmp[0][4] = {embed::EmbedStates::RUNNING};
+
+            tmp[1][3] = { embed::EmbedStates::INPLACE_ACTIVE };
+
+            tmp[2][0] = { embed::EmbedStates::RUNNING };
+
+            tmp[3][0] = { embed::EmbedStates::INPLACE_ACTIVE,
+                                                embed::EmbedStates::RUNNING };
+
+            tmp[3][1] = { embed::EmbedStates::INPLACE_ACTIVE };
+
+            tmp[4][0] = { embed::EmbedStates::RUNNING };
+
+            return tmp;
+        }();
+        return map;
+    }
+
+    // accepted states
+    const css::uno::Sequence< sal_Int32 > & getAcceptedStates()
+    {
+        static const css::uno::Sequence< sal_Int32 > states {
+            /* [0] */ embed::EmbedStates::LOADED,
+                          /* [1] */ embed::EmbedStates::RUNNING,
+                          /* [2] */ embed::EmbedStates::INPLACE_ACTIVE,
+                          /* [3] */ embed::EmbedStates::UI_ACTIVE,
+                          /* [4] */ embed::EmbedStates::ACTIVE };
+        assert(states.getLength() == NUM_SUPPORTED_STATES);
+        return states;
+    }
+
+}
 
 sal_Int32 OCommonEmbeddedObject::ConvertVerbToState_Impl( sal_Int32 nVerb )
 {
@@ -161,6 +216,37 @@ void OCommonEmbeddedObject::StateChangeNotification_Impl( bool bBeforeChange, sa
     rGuard.reset();
 }
 
+void OCommonEmbeddedObject::SetInplaceActiveState()
+{
+    if ( !m_xClientSite.is() )
+        throw embed::WrongStateException( "client site not set, yet", *this );
+
+    uno::Reference< embed::XInplaceClient > xInplaceClient( m_xClientSite, uno::UNO_QUERY );
+    if ( !xInplaceClient.is() || !xInplaceClient->canInplaceActivate() )
+        throw embed::WrongStateException(); //TODO: can't activate inplace
+    xInplaceClient->activatingInplace();
+
+    uno::Reference< embed::XWindowSupplier > xClientWindowSupplier( xInplaceClient, uno::UNO_QUERY_THROW );
+
+    m_xClientWindow = xClientWindowSupplier->getWindow();
+    m_aOwnRectangle = xInplaceClient->getPlacement();
+    m_aClipRectangle = xInplaceClient->getClipRectangle();
+    awt::Rectangle aRectangleToShow = GetRectangleInterception( m_aOwnRectangle, m_aClipRectangle );
+
+    // create own window based on the client window
+    // place and resize the window according to the rectangles
+    uno::Reference< awt::XWindowPeer > xClientWindowPeer( m_xClientWindow, uno::UNO_QUERY_THROW );
+
+    // dispatch provider may not be provided
+    uno::Reference< frame::XDispatchProvider > xContainerDP = xInplaceClient->getInplaceDispatchProvider();
+    bool bOk = m_xDocHolder->ShowInplace( xClientWindowPeer, aRectangleToShow, xContainerDP );
+    m_nObjectState = embed::EmbedStates::INPLACE_ACTIVE;
+    if ( !bOk )
+    {
+        SwitchStateTo_Impl( embed::EmbedStates::RUNNING );
+        throw embed::WrongStateException(); //TODO: can't activate inplace
+    }
+}
 
 void OCommonEmbeddedObject::SwitchStateTo_Impl( sal_Int32 nNextState )
 {
@@ -234,34 +320,7 @@ void OCommonEmbeddedObject::SwitchStateTo_Impl( sal_Int32 nNextState )
         {
             if ( nNextState == embed::EmbedStates::INPLACE_ACTIVE )
             {
-                if ( !m_xClientSite.is() )
-                    throw embed::WrongStateException( "client site not set, yet", *this );
-
-                uno::Reference< embed::XInplaceClient > xInplaceClient( m_xClientSite, uno::UNO_QUERY );
-                if ( !xInplaceClient.is() || !xInplaceClient->canInplaceActivate() )
-                    throw embed::WrongStateException(); //TODO: can't activate inplace
-                xInplaceClient->activatingInplace();
-
-                uno::Reference< embed::XWindowSupplier > xClientWindowSupplier( xInplaceClient, uno::UNO_QUERY_THROW );
-
-                m_xClientWindow = xClientWindowSupplier->getWindow();
-                m_aOwnRectangle = xInplaceClient->getPlacement();
-                m_aClipRectangle = xInplaceClient->getClipRectangle();
-                awt::Rectangle aRectangleToShow = GetRectangleInterception( m_aOwnRectangle, m_aClipRectangle );
-
-                // create own window based on the client window
-                // place and resize the window according to the rectangles
-                uno::Reference< awt::XWindowPeer > xClientWindowPeer( m_xClientWindow, uno::UNO_QUERY_THROW );
-
-                // dispatch provider may not be provided
-                uno::Reference< frame::XDispatchProvider > xContainerDP = xInplaceClient->getInplaceDispatchProvider();
-                bool bOk = m_xDocHolder->ShowInplace( xClientWindowPeer, aRectangleToShow, xContainerDP );
-                m_nObjectState = nNextState;
-                if ( !bOk )
-                {
-                    SwitchStateTo_Impl( embed::EmbedStates::RUNNING );
-                    throw embed::WrongStateException(); //TODO: can't activate inplace
-                }
+                SetInplaceActiveState();
             }
             else if ( nNextState == embed::EmbedStates::ACTIVE )
             {
@@ -389,27 +448,28 @@ void OCommonEmbeddedObject::SwitchStateTo_Impl( sal_Int32 nNextState )
 uno::Sequence< sal_Int32 > const & OCommonEmbeddedObject::GetIntermediateStatesSequence_Impl( sal_Int32 nNewState )
 {
     sal_Int32 nCurInd = 0;
-    for ( nCurInd = 0; nCurInd < m_aAcceptedStates.getLength(); nCurInd++ )
-        if ( m_aAcceptedStates[nCurInd] == m_nObjectState )
+    auto & rAcceptedStates = getAcceptedStates();
+    for ( nCurInd = 0; nCurInd < rAcceptedStates.getLength(); nCurInd++ )
+        if ( rAcceptedStates[nCurInd] == m_nObjectState )
             break;
 
-    if ( nCurInd == m_aAcceptedStates.getLength() )
+    if ( nCurInd == rAcceptedStates.getLength() )
         throw embed::WrongStateException( "The object is in unacceptable state!",
                                           static_cast< ::cppu::OWeakObject* >(this) );
 
     sal_Int32 nDestInd = 0;
-    for ( nDestInd = 0; nDestInd < m_aAcceptedStates.getLength(); nDestInd++ )
-        if ( m_aAcceptedStates[nDestInd] == nNewState )
+    for ( nDestInd = 0; nDestInd < rAcceptedStates.getLength(); nDestInd++ )
+        if ( rAcceptedStates[nDestInd] == nNewState )
             break;
 
-    if ( nDestInd == m_aAcceptedStates.getLength() )
+    if ( nDestInd == rAcceptedStates.getLength() )
         throw embed::UnreachableStateException(
             "The state either not reachable, or the object allows the state only as an intermediate one!",
             static_cast< ::cppu::OWeakObject* >(this),
             m_nObjectState,
             nNewState );
 
-    return m_pIntermediateStatesSeqs[nCurInd][nDestInd];
+    return getIntermediateStatesMap()[nCurInd][nDestInd];
 }
 
 
@@ -486,7 +546,7 @@ uno::Sequence< sal_Int32 > SAL_CALL OCommonEmbeddedObject::getReachableStates()
         throw embed::WrongStateException( "The object has no persistence!",
                                            static_cast< ::cppu::OWeakObject* >(this) );
 
-    return m_aAcceptedStates;
+    return getAcceptedStates();
 }
 
 
@@ -637,6 +697,13 @@ void SAL_CALL OCommonEmbeddedObject::setContainerName( const OUString& sName )
         throw lang::DisposedException(); // TODO
 
     m_aContainerName = sName;
+}
+
+void OCommonEmbeddedObject::SetOleState(bool bIsOleUpdate)
+{
+    ::osl::MutexGuard aGuard( m_aMutex );
+
+    m_bOleUpdate = bIsOleUpdate;
 }
 
 css::uno::Reference< css::uno::XInterface > SAL_CALL OCommonEmbeddedObject::getParent()

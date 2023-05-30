@@ -18,7 +18,6 @@
  */
 
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <rtl/math.hxx>
 #include <o3tl/float_int_conversion.hxx>
 #include <osl/diagnose.h>
@@ -267,7 +266,7 @@ bool ScRangeToSequence::FillMixedArray( uno::Any& rAny, ScDocument& rDoc, const 
                 continue;
             }
 
-            if (aCell.meType == CELLTYPE_FORMULA && aCell.mpFormula->GetErrCode() != FormulaError::NONE)
+            if (aCell.getType() == CELLTYPE_FORMULA && aCell.getFormula()->GetErrCode() != FormulaError::NONE)
             {
                 // if NV is allowed, leave empty for errors
                 bHasErrors = true;

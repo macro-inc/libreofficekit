@@ -84,27 +84,14 @@ struct DirectoryImpl
 }
 
 DirectoryItem_Impl::DirectoryItem_Impl(
-    rtl_String * strFilePath, unsigned char DType)
-    : m_strFilePath (strFilePath),
+    OString strFilePath, unsigned char DType)
+    : m_strFilePath (std::move(strFilePath)),
       m_RefCount     (1),
       m_DType        (DType)
 {
-    if (m_strFilePath != nullptr)
-        rtl_string_acquire(m_strFilePath);
 }
 DirectoryItem_Impl::~DirectoryItem_Impl()
 {
-    if (m_strFilePath != nullptr)
-        rtl_string_release(m_strFilePath);
-}
-
-void * DirectoryItem_Impl::operator new(size_t n)
-{
-    return malloc(n);
-}
-void DirectoryItem_Impl::operator delete(void * p)
-{
-    free(p);
 }
 
 void DirectoryItem_Impl::acquire()
@@ -343,9 +330,9 @@ oslFileError SAL_CALL osl_getNextDirectoryItem(oslDirectory pDirectory,
         pImpl = nullptr;
     }
 #ifdef _DIRENT_HAVE_D_TYPE
-    pImpl = new DirectoryItem_Impl(strFilePath.pData, pEntry->d_type);
+    pImpl = new DirectoryItem_Impl(strFilePath, pEntry->d_type);
 #else
-    pImpl = new DirectoryItem_Impl(strFilePath.pData);
+    pImpl = new DirectoryItem_Impl(strFilePath);
 #endif /* _DIRENT_HAVE_D_TYPE */
     *pItem = pImpl;
 
@@ -372,7 +359,7 @@ oslFileError SAL_CALL osl_getDirectoryItem(rtl_uString* ustrFileURL, oslDirector
     }
     else
     {
-        *pItem = new DirectoryItem_Impl(strSystemPath.pData);
+        *pItem = new DirectoryItem_Impl(std::move(strSystemPath));
     }
 
     return osl_error;
@@ -863,21 +850,18 @@ static oslFileError oslDoCopy(const char* pszSourceFileName, const char* pszDest
         }
     }
 
-    /* mfe: should be S_ISREG */
-    if ( !S_ISLNK(nMode) )
+    if ( S_ISREG(nMode) )
     {
         /* copy SourceFile to DestFile */
         nRet = oslDoCopyFile(pszSourceFileName,pszDestFileName,nSourceSize, nMode);
     }
-    /* mfe: OK redundant at the moment */
     else if ( S_ISLNK(nMode) )
     {
         nRet = oslDoCopyLink(pszSourceFileName,pszDestFileName);
     }
     else
     {
-        /* mfe: what to do here? */
-        nRet=ENOSYS;
+        nRet = EINVAL;
     }
 
     if ( nRet > 0 && DestFileExists )

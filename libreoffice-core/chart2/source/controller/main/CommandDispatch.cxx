@@ -19,7 +19,7 @@
 
 #include "CommandDispatch.hxx"
 #include <com/sun/star/util/URLTransformer.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -48,13 +48,7 @@ void SAL_CALL CommandDispatch::disposing()
 {
     Reference< uno::XInterface > xEventSource(static_cast< cppu::OWeakObject* >( this ));
     for( auto& rElement : m_aListeners )
-    {
-        if( rElement.second )
-        {
-            rElement.second->disposeAndClear( xEventSource );
-            rElement.second.reset();
-        }
-    }
+        rElement.second.disposeAndClear( xEventSource );
     m_aListeners.clear();
 }
 
@@ -67,13 +61,14 @@ void SAL_CALL CommandDispatch::addStatusListener( const Reference< frame::XStatu
     tListenerMap::iterator aIt( m_aListeners.find( URL.Complete ));
     if( aIt == m_aListeners.end())
     {
-        aIt = m_aListeners.insert(
-            m_aListeners.begin(),
-            tListenerMap::value_type( URL.Complete, new ::comphelper::OInterfaceContainerHelper2( m_aMutex )));
+        aIt = m_aListeners.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(URL.Complete),
+                    std::forward_as_tuple( m_aMutex )).first;
     }
-    OSL_ASSERT( aIt != m_aListeners.end());
+    assert( aIt != m_aListeners.end());
 
-    aIt->second->addInterface( Control );
+    aIt->second.addInterface( Control );
     fireStatusEvent( URL.Complete, Control );
 }
 
@@ -81,7 +76,7 @@ void SAL_CALL CommandDispatch::removeStatusListener( const Reference< frame::XSt
 {
     tListenerMap::iterator aIt( m_aListeners.find( URL.Complete ));
     if( aIt != m_aListeners.end())
-        (*aIt).second->removeInterface( Control );
+        (*aIt).second.removeInterface( Control );
 }
 
 // ____ XModifyListener ____
@@ -132,22 +127,17 @@ void CommandDispatch::fireStatusEventForURL(
         tListenerMap::iterator aIt( m_aListeners.find( aURL.Complete ));
         if( aIt != m_aListeners.end())
         {
-            if( aIt->second )
-            {
-                ::comphelper::OInterfaceIteratorHelper2 aIntfIt( *((*aIt).second) );
+            ::comphelper::OInterfaceIteratorHelper3 aIntfIt( aIt->second );
 
-                while( aIntfIt.hasMoreElements())
+            while( aIntfIt.hasMoreElements())
+            {
+                try
                 {
-                    Reference< frame::XStatusListener > xListener( aIntfIt.next(), uno::UNO_QUERY );
-                    try
-                    {
-                        if( xListener.is())
-                            xListener->statusChanged( aEventToSend );
-                    }
-                    catch( const uno::Exception & )
-                    {
-                        DBG_UNHANDLED_EXCEPTION("chart2");
-                    }
+                    aIntfIt.next()->statusChanged( aEventToSend );
+                }
+                catch( const uno::Exception & )
+                {
+                    DBG_UNHANDLED_EXCEPTION("chart2");
                 }
             }
         }

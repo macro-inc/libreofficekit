@@ -4,38 +4,38 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkAdjustment" id="adjustmentIndent">
     <property name="upper">990</property>
-    <property name="step_increment">5</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">5</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustmentSpinDegrees">
     <property name="upper">359</property>
-    <property name="step_increment">5</property>
-    <property name="page_increment">10</property>
+    <property name="step-increment">5</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">svx/res/lo03.png</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">svx/res/lo03.png</property>
   </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">svx/res/lo02.png</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">svx/res/lo02.png</property>
   </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="icon_name">svx/res/lo01.png</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">svx/res/lo01.png</property>
   </object>
   <!-- n-columns=1 n-rows=1 -->
   <object class="GtkGrid" id="AlignmentPropertyPanel">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <child>
       <!-- n-columns=2 n-rows=7 -->
       <object class="GtkGrid" id="grid1">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="hexpand">True</property>
         <property name="border-width">6</property>
         <property name="row-spacing">3</property>
@@ -43,24 +43,24 @@
         <child>
           <object class="GtkBox" id="box3">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="hexpand">True</property>
             <property name="spacing">3</property>
             <child>
               <object class="GtkToolbar" id="horizontalalignment">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes" context="sidebaralignment|horizontalalignment|tooltip_text">Horizontal Alignment</property>
+                <property name="can-focus">True</property>
+                <property name="tooltip-text" translatable="yes" context="sidebaralignment|horizontalalignment|tooltip_text">Horizontal Alignment</property>
                 <property name="halign">start</property>
-                <property name="toolbar_style">icons</property>
-                <property name="show_arrow">False</property>
+                <property name="toolbar-style">icons</property>
+                <property name="show-arrow">False</property>
                 <property name="icon_size">2</property>
                 <child>
                   <object class="GtkToggleToolButton" id=".uno:AlignLeft">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">start</property>
-                    <property name="use_underline">True</property>
+                    <property name="use-underline">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -110,11 +110,11 @@
             <child>
               <object class="GtkToolbar" id="verticalalignment">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="tooltip_text" translatable="yes" context="sidebaralignment|verticalalignment|tooltip_text">Vertical Alignment</property>
+                <property name="can-focus">True</property>
+                <property name="tooltip-text" translatable="yes" context="sidebaralignment|verticalalignment|tooltip_text">Vertical Alignment</property>
                 <property name="halign">end</property>
-                <property name="toolbar_style">icons</property>
-                <property name="show_arrow">False</property>
+                <property name="toolbar-style">icons</property>
+                <property name="show-arrow">False</property>
                 <property name="icon_size">2</property>
                 <child>
                   <object class="GtkToggleToolButton" id=".uno:AlignTop">
@@ -153,16 +153,16 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
               <object class="GtkToolbar" id="writedirection">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="toolbar_style">icons</property>
-                <property name="show_arrow">False</property>
+                <property name="can-focus">True</property>
+                <property name="toolbar-style">icons</property>
+                <property name="show-arrow">False</property>
                 <property name="icon_size">2</property>
                 <child>
                   <object class="GtkToggleToolButton" id=".uno:ParaLeftToRight">
@@ -190,7 +190,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -348,12 +348,12 @@
           <object class="GtkCheckButton" id="wraptext">
             <property name="label" translatable="yes" context="sidebaralignment|wraptext">Wrap text</property>
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="tooltip_text" translatable="yes" context="sidebaralignment|wraptext|tooltip_text">Wrap texts automatically.</property>
-            <property name="halign">end</property>
-            <property name="use_underline">True</property>
-            <property name="draw_indicator">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="tooltip-text" translatable="yes" context="sidebaralignment|wraptext|tooltip_text">Wrap texts automatically.</property>
+            <property name="halign">start</property>
+            <property name="use-underline">True</property>
+            <property name="draw-indicator">True</property>
           </object>
           <packing>
             <property name="left-attach">0</property>
@@ -365,11 +365,12 @@
           <object class="GtkCheckButton" id="mergecells">
             <property name="label" translatable="yes" context="sidebaralignment|mergecells">Merge cells</property>
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="tooltip_text" translatable="yes" context="sidebaralignment|mergecells|tooltip_text">Joins the selected cells into one.</property>
-            <property name="use_underline">True</property>
-            <property name="draw_indicator">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="tooltip-text" translatable="yes" context="sidebaralignment|mergecells|tooltip_text">Joins the selected cells into one.</property>
+            <property name="halign">start</property>
+            <property name="use-underline">True</property>
+            <property name="draw-indicator">True</property>
           </object>
           <packing>
             <property name="left-attach">0</property>
@@ -393,10 +394,10 @@
         </child>
         <child>
           <object class="GtkLabel" id="leftindentlabel">
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="label" translatable="yes" context="sidebaralignment|leftindentlabel">_Indent:</property>
-            <property name="use_underline">True</property>
-            <property name="mnemonic_widget">leftindent</property>
+            <property name="use-underline">True</property>
+            <property name="mnemonic-widget">leftindent</property>
             <property name="xalign">0</property>
           </object>
           <packing>
@@ -405,13 +406,10 @@
             <property name="width">2</property>
           </packing>
         </child>
-        <child>
-          <placeholder/>
-        </child>
       </object>
       <packing>
-        <property name="left_attach">0</property>
-        <property name="top_attach">0</property>
+        <property name="left-attach">0</property>
+        <property name="top-attach">0</property>
       </packing>
     </child>
   </object>

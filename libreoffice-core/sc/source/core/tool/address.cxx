@@ -1223,23 +1223,12 @@ static ScRefFlags lcl_ScAddress_Parse_OOo( const sal_Unicode* p, const ScDocumen
                 }
                 aTab = aTabAcc.makeStringAndClear();
             }
-            if( *p++ != '.' )
+            if (*p != '.')
                 nBits = ScRefFlags::ZERO;
-
-            if (!bExtDoc && !rDoc.GetTable( aTab, nTab ))
+            else
             {
-                // Specified table name is not found in this document.  Assume this is an external document.
-                aDocName = aTab;
-                sal_Int32 n = aDocName.lastIndexOf('.');
-                // Assume that common filename extensions are not more than 4 characters.
-                if (n > 0 && aTab.getLength() - n <= 4)
-                {
-                    // Extension found.  Strip it.
-                    aTab = aTab.copy(0, n);
-                    bExtDoc = true;
-                }
-                else
-                    // No extension found.  This is probably not an external document.
+                ++p;
+                if (!bExtDoc && !rDoc.GetTable( aTab, nTab ))
                     nBits = ScRefFlags::ZERO;
             }
         }
@@ -1555,15 +1544,6 @@ ScRefFlags ScAddress::Parse( const OUString& r, const ScDocument& rDoc,
     return lcl_ScAddress_Parse( r.getStr(), rDoc, *this, rDetails, pExtInfo, pExternalLinks, pSheetEndPos, pErrRef);
 }
 
-bool ScRange::Intersects( const ScRange& rRange ) const
-{
-    return !(
-        std::min( aEnd.Col(), rRange.aEnd.Col() ) < std::max( aStart.Col(), rRange.aStart.Col() )
-     || std::min( aEnd.Row(), rRange.aEnd.Row() ) < std::max( aStart.Row(), rRange.aStart.Row() )
-     || std::min( aEnd.Tab(), rRange.aEnd.Tab() ) < std::max( aStart.Tab(), rRange.aStart.Tab() )
-        );
-}
-
 ScRange ScRange::Intersection( const ScRange& rOther ) const
 {
     SCCOL nCol1 = std::max(aStart.Col(), rOther.aStart.Col());
@@ -1577,28 +1557,6 @@ ScRange ScRange::Intersection( const ScRange& rOther ) const
         return ScRange(ScAddress::INITIALIZE_INVALID);
 
     return ScRange(nCol1, nRow1, nTab1, nCol2, nRow2, nTab2);
-}
-
-void ScRange::PutInOrder()
-{
-    SCCOL nTempCol;
-    if ( aEnd.Col() < (nTempCol = aStart.Col()) )
-    {
-        aStart.SetCol(aEnd.Col());
-        aEnd.SetCol(nTempCol);
-    }
-    SCROW nTempRow;
-    if ( aEnd.Row() < (nTempRow = aStart.Row()) )
-    {
-        aStart.SetRow(aEnd.Row());
-        aEnd.SetRow(nTempRow);
-    }
-    SCTAB nTempTab;
-    if ( aEnd.Tab() < (nTempTab = aStart.Tab()) )
-    {
-        aStart.SetTab(aEnd.Tab());
-        aEnd.SetTab(nTempTab);
-    }
 }
 
 void ScRange::ExtendTo( const ScRange& rRange )
@@ -2069,7 +2027,7 @@ template<typename T > static void lcl_Format( T& r, SCTAB nTab, SCROW nRow, SCCO
                     {
                         lcl_string_append(r.append("'["), aDocName);
                         r.append("]");
-                        lcl_string_append(r, aTabName.copy(1));
+                        lcl_string_append(r, aTabName.subView(1));
                     }
                     else
                     {
@@ -2136,7 +2094,7 @@ static void lcl_Split_DocTab( const ScDocument& rDoc,  SCTAB nTab,
     rDoc.GetName(nTab, rTabName);
     rDocName.clear();
     // External reference, same as in ScCompiler::MakeTabStr()
-    if ( rTabName[0] == '\'' )
+    if (!rTabName.isEmpty() && rTabName[0] == '\'')
     {   // "'Doc'#Tab"
         sal_Int32 nPos = ScCompiler::GetDocTabPos( rTabName);
         if (nPos != -1)
@@ -2550,10 +2508,10 @@ OUString ScRefAddress::GetRefString( const ScDocument& rDoc, SCTAB nActTab,
     return aAdr.Format(nFlags, &rDoc, rDetails);
 }
 
-bool AlphaToCol(const ScDocument& rDoc, SCCOL& rCol, const OUString& rStr)
+bool AlphaToCol(const ScDocument& rDoc, SCCOL& rCol, std::u16string_view rStr)
 {
     SCCOL nResult = 0;
-    sal_Int32 nStop = rStr.getLength();
+    sal_Int32 nStop = rStr.size();
     sal_Int32 nPos = 0;
     sal_Unicode c;
     const SCCOL nMaxCol = rDoc.MaxCol();

@@ -131,10 +131,10 @@ SwFrameFormat *DocumentLayoutManager::MakeLayoutFormat( RndStdIds eRequest, cons
                                  (bHeader ? "Right header" : "Right footer"),
                                  m_rDoc.GetDfltFrameFormat() );
 
-            SwNodeIndex aTmpIdx( m_rDoc.GetNodes().GetEndOfAutotext() );
+            const SwNode& rEndOfAutotext( m_rDoc.GetNodes().GetEndOfAutotext() );
             SwStartNode* pSttNd =
                 m_rDoc.GetNodes().MakeTextSection
-                ( aTmpIdx,
+                ( rEndOfAutotext,
                   bHeader ? SwHeaderStartNode : SwFooterStartNode,
                   m_rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool(o3tl::narrowing<sal_uInt16>( bHeader
                                      ? ( eRequest == RndStdIds::HEADERL
@@ -259,7 +259,7 @@ void DocumentLayoutManager::DelLayoutFormat( SwFrameFormat *pFormat )
                         SwFrameFormat* pTmpFormat = (*pTable)[i];
                         const SwFormatAnchor &rAnch = pTmpFormat->GetAnchor();
                         if ( rAnch.GetAnchorId() == RndStdIds::FLY_AT_FLY &&
-                             rAnch.GetContentAnchor()->nNode.GetIndex() == nNodeIdxOfFlyFormat )
+                             rAnch.GetAnchorNode()->GetIndex() == nNodeIdxOfFlyFormat )
                         {
                             aToDeleteFrameFormats.push_back( pTmpFormat );
                         }
@@ -287,23 +287,21 @@ void DocumentLayoutManager::DelLayoutFormat( SwFrameFormat *pFormat )
 
         // Delete the character for FlyFrames anchored as char (if necessary)
         const SwFormatAnchor& rAnchor = pFormat->GetAnchor();
-        if ((RndStdIds::FLY_AS_CHAR == rAnchor.GetAnchorId()) && rAnchor.GetContentAnchor())
+        if ((RndStdIds::FLY_AS_CHAR == rAnchor.GetAnchorId()) && rAnchor.GetAnchorNode())
         {
-            const SwPosition* pPos = rAnchor.GetContentAnchor();
-            SwTextNode *pTextNd = pPos->nNode.GetNode().GetTextNode();
+            SwTextNode *pTextNd = rAnchor.GetAnchorNode()->GetTextNode();
 
             // attribute is still in text node, delete it
             if ( pTextNd )
             {
                 SwTextFlyCnt* const pAttr = static_cast<SwTextFlyCnt*>(
-                    pTextNd->GetTextAttrForCharAt( pPos->nContent.GetIndex(),
+                    pTextNd->GetTextAttrForCharAt( rAnchor.GetAnchorContentOffset(),
                         RES_TXTATR_FLYCNT ));
                 if ( pAttr && (pAttr->GetFlyCnt().GetFrameFormat() == pFormat) )
                 {
                     // don't delete, set pointer to 0
                     const_cast<SwFormatFlyCnt&>(pAttr->GetFlyCnt()).SetFlyFormat();
-                    SwIndex aIdx( pPos->nContent );
-                    pTextNd->EraseText( aIdx, 1 );
+                    pTextNd->EraseText( *rAnchor.GetContentAnchor(), 1 );
                 }
             }
         }
@@ -336,15 +334,16 @@ SwFrameFormat *DocumentLayoutManager::CopyLayoutFormat(
     //                     2) anchored in a header/footer
     //                     3) anchored (to paragraph?)
     bool bMayNotCopy = false;
+    const SwNode* pCAnchor = rNewAnchor.GetAnchorNode();
+    bool bInHeaderFooter = pCAnchor && m_rDoc.IsInHeaderFooter(*pCAnchor);
     if(bDraw)
     {
-        const auto pCAnchor = rNewAnchor.GetContentAnchor();
         bool bCheckControlLayer = false;
         rSource.CallSwClientNotify(sw::CheckDrawFrameFormatLayerHint(&bCheckControlLayer));
         bMayNotCopy =
             bCheckControlLayer &&
             ((RndStdIds::FLY_AT_PARA == rNewAnchor.GetAnchorId()) || (RndStdIds::FLY_AT_FLY  == rNewAnchor.GetAnchorId()) || (RndStdIds::FLY_AT_CHAR == rNewAnchor.GetAnchorId())) &&
-            pCAnchor && m_rDoc.IsInHeaderFooter(pCAnchor->nNode);
+            bInHeaderFooter;
     }
 
     // just return if we can't copy this
@@ -382,12 +381,11 @@ SwFrameFormat *DocumentLayoutManager::CopyLayoutFormat(
         const SwNode& rCSttNd = rSource.GetContent().GetContentIdx()->GetNode();
         SwNodeRange aRg( rCSttNd, SwNodeOffset(1), *rCSttNd.EndOfSectionNode() );
 
-        SwNodeIndex aIdx( m_rDoc.GetNodes().GetEndOfAutotext() );
-        SwStartNode* pSttNd = SwNodes::MakeEmptySection( aIdx, SwFlyStartNode );
+        SwStartNode* pSttNd = SwNodes::MakeEmptySection( m_rDoc.GetNodes().GetEndOfAutotext(), SwFlyStartNode );
 
         // Set the Anchor/ContentIndex first.
         // Within the copying part, we can access the values (DrawFormat in Headers and Footers)
-        aIdx = *pSttNd;
+        SwNodeIndex aIdx( *pSttNd );
         SwFormatContent aAttr( rSource.GetContent() );
         aAttr.SetNewContentIdx( &aIdx );
         pDest->SetFormatAttr( aAttr );
@@ -395,24 +393,24 @@ SwFrameFormat *DocumentLayoutManager::CopyLayoutFormat(
 
         if( !m_rDoc.IsCopyIsMove() || &m_rDoc != pSrcDoc )
         {
-            if( m_rDoc.IsInReading() || m_rDoc.IsInMailMerge() )
-                pDest->SetName( OUString() );
+            if( (m_rDoc.IsInReading() && !bInHeaderFooter) || m_rDoc.IsInMailMerge() )
+                pDest->SetFormatName( OUString() );
             else
             {
                 // Test first if the name is already taken, if so generate a new one.
                 SwNodeType nNdTyp = aRg.aStart.GetNode().GetNodeType();
 
                 OUString sOld( pDest->GetName() );
-                pDest->SetName( OUString() );
+                pDest->SetFormatName( OUString() );
                 if( m_rDoc.FindFlyByName( sOld, nNdTyp ) )     // found one
                     switch( nNdTyp )
                     {
-                    case SwNodeType::Grf:    sOld = m_rDoc.GetUniqueGrfName();      break;
+                    case SwNodeType::Grf:    sOld = m_rDoc.GetUniqueGrfName(sOld);  break;
                     case SwNodeType::Ole:    sOld = m_rDoc.GetUniqueOLEName();      break;
                     default:                 sOld = m_rDoc.GetUniqueFrameName();    break;
                     }
 
-                pDest->SetName( sOld );
+                pDest->SetFormatName( sOld );
             }
         }
 
@@ -428,7 +426,7 @@ SwFrameFormat *DocumentLayoutManager::CopyLayoutFormat(
         //contact object itself. They should be managed by SwUndoInsLayFormat.
         const ::sw::DrawUndoGuard drawUndoGuard(m_rDoc.GetIDocumentUndoRedo());
 
-        pSrcDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aIdx, nullptr, false, true, true);
+        pSrcDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aIdx.GetNode(), nullptr, false, true, true);
     }
     else
     {
@@ -454,83 +452,26 @@ SwFrameFormat *DocumentLayoutManager::CopyLayoutFormat(
 
     if (bSetTextFlyAtt && (RndStdIds::FLY_AS_CHAR == rNewAnchor.GetAnchorId()))
     {
-        const SwPosition* pPos = rNewAnchor.GetContentAnchor();
+        SwNode* pAnchorNode = rNewAnchor.GetAnchorNode();
         SwFormatFlyCnt aFormat( pDest );
-        pPos->nNode.GetNode().GetTextNode()->InsertItem(
-            aFormat, pPos->nContent.GetIndex(), 0 );
+        pAnchorNode->GetTextNode()->InsertItem(
+            aFormat, rNewAnchor.GetAnchorContentOffset(), 0 );
     }
 
     if( bMakeFrames )
         pDest->MakeFrames();
-
-    // If the draw format has a TextBox, then copy its fly format as well.
-    if (rSource.Which() == RES_DRAWFRMFMT && rSource.GetOtherTextBoxFormat())
-    {
-        auto pObj = rSource.FindRealSdrObject();
-        auto pTextBoxNd = new SwTextBoxNode(pDest);
-        pDest->SetOtherTextBoxFormat(pTextBoxNd);
-
-        if (pObj)
-        {
-            const bool bIsGroupObj = pObj->getChildrenOfSdrObject();
-            for (size_t it = 0;
-                 it < (bIsGroupObj ? pObj->getChildrenOfSdrObject()->GetObjCount() : 1); it++)
-            {
-                auto pChild = bIsGroupObj ? pObj->getChildrenOfSdrObject()->GetObj(it)
-                                          : const_cast<SdrObject*>(pObj);
-                if (auto pSourceTextBox
-                    = SwTextBoxHelper::getOtherTextBoxFormat(&rSource, RES_DRAWFRMFMT, pChild))
-                {
-                    SwFormatAnchor boxAnchor(rNewAnchor);
-                    if (RndStdIds::FLY_AS_CHAR == boxAnchor.GetAnchorId())
-                    {
-                        // AS_CHAR *must not* be set on textbox fly-frame
-                        boxAnchor.SetType(RndStdIds::FLY_AT_CHAR);
-                    }
-                    // presumably these anchors are supported though not sure
-                    assert(RndStdIds::FLY_AT_CHAR == boxAnchor.GetAnchorId()
-                           || RndStdIds::FLY_AT_PARA == boxAnchor.GetAnchorId()
-                           || boxAnchor.GetAnchorId() == RndStdIds::FLY_AT_PAGE);
-
-                    if (!bMakeFrames && rNewAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR)
-                    {
-                        // If the draw format is as-char, then it will be copied with bMakeFrames=false, but
-                        // doing the same for the fly format would result in not making fly frames at all.
-                        bMakeFrames = true;
-                    }
-                    SwFrameFormat* pDestTextBox
-                        = CopyLayoutFormat(*pSourceTextBox, boxAnchor, bSetTextFlyAtt, bMakeFrames);
-
-                    SwAttrSet aSet(pDest->GetAttrSet());
-                    SwFormatContent aContent(
-                        pDestTextBox->GetContent().GetContentIdx()->GetNode().GetStartNode());
-                    aSet.Put(aContent);
-                    pDest->SetFormatAttr(aSet);
-
-                    // Link FLY and DRAW formats, so it becomes a text box
-                    SdrObject* pNewObj = pDest->FindRealSdrObject();
-                    if (bIsGroupObj && pNewObj
-                        && pNewObj->getChildrenOfSdrObject()
-                        && (pNewObj->getChildrenOfSdrObject()->GetObjCount() > it)
-                        && pNewObj->getChildrenOfSdrObject()->GetObj(it))
-                        pNewObj = pNewObj->getChildrenOfSdrObject()->GetObj(it);
-                    pTextBoxNd->AddTextBox(pNewObj, pDestTextBox);
-                    pDestTextBox->SetOtherTextBoxFormat(pTextBoxNd);
-                }
-
-                if (!bIsGroupObj)
-                    break;
-            }
-        }
-    }
 
     if (pDest->GetName().isEmpty())
     {
         // Format name should have unique name. Let's use object name as a fallback
         SdrObject *pObj = pDest->FindSdrObject();
         if (pObj)
-            pDest->SetName(pObj->GetName());
+            pDest->SetFormatName(pObj->GetName());
     }
+
+    // If the draw format has a TextBox, then copy its fly format as well.
+    if (const auto& pTextBoxes = rSource.GetOtherTextBoxFormats())
+        pTextBoxes->Clone(&m_rDoc, rNewAnchor, pDest, bSetTextFlyAtt, bMakeFrames);
 
     return pDest;
 }

@@ -26,6 +26,7 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nlangtag/mslangid.hxx>
 #include <editeng/escapementitem.hxx>
+#include <docmodel/uno/UnoThemeColor.hxx>
 #include <oox/helper/helper.hxx>
 #include <oox/helper/propertyset.hxx>
 #include <oox/core/xmlfilterbase.hxx>
@@ -53,19 +54,19 @@ void TextCharacterProperties::assignUsed( const TextCharacterProperties& rSource
     maSymbolFont.assignIfUsed( rSourceProps.maSymbolFont );
     maHighlightColor.assignIfUsed( rSourceProps.maHighlightColor );
     maUnderlineColor.assignIfUsed( rSourceProps.maUnderlineColor );
-    moLang.assignIfUsed( rSourceProps.moLang );
-    moHeight.assignIfUsed( rSourceProps.moHeight );
-    moFontScale.assignIfUsed(rSourceProps.moFontScale);
-    moSpacing.assignIfUsed( rSourceProps.moSpacing );
-    moUnderline.assignIfUsed( rSourceProps.moUnderline );
-    moBaseline.assignIfUsed( rSourceProps.moBaseline );
-    moStrikeout.assignIfUsed( rSourceProps.moStrikeout );
-    moCaseMap.assignIfUsed( rSourceProps.moCaseMap );
-    moBold.assignIfUsed( rSourceProps.moBold );
-    moItalic.assignIfUsed( rSourceProps.moItalic );
-    moUnderlineLineFollowText.assignIfUsed( rSourceProps.moUnderlineLineFollowText );
-    moUnderlineFillFollowText.assignIfUsed( rSourceProps.moUnderlineFillFollowText );
-    moTextOutlineProperties.assignIfUsed(rSourceProps.moTextOutlineProperties);
+    assignIfUsed( moLang, rSourceProps.moLang );
+    assignIfUsed( moHeight, rSourceProps.moHeight );
+    assignIfUsed( moFontScale, rSourceProps.moFontScale);
+    assignIfUsed( moSpacing, rSourceProps.moSpacing );
+    assignIfUsed( moUnderline, rSourceProps.moUnderline );
+    assignIfUsed( moBaseline, rSourceProps.moBaseline );
+    assignIfUsed( moStrikeout, rSourceProps.moStrikeout );
+    assignIfUsed( moCaseMap, rSourceProps.moCaseMap );
+    assignIfUsed( moBold, rSourceProps.moBold );
+    assignIfUsed( moItalic, rSourceProps.moItalic );
+    assignIfUsed( moUnderlineLineFollowText, rSourceProps.moUnderlineLineFollowText );
+    assignIfUsed( moUnderlineFillFollowText, rSourceProps.moUnderlineFillFollowText );
+    assignIfUsed( moTextOutlineProperties, rSourceProps.moTextOutlineProperties);
 
     maTextEffectsProperties = rSourceProps.maTextEffectsProperties;
     maFillProperties.assignUsed( rSourceProps.maFillProperties );
@@ -108,31 +109,49 @@ void TextCharacterProperties::pushToPropMap( PropertyMap& rPropMap, const XmlFil
         rPropMap.setProperty( PROP_CharFontFamilyComplex, nFontFamily);
     }
 
-    if ( maFillProperties.moFillType.has() )
+    if ( maFillProperties.moFillType.has_value() )
     {
         Color aColor = maFillProperties.getBestSolidColor();
+        bool bContoured = false;
 
         // noFill doesn't exist for characters. Map noFill to 99% transparency
-        if (maFillProperties.moFillType.get() == XML_noFill)
+        if (maFillProperties.moFillType.value() == XML_noFill)
             aColor.addTransformation(XML_alpha, 1000);
 
         // tdf#137438 Emulate text outline color/transparency.
         // If the outline color dominates, then use it as the text color.
-        if (moTextOutlineProperties.has()
-            && moTextOutlineProperties.get().maLineFill.moFillType.has()
-            && moTextOutlineProperties.get().maLineFill.moFillType.get() != XML_noFill)
+        if (moTextOutlineProperties.has_value()
+            && moTextOutlineProperties.value().maLineFill.moFillType.has_value()
+            && moTextOutlineProperties.value().maLineFill.moFillType.value() != XML_noFill)
         {
-            Color aLineColor = moTextOutlineProperties.get().maLineFill.getBestSolidColor();
+            Color aLineColor = moTextOutlineProperties.value().maLineFill.getBestSolidColor();
             sal_Int16 nLineTransparency = aLineColor.getTransparency();
-            if (nLineTransparency < aColor.getTransparency())
+
+            // tdf#127696 If the text color is white (and the outline color doesn't dominate),
+            //            then this is contoured text in LO.
+            if (nLineTransparency < aColor.getTransparency()
+                || (bContoured = aColor.getColor(rFilter.getGraphicHelper()) == COL_WHITE))
                 aColor = aLineColor;
         }
         rPropMap.setProperty(PROP_CharColor, aColor.getColor(rFilter.getGraphicHelper()));
-        // set color theme index
-        rPropMap.setProperty(PROP_CharColorTheme, aColor.getSchemeColorIndex());
-        rPropMap.setProperty(PROP_CharColorTintOrShade, aColor.getTintOrShade());
-        rPropMap.setProperty(PROP_CharColorLumMod, aColor.getLumMod());
-        rPropMap.setProperty(PROP_CharColorLumOff, aColor.getLumOff());
+
+        // set theme color
+        model::ThemeColor aThemeColor;
+        aThemeColor.setType(model::convertToThemeColorType(aColor.getSchemeColorIndex()));
+        if (aColor.getTintOrShade() > 0)
+            aThemeColor.addTransformation({model::TransformationType::Tint, aColor.getTintOrShade()});
+        if (aColor.getTintOrShade() < 0)
+        {
+            sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-aColor.getTintOrShade());
+            aThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+        }
+        if (aColor.getLumMod() != 10000)
+            aThemeColor.addTransformation({model::TransformationType::LumMod, aColor.getLumMod()});
+        if (aColor.getLumOff() != 0)
+            aThemeColor.addTransformation({model::TransformationType::LumOff, aColor.getLumOff()});
+
+        rPropMap.setProperty(PROP_CharColorThemeReference, model::theme::createXThemeColor(aThemeColor));
+        rPropMap.setProperty(PROP_CharContoured, bContoured);
 
         if (aColor.hasTransparency())
         {
@@ -146,9 +165,9 @@ void TextCharacterProperties::pushToPropMap( PropertyMap& rPropMap, const XmlFil
         }
     }
 
-    if( moLang.has() && !moLang.get().isEmpty() )
+    if( moLang.has_value() && !moLang.value().isEmpty() )
     {
-        LanguageTag aTag(moLang.get());
+        LanguageTag aTag(moLang.value());
         lang::Locale aLocale(aTag.getLocale());
         switch(MsLangId::getScriptType(aTag.getLanguageType()))
         {
@@ -161,42 +180,42 @@ void TextCharacterProperties::pushToPropMap( PropertyMap& rPropMap, const XmlFil
         }
     }
 
-    if( moHeight.has() )
+    if( moHeight.has_value() )
     {
-        float fHeight = GetFontHeight( moHeight.get() );
-        if (moFontScale.has())
-            fHeight *= (moFontScale.get() / 100000);
+        float fHeight = GetFontHeight( moHeight.value() );
+        if (moFontScale.has_value())
+            fHeight *= (moFontScale.value() / 100000);
         rPropMap.setProperty( PROP_CharHeight, fHeight);
         rPropMap.setProperty( PROP_CharHeightAsian, fHeight);
         rPropMap.setProperty( PROP_CharHeightComplex, fHeight);
     }
 
-    rPropMap.setProperty( PROP_CharKerning, static_cast<sal_Int16>(GetTextSpacingPoint( moSpacing.get( 0 ) )));
+    rPropMap.setProperty( PROP_CharKerning, static_cast<sal_Int16>(GetTextSpacingPoint( moSpacing.value_or( 0 ) )));
 
-    rPropMap.setProperty( PROP_CharUnderline, GetFontUnderline( moUnderline.get( XML_none ) ));
-    rPropMap.setProperty( PROP_CharStrikeout, GetFontStrikeout( moStrikeout.get( XML_noStrike ) ));
-    rPropMap.setProperty( PROP_CharCaseMap, GetCaseMap( moCaseMap.get( XML_none ) ));
+    rPropMap.setProperty( PROP_CharUnderline, GetFontUnderline( moUnderline.value_or( XML_none ) ));
+    rPropMap.setProperty( PROP_CharStrikeout, GetFontStrikeout( moStrikeout.value_or( XML_noStrike ) ));
+    rPropMap.setProperty( PROP_CharCaseMap, GetCaseMap( moCaseMap.value_or( XML_none ) ));
 
-    if( moBaseline.has() ) {
-        rPropMap.setProperty( PROP_CharEscapement, sal_Int16(moBaseline.get( 0 ) / 1000));
+    if( moBaseline.has_value() ) {
+        rPropMap.setProperty( PROP_CharEscapement, sal_Int16(moBaseline.value_or( 0 ) / 1000));
         rPropMap.setProperty( PROP_CharEscapementHeight, sal_Int8(DFLT_ESC_PROP));
     } else {
         rPropMap.setProperty( PROP_CharEscapement, sal_Int16(0));
         rPropMap.setProperty( PROP_CharEscapementHeight, sal_Int8(100)); // 100%
     }
 
-    float fWeight = moBold.get( false ) ? awt::FontWeight::BOLD : awt::FontWeight::NORMAL;
+    float fWeight = moBold.value_or( false ) ? awt::FontWeight::BOLD : awt::FontWeight::NORMAL;
     rPropMap.setProperty( PROP_CharWeight, fWeight);
     rPropMap.setProperty( PROP_CharWeightAsian, fWeight);
     rPropMap.setProperty( PROP_CharWeightComplex, fWeight);
 
-    awt::FontSlant eSlant = moItalic.get( false ) ? awt::FontSlant_ITALIC : awt::FontSlant_NONE;
+    awt::FontSlant eSlant = moItalic.value_or( false ) ? awt::FontSlant_ITALIC : awt::FontSlant_NONE;
     rPropMap.setProperty( PROP_CharPosture, eSlant);
     rPropMap.setProperty( PROP_CharPostureAsian, eSlant);
     rPropMap.setProperty( PROP_CharPostureComplex, eSlant);
 
-    bool bUnderlineFillFollowText = moUnderlineFillFollowText.get( false );
-    if( moUnderline.has() && maUnderlineColor.isUsed() && !bUnderlineFillFollowText )
+    bool bUnderlineFillFollowText = moUnderlineFillFollowText.value_or( false );
+    if( moUnderline.has_value() && maUnderlineColor.isUsed() && !bUnderlineFillFollowText )
     {
         rPropMap.setProperty( PROP_CharUnderlineHasColor, true);
         rPropMap.setProperty( PROP_CharUnderlineColor, maUnderlineColor.getColor( rFilter.getGraphicHelper() ));
@@ -206,8 +225,6 @@ void TextCharacterProperties::pushToPropMap( PropertyMap& rPropMap, const XmlFil
         rPropMap.setProperty( PROP_CharUnderlineHasColor, false);
         rPropMap.setProperty( PROP_CharUnderlineColor, sal_Int32(-1));
     }
-
-    // TODO If bUnderlineFillFollowText uFillTx (CT_TextUnderlineFillFollowText) is set, fill color of the underline should be the same color as the text
 
     if (maHighlightColor.isUsed() && maHighlightColor.getTransparency() != 100)
         rPropMap.setProperty( PROP_CharBackColor, maHighlightColor.getColor( rFilter.getGraphicHelper() ));
@@ -223,7 +240,7 @@ static void pushToGrabBag( PropertySet& rPropSet, const std::vector<PropertyValu
     Any aAnyGrabBag = rPropSet.getAnyProperty(PROP_CharInteropGrabBag);
     aAnyGrabBag >>= aGrabBag;
 
-    rPropSet.setAnyProperty(PROP_CharInteropGrabBag, makeAny(comphelper::concatSequences(aGrabBag, aVectorOfPropertyValues)));
+    rPropSet.setAnyProperty(PROP_CharInteropGrabBag, Any(comphelper::concatSequences(aGrabBag, aVectorOfPropertyValues)));
 }
 
 void TextCharacterProperties::pushToPropSet( PropertySet& rPropSet, const XmlFilterBase& rFilter ) const
@@ -236,7 +253,7 @@ void TextCharacterProperties::pushToPropSet( PropertySet& rPropSet, const XmlFil
 
 float TextCharacterProperties::getCharHeightPoints( float fDefault ) const
 {
-    return moHeight.has() ? GetFontHeight( moHeight.get() ) : fDefault;
+    return moHeight.has_value() ? GetFontHeight( moHeight.value() ) : fDefault;
 }
 
 } // namespace oox::drawingml

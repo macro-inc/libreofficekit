@@ -56,12 +56,15 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 	$(gb_RUN_CONFIGURE) ./configure \
 		$(if $(debug),STRIP=" ") \
 		$(if $(filter ANDROID iOS,$(OS)),CFLAGS="$(if $(debug),-g) $(ZLIB_CFLAGS) $(gb_VISIBILITY_FLAGS)") \
-		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS=" $(ZLIB_CFLAGS)" --enable-pthread=yes PTHREAD_LIBS="") \
-		$(if $(filter-out EMSCRIPTEN ANDROID iOS,$(OS)),CFLAGS="$(CFLAGS) $(if $(debug),-g) $(ZLIB_CFLAGS)" ) \
-		$(if $(filter ANDROID iOS,$(OS)),PKG_CONFIG=./dummy_pkg_config) \
+		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS="-O3 -DCAIRO_NO_MUTEX $(ZLIB_CFLAGS) -Wno-enum-conversion $(gb_EMSCRIPTEN_CPPFLAGS)" ) \
+		$(if $(filter-out EMSCRIPTEN ANDROID iOS,$(OS)), \
+			CFLAGS="$(CFLAGS) $(call gb_ExternalProject_get_build_flags,cairo) $(ZLIB_CFLAGS)" \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,cairo)" \
+			) \
+		$(if $(filter ANDROID iOS WNT,$(OS)),PKG_CONFIG=./dummy_pkg_config) \
 		LIBS="$(ZLIB_LIBS)" \
 		$(if $(filter -fsanitize=%,$(LDFLAGS)),LDFLAGS="$(LDFLAGS) -fuse-ld=bfd") \
-		pixman_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,pixman)/pixman -pthread" \
+		pixman_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,pixman)/pixman $(if $(filter WNT,$(OS)),,-pthread)" \
 		pixman_LIBS="-L$(call gb_UnpackedTarball_get_dir,pixman)/pixman/.libs -lpixman-1 \
 			$(if $(filter LINUX,$(OS)),-Wl$(COMMA)-z$(COMMA)origin \
 					-Wl$(COMMA)-rpath$(COMMA)\\\$$\$$ORIGIN) \
@@ -73,14 +76,14 @@ $(call gb_ExternalProject_get_state_target,cairo,build) :
 		$(if $(SYSTEM_FREETYPE),,FREETYPE_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,freetype)/include") \
 		$(if $(SYSTEM_FONTCONFIG),,FONTCONFIG_CFLAGS="-I$(call gb_UnpackedTarball_get_dir,fontconfig)") \
 		$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-		$(if $(filter WNT,$(OS)),--disable-shared,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static)) \
+		$(if $(filter WNT,$(OS)),--disable-shared ax_cv_c_float_words_bigendian=no ac_cv_c_bigendian=no --disable-quartz,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),--disable-shared,--disable-static)) \
 		$(if $(filter EMSCRIPTEN ANDROID iOS,$(OS)),--disable-xlib --disable-xcb,$(if $(filter TRUE,$(DISABLE_GUI)),--disable-xlib --disable-xcb,--enable-xlib --enable-xcb)) \
 		$(if $(filter iOS,$(OS)),--enable-quartz --enable-quartz-font) \
 		--disable-valgrind \
 		--enable-ft --enable-fc \
 		--disable-svg --enable-gtk-doc=no --enable-test-surfaces=no \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
-		$(if $(filter INTEL ARM X86_64,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no) \
+		$(gb_CONFIGURE_PLATFORMS) \
+		$(if $(CROSS_COMPILING),$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no ax_cv_c_float_words_bigendian=no)) \
 		$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 		$(if $(filter MACOSX,$(OS)),FONTCONFIG_LIBS="-L$(call gb_UnpackedTarball_get_dir,fontconfig)/src/.libs -lfontconfig -L$(gb_StaticLibrary_WORKDIR) -lexpat") \
 	&& cd src && $(MAKE) \

@@ -18,7 +18,6 @@
 #include <sfx2/filedlghelper.hxx>
 #include <tools/urlobj.hxx>
 
-#include <unotools/pathoptions.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <vcl/graphicfilter.hxx>
 #include <vcl/svapp.hxx>
@@ -26,7 +25,7 @@
 #include <svx/xfillit0.hxx>
 #include <svx/xfltrit.hxx>
 #include <svx/xflclit.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <xmloff/autolayout.hxx>
 
 #include "PhotoAlbumDialog.hxx"

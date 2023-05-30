@@ -33,6 +33,7 @@
 #include <uielement/togglebuttontoolbarcontroller.hxx>
 #include <uielement/FixedTextToolbarController.hxx>
 #include <uielement/FixedImageToolbarController.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace framework
 {
@@ -92,10 +93,10 @@ using namespace ::com::sun::star;
 
 */
 bool ToolBarMerger::IsCorrectContext(
-    const OUString& rContext,
+    std::u16string_view rContext,
     std::u16string_view rModuleIdentifier )
 {
-    return ( rContext.isEmpty() || ( rContext.indexOf( rModuleIdentifier ) >= 0 ));
+    return ( rContext.empty() || ( rContext.find( rModuleIdentifier ) != std::u16string_view::npos ));
 }
 
 /**
@@ -215,6 +216,10 @@ void ToolBarMerger::ConvertSequenceToValues(
 
      Must be a valid pointer to a toolbar with items which
      should be searched.
+@param
+     nFirstItem
+
+     First toolbar item to search from.
 
  @param
      rReferencePoint
@@ -227,7 +232,7 @@ void ToolBarMerger::ConvertSequenceToValues(
      position of the reference point and the toolbar used.
 */
 ReferenceToolbarPathInfo ToolBarMerger::FindReferencePoint(
-    const ToolBox*   pToolbar,
+    const ToolBox* pToolbar, sal_uInt16 nFirstItem,
     std::u16string_view rReferencePoint )
 {
     ReferenceToolbarPathInfo aResult;
@@ -236,7 +241,7 @@ ReferenceToolbarPathInfo ToolBarMerger::FindReferencePoint(
 
     const ToolBox::ImplToolItems::size_type nSize( pToolbar->GetItemCount() );
 
-    for ( ToolBox::ImplToolItems::size_type i = 0; i < nSize; i++ )
+    for ( ToolBox::ImplToolItems::size_type i = nFirstItem; i < nSize; i++ )
     {
         const ToolBoxItemId nItemId = pToolbar->GetItemId( i );
         if ( nItemId > ToolBoxItemId(0) )
@@ -307,7 +312,7 @@ bool ToolBarMerger::ProcessMergeOperation(
     CommandToInfoMap&                      rCommandMap,
     std::u16string_view                    rModuleIdentifier,
     std::u16string_view                    rMergeCommand,
-    const OUString&                        rMergeCommandParameter,
+    std::u16string_view                    rMergeCommandParameter,
     const AddonToolbarItemContainer&       rItems )
 {
     if ( rMergeCommand == MERGECOMMAND_ADDAFTER )
@@ -544,9 +549,9 @@ void ToolBarMerger::ReplaceItem(
 void ToolBarMerger::RemoveItems(
     ToolBox*                  pToolbar,
     ToolBox::ImplToolItems::size_type nPos,
-    const OUString&    rMergeCommandParameter )
+    std::u16string_view rMergeCommandParameter )
 {
-    sal_Int32 nCount = rMergeCommandParameter.toInt32();
+    sal_Int32 nCount = o3tl::toInt32(rMergeCommandParameter);
     if ( nCount > 0 )
     {
         for ( sal_Int32 i = 0; i < nCount; i++ )
@@ -625,8 +630,7 @@ void ToolBarMerger::CreateToolbarItem( ToolBox* pToolbar, ToolBox::ImplToolItems
 {
     assert(pToolbar->GetItemData(nItemId) == nullptr); // that future would contain a double free
 
-    pToolbar->InsertItem( nItemId, rItem.aLabel, ToolBoxItemBits::NONE, nPos );
-    pToolbar->SetItemCommand( nItemId, rItem.aCommandURL );
+    pToolbar->InsertItem( nItemId, rItem.aLabel, rItem.aCommandURL, ToolBoxItemBits::NONE, nPos );
     pToolbar->SetQuickHelpText( nItemId, rItem.aLabel );
     pToolbar->SetItemText( nItemId, rItem.aLabel );
     pToolbar->EnableItem( nItemId );

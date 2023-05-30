@@ -30,12 +30,16 @@
 #include <txatbase.hxx>
 #include <ndtxt.hxx>
 #include <textcontentcontrol.hxx>
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/txtnode/data/";
+#include <swdtflvr.hxx>
 
 /// Covers sw/source/core/txtnode/ fixes.
 class SwCoreTxtnodeTest : public SwModelTestBase
 {
+public:
+    SwCoreTxtnodeTest()
+        : SwModelTestBase("/sw/qa/core/txtnode/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testBtlrCellChinese)
@@ -44,7 +48,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testBtlrCellChinese)
     // classified as vertical, i.e. the glyph has the same direction in both the lrtb ("Latin") and
     // tbrl ("Chinese") directions. Make sure that Chinese text is handled the same way in the btlr
     // case as it's handled in the Latin case.
-    load(DATA_DIRECTORY, "btlr-cell-chinese.doc");
+    createSwDoc("btlr-cell-chinese.doc");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pShell = pTextDoc->GetDocShell();
     std::shared_ptr<GDIMetaFile> xMetaFile = pShell->GetPreviewMetaFile();
@@ -60,7 +64,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testBtlrCellChinese)
 
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testTextBoxCopyAnchor)
 {
-    load(DATA_DIRECTORY, "textbox-copy-anchor.docx");
+    createSwDoc("textbox-copy-anchor.docx");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pShell->GetWrtShell();
@@ -79,16 +83,16 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testTextBoxCopyAnchor)
 
     SwPosition aDrawAnchor1 = *rFormats[0]->GetAnchor().GetContentAnchor();
     SwPosition aFlyAnchor1 = *rFormats[1]->GetAnchor().GetContentAnchor();
-    CPPUNIT_ASSERT_EQUAL(aFlyAnchor1.nNode, aDrawAnchor1.nNode);
+    CPPUNIT_ASSERT_EQUAL(aFlyAnchor1.GetNodeIndex(), aDrawAnchor1.GetNodeIndex());
     SwPosition aDrawAnchor2 = *rFormats[2]->GetAnchor().GetContentAnchor();
     SwPosition aFlyAnchor2 = *rFormats[3]->GetAnchor().GetContentAnchor();
     // This also failed, aFlyAnchor2 was wrong, as it got out of sync with aDrawAnchor2.
-    CPPUNIT_ASSERT_EQUAL(aFlyAnchor2.nNode, aDrawAnchor2.nNode);
+    CPPUNIT_ASSERT_EQUAL(aFlyAnchor2.GetNodeIndex(), aDrawAnchor2.GetNodeIndex());
 }
 
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testTextBoxNodeSplit)
 {
-    load(DATA_DIRECTORY, "textbox-node-split.docx");
+    createSwDoc("textbox-node-split.docx");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pShell = pTextDoc->GetDocShell();
     SwWrtShell* pWrtShell = pShell->GetWrtShell();
@@ -132,7 +136,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testTitleFieldInvalidate)
     comphelper::LibreOfficeKit::setActive(true);
 
     // Given a document with a title field:
-    load(DATA_DIRECTORY, "title-field-invalidate.fodt");
+    createSwDoc("title-field-invalidate.fodt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     pTextDoc->initializeForTiledRendering({});
     SwDocShell* pShell = pTextDoc->GetDocShell();
@@ -168,12 +172,12 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testTitleFieldInvalidate)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testFlyAnchorUndo)
 {
     // Given a document with a fly frame, anchored after the last char of the document:
-    load(DATA_DIRECTORY, "fly-anchor-undo.odt");
+    createSwDoc("fly-anchor-undo.odt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pShell = pTextDoc->GetDocShell();
     SwDoc* pDoc = pShell->GetDoc();
     const SwFrameFormats& rSpz = *pDoc->GetSpzFrameFormats();
-    sal_Int32 nExpected = rSpz[0]->GetAnchor().GetContentAnchor()->nContent.GetIndex();
+    sal_Int32 nExpected = rSpz[0]->GetAnchor().GetAnchorContentOffset();
 
     // When deleting that last character and undoing it:
     SwWrtShell* pWrtShell = pShell->GetWrtShell();
@@ -182,7 +186,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testFlyAnchorUndo)
     pWrtShell->Undo();
 
     // Then make sure the anchor position after the undo is the same as the original:
-    sal_Int32 nActual = rSpz[0]->GetAnchor().GetContentAnchor()->nContent.GetIndex();
+    sal_Int32 nActual = rSpz[0]->GetAnchor().GetAnchorContentOffset();
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: 3
     // - Actual  : 2
@@ -193,10 +197,11 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testFlyAnchorUndo)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testSplitNodeSuperscriptCopy)
 {
     // Given a document with superscript text at the end of a paragraph:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->Insert("1st");
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/true, 2, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/true, 2, /*bBasicCall=*/false);
     SfxItemSetFixed<RES_CHRATR_ESCAPEMENT, RES_CHRATR_ESCAPEMENT> aSet(pWrtShell->GetAttrPool());
     SvxEscapementItem aItem(SvxEscapement::Superscript, RES_CHRATR_ESCAPEMENT);
     aSet.Put(aItem);
@@ -217,7 +222,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testSplitNodeSuperscriptCopy)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testInsertDropDownContentControlTwice)
 {
     // Given an already selected dropdown content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
 
@@ -228,7 +234,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testInsertDropDownContentControlTwice)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testCheckboxContentControlKeyboard)
 {
     // Given an already selected checkbox content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::CHECKBOX);
     SwEditWin& rEditWin = pWrtShell->GetView().GetEditWin();
@@ -238,7 +245,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testCheckboxContentControlKeyboard)
     rEditWin.KeyInput(aKeyEvent);
 
     // Then make sure the state is toggled:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetPointNode().GetTextNode();
     SwTextAttr* pAttr = pTextNode->GetTextAttrForCharAt(0, RES_TXTATR_CONTENTCONTROL);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
@@ -252,7 +259,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testCheckboxContentControlKeyboard)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testDropdownContentControlKeyboard)
 {
     // Given an already selected dropdown content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
 
@@ -273,7 +281,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testDropdownContentControlKeyboard)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testPictureContentControlKeyboard)
 {
     // Given an already selected picture content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::PICTURE);
     pWrtShell->GotoObj(/*bNext=*/true, GotoObjFlags::Any);
@@ -281,10 +290,11 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testPictureContentControlKeyboard)
     // When checking if enter should trigger the file picker:
     const SwFrameFormat* pFlyFormat = pWrtShell->GetFlyFrameFormat();
     const SwFormatAnchor& rFormatAnchor = pFlyFormat->GetAnchor();
-    const SwPosition* pAnchorPos = rFormatAnchor.GetContentAnchor();
-    SwTextNode* pTextNode = pAnchorPos->nNode.GetNode().GetTextNode();
-    SwTextAttr* pAttr = pTextNode->GetTextAttrAt(pAnchorPos->nContent.GetIndex(),
-                                                 RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT);
+    SwNode* pAnchorNode = rFormatAnchor.GetAnchorNode();
+    SwTextNode* pTextNode = pAnchorNode->GetTextNode();
+    SwTextAttr* pAttr
+        = pTextNode->GetTextAttrAt(rFormatAnchor.GetAnchorContentOffset(),
+                                   RES_TXTATR_CONTENTCONTROL, ::sw::GetTextAttrMode::Parent);
     auto pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
     auto& rFormatContentControl
         = static_cast<SwFormatContentControl&>(pTextContentControl->GetAttr());
@@ -300,7 +310,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testPictureContentControlKeyboard)
 CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testDateContentControlKeyboard)
 {
     // Given an already selected date content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DATE);
 
@@ -316,6 +327,36 @@ CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testDateContentControlKeyboard)
     // Without the accompanying fix in place, this test would have failed, the date popup was
     // mouse-only.
     CPPUNIT_ASSERT(bShouldOpen);
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreTxtnodeTest, testContentControlCopy)
+{
+    // Given a document with a content control:
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    pWrtShell->InsertContentControl(SwContentControlType::CHECKBOX);
+
+    // When copying that content control:
+    pWrtShell->SelAll();
+    rtl::Reference<SwTransferable> xTransfer = new SwTransferable(*pWrtShell);
+    xTransfer->Copy();
+    // Kill the selection, go to the end of the document:
+    pWrtShell->EndOfSection();
+    TransferableDataHelper aHelper(xTransfer);
+    SwTransferable::Paste(*pWrtShell, aHelper);
+
+    // Then make sure that the copy is also a checkbox:
+    SwContentControlManager& rManager = pDoc->GetContentControlManager();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rManager.GetCount());
+    const SwFormatContentControl& rFormat1 = rManager.Get(0)->GetContentControl();
+    CPPUNIT_ASSERT_EQUAL(SwContentControlType::CHECKBOX, rFormat1.GetContentControl()->GetType());
+    const SwFormatContentControl& rFormat2 = rManager.Get(1)->GetContentControl();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1 (CHECKBOX)
+    // - Actual  : 0 (RICH_TEXT)
+    // i.e. properties were not copied from the source to the destination content control.
+    CPPUNIT_ASSERT_EQUAL(SwContentControlType::CHECKBOX, rFormat2.GetContentControl()->GetType());
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

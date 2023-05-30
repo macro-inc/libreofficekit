@@ -21,6 +21,7 @@
 #include <dtoa.h>
 #include <float.h>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <sal/log.hxx>
 #include <tools/date.hxx>
 #include <rtl/math.hxx>
@@ -152,13 +153,13 @@ static void TransformInput( SvNumberFormatter const * pFormatter, OUString& rStr
  * Only simple unsigned floating point values without any error detection,
  * decimal separator has to be '.'
  */
-double ImpSvNumberInputScan::StringToDouble( const OUString& rStr, bool bForceFraction )
+double ImpSvNumberInputScan::StringToDouble( std::u16string_view aStr, bool bForceFraction )
 {
     std::unique_ptr<char[]> bufInHeap;
     constexpr int bufOnStackSize = 256;
     char bufOnStack[bufOnStackSize];
     char* buf = bufOnStack;
-    const sal_Int32 bufsize = rStr.getLength() + (bForceFraction ? 2 : 1);
+    const sal_Int32 bufsize = aStr.size() + (bForceFraction ? 2 : 1);
     if (bufsize > bufOnStackSize)
     {
         bufInHeap = std::make_unique<char[]>(bufsize);
@@ -167,9 +168,9 @@ double ImpSvNumberInputScan::StringToDouble( const OUString& rStr, bool bForceFr
     char* p = buf;
     if (bForceFraction)
         *p++ = '.';
-    for (sal_Int32 nPos = 0; nPos < rStr.getLength(); ++nPos)
+    for (size_t nPos = 0; nPos < aStr.size(); ++nPos)
     {
-        sal_Unicode c = rStr[nPos];
+        sal_Unicode c = aStr[nPos];
         if (c == '.' || (c >= '0' && c <= '9'))
             *p++ = static_cast<char>(c);
         else
@@ -484,10 +485,10 @@ bool ImpSvNumberInputScan::StringContainsWord( const OUString& rWhat,
 /**
  * Skips the supplied char
  */
-inline bool ImpSvNumberInputScan::SkipChar( sal_Unicode c, const OUString& rString,
+inline bool ImpSvNumberInputScan::SkipChar( sal_Unicode c, std::u16string_view rString,
                                             sal_Int32& nPos )
 {
-    if ((nPos < rString.getLength()) && (rString[nPos] == c))
+    if ((nPos < static_cast<sal_Int32>(rString.size())) && (rString[nPos] == c))
     {
         nPos++;
         return true;
@@ -534,7 +535,7 @@ inline bool ImpSvNumberInputScan::SkipString( const OUString& rWhat,
 /**
  * Recognizes exactly ,111 in {3} and {3,2} or ,11 in {3,2} grouping
  */
-inline bool ImpSvNumberInputScan::GetThousandSep( const OUString& rString,
+inline bool ImpSvNumberInputScan::GetThousandSep( std::u16string_view rString,
                                                   sal_Int32& nPos,
                                                   sal_uInt16 nStringPos ) const
 {
@@ -542,7 +543,7 @@ inline bool ImpSvNumberInputScan::GetThousandSep( const OUString& rString,
     // Is it an ordinary space instead of a no-break space?
     bool bSpaceBreak = (rSep[0] == cNoBreakSpace || rSep[0] == cNarrowNoBreakSpace) &&
         rString[0] == u' ' &&
-        rSep.getLength() == 1 && rString.getLength() == 1;
+        rSep.getLength() == 1 && rString.size() == 1;
     if (!((rString == rSep || bSpaceBreak) &&      // nothing else
            nStringPos < nStringsCnt - 1 &&         // safety first!
            IsNum[ nStringPos + 1 ] ))              // number follows
@@ -850,18 +851,18 @@ bool ImpSvNumberInputScan::GetTimeAmPm( const OUString& rString, sal_Int32& nPos
  * ','   => true
  * else => false
  */
-inline bool ImpSvNumberInputScan::GetDecSep( const OUString& rString, sal_Int32& nPos ) const
+inline bool ImpSvNumberInputScan::GetDecSep( std::u16string_view rString, sal_Int32& nPos ) const
 {
-    if ( rString.getLength() > nPos )
+    if ( static_cast<sal_Int32>(rString.size()) > nPos )
     {
         const OUString& rSep = pFormatter->GetNumDecimalSep();
-        if ( rString.match( rSep, nPos) )
+        if ( o3tl::starts_with(rString.substr(nPos), rSep) )
         {
             nPos = nPos + rSep.getLength();
             return true;
         }
         const OUString& rSepAlt = pFormatter->GetNumDecimalSepAlt();
-        if ( !rSepAlt.isEmpty() && rString.match( rSepAlt, nPos) )
+        if ( !rSepAlt.isEmpty() && o3tl::starts_with(rString.substr(nPos), rSepAlt) )
         {
             nPos = nPos + rSepAlt.getLength();
             return true;
@@ -874,9 +875,9 @@ inline bool ImpSvNumberInputScan::GetDecSep( const OUString& rString, sal_Int32&
 /**
  * Reading a hundredth seconds separator
  */
-inline bool ImpSvNumberInputScan::GetTime100SecSep( const OUString& rString, sal_Int32& nPos ) const
+inline bool ImpSvNumberInputScan::GetTime100SecSep( std::u16string_view rString, sal_Int32& nPos ) const
 {
-    if ( rString.getLength() > nPos )
+    if ( static_cast<sal_Int32>(rString.size()) > nPos )
     {
         if (bIso8601Tsep)
         {
@@ -891,7 +892,7 @@ inline bool ImpSvNumberInputScan::GetTime100SecSep( const OUString& rString, sal
         // Even in an otherwise ISO 8601 string be lenient and accept the
         // locale defined separator.
         const OUString& rSep = pFormatter->GetLocaleData()->getTime100SecSep();
-        if ( rString.match( rSep, nPos ))
+        if ( o3tl::starts_with(rString.substr(nPos), rSep))
         {
             nPos = nPos + rSep.getLength();
             return true;
@@ -905,12 +906,13 @@ inline bool ImpSvNumberInputScan::GetTime100SecSep( const OUString& rString, sal
  * Read a sign including brackets
  * '+'   =>  1
  * '-'   => -1
+ * u'−'   => -1
  *  '('   => -1, bNegCheck = 1
  * else =>  0
  */
-int ImpSvNumberInputScan::GetSign( const OUString& rString, sal_Int32& nPos )
+int ImpSvNumberInputScan::GetSign( std::u16string_view rString, sal_Int32& nPos )
 {
-    if (rString.getLength() > nPos)
+    if (static_cast<sal_Int32>(rString.size()) > nPos)
         switch (rString[ nPos ])
         {
         case '+':
@@ -920,6 +922,8 @@ int ImpSvNumberInputScan::GetSign( const OUString& rString, sal_Int32& nPos )
             bNegCheck = true;
             [[fallthrough]];
         case '-':
+        // tdf#117037 - unicode minus (0x2212)
+        case u'−':
             nPos++;
             return -1;
         default:
@@ -936,9 +940,9 @@ int ImpSvNumberInputScan::GetSign( const OUString& rString, sal_Int32& nPos )
  * '-'   => -1
  * else =>  0
  */
-short ImpSvNumberInputScan::GetESign( const OUString& rString, sal_Int32& nPos )
+short ImpSvNumberInputScan::GetESign( std::u16string_view rString, sal_Int32& nPos )
 {
-    if (rString.getLength() > nPos)
+    if (static_cast<sal_Int32>(rString.size()) > nPos)
     {
         switch (rString[nPos])
         {
@@ -1262,17 +1266,17 @@ bool ImpSvNumberInputScan::MayBeMonthDate()
 /** If a string is a separator plus '-' minus sign preceding a 'Y' year in
     a date pattern at position nPat.
  */
-static bool lcl_IsSignedYearSep( const OUString& rStr, const OUString& rPat, sal_Int32 nPat )
+static bool lcl_IsSignedYearSep( std::u16string_view rStr, std::u16string_view rPat, sal_Int32 nPat )
 {
     bool bOk = false;
-    sal_Int32 nLen = rStr.getLength();
+    sal_Int32 nLen = rStr.size();
     if (nLen > 1 && rStr[nLen-1] == '-')
     {
         --nLen;
-        if (nPat + nLen < rPat.getLength() && rPat[nPat+nLen] == 'Y')
+        if (nPat + nLen < static_cast<sal_Int32>(rPat.size()) && rPat[nPat+nLen] == 'Y')
         {
             // Signed year is possible.
-            bOk = (rPat.indexOf( rStr.subView( 0, nLen), nPat) == nPat);
+            bOk = (rPat.find( rStr.substr( 0, nLen), nPat) == static_cast<size_t>(nPat));
         }
     }
     return bOk;
@@ -1280,11 +1284,11 @@ static bool lcl_IsSignedYearSep( const OUString& rStr, const OUString& rPat, sal
 
 
 /** Length of separator usually is 1 but theoretically could be anything. */
-static sal_Int32 lcl_getPatternSeparatorLength( const OUString& rPat, sal_Int32 nPat )
+static sal_Int32 lcl_getPatternSeparatorLength( std::u16string_view rPat, sal_Int32 nPat )
 {
     sal_Int32 nSep = nPat;
     sal_Unicode c;
-    while (nSep < rPat.getLength() && (c = rPat[nSep]) != 'D' && c != 'M' && c != 'Y')
+    while (nSep < static_cast<sal_Int32>(rPat.size()) && (c = rPat[nSep]) != 'D' && c != 'M' && c != 'Y')
         ++nSep;
     return nSep - nPat;
 }
@@ -1356,10 +1360,22 @@ bool ImpSvNumberInputScan::IsAcceptedDatePattern( sal_uInt16 nStartPatternAt )
 
     for (sal_Int32 nPattern=0; nPattern < sDateAcceptancePatterns.getLength(); ++nPattern)
     {
+        const OUString& rPat = sDateAcceptancePatterns[nPattern];
+        if (rPat.getLength() == 3)
+        {
+            // Ignore a pattern that would match numeric input with decimal
+            // separator. It may had been read from configuration or resulted
+            // from the locales' patterns concatenation above.
+            if (    rPat[1] == pFormatter->GetLocaleData()->getNumDecimalSep().toChar()
+                 || rPat[1] == pFormatter->GetLocaleData()->getNumDecimalSepAlt().toChar())
+            {
+                SAL_WARN("svl.numbers", "ignoring date acceptance pattern with decimal separator ambiguity: " << rPat);
+                continue;   // for, next pattern
+            }
+        }
         sal_uInt16 nNext = nDatePatternStart;
         nDatePatternNumbers = 0;
         bool bOk = true;
-        const OUString& rPat = sDateAcceptancePatterns[nPattern];
         sal_Int32 nPat = 0;
         for ( ; nPat < rPat.getLength() && bOk && nNext < nStringsCnt; ++nPat, ++nNext)
         {
@@ -1432,11 +1448,10 @@ bool ImpSvNumberInputScan::IsAcceptedDatePattern( sal_uInt16 nStartPatternAt )
                         // Expand again in case of pattern "M. D. " and
                         // input "M. D.  ", maybe fetched far, but...
                         padToLength(aBuf, rPat.getLength() - nPat, ' ');
-                        OUString aStr = aBuf.makeStringAndClear();
-                        bOk = (rPat.indexOf( aStr, nPat) == nPat);
+                        bOk = (rPat.indexOf( aBuf, nPat) == nPat);
                         if (bOk)
                         {
-                            nPat += aStr.getLength() - 1;
+                            nPat += aBuf.getLength() - 1;
                         }
                     }
                 }
@@ -1551,7 +1566,7 @@ bool ImpSvNumberInputScan::SkipDatePatternSeparator( sal_uInt16 nParticle, sal_I
                     OUStringBuffer aBuf(sStrArray[nNext]);
                     aBuf.stripEnd();
                     padToLength(aBuf, rPat.getLength() - nPat, ' ');
-                    bOk = (rPat.indexOf( aBuf.makeStringAndClear(), nPat) == nPat);
+                    bOk = (rPat.indexOf(aBuf, nPat) == nPat);
                 }
                 if (bOk)
                 {
@@ -1703,6 +1718,52 @@ DateOrder ImpSvNumberInputScan::GetDateOrder( bool bFromFormatIfNoPattern )
     }
     SAL_WARN( "svl.numbers", "ImpSvNumberInputScan::GetDateOrder: undefined, falling back to locale's default");
     return pFormatter->GetLocaleData()->getDateOrder();
+}
+
+LongDateOrder ImpSvNumberInputScan::GetMiddleMonthLongDateOrder( bool bFormatTurn,
+                                                                 const LocaleDataWrapper* pLoc,
+                                                                 DateOrder eDateOrder )
+{
+    if (MayBeMonthDate())
+        return (nMayBeMonthDate == 2) ? LongDateOrder::DMY : LongDateOrder::YMD;
+
+    LongDateOrder eLDO;
+    const sal_uInt32 nExactDateOrder = (bFormatTurn ? mpFormat->GetExactDateOrder() : 0);
+    if (!nExactDateOrder)
+        eLDO = pLoc->getLongDateOrder();
+    else if ((((nExactDateOrder >> 16) & 0xff) == 'Y') && ((nExactDateOrder & 0xff) == 'D'))
+        eLDO = LongDateOrder::YMD;
+    else if ((((nExactDateOrder >> 16) & 0xff) == 'D') && ((nExactDateOrder & 0xff) == 'Y'))
+        eLDO = LongDateOrder::DMY;
+    else
+        eLDO = pLoc->getLongDateOrder();
+    if (eLDO != LongDateOrder::YMD && eLDO != LongDateOrder::DMY)
+    {
+        switch (eDateOrder)
+        {
+            case DateOrder::YMD:
+                eLDO = LongDateOrder::YMD;
+            break;
+            case DateOrder::DMY:
+                eLDO = LongDateOrder::DMY;
+            break;
+            default:
+                ;   // nothing, not a date
+        }
+    }
+    else if (eLDO == LongDateOrder::DMY && eDateOrder == DateOrder::YMD)
+    {
+        // Check possible order and maybe switch.
+        if (!ImplGetDay(0) && ImplGetDay(1))
+            eLDO = LongDateOrder::YMD;
+    }
+    else if (eLDO == LongDateOrder::YMD && eDateOrder == DateOrder::DMY)
+    {
+        // Check possible order and maybe switch.
+        if (!ImplGetDay(1) && ImplGetDay(0))
+            eLDO = LongDateOrder::DMY;
+    }
+    return eLDO;
 }
 
 bool ImpSvNumberInputScan::GetDateRef( double& fDays, sal_uInt16& nCounter )
@@ -2061,14 +2122,14 @@ input for the following reasons:
             case 2:             // month in the middle (10 Jan 94)
             {
                 pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
-                DateOrder eDF = (MayBeMonthDate() ? (nMayBeMonthDate == 2 ? DateOrder::DMY : DateOrder::YMD) : DateFmt);
-                switch (eDF)
+                const LongDateOrder eLDO = GetMiddleMonthLongDateOrder( bFormatTurn, pLoc, DateFmt);
+                switch (eLDO)
                 {
-                case DateOrder::DMY:
+                case LongDateOrder::DMY:
                     pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(0) );
                     pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(1) );
                     break;
-                case DateOrder::YMD:
+                case LongDateOrder::YMD:
                     pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(1) );
                     pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(0) );
                     break;
@@ -2078,7 +2139,17 @@ input for the following reasons:
                 }
                 break;
             }
-            default:            // else, e.g. month at the end (94 10 Jan)
+            case 3:             // month at the end (94 10 Jan)
+                if (pLoc->getLongDateOrder() != LongDateOrder::YDM)
+                    res = false;
+                else
+                {
+                    pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(1) );
+                    pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
+                    pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(0) );
+                }
+                break;
+            default:
                 res = false;
                 break;
             }   // switch (nMonthPos)
@@ -2130,29 +2201,37 @@ input for the following reasons:
                 break;
             }
             case 1:             // month at the beginning (Jan 01 01 8:23)
+            {
                 nCounter = 2;
-                switch (DateFmt)
+                // The input is valid as MDY in almost any
+                // constellation, there is no date order (M)YD except if
+                // set in a format applied.
+                pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
+                sal_uInt32 nExactDateOrder = (bFormatTurn ? mpFormat->GetExactDateOrder() : 0);
+                if ((((nExactDateOrder >> 8) & 0xff) == 'Y') && ((nExactDateOrder & 0xff) == 'D'))
                 {
-                case DateOrder::MDY:
+                    pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(1) );
+                    pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(0) );
+                }
+                else
+                {
                     pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(0) );
-                    pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
                     pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(1) );
-                    break;
-                default:
-                    res = false;
-                    break;
                 }
                 break;
+            }
             case 2:             // month in the middle (10 Jan 94 8:23)
+            {
                 nCounter = 2;
                 pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
-                switch (DateFmt)
+                const LongDateOrder eLDO = GetMiddleMonthLongDateOrder( bFormatTurn, pLoc, DateFmt);
+                switch (eLDO)
                 {
-                case DateOrder::DMY:
+                case LongDateOrder::DMY:
                     pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(0) );
                     pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(1) );
                     break;
-                case DateOrder::YMD:
+                case LongDateOrder::YMD:
                     pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(1) );
                     pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(0) );
                     break;
@@ -2161,7 +2240,19 @@ input for the following reasons:
                     break;
                 }
                 break;
-            default:            // else, e.g. month at the end (94 10 Jan 8:23)
+            }
+            case 3:            // month at the end (94 10 Jan 8:23)
+                nCounter = 2;
+                if (pLoc->getLongDateOrder() != LongDateOrder::YDM)
+                    res = false;
+                else
+                {
+                    pCal->setValue( CalendarFieldIndex::DAY_OF_MONTH, ImplGetDay(1) );
+                    pCal->setValue( CalendarFieldIndex::MONTH, std::abs(nMonth)-1 );
+                    pCal->setValue( CalendarFieldIndex::YEAR, ImplGetYear(0) );
+                }
+                break;
+            default:
                 nCounter = 2;
                 res = false;
                 break;
@@ -2470,7 +2561,7 @@ bool ImpSvNumberInputScan::ScanStartString( const OUString& rString )
  * All gone => true
  * else     => false
  */
-bool ImpSvNumberInputScan::ScanMidString( const OUString& rString, sal_uInt16 nStringPos )
+bool ImpSvNumberInputScan::ScanMidString( const OUString& rString, sal_uInt16 nStringPos, sal_uInt16 nCurNumCount )
 {
     sal_Int32 nPos = 0;
     SvNumFormatType eOldScannedType = eScannedType;
@@ -2557,15 +2648,17 @@ bool ImpSvNumberInputScan::ScanMidString( const OUString& rString, sal_uInt16 nS
     if (SkipChar('/', rString, nPos))               // fraction?
     {
         if ( eScannedType != SvNumFormatType::UNDEFINED &&  // already another type
-             eScannedType != SvNumFormatType::DATE)       // except date
+             eScannedType != SvNumFormatType::DATE)         // except date
         {
-            return MatchedReturn();                     // => jan/31/1994
+            return MatchedReturn();                         // => jan/31/1994
         }
-        else if (eScannedType != SvNumFormatType::DATE &&    // analyzed no date until now
-                 ( eSetType == SvNumFormatType::FRACTION ||  // and preset was fraction
-                   (nNumericsCnt == 3 &&                     // or 3 numbers
-                    (nStringPos == 3 ||                  // and 3rd string particle
-                     (nStringPos == 4 && nSign)))))      // or 4th  if signed
+        else if (eScannedType != SvNumFormatType::DATE &&   // analyzed no date until now
+                 (eSetType == SvNumFormatType::FRACTION ||  // and preset was fraction
+                  (nNumericsCnt == 3 &&                     // or 3 numbers
+                   (nStringPos == 3 ||                      // and 4th string particle
+                    (nStringPos == 4 && nSign)) &&          // or 5th if signed
+                   sStrArray[nStringPos-2].indexOf('/') == -1)))  // and not 23/11/1999
+                                                                  // that was not accepted as date yet
         {
             SkipBlanks(rString, nPos);
             if (nPos == rString.getLength())
@@ -2668,7 +2761,7 @@ bool ImpSvNumberInputScan::ScanMidString( const OUString& rString, sal_uInt16 nS
     }
 
     const sal_Int32 nMonthStart = nPos;
-    short nTempMonth = GetMonth(rString, nPos);     // month in the middle (10 Jan 94)
+    short nTempMonth = GetMonth(rString, nPos);     // month in the middle (10 Jan 94) or at the end (94 10 Jan)
     if (nTempMonth)
     {
         if (nMonth != 0)                            // month dup
@@ -2684,7 +2777,10 @@ bool ImpSvNumberInputScan::ScanMidString( const OUString& rString, sal_uInt16 nS
         {
             eScannedType = SvNumFormatType::DATE;       // !!! it IS a date
             nMonth = nTempMonth;
-            nMonthPos = 2;                          // month in the middle
+            if (nCurNumCount <= 1)
+                nMonthPos = 2;                      // month in the middle
+            else
+                nMonthPos = 3;                      // month at the end
             if ( nMonth < 0 )
             {
                 SkipChar( '.', rString, nPos );     // abbreviated
@@ -3385,7 +3481,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
             i++;                            // i=1
         }
         GetNextNumber(i,j);                 // i=1,2
-        if ( !ScanMidString( sStrArray[i], i ) )
+        if ( !ScanMidString( sStrArray[i], i, j ) )
         {
             return false;
         }
@@ -3423,7 +3519,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
             }
         }
         GetNextNumber(i,j);                 // i=1,2
-        if ( !ScanMidString( sStrArray[i], i ) )
+        if ( !ScanMidString( sStrArray[i], i, j ) )
         {
             return false;
         }
@@ -3433,7 +3529,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
             return false;
         }
         GetNextNumber(i,j);                 // i=3,4
-        if ( !ScanMidString( sStrArray[i], i ) )
+        if ( !ScanMidString( sStrArray[i], i, j ) )
         {
             return false;
         }
@@ -3471,7 +3567,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
                 return false;
         }
         GetNextNumber(i,j);                 // i=1,2
-        if ( !ScanMidString( sStrArray[i], i ) )
+        if ( !ScanMidString( sStrArray[i], i, j ) )
         {
             return false;
         }
@@ -3487,7 +3583,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
                     return false;
                 }
                 GetNextNumber(i,j);
-                if ( i < nStringsCnt && !ScanMidString( sStrArray[i], i ) )
+                if ( i < nStringsCnt && !ScanMidString( sStrArray[i], i, j ) )
                 {
                     return false;
                 }
@@ -3505,7 +3601,7 @@ bool ImpSvNumberInputScan::IsNumberFormatMain( const OUString& rString,        /
                     return false;
                 }
                 GetNextNumber(i,j);
-                if ( i < nStringsCnt && !ScanMidString( sStrArray[i], i ) )
+                if ( i < nStringsCnt && !ScanMidString( sStrArray[i], i, j ) )
                 {
                     return false;
                 }
@@ -4047,7 +4143,7 @@ bool ImpSvNumberInputScan::IsNumberFormat( const OUString& rString,         // s
 
             if (eScannedType != SvNumFormatType::SCIENTIFIC)
             {
-                fOutNumber = StringToDouble(sResString.makeStringAndClear());
+                fOutNumber = StringToDouble(sResString);
             }
             else
             {                                           // append exponent
@@ -4058,7 +4154,7 @@ bool ImpSvNumberInputScan::IsNumberFormat( const OUString& rString,         // s
                 }
                 sResString.append(sStrArray[nNums[nNumericsCnt-1]]);
                 rtl_math_ConversionStatus eStatus;
-                fOutNumber = ::rtl::math::stringToDouble( sResString.makeStringAndClear(), '.', ',', &eStatus );
+                fOutNumber = ::rtl::math::stringToDouble( sResString, '.', ',', &eStatus );
                 if ( eStatus == rtl_math_ConversionStatus_OutOfRange )
                 {
                     F_Type = SvNumFormatType::TEXT;         // overflow/underflow -> Text
@@ -4107,7 +4203,7 @@ bool ImpSvNumberInputScan::IsNumberFormat( const OUString& rString,         // s
                 {
                     sResString = sStrArray[nNums[0]];
                     sResString.append(sStrArray[nNums[1]]); // integer part
-                    fOutNumber = StringToDouble(sResString.makeStringAndClear());
+                    fOutNumber = StringToDouble(sResString);
                 }
                 else
                 {
@@ -4134,7 +4230,7 @@ bool ImpSvNumberInputScan::IsNumberFormat( const OUString& rString,         // s
                         sResString.append(sStrArray[nNums[k]]);
                     }
                 }
-                fOutNumber = StringToDouble(sResString.makeStringAndClear());
+                fOutNumber = StringToDouble(sResString);
 
                 if (k == nNumericsCnt-2)
                 {

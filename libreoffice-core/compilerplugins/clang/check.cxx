@@ -191,7 +191,7 @@ namespace {
 
 bool isGlobalNamespace(clang::DeclContext const * context) {
     assert(context != nullptr);
-    return (context->isLookupContext() ? context : context->getLookupParent())->isTranslationUnit();
+    return context->getEnclosingNamespaceContext()->isTranslationUnit();
 }
 
 }

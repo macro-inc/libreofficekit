@@ -7,25 +7,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <memory>
-#include <string_view>
 #include <swmodeltestbase.hxx>
 #include <docsh.hxx>
 #include <unotxdoc.hxx>
 
 #include <IndexingExport.hxx>
 
-namespace
-{
-constexpr OUStringLiteral DATA_DIRECTORY = u"sw/qa/extras/indexing/data/";
-}
-
 class IndexingExportTest : public SwModelTestBase
 {
-private:
-    SwDoc* createDoc(const char* pName = nullptr);
-
 public:
+    IndexingExportTest()
+        : SwModelTestBase("/sw/qa/extras/indexing/data/")
+    {
+    }
+
     void testIndexingExport_Paragraphs();
     void testIndexingExport_Images();
     void testIndexingExport_OLE();
@@ -47,21 +42,10 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-SwDoc* IndexingExportTest::createDoc(const char* pName)
-{
-    if (!pName)
-        loadURL("private:factory/swriter", nullptr);
-    else
-        load(DATA_DIRECTORY, pName);
-
-    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
-    CPPUNIT_ASSERT(pTextDoc);
-    return pTextDoc->GetDocShell()->GetDoc();
-}
-
 void IndexingExportTest::testIndexingExport_Paragraphs()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_VariousParagraphs.odt");
+    createSwDoc("IndexingExport_VariousParagraphs.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -96,7 +80,8 @@ void IndexingExportTest::testIndexingExport_Paragraphs()
 
 void IndexingExportTest::testIndexingExport_Images()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Images.odt");
+    createSwDoc("IndexingExport_Images.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -118,7 +103,8 @@ void IndexingExportTest::testIndexingExport_Images()
 
 void IndexingExportTest::testIndexingExport_OLE()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_OLE.odt");
+    createSwDoc("IndexingExport_OLE.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -137,7 +123,8 @@ void IndexingExportTest::testIndexingExport_OLE()
 
 void IndexingExportTest::testIndexingExport_Shapes()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Shapes.odt");
+    createSwDoc("IndexingExport_Shapes.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -176,7 +163,8 @@ void IndexingExportTest::testIndexingExport_Shapes()
 
 void IndexingExportTest::testIndexingExport_Tables()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Tables.odt");
+    createSwDoc("IndexingExport_Tables.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -243,7 +231,8 @@ void IndexingExportTest::testIndexingExport_Tables()
 
 void IndexingExportTest::testIndexingExport_Sections()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Sections.odt");
+    createSwDoc("IndexingExport_Sections.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -274,7 +263,8 @@ void IndexingExportTest::testIndexingExport_Sections()
 
 void IndexingExportTest::testIndexingExport_Fontwork()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Fontwork.odt");
+    createSwDoc("IndexingExport_Fontwork.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;
@@ -298,7 +288,8 @@ void IndexingExportTest::testIndexingExport_Fontwork()
 
 void IndexingExportTest::testIndexingExport_Header_Footer()
 {
-    SwDoc* pDoc = createDoc("IndexingExport_Header_Footer.odt");
+    createSwDoc("IndexingExport_Header_Footer.odt");
+    SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
     SvMemoryStream aMemoryStream;

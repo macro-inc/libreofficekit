@@ -24,7 +24,8 @@
 #include <com/sun/star/sdbcx/XAppend.hpp>
 
 #include <comphelper/property.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace dbaccess
 {
@@ -37,10 +38,10 @@ namespace dbaccess
 
 
     OPropertyForward::OPropertyForward( const Reference< XPropertySet>& _xSource, const Reference< XNameAccess>& _xDestContainer,
-            const OUString& _sName, const std::vector< OUString>& _aPropertyList )
+            OUString _sName, const std::vector< OUString>& _aPropertyList )
         :m_xSource( _xSource, UNO_SET_THROW )
         ,m_xDestContainer( _xDestContainer, UNO_SET_THROW )
-        ,m_sName( _sName )
+        ,m_sName(std::move( _sName ))
         ,m_bInInsert( false )
     {
 

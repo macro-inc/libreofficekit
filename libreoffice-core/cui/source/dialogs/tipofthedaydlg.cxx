@@ -27,7 +27,6 @@
 #include <vcl/help.hxx>
 #include <vcl/window.hxx>
 
-#include <com/sun/star/frame/XDesktop2.hpp>
 #include <com/sun/star/frame/XDispatch.hpp>
 #include <com/sun/star/frame/XDispatchProvider.hpp>
 #include <com/sun/star/util/URL.hpp>
@@ -92,7 +91,10 @@ TipOfTheDayDialog::TipOfTheDayDialog(weld::Window* pParent)
 IMPL_LINK(TipOfTheDayDialog, Terminated, VclWindowEvent&, rEvent, void)
 {
     if (rEvent.GetId() == VclEventId::ObjectDying)
+    {
+        m_pParent = nullptr;
         TipOfTheDayDialog::response(RET_OK);
+    }
 }
 
 TipOfTheDayDialog::~TipOfTheDayDialog()
@@ -123,7 +125,7 @@ static bool file_exists(const OUString& fileName)
 
 void TipOfTheDayDialog::UpdateTip()
 {
-    constexpr sal_Int32 nNumberOfTips = SAL_N_ELEMENTS(TIPOFTHEDAY_STRINGARRAY);
+    constexpr sal_Int32 nNumberOfTips = std::size(TIPOFTHEDAY_STRINGARRAY);
 
     if ((m_nCurrentTip >= nNumberOfTips) || (m_nCurrentTip < 0))
         m_nCurrentTip = 0;

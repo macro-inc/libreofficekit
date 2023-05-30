@@ -29,7 +29,6 @@
 #include "hierarchydatasource.hxx"
 #include <osl/diagnose.h>
 
-#include <comphelper/interfacecontainer2.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/weak.hxx>
@@ -43,6 +42,7 @@
 #include <o3tl/string_view.hxx>
 #include <ucbhelper/macros.hxx>
 #include <mutex>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace hierarchy_ucp;
@@ -89,8 +89,8 @@ class HierarchyDataAccess : public cppu::OWeakObject,
     bool m_bReadOnly;
 
 public:
-    HierarchyDataAccess( const uno::Reference<
-                                        uno::XInterface > & xConfigAccess,
+    HierarchyDataAccess( uno::Reference<
+                                        uno::XInterface > xConfigAccess,
                          bool bReadOnly );
 
     // XInterface
@@ -185,8 +185,8 @@ using namespace hcp_impl;
 
 
 HierarchyDataSource::HierarchyDataSource(
-        const uno::Reference< uno::XComponentContext > & rxContext )
-: m_xContext( rxContext )
+        uno::Reference< uno::XComponentContext > xContext )
+: m_xContext(std::move( xContext ))
 {
 }
 
@@ -224,13 +224,13 @@ ucb_HierarchyDataSource_get_implementation(
 // virtual
 void SAL_CALL HierarchyDataSource::dispose()
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pDisposeEventListeners && m_pDisposeEventListeners->getLength() )
+    if ( m_aDisposeEventListeners.getLength(aGuard) )
     {
         lang::EventObject aEvt;
         aEvt.Source = static_cast< lang::XComponent * >( this );
-        m_pDisposeEventListeners->disposeAndClear( aEvt );
+        m_aDisposeEventListeners.disposeAndClear( aGuard, aEvt );
     }
 }
 
@@ -239,13 +239,9 @@ void SAL_CALL HierarchyDataSource::dispose()
 void SAL_CALL HierarchyDataSource::addEventListener(
                     const uno::Reference< lang::XEventListener > & Listener )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( !m_pDisposeEventListeners )
-        m_pDisposeEventListeners.reset(
-            new comphelper::OInterfaceContainerHelper2( m_aMutex ) );
-
-    m_pDisposeEventListeners->addInterface( Listener );
+    m_aDisposeEventListeners.addInterface( aGuard, Listener );
 }
 
 
@@ -253,10 +249,9 @@ void SAL_CALL HierarchyDataSource::addEventListener(
 void SAL_CALL HierarchyDataSource::removeEventListener(
                     const uno::Reference< lang::XEventListener > & Listener )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pDisposeEventListeners )
-        m_pDisposeEventListeners->removeInterface( Listener );
+    m_aDisposeEventListeners.removeInterface( aGuard, Listener );
 }
 
 
@@ -305,8 +300,6 @@ HierarchyDataSource::createInstanceWithArguments(
                                 const uno::Sequence< uno::Any > & Arguments,
                                 bool bCheckArgs )
 {
-    osl::Guard< osl::Mutex > aGuard( m_aMutex );
-
     // Check service specifier.
     bool bReadOnly  = ServiceSpecifier == READ_SERVICE_NAME;
     bool bReadWrite = !bReadOnly && ServiceSpecifier == READWRITE_SERVICE_NAME;
@@ -421,7 +414,7 @@ HierarchyDataSource::getConfigProvider()
 {
     if ( !m_xConfigProvider.is() )
     {
-        osl::Guard< osl::Mutex > aGuard( m_aMutex );
+        std::unique_lock aGuard( m_aMutex );
         if ( !m_xConfigProvider.is() )
         {
             try
@@ -484,10 +477,10 @@ css::uno::Reference<T> HierarchyDataAccess::ensureOrigInterface(css::uno::Refere
 }
 
 
-HierarchyDataAccess::HierarchyDataAccess( const uno::Reference<
-                                            uno::XInterface > & xConfigAccess,
+HierarchyDataAccess::HierarchyDataAccess( uno::Reference<
+                                            uno::XInterface > xConfigAccess,
                                           bool bReadOnly )
-: m_xConfigAccess( xConfigAccess ),
+: m_xConfigAccess(std::move( xConfigAccess )),
   m_bReadOnly( bReadOnly )
 {
 }

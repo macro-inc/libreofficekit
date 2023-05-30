@@ -39,7 +39,7 @@ class DrawDocShell;
 // We have to expand the SFX_IMPL_VIEWFACTORY macro to call LateInit() after a
 // new PresentationViewShellBase object has been constructed.
 
-SfxViewFactory* PresentationViewShellBase::pFactory;
+SfxViewFactory* PresentationViewShellBase::s_pFactory;
 SfxViewShell* PresentationViewShellBase::CreateInstance (
     SfxViewFrame *_pFrame, SfxViewShell *pOldView)
 {
@@ -50,7 +50,7 @@ SfxViewShell* PresentationViewShellBase::CreateInstance (
 }
 void PresentationViewShellBase::RegisterFactory( SfxInterfaceId nPrio )
 {
-    pFactory = new SfxViewFactory(
+    s_pFactory = new SfxViewFactory(
         &CreateInstance,nPrio,"FullScreenPresentation");
     InitFactory();
 }
@@ -73,7 +73,7 @@ PresentationViewShellBase::PresentationViewShellBase (
         Reference<beans::XPropertySet> xLayouterSet(xFrameSet->getPropertyValue("LayoutManager"), UNO_QUERY);
         if (xLayouterSet.is())
         {
-            xLayouterSet->setPropertyValue("AutomaticToolbars", makeAny(false));
+            xLayouterSet->setPropertyValue("AutomaticToolbars", Any(false));
         }
     }
 }

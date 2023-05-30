@@ -81,36 +81,4 @@ std::unique_ptr<GenericSalLayout> X11SalGraphics::GetTextLayout(int nFallbackLev
     return mxTextRenderImpl->GetTextLayout(nFallbackLevel);
 }
 
-bool X11SalGraphics::CreateFontSubset(
-                                   const OUString& rToFile,
-                                   const vcl::font::PhysicalFontFace* pFont,
-                                   const sal_GlyphId* pGlyphIds,
-                                   const sal_uInt8* pEncoding,
-                                   sal_Int32* pWidths,
-                                   int nGlyphCount,
-                                   FontSubsetInfo& rInfo
-                                   )
-{
-    return mxTextRenderImpl->CreateFontSubset(rToFile, pFont,
-            pGlyphIds, pEncoding, pWidths, nGlyphCount, rInfo);
-}
-
-const void* X11SalGraphics::GetEmbedFontData(const vcl::font::PhysicalFontFace* pFont, tools::Long* pDataLen)
-{
-    return mxTextRenderImpl->GetEmbedFontData(pFont, pDataLen);
-}
-
-void X11SalGraphics::FreeEmbedFontData( const void* pData, tools::Long nLen )
-{
-    mxTextRenderImpl->FreeEmbedFontData(pData, nLen);
-}
-
-void X11SalGraphics::GetGlyphWidths( const vcl::font::PhysicalFontFace* pFont,
-                                   bool bVertical,
-                                   std::vector< sal_Int32 >& rWidths,
-                                   Ucs2UIntMap& rUnicodeEnc )
-{
-    mxTextRenderImpl->GetGlyphWidths(pFont, bVertical, rWidths, rUnicodeEnc);
-}
-
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

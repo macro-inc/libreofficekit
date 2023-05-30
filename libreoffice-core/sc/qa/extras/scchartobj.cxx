@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xnamed.hxx>
 #include <test/document/xembeddedobjectsupplier.hxx>
@@ -37,7 +37,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScChartObj : public CalcUnoApiTest,
+class ScChartObj : public UnoApiTest,
                    public apitest::XEmbeddedObjectSupplier,
                    public apitest::XNamed,
                    public apitest::XPropertySet,
@@ -49,7 +49,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScChartObj);
 
@@ -74,13 +73,10 @@ public:
     CPPUNIT_TEST(testGetSetRanges);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScChartObj::ScChartObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XNamed("ScChartObj")
     , XServiceInfo("ScChartObj", "com.sun.star.table.TableChart")
 {
@@ -88,7 +84,7 @@ ScChartObj::ScChartObj()
 
 uno::Reference<uno::XInterface> ScChartObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xSheets, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheet> xSheet0(xIA->getByIndex(0), uno::UNO_QUERY_THROW);
@@ -170,15 +166,9 @@ uno::Reference<uno::XInterface> ScChartObj::init()
 
 void ScChartObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScChartObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScChartObj);

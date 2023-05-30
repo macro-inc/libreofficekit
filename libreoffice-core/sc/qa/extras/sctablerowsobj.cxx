@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -35,7 +35,7 @@ using namespace css::uno;
 
 namespace sc_apitest
 {
-class ScTableRowsObj : public CalcUnoApiTest,
+class ScTableRowsObj : public UnoApiTest,
                        public apitest::XElementAccess,
                        public apitest::XEnumerationAccess,
                        public apitest::XIndexAccess,
@@ -48,7 +48,6 @@ public:
     virtual uno::Reference<uno::XInterface> init() override;
     virtual uno::Reference<uno::XInterface> getXCellRange() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScTableRowsObj);
 
@@ -73,13 +72,10 @@ public:
     CPPUNIT_TEST(testRemoveByIndex);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScTableRowsObj::ScTableRowsObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<table::XCellRange>::get())
     , XIndexAccess(ScSheetLimits::CreateDefault().GetMaxRowCount())
     , XServiceInfo("ScTableRowsObj", "com.sun.star.table.TableRows")
@@ -88,7 +84,7 @@ ScTableRowsObj::ScTableRowsObj()
 
 uno::Reference<uno::XInterface> ScTableRowsObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
@@ -104,7 +100,7 @@ uno::Reference<uno::XInterface> ScTableRowsObj::init()
 
 uno::Reference<uno::XInterface> ScTableRowsObj::getXCellRange()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_MESSAGE("no calc document", xDoc.is());
 
     uno::Reference<sheet::XSpreadsheets> xSheets(xDoc->getSheets(), uno::UNO_SET_THROW);
@@ -118,14 +114,8 @@ uno::Reference<uno::XInterface> ScTableRowsObj::getXCellRange()
 
 void ScTableRowsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScTableRowsObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScTableRowsObj);

@@ -25,6 +25,8 @@
 #include <o3tl/char16_t2wchar_t.hxx>
 
 #ifdef _WIN32
+#include <cstddef>
+#include <string_view>
 #if !defined WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
 #endif
@@ -45,13 +47,13 @@ void PrivateProfileStringListener::Initialize( const OUString& rFileName, const 
     maKey = rKey;
 }
 #ifdef _WIN32
-static void lcl_getRegKeyInfo( const OString& sKeyInfo, HKEY& hBaseKey, OString& sSubKey )
+static void lcl_getRegKeyInfo( std::string_view sKeyInfo, HKEY& hBaseKey, OString& sSubKey )
 {
-    sal_Int32 nBaseKeyIndex = sKeyInfo.indexOf('\\');
-    if( nBaseKeyIndex > 0 )
+    std::size_t nBaseKeyIndex = sKeyInfo.find('\\');
+    if( nBaseKeyIndex != std::string_view::npos )
     {
-        OString sBaseKey = sKeyInfo.copy( 0, nBaseKeyIndex );
-        sSubKey = sKeyInfo.copy( nBaseKeyIndex + 1 );
+        std::string_view sBaseKey = sKeyInfo.substr( 0, nBaseKeyIndex );
+        sSubKey = OString(sKeyInfo.substr( nBaseKeyIndex + 1 ));
         if( sBaseKey == "HKEY_CURRENT_USER" )
         {
             hBaseKey = HKEY_CURRENT_USER;
@@ -118,7 +120,7 @@ uno::Any PrivateProfileStringListener::getValueEvent()
     sValue = OStringToOUString(aCfg.ReadKey(maKey), RTL_TEXTENCODING_DONTKNOW);
 
 
-    return uno::makeAny( sValue );
+    return uno::Any( sValue );
 }
 
 void PrivateProfileStringListener::setValueEvent( const css::uno::Any& value )
@@ -251,7 +253,7 @@ SwVbaSystem::PrivateProfileString( const OUString& rFilename, const OUString& rS
     OString aKey(OUStringToOString(rKey, RTL_TEXTENCODING_DONTKNOW));
     maPrivateProfileStringListener.Initialize( sFileUrl, aGroupName, aKey );
 
-    return uno::makeAny( uno::Reference< XPropValue > ( new ScVbaPropValue( &maPrivateProfileStringListener ) ) );
+    return uno::Any( uno::Reference< XPropValue > ( new ScVbaPropValue( &maPrivateProfileStringListener ) ) );
 }
 
 OUString

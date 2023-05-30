@@ -43,7 +43,6 @@
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <o3tl/safeint.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <rtl/ref.hxx>
 #include <sal/log.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -114,7 +113,7 @@ private:
 AccessibleSlideSorterView::AccessibleSlideSorterView(
     ::sd::slidesorter::SlideSorter& rSlideSorter,
     vcl::Window* pContentWindow)
-    : AccessibleSlideSorterViewBase(MutexOwner::maMutex),
+    : AccessibleSlideSorterViewBase(m_aMutex),
       mrSlideSorter(rSlideSorter),
       mnClientId(0),
       mpContentWindow(pContentWindow)
@@ -163,7 +162,7 @@ AccessibleSlideSorterObject* AccessibleSlideSorterView::GetAccessibleChildImplem
     sal_Int32 nIndex)
 {
     AccessibleSlideSorterObject* pResult = nullptr;
-    ::osl::MutexGuard aGuard (maMutex);
+    ::osl::MutexGuard aGuard (m_aMutex);
 
     if (nIndex>=0 && nIndex<mpImpl->GetVisibleChildCount())
         pResult = mpImpl->GetVisibleChild(nIndex);
@@ -173,7 +172,7 @@ AccessibleSlideSorterObject* AccessibleSlideSorterView::GetAccessibleChildImplem
 
 void AccessibleSlideSorterView::Destroyed()
 {
-    ::osl::MutexGuard aGuard (maMutex);
+    ::osl::MutexGuard aGuard (m_aMutex);
 
     // Send a disposing to all listeners.
     if (mnClientId != 0)
@@ -194,18 +193,18 @@ Reference<XAccessibleContext > SAL_CALL
 
 //=====  XAccessibleContext  ==================================================
 
-sal_Int32 SAL_CALL AccessibleSlideSorterView::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleSlideSorterView::getAccessibleChildCount()
 {
     ThrowIfDisposed();
-    ::osl::MutexGuard aGuard (maMutex);
+    ::osl::MutexGuard aGuard (m_aMutex);
     return mpImpl->GetVisibleChildCount();
 }
 
 Reference<XAccessible > SAL_CALL
-    AccessibleSlideSorterView::getAccessibleChild (sal_Int32 nIndex)
+    AccessibleSlideSorterView::getAccessibleChild (sal_Int64 nIndex)
 {
     ThrowIfDisposed();
-    ::osl::MutexGuard aGuard (maMutex);
+    ::osl::MutexGuard aGuard (m_aMutex);
 
     if (nIndex<0 || nIndex>=mpImpl->GetVisibleChildCount())
         throw lang::IndexOutOfBoundsException();
@@ -229,18 +228,18 @@ Reference<XAccessible > SAL_CALL AccessibleSlideSorterView::getAccessibleParent(
     return xParent;
 }
 
-sal_Int32 SAL_CALL AccessibleSlideSorterView::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleSlideSorterView::getAccessibleIndexInParent()
 {
     OSL_ASSERT(getAccessibleParent().is());
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
-    sal_Int32 nIndexInParent(-1);
+    sal_Int64 nIndexInParent(-1);
 
     Reference<XAccessibleContext> xParentContext (getAccessibleParent()->getAccessibleContext());
     if (xParentContext.is())
     {
-        sal_Int32 nChildCount (xParentContext->getAccessibleChildCount());
-        for (sal_Int32 i=0; i<nChildCount; ++i)
+        sal_Int64 nChildCount (xParentContext->getAccessibleChildCount());
+        for (sal_Int64 i=0; i<nChildCount; ++i)
             if (xParentContext->getAccessibleChild(i).get()
                     == static_cast<XAccessible*>(this))
             {
@@ -280,28 +279,27 @@ Reference<XAccessibleRelationSet> SAL_CALL
     return Reference<XAccessibleRelationSet>();
 }
 
-Reference<XAccessibleStateSet > SAL_CALL
-    AccessibleSlideSorterView::getAccessibleStateSet()
+sal_Int64 SAL_CALL AccessibleSlideSorterView::getAccessibleStateSet()
 {
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet = new ::utl::AccessibleStateSetHelper();
+    sal_Int64 nStateSet = 0;
 
-    pStateSet->AddState(AccessibleStateType::FOCUSABLE);
-    pStateSet->AddState(AccessibleStateType::SELECTABLE);
-    pStateSet->AddState(AccessibleStateType::ENABLED);
-    pStateSet->AddState(AccessibleStateType::ACTIVE);
-    pStateSet->AddState(AccessibleStateType::MULTI_SELECTABLE);
-    pStateSet->AddState(AccessibleStateType::OPAQUE);
+    nStateSet |= AccessibleStateType::FOCUSABLE;
+    nStateSet |= AccessibleStateType::SELECTABLE;
+    nStateSet |= AccessibleStateType::ENABLED;
+    nStateSet |= AccessibleStateType::ACTIVE;
+    nStateSet |= AccessibleStateType::MULTI_SELECTABLE;
+    nStateSet |= AccessibleStateType::OPAQUE;
     if (mpContentWindow!=nullptr)
     {
         if (mpContentWindow->IsVisible())
-            pStateSet->AddState(AccessibleStateType::VISIBLE);
+            nStateSet |= AccessibleStateType::VISIBLE;
         if (mpContentWindow->IsReallyVisible())
-            pStateSet->AddState(AccessibleStateType::SHOWING);
+            nStateSet |= AccessibleStateType::SHOWING;
     }
 
-    return pStateSet;
+    return nStateSet;
 }
 
 lang::Locale SAL_CALL AccessibleSlideSorterView::getLocale()
@@ -325,7 +323,7 @@ void SAL_CALL AccessibleSlideSorterView::addAccessibleEventListener(
     if (!rxListener.is())
         return;
 
-    const osl::MutexGuard aGuard(maMutex);
+    const osl::MutexGuard aGuard(m_aMutex);
 
     if (rBHelper.bDisposed || rBHelper.bInDispose)
     {
@@ -347,7 +345,7 @@ void SAL_CALL AccessibleSlideSorterView::removeAccessibleEventListener(
     if (!rxListener.is())
         return;
 
-    const osl::MutexGuard aGuard(maMutex);
+    const osl::MutexGuard aGuard(m_aMutex);
 
     if (mnClientId == 0)
         return;
@@ -495,10 +493,13 @@ sal_Int32 SAL_CALL AccessibleSlideSorterView::getBackground()
 
 //===== XAccessibleSelection ==================================================
 
-void SAL_CALL AccessibleSlideSorterView::selectAccessibleChild (sal_Int32 nChildIndex)
+void SAL_CALL AccessibleSlideSorterView::selectAccessibleChild (sal_Int64 nChildIndex)
 {
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
+
+    if (nChildIndex < 0 || nChildIndex >= getAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
 
     AccessibleSlideSorterObject* pChild = mpImpl->GetAccessibleChild(nChildIndex);
     if (pChild == nullptr)
@@ -507,11 +508,14 @@ void SAL_CALL AccessibleSlideSorterView::selectAccessibleChild (sal_Int32 nChild
     mrSlideSorter.GetController().GetPageSelector().SelectPage(pChild->GetPageNumber());
 }
 
-sal_Bool SAL_CALL AccessibleSlideSorterView::isAccessibleChildSelected (sal_Int32 nChildIndex)
+sal_Bool SAL_CALL AccessibleSlideSorterView::isAccessibleChildSelected (sal_Int64 nChildIndex)
 {
     ThrowIfDisposed();
     bool bIsSelected = false;
     const SolarMutexGuard aSolarGuard;
+
+    if (nChildIndex < 0 || nChildIndex >= getAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
 
     AccessibleSlideSorterObject* pChild = mpImpl->GetAccessibleChild(nChildIndex);
     if (pChild == nullptr)
@@ -539,7 +543,7 @@ void SAL_CALL AccessibleSlideSorterView::selectAllAccessibleChildren()
     mrSlideSorter.GetController().GetPageSelector().SelectAllPages();
 }
 
-sal_Int32 SAL_CALL AccessibleSlideSorterView::getSelectedAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleSlideSorterView::getSelectedAccessibleChildCount()
 {
     ThrowIfDisposed ();
     const SolarMutexGuard aSolarGuard;
@@ -547,10 +551,14 @@ sal_Int32 SAL_CALL AccessibleSlideSorterView::getSelectedAccessibleChildCount()
 }
 
 Reference<XAccessible > SAL_CALL
-    AccessibleSlideSorterView::getSelectedAccessibleChild (sal_Int32 nSelectedChildIndex )
+    AccessibleSlideSorterView::getSelectedAccessibleChild (sal_Int64 nSelectedChildIndex )
 {
     ThrowIfDisposed ();
     const SolarMutexGuard aSolarGuard;
+
+    if (nSelectedChildIndex < 0 || nSelectedChildIndex >= getSelectedAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
+
     Reference<XAccessible> xChild;
 
     ::sd::slidesorter::controller::PageSelector& rSelector (
@@ -574,10 +582,13 @@ Reference<XAccessible > SAL_CALL
     return xChild;
 }
 
-void SAL_CALL AccessibleSlideSorterView::deselectAccessibleChild (sal_Int32 nChildIndex)
+void SAL_CALL AccessibleSlideSorterView::deselectAccessibleChild (sal_Int64 nChildIndex)
 {
     ThrowIfDisposed();
     const SolarMutexGuard aSolarGuard;
+
+    if (nChildIndex < 0 || nChildIndex >= getAccessibleChildCount())
+        throw lang::IndexOutOfBoundsException();
 
     AccessibleSlideSorterObject* pChild = mpImpl->GetAccessibleChild(nChildIndex);
     if (pChild == nullptr)

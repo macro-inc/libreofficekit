@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2022-05-23 12:49+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2022-12-19 14:08+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Asturian <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/ast/>\n"
 "Language: ast\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1516047327.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Nun se pudo crear el direutoriu «%1».<BR>Seique nun quede espaciu bastante nel discu duru."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Nun se pue crear el documentu de testu.<BR>Mira ver si'l módulu «PRODUCTNAME Writer» ta instaláu."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "Nun se pue crear el documentu de testu.<BR>Mira ver si'l módulu «%PRODUCTNAME Writer» ta instaláu."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Nun se pue crear la fueya de cálculu.<BR>Mira ver si'l módulu «PRODUCTNAME Calc» ta instaláu."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "Nun se pue crear la fueya de cálculu.<BR>Mira ver si'l módulu «%PRODUCTNAME Calc» ta instaláu."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Nun se pue crear la presentación.<BR>Mira ver si'l módulu «PRODUCTNAME Impress» ta instaláu."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "Nun se pue crear la presentación.<BR>Mira ver si'l módulu «%PRODUCTNAME Impress» ta instaláu."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Nun se pue crear el dibuxu.<BR>Mira ver si'l módulu «PRODUCTNAME Draw» ta instaláu."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "Nun se pue crear el dibuxu.<BR>Mira ver si'l módulu «%PRODUCTNAME Draw» ta instaláu."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Nun se pue crear la fórmula.<BR>Mira ver si'l módulu «PRODUCTNAME Math» ta instaláu."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "Nun se pue crear la fórmula.<BR>Mira ver si'l módulu «%PRODUCTNAME Math» ta instaláu."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -3871,6 +3871,15 @@ msgctxt ""
 msgid "Lithuanian Litas"
 msgstr ""
 
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr ""
+
 #. eDjBr
 #: resources_en_US.properties
 msgctxt ""
@@ -4254,7 +4263,6 @@ msgstr "Títulu"
 
 #. s8G9A
 #: resources_en_US.properties
-#, fuzzy
 msgctxt ""
 "resources_en_US.properties\n"
 "CorrespondenceFields_10\n"

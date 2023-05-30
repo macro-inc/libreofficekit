@@ -79,7 +79,7 @@ namespace drawinglayer::primitive2d
         /*  helper for linear and radial gradient, both get derived from this
             to share common definitions and functionality
          **/
-        class SvgGradientHelper
+        class SAL_LOPLUGIN_ANNOTATE("crosscast") SvgGradientHelper
         {
         private:
             /// the extra gradient transform
@@ -134,8 +134,8 @@ namespace drawinglayer::primitive2d
             virtual void checkPreconditions();
             void createResult(
                 Primitive2DContainer& rContainer,
-                const Primitive2DContainer& rTargetColor,
-                const Primitive2DContainer& rTargetOpacity,
+                Primitive2DContainer aTargetColor,
+                Primitive2DContainer aTargetOpacity,
                 const basegfx::B2DHomMatrix& rUnitGradientToObject,
                 bool bInvert = false) const;
             bool getCreatesContent() const { return mbCreatesContent; }
@@ -147,8 +147,8 @@ namespace drawinglayer::primitive2d
         public:
             /// constructor
             SvgGradientHelper(
-                const basegfx::B2DHomMatrix& rGradientTransform,
-                const basegfx::B2DPolyPolygon& rPolyPolygon,
+                basegfx::B2DHomMatrix aGradientTransform,
+                basegfx::B2DPolyPolygon aPolyPolygon,
                 SvgGradientEntryVector&& rGradientEntries,
                 const basegfx::B2DPoint& rStart,
                 bool bUseUnitCoordinates,

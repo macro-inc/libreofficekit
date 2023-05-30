@@ -56,7 +56,7 @@ void SwHTMLParser::NewNumberBulletList( HtmlTokenId nToken )
 
     // Create a new paragraph
     bool bSpace = (rInfo.GetDepth() + m_nDefListDeep) == 0;
-    if( m_pPam->GetPoint()->nContent.GetIndex() )
+    if( m_pPam->GetPoint()->GetContentIndex() )
         AppendTextNode( bSpace ? AM_SPACE : AM_NOSPACE, false );
     else if( bSpace )
         AddParSpace();
@@ -334,10 +334,10 @@ void SwHTMLParser::EndNumberBulletList( HtmlTokenId nToken )
     // A new paragraph needs to be created, when
     // - the current one isn't empty (it contains text or paragraph-bound objects)
     // - the current one is numbered
-    bool bAppend = m_pPam->GetPoint()->nContent.GetIndex() > 0;
+    bool bAppend = m_pPam->GetPoint()->GetContentIndex() > 0;
     if( !bAppend )
     {
-        SwTextNode* pTextNode = m_pPam->GetNode().GetTextNode();
+        SwTextNode* pTextNode = m_pPam->GetPointNode().GetTextNode();
 
         bAppend = (pTextNode && ! pTextNode->IsOutline() && pTextNode->IsCountedInList()) ||
 
@@ -395,7 +395,7 @@ void SwHTMLParser::EndNumberBulletList( HtmlTokenId nToken )
 
             // On the last append, the NumRule item and NodeNum object were copied.
             // Now we need to delete them. ResetAttr deletes the NodeNum object as well
-            if (SwTextNode *pTextNode = m_pPam->GetNode().GetTextNode())
+            if (SwTextNode *pTextNode = m_pPam->GetPointNode().GetTextNode())
                 pTextNode->ResetAttr(RES_PARATR_NUMRULE);
 
             rInfo.Clear();
@@ -463,11 +463,11 @@ void SwHTMLParser::NewNumberBulletListItem( HtmlTokenId nToken )
     }
 
     // create a new paragraph
-    if( m_pPam->GetPoint()->nContent.GetIndex() )
+    if( m_pPam->GetPoint()->GetContentIndex() )
         AppendTextNode( AM_NOSPACE, false );
     m_bNoParSpace = false;    // no space in <LI>!
 
-    SwTextNode* pTextNode = m_pPam->GetNode().GetTextNode();
+    SwTextNode* pTextNode = m_pPam->GetPointNode().GetTextNode();
     if (!pTextNode)
     {
         SAL_WARN("sw.html", "No Text-Node at PaM-Position");
@@ -555,7 +555,7 @@ void SwHTMLParser::NewNumberBulletListItem( HtmlTokenId nToken )
 void SwHTMLParser::EndNumberBulletListItem( HtmlTokenId nToken, bool bSetColl )
 {
     // Create a new paragraph
-    if( nToken == HtmlTokenId::NONE && m_pPam->GetPoint()->nContent.GetIndex() )
+    if( nToken == HtmlTokenId::NONE && m_pPam->GetPoint()->GetContentIndex() )
         AppendTextNode( AM_NOSPACE );
 
     // Get context to that token and pop it from stack
@@ -601,7 +601,7 @@ void SwHTMLParser::EndNumberBulletListItem( HtmlTokenId nToken, bool bSetColl )
 
 void SwHTMLParser::SetNodeNum( sal_uInt8 nLevel )
 {
-    SwTextNode* pTextNode = m_pPam->GetNode().GetTextNode();
+    SwTextNode* pTextNode = m_pPam->GetPointNode().GetTextNode();
     if (!pTextNode)
     {
         SAL_WARN("sw.html", "No Text-Node at PaM-Position");

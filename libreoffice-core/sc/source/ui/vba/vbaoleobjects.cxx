@@ -24,6 +24,7 @@
 #include "vbaoleobject.hxx"
 #include "vbaoleobjects.hxx"
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
@@ -57,7 +58,7 @@ public:
     {
         if ( Index < 0 || Index >= getCount() )
             throw lang::IndexOutOfBoundsException();
-        return uno::makeAny( vObjects[ Index ] );
+        return uno::Any( vObjects[ Index ] );
     }
 
         // Methods XElementAccess
@@ -81,10 +82,10 @@ class EnumWrapper : public EnumerationHelper_BASE
         uno::Reference<container::XIndexAccess > m_xIndexAccess;
         sal_Int32 nIndex;
 public:
-        EnumWrapper( const uno::Reference< XHelperInterface >& xParent,
-                     const uno::Reference< uno::XComponentContext >& xContext,
-                     const uno::Reference< container::XIndexAccess >& xIndexAccess )
-            :  m_xParent( xParent ), m_xContext( xContext), m_xIndexAccess( xIndexAccess ), nIndex( 0 ) {}
+        EnumWrapper( uno::Reference< XHelperInterface > xParent,
+                     uno::Reference< uno::XComponentContext > xContext,
+                     uno::Reference< container::XIndexAccess > xIndexAccess )
+            :  m_xParent(std::move( xParent )), m_xContext(std::move( xContext)), m_xIndexAccess(std::move( xIndexAccess )), nIndex( 0 ) {}
 
         virtual sal_Bool SAL_CALL hasMoreElements(  ) override
         {
@@ -96,7 +97,7 @@ public:
             if ( nIndex < m_xIndexAccess->getCount() )
             {
                 uno::Reference< drawing::XControlShape > xControlShape (  m_xIndexAccess->getByIndex( nIndex++ ), uno::UNO_QUERY_THROW );
-                return uno::makeAny( uno::Reference< ov::excel::XOLEObject >( new ScVbaOLEObject( m_xParent, m_xContext, xControlShape ) ) );
+                return uno::Any( uno::Reference< ov::excel::XOLEObject >( new ScVbaOLEObject( m_xParent, m_xContext, xControlShape ) ) );
             }
             throw container::NoSuchElementException();
         }
@@ -127,7 +128,7 @@ ScVbaOLEObjects::createCollectionObject( const css::uno::Any& aSource )
     {
         uno::Reference< drawing::XControlShape > xControlShape( aSource, uno::UNO_QUERY_THROW );
     // parent of OLEObject is the same parent as the collection ( e.g. the sheet )
-        return uno::makeAny( uno::Reference< ov::excel::XOLEObject >( new ScVbaOLEObject( getParent(), mxContext, xControlShape ) ) );
+        return uno::Any( uno::Reference< ov::excel::XOLEObject >( new ScVbaOLEObject( getParent(), mxContext, xControlShape ) ) );
     }
     return uno::Any();
 }

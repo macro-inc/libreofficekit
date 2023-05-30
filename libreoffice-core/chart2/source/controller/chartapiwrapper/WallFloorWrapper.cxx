@@ -21,7 +21,6 @@
 #include "Chart2ModelContact.hxx"
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <com/sun/star/chart2/XDiagram.hpp>
 
 #include <FillProperties.hxx>
 #include <LinePropertiesHelper.hxx>
@@ -29,6 +28,7 @@
 #include <WrappedDirectStateProperty.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -74,8 +74,8 @@ namespace chart::wrapper
 {
 
 WallFloorWrapper::WallFloorWrapper( bool bWall,
-    const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact ) :
-        m_spChart2ModelContact( spChart2ModelContact ),
+    std::shared_ptr<Chart2ModelContact> spChart2ModelContact ) :
+        m_spChart2ModelContact(std::move( spChart2ModelContact )),
         m_aEventListenerContainer( m_aMutex ),
         m_bWall( bWall )
 
@@ -113,7 +113,7 @@ Reference< beans::XPropertySet > WallFloorWrapper::getInnerPropertySet()
 {
     Reference< beans::XPropertySet > xRet;
 
-    Reference< chart2::XDiagram > xDiagram( m_spChart2ModelContact->getChart2Diagram() );
+    rtl::Reference< ::chart::Diagram > xDiagram( m_spChart2ModelContact->getDiagram() );
     if( xDiagram.is() )
     {
         if( m_bWall )

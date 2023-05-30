@@ -46,6 +46,7 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/sdbcx/XTablesSupplier.hpp>
 #include <composertools.hxx>
+#include <utility>
 #include "PrivateRow.hxx"
 
 using namespace dbaccess;
@@ -103,17 +104,17 @@ namespace
 }
 
 
-OKeySet::OKeySet(const connectivity::OSQLTable& _xTable,
-                 const OUString& _rUpdateTableName,    // this can be the alias or the full qualified name
+OKeySet::OKeySet(connectivity::OSQLTable  _xTable,
+                 OUString _sUpdateTableName,    // this can be the alias or the full qualified name
                  const Reference< XSingleSelectQueryAnalyzer >& _xComposer,
                  const ORowSetValueVector& _aParameterValueForCache,
                  sal_Int32 i_nMaxRows,
                  sal_Int32& o_nRowCount)
             :OCacheSet(i_nMaxRows)
             ,m_aParameterValueForCache(new ORowSetValueVector(_aParameterValueForCache))
-            ,m_xTable(_xTable)
+            ,m_xTable(std::move(_xTable))
             ,m_xComposer(_xComposer)
-            ,m_sUpdateTableName(_rUpdateTableName)
+            ,m_sUpdateTableName(std::move(_sUpdateTableName))
             ,m_rRowCount(o_nRowCount)
             ,m_bRowCountFinal(false)
 {
@@ -282,7 +283,7 @@ void OKeySet::construct(const Reference< XResultSet>& _xDriverSet, const OUStrin
     Reference<XDatabaseMetaData> xMeta = m_xConnection->getMetaData();
     Reference<XColumnsSupplier> xQueryColSup(m_xComposer, UNO_QUERY);
     const Reference<XNameAccess> xQueryColumns = xQueryColSup->getColumns();
-    findTableColumnsMatching_throw( makeAny(m_xTable), m_sUpdateTableName, xMeta, xQueryColumns, m_pKeyColumnNames );
+    findTableColumnsMatching_throw( Any(m_xTable), m_sUpdateTableName, xMeta, xQueryColumns, m_pKeyColumnNames );
 
     Reference< XSingleSelectQueryComposer> xSourceComposer(m_xComposer,UNO_QUERY);
     Reference< XMultiServiceFactory >  xFactory(m_xConnection, UNO_QUERY_THROW);
@@ -406,7 +407,7 @@ Any OKeySet::getBookmark()
 {
     OSL_ENSURE(m_aKeyIter != m_aKeyMap.end() && m_aKeyIter != m_aKeyMap.begin(),
         "getBookmark is only possible when we stand on a valid row!");
-    return makeAny(m_aKeyIter->first);
+    return Any(m_aKeyIter->first);
 }
 
 bool OKeySet::moveToBookmark( const Any& bookmark )
@@ -444,9 +445,9 @@ void OKeySet::updateRow(const ORowSetRow& _rInsertRow ,const ORowSetRow& _rOrigi
 
     OUStringBuffer aSql = "UPDATE " + m_aComposedTableName + " SET ";
     // list all columns that should be set
-    static OUString aPara(" = ?,");
+    constexpr OUStringLiteral aPara(u" = ?,");
     OUString aQuote  = getIdentifierQuoteString();
-    static OUString aAnd(" AND ");
+    constexpr OUStringLiteral aAnd(u" AND ");
     OUString sIsNull(" IS NULL");
     OUString sParam(" = ?");
 
@@ -463,7 +464,6 @@ void OKeySet::updateRow(const ORowSetRow& _rInsertRow ,const ORowSetRow& _rOrigi
     std::vector<sal_Int32> aIndexColumnPositions;
 
     const sal_Int32 nOldLength = aSql.getLength();
-    sal_Int32 i = 1;
     // here we build the condition part for the update statement
     for (auto const& columnName : *m_pColumnNames)
     {
@@ -499,7 +499,6 @@ void OKeySet::updateRow(const ORowSetRow& _rInsertRow ,const ORowSetRow& _rOrigi
         {
             aSql.append(::dbtools::quoteName( aQuote,columnName.second.sRealName) + aPara);
         }
-        ++i;
     }
 
     if( aSql.getLength() != nOldLength )
@@ -514,15 +513,15 @@ void OKeySet::updateRow(const ORowSetRow& _rInsertRow ,const ORowSetRow& _rOrigi
         aSql.append(" WHERE ");
         if(!sKeyCondition.isEmpty() && !sIndexCondition.isEmpty())
         {
-            aSql.append(sKeyCondition.makeStringAndClear() + sIndexCondition.makeStringAndClear());
+            aSql.append(sKeyCondition + sIndexCondition);
         }
         else if(!sKeyCondition.isEmpty())
         {
-            aSql.append(sKeyCondition.makeStringAndClear());
+            aSql.append(sKeyCondition);
         }
         else if(!sIndexCondition.isEmpty())
         {
-            aSql.append(sIndexCondition.makeStringAndClear());
+            aSql.append(sIndexCondition);
         }
         aSql.setLength(aSql.getLength()-5); // remove the last AND
     }
@@ -622,7 +621,7 @@ void OKeySet::insertRow( const ORowSetRow& _rInsertRow,const connectivity::OSQLT
 
     aSql[aSql.getLength() - 1] = ')';
     aValues[aValues.getLength() - 1] = ')';
-    aSql.append(aValues.makeStringAndClear());
+    aSql.append(aValues);
     // now create,fill and execute the prepared statement
     executeInsert(_rInsertRow,aSql.makeStringAndClear(),u"",bRefetch);
 }
@@ -725,7 +724,7 @@ void OKeySet::executeInsert( const ORowSetRow& _rInsertRow,const OUString& i_sSQ
         if(!sMaxStmt.isEmpty())
         {
             sMaxStmt[sMaxStmt.getLength()-1] = ' ';
-            OUString sStmt = "SELECT " + sMaxStmt.makeStringAndClear() + "FROM ";
+            OUString sStmt = "SELECT " + sMaxStmt + "FROM ";
             OUString sCatalog,sSchema,sTable;
             ::dbtools::qualifiedNameComponents(m_xConnection->getMetaData(),m_sUpdateTableName,sCatalog,sSchema,sTable,::dbtools::EComposeRule::InDataManipulation);
             sStmt += ::dbtools::composeTableNameForSelect( m_xConnection, sCatalog, sSchema, sTable );
@@ -763,7 +762,7 @@ void OKeySet::executeInsert( const ORowSetRow& _rInsertRow,const OUString& i_sSQ
 
         m_aKeyIter = m_aKeyMap.emplace( aKeyIter->first + 1, OKeySetValue(aKeyRow,std::pair<sal_Int32,Reference<XRow> >(1,Reference<XRow>())) ).first;
         // now we set the bookmark for this row
-        (*_rInsertRow)[0] = makeAny(static_cast<sal_Int32>(m_aKeyIter->first));
+        (*_rInsertRow)[0] = Any(static_cast<sal_Int32>(m_aKeyIter->first));
         tryRefetch(_rInsertRow,bRefetch);
     }
 }
@@ -886,7 +885,7 @@ void OKeySet::deleteRow(const ORowSetRow& _rDeleteRow,const connectivity::OSQLTa
             }
         }
     }
-    aSql.append(sIndexCondition.makeStringAndClear());
+    aSql.append(sIndexCondition);
     aSql.setLength(aSql.getLength()-5);
 
     // now create end execute the prepared statement
@@ -1381,7 +1380,7 @@ namespace dbaccess
 
 void getColumnPositions(const Reference<XNameAccess>& _rxQueryColumns,
                             const css::uno::Sequence< OUString >& _aColumnNames,
-                            const OUString& _rsUpdateTableName,
+                            std::u16string_view _rsUpdateTableName,
                             SelectColumnsMetaData& o_rColumnNames,
                             bool i_bAppendTableName)
     {

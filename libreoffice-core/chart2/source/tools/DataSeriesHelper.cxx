@@ -18,8 +18,13 @@
  */
 
 #include <DataSeriesHelper.hxx>
+#include <DataSeries.hxx>
 #include <DataSource.hxx>
+#include <ChartType.hxx>
 #include <unonames.hxx>
+#include <Diagram.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <Axis.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/chart2/DataPointLabel.hpp>
@@ -32,15 +37,13 @@
 #include <com/sun/star/chart2/XDiagram.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
 
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
-#include <com/sun/star/chart2/XChartTypeContainer.hpp>
-#include <com/sun/star/chart2/XDataSeriesContainer.hpp>
 #include <comphelper/sequence.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <vector>
 #include <set>
 
@@ -56,8 +59,8 @@ namespace
 class lcl_MatchesRole
 {
 public:
-    explicit lcl_MatchesRole( const OUString & aRole, bool bMatchPrefix ) :
-            m_aRole( aRole ),
+    explicit lcl_MatchesRole( OUString aRole, bool bMatchPrefix ) :
+            m_aRole(std::move( aRole )),
             m_bMatchPrefix( bMatchPrefix )
     {}
 
@@ -106,33 +109,25 @@ Reference< chart2::data::XLabeledDataSequence > lcl_findLSequenceWithOnlyLabel(
 }
 
 void lcl_getCooSysAndChartTypeOfSeries(
-    const Reference< chart2::XDataSeries > & xSeries,
+    const rtl::Reference< ::chart::DataSeries > & xSeries,
     const Reference< chart2::XDiagram > & xDiagram,
-    Reference< chart2::XCoordinateSystem > & xOutCooSys,
-    Reference< chart2::XChartType > & xOutChartType )
+    rtl::Reference< ::chart::BaseCoordinateSystem > & xOutCooSys,
+    rtl::Reference< ::chart::ChartType > & xOutChartType )
 {
-    Reference< chart2::XCoordinateSystemContainer > xCooSysCnt( xDiagram, uno::UNO_QUERY );
-    if( !xCooSysCnt.is())
+    if( !xDiagram.is())
         return;
+    ::chart::Diagram* pDiagram = dynamic_cast<::chart::Diagram*>(xDiagram.get());
 
-    const Sequence< Reference< chart2::XCoordinateSystem > > aCooSysSeq( xCooSysCnt->getCoordinateSystems());
-    for( Reference< chart2::XCoordinateSystem > const & coords : aCooSysSeq )
+    for( rtl::Reference< ::chart::BaseCoordinateSystem > const & coords : pDiagram->getBaseCoordinateSystems() )
     {
-        Reference< chart2::XChartTypeContainer > xCTCnt( coords, uno::UNO_QUERY_THROW );
-        const Sequence< Reference< chart2::XChartType > > aChartTypes( xCTCnt->getChartTypes());
-        for( Reference< chart2::XChartType > const & chartType : aChartTypes )
+        for( rtl::Reference< ::chart::ChartType > const & chartType : coords->getChartTypes2() )
         {
-            Reference< chart2::XDataSeriesContainer > xSeriesCnt( chartType, uno::UNO_QUERY );
-            if( xSeriesCnt.is())
+            for( rtl::Reference< ::chart::DataSeries > const & dataSeries : chartType->getDataSeries2() )
             {
-                const Sequence< Reference< chart2::XDataSeries > > aSeries( xSeriesCnt->getDataSeries());
-                for( Reference< chart2::XDataSeries > const & dataSeries : aSeries )
+                if( dataSeries == xSeries )
                 {
-                    if( dataSeries == xSeries )
-                    {
-                        xOutCooSys.set( coords );
-                        xOutChartType.set( chartType );
-                    }
+                    xOutCooSys = coords;
+                    xOutChartType = chartType;
                 }
             }
         }
@@ -203,43 +198,60 @@ OUString getRole( const uno::Reference< chart2::data::XLabeledDataSequence >& xL
     return aRet;
 }
 
-Reference< chart2::data::XLabeledDataSequence >
+uno::Reference< chart2::data::XLabeledDataSequence >
     getDataSequenceByRole(
         const Reference< chart2::data::XDataSource > & xSource,
         const OUString& aRole,
         bool bMatchPrefix /* = false */ )
 {
-    Reference< chart2::data::XLabeledDataSequence > aNoResult;
+    uno::Reference< chart2::data::XLabeledDataSequence > aNoResult;
     if( ! xSource.is())
         return aNoResult;
-    Sequence< Reference< chart2::data::XLabeledDataSequence > > aLabeledSeq( xSource->getDataSequences());
-
-    const Reference< chart2::data::XLabeledDataSequence > * pBegin = aLabeledSeq.getConstArray();
-    const Reference< chart2::data::XLabeledDataSequence > * pEnd = pBegin + aLabeledSeq.getLength();
-    const Reference< chart2::data::XLabeledDataSequence > * pMatch =
-        std::find_if( pBegin, pEnd, lcl_MatchesRole( aRole, bMatchPrefix ));
-
-    if( pMatch != pEnd )
-        return *pMatch;
+    const Sequence< Reference< chart2::data::XLabeledDataSequence > > aLabeledSeq( xSource->getDataSequences());
+    try
+    {
+        for (auto const & i : aLabeledSeq)
+        {
+            if (lcl_MatchesRole(aRole, bMatchPrefix)(i))
+                return i;
+        }
+    }
+    catch (const lang::DisposedException&)
+    {
+        TOOLS_WARN_EXCEPTION( "chart2", "unexpected exception caught" );
+    }
 
     return aNoResult;
 }
 
-std::vector< Reference< chart2::data::XLabeledDataSequence > >
+std::vector< uno::Reference< chart2::data::XLabeledDataSequence > >
     getAllDataSequencesByRole( const Sequence< Reference< chart2::data::XLabeledDataSequence > > & aDataSequences,
                                const OUString& aRole )
 {
-    std::vector< Reference< chart2::data::XLabeledDataSequence > > aResultVec;
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aResultVec;
+    for (const auto & i : aDataSequences)
+    {
+        if (lcl_MatchesRole(aRole, /*bMatchPrefix*/true)(i))
+            aResultVec.push_back(i);
+    }
+    return aResultVec;
+}
+
+std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence > >
+    getAllDataSequencesByRole( const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aDataSequences,
+                               const OUString& aRole )
+{
+    std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence > > aResultVec;
     std::copy_if( aDataSequences.begin(), aDataSequences.end(),
                            std::back_inserter( aResultVec ),
                            lcl_MatchesRole(aRole, /*bMatchPrefix*/true) );
     return aResultVec;
 }
 
-std::vector<Reference<css::chart2::data::XLabeledDataSequence> >
+std::vector<uno::Reference<chart2::data::XLabeledDataSequence> >
 getAllDataSequences( const uno::Sequence<uno::Reference<chart2::XDataSeries> >& aSeries )
 {
-    std::vector< Reference< chart2::data::XLabeledDataSequence > > aSeqVec;
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aSeqVec;
 
     for( uno::Reference<chart2::XDataSeries> const & dataSeries : aSeries )
     {
@@ -247,18 +259,34 @@ getAllDataSequences( const uno::Sequence<uno::Reference<chart2::XDataSeries> >& 
         if( xSource.is())
         {
             const Sequence< Reference< chart2::data::XLabeledDataSequence > > aSeq( xSource->getDataSequences());
-            aSeqVec.insert( aSeqVec.end(), aSeq.begin(), aSeq.end() );
+            for (const auto & i : aSeq)
+            {
+                aSeqVec.push_back(i);
+            }
         }
     }
 
     return aSeqVec;
 }
 
-Reference< chart2::data::XDataSource >
-    getDataSource( const Sequence< Reference< chart2::XDataSeries > > & aSeries )
+std::vector<uno::Reference<chart2::data::XLabeledDataSequence> >
+getAllDataSequences( const std::vector<rtl::Reference<DataSeries> >& aSeries )
 {
-    return Reference< chart2::data::XDataSource >(
-        new DataSource(comphelper::containerToSequence(getAllDataSequences(aSeries))));
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aSeqVec;
+
+    for( rtl::Reference<DataSeries> const & dataSeries : aSeries )
+    {
+        const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & aSeq( dataSeries->getDataSequences2());
+        aSeqVec.insert( aSeqVec.end(), aSeq.begin(), aSeq.end() );
+    }
+
+    return aSeqVec;
+}
+
+rtl::Reference< DataSource >
+    getDataSource( const std::vector< rtl::Reference< DataSeries > > & aSeries )
+{
+    return new DataSource(getAllDataSequences(aSeries));
 }
 
 namespace
@@ -350,23 +378,22 @@ OUString getLabelForLabeledDataSequence(
 }
 
 OUString getDataSeriesLabel(
-    const Reference< chart2::XDataSeries > & xSeries,
+    const rtl::Reference< DataSeries > & xSeries,
     const OUString & rLabelSequenceRole )
 {
     OUString aResult;
 
-    Reference< chart2::data::XDataSource > xSource( xSeries, uno::UNO_QUERY );
-    if( xSource.is())
+    if( xSeries.is())
     {
         Reference< chart2::data::XLabeledDataSequence > xLabeledSeq(
-            ::chart::DataSeriesHelper::getDataSequenceByRole( xSource, rLabelSequenceRole ));
+            ::chart::DataSeriesHelper::getDataSequenceByRole( xSeries, rLabelSequenceRole ));
         if( xLabeledSeq.is())
             aResult = getLabelForLabeledDataSequence( xLabeledSeq );
         else
         {
             // special case: labeled data series with only a label and no values may
             // serve as label
-            xLabeledSeq.set( lcl_findLSequenceWithOnlyLabel( xSource ));
+            xLabeledSeq.set( lcl_findLSequenceWithOnlyLabel( xSeries ));
             if( xLabeledSeq.is())
             {
                 Reference< chart2::data::XDataSequence > xSeq( xLabeledSeq->getLabel());
@@ -381,8 +408,8 @@ OUString getDataSeriesLabel(
 }
 
 void setStackModeAtSeries(
-    const Sequence< Reference< chart2::XDataSeries > > & aSeries,
-    const Reference< chart2::XCoordinateSystem > & xCorrespondingCoordinateSystem,
+    const std::vector< rtl::Reference< DataSeries > > & aSeries,
+    const rtl::Reference< BaseCoordinateSystem > & xCorrespondingCoordinateSystem,
     StackMode eStackMode )
 {
     const uno::Any aPropValue(
@@ -394,17 +421,16 @@ void setStackModeAtSeries(
         : chart2::StackingDirection_NO_STACKING );
 
     std::set< sal_Int32 > aAxisIndexSet;
-    for( Reference< chart2::XDataSeries > const & dataSeries : aSeries )
+    for( rtl::Reference< DataSeries > const & dataSeries : aSeries )
     {
         try
         {
-            Reference< beans::XPropertySet > xProp( dataSeries, uno::UNO_QUERY );
-            if( xProp.is() )
+            if( dataSeries.is() )
             {
-                xProp->setPropertyValue( "StackingDirection", aPropValue );
+                dataSeries->setPropertyValue( "StackingDirection", aPropValue );
 
                 sal_Int32 nAxisIndex;
-                xProp->getPropertyValue( "AttachedAxisIndex" ) >>= nAxisIndex;
+                dataSeries->getPropertyValue( "AttachedAxisIndex" ) >>= nAxisIndex;
                 aAxisIndexSet.insert(nAxisIndex);
             }
         }
@@ -425,8 +451,8 @@ void setStackModeAtSeries(
 
     for (auto const& axisIndex : aAxisIndexSet)
     {
-        Reference< chart2::XAxis > xAxis(
-            xCorrespondingCoordinateSystem->getAxisByDimension(1, axisIndex));
+        rtl::Reference< Axis > xAxis =
+            xCorrespondingCoordinateSystem->getAxisByDimension2(1, axisIndex);
         if( xAxis.is())
         {
             bool bPercent = (eStackMode == StackMode::YStackedPercent);
@@ -464,7 +490,7 @@ sal_Int32 getAttachedAxisIndex( const Reference< chart2::XDataSeries > & xSeries
 
 sal_Int32 getNumberFormatKeyFromAxis(
     const Reference< chart2::XDataSeries > & xSeries,
-    const Reference< chart2::XCoordinateSystem > & xCorrespondingCoordinateSystem,
+    const rtl::Reference< BaseCoordinateSystem > & xCorrespondingCoordinateSystem,
     sal_Int32 nDimensionIndex,
     sal_Int32 nAxisIndex /* = -1 */ )
 {
@@ -473,8 +499,8 @@ sal_Int32 getNumberFormatKeyFromAxis(
         nAxisIndex = getAttachedAxisIndex( xSeries );
     try
     {
-        Reference< beans::XPropertySet > xAxisProp(
-            xCorrespondingCoordinateSystem->getAxisByDimension( nDimensionIndex, nAxisIndex ), uno::UNO_QUERY );
+        rtl::Reference< Axis > xAxisProp =
+            xCorrespondingCoordinateSystem->getAxisByDimension2( nDimensionIndex, nAxisIndex );
         if( xAxisProp.is())
             xAxisProp->getPropertyValue(CHART_UNONAME_NUMFMT) >>= nResult;
     }
@@ -486,43 +512,46 @@ sal_Int32 getNumberFormatKeyFromAxis(
     return nResult;
 }
 
-Reference< chart2::XCoordinateSystem > getCoordinateSystemOfSeries(
+rtl::Reference< ::chart::BaseCoordinateSystem > getCoordinateSystemOfSeries(
     const Reference< chart2::XDataSeries > & xSeries,
-    const Reference< chart2::XDiagram > & xDiagram )
+    const rtl::Reference< Diagram > & xDiagram )
 {
-    Reference< chart2::XCoordinateSystem > xResult;
-    Reference< chart2::XChartType > xDummy;
-    lcl_getCooSysAndChartTypeOfSeries( xSeries, xDiagram, xResult, xDummy );
+    rtl::Reference< ::chart::BaseCoordinateSystem > xResult;
+    rtl::Reference< ::chart::ChartType > xDummy;
+    rtl::Reference< DataSeries> pSeries = dynamic_cast<DataSeries*>(xSeries.get());
+    assert(pSeries);
+    lcl_getCooSysAndChartTypeOfSeries( pSeries, xDiagram, xResult, xDummy );
 
     return xResult;
 }
 
-Reference< chart2::XChartType > getChartTypeOfSeries(
+rtl::Reference< ::chart::ChartType > getChartTypeOfSeries(
     const Reference< chart2::XDataSeries > & xSeries,
-    const Reference< chart2::XDiagram > & xDiagram )
+    const rtl::Reference< Diagram > & xDiagram )
 {
-    Reference< chart2::XChartType > xResult;
-    Reference< chart2::XCoordinateSystem > xDummy;
-    lcl_getCooSysAndChartTypeOfSeries( xSeries, xDiagram, xDummy, xResult );
+    rtl::Reference< ::chart::ChartType > xResult;
+    rtl::Reference< ::chart::BaseCoordinateSystem > xDummy;
+    rtl::Reference< DataSeries> pSeries = dynamic_cast<DataSeries*>(xSeries.get());
+    assert(pSeries);
+    lcl_getCooSysAndChartTypeOfSeries( pSeries, xDiagram, xDummy, xResult );
 
     return xResult;
 }
 
 void deleteSeries(
     const Reference< chart2::XDataSeries > & xSeries,
-    const Reference< chart2::XChartType > & xChartType )
+    const rtl::Reference< ::chart::ChartType > & xChartType )
 {
     try
     {
-        Reference< chart2::XDataSeriesContainer > xSeriesCnt( xChartType, uno::UNO_QUERY_THROW );
-        auto aSeries(
-            comphelper::sequenceToContainer<std::vector< Reference< chart2::XDataSeries > > >( xSeriesCnt->getDataSeries()));
-        std::vector< Reference< chart2::XDataSeries > >::iterator aIt =
-              std::find( aSeries.begin(), aSeries.end(), xSeries );
+        rtl::Reference<DataSeries> pSeries = dynamic_cast<DataSeries*>(xSeries.get());
+        assert(pSeries);
+        std::vector< rtl::Reference< DataSeries > > aSeries = xChartType->getDataSeries2();
+        auto aIt = std::find( aSeries.begin(), aSeries.end(), pSeries );
         if( aIt != aSeries.end())
         {
             aSeries.erase( aIt );
-            xSeriesCnt->setDataSeries( comphelper::containerToSequence( aSeries ));
+            xChartType->setDataSeries( aSeries );
         }
     }
     catch( const uno::Exception & )
@@ -589,13 +618,20 @@ void makeLinesThickOrThin( const Reference< beans::XPropertySet > & xSeriesPrope
 void setPropertyAlsoToAllAttributedDataPoints( const Reference< chart2::XDataSeries >& xSeries,
                                               const OUString& rPropertyName, const uno::Any& rPropertyValue )
 {
-    Reference< beans::XPropertySet > xSeriesProperties( xSeries, uno::UNO_QUERY );
-    if( !xSeriesProperties.is() )
+    rtl::Reference<DataSeries> pSeries = dynamic_cast<DataSeries*>(xSeries.get());
+    assert(!xSeries || pSeries);
+    setPropertyAlsoToAllAttributedDataPoints(pSeries, rPropertyName, rPropertyValue);
+}
+
+void setPropertyAlsoToAllAttributedDataPoints( const rtl::Reference< ::chart::DataSeries >& xSeries,
+                                              const OUString& rPropertyName, const uno::Any& rPropertyValue )
+{
+    if( !xSeries.is() )
         return;
 
-    xSeriesProperties->setPropertyValue( rPropertyName, rPropertyValue );
+    xSeries->setPropertyValue( rPropertyName, rPropertyValue );
     uno::Sequence< sal_Int32 > aAttributedDataPointIndexList;
-    if( xSeriesProperties->getPropertyValue( "AttributedDataPoints" ) >>= aAttributedDataPointIndexList )
+    if( xSeries->getPropertyValue( "AttributedDataPoints" ) >>= aAttributedDataPointIndexList )
     {
         for(sal_Int32 nN=aAttributedDataPointIndexList.getLength();nN--;)
         {
@@ -777,9 +813,8 @@ bool hasDataLabelAtPoint( const Reference< chart2::XDataSeries >& xSeries, sal_I
             uno::Sequence< sal_Int32 > aAttributedDataPointIndexList;
             if( xSeriesProperties->getPropertyValue( "AttributedDataPoints" ) >>= aAttributedDataPointIndexList )
             {
-                auto aIndices( comphelper::sequenceToContainer<std::vector< sal_Int32 >>( aAttributedDataPointIndexList ) );
-                std::vector< sal_Int32 >::iterator aIt = std::find( aIndices.begin(), aIndices.end(), nPointIndex );
-                if( aIt != aIndices.end())
+                auto aIt = std::find( std::as_const(aAttributedDataPointIndexList).begin(), std::as_const(aAttributedDataPointIndexList).end(), nPointIndex );
+                if( aIt != std::as_const(aAttributedDataPointIndexList).end())
                     xProp = xSeries->getDataPointByIndex(nPointIndex);
                 else
                     xProp = xSeriesProperties;

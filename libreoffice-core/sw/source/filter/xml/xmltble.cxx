@@ -200,29 +200,17 @@ public:
                                          std::u16string_view rNamePrefix,
                                             sal_uInt32 nLine )
 {
-    const SwFormatFrameSize *pFrameSize = nullptr;
-    const SwFormatRowSplit* pRowSplit = nullptr;
-    const SvxBrushItem *pBrush = nullptr;
-    const SvxPrintItem *pHasTextChangesOnly = nullptr;
-
     const SfxItemSet& rItemSet = rFrameFormat.GetAttrSet();
-    const SfxPoolItem *pItem;
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_FRM_SIZE, false, &pItem ) )
-        pFrameSize = static_cast<const SwFormatFrameSize *>(pItem);
 
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_ROW_SPLIT, false, &pItem ) )
-        pRowSplit = static_cast<const SwFormatRowSplit *>(pItem);
-
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_BACKGROUND, false, &pItem ) )
-        pBrush = static_cast<const SvxBrushItem *>(pItem);
-
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_PRINT, false, &pItem ) )
-        pHasTextChangesOnly = static_cast<const SvxPrintItem *>(pItem);
+    const SwFormatFrameSize *pFrameSize = rItemSet.GetItemIfSet( RES_FRM_SIZE, false );
+    const SwFormatRowSplit* pRowSplit = rItemSet.GetItemIfSet( RES_ROW_SPLIT, false );
+    const SvxBrushItem *pBrush = rItemSet.GetItemIfSet( RES_BACKGROUND, false );
+    const SvxPrintItem *pHasTextChangesOnly = rItemSet.GetItemIfSet( RES_PRINT, false);
 
     // empty styles have not to be exported
     if( !pFrameSize && !pBrush && !pRowSplit && !pHasTextChangesOnly )
     {
-        m_rFormatMap.emplace(&rFrameFormat, ::std::optional<OUString>()); // empty just to enable assert
+        m_rFormatMap.try_emplace(&rFrameFormat); // empty just to enable assert
         return {};
     }
 
@@ -236,13 +224,12 @@ public:
         const SvxPrintItem *pTestHasTextChangesOnly = nullptr;
         const SwFrameFormat *pTestFormat = *i;
         const SfxItemSet& rTestSet = pTestFormat->GetAttrSet();
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_FRM_SIZE, false,
-                                                  &pItem ) )
+        if( const SwFormatFrameSize* pItem = rTestSet.GetItemIfSet( RES_FRM_SIZE, false ) )
         {
             if( !pFrameSize )
                 break;
 
-            pTestFrameSize = static_cast<const SwFormatFrameSize *>(pItem);
+            pTestFrameSize = pItem;
         }
         else
         {
@@ -250,13 +237,12 @@ public:
                 continue;
         }
 
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_BACKGROUND, false,
-                                                  &pItem ) )
+        if( const SvxBrushItem* pItem = rTestSet.GetItemIfSet( RES_BACKGROUND, false) )
         {
             if( !pBrush )
                 break;
 
-            pTestBrush = static_cast<const SvxBrushItem *>(pItem);
+            pTestBrush = pItem;
         }
         else
         {
@@ -264,13 +250,12 @@ public:
                 continue;
         }
 
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_ROW_SPLIT, false,
-                                                  &pItem ) )
+        if( const SwFormatRowSplit* pItem = rTestSet.GetItemIfSet( RES_ROW_SPLIT, false ) )
         {
             if( !pRowSplit )
                 break;
 
-            pTestRowSplit = static_cast<const SwFormatRowSplit *>(pItem);
+            pTestRowSplit = pItem;
         }
         else
         {
@@ -278,13 +263,12 @@ public:
                 continue;
         }
 
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_PRINT, false,
-                                                  &pItem ) )
+        if( const SvxPrintItem* pItem = rTestSet.GetItemIfSet( RES_PRINT, false ) )
         {
             if( !pHasTextChangesOnly )
                 break;
 
-            pTestHasTextChangesOnly = static_cast<const SvxPrintItem *>(pItem);
+            pTestHasTextChangesOnly = pItem;
         }
         else
         {
@@ -309,13 +293,13 @@ public:
         // found!
         auto const oName(m_rFormatMap.find(pTestFormat)->second);
         assert(oName);
-        m_rFormatMap.emplace(&rFrameFormat, oName);
+        m_rFormatMap.try_emplace(&rFrameFormat, oName);
         return {};
     }
 
     {
         OUString const name(OUString::Concat(rNamePrefix) + "." + OUString::number(nLine+1));
-        m_rFormatMap.emplace(&rFrameFormat, ::std::optional<OUString>(name));
+        m_rFormatMap.try_emplace(&rFrameFormat, name);
         if ( i != m_aFormatList.end() ) ++i;
         m_aFormatList.insert( i, &rFrameFormat );
         return ::std::optional<OUString>(name);
@@ -340,39 +324,21 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
                                          std::u16string_view rNamePrefix,
                                             sal_uInt32 nCol, sal_uInt32 nRow, bool bTop )
 {
-    const SwFormatVertOrient *pVertOrient = nullptr;
-    const SvxBrushItem *pBrush = nullptr;
-    const SvxBoxItem *pBox = nullptr;
-    const SwTableBoxNumFormat *pNumFormat = nullptr;
-    const SvxFrameDirectionItem *pFrameDir = nullptr;
-    const SvXMLAttrContainerItem *pAttCnt = nullptr;
-
     const SfxItemSet& rItemSet = rFrameFormat.GetAttrSet();
-    const SfxPoolItem *pItem;
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_VERT_ORIENT, false,
-                                               &pItem ) )
-        pVertOrient = static_cast<const SwFormatVertOrient *>(pItem);
-
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_BACKGROUND, false, &pItem ) )
-        pBrush = static_cast<const SvxBrushItem *>(pItem);
-
-    if( SfxItemState::SET == rItemSet.GetItemState( RES_BOX, false, &pItem ) )
-        pBox = static_cast<const SvxBoxItem *>(pItem);
-
-    if ( SfxItemState::SET == rItemSet.GetItemState( RES_BOXATR_FORMAT,
-                                                false, &pItem ) )
-        pNumFormat = static_cast<const SwTableBoxNumFormat *>(pItem);
-    if ( SfxItemState::SET == rItemSet.GetItemState( RES_FRAMEDIR,
-                                                false, &pItem ) )
-        pFrameDir = static_cast<const SvxFrameDirectionItem *>(pItem);
-    if ( SfxItemState::SET == rItemSet.GetItemState( RES_UNKNOWNATR_CONTAINER,
-                                                false, &pItem ) )
-        pAttCnt = static_cast<const SvXMLAttrContainerItem *>(pItem);
+    const SwFormatVertOrient *pVertOrient = rItemSet.GetItemIfSet( RES_VERT_ORIENT, false );
+    const SvxBrushItem *pBrush = rItemSet.GetItemIfSet( RES_BACKGROUND, false );
+    const SvxBoxItem *pBox = rItemSet.GetItemIfSet( RES_BOX, false );
+    const SwTableBoxNumFormat *pNumFormat = rItemSet.GetItemIfSet( RES_BOXATR_FORMAT,
+                                                false );
+    const SvxFrameDirectionItem *pFrameDir = rItemSet.GetItemIfSet( RES_FRAMEDIR,
+                                                false );
+    const SvXMLAttrContainerItem *pAttCnt = rItemSet.GetItemIfSet( RES_UNKNOWNATR_CONTAINER,
+                                                false );
 
     // empty styles have not to be exported
     if( !pVertOrient && !pBrush && !pBox && !pNumFormat && !pFrameDir && !pAttCnt )
     {
-        m_rFormatMap.emplace(&rFrameFormat, ::std::optional<OUString>()); // empty just to enable assert
+        m_rFormatMap.try_emplace(&rFrameFormat); // empty just to enable assert
         return {};
     }
 
@@ -393,13 +359,12 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
         const SvXMLAttrContainerItem *pTestAttCnt = nullptr;
         const SwFrameFormat* pTestFormat = *i;
         const SfxItemSet& rTestSet = pTestFormat->GetAttrSet();
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_VERT_ORIENT, false,
-                                                  &pItem ) )
+        if( const SwFormatVertOrient* pItem = rTestSet.GetItemIfSet( RES_VERT_ORIENT, false ) )
         {
             if( !pVertOrient )
                 break;
 
-            pTestVertOrient = static_cast<const SwFormatVertOrient *>(pItem);
+            pTestVertOrient = pItem;
         }
         else
         {
@@ -407,13 +372,12 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
                 continue;
         }
 
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_BACKGROUND, false,
-                                                  &pItem ) )
+        if( const SvxBrushItem* pItem = rTestSet.GetItemIfSet( RES_BACKGROUND, false ) )
         {
             if( !pBrush )
                 break;
 
-            pTestBrush = static_cast<const SvxBrushItem *>(pItem);
+            pTestBrush = pItem;
         }
         else
         {
@@ -421,12 +385,12 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
                 continue;
         }
 
-        if( SfxItemState::SET == rTestSet.GetItemState( RES_BOX, false, &pItem ) )
+        if( const SvxBoxItem* pItem = rTestSet.GetItemIfSet( RES_BOX, false ) )
         {
             if( !pBox )
                 break;
 
-            pTestBox = static_cast<const SvxBoxItem *>(pItem);
+            pTestBox = pItem;
         }
         else
         {
@@ -434,13 +398,13 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
                 continue;
         }
 
-        if ( SfxItemState::SET == rTestSet.GetItemState( RES_BOXATR_FORMAT,
-                                                false, &pItem ) )
+        if ( const SwTableBoxNumFormat* pItem = rTestSet.GetItemIfSet( RES_BOXATR_FORMAT,
+                                                false ) )
         {
             if( !pNumFormat )
                 break;
 
-            pTestNumFormat = static_cast<const SwTableBoxNumFormat *>(pItem);
+            pTestNumFormat = pItem;
         }
         else
         {
@@ -449,13 +413,13 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
 
         }
 
-        if ( SfxItemState::SET == rTestSet.GetItemState( RES_FRAMEDIR,
-                                                false, &pItem ) )
+        if ( const SvxFrameDirectionItem* pItem = rTestSet.GetItemIfSet( RES_FRAMEDIR,
+                                                false ) )
         {
             if( !pFrameDir )
                 break;
 
-            pTestFrameDir = static_cast<const SvxFrameDirectionItem *>(pItem);
+            pTestFrameDir = pItem;
         }
         else
         {
@@ -464,13 +428,13 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
 
         }
 
-        if ( SfxItemState::SET == rTestSet.GetItemState( RES_UNKNOWNATR_CONTAINER,
-                                                false, &pItem ) )
+        if ( const SvXMLAttrContainerItem* pItem = rTestSet.GetItemIfSet( RES_UNKNOWNATR_CONTAINER,
+                                                false ) )
         {
              if( !pAttCnt )
                  break;
 
-             pTestAttCnt = static_cast<const SvXMLAttrContainerItem *>(pItem);
+             pTestAttCnt = pItem;
         }
         else
         {
@@ -501,13 +465,13 @@ static OUString lcl_xmltble_appendBoxPrefix(std::u16string_view rNamePrefix,
         // found!
         auto const oName(m_rFormatMap.find(pTestFormat)->second);
         assert(oName);
-        m_rFormatMap.emplace(&rFrameFormat, oName);
+        m_rFormatMap.try_emplace(&rFrameFormat, oName);
         return {};
     }
 
     {
         OUString const name(lcl_xmltble_appendBoxPrefix(rNamePrefix, nCol, nRow, bTop));
-        m_rFormatMap.emplace(&rFrameFormat, ::std::optional<OUString>(name));
+        m_rFormatMap.try_emplace(&rFrameFormat, name);
         if ( i != m_aFormatList.end() ) ++i;
         m_aFormatList.insert( i, &rFrameFormat );
         return ::std::optional<OUString>(name);
@@ -684,7 +648,7 @@ void SwXMLExport::ExportTableLinesAutoStyles( const SwTableLines& rLines,
         SwFrameFormat *pFrameFormat = pLine->GetFrameFormat();
         if (auto oNew = rExpRows.AddRow(*pFrameFormat, rNamePrefix, nLine))
         {
-            ExportFormat(*pFrameFormat, XML_TABLE_ROW, oNew);
+            ExportFormat(*pFrameFormat, XML_TABLE_ROW, std::move(oNew));
         }
 
         const SwTableBoxes& rBoxes = pLine->GetTabBoxes();
@@ -715,7 +679,7 @@ void SwXMLExport::ExportTableLinesAutoStyles( const SwTableLines& rLines,
                 if (auto oNew = rExpCells.AddCell(*pFrameFormat2, rNamePrefix, nOldCol, nLine,
                                        bTop) )
                 {
-                    ExportFormat(*pFrameFormat2, XML_TABLE_CELL, oNew);
+                    ExportFormat(*pFrameFormat2, XML_TABLE_CELL, std::move(oNew));
                 }
 
                 Reference < XCell > xCell = SwXCell::CreateXCell(
@@ -1256,7 +1220,6 @@ void SwXMLTextParagraphExport::exportTable(
             OSL_ENSURE( pTableNd, "table node missing" );
             if( bAutoStyles )
             {
-                SwNodeIndex aIdx( *pTableNd );
                 // AUTOSTYLES: Optimization: Do not export table autostyle if
                 // we are currently exporting the content.xml stuff and
                 // the table is located in header/footer:
@@ -1264,10 +1227,10 @@ void SwXMLTextParagraphExport::exportTable(
                 // ALL flags are set at the same time.
                 const bool bExportStyles = bool( GetExport().getExportFlags() & SvXMLExportFlags::STYLES );
                 if (!isAutoStylesCollected()
-                    && (bExportStyles || !pFormat->GetDoc()->IsInHeaderFooter(aIdx)))
+                    && (bExportStyles || !pFormat->GetDoc()->IsInHeaderFooter(*pTableNd)))
                 {
                     maTableNodes.push_back(pTableNd);
-                    m_TableFormats.emplace(pTableNd, ::std::make_pair(SwXMLTextParagraphExport::FormatMap(), SwXMLTextParagraphExport::FormatMap()));
+                    m_TableFormats.try_emplace(pTableNd);
                     // Collect all tables inside cells of this table, too
                     CollectTableLinesAutoStyles(pTable->GetTabLines(), *pFormat, _bProgress);
                 }

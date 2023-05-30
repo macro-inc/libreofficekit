@@ -26,9 +26,9 @@
 #include <textuno.hxx>
 #include <editutil.hxx>
 #include <document.hxx>
+#include <utility>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
-#include <xmloff/namespacemap.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <sax/tools/converter.hxx>
 #include <svl/sharedstringpool.hxx>
@@ -152,7 +152,7 @@ class ScXMLChangeTextPContext : public ScXMLImportContext
 public:
 
     ScXMLChangeTextPContext( ScXMLImport& rImport, sal_Int32 nElement,
-                       const css::uno::Reference<css::xml::sax::XFastAttributeList>& xAttrList,
+                       css::uno::Reference<css::xml::sax::XFastAttributeList> xAttrList,
                         ScXMLChangeCellContext* pChangeCellContext);
 
     virtual css::uno::Reference< css::xml::sax::XFastContextHandler > SAL_CALL createFastChildContext(
@@ -432,8 +432,9 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > ScXMLChangeInfoContext
 void SAL_CALL ScXMLChangeInfoContext::endFastElement( sal_Int32 /*nElement*/ )
 {
     aInfo.sUser = sAuthorBuffer.makeStringAndClear();
-    ::sax::Converter::parseDateTime(aInfo.aDateTime,
-            sDateTimeBuffer.makeStringAndClear());
+    if (!::sax::Converter::parseDateTime(aInfo.aDateTime, sDateTimeBuffer))
+        SAL_WARN("sc.filter", "ScXMLChangeInfoContext: broken DateTime '" << sDateTimeBuffer.toString() << "'");
+    sDateTimeBuffer.setLength(0);
     aInfo.sComment = sCommentBuffer.makeStringAndClear();
     pChangeTrackingImportHelper->SetActionInfo(aInfo);
 }
@@ -643,10 +644,10 @@ uno::Reference< xml::sax::XFastContextHandler > SAL_CALL ScXMLDeletionsContext::
 
 ScXMLChangeTextPContext::ScXMLChangeTextPContext( ScXMLImport& rImport,
                                       sal_Int32 nElement,
-                                      const css::uno::Reference<css::xml::sax::XFastAttributeList>& xAttrList,
+                                      css::uno::Reference<css::xml::sax::XFastAttributeList> xAttrList,
                                       ScXMLChangeCellContext* pTempChangeCellContext) :
     ScXMLImportContext( rImport ),
-    mxAttrList(xAttrList),
+    mxAttrList(std::move(xAttrList)),
     mnElement(nElement),
     pChangeCellContext(pTempChangeCellContext)
 {
@@ -777,12 +778,12 @@ ScXMLChangeCellContext::ScXMLChangeCellContext( ScXMLImport& rImport,
             case XML_ELEMENT( OFFICE, XML_DATE_VALUE ):
                 bEmpty = false;
                 if (GetScImport().GetMM100UnitConverter().setNullDate(GetScImport().GetModel()))
-                    GetScImport().GetMM100UnitConverter().convertDateTime(rDateTimeValue, aIter.toString());
+                    GetScImport().GetMM100UnitConverter().convertDateTime(rDateTimeValue, aIter.toView());
                 fValue = rDateTimeValue;
                 break;
             case XML_ELEMENT( OFFICE, XML_TIME_VALUE ):
                 bEmpty = false;
-                ::sax::Converter::convertDuration(rDateTimeValue, aIter.toString());
+                ::sax::Converter::convertDuration(rDateTimeValue, aIter.toView());
                 fValue = rDateTimeValue;
             }
         }
@@ -861,8 +862,7 @@ void SAL_CALL ScXMLChangeCellContext::endFastElement( sal_Int32 /*nElement*/ )
             }
 
             // The cell will own the text object instance.
-            mrOldCell.meType = CELLTYPE_EDIT;
-            mrOldCell.mpEditText = mpEditTextObj->CreateTextObject().release();
+            mrOldCell.set(mpEditTextObj->CreateTextObject());
             GetScImport().GetTextImport()->ResetCursor();
             mpEditTextObj.clear();
         }
@@ -872,13 +872,11 @@ void SAL_CALL ScXMLChangeCellContext::endFastElement( sal_Int32 /*nElement*/ )
             {
                 if (!sText.isEmpty() && bString)
                 {
-                    mrOldCell.meType = CELLTYPE_STRING;
-                    mrOldCell.mpString = new svl::SharedString(pDoc->GetSharedStringPool().intern(sText));
+                    mrOldCell.set(pDoc->GetSharedStringPool().intern(sText));
                 }
                 else
                 {
-                    mrOldCell.meType = CELLTYPE_VALUE;
-                    mrOldCell.mfValue = fValue;
+                    mrOldCell.set(fValue);
                 }
                 if (rType == css::util::NumberFormat::DATE || rType == css::util::NumberFormat::TIME)
                     rInputString = sText;

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: UI\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-01-31 12:38+0000\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-02-02 12:18+0000\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>\n"
 "Language-Team: Icelandic <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/is/>\n"
 "Language: is\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1550489767.000000\n"
 
 #. W5ukN
@@ -464,7 +464,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Duplicate Sheet"
-msgstr ""
+msgstr "Tvítaka blað"
 
 #. Ui6br
 #: CalcCommands.xcu
@@ -774,7 +774,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr ""
+msgstr "Útværir ten~glar..."
 
 #. FTLfZ
 #: CalcCommands.xcu
@@ -1254,7 +1254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Go to Sheet..."
-msgstr ""
+msgstr "~Fara á blað..."
 
 #. 79aNB
 #: CalcCommands.xcu
@@ -2104,17 +2104,17 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Sparklines"
-msgstr ""
+msgstr "Smágröf"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr ""
+msgid "Sparkline..."
+msgstr "Smágraf..."
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -2124,7 +2124,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Eyða smágrafi"
 
 #. fFsYi
 #: CalcCommands.xcu
@@ -2134,7 +2134,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Eyða hópi smágrafa"
 
 #. w6VdZ
 #: CalcCommands.xcu
@@ -2144,7 +2144,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Hópa smágröf"
 
 #. 9pmpG
 #: CalcCommands.xcu
@@ -2154,7 +2154,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Taka smágröf úr hópi"
 
 #. MRK2s
 #: CalcCommands.xcu
@@ -2164,7 +2164,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline..."
-msgstr ""
+msgstr "Breyta smágrafi..."
 
 #. cA9mm
 #: CalcCommands.xcu
@@ -2174,7 +2174,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline Group..."
-msgstr ""
+msgstr "Breyta hópi smágrafa..."
 
 #. dTXDB
 #: CalcCommands.xcu
@@ -2404,7 +2404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show Hidden Row/Column Indicator"
-msgstr ""
+msgstr "Birta vísir fyrir faldar raðir/dálka"
 
 #. nZGvm
 #: CalcCommands.xcu
@@ -2414,7 +2414,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Hidden Row/Column Indicator"
-msgstr ""
+msgstr "Vísir fyrir faldar raðir/dálka"
 
 #. PMfQA
 #: CalcCommands.xcu
@@ -2424,7 +2424,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show the indicator for hidden rows and columns"
-msgstr ""
+msgstr "Birta vísirinn fyrir faldar raðir og dálka"
 
 #. 2TbE2
 #: CalcCommands.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "~Y-villusúlur..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Gagnatafla..."
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -6535,6 +6545,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Sníða eitt gagnamerki..."
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Setja inn gagnatöflu"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Eyða gagnatöflu"
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -9014,7 +9044,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr ""
+msgstr "Útværir ten~glar..."
 
 #. pQhVJ
 #: DrawImpressCommands.xcu
@@ -10694,7 +10724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Rows Evenly"
-msgstr ""
+msgstr "Dreifa röðum jafnt"
 
 #. tjGQ2
 #: DrawImpressCommands.xcu
@@ -16484,7 +16514,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~Callout Shapes"
-msgstr ""
+msgstr "Tal~blöðruform"
 
 #. cGLti
 #: GenericCommands.xcu
@@ -18374,7 +18404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Find Values"
-msgstr ""
+msgstr "Finna gildi"
 
 #. 9rvmc
 #: GenericCommands.xcu
@@ -18384,7 +18414,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Find text in values, to search in formulas use the dialog"
-msgstr ""
+msgstr "Finna texta í gildum, til að leita í formúlum skaltu nota samskiptagluggann"
 
 #. NCRsb
 #: GenericCommands.xcu
@@ -20186,7 +20216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Up"
-msgstr ""
+msgstr "Færa upp"
 
 #. J83AS
 #: GenericCommands.xcu
@@ -20196,7 +20226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs up one paragraph"
-msgstr ""
+msgstr "Færa valdar málsgreinar upp um eina málsgrein"
 
 #. GvBYt
 #: GenericCommands.xcu
@@ -20216,7 +20246,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Down"
-msgstr ""
+msgstr "Færa niður"
 
 #. ZEVXU
 #: GenericCommands.xcu
@@ -20226,7 +20256,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs down one paragraph"
-msgstr ""
+msgstr "Færa valdar málsgreinar niður um eina málsgrein"
 
 #. KQLPA
 #: GenericCommands.xcu
@@ -20256,7 +20286,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Promote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Færa stig efnisskipunar á völdum listamálsgreinum upp"
 
 #. 3WakF
 #: GenericCommands.xcu
@@ -20316,7 +20346,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Demote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Færa stig efnisskipunar á völdum listamálsgreinum niður"
 
 #. BoAR5
 #: GenericCommands.xcu
@@ -20736,7 +20766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Setja inn OLE-hlut"
 
 #. gB86r
 #: GenericCommands.xcu
@@ -20746,7 +20776,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~OLE Object..."
-msgstr ""
+msgstr "~OLE-hlutur..."
 
 #. zKjoT
 #: GenericCommands.xcu
@@ -20756,7 +20786,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Open dialog to insert OLE object"
-msgstr ""
+msgstr "Opna glugga til að setja inn OLE-hlut"
 
 #. 6B9a2
 #: GenericCommands.xcu
@@ -21006,7 +21036,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Ob~ject"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. o5DE2
 #: GenericCommands.xcu
@@ -21016,7 +21046,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Menu for editing or saving OLE objects"
-msgstr ""
+msgstr "Valmynd til breytinga eða vistunar á OLE-hlutum"
 
 #. WQPXj
 #: GenericCommands.xcu
@@ -21396,7 +21426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Text B~ox and Shape"
-msgstr ""
+msgstr "T~extareitur og lögun"
 
 #. zFyfF
 #: GenericCommands.xcu
@@ -21946,7 +21976,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Merge Cells"
-msgstr ""
+msgstr "Sameina reiti"
 
 #. ktF7K
 #: GenericCommands.xcu
@@ -21956,7 +21986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split Cells..."
-msgstr ""
+msgstr "Kljúfa reiti..."
 
 #. 2gYcx
 #: GenericCommands.xcu
@@ -22066,7 +22096,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select start and end arrowheads for lines."
-msgstr ""
+msgstr "Veldu örvaenda upphafs og enda á línum."
 
 #. FDhkx
 #: GenericCommands.xcu
@@ -22197,26 +22227,6 @@ msgctxt ""
 "value.text"
 msgid "Delete C~ontents..."
 msgstr "E~yða innihaldi..."
-
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Tjáningartákn"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Setja inn tjáningartákn"
 
 #. tEjpF
 #: GenericCommands.xcu
@@ -23477,6 +23487,36 @@ msgctxt ""
 "value.text"
 msgid "Toggle Automatic Spell Checking"
 msgstr "Víxla sjálfvirkri yfirferð stafsetningar af/á"
+
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Sjálfvirk athugun á altækum aðgangi"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "Sjálfvirk athu~gun á altækum aðgangi"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Víxla af/á sjálfvirkri athugun á altækum aðgangi"
 
 #. 4DCmg
 #: GenericCommands.xcu
@@ -25956,7 +25996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Character Font Position..."
-msgstr ""
+msgstr "Leturstaða stafs..."
 
 #. fZufx
 #: GenericCommands.xcu
@@ -25976,7 +26016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~OLE Object"
-msgstr ""
+msgstr "~OLE-hlutur"
 
 #. SQ76T
 #: GenericCommands.xcu
@@ -26256,7 +26296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Anchor Menu"
-msgstr ""
+msgstr "Valmynd festipunkts"
 
 #. oNBG8
 #: GenericCommands.xcu
@@ -26276,7 +26316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Veldu festingu fyrir hlut"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -26476,7 +26516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Columns"
-msgstr ""
+msgstr "Eyða dálkum"
 
 #. AG4Qy
 #: GenericCommands.xcu
@@ -26486,7 +26526,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Columns"
-msgstr ""
+msgstr "Eyða ~dálkum"
 
 #. KxsdA
 #: GenericCommands.xcu
@@ -26496,7 +26536,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected columns"
-msgstr ""
+msgstr "Eyða völdum dálkum"
 
 #. VL8Wa
 #: GenericCommands.xcu
@@ -26506,7 +26546,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Rows"
-msgstr ""
+msgstr "Eyða röðum"
 
 #. uAPr9
 #: GenericCommands.xcu
@@ -26516,7 +26556,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Rows"
-msgstr ""
+msgstr "Eyða ~röðum"
 
 #. wjm8K
 #: GenericCommands.xcu
@@ -26526,7 +26566,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected rows"
-msgstr ""
+msgstr "Eyða völdum röðum"
 
 #. poXFa
 #: GenericCommands.xcu
@@ -26766,7 +26806,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Give a label to identify an object"
-msgstr ""
+msgstr "Gefðu upp merkingu til að auðkenna hlut"
 
 #. k5bGq
 #: GenericCommands.xcu
@@ -26786,7 +26826,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Add descriptions of non-text content (for accessibility)"
-msgstr ""
+msgstr "Bættu við lýsingum á efni sem ekki er texti (fyrir altækt aðgengi)"
 
 #. YwMhY
 #: GenericCommands.xcu
@@ -26856,7 +26896,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "QR and ~Barcode..."
-msgstr ""
+msgstr "QR-~kóðar og strikamerki..."
 
 #. FCYvB
 #: GenericCommands.xcu
@@ -26866,7 +26906,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Edit Barcode..."
-msgstr ""
+msgstr "Br~eyta strikamerki..."
 
 #. HhCdv
 #: GenericCommands.xcu
@@ -27156,7 +27196,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Graphic Size Check..."
-msgstr ""
+msgstr "Athugun á stærð myndefnis..."
 
 #. ACwaJ
 #: GenericCommands.xcu
@@ -28338,6 +28378,16 @@ msgctxt ""
 msgid "~Others"
 msgstr "~Annað"
 
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Opna einindaspjald"
+
 #. uXvss
 #: MathWindowState.xcu
 msgctxt ""
@@ -29036,7 +29086,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Elements"
-msgstr ""
+msgstr "Stök"
 
 #. B4iFE
 #: Sidebar.xcu
@@ -29176,7 +29226,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Properties"
-msgstr ""
+msgstr "Eiginleikar"
 
 #. VwByE
 #: Sidebar.xcu
@@ -29186,7 +29236,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Elements"
-msgstr ""
+msgstr "Stök"
 
 #. hKwDG
 #: Sidebar.xcu
@@ -29246,7 +29296,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Page"
-msgstr ""
+msgstr "Síða"
 
 #. E9FJB
 #: Sidebar.xcu
@@ -30528,15 +30578,15 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Birta rakningu á breytingum"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
-msgstr "Sýna rak~tar breytingar"
+msgid "Show Tracked ~Changes"
+msgstr "Sýna raktar ~breytingar"
 
 #. sMgCx
 #: WriterCommands.xcu
@@ -30597,6 +30647,16 @@ msgctxt ""
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
 msgstr "Birtir hnappa næst við fyrirsagnir og undirfyrirsagnir til að auðvelda útflettingu efnisskipunar. Án þessara hnappa ná samt auðveldlega gera þetta í Uppbygging-glugganum."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Birta efnisskipun upp að stigi..."
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30756,7 +30816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Control Properties"
-msgstr ""
+msgstr "Eiginleikar efnisstýringar"
 
 #. npNpZ
 #: WriterCommands.xcu
@@ -30926,7 +30986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Controls"
-msgstr ""
+msgstr "Stýringar efnis"
 
 #. isyh9
 #: WriterCommands.xcu
@@ -30936,7 +30996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Rich Text Content Control"
-msgstr ""
+msgstr "Setja inn efnisstýringu fyrir sniðinn texta"
 
 #. GH8DZ
 #: WriterCommands.xcu
@@ -30946,7 +31006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Check Box Content Control"
-msgstr ""
+msgstr "Setja inn gátreit efnisstýringar"
 
 #. h2RBS
 #: WriterCommands.xcu
@@ -30956,7 +31016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Drop-Down List Content Control"
-msgstr ""
+msgstr "Setja inn fellilista efnisstýringar"
 
 #. Avn9E
 #: WriterCommands.xcu
@@ -30966,7 +31026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Picture Content Control"
-msgstr ""
+msgstr "Setja inn efnisstýringu fyrir mynd"
 
 #. oxa64
 #: WriterCommands.xcu
@@ -30976,7 +31036,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
-msgstr ""
+msgstr "Setja inn dagsetningu efnisstýringar"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Setja inn efnisstýringu fyrir hreinan texta"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Setja inn valreit efnisstýringar"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -31436,7 +31516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Object Insert Menu"
-msgstr ""
+msgstr "Innsetningarvalmynd OLE-hluta"
 
 #. DE4Ca
 #: WriterCommands.xcu
@@ -31446,7 +31526,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Setja inn OLE-hlut"
 
 #. ESBXG
 #: WriterCommands.xcu
@@ -32078,6 +32158,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Titilsíða..."
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Þýða..."
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32396,7 +32486,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr ""
+msgstr "Útværir ten~glar..."
 
 #. PCFhM
 #: WriterCommands.xcu
@@ -32478,6 +32568,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "R~aðir fyrir ofan"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Setja raðir inn fyrir ofan"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32497,6 +32597,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Raðir ~fyrir neðan"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Setja inn raðir fyrir neðan"
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32518,15 +32628,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Setja inn dálka á undan"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
+msgid "Columns B~efore"
 msgstr "~Dálkar á undan"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Setja inn dálka á undan"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32538,15 +32658,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Setja dálka inn á eftir"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
-msgstr "Dálkar á ~eftir"
+msgid "Columns A~fter"
+msgstr "Dálkar á e~ftir"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Setja inn dálka á eftir"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -32976,7 +33106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level"
-msgstr ""
+msgstr "Færa stig efnisskipanar niður"
 
 #. jzcmc
 #: WriterCommands.xcu
@@ -32996,7 +33126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level"
-msgstr ""
+msgstr "Færa stig efnisskipunar upp"
 
 #. MdLME
 #: WriterCommands.xcu
@@ -33056,7 +33186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up"
-msgstr ""
+msgstr "Færa atriði upp"
 
 #. F6Rc7
 #: WriterCommands.xcu
@@ -33076,7 +33206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down"
-msgstr ""
+msgstr "Færa atriði niður"
 
 #. 2GyQ4
 #: WriterCommands.xcu
@@ -33146,7 +33276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr ""
+msgstr "Niður um eitt stig með undirpunktum"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33166,7 +33296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr ""
+msgstr "Upp um eitt stig með undirpunktum"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33176,7 +33306,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr ""
+msgstr "Færa atriði upp með undirpunktum"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33196,7 +33326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr ""
+msgstr "Færa atriði niður með undirpunktum"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -34086,7 +34216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Column Width"
-msgstr ""
+msgstr "Minnsta breidd dálks"
 
 #. TEEVY
 #: WriterCommands.xcu
@@ -34096,7 +34226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Column Width: Adjust width of selected columns to fit content"
-msgstr ""
+msgstr "Minnsta breidd dálks: Aðlaga breidd valinna dálka að efni"
 
 #. vGAT7
 #: WriterCommands.xcu
@@ -34126,7 +34256,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Row Height"
-msgstr ""
+msgstr "Minnsta hæð raðar"
 
 #. wJUJV
 #: WriterCommands.xcu
@@ -34136,7 +34266,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Row Height: Adjust height of selected rows to fit content"
-msgstr ""
+msgstr "Minnsta hæð raðar: Aðlaga hæð valinna raða að efni"
 
 #. 9RUey
 #: WriterCommands.xcu
@@ -34788,6 +34918,166 @@ msgctxt ""
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Klóna snið (tvísmella og nota Ctrl/Cmd til að breyta hegðun)"
 
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Aðdráttur"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Sýsla með raktar breytingar"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Stafur"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Málsgrein"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Eiginleikar töflu"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Staða og stærð"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Eiginleikar myndar"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Eiginleikar ramma"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "Eiginleikar OLE-hlutar"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Textaskipting"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Jaðrar"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Jaðrar"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Flötur"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Flötur"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Lína"
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Lína"
+
 #. 7PCFf
 #: WriterCommands.xcu
 msgctxt ""
@@ -35426,7 +35716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr ""
+msgstr "Enginn sta~fastíll"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -35436,7 +35726,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Remove applied character style"
-msgstr ""
+msgstr "Fjarlægja virkan stafastíl"
 
 #. idpKA
 #: WriterCommands.xcu
@@ -36376,7 +36666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. nCSvk
 #: WriterFormWindowState.xcu
@@ -36856,7 +37146,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. v45LV
 #: WriterGlobalWindowState.xcu
@@ -37376,7 +37666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. 5GFnw
 #: WriterReportWindowState.xcu
@@ -37676,7 +37966,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. gaswH
 #: WriterWebWindowState.xcu
@@ -38336,7 +38626,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. Tgtuj
 #: WriterWindowState.xcu
@@ -38527,6 +38817,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Staðlað (einfaldur hamur)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Staðlað (einfaldur hamur) - Athugasemd"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Staðlað (einfaldur hamur) - Lögun"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Staðlað (einfaldur hamur) - Texti lögunar"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Staðlað (einfaldur hamur) - Stýring innfyllingarforms"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Staðlað (einfaldur hamur) - Rammi"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Staðlað (einfaldur hamur) - Mynd"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Staðlað (einfaldur hamur) - Myndefni"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Staðlað (einfaldur hamur) - OLE-hlutur"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Staðlað (einfaldur hamur) - Prentskoðun"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Staðlað (einfaldur hamur) - Tafla"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Staðlað (einfaldur hamur) - Texti"
 
 #. h6gRt
 #: WriterWindowState.xcu
@@ -38876,7 +39276,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-hlutur"
 
 #. URXoj
 #: XFormsWindowState.xcu

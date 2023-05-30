@@ -21,6 +21,7 @@
 
 #include <string_view>
 
+#include <utility>
 #include <viewsh.hxx>
 #include <doc.hxx>
 #include <IDocumentLayoutAccess.hxx>
@@ -53,6 +54,13 @@
 #include <frmtool.hxx>
 #include <ndindex.hxx>
 #include <IDocumentSettingAccess.hxx>
+#include <IDocumentRedlineAccess.hxx>
+#include <swmodule.hxx>
+#include <unotextrange.hxx>
+#include <redline.hxx>
+#include <editeng/colritem.hxx>
+#include <editeng/udlnitem.hxx>
+#include <editeng/crossedoutitem.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/awt/CharSet.hpp>
@@ -990,6 +998,36 @@ SwNumberPortion *SwTextFormatter::NewFootnoteNumPortion( SwTextFormatInfo const 
     pNumFnt->SetDiffFnt(&rSet, pIDSA );
     pNumFnt->SetVertical( pNumFnt->GetOrientation(), m_pFrame->IsVertical() );
 
+    // tdf#85610 apply redline coloring to the footnote numbering in the footnote area
+    SwUnoInternalPaM aPam(*pDoc);
+    if ( ::sw::XTextRangeToSwPaM(aPam, xAnchor) )
+    {
+        SwRedlineTable::size_type nRedlinePos = 0;
+        const SwRedlineTable& rTable = pDoc->getIDocumentRedlineAccess().GetRedlineTable();
+        const SwRangeRedline* pRedline = rTable.FindAtPosition( *aPam.Start(), nRedlinePos );
+        if (pRedline)
+        {
+            SwAttrPool& rPool = pDoc->GetAttrPool();
+            SfxItemSetFixed<RES_CHRATR_BEGIN, RES_CHRATR_END-1> aSet(rPool);
+
+            std::size_t aAuthor = (1 < pRedline->GetStackCount())
+                    ? pRedline->GetAuthor( 1 )
+                    : pRedline->GetAuthor();
+
+            if ( RedlineType::Delete == pRedline->GetType() )
+                SW_MOD()->GetDeletedAuthorAttr(aAuthor, aSet);
+            else
+                SW_MOD()->GetInsertAuthorAttr(aAuthor, aSet);
+
+            if (const SvxColorItem* pItem = aSet.GetItemIfSet(RES_CHRATR_COLOR))
+                pNumFnt->SetColor(pItem->GetValue());
+            if (const SvxUnderlineItem* pItem = aSet.GetItemIfSet(RES_CHRATR_UNDERLINE))
+                pNumFnt->SetUnderline(pItem->GetLineStyle());
+            if (const SvxCrossedOutItem* pItem = aSet.GetItemIfSet(RES_CHRATR_CROSSEDOUT))
+                pNumFnt->SetStrikeout( pItem->GetStrikeout() );
+        }
+    }
+
     SwFootnoteNumPortion* pNewPor = new SwFootnoteNumPortion( aFootnoteText, std::move(pNumFnt) );
     pNewPor->SetLeft( !m_pFrame->IsRightToLeft() );
     return pNewPor;
@@ -1313,17 +1351,14 @@ SwFootnoteSave::SwFootnoteSave(const SwTextSizeInfo& rInf, const SwTextFootnote*
         }
 
         // set the correct rotation at the footnote font
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == rSet.GetItemState( RES_CHRATR_ROTATE,
-            true, &pItem ))
-            m_pFnt->SetVertical(static_cast<const SvxCharRotateItem*>(pItem)->GetValue(),
+        if( const SvxCharRotateItem* pItem = rSet.GetItemIfSet( RES_CHRATR_ROTATE ) )
+            m_pFnt->SetVertical(pItem->GetValue(),
                                 rInf.GetTextFrame()->IsVertical());
 
         m_pFnt->ChgPhysFnt(m_pInf->GetVsh(), *m_pInf->GetOut());
 
-        if( SfxItemState::SET == rSet.GetItemState( RES_CHRATR_BACKGROUND,
-            true, &pItem ))
-            m_pFnt->SetBackColor(static_cast<const SvxBrushItem*>(pItem)->GetColor());
+        if( const SvxBrushItem* pItem = rSet.GetItemIfSet( RES_CHRATR_BACKGROUND ) )
+            m_pFnt->SetBackColor(pItem->GetColor());
     }
     else
         m_pFnt = nullptr;
@@ -1408,8 +1443,8 @@ SwFieldPortion *SwQuoVadisPortion::Clone( const OUString &rExpand ) const
     return new SwQuoVadisPortion( rExpand, m_aErgo );
 }
 
-SwQuoVadisPortion::SwQuoVadisPortion( const OUString &rExp, const OUString& rStr )
-    : SwFieldPortion( rExp ), m_aErgo(rStr)
+SwQuoVadisPortion::SwQuoVadisPortion( const OUString &rExp, OUString aStr )
+    : SwFieldPortion( rExp ), m_aErgo(std::move(aStr))
 {
     SetLen(TextFrameIndex(0));
     SetWhichPor( PortionType::QuoVadis );

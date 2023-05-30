@@ -17,18 +17,17 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include "DataInterpreter.hxx"
+#include <DataInterpreter.hxx>
 #include <DataSeries.hxx>
-#include <DataSourceHelper.hxx>
+#include <DataSource.hxx>
 #include <DataSeriesHelper.hxx>
 #include <CommonConverters.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/chart2/data/XDataSink.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
-#include <vector>
 #include <algorithm>
+#include <cstddef>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -54,10 +53,10 @@ DataInterpreter::~DataInterpreter()
 {}
 
 // ____ XDataInterpreter ____
-InterpretedData SAL_CALL DataInterpreter::interpretDataSource(
+InterpretedData DataInterpreter::interpretDataSource(
     const Reference< data::XDataSource >& xSource,
     const Sequence< beans::PropertyValue >& aArguments,
-    const Sequence< Reference< XDataSeries > >& aSeriesToReUse )
+    const std::vector< rtl::Reference< DataSeries > >& aSeriesToReUse )
 {
     if( ! xSource.is())
         return InterpretedData();
@@ -66,10 +65,10 @@ InterpretedData SAL_CALL DataInterpreter::interpretDataSource(
     lcl_ShowDataSource( xSource );
 #endif
 
-    const Sequence< Reference< data::XLabeledDataSequence > > aData( xSource->getDataSequences() );
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aData = getDataSequences(xSource);
 
-    Reference< data::XLabeledDataSequence > xCategories;
-    vector< Reference< data::XLabeledDataSequence > > aSequencesVec;
+    uno::Reference< chart2::data::XLabeledDataSequence > xCategories;
+    vector< uno::Reference< chart2::data::XLabeledDataSequence > > aSequencesVec;
 
     // check if we should use categories
 
@@ -77,13 +76,13 @@ InterpretedData SAL_CALL DataInterpreter::interpretDataSource(
 
     // parse data
     bool bCategoriesUsed = false;
-    for( Reference< data::XLabeledDataSequence > const & labeledData : aData )
+    for( uno::Reference< chart2::data::XLabeledDataSequence > const & labeledData : aData )
     {
         try
         {
             if( bHasCategories && ! bCategoriesUsed )
             {
-                xCategories.set( labeledData );
+                xCategories = labeledData;
                 if( xCategories.is())
                     SetRole( xCategories->getValues(), "categories");
                 bCategoriesUsed = true;
@@ -102,53 +101,50 @@ InterpretedData SAL_CALL DataInterpreter::interpretDataSource(
     }
 
     // create DataSeries
-    sal_Int32 nSeriesIndex = 0;
-    vector< Reference< XDataSeries > > aSeriesVec;
+    std::size_t nSeriesIndex = 0;
+    vector< rtl::Reference< DataSeries > > aSeriesVec;
     aSeriesVec.reserve( aSequencesVec.size());
 
     for (auto const& elem : aSequencesVec)
     {
-        Sequence< Reference< data::XLabeledDataSequence > > aNewData( &elem, 1 );
-        Reference< XDataSeries > xSeries;
-        if( nSeriesIndex < aSeriesToReUse.getLength())
-            xSeries.set( aSeriesToReUse[nSeriesIndex] );
+        std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aNewData { elem };
+        rtl::Reference< DataSeries > xSeries;
+        if( nSeriesIndex < aSeriesToReUse.size())
+            xSeries = aSeriesToReUse[nSeriesIndex];
         else
-            xSeries.set( new DataSeries );
-        OSL_ASSERT( xSeries.is() );
-        Reference< data::XDataSink > xSink( xSeries, uno::UNO_QUERY );
-        OSL_ASSERT( xSink.is() );
-        xSink->setData( aNewData );
+            xSeries = new DataSeries;
+        assert( xSeries.is() );
+        xSeries->setData( aNewData );
 
         aSeriesVec.push_back( xSeries );
         ++nSeriesIndex;
     }
 
-    return InterpretedData( { comphelper::containerToSequence( aSeriesVec ) }, xCategories );
+    return { { aSeriesVec }, xCategories };
 }
 
-InterpretedData SAL_CALL DataInterpreter::reinterpretDataSeries(
+InterpretedData DataInterpreter::reinterpretDataSeries(
     const InterpretedData& aInterpretedData )
 {
     InterpretedData aResult( aInterpretedData );
 
     sal_Int32 i=0;
-    Sequence< Reference< XDataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
-    const sal_Int32 nCount = aSeries.getLength();
+    std::vector< rtl::Reference< DataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
+    const sal_Int32 nCount = aSeries.size();
     for( ; i<nCount; ++i )
     {
         try
         {
-            Reference< data::XDataSource > xSeriesSource( aSeries[i], uno::UNO_QUERY_THROW );
-            Sequence< Reference< data::XLabeledDataSequence > > aNewSequences;
+            std::vector< uno::Reference< data::XLabeledDataSequence > > aNewSequences;
 
             // values-y
-            Reference< data::XLabeledDataSequence > xValuesY(
-                DataSeriesHelper::getDataSequenceByRole( xSeriesSource, "values-y" ));
+            uno::Reference< data::XLabeledDataSequence > xValuesY =
+                DataSeriesHelper::getDataSequenceByRole( aSeries[i], "values-y" );
             // re-use values-... as values-y
             if( ! xValuesY.is())
             {
-                xValuesY.set(
-                    DataSeriesHelper::getDataSequenceByRole( xSeriesSource, "values", true ));
+                xValuesY =
+                    DataSeriesHelper::getDataSequenceByRole( aSeries[i], "values", true );
                 if( xValuesY.is())
                     SetRole( xValuesY->getValues(), "values-y");
             }
@@ -157,8 +153,8 @@ InterpretedData SAL_CALL DataInterpreter::reinterpretDataSeries(
                 aNewSequences = { xValuesY };
             }
 
-            Sequence< Reference< data::XLabeledDataSequence > > aSeqs( xSeriesSource->getDataSequences());
-            if( aSeqs.getLength() != aNewSequences.getLength() )
+            const std::vector< uno::Reference< data::XLabeledDataSequence > > & aSeqs = aSeries[i]->getDataSequences2();
+            if( aSeqs.size() != aNewSequences.size() )
             {
 #ifdef DEBUG_CHART2_TEMPLATE
                 sal_Int32 j=0;
@@ -167,8 +163,7 @@ InterpretedData SAL_CALL DataInterpreter::reinterpretDataSeries(
                     assert( aSeqs[j] == xValuesY && "All sequences should be used" );
                 }
 #endif
-                Reference< data::XDataSink > xSink( xSeriesSource, uno::UNO_QUERY_THROW );
-                xSink->setData( aNewSequences );
+                aSeries[i]->setData( aNewSequences );
             }
         }
         catch( const uno::Exception & )
@@ -181,17 +176,15 @@ InterpretedData SAL_CALL DataInterpreter::reinterpretDataSeries(
 }
 
 // criterion: all series must have exactly one data::XLabeledDataSequence
-sal_Bool SAL_CALL DataInterpreter::isDataCompatible(
-    const chart2::InterpretedData& aInterpretedData )
+bool DataInterpreter::isDataCompatible(
+    const InterpretedData& aInterpretedData )
 {
-    const Sequence< Reference< XDataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
-    for( Reference< XDataSeries > const & i : aSeries )
+    const std::vector< rtl::Reference< DataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
+    for( rtl::Reference< DataSeries > const & i : aSeries )
     {
         try
         {
-            Reference< data::XDataSource > xSrc( i, uno::UNO_QUERY_THROW );
-            Sequence< Reference< data::XLabeledDataSequence > > aSeq( xSrc->getDataSequences());
-            if( aSeq.getLength() != 1 )
+            if( i->getDataSequences2().size() != 1 )
                 return false;
         }
         catch( const uno::Exception & )
@@ -256,27 +249,24 @@ private:
 
 } // anonymous namespace
 
-Reference< data::XDataSource > SAL_CALL DataInterpreter::mergeInterpretedData(
+rtl::Reference< DataSource > DataInterpreter::mergeInterpretedData(
     const InterpretedData& aInterpretedData )
 {
     vector< Reference< data::XLabeledDataSequence > > aResultVec;
-    aResultVec.reserve( aInterpretedData.Series.getLength() +
+    aResultVec.reserve( aInterpretedData.Series.size() +
                         1 // categories
         );
 
     if( aInterpretedData.Categories.is())
         aResultVec.push_back( aInterpretedData.Categories );
 
-    const Sequence< Reference< XDataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
-    for( Reference< XDataSeries > const & dataSeries : aSeries )
+    const std::vector< rtl::Reference< DataSeries > > aSeries = FlattenSequence( aInterpretedData.Series );
+    for( rtl::Reference< DataSeries > const & dataSeries : aSeries )
     {
         try
         {
-            Reference< data::XDataSource > xSrc( dataSeries, uno::UNO_QUERY_THROW );
-            const Sequence< Reference< data::XLabeledDataSequence > > aSeq( xSrc->getDataSequences());
-
             // add all sequences of data series
-            for( Reference< data::XLabeledDataSequence > const & xAdd : aSeq )
+            for( uno::Reference< data::XLabeledDataSequence > const & xAdd : dataSeries->getDataSequences2() )
             {
                 // only add if sequence is not yet in the result
                 if( none_of( aResultVec.begin(), aResultVec.end(),
@@ -292,10 +282,10 @@ Reference< data::XDataSource > SAL_CALL DataInterpreter::mergeInterpretedData(
         }
     }
 
-    return DataSourceHelper::createDataSource( comphelper::containerToSequence( aResultVec ) );
+    return new DataSource(aResultVec);
 }
 
-uno::Any SAL_CALL DataInterpreter::getChartTypeSpecificData(
+uno::Any DataInterpreter::getChartTypeSpecificData(
     const OUString & )
 {
     return uno::Any();
@@ -350,14 +340,14 @@ uno::Any DataInterpreter::GetProperty(
 
 bool DataInterpreter::HasCategories(
     const Sequence< beans::PropertyValue > & rArguments,
-    const Sequence< Reference< data::XLabeledDataSequence > > & rData )
+    const std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > & rData )
 {
     bool bHasCategories = false;
 
     if( rArguments.hasElements() )
         GetProperty( rArguments, u"HasCategories" ) >>= bHasCategories;
 
-    for( sal_Int32 nLSeqIdx=0; ! bHasCategories && nLSeqIdx<rData.getLength(); ++nLSeqIdx )
+    for( std::size_t nLSeqIdx=0; ! bHasCategories && nLSeqIdx<rData.size(); ++nLSeqIdx )
         bHasCategories = ( rData[nLSeqIdx].is() && GetRole( rData[nLSeqIdx]->getValues() ) == "categories");
 
     return bHasCategories;
@@ -384,6 +374,17 @@ sal_Bool SAL_CALL DataInterpreter::supportsService( const OUString& rServiceName
 css::uno::Sequence< OUString > SAL_CALL DataInterpreter::getSupportedServiceNames()
 {
     return { "com.sun.star.chart2.DataInterpreter" };
+}
+
+std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > DataInterpreter::getDataSequences(
+        const css::uno::Reference< css::chart2::data::XDataSource >& xSource)
+{
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aData;
+    for (const Reference< data::XLabeledDataSequence > & rLDS : xSource->getDataSequences() )
+    {
+        aData.push_back(rLDS);
+    }
+    return aData;
 }
 
 } // namespace chart

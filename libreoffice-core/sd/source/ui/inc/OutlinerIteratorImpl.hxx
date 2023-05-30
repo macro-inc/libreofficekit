@@ -54,7 +54,7 @@ public:
         const std::weak_ptr<ViewShell>& rpViewShellWeak,
         bool bDirectionIsForward);
     IteratorImplBase (SdDrawDocument* pDocument,
-        const std::weak_ptr<ViewShell>& rpViewShellWeak,
+        std::weak_ptr<ViewShell> pViewShellWeak,
         bool bDirectionIsForward, PageKind ePageKind, EditMode eEditMode);
     virtual ~IteratorImplBase();
 
@@ -126,7 +126,7 @@ class SelectionIteratorImpl
 {
 public:
     SelectionIteratorImpl (
-        const ::std::vector< ::tools::WeakReference<SdrObject> >& rObjectList,
+        const ::std::vector< ::unotools::WeakReference<SdrObject> >& rObjectList,
         sal_Int32 nObjectIndex,
         SdDrawDocument* pDocument,
         const std::weak_ptr<ViewShell>& rpViewShellWeak,
@@ -140,7 +140,7 @@ public:
     virtual bool operator== (const IteratorImplBase& rIterator) const override;
 
 private:
-    const ::std::vector<::tools::WeakReference<SdrObject>>& mrObjectList;
+    const ::std::vector<::unotools::WeakReference<SdrObject>>& mrObjectList;
     sal_Int32 mnObjectIndex;
 
     /** Compare the given iterator with this object.  This method handles

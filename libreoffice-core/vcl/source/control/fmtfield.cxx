@@ -266,6 +266,7 @@ Formatter::Formatter()
     ,m_bAutoColor(false)
     ,m_bEnableNaN(false)
     ,m_bDisableRemainderFactor(false)
+    ,m_bDefaultValueSet(false)
     ,m_ValueState(valueDirty)
     ,m_dCurrentValue(0)
     ,m_dDefaultValue(0)
@@ -317,7 +318,7 @@ void Formatter::SetTextFormatted(const OUString& rStr)
     // calculate the new selection
     Selection aSel(GetEntrySelection());
     Selection aNewSel(aSel);
-    aNewSel.Justify();
+    aNewSel.Normalize();
     sal_Int32 nNewLen = sFormatted.getLength();
     sal_Int32 nCurrentLen = GetEntryText().getLength();
     if ((nNewLen > nCurrentLen) && (aNewSel.Max() == nCurrentLen))
@@ -416,7 +417,7 @@ void Formatter::ImplSetTextImpl(const OUString& rNew, Selection const * pNewSel)
     else
     {
         Selection aSel(GetEntrySelection());
-        aSel.Justify();
+        aSel.Normalize();
 
         sal_Int32 nNewLen = rNew.getLength();
         sal_Int32 nCurrentLen = GetEntryText().getLength();
@@ -791,7 +792,11 @@ bool Formatter::ImplGetValue(double& dNewVal)
     if (m_ValueState == valueDouble)
         return true;
 
-    dNewVal = m_dDefaultValue;
+    // tdf#155241 default to m_dDefaultValue only if explicitly set
+    // otherwise default to m_dCurrentValue
+    if (m_bDefaultValueSet)
+        dNewVal = m_dDefaultValue;
+
     OUString sText(GetEntryText());
     if (sText.isEmpty())
         return true;
@@ -1091,8 +1096,7 @@ void DoubleCurrencyField::UpdateCurrencyFormat()
      * there's
      * error: request for member 'getNumThousandSep' in 'aLocaleInfo', which is
      * of non-class type 'LocaleDataWrapper(LanguageTag)' */
-    LanguageTag aLanguageTag( eLanguage);
-    LocaleDataWrapper aLocaleInfo( aLanguageTag );
+    LocaleDataWrapper aLocaleInfo(( LanguageTag(eLanguage) ));
 
     OUStringBuffer sNewFormat;
     if (bThSep)
@@ -1107,10 +1111,7 @@ void DoubleCurrencyField::UpdateCurrencyFormat()
     if (nDigits)
     {
         sNewFormat.append(aLocaleInfo.getNumDecimalSep());
-
-        OUStringBuffer sTemp;
-        comphelper::string::padToLength(sTemp, nDigits, '0');
-        sNewFormat.append(sTemp);
+        comphelper::string::padToLength(sNewFormat, sNewFormat.getLength() + nDigits, '0');
     }
 
     if (getPrependCurrSym())
@@ -1190,6 +1191,7 @@ void FormattedField::Up()
 
     sal_Int64 nValue = std::round(rFormatter.GetValue() * nScale);
     sal_Int64 nSpinSize = std::round(rFormatter.GetSpinSize() * nScale);
+    assert(nSpinSize != 0);
     sal_Int64 nRemainder = rFormatter.GetDisableRemainderFactor() || nSpinSize == 0 ? 0 : nValue % nSpinSize;
     if (nValue >= 0)
         nValue = (nRemainder == 0) ? nValue + nSpinSize : nValue + nSpinSize - nRemainder;
@@ -1211,6 +1213,7 @@ void FormattedField::Down()
 
     sal_Int64 nValue = std::round(rFormatter.GetValue() * nScale);
     sal_Int64 nSpinSize = std::round(rFormatter.GetSpinSize() * nScale);
+    assert(nSpinSize != 0);
     sal_Int64 nRemainder = rFormatter.GetDisableRemainderFactor() || nSpinSize == 0 ? 0 : nValue % nSpinSize;
     if (nValue >= 0)
         nValue = (nRemainder == 0) ? nValue - nSpinSize : nValue - nRemainder;
@@ -1258,14 +1261,14 @@ void FormattedField::Modify()
 
 bool FormattedField::PreNotify(NotifyEvent& rNEvt)
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT)
+    if (rNEvt.GetType() == NotifyEventType::KEYINPUT)
         GetFormatter().SetLastSelection(GetSelection());
     return SpinField::PreNotify(rNEvt);
 }
 
 bool FormattedField::EventNotify(NotifyEvent& rNEvt)
 {
-    if ((rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !IsReadOnly())
+    if ((rNEvt.GetType() == NotifyEventType::KEYINPUT) && !IsReadOnly())
     {
         const KeyEvent& rKEvt = *rNEvt.GetKeyEvent();
         sal_uInt16 nMod = rKEvt.GetKeyCode().GetModifier();
@@ -1287,7 +1290,7 @@ bool FormattedField::EventNotify(NotifyEvent& rNEvt)
         }
     }
 
-    if ((rNEvt.GetType() == MouseNotifyEvent::COMMAND) && !IsReadOnly())
+    if ((rNEvt.GetType() == NotifyEventType::COMMAND) && !IsReadOnly())
     {
         const CommandEvent* pCommand = rNEvt.GetCommandEvent();
         if (pCommand->GetCommand() == CommandEventId::Wheel)
@@ -1305,7 +1308,7 @@ bool FormattedField::EventNotify(NotifyEvent& rNEvt)
         }
     }
 
-    if (rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS && m_pFormatter)
+    if (rNEvt.GetType() == NotifyEventType::LOSEFOCUS && m_pFormatter)
         m_pFormatter->EntryLostFocus();
 
     return SpinField::EventNotify( rNEvt );

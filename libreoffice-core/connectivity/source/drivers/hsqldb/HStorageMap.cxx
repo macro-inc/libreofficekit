@@ -27,7 +27,7 @@
 #include <sal/log.hxx>
 #include <uno/mapping.hxx>
 #include <algorithm>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace connectivity::hsqldb
 {
@@ -132,9 +132,9 @@ namespace connectivity::hsqldb
             return OUString::number(s_nCount++);
         }
 
-        OUString StorageContainer::removeURLPrefix(const OUString& _sURL,const OUString& _sFileURL)
+        OUString StorageContainer::removeURLPrefix(std::u16string_view _sURL, std::u16string_view _sFileURL)
         {
-            return _sURL.copy(_sFileURL.getLength()+1);
+            return OUString(_sURL.substr(_sFileURL.size()+1));
         }
 
         OUString StorageContainer::removeOldURLPrefix(const OUString& _sURL)

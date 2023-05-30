@@ -26,8 +26,6 @@
 #include <com/sun/star/view/PaperFormat.hpp>
 #include <com/sun/star/view/PaperOrientation.hpp>
 #include <com/sun/star/ucb/NameClash.hpp>
-#include <com/sun/star/ucb/ContentCreationException.hpp>
-#include <com/sun/star/ucb/CommandAbortedException.hpp>
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/view/DuplexMode.hpp>
 #include <comphelper/processfactory.hxx>
@@ -37,11 +35,11 @@
 #include <osl/file.hxx>
 #include <osl/thread.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <ucbhelper/content.hxx>
-#include <comphelper/multicontainer2.hxx>
-#include <osl/mutex.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 
@@ -59,12 +57,12 @@ using namespace ::com::sun::star::uno;
 struct IMPL_PrintListener_DataContainer : public SfxListener
 {
     SfxObjectShellRef                               m_pObjectShell;
-    comphelper::OMultiTypeInterfaceContainerHelper2 m_aInterfaceContainer;
+    std::mutex                                      m_aMutex;
+    comphelper::OInterfaceContainerHelper4<view::XPrintJobListener> m_aJobListeners;
     uno::Reference< css::view::XPrintJob>           m_xPrintJob;
     css::uno::Sequence< css::beans::PropertyValue > m_aPrintOptions;
 
-    explicit IMPL_PrintListener_DataContainer( ::osl::Mutex& aMutex)
-            :   m_aInterfaceContainer   ( aMutex )
+    explicit IMPL_PrintListener_DataContainer()
     {
     }
 
@@ -144,7 +142,7 @@ void SAL_CALL SfxPrintJob_Impl::cancelJob()
 
 SfxPrintHelper::SfxPrintHelper()
 {
-    m_pData.reset(new IMPL_PrintListener_DataContainer(m_aMutex));
+    m_pData.reset(new IMPL_PrintListener_DataContainer());
 }
 
 void SAL_CALL SfxPrintHelper::initialize( const css::uno::Sequence< css::uno::Any >& aArguments )
@@ -463,13 +461,13 @@ class ImplUCBPrintWatcher : public ::osl::Thread
         /// this describes the target location for the printed temp file
         OUString m_sTargetURL;
         /// it holds the temp file alive, till the print job will finish and remove it from disk automatically if the object die
-        ::utl::TempFile* m_pTempFile;
+        ::utl::TempFileNamed* m_pTempFile;
 
     public:
         /* initialize this watcher but don't start it */
-        ImplUCBPrintWatcher( SfxPrinter* pPrinter, ::utl::TempFile* pTempFile, const OUString& sTargetURL )
+        ImplUCBPrintWatcher( SfxPrinter* pPrinter, ::utl::TempFileNamed* pTempFile, OUString sTargetURL )
                 : m_pPrinter  ( pPrinter   )
-                , m_sTargetURL( sTargetURL )
+                , m_sTargetURL(std::move( sTargetURL ))
                 , m_pTempFile ( pTempFile  )
         {}
 
@@ -510,7 +508,7 @@ class ImplUCBPrintWatcher : public ::osl::Thread
            the thread, if finishing of the job was detected outside this thread.
            But it must be called without using a corresponding thread for the given parameter!
          */
-        static void moveAndDeleteTemp( ::utl::TempFile** ppTempFile, const OUString& sTargetURL )
+        static void moveAndDeleteTemp( ::utl::TempFileNamed** ppTempFile, std::u16string_view sTargetURL )
         {
             // move the file
             try
@@ -579,7 +577,7 @@ void SAL_CALL SfxPrintHelper::print(const uno::Sequence< beans::PropertyValue >&
     // a local one we can suppress this special handling. Because then vcl makes all
     // right for us.
     OUString sUcbUrl;
-    ::utl::TempFile* pUCBPrintTempFile = nullptr;
+    ::utl::TempFileNamed* pUCBPrintTempFile = nullptr;
 
     uno::Sequence < beans::PropertyValue > aCheckedArgs( rOptions.getLength() );
     auto pCheckedArgs = aCheckedArgs.getArray();
@@ -656,7 +654,7 @@ void SAL_CALL SfxPrintHelper::print(const uno::Sequence< beans::PropertyValue >&
                 // Execution of the print job will be done later by executing
                 // a slot ...
                 if(!pUCBPrintTempFile)
-                    pUCBPrintTempFile = new ::utl::TempFile();
+                    pUCBPrintTempFile = new ::utl::TempFileNamed();
                 pUCBPrintTempFile->EnableKillingFile();
 
                 //FIXME: does it work?
@@ -694,6 +692,15 @@ void SAL_CALL SfxPrintHelper::print(const uno::Sequence< beans::PropertyValue >&
                 throw css::lang::IllegalArgumentException();
             pCheckedArgs[nProps].Name = "SinglePrintJobs";
             pCheckedArgs[nProps++].Value <<= bTemp;
+        }
+
+        else if ( rProp.Name == "JobName" )
+        {
+            OUString sTemp;
+            if( !(rProp.Value >>= sTemp) )
+                throw css::lang::IllegalArgumentException();
+            pCheckedArgs[nProps].Name = rProp.Name;
+            pCheckedArgs[nProps++].Value <<= sTemp;
         }
 
         // Pages-Property
@@ -781,30 +788,29 @@ void IMPL_PrintListener_DataContainer::Notify( SfxBroadcaster& rBC, const SfxHin
         m_aPrintOptions = pPrintHint->GetOptions();
     }
 
-    comphelper::OInterfaceContainerHelper2* pContainer = m_aInterfaceContainer.getContainer(
-        cppu::UnoType<view::XPrintJobListener>::get());
-    if ( !pContainer )
+    std::unique_lock aGuard(m_aMutex);
+    if (!m_aJobListeners.getLength(aGuard))
         return;
-
     view::PrintJobEvent aEvent;
     aEvent.Source = m_xPrintJob;
     aEvent.State = pPrintHint->GetWhich();
 
-    comphelper::OInterfaceIteratorHelper2 pIterator(*pContainer);
+    comphelper::OInterfaceIteratorHelper4 pIterator(aGuard, m_aJobListeners);
+    aGuard.unlock();
     while (pIterator.hasMoreElements())
-        static_cast<view::XPrintJobListener*>(pIterator.next())->printJobEvent( aEvent );
+        pIterator.next()->printJobEvent( aEvent );
 }
 
 void SAL_CALL SfxPrintHelper::addPrintJobListener( const css::uno::Reference< css::view::XPrintJobListener >& xListener )
 {
-    SolarMutexGuard aGuard;
-    m_pData->m_aInterfaceContainer.addInterface( cppu::UnoType<view::XPrintJobListener>::get(), xListener );
+    std::unique_lock aGuard(m_pData->m_aMutex);
+    m_pData->m_aJobListeners.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL SfxPrintHelper::removePrintJobListener( const css::uno::Reference< css::view::XPrintJobListener >& xListener )
 {
-    SolarMutexGuard aGuard;
-    m_pData->m_aInterfaceContainer.removeInterface( cppu::UnoType<view::XPrintJobListener>::get(), xListener );
+    std::unique_lock aGuard(m_pData->m_aMutex);
+    m_pData->m_aJobListeners.removeInterface( aGuard, xListener );
 }
 
 

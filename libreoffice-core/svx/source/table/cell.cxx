@@ -27,9 +27,11 @@
 
 #include <comphelper/sequence.hxx>
 #include <o3tl/any.hxx>
+#include <svl/grabbagitem.hxx>
 #include <svl/style.hxx>
 #include <svl/itemset.hxx>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <libxml/xmlwriter.h>
 
@@ -55,9 +57,10 @@
 #include <editeng/charrotateitem.hxx>
 #include <svx/xflbstit.hxx>
 #include <svx/xflbmtit.hxx>
+#include <svx/xlnclit.hxx>
 #include <svx/svdpool.hxx>
 #include <svx/xflclit.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 
 using ::editeng::SvxBorderLine;
@@ -79,14 +82,14 @@ static const SvxItemPropertySet* ImplGetSvxCellPropertySet()
         FILL_PROPERTIES
 //      { "HasLevels",                    OWN_ATTR_HASLEVELS,             cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::READONLY,      0},
         { u"Style",                        OWN_ATTR_STYLE,                 cppu::UnoType< css::style::XStyle >::get(),                                    css::beans::PropertyAttribute::MAYBEVOID, 0},
-        { u"" UNO_NAME_TEXT_WRITINGMODE,      SDRATTR_TEXTDIRECTION,          cppu::UnoType<css::text::WritingMode>::get(),                         0,      0},
-        { u"" UNO_NAME_TEXT_HORZADJUST,       SDRATTR_TEXT_HORZADJUST,        cppu::UnoType<css::drawing::TextHorizontalAdjust>::get(),  0,      0},
-        { u"" UNO_NAME_TEXT_LEFTDIST,         SDRATTR_TEXT_LEFTDIST,          cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
-        { u"" UNO_NAME_TEXT_LOWERDIST,        SDRATTR_TEXT_LOWERDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
-        { u"" UNO_NAME_TEXT_RIGHTDIST,        SDRATTR_TEXT_RIGHTDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
-        { u"" UNO_NAME_TEXT_UPPERDIST,        SDRATTR_TEXT_UPPERDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
-        { u"" UNO_NAME_TEXT_VERTADJUST,       SDRATTR_TEXT_VERTADJUST,        cppu::UnoType<css::drawing::TextVerticalAdjust>::get(),    0,      0},
-        { u"" UNO_NAME_TEXT_WORDWRAP,         SDRATTR_TEXT_WORDWRAP,          cppu::UnoType<bool>::get(),        0,      0},
+        { UNO_NAME_TEXT_WRITINGMODE,      SDRATTR_TEXTDIRECTION,          cppu::UnoType<css::text::WritingMode>::get(),                         0,      0},
+        { UNO_NAME_TEXT_HORZADJUST,       SDRATTR_TEXT_HORZADJUST,        cppu::UnoType<css::drawing::TextHorizontalAdjust>::get(),  0,      0},
+        { UNO_NAME_TEXT_LEFTDIST,         SDRATTR_TEXT_LEFTDIST,          cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
+        { UNO_NAME_TEXT_LOWERDIST,        SDRATTR_TEXT_LOWERDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
+        { UNO_NAME_TEXT_RIGHTDIST,        SDRATTR_TEXT_RIGHTDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
+        { UNO_NAME_TEXT_UPPERDIST,        SDRATTR_TEXT_UPPERDIST,         cppu::UnoType<sal_Int32>::get(),        0,      0, PropertyMoreFlags::METRIC_ITEM},
+        { UNO_NAME_TEXT_VERTADJUST,       SDRATTR_TEXT_VERTADJUST,        cppu::UnoType<css::drawing::TextVerticalAdjust>::get(),    0,      0},
+        { UNO_NAME_TEXT_WORDWRAP,         SDRATTR_TEXT_WORDWRAP,          cppu::UnoType<bool>::get(),        0,      0},
 
         { u"TableBorder",                  OWN_ATTR_TABLEBORDER,           cppu::UnoType<TableBorder>::get(), 0, 0 },
         { u"TopBorder",                    SDRATTR_TABLE_BORDER,           cppu::UnoType<BorderLine>::get(), 0, TOP_BORDER },
@@ -94,11 +97,11 @@ static const SvxItemPropertySet* ImplGetSvxCellPropertySet()
         { u"LeftBorder",                   SDRATTR_TABLE_BORDER,           cppu::UnoType<BorderLine>::get(), 0, LEFT_BORDER },
         { u"RightBorder",                  SDRATTR_TABLE_BORDER,           cppu::UnoType<BorderLine>::get(), 0, RIGHT_BORDER },
         { u"RotateAngle",                  SDRATTR_TABLE_TEXT_ROTATION,    cppu::UnoType<sal_Int32>::get(), 0, 0 },
+        { u"CellInteropGrabBag",           SDRATTR_TABLE_GRABBAG,          cppu::UnoType<css::uno::Sequence<css::beans::PropertyValue>>::get(), 0, 0},
 
         SVX_UNOEDIT_OUTLINER_PROPERTIES,
         SVX_UNOEDIT_CHAR_PROPERTIES,
         SVX_UNOEDIT_PARA_PROPERTIES,
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
     static SvxItemPropertySet aSvxCellPropertySet( aSvxCellPropertyMap, SdrObject::GetGlobalDrawObjectItemPool() );
@@ -111,7 +114,7 @@ namespace
 class CellTextProvider : public svx::ITextProvider
 {
 public:
-    explicit CellTextProvider(const sdr::table::CellRef& rCell);
+    explicit CellTextProvider(sdr::table::CellRef xCell);
     virtual ~CellTextProvider();
 
 private:
@@ -122,8 +125,8 @@ private:
     const sdr::table::CellRef m_xCell;
 };
 
-CellTextProvider::CellTextProvider(const sdr::table::CellRef& rCell)
-    : m_xCell(rCell)
+CellTextProvider::CellTextProvider(sdr::table::CellRef xCell)
+    : m_xCell(std::move(xCell))
 {
 }
 
@@ -167,7 +170,7 @@ namespace sdr::properties
 
             void ForceDefaultAttributes() override;
 
-            void ItemSetChanged(const SfxItemSet*) override;
+            void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich) override;
 
             void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
 
@@ -223,7 +226,7 @@ namespace sdr::properties
         {
         }
 
-        void CellProperties::ItemSetChanged(const SfxItemSet* pSet )
+        void CellProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich)
         {
             SdrTextObj& rObj = static_cast<SdrTextObj&>(GetSdrObject());
 
@@ -254,12 +257,15 @@ namespace sdr::properties
                     // if the user sets character attributes to the complete
                     // cell we want to remove all hard set character attributes
                     // with same which ids from the text
-                    std::vector<sal_uInt16> aCharWhichIds(GetAllCharPropIds(*pSet));
+                    std::vector<sal_uInt16> aCharWhichIds(GetAllCharPropIds(aChangedItems));
 
                     for(sal_Int32 nPara = 0; nPara < nParaCount; nPara++)
                     {
                         SfxItemSet aSet(pOutliner->GetParaAttribs(nPara));
-                        aSet.Put(*pSet);
+                        for (const SfxPoolItem* pItem : aChangedItems)
+                            aSet.Put(*pItem);
+                        if (nDeletedWhich)
+                            aSet.ClearItem(nDeletedWhich);
 
                         for (const auto& rWhichId : aCharWhichIds)
                         {
@@ -289,7 +295,7 @@ namespace sdr::properties
             }
 
             // call parent
-            AttributeProperties::ItemSetChanged(pSet);
+            AttributeProperties::ItemSetChanged(aChangedItems, nDeletedWhich);
 
             if( mxCell.is() )
                 mxCell->notifyModified();
@@ -305,14 +311,13 @@ namespace sdr::properties
                 rObj.SetVerticalWriting(bVertical);
 
                 // Set a cell vertical property
-                std::optional<OutlinerParaObject> pParaObj = mxCell->CreateEditOutlinerParaObject();
+                std::optional<OutlinerParaObject> pEditParaObj = mxCell->CreateEditOutlinerParaObject();
 
-                if( !pParaObj && mxCell->GetOutlinerParaObject() )
-                    pParaObj = *mxCell->GetOutlinerParaObject();
-
-                if(pParaObj)
+                if( !pEditParaObj && mxCell->GetOutlinerParaObject() )
                 {
-                    pParaObj->SetVertical(bVertical);
+                    OutlinerParaObject* pParaObj = mxCell->GetOutlinerParaObject();
+                    if(pParaObj)
+                        pParaObj->SetVertical(bVertical);
                 }
             }
 
@@ -321,22 +326,23 @@ namespace sdr::properties
                 const SvxTextRotateItem* pRotateItem = static_cast<const SvxTextRotateItem*>(pNewItem);
 
                 // Set a cell vertical property
-                std::optional<OutlinerParaObject> pParaObj = mxCell->CreateEditOutlinerParaObject();
+                std::optional<OutlinerParaObject> pEditParaObj = mxCell->CreateEditOutlinerParaObject();
 
-                if (!pParaObj && mxCell->GetOutlinerParaObject())
-                    pParaObj = *mxCell->GetOutlinerParaObject();
-
-                if (pParaObj)
+                if (!pEditParaObj && mxCell->GetOutlinerParaObject())
                 {
-                    if(pRotateItem->IsVertical() && pRotateItem->IsTopToBottom())
-                        pParaObj->SetRotation(TextRotation::TOPTOBOTTOM);
-                    else if (pRotateItem->IsVertical())
-                        pParaObj->SetRotation(TextRotation::BOTTOMTOTOP);
-                    else
-                        pParaObj->SetRotation(TextRotation::NONE);
+                    OutlinerParaObject* pParaObj = mxCell->GetOutlinerParaObject();
+                    if (pParaObj)
+                    {
+                        if(pRotateItem->IsVertical() && pRotateItem->IsTopToBottom())
+                            pParaObj->SetRotation(TextRotation::TOPTOBOTTOM);
+                        else if (pRotateItem->IsVertical())
+                            pParaObj->SetRotation(TextRotation::BOTTOMTOTOP);
+                        else
+                            pParaObj->SetRotation(TextRotation::NONE);
+                    }
                 }
 
-               // Change autogrow direction
+                // Change autogrow direction
                 SdrTextObj& rObj = static_cast<SdrTextObj&>(GetSdrObject());
 
                 // rescue object size
@@ -634,7 +640,7 @@ void Cell::SetStyleSheet( SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAttr )
 
     if( mpProperties && (mpProperties->GetStyleSheet() != pStyleSheet) )
     {
-        mpProperties->SetStyleSheet( pStyleSheet, bDontRemoveHardAttr );
+        mpProperties->SetStyleSheet( pStyleSheet, bDontRemoveHardAttr, true );
     }
 }
 
@@ -863,13 +869,13 @@ Any SAL_CALL Cell::queryInterface( const Type & rType )
 
 void SAL_CALL Cell::acquire() noexcept
 {
-    ::cppu::OWeakObject::acquire();
+    SdrText::acquire();
 }
 
 
 void SAL_CALL Cell::release() noexcept
 {
-    ::cppu::OWeakObject::release();
+    SdrText::release();
 }
 
 
@@ -1101,6 +1107,14 @@ void SAL_CALL Cell::setPropertyValue( const OUString& rPropertyName, const Any& 
             mpProperties->SetObjectItem(SvxTextRotateItem(Degree10(nRotVal/10), SDRATTR_TABLE_TEXT_ROTATION));
             return;
         }
+        case SDRATTR_TABLE_GRABBAG:
+        {
+            if (mpGrabBagItem == nullptr)
+                mpGrabBagItem.reset(new SfxGrabBagItem);
+
+            mpGrabBagItem->PutValue(rValue, 0);
+            return;
+        }
         default:
         {
             SfxItemSet aSet(GetObject().getSdrModelFromSdrObject().GetItemPool(), pMap->nWID, pMap->nWID);
@@ -1221,6 +1235,17 @@ Any SAL_CALL Cell::getPropertyValue( const OUString& PropertyName )
             const SvxTextRotateItem& rTextRotate = mpProperties->GetItem(SDRATTR_TABLE_TEXT_ROTATION);
             return Any(sal_Int32(to<Degree100>(rTextRotate.GetValue())));
         }
+        case SDRATTR_TABLE_GRABBAG:
+        {
+            if (mpGrabBagItem != nullptr)
+            {
+                Any aGrabBagSequence;
+                mpGrabBagItem->QueryValue(aGrabBagSequence);
+                return aGrabBagSequence;
+            }
+            else
+                return Any{css::uno::Sequence<css::beans::PropertyValue>()};
+        }
         default:
         {
             SfxItemSet aSet(GetObject().getSdrModelFromSdrObject().GetItemPool(), pMap->nWID, pMap->nWID);
@@ -1279,6 +1304,9 @@ void SAL_CALL Cell::setPropertyValues( const Sequence< OUString >& aPropertyName
         throw DisposedException();
 
     const sal_Int32 nCount = aPropertyNames.getLength();
+    if (nCount != aValues.getLength())
+        throw css::lang::IllegalArgumentException("lengths do not match",
+                                                  static_cast<cppu::OWeakObject*>(this), -1);
 
     const OUString* pNames = aPropertyNames.getConstArray();
     const Any* pValues = aValues.getConstArray();
@@ -1447,7 +1475,7 @@ PropertyState SAL_CALL Cell::getPropertyState( const OUString& PropertyName )
                     if (pMap->nMemberId == MID_COLOR_THEME_INDEX)
                     {
                         const XFillColorItem* pColor = rSet.GetItem<XFillColorItem>(pMap->nWID);
-                        if (pColor->GetThemeColor().GetThemeIndex() == -1)
+                        if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
                         {
                             eState = PropertyState_DEFAULT_VALUE;
                         }
@@ -1455,7 +1483,13 @@ PropertyState SAL_CALL Cell::getPropertyState( const OUString& PropertyName )
                     else if (pMap->nMemberId == MID_COLOR_LUM_MOD)
                     {
                         const XFillColorItem* pColor = rSet.GetItem<XFillColorItem>(pMap->nWID);
-                        if (pColor->GetThemeColor().GetLumMod() == 10000)
+                        sal_Int16 nLumMod = 10000;
+                        for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                        {
+                            if (rTransform.meType == model::TransformationType::LumMod)
+                                nLumMod = rTransform.mnValue;
+                        }
+                        if (nLumMod == 10000)
                         {
                             eState = PropertyState_DEFAULT_VALUE;
                         }
@@ -1463,11 +1497,36 @@ PropertyState SAL_CALL Cell::getPropertyState( const OUString& PropertyName )
                     else if (pMap->nMemberId == MID_COLOR_LUM_OFF)
                     {
                         const XFillColorItem* pColor = rSet.GetItem<XFillColorItem>(pMap->nWID);
-                        if (pColor->GetThemeColor().GetLumOff() == 0)
+                        sal_Int16 nLumOff = 0;
+                        for (auto const& rTransform : pColor->GetThemeColor().getTransformations())
+                        {
+                            if (rTransform.meType == model::TransformationType::LumOff)
+                                nLumOff = rTransform.mnValue;
+                        }
+                        if (nLumOff == 0)
                         {
                             eState = PropertyState_DEFAULT_VALUE;
                         }
                     }
+                    else if (pMap->nMemberId == MID_COLOR_THEME_REFERENCE)
+                    {
+                        const XFillColorItem* pColor = rSet.GetItem<XFillColorItem>(pMap->nWID);
+                        if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
+                        {
+                            eState = PropertyState_DEFAULT_VALUE;
+                        }
+                    }
+                    break;
+                case XATTR_LINECOLOR:
+                    if (pMap->nMemberId == MID_COLOR_THEME_REFERENCE)
+                    {
+                        auto const* pColor = rSet.GetItem<XLineColorItem>(pMap->nWID);
+                        if (pColor->GetThemeColor().getType() == model::ThemeColorType::Unknown)
+                        {
+                            eState = PropertyState_DEFAULT_VALUE;
+                        }
+                    }
+                    break;
                 }
             }
         }

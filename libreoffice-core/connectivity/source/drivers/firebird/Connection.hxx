@@ -104,7 +104,7 @@ namespace connectivity::firebird
              * The extracted .fbk is written in firebird.fbk, the temporary
              * .fdb is stored as firebird.fdb.
              */
-            std::unique_ptr< ::utl::TempFile >  m_pDatabaseFileDir;
+            std::unique_ptr< ::utl::TempFileNamed >  m_pDatabaseFileDir;
             /**
              * Path for our extracted .fbk file.
              *
@@ -210,7 +210,7 @@ namespace connectivity::firebird
             DECLARE_SERVICE_INFO();
             // XUnoTunnel
             virtual sal_Int64 SAL_CALL getSomething(const css::uno::Sequence<sal_Int8>& rId) override;
-            static css::uno::Sequence<sal_Int8> getUnoTunnelId();
+            static const css::uno::Sequence<sal_Int8> & getUnoTunnelId();
             // XConnection
             virtual css::uno::Reference< css::sdbc::XStatement > SAL_CALL createStatement(  ) override;
             virtual css::uno::Reference< css::sdbc::XPreparedStatement > SAL_CALL prepareStatement( const OUString& sql ) override;

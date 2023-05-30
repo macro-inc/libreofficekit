@@ -17,6 +17,8 @@
 
 #include "clang/AST/Attr.h"
 
+#include "config_clang.h"
+
 #include "plugin.hxx"
 
 namespace {
@@ -74,6 +76,7 @@ void ReservedId::postRun() {
                     // extensions/source/activex/StdAfx2.h
                 && id != "_ATL_STATIC_REGISTRY"
                     // extensions/source/activex/StdAfx2.h
+                && id != "_CRT_RAND_S" // sal/osl/w32/random.cxx
                 && id != "_GLIBCXX_CDTOR_CALLABI"
                 && id != "_HAS_AUTO_PTR_ETC" // unotools/source/i18n/resmgr.cxx
                 && id != "_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR" // unotools/source/i18n/resmgr.cxx
@@ -110,16 +113,14 @@ void ReservedId::postRun() {
                 for (;;) {
                     if (d->getKind() == MacroDirective::MD_Define) {
                         auto loc = d->getLocation();
-                        if (loc.isValid() && !ignoreLocation(loc)) {
+                        if (loc.isValid() && !ignoreLocation(loc) && !suppressWarningAt(loc)) {
                             auto file = getFilenameOfLocation(loc);
-                            if (!loplugin::isSamePathname(
+                            if (!loplugin::isSameUnoIncludePathname(
                                     file,
-                                    SRCDIR
-                                        "/include/cppuhelper/implbase_ex_post.hxx")
-                                && !loplugin::isSamePathname(
+                                    "cppuhelper/implbase_ex_post.hxx")
+                                && !loplugin::isSameUnoIncludePathname(
                                     file,
-                                    SRCDIR
-                                        "/include/cppuhelper/implbase_ex_pre.hxx"))
+                                    "cppuhelper/implbase_ex_pre.hxx"))
                             {
                                 report(
                                     DiagnosticsEngine::Warning,
@@ -168,8 +169,6 @@ bool ReservedId::VisitNamedDecl(NamedDecl const * decl) {
                 // vcl/source/window/cairo_cairo.cxx -> include/vcl/sysdata.hxx
             && s != "__CxxDetectRethrow"
                 // bridges/source/cpp_uno/msvc_win32_x86-64/mscx.hxx
-            && s != "__GLXcontextRec" // vcl/unx/glxtest.cxx
-            && s != "__GLXFBConfigRec" // vcl/unx/glxtest.cxx
             && s != "__PK11_GetKeyData"
                 // xmlsecurity/source/xmlsec/nss/nssrenam.h
             && s != "__current_exception" // bridges/inc/except.hxx, Windows
@@ -208,10 +207,16 @@ bool ReservedId::VisitNamedDecl(NamedDecl const * decl) {
                 // vcl/unx/gtk/xid_fullscreen_on_all_monitors.c
             && s != "_GstVideoOverlay"
                 // avmedia/source/gstreamer/gstplayer.hxx
+            && s != "_GtkMediaStream"
+                // avmedia/source/gtk/gtkplayer.hxx
+            && s != "_GtkWidget"
+                // avmedia/source/gtk/gtkplayer.hxx
             && s != "_Module" // extensions/source/activex/StdAfx2.h, CComModule
             && s != "_NotifyingLayout" // vcl/unx/gtk4/notifyinglayout.cxx
             && s != "_SurfacePaintable" // vcl/unx/gtk3/gtkinst.cxx
             && s != "_SurfacePaintableClass" // vcl/unx/gtk3/gtkinst.cxx
+            && s != "_SurfaceCellRenderer" // vcl/unx/gtk4/surfacecellrenderer.cxx
+            && s != "_SurfaceCellRendererClass" // vcl/unx/gtk4/surfacecellrenderer.cxx
             && s != "_TransferableContent" // vcl/unx/gtk4/transferableprovider.cxx
             && s != "_TransferableContentClass" // vcl/unx/gtk4/transferableprovider.cxx
             && s != "_XRegion" // vcl/unx/generic/gdi/x11cairotextrender.cxx

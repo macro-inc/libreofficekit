@@ -17,10 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <xeescher.hxx>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 #include <com/sun/star/awt/VisualEffect.hpp>
 #include <com/sun/star/awt/ScrollBarOrientation.hpp>
@@ -57,7 +57,6 @@
 #include <userdat.hxx>
 #include <drwlayer.hxx>
 #include <svl/itemset.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/sdtaitm.hxx>
 #include <document.hxx>
 #include <svx/xfillit0.hxx>
@@ -386,8 +385,8 @@ XclExpMsoDrawing::XclExpMsoDrawing( XclEscherEx& rEscherEx ) :
 {
 }
 
-XclExpImgData::XclExpImgData( const Graphic& rGraphic, sal_uInt16 nRecId ) :
-    maGraphic( rGraphic ),
+XclExpImgData::XclExpImgData( Graphic aGraphic, sal_uInt16 nRecId ) :
+    maGraphic(std::move( aGraphic )),
     mnRecId( nRecId )
 {
 }
@@ -527,10 +526,10 @@ void XclExpControlHelper::WriteFormulaSubRec( XclExpStream& rStrm, sal_uInt16 nS
 //#if EXC_EXP_OCX_CTRL
 
 XclExpOcxControlObj::XclExpOcxControlObj( XclExpObjectManager& rObjMgr, Reference< XShape > const & xShape,
-        const tools::Rectangle* pChildAnchor, const OUString& rClassName, sal_uInt32 nStrmStart, sal_uInt32 nStrmSize ) :
+        const tools::Rectangle* pChildAnchor, OUString aClassName, sal_uInt32 nStrmStart, sal_uInt32 nStrmSize ) :
     XclObj( rObjMgr, EXC_OBJTYPE_PICTURE, true ),
     XclExpControlHelper( rObjMgr.GetRoot() ),
-    maClassName( rClassName ),
+    maClassName(std::move( aClassName )),
     mnStrmStart( nStrmStart ),
     mnStrmSize( nStrmSize )
 {
@@ -1100,7 +1099,7 @@ class VmlFormControlExporter : public oox::vml::VMLExport
 public:
     VmlFormControlExporter(const sax_fastparser::FSHelperPtr& p, sal_uInt16 nObjType,
                            const tools::Rectangle& rAreaFrom, const tools::Rectangle& rAreaTo,
-                           const OUString& rLabel, const OUString& rMacroName);
+                           OUString aLabel, OUString aMacroName);
 
 protected:
     using VMLExport::StartShape;
@@ -1113,13 +1112,13 @@ VmlFormControlExporter::VmlFormControlExporter(const sax_fastparser::FSHelperPtr
                                                sal_uInt16 nObjType,
                                                const tools::Rectangle& rAreaFrom,
                                                const tools::Rectangle& rAreaTo,
-                                               const OUString& rLabel, const OUString& rMacroName)
+                                               OUString aLabel, OUString aMacroName)
     : VMLExport(p)
     , m_nObjType(nObjType)
     , m_aAreaFrom(rAreaFrom)
     , m_aAreaTo(rAreaTo)
-    , m_aLabel(rLabel)
-    , m_aMacroName(rMacroName)
+    , m_aLabel(std::move(aLabel))
+    , m_aMacroName(std::move(aMacroName))
 {
 }
 
@@ -1598,7 +1597,7 @@ void XclExpChartObj::SaveXml( XclExpXmlStream& rStrm )
 css::uno::Reference<css::chart::XChartDocument> XclExpChartObj::GetChartDoc() const
 {
     SdrObject* pObj = SdrObject::getSdrObjectFromXShape(mxShape);
-    if (!pObj || pObj->GetObjIdentifier() != OBJ_OLE2)
+    if (!pObj || pObj->GetObjIdentifier() != SdrObjKind::OLE2)
         return {};
     // May load here - makes sure that we are working with actually loaded OLE object
     return css::uno::Reference<css::chart::XChartDocument>(
@@ -1935,14 +1934,14 @@ XclExpObjectManager::XclExpObjectManager( const XclExpRoot& rRoot ) :
     XclExpRoot( rRoot )
 {
     InitStream( true );
-    mxEscherEx = std::make_shared<XclEscherEx>( GetRoot(), *this, *mxDffStrm );
+    mxEscherEx = std::make_shared<XclEscherEx>( GetRoot(), *this, *mpDffStrm );
 }
 
 XclExpObjectManager::XclExpObjectManager( const XclExpObjectManager& rParent ) :
     XclExpRoot( rParent.GetRoot() )
 {
     InitStream( false );
-    mxEscherEx = std::make_shared<XclEscherEx>( GetRoot(), *this, *mxDffStrm, rParent.mxEscherEx.get() );
+    mxEscherEx = std::make_shared<XclEscherEx>( GetRoot(), *this, *mpDffStrm, rParent.mxEscherEx.get() );
 }
 
 XclExpObjectManager::~XclExpObjectManager()
@@ -2017,18 +2016,17 @@ void XclExpObjectManager::InitStream( bool bTempFile )
 {
     if( bTempFile )
     {
-        mxTempFile = std::make_shared<::utl::TempFile>();
-        if( mxTempFile->IsValid() )
-        {
-            mxTempFile->EnableKillingFile();
-            mxDffStrm = ::utl::UcbStreamHelper::CreateStream( mxTempFile->GetURL(), StreamMode::STD_READWRITE );
-        }
+        moTempFile.emplace();
+        mpDffStrm = moTempFile->GetStream( StreamMode::STD_READWRITE );
     }
 
-    if( !mxDffStrm )
-        mxDffStrm = std::make_unique<SvMemoryStream>();
+    if( !mpDffStrm )
+    {
+        mpBackupStrm = std::make_unique<SvMemoryStream>();
+        mpDffStrm = mpBackupStrm.get();
+    }
 
-    mxDffStrm->SetEndian( SvStreamEndian::LITTLE );
+    mpDffStrm->SetEndian( SvStreamEndian::LITTLE );
 }
 
 XclExpEmbeddedObjectManager::XclExpEmbeddedObjectManager(

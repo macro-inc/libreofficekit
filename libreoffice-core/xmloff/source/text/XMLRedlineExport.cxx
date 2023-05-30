@@ -129,10 +129,10 @@ void XMLRedlineExport::ExportChangesList(
     if (aFind == aChangeMap.end())
         return;
 
-    ChangesVectorType* pChangesList = aFind->second.get();
+    ChangesVectorType& rChangesList = aFind->second;
 
     // export only if changes are found
-    if (pChangesList->empty())
+    if (rChangesList.empty())
         return;
 
     // changes container element
@@ -141,7 +141,7 @@ void XMLRedlineExport::ExportChangesList(
                                 true, true);
 
     // iterate over changes list
-    for (auto const& change : *pChangesList)
+    for (auto const& change : rChangesList)
     {
         ExportChangedRegion(change);
     }
@@ -158,12 +158,11 @@ void XMLRedlineExport::SetCurrentXText(
         ChangesMapType::iterator aIter = aChangeMap.find(rText);
         if (aIter == aChangeMap.end())
         {
-            ChangesVectorType* pList = new ChangesVectorType;
-            aChangeMap[rText].reset( pList );
-            pCurrentChangesList = pList;
+            auto rv = aChangeMap.emplace(std::piecewise_construct, std::forward_as_tuple(rText), std::forward_as_tuple());
+            pCurrentChangesList = &rv.first->second;
         }
         else
-            pCurrentChangesList = aIter->second.get();
+            pCurrentChangesList = &aIter->second;
     }
     else
     {
@@ -475,12 +474,16 @@ void XMLRedlineExport::ExportChangeInfo(
     WriteComment( sTmp );
 }
 
+// write RedlineSuccessorData
 void XMLRedlineExport::ExportChangeInfo(
     const Sequence<PropertyValue> & rPropertyValues)
 {
     OUString sComment;
     bool bRemovePersonalInfo = SvtSecurityOptions::IsOptionSet(
             SvtSecurityOptions::EOption::DocWarnRemovePersonalInfo );
+
+    SvXMLElementExport aChangeInfo(rExport, XML_NAMESPACE_OFFICE,
+                                   XML_CHANGE_INFO, true, true);
 
     for(const PropertyValue& rVal : rPropertyValues)
     {
@@ -490,9 +493,12 @@ void XMLRedlineExport::ExportChangeInfo(
             rVal.Value >>= sTmp;
             if (!sTmp.isEmpty())
             {
-                rExport.AddAttribute(XML_NAMESPACE_OFFICE, XML_CHG_AUTHOR, bRemovePersonalInfo
-                        ? "Author" + OUString::number(rExport.GetInfoID(sTmp))
-                        : sTmp);
+                SvXMLElementExport aCreatorElem( rExport, XML_NAMESPACE_DC,
+                                        XML_CREATOR, true,
+                                        false );
+                rExport.Characters(bRemovePersonalInfo
+                                        ? "Author" + OUString::number(rExport.GetInfoID(sTmp))
+                                        : sTmp );
             }
         }
         else if( rVal.Name == "RedlineComment" )
@@ -505,9 +511,12 @@ void XMLRedlineExport::ExportChangeInfo(
             rVal.Value >>= aDateTime;
             OUStringBuffer sBuf;
             ::sax::Converter::convertDateTime(sBuf, bRemovePersonalInfo
-                    ? util::DateTime(0, 0, 0, 0, 1, 1, 1970, true) // Epoch time
-                    : aDateTime, nullptr);
-            rExport.AddAttribute(XML_NAMESPACE_OFFICE, XML_CHG_DATE_TIME, sBuf.makeStringAndClear());
+                                        ? util::DateTime(0, 0, 0, 0, 1, 1, 1970, true) // Epoch time
+                                        : aDateTime, nullptr);
+            SvXMLElementExport aDateElem( rExport, XML_NAMESPACE_DC,
+                                          XML_DATE, true,
+                                          false );
+            rExport.Characters(sBuf.makeStringAndClear());
         }
         else if( rVal.Name == "RedlineType" )
         {
@@ -520,10 +529,7 @@ void XMLRedlineExport::ExportChangeInfo(
         // else: unknown value -> ignore
     }
 
-    // finally write element
-    SvXMLElementExport aChangeInfo(rExport, XML_NAMESPACE_OFFICE,
-                                   XML_CHANGE_INFO, true, true);
-
+    // finally write comment paragraphs
     WriteComment( sComment );
 }
 

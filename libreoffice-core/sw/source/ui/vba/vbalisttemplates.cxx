@@ -16,6 +16,8 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include <utility>
+
 #include "vbalisttemplates.hxx"
 #include "vbalisttemplate.hxx"
 
@@ -38,14 +40,14 @@ public:
     virtual uno::Any SAL_CALL nextElement(  ) override
     {
         if ( nIndex <= pListTemplates->getCount() )
-            return pListTemplates->Item( uno::makeAny( nIndex++ ), uno::Any() );
+            return pListTemplates->Item( uno::Any( nIndex++ ), uno::Any() );
         throw container::NoSuchElementException();
     }
 };
 
 }
 
-SwVbaListTemplates::SwVbaListTemplates( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, const uno::Reference< text::XTextDocument >& xTextDoc, sal_Int32 nType ) : SwVbaListTemplates_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >() ),  mxTextDocument( xTextDoc ), mnGalleryType( nType )
+SwVbaListTemplates::SwVbaListTemplates( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, uno::Reference< text::XTextDocument >  xTextDoc, sal_Int32 nType ) : SwVbaListTemplates_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >() ),  mxTextDocument(std::move( xTextDoc )), mnGalleryType( nType )
 {
 }
 
@@ -63,7 +65,7 @@ uno::Any SAL_CALL SwVbaListTemplates::Item( const uno::Any& Index1, const uno::A
     if( nIndex <=0 || nIndex > getCount() )
         throw  uno::RuntimeException("Index out of bounds" );
 
-    return uno::makeAny( uno::Reference< word::XListTemplate >( new SwVbaListTemplate( this, mxContext, mxTextDocument, mnGalleryType, nIndex ) ) );
+    return uno::Any( uno::Reference< word::XListTemplate >( new SwVbaListTemplate( this, mxContext, mxTextDocument, mnGalleryType, nIndex ) ) );
 }
 
 // XEnumerationAccess

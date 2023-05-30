@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -57,8 +59,8 @@ class tdf126248(UITestCase):
                 select_pos(xTabs, "1")
 
                 # Get current font names from the Format Cell dialog
-                westFontName = get_state_as_dict(xDialog.getChild("westfontnamelb-cjk"))['Text']
-                eastFontName = get_state_as_dict(xDialog.getChild("eastfontnamelb"))['Text']
+                westFontName = get_state_as_dict(xDialog.getChild("edWestFontName"))['Text']
+                eastFontName = get_state_as_dict(xDialog.getChild("edCJKFontName"))['Text']
 
             xCalcDoc = self.xUITest.getTopFocusWindow()
             gridwin = xCalcDoc.getChild("grid_window")

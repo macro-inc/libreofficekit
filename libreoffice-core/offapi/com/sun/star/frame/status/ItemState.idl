@@ -16,8 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_frame_status_ItemState_idl__
-#define __com_sun_star_frame_status_ItemState_idl__
 
 
 
@@ -46,12 +44,12 @@ constants ItemState
      * anymore due to not being used, so remove for simplification
      * reasons and to prepare rework of Item/ItemSet/ItemPool stuff.
      *
-     * There are only three usages of ::ItemState in the code which
-     * all set the internal SfxItem to SfxVoidItem when triggered,
-     * which is equivalent to state SfxItemState::DISABLED (see
-     * e.g. SfxItemSet::GetItemState), so READ_ONLY gets not used
-     * in internal handling, even when eventually existing UNO API
-     * usages hand it over the office.
+     * There are only three usages of com::sun::star::frame::status::ItemState
+     * in the code which all set the internal SfxItem to SfxVoidItem when
+     * triggered, which is equivalent to state SfxItemState::DISABLED (see e.g.
+     * SfxItemSet::GetItemState), so READ_ONLY gets not used in internal
+     * handling, even when eventually existing UNO API usages hand it over the
+     * office.
      */
     const short READ_ONLY      = 2;
 
@@ -75,7 +73,5 @@ constants ItemState
 
 
 }; }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

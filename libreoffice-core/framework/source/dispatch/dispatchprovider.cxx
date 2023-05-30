@@ -32,10 +32,13 @@
 #include <com/sun/star/uno/Exception.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
+#include <com/sun/star/util/XCacheInfo.hpp>
 
 #include <rtl/ustring.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sal/log.hxx>
+#include <framework/dispatchhelper.hxx>
 
 namespace framework{
 
@@ -53,9 +56,9 @@ namespace framework{
     @param      xFrame
                     reference to our owner frame.
 */
-DispatchProvider::DispatchProvider( const css::uno::Reference< css::uno::XComponentContext >& rxContext  ,
-                                    const css::uno::Reference< css::frame::XFrame >&              xFrame    )
-        : m_xContext    ( rxContext                     )
+DispatchProvider::DispatchProvider( css::uno::Reference< css::uno::XComponentContext >  xContext  ,
+                                    const css::uno::Reference< css::frame::XFrame >&    xFrame    )
+        : m_xContext    (std::move( xContext                     ))
         , m_xFrame      ( xFrame                        )
 {
 }
@@ -440,18 +443,36 @@ css::uno::Reference< css::frame::XDispatch > DispatchProvider::implts_searchProt
             SolarMutexGuard g;
 
             // create it
+            bool bInitialize = true;
             try
             {
-                xHandler.set(
-                    css::uno::Reference<css::lang::XMultiServiceFactory>(m_xContext->getServiceManager(), css::uno::UNO_QUERY_THROW)
-                      ->createInstance(aHandler.m_sUNOName),
-                    css::uno::UNO_QUERY);
+                // Only create the protocol handler instance once, the creation is expensive.
+                auto it = m_aProtocolHandlers.find(aHandler.m_sUNOName);
+                if (it == m_aProtocolHandlers.end())
+                {
+                    xHandler.set(
+                        css::uno::Reference<css::lang::XMultiServiceFactory>(m_xContext->getServiceManager(), css::uno::UNO_QUERY_THROW)
+                          ->createInstance(aHandler.m_sUNOName),
+                        css::uno::UNO_QUERY);
+
+                    // Check if the handler explicitly requested to avoid caching.
+                    css::uno::Reference<css::util::XCacheInfo> xCacheInfo(xHandler, css::uno::UNO_QUERY);
+                    if (!xCacheInfo.is() || xCacheInfo->isCachingAllowed())
+                    {
+                        m_aProtocolHandlers.emplace(aHandler.m_sUNOName, xHandler);
+                    }
+                }
+                else
+                {
+                    xHandler = it->second;
+                    bInitialize = false;
+                }
             }
             catch(const css::uno::Exception&) {}
 
             // look if initialization is necessary
             css::uno::Reference< css::lang::XInitialization > xInit( xHandler, css::uno::UNO_QUERY );
-            if (xInit.is())
+            if (xInit.is() && bInitialize)
             {
                 css::uno::Reference< css::frame::XFrame > xOwner( m_xFrame.get(), css::uno::UNO_QUERY );
                 SAL_WARN_IF(!xOwner.is(), "fwk", "DispatchProvider::implts_searchProtocolHandler(): Couldn't get reference to my owner frame. So I can't set may needed context information for this protocol handler.");

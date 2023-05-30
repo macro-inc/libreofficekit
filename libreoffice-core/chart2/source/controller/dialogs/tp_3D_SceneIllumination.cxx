@@ -20,6 +20,7 @@
 #include "tp_3D_SceneIllumination.hxx"
 #include <CommonConverters.hxx>
 #include <ControllerLockGuard.hxx>
+#include <ChartModel.hxx>
 
 #include <svx/colorbox.hxx>
 #include <svx/float3d.hxx>
@@ -28,8 +29,10 @@
 #include <svtools/colrdlg.hxx>
 #include <svx/svx3ditems.hxx>
 #include <svx/svddef.hxx>
+#include <utility>
+#include <svx/obj3d.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 
@@ -137,7 +140,7 @@ namespace
         try
         {
             xSceneProperties->setPropertyValue( "D3DSceneLightColor" + aIndex,
-                                                uno::makeAny( rLightSource.nDiffuseColor ));
+                                                uno::Any( rLightSource.nDiffuseColor ));
             xSceneProperties->setPropertyValue( "D3DSceneLightDirection" + aIndex,
                                                 uno::Any( rLightSource.aDirection ));
             xSceneProperties->setPropertyValue( "D3DSceneLightOn" + aIndex,
@@ -171,7 +174,7 @@ namespace
         try
         {
             xSceneProperties->setPropertyValue("D3DSceneAmbientColor",
-                                               uno::makeAny( rColor ));
+                                               uno::Any( rColor ));
         }
         catch( const uno::Exception & )
         {
@@ -182,9 +185,9 @@ namespace
 
 ThreeD_SceneIllumination_TabPage::ThreeD_SceneIllumination_TabPage(weld::Container* pParent,
     weld::Window* pTopLevel,
-    const uno::Reference< beans::XPropertySet > & xSceneProperties,
-    const uno::Reference< frame::XModel >& xChartModel)
-    : m_xSceneProperties( xSceneProperties )
+    uno::Reference< beans::XPropertySet > xSceneProperties,
+    const rtl::Reference<::chart::ChartModel>& xChartModel)
+    : m_xSceneProperties(std::move( xSceneProperties ))
     , m_aTimerTriggeredControllerLock( xChartModel )
     , m_bInCommitToModel( false )
     , m_aModelChangeListener( LINK( this, ThreeD_SceneIllumination_TabPage, fillControlsFromModel ) )

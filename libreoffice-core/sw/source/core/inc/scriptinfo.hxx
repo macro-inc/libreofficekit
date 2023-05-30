@@ -28,6 +28,7 @@
 #include <i18nlangtag/lang.h>
 #include <tools/long.hxx>
 #include "TextFrameIndex.hxx"
+#include <doc.hxx>
 
 class SwTextNode;
 class SwTextFrame;
@@ -71,7 +72,7 @@ private:
     std::deque<TextFrameIndex> m_NoKashidaLine;
     std::deque<TextFrameIndex> m_NoKashidaLineEnd;
     std::vector<TextFrameIndex> m_HiddenChg;
-    std::vector<std::pair<TextFrameIndex, MarkKind>> m_Bookmarks;
+    std::vector<std::tuple<TextFrameIndex, MarkKind, Color, OUString>> m_Bookmarks;
     //! Records a single change in compression.
     struct CompressionChangeInfo
     {
@@ -184,7 +185,8 @@ public:
     }
     TextFrameIndex NextHiddenChg(TextFrameIndex nPos) const;
     TextFrameIndex NextBookmark(TextFrameIndex nPos) const;
-    MarkKind GetBookmark(TextFrameIndex nPos) const;
+    std::vector<std::tuple<MarkKind, Color, OUString>>
+            GetBookmarks(TextFrameIndex const nPos);
     static void CalcHiddenRanges(const SwTextNode& rNode,
             MultiSelection& rHiddenMulti,
             std::vector<std::pair<sw::mark::IBookmark const*, MarkKind>> * pBookmarks);
@@ -270,7 +272,7 @@ public:
     // HIDDEN TEXT STUFF END
 
     // modifies the kerning array according to a given compress value
-    tools::Long Compress( sal_Int32* pKernArray, TextFrameIndex nIdx, TextFrameIndex nLen,
+    tools::Long Compress( KernArray& rKernArray, TextFrameIndex nIdx, TextFrameIndex nLen,
                    const sal_uInt16 nCompress, const sal_uInt16 nFontHeight,
                    const bool bCentered,
                    Point* pPoint = nullptr ) const;
@@ -289,7 +291,7 @@ public:
                 The value which has to be added to a kashida opportunity.
     @return The number of kashida opportunities in the given range
 */
-    sal_Int32 KashidaJustify( sal_Int32* pKernArray,
+    sal_Int32 KashidaJustify( KernArray* pKernArray, sal_Bool* pKashidaArray,
           TextFrameIndex nStt, TextFrameIndex nLen, tools::Long nSpaceAdd = 0) const;
 
 /** Clears array of kashidas marked as invalid
@@ -348,7 +350,7 @@ public:
 
     @descr  Add some extra space for thai justification to the
             positions in the kerning array.
-    @param  rText
+    @param  aText
                 The String
     @param  pKernArray
                 The printers kerning array. Optional.
@@ -360,7 +362,7 @@ public:
                 The value which has to be added to the cells.
     @return The number of extra spaces in the given range
 */
-    static TextFrameIndex ThaiJustify( const OUString& rText, sal_Int32* pKernArray,
+    static TextFrameIndex ThaiJustify( std::u16string_view aText, KernArray* pKernArray,
                                   TextFrameIndex nIdx,
                                   TextFrameIndex nLen,
                                   TextFrameIndex nNumberOfBlanks = TextFrameIndex(0),
@@ -369,7 +371,7 @@ public:
     static TextFrameIndex CountCJKCharacters(const OUString &rText,
             TextFrameIndex nPos, TextFrameIndex nEnd, LanguageType aLang);
 
-    static void CJKJustify( const OUString& rText, sal_Int32* pKernArray,
+    static void CJKJustify( const OUString& rText, KernArray& rKernArray,
                                   TextFrameIndex nStt,
                                   TextFrameIndex nLen, LanguageType aLang,
                                   tools::Long nSpaceAdd, bool bIsSpaceStop );

@@ -42,6 +42,7 @@
 
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <stdio.h>
 
@@ -78,7 +79,7 @@ struct ObjectEntry
     sal_Int32 nRef;
     bool mixedObject;
 
-    explicit ObjectEntry( const OUString & rOId_ );
+    explicit ObjectEntry( OUString aOId_ );
 
     void append(
         uno_DefaultEnvironment * pEnv,
@@ -147,8 +148,8 @@ struct uno_DefaultEnvironment : public uno_ExtEnvironment
 };
 
 
-ObjectEntry::ObjectEntry( OUString const & rOId_ )
-    : oid( rOId_ ),
+ObjectEntry::ObjectEntry( OUString aOId_ )
+    : oid(std::move( aOId_ )),
       nRef( 0 ),
       mixedObject( false )
 {
@@ -698,7 +699,8 @@ extern "C" void SAL_CALL uno_dumpEnvironment(
                    "###########################################", pFilter );
         buf.append( "environment: " );
         buf.append( pEnv->pTypeName );
-        writeLine( stream, buf.makeStringAndClear(), pFilter );
+        writeLine( stream, buf, pFilter );
+        buf.setLength(0);
         writeLine( stream, "NO INTERFACE INFORMATION AVAILABLE!", pFilter );
         return;
     }
@@ -707,7 +709,8 @@ extern "C" void SAL_CALL uno_dumpEnvironment(
                "######################################", pFilter );
     buf.append( "environment dump: " );
     buf.append( pEnv->pTypeName );
-    writeLine( stream, buf.makeStringAndClear(), pFilter );
+    writeLine( stream, buf, pFilter );
+    buf.setLength(0);
 
     uno_DefaultEnvironment * that =
         reinterpret_cast< uno_DefaultEnvironment * >(pEnv);
@@ -726,7 +729,8 @@ extern "C" void SAL_CALL uno_dumpEnvironment(
         buf.append( "; oid=\"" );
         buf.append( pOEntry->oid );
         buf.append( '\"' );
-        writeLine( stream, buf.makeStringAndClear(), pFilter );
+        writeLine( stream, buf, pFilter );
+        buf.setLength(0);
 
         for ( std::size_t nPos = 0;
               nPos < pOEntry->aInterfaces.size(); ++nPos )
@@ -757,7 +761,8 @@ extern "C" void SAL_CALL uno_dumpEnvironment(
                     buf.append( " (ptr not found in map!)" );
                 }
             }
-            writeLine( stream, buf.makeStringAndClear(), pFilter );
+            writeLine( stream, buf, pFilter );
+            buf.setLength(0);
         }
     }
     if (! ptr2obj.empty())
@@ -782,7 +787,7 @@ extern "C" void SAL_CALL uno_dumpEnvironmentByName(
     {
         writeLine(
             stream,
-            OUStringConcatenation("environment \"" + OUString::unacquired(&pEnvDcp) + "\" does not exist!"),
+            Concat2View("environment \"" + OUString::unacquired(&pEnvDcp) + "\" does not exist!"),
             pFilter );
     }
 }
@@ -845,10 +850,10 @@ static void unoenv_computeObjectIdentifier(
     (*pUnoI->release)( pUnoI );
     OUString aStr(
         // interface
-        OUString::number( reinterpret_cast< sal_Int64 >(pUnoI), 16 ) + ";"
+        OUString::number( reinterpret_cast< sal_IntPtr >(pUnoI), 16 ) + ";"
         // environment[context]
         + OUString::unacquired(&pEnv->aBase.pTypeName) + "["
-        + OUString::number( reinterpret_cast< sal_Int64 >(
+        + OUString::number( reinterpret_cast< sal_IntPtr >(
                     reinterpret_cast<
                     uno_Environment * >(pEnv)->pContext ), 16 )
         // process;good guid

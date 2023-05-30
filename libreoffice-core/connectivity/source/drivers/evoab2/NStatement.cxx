@@ -38,7 +38,7 @@
 #include <sqlbison.hxx>
 #include <strings.hrc>
 #include <connectivity/dbexception.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace connectivity::evoab {
 
@@ -549,7 +549,7 @@ Any SAL_CALL OCommonStatement::getWarnings(  )
     checkDisposed(OCommonStatement_IBase::rBHelper.bDisposed);
 
 
-    return makeAny(SQLWarning());
+    return Any(SQLWarning());
 }
 
 
@@ -614,7 +614,7 @@ Reference< XResultSet > OCommonStatement::impl_executeQuery_throw( const QueryDa
     pResult->construct( _rQueryData );
 
     // done
-    m_xResultSet = pResult;
+    m_xResultSet = Reference<XWeak>(pResult);
     return pResult;
 }
 

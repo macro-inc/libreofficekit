@@ -31,6 +31,7 @@
 #include <IDocumentLayoutAccess.hxx>
 #include <view.hxx>
 #include <viewsh.hxx>
+#include <comphelper/servicehelper.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::ooo::vba;
@@ -164,7 +165,7 @@ bool gotoSelectedObjectAnchor( const uno::Reference< frame::XModel>& xModel )
     {
         uno::Reference< text::XTextRange > xTextRange( xTextContent->getAnchor(), uno::UNO_SET_THROW );
         uno::Reference< view::XSelectionSupplier > xSelectSupp( xModel->getCurrentController(), uno::UNO_QUERY_THROW );
-        xSelectSupp->select( uno::makeAny( xTextRange ) );
+        xSelectSupp->select( uno::Any( xTextRange ) );
         isObjectSelected = true;
     }
     return isObjectSelected;

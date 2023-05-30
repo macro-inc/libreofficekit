@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-04-26 13:59+0200\n"
-"PO-Revision-Date: 2022-03-24 07:35+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-03-09 11:34+0000\n"
 "Last-Translator: Miloš Šrámek <msramek22@gmail.com>\n"
-"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-master/uuimessages/sk/>\n"
+"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-7-5/uuimessages/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1547564266.000000\n"
 
 #. DLY8p
@@ -660,8 +660,8 @@ msgid ""
 msgstr ""
 "Súbor dokumentu „$(ARG1)“ je od $(ARG2) vami uzamknutý na úpravu v inom systéme.\n"
 "\n"
-"Otvorte dokument iba na čítanie alebo vlastné uzamknutie  ignorujte a dokument otvorte na úpravu.\n"
-"Výberom možnosti Upozorniť dokument otvoríte iba na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
+"Otvorte dokument len na čítanie alebo vlastné uzamknutie  ignorujte a dokument otvorte na úpravu.\n"
+"Výberom možnosti Upozorniť dokument otvoríte len na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
 
 #. 8mKMg
 #: uui/inc/strings.hrc:34
@@ -739,7 +739,7 @@ msgid ""
 msgstr ""
 "Nebolo možné vytvoriť súbor zámku pre exkluzívny prístup %PRODUCTNAME z dôvodu nedostatočných práv na vytvorenie súboru zámku v danom umiestnení alebo nedostatku voľného miesta na disku.\n"
 "\n"
-"Výberom možnosti Upozorniť otvoríte iba na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
+"Výberom možnosti Upozorniť otvoríte len na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
 
 #. CaBXF
 #: uui/inc/strings.hrc:47
@@ -753,72 +753,30 @@ msgctxt "STR_LOCKFAILED_OPENREADONLY_NOTIFY_BTN"
 msgid "~Notify"
 msgstr "~Upozorniť"
 
-#. u5nuY
+#. q5Dhj
 #: uui/inc/strings.hrc:50
-msgctxt "STR_OPENLOCKED_TITLE"
-msgid "Document in Use"
-msgstr "Používaný dokument"
-
-#. qcayz
-#: uui/inc/strings.hrc:51
-msgctxt "STR_OPENLOCKED_MSG"
+msgctxt "STR_OPENLOCKED_HIDDEN_DATA"
 msgid ""
-"Document file '$(ARG1)' is locked for editing by:\n"
-"\n"
-"$(ARG2)\n"
-"\n"
-"Open document read-only or open a copy of the document for editing.\n"
-"Select Notify to open read-only and get notified when the document becomes editable.$(ARG3)"
+"Document Name: $(ARG1)\n"
+"User Name: $(ARG2)"
 msgstr ""
-"Súbor dokumentu „$ (ARG1)“ je uzamknutý na úpravy používateľom\n"
-"\n"
-"$ (ARG2)\n"
-"\n"
-"Otvorte dokument iba na čítanie alebo otvorte kópiu dokumentu na úpravu.\n"
-"Výberom možnosti Upozorniť dokument otvoríte iba na čítanie a dostanete upozornenie, keď bude dokument možné upraviť.$(ARG3)"
-
-#. VF7vT
-#: uui/inc/strings.hrc:52
-msgctxt "STR_OPENLOCKED_ALLOWIGNORE_MSG"
-msgid ""
-"\n"
-"You may also ignore the file locking and open the document for editing."
-msgstr ""
-"\n"
-"Uzamknutie súboru môžete ignorovať a dokument otvoriť na úpravu."
-
-#. tc7YZ
-#: uui/inc/strings.hrc:53
-msgctxt "STR_OPENLOCKED_OPENREADONLY_BTN"
-msgid "Open ~Read-Only"
-msgstr "Otvo~riť len na čítanie"
-
-#. anQNW
-#: uui/inc/strings.hrc:54
-msgctxt "STR_OPENLOCKED_OPENREADONLY_NOTIFY_BTN"
-msgid "~Notify"
-msgstr "~Upozorniť"
-
-#. TsA54
-#: uui/inc/strings.hrc:55
-msgctxt "STR_OPENLOCKED_OPENCOPY_BTN"
-msgid "Open ~Copy"
-msgstr "Otvoriť ~kópiu"
+"Názov dokumentu: $(ARG1)\n"
+"Meno používateľa: $(ARG2)"
 
 #. EXAAf
-#: uui/inc/strings.hrc:56
+#: uui/inc/strings.hrc:51
 msgctxt "STR_UNKNOWNUSER"
 msgid "Unknown User"
 msgstr "Neznámy používateľ"
 
 #. PFEwD
-#: uui/inc/strings.hrc:58
+#: uui/inc/strings.hrc:53
 msgctxt "STR_FILECHANGED_TITLE"
 msgid "Document Has Been Changed by Others"
 msgstr "Dokument bol zmenený niekým iným"
 
 #. umCKE
-#: uui/inc/strings.hrc:59
+#: uui/inc/strings.hrc:54
 msgctxt "STR_FILECHANGED_MSG"
 msgid ""
 "The file has been changed since it was opened for editing in %PRODUCTNAME. Saving your version of the document will overwrite changes made by others.\n"
@@ -830,19 +788,19 @@ msgstr ""
 "Chcete uložiť aj tak?"
 
 #. DGYmK
-#: uui/inc/strings.hrc:60
+#: uui/inc/strings.hrc:55
 msgctxt "STR_FILECHANGED_SAVEANYWAY_BTN"
 msgid "~Save Anyway"
 msgstr "~Uložiť aj tak"
 
 #. YBz5F
-#: uui/inc/strings.hrc:62
+#: uui/inc/strings.hrc:57
 msgctxt "STR_TRYLATER_TITLE"
 msgid "Document in Use"
-msgstr "Používaný dokument"
+msgstr "Dokument sa už používa"
 
 #. 4Fimj
-#: uui/inc/strings.hrc:63
+#: uui/inc/strings.hrc:58
 msgctxt "STR_TRYLATER_MSG"
 msgid ""
 "Document file '$(ARG1)' is locked for editing by:\n"
@@ -858,7 +816,7 @@ msgstr ""
 "Skúste znovu neskôr alebo si uložte kópiu tohto dokumentu."
 
 #. b3UBG
-#: uui/inc/strings.hrc:64
+#: uui/inc/strings.hrc:59
 msgctxt "STR_OVERWRITE_IGNORELOCK_MSG"
 msgid ""
 "Document file '$(ARG1)' is locked for editing by:\n"
@@ -874,19 +832,19 @@ msgstr ""
 "Uzamknutie súboru môžete ignorovať súbor môžete prepísať."
 
 #. 8JFLZ
-#: uui/inc/strings.hrc:65
+#: uui/inc/strings.hrc:60
 msgctxt "STR_TRYLATER_RETRYSAVING_BTN"
 msgid "~Retry Saving"
 msgstr "~Znovu uložiť"
 
 #. 6iCzM
-#: uui/inc/strings.hrc:66
+#: uui/inc/strings.hrc:61
 msgctxt "STR_TRYLATER_SAVEAS_BTN"
 msgid "~Save As..."
 msgstr "~Uložiť ako..."
 
 #. nqrvC
-#: uui/inc/strings.hrc:68
+#: uui/inc/strings.hrc:63
 msgctxt "STR_RENAME_OR_REPLACE"
 msgid ""
 "A file with the name \"%NAME\" already exists in the location \"%FOLDER\".\n"
@@ -896,7 +854,7 @@ msgstr ""
 "Kliknite na Nahradiť alebo zadajte nový názov."
 
 #. 3bJvA
-#: uui/inc/strings.hrc:69
+#: uui/inc/strings.hrc:64
 msgctxt "STR_NAME_CLASH_RENAME_ONLY"
 msgid ""
 "A file with the name \"%NAME\" already exists in the location \"%FOLDER\".\n"
@@ -906,79 +864,79 @@ msgstr ""
 "Zadajte nový názov."
 
 #. Bapqc
-#: uui/inc/strings.hrc:70
+#: uui/inc/strings.hrc:65
 msgctxt "STR_SAME_NAME_USED"
 msgid "Please provide a different file name!"
 msgstr "Zadajte prosím iný názov!"
 
 #. BsaWY
-#: uui/inc/strings.hrc:72
+#: uui/inc/strings.hrc:67
 msgctxt "STR_ERROR_PASSWORD_TO_OPEN_WRONG"
 msgid "The password is incorrect. The file cannot be opened."
 msgstr "Nesprávne heslo. Súbor nemožno otvoriť."
 
 #. WQbYF
-#: uui/inc/strings.hrc:73
+#: uui/inc/strings.hrc:68
 msgctxt "STR_ERROR_PASSWORD_TO_MODIFY_WRONG"
 msgid "The password is incorrect. The file cannot be modified."
 msgstr "Nesprávne heslo. Súbor nemožno modifikovať."
 
 #. Gq9FJ
-#: uui/inc/strings.hrc:74
+#: uui/inc/strings.hrc:69
 msgctxt "STR_ERROR_MASTERPASSWORD_WRONG"
 msgid "The master password is incorrect."
 msgstr "Hlavné heslo je nesprávne."
 
 #. pRwHM
-#: uui/inc/strings.hrc:75
+#: uui/inc/strings.hrc:70
 msgctxt "STR_ERROR_SIMPLE_PASSWORD_WRONG"
 msgid "The password is incorrect."
 msgstr "Heslo je nesprávne."
 
 #. DwdJn
-#: uui/inc/strings.hrc:76
+#: uui/inc/strings.hrc:71
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The password confirmation does not match."
 msgstr "Potvrdenie hesla nie je správne."
 
 #. dwGow
-#: uui/inc/strings.hrc:78
+#: uui/inc/strings.hrc:73
 msgctxt "STR_LOCKCORRUPT_TITLE"
 msgid "Lock file is corrupted"
 msgstr "Súbor uzamknutia je poškodený"
 
 #. nkUGA
-#: uui/inc/strings.hrc:79
+#: uui/inc/strings.hrc:74
 msgctxt "STR_LOCKCORRUPT_MSG"
 msgid ""
 "The lock file is corrupted and probably empty. Opening the document read-only and closing it again removes the corrupted lock file.\n"
 "\n"
 "Select Notify to open read-only and get notified when the document becomes editable."
 msgstr ""
-"Súbor zámku je poškodený a pravdepodobne prázdny. Otvorením dokumentu iba na čítanie a jeho opätovným zatvorením sa odstráni poškodený súbor zámku.\n"
+"Súbor zámku je poškodený a pravdepodobne prázdny. Otvorením dokumentu len na čítanie a jeho opätovným zatvorením sa odstráni poškodený súbor zámku.\n"
 "\n"
-"Výberom možnosti Upozorniť dokument otvoríte iba na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
+"Výberom možnosti Upozorniť dokument otvoríte len na čítanie a dostanete upozornenie, keď bude dokument možné upraviť."
 
 #. fKEYB
-#: uui/inc/strings.hrc:80
+#: uui/inc/strings.hrc:75
 msgctxt "STR_LOCKCORRUPT_OPENREADONLY_BTN"
 msgid "Open ~Read-Only"
 msgstr "Otvo~riť len na čítanie"
 
 #. qRAcY
-#: uui/inc/strings.hrc:81
+#: uui/inc/strings.hrc:76
 msgctxt "STR_LOCKCORRUPT_OPENREADONLY_NOTIFY_BTN"
 msgid "~Notify"
 msgstr "~Upozorniť"
 
 #. rBAR3
-#: uui/inc/strings.hrc:83
+#: uui/inc/strings.hrc:78
 msgctxt "STR_RELOADEDITABLE_TITLE"
 msgid "Document is now editable"
 msgstr "Dokument je už možné upraviť"
 
 #. cVZuC
-#: uui/inc/strings.hrc:84
+#: uui/inc/strings.hrc:79
 msgctxt "STR_RELOADEDITABLE_MSG"
 msgid ""
 "Document file '$(ARG1)' is now editable \n"
@@ -990,7 +948,7 @@ msgstr ""
 "Znova načítať tento dokument na úpravu?"
 
 #. vynDE
-#: uui/inc/strings.hrc:85
+#: uui/inc/strings.hrc:80
 msgctxt "STR_RELOADEDITABLE_BTN"
 msgid "~Reload"
 msgstr "~Znovu načítať?"
@@ -1165,7 +1123,7 @@ msgstr "_Zadajte heslo:"
 #: uui/uiconfig/ui/masterpassworddlg.ui:110
 msgctxt "masterpassworddlg|extended_tip|password"
 msgid "Type a password. A password is case sensitive."
-msgstr "Zadajte heslo. Pri hesle záleží na veľkosti písmen."
+msgstr "Zadajte heslo. V hesle sa rozlišujú malé a veľké písmená."
 
 #. Twvfe
 #: uui/uiconfig/ui/masterpassworddlg.ui:139
@@ -1183,7 +1141,7 @@ msgstr "Nastaviť heslo"
 #: uui/uiconfig/ui/password.ui:120
 msgctxt "password|extended_tip|newpassEntry"
 msgid "Type a password. A password is case sensitive."
-msgstr "Zadajte heslo. Pri hesle záleží na veľkosti písmen."
+msgstr "Zadajte heslo. V hesle sa rozlišujú malé a veľké písmená."
 
 #. QbKd2
 #: uui/uiconfig/ui/password.ui:139
@@ -1234,7 +1192,7 @@ msgid "Caution: If you forget the master password, you will be unable to access 
 msgstr "Upozornenie: V prípade, že zabudnete hlavné heslo, nebudete mať prístup k žiadnym informáciám, ktoré chráni. Heslá sú citlivé na veľkosť písma."
 
 #. BHvee
-#: uui/uiconfig/ui/setmasterpassworddlg.ui:202
+#: uui/uiconfig/ui/setmasterpassworddlg.ui:205
 msgctxt "setmasterpassworddlg|extended_tip|SetMasterPasswordDialog"
 msgid "Assign a master password to protect the access to a saved password."
 msgstr "Zadajte hlavné heslo, ktoré bude chrániť prístup k uloženým heslám."

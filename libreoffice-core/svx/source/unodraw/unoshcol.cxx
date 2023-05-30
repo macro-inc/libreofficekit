@@ -24,9 +24,10 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase3.hxx>
 #include <cppuhelper/interfacecontainer.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/mutex.hxx>
 #include <sal/log.hxx>
@@ -36,18 +37,12 @@ using namespace ::com::sun::star::uno;
 
 namespace {
 
-class SvxShapeCollectionMutex
-{
-public:
-    ::osl::Mutex maMutex;
-};
-
 class SvxShapeCollection :
-    public cppu::WeakAggImplHelper3<drawing::XShapes, lang::XServiceInfo, lang::XComponent>,
-    public SvxShapeCollectionMutex
+    public cppu::BaseMutex,
+    public cppu::WeakAggImplHelper3<drawing::XShapes, lang::XServiceInfo, lang::XComponent>
 {
 private:
-    comphelper::OInterfaceContainerHelper2 maShapeContainer;
+    comphelper::OInterfaceContainerHelper3<drawing::XShape> maShapeContainer;
 
     cppu::OBroadcastHelper mrBHelper;
 
@@ -81,7 +76,7 @@ public:
 };
 
 SvxShapeCollection::SvxShapeCollection() noexcept
-: maShapeContainer( maMutex ), mrBHelper( maMutex )
+: maShapeContainer( m_aMutex ), mrBHelper( m_aMutex )
 {
 }
 
@@ -213,8 +208,8 @@ uno::Any SAL_CALL SvxShapeCollection::getByIndex( sal_Int32 Index )
     if( Index < 0 || Index >= getCount() )
         throw lang::IndexOutOfBoundsException();
 
-    Reference< uno::XInterface> xInterface = maShapeContainer.getInterface(Index);
-    return uno::makeAny( Reference< drawing::XShape>(static_cast< drawing::XShape* >( xInterface.get())) );
+    Reference<drawing::XShape> xShape = maShapeContainer.getInterface(Index);
+    return uno::Any( xShape );
 }
 
 // XElementAccess

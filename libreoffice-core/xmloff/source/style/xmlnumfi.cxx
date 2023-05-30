@@ -30,6 +30,7 @@
 
 #include <sax/tools/converter.hxx>
 
+#include <utility>
 #include <xmloff/xmlement.hxx>
 #include <xmloff/xmlnumfi.hxx>
 #include <xmloff/xmltkmap.hxx>
@@ -57,8 +58,8 @@ struct SvXMLNumFmtEntry
     sal_uInt32  nKey;
     bool        bRemoveAfterUse;
 
-    SvXMLNumFmtEntry( const OUString& rN, sal_uInt32 nK, bool bR ) :
-        aName(rN), nKey(nK), bRemoveAfterUse(bR) {}
+    SvXMLNumFmtEntry( OUString aN, sal_uInt32 nK, bool bR ) :
+        aName(std::move(aN)), nKey(nK), bRemoveAfterUse(bR) {}
 };
 
 }
@@ -424,7 +425,7 @@ SvXMLNumFmtPropContext::SvXMLNumFmtPropContext( SvXMLImport& rImport,
         {
             case XML_ELEMENT(FO, XML_COLOR):
             case XML_ELEMENT(FO_COMPAT, XML_COLOR):
-                bColSet = ::sax::Converter::convertColor( m_nColor, aIter.toString() );
+                bColSet = ::sax::Converter::convertColor( m_nColor, aIter.toView() );
                 break;
             default:
                 XMLOFF_WARN_UNKNOWN("xmloff", aIter);
@@ -456,7 +457,7 @@ SvXMLNumFmtEmbeddedTextContext::SvXMLNumFmtEmbeddedTextContext( SvXMLImport& rIm
     {
         if ( aIter.getToken() == XML_ELEMENT(NUMBER, XML_POSITION) )
         {
-            if (::sax::Converter::convertNumber( nAttrVal, aIter.toView(), 0 ))
+            if (::sax::Converter::convertNumber( nAttrVal, aIter.toView() ))
                 nTextPosition = nAttrVal;
         }
         else
@@ -551,8 +552,7 @@ static void lcl_EnquoteIfNecessary( OUStringBuffer& rContent, const SvXMLNumForm
         //  the percent character in percentage styles must be left out of quoting
         //  (one occurrence is enough even if there are several percent characters in the string)
 
-        OUString aString( rContent.toString() );
-        sal_Int32 nPos = aString.indexOf( '%' );
+        sal_Int32 nPos = rContent.indexOf( '%' );
         if ( nPos >= 0 )
         {
             if ( nPos + 1 < nLength )
@@ -866,7 +866,7 @@ void SvXMLNumFmtElementContext::endFastElement(sal_Int32 )
     {
         case SvXMLStyleTokens::Text:
             if ( rParent.HasLongDoW() &&
-                 aContent.toString() == rParent.GetLocaleData().getLongDateDayOfWeekSep() )
+                 std::u16string_view(aContent) == rParent.GetLocaleData().getLongDateDayOfWeekSep() )
             {
                 //  skip separator constant after long day of week
                 //  (NF_KEY_NNNN contains the separator)
@@ -881,13 +881,15 @@ void SvXMLNumFmtElementContext::endFastElement(sal_Int32 )
             if ( !aContent.isEmpty() )
             {
                 lcl_EnquoteIfNecessary( aContent, rParent );
-                rParent.AddToCode( aContent.makeStringAndClear() );
+                rParent.AddToCode( aContent );
+                aContent.setLength(0);
             }
             else
             {
                 // Quoted empty text may be significant to separate.
                 aContent.append("\"\"");
-                rParent.AddToCode( aContent.makeStringAndClear() );
+                rParent.AddToCode( aContent );
+                aContent.setLength(0);
                 rParent.SetHasTrailingEmptyText(true);  // *after* AddToCode()
             }
             break;
@@ -1034,7 +1036,7 @@ void SvXMLNumFmtElementContext::endFastElement(sal_Int32 )
                     rParent.AddNumber( aNumInfo );      // number without decimals
                     OUStringBuffer sIntegerFractionDelimiter(aNumInfo.aIntegerFractionDelimiter);
                     lcl_EnquoteIfNecessary( sIntegerFractionDelimiter, rParent );
-                    rParent.AddToCode( sIntegerFractionDelimiter.makeStringAndClear() ); // default is ' '
+                    rParent.AddToCode( sIntegerFractionDelimiter ); // default is ' '
                 }
 
                 //! build string and add at once
@@ -1515,7 +1517,8 @@ sal_Int32 SvXMLNumFormatContext::CreateAndInsert(SvNumberFormatter* pFormatter)
             aFormatCode.truncate( nBufLen - 2);
     }
 
-    aFormatCode.insert( 0, aConditions.makeStringAndClear() );
+    aFormatCode.insert( 0, aConditions );
+    aConditions.setLength(0);
     OUString sFormat = aFormatCode.makeStringAndClear();
 
     //  test special cases
@@ -1704,8 +1707,8 @@ void SvXMLNumFormatContext::AddNumber( const SvXMLNumberInfo& rInfo )
 
     bool bGrouping = rInfo.bGrouping;
     size_t const nEmbeddedCount = rInfo.m_EmbeddedElements.size();
-    if ( nEmbeddedCount )
-        bGrouping = false;      // grouping and embedded characters can't be used together
+    if ( nEmbeddedCount && rInfo.m_EmbeddedElements.rbegin()->first > 0 )
+        bGrouping = false;      // grouping and embedded characters in integer part can't be used together
 
     sal_uInt32 nStdIndex = pFormatter->GetStandardIndex( nFormatLang );
     OUStringBuffer aNumStr(pFormatter->GenerateFormat( nStdIndex, nFormatLang,
@@ -1743,10 +1746,21 @@ void SvXMLNumFormatContext::AddNumber( const SvXMLNumberInfo& rInfo )
         }
     }
 
+    if ( ( rInfo.bDecReplace || rInfo.nMinDecimalDigits < rInfo.nDecimals ) && nPrec )     // add decimal replacement (dashes)
+    {
+        //  add dashes for explicit decimal replacement, # or ? for variable decimals
+        sal_Unicode cAdd = rInfo.bDecReplace ? '-' : ( rInfo.bDecAlign ? '?': '#' );
+
+        if ( rInfo.nMinDecimalDigits == 0 )
+            aNumStr.append( pData->GetLocaleData( nFormatLang ).getNumDecimalSep() );
+        for ( sal_uInt16 i=rInfo.nMinDecimalDigits; i<nPrec; i++)
+            aNumStr.append( cAdd );
+    }
+
     if ( nEmbeddedCount )
     {
         //  insert embedded strings into number string
-        //  only the integer part is supported
+        //  support integer (position >=0) and decimal (position <0) part
         //  nZeroPos is the string position where format position 0 is inserted
 
         sal_Int32 nZeroPos = aNumStr.indexOf( pData->GetLocaleData( nFormatLang ).getNumDecimalSep() );
@@ -1775,7 +1789,7 @@ void SvXMLNumFormatContext::AddNumber( const SvXMLNumberInfo& rInfo )
         {
             sal_Int32 const nFormatPos = it.first;
             sal_Int32 nInsertPos = nZeroPos - nFormatPos;
-            if ( nFormatPos >= 0 && nInsertPos >= 0 )
+            if ( nInsertPos >= 0 )
             {
                 //  #107805# always quote embedded strings - even space would otherwise
                 //  be recognized as thousands separator in French.
@@ -1788,17 +1802,6 @@ void SvXMLNumFormatContext::AddNumber( const SvXMLNumberInfo& rInfo )
     }
 
     aFormatCode.append( aNumStr );
-
-    if ( ( rInfo.bDecReplace || rInfo.nMinDecimalDigits < rInfo.nDecimals ) && nPrec )     // add decimal replacement (dashes)
-    {
-        //  add dashes for explicit decimal replacement, # or ? for variable decimals
-        sal_Unicode cAdd = rInfo.bDecReplace ? '-' : ( rInfo.bDecAlign ? '?': '#' );
-
-        if ( rInfo.nMinDecimalDigits == 0 )
-            aFormatCode.append( pData->GetLocaleData( nFormatLang ).getNumDecimalSep() );
-        for ( sal_uInt16 i=rInfo.nMinDecimalDigits; i<nPrec; i++)
-            aFormatCode.append( cAdd );
-    }
 
     //  add extra thousands separators for display factor
 
@@ -1944,10 +1947,10 @@ void SvXMLNumFormatContext::AddNfKeyword( sal_uInt16 nIndex )
     }
 }
 
-static bool lcl_IsAtEnd( OUStringBuffer& rBuffer, const OUString& rToken )
+static bool lcl_IsAtEnd( OUStringBuffer& rBuffer, std::u16string_view rToken )
 {
     sal_Int32 nBufLen = rBuffer.getLength();
-    sal_Int32 nTokLen = rToken.getLength();
+    sal_Int32 nTokLen = rToken.size();
 
     if ( nTokLen > nBufLen )
         return false;
@@ -2067,7 +2070,7 @@ void SvXMLNumFormatContext::AddColor( Color const nColor )
     {
         aColName.insert( 0, '[' );
         aColName.append( ']' );
-        aFormatCode.insert( 0, aColName.makeStringAndClear() );
+        aFormatCode.insert( 0, aColName );
     }
 }
 

@@ -21,6 +21,7 @@
 #include <ooo/vba/excel/XlColorIndex.hpp>
 #include <ooo/vba/excel/XlUnderlineStyle.hpp>
 #include <svl/itemset.hxx>
+#include <o3tl/string_view.hxx>
 #include "excelvbahelper.hxx"
 #include "vbafont.hxx"
 #include "vbapalette.hxx"
@@ -74,7 +75,7 @@ ScVbaFont::setColorIndex( const uno::Any& _colorindex )
     if ( !nIndex || ( nIndex == excel::XlColorIndex::xlColorIndexAutomatic ) )
     {
         nIndex = 1;  // check default ( assume black )
-        ScVbaFont_BASE::setColorIndex( uno::makeAny( nIndex ) );
+        ScVbaFont_BASE::setColorIndex( uno::Any( nIndex ) );
     }
     else
         ScVbaFont_BASE::setColorIndex( _colorindex );
@@ -134,14 +135,14 @@ ScVbaFont::setFontStyle( const uno::Any& aValue )
 
     for (sal_Int32 nIdx{ 0 }; nIdx>=0; )
     {
-        const OUString aToken{ aStyles.getToken( 0, ' ', nIdx ) };
-        if (aToken.equalsIgnoreAsciiCase("Bold"))
+        const std::u16string_view aToken{ o3tl::getToken(aStyles, 0, ' ', nIdx ) };
+        if (o3tl::equalsIgnoreAsciiCase(aToken, u"Bold"))
         {
             bBold = true;
             if (bItalic)
                 break;
         }
-        else if (aToken.equalsIgnoreAsciiCase("Italic"))
+        else if (o3tl::equalsIgnoreAsciiCase(aToken, u"Italic"))
         {
             bItalic = true;
             if (bBold)
@@ -149,8 +150,8 @@ ScVbaFont::setFontStyle( const uno::Any& aValue )
         }
     }
 
-    setBold( uno::makeAny( bBold ) );
-    setItalic( uno::makeAny( bItalic ) );
+    setBold( uno::Any( bBold ) );
+    setItalic( uno::Any( bItalic ) );
 }
 
 uno::Any SAL_CALL
@@ -169,7 +170,7 @@ ScVbaFont::getFontStyle()
             aStyles.append(" ");
         aStyles.append("Italic");
     }
-    return uno::makeAny( aStyles.makeStringAndClear() );
+    return uno::Any( aStyles.makeStringAndClear() );
 }
 
 uno::Any SAL_CALL
@@ -228,7 +229,7 @@ ScVbaFont::getUnderline()
     sal_Int32 nValue = awt::FontUnderline::NONE;
 
     if(mbFormControl)
-        return uno::makeAny( nValue );
+        return uno::Any( nValue );
 
     mxFont->getPropertyValue("CharUnderline") >>= nValue;
     switch ( nValue )
@@ -246,7 +247,7 @@ ScVbaFont::getUnderline()
             throw uno::RuntimeException("Unknown value retrieved for Underline" );
 
     }
-    return uno::makeAny( nValue );
+    return uno::Any( nValue );
 }
 
 uno::Any SAL_CALL

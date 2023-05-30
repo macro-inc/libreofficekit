@@ -24,6 +24,7 @@
 
 #include <font/PhysicalFontFaceCollection.hxx>
 #include <font/PhysicalFontCollection.hxx>
+#include <utility>
 
 namespace vcl::font
 {
@@ -58,11 +59,11 @@ void PhysicalFontFamily::CalcType( ImplFontAttrs& rType, FontWeight& rWeight, Fo
     }
 }
 
-static ImplFontAttrs lcl_IsCJKFont( const OUString& rFontName )
+static ImplFontAttrs lcl_IsCJKFont( std::u16string_view rFontName )
 {
     // Test, if Fontname includes CJK characters --> In this case we
     // mention that it is a CJK font
-    for(int i = 0; i < rFontName.getLength(); i++)
+    for(size_t i = 0; i < rFontName.size(); i++)
     {
         const sal_Unicode ch = rFontName[i];
         // japanese
@@ -92,8 +93,8 @@ static ImplFontAttrs lcl_IsCJKFont( const OUString& rFontName )
     return ImplFontAttrs::None;
 }
 
-PhysicalFontFamily::PhysicalFontFamily( const OUString& rSearchName )
-:   maSearchName( rSearchName ),
+PhysicalFontFamily::PhysicalFontFamily( OUString aSearchName )
+:   maSearchName(std::move( aSearchName )),
     mnTypeFaces( FontTypeFaces::NONE ),
     meFamily( FAMILY_DONTKNOW ),
     mePitch( PITCH_DONTKNOW ),
@@ -130,7 +131,7 @@ void PhysicalFontFamily::AddFontFace( PhysicalFontFace* pNewFontFace )
     // set attributes for attribute based font matching
     mnTypeFaces |= FontTypeFaces::Scalable;
 
-    if( pNewFontFace->IsSymbolFont() )
+    if( pNewFontFace->IsMicrosoftSymbolEncoded() )
         mnTypeFaces |= FontTypeFaces::Symbol;
     else
         mnTypeFaces |= FontTypeFaces::NoneSymbol;

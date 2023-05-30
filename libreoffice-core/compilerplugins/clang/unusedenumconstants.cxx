@@ -12,8 +12,8 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include "config_clang.h"
 #include "plugin.hxx"
-#include "compat.hxx"
 
 /**
 This looks for unused enum constants
@@ -67,6 +67,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         TraverseDecl(compiler.getASTContext().getTranslationUnitDecl());
 
         if (!isUnitTestMode())
@@ -246,9 +248,7 @@ walk_up:
                 || isa<ParenExpr>(parent)
                 || isa<MaterializeTemporaryExpr>(parent)
                 || isa<ExprWithCleanups>(parent)
-#if CLANG_VERSION >= 80000
                 || isa<ConstantExpr>(parent)
-#endif
                 || isa<CXXBindTemporaryExpr>(parent))
     {
         goto walk_up;
@@ -264,6 +264,10 @@ walk_up:
         bWrite = true;
     }
     else if (isa<MemberExpr>(parent))
+    {
+        goto walk_up;
+    }
+    else if (isa<ParenListExpr>(parent))
     {
         goto walk_up;
     }
@@ -284,7 +288,7 @@ walk_up:
         declRefExpr->dump();
         report( DiagnosticsEngine::Warning,
                 "unhandled clang AST node type",
-                compat::getBeginLoc(parent));
+                parent->getBeginLoc());
     }
 
     if (bWrite) {

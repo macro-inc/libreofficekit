@@ -21,9 +21,10 @@
 
 #include <cmdid.h>
 #include <cppuhelper/exc_hlp.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <svl/itemprop.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <unocrsrhelper.hxx>
 #include <unoparaframeenum.hxx>
@@ -61,31 +62,37 @@ void SwXTextPortion::init(const SwUnoCursor* pPortionCursor)
 
 SwXTextPortion::SwXTextPortion(
     const SwUnoCursor* pPortionCursor,
-        uno::Reference< text::XText > const& rParent,
+        uno::Reference< text::XText > xParent,
         SwTextPortionType eType)
     : m_pPropSet(aSwMapProvider.GetPropertySet(
         (PORTION_REDLINE_START == eType ||
          PORTION_REDLINE_END   == eType)
             ?  PROPERTY_MAP_REDLINE_PORTION
             :  PROPERTY_MAP_TEXTPORTION_EXTENSIONS))
-    , m_xParentText(rParent)
+    , m_xParentText(std::move(xParent))
     , m_pFrameFormat(nullptr)
-    , m_ePortionType(eType)
+    , m_ePortionType(eType != PORTION_LIST_AUTOFMT ? eType : PORTION_TEXT)
     , m_bIsCollapsed(false)
+    , m_bIsListAutoFormat(false)
 {
+    if (eType == PORTION_LIST_AUTOFMT)
+    {
+        m_bIsListAutoFormat = true;
+    }
     init( pPortionCursor);
 }
 
 SwXTextPortion::SwXTextPortion(
     const SwUnoCursor* pPortionCursor,
-    uno::Reference< text::XText > const& rParent,
+    uno::Reference< text::XText > xParent,
     SwFrameFormat& rFormat )
     : m_pPropSet(aSwMapProvider.GetPropertySet(
                     PROPERTY_MAP_TEXTPORTION_EXTENSIONS))
-    , m_xParentText(rParent)
+    , m_xParentText(std::move(xParent))
     , m_pFrameFormat(&rFormat)
     , m_ePortionType(PORTION_FRAME)
     , m_bIsCollapsed(false)
+    , m_bIsListAutoFormat(false)
 {
     StartListening(rFormat.GetNotifier());
     init( pPortionCursor);
@@ -94,30 +101,34 @@ SwXTextPortion::SwXTextPortion(
 SwXTextPortion::SwXTextPortion(
     const SwUnoCursor* pPortionCursor,
     SwTextRuby const& rAttr,
-    uno::Reference< text::XText > const& xParent,
+    uno::Reference< text::XText >  xParent,
     bool bIsEnd )
     : m_pPropSet(aSwMapProvider.GetPropertySet(
                     PROPERTY_MAP_TEXTPORTION_EXTENSIONS))
-    , m_xParentText(xParent)
-    , m_pRubyText   ( bIsEnd ? nullptr : new uno::Any )
-    , m_pRubyStyle  ( bIsEnd ? nullptr : new uno::Any )
-    , m_pRubyAdjust ( bIsEnd ? nullptr : new uno::Any )
-    , m_pRubyIsAbove( bIsEnd ? nullptr : new uno::Any )
-    , m_pRubyPosition( bIsEnd ? nullptr : new uno::Any )
+    , m_xParentText(std::move(xParent))
     , m_pFrameFormat(nullptr)
     , m_ePortionType( bIsEnd ? PORTION_RUBY_END : PORTION_RUBY_START )
     , m_bIsCollapsed(false)
+    , m_bIsListAutoFormat(false)
 {
+    if (!bIsEnd)
+    {
+        m_oRubyText.emplace();
+        m_oRubyStyle.emplace();
+        m_oRubyAdjust.emplace();
+        m_oRubyIsAbove.emplace();
+        m_oRubyPosition.emplace();
+    }
     init( pPortionCursor);
 
     if (!bIsEnd)
     {
         const SfxPoolItem& rItem = rAttr.GetAttr();
-        rItem.QueryValue(*m_pRubyText);
-        rItem.QueryValue(*m_pRubyStyle, MID_RUBY_CHARSTYLE);
-        rItem.QueryValue(*m_pRubyAdjust, MID_RUBY_ADJUST);
-        rItem.QueryValue(*m_pRubyIsAbove, MID_RUBY_ABOVE);
-        rItem.QueryValue(*m_pRubyPosition, MID_RUBY_POSITION);
+        rItem.QueryValue(*m_oRubyText);
+        rItem.QueryValue(*m_oRubyStyle, MID_RUBY_CHARSTYLE);
+        rItem.QueryValue(*m_oRubyAdjust, MID_RUBY_ADJUST);
+        rItem.QueryValue(*m_oRubyIsAbove, MID_RUBY_ABOVE);
+        rItem.QueryValue(*m_oRubyPosition, MID_RUBY_POSITION);
     }
 }
 
@@ -164,12 +175,13 @@ OUString SwXTextPortion::getString()
     SwUnoCursor& rUnoCursor = GetCursor();
 
     // TextPortions are always within a paragraph
-    SwTextNode* pTextNd = rUnoCursor.GetNode().GetTextNode();
+    SwTextNode* pTextNd = rUnoCursor.GetPointNode().GetTextNode();
     if ( pTextNd )
     {
-        const sal_Int32 nStt = rUnoCursor.Start()->nContent.GetIndex();
+        const sal_Int32 nStt = rUnoCursor.Start()->GetContentIndex();
         aText = pTextNd->GetExpandText(nullptr, nStt,
-                rUnoCursor.End()->nContent.GetIndex() - nStt );
+                rUnoCursor.End()->GetContentIndex() - nStt,
+                false, false, false, ExpandMode::ExpandFootnote);
     }
     return aText;
 }
@@ -214,6 +226,21 @@ void SwXTextPortion::GetPropertyValue(
         SwUnoCursor *pUnoCursor,
         std::unique_ptr<SfxItemSet> &pSet )
 {
+    static constexpr OUStringLiteral TEXT = u"Text";
+    static constexpr OUStringLiteral TEXTFIELD = u"TextField";
+    static constexpr OUStringLiteral FRAME = u"Frame";
+    static constexpr OUStringLiteral FOOTNOTE = u"Footnote";
+    static constexpr OUStringLiteral REDLINE = u"Redline";
+    static constexpr OUStringLiteral RUBY = u"Ruby";
+    static constexpr OUStringLiteral SOFTPAGEBREAK = u"SoftPageBreak";
+    static constexpr OUStringLiteral TEXTFIELDSTART = u"TextFieldStart";
+    static constexpr OUStringLiteral TEXTFIELDSEPARATOR = u"TextFieldSeparator";
+    static constexpr OUStringLiteral TEXTFIELDEND = u"TextFieldEnd";
+    static constexpr OUStringLiteral TEXTFIELDSTARTEND = u"TextFieldStartEnd";
+    static constexpr OUStringLiteral ANNOTATION = u"Annotation";
+    static constexpr OUStringLiteral ANNOTATIONEND = u"AnnotationEnd";
+    static constexpr OUStringLiteral LINEBREAK = u"LineBreak";
+
     OSL_ENSURE( pUnoCursor, "UNO cursor missing" );
     if (!pUnoCursor)
         return;
@@ -221,48 +248,36 @@ void SwXTextPortion::GetPropertyValue(
     {
         case FN_UNO_TEXT_PORTION_TYPE:
         {
-            const char* pRet;
+            OUString sRet;
             switch (m_ePortionType)
             {
-            case PORTION_TEXT:          pRet = "Text";break;
-            case PORTION_FIELD:         pRet = "TextField";break;
-            case PORTION_FRAME:         pRet = "Frame";break;
-            case PORTION_FOOTNOTE:      pRet = "Footnote";break;
+            case PORTION_TEXT:           sRet = TEXT; break;
+            case PORTION_FIELD:          sRet = TEXTFIELD; break;
+            case PORTION_FRAME:          sRet = FRAME; break;
+            case PORTION_FOOTNOTE:       sRet = FOOTNOTE; break;
             case PORTION_REFMARK_START:
-            case PORTION_REFMARK_END:   pRet = UNO_NAME_REFERENCE_MARK;break;
+            case PORTION_REFMARK_END:    sRet = UNO_NAME_REFERENCE_MARK; break;
             case PORTION_TOXMARK_START:
-            case PORTION_TOXMARK_END:   pRet = UNO_NAME_DOCUMENT_INDEX_MARK;break;
-            case PORTION_BOOKMARK_START :
-            case PORTION_BOOKMARK_END : pRet = UNO_NAME_BOOKMARK;break;
+            case PORTION_TOXMARK_END:    sRet = UNO_NAME_DOCUMENT_INDEX_MARK; break;
+            case PORTION_BOOKMARK_START:
+            case PORTION_BOOKMARK_END :  sRet = UNO_NAME_BOOKMARK; break;
             case PORTION_REDLINE_START:
-            case PORTION_REDLINE_END:   pRet = "Redline";break;
+            case PORTION_REDLINE_END:    sRet = REDLINE; break;
             case PORTION_RUBY_START:
-            case PORTION_RUBY_END:      pRet = "Ruby";break;
-            case PORTION_SOFT_PAGEBREAK:pRet = "SoftPageBreak";break;
-            case PORTION_META:          pRet = UNO_NAME_META; break;
-            case PORTION_FIELD_START:pRet = "TextFieldStart";break;
-            case PORTION_FIELD_SEP:     pRet = "TextFieldSeparator";break;
-            case PORTION_FIELD_END:pRet = "TextFieldEnd";break;
-            case PORTION_FIELD_START_END:pRet = "TextFieldStartEnd";break;
-            case PORTION_ANNOTATION:
-                pRet = "Annotation";
-                break;
-            case PORTION_ANNOTATION_END:
-                pRet = "AnnotationEnd";
-                break;
-            case PORTION_LINEBREAK:
-                pRet = "LineBreak";
-                break;
-            case PORTION_CONTENT_CONTROL:
-                pRet = UNO_NAME_CONTENT_CONTROL;
-                break;
-            default:
-                pRet = nullptr;
+            case PORTION_RUBY_END:       sRet = RUBY; break;
+            case PORTION_SOFT_PAGEBREAK: sRet = SOFTPAGEBREAK; break;
+            case PORTION_META:           sRet = UNO_NAME_META; break;
+            case PORTION_FIELD_START:    sRet = TEXTFIELDSTART; break;
+            case PORTION_FIELD_SEP:      sRet = TEXTFIELDSEPARATOR; break;
+            case PORTION_FIELD_END:      sRet = TEXTFIELDEND; break;
+            case PORTION_FIELD_START_END:sRet = TEXTFIELDSTARTEND; break;
+            case PORTION_ANNOTATION:     sRet = ANNOTATION; break;
+            case PORTION_ANNOTATION_END: sRet = ANNOTATIONEND; break;
+            case PORTION_LINEBREAK:      sRet = LINEBREAK; break;
+            case PORTION_CONTENT_CONTROL:sRet = UNO_NAME_CONTENT_CONTROL; break;
+            default: break;
             }
 
-            OUString sRet;
-            if( pRet )
-                sRet = OUString::createFromAscii( pRet );
             rVal <<= sRet;
         }
         break;
@@ -347,23 +362,38 @@ void SwXTextPortion::GetPropertyValue(
         break;
         case RES_TXTATR_CJK_RUBY:
         {
-            const uno::Any* pToSet = nullptr;
+            const std::optional<uno::Any>* pToSet = nullptr;
             switch(rEntry.nMemberId)
             {
-                case MID_RUBY_TEXT :    pToSet = m_pRubyText.get();   break;
-                case MID_RUBY_ADJUST :  pToSet = m_pRubyAdjust.get(); break;
-                case MID_RUBY_CHARSTYLE:pToSet = m_pRubyStyle.get();  break;
-                case MID_RUBY_ABOVE :   pToSet = m_pRubyIsAbove.get();break;
-                case MID_RUBY_POSITION: pToSet = m_pRubyPosition.get();break;
+                case MID_RUBY_TEXT :    pToSet = &m_oRubyText;   break;
+                case MID_RUBY_ADJUST :  pToSet = &m_oRubyAdjust; break;
+                case MID_RUBY_CHARSTYLE:pToSet = &m_oRubyStyle;  break;
+                case MID_RUBY_ABOVE :   pToSet = &m_oRubyIsAbove;break;
+                case MID_RUBY_POSITION: pToSet = &m_oRubyPosition;break;
             }
-            if(pToSet)
-                rVal = *pToSet;
+            if(pToSet && *pToSet)
+                rVal = **pToSet;
         }
         break;
         default:
             beans::PropertyState eTemp;
-            bool bDone = SwUnoCursorHelper::getCursorPropertyValue(
-                                rEntry, *pUnoCursor, &rVal, eTemp );
+            bool bDone = false;
+            if (m_bIsListAutoFormat)
+            {
+                SwTextNode* pTextNode = pUnoCursor->GetPointNode().GetTextNode();
+                std::shared_ptr<SfxItemSet> pListSet
+                    = pTextNode->GetAttr(RES_PARATR_LIST_AUTOFMT).GetStyleHandle();
+                if (pListSet)
+                {
+                    m_pPropSet->getPropertyValue(rEntry, *pListSet, rVal);
+                    bDone = true;
+                }
+            }
+            if (!bDone)
+            {
+                bDone = SwUnoCursorHelper::getCursorPropertyValue(
+                                    rEntry, *pUnoCursor, &rVal, eTemp );
+            }
             if(!bDone)
             {
                 if(!pSet)
@@ -416,6 +446,10 @@ void SwXTextPortion::SetPropertyValues_Impl(
     const uno::Sequence< OUString >& rPropertyNames,
     const uno::Sequence< uno::Any >& rValues )
 {
+    if (rPropertyNames.getLength() != rValues.getLength())
+        throw lang::IllegalArgumentException("lengths do not match",
+                                             static_cast<cppu::OWeakObject*>(this), -1);
+
     SwUnoCursor& rUnoCursor = GetCursor();
 
     {
@@ -598,11 +632,30 @@ uno::Sequence< beans::GetDirectPropertyTolerantResult > SwXTextPortion::GetPrope
         const SfxItemPropertyMap& rPropMap = m_pPropSet->getPropertyMap();
 
 
-        uno::Sequence< beans::PropertyState > aPropertyStates =
-            SwUnoCursorHelper::GetPropertyStates(
-                rUnoCursor, *m_pPropSet,
-                rPropertyNames,
-                SW_PROPERTY_STATE_CALLER_SWX_TEXT_PORTION_TOLERANT );
+        uno::Sequence< beans::PropertyState > aPropertyStates;
+        if (m_bIsListAutoFormat)
+        {
+            SwTextNode* pTextNode = rUnoCursor.GetPointNode().GetTextNode();
+            std::shared_ptr<SfxItemSet> pListSet
+                = pTextNode->GetAttr(RES_PARATR_LIST_AUTOFMT).GetStyleHandle();
+            if (pListSet)
+            {
+                std::vector<beans::PropertyState> aStates;
+                for (const auto& rPropertyName : rPropertyNames)
+                {
+                    aStates.push_back(m_pPropSet->getPropertyState(rPropertyName, *pListSet));
+                }
+                aPropertyStates = comphelper::containerToSequence(aStates);
+            }
+        }
+        if (!aPropertyStates.hasElements())
+        {
+            aPropertyStates =
+                SwUnoCursorHelper::GetPropertyStates(
+                    rUnoCursor, *m_pPropSet,
+                    rPropertyNames,
+                    SW_PROPERTY_STATE_CALLER_SWX_TEXT_PORTION_TOLERANT );
+        }
         const beans::PropertyState* pPropertyStates = aPropertyStates.getConstArray();
 
         for (sal_Int32 i = 0;  i < nProps;  ++i)

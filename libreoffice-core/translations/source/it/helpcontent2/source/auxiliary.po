@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-11-25 19:33+0100\n"
-"PO-Revision-Date: 2022-07-19 20:03+0000\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-12-12 13:30+0000\n"
 "Last-Translator: Valter Mura <valtermura@gmail.com>\n"
 "Language-Team: Italian <https://translations.documentfoundation.org/projects/libo_help-master/auxiliary/it/>\n"
 "Language: it\n"
@@ -123,6 +123,15 @@ msgctxt ""
 "node.text"
 msgid "Programming with Python"
 msgstr "Programmare con Python"
+
+#. Y4vuu
+#: sbasic.tree
+msgctxt ""
+"sbasic.tree\n"
+"070203\n"
+"node.text"
+msgid "Python Modules"
+msgstr "Moduli Python"
 
 #. JCHAg
 #: sbasic.tree
@@ -313,11 +322,11 @@ msgctxt ""
 msgid "Writing Calc Macros"
 msgstr "Scrivere macro per Calc"
 
-#. Q59GN
+#. vBXqp
 #: scalc.tree
 msgctxt ""
 "scalc.tree\n"
-"0815\n"
+"0816\n"
 "node.text"
 msgid "Miscellaneous"
 msgstr "Altro"
@@ -662,7 +671,7 @@ msgctxt ""
 "1015\n"
 "node.text"
 msgid "Document Version Tracking"
-msgstr "Tracciatura della versione del documento"
+msgstr "Tracciamento delle versioni del documento"
 
 #. AnvYc
 #: shared.tree
@@ -923,7 +932,7 @@ msgctxt ""
 "0210\n"
 "node.text"
 msgid "Navigating Text Documents"
-msgstr "Navigare nei documenti di testo"
+msgstr "Spostarsi tra i documenti di testo"
 
 #. hjKKD
 #: swriter.tree

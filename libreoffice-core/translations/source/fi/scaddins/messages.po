@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-03-04 19:36+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2022-12-07 12:12+0000\n"
 "Last-Translator: Tuomas Hietala <tuomas.hietala@iki.fi>\n"
 "Language-Team: Finnish <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/fi/>\n"
 "Language: fi\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1507240310.000000\n"
 
 #. i8Y7Z
@@ -240,11 +240,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Luettelo vapaapäivien (lomat, vapaa-aika ja niin edelleen) arvovastineista"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Palauttaa arvon 'tosi', jos luku on parillinen"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr "Palauttaa arvon 'tosi', jos kokonaisluvuksi katkaistu luku on parillinen"
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -258,11 +258,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "Luku, jonka kaksoiskerroin palautetaan"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Palauttaa arvon 'tosi', jos luku on pariton"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr "Palauttaa arvon 'tosi', jos kokonaisluvuksi katkaistu luku on pariton"
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -426,11 +426,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "Luku, joka kerrotaan piillä"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Palauttaa satunnaisen kokonaisluvun määrittämältäsi arvoväliltä"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr "Palauttaa satunnaisen kokonaisluvun ala- ja ylärajan väliltä (ala- ja yläraja mukaan lukien)"
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -438,11 +438,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Alaraja"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Arvovälin pienin kokonaisluku"
+msgid "The smallest integer that can be returned"
+msgstr "Pienin palautettava kokonaisluku"
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -450,11 +450,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Yläraja"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "Arvovälin suurin kokonaisluku"
+msgid "The largest integer that can be returned"
+msgstr "Suurin palautettava kokonaisluku"
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156
@@ -1260,7 +1260,7 @@ msgstr "Kompleksiluku"
 #: scaddins/inc/analysis.hrc:416
 msgctxt "ANALYSIS_Imlog10"
 msgid "Returns the base-10 logarithm of a complex number"
-msgstr "Palauttaa kompleksiluvun kymmenkantalogaritmin"
+msgstr "Palauttaa kompleksiluvun kymmenkantaisen logaritmin"
 
 #. oRbBa
 #: scaddins/inc/analysis.hrc:417

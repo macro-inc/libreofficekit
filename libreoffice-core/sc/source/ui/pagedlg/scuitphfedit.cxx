@@ -31,7 +31,6 @@
 #include <unotools/useroptions.hxx>
 
 #include <editutil.hxx>
-#include <global.hxx>
 #include <attrib.hxx>
 #include <patattr.hxx>
 
@@ -41,7 +40,7 @@
 
 ScHFEditPage::ScHFEditPage(weld::Container* pPage, weld::DialogController* pController,
                            const SfxItemSet& rCoreAttrs,
-                           sal_uInt16 nWhichId,
+                           TypedWhichId<ScPageHFItem> nWhichId,
                            bool bHeader)
     : SfxTabPage(pPage, pController, "modules/scalc/ui/headerfootercontent.ui", "HeaderFooterContent", &rCoreAttrs)
     , nWhich( nWhichId )
@@ -147,17 +146,15 @@ void ScHFEditPage::SetNumType(SvxNumType eNumType)
 
 void ScHFEditPage::Reset( const SfxItemSet* rCoreSet )
 {
-    const SfxPoolItem* pItem = nullptr;
-    if ( !rCoreSet->HasItem(nWhich, &pItem) )
+    const ScPageHFItem* pItem = rCoreSet->GetItemIfSet(nWhich);
+    if ( !pItem )
         return;
 
-    const ScPageHFItem& rItem = static_cast<const ScPageHFItem&>(*pItem);
-
-    if( const EditTextObject* pLeft = rItem.GetLeftArea() )
+    if( const EditTextObject* pLeft = pItem->GetLeftArea() )
         m_xWndLeft->SetText( *pLeft );
-    if( const EditTextObject* pCenter = rItem.GetCenterArea() )
+    if( const EditTextObject* pCenter = pItem->GetCenterArea() )
         m_xWndCenter->SetText( *pCenter );
-    if( const EditTextObject* pRight = rItem.GetRightArea() )
+    if( const EditTextObject* pRight = pItem->GetRightArea() )
         m_xWndRight->SetText( *pRight );
 
     SetSelectDefinedList();
@@ -781,7 +778,7 @@ IMPL_LINK(ScHFEditPage, MenuHdl, const OString&, rSelectedId, void)
 ScFirstHeaderEditPage::ScFirstHeaderEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_HEADERFIRST ),
+                    SID_SCATTR_PAGE_HEADERFIRST,
                     true )
     {}
 
@@ -794,7 +791,7 @@ std::unique_ptr<SfxTabPage> ScFirstHeaderEditPage::Create( weld::Container* pPag
 ScRightHeaderEditPage::ScRightHeaderEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_HEADERRIGHT ),
+                    SID_SCATTR_PAGE_HEADERRIGHT,
                     true )
     {}
 
@@ -807,7 +804,7 @@ std::unique_ptr<SfxTabPage> ScRightHeaderEditPage::Create( weld::Container* pPag
 ScLeftHeaderEditPage::ScLeftHeaderEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_HEADERLEFT ),
+                    SID_SCATTR_PAGE_HEADERLEFT,
                     true )
     {}
 
@@ -820,7 +817,7 @@ std::unique_ptr<SfxTabPage> ScLeftHeaderEditPage::Create( weld::Container* pPage
 ScFirstFooterEditPage::ScFirstFooterEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_FOOTERFIRST ),
+                    SID_SCATTR_PAGE_FOOTERFIRST,
                     false )
     {}
 
@@ -833,7 +830,7 @@ std::unique_ptr<SfxTabPage> ScFirstFooterEditPage::Create( weld::Container* pPag
 ScRightFooterEditPage::ScRightFooterEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_FOOTERRIGHT ),
+                    SID_SCATTR_PAGE_FOOTERRIGHT,
                     false )
     {}
 
@@ -846,7 +843,7 @@ std::unique_ptr<SfxTabPage> ScRightFooterEditPage::Create( weld::Container* pPag
 ScLeftFooterEditPage::ScLeftFooterEditPage( weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rCoreSet )
     : ScHFEditPage( pPage, pController,
                     rCoreSet,
-                    rCoreSet.GetPool()->GetWhich(SID_SCATTR_PAGE_FOOTERLEFT ),
+                    SID_SCATTR_PAGE_FOOTERLEFT,
                     false )
     {}
 

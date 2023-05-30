@@ -31,6 +31,8 @@
 #endif
 
 #include <condition_variable>
+#include <mutex>
+#include <queue>
 
 #if defined(_WIN32)
 #include <chrono>
@@ -43,9 +45,6 @@ typedef struct _timeval {
 #else // !_WIN32
 # include <sys/time.h>
 #endif
-
-#define VIRTUAL_DESKTOP_WIDTH 1024
-#define VIRTUAL_DESKTOP_HEIGHT 768
 
 #ifdef IOS
 #define SvpSalInstance AquaSalInstance
@@ -81,7 +80,9 @@ private:
     // at least one subclass of SvpSalInstance (GTK3) that doesn't use them.
     friend class SvpSalInstance;
     // members for communication from main thread to non-main thread
-    int                     m_FeedbackFDs[2];
+    std::mutex              m_FeedbackMutex;
+    std::queue<bool>        m_FeedbackPipe;
+    std::condition_variable m_FeedbackCV;
     osl::Condition          m_NonMainWaitingYieldCond;
     // members for communication from non-main thread to main thread
     bool                    m_bNoYieldLock = false; // accessed only on main thread
@@ -100,8 +101,6 @@ public:
     virtual bool IsCurrentThread() const override;
 };
 
-SalInstance* svp_create_SalInstance();
-
 // NOTE: the functions IsMainThread, DoYield and Wakeup *require* the use of
 // SvpSalYieldMutex; if a subclass uses something else it must override these
 // (Wakeup is only called by SvpSalTimer and SvpSalFrame)
@@ -117,6 +116,7 @@ class VCL_DLLPUBLIC SvpSalInstance : public SalGenericInstance, public SalUserEv
 
     virtual void            TriggerUserEventProcessing() override;
     virtual void            ProcessEvent( SalUserEvent aEvent ) override;
+    bool ImplYield(bool bWait, bool bHandleAllCurrentEvents);
 
 public:
     static SvpSalInstance*  s_pDefaultInstance;
@@ -124,8 +124,7 @@ public:
     SvpSalInstance( std::unique_ptr<SalYieldMutex> pMutex );
     virtual ~SvpSalInstance() override;
 
-    void                    CloseWakeupPipe(bool log);
-    void                    CreateWakeupPipe(bool log);
+    void                    CloseWakeupPipe();
     void                    Wakeup(SvpRequest request = SvpRequest::NONE);
 
     void                    StartTimer( sal_uInt64 nMS );
@@ -165,7 +164,11 @@ public:
 
     virtual void            GetPrinterQueueInfo( ImplPrnQueueList* pList ) override;
     virtual void            GetPrinterQueueState( SalPrinterQueueInfo* pInfo ) override;
+#ifdef _WIN32
+    virtual OUString        GetDefaultPrinter() { return OUString(); }
+#else
     virtual OUString        GetDefaultPrinter() override;
+#endif
     virtual void            PostPrintersChanged() override;
 
     // SalTimer

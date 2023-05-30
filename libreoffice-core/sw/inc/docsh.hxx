@@ -253,6 +253,9 @@ public:
                                    bool bTemplate = false ) const override;
 
     virtual std::set<Color> GetDocColors() override;
+
+    virtual std::vector<Color> GetThemeColors() override;
+
     sfx::AccessibilityIssueCollection runAccessibilityCheck() override;
 
     virtual void LoadStyles( SfxObjectShell& rSource ) override;
@@ -345,7 +348,7 @@ protected:
 */
 int SwFindDocShell( SfxObjectShellRef& xDocSh,
                     SfxObjectShellLock& xLockRef,
-                    const OUString& rFileName,
+                    std::u16string_view rFileName,
                     const OUString& rPasswd,
                     const OUString& rFilter,
                     sal_Int16 nVersion,

@@ -32,14 +32,14 @@ namespace accessibility
                                           const css::uno::Reference< css::awt::XWindow >& _xFocusWindow,
                                           AccessibleBrowseBoxObjType  _eObjType);
         /** @return  The count of visible children. */
-        virtual sal_Int32 SAL_CALL getAccessibleChildCount() override;
+        virtual sal_Int64 SAL_CALL getAccessibleChildCount() override;
 
         /** @return  The XAccessible interface of the specified child. */
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL
-            getAccessibleChild( sal_Int32 nChildIndex ) override;
+            getAccessibleChild( sal_Int64 nChildIndex ) override;
 
         /** @return  The index of this object among the parent's children. */
-        virtual sal_Int32 SAL_CALL getAccessibleIndexInParent() override;
+        virtual sal_Int64 SAL_CALL getAccessibleIndexInParent() override;
 
         /** Grabs the focus to the BrowseBox. */
         virtual void SAL_CALL grabFocus() override;
@@ -54,12 +54,9 @@ namespace accessibility
         */
         virtual OUString SAL_CALL getImplementationName() override;
 
-        /** Creates a new AccessibleStateSetHelper and fills it with states of the
-            current object.
-            @return
-                A filled AccessibleStateSetHelper.
+        /** Return a bitset of states of the current object.
         */
-        rtl::Reference<::utl::AccessibleStateSetHelper> implCreateStateSetHelper() override;
+        sal_Int64 implCreateStateSet() override;
 
     private:
         virtual tools::Rectangle implGetBoundingBox() override;

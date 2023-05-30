@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/sheet/databaserange.hxx>
 #include <test/sheet/xcellrangereferrer.hxx>
 #include <test/sheet/xdatabaserange.hxx>
@@ -24,14 +24,13 @@ using namespace css::uno;
 
 namespace sc_apitest {
 
-class ScDatabaseRangeObj : public CalcUnoApiTest,
+class ScDatabaseRangeObj : public UnoApiTest,
                            public apitest::DatabaseRange,
                            public apitest::XCellRangeReferrer,
                            public apitest::XDatabaseRange
 {
 public:
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference< uno::XInterface > init() override;
     virtual uno::Reference< uno::XInterface > init( const OUString& rDBName ) override;
@@ -65,12 +64,10 @@ public:
     CPPUNIT_TEST(testRefresh);
 
     CPPUNIT_TEST_SUITE_END();
-private:
-    uno::Reference< lang::XComponent > mxComponent;
 };
 
 ScDatabaseRangeObj::ScDatabaseRangeObj()
-      : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+      : UnoApiTest("/sc/qa/extras/testdocuments")
 {
 }
 
@@ -98,18 +95,9 @@ uno::Reference< uno::XInterface > ScDatabaseRangeObj::init( const OUString& rDBN
 
 void ScDatabaseRangeObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
 
-    OUString aFileURL;
-    createFileURL(u"ScDatabaseRangeObj.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL, "com.sun.star.sheet.SpreadsheetDocument");
-
-}
-
-void ScDatabaseRangeObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"ScDatabaseRangeObj.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScDatabaseRangeObj);

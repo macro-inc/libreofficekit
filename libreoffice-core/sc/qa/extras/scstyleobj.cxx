@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xnamed.hxx>
 
@@ -31,13 +31,12 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScStyleObj : public CalcUnoApiTest, public apitest::XNamed, public apitest::XPropertySet
+class ScStyleObj : public UnoApiTest, public apitest::XNamed, public apitest::XPropertySet
 {
 public:
     ScStyleObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     virtual uno::Reference<uno::XInterface> init() override;
 
@@ -55,13 +54,10 @@ public:
     CPPUNIT_TEST(testVetoableChangeListener);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScStyleObj::ScStyleObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XNamed("ScStyleObj")
     , XPropertySet({
           "BottomBorder",          "BottomBorder2",     "CellProtection", "CharLocale",
@@ -77,7 +73,7 @@ ScStyleObj::ScStyleObj()
 
 uno::Reference<uno::XInterface> ScStyleObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<style::XStyleFamiliesSupplier> xSFS(xDoc, uno::UNO_QUERY_THROW);
     uno::Reference<container::XNameAccess> xNA_StyleFamilies(xSFS->getStyleFamilies(),
@@ -95,28 +91,22 @@ uno::Reference<uno::XInterface> ScStyleObj::init()
     {
         xNC->removeByName("ScStyleObj");
     }
-    xNC->insertByName("ScStyleObj", uno::makeAny(xStyle));
+    xNC->insertByName("ScStyleObj", uno::Any(xStyle));
 
     uno::Reference<container::XIndexAccess> xIA_sheets(xDoc->getSheets(), uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XSpreadsheet> xSheet0(xIA_sheets->getByIndex(0), uno::UNO_QUERY_THROW);
     uno::Reference<table::XCell> xCell = xSheet0->getCellByPosition(2, 3);
     uno::Reference<beans::XPropertySet> xPS(xCell, uno::UNO_QUERY_THROW);
-    xPS->setPropertyValue("CellStyle", uno::makeAny(xStyle->getName()));
+    xPS->setPropertyValue("CellStyle", uno::Any(xStyle->getName()));
 
     return xStyle;
 }
 
 void ScStyleObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScStyleObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScStyleObj);

@@ -37,7 +37,7 @@
 #include <unotools/streamwrap.hxx>
 #include <unotools/tempfile.hxx>
 #include <svl/urihelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
 #include <tools/urlobj.hxx>
 
@@ -109,7 +109,7 @@ static void addFile_( Reference< XInterface > const & xRootFolder, Reference< XS
     if( xSink.is() && xTunnel.is())
     {
         Reference< XNameContainer > xNameContainer(xRootFolder, UNO_QUERY );
-        xNameContainer->insertByName(encodeZipUri( aName ), makeAny(xTunnel));
+        xNameContainer->insertByName(encodeZipUri( aName ), Any(xTunnel));
         xSink->setInputStream( xInput );
     }
 }
@@ -191,20 +191,18 @@ bool XMLFilterJarHelper::savePackage( const OUString& rPackageURL, const std::ve
             }
 
             // create TypeDetection.xcu
-            utl::TempFile aTempFile;
-            aTempFile.EnableKillingFile();
-            OUString aTempFileURL( aTempFile.GetURL() );
+            utl::TempFileFast aTempFile;
+            SvStream* pStream = aTempFile.GetStream(StreamMode::READWRITE);
 
             {
-                osl::File aOutputFile( aTempFileURL );
-                (void)aOutputFile.open(osl_File_OpenFlag_Write);
-                Reference< XOutputStream > xOS( new OSLOutputStreamWrapper( aOutputFile ) );
+                Reference< XOutputStream > xOS( new ::utl::OOutputStreamWrapper( *pStream ) );
 
                 TypeDetectionExporter aExporter( mxContext );
                 aExporter.doExport(xOS,rFilters);
             }
 
-            Reference< XInputStream > XIS(  new utl::OSeekableInputStreamWrapper( new SvFileStream(aTempFileURL, StreamMode::READ ), true ) );
+            pStream->Seek(0);
+            Reference< XInputStream > XIS(  new utl::OSeekableInputStreamWrapper( *pStream ) );
             addFile_( xRootFolder, xFactory,  XIS, "TypeDetection.xcu" );
 
             Reference< XChangesBatch > xBatch( xIfc, UNO_QUERY );
@@ -299,7 +297,7 @@ bool XMLFilterJarHelper::copyFiles( const Reference< XHierarchicalNameAccess >& 
     return bOk;
 }
 
-bool XMLFilterJarHelper::copyFile( const Reference< XHierarchicalNameAccess >& xIfc, OUString& rURL, const OUString& rTargetURL )
+bool XMLFilterJarHelper::copyFile( const Reference< XHierarchicalNameAccess >& xIfc, OUString& rURL, std::u16string_view rTargetURL )
 {
     if( !rURL.matchIgnoreAsciiCase( sVndSunStarPackage ) )
         return true;
@@ -308,8 +306,8 @@ bool XMLFilterJarHelper::copyFile( const Reference< XHierarchicalNameAccess >& x
     {
         OUString szPackagePath( encodeZipUri( rURL.copy( sVndSunStarPackage.getLength() ) ) );
 
-        if ( ::comphelper::OStorageHelper::PathHasSegment( szPackagePath, ".." )
-          || ::comphelper::OStorageHelper::PathHasSegment( szPackagePath, "." ) )
+        if ( ::comphelper::OStorageHelper::PathHasSegment( szPackagePath, u".." )
+          || ::comphelper::OStorageHelper::PathHasSegment( szPackagePath, u"." ) )
             throw lang::IllegalArgumentException();
 
         if( xIfc->hasByHierarchicalName( szPackagePath ) )

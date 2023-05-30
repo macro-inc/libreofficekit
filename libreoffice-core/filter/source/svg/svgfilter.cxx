@@ -41,10 +41,11 @@
 #include <unotools/mediadescriptor.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/zcodec.hxx>
 
 #include <drawinglayer/primitive2d/baseprimitive2d.hxx>
+#include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 
 #include "svgfilter.hxx"
@@ -77,6 +78,7 @@ SVGFilter::SVGFilter( const Reference< XComponentContext >& rxCtx ) :
     mpObjects( nullptr ),
     mbExportShapeSelection(false),
     mbIsPreview(false),
+    mbShouldCompress(false),
     mbWriterFilter(false),
     mbCalcFilter(false),
     mbImpressFilter(false),
@@ -99,6 +101,7 @@ sal_Bool SAL_CALL SVGFilter::filter( const Sequence< PropertyValue >& rDescripto
     mbWriterFilter = false;
     mbCalcFilter = false;
     mbImpressFilter = false;
+    mbShouldCompress = false;
 
     if(mxDstDoc.is()) // Import works for Impress / draw only
         return filterImpressOrDraw(rDescriptor);
@@ -135,6 +138,10 @@ sal_Bool SAL_CALL SVGFilter::filter( const Sequence< PropertyValue >& rDescripto
             {
                 mbCalcFilter = true;
                 return filterWriterOrCalc(rDescriptor);
+            }
+            else if(sFilterName == "draw_svgz_Export")
+            {
+                mbShouldCompress = true;
             }
             break;
         }
@@ -230,7 +237,7 @@ bool SVGFilter::filterImpressOrDraw( const Sequence< PropertyValue >& rDescripto
             GraphicFilter aGraphicFilter;
             Graphic aGraphic;
             const ErrCode nGraphicFilterErrorCode(
-                aGraphicFilter.ImportGraphic(aGraphic, OUString(), *aStream));
+                aGraphicFilter.ImportGraphic(aGraphic, u"", *aStream));
 
             if(ERRCODE_NONE != nGraphicFilterErrorCode)
             {
@@ -268,15 +275,10 @@ bool SVGFilter::filterImpressOrDraw( const Sequence< PropertyValue >& rDescripto
 
                     for(const auto& rCandidate : aContainer)
                     {
-                        if(rCandidate.is())
+                        if(rCandidate && PRIMITIVE2D_ID_HIDDENGEOMETRYPRIMITIVE2D != rCandidate->getPrimitive2DID())
                         {
-                            auto pBasePrimitive = static_cast< const drawinglayer::primitive2d::BasePrimitive2D* >(rCandidate.get());
-
-                            if(PRIMITIVE2D_ID_HIDDENGEOMETRYPRIMITIVE2D != pBasePrimitive->getPrimitive2DID())
-                            {
-                                bAllAreHiddenGeometry = false;
-                                break;
-                            }
+                            bAllAreHiddenGeometry = false;
+                            break;
                         }
                     }
 
@@ -289,15 +291,15 @@ bool SVGFilter::filterImpressOrDraw( const Sequence< PropertyValue >& rDescripto
 
             // create a SdrModel-GraphicObject to insert to page
             SdrPage* pTargetSdrPage(pSvxDrawPage->GetSdrPage());
-            std::unique_ptr< SdrGrafObj, SdrObjectFreeOp > aNewSdrGrafObj;
+            rtl::Reference< SdrGrafObj > aNewSdrGrafObj;
 
             // tdf#118232 only add an SdrGrafObj when we have Geometry
             if(!bContainsNoGeometry)
             {
-                aNewSdrGrafObj.reset(
+                aNewSdrGrafObj =
                     new SdrGrafObj(
                         pTargetSdrPage->getSdrModelFromSdrPage(),
-                        aGraphic));
+                        aGraphic);
             }
 
             // Evtl. adapt the GraphicPrefSize to target-MapMode of target-Model
@@ -353,7 +355,7 @@ bool SVGFilter::filterImpressOrDraw( const Sequence< PropertyValue >& rDescripto
                         aGraphicSize));
 
                 // insert to page (owner change of SdrGrafObj)
-                pTargetSdrPage->InsertObject(aNewSdrGrafObj.release());
+                pTargetSdrPage->InsertObject(aNewSdrGrafObj.get());
             }
 
             // done - set positive result now

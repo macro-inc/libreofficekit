@@ -42,12 +42,6 @@
 using namespace ::com::sun::star;
 using namespace svl;
 
-static std::ostream& operator<<(std::ostream& rStrm, const Color& rColor)
-{
-    rStrm << "Color: R:" << static_cast<int>(rColor.GetRed()) << " G:" << static_cast<int>(rColor.GetGreen()) << " B: " << static_cast<int>(rColor.GetBlue());
-    return rStrm;
-}
-
 namespace svl
 {
 static std::ostream& operator<<(std::ostream& rStrm, const SharedString& string )
@@ -104,7 +98,7 @@ public:
     CPPUNIT_TEST(testExcelExportFormats);
     CPPUNIT_TEST_SUITE_END();
 
-private:
+protected:
     uno::Reference< uno::XComponentContext > m_xContext;
     void checkPreviewString(SvNumberFormatter& aFormatter,
                             const OUString& sCode,
@@ -451,10 +445,10 @@ void Test::testSharedStringPoolEmptyString()
     svl::SharedStringPool aPool(aSysLocale.GetCharClass());
     aPool.intern("");
     CPPUNIT_ASSERT_EQUAL(SharedString::getEmptyString(), aPool.intern(""));
-    CPPUNIT_ASSERT_EQUAL(SharedString::getEmptyString(), aPool.intern(OUString()));
+    CPPUNIT_ASSERT_EQUAL(SharedString::getEmptyString(), aPool.intern(SharedString::EMPTY_STRING));
     // And it should still work even after purging.
     aPool.purge();
-    CPPUNIT_ASSERT_EQUAL(SharedString::getEmptyString(), aPool.intern(OUString()));
+    CPPUNIT_ASSERT_EQUAL(SharedString::getEmptyString(), aPool.intern(SharedString::EMPTY_STRING));
 }
 
 void Test::checkPreviewString(SvNumberFormatter& aFormatter,
@@ -1279,7 +1273,8 @@ void Test::testIsNumberFormatSpecific()
             { "1999-11-22", true, "1999-11-22", 0 },
             { "11/2/1",     true, "2011-02-01", 0 },
             { "99-2-11",    true, "1999-02-11", 0 },
-            { "22-2-11",    true, "2022-02-11", 0 }
+            { "22-2-11",    true, "2022-02-11", 0 },
+            { "02 Mar 2020",true, "2020-03-02", 0 }
         };
 
         checkSpecificNumberFormats( aFormatter, aIO, "[en-ZA] date");
@@ -1452,6 +1447,18 @@ void Test::testUserDefinedNumberFormats()
         sCode = "# ?/???";
         sExpected = "-575 540/697";
         checkPreviewString(aFormatter, sCode, -575.774749601315, eLang, sExpected);
+    }
+    {  // tdf#153887: integer value without integer part displayed
+        sCode = "#/?";
+        sExpected = "2/1";
+        checkPreviewString(aFormatter, sCode, 1.95, eLang, sExpected);
+        checkPreviewString(aFormatter, sCode, 2.00, eLang, sExpected);
+        checkPreviewString(aFormatter, sCode, 2.05, eLang, sExpected);
+        sCode = "0/8";
+        sExpected = "16/8";
+        checkPreviewString(aFormatter, sCode, 1.95, eLang, sExpected);
+        checkPreviewString(aFormatter, sCode, 2.00, eLang, sExpected);
+        checkPreviewString(aFormatter, sCode, 2.05, eLang, sExpected);
     }
     {  // tdf#102507: left alignment of denominator
         sCode = "# ?/???";
@@ -1947,6 +1954,19 @@ void Test::testExcelExportFormats()
     aCode = aFormatter.GetFormatStringForExcel( nKey2, aKeywords, aTempFormatter);
     // Test that LCID is not prepended. Note that literal characters are escaped.
     CPPUNIT_ASSERT_EQUAL( OUString("[$R-1C09]\\ #,##0.0;[$R-1C09]\\-#,##0.0"), aCode);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testLanguageNone)
+{
+    SvNumberFormatter aFormatter(m_xContext, LANGUAGE_ENGLISH_US);
+    NfKeywordTable keywords;
+    aFormatter.FillKeywordTableForExcel(keywords);
+    OUString code("TT.MM.JJJJ");
+    sal_uInt32 nKey = aFormatter.GetEntryKey(code, LANGUAGE_GERMAN);
+    CPPUNIT_ASSERT(nKey != NUMBERFORMAT_ENTRY_NOT_FOUND);
+    SvNumberformat const*const pFormat = aFormatter.GetEntry(nKey);
+    LocaleDataWrapper ldw(m_xContext, LanguageTag(pFormat->GetLanguage()));
+    CPPUNIT_ASSERT_EQUAL(OUString("dd.mm.yyyy"), pFormat->GetMappedFormatstring(keywords, ldw));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(Test);

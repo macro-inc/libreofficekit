@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-07-06 16:25+0000\n"
+"POT-Creation-Date: 2023-02-09 12:12+0100\n"
+"PO-Revision-Date: 2022-12-21 15:34+0000\n"
 "Last-Translator: Rhoslyn Prys <rprys@yahoo.com>\n"
 "Language-Team: Welsh <https://translations.documentfoundation.org/projects/libo_ui-master/sdmessages/cy/>\n"
 "Language: cy\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=(n==0) ? 0 : (n==1) ? 1 : (n==2) ? 2 : (n==3) ? 3 :(n==6) ? 4 : 5;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: LibreOffice\n"
 "X-POOTLE-MTIME: 1565695968.000000\n"
 
 #. WDjkB
@@ -2396,44 +2396,14 @@ msgctxt "STR_SAVE_DOC"
 msgid "Save Document"
 msgstr "Cadw Dogfen"
 
-#. VCFFA
-#: sd/inc/strings.hrc:363
-msgctxt "STR_POOLSHEET_BANDED_CELL"
-msgid "Banding cell"
-msgstr "Cell bandio"
-
-#. FBzD4
-#: sd/inc/strings.hrc:364
-msgctxt "STR_POOLSHEET_HEADER"
-msgid "Header"
-msgstr "Pennyn"
-
-#. kut56
-#: sd/inc/strings.hrc:365
-msgctxt "STR_POOLSHEET_TOTAL"
-msgid "Total line"
-msgstr "Llinell gyfanswm"
-
-#. 4UBCG
-#: sd/inc/strings.hrc:366
-msgctxt "STR_POOLSHEET_FIRST_COLUMN"
-msgid "First column"
-msgstr "Colofn gyntaf"
-
-#. f3Zfa
-#: sd/inc/strings.hrc:367
-msgctxt "STR_POOLSHEET_LAST_COLUMN"
-msgid "Last column"
-msgstr "Colofn olaf"
-
 #. HAeDt
-#: sd/inc/strings.hrc:368
+#: sd/inc/strings.hrc:363
 msgctxt "STR_SHRINK_FONT_SIZE"
 msgid "Shrink font size"
 msgstr "Lleihau maint ffont"
 
 #. 7uDfu
-#: sd/inc/strings.hrc:369
+#: sd/inc/strings.hrc:364
 msgctxt "STR_GROW_FONT_SIZE"
 msgid "Grow font size"
 msgstr "Cynyddu maint ffont"
@@ -2441,628 +2411,646 @@ msgstr "Cynyddu maint ffont"
 #. E9zvq
 #. Names and descriptions of the Draw/Impress accessibility views
 #. ==============================================================
-#: sd/inc/strings.hrc:374
+#: sd/inc/strings.hrc:369
 msgctxt "SID_SD_A11Y_D_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "Golwg Lluniadu"
 
 #. GfnmX
-#: sd/inc/strings.hrc:375
+#: sd/inc/strings.hrc:370
 msgctxt "SID_SD_A11Y_I_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "Golwg Lluniadu"
 
 #. YCVqM
-#: sd/inc/strings.hrc:376
+#: sd/inc/strings.hrc:371
 msgctxt "SID_SD_A11Y_I_OUTLINEVIEW_N"
 msgid "Outline View"
 msgstr "Golwg Amlinell"
 
 #. k2hXi
-#: sd/inc/strings.hrc:377
+#: sd/inc/strings.hrc:372
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_N"
 msgid "Slides View"
 msgstr "Golwg Sleidiau"
 
 #. A22hR
-#: sd/inc/strings.hrc:378
+#: sd/inc/strings.hrc:373
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_D"
 msgid "This is where you sort slides."
 msgstr "Dyma lle rhydych yn trefnu sleidiau."
 
 #. vyX8L
-#: sd/inc/strings.hrc:379
+#: sd/inc/strings.hrc:374
 msgctxt "SID_SD_A11Y_I_NOTESVIEW_N"
 msgid "Notes View"
 msgstr "Golwg Nodiadau"
 
 #. qr5ov
-#: sd/inc/strings.hrc:380
+#: sd/inc/strings.hrc:375
 msgctxt "SID_SD_A11Y_I_HANDOUTVIEW_N"
 msgid "Handout View"
 msgstr "Golwg Taflen"
 
 #. Ycpb4
-#: sd/inc/strings.hrc:381
+#: sd/inc/strings.hrc:376
 msgctxt "SID_SD_A11Y_P_TITLE_N"
 msgid "PresentationTitle"
 msgstr "TeitlCyflwyniad"
 
 #. 4WCzf
-#: sd/inc/strings.hrc:382
+#: sd/inc/strings.hrc:377
 msgctxt "SID_SD_A11Y_P_OUTLINER_N"
 msgid "PresentationOutliner"
 msgstr "AmlinellwrCyflwyniad"
 
 #. cBoMF
-#: sd/inc/strings.hrc:383
+#: sd/inc/strings.hrc:378
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N"
 msgid "PresentationSubtitle"
 msgstr "IsdeitlCyflwyniad"
 
 #. 8KV99
-#: sd/inc/strings.hrc:384
+#: sd/inc/strings.hrc:379
 msgctxt "SID_SD_A11Y_P_PAGE_N"
 msgid "PresentationPage"
 msgstr "TudalenCyflwyniad"
 
 #. R6kyg
-#: sd/inc/strings.hrc:385
+#: sd/inc/strings.hrc:380
 msgctxt "SID_SD_A11Y_P_NOTES_N"
 msgid "PresentationNotes"
 msgstr "NodiadauCyflwyniad"
 
 #. X8c9Z
-#: sd/inc/strings.hrc:386
+#: sd/inc/strings.hrc:381
 msgctxt "SID_SD_A11Y_P_HANDOUT_N"
 msgid "Handout"
 msgstr "Taflen"
 
 #. FeAdu
-#: sd/inc/strings.hrc:387
+#: sd/inc/strings.hrc:382
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N"
 msgid "UnknownAccessiblePresentationShape"
 msgstr "SiâpCyflwyniadHygyrchAnhysbys"
 
 #. sA8of
-#: sd/inc/strings.hrc:388
+#: sd/inc/strings.hrc:383
 msgctxt "SID_SD_A11Y_P_FOOTER_N"
 msgid "PresentationFooter"
 msgstr "TroedynCyflwyniad"
 
 #. KAC6Z
-#: sd/inc/strings.hrc:389
+#: sd/inc/strings.hrc:384
 msgctxt "SID_SD_A11Y_P_HEADER_N"
 msgid "PresentationHeader"
 msgstr "PennynCyflwyniad"
 
 #. EfHeH
-#: sd/inc/strings.hrc:390
+#: sd/inc/strings.hrc:385
 msgctxt "SID_SD_A11Y_P_DATE_N"
 msgid "PresentationDateAndTime"
 msgstr "DyddiadAcAmserCyflwyniad"
 
 #. WosPZ
-#: sd/inc/strings.hrc:391
+#: sd/inc/strings.hrc:386
 msgctxt "SID_SD_A11Y_P_NUMBER_N"
 msgid "PresentationPageNumber"
 msgstr "RhifTudalenCyflwyniad"
 
 #. kCGsH
-#: sd/inc/strings.hrc:392
+#: sd/inc/strings.hrc:387
 msgctxt "SID_SD_A11Y_D_PRESENTATION"
 msgid "%PRODUCTNAME Presentation"
 msgstr "Cyflwyniad %PRODUCTNAME"
 
 #. ubJop
-#: sd/inc/strings.hrc:393
+#: sd/inc/strings.hrc:388
 msgctxt "SID_SD_A11Y_P_TITLE_N_STYLE"
 msgid "Title"
 msgstr "Teitl"
 
 #. Va4KF
-#: sd/inc/strings.hrc:394
+#: sd/inc/strings.hrc:389
 msgctxt "SID_SD_A11Y_P_OUTLINER_N_STYLE"
 msgid "Outliner"
 msgstr "Amlinellu"
 
 #. 6FKRE
-#: sd/inc/strings.hrc:395
+#: sd/inc/strings.hrc:390
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N_STYLE"
 msgid "Subtitle"
 msgstr "Is Deitl"
 
 #. eSBEi
-#: sd/inc/strings.hrc:396
+#: sd/inc/strings.hrc:391
 msgctxt "SID_SD_A11Y_P_PAGE_N_STYLE"
 msgid "Page"
 msgstr "Tudalen"
 
 #. WEaeZ
-#: sd/inc/strings.hrc:397
+#: sd/inc/strings.hrc:392
 msgctxt "SID_SD_A11Y_P_NOTES_N_STYLE"
 msgid "Notes"
 msgstr "Nodiadau"
 
 #. buhox
-#: sd/inc/strings.hrc:398
+#: sd/inc/strings.hrc:393
 msgctxt "SID_SD_A11Y_P_HANDOUT_N_STYLE"
 msgid "Handout"
 msgstr "Taflen"
 
 #. 4xBQg
-#: sd/inc/strings.hrc:399
+#: sd/inc/strings.hrc:394
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N_STYLE"
 msgid "Unknown Accessible Presentation Shape"
 msgstr "Siap Cyflwniad Hygyrchedd Anhysbys"
 
 #. CGegB
-#: sd/inc/strings.hrc:400
+#: sd/inc/strings.hrc:395
 msgctxt "SID_SD_A11Y_P_FOOTER_N_STYLE"
 msgid "Footer"
 msgstr "Troedyn"
 
 #. SrrR4
-#: sd/inc/strings.hrc:401
+#: sd/inc/strings.hrc:396
 msgctxt "SID_SD_A11Y_P_HEADER_N_STYLE"
 msgid "Header"
 msgstr "Pennyn"
 
 #. CCwKy
-#: sd/inc/strings.hrc:402
+#: sd/inc/strings.hrc:397
 msgctxt "SID_SD_A11Y_P_DATE_N_STYLE"
 msgid "Date"
 msgstr "Dyddiad"
 
 #. EFmn4
-#: sd/inc/strings.hrc:403
+#: sd/inc/strings.hrc:398
 msgctxt "SID_SD_A11Y_P_NUMBER_N_STYLE"
 msgid "Number"
 msgstr "Rhif"
 
 #. wFpMQ
-#: sd/inc/strings.hrc:404
+#: sd/inc/strings.hrc:399
 msgctxt "SID_SD_A11Y_D_PRESENTATION_READONLY"
 msgid "(read-only)"
 msgstr "(darllen yn unig)"
 
 #. EV4W5
-#: sd/inc/strings.hrc:406
+#: sd/inc/strings.hrc:401
 msgctxt "STR_CUSTOMANIMATION_REPEAT_NONE"
 msgid "none"
 msgstr "dim"
 
 #. 9izAz
-#: sd/inc/strings.hrc:407
+#: sd/inc/strings.hrc:402
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_NEXT_CLICK"
 msgid "Until next click"
 msgstr "Tan y clic nesaf"
 
 #. oEQ7B
-#: sd/inc/strings.hrc:408
+#: sd/inc/strings.hrc:403
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_END_OF_SLIDE"
 msgid "Until end of slide"
 msgstr "Tan ddiwedd y sleid"
 
 #. Lf9gB
-#: sd/inc/strings.hrc:409
+#: sd/inc/strings.hrc:404
 msgctxt "STR_CUSTOMANIMATION_DIRECTION_PROPERTY"
 msgid "Direction:"
 msgstr "Cyfeiriad:"
 
 #. xxDXG
-#: sd/inc/strings.hrc:410
+#: sd/inc/strings.hrc:405
 msgctxt "STR_CUSTOMANIMATION_ZOOM_PROPERTY"
 msgid "Zoom:"
 msgstr "Chwyddo:"
 
 #. SvBeK
-#: sd/inc/strings.hrc:411
+#: sd/inc/strings.hrc:406
 msgctxt "STR_CUSTOMANIMATION_SPOKES_PROPERTY"
 msgid "Spokes:"
 msgstr "Sbocau:"
 
 #. eJ4qZ
-#: sd/inc/strings.hrc:412
+#: sd/inc/strings.hrc:407
 msgctxt "STR_CUSTOMANIMATION_FIRST_COLOR_PROPERTY"
 msgid "First color:"
 msgstr "Lliw cyntaf:"
 
 #. CSbCE
-#: sd/inc/strings.hrc:413
+#: sd/inc/strings.hrc:408
 msgctxt "STR_CUSTOMANIMATION_SECOND_COLOR_PROPERTY"
 msgid "Second color:"
 msgstr "Ail liw:"
 
 #. cZUiD
-#: sd/inc/strings.hrc:414
+#: sd/inc/strings.hrc:409
 msgctxt "STR_CUSTOMANIMATION_FILL_COLOR_PROPERTY"
 msgid "Fill color:"
 msgstr "Lliw llanw:"
 
 #. U5ZDL
-#: sd/inc/strings.hrc:415
+#: sd/inc/strings.hrc:410
 msgctxt "STR_CUSTOMANIMATION_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "Arddull:"
 
 #. vKLER
-#: sd/inc/strings.hrc:416
+#: sd/inc/strings.hrc:411
 msgctxt "STR_CUSTOMANIMATION_FONT_PROPERTY"
 msgid "Font:"
 msgstr "Ffont:"
 
 #. Fdsks
-#: sd/inc/strings.hrc:417
+#: sd/inc/strings.hrc:412
 msgctxt "STR_CUSTOMANIMATION_FONT_COLOR_PROPERTY"
 msgid "Font color:"
 msgstr "Lliw ffont:"
 
 #. nT7dm
-#: sd/inc/strings.hrc:418
+#: sd/inc/strings.hrc:413
 msgctxt "STR_CUSTOMANIMATION_FONT_SIZE_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "Arddull:"
 
 #. q24Fe
-#: sd/inc/strings.hrc:419
+#: sd/inc/strings.hrc:414
 msgctxt "STR_CUSTOMANIMATION_FONT_STYLE_PROPERTY"
 msgid "Typeface:"
 msgstr "Ffurf-deip:"
 
 #. nAqeR
-#: sd/inc/strings.hrc:420
+#: sd/inc/strings.hrc:415
 msgctxt "STR_CUSTOMANIMATION_LINE_COLOR_PROPERTY"
 msgid "Line color:"
 msgstr "Lliw llinell:"
 
 #. w7G4Q
-#: sd/inc/strings.hrc:421
+#: sd/inc/strings.hrc:416
 msgctxt "STR_CUSTOMANIMATION_SIZE_PROPERTY"
 msgid "Font size:"
 msgstr "Maint ffont:"
 
 #. R3GgU
-#: sd/inc/strings.hrc:422
+#: sd/inc/strings.hrc:417
 msgctxt "STR_CUSTOMANIMATION_SCALE_PROPERTY"
 msgid "Size:"
 msgstr "Maint:"
 
 #. YEwoz
-#: sd/inc/strings.hrc:423
+#: sd/inc/strings.hrc:418
 msgctxt "STR_CUSTOMANIMATION_AMOUNT_PROPERTY"
 msgid "Amount:"
 msgstr "Swm:"
 
 #. wiQPZ
-#: sd/inc/strings.hrc:424
+#: sd/inc/strings.hrc:419
 msgctxt "STR_CUSTOMANIMATION_COLOR_PROPERTY"
 msgid "Color:"
 msgstr "Lliw:"
 
 #. f5u6C
-#: sd/inc/strings.hrc:425
+#: sd/inc/strings.hrc:420
 msgctxt "STR_CUSTOMANIMATION_NO_SOUND"
 msgid "(No sound)"
 msgstr "(Dim sain)"
 
 #. N7jGX
-#: sd/inc/strings.hrc:426
+#: sd/inc/strings.hrc:421
 msgctxt "STR_CUSTOMANIMATION_STOP_PREVIOUS_SOUND"
 msgid "(Stop previous sound)"
 msgstr "(Atal y sain blaenorol)"
 
 #. vasqr
-#: sd/inc/strings.hrc:427
+#: sd/inc/strings.hrc:422
 msgctxt "STR_CUSTOMANIMATION_BROWSE_SOUND"
 msgid "Other sound..."
 msgstr "Sain arall..."
 
 #. CjvLY
-#: sd/inc/strings.hrc:428
+#: sd/inc/strings.hrc:423
 msgctxt "STR_CUSTOMANIMATION_SAMPLE"
 msgid "Sample"
 msgstr "Sampl"
 
 #. CdYt2
-#: sd/inc/strings.hrc:429
+#: sd/inc/strings.hrc:424
 msgctxt "STR_CUSTOMANIMATION_TRIGGER"
 msgid "Trigger"
 msgstr "Trigyr"
 
 #. Evkrq
-#: sd/inc/strings.hrc:430
+#: sd/inc/strings.hrc:425
 msgctxt "STR_CUSTOMANIMATION_USERPATH"
 msgid "User paths"
 msgstr "Llwybrau defnyddwyr"
 
 #. EcciE
-#: sd/inc/strings.hrc:431
+#: sd/inc/strings.hrc:426
 msgctxt "STR_CUSTOMANIMATION_ENTRANCE"
 msgid "Entrance: %1"
 msgstr "Mynedfa: %1"
 
 #. Zydrz
-#: sd/inc/strings.hrc:432
+#: sd/inc/strings.hrc:427
 msgctxt "STR_CUSTOMANIMATION_EMPHASIS"
 msgid "Emphasis: %1"
 msgstr "Pwyslais: %1"
 
 #. kW2DL
-#: sd/inc/strings.hrc:433
+#: sd/inc/strings.hrc:428
 msgctxt "STR_CUSTOMANIMATION_EXIT"
 msgid "Exit: %1"
 msgstr "Gadael: %1"
 
 #. iKFbF
-#: sd/inc/strings.hrc:434
+#: sd/inc/strings.hrc:429
 msgctxt "STR_CUSTOMANIMATION_MOTION_PATHS"
 msgid "Motion Paths: %1"
 msgstr "Llwybrau Mudiant: %1"
 
 #. kg9Yv
-#: sd/inc/strings.hrc:435
+#: sd/inc/strings.hrc:430
 msgctxt "STR_CUSTOMANIMATION_MISC"
 msgid "Misc: %1"
 msgstr "Amr: %1"
 
 #. Ep4QY
-#: sd/inc/strings.hrc:436
+#: sd/inc/strings.hrc:431
 msgctxt "STR_SLIDETRANSITION_NONE"
 msgid "None"
 msgstr "Dim"
 
 #. KAsTD
-#: sd/inc/strings.hrc:438
+#: sd/inc/strings.hrc:433
 msgctxt "STR_ANNOTATION_TODAY"
 msgid "Today,"
 msgstr "Heddiw,"
 
 #. DEYnN
-#: sd/inc/strings.hrc:439
+#: sd/inc/strings.hrc:434
 msgctxt "STR_ANNOTATION_YESTERDAY"
 msgid "Yesterday,"
 msgstr "Ddoe,"
 
 #. bh3FZ
-#: sd/inc/strings.hrc:440
+#: sd/inc/strings.hrc:435
 msgctxt "STR_ANNOTATION_NOAUTHOR"
 msgid "(no author)"
 msgstr "(dim awdur)"
 
 #. AvNV8
-#: sd/inc/strings.hrc:441
+#: sd/inc/strings.hrc:436
 msgctxt "STR_ANNOTATION_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress reached the end of the presentation. Do you want to continue at the beginning?"
 msgstr "Mae %PRODUCTNAME Impress wedi cyrraedd diwedd y cyflwyniad. Hoffech chi barhau o'r cychwyn?"
 
 #. P5gKe
-#: sd/inc/strings.hrc:442
+#: sd/inc/strings.hrc:437
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress reached the beginning of the presentation. Do you want to continue at the end?"
 msgstr "Mae %PRODUCTNAME Impress wedi cyrraedd diwedd y cyflwyniad. Hoffech chi barhau o'r diwedd?"
 
 #. KGmdL
-#: sd/inc/strings.hrc:443
+#: sd/inc/strings.hrc:438
 msgctxt "STR_ANNOTATION_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the end of the document. Do you want to continue at the beginning?"
 msgstr "Mae %PRODUCTNAME Draw wedi cyrraedd diwedd y ddogfen. Hoffech chi barhau o'r cychwyn?"
 
 #. oEn6r
-#: sd/inc/strings.hrc:444
+#: sd/inc/strings.hrc:439
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the beginning of the document. Do you want to continue at the end?"
 msgstr "Mae %PRODUCTNAME Draw wedi cyrraedd dechrau'r ddogfen. Hoffech chi barhau o'r diwedd?"
 
 #. eP7Vm
-#: sd/inc/strings.hrc:445
+#: sd/inc/strings.hrc:440
 msgctxt "STR_ANNOTATION_UNDO_INSERT"
 msgid "Insert Comment"
 msgstr "Mewnosod Sylw"
 
 #. s4c9W
-#: sd/inc/strings.hrc:446
+#: sd/inc/strings.hrc:441
 msgctxt "STR_ANNOTATION_UNDO_DELETE"
 msgid "Delete Comment(s)"
 msgstr "Dileu Sylw(adau)"
 
 #. bxiPE
-#: sd/inc/strings.hrc:447
+#: sd/inc/strings.hrc:442
 msgctxt "STR_ANNOTATION_UNDO_MOVE"
 msgid "Move Comment"
 msgstr "Symud Sylwadau"
 
 #. hQbpd
-#: sd/inc/strings.hrc:448
+#: sd/inc/strings.hrc:443
 msgctxt "STR_ANNOTATION_UNDO_EDIT"
 msgid "Edit Comment"
 msgstr "Golygu Nodyn"
 
 #. g6k7E
-#: sd/inc/strings.hrc:449
+#: sd/inc/strings.hrc:444
 msgctxt "STR_ANNOTATION_REPLY"
 msgid "Reply to %1"
 msgstr "Ateb i %1"
 
 #. NMTpu
-#: sd/inc/strings.hrc:451
+#: sd/inc/strings.hrc:446
 msgctxt "RID_DRAW_MEDIA_TOOLBOX"
 msgid "Media Playback"
 msgstr "Ailchwarae'r Cyfrwng"
 
 #. Q76cw
-#: sd/inc/strings.hrc:452
+#: sd/inc/strings.hrc:447
 msgctxt "RID_DRAW_TABLE_TOOLBOX"
 msgid "Table"
 msgstr "Tabl"
 
 #. xCRmu
-#: sd/inc/strings.hrc:454
+#: sd/inc/strings.hrc:449
 msgctxt "STR_IMPRESS_PRINT_UI_GROUP_NAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 6KbnP
-#: sd/inc/strings.hrc:455
+#: sd/inc/strings.hrc:450
 msgctxt "STR_IMPRESS_PRINT_UI_CONTENT"
 msgid "Document"
 msgstr "Dogfen"
 
 #. uBxPs
-#: sd/inc/strings.hrc:456
+#: sd/inc/strings.hrc:451
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDESPERPAGE"
 msgid "Slides per page:"
 msgstr "Sleidiau i'r dudalen:"
 
 #. EPBUK
-#: sd/inc/strings.hrc:457
+#: sd/inc/strings.hrc:452
 msgctxt "STR_IMPRESS_PRINT_UI_ORDER"
 msgid "Order:"
 msgstr "Trefn:"
 
 #. BFEFJ
-#: sd/inc/strings.hrc:458
+#: sd/inc/strings.hrc:453
 msgctxt "STR_IMPRESS_PRINT_UI_INCLUDE_CONTENT"
 msgid "~Contents"
 msgstr "~Cynnwys"
 
 #. AdWKp
-#: sd/inc/strings.hrc:459
+#: sd/inc/strings.hrc:454
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_NAME"
 msgid "~Slide name"
 msgstr "~Enw sleid"
 
 #. GkLky
-#: sd/inc/strings.hrc:460
+#: sd/inc/strings.hrc:455
 msgctxt "STR_DRAW_PRINT_UI_IS_PRINT_NAME"
 msgid "P~age name"
 msgstr "~Enw tudalen"
 
 #. EFkVE
-#: sd/inc/strings.hrc:461
+#: sd/inc/strings.hrc:456
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_DATE"
 msgid "~Date and time"
 msgstr "~Dyddiad ac amser"
 
 #. ZcDFL
-#: sd/inc/strings.hrc:462
+#: sd/inc/strings.hrc:457
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_HIDDEN"
 msgid "Hidden pages"
 msgstr "Tudalennau cudd"
 
 #. CSUbC
-#: sd/inc/strings.hrc:463
+#: sd/inc/strings.hrc:458
 msgctxt "STR_IMPRESS_PRINT_UI_QUALITY"
 msgid "Color"
 msgstr "Lliw"
 
 #. WmYKp
-#: sd/inc/strings.hrc:464
+#: sd/inc/strings.hrc:459
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_OPTIONS"
 msgid "~Size"
 msgstr "~Maint"
 
 #. qDGVE
-#: sd/inc/strings.hrc:465
+#: sd/inc/strings.hrc:460
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE"
 msgid "Brochure"
 msgstr "Llyfryn"
 
 #. K7m8L
-#: sd/inc/strings.hrc:466
+#: sd/inc/strings.hrc:461
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_SIDES"
 msgid "Page sides"
 msgstr "Dalennau"
 
 #. 8AzJi
-#: sd/inc/strings.hrc:467
+#: sd/inc/strings.hrc:462
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE_INCLUDE"
 msgid "Include"
 msgstr "Cynnwys"
 
 #. AEeCf
-#: sd/inc/strings.hrc:468
+#: sd/inc/strings.hrc:463
 msgctxt "STR_IMPRESS_PRINT_UI_PAPER_TRAY"
 msgid "~Use only paper tray from printer preferences"
 msgstr "~Defnyddio dim ond y drôr papur o'r dewisiadau argraffu"
 
 #. jBxbU
-#: sd/inc/strings.hrc:469
+#: sd/inc/strings.hrc:464
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_RANGE"
 msgid "Pages:"
 msgstr "Tudalennau:"
 
 #. a3tSp
-#: sd/inc/strings.hrc:470
+#: sd/inc/strings.hrc:465
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDE_RANGE"
 msgid "Slides:"
 msgstr "Sleidiau:"
 
 #. pPiWM
-#: sd/inc/strings.hrc:472
+#: sd/inc/strings.hrc:467
 msgctxt "STR_SAR_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress has searched to the end of the presentation. Do you want to continue at the beginning?"
 msgstr "Mae %PRODUCTNAME Impress wedi chwilio i ddiwedd y cyflwyniad. Hoffech chi barhau i'r diwedd?"
 
 #. buKAC
-#: sd/inc/strings.hrc:473
+#: sd/inc/strings.hrc:468
 msgctxt "STR_SAR_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress has searched to the beginning of the presentation. Do you want to continue at the end?"
 msgstr "Mae %PRODUCTNAME Impress wedi chwilio i gychwyn y cyflwyniad. Hoffech chi barhau i'r diwedd?"
 
 #. iiE2i
-#: sd/inc/strings.hrc:474
+#: sd/inc/strings.hrc:469
 msgctxt "STR_SAR_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the end of the document. Do you want to continue at the beginning?"
 msgstr "Mae %PRODUCTNAME Draw wedi chwilio i ddiwedd y ddogfen. Hoffech chi barhau o'r cychwyn?"
 
 #. RAhiP
-#: sd/inc/strings.hrc:475
+#: sd/inc/strings.hrc:470
 msgctxt "STR_SAR_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the beginning of the document. Do you want to continue at the end?"
 msgstr "Mae %PRODUCTNAME Draw wedi chwilio i gychwyn y ddogfen. Hoffech chi barhau o'r diwedd?"
 
 #. 6GhtE
-#: sd/inc/strings.hrc:477
+#: sd/inc/strings.hrc:472
 msgctxt "STR_ANIMATION_DIALOG_TITLE"
 msgid "Animation"
 msgstr "Animeiddio"
 
 #. X9CWA
-#: sd/inc/strings.hrc:479
+#: sd/inc/strings.hrc:474
 msgctxt "RID_SVXSTR_EDIT_GRAPHIC"
 msgid "Link"
 msgstr "Cysylltiad"
 
 #. yYhnC
-#: sd/inc/strings.hrc:481
+#: sd/inc/strings.hrc:476
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Next"
 msgstr "_Nesaf"
 
 #. YG7NQ
-#: sd/inc/strings.hrc:482
+#: sd/inc/strings.hrc:477
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Previous"
 msgstr "~Blaenorol"
 
 #. A9eJu
-#: sd/inc/strings.hrc:483
+#: sd/inc/strings.hrc:478
 msgctxt "RID_SVXSTR_MENU_FIRST"
 msgid "~First Slide"
 msgstr "Sleid _Gyntaf"
 
 #. CVatA
-#: sd/inc/strings.hrc:484
+#: sd/inc/strings.hrc:479
 msgctxt "RID_SVXSTR_MENU_LAST"
 msgid "~Last Slide"
 msgstr "Sleid _Olaf"
 
 #. Wkvpi
-#: sd/inc/strings.hrc:486
+#: sd/inc/strings.hrc:481
 msgctxt "STR_CLOSE_PANE"
 msgid "Close Pane"
 msgstr "Cau'r Paen"
+
+#. KfamK
+#: sd/inc/strings.hrc:482
+msgctxt "STR_INSERT_TABLESTYLE"
+msgid "Add a new design"
+msgstr "Ychwanegu cynllun newydd"
+
+#. a9JBA
+#: sd/inc/strings.hrc:483
+msgctxt "STR_REMOVE_TABLESTYLE"
+msgid ""
+"The selected style is in use in this document.\n"
+"If you will delete this style, tables using it will revert to the default style.\n"
+"Do you still wish to delete this style?\n"
+msgstr ""
+"Mae'r arddull a ddewiswyd yn cael ei ddefnyddio eisoes yn y ddogfen hon.\n"
+"Os fyddwch yn dileu'r arddull hon, bydd y tablau sy'n ei defnyddio'n dychwelyd i'r arddull ragosodedig.\n"
+"Ydych chi eisiau dileu'r arddull hon?\n"
 
 #. xNozF
 #: sd/uiconfig/sdraw/ui/breakdialog.ui:8
@@ -3628,11 +3616,11 @@ msgctxt "drawprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated pages"
 msgstr "Teilsio dalen o bapur ar dudalennau sy'n ailadrodd"
 
-#. T6HHy
+#. dBYC3
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:269
 msgctxt "drawprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
-msgstr "Yn pennu bod tudalennau i'w hargraffu ar ffurf teils. Os yw'r tudalennau neu'r sleidiau yn llai na'r papur, bydd sawl tudalen neu sleid yn cael eu hargraffu ar un dudalen o bapur."
+msgid "Specifies that pages are to be printed in tiled format. If the pages are smaller than the paper, the page will be repeated multiple times on one sheet of paper."
+msgstr "Yn pennu bod tudalennau i'w hargraffu ar fformat teilsio. Os yw'r tudalennau'n llai na'r papur, bydd y dudalen yn cael ei hailadrodd nifer lluosog o weithiau ar un ddalen o bapur."
 
 #. qbU9A
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:285
@@ -3773,55 +3761,61 @@ msgid "_Title"
 msgstr "_Teitl"
 
 #. KKC7D
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:188
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:189
 msgctxt "insertlayer|extended_tip|textview"
 msgid "Enter a description of the layer."
 msgstr "Rhowch ddisgrifiad o'r haen."
 
 #. g2K4k
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:199
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:200
 msgctxt "insertlayer|description"
 msgid "_Description"
 msgstr "_Disgrifiad"
 
 #. DTUy2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:215
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:228
 msgctxt "insertlayer|visible"
 msgid "_Visible"
 msgstr "_Gweladwy"
 
 #. oXY4U
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:223
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:236
 msgctxt "insertlayer|extended_tip|visible"
 msgid "Show or hide the layer."
 msgstr "Dangos neu guddio'r haen."
 
 #. BtGRo
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:235
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:248
 msgctxt "insertlayer|printable"
 msgid "_Printable"
 msgstr "_Argraffadwy"
 
 #. VASG2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:243
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:256
 msgctxt "insertlayer|extended_tip|printable"
 msgid "When printing, print or ignore this particular layer."
 msgstr "Wrth argraffu, argraffu neu anwybyddu'r haen benodol hon."
 
 #. E6EKN
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:255
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:268
 msgctxt "insertlayer|locked"
 msgid "_Locked"
 msgstr "_Clowyd"
 
 #. uaSTH
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:263
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:276
 msgctxt "insertlayer|extended_tip|locked"
 msgid "Prevent elements on the layer from being edited."
 msgstr "Rhwystrwch elfennau o'r haen rhag cael eu golygu."
 
-#. ogtGC
+#. WzZxq
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:292
+msgctxt "insertlayer|properties"
+msgid "Properties"
+msgstr "Priodweddau"
+
+#. ogtGC
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:321
 msgctxt "insertlayer|extended_tip|InsertLayerDialog"
 msgid "Inserts a new layer in the document. Layers are only available in Draw, not in Impress."
 msgstr "Yn mewnosod haen newydd yn y ddogfen. Dim ond yn Draw y mae haenau ar gael ac nid yn Impress."
@@ -3862,6 +3856,12 @@ msgctxt "namedesign|NameDesignDialog"
 msgid "Name HTML Design"
 msgstr "Enw Cynllun HTML"
 
+#. PGoPa
+#: sd/uiconfig/sdraw/ui/navigatorcontextmenu.ui:12
+msgctxt "navigatorcontextmenu|STR_RENAME"
+msgid "Rename..."
+msgstr "Ailenwi..."
+
 #. V3FWt
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:3162
 msgctxt "drawnotebookbar|FileLabel"
@@ -3899,189 +3899,189 @@ msgid "Fiel_d"
 msgstr "_Maes"
 
 #. S5FkE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5619
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5596
 msgctxt "drawnotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Mewnosod"
 
 #. Z3UCg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5723
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5700
 msgctxt "drawnotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "~Mewnosod"
 
 #. TVDXM
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6423
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6400
 msgctxt "drawnotebookbar|PageMenuButton"
 msgid "_Layout"
 msgstr "_Cynllun"
 
 #. Rv7x4
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6508
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6485
 msgctxt "drawnotebookbar|PageLabel"
 msgid "~Layout"
 msgstr "~Cynllun"
 
 #. BQcfo
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7046
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7023
 msgctxt "drawnotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Adolygu"
 
 #. prpcY
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7129
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7106
 msgctxt "drawnotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Adolygu"
 
 #. EiuB6
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8158
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8135
 msgctxt "drawnotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Golwg"
 
 #. EF3TH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8243
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8220
 msgctxt "drawnotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Golwg"
 
 #. 94L75
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9588
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9565
 msgctxt "drawnotebookbar|TextMenuButton"
 msgid "T_ext"
 msgstr "_Testun"
 
 #. PQtWE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9683
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9660
 msgctxt "drawnotebookbar|ReferencesLabel"
 msgid "T~ext"
 msgstr "_Testun"
 
 #. tNq7H
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10585
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10562
 msgctxt "drawnotebookbar|TableMenuButton"
 msgid "_Table"
 msgstr "_Tabl"
 
 #. 9pJGh
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10669
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10646
 msgctxt "drawnotebookbar|TableLabel"
 msgid "~Table"
 msgstr "~Tabl"
 
 #. ECD4J
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11196
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:12513
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14307
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11173
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:12490
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14284
 msgctxt "drawnotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Trosi"
 
 #. 4Z6aZ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11864
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11841
 msgctxt "drawnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
 msgstr "~Delwedd"
 
 #. 7FoFi
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11973
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11950
 msgctxt "drawnotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "~Delwedd"
 
 #. 6SADm
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13724
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13701
 msgctxt "drawnotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "~Lluniadu"
 
 #. 6S8qN
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13830
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13807
 msgctxt "drawnotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Lluniadu"
 
 #. QAEDd
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14663
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14640
 msgctxt "drawnotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "~Gwrthrych"
 
 #. SL4NA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14770
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14747
 msgctxt "drawnotebookbar|ObjectLabel"
 msgid "~Object"
 msgstr "~Gwrthrych"
 
 #. 4aAxG
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15271
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15248
 msgctxt "drawnotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Cyfrwng"
 
 #. ed3LH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15375
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15352
 msgctxt "drawnotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Cyfrwng"
 
 #. FAL6c
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16183
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16160
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "_Ffurflen"
 
 #. oaAJU
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16267
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16244
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "~Ffurflen"
 
 #. ZBVGA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17054
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17031
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "3_d"
 msgstr "3_d"
 
 #. fEyRX
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17161
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17138
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "3~d"
 msgstr "3~d"
 
 #. 7ZLQw
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17685
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17662
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "_Master"
 msgstr "_Meistr"
 
 #. oiXVg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17769
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17746
 msgctxt "DrawNotebookbar|MasterLabel"
 msgid "~Master"
 msgstr "~Prif"
 
 #. yzvja
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17826
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17803
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "E_xtension"
 msgstr "E_styniad"
 
 #. L3eG5
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17900
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17877
 msgctxt "drawnotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~styniad"
 
 #. dkNUg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18812
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18789
 msgctxt "drawnotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Offer"
 
 #. Je8XQ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18896
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18873
 msgctxt "drawnotebookbar|DevLabel"
 msgid "~Tools"
 msgstr "~Offer"
@@ -4117,181 +4117,181 @@ msgid "Fiel_d"
 msgstr "_Maes"
 
 #. ZDsWu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5546
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5507
 msgctxt "notebookbar_draw_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Mewnosod"
 
 #. d8cey
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5597
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5558
 msgctxt "notebookbar_draw_compact|InsertLabel"
 msgid "~Insert"
 msgstr "~Mewnosod"
 
 #. kkPza
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6296
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6257
 msgctxt "notebookbar_draw_compact|LayoutMenuButton"
 msgid "Layout"
 msgstr "Cynllun"
 
 #. 2wBCF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6348
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6309
 msgctxt "notebookbar_draw_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "~Cynllun"
 
 #. GG7uL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6863
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6824
 msgctxt "notebookbar_draw_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Adolygu"
 
 #. twxEq
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6915
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6876
 msgctxt "notebookbar_draw_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Adolygu"
 
 #. H5eNL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7610
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7571
 msgctxt "notebookbar_draw_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Golwg"
 
 #. GGEXu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7662
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7623
 msgctxt "notebookbar_draw_compact|ViewLabel"
 msgid "~View"
 msgstr "Go~lwg"
 
 #. CqEAM
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9144
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9105
 msgctxt "notebookbar_draw_compact|TextMenuButton"
 msgid "T_ext"
 msgstr "_Testun"
 
 #. LFcJC
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9198
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9159
 msgctxt "notebookbar_draw_compact|ReferencesLabel"
 msgid "T~ext"
 msgstr "_Testun"
 
 #. sdACh
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10891
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10852
 msgctxt "notebookbar_draw_compact|TableMenuButton"
 msgid "T_able"
 msgstr "T_abl"
 
 #. GEmbu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10942
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10903
 msgctxt "notebookbar_draw_compact|TableLabel"
 msgid "~Table"
 msgstr "~Tabl"
 
 #. EGCcN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12291
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12252
 msgctxt "notebookbar_draw_compact|ImageMenuButton"
 msgid "Image"
 msgstr "Delwedd"
 
 #. 2eQcW
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12343
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12304
 msgctxt "notebookbar_draw_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "~Delwedd"
 
 #. CezAN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14177
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14138
 msgctxt "notebookbar_draw_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "_Lluniadu"
 
 #. tAMd5
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14232
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14193
 msgctxt "notebookbar_draw_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "~Lluniadu"
 
 #. A49xv
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15231
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15192
 msgctxt "notebookbar_draw_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Gwrthrych"
 
 #. 3gubF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15287
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15248
 msgctxt "notebookbar_draw_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Gwrthrych"
 
 #. fDRf9
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16432
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16393
 msgctxt "notebookbar_draw_compact|MediaButton"
 msgid "_Media"
 msgstr "_Cyfrwng"
 
 #. dAbX4
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16486
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16447
 msgctxt "notebookbar_draw_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Cyfrwng"
 
 #. SCSH8
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17723
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17684
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "Fo_rm"
 msgstr "-Ffurflen"
 
 #. vzdXF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17778
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17739
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "~Ffurflen"
 
 #. zEK2o
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18299
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18260
 msgctxt "notebookbar_draw_compact|PrintPreviewButton"
 msgid "_Master"
 msgstr "~Prif"
 
 #. S3huE
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18351
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18312
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "~Master"
 msgstr "~Prif"
 
 #. T3Z8R
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19313
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19274
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "3_d"
 msgstr "3_d"
 
 #. ZCuDe
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19368
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19329
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "3~d"
 msgstr "3~d"
 
 #. YpLRj
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19447
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19408
 msgctxt "notebookbar_draw_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_styniad"
 
 #. uRrEt
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19505
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19466
 msgctxt "notebookbar_draw_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~styniad"
 
 #. L3xmd
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20506
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20467
 msgctxt "notebookbar_draw_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Offer"
 
 #. LhBTk
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20558
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20519
 msgctxt "notebookbar_draw_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Offer"
@@ -5462,7 +5462,7 @@ msgid "Deletes the selected element or elements without requiring confirmation."
 msgstr "Yn dileu'r elfen neu'r elfennau a ddewiswyd heb fod angen cadarnhad."
 
 #. 8Cf3C
-#: sd/uiconfig/simpress/ui/customslideshows.ui:267
+#: sd/uiconfig/simpress/ui/customslideshows.ui:264
 msgctxt "customslideshows|extended_tip|CustomSlideShows"
 msgid "Defines a custom slide show using slides within the current presentation. You can then pick slides to meet the needs of your audience. You can create as many custom slide shows as you want."
 msgstr "Yn diffinio sioe sleidiau cyfaddas gan ddefnyddio sleidiau yn y cyflwyniad cyfredol. Yna gallwch ddewis sleidiau i ddiwallu anghenion eich cynulleidfa. Gallwch greu cymaint o sioeau sleidiau cyfaddas ag y dymunwch."
@@ -6337,11 +6337,11 @@ msgctxt "impressprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated slides"
 msgstr "Teilo dalennau o bapur gyda sleidiau'n ailadrodd"
 
-#. BkFHA
+#. NDyEg
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:411
 msgctxt "impressprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
-msgstr "Yn pennu bod tudalennau i'w hargraffu ar ffurf teils. Os yw'r tudalennau neu'r sleidiau yn llai na'r papur, bydd sawl tudalen neu sleid yn cael eu hargraffu ar un dudalen o bapur."
+msgid "Specifies that slides are to be printed in tiled format. If the slides are smaller than the paper, the slide will be repeated multiple times on one sheet of paper."
+msgstr "Yn pennu bod sleidiau i'w hargraffu ar fformat teilsio. Os yw'r sleidiau'n llai na'r papur, bydd y sleid yn cael ei hailadrodd nifer lluosog o weithiau ar un ddalen o bapur."
 
 #. xa7tq
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:427
@@ -6494,13 +6494,13 @@ msgid "_Insert Slide"
 msgstr "Mewnosod _Sleid"
 
 #. e84v4
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:55
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:60
 msgctxt "layoutwindow|label5"
 msgid "Horizontal"
 msgstr "Llorweddol"
 
 #. usUqJ
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:107
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:112
 msgctxt "layoutwindow|label6"
 msgid "Vertical"
 msgstr "Fertigol"
@@ -6638,13 +6638,13 @@ msgid "Lists currently open documents."
 msgstr "Yn rhestru'r dogfennau sydd ar agor ar hyn o bryd."
 
 #. D6ag8
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:119
 msgctxt "navigatorpanel|STR_OBJECTS_TREE"
 msgid "Page Tree"
 msgstr "Coeden y Dudalen"
 
 #. e6gMq
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:121
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
 msgctxt "navigatorpanel|extended_tip|tree"
 msgid "Lists available slides. Double-click a slide to make it the active slide."
 msgstr "Yn rhestru'r sleidiau sydd ar gael. Cliciwch ddwywaith ar sleid i'w gwneud yn sleid weithredol."
@@ -6662,79 +6662,79 @@ msgid "Jumps to the first page."
 msgstr "Yn neidio i'r dudalen gyntaf."
 
 #. NWPFk
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:158
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:159
 msgctxt "navigatorpanel|previous|tooltip_text"
 msgid "Previous Slide"
 msgstr "Sleid Flaenorol"
 
 #. PJUma
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:162
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:163
 msgctxt "navigatorpanel|extended_tip|previous"
 msgid "Moves back one page."
 msgstr "Yn symud yn ôl un dudalen."
 
 #. bkvQE
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:174
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:176
 msgctxt "navigatorpanel|next|tooltip_text"
 msgid "Next Slide"
 msgstr "Sleid Nesaf"
 
 #. zbUVG
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:178
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:180
 msgctxt "navigatorpanel|extended_tip|next"
 msgid "Move forward one page."
 msgstr "Symud ymlaen un dudalen."
 
 #. FVSHF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:190
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:193
 msgctxt "navigatorpanel|last|tooltip_text"
 msgid "Last Slide"
 msgstr "Sleid Olaf"
 
 #. aPU7Y
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:194
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:197
 msgctxt "navigatorpanel|extended_tip|last"
 msgid "Jumps to the last page."
 msgstr "Yn neidio i'r dudalen olaf."
 
 #. mHVom
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:218
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
 msgctxt "navigatorpanel|dragmode|tooltip_text"
 msgid "Drag Mode"
 msgstr "Modd Llusgo"
 
 #. BEJEZ
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:226
 msgctxt "navigatorpanel|extended_tip|dragmode"
 msgid "Drag and drop slides and named objects into the active slide."
 msgstr "Llusgo a gollwng sleidiau a gwrthrychau a enwir i'r sleid weithredol."
 
 #. Qb5a9
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:234
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:239
 msgctxt "navigatorpanel|shapes|tooltip_text"
 msgid "Show Shapes"
 msgstr "Dangos Siapiau"
 
 #. EUeae
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:238
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:243
 msgctxt "navigatorpanel|extended_tip|shapes"
 msgid "In the submenu you can choose to display a list of all shapes or only the named shapes. Use drag-and-drop in the list to reorder the shapes. When you set the focus to a slide and press the Tab key, the next shape in the defined order is selected."
 msgstr "Yn yr is-ddewislen gallwch ddewis dangos rhestr o'r holl siapiau neu ddim ond y siapiau sy'n cael eu henwi. Defnyddiwch lusgo a gollwng yn y rhestr i ail-drefnu'r siapiau. Pan fyddwch chi'n gosod y ffocws i sleid ac yn pwyso'r fysell Tab, mae'r siâp nesaf yn y drefn ddiffiniedig, yn cael ei ddewis."
 
 #. DzQZC
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:261
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:266
 msgctxt "navigatorpanel|extended_tip|NavigatorPanel"
 msgid "Opens the Navigator, where you can quickly jump to other slides or move between open files."
 msgstr "Yn agor y Llywiwr, lle gallwch neidio i sleidiau eraill yn gyflym neu symud rhwng ffeiliau sydd ar agor."
 
 #. pzb3K
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:272
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:277
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_NAMED_SHAPES"
 msgid "Named shapes"
 msgstr "Siapiau ag enwau"
 
 #. dLEPF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:281
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:286
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_ALL_SHAPES"
 msgid "All shapes"
 msgstr "Pob siâp"
@@ -6776,201 +6776,201 @@ msgid "Fiel_d"
 msgstr "_Maes"
 
 #. 9GEAC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6031
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6008
 msgctxt "impressnotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Mewnosod"
 
 #. t3YwN
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6134
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6111
 msgctxt "impressnotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "~Mewnosod"
 
 #. 58fjG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6909
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6886
 msgctxt "impressnotebookbar|SlideMenuButton"
 msgid "_Layout"
 msgstr "_Cynllun"
 
 #. ArPLp
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6971
 msgctxt "impressnotebookbar|LayoutLabel"
 msgid "~Layout"
 msgstr "~Cynllun"
 
 #. vRtjP
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7458
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7435
 msgctxt "impressnotebookbar|SlideShowMenuButton"
 msgid "_Slide Show"
 msgstr "_Sioe Sleidiau"
 
 #. nV5FC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7542
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7519
 msgctxt "impressnotebookbar|ReferencesLabel"
 msgid "~Slide Show"
 msgstr "~Sioe Sleidiau"
 
 #. sDdGm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8078
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8055
 msgctxt "impressnotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Adolygu"
 
 #. drk6E
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8161
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8138
 msgctxt "impressnotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Adolugu"
 
 #. vjE5w
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9380
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9357
 msgctxt "impressnotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Golwg"
 
 #. KJK9J
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9465
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9442
 msgctxt "impressnotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Golwg"
 
 #. bWC2b
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10359
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10336
 msgctxt "impressnotebookbar|TableMenuButton"
 msgid "_Table"
 msgstr "_Tabl"
 
 #. dmEJG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10443
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10420
 msgctxt "impressnotebookbar|TableLabel"
 msgid "~Table"
 msgstr "~Tabl"
 
 #. Cn8TS
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10968
-#: sd/uiconfig/simpress/ui/notebookbar.ui:12222
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14034
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10945
+#: sd/uiconfig/simpress/ui/notebookbar.ui:12199
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14011
 msgctxt "impressnotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Trosi"
 
 #. do5DT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11638
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11615
 msgctxt "impressnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
 msgstr "~Delwedd"
 
 #. XCSMA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11747
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11724
 msgctxt "impressnotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "~Delwedd"
 
 #. nTy3C
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13449
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13426
 msgctxt "impressnotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "~Lluniadu"
 
 #. BfNQD
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13556
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13533
 msgctxt "impressnotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Lluniadu"
 
 #. p3Faf
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14390
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14367
 msgctxt "impressnotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Gwrthrych"
 
 #. wL8mu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14497
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14474
 msgctxt "impressnotebookbar|ObjectLabel"
 msgid "~Object"
 msgstr "~Gwrthrych"
 
 #. AAosj
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14998
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14975
 msgctxt "impressnotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Cyfrwng"
 
 #. GgHEg
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15102
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15079
 msgctxt "impressnotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Cyfrwng"
 
 #. W9oCC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15910
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15887
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "-Ffurflen"
 
 #. 7sAbT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15971
 msgctxt "ImpressNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "~Ffurflen"
 
 #. aAdZJ
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16789
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16766
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "_Master"
 msgstr "~Prif"
 
 #. XAZEm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16873
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16850
 msgctxt "ImpressNotebookbar|MasterLabel"
 msgid "~Master"
 msgstr "~Prif"
 
 #. DyZAq
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17683
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17660
 msgctxt "ImpressNotebookbar|FormMenuButton"
 msgid "_View"
 msgstr "_Golwg"
 
 #. rUJFu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17767
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17744
 msgctxt "ImpressNotebookbar|View2Label"
 msgid "~Outline"
 msgstr "A~mlinell"
 
 #. pA8DH
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18554
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18531
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "3_d"
 msgstr "3_d"
 
 #. xwrog
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18661
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18638
 msgctxt "impressnotebookbar|FormLabel"
 msgid "3~d"
 msgstr "3~d"
 
 #. syaDA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18718
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18695
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "E_xtension"
 msgstr "E_styniad"
 
 #. Nwrnv
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18792
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18769
 msgctxt "impressnotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~styniad"
 
 #. rBSXA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19755
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19732
 msgctxt "impressnotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Offer"
 
 #. DTNDB
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19839
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19816
 msgctxt "impressnotebookbar|DevLabel"
 msgid "~Tools"
 msgstr "~Offer"
@@ -7006,181 +7006,181 @@ msgid "Fiel_d"
 msgstr "_Maes"
 
 #. 927AD
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5832
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5793
 msgctxt "notebookbar_impress_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Mewnosod"
 
 #. ZPHaB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5883
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5844
 msgctxt "notebookbar_impress_compact|InsertLabel"
 msgid "~Insert"
 msgstr "~Mewnosod"
 
 #. zEEiz
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6669
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6630
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "Layout"
 msgstr "Cynllun"
 
 #. EZeGS
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6721
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6682
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "~Cynllun"
 
 #. sMsGk
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7236
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7197
 msgctxt "notebookbar_impress_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Adolygu"
 
 #. pZ4A3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7288
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7249
 msgctxt "notebookbar_impress_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Adolygu"
 
 #. cRSR3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7825
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7786
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "_Slide Show"
 msgstr "_Sioe Sleidiau"
 
 #. KAo9c
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7877
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7838
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Slide Show"
 msgstr "~Sioe Sleidiau"
 
 #. URjcx
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8709
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8670
 msgctxt "notebookbar_impress_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Golwg"
 
 #. SScpo
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8761
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8722
 msgctxt "notebookbar_impress_compact|ViewLabel"
 msgid "~View"
 msgstr "Go~lwg"
 
 #. CzCMC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10445
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10406
 msgctxt "notebookbar_impress_compact|TableMenuButton"
 msgid "T_able"
 msgstr "T_abl"
 
 #. mnepU
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10496
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10457
 msgctxt "notebookbar_impress_compact|TableLabel"
 msgid "~Table"
 msgstr "~Tabl"
 
 #. BzXPB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11843
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11804
 msgctxt "notebookbar_impress_compact|ImageMenuButton"
 msgid "Image"
 msgstr "Delwedd"
 
 #. wD2ow
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11898
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11859
 msgctxt "notebookbar_impress_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "~Delwedd"
 
 #. ZqPYr
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13673
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13634
 msgctxt "notebookbar_impress_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "_Lluniadu"
 
 #. 78DU3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13725
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13686
 msgctxt "notebookbar_impress_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "~Lluniadu"
 
 #. uv2FE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14722
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14683
 msgctxt "notebookbar_impress_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Gwrthrych"
 
 #. FSjqt
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14774
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14735
 msgctxt "notebookbar_impress_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Gwrthrych"
 
 #. t3Fmv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15917
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15878
 msgctxt "notebookbar_impress_compact|MediaButton"
 msgid "_Media"
 msgstr "_Cyfrwng"
 
 #. HbptL
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15968
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15929
 msgctxt "notebookbar_impress_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Cyfrwng"
 
 #. NNqQ2
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17205
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17166
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "Fo_rm"
 msgstr "-Ffurflen"
 
 #. DpFpM
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17257
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17218
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "~Ffurflen"
 
 #. MNUFm
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18009
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17970
 msgctxt "notebookbar_impress_compact|PrintPreviewButton"
 msgid "_Master"
 msgstr "~Prif"
 
 #. NUiWE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18061
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18022
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "~Master"
 msgstr "~Prif"
 
 #. 4f9xG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19021
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18982
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "3_d"
 msgstr "3_d"
 
 #. ntfL7
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19073
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19034
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "3~d"
 msgstr "3~d"
 
 #. ntjaC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19152
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19113
 msgctxt "notebookbar_impress_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_styniad"
 
 #. Tu5f8
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19210
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19171
 msgctxt "notebookbar_impress_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~styniad"
 
 #. abvtG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20211
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20172
 msgctxt "notebookbar_impress_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Offer"
 
 #. oKhkv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20263
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20224
 msgctxt "notebookbar_impress_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Offer"
@@ -7922,23 +7922,23 @@ msgctxt "extended_tip|enremotcont"
 msgid "Specifies that you want to enable Bluetooth remote control while Impress is running."
 msgstr "Yn pennu eich bod am alluogi teclyn rheoli o bell Bluetooth tra bod Impress yn rhedeg."
 
+#. dQSDT
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:149
+msgctxt "optimpressgeneralpage|enprsntconsfullscreen"
+msgid "Fullscreen presenter console"
+msgstr "Consol cyflwynydd sgrin lawn"
+
+#. BPu2B
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:157
+msgctxt "extended_tip|enprsntconsfullscreen"
+msgid "Specifies that you want to show the Presenter Console in fullscreen mode."
+msgstr "Yn pennu eich bod eisiau dangos y Consol Cyflwyno yn y modd sgrin lawn."
+
 #. txHfw
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:153
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:172
 msgctxt "optimpressgeneralpage|label7"
 msgid "Presentation"
 msgstr "Cyflwyniad"
-
-#. 3BkYq
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:182
-msgctxt "optimpressgeneralpage|printermetrics"
-msgid "Us_e printer metrics for document formatting"
-msgstr "_Defnyddio metrics yr argraffydd i fformatio'r ddogfen"
-
-#. mTuAd
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:190
-msgctxt "extended_tip|printermetrics"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen. If this box is not checked, a printer independent layout will be used for screen display and printing."
-msgstr "Yn pennu bod metrigau argraffydd yn cael eu defnyddio ar gyfer argraffu a hefyd ar gyfer fformatio'r hyn sy'n cael ei ddangos ar y sgrin. Os na chaiff y blwch hwn ei wirio, bydd cynllun annibynnol argraffydd yn cael ei ddefnyddio ar gyfer dangos sgrin ac argraffu."
 
 #. VVZZf
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:201
@@ -8191,6 +8191,203 @@ msgstr "Llenwi'r Sgrin"
 msgctxt "photoalbum|insert_as_link_check"
 msgid "Link images"
 msgstr "Cysylltu delweddau"
+
+#. c5owK
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:41
+msgctxt "pmimagespage|STR_REMOVE_CROP_AREA"
+msgid "_Delete cropped image areas"
+msgstr "_Dileu ardaloedd delwedd wedi'u tocio"
+
+#. bw3Ac
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:55
+msgctxt "pmimagespage|STR_EMBED_LINKED_GRAPHICS"
+msgid "_Embed external images"
+msgstr "_Mewnosod delweddau allanol"
+
+#. vF2CP
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:76
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "Reduce _image resolution"
+msgstr "_Lleihau cydraniad delwedd"
+
+#. aCEmS
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:92
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "<no change>"
+msgstr "<dim newid>"
+
+#. 7Jqdo
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:93
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "96 DPI (screen resolution)"
+msgstr "96 DPI (cydraniad sgrin)"
+
+#. JXujg
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:94
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "150 DPI (projector resolution)"
+msgstr "150 DPI (cydraniad taflunydd)"
+
+#. 76mBF
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:95
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "300 DPI (print resolution)"
+msgstr "300 DPI (cydraniad argraffu)"
+
+#. G5zaJ
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:96
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "600 DPI (print resolution)"
+msgstr "600 DPI (cydraniad argraffu)"
+
+#. 2hKhk
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:113
+msgctxt "pmimagespage|STR_LOSSLESS_COMPRESSION"
+msgid "_Lossless compression"
+msgstr "_Cywasgiad digoll"
+
+#. GLtSt
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:128
+msgctxt "pmimagespage|STR_JPEG_COMPRESSION"
+msgid "_JPEG compression"
+msgstr "_Cywasgiad JPEG"
+
+#. 22Nif
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:152
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "_Quality in %"
+msgstr "_Ansawdd o fewn %"
+
+#. xYnbA
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:187
+msgctxt "pmimagespages|STR_GRAPHIC_OPTIMIZATION"
+msgid "Choose settings for optimizing images"
+msgstr "Dewis y gosodiadau ar gyfer gwella delweddau"
+
+#. w6qX4
+#: sd/uiconfig/simpress/ui/pminfodialog.ui:29
+msgctxt "pminfodialog|ask"
+msgid "_Open newly created presentation"
+msgstr "_Agor cyflwyniad newydd ei greu"
+
+#. 9HUiB
+#: sd/uiconfig/simpress/ui/pmintropage.ui:40
+msgctxt "pmintropage|STR_INTRODUCTION_T"
+msgid ""
+"The Presentation Minimizer is used to reduce the file size of the current presentation. Images will be compressed and data, that is no longer needed, will be removed.\n"
+"\n"
+"        At the last step of the wizard you can choose to apply the changes to the current presentation or to create an optimized new version of the presentation."
+msgstr ""
+"Mae'r Lleihawr Cyflwyniad yn cael ei ddefnyddio i leihau maint y cyflwyniad cyfredol. Bydd delweddau yn cael eu cywasgu a bydd data nad oes ei angen bellach yn cael ei dynnu.\n"
+"\\v        Yng ngham olaf y dewin bydd modd dewis gosod y newidiadau i'r cyflwyniad cyfredol neu greu fersiwn newydd gwell o'r cyflwyniad."
+
+#. WwLQG
+#: sd/uiconfig/simpress/ui/pmintropage.ui:73
+msgctxt "pmintropage:STR_REMOVE"
+msgid "_Delete"
+msgstr "_Dileu"
+
+#. NPMR9
+#: sd/uiconfig/simpress/ui/pmintropage.ui:95
+msgctxt "pmintropage|STR_CHOSE_SETTINGS"
+msgid "_Choose settings for Presentation Minimizer"
+msgstr "_Dewis gosodiadau ar gyfer Lleihawr Cyflwyniad"
+
+#. FtXuZ
+#: sd/uiconfig/simpress/ui/pmintropage.ui:120
+msgctxt "pmintropage|STR_INTRODUCTION"
+msgid "Introduction"
+msgstr "Cyflwyniad"
+
+#. kJS2d
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:36
+msgctxt "pmimagespage|STR_OLE_REPLACE"
+msgid "Create static replacement images for OLE objects"
+msgstr "Creu graffigau newidiad statig ar gyfer gwrthrychau OLE"
+
+#. LkYsy
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:51
+msgctxt "pmobjectspage|STR_ALL_OLE_OBJECTS"
+msgid "For _all OLE objects"
+msgstr "Ar gyfer _pob gwrthrych OLE"
+
+#. hocJG
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:67
+msgctxt "pmobjectspage|STR_ALIEN_OLE_OBJECTS_ONLY"
+msgid "_For OLE objects not based on OpenDocument format"
+msgstr "_Ar gyfer gwrthrychau OLE nad ydyn nhw'n seiliedig ar fformat OpenDocument"
+
+#. CcCfe
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:106
+msgctxt "pmobjectspages|STR_OLE_OPTIMIZATION"
+msgid "Choose settings for replacing OLE objects"
+msgstr "Dewis dewisiadau ar gyfer newid gwrthrychau OLE"
+
+#. bRB3B
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:36
+msgctxt "pmslidespage|STR_DELETE_MASTER_PAGES"
+msgid "Delete unused _master slides"
+msgstr "Dileu ~prif sleidiau heb eu defnyddio"
+
+#. wDvum
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:50
+msgctxt "pmslidespage|STR_DELETE_HIDDEN_SLIDES"
+msgid "Delete hidden _slides"
+msgstr "Dileu _sleidiau cudd"
+
+#. EoDRG
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:64
+msgctxt "pmslidespage|STR_CUSTOM_SHOW"
+msgid "Delete slides that are not used for the _custom slide show"
+msgstr "Dileu sleidiau nad ydynt yn cael eu defnyddio ar gyfer y _sioe sleidiau cyfaddas"
+
+#. TEzVE
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:97
+msgctxt "pmslidespage|STR_DELETE_NOTES_PAGES"
+msgid "_Clear notes"
+msgstr "_Clirio nodiadau"
+
+#. Jsmp2
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:115
+msgctxt "pmslidespages|STR_CHOOSE_SLIDES"
+msgid "Choose which slides to delete"
+msgstr "Dewis pa sleidiau i'w dileu"
+
+#. cBtLF
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:47
+msgctxt "pmsummarypage|STR_APPLY_TO_CURRENT"
+msgid "_Apply changes to current presentation"
+msgstr "_Gosod newidiadau i'r cyflwyniad presennol"
+
+#. mBhDk
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:63
+msgctxt "pmsummarypage|STR_SAVE_AS"
+msgid "_Duplicate presentation before applying changes"
+msgstr "_Dyblygu cyflwyniad cyn gosod y newidiadau"
+
+#. PiAHE
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:105
+msgctxt "pmsummarypage|STR_SAVE_SETTINGS"
+msgid "_Save settings as"
+msgstr "_Cadw gosodiadau fel"
+
+#. ExrdK
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:182
+msgctxt "pmsummarypage|STR_CURRENT_FILESIZE"
+msgid "Current file size:"
+msgstr "Maint y ffeil gyfredol:"
+
+#. ZcrFM
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:194
+msgctxt "pmsummarypage|STR_ESTIMATED_FILESIZE"
+msgid "Estimated new file size:"
+msgstr "Amcan o faint y ffeil newydd:"
+
+#. Ubstx
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:250
+msgctxt "pmsummarypages|STR_SUMMARY_TITLE"
+msgid "Choose where to apply the following changes"
+msgstr "Dewis lle i osod y newidiadau canlynol"
 
 #. LAEo2
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:13
@@ -9829,6 +10026,78 @@ msgstr "Colofn _olaf"
 msgctxt "tabledesignpanel|UseBandingColumnStyle"
 msgid "Ba_nded columns"
 msgstr "Colofnau b_andiog"
+
+#. fKBVs
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:152
+msgctxt "tabledesignpanel|menunew"
+msgid "New"
+msgstr "Newydd"
+
+#. U5Noi
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:160
+msgctxt "tabledesignpanel|menuclone"
+msgid "Clone"
+msgstr "Clonio"
+
+#. ZsSkp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:168
+msgctxt "tabledesignpanel|menudelete"
+msgid "Delete"
+msgstr "Dileu:"
+
+#. RWsRb
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:176
+msgctxt "tabledesignpanel|menureset"
+msgid "Reset"
+msgstr "Ailosod"
+
+#. ZCDY2
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:184
+msgctxt "tabledesignpanel|menuformat"
+msgid "Format"
+msgstr "Fformat"
+
+#. 8myJL
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:194
+msgctxt "tabledesignpanel|menufirstrow"
+msgid "Header row..."
+msgstr "Rhes pennyn..."
+
+#. ZeuD3
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:202
+msgctxt "tabledesignpanel|menulastrow"
+msgid "Total row..."
+msgstr "Rhes cyfansymiau..."
+
+#. 3yZqr
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:210
+msgctxt "tabledesignpanel|menuoddrows"
+msgid "Banded rows..."
+msgstr "Rhes bandiog..."
+
+#. JzTgZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:224
+msgctxt "tabledesignpanel|menufirstcolumn"
+msgid "First column..."
+msgstr "Colofn gyntaf..."
+
+#. f5bFZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:232
+msgctxt "tabledesignpanel|menulastcolumn"
+msgid "Last column..."
+msgstr "Colofn olaf..."
+
+#. MhPWp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:240
+msgctxt "tabledesignpanel|menuoddcolumns"
+msgid "Banded columns..."
+msgstr "Colofnau bandiog..."
+
+#. fUFnD
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:254
+msgctxt "tabledesignpanel|menubody"
+msgid "Other cells..."
+msgstr "Celloedd eraill..."
 
 #. FvyKu
 #: sd/uiconfig/simpress/ui/templatedialog.ui:8

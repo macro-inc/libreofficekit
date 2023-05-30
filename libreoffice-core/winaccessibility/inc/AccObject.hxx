@@ -34,21 +34,12 @@
 #include <com/sun/star/accessibility/XAccessibleAction.hpp>
 
 #include "accHelper.hxx"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 class AccEventListener;
 class AccObjectManagerAgent;
 class AccObject;
 
-typedef std::map<const long, AccObject*> IAccSelectionList;
 typedef std::vector<AccObject *> IAccChildList;
 
 
@@ -63,7 +54,6 @@ private:
     AccObject*          m_pParentObj;
     IAccChildList       m_childrenList;
     ::rtl::Reference<AccEventListener>  m_pListener;
-    IAccSelectionList   m_selectionList;
 
     css::uno::Reference < css::accessibility::XAccessible > m_xAccRef;
     css::uno::Reference < css::accessibility::XAccessibleAction > m_xAccActionRef;
@@ -74,7 +64,7 @@ private:
     void UpdateActionDesc();
     void UpdateRole();
 
-    DWORD GetMSAAStateFromUNO(short xState);//translate state from UNO to MSAA value
+    DWORD GetMSAAStateFromUNO(sal_Int64 xState);//translate state from UNO to MSAA value
     css::accessibility::XAccessibleSelection* GetXAccessibleSelection();
     void GetExpandedState(sal_Bool* isExpandable, sal_Bool* isExpanded);
     OUString GetMAccessibleValueFromAny(css::uno::Any pAny);
@@ -109,12 +99,11 @@ public:
 
     void NotifyDestroy();
 
-    void  DecreaseState(short xState );//call COM interface DecreaseState method
-    void  IncreaseState( short xState );//call COM interface IncreaseState method
+    void  DecreaseState( sal_Int64 xState );//call COM interface DecreaseState method
+    void  IncreaseState( sal_Int64 xState );//call COM interface IncreaseState method
 
     void  SetName( css::uno::Any newName);
     void  SetValue( css::uno::Any pAny );
-    void  SetRole( short Role );
 
     short GetRole() const;
 
@@ -123,13 +112,10 @@ public:
     void  UpdateValue();
     void  UpdateAction();
     void  UpdateValidWindow();
-    void  UpdateLocation();
 
     void  setFocus();
     void  unsetFocus();
 
-    void  AddSelect(long index, AccObject* accObj);
-    IAccSelectionList& GetSelection();
     void  setLocalizedResourceString();
 };
 

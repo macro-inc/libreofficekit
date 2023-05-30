@@ -36,7 +36,7 @@
 #include "dsselect.hxx"
 #include <svl/filenotation.hxx>
 #include <com/sun/star/awt/XSystemDependentWindowPeer.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/lang/SystemDependent.hpp>
 #include <com/sun/star/mozilla/MozillaBootstrap.hpp>
@@ -46,7 +46,7 @@
 #include <ucbhelper/content.hxx>
 #include "finteraction.hxx"
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #if defined _WIN32
 #include <rtl/process.h>
@@ -570,7 +570,7 @@ namespace dbaui
         commitURL();
     }
 
-    bool OConnectionHelper::createDirectoryDeep(const OUString& _rPathURL)
+    bool OConnectionHelper::createDirectoryDeep(std::u16string_view _rPathURL)
     {
         // get a URL object analyzing the URL for us ...
         INetURLObject aParser;

@@ -22,7 +22,7 @@
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <strings.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace dbaxml
 {
@@ -50,7 +50,7 @@ OXMLConnectionResource::OXMLConnectionResource( ODBFilter& rImport,
             case XML_ELEMENT(XLINK, XML_HREF):
                 try
                 {
-                    xDataSource->setPropertyValue(PROPERTY_URL,makeAny(aIter.toString()));
+                    xDataSource->setPropertyValue(PROPERTY_URL,Any(aIter.toString()));
                 }
                 catch(const Exception&)
                 {

@@ -38,6 +38,8 @@ namespace chart::BaseGFXHelper
 
 OOO_DLLPUBLIC_CHARTTOOLS ::basegfx::B3DRange getBoundVolume( const css::drawing::PolyPolygonShape3D& rPolyPoly );
 
+OOO_DLLPUBLIC_CHARTTOOLS ::basegfx::B3DRange getBoundVolume( const std::vector<std::vector<css::drawing::Position3D>>& rPolyPoly );
+
 OOO_DLLPUBLIC_CHARTTOOLS ::basegfx::B2IRectangle makeRectangle(
             const css::awt::Point& rPosition,
             const css::awt::Size& rSize );
@@ -49,6 +51,8 @@ OOO_DLLPUBLIC_CHARTTOOLS css::awt::Point B2IRectangleToAWTPoint(
 
 OOO_DLLPUBLIC_CHARTTOOLS css::awt::Size B2IRectangleToAWTSize(
             const ::basegfx::B2IRectangle& rB2IRectangle );
+
+OOO_DLLPUBLIC_CHARTTOOLS css::awt::Rectangle toAwtRectangle(const basegfx::B2IRectangle& rB2IRectangle);
 
 ::basegfx::B3DVector Direction3DToB3DVector(
     const css::drawing::Direction3D& rDirection );

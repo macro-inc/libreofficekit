@@ -20,8 +20,10 @@
 #include <config_features.h>
 
 #include <officecfg/Office/Common.hxx>
+#include <editeng/sizeitem.hxx>
 #include <sal/log.hxx>
 #include <sfx2/opengrf.hxx>
+#include <sfx2/viewfrm.hxx>
 #include <svx/svdograf.hxx>
 #include <svx/svdomedia.hxx>
 #include <svx/svdpage.hxx>
@@ -46,6 +48,8 @@
 #include <globstr.hrc>
 #include <comphelper/lok.hxx>
 
+#include <com/sun/star/frame/XDispatchProvider.hpp>
+#include <com/sun/star/media/XPlayer.hpp>
 #include <com/sun/star/ui/dialogs/XFilePickerControlAccess.hpp>
 #include <com/sun/star/ui/dialogs/ExtendedFilePickerElementIds.hpp>
 #include <com/sun/star/ui/dialogs/ListboxControlActions.hpp>
@@ -175,7 +179,7 @@ static void lcl_InsertGraphic( const Graphic& rGraphic,
 
     tools::Rectangle aRect ( aInsertPos, aLogicSize );
 
-    SdrGrafObj* pObj = new SdrGrafObj(
+    rtl::Reference<SdrGrafObj> pObj = new SdrGrafObj(
         pView->getSdrModelFromSdrView(), // TTTT pView should be reference
         rGraphic1,
         aRect);
@@ -194,7 +198,7 @@ static void lcl_InsertGraphic( const Graphic& rGraphic,
 
     //  don't select if from (dispatch) API, to allow subsequent cell operations
     SdrInsertFlags nInsOptions = (bApi && !comphelper::LibreOfficeKit::isActive()) ? SdrInsertFlags::DONTMARK : SdrInsertFlags::NONE;
-    bool bSuccess = pView->InsertObjectAtView( pObj, *pPV, nInsOptions );
+    bool bSuccess = pView->InsertObjectAtView( pObj.get(), *pPV, nInsOptions );
 
     // SetGraphicLink has to be used after inserting the object,
     // otherwise an empty graphic is swapped in and the contact stuff crashes.
@@ -202,6 +206,8 @@ static void lcl_InsertGraphic( const Graphic& rGraphic,
     if (bSuccess && bAsLink)
         pObj->SetGraphicLink( rFileName );
 }
+
+#if HAVE_FEATURE_AVMEDIA
 
 static void lcl_InsertMedia( const OUString& rMediaURL, bool bApi,
                       ScTabViewShell* pViewSh, const vcl::Window* pWindow, SdrView* pView,
@@ -237,21 +243,18 @@ static void lcl_InsertMedia( const OUString& rMediaURL, bool bApi,
     {
         uno::Reference<frame::XModel> const xModel(
                 rData.GetDocument().GetDocumentShell()->GetModel());
-#if HAVE_FEATURE_AVMEDIA
         bool const bRet = ::avmedia::EmbedMedia(xModel, rMediaURL, realURL);
         if (!bRet) { return; }
-#else
-        return;
-#endif
     }
 
-    SdrMediaObj* pObj = new SdrMediaObj(
+    rtl::Reference<SdrMediaObj> pObj = new SdrMediaObj(
         *rData.GetDocument().GetDrawLayer(),
         tools::Rectangle(aInsertPos, aSize));
 
     pObj->setURL( realURL, ""/*TODO?*/ );
-    pView->InsertObjectAtView( pObj, *pPV, bApi ? SdrInsertFlags::DONTMARK : SdrInsertFlags::NONE );
+    pView->InsertObjectAtView( pObj.get(), *pPV, bApi ? SdrInsertFlags::DONTMARK : SdrInsertFlags::NONE );
 }
+#endif
 
 FuInsertGraphic::FuInsertGraphic( ScTabViewShell&   rViewSh,
                                   vcl::Window*      pWin,
@@ -261,17 +264,18 @@ FuInsertGraphic::FuInsertGraphic( ScTabViewShell&   rViewSh,
        : FuPoor(rViewSh, pWin, pViewP, pDoc, rReq)
 {
     const SfxItemSet* pReqArgs = rReq.GetArgs();
-    const SfxPoolItem* pItem;
+    const SfxStringItem* pGraphicItem;
     if ( pReqArgs &&
-         pReqArgs->GetItemState( SID_INSERT_GRAPHIC, true, &pItem ) == SfxItemState::SET )
+         (pGraphicItem = pReqArgs->GetItemIfSet( SID_INSERT_GRAPHIC, true )) )
     {
-        OUString aFileName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        OUString aFileName = pGraphicItem->GetValue();
 
         OUString aFilterName;
-        if ( pReqArgs->GetItemState( FN_PARAM_FILTER, true, &pItem ) == SfxItemState::SET )
-            aFilterName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        if ( const SfxStringItem* pFilterItem = pReqArgs->GetItemIfSet( FN_PARAM_FILTER ) )
+            aFilterName = pFilterItem->GetValue();
 
         bool bAsLink = false;
+        const SfxPoolItem* pItem;
         if ( pReqArgs->GetItemState( FN_PARAM_1, true, &pItem ) == SfxItemState::SET )
             bAsLink = static_cast<const SfxBoolItem*>(pItem)->GetValue();
 
@@ -372,9 +376,15 @@ FuInsertMedia::FuInsertMedia( ScTabViewShell&   rViewSh,
                               const SfxRequest& rReq ) :
     FuPoor(rViewSh, pWin, pViewP, pDoc, rReq)
 {
+#if HAVE_FEATURE_AVMEDIA
     OUString     aURL;
     const SfxItemSet*   pReqArgs = rReq.GetArgs();
     bool                bAPI = false;
+
+    const SvxSizeItem* pSizeItem = rReq.GetArg<SvxSizeItem>(FN_PARAM_1);
+    const SfxBoolItem* pLinkItem = rReq.GetArg<SfxBoolItem>(FN_PARAM_2);
+    const bool bSizeUnknown = !pSizeItem;
+    Size aPrefSize;
 
     if( pReqArgs )
     {
@@ -387,38 +397,49 @@ FuInsertMedia::FuInsertMedia( ScTabViewShell&   rViewSh,
         }
     }
 
-    bool bLink(true);
+    bool bLink(pLinkItem ? pLinkItem->GetValue() : true);
     bool bInsertMedia = bAPI;
-#if HAVE_FEATURE_AVMEDIA
     if (!bInsertMedia)
         bInsertMedia = ::avmedia::MediaWindow::executeMediaURLDialog(pWin ? pWin->GetFrameWeld() : nullptr, aURL, &bLink);
-#endif
     if (!bInsertMedia)
         return;
 
-    Size aPrefSize;
-
-    if( pWin )
-        pWin->EnterWait();
-
-#if HAVE_FEATURE_AVMEDIA
-    if( !::avmedia::MediaWindow::isMediaURL( aURL, ""/*TODO?*/, true, &aPrefSize ) )
+    if (!bSizeUnknown)
     {
-        if( pWin )
-            pWin->LeaveWait();
-
-        if( !bAPI )
-            ::avmedia::MediaWindow::executeFormatErrorBox(pWindow ? pWindow->GetFrameWeld() : nullptr);
+        aPrefSize = pSizeItem->GetSize();
     }
     else
-#endif
     {
-        lcl_InsertMedia( aURL, bAPI, &rViewSh, pWindow, pView, aPrefSize,
-                bLink );
+        if( pWin )
+            pWin->EnterWait();
+
+        css::uno::Reference<css::frame::XDispatchProvider> xDispatchProvider(rViewShell.GetViewFrame()->GetFrame().GetFrameInterface(), css::uno::UNO_QUERY);
+
+        rtl::Reference<avmedia::PlayerListener> xPlayerListener(new avmedia::PlayerListener(
+            [xDispatchProvider, aURL, bLink](const css::uno::Reference<css::media::XPlayer>& rPlayer){
+                css::awt::Size aSize = rPlayer->getPreferredPlayerWindowSize();
+                avmedia::MediaWindow::dispatchInsertAVMedia(xDispatchProvider, aSize, aURL, bLink);
+            }));
+
+        const bool bIsMediaURL = ::avmedia::MediaWindow::isMediaURL(aURL, ""/*TODO?*/, true, xPlayerListener);
 
         if( pWin )
             pWin->LeaveWait();
+
+        if (!bIsMediaURL && !bAPI)
+            ::avmedia::MediaWindow::executeFormatErrorBox(pWindow ? pWindow->GetFrameWeld() : nullptr);
+
+        return;
     }
+
+    if (pWin)
+        pWin->EnterWait();
+
+    lcl_InsertMedia(aURL, bAPI, &rViewSh, pWindow, pView, aPrefSize, bLink);
+
+    if (pWin)
+        pWin->LeaveWait();
+#endif
 }
 
 FuInsertMedia::~FuInsertMedia()

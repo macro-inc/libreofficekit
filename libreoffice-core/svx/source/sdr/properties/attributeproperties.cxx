@@ -53,7 +53,7 @@ namespace sdr::properties
 
                     while(nWhich)
                     {
-                        if(SfxItemState::SET == rStyle.GetItemState(nWhich))
+                        if(SfxItemState::SET == aIter.GetItemState())
                         {
                             mxItemSet->ClearItem(nWhich);
                         }
@@ -268,15 +268,14 @@ namespace sdr::properties
                     // problem with constructors and virtual functions in C++),
                     // thus DontRemoveHardAttr is not needed.
                     const_cast< AttributeProperties* >(this)->SetStyleSheet(
-                        mpStyleSheet,
-                        true);
+                        mpStyleSheet, true, true);
                 }
             }
 
             return *mxItemSet;
         }
 
-        void AttributeProperties::ItemSetChanged(const SfxItemSet* /*pSet*/)
+        void AttributeProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > /*aChangedItems*/, sal_uInt16 /*nDeletedWhich*/)
         {
             // own modifications
             SdrObject& rObj = GetSdrObject();
@@ -340,10 +339,7 @@ namespace sdr::properties
                 if(pResultItem)
                 {
                     // force ItemSet
-                    mxItemSet->Put(*pResultItem);
-
-                    // delete item if it was a generated one
-                    pResultItem.reset();
+                    mxItemSet->Put(std::move(pResultItem));
                 }
                 else
                 {
@@ -360,7 +356,8 @@ namespace sdr::properties
             }
         }
 
-        void AttributeProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void AttributeProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool /*bBroadcast*/)
         {
             // guarantee SfxItemSet existence
             GetObjectItemSet();
@@ -523,6 +520,22 @@ namespace sdr::properties
             }
             return false;
         }
+
+        void AttributeProperties::applyDefaultStyleSheetFromSdrModel()
+        {
+            SfxStyleSheet* pDefaultStyleSheet(GetSdrObject().getSdrModelFromSdrObject().GetDefaultStyleSheet());
+
+            // tdf#118139 Only do this when StyleSheet really differs. It may e.g.
+            // be the case that nullptr == pDefaultStyleSheet and there is none set yet,
+            // so indeed no need to set it (needed for some strange old MSWord2003
+            // documents with CustomShape-'Group' and added Text-Frames, see task description)
+            if(pDefaultStyleSheet != GetStyleSheet())
+            {
+                // do not delete hard attributes when setting dsefault Style
+                SetStyleSheet(pDefaultStyleSheet, true, true);
+            }
+        }
+
 } // end of namespace
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

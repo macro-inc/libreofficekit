@@ -18,12 +18,12 @@
  */
 
 #include <comphelper/processfactory.hxx>
-#include <sal/log.hxx>
 #include <unotools/charclass.hxx>
 #include <rtl/character.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/i18n/CharacterClassification.hpp>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::i18n;
@@ -31,15 +31,15 @@ using namespace ::com::sun::star::uno;
 
 CharClass::CharClass(
             const Reference< uno::XComponentContext > & rxContext,
-            const LanguageTag& rLanguageTag
+            LanguageTag aLanguageTag
             )
-    : maLanguageTag( rLanguageTag)
+    : maLanguageTag(std::move( aLanguageTag))
 {
     xCC = CharacterClassification::create( rxContext );
 }
 
-CharClass::CharClass( const LanguageTag& rLanguageTag )
-    : maLanguageTag( rLanguageTag)
+CharClass::CharClass( LanguageTag aLanguageTag )
+    : maLanguageTag(std::move( aLanguageTag))
 {
     xCC = CharacterClassification::create( comphelper::getProcessComponentContext() );
 }
@@ -59,12 +59,12 @@ const css::lang::Locale& CharClass::getMyLocale() const
 }
 
 // static
-bool CharClass::isAsciiNumeric( const OUString& rStr )
+bool CharClass::isAsciiNumeric( std::u16string_view rStr )
 {
-    if ( rStr.isEmpty() )
+    if ( rStr.empty() )
         return false;
-    const sal_Unicode* p = rStr.getStr();
-    const sal_Unicode* const pStop = p + rStr.getLength();
+    const sal_Unicode* p = rStr.data();
+    const sal_Unicode* const pStop = p + rStr.size();
 
     do
     {
@@ -77,12 +77,12 @@ bool CharClass::isAsciiNumeric( const OUString& rStr )
 }
 
 // static
-bool CharClass::isAsciiAlpha( const OUString& rStr )
+bool CharClass::isAsciiAlpha( std::u16string_view rStr )
 {
-    if ( rStr.isEmpty() )
+    if ( rStr.empty() )
         return false;
-    const sal_Unicode* p = rStr.getStr();
-    const sal_Unicode* const pStop = p + rStr.getLength();
+    const sal_Unicode* p = rStr.data();
+    const sal_Unicode* const pStop = p + rStr.size();
 
     do
     {
@@ -132,9 +132,19 @@ bool CharClass::isLetter( const OUString& rStr, sal_Int32 nPos ) const
 
 bool CharClass::isLetter( const OUString& rStr ) const
 {
+    if (rStr.isEmpty())
+        return false;
+
     try
     {
-        return isLetterType( xCC->getStringType( rStr, 0, rStr.getLength(), getMyLocale() ) );
+        sal_Int32 nPos = 0;
+        while (nPos < rStr.getLength())
+        {
+            if (!isLetter( rStr, nPos))
+                return false;
+            rStr.iterateCodePoints( &nPos);
+        }
+        return true;
     }
     catch ( const Exception& )
     {
@@ -163,9 +173,19 @@ bool CharClass::isDigit( const OUString& rStr, sal_Int32 nPos ) const
 
 bool CharClass::isNumeric( const OUString& rStr ) const
 {
+    if (rStr.isEmpty())
+        return false;
+
     try
     {
-        return isNumericType( xCC->getStringType( rStr, 0, rStr.getLength(), getMyLocale() ) );
+        sal_Int32 nPos = 0;
+        while (nPos < rStr.getLength())
+        {
+            if (!isDigit( rStr, nPos))
+                return false;
+            rStr.iterateCodePoints( &nPos);
+        }
+        return true;
     }
     catch ( const Exception& )
     {
@@ -183,7 +203,7 @@ bool CharClass::isAlphaNumeric( const OUString& rStr, sal_Int32 nPos ) const
     try
     {
         return  (xCC->getCharacterType( rStr, nPos, getMyLocale() ) &
-                (nCharClassAlphaType | KCharacterType::DIGIT)) != 0;
+                (nCharClassAlphaType | nCharClassNumericType)) != 0;
     }
     catch ( const Exception& )
     {
@@ -201,7 +221,7 @@ bool CharClass::isLetterNumeric( const OUString& rStr, sal_Int32 nPos ) const
     try
     {
         return  (xCC->getCharacterType( rStr, nPos, getMyLocale() ) &
-                (nCharClassLetterType | KCharacterType::DIGIT)) != 0;
+                (nCharClassLetterType | nCharClassNumericType)) != 0;
     }
     catch ( const Exception& )
     {
@@ -212,9 +232,64 @@ bool CharClass::isLetterNumeric( const OUString& rStr, sal_Int32 nPos ) const
 
 bool CharClass::isLetterNumeric( const OUString& rStr ) const
 {
+    if (rStr.isEmpty())
+        return false;
+
     try
     {
-        return isLetterNumericType( xCC->getStringType( rStr, 0, rStr.getLength(), getMyLocale() ) );
+        sal_Int32 nPos = 0;
+        while (nPos < rStr.getLength())
+        {
+            if (!isLetterNumeric( rStr, nPos))
+                return false;
+            rStr.iterateCodePoints( &nPos);
+        }
+        return true;
+    }
+    catch ( const Exception& )
+    {
+        TOOLS_WARN_EXCEPTION("unotools.i18n", "" );
+    }
+    return false;
+}
+
+bool CharClass::isUpper( const OUString& rStr, sal_Int32 nPos ) const
+{
+    sal_Unicode c = rStr[nPos];
+    if ( c < 128 )
+        return rtl::isAsciiUpperCase(c);
+
+    try
+    {
+        return (xCC->getCharacterType( rStr, nPos, getMyLocale()) &
+                KCharacterType::UPPER) != 0;
+    }
+    catch ( const Exception& )
+    {
+        TOOLS_WARN_EXCEPTION("unotools.i18n", "" );
+    }
+    return false;
+}
+
+bool CharClass::isUpper( const OUString& rStr, sal_Int32 nPos, sal_Int32 nCount ) const
+{
+    if (rStr.isEmpty())
+        return false;
+
+    assert(nPos >= 0 && nPos < rStr.getLength() && nCount > 0);
+    if (nPos < 0 || nPos >= rStr.getLength() || nCount == 0)
+        return false;
+
+    try
+    {
+        const sal_Int32 nLen = std::min( nPos + nCount, rStr.getLength());
+        while (nPos < nLen)
+        {
+            if (!isUpper( rStr, nPos))
+                return false;
+            rStr.iterateCodePoints( &nPos);
+        }
+        return true;
     }
     catch ( const Exception& )
     {
@@ -306,19 +381,6 @@ sal_Int32 CharClass::getCharacterType( const OUString& rStr, sal_Int32 nPos ) co
     try
     {
         return xCC->getCharacterType( rStr, nPos, getMyLocale() );
-    }
-    catch ( const Exception& )
-    {
-        TOOLS_WARN_EXCEPTION("unotools.i18n", "" );
-    }
-    return 0;
-}
-
-sal_Int32 CharClass::getStringType( const OUString& rStr, sal_Int32 nPos, sal_Int32 nCount ) const
-{
-    try
-    {
-        return xCC->getStringType( rStr, nPos, nCount, getMyLocale() );
     }
     catch ( const Exception& )
     {

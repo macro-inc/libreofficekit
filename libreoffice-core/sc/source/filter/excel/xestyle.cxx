@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <utility>
 #include <xestyle.hxx>
 
 #include <algorithm>
@@ -2274,9 +2275,9 @@ void XclExpDefaultXF::SetNumFmt( sal_uInt16 nXclNumFmt )
     mbFmtUsed = true;
 }
 
-XclExpStyle::XclExpStyle( sal_uInt32 nXFId, const OUString& rStyleName ) :
+XclExpStyle::XclExpStyle( sal_uInt32 nXFId, OUString aStyleName ) :
     XclExpRecord( EXC_ID_STYLE, 4 ),
-    maName( rStyleName ),
+    maName(std::move( aStyleName )),
     maXFId( nXFId ),
     mnStyleId( EXC_STYLE_USERDEF ),
     mnLevel( EXC_STYLE_NOLEVEL )
@@ -3151,10 +3152,9 @@ XclExpDxfs::XclExpDxfs( const XclExpRoot& rRoot )
                         std::unique_ptr<XclExpDxfFont> pFont(new XclExpDxfFont(rRoot, rSet));
 
                         std::unique_ptr<XclExpNumFmt> pNumFormat;
-                        const SfxPoolItem *pPoolItem = nullptr;
-                        if( rSet.GetItemState( ATTR_VALUE_FORMAT, true, &pPoolItem ) == SfxItemState::SET )
+                        if( const SfxUInt32Item *pPoolItem = rSet.GetItemIfSet( ATTR_VALUE_FORMAT ) )
                         {
-                            sal_uInt32 nScNumFmt = static_cast< const SfxUInt32Item* >(pPoolItem)->GetValue();
+                            sal_uInt32 nScNumFmt = pPoolItem->GetValue();
                             sal_Int32 nXclNumFmt = GetRoot().GetNumFmtBuffer().Insert(nScNumFmt);
                             pNumFormat.reset(new XclExpNumFmt( nScNumFmt, nXclNumFmt, GetNumberFormatCode( *this, nScNumFmt, xFormatter.get(), mpKeywordTable.get() )));
                         }
@@ -3210,6 +3210,14 @@ void XclExpDxfs::SaveXml( XclExpXmlStream& rStrm )
     rStyleSheet->endElement( XML_dxfs );
 }
 
+void XclExpDxfs::Finalize()
+{
+    for (auto& rxDxf : maDxf)
+    {
+        rxDxf->SetFinalColors();
+    }
+}
+
 XclExpDxf::XclExpDxf( const XclExpRoot& rRoot, std::unique_ptr<XclExpCellAlign> pAlign, std::unique_ptr<XclExpCellBorder> pBorder,
             std::unique_ptr<XclExpDxfFont> pFont, std::unique_ptr<XclExpNumFmt> pNumberFmt, std::unique_ptr<XclExpCellProt> pProt,
             std::unique_ptr<XclExpColor> pColor)
@@ -3231,6 +3239,14 @@ XclExpDxf::XclExpDxf(const XclExpRoot& rRoot, std::unique_ptr<XclExpCellArea> pC
 
 XclExpDxf::~XclExpDxf()
 {
+}
+
+void XclExpDxf::SetFinalColors()
+{
+    if (mpBorder)
+    {
+        mpBorder->SetFinalColors(GetPalette());
+    }
 }
 
 void XclExpDxf::SaveXml( XclExpXmlStream& rStrm )

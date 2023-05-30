@@ -295,16 +295,13 @@ void SwDoc::CopyMasterHeader(const SwPageDesc &rChged, const SwFormatHeader &rHe
                     // The section which the right header attribute is pointing
                     // is copied, and the Index to the StartNode is set to
                     // the left or first header attribute.
-                    SwNodeIndex aTmp( GetNodes().GetEndOfAutotext() );
-                    SwStartNode* pSttNd = SwNodes::MakeEmptySection( aTmp, SwHeaderStartNode );
+                    SwStartNode* pSttNd = SwNodes::MakeEmptySection( GetNodes().GetEndOfAutotext(), SwHeaderStartNode );
                     SwNodeRange aRange( aRCnt.GetContentIdx()->GetNode(), SwNodeOffset(0),
                                 *aRCnt.GetContentIdx()->GetNode().EndOfSectionNode() );
-                    aTmp = *pSttNd->EndOfSectionNode();
-                    GetNodes().Copy_( aRange, aTmp, false );
-                    aTmp = *pSttNd;
-                    GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRange, nullptr, aTmp);
+                    GetNodes().Copy_( aRange, *pSttNd->EndOfSectionNode(), false );
+                    GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRange, nullptr, *pSttNd);
                     SwPaM const source(aRange.aStart, aRange.aEnd);
-                    SwPosition dest(aTmp);
+                    SwPosition dest(*pSttNd);
                     sw::CopyBookmarks(source, dest);
                     pFormat->SetFormatAttr( SwFormatContent( pSttNd ) );
                     rDescFrameFormat.SetFormatAttr( SwFormatHeader( pFormat ) );
@@ -375,16 +372,13 @@ void SwDoc::CopyMasterFooter(const SwPageDesc &rChged, const SwFormatFooter &rFo
                     // The section to which the right footer attribute is pointing
                     // is copied, and the Index to the StartNode is set to
                     // the left footer attribute.
-                    SwNodeIndex aTmp( GetNodes().GetEndOfAutotext() );
-                    SwStartNode* pSttNd = SwNodes::MakeEmptySection( aTmp, SwFooterStartNode );
+                    SwStartNode* pSttNd = SwNodes::MakeEmptySection( GetNodes().GetEndOfAutotext(), SwFooterStartNode );
                     SwNodeRange aRange( aRCnt.GetContentIdx()->GetNode(), SwNodeOffset(0),
                                 *aRCnt.GetContentIdx()->GetNode().EndOfSectionNode() );
-                    aTmp = *pSttNd->EndOfSectionNode();
-                    GetNodes().Copy_( aRange, aTmp, false );
-                    aTmp = *pSttNd;
-                    GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRange, nullptr, aTmp);
+                    GetNodes().Copy_( aRange, *pSttNd->EndOfSectionNode(), false );
+                    GetDocumentContentOperationsManager().CopyFlyInFlyImpl(aRange, nullptr, *pSttNd);
                     SwPaM const source(aRange.aStart, aRange.aEnd);
-                    SwPosition dest(aTmp);
+                    SwPosition dest(*pSttNd);
                     sw::CopyBookmarks(source, dest);
                     pFormat->SetFormatAttr( SwFormatContent( pSttNd ) );
                     rDescFrameFormat.SetFormatAttr( SwFormatFooter( pFormat ) );
@@ -484,7 +478,7 @@ void SwDoc::ChgPageDesc( size_t i, const SwPageDesc &rChged )
                                 SwCursorShell* pShell = SwIterator<SwCursorShell, SwContentNode>(*static_cast<SwContentNode*>(pNode)).First();
                                 if (pShell)
                                 {
-                                    pShell->ParkCursor(aIdx);
+                                    pShell->ParkCursor(aIdx.GetNode());
                                     aIdx = nEnd - 1;
                                 }
                             }
@@ -903,7 +897,7 @@ void SwDoc::PrtOLENotify( bool bAll )
 IMPL_LINK_NOARG( SwDoc, DoUpdateModifiedOLE, Timer *, void )
 {
     SwFEShell* pSh = static_cast<SwFEShell*>(GetEditShell());
-    if( !pSh )
+    if (!pSh)
         return;
 
     mbOLEPrtNotifyPending = mbAllOLENotify = false;

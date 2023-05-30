@@ -32,7 +32,9 @@
 #include "vbacontrol.hxx"
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <o3tl/safeint.hxx>
 #include <unordered_map>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
@@ -135,9 +137,9 @@ public:
 
     virtual uno::Any SAL_CALL getByIndex( ::sal_Int32 Index ) override
     {
-        if ( Index < 0 || Index >= static_cast< sal_Int32 >( mControls.size() ) )
+        if ( Index < 0 || o3tl::make_unsigned(Index) >= mControls.size() )
             throw lang::IndexOutOfBoundsException();
-        return uno::makeAny( mControls[ Index ] );
+        return uno::Any( mControls[ Index ] );
     }
 };
 
@@ -155,15 +157,15 @@ class ControlsEnumWrapper : public EnumerationHelper_BASE
 public:
 
     ControlsEnumWrapper(
-        const uno::Reference< uno::XComponentContext >& xContext,
-        const uno::Reference< container::XIndexAccess >& xIndexAccess,
-        const uno::Reference< awt::XControl >& xDlg,
-        const uno::Reference< frame::XModel >& xModel,
+        uno::Reference< uno::XComponentContext > xContext,
+        uno::Reference< container::XIndexAccess > xIndexAccess,
+        uno::Reference< awt::XControl > xDlg,
+        uno::Reference< frame::XModel > xModel,
         double fOffsetX, double fOffsetY ) :
-    m_xContext( xContext),
-    m_xIndexAccess( xIndexAccess ),
-    m_xDlg( xDlg ),
-    m_xModel( xModel ),
+    m_xContext(std::move( xContext)),
+    m_xIndexAccess(std::move( xIndexAccess )),
+    m_xDlg(std::move( xDlg )),
+    m_xModel(std::move( xModel )),
     mfOffsetX( fOffsetX ),
     mfOffsetY( fOffsetY ),
     nIndex( 0 ) {}
@@ -183,7 +185,7 @@ public:
             uno::Reference< msforms::XControl > xVBAControl;
             if ( xControl.is() && m_xDlg.is() )
                 xVBAControl = ScVbaControlFactory::createUserformControl( m_xContext, xControl, m_xDlg, m_xModel, mfOffsetX, mfOffsetY );
-            return uno::makeAny( xVBAControl );
+            return uno::Any( xVBAControl );
         }
         throw container::NoSuchElementException();
     }
@@ -202,11 +204,11 @@ ScVbaControls::ScVbaControls(
         const uno::Reference< XHelperInterface >& xParent,
         const uno::Reference< uno::XComponentContext >& xContext,
         const css::uno::Reference< awt::XControl >& xDialog,
-        const uno::Reference< frame::XModel >& xModel,
+        uno::Reference< frame::XModel > xModel,
         double fOffsetX, double fOffsetY ) :
     ControlsImpl_BASE( xParent, xContext, lcl_controlsWrapper( xDialog  ) ),
     mxDialog( xDialog ),
-    mxModel( xModel ),
+    mxModel(std::move( xModel )),
     mfOffsetX( fOffsetX ),
     mfOffsetY( fOffsetY )
 {
@@ -374,7 +376,7 @@ uno::Any SAL_CALL ScVbaControls::Add( const uno::Any& Object, const uno::Any& St
                 xModelProps->setPropertyValue( "FontStrikeout" , uno::Any( awt::FontStrikeout::NONE ) );
             }
 
-            xDialogContainer->insertByName( aNewName, uno::makeAny( xNewModel ) );
+            xDialogContainer->insertByName( aNewName, uno::Any( xNewModel ) );
             uno::Reference< awt::XControlContainer > xControlContainer( mxDialog, uno::UNO_QUERY_THROW );
             xNewControl = xControlContainer->getControl( aNewName );
 

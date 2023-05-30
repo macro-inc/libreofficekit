@@ -19,11 +19,11 @@
 
 #include <dlg_DataEditor.hxx>
 #include "DataBrowser.hxx"
+#include <ChartModel.hxx>
 #include <comphelper/stl_types.hxx>
 
 #include <com/sun/star/awt/XWindow.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/frame/XStorable.hpp>
+#include <utility>
 
 using namespace ::com::sun::star;
 using ::com::sun::star::uno::Reference;
@@ -32,11 +32,11 @@ namespace chart
 {
 
 DataEditor::DataEditor(weld::Window* pParent,
-    const Reference< chart2::XChartDocument > & xChartDoc,
+    rtl::Reference<::chart::ChartModel> xChartDoc,
     const Reference< uno::XComponentContext > & xContext)
     : GenericDialogController(pParent, "modules/schart/ui/chartdatadialog.ui", "ChartDataDialog")
     , m_bReadOnly(false)
-    , m_xChartDoc(xChartDoc)
+    , m_xChartDoc(std::move(xChartDoc))
     , m_xContext(xContext)
     , m_xTbxData(m_xBuilder->weld_toolbar("toolbar"))
     , m_xCloseBtn(m_xBuilder->weld_button("close"))
@@ -57,13 +57,12 @@ DataEditor::DataEditor(weld::Window* pParent,
 
     m_xBrwData->SetCursorMovedHdl( LINK( this, DataEditor, BrowserCursorMovedHdl ));
 
-    m_xBrwData->SetDataFromModel( m_xChartDoc, m_xContext );
+    m_xBrwData->SetDataFromModel( m_xChartDoc );
     m_xBrwData->GrabFocus();
 
     bool bReadOnly = true;
-    Reference< frame::XStorable > xStor( m_xChartDoc, uno::UNO_QUERY );
-    if( xStor.is())
-        bReadOnly = xStor->isReadonly();
+    if( m_xChartDoc.is())
+        bReadOnly = m_xChartDoc->isReadonly();
     SetReadOnly( bReadOnly );
 }
 

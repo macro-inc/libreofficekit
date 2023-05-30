@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2021-03-03 20:36+0000\n"
-"Last-Translator: Andras Timar <timar74@gmail.com>\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
+"Last-Translator: Gábor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.4\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1559196242.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "A(z) „%1” könyvtár létrehozása nem sikerült.<BR>Lehet, hogy nincs több hely a merevlemezen?"
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "A szöveges dokumentum létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a PRODUCTNAME Writer modul."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "A szöveges dokumentum létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a %PRODUCTNAME Writer modul."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "A munkafüzet létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a PRODUCTNAME Calc modul."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "A munkafüzet létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a %PRODUCTNAME Calc modul."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "A bemutató létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a PRODUCTNAME Impress modul."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "A bemutató létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a %PRODUCTNAME Impress modul."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "A rajz létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a PRODUCTNAME Draw modul."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "A rajz létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a %PRODUCTNAME Draw modul."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "A képlet létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a PRODUCTNAME Math modul."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "A képlet létrehozása nem sikerült.<BR>Ellenőrizze, hogy telepítve van-e a %PRODUCTNAME Math modul."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -3853,6 +3853,15 @@ msgctxt ""
 "property.text"
 msgid "Lithuanian Litas"
 msgstr "Litván lita"
+
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "Horvát kuna"
 
 #. eDjBr
 #: resources_en_US.properties

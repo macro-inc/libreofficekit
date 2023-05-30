@@ -9,6 +9,7 @@
 
 #include "SchXMLPropertyMappingContext.hxx"
 #include "SchXMLTools.hxx"
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/namespacemap.hxx>
@@ -45,7 +46,7 @@ Reference< chart2::data::XLabeledDataSequence2 > createAndAddSequenceToSeries( c
     Reference< chart2::data::XDataSequence > xSeq = SchXMLTools::CreateDataSequence( rRange, xChartDoc );
     Reference< beans::XPropertySet > xSeqProp( xSeq, uno::UNO_QUERY );
     if( xSeqProp.is())
-        xSeqProp->setPropertyValue("Role", uno::makeAny( rRole));
+        xSeqProp->setPropertyValue("Role", uno::Any( rRole));
     xLabeledSeq->setValues( xSeq );
 
     Reference< chart2::data::XDataSink > xSink( xSeriesSource, uno::UNO_QUERY );
@@ -66,9 +67,9 @@ SchXMLPropertyMappingContext::SchXMLPropertyMappingContext(
         SvXMLImport& rImport,
         tSchXMLLSequencesPerIndex & rLSequencesPerIndex,
         uno::Reference<
-        chart2::XDataSeries > const & xSeries ):
+        chart2::XDataSeries > xSeries ):
     SvXMLImportContext( rImport ),
-    mxDataSeries(xSeries),
+    mxDataSeries(std::move(xSeries)),
     mrLSequencesPerIndex(rLSequencesPerIndex)
 {
 

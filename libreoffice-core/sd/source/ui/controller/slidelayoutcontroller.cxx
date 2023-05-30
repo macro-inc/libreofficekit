@@ -26,7 +26,6 @@
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/toolbox.hxx>
 
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 
 #include <svtools/toolbarmenu.hxx>
@@ -77,33 +76,35 @@ private:
     std::unique_ptr<weld::Button> mxMoreButton;
 };
 
-struct snewfoil_value_info_layout
+struct snew_slide_value_info_layout
 {
-    const char* msBmpResId;
+    rtl::OUStringConstExpr msBmpResId;
     TranslateId mpStrResId;
     AutoLayout maAutoLayout;
 };
 
 }
 
-const snewfoil_value_info_layout notes[] =
+constexpr OUStringLiteral EMPTY = u"";
+
+const snew_slide_value_info_layout notes[] =
 {
-    {BMP_FOILN_01, STR_AUTOLAYOUT_NOTES, AUTOLAYOUT_NOTES},
-    {nullptr, {}, AUTOLAYOUT_NONE},
+    {BMP_SLIDEN_01, STR_AUTOLAYOUT_NOTES, AUTOLAYOUT_NOTES},
+    {EMPTY, {}, AUTOLAYOUT_NONE},
 };
 
-const snewfoil_value_info_layout handout[] =
+const snew_slide_value_info_layout handout[] =
 {
-    {BMP_FOILH_01, STR_AUTOLAYOUT_HANDOUT1, AUTOLAYOUT_HANDOUT1},
-    {BMP_FOILH_02, STR_AUTOLAYOUT_HANDOUT2, AUTOLAYOUT_HANDOUT2},
-    {BMP_FOILH_03, STR_AUTOLAYOUT_HANDOUT3, AUTOLAYOUT_HANDOUT3},
-    {BMP_FOILH_04, STR_AUTOLAYOUT_HANDOUT4, AUTOLAYOUT_HANDOUT4},
-    {BMP_FOILH_06, STR_AUTOLAYOUT_HANDOUT6, AUTOLAYOUT_HANDOUT6},
-    {BMP_FOILH_09, STR_AUTOLAYOUT_HANDOUT9, AUTOLAYOUT_HANDOUT9},
-    {nullptr, {}, AUTOLAYOUT_NONE},
+    {BMP_SLIDEH_01, STR_AUTOLAYOUT_HANDOUT1, AUTOLAYOUT_HANDOUT1},
+    {BMP_SLIDEH_02, STR_AUTOLAYOUT_HANDOUT2, AUTOLAYOUT_HANDOUT2},
+    {BMP_SLIDEH_03, STR_AUTOLAYOUT_HANDOUT3, AUTOLAYOUT_HANDOUT3},
+    {BMP_SLIDEH_04, STR_AUTOLAYOUT_HANDOUT4, AUTOLAYOUT_HANDOUT4},
+    {BMP_SLIDEH_06, STR_AUTOLAYOUT_HANDOUT6, AUTOLAYOUT_HANDOUT6},
+    {BMP_SLIDEH_09, STR_AUTOLAYOUT_HANDOUT9, AUTOLAYOUT_HANDOUT9},
+    {EMPTY, {}, AUTOLAYOUT_NONE},
 };
 
-const snewfoil_value_info_layout standard[] =
+const snew_slide_value_info_layout standard[] =
 {
     {BMP_LAYOUT_EMPTY,    STR_AUTOLAYOUT_NONE,                 AUTOLAYOUT_NONE         },
     {BMP_LAYOUT_HEAD03,   STR_AUTOLAYOUT_TITLE,                AUTOLAYOUT_TITLE        },
@@ -117,26 +118,26 @@ const snewfoil_value_info_layout standard[] =
     {BMP_LAYOUT_HEAD02B,  STR_AUTOLAYOUT_CONTENT_OVER_CONTENT, AUTOLAYOUT_TITLE_CONTENT_OVER_CONTENT },
     {BMP_LAYOUT_HEAD04,   STR_AUTOLAYOUT_4CONTENT,             AUTOLAYOUT_TITLE_4CONTENT },
     {BMP_LAYOUT_HEAD06,   STR_AUTOLAYOUT_6CONTENT,             AUTOLAYOUT_TITLE_6CONTENT },
-    {nullptr, {}, AUTOLAYOUT_NONE}
+    {EMPTY, {}, AUTOLAYOUT_NONE}
 };
 
-const snewfoil_value_info_layout v_standard[] =
+const snew_slide_value_info_layout v_standard[] =
 {
     // vertical
     {BMP_LAYOUT_VERTICAL02, STR_AL_VERT_TITLE_TEXT_CHART,      AUTOLAYOUT_VTITLE_VCONTENT_OVER_VCONTENT   },
     {BMP_LAYOUT_VERTICAL01, STR_AL_VERT_TITLE_VERT_OUTLINE,    AUTOLAYOUT_VTITLE_VCONTENT                 },
     {BMP_LAYOUT_HEAD02,     STR_AL_TITLE_VERT_OUTLINE,         AUTOLAYOUT_TITLE_VCONTENT                  },
     {BMP_LAYOUT_HEAD02A,    STR_AL_TITLE_VERT_OUTLINE_CLIPART, AUTOLAYOUT_TITLE_2VTEXT                    },
-    {nullptr, {}, AUTOLAYOUT_NONE}
+    {EMPTY, {}, AUTOLAYOUT_NONE}
 };
 
-static void fillLayoutValueSet( ValueSet* pValue, const snewfoil_value_info_layout* pInfo )
+static void fillLayoutValueSet( ValueSet* pValue, const snew_slide_value_info_layout* pInfo )
 {
     Size aLayoutItemSize;
     for( ; pInfo->mpStrResId; pInfo++ )
     {
         OUString aText(SdResId(pInfo->mpStrResId));
-        Image aImg(StockImage::Yes, OUString::createFromAscii(pInfo->msBmpResId));
+        Image aImg(StockImage::Yes, pInfo->msBmpResId);
         pValue->InsertItem(static_cast<sal_uInt16>(pInfo->maAutoLayout)+1, aImg, aText);
         aLayoutItemSize.setWidth( std::max( aLayoutItemSize.Width(),   aImg.GetSizePixel().Width()  ) );
         aLayoutItemSize.setHeight( std::max( aLayoutItemSize.Height(), aImg.GetSizePixel().Height() ) );
@@ -186,7 +187,7 @@ LayoutToolbarMenu::LayoutToolbarMenu(SlideLayoutController* pControl, weld::Widg
 
     mxLayoutSet1->SetSelectHdl( LINK( this, LayoutToolbarMenu, SelectValueSetHdl ) );
 
-    const snewfoil_value_info_layout* pInfo = nullptr;
+    const snew_slide_value_info_layout* pInfo = nullptr;
     sal_Int16 nColCount = 4;
     switch( eMode )
     {

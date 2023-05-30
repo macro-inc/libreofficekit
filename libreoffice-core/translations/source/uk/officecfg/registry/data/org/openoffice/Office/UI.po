@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-06-09 10:00+0000\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-01-09 03:14+0000\n"
 "Last-Translator: Євген Кондратюк <lachend@gmail.com>\n"
 "Language-Team: Ukrainian <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/uk/>\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1566240534.000000\n"
 
 #. W5ukN
@@ -1254,7 +1254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Go to Sheet..."
-msgstr ""
+msgstr "~Перейти до аркуша..."
 
 #. 79aNB
 #: CalcCommands.xcu
@@ -2104,17 +2104,17 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Sparklines"
-msgstr ""
+msgstr "Лінії тренду"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr ""
+msgid "Sparkline..."
+msgstr "Лінія тренду..."
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -2124,7 +2124,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Видалити лінію тренду"
 
 #. fFsYi
 #: CalcCommands.xcu
@@ -2134,7 +2134,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Видалити групу ліній тренду"
 
 #. w6VdZ
 #: CalcCommands.xcu
@@ -2144,7 +2144,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Згрупувати лінії тренду"
 
 #. 9pmpG
 #: CalcCommands.xcu
@@ -2154,7 +2154,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Розгрупувати лінії тренду"
 
 #. MRK2s
 #: CalcCommands.xcu
@@ -2164,7 +2164,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline..."
-msgstr ""
+msgstr "Редагувати лінію тренду..."
 
 #. cA9mm
 #: CalcCommands.xcu
@@ -2174,7 +2174,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline Group..."
-msgstr ""
+msgstr "Редагувати групу ліній тренду..."
 
 #. dTXDB
 #: CalcCommands.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "Позначки похибок за ~Y..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Таблиця даних..."
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -6535,6 +6545,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Формат окремого підпису даних..."
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Вставити таблицю даних"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Вилучити таблицю даних"
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -10694,7 +10724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Rows Evenly"
-msgstr ""
+msgstr "Вирівняти висоту рядків"
 
 #. tjGQ2
 #: DrawImpressCommands.xcu
@@ -20186,7 +20216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Up"
-msgstr ""
+msgstr "Посунути вгору"
 
 #. J83AS
 #: GenericCommands.xcu
@@ -20196,7 +20226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs up one paragraph"
-msgstr ""
+msgstr "Підняти виділені абзаци"
 
 #. GvBYt
 #: GenericCommands.xcu
@@ -20216,7 +20246,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Down"
-msgstr ""
+msgstr "Посунути вниз"
 
 #. ZEVXU
 #: GenericCommands.xcu
@@ -20226,7 +20256,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs down one paragraph"
-msgstr ""
+msgstr "Опустити виділені абзаци"
 
 #. KQLPA
 #: GenericCommands.xcu
@@ -20256,7 +20286,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Promote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Підвищити рівень структури обраних абзаців списку"
 
 #. 3WakF
 #: GenericCommands.xcu
@@ -20316,7 +20346,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Demote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Понизити рівень структури обраних абзаців списку"
 
 #. BoAR5
 #: GenericCommands.xcu
@@ -20736,7 +20766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Вставка об'єкта OLE"
 
 #. gB86r
 #: GenericCommands.xcu
@@ -20746,7 +20776,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~OLE Object..."
-msgstr ""
+msgstr "Об'єкт ~OLE..."
 
 #. zKjoT
 #: GenericCommands.xcu
@@ -20756,7 +20786,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Open dialog to insert OLE object"
-msgstr ""
+msgstr "Відкрити діалогове вікно для вставки об'єкта OLE"
 
 #. 6B9a2
 #: GenericCommands.xcu
@@ -21006,7 +21036,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Ob~ject"
-msgstr ""
+msgstr "Об'є~кт OLE"
 
 #. o5DE2
 #: GenericCommands.xcu
@@ -21016,7 +21046,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Menu for editing or saving OLE objects"
-msgstr ""
+msgstr "Меню для редагування або збереження об'єктів OLE"
 
 #. WQPXj
 #: GenericCommands.xcu
@@ -21396,7 +21426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Text B~ox and Shape"
-msgstr ""
+msgstr "Текстове ~поле і фігура"
 
 #. zFyfF
 #: GenericCommands.xcu
@@ -22066,7 +22096,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select start and end arrowheads for lines."
-msgstr ""
+msgstr "Виберіть початок і кінець стрілок на лініях."
 
 #. FDhkx
 #: GenericCommands.xcu
@@ -22197,26 +22227,6 @@ msgctxt ""
 "value.text"
 msgid "Delete C~ontents..."
 msgstr "Видалити ~вміст..."
-
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Емоційки"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Вставити емоційки"
 
 #. tEjpF
 #: GenericCommands.xcu
@@ -23478,6 +23488,36 @@ msgctxt ""
 msgid "Toggle Automatic Spell Checking"
 msgstr "Перемкнути автоматичну перевірку правопису"
 
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Автоматична перевірка доступності"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "Автоматична перевірка ~доступності"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Перемкнути автоматичну перевірку доступності"
+
 #. 4DCmg
 #: GenericCommands.xcu
 msgctxt ""
@@ -24146,7 +24186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Basic..."
-msgstr "~Basic..."
+msgstr "~BASIC..."
 
 #. 6NozA
 #: GenericCommands.xcu
@@ -25976,7 +26016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~OLE Object"
-msgstr ""
+msgstr "Об'єкт ~OLE"
 
 #. SQ76T
 #: GenericCommands.xcu
@@ -26256,7 +26296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Anchor Menu"
-msgstr ""
+msgstr "Прив'язка об'єкта"
 
 #. oNBG8
 #: GenericCommands.xcu
@@ -26276,7 +26316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Виберіть якір на об'єкті"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -26766,7 +26806,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Give a label to identify an object"
-msgstr ""
+msgstr "Присвойте мітку для ідентифікації об’єкта"
 
 #. k5bGq
 #: GenericCommands.xcu
@@ -26786,7 +26826,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Add descriptions of non-text content (for accessibility)"
-msgstr ""
+msgstr "Додайте описи не-текстового вмісту (для доступності)"
 
 #. YwMhY
 #: GenericCommands.xcu
@@ -28338,6 +28378,16 @@ msgctxt ""
 msgid "~Others"
 msgstr "~Інше"
 
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Відкрити панель елементів"
+
 #. uXvss
 #: MathWindowState.xcu
 msgctxt ""
@@ -29036,7 +29086,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Elements"
-msgstr ""
+msgstr "Елементи"
 
 #. B4iFE
 #: Sidebar.xcu
@@ -30528,15 +30578,15 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Показувати відстежені зміни"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
-msgstr "Показувати відс~тежені зміни"
+msgid "Show Tracked ~Changes"
+msgstr "Показати зміни"
 
 #. sMgCx
 #: WriterCommands.xcu
@@ -30597,6 +30647,16 @@ msgctxt ""
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
 msgstr "Показати поруч із заголовками та підзаголовками кнопки для згортання структури. Без кнопок ви можете згортати структуру за допомогою Навігатора."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Показати вміст структури до рівня..."
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30756,7 +30816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Control Properties"
-msgstr ""
+msgstr "Властивості ЕКВ"
 
 #. npNpZ
 #: WriterCommands.xcu
@@ -30926,7 +30986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Controls"
-msgstr ""
+msgstr "Елементи керування вмістом"
 
 #. isyh9
 #: WriterCommands.xcu
@@ -30936,7 +30996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Rich Text Content Control"
-msgstr ""
+msgstr "Вставити текст з форматуванням (ЕКВ)"
 
 #. GH8DZ
 #: WriterCommands.xcu
@@ -30946,7 +31006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Check Box Content Control"
-msgstr ""
+msgstr "Вставити прапорець (ЕКВ)"
 
 #. h2RBS
 #: WriterCommands.xcu
@@ -30956,7 +31016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Drop-Down List Content Control"
-msgstr ""
+msgstr "Вставити поле зі спадним списком (ЕКВ)"
 
 #. Avn9E
 #: WriterCommands.xcu
@@ -30966,7 +31026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Picture Content Control"
-msgstr ""
+msgstr "Вставити зображення (ЕКВ)"
 
 #. oxa64
 #: WriterCommands.xcu
@@ -30976,7 +31036,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
-msgstr ""
+msgstr "Вставити дату (ЕКВ)"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Вставити елемент управління «Неформатований текст»"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Вставити елемент «Поле зі списком»"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -31436,7 +31516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Object Insert Menu"
-msgstr ""
+msgstr "OLE-об'єкт \"Вставити меню\""
 
 #. DE4Ca
 #: WriterCommands.xcu
@@ -31446,7 +31526,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Вставка об'єкта OLE"
 
 #. ESBXG
 #: WriterCommands.xcu
@@ -32078,6 +32158,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Титульна сторінка..."
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Перекласти..."
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32478,6 +32568,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Рядки ~вище"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Вставити рядки зверху"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32497,6 +32597,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Рядки ~нижче"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Вставити рядки знизу"
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32518,15 +32628,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Вставити стовпці перед"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
+msgid "Columns B~efore"
 msgstr "Стовпці ~перед"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Вставити стовпці перед"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32538,15 +32658,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Вставити стовпці після"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
+msgid "Columns A~fter"
 msgstr "Стовпці п~ісля"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Вставити стопці після"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -33056,7 +33186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up"
-msgstr ""
+msgstr "Підняти елемент"
 
 #. F6Rc7
 #: WriterCommands.xcu
@@ -33076,7 +33206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down"
-msgstr ""
+msgstr "Опустити елемент"
 
 #. 2GyQ4
 #: WriterCommands.xcu
@@ -33146,7 +33276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr ""
+msgstr "Пониження рівня структури з підпунктами"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33166,7 +33296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr ""
+msgstr "Підвищення рівня структури з підпунктами"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33176,7 +33306,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr ""
+msgstr "Підвищити елемент з підпунктами"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33196,7 +33326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr ""
+msgstr "Понизити елемент з підпунктами"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -34086,7 +34216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Column Width"
-msgstr ""
+msgstr "Найменша ширина стовпця"
 
 #. TEEVY
 #: WriterCommands.xcu
@@ -34096,7 +34226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Column Width: Adjust width of selected columns to fit content"
-msgstr ""
+msgstr "Найменша ширина стовпця: Налаштуйте ширину виділених стовпців, щоб вміст поміщався"
 
 #. vGAT7
 #: WriterCommands.xcu
@@ -34126,7 +34256,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Row Height"
-msgstr ""
+msgstr "Найменша висота рядка"
 
 #. wJUJV
 #: WriterCommands.xcu
@@ -34136,7 +34266,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Row Height: Adjust height of selected rows to fit content"
-msgstr ""
+msgstr "Найменша висота рядка: Налаштуйте висоту виділених рядків, щоб вміст поміщався"
 
 #. 9RUey
 #: WriterCommands.xcu
@@ -34788,6 +34918,166 @@ msgctxt ""
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Клонувати формат (двічі клацнути з Ctrl або Cmd - інша поведінка)"
 
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Масштаб"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Керування відстеженими змінами"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Символ"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Абзац"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Властивості таблиці"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Положення та розмір"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Властивості зображення"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Властивості рамки"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "Властивості об'єкта OLE"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Обтікання текстом"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Обрамлення"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Обрамлення"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Заповнення"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Заповнення"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Лінія"
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Лінія"
+
 #. 7PCFf
 #: WriterCommands.xcu
 msgctxt ""
@@ -35426,7 +35716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr ""
+msgstr "Без стилю символа"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -35436,7 +35726,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Remove applied character style"
-msgstr ""
+msgstr "Прибрати застосований стиль символів"
 
 #. idpKA
 #: WriterCommands.xcu
@@ -36376,7 +36666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. nCSvk
 #: WriterFormWindowState.xcu
@@ -36856,7 +37146,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. v45LV
 #: WriterGlobalWindowState.xcu
@@ -37376,7 +37666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. 5GFnw
 #: WriterReportWindowState.xcu
@@ -37676,7 +37966,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. gaswH
 #: WriterWebWindowState.xcu
@@ -38336,7 +38626,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. Tgtuj
 #: WriterWindowState.xcu
@@ -38527,6 +38817,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Стандартна (одинарний режим)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Стандартна (в один рядок) - Коментар"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Стандартна (в один рядок) - Фігура"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Стандартна (в один рядок) - Текст фігури"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Стандартна (в один рядок) - Елемент управління"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Стандартна (в один рядок) - Фрейм"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Стандартна (в один рядок) - Зображення"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Стандартна (в один рядок) - Медіа"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Стандартна (в один рядок) - Об'єкт OLE"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Стандартна (в один рядок) - Попередній перегляд"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Стандартна (в один рядок) - Таблиця"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Стандартна (в один рядок) - Текст"
 
 #. h6gRt
 #: WriterWindowState.xcu
@@ -38876,7 +39276,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE-об'єкт"
 
 #. URXoj
 #: XFormsWindowState.xcu

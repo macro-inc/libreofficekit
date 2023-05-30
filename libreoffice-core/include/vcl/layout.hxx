@@ -470,6 +470,7 @@ public:
     virtual void StateChanged(StateChangedType nType) override;
     void  SetExpandedHdl( const Link<VclExpander&,void>& rLink ) { maExpandedHdl = rLink; }
     virtual void DumpAsPropertyTree(tools::JsonWriter& rJsonWriter) override;
+    virtual FactoryFunction GetUITestFactory() const override;
 private:
     virtual Size calculateRequisition() const override;
     virtual void setAllocation(const Size &rAllocation) override;
@@ -497,6 +498,7 @@ public:
     //to override it
     void setUserManagedScrolling(bool bUserManagedScrolling) { m_bUserManagedScrolling = bUserManagedScrolling;}
     void doSetAllocation(const Size &rAllocation, bool bRetryOnFailure);
+    virtual void DumpAsPropertyTree(::tools::JsonWriter& rJsonWriter) override;
 private:
     virtual Size calculateRequisition() const override;
     virtual void setAllocation(const Size &rAllocation) override;
@@ -645,11 +647,6 @@ private:
     {
         m_aResizeHdl.Call(GetOutputSizePixel());
     }
-    virtual void MouseMove(const MouseEvent& rMEvt) override
-    {
-        if (!m_aMouseMotionHdl.Call(rMEvt))
-            Control::MouseMove(rMEvt);
-    }
     virtual void KeyInput(const KeyEvent& rKEvt) override
     {
         if (!m_aKeyPressHdl.Call(rKEvt))
@@ -708,6 +705,11 @@ public:
     {
         if (!m_aMouseReleaseHdl.Call(rMEvt))
             Control::MouseButtonUp(rMEvt);
+    }
+    virtual void MouseMove(const MouseEvent& rMEvt) override
+    {
+        if (!m_aMouseMotionHdl.Call(rMEvt))
+            Control::MouseMove(rMEvt);
     }
     virtual OUString GetSurroundingText() const override;
     virtual Selection GetSurroundingTextSelection() const override;

@@ -175,7 +175,6 @@ struct XmlFilterBaseImpl
 
     FastParser                     maFastParser;
     RelationsMap                   maRelationsMap;
-    TextFieldStack                 maTextFieldStack;
     const NamespaceMap&            mrNamespaceMap;
     NamedShapePairs* mpDiagramFontHeights = nullptr;
 
@@ -213,6 +212,12 @@ XmlFilterBase::~XmlFilterBase()
     // case it's member RelationsMap maRelationsMap will be destroyed, but maybe
     // still be used by ~FragmentHandler -> crash.
     mxImpl->maFastParser.clearDocumentHandler();
+}
+
+std::shared_ptr<::oox::drawingml::Theme> XmlFilterBase::getCurrentThemePtr() const
+{
+    // default returns empty ptr
+    return std::shared_ptr<::oox::drawingml::Theme>();
 }
 
 void XmlFilterBase::checkDocumentProperties(const Reference<XDocumentProperties>& xDocProps)
@@ -501,11 +506,6 @@ FSHelperPtr XmlFilterBase::openFragmentStreamWithSerializer( const OUString& rSt
     return std::make_shared<FastSerializerHelper>( openFragmentStream( rStreamName, rMediaType ), bWriteHeader );
 }
 
-TextFieldStack& XmlFilterBase::getTextFieldStack() const
-{
-    return mxImpl->maTextFieldStack;
-}
-
 namespace {
 
 OUString lclAddRelation( const Reference< XRelationshipAccess >& rRelations, sal_Int32 nId, const OUString& rType, std::u16string_view rTarget, bool bExternal )
@@ -604,7 +604,7 @@ writeElement( const FSHelperPtr& pDoc, sal_Int32 nXmlElement, const Sequence< OU
     ::comphelper::intersperse(aItems.begin(), aItems.end(),
                               ::comphelper::OUStringBufferAppender(sRep), OUString(" "));
 
-    writeElement( pDoc, nXmlElement, sRep.makeStringAndClear() );
+    writeElement( pDoc, nXmlElement, sRep );
 }
 
 static void
@@ -697,6 +697,8 @@ writeCoreProperties( XmlFilterBase& rSelf, const Reference< XDocumentProperties 
     }
 
     pCoreProps->endElementNS( XML_cp, XML_coreProperties );
+
+    pCoreProps->endDocument();
 }
 
 static void
@@ -819,6 +821,8 @@ writeAppProperties( XmlFilterBase& rSelf, const Reference< XDocumentProperties >
     }
 
     pAppProps->endElement( XML_Properties );
+
+    pAppProps->endDocument();
 }
 
 static void
@@ -857,26 +861,24 @@ writeCustomProperties( XmlFilterBase& rSelf, const Reference< XDocumentPropertie
     {
         if ( !rProp.Name.isEmpty() )
         {
-            // tdf#127864 - export custom document properties using utf8 text encoding
-            OString aName = OUStringToOString(rProp.Name, RTL_TEXTENCODING_UTF8);
             // Skip storing these values in Custom Properties as it will be stored in Core/Extended Properties
-            if (( aName == "OOXMLCorePropertyCategory" ) || // stored in cp:category
-                ( aName == "OOXMLCorePropertyContentStatus" ) || // stored in cp:contentStatus
-                ( aName == "OOXMLCorePropertyContentType" ) || // stored in cp:contentType
-                ( aName == "OOXMLCorePropertyIdentifier" ) || // stored in dc:identifier
-                ( aName == "OOXMLCorePropertyVersion" ) || // stored in cp:version
-                ( aName == "HyperlinkBase" ) || // stored in Extended File Properties
-                ( aName == "AppVersion" ) || // stored in Extended File Properties
-                ( aName == "DocSecurity" ) || // stored in Extended File Properties
-                ( aName == "Manager" ) || // stored in Extended File Properties
-                ( aName == "Company" )) // stored in Extended File Properties
+            if (( rProp.Name == "OOXMLCorePropertyCategory" ) || // stored in cp:category
+                ( rProp.Name == "OOXMLCorePropertyContentStatus" ) || // stored in cp:contentStatus
+                ( rProp.Name == "OOXMLCorePropertyContentType" ) || // stored in cp:contentType
+                ( rProp.Name == "OOXMLCorePropertyIdentifier" ) || // stored in dc:identifier
+                ( rProp.Name == "OOXMLCorePropertyVersion" ) || // stored in cp:version
+                ( rProp.Name == "HyperlinkBase" ) || // stored in Extended File Properties
+                ( rProp.Name == "AppVersion" ) || // stored in Extended File Properties
+                ( rProp.Name == "DocSecurity" ) || // stored in Extended File Properties
+                ( rProp.Name == "Manager" ) || // stored in Extended File Properties
+                ( rProp.Name == "Company" )) // stored in Extended File Properties
                 continue;
 
             // pid starts from 2 not from 1 as MS supports pid from 2
             pAppProps->startElement( XML_property ,
                 XML_fmtid,  "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}",
                 XML_pid,    OString::number(nIndex + 2),
-                XML_name,   aName);
+                XML_name,   rProp.Name);
 
             switch ( rProp.Value.getValueTypeClass() )
             {
@@ -939,6 +941,8 @@ writeCustomProperties( XmlFilterBase& rSelf, const Reference< XDocumentPropertie
         ++nIndex;
     }
     pAppProps->endElement( XML_Properties );
+
+    pAppProps->endDocument();
 }
 
 void XmlFilterBase::exportDocumentProperties( const Reference< XDocumentProperties >& xProperties, bool bSecurityOptOpenReadOnly )
@@ -1132,8 +1136,7 @@ void XmlFilterBase::exportCustomFragments()
     uno::Reference<beans::XPropertySet> xPropSet(xModel, uno::UNO_QUERY_THROW);
 
     uno::Reference<beans::XPropertySetInfo> xPropSetInfo = xPropSet->getPropertySetInfo();
-    static constexpr OUStringLiteral aName = u"" UNO_NAME_MISC_OBJ_INTEROPGRABBAG;
-    if (!xPropSetInfo->hasPropertyByName(aName))
+    if (!xPropSetInfo->hasPropertyByName(UNO_NAME_MISC_OBJ_INTEROPGRABBAG))
         return;
 
     uno::Sequence<uno::Reference<xml::dom::XDocument>> customXmlDomlist;
@@ -1144,7 +1147,7 @@ void XmlFilterBase::exportCustomFragments()
     uno::Sequence<uno::Sequence<beans::StringPair>> aContentTypes;
 
     uno::Sequence<beans::PropertyValue> propList;
-    xPropSet->getPropertyValue(aName) >>= propList;
+    xPropSet->getPropertyValue(UNO_NAME_MISC_OBJ_INTEROPGRABBAG) >>= propList;
     for (const auto& rProp : std::as_const(propList))
     {
         const OUString propName = rProp.Name;
@@ -1182,7 +1185,7 @@ void XmlFilterBase::exportCustomFragments()
         const OUString fragmentPath = "customXml/item" + OUString::number(j+1) + ".xml";
         if (customXmlDom.is())
         {
-            addRelation(oox::getRelationship(Relationship::CUSTOMXML), OUStringConcatenation("../" + fragmentPath));
+            addRelation(oox::getRelationship(Relationship::CUSTOMXML), Concat2View("../" + fragmentPath));
 
             uno::Reference<xml::sax::XSAXSerializable> serializer(customXmlDom, uno::UNO_QUERY);
             uno::Reference<xml::sax::XWriter> writer = xml::sax::Writer::create(comphelper::getProcessComponentContext());
@@ -1203,7 +1206,7 @@ void XmlFilterBase::exportCustomFragments()
             // Adding itemprops's relationship entry to item.xml.rels file
             addRelation(openFragmentStream(fragmentPath, "application/xml"),
                         oox::getRelationship(Relationship::CUSTOMXMLPROPS),
-                        OUStringConcatenation("itemProps"+OUString::number(j+1)+".xml"));
+                        Concat2View("itemProps"+OUString::number(j+1)+".xml"));
         }
     }
 
@@ -1221,7 +1224,7 @@ void XmlFilterBase::exportCustomFragments()
             {
                 const OUString aType = comphelper::OFOPXMLHelper::GetContentTypeByName(aContentTypes, aFilename);
                 const OUString aContentType = (aType.getLength() ? aType : OUString("application/octet-stream"));
-                xProps->setPropertyValue("MediaType", uno::makeAny(aContentType));
+                xProps->setPropertyValue("MediaType", uno::Any(aContentType));
             }
         }
     }

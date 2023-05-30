@@ -36,6 +36,7 @@
 
 #include <sal/log.hxx>
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -245,7 +246,7 @@ bool isMainSequenceRootNode_(
     // end-of-mainsequence signalling below)
     beans::NamedValue const aSearchKey(
         "node-type",
-        uno::makeAny( presentation::EffectNodeType::MAIN_SEQUENCE ) );
+        uno::Any( presentation::EffectNodeType::MAIN_SEQUENCE ) );
 
     uno::Sequence<beans::NamedValue> const userData(xNode->getUserData());
     return findNamedValue( userData, aSearchKey );
@@ -313,12 +314,12 @@ private:
 };
 
 BaseNode::BaseNode( const uno::Reference< animations::XAnimationNode >& xNode,
-                    const BaseContainerNodeSharedPtr&                   rParent,
+                    BaseContainerNodeSharedPtr                          xParent,
                     const NodeContext&                                  rContext ) :
     maContext( rContext.maContext ),
     maDeactivatingListeners(),
     mxAnimationNode( xNode ),
-    mpParent( rParent ),
+    mpParent(std::move( xParent )),
     mpSelf(),
     mpStateTransitionTable( nullptr ),
     mnStartDelay( rContext.mnStartDelay ),

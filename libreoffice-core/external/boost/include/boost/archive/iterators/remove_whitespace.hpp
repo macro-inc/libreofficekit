@@ -4,6 +4,7 @@
 #pragma GCC diagnostic ignored "-Wpragmas"  /* first! for GCC */
 #pragma GCC diagnostic ignored "-Wunknown-warning-option" // second! for Clang 5
 #pragma GCC diagnostic ignored "-Wdelete-non-virtual-dtor"
+#pragma GCC diagnostic ignored "-Wdeprecated-builtins"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #pragma GCC diagnostic ignored "-Wdeprecated-copy-dtor"
@@ -13,7 +14,6 @@
 #pragma GCC diagnostic ignored "-Winvalid-constexpr"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #pragma GCC diagnostic ignored "-Wmicrosoft-unqualified-friend"
-#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 #pragma GCC diagnostic ignored "-Wnonnull"
 #pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wplacement-new"

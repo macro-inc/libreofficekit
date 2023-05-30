@@ -25,9 +25,13 @@
 #include <CharacterPropertyItemConverter.hxx>
 #include <StatisticsItemConverter.hxx>
 #include <SeriesOptionsItemConverter.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
 #include <unonames.hxx>
 
@@ -36,8 +40,8 @@
 #include <com/sun/star/chart2/DataPointLabel.hpp>
 #include <com/sun/star/chart2/Symbol.hpp>
 #include <com/sun/star/chart2/RelativePosition.hpp>
+#include <com/sun/star/chart2/XDataSeries.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 
 #include <comphelper/sequence.hxx>
 #include <svx/xflclit.hxx>
@@ -48,9 +52,8 @@
 #include <editeng/brushitem.hxx>
 #include <svl/ilstitem.hxx>
 #include <svx/sdangitm.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/graph.hxx>
-#include <oox/helper/containerhelper.hxx>
 #include <rtl/math.hxx>
 
 #include <svx/tabline.hxx>
@@ -198,10 +201,10 @@ bool lcl_UseSourceFormatFromItemToPropertySet( sal_uInt16 nWhichId, const SfxIte
 } // anonymous namespace
 
 DataPointItemConverter::DataPointItemConverter(
-    const uno::Reference< frame::XModel > & xChartModel,
+    const rtl::Reference<::chart::ChartModel> & xChartModel,
     const uno::Reference< uno::XComponentContext > & xContext,
     const uno::Reference< beans::XPropertySet > & rPropertySet,
-    const uno::Reference< XDataSeries > & xSeries,
+    const rtl::Reference< DataSeries > & xSeries,
     SfxItemPool& rItemPool,
     SdrModel& rDrawModel,
     const uno::Reference<lang::XMultiServiceFactory>& xNamedPropertyContainerFactory,
@@ -235,8 +238,8 @@ DataPointItemConverter::DataPointItemConverter(
         m_aConverters.emplace_back( new SeriesOptionsItemConverter( xChartModel, xContext, rPropertySet, rItemPool ));
     }
 
-    uno::Reference< XDiagram > xDiagram( ChartModelHelper::findDiagram(xChartModel) );
-    uno::Reference< XChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram , xSeries ) );
+    rtl::Reference< Diagram > xDiagram( ChartModelHelper::findDiagram(xChartModel) );
+    rtl::Reference< ChartType > xChartType( DiagramHelper::getChartTypeOfSeries( xDiagram , xSeries ) );
     bool bFound = false;
     bool bAmbiguous = false;
     bool bSwapXAndY = DiagramHelper::getVertical( xDiagram, bFound, bAmbiguous );
@@ -247,9 +250,8 @@ DataPointItemConverter::DataPointItemConverter(
     if (bDataSeries)
         return;
 
-    uno::Reference<beans::XPropertySet> xSeriesProp(xSeries, uno::UNO_QUERY);
     uno::Sequence<sal_Int32> deletedLegendEntriesSeq;
-    xSeriesProp->getPropertyValue("DeletedLegendEntries") >>= deletedLegendEntriesSeq;
+    xSeries->getPropertyValue("DeletedLegendEntries") >>= deletedLegendEntriesSeq;
     for (const auto& deletedLegendEntry : std::as_const(deletedLegendEntriesSeq))
     {
         if (nPointIndex == deletedLegendEntry)
@@ -570,8 +572,7 @@ bool DataPointItemConverter::ApplySpecialItem(
             if (bHideLegendEntry != m_bHideLegendEntry)
             {
                 uno::Sequence<sal_Int32> deletedLegendEntriesSeq;
-                Reference<beans::XPropertySet> xSeriesProp(m_xSeries, uno::UNO_QUERY);
-                xSeriesProp->getPropertyValue("DeletedLegendEntries") >>= deletedLegendEntriesSeq;
+                m_xSeries->getPropertyValue("DeletedLegendEntries") >>= deletedLegendEntriesSeq;
                 std::vector<sal_Int32> deletedLegendEntries;
                 for (const auto& deletedLegendEntry : std::as_const(deletedLegendEntriesSeq))
                 {
@@ -580,7 +581,7 @@ bool DataPointItemConverter::ApplySpecialItem(
                 }
                 if (bHideLegendEntry)
                     deletedLegendEntries.push_back(m_nPointIndex);
-                xSeriesProp->setPropertyValue("DeletedLegendEntries", uno::makeAny(comphelper::containerToSequence(deletedLegendEntries)));
+                m_xSeries->setPropertyValue("DeletedLegendEntries", uno::Any(comphelper::containerToSequence(deletedLegendEntries)));
             }
         }
         break;
@@ -591,10 +592,9 @@ bool DataPointItemConverter::ApplySpecialItem(
             {
                 bool bNew = static_cast<const SfxBoolItem&>(rItemSet.Get(nWhichId)).GetValue();
                 bool bOld = true;
-                Reference<beans::XPropertySet> xSeriesProp(m_xSeries, uno::UNO_QUERY);
-                if( (xSeriesProp->getPropertyValue("ShowCustomLeaderLines") >>= bOld) && bOld != bNew )
+                if( (m_xSeries->getPropertyValue("ShowCustomLeaderLines") >>= bOld) && bOld != bNew )
                 {
-                    xSeriesProp->setPropertyValue("ShowCustomLeaderLines", uno::Any(bNew));
+                    m_xSeries->setPropertyValue("ShowCustomLeaderLines", uno::Any(bNew));
                     bChanged = true;
                 }
             }
@@ -758,8 +758,7 @@ void DataPointItemConverter::FillSpecialItem(
             try
             {
                 bool bValue = true;
-                Reference<beans::XPropertySet> xSeriesProp(m_xSeries, uno::UNO_QUERY);
-                if( xSeriesProp->getPropertyValue( "ShowCustomLeaderLines" ) >>= bValue )
+                if( m_xSeries->getPropertyValue( "ShowCustomLeaderLines" ) >>= bValue )
                     rOutItemSet.Put(SfxBoolItem(nWhichId, bValue));
             }
             catch (const uno::Exception&)
@@ -803,7 +802,7 @@ void DataPointItemConverter::FillSpecialItem(
 
             if( GetPropertySet()->getPropertyValue( "TextRotation" ) >>= fValue )
             {
-                rOutItemSet.Put( SdrAngleItem( nWhichId, Degree100(static_cast< sal_Int32 >(
+                rOutItemSet.Put( SdrAngleItem( SCHATTR_TEXT_DEGREES, Degree100(static_cast< sal_Int32 >(
                                                    ::rtl::math::round( fValue * 100.0 ) ) )));
             }
         }

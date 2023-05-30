@@ -20,8 +20,9 @@
 #pragma once
 
 #include <sal/config.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <memory>
+#include <config_features.h>
 
 class SbxArray;
 class SbxVariable;
@@ -33,7 +34,9 @@ public:
 
     SbiDllMgr();
 
+#if HAVE_FEATURE_SCRIPTING && defined(_WIN32) && !defined(_ARM64_)
     ~SbiDllMgr();
+#endif
 
     ErrCode Call(
         std::u16string_view function, std::u16string_view library,
@@ -42,7 +45,7 @@ public:
     void FreeDll(OUString const & library);
 
 private:
-#if defined(_WIN32) && !defined(_ARM64_)
+#if HAVE_FEATURE_SCRIPTING && defined(_WIN32) && !defined(_ARM64_)
     struct Impl;
 
     std::unique_ptr< Impl > impl_;

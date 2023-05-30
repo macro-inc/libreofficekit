@@ -21,11 +21,12 @@
 #include <symbol.hxx>
 #include <smmod.hxx>
 #include "tmpdevice.hxx"
+#include <utility>
 #include <visitors.hxx>
-
 #include <tools/UnitConversion.hxx>
 #include <vcl/metric.hxx>
 #include <osl/diagnose.h>
+#include <basegfx/numeric/ftools.hxx>
 
 namespace {
 
@@ -43,8 +44,8 @@ void ForEachNonNull(SmNode *pNode, F && f)
 
 }
 
-SmNode::SmNode(SmNodeType eNodeType, const SmToken &rNodeToken)
-    : maNodeToken( rNodeToken )
+SmNode::SmNode(SmNodeType eNodeType, SmToken aNodeToken)
+    : maNodeToken(std::move( aNodeToken ))
     , meType( eNodeType )
     , meScaleMode( SmScaleMode::None )
     , meRectHorAlign( RectHorAlign::Left )
@@ -782,6 +783,12 @@ void SmRootNode::Arrange(OutputDevice &rDev, const SmFormat &rFormat)
     nHeight += rFormat.GetDistance(DIS_ROOT)
                * GetFont().GetFontSize().Height() / 100;
 
+    if (nHeight < 0)
+    {
+        SAL_WARN("starmath", "negative height");
+        nHeight = 0;
+    }
+
     // font specialist advised to change the width first
     pRootSym->AdaptToY(rDev, nHeight);
     pRootSym->AdaptToX(rDev, pBody->GetItalicWidth());
@@ -988,8 +995,7 @@ void SmBinDiagonalNode::GetOperPosSize(Point &rPos, Size &rSize,
                         const Point &rDiagPoint, double fAngleDeg) const
 
 {
-    static const double  fPi   = 3.1415926535897932384626433;
-    double  fAngleRad   = fAngleDeg / 180.0 * fPi;
+    double  fAngleRad   = basegfx::deg2rad(fAngleDeg);
     tools::Long    nRectLeft   = GetItalicLeft(),
             nRectRight  = GetItalicRight(),
             nRectTop    = GetTop(),
@@ -2156,14 +2162,14 @@ void SmMathSymbolNode::Arrange(OutputDevice &rDev, const SmFormat &rFormat)
 
 /**************************************************************************/
 
-static bool lcl_IsFromGreekSymbolSet( const OUString &rTokenText )
+static bool lcl_IsFromGreekSymbolSet( std::u16string_view aTokenText )
 {
     bool bRes = false;
 
     // valid symbol name needs to have a '%' at pos 0 and at least an additional char
-    if (rTokenText.getLength() > 2 && rTokenText[0] == u'%')
+    if (aTokenText.size() > 2 && aTokenText[0] == u'%')
     {
-        OUString aName( rTokenText.copy(1) );
+        OUString aName( aTokenText.substr(1) );
         SmSym *pSymbol = SM_MOD()->GetSymbolManager().GetSymbolByName( aName );
         if (pSymbol && SmLocalizedSymbolData::GetExportSymbolSetName(pSymbol->GetSymbolSetName()) == "Greek")
             bRes = true;

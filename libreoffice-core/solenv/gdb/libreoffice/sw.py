@@ -38,16 +38,22 @@ class SwNodeIndexPrinter(object):
         nodeindex = block['nStart'] + node['m_nOffset']
         return "%s (node %d)" % (self.typename, nodeindex)
 
-class SwIndexPrinter(object):
-    '''Prints SwIndex.'''
+class SwContentIndexPrinter(object):
+    '''Prints SwContentIndex.'''
 
     def __init__(self, typename, value):
         self.typename = typename
         self.value = value
 
     def to_string(self):
+        pNode = self.value['m_pContentNode']
+        nodeindex = 'none'
+        if pNode:
+            node = pNode.dereference()
+            block = node['m_pBlock'].dereference();
+            nodeindex = str(block['nStart'] + node['m_nOffset'])
         offset = self.value['m_nIndex']
-        return "%s (offset %d)" % (self.typename, offset)
+        return "%s (node %s offset %s)" % (self.typename, nodeindex, offset)
 
 class SwPaMPrinter(object):
     '''Prints SwPaM.'''
@@ -105,7 +111,7 @@ class MarkBasePrinter(object):
     def children(self):
         m = self.value.cast(self.value.dynamic_type)
         return [ ( v, m[ v ] )
-            for v in ( 'm_aName', 'm_pPos1', 'm_pPos2' ) ].__iter__()
+            for v in ( 'm_aName', 'm_oPos1', 'm_oPos2' ) ].__iter__()
 
 class SwXTextRangeImplPrinter(object):
     '''Prints SwXTextRange::Impl.'''
@@ -159,7 +165,7 @@ class SwXTextRangePrinter(object):
         self.value = value
 
     def to_string(self):
-        return "%s %s" % (self.typename, self.value['m_pImpl'])
+        return "%s %s" % (self.typename, self.value['m_pImpl']['_M_t']['_M_t'].cast(gdb.lookup_type("std::_Head_base<0, SwXTextRange::Impl*, false>"))['_M_head_impl'].dereference())
 
 class BigPtrArrayPrinter(object):
     '''Prints BigPtrArray.'''
@@ -284,7 +290,7 @@ def build_pretty_printers():
     printer.add('BigPtrArray', BigPtrArrayPrinter)
     printer.add('SwPosition', SwPositionPrinter)
     printer.add('SwNodeIndex', SwNodeIndexPrinter)
-    printer.add('SwIndex', SwIndexPrinter)
+    printer.add('SwContentIndex', SwContentIndexPrinter)
     printer.add('SwPaM', SwPaMPrinter)
     printer.add('SwUnoCursor', SwUnoCursorPrinter)
     printer.add('SwRect', SwRectPrinter)

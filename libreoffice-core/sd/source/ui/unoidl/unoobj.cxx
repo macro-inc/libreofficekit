@@ -43,7 +43,6 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <svx/unoshape.hxx>
 #include <svx/svdotext.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdopath.hxx>
 #include <svx/svdoole2.hxx>
 #include <svx/svdograf.hxx>
@@ -96,7 +95,6 @@ using ::com::sun::star::drawing::XShape;
 #define WID_ANIMPATH        16
 #define WID_IMAGEMAP        17
 #define WID_ISANIMATION     18
-#define WID_THAT_NEED_ANIMINFO 19
 
 #define WID_ISEMPTYPRESOBJ  20
 #define WID_ISPRESOBJ       21
@@ -130,11 +128,9 @@ using ::com::sun::star::drawing::XShape;
         { u"IsAnimation",              WID_ISANIMATION,     cppu::UnoType<bool>::get(),                            0, 0},\
         { u"NavigationOrder",          WID_NAVORDER,        cppu::UnoType<sal_Int32>::get(),                       0, 0},\
         { u"PlaceholderText",          WID_PLACEHOLDERTEXT, cppu::UnoType<OUString>::get(),                        0, 0},\
-        { u"", 0, css::uno::Type(), 0, 0 }
 
-    static const SfxItemPropertyMapEntry* lcl_GetImpress_SdXShapePropertyGraphicMap_Impl()
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetImpress_SdXShapePropertyGraphicMap_Impl()
     {
-
         static const SfxItemPropertyMapEntry aImpress_SdXShapePropertyGraphicMap_Impl[] =
         {
             { u"ImageMap",             WID_IMAGEMAP,        cppu::UnoType<container::XIndexContainer>::get(),    0, 0 },
@@ -143,9 +139,8 @@ using ::com::sun::star::drawing::XShape;
         return aImpress_SdXShapePropertyGraphicMap_Impl;
     }
 
-    static const SfxItemPropertyMapEntry* lcl_GetImpress_SdXShapePropertySimpleMap_Impl()
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetImpress_SdXShapePropertySimpleMap_Impl()
     {
-
         static const SfxItemPropertyMapEntry aImpress_SdXShapePropertySimpleMap_Impl[] =
         {
             IMPRESS_MAP_ENTRIES
@@ -158,9 +153,8 @@ using ::com::sun::star::drawing::XShape;
         { u"" UNO_NAME_OBJ_CLICKACTION,   WID_CLICKACTION,    cppu::UnoType<presentation::ClickAction>::get(),0, 0},\
         { u"" UNO_NAME_OBJ_STYLE,         WID_STYLE,          cppu::UnoType<style::XStyle>::get(),            css::beans::PropertyAttribute::MAYBEVOID, 0},\
         { u"NavigationOrder",          WID_NAVORDER,       cppu::UnoType<sal_Int32>::get(),                0, 0},\
-        { u"", 0, css::uno::Type(), 0, 0 }
 
-    static const SfxItemPropertyMapEntry* lcl_GetDraw_SdXShapePropertySimpleMap_Impl()
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDraw_SdXShapePropertySimpleMap_Impl()
     {
         static const SfxItemPropertyMapEntry aDraw_SdXShapePropertyMap_Impl[] =
         {
@@ -168,7 +162,7 @@ using ::com::sun::star::drawing::XShape;
         };
         return aDraw_SdXShapePropertyMap_Impl;
     }
-    static const SfxItemPropertyMapEntry* lcl_GetDraw_SdXShapePropertyGraphicMap_Impl()
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDraw_SdXShapePropertyGraphicMap_Impl()
     {
         static const SfxItemPropertyMapEntry aDraw_SdXShapePropertyGraphicMap_Impl[] =
         {
@@ -177,9 +171,9 @@ using ::com::sun::star::drawing::XShape;
         };
         return aDraw_SdXShapePropertyGraphicMap_Impl;
     }
-    static const SfxItemPropertyMapEntry* lcl_ImplGetShapePropertyMap( bool bImpress, bool bGraphicObj )
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_ImplGetShapePropertyMap( bool bImpress, bool bGraphicObj )
     {
-        const SfxItemPropertyMapEntry* pRet = nullptr;
+        o3tl::span<const SfxItemPropertyMapEntry> pRet;
         if( bImpress )
         {
             if( bGraphicObj )
@@ -228,13 +222,9 @@ using ::com::sun::star::drawing::XShape;
         }
         return pRet;
     }
-    static const SfxItemPropertyMapEntry* lcl_GetEmpty_SdXShapePropertyMap_Impl()
+    static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetEmpty_SdXShapePropertyMap_Impl()
     {
-        static const SfxItemPropertyMapEntry aEmpty_SdXShapePropertyMap_Impl[] =
-        {
-            { u"", 0, css::uno::Type(), 0, 0 }
-        };
-        return aEmpty_SdXShapePropertyMap_Impl;
+        return {};
     }
 
     static const SvxItemPropertySet* lcl_GetEmpty_SdXShapePropertySet_Impl()
@@ -257,10 +247,10 @@ const SvEventDescription* ImplGetSupportedMacroItems()
 SdXShape::SdXShape(SvxShape* pShape, SdXImpressDocument* pModel)
 :   mpShape( pShape ),
     mpPropSet( pModel?
-                    lcl_ImplGetShapePropertySet(pModel->IsImpressDocument(), pShape->getShapeKind() == OBJ_GRAF )
+                    lcl_ImplGetShapePropertySet(pModel->IsImpressDocument(), pShape->getShapeKind() == SdrObjKind::Graphic )
                 :   lcl_GetEmpty_SdXShapePropertySet_Impl() ),
     mpMap( pModel?
-                    lcl_ImplGetShapePropertyMap(pModel->IsImpressDocument(), pShape->getShapeKind() == OBJ_GRAF )
+                    lcl_ImplGetShapePropertyMap(pModel->IsImpressDocument(), pShape->getShapeKind() == SdrObjKind::Graphic )
                 :   lcl_GetEmpty_SdXShapePropertyMap_Impl() ),
     mpModel(pModel)
 {
@@ -315,7 +305,7 @@ uno::Sequence< uno::Type > SAL_CALL SdXShape::getTypes()
     }
     else
     {
-        sal_uInt32 nObjId = mpShape->getShapeKind();
+        SdrObjKind nObjId = mpShape->getShapeKind();
         uno::Sequence< uno::Type > aTypes;
         SdTypesCache& gImplTypesCache = SD_MOD()->gImplTypesCache;
         SdTypesCache::iterator aIter( gImplTypesCache.find( nObjId ) );
@@ -388,7 +378,7 @@ uno::Any SAL_CALL SdXShape::getPropertyDefault( const OUString& aPropertyName )
 //XPropertySet
 css::uno::Reference< css::beans::XPropertySetInfo > SAL_CALL SdXShape::getPropertySetInfo()
 {
-    SfxItemPropertyMapEntry const * nObjId = mpShape->getPropertyMapEntries();
+    o3tl::span<SfxItemPropertyMapEntry const> nObjId = mpShape->getPropertyMapEntries();
     css::uno::Reference<css::beans::XPropertySetInfo> pInfo;
 
     SdExtPropertySetInfoCache& rCache = (mpModel && mpModel->IsImpressDocument()) ?
@@ -422,8 +412,6 @@ void SAL_CALL SdXShape::setPropertyValue( const OUString& aPropertyName, const c
         SdrObject* pObj = mpShape->GetSdrObject();
         if( pObj )
         {
-            SdAnimationInfo* pInfo = GetAnimationInfo(pEntry->nWID <= WID_THAT_NEED_ANIMINFO);
-
             switch(pEntry->nWID)
             {
                 case WID_NAVORDER:
@@ -491,10 +479,6 @@ void SAL_CALL SdXShape::setPropertyValue( const OUString& aPropertyName, const c
                             if(!pGroup->GetSubList()->GetObjCount())
                             {
                                 pPage->NbcRemoveObject(pGroup->GetOrdNum());
-
-                                // always use SdrObject::Free(...) for SdrObjects (!)
-                                SdrObject* pTemp(pGroup);
-                                SdrObject::Free(pTemp);
                             }
                         }
                     }
@@ -507,19 +491,23 @@ void SAL_CALL SdXShape::setPropertyValue( const OUString& aPropertyName, const c
                     if(!(aValue >>= aString))
                         throw lang::IllegalArgumentException();
 
+                    SdAnimationInfo* pInfo = GetAnimationInfo(true);
                     pInfo->SetBookmark( SdDrawPage::getUiNameFromPageApiName( aString ) );
                     break;
                 }
                 case WID_CLICKACTION:
+                {
+                    SdAnimationInfo* pInfo = GetAnimationInfo(true);
                     ::cppu::any2enum< presentation::ClickAction >( pInfo->meClickAction, aValue);
                     break;
-
+                }
 // TODO: WID_PLAYFULL:
                 case WID_SOUNDFILE:
                 {
                     OUString aString;
                     if(!(aValue >>= aString))
                         throw lang::IllegalArgumentException();
+                    SdAnimationInfo* pInfo = GetAnimationInfo(true);
                     pInfo->maSoundFile = aString;
                     EffectMigration::UpdateSoundEffect( mpShape, pInfo );
                     break;
@@ -527,6 +515,7 @@ void SAL_CALL SdXShape::setPropertyValue( const OUString& aPropertyName, const c
 
                 case WID_SOUNDON:
                 {
+                    SdAnimationInfo* pInfo = GetAnimationInfo(true);
                     if( !(aValue >>= pInfo->mbSoundOn) )
                         throw lang::IllegalArgumentException();
                     EffectMigration::UpdateSoundEffect( mpShape, pInfo );
@@ -538,6 +527,7 @@ void SAL_CALL SdXShape::setPropertyValue( const OUString& aPropertyName, const c
                     if(!(aValue >>= nVerb))
                         throw lang::IllegalArgumentException();
 
+                    SdAnimationInfo* pInfo = GetAnimationInfo(true);
                     pInfo->mnVerb = static_cast<sal_uInt16>(nVerb);
                     break;
                 }
@@ -812,15 +802,16 @@ uno::Sequence< OUString > SAL_CALL SdXShape::getSupportedServiceNames()
     SdrObject* pObj = mpShape->GetSdrObject();
     if(pObj && pObj->GetObjInventor() == SdrInventor::Default )
     {
-        sal_uInt32 nInventor = pObj->GetObjIdentifier();
+        SdrObjKind nInventor = pObj->GetObjIdentifier();
         switch( nInventor )
         {
-        case OBJ_TITLETEXT:
+        case SdrObjKind::TitleText:
             aAdd.emplace_back(u"com.sun.star.presentation.TitleTextShape");
             break;
-        case OBJ_OUTLINETEXT:
+        case SdrObjKind::OutlineText:
             aAdd.emplace_back(u"com.sun.star.presentation.OutlinerShape");
             break;
+        default: ;
         }
     }
     return comphelper::concatSequences(mpShape->_getSupportedServiceNames(), aAdd);
@@ -848,7 +839,7 @@ bool SdXShape::IsEmptyPresObj() const
     if( (pObj != nullptr) && pObj->IsEmptyPresObj() )
     {
         // check if the object is in edit, then if it's temporarily not empty
-        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+        SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
         if( pTextObj == nullptr )
             return true;
 
@@ -899,7 +890,7 @@ void SdXShape::SetEmptyPresObj(bool bEmpty)
         // really delete SdrOutlinerObj at pObj
         pObj->NbcSetOutlinerParaObject(std::nullopt);
         if( bVertical )
-            if (auto pTextObj = dynamic_cast<SdrTextObj*>( pObj ) )
+            if (auto pTextObj = DynCastSdrTextObj( pObj ) )
                 pTextObj->SetVerticalWriting( true );
 
         SdrGrafObj* pGraphicObj = dynamic_cast<SdrGrafObj*>( pObj  );
@@ -1278,8 +1269,8 @@ void SAL_CALL SdUnoEventsAccess::replaceByName( const OUString& aName, const uno
                         sal_Int32 nPos = aStrBookmark.lastIndexOf( '#' );
                         if( nPos >= 0 )
                         {
-                            OUString aURL( aStrBookmark.copy( 0, nPos+1 ) );
-                            aURL += getUiNameFromPageApiNameImpl( aStrBookmark.copy( nPos+1 ) );
+                            OUString aURL = aStrBookmark.subView( 0, nPos+1 )
+                                    + getUiNameFromPageApiNameImpl( aStrBookmark.copy( nPos+1 ) );
                             aStrBookmark = aURL;
                         }
                     }
@@ -1349,17 +1340,12 @@ void SAL_CALL SdUnoEventsAccess::replaceByName( const OUString& aName, const uno
             else
             {
                 sal_Int32 nIdx{ 0 };
-                const OUString aLibName   = aStrMacro.getToken(0, '.', nIdx);
-                const OUString aModulName = aStrMacro.getToken(0, '.', nIdx);
-                const OUString aMacroName = aStrMacro.getToken(0, '.', nIdx);
+                const std::u16string_view aLibName   = o3tl::getToken(aStrMacro, 0, '.', nIdx);
+                const std::u16string_view aModulName = o3tl::getToken(aStrMacro, 0, '.', nIdx);
+                const std::u16string_view aMacroName = o3tl::getToken(aStrMacro, 0, '.', nIdx);
 
-                OUStringBuffer sBuffer;
-                sBuffer.append( aMacroName );
-                sBuffer.append( '.' );
-                sBuffer.append( aModulName );
-                sBuffer.append( '.' );
-                sBuffer.append( aLibName );
-                sBuffer.append( '.' );
+                OUStringBuffer sBuffer(
+                    OUString::Concat(aMacroName) + OUStringChar('.') + aModulName + OUStringChar('.') + aLibName + OUStringChar('.') );
 
                 if ( aStrLibrary == "StarOffice" )
                 {
@@ -1464,11 +1450,11 @@ uno::Any SAL_CALL SdUnoEventsAccess::getByName( const OUString& aName )
             // "Macroname.Modulname.Libname.Documentname" or
             // "Macroname.Modulname.Libname.Applicationname"
             sal_Int32 nIdx{ 0 };
-            const OUString aMacroName = aMacro.getToken(0, '.', nIdx);
-            const OUString aModulName = aMacro.getToken(0, '.', nIdx);
-            const OUString aLibName   = aMacro.getToken(0, '.', nIdx);
+            const std::u16string_view aMacroName = o3tl::getToken(aMacro, 0, '.', nIdx);
+            const std::u16string_view aModulName = o3tl::getToken(aMacro, 0, '.', nIdx);
+            const std::u16string_view aLibName   = o3tl::getToken(aMacro, 0, '.', nIdx);
 
-            OUString sBuffer = aLibName +
+            OUString sBuffer = OUString::Concat(aLibName) +
                 "."  +
                 aModulName  +
                 "."  +
@@ -1531,8 +1517,8 @@ uno::Any SAL_CALL SdUnoEventsAccess::getByName( const OUString& aName )
                 sal_Int32 nPos = aString.lastIndexOf( '#' );
                 if( nPos >= 0 )
                 {
-                    OUString aURL( aString.copy( 0, nPos+1 ) );
-                    aURL += getPageApiNameFromUiName( aString.copy( nPos+1 ) );
+                    OUString aURL = aString.subView( 0, nPos+1 ) +
+                        getPageApiNameFromUiName( aString.copy( nPos+1 ) );
                     aString = aURL;
                 }
                 pProperties->Name = gaStrBookmark;

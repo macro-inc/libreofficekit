@@ -54,7 +54,7 @@
 #include <officecfg/Office/Common.hxx>
 #include <officecfg/Setup.hxx>
 #include <comphelper/configuration.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #if HAVE_FEATURE_BREAKPAD
 #include <desktop/crashreport.hxx>
 #endif
@@ -88,6 +88,7 @@
 #include <svtools/imgdef.hxx>
 
 #if defined(_WIN32)
+#include <systools/win32/winstoreutil.hxx>
 #include <vcl/fileregistration.hxx>
 #endif
 using namespace ::com::sun::star::uno;
@@ -159,7 +160,6 @@ OfaMiscTabPage::OfaMiscTabPage(weld::Container* pPage, weld::DialogController* p
     , m_xFileDlgFrame(m_xBuilder->weld_widget("filedlgframe"))
     , m_xFileDlgROImage(m_xBuilder->weld_widget("lockimage"))
     , m_xFileDlgCB(m_xBuilder->weld_check_button("filedlg"))
-    , m_xPrintDlgCB(m_xBuilder->weld_check_button("printdlg"))
     , m_xDocStatusCB(m_xBuilder->weld_check_button("docstatus"))
     , m_xYearFrame(m_xBuilder->weld_widget("yearframe"))
     , m_xYearValueField(m_xBuilder->weld_spin_button("year"))
@@ -193,6 +193,11 @@ OfaMiscTabPage::OfaMiscTabPage(weld::Container* pPage, weld::DialogController* p
     m_xQuickStarterFrame->hide();
     //Hide frame label in case of no content
     m_xHelpImproveLabel->hide();
+#else
+    // Store-packaged apps (located under the protected Program Files\WindowsApps) can't use normal
+    // shell shortcuts to their exe; hide. TODO: show a button to open "Startup Apps" system applet?
+    if (sal::systools::IsStorePackagedApp())
+        m_xQuickStarterFrame->hide();
 #endif
 
 #if defined(_WIN32)
@@ -244,7 +249,7 @@ bool OfaMiscTabPage::FillItemSet( SfxItemSet* rSet )
         bModified = true;
     }
 
-    const SfxUInt16Item* pUInt16Item = dynamic_cast< const SfxUInt16Item* >( GetOldItem( *rSet, SID_ATTR_YEAR2000 ) );
+    const SfxUInt16Item* pUInt16Item = GetOldItem( *rSet, SID_ATTR_YEAR2000 );
     sal_uInt16 nNum = static_cast<sal_uInt16>(m_xYearValueField->get_text().toInt32());
     if ( pUInt16Item && pUInt16Item->GetValue() != nNum )
     {
@@ -295,10 +300,9 @@ void OfaMiscTabPage::Reset( const SfxItemSet* rSet )
     m_xDocStatusCB->set_active(officecfg::Office::Common::Print::PrintingModifiesDocument::get());
     m_xDocStatusCB->save_state();
 
-    const SfxPoolItem* pItem = nullptr;
-    if ( SfxItemState::SET == rSet->GetItemState( SID_ATTR_YEAR2000, false, &pItem ) )
+    if ( const SfxUInt16Item* pYearItem = rSet->GetItemIfSet( SID_ATTR_YEAR2000, false ) )
     {
-        m_xYearValueField->set_value( static_cast<const SfxUInt16Item*>(pItem)->GetValue() );
+        m_xYearValueField->set_value( pYearItem->GetValue() );
         TwoFigureHdl(*m_xYearValueField);
     }
     else
@@ -312,6 +316,7 @@ void OfaMiscTabPage::Reset( const SfxItemSet* rSet )
     m_xCrashReport->hide();
 #endif
 
+    const SfxPoolItem* pItem = nullptr;
     SfxItemState eState = rSet->GetItemState( SID_ATTR_QUICKLAUNCHER, false, &pItem );
     if ( SfxItemState::SET == eState )
         m_xQuickLaunchCB->set_active( static_cast<const SfxBoolItem*>(pItem)->GetValue() );
@@ -529,6 +534,8 @@ OfaViewTabPage::OfaViewTabPage(weld::Container* pPage, weld::DialogController* p
     , m_xIconSizeLB(m_xBuilder->weld_combo_box("iconsize"))
     , m_xSidebarIconSizeLB(m_xBuilder->weld_combo_box("sidebariconsize"))
     , m_xNotebookbarIconSizeLB(m_xBuilder->weld_combo_box("notebookbariconsize"))
+    , m_xDarkModeFrame(m_xBuilder->weld_widget("darkmode"))
+    , m_xAppearanceStyleLB(m_xBuilder->weld_combo_box("appearance"))
     , m_xIconStyleLB(m_xBuilder->weld_combo_box("iconstyle"))
     , m_xFontAntiAliasing(m_xBuilder->weld_check_button("aafont"))
     , m_xAAPointLimitLabel(m_xBuilder->weld_label("aafrom"))
@@ -547,16 +554,32 @@ OfaViewTabPage::OfaViewTabPage(weld::Container* pPage, weld::DialogController* p
     , m_xMouseMiddleLB(m_xBuilder->weld_combo_box("mousemiddle"))
     , m_xMoreIcons(m_xBuilder->weld_button("btnMoreIcons"))
     , m_xRunGPTests(m_xBuilder->weld_button("btn_rungptest"))
+    , m_sAutoStr(m_xIconStyleLB->get_text(0))
 {
-    if (Application::GetToolkitName().startsWith("gtk"))
+    OUString sToolKitName(Application::GetToolkitName());
+    if (sToolKitName.startsWith("gtk"))
         m_xMenuIconBox->hide();
+
+    const bool bHasDarkMode = sToolKitName.startsWith("gtk") || sToolKitName == "osx" || sToolKitName == "win";
+    if (!bHasDarkMode)
+        m_xDarkModeFrame->hide();
 
     m_xFontAntiAliasing->connect_toggled( LINK( this, OfaViewTabPage, OnAntialiasingToggled ) );
 
     m_xUseSkia->connect_toggled(LINK(this, OfaViewTabPage, OnUseSkiaToggled));
 
+    UpdateIconThemes();
+
+    m_xIconStyleLB->set_active(0);
+
+    m_xMoreIcons->set_from_icon_name("cmd/sc_additionsdialog.png");
+    m_xMoreIcons->connect_clicked(LINK(this, OfaViewTabPage, OnMoreIconsClick));
+    m_xRunGPTests->connect_clicked( LINK( this, OfaViewTabPage, OnRunGPTestClick));
+}
+
+void OfaViewTabPage::UpdateIconThemes()
+{
     // Set known icon themes
-    OUString sAutoStr( m_xIconStyleLB->get_text( 0 ) );
     m_xIconStyleLB->clear();
     StyleSettings aStyleSettings = Application::GetSettings().GetStyleSettings();
     mInstalledIconThemes = aStyleSettings.GetInstalledIconThemes();
@@ -566,9 +589,7 @@ OfaViewTabPage::OfaViewTabPage(weld::Container* pPage, weld::DialogController* p
     OUString autoThemeId = aStyleSettings.GetAutomaticallyChosenIconTheme();
     const vcl::IconThemeInfo& autoIconTheme = vcl::IconThemeInfo::FindIconThemeById(mInstalledIconThemes, autoThemeId);
 
-    OUString entryForAuto = sAutoStr + " (" +
-                                autoIconTheme.GetDisplayName() +
-                                ")";
+    OUString entryForAuto = m_sAutoStr + " (" + autoIconTheme.GetDisplayName() + ")";
     m_xIconStyleLB->append("auto", entryForAuto); // index 0 means choose style automatically
 
     // separate auto and other icon themes
@@ -576,12 +597,6 @@ OfaViewTabPage::OfaViewTabPage(weld::Container* pPage, weld::DialogController* p
 
     for (auto const& installIconTheme : mInstalledIconThemes)
         m_xIconStyleLB->append(installIconTheme.GetThemeId(), installIconTheme.GetDisplayName());
-
-    m_xIconStyleLB->set_active(0);
-
-    m_xMoreIcons->set_from_icon_name("cmd/sc_additionsdialog.png");
-    m_xMoreIcons->connect_clicked(LINK(this, OfaViewTabPage, OnMoreIconsClick));
-    m_xRunGPTests->connect_clicked( LINK( this, OfaViewTabPage, OnRunGPTestClick));
 }
 
 OfaViewTabPage::~OfaViewTabPage()
@@ -669,6 +684,7 @@ bool OfaViewTabPage::FillItemSet( SfxItemSet* )
 {
     bool bModified = false;
     bool bMenuOptModified = false;
+    bool bDarkModeOptModified = false;
     bool bRepaintWindows(false);
     std::shared_ptr<comphelper::ConfigurationChanges> xChanges(comphelper::ConfigurationChanges::create());
 
@@ -782,6 +798,12 @@ bool OfaViewTabPage::FillItemSet( SfxItemSet* )
         bAppearanceChanged = true;
     }
 
+    if (m_xAppearanceStyleLB->get_value_changed_from_saved())
+    {
+        bDarkModeOptModified = true;
+        bModified = true;
+    }
+
     if (m_xContextMenuShortcutsLB->get_value_changed_from_saved())
     {
         officecfg::Office::Common::View::Menu::ShortcutsInContextMenus::set(
@@ -825,12 +847,20 @@ bool OfaViewTabPage::FillItemSet( SfxItemSet* )
 
     xChanges->commit();
 
-    if( bMenuOptModified )
+    if (bMenuOptModified || bDarkModeOptModified)
     {
         // Set changed settings to the application instance
         AllSettings aAllSettings = Application::GetSettings();
-        StyleSettings aStyleSettings = aAllSettings.GetStyleSettings();
-        aAllSettings.SetStyleSettings(aStyleSettings);
+
+        if (bMenuOptModified)
+        {
+            StyleSettings aStyleSettings = aAllSettings.GetStyleSettings();
+            aAllSettings.SetStyleSettings(aStyleSettings);
+        }
+
+        if (bDarkModeOptModified)
+            MiscSettings::SetDarkMode(m_xAppearanceStyleLB->get_active());
+
         Application::MergeSystemSettings( aAllSettings );
         Application::SetSettings(aAllSettings);
     }
@@ -900,6 +930,9 @@ void OfaViewTabPage::Reset( const SfxItemSet* )
     m_xNotebookbarIconSizeLB->set_active(nNotebookbarSizeLB_InitialSelection);
     m_xNotebookbarIconSizeLB->save_value();
 
+    // tdf#153497 set name of automatic icon theme, it may have changed due to "Apply" while this page is visible
+    UpdateIconThemes();
+
     if (aMiscOptions.IconThemeWasSetAutomatically()) {
         nStyleLB_InitialSelection = 0;
     }
@@ -912,6 +945,9 @@ void OfaViewTabPage::Reset( const SfxItemSet* )
 
     m_xIconStyleLB->set_active(nStyleLB_InitialSelection);
     m_xIconStyleLB->save_value();
+
+    m_xAppearanceStyleLB->set_active(officecfg::Office::Common::Misc::Appearance::get());
+    m_xAppearanceStyleLB->save_value();
 
     // Mouse Snap
     m_xMousePosLB->set_active(static_cast<sal_Int32>(pAppearanceCfg->GetSnapMode()));
@@ -1168,7 +1204,7 @@ OfaLanguagesTabPage::OfaLanguagesTabPage(weld::Container* pPage, weld::DialogCon
         aStr_ = ApplyLreOrRleEmbedding( aStr_ ) +
                 aTwoSpace +
                 ApplyLreOrRleEmbedding( SvtLanguageTable::GetLanguageString( v->GetLanguage() ) );
-        m_xCurrencyLB->append(OUString::number(reinterpret_cast<sal_Int64>(v)), aStr_);
+        m_xCurrencyLB->append(weld::toId(v), aStr_);
     }
 
     m_xCurrencyLB->set_active(0);
@@ -1336,7 +1372,7 @@ bool OfaLanguagesTabPage::FillItemSet( SfxItemSet* rSet )
     // Configured currency, for example, USD-en-US or EUR-de-DE, or empty for locale default.
     OUString sOldCurr = pLangConfig->aSysLocaleOptions.GetCurrencyConfigString();
     OUString sId = m_xCurrencyLB->get_active_id();
-    const NfCurrencyEntry* pCurr = sId == "default" ? nullptr : reinterpret_cast<const NfCurrencyEntry*>(sId.toInt64());
+    const NfCurrencyEntry* pCurr = sId == "default" ? nullptr : weld::fromId<const NfCurrencyEntry*>(sId);
     OUString sNewCurr;
     if ( pCurr )
         sNewCurr = SvtSysLocaleOptions::CreateCurrencyConfigString(
@@ -1365,7 +1401,7 @@ bool OfaLanguagesTabPage::FillItemSet( SfxItemSet* rSet )
             Any aValue;
             Locale aLocale = LanguageTag::convertToLocale( eSelectLang, false);
             aValue <<= aLocale;
-            pLangConfig->aLinguConfig.SetProperty( "DefaultLocale", aValue );
+            pLangConfig->aLinguConfig.SetProperty( u"DefaultLocale", aValue );
             if (xLinguProp.is())
                 xLinguProp->setDefaultLocale( aLocale );
         }
@@ -1384,7 +1420,7 @@ bool OfaLanguagesTabPage::FillItemSet( SfxItemSet* rSet )
             Any aValue;
             Locale aLocale = LanguageTag::convertToLocale( eSelectLang, false);
             aValue <<= aLocale;
-            pLangConfig->aLinguConfig.SetProperty( "DefaultLocale_CJK", aValue );
+            pLangConfig->aLinguConfig.SetProperty( u"DefaultLocale_CJK", aValue );
             if (xLinguProp.is())
                 xLinguProp->setDefaultLocale_CJK( aLocale );
         }
@@ -1403,7 +1439,7 @@ bool OfaLanguagesTabPage::FillItemSet( SfxItemSet* rSet )
             Any aValue;
             Locale aLocale = LanguageTag::convertToLocale( eSelectLang, false);
             aValue <<= aLocale;
-            pLangConfig->aLinguConfig.SetProperty( "DefaultLocale_CTL", aValue );
+            pLangConfig->aLinguConfig.SetProperty( u"DefaultLocale_CTL", aValue );
             if (xLinguProp.is())
                 xLinguProp->setDefaultLocale_CTL( aLocale );
         }
@@ -1496,7 +1532,7 @@ void OfaLanguagesTabPage::Reset( const SfxItemSet* rSet )
         pCurr = SvNumberFormatter::GetCurrencyEntry( aAbbrev, eLang );
     }
     // if pCurr==nullptr the SYSTEM entry is selected
-    OUString sId = !pCurr ? OUString("default") : OUString::number(reinterpret_cast<sal_Int64>(pCurr));
+    OUString sId = !pCurr ? OUString("default") : weld::toId(pCurr);
     m_xCurrencyLB->set_active_id(sId);
     bReadonly = pLangConfig->aSysLocaleOptions.IsReadOnly(SvtSysLocaleOptions::EOption::Currency);
     m_xCurrencyLB->set_sensitive(!bReadonly);
@@ -1508,10 +1544,17 @@ void OfaLanguagesTabPage::Reset( const SfxItemSet* rSet )
     {
         const LocaleDataWrapper& rLocaleWrapper( Application::GetSettings().GetLocaleDataWrapper() );
         aDatePatternsString = lcl_getDatePatternsConfigString( rLocaleWrapper);
+        // Let's assume patterns are valid at this point.
+        m_bDatePatternsValid = true;
     }
-    // Let's assume patterns are valid at this point.
-    m_bDatePatternsValid = true;
+    else
+    {
+        bool bModified = false;
+        m_bDatePatternsValid = validateDatePatterns( bModified, aDatePatternsString);
+    }
     m_xDatePatternsED->set_text(aDatePatternsString);
+    m_xDatePatternsED->set_message_type( m_bDatePatternsValid ?
+            weld::EntryMessageType::Normal : weld::EntryMessageType::Error);
     bReadonly = pLangConfig->aSysLocaleOptions.IsReadOnly(SvtSysLocaleOptions::EOption::DatePatterns);
     m_xDatePatternsED->set_sensitive(!bReadonly);
     m_xDatePatternsFT->set_sensitive(!bReadonly);
@@ -1530,18 +1573,18 @@ void OfaLanguagesTabPage::Reset( const SfxItemSet* rSet )
     Any aCTLLang;
     try
     {
-        aWestLang = pLangConfig->aLinguConfig.GetProperty("DefaultLocale");
+        aWestLang = pLangConfig->aLinguConfig.GetProperty(u"DefaultLocale");
         Locale aLocale;
         aWestLang >>= aLocale;
 
         eCurLang = LanguageTag::convertToLanguageType( aLocale, false);
 
-        aCJKLang = pLangConfig->aLinguConfig.GetProperty("DefaultLocale_CJK");
+        aCJKLang = pLangConfig->aLinguConfig.GetProperty(u"DefaultLocale_CJK");
         aLocale = Locale();
         aCJKLang >>= aLocale;
         eCurLangCJK = LanguageTag::convertToLanguageType( aLocale, false);
 
-        aCTLLang = pLangConfig->aLinguConfig.GetProperty("DefaultLocale_CTL");
+        aCTLLang = pLangConfig->aLinguConfig.GetProperty(u"DefaultLocale_CTL");
         aLocale = Locale();
         aCTLLang >>= aLocale;
         eCurLangCTL = LanguageTag::convertToLanguageType( aLocale, false);
@@ -1554,24 +1597,23 @@ void OfaLanguagesTabPage::Reset( const SfxItemSet* rSet )
     {
         m_xCurrentDocCB->set_sensitive(true);
         m_xCurrentDocCB->set_active(bLanguageCurrentDoc_Impl);
-        const SfxPoolItem* pLang;
-        if( SfxItemState::SET == rSet->GetItemState(SID_ATTR_LANGUAGE, false, &pLang))
+        if( const SvxLanguageItem* pLangItem = rSet->GetItemIfSet(SID_ATTR_LANGUAGE, false))
         {
-            LanguageType eTempCurLang = static_cast<const SvxLanguageItem*>(pLang)->GetValue();
+            LanguageType eTempCurLang = pLangItem->GetValue();
             if (MsLangId::resolveSystemLanguageByScriptType(eCurLang, css::i18n::ScriptType::LATIN) != eTempCurLang)
                 eCurLang = eTempCurLang;
         }
 
-        if( SfxItemState::SET == rSet->GetItemState(SID_ATTR_CHAR_CJK_LANGUAGE, false, &pLang))
+        if( const SvxLanguageItem* pLang = rSet->GetItemIfSet(SID_ATTR_CHAR_CJK_LANGUAGE, false))
         {
-            LanguageType eTempCurLang = static_cast<const SvxLanguageItem*>(pLang)->GetValue();
+            LanguageType eTempCurLang = pLang->GetValue();
             if (MsLangId::resolveSystemLanguageByScriptType(eCurLangCJK, css::i18n::ScriptType::ASIAN) != eTempCurLang)
                 eCurLangCJK = eTempCurLang;
         }
 
-        if( SfxItemState::SET == rSet->GetItemState(SID_ATTR_CHAR_CTL_LANGUAGE, false, &pLang))
+        if( const SvxLanguageItem* pLang = rSet->GetItemIfSet(SID_ATTR_CHAR_CTL_LANGUAGE, false))
         {
-            LanguageType eTempCurLang = static_cast<const SvxLanguageItem*>(pLang)->GetValue();
+            LanguageType eTempCurLang = pLang->GetValue();
             if (MsLangId::resolveSystemLanguageByScriptType(eCurLangCTL, css::i18n::ScriptType::COMPLEX) != eTempCurLang)
                 eCurLangCTL = eTempCurLang;
         }
@@ -1597,14 +1639,14 @@ void OfaLanguagesTabPage::Reset( const SfxItemSet* rSet )
     m_xIgnoreLanguageChangeCB->save_state();
     m_xCurrentDocCB->save_state();
 
-    bool bEnable = !pLangConfig->aLinguConfig.IsReadOnly( "DefaultLocale" );
+    bool bEnable = !pLangConfig->aLinguConfig.IsReadOnly( u"DefaultLocale" );
     m_xWesternLanguageFT->set_sensitive( bEnable );
     m_xWesternLanguageLB->set_sensitive( bEnable );
 
     // check the box "For the current document only"
     // set the focus to the Western Language box
-    const SfxPoolItem* pLang = nullptr;
-    if ( SfxItemState::SET == rSet->GetItemState(SID_SET_DOCUMENT_LANGUAGE, false, &pLang ) && static_cast<const SfxBoolItem*>(pLang)->GetValue() )
+    const SfxBoolItem* pLang = rSet->GetItemIfSet(SID_SET_DOCUMENT_LANGUAGE, false );
+    if ( pLang && pLang->GetValue() )
     {
         m_xWesternLanguageLB->grab_focus();
         m_xCurrentDocCB->set_sensitive(true);
@@ -1617,7 +1659,7 @@ IMPL_LINK(OfaLanguagesTabPage, SupportHdl, weld::Toggleable&, rBox, void)
     bool bCheck = rBox.get_active();
     if ( m_xAsianSupportCB.get() == &rBox )
     {
-        bool bReadonly = pLangConfig->aLinguConfig.IsReadOnly("DefaultLocale_CJK");
+        bool bReadonly = pLangConfig->aLinguConfig.IsReadOnly(u"DefaultLocale_CJK");
         bCheck = ( bCheck && !bReadonly );
         m_xAsianLanguageLB->set_sensitive( bCheck );
         if (rBox.get_sensitive())
@@ -1625,7 +1667,7 @@ IMPL_LINK(OfaLanguagesTabPage, SupportHdl, weld::Toggleable&, rBox, void)
     }
     else if ( m_xCTLSupportCB.get() == &rBox )
     {
-        bool bReadonly = pLangConfig->aLinguConfig.IsReadOnly("DefaultLocale_CTL");
+        bool bReadonly = pLangConfig->aLinguConfig.IsReadOnly(u"DefaultLocale_CTL");
         bCheck = ( bCheck && !bReadonly  );
         m_xComplexLanguageLB->set_sensitive( bCheck );
         if (rBox.get_sensitive())
@@ -1681,8 +1723,7 @@ IMPL_LINK_NOARG(OfaLanguagesTabPage, LocaleSettingHdl, weld::ComboBox&, void)
     m_xCurrencyLB->set_active_text(aDefaultCurr);
 
     // obtain corresponding locale data
-    LanguageTag aLanguageTag( eLang);
-    LocaleDataWrapper aLocaleWrapper( aLanguageTag );
+    LocaleDataWrapper aLocaleWrapper(( LanguageTag(eLang) ));
 
     // update the decimal separator key of the related CheckBox
     OUString sTempLabel(m_sDecimalSeparatorLabel);
@@ -1693,20 +1734,39 @@ IMPL_LINK_NOARG(OfaLanguagesTabPage, LocaleSettingHdl, weld::ComboBox&, void)
     OUString aDatePatternsString = lcl_getDatePatternsConfigString( aLocaleWrapper);
     m_bDatePatternsValid = true;
     m_xDatePatternsED->set_text( aDatePatternsString);
+    m_xDatePatternsED->set_message_type(weld::EntryMessageType::Normal);
 }
 
 IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
 {
-    const OUString aPatterns(rEd.get_text());
-    OUStringBuffer aBuf( aPatterns);
-    sal_Int32 nChar = 0;
-    bool bValid = true;
+    OUString aPatterns(rEd.get_text());
     bool bModified = false;
-    if (!aPatterns.isEmpty())
+    const bool bValid = validateDatePatterns( bModified, aPatterns);
+    if (bModified)
     {
+        // gtk3 keeps the cursor position on equal length set_text() but at
+        // least the 'gen' backend does not and resets to 0.
+        const int nCursorPos = rEd.get_position();
+        rEd.set_text(aPatterns);
+        rEd.set_position(nCursorPos);
+    }
+    if (bValid)
+        rEd.set_message_type(weld::EntryMessageType::Normal);
+    else
+        rEd.set_message_type(weld::EntryMessageType::Error);
+    m_bDatePatternsValid = bValid;
+}
+
+bool OfaLanguagesTabPage::validateDatePatterns( bool& rbModified, OUString& rPatterns )
+{
+    bool bValid = true;
+    if (!rPatterns.isEmpty())
+    {
+        OUStringBuffer aBuf( rPatterns);
+        sal_Int32 nChar = 0;
         for (sal_Int32 nIndex=0; nIndex >= 0 && bValid; ++nChar)
         {
-            const OUString aPat( aPatterns.getToken( 0, ';', nIndex));
+            const OUString aPat( rPatterns.getToken( 0, ';', nIndex));
             if (aPat.isEmpty() && nIndex < 0)
             {
                 // Indicating failure when about to append a pattern is too
@@ -1721,6 +1781,18 @@ IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
                 bool bY, bM, bD;
                 bY = bM = bD = false;
                 bool bSep = true;
+                if (aPat.getLength() == 3)
+                {
+                    // Disallow a pattern that would match a numeric input with
+                    // decimal separator, like M.D
+                    const LanguageType eLang = m_xLocaleSettingLB->get_active_id();
+                    const LocaleDataWrapper aLocaleWrapper(( LanguageTag(eLang)));
+                    if (    aPat[1] == aLocaleWrapper.getNumDecimalSep().toChar()
+                         || aPat[1] == aLocaleWrapper.getNumDecimalSepAlt().toChar())
+                    {
+                        bValid = false;
+                    }
+                }
                 for (sal_Int32 i = 0; i < aPat.getLength() && bValid; /*nop*/)
                 {
                     const sal_Int32 j = i;
@@ -1735,7 +1807,7 @@ IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
                             else if (c == 'y')
                             {
                                 aBuf[nChar] = 'Y';
-                                bModified = true;
+                                rbModified = true;
                             }
                             bY = true;
                             bSep = false;
@@ -1747,7 +1819,7 @@ IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
                             else if (c == 'm')
                             {
                                 aBuf[nChar] = 'M';
-                                bModified = true;
+                                rbModified = true;
                             }
                             bM = true;
                             bSep = false;
@@ -1759,7 +1831,7 @@ IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
                             else if (c == 'd')
                             {
                                 aBuf[nChar] = 'D';
-                                bModified = true;
+                                rbModified = true;
                             }
                             bD = true;
                             bSep = false;
@@ -1777,20 +1849,10 @@ IMPL_LINK( OfaLanguagesTabPage, DatePatternsHdl, weld::Entry&, rEd, void )
                 bValid &= (bY || bM || bD);
             }
         }
+        if (rbModified)
+            rPatterns = aBuf.makeStringAndClear();
     }
-    if (bModified)
-    {
-        // gtk3 keeps the cursor position on equal length set_text() but at
-        // least the 'gen' backend does not and resets to 0.
-        const int nCursorPos = rEd.get_position();
-        rEd.set_text(aBuf.makeStringAndClear());
-        rEd.set_position(nCursorPos);
-    }
-    if (bValid)
-        rEd.set_message_type(weld::EntryMessageType::Normal);
-    else
-        rEd.set_message_type(weld::EntryMessageType::Error);
-    m_bDatePatternsValid = bValid;
+    return bValid;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -24,7 +24,6 @@
 #include <sdr/primitive2d/sdrattributecreator.hxx>
 #include <sdr/primitive3d/sdrattributecreator3d.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
-#include <memory>
 
 
 namespace sdr::contact
@@ -46,7 +45,7 @@ namespace sdr::contact
                 drawinglayer::primitive2d::createNewSdrLineFillShadowAttribute(rItemSet, false));
 
             // get extrude geometry
-            const basegfx::B2DPolyPolygon aPolyPolygon(GetE3dExtrudeObj().GetExtrudePolygon());
+            basegfx::B2DPolyPolygon aPolyPolygon(GetE3dExtrudeObj().GetExtrudePolygon());
 
             // get 3D Object Attributes
             drawinglayer::attribute::Sdr3DObjectAttribute aSdr3DObjectAttribute(drawinglayer::primitive2d::createNewSdr3DObjectAttribute(rItemSet));
@@ -72,7 +71,7 @@ namespace sdr::contact
             const drawinglayer::primitive3d::Primitive3DReference xReference(
                 new drawinglayer::primitive3d::SdrExtrudePrimitive3D(
                     aWorldTransform, aTextureSize, aAttribute, aSdr3DObjectAttribute,
-                    aPolyPolygon, fDepth, fDiagonal, fBackScale, bSmoothNormals, bSmoothLids,
+                    std::move(aPolyPolygon), fDepth, fDiagonal, fBackScale, bSmoothNormals, bSmoothLids,
                     bCharacterMode, bCloseFront, bCloseBack));
             xRetval = { xReference };
 

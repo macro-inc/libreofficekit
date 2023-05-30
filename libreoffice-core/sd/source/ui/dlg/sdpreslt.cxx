@@ -66,13 +66,12 @@ SdPresLayoutDlg::~SdPresLayoutDlg()
  */
 void SdPresLayoutDlg::Reset()
 {
-    const SfxPoolItem *pPoolItem = nullptr;
     tools::Long nName;
 
     // replace master page
-    if( mrOutAttrs.GetItemState( ATTR_PRESLAYOUT_MASTER_PAGE, false, &pPoolItem ) == SfxItemState::SET )
+    if( const SfxBoolItem* pPoolItem = mrOutAttrs.GetItemIfSet( ATTR_PRESLAYOUT_MASTER_PAGE, false ) )
     {
-        bool bMasterPage = static_cast<const SfxBoolItem*>(pPoolItem)->GetValue();
+        bool bMasterPage = pPoolItem->GetValue();
         m_xCbxMasterPage->set_sensitive( !bMasterPage );
         m_xCbxMasterPage->set_active( bMasterPage );
     }
@@ -80,8 +79,8 @@ void SdPresLayoutDlg::Reset()
     // remove not used master pages
     m_xCbxCheckMasters->set_active(false);
 
-    if(mrOutAttrs.GetItemState(ATTR_PRESLAYOUT_NAME, true, &pPoolItem) == SfxItemState::SET)
-        maName = static_cast<const SfxStringItem*>(pPoolItem)->GetValue();
+    if( const SfxStringItem* pPoolItem = mrOutAttrs.GetItemIfSet(ATTR_PRESLAYOUT_NAME) )
+        maName = pPoolItem->GetValue();
     else
         maName.clear();
 
@@ -254,7 +253,7 @@ IMPL_LINK_NOARG(SdPresLayoutDlg, ClickLoadHdl, weld::Button&, void)
             // empty layout
             maLayoutNames.push_back(maStrNone);
             m_xVS->InsertItem( static_cast<sal_uInt16>(maLayoutNames.size()),
-                    Image(BMP_FOIL_NONE), maStrNone );
+                    Image(BMP_SLIDE_NONE), maStrNone );
         }
 
         if (!bCancel)

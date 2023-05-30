@@ -8,7 +8,9 @@
  */
 
 #include "rtfcharsets.hxx"
-#include <sal/macros.h>
+
+#include <iterator>
+
 #include <rtl/textenc.h>
 
 namespace writerfilter::rtftok
@@ -49,7 +51,7 @@ RTFEncoding const aRTFEncodings[] = {
     { 255, 850 }, // OEM
 };
 
-int nRTFEncodings = SAL_N_ELEMENTS(aRTFEncodings);
+int nRTFEncodings = std::size(aRTFEncodings);
 
 RTFFontNameSuffix const aRTFFontNameSuffixes[] = {
     { "Baltic", RTL_TEXTENCODING_MS_1257 },   { "CE", RTL_TEXTENCODING_MS_1250 },

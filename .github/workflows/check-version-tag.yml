@@ -25,5 +25,7 @@ jobs:
           git clone --no-checkout --depth=1 --sparse --filter=blob:none https://github.com/${{ github.repository }} lok
           cd lok
           git checkout
-          echo "::set-output name=version::$(cat VERSION)"
-          git ls-remote --tags --exit-code -q https://github.com/${{ github.repository }} "refs/tags/$(cat VERSION)" && echo "::set-output name=should_run::false" 
+          echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+          if git ls-remote --tags --exit-code -q https://github.com/${{ github.repository }} "refs/tags/$(cat VERSION)"; then
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          fi

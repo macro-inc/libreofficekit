@@ -47,6 +47,7 @@
 #include <editutil.hxx>
 #include <listenercontext.hxx>
 #include <scopetools.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <math.h>
 #include <memory>
@@ -69,7 +70,7 @@ short lcl_DecompValueString( OUString& rValue, sal_Int32& nVal, sal_uInt16* pMin
     sal_Int32 nNum = 0;
     if ( p[nNum] == '-' || p[nNum] == '+' )
         nNum = nSign = 1;
-    while ( p[nNum] && CharClass::isAsciiNumeric( OUString(p[nNum]) ) )
+    while ( p[nNum] && CharClass::isAsciiNumeric( std::u16string_view(&p[nNum], 1) ) )
         nNum++;
 
     sal_Unicode cNext = p[nNum];            // 0 if at the end
@@ -78,9 +79,9 @@ short lcl_DecompValueString( OUString& rValue, sal_Int32& nVal, sal_uInt16* pMin
     // #i5550# If there are numbers at the beginning and the end,
     // prefer the one at the beginning only if it's followed by a space.
     // Otherwise, use the number at the end, to enable things like IP addresses.
-    if ( nNum > nSign && ( cNext == 0 || cNext == ' ' || !CharClass::isAsciiNumeric(OUString(cLast)) ) )
+    if ( nNum > nSign && ( cNext == 0 || cNext == ' ' || !CharClass::isAsciiNumeric(std::u16string_view(&cLast, 1)) ) )
     {   // number at the beginning
-        nVal = rValue.copy( 0, nNum ).toInt32();
+        nVal = o3tl::toInt32(rValue.subView( 0, nNum ));
         //  any number with a leading zero sets the minimum number of digits
         if ( p[nSign] == '0' && pMinDigits && ( nNum - nSign > *pMinDigits ) )
             *pMinDigits = nNum - nSign;
@@ -91,7 +92,7 @@ short lcl_DecompValueString( OUString& rValue, sal_Int32& nVal, sal_uInt16* pMin
     {
         nSign = 0;
         sal_Int32 nEnd = nNum = rValue.getLength() - 1;
-        while ( nNum && CharClass::isAsciiNumeric( OUString(p[nNum]) ) )
+        while ( nNum && CharClass::isAsciiNumeric( std::u16string_view(&p[nNum], 1) ) )
             nNum--;
         if ( p[nNum] == '-' || p[nNum] == '+' )
         {
@@ -100,7 +101,7 @@ short lcl_DecompValueString( OUString& rValue, sal_Int32& nVal, sal_uInt16* pMin
         }
         if ( nNum < nEnd - nSign )
         {   // number at the end
-            nVal = rValue.copy( nNum + 1 ).toInt32();
+            nVal = o3tl::toInt32(rValue.subView( nNum + 1 ));
             //  any number with a leading zero sets the minimum number of digits
             if ( p[nNum+1+nSign] == '0' && pMinDigits && ( nEnd - nNum - nSign > *pMinDigits ) )
                 *pMinDigits = nEnd - nNum - nSign;
@@ -124,9 +125,9 @@ OUString lcl_ValueString( sal_Int32 nValue, sal_uInt16 nMinDigits )
         OUString aStr = OUString::number( std::abs( nValue ) );
         if ( aStr.getLength() < nMinDigits )
         {
-            OUStringBuffer aZero;
+            OUStringBuffer aZero(nMinDigits);
             comphelper::string::padToLength(aZero, nMinDigits - aStr.getLength(), '0');
-            aStr = aZero.makeStringAndClear() + aStr;
+            aStr = aZero.append(aStr).makeStringAndClear();
         }
         //  nMinDigits doesn't include the '-' sign -> add after inserting zeros
         if ( nValue < 0 )
@@ -213,6 +214,28 @@ double approxDiff( double a, double b )
     const int nExpArg = static_cast<int>(floor(log10(std::max(aa, ab)))) - 15;
     return rtl::math::round(c, -std::max(nExp, nExpArg));
 }
+
+double approxTimeDiff( double a, double b )
+{
+    // Scale to hours, round to "nanohours" (multiple nanoseconds), scale back.
+    // Get back 0.0416666666666667 instead of 0.041666666700621136 or
+    // 0.041666666664241347 (raw a-b) for one hour, or worse the approxDiff()
+    // 0.041666666659999997 value. Though there is no such correct value,
+    // IEEE-754 nearest values are
+    // 0.041666666666666664353702032030923874117434024810791015625
+    // (0x3FA5555555555555) and
+    // 0.04166666666666667129259593593815225176513195037841796875
+    // (0x3FA5555555555556).
+    // This works also for a diff of seconds, unless corner cases would be
+    // discovered, which would make it necessary to ditch the floating point
+    // and convert to/from time structure values instead.
+    return rtl::math::round((a - b) * 24, 9) / 24;
+}
+
+double approxTypedDiff( double a, double b, bool bTime )
+{
+    return bTime ? approxTimeDiff( a, b) : approxDiff( a, b);
+}
 }
 
 void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
@@ -272,7 +295,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
             if (bOverlapped)
                 bHasOverlappedCells = true;
 
-            if (!bOverlapped || GetCellValue(nColCurr, nRowCurr).meType != CELLTYPE_NONE)
+            if (!bOverlapped || GetCellValue(nColCurr, nRowCurr).getType() != CELLTYPE_NONE)
             {
                 rNonOverlappedCellIdx[nValueCount++] = i;
                 // if there is at least 1 non empty overlapped cell, then no cell should be skipped
@@ -299,7 +322,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
             nRowCurr = nRow1 + rNonOverlappedCellIdx[0] * nAddY;
             ScRefCellValue aPrevCell, aCurrCell;
             aCurrCell = GetCellValue(nColCurr, nRowCurr);
-            CellType eCellType = aCurrCell.meType;
+            CellType eCellType = aCurrCell.getType();
             if (eCellType == CELLTYPE_VALUE)
             {
                 bool bVal = true;
@@ -315,7 +338,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                         tools::Long nDDiff = 0, nMDiff = 0, nYDiff = 0; // to avoid warnings
                         Date aNullDate = rDocument.GetFormatTable()->GetNullDate();
                         Date aCurrDate = aNullDate, aPrevDate = aNullDate;
-                        aCurrDate.AddDays(aCurrCell.mfValue);
+                        aCurrDate.AddDays(aCurrCell.getDouble());
                         for (SCSIZE i = 1; i < nValueCount && bVal; i++)
                         {
                             aPrevCell = aCurrCell;
@@ -323,9 +346,9 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                             nColCurr = nCol1 + rNonOverlappedCellIdx[i] * nAddX;
                             nRowCurr = nRow1 + rNonOverlappedCellIdx[i] * nAddY;
                             aCurrCell = GetCellValue(nColCurr, nRowCurr);
-                            if (aCurrCell.meType == CELLTYPE_VALUE)
+                            if (aCurrCell.getType() == CELLTYPE_VALUE)
                             {
-                                aCurrDate = aNullDate + static_cast<sal_Int32>(aCurrCell.mfValue);
+                                aCurrDate = aNullDate + static_cast<sal_Int32>(aCurrCell.getDouble());
                                 if (eType != FILL_DAY) {
                                     nDDiff = aCurrDate.GetDay()
                                              - static_cast<tools::Long>(aPrevDate.GetDay());
@@ -385,7 +408,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                     }
                 }
                 else if (nCurrCellFormatType == SvNumFormatType::LOGICAL
-                         && ((fVal = aCurrCell.mfValue) == 0.0 || fVal == 1.0))
+                         && ((fVal = aCurrCell.getDouble()) == 0.0 || fVal == 1.0))
                 {
                 }
                 else if (nValueCount >= 2)
@@ -396,14 +419,16 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                         nColCurr = nCol1 + rNonOverlappedCellIdx[i] * nAddX;
                         nRowCurr = nRow1 + rNonOverlappedCellIdx[i] * nAddY;
                         aCurrCell = GetCellValue(nColCurr, nRowCurr);
-                        if (aCurrCell.meType == CELLTYPE_VALUE)
+                        if (aCurrCell.getType() == CELLTYPE_VALUE)
                         {
-                            double nDiff = approxDiff(aCurrCell.mfValue, aPrevCell.mfValue);
+                            double nDiff = approxTypedDiff(aCurrCell.getDouble(), aPrevCell.getDouble(),
+                                    (nCurrCellFormatType == SvNumFormatType::TIME ||
+                                     nCurrCellFormatType == SvNumFormatType::DATETIME));
                             if (i == 1)
                                 rInc = nDiff;
                             if (!::rtl::math::approxEqual(nDiff, rInc, 13))
                                 bVal = false;
-                            else if ((aCurrCell.mfValue == 0.0 || aCurrCell.mfValue == 1.0)
+                            else if ((aCurrCell.getDouble() == 0.0 || aCurrCell.getDouble() == 1.0)
                                      && (rDocument.GetFormatTable()->GetType(
                                              GetNumberFormat(nColCurr, nRowCurr))
                                          == SvNumFormatType::LOGICAL))
@@ -470,7 +495,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                         nColCurr = nCol1 + rNonOverlappedCellIdx[i] * nAddX;
                         nRowCurr = nRow1 + rNonOverlappedCellIdx[i] * nAddY;
                         ScRefCellValue aCell = GetCellValue(nColCurr, nRowCurr);
-                        CellType eType = aCell.meType;
+                        CellType eType = aCell.getType();
                         if (eType == CELLTYPE_STRING || eType == CELLTYPE_EDIT)
                         {
                             aStr2 = aCell.getString(&rDocument);
@@ -508,15 +533,16 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
     SCROW nRow = nRow1;
 
     ScRefCellValue aFirstCell = GetCellValue(nCol, nRow);
-    CellType eCellType = aFirstCell.meType;
+    CellType eCellType = aFirstCell.getType();
 
     if (eCellType == CELLTYPE_VALUE)
     {
         double fVal;
         sal_uInt32 nFormat = GetAttr(nCol,nRow,ATTR_VALUE_FORMAT)->GetValue();
         const SvNumFormatType nFormatType = rDocument.GetFormatTable()->GetType(nFormat);
-        bool bDate = (nFormatType  == SvNumFormatType::DATE );
-        bool bBooleanCell = (!bDate && nFormatType == SvNumFormatType::LOGICAL);
+        bool bDate = (nFormatType == SvNumFormatType::DATE);        // date without time
+        bool bTime = (nFormatType == SvNumFormatType::TIME || nFormatType == SvNumFormatType::DATETIME);
+        bool bBooleanCell = (nFormatType == SvNumFormatType::LOGICAL);
         if (bDate)
         {
             if (nCount > 1)
@@ -524,7 +550,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                 double nVal;
                 Date aNullDate = rDocument.GetFormatTable()->GetNullDate();
                 Date aDate1 = aNullDate;
-                nVal = aFirstCell.mfValue;
+                nVal = aFirstCell.getDouble();
                 aDate1.AddDays(nVal);
                 Date aDate2 = aNullDate;
                 nVal = GetValue(nCol+nAddX, nRow+nAddY);
@@ -558,9 +584,9 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                     for (SCSIZE i=1; i<nCount && bVal; i++)
                     {
                         ScRefCellValue aCell = GetCellValue(nCol,nRow);
-                        if (aCell.meType == CELLTYPE_VALUE)
+                        if (aCell.getType() == CELLTYPE_VALUE)
                         {
-                            nVal = aCell.mfValue;
+                            nVal = aCell.getDouble();
                             aDate2 = aNullDate + static_cast<sal_Int32>(nVal);
                             if ( eType == FILL_DAY )
                             {
@@ -611,7 +637,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                 rInc = 1.0;
             }
         }
-        else if (bBooleanCell && ((fVal = aFirstCell.mfValue) == 0.0 || fVal == 1.0))
+        else if (bBooleanCell && ((fVal = aFirstCell.getDouble()) == 0.0 || fVal == 1.0))
         {
             // Nothing, rInc stays 0.0, no specific fill mode.
         }
@@ -619,19 +645,19 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
         {
             if (nCount > 1)
             {
-                double nVal1 = aFirstCell.mfValue;
+                double nVal1 = aFirstCell.getDouble();
                 double nVal2 = GetValue(nCol+nAddX, nRow+nAddY);
-                rInc = approxDiff( nVal2, nVal1);
+                rInc = approxTypedDiff( nVal2, nVal1, bTime);
                 nCol = sal::static_int_cast<SCCOL>( nCol + nAddX );
                 nRow = sal::static_int_cast<SCROW>( nRow + nAddY );
                 bool bVal = true;
                 for (SCSIZE i=1; i<nCount && bVal; i++)
                 {
                     ScRefCellValue aCell = GetCellValue(nCol,nRow);
-                    if (aCell.meType == CELLTYPE_VALUE)
+                    if (aCell.getType() == CELLTYPE_VALUE)
                     {
-                        nVal2 = aCell.mfValue;
-                        double nDiff = approxDiff( nVal2, nVal1);
+                        nVal2 = aCell.getDouble();
+                        double nDiff = approxTypedDiff( nVal2, nVal1, bTime);
                         if ( !::rtl::math::approxEqual( nDiff, rInc, 13 ) )
                             bVal = false;
                         else if ((nVal2 == 0.0 || nVal2 == 1.0) &&
@@ -710,7 +736,7 @@ void ScTable::FillAnalyse( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                     for (SCSIZE i=1; i<nCount && bVal; i++)
                     {
                         ScRefCellValue aCell = GetCellValue(nCol, nRow);
-                        CellType eType = aCell.meType;
+                        CellType eType = aCell.getType();
                         if ( eType == CELLTYPE_STRING || eType == CELLTYPE_EDIT )
                         {
                             aStr = aCell.getString(&rDocument);
@@ -909,9 +935,9 @@ void ScTable::FillAuto( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                 if ( bGetPattern )
                 {
                     if (bVertical)      // rInner&:=nRow, rOuter&:=nCol
-                        pSrcPattern = aCol[nCol].GetPattern(static_cast<SCROW>(nAtSrc));
+                        pSrcPattern = GetColumnData(nCol).GetPattern(static_cast<SCROW>(nAtSrc));
                     else                // rInner&:=nCol, rOuter&:=nRow
-                        pSrcPattern = aCol[nAtSrc].GetPattern(static_cast<SCROW>(nRow));
+                        pSrcPattern = GetColumnData(nAtSrc).GetPattern(static_cast<SCROW>(nRow));
                     bGetPattern = false;
                     pStyleSheet = pSrcPattern->GetStyleSheet();
                     // do transfer ATTR_MERGE / ATTR_MERGE_FLAG
@@ -1223,7 +1249,7 @@ void  ScTable::FillSparkline(bool bVertical, SCCOLROW nFixed,
     for (SCROW nCurrent = nStart; nCurrent <= nEnd; nCurrent++)
     {
         auto pSparkline = bVertical ? GetSparkline(nFixed, nCurrent) : GetSparkline(nCurrent, nFixed);
-        bHasSparklines = bHasSparklines || bool(pSparkline);
+        bHasSparklines = bHasSparklines || pSparkline;
         aSparklineSeries.push_back(pSparkline);
     }
 
@@ -1303,6 +1329,49 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
 
     if ( bOk )
     {
+        tools::Long nBegin = 0;
+        tools::Long nEnd = 0;
+        tools::Long nHidden = 0;
+        if (eFillDir == FILL_TO_BOTTOM || eFillDir == FILL_TO_TOP)
+        {
+            if (nEndY > nRow1)
+            {
+                nBegin = nRow2+1;
+                nEnd = nEndY;
+            }
+            else
+            {
+                nBegin = nEndY;
+                nEnd = nRow1 -1;
+            }
+
+            tools::Long nVisible = CountVisibleRows(nBegin, nEnd);
+            nHidden = nEnd + 1 - nBegin - nVisible;
+        }
+        else
+        {
+            if (nEndX > nCol1)
+            {
+                nBegin = nCol2+1;
+                nEnd = nEndX;
+            }
+            else
+            {
+                nBegin = nEndX;
+                nEnd = nCol1 -1;
+            }
+
+            tools::Long nVisible = CountVisibleCols(nBegin, nEnd);
+            nHidden = nEnd + 1 - nBegin - nVisible;
+        }
+        if (nHidden)
+        {
+            if (nIndex > 0)
+                nIndex = nIndex - nHidden;
+            else
+                nIndex = nIndex + nHidden;
+        }
+
         FillCmd eFillCmd;
         FillDateCmd eDateCmd;
         double nInc;
@@ -1333,30 +1402,6 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
         }
         else if ( eFillCmd == FILL_SIMPLE )         // fill with pattern/sample
         {
-            if ((eFillDir == FILL_TO_BOTTOM)||(eFillDir == FILL_TO_TOP))
-            {
-                tools::Long nBegin = 0;
-                tools::Long nEnd = 0;
-                if (nEndY > nRow1)
-                {
-                    nBegin = nRow2+1;
-                    nEnd = nEndY;
-                }
-                else
-                {
-                    nBegin = nEndY;
-                    nEnd = nRow1 -1;
-                }
-
-                tools::Long nNonFiltered = CountNonFilteredRows(nBegin, nEnd);
-                tools::Long nFiltered = nEnd + 1 - nBegin - nNonFiltered;
-
-                if (nIndex > 0)
-                    nIndex = nIndex - nFiltered;
-                else
-                    nIndex = nIndex + nFiltered;
-            }
-
             tools::Long nPosIndex = nIndex;
             while ( nPosIndex < 0 )
                 nPosIndex += nSrcCount;
@@ -1377,7 +1422,7 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
                 else
                     nDelta = ( nIndex - nSrcCount + 1 ) / nSrcCount;    // -1 -> -1
 
-                CellType eType = aCell.meType;
+                CellType eType = aCell.getType();
                 switch ( eType )
                 {
                     case CELLTYPE_STRING:
@@ -1414,7 +1459,7 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
                     {
                         sal_uInt32 nNumFmt = GetNumberFormat( nSrcX, nSrcY );
                         //  overflow is possible...
-                        double nVal = aCell.mfValue;
+                        double nVal = aCell.getDouble();
                         if ( !(nScFillModeMouseModifier & KEY_MOD1) )
                         {
                             const SvNumFormatType nFormatType = rDocument.GetFormatTable()->GetType(nNumFmt);
@@ -1457,7 +1502,7 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
             ScRefCellValue aCell = GetCellValue(nCol1, nRow1);
             if (!aCell.isEmpty())
             {
-                CellType eType = aCell.meType;
+                CellType eType = aCell.getType();
                 switch ( eType )
                 {
                     case CELLTYPE_STRING:
@@ -1472,10 +1517,10 @@ OUString ScTable::GetAutoFillPreview( const ScRange& rSource, SCCOL nEndX, SCROW
                     }
                     break;
                     case CELLTYPE_VALUE:
-                        nStart = aCell.mfValue;
+                        nStart = aCell.getDouble();
                     break;
                     case CELLTYPE_FORMULA:
-                        nStart = aCell.mpFormula->GetValue();
+                        nStart = aCell.getFormula()->GetValue();
                     break;
                     default:
                         nStart = 0.0;
@@ -1741,12 +1786,12 @@ void ScTable::FillSeriesSimple(
 
     if (bVertical)
     {
-        switch (rSrcCell.meType)
+        switch (rSrcCell.getType())
         {
             case CELLTYPE_FORMULA:
             {
                 FillFormulaVertical(
-                    *rSrcCell.mpFormula, rInner, rCol, nIMin, nIMax, pProgress, rProgress);
+                    *rSrcCell.getFormula(), rInner, rCol, nIMin, nIMax, pProgress, rProgress);
             }
             break;
             default:
@@ -1773,7 +1818,7 @@ void ScTable::FillSeriesSimple(
     }
     else
     {
-        switch (rSrcCell.meType)
+        switch (rSrcCell.getType())
         {
             case CELLTYPE_FORMULA:
             {
@@ -1785,7 +1830,7 @@ void ScTable::FillSeriesSimple(
                     if (bHidden)
                         continue;
 
-                    FillFormula(rSrcCell.mpFormula, rCol, rRow, (rInner == nIMax));
+                    FillFormula(rSrcCell.getFormula(), rCol, rRow, (rInner == nIMax));
                     if (pProgress)
                         pProgress->SetStateOnPercent(++rProgress);
                 }
@@ -1868,13 +1913,13 @@ void ScTable::FillAutoSimple(
                 if (bVertical)      // rInner&:=nRow, rOuter&:=nCol
                 {
                     aSrcCell = GetCellValue(rCol, nSource);
-                    if (nISrcStart == nISrcEnd && aSrcCell.meType == CELLTYPE_FORMULA)
+                    if (nISrcStart == nISrcEnd && aSrcCell.getType() == CELLTYPE_FORMULA)
                     {
-                        FillFormulaVertical(*aSrcCell.mpFormula, rInner, rCol, nIStart, nIEnd, pProgress, rProgress);
+                        FillFormulaVertical(*aSrcCell.getFormula(), rInner, rCol, nIStart, nIEnd, pProgress, rProgress);
                         return;
                     }
                     const SvNumFormatType nFormatType = rDocument.GetFormatTable()->GetType(
-                                aCol[rCol].GetNumberFormat( rDocument.GetNonThreadedContext(), nSource));
+                                GetColumnData(rCol).GetNumberFormat( rDocument.GetNonThreadedContext(), nSource));
                     bBooleanCell = (nFormatType == SvNumFormatType::LOGICAL);
                     bPercentCell = (nFormatType == SvNumFormatType::PERCENT);
 
@@ -1883,7 +1928,7 @@ void ScTable::FillAutoSimple(
                 {
                     aSrcCell = GetCellValue(nSource, rRow);
                     const SvNumFormatType nFormatType = rDocument.GetFormatTable()->GetType(
-                                aCol[nSource].GetNumberFormat( rDocument.GetNonThreadedContext(), rRow));
+                                GetColumnData(nSource).GetNumberFormat( rDocument.GetNonThreadedContext(), rRow));
                     bBooleanCell = (nFormatType == SvNumFormatType::LOGICAL);
                     bPercentCell = (nFormatType == SvNumFormatType::PERCENT);
                 }
@@ -1891,14 +1936,14 @@ void ScTable::FillAutoSimple(
                 bGetCell = false;
                 if (!aSrcCell.isEmpty())
                 {
-                    switch (aSrcCell.meType)
+                    switch (aSrcCell.getType())
                     {
                         case CELLTYPE_STRING:
                         case CELLTYPE_EDIT:
-                            if (aSrcCell.meType == CELLTYPE_STRING)
-                                aValue = aSrcCell.mpString->getString();
+                            if (aSrcCell.getType() == CELLTYPE_STRING)
+                                aValue = aSrcCell.getSharedString()->getString();
                             else
-                                aValue = ScEditUtil::GetString(*aSrcCell.mpEditText, &rDocument);
+                                aValue = ScEditUtil::GetString(*aSrcCell.getEditText(), &rDocument);
                             if ( !(nScFillModeMouseModifier & KEY_MOD1) && !bHasFiltered )
                             {
                                 nCellDigits = 0;    // look at each source cell individually
@@ -1917,17 +1962,17 @@ void ScTable::FillAutoSimple(
                 }
             }
 
-            switch (aSrcCell.meType)
+            switch (aSrcCell.getType())
             {
                 case CELLTYPE_VALUE:
                     {
                         double fVal;
-                        if (bBooleanCell && ((fVal = aSrcCell.mfValue) == 0.0 || fVal == 1.0))
-                            aCol[rCol].SetValue(rRow, aSrcCell.mfValue);
+                        if (bBooleanCell && ((fVal = aSrcCell.getDouble()) == 0.0 || fVal == 1.0))
+                            aCol[rCol].SetValue(rRow, aSrcCell.getDouble());
                         else if(bPercentCell)
-                            aCol[rCol].SetValue(rRow, aSrcCell.mfValue + nDelta * 0.01); // tdf#89998 increment by 1% at a time
+                            aCol[rCol].SetValue(rRow, aSrcCell.getDouble() + nDelta * 0.01); // tdf#89998 increment by 1% at a time
                         else
-                            aCol[rCol].SetValue(rRow, aSrcCell.mfValue + nDelta);
+                            aCol[rCol].SetValue(rRow, aSrcCell.getDouble() + nDelta);
                     }
                     break;
                 case CELLTYPE_STRING:
@@ -1945,7 +1990,7 @@ void ScTable::FillAutoSimple(
                             setSuffixCell(
                                 aCol[rCol], rRow,
                                 nNextValue, nCellDigits, aValue,
-                                aSrcCell.meType, bIsOrdinalSuffix);
+                                aSrcCell.getType(), bIsOrdinalSuffix);
                         }
                         else
                         {
@@ -1964,7 +2009,7 @@ void ScTable::FillAutoSimple(
                     break;
                 case CELLTYPE_FORMULA :
                     FillFormula(
-                        aSrcCell.mpFormula, rCol, rRow, (rInner == nIEnd));
+                        aSrcCell.getFormula(), rCol, rRow, (rInner == nIEnd));
                     if (nFormulaCounter - nActFormCnt > nMaxFormCnt)
                         nMaxFormCnt = nFormulaCounter - nActFormCnt;
                     break;
@@ -2013,7 +2058,7 @@ void ScTable::FillAutoSimple(
         //  and even then not individually for each one
 
         ++rProgress;
-        if ( pProgress && (aSrcCell.meType == CELLTYPE_FORMULA || aSrcCell.meType == CELLTYPE_EDIT) )
+        if ( pProgress && (aSrcCell.getType() == CELLTYPE_FORMULA || aSrcCell.getType() == CELLTYPE_EDIT) )
             pProgress->SetStateOnPercent( rProgress );
 
     }
@@ -2035,7 +2080,6 @@ inline bool isOverflow( const double& rVal, const double& rMax, const double& rS
                 return rVal > rMax;
             else
                 return rVal < rMax;
-        break;
         case FILL_GROWTH:
             if (rStep > 0.0)
             {
@@ -2211,13 +2255,13 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
         else
             aSrcCell = GetCellValue(static_cast<SCCOL>(nISource), static_cast<SCROW>(nOStart));
         // Same logic as for the actual series.
-        if (!aSrcCell.isEmpty() && (aSrcCell.meType == CELLTYPE_VALUE || aSrcCell.meType == CELLTYPE_FORMULA))
+        if (!aSrcCell.isEmpty() && (aSrcCell.getType() == CELLTYPE_VALUE || aSrcCell.getType() == CELLTYPE_FORMULA))
         {
             double nStartVal;
-            if (aSrcCell.meType == CELLTYPE_VALUE)
-                nStartVal = aSrcCell.mfValue;
+            if (aSrcCell.getType() == CELLTYPE_VALUE)
+                nStartVal = aSrcCell.getDouble();
             else
-                nStartVal = aSrcCell.mpFormula->GetValue();
+                nStartVal = aSrcCell.getFormula()->GetValue();
             if (eFillCmd == FILL_LINEAR)
             {
                 if (nStepValue == 0.0)
@@ -2255,7 +2299,6 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
     // Perform the fill once per each 'outer' position i.e. one per column
     // when filling vertically.
 
-    sal_uInt64 nActFormCnt = 0;
     for (rOuter = nOStart; rOuter <= nOEnd; rOuter++)
     {
         rInner = nISource;
@@ -2336,7 +2379,7 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
 
         if (!aSrcCell.isEmpty())
         {
-            CellType eCellType = aSrcCell.meType;
+            CellType eCellType = aSrcCell.getType();
 
             if (eFillCmd == FILL_SIMPLE)                // copy
             {
@@ -2344,8 +2387,8 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
             }
             else if (eCellType == CELLTYPE_VALUE || eCellType == CELLTYPE_FORMULA)
             {
-                const double nStartVal = (eCellType == CELLTYPE_VALUE ? aSrcCell.mfValue :
-                        aSrcCell.mpFormula->GetValue());
+                const double nStartVal = (eCellType == CELLTYPE_VALUE ? aSrcCell.getDouble() :
+                        aSrcCell.getFormula()->GetValue());
                 double nVal = nStartVal;
                 tools::Long nIndex = 0;
 
@@ -2442,9 +2485,9 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
                 }
                 OUString aValue;
                 if (eCellType == CELLTYPE_STRING)
-                    aValue = aSrcCell.mpString->getString();
+                    aValue = aSrcCell.getSharedString()->getString();
                 else
-                    aValue = ScEditUtil::GetString(*aSrcCell.mpEditText, &rDocument);
+                    aValue = ScEditUtil::GetString(*aSrcCell.getEditText(), &rDocument);
                 sal_Int32 nStringValue;
                 sal_uInt16 nMinDigits = nArgMinDigits;
                 short nHeadNoneTail = lcl_DecompValueString( aValue, nStringValue, &nMinDigits );
@@ -2550,7 +2593,6 @@ void ScTable::FillSeries( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2,
             nProgress += nIMax - nIMin + 1;
             pProgress->SetStateOnPercent( nProgress );
         }
-        ++nActFormCnt;
     }
 }
 
@@ -2600,7 +2642,7 @@ void ScTable::AutoFormat( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW
     // Left top corner
     AutoFormatArea(nCol, nRow, nCol, nRow, *pPatternAttrs[nIndex], nFormatNo);
     // Left column
-    if (pData->IsEqualData(4, 8))
+    if (pData->HasSameData(4, 8))
         AutoFormatArea(nStartCol, nStartRow + 1, nStartCol, nEndRow - 1, *pPatternAttrs[4], nFormatNo);
     else
     {
@@ -2624,7 +2666,7 @@ void ScTable::AutoFormat( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW
     nIndex = 3;
     AutoFormatArea(nCol, nRow, nCol, nRow, *pPatternAttrs[nIndex], nFormatNo);
     // Right column
-    if (pData->IsEqualData(7, 11))
+    if (pData->HasSameData(7, 11))
         AutoFormatArea(nEndCol, nStartRow + 1, nEndCol, nEndRow - 1, *pPatternAttrs[7], nFormatNo);
     else
     {
@@ -2664,11 +2706,11 @@ void ScTable::AutoFormat( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW
             nIndex = 13;
     }
     // Body
-    if ((pData->IsEqualData(5, 6)) && (pData->IsEqualData(9, 10)) && (pData->IsEqualData(5, 9)))
+    if ((pData->HasSameData(5, 6)) && (pData->HasSameData(9, 10)) && (pData->HasSameData(5, 9)))
         AutoFormatArea(nStartCol + 1, nStartRow + 1, nEndCol-1, nEndRow - 1, *pPatternAttrs[5], nFormatNo);
     else
     {
-        if ((pData->IsEqualData(5, 9)) && (pData->IsEqualData(6, 10)))
+        if ((pData->HasSameData(5, 9)) && (pData->HasSameData(6, 10)))
         {
             nIndex = 5;
             for (nCol = nStartCol + 1; nCol < nEndCol; nCol++)

@@ -32,7 +32,7 @@
 
 #include <vcl/toolkit/treelistbox.hxx>
 #include <vcl/toolkit/svlbitm.hxx>
-#include <tools/wintypes.hxx>
+#include <vcl/wintypes.hxx>
 #include <bitmaps.hlst>
 #include <svimpbox.hxx>
 #include <comphelper/processfactory.hxx>
@@ -402,10 +402,10 @@ void SvImpLBox::PageDown( sal_uInt16 nDelta )
         m_pView->PaintImmediately();
         m_pView->Scroll( 0, nScroll, aArea, ScrollFlags::NoChildren );
         m_pView->PaintImmediately();
-        m_pView->NotifyScrolled();
     }
 
     ShowCursor( true );
+    m_pView->NotifyScrolled();
 }
 
 void SvImpLBox::PageUp( sal_uInt16 nDelta )
@@ -437,10 +437,10 @@ void SvImpLBox::PageUp( sal_uInt16 nDelta )
         m_pView->PaintImmediately();
         m_pView->Scroll( 0, nEntryHeight*nRealDelta, aArea, ScrollFlags::NoChildren );
         m_pView->PaintImmediately();
-        m_pView->NotifyScrolled();
     }
 
     ShowCursor( true );
+    m_pView->NotifyScrolled();
 }
 
 void SvImpLBox::KeyUp( bool bPageUp )
@@ -946,6 +946,7 @@ void SvImpLBox::MakeVisible( SvTreeListEntry* pEntry, bool bMoveToTop )
     FillView();
     m_aVerSBar->SetThumbPos( static_cast<tools::Long>(m_pView->GetVisiblePos( m_pStartEntry )) );
     ShowCursor( true );
+    m_pView->NotifyScrolled();
     m_pView->Invalidate();
 }
 
@@ -1020,11 +1021,10 @@ void SvImpLBox::DrawNet(vcl::RenderContext& rRenderContext)
     rRenderContext.Push(vcl::PushFlags::LINECOLOR);
 
     const StyleSettings& rStyleSettings = rRenderContext.GetSettings().GetStyleSettings();
-    Color aCol = rStyleSettings.GetFaceColor();
 
-    if (aCol.IsRGBEqual(rRenderContext.GetBackground().GetColor()))
-        aCol = rStyleSettings.GetShadowColor();
-    rRenderContext.SetLineColor(aCol);
+    // Set color to draw the vertical and horizontal lines
+    rRenderContext.SetLineColor(rStyleSettings.GetShadowColor());
+
     Point aPos1, aPos2;
     sal_uInt16 nDistance;
     sal_uLong nMax = m_nVisibleCount + nOffs + 1;
@@ -1127,7 +1127,7 @@ void SvImpLBox::AdjustScrollBars( Size& rSize )
     sal_uLong nTotalCount = m_pView->GetVisibleCount();
 
     // number of entries visible within the view
-    m_nVisibleCount = aOSize.Height() / nEntryHeight;
+    m_nVisibleCount = o3tl::make_unsigned(aOSize.Height() / nEntryHeight);
 
     // do we need a vertical scrollbar?
     if( bVerSBar || nTotalCount > m_nVisibleCount )
@@ -1148,7 +1148,7 @@ void SvImpLBox::AdjustScrollBars( Size& rSize )
         nResult |= 0x0002;
         // the number of entries visible within the view has to be recalculated
         // because the horizontal scrollbar is now visible.
-        m_nVisibleCount =  (aOSize.Height() - m_nHorSBarHeight) / nEntryHeight;
+        m_nVisibleCount = o3tl::make_unsigned(std::max<tools::Long>(0, aOSize.Height() - m_nHorSBarHeight) / nEntryHeight);
         // we might actually need a vertical scrollbar now
         if( !(nResult & 0x0001) &&
             ((nTotalCount > m_nVisibleCount) || bVerSBar) )
@@ -1845,7 +1845,7 @@ bool SvImpLBox::MouseMoveCheckCtrl(const MouseEvent& rMEvt, SvTreeListEntry cons
 
 bool SvImpLBox::ButtonUpCheckCtrl( const MouseEvent& rMEvt )
 {
-    if( m_pActiveButton )
+    if( m_pActiveButton && m_pActiveButton->isEnable())
     {
         m_pView->ReleaseMouse();
         SvTreeListEntry* pEntry = GetClickedEntry( rMEvt.GetPosPixel() );
@@ -2048,7 +2048,11 @@ void SvImpLBox::MouseMove( const MouseEvent& rMEvt)
         if (!pEntry)
             m_pView->SelectAll(false);
         else if (!m_pView->IsSelected(pEntry) && IsSelectable(pEntry))
+        {
+            m_pView->mbSelectingByHover = true;
             m_pView->Select(pEntry);
+            m_pView->mbSelectingByHover = false;
+        }
     }
 }
 
@@ -2383,9 +2387,12 @@ bool SvImpLBox::KeyInput( const KeyEvent& rKEvt)
 
         case KEY_SUBTRACT:
             if (m_pView->IsExpanded(m_pCursor))
-                m_pView->Collapse(m_pCursor);
-            if (bMod1)
-                CollapseTo(m_pTree->GetRootLevelParent(m_pCursor));
+            {
+                if (bMod1)
+                    CollapseTo(m_pCursor);
+                else
+                    m_pView->Collapse(m_pCursor);
+            }
             break;
 
         case KEY_MULTIPLY:
@@ -2832,7 +2839,7 @@ void SvImpLBox::Command( const CommandEvent& rCEvt )
     if (nCommand == CommandEventId::Wheel ||
         nCommand == CommandEventId::StartAutoScroll ||
         nCommand == CommandEventId::AutoScroll ||
-        nCommand == CommandEventId::Gesture)
+        nCommand == CommandEventId::GesturePan)
     {
         if (m_pView->HandleScrollCommand(rCEvt, m_aHorSBar.get(), m_aVerSBar.get()))
             return;

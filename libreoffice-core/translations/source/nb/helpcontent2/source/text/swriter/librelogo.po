@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-07-15 17:18+0000\n"
-"Last-Translator: Karl Morten Ramberg <karl.m.ramberg@gmail.com>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-12-12 13:30+0000\n"
+"Last-Translator: serval2412 <serval2412@yahoo.fr>\n"
 "Language-Team: Norwegian Bokmål <https://translations.documentfoundation.org/projects/libo_help-master/textswriterlibrelogo/nb_NO/>\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>LibreLogo</bookmark_value><bookmark_value>Logo</bookmark_value><bookmark_value>Turtle graphics</bookmark_value>"
 msgstr "<bookmark_value>LibreLogo</bookmark_value><bookmark_value>Logo</bookmark_value><bookmark_value>Skilpaddegrafikk</bookmark_value>"
 
-#. NwN2R
+#. Tpn7D
 #: LibreLogo.xhp
 msgctxt ""
 "LibreLogo.xhp\n"
 "hd_170\n"
 "help.text"
-msgid "LibreLogo"
-msgstr "LibreLogo"
+msgid "<variable id=\"LibreLogoh1\"><link href=\"text/swriter/librelogo/LibreLogo.xhp\">LibreLogo</link></variable>"
+msgstr "<variable id=\"LibreLogoh1\"><link href=\"text/swriter/librelogo/LibreLogo.xhp\">LibreLogo</link></variable>"
 
 #. HvLY3
 #: LibreLogo.xhp
@@ -167,7 +167,7 @@ msgctxt ""
 "par_345\n"
 "help.text"
 msgid "The “magic wand” icon sets 2-page layout for program editing, expands and converts to uppercase the abbreviated, lowercase Logo commands in the Writer document. Change the language of the document (<switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - Language Settings - Languages - Western</menuitem>) and click on this icon to translate the Logo program to the selected language."
-msgstr "Ikonet \"tryllestav\" stiller inn 2-siders layout for programredigering, utvider og konverterer til store bokstaver med små bokstaver i Writer-dokumentet. Endre språk for dokumentet (<switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>% PRODUCTNAME - Innstillinger </menuitem> </caseinline> <defaultinline> <menuitem> Verktøy - Valg </menuitem> </defaultinline> </switchinline> <menuitem> - Språkinnstillinger - Språk - Vestlig </menuitem>) og klikk på dette ikonet for å oversette Logo-programmet til det valgte språket."
+msgstr "Ikonet \"tryllestav\" stiller inn 2-siders layout for programredigering, utvider og konverterer til store bokstaver med små bokstaver i Writer-dokumentet. Endre språk for dokumentet (<switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Innstillinger </menuitem> </caseinline> <defaultinline> <menuitem> Verktøy - Valg </menuitem> </defaultinline> </switchinline> <menuitem> - Språkinnstillinger - Språk - Vestlig </menuitem>) og klikk på dette ikonet for å oversette Logo-programmet til det valgte språket."
 
 #. UXKqW
 #: LibreLogo.xhp
@@ -448,14 +448,14 @@ msgctxt ""
 msgid "Alternative parenthesization in function calls"
 msgstr "Alternativ bruk av klammeparenteser i funksjonskall"
 
-#. kRVnr
+#. u354b
 #: LibreLogo.xhp
 msgctxt ""
 "LibreLogo.xhp\n"
 "par_660\n"
 "help.text"
-msgid "TO star size color<br/> FILLCOLOR color<br/> REPEAT 5 [ LEFT 72 FORWARD size RIGHT 144 FORWARD size ]<br/> FILL<br/> END<br/> <br/> star 100 “red”<br/> star (100, “green”)<br/> star(100, “blue”)<br/>"
-msgstr "TIL stjerne størrelse farge<br/> FYLLFARGE farge<br/> GJENTA 5 [ VENSTRE 72 FOROVER størrelse HØGRE 144 FOROVER storleik ]<br/> FYLL<br/> SLUTT<br/> <br/> stjerne 100 “rød”<br/> stjerner (100, “grønn”)<br/> stjerne(100, “blå”)<br/>"
+msgid "TO star size color<br/> FILLCOLOR color<br/> REPEAT 5 [ LEFT 72 FORWARD size RIGHT 144 FORWARD size ]<br/> FILL<br/> END<br/> <br/> star 100 “red”<br/> star(100, “green”)<br/> star(100, “blue”)<br/>"
+msgstr "TIL stjernestørrelse farge<br/> FYLLFARGE farge<br/> REPETA 5 [ VENSTRE 72 FREMSTØRRELSE HØYRE 144 FREMOVER størrelse ]<br/> FYLL<br/> SLUTT<br/> <br/> stjerne 100 “rød”<br/> stjerne(100, «grønn»)<br/> stjerne(100, «blå»)<br/>"
 
 #. usjNU
 #: LibreLogo.xhp

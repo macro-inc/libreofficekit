@@ -14,7 +14,6 @@
 
 #include <edtwin.hxx>
 #include <view.hxx>
-#include <docsh.hxx>
 #include <strings.hrc>
 #include <formatcontentcontrol.hxx>
 #include <wrtsh.hxx>
@@ -43,6 +42,7 @@ void SwDropDownContentControlButton::InitDropdown()
     tools::Long nMinListWidth = GetSizePixel().Width();
     aSize.setWidth(std::max(aSize.Width(), nMinListWidth));
     m_xTreeView->set_size_request(aSize.Width(), aSize.Height());
+    m_xTreeView->set_direction(m_bRTL);
 }
 
 IMPL_LINK(SwDropDownContentControlButton, ListBoxHandler, weld::TreeView&, rBox, bool)

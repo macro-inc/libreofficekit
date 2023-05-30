@@ -22,6 +22,7 @@
 #include <editeng/editeng.hxx>
 #include <svl/hint.hxx>
 #include <sfx2/app.hxx>
+#include <utility>
 
 void ImpEditEngine::SetStyleSheetPool( SfxStyleSheetPool* pSPool )
 {
@@ -140,37 +141,32 @@ void ImpEditEngine::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
     // So that not a lot of unnecessary formatting is done when destructing:
     if ( !bDowning )
     {
-
-        const SfxStyleSheetHint* pStyleSheetHint = dynamic_cast<const SfxStyleSheetHint*>(&rHint);
-        if ( pStyleSheetHint )
+        SfxHintId nId = rHint.GetId();
+        if ( ( nId == SfxHintId::StyleSheetInDestruction ) ||
+             ( nId == SfxHintId::StyleSheetErased ) )
         {
-            DBG_ASSERT( dynamic_cast< const SfxStyleSheet* >(pStyleSheetHint->GetStyleSheet()) != nullptr, "No SfxStyleSheet!" );
+            const SfxStyleSheetHint* pStyleSheetHint = static_cast<const SfxStyleSheetHint*>(&rHint);
             SfxStyleSheet* pStyle = static_cast<SfxStyleSheet*>( pStyleSheetHint->GetStyleSheet() );
-            SfxHintId nId = pStyleSheetHint->GetId();
-            if ( ( nId == SfxHintId::StyleSheetInDestruction ) ||
-                 ( nId == SfxHintId::StyleSheetErased ) )
-            {
-                RemoveStyleFromParagraphs( pStyle );
-            }
-            else if ( nId == SfxHintId::StyleSheetModified )
-            {
-                UpdateParagraphsWithStyleSheet( pStyle );
-            }
+            RemoveStyleFromParagraphs( pStyle );
         }
-        else if ( auto pStyle = dynamic_cast< SfxStyleSheet* >(&rBC) )
+        else if ( nId == SfxHintId::StyleSheetModified )
         {
-            SfxHintId nId = rHint.GetId();
-            if ( nId == SfxHintId::Dying )
-            {
+            const SfxStyleSheetHint* pStyleSheetHint = static_cast<const SfxStyleSheetHint*>(&rHint);
+            SfxStyleSheet* pStyle = static_cast<SfxStyleSheet*>( pStyleSheetHint->GetStyleSheet() );
+            UpdateParagraphsWithStyleSheet( pStyle );
+        }
+        else if ( nId == SfxHintId::Dying )
+        {
+            if ( auto pStyle = dynamic_cast< SfxStyleSheet* >(&rBC) )
                 RemoveStyleFromParagraphs( pStyle );
-            }
-            else if ( nId == SfxHintId::DataChanged )
-            {
+        }
+        else if ( nId == SfxHintId::DataChanged )
+        {
+            if ( auto pStyle = dynamic_cast< SfxStyleSheet* >(&rBC) )
                 UpdateParagraphsWithStyleSheet( pStyle );
-            }
         }
     }
-    if(dynamic_cast<const SfxApplication*>(&rBC) != nullptr && rHint.GetId() == SfxHintId::Dying)
+    if (rHint.GetId() == SfxHintId::Dying && dynamic_cast<const SfxApplication*>(&rBC))
         Dispose();
 }
 
@@ -191,7 +187,7 @@ std::unique_ptr<EditUndoSetAttribs> ImpEditEngine::CreateAttribUndo( EditSelecti
     {
         SfxItemSet aTmpSet( GetEmptyItemSet() );
         aTmpSet.Put( rSet );
-        pUndo.reset( new EditUndoSetAttribs(pEditEngine, aESel, aTmpSet) );
+        pUndo.reset( new EditUndoSetAttribs(pEditEngine, aESel, std::move(aTmpSet)) );
     }
     else
     {
@@ -816,8 +812,8 @@ void IdleFormattter::ForceTimeout()
     }
 }
 
-ImplIMEInfos::ImplIMEInfos( const EditPaM& rPos, const OUString& rOldTextAfterStartPos )
- : aOldTextAfterStartPos( rOldTextAfterStartPos ),
+ImplIMEInfos::ImplIMEInfos( const EditPaM& rPos, OUString _aOldTextAfterStartPos )
+ : aOldTextAfterStartPos(std::move( _aOldTextAfterStartPos )),
  aPos(rPos),
  nLen(0),
  bWasCursorOverwrite(false)

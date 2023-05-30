@@ -19,8 +19,7 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
+#include <comphelper/propertyvalue.hxx>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/frame/XDispatch.hpp>
 #include <com/sun/star/frame/XDispatchProvider.hpp>
@@ -32,6 +31,7 @@
 #include <o3tl/any.hxx>
 #include <svtools/miscopt.hxx>
 #include <svtools/imgdef.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/mnemonic.hxx>
@@ -49,9 +49,9 @@ using namespace ::com::sun::star::beans;
 // Constants --------------------------------------------------------------
 
 
-BibToolBarListener::BibToolBarListener(BibToolBar *pTB, const OUString& aStr, ToolBoxItemId nId):
+BibToolBarListener::BibToolBarListener(BibToolBar *pTB, OUString aStr, ToolBoxItemId nId):
         nIndex(nId),
-        aCommand(aStr),
+        aCommand(std::move(aStr)),
         pToolBar(pTB)
 {
 }
@@ -350,14 +350,11 @@ void BibToolBar::Select()
     }
     else
     {
-        Sequence<PropertyValue> aPropVal(2);
-        PropertyValue* pPropertyVal = const_cast<PropertyValue*>(aPropVal.getConstArray());
-        pPropertyVal[0].Name="QueryText";
-        OUString aSelection = pEdQuery->get_text();
-        pPropertyVal[0].Value <<= aSelection;
-
-        pPropertyVal[1].Name="QueryField";
-        pPropertyVal[1].Value <<= aQueryField;
+        Sequence<PropertyValue> aPropVal
+        {
+            comphelper::makePropertyValue("QueryText", pEdQuery->get_text()),
+            comphelper::makePropertyValue("QueryField", aQueryField)
+        };
         SendDispatch(nId,aPropVal);
     }
 }
@@ -475,20 +472,18 @@ bool BibToolBar::PreNotify( NotifyEvent& rNEvt )
 {
     bool bResult = true;
 
-    MouseNotifyEvent nSwitch=rNEvt.GetType();
-    if (pEdQuery && pEdQuery->has_focus() && nSwitch == MouseNotifyEvent::KEYINPUT)
+    NotifyEventType nSwitch=rNEvt.GetType();
+    if (pEdQuery && pEdQuery->has_focus() && nSwitch == NotifyEventType::KEYINPUT)
     {
         const vcl::KeyCode& aKeyCode=rNEvt.GetKeyEvent()->GetKeyCode();
         sal_uInt16 nKey = aKeyCode.GetCode();
         if(nKey == KEY_RETURN)
         {
-            Sequence<PropertyValue> aPropVal(2);
-            PropertyValue* pPropertyVal = const_cast<PropertyValue*>(aPropVal.getConstArray());
-            pPropertyVal[0].Name = "QueryText";
-            OUString aSelection = pEdQuery->get_text();
-            pPropertyVal[0].Value <<= aSelection;
-            pPropertyVal[1].Name="QueryField";
-            pPropertyVal[1].Value <<= aQueryField;
+            Sequence<PropertyValue> aPropVal
+            {
+                comphelper::makePropertyValue("QueryText", pEdQuery->get_text()),
+                comphelper::makePropertyValue("QueryField", aQueryField)
+            };
             SendDispatch(nTBC_BT_AUTOFILTER, aPropVal);
             return bResult;
         }
@@ -507,11 +502,10 @@ IMPL_LINK_NOARG( BibToolBar, SelHdl, weld::ComboBox&, void )
 
 IMPL_LINK_NOARG( BibToolBar, SendSelHdl, Timer*, void )
 {
-    Sequence<PropertyValue> aPropVal(1);
-    PropertyValue* pPropertyVal = const_cast<PropertyValue*>(aPropVal.getConstArray());
-    pPropertyVal[0].Name = "DataSourceName";
-    OUString aEntry( MnemonicGenerator::EraseAllMnemonicChars( pLbSource->get_active_text() ) );
-    pPropertyVal[0].Value <<= aEntry;
+    Sequence<PropertyValue> aPropVal
+    {
+        comphelper::makePropertyValue("DataSourceName", MnemonicGenerator::EraseAllMnemonicChars( pLbSource->get_active_text() ))
+    };
     SendDispatch(nTBC_SOURCE, aPropVal);
 }
 
@@ -535,13 +529,11 @@ IMPL_LINK_NOARG(BibToolBar, MenuHdl, ToolBox*, void)
         xPopupMenu->set_active(sId, true);
         sSelMenuItem = sId;
         aQueryField = MnemonicGenerator::EraseAllMnemonicChars(xPopupMenu->get_label(sId));
-        Sequence<PropertyValue> aPropVal(2);
-        PropertyValue* pPropertyVal = const_cast<PropertyValue*>(aPropVal.getConstArray());
-        pPropertyVal[0].Name = "QueryText";
-        OUString aSelection = pEdQuery->get_text();
-        pPropertyVal[0].Value <<= aSelection;
-        pPropertyVal[1].Name="QueryField";
-        pPropertyVal[1].Value <<= aQueryField;
+        Sequence<PropertyValue> aPropVal
+        {
+            comphelper::makePropertyValue("QueryText", pEdQuery->get_text()),
+            comphelper::makePropertyValue("QueryField", aQueryField)
+        };
         SendDispatch(nTBC_BT_AUTOFILTER, aPropVal);
     }
 

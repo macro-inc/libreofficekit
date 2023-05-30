@@ -20,7 +20,6 @@
 
 #include <sfx2/signaturestate.hxx>
 #include <vcl/weld.hxx>
-#include <memory>
 
 class SfxObjectShell;
 
@@ -40,7 +39,6 @@ namespace basctl
             which does not support being signed, the DocumentSignature instance is invalid afterwards.
         */
         explicit DocumentSignature (ScriptDocument const&);
-        ~DocumentSignature();
 
         /** determines whether the instance is valid
 

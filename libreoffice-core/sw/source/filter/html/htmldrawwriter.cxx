@@ -72,8 +72,7 @@ void SwHTMLWriter::GetEEAttrsFromDrwObj( SfxItemSet& rItemSet,
     while( nEEWhich )
     {
         const SfxPoolItem *pEEItem;
-        bool bSet = SfxItemState::SET == rObjItemSet.GetItemState( nEEWhich, false,
-                                                              &pEEItem );
+        bool bSet = SfxItemState::SET == aIter.GetItemState( false, &pEEItem );
 
         sal_uInt16 nSwWhich = 0;
         switch( nEEWhich )
@@ -250,12 +249,16 @@ Writer& OutHTML_DrawFrameFormatAsMarquee( Writer& rWrt,
             rItemSet.Get(XATTR_FILLCOLOR).GetColorValue();
 
         sOut.append(" " OOO_STRING_SVTOOLS_HTML_O_bgcolor "=");
-        rWrt.Strm().WriteOString( sOut.makeStringAndClear() );
+        rWrt.Strm().WriteOString( sOut );
+        sOut.setLength(0);
         HTMLOutFuncs::Out_Color( rWrt.Strm(), rFillColor );
     }
 
     if (!sOut.isEmpty())
-        rWrt.Strm().WriteOString( sOut.makeStringAndClear() );
+    {
+        rWrt.Strm().WriteOString( sOut );
+        sOut.setLength(0);
+    }
 
     // and now ALIGN, HSPACE and VSPACE
     HtmlFrmOpts nFrameFlags = HTML_FRMOPTS_MARQUEE;
@@ -273,10 +276,9 @@ Writer& OutHTML_DrawFrameFormatAsMarquee( Writer& rWrt,
     aOutliner.SetText( *pOutlinerParaObj );
     OUString aText( aOutliner.GetText( aOutliner.GetParagraph(0),
                                      aOutliner.GetParagraphCount() ) );
-    HTMLOutFuncs::Out_String( rWrt.Strm(), aText,
-                                rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+    HTMLOutFuncs::Out_String( rWrt.Strm(), aText );
 
-    HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), OStringConcatenation(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_marquee), false );
+    HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_marquee), false );
 
     if( !aEndTags.isEmpty() )
         rWrt.Strm().WriteOString( aEndTags );

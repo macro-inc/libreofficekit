@@ -17,18 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-
-/**************************************************************************
-                                TODO
- **************************************************************************
-
- *************************************************************************/
 #include <ucbhelper/interactionrequest.hxx>
 
 #include <rtl/ref.hxx>
 #include <osl/diagnose.h>
 #include <cppuhelper/typeprovider.hxx>
 #include <cppuhelper/queryinterface.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ucbhelper;
@@ -49,8 +44,8 @@ struct InteractionRequest_Impl
             css::task::XInteractionContinuation > > m_aContinuations;
 
     InteractionRequest_Impl() {}
-    explicit InteractionRequest_Impl( const uno::Any & rRequest )
-    : m_aRequest( rRequest ) {}
+    explicit InteractionRequest_Impl( uno::Any aRequest )
+    : m_aRequest(std::move( aRequest )) {}
 };
 
 }

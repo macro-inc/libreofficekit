@@ -34,7 +34,7 @@
 #include <com/sun/star/util/XModeChangeListener.hpp>
 #include <com/sun/star/util/XCloseListener.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
-#include <com/sun/star/frame/XController.hpp>
+#include <com/sun/star/frame/XController2.hpp>
 #include <com/sun/star/frame/XLayoutManagerListener.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
@@ -88,12 +88,13 @@ class DrawModelWrapper;
 class DrawViewWrapper;
 class ReferenceSizeProvider;
 class ViewElementListProvider;
+class Diagram;
 
 enum ChartDrawMode { CHARTDRAW_INSERT, CHARTDRAW_SELECT };
 
 
-class ChartController   : public ::cppu::WeakImplHelper <
-         css::frame::XController   //comprehends XComponent (required interface)
+class ChartController final : public ::cppu::WeakImplHelper <
+         css::frame::XController2   //comprehends XComponent (css::frame::XController is required interface)
         ,css::frame::XDispatchProvider     //(required interface)
         ,css::view::XSelectionSupplier     //(optional interface)
         ,css::ui::XContextMenuInterception //(optional interface)
@@ -109,7 +110,7 @@ class ChartController   : public ::cppu::WeakImplHelper <
 {
 public:
     ChartController() = delete;
-    explicit ChartController(css::uno::Reference< css::uno::XComponentContext > const & xContext);
+    explicit ChartController(css::uno::Reference< css::uno::XComponentContext > xContext);
     virtual ~ChartController() override;
 
     OUString GetContextName();
@@ -140,6 +141,12 @@ public:
 
     virtual sal_Bool SAL_CALL
         suspend( sal_Bool bSuspend ) override;
+
+    // css::frame::XController2
+    virtual css::uno::Reference<css::awt::XWindow> SAL_CALL getComponentWindow() override;
+    virtual OUString SAL_CALL getViewControllerName() override;
+    virtual css::uno::Sequence<css::beans::PropertyValue> SAL_CALL getCreationArguments() override;
+    virtual css::uno::Reference<css::ui::XSidebarProvider> SAL_CALL getSidebar() override;
 
     // css::lang::XComponent (base of XController)
     virtual void SAL_CALL
@@ -336,24 +343,25 @@ public:
 
     css::uno::Reference<css::uno::XInterface> const & getChartView() const;
 
+    rtl::Reference<::chart::ChartModel> getChartModel();
+    rtl::Reference<::chart::Diagram> getFirstDiagram();
+
 private:
     class TheModel : public salhelper::SimpleReferenceObject
     {
         public:
-            explicit TheModel( const css::uno::Reference<
-                        css::frame::XModel > & xModel );
+            explicit TheModel( rtl::Reference<::chart::ChartModel> xModel );
 
             virtual ~TheModel() override;
 
             void        addListener( ChartController* pController );
             void        removeListener(  ChartController* pController );
             void        tryTermination();
-            const css::uno::Reference< css::frame::XModel >&
+            const rtl::Reference<::chart::ChartModel>&
                         getModel() const { return m_xModel;}
 
         private:
-            css::uno::Reference< css::frame::XModel >     m_xModel;
-            css::uno::Reference< css::util::XCloseable >  m_xCloseable;
+            rtl::Reference<::chart::ChartModel>     m_xModel;
 
             //the ownership between model and controller is not clear at first
             //each controller might consider himself as owner of the model first
@@ -502,11 +510,11 @@ private:
     void executeDispatch_LOKSetTextSelection(int nType, int nX, int nY);
     void executeDispatch_LOKPieSegmentDragging(int nOffset);
     void executeDispatch_FillColor(sal_uInt32 nColor);
-    void executeDispatch_FillGradient(OUString sJSONGradient);
+    void executeDispatch_FillGradient(std::u16string_view sJSONGradient);
     void executeDispatch_LineColor(sal_uInt32 nColor);
     void executeDispatch_LineWidth(sal_uInt32 nWidth);
 
-    void sendPopupRequest(OUString const & rCID, tools::Rectangle aRectangle);
+    void sendPopupRequest(std::u16string_view rCID, tools::Rectangle aRectangle);
 
     void impl_ShapeControllerDispatch( const css::util::URL& rURL,
         const css::uno::Sequence< css::beans::PropertyValue >& rArgs );
@@ -534,7 +542,7 @@ private:
     /// @return </sal_True>, if resize/move was successful
     bool impl_moveOrResizeObject(
         const OUString & rCID, eMoveOrResizeType eType, double fAmountLogicX, double fAmountLogicY );
-    bool impl_DragDataPoint( const OUString & rCID, double fOffset );
+    bool impl_DragDataPoint( std::u16string_view rCID, double fOffset );
 
     static const o3tl::sorted_vector< OUString >& impl_getAvailableCommands();
 

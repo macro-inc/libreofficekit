@@ -25,6 +25,7 @@
 
 #include <com/sun/star/frame/CommandGroup.hpp>
 #include <o3tl/unsafe_downcast.hxx>
+#include <o3tl/string_view.hxx>
 #include <vcl/svapp.hxx>
 #include <svl/itempool.hxx>
 #include <editeng/eeitem.hxx>
@@ -101,7 +102,7 @@ void DrawCommandDispatch::setAttributes( SdrObject* pObj )
 
     DrawModelWrapper* pDrawModelWrapper = m_pChartController->GetDrawModelWrapper();
     DrawViewWrapper* pDrawViewWrapper = m_pChartController->GetDrawViewWrapper();
-    if ( !(pDrawModelWrapper && pDrawViewWrapper && pDrawViewWrapper->GetCurrentObjIdentifier() == OBJ_CUSTOMSHAPE) )
+    if ( !(pDrawModelWrapper && pDrawViewWrapper && pDrawViewWrapper->GetCurrentObjIdentifier() == SdrObjKind::CustomShape) )
         return;
 
     bool bAttributesAppliedFromGallery = false;
@@ -257,7 +258,7 @@ FeatureState DrawCommandDispatch::getState( const OUString& rCommand )
 void DrawCommandDispatch::execute( const OUString& rCommand, const Sequence< beans::PropertyValue>& rArgs )
 {
     ChartDrawMode eDrawMode = CHARTDRAW_SELECT;
-    SdrObjKind eKind = OBJ_NONE;
+    SdrObjKind eKind = SdrObjKind::NONE;
 
     sal_uInt16 nFeatureId = 0;
     OUString aBaseCommand;
@@ -274,45 +275,45 @@ void DrawCommandDispatch::execute( const OUString& rCommand, const Sequence< bea
         case COMMAND_ID_OBJECT_SELECT:
             {
                 eDrawMode = CHARTDRAW_SELECT;
-                eKind = OBJ_NONE;
+                eKind = SdrObjKind::NONE;
             }
             break;
         case COMMAND_ID_DRAW_LINE:
         case COMMAND_ID_LINE_ARROW_END:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_LINE;
+                eKind = SdrObjKind::Line;
             }
             break;
         case COMMAND_ID_DRAW_RECT:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_RECT;
+                eKind = SdrObjKind::Rectangle;
             }
             break;
         case COMMAND_ID_DRAW_ELLIPSE:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_CIRC;
+                eKind = SdrObjKind::CircleOrEllipse;
             }
             break;
         case COMMAND_ID_DRAW_FREELINE_NOFILL:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_FREELINE;
+                eKind = SdrObjKind::FreehandLine;
             }
             break;
         case COMMAND_ID_DRAW_TEXT:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_TEXT;
+                eKind = SdrObjKind::Text;
                 bCreate = true;
             }
             break;
         case COMMAND_ID_DRAW_CAPTION:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_CAPTION;
+                eKind = SdrObjKind::Caption;
             }
             break;
         case COMMAND_ID_DRAWTBX_CS_BASIC:
@@ -323,13 +324,13 @@ void DrawCommandDispatch::execute( const OUString& rCommand, const Sequence< bea
         case COMMAND_ID_DRAWTBX_CS_STAR:
             {
                 eDrawMode = CHARTDRAW_INSERT;
-                eKind = OBJ_CUSTOMSHAPE;
+                eKind = SdrObjKind::CustomShape;
             }
             break;
         default:
             {
                 eDrawMode = CHARTDRAW_SELECT;
-                eKind = OBJ_NONE;
+                eKind = SdrObjKind::NONE;
             }
             break;
     }
@@ -361,11 +362,11 @@ void DrawCommandDispatch::execute( const OUString& rCommand, const Sequence< bea
     if ( eDrawMode != CHARTDRAW_INSERT )
         return;
 
-    SdrObject* pObj = createDefaultObject( nFeatureId );
+    rtl::Reference<SdrObject> pObj = createDefaultObject( nFeatureId );
     if ( pObj )
     {
         SdrPageView* pPageView = pDrawViewWrapper->GetSdrPageView();
-        if (pDrawViewWrapper->InsertObjectAtView(pObj, *pPageView))
+        if (pDrawViewWrapper->InsertObjectAtView(pObj.get(), *pPageView))
             m_pChartController->SetAndApplySelection(Reference<drawing::XShape>(pObj->getUnoShape(), uno::UNO_QUERY));
         if ( nFeatureId == COMMAND_ID_DRAW_TEXT )
         {
@@ -401,9 +402,9 @@ void DrawCommandDispatch::setInsertObj(SdrObjKind eObj)
     }
 }
 
-SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
+rtl::Reference<SdrObject> DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
 {
-    SdrObject* pObj = nullptr;
+    rtl::Reference<SdrObject> pObj;
     DrawViewWrapper* pDrawViewWrapper = ( m_pChartController ? m_pChartController->GetDrawViewWrapper() : nullptr );
     DrawModelWrapper* pDrawModelWrapper = ( m_pChartController ? m_pChartController->GetDrawModelWrapper() : nullptr );
 
@@ -434,7 +435,7 @@ SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
                     case COMMAND_ID_DRAW_LINE:
                     case COMMAND_ID_LINE_ARROW_END:
                         {
-                            if ( auto const pathObj = dynamic_cast<SdrPathObj*>( pObj) )
+                            if ( auto const pathObj = dynamic_cast<SdrPathObj*>( pObj.get()) )
                             {
                                 Point aStart = aRect.TopLeft();
                                 Point aEnd = aRect.BottomRight();
@@ -451,7 +452,7 @@ SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
                         break;
                     case COMMAND_ID_DRAW_FREELINE_NOFILL:
                         {
-                            if ( auto const pathObj = dynamic_cast<SdrPathObj*>( pObj) )
+                            if ( auto const pathObj = dynamic_cast<SdrPathObj*>( pObj.get()) )
                             {
                                 basegfx::B2DPolygon aInnerPoly;
                                 aInnerPoly.append( basegfx::B2DPoint( aRect.Left(), aRect.Bottom() ) );
@@ -472,7 +473,7 @@ SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
                     case COMMAND_ID_DRAW_TEXT:
                     case COMMAND_ID_DRAW_TEXT_VERTICAL:
                         {
-                            if ( SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>( pObj) )
+                            if ( SdrTextObj* pTextObj = DynCastSdrTextObj( pObj.get()) )
                             {
                                 pTextObj->SetLogicRect( aRect );
                                 bool bVertical = ( nID == COMMAND_ID_DRAW_TEXT_VERTICAL );
@@ -492,7 +493,7 @@ SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
                     case COMMAND_ID_DRAW_CAPTION:
                     case COMMAND_ID_DRAW_CAPTION_VERTICAL:
                         {
-                            if ( SdrCaptionObj* pCaptionObj = dynamic_cast<SdrCaptionObj*>( pObj) )
+                            if ( SdrCaptionObj* pCaptionObj = dynamic_cast<SdrCaptionObj*>( pObj.get()) )
                             {
                                 bool bIsVertical( nID == COMMAND_ID_DRAW_CAPTION_VERTICAL );
                                 pCaptionObj->SetVerticalWriting( bIsVertical );
@@ -513,7 +514,7 @@ SdrObject* DrawCommandDispatch::createDefaultObject( const sal_uInt16 nID )
                         {
                             pObj->SetLogicRect( aRect );
                             SfxItemSet aSet( pDrawModelWrapper->GetItemPool() );
-                            setAttributes( pObj );
+                            setAttributes( pObj.get() );
                             pObj->SetMergedItemSet( aSet );
                         }
                         break;
@@ -533,9 +534,9 @@ bool DrawCommandDispatch::parseCommandURL( const OUString& rCommandURL, sal_uInt
     OUString aBaseCommand;
     OUString aType;
 
-    sal_Int32 nIndex = 1;
-    OUString aToken = rCommandURL.getToken( 0, '.', nIndex );
-    if ( nIndex == -1 || aToken.isEmpty() )
+    sal_Int32 nIndex = std::min(sal_Int32(1), rCommandURL.getLength());
+    std::u16string_view aToken = o3tl::getToken(rCommandURL, 0, '.', nIndex );
+    if ( nIndex == -1 || aToken.empty() )
     {
         aBaseCommand = rCommandURL;
         SupportedFeatures::const_iterator aIter = m_aSupportedFeatures.find( aBaseCommand );

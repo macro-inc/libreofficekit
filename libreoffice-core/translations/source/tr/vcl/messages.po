@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-02-02 13:38+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-02-28 22:08+0000\n"
 "Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
-"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/vclmessages/tr/>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-7-5/vclmessages/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1554881042.000000\n"
 
 #. k5jTM
@@ -906,7 +906,7 @@ msgstr "İşlemci süreçleri: "
 #: vcl/inc/strings.hrc:82
 msgctxt "SV_APP_OSVERSION"
 msgid "OS: "
-msgstr "İşletim Sistemi:"
+msgstr "İşletim Sistemi: "
 
 #. Yqrwo
 #: vcl/inc/strings.hrc:83
@@ -1380,11 +1380,11 @@ msgctxt "STR_FONT_FEATURE_ID_FALT"
 msgid "Final Glyph on Line Alternates"
 msgstr "Satırdaki Son Glif Değişir"
 
-#. rKM4e
+#. q3jvz
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:43
 msgctxt "STR_FONT_FEATURE_ID_FRAC"
-msgid "Fraction style:"
-msgstr "Kesir biçemi:"
+msgid "Fraction style"
+msgstr "Kesir biçemi"
 
 #. FA4Qr
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:44
@@ -1722,6 +1722,12 @@ msgctxt "STR_FONT_FEATURE_ID_ZERO"
 msgid "Slashed Zero"
 msgstr "Çizgili Sıfır"
 
+#. 8jmFo
+#: vcl/inc/font/OpenTypeFeatureStrings.hrc:100
+msgctxt "STR_FONT_FEATURE_PARAM_NONE"
+msgid "None"
+msgstr "Hiçbiri"
+
 #. TxdMF
 #: vcl/uiconfig/ui/aboutbox.ui:74
 msgctxt "aboutdialog|buildIdLink"
@@ -1835,6 +1841,62 @@ msgstr "Varsayılan yazıcı bulunamadı."
 msgctxt "errornoprinterdialog|ErrorNoPrinterDialog"
 msgid "Please choose a printer and try again."
 msgstr "Lütfen bir yazıcı seçin ve tekrar deneyin."
+
+#. puBNZ
+#: vcl/uiconfig/ui/openlockedquerybox.ui:8
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Document in Use"
+msgstr "Kullanımdaki Belge"
+
+#. 4ZftN
+#: vcl/uiconfig/ui/openlockedquerybox.ui:76
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark image"
+msgstr "Soru işareti resmi"
+
+#. LCYux
+#: vcl/uiconfig/ui/openlockedquerybox.ui:77
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark icon for dialog box."
+msgstr "İletişim penceresi için soru işareti simgesi"
+
+#. j4NGP
+#: vcl/uiconfig/ui/openlockedquerybox.ui:100
+msgctxt "openlockedquerybox|messagetext"
+msgid "This file has been locked by another user."
+msgstr "Bu dosya başka bir kullanıcı tarafından kilitlenmiş."
+
+#. sq7go
+#: vcl/uiconfig/ui/openlockedquerybox.ui:124
+msgctxt "openlockedquerybox|ReadOnlyMessage"
+msgid ""
+"You can open it read only  and\n"
+"receive a notification if ready."
+msgstr ""
+"Salt okunur olarak açabilir ve\n"
+"hazırsa bir bildirim alabilirsiniz."
+
+#. nFBTF
+#: vcl/uiconfig/ui/openlockedquerybox.ui:142
+msgctxt "openlockedquerybox|OpenCopyMessage"
+msgid ""
+"You can open a copy on your\n"
+"local system."
+msgstr ""
+"Yerel sisteminizde bir kopya\n"
+"açabilirsiniz."
+
+#. W3Sbv
+#: vcl/uiconfig/ui/openlockedquerybox.ui:178
+msgctxt "openlockedquerybox|expandertext"
+msgid "_More Details"
+msgstr "_Daha Fazla Ayrıntı"
+
+#. jEGxc
+#: vcl/uiconfig/ui/openlockedquerybox.ui:264
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Displays information about locked files and further steps to take when opening a locked file."
+msgstr "Kilitli dosyalarla ilgili bilgileri ve kilitli bir dosyayı açarken atılacak diğer adımları görüntüler."
 
 #. DUavz
 #: vcl/uiconfig/ui/printdialog.ui:64
@@ -2110,7 +2172,7 @@ msgstr "Sıra:"
 #: vcl/uiconfig/ui/printdialog.ui:781
 msgctxt "printdialog|reverseorder"
 msgid "Print in _reverse order"
-msgstr "Yazdırmayı ters sayfa sırasında yap"
+msgstr "Yazdırmayı _ters sayfa sırasında yap"
 
 #. svd2Q
 #: vcl/uiconfig/ui/printdialog.ui:790

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-04-11 15:28+0200\n"
-"PO-Revision-Date: 2022-07-15 17:18+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-05 06:41+0000\n"
 "Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicpython/de/>\n"
 "Language: de\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1566103429.000000\n"
 
 #. naSFZ
@@ -34,32 +34,32 @@ msgctxt ""
 msgid "<bookmark_value>macros;Python scripts</bookmark_value>        <bookmark_value>Python;macros</bookmark_value>        <bookmark_value>scripts;Python</bookmark_value>"
 msgstr "<bookmark_value>Makros; Python-Skripte</bookmark_value><bookmark_value>Python; Makros</bookmark_value><bookmark_value>Skripte; Python</bookmark_value>"
 
-#. vAoRU
+#. KSaCr
 #: main0000.xhp
 msgctxt ""
 "main0000.xhp\n"
 "hd_id3154232\n"
 "help.text"
-msgid "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\" name=\"mainpython\">%PRODUCTNAME Python Scripts Help</link></variable>"
-msgstr "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\" name=\"mainpython\">%PRODUCTNAME Python-Skripte Hilfe</link></variable>"
+msgid "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\">%PRODUCTNAME Python Scripts Help</link></variable>"
+msgstr "<variable id=\"pythonscriptshelp\"><link href=\"text/sbasic/python/main0000.xhp\">%PRODUCTNAME Python-Skripte Hilfe</link></variable>"
 
-#. snE38
+#. nFipH
 #: main0000.xhp
 msgctxt ""
 "main0000.xhp\n"
 "par_id3153894\n"
 "help.text"
-msgid "%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href=\"https://api.libreoffice.org/\" name=\"api.libreoffice.org\">https://api.libreoffice.org</link>"
-msgstr "%PRODUCTNAME bietet eine Anwendungsprogrammierschnittstelle (Application Programming Interface, API), die über das $[officename] Software Development Kit (SDK) eine Steuerung der $[officename]-Komponenten aus verschiedenen Programmiersprachen ermöglicht. Weitere Informationen zur $[officename]-API und dem Software Development Kit finden Sie unter <link href=\"https://api.libreoffice.org/\" name=\"api.libreoffice.org\">https://api.libreoffice.org</link> (englisch)."
+msgid "%PRODUCTNAME provides an Application Programming Interface (API) that allows controlling the $[officename] components with different programming languages by using the $[officename] Software Development Kit (SDK). For more information about the $[officename] API and the Software Development Kit, visit <link href=\"https://api.libreoffice.org/\">https://api.libreoffice.org</link>"
+msgstr "%PRODUCTNAME bietet eine Anwendungsprogrammierschnittstelle (Application Programming Interface, API), die über das $[officename] Software Development Kit (SDK) eine Steuerung der $[officename]-Komponenten aus verschiedenen Programmiersprachen ermöglicht. Weitere Informationen zur $[officename]-API und dem Software Development Kit finden Sie unter <link href=\"https://api.libreoffice.org/\">https://api.libreoffice.org</link> (englisch)."
 
-#. 9EUoJ
+#. yEBNs
 #: main0000.xhp
 msgctxt ""
 "main0000.xhp\n"
 "par_id3147226\n"
 "help.text"
-msgid "This help section explains the most common Python script functions for %PRODUCTNAME. For more in-depth information please refer to the <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"wiki.documentfoundation.org PYTHON Guide\">Designing & Developing Python Applications</link> on the Wiki."
-msgstr "Dieser Hilfeabschnitt erläutert die geläufigsten Funktionen für Python-Skripte von %PRODUCTNAME. Für ausführlichere Informationen lesen Sie bitte <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"wiki.documentfoundation.org PYTHON Guide\">Designing & Developing Python Applications</link> im Wiki."
+msgid "This help section explains the most common Python script functions for %PRODUCTNAME. For more in-depth information please refer to the <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> on the Wiki."
+msgstr "Dieser Hilfeabschnitt erläutert die geläufigsten Funktionen für Python-Skripte von %PRODUCTNAME. Für ausführlichere Informationen lesen Sie bitte <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> im Wiki."
 
 #. FjaiD
 #: main0000.xhp
@@ -86,7 +86,43 @@ msgctxt ""
 "par_id131568902936659\n"
 "help.text"
 msgid "The %PRODUCTNAME scripting framework for Python is optional on some GNU/Linux distributions. If it is installed, selecting <menuitem>Tools - Macros - Run Macro</menuitem> and checking <literal>Application Macros</literal> for the presence of <literal>HelloWorld – HelloWorldPython</literal> macro is sufficient. If absent, please refer to your distribution documentation in order to install the %PRODUCTNAME scripting framework for Python."
-msgstr ""
+msgstr "Das %PRODUCTNAME \"Scripting Framework\" für Python ist für einige GNU/Linux-Distributionen optional. Wenn es installiert ist, ist es ausreichend, wenn Sie <menuitem>Extras – Makros – Makro ausführen…</menuitem> wählen und prüfen, ob unter <literal>Anwendungsmakros</literal>, das Makro <literal>HelloWorld – HelloWorldPython</literal> vorhanden ist. Wenn nicht, lesen Sie bitte in der Dokumentation ihrer Distribution nach, wie das %PRODUCTNAME \"Scripting Framework\" für Python installiert wird."
+
+#. STRqN
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"hd_id901655365903313\n"
+"help.text"
+msgid "%PRODUCTNAME Python Modules"
+msgstr "%PRODUCTNAME Python-Module"
+
+#. dtVM5
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id21655367848705\n"
+"help.text"
+msgid "<link href=\"text/sbasic/python/python_screen.xhp\"><literal>msgbox</literal> module</link>"
+msgstr "<link href=\"text/sbasic/python/python_screen.xhp\">Modul <literal>msgbox</literal></link>"
+
+#. vzq4f
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id801655368030968\n"
+"help.text"
+msgid "<link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\"><literal>scriptforge</literal> module</link>"
+msgstr "<link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">Modul <literal>scriptforge</literal></link>"
+
+#. LN2JT
+#: main0000.xhp
+msgctxt ""
+"main0000.xhp\n"
+"par_id12655637848750\n"
+"help.text"
+msgid "<link href=\"text/sbasic/python/python_programming.xhp#uno\"><literal>uno</literal> module</link>"
+msgstr "<link href=\"text/sbasic/python/python_programming.xhp#uno\">Modul <literal>uno</literal></link>"
 
 #. naZBV
 #: python_2_basic.xhp
@@ -106,14 +142,14 @@ msgctxt ""
 msgid "<bookmark_value>Python;Calling Basic</bookmark_value> <bookmark_value>ParamArray</bookmark_value>"
 msgstr "<bookmark_value>Python; Basic aufrufen</bookmark_value><bookmark_value>ParamArray</bookmark_value>"
 
-#. rGfKE
+#. GAu3K
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0331\n"
 "help.text"
-msgid "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Calling Basic macros from Python\">Calling Basic Macros from Python</link></variable>"
-msgstr "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Basic Makros aus Python aufrufen\">Basic Makros aus Python aufrufen</link></variable>"
+msgid "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\">Calling Basic Macros from Python</link></variable>"
+msgstr "<variable id=\"py2ba_h1\"><link href=\"text/sbasic/python/python_2_basic.xhp\">Basic Makros aus Python aufrufen</link></variable>"
 
 #. XzJcA
 #: python_2_basic.xhp
@@ -169,14 +205,14 @@ msgctxt ""
 msgid "It is recommended to have knowledge of Python standard modules and %PRODUCTNAME API features prior to perform inter-language calls from Python to Basic, JavaScript or any other script engine."
 msgstr "Es wird empfohlen, sich mit den Python-Standardmodulen und den %PRODUCTNAME-API-Funktionen vertraut zu machen, bevor Sie Sprachaufrufe von Python an Basic, JavaScript oder eine andere Skript-Engine ausführen."
 
-#. Sffwq
+#. raHqP
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0338\n"
 "help.text"
-msgid "When running Python scripts from an Integrated Development Environment (IDE), the %PRODUCTNAME-embedded Basic engine may be absent. Avoid Python-to-%PRODUCTNAME Basic calls in such contexts. However Python environment and Universal Networks Objects (UNO) are fully available. Refer to <link href=\"text/sbasic/python/python_ide.xhp\" name=\"Setting Up an Integrated IDE for Python\">Setting Up an Integrated IDE for Python</link> for more information."
-msgstr "Beim Ausführen von Python-Skripten in einer IDE (Integrated Development Environment) fehlt möglicherweise die eingebettete %PRODUCTNAME Basic-Engine. Vermeiden Sie in einem solchen Kontext Aufrufe von Python an %PRODUCTNAME Basic. Die Python-Umgebung und das Universal Networks Objects (UNO) sind jedoch vollständig verfügbar. Weitere Informationen finden Sie unter <link href=\"text/sbasic/python/python_ide.xhp\" name=\"Setting Up an Integrated IDE for Python\">Einrichten einer integrierten IDE für Python</link>."
+msgid "When running Python scripts from an Integrated Development Environment (IDE), the %PRODUCTNAME-embedded Basic engine may be absent. Avoid Python-to-%PRODUCTNAME Basic calls in such contexts. However Python environment and Universal Networks Objects (UNO) are fully available. Refer to <link href=\"text/sbasic/python/python_ide.xhp\">Setting Up an Integrated IDE for Python</link> for more information."
+msgstr "Beim Ausführen von Python-Skripten in einer IDE (Integrated Development Environment) fehlt möglicherweise die eingebettete %PRODUCTNAME Basic-Engine. Vermeiden Sie in einem solchen Kontext Aufrufe von Python an %PRODUCTNAME Basic. Die Python-Umgebung und das Universal Networks Objects (UNO) sind jedoch vollständig verfügbar. Weitere Informationen finden Sie unter <link href=\"text/sbasic/python/python_ide.xhp\">Einrichten einer integrierten IDE für Python</link>."
 
 #. NcuDF
 #: python_2_basic.xhp
@@ -187,14 +223,14 @@ msgctxt ""
 msgid "Retrieving %PRODUCTNAME Basic Scripts"
 msgstr "%PRODUCTNAME Basic-Skripte abrufen"
 
-#. yiTqz
+#. yS5os
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0340\n"
 "help.text"
-msgid "%PRODUCTNAME Basic macros can be personal, shared, or embedded in documents. In order to execute them, Python run time needs to be provided with Basic macro locations. Implementing the <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"XScriptProvider interface\">com.sun.star.script.provider.XScriptProvider</link> interface allows the retrieval of executable scripts:"
-msgstr "Grundlegende %PRODUCTNAME Makros können privat, gemeinsam oder in Dokumente eingebettet sein. Um sie auszuführen, muss die Python-Runtime mit Basic-Makro-Positionen versehen werden. Das Implementieren der Schnittstelle <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"XScriptProvider interface\">com.sun.star.script.provider.XScriptProvider</link> ermöglicht den Abruf von ausführbaren Skripten:"
+msgid "%PRODUCTNAME Basic macros can be personal, shared, or embedded in documents. In order to execute them, Python run time needs to be provided with Basic macro locations. Implementing the <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScriptProvider</link> interface allows the retrieval of executable scripts:"
+msgstr "Grundlegende %PRODUCTNAME Makros können privat, gemeinsam oder in Dokumente eingebettet sein. Um sie auszuführen, muss die Python-Runtime mit Basic-Makro-Positionen versehen werden. Das Implementieren der Schnittstelle <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScriptProvider</link> ermöglicht den Abruf von ausführbaren Skripten:"
 
 #. w4UAs
 #: python_2_basic.xhp
@@ -232,14 +268,14 @@ msgctxt ""
 msgid "<bookmark_value>API;script.provider.XScript : Executing Basic scripts</bookmark_value>"
 msgstr "<bookmark_value>API; script.provider.XScript: Basic-Skripte ausführen</bookmark_value>"
 
-#. 7BfDh
+#. cHSHW
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0364\n"
 "help.text"
-msgid "The %PRODUCTNAME Software Development Kit (SDK) documentation for <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\" name=\"XScript interface\">com.sun.star.script.provider.XScript</link> interface details the calling convention for inter-language calls. Invocation of functions requires three arrays:"
-msgstr "In der %PRODUCTNAME Software Development Kit (SDK)-Dokumentation für die <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\" name=\"XScript interface\">com.sun.star.script.provider.XScript</link>-Schnittstelle wird die Aufrufkonvention für Sprachaufrufe beschrieben. Der Aufruf von Funktionen erfordert drei Arrays:"
+msgid "The %PRODUCTNAME Software Development Kit (SDK) documentation for <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\">com.sun.star.script.provider.XScript</link> interface details the calling convention for inter-language calls. Invocation of functions requires three arrays:"
+msgstr "In der %PRODUCTNAME Software Development Kit (SDK)-Dokumentation für die <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html#a11a551f5a2520f74c5109cd8c9f8c7b7\">com.sun.star.script.provider.XScript</link>-Schnittstelle wird die Aufrufkonvention für Sprachaufrufe beschrieben. Der Aufruf von Funktionen erfordert drei Arrays:"
 
 #. UDhtt
 #: python_2_basic.xhp
@@ -286,23 +322,23 @@ msgctxt ""
 msgid "Examples of Personal or Shared Scripts"
 msgstr "Beispiele für private oder gemeinsam genutzte Skripte"
 
-#. nyNGG
+#. Grgdj
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0373\n"
 "help.text"
-msgid "Examples in <link href=\"text/sbasic/python/python_screen.xhp\" name=\"Input/Output to Screen\">Input/Output to Screen</link> detail Python to Basic invocation calls. <link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Monitoring Document Events</link> illustrates the usage of *args Python idiom to print a variable number of parameters to <literal>Access2Base</literal> logging console dialog."
-msgstr "<link href=\"text/sbasic/python/python_screen.xhp\" name=\"Input/Output to Screen\">Ein-/Ausgabe auf dem Bildschirm</link> beschreiben die Aufrufe von Python zu Basic. <link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Überwachen von Dokumentereignissen</link> veranschaulicht die Verwendung der *args-Python-Sprache zum Drucken einer variablen Anzahl von Parametern in <literal>Access2Base</literal> im Dialog Protokollierungskonsole."
+msgid "Examples in <link href=\"text/sbasic/python/python_screen.xhp\">Input/Output to Screen</link> detail Python to Basic invocation calls. <link href=\"text/sbasic/python/python_document_events.xhp\">Monitoring Document Events</link> illustrates the usage of *args Python idiom to print a variable number of parameters to <literal>Access2Base</literal> logging console dialog."
+msgstr "<link href=\"text/sbasic/python/python_screen.xhp\">Ein-/Ausgabe auf dem Bildschirm</link> beschreiben die Aufrufe von Python zu Basic. <link href=\"text/sbasic/python/python_document_events.xhp\">Überwachen von Dokumentereignissen</link> veranschaulicht die Verwendung der *args-Python-Sprache zum Drucken einer variablen Anzahl von Parametern in <literal>Access2Base</literal> im Dialog Protokollierungskonsole."
 
-#. dt25D
+#. vPub5
 #: python_2_basic.xhp
 msgctxt ""
 "python_2_basic.xhp\n"
 "N0374\n"
 "help.text"
-msgid "At time of development you can interrupt Python script execution using <link href=\"https://berma.pagesperso-orange.fr/index2.html\" name=\"Xray extension\">Xray extension</link> in order to inspect properties and methods of UNO objects. The APSO extension debugger allows object introspection using either Xray either MRI extensions."
-msgstr "Zum Zeitpunkt der Entwicklung können Sie die Ausführung von Python-Skripten mithilfe der <link href=\"https://berma.pagesperso-orange.fr/index2.html\" name=\"Xray extension\">Erweiterung Xray</link> unterbrechen, um die Eigenschaften und Methoden von UNO-Objekten zu überprüfen. Der Debugger der APSO-Erweiterung ermöglicht die Inspektion von Objekten mit Röntgen- oder MRT-Erweiterungen."
+msgid "At time of development you can interrupt Python script execution using <link href=\"https://berma.pagesperso-orange.fr/index2.html\">Xray extension</link> in order to inspect properties and methods of UNO objects. The APSO extension debugger allows object introspection using either Xray either MRI extensions."
+msgstr "Zum Zeitpunkt der Entwicklung können Sie die Ausführung von Python-Skripten mithilfe der <link href=\"https://berma.pagesperso-orange.fr/index2.html\">Erweiterung Xray</link> unterbrechen, um die Eigenschaften und Methoden von UNO-Objekten zu überprüfen. Der Debugger der APSO-Erweiterung ermöglicht die Inspektion von Objekten mit Röntgen- oder MRT-Erweiterungen."
 
 #. F8dF9
 #: python_2_basic.xhp
@@ -394,23 +430,23 @@ msgctxt ""
 msgid "<bookmark_value>Python;dialogs</bookmark_value>        <bookmark_value>dialog box;Python</bookmark_value>        <bookmark_value>dialogs;Python</bookmark_value>"
 msgstr "<bookmark_value>Python; Dialoge</bookmark_value><bookmark_value>Dialoge; in Python</bookmark_value><bookmark_value>Dialoge; Python</bookmark_value>"
 
-#. rXdUF
+#. D6egS
 #: python_dialogs.xhp
 msgctxt ""
 "python_dialogs.xhp\n"
 "N0336\n"
 "help.text"
-msgid "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"command_name\">Opening a Dialog with Python</link></variable>"
-msgstr "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"command_name\">Einen Dialog mit Python öffnen</link></variable>"
+msgid "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\">Opening a Dialog with Python</link></variable>"
+msgstr "<variable id=\"pythondialog\"><link href=\"text/sbasic/python/python_dialogs.xhp\">Einen Dialog mit Python öffnen</link></variable>"
 
-#. MZJA9
+#. X8omL
 #: python_dialogs.xhp
 msgctxt ""
 "python_dialogs.xhp\n"
 "N0337\n"
 "help.text"
-msgid "%PRODUCTNAME static dialogs are created with the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog editor\">Dialog editor</link> and are stored in varying places according to their personal (My Macros), shared (Application Macros) or document-embedded nature. In reverse, dynamic dialogs are constructed at runtime, from Basic or Python scripts, or using any other <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME supported language</link> for that matter. Opening static dialogs with Python is illustrated herewith. Exception handling and internationalization are omitted for clarity."
-msgstr ""
+msgid "%PRODUCTNAME static dialogs are created with the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog editor</link> and are stored in varying places according to their personal (My Macros), shared (Application Macros) or document-embedded nature. In reverse, dynamic dialogs are constructed at runtime, from Basic or Python scripts, or using any other <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME supported language</link> for that matter. Opening static dialogs with Python is illustrated herewith. Exception handling and internationalization are omitted for clarity."
+msgstr "Statische Dialoge in %PRODUCTNAME werden mit dem <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog-Editor</link> erstellt und an verschiedenen Orten gespeichert, je nachdem, ob sie persönlich (Meine Makros), geteilt (Anwendungsmakros) oder in Dokumenten eingebettet sind. Umgekehrt werden dynamische Dialoge zur Laufzeit aus Basic- oder Python-Skripten oder unter Verwendung einer anderen von <link href=\"text/shared/guide/scripting.xhp\">%PRODUCTNAME unterstützten Sprache</link> erstellt. Das Öffnen von statischen Dialogen mit Python wird hiermit veranschaulicht. Ausnahmebehandlung und Internationalisierung sind aus Gründen der Übersichtlichkeit weggelassen."
 
 #. AbdfS
 #: python_dialogs.xhp
@@ -419,7 +455,7 @@ msgctxt ""
 "N0338\n"
 "help.text"
 msgid "My Macros or Application Macros dialogs"
-msgstr ""
+msgstr "Dialoge für Meine Makros oder Anwendungsmakros"
 
 #. pcUEy
 #: python_dialogs.xhp
@@ -484,14 +520,14 @@ msgctxt ""
 msgid "<bookmark_value>Basic;Monitoring Document Events</bookmark_value>         <bookmark_value>Python;Monitoring Document Events</bookmark_value>         <bookmark_value>Access2Base;Console</bookmark_value>         <bookmark_value>Access2Base;Trace</bookmark_value>         <bookmark_value>API;document.DocumentEvent: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventBroadcaster: Monitoring Document Event</bookmark_value>         <bookmark_value>API;document.XDocumentEventListener: Monitoring Document Event</bookmark_value>         <bookmark_value>API;lang.EventObject: Monitoring Document Event</bookmark_value>"
 msgstr "<bookmark_value>Basic; Dokumentereignisse überwachen</bookmark_value><bookmark_value>Python; Dokumentereignisse überwachen</bookmark_value><bookmark_value>Access2Base; Konsole</bookmark_value><bookmark_value>Access2Base; Trace</bookmark_value><bookmark_value>API; document.DocumentEvent: Dokumentereignis überwachen</bookmark_value><bookmark_value>API; document.XDocumentEventBroadcaster: Dokumentereignis überwachen</bookmark_value><bookmark_value>API; document.XDocumentEventListener: Dokumentereignis überwachen</bookmark_value><bookmark_value>API; lang.EventObject: Dokumentereignis überwachen</bookmark_value>"
 
-#. D6i78
+#. CXFbV
 #: python_document_events.xhp
 msgctxt ""
 "python_document_events.xhp\n"
 "N0527\n"
 "help.text"
-msgid "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Listening to Document Events</link></variable>"
-msgstr "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\" name=\"Monitoring Document Events\">Dokumentereignisse überwachen</link></variable>"
+msgid "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\">Listening to Document Events</link></variable>"
+msgstr "<variable id=\"pythonmonitor\"><link href=\"text/sbasic/python/python_document_events.xhp\">Dokumentereignisse überwachen</link></variable>"
 
 #. 9kSGW
 #: python_document_events.xhp
@@ -518,7 +554,7 @@ msgctxt ""
 "par_id461630582396782\n"
 "help.text"
 msgid "Control the processing of document save, document copy, print or mailmerge requests."
-msgstr ""
+msgstr "Steuern Sie die Verarbeitung von Dokumentenspeicher-, Dokumentkopier-, Druck- oder Seriendruckanforderungen."
 
 #. xrRHB
 #: python_document_events.xhp
@@ -538,14 +574,14 @@ msgctxt ""
 msgid "Import math Python packages before opening a Calc document. Release these packages when the document closes."
 msgstr "Importiert mathematische Python-Pakete vor dem Öffnen eines Calc-Dokuments. Gibt diese Pakete frei, wenn das Dokument geschlossen wird."
 
-#. bXprs
+#. MviLj
 #: python_document_events.xhp
 msgctxt ""
 "python_document_events.xhp\n"
 "N0528\n"
 "help.text"
-msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\" name=\"assigning macros to events\">assigning macros to events</link>, one can monitor events raised by %PRODUCTNAME documents. Application Programming Interface (API) broadcasters are responsible for calling event scripts. Unlike listeners that require to define all supported methods, even if unused, document monitors require only two methods next to hooked event scripts."
-msgstr "Neben dem <link href=\"text/sbasic/shared/01040000.xhp\" name=\"assigning macros to events\">Zuweisen von Makros zu Ereignissen</link> können Ereignisse überwacht werden, die von %PRODUCTNAME-Dokumenten ausgelöst werden. API-Sender (Application Programming Interface) sind für den Aufruf von Ereignisskripten verantwortlich. Im Gegensatz zu Empfängern, die alle unterstützten Methoden definieren müssen, benötigen Dokumentmonitore, auch wenn sie nicht verwendet werden, nur zwei Methoden neben verknüpften Ereignisskripten."
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\">assigning macros to events</link>, one can monitor events raised by %PRODUCTNAME documents. Application Programming Interface (API) broadcasters are responsible for calling event scripts. Unlike listeners that require to define all supported methods, even if unused, document monitors require only two methods next to hooked event scripts."
+msgstr "Neben dem <link href=\"text/sbasic/shared/01040000.xhp\">Zuweisen von Makros zu Ereignissen</link> können Ereignisse überwacht werden, die von %PRODUCTNAME-Dokumenten ausgelöst werden. API-Sender (Application Programming Interface) sind für den Aufruf von Ereignisskripten verantwortlich. Im Gegensatz zu Empfängern, die alle unterstützten Methoden definieren müssen, benötigen Dokumentmonitore, auch wenn sie nicht verwendet werden, nur zwei Methoden neben verknüpften Ereignisskripten."
 
 #. 6j5Bu
 #: python_document_events.xhp
@@ -563,7 +599,7 @@ msgctxt ""
 "N0530\n"
 "help.text"
 msgid "Monitoring is illustrated herewith for Basic and Python languages using object-oriented programming. Assigning <literal>OnLoad</literal> script, to the <menuitem>Open Document</menuitem> event, suffices to initiate and terminate document event monitoring. <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab is used to assign either scripts."
-msgstr ""
+msgstr "Die Überwachung wird für Basic- und Python-Sprachen unter Verwendung objektorientierter Programmierung veranschaulicht. Das Zuweisen des Skripts <literal>OnLoad</literal> zum Ereignis <menuitem>Open Document</menuitem> reicht aus, um die Dokumentereignis-Überwachung zu beginnen und zu beenden. Wählen Sie <menuitem>Extras – Anpassen…</menuitem> Register: <menuitem>Ereignisse</menuitem>, um Skripte zuzuweisen."
 
 #. KgWvt
 #: python_document_events.xhp
@@ -608,7 +644,7 @@ msgctxt ""
 "N0534\n"
 "help.text"
 msgid "<literal>OnLoad</literal> and <literal>OnUnload</literal> events can be used to respectively set and unset Python programs path. They are described as <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem>."
-msgstr ""
+msgstr "Die Ereignisse <literal>OnLoad</literal> und <literal>OnUnload</literal> können verwendet werden, um den Python-Programmpfad festzulegen beziehungsweise aufzuheben. Sie werden als <menuitem>Dokument öffnen</menuitem> und <menuitem>Dokument geschlossen</menuitem> bezeichnet."
 
 #. i7waD
 #: python_document_events.xhp
@@ -779,7 +815,7 @@ msgctxt ""
 "N0602\n"
 "help.text"
 msgid "listener = UiDocument()  # Initiates listening"
-msgstr ""
+msgstr "listener = UiDocument()  # Beginnt die Überwachung"
 
 #. CkJg4
 #: python_document_events.xhp
@@ -851,7 +887,7 @@ msgctxt ""
 "N0638\n"
 "help.text"
 msgid "''' Grab application-based Basic script '''"
-msgstr ""
+msgstr "''' Anwendungsbasiertes Basic-Skript abrufen '''"
 
 #. 2dfeg
 #: python_document_events.xhp
@@ -862,14 +898,14 @@ msgctxt ""
 msgid "Mind the misspelled <literal>documentEventOccured</literal> method that inherits a typo from %PRODUCTNAME Application Programming Interface (API)."
 msgstr "Beachten Sie die falsch geschriebene Methode <literal>documentEventOccured</literal>, die einen Tippfehler der %PRODUCTNAME API (Application Programming Interface) übernimmt."
 
-#. qNVD4
+#. notj8
 #: python_document_events.xhp
 msgctxt ""
 "python_document_events.xhp\n"
 "N0648\n"
 "help.text"
-msgid "<menuitem>Start application</menuitem> and <menuitem>Close application</menuitem> events can respectively be used to set and to unset Python path for user scripts or %PRODUCTNAME scripts. In a similar fashion, document based Python libraries or modules can be loaded and released using <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem> events. Refer to <link href=\"text/sbasic/python/python_import.xhp\" name=\"Importing Python Modules\">Importing Python Modules</link> for more information."
-msgstr ""
+msgid "<menuitem>Start application</menuitem> and <menuitem>Close application</menuitem> events can respectively be used to set and to unset Python path for user scripts or %PRODUCTNAME scripts. In a similar fashion, document based Python libraries or modules can be loaded and released using <menuitem>Open document</menuitem> and <menuitem>Document closed</menuitem> events. Refer to <link href=\"text/sbasic/python/python_import.xhp\">Importing Python Modules</link> for more information."
+msgstr "Mit den Ereignissen <menuitem>Anwendung starten</menuitem> und <menuitem>Anwendung schließen</menuitem> können Sie den Python-Pfad für Benutzerskripte oder %PRODUCTNAME-Skripte festlegen und deaktivieren. In ähnlicher Weise können dokumentbasierte Python-Bibliotheken oder -Module mit den Ereignissen <menuitem>Dokument öffnen</menuitem> und <menuitem>Dokument geschlossen</menuitem> geladen und freigegeben werden. Weitere Informationen finden Sie unter <link href=\"text/sbasic/python/python_import.xhp\">Importieren von Python-Modulen</link>."
 
 #. 8pHCg
 #: python_document_events.xhp
@@ -887,7 +923,7 @@ msgctxt ""
 "bm_id591622446367707\n"
 "help.text"
 msgid "<bookmark_value>API;GlobalScope.BasicLibraries</bookmark_value>        <bookmark_value>Tools;Strings</bookmark_value>"
-msgstr "<bookmark_value>API; GlobalScope.BasicLibraries</bookmark_value><bookmark_value>Werkzeuge; Zeichenketten</bookmark_value>"
+msgstr "<bookmark_value>API; GlobalScope.BasicLibraries</bookmark_value><bookmark_value>Werkzeuge; Zeichenfolgen</bookmark_value>"
 
 #. D5Lsi
 #: python_document_events.xhp
@@ -896,7 +932,7 @@ msgctxt ""
 "N0650\n"
 "help.text"
 msgid "Using <menuitem>Tools - Customize</menuitem> menu <menuitem>Events</menuitem> tab, the <menuitem>Open document</menuitem> event fires a <literal>ConsoleLogger</literal> initialisation. <literal>_documentEventOccured</literal> routine - set by <literal>ConsoleLogger</literal> - serves as a unique entry point to trap all document events."
-msgstr ""
+msgstr "Bei der Verwendung des Menüs <menuitem>Extras – Anpassen…</menuitem> – Register: <menuitem>Ereignisse</menuitem> startet das Ereignis <menuitem>Dokument öffnen</menuitem> die Initialisierung von <literal>ConsoleLogger</literal>. Die Routine <literal>_documentEventOccured</literal> – festgelegt von <literal>ConsoleLogger</literal> – dient als eindeutiger Einstiegspunkt, um alle Dokumentereignisse abzufangen."
 
 #. gGpkW
 #: python_document_events.xhp
@@ -905,7 +941,7 @@ msgctxt ""
 "hd_id421630510141729\n"
 "help.text"
 msgid "controller.Events module"
-msgstr ""
+msgstr "Modul controller.Events"
 
 #. rJX92
 #: python_document_events.xhp
@@ -914,7 +950,7 @@ msgctxt ""
 "bas_id431630567378062\n"
 "help.text"
 msgid "Global _obj As Object ' controller.ConsoleLogger instance"
-msgstr ""
+msgstr "Global _obj As Object ' Instanz controller.ConsoleLogger"
 
 #. PfRq6
 #: python_document_events.xhp
@@ -932,7 +968,7 @@ msgctxt ""
 "bas_id371630509596674\n"
 "help.text"
 msgid "''' ConsoleLogger unique entry point '''"
-msgstr ""
+msgstr "''' Eindeutiger Einstiegspunkt für ConsoleLogger '''"
 
 #. upGWH
 #: python_document_events.xhp
@@ -941,7 +977,7 @@ msgctxt ""
 "hd_id721630511986813\n"
 "help.text"
 msgid "controller.ConsoleLogger class module"
-msgstr ""
+msgstr "Klassenmodul controller.ConsoleLogger"
 
 #. AN8tn
 #: python_document_events.xhp
@@ -950,7 +986,7 @@ msgctxt ""
 "par_id901630509435225\n"
 "help.text"
 msgid "Events monitoring starts from the moment a <literal>ConsoleLogger</literal> object is instantiated and ultimately stops upon document closure. <literal>StartAdapter</literal> routine loads necessary Basic libraries, while caught events are reported using <literal>Access2Base.Trace</literal> module."
-msgstr ""
+msgstr "Die Überwachung von Ereignissen beginnt in dem Moment, in dem ein Objekt <literal>ConsoleLogger</literal> erzeugt wird, und endet schließlich mit dem Schließen des Dokuments. Die Routine <literal>StartAdapter</literal> lädt die benötigten Basic-Bibliotheken, während abgefangene Ereignisse mithilfe des Moduls <literal>Access2Base.Trace</literal> angezeigt werden."
 
 #. 2jXHB
 #: python_document_events.xhp
@@ -968,7 +1004,7 @@ msgctxt ""
 "N0666\n"
 "help.text"
 msgid "Private Const UI_NOPROMPT = False ' Set it to True to visualise documents events"
-msgstr ""
+msgstr "Private Const UI_NOPROMPT = False ' Legen Sie es auf \"True\" fest, um Dokumentereignisse anzuzeigen"
 
 #. EQG8C
 #: python_document_events.xhp
@@ -986,7 +1022,7 @@ msgctxt ""
 "bas_id131630510956418\n"
 "help.text"
 msgid "Private _txtMsg As String ' text message to log in console"
-msgstr ""
+msgstr "Private _txtMsg As String ' Textnachricht zum Aufzeichnen in der Konsole"
 
 #. JaEhY
 #: python_document_events.xhp
@@ -995,7 +1031,7 @@ msgctxt ""
 "N0677\n"
 "help.text"
 msgid "' PROPERTIES"
-msgstr ""
+msgstr "' EIGENSCHAFTEN"
 
 #. aGuEg
 #: python_document_events.xhp
@@ -1040,7 +1076,7 @@ msgctxt ""
 "N0705\n"
 "help.text"
 msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events are being logged\", UI_PROMPT)"
-msgstr ""
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dokumentereignisse werden protokolliert\", UI_PROMPT)"
 
 #. NkHa4
 #: python_document_events.xhp
@@ -1058,7 +1094,7 @@ msgctxt ""
 "N0717\n"
 "help.text"
 msgid "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Document events have been logged\", UI_PROMPT)"
-msgstr ""
+msgstr "Access2Base.Trace.TraceLog(\"INFO\", _txtMsg & \"Dokumentereignisse wurden protokolliert\", UI_PROMPT)"
 
 #. GAD2E
 #: python_document_events.xhp
@@ -1067,7 +1103,7 @@ msgctxt ""
 "N0719\n"
 "help.text"
 msgid "Access2Base.Trace.TraceConsole() ' Captured events dialog"
-msgstr ""
+msgstr "Access2Base.Trace.TraceConsole() ' Dialog „Erfasste Ereignisse“"
 
 #. X8Kdh
 #: python_document_events.xhp
@@ -1076,7 +1112,7 @@ msgctxt ""
 "N0722\n"
 "help.text"
 msgid "' EVENTS"
-msgstr ""
+msgstr "' EREIGNISSE"
 
 #. uVpJf
 #: python_document_events.xhp
@@ -1150,14 +1186,14 @@ msgctxt ""
 msgid "adapted from DisplayAvailableEvents() by A. Pitonyak"
 msgstr "Adaptiert von DisplayAvailableEvents() von A. Pitonyak"
 
-#. wXN8p
+#. o2YTy
 #: python_document_events.xhp
 msgctxt ""
 "python_document_events.xhp\n"
 "N0747\n"
 "help.text"
-msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer\">Alternative Python Script Organizer (APSO)</link> extension is used to render events information on screen."
-msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer\">Alternative Python Script Organizer (APSO)</link> wird zum Rendern von Ereignisinformationen auf dem Bildschirm verwendet."
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer (APSO)</link> extension is used to render events information on screen."
+msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer (APSO)</link> wird zum Rendern von Ereignisinformationen auf dem Bildschirm verwendet."
 
 #. kgY8m
 #: python_document_events.xhp
@@ -1186,23 +1222,23 @@ msgctxt ""
 msgid "Python examples"
 msgstr "Python Beispiele"
 
-#. Etrfb
+#. DAoFA
 #: python_examples.xhp
 msgctxt ""
 "python_examples.xhp\n"
 "bm_id20191031405\n"
 "help.text"
-msgid "<bookmark_value>Python;examples</bookmark_value>            <bookmark_value>Python;shell</bookmark_value>            <bookmark_value>Python;platform</bookmark_value>            <bookmark_value>Python;session</bookmark_value>            <bookmark_value>Python;screen input/output</bookmark_value>"
-msgstr "<bookmark_value>Python; Beispiele</bookmark_value><bookmark_value>Python; Shell</bookmark_value><bookmark_value>Python; Plattform</bookmark_value><bookmark_value>Python; Session</bookmark_value><bookmark_value>Python; Bildschirm Ein-/Ausgabe</bookmark_value>"
+msgid "<bookmark_value>Python;examples</bookmark_value>            <bookmark_value>Python;platform</bookmark_value>            <bookmark_value>Python;session</bookmark_value>            <bookmark_value>Python;screen input/output</bookmark_value>"
+msgstr "<bookmark_value>Python; Beispiele</bookmark_value><bookmark_value>Python; Plattform</bookmark_value><bookmark_value>Python; Sitzung</bookmark_value><bookmark_value>Python; Bildschirmein- und -ausgabe</bookmark_value>"
 
-#. 2vmkq
+#. QbiDM
 #: python_examples.xhp
 msgctxt ""
 "python_examples.xhp\n"
 "hd_id201901031407\n"
 "help.text"
-msgid "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\" name=\"python examples\">Python programming examples</link></variable>"
-msgstr "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\" name=\"python examples\">Python-Programmierbeispiele</link></variable>"
+msgid "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\">Python programming examples</link></variable>"
+msgstr "<variable id=\"pythonexamples2\"><link href=\"text/sbasic/python/python_examples.xhp\">Python-Programmierbeispiele</link></variable>"
 
 #. xkeov
 #: python_handler.xhp
@@ -1222,23 +1258,23 @@ msgctxt ""
 msgid "<bookmark_value>Basic;Dialog Handler</bookmark_value>         <bookmark_value>Python;Dialog Handler</bookmark_value>         <bookmark_value>Access2Base;dlgTrace</bookmark_value>         <bookmark_value>Access2Base;_DumpToFile</bookmark_value>         <bookmark_value>API;DialogProvider2</bookmark_value>         <bookmark_value>API;XDialogEventHandler</bookmark_value>"
 msgstr "<bookmark_value>Basic; Dialog-Handler</bookmark_value><bookmark_value>Python; Dialog-Handler</bookmark_value><bookmark_value>Access2Base; dlgTrace</bookmark_value><bookmark_value>Access2Base; _DumpToFile</bookmark_value><bookmark_value>API; DialogProvider2</bookmark_value><bookmark_value>API; XDialogEventHandler</bookmark_value>"
 
-#. MQUtw
+#. 6ADFX
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0665\n"
 "help.text"
-msgid "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\" name=\"Creating a Dialog Handler\">Creating a Dialog Handler</link></variable>"
-msgstr "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\" name=\"Creating a Dialog Handler\">Einen Dialog-Handler erstellen</link></variable>"
+msgid "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\">Creating a Dialog Handler</link></variable>"
+msgstr "<variable id=\"pythonhandler_h1\"><link href=\"text/sbasic/python/python_handler.xhp\">Einen Dialog-Handler erstellen</link></variable>"
 
-#. AxGAd
+#. ykPkA
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0666\n"
 "help.text"
-msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Assigning macros to events\">assigning macros to events</link> or <link href=\"text/sbasic/basic/python/python_listener\" name=\"creating event listeners\">creating event listeners</link>, one can use dialog handlers, whose principle is to define UNO keywords, or methods, that are mapped to events to watch for. The event handler is responsible for executing methods using the <literal>vnd.sun.star.UNO:<method_name></literal> protocol. Unlike listeners that require to define all supported methods, even if unused, dialog handlers require only two methods on top of intended control hook scripts."
-msgstr "<link href=\"text/sbasic/shared/01040000.xhp\" name=\"Assigning macros to events\">Zuweisen von Makros zu Ereignissen</link> oder <link href=\"text/sbasic/basic/python/python_listener\" name=\"creating event listeners\">Erstellen von Ereignis-Listenern</link> können Sie Dialog-Handler verwenden, deren Prinzip darin besteht, UNO-Schlüsselwörter oder -Methoden zu definieren, die Ereignissen zugeordnet sind, auf die geachtet werden soll. Die Ereignisbehandlungsroutine ist für die Ausführung von Methoden unter Verwendung des Protokolls <literal> vnd.sun.star.UNO: <method_name></literal> verantwortlich. Im Gegensatz zu Listenern, die alle unterstützten Methoden definieren müssen, benötigen Dialog-Handler nur zwei Methoden zusätzlich zu den beabsichtigten Kontroll-Hook-Skripten."
+msgid "Next to <link href=\"text/sbasic/shared/01040000.xhp\">assigning macros to events</link> or <link href=\"text/sbasic/basic/python/python_listener\">creating event listeners</link>, one can use dialog handlers, whose principle is to define UNO keywords, or methods, that are mapped to events to watch for. The event handler is responsible for executing methods using the <literal>vnd.sun.star.UNO:<method_name></literal> protocol. Unlike listeners that require to define all supported methods, even if unused, dialog handlers require only two methods on top of intended control hook scripts."
+msgstr "<link href=\"text/sbasic/shared/01040000.xhp\">Zuweisen von Makros zu Ereignissen</link> oder <link href=\"text/sbasic/basic/python/python_listener\">Erstellen von Ereignis-Listenern</link> können Sie Dialog-Handler verwenden, deren Prinzip darin besteht, UNO-Schlüsselwörter oder -Methoden zu definieren, die Ereignissen zugeordnet sind, auf die geachtet werden soll. Die Ereignisbehandlungsroutine ist für die Ausführung von Methoden unter Verwendung des Protokolls <literal> vnd.sun.star.UNO: <method_name></literal> verantwortlich. Im Gegensatz zu Listenern, die alle unterstützten Methoden definieren müssen, benötigen Dialog-Handler nur zwei Methoden zusätzlich zu den beabsichtigten Kontroll-Hook-Skripten."
 
 #. Waa56
 #: python_handler.xhp
@@ -1294,14 +1330,14 @@ msgctxt ""
 msgid "Export <literal>Access2Base</literal> <literal>dlgTrace</literal> dialog and import it into <literal>MyLib</literal> application library."
 msgstr "Exportiert den Dialog <literal>Access2Base</literal> <literal>dlgTrace</literal> und importiert ihn in die Anwendungsbibliothek <literal>MyLib</literal>."
 
-#. QKmBa
+#. vFWDG
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0673\n"
 "help.text"
-msgid "Inside the control properties pane of the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Dialog Editor\">Dialog Editor</link>, use the Events tab to replace macro assignments by component assignments, and type in the intended method names:"
-msgstr "Verwenden Sie im Bereich der Steuerelement-Eigenschaften des <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Dialog Editor\">Dialogeditors</link> das Register Ereignisse, um Makrozuweisungen durch Komponentenzuweisungen zu ersetzen, und geben Sie den vorgesehenen Methodennamen ein:"
+msgid "Inside the control properties pane of the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog Editor</link>, use the Events tab to replace macro assignments by component assignments, and type in the intended method names:"
+msgstr "Verwenden Sie im Bereich der Steuerelement-Eigenschaften des <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialogeditors</link> das Register Ereignisse, um Makrozuweisungen durch Komponentenzuweisungen zu ersetzen, und geben Sie den vorgesehenen Methodennamen ein:"
 
 #. qNEVD
 #: python_handler.xhp
@@ -1348,14 +1384,14 @@ msgctxt ""
 msgid "Creating the handler"
 msgstr "Handler erstellen"
 
-#. nHvEi
+#. BN7Lo
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0679\n"
 "help.text"
-msgid "<literal>createDialogWithHandler</literal> method of <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\" name=\"com.sun.star.awt.DialogProvider2\">com.sun.star.awt.DialogProvider2</link> service is used to set the dialog and its handler. The handler is responsible for implementing <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\" name=\"com.sun.star.awt.XDialogEventHandler\">com.sun.star.awt.XDialogEventHandler</link> interface."
-msgstr "Die Methode <literal>createDialogWithHandler</literal> des Services <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\" name=\"com.sun.star.awt.DialogProvider2\">com.sun.star.awt.DialogProvider2</link> wird verwendet, um den Dialog und seinen Handler festzulegen. Der Handler ist für die Implementierung der Schnittstelle <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\" name=\"com.sun.star.awt.XDialogEventHandler\">com.sun.star.awt.XDialogEventHandler</link> verantwortlich."
+msgid "<literal>createDialogWithHandler</literal> method of <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\">com.sun.star.awt.DialogProvider2</link> service is used to set the dialog and its handler. The handler is responsible for implementing <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\">com.sun.star.awt.XDialogEventHandler</link> interface."
+msgstr "Die Methode <literal>createDialogWithHandler</literal> des Services <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1awt_1_1DialogProvider2.html\">com.sun.star.awt.DialogProvider2</link> wird verwendet, um den Dialog und seinen Handler festzulegen. Der Handler ist für die Implementierung der Schnittstelle <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1awt_1_1XDialogEventHandler.html\">com.sun.star.awt.XDialogEventHandler</link> verantwortlich."
 
 #. 2CCEz
 #: python_handler.xhp
@@ -1429,14 +1465,14 @@ msgctxt ""
 msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
 msgstr "Wie erwartet, löst die fehlende Methode <literal>onOkHasFocus</literal> eine Ausnahme aus."
 
-#. 63rxz
+#. vC7GW
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0741\n"
 "help.text"
-msgid "Refer to <link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Python calls to %PRODUCTNAME Basic\">Python calls to %PRODUCTNAME Basic</link> page for <literal>getBasicScript</literal> routine description and for details about cross-language scripting execution."
-msgstr "Siehe <link href=\"text/sbasic/python/python_2_basic.xhp\" name=\"Python calls to %PRODUCTNAME Basic\">Python-Aufrufe an %PRODUCTNAME Basic</link> für die Routinenbeschreibung <literal>getBasicScript</literal> und Details zur sprachübergreifenden Skriptausführung."
+msgid "Refer to <link href=\"text/sbasic/python/python_2_basic.xhp\">Python calls to %PRODUCTNAME Basic</link> page for <literal>getBasicScript</literal> routine description and for details about cross-language scripting execution."
+msgstr "Siehe <link href=\"text/sbasic/python/python_2_basic.xhp\">Python-Aufrufe an %PRODUCTNAME Basic</link> für die Routinenbeschreibung <literal>getBasicScript</literal> und Details zur sprachübergreifenden Skriptausführung."
 
 #. b6xGw
 #: python_handler.xhp
@@ -1501,14 +1537,14 @@ msgctxt ""
 msgid "As expected, <literal>onOkHasFocus</literal> missing method throws an exception."
 msgstr "Wie erwartet löst die fehlende Methode <literal>onOkHasFocus</literal> eine Ausnahme aus."
 
-#. 4RevF
+#. EX74b
 #: python_handler.xhp
 msgctxt ""
 "python_handler.xhp\n"
 "N0505\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener Function</link>"
-msgstr "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">Funktion CreateUnoListener</link>"
+msgid "<link href=\"text/sbasic/shared/03132000.xhp\">CreateUnoListener Function</link>"
+msgstr "<link href=\"text/sbasic/shared/03132000.xhp\">Funktion CreateUnoListener</link>"
 
 #. Ur3DA
 #: python_ide.xhp
@@ -1528,14 +1564,14 @@ msgctxt ""
 msgid "<bookmark_value>APSO</bookmark_value>            <bookmark_value>Alternative Python Scripts Organizer</bookmark_value>            <bookmark_value>python;IDE - integrated development environment</bookmark_value>            <bookmark_value>python;editor</bookmark_value>"
 msgstr "<bookmark_value>APSO</bookmark_value><bookmark_value>Alternative Python Scripts Organizer</bookmark_value><bookmark_value>Python; IDE - Integrated Development Environment</bookmark_value><bookmark_value>Python; Editor</bookmark_value>"
 
-#. cANSA
+#. fzoAS
 #: python_ide.xhp
 msgctxt ""
 "python_ide.xhp\n"
 "hd_id151543348965464\n"
 "help.text"
-msgid "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\" name=\"Python IDE Setup\">Setting up an Integrated Development Environment (IDE) for Python</link></variable>"
-msgstr "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\" name=\"Python IDE Setup\">Eine IDE (Integrated Development Environment) für Python einrichten</link></variable>"
+msgid "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\">Setting up an Integrated Development Environment (IDE) for Python</link></variable>"
+msgstr "<variable id=\"pythonideh1\"><link href=\"text/sbasic/python/python_ide.xhp\">Eine IDE (Integrated Development Environment) für Python einrichten</link></variable>"
 
 #. k7syF
 #: python_ide.xhp
@@ -1546,14 +1582,14 @@ msgctxt ""
 msgid "Writing Python macros requires extra configuration steps to set an IDE of choice."
 msgstr "Das Schreiben von Python-Makros erfordert zusätzliche Konfigurationsschritte, um eine IDE Ihrer Wahl festzulegen."
 
-#. NGxNi
+#. pYeKm
 #: python_ide.xhp
 msgctxt ""
 "python_ide.xhp\n"
 "N0106\n"
 "help.text"
-msgid "Unlike Basic language macros development in %PRODUCTNAME, developing Python scripts for %PRODUCTNAME requires to configure an external Integrated Development Environment (IDE). Multiple IDEs are available that range from beginners to advanced Python coders. While using a Python IDE programmers benefit from numerous features such as syntax highlighting, code folding, class browsing, code completion, coding standard enforcement, test driven development, debugging, version control and many more. You can refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"Designing & Developing Python Applications\">Designing & Developing Python Applications</link> on the Wiki for more in-depth information about the setup of a bridge between your IDE and a running instance %PRODUCTNAME."
-msgstr "Im Gegensatz zur Entwicklung von Basic-Sprachmakros in %PRODUCTNAME muss für die Entwicklung von Python-Skripten für %PRODUCTNAME eine externe IDE (Integrated Development Environment) konfiguriert werden. Es sind mehrere IDEs verfügbar, die von Anfängern bis zu fortgeschrittenen Python-Codierern reichen. Während der Verwendung einer Python-IDE profitieren Programmierer von zahlreichen Funktionen wie Syntax-Hervorhebung, Code-Folding, Klassen-Browsing, Code-Vervollständigung, Durchsetzung von Codierungsstandard, testgetriebener Entwicklung, Debugging, Versionskontrolle und vielem mehr. Weitere Informationen zum Einrichten einer Brücke zwischen Ihrer IDE und einer ausgeführten Instanz von %PRODUCTNAME finden Sie unter <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"Designing & Developing Python Applications\">Designing & Developing Python Applications</link> (englisch) im Wiki."
+msgid "Unlike Basic language macros development in %PRODUCTNAME, developing Python scripts for %PRODUCTNAME requires to configure an external Integrated Development Environment (IDE). Multiple IDEs are available that range from beginners to advanced Python coders. While using a Python IDE programmers benefit from numerous features such as syntax highlighting, code folding, class browsing, code completion, coding standard enforcement, test driven development, debugging, version control and many more. You can refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> on the Wiki for more in-depth information about the setup of a bridge between your IDE and a running instance %PRODUCTNAME."
+msgstr "Im Gegensatz zur Entwicklung von Basic-Sprachmakros in %PRODUCTNAME muss für die Entwicklung von Python-Skripten für %PRODUCTNAME eine externe IDE (Integrated Development Environment) konfiguriert werden. Es sind mehrere IDEs verfügbar, die von Anfängern bis zu fortgeschrittenen Python-Codierern reichen. Während der Verwendung einer Python-IDE profitieren Programmierer von zahlreichen Funktionen wie Syntax-Hervorhebung, Code-Folding, Klassen-Browsing, Code-Vervollständigung, Durchsetzung von Codierungsstandard, testgetriebener Entwicklung, Debugging, Versionskontrolle und vielem mehr. Weitere Informationen zum Einrichten einer Brücke zwischen Ihrer IDE und einer ausgeführten Instanz von %PRODUCTNAME finden Sie unter <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> (englisch) im Wiki."
 
 #. u2xio
 #: python_ide.xhp
@@ -1564,14 +1600,14 @@ msgctxt ""
 msgid "The APSO Extension"
 msgstr "Die Erweiterung APSO"
 
-#. 4isF2
+#. TZvni
 #: python_ide.xhp
 msgctxt ""
 "python_ide.xhp\n"
 "N0104\n"
 "help.text"
-msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer (APSO)\">Alternative Python Script Organizer (APSO)</link> extension eases the edition of Python scripts, in particular when embedded in a document. Using APSO you can configure your preferred source code editor, start the integrated Python shell and debug Python scripts. Extensions exist that help inspect arbitrary UNO objects, refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"eDesigning & Developing Python Applications\">Designing & Developing Python Applications</link> for additional details on such extensions."
-msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"Alternative Python Script Organizer (APSO)\">APSO (Alternative Python Script Organizer)</link> vereinfacht das Bearbeiten von Python-Skripten, insbesondere wenn sie in ein Dokument eingebettet sind. Mit APSO können Sie Ihren bevorzugten Quellcode-Editor konfigurieren, die integrierte Python-Shell starten und Python-Skripte debuggen. Es gibt Erweiterungen, mit denen Sie beliebige UNO-Objekte untersuchen können. Weitere Informationen zu diesen Erweiterungen finden Sie unter <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\" name=\"eDesigning & Developing Python Applications\">Designing & Developing Python Applications</link> (englisch)."
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer (APSO)</link> extension eases the edition of Python scripts, in particular when embedded in a document. Using APSO you can configure your preferred source code editor, start the integrated Python shell and debug Python scripts. Extensions exist that help inspect arbitrary UNO objects, refer to <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> for additional details on such extensions."
+msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">APSO (Alternative Python Script Organizer)</link> vereinfacht das Bearbeiten von Python-Skripten, insbesondere wenn sie in ein Dokument eingebettet sind. Mit APSO können Sie Ihren bevorzugten Quellcode-Editor konfigurieren, die integrierte Python-Shell starten und Python-Skripte debuggen. Es gibt Erweiterungen, mit denen Sie beliebige UNO-Objekte untersuchen können. Weitere Informationen zu diesen Erweiterungen finden Sie unter <link href=\"https://wiki.documentfoundation.org/Macros/Python_Design_Guide\">Designing & Developing Python Applications</link> (englisch)."
 
 #. 5E2EV
 #: python_import.xhp
@@ -1591,14 +1627,14 @@ msgctxt ""
 msgid "<bookmark_value>Python;import</bookmark_value>        <bookmark_value>Python;Modules</bookmark_value>        <bookmark_value>Python;pythonpath</bookmark_value>        <bookmark_value>PythonLibraries</bookmark_value>"
 msgstr "<bookmark_value>Python; Importieren</bookmark_value><bookmark_value>Python; Module</bookmark_value><bookmark_value>Python; pythonpath</bookmark_value><bookmark_value>PythonLibraries</bookmark_value>"
 
-#. 5QqdJ
+#. MHcrX
 #: python_import.xhp
 msgctxt ""
 "python_import.xhp\n"
 "N0462\n"
 "help.text"
-msgid "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\" name=\"python imports\">Importing Python Modules</link></variable>"
-msgstr "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\" name=\"python imports\">Importieren von Python-Modulen</link></variable>"
+msgid "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\">Importing Python Modules</link></variable>"
+msgstr "<variable id=\"pythonimporth1\"><link href=\"text/sbasic/python/python_import.xhp\">Importieren von Python-Modulen</link></variable>"
 
 #. VHAM5
 #: python_import.xhp
@@ -1924,23 +1960,23 @@ msgctxt ""
 msgid "<bookmark_value>Python;Event Listener</bookmark_value>         <bookmark_value>Python;createUnoListener</bookmark_value>         <bookmark_value>Basic;Event Listener</bookmark_value>         <bookmark_value>API;ActionEvent</bookmark_value>         <bookmark_value>API;DialogProvider</bookmark_value>         <bookmark_value>API;EventObject</bookmark_value>         <bookmark_value>API;ExecutableDialogResults</bookmark_value>         <bookmark_value>API;XActionListener</bookmark_value>"
 msgstr "<bookmark_value>Python; Ereignis-Listener</bookmark_value><bookmark_value>Python; createUnoListener</bookmark_value><bookmark_value>Basic; Ereignis-Listener</bookmark_value><bookmark_value>API; ActionEvent</bookmark_value><bookmark_value>API; DialogProvider</bookmark_value><bookmark_value>API; EventObject</bookmark_value><bookmark_value>API; ExecutableDialogResults</bookmark_value><bookmark_value>API; XActionListener</bookmark_value>"
 
-#. Pjc9z
+#. o4QUC
 #: python_listener.xhp
 msgctxt ""
 "python_listener.xhp\n"
 "N0386\n"
 "help.text"
-msgid "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\" name=\"python listeners\">Creating Event Listeners</link></variable>"
-msgstr "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\" name=\"Erstellen von Ereignislistenern\">Erstellen von Ereignislistenern</link></variable>"
+msgid "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\">Creating Event Listeners</link></variable>"
+msgstr "<variable id=\"pythonlistener\"><link href=\"text/sbasic/python/python_listener.xhp\">Erstellen von Ereignislistenern</link></variable>"
 
-#. DGgrp
+#. S8UHm
 #: python_listener.xhp
 msgctxt ""
 "python_listener.xhp\n"
 "N0387\n"
 "help.text"
-msgid "Events raised by dialogs, documents, forms or graphical controls can be linked to macros, which is referred to as event-driven programming. The most common method to relate events to macros are the <literal>Events</literal> tab in <menuitem>Tools – Customize</menuitem> menu and the <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Create dialog\">Dialog Editor</link> Control properties pane from <menuitem>Tools - Macros – Organise Dialogs...</menuitem> menu."
-msgstr "Ereignisse, die durch Dialoge, Dokumente, Formulare oder grafische Steuerelemente ausgelöst werden, können mit Makros verknüpft werden, die als Ereignis-gesteuerte Programmierung bezeichnet werden. Die gebräuchlichsten Methoden, Ereignisse mit Makros in Beziehung zu setzen, sind <literal>Ereignisse</literal> (wählen Sie <menuitem>Extras – Anpassen… – Register: Ereignisse</menuitem>) und der <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Create dialog\">Dialog-Editor</link> (wählen Sie <menuitem>Extras – Makros – Dialoge verwalten…</menuitem>)."
+msgid "Events raised by dialogs, documents, forms or graphical controls can be linked to macros, which is referred to as event-driven programming. The most common method to relate events to macros are the <literal>Events</literal> tab in <menuitem>Tools – Customize</menuitem> menu and the <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog Editor</link> Control properties pane from <menuitem>Tools - Macros – Organise Dialogs...</menuitem> menu."
+msgstr "Ereignisse, die durch Dialoge, Dokumente, Formulare oder grafische Steuerelemente ausgelöst werden, können mit Makros verknüpft werden, die als Ereignis-gesteuerte Programmierung bezeichnet werden. Die gebräuchlichsten Methoden, Ereignisse mit Makros in Beziehung zu setzen, sind <literal>Ereignisse</literal> (wählen Sie <menuitem>Extras – Anpassen… – Register: Ereignisse</menuitem>) und der <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog-Editor</link> (wählen Sie <menuitem>Extras – Makros – Dialoge verwalten…</menuitem>)."
 
 #. Dd2YW
 #: python_listener.xhp
@@ -2113,41 +2149,32 @@ msgctxt ""
 msgid "Other Event Listeners"
 msgstr "Weitere Event-Listener"
 
-#. HsXBE
+#. 5CsEJ
 #: python_listener.xhp
 msgctxt ""
 "python_listener.xhp\n"
 "N0499\n"
 "help.text"
-msgid "Listeners are usually coded along with <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"dialog opening\">dialog opening</link>. Numerous listener approaches are possible such as event handlers for dialogs or event monitors for documents or forms."
-msgstr "Listener werden normalerweise zusammen mit der <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"dialog opening\">Dialogöffnung</link> codiert. Zahlreiche Listener-Ansätze sind möglich, beispielsweise Event-Handler für Dialoge oder Event-Monitore für Dokumente oder Formulare."
+msgid "Listeners are usually coded along with <link href=\"text/sbasic/python/python_dialogs.xhp\">dialog opening</link>. Numerous listener approaches are possible such as event handlers for dialogs or event monitors for documents or forms."
+msgstr "Listener werden normalerweise zusammen mit der <link href=\"text/sbasic/python/python_dialogs.xhp\">Dialogöffnung</link> codiert. Zahlreiche Listener-Ansätze sind möglich, beispielsweise Event-Handler für Dialoge oder Event-Monitore für Dokumente oder Formulare."
 
-#. Xyv2b
-#: python_listener.xhp
-msgctxt ""
-"python_listener.xhp\n"
-"N0505\n"
-"help.text"
-msgid "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"CreateUnoListener Function\">CreateUnoListener Function</link>"
-msgstr "<link href=\"text/sbasic/shared/03132000.xhp\" name=\"Funktion CreateUnoListener\">Funktion CreateUnoListener</link>"
-
-#. zKQhy
+#. 2u4dC
 #: python_listener.xhp
 msgctxt ""
 "python_listener.xhp\n"
 "N0506\n"
 "help.text"
-msgid "<link href=\"text/swriter/01/05060700.xhp\" name=\"Events mapping to objects\">Events mapping to objects</link>"
-msgstr "<link href=\"text/swriter/01/05060700.xhp\" name=\"Ereigniszuordnung zu Objekten\">Ereigniszuordnung zu Objekten</link>"
+msgid "<link href=\"text/swriter/01/05060700.xhp\">Events mapping to objects</link>"
+msgstr "<link href=\"text/swriter/01/05060700.xhp\">Ereigniszuordnung zu Objekten</link>"
 
-#. Xbxfm
+#. CWePB
 #: python_listener.xhp
 msgctxt ""
 "python_listener.xhp\n"
 "N0509\n"
 "help.text"
-msgid "See also <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Document events\">Document events</link>, <link href=\"text/shared/02/01170202.xhp\" name=\"Form events\">Form events</link>."
-msgstr "Siehe auch <link href=\"text/sbasic/shared/01040000.xhp\" name=\"Dokumentereignisse\">Dokumentereignisse</link>, <link href=\"text/shared/02/01170202.xhp\" name=\"Formularereignisse\">Formularereignisse</link>."
+msgid "See also <link href=\"text/sbasic/shared/01040000.xhp\">Document events</link>, <link href=\"text/shared/02/01170202.xhp\">Form events</link>."
+msgstr "Siehe auch <link href=\"text/sbasic/shared/01040000.xhp\">Dokumentereignisse</link>, <link href=\"text/shared/02/01170202.xhp\">Formularereignisse</link>."
 
 #. GC8Ny
 #: python_locations.xhp
@@ -2158,14 +2185,14 @@ msgctxt ""
 msgid "Python Scripts Organization"
 msgstr "Organisation von Python-Skripten"
 
-#. KKGnc
+#. ENGH2
 #: python_locations.xhp
 msgctxt ""
 "python_locations.xhp\n"
 "hd_id391543358231021\n"
 "help.text"
-msgid "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\" name=\"command_name\">Python Scripts Organization and Location</link></variable>"
-msgstr "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\" name=\"command_name\">Organisation und Speicherort von Python-Skripten</link></variable>"
+msgid "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\">Python Scripts Organization and Location</link></variable>"
+msgstr "<variable id=\"pythonlocations1\"><link href=\"text/sbasic/python/python_locations.xhp\">Organisation und Speicherort von Python-Skripten</link></variable>"
 
 #. rRufi
 #: python_locations.xhp
@@ -2174,7 +2201,7 @@ msgctxt ""
 "par_id481636114810038\n"
 "help.text"
 msgid "%PRODUCTNAME macros are grouped in module files, modules are usually grouped in library folders, and libraries are grouped in library containers although containers can contain modules too."
-msgstr ""
+msgstr "%PRODUCTNAME-Makros sind in Moduldateien gruppiert, Module sind für gewöhnlich in Bibliotheksordnern gruppiert und Bibliotheken sind in Bibliothekscontainern gruppiert, wobei auch Container Module enthalten können."
 
 #. wGWz9
 #: python_locations.xhp
@@ -2183,7 +2210,7 @@ msgctxt ""
 "par_id771543358231022\n"
 "help.text"
 msgid "A library is used as a major grouping for either an entire category of macros, or for an entire application. Modules usually split functionality, such as user interaction and calculations. Individual macros are subroutines and functions. The Figure below shows an example of the hierarchical structure of macro libraries in %PRODUCTNAME."
-msgstr ""
+msgstr "Eine Bibliothek wird entweder als Hauptgruppe für eine ganze Kategorie von Makros oder einer ganzen Anwendung genutzt. Module teilen für gewöhnlich verschiedene Funktionalitäten auf, wie Nutzerinteraktionen und Berechnungen. Individuelle Makros sind Subroutinen und Funktionen. Die nachfolgende Abbildung zeigt ein Beispiel einer hierarchischen Struktur von Makrobibliotheken in %PRDUCTNAME."
 
 #. b8iEG
 #: python_locations.xhp
@@ -2192,7 +2219,7 @@ msgctxt ""
 "par_id771636279690940\n"
 "help.text"
 msgid "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Library Container diagram</alt></image>"
-msgstr ""
+msgstr "<image src=\"media/helpimg/sbasic/Library-Container.svg\" id=\"img_id121636285791637\" width=\"8cm\" height=\"5.5cm\"><alt id=\"alt_id471636279690940\">Abbildung Makrobibliotheken</alt></image>"
 
 #. JqG95
 #: python_locations.xhp
@@ -2201,7 +2228,7 @@ msgctxt ""
 "par_id171636114787810\n"
 "help.text"
 msgid "<emph>Figure:</emph> Macro Library hierarchy"
-msgstr ""
+msgstr "<emph>Abbildung:</emph> Hierarchie von Makrobibliotheken"
 
 #. dbwvM
 #: python_locations.xhp
@@ -2210,7 +2237,7 @@ msgctxt ""
 "par_id801636114790638\n"
 "help.text"
 msgid "The containers are accessible in all %PRODUCTNAME programs through the user interface. Go to <menuitem>Tools > Macros > Organize Macros > Python</menuitem>, to open the Python Macros dialog."
-msgstr ""
+msgstr "Die Container sind alle über die %PRODUCTNAME-Benutzeroberfläche erreichbar. Wählen Sie dazu <menuitem>Extras – Makros – Makros verwalten – Python…</menuitem>, um den Dialog Python-Makros zu öffnen."
 
 #. FU5EC
 #: python_locations.xhp
@@ -2219,7 +2246,7 @@ msgctxt ""
 "par_id801636114808666\n"
 "help.text"
 msgid "Three library containers are shown in the Macro From list:"
-msgstr ""
+msgstr "In der Liste Makros werden drei Bibliothekscontainer angezeigt:"
 
 #. RnBRr
 #: python_locations.xhp
@@ -2228,7 +2255,7 @@ msgctxt ""
 "par_id321636114854594\n"
 "help.text"
 msgid "<emph>My Macros:</emph> personal macros available for the %PRODUCTNAME user"
-msgstr ""
+msgstr "<emph>Meine Makros:</emph> Persönliche Makros, die für den %PRODUCTNAME-Benutzer verfügbar sind"
 
 #. bDXrr
 #: python_locations.xhp
@@ -2237,7 +2264,7 @@ msgctxt ""
 "par_id471636114847530\n"
 "help.text"
 msgid "<emph>Application Macros:</emph> system macros distributed with %PRODUCTNAME for every computer user"
-msgstr ""
+msgstr "<emph>Anwendungsmakros:</emph> Systemmakros, die mit %PRODUCTNAME für jeden Computerbenutzer installiert werden"
 
 #. kVY4C
 #: python_locations.xhp
@@ -2246,7 +2273,7 @@ msgctxt ""
 "par_id191636114858218\n"
 "help.text"
 msgid "<emph>Document macros:</emph>  every document can contain macro libraries available in that document for all users"
-msgstr ""
+msgstr "<emph>Dokument-Makros:</emph> Jedes Dokument kann Makrobibliotheken enthalten, die in diesem Dokument für alle Benutzer verfügbar sind"
 
 #. iEtmS
 #: python_locations.xhp
@@ -2257,14 +2284,14 @@ msgctxt ""
 msgid "Python Script Locations"
 msgstr "Speicherorte für Python-Skripte"
 
-#. cmghv
+#. AMBK6
 #: python_locations.xhp
 msgctxt ""
 "python_locations.xhp\n"
 "par_id121551089455774\n"
 "help.text"
-msgid "Refer to <link href=\"text/sbasic/python/python_session.xhp\" name=\"Getting Session Information\">Getting Session Information</link> in order to get programmatic access to Python script locations."
-msgstr "Weitere Informationen zum programmgesteuerten Zugriff auf Python-Skriptspeicherorte finden Sie unter <link href=\"text/sbasic/python/python_session.xhp\" name=\"Getting Session Information\">Abrufen von Sitzungsinformationen</link>."
+msgid "Refer to <link href=\"text/sbasic/python/python_session.xhp\">Getting Session Information</link> in order to get programmatic access to Python script locations."
+msgstr "Weitere Informationen zum programmgesteuerten Zugriff auf Python-Skriptspeicherorte finden Sie unter <link href=\"text/sbasic/python/python_session.xhp\">Abrufen von Sitzungsinformationen</link>."
 
 #. GDrUs
 #: python_locations.xhp
@@ -2273,7 +2300,7 @@ msgctxt ""
 "hd_id591544049572647\n"
 "help.text"
 msgid "Application Macros"
-msgstr ""
+msgstr "Anwendungsmakros"
 
 #. xBzRT
 #: python_locations.xhp
@@ -2390,7 +2417,7 @@ msgctxt ""
 "par_id181544209916707\n"
 "help.text"
 msgid "Python macros can be organized in libraries, modules and macros. Use the Macro Library hierarchy as a guide when creating or installing new macros in module files, new module files in library folders or new library folders in containers."
-msgstr ""
+msgstr "Python-Makros können in Bibliotheken, Modulen und Makros organisiert werden. Verwenden Sie die Hierarchie von Makrobibliotheken als Leitfaden, wenn Sie neue Makros in Moduldateien, neue Moduldateien in Bibliotheksordnern oder neue Bibliotheksordner in Containern erstellen oder installieren."
 
 #. Zcfxg
 #: python_platform.xhp
@@ -2410,14 +2437,14 @@ msgctxt ""
 msgid "<bookmark_value>Platform;isLinux</bookmark_value>        <bookmark_value>Platform;isMacOsX</bookmark_value>        <bookmark_value>Platform;isWindows</bookmark_value>        <bookmark_value>Platform;ComputerName</bookmark_value>        <bookmark_value>Platform;OSName</bookmark_value>        <bookmark_value>API;ConfigurationAccess</bookmark_value>        <bookmark_value>Tools;GetRegistryContent</bookmark_value>"
 msgstr "<bookmark_value>Plattform; isLinux</bookmark_value><bookmark_value>Plattform; isMacOsX</bookmark_value><bookmark_value>Plattform; isWindows</bookmark_value><bookmark_value>Plattform; ComputerName</bookmark_value><bookmark_value>Plattform; OSName</bookmark_value><bookmark_value>API; ConfigurationAccess</bookmark_value><bookmark_value>Extras; GetRegistryContent</bookmark_value>"
 
-#. uMBGn
+#. drCq4
 #: python_platform.xhp
 msgctxt ""
 "python_platform.xhp\n"
 "N0509\n"
 "help.text"
-msgid "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\" name=\"platform01\">Identifying the operating system</link></variable>"
-msgstr "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\" name=\"Betriebssystem identifizieren\">Betriebssystem identifizieren</link></variable>"
+msgid "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\">Identifying the operating system</link></variable>"
+msgstr "<variable id=\"pythonplatform\"><link href=\"text/sbasic/python/python_platform.xhp\">Betriebssystem identifizieren</link></variable>"
 
 #. vqduy
 #: python_platform.xhp
@@ -2572,32 +2599,32 @@ msgctxt ""
 msgid "Python : Programming with Python"
 msgstr "Python: Programmierung mit Python"
 
-#. g4R9j
+#. BG8VW
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0218\n"
 "help.text"
-msgid "<bookmark_value>Python;Programming</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value>        <bookmark_value>XSCRIPTCONTEXT;getComponentContext()</bookmark_value>        <bookmark_value>uno.py</bookmark_value>        <bookmark_value>uno.py;getComponentContext()</bookmark_value>"
-msgstr "<bookmark_value>Python; Programmierung</bookmark_value><bookmark_value>XSCRIPTCONTEXT; Python</bookmark_value><bookmark_value>XSCRIPTCONTEXT; getComponentContext()</bookmark_value><bookmark_value>uno.py</bookmark_value><bookmark_value>uno.py; getComponentContext()</bookmark_value>"
+msgid "<bookmark_value>Python;Programming</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;Python</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getComponentContext</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getDesktop</bookmark_value>      <bookmark_value>XSCRIPTCONTEXT;getDocument</bookmark_value>      <bookmark_value>uno.py;getComponentContext</bookmark_value>      <bookmark_value>uno.py;getDesktop</bookmark_value>      <bookmark_value>uno.py;getDocument</bookmark_value>"
+msgstr "<bookmark_value>Python; Programmierung</bookmark_value><bookmark_value>XSCRIPTCONTEXT; Python</bookmark_value><bookmark_value>XSCRIPTCONTEXT; getComponentContext</bookmark_value><bookmark_value>XSCRIPTCONTEXT; getDesktop</bookmark_value><bookmark_value>XSCRIPTCONTEXT; getDocument</bookmark_value><bookmark_value>uno.py; getComponentContext</bookmark_value><bookmark_value>uno.py; getDesktop</bookmark_value><bookmark_value>uno.py; getDocument</bookmark_value>"
 
-#. CU6JS
+#. sZPDY
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "hd_id691546462755220\n"
 "help.text"
-msgid "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\" name=\"python programming\">Programming with Python Scripts</link></variable>"
-msgstr "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\" name=\"python programming\">Programmierung mit Python-Skripten</link></variable>"
+msgid "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\">Programming with Python Scripts</link></variable>"
+msgstr "<variable id=\"pythonprogrammingheading\"><link href=\"text/sbasic/python/python_programming.xhp\">Programmierung mit Python-Skripten</link></variable>"
 
-#. BjiFe
+#. Mc7G4
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0220\n"
 "help.text"
-msgid "A Python macro is a function within a .py file, identified as a module. Unlike %PRODUCTNAME Basic and its dozen of <link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects functions or services\">UNO objects functions or services</link>, Python macros use the <literal>XSCRIPTCONTEXT</literal> UNO single object, shared with JavaScript and BeanShell. The <literal>g_exportedScripts</literal> global tuple explicitly lists selectable macros from a module. Python modules hold autonomous code logic, and are independent from one another."
-msgstr "Ein Python-Makro ist eine Funktion in einer .py-Datei, die als Modul identifiziert wird. Im Gegensatz zu %PRODUCTNAME Basic und seinem Dutzend <link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects functions or services\">Funktionen oder Dienste von UNO-Objekten</link> verwenden Python-Makros das UNO-Einzelobjekt <literal>XSCRIPTCONTEXT</literal>, gemeinsam mit JavaScript und BeanShell. Das globale Tupel <literal>g_exportedScripts</literal> listet explizit auswählbare Makros aus einem Modul auf. Python-Module verfügen über eine autonome Codelogik und sind voneinander unabhängig."
+msgid "A Python macro is a function within a .py file, identified as a module. Unlike %PRODUCTNAME Basic and its dozen of <link href=\"text/sbasic/shared/uno_objects.xhp\">UNO objects functions or services</link>, Python macros use the <literal>XSCRIPTCONTEXT</literal> UNO single object, shared with JavaScript and BeanShell. The <literal>g_exportedScripts</literal> global tuple explicitly lists selectable macros from a module. Python modules hold autonomous code logic, and are independent from one another."
+msgstr "Ein Python-Makro ist eine Funktion in einer .py-Datei, die als Modul identifiziert wird. Im Gegensatz zu %PRODUCTNAME Basic und seinem Dutzend <link href=\"text/sbasic/shared/uno_objects.xhp\">Funktionen oder Dienste von UNO-Objekten</link> verwenden Python-Makros das UNO-Einzelobjekt <literal>XSCRIPTCONTEXT</literal>, gemeinsam mit JavaScript und BeanShell. Das globale Tupel <literal>g_exportedScripts</literal> listet explizit auswählbare Makros aus einem Modul auf. Python-Module verfügen über eine autonome Codelogik und sind voneinander unabhängig."
 
 #. 8Ri8m
 #: python_programming.xhp
@@ -2608,14 +2635,14 @@ msgctxt ""
 msgid "XSCRIPTCONTEXT Global Variable"
 msgstr "Globale Variable XSCRIPTCONTEXT"
 
-#. xnRGE
+#. 8GP6t
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0222\n"
 "help.text"
-msgid "Genuine Basic UNO facilities can be inferred from <literal>XSCRIPTCONTEXT</literal> global variable. Refer to %PRODUCTNAME API for a complete <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\" name=\"description of XSCRIPTCONTEXT\">description of XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal> methods summarize as:"
-msgstr "Echte grundlegende UNO-Funktionen können aus der globalen Variablen <literal>XSCRIPTCONTEXT</literal> abgeleitet werden. In der %PRODUCTNAME-API finden Sie eine vollständige <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\" name=\"description of XSCRIPTCONTEXT\">Beschreibung von XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal>-Methoden zusammengefasst sind:"
+msgid "Genuine Basic UNO facilities can be inferred from <literal>XSCRIPTCONTEXT</literal> global variable. Refer to %PRODUCTNAME API for a complete <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\">description of XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal> methods summarize as:"
+msgstr "Echte grundlegende UNO-Funktionen können aus der globalen Variablen <literal>XSCRIPTCONTEXT</literal> abgeleitet werden. In der %PRODUCTNAME-API finden Sie eine vollständige <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScriptContext.html\">Beschreibung von XSCRIPTCONTEXT</link>. <literal>XSCRIPTCONTEXT</literal>-Methoden zusammengefasst sind:"
 
 #. U6KbS
 #: python_programming.xhp
@@ -2678,7 +2705,7 @@ msgctxt ""
 "N0237\n"
 "help.text"
 msgid "<emph>HelloWorld</emph> and <emph>Capitalise</emph> installation shared scripts illustrate UNO-related macros making use of <literal>XSCRIPTCONTEXT</literal> global variable."
-msgstr "Die gemeinsam genutzten Installationsskripts <emph>HelloWorld</emph> und <emph>Capitalize</emph> veranschaulichen UNO-bezogene Makros, welche die globale Variable <literal>XSCRIPTCONTEXT</literal> verwenden."
+msgstr "Die gemeinsam genutzten Installationsskripte <emph>HelloWorld</emph> und <emph>Capitalize</emph> veranschaulichen UNO-bezogene Makros, welche die globale Variable <literal>XSCRIPTCONTEXT</literal> verwenden."
 
 #. RQgKR
 #: python_programming.xhp
@@ -2707,23 +2734,32 @@ msgctxt ""
 msgid "<literal>XSCRIPTCONTEXT</literal> is not provided to imported modules."
 msgstr "<literal>XSCRIPTCONTEXT</literal> wird importierten Modulen nicht zur Verfügung gestellt."
 
-#. dURCV
+#. FxPgc
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0241\n"
 "help.text"
-msgid "%PRODUCTNAME Basic libraries contain classes, routines and variables, Python modules contain classes, functions and variables. Common pieces of reusable Python or UNO features must be stored in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"My macros\">My macros</link> within <literal>(User Profile)/Scripts/python/pythonpath</literal>. Python libraries help organize modules in order to prevent module name collisions. Import <literal>uno.py</literal> inside shared modules."
-msgstr "%PRODUCTNAME Basic-Bibliotheken enthalten Klassen, Routinen und Variablen, Python-Module enthalten Klassen, Funktionen und Variablen. Allgemeine Teile wiederverwendbarer Python- oder UNO-Funktionen müssen in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"My macros\">Meine Makros</link> in <literal>(Benutzerprofil)/Scripts/python/pythonpath</literal> gespeichert werden. Python-Bibliotheken helfen beim Organisieren von Modulen, um Kollisionen von Modulnamen zu verhindern. Importieren Sie <literal>uno.py</literal> in gemeinsam genutzte Module."
+msgid "%PRODUCTNAME Basic libraries contain classes, routines and variables, Python modules contain classes, functions and variables. Common pieces of reusable Python or UNO features must be stored in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> within <literal>(User Profile)/Scripts/python/pythonpath</literal>. Python libraries help organize modules in order to prevent module name collisions. Import <literal>uno.py</literal> inside shared modules."
+msgstr "%PRODUCTNAME Basic-Bibliotheken enthalten Klassen, Routinen und Variablen, Python-Module enthalten Klassen, Funktionen und Variablen. Allgemeine Teile wiederverwendbarer Python- oder UNO-Funktionen müssen in <link href=\"text/sbasic/python/python_locations.xhp\">Meine Makros</link> in <literal>(Benutzerprofil)/Scripts/python/pythonpath</literal> gespeichert werden. Python-Bibliotheken helfen beim Organisieren von Modulen, um Kollisionen von Modulnamen zu verhindern. Importieren Sie <literal>uno.py</literal> in gemeinsam genutzte Module."
 
-#. a2xVe
+#. EGdaE
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0242\n"
 "help.text"
-msgid "Genuine BASIC UNO facilities can be inferred using <literal>uno.py</literal> module. Use <link href=\"text/sbasic/python/python_shell.xhp\" name=\"Python interactive shell\">Python interactive shell</link> to get a complete module description using <literal>dir()</literal> and <literal>help()</literal> Python commands."
-msgstr "Echte BASIC UNO-Einrichtungen können mithilfe des Moduls <literal>uno.py</literal> abgeleitet werden. Lesen Sie <link href=\"text/sbasic/python/python_shell.xhp\" name=\"Python interactive shell\">Interaktive Python-Shell</link>, um eine vollständige Modulbeschreibung mit den Python-Befehlen <literal>dir()</literal> und <literal>help()</literal> zu erhalten."
+msgid "Genuine BASIC UNO facilities can be inferred using <literal>uno.py</literal> module. Use <link href=\"text/sbasic/python/python_shell.xhp\">Python interactive shell</link> to get a complete module description using <literal>dir()</literal> and <literal>help()</literal> Python commands."
+msgstr "Echte BASIC UNO-Einrichtungen können mithilfe des Moduls <literal>uno.py</literal> abgeleitet werden. Lesen Sie <link href=\"text/sbasic/python/python_shell.xhp\">Interaktive Python-Shell</link>, um eine vollständige Modulbeschreibung mit den Python-Befehlen <literal>dir()</literal> und <literal>help()</literal> zu erhalten."
+
+#. SsAZa
+#: python_programming.xhp
+msgctxt ""
+"python_programming.xhp\n"
+"bm_id391659034206678\n"
+"help.text"
+msgid "<bookmark_value>uno.py</bookmark_value>        <bookmark_value>uno.py;absolutize</bookmark_value>        <bookmark_value>uno.py;createUnoStruct</bookmark_value>        <bookmark_value>uno.py;fileUrlToSystemPath</bookmark_value>        <bookmark_value>uno.py;getClass</bookmark_value>        <bookmark_value>uno.py;getComponentContext</bookmark_value>        <bookmark_value>uno.py;Enum</bookmark_value>        <bookmark_value>uno.py;getConstantByName</bookmark_value>        <bookmark_value>uno.py;isInterface</bookmark_value>        <bookmark_value>uno.py;systemPathToFileUrl</bookmark_value>"
+msgstr "<bookmark_value>uno.py</bookmark_value><bookmark_value>uno.py; absolutize</bookmark_value><bookmark_value>uno.py; createUnoStruct</bookmark_value><bookmark_value>uno.py; fileUrlToSystemPath</bookmark_value><bookmark_value>uno.py; getClass</bookmark_value><bookmark_value>uno.py; getComponentContext</bookmark_value><bookmark_value>uno.py; Enum</bookmark_value><bookmark_value>uno.py; getConstantByName</bookmark_value><bookmark_value>uno.py; isInterface</bookmark_value><bookmark_value>uno.py; systemPathToFileUrl</bookmark_value>"
 
 #. Gi6iz
 #: python_programming.xhp
@@ -2869,23 +2905,23 @@ msgctxt ""
 msgid "Basic UNO features"
 msgstr "Basic UNO-Funktionen"
 
-#. 8EWYh
+#. wSBYY
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0284\n"
 "help.text"
-msgid "See <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"Opening a Dialog\">Opening a Dialog</link>"
-msgstr "Siehe <link href=\"text/sbasic/python/python_dialogs.xhp\" name=\"Opening a Dialog\">Einen Dialog öffnen</link>"
+msgid "See <link href=\"text/sbasic/python/python_dialogs.xhp\">Opening a Dialog</link>"
+msgstr "Siehe <link href=\"text/sbasic/python/python_dialogs.xhp\">Einen Dialog öffnen</link>"
 
-#. F2cFF
+#. ucBDS
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0286\n"
 "help.text"
-msgid "See <link href=\"text/sbasic/python/python_listener.xhp\" name=\"Creating a Listener\">Creating a Listener</link>"
-msgstr "Siehe <link href=\"text/sbasic/python/python_listener.xhp\" name=\"Creating a Listener\">Einen Listener erstellen</link>"
+msgid "See <link href=\"text/sbasic/python/python_listener.xhp\">Creating a Listener</link>"
+msgstr "Siehe <link href=\"text/sbasic/python/python_listener.xhp\">Einen Listener erstellen</link>"
 
 #. LNUaK
 #: python_programming.xhp
@@ -2896,32 +2932,32 @@ msgctxt ""
 msgid "See UNO data types"
 msgstr "Siehe UNO-Datentypen"
 
-#. 4vWGa
+#. pFbcP
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
-"N0297\n"
+"N1297\n"
 "help.text"
 msgid "Importing an embedded Module"
 msgstr "Importieren eines eingebetteten Moduls"
 
-#. SGVBE
+#. GPRuc
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
-"N0298\n"
+"N1298\n"
 "help.text"
-msgid "Similarly to %PRODUCTNAME Basic that supports browsing and dynamic loading of libraries, Python libraries can be explored and imported on demand. For more information on library containers, visit <link href=\"https://api.libreoffice.org/\" name=\"API Documentation site\">%PRODUCTNAME Application Programming Interface</link> (API) or download <link href=\"https://www.libreoffice.org/download/download/\" name=\"SDK download page\">%PRODUCTNAME Software Development Kit</link> (SDK)."
-msgstr "Ähnlich wie %PRODUCTNAME Basic, welches das Durchsuchen und dynamische Laden von Bibliotheken unterstützt, können Python-Bibliotheken bei Bedarf durchsucht und importiert werden. Weitere Informationen zu Bibliothekscontainern finden Sie unter <link href=\"https://api.libreoffice.org/\" name=\"API Documentation site\">%PRODUCTNAME Application Programming Interface</link> (API) oder laden Sie sich das <link href=\"https://www.libreoffice.org/download/download/\" name=\"SDK download page\">%PRODUCTNAME Software Development Kit</link> (SDK) herunter."
+msgid "Similarly to %PRODUCTNAME Basic that supports browsing and dynamic loading of libraries, Python libraries can be explored and imported on demand. For more information on library containers, visit <link href=\"https://api.libreoffice.org/\">%PRODUCTNAME Application Programming Interface</link> (API) or download <link href=\"https://www.libreoffice.org/download/download/\">%PRODUCTNAME Software Development Kit</link> (SDK)."
+msgstr "Ebenso wie %PRODUCTNAME-Basic das Durchsuchen und dynamische Laden von Bibliotheken unterstützt, können auch Python-Bibliotheken durchforscht und auf Anfrage importiert werden. Für mehr Informationen über Bibliothekscontainer besuchen Sie <link href=\"https://api.libreoffice.org/\">%PRODUCTNAME Application Programming Interface</link> (API) oder laden Sie das <link href=\"https://www.libreoffice.org/download/download/\">%PRODUCTNAME Software Development Kit</link> (SDK) herunter."
 
-#. VtFrH
+#. SEeXV
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
-"N0299\n"
+"N3299\n"
 "help.text"
 msgid "Importing a Python document embedded module is illustrated below, exception handling is not detailed:"
-msgstr "Das Importieren eines eingebetteten Python-Dokumentmoduls ist unten dargestellt. Die Ausnahmebehandlung wird nicht detailliert beschrieben:"
+msgstr "Das Importieren eines eingebetteten Moduls für ein Python-Dokument wird unten veranschaulicht, die Ausnahmebehandlung wird nicht detailliert beschrieben:"
 
 #. P2R2D
 #: python_programming.xhp
@@ -2995,14 +3031,14 @@ msgctxt ""
 msgid "ui = load_library(\"my_gui\",'screen_io')  # add <lib> path + import <module>"
 msgstr "ui = load_library(\"my_gui\",'screen_io')  # Pfad <lib> hinzufügen + <module> importieren"
 
-#. HFcCm
+#. yjHXX
 #: python_programming.xhp
 msgctxt ""
 "python_programming.xhp\n"
 "N0321\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects page\">Basic UNO Objects, Functions and Services</link>"
-msgstr "<link href=\"text/sbasic/shared/uno_objects.xhp\" name=\"UNO objects page\">Grundlegende UNO-Objekte, -Funktionen und -Dienste</link>"
+msgid "<link href=\"text/sbasic/shared/uno_objects.xhp\">Basic UNO Objects, Functions and Services</link>"
+msgstr "<link href=\"text/sbasic/shared/uno_objects.xhp\">Grundlegende UNO-Objekte, -Funktionen und -Dienste</link>"
 
 #. zRBRa
 #: python_screen.xhp
@@ -3022,14 +3058,14 @@ msgctxt ""
 msgid "<bookmark_value>Python;InputBox</bookmark_value>        <bookmark_value>Python;MsgBox</bookmark_value>        <bookmark_value>Python;Print</bookmark_value>        <bookmark_value>API;script.provider.MasterScriptProvider: Screen Input/Output</bookmark_value>        <bookmark_value>API;script.provider.XScript: Screen Input/Output</bookmark_value>"
 msgstr "<bookmark_value>Python; InputBox</bookmark_value><bookmark_value>Python; MsgBox</bookmark_value><bookmark_value>Python; Print</bookmark_value><bookmark_value>API; script.provider.MasterScriptProvider: Bildschirmeingabe/-ausgabe</bookmark_value><bookmark_value>API; script.provider.XScript: Bildschirmeingabe/-ausgabe</bookmark_value>"
 
-#. fovpz
+#. aSpmm
 #: python_screen.xhp
 msgctxt ""
 "python_screen.xhp\n"
 "N0434\n"
 "help.text"
-msgid "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\" name=\"IO to screen\">Input/Output to Screen</link></variable>"
-msgstr "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\" name=\"IO to screen\">Ein-/Ausgabe auf dem Bildschirm</link></variable>"
+msgid "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\">Input/Output to Screen</link></variable>"
+msgstr "<variable id=\"ioscreen\"><link href=\"text/sbasic/python/python_screen.xhp\">Ein-/Ausgabe auf dem Bildschirm</link></variable>"
 
 #. qCLEs
 #: python_screen.xhp
@@ -3040,14 +3076,14 @@ msgctxt ""
 msgid "Python standard output file is not available when running Python macros from <menuitem>Tools – Macros - Run Macro</menuitem>... menu. Presenting the output of a module requires the Python interactive console. Features such as <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> and <literal>str()</literal> are available from the Python shell."
 msgstr "Die Python-Standardausgabedatei ist nicht verfügbar, wenn Python-Makros über <menuitem>Extras – Makros – Makro ausführen…</menuitem> ausgeführt werden. Für die Darstellung der Ausgabe eines Moduls ist die interaktive Python-Konsole erforderlich. Funktionen wie <literal>input()</literal>, <literal>print()</literal>, <literal>repr()</literal> und <literal>str()</literal> sind über die Python-Shell verfügbar."
 
-#. NHHFB
+#. ftsGT
 #: python_screen.xhp
 msgctxt ""
 "python_screen.xhp\n"
-"N0436\n"
+"msgbox_tip\n"
 "help.text"
-msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"apso\">Alternative Python Script Organizer</link> (APSO) extension offers a msgbox() function out of its <literal>apso_utils</literal> module."
-msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\" name=\"apso\">Alternative Python Script Organizer</link> (APSO) bietet eine Funktion msgbox() aus dem Modul <literal>apso_utils</literal> an."
+msgid "%PRODUCTNAME <literal>msgbox</literal> Python module proposes a <literal>msgbox()</literal> method that is illustrated in <link href=\"text/sbasic/python/python_handler.xhp\">Creating Event Listeners</link> and <link href=\"text/sbasic/python/python_handler.xhp\">Creating a dialog handler</link> example pages."
+msgstr "Das %PRODUCTNAME-Python-Modul <literal>msgbox</literal> schlägt eine Methode <literal>msgbox()</literal> vor, die beispielhaft auf den Seiten <link href=\"text/sbasic/python/python_handler.xhp\">Erstellen von Ereignis-Listenern</link> und <link href=\"text/sbasic/python/python_handler.xhp\">Erstellen eines Dialog-Handlers</link> dargestellt wird."
 
 #. aPSDz
 #: python_screen.xhp
@@ -3085,23 +3121,23 @@ msgctxt ""
 msgid "Installation:"
 msgstr "Installation:"
 
-#. QDrDk
+#. 6J2px
 #: python_screen.xhp
 msgctxt ""
 "python_screen.xhp\n"
 "N0450\n"
 "help.text"
-msgid "Copy <literal>screen_io</literal> Python module in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">My macros</link> within <UserProfile>/Scripts/python/pythonpath,"
-msgstr "Kopieren Sie das Python-Modul <literal>screen_io</literal> in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">Meine Makros</link> unterhalb von <UserProfile>/Scripts/python/pythonpath,"
+msgid "Copy <literal>screen_io</literal> Python module in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> within <UserProfile>/Scripts/python/pythonpath,"
+msgstr "Kopieren Sie das Python-Modul <literal>screen_io</literal> in <link href=\"text/sbasic/python/python_locations.xhp\">Meine Makros</link> unterhalb von <UserProfile>/Scripts/python/pythonpath,"
 
-#. bckjW
+#. g98C5
 #: python_screen.xhp
 msgctxt ""
 "python_screen.xhp\n"
 "N0451\n"
 "help.text"
-msgid "Copy <literal>uiScripts</literal> Basic module in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">My macros</link> Standard Basic library,"
-msgstr "Kopieren Sie das Basic-Modul <literal>uiScripts</literal> in <link href=\"text/sbasic/python/python_locations.xhp\" name=\"User macros\">Meine Makros</link> in die Basic-Bibliothek Standard,"
+msgid "Copy <literal>uiScripts</literal> Basic module in <link href=\"text/sbasic/python/python_locations.xhp\">My macros</link> Standard Basic library,"
+msgstr "Kopieren Sie das Basic-Modul <literal>uiScripts</literal> in <link href=\"text/sbasic/python/python_locations.xhp\">Meine Makros</link> in die Basic-Bibliothek Standard,"
 
 #. XAthB
 #: python_screen.xhp
@@ -3146,7 +3182,16 @@ msgctxt ""
 "N0479\n"
 "help.text"
 msgid "\"\"\"Outputs the specified strings or numeric expressions in a dialog box.\"\"\""
-msgstr "\"\"\" Gibt die angegebenen Zeichenketten oder numerischen Ausdrücke in einem Dialog aus. \"\"\""
+msgstr "\"\"\" Gibt die angegebenen Zeichenfolgen oder numerischen Ausdrücke in einem Dialog aus. \"\"\""
+
+#. L833Z
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"par_id161655364816553\n"
+"help.text"
+msgid "<literal>MsgBox</literal> and <literal>InputBox</literal> methods from the <link href=\"text/sbasic/shared/03/sf_basic.xhp\">Basic service</link> included in <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\"> the ScriptForge libraries</link> call directly their native Basic counterparts."
+msgstr "Die Methoden <literal>MsgBox</literal> und <literal>InputBox</literal> aus dem <link href=\"text/sbasic/shared/03/sf_basic.xhp\">Dienst Basic</link>, die in den <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">Bibliotheken von ScriptForge</link> enthalten sind, rufen direkt ihre nativen Gegenstücke aus Basic auf."
 
 #. EYqxJ
 #: python_screen.xhp
@@ -3156,6 +3201,15 @@ msgctxt ""
 "help.text"
 msgid "<literal>uiScripts</literal> Basic module"
 msgstr "Basic-Modul <literal>uiScripts</literal>"
+
+#. enXba
+#: python_screen.xhp
+msgctxt ""
+"python_screen.xhp\n"
+"tip_APSO\n"
+"help.text"
+msgid "The <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer</link> (APSO) extension offers a msgbox() function out of its <literal>apso_utils</literal> module."
+msgstr "Die Erweiterung <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-python\">Alternative Python Script Organizer</link> (APSO) bietet eine Funktion msgbox() aus seinem Modul <literal>apso_utils</literal> an."
 
 #. CGnPe
 #: python_session.xhp
@@ -3175,14 +3229,14 @@ msgctxt ""
 msgid "<bookmark_value>Session;UserName</bookmark_value>        <bookmark_value>Session;SharedScripts</bookmark_value>        <bookmark_value>Session;SharedPythonScripts</bookmark_value>        <bookmark_value>Session;UserProfile</bookmark_value>        <bookmark_value>Session;UserScripts</bookmark_value>        <bookmark_value>Session;UserPythonScripts</bookmark_value>        <bookmark_value>API;PathSubstitution</bookmark_value>"
 msgstr "<bookmark_value>Sitzung; Benutzername</bookmark_value><bookmark_value>Sitzung; gemeinsame Skripte</bookmark_value><bookmark_value>Sitzung; gemeinsame Python-Skripte</bookmark_value><bookmark_value>Sitzung; Benutzerprofil</bookmark_value><bookmark_value>Sitzung; Benutzer-Skripte</bookmark_value><bookmark_value>Sitzung; benutzerdefinierte Python-Skripte</bookmark_value><bookmark_value>API; Pfadwechsel</bookmark_value>"
 
-#. EvmoA
+#. qBME3
 #: python_session.xhp
 msgctxt ""
 "python_session.xhp\n"
 "N0340\n"
 "help.text"
-msgid "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\" name=\"session01\">Getting Session Information</link></variable>"
-msgstr "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\" name=\"session01\">Sitzungsinformationen abrufen</link></variable>"
+msgid "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\">Getting Session Information</link></variable>"
+msgstr "<variable id=\"pythonsession\"><link href=\"text/sbasic/python/python_session.xhp\">Sitzungsinformationen abrufen</link></variable>"
 
 #. nmTjF
 #: python_session.xhp
@@ -3479,25 +3533,25 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Python Interactive Shell"
-msgstr "Python Interaktive-Shell"
+msgstr "Interaktive Python-Konsole"
 
-#. LUGZ7
+#. uRFzN
 #: python_shell.xhp
 msgctxt ""
 "python_shell.xhp\n"
 "N0117\n"
 "help.text"
-msgid "<bookmark_value>Python console</bookmark_value>        <bookmark_value>Python Interactive Shell</bookmark_value>"
-msgstr "<bookmark_value>Python-Konsole</bookmark_value><bookmark_value>Python; interaktive Shell</bookmark_value>"
+msgid "<bookmark_value>Python console</bookmark_value>        <bookmark_value>Python Interactive Shell</bookmark_value>        <bookmark_value>Python;Shell</bookmark_value>"
+msgstr "<bookmark_value>Python Konsole</bookmark_value><bookmark_value>Python Interaktive Shell</bookmark_value><bookmark_value>Python; Shell</bookmark_value>"
 
-#. PmoqF
+#. 6dAy2
 #: python_shell.xhp
 msgctxt ""
 "python_shell.xhp\n"
 "N0118\n"
 "help.text"
-msgid "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\" name=\"python shell\">Running Python Interactive Console</link></variable>"
-msgstr "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\" name=\"python shell\">Interaktive Python-Konsole ausführen</link></variable>"
+msgid "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\">Running Python Interactive Console</link></variable>"
+msgstr "<variable id=\"pythonshell1\"><link href=\"text/sbasic/python/python_shell.xhp\">Interaktive Python-Konsole ausführen</link></variable>"
 
 #. Met9b
 #: python_shell.xhp
@@ -3515,7 +3569,7 @@ msgctxt ""
 "par_id851633601202270\n"
 "help.text"
 msgid "From a full-featured %PRODUCTNAME installed package, use either Basic or Python:"
-msgstr ""
+msgstr "Verwenden Sie in einem vollständig installierten %PRODUCTNAME entweder Basic oder Python:"
 
 #. 5HhXz
 #: python_shell.xhp
@@ -3524,7 +3578,7 @@ msgctxt ""
 "N0121\n"
 "help.text"
 msgid "Using a Basic macro"
-msgstr ""
+msgstr "Ein Basic-Makro verwenden"
 
 #. KhWLk
 #: python_shell.xhp
@@ -3533,7 +3587,7 @@ msgctxt ""
 "N0127\n"
 "help.text"
 msgid "Using a Python macro"
-msgstr ""
+msgstr "Ein Python-Makro verwenden"
 
 #. 3FCJH
 #: python_shell.xhp
@@ -3542,7 +3596,7 @@ msgctxt ""
 "N0141\n"
 "help.text"
 msgid "Example output"
-msgstr ""
+msgstr "Beispiel einer Ausgabe"
 
 #. MxDtE
 #: python_shell.xhp
@@ -3551,7 +3605,7 @@ msgctxt ""
 "N0142\n"
 "help.text"
 msgid "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Python Interactive Console</alt></image>"
-msgstr ""
+msgstr "<image src=\"media/helpimg/python/python_interactive_console.png\" id=\"N0143\"><alt id=\"N0143\">Interaktive Python-Konsole</alt></image>"
 
 #. fk6sx
 #: python_shell.xhp
@@ -3560,7 +3614,7 @@ msgctxt ""
 "hd_id381633446811095\n"
 "help.text"
 msgid "Using the Terminal"
-msgstr ""
+msgstr "Das Terminal verwenden"
 
 #. CNFdD
 #: python_shell.xhp
@@ -3569,7 +3623,7 @@ msgctxt ""
 "par_id801633601715910\n"
 "help.text"
 msgid "From a %PRODUCTNAME copy included in a GNU/Linux platform, use the terminal as shown:"
-msgstr ""
+msgstr "Verwenden Sie das in einer GNU/Linux-Plattform der %PRODUCTNAME-Kopie enthaltene Terminal wie folgt:"
 
 #. vWPwe
 #: python_shell.xhp
@@ -3578,7 +3632,7 @@ msgctxt ""
 "par_id531633444780190\n"
 "help.text"
 msgid "<literal>whereis</literal> or <literal>type</literal> terminal commands help locate Python interactive console:"
-msgstr ""
+msgstr "Die Terminal-Befehle <literal>whereis</literal> oder <literal>type</literal> helfen bei der Suche nach der interaktiven Python-Konsole:"
 
 #. 8Ei5d
 #: python_shell.xhp
@@ -3587,16 +3641,16 @@ msgctxt ""
 "hd_id311633513620803\n"
 "help.text"
 msgid "Alternative console"
-msgstr ""
+msgstr "Alternative Konsole"
 
-#. d8DCA
+#. R53nU
 #: python_shell.xhp
 msgctxt ""
 "python_shell.xhp\n"
 "par_id81632760673283\n"
 "help.text"
-msgid "Use <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\" name=\"APSO extension\">APSO extension</link> console as an alternative:"
-msgstr ""
+msgid "Use <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\">APSO extension</link> console as an alternative:"
+msgstr "Verwenden Sie die Konsole <link href=\"https://extensions.libreoffice.org/extensions/apso-alternative-script-organizer-for-Python\">APSO-Erweiterung</link> als eine Alternative:"
 
 #. 6h9CS
 #: python_shell.xhp
@@ -3605,13 +3659,13 @@ msgctxt ""
 "N0144\n"
 "help.text"
 msgid "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">APSO console</alt></image>"
-msgstr ""
+msgstr "<image src=\"media/helpimg/python/python_shell.png\" id=\"N0144\"><alt id=\"N0144\">APSO-Konsole</alt></image>"
 
-#. MxGkV
+#. MRf8v
 #: python_shell.xhp
 msgctxt ""
 "python_shell.xhp\n"
 "par_id351633599611244\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\" name=\"PythonShell method\"><literal>PythonShell</literal></link> function in <link href=\"text/sbasic/shared/03/sf_exception.xhp\" name=\"ScriptForge.Exception service\"><literal>ScriptForge.Exception</literal></link> service"
-msgstr ""
+msgid "<link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\"><literal>PythonShell</literal></link> function in <link href=\"text/sbasic/shared/03/sf_exception.xhp\"><literal>ScriptForge.Exception</literal></link> service"
+msgstr "Funktion <link href=\"text/sbasic/shared/03/sf_exception.xhp?#PythonShell\"><literal>PythonShell</literal></link> im Dienst <link href=\"text/sbasic/shared/03/sf_exception.xhp\"><literal>ScriptForge.Exception</literal></link>"

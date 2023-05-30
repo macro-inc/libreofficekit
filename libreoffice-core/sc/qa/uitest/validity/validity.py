@@ -1,16 +1,17 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict
-from uitest.uihelper.common import select_pos
-from uitest.uihelper.common import select_by_text
-from uitest.uihelper.calc import enter_text_to_cell
-from libreoffice.calc.document import get_cell_by_position
+from uitest.uihelper.common import select_by_text, select_pos
+
 from libreoffice.uno.propertyvalue import mkPropertyValues
+
 
 class validity(UITestCase):
     def test_validity_tab_criteria(self):
@@ -60,7 +61,7 @@ class validity(UITestCase):
                 select_pos(xTabs, "1")
                 xtsbhelp = xDialog.getChild("tsbhelp")
                 xtitle = xDialog.getChild("title")
-                xinputhelp = xDialog.getChild("inputhelp")
+                xinputhelp = xDialog.getChild("inputhelp_text")
 
                 xtsbhelp.executeAction("CLICK", tuple())
                 xtitle.executeAction("TYPE", mkPropertyValues({"TEXT":"A"}))
@@ -70,7 +71,7 @@ class validity(UITestCase):
                 xTabs = xDialog.getChild("tabcontrol")
                 xtsbhelp = xDialog.getChild("tsbhelp")
                 xtitle = xDialog.getChild("title")
-                xinputhelp = xDialog.getChild("inputhelp")
+                xinputhelp = xDialog.getChild("inputhelp_text")
                 select_pos(xTabs, "1")
                 self.assertEqual(get_state_as_dict(xtsbhelp)["Selected"], "true")
                 self.assertEqual(get_state_as_dict(xtitle)["Text"], "A")

@@ -25,7 +25,6 @@
 #include <svx/svdograf.hxx>
 #include <svx/svdoole2.hxx>
 #include <filter/msfilter/msdffimp.hxx>
-#include <unotools/configmgr.hxx>
 #include <grfatr.hxx>
 #include <fmtanchr.hxx>
 #include <fmtcntnt.hxx>
@@ -233,10 +232,10 @@ static void WW8PicShadowToReal(  WW8_PIC_SHADOW const *  pPicS,  WW8_PIC*  pPic 
 
 bool SwWW8ImplReader::GetPictGrafFromStream(Graphic& rGraphic, SvStream& rSrc)
 {
-    return ERRCODE_NONE == GraphicFilter::GetGraphicFilter().ImportGraphic(rGraphic, OUString(), rSrc);
+    return ERRCODE_NONE == GraphicFilter::GetGraphicFilter().ImportGraphic(rGraphic, u"", rSrc);
 }
 
-bool SwWW8ImplReader::ReadGrafFile(OUString& rFileName, std::unique_ptr<Graphic>& rpGraphic,
+bool SwWW8ImplReader::ReadGrafFile(OUString& rFileName, std::optional<Graphic>& roGraphic,
     const WW8_PIC& rPic, SvStream* pSt, sal_uLong nFilePos, bool* pbInDoc)
 {                                                  // Write the graphic to the file
     *pbInDoc = true;                               // default
@@ -273,7 +272,7 @@ bool SwWW8ImplReader::ReadGrafFile(OUString& rFileName, std::unique_ptr<Graphic>
 
     if (m_xWwFib->m_envr != 1) // !MAC as creator
     {
-        rpGraphic.reset(new Graphic(aWMF));
+        roGraphic.emplace(aWMF);
         return true;
     }
 
@@ -285,10 +284,10 @@ bool SwWW8ImplReader::ReadGrafFile(OUString& rFileName, std::unique_ptr<Graphic>
     tools::Long nData = rPic.lcb - ( pSt->Tell() - nPosFc );
     if (nData > 0)
     {
-        rpGraphic.reset(new Graphic());
-        bOk = SwWW8ImplReader::GetPictGrafFromStream(*rpGraphic, *pSt);
+        roGraphic.emplace();
+        bOk = SwWW8ImplReader::GetPictGrafFromStream(*roGraphic, *pSt);
         if (!bOk)
-            rpGraphic.reset();
+            roGraphic.reset();
     }
     return bOk; // Contains graphic
 }
@@ -416,8 +415,8 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf1(WW8_PIC const & rPic, SvStream* pSt,
 
     OUString aFileName;
     bool bInDoc;
-    std::unique_ptr<Graphic> pGraph;
-    bool bOk = ReadGrafFile(aFileName, pGraph, rPic, pSt, nFilePos, &bInDoc);
+    std::optional<Graphic> oGraph;
+    bool bOk = ReadGrafFile(aFileName, oGraph, rPic, pSt, nFilePos, &bInDoc);
 
     if (!bOk)
     {
@@ -434,9 +433,9 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf1(WW8_PIC const & rPic, SvStream* pSt,
     }
 
     if (m_xWFlyPara && m_xWFlyPara->bGrafApo)
-        pRet = MakeGrafNotInContent(aPD, pGraph.get(), aFileName, aGrfSet);
+        pRet = MakeGrafNotInContent(aPD, oGraph ? &*oGraph : nullptr, aFileName, aGrfSet);
     else
-        pRet = MakeGrafInContent(rPic, aPD, pGraph.get(), aFileName, aGrfSet);
+        pRet = MakeGrafInContent(rPic, aPD, oGraph ? &*oGraph : nullptr, aFileName, aGrfSet);
     return pRet;
 }
 
@@ -525,7 +524,7 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf(SdrTextObj const * pTextObj,
         else if((0x64 == aPic.MFP.mm) || (0x66 == aPic.MFP.mm))
         {
             // linked graphic in ESCHER-Object
-            SdrObject* pObject = nullptr;
+            rtl::Reference<SdrObject> pObject;
 
             WW8PicDesc aPD( aPic );
             if (!m_xMSDffManager)
@@ -609,7 +608,7 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf(SdrTextObj const * pTextObj,
                     // Modified for i120716,for graf importing from MS Word 2003
                     // binary format, there is no border distance.
                     tools::Rectangle aInnerDist(0,0,0,0);
-                    MatchSdrItemsIntoFlySet( pObject, aAttrSet,
+                    MatchSdrItemsIntoFlySet( pObject.get(), aAttrSet,
                         pRecord->eLineStyle, pRecord->eLineDashing,
                         pRecord->eShapeType, aInnerDist );
 
@@ -652,14 +651,14 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf(SdrTextObj const * pTextObj,
                     ReplaceObj(*pTextObj, *pObject);
                 else
                 {
-                    if (sal_uInt16(OBJ_OLE2) == pObject->GetObjIdentifier())
+                    if (SdrObjKind::OLE2 == pObject->GetObjIdentifier())
                     {
                         // the size from BLIP, if there is any, should be already set
-                        pRet = InsertOle(*static_cast<SdrOle2Obj*>(pObject), aAttrSet, &aGrSet);
+                        pRet = InsertOle(*static_cast<SdrOle2Obj*>(pObject.get()), aAttrSet, &aGrSet);
                     }
                     else
                     {
-                        if (SdrGrafObj* pGraphObject = dynamic_cast<SdrGrafObj*>( pObject) )
+                        if (SdrGrafObj* pGraphObject = dynamic_cast<SdrGrafObj*>( pObject.get()) )
                         {
                             // Now add the link or rather the graphic to the doc
                             const Graphic& rGraph = pGraphObject->GetGraphic();
@@ -687,7 +686,7 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf(SdrTextObj const * pTextObj,
 
                     OUString aObjectName(pObject->GetName());
                     if (aObjectName.isEmpty() || !m_rDoc.FindFlyByName(aObjectName, GetNodeType(*pRet)))
-                        pRet->SetName(aObjectName);
+                        pRet->SetFormatName(aObjectName);
                     else
                         m_aGrfNameGenerator.SetUniqueGraphName(pRet, aObjectName);
 
@@ -695,22 +694,22 @@ SwFrameFormat* SwWW8ImplReader::ImportGraf(SdrTextObj const * pTextObj,
                     // Z-order-list accordingly (or delete entry)
                     if (SdrObject* pOurNewObject = CreateContactObject(pRet))
                     {
-                        if (pOurNewObject != pObject)
+                        if (pOurNewObject != pObject.get())
                         {
-                            m_xMSDffManager->ExchangeInShapeOrder( pObject, 0,
+                            m_xMSDffManager->ExchangeInShapeOrder( pObject.get(), 0,
                                 pOurNewObject );
 
                             // delete and destroy old SdrGrafObj from page
                             if (pObject->getSdrPageFromSdrObject())
                                 m_pDrawPg->RemoveObject(pObject->GetOrdNum());
-                            SdrObject::Free( pObject );
+                            pObject.clear();
                         }
                     }
                     else
-                        m_xMSDffManager->RemoveFromShapeOrder( pObject );
+                        m_xMSDffManager->RemoveFromShapeOrder( pObject.get() );
                 }
                 else
-                    m_xMSDffManager->RemoveFromShapeOrder( pObject );
+                    m_xMSDffManager->RemoveFromShapeOrder( pObject.get() );
 
                 // also delete this from the page if not grouped
                 if (pTextObj && !bTextObjWasGrouped && pTextObj->getSdrPageFromSdrObject())

@@ -24,6 +24,10 @@
 #include <rtl/ustrbuf.hxx>
 
 #include <rtl/character.hxx>
+#include <o3tl/sprintf.hxx>
+#include <o3tl/string_view.hxx>
+#include <string_view>
+#include <utility>
 
 /*
 TODO: are there any Star-Basic characteristics unconsidered?
@@ -91,24 +95,24 @@ static double get_number_of_digits( double dNumber )
 
 
 SbxBasicFormater::SbxBasicFormater( sal_Unicode _cDecPoint, sal_Unicode _cThousandSep,
-                      const OUString& _sOnStrg,
-                      const OUString& _sOffStrg,
-                      const OUString& _sYesStrg,
-                      const OUString& _sNoStrg,
-                      const OUString& _sTrueStrg,
-                      const OUString& _sFalseStrg,
-                      const OUString& _sCurrencyStrg,
-                      const OUString& _sCurrencyFormatStrg )
+                      OUString _sOnStrg,
+                      OUString _sOffStrg,
+                      OUString _sYesStrg,
+                      OUString _sNoStrg,
+                      OUString _sTrueStrg,
+                      OUString _sFalseStrg,
+                      OUString _sCurrencyStrg,
+                      OUString _sCurrencyFormatStrg )
     : cDecPoint(_cDecPoint)
     , cThousandSep(_cThousandSep)
-    , sOnStrg(_sOnStrg)
-    , sOffStrg(_sOffStrg)
-    , sYesStrg(_sYesStrg)
-    , sNoStrg(_sNoStrg)
-    , sTrueStrg(_sTrueStrg)
-    , sFalseStrg(_sFalseStrg)
-    , sCurrencyStrg(_sCurrencyStrg)
-    , sCurrencyFormatStrg(_sCurrencyFormatStrg)
+    , sOnStrg(std::move(_sOnStrg))
+    , sOffStrg(std::move(_sOffStrg))
+    , sYesStrg(std::move(_sYesStrg))
+    , sNoStrg(std::move(_sNoStrg))
+    , sTrueStrg(std::move(_sTrueStrg))
+    , sFalseStrg(std::move(_sFalseStrg))
+    , sCurrencyStrg(std::move(_sCurrencyStrg))
+    , sCurrencyFormatStrg(std::move(_sCurrencyFormatStrg))
     , dNum(0.0)
     , nNumExp(0)
     , nExpExp(0)
@@ -232,17 +236,16 @@ void SbxBasicFormater::InitScan( double _dNum )
     dNum = _dNum;
     InitExp( get_number_of_digits( dNum ) );
     // maximum of 15 positions behind the decimal point, example: -1.234000000000000E-001
-    /*int nCount =*/ sprintf( sBuffer,"%+22.15lE",dNum );
+    /*int nCount =*/ o3tl::sprintf( sBuffer,"%+22.15lE",dNum );
     sSciNumStrg = OUString::createFromAscii( sBuffer );
 }
 
 
 void SbxBasicFormater::InitExp( double _dNewExp )
 {
-    char sBuffer[ MAX_DOUBLE_BUFFER_LENGTH ];
     nNumExp = static_cast<short>(_dNewExp);
-    /*int nCount =*/ sprintf( sBuffer,"%+i",nNumExp );
-    sNumExpStrg = OUString::createFromAscii( sBuffer );
+    sNumExpStrg = (nNumExp >= 0 ? std::u16string_view(u"+") : std::u16string_view(u""))
+        + OUString::number(nNumExp);
     nExpExp = static_cast<short>(get_number_of_digits( static_cast<double>(nNumExp) ));
 }
 
@@ -295,71 +298,71 @@ short SbxBasicFormater::GetDigitAtPosExpScan( double dNewExponent, short nPos,
 
 // Copies the respective part of the format-string, if existing, and returns it.
 // So a new string is created, which has to be freed by the caller later.
-OUString SbxBasicFormater::GetPosFormatString( const OUString& sFormatStrg, bool & bFound )
+OUString SbxBasicFormater::GetPosFormatString( std::u16string_view sFormatStrg, bool & bFound )
 {
     bFound = false;     // default...
-    sal_Int32 nPos = sFormatStrg.indexOf( FORMAT_SEPARATOR );
+    size_t nPos = sFormatStrg.find( FORMAT_SEPARATOR );
 
-    if( nPos >= 0 )
+    if( nPos != std::u16string_view::npos )
     {
         bFound = true;
         // the format-string for positive numbers is
         // everything before the first ';'
-        return sFormatStrg.copy( 0,nPos );
+        return OUString(sFormatStrg.substr( 0,nPos ));
     }
 
     return OUString();
 }
 
 // see also GetPosFormatString()
-OUString SbxBasicFormater::GetNegFormatString( const OUString& sFormatStrg, bool & bFound )
+OUString SbxBasicFormater::GetNegFormatString( std::u16string_view sFormatStrg, bool & bFound )
 {
     bFound = false;     // default...
-    sal_Int32 nPos = sFormatStrg.indexOf( FORMAT_SEPARATOR );
+    size_t nPos = sFormatStrg.find( FORMAT_SEPARATOR );
 
-    if( nPos >= 0)
+    if( nPos != std::u16string_view::npos)
     {
         // the format-string for negative numbers is
         // everything between the first and the second ';'
-        OUString sTempStrg = sFormatStrg.copy( nPos+1 );
-        nPos = sTempStrg.indexOf( FORMAT_SEPARATOR );
+        std::u16string_view sTempStrg = sFormatStrg.substr( nPos+1 );
+        nPos = sTempStrg.find( FORMAT_SEPARATOR );
         bFound = true;
-        if( nPos < 0 )
+        if( nPos == std::u16string_view::npos )
         {
-            return sTempStrg;
+            return OUString(sTempStrg);
         }
         else
         {
-            return sTempStrg.copy( 0,nPos );
+            return OUString(sTempStrg.substr( 0,nPos ));
         }
     }
     return OUString();
 }
 
 // see also GetPosFormatString()
-OUString SbxBasicFormater::Get0FormatString( const OUString& sFormatStrg, bool & bFound )
+OUString SbxBasicFormater::Get0FormatString( std::u16string_view sFormatStrg, bool & bFound )
 {
     bFound = false;     // default...
-    sal_Int32 nPos = sFormatStrg.indexOf( FORMAT_SEPARATOR );
+    size_t nPos = sFormatStrg.find( FORMAT_SEPARATOR );
 
-    if( nPos >= 0 )
+    if( nPos != std::u16string_view::npos )
     {
         // the format string for the zero is
         // everything after the second ';'
-        OUString sTempStrg = sFormatStrg.copy( nPos+1 );
-        nPos = sTempStrg.indexOf( FORMAT_SEPARATOR );
-        if( nPos >= 0 )
+        std::u16string_view sTempStrg = sFormatStrg.substr( nPos+1 );
+        nPos = sTempStrg.find( FORMAT_SEPARATOR );
+        if( nPos != std::u16string_view::npos )
         {
             bFound = true;
-            sTempStrg = sTempStrg.copy( nPos+1 );
-            nPos = sTempStrg.indexOf( FORMAT_SEPARATOR );
-            if( nPos < 0 )
+            sTempStrg = sTempStrg.substr( nPos+1 );
+            nPos = sTempStrg.find( FORMAT_SEPARATOR );
+            if( nPos == std::u16string_view::npos )
             {
-                return sTempStrg;
+                return OUString(sTempStrg);
             }
             else
             {
-                return sTempStrg.copy( 0,nPos );
+                return OUString(sTempStrg.substr( 0,nPos ));
             }
         }
     }
@@ -368,25 +371,25 @@ OUString SbxBasicFormater::Get0FormatString( const OUString& sFormatStrg, bool &
 }
 
 // see also GetPosFormatString()
-OUString SbxBasicFormater::GetNullFormatString( const OUString& sFormatStrg, bool & bFound )
+OUString SbxBasicFormater::GetNullFormatString( std::u16string_view sFormatStrg, bool & bFound )
 {
     bFound = false;     // default...
-    sal_Int32 nPos = sFormatStrg.indexOf( FORMAT_SEPARATOR );
+    size_t nPos = sFormatStrg.find( FORMAT_SEPARATOR );
 
-    if( nPos >= 0 )
+    if( nPos != std::u16string_view::npos )
     {
         // the format-string for the Null is
         // everything after the third ';'
-        OUString sTempStrg = sFormatStrg.copy( nPos+1 );
-        nPos = sTempStrg.indexOf( FORMAT_SEPARATOR );
-        if( nPos >= 0 )
+        std::u16string_view sTempStrg = sFormatStrg.substr( nPos+1 );
+        nPos = sTempStrg.find( FORMAT_SEPARATOR );
+        if( nPos != std::u16string_view::npos )
         {
-            sTempStrg = sTempStrg.copy( nPos+1 );
-            nPos = sTempStrg.indexOf( FORMAT_SEPARATOR );
-            if( nPos >= 0 )
+            sTempStrg = sTempStrg.substr( nPos+1 );
+            nPos = sTempStrg.find( FORMAT_SEPARATOR );
+            if( nPos != std::u16string_view::npos )
             {
                 bFound = true;
-                return sTempStrg.copy( nPos+1 );
+                return OUString(sTempStrg.substr( nPos+1 ));
             }
         }
     }
@@ -395,7 +398,7 @@ OUString SbxBasicFormater::GetNullFormatString( const OUString& sFormatStrg, boo
 }
 
 // returns value <> 0 in case of an error
-void SbxBasicFormater::AnalyseFormatString( const OUString& sFormatStrg,
+void SbxBasicFormater::AnalyseFormatString( std::u16string_view sFormatStrg,
                 short& nNoOfDigitsLeft, short& nNoOfDigitsRight,
                 short& nNoOfOptionalDigitsLeft,
                 short& nNoOfExponentDigits, short& nNoOfOptionalExponentDigits,
@@ -406,7 +409,7 @@ void SbxBasicFormater::AnalyseFormatString( const OUString& sFormatStrg,
     sal_Int32 nLen;
     short nState = 0;
 
-    nLen = sFormatStrg.getLength();
+    nLen = sFormatStrg.size();
     nNoOfDigitsLeft = 0;
     nNoOfDigitsRight = 0;
     nNoOfOptionalDigitsLeft = 0;
@@ -417,7 +420,7 @@ void SbxBasicFormater::AnalyseFormatString( const OUString& sFormatStrg,
     bScientific = false;
     // from 11.7.97: as soon as a comma (point?) is found in the format string,
     // all three decimal powers are marked (i. e. thousand, million, ...)
-    bGenerateThousandSeparator = sFormatStrg.indexOf( ',' ) >= 0;
+    bGenerateThousandSeparator = sFormatStrg.find( ',' ) != std::u16string_view::npos;
     nMultipleThousandSeparators = 0;
 
     for( sal_Int32 i = 0; i < nLen; i++ )
@@ -511,7 +514,7 @@ void SbxBasicFormater::AnalyseFormatString( const OUString& sFormatStrg,
 // the flag bCreateSign says that at the mantissa a leading sign
 // shall be created
 void SbxBasicFormater::ScanFormatString( double dNumber,
-                                         const OUString& sFormatStrg, OUString& sReturnStrgFinal,
+                                         std::u16string_view sFormatStrg, OUString& sReturnStrgFinal,
                                          bool bCreateSign )
 {
     short   /*nErr,*/nNoOfDigitsLeft,nNoOfDigitsRight,nNoOfOptionalDigitsLeft,
@@ -563,7 +566,7 @@ void SbxBasicFormater::ScanFormatString( double dNumber,
     bSignHappend = false;
     bFoundFirstDigit = false;
     bIsNegative = dNumber < 0.0;
-    nLen = sFormatStrg.getLength();
+    nLen = sFormatStrg.size();
     dExponent = get_number_of_digits( dNumber );
     nExponentPos = 0;
     nMaxExponentDigit = 0;
@@ -835,12 +838,12 @@ void SbxBasicFormater::ScanFormatString( double dNumber,
 
     if( nNoOfDigitsRight>0 )
     {
-        ParseBack( sReturnStrg, sFormatStrg, sFormatStrg.getLength()-1 );
+        ParseBack( sReturnStrg, sFormatStrg, sFormatStrg.size()-1 );
     }
     sReturnStrgFinal = sReturnStrg.makeStringAndClear();
 }
 
-OUString SbxBasicFormater::BasicFormatNull( const OUString& sFormatStrg )
+OUString SbxBasicFormater::BasicFormatNull( std::u16string_view sFormatStrg )
 {
     bool bNullFormatFound;
     OUString sNullFormatStrg = GetNullFormatString( sFormatStrg, bNullFormatFound );
@@ -957,41 +960,41 @@ OUString SbxBasicFormater::BasicFormat( double dNumber, const OUString& _sFormat
     return sReturnStrg;
 }
 
-bool SbxBasicFormater::isBasicFormat( const OUString& sFormatStrg )
+bool SbxBasicFormater::isBasicFormat( std::u16string_view sFormatStrg )
 {
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_GENERALNUMBER ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_GENERALNUMBER ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_CURRENCY ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_CURRENCY ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_FIXED ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_FIXED ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_STANDARD ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_STANDARD ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_PERCENT ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_PERCENT ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_SCIENTIFIC ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_SCIENTIFIC ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_YESNO ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_YESNO ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_TRUEFALSE ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_TRUEFALSE ) )
     {
         return true;
     }
-    if( sFormatStrg.equalsIgnoreAsciiCase( BASICFORMAT_ONOFF ) )
+    if( o3tl::equalsIgnoreAsciiCase( sFormatStrg, BASICFORMAT_ONOFF ) )
     {
         return true;
     }

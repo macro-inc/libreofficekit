@@ -22,42 +22,9 @@
 #include <svl/poolitem.hxx>
 #include <tools/color.hxx>
 #include <editeng/editengdllapi.h>
+#include <docmodel/theme/ThemeColor.hxx>
 
 #define VERSION_USEAUTOCOLOR    1
-
-/// Represents theme metadata for a (tools) Color.
-class EDITENG_DLLPUBLIC SvxThemeColor
-{
-    sal_Int16 maThemeIndex;
-    /// Luminance Modulation: 100th percentage, defaults to 100%.
-    sal_Int16 mnLumMod;
-    /// Luminance Offset: 100th percentage, defaults to 0%.
-    sal_Int16 mnLumOff;
-
-public:
-    explicit SvxThemeColor();
-    bool operator==(const SvxThemeColor& rThemeColor) const;
-
-    sal_Int16 GetThemeIndex() const
-    {
-        return maThemeIndex;
-    }
-
-    void SetThemeIndex(sal_Int16 nIndex)
-    {
-        maThemeIndex = nIndex;
-    }
-
-    void SetLumMod(sal_Int16 nLumMod) { mnLumMod = nLumMod; }
-
-    sal_Int16 GetLumMod() const { return mnLumMod; }
-
-    void SetLumOff(sal_Int16 nLumOff) { mnLumOff = nLumOff; }
-
-    sal_Int16 GetLumOff() const { return mnLumOff; }
-
-    void dumpAsXml(xmlTextWriterPtr pWriter) const;
-};
 
 /** SvxColorItem item describes a color.
 */
@@ -65,14 +32,14 @@ class EDITENG_DLLPUBLIC SvxColorItem final : public SfxPoolItem
 {
 private:
     Color mColor;
-    SvxThemeColor maThemeColor;
-    sal_Int16 maTintShade;
+    model::ThemeColor maThemeColor;
 
 public:
     static SfxPoolItem* CreateDefault();
 
     explicit SvxColorItem(const sal_uInt16 nId);
     SvxColorItem(const Color& aColor, const sal_uInt16 nId);
+    SvxColorItem(const Color& aColor, model::ThemeColor const& rThemeColor, const sal_uInt16 nId);
     virtual ~SvxColorItem() override;
 
     // "pure virtual Methods" from SfxPoolItem
@@ -93,19 +60,14 @@ public:
     }
     void SetValue(const Color& rNewColor);
 
-    sal_Int16 GetTintOrShade() const
+    model::ThemeColor& GetThemeColor() { return maThemeColor; }
+
+    const model::ThemeColor& GetThemeColor() const { return maThemeColor; }
+
+    void setThemeColor(model::ThemeColor const& rThemeColor)
     {
-        return maTintShade;
+        maThemeColor = rThemeColor;
     }
-
-    void SetTintOrShade(sal_Int16 nTintOrShade)
-    {
-        maTintShade = nTintOrShade;
-    }
-
-    SvxThemeColor& GetThemeColor() { return maThemeColor; }
-
-    const SvxThemeColor& GetThemeColor() const { return maThemeColor; }
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

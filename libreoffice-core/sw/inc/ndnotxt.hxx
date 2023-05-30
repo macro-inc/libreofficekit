@@ -25,8 +25,7 @@
 
 class Size;
 
-// SwNoTextNode
-
+/// Layout frame for SwNoTextNode, i.e. graphics and OLE nodes (including charts).
 class SW_DLLPUBLIC SwNoTextNode : public SwContentNode
 {
     friend class SwNodes;
@@ -47,7 +46,7 @@ class SW_DLLPUBLIC SwNoTextNode : public SwContentNode
     SwNoTextNode &operator=( const SwNoTextNode& ) = delete;
 
 protected:
-    SwNoTextNode( const SwNodeIndex &rWhere, const SwNodeType nNdType,
+    SwNoTextNode( SwNode& rWhere, const SwNodeType nNdType,
                 SwGrfFormatColl *pGrColl, SwAttrSet const * pAutoAttr );
 
 public:

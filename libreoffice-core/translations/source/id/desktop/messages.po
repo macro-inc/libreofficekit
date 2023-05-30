@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-04 16:15+0000\n"
-"Last-Translator: Rizal Muttaqin <riz_17_oke@yahoo.co.id>\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-12-07 12:12+0000\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -919,11 +919,11 @@ msgctxt "extensionmanager|label1"
 msgid "Display Extensions"
 msgstr "Tampilkan Ekstensi"
 
-#. yTB9y
+#. WREKY
 #: desktop/uiconfig/ui/extensionmanager.ui:162
 msgctxt "extensionmanager|search"
-msgid "Search ..."
-msgstr "Cari ..."
+msgid "Search..."
+msgstr "Cari..."
 
 #. BAVdg
 #: desktop/uiconfig/ui/extensionmanager.ui:191

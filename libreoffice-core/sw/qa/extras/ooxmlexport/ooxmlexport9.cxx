@@ -9,16 +9,12 @@
 
 #include <swmodeltestbase.hxx>
 
-#include <config_features.h>
+#include <config_fonts.h>
 
-#include <com/sun/star/awt/Size.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/text/XFootnote.hpp>
 #include <com/sun/star/text/XPageCursor.hpp>
 #include <com/sun/star/text/XTextColumns.hpp>
-#include <com/sun/star/text/XTextFramesSupplier.hpp>
 #include <com/sun/star/text/XTextViewCursorSupplier.hpp>
-#include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/style/BreakType.hpp>
 #include <com/sun/star/style/PageStyleLayout.hpp>
 #include <com/sun/star/text/HoriOrientation.hpp>
@@ -32,7 +28,6 @@
 #include <com/sun/star/style/LineSpacingMode.hpp>
 #include <com/sun/star/style/ParagraphAdjust.hpp>
 #include <com/sun/star/drawing/XControlShape.hpp>
-#include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/packages/zip/ZipFileAccess.hpp>
 #include <com/sun/star/text/XTextTable.hpp>
 
@@ -40,6 +35,7 @@
 #include <sfx2/docfilt.hxx>
 #include <comphelper/processfactory.hxx>
 #include <tools/UnitConversion.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <docsh.hxx>
 #include <ftninfo.hxx>
@@ -49,15 +45,6 @@ class Test : public SwModelTestBase
 {
 public:
     Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
-    }
 };
 
 class DocmTest : public SwModelTestBase
@@ -118,11 +105,14 @@ DECLARE_SW_ROUNDTRIP_TEST(testDocmSave, "hello.docm", nullptr, DocmTest)
     // This was
     // application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml,
     // we used the wrong content type for .docm files.
-    if (xmlDocUniquePtr pXmlDoc = parseExport("[Content_Types].xml"))
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlDoc = parseExport("[Content_Types].xml");
         assertXPath(pXmlDoc,
                     "/ContentType:Types/ContentType:Override[@PartName='/word/document.xml']",
                     "ContentType",
                     "application/vnd.ms-word.document.macroEnabled.main+xml");
+    }
 }
 
 DECLARE_SW_ROUNDTRIP_TEST(testBadDocm, "bad.docm", nullptr, DocmTest)
@@ -133,13 +123,24 @@ DECLARE_SW_ROUNDTRIP_TEST(testBadDocm, "bad.docm", nullptr, DocmTest)
     CPPUNIT_ASSERT_EQUAL(OUString("MS Word 2007 XML VBA"), pTextDoc->GetDocShell()->GetMedium()->GetFilter()->GetName());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf109063, "tdf109063.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf109063)
 {
-    // This was 1, near-page-width table was imported as a TextFrame.
-    CPPUNIT_ASSERT_EQUAL(0, getShapes());
+    auto verify = [this]() {
+        // A near-page-width table should be allowed to split:
+        uno::Reference<text::XTextFramesSupplier> xDocument(mxComponent, uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xFrame(xDocument->getTextFrames()->getByName("Frame1"),
+                                                   uno::UNO_QUERY);
+        bool bIsSplitAllowed{};
+        xFrame->getPropertyValue("IsSplitAllowed") >>= bIsSplitAllowed;
+        CPPUNIT_ASSERT(bIsSplitAllowed);
+    };
+    createSwDoc("tdf109063.docx");
+    verify();
+    reload(mpFilter, "tdf109063.docx");
+    verify();
 }
 
-CPPUNIT_TEST_FIXTURE(Test, testTdf108269)
+CPPUNIT_TEST_FIXTURE(DocmTest, testTdf108269)
 {
     loadAndReload("tdf108269.docm");
     uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), maTempFile.GetURL());
@@ -147,6 +148,14 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf108269)
     // grab-bag.
     CPPUNIT_ASSERT(xNameAccess->hasByName("word/vbaProject.bin"));
     CPPUNIT_ASSERT(xNameAccess->hasByName("word/vbaData.xml"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf125338)
+{
+    loadAndSave("tdf125338.docm");
+    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess = packages::zip::ZipFileAccess::createWithURL(comphelper::getComponentContext(m_xSFactory), maTempFile.GetURL());
+    // docm files should not retain macros when saved as docx
+    CPPUNIT_ASSERT(!xNameAccess->hasByName("word/vbaProject.bin"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf92045, "tdf92045.docx")
@@ -436,9 +445,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf79272_strictDxa, "tdf79272_strictDxa.docx")
     uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int32(4318), getProperty<sal_Int32>(xTables->getByIndex(0), "Width"));
 
-    xmlDocUniquePtr pXmlDoc = parseExport("word/styles.xml");
-    if (!pXmlDoc)
+    if (!isExported())
          return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/styles.xml");
     // Validation test: order of elements was wrong. Order was: insideH, end, insideV.
     int nEnd = getXPathPosition(pXmlDoc, "/w:styles/w:style[@w:styleId='TableGrid']/w:tblPr/w:tblBorders", "end");
     int nInsideH = getXPathPosition(pXmlDoc, "/w:styles/w:style[@w:styleId='TableGrid']/w:tblPr/w:tblBorders", "insideH");
@@ -487,8 +496,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf104420, "tdf104420_lostParagraph.docx")
     CPPUNIT_ASSERT_EQUAL( 2, getPages() );
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf41542_borderlessPadding, "tdf41542_borderlessPadding.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf41542_borderlessPadding)
 {
+    loadAndReload("tdf41542_borderlessPadding.odt");
     // the page style's borderless padding should force this to 3 pages, not 1
     CPPUNIT_ASSERT_EQUAL( 3, getPages() );
 }
@@ -501,7 +511,7 @@ DECLARE_OOXMLEXPORT_TEST(tdf105490_negativeMargins, "tdf105490_negativeMargins.d
 }
 #endif
 
-DECLARE_OOXMLEXPORT_TEST(testTdf97648_relativeWidth,"tdf97648_relativeWidth.docx")
+DECLARE_OOXMLEXPORT_TEST(testTdf97648_relativeWidth, "tdf97648_relativeWidth.docx")
 {
     CPPUNIT_ASSERT_DOUBLES_EQUAL( sal_Int32(7616), getShape(1)->getSize().Width, 10);
     CPPUNIT_ASSERT_DOUBLES_EQUAL( sal_Int32(8001), getShape(2)->getSize().Width, 10);
@@ -512,7 +522,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf97648_relativeWidth,"tdf97648_relativeWidth.docx
 
 
     CPPUNIT_ASSERT_EQUAL( sal_Int32(0), getProperty<sal_Int32>(getShape(1), "LeftMargin") );
-    if (!mbExported)
+    if (!isExported())
     {
         CPPUNIT_ASSERT_EQUAL_MESSAGE("Text should wrap above/below the line", text::WrapTextMode_NONE, getProperty<text::WrapTextMode>(getShape(1), "Surround"));
         CPPUNIT_ASSERT_EQUAL(text::HoriOrientation::CENTER, getProperty<sal_Int16>(getShape(2), "HoriOrient"));
@@ -540,8 +550,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf46940_dontEquallyDistributeColumns, "tdf46940_do
     CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xTextSections->getByIndex(3), "DontBalanceTextColumns"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf98700_keepWithNext, "tdf98700_keepWithNext.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf98700_keepWithNext)
 {
+    loadAndReload("tdf98700_keepWithNext.odt");
     CPPUNIT_ASSERT_EQUAL(2, getPages());
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Heading style keeps with next", true, getProperty<bool>(getParagraph(1), "ParaKeepTogether"));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Default style doesn't keep with next", false, getProperty<bool>(getParagraph(2), "ParaKeepTogether"));
@@ -812,40 +823,47 @@ DECLARE_OOXMLEXPORT_TEST(testBnc519228OddBreaks, "bnc519228_odd-breaksB.docx")
 {
     // Check that all the normal styles are not set as right-only, those should be only those used after odd page breaks.
     uno::Reference<beans::XPropertySet> defaultStyle(getStyles("PageStyles")->getByName("Standard"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(style::PageStyleLayout_ALL), defaultStyle->getPropertyValue("PageStyleLayout"));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(style::PageStyleLayout_ALL), defaultStyle->getPropertyValue("PageStyleLayout"));
     uno::Reference<beans::XPropertySet> firstPage( getStyles("PageStyles")->getByName("First Page"), uno::UNO_QUERY );
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(style::PageStyleLayout_ALL), firstPage->getPropertyValue("PageStyleLayout"));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(style::PageStyleLayout_ALL), firstPage->getPropertyValue("PageStyleLayout"));
 
     OUString page1StyleName = getProperty<OUString>( getParagraph( 1, "This is the first page." ), "PageDescName");
     uno::Reference<beans::XPropertySet> page1Style(getStyles("PageStyles")->getByName(page1StyleName), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(style::PageStyleLayout_RIGHT), page1Style->getPropertyValue("PageStyleLayout"));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(style::PageStyleLayout_RIGHT), page1Style->getPropertyValue("PageStyleLayout"));
     getParagraphOfText( 1, getProperty< uno::Reference<text::XText> >(page1Style, "HeaderText"), "This is the header for odd pages");
 
     // Page2 comes from follow of style for page 1 and should be a normal page. Also check the two page style have the same properties,
     // since page style for page1 was created from page style for page 2.
     OUString page2StyleName = getProperty<OUString>( page1Style, "FollowStyle" );
     uno::Reference<beans::XPropertySet> page2Style(getStyles("PageStyles")->getByName(page2StyleName), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(style::PageStyleLayout_ALL), page2Style->getPropertyValue("PageStyleLayout"));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(style::PageStyleLayout_ALL), page2Style->getPropertyValue("PageStyleLayout"));
     getParagraphOfText( 1, getProperty< uno::Reference<text::XText> >(page2Style, "HeaderTextLeft"), "This is the even header");
     getParagraphOfText( 1, getProperty< uno::Reference<text::XText> >(page2Style, "HeaderTextRight"), "This is the header for odd pages");
     CPPUNIT_ASSERT_EQUAL(getProperty<sal_Int32>(page1Style, "TopMargin"), getProperty<sal_Int32>(page2Style, "TopMargin"));
 
     OUString page5StyleName = getProperty<OUString>( getParagraph( 4, "Then an odd break after an odd page, should lead us to page #5." ), "PageDescName");
     uno::Reference<beans::XPropertySet> page5Style(getStyles("PageStyles")->getByName(page5StyleName), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL(uno::makeAny(style::PageStyleLayout_RIGHT), page5Style->getPropertyValue("PageStyleLayout"));
+    CPPUNIT_ASSERT_EQUAL(uno::Any(style::PageStyleLayout_RIGHT), page5Style->getPropertyValue("PageStyleLayout"));
     getParagraphOfText( 1, getProperty< uno::Reference<text::XText> >(page5Style, "HeaderText"), "This is the header for odd pages");
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf79329, "tdf79329.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf79329)
 {
-    uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
-    uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
-    // This was 1: only the inner, not the outer table was created.
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xTables->getCount());
+    auto verify = [this]() {
+        uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
+        uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
+        // This was 1: only the inner, not the outer table was created.
+        CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xTables->getCount());
+    };
+    createSwDoc("tdf79329.docx");
+    verify();
+    reload(mpFilter, "tdf79329.docx");
+    verify();
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testTdf103982, "tdf103982.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf103982)
 {
+    loadAndReload("tdf103982.docx");
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     sal_Int32 nDistB = getXPath(pXmlDoc, "//wp:anchor", "distB").toInt32();
     // This was -260350, which is not a valid value for an unsigned type.
@@ -923,11 +941,11 @@ DECLARE_OOXMLEXPORT_TEST(testTdf82173_footnoteStyle, "tdf82173_footnoteStyle.doc
 
     uno::Reference<beans::XPropertySet> xPageStyle(getStyles("CharacterStyles")->getByName("Footnote Characters"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL( sal_Int32(58),       getProperty< sal_Int32 >(xPageStyle, "CharEscapementHeight") );
-    CPPUNIT_ASSERT_EQUAL( Color(0x00FF00), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL( Color(0x00FF00), getProperty<Color>(xPageStyle, "CharColor"));
 
     xPageStyle.set(getStyles("CharacterStyles")->getByName("Footnote anchor"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL( sal_Int32(58),       getProperty< sal_Int32 >(xPageStyle, "CharEscapementHeight") );
-    CPPUNIT_ASSERT_EQUAL( Color(0x00FF00), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL( Color(0x00FF00), getProperty<Color>(xPageStyle, "CharColor"));
 
     //tdf#118361 - in RTL locales, the footnote separator should still be left aligned.
     uno::Any aPageStyle = getStyles("PageStyles")->getByName("Standard");
@@ -942,30 +960,31 @@ DECLARE_OOXMLEXPORT_TEST(testTdf82173_endnoteStyle, "tdf82173_endnoteStyle.docx"
     xEndnotes->getByIndex(0) >>= xEndnote;
     // character properties were previously not assigned to the footnote/endnote in-text anchor.
     CPPUNIT_ASSERT_EQUAL( 24.0f, getProperty< float >(xEndnote->getAnchor(), "CharHeight") );
-    CPPUNIT_ASSERT_EQUAL( Color(0xFF0000), Color(ColorTransparency, getProperty< sal_Int32 >(xEndnote->getAnchor(), "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL( Color(0xFF0000), getProperty<Color>(xEndnote->getAnchor(), "CharColor"));
 
     uno::Reference<text::XText> xEndnoteText;
     xEndnotes->getByIndex(0) >>= xEndnoteText;
     // This was Endnote Symbol
     CPPUNIT_ASSERT_EQUAL(OUString("Endnote"), getProperty<OUString>(getParagraphOfText(1, xEndnoteText), "ParaStyleName"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x993300), Color(ColorTransparency, getProperty<sal_Int32>(getParagraphOfText(1, xEndnoteText), "CharColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x993300), getProperty<Color>(getParagraphOfText(1, xEndnoteText), "CharColor"));
 
     uno::Reference<beans::XPropertySet> xPageStyle(getStyles("CharacterStyles")->getByName("Endnote Characters"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL( sal_Int32(58),       getProperty< sal_Int32 >(xPageStyle, "CharEscapementHeight") );
-    CPPUNIT_ASSERT_EQUAL( Color(0xFF00FF), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL( Color(0xFF00FF), getProperty<Color>(xPageStyle, "CharColor"));
 
     xPageStyle.set(getStyles("CharacterStyles")->getByName("Endnote anchor"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL( sal_Int32(58),       getProperty< sal_Int32 >(xPageStyle, "CharEscapementHeight") );
-    CPPUNIT_ASSERT_EQUAL( Color(0xFF00FF), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL( Color(0xFF00FF), getProperty<Color>(xPageStyle, "CharColor"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf55427_footnote2endnote, "tdf55427_footnote2endnote.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf55427_footnote2endnote)
 {
+    loadAndReload("tdf55427_footnote2endnote.odt");
     CPPUNIT_ASSERT_EQUAL(4, getPages());
     uno::Reference<beans::XPropertySet> xPageStyle(getStyles("ParagraphStyles")->getByName("Footnote"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Footnote style is rose color", Color(0xFF007F), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Footnote style is rose color", Color(0xFF007F), getProperty<Color>(xPageStyle, "CharColor"));
     xPageStyle.set(getStyles("ParagraphStyles")->getByName("Endnote"), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Endnote style is cyan3 color", Color(0x2BD0D2), Color(ColorTransparency, getProperty< sal_Int32 >(xPageStyle, "CharColor")) );
+    CPPUNIT_ASSERT_EQUAL_MESSAGE( "Endnote style is cyan3 color", Color(0x2BD0D2), getProperty<Color>(xPageStyle, "CharColor"));
 
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
@@ -986,7 +1005,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf55427_footnote2endnote, "tdf55427_footnote2endno
     xEndnotes->getByIndex(0) >>= xEndnoteText;
 
     // ODT footnote-at-document-end's closest DOCX match is an endnote, so the two imports will not exactly match by design.
-    if (!mbExported)
+    if (!isExported())
     {
         CPPUNIT_ASSERT_EQUAL_MESSAGE( "original footnote count", sal_Int32(5), xFootnotes->getCount() );
         CPPUNIT_ASSERT_EQUAL_MESSAGE( "original endnote count", sal_Int32(1), xEndnotes->getCount() );
@@ -1133,7 +1152,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf121670_columnsInSectionsOnly, "tdf121670_columns
 CPPUNIT_TEST_FIXTURE(Test, testTdf106492)
 {
     loadAndSave("tdf106492.docx");
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     // This was 4: an additional sectPr was added to the document.
     assertXPath(pXmlDoc, "//w:sectPr", 3);
 }
@@ -1154,15 +1173,23 @@ DECLARE_OOXMLEXPORT_TEST(testTdf107033, "tdf107033.docx")
 }
 
 #if HAVE_MORE_FONTS
-DECLARE_OOXMLEXPORT_TEST(testTdf107889, "tdf107889.docx")
+CPPUNIT_TEST_FIXTURE(Test, testTdf107889)
 {
-    // This was 1, multi-page table was imported as a floating one.
-    CPPUNIT_ASSERT_EQUAL(0, getShapes());
+    auto verify = [this]() {
+        // This was 1, multi-page table was imported as a non-split fly.
+        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+        assertXPath(pXmlDoc, "//tab", 2);
+    };
+    createSwDoc("tdf107889.docx");
+    verify();
+    reload(mpFilter, "tdf107889.docx");
+    verify();
 }
 #endif
 
-DECLARE_OOXMLEXPORT_TEST(testTdf107837, "tdf107837.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf107837)
 {
+    loadAndReload("tdf107837.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     uno::Reference<text::XTextSectionsSupplier> xTextSectionsSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xTextSections(xTextSectionsSupplier->getTextSections(), uno::UNO_QUERY);
@@ -1170,16 +1197,18 @@ DECLARE_OOXMLEXPORT_TEST(testTdf107837, "tdf107837.odt")
     CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(xTextSections->getByIndex(0), "DontBalanceTextColumns"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf107684, "tdf107684.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf107684)
 {
+    loadAndReload("tdf107684.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
-    if (xmlDocUniquePtr pXmlDoc = parseExport("word/styles.xml"))
-        // This was 1, <w:outlineLvl> was duplicated for Heading1.
-        assertXPath(pXmlDoc, "//w:style[@w:styleId='Heading1']/w:pPr/w:outlineLvl", 1);
+    xmlDocUniquePtr pXmlDoc = parseExport("word/styles.xml");
+    // This was 1, <w:outlineLvl> was duplicated for Heading1.
+    assertXPath(pXmlDoc, "//w:style[@w:styleId='Heading1']/w:pPr/w:outlineLvl", 1);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf107618, "tdf107618.doc")
+CPPUNIT_TEST_FIXTURE(Test, testTdf107618)
 {
+    loadAndReload("tdf107618.doc");
     // This was false, header was lost on export.
     uno::Reference<beans::XPropertySet> xPageStyle(getStyles("PageStyles")->getByName("Standard"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(true, getProperty<bool>(xPageStyle, "HeaderIsOn"));
@@ -1221,8 +1250,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf105095, "tdf105095.docx")
     CPPUNIT_ASSERT_EQUAL( OUString("\tfootnote"), xTextRange->getString() );
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf106062_nonHangingFootnote, "tdf106062_nonHangingFootnote.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf106062_nonHangingFootnote)
 {
+    loadAndReload("tdf106062_nonHangingFootnote.odt");
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     uno::Reference<text::XFootnotesSupplier> xFootnotesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XIndexAccess> xFootnotes = xFootnotesSupplier->getFootnotes();
@@ -1278,7 +1308,7 @@ DECLARE_OOXMLEXPORT_TEST( testActiveXCheckbox, "activex_checkbox.docx" )
     CPPUNIT_ASSERT_EQUAL( sal_Int32( 0x316AC5 ), getProperty<sal_Int32>(xPropertySet, "BackgroundColor") );
 
     // Check Text color (active border system color)
-    CPPUNIT_ASSERT_EQUAL(Color(0xD4D0C8), Color(ColorTransparency, getProperty<sal_Int32>(xPropertySet, "TextColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0xD4D0C8), getProperty<Color>(xPropertySet, "TextColor"));
 
     // Check state of the checkbox
     CPPUNIT_ASSERT_EQUAL(sal_Int16(1), getProperty<sal_Int16>(xPropertySet, "State"));
@@ -1288,8 +1318,9 @@ DECLARE_OOXMLEXPORT_TEST( testActiveXCheckbox, "activex_checkbox.docx" )
     CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AT_CHARACTER,getProperty<text::TextContentAnchorType>(xPropertySet2,"AnchorType"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testActiveXControlAlign, "activex_control_align.odt")
+CPPUNIT_TEST_FIXTURE(Test, testActiveXControlAlign)
 {
+    loadAndReload("activex_control_align.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // First check box aligned as a floating object
@@ -1337,7 +1368,7 @@ DECLARE_OOXMLEXPORT_TEST(testActiveXControlAlign, "activex_control_align.odt")
     CPPUNIT_ASSERT_EQUAL(sal_Int32(-1085), xShape->getPosition().Y);
 
     // Also check the specific OOXML elements
-    xmlDocUniquePtr pXmlDoc = parseExport();
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
     CPPUNIT_ASSERT(pXmlDoc);
     // For inline controls use w:object as parent element and pictureFrame shapetype
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/w:object", 1);
@@ -1392,8 +1423,9 @@ DECLARE_OOXMLEXPORT_TEST(testWatermark, "watermark-shapetype.docx")
     CPPUNIT_ASSERT_EQUAL(xPropertySet1->getPropertyValue("TextAutoGrowHeight"), xPropertySet2->getPropertyValue("TextAutoGrowHeight"));
 }
 
-DECLARE_OOXMLEXPORT_TEST(testActiveXControlAtRunEnd, "activex_control_at_run_end.odt")
+CPPUNIT_TEST_FIXTURE(Test, testActiveXControlAtRunEnd)
 {
+    loadAndReload("activex_control_at_run_end.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // Two issues were here:
@@ -1497,7 +1529,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf90789, "tdf90789.docx")
 
     uno::Reference<frame::XModel> xModel(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<view::XSelectionSupplier> xCtrl(xModel->getCurrentController(), uno::UNO_QUERY_THROW);
-    xCtrl->select(uno::makeAny(xShape->getAnchor()));
+    xCtrl->select(uno::Any(xShape->getAnchor()));
 
     uno::Reference<text::XTextViewCursorSupplier> xTextViewCursorSupplier(xCtrl, uno::UNO_QUERY_THROW);
     uno::Reference<text::XTextViewCursor> xTextCursor(xTextViewCursorSupplier->getViewCursor(), uno::UNO_SET_THROW);

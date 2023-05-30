@@ -154,7 +154,7 @@ static OString macxp_resolveAliasAndConvert(OString const & p)
     {
         strcpy(path, p.getStr());
         macxp_resolveAlias(path, PATH_MAX);
-        return OString(path);
+        return path;
     }
     return p;
 }
@@ -214,8 +214,12 @@ template<> OUString fromOString(OString const & s)
 template<typename T> bool realpath_(const T& pstrFileName, T& ppstrResolvedName)
 {
     OString fn = toOString(pstrFileName);
-#ifdef ANDROID
+#if defined ANDROID || defined(EMSCRIPTEN)
+#if defined ANDROID
     if (fn == "/assets" || fn.startsWith("/assets/"))
+#else
+    if (fn == "/instdir" || fn.startsWith("/instdir/"))
+#endif
     {
         if (osl::access(fn, F_OK) == -1)
             return false;
@@ -224,7 +228,7 @@ template<typename T> bool realpath_(const T& pstrFileName, T& ppstrResolvedName)
 
         return true;
     }
-#endif
+#endif // ANDROID || EMSCRIPTEN
 
 #ifdef MACOSX
     fn = macxp_resolveAliasAndConvert(fn);
@@ -357,16 +361,16 @@ int osl::mkdir(const OString& path, mode_t mode)
     return result;
 }
 
-int open_c(const char *cpPath, int oflag, int mode)
+int open_c(const OString& path, int oflag, int mode)
 {
-    accessFilePathState *state = prepare_to_access_file_path(cpPath);
+    accessFilePathState *state = prepare_to_access_file_path(path.getStr());
 
-    int result = open(cpPath, oflag, mode);
+    int result = open(path.getStr(), oflag, mode);
     int saved_errno = errno;
     if (result == -1)
-        SAL_INFO("sal.file", "open(" << cpPath << ",0" << std::oct << oflag << ",0" << mode << std::dec << "): " << UnixErrnoString(saved_errno));
+        SAL_INFO("sal.file", "open(" << path << ",0" << std::oct << oflag << ",0" << mode << std::dec << "): " << UnixErrnoString(saved_errno));
     else
-        SAL_INFO("sal.file", "open(" << cpPath << ",0" << std::oct << oflag << ",0" << mode << std::dec << ") => " << result);
+        SAL_INFO("sal.file", "open(" << path << ",0" << std::oct << oflag << ",0" << mode << std::dec << ") => " << result);
 
 #if HAVE_FEATURE_MACOSX_SANDBOX
     if (isSandboxed && result != -1 && (oflag & O_CREAT) && (oflag & O_EXCL))
@@ -378,9 +382,10 @@ int open_c(const char *cpPath, int oflag, int mode)
         // scoped bookmark for it so that we can access the file in
         // the future, too. (For the "Recent Files" functionality.)
         const char *sandbox = [NSHomeDirectory() UTF8String];
-        if (!(strncmp(sandbox, cpPath, strlen(sandbox)) == 0 &&
-              cpPath[strlen(sandbox)] == '/'))
+        if (!(strncmp(sandbox, path.getStr(), strlen(sandbox)) == 0 &&
+              path[strlen(sandbox)] == '/'))
         {
+            auto cpPath = path.getStr();
             NSURL *url = [NSURL fileURLWithPath:[NSString stringWithUTF8String:cpPath]];
             NSData *data = [url bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope
                          includingResourceValuesForKeys:nil
@@ -395,7 +400,7 @@ int open_c(const char *cpPath, int oflag, int mode)
     }
 #endif
 
-    done_accessing_file_path(cpPath, state);
+    done_accessing_file_path(path.getStr(), state);
 
     errno = saved_errno;
 
@@ -413,7 +418,7 @@ int utime_c(const char *cpPath, struct utimbuf *times)
     return result;
 }
 
-int ftruncate_with_name(int fd, sal_uInt64 uSize, rtl_String* path)
+int ftruncate_with_name(int fd, sal_uInt64 uSize, const OString& path)
 {
     /* When sandboxed on macOS, ftruncate(), even if it takes an
      * already open file descriptor which was returned from an open()

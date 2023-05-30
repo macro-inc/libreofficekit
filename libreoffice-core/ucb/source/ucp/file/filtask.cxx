@@ -539,7 +539,7 @@ TaskManager::associate( const OUString& aUnqPath,
                             beans::PropertyState_DEFAULT_VALUE,
                             Attributes );
 
-    TaskManager::PropertySet::iterator it1 = m_aDefaultProperties.find( newProperty );
+    auto it1 = m_aDefaultProperties.find( newProperty );
     if( it1 != m_aDefaultProperties.end() )
         throw beans::PropertyExistException( THROW_WHERE );
 
@@ -570,7 +570,7 @@ TaskManager::deassociate( const OUString& aUnqPath,
 {
     MyProperty oldProperty( PropertyName );
 
-    TaskManager::PropertySet::iterator it1 = m_aDefaultProperties.find( oldProperty );
+    auto it1 = m_aDefaultProperties.find( oldProperty );
     if( it1 != m_aDefaultProperties.end() )
         throw beans::NotRemoveableException( THROW_WHERE );
 
@@ -845,7 +845,7 @@ TaskManager::setv( const OUString& aUnqPath,
 
     TaskManager::ContentMap::iterator it = m_aContent.find( aUnqPath );
     PropertySet& properties = it->second.properties;
-    TaskManager::PropertySet::iterator it1;
+    TaskManager::PropertySet::const_iterator it1;
     uno::Any aAny;
 
     for( sal_Int32 i = 0; i < values.getLength(); ++i )
@@ -1934,6 +1934,7 @@ void TaskManager::insertDefaultProperties( const OUString& aUnqPath )
     PropertySet& properties = it->second.properties;
     bool ContentNotDefau = properties.find( ContentTProperty ) != properties.end();
 
+    properties.reserve(properties.size() + m_aDefaultProperties.size());
     for (auto const& defaultprop : m_aDefaultProperties)
     {
         if( !ContentNotDefau || defaultprop.getPropertyName() != ContentType )
@@ -2243,7 +2244,7 @@ void
 TaskManager::commit( const TaskManager::ContentMap::iterator& it,
                const osl::FileStatus& aFileStatus )
 {
-    TaskManager::PropertySet::iterator it1;
+    TaskManager::PropertySet::const_iterator it1;
 
     if( it->second.properties.empty() )
     {
@@ -2326,15 +2327,15 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
 
         it1 = properties.find( MyProperty( IsVolume ) );
         if( it1 != properties.end() )
-            it1->setValue( uno::makeAny( isVolume ) );
+            it1->setValue( uno::Any( isVolume ) );
 
         it1 = properties.find( MyProperty( IsFolder ) );
         if( it1 != properties.end() )
-            it1->setValue( uno::makeAny( isDirectory ) );
+            it1->setValue( uno::Any( isDirectory ) );
 
         it1 = properties.find( MyProperty( IsDocument ) );
         if( it1 != properties.end() )
-            it1->setValue( uno::makeAny( isFile ) );
+            it1->setValue( uno::Any( isFile ) );
 
         osl::VolumeInfo aVolumeInfo( osl_VolumeInfo_Mask_Attributes );
         if( isVolume &&
@@ -2349,19 +2350,19 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
 
             it1 = properties.find( MyProperty( IsRemote ) );
             if( it1 != properties.end() )
-                it1->setValue( uno::makeAny( isRemote ) );
+                it1->setValue( uno::Any( isRemote ) );
 
             it1 = properties.find( MyProperty( IsRemoveable ) );
             if( it1 != properties.end() )
-                it1->setValue( uno::makeAny( isRemoveable ) );
+                it1->setValue( uno::Any( isRemoveable ) );
 
             it1 = properties.find( MyProperty( IsCompactDisc ) );
             if( it1 != properties.end() )
-                it1->setValue( uno::makeAny( isCompactDisc ) );
+                it1->setValue( uno::Any( isCompactDisc ) );
 
             it1 = properties.find( MyProperty( IsFloppy ) );
             if( it1 != properties.end() )
-                it1->setValue( uno::makeAny( isFloppy ) );
+                it1->setValue( uno::Any( isFloppy ) );
         }
         else
         {
@@ -2390,7 +2391,7 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
 
     it1 = properties.find( MyProperty( Size ) );
     if( it1 != properties.end() )
-        it1->setValue( uno::makeAny( dirSize ) );
+        it1->setValue( uno::Any( dirSize ) );
 
     it1 = properties.find( MyProperty( IsReadOnly ) );
     if( it1 != properties.end() )
@@ -2399,7 +2400,7 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
         {
             sal_uInt64 Attr = aFileStatus.getAttributes();
             bool readonly = ( Attr & osl_File_Attribute_ReadOnly ) != 0;
-            it1->setValue( uno::makeAny( readonly ) );
+            it1->setValue( uno::Any( readonly ) );
         }
     }
 
@@ -2410,7 +2411,7 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
         {
             sal_uInt64 Attr = aFileStatus.getAttributes();
             bool ishidden = ( Attr & osl_File_Attribute_Hidden ) != 0;
-            it1->setValue( uno::makeAny( ishidden ) );
+            it1->setValue( uno::Any( ishidden ) );
         }
     }
 
@@ -2443,13 +2444,13 @@ TaskManager::commit( const TaskManager::ContentMap::iterator& it,
             aDateTime.Day = myDateTime.Day;
             aDateTime.Month = myDateTime.Month;
             aDateTime.Year = myDateTime.Year;
-            it1->setValue( uno::makeAny( aDateTime ) );
+            it1->setValue( uno::Any( aDateTime ) );
         }
     }
 
     it1 = properties.find( MyProperty( CreatableContentsInfo ) );
     if( it1 != properties.end() )
-        it1->setValue( uno::makeAny(
+        it1->setValue( uno::Any(
             isDirectory || !aFileStatus.isValid( osl_FileStatus_Mask_Type )
                 ? queryCreatableContentsInfo()
                 : uno::Sequence< ucb::ContentInfo >() ) );

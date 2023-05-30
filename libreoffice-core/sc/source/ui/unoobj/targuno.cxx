@@ -19,11 +19,10 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <toolkit/helper/vclunohelper.hxx>
 #include <svl/itemprop.hxx>
 #include <svl/hint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/diagnose.h>
 #include <com/sun/star/awt/XBitmap.hpp>
@@ -50,13 +49,12 @@ const TranslateId aTypeResIds[SC_LINKTARGETTYPE_COUNT] =
     SCSTR_CONTENT_DBAREA        // SC_LINKTARGETTYPE_DBAREA
 };
 
-static const SfxItemPropertyMapEntry* lcl_GetLinkTargetMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetLinkTargetMap()
 {
     static const SfxItemPropertyMapEntry aLinkTargetMap_Impl[] =
     {
-        {u"" SC_UNO_LINKDISPBIT,  0,  cppu::UnoType<awt::XBitmap>::get(),   beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNO_LINKDISPNAME, 0,  cppu::UnoType<OUString>::get(),                beans::PropertyAttribute::READONLY, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNO_LINKDISPBIT,  0,  cppu::UnoType<awt::XBitmap>::get(),   beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNO_LINKDISPNAME, 0,  cppu::UnoType<OUString>::get(),                beans::PropertyAttribute::READONLY, 0 },
     };
     return aLinkTargetMap_Impl;
 }
@@ -99,7 +97,7 @@ uno::Any SAL_CALL ScLinkTargetTypesObj::getByName(const OUString& aName)
     {
         for (sal_uInt16 i=0; i<SC_LINKTARGETTYPE_COUNT; i++)
             if ( aNames[i] == aName )
-                return uno::makeAny(uno::Reference< beans::XPropertySet >(new ScLinkTargetTypeObj( pDocShell, i )));
+                return uno::Any(uno::Reference< beans::XPropertySet >(new ScLinkTargetTypeObj( pDocShell, i )));
     }
 
     throw container::NoSuchElementException();
@@ -191,7 +189,6 @@ uno::Reference< container::XNameAccess > SAL_CALL  ScLinkTargetTypeObj::getLinks
 
 uno::Reference< beans::XPropertySetInfo > SAL_CALL  ScLinkTargetTypeObj::getPropertySetInfo()
 {
-    SolarMutexGuard aGuard;
     static uno::Reference< beans::XPropertySetInfo >  aRef(new SfxItemPropertySetInfo( lcl_GetLinkTargetMap() ));
     return aRef;
 }
@@ -203,16 +200,16 @@ void SAL_CALL ScLinkTargetTypeObj::setPropertyValue(const OUString& /* aProperty
     //! exception?
 }
 
-const std::u16string_view aContentBmps[]=
+constexpr rtl::OUStringConstExpr aContentBmps[]=
 {
-    u"" RID_BMP_CONTENT_TABLE,
-    u"" RID_BMP_CONTENT_RANGENAME,
-    u"" RID_BMP_CONTENT_DBAREA,
-    u"" RID_BMP_CONTENT_GRAPHIC,
-    u"" RID_BMP_CONTENT_OLEOBJECT,
-    u"" RID_BMP_CONTENT_NOTE,
-    u"" RID_BMP_CONTENT_AREALINK,
-    u"" RID_BMP_CONTENT_DRAWING
+    RID_BMP_CONTENT_TABLE,
+    RID_BMP_CONTENT_RANGENAME,
+    RID_BMP_CONTENT_DBAREA,
+    RID_BMP_CONTENT_GRAPHIC,
+    RID_BMP_CONTENT_OLEOBJECT,
+    RID_BMP_CONTENT_NOTE,
+    RID_BMP_CONTENT_AREALINK,
+    RID_BMP_CONTENT_DRAWING
 };
 
 void ScLinkTargetTypeObj::SetLinkTargetBitmap( uno::Any& rRet, sal_uInt16 nType )
@@ -250,8 +247,8 @@ uno::Any SAL_CALL ScLinkTargetTypeObj::getPropertyValue(const OUString& Property
 
 SC_IMPL_DUMMY_PROPERTY_LISTENER( ScLinkTargetTypeObj )
 
-ScLinkTargetsObj::ScLinkTargetsObj( const uno::Reference< container::XNameAccess > & rColl ) :
-    xCollection( rColl )
+ScLinkTargetsObj::ScLinkTargetsObj( uno::Reference< container::XNameAccess > xColl ) :
+    xCollection(std::move( xColl ))
 {
     OSL_ENSURE( xCollection.is(), "ScLinkTargetsObj: NULL" );
 }
@@ -266,7 +263,7 @@ uno::Any SAL_CALL ScLinkTargetsObj::getByName(const OUString& aName)
 {
     uno::Reference<beans::XPropertySet> xProp(xCollection->getByName(aName), uno::UNO_QUERY);
     if (xProp.is())
-        return uno::makeAny(xProp);
+        return uno::Any(xProp);
 
     throw container::NoSuchElementException();
 }

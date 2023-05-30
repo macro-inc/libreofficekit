@@ -29,7 +29,6 @@
 #include <sot/formats.hxx>
 #include <vcl/vclptr.hxx>
 #include <vcl/window.hxx>
-#include <tools/solar.h>
 
 class SvxClipboardFormatItem;
 class TransferableDataHelper;
@@ -57,7 +56,7 @@ private:
     bool        HasClipboardFormat( SotClipboardFormatId nFormatId );
     void        ExecuteExternalSource(
                     const OUString& _rFile, const OUString& _rFilter, const OUString& _rOptions,
-                    const OUString& _rSource, sal_uLong _nRefresh, SfxRequest& _rRequest );
+                    const OUString& _rSource, sal_Int32 _nRefreshDelaySeconds, SfxRequest& _rRequest );
 
     void ExecuteDataPilotDialog();
     void ExecuteXMLSourceDialog();

@@ -22,6 +22,7 @@
 
 #include <com/sun/star/awt/Rectangle.hpp>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <oox/helper/attributelist.hxx>
 #include <unitconverter.hxx>
 #include <oox/token/namespaces.hxx>
@@ -122,7 +123,7 @@ void ShapeAnchor::importClientData( const AttributeList& rAttribs )
     maClientData.mbPrintsWithSheet = rAttribs.getBool( XML_fPrintsWithSheet, true );
 }
 
-void ShapeAnchor::setCellPos( sal_Int32 nElement, sal_Int32 nParentContext, const OUString& rValue )
+void ShapeAnchor::setCellPos( sal_Int32 nElement, sal_Int32 nParentContext, std::u16string_view rValue )
 {
     CellAnchorModel* pCellAnchor = nullptr;
     switch( nParentContext )
@@ -140,15 +141,15 @@ void ShapeAnchor::setCellPos( sal_Int32 nElement, sal_Int32 nParentContext, cons
     }
     if( pCellAnchor ) switch( nElement )
     {
-        case XDR_TOKEN( col ):      pCellAnchor->mnCol = rValue.toInt32();          break;
-        case XDR_TOKEN( row ):      pCellAnchor->mnRow = rValue.toInt32();          break;
-        case XDR_TOKEN( colOff ):   pCellAnchor->mnColOffset = rValue.toInt64();    break;
-        case XDR_TOKEN( rowOff ):   pCellAnchor->mnRowOffset = rValue.toInt64();    break;
+        case XDR_TOKEN( col ):      pCellAnchor->mnCol = o3tl::toInt32(rValue);          break;
+        case XDR_TOKEN( row ):      pCellAnchor->mnRow = o3tl::toInt32(rValue);          break;
+        case XDR_TOKEN( colOff ):   pCellAnchor->mnColOffset = o3tl::toInt64(rValue);    break;
+        case XDR_TOKEN( rowOff ):   pCellAnchor->mnRowOffset = o3tl::toInt64(rValue);    break;
         default:    OSL_ENSURE( false, "ShapeAnchor::setCellPos - unexpected element" );
     }
 }
 
-void ShapeAnchor::importVmlAnchor( const OUString& rAnchor )
+void ShapeAnchor::importVmlAnchor( std::u16string_view rAnchor )
 {
     meAnchorType = ANCHOR_VML;
     meCellAnchorType = CellAnchorType::Pixel;
@@ -158,7 +159,7 @@ void ShapeAnchor::importVmlAnchor( const OUString& rAnchor )
 
     for(sal_Int32 nIndex{ 0 }; nIndex>=0;)
     {
-        nValues[nI] = rAnchor.getToken( 0, ',', nIndex ).toInt32();
+        nValues[nI] = o3tl::toInt32(o3tl::getToken(rAnchor, 0, ',', nIndex ));
         if (++nI==8)
         {
             maFrom.mnCol       = nValues[0];
@@ -280,8 +281,8 @@ EmuPoint ShapeAnchor::calcCellAnchorEmu( const CellAnchorModel& rModel ) const
         case CellAnchorType::Pixel:
         {
             const UnitConverter& rUnitConv = getUnitConverter();
-            aEmuPoint.X += static_cast< sal_Int64 >( rUnitConv.scaleValue( static_cast< double >( rModel.mnColOffset ), Unit::ScreenX, Unit::Emu ) );
-            aEmuPoint.Y += static_cast< sal_Int64 >( rUnitConv.scaleValue( static_cast< double >( rModel.mnRowOffset ), Unit::ScreenY, Unit::Emu ) );
+            aEmuPoint.X += std::round( rUnitConv.scaleValue( rModel.mnColOffset, Unit::ScreenX, Unit::Emu ) );
+            aEmuPoint.Y += std::round( rUnitConv.scaleValue( rModel.mnRowOffset, Unit::ScreenY, Unit::Emu ) );
         }
         break;
     }

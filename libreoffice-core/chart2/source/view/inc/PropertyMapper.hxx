@@ -20,18 +20,19 @@
 
 #include <sal/config.h>
 
-#include <map>
+#include <unordered_map>
 
 #include <com/sun/star/uno/Sequence.h>
 #include <com/sun/star/uno/Reference.h>
 
 namespace com::sun::star::beans { class XPropertySet; }
+class SvxShape;
 
 namespace chart
 {
 
-typedef std::map< OUString, OUString >                              tPropertyNameMap;
-typedef std::map< OUString, css::uno::Any >            tPropertyNameValueMap;
+typedef std::unordered_map<OUString, OUString> tPropertyNameMap;
+typedef std::unordered_map<OUString, css::uno::Any> tPropertyNameValueMap;
 typedef css::uno::Sequence< OUString >                   tNameSequence;
 typedef css::uno::Sequence< css::uno::Any > tAnySequence;
 
@@ -47,8 +48,12 @@ public:
     static void setMappedProperties(
           const css::uno::Reference< css::beans::XPropertySet >& xTarget
         , const css::uno::Reference< css::beans::XPropertySet >& xSource
-        , const tPropertyNameMap& rMap
-        , tPropertyNameValueMap const * pOverwriteMap=nullptr );
+        , const tPropertyNameMap& rMap );
+
+    static void setMappedProperties(
+          SvxShape& xTarget
+        , const css::uno::Reference< css::beans::XPropertySet >& xSource
+        , const tPropertyNameMap& rMap );
 
     /**
      * Fetch property values from the source object and map it to the
@@ -65,13 +70,6 @@ public:
         , const tPropertyNameMap& rNameMap
         , const css::uno::Reference< css::beans::XPropertySet >& xSourceProp
         );
-
-    static void getMultiPropertyLists(
-                  tNameSequence& rNames
-                , tAnySequence&  rValues
-                , const css::uno::Reference< css::beans::XPropertySet >& xProp
-                , const tPropertyNameMap& rMap
-                );
 
     static void getMultiPropertyListsFromValueMap(
                   tNameSequence& rNames
@@ -92,7 +90,7 @@ public:
     static void setMultiProperties(
                   const tNameSequence& rNames
                 , const tAnySequence&  rValues
-                , const css::uno::Reference< css::beans::XPropertySet >& xTarget );
+                , SvxShape& xTarget );
 
     static const tPropertyNameMap& getPropertyNameMapForCharacterProperties();
     static const tPropertyNameMap& getPropertyNameMapForParagraphProperties();

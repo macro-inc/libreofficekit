@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-05-22 13:26+0000\n"
-"Last-Translator: JO3EMC <jo3emc@jarl.com>\n"
+"POT-Creation-Date: 2023-01-09 11:30+0100\n"
+"PO-Revision-Date: 2023-02-15 14:24+0000\n"
+"Last-Translator: Shinji Enoki <shinji.enoki@gmail.com>\n"
 "Language-Team: Japanese <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1562983822.000000\n"
 
 #. bHbFE
@@ -1172,11 +1172,11 @@ msgctxt "STR_PB_SAVEACOPY"
 msgid "Save a Copy"
 msgstr "コピーを保存"
 
-#. T9mMd
+#. CrEzt
 #: include/sfx2/strings.hrc:215
 msgctxt "STR_PB_COMPAREDOC"
-msgid "Compare to"
-msgstr "比較"
+msgid "Compare to Original Document"
+msgstr ""
 
 #. 4qMCh
 #: include/sfx2/strings.hrc:216
@@ -1661,336 +1661,366 @@ msgctxt "STR_REFRESH_PASSWORD"
 msgid "Refresh Password"
 msgstr "パスワードを更新"
 
+#. JBvAE
+#: include/sfx2/strings.hrc:295
+msgctxt "STR_CONTAINS_MACROS"
+msgid "The document contains macros."
+msgstr ""
+
+#. W7BEM
+#: include/sfx2/strings.hrc:296
+msgctxt "STR_MACROS"
+msgid "Macros"
+msgstr ""
+
+#. xtAP6
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_EVENTS"
+msgid "Events"
+msgstr ""
+
 #. kej8D
 #. Translators: default Impress template names
-#: include/sfx2/strings.hrc:297
+#: include/sfx2/strings.hrc:300
 msgctxt "STR_TEMPLATE_NAME1"
 msgid "Grey Elegant"
 msgstr "グレーエレガント"
 
 #. FkuLG
-#: include/sfx2/strings.hrc:298
+#: include/sfx2/strings.hrc:301
 msgctxt "STR_TEMPLATE_NAME2"
 msgid "Beehive"
 msgstr "ハチの巣"
 
 #. uwaPH
-#: include/sfx2/strings.hrc:299
+#: include/sfx2/strings.hrc:302
 msgctxt "STR_TEMPLATE_NAME3"
 msgid "Blue Curve"
 msgstr "ブルーカーブ"
 
 #. hHRDz
-#: include/sfx2/strings.hrc:300
+#: include/sfx2/strings.hrc:303
 msgctxt "STR_TEMPLATE_NAME4"
 msgid "Blueprint Plans"
 msgstr "青写真"
 
 #. MAnPU
-#: include/sfx2/strings.hrc:301
+#: include/sfx2/strings.hrc:304
 msgctxt "STR_TEMPLATE_NAME5"
 msgid "Candy"
 msgstr "キャンディ"
 
 #. jEiAn
-#: include/sfx2/strings.hrc:302
+#: include/sfx2/strings.hrc:305
 msgctxt "STR_TEMPLATE_NAME6"
 msgid "Yellow Idea"
 msgstr "イエローアイデア"
 
 #. QDNuB
-#: include/sfx2/strings.hrc:303
+#: include/sfx2/strings.hrc:306
 msgctxt "STR_TEMPLATE_NAME7"
 msgid "DNA"
 msgstr "DNA"
 
 #. XBrCi
-#: include/sfx2/strings.hrc:304
+#: include/sfx2/strings.hrc:307
 msgctxt "STR_TEMPLATE_NAME8"
 msgid "Focus"
 msgstr "フォーカス"
 
 #. GADdA
-#: include/sfx2/strings.hrc:305
+#: include/sfx2/strings.hrc:308
 msgctxt "STR_TEMPLATE_NAME9"
 msgid "Forestbird"
 msgstr "森の小鳥"
 
 #. TT8G5
-#: include/sfx2/strings.hrc:306
+#: include/sfx2/strings.hrc:309
 msgctxt "STR_TEMPLATE_NAME10"
 msgid "Freshes"
 msgstr "フレッシュ"
 
 #. C5N9D
-#: include/sfx2/strings.hrc:307
+#: include/sfx2/strings.hrc:310
 msgctxt "STR_TEMPLATE_NAME11"
 msgid "Inspiration"
 msgstr "インスピレーション"
 
 #. fCKG9
-#: include/sfx2/strings.hrc:308
+#: include/sfx2/strings.hrc:311
 msgctxt "STR_TEMPLATE_NAME12"
 msgid "Lights"
 msgstr "輝き"
 
 #. pcLWs
-#: include/sfx2/strings.hrc:309
+#: include/sfx2/strings.hrc:312
 msgctxt "STR_TEMPLATE_NAME13"
 msgid "Growing Liberty"
 msgstr "グローイング リバティ"
 
 #. xo2gC
-#: include/sfx2/strings.hrc:310
+#: include/sfx2/strings.hrc:313
 msgctxt "STR_TEMPLATE_NAME14"
 msgid "Metropolis"
 msgstr "メトロポリス"
 
 #. FFDBk
-#: include/sfx2/strings.hrc:311
+#: include/sfx2/strings.hrc:314
 msgctxt "STR_TEMPLATE_NAME15"
 msgid "Midnightblue"
 msgstr "ミッドナイトブルー"
 
 #. yiCzk
-#: include/sfx2/strings.hrc:312
+#: include/sfx2/strings.hrc:315
 msgctxt "STR_TEMPLATE_NAME16"
 msgid "Nature Illustration"
 msgstr "自然"
 
 #. cCZzC
-#: include/sfx2/strings.hrc:313
+#: include/sfx2/strings.hrc:316
 msgctxt "STR_TEMPLATE_NAME17"
 msgid "Pencil"
 msgstr "鉛筆"
 
 #. Ji4Cw
-#: include/sfx2/strings.hrc:314
+#: include/sfx2/strings.hrc:317
 msgctxt "STR_TEMPLATE_NAME18"
 msgid "Piano"
 msgstr "ピアノ"
 
 #. mrbiq
-#: include/sfx2/strings.hrc:315
+#: include/sfx2/strings.hrc:318
 msgctxt "STR_TEMPLATE_NAME19"
 msgid "Portfolio"
 msgstr "ポートフォリオ"
 
 #. ysBGy
-#: include/sfx2/strings.hrc:316
+#: include/sfx2/strings.hrc:319
 msgctxt "STR_TEMPLATE_NAME20"
 msgid "Progress"
 msgstr "プログレス"
 
 #. gtPt9
-#: include/sfx2/strings.hrc:317
+#: include/sfx2/strings.hrc:320
 msgctxt "STR_TEMPLATE_NAME21"
 msgid "Sunset"
 msgstr "サンセット"
 
 #. 73Y2e
-#: include/sfx2/strings.hrc:318
+#: include/sfx2/strings.hrc:321
 msgctxt "STR_TEMPLATE_NAME22"
 msgid "Vintage"
 msgstr "ビンテージ"
 
 #. MSY8y
-#: include/sfx2/strings.hrc:319
+#: include/sfx2/strings.hrc:322
 msgctxt "STR_TEMPLATE_NAME23"
 msgid "Vivid"
 msgstr "ビビッド"
 
 #. QDZBz
 #. Translators: default Writer template names
-#: include/sfx2/strings.hrc:321
+#: include/sfx2/strings.hrc:324
 msgctxt "STR_TEMPLATE_NAME24"
 msgid "CV"
 msgstr "履歴書（英文）"
 
 #. Koe3V
-#: include/sfx2/strings.hrc:322
+#: include/sfx2/strings.hrc:325
 msgctxt "STR_TEMPLATE_NAME25"
 msgid "Resume"
 msgstr "職務経歴書（英文）"
 
 #. hCpfD
-#: include/sfx2/strings.hrc:323
+#: include/sfx2/strings.hrc:326
 msgctxt "STR_TEMPLATE_NAME26"
 msgid "Default"
 msgstr "標準"
 
 #. d7Hyk
-#: include/sfx2/strings.hrc:324
+#: include/sfx2/strings.hrc:327
 msgctxt "STR_TEMPLATE_NAME27"
 msgid "Modern"
 msgstr "モダン（英文）"
 
 #. CVJEC
-#: include/sfx2/strings.hrc:325
+#: include/sfx2/strings.hrc:328
 msgctxt "STR_TEMPLATE_NAME28"
 msgid "Modern business letter sans-serif"
 msgstr "ビジネス文書（英文）サンセリフ"
 
 #. 95GeB
-#: include/sfx2/strings.hrc:326
+#: include/sfx2/strings.hrc:329
 msgctxt "STR_TEMPLATE_NAME29"
 msgid "Modern business letter serif"
 msgstr "ビジネス文書（英文）セリフ"
 
 #. XdU49
-#: include/sfx2/strings.hrc:327
+#: include/sfx2/strings.hrc:330
 msgctxt "STR_TEMPLATE_NAME30"
 msgid "Businesscard with logo"
 msgstr "名刺ロゴ付き（英文）"
 
 #. UAmSj
-#: include/sfx2/strings.hrc:328
+#: include/sfx2/strings.hrc:331
 msgctxt "STR_TEMPLATE_NAME31"
 msgid "Simple"
 msgstr "シンプル（英文）"
 
 #. W7NVH
-#: include/sfx2/strings.hrc:329
+#: include/sfx2/strings.hrc:332
 msgctxt "STR_TEMPLATE_NAME32"
 msgid "BPMN"
 msgstr "ビジネスプロセスモデリング"
 
+#. PUBoR
+#: include/sfx2/strings.hrc:333
+msgctxt "STR_TEMPLATE_NAME33"
+msgid "Simplified Chinese Normal"
+msgstr ""
+
 #. ZaGGB
-#: include/sfx2/strings.hrc:331
+#: include/sfx2/strings.hrc:335
 msgctxt "STR_CLEAR_CHAR"
 msgid "Remove"
 msgstr "削除"
 
 #. JReRY
-#: include/sfx2/strings.hrc:332
+#: include/sfx2/strings.hrc:336
 msgctxt "STR_CLEAR_ALL_CHAR"
 msgid "Clear All"
 msgstr "すべて消去"
 
 #. yC8Gs
-#: include/sfx2/strings.hrc:334
+#: include/sfx2/strings.hrc:338
 msgctxt "STR_PASSWORD_LEN"
 msgid "Password length"
 msgstr "パスワードの長さ"
 
 #. FKFmJ
-#: include/sfx2/strings.hrc:335
+#: include/sfx2/strings.hrc:339
 msgctxt "STR_PASSWORD_WARNING"
 msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
 msgstr "入力されたパスワードだと相互運用性の問題が生じます。52バイトより短いパスワード、または55バイトより長いパスワードを入力してください。"
 
 #. jBQFN
-#: include/sfx2/strings.hrc:337
+#: include/sfx2/strings.hrc:341
 msgctxt "STR_CTRLCLICKHYPERLINK"
 msgid "%{key}-click to open hyperlink: %{link}"
 msgstr ""
 
 #. jC3AK
-#: include/sfx2/strings.hrc:338
+#: include/sfx2/strings.hrc:342
 msgctxt "STR_CLICKHYPERLINK"
 msgid "Click to open hyperlink: %{link}"
 msgstr ""
 
 #. eFJMp
-#: include/sfx2/strings.hrc:340
+#: include/sfx2/strings.hrc:344
 msgctxt "STR_STYLEUSEDBY"
 msgid "(used by: %STYLELIST)"
 msgstr ""
 
 #. 6UgqW
-#: include/sfx2/strings.hrc:342
+#: include/sfx2/strings.hrc:346
 msgctxt "STR_DOCUMENT"
 msgid "Document"
 msgstr "文書"
 
 #. XDGTb
-#: include/sfx2/strings.hrc:343
+#: include/sfx2/strings.hrc:347
 msgctxt "STR_SPREADSHEET"
 msgid "Spreadsheet"
 msgstr "表計算ドキュメント"
 
 #. 3UZXB
-#: include/sfx2/strings.hrc:344
+#: include/sfx2/strings.hrc:348
 msgctxt "STR_PRESENTATION"
 msgid "Presentation"
 msgstr "プレゼンテーション"
 
 #. noN5s
-#: include/sfx2/strings.hrc:345
+#: include/sfx2/strings.hrc:349
 msgctxt "STR_DRAWING"
 msgid "Drawing"
 msgstr "図形描画"
 
 #. QpuFo
-#: include/sfx2/strings.hrc:346
+#: include/sfx2/strings.hrc:350
 msgctxt "STR_RECENT"
 msgid "Recently used"
 msgstr ""
 
 #. EcAjb
-#: include/sfx2/strings.hrc:347
+#: include/sfx2/strings.hrc:351
 msgctxt "STR_NORECENT"
 msgid "No recent characters"
 msgstr ""
 
 #. tfjbD
-#: include/sfx2/strings.hrc:349
+#: include/sfx2/strings.hrc:353
 msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
 msgid "Reset All De~fault Templates"
 msgstr "すべての規定のテンプレートを元に戻す(~F)"
 
 #. GWuDE
-#: include/sfx2/strings.hrc:350
+#: include/sfx2/strings.hrc:354
 msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
 msgid "Reset De~fault Text Document"
 msgstr ""
 
 #. j5eV8
-#: include/sfx2/strings.hrc:351
+#: include/sfx2/strings.hrc:355
 msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
 msgid "Reset De~fault Spreadsheet"
 msgstr ""
 
 #. mWp3t
-#: include/sfx2/strings.hrc:352
+#: include/sfx2/strings.hrc:356
 msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
 msgid "Reset De~fault Presentation"
 msgstr ""
 
 #. wfExB
-#: include/sfx2/strings.hrc:353
+#: include/sfx2/strings.hrc:357
 msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
 msgid "Reset De~fault Drawing"
 msgstr ""
 
 #. BFaGA
-#: include/sfx2/strings.hrc:354
+#: include/sfx2/strings.hrc:358
 msgctxt "STR_ACTION_IMPORT"
 msgid "~Import"
 msgstr ""
 
 #. 8Cwfk
-#: include/sfx2/strings.hrc:355
+#: include/sfx2/strings.hrc:359
 msgctxt "STR_ACTION_EXTENSIONS"
 msgid "E~xtensions"
 msgstr ""
 
 #. idGvM
-#: include/sfx2/strings.hrc:356
+#: include/sfx2/strings.hrc:360
 msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
 msgid "Rename"
 msgstr ""
 
 #. EyjE3
-#: include/sfx2/strings.hrc:357
+#: include/sfx2/strings.hrc:361
 msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
 msgid "Rename Category"
 msgstr ""
 
 #. T79Eb
-#: include/sfx2/strings.hrc:358
+#: include/sfx2/strings.hrc:362
 msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
 msgid "New Category"
+msgstr ""
+
+#. fCRA7
+#: include/sfx2/strings.hrc:364
+msgctxt "STR_OBJECT_INSPECTOR"
+msgid "UNO Object Inspector"
 msgstr ""
 
 #. wH3TZ
@@ -2312,47 +2342,23 @@ msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Personal Correspondence and Documents"
 msgstr "個人用通信文とドキュメント"
 
-#. 6Dgiz
-#: sfx2/inc/doctempl.hrc:34
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Forms and Contracts"
-msgstr "業務用書類と契約書"
-
-#. VCKTG
-#: sfx2/inc/doctempl.hrc:35
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Finances"
-msgstr "財政"
-
-#. HmqGP
-#: sfx2/inc/doctempl.hrc:36
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Education"
-msgstr "教養"
-
-#. xopM8
-#: sfx2/inc/doctempl.hrc:37
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Presentation Backgrounds"
-msgstr "プレゼンテーション背景"
-
 #. tSQLA
-#: sfx2/inc/doctempl.hrc:38
+#: sfx2/inc/doctempl.hrc:34
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Presentations"
 msgstr "プレゼンテーション"
 
-#. KuNzz
-#: sfx2/inc/doctempl.hrc:39
+#. Fi5fa
+#: sfx2/inc/doctempl.hrc:35
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Miscellaneous"
-msgstr "その他"
+msgid "Drawings"
+msgstr ""
 
-#. SC4E5
-#: sfx2/inc/doctempl.hrc:40
+#. uw5RC
+#: sfx2/inc/doctempl.hrc:36
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Labels"
-msgstr "ラベル"
+msgid "Localization"
+msgstr ""
 
 #. Wg9Je
 #: sfx2/source/devtools/DevToolsStrings.hrc:15
@@ -2961,7 +2967,7 @@ msgid "No"
 msgstr "いいえ"
 
 #. kDKBB
-#: sfx2/uiconfig/ui/commandpopup.ui:36
+#: sfx2/uiconfig/ui/commandpopup.ui:35
 msgctxt "commandpopup|entry"
 msgid "Search command"
 msgstr ""
@@ -3388,14 +3394,20 @@ msgctxt "documentinfopage|thumbnailsavecb"
 msgid "Save preview image with this document"
 msgstr "このドキュメントのプレビューを保存"
 
-#. 2GKBr
-#: sfx2/uiconfig/ui/documentinfopage.ui:415
+#. 6bF5w
+#: sfx2/uiconfig/ui/documentinfopage.ui:416
 msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
-msgid "Image preferred DPI"
+msgid "Preferred resolution for images:"
+msgstr ""
+
+#. pukYD
+#: sfx2/uiconfig/ui/documentinfopage.ui:466
+msgctxt "documentinfopage|image-preferred-ppi-unit"
+msgid "ppi"
 msgstr ""
 
 #. VWjRu
-#: sfx2/uiconfig/ui/documentinfopage.ui:479
+#: sfx2/uiconfig/ui/documentinfopage.ui:500
 msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
 msgid "Contains basic information about the current file."
 msgstr "現在のファイルに関する基本的な情報が表示されます。"
@@ -3718,7 +3730,7 @@ msgctxt "licensedialog|show"
 msgid "_Show License"
 msgstr "ライセンスを表示(_S)"
 
-#. 3unZa
+#. uCvKD
 #: sfx2/uiconfig/ui/licensedialog.ui:68
 msgctxt "licensedialog|label"
 msgid ""
@@ -3728,7 +3740,7 @@ msgid ""
 "\n"
 "All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
 "\n"
-"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"Copyright © 2000–2023 LibreOffice contributors. All rights reserved.\n"
 "\n"
 "This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
 msgstr ""
@@ -4022,7 +4034,7 @@ msgid "Style"
 msgstr "スタイル"
 
 #. NXG9o
-#: sfx2/uiconfig/ui/managestylepage.ui:227
+#: sfx2/uiconfig/ui/managestylepage.ui:230
 msgctxt "managestylepage|label2"
 msgid "Contains"
 msgstr "次を含む"
@@ -4681,131 +4693,149 @@ msgctxt "startcenter|clear_all"
 msgid "Clear Recent Documents"
 msgstr "この一覧をクリアする"
 
-#. gCfQ9
-#: sfx2/uiconfig/ui/startcenter.ui:38
-msgctxt "startcenter|filter_writer"
-msgid "Writer Templates"
-msgstr "Writer テンプレート"
-
-#. kj5ts
-#: sfx2/uiconfig/ui/startcenter.ui:45
-msgctxt "startcenter|filter_calc"
-msgid "Calc Templates"
-msgstr "Calc テンプレート"
-
-#. HEYvU
-#: sfx2/uiconfig/ui/startcenter.ui:52
-msgctxt "startcenter|filter_impress"
-msgid "Impress Templates"
-msgstr "Impress テンプレート"
-
-#. uWEpu
-#: sfx2/uiconfig/ui/startcenter.ui:59
-msgctxt "startcenter|filter_draw"
-msgid "Draw Templates"
-msgstr "Draw テンプレート"
-
-#. e3TH8
-#: sfx2/uiconfig/ui/startcenter.ui:72
-msgctxt "startcenter|manage"
-msgid "Manage Templates"
-msgstr "テンプレートの管理"
+#. zmWnH
+#: sfx2/uiconfig/ui/startcenter.ui:24
+msgctxt "startcenter|clear_unavailable"
+msgid "Clear Unavailable Files"
+msgstr "無効なファイルをクリアする"
 
 #. isnw8
-#: sfx2/uiconfig/ui/startcenter.ui:151
+#: sfx2/uiconfig/ui/startcenter.ui:119
 msgctxt "startcenter|open_all"
 msgid "_Open File"
 msgstr "ファイルを開く(_O)"
 
 #. 6zjop
-#: sfx2/uiconfig/ui/startcenter.ui:172
+#: sfx2/uiconfig/ui/startcenter.ui:140
 msgctxt "startcenter|open_remote"
 msgid "Remote File_s"
 msgstr "リモートファイル(_S)"
 
 #. ZUnZ9
-#: sfx2/uiconfig/ui/startcenter.ui:205
+#: sfx2/uiconfig/ui/startcenter.ui:173
 msgctxt "startcenter|open_recent"
 msgid "_Recent Documents"
 msgstr "最近使用したドキュメント(_R)"
 
 #. BnkvG
-#: sfx2/uiconfig/ui/startcenter.ui:229
+#: sfx2/uiconfig/ui/startcenter.ui:193
 msgctxt "startcenter|templates_all"
 msgid "T_emplates"
 msgstr "テンプレート(_E)"
 
 #. JEkqY
-#: sfx2/uiconfig/ui/startcenter.ui:270
+#: sfx2/uiconfig/ui/startcenter.ui:230
 msgctxt "startcenter|create_label"
 msgid "Create:"
 msgstr "新規作成:"
 
 #. SY4iY
-#: sfx2/uiconfig/ui/startcenter.ui:281
+#: sfx2/uiconfig/ui/startcenter.ui:241
 msgctxt "startcenter|writer_all"
 msgid "_Writer Document"
 msgstr "_Writer 文書ドキュメント"
 
 #. Bvz5c
-#: sfx2/uiconfig/ui/startcenter.ui:301
+#: sfx2/uiconfig/ui/startcenter.ui:261
 msgctxt "startcenter|calc_all"
 msgid "_Calc Spreadsheet"
 msgstr "_Calc 表計算ドキュメント"
 
 #. RxGP6
-#: sfx2/uiconfig/ui/startcenter.ui:321
+#: sfx2/uiconfig/ui/startcenter.ui:281
 msgctxt "startcenter|impress_all"
 msgid "_Impress Presentation"
 msgstr "_Impress プレゼンテーション"
 
 #. 7fE2M
-#: sfx2/uiconfig/ui/startcenter.ui:341
+#: sfx2/uiconfig/ui/startcenter.ui:301
 msgctxt "startcenter|draw_all"
 msgid "_Draw Drawing"
 msgstr "_Draw 図形描画"
 
 #. 7wn8r
-#: sfx2/uiconfig/ui/startcenter.ui:361
+#: sfx2/uiconfig/ui/startcenter.ui:321
 msgctxt "startcenter|math_all"
 msgid "_Math Formula"
 msgstr "_Math 数式"
 
 #. nnwDC
-#: sfx2/uiconfig/ui/startcenter.ui:381
+#: sfx2/uiconfig/ui/startcenter.ui:341
 msgctxt "startcenter|database_all"
 msgid "_Base Database"
 msgstr "_Base データベース"
 
 #. ZEDmn
-#: sfx2/uiconfig/ui/startcenter.ui:403
+#: sfx2/uiconfig/ui/startcenter.ui:363
 msgctxt "startcenter|althelplabel"
 msgid "He_lp"
 msgstr "ヘルプ(_L)"
 
 #. oqVes
-#: sfx2/uiconfig/ui/startcenter.ui:473
+#: sfx2/uiconfig/ui/startcenter.ui:433
 msgctxt "startcenter|extensions"
 msgid "E_xtensions"
 msgstr "拡張機能(_X)"
 
 #. rDw4E
-#: sfx2/uiconfig/ui/startcenter.ui:498
+#: sfx2/uiconfig/ui/startcenter.ui:458
 msgctxt "startcenter|label1"
 msgid "Application"
 msgstr "アプリケーション"
 
 #. UiDMp
-#: sfx2/uiconfig/ui/startcenter.ui:518
+#: sfx2/uiconfig/ui/startcenter.ui:478
 msgctxt "startcenter|all_recent_label"
 msgid "Recent Files List"
 msgstr "最近のファイル一覧"
 
 #. kho2B
-#: sfx2/uiconfig/ui/startcenter.ui:531
+#: sfx2/uiconfig/ui/startcenter.ui:491
 msgctxt "startcenter|local_view_label"
 msgid "Templates List"
 msgstr "テンプレート一覧"
+
+#. FcFBB
+#: sfx2/uiconfig/ui/startcenter.ui:516
+msgctxt "startcenter|filter_label"
+msgid "Filter:"
+msgstr "フィルター:"
+
+#. xYGf6
+#: sfx2/uiconfig/ui/startcenter.ui:533
+msgctxt "startcenter|filter_none"
+msgid "All Applications"
+msgstr "すべてのアプリケーション"
+
+#. fAxHB
+#: sfx2/uiconfig/ui/startcenter.ui:534
+msgctxt "startcenter|filter_writer"
+msgid "Text Documents"
+msgstr "文書ドキュメント"
+
+#. zdYmN
+#: sfx2/uiconfig/ui/startcenter.ui:535
+msgctxt "startcenter|filter_calc"
+msgid "Spreadsheets"
+msgstr "表計算ドキュメント"
+
+#. DZVJB
+#: sfx2/uiconfig/ui/startcenter.ui:536
+msgctxt "startcenter|filter_impress"
+msgid "Presentations"
+msgstr "プレゼンテーション"
+
+#. 67F9T
+#: sfx2/uiconfig/ui/startcenter.ui:537
+msgctxt "startcenter|filter_draw"
+msgid "Drawings"
+msgstr "図形描画"
+
+#. ZCQZB
+#: sfx2/uiconfig/ui/startcenter.ui:554
+msgctxt "startcenter|mbActions|tool_tip"
+msgid "Actions"
+msgstr ""
 
 #. UHrAZ
 #: sfx2/uiconfig/ui/stylecontextmenu.ui:12
@@ -4892,139 +4922,139 @@ msgid "or Create a New Category"
 msgstr "または新しいカテゴリーを作成"
 
 #. eUWTy
-#: sfx2/uiconfig/ui/templatedlg.ui:46
+#: sfx2/uiconfig/ui/templatedlg.ui:44
 msgctxt "templatedlg|TemplateDialog"
 msgid "Templates"
 msgstr "テンプレート"
 
 #. rhuYP
-#: sfx2/uiconfig/ui/templatedlg.ui:77
+#: sfx2/uiconfig/ui/templatedlg.ui:76
 msgctxt "templatedlg|hidedialogcb"
 msgid "Show this dialog at startup"
 msgstr "起動時にこのダイアログを表示する"
 
 #. 32zsB
-#: sfx2/uiconfig/ui/templatedlg.ui:144
+#: sfx2/uiconfig/ui/templatedlg.ui:143
 msgctxt "templatedlg|search_filter|tooltip_text"
 msgid "Search"
 msgstr "検索"
 
 #. sGZMC
-#: sfx2/uiconfig/ui/templatedlg.ui:148
+#: sfx2/uiconfig/ui/templatedlg.ui:147
 msgctxt "templatedlg|search_filter"
 msgid "Search..."
 msgstr "検索..."
 
 #. DF5YC
-#: sfx2/uiconfig/ui/templatedlg.ui:167
+#: sfx2/uiconfig/ui/templatedlg.ui:166
 msgctxt "templatedlg|action_menu|label"
 msgid "_Manage"
 msgstr "管理(_M)"
 
 #. LUs2m
-#: sfx2/uiconfig/ui/templatedlg.ui:181
+#: sfx2/uiconfig/ui/templatedlg.ui:180
 msgctxt "templatedlg|extended_tip|action_menu"
 msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
 msgstr "カテゴリーの作成や名前の変更、削除、標準のテンプレートを戻したり、テンプレートマネージャーの更新などできます。"
 
 #. fXVNY
-#: sfx2/uiconfig/ui/templatedlg.ui:208
+#: sfx2/uiconfig/ui/templatedlg.ui:207
 msgctxt "templatedlg|filter_application|tooltip_text"
 msgid "Filter by Application"
 msgstr "アプリケーションによるフィルター"
 
 #. tqVhJ
-#: sfx2/uiconfig/ui/templatedlg.ui:210
+#: sfx2/uiconfig/ui/templatedlg.ui:209
 msgctxt "templatedlg|applist"
 msgid "All Applications"
 msgstr "すべてのアプリケーション"
 
 #. pD6pU
-#: sfx2/uiconfig/ui/templatedlg.ui:211
+#: sfx2/uiconfig/ui/templatedlg.ui:210
 msgctxt "templatedlg|applist"
 msgid "Text Documents"
 msgstr "文書ドキュメント"
 
 #. eECt7
-#: sfx2/uiconfig/ui/templatedlg.ui:212
+#: sfx2/uiconfig/ui/templatedlg.ui:211
 msgctxt "templatedlg|applist"
 msgid "Spreadsheets"
 msgstr "表計算ドキュメント"
 
 #. ajLbV
-#: sfx2/uiconfig/ui/templatedlg.ui:213
+#: sfx2/uiconfig/ui/templatedlg.ui:212
 msgctxt "templatedlg|applist"
 msgid "Presentations"
 msgstr "プレゼンテーション"
 
 #. LfUzB
-#: sfx2/uiconfig/ui/templatedlg.ui:214
+#: sfx2/uiconfig/ui/templatedlg.ui:213
 msgctxt "templatedlg|applist"
 msgid "Drawings"
 msgstr "図形描画"
 
 #. t7zE7
-#: sfx2/uiconfig/ui/templatedlg.ui:228
+#: sfx2/uiconfig/ui/templatedlg.ui:227
 msgctxt "templatedlg|filter_folder|tooltip_text"
 msgid "Filter by Category"
 msgstr "分類によるフィルター"
 
 #. 93CGw
-#: sfx2/uiconfig/ui/templatedlg.ui:230
+#: sfx2/uiconfig/ui/templatedlg.ui:229
 msgctxt "templatedlg|folderlist"
 msgid "All Categories"
 msgstr "すべてのカテゴリー"
 
 #. NF9wE
-#: sfx2/uiconfig/ui/templatedlg.ui:251
+#: sfx2/uiconfig/ui/templatedlg.ui:250
 msgctxt "templatedlg|label1"
 msgid "Filter"
 msgstr "フィルター"
 
 #. ewTL3
-#: sfx2/uiconfig/ui/templatedlg.ui:357
+#: sfx2/uiconfig/ui/templatedlg.ui:356
 msgctxt "templatedlg|treeviewcolumn1"
 msgid "Name"
 msgstr "名前"
 
 #. 7EJRA
-#: sfx2/uiconfig/ui/templatedlg.ui:374
+#: sfx2/uiconfig/ui/templatedlg.ui:373
 msgctxt "templatedlg|treeviewcolumn2"
 msgid "Category"
 msgstr "カテゴリー"
 
 #. AC27i
-#: sfx2/uiconfig/ui/templatedlg.ui:389
+#: sfx2/uiconfig/ui/templatedlg.ui:388
 msgctxt "templatedlg|treeviewcolumn3"
 msgid "Application"
 msgstr "アプリケーション"
 
 #. eSaBw
-#: sfx2/uiconfig/ui/templatedlg.ui:404
+#: sfx2/uiconfig/ui/templatedlg.ui:403
 msgctxt "templatedlg|treeviewcolumn4"
 msgid "Modified"
 msgstr "変更日時"
 
 #. pNzYA
-#: sfx2/uiconfig/ui/templatedlg.ui:419
+#: sfx2/uiconfig/ui/templatedlg.ui:418
 msgctxt "templatedlg|treeviewcolumn5"
 msgid "Size"
 msgstr "サイズ"
 
 #. j39jM
-#: sfx2/uiconfig/ui/templatedlg.ui:445
+#: sfx2/uiconfig/ui/templatedlg.ui:444
 msgctxt "templatedlg|thumbnailviewlabel"
 msgid "Template List"
 msgstr "テンプレート一覧"
 
 #. yEhgP
-#: sfx2/uiconfig/ui/templatedlg.ui:464
+#: sfx2/uiconfig/ui/templatedlg.ui:463
 msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
 msgid "Thumbnail View"
 msgstr "サムネイル表示"
 
 #. j76ke
-#: sfx2/uiconfig/ui/templatedlg.ui:481
+#: sfx2/uiconfig/ui/templatedlg.ui:480
 msgctxt "templatedlg|list_view_btn|tooltip_text"
 msgid "List View"
 msgstr "リスト表示"

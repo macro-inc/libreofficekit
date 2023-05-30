@@ -21,8 +21,10 @@
 #include <osl/thread.h>
 #include <tools/stream.hxx>
 #include <tools/vcompat.hxx>
+#include <unotools/configmgr.hxx>
 
 #include <vcl/filter/SvmReader.hxx>
+#include <vcl/rendercontext/DrawTextFlags.hxx>
 #include <vcl/TypeSerializer.hxx>
 #include <vcl/dibtools.hxx>
 #include <vcl/gdimtf.hxx>
@@ -68,7 +70,7 @@ SvStream& SvmReader::Read(GDIMetaFile& rMetaFile, ImplMetaReadData* pData)
         return mrStream;
     }
 
-    sal_uLong nStmPos = mrStream.Tell();
+    sal_uInt64 nStmPos = mrStream.Tell();
     SvStreamEndian nOldFormat = mrStream.GetEndian();
 
     mrStream.SetEndian(SvStreamEndian::LITTLE);
@@ -160,166 +162,112 @@ rtl::Reference<MetaAction> SvmReader::MetaActionHandler(ImplMetaReadData* pData)
     {
         case MetaActionType::NONE:
             return DefaultHandler();
-            break;
         case MetaActionType::PIXEL:
             return PixelHandler();
-            break;
         case MetaActionType::POINT:
             return PointHandler();
-            break;
         case MetaActionType::LINE:
             return LineHandler();
-            break;
         case MetaActionType::RECT:
             return RectHandler();
-            break;
         case MetaActionType::ROUNDRECT:
             return RoundRectHandler();
-            break;
         case MetaActionType::ELLIPSE:
             return EllipseHandler();
-            break;
         case MetaActionType::ARC:
             return ArcHandler();
-            break;
         case MetaActionType::PIE:
             return PieHandler();
-            break;
         case MetaActionType::CHORD:
             return ChordHandler();
-            break;
         case MetaActionType::POLYLINE:
             return PolyLineHandler();
-            break;
         case MetaActionType::POLYGON:
             return PolygonHandler();
-            break;
         case MetaActionType::POLYPOLYGON:
             return PolyPolygonHandler();
-            break;
         case MetaActionType::TEXT:
             return TextHandler(pData);
-            break;
         case MetaActionType::TEXTARRAY:
             return TextArrayHandler(pData);
-            break;
         case MetaActionType::STRETCHTEXT:
             return StretchTextHandler(pData);
-            break;
         case MetaActionType::TEXTRECT:
             return TextRectHandler(pData);
-            break;
         case MetaActionType::TEXTLINE:
             return TextLineHandler();
-            break;
         case MetaActionType::BMP:
             return BmpHandler();
-            break;
         case MetaActionType::BMPSCALE:
             return BmpScaleHandler();
-            break;
         case MetaActionType::BMPSCALEPART:
             return BmpScalePartHandler();
-            break;
         case MetaActionType::BMPEX:
             return BmpExHandler();
-            break;
         case MetaActionType::BMPEXSCALE:
             return BmpExScaleHandler();
-            break;
         case MetaActionType::BMPEXSCALEPART:
             return BmpExScalePartHandler();
-            break;
         case MetaActionType::MASK:
             return MaskHandler();
-            break;
         case MetaActionType::MASKSCALE:
             return MaskScaleHandler();
-            break;
         case MetaActionType::MASKSCALEPART:
             return MaskScalePartHandler();
-            break;
         case MetaActionType::GRADIENT:
             return GradientHandler();
-            break;
         case MetaActionType::GRADIENTEX:
             return GradientExHandler();
-            break;
         case MetaActionType::HATCH:
             return HatchHandler();
-            break;
         case MetaActionType::WALLPAPER:
             return WallpaperHandler();
-            break;
         case MetaActionType::CLIPREGION:
             return ClipRegionHandler();
-            break;
         case MetaActionType::ISECTRECTCLIPREGION:
             return ISectRectClipRegionHandler();
-            break;
         case MetaActionType::ISECTREGIONCLIPREGION:
             return ISectRegionClipRegionHandler();
-            break;
         case MetaActionType::MOVECLIPREGION:
             return MoveClipRegionHandler();
-            break;
         case MetaActionType::LINECOLOR:
             return LineColorHandler();
-            break;
         case MetaActionType::FILLCOLOR:
             return FillColorHandler();
-            break;
         case MetaActionType::TEXTCOLOR:
             return TextColorHandler();
-            break;
         case MetaActionType::TEXTFILLCOLOR:
             return TextFillColorHandler();
-            break;
         case MetaActionType::TEXTLINECOLOR:
             return TextLineColorHandler();
-            break;
         case MetaActionType::OVERLINECOLOR:
             return OverlineColorHandler();
-            break;
         case MetaActionType::TEXTALIGN:
             return TextAlignHandler();
-            break;
         case MetaActionType::MAPMODE:
             return MapModeHandler();
-            break;
         case MetaActionType::FONT:
             return FontHandler(pData);
-            break;
         case MetaActionType::PUSH:
             return PushHandler();
-            break;
         case MetaActionType::POP:
             return PopHandler();
-            break;
         case MetaActionType::RASTEROP:
             return RasterOpHandler();
-            break;
         case MetaActionType::Transparent:
             return TransparentHandler();
-            break;
         case MetaActionType::FLOATTRANSPARENT:
             return FloatTransparentHandler(pData);
-            break;
         case MetaActionType::EPS:
             return EPSHandler();
-            break;
         case MetaActionType::REFPOINT:
             return RefPointHandler();
-            break;
         case MetaActionType::COMMENT:
             return CommentHandler();
-            break;
         case MetaActionType::LAYOUTMODE:
             return LayoutModeHandler();
-            break;
         case MetaActionType::TEXTLANGUAGE:
             return TextLanguageHandler();
-            break;
 
         default:
         {
@@ -683,7 +631,7 @@ rtl::Reference<MetaAction> SvmReader::TextArrayHandler(const ImplMetaReadData* p
 {
     rtl::Reference<MetaTextArrayAction> pAction(new MetaTextArrayAction);
 
-    std::vector<sal_Int32> aArray;
+    KernArray aArray;
 
     VersionCompatRead aCompat(mrStream);
     TypeSerializer aSerializer(mrStream);
@@ -722,17 +670,16 @@ rtl::Reference<MetaAction> SvmReader::TextArrayHandler(const ImplMetaReadData* p
         {
             try
             {
-                aArray.resize(nTmpLen);
                 sal_Int32 i;
                 sal_Int32 val(0);
                 for (i = 0; i < nAryLen; i++)
                 {
                     mrStream.ReadInt32(val);
-                    aArray[i] = val;
+                    aArray.push_back(val);
                 }
                 // #106172# setup remainder
                 for (; i < nTmpLen; i++)
-                    aArray[i] = 0;
+                    aArray.push_back(0);
             }
             catch (std::bad_alloc&)
             {
@@ -760,6 +707,28 @@ rtl::Reference<MetaAction> SvmReader::TextArrayHandler(const ImplMetaReadData* p
 
     if (!aArray.empty())
         pAction->SetDXArray(std::move(aArray));
+
+    if (aCompat.GetVersion() >= 3) // Version 3
+    {
+        sal_uInt32 nKashidaAryLen(0);
+        mrStream.ReadUInt32(nKashidaAryLen);
+        nTmpLen = std::min(nKashidaAryLen, static_cast<sal_uInt32>(pAction->GetDXArray().size()));
+        if (nTmpLen)
+        {
+            // aKashidaArray, if not empty, must be the same size as aArray
+            std::vector<sal_Bool> aKashidaArray(pAction->GetDXArray().size(), 0);
+
+            // [-loplugin:fakebool] false positive:
+            sal_Bool val(sal_False);
+            for (sal_uInt32 i = 0; i < nTmpLen; i++)
+            {
+                mrStream.ReadUChar(val);
+                aKashidaArray[i] = val;
+            }
+            pAction->SetKashidaArray(std::move(aKashidaArray));
+        }
+    }
+
     return pAction;
 }
 
@@ -820,7 +789,13 @@ rtl::Reference<MetaAction> SvmReader::TextRectHandler(const ImplMetaReadData* pD
     mrStream.ReadUInt16(nTmp);
 
     pAction->SetRect(aRect);
-    pAction->SetStyle(static_cast<DrawTextFlags>(nTmp));
+
+    DrawTextFlags nFlags(static_cast<DrawTextFlags>(nTmp));
+    const static bool bFuzzing = utl::ConfigManager::IsFuzzing();
+    if (bFuzzing)
+        nFlags = nFlags & ~DrawTextFlags::MultiLine;
+
+    pAction->SetStyle(nFlags);
 
     if (aCompat.GetVersion() >= 2) // Version 2
         aStr = read_uInt16_lenPrefixed_uInt16s_ToOUString(mrStream);
@@ -880,6 +855,24 @@ rtl::Reference<MetaAction> SvmReader::BmpHandler()
     return pAction;
 }
 
+namespace
+{
+void sanitizeNegativeSizeDimensions(Size& rSize)
+{
+    if (rSize.Width() < 0)
+    {
+        SAL_WARN("vcl.gdi", "sanitizeNegativeSizeDimensions: negative width");
+        rSize.setWidth(0);
+    }
+
+    if (rSize.Height() < 0)
+    {
+        SAL_WARN("vcl.gdi", "sanitizeNegativeSizeDimensions: negative height");
+        rSize.setHeight(0);
+    }
+}
+}
+
 rtl::Reference<MetaAction> SvmReader::BmpScaleHandler()
 {
     rtl::Reference<MetaBmpScaleAction> pAction(new MetaBmpScaleAction);
@@ -890,8 +883,10 @@ rtl::Reference<MetaAction> SvmReader::BmpScaleHandler()
     TypeSerializer aSerializer(mrStream);
     Point aPoint;
     aSerializer.readPoint(aPoint);
+
     Size aSz;
     aSerializer.readSize(aSz);
+    sanitizeNegativeSizeDimensions(aSz);
 
     pAction->SetBitmap(aBmp);
     pAction->SetPoint(aPoint);
@@ -953,8 +948,10 @@ rtl::Reference<MetaAction> SvmReader::BmpExScaleHandler()
     TypeSerializer aSerializer(mrStream);
     Point aPoint;
     aSerializer.readPoint(aPoint);
+
     Size aSize;
     aSerializer.readSize(aSize);
+    sanitizeNegativeSizeDimensions(aSize);
 
     pAction->SetBitmapEx(aBmpEx);
     pAction->SetPoint(aPoint);
@@ -1342,8 +1339,11 @@ rtl::Reference<MetaAction> SvmReader::FloatTransparentHandler(ImplMetaReadData* 
     TypeSerializer aSerializer(mrStream);
     Point aPoint;
     aSerializer.readPoint(aPoint);
+
     Size aSize;
     aSerializer.readSize(aSize);
+    sanitizeNegativeSizeDimensions(aSize);
+
     Gradient aGradient;
     aSerializer.readGradient(aGradient);
 

@@ -24,6 +24,7 @@
 #include <sal/log.hxx>
 #include <unotools/configmgr.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 #include <document.hxx>
 #include <table.hxx>
@@ -271,8 +272,14 @@ void ScDocument::InsertMatrixFormula(SCCOL nCol1, SCROW nRow1,
         SAL_WARN("sc", "ScDocument::InsertMatrixFormula: No table marked");
         return;
     }
-    if (utl::ConfigManager::IsFuzzing()) //just too slow
-        return;
+    if (utl::ConfigManager::IsFuzzing())
+    {
+        // just too slow
+        if (nCol2 - nCol1 > 64)
+            return;
+        if (nRow2 - nRow1 > 64)
+            return;
+    }
     assert( ValidColRow( nCol1, nRow1) && ValidColRow( nCol2, nRow2));
 
     SCTAB nTab1 = *rMark.begin();
@@ -337,9 +344,9 @@ void ScDocument::InsertMatrixFormula(SCCOL nCol1, SCROW nRow1,
                 aRefData.SetRelRow(nRow1 - nRow);
                 *t->GetSingleRef() = aRefData;
                 // Token array must be cloned so that each formula cell receives its own copy.
-                std::unique_ptr<ScTokenArray> pTokArr(aArr.Clone());
+                ScTokenArray aTokArr(aArr.CloneValue());
                 aPos = ScAddress(nCol, nRow, nTab);
-                pCell = new ScFormulaCell(*this, aPos, *pTokArr, eGram, ScMatrixMode::Reference);
+                pCell = new ScFormulaCell(*this, aPos, aTokArr, eGram, ScMatrixMode::Reference);
                 pTab->SetFormulaCell(nCol, nRow, pCell);
             }
         }
@@ -755,8 +762,7 @@ const SfxPoolItem* ScDocument::GetEffItem(
     if ( pPattern )
     {
         const SfxItemSet& rSet = pPattern->GetItemSet();
-        const SfxPoolItem* pItem;
-        if ( rSet.GetItemState( ATTR_CONDITIONAL, true, &pItem ) == SfxItemState::SET )
+        if ( rSet.GetItemState( ATTR_CONDITIONAL ) == SfxItemState::SET )
         {
             const ScCondFormatIndexes& rIndex = pPattern->GetItem(ATTR_CONDITIONAL).GetCondFormatData();
             ScConditionalFormatList* pCondFormList = GetCondFormList( nTab );
@@ -774,6 +780,7 @@ const SfxPoolItem* ScDocument::GetEffItem(
                         {
                             SfxStyleSheetBase* pStyleSheet = mxPoolHelper->GetStylePool()->Find(
                                     aStyle, SfxStyleFamily::Para );
+                            const SfxPoolItem* pItem = nullptr;
                             if ( pStyleSheet && pStyleSheet->GetItemSet().GetItemState(
                                         nWhich, true, &pItem ) == SfxItemState::SET )
                                 return pItem;
@@ -871,7 +878,7 @@ void ScDocument::SetCondFormList( ScConditionalFormatList* pList, SCTAB nTab )
         maTabs[nTab]->SetCondFormList(pList);
 }
 
-const ScValidationData* ScDocument::GetValidationEntry( sal_uLong nIndex ) const
+const ScValidationData* ScDocument::GetValidationEntry( sal_uInt32 nIndex ) const
 {
     if ( pValidationList )
         return pValidationList->GetData( nIndex );
@@ -1177,9 +1184,9 @@ void ScDocument::CompareDocument( ScDocument& rOtherDoc )
             GetName( nThisTab, aTabName );
             OUString aTemplate = ScResId(STR_PROGRESS_COMPARING);
             sal_Int32 nIndex = 0;
-            OUString aProText = aTemplate.getToken( 0, '#', nIndex ) +
+            OUString aProText = o3tl::getToken(aTemplate, 0, '#', nIndex ) +
                 aTabName +
-                aTemplate.getToken( 0, '#', nIndex );
+                o3tl::getToken(aTemplate, 0, '#', nIndex );
             ScProgress aProgress( GetDocumentShell(), aProText, 3*nThisEndRow, true );  // 2x FindOrder, 1x here
             tools::Long nProgressStart = 2*nThisEndRow;                    // start for here
 

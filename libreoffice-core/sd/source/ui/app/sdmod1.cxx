@@ -23,7 +23,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <framework/FrameworkHelper.hxx>
-
+#include <osl/diagnose.h>
 #include <vcl/commandevent.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/errinf.hxx>
@@ -90,11 +90,10 @@ void SdModule::Execute(SfxRequest& rReq)
         case SID_AUTOSPELL_CHECK:
         {
             // automatic spell checker
-            const SfxPoolItem* pItem;
-            if( pSet && SfxItemState::SET == pSet->GetItemState(
-                        SID_AUTOSPELL_CHECK, false, &pItem ) )
+            const SfxBoolItem* pItem;
+            if( pSet && (pItem = pSet->GetItemIfSet( SID_AUTOSPELL_CHECK, false ) ) )
             {
-                bool bOnlineSpelling = static_cast<const SfxBoolItem*>( pItem )->GetValue();
+                bool bOnlineSpelling = pItem->GetValue();
                 // save at document:
                 ::sd::DrawDocShell* pDocSh = dynamic_cast< ::sd::DrawDocShell *>( SfxObjectShell::Current() );
                 if( pDocSh )
@@ -108,10 +107,10 @@ void SdModule::Execute(SfxRequest& rReq)
 
         case SID_ATTR_METRIC:
         {
-            const SfxPoolItem* pItem;
-            if ( pSet && SfxItemState::SET == pSet->GetItemState( SID_ATTR_METRIC, true, &pItem ) )
+            const SfxUInt16Item* pItem;
+            if ( pSet && (pItem = pSet->GetItemIfSet( SID_ATTR_METRIC ) ) )
             {
-                FieldUnit eUnit = static_cast<FieldUnit>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
+                FieldUnit eUnit = static_cast<FieldUnit>(pItem->GetValue());
                 switch( eUnit )
                 {
                     case FieldUnit::MM:      // only the units which are also in the dialog
@@ -161,9 +160,9 @@ void SdModule::Execute(SfxRequest& rReq)
                     LanguageType eLanguage = static_cast<const SvxLanguageItem*>(pItem)->GetValue();
                     SdDrawDocument* pDoc = pDocSh->GetDoc();
 
-                    if( nSlotId == SID_ATTR_CHAR_CJK_LANGUAGE )
+                    if( nSlotId == sal_uInt16(SID_ATTR_CHAR_CJK_LANGUAGE) )
                         pDoc->SetLanguage( eLanguage, EE_CHAR_LANGUAGE_CJK );
-                    else if( nSlotId == SID_ATTR_CHAR_CTL_LANGUAGE )
+                    else if( nSlotId == sal_uInt16(SID_ATTR_CHAR_CTL_LANGUAGE) )
                         pDoc->SetLanguage( eLanguage, EE_CHAR_LANGUAGE_CTL );
                     else
                         pDoc->SetLanguage( eLanguage, EE_CHAR_LANGUAGE );
@@ -463,7 +462,7 @@ SfxFrame* SdModule::ExecuteNewDocument( SfxRequest const & rReq )
             //we start without wizard
 
             //check whether we should load a template document
-            OUString aStandardTemplate( SfxObjectFactory::GetStandardTemplate( "com.sun.star.presentation.PresentationDocument" ) );
+            OUString aStandardTemplate( SfxObjectFactory::GetStandardTemplate( u"com.sun.star.presentation.PresentationDocument" ) );
 
             if( !aStandardTemplate.isEmpty() )
             {
@@ -494,9 +493,12 @@ SfxFrame* SdModule::ExecuteNewDocument( SfxRequest const & rReq )
             // was open
             if (pFrame && SfxApplication::IsTipOfTheDayDue() && !SfxApplication::IsHeadlessOrUITest())
             {
-                // tdf#127946 pass in argument for dialog parent
-                SfxUnoFrameItem aDocFrame(SID_FILLFRAME, pFrame->GetFrameInterface());
-                GetDispatcher()->ExecuteList(SID_TIPOFTHEDAY, SfxCallMode::SLOT, {}, { &aDocFrame });
+                if (SfxDispatcher* pDispatcher = GetDispatcher())
+                {
+                    // tdf#127946 pass in argument for dialog parent
+                    SfxUnoFrameItem aDocFrame(SID_FILLFRAME, pFrame->GetFrameInterface());
+                    pDispatcher->ExecuteList(SID_TIPOFTHEDAY, SfxCallMode::SLOT, {}, { &aDocFrame });
+                }
             }
         }
     }

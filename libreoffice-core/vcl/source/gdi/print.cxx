@@ -22,6 +22,7 @@
 #include <sal/types.h>
 #include <sal/log.hxx>
 #include <comphelper/processfactory.hxx>
+#include <o3tl/safeint.hxx>
 #include <tools/debug.hxx>
 #include <tools/helpers.hxx>
 
@@ -101,7 +102,7 @@ void Printer::ImplPrintTransparent( const Bitmap& rBmp, const Bitmap& rMask,
     Size        aDestSz( LogicToPixel( rDestSize ) );
     tools::Rectangle   aSrcRect( rSrcPtPixel, rSrcSizePixel );
 
-    aSrcRect.Justify();
+    aSrcRect.Normalize();
 
     if( rBmp.IsEmpty() || !aSrcRect.GetWidth() || !aSrcRect.GetHeight() || !aDestSz.Width() || !aDestSz.Height() )
         return;
@@ -405,6 +406,7 @@ const std::vector<OUString>& Printer::GetPrinterQueues()
     ImplSVData* pSVData = ImplGetSVData();
     if ( !pSVData->maGDIData.mpPrinterQueueList )
         ImplInitPrnQueueList();
+    assert(pSVData->maGDIData.mpPrinterQueueList && "mpPrinterQueueList exists by now");
     return pSVData->maGDIData.mpPrinterQueueList->m_aPrinterList;
 }
 
@@ -693,7 +695,7 @@ void Printer::DrawDeviceMask( const Bitmap& rMask, const Color& rMaskColor,
     Size        aDestSz( LogicToPixel( rDestSize ) );
     tools::Rectangle   aSrcRect( rSrcPtPixel, rSrcSizePixel );
 
-    aSrcRect.Justify();
+    aSrcRect.Normalize();
 
     if( !(!rMask.IsEmpty() && aSrcRect.GetWidth() && aSrcRect.GetHeight() && aDestSz.Width() && aDestSz.Height()) )
         return;
@@ -1345,6 +1347,7 @@ bool Printer::SetPaperSizeUser( const Size& rSize )
         rData.SetPaperFormat( PAPER_USER );
         rData.SetPaperWidth( aPageSize.Width() );
         rData.SetPaperHeight( aPageSize.Height() );
+        rData.SetOrientation( Orientation::Portrait );
 
         if ( IsDisplayPrinter() )
         {
@@ -1419,7 +1422,7 @@ const PaperInfo& Printer::GetPaperInfo( int nPaper ) const
         return ImplGetEmptyPaper();
     if( ! mpInfoPrinter->m_bPapersInit )
         mpInfoPrinter->InitPaperFormats( &maJobSetup.ImplGetConstData() );
-    if( mpInfoPrinter->m_aPaperFormats.empty() || nPaper < 0 || nPaper >= int(mpInfoPrinter->m_aPaperFormats.size()) )
+    if( mpInfoPrinter->m_aPaperFormats.empty() || nPaper < 0 || o3tl::make_unsigned(nPaper) >= mpInfoPrinter->m_aPaperFormats.size() )
         return ImplGetEmptyPaper();
     return mpInfoPrinter->m_aPaperFormats[nPaper];
 }

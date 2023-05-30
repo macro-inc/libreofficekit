@@ -154,15 +154,25 @@ void OutputDevice::DrawBitmap( const Point& rDestPt, const Size& rDestSize,
             {
                 if (nAction == MetaActionType::BMPSCALE && CanSubsampleBitmap())
                 {
-                    const double nScaleX = aPosAry.mnDestWidth  / static_cast<double>(aPosAry.mnSrcWidth);
-                    const double nScaleY = aPosAry.mnDestHeight / static_cast<double>(aPosAry.mnSrcHeight);
+                    double nScaleX = aPosAry.mnDestWidth  / static_cast<double>(aPosAry.mnSrcWidth);
+                    double nScaleY = aPosAry.mnDestHeight / static_cast<double>(aPosAry.mnSrcHeight);
 
                     // If subsampling, use Bitmap::Scale() for subsampling of better quality.
+
+                    // but hidpi surfaces like the cairo one have their own scale, so don't downscale
+                    // past the surface scaling which can retain the extra detail
+                    double fScale(1.0);
+                    if (mpGraphics->ShouldDownscaleIconsAtSurface(&fScale))
+                    {
+                        nScaleX *= fScale;
+                        nScaleY *= fScale;
+                    }
+
                     if ( nScaleX < 1.0 || nScaleY < 1.0 )
                     {
                         aBmp.Scale(nScaleX, nScaleY);
-                        aPosAry.mnSrcWidth = aPosAry.mnDestWidth;
-                        aPosAry.mnSrcHeight = aPosAry.mnDestHeight;
+                        aPosAry.mnSrcWidth = aPosAry.mnDestWidth * fScale;
+                        aPosAry.mnSrcHeight = aPosAry.mnDestHeight * fScale;
                     }
                 }
 
@@ -347,7 +357,11 @@ void OutputDevice::DrawDeviceAlphaBitmap( const Bitmap& rBmp, const AlphaMask& r
         }
 
         // we need to make sure Skia never reaches this slow code path
-        assert(!SkiaHelper::isVCLSkiaEnabled());
+        // (but do not fail in no-op cases)
+        assert(!SkiaHelper::isVCLSkiaEnabled()
+            || tools::Rectangle(Point(), rBmp.GetSizePixel())
+                .Intersection(tools::Rectangle(rSrcPtPixel, rSrcSizePixel)).IsEmpty()
+            || mpAlphaVDev->LogicToPixel(mpAlphaVDev->GetOutputSizePixel()).IsEmpty());
     }
 
     tools::Rectangle aBmpRect(Point(), rBmp.GetSizePixel());

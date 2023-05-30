@@ -39,7 +39,6 @@
 #include <com/sun/star/uno/Sequence.h>
 #include <svx/sdr/contact/viewcontactofe3dscene.hxx>
 #include <svx/e3dsceneupdater.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <unotools/configmgr.hxx>
 
 using namespace com::sun::star;
@@ -96,7 +95,7 @@ bool E3dObject::IsBreakObjPossible()
     return false;
 }
 
-std::unique_ptr<SdrAttrObj,SdrObjectFreeOp> E3dObject::GetBreakObj()
+rtl::Reference<SdrAttrObj> E3dObject::GetBreakObj()
 {
     return nullptr;
 }
@@ -108,7 +107,7 @@ SdrInventor E3dObject::GetObjInventor() const
 
 SdrObjKind E3dObject::GetObjIdentifier() const
 {
-    return E3D_OBJECT_ID;
+    return SdrObjKind::E3D_Object;
 }
 
 // Determine the capabilities of the object
@@ -265,7 +264,7 @@ void E3dObject::StructureChanged()
 
 E3dScene* E3dObject::getParentE3dSceneFromE3dObject() const
 {
-    return dynamic_cast< E3dScene* >(getParentSdrObjectFromSdrObject());
+    return DynCastE3dScene(getParentSdrObjectFromSdrObject());
 }
 
 // Determine the top-level scene object
@@ -398,7 +397,7 @@ OUString E3dObject::TakeObjNamePlural() const
     return SvxResId(STR_ObjNamePluralObj3d);
 }
 
-E3dObject* E3dObject::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dObject::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dObject(rTargetModel, *this);
 }
@@ -545,11 +544,14 @@ void E3dCompoundObject::AddToHdlList(SdrHdlList& rHdlList) const
 
 SdrObjKind E3dCompoundObject::GetObjIdentifier() const
 {
-    return E3D_COMPOUNDOBJ_ID;
+    return SdrObjKind::E3D_CompoundObject;
 }
 
 void E3dCompoundObject::RecalcSnapRect()
 {
+    if (utl::ConfigManager::IsFuzzing()) // skip slow path for fuzzing
+        return;
+
     const uno::Sequence< beans::PropertyValue > aEmptyParameters;
     drawinglayer::geometry::ViewInformation3D aViewInfo3D(aEmptyParameters);
     E3dScene* pRootScene = fillViewInformation3DForCompoundObject(aViewInfo3D, *this);
@@ -591,7 +593,7 @@ void E3dCompoundObject::RecalcSnapRect()
         sal_Int32(ceil(aSnapRange.getMaxX())), sal_Int32(ceil(aSnapRange.getMaxY())));
 }
 
-E3dCompoundObject* E3dCompoundObject::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dCompoundObject::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dCompoundObject(rTargetModel, *this);
 }

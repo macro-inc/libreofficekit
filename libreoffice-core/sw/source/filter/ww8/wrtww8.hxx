@@ -21,6 +21,7 @@
 #define INCLUDED_SW_SOURCE_FILTER_WW8_WRTWW8_HXX
 
 #include <sot/storage.hxx>
+#include <svl/nfkeytab.hxx>
 #include <tools/solar.h>
 #include <tools/gen.hxx>
 #include <editeng/editdata.hxx>
@@ -195,7 +196,7 @@ class MSWordSections
 {
 protected:
     bool mbDocumentIsProtected;
-    std::vector<WW8_SepInfo> aSects;
+    std::vector<WW8_SepInfo> m_aSects;
 
     void CheckForFacinPg( const WW8Export& rWrt ) const;
     void NeedsDocumentProtected(const WW8_SepInfo &rInfo);
@@ -240,11 +241,11 @@ public:
 
 class WW8_WrPlcSepx : public MSWordSections
 {
-    std::vector<WW8_CP> aCps;
+    std::vector<WW8_CP> m_aCps;
     std::vector< std::shared_ptr<WW8_PdAttrDesc> > m_SectionAttributes;
     // hack to prevent adding sections in endnotes
     bool m_bHeaderFooterWritten;
-    std::unique_ptr<WW8_WrPlc0> pTextPos;        // Position of the headers/footers
+    std::unique_ptr<WW8_WrPlc0> m_pTextPos;        // Position of the headers/footers
 
     WW8_WrPlcSepx( const WW8_WrPlcSepx& ) = delete;
     WW8_WrPlcSepx& operator=( const WW8_WrPlcSepx& ) = delete;
@@ -263,7 +264,7 @@ public:
                     const SwNode& rNd,
                     const SwSectionFormat* pSectionFormat,
                     sal_uLong nLnNumRestartNo );
-    void Finish( WW8_CP nEndCp ) { aCps.push_back( nEndCp ); }
+    void Finish( WW8_CP nEndCp ) { m_aCps.push_back( nEndCp ); }
 
     bool WriteKFText( WW8Export& rWrt );
     void WriteSepx( SvStream& rStrm ) const;
@@ -281,7 +282,7 @@ public:
 class WW8_WrPct
 {
     std::vector<std::unique_ptr<WW8_WrPc>> m_Pcts;
-    WW8_FC nOldFc;
+    WW8_FC m_nOldFc;
 public:
     explicit WW8_WrPct(WW8_FC nStartFc);
     ~WW8_WrPct();
@@ -305,7 +306,7 @@ private:
     FontFamily meFamily;
     rtl_TextEncoding meChrSet;
 public:
-     wwFont( const OUString &rFamilyName, FontPitch ePitch, FontFamily eFamily,
+     wwFont( std::u16string_view rFamilyName, FontPitch ePitch, FontFamily eFamily,
         rtl_TextEncoding eChrSet);
     void Write( SvStream *pTableStram ) const;
     void WriteDocx( DocxAttributeOutput* rAttrOutput ) const;
@@ -324,7 +325,7 @@ private:
     std::vector< const wwFont* > AsVector() const;
 
 public:
-    wwFontHelper() : bLoadAllFonts(false) {}
+    wwFontHelper() : m_bLoadAllFonts(false) {}
     /// rDoc used only to get the initial standard font(s) in use.
     void InitFontTable(const SwDoc& rDoc);
     sal_uInt16 GetId(const SvxFontItem& rFont);
@@ -334,7 +335,7 @@ public:
     void WriteFontTable( const RtfAttributeOutput& rAttrOutput );
 
     /// If true, all fonts are loaded before processing the document.
-    bool bLoadAllFonts: 1;
+    bool m_bLoadAllFonts: 1;
 };
 
 class DrawObj
@@ -494,6 +495,7 @@ public:
     std::unordered_map<SwTOXMark const*, OUString> m_TOXMarkBookmarksByTOXMark;
     ww8::Frames m_aFrames;             // The floating frames in this document
     const SwPageDesc *m_pCurrentPageDesc;
+    const SwPageDesc* m_pPreviousSectionPageDesc;
     bool m_bFirstTOCNodeWithSection;
     std::unique_ptr<WW8_WrPlcPn> m_pPapPlc;
     std::unique_ptr<WW8_WrPlcPn> m_pChpPlc;
@@ -809,9 +811,13 @@ public:
     // Compute the number format for WW dates
     bool GetNumberFormat(const SwField& rField, OUString& rStr);
 
-    virtual sal_uLong ReplaceCr( sal_uInt8 nChar ) = 0;
+    virtual sal_uInt64 ReplaceCr( sal_uInt8 nChar ) = 0;
 
     const SfxPoolItem* HasItem( sal_uInt16 nWhich ) const;
+    template<class T> const T* HasItem(TypedWhichId<T> nWhich) const
+    {
+        return static_cast<const T*>(HasItem(sal_uInt16(nWhich)));
+    }
 
     /// Returns the index of a picture bullet, used in numberings.
     int GetGrfIndex(const SvxBrushItem& rBrush);
@@ -938,7 +944,7 @@ friend void WW8_WrtRedlineAuthor::Write(Writer &rWrt);
     SfxMedium *mpMedium;
 
 public:
-    SwWW8Writer(const OUString& rFltName, const OUString& rBaseURL);
+    SwWW8Writer(std::u16string_view rFltName, const OUString& rBaseURL);
     virtual ~SwWW8Writer() override;
 
     virtual ErrCode WriteStorage() override;
@@ -988,15 +994,15 @@ private:
 class WW8Export : public MSWordExportBase
 {
 public:
-    std::unique_ptr<ww::bytes> pO;      ///< Buffer
+    std::unique_ptr<ww::bytes> m_pO;      ///< Buffer
 
-    SvStream *pTableStrm, *pDataStrm;   ///< Streams for WW97 Export
+    SvStream *m_pTableStrm, *m_pDataStrm;   ///< Streams for WW97 Export
 
-    std::unique_ptr<WW8Fib> pFib;                       ///< File Information Block
-    std::unique_ptr<WW8Dop> pDop;                       ///< Document Properties
-    std::unique_ptr<WW8_WrPlcFootnoteEdn> pFootnote;    ///< Footnotes - structure to remember them, and output
-    std::unique_ptr<WW8_WrPlcFootnoteEdn> pEdn;         ///< Endnotes - structure to remember them, and output
-    std::unique_ptr<WW8_WrPlcSepx> pSepx;               ///< Sections/headers/footers
+    std::unique_ptr<WW8Fib> m_pFib;                       ///< File Information Block
+    std::unique_ptr<WW8Dop> m_pDop;                       ///< Document Properties
+    std::unique_ptr<WW8_WrPlcFootnoteEdn> m_pFootnote;    ///< Footnotes - structure to remember them, and output
+    std::unique_ptr<WW8_WrPlcFootnoteEdn> m_pEdn;         ///< Endnotes - structure to remember them, and output
+    std::unique_ptr<WW8_WrPlcSepx> m_pSepx;               ///< Sections/headers/footers
 
     bool m_bDot; ///< Template or document.
 
@@ -1005,7 +1011,7 @@ protected:
     std::unique_ptr<WW8AttributeOutput> m_pAttrOutput;  ///< Converting attributes to stream data
 
 private:
-    tools::SvRef<SotStorage>       xEscherStg;      /// memory leak #i120098#, to hold the reference to unnamed SotStorage obj
+    tools::SvRef<SotStorage>       m_xEscherStg;      /// memory leak #i120098#, to hold the reference to unnamed SotStorage obj
 
 public:
     /// Access to the attribute output class.
@@ -1090,7 +1096,7 @@ public:
     void WriteAsStringTable(const std::vector<OUString>&, sal_Int32& rfcSttbf,
         sal_Int32& rlcbSttbf);
 
-    virtual sal_uLong ReplaceCr( sal_uInt8 nChar ) override;
+    virtual sal_uInt64 ReplaceCr( sal_uInt8 nChar ) override;
 
     virtual void WriteCR( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfoInner = ww8::WW8TableNodeInfoInner::Pointer_t() ) override;
     void WriteChar( sal_Unicode c ) override;
@@ -1102,7 +1108,7 @@ public:
             // some partly static semi-internal function declarations
 
     void OutSprmBytes( sal_uInt8* pBytes, sal_uInt16 nSiz )
-                                { pO->insert( pO->end(), pBytes, pBytes+nSiz ); }
+                                { m_pO->insert( m_pO->end(), pBytes, pBytes+nSiz ); }
 
     virtual void SectionBreaksAndFrames( const SwTextNode& rNode ) override;
 
@@ -1149,9 +1155,9 @@ public:
     void MiserableRTLFrameFormatHack(SwTwips &rLeft, SwTwips &rRight,
         const ww8::Frame &rFrameFormat);
 
-    void InsUInt16( sal_uInt16 n )      { SwWW8Writer::InsUInt16( *pO, n ); }
+    void InsUInt16( sal_uInt16 n )      { SwWW8Writer::InsUInt16( *m_pO, n ); }
     void InsInt16(sal_Int16 n) { InsUInt16(sal_uInt16(n)); }
-    void InsUInt32( sal_uInt32 n )      { SwWW8Writer::InsUInt32( *pO, n ); }
+    void InsUInt32( sal_uInt32 n )      { SwWW8Writer::InsUInt32( *m_pO, n ); }
     void WriteStringAsPara( const OUString& rText );
 
     /// Setup the exporter.
@@ -1215,10 +1221,10 @@ private:
     WW8_WrPlcSubDoc(const WW8_WrPlcSubDoc&) = delete;
     WW8_WrPlcSubDoc& operator=(const WW8_WrPlcSubDoc&) = delete;
 protected:
-    std::vector<WW8_CP> aCps;
-    std::vector<const void*> aContent;                // PTRARR of SwFormatFootnote/PostIts/..
-    std::vector<const SwFrameFormat*> aSpareFormats;  // a backup for aContent: if there's no SdrObject, stores the fmt directly here
-    std::unique_ptr<WW8_WrPlc0> pTextPos;             // positions of the individual texts
+    std::vector<WW8_CP> m_aCps;
+    std::vector<const void*> m_aContent;                // PTRARR of SwFormatFootnote/PostIts/..
+    std::vector<const SwFrameFormat*> m_aSpareFormats;  // a backup for aContent: if there's no SdrObject, stores the fmt directly here
+    std::unique_ptr<WW8_WrPlc0> m_pTextPos;             // positions of the individual texts
 
     WW8_WrPlcSubDoc();
     virtual ~WW8_WrPlcSubDoc();
@@ -1234,12 +1240,12 @@ protected:
 class WW8_WrPlcFootnoteEdn : public WW8_WrPlcSubDoc
 {
 private:
-    sal_uInt8 nTyp;
+    sal_uInt8 m_nTyp;
 
     WW8_WrPlcFootnoteEdn(const WW8_WrPlcFootnoteEdn&) = delete;
     WW8_WrPlcFootnoteEdn& operator=(WW8_WrPlcFootnoteEdn const &) = delete;
 public:
-    explicit WW8_WrPlcFootnoteEdn( sal_uInt8 nTTyp ) : nTyp( nTTyp ) {}
+    explicit WW8_WrPlcFootnoteEdn( sal_uInt8 nTTyp ) : m_nTyp( nTTyp ) {}
 
     bool WriteText( WW8Export& rWrt );
     void WritePlc( WW8Export& rWrt ) const;
@@ -1285,36 +1291,36 @@ public:
 class WW8_WrPlcTextBoxes : public WW8_WrPlcSubDoc // double Plc for Textboxes
 {                        // Frame/DrawTextboxes!
 private:
-    sal_uInt8 nTyp;
-    std::vector<sal_uInt32> aShapeIds;        // VARARR of ShapeIds for the SwFrameFormats
+    sal_uInt8 m_nTyp;
+    std::vector<sal_uInt32> m_aShapeIds;        // VARARR of ShapeIds for the SwFrameFormats
     virtual const std::vector<sal_uInt32>* GetShapeIdArr() const override;
 
     WW8_WrPlcTextBoxes(const WW8_WrPlcTextBoxes&) = delete;
     WW8_WrPlcTextBoxes& operator=(WW8_WrPlcTextBoxes const &) = delete;
 public:
-    explicit WW8_WrPlcTextBoxes( sal_uInt8 nTTyp ) : nTyp( nTTyp ) {}
+    explicit WW8_WrPlcTextBoxes( sal_uInt8 nTTyp ) : m_nTyp( nTTyp ) {}
 
     bool WriteText( WW8Export& rWrt );
     void WritePlc( WW8Export& rWrt ) const;
     void Append( const SdrObject& rObj, sal_uInt32 nShapeId );
     void Append( const SwFrameFormat* pFormat, sal_uInt32 nShapeId );
-    sal_uInt16 Count() const { return aContent.size(); }
+    sal_uInt16 Count() const { return m_aContent.size(); }
     sal_uInt16 GetPos( const void* p ) const
     {
         std::vector<const void*>::const_iterator it
-            = std::find( aContent.begin(), aContent.end(), p );
-        return it == aContent.end() ? USHRT_MAX : it - aContent.begin();
+            = std::find( m_aContent.begin(), m_aContent.end(), p );
+        return it == m_aContent.end() ? USHRT_MAX : it - m_aContent.begin();
     }
 };
 
 class WW8_WrPlcPn                   // Plc for Page Numbers
 {
 private:
-    WW8Export& rWrt;
+    WW8Export& m_rWrt;
     // Plc for Chpx and Papx ( incl PN-Plc )
     std::vector<std::unique_ptr<WW8_WrFkp>> m_Fkps;
-    sal_uInt16 nFkpStartPage;
-    ePLCFT ePlc;
+    sal_uInt16 m_nFkpStartPage;
+    ePLCFT m_ePlc;
 
     WW8_WrPlcPn(const WW8_WrPlcPn&) = delete;
     WW8_WrPlcPn& operator=(const WW8_WrPlcPn&) = delete;
@@ -1331,15 +1337,15 @@ public:
 class WW8_WrPlc1
 {
 private:
-    std::vector<WW8_CP> aPos;
-    std::unique_ptr<sal_uInt8[]> pData;                // content ( structures )
-    sal_uLong nDataLen;
-    sal_uInt16 nStructSiz;
+    std::vector<WW8_CP> m_aPos;
+    std::unique_ptr<sal_uInt8[]> m_pData;                // content ( structures )
+    sal_uLong m_nDataLen;
+    sal_uInt16 m_nStructSiz;
 
     WW8_WrPlc1(const WW8_WrPlc1&) = delete;
     WW8_WrPlc1& operator=(const WW8_WrPlc1&) = delete;
 protected:
-    sal_uInt16 Count() const { return aPos.size(); }
+    sal_uInt16 Count() const { return m_aPos.size(); }
     void Write( SvStream& rStrm );
     WW8_CP Prev() const;
 public:
@@ -1353,18 +1359,18 @@ public:
 class WW8_WrPlcField : public WW8_WrPlc1
 {
 private:
-    sal_uInt8 nTextTyp;
-    sal_uInt16 nResults;
+    sal_uInt8 m_nTextTyp;
+    sal_uInt16 m_nResults;
 
     WW8_WrPlcField(const WW8_WrPlcField&) = delete;
     WW8_WrPlcField& operator=(const WW8_WrPlcField&) = delete;
 public:
     WW8_WrPlcField( sal_uInt16 nStructSz, sal_uInt8 nTTyp )
-        : WW8_WrPlc1( nStructSz ), nTextTyp( nTTyp ), nResults(0)
+        : WW8_WrPlc1( nStructSz ), m_nTextTyp( nTTyp ), m_nResults(0)
     {}
     void Write( WW8Export& rWrt );
-    void ResultAdded() { ++nResults; }
-    sal_uInt16 ResultCount() const { return nResults; }
+    void ResultAdded() { ++m_nResults; }
+    sal_uInt16 ResultCount() const { return m_nResults; }
 };
 
 class WW8_WrMagicTable : public WW8_WrPlc1
@@ -1404,7 +1410,7 @@ class SwWW8WrGrf
 {
 private:
     /// for access to the variables
-    WW8Export& rWrt;
+    WW8Export& m_rWrt;
 
     std::vector<GraphicDetails> maDetails;
     sal_uInt16 mnIdx;       // index in file positions
@@ -1422,7 +1428,7 @@ private:
     SwWW8WrGrf(const SwWW8WrGrf&) = delete;
     SwWW8WrGrf& operator=(const SwWW8WrGrf&) = delete;
 public:
-    explicit SwWW8WrGrf( WW8Export& rW ) : rWrt( rW ), mnIdx( 0 ) {}
+    explicit SwWW8WrGrf( WW8Export& rW ) : m_rWrt( rW ), mnIdx( 0 ) {}
     void Insert(const ww8::Frame &rFly);
     void Write();
     sal_uLong GetFPos()
@@ -1435,7 +1441,7 @@ public:
 class MSWordAttrIter
 {
 private:
-    MSWordAttrIter* pOld;
+    MSWordAttrIter* m_pOld;
     MSWordAttrIter(const MSWordAttrIter&) = delete;
     MSWordAttrIter& operator=(const MSWordAttrIter&) = delete;
 protected:
@@ -1445,23 +1451,27 @@ public:
     virtual ~MSWordAttrIter();
 
     virtual const SfxPoolItem* HasTextItem( sal_uInt16 nWhich ) const = 0;
+    template<class T> const T* HasTextItem( TypedWhichId<T> nWhich ) const
+    {
+        return static_cast<const T*>(HasTextItem(sal_uInt16(nWhich)));
+    }
     virtual const SfxPoolItem& GetItem( sal_uInt16 nWhich ) const = 0;
- };
+};
 
 /// Used to export formatted text associated to drawings.
 class MSWord_SdrAttrIter : public MSWordAttrIter
 {
 private:
-    const EditTextObject* pEditObj;
-    const SfxItemPool* pEditPool;
-    std::vector<EECharAttrib> aTextAtrArr;
-    std::vector<const EECharAttrib*> aChrTextAtrArr;
-    std::vector<rtl_TextEncoding> aChrSetArr;
-    sal_Int32 nPara;
-    sal_Int32 nCurrentSwPos;
-    sal_Int32 nTmpSwPos;                   // for HasItem()
-    rtl_TextEncoding eNdChrSet;
-    sal_uInt16 nScript;
+    const EditTextObject* m_pEditObj;
+    const SfxItemPool* m_pEditPool;
+    std::vector<EECharAttrib> m_aTextAtrArr;
+    std::vector<const EECharAttrib*> m_aChrTextAtrArr;
+    std::vector<rtl_TextEncoding> m_aChrSetArr;
+    sal_Int32 m_nPara;
+    sal_Int32 m_nCurrentSwPos;
+    sal_Int32 m_nTmpSwPos;                   // for HasItem()
+    rtl_TextEncoding m_eNdChrSet;
+    sal_uInt16 m_nScript;
     sal_uInt8 mnTyp;
 
     sal_Int32 SearchNext( sal_Int32 nStartPos );
@@ -1480,14 +1490,14 @@ public:
 
     bool IsTextAttr(sal_Int32 nSwPos);
 
-    void NextPos() { if ( nCurrentSwPos < SAL_MAX_INT32 ) nCurrentSwPos = SearchNext( nCurrentSwPos + 1 ); }
+    void NextPos() { if ( m_nCurrentSwPos < SAL_MAX_INT32 ) m_nCurrentSwPos = SearchNext( m_nCurrentSwPos + 1 ); }
 
     void OutAttr( sal_Int32 nSwPos );
     virtual const SfxPoolItem* HasTextItem( sal_uInt16 nWhich ) const override;
     virtual const SfxPoolItem& GetItem( sal_uInt16 nWhich ) const override;
-    sal_Int32 WhereNext() const                { return nCurrentSwPos; }
+    sal_Int32 WhereNext() const                { return m_nCurrentSwPos; }
     rtl_TextEncoding GetNextCharSet() const;
-    rtl_TextEncoding GetNodeCharSet() const     { return eNdChrSet; }
+    rtl_TextEncoding GetNodeCharSet() const     { return m_eNdChrSet; }
 };
 
 // class SwWW8AttrIter is a helper for constructing the Fkp.chpx.
@@ -1500,7 +1510,7 @@ public:
 class SwWW8AttrIter : public MSWordAttrIter
 {
 private:
-    const SwTextNode& rNd;
+    const SwTextNode& m_rNode;
 
     sw::util::CharRuns maCharRuns;
     sw::util::CharRuns::const_iterator maCharRunIter;
@@ -1509,9 +1519,9 @@ private:
     sal_uInt16 mnScript;
     bool mbCharIsRTL;
 
-    const SwRangeRedline* pCurRedline;
-    sal_Int32 nCurrentSwPos;
-    SwRedlineTable::size_type nCurRedlinePos;
+    const SwRangeRedline* m_pCurRedline;
+    sal_Int32 m_nCurrentSwPos;
+    SwRedlineTable::size_type m_nCurRedlinePos;
 
     bool mbParaIsRTL;
 
@@ -1539,9 +1549,9 @@ public:
     bool IsDropCap( int nSwPos );
     bool RequiresImplicitBookmark();
 
-    void NextPos() { if ( nCurrentSwPos < SAL_MAX_INT32 ) nCurrentSwPos = SearchNext( nCurrentSwPos + 1 ); }
+    void NextPos() { if ( m_nCurrentSwPos < SAL_MAX_INT32 ) m_nCurrentSwPos = SearchNext( m_nCurrentSwPos + 1 ); }
 
-    void OutAttr(sal_Int32 nSwPos, bool bWriteCombinedChars, bool bPostponeSingleUse = false);
+    void OutAttr(sal_Int32 nSwPos, bool bWriteCombinedChars);
     virtual const SfxPoolItem* HasTextItem( sal_uInt16 nWhich ) const override;
     virtual const SfxPoolItem& GetItem( sal_uInt16 nWhich ) const override;
     int OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos);
@@ -1550,7 +1560,7 @@ public:
     FlyProcessingState OutFlys(sal_Int32 nSwPos);
     bool HasFlysAt(sal_Int32 nSwPos) const;
 
-    sal_Int32 WhereNext() const { return nCurrentSwPos; }
+    sal_Int32 WhereNext() const { return m_nCurrentSwPos; }
     sal_uInt16 GetScript() const { return mnScript; }
     bool IsParaRTL() const { return mbParaIsRTL; }
     rtl_TextEncoding GetCharSet() const { return meChrSet; }
@@ -1563,7 +1573,7 @@ public:
 
     void SplitRun( sal_Int32 nSplitEndPos );
 
-    const SwTextNode& GetNode() const { return rNd; }
+    const SwTextNode& GetNode() const { return m_rNode; }
 };
 
 /// Class to collect and output the styles table.
@@ -1571,26 +1581,34 @@ class MSWordStyles
 {
     MSWordExportBase& m_rExport;
     sal_uInt16 m_aHeadingParagraphStyles[MAXLEVEL];
-    std::vector<SwFormat*> m_aFormatA; ///< Slot <-> Character and paragraph style array (0 for list styles).
-    sal_uInt16 m_nUsedSlots;
-    bool m_bListStyles; ///< If list styles are requested to be exported as well.
-    std::map<sal_uInt16, const SwNumRule*> m_aNumRules; ///< Slot <-> List style map.
 
-    /// We need to build style id's for DOCX export; ideally we should roundtrip that, but this is good enough.
-    std::vector<OString> m_aStyleIds;
+    struct MapEntry
+    {
+        const SwFormat* format = nullptr;
+        const SwNumRule* num_rule = nullptr;
+        /// We need to build style id's for DOCX export; ideally we should roundtrip that, but this is good enough.
+        sal_uInt16 ww_id = ww::stiUser;
+        OUString ww_name;
+        OString style_id;
+
+        MapEntry() = default;
+        MapEntry(const SwFormat* f) : format(f) { if (f) ww_id = GetWWId(*f); }
+        MapEntry(const SwNumRule* r) : num_rule(r) {}
+    };
+    std::vector<MapEntry> m_aStyles; ///< Slot <-> Character/paragraph/list style array.
+    bool m_bListStyles; ///< If list styles are requested to be exported as well.
 
     /// Create the style table, called from the constructor.
     void BuildStylesTable();
 
-    /// Based on pFormatA, fill in m_aStyleIds with unique, MS-like names.
+    /// Generate proper Word names, taking mapping between special types into account
+    void BuildWwNames();
+
+    /// Based on style names, fill in unique, MS-like names.
     void BuildStyleIds();
 
-    /// Get slot number during building the style table.
-    sal_uInt16 BuildGetSlot( const SwFormat& rFormat );
-    sal_uInt16 BuildGetSlot( const SwNumRule& /*rNumRule*/ ) { return m_nUsedSlots++;}
-
     /// Return information about one style.
-    void GetStyleData( SwFormat* pFormat, bool& bFormatColl, sal_uInt16& nBase, sal_uInt16& nNext, sal_uInt16& nLink );
+    void GetStyleData( const SwFormat* pFormat, bool& bFormatColl, sal_uInt16& nBase, sal_uInt16& nNext, sal_uInt16& nLink );
 
     /// Outputs attributes of one style.
     void WriteProperties( const SwFormat* pFormat, bool bPap, sal_uInt16 nPos, bool bInsDefCharSiz );
@@ -1600,8 +1618,7 @@ class MSWordStyles
     void SetStyleDefaults( const SwFormat& rFormat, bool bPap );
 
     /// Outputs one style - called (in a loop) from OutputStylesTable().
-    void OutputStyle( SwFormat* pFormat, sal_uInt16 nPos );
-    void OutputStyle( const SwNumRule* pNumRule, sal_uInt16 nPos );
+    void OutputStyle( sal_uInt16 nSlot );
 
     MSWordStyles( const MSWordStyles& ) = delete;
     MSWordStyles& operator=( const MSWordStyles& ) = delete;
@@ -1613,18 +1630,18 @@ public:
     /// Output the styles table.
     void OutputStylesTable();
 
-    /// Get id of the style (rFormat).
+    /// Get slot of the style (rFormat).
     sal_uInt16 GetSlot( const SwFormat* pFormat ) const;
 
     /// create style id using only ASCII characters of the style name
-    static OString CreateStyleId(const OUString &rName);
+    static OString CreateStyleId(std::u16string_view aName);
 
-    /// Get styleId of the nId-th style (nId is its position in pFormatA).
-    OString const & GetStyleId(sal_uInt16 nId) const;
+    /// Get styleId of the nSlot-th style (nSlot is its position in m_aStyles).
+    OString const & GetStyleId(sal_uInt16 nSlot) const;
 
-    const SwFormat* GetSwFormat(sal_uInt16 nId) const { return m_aFormatA[nId]; }
-    /// Get numbering rule of the nId-th style
-    const SwNumRule* GetSwNumRule(sal_uInt16 nId) const;
+    const SwFormat* GetSwFormat(sal_uInt16 nSlot) const { return m_aStyles[nSlot].format; }
+    /// Get numbering rule of the nSlot-th style
+    const SwNumRule* GetSwNumRule(sal_uInt16 nSlot) const { return m_aStyles[nSlot].num_rule; }
     sal_uInt16 GetHeadingParagraphStyleId(sal_uInt16 nLevel) const { return m_aHeadingParagraphStyles[ nLevel ]; }
 };
 
@@ -1633,7 +1650,7 @@ public:
 sal_Int16 GetWordFirstLineOffset(const SwNumFormat &rFormat);
 // A bit of a bag on the side for now
 OUString FieldString(ww::eField eIndex);
-OUString BookmarkToWord(const OUString &rBookmark, bool* pIsMove = nullptr, bool* pIsFrom = nullptr);
+OUString BookmarkToWord(std::u16string_view rBookmark, bool* pIsMove = nullptr, bool* pIsFrom = nullptr);
 
 class WW8SHDLong
 {

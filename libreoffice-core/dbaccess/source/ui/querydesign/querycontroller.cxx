@@ -62,12 +62,14 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <svl/undo.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/stdtext.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <osl/mutex.hxx>
+#include <o3tl/string_view.hxx>
 #include <memory>
 #include <vector>
 
@@ -478,6 +480,7 @@ void OQueryController::Execute(sal_uInt16 _nId, const Sequence< PropertyValue >&
                     std::unique_ptr<::connectivity::OSQLParseNode> pNode = m_aSqlParser.parseTree(aErrorMsg,m_sStatement,m_bGraphicalDesign);
                     if ( pNode )
                     {
+                        assert(m_pSqlIterator && "SqlIterator must exist");
                         delete m_pSqlIterator->getParseTree();
                         m_pSqlIterator->setParseTree(pNode.release());
                         m_pSqlIterator->traverseAll();
@@ -874,7 +877,7 @@ OUString OQueryController::getPrivateTitle( ) const
             SolarMutexGuard aSolarGuard;
             ::osl::MutexGuard aGuard( getMutex() );
             OUString aDefaultName = DBA_RES(editingView() ? STR_VIEW_TITLE : STR_QRY_TITLE);
-            return aDefaultName.getToken(0, ' ') + OUString::number(getCurrentStartNumber());
+            return o3tl::getToken(aDefaultName, 0, ' ') + OUString::number(getCurrentStartNumber());
         }
     }
     return m_sName;
@@ -1114,15 +1117,15 @@ void OQueryController::executeQuery()
         {
             auto aProps(::comphelper::InitPropertySequence(
                 {
-                    { PROPERTY_DATASOURCENAME, makeAny(sDataSourceName) },
-                    { PROPERTY_COMMAND_TYPE, makeAny(CommandType::COMMAND) },
-                    { PROPERTY_COMMAND, makeAny(sTranslatedStmt) },
-                    { PROPERTY_ENABLE_BROWSER, makeAny(false) },
-                    { PROPERTY_ACTIVE_CONNECTION, makeAny(getConnection()) },
-                    { PROPERTY_UPDATE_CATALOGNAME, makeAny(m_sUpdateCatalogName) },
-                    { PROPERTY_UPDATE_SCHEMANAME, makeAny(m_sUpdateSchemaName) },
-                    { PROPERTY_UPDATE_TABLENAME, makeAny(OUString()) },
-                    { PROPERTY_ESCAPE_PROCESSING, makeAny(m_bEscapeProcessing) }
+                    { PROPERTY_DATASOURCENAME, Any(sDataSourceName) },
+                    { PROPERTY_COMMAND_TYPE, Any(CommandType::COMMAND) },
+                    { PROPERTY_COMMAND, Any(sTranslatedStmt) },
+                    { PROPERTY_ENABLE_BROWSER, Any(false) },
+                    { PROPERTY_ACTIVE_CONNECTION, Any(getConnection()) },
+                    { PROPERTY_UPDATE_CATALOGNAME, Any(m_sUpdateCatalogName) },
+                    { PROPERTY_UPDATE_SCHEMANAME, Any(m_sUpdateSchemaName) },
+                    { PROPERTY_UPDATE_TABLENAME, Any(OUString()) },
+                    { PROPERTY_ESCAPE_PROCESSING, Any(m_bEscapeProcessing) }
                 }));
 
             xDisp->dispatch(aWantToDispatch, aProps);
@@ -1262,7 +1265,7 @@ bool OQueryController::doSaveAsDoc(bool _bSaveAs)
             {
                 xQuery = xFact->createDataDescriptor();
                 // to set the name is only allowed when the query is new
-                xQuery->setPropertyValue( PROPERTY_NAME, makeAny( m_sName ) );
+                xQuery->setPropertyValue( PROPERTY_NAME, Any( m_sName ) );
             }
             else
             {
@@ -1287,18 +1290,18 @@ bool OQueryController::doSaveAsDoc(bool _bSaveAs)
         }
         else
         {   // we're creating a query, or a *new* view
-            xQuery->setPropertyValue( PROPERTY_COMMAND, makeAny( sTranslatedStmt ) );
+            xQuery->setPropertyValue( PROPERTY_COMMAND, Any( sTranslatedStmt ) );
 
             if ( editingView() )
             {
-                xQuery->setPropertyValue( PROPERTY_CATALOGNAME, makeAny( m_sUpdateCatalogName ) );
-                xQuery->setPropertyValue( PROPERTY_SCHEMANAME, makeAny( m_sUpdateSchemaName ) );
+                xQuery->setPropertyValue( PROPERTY_CATALOGNAME, Any( m_sUpdateCatalogName ) );
+                xQuery->setPropertyValue( PROPERTY_SCHEMANAME, Any( m_sUpdateSchemaName ) );
             }
 
             if ( editingQuery() )
             {
-                xQuery->setPropertyValue( PROPERTY_UPDATE_TABLENAME, makeAny( OUString() ) );
-                xQuery->setPropertyValue( PROPERTY_ESCAPE_PROCESSING, css::uno::makeAny( m_bEscapeProcessing ) );
+                xQuery->setPropertyValue( PROPERTY_UPDATE_TABLENAME, Any( OUString() ) );
+                xQuery->setPropertyValue( PROPERTY_ESCAPE_PROCESSING, css::uno::Any( m_bEscapeProcessing ) );
 
                 xQuery->setPropertyValue( PROPERTY_LAYOUTINFORMATION, getViewData() );
             }
@@ -1315,7 +1318,7 @@ bool OQueryController::doSaveAsDoc(bool _bSaveAs)
             {
                 Reference< XNameContainer > xCont( xElements, UNO_QUERY );
                 if ( xCont.is() )
-                    xCont->insertByName( m_sName, makeAny( xQuery ) );
+                    xCont->insertByName( m_sName, Any( xQuery ) );
             }
 
             if ( editingView() )
@@ -1380,8 +1383,8 @@ struct CommentStrip
 {
     OUString maComment;
     bool            mbLastOnLine;
-    CommentStrip( const OUString& rComment, bool bLastOnLine )
-        : maComment( rComment), mbLastOnLine( bLastOnLine) {}
+    CommentStrip( OUString sComment, bool bLastOnLine )
+        : maComment(std::move( sComment)), mbLastOnLine( bLastOnLine) {}
 };
 
 }
@@ -1680,7 +1683,7 @@ void OQueryController::impl_reset( const bool i_bForceCurrentControllerSettings 
                     {
                         if ( !i_bForceCurrentControllerSettings && m_bGraphicalDesign && !editingView() )
                         {
-                            impl_showAutoSQLViewError( makeAny( m_pSqlIterator->getErrors() ) );
+                            impl_showAutoSQLViewError( Any( m_pSqlIterator->getErrors() ) );
                         }
                         bError = true;
                     }
@@ -1723,9 +1726,9 @@ void OQueryController::reset()
 
 void OQueryController::setStatement_fireEvent( const OUString& _rNewStatement, bool _bFireStatementChange )
 {
-    Any aOldValue = makeAny( m_sStatement );
+    Any aOldValue( m_sStatement );
     m_sStatement = _rNewStatement;
-    Any aNewValue = makeAny( m_sStatement );
+    Any aNewValue( m_sStatement );
 
     sal_Int32 nHandle = PROPERTY_ID_ACTIVECOMMAND;
     if ( _bFireStatementChange )
@@ -1737,9 +1740,9 @@ void OQueryController::setEscapeProcessing_fireEvent( const bool _bEscapeProcess
     if ( _bEscapeProcessing == m_bEscapeProcessing )
         return;
 
-    Any aOldValue = makeAny( m_bEscapeProcessing );
+    Any aOldValue( m_bEscapeProcessing );
     m_bEscapeProcessing = _bEscapeProcessing;
-    Any aNewValue = makeAny( m_bEscapeProcessing );
+    Any aNewValue( m_bEscapeProcessing );
 
     sal_Int32 nHandle = PROPERTY_ID_ESCAPE_PROCESSING;
     fire( &nHandle, &aNewValue, &aOldValue, 1, false );
@@ -1776,7 +1779,7 @@ Any SAL_CALL OQueryController::getViewData()
     ::comphelper::NamedValueCollection aViewSettings;
     saveViewSettings( aViewSettings, false );
 
-    return makeAny( aViewSettings.getPropertyValues() );
+    return Any( aViewSettings.getPropertyValues() );
 }
 
 void SAL_CALL OQueryController::restoreViewData(const Any& /*Data*/)

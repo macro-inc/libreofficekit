@@ -46,9 +46,7 @@ namespace detail { class ConfigurationWrapper; }
 /// directly.
 class COMPHELPER_DLLPUBLIC ConfigurationChanges {
 public:
-    static std::shared_ptr<ConfigurationChanges> create(
-        css::uno::Reference< css::uno::XComponentContext >
-            const & context = comphelper::getProcessComponentContext());
+    static std::shared_ptr<ConfigurationChanges> create();
 
     ~ConfigurationChanges();
 
@@ -85,19 +83,11 @@ namespace detail {
 /// @internal
 class COMPHELPER_DLLPUBLIC ConfigurationWrapper {
 public:
-    static ConfigurationWrapper const & get(
-        css::uno::Reference< css::uno::XComponentContext >
-            const & context);
-
-    SAL_DLLPRIVATE explicit ConfigurationWrapper(
-        css::uno::Reference< css::uno::XComponentContext >
-            const & context);
-
-    SAL_DLLPRIVATE ~ConfigurationWrapper();
+    static ConfigurationWrapper const & get();
 
     bool isReadOnly(OUString const & path) const;
 
-    css::uno::Any getPropertyValue(OUString const & path) const;
+    css::uno::Any getPropertyValue(std::u16string_view path) const;
 
     static void setPropertyValue(
         std::shared_ptr< ConfigurationChanges > const & batch,
@@ -131,6 +121,10 @@ public:
     std::shared_ptr< ConfigurationChanges > createChanges() const;
 
 private:
+    SAL_DLLPRIVATE explicit ConfigurationWrapper();
+
+    SAL_DLLPRIVATE ~ConfigurationWrapper();
+
     ConfigurationWrapper(const ConfigurationWrapper&) = delete;
     ConfigurationWrapper& operator=(const ConfigurationWrapper&) = delete;
 
@@ -146,7 +140,7 @@ private:
 /// @internal
 template< typename T > struct Convert {
     static css::uno::Any toAny(T const & value)
-    { return css::uno::makeAny(value); }
+    { return css::uno::Any(value); }
 
     static T fromAny(css::uno::Any const & value)
     { return value.get< T >(); }
@@ -164,7 +158,7 @@ template< typename T > struct Convert< std::optional< T > >
 {
     static css::uno::Any toAny(std::optional< T > const & value) {
         return value
-            ? css::uno::makeAny(*value)
+            ? css::uno::Any(*value)
             : css::uno::Any();
     }
 
@@ -193,24 +187,20 @@ template< typename T, typename U > struct ConfigurationProperty
 {
     /// Get the read-only status of the given (non-localized) configuration
     /// property.
-    static bool isReadOnly(
-        css::uno::Reference<css::uno::XComponentContext> const & context
-            = comphelper::getProcessComponentContext())
+    static bool isReadOnly()
     {
-        return detail::ConfigurationWrapper::get(context).isReadOnly(T::path());
+        return detail::ConfigurationWrapper::get().isReadOnly(T::path());
     }
 
     /// Get the value of the given (non-localized) configuration property.
     ///
     /// For nillable properties, U is of type std::optional<U'>.
-    static U get(
-        css::uno::Reference< css::uno::XComponentContext >
-            const & context = comphelper::getProcessComponentContext())
+    static U get()
     {
         // Folding this into one statement causes a bogus error at least with
         // Red Hat GCC 4.6.2-1:
         css::uno::Any a(
-            detail::ConfigurationWrapper::get(context).getPropertyValue(
+            detail::ConfigurationWrapper::get().getPropertyValue(
                 T::path()));
         return detail::Convert< U >::fromAny(a);
     }
@@ -247,12 +237,12 @@ template< typename T, typename U > struct ConfigurationLocalizedProperty
     /// com.sun.star.configuration.theDefaultProvider.
     ///
     /// For nillable properties, U is of type std::optional<U'>.
-    static U get(css::uno::Reference< css::uno::XComponentContext > const & context)
+    static U get()
     {
         // Folding this into one statement causes a bogus error at least with
         // Red Hat GCC 4.6.2-1:
         css::uno::Any a(
-            detail::ConfigurationWrapper::get(context).
+            detail::ConfigurationWrapper::get().
             getLocalizedPropertyValue(T::path()));
         return detail::Convert< U >::fromAny(a);
     }
@@ -288,10 +278,9 @@ template< typename T > struct ConfigurationGroup {
     /// Get read-only access to the given configuration group.
     static css::uno::Reference<
         css::container::XHierarchicalNameAccess >
-    get(css::uno::Reference< css::uno::XComponentContext >
-            const & context = comphelper::getProcessComponentContext())
+    get()
     {
-        return detail::ConfigurationWrapper::get(context).getGroupReadOnly(
+        return detail::ConfigurationWrapper::get().getGroupReadOnly(
             T::path());
     }
 
@@ -322,10 +311,9 @@ template< typename T > struct ConfigurationSet {
     /// Get read-only access to the given configuration set.
     static
     css::uno::Reference< css::container::XNameAccess >
-    get(css::uno::Reference< css::uno::XComponentContext >
-            const & context = comphelper::getProcessComponentContext())
+    get()
     {
-        return detail::ConfigurationWrapper::get(context).getSetReadOnly(
+        return detail::ConfigurationWrapper::get().getSetReadOnly(
             T::path());
     }
 

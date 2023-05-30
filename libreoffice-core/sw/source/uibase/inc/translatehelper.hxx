@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #pragma once
-#include "swtypes.hxx"
+#include <swtypes.hxx>
 
 class SwWrtShell;
 class SwPaM;

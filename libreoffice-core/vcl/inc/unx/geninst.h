@@ -24,7 +24,7 @@
 #include <memory>
 #include <comphelper/solarmutex.hxx>
 #include <salinst.hxx>
-#include <saldatabasic.hxx>
+#include <svdata.hxx>
 #include <unx/genprn.h>
 
 class VCL_DLLPUBLIC SalYieldMutex : public comphelper::SolarMutex
@@ -60,7 +60,9 @@ public:
     virtual std::unique_ptr<SalPrinter> CreatePrinter  ( SalInfoPrinter* pInfoPrinter ) override;
     virtual void                GetPrinterQueueInfo    ( ImplPrnQueueList* pList ) override;
     virtual void                GetPrinterQueueState   ( SalPrinterQueueInfo* pInfo ) override;
+#if !defined(_WIN32)
     virtual OUString            GetDefaultPrinter() override;
+#endif
     virtual void                PostPrintersChanged() = 0;
     virtual void                updatePrinterUpdate() override;
     virtual void                jobStartedPrinterUpdate() override;
@@ -83,7 +85,7 @@ protected:
 
 inline SalGenericInstance *GetGenericInstance()
 {
-    return static_cast<SalGenericInstance *>(GetSalData()->m_pInstance);
+    return static_cast<SalGenericInstance*>(GetSalInstance());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

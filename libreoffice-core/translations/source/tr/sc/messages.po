@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-08 14:37+0200\n"
-"PO-Revision-Date: 2022-07-04 16:16+0000\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-02-28 22:08+0000\n"
 "Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
-"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/scmessages/tr/>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-7-5/scmessages/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1558918336.000000\n"
 
 #. kBovX
@@ -1464,6 +1464,9 @@ msgid ""
 "a table range of at least\n"
 "3 × 3 cells must be selected."
 msgstr ""
+"Otomatik Biçim uygulamak için \n"
+"en az 3 × 3 hücreden oluşan \n"
+"bir tablo aralığı seçilmelidir."
 
 #. iySox
 #: sc/inc/globstr.hrc:261
@@ -1511,13 +1514,13 @@ msgstr "Lotus dosyaları içe aktarımı"
 #: sc/inc/globstr.hrc:268
 msgctxt "STR_IMPORT_DBF"
 msgid "Import dBASE files"
-msgstr ""
+msgstr "dBASE dosyalarını içe aktar"
 
 #. uyTFS
 #: sc/inc/globstr.hrc:269
 msgctxt "STR_EXPORT_DBF"
 msgid "dBASE export"
-msgstr ""
+msgstr "dBASE dışa aktar"
 
 #. CtHUj
 #: sc/inc/globstr.hrc:270
@@ -1903,17 +1906,17 @@ msgctxt "STR_SCATTR_PAGE_SCALE"
 msgid "Reduce/enlarge printout"
 msgstr "Küçültülmüş/büyültülmüş çıktı"
 
-#. CXqDX
+#. jYSCo
 #: sc/inc/globstr.hrc:333
 msgctxt "STR_SCATTR_PAGE_SCALETOPAGES"
-msgid "Fit print range(s) on number of pages"
-msgstr "Yazdırma aralığını/aralıklarını sayfa sayısına uydur"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Sayfa sayısına göre baskı aralığını/aralıklarını uydur"
 
-#. kDAZk
+#. P4CCx
 #: sc/inc/globstr.hrc:334
 msgctxt "STR_SCATTR_PAGE_SCALETO"
-msgid "Fit print range(s) to width/height"
-msgstr "Çıktı aralığını genişliğe/yüksekliğe göre uydur"
+msgid "Shrink print range(s) to width/height"
+msgstr "Yazdırma aralığını/aralıklarını genişliğe/yüksekliğe uydur"
 
 #. fnrU6
 #: sc/inc/globstr.hrc:335
@@ -1994,11 +1997,11 @@ msgctxt "STR_ON"
 msgid "on"
 msgstr "açık"
 
-#. NqkbD
+#. RryEg
 #: sc/inc/globstr.hrc:348
 msgctxt "STR_RELOAD_TABLES"
-msgid "Security Warning: Automatic update of external links has been disabled."
-msgstr "Güvenlik Uyarısı: Harici bağlantıların otomatik güncellenmesi devre dışı bırakıldı."
+msgid "Automatic update of external links has been disabled."
+msgstr "Harici bağlantıların otomatik güncellenmesi pasifleştirildi."
 
 #. qkto7
 #: sc/inc/globstr.hrc:349
@@ -2128,7 +2131,7 @@ msgstr "İçeriği sil"
 #: sc/inc/globstr.hrc:367
 msgctxt "STR_QUICKHELP_REF"
 msgid "%1 R  × %2 C"
-msgstr ""
+msgstr "%1 Str  × %2 Stn"
 
 #. NJpDi
 #: sc/inc/globstr.hrc:368
@@ -2301,7 +2304,7 @@ msgstr "Dizi alanını ayarla"
 #: sc/inc/globstr.hrc:395
 msgctxt "STR_TIP_RESIZEMATRIX"
 msgid "Array formula  %1 R × %2 C"
-msgstr ""
+msgstr "Dizi formülü %1 Str × %2 Stn"
 
 #. nkxuG
 #: sc/inc/globstr.hrc:396
@@ -2595,7 +2598,7 @@ msgstr "Özet tablo kaynak verisi geçersiz."
 #: sc/inc/globstr.hrc:438
 msgctxt "STR_OPTIONS_WARN_SEPARATORS"
 msgid "Because the current formula separator settings conflict with the locale, the formula separators have been reset to their default values."
-msgstr "Şu anki formül ayırıcı ayarları yerel ile çatıştığından, formül ayıraçları öntanımlı değerlerine geri dönmüştür."
+msgstr "Şu anki formül ayırıcı ayarları yerel ile çatıştığından, formül ayıraçları varsayılan değerlerine geri dönmüştür."
 
 #. QMTkA
 #: sc/inc/globstr.hrc:439
@@ -2649,7 +2652,7 @@ msgstr "Geçersiz isim. Halihazırda seçili kapsamda için kullanılıyor."
 #: sc/inc/globstr.hrc:447
 msgctxt "STR_ERR_NAME_INVALID"
 msgid "Invalid name. Start with a letter, use only letters, numbers and underscore."
-msgstr "Geçersiz isim.  Bir harfle başlayın, yalnızca harf, sayı ve alt çizgi kullanın."
+msgstr "Geçersiz isim. Bir harfle başlayın, yalnızca harf, sayı ve alt çizgi kullanın."
 
 #. owW4Y
 #: sc/inc/globstr.hrc:448
@@ -3083,11 +3086,11 @@ msgctxt "STR_UNDO_FORMULA_TO_VALUE"
 msgid "Convert Formula To Value"
 msgstr "Formülü Değere Dönüştür"
 
-#. dsjqi
+#. BywKj
 #: sc/inc/globstr.hrc:515
 msgctxt "STR_UNQUOTED_STRING"
-msgid "Strings without quotes are interpreted as column/row labels."
-msgstr "Tırnak içinde olmayan ifadeler satır/sütun etiketi olarak işlenirler."
+msgid "Strings without quotes are interpreted as defined names or references or column/row labels."
+msgstr "Tırnaksız dizeler, tanımlanmış adlar veya başvurular veya sütun/satır etiketleri olarak yorumlanır."
 
 #. rHjns
 #: sc/inc/globstr.hrc:516
@@ -6864,11 +6867,11 @@ msgctxt "SC_OPCODE_RANDOM"
 msgid "Returns a random number between 0 and 1."
 msgstr "0 ile 1 arasında bulunan rasgele bir sayı verir."
 
-#. QugqG
+#. Le6a5
 #: sc/inc/scfuncs.hrc:1064
 msgctxt "SC_OPCODE_IS_EVEN"
-msgid "Returns TRUE if value is an even integer."
-msgstr "Değer bir çift sayı ise sonuç DOĞRU olur."
+msgid "Returns TRUE if the value truncated to integer is even."
+msgstr "Tamsayıya biçilen değer çift ise DOĞRU döndürür."
 
 #. aEG3g
 #: sc/inc/scfuncs.hrc:1065
@@ -6882,11 +6885,11 @@ msgctxt "SC_OPCODE_IS_EVEN"
 msgid "The value to be tested."
 msgstr "Denetlenecek değer."
 
-#. M8AAF
+#. FXDi6
 #: sc/inc/scfuncs.hrc:1072
 msgctxt "SC_OPCODE_IS_ODD"
-msgid "Returns TRUE if value is an odd integer."
-msgstr "Değer bir tek sayı ise sonuç DOĞRU olur."
+msgid "Returns TRUE if the value truncated to integer is odd."
+msgstr "Tamsayıya biçilen değer tek ise DOĞRU döndürür."
 
 #. 4scb6
 #: sc/inc/scfuncs.hrc:1073
@@ -8658,7 +8661,7 @@ msgstr "Değişken listesinin en büyük sayısını verir."
 #: sc/inc/scfuncs.hrc:1711
 msgctxt "SC_OPCODE_MAX"
 msgid "Number "
-msgstr "Sayı"
+msgstr "Sayı "
 
 #. XowNY
 #: sc/inc/scfuncs.hrc:1712
@@ -8820,7 +8823,7 @@ msgstr "Tüm popülasyondan yola çıkarak varyansı hesaplar. Metin sıfır ola
 #: sc/inc/scfuncs.hrc:1783
 msgctxt "SC_OPCODE_VAR_P_A"
 msgid "Value "
-msgstr "Değer"
+msgstr "Değer "
 
 #. yZFuZ
 #: sc/inc/scfuncs.hrc:1784
@@ -14580,7 +14583,7 @@ msgstr "Metne dönüştür."
 #: sc/inc/scfuncs.hrc:3527
 msgctxt "SC_OPCODE_ASC"
 msgid "Converts full-width ASCII and katakana characters to half-width."
-msgstr "Tam-geniş ASCII ve katakana karakterlerini  yarı-genişliğe dönüştür."
+msgstr "Tam-geniş ASCII ve katakana karakterlerini yarı-genişliğe dönüştür."
 
 #. FKMAj
 #: sc/inc/scfuncs.hrc:3528
@@ -15242,11 +15245,11 @@ msgctxt "SC_OPCODE_FIXED"
 msgid "Decimals"
 msgstr "Onluk"
 
-#. ACFqC
+#. CTmcM
 #: sc/inc/scfuncs.hrc:3751
 msgctxt "SC_OPCODE_FIXED"
-msgid "Decimal places. The number of fixed decimal places that are to be displayed."
-msgstr "Ondalık haneler. Görüntülenecek sabit ondalık hane sayısı."
+msgid "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."
+msgstr "Ondalık. Görüntülenecek sabit ondalık basamak sayısı. Varsayılan 2."
 
 #. fdn6N
 #: sc/inc/scfuncs.hrc:3752
@@ -15516,7 +15519,7 @@ msgstr "Bayraklar veya Oluşum"
 #: sc/inc/scfuncs.hrc:3831
 msgctxt "SC_OPCODE_REGEX"
 msgid "Text specifying option flags, \"g\" for global replacement. Or number of occurrence to match or replace."
-msgstr "Seçenek bayraklarını belirten metin, genel değiştirme için \"g\".  Veya eşleşecek veya değiştirilecek oluşum sayısı."
+msgstr "Seçenek bayraklarını belirten metin, genel değiştirme için \"g\". Veya eşleşecek veya değiştirilecek oluşum sayısı."
 
 #. Gp7Ph
 #: sc/inc/scfuncs.hrc:3837
@@ -16459,7 +16462,7 @@ msgstr "Dizi"
 #: sc/inc/scfuncs.hrc:4127
 msgctxt "SC_OPCODE_FOURIER"
 msgid "The array whose DFT needs to be computed. The dimensions of this array can be Nx1 or Nx2 or 1xN or 2xN."
-msgstr "DFT'sinin hesaplanması gereken dizi.  Bu dizinin boyutları Nx1 veya Nx2 veya 1xN veya 2xN olabilir."
+msgstr "DFT'sinin hesaplanması gereken dizi. Bu dizinin boyutları Nx1 veya Nx2 veya 1xN veya 2xN olabilir."
 
 #. M7L6L
 #: sc/inc/scfuncs.hrc:4128
@@ -16515,11 +16518,11 @@ msgctxt "SC_OPCODE_RANDOM_NV"
 msgid "Returns a random number between 0 and 1, non-volatile."
 msgstr "0 ile 1 arasında geçici olmayan rastgele bir sayı döndürür."
 
-#. op2W5
+#. fDQYY
 #: sc/inc/scfuncs.hrc:4147
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "Returns a random integer between the numbers you specify, non-volatile."
-msgstr "Belirttiğiniz sayılar arasında geçici olmayan rastgele bir tamsayı döndürür."
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."
+msgstr "Belirtilen Alt ve Üst değerler (her ikisi de dahil) arasında geçici olmayan rastgele bir tamsayı döndürür."
 
 #. o3i8h
 #: sc/inc/scfuncs.hrc:4148
@@ -16527,11 +16530,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Bottom"
 msgstr "Alt"
 
-#. HdKGo
+#. 7kUdh
 #: sc/inc/scfuncs.hrc:4149
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The smallest integer returned."
-msgstr "En küçük tamsayıyı döndürür"
+msgid "The smallest integer that can be returned."
+msgstr "Döndürülebilecek en küçük tamsayı."
 
 #. 8s6nU
 #: sc/inc/scfuncs.hrc:4150
@@ -16539,11 +16542,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Top"
 msgstr "Üst"
 
-#. x9uuF
+#. AmoKE
 #: sc/inc/scfuncs.hrc:4151
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The largest integer returned."
-msgstr "En büyük tamsayıyı döndürür"
+msgid "The largest integer that can be returned."
+msgstr "Döndürülebilecek en büyük tamsayı."
 
 #. pDDme
 #: sc/inc/scstyles.hrc:29
@@ -16672,1906 +16675,1900 @@ msgctxt "SCSTR_FILTER_CONDITION"
 msgid "Filter by Condition"
 msgstr "Koşula Göre Süz"
 
-#. 5LENV
-#: sc/inc/strings.hrc:41
-msgctxt "SCSTR_FILTER_TEXT_COLOR"
-msgid "Text Color"
-msgstr "Metin Rengi"
-
-#. BtGE4
-#: sc/inc/strings.hrc:42
-msgctxt "SCSTR_FILTER_BACKGROUND_COLOR"
-msgid "Background Color"
-msgstr "Arkaplan Rengi"
-
-#. td5Gr
+#. PWtxn
 #. This must match the translation of the same strings of standardfilterdialog|cond
-#: sc/inc/strings.hrc:44
+#: sc/inc/strings.hrc:42
 msgctxt "STANDARDFILTERDIALOG_COND"
-msgid "Text color"
-msgstr "Metin rengi"
+msgid "Font color"
+msgstr "Yazı tipi rengi"
 
 #. sGJCz
-#: sc/inc/strings.hrc:45
+#: sc/inc/strings.hrc:43
 msgctxt "STANDARDFILTERDIALOG_COND"
 msgid "Background color"
 msgstr "Arkaplan rengi"
 
 #. teYGB
-#: sc/inc/strings.hrc:46
+#: sc/inc/strings.hrc:44
 msgctxt "SCSTR_FILTER_NO_FILL"
 msgid "No Fill"
 msgstr "Dolgu yok"
 
 #. 8DPvA
-#: sc/inc/strings.hrc:47
+#: sc/inc/strings.hrc:45
 msgctxt "SCSTR_FILTER_AUTOMATIC_COLOR"
 msgid "Automatic"
 msgstr "Otomatik"
 
 #. Wgy7r
-#: sc/inc/strings.hrc:48
+#: sc/inc/strings.hrc:46
 msgctxt "SCSTR_NONAME"
 msgid "unnamed"
 msgstr "isimsiz"
 
 #. JAf3n
-#: sc/inc/strings.hrc:49
+#: sc/inc/strings.hrc:47
 msgctxt "SCSTR_INSERT_RTL"
 msgid "Shift cells left"
 msgstr "Hücreleri sola kaydır"
 
 #. CW4Wh
 #. "%1 is replaced to column letter, such as 'Column A'"
-#: sc/inc/strings.hrc:51
+#: sc/inc/strings.hrc:49
 msgctxt "SCSTR_COLUMN_LETTER"
 msgid "Column %1"
 msgstr "Sütun %1"
 
 #. CJrpZ
-#: sc/inc/strings.hrc:52
+#: sc/inc/strings.hrc:50
 msgctxt "SCSTR_COLUMN"
 msgid "Column"
 msgstr "Sütun"
 
 #. Bjnch
-#: sc/inc/strings.hrc:53
+#: sc/inc/strings.hrc:51
 msgctxt "SCSTR_ROW"
 msgid "Row"
 msgstr "Satır"
 
 #. 7p8BN
-#: sc/inc/strings.hrc:54
+#: sc/inc/strings.hrc:52
 msgctxt "SCSTR_TABLE"
 msgid "Sheet"
 msgstr "Sayfa"
 
 #. ArnTD
-#: sc/inc/strings.hrc:55
+#: sc/inc/strings.hrc:53
 msgctxt "SCSTR_NAME"
 msgid "Name"
 msgstr "İsim"
 
 #. BxrBH
-#: sc/inc/strings.hrc:56
+#: sc/inc/strings.hrc:54
 msgctxt "SCSTR_APDTABLE"
 msgid "Append Sheet"
 msgstr "Sayfa Sonuna Ekle"
 
 #. sba4F
-#: sc/inc/strings.hrc:57
+#: sc/inc/strings.hrc:55
 msgctxt "SCSTR_RENAMETAB"
 msgid "Rename Sheet"
 msgstr "Sayfayı Yeniden Adlandır"
 
 #. EEcgV
-#: sc/inc/strings.hrc:58
+#: sc/inc/strings.hrc:56
 msgctxt "SCSTR_SET_TAB_BG_COLOR"
 msgid "Tab Color"
 msgstr "Sekme rengi"
 
 #. sTank
-#: sc/inc/strings.hrc:59
+#: sc/inc/strings.hrc:57
 msgctxt "SCSTR_NO_TAB_BG_COLOR"
 msgid "Default"
 msgstr "Varsayılan"
 
 #. yEEuF
-#: sc/inc/strings.hrc:60
+#: sc/inc/strings.hrc:58
 msgctxt "SCSTR_RENAMEOBJECT"
 msgid "Name Object"
 msgstr "Nesne adı"
 
 #. 3FHKw
-#: sc/inc/strings.hrc:61
+#: sc/inc/strings.hrc:59
 msgctxt "STR_INSERTGRAPHIC"
 msgid "Insert Image"
 msgstr "Resim Ekle"
 
 #. bKv77
-#: sc/inc/strings.hrc:62
+#: sc/inc/strings.hrc:60
 msgctxt "SCSTR_TOTAL"
 msgid "One result found"
 msgid_plural "%1 results found"
 msgstr[0] "%1 sonuç bulundu"
 
 #. 7GkKi
-#: sc/inc/strings.hrc:63
+#: sc/inc/strings.hrc:61
 msgctxt "SCSTR_SKIPPED"
 msgid "(only %1 are listed)"
 msgstr "(sadece %1 listelendi)"
 
+#. khhRt
+#: sc/inc/strings.hrc:62
+msgctxt "SCSTR_RESULTS_CLAMPED"
+msgid "More than %1 results found (stopped counting)"
+msgstr "%1'den fazla sonuç bulundu (saymayı durdurdu)"
+
 #. YxFpr
 #. Attribute
-#: sc/inc/strings.hrc:65
+#: sc/inc/strings.hrc:64
 msgctxt "SCSTR_PROTECTDOC"
 msgid "Protect Spreadsheet Structure"
 msgstr "Hesap Tablosu Yapısını Koru"
 
 #. SQCpD
-#: sc/inc/strings.hrc:66
+#: sc/inc/strings.hrc:65
 msgctxt "SCSTR_UNPROTECTDOC"
 msgid "Unprotect Spreadsheet Structure"
 msgstr "Hesap Tablo Yapısı Korumasını Kaldır"
 
 #. rAV3G
-#: sc/inc/strings.hrc:67
+#: sc/inc/strings.hrc:66
 msgctxt "SCSTR_UNPROTECTTAB"
 msgid "Unprotect Sheet"
 msgstr "Sayfa Korumasını Kaldır"
 
 #. K7w3B
-#: sc/inc/strings.hrc:68
+#: sc/inc/strings.hrc:67
 msgctxt "SCSTR_CHG_PROTECT"
 msgid "Protect Records"
 msgstr "Kayıtları Koru"
 
 #. DLDBg
-#: sc/inc/strings.hrc:69
+#: sc/inc/strings.hrc:68
 msgctxt "SCSTR_CHG_UNPROTECT"
 msgid "Unprotect Records"
 msgstr "Kayıt Korumasını Kaldır"
 
 #. rFdAS
-#: sc/inc/strings.hrc:70
+#: sc/inc/strings.hrc:69
 msgctxt "SCSTR_PASSWORD"
 msgid "Password:"
 msgstr "Parola:"
 
 #. dd2wC
-#: sc/inc/strings.hrc:71
+#: sc/inc/strings.hrc:70
 msgctxt "SCSTR_PASSWORDOPT"
 msgid "Password (optional):"
 msgstr "Parola (isteğe bağlı):"
 
 #. dTBug
-#: sc/inc/strings.hrc:72
+#: sc/inc/strings.hrc:71
 msgctxt "SCSTR_WRONGPASSWORD"
 msgid "Incorrect Password"
 msgstr "Yanlış Parola"
 
 #. bkGuJ
-#: sc/inc/strings.hrc:73
+#: sc/inc/strings.hrc:72
 msgctxt "SCSTR_END"
 msgid "~End"
 msgstr "~Son"
 
 #. XNnTf
-#: sc/inc/strings.hrc:74
+#: sc/inc/strings.hrc:73
 msgctxt "SCSTR_UNKNOWN"
 msgid "Unknown"
 msgstr "Bilinmiyor"
 
 #. NoEfk
-#: sc/inc/strings.hrc:75
+#: sc/inc/strings.hrc:74
 msgctxt "SCSTR_VALID_MINIMUM"
 msgid "~Minimum"
 msgstr "~Asgari"
 
 #. gKahz
-#: sc/inc/strings.hrc:76
+#: sc/inc/strings.hrc:75
 msgctxt "SCSTR_VALID_MAXIMUM"
 msgid "~Maximum"
 msgstr "~Azami"
 
 #. nmeHF
-#: sc/inc/strings.hrc:77
+#: sc/inc/strings.hrc:76
 msgctxt "SCSTR_VALID_VALUE"
 msgid "~Value"
 msgstr "~Değer"
 
 #. g8Cow
-#: sc/inc/strings.hrc:78
+#: sc/inc/strings.hrc:77
 msgctxt "SCSTR_VALID_FORMULA"
 msgid "~Formula"
 msgstr "~Formül"
 
 #. 6YEEk
-#: sc/inc/strings.hrc:79
+#: sc/inc/strings.hrc:78
 msgctxt "SCSTR_VALID_RANGE"
 msgid "~Source"
 msgstr "~Kaynak"
 
 #. FA84s
-#: sc/inc/strings.hrc:80
+#: sc/inc/strings.hrc:79
 msgctxt "SCSTR_VALID_LIST"
 msgid "~Entries"
 msgstr "~Girdiler"
 
 #. vhcaA
 #. for dialogues:
-#: sc/inc/strings.hrc:82
+#: sc/inc/strings.hrc:81
 msgctxt "SCSTR_CHARSET_USER"
 msgid "System"
 msgstr "Sistem"
 
 #. 2tobg
-#: sc/inc/strings.hrc:83
+#: sc/inc/strings.hrc:82
 msgctxt "SCSTR_COLUMN_USER"
 msgid "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide"
 msgstr "Standart;Metin;Tarih (GAY);Tarih (AGY);Tarih(YAG);İngilizce (ABD);gizle"
 
 #. px75F
-#: sc/inc/strings.hrc:84
+#: sc/inc/strings.hrc:83
 msgctxt "SCSTR_FIELDSEP_TAB"
 msgid "Tab"
 msgstr "Sekmeler"
 
 #. ZGpGp
-#: sc/inc/strings.hrc:85
+#: sc/inc/strings.hrc:84
 msgctxt "SCSTR_FIELDSEP_SPACE"
 msgid "space"
 msgstr "boşluk"
 
 #. C8dAj
-#: sc/inc/strings.hrc:86
+#: sc/inc/strings.hrc:85
 msgctxt "SCSTR_UNDO_GRAFFILTER"
 msgid "Image Filter"
 msgstr "Resim Filtresi"
 
 #. CfBRk
-#: sc/inc/strings.hrc:87
+#: sc/inc/strings.hrc:86
 msgctxt "STR_CAPTION_DEFAULT_TEXT"
 msgid "Text"
 msgstr "Metin"
 
 #. X6bVC
 #. Select tables dialog title
-#: sc/inc/strings.hrc:89
+#: sc/inc/strings.hrc:88
 msgctxt "STR_DLG_SELECTTABLES_TITLE"
 msgid "Select Sheets"
 msgstr "Sayfaları Seç"
 
 #. GYoSL
-#: sc/inc/strings.hrc:90
+#: sc/inc/strings.hrc:89
 msgctxt "STR_DLG_SELECTTABLE_TITLE"
 msgid "Go to Sheet"
 msgstr "Sayfaya Git"
 
 #. iHTDF
-#: sc/inc/strings.hrc:91
+#: sc/inc/strings.hrc:90
 msgctxt "STR_DLG_SELECTTABLE_MASK"
 msgid "~Type a Sheet Name"
 msgstr "~Bir Sayfa Adı Yaz"
 
 #. SEDS2
 #. Select tables dialog listbox
-#: sc/inc/strings.hrc:93
+#: sc/inc/strings.hrc:92
 msgctxt "STR_DLG_SELECTTABLES_LBNAME"
 msgid "~Selected sheets"
 msgstr "~Seçilen sayfalar"
 
 #. szfzF
-#: sc/inc/strings.hrc:94
+#: sc/inc/strings.hrc:93
 msgctxt "STR_DLG_SELECTTABLE_LBNAME"
 msgid "~Sheets"
 msgstr "~Sayfalar"
 
 #. SfEhE
-#: sc/inc/strings.hrc:95
+#: sc/inc/strings.hrc:94
 msgctxt "STR_ACC_CSVRULER_NAME"
 msgid "Ruler"
 msgstr "Cetvel"
 
 #. 3VwsT
-#: sc/inc/strings.hrc:96
+#: sc/inc/strings.hrc:95
 msgctxt "STR_ACC_CSVRULER_DESCR"
 msgid "This ruler manages objects at fixed positions."
 msgstr "Cetvel nesnelerin konumlarını sabitlemek için kullanılır."
 
 #. 7Ream
-#: sc/inc/strings.hrc:97
+#: sc/inc/strings.hrc:96
 msgctxt "STR_ACC_CSVGRID_NAME"
 msgid "Preview"
 msgstr "Önizleme"
 
 #. uSKyF
-#: sc/inc/strings.hrc:98
+#: sc/inc/strings.hrc:97
 msgctxt "STR_ACC_CSVGRID_DESCR"
 msgid "This sheet shows how the data will be arranged in the document."
 msgstr "Bu sayfa belge içindeki verilerin nasıl ayarlanacağını gösterir."
 
 #. MwTAm
-#: sc/inc/strings.hrc:99
+#: sc/inc/strings.hrc:98
 msgctxt "STR_ACC_DOC_NAME"
 msgid "Document view"
 msgstr "Belge görüntüsü"
 
 #. NFaas
-#: sc/inc/strings.hrc:100
+#: sc/inc/strings.hrc:99
 msgctxt "STR_ACC_TABLE_NAME"
 msgid "Sheet %1"
 msgstr "Sayfa %1"
 
 #. 2qRJG
-#: sc/inc/strings.hrc:101
+#: sc/inc/strings.hrc:100
 msgctxt "STR_ACC_CELL_NAME"
 msgid "Cell %1"
 msgstr "Hücre %1"
 
 #. KD4PA
-#: sc/inc/strings.hrc:102
+#: sc/inc/strings.hrc:101
 msgctxt "STR_ACC_LEFTAREA_NAME"
 msgid "Left area"
 msgstr "Sol alan"
 
 #. 56AkM
-#: sc/inc/strings.hrc:103
+#: sc/inc/strings.hrc:102
 msgctxt "STR_ACC_PREVIEWDOC_NAME"
 msgid "Page preview"
 msgstr "Sayfa önizleme"
 
 #. RA4AS
-#: sc/inc/strings.hrc:104
+#: sc/inc/strings.hrc:103
 msgctxt "STR_ACC_CENTERAREA_NAME"
 msgid "Center area"
 msgstr "Merkez alan"
 
 #. 2hpwq
-#: sc/inc/strings.hrc:105
+#: sc/inc/strings.hrc:104
 msgctxt "STR_ACC_RIGHTAREA_NAME"
 msgid "Right area"
 msgstr "Sağ alan"
 
 #. FrXgq
-#: sc/inc/strings.hrc:106
+#: sc/inc/strings.hrc:105
 msgctxt "STR_ACC_HEADER_NAME"
 msgid "Header of page %1"
 msgstr "%1 sayfa başlığı"
 
 #. BwF8D
-#: sc/inc/strings.hrc:107
+#: sc/inc/strings.hrc:106
 msgctxt "STR_ACC_FOOTER_NAME"
 msgid "Footer of page %1"
 msgstr "%1 sayfasının alt bilgisi"
 
 #. 9T4c8
-#: sc/inc/strings.hrc:108
+#: sc/inc/strings.hrc:107
 msgctxt "STR_ACC_EDITLINE_NAME"
 msgid "Input line"
 msgstr "Giriş satırı"
 
 #. ejFak
-#: sc/inc/strings.hrc:109
+#: sc/inc/strings.hrc:108
 msgctxt "STR_ACC_EDITLINE_DESCR"
 msgid "This is where you enter or edit text, numbers and formulas."
 msgstr "Metin, sayı ve formül girdiğiniz yer."
 
 #. XX585
-#: sc/inc/strings.hrc:110
+#: sc/inc/strings.hrc:109
 msgctxt "SCSTR_MEDIASHELL"
 msgid "Media Playback"
 msgstr "Ortam Yürütücüsü"
 
 #. SuAaA
-#: sc/inc/strings.hrc:111
+#: sc/inc/strings.hrc:110
 msgctxt "RID_SCSTR_ONCLICK"
 msgid "Mouse button pressed"
 msgstr "Fare düğmesine tıklandı"
 
 #. 4prfv
-#: sc/inc/strings.hrc:112
+#: sc/inc/strings.hrc:111
 msgctxt "STR_ACC_TOOLBAR_FORMULA"
 msgid "Formula Tool Bar"
 msgstr "Formül Araç Çubuğu"
 
 #. nAcNZ
-#: sc/inc/strings.hrc:113
+#: sc/inc/strings.hrc:112
 msgctxt "STR_ACC_DOC_SPREADSHEET"
 msgid "%PRODUCTNAME Spreadsheets"
 msgstr "%PRODUCTNAME Hesap Tabloları"
 
 #. 8UMap
-#: sc/inc/strings.hrc:114
+#: sc/inc/strings.hrc:113
 msgctxt "STR_ACC_DOC_SPREADSHEET_READONLY"
 msgid "(read-only)"
 msgstr "(salt okunur)"
 
 #. fDxgL
-#: sc/inc/strings.hrc:115
+#: sc/inc/strings.hrc:114
 msgctxt "STR_ACC_DOC_PREVIEW_SUFFIX"
 msgid "(Preview mode)"
 msgstr "(Önizleme Kipi)"
 
 #. ZwiH6
-#: sc/inc/strings.hrc:116
+#: sc/inc/strings.hrc:115
 msgctxt "SCSTR_PRINTOPT_PAGES"
 msgid "Pages:"
 msgstr "Sayfalar:"
 
 #. FYjDY
-#: sc/inc/strings.hrc:117
+#: sc/inc/strings.hrc:116
 msgctxt "SCSTR_PRINTOPT_SUPPRESSEMPTY"
 msgid "~Suppress output of empty pages"
 msgstr "~Boş sayfaların çıkmasını engelle"
 
 #. GQNVf
-#: sc/inc/strings.hrc:118
+#: sc/inc/strings.hrc:117
 msgctxt "SCSTR_PRINTOPT_ALLSHEETS"
 msgid "Print All Sheets"
 msgstr "Tüm Sayfaları Yazdır"
 
 #. xcKcm
-#: sc/inc/strings.hrc:119
+#: sc/inc/strings.hrc:118
 msgctxt "SCSTR_PRINTOPT_SELECTEDSHEETS"
 msgid "Print Selected Sheets"
 msgstr "Seçilen Sayfaları Yazdır"
 
 #. e7kTj
-#: sc/inc/strings.hrc:120
+#: sc/inc/strings.hrc:119
 msgctxt "SCSTR_PRINTOPT_SELECTEDCELLS"
 msgid "Print Selected Cells"
 msgstr "Seçilen Hücreleri Yazdır"
 
 #. z4DB6
-#: sc/inc/strings.hrc:121
+#: sc/inc/strings.hrc:120
 msgctxt "SCSTR_PRINTOPT_FROMWHICH"
 msgid "From which:"
 msgstr "Kaynak:"
 
 #. v5EK2
-#: sc/inc/strings.hrc:122
+#: sc/inc/strings.hrc:121
 msgctxt "SCSTR_PRINTOPT_PRINTALLPAGES"
 msgid "All ~Pages"
 msgstr "Tüm ~Sayfalar"
 
 #. cvNuW
-#: sc/inc/strings.hrc:123
+#: sc/inc/strings.hrc:122
 msgctxt "SCSTR_PRINTOPT_PRINTPAGES"
 msgid "Pa~ges:"
 msgstr "Say~falar:"
 
 #. Pw9Pu
-#: sc/inc/strings.hrc:124
+#: sc/inc/strings.hrc:123
 msgctxt "SCSTR_PRINTOPT_PRODNAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 4BEKq
-#: sc/inc/strings.hrc:125
+#: sc/inc/strings.hrc:124
 msgctxt "SCSTR_DDEDOC_NOT_LOADED"
 msgid "The following DDE source could not be updated possibly because the source document was not open. Please launch the source document and try again."
 msgstr "Kaynak belge açık olmadığı için DDE güncellenemedi. Lütfen önce kaynak belgeyi açın ve tekrar deneyin."
 
 #. kGmko
-#: sc/inc/strings.hrc:126
+#: sc/inc/strings.hrc:125
 msgctxt "SCSTR_EXTDOC_NOT_LOADED"
 msgid "The following external file could not be loaded. Data linked from this file did not get updated."
 msgstr "Aşağıdaki harici dosya yüklenemedi. Bu dosyaya yapılan veri bağlantısı güncellenemedi."
 
 #. BvtFc
-#: sc/inc/strings.hrc:127
+#: sc/inc/strings.hrc:126
 msgctxt "SCSTR_UPDATE_EXTDOCS"
 msgid "Updating external links."
 msgstr "Harici bağlantılar güncelleniyor."
 
 #. MACSv
-#: sc/inc/strings.hrc:128
+#: sc/inc/strings.hrc:127
 msgctxt "SCSTR_FORMULA_SYNTAX_CALC_A1"
 msgid "Calc A1"
 msgstr "Calc A1"
 
 #. xEQCB
-#: sc/inc/strings.hrc:129
+#: sc/inc/strings.hrc:128
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_A1"
 msgid "Excel A1"
 msgstr "Excel A1"
 
 #. KLkBH
-#: sc/inc/strings.hrc:130
+#: sc/inc/strings.hrc:129
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_R1C1"
 msgid "Excel R1C1"
 msgstr "Excel R1C1"
 
 #. pr4wW
-#: sc/inc/strings.hrc:131
+#: sc/inc/strings.hrc:130
 msgctxt "SCSTR_COL_LABEL"
 msgid "Range contains column la~bels"
-msgstr "Kenarlar sütun etiketlerinden oluşuyor"
+msgstr "Kenarlar sütun ~etiketlerinden oluşuyor"
 
 #. mJyFP
-#: sc/inc/strings.hrc:132
+#: sc/inc/strings.hrc:131
 msgctxt "SCSTR_ROW_LABEL"
 msgid "Range contains ~row labels"
 msgstr "Sınır ~satır etiketlerini içerir"
 
 #. ujjcx
-#: sc/inc/strings.hrc:133
+#: sc/inc/strings.hrc:132
 msgctxt "SCSTR_VALERR"
 msgid "Invalid value"
 msgstr "Geçersiz değer"
 
 #. SoLXN
-#: sc/inc/strings.hrc:134
+#: sc/inc/strings.hrc:133
 msgctxt "STR_NOFORMULASPECIFIED"
 msgid "No formula specified."
 msgstr "Formül girilmedi."
 
 #. YFnCS
-#: sc/inc/strings.hrc:135
+#: sc/inc/strings.hrc:134
 msgctxt "STR_NOCOLROW"
 msgid "Neither row or column specified."
 msgstr "Ne satır ne de sütun belirtildi."
 
 #. 6YQh2
-#: sc/inc/strings.hrc:136
+#: sc/inc/strings.hrc:135
 msgctxt "STR_WRONGFORMULA"
 msgid "Undefined name or range."
 msgstr "Tanımlanmamış ad ya da alan."
 
 #. 4aHCG
-#: sc/inc/strings.hrc:137
+#: sc/inc/strings.hrc:136
 msgctxt "STR_WRONGROWCOL"
 msgid "Undefined name or wrong cell reference."
 msgstr "Tanımlanmamış ad ya da yanlış hücre referansı."
 
 #. G8KPr
-#: sc/inc/strings.hrc:138
+#: sc/inc/strings.hrc:137
 msgctxt "STR_NOCOLFORMULA"
 msgid "Formulas don't form a column."
 msgstr "Formüller sütun oluşturmuyor."
 
 #. uSxCb
-#: sc/inc/strings.hrc:139
+#: sc/inc/strings.hrc:138
 msgctxt "STR_NOROWFORMULA"
 msgid "Formulas don't form a row."
 msgstr "Formüller satır oluşturmuyor."
 
 #. PknB5
-#: sc/inc/strings.hrc:140
+#: sc/inc/strings.hrc:139
 msgctxt "STR_ADD_AUTOFORMAT_TITLE"
 msgid "Add AutoFormat"
 msgstr "Otomatik Biçimlendirme Ekle"
 
 #. 7KuSQ
-#: sc/inc/strings.hrc:141
+#: sc/inc/strings.hrc:140
 msgctxt "STR_RENAME_AUTOFORMAT_TITLE"
 msgid "Rename AutoFormat"
 msgstr "Otomatik Biçimlendirmeyi Yeniden İsimlendir"
 
 #. hqtgD
-#: sc/inc/strings.hrc:142
+#: sc/inc/strings.hrc:141
 msgctxt "STR_ADD_AUTOFORMAT_LABEL"
 msgid "Name"
 msgstr "İsim"
 
 #. L9jQU
-#: sc/inc/strings.hrc:143
+#: sc/inc/strings.hrc:142
 msgctxt "STR_DEL_AUTOFORMAT_TITLE"
 msgid "Delete AutoFormat"
 msgstr "Otomatik Biçimlendirmeyi Sil"
 
 #. KCDoJ
-#: sc/inc/strings.hrc:144
+#: sc/inc/strings.hrc:143
 msgctxt "STR_DEL_AUTOFORMAT_MSG"
 msgid "Do you really want to delete the # AutoFormat?"
 msgstr "# OtomatikBiçimlendirme gerçekten silinsin mi?"
 
 #. GDdL3
-#: sc/inc/strings.hrc:145
+#: sc/inc/strings.hrc:144
 msgctxt "STR_BTN_AUTOFORMAT_CLOSE"
 msgid "~Close"
 msgstr "~Kapat"
 
 #. DAuNm
-#: sc/inc/strings.hrc:146
+#: sc/inc/strings.hrc:145
 msgctxt "STR_JAN"
 msgid "Jan"
 msgstr "Oca"
 
 #. WWzNg
-#: sc/inc/strings.hrc:147
+#: sc/inc/strings.hrc:146
 msgctxt "STR_FEB"
 msgid "Feb"
 msgstr "Şub"
 
 #. CCC3U
-#: sc/inc/strings.hrc:148
+#: sc/inc/strings.hrc:147
 msgctxt "STR_MAR"
 msgid "Mar"
 msgstr "Mar"
 
 #. cr7Jq
-#: sc/inc/strings.hrc:149
+#: sc/inc/strings.hrc:148
 msgctxt "STR_NORTH"
 msgid "North"
 msgstr "Kuzey"
 
 #. wHYPw
-#: sc/inc/strings.hrc:150
+#: sc/inc/strings.hrc:149
 msgctxt "STR_MID"
 msgid "Mid"
 msgstr "Orta"
 
 #. sxDHC
-#: sc/inc/strings.hrc:151
+#: sc/inc/strings.hrc:150
 msgctxt "STR_SOUTH"
 msgid "South"
 msgstr "Güney"
 
 #. CWcdp
-#: sc/inc/strings.hrc:152
+#: sc/inc/strings.hrc:151
 msgctxt "STR_SUM"
 msgid "Total"
 msgstr "Toplam"
 
 #. MMCxb
-#: sc/inc/strings.hrc:153
+#: sc/inc/strings.hrc:152
 msgctxt "SCSTR_UNDO_PAGE_ANCHOR"
 msgid "Page Anchor"
 msgstr "Sayfa Sabitleyici"
 
 #. fFFQ8
-#: sc/inc/strings.hrc:154
+#: sc/inc/strings.hrc:153
 msgctxt "SCSTR_UNDO_CELL_ANCHOR"
 msgid "Cell Anchor"
 msgstr "Hücre Sabitleyici"
 
 #. rTGKc
-#: sc/inc/strings.hrc:155
+#: sc/inc/strings.hrc:154
 msgctxt "SCSTR_CONDITION"
 msgid "Condition "
 msgstr "Koşul "
 
 #. 56Wmj
 #. content description strings are also use        d in ScLinkTargetsObj
-#: sc/inc/strings.hrc:158
+#: sc/inc/strings.hrc:157
 msgctxt "SCSTR_CONTENT_ROOT"
 msgid "Contents"
 msgstr "İçindekiler"
 
 #. wLN3J
-#: sc/inc/strings.hrc:159
+#: sc/inc/strings.hrc:158
 msgctxt "SCSTR_CONTENT_TABLE"
 msgid "Sheets"
 msgstr "Sayfalar"
 
 #. 3ZhJn
-#: sc/inc/strings.hrc:160
+#: sc/inc/strings.hrc:159
 msgctxt "SCSTR_CONTENT_RANGENAME"
 msgid "Range names"
 msgstr "Aralık adları"
 
 #. jjQeD
-#: sc/inc/strings.hrc:161
+#: sc/inc/strings.hrc:160
 msgctxt "SCSTR_CONTENT_DBAREA"
 msgid "Database ranges"
 msgstr "Vertabanı aralıkları"
 
 #. kbHfD
-#: sc/inc/strings.hrc:162
+#: sc/inc/strings.hrc:161
 msgctxt "SCSTR_CONTENT_GRAPHIC"
 msgid "Images"
 msgstr "Resimler"
 
 #. 3imVs
-#: sc/inc/strings.hrc:163
+#: sc/inc/strings.hrc:162
 msgctxt "SCSTR_CONTENT_OLEOBJECT"
 msgid "OLE objects"
 msgstr "OLE nesneleri"
 
 #. T28Cj
-#: sc/inc/strings.hrc:164
+#: sc/inc/strings.hrc:163
 msgctxt "SCSTR_CONTENT_NOTE"
 msgid "Comments"
 msgstr "Açıklamalar"
 
 #. 5UcFo
-#: sc/inc/strings.hrc:165
+#: sc/inc/strings.hrc:164
 msgctxt "SCSTR_CONTENT_AREALINK"
 msgid "Linked areas"
 msgstr "Bağlantılı alanlar"
 
 #. HzVgF
-#: sc/inc/strings.hrc:166
+#: sc/inc/strings.hrc:165
 msgctxt "SCSTR_CONTENT_DRAWING"
 msgid "Drawing objects"
 msgstr "Çizim nesneleri"
 
 #. sCafb
-#: sc/inc/strings.hrc:167
+#: sc/inc/strings.hrc:166
 msgctxt "SCSTR_ACTIVE"
 msgid "active"
 msgstr "etkin"
 
 #. q6EmB
-#: sc/inc/strings.hrc:168
+#: sc/inc/strings.hrc:167
 msgctxt "SCSTR_NOTACTIVE"
 msgid "inactive"
 msgstr "kapalı"
 
 #. Gr6xn
-#: sc/inc/strings.hrc:169
+#: sc/inc/strings.hrc:168
 msgctxt "SCSTR_HIDDEN"
 msgid "hidden"
 msgstr "gizli"
 
 #. vnwQr
-#: sc/inc/strings.hrc:170
+#: sc/inc/strings.hrc:169
 msgctxt "SCSTR_ACTIVEWIN"
 msgid "Active Window"
 msgstr "Etkin Pencere"
 
 #. yo3cD
-#: sc/inc/strings.hrc:171
+#: sc/inc/strings.hrc:170
 msgctxt "SCSTR_QHLP_SCEN_LISTBOX"
 msgid "Scenario Name"
 msgstr "Senaryo Adı"
 
 #. oWz3B
-#: sc/inc/strings.hrc:172
+#: sc/inc/strings.hrc:171
 msgctxt "SCSTR_QHLP_SCEN_COMMENT"
 msgid "Comment"
 msgstr "Açıklama"
 
 #. tNLKD
-#: sc/inc/strings.hrc:174
+#: sc/inc/strings.hrc:173
 msgctxt "STR_MENU_SORT_ASC"
 msgid "Sort Ascending"
 msgstr "Artan Sıralama"
 
 #. S6kbN
-#: sc/inc/strings.hrc:175
+#: sc/inc/strings.hrc:174
 msgctxt "STR_MENU_SORT_DESC"
 msgid "Sort Descending"
 msgstr "Azalan Sıralama"
 
 #. BDYHo
-#: sc/inc/strings.hrc:176
+#: sc/inc/strings.hrc:175
 msgctxt "STR_MENU_SORT_CUSTOM"
 msgid "Custom Sort"
 msgstr "Özel Sırala"
 
 #. bpBbA
-#: sc/inc/strings.hrc:178
+#: sc/inc/strings.hrc:177
 msgctxt "SCSTR_QHELP_POSWND"
 msgid "Name Box"
 msgstr "İsim Kutusu"
 
 #. GeNTF
-#: sc/inc/strings.hrc:179
+#: sc/inc/strings.hrc:178
 msgctxt "SCSTR_QHELP_INPUTWND"
 msgid "Input line"
 msgstr "Giriş satırı"
 
 #. E6mnF
-#: sc/inc/strings.hrc:180
+#: sc/inc/strings.hrc:179
 msgctxt "SCSTR_QHELP_BTNCALC"
 msgid "Function Wizard"
 msgstr "İşlev Sihirbazı"
 
 #. rU6xA
-#: sc/inc/strings.hrc:181
+#: sc/inc/strings.hrc:180
 msgctxt "SCSTR_QHELP_BTNOK"
 msgid "Accept"
 msgstr "Onayla"
 
 #. NC6DB
-#: sc/inc/strings.hrc:182
+#: sc/inc/strings.hrc:181
 msgctxt "SCSTR_QHELP_BTNCANCEL"
 msgid "Cancel"
 msgstr "İptal"
 
 #. 9JUCF
-#: sc/inc/strings.hrc:183
+#: sc/inc/strings.hrc:182
 msgctxt "SCSTR_QHELP_BTNSUM"
 msgid "Select Function"
 msgstr "İşlev Seç"
 
 #. kFqE4
-#: sc/inc/strings.hrc:184
+#: sc/inc/strings.hrc:183
 msgctxt "SCSTR_QHELP_BTNEQUAL"
 msgid "Formula"
 msgstr "Formül"
 
 #. dPqKq
-#: sc/inc/strings.hrc:185
+#: sc/inc/strings.hrc:184
 msgctxt "SCSTR_QHELP_EXPAND_FORMULA"
 msgid "Expand Formula Bar"
 msgstr "Formül Çubuğun Genişlet"
 
 #. ENx2Q
-#: sc/inc/strings.hrc:186
+#: sc/inc/strings.hrc:185
 msgctxt "SCSTR_QHELP_COLLAPSE_FORMULA"
 msgid "Collapse Formula Bar"
 msgstr "Formül Çubuğunu Daralt"
 
 #. nSD8r
-#: sc/inc/strings.hrc:188
+#: sc/inc/strings.hrc:187
 msgctxt "STR_UNKNOWN_USER_CONFLICT"
 msgid "Unknown User"
 msgstr "Bilinmeyen Kullanıcı"
 
 #. HDiei
-#: sc/inc/strings.hrc:190
+#: sc/inc/strings.hrc:189
 msgctxt "STR_CHG_INSERT_COLS"
 msgid "Column inserted"
 msgstr "Sütun eklendi"
 
 #. brecA
-#: sc/inc/strings.hrc:191
+#: sc/inc/strings.hrc:190
 msgctxt "STR_CHG_INSERT_ROWS"
 msgid "Row inserted "
 msgstr "Satır eklendi "
 
 #. nBf8B
-#: sc/inc/strings.hrc:192
+#: sc/inc/strings.hrc:191
 msgctxt "STR_CHG_INSERT_TABS"
 msgid "Sheet inserted "
 msgstr "Sayfa eklendi "
 
 #. Td8iF
-#: sc/inc/strings.hrc:193
+#: sc/inc/strings.hrc:192
 msgctxt "STR_CHG_DELETE_COLS"
 msgid "Column deleted"
 msgstr "Sütun silindi"
 
 #. 8Kopo
-#: sc/inc/strings.hrc:194
+#: sc/inc/strings.hrc:193
 msgctxt "STR_CHG_DELETE_ROWS"
 msgid "Row deleted"
 msgstr "Satır silindi"
 
 #. DynWz
-#: sc/inc/strings.hrc:195
+#: sc/inc/strings.hrc:194
 msgctxt "STR_CHG_DELETE_TABS"
 msgid "Sheet deleted"
 msgstr "Sayfa silindi"
 
 #. 6f9S9
-#: sc/inc/strings.hrc:196
+#: sc/inc/strings.hrc:195
 msgctxt "STR_CHG_MOVE"
 msgid "Range moved"
 msgstr "Aralık taşındı"
 
 #. UpHkf
-#: sc/inc/strings.hrc:197
+#: sc/inc/strings.hrc:196
 msgctxt "STR_CHG_CONTENT"
 msgid "Changed contents"
 msgstr "Değiştirilmiş içerik"
 
 #. cefNw
-#: sc/inc/strings.hrc:198
+#: sc/inc/strings.hrc:197
 msgctxt "STR_CHG_CONTENT_WITH_CHILD"
 msgid "Changed contents"
 msgstr "Değiştirilmiş içerik"
 
 #. DcsSq
-#: sc/inc/strings.hrc:199
+#: sc/inc/strings.hrc:198
 msgctxt "STR_CHG_CHILD_CONTENT"
 msgid "Changed to "
 msgstr "Değiştirilen "
 
 #. naPuN
-#: sc/inc/strings.hrc:200
+#: sc/inc/strings.hrc:199
 msgctxt "STR_CHG_CHILD_ORGCONTENT"
 msgid "Original"
 msgstr "Özgün"
 
 #. cbtSw
-#: sc/inc/strings.hrc:201
+#: sc/inc/strings.hrc:200
 msgctxt "STR_CHG_REJECT"
 msgid "Changes rejected"
 msgstr "Değişiklikler reddedildi"
 
 #. rGkvk
-#: sc/inc/strings.hrc:202
+#: sc/inc/strings.hrc:201
 msgctxt "STR_CHG_ACCEPTED"
 msgid "Accepted"
 msgstr "Kabul edildi"
 
 #. FRREF
-#: sc/inc/strings.hrc:203
+#: sc/inc/strings.hrc:202
 msgctxt "STR_CHG_REJECTED"
 msgid "Rejected"
 msgstr "Reddedildi"
 
 #. bG7Pb
-#: sc/inc/strings.hrc:204
+#: sc/inc/strings.hrc:203
 msgctxt "STR_CHG_NO_ENTRY"
 msgid "No Entry"
 msgstr "Girdi yok"
 
 #. i2doZ
-#: sc/inc/strings.hrc:205
+#: sc/inc/strings.hrc:204
 msgctxt "STR_CHG_EMPTY"
 msgid "<empty>"
 msgstr "<empty>"
 
 #. dAt5Q
-#: sc/inc/strings.hrc:207
+#: sc/inc/strings.hrc:206
 msgctxt "STR_NOT_PROTECTED"
 msgid "Not protected"
 msgstr "Korumalı değil"
 
 #. 3TDDs
-#: sc/inc/strings.hrc:208
+#: sc/inc/strings.hrc:207
 msgctxt "STR_NOT_PASS_PROTECTED"
 msgid "Not password-protected"
 msgstr "Parola korumalı değil"
 
 #. qBe6G
-#: sc/inc/strings.hrc:209
+#: sc/inc/strings.hrc:208
 msgctxt "STR_HASH_BAD"
 msgid "Hash incompatible"
 msgstr "Dosya özeti uyumsuz"
 
 #. XoAEE
-#: sc/inc/strings.hrc:210
+#: sc/inc/strings.hrc:209
 msgctxt "STR_HASH_GOOD"
 msgid "Hash compatible"
 msgstr "Dosya özeti uyumlu"
 
 #. MHDYB
-#: sc/inc/strings.hrc:211
+#: sc/inc/strings.hrc:210
 msgctxt "STR_RETYPE"
 msgid "Re-type"
 msgstr "Yeniden yaz"
 
 #. bFjd9
 #. MovingAverageDialog
-#: sc/inc/strings.hrc:214
+#: sc/inc/strings.hrc:213
 msgctxt "STR_MOVING_AVERAGE_UNDO_NAME"
 msgid "Moving Average"
 msgstr "Hareketli Ortalama"
 
 #. ZUkPQ
 #. ExponentialSmoothingDialog
-#: sc/inc/strings.hrc:216
+#: sc/inc/strings.hrc:215
 msgctxt "STR_EXPONENTIAL_SMOOTHING_UNDO_NAME"
 msgid "Exponential Smoothing"
 msgstr "Üstel Yuvarlama"
 
 #. LAfqT
 #. AnalysisOfVarianceDialog
-#: sc/inc/strings.hrc:218
+#: sc/inc/strings.hrc:217
 msgctxt "STR_ANALYSIS_OF_VARIANCE_UNDO_NAME"
 msgid "Analysis of Variance"
 msgstr "Varyans Analizi"
 
 #. 8v4W5
-#: sc/inc/strings.hrc:219
+#: sc/inc/strings.hrc:218
 msgctxt "STR_LABEL_ANOVA"
 msgid "Analysis of Variance (ANOVA)"
 msgstr "Varyans Analizi (ANOVA)"
 
 #. NY8WD
-#: sc/inc/strings.hrc:220
+#: sc/inc/strings.hrc:219
 msgctxt "STR_ANOVA_SINGLE_FACTOR_LABEL"
 msgid "ANOVA - Single Factor"
 msgstr "ANOVA - Tek Çarpan"
 
 #. AFnEZ
-#: sc/inc/strings.hrc:221
+#: sc/inc/strings.hrc:220
 msgctxt "STR_ANOVA_TWO_FACTOR_LABEL"
 msgid "ANOVA - Two Factor"
 msgstr "ANOVA - İki Faktör"
 
 #. hBPGD
-#: sc/inc/strings.hrc:222
+#: sc/inc/strings.hrc:221
 msgctxt "STR_ANOVA_LABEL_GROUPS"
 msgid "Groups"
 msgstr "Gruplar"
 
 #. DiUWy
-#: sc/inc/strings.hrc:223
+#: sc/inc/strings.hrc:222
 msgctxt "STR_ANOVA_LABEL_BETWEEN_GROUPS"
 msgid "Between Groups"
 msgstr "Gruplar Arasında"
 
 #. fBh3S
-#: sc/inc/strings.hrc:224
+#: sc/inc/strings.hrc:223
 msgctxt "STR_ANOVA_LABEL_WITHIN_GROUPS"
 msgid "Within Groups"
 msgstr "Gruplar İçinde"
 
 #. DFcw4
-#: sc/inc/strings.hrc:225
+#: sc/inc/strings.hrc:224
 msgctxt "STR_ANOVA_LABEL_SOURCE_OF_VARIATION"
 msgid "Source of Variation"
 msgstr "Varyasyon Kaynağı"
 
 #. KYbb8
-#: sc/inc/strings.hrc:226
+#: sc/inc/strings.hrc:225
 msgctxt "STR_ANOVA_LABEL_SS"
 msgid "SS"
 msgstr "SS"
 
 #. j7j6E
-#: sc/inc/strings.hrc:227
+#: sc/inc/strings.hrc:226
 msgctxt "STR_ANOVA_LABEL_DF"
 msgid "df"
 msgstr "df"
 
 #. 6QJED
-#: sc/inc/strings.hrc:228
+#: sc/inc/strings.hrc:227
 msgctxt "STR_ANOVA_LABEL_MS"
 msgid "MS"
 msgstr "MS"
 
 #. JcWo9
-#: sc/inc/strings.hrc:229
+#: sc/inc/strings.hrc:228
 msgctxt "STR_ANOVA_LABEL_F"
 msgid "F"
 msgstr "F"
 
 #. a43mP
-#: sc/inc/strings.hrc:230
+#: sc/inc/strings.hrc:229
 msgctxt "STR_ANOVA_LABEL_SIGNIFICANCE_F"
 msgid "Significance F"
 msgstr "Anlamlılık F"
 
 #. MMmsS
-#: sc/inc/strings.hrc:231
+#: sc/inc/strings.hrc:230
 msgctxt "STR_ANOVA_LABEL_P_VALUE"
 msgid "P-value"
 msgstr "P-değer"
 
 #. UoaCS
-#: sc/inc/strings.hrc:232
+#: sc/inc/strings.hrc:231
 msgctxt "STR_ANOVA_LABEL_F_CRITICAL"
 msgid "F critical"
 msgstr "F kritik"
 
 #. oJD9H
-#: sc/inc/strings.hrc:233
+#: sc/inc/strings.hrc:232
 msgctxt "STR_ANOVA_LABEL_TOTAL"
 msgid "Total"
 msgstr "Toplam"
 
 #. kvSFC
 #. CorrelationDialog
-#: sc/inc/strings.hrc:235
+#: sc/inc/strings.hrc:234
 msgctxt "STR_CORRELATION_UNDO_NAME"
 msgid "Correlation"
 msgstr "İlişki"
 
 #. WC4SJ
-#: sc/inc/strings.hrc:236
+#: sc/inc/strings.hrc:235
 msgctxt "STR_CORRELATION_LABEL"
 msgid "Correlations"
 msgstr "İlişkiler"
 
 #. AAb7T
 #. CovarianceDialog
-#: sc/inc/strings.hrc:238
+#: sc/inc/strings.hrc:237
 msgctxt "STR_COVARIANCE_UNDO_NAME"
 msgid "Covariance"
 msgstr "Kovaryans"
 
 #. VyxUL
-#: sc/inc/strings.hrc:239
+#: sc/inc/strings.hrc:238
 msgctxt "STR_COVARIANCE_LABEL"
 msgid "Covariances"
 msgstr "Kovaryanslar"
 
 #. 8gmqu
 #. DescriptiveStatisticsDialog
-#: sc/inc/strings.hrc:241
+#: sc/inc/strings.hrc:240
 msgctxt "STR_DESCRIPTIVE_STATISTICS_UNDO_NAME"
 msgid "Descriptive Statistics"
 msgstr "Açıklayıcı İstatistikler"
 
 #. FGXC5
-#: sc/inc/strings.hrc:242
+#: sc/inc/strings.hrc:241
 msgctxt "STRID_CALC_MEAN"
 msgid "Mean"
 msgstr "Ortalama"
 
 #. 2sHVR
-#: sc/inc/strings.hrc:243
+#: sc/inc/strings.hrc:242
 msgctxt "STRID_CALC_STD_ERROR"
 msgid "Standard Error"
 msgstr "Standart Hata"
 
 #. KrDBB
-#: sc/inc/strings.hrc:244
+#: sc/inc/strings.hrc:243
 msgctxt "STRID_CALC_MODE"
 msgid "Mode"
 msgstr "Kip"
 
 #. AAbEo
-#: sc/inc/strings.hrc:245
+#: sc/inc/strings.hrc:244
 msgctxt "STRID_CALC_MEDIAN"
 msgid "Median"
 msgstr "Ortanca"
 
 #. h2HaP
-#: sc/inc/strings.hrc:246
+#: sc/inc/strings.hrc:245
 msgctxt "STRID_CALC_VARIANCE"
 msgid "Variance"
 msgstr "Varyans"
 
 #. 3uYMC
-#: sc/inc/strings.hrc:247
+#: sc/inc/strings.hrc:246
 msgctxt "STRID_CALC_STD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Standart Sapma"
 
 #. JTx7f
-#: sc/inc/strings.hrc:248
+#: sc/inc/strings.hrc:247
 msgctxt "STRID_CALC_KURTOSIS"
 msgid "Kurtosis"
 msgstr "Basıklık"
 
 #. EXJJt
-#: sc/inc/strings.hrc:249
+#: sc/inc/strings.hrc:248
 msgctxt "STRID_CALC_SKEWNESS"
 msgid "Skewness"
 msgstr "Eğrilik"
 
 #. HkRYo
-#: sc/inc/strings.hrc:250
+#: sc/inc/strings.hrc:249
 msgctxt "STRID_CALC_RANGE"
 msgid "Range"
 msgstr "Aralık"
 
 #. LHk8p
-#: sc/inc/strings.hrc:251
+#: sc/inc/strings.hrc:250
 msgctxt "STRID_CALC_MIN"
 msgid "Minimum"
 msgstr "Asgari"
 
 #. LtMJs
-#: sc/inc/strings.hrc:252
+#: sc/inc/strings.hrc:251
 msgctxt "STRID_CALC_MAX"
 msgid "Maximum"
 msgstr "Azami"
 
 #. Q5r5c
-#: sc/inc/strings.hrc:253
+#: sc/inc/strings.hrc:252
 msgctxt "STRID_CALC_SUM"
 msgid "Sum"
 msgstr "Toplam"
 
 #. s8K23
-#: sc/inc/strings.hrc:254
+#: sc/inc/strings.hrc:253
 msgctxt "STRID_CALC_COUNT"
 msgid "Count"
 msgstr "Sayaç"
 
 #. pU8QG
-#: sc/inc/strings.hrc:255
+#: sc/inc/strings.hrc:254
 msgctxt "STRID_CALC_FIRST_QUARTILE"
 msgid "First Quartile"
 msgstr "İlk Çeyrek"
 
 #. PGXzY
-#: sc/inc/strings.hrc:256
+#: sc/inc/strings.hrc:255
 msgctxt "STRID_CALC_THIRD_QUARTILE"
 msgid "Third Quartile"
 msgstr "Üçüncü Çeyrek"
 
 #. gABRP
 #. RandomNumberGeneratorDialog
-#: sc/inc/strings.hrc:258
+#: sc/inc/strings.hrc:257
 msgctxt "STR_UNDO_DISTRIBUTION_TEMPLATE"
 msgid "Random ($(DISTRIBUTION))"
 msgstr "Rastgele ($(DISTRIBUTION))"
 
 #. A8Rc9
-#: sc/inc/strings.hrc:259
+#: sc/inc/strings.hrc:258
 msgctxt "STR_DISTRIBUTION_UNIFORM_REAL"
 msgid "Uniform"
 msgstr "Düzgün"
 
 #. 9ke8L
-#: sc/inc/strings.hrc:260
+#: sc/inc/strings.hrc:259
 msgctxt "STR_DISTRIBUTION_UNIFORM_INTEGER"
 msgid "Uniform Integer"
 msgstr "Birleşik Tamsayı"
 
 #. GC2LH
-#: sc/inc/strings.hrc:261
+#: sc/inc/strings.hrc:260
 msgctxt "STR_DISTRIBUTION_NORMAL"
 msgid "Normal"
 msgstr "Normal"
 
 #. XjQ2x
-#: sc/inc/strings.hrc:262
+#: sc/inc/strings.hrc:261
 msgctxt "STR_DISTRIBUTION_CAUCHY"
 msgid "Cauchy"
 msgstr "Cauchy"
 
 #. G5CqB
-#: sc/inc/strings.hrc:263
+#: sc/inc/strings.hrc:262
 msgctxt "STR_DISTRIBUTION_BERNOULLI"
 msgid "Bernoulli"
 msgstr "Bernoulli"
 
 #. GpJUB
-#: sc/inc/strings.hrc:264
+#: sc/inc/strings.hrc:263
 msgctxt "STR_DISTRIBUTION_BINOMIAL"
 msgid "Binomial"
 msgstr "Binom"
 
 #. 6yJKm
-#: sc/inc/strings.hrc:265
+#: sc/inc/strings.hrc:264
 msgctxt "STR_DISTRIBUTION_NEGATIVE_BINOMIAL"
 msgid "Negative Binomial"
 msgstr "Negatif Binom"
 
 #. zzpmN
-#: sc/inc/strings.hrc:266
+#: sc/inc/strings.hrc:265
 msgctxt "STR_DISTRIBUTION_CHI_SQUARED"
 msgid "Chi Squared"
 msgstr "Ki-Kare"
 
 #. NGBzX
-#: sc/inc/strings.hrc:267
+#: sc/inc/strings.hrc:266
 msgctxt "STR_DISTRIBUTION_GEOMETRIC"
 msgid "Geometric"
 msgstr "Geometrik"
 
 #. BNZPE
-#: sc/inc/strings.hrc:268
+#: sc/inc/strings.hrc:267
 msgctxt "STR_RNG_PARAMETER_MINIMUM"
 msgid "Minimum"
 msgstr "Asgari"
 
 #. EThhi
-#: sc/inc/strings.hrc:269
+#: sc/inc/strings.hrc:268
 msgctxt "STR_RNG_PARAMETER_MAXIMUM"
 msgid "Maximum"
 msgstr "Azami"
 
 #. RPYEG
-#: sc/inc/strings.hrc:270
+#: sc/inc/strings.hrc:269
 msgctxt "STR_RNG_PARAMETER_MEAN"
 msgid "Mean"
 msgstr "Ortalama"
 
 #. VeqrX
-#: sc/inc/strings.hrc:271
+#: sc/inc/strings.hrc:270
 msgctxt "STR_RNG_PARAMETER_STANDARD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Standart Sapma"
 
 #. ChwWE
-#: sc/inc/strings.hrc:272
+#: sc/inc/strings.hrc:271
 msgctxt "STR_RNG_PARAMETER_STANDARD_MEDIAN"
 msgid "Median"
 msgstr "Ortanca"
 
 #. SzgEb
-#: sc/inc/strings.hrc:273
+#: sc/inc/strings.hrc:272
 msgctxt "STR_RNG_PARAMETER_STANDARD_SIGMA"
 msgid "Sigma"
 msgstr "Sigma"
 
 #. 94TBK
-#: sc/inc/strings.hrc:274
+#: sc/inc/strings.hrc:273
 msgctxt "STR_RNG_PARAMETER_STANDARD_PROBABILITY"
 msgid "p Value"
 msgstr "p Değeri"
 
 #. AfUsB
-#: sc/inc/strings.hrc:275
+#: sc/inc/strings.hrc:274
 msgctxt "STR_RNG_PARAMETER_STANDARD_NUMBER_OF_TRIALS"
 msgid "Number of Trials"
 msgstr "Deneme Sayısı"
 
 #. DdfR6
-#: sc/inc/strings.hrc:276
+#: sc/inc/strings.hrc:275
 msgctxt "STR_RNG_PARAMETER_STANDARD_NU_VALUE"
 msgid "nu Value"
 msgstr "nu Değeri"
 
 #. gygpC
 #. SamplingDialog
-#: sc/inc/strings.hrc:278
+#: sc/inc/strings.hrc:277
 msgctxt "STR_SAMPLING_UNDO_NAME"
 msgid "Sampling"
 msgstr "Örnekleme"
 
 #. zLuBp
 #. Names of dialogs
-#: sc/inc/strings.hrc:280
+#: sc/inc/strings.hrc:279
 msgctxt "STR_FTEST"
 msgid "F-test"
 msgstr "F-testi"
 
 #. bQEfv
-#: sc/inc/strings.hrc:281
+#: sc/inc/strings.hrc:280
 msgctxt "STR_FTEST_UNDO_NAME"
 msgid "F-test"
 msgstr "F-testi"
 
 #. UdsVZ
-#: sc/inc/strings.hrc:282
+#: sc/inc/strings.hrc:281
 msgctxt "STR_TTEST"
 msgid "Paired t-test"
 msgstr "Eşleştirilmiş t-testi"
 
 #. A7xTa
-#: sc/inc/strings.hrc:283
+#: sc/inc/strings.hrc:282
 msgctxt "STR_TTEST_UNDO_NAME"
 msgid "Paired t-test"
 msgstr "Eşleştirilmiş t-testi"
 
 #. dWPSe
-#: sc/inc/strings.hrc:284
+#: sc/inc/strings.hrc:283
 msgctxt "STR_ZTEST"
 msgid "z-test"
 msgstr "z-testi"
 
 #. QvZ7V
-#: sc/inc/strings.hrc:285
+#: sc/inc/strings.hrc:284
 msgctxt "STR_ZTEST_UNDO_NAME"
 msgid "z-test"
 msgstr "z-testi"
 
 #. D6AqL
-#: sc/inc/strings.hrc:286
+#: sc/inc/strings.hrc:285
 msgctxt "STR_CHI_SQUARE_TEST"
 msgid "Test of Independence (Chi-Square)"
 msgstr "Bağımsızlık Testi (Ki-kare)"
 
 #. PvFSb
-#: sc/inc/strings.hrc:287
+#: sc/inc/strings.hrc:286
 msgctxt "STR_REGRESSION_UNDO_NAME"
 msgid "Regression"
 msgstr "Sapma"
 
 #. NXrYh
-#: sc/inc/strings.hrc:288
+#: sc/inc/strings.hrc:287
 msgctxt "STR_REGRESSION"
 msgid "Regression"
 msgstr "Sapma"
 
 #. AM5WV
-#: sc/inc/strings.hrc:289
+#: sc/inc/strings.hrc:288
 msgctxt "STR_FOURIER_ANALYSIS_UNDO_NAME"
 msgid "Fourier Analysis"
 msgstr "Fourier Analizi"
 
 #. hd6yJ
-#: sc/inc/strings.hrc:290
+#: sc/inc/strings.hrc:289
 msgctxt "STR_FOURIER_ANALYSIS"
 msgid "Fourier Analysis"
 msgstr "Fourier Analizi"
 
 #. KNJ5s
 #. Common
-#: sc/inc/strings.hrc:292
+#: sc/inc/strings.hrc:291
 msgctxt "STR_COLUMN_LABEL_TEMPLATE"
 msgid "Column %NUMBER%"
 msgstr "Sütun %NUMBER%"
 
 #. aTAGd
-#: sc/inc/strings.hrc:293
+#: sc/inc/strings.hrc:292
 msgctxt "STR_ROW_LABEL_TEMPLATE"
 msgid "Row %NUMBER%"
 msgstr "Satır %NUMBER%"
 
 #. nAbaC
-#: sc/inc/strings.hrc:294
+#: sc/inc/strings.hrc:293
 msgctxt "STR_LABEL_ALPHA"
 msgid "Alpha"
 msgstr "Alfa"
 
 #. FZZCu
-#: sc/inc/strings.hrc:295
+#: sc/inc/strings.hrc:294
 msgctxt "STR_VARIABLE_1_LABEL"
 msgid "Variable 1"
 msgstr "Değişken 1"
 
 #. pnyaa
-#: sc/inc/strings.hrc:296
+#: sc/inc/strings.hrc:295
 msgctxt "STR_VARIABLE_2_LABEL"
 msgid "Variable 2"
 msgstr "Değişken 2"
 
 #. LU4CC
-#: sc/inc/strings.hrc:297
+#: sc/inc/strings.hrc:296
 msgctxt "STR_HYPOTHESIZED_MEAN_DIFFERENCE_LABEL"
 msgid "Hypothesized Mean Difference"
 msgstr "Hipotetik Ortalama Fark"
 
 #. sCNt9
-#: sc/inc/strings.hrc:298
+#: sc/inc/strings.hrc:297
 msgctxt "STR_OBSERVATIONS_LABEL"
 msgid "Observations"
 msgstr "Gözlemler"
 
 #. arX5v
-#: sc/inc/strings.hrc:299
+#: sc/inc/strings.hrc:298
 msgctxt "STR_OBSERVED_MEAN_DIFFERENCE_LABEL"
 msgid "Observed Mean Difference"
 msgstr "Gözlenen Ortalama Fark"
 
 #. dr3Gt
-#: sc/inc/strings.hrc:300
+#: sc/inc/strings.hrc:299
 msgctxt "STR_LABEL_RSQUARED"
 msgid "R^2"
 msgstr "R^2"
 
 #. pnhCA
-#: sc/inc/strings.hrc:301
+#: sc/inc/strings.hrc:300
 msgctxt "STR_LABEL_ADJUSTED_RSQUARED"
 msgid "Adjusted R^2"
 msgstr "Düzeltilmiş R^2"
 
 #. ACsNA
-#: sc/inc/strings.hrc:302
+#: sc/inc/strings.hrc:301
 msgctxt "STR_LABEL_XVARIABLES_COUNT"
 msgid "Count of X variables"
 msgstr "X değişkenleri sayısı"
 
 #. kEPsb
-#: sc/inc/strings.hrc:303
+#: sc/inc/strings.hrc:302
 msgctxt "STR_DEGREES_OF_FREEDOM_LABEL"
 msgid "df"
 msgstr "df"
 
 #. FYUYT
-#: sc/inc/strings.hrc:304
+#: sc/inc/strings.hrc:303
 msgctxt "STR_P_VALUE_LABEL"
 msgid "P-value"
 msgstr "P-değeri"
 
 #. S3BHc
-#: sc/inc/strings.hrc:305
+#: sc/inc/strings.hrc:304
 msgctxt "STR_CRITICAL_VALUE_LABEL"
 msgid "Critical Value"
 msgstr "Kritik Değer"
 
 #. wgpT3
-#: sc/inc/strings.hrc:306
+#: sc/inc/strings.hrc:305
 msgctxt "STR_TEST_STATISTIC_LABEL"
 msgid "Test Statistic"
 msgstr "İstatistiği Sına"
 
 #. kTwBX
-#: sc/inc/strings.hrc:307
+#: sc/inc/strings.hrc:306
 msgctxt "STR_LABEL_LOWER"
 msgid "Lower"
 msgstr "Küçült"
 
 #. GgFPs
-#: sc/inc/strings.hrc:308
+#: sc/inc/strings.hrc:307
 msgctxt "STR_LABEL_Upper"
 msgid "Upper"
 msgstr "Büyült"
 
 #. hkXzo
-#: sc/inc/strings.hrc:309
+#: sc/inc/strings.hrc:308
 msgctxt "STR_MESSAGE_INVALID_INPUT_RANGE"
 msgid "Input range is invalid."
 msgstr "Girilen aralık geçersiz."
 
 #. rTFFF
-#: sc/inc/strings.hrc:310
+#: sc/inc/strings.hrc:309
 msgctxt "STR_MESSAGE_INVALID_OUTPUT_ADDR"
 msgid "Output address is not valid."
 msgstr "Çıktı adresi geçersiz."
 
 #. rtSox
 #. RegressionDialog
-#: sc/inc/strings.hrc:312
+#: sc/inc/strings.hrc:311
 msgctxt "STR_LABEL_LINEAR"
 msgid "Linear"
 msgstr "Doğrusal"
 
 #. kVG6g
-#: sc/inc/strings.hrc:313
+#: sc/inc/strings.hrc:312
 msgctxt "STR_LABEL_LOGARITHMIC"
 msgid "Logarithmic"
 msgstr "Logaritmik"
 
 #. wmyFW
-#: sc/inc/strings.hrc:314
+#: sc/inc/strings.hrc:313
 msgctxt "STR_LABEL_POWER"
 msgid "Power"
 msgstr "Kuvvet"
 
 #. GabFM
-#: sc/inc/strings.hrc:315
+#: sc/inc/strings.hrc:314
 msgctxt "STR_MESSAGE_XINVALID_RANGE"
 msgid "Independent variable(s) range is not valid."
 msgstr "Bağımsız değişken(ler) aralığı geçerli değil."
 
 #. 8x8DM
-#: sc/inc/strings.hrc:316
+#: sc/inc/strings.hrc:315
 msgctxt "STR_MESSAGE_YINVALID_RANGE"
 msgid "Dependent variable(s) range is not valid."
 msgstr "Bağımlı değişken(ler) aralığı geçerli değil."
 
 #. E7BD2
-#: sc/inc/strings.hrc:317
+#: sc/inc/strings.hrc:316
 msgctxt "STR_MESSAGE_INVALID_CONFIDENCE_LEVEL"
 msgid "Confidence level must be in the interval (0, 1)."
 msgstr "Güvenilirlik seviyesi aralığın(0,1) içinde olmalı."
 
 #. ZdyQs
-#: sc/inc/strings.hrc:318
+#: sc/inc/strings.hrc:317
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_COLUMN"
 msgid "Y variable range cannot have more than 1 column."
 msgstr "Y değişken aralığı 1 sütundan fazla olamaz."
 
 #. UpZqC
-#: sc/inc/strings.hrc:319
+#: sc/inc/strings.hrc:318
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_ROW"
 msgid "Y variable range cannot have more than 1 row."
 msgstr "Y değişken aralığı 1 satırdan fazla olamaz."
 
 #. DrsBe
-#: sc/inc/strings.hrc:320
+#: sc/inc/strings.hrc:319
 msgctxt "STR_MESSAGE_UNIVARIATE_NUMOBS_MISMATCH"
 msgid "Univariate regression : The observation count in X and Y must match."
 msgstr "Tek değişkenli regresyon : X ve Y'deki gözlem sayısı eşleşmelidir."
 
 #. KuttF
-#: sc/inc/strings.hrc:321
+#: sc/inc/strings.hrc:320
 msgctxt "STR_MESSAGE_MULTIVARIATE_NUMOBS_MISMATCH"
 msgid "Multivariate regression : The observation count in X and Y must match."
 msgstr "Çok değişkenli regresyon : X ve Y'deki gözlem sayısı eşleşmelidir."
 
 #. 6Cghz
-#: sc/inc/strings.hrc:322
+#: sc/inc/strings.hrc:321
 msgctxt "STR_LABEL_REGRESSION_MODEL"
 msgid "Regression Model"
 msgstr "Regresyon Modeli"
 
 #. bmR5w
-#: sc/inc/strings.hrc:323
+#: sc/inc/strings.hrc:322
 msgctxt "STR_LABEL_REGRESSION_STATISTICS"
 msgid "Regression Statistics"
 msgstr "Regresyon İstatistikleri"
 
 #. RNHCx
-#: sc/inc/strings.hrc:324
+#: sc/inc/strings.hrc:323
 msgctxt "STR_LABEL_RESIDUAL"
 msgid "Residual"
 msgstr "Kalan"
 
 #. 4DANj
-#: sc/inc/strings.hrc:325
+#: sc/inc/strings.hrc:324
 msgctxt "STR_LABEL_CONFIDENCE_LEVEL"
 msgid "Confidence level"
 msgstr "Güven seviyesi"
 
 #. 9LhbX
-#: sc/inc/strings.hrc:326
+#: sc/inc/strings.hrc:325
 msgctxt "STR_LABEL_COEFFICIENTS"
 msgid "Coefficients"
 msgstr "Katsayılar"
 
 #. nyH7s
-#: sc/inc/strings.hrc:327
+#: sc/inc/strings.hrc:326
 msgctxt "STR_LABEL_TSTATISTIC"
 msgid "t-Statistic"
 msgstr "t-İstatik"
 
 #. PGno2
-#: sc/inc/strings.hrc:328
+#: sc/inc/strings.hrc:327
 msgctxt "STR_LABEL_INTERCEPT"
 msgid "Intercept"
 msgstr "Kesiştir"
 
 #. oa4Cm
-#: sc/inc/strings.hrc:329
+#: sc/inc/strings.hrc:328
 msgctxt "STR_LABEL_PREDICTEDY"
 msgid "Predicted Y"
 msgstr "Tahmin edilen Y"
 
 #. QFEjs
-#: sc/inc/strings.hrc:330
+#: sc/inc/strings.hrc:329
 msgctxt "STR_LINEST_RAW_OUTPUT_TITLE"
 msgid "LINEST raw output"
 msgstr "LINEST ham çıktı"
 
 #. bk7FH
 #. F Test
-#: sc/inc/strings.hrc:332
+#: sc/inc/strings.hrc:331
 msgctxt "STR_FTEST_P_RIGHT_TAIL"
 msgid "P (F<=f) right-tail"
 msgstr "P (F<=f) sağ kuyruk"
 
 #. CkHJw
-#: sc/inc/strings.hrc:333
+#: sc/inc/strings.hrc:332
 msgctxt "STR_FTEST_F_CRITICAL_RIGHT_TAIL"
 msgid "F Critical right-tail"
 msgstr "F Kritik sağ kuyruk"
 
 #. J7yMZ
-#: sc/inc/strings.hrc:334
+#: sc/inc/strings.hrc:333
 msgctxt "STR_FTEST_P_LEFT_TAIL"
 msgid "P (F<=f) left-tail"
 msgstr "P (F<=f) sol kuyruk"
 
 #. R3BNC
-#: sc/inc/strings.hrc:335
+#: sc/inc/strings.hrc:334
 msgctxt "STR_FTEST_F_CRITICAL_LEFT_TAIL"
 msgid "F Critical left-tail"
 msgstr "F Kritik sol kuyruk"
 
 #. Bve5D
-#: sc/inc/strings.hrc:336
+#: sc/inc/strings.hrc:335
 msgctxt "STR_FTEST_P_TWO_TAIL"
 msgid "P two-tail"
 msgstr "P çift kuyruk"
 
 #. 4YZrT
-#: sc/inc/strings.hrc:337
+#: sc/inc/strings.hrc:336
 msgctxt "STR_FTEST_F_CRITICAL_TWO_TAIL"
 msgid "F Critical two-tail"
 msgstr "F Kritik çift kuyruk"
 
 #. qaf4N
 #. t Test
-#: sc/inc/strings.hrc:339
+#: sc/inc/strings.hrc:338
 msgctxt "STR_TTEST_PEARSON_CORRELATION"
 msgid "Pearson Correlation"
 msgstr "Pearson Korelasyonu"
 
 #. C6BU8
-#: sc/inc/strings.hrc:340
+#: sc/inc/strings.hrc:339
 msgctxt "STR_TTEST_VARIANCE_OF_THE_DIFFERENCES"
 msgid "Variance of the Differences"
 msgstr "Farkların Varyansı"
 
 #. j8NuP
-#: sc/inc/strings.hrc:341
+#: sc/inc/strings.hrc:340
 msgctxt "STR_TTEST_T_STAT"
 msgid "t Stat"
 msgstr "t İstatistik"
 
 #. bKoeX
-#: sc/inc/strings.hrc:342
+#: sc/inc/strings.hrc:341
 msgctxt "STR_TTEST_P_ONE_TAIL"
 msgid "P (T<=t) one-tail"
 msgstr "P (T<=t) tek kuyruk"
 
 #. dub8R
-#: sc/inc/strings.hrc:343
+#: sc/inc/strings.hrc:342
 msgctxt "STR_TTEST_T_CRITICAL_ONE_TAIL"
 msgid "t Critical one-tail"
 msgstr "t Kritik tek kuyruk"
 
 #. FrDDz
-#: sc/inc/strings.hrc:344
+#: sc/inc/strings.hrc:343
 msgctxt "STR_TTEST_P_TWO_TAIL"
 msgid "P (T<=t) two-tail"
 msgstr "P (T<=t) çift kuyruk"
 
 #. RQqAd
-#: sc/inc/strings.hrc:345
+#: sc/inc/strings.hrc:344
 msgctxt "STR_TTEST_T_CRITICAL_TWO_TAIL"
 msgid "t Critical two-tail"
 msgstr "t Kritik çift kuyruk"
 
 #. kDCsZ
 #. Z Test
-#: sc/inc/strings.hrc:347
+#: sc/inc/strings.hrc:346
 msgctxt "STR_ZTEST_Z_VALUE"
 msgid "z"
 msgstr "z"
 
 #. CF8D5
-#: sc/inc/strings.hrc:348
+#: sc/inc/strings.hrc:347
 msgctxt "STR_ZTEST_KNOWN_VARIANCE"
 msgid "Known Variance"
 msgstr "Bilinen Varyans"
 
 #. cYWDr
-#: sc/inc/strings.hrc:349
+#: sc/inc/strings.hrc:348
 msgctxt "STR_ZTEST_P_ONE_TAIL"
 msgid "P (Z<=z) one-tail"
 msgstr "P (Z<=z) tek kuyruk"
 
 #. DmEVf
-#: sc/inc/strings.hrc:350
+#: sc/inc/strings.hrc:349
 msgctxt "STR_ZTEST_Z_CRITICAL_ONE_TAIL"
 msgid "z Critical one-tail"
 msgstr "z Kritik tek kuyruk"
 
 #. G8PeP
-#: sc/inc/strings.hrc:351
+#: sc/inc/strings.hrc:350
 msgctxt "STR_ZTEST_P_TWO_TAIL"
 msgid "P (Z<=z) two-tail"
 msgstr "P (Z<=z) iki kuyruk"
 
 #. rGBfK
-#: sc/inc/strings.hrc:352
+#: sc/inc/strings.hrc:351
 msgctxt "STR_ZTEST_Z_CRITICAL_TWO_TAIL"
 msgid "z Critical two-tail"
 msgstr "z Kritik çift kuyruk"
 
 #. mCsCB
 #. Fourier Analysis
-#: sc/inc/strings.hrc:354
+#: sc/inc/strings.hrc:353
 msgctxt "STR_FOURIER_TRANSFORM"
 msgid "Fourier Transform"
 msgstr "Fourier Dönüşümü"
 
 #. sc3hp
-#: sc/inc/strings.hrc:355
+#: sc/inc/strings.hrc:354
 msgctxt "STR_INVERSE_FOURIER_TRANSFORM"
 msgid "Inverse Fourier Transform"
 msgstr "Ters Fourier Dönüşümü"
 
 #. AtC94
-#: sc/inc/strings.hrc:356
+#: sc/inc/strings.hrc:355
 msgctxt "STR_REAL_PART"
 msgid "Real"
 msgstr "Gerçek"
 
 #. SoyPr
-#: sc/inc/strings.hrc:357
+#: sc/inc/strings.hrc:356
 msgctxt "STR_IMAGINARY_PART"
 msgid "Imaginary"
 msgstr "Hayali"
 
 #. ymnyT
-#: sc/inc/strings.hrc:358
+#: sc/inc/strings.hrc:357
 msgctxt "STR_MAGNITUDE_PART"
 msgid "Magnitude"
 msgstr "Büyüklük"
 
 #. NGmmD
-#: sc/inc/strings.hrc:359
+#: sc/inc/strings.hrc:358
 msgctxt "STR_PHASE_PART"
 msgid "Phase"
 msgstr "Evre"
 
 #. E7Eez
-#: sc/inc/strings.hrc:360
+#: sc/inc/strings.hrc:359
 msgctxt "STR_MESSAGE_INVALID_NUMCOLS"
 msgid "More than two columns selected in grouped by column mode."
 msgstr "Sütuna göre gruplama modunda ikiden fazla sütun seçildi."
 
 #. wF2RV
-#: sc/inc/strings.hrc:361
+#: sc/inc/strings.hrc:360
 msgctxt "STR_MESSAGE_INVALID_NUMROWS"
 msgid "More than two rows selected in grouped by row mode."
 msgstr "Satır kipinde gruplanmış olarak ikiden fazla satır seçildi."
 
 #. DRbrH
-#: sc/inc/strings.hrc:362
+#: sc/inc/strings.hrc:361
 msgctxt "STR_MESSAGE_NODATA_IN_RANGE"
 msgid "No data in input range."
 msgstr "Girdi aralığında veri yok."
 
 #. gjC2w
-#: sc/inc/strings.hrc:363
+#: sc/inc/strings.hrc:362
 msgctxt "STR_MESSAGE_OUTPUT_TOO_LONG"
 msgid "Output is too long to write into the sheet."
 msgstr "Çıktı sayfaya yazdırılamayacak kadar büyük."
 
 #. SnGyL
-#: sc/inc/strings.hrc:364
+#: sc/inc/strings.hrc:363
 msgctxt "STR_INPUT_DATA_RANGE"
 msgid "Input data range"
 msgstr "Girdi veri aralığı"
 
 #. EaQGL
 #. infobar for allowing links to update or not
-#: sc/inc/strings.hrc:366
+#: sc/inc/strings.hrc:365
 msgctxt "STR_ENABLE_CONTENT"
 msgid "Allow updating"
 msgstr "Güncellemeye izin ver"
 
 #. aJDFG
 #. tooltip for the "Allow updating" infobar button
-#: sc/inc/strings.hrc:368
+#: sc/inc/strings.hrc:367
 msgctxt "STR_ENABLE_CONTENT_TOOLTIP"
 msgid "Only allow updating if you trust this document."
 msgstr "Yalnızca bu belgeye güveniyorsanız güncellemeye izin verin."
 
 #. w5Gd7
 #. Insert image dialog
-#: sc/inc/strings.hrc:370
+#: sc/inc/strings.hrc:369
 msgctxt "STR_ANCHOR_TO_CELL"
 msgid "To cell"
 msgstr "Hücreye"
 
 #. itvXY
-#: sc/inc/strings.hrc:371
+#: sc/inc/strings.hrc:370
 msgctxt "STR_ANCHOR_TO_CELL_RESIZE"
 msgid "To cell (resize with cell)"
 msgstr "Hücreye (hücre ile yeniden boyutlandır)"
 
 #. P8vG7
-#: sc/inc/strings.hrc:372
+#: sc/inc/strings.hrc:371
 msgctxt "STR_ANCHOR_TO_PAGE"
 msgid "To page"
 msgstr "Sayfaya"
 
 #. SSc6B
-#: sc/inc/strings.hrc:374
+#: sc/inc/strings.hrc:373
 msgctxt "sharedocumentdlg|nouserdata"
 msgid "No user data available."
 msgstr "Kullanıcı verisi yok."
 
 #. FFnfu
-#: sc/inc/strings.hrc:375
+#: sc/inc/strings.hrc:374
 msgctxt "sharedocumentdlg|exclusive"
 msgid "(exclusive access)"
 msgstr "(özel erişim)"
 
 #. hitQA
-#: sc/inc/strings.hrc:376
+#: sc/inc/strings.hrc:375
 msgctxt "STR_NO_NAMED_RANGES_AVAILABLE"
 msgid "No named ranges available in the selected document"
 msgstr "Seçilen belgede isimlendirilmiş aralık yok"
 
 #. hnAZx
-#: sc/inc/strings.hrc:377
+#: sc/inc/strings.hrc:376
 msgctxt "STR_BORDER_HAIRLINE"
 msgid "Hairline (%s pt)"
 msgstr "Sınır çizgisi (%s pt)"
 
 #. E9Dhi
-#: sc/inc/strings.hrc:378
+#: sc/inc/strings.hrc:377
 msgctxt "STR_BORDER_VERY_THIN"
 msgid "Very thin (%s pt)"
 msgstr "Çok ince (%s pt)"
 
 #. KGVAw
-#: sc/inc/strings.hrc:379
+#: sc/inc/strings.hrc:378
 msgctxt "STR_BORDER_THIN"
 msgid "Thin (%s pt)"
 msgstr "İnce (%s pt)"
 
 #. V6PRY
-#: sc/inc/strings.hrc:380
+#: sc/inc/strings.hrc:379
 msgctxt "STR_BORDER_MEDIUM"
 msgid "Medium (%s pt)"
 msgstr "Orta (%s pt)"
 
 #. GyeKi
-#: sc/inc/strings.hrc:381
+#: sc/inc/strings.hrc:380
 msgctxt "STR_BORDER_THICK"
 msgid "Thick (%s pt)"
 msgstr "Kalın (%s pt)"
 
 #. QvEAB
-#: sc/inc/strings.hrc:382
+#: sc/inc/strings.hrc:381
 msgctxt "STR_BORDER_EXTRA_THICK"
 msgid "Extra thick (%s pt)"
 msgstr "Çok kalın (%s pt)"
 
 #. v9kkb
-#: sc/inc/strings.hrc:383
+#: sc/inc/strings.hrc:382
 msgctxt "STR_BORDER_DOUBLE_1"
 msgid "Double Hairline (%s pt)"
 msgstr "Çift Sınır Çizgisi (%s pt)"
 
 #. KzKEy
-#: sc/inc/strings.hrc:384
+#: sc/inc/strings.hrc:383
 msgctxt "STR_BORDER_DOUBLE_2"
 msgid "Thin/Medium (%s pt)"
 msgstr "İnce/Orta (%s pt)"
 
 #. HD8tG
-#: sc/inc/strings.hrc:385
+#: sc/inc/strings.hrc:384
 msgctxt "STR_BORDER_DOUBLE_3"
 msgid "Medium/Hairline (%s pt)"
 msgstr "Orta/Sınır Çizgisi (%s pt)"
 
 #. ygGcU
-#: sc/inc/strings.hrc:386
+#: sc/inc/strings.hrc:385
 msgctxt "STR_BORDER_DOUBLE_4"
 msgid "Medium/Medium (%s pt)"
 msgstr "Orta/Orta (%s pt)"
@@ -18579,19 +18576,19 @@ msgstr "Orta/Orta (%s pt)"
 #. z9YGZ
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: sc/inc/strings.hrc:390
+#: sc/inc/strings.hrc:389
 msgctxt "sortoptionspage|extended_tip|sortuserlb"
 msgid "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists."
 msgstr "Uygulamak istediğiniz özel sıralama türünü seçin. Bir özel sıralama türü belirlemek için Araçlar - Seçenekler - %PRODUCTNAME Calc - Listeleri Sırala'yı seçin."
 
 #. T5A7R
-#: sc/inc/strings.hrc:391
+#: sc/inc/strings.hrc:390
 msgctxt "subtotaloptionspage|extended_tip|lbuserdef"
 msgid "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists."
 msgstr "Araçlar - Seçenekler - %PRODUCTNAME Calc – Sıralı Listeler altında tanımlanmış olan bir kullanıcı tanımlı sıralama düzeni kullanır."
 
 #. gbz6Y
-#: sc/inc/strings.hrc:392
+#: sc/inc/strings.hrc:391
 msgctxt "extended_tip|annot"
 msgid "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box."
 msgstr "Açıklama olduğunda, hücrenin sağ üst köşesinde küçük bir dikdörtgenin görülmesini belirler. Bu açıklama sadece Seçenekler iletişim penceresinde %PRODUCTNAME - Genel altında açıklamaları etkinleştirdiğinizde görünür."
@@ -18738,7 +18735,7 @@ msgstr "Pencereyi kapatır ve değişiklikleri göz ardı eder."
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:119
 msgctxt "advancedfilterdialog|extended_tip|rbfilterarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. yFS2F
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:134
@@ -18828,7 +18825,7 @@ msgstr "Süzgeç ölçütlerini _koru"
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:323
 msgctxt "advancedfilterdialog|extended_tip|destpers"
 msgid "Select the Copy results to check box, and then specify the destination range where you want to display the filtered data. If this box is checked, the destination range remains linked to the source range. You must have defined the source range under Data - Define range as a database range."
-msgstr " Sonuçları Kopyala onay kutusunu işaretleyerek, süzülmüş verinin kopyalanacağı hedef aralığını belirleyin. Bu onay kutusu işaretli ise hedef aralığı kaynak aralığına bağlı kalır. Veri - Aralık tanımla yoluyla kaynak aralığını bir veritabanı alanı olarak belirlemelisiniz."
+msgstr "Sonuçları Kopyala onay kutusunu işaretleyerek, süzülmüş verinin kopyalanacağı hedef aralığını belirleyin. Bu onay kutusu işaretli ise hedef aralığı kaynak aralığına bağlı kalır. Veri - Aralık tanımla yoluyla kaynak aralığını bir veritabanı alanı olarak belirlemelisiniz."
 
 #. NLz5G
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:355
@@ -18858,7 +18855,7 @@ msgstr "Onay kutusunu seçin, ve süzülmüş verinin gösterilmesini istediğin
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:398
 msgctxt "advancedfilterdialog|extended_tip|rbcopyarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. RGXM4
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:423
@@ -19140,7 +19137,7 @@ msgstr "İşaretlendiğinde, alana seçilmiş biçemin kenarlık biçimini uygul
 #: sc/uiconfig/scalc/ui/autoformattable.ui:333
 msgctxt "autoformattable|fontcb"
 msgid "Font"
-msgstr "Yazıtipi"
+msgstr "Yazı tipi"
 
 #. GjAFM
 #: sc/uiconfig/scalc/ui/autoformattable.ui:341
@@ -19266,7 +19263,7 @@ msgstr "DeğişkenP"
 #: sc/uiconfig/scalc/ui/cellprotectionpage.ui:32
 msgctxt "cellprotectionpage|checkProtected"
 msgid "_Protected"
-msgstr "Korumalı"
+msgstr "_Korumalı"
 
 #. jkUCZ
 #: sc/uiconfig/scalc/ui/cellprotectionpage.ui:43
@@ -19311,37 +19308,37 @@ msgstr ""
 "'Araçlar' menüsünden 'Sayfayı Koru' seçeneğini seçin."
 
 #. bVREg
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:118
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:121
 msgctxt "cellprotectionpage|LabelProtection"
 msgid "Protection"
 msgstr "Koruma"
 
 #. A5DFp
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:148
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:151
 msgctxt "cellprotectionpage|checkHidePrinting"
 msgid "Hide _when printing"
 msgstr "_Yazdırırken gizle"
 
 #. ZosAc
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:157
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:160
 msgctxt "cellprotectionpage|extended_tip|checkHidePrinting"
 msgid "Keeps the selected cells from being printed."
 msgstr "Seçilmiş olan hücrelerin yazdırılmamasını sağlar."
 
 #. QqUqE
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:172
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:175
 msgctxt "cellprotectionpage|label4"
 msgid "The cells selected will be omitted when printing."
 msgstr "Geçerli seçimin hücreleri yazdırmaya dahil olmayacak."
 
 #. 8RuyP
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:188
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:194
 msgctxt "cellprotectionpage|label3"
 msgid "Print"
 msgstr "Yazdır"
 
 #. DPWp6
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:202
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:208
 msgctxt "cellprotectionpage|extended_tip|CellProtectionPage"
 msgid "Defines protection options for selected cells."
 msgstr "Seçilmiş hücrelere koruma seçeneği tanımlanır."
@@ -19530,7 +19527,7 @@ msgstr "Kullanmak istediğiniz sütun genişliğini girin."
 #: sc/uiconfig/scalc/ui/colwidthdialog.ui:121
 msgctxt "colwidthdialog|default"
 msgid "_Default value"
-msgstr "_Öntanımlı değer"
+msgstr "_Varsayılan değer"
 
 #. rov8K
 #: sc/uiconfig/scalc/ui/colwidthdialog.ui:129
@@ -20262,7 +20259,7 @@ msgstr "Aralık:"
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:331
 msgctxt "conditionalformatdialog|extended_tip|rbassign"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. BH5wk
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:347
@@ -20490,7 +20487,7 @@ msgstr "Birleştirme aralıkları kutusunda listelenen hücre aralıklarıyla bi
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:276
 msgctxt "consolidatedialog|extended_tip|rbdataarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. ziYLq
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:306
@@ -20508,7 +20505,7 @@ msgstr "Birleştirme sonuçlarının görüntüleneceği ilk hücreyi görüntü
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:344
 msgctxt "consolidatedialog|extended_tip|rbdestarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. zrSv3
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:376
@@ -21444,7 +21441,7 @@ msgstr "Veri formu"
 #: sc/uiconfig/scalc/ui/dataform.ui:37
 msgctxt "dataform|close"
 msgid "_Close"
-msgstr "Kapat"
+msgstr "_Kapat"
 
 #. gbAzv
 #: sc/uiconfig/scalc/ui/dataform.ui:166
@@ -21456,7 +21453,7 @@ msgstr "Yeni Kayıt"
 #: sc/uiconfig/scalc/ui/dataform.ui:177
 msgctxt "dataform|new"
 msgid "_New"
-msgstr "Yeni"
+msgstr "_Yeni"
 
 #. Epdm6
 #: sc/uiconfig/scalc/ui/dataform.ui:193
@@ -21489,85 +21486,85 @@ msgid "Data Entry Form is a tool to make table data entry easy in spreadsheets."
 msgstr "Veri Giriş Formu, tablo verilerini hesap tablolarina kolayca girmenizi sağlayan bir araçtır."
 
 #. 6DQYr
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:25
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:22
 msgctxt "dataproviderdlg/okaybtn"
 msgid "Okay"
 msgstr "Tamam"
 
 #. Ah2h8
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:38
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:35
 msgctxt "dataproviderdlg/cancelbtn"
 msgid "Cancel"
 msgstr "İptal"
 
 #. a7EFA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:88
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:86
 msgctxt "dataproviderdlg|db_name"
 msgid "Database Range:"
 msgstr "Veri Tabanı Aralığı:"
 
 #. pSQ4F
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:113
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:111
 msgctxt "dataproviderdlg/provider"
 msgid "Data Provider:"
 msgstr "Veri Sağlayıcı:"
 
 #. RGiXi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:138
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:136
 msgctxt "dataproviderdlg/url"
 msgid "URL:"
 msgstr "URL:"
 
 #. GKDQA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:161
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:159
 msgctxt "dataproviderdlg/browse_btn"
 msgid "Browse"
 msgstr "Göz at"
 
 #. GABzG
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:175
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:173
 msgctxt "dataproviderdlg/id"
 msgid "Id / Xpath:"
 msgstr "Id / Xpath:"
 
 #. pwS4k
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:203
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:201
 msgctxt "dataproviderdlg/lbSource"
 msgid "Source"
 msgstr "Kaynak"
 
 #. fHfGq
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:237
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:236
 msgctxt "dataproviderdlg/transformation_add"
 msgid "Add"
 msgstr "Ekle"
 
 #. Smoiv
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:241
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:240
 msgctxt "dataproviderdlg/AddTransformation_tooltip"
 msgid "Add Transformations"
 msgstr "Dönüşümler Ekle"
 
 #. cSgeU
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:297
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:296
 msgctxt "dataproviderdlg/transformation"
 msgid "Transformations"
 msgstr "Dönüşümler"
 
 #. gpeXB
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:353
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:352
 msgctxt "dataproviderdlg/apply"
 msgid "Apply"
 msgstr "Uygula"
 
 #. bDVwi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:357
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:356
 msgctxt "dataproviderdlg/apply_tooltiptext"
 msgid "Apply Changes"
 msgstr "Değişiklikleri Uygula"
 
 #. 6pCFs
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:376
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:375
 msgctxt "dataproviderdlg/preview"
 msgid "Preview"
 msgstr "Önizleme"
@@ -21834,13 +21831,13 @@ msgstr "Ad"
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:223
 msgctxt "definedatabaserangedialog|extended_tip|assign"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. ySCS4
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:240
 msgctxt "definedatabaserangedialog|extended_tip|assignrb"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. FUAH2
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:256
@@ -22026,7 +22023,7 @@ msgstr "Alanı bir yazdırma aralığı olarak tanımlar."
 #: sc/uiconfig/scalc/ui/definename.ui:264
 msgctxt "definename|filter"
 msgid "_Filter"
-msgstr "Süzgeç"
+msgstr "_Süzgeç"
 
 #. KPv69
 #: sc/uiconfig/scalc/ui/definename.ui:272
@@ -22080,7 +22077,7 @@ msgstr "Seçili aralığa veya bir formül ifadesine isim belirleyebileceğiniz 
 #: sc/uiconfig/scalc/ui/deletecells.ui:8
 msgctxt "deletecells|DeleteCellsDialog"
 msgid "Delete Cells"
-msgstr "Hücreleri sil"
+msgstr "Hücreleri Sil"
 
 #. UXfkG
 #: sc/uiconfig/scalc/ui/deletecells.ui:92
@@ -22638,7 +22635,7 @@ msgstr "Eklemek istediğiniz verileri içeren dosyayı bulmak için bir dosya il
 #: sc/uiconfig/scalc/ui/externaldata.ui:178
 msgctxt "externaldata|label1"
 msgid "URL of _External Data Source"
-msgstr "Harici Veri Kaynağı Adresi"
+msgstr "_Harici Veri Kaynağı Adresi"
 
 #. x9ENQ
 #: sc/uiconfig/scalc/ui/externaldata.ui:242
@@ -22905,25 +22902,25 @@ msgid "Remove row"
 msgstr "Satır sil"
 
 #. cd5X5
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:150
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:158
 msgctxt "filterdropdown|STR_EDIT_SEARCH_ITEMS"
 msgid "Search items..."
 msgstr "Ögeleri ara..."
 
 #. zKwWE
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:184
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:192
 msgctxt "filterdropdown|STR_BTN_TOGGLE_ALL"
 msgid "All"
 msgstr "Tümü"
 
 #. JsSz6
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:203
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:211
 msgctxt "filterdropdown|STR_BTN_SELECT_CURRENT"
 msgid "Show only the current item."
 msgstr "Yalnızça geçerli ögeyi göster."
 
 #. vBQYB
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:218
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:226
 msgctxt "filterdropdown|STR_BTN_UNSELECT_CURRENT"
 msgid "Hide only the current item."
 msgstr "Yalnızca geçerli ögeyi gizle."
@@ -22934,11 +22931,11 @@ msgctxt "filtersubdropdown|background"
 msgid "Background Color"
 msgstr "Arkaplan Rengi"
 
-#. EZpYM
+#. ca9FH
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:205
 msgctxt "filtersubdropdown|textcolor"
-msgid "Text Color"
-msgstr "Metin Rengi"
+msgid "Font Color"
+msgstr "Yazı Tipi Rengi"
 
 #. XYJHx
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:28
@@ -23148,7 +23145,7 @@ msgstr "Arkaplan"
 #: sc/uiconfig/scalc/ui/formatcellsdialog.ui:473
 msgctxt "formatcellsdialog|cellprotection"
 msgid "Cell Protection"
-msgstr "Hücre koruması"
+msgstr "Hücre Koruması"
 
 #. ymJhE
 #: sc/uiconfig/scalc/ui/formulacalculationoptions.ui:9
@@ -23301,106 +23298,100 @@ msgid "Produces the Fourier analysis of a data set by computing the Discrete Fou
 msgstr "Bir çift Hızlı Fourier Dönüşümü (FFT) algoritması kullanarak karmaşık sayıların bir giriş dizisinin Ayrık Fourier Dönüşümünü (DFT) hesaplayarak bir veri kümesinin Fourier analizini üretir."
 
 #. FEwZR
-#: sc/uiconfig/scalc/ui/functionpanel.ui:63
+#: sc/uiconfig/scalc/ui/functionpanel.ui:54
 msgctxt "functionpanel|insert|tooltip_text"
 msgid "Insert Function into calculation sheet"
 msgstr "Hesaplama sayfasına işlev ekle"
 
 #. L79E6
-#: sc/uiconfig/scalc/ui/functionpanel.ui:78
+#: sc/uiconfig/scalc/ui/functionpanel.ui:69
 msgctxt "functionpanel|category"
 msgid "Last Used"
 msgstr "Son Kullanılan"
 
 #. uRXDm
-#: sc/uiconfig/scalc/ui/functionpanel.ui:79
+#: sc/uiconfig/scalc/ui/functionpanel.ui:70
 msgctxt "functionpanel|category"
 msgid "All"
 msgstr "Tümü"
 
 #. Fk97C
-#: sc/uiconfig/scalc/ui/functionpanel.ui:80
+#: sc/uiconfig/scalc/ui/functionpanel.ui:71
 msgctxt "functionpanel|category"
 msgid "Database"
 msgstr "Veritabanı"
 
 #. hCefc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:81
+#: sc/uiconfig/scalc/ui/functionpanel.ui:72
 msgctxt "functionpanel|category"
 msgid "Date&Time"
 msgstr "Tarih&Saat"
 
 #. Cj6Vy
-#: sc/uiconfig/scalc/ui/functionpanel.ui:82
+#: sc/uiconfig/scalc/ui/functionpanel.ui:73
 msgctxt "functionpanel|category"
 msgid "Financial"
 msgstr "Finansal"
 
 #. gS2PB
-#: sc/uiconfig/scalc/ui/functionpanel.ui:83
+#: sc/uiconfig/scalc/ui/functionpanel.ui:74
 msgctxt "functionpanel|category"
 msgid "Information"
 msgstr "Bilgi"
 
 #. rMqtg
-#: sc/uiconfig/scalc/ui/functionpanel.ui:84
+#: sc/uiconfig/scalc/ui/functionpanel.ui:75
 msgctxt "functionpanel|category"
 msgid "Logical"
 msgstr "Mantııksal"
 
 #. 6cFkD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:85
+#: sc/uiconfig/scalc/ui/functionpanel.ui:76
 msgctxt "functionpanel|category"
 msgid "Mathematical"
 msgstr "Matematiksel"
 
 #. RdQeE
-#: sc/uiconfig/scalc/ui/functionpanel.ui:86
+#: sc/uiconfig/scalc/ui/functionpanel.ui:77
 msgctxt "functionpanel|category"
 msgid "Array"
 msgstr "Dizi"
 
 #. h4kRr
-#: sc/uiconfig/scalc/ui/functionpanel.ui:87
+#: sc/uiconfig/scalc/ui/functionpanel.ui:78
 msgctxt "functionpanel|category"
 msgid "Statistical"
 msgstr "İstatistiksel"
 
 #. 6XCsS
-#: sc/uiconfig/scalc/ui/functionpanel.ui:88
+#: sc/uiconfig/scalc/ui/functionpanel.ui:79
 msgctxt "functionpanel|category"
 msgid "Spreadsheet"
 msgstr "Hesap Tablosu"
 
 #. DwfB5
-#: sc/uiconfig/scalc/ui/functionpanel.ui:89
+#: sc/uiconfig/scalc/ui/functionpanel.ui:80
 msgctxt "functionpanel|category"
 msgid "Text"
 msgstr "Metin"
 
 #. BCiyc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:90
+#: sc/uiconfig/scalc/ui/functionpanel.ui:81
 msgctxt "functionpanel|category"
 msgid "Add-in"
 msgstr "Eklenti"
 
 #. tDNFD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:94
+#: sc/uiconfig/scalc/ui/functionpanel.ui:85
 msgctxt "functionpanel|extended_tip|category"
 msgid "Displays the available functions."
 msgstr "Kullanılabilir olan işlevleri listeler."
 
 #. V9ATp
-#: sc/uiconfig/scalc/ui/functionpanel.ui:141
+#: sc/uiconfig/scalc/ui/functionpanel.ui:133
 msgctxt "functionpanel|extended_tip|funclist"
 msgid "Displays the available functions."
 msgstr "Kullanılabilir olan işlevleri listeler."
-
-#. rmQie
-#: sc/uiconfig/scalc/ui/functionpanel.ui:175
-msgctxt "functionpanel|funcdesc"
-msgid "label"
-msgstr "etiket"
 
 #. dmA3u
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:8
@@ -23460,13 +23451,13 @@ msgstr "Hedefe ulaşmak için değeri kullanılacak değişken hücre başvurusu
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:204
 msgctxt "goalseekdlg|extended_tip|formulabutton"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. phzQE
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:220
 msgctxt "goalseekdlg|extended_tip|varbutton"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. mHUzW
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:238
@@ -23841,55 +23832,55 @@ msgid "Use the buttons to change the font or insert field commands such as date,
 msgstr "Yazı tipini değiştirmek ya da tarih, saat gibi alan komutları eklemek için düğmeleri kullanınız."
 
 #. WBsTf
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:503
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:506
 msgctxt "headerfootercontent|label1"
 msgid "Note"
 msgstr "Not"
 
 #. X2HEK
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:525
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:528
 msgctxt "headerfootercontent|labelSTR_HF_NONE_IN_BRACKETS"
 msgid "(none)"
 msgstr "(hiçbiri)"
 
 #. RSazM
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:537
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:540
 msgctxt "headerfootercontent|labelSTR_PAGE"
 msgid "Page"
 msgstr "Sayfa"
 
 #. CMDYZ
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:549
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:552
 msgctxt "headerfootercontent|labelSTR_HF_OF_QUESTION"
 msgid "of ?"
 msgstr "?"
 
 #. jQyGW
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:561
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:564
 msgctxt "headerfootercontent|labelSTR_HF_CONFIDENTIAL"
 msgid "Confidential"
 msgstr "Gizli"
 
 #. EeAAh
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:573
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:576
 msgctxt "headerfootercontent|labelSTR_HF_CREATED_BY"
 msgid "Created by"
 msgstr "Yazan"
 
 #. CASF2
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:585
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:588
 msgctxt "headerfootercontent|labelSTR_HF_CUSTOMIZED"
 msgid "Customized"
 msgstr "Özelleştirildi"
 
 #. wZN6q
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:597
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:600
 msgctxt "headerfootercontent|labelSTR_HF_OF"
 msgid "of"
 msgstr "/"
 
 #. SDx4X
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:614
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:617
 msgctxt "headerfootercontent|extended_tip|HeaderFooterContent"
 msgid "Defines or formats a header or footer for a Page Style."
 msgstr "Bir sayfa biçemi için, üst bilgi veya alt bilgi tanımlar veya biçimler."
@@ -24060,7 +24051,7 @@ msgstr "Tüm satı_r"
 #: sc/uiconfig/scalc/ui/insertcells.ui:143
 msgctxt "insertcells|extended_tip|rows"
 msgid "Inserts an entire row. The position of the row is determined by the selection on the sheet."
-msgstr "Bütün bir satır ekler. Eklenecek satır sayısı seçilmiş olan satır sayısı kadar olur. "
+msgstr "Bütün bir satır ekler. Eklenecek satır sayısı seçilmiş olan satır sayısı kadar olur."
 
 #. 6UZ5M
 #: sc/uiconfig/scalc/ui/insertcells.ui:155
@@ -24084,7 +24075,7 @@ msgstr "Seçim"
 #: sc/uiconfig/scalc/ui/insertcells.ui:205
 msgctxt "insertcells|extended_tip|InsertCellsDialog"
 msgid "Opens the Insert Cells dialog, in which you can insert new cells according to the options that you specify."
-msgstr "  hücre eklepenceresini açar, bu diyalog ile ayarlanan  seçeneklere göre yeni hücreler eklenir."
+msgstr "Hücre eklepenceresini açar, bu diyalog ile ayarlanan seçeneklere göre yeni hücreler eklenir."
 
 #. Ex63x
 #: sc/uiconfig/scalc/ui/insertname.ui:20
@@ -24198,13 +24189,13 @@ msgstr "Yeni bir sayfa yaratır. İsim alanında bir sayfa adı girin. İzin ver
 #: sc/uiconfig/scalc/ui/insertsheet.ui:231
 msgctxt "insertsheet|countft"
 msgid "N_o. of sheets:"
-msgstr "Sayfa Sayısı:"
+msgstr "_Sayfa sayısı:"
 
 #. xnBgf
 #: sc/uiconfig/scalc/ui/insertsheet.ui:245
 msgctxt "insertsheet|nameft"
 msgid "Na_me:"
-msgstr "İsi_m:"
+msgstr "_Ad:"
 
 #. JqDES
 #: sc/uiconfig/scalc/ui/insertsheet.ui:265
@@ -24246,7 +24237,7 @@ msgstr "Dosyadaki tablolar"
 #: sc/uiconfig/scalc/ui/insertsheet.ui:393
 msgctxt "insertsheet|extended_tip|tables"
 msgid "If you selected a file by using the Browse button, the sheets contained in it are displayed in the list box. The file path is displayed below this box. Select the sheet to be inserted from the list box."
-msgstr " Araştır düğmesini kullanarak bir dosya seçerseniz, belgedeki sayfalar listede görüntülenir. Dosya yolu bu kutunun altında görüntülenir. Liste kutusundan eklenecek sayfayı seçin."
+msgstr "Araştır düğmesini kullanarak bir dosya seçerseniz, belgedeki sayfalar listede görüntülenir. Dosya yolu bu kutunun altında görüntülenir. Liste kutusundan eklenecek sayfayı seçin."
 
 #. mGqDq
 #: sc/uiconfig/scalc/ui/insertsheet.ui:412
@@ -24372,7 +24363,7 @@ msgstr "Kapsamı güncellemek için belgedeki hücreleri seçiniz."
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:215
 msgctxt "managenamesdialog|label2"
 msgid "Name:"
-msgstr "İsim:"
+msgstr "Ad:"
 
 #. XY33d
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:229
@@ -24396,7 +24387,7 @@ msgstr "Seçili olan alan adının referansı mutlak değer olarak burada göste
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:288
 msgctxt "managenamesdialog|extended_tip|assign"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. ddGRB
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:309
@@ -24426,7 +24417,7 @@ msgstr "Alanı bir yazdırma aralığı olarak tanımlar."
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:380
 msgctxt "managenamesdialog|filter"
 msgid "_Filter"
-msgstr "Süzgeç"
+msgstr "_Süzgeç"
 
 #. DoQMz
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:388
@@ -24462,7 +24453,7 @@ msgstr "Alanı tekrar eden satırlar olarak tanımlar."
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:441
 msgctxt "managenamesdialog|label1"
 msgid "Range _Options"
-msgstr "Aralık Seçenekleri"
+msgstr "Aralık _Seçenekleri"
 
 #. MFz5S
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:447
@@ -24780,19 +24771,19 @@ msgstr "Veri tablonuzdaki sütunlarda değişken olarak kullanılacak girdi hüc
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:208
 msgctxt "multipleoperationsdialog|extended_tip|formulasref"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. qdF79
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:224
 msgctxt "multipleoperationsdialog|extended_tip|rowref"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. pzEjo
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:240
 msgctxt "multipleoperationsdialog|extended_tip|colref"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. LqDCg
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:255
@@ -24834,7 +24825,7 @@ msgstr "Her bir etiket aralığının hücre başvurusunu görüntüler."
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:150
 msgctxt "namerangesdialog|extended_tip|rbassign"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. RHkHY
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:174
@@ -24876,7 +24867,7 @@ msgstr "Geçerli olan etiket aralığı için veri aralığını ayarlar. Düzen
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:269
 msgctxt "namerangesdialog|extended_tip|rbassign2"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. UQwuv
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:300
@@ -25155,177 +25146,177 @@ msgid "Fiel_d"
 msgstr "Ala_n"
 
 #. VCk9a
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5882
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5859
 msgctxt "CalcNotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Ekle"
 
 #. HnjBi
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5987
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5964
 msgctxt "CalcNotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "~Ekle"
 
 #. xmARL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6388
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6413
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6841
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6365
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6390
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6818
 msgctxt "CalcNotebookbar|objectalign|tooltip_text"
 msgid "Object Align"
 msgstr "Nesne Hizalama"
 
 #. vruXQ
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7062
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7039
 msgctxt "CalcNotebookbar|LayoutMenuButton"
 msgid "_Layout"
 msgstr "_Düzen"
 
 #. eWinY
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7146
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7123
 msgctxt "CalcNotebookbar|PageLayoutLabel"
 msgid "~Layout"
 msgstr "~Düzen"
 
 #. pnWd5
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8423
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8400
 msgctxt "CalcNotebookbar|StatisticsMenuButton"
 msgid "_Statistics"
 msgstr "İ_statistikler"
 
 #. BiHBE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8474
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8451
 msgctxt "CalcNotebookbar|DataMenuButton"
 msgid "_Data"
 msgstr "_Veri"
 
 #. xzx9j
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8580
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8557
 msgctxt "CalcNotebookbar|DataLabel"
 msgid "~Data"
 msgstr "~Veri"
 
 #. CBEHA
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9383
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9360
 msgctxt "CalcNotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Gözden geçir"
 
 #. 7FXbr
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9468
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9445
 msgctxt "CalcNotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Gözden Geçir"
 
 #. NT37F
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10354
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10331
 msgctxt "CalcNotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Görünüm"
 
 #. rPdAq
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10439
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10416
 msgctxt "CalcNotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Görünüm"
 
 #. SAv6Z
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11548
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11525
 msgctxt "CalcNotebookbar|ImageMenuButton"
 msgid "Ima_ge"
 msgstr "Re_sim"
 
 #. rwprK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11669
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11646
 msgctxt "CalcNotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "Res~im"
 
 #. EjbzV
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12850
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12827
 msgctxt "CalcNotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "_Çizelge"
 
 #. iagRv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12957
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12934
 msgctxt "CalcNotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Çizelge"
 
 #. EgeGL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13415
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13392
 msgctxt "CalcNotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Dönüştür"
 
 #. PRmbH
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13705
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13682
 msgctxt "CalcNotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Nesne"
 
 #. xTKVv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13812
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13789
 msgctxt "CalcNotebookbar|FrameLabel"
 msgid "~Object"
 msgstr "~Nesne"
 
 #. cHyKz
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14371
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14348
 msgctxt "CalcNotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Ortam"
 
 #. CJ2qx
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14476
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14453
 msgctxt "CalcNotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Ortam"
 
 #. eQK6A
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14858
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14835
 msgctxt "CalcNotebookbar|PrintMenuButton"
 msgid "_Print"
 msgstr "_Yazdır"
 
 #. sCGyG
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14941
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14918
 msgctxt "CalcNotebookbar|PrintLabel"
 msgid "~Print"
 msgstr "~Yazdır"
 
 #. 5JVAt
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15749
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15726
 msgctxt "CalcNotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Fo_rm"
 
 #. CCEAK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15833
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15810
 msgctxt "CalcNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Fo~rm"
 
 #. DHeyE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15890
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15867
 msgctxt "CalcNotebookbar|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_klenti"
 
 #. 4ZDL7
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15964
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15941
 msgctxt "CalcNotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~klenti"
 
 #. 3Ec6T
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17153
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17130
 msgctxt "CalcNotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Araçlar"
 
 #. 8HTEk
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17237
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17214
 msgctxt "CalcNotebookbar|ToolsLabel"
 msgid "~Tools"
 msgstr "~Araçlar"
@@ -25344,7 +25335,7 @@ msgstr "~Dosya"
 
 #. UWfVg
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:3545
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6152
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6113
 msgctxt "notebookbar_compact|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Seçilen hücrelerin kenarlıklarını belirleyin."
@@ -25368,163 +25359,163 @@ msgid "Fiel_d"
 msgstr "Ala_n"
 
 #. zveKA
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5637
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5598
 msgctxt "notebookbar_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Ekle"
 
 #. CDXv3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5692
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5653
 msgctxt "notebookbar_compact|InsertLabel"
 msgid "~Insert"
 msgstr "~Ekle"
 
 #. EvytN
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6273
 msgctxt "notebookbar_compact|PageMenuButton"
 msgid "_Layout"
 msgstr "_Düzen"
 
 #. TbQMa
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6364
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6325
 msgctxt "notebookbar_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "~Düzen"
 
 #. QqjZP
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7199
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7160
 msgctxt "notebookbar_compact|Statistics"
 msgid "_Statistics"
 msgstr "İ_statistikler"
 
 #. GFZNz
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7264
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7225
 msgctxt "notebookbar_compact|DataMenuButton"
 msgid "_Data"
 msgstr "_Veri"
 
 #. TCt7E
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7315
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7276
 msgctxt "notebookbar_compact|DataLabel"
 msgid "~Data"
 msgstr "~Veri"
 
 #. jYD7j
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7997
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7958
 msgctxt "notebookbar_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Gözden Geçir"
 
 #. Lbj5B
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8049
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8010
 msgctxt "notebookbar_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Gözden Geçir"
 
 #. 35kA2
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8716
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8677
 msgctxt "notebookbar_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Görünüm"
 
 #. ZGh8C
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8768
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8729
 msgctxt "notebookbar_compact|ViewLabel"
 msgid "~View"
 msgstr "~Görünüm"
 
 #. dV94w
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10082
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10043
 msgctxt "notebookbar_compact|GraphicMenuButton"
 msgid "Im_age"
 msgstr "R_esim"
 
 #. ekWoX
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10134
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10095
 msgctxt "notebookbar_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "Res~im"
 
 #. 8eQN8
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11504
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11465
 msgctxt "notebookbar_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "Ç_izim"
 
 #. FBf68
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11556
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11517
 msgctxt "notebookbar_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "~Çizim"
 
 #. DoVwy
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12507
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12468
 msgctxt "notebookbar_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Nesne"
 
 #. JXKiY
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12559
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12520
 msgctxt "notebookbar_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Nesne"
 
 #. q8wnS
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13259
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13220
 msgctxt "notebookbar_compact|MediaButton"
 msgid "_Media"
 msgstr "_Ortam"
 
 #. 7HDt3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13273
 msgctxt "notebookbar_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Ortam"
 
 #. vSDok
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13871
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13832
 msgctxt "notebookbar_compact|PrintPreviewButton"
 msgid "Print"
 msgstr "Yazdır"
 
 #. goiqQ
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13923
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13884
 msgctxt "notebookbar_compact|FormLabel"
 msgid "~Print"
 msgstr "~Yazdır"
 
 #. EBGs5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15237
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15198
 msgctxt "notebookbar_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Fo_rm"
 
 #. EKA8X
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15289
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15250
 msgctxt "notebookbar_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Fo~rm"
 
 #. 8SvE5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15368
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15329
 msgctxt "notebookbar_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_klenti"
 
 #. WH5NR
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15426
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15387
 msgctxt "notebookbar_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~klenti"
 
 #. 8fhwb
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16427
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16388
 msgctxt "notebookbar_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Araçlar"
 
 #. kpc43
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16479
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16440
 msgctxt "notebookbar_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Araçlar"
@@ -26498,13 +26489,13 @@ msgstr "_Doğruluk gösterildiği gibi"
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:119
 msgctxt "extended_tip|calc"
 msgid "Specifies whether to make calculations using the rounded values displayed in the sheet. Charts will be shown with the displayed values. If the Precision as shown option is not marked, the displayed numbers are rounded, but they are calculated internally using the non-rounded number."
-msgstr "Hesaplamaların  sayfada gözüken yuvarlanmış değerlerle mi yapılacağını tanımlar. Çizelgeler gözüken değerlerle gösterilecektir. Eğer Gösterildiği gibi hassasiyet seçeneği işaretli değilse, gösterilen sayılar yuvarlanır, fakat içerideki işlemlerde yuvarlanmamış sayılar kullanılarak hesaplamalar yapılır."
+msgstr "Hesaplamaların sayfada gözüken yuvarlanmış değerlerle mi yapılacağını tanımlar. Çizelgeler gözüken değerlerle gösterilecektir. Eğer Gösterildiği gibi hassasiyet seçeneği işaretli değilse, gösterilen sayılar yuvarlanır, fakat içerideki işlemlerde yuvarlanmamış sayılar kullanılarak hesaplamalar yapılır."
 
 #. BiDg6
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:130
 msgctxt "optcalculatepage|match"
 msgid "Search criteria = and <> must apply to _whole cells"
-msgstr "Arama ölçütleri = ve <> tüm hücrelere uygulanmalıdır."
+msgstr "Arama ölçütleri = ve <> _tüm hücrelere uygulanmalıdır."
 
 #. deGGB
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:134
@@ -26564,7 +26555,7 @@ msgstr "Genel Hesaplamalar"
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:266
 msgctxt "optcalculatepage|iterate"
 msgid "_Iterations"
-msgstr "Yinelemeler"
+msgstr "_Yinelemeler"
 
 #. pBKcn
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:274
@@ -26996,7 +26987,7 @@ msgstr "Dizi _satırı:"
 #: sc/uiconfig/scalc/ui/optformula.ui:383
 msgctxt "optformula|reset"
 msgid "Rese_t Separators Settings"
-msgstr "Ayraç Ayarlarını Sıfırla"
+msgstr "Ayraç Ayarlarını _Sıfırla"
 
 #. 9oMMw
 #: sc/uiconfig/scalc/ui/optformula.ui:407
@@ -27032,7 +27023,7 @@ msgstr "Bir sütundaki en uzun girdi ile sütun dikey sınırları arasındaki e
 #: sc/uiconfig/scalc/ui/optimalcolwidthdialog.ui:122
 msgctxt "optimalcolwidthdialog|default"
 msgid "_Default value"
-msgstr "_Öntanımlı değer"
+msgstr "_Varsayılan değer"
 
 #. RMGd4
 #: sc/uiconfig/scalc/ui/optimalcolwidthdialog.ui:130
@@ -27134,7 +27125,7 @@ msgstr "Mevcut seçili listenin içeriğini görüntüler. İçerik düzenleneme
 #: sc/uiconfig/scalc/ui/optsortlists.ui:213
 msgctxt "optsortlists|new"
 msgid "_New"
-msgstr "Yeni"
+msgstr "_Yeni"
 
 #. uH79F
 #: sc/uiconfig/scalc/ui/optsortlists.ui:220
@@ -27284,7 +27275,7 @@ msgstr "Sayılar"
 #: sc/uiconfig/scalc/ui/paratemplatedialog.ui:247
 msgctxt "paratemplatedialog|font"
 msgid "Font"
-msgstr "Yazı tipi"
+msgstr "Yazı Tipi"
 
 #. d5N6G
 #: sc/uiconfig/scalc/ui/paratemplatedialog.ui:295
@@ -27320,7 +27311,7 @@ msgstr "Arkaplan"
 #: sc/uiconfig/scalc/ui/paratemplatedialog.ui:535
 msgctxt "paratemplatedialog|protection"
 msgid "Cell Protection"
-msgstr "Hücre koruması"
+msgstr "Hücre Koruması"
 
 #. biiBk
 #: sc/uiconfig/scalc/ui/pastespecial.ui:32
@@ -27410,7 +27401,7 @@ msgstr "Hemen çalıştır"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:238
 msgctxt "pastespecial|extended_tip|cbImmediately"
 msgid "Check this option to run the preset immediately. Uncheck it to manipulate the options before clicking OK."
-msgstr "Ön ayarı hemen çalıştırmak için bu seçeneği işaretleyin.  Tamam'a tıklamadan önce seçenekleri değiştirmek için işaretini kaldırın."
+msgstr "Ön ayarı hemen çalıştırmak için bu seçeneği işaretleyin. Tamam'a tıklamadan önce seçenekleri değiştirmek için işaretini kaldırın."
 
 #. YD43i
 #: sc/uiconfig/scalc/ui/pastespecial.ui:254
@@ -27676,11 +27667,11 @@ msgctxt "pastespecial|label2"
 msgid "Operations"
 msgstr "İşlemler"
 
-#. ypkML
-#: sc/uiconfig/scalc/ui/pastespecial.ui:825
+#. cBodz
+#: sc/uiconfig/scalc/ui/pastespecial.ui:824
 msgctxt "pastespecial|extended_tip|PasteSpecial"
-msgid "Inserts the contents of the clipboard into the current file in a format that you can specify."
-msgstr "Pano içeriğini etkin belgeye belirlediğiniz biçem ile ekler."
+msgid "Inserts the contents of the clipboard into the current document in a format that you can specify."
+msgstr "Pano içeriğini, belirtebileceğiniz bir biçimde geçerli belgeye ekler."
 
 #. AqzPf
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:16
@@ -27698,7 +27689,7 @@ msgstr "_Seçenekler..."
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:41
 msgctxt "pivotfielddialog|extended_tip|options"
 msgid "Opens the Data Field Options dialog. The Options button is visible for filters and column or row fields only."
-msgstr "Veri Alanı Seçenekleri iletişim penceresini açar.  Seçenekler düğmesi, yalnızca filtreler ve sütun veya satır alanları için görünür."
+msgstr "Veri Alanı Seçenekleri iletişim penceresini açar. Seçenekler düğmesi, yalnızca filtreler ve sütun veya satır alanları için görünür."
 
 #. KBmND
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:133
@@ -28118,7 +28109,7 @@ msgstr "Özet tablosunun sonuçlarını görüntülemek istediğiniz alanı seç
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:845
 msgctxt "pivottablelayoutdialog|extended_tip|destination-button"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. LBRZw
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:860
@@ -28178,7 +28169,7 @@ msgstr "Kaynak ve Hedef"
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:1028
 msgctxt "pivottablelayoutdialog|extended_tip|more"
 msgid "Displays or hides additional options for defining the pivot table."
-msgstr "Özet tablo için ek seçenekleri görüntüler veya  gizler."
+msgstr "Özet tablo için ek seçenekleri görüntüler veya gizler."
 
 #. rSsEg
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:1054
@@ -28208,7 +28199,7 @@ msgstr "Pencereyi kapatır ve değişiklikleri göz ardı eder."
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:119
 msgctxt "printareasdialog|extended_tip|rbprintarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. 6nt5h
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:138
@@ -28298,7 +28289,7 @@ msgstr "Tüm sayfalarda bastırılması için bir veya daha fazla sütun seçin.
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:326
 msgctxt "printareasdialog|extended_tip|rbrepeatcol"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür. İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. bKSEJ
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:340
@@ -28564,11 +28555,11 @@ msgctxt "randomnumbergenerator|enable-rounding-check"
 msgid "Enable rounding"
 msgstr "Yuvarlamayı etkinleştir"
 
-#. 8n4v9
+#. 6cz4t
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:418
 msgctxt "randomnumbergenerator|extended_tip|enable-rounding-check"
-msgid "Truncate the number to a given number of Decimal Places."
-msgstr "Sayıyı verilen Ondalık Basamak sayısına kısalt."
+msgid "Round the number to a given number of Decimal Places."
+msgstr "Sayıyı belirli bir Ondalık Basamağa yuvarla."
 
 #. nRvWV
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:434
@@ -29284,38 +29275,26 @@ msgctxt "scgeneralpage|enter_paste_mode_cb"
 msgid "Press Enter to paste and clear clipboard"
 msgstr "Panoyu yapıştırmak ve temizlemek için Enter tuşuna basın"
 
-#. LFenu
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
-msgctxt "scgeneralpage|textfmtcb"
-msgid "Use printer metrics for text formatting"
-msgstr "Metni biçimlendirmek için yazıcının ölçü birimlerini kullan"
-
-#. ECUd7
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:385
-msgctxt "extended_tip|textfmtcb"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen."
-msgstr "Yazdırmada ve ekranda görüntü biçimledirmede uygulamak için yazıcı metriğini belirler."
-
 #. zW9SZ
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:397
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
 msgctxt "scgeneralpage|markhdrcb"
 msgid "Highlight sele_ction in column/row headers"
 msgstr "Sütun/satır üst bilgilerinde seçi_mi vurgula"
 
 #. payBv
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:405
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:386
 msgctxt "extended_tip|markhdrcb"
 msgid "Specifies whether to highlight column and row headers in the selected columns or rows."
 msgstr "Seçili satır veya sütunların başlıklarının vurgulanıp vurgulanmayacağını belirtir."
 
 #. KGWyE
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:417
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:398
 msgctxt "scgeneralpage|sortrefupdatecb"
 msgid "Update references when sorting range of cells"
 msgstr "Hücre aralığını sıralarken başvuruları güncelle"
 
 #. M9G8o
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:439
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:420
 msgctxt "scgeneralpage|label3"
 msgid "Input Settings"
 msgstr "Giriş Ayarları"
@@ -29450,7 +29429,7 @@ msgstr "Aralıklar"
 #: sc/uiconfig/scalc/ui/selectrange.ui:162
 msgctxt "selectrange|extended_tip|SelectRangeDialog"
 msgid "Selects a database range that you defined under Data - Define Range."
-msgstr " Veri - Aralık Tanımla yoluyla tanımlamış olduğunuz veritabanlarından bir veritabanı aralığı seçer."
+msgstr "Veri - Aralık Tanımla yoluyla tanımlamış olduğunuz veritabanlarından bir veritabanı aralığı seçer."
 
 #. EzRBz
 #: sc/uiconfig/scalc/ui/selectsource.ui:8
@@ -29651,19 +29630,19 @@ msgid "Note: Changes to formatting attributes like fonts, colors, and number for
 msgstr "Not: Biçimlendirme öznitelikleri olan yazı tipleri, renkler ve sayı biçimlerindeki değişiklikler kaydedilmeyecektir ve grafik ve çizim nesneleri gibi bazı işlevlerde paylaştırılmış kipte kullanılamayacaktır. Bu özelliklerinden birinde değişiklik yapabilmek için paylaştırılmış kip kapatılmalıdır."
 
 #. dQz77
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:187
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:190
 msgctxt "sharedocumentdlg|name"
 msgid "Name"
 msgstr "Ad"
 
 #. EC8AA
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:200
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:203
 msgctxt "sharedocumentdlg|accessed"
 msgid "Accessed"
 msgstr "Erişim"
 
 #. hHHJG
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:224
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:227
 msgctxt "sharedocumentdlg|label1"
 msgid "Users Currently Accessing This Spreadsheet"
 msgstr "Bu Hesap Tablosuna Halen Erişen Kullanıcılar"
@@ -29750,7 +29729,7 @@ msgstr "Satır ve sütun başlıklarının basılıp basılmayacağını belirle
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:255
 msgctxt "sheetprintpage|checkBTN_GRID"
 msgid "_Grid"
-msgstr "Izgara"
+msgstr "_Izgara"
 
 #. V7t5z
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:263
@@ -29896,17 +29875,17 @@ msgctxt "sheetprintpage|comboLB_SCALEMODE"
 msgid "Reduce/enlarge printout"
 msgstr "Küçültülmüş/büyültülmüş çıktı"
 
-#. GxZyi
+#. i7BEB
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:645
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) to width/height"
-msgstr "Çıktı aralığını genişliğe/yüksekliğe göre uydur"
+msgid "Shrink print range(s) to width/height"
+msgstr "Yazdırma aralığını/aralıklarını genişliğe/yüksekliğe uydur"
 
-#. Y2GhT
+#. KzA6v
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:646
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) on number of pages"
-msgstr "Yazdırma aralığını/aralıklarını sayfa sayısına uydur"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Sayfa sayısına göre baskı aralığını/aralıklarını uydur"
 
 #. AzkrF
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:650
@@ -30017,97 +29996,97 @@ msgid "Displays a list of all hidden sheets in your spreadsheet document."
 msgstr "Hesap tablosu belgenizdeki tüm gizlenmiş sayfaları listeler."
 
 #. ktHTz
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:52
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:53
 msgctxt "sidebaralignment|horizontalalignment|tooltip_text"
 msgid "Horizontal Alignment"
 msgstr "Yatay Hizalama"
 
 #. U8BWH
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:109
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:114
 msgctxt "sidebaralignment|verticalalignment|tooltip_text"
 msgid "Vertical Alignment"
 msgstr "Dikey Hizalama"
 
-#. etrVi
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:237
-msgctxt "sidebaralignment|leftindent|tooltip_text"
-msgid "Indents from the left edge."
-msgstr "Sol kenardan girintilenir."
-
 #. qtoY5
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:266
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:243
 msgctxt "sidebaralignment|orientationlabel"
 msgid "Text _orientation:"
 msgstr "Metin _yönü:"
 
 #. Ume2A
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:281
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:257
 msgctxt "sidebaralignment|orientationdegrees|tooltip_text"
 msgid "Select the angle for rotation."
 msgstr "Döndürme açısını seçin."
 
 #. KEG9k
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:308
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:270
 msgctxt "sidebaralignment|stacked"
 msgid "Vertically stacked"
 msgstr "Dikey yığılmış"
 
 #. ZE4wU
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:336
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:295
 msgctxt "sidebaralignment|bottom|tooltip_text"
 msgid "Text Extension From Lower Cell Border"
 msgstr "Hücre Alt Kenarından Metin Genişlemesi"
 
 #. CgVBh
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:312
 msgctxt "sidebaralignment|top|tooltip_text"
 msgid "Text Extension From Upper Cell Border"
 msgstr "Hücre Üst Kenarından Metin Genişlemesi"
 
 #. TSALx
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:329
 msgctxt "sidebaralignment|standard|tooltip_text"
 msgid "Text Extension Inside Cell"
 msgstr "Hücre İçinde Metin Genişlemesi"
 
 #. xruhe
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:349
 msgctxt "sidebaralignment|wraptext"
 msgid "Wrap text"
 msgstr "Metni kaydır"
 
 #. uTKvq
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:402
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
 msgctxt "sidebaralignment|wraptext|tooltip_text"
 msgid "Wrap texts automatically."
 msgstr "Metni otomatik olarak kaydır."
 
 #. Ae65n
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:415
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:366
 msgctxt "sidebaralignment|mergecells"
 msgid "Merge cells"
 msgstr "Hücreleri birleştir"
 
 #. NK2BS
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:419
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
 msgctxt "sidebaralignment|mergecells|tooltip_text"
 msgid "Joins the selected cells into one."
 msgstr "Seçilen hücreleri birleştirip tek bir hücre haline getirir."
 
+#. etrVi
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:385
+msgctxt "sidebaralignment|leftindent|tooltip_text"
+msgid "Indents from the left edge."
+msgstr "Sol kenardan girintilenir."
+
 #. FdKBk
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:433
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
 msgctxt "sidebaralignment|leftindentlabel"
 msgid "_Indent:"
 msgstr "_Girinti:"
 
 #. BBGFK
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:23
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:22
 msgctxt "sidebarcellappearance|cellbackgroundlabel"
 msgid "_Background:"
 msgstr "_Arkaplan:"
 
 #. bjHWc
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:37
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:36
 msgctxt "sidebarcellappearance|cellbackgroundcolor|tooltip_text"
 msgid "Select the background color of the selected cells."
 msgstr "Seçilen hücrelerin arkaplan rengini seçin."
@@ -30119,199 +30098,199 @@ msgid "Select the background color of the selected cells."
 msgstr "Seçilen hücrelerin arkaplan rengini seçin."
 
 #. DKEkN
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:71
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:72
 msgctxt "sidebarcellappearance|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Seçilen hücrelerin kenarlıklarını belirleyin."
 
 #. D2TVi
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:92
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:93
 msgctxt "sidebarcellappearance|borderlinecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Kenarlıkların çizgi rengini seçin."
 
 #. GqfZD
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:101
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:103
 msgctxt "sidebarcellappearance|linecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Kenarlıkların çizgi rengini seçin."
 
 #. 8AUBs
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:111
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:113
 msgctxt "sidebarcellappearance|borderlinecolor-atkobject"
 msgid "Border Line Color"
 msgstr "Kenarlık Çizgisi Rengi"
 
 #. VgXDF
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:132
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:135
 msgctxt "sidebarcellappearance|linestyle|tooltip_text"
 msgid "Select the line style of the borders."
 msgstr "Kenarlıkların çizgi biçemini seçin."
 
 #. jaxhA
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:142
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:145
 msgctxt "sidebarcellappearance|borderlinestyle-atkobject"
 msgid "Border Line Style"
 msgstr "Kenarlık Çizgisi Biçemi"
 
 #. CNqCC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:71
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
 msgctxt "sidebarnumberformat|numberformatcombobox|tooltip_text"
 msgid "Select a category of contents."
 msgstr "Bir içerik kategorisi seçin."
 
 #. EeECn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:75
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:85
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "General"
 msgstr "Genel"
 
 #. SmpsG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:76
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:86
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Number"
 msgstr "Sayı"
 
 #. 8FGeM
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:77
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:87
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Percent"
 msgstr "Yüzde"
 
 #. bHC79
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:78
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Currency"
 msgstr "Para birimi"
 
 #. Lh2G6
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:79
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:89
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Date "
 msgstr "Tarih "
 
 #. EUCxB
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:80
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:90
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Time"
 msgstr "Saat"
 
 #. EukSF
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:91
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Scientific"
 msgstr "Bilimsel"
 
 #. AQV5y
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:82
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:92
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Fraction"
 msgstr "Kesir"
 
 #. kQGBu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:83
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:93
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Boolean Value"
 msgstr "Mantıksal Değer"
 
 #. Gv2sX
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:84
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:94
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Text"
 msgstr "Metin"
 
 #. ypKG8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:98
 msgctxt "sidebarnumberformat|numberformatcombobox-atkobject"
 msgid "Category"
 msgstr "Kategori"
 
 #. FqFzG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:120
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:117
 msgctxt "sidebarnumberformat|decimalplaceslabel"
 msgid "_Decimal places:"
 msgstr "_Ondalık basamaklar:"
 
 #. xen2B
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:134
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:131
 msgctxt "sidebarnumberformat|denominatorplaceslabel"
 msgid "Den_ominator places:"
 msgstr "Payda k_onumları:"
 
 #. cdFDC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:162
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:158
 msgctxt "sidebarnumberformat|denominatorplaces|tooltip_text"
 msgid "Enter the number of places for the denominator that you want to display."
 msgstr "Payda için görüntülemek istediğiniz konum sayısını girin."
 
 #. ySDGH
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:167
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:163
 msgctxt "sidebarnumberformat|denominatorplaces-atkobject"
 msgid "Denominator Places"
 msgstr "Payda Konumları"
 
 #. EaLbU
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:181
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:177
 msgctxt "sidebarnumberformat|decimalplaces|tooltip_text"
 msgid "Enter the number of decimal places that you want to display."
 msgstr "Göstermek istediğiniz ondalık hane sayısını giriniz."
 
 #. 5tvJA
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:186
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:182
 msgctxt "sidebarnumberformat|decimalplaces-atkobject"
 msgid "Decimal Places"
 msgstr "Ondalık Basamaklar"
 
 #. 4h3mG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:219
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:202
 msgctxt "sidebarnumberformat|leadingzeroeslabel"
 msgid "Leading _zeroes:"
 msgstr "Virgül öncesi _sıfır sayısı:"
 
 #. 35pSE
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:234
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:215
 msgctxt "sidebarnumberformat|leadingzeroes|tooltip_text"
 msgid "Enter the maximum number of zeroes to display before the decimal point."
 msgstr "Ondalık haneden önce gösterilecek azami sıfır sayısını giriniz."
 
 #. UFTBa
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:240
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:221
 msgctxt "sidebarnumberformat|leadingzeroes-atkobject"
 msgid "Leading Zeroes"
 msgstr "Önde Gelen Sıfırlar"
 
 #. jkDKD
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:259
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:232
 msgctxt "sidebarnumberformat|negativenumbersred"
 msgid "_Negative numbers in red"
 msgstr "_Negatif sayılar kırmızı"
 
 #. apRL8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:263
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:236
 msgctxt "sidebarnumberformat|negativenumbersred|tooltip_text"
 msgid "Changes the font color of negative numbers to red."
-msgstr "Negatif sayıların yazıtipi rengini kırmızı ile değiştirir."
+msgstr "Negatif sayıların yazı tipi rengini kırmızı ile değiştirir."
 
 #. BJ9Gy
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:275
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:249
 msgctxt "sidebarnumberformat|thousandseparator"
 msgid "_Thousands separator"
 msgstr "_Binlik ayracı"
 
 #. ykEWn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:279
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:253
 msgctxt "sidebarnumberformat|thousandseparator|tooltip_text"
 msgid "Inserts a separator between thousands."
 msgstr "Binlikler arasına bir ayıraç ekler."
 
 #. pGpRu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:291
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:266
 msgctxt "sidebarnumberformat|engineeringnotation"
 msgid "_Engineering notation"
 msgstr "_Mühendislik yazımı"
 
 #. 9CEjC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:294
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:269
 msgctxt "sidebarnumberformat|engineeringnotation|tooltip_text"
 msgid "Ensures that exponent is a multiple of 3."
 msgstr "Kuvvetin 3'ün katı olduğundan emin olur."
@@ -30344,7 +30323,7 @@ msgstr "Çözümleyici"
 #: sc/uiconfig/scalc/ui/solverdlg.ui:39
 msgctxt "solverdlg|resetall"
 msgid "_Reset All"
-msgstr "Temi_zle"
+msgstr "Tümünü _Sıfırla"
 
 #. bz78K
 #: sc/uiconfig/scalc/ui/solverdlg.ui:53
@@ -30352,11 +30331,11 @@ msgctxt "solverdlg|options"
 msgid "O_ptions..."
 msgstr "S_eçenekler..."
 
-#. UABF3
+#. 8BGxk
 #: sc/uiconfig/scalc/ui/solverdlg.ui:60
 msgctxt "solverdlg|extended_tip|options"
-msgid "Opens the Solver Options dialog."
-msgstr "Çözücü Seçenekleri iletişim penceresini açar."
+msgid "Opens the solver’s Options dialog."
+msgstr "Çözücü'nün Seçenekler iletişim penceresini açar."
 
 #. 8hMNV
 #: sc/uiconfig/scalc/ui/solverdlg.ui:72
@@ -30791,25 +30770,25 @@ msgid "Left to right (sort columns)"
 msgstr "Soldan sağa (sütunları sırala)"
 
 #. vTci8
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:112
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:111
 msgctxt "sortcriteriapage|lbDirection"
 msgid "Direction:"
 msgstr "Yön:"
 
 #. 6YQSB
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:122
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:121
 msgctxt "sortcriteriapage|header"
 msgid "Range contains..."
 msgstr "Aralık şunları içerir..."
 
 #. E9DMu
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:138
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:137
 msgctxt "sortcriteriapage|lbHeader"
 msgid "Headers:"
 msgstr "Üst Bilgiler:"
 
 #. 5oaCb
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:155
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:154
 msgctxt "sortcriteriapage|lbOptions"
 msgid "Sort Options"
 msgstr "Sıralama Seçenekleri"
@@ -31115,181 +31094,181 @@ msgid "Series:"
 msgstr "Seriler:"
 
 #. wBmc6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:283
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:285
 msgctxt "SparklineDialog|checkButton_Negative"
 msgid "Negative points:"
 msgstr "Negatif noktalar:"
 
 #. ySwZA
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:319
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:323
 msgctxt "SparklineDialog|checkButton_High"
 msgid "High points:"
 msgstr "Yüksek noktalar:"
 
 #. DJKw7
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:355
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:361
 msgctxt "SparklineDialog|checkButton_Low"
 msgid "Low points:"
 msgstr "Düşük noktalar:"
 
 #. q5qaV
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:391
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:399
 msgctxt "SparklineDialog|checkButton_Marker"
 msgid "Marker:"
 msgstr "İşaretleyici:"
 
 #. 4yLTi
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:427
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:437
 msgctxt "SparklineDialog|checkButton_First"
 msgid "First point:"
 msgstr "İlk nokta:"
 
 #. EYEEJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:463
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:475
 msgctxt "SparklineDialog|checkButton_Last"
 msgid "Last point:"
 msgstr "Son nokta:"
 
 #. mP9Uy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:503
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:517
 msgctxt "SparklineDialog|label_Colors"
 msgid "Colors"
 msgstr "Renkler"
 
 #. a9F7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:537
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:551
 msgctxt "SparklineDialog|label_LineWidth"
 msgid "Line width:"
 msgstr "Çizgi genişliği:"
 
 #. ofAyv
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:552
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:566
 msgctxt "SparklineDialog|spinButton_LineWidth"
 msgid "1,00"
 msgstr "1,00"
 
 #. 4ciyB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:570
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:584
 msgctxt "SparklineDialog|label_DisplayEmptyCellsAs"
 msgid "Display empty cells as:"
 msgstr "Boş hücreleri şu şekilde göster:"
 
 #. K3oCB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:585
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:599
 msgctxt "SparklineDialog|optionEmpty_Gap"
 msgid "Gap"
 msgstr "Boşluk"
 
 #. fzBds
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:586
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:600
 msgctxt "SparklineDialog|optionEmpty_Zero"
 msgid "Zero"
 msgstr "Sıfır"
 
 #. tGCDf
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:587
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:601
 msgctxt "SparklineDialog|optionEmpty_Span"
 msgid "Span"
 msgstr "Açıklık"
 
 #. fkB5s
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:597
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:611
 msgctxt "SparklineDialog|checkButton_Hidden"
 msgid "Display hidden"
 msgstr "Gizliyi göster"
 
 #. gxx8E
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:612
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:626
 msgctxt "SparklineDialog|checkButton_RTL"
 msgid "Right-to-left"
 msgstr "Sağdan sola"
 
 #. GJfmJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:631
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
 msgctxt "SparklineDialog|optionType_Line"
 msgid "Line"
 msgstr "Çizgi"
 
 #. 2ZDbw
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:632
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:646
 msgctxt "SparklineDialog|optionType_Column"
 msgid "Column"
 msgstr "Sütun"
 
 #. UirXW
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:633
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:647
 msgctxt "SparklineDialog|optionType_Stacked"
 msgid "Stacked"
 msgstr "Yığın"
 
 #. zmCsJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:659
 msgctxt "SparklineDialog|label_Type"
 msgid "Type:"
 msgstr "Tür:"
 
 #. o8rnM
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:661
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:675
 msgctxt "SparklineDialog|label_Properties"
 msgid "Properties"
 msgstr "Özellikler"
 
 #. uQaJH
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:694
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:708
 msgctxt "SparklineDialog|option_MinAxis_Individual"
 msgid "Individual"
 msgstr "Bireysel"
 
 #. BCX7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:695
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:709
 msgctxt "SparklineDialog|option_MinAxis_Group"
 msgid "Group"
 msgstr "Grupla"
 
 #. SubB5
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:696
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:710
 msgctxt "SparklineDialog|option_MinAxis_Custom"
 msgid "Custom"
 msgstr "Özel"
 
 #. T8Arr
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:724
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:738
 msgctxt "SparklineDialog|option_MaxAxis_Individual"
 msgid "Individual"
 msgstr "Bireysel"
 
 #. DDfCP
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:725
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:739
 msgctxt "SparklineDialog|option_MaxAxis_Group"
 msgid "Group"
 msgstr "Grupla"
 
 #. C2Huq
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:726
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:740
 msgctxt "SparklineDialog|option_MaxAxis_Custom"
 msgid "Custom"
 msgstr "Özel"
 
-#. JFSoc
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:753
+#. kiBE8
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:767
 msgctxt "SparklineDialog|label_AxisMaximum"
-msgid "Vertical maximum"
-msgstr "Dikey azami"
+msgid "Vertical maximum:"
+msgstr "Dikey azami:"
 
 #. MEvJy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:768
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:782
 msgctxt "SparklineDialog|label_AxisMinimum"
 msgid "Vertical minimum:"
 msgstr "Dikey asgari:"
 
 #. EMPn4
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:780
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:794
 msgctxt "SparklineDialog|checkBox_DisplayX"
 msgid "Display X axis"
 msgstr "X eksenini göster"
 
 #. uAAF6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:800
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:814
 msgctxt "SparklineDialog|label_Axes"
 msgid "Axes"
 msgstr "Eksenler"
@@ -31582,14 +31561,14 @@ msgctxt "standardfilterdialog|cond"
 msgid "Does not end with"
 msgstr "İle bitmeyen"
 
-#. XCG8Q
+#. 3PahC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:433
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:472
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:511
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:550
 msgctxt "standardfilterdialog|cond"
-msgid "Text color"
-msgstr "Metin rengi"
+msgid "Font color"
+msgstr "Yazı tipi rengi"
 
 #. 5Wa7m
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:434
@@ -31760,7 +31739,7 @@ msgstr "Süzgeç ölçütlerini _koru"
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1067
 msgctxt "standardfilterdialog|extended_tip|destpers"
 msgid "Select the Copy results to check box, and then specify the destination range where you want to display the filtered data. If this box is checked, the destination range remains linked to the source range. You must have defined the source range under Data - Define range as a database range."
-msgstr " Sonuçları Kopyala onay kutusunu işaretleyerek, süzülmüş verinin kopyalanacağı hedef aralığını belirleyin. Bu onay kutusu işaretli ise hedef aralığı kaynak aralığına bağlı kalır. Veri - Aralık tanımla yoluyla kaynak aralığını bir veritabanı alanı olarak belirlemelisiniz."
+msgstr "Sonuçları Kopyala onay kutusunu işaretleyerek, süzülmüş verinin kopyalanacağı hedef aralığını belirleyin. Bu onay kutusu işaretli ise hedef aralığı kaynak aralığına bağlı kalır. Veri - Aralık tanımla yoluyla kaynak aralığını bir veritabanı alanı olarak belirlemelisiniz."
 
 #. StG9B
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1099
@@ -31790,7 +31769,7 @@ msgstr "Onay kutusunu seçin, ve süzülmüş verinin gösterilmesini istediğin
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1142
 msgctxt "standardfilterdialog|extended_tip|rbcopyarea"
 msgid "Click the Shrink icon to reduce the dialog to the size of the input field. It is then easier to mark the required reference in the sheet. The icons then automatically convert to the Maximize icon. Click it to restore the dialog to its original size."
-msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın.  Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır.  Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
+msgstr "İletişim penceresini giriş alanı boyutuna küçültmek için Küçült simgesine tıklayın. Bu durumda, gerekli referansı sayfada işaretlemek daha kolaydır. Simgeler daha sonra otomatik olarak Ekranı Kapla simgesine dönüşür.  İletişim penceresini özgün boyutuna geri yüklemek için tıklayın."
 
 #. 4PyDb
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1167
@@ -31982,7 +31961,7 @@ msgstr "_Artan"
 #: sc/uiconfig/scalc/ui/subtotaloptionspage.ui:137
 msgctxt "subtotaloptionspage|extended_tip|ascending"
 msgid "Sorts beginning with the lowest value. You can define the sort rules on Data - Sort - Options."
-msgstr "En düşük değerden başlayarak sıralar.  Sıralama kurallarını Veri - Sırala - Seçenekler'den tanımlayabilirsiniz."
+msgstr "En düşük değerden başlayarak sıralar. Sıralama kurallarını Veri - Sırala - Seçenekler'den tanımlayabilirsiniz."
 
 #. maa6m
 #: sc/uiconfig/scalc/ui/subtotaloptionspage.ui:148
@@ -31994,7 +31973,7 @@ msgstr "A_zalan"
 #: sc/uiconfig/scalc/ui/subtotaloptionspage.ui:158
 msgctxt "subtotaloptionspage|extended_tip|descending"
 msgid "Sorts beginning with the highest value. You can define the sort rules on Data - Sort - Options."
-msgstr "En yüksek değerden başlayarak sıralar.  Sıralama kurallarını Veri - Sırala - Seçenekler'den tanımlayabilirsiniz."
+msgstr "En yüksek değerden başlayarak sıralar. Sıralama kurallarını Veri - Sırala - Seçenekler'den tanımlayabilirsiniz."
 
 #. EGqiq
 #: sc/uiconfig/scalc/ui/subtotaloptionspage.ui:169
@@ -32072,7 +32051,7 @@ msgstr "K_arakter kümesi:"
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:133
 msgctxt "textimportcsv|textlanguage"
 msgid "_Locale:"
-msgstr ""
+msgstr "_Konum:"
 
 #. GAQTV
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:147
@@ -32366,7 +32345,7 @@ msgstr "Otomatik"
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:148
 msgctxt "textimportoptions|label2"
 msgid "Select the Locale to Use for Import"
-msgstr ""
+msgstr "İçe Aktarma için Kullanılacak Yerel Ayarı Seçin"
 
 #. iRYr7
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:169
@@ -32657,127 +32636,127 @@ msgid "Specifies when grid lines will be displayed. Default is to display grid l
 msgstr "Izgara çizgilerinin ne zaman görüntüleneceğini belirler. Sadece arkaplan rengi olmayan hücrelerde ızgara çizgileri gösterilmesi varsayılan seçenektir. Ayrıca, arkaplan rengi olan hücrelerde ızgara çizgilerinin gösterilmesini veya saklanmasını seçebilirsiniz."
 
 #. yajBD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:468
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:469
 msgctxt "extended_tip|color"
 msgid "Specifies a color for the grid lines in the current document."
 msgstr "Mevcut belgedeki ızgara çizgilerinin rengini belirler."
 
 #. BpEmt
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:482
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:483
 msgctxt "tpviewpage|labelCursor"
 msgid "Pointe_r:"
 msgstr "İşa_retçi:"
 
 #. AmbjZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:494
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:495
 msgctxt "tpviewpage|radiobuttonThemed"
 msgid "T_hemed"
 msgstr "T_emalı"
 
 #. xQTDE
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:498
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:499
 msgctxt "tpviewpage|radiobuttonThemedTip"
 msgid "Show the pointer as defined in the icon theme, typically as fat cross."
 msgstr "İşaretçiyi simge temasında tanımlandığı gibi, tipik olarak kalın çarpı şeklinde gösterin."
 
 #. 3HxpG
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:510
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:511
 msgctxt "tpviewpage|radiobuttonSystem"
 msgid "S_ystem"
 msgstr "S_istem"
 
 #. weVdC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:514
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:515
 msgctxt "tpviewpage|radiobuttonSystemTip"
 msgid "Show the pointer as system default, typically an arrow pointer."
 msgstr "İşaretçiyi, genellikle bir ok işaretçisi olan sistem varsayılanı olarak gösterin."
 
 #. Cb4AM
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:530
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:531
 msgctxt "tpviewpage|label1"
 msgid "Visual Aids"
 msgstr "Görsel Yardımlar"
 
 #. Qd5Rp
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:561
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:562
 msgctxt "tpviewpage|objgrf_label"
 msgid "Ob_jects/Images:"
 msgstr "Nes_neler/Resimler:"
 
 #. vLBFR
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:575
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:576
 msgctxt "tpviewpage|diagram_label"
 msgid "Char_ts:"
 msgstr "G_rafikler:"
 
 #. q544D
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:589
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:590
 msgctxt "tpviewpage|draw_label"
 msgid "_Drawing objects:"
 msgstr "_Çizim nesneleri:"
 
 #. mpELg
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:604
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
 msgctxt "tpviewpage|objgrf"
 msgid "Show"
 msgstr "Göster"
 
 #. Kx6yJ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:606
 msgctxt "tpviewpage|objgrf"
 msgid "Hide"
 msgstr "Gizle"
 
 #. oKpbX
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:609
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:610
 msgctxt "extended_tip|objgrf"
 msgid "Defines if objects and graphics are shown or hidden."
 msgstr "Nesneler ve grafikler gizlenecek mi yoksa gösterilecek mi tanımlar."
 
 #. wFBeZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:623
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
 msgctxt "tpviewpage|diagram"
 msgid "Show"
 msgstr "Göster"
 
 #. H7MAB
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:625
 msgctxt "tpviewpage|diagram"
 msgid "Hide"
 msgstr "Gizle"
 
 #. oVE9C
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:628
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:629
 msgctxt "extended_tip|diagram"
 msgid "Defines if charts in your document are shown or hidden."
 msgstr "Belgenizdeki çizelgeler gösterilecek mi gizlenecek mi kararını verir."
 
 #. YaiTQ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:642
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
 msgctxt "tpviewpage|draw"
 msgid "Show"
 msgstr "Göster"
 
 #. DST5a
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:644
 msgctxt "tpviewpage|draw"
 msgid "Hide"
 msgstr "Gizle"
 
 #. FDGKD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:647
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:648
 msgctxt "extended_tip|draw"
 msgid "Defines if drawing objects in your document are shown or hidden."
 msgstr "Belgenizdeki çizim nesnelerinin gösterilmesini veya gizlenmesini tanımlar."
 
 #. E6GxC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:662
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:663
 msgctxt "tpviewpage|label2"
 msgid "Objects"
 msgstr "Nesneler"
 
 #. AnHPF
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:686
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:687
 msgctxt "extended_tip|TpViewPage"
 msgid "Defines which elements of the Calc main window are displayed. You can also show or hide highlighting of values in tables."
 msgstr "Calc ana penceresinin hangi ögelerinin görüntüleneceğini tanımlar. Ayrıca tablolardaki değerlerin vurgulanmasını gösterebilir veya gizleyebilirsiniz."
@@ -32974,11 +32953,11 @@ msgctxt "validationcriteriapage|liststore2"
 msgid "invalid range"
 msgstr "geçersiz aralık"
 
-#. 89CdB
+#. 8udun
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:84
 msgctxt "validationcriteriapage|extended_tip|data"
-msgid "Select the comparative operator that you want to use."
-msgstr "Kullanmak istediğiniz karşılaştırma işleçlerini seçin."
+msgid "Select the comparison operator that you want to use."
+msgstr "Kullanmak istediğiniz karşılaştırma operatörünü seçin."
 
 #. RCFrD
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:97
@@ -33008,7 +32987,7 @@ msgstr "A_zami:"
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:205
 msgctxt "validationcriteriapage|allowempty"
 msgid "Allow _empty cells"
-msgstr "Boş hücrelere izin ver"
+msgstr "_Boş hücrelere izin ver"
 
 #. gMyAs
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:213
@@ -33047,13 +33026,13 @@ msgid "A valid source can only consist of a contiguous selection of rows and col
 msgstr "Geçerli bir kaynak sadece sütunlardan ve yakın seçilmiş satırlardan ya da bir alan veya diziyle sonuçlanan formüllerden oluşabilir."
 
 #. 9v4Ah
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:286
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:289
 msgctxt "validationcriteriapage|extended_tip|max"
 msgid "Enter the maximum value for the data validation option that you selected in the Allow box."
-msgstr "İzin ver  kutusunda veri geçerliliği için seçmiş olduğunuz seçeneğe göre, azami değeri girin."
+msgstr "İzin ver kutusunda veri geçerliliği için seçmiş olduğunuz seçeneğe göre, azami değeri girin."
 
 #. 3HjmP
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:309
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:312
 msgctxt "validationcriteriapage|extended_tip|ValidationCriteriaPage"
 msgid "Specify the validation rules for the selected cell(s)."
 msgstr "Seçilmiş hücre(ler)e geçerlilik kuraları tanımlayabilirsiniz."

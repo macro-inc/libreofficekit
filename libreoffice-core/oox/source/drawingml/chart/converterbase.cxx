@@ -31,8 +31,10 @@
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <osl/diagnose.h>
+#include <sal/log.hxx>
 #include <basegfx/numeric/ftools.hxx>
 #include <oox/core/xmlfilterbase.hxx>
+#include <oox/helper/helper.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
 
@@ -84,6 +86,11 @@ void TitleLayoutInfo::convertTitlePos( ConverterRoot const & rRoot, const Refere
     {
         // try to get the title shape
         Reference< XShape > xTitleShape = mpGetShape( rxChart1Doc );
+        if (!xTitleShape)
+        {
+            SAL_WARN("oox", "failed to get a TitleShape");
+            return;
+        }
         // get title rotation angle, needed for correction of position of top-left edge
         double fAngle = 0.0;
         PropertySet aTitleProp( mxTitle );

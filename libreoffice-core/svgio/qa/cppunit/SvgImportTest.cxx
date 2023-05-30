@@ -13,13 +13,13 @@
 #include <test/xmltesttools.hxx>
 
 #include <comphelper/seqstream.hxx>
-#include <comphelper/sequence.hxx>
 
 #include <com/sun/star/graphic/SvgTools.hpp>
 #include <com/sun/star/graphic/XPrimitive2D.hpp>
 
 #include <drawinglayer/primitive2d/Tools.hxx>
 #include <drawinglayer/tools/primitive2dxmldump.hxx>
+#include <drawinglayer/primitive2d/Primitive2DContainer.hxx>
 
 #include <memory>
 #include <string_view>
@@ -37,88 +37,10 @@ using drawinglayer::primitive2d::Primitive2DReference;
 
 class Test : public test::BootstrapFixture, public XmlTestTools
 {
+protected:
     void checkRectPrimitive(Primitive2DSequence const & rPrimitive);
 
-    void testStyles();
-    void testSymbol();
-    void testTdf87309();
-    void testFontsizeKeywords();
-    void testFontsizePercentage();
-    void testFontsizeRelative();
-    void testTdf45771();
-    void testTdf97941();
-    void testTdf104339();
-    void testTdf85770();
-    void testTdf79163();
-    void testTdf97542_1();
-    void testTdf97542_2();
-    void testTdf97543();
-    void testRGBColor();
-    void testRGBAColor();
-    void testNoneColor();
-    void testTdf97936();
-    void testTdf149893();
-    void testShapeWithClipPathAndCssStyle();
-    void testClipPathAndParentStyle();
-    void testClipPathAndStyle();
-    void testClipPathUsingClipPath();
-    void testClipRule();
-    void testi125329();
-    void testMaskingPath07b();
-    void test123926();
-    void test47446();
-    void test47446b();
-    void testMaskText();
-    void testTdf99994();
-    void testTdf99115();
-    void testTdf101237();
-    void testTdf94765();
-    void testBehaviourWhenWidthAndHeightIsOrIsNotSet();
-    void testTdf97663();
-    void testTdf149880();
-
     Primitive2DSequence parseSvg(std::u16string_view aSource);
-
-public:
-    CPPUNIT_TEST_SUITE(Test);
-    CPPUNIT_TEST(testStyles);
-    CPPUNIT_TEST(testSymbol);
-    CPPUNIT_TEST(testTdf87309);
-    CPPUNIT_TEST(testFontsizeKeywords);
-    CPPUNIT_TEST(testFontsizePercentage);
-    CPPUNIT_TEST(testFontsizeRelative);
-    CPPUNIT_TEST(testTdf45771);
-    CPPUNIT_TEST(testTdf97941);
-    CPPUNIT_TEST(testTdf104339);
-    CPPUNIT_TEST(testTdf85770);
-    CPPUNIT_TEST(testTdf79163);
-    CPPUNIT_TEST(testTdf97542_1);
-    CPPUNIT_TEST(testTdf97542_2);
-    CPPUNIT_TEST(testTdf97543);
-    CPPUNIT_TEST(testRGBColor);
-    CPPUNIT_TEST(testRGBAColor);
-    CPPUNIT_TEST(testNoneColor);
-    CPPUNIT_TEST(testTdf97936);
-    CPPUNIT_TEST(testTdf149893);
-    CPPUNIT_TEST(testShapeWithClipPathAndCssStyle);
-    CPPUNIT_TEST(testClipPathAndParentStyle);
-    CPPUNIT_TEST(testClipPathAndStyle);
-    CPPUNIT_TEST(testClipPathUsingClipPath);
-    CPPUNIT_TEST(testClipRule);
-    CPPUNIT_TEST(testi125329);
-    CPPUNIT_TEST(testMaskingPath07b);
-    CPPUNIT_TEST(test123926);
-    CPPUNIT_TEST(test47446);
-    CPPUNIT_TEST(test47446b);
-    CPPUNIT_TEST(testMaskText);
-    CPPUNIT_TEST(testTdf99994);
-    CPPUNIT_TEST(testTdf99115);
-    CPPUNIT_TEST(testTdf101237);
-    CPPUNIT_TEST(testTdf94765);
-    CPPUNIT_TEST(testBehaviourWhenWidthAndHeightIsOrIsNotSet);
-    CPPUNIT_TEST(testTdf97663);
-    CPPUNIT_TEST(testTdf149880);
-    CPPUNIT_TEST_SUITE_END();
 };
 
 Primitive2DSequence Test::parseSvg(std::u16string_view aSource)
@@ -143,7 +65,7 @@ Primitive2DSequence Test::parseSvg(std::u16string_view aSource)
 void Test::checkRectPrimitive(Primitive2DSequence const & rPrimitive)
 {
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(rPrimitive));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(rPrimitive));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -163,14 +85,17 @@ void Test::checkRectPrimitive(Primitive2DSequence const & rPrimitive)
 bool arePrimitive2DSequencesEqual(const Primitive2DSequence& rA, const Primitive2DSequence& rB)
 {
     return std::equal(rA.begin(), rA.end(), rB.begin(), rB.end(),
-        [](const Primitive2DReference& a, const Primitive2DReference& b) {
-            return drawinglayer::primitive2d::arePrimitive2DReferencesEqual(a, b); });
+        [](const css::uno::Reference<css::graphic::XPrimitive2D>& a,
+           const css::uno::Reference<css::graphic::XPrimitive2D>& b)
+        {
+            return drawinglayer::primitive2d::arePrimitive2DReferencesEqual(a, b);
+        });
 }
 
 // Attributes for an object (like rect as in this case) can be defined
 // in different ways (directly with xml attributes, or with CSS styles),
 // however the end result should be the same.
-void Test::testStyles()
+CPPUNIT_TEST_FIXTURE(Test, testStyles)
 {
     Primitive2DSequence aSequenceRect = parseSvg(u"/svgio/qa/cppunit/data/Rect.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceRect.getLength()));
@@ -193,13 +118,13 @@ void Test::testStyles()
     CPPUNIT_ASSERT(arePrimitive2DSequencesEqual(aSequenceRect, aSequenceRectWithStylesByGroup));
 }
 
-void Test::testSymbol()
+CPPUNIT_TEST_FIXTURE(Test, testSymbol)
 {
     Primitive2DSequence aSequenceTdf87309 = parseSvg(u"/svgio/qa/cppunit/data/symbol.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf87309.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf87309));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf87309);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -210,13 +135,13 @@ void Test::testSymbol()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor", "color", "#00d000");
 }
 
-void Test::testTdf87309()
+CPPUNIT_TEST_FIXTURE(Test, testTdf87309)
 {
     Primitive2DSequence aSequenceTdf87309 = parseSvg(u"/svgio/qa/cppunit/data/tdf87309.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf87309.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf87309));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf87309);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -229,13 +154,13 @@ void Test::testTdf87309()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor/polypolygon", "maxy", "110");
 }
 
-void Test::testFontsizeKeywords()
+CPPUNIT_TEST_FIXTURE(Test, testFontsizeKeywords)
 {
     Primitive2DSequence aSequenceFontsizeKeywords = parseSvg(u"/svgio/qa/cppunit/data/FontsizeKeywords.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceFontsizeKeywords.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceFontsizeKeywords));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceFontsizeKeywords);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -291,14 +216,14 @@ void Test::testFontsizeKeywords()
 }
 
 
-void Test::testFontsizePercentage()
+CPPUNIT_TEST_FIXTURE(Test, testFontsizePercentage)
 {
     //Check when font-size uses percentage and defined globally
     Primitive2DSequence aSequenceFontsizePercentage = parseSvg(u"/svgio/qa/cppunit/data/FontsizePercentage.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceFontsizePercentage.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceFontsizePercentage));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceFontsizePercentage);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -308,14 +233,14 @@ void Test::testFontsizePercentage()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Times New Roman");
 }
 
-void Test::testFontsizeRelative()
+CPPUNIT_TEST_FIXTURE(Test, testFontsizeRelative)
 {
     //Check when font-size uses relative units (em,ex) and it's based on its parent's font-size
     Primitive2DSequence aSequenceFontsizeRelative = parseSvg(u"/svgio/qa/cppunit/data/FontsizeRelative.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceFontsizeRelative.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceFontsizeRelative));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceFontsizeRelative);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -330,14 +255,108 @@ void Test::testFontsizeRelative()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "familyname", "serif");
 }
 
-void Test::testTdf45771()
+CPPUNIT_TEST_FIXTURE(Test, testMarkerOrient)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/MarkerOrient.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy11", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy12", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy13", "7");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy21", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy22", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy23", "13");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy31", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy32", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]", "xy33", "1");
+
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy11", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy12", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy13", "87");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy21", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy22", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy23", "87");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy31", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy32", "0");
+    assertXPath(pDocument, "/primitive2D/transform/transform[2]", "xy33", "1");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testMarkerInPresentation)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/markerInPresentation.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/transform/polypolygonstroke/line", 1);
+    assertXPath(pDocument, "/primitive2D/transform/transform/polypolygonstroke/polypolygon/polygon", 1);
+    assertXPath(pDocument, "/primitive2D/transform/transform/polypolygonstroke/polypolygon/polygon", 1);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 0
+    // - Actual  : 2
+    assertXPath(pDocument, "/primitive2D/transform/transform/transform", 0);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testMarkerInCssStyle)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/markerInCssStyle.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 20
+    // - Actual  : 0
+    assertXPath(pDocument, "/primitive2D/transform/transform/polypolygonstroke/line", 20);
+
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]/polypolygonstroke/line", "color", "#008000");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]/polypolygonstroke/line", "width", "1");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]/polypolygonstroke/line", "linejoin", "Miter");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]/polypolygonstroke/line", "miterangle", "28");
+    assertXPath(pDocument, "/primitive2D/transform/transform[1]/polypolygonstroke/line", "linecap", "BUTT");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTextXmlSpace)
+{
+    //Check tspan fontsize when using relative units
+    Primitive2DSequence aSequenceTdf97941 = parseSvg(u"/svgio/qa/cppunit/data/textXmlSpace.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97941.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf97941);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[1]", "text", "a b");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[2]", "text", "a b");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[3]", "text", "a b");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[4]", "text", "ab");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[5]", "text", " a  b ");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[6]", "text", "a b");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[7]", "text", "a   b");
+    assertXPath(pDocument, "/primitive2D/transform/mask/textsimpleportion[8]", "text", "a b");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf45771)
 {
     //Check text fontsize when using relative units
     Primitive2DSequence aSequenceTdf45771 = parseSvg(u"/svgio/qa/cppunit/data/tdf45771.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf45771.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf45771));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf45771);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -347,14 +366,14 @@ void Test::testTdf45771()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Times New Roman");
 }
 
-void Test::testTdf97941()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97941)
 {
     //Check tspan fontsize when using relative units
     Primitive2DSequence aSequenceTdf97941 = parseSvg(u"/svgio/qa/cppunit/data/tdf97941.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97941.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf97941));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf97941);
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -364,25 +383,25 @@ void Test::testTdf97941()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Times New Roman");
 }
 
-void Test::testTdf104339()
+CPPUNIT_TEST_FIXTURE(Test, testTdf104339)
 {
     Primitive2DSequence aSequenceTdf104339 = parseSvg(u"/svgio/qa/cppunit/data/tdf104339.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf104339.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf104339));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequenceTdf104339);
 
     CPPUNIT_ASSERT (pDocument);
     assertXPath(pDocument, "/primitive2D/transform/transform/transform/transform/transform/polypolygoncolor", "color", "#000000");
 }
 
-void Test::testTdf85770()
+CPPUNIT_TEST_FIXTURE(Test, testTdf85770)
 {
     Primitive2DSequence aSequenceTdf85770 = parseSvg(u"/svgio/qa/cppunit/data/tdf85770.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf85770.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf85770));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf85770));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -391,7 +410,7 @@ void Test::testTdf85770()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "height", "11");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Times New Roman");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "fontcolor", "#000000");
-    assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "text", "Start ");
+    assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "text", "Start");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "height", "11");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "familyname", "Times New Roman");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[3]", "fontcolor", "#000000");
@@ -401,27 +420,27 @@ void Test::testTdf85770()
 
 }
 
-void Test::testTdf79163()
+CPPUNIT_TEST_FIXTURE(Test, testTdf79163)
 {
     //Check Opacity
     Primitive2DSequence aSequenceTdf79163 = parseSvg(u"/svgio/qa/cppunit/data/tdf79163.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf79163.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf79163));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf79163));
 
     CPPUNIT_ASSERT (pDocument);
 
     assertXPath(pDocument, "/primitive2D/transform/unifiedtransparence", "transparence", "50");
 }
 
-void Test::testTdf97542_1()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97542_1)
 {
     Primitive2DSequence aSequenceTdf97542_1 = parseSvg(u"/svgio/qa/cppunit/data/tdf97542_1.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97542_1.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf97542_1));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf97542_1));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -431,13 +450,13 @@ void Test::testTdf97542_1()
     assertXPath(pDocument, "/primitive2D/transform/objectinfo/textsimpleportion", "familyname", "serif");
 }
 
-void Test::testTdf97542_2()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97542_2)
 {
     Primitive2DSequence aSequenceTdf97542_2 = parseSvg(u"/svgio/qa/cppunit/data/tdf97542_2.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97542_2.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf97542_2));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf97542_2));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -450,14 +469,14 @@ void Test::testTdf97542_2()
     assertXPath(pDocument, "/primitive2D/transform/objectinfo/svgradialgradient", "opacity", "1");
 }
 
-void Test::testTdf97543()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97543)
 {
     // check visibility="inherit"
     Primitive2DSequence aSequenceTdf97543 = parseSvg(u"/svgio/qa/cppunit/data/tdf97543.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97543.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf97543));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf97543));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -470,13 +489,13 @@ void Test::testTdf97543()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor/polypolygon", "maxy", "110");
 }
 
-void Test::testRGBColor()
+CPPUNIT_TEST_FIXTURE(Test, testRGBColor)
 {
     Primitive2DSequence aSequenceRGBColor = parseSvg(u"/svgio/qa/cppunit/data/RGBColor.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceRGBColor.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceRGBColor));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceRGBColor));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -489,26 +508,26 @@ void Test::testRGBColor()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor/polypolygon", "maxy", "110");
 }
 
-void Test::testRGBAColor()
+CPPUNIT_TEST_FIXTURE(Test, testRGBAColor)
 {
     Primitive2DSequence aSequenceRGBAColor = parseSvg(u"/svgio/qa/cppunit/data/RGBAColor.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceRGBAColor.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceRGBAColor));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceRGBAColor));
 
     CPPUNIT_ASSERT (pDocument);
 
     assertXPath(pDocument, "/primitive2D/transform/unifiedtransparence", "transparence", "50");
 }
 
-void Test::testNoneColor()
+CPPUNIT_TEST_FIXTURE(Test, testNoneColor)
 {
     Primitive2DSequence aSequenceRGBAColor = parseSvg(u"/svgio/qa/cppunit/data/noneColor.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceRGBAColor.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceRGBAColor));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceRGBAColor));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -518,14 +537,14 @@ void Test::testNoneColor()
     assertXPath(pDocument, "/primitive2D/transform/mask/polypolygonstroke/line", "width", "3");
 }
 
-void Test::testTdf97936()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97936)
 {
     // check that both rectangles are rendered in the viewBox
     Primitive2DSequence aSequenceTdf97936 = parseSvg(u"/svgio/qa/cppunit/data/tdf97936.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf97936.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf97936));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf97936));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -545,13 +564,13 @@ void Test::testTdf97936()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor[2]/polypolygon", "maxy", "100");
 }
 
-void Test::testTdf149893()
+CPPUNIT_TEST_FIXTURE(Test, testTdf149893)
 {
     Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/tdf149893.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequence));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -561,14 +580,14 @@ void Test::testTdf149893()
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor", "color", "#008000");
 }
 
-void Test::testShapeWithClipPathAndCssStyle()
+CPPUNIT_TEST_FIXTURE(Test, testShapeWithClipPathAndCssStyle)
 {
     // tdf#97539: Check there is a mask and 3 polygons
     Primitive2DSequence aSequenceClipPathAndStyle = parseSvg(u"/svgio/qa/cppunit/data/ShapeWithClipPathAndCssStyle.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceClipPathAndStyle.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceClipPathAndStyle));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceClipPathAndStyle));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -576,7 +595,7 @@ void Test::testShapeWithClipPathAndCssStyle()
     assertXPath(pDocument, "/primitive2D/transform/mask/polypolygoncolor/polypolygon/polygon", 1);
 }
 
-void Test::testClipPathAndParentStyle()
+CPPUNIT_TEST_FIXTURE(Test, testClipPathAndParentStyle)
 {
     //Check that fill color, stroke color and stroke-width are inherited from use element
     //when the element is within a clipPath element
@@ -584,7 +603,7 @@ void Test::testClipPathAndParentStyle()
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceClipPathAndParentStyle.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceClipPathAndParentStyle));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceClipPathAndParentStyle));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -594,7 +613,7 @@ void Test::testClipPathAndParentStyle()
 
 }
 
-void Test::testClipPathAndStyle()
+CPPUNIT_TEST_FIXTURE(Test, testClipPathAndStyle)
 {
     //Check that fill color, stroke color and stroke-width are inherited from use element
     //when the element is within a clipPath element
@@ -602,7 +621,7 @@ void Test::testClipPathAndStyle()
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceClipPathAndStyle.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceClipPathAndStyle));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceClipPathAndStyle));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -612,13 +631,28 @@ void Test::testClipPathAndStyle()
 
 }
 
-void Test::testClipPathUsingClipPath()
+CPPUNIT_TEST_FIXTURE(Test, testShapeWithClipPath)
+{
+    // Check there is a mask and 3 polygons
+    Primitive2DSequence aSequenceClipPathAndStyle = parseSvg(u"/svgio/qa/cppunit/data/ShapeWithClipPath.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceClipPathAndStyle.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceClipPathAndStyle));
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/mask/polypolygon/polygon", 2);
+    assertXPath(pDocument, "/primitive2D/transform/mask/polypolygoncolor/polypolygon/polygon", 1);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testClipPathUsingClipPath)
 {
     Primitive2DSequence aSequenceClipPathAndStyle = parseSvg(u"/svgio/qa/cppunit/data/ClipPathUsingClipPath.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceClipPathAndStyle.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceClipPathAndStyle));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceClipPathAndStyle));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -626,13 +660,29 @@ void Test::testClipPathUsingClipPath()
     assertXPath(pDocument, "/primitive2D/transform/mask/mask/polypolygon/polygon/point", 13);
 }
 
-void Test::testClipRule()
+CPPUNIT_TEST_FIXTURE(Test, testFillRule)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/FillRule.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor", "color", "#000000");
+    assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor/polypolygon/polygon", 2);
+    assertXPath(pDocument, "/primitive2D/transform/polypolygonstroke/line", "color", "#ff0000");
+    assertXPath(pDocument, "/primitive2D/transform/polypolygonstroke/polypolygon/polygon", 2);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testClipRule)
 {
     Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/ClipRule.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequence));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -648,14 +698,14 @@ void Test::testClipRule()
     assertXPath(pDocument, "/primitive2D/transform/mask[2]/polypolygoncolor/polypolygon/polygon/point", 5);
 }
 
-void Test::testi125329()
+CPPUNIT_TEST_FIXTURE(Test, testi125329)
 {
     //Check style inherit from * css element
     Primitive2DSequence aSequencei125329 = parseSvg(u"/svgio/qa/cppunit/data/i125329.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequencei125329.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequencei125329));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequencei125329));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -670,7 +720,7 @@ void Test::testi125329()
     assertXPath(pDocument, "/primitive2D/transform/transform/objectinfo/polypolygonstroke/line", "width", "1"); // rect stroke width
 }
 
-void Test::testMaskingPath07b()
+CPPUNIT_TEST_FIXTURE(Test, testMaskingPath07b)
 {
     //For the time being, check that masking-path-07-b.svg can be imported and it doesn't hang on loading
     //it used to hang after d5649ae7b76278cb3155f951d6327157c7c92b65
@@ -678,33 +728,33 @@ void Test::testMaskingPath07b()
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceMaskingPath07b.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceMaskingPath07b));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceMaskingPath07b));
 
     CPPUNIT_ASSERT (pDocument);
 
 }
 
-void Test::test123926()
+CPPUNIT_TEST_FIXTURE(Test, test123926)
 {
     Primitive2DSequence aSequence123926 = parseSvg(u"/svgio/qa/cppunit/data/tdf123926.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence123926.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequence123926));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence123926));
 
     CPPUNIT_ASSERT (pDocument);
 
     assertXPath(pDocument, "/primitive2D/transform/transform/transform/unifiedtransparence/polypolygoncolor", "color", "#7cb5ec");
 }
 
-void Test::test47446()
+CPPUNIT_TEST_FIXTURE(Test, test47446)
 {
     //Check that marker's fill attribute is black is not set
     Primitive2DSequence aSequence47446 = parseSvg(u"/svgio/qa/cppunit/data/47446.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence47446.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequence47446));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence47446));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -712,14 +762,14 @@ void Test::test47446()
 
 }
 
-void Test::test47446b()
+CPPUNIT_TEST_FIXTURE(Test, test47446b)
 {
     //Check that marker's fill attribute is inherit from def
     Primitive2DSequence aSequence47446b = parseSvg(u"/svgio/qa/cppunit/data/47446b.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence47446b.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequence47446b));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence47446b));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -727,14 +777,30 @@ void Test::test47446b()
 
 }
 
-void Test::testMaskText()
+CPPUNIT_TEST_FIXTURE(Test, testTdf103888)
+{
+    Primitive2DSequence aSequenceMaskText = parseSvg(u"/svgio/qa/cppunit/data/tdf103888.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceMaskText.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceMaskText));
+
+    CPPUNIT_ASSERT (pDocument);
+
+    // Without the fix in place, this test would have failed here with number of nodes is incorrect
+    assertXPath(pDocument, "/primitive2D/transform/transform/textsimpleportion[1]", "text", "Her");
+    assertXPath(pDocument, "/primitive2D/transform/transform/textsimpleportion[2]", "text", "vor");
+    assertXPath(pDocument, "/primitive2D/transform/transform/textsimpleportion[3]", "text", "hebung");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testMaskText)
 {
     //Check that mask is applied on text
     Primitive2DSequence aSequenceMaskText = parseSvg(u"/svgio/qa/cppunit/data/maskText.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceMaskText.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceMaskText));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceMaskText));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -745,14 +811,14 @@ void Test::testMaskText()
     assertXPath(pDocument, "/primitive2D/transform/transform/textsimpleportion", "familyname", "Times New Roman");
 }
 
-void Test::testTdf99994()
+CPPUNIT_TEST_FIXTURE(Test, testTdf99994)
 {
     //Check text fontsize when using relative units
     Primitive2DSequence aSequenceTdf99994 = parseSvg(u"/svgio/qa/cppunit/data/tdf99994.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf99994.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf99994));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf99994));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -762,14 +828,14 @@ void Test::testTdf99994()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Sans");
 }
 
-void Test::testTdf99115()
+CPPUNIT_TEST_FIXTURE(Test, testTdf99115)
 {
     //Check that styles are resolved correctly where there is a * css selector
     Primitive2DSequence aSequenceTdf99115 = parseSvg(u"/svgio/qa/cppunit/data/tdf99115.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf99115.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf99115) );
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf99115) );
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -810,7 +876,7 @@ void Test::testTdf99115()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[9]", "height", "18");
 }
 
-void Test::testTdf101237()
+CPPUNIT_TEST_FIXTURE(Test, testTdf101237)
 {
     //Check that fill color, stroke color and stroke-width are inherited from use element
     //when the element is within a clipPath element
@@ -818,7 +884,7 @@ void Test::testTdf101237()
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf101237.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf101237));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf101237));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -827,13 +893,13 @@ void Test::testTdf101237()
     assertXPath(pDocument, "/primitive2D/transform/polypolygonstroke/line", "width", "5");
 }
 
-void Test::testTdf94765()
+CPPUNIT_TEST_FIXTURE(Test, testTdf94765)
 {
     Primitive2DSequence aSequenceTdf94765 = parseSvg(u"/svgio/qa/cppunit/data/tdf94765.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequenceTdf94765.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(comphelper::sequenceToContainer<Primitive2DContainer>(aSequenceTdf94765));
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequenceTdf94765));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -848,7 +914,7 @@ void Test::testTdf94765()
     assertXPath(pDocument, "/primitive2D/transform/transform/svglineargradient[2]", "endy", "0");
 }
 
-void Test::testBehaviourWhenWidthAndHeightIsOrIsNotSet()
+CPPUNIT_TEST_FIXTURE(Test, testBehaviourWhenWidthAndHeightIsOrIsNotSet)
 {
     // This test checks the behaviour when width and height attributes
     // are and are not set. In both cases the result must be the same,
@@ -868,7 +934,7 @@ void Test::testBehaviourWhenWidthAndHeightIsOrIsNotSet()
         basegfx::B2DRange aRange;
         uno::Sequence<beans::PropertyValue> aViewParameters;
 
-        for (Primitive2DReference const & xReference : aSequence)
+        for (css::uno::Reference<css::graphic::XPrimitive2D> const & xReference : aSequence)
         {
             if (xReference.is())
             {
@@ -893,7 +959,7 @@ void Test::testBehaviourWhenWidthAndHeightIsOrIsNotSet()
         basegfx::B2DRange aRange;
         uno::Sequence<beans::PropertyValue> aViewParameters;
 
-        for (Primitive2DReference const & xReference : aSequence)
+        for (css::uno::Reference<css::graphic::XPrimitive2D> const & xReference : aSequence)
         {
             if (xReference.is())
             {
@@ -910,15 +976,13 @@ void Test::testBehaviourWhenWidthAndHeightIsOrIsNotSet()
     }
 }
 
-void Test::testTdf97663()
+CPPUNIT_TEST_FIXTURE(Test, testTdf97663)
 {
     Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/em_units.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    // This can be dumped to a file using dumper.dump(container, file_url)
-    Primitive2DContainer container = comphelper::sequenceToContainer<Primitive2DContainer>(aSequence);
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(container);
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -928,14 +992,13 @@ void Test::testTdf97663()
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "y", "236");
 }
 
-void Test::testTdf149880()
+CPPUNIT_TEST_FIXTURE(Test, testTdf149880)
 {
     Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/tdf149880.svg");
     CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
 
     drawinglayer::Primitive2dXmlDump dumper;
-    Primitive2DContainer container = comphelper::sequenceToContainer<Primitive2DContainer>(aSequence);
-    xmlDocUniquePtr pDocument = dumper.dumpAndParse(container);
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
 
     CPPUNIT_ASSERT (pDocument);
 
@@ -949,7 +1012,48 @@ void Test::testTdf149880()
             "/primitive2D/transform/mask/unhandled/mask/transform/transform/bitmap", 28);
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(Test);
+CPPUNIT_TEST_FIXTURE(Test, testCssClassRedefinition)
+{
+    // Tests for svg css class redefinition behavior
+    // Example:
+    // .c1 {fill:#00ff00}
+    // .c1 {font-family:Sans}
+    // .c1 {fill:#ff0000}
+    // Expected result is .c1 {font-family:Sans; fill:#ff0000} because
+    // the second redefinition appends attributes to the class and the
+    // third redefinition replaces the already existing
+    // attribute in the original definition
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/CssClassRedefinition.svg");
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(Primitive2DContainer(aSequence));
+    CPPUNIT_ASSERT (pDocument);
+    assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "text", "test");
+    assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "fontcolor", "#ff0000");
+    assertXPath(
+        pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Open Symbol");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTspanFillOpacity)
+{
+    // Given an SVG file with <tspan fill-opacity="0.30">:
+    std::u16string_view aPath = u"/svgio/qa/cppunit/data/tspan-fill-opacity.svg";
+
+    // When rendering that SVG:
+    Primitive2DSequence aSequence = parseSvg(aPath);
+
+    // Then make sure that the text portion is wrapped in a transparency primitive with the correct
+    // transparency value:
+    drawinglayer::Primitive2dXmlDump aDumper;
+    xmlDocUniquePtr pDocument = aDumper.dumpAndParse(Primitive2DContainer(aSequence));
+    sal_Int32 nTransparence = getXPath(pDocument, "//textsimpleportion[@text='hello']/parent::unifiedtransparence", "transparence").toInt32();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // - XPath '//textsimpleportion[@text='hello']/parent::unifiedtransparence' number of nodes is incorrect
+    // i.e. the relevant <textsimpleportion> had no <unifiedtransparence> parent, the text was not
+    // semi-transparent.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(70), nTransparence);
+}
 
 }
 

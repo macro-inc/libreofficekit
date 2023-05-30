@@ -40,9 +40,9 @@ class OWriterTable : public OWriterTable_BASE
 private:
     css::uno::Reference<css::text::XTextTable> m_xTable;
     OWriterConnection* m_pWriterConnection;
-    sal_Int32 m_nStartCol;
-    sal_Int32 m_nDataCols;
-    bool m_bHasHeaders;
+    sal_Int32 m_nStartCol = 0;
+    sal_Int32 m_nDataCols = 0;
+    bool m_bHasHeaders = false;
 
     void fillColumns();
 
@@ -56,7 +56,7 @@ public:
 
     // css::lang::XUnoTunnel
     sal_Int64 SAL_CALL getSomething(const css::uno::Sequence<sal_Int8>& rId) override;
-    static css::uno::Sequence<sal_Int8> getUnoTunnelId();
+    static const css::uno::Sequence<sal_Int8>& getUnoTunnelId();
 
     void construct() override;
 };

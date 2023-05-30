@@ -20,8 +20,7 @@
 #include <config_folders.h>
 
 #include <comphelper/lok.hxx>
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
 #include <unotools/bootstrap.hxx>
@@ -129,15 +128,14 @@ struct ReSubstFixedVarOrder
     }
 };
 
-typedef ::cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
     css::util::XStringSubstitution,
     css::lang::XServiceInfo > SubstitutePathVariables_BASE;
 
-class SubstitutePathVariables : private cppu::BaseMutex,
-                                public SubstitutePathVariables_BASE
+class SubstitutePathVariables : public SubstitutePathVariables_BASE
 {
 public:
-    explicit SubstitutePathVariables(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    explicit SubstitutePathVariables();
 
     virtual OUString SAL_CALL getImplementationName() override
     {
@@ -187,12 +185,9 @@ private:
     VarNameToIndexMap            m_aPreDefVarMap;         // Mapping from pre-def variable names to enum for array access
     PredefinedPathVariables      m_aPreDefVars;           // All predefined variables
     std::vector<ReSubstFixedVarOrder> m_aReSubstFixedVarOrder; // To speed up resubstitution fixed variables (order for lookup)
-    css::uno::Reference< css::uno::XComponentContext > m_xContext;
 };
 
-SubstitutePathVariables::SubstitutePathVariables( const Reference< XComponentContext >& xContext ) :
-    SubstitutePathVariables_BASE(m_aMutex),
-    m_xContext( xContext )
+SubstitutePathVariables::SubstitutePathVariables()
 {
     SetPredefinedPathVariables();
 
@@ -227,26 +222,26 @@ SubstitutePathVariables::SubstitutePathVariables( const Reference< XComponentCon
 // XStringSubstitution
 OUString SAL_CALL SubstitutePathVariables::substituteVariables( const OUString& aText, sal_Bool bSubstRequired )
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
     return impl_substituteVariable( aText, bSubstRequired );
 }
 
 OUString SAL_CALL SubstitutePathVariables::reSubstituteVariables( const OUString& aText )
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
     return impl_reSubstituteVariables( aText );
 }
 
 OUString SAL_CALL SubstitutePathVariables::getSubstituteVariableValue( const OUString& aVariable )
 {
-    osl::MutexGuard g(rBHelper.rMutex);
+    std::unique_lock g(m_aMutex);
     return impl_getSubstituteVariableValue( aVariable );
 }
 
 OUString SubstitutePathVariables::GetWorkPath() const
 {
     OUString aWorkPath;
-    css::uno::Reference< css::container::XHierarchicalNameAccess > xPaths(officecfg::Office::Paths::Paths::get(m_xContext), css::uno::UNO_QUERY_THROW);
+    css::uno::Reference< css::container::XHierarchicalNameAccess > xPaths(officecfg::Office::Paths::Paths::get(), css::uno::UNO_QUERY_THROW);
     if (!(xPaths->getByHierarchicalName("['Work']/WritePath") >>= aWorkPath))
         // fallback in case config layer does not return a usable work dir value.
         aWorkPath = GetWorkVariableValue();
@@ -257,7 +252,7 @@ OUString SubstitutePathVariables::GetWorkPath() const
 OUString SubstitutePathVariables::GetWorkVariableValue() const
 {
     OUString aWorkPath;
-    std::optional<OUString> x(officecfg::Office::Paths::Variables::Work::get(m_xContext));
+    std::optional<OUString> x(officecfg::Office::Paths::Variables::Work::get());
     if (!x)
     {
         // fallback to $HOME in case platform dependent config layer does not return
@@ -691,10 +686,10 @@ void SubstitutePathVariables::SetPredefinedPathVariables()
 
 extern "C" SAL_DLLPUBLIC_EXPORT css::uno::XInterface *
 com_sun_star_comp_framework_PathSubstitution_get_implementation(
-    css::uno::XComponentContext *context,
+    css::uno::XComponentContext *,
     css::uno::Sequence<css::uno::Any> const &)
 {
-    return cppu::acquire(new SubstitutePathVariables(context));
+    return cppu::acquire(new SubstitutePathVariables());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

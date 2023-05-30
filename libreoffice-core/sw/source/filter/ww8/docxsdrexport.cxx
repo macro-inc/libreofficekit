@@ -10,10 +10,8 @@
 #include "docxsdrexport.hxx"
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/PointSequenceSequence.hpp>
-#include <com/sun/star/drawing/EnhancedCustomShapeParameterPair.hpp>
 #include <editeng/lrspitem.hxx>
 #include <editeng/ulspitem.hxx>
-#include <editeng/unoprnms.hxx>
 #include <editeng/shaditem.hxx>
 #include <editeng/opaqitem.hxx>
 #include <editeng/boxitem.hxx>
@@ -39,12 +37,9 @@
 #include <comphelper/flagguard.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/sequenceashashmap.hxx>
-#include <sal/log.hxx>
 #include <frmfmt.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 
-#include <tools/diagnose_ex.h>
-#include <svx/xlnwtit.hxx>
 #include <svx/svdtrans.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 
@@ -144,11 +139,11 @@ bool lcl_IsRotateAngleValid(const SdrObject& rObj)
     // have been incorporated.
     switch (rObj.GetObjIdentifier())
     {
-        case OBJ_GRUP:
-        case OBJ_LINE:
-        case OBJ_PLIN:
-        case OBJ_PATHLINE:
-        case OBJ_PATHFILL:
+        case SdrObjKind::Group:
+        case SdrObjKind::Line:
+        case SdrObjKind::PolyLine:
+        case SdrObjKind::PathLine:
+        case SdrObjKind::PathFill:
             return false;
         default:
             return true;
@@ -163,8 +158,8 @@ void lcl_calculateMSOBaseRectangle(const SdrObject& rObj, double& rfMSOLeft, dou
     // directly usable as 'base rectangle'.
     double fCenterX = (rObj.GetSnapRect().Left() + rObj.GetSnapRect().Right()) / 2.0;
     double fCenterY = (rObj.GetSnapRect().Top() + rObj.GetSnapRect().Bottom()) / 2.0;
-    double fHalfWidth = rObj.GetLogicRect().getWidth() / 2.0;
-    double fHalfHeight = rObj.GetLogicRect().getHeight() / 2.0;
+    double fHalfWidth = rObj.GetLogicRect().getOpenWidth() / 2.0;
+    double fHalfHeight = rObj.GetLogicRect().getOpenHeight() / 2.0;
 
     // MSO swaps width and height depending on rotation angle; exception: Word 2007 (vers 12) never
     // swaps width and height for images.
@@ -302,13 +297,13 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
     basegfx::B2DPolyPolygon aPolyPolygon;
     switch (pSdrObj->GetObjIdentifier())
     {
-        case OBJ_CUSTOMSHAPE:
+        case SdrObjKind::CustomShape:
         {
             // EnhancedCustomShapeEngine::GetLineGeometry() is not directly usable, because the wrap
             // polygon acts on the untransformed shape in Word. We do here similar as in
             // GetLineGeometry(), but without transformations.
             EnhancedCustomShape2d aCustomShape2d(*static_cast<SdrObjCustomShape*>(pSdrObj));
-            SdrObjectUniquePtr pLineGeometryObj = aCustomShape2d.CreateLineGeometry();
+            rtl::Reference<SdrObject> pLineGeometryObj = aCustomShape2d.CreateLineGeometry();
             if (!pLineGeometryObj)
                 break;
 
@@ -322,7 +317,8 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
                     aPP = pPathObj->GetPathPoly();
                 else
                 {
-                    SdrObjectUniquePtr pNewObj = pLineGeometryObj->ConvertToPolyObj(false, false);
+                    rtl::Reference<SdrObject> pNewObj
+                        = pLineGeometryObj->ConvertToPolyObj(false, false);
                     SdrPathObj* pPath = dynamic_cast<SdrPathObj*>(pNewObj.get());
                     if (pPath)
                         aPP = pPath->GetPathPoly();
@@ -339,9 +335,9 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
             basegfx::B2DHomMatrix aTranslateToOrigin(
                 basegfx::utils::createTranslateB2DHomMatrix(-aCenter.X(), -aCenter.Y()));
             aPolyPolygon.transform(aTranslateToOrigin);
-            const double fWidth(pSdrObj->GetLogicRect().getWidth());
+            const double fWidth(pSdrObj->GetLogicRect().getOpenWidth());
             double fScaleX = fWidth == 0.0 ? 1.0 : 21600.0 / fWidth;
-            const double fHeight(pSdrObj->GetLogicRect().getHeight());
+            const double fHeight(pSdrObj->GetLogicRect().getOpenHeight());
             double fScaleY = fHeight == 0.0 ? 1.0 : 21600.0 / fHeight;
             basegfx::B2DHomMatrix aScale(basegfx::utils::createScaleB2DHomMatrix(fScaleX, fScaleY));
             aPolyPolygon.transform(aScale);
@@ -351,29 +347,29 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
             aPolyPolygon.transform(aTranslateToCenter);
             break;
         } // end case OBJ_CUSTOMSHAPE
-        case OBJ_LINE:
+        case SdrObjKind::Line:
         {
             aContour.Insert(0, Point(0, 0));
             aContour.Insert(1, Point(21600, 21600));
             aContour.Insert(2, Point(0, 0));
             return aContour;
         }
-        case OBJ_PATHFILL:
-        case OBJ_PATHLINE:
-        case OBJ_FREEFILL:
-        case OBJ_FREELINE:
-        case OBJ_PATHPOLY:
-        case OBJ_PATHPLIN:
+        case SdrObjKind::PathFill:
+        case SdrObjKind::PathLine:
+        case SdrObjKind::FreehandFill:
+        case SdrObjKind::FreehandLine:
+        case SdrObjKind::PathPoly:
+        case SdrObjKind::PathPolyLine:
             // case OBJ_POLY: FixMe: Creating wrap polygon would work, but export to DML is currently
             // case OBJ_PLIN: disabled for unknown reason; related bug 75254.
             {
                 // Includes removing any control points
-                SdrObjectUniquePtr pNewObj = pSdrObj->ConvertToPolyObj(false, false);
+                rtl::Reference<SdrObject> pNewObj = pSdrObj->ConvertToPolyObj(false, false);
                 SdrPathObj* pConverted = dynamic_cast<SdrPathObj*>(pNewObj.get());
                 if (!pConverted)
                     break;
                 aPolyPolygon = pConverted->GetPathPoly();
-                pNewObj.reset();
+                pNewObj.clear();
 
                 // Word adds a line from last to first point. That will cut of indentations from being
                 // filled. To prevent this, the wrap polygon is lead along the path back to the first
@@ -391,9 +387,9 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
                     basegfx::utils::createTranslateB2DHomMatrix(-aCenter.X(), -aCenter.Y()));
                 aPolyPolygon.transform(aTranslateToOrigin);
 
-                const double fWidth(pSdrObj->GetLogicRect().getWidth());
+                const double fWidth(pSdrObj->GetLogicRect().getOpenWidth());
                 double fScaleX = fWidth == 0.0 ? 1.0 : 21600.0 / fWidth;
-                const double fHeight(pSdrObj->GetLogicRect().getHeight());
+                const double fHeight(pSdrObj->GetLogicRect().getOpenHeight());
                 double fScaleY = fHeight == 0.0 ? 1.0 : 21600.0 / fHeight;
                 basegfx::B2DHomMatrix aScale(
                     basegfx::utils::createScaleB2DHomMatrix(fScaleX, fScaleY));
@@ -404,7 +400,7 @@ tools::Polygon lcl_CreateContourPolygon(SdrObject* pSdrObj)
                 aPolyPolygon.transform(aTranslateToCenter);
                 break;
             }
-        case OBJ_NONE:
+        case SdrObjKind::NONE:
         default:
             break;
     }
@@ -716,7 +712,7 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
     sal_Int32 nTopExt(0);
     sal_Int32 nBottomExt(0);
 
-    if ((!pObj) || (pObj && (pObj->GetObjIdentifier() == SwFlyDrawObjIdentifier)))
+    if ((!pObj) || (pObj && (pObj->GetObjIdentifier() == SdrObjKind::SwFlyDrawObjIdentifier)))
     {
         // Frame objects have a restricted shadow and no further effects. They have border instead of
         // stroke. LO includes shadow and border in the object size, but Word not.
@@ -784,7 +780,8 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
     {
         // Word 2007 makes no width-height-swap for images. Detect this situation.
         sal_Int32 nMode = m_pImpl->getExport().getWordCompatibilityModeFromGrabBag();
-        bool bIsWord2007Image(nMode > 0 && nMode < 14 && pObj->GetObjIdentifier() == OBJ_GRAF);
+        bool bIsWord2007Image(nMode > 0 && nMode < 14
+                              && pObj->GetObjIdentifier() == SdrObjKind::Graphic);
 
         // Word cannot handle negative EffectExtent although allowed in OOXML, the 'dist' attributes
         // may not be negative. Take care of that.
@@ -806,15 +803,17 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
             if (it != aGrabBag.end())
             {
                 comphelper::SequenceAsHashMap aAnchorDistDiff(it->second);
-                for (const std::pair<const OUString, uno::Any>& rDiff : aAnchorDistDiff)
+                for (const std::pair<const comphelper::OUStringAndHashCode, uno::Any>& rDiff :
+                     aAnchorDistDiff)
                 {
-                    if (rDiff.first == "distTDiff" && rDiff.second.has<sal_Int32>())
+                    const OUString& rName = rDiff.first.maString;
+                    if (rName == "distTDiff" && rDiff.second.has<sal_Int32>())
                         nDistT -= round(rDiff.second.get<sal_Int32>());
-                    else if (rDiff.first == "distBDiff" && rDiff.second.has<sal_Int32>())
+                    else if (rName == "distBDiff" && rDiff.second.has<sal_Int32>())
                         nDistB -= round(rDiff.second.get<sal_Int32>());
-                    else if (rDiff.first == "distLDiff" && rDiff.second.has<sal_Int32>())
+                    else if (rName == "distLDiff" && rDiff.second.has<sal_Int32>())
                         nDistL -= rDiff.second.get<sal_Int32>();
-                    else if (rDiff.first == "distRDiff" && rDiff.second.has<sal_Int32>())
+                    else if (rName == "distRDiff" && rDiff.second.has<sal_Int32>())
                         nDistR -= rDiff.second.get<sal_Int32>();
                 }
             }
@@ -870,6 +869,15 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
             if (xShapeProps.is())
                 xShapeProps->getPropertyValue("IsFollowingTextFlow") >>= bLclInTabCell;
         }
+
+        if (pFrameFormat->GetSurround().GetValue() == text::WrapTextMode_THROUGH
+            && pFrameFormat->GetHoriOrient().GetRelationOrient() == text::RelOrientation::FRAME)
+        {
+            // "In front of text" and horizontal positioning relative to Column is ignored on
+            // import, add it back here.
+            bLclInTabCell = true;
+        }
+
         if (bLclInTabCell)
             attrList->add(XML_layoutInCell, "1");
         else
@@ -906,7 +914,7 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
         aPos.X += nPosXDiff; // Make the postponed position move of frames.
         aPos.Y += nPosYDiff;
         if (pObj && lcl_IsRotateAngleValid(*pObj)
-            && pObj->GetObjIdentifier() != SwFlyDrawObjIdentifier)
+            && pObj->GetObjIdentifier() != SdrObjKind::SwFlyDrawObjIdentifier)
             lclMovePositionWithRotation(aPos, rSize, pObj->GetRotateAngle());
 
         const char* relativeFromH;
@@ -1163,15 +1171,17 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
             sal_Int64 nTopExtGrabBag(0);
             sal_Int64 nRightExtGrabBag(0);
             sal_Int64 nBottomExtGrabBag(0);
-            for (const std::pair<const OUString, uno::Any>& rDirection : aEffectExtent)
+            for (const std::pair<const comphelper::OUStringAndHashCode, uno::Any>& rDirection :
+                 aEffectExtent)
             {
-                if (rDirection.first == "l" && rDirection.second.has<sal_Int32>())
+                const OUString& rName = rDirection.first.maString;
+                if (rName == "l" && rDirection.second.has<sal_Int32>())
                     nLeftExtGrabBag = rDirection.second.get<sal_Int32>();
-                else if (rDirection.first == "t" && rDirection.second.has<sal_Int32>())
+                else if (rName == "t" && rDirection.second.has<sal_Int32>())
                     nTopExtGrabBag = rDirection.second.get<sal_Int32>();
-                else if (rDirection.first == "r" && rDirection.second.has<sal_Int32>())
+                else if (rName == "r" && rDirection.second.has<sal_Int32>())
                     nRightExtGrabBag = rDirection.second.get<sal_Int32>();
-                else if (rDirection.first == "b" && rDirection.second.has<sal_Int32>())
+                else if (rName == "b" && rDirection.second.has<sal_Int32>())
                     nBottomExtGrabBag = rDirection.second.get<sal_Int32>();
             }
             if (abs(nLeftExtEMU - nLeftExtGrabBag) <= 635 && abs(nTopExtEMU - nTopExtGrabBag) <= 635
@@ -1290,12 +1300,12 @@ void DocxSdrExport::startDMLAnchorInline(const SwFrameFormat* pFrameFormat, cons
 
             m_pImpl->getSerializer()->startElementNS(XML_wp, XML_wrapPolygon, XML_edited, "0");
             auto aSeqSeq = it->second.get<drawing::PointSequenceSequence>();
-            auto aPoints(comphelper::sequenceToContainer<std::vector<awt::Point>>(aSeqSeq[0]));
-            for (auto i = aPoints.begin(); i != aPoints.end(); ++i)
+            const auto& rPoints = aSeqSeq[0];
+            for (auto i = rPoints.begin(); i != rPoints.end(); ++i)
             {
-                awt::Point& rPoint = *i;
+                const awt::Point& rPoint = *i;
                 m_pImpl->getSerializer()->singleElementNS(
-                    XML_wp, (i == aPoints.begin() ? XML_start : XML_lineTo), XML_x,
+                    XML_wp, (i == rPoints.begin() ? XML_start : XML_lineTo), XML_x,
                     OString::number(rPoint.X), XML_y, OString::number(rPoint.Y));
             }
             m_pImpl->getSerializer()->endElementNS(XML_wp, XML_wrapPolygon);
@@ -1384,7 +1394,8 @@ void DocxSdrExport::writeDMLDrawing(const SdrObject* pSdrObject, const SwFrameFo
     m_pImpl->getExport().DocxAttrOutput().GetSdtEndBefore(pSdrObject);
 
     sax_fastparser::FSHelperPtr pFS = m_pImpl->getSerializer();
-    Size aSize(pSdrObject->GetLogicRect().getWidth(), pSdrObject->GetLogicRect().getHeight());
+    Size aSize(pSdrObject->GetLogicRect().getOpenWidth(),
+               pSdrObject->GetLogicRect().getOpenHeight());
     startDMLAnchorInline(pFrameFormat, aSize);
 
     rtl::Reference<sax_fastparser::FastAttributeList> pDocPrAttrList
@@ -1665,7 +1676,7 @@ void DocxSdrExport::writeDiagram(const SdrObject* sdrObject, const SwFrameFormat
                                            uno::UNO_QUERY);
 
     // write necessary tags to document.xml
-    Size aSize(sdrObject->GetSnapRect().getWidth(), sdrObject->GetSnapRect().getHeight());
+    Size aSize(sdrObject->GetSnapRect().getOpenWidth(), sdrObject->GetSnapRect().getOpenHeight());
     startDMLAnchorInline(&rFrameFormat, aSize);
 
     m_pImpl->getDrawingML()->SetFS(m_pImpl->getSerializer());
@@ -1718,10 +1729,15 @@ void DocxSdrExport::writeBoxItemLine(const SvxBoxItem& rBox)
     }
 
     sax_fastparser::FSHelperPtr pFS = m_pImpl->getSerializer();
-    double fConverted(editeng::ConvertBorderWidthToWord(pBorderLine->GetBorderLineStyle(),
-                                                        pBorderLine->GetWidth()));
-    OString sWidth(OString::number(TwipsToEMU(fConverted)));
-    pFS->startElementNS(XML_a, XML_ln, XML_w, sWidth);
+    if (pBorderLine->GetWidth() == SvxBorderLineWidth::Hairline)
+        pFS->startElementNS(XML_a, XML_ln);
+    else
+    {
+        double fConverted(editeng::ConvertBorderWidthToWord(pBorderLine->GetBorderLineStyle(),
+                                                            pBorderLine->GetWidth()));
+        OString sWidth(OString::number(TwipsToEMU(fConverted)));
+        pFS->startElementNS(XML_a, XML_ln, XML_w, sWidth);
+    }
 
     pFS->startElementNS(XML_a, XML_solidFill);
     OString sColor(msfilter::util::ConvertColor(pBorderLine->GetColor()));
@@ -1958,7 +1974,10 @@ void DocxSdrExport::writeDMLTextFrame(ww8::Frame const* pParentFrame, int nAncho
             m_pImpl->getBodyPrAttrList()->add(XML_vert, "eaVert");
         else if (rDirection.GetValue() == SvxFrameDirection::Vertical_LR_BT)
             m_pImpl->getBodyPrAttrList()->add(XML_vert, "vert270");
-
+        else if (rDirection.GetValue() == SvxFrameDirection::Vertical_LR_TB)
+            m_pImpl->getBodyPrAttrList()->add(XML_vert, "mongolianVert");
+        else if (rDirection.GetValue() == SvxFrameDirection::Vertical_RL_TB90)
+            m_pImpl->getBodyPrAttrList()->add(XML_vert, "vert");
         {
             ::comphelper::FlagRestorationGuard const g(m_pImpl->m_bFlyFrameGraphic, true);
             comphelper::ValueRestorationGuard vg(m_pImpl->getExport().m_nTextTyp, TXT_TXTBOX);

@@ -19,8 +19,7 @@
 
 #include <sal/config.h>
 
-#include <o3tl/float_int_conversion.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <basic/sberrors.hxx>
 #include "sbxconv.hxx"
 #include <rtlproto.hxx>
@@ -66,16 +65,7 @@ start:
         case SbxULONG:
             nRes = p->nULong; break;
         case SbxSINGLE:
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(p->nSingle), SbxMAXULNG) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = SbxMAXULNG;
-            }
-            else if( p->nSingle < 0 )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = 0;
-            }
-            else
-                nRes = static_cast<sal_uInt32>( p->nSingle + 0.5 );
+            nRes = ImpDoubleToULong(p->nSingle);
             break;
         case SbxDATE:
         case SbxDOUBLE:
@@ -101,16 +91,7 @@ start:
             else
                 dVal = p->nDouble;
 
-            if( !o3tl::convertsToAtMost(o3tl::roundAway(dVal), SbxMAXULNG) )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = SbxMAXULNG;
-            }
-            else if( dVal < 0 )
-            {
-                SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = 0;
-            }
-            else
-                nRes = static_cast<sal_uInt32>( dVal + 0.5 );
+            nRes = ImpDoubleToULong(dVal);
             break;
             }
         case SbxBYREF | SbxSTRING:
@@ -124,16 +105,8 @@ start:
                 SbxDataType t;
                 if( ImpScan( *p->pOUString, d, t, nullptr, !LibreOffice6FloatingPointMode() ) != ERRCODE_NONE )
                     nRes = 0;
-                else if( !o3tl::convertsToAtMost(o3tl::roundAway(d), SbxMAXULNG) )
-                {
-                    SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = SbxMAXULNG;
-                }
-                else if( d < 0 )
-                {
-                    SbxBase::SetError( ERRCODE_BASIC_MATH_OVERFLOW ); nRes = 0;
-                }
                 else
-                    nRes = static_cast<sal_uInt32>( d + 0.5 );
+                    nRes = ImpDoubleToULong(d);
             }
             break;
         case SbxOBJECT:

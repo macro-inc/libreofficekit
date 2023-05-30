@@ -27,6 +27,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::uno;
@@ -98,11 +99,11 @@ class ChooseContext
     : public ContextHandler2
 {
 public:
-    ChooseContext( ContextHandler2Helper const & rParent, const AttributeList& rAttribs, const LayoutAtomPtr & pNode )
+    ChooseContext( ContextHandler2Helper const & rParent, const AttributeList& rAttribs, LayoutAtomPtr pNode )
         : ContextHandler2( rParent )
-        , mpNode( pNode )
+        , mpNode(std::move( pNode ))
         {
-            msName = rAttribs.getString( XML_name ).get();
+            msName = rAttribs.getStringDefaulted( XML_name );
         }
 
     virtual ContextHandlerRef
@@ -143,7 +144,7 @@ public:
     ForEachContext( ContextHandler2Helper const & rParent, const AttributeList& rAttribs, const ForEachAtomPtr& pAtom )
         : LayoutNodeContext( rParent, rAttribs, pAtom )
         {
-            pAtom->setRef(rAttribs.getString(XML_ref).get());
+            pAtom->setRef(rAttribs.getStringDefaulted(XML_ref));
             pAtom->iterator().loadFromXAttr( rAttribs.getFastAttributeList() );
 
             LayoutAtomMap& rLayoutAtomMap = pAtom->getLayoutNode().getDiagram().getLayout()->getLayoutAtomMap();
@@ -164,7 +165,7 @@ public:
 
     virtual ContextHandlerRef onCreateContext( ::sal_Int32 aElement, const AttributeList& rAttribs ) override
         {
-            mVariables[ getBaseToken(aElement) ] = rAttribs.getString( XML_val ).get();
+            mVariables[ getBaseToken(aElement) ] = rAttribs.getStringDefaulted( XML_val );
             return this;
         }
 private:
@@ -181,7 +182,7 @@ LayoutNodeContext::LayoutNodeContext( ContextHandler2Helper const & rParent,
     , mpNode( pAtom )
 {
     assert( pAtom && "Node must NOT be NULL" );
-    mpNode->setName( rAttribs.getString( XML_name ).get() );
+    mpNode->setName( rAttribs.getStringDefaulted( XML_name ) );
 }
 
 LayoutNodeContext::~LayoutNodeContext()
@@ -216,8 +217,8 @@ LayoutNodeContext::onCreateContext( ::sal_Int32 aElement,
             }
         }
 
-        pNode->setMoveWith( rAttribs.getString( XML_moveWith ).get() );
-        pNode->setStyleLabel( rAttribs.getString( XML_styleLbl ).get() );
+        pNode->setMoveWith( rAttribs.getStringDefaulted( XML_moveWith ) );
+        pNode->setStyleLabel( rAttribs.getStringDefaulted( XML_styleLbl ) );
         return new LayoutNodeContext( *this, rAttribs, pNode );
     }
     case DGM_TOKEN( shape ):

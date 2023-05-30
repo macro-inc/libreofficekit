@@ -46,8 +46,9 @@
 #include <com/sun/star/xml/sax/XDocumentHandler.hpp>
 
 #include <comphelper/processfactory.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <algorithm>
 #include <map>
 
@@ -86,16 +87,16 @@ OUString lcl_getGeneratorFromModelOrItsParent( const uno::Reference< frame::XMod
     return aGenerator;
 }
 
-sal_Int32 lcl_getBuildIDFromGenerator( const OUString& rGenerator )
+sal_Int32 lcl_getBuildIDFromGenerator( std::u16string_view rGenerator )
 {
     //returns -1 if nothing found
     sal_Int32 nBuildId = -1;
     static const OUStringLiteral sBuildCompare(  u"$Build-"  );
-    sal_Int32 nBegin = rGenerator.indexOf( sBuildCompare );
-    if( nBegin >= 0 )
+    size_t nBegin = rGenerator.find( sBuildCompare );
+    if( nBegin != std::u16string_view::npos )
     {
-        OUString sBuildId( rGenerator.copy( nBegin + sBuildCompare.getLength() ) );
-        nBuildId = sBuildId.toInt32();
+        std::u16string_view sBuildId = rGenerator.substr( nBegin + sBuildCompare.getLength() );
+        nBuildId = o3tl::toInt32(sBuildId);
     }
     return nBuildId;
 }
@@ -270,7 +271,7 @@ OUString GetChartTypeByClassName(
 }
 
 XMLTokenEnum getTokenByChartType(
-    const OUString & rChartTypeService, bool bUseOldNames )
+    std::u16string_view rChartTypeService, bool bUseOldNames )
 {
     XMLTokenEnum eResult = XML_TOKEN_INVALID;
     OUString aPrefix, aPostfix;
@@ -286,43 +287,43 @@ XMLTokenEnum getTokenByChartType(
         aPostfix = "ChartType";
     }
 
-    if( rChartTypeService.match( aPrefix ))
+    if( o3tl::starts_with(rChartTypeService, aPrefix))
     {
         sal_Int32 nSkip = aPrefix.getLength();
-        SAL_WARN_IF( rChartTypeService.getLength() < nSkip, "xmloff.chart", "ChartTypeService.getLength() < nSkip" );
-        sal_Int32 nTypeLength = rChartTypeService.getLength() - nSkip - aPostfix.getLength();
+        SAL_WARN_IF( static_cast<sal_Int32>(rChartTypeService.size()) < nSkip, "xmloff.chart", "ChartTypeService.getLength() < nSkip" );
+        sal_Int32 nTypeLength = rChartTypeService.size() - nSkip - aPostfix.getLength();
         // if postfix matches and leaves a non-empty type
-        if( nTypeLength > 0 && rChartTypeService.match( aPostfix, nSkip + nTypeLength ))
+        if( nTypeLength > 0 && o3tl::starts_with(rChartTypeService.substr(nSkip + nTypeLength), aPostfix) )
         {
-            OUString aServiceName( rChartTypeService.copy( nSkip, nTypeLength ));
+            std::u16string_view aServiceName( rChartTypeService.substr( nSkip, nTypeLength ));
 
-            if ( aServiceName == "Line" )
+            if ( aServiceName == u"Line" )
                 eResult = XML_LINE;
-            else if ( aServiceName == "Area" )
+            else if ( aServiceName == u"Area" )
                 eResult = XML_AREA;
-            else if( aServiceName == "Bar" ||
-                     (!bUseOldNames && aServiceName == "Column"))
+            else if( aServiceName == u"Bar" ||
+                     (!bUseOldNames && aServiceName == u"Column"))
                 eResult = XML_BAR;
-            else if ( aServiceName == "Pie" )
+            else if ( aServiceName == u"Pie" )
                 eResult = XML_CIRCLE;
-            else if ( aServiceName == "Donut" )
+            else if ( aServiceName == u"Donut" )
                 eResult = XML_RING;
-            else if( (bUseOldNames && aServiceName == "XY") ||
-                     (!bUseOldNames && aServiceName == "Scatter"))
+            else if( (bUseOldNames && aServiceName == u"XY") ||
+                     (!bUseOldNames && aServiceName == u"Scatter"))
                 eResult = XML_SCATTER;
-            else if ( aServiceName == "Bubble" )
+            else if ( aServiceName == u"Bubble" )
                 eResult = XML_BUBBLE;
-            else if ( aServiceName == "Net" )
+            else if ( aServiceName == u"Net" )
                 eResult = XML_RADAR;
-            else if ( aServiceName == "FilledNet" )
+            else if ( aServiceName == u"FilledNet" )
                 eResult = XML_FILLED_RADAR;
-            else if( (bUseOldNames && aServiceName == "Stock") ||
-                     (!bUseOldNames && aServiceName == "CandleStick"))
+            else if( (bUseOldNames && aServiceName == u"Stock") ||
+                     (!bUseOldNames && aServiceName == u"CandleStick"))
                 eResult = XML_STOCK;
         }
     }
 
-    if( eResult == XML_TOKEN_INVALID && !rChartTypeService.isEmpty() )
+    if( eResult == XML_TOKEN_INVALID && !rChartTypeService.empty() )
         eResult = XML_ADD_IN;
 
     return eResult;
@@ -635,7 +636,7 @@ void setXMLRangePropertyAtDataSequence(
         Reference< beans::XPropertySet > xProp( xDataSequence, uno::UNO_QUERY_THROW );
         Reference< beans::XPropertySetInfo > xInfo( xProp->getPropertySetInfo());
         if( xInfo.is() && xInfo->hasPropertyByName( aXMLRangePropName ))
-            xProp->setPropertyValue( aXMLRangePropName, uno::makeAny( rXMLRange ));
+            xProp->setPropertyValue( aXMLRangePropName, uno::Any( rXMLRange ));
     }
     catch( const uno::Exception & )
     {

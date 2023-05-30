@@ -17,11 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_AccessibleTableModelChange_idl__
-#define __com_sun_star_accessibility_AccessibleTableModelChange_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-
 module com { module sun { module star { module accessibility {
 
 /** This structure lets an event give access to a change of a table model.
@@ -39,8 +34,8 @@ struct AccessibleTableModelChange
     /** The type of the event as defined in
             AccessibleTableModelChangeType.
 
-        <p>The model change either inserted or deleted one or more rows
-        and/or columns or modified the content of a number of cells.  See
+        <p>The model change either inserted or removed one or more rows
+        or columns or modified the content of a number of cells.  See
         AccessibleTableModelChangeType for details of the type
         of the model change.</p>
     */
@@ -76,7 +71,5 @@ struct AccessibleTableModelChange
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

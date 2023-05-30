@@ -25,7 +25,7 @@
 #include <comphelper/types.hxx>
 #include <osl/mutex.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <com/sun/star/sdbc/SQLException.hpp>
@@ -213,7 +213,7 @@ namespace dbaui
                 Reference< com::sun::star::beans::XPropertySet > xStatementProps(xStatement, UNO_QUERY_THROW);
                 try
                 {
-                    xStatementProps->setPropertyValue(PROPERTY_ESCAPE_PROCESSING, makeAny(false));
+                    xStatementProps->setPropertyValue(PROPERTY_ESCAPE_PROCESSING, Any(false));
                 }
                 catch( const Exception& )
                 {
@@ -235,7 +235,7 @@ namespace dbaui
                 }
                 else
                     addOutputText(
-                        OUStringConcatenation(OUString::number(xMR->getUpdateCount()) + " rows updated\n"));
+                        Concat2View(OUString::number(xMR->getUpdateCount()) + " rows updated\n"));
                 for (;;)
                 {
                     hasRS = xMR->getMoreResults();
@@ -255,17 +255,17 @@ namespace dbaui
                 if (upperStatement.startsWith("UPDATE"))
                 {
                     sal_Int32 resultCount = xStatement->executeUpdate(_rStatement);
-                    addOutputText(OUStringConcatenation(OUString::number(resultCount) + " rows updated\n"));
+                    addOutputText(Concat2View(OUString::number(resultCount) + " rows updated\n"));
                 }
                 else if (upperStatement.startsWith("INSERT"))
                 {
                     sal_Int32 resultCount = xStatement->executeUpdate(_rStatement);
-                    addOutputText(OUStringConcatenation(OUString::number(resultCount) + " rows inserted\n"));
+                    addOutputText(Concat2View(OUString::number(resultCount) + " rows inserted\n"));
                 }
                 else if (upperStatement.startsWith("DELETE"))
                 {
                     sal_Int32 resultCount = xStatement->executeUpdate(_rStatement);
-                    addOutputText(OUStringConcatenation(OUString::number(resultCount) + " rows deleted\n"));
+                    addOutputText(Concat2View(OUString::number(resultCount) + " rows deleted\n"));
                 }
                 else if (upperStatement.startsWith("CREATE"))
                 {
@@ -281,7 +281,7 @@ namespace dbaui
                 else
                 {
                     sal_Int32 resultCount = xStatement->executeUpdate(_rStatement);
-                    addOutputText(OUStringConcatenation(OUString::number(resultCount) + " rows updated\n"));
+                    addOutputText(Concat2View(OUString::number(resultCount) + " rows updated\n"));
                 }
             }
             // successful
@@ -328,7 +328,7 @@ namespace dbaui
             {
             }
             // report the output
-            addOutputText(out.makeStringAndClear());
+            addOutputText(out);
         }
     }
 

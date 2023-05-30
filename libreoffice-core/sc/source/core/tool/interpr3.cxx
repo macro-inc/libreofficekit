@@ -27,8 +27,8 @@
 #include <matrixoperators.hxx>
 #include <scmatrix.hxx>
 
-#include <math.h>
 #include <cassert>
+#include <cmath>
 #include <memory>
 #include <set>
 #include <vector>
@@ -36,7 +36,6 @@
 #include <comphelper/random.hxx>
 #include <o3tl/float_int_conversion.hxx>
 #include <osl/diagnose.h>
-#include <basegfx/numeric/ftools.hxx>
 
 using ::std::vector;
 using namespace formula;
@@ -200,7 +199,7 @@ double ScInterpreter::phi(double x)
 
 double ScInterpreter::integralPhi(double x)
 { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
-    return 0.5 * std::erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
+    return 0.5 * std::erfc(-x * M_SQRT1_2);
 }
 
 double ScInterpreter::taylor(const double* pPolynom, sal_uInt16 nMax, double x)
@@ -602,7 +601,7 @@ double ScInterpreter::GetGamma(double fZ)
 
     if (fZ >= -0.5) // shift to x>=1, might overflow
     {
-        double fLogTest = lcl_GetLogGammaHelper(fZ+2) - rtl::math::log1p(fZ) - log( std::abs(fZ));
+        double fLogTest = lcl_GetLogGammaHelper(fZ+2) - std::log1p(fZ) - log( std::abs(fZ));
         if (fLogTest >= fLogDblMax)
         {
             SetError( FormulaError::IllegalFPOperation);
@@ -635,7 +634,7 @@ double ScInterpreter::GetLogGamma(double fZ)
         return log(lcl_GetGammaHelper(fZ));
     if (fZ >= 0.5)
         return log( lcl_GetGammaHelper(fZ+1) / fZ);
-    return lcl_GetLogGammaHelper(fZ+2) - rtl::math::log1p(fZ) - log(fZ);
+    return lcl_GetLogGammaHelper(fZ+2) - std::log1p(fZ) - log(fZ);
 }
 
 double ScInterpreter::GetFDist(double x, double fF1, double fF2)
@@ -824,8 +823,8 @@ double ScInterpreter::GetBeta(double fAlpha, double fBeta)
     fLanczos *= sqrt((fABgm/(fA+fgm))/(fB+fgm));
     double fTempA = fB/(fA+fgm); // (fA+fgm)/fABgm = 1 / ( 1 + fB/(fA+fgm))
     double fTempB = fA/(fB+fgm);
-    double fResult = exp(-fA * ::rtl::math::log1p(fTempA)
-                            -fB * ::rtl::math::log1p(fTempB)-fgm);
+    double fResult = exp(-fA * std::log1p(fTempA)
+                            -fB * std::log1p(fTempB)-fgm);
     fResult *= fLanczos;
     return fResult;
 }
@@ -853,8 +852,8 @@ double ScInterpreter::GetLogBeta(double fAlpha, double fBeta)
     fLogLanczos += 0.5*(log(fABgm)-log(fA+fgm)-log(fB+fgm));
     double fTempA = fB/(fA+fgm); // (fA+fgm)/fABgm = 1 / ( 1 + fB/(fA+fgm))
     double fTempB = fA/(fB+fgm);
-    double fResult = -fA * ::rtl::math::log1p(fTempA)
-                        -fB * ::rtl::math::log1p(fTempB)-fgm;
+    double fResult = -fA * std::log1p(fTempA)
+                        -fB * std::log1p(fTempB)-fgm;
     fResult += fLogLanczos;
     return fResult;
 }
@@ -875,7 +874,7 @@ double ScInterpreter::GetBetaDistPDF(double fX, double fA, double fB)
             return HUGE_VAL;
         }
         if (fX <= 0.01)
-            return fB + fB * std::expm1((fB-1.0) * ::rtl::math::log1p(-fX));
+            return fB + fB * std::expm1((fB-1.0) * std::log1p(-fX));
         else
             return fB * pow(0.5-fX+0.5,fB-1.0);
     }
@@ -914,7 +913,7 @@ double ScInterpreter::GetBetaDistPDF(double fX, double fA, double fB)
     // normal cases; result x^(a-1)*(1-x)^(b-1)/Beta(a,b)
     const double fLogDblMax = log( ::std::numeric_limits<double>::max());
     const double fLogDblMin = log( ::std::numeric_limits<double>::min());
-    double fLogY = (fX < 0.1) ? ::rtl::math::log1p(-fX) : log(0.5-fX+0.5);
+    double fLogY = (fX < 0.1) ? std::log1p(-fX) : log(0.5-fX+0.5);
     double fLogX = log(fX);
     double fAm1LogX = (fA-1.0) * fLogX;
     double fBm1LogY = (fB-1.0) * fLogY;
@@ -994,13 +993,13 @@ double ScInterpreter::GetBetaDist(double fXin, double fAlpha, double fBeta)
         return pow(fXin, fAlpha);
     if (fAlpha == 1.0)
     //            1.0 - pow(1.0-fX,fBeta) is not accurate enough
-        return -std::expm1(fBeta * ::rtl::math::log1p(-fXin));
+        return -std::expm1(fBeta * std::log1p(-fXin));
     //FIXME: need special algorithm for fX near fP for large fA,fB
     double fResult;
     // I use always continued fraction, power series are neither
     // faster nor more accurate.
     double fY = (0.5-fXin)+0.5;
-    double flnY = ::rtl::math::log1p(-fXin);
+    double flnY = std::log1p(-fXin);
     double fX = fXin;
     double flnX = log(fXin);
     double fA = fAlpha;
@@ -1154,7 +1153,7 @@ void ScInterpreter::ScFisher()
     if (std::abs(fVal) >= 1.0)
         PushIllegalArgument();
     else
-        PushDouble( ::rtl::math::atanh( fVal));
+        PushDouble(::atanh(fVal));
 }
 
 void ScInterpreter::ScFisherInv()
@@ -2506,7 +2505,7 @@ void ScInterpreter::ScZTest()
                 ScRange aRange;
                 FormulaError nErr = FormulaError::NONE;
                 PopDoubleRef( aRange, nParam, nRefInList);
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst(fVal, nErr))
                 {
                     fSum += fVal;
@@ -2948,7 +2947,7 @@ void ScInterpreter::ScHarMean()
                 FormulaError nErr = FormulaError::NONE;
                 PopDoubleRef( aRange, nParamCount, nRefInList);
                 double nCellVal;
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst(nCellVal, nErr))
                 {
                     if (nCellVal > 0.0)
@@ -3086,7 +3085,7 @@ void ScInterpreter::ScGeoMean()
                 FormulaError nErr = FormulaError::NONE;
                 PopDoubleRef( aRange, nParamCount, nRefInList);
                 double nCellVal;
-                ScValueIterator aValIter(mrDoc, aRange, mnSubTotalFlags);
+                ScValueIterator aValIter(mrContext, aRange, mnSubTotalFlags);
                 if (aValIter.GetFirst(nCellVal, nErr))
                 {
                     if (nCellVal > 0.0)
@@ -3251,7 +3250,7 @@ bool ScInterpreter::CalculateSkew(KahanSum& fSum, double& fCount, std::vector<do
             {
                 PopDoubleRef( aRange, nParamCount, nRefInList);
                 FormulaError nErr = FormulaError::NONE;
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst(fVal, nErr))
                 {
                     fSum += fVal;
@@ -3410,8 +3409,13 @@ double ScInterpreter::GetPercentile( vector<double> & rArray, double fPercentile
         OSL_ENSURE(nIndex < nSize, "GetPercentile: wrong index(1)");
         vector<double>::iterator iter = rArray.begin() + nIndex;
         ::std::nth_element( rArray.begin(), iter, rArray.end());
-        if (fDiff == 0.0)
+        if (fDiff <= 0.0)
+        {
+            // Note: neg fDiff seen with forum-mso-en4-719754.xlsx with
+            // fPercentile of near 1 where approxFloor gave nIndex of nSize-1
+            // resulting in a non-zero tiny negative fDiff.
             return *iter;
+        }
         else
         {
             OSL_ENSURE(nIndex < nSize-1, "GetPercentile: wrong index(2)");
@@ -3466,7 +3470,7 @@ void ScInterpreter::ScPercentile( bool bInclusive )
     GetNumberSequenceArray( 1, aArray, false );
     if ( aArray.empty() || nGlobalError != FormulaError::NONE )
     {
-        SetError( FormulaError::NoValue );
+        PushNoValue();
         return;
     }
     if ( bInclusive )
@@ -3489,7 +3493,7 @@ void ScInterpreter::ScQuartile( bool bInclusive )
     GetNumberSequenceArray( 1, aArray, false );
     if ( aArray.empty() || nGlobalError != FormulaError::NONE )
     {
-        SetError( FormulaError::NoValue );
+        PushNoValue();
         return;
     }
     if ( bInclusive )
@@ -3634,8 +3638,8 @@ void ScInterpreter::CalculateSmallLarge(bool bSmall)
         return;
 
     SCSIZE nCol = 0, nRow = 0;
-    auto aArray = GetTopNumberArray(nCol, nRow);
-    const auto nRankArraySize = aArray.size();
+    const auto aArray = GetTopNumberArray(nCol, nRow);
+    const size_t nRankArraySize = aArray.size();
     if (nRankArraySize == 0 || nGlobalError != FormulaError::NONE)
     {
         PushNoValue();
@@ -3663,7 +3667,12 @@ void ScInterpreter::CalculateSmallLarge(bool bSmall)
     {
         const SCSIZE k = aRankArray[0];
         if (k < 1 || nSize < k)
-            PushNoValue();
+        {
+            if (!std::isfinite(aArray[0]))
+                PushDouble(aArray[0]);  // propagates error
+            else
+                PushNoValue();
+        }
         else
         {
             vector<double>::iterator iPos = aSortArray.begin() + (bSmall ? k-1 : nSize-k);
@@ -3695,15 +3704,19 @@ void ScInterpreter::CalculateSmallLarge(bool bSmall)
         else
             std::sort(aSortArray.begin(), aSortArray.end());
 
-        aArray.clear();
-        for (SCSIZE n : aRankArray)
+        std::vector<double> aResultArray;
+        aResultArray.reserve(nRankArraySize);
+        for (size_t i = 0; i < nRankArraySize; ++i)
         {
+            const SCSIZE n = aRankArray[i];
             if (1 <= n && n <= nSize)
-                aArray.push_back( aSortArray[bSmall ? n-1 : nSize-n]);
+                aResultArray.push_back( aSortArray[bSmall ? n-1 : nSize-n]);
+            else if (!std::isfinite( aArray[i]))
+                aResultArray.push_back( aArray[i]);  // propagate error
             else
-                aArray.push_back( CreateDoubleError( FormulaError::NoValue));
+                aResultArray.push_back( CreateDoubleError( FormulaError::IllegalArgument));
         }
-        ScMatrixRef pResult = GetNewMat(nCol, nRow, aArray);
+        ScMatrixRef pResult = GetNewMat(nCol, nRow, aResultArray);
         PushMatrix(pResult);
     }
 }
@@ -3886,7 +3899,7 @@ std::vector<double> ScInterpreter::GetTopNumberArray( SCSIZE& rCol, SCSIZE& rRow
 
             FormulaError nErr = FormulaError::NONE;
             double fCellVal;
-            ScValueIterator aValIter(mrDoc, aRange, mnSubTotalFlags);
+            ScValueIterator aValIter(mrContext, aRange, mnSubTotalFlags);
             if (aValIter.GetFirst(fCellVal, nErr))
             {
                 do
@@ -3908,19 +3921,30 @@ std::vector<double> ScInterpreter::GetTopNumberArray( SCSIZE& rCol, SCSIZE& rRow
             if (!pMat)
                 break;
 
+            const SCSIZE nCount = pMat->GetElementCount();
+            aArray.reserve(nCount);
+            // Do not propagate errors from matrix elements as global error.
+            pMat->SetErrorInterpreter(nullptr);
             if (pMat->IsNumeric())
             {
-                SCSIZE nCount = pMat->GetElementCount();
-                aArray.reserve(nCount);
                 for (SCSIZE i = 0; i < nCount; ++i)
                     aArray.push_back(pMat->GetDouble(i));
-                pMat->GetDimensions(rCol, rRow);
             }
             else
-                SetError(FormulaError::IllegalParameter);
+            {
+                for (SCSIZE i = 0; i < nCount; ++i)
+                {
+                    if (pMat->IsValue(i))
+                        aArray.push_back( pMat->GetDouble(i));
+                    else
+                        aArray.push_back( CreateDoubleError( FormulaError::NoValue));
+                }
+            }
+            pMat->GetDimensions(rCol, rRow);
         }
         break;
         default:
+            PopError();
             SetError(FormulaError::IllegalParameter);
         break;
     }
@@ -3967,7 +3991,7 @@ void ScInterpreter::GetNumberSequenceArray( sal_uInt8 nParamCount, vector<double
 
                 FormulaError nErr = FormulaError::NONE;
                 double fCellVal;
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst( fCellVal, nErr))
                 {
                     if (bIgnoreErrVal)
@@ -4224,7 +4248,7 @@ void ScInterpreter::ScRank( bool bAverage )
     else
     {
         if ( fVal < aSortArray[ 0 ] || fVal > aSortArray[ nSize - 1 ] )
-            PushNoValue();
+            PushError( FormulaError::NotAvailable);
         else
         {
             double fLastPos = 0;
@@ -4249,7 +4273,11 @@ void ScInterpreter::ScRank( bool bAverage )
             }
             if ( !bFinished )
                 fLastPos = i;
-            if ( !bAverage )
+            if (fFirstPos <= 0)
+            {
+                PushError( FormulaError::NotAvailable);
+            }
+            else if ( !bAverage )
             {
                 if ( bAscending )
                     PushDouble( fFirstPos );
@@ -4305,7 +4333,7 @@ void ScInterpreter::ScAveDev()
                 FormulaError nErr = FormulaError::NONE;
                 double nCellVal;
                 PopDoubleRef( aRange, nParam, nRefInList);
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst(nCellVal, nErr))
                 {
                     rVal += nCellVal;
@@ -4384,7 +4412,7 @@ void ScInterpreter::ScAveDev()
                 FormulaError nErr = FormulaError::NONE;
                 double nCellVal;
                 PopDoubleRef( aRange, nParam, nRefInList);
-                ScValueIterator aValIter( mrDoc, aRange, mnSubTotalFlags );
+                ScValueIterator aValIter( mrContext, aRange, mnSubTotalFlags );
                 if (aValIter.GetFirst(nCellVal, nErr))
                 {
                     rVal += std::abs(nCellVal - nMiddle);
@@ -4446,11 +4474,7 @@ void ScInterpreter::ScProbability()
     else
         fLo = fUp;
     if (fLo > fUp)
-    {
-        double fTemp = fLo;
-        fLo = fUp;
-        fUp = fTemp;
-    }
+        std::swap( fLo, fUp );
     ScMatrixRef pMatP = GetMatrix();
     ScMatrixRef pMatW = GetMatrix();
     if (!pMatP || !pMatW)
@@ -5101,7 +5125,7 @@ static void lcl_convertToPolar(std::vector<double>& rCmplxArray, double fMinMag)
     {
         fR = rCmplxArray[nIdx];
         fI = rCmplxArray[nPoints+nIdx];
-        fMag = sqrt(fR*fR + fI*fI);
+        fMag = std::hypot(fR, fI);
         if (fMag < fMinMag)
         {
             fMag = 0.0;

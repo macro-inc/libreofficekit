@@ -46,8 +46,6 @@ class SW_DLLPUBLIC SwPortionHandler
 {
 public:
 
-    SwPortionHandler() {}           /// (empty) constructor
-
     virtual ~SwPortionHandler() {}  /// (empty) destructor
 
     /** text portion. A run of nLength characters from the view
@@ -58,9 +56,7 @@ public:
      */
     virtual void Text(
         TextFrameIndex nLength, ///< length of this portion in the view string
-        PortionType nType,       /// type of this portion
-        sal_Int32 nHeight = 0,   /// height of this portion
-        sal_Int32 nWidth = 0     /// width of this portion
+        PortionType nType       /// type of this portion
         ) = 0;
 
     /** special portion. This method is called for every non-text
@@ -71,16 +67,13 @@ public:
     virtual void Special(
         TextFrameIndex nLength, ///< length of this portion in the view string
         const OUString& rText, /// text which is painted on-screen
-        PortionType nType,         /// type of this portion
-        sal_Int32 nHeight = 0,     /// font height of the painted text
-        sal_Int32 nWidth = 0,     /// width of this portion
-        const SwFont* pFont = nullptr /// font of this portion
+        PortionType nType         /// type of this portion
         ) = 0;
 
     /** line break. This method is called whenever a line break in the
      * layout occurs.
      */
-    virtual void LineBreak(sal_Int32 nWidth) = 0;
+    virtual void LineBreak() = 0;
 
     /** skip characters. The SwTextFrame may only display partially
      * display a certain paragraph (e.g. when the paragraph is split

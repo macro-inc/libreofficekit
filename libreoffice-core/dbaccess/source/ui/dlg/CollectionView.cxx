@@ -18,7 +18,7 @@
  */
 
 #include <CollectionView.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
 #include <comphelper/interaction.hxx>
@@ -26,6 +26,7 @@
 #include <cppuhelper/exc_hlp.hxx>
 #include <com/sun/star/container/XChild.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
+#include <o3tl/safeint.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <UITools.hxx>
@@ -41,6 +42,7 @@
 #include <ucbhelper/commandenvironment.hxx>
 #include <ucbhelper/content.hxx>
 #include <connectivity/dbexception.hxx>
+#include <utility>
 
 namespace dbaui
 {
@@ -57,10 +59,10 @@ using namespace comphelper;
 OCollectionView::OCollectionView(weld::Window* pParent,
                                  const Reference< XContent>& _xContent,
                                  const OUString& _sDefaultName,
-                                 const css::uno::Reference< css::uno::XComponentContext >& _rxContext)
+                                 css::uno::Reference< css::uno::XComponentContext > _xContext)
     : GenericDialogController(pParent, "dbaccess/ui/collectionviewdialog.ui", "CollectionView")
     , m_xContent(_xContent)
-    , m_xContext(_rxContext)
+    , m_xContext(std::move(_xContext))
     , m_bCreateForm(true)
     , m_xFTCurrentPath(m_xBuilder->weld_label("currentPathLabel"))
     , m_xNewFolder(m_xBuilder->weld_button("newFolderButton"))
@@ -141,7 +143,7 @@ IMPL_LINK_NOARG(OCollectionView, Save_Click, weld::Button&, void)
 
                     Reference<XInteractionHandler2> xHandler(
                         InteractionHandler::createWithParent(m_xContext, m_xDialog->GetXWindow()));
-                    rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(makeAny(aException));
+                    rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(Any(aException));
 
                     rtl::Reference<OInteractionApprove> pApprove = new OInteractionApprove;
                     pRequest->addContinuation(pApprove);
@@ -177,7 +179,7 @@ IMPL_LINK_NOARG(OCollectionView, NewFolder_Click, weld::Button&, void)
     try
     {
         Reference<XHierarchicalNameContainer> xNameContainer(m_xContent,UNO_QUERY);
-        if ( dbaui::insertHierachyElement(m_xDialog.get(),m_xContext,xNameContainer,OUString(),m_bCreateForm) )
+        if ( dbaui::insertHierarchyElement(m_xDialog.get(),m_xContext,xNameContainer,OUString(),m_bCreateForm) )
             Initialize();
     }
     catch( const SQLException& )
@@ -256,9 +258,9 @@ void OCollectionView::initCurrentPath()
             static const char s_sReportsCID[] = "private:reports";
             m_bCreateForm = s_sFormsCID == sCID;
             OUString sPath("/");
-            if ( m_bCreateForm && sCID.getLength() != static_cast<sal_Int32>(strlen(s_sFormsCID)))
+            if ( m_bCreateForm && o3tl::make_unsigned(sCID.getLength()) != strlen(s_sFormsCID))
                 sPath = sCID.copy(strlen(s_sFormsCID));
-            else if ( !m_bCreateForm && sCID.getLength() != static_cast<sal_Int32>(strlen(s_sReportsCID)) )
+            else if ( !m_bCreateForm && o3tl::make_unsigned(sCID.getLength()) != strlen(s_sReportsCID) )
                 sPath = sCID.copy(strlen(s_sReportsCID) - 2);
 
             m_xFTCurrentPath->set_label(sPath);

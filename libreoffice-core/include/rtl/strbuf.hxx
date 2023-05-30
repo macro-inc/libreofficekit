@@ -27,6 +27,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <limits>
 
 #include "rtl/strbuf.h"
 #include "rtl/string.hxx"
@@ -35,6 +36,7 @@
 #ifdef LIBO_INTERNAL_ONLY // "RTL_FAST_STRING"
 #include "rtl/stringconcat.hxx"
 #include <string_view>
+#include <type_traits>
 #endif
 
 #ifdef RTL_STRING_UNITTEST
@@ -99,31 +101,32 @@ public:
 
         @param      length   the initial capacity.
      */
-    explicit OStringBuffer(int length)
+    explicit OStringBuffer(sal_Int32 length)
         : pData(NULL)
         , nCapacity( length )
     {
         rtl_string_new_WithLength( &pData, length );
     }
-#if __cplusplus >= 201103L
-    explicit OStringBuffer(unsigned int length)
-        : OStringBuffer(static_cast<int>(length))
+#if defined LIBO_INTERNAL_ONLY
+    template<typename T>
+    explicit OStringBuffer(T length, std::enable_if_t<std::is_integral_v<T>, int> = 0)
+        : OStringBuffer(static_cast<sal_Int32>(length))
     {
+        assert(
+            length >= 0
+            && static_cast<std::make_unsigned_t<T>>(length)
+                <= static_cast<std::make_unsigned_t<sal_Int32>>(
+                    std::numeric_limits<sal_Int32>::max()));
     }
-#if SAL_TYPES_SIZEOFLONG == 4
-    // additional overloads for sal_Int32 sal_uInt32
-    explicit OStringBuffer(long length)
-        : OStringBuffer(static_cast<int>(length))
-    {
-    }
-    explicit OStringBuffer(unsigned long length)
-        : OStringBuffer(static_cast<int>(length))
-    {
-    }
-#endif
-    // avoid obvious bugs
+    // avoid (obvious) bugs
+    explicit OStringBuffer(bool) = delete;
     explicit OStringBuffer(char) = delete;
-    explicit OStringBuffer(sal_Unicode) = delete;
+    explicit OStringBuffer(wchar_t) = delete;
+#if defined __cpp_char8_t
+    explicit OStringBuffer(char8_t) = delete;
+#endif
+    explicit OStringBuffer(char16_t) = delete;
+    explicit OStringBuffer(char32_t) = delete;
 #endif
 
     /**
@@ -176,6 +179,17 @@ public:
         nCapacity = length + 16;
         rtl_stringbuffer_newFromStr_WithLength( &pData, value, length );
     }
+
+#if __cplusplus > 202002L // C++23 P2266R3 "Simpler implicit move"
+    template< typename T >
+    OStringBuffer( T&& value, typename libreoffice_internal::NonConstCharArrayDetector< T, libreoffice_internal::Dummy >::Type = libreoffice_internal::Dummy())
+        : pData(NULL)
+    {
+        sal_Int32 length = rtl_str_getLength( value );
+        nCapacity = length + 16;
+        rtl_stringbuffer_newFromStr_WithLength( &pData, value, length );
+    }
+#endif
 
     /**
       Constructs a string buffer so that it represents the same
@@ -243,9 +257,9 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OStringBuffer( OStringNumber< T >&& n )
-        : OStringBuffer( OString( n ))
+    template< typename T, std::size_t N >
+    OStringBuffer( StringNumberBase< char, T, N >&& n )
+        : OStringBuffer( n.buf, n.length)
     {}
 #endif
 
@@ -277,7 +291,8 @@ public:
         if (n >= nCapacity) {
             ensureCapacity(n + 16); //TODO: check for overflow
         }
-        std::memcpy(pData->buffer, string.data(), n + 1);
+        std::memcpy(pData->buffer, string.data(), n);
+        pData->buffer[n] = '\0';
         pData->length = n;
         return *this;
     }
@@ -330,8 +345,8 @@ public:
     }
 
     /** @overload @internal */
-    template<typename T>
-    OStringBuffer & operator =(OStringNumber<T> && n)
+    template<typename T, std::size_t N>
+    OStringBuffer & operator =(StringNumberBase<char, T, N> && n)
     {
         *this = OStringBuffer( std::move ( n ));
         return *this;
@@ -390,7 +405,7 @@ public:
 
         The capacity
         is the amount of storage available for newly inserted
-        characters. The real buffer size is 2 bytes longer, because
+        characters. The real buffer size is 1 byte longer, because
         all strings are 0 terminated.
 
         @return  the current capacity of this string buffer.
@@ -614,8 +629,8 @@ public:
      @overload
      @internal
     */
-    template< typename T >
-    OStringBuffer& append( OStringNumber< T >&& c )
+    template< typename T, std::size_t N >
+    OStringBuffer& append( StringNumberBase< char, T, N >&& c )
     {
         return append( c.buf, c.length );
     }
@@ -1067,7 +1082,7 @@ public:
 
         This function should be used with care.  After you have called this
         function, you may use the returned pInternalData and pInternalCapacity
-        only as long as you make no other calls on this OUStringBuffer.
+        only as long as you make no other calls on this OStringBuffer.
 
         @param pInternalData
         This output parameter receives a pointer to the internal data
@@ -1102,11 +1117,8 @@ private:
 template<> struct ToStringHelper<OStringBuffer> {
     static std::size_t length(OStringBuffer const & s) { return s.getLength(); }
 
-    static char * addData(char * buffer, OStringBuffer const & s) SAL_RETURNS_NONNULL
+    char * operator()(char * buffer, OStringBuffer const & s) const SAL_RETURNS_NONNULL
     { return addDataHelper(buffer, s.getStr(), s.getLength()); }
-
-    static constexpr bool allowOStringConcat = true;
-    static constexpr bool allowOUStringConcat = false;
 };
 #endif
 

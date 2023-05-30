@@ -150,7 +150,7 @@ bool ViewObjectContactPrimitiveHit(
                     bTextOnly);
 
                 // ask for HitStack
-                aHitTestProcessor2D.collectHitStack(true);
+                aHitTestProcessor2D.collectHitStack(pHitContainer != nullptr);
 
                 // feed it with the primitives
                 aHitTestProcessor2D.process(aSequence);

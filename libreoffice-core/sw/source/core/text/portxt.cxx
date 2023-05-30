@@ -113,7 +113,7 @@ static TextFrameIndex lcl_AddSpace(const SwTextSizeInfo &rInf,
     {
         if ( SwScriptInfo::IsArabicText( *pStr, nPos, nEnd - nPos ) && pSI->CountKashida() )
         {
-            const sal_Int32 nKashRes = pSI->KashidaJustify(nullptr, nPos, nEnd - nPos);
+            const sal_Int32 nKashRes = pSI->KashidaJustify(nullptr, nullptr, nPos, nEnd - nPos);
             // i60591: need to check result of KashidaJustify
             // determine if kashida justification is applicable
             if (nKashRes != -1)
@@ -321,6 +321,7 @@ bool SwTextPortion::Format_( SwTextFormatInfo &rInf )
     if ( !bFull )
     {
         Width( aGuess.BreakWidth() );
+        ExtraBlankWidth(aGuess.ExtraBlankWidth());
         // Caution!
         if( !InExpGrp() || InFieldGrp() )
             SetLen( rInf.GetLen() );
@@ -409,6 +410,8 @@ bool SwTextPortion::Format_( SwTextFormatInfo &rInf )
             {
                 SwHolePortion *pNew = new SwHolePortion( *this );
                 pNew->SetLen( nRealStart - aGuess.BreakPos() );
+                pNew->Width(0);
+                pNew->ExtraBlankWidth( aGuess.ExtraBlankWidth() );
                 Insert( pNew );
             }
         }
@@ -419,8 +422,11 @@ bool SwTextPortion::Format_( SwTextFormatInfo &rInf )
     else
     {
         bool bFirstPor = rInf.GetLineStart() == rInf.GetIdx();
+        const bool bBreakLineIfHasFly
+            = rInf.GetTextFrame()->GetDoc().getIDocumentSettingAccess().get(
+                DocumentSettingId::WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML);
         if (aGuess.BreakPos() != TextFrameIndex(COMPLETE_STRING) &&
-            aGuess.BreakPos() != rInf.GetLineStart() &&
+            (aGuess.BreakPos() != rInf.GetLineStart() || bBreakLineIfHasFly) &&
             ( !bFirstPor || rInf.GetFly() || rInf.GetLast()->IsFlyPortion() ||
               rInf.IsFirstMulti() ) &&
             ( !rInf.GetLast()->IsBlankPortion() ||
@@ -430,7 +436,7 @@ bool SwTextPortion::Format_( SwTextFormatInfo &rInf )
         }
         else
              // case C2, last exit
-            BreakCut( rInf, aGuess );
+            BreakCut(rInf, aGuess);
     }
 
     return bFull;
@@ -667,7 +673,7 @@ tools::Long SwTextPortion::CalcSpacing( tools::Long nSpaceAdd, const SwTextSizeI
 
 void SwTextPortion::HandlePortion( SwPortionHandler& rPH ) const
 {
-    rPH.Text( GetLen(), GetWhichPor(), Height(), Width() );
+    rPH.Text( GetLen(), GetWhichPor() );
 }
 
 SwTextInputFieldPortion::SwTextInputFieldPortion()
@@ -699,12 +705,12 @@ void SwTextInputFieldPortion::Paint( const SwTextPaintInfo &rInf ) const
 
         if (aIntersect.HasArea()
             && rInf.OnWin()
-            && SwViewOption::IsFieldShadings()
+            && rInf.GetOpt().IsFieldShadings()
             && !rInf.GetOpt().IsPagePreview())
         {
             OutputDevice* pOut = const_cast<OutputDevice*>(rInf.GetOut());
             pOut->Push(vcl::PushFlags::LINECOLOR | vcl::PushFlags::FILLCOLOR);
-            pOut->SetFillColor(SwViewOption::GetFieldShadingsColor());
+            pOut->SetFillColor(rInf.GetOpt().GetFieldShadingsColor());
             pOut->SetLineColor();
             pOut->DrawRect(aIntersect.SVRect());
             pOut->Pop();
@@ -746,25 +752,44 @@ SwHolePortion::SwHolePortion( const SwTextPortion &rPor )
 {
     SetLen( TextFrameIndex(1) );
     Height( rPor.Height() );
+    Width(0);
     SetAscent( rPor.GetAscent() );
     SetWhichPor( PortionType::Hole );
 }
 
 SwLinePortion *SwHolePortion::Compress() { return this; }
 
+// The GetTextSize() assumes that the own length is correct
+SwPosSize SwHolePortion::GetTextSize(const SwTextSizeInfo& rInf) const
+{
+    SwPosSize aSize = rInf.GetTextSize();
+    if (!GetJoinBorderWithPrev())
+        aSize.Width(aSize.Width() + rInf.GetFont()->GetLeftBorderSpace());
+    if (!GetJoinBorderWithNext())
+        aSize.Width(aSize.Width() + rInf.GetFont()->GetRightBorderSpace());
+
+    aSize.Height(aSize.Height() +
+        rInf.GetFont()->GetTopBorderSpace() +
+        rInf.GetFont()->GetBottomBorderSpace());
+
+    return aSize;
+}
+
 void SwHolePortion::Paint( const SwTextPaintInfo &rInf ) const
 {
     if( !rInf.GetOut() )
         return;
 
+    bool bPDFExport = rInf.GetVsh()->GetViewOptions()->IsPDFExport();
+
     // #i16816# export stuff only needed for tagged pdf support
-    if (!SwTaggedPDFHelper::IsExportTaggedPDF( *rInf.GetOut()) )
+    if (bPDFExport && !SwTaggedPDFHelper::IsExportTaggedPDF( *rInf.GetOut()) )
         return;
 
     // #i68503# the hole must have no decoration for a consistent visual appearance
     const SwFont* pOrigFont = rInf.GetFont();
     std::unique_ptr<SwFont> pHoleFont;
-    std::unique_ptr<SwFontSave> pFontSave;
+    std::optional<SwFontSave> oFontSave;
     if( pOrigFont->GetUnderline() != LINESTYLE_NONE
     ||  pOrigFont->GetOverline() != LINESTYLE_NONE
     ||  pOrigFont->GetStrikeout() != STRIKEOUT_NONE )
@@ -773,12 +798,21 @@ void SwHolePortion::Paint( const SwTextPaintInfo &rInf ) const
         pHoleFont->SetUnderline( LINESTYLE_NONE );
         pHoleFont->SetOverline( LINESTYLE_NONE );
         pHoleFont->SetStrikeout( STRIKEOUT_NONE );
-        pFontSave.reset(new SwFontSave( rInf, pHoleFont.get() ));
+        oFontSave.emplace( rInf, pHoleFont.get() );
     }
 
-    rInf.DrawText(" ", *this, TextFrameIndex(0), TextFrameIndex(1));
+    if (bPDFExport)
+    {
+        rInf.DrawText(" ", *this, TextFrameIndex(0), TextFrameIndex(1));
+    }
+    else
+    {
+        // tdf#43244: Paint spaces even at end of line,
+        // but only if this paint is not called for pdf export, to keep that pdf export intact
+        rInf.DrawText(*this, rInf.GetLen());
+    }
 
-    pFontSave.reset();
+    oFontSave.reset();
     pHoleFont.reset();
 }
 
@@ -790,6 +824,18 @@ bool SwHolePortion::Format( SwTextFormatInfo &rInf )
 void SwHolePortion::HandlePortion( SwPortionHandler& rPH ) const
 {
     rPH.Text( GetLen(), GetWhichPor() );
+}
+
+void SwHolePortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText, TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwHolePortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("blank-width"),
+                                      BAD_CAST(OString::number(m_nBlankWidth).getStr()));
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 void SwFieldMarkPortion::Paint( const SwTextPaintInfo & /*rInf*/) const

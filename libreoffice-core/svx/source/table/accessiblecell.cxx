@@ -30,10 +30,10 @@
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
 
 #include <editeng/unoedsrc.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <comphelper/string.hxx>
 #include <comphelper/sequence.hxx>
 #include <svx/IAccessibleViewForwarder.hxx>
@@ -50,11 +50,11 @@ using namespace ::com::sun::star::container;
 
 namespace accessibility {
 
-AccessibleCell::AccessibleCell( const css::uno::Reference< css::accessibility::XAccessible>& rxParent, const sdr::table::CellRef& rCell, sal_Int32 nIndex, const AccessibleShapeTreeInfo& rShapeTreeInfo )
+AccessibleCell::AccessibleCell( const css::uno::Reference< css::accessibility::XAccessible>& rxParent, sdr::table::CellRef xCell, sal_Int32 nIndex, const AccessibleShapeTreeInfo& rShapeTreeInfo )
 : AccessibleCellBase( rxParent, AccessibleRole::TABLE_CELL )
 , maShapeTreeInfo( rShapeTreeInfo )
 , mnIndexInParent( nIndex )
-, mxCell( rCell )
+, mxCell(std::move( xCell ))
 {
     //Init the pAccTable var
     pAccTable = dynamic_cast <AccessibleTableShape *> (rxParent.get());
@@ -87,7 +87,7 @@ void AccessibleCell::Init()
 }
 
 
-bool AccessibleCell::SetState (sal_Int16 aState)
+bool AccessibleCell::SetState (sal_Int64 aState)
 {
     bool bStateHasChanged = false;
 
@@ -106,7 +106,7 @@ bool AccessibleCell::SetState (sal_Int16 aState)
 }
 
 
-bool AccessibleCell::ResetState (sal_Int16 aState)
+bool AccessibleCell::ResetState (sal_Int64 aState)
 {
     bool bStateHasChanged = false;
 
@@ -151,7 +151,7 @@ void SAL_CALL AccessibleCell::release(  ) noexcept
 
 /** The children of this cell come from the paragraphs of text.
 */
-sal_Int32 SAL_CALL AccessibleCell::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleCell::getAccessibleChildCount()
 {
     SolarMutexGuard aSolarGuard;
     ThrowIfDisposed ();
@@ -162,12 +162,11 @@ sal_Int32 SAL_CALL AccessibleCell::getAccessibleChildCount()
 /** Forward the request to the shape.  Return the requested shape or throw
     an exception for a wrong index.
 */
-Reference<XAccessible> SAL_CALL AccessibleCell::getAccessibleChild (sal_Int32 nIndex)
+Reference<XAccessible> SAL_CALL AccessibleCell::getAccessibleChild (sal_Int64 nIndex)
 {
     SolarMutexGuard aSolarGuard;
     ThrowIfDisposed ();
 
-    // todo: does GetChild throw IndexOutOfBoundsException?
     return mpText->GetChild (nIndex);
 }
 
@@ -178,67 +177,54 @@ Reference<XAccessible> SAL_CALL AccessibleCell::getAccessibleChild (sal_Int32 nI
         SHOWING
         VISIBLE
 */
-Reference<XAccessibleStateSet> SAL_CALL AccessibleCell::getAccessibleStateSet()
+sal_Int64 SAL_CALL AccessibleCell::getAccessibleStateSet()
 {
     SolarMutexGuard aSolarGuard;
     ::osl::MutexGuard aGuard (m_aMutex);
-    Reference<XAccessibleStateSet> xStateSet;
+    sal_Int64 nStateSet = 0;
 
     if (rBHelper.bDisposed || mpText == nullptr)
     {
         // Return a minimal state set that only contains the DEFUNC state.
-        xStateSet = AccessibleContextBase::getAccessibleStateSet ();
+        nStateSet = AccessibleContextBase::getAccessibleStateSet ();
     }
     else
     {
-        ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-
-        if(pStateSet)
+        // Merge current FOCUSED state from edit engine.
+        if (mpText != nullptr)
         {
-            // Merge current FOCUSED state from edit engine.
-            if (mpText != nullptr)
-            {
-                if (mpText->HaveFocus())
-                    pStateSet->AddState (AccessibleStateType::FOCUSED);
-                else
-                    pStateSet->RemoveState (AccessibleStateType::FOCUSED);
-            }
-            // Set the invisible state for merged cell
-            if (mxCell.is() && mxCell->isMerged())
-                pStateSet->RemoveState(AccessibleStateType::VISIBLE);
+            if (mpText->HaveFocus())
+                mnStateSet |= AccessibleStateType::FOCUSED;
             else
-                pStateSet->AddState(AccessibleStateType::VISIBLE);
+                mnStateSet &= ~AccessibleStateType::FOCUSED;
+        }
+        // Set the invisible state for merged cell
+        if (mxCell.is() && mxCell->isMerged())
+            mnStateSet &= ~AccessibleStateType::VISIBLE;
+        else
+            mnStateSet |= AccessibleStateType::VISIBLE;
 
 
-            //Just when the parent table is not read-only,set states EDITABLE,RESIZABLE,MOVEABLE
-            css::uno::Reference<XAccessible> xTempAcc = getAccessibleParent();
-            if( xTempAcc.is() )
+        //Just when the parent table is not read-only,set states EDITABLE,RESIZABLE,MOVEABLE
+        css::uno::Reference<XAccessible> xTempAcc = getAccessibleParent();
+        if( xTempAcc.is() )
+        {
+            css::uno::Reference<XAccessibleContext>
+                                    xTempAccContext = xTempAcc->getAccessibleContext();
+            if( xTempAccContext.is() )
             {
-                css::uno::Reference<XAccessibleContext>
-                                        xTempAccContext = xTempAcc->getAccessibleContext();
-                if( xTempAccContext.is() )
+                if (xTempAccContext->getAccessibleStateSet() & AccessibleStateType::EDITABLE)
                 {
-                    css::uno::Reference<XAccessibleStateSet> rState =
-                        xTempAccContext->getAccessibleStateSet();
-                    if( rState.is() )
-                    {
-                        const css::uno::Sequence<short> aStates = rState->getStates();
-                        if (std::find(aStates.begin(), aStates.end(), AccessibleStateType::EDITABLE) != aStates.end())
-                        {
-                            pStateSet->AddState (AccessibleStateType::EDITABLE);
-                            pStateSet->AddState (AccessibleStateType::RESIZABLE);
-                            pStateSet->AddState (AccessibleStateType::MOVEABLE);
-                        }
-                    }
+                    mnStateSet |= AccessibleStateType::EDITABLE;
+                    mnStateSet |= AccessibleStateType::RESIZABLE;
+                    mnStateSet |= AccessibleStateType::MOVEABLE;
                 }
             }
-            // Create a copy of the state set that may be modified by the
-            // caller without affecting the current state set.
-            xStateSet.set(new ::utl::AccessibleStateSetHelper (*pStateSet));
         }
+        nStateSet = mnStateSet;
     }
 
-    return xStateSet;
+    return nStateSet;
 }
 
 
@@ -263,8 +249,8 @@ Reference<XAccessible > SAL_CALL  AccessibleCell::getAccessibleAtPoint ( const c
     SolarMutexGuard aSolarGuard;
     ::osl::MutexGuard aGuard (m_aMutex);
 
-    sal_Int32 nChildCount = getAccessibleChildCount ();
-    for (sal_Int32 i=0; i<nChildCount; ++i)
+    sal_Int64 nChildCount = getAccessibleChildCount ();
+    for (sal_Int64 i = 0; i < nChildCount; ++i)
     {
         Reference<XAccessible> xChild (getAccessibleChild (i));
         if (xChild.is())
@@ -321,7 +307,7 @@ css::awt::Rectangle SAL_CALL AccessibleCell::getBounds()
             awt::Size aParentSize (xParentComponent->getSize());
             ::tools::Rectangle aParentBBox (0,0, aParentSize.Width, aParentSize.Height);
             aBBox = aBBox.GetIntersection (aParentBBox);
-            aBoundingBox = awt::Rectangle ( aBBox.Left(), aBBox.Top(), aBBox.getWidth(), aBBox.getHeight());
+            aBoundingBox = awt::Rectangle ( aBBox.Left(), aBBox.Top(), aBBox.getOpenWidth(), aBBox.getOpenHeight());
         }
         else
         {
@@ -493,9 +479,7 @@ void AccessibleCell::disposing()
 
     // Make sure to send an event that this object loses the focus in the
     // case that it has the focus.
-    ::utl::AccessibleStateSetHelper* pStateSet = static_cast< ::utl::AccessibleStateSetHelper*>(mxStateSet.get());
-    if (pStateSet != nullptr)
-        pStateSet->RemoveState(AccessibleStateType::FOCUSED);
+    mnStateSet &= ~AccessibleStateType::FOCUSED;
 
     if (mpText != nullptr)
     {
@@ -512,7 +496,7 @@ void AccessibleCell::disposing()
     AccessibleContextBase::dispose ();
 }
 
-sal_Int32 SAL_CALL AccessibleCell::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleCell::getAccessibleIndexInParent()
 {
     ThrowIfDisposed ();
     return mnIndexInParent;
@@ -549,7 +533,7 @@ OUString AccessibleCell::getCellName( sal_Int32 nCol, sal_Int32 nRow )
         }
         aStr.append(static_cast<sal_Unicode>( 'A' +
                 static_cast<sal_uInt16>(nCol)));
-        aBuf.append(comphelper::string::reverseString(aStr.makeStringAndClear()));
+        aBuf.append(comphelper::string::reverseString(aStr));
     }
     aBuf.append(nRow+1);
     return aBuf.makeStringAndClear();

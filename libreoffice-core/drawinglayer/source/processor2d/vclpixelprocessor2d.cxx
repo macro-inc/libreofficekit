@@ -23,21 +23,21 @@
 #include <comphelper/lok.hxx>
 
 #include <sal/log.hxx>
-#include <vcl/BitmapBasicMorphologyFilter.hxx>
-#include <vcl/BitmapFilterStackBlur.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/hatch.hxx>
 #include <vcl/canvastools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/Tools.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGradientPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonGraphicPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <drawinglayer/primitive2d/fillgraphicprimitive2d.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
@@ -57,7 +57,6 @@
 #include <drawinglayer/primitive2d/pointarrayprimitive2d.hxx>
 #include <drawinglayer/primitive2d/fillhatchprimitive2d.hxx>
 #include <drawinglayer/primitive2d/epsprimitive2d.hxx>
-#include <drawinglayer/primitive2d/softedgeprimitive2d.hxx>
 #include <drawinglayer/primitive2d/shadowprimitive2d.hxx>
 #include <drawinglayer/primitive2d/patternfillprimitive2d.hxx>
 
@@ -71,21 +70,11 @@ using namespace com::sun::star;
 
 namespace drawinglayer::processor2d
 {
-struct VclPixelProcessor2D::Impl
-{
-    AntialiasingFlags m_nOrigAntiAliasing;
-
-    explicit Impl(OutputDevice const& rOutDev)
-        : m_nOrigAntiAliasing(rOutDev.GetAntialiasing())
-    {
-    }
-};
-
 VclPixelProcessor2D::VclPixelProcessor2D(const geometry::ViewInformation2D& rViewInformation,
                                          OutputDevice& rOutDev,
                                          const basegfx::BColorModifierStack& rInitStack)
     : VclProcessor2D(rViewInformation, rOutDev, rInitStack)
-    , m_pImpl(new Impl(rOutDev))
+    , m_nOrigAntiAliasing(rOutDev.GetAntialiasing())
 {
     // prepare maCurrentTransformation matrix with viewTransformation to target directly to pixels
     maCurrentTransformation = rViewInformation.getObjectToViewTransformation();
@@ -95,13 +84,13 @@ VclPixelProcessor2D::VclPixelProcessor2D(const geometry::ViewInformation2D& rVie
     mpOutputDevice->SetMapMode();
 
     // react on AntiAliasing settings
-    if (SvtOptionsDrawinglayer::IsAntiAliasing())
+    if (rViewInformation.getUseAntiAliasing())
     {
-        mpOutputDevice->SetAntialiasing(m_pImpl->m_nOrigAntiAliasing | AntialiasingFlags::Enable);
+        mpOutputDevice->SetAntialiasing(m_nOrigAntiAliasing | AntialiasingFlags::Enable);
     }
     else
     {
-        mpOutputDevice->SetAntialiasing(m_pImpl->m_nOrigAntiAliasing & ~AntialiasingFlags::Enable);
+        mpOutputDevice->SetAntialiasing(m_nOrigAntiAliasing & ~AntialiasingFlags::Enable);
     }
 }
 
@@ -111,7 +100,7 @@ VclPixelProcessor2D::~VclPixelProcessor2D()
     mpOutputDevice->Pop();
 
     // restore AntiAliasing
-    mpOutputDevice->SetAntialiasing(m_pImpl->m_nOrigAntiAliasing);
+    mpOutputDevice->SetAntialiasing(m_nOrigAntiAliasing);
 }
 
 void VclPixelProcessor2D::tryDrawPolyPolygonColorPrimitive2DDirect(
@@ -195,32 +184,6 @@ bool VclPixelProcessor2D::tryDrawPolygonStrokePrimitive2DDirect(
         rSource.getLineAttribute().getLineJoin(), rSource.getLineAttribute().getLineCap(),
         rSource.getLineAttribute().getMiterMinimumAngle());
 }
-
-namespace
-{
-GradientStyle convertGradientStyle(drawinglayer::attribute::GradientStyle eGradientStyle)
-{
-    switch (eGradientStyle)
-    {
-        case drawinglayer::attribute::GradientStyle::Axial:
-            return GradientStyle::Axial;
-        case drawinglayer::attribute::GradientStyle::Radial:
-            return GradientStyle::Radial;
-        case drawinglayer::attribute::GradientStyle::Elliptical:
-            return GradientStyle::Elliptical;
-        case drawinglayer::attribute::GradientStyle::Square:
-            return GradientStyle::Square;
-        case drawinglayer::attribute::GradientStyle::Rect:
-            return GradientStyle::Rect;
-        case drawinglayer::attribute::GradientStyle::Linear:
-            return GradientStyle::Linear;
-        default:
-            assert(false);
-            return GradientStyle::Linear;
-    }
-}
-
-} // end anonymous namespace
 
 void VclPixelProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimitive2D& rCandidate)
 {
@@ -367,17 +330,6 @@ void VclPixelProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimitiv
                 static_cast<const primitive2d::BackgroundColorPrimitive2D&>(rCandidate));
             break;
         }
-        case PRIMITIVE2D_ID_TEXTHIERARCHYEDITPRIMITIVE2D:
-        {
-            // #i97628#
-            // This primitive means that the content is derived from an active text edit,
-            // not from model data itself. Some renderers need to suppress this content, e.g.
-            // the pixel renderer used for displaying the edit view (like this one). It's
-            // not to be suppressed by the MetaFile renderers, so that the edited text is
-            // part of the MetaFile, e.g. needed for presentation previews.
-            // Action: Ignore here, do nothing.
-            break;
-        }
         case PRIMITIVE2D_ID_INVERTPRIMITIVE2D:
         {
             processInvertPrimitive2D(rCandidate);
@@ -404,24 +356,6 @@ void VclPixelProcessor2D::processBasePrimitive2D(const primitive2d::BasePrimitiv
         {
             processBorderLinePrimitive2D(
                 static_cast<const drawinglayer::primitive2d::BorderLinePrimitive2D&>(rCandidate));
-            break;
-        }
-        case PRIMITIVE2D_ID_GLOWPRIMITIVE2D:
-        {
-            processGlowPrimitive2D(
-                static_cast<const drawinglayer::primitive2d::GlowPrimitive2D&>(rCandidate));
-            break;
-        }
-        case PRIMITIVE2D_ID_SOFTEDGEPRIMITIVE2D:
-        {
-            processSoftEdgePrimitive2D(
-                static_cast<const drawinglayer::primitive2d::SoftEdgePrimitive2D&>(rCandidate));
-            break;
-        }
-        case PRIMITIVE2D_ID_SHADOWPRIMITIVE2D:
-        {
-            processShadowPrimitive2D(
-                static_cast<const drawinglayer::primitive2d::ShadowPrimitive2D&>(rCandidate));
             break;
         }
         case PRIMITIVE2D_ID_FILLGRADIENTPRIMITIVE2D:
@@ -537,14 +471,30 @@ void VclPixelProcessor2D::processBitmapPrimitive2D(
 void VclPixelProcessor2D::processPolyPolygonGradientPrimitive2D(
     const primitive2d::PolyPolygonGradientPrimitive2D& rPolygonCandidate)
 {
-    // direct draw of gradient
-    const attribute::FillGradientAttribute& rGradient(rPolygonCandidate.getFillGradient());
-    basegfx::BColor aStartColor(maBColorModifierStack.getModifiedColor(rGradient.getStartColor()));
-    basegfx::BColor aEndColor(maBColorModifierStack.getModifiedColor(rGradient.getEndColor()));
     basegfx::B2DPolyPolygon aLocalPolyPolygon(rPolygonCandidate.getB2DPolyPolygon());
 
+    // no geometry, no need to render, done
     if (!aLocalPolyPolygon.count())
         return;
+
+    // *try* direct draw (AKA using old VCL stuff) to render gradient
+    const attribute::FillGradientAttribute& rGradient(rPolygonCandidate.getFillGradient());
+
+    // MCGR: *many* - and not only GradientStops - cases cannot be handled by VCL
+    // so use decomposition
+    // NOTE: There may be even more reasons to detect, e.g. a ViewTransformation
+    // that uses shear/rotate/mirror (what VCL cannot handle at all), see
+    // other checks already in processFillGradientPrimitive2D
+    if (rGradient.cannotBeHandledByVCL())
+    {
+        process(rPolygonCandidate);
+        return;
+    }
+
+    basegfx::BColor aStartColor(
+        maBColorModifierStack.getModifiedColor(rGradient.getColorStops().front().getStopColor()));
+    basegfx::BColor aEndColor(
+        maBColorModifierStack.getModifiedColor(rGradient.getColorStops().back().getStopColor()));
 
     if (aStartColor == aEndColor)
     {
@@ -553,12 +503,11 @@ void VclPixelProcessor2D::processPolyPolygonGradientPrimitive2D(
         mpOutputDevice->SetLineColor();
         mpOutputDevice->SetFillColor(Color(aStartColor));
         mpOutputDevice->DrawPolyPolygon(aLocalPolyPolygon);
+        return;
     }
-    else
-    {
-        // use the primitive decomposition of the metafile
-        process(rPolygonCandidate);
-    }
+
+    // use the primitive decomposition
+    process(rPolygonCandidate);
 }
 
 void VclPixelProcessor2D::processPolyPolygonColorPrimitive2D(
@@ -573,7 +522,7 @@ void VclPixelProcessor2D::processPolyPolygonColorPrimitive2D(
     // when AA is on and this filled polygons are the result of stroked line geometry,
     // draw the geometry once extra as lines to avoid AA 'gaps' between partial polygons
     // Caution: This is needed in both cases (!)
-    if (!(mnPolygonStrokePrimitive2D && SvtOptionsDrawinglayer::IsAntiAliasing()
+    if (!(mnPolygonStrokePrimitive2D && getViewInformation2D().getUseAntiAliasing()
           && (mpOutputDevice->GetAntialiasing() & AntialiasingFlags::Enable)))
         return;
 
@@ -619,9 +568,7 @@ void VclPixelProcessor2D::processUnifiedTransparencePrimitive2D(
 
         if (1 == rContent.size())
         {
-            const primitive2d::Primitive2DReference xReference(rContent[0]);
-            const primitive2d::BasePrimitive2D* pBasePrimitive
-                = static_cast<const primitive2d::BasePrimitive2D*>(xReference.get());
+            const primitive2d::BasePrimitive2D* pBasePrimitive = rContent[0].get();
 
             switch (pBasePrimitive->getPrimitive2DID())
             {
@@ -790,7 +737,7 @@ void VclPixelProcessor2D::processPolygonStrokePrimitive2D(
 void VclPixelProcessor2D::processFillHatchPrimitive2D(
     const primitive2d::FillHatchPrimitive2D& rFillHatchPrimitive)
 {
-    if (SvtOptionsDrawinglayer::IsAntiAliasing())
+    if (getViewInformation2D().getUseAntiAliasing())
     {
         // if AA is used (or ignore smoothing is on), there is no need to smooth
         // hatch painting, use decomposition
@@ -957,8 +904,7 @@ void VclPixelProcessor2D::processInvertPrimitive2D(const primitive2d::BasePrimit
 void VclPixelProcessor2D::processMetaFilePrimitive2D(const primitive2d::BasePrimitive2D& rCandidate)
 {
     // #i98289#
-    const bool bForceLineSnap(SvtOptionsDrawinglayer::IsAntiAliasing()
-                              && SvtOptionsDrawinglayer::IsSnapHorVerLinesToDiscrete());
+    const bool bForceLineSnap(getViewInformation2D().getPixelSnapHairline());
     const AntialiasingFlags nOldAntiAliase(mpOutputDevice->GetAntialiasing());
 
     if (bForceLineSnap)
@@ -974,264 +920,116 @@ void VclPixelProcessor2D::processMetaFilePrimitive2D(const primitive2d::BasePrim
     }
 }
 
-namespace
-{
-/* Returns 8-bit alpha mask created from passed mask.
-
-   Negative fErodeDilateRadius values mean erode, positive - dilate.
-   nTransparency defines minimal transparency level.
-*/
-AlphaMask ProcessAndBlurAlphaMask(const Bitmap& rMask, double fErodeDilateRadius,
-                                  double fBlurRadius, sal_uInt8 nTransparency,
-                                  bool bConvertTo1Bit = true)
-{
-    // Only completely white pixels on the initial mask must be considered for transparency. Any
-    // other color must be treated as black. This creates 1-bit B&W bitmap.
-    BitmapEx mask(bConvertTo1Bit ? rMask.CreateMask(COL_WHITE) : rMask);
-
-    // Scaling down increases performance without noticeable quality loss. Additionally,
-    // current blur implementation can only handle blur radius between 2 and 254.
-    Size aSize = mask.GetSizePixel();
-    double fScale = 1.0;
-    while (fBlurRadius > 254 || aSize.Height() > 1000 || aSize.Width() > 1000)
-    {
-        fScale /= 2;
-        fBlurRadius /= 2;
-        fErodeDilateRadius /= 2;
-        aSize.setHeight(aSize.Height() / 2);
-        aSize.setWidth(aSize.Width() / 2);
-    }
-
-    // BmpScaleFlag::Fast is important for following color replacement
-    mask.Scale(fScale, fScale, BmpScaleFlag::Fast);
-
-    if (fErodeDilateRadius > 0)
-        BitmapFilter::Filter(mask, BitmapDilateFilter(fErodeDilateRadius));
-    else if (fErodeDilateRadius < 0)
-        BitmapFilter::Filter(mask, BitmapErodeFilter(-fErodeDilateRadius, 0xFF));
-
-    if (nTransparency)
-    {
-        const Color aTransparency(nTransparency, nTransparency, nTransparency);
-        mask.Replace(COL_BLACK, aTransparency);
-    }
-
-    // We need 8-bit grey mask for blurring
-    mask.Convert(BmpConversion::N8BitGreys);
-
-    // calculate blurry effect
-    BitmapFilter::Filter(mask, BitmapFilterStackBlur(fBlurRadius));
-
-    mask.Scale(rMask.GetSizePixel());
-
-    return AlphaMask(mask.GetBitmap());
-}
-
-drawinglayer::geometry::ViewInformation2D
-expandRange(const drawinglayer::geometry::ViewInformation2D& rViewInfo, double nAmount)
-{
-    basegfx::B2DRange viewport(rViewInfo.getViewport());
-    viewport.grow(nAmount);
-    return { rViewInfo.getObjectTransformation(),
-             rViewInfo.getViewTransformation(),
-             viewport,
-             rViewInfo.getVisualizedPage(),
-             rViewInfo.getViewTime(),
-             rViewInfo.getReducedDisplayQuality() };
-}
-}
-
-void VclPixelProcessor2D::processGlowPrimitive2D(const primitive2d::GlowPrimitive2D& rCandidate)
-{
-    const double nGlowRadius(rCandidate.getGlowRadius());
-    // Avoid wrong effect on the cut-off side; so expand by radius
-    const auto aExpandedViewInfo(expandRange(getViewInformation2D(), nGlowRadius));
-    basegfx::B2DRange aRange(rCandidate.getB2DRange(aExpandedViewInfo));
-    aRange.transform(maCurrentTransformation);
-    basegfx::B2DVector aGlowRadiusVector(nGlowRadius, 0);
-    // Calculate the pixel size of glow radius in current transformation
-    aGlowRadiusVector *= maCurrentTransformation;
-    // Glow radius is the size of the halo from each side of the object. The halo is the
-    // border of glow color that fades from glow transparency level to fully transparent
-    // When blurring a sharp boundary (our case), it gets 50% of original intensity, and
-    // fades to both sides by the blur radius; thus blur radius is half of glow radius.
-    const double fBlurRadius = aGlowRadiusVector.getLength() / 2;
-    // Consider glow transparency (initial transparency near the object edge)
-    const sal_uInt8 nAlpha = rCandidate.getGlowColor().GetAlpha();
-
-    impBufferDevice aBufferDevice(*mpOutputDevice, aRange, false);
-    if (aBufferDevice.isVisible())
-    {
-        // remember last OutDev and set to content
-        OutputDevice* pLastOutputDevice = mpOutputDevice;
-        mpOutputDevice = &aBufferDevice.getContent();
-        // We don't need antialiased mask here, which would only make effect thicker
-        const auto aPrevAA = mpOutputDevice->GetAntialiasing();
-        mpOutputDevice->SetAntialiasing(AntialiasingFlags::NONE);
-        process(rCandidate);
-
-        // Limit the bitmap size to the visible area.
-        basegfx::B2DRange bitmapRange(aRange);
-        if (!aExpandedViewInfo.getDiscreteViewport().isEmpty())
-            bitmapRange.intersect(aExpandedViewInfo.getDiscreteViewport());
-        if (!bitmapRange.isEmpty())
-        {
-            const tools::Rectangle aRect(
-                static_cast<tools::Long>(std::floor(bitmapRange.getMinX())),
-                static_cast<tools::Long>(std::floor(bitmapRange.getMinY())),
-                static_cast<tools::Long>(std::ceil(bitmapRange.getMaxX())),
-                static_cast<tools::Long>(std::ceil(bitmapRange.getMaxY())));
-            BitmapEx bmpEx = mpOutputDevice->GetBitmapEx(aRect.TopLeft(), aRect.GetSize());
-            mpOutputDevice->SetAntialiasing(aPrevAA);
-
-            AlphaMask mask
-                = ProcessAndBlurAlphaMask(bmpEx.GetAlpha(), fBlurRadius, fBlurRadius, 255 - nAlpha);
-
-            // The end result is the bitmap filled with glow color and blurred 8-bit alpha mask
-            const basegfx::BColor aGlowColor(
-                maBColorModifierStack.getModifiedColor(rCandidate.getGlowColor().getBColor()));
-            Bitmap bmp = bmpEx.GetBitmap();
-            bmp.Erase(Color(aGlowColor));
-            BitmapEx result(bmp, mask);
-
-            // back to old OutDev
-            mpOutputDevice = pLastOutputDevice;
-            mpOutputDevice->DrawBitmapEx(aRect.TopLeft(), result);
-        }
-        else
-        {
-            mpOutputDevice = pLastOutputDevice;
-        }
-    }
-    else
-        SAL_WARN("drawinglayer", "Temporary buffered virtual device is not visible");
-}
-
-void VclPixelProcessor2D::processSoftEdgePrimitive2D(
-    const primitive2d::SoftEdgePrimitive2D& rCandidate)
-{
-    const double nRadius(rCandidate.getRadius());
-    // Avoid wrong effect on the cut-off side; so expand by diameter
-    const auto aExpandedViewInfo(expandRange(getViewInformation2D(), nRadius * 2));
-
-    basegfx::B2DRange aRange(rCandidate.getB2DRange(aExpandedViewInfo));
-    aRange.transform(maCurrentTransformation);
-    basegfx::B2DVector aRadiusVector(nRadius, 0);
-    // Calculate the pixel size of soft edge radius in current transformation
-    aRadiusVector *= maCurrentTransformation;
-    // Blur radius is equal to soft edge radius
-    const double fBlurRadius = aRadiusVector.getLength();
-
-    impBufferDevice aBufferDevice(*mpOutputDevice, aRange, false);
-    if (aBufferDevice.isVisible())
-    {
-        // remember last OutDev and set to content
-        OutputDevice* pLastOutputDevice = mpOutputDevice;
-        mpOutputDevice = &aBufferDevice.getContent();
-        // Since the effect converts all children to bitmap, we can't disable antialiasing here,
-        // because it would result in poor quality in areas not affected by the effect
-        process(rCandidate);
-
-        // Limit the bitmap size to the visible area.
-        basegfx::B2DRange bitmapRange(aRange);
-        if (!aExpandedViewInfo.getDiscreteViewport().isEmpty())
-            bitmapRange.intersect(aExpandedViewInfo.getDiscreteViewport());
-        if (!bitmapRange.isEmpty())
-        {
-            const tools::Rectangle aRect(
-                static_cast<tools::Long>(std::floor(bitmapRange.getMinX())),
-                static_cast<tools::Long>(std::floor(bitmapRange.getMinY())),
-                static_cast<tools::Long>(std::ceil(bitmapRange.getMaxX())),
-                static_cast<tools::Long>(std::ceil(bitmapRange.getMaxY())));
-            BitmapEx bitmap = mpOutputDevice->GetBitmapEx(aRect.TopLeft(), aRect.GetSize());
-
-            AlphaMask aMask = bitmap.GetAlpha();
-            AlphaMask blurMask = ProcessAndBlurAlphaMask(aMask, -fBlurRadius, fBlurRadius, 0);
-
-            aMask.BlendWith(blurMask);
-
-            // The end result is the original bitmap with blurred 8-bit alpha mask
-            BitmapEx result(bitmap.GetBitmap(), aMask);
-
-            // back to old OutDev
-            mpOutputDevice = pLastOutputDevice;
-            mpOutputDevice->DrawBitmapEx(aRect.TopLeft(), result);
-        }
-        else
-        {
-            mpOutputDevice = pLastOutputDevice;
-        }
-    }
-    else
-        SAL_WARN("drawinglayer", "Temporary buffered virtual device is not visible");
-}
-
-void VclPixelProcessor2D::processShadowPrimitive2D(const primitive2d::ShadowPrimitive2D& rCandidate)
-{
-    if (rCandidate.getShadowBlur() == 0)
-    {
-        process(rCandidate);
-        return;
-    }
-
-    basegfx::B2DRange aRange(rCandidate.getB2DRange(getViewInformation2D()));
-    aRange.transform(maCurrentTransformation);
-    basegfx::B2DVector aBlurRadiusVector(rCandidate.getShadowBlur(), 0);
-    aBlurRadiusVector *= maCurrentTransformation;
-    const double fBlurRadius = aBlurRadiusVector.getLength();
-
-    impBufferDevice aBufferDevice(*mpOutputDevice, aRange);
-    if (aBufferDevice.isVisible() && !aRange.isEmpty())
-    {
-        OutputDevice* pLastOutputDevice = mpOutputDevice;
-        mpOutputDevice = &aBufferDevice.getContent();
-
-        process(rCandidate);
-
-        const tools::Rectangle aRect(static_cast<tools::Long>(std::floor(aRange.getMinX())),
-                                     static_cast<tools::Long>(std::floor(aRange.getMinY())),
-                                     static_cast<tools::Long>(std::ceil(aRange.getMaxX())),
-                                     static_cast<tools::Long>(std::ceil(aRange.getMaxY())));
-
-        BitmapEx bitmapEx = mpOutputDevice->GetBitmapEx(aRect.TopLeft(), aRect.GetSize());
-
-        AlphaMask mask = ProcessAndBlurAlphaMask(bitmapEx.GetAlpha(), 0, fBlurRadius, 0, false);
-
-        const basegfx::BColor aShadowColor(
-            maBColorModifierStack.getModifiedColor(rCandidate.getShadowColor()));
-
-        Bitmap bitmap = bitmapEx.GetBitmap();
-        bitmap.Erase(Color(aShadowColor));
-        BitmapEx result(bitmap, mask);
-
-        mpOutputDevice = pLastOutputDevice;
-        mpOutputDevice->DrawBitmapEx(aRect.TopLeft(), result);
-    }
-    else
-        SAL_WARN("drawinglayer", "Temporary buffered virtual device is not visible");
-}
-
 void VclPixelProcessor2D::processFillGradientPrimitive2D(
     const primitive2d::FillGradientPrimitive2D& rPrimitive)
 {
     const attribute::FillGradientAttribute& rFillGradient = rPrimitive.getFillGradient();
+    bool useDecompose(false);
 
-    // VCL should be able to handle all styles, but for tdf#133477 the VCL result
-    // is different from processing the gradient manually by drawinglayer
-    // (and the Writer unittest for it fails). Keep using the drawinglayer code
-    // until somebody founds out what's wrong and fixes it.
-    if (rFillGradient.getStyle() != drawinglayer::attribute::GradientStyle::Linear
-        && rFillGradient.getStyle() != drawinglayer::attribute::GradientStyle::Axial
-        && rFillGradient.getStyle() != drawinglayer::attribute::GradientStyle::Radial)
+    // MCGR: *many* - and not only GradientStops - cases cannot be handled by VCL
+    // so use decomposition
+    if (rFillGradient.cannotBeHandledByVCL())
     {
-        process(rPrimitive);
+        useDecompose = true;
+    }
+
+    // tdf#149754 VCL gradient draw is not capable to handle all primitive gradient definitions,
+    // what should be clear due to being developed to extend/replace them in
+    // capabilities & precision.
+    // It is e.g. not capable to correctly paint if the OutputRange is not completely
+    // inside the DefinitionRange, thus forcing to paint gradient parts *outside* the
+    // DefinitionRange.
+    // This happens for Writer with Frames anchored in Frames (and was broken due to
+    // falling back to VCL Gradient paint here), and for the new SlideBackgroundFill
+    // Fill mode for objects using it that reach outside the page (which is the
+    // DefinitionRange in that case).
+    // I see no real reason to fallback here to OutputDevice::DrawGradient and VCL
+    // gradient paint at all (system-dependent renderers wouldn't in the future), but
+    // will for convenience only add that needed additional correcting case
+    if (!useDecompose && !rPrimitive.getDefinitionRange().isInside(rPrimitive.getOutputRange()))
+    {
+        useDecompose = true;
+    }
+
+    // tdf#151081 need to use regular primitive decomposition when the gradient
+    // is transformed in any other way then just translate & scale
+    if (!useDecompose)
+    {
+        basegfx::B2DVector aScale, aTranslate;
+        double fRotate, fShearX;
+
+        maCurrentTransformation.decompose(aScale, aTranslate, fRotate, fShearX);
+
+        // detect if transformation is rotated, sheared or mirrored in X and/or Y
+        if (!basegfx::fTools::equalZero(fRotate) || !basegfx::fTools::equalZero(fShearX)
+            || aScale.getX() < 0.0 || aScale.getY() < 0.0)
+        {
+            useDecompose = true;
+        }
+    }
+
+    if (useDecompose)
+    {
+        // default is to use the direct render below. For security,
+        // keep the (simple) fallback to decompose in place here
+        static bool bTryDirectRender(true);
+
+        if (bTryDirectRender)
+        {
+            // MCGR: Avoid one level of primitive creation, use FillGradientPrimitive2D
+            // tooling to directly create needed geoemtry & color for getting better
+            // performance (partially compensate for potentially more expensive multi
+            // color gradients).
+            // To handle a primitive that needs paint, either use decompose, or - when you
+            // do not want that for any reason, e.g. extra primitives created - implement
+            // a direct handling in your primitive rendererer. This is always possible
+            // since primitives by definition are self-contained what means they have all
+            // needed data locally available to do so.
+            // The question is the complexity to invest - the implemented decompose
+            // is always a good hint what is neeed to do this. In this case I decided
+            // to add some tooling methods to the primitive itself to support this. These
+            // are used in decompose and can be used - as here now - for direct handling,
+            // too. This is always a possibility in primitive handling - you can, but do not
+            // have to.
+            mpOutputDevice->SetFillColor(
+                Color(maBColorModifierStack.getModifiedColor(rPrimitive.getOuterColor())));
+            mpOutputDevice->SetLineColor();
+            mpOutputDevice->DrawTransparent(
+                maCurrentTransformation,
+                basegfx::B2DPolyPolygon(
+                    basegfx::utils::createPolygonFromRect(rPrimitive.getOutputRange())),
+                0.0);
+
+            // paint solid fill steps by providing callback as lambda
+            auto aCallback([&rPrimitive, this](const basegfx::B2DHomMatrix& rMatrix,
+                                               const basegfx::BColor& rColor) {
+                // create part polygon
+                basegfx::B2DPolygon aNewPoly(rPrimitive.getUnitPolygon());
+                aNewPoly.transform(rMatrix);
+
+                // create solid fill
+                mpOutputDevice->SetFillColor(Color(maBColorModifierStack.getModifiedColor(rColor)));
+                mpOutputDevice->DrawTransparent(maCurrentTransformation,
+                                                basegfx::B2DPolyPolygon(aNewPoly), 0.0);
+            });
+
+            // call value generator to trigger callbacks
+            rPrimitive.generateMatricesAndColors(aCallback);
+        }
+        else
+        {
+            // use the decompose
+            process(rPrimitive);
+        }
+
         return;
     }
 
-    GradientStyle eGradientStyle = convertGradientStyle(rFillGradient.getStyle());
-
-    Gradient aGradient(eGradientStyle, Color(rFillGradient.getStartColor()),
-                       Color(rFillGradient.getEndColor()));
+    // try to use vcl - since vcl uses the old gradient paint mechanisms this may
+    // create wrong geometries. If so, add another case above for useDecompose
+    Gradient aGradient(rFillGradient.getStyle(),
+                       Color(rFillGradient.getColorStops().front().getStopColor()),
+                       Color(rFillGradient.getColorStops().back().getStopColor()));
 
     aGradient.SetAngle(Degree10(static_cast<int>(basegfx::rad2deg<10>(rFillGradient.getAngle()))));
     aGradient.SetBorder(rFillGradient.getBorder() * 100);
@@ -1280,7 +1078,7 @@ void VclPixelProcessor2D::processPatternFillPrimitive2D(
     tools::Rectangle aMaskRect = vcl::unotools::rectangleFromB2DRectangle(aMaskRange);
 
     // Unless smooth edges are needed, simply use clipping.
-    if (basegfx::utils::isRectangle(aMask) || !SvtOptionsDrawinglayer::IsAntiAliasing())
+    if (basegfx::utils::isRectangle(aMask) || !getViewInformation2D().getUseAntiAliasing())
     {
         mpOutputDevice->Push(vcl::PushFlags::CLIPREGION);
         mpOutputDevice->IntersectClipRegion(vcl::Region(aMask));

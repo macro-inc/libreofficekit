@@ -32,6 +32,8 @@
 #include <cfgitem.hxx>
 #include <starmathdatabase.hxx>
 
+#include <stack>
+
 using namespace ::com::sun::star::i18n;
 
 //Definition of math keywords
@@ -286,7 +288,7 @@ const sal_Int32 coUserDefinedCharContFlags = KParseTokens::ANY_LETTER_OR_NUMBER
 //Checks if keyword is in the list.
 static inline bool findCompare(const SmTokenTableEntry& lhs, const OUString& s)
 {
-    return s.compareToIgnoreAsciiCase(lhs.pIdent) > 0;
+    return s.compareToIgnoreAsciiCase(lhs.aIdent) > 0;
 }
 
 //Returns the SmTokenTableEntry for a keyword
@@ -297,7 +299,7 @@ static const SmTokenTableEntry* GetTokenTableEntry(const OUString& rName)
     //Looks for the first keyword after or equal to rName in alphabetical order.
     auto findIter
         = std::lower_bound(std::begin(aTokenTable), std::end(aTokenTable), rName, findCompare);
-    if (findIter != std::end(aTokenTable) && rName.equalsIgnoreAsciiCase(findIter->pIdent))
+    if (findIter != std::end(aTokenTable) && rName.equalsIgnoreAsciiCase(findIter->aIdent))
         return &*findIter; //check is equal
     return nullptr; //not found
 }
@@ -372,12 +374,12 @@ static bool lcl_IsNotWholeNumber16(const OUString& rText)
 }
 
 //Text replace onto m_aBufferString
-void SmParser5::Replace(sal_Int32 nPos, sal_Int32 nLen, const OUString& rText)
+void SmParser5::Replace(sal_Int32 nPos, sal_Int32 nLen, std::u16string_view aText)
 {
     assert(nPos + nLen <= m_aBufferString.getLength()); //checks if length allows text replace
 
-    m_aBufferString = m_aBufferString.replaceAt(nPos, nLen, rText); //replace and reindex
-    sal_Int32 nChg = rText.getLength() - nLen;
+    m_aBufferString = m_aBufferString.replaceAt(nPos, nLen, aText); //replace and reindex
+    sal_Int32 nChg = aText.size() - nLen;
     m_nBufferIndex = m_nBufferIndex + nChg;
     m_nTokenIndex = m_nTokenIndex + nChg;
 }
@@ -488,7 +490,7 @@ void SmParser5::NextToken() //Central part of the parser
             m_aCurToken.setChar(pEntry->cMathChar);
             m_aCurToken.nGroup = pEntry->nGroup;
             m_aCurToken.nLevel = pEntry->nLevel;
-            m_aCurToken.aText = pEntry->pIdent;
+            m_aCurToken.aText = pEntry->aIdent;
         }
         else
         {
@@ -1779,7 +1781,9 @@ std::unique_ptr<SmNode> SmParser5::DoTerm(bool bGroupNumberIdent)
                 return DoUnOper();
             if (TokenInGroup(TG::Attribute) || TokenInGroup(TG::FontAttr))
             {
-                std::stack<std::unique_ptr<SmStructureNode>> aStack;
+                std::stack<std::unique_ptr<SmStructureNode>,
+                           std::vector<std::unique_ptr<SmStructureNode>>>
+                    aStack;
                 bool bIsAttr;
                 for (;;)
                 {
@@ -2619,7 +2623,7 @@ std::unique_ptr<SmSpecialNode> SmParser5::DoSpecial()
     {
         if (IsImportSymbolNames())
         {
-            aNewName = SmLocalizedSymbolData::GetUiSymbolName(rName.copy(1));
+            aNewName = SmLocalizedSymbolData::GetUiSymbolName(rName.subView(1));
             bReplace = true;
         }
         else if (IsExportSymbolNames())

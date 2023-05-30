@@ -19,6 +19,7 @@
 
 #include "VAxisProperties.hxx"
 #include <ViewDefines.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <ChartModelHelper.hxx>
 #include <ExplicitCategoriesProvider.hxx>
@@ -26,10 +27,10 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/chart/ChartAxisArrangeOrderType.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
-#include <com/sun/star/chart2/XAxis.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/math.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -152,10 +153,10 @@ TickmarkProperties AxisProperties::getBiggestTickmarkProperties()
     return aTickmarkProperties;
 }
 
-AxisProperties::AxisProperties( const uno::Reference< XAxis >& xAxisModel
-                              , ExplicitCategoriesProvider* pExplicitCategoriesProvider
-                              , rtl::Reference<::chart::DataTable> const& xDataTableModel)
-    : m_xAxisModel(xAxisModel)
+AxisProperties::AxisProperties(rtl::Reference<::chart::Axis> xAxisModel,
+                               ExplicitCategoriesProvider* pExplicitCategoriesProvider,
+                               rtl::Reference<::chart::DataTable> const& xDataTableModel)
+    : m_xAxisModel(std::move(xAxisModel))
     , m_nDimensionIndex(0)
     , m_bIsMainAxis(true)
     , m_bSwapXAndY(false)
@@ -165,6 +166,7 @@ AxisProperties::AxisProperties( const uno::Reference< XAxis >& xAxisModel
     , m_bCrossingAxisHasReverseDirection(false)
     , m_bCrossingAxisIsCategoryAxes(false)
     , m_bDisplayDataTable(false)
+    , m_bDataTableAlignAxisValuesWithColumns(false)
     , m_bDisplayLabels( true )
     , m_bTryStaggeringFirst( false )
     , m_nNumberFormatKey(0)
@@ -243,13 +245,11 @@ void AxisProperties::initAxisPositioning( const uno::Reference< beans::XProperty
 
 void AxisProperties::init( bool bCartesian )
 {
-    uno::Reference< beans::XPropertySet > xProp =
-        uno::Reference<beans::XPropertySet>::query( m_xAxisModel );
-    if( !xProp.is() )
+    if( !m_xAxisModel.is() )
         return;
 
     if( m_nDimensionIndex<2 )
-        initAxisPositioning( xProp );
+        initAxisPositioning( m_xAxisModel );
 
     ScaleData aScaleData = m_xAxisModel->getScaleData();
     if( m_nDimensionIndex==0 )
@@ -302,19 +302,19 @@ void AxisProperties::init( bool bCartesian )
     try
     {
         //init LineProperties
-        m_aLineProperties.initFromPropertySet( xProp );
+        m_aLineProperties.initFromPropertySet( m_xAxisModel );
 
         //init display labels
-        xProp->getPropertyValue( "DisplayLabels" ) >>= m_bDisplayLabels;
+        m_xAxisModel->getPropertyValue( "DisplayLabels" ) >>= m_bDisplayLabels;
 
         // Init layout strategy hint for axis labels.
         // Compatibility option: starting from LibreOffice 5.1 the rotated
         // layout is preferred to staggering for axis labels.
-        xProp->getPropertyValue( "TryStaggeringFirst" ) >>= m_bTryStaggeringFirst;
+        m_xAxisModel->getPropertyValue( "TryStaggeringFirst" ) >>= m_bTryStaggeringFirst;
 
         //init TickmarkProperties
-        xProp->getPropertyValue( "MajorTickmarks" ) >>= m_nMajorTickmarks;
-        xProp->getPropertyValue( "MinorTickmarks" ) >>= m_nMinorTickmarks;
+        m_xAxisModel->getPropertyValue( "MajorTickmarks" ) >>= m_nMajorTickmarks;
+        m_xAxisModel->getPropertyValue( "MinorTickmarks" ) >>= m_nMinorTickmarks;
 
         sal_Int32 nMaxDepth = 0;
         if(m_nMinorTickmarks!=0)
@@ -349,46 +349,44 @@ void AxisProperties::init( bool bCartesian )
 AxisLabelProperties::AxisLabelProperties()
                         : m_aFontReferenceSize( ChartModelHelper::getDefaultPageSize() )
                         , m_aMaximumSpaceForLabels( 0 , 0, m_aFontReferenceSize.Width, m_aFontReferenceSize.Height )
-                        , nNumberFormatKey(0)
-                        , eStaggering( AxisLabelStaggering::SideBySide )
-                        , bLineBreakAllowed( false )
-                        , bOverlapAllowed( false )
-                        , bStackCharacters( false )
-                        , fRotationAngleDegree( 0.0 )
-                        , nRhythm( 1 )
+                        , m_nNumberFormatKey(0)
+                        , m_eStaggering( AxisLabelStaggering::SideBySide )
+                        , m_bLineBreakAllowed( false )
+                        , m_bOverlapAllowed( false )
+                        , m_bStackCharacters( false )
+                        , m_fRotationAngleDegree( 0.0 )
+                        , m_nRhythm( 1 )
 {
 
 }
 
-void AxisLabelProperties::init( const uno::Reference< XAxis >& xAxisModel )
+void AxisLabelProperties::init( const rtl::Reference< Axis >& xAxisModel )
 {
-    uno::Reference< beans::XPropertySet > xProp =
-        uno::Reference<beans::XPropertySet>::query( xAxisModel );
-    if(!xProp.is())
+    if(!xAxisModel.is())
         return;
 
     try
     {
-        xProp->getPropertyValue( "TextBreak" ) >>= bLineBreakAllowed;
-        xProp->getPropertyValue( "TextOverlap" ) >>= bOverlapAllowed;
-        xProp->getPropertyValue( "StackCharacters" ) >>= bStackCharacters;
-        xProp->getPropertyValue( "TextRotation" ) >>= fRotationAngleDegree;
+        xAxisModel->getPropertyValue( "TextBreak" ) >>= m_bLineBreakAllowed;
+        xAxisModel->getPropertyValue( "TextOverlap" ) >>= m_bOverlapAllowed;
+        xAxisModel->getPropertyValue( "StackCharacters" ) >>= m_bStackCharacters;
+        xAxisModel->getPropertyValue( "TextRotation" ) >>= m_fRotationAngleDegree;
 
         css::chart::ChartAxisArrangeOrderType eArrangeOrder;
-        xProp->getPropertyValue( "ArrangeOrder" ) >>= eArrangeOrder;
+        xAxisModel->getPropertyValue( "ArrangeOrder" ) >>= eArrangeOrder;
         switch(eArrangeOrder)
         {
             case css::chart::ChartAxisArrangeOrderType_SIDE_BY_SIDE:
-                eStaggering = AxisLabelStaggering::SideBySide;
+                m_eStaggering = AxisLabelStaggering::SideBySide;
                 break;
             case css::chart::ChartAxisArrangeOrderType_STAGGER_EVEN:
-                eStaggering = AxisLabelStaggering::StaggerEven;
+                m_eStaggering = AxisLabelStaggering::StaggerEven;
                 break;
             case css::chart::ChartAxisArrangeOrderType_STAGGER_ODD:
-                eStaggering = AxisLabelStaggering::StaggerOdd;
+                m_eStaggering = AxisLabelStaggering::StaggerOdd;
                 break;
             default:
-                eStaggering = AxisLabelStaggering::StaggerAuto;
+                m_eStaggering = AxisLabelStaggering::StaggerAuto;
                 break;
         }
     }
@@ -400,14 +398,14 @@ void AxisLabelProperties::init( const uno::Reference< XAxis >& xAxisModel )
 
 bool AxisLabelProperties::isStaggered() const
 {
-    return ( eStaggering == AxisLabelStaggering::StaggerOdd || eStaggering == AxisLabelStaggering::StaggerEven );
+    return ( m_eStaggering == AxisLabelStaggering::StaggerOdd || m_eStaggering == AxisLabelStaggering::StaggerEven );
 }
 
 void AxisLabelProperties::autoRotate45()
 {
-    fRotationAngleDegree = 45;
-    bLineBreakAllowed = false;
-    eStaggering = AxisLabelStaggering::SideBySide;
+    m_fRotationAngleDegree = 45;
+    m_bLineBreakAllowed = false;
+    m_eStaggering = AxisLabelStaggering::SideBySide;
 }
 
 } //namespace chart

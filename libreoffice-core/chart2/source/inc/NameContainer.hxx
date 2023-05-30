@@ -23,15 +23,11 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
 #include <cppuhelper/implbase.hxx>
-#include "charttoolsdllapi.hxx"
 
 #include <map>
 
 namespace chart
 {
-
-OOO_DLLPUBLIC_CHARTTOOLS css::uno::Reference< css::container::XNameContainer > createNameContainer(
-    const css::uno::Type& rType, const OUString& rServicename, const OUString& rImplementationName );
 
 namespace impl
 {
@@ -42,11 +38,12 @@ typedef ::cppu::WeakImplHelper<
     NameContainer_Base;
 }
 
-class NameContainer : public impl::NameContainer_Base
+/// Contains the XML namespaces map
+///
+class NameContainer final : public impl::NameContainer_Base
 {
 public:
-    NameContainer() = delete;
-    NameContainer( const css::uno::Type& rType, const OUString& rServicename, const OUString& rImplementationName );
+    NameContainer();
     explicit NameContainer( const NameContainer & rOther );
     virtual ~NameContainer() override;
 
@@ -75,12 +72,8 @@ public:
     virtual css::uno::Reference< css::util::XCloneable > SAL_CALL createClone() override;
 
 private: //member
-    const css::uno::Type           m_aType;
-    const OUString                 m_aServicename;
-    const OUString                 m_aImplementationName;
 
     typedef std::map< OUString, css::uno::Any > tContentMap;
-
     tContentMap m_aMap;
 };
 

@@ -9,7 +9,7 @@
 
 $(eval $(call gb_Library_Library,xstor))
 
-$(eval $(call gb_Library_set_componentfile,xstor,package/source/xstor/xstor))
+$(eval $(call gb_Library_set_componentfile,xstor,package/source/xstor/xstor,services))
 
 $(eval $(call gb_Library_set_include,xstor,\
 	$$(INCLUDE) \
@@ -27,6 +27,7 @@ $(eval $(call gb_Library_use_libraries,xstor,\
 	sal \
 	salhelper \
 	tl \
+	utl \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,xstor,\

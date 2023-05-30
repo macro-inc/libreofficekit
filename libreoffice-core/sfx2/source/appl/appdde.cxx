@@ -35,7 +35,7 @@
 
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/pathoptions.hxx>
 #include <vcl/svapp.hxx>
 
@@ -80,7 +80,7 @@ public:
     virtual bool SysTopicExecute( const OUString* pStr );
 };
 
-    bool lcl_IsDocument( const OUString& rContent )
+    bool lcl_IsDocument( std::u16string_view rContent )
     {
         using namespace com::sun::star;
 

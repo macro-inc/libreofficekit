@@ -18,33 +18,27 @@
  */
 
 #include <memory>
+#include <unordered_map>
 
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/event.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weldutils.hxx>
+#include <vcl/window.hxx>
 #include <svl/intitem.hxx>
-#include <svl/stritem.hxx>
 #include <svl/style.hxx>
 #include <comphelper/processfactory.hxx>
-#include <comphelper/sequenceashashmap.hxx>
-#include <com/sun/star/beans/PropertyValue.hpp>
-#include <com/sun/star/frame/ModuleManager.hpp>
-#include <com/sun/star/frame/UnknownModuleException.hpp>
 #include <officecfg/Office/Common.hxx>
 
-#include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
-#include <sfx2/app.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/bindings.hxx>
-#include <sfx2/templdlg.hxx>
 #include <templdgi.hxx>
 #include <tplcitem.hxx>
 #include <sfx2/styfitem.hxx>
@@ -67,13 +61,34 @@
 #include <sfx2/StylePreviewRenderer.hxx>
 
 #include <StyleList.hxx>
-#include <vcl/toolbox.hxx>
-#include <vcl/menu.hxx>
 
 using namespace css;
 using namespace css::beans;
 using namespace css::frame;
 using namespace css::uno;
+
+class TreeViewDropTarget final : public DropTargetHelper
+{
+private:
+    StyleList& m_rParent;
+
+public:
+    TreeViewDropTarget(StyleList& rStyleList, weld::TreeView& rTreeView)
+        : DropTargetHelper(rTreeView.get_drop_target())
+        , m_rParent(rStyleList)
+    {
+    }
+
+    virtual sal_Int8 AcceptDrop(const AcceptDropEvent& rEvt) override
+    {
+        return m_rParent.AcceptDrop(rEvt, *this);
+    }
+
+    virtual sal_Int8 ExecuteDrop(const ExecuteDropEvent& rEvt) override
+    {
+        return m_rParent.ExecuteDrop(rEvt);
+    }
+};
 
 // Constructor
 
@@ -252,29 +267,6 @@ void StyleList::EnableNewByExample(bool newByExampleDisabled)
     m_bNewByExampleDisabled = newByExampleDisabled;
 }
 
-class TreeViewDropTarget final : public DropTargetHelper
-{
-private:
-    StyleList& m_rParent;
-
-public:
-    TreeViewDropTarget(StyleList& rStyleList, weld::TreeView& rTreeView)
-        : DropTargetHelper(rTreeView.get_drop_target())
-        , m_rParent(rStyleList)
-    {
-    }
-
-    virtual sal_Int8 AcceptDrop(const AcceptDropEvent& rEvt) override
-    {
-        return m_rParent.AcceptDrop(rEvt, *this);
-    }
-
-    virtual sal_Int8 ExecuteDrop(const ExecuteDropEvent& rEvt) override
-    {
-        return m_rParent.ExecuteDrop(rEvt);
-    }
-};
-
 void StyleList::FilterSelect(sal_uInt16 nActFilter, bool bsetFilter)
 {
     m_nActFilter = nActFilter;
@@ -422,11 +414,6 @@ void StyleList::connect_LoadFactoryStyleFilter(const Link<SfxObjectShell const*,
 void StyleList::connect_SaveSelection(const Link<StyleList&, SfxObjectShell*> rLink)
 {
     m_aSaveSelection = rLink;
-}
-
-void StyleList::connect_UpdateStyleDependents(const Link<void*, void> rLink)
-{
-    m_aUpdateStyleDependents = rLink;
 }
 
 /** Drop is enabled as long as it is allowed to create a new style by example, i.e. to
@@ -597,9 +584,9 @@ private:
 public:
     bool HasParent() const { return !aParent.isEmpty(); }
 
-    StyleTree_Impl(const OUString& rName, const OUString& rParent)
-        : aName(rName)
-        , aParent(rParent)
+    StyleTree_Impl(OUString _aName, OUString _aParent)
+        : aName(std::move(_aName))
+        , aParent(std::move(_aParent))
         , pChildren(0)
     {
     }
@@ -1571,17 +1558,20 @@ IMPL_LINK(StyleList, CustomRenderHdl, weld::TreeView::render_args, aPayload, voi
 
     if (pStyleManager)
     {
-        const SfxStyleFamilyItem* pItem = GetFamilyItem();
-        SfxStyleSheetBase* pStyleSheet = pStyleManager->Search(rId, pItem->GetFamily());
-
-        if (pStyleSheet)
+        if (const SfxStyleFamilyItem* pItem = GetFamilyItem())
         {
-            rRenderContext.Push(vcl::PushFlags::ALL);
-            sal_Int32 nSize = aRect.GetHeight();
-            std::unique_ptr<sfx2::StylePreviewRenderer> pStylePreviewRenderer(
-                pStyleManager->CreateStylePreviewRenderer(rRenderContext, pStyleSheet, nSize));
-            bSuccess = pStylePreviewRenderer->recalculate() && pStylePreviewRenderer->render(aRect);
-            rRenderContext.Pop();
+            SfxStyleSheetBase* pStyleSheet = pStyleManager->Search(rId, pItem->GetFamily());
+
+            if (pStyleSheet)
+            {
+                rRenderContext.Push(vcl::PushFlags::ALL);
+                sal_Int32 nSize = aRect.GetHeight();
+                std::unique_ptr<sfx2::StylePreviewRenderer> pStylePreviewRenderer(
+                    pStyleManager->CreateStylePreviewRenderer(rRenderContext, pStyleSheet, nSize));
+                bSuccess
+                    = pStylePreviewRenderer->recalculate() && pStylePreviewRenderer->render(aRect);
+                rRenderContext.Pop();
+            }
         }
     }
 
@@ -1698,7 +1688,7 @@ void StyleList::Update()
         // other DocShell -> all new
         m_pParentDialog->CheckItem(OString::number(m_nActFamily));
         m_nActFilter = static_cast<sal_uInt16>(m_aLoadFactoryStyleFilter.Call(pDocShell));
-        m_pParentDialog->IsUpdate(true, *this);
+        m_pParentDialog->IsUpdate(*this);
         if (0xffff == m_nActFilter)
         {
             m_nActFilter = pDocShell->GetAutoStyleFilterIndex();

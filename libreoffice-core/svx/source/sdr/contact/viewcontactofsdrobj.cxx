@@ -41,14 +41,8 @@ ViewObjectContact& ViewContactOfSdrObj::CreateObjectSpecificViewObjectContact(Ob
 }
 
 ViewContactOfSdrObj::ViewContactOfSdrObj(SdrObject& rObj)
-:   mrObject(rObj),
-    meRememberedAnimationKind(SdrTextAniKind::NONE)
+:   mrObject(rObj)
 {
-    // init AnimationKind
-    if(auto pTextObj = dynamic_cast<const SdrTextObj*>( &GetSdrObject() ))
-    {
-        meRememberedAnimationKind = pTextObj->GetTextAniKind();
-    }
 }
 
 ViewContactOfSdrObj::~ViewContactOfSdrObj()
@@ -104,13 +98,10 @@ ViewContact* ViewContactOfSdrObj::GetParentContact() const
 void ViewContactOfSdrObj::ActionChanged()
 {
     // look for own changes
-    if (SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>(&GetSdrObject()))
+    if (SdrTextObj* pTextObj = DynCastSdrTextObj(&GetSdrObject()))
     {
-        if (pTextObj->GetTextAniKind() != meRememberedAnimationKind)
-        {
-            // #i38135# now remember new type
-            meRememberedAnimationKind = pTextObj->GetTextAniKind();
-        }
+        //  tdf#146860 no idea why, but calling this makes the text boxes render properly
+        pTextObj->GetTextAniKind();
     }
 
     // call parent

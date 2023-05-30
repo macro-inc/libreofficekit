@@ -24,7 +24,6 @@
 #include <com/sun/star/text/GraphicCrop.hpp>
 
 #include <rtl/ustring.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 
 #include <ucbhelper/content.hxx>
@@ -42,7 +41,7 @@
 #include <svx/strings.hrc>
 #include <svx/sdr/contact/viewcontactofsdrmediaobj.hxx>
 #include <avmedia/mediawindow.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -50,11 +49,14 @@ using namespace ::com::sun::star;
 struct SdrMediaObj::Impl
 {
     ::avmedia::MediaItem                  m_MediaProperties;
+#if HAVE_FEATURE_AVMEDIA
     // Note: the temp file is read only, until it is deleted!
     // It may be shared between multiple documents in case of copy/paste,
     // hence the shared_ptr.
     std::shared_ptr< ::avmedia::MediaTempFile >  m_pTempFile;
+#endif
     uno::Reference< graphic::XGraphic >   m_xCachedSnapshot;
+    rtl::Reference<avmedia::PlayerListener> m_xPlayerListener;
     OUString m_LastFailedPkgURL;
 };
 
@@ -68,7 +70,9 @@ SdrMediaObj::SdrMediaObj(SdrModel& rSdrModel, SdrMediaObj const & rSource)
 :   SdrRectObj(rSdrModel, rSource)
     ,m_xImpl( new Impl )
 {
+#if HAVE_FEATURE_AVMEDIA
     m_xImpl->m_pTempFile = rSource.m_xImpl->m_pTempFile; // before props
+#endif
     setMediaProperties( rSource.getMediaProperties() );
     m_xImpl->m_xCachedSnapshot = rSource.m_xImpl->m_xCachedSnapshot;
 }
@@ -79,6 +83,14 @@ SdrMediaObj::SdrMediaObj(
 :   SdrRectObj(rSdrModel, rRect)
     ,m_xImpl( new Impl )
 {
+    osl_atomic_increment(&m_refCount);
+
+    const bool bUndo(rSdrModel.IsUndoEnabled());
+    rSdrModel.EnableUndo(false);
+    MakeNameUnique();
+    rSdrModel.EnableUndo(bUndo);
+
+    osl_atomic_decrement(&m_refCount);
 }
 
 SdrMediaObj::~SdrMediaObj()
@@ -119,7 +131,7 @@ void SdrMediaObj::TakeObjInfo( SdrObjTransformInfoRec& rInfo ) const
 
 SdrObjKind SdrMediaObj::GetObjIdentifier() const
 {
-    return OBJ_MEDIA;
+    return SdrObjKind::Media;
 }
 
 OUString SdrMediaObj::TakeObjNameSingul() const
@@ -139,7 +151,7 @@ OUString SdrMediaObj::TakeObjNamePlural() const
     return SvxResId(STR_ObjNamePluralMEDIA);
 }
 
-SdrMediaObj* SdrMediaObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrMediaObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrMediaObj(rTargetModel, *this);
 }
@@ -175,9 +187,20 @@ uno::Reference< graphic::XGraphic > const & SdrMediaObj::getSnapshot() const
         OUString aRealURL = m_xImpl->m_MediaProperties.getTempURL();
         if( aRealURL.isEmpty() )
             aRealURL = m_xImpl->m_MediaProperties.getURL();
-        uno::Reference<graphic::XGraphic> xGraphic
-            = m_xImpl->m_MediaProperties.getGraphic().GetXGraphic();
-        m_xImpl->m_xCachedSnapshot = avmedia::MediaWindow::grabFrame( aRealURL, m_xImpl->m_MediaProperties.getReferer(), m_xImpl->m_MediaProperties.getMimeType(), xGraphic);
+        OUString sReferer = m_xImpl->m_MediaProperties.getReferer();
+        OUString sMimeType = m_xImpl->m_MediaProperties.getMimeType();
+        uno::Reference<graphic::XGraphic> xCachedSnapshot = m_xImpl->m_xCachedSnapshot;
+
+        m_xImpl->m_xPlayerListener.set(new avmedia::PlayerListener(
+            [this, xCachedSnapshot, aRealURL, sReferer, sMimeType](const css::uno::Reference<css::media::XPlayer>& rPlayer){
+                SolarMutexGuard g;
+                uno::Reference<graphic::XGraphic> xGraphic
+                    = m_xImpl->m_MediaProperties.getGraphic().GetXGraphic();
+                m_xImpl->m_xCachedSnapshot = avmedia::MediaWindow::grabFrame(rPlayer, xGraphic);
+                ActionChanged();
+            }));
+
+        avmedia::MediaWindow::grabFrame(aRealURL, sReferer, sMimeType, m_xImpl->m_xPlayerListener);
     }
 #endif
     return m_xImpl->m_xCachedSnapshot;
@@ -249,7 +272,7 @@ const OUString& SdrMediaObj::getURL() const
 #if HAVE_FEATURE_AVMEDIA
     return m_xImpl->m_MediaProperties.getURL();
 #else
-static OUString ret;
+    static OUString ret;
     return ret;
 #endif
 }
@@ -277,6 +300,7 @@ const ::avmedia::MediaItem& SdrMediaObj::getMediaProperties() const
 
 uno::Reference<io::XInputStream> SdrMediaObj::GetInputStream() const
 {
+#if HAVE_FEATURE_AVMEDIA
     if (!m_xImpl->m_pTempFile)
     {
         SAL_WARN("svx", "this is only intended for embedded media");
@@ -286,10 +310,16 @@ uno::Reference<io::XInputStream> SdrMediaObj::GetInputStream() const
                 uno::Reference<ucb::XCommandEnvironment>(),
                 comphelper::getProcessComponentContext());
     return tempFile.openStream();
+#else
+    return nullptr;
+#endif
 }
 
 void SdrMediaObj::SetInputStream(uno::Reference<io::XInputStream> const& xStream)
 {
+#if !HAVE_FEATURE_AVMEDIA
+    (void) xStream;
+#else
     if (m_xImpl->m_pTempFile || m_xImpl->m_LastFailedPkgURL.isEmpty())
     {
         SAL_WARN("svx", "this is only intended for embedded media");
@@ -306,12 +336,11 @@ void SdrMediaObj::SetInputStream(uno::Reference<io::XInputStream> const& xStream
     if (bSuccess)
     {
         m_xImpl->m_pTempFile = std::make_shared<::avmedia::MediaTempFile>(tempFileURL);
-#if HAVE_FEATURE_AVMEDIA
         m_xImpl->m_MediaProperties.setURL(
             m_xImpl->m_LastFailedPkgURL, tempFileURL, "");
-#endif
     }
     m_xImpl->m_LastFailedPkgURL.clear(); // once only
+#endif
 }
 
 /// copy a stream from XStorage to temp file
@@ -377,6 +406,7 @@ void SdrMediaObj::mediaPropertiesChanged( const ::avmedia::MediaItem& rNewProper
         ( rNewProperties.getURL() != getURL() ))
     {
         m_xImpl->m_xCachedSnapshot.clear();
+        m_xImpl->m_xPlayerListener.clear();
         OUString const& url(rNewProperties.getURL());
         if (url.startsWithIgnoreAsciiCase("vnd.sun.star.Package:"))
         {
@@ -445,20 +475,20 @@ void SdrMediaObj::mediaPropertiesChanged( const ::avmedia::MediaItem& rNewProper
 void SdrMediaObj::notifyPropertiesForLOKit()
 {
 #if HAVE_FEATURE_AVMEDIA
-    if (!getTempURL().isEmpty())
+    if (!m_xImpl->m_MediaProperties.getTempURL().isEmpty())
     {
         const auto mediaId = reinterpret_cast<std::size_t>(this);
 
         boost::property_tree::ptree json;
         json.put("action", "update");
         json.put("id", mediaId);
-        json.put("url", getTempURL());
+        json.put("url", m_xImpl->m_MediaProperties.getTempURL());
 
         const tools::Rectangle aRect = o3tl::convert(maRect, o3tl::Length::mm100, o3tl::Length::twip);
         json.put("x", aRect.getX());
         json.put("y", aRect.getY());
-        json.put("w", aRect.getWidth());
-        json.put("h", aRect.getHeight());
+        json.put("w", aRect.getOpenWidth());
+        json.put("h", aRect.getOpenHeight());
 
         SfxLokHelper::notifyMediaUpdate(json);
     }

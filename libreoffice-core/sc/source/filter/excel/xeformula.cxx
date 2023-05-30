@@ -25,6 +25,7 @@
 #include <rangelst.hxx>
 #include <tokenarray.hxx>
 #include <scmatrix.hxx>
+#include <utility>
 #include <xeformula.hxx>
 #include <xehelper.hxx>
 #include <xelink.hxx>
@@ -34,7 +35,6 @@
 #include <xltools.hxx>
 #include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
-#include <basegfx/numeric/ftools.hxx>
 
 using namespace ::formula;
 
@@ -126,7 +126,7 @@ public:
     explicit            XclExpFuncData(
                             const XclExpScToken& rTokData,
                             const XclFunctionInfo& rFuncInfo,
-                            const XclExpExtFuncData& rExtFuncData );
+                            XclExpExtFuncData aExtFuncData );
 
     const FormulaToken& GetScToken() const { return *mrTokData.mpScToken; }
     OpCode       GetOpCode() const { return mrFuncInfo.meOpCode; }
@@ -163,10 +163,10 @@ private:
 };
 
 XclExpFuncData::XclExpFuncData( const XclExpScToken& rTokData,
-        const XclFunctionInfo& rFuncInfo, const XclExpExtFuncData& rExtFuncData ) :
+        const XclFunctionInfo& rFuncInfo, XclExpExtFuncData aExtFuncData ) :
     mrTokData( rTokData ),
     mrFuncInfo( rFuncInfo ),
-    maExtFuncData( rExtFuncData ),
+    maExtFuncData(std::move( aExtFuncData )),
     mxOperands( std::make_shared<XclExpOperandList>() ),
     mpParamInfo( rFuncInfo.mpParamInfos )
 {
@@ -1398,7 +1398,7 @@ void XclExpFmlaCompImpl::ProcessFunction( const XclExpScToken& rTokData )
     else if( pFuncInfo->IsMacroFunc() )
         aExtFuncData.Set( pFuncInfo->GetMacroFuncName(), false, true );
 
-    XclExpFuncData aFuncData( rTokData, *pFuncInfo, aExtFuncData );
+    XclExpFuncData aFuncData( rTokData, *pFuncInfo, std::move(aExtFuncData) );
     XclExpScToken aTokData;
 
     // preparations for special functions, before function processing starts

@@ -20,6 +20,8 @@
 #ifndef INCLUDED_SFX2_INC_DINFDLG_HRC
 #define INCLUDED_SFX2_INC_DINFDLG_HRC
 
+#include <unotools/resmgr.hxx>
+
 #define NC_(Context, String) TranslateId(Context, reinterpret_cast<char const *>(u8##String))
 
 const TranslateId SFX_CB_PROPERTY_STRINGARRAY[] =
@@ -75,6 +77,10 @@ const std::pair<TranslateId, CustomProperties> SFX_LB_PROPERTY_STRINGARRAY[] =
     { NC_("SFX_CB_PROPERTY_STRINGARRAY", "Number")      , Custom_Type_Number },
     { NC_("SFX_CB_PROPERTY_STRINGARRAY", "Yes or no")   , Custom_Type_Boolean }
 };
+
+// accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+// in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#define STR_A11Y_DESC_USERDATA                      NC_("documentinfopage|extended_tip|userdatacb", "Saves the user's full name with the file. You can edit the name by choosing Tools - Options - %PRODUCTNAME - User Data.")
 
 #endif
 

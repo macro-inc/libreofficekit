@@ -44,6 +44,7 @@
 #include <tools/globname.hxx>
 #include <unotools/streamwrap.hxx>
 #include <comphelper/processfactory.hxx>
+#include <utility>
 
 namespace oox::ole {
 
@@ -171,7 +172,7 @@ classIdToGUIDCNamePairMap::classIdToGUIDCNamePairMap()
              { AX_GUID_SCROLLBAR, "ScrollBar"},
         }
     };
-    int const length = SAL_N_ELEMENTS( initialCntrlData );
+    int const length = std::size( initialCntrlData );
     IdCntrlData const * pData = initialCntrlData;
     for ( int index = 0; index < length; ++index, ++pData )
         mnIdToGUIDCNamePairMap[ pData->nId ] = pData->aData;
@@ -203,8 +204,8 @@ StdFontInfo::StdFontInfo() :
 {
 }
 
-StdFontInfo::StdFontInfo( const OUString& rName, sal_uInt32 nHeight ) :
-    maName( rName ),
+StdFontInfo::StdFontInfo( OUString aName, sal_uInt32 nHeight ) :
+    maName(std::move( aName )),
     mnHeight( nHeight ),
     mnWeight( OLE_STDFONT_NORMAL ),
     mnCharSet( WINDOWS_CHARSET_ANSI ),
@@ -421,7 +422,7 @@ MSConvertOCXControls::~MSConvertOCXControls()
 }
 
 bool
-MSConvertOCXControls::importControlFromStream( ::oox::BinaryInputStream& rInStrm, Reference< XFormComponent >& rxFormComp, const OUString& rGuidString )
+MSConvertOCXControls::importControlFromStream( ::oox::BinaryInputStream& rInStrm, Reference< XFormComponent >& rxFormComp, std::u16string_view rGuidString )
 {
     ::oox::ole::EmbeddedControl aControl( "Unknown" );
     if( ::oox::ole::ControlModelBase* pModel = aControl.createModelFromGuid( rGuidString  ) )
@@ -525,8 +526,7 @@ bool MSConvertOCXControls::WriteOCXExcelKludgeStream( const css::uno::Reference<
         return false;
     rName = exportHelper.getTypeName();
     SvGlobalName aName;
-    OUString sId = exportHelper.getGUID();
-    aName.MakeId(sId);
+    aName.MakeId(exportHelper.getGUID());
     BinaryXOutputStream aOut( xOutStrm, false );
     OleHelper::exportGuid( aOut, aName );
     exportHelper.exportControl( xOutStrm, rSize );
@@ -544,8 +544,7 @@ bool MSConvertOCXControls::WriteOCXStream( const Reference< XModel >& rxModel, t
     if ( !exportHelper.isValid() )
         return false;
 
-    OUString sId = exportHelper.getGUID();
-    aName.MakeId(sId);
+    aName.MakeId(exportHelper.getGUID());
 
     OUString sFullName = exportHelper.getFullName();
     rName = exportHelper.getTypeName();

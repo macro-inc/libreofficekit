@@ -22,7 +22,6 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <comphelper/propertyvalue.hxx>
 
-#include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XIndexContainer.hpp>
 #include <com/sun/star/container/XNameReplace.hpp>
@@ -35,23 +34,24 @@
 #include <rtl/strbuf.hxx>
 #include <svx/svdobj.hxx>
 #include <drwlayer.hxx>
-#include <userdat.hxx>
 #include <oox/core/filterbase.hxx>
 #include <oox/drawingml/connectorshapecontext.hxx>
 #include <oox/drawingml/graphicshapecontext.hxx>
 #include <oox/helper/attributelist.hxx>
 #include <oox/helper/propertyset.hxx>
+#include <oox/shape/ShapeDrawingFragmentHandler.hxx>
 #include <oox/token/namespaces.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
 #include <oox/vml/vmlshape.hxx>
 #include <oox/vml/vmlshapecontainer.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <formulaparser.hxx>
 #include <stylesbuffer.hxx>
 #include <themebuffer.hxx>
-#include <unitconverter.hxx>
 #include <worksheetbuffer.hxx>
+
 namespace oox::xls {
 
 using namespace ::com::sun::star::beans;
@@ -142,7 +142,8 @@ GroupShapeContext::GroupShapeContext( const FragmentHandler2& rParent,
         {
             ShapePtr xShape = std::make_shared<Shape>( rHelper, rAttribs, "com.sun.star.drawing.ConnectorShape" );
             if( pxShape ) *pxShape = xShape;
-            return new ConnectorShapeContext( rParent, rxParentShape, xShape );
+            return new ConnectorShapeContext(rParent, rxParentShape, xShape,
+                                             xShape->getConnectorShapeProperties());
         }
         case XDR_TOKEN( pic ):
         {
@@ -304,6 +305,29 @@ void DrawingFragment::onEndElement()
                     mxShape->setPosition(Point(aShapeRectEmu32.X, aShapeRectEmu32.Y));
                     mxShape->setSize(Size(aShapeRectEmu32.Width, aShapeRectEmu32.Height));
 
+                    // tdf#83671. Because Excel saves a diagram with zero size in xdr:xfm, the
+                    // initial diagram import produces a background shape with zero size and no
+                    // diagram shapes at all. Here the size has been determined from the anchor and
+                    // thus repeating the import of diagram.xml gives the diagram shapes.
+                    if (mxShape->getDiagramDoms().getLength() > 0
+                        && mxShape->getChildren().size() == 1
+                        && mxShape->getExtDrawings().size() == 1)
+                    {
+                        mxShape->getChildren()[0]->setSize(mxShape->getSize());
+                        OUString sFragmentPath(
+                            getFragmentPathFromRelId(mxShape->getExtDrawings()[0]));
+                        // Don't know why importFragment looses shape name and id. Rescue them.
+                        OUString sBackupName(mxShape->getName());
+                        OUString sBackupId(mxShape->getId());
+                        getOoxFilter().importFragment(new oox::shape::ShapeDrawingFragmentHandler(
+                            getOoxFilter(), sFragmentPath, mxShape));
+                        mxShape->setName(sBackupName);
+                        mxShape->setId(sBackupId);
+                    }
+
+                    if (mxShape->getFontRefColorForNodes().isUsed())
+                          applyFontRefColor(mxShape, mxShape->getFontRefColorForNodes());
+
                     basegfx::B2DHomMatrix aTransformation;
                     if ( !bIsShapeVisible)
                         mxShape->setHidden(true);
@@ -331,6 +355,17 @@ void DrawingFragment::onEndElement()
             mxShape.reset();
             mxAnchor.reset();
         break;
+    }
+}
+
+void DrawingFragment::applyFontRefColor(const oox::drawingml::ShapePtr& pShape,
+                                        const oox::drawingml::Color& rFontRefColor)
+{
+    pShape->getShapeStyleRefs()[XML_fontRef].maPhClr = rFontRefColor;
+    std::vector<oox::drawingml::ShapePtr>& vChildren = pShape->getChildren();
+    for (auto const& child : vChildren)
+    {
+        applyFontRefColor(child, rFontRefColor);
     }
 }
 
@@ -541,7 +576,7 @@ Reference< XShape > VmlDrawing::createAndInsertClientXShape( const ::oox::vml::S
                     instead the top border of the caption text. */
                 if( const ::oox::vml::TextFontModel* pFontModel = pTextBox ? pTextBox->getFirstFont() : nullptr )
                 {
-                    sal_Int32 nFontHeightHmm = getUnitConverter().scaleToMm100( pFontModel->monSize.get( 160 ), Unit::Twip );
+                    sal_Int32 nFontHeightHmm = o3tl::convert( pFontModel->monSize.value_or( 160 ), o3tl::Length::twip, o3tl::Length::mm100 );
                     sal_Int32 nYDiff = ::std::min< sal_Int32 >( nFontHeightHmm / 2, aShapeRect.Y );
                     aShapeRect.Y -= nYDiff;
                     aShapeRect.Height += nYDiff;
@@ -695,29 +730,29 @@ void VmlDrawing::notifyXShapeInserted( const Reference< XShape >& rxShape,
 
 // private --------------------------------------------------------------------
 
-sal_uInt32 VmlDrawing::convertControlTextColor( const OUString& rTextColor ) const
+sal_uInt32 VmlDrawing::convertControlTextColor( std::u16string_view aTextColor ) const
 {
     // color attribute not present or 'auto' - use passed default color
-    if( rTextColor.isEmpty() || rTextColor.equalsIgnoreAsciiCase( "auto" ) )
+    if( aTextColor.empty() || o3tl::equalsIgnoreAsciiCase( aTextColor, u"auto" ) )
         return AX_SYSCOLOR_WINDOWTEXT;
 
-    if( rTextColor[ 0 ] == '#' )
+    if( aTextColor[ 0 ] == '#' )
     {
         // RGB colors in the format '#RRGGBB'
-        if( rTextColor.getLength() == 7 )
-            return OleHelper::encodeOleColor( rTextColor.copy( 1 ).toUInt32( 16 ) );
+        if( aTextColor.size() == 7 )
+            return OleHelper::encodeOleColor( o3tl::toUInt32(aTextColor.substr( 1 ), 16) );
 
         // RGB colors in the format '#RGB'
-        if( rTextColor.getLength() == 4 )
+        if( aTextColor.size() == 4 )
         {
-            sal_Int32 nR = rTextColor.copy( 1, 1 ).toUInt32( 16 ) * 0x11;
-            sal_Int32 nG = rTextColor.copy( 2, 1 ).toUInt32( 16 ) * 0x11;
-            sal_Int32 nB = rTextColor.copy( 3, 1 ).toUInt32( 16 ) * 0x11;
+            sal_Int32 nR = o3tl::toUInt32(aTextColor.substr( 1, 1 ), 16) * 0x11;
+            sal_Int32 nG = o3tl::toUInt32(aTextColor.substr( 2, 1 ), 16) * 0x11;
+            sal_Int32 nB = o3tl::toUInt32(aTextColor.substr( 3, 1 ), 16) * 0x11;
             return OleHelper::encodeOleColor( (nR << 16) | (nG << 8) | nB );
         }
 
         OSL_ENSURE( false, OStringBuffer( "VmlDrawing::convertControlTextColor - invalid color name '" ).
-            append( OUStringToOString( rTextColor, RTL_TEXTENCODING_ASCII_US ) ).append( '\'' ).getStr() );
+            append( OUStringToOString( aTextColor, RTL_TEXTENCODING_ASCII_US ) ).append( '\'' ).getStr() );
         return AX_SYSCOLOR_WINDOWTEXT;
     }
 
@@ -725,7 +760,7 @@ sal_uInt32 VmlDrawing::convertControlTextColor( const OUString& rTextColor ) con
 
     /*  Predefined color names or system color names (resolve to RGB to detect
         valid color name). */
-    sal_Int32 nColorToken = AttributeConversion::decodeToken( rTextColor );
+    sal_Int32 nColorToken = AttributeConversion::decodeToken( aTextColor );
     ::Color nRgbValue = Color::getVmlPresetColor( nColorToken, API_RGB_TRANSPARENT );
     if( nRgbValue == API_RGB_TRANSPARENT )
         nRgbValue = rGraphicHelper.getSystemColor( nColorToken );
@@ -733,28 +768,28 @@ sal_uInt32 VmlDrawing::convertControlTextColor( const OUString& rTextColor ) con
         return OleHelper::encodeOleColor( nRgbValue );
 
     // try palette color
-    return OleHelper::encodeOleColor( rGraphicHelper.getPaletteColor( rTextColor.toInt32() ) );
+    return OleHelper::encodeOleColor( rGraphicHelper.getPaletteColor( o3tl::toInt32(aTextColor) ) );
 }
 
 void VmlDrawing::convertControlFontData( AxFontData& rAxFontData, sal_uInt32& rnOleTextColor, const ::oox::vml::TextFontModel& rFontModel ) const
 {
-    if( rFontModel.moName.has() )
-        rAxFontData.maFontName = rFontModel.moName.get();
+    if( rFontModel.moName.has_value() )
+        rAxFontData.maFontName = rFontModel.moName.value();
 
     // font height: convert from twips to points, then to internal representation of AX controls
-    rAxFontData.setHeightPoints( static_cast< sal_Int16 >( (rFontModel.monSize.get( 200 ) + 10) / 20 ) );
+    rAxFontData.setHeightPoints( static_cast< sal_Int16 >( (rFontModel.monSize.value_or( 200 ) + 10) / 20 ) );
 
     // font effects
     rAxFontData.mnFontEffects = AxFontFlags::NONE;
-    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Bold, rFontModel.mobBold.get( false ) );
-    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Italic, rFontModel.mobItalic.get( false ) );
-    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Strikeout, rFontModel.mobStrikeout.get( false ) );
-    sal_Int32 nUnderline = rFontModel.monUnderline.get( XML_none );
+    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Bold, rFontModel.mobBold.value_or( false ) );
+    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Italic, rFontModel.mobItalic.value_or( false ) );
+    setFlag( rAxFontData.mnFontEffects, AxFontFlags::Strikeout, rFontModel.mobStrikeout.value_or( false ) );
+    sal_Int32 nUnderline = rFontModel.monUnderline.value_or( XML_none );
     setFlag( rAxFontData.mnFontEffects, AxFontFlags::Underline, nUnderline != XML_none );
     rAxFontData.mbDblUnderline = nUnderline == XML_double;
 
     // font color
-    rnOleTextColor = convertControlTextColor( rFontModel.moColor.get( OUString() ) );
+    rnOleTextColor = convertControlTextColor( rFontModel.moColor.value_or( OUString() ) );
 }
 
 void VmlDrawing::convertControlText( AxFontData& rAxFontData, sal_uInt32& rnOleTextColor,
@@ -779,7 +814,7 @@ void VmlDrawing::convertControlText( AxFontData& rAxFontData, sal_uInt32& rnOleT
 void VmlDrawing::convertControlBackground( AxMorphDataModelBase& rAxModel, const ::oox::vml::ShapeBase& rShape ) const
 {
     const ::oox::vml::FillModel& rFillModel = rShape.getTypeModel().maFillModel;
-    bool bHasFill = rFillModel.moFilled.get( true );
+    bool bHasFill = rFillModel.moFilled.value_or( true );
     setFlag( rAxModel.mnFlags, AX_FLAGS_OPAQUE, bHasFill );
     if( bHasFill )
     {

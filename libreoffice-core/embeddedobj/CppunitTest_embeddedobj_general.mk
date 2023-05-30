@@ -22,10 +22,14 @@ $(eval $(call gb_CppunitTest_add_exception_objects,embeddedobj_general, \
 $(eval $(call gb_CppunitTest_use_libraries,embeddedobj_general, \
     comphelper \
     cppu \
+    cppuhelper \
     embobj \
     sal \
+    subsequenttest \
     test \
+    tl \
     unotest \
+    utl \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,embeddedobj_general))

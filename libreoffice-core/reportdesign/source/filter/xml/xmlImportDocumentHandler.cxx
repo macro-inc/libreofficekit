@@ -29,13 +29,14 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/namedvaluecollection.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include <xmloff/attrlist.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlement.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <xmloff/xmltkmap.hxx>
 #include <xmloff/xmlnamespace.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
 
 #include "xmlHelper.hxx"
@@ -47,9 +48,9 @@ namespace rptxml
 using namespace ::com::sun::star;
 using namespace ::xmloff::token;
 
-ImportDocumentHandler::ImportDocumentHandler(uno::Reference< uno::XComponentContext > const & context)
+ImportDocumentHandler::ImportDocumentHandler(uno::Reference< uno::XComponentContext > context)
     :m_bImportedChart( false )
-    ,m_xContext(context)
+    ,m_xContext(std::move(context))
 {
 }
 
@@ -105,8 +106,8 @@ void SAL_CALL ImportDocumentHandler::endDocument()
     // this fills the chart again
     ::comphelper::NamedValueCollection aArgs;
     aArgs.put( "CellRangeRepresentation", OUString("all") );
-    aArgs.put( "FirstCellAsLabel", uno::makeAny( true ) );
-    aArgs.put( "DataRowSource", uno::makeAny( chart::ChartDataRowSource_COLUMNS ) );
+    aArgs.put( "FirstCellAsLabel", uno::Any( true ) );
+    aArgs.put( "DataRowSource", uno::Any( chart::ChartDataRowSource_COLUMNS ) );
 
     bool bHasCategories = false;
 
@@ -131,13 +132,13 @@ void SAL_CALL ImportDocumentHandler::endDocument()
             }
         }
     }
-    aArgs.put( "HasCategories", uno::makeAny( bHasCategories ) );
+    aArgs.put( "HasCategories", uno::Any( bHasCategories ) );
 
     uno::Reference< chart::XComplexDescriptionAccess > xDataProvider(m_xModel->getDataProvider(),uno::UNO_QUERY);
     if ( xDataProvider.is() )
     {
         const uno::Sequence< OUString > aColumnNames = xDataProvider->getColumnDescriptions();
-        aArgs.put( "ColumnDescriptions", uno::makeAny( aColumnNames ) );
+        aArgs.put( "ColumnDescriptions", uno::Any( aColumnNames ) );
     }
 
     xReceiver->attachDataProvider( m_xDatabaseDataProvider );
@@ -247,14 +248,14 @@ void SAL_CALL ImportDocumentHandler::startElement(const OUString & _sName, const
         const sal_Int16 nLength = (_xAttrList.is()) ? _xAttrList->getLength() : 0;
         for(sal_Int16 i = 0; i < nLength; ++i)
         {
-            OUString sLocalName;
+            std::u16string_view sLocalName;
             const OUString sAttrName = _xAttrList->getNameByIndex( i );
             const sal_Int32 nColonPos = sAttrName.indexOf( ':' );
             if( -1 == nColonPos )
                 sLocalName = sAttrName;
             else
-                sLocalName = sAttrName.copy( nColonPos + 1 );
-            if ( sLocalName == "data-source-has-labels" )
+                sLocalName = sAttrName.subView( nColonPos + 1 );
+            if ( sLocalName == u"data-source-has-labels" )
             {
                 const OUString sValue = _xAttrList->getValueByIndex( i );
                 bHasCategories = sValue == "both";
@@ -343,13 +344,9 @@ void SAL_CALL ImportDocumentHandler::initialize( const uno::Sequence< uno::Any >
     m_xDatabaseDataProvider.set(m_xModel->getDataProvider(),uno::UNO_QUERY);
     if ( !m_xDatabaseDataProvider.is() )
     {
-        static constexpr OUStringLiteral s_sDatabaseDataProvider = u"com.sun.star.chart2.data.DatabaseDataProvider";
-        m_xDatabaseDataProvider.set(m_xContext->getServiceManager()->createInstanceWithContext(s_sDatabaseDataProvider
-            ,m_xContext),uno::UNO_QUERY_THROW);
-        m_xDatabaseDataProvider->setRowLimit(10);
-
-        uno::Reference< chart2::data::XDataReceiver > xReceiver(m_xModel,uno::UNO_QUERY_THROW);
-        xReceiver->attachDataProvider(m_xDatabaseDataProvider);
+        // tdf#117162 reportbuilder needs the DataProvider to exist to progress further
+        setDataProvider(m_xModel, OUString());
+        m_xDatabaseDataProvider.set(m_xModel->getDataProvider(), uno::UNO_QUERY_THROW);
     }
 
     m_aArguments = m_xDatabaseDataProvider->detectArguments(nullptr);

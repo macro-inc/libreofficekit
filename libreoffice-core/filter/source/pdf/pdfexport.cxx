@@ -22,8 +22,8 @@
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/poly.hxx>
-#include <tools/diagnose_ex.h>
-#include <unotools/resmgr.hxx>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/mapmod.hxx>
 #include <vcl/gdimtf.hxx>
@@ -38,7 +38,7 @@
 #include <unotools/configmgr.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <basegfx/matrix/b2dhommatrix.hxx>
+#include <officecfg/Office/Common.hxx>
 
 #include "pdfexport.hxx"
 #include <strings.hrc>
@@ -61,6 +61,7 @@
 #include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/security/XCertificate.hpp>
 #include <com/sun/star/beans/XMaterialHolder.hpp>
+#include <com/sun/star/xml/crypto/SEInitializer.hpp>
 
 #include <memory>
 
@@ -85,6 +86,7 @@ PDFExport::PDFExport( const Reference< XComponent >& rxSrcDoc,
     mnPDFTypeSelection          ( 0 ),
     mbPDFUACompliance           ( false),
     mbExportNotes               ( true ),
+    mbExportNotesInMargin       ( false ),
     mbExportPlaceholders        ( false ),
     mbUseReferenceXObject       ( false ),
     mbExportNotesPages          ( false ),
@@ -401,6 +403,25 @@ static OUString getMimetypeForDocument( const Reference< XComponentContext >& xC
     return aDocMimetype;
 }
 
+uno::Reference<security::XCertificate>
+PDFExport::GetCertificateFromSubjectName(const std::u16string_view& rSubjectName) const
+{
+    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer
+        = xml::crypto::SEInitializer::create(mxContext);
+    uno::Reference<xml::crypto::XXMLSecurityContext> xSecurityContext
+        = xSEInitializer->createSecurityContext(OUString());
+    uno::Reference<xml::crypto::XSecurityEnvironment> xSecurityEnvironment
+        = xSecurityContext->getSecurityEnvironment();
+    for (const auto& xCertificate : xSecurityEnvironment->getPersonalCertificates())
+    {
+        if (xCertificate->getSubjectName() == rSubjectName)
+        {
+            return xCertificate;
+        }
+    }
+
+    return {};
+}
 
 bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& rFilterData )
 {
@@ -462,12 +483,18 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                 }
             }
             // getting the string for the producer
-            aContext.DocumentInfo.Producer =
-                utl::ConfigManager::getProductName() +
-                " " +
-                utl::ConfigManager::getProductVersion();
+            OUString aProducerOverride = officecfg::Office::Common::Save::Document::GeneratorOverride::get();
+            if( !aProducerOverride.isEmpty())
+                aContext.DocumentInfo.Producer = aProducerOverride;
+            else
+                aContext.DocumentInfo.Producer =
+                    utl::ConfigManager::getProductName() +
+                    " " +
+                    utl::ConfigManager::getProductVersion();
+
             aContext.DocumentInfo.Creator = aCreator;
 
+            OUString aSignCertificateSubjectName;
             for ( const beans::PropertyValue& rProp : rFilterData )
             {
                 if ( rProp.Name == "PageRange" )
@@ -492,6 +519,8 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                     rProp.Value >>= mbPDFUACompliance;
                 else if ( rProp.Name == "ExportNotes" )
                     rProp.Value >>= mbExportNotes;
+                else if ( rProp.Name == "ExportNotesInMargin" )
+                    rProp.Value >>= mbExportNotesInMargin;
                 else if ( rProp.Name == "ExportNotesPages" )
                     rProp.Value >>= mbExportNotesPages;
                 else if ( rProp.Name == "ExportOnlyNotesPages" )
@@ -619,6 +648,8 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                     rProp.Value >>= msSignPassword;
                 else if ( rProp.Name == "SignatureCertificate" )
                     rProp.Value >>= maSignCertificate;
+                else if (rProp.Name == "SignCertificateSubjectName")
+                    rProp.Value >>= aSignCertificateSubjectName;
                 else if ( rProp.Name == "SignatureTSA" )
                     rProp.Value >>= msSignTSA;
                 else if ( rProp.Name == "ExportPlaceholders" )
@@ -628,6 +659,11 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                 // Redaction & bitmap related stuff
                 else if ( rProp.Name == "IsRedactMode" )
                     rProp.Value >>= mbIsRedactMode;
+            }
+
+            if (!maSignCertificate.is() && !aSignCertificateSubjectName.isEmpty())
+            {
+                maSignCertificate = GetCertificateFromSubjectName(aSignCertificateSubjectName);
             }
 
             aContext.URL        = aURL.GetMainURL(INetURLObject::DecodeMechanism::ToIUri);
@@ -666,13 +702,21 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
             case 16:
                 aContext.Version = vcl::PDFWriter::PDFVersion::PDF_1_6;
                 break;
+            case 17:
+                aContext.Version = vcl::PDFWriter::PDFVersion::PDF_1_7;
+                break;
             }
 
             // PDF/UA support
             aContext.UniversalAccessibilityCompliance = mbPDFUACompliance;
             if (mbPDFUACompliance)
             {
+                // ISO 14289-1:2014, Clause: 7.1
                 mbUseTaggedPDF = true;
+                // ISO 14289-1:2014, Clause: 7.16
+                mbCanExtractForAccessibility = true;
+                // ISO 14289-1:2014, Clause: 7.20
+                mbUseReferenceXObject = false;
             }
 
             // copy in context the values default in the constructor or set by the FilterData sequence of properties
@@ -902,6 +946,7 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                 vcl::PDFExtOutDevData aPDFExtOutDevData( *pOut );
                 pOut->SetExtOutDevData( &aPDFExtOutDevData );
                 aPDFExtOutDevData.SetIsExportNotes( mbExportNotes );
+                aPDFExtOutDevData.SetIsExportNotesInMargin( mbExportNotesInMargin );
                 aPDFExtOutDevData.SetIsExportTaggedPDF( mbUseTaggedPDF );
                 aPDFExtOutDevData.SetIsExportTransitionEffects( mbUseTransitionEffects );
                 aPDFExtOutDevData.SetIsExportFormFields( mbExportFormFields );
@@ -921,7 +966,8 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                     comphelper::makePropertyValue("IsSkipEmptyPages", mbSkipEmptyPages),
                     comphelper::makePropertyValue("PageRange", aPageRange),
                     comphelper::makePropertyValue("ExportPlaceholders", mbExportPlaceholders),
-                    comphelper::makePropertyValue("SinglePageSheets", mbSinglePageSheets)
+                    comphelper::makePropertyValue("SinglePageSheets", mbSinglePageSheets),
+                    comphelper::makePropertyValue("ExportNotesInMargin", mbExportNotesInMargin)
                 };
                 Any& rExportNotesValue = aRenderOptions.getArray()[ 1 ].Value;
 
@@ -947,14 +993,14 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                         xViewProperties->getPropertyValue( sShowOnlineLayout ) >>= bReChangeToNormalView;
                         if( bReChangeToNormalView )
                         {
-                            xViewProperties->setPropertyValue( sShowOnlineLayout, uno::makeAny( false ) );
+                            xViewProperties->setPropertyValue( sShowOnlineLayout, uno::Any( false ) );
                         }
 
                         // Also, disable hide-whitespace during export.
                         xViewProperties->getPropertyValue(sHideWhitespace) >>= bReHideWhitespace;
                         if (bReHideWhitespace)
                         {
-                            xViewProperties->setPropertyValue(sHideWhitespace, uno::makeAny(false));
+                            xViewProperties->setPropertyValue(sHideWhitespace, uno::Any(false));
                         }
                     }
                     catch( const uno::Exception& )
@@ -981,11 +1027,10 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
 
                 if ( mxStatusIndicator.is() )
                 {
-                    std::locale loc(Translate::Create("flt"));
                     sal_Int32 nTotalPageCount = aRangeEnum.size();
                     if ( bExportPages && bExportNotesPages )
                         nTotalPageCount *= 2;
-                    mxStatusIndicator->start(Translate::get(PDF_PROGRESS_BAR, loc), nTotalPageCount);
+                    mxStatusIndicator->start(FilterResId(PDF_PROGRESS_BAR), nTotalPageCount);
                 }
 
                 bRet = nPageCount > 0;
@@ -1017,7 +1062,7 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                 {
                     try
                     {
-                        xViewProperties->setPropertyValue( sShowOnlineLayout, uno::makeAny( true ) );
+                        xViewProperties->setPropertyValue( sShowOnlineLayout, uno::Any( true ) );
                     }
                     catch( const uno::Exception& )
                     {
@@ -1027,7 +1072,7 @@ bool PDFExport::Export( const OUString& rFile, const Sequence< PropertyValue >& 
                 {
                     try
                     {
-                        xViewProperties->setPropertyValue( sHideWhitespace, uno::makeAny( true ) );
+                        xViewProperties->setPropertyValue( sHideWhitespace, uno::Any( true ) );
                     }
                     catch( const uno::Exception& )
                     {
@@ -1054,7 +1099,7 @@ class PDFErrorRequest : private cppu::BaseMutex,
 {
     task::PDFExportException maExc;
 public:
-    explicit PDFErrorRequest( const task::PDFExportException& i_rExc );
+    explicit PDFErrorRequest( task::PDFExportException aExc );
 
     // XInteractionRequest
     virtual uno::Any SAL_CALL getRequest() override;
@@ -1062,9 +1107,9 @@ public:
 };
 
 
-PDFErrorRequest::PDFErrorRequest( const task::PDFExportException& i_rExc ) :
+PDFErrorRequest::PDFErrorRequest( task::PDFExportException aExc ) :
     PDFErrorRequestBase( m_aMutex ),
-    maExc( i_rExc )
+    maExc(std::move( aExc ))
 {
 }
 
@@ -1093,7 +1138,7 @@ void PDFExport::showErrors( const std::set< vcl::PDFWriter::ErrorCode >& rErrors
     {
         task::PDFExportException aExc;
         aExc.ErrorCodes = comphelper::containerToSequence<sal_Int32>( rErrors );
-        Reference< task::XInteractionRequest > xReq( new PDFErrorRequest( aExc ) );
+        Reference< task::XInteractionRequest > xReq( new PDFErrorRequest( std::move(aExc) ) );
         mxIH->handle( xReq );
     }
 }

@@ -28,6 +28,8 @@
 #include "tp_Wizard_TitlesAndObjects.hxx"
 #include "tp_DataSource.hxx"
 #include <ChartTypeTemplateProvider.hxx>
+#include <ChartTypeTemplate.hxx>
+#include <utility>
 #include "DialogModel.hxx"
 
 using namespace css;
@@ -44,16 +46,16 @@ namespace chart
 #define STATE_OBJECTS      3
 #define STATE_LAST         STATE_OBJECTS
 
-CreationWizard::CreationWizard(weld::Window* pParent, const uno::Reference<frame::XModel>& xChartModel,
-                               const uno::Reference<uno::XComponentContext>& xContext)
+CreationWizard::CreationWizard(weld::Window* pParent, const rtl::Reference<::chart::ChartModel>& xChartModel,
+                               uno::Reference<uno::XComponentContext> xContext)
     : vcl::RoadmapWizardMachine(pParent)
     , m_xChartModel(xChartModel,uno::UNO_QUERY)
-    , m_xComponentContext(xContext)
+    , m_xComponentContext(std::move(xContext))
     , m_pTemplateProvider(nullptr)
     , m_aTimerTriggeredControllerLock(xChartModel)
     , m_bCanTravel(true)
 {
-    m_pDialogModel.reset(new DialogModel(m_xChartModel, m_xComponentContext));
+    m_pDialogModel.reset(new DialogModel(m_xChartModel));
     defaultButton(WizardButtonFlags::FINISH);
 
     setTitleBase(SchResId(STR_DLG_CHART_WIZARD));

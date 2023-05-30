@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LibreOffice 3.5.x\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:04+0200\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
 "PO-Revision-Date: 2020-08-18 15:35+0000\n"
 "Last-Translator: Donald Rogers <donr2648@clear.net.nz>\n"
 "Language-Team: Esperanto <https://weblate.documentfoundation.org/projects/libo_help-master/textshared00/eo/>\n"
@@ -33,6 +33,24 @@ msgctxt ""
 "help.text"
 msgid "Frequently-Used Buttons"
 msgstr "Ofte uzataj butonoj"
+
+#. a44G6
+#: 00000001.xhp
+msgctxt ""
+"00000001.xhp\n"
+"hd_id211668777619062\n"
+"help.text"
+msgid "Help"
+msgstr ""
+
+#. ruaTG
+#: 00000001.xhp
+msgctxt ""
+"00000001.xhp\n"
+"par_id761668777629023\n"
+"help.text"
+msgid "Click the <menuitem>Help</menuitem> button to open the help page associated with the currently open dialog."
+msgstr ""
 
 #. WptWZ
 #: 00000001.xhp
@@ -124,13 +142,13 @@ msgctxt ""
 msgid "You can type a numerical value into the field next to the spin button, or select the value with the <emph>Up Arrow</emph> or <emph>Down Arrow</emph> symbols on the spin button. On the keyboard you can press the <item type=\"keycode\">Up Arrow</item> and <item type=\"keycode\">Down Arrow</item> keys to increase or reduce the value. You can press the <item type=\"keycode\">Page Up</item> and <item type=\"keycode\">Page Down</item> keys to set the maximum and minimum value."
 msgstr "Vi povas tajpi numeran valoron en la kampo apud la numeradilo, aŭ elektu la valoron per la simbolo <emph>Supren-sago</emph> aŭ <emph>Malsupren-sago</emph> sur la numeradilo. Ĉe la klavaro, vi povas premi la klavojn <item type=\"keycode\">Supren-sago</item> kaj <item type=\"keycode\">Malsupren-sago</item> por pliigi aŭ malpliigi la valoron. Vi povas premi la klavojn <item type=\"keycode\">Paĝo supren</item> kaj <item type=\"keycode\">Paĝo malsupren</item> por agordi la maksimuman kaj minimuman valoron."
 
-#. 2zxgm
+#. vEMqx
 #: 00000001.xhp
 msgctxt ""
 "00000001.xhp\n"
 "par_id3150264\n"
 "help.text"
-msgid "If the field next to the spin button defines numerical values, you can also define a <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"measurement unit\">measurement unit</link>, for example, <emph>1 cm or 5 mm, 12 pt or 2\"</emph>."
+msgid "If the field next to the spin button defines numerical values, you can also define a <link href=\"text/shared/00/00000003.xhp#measurement_units\">measurement unit</link>, for example, <emph>1 cm or 5 mm, 12 pt or 2\"</emph>."
 msgstr ""
 
 #. 7DT6o
@@ -214,13 +232,13 @@ msgctxt ""
 msgid "Metrics"
 msgstr "Mezurunuoj"
 
-#. XHnuD
+#. u6pCA
 #: 00000001.xhp
 msgctxt ""
 "00000001.xhp\n"
 "par_id3145345\n"
 "help.text"
-msgid "You can enter values in the input fields in different <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"units of measurement\">units of measurement</link>. The default unit is inches. However, if you want a space of exactly 1 cm, then type \"1cm\". Additional units are available according to the context, for example, 12 pt for a 12 point spacing. If the value of the new unit is unrealistic, the program uses a predefined maximum or minimum value."
+msgid "You can enter values in the input fields in different <link href=\"text/shared/00/00000003.xhp#measurement_units\">units of measurement</link>. The default unit is inches. However, if you want a space of exactly 1 cm, then type \"1cm\". Additional units are available according to the context, for example, 12 pt for a 12 point spacing. If the value of the new unit is unrealistic, the program uses a predefined maximum or minimum value."
 msgstr ""
 
 #. gjFSF
@@ -655,14 +673,14 @@ msgctxt ""
 msgid "<variable id=\"siehe\">See also the following functions:</variable>"
 msgstr "<variable id=\"siehe\">Rigardu ankaŭ la jenajn funkciojn:</variable>"
 
-#. Jrt98
+#. mmm8z
 #: 00000001.xhp
 msgctxt ""
 "00000001.xhp\n"
 "par_id3147418\n"
 "help.text"
-msgid "The search supports wildcards or <link href=\"text/shared/01/02100001.xhp\" name=\"regular expressions\">regular expressions</link>. With regular expressions enabled, you can enter \"all.*\", for example to find the first location of \"all\" followed by any characters. If you want to search for a text that is also a regular expression, you must either precede every character with a \"\\\" character, or enclose the text into \\Q...\\E. You can switch the automatic evaluation of wildcards or regular expression on and off in <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME Calc - Calculate</menuitem></link>."
-msgstr "La serĉo subtenas ĵokerojn aŭ <link href=\"text/shared/01/02100001.xhp\" name=\"regular expressions\">regulajn esprimojn</link>. Enŝaltinte regulajn esprimojn, vi povas enigi je \"ĉio.*\", ekzemple por serĉi la unuan lokon de \"ĉio\" sekvata de ajnaj signoj. Se vi volas serĉi tekston, kiu estas ankaŭ regula esprimo, vi devas aŭ antaŭigi ĉiun signon per \"\\\", aŭ enfermi la tekston en \\Q...\\E. Vi povas malŝalti la aŭtomatan kalkuladon de ĵokeroj aŭ regulaj esprimoj en <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferoj</menuitem></caseinline><defaultinline><menuitem>Iloj - Agordoj</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME-Tabelilo - Kalkuli</menuitem></link>."
+msgid "The search supports wildcards or <link href=\"text/shared/01/02100001.xhp\">regular expressions</link>. With regular expressions enabled, you can enter \"all.*\", for example to find the first location of \"all\" followed by any characters. If you want to search for a text that is also a regular expression, you must either precede every regular expression metacharacter or operator with a \"\\\" character, or enclose the text into \\Q...\\E. You can switch the automatic evaluation of wildcards or regular expression on and off in <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME Calc - Calculate</menuitem></link>."
+msgstr ""
 
 #. GFeqE
 #: 00000001.xhp
@@ -682,13 +700,13 @@ msgctxt ""
 msgid "<variable id=\"wahr\">If an error occurs, the function returns a logical or numerical value.</variable>"
 msgstr "<variable id=\"wahr\">Se okazas eraro, la funkcio liveras logikan aŭ numeran valoron.</variable>"
 
-#. ECspB
+#. dv8ti
 #: 00000001.xhp
 msgctxt ""
 "00000001.xhp\n"
 "par_id3154145\n"
 "help.text"
-msgid "<variable id=\"kontext\">(This command is only accessible through the <link href=\"text/shared/00/00000005.xhp#contextmenu\" name=\"context menu\">context menu</link>).</variable>"
+msgid "<variable id=\"kontext\">(This command is only accessible through the <link href=\"text/shared/00/00000005.xhp#contextmenu\">context menu</link>).</variable>"
 msgstr ""
 
 #. JFGU9
@@ -799,14 +817,14 @@ msgctxt ""
 msgid "<bookmark_value>Internet glossary</bookmark_value>  <bookmark_value>common terms;Internet glossary</bookmark_value>  <bookmark_value>glossaries;Internet terms</bookmark_value>  <bookmark_value>terminology;Internet glossary</bookmark_value>"
 msgstr "<bookmark_value>Interreta glosaro</bookmark_value>  <bookmark_value>oftaj terminoj;Interreta glosaro</bookmark_value>  <bookmark_value>glosaroj;Interretaj terminoj</bookmark_value>  <bookmark_value>terminologio;Interreta glosaro</bookmark_value>"
 
-#. fSAvG
+#. wCWZm
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "hd_id3150702\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp\" name=\"Glossary of Internet Terms\">Glossary of Internet Terms</link>"
-msgstr "<link href=\"text/shared/00/00000002.xhp\" name=\"Glossary of Internet Terms\">Glosaro pri Interretaj Terminoj</link>"
+msgid "<link href=\"text/shared/00/00000002.xhp\">Glossary of Internet Terms</link>"
+msgstr "<link href=\"text/shared/00/00000002.xhp\">Glosaro pri Interretaj Terminoj</link>"
 
 #. aj3Pk
 #: 00000002.xhp
@@ -853,14 +871,14 @@ msgctxt ""
 msgid "<variable id=\"epubv\">EPUB is standard for electronic book files with the extension <emph>.epub</emph> that can be downloaded and read on devices like smartphones, tablets, computers, or e-readers.</variable>"
 msgstr "<variable id=\"epubv\">EPUB estas normo por bitlibroj kun la sufikso <emph>.epub</emph>. Ili estas elŝuteblaj kaj legeblaj per ilo, ekzemple poŝtelefono, tabulkomputilo, komputilo, aŭ bitlibrolegilo.</variable>"
 
-#. FDzf7
+#. gF4eu
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id981525003378764\n"
 "help.text"
-msgid "EPUB is a technical standard published now by the <link href=\"https://www.w3.org/publishing/\" name=\"IDPF\">Publishing group of W3C</link>. EPUB is a popular format because it is open and is based on HTML."
-msgstr "EPUB estas teknika normo publikigita de la <link href=\"https://www.w3.org/publishing/\" name=\"IDPF\">Publishing group of W3C</link>. EPUB estas populara formato ĉar ĝi estas libera kaj bazita sur HTML."
+msgid "EPUB is a technical standard published now by the <link href=\"https://www.w3.org/publishing/\">Publishing group of W3C</link>. EPUB is a popular format because it is open and is based on HTML."
+msgstr "EPUB estas teknika normo publikigita de la <link href=\"https://www.w3.org/publishing/\">Publishing group of W3C</link>. EPUB estas populara formato ĉar ĝi estas libera kaj bazita sur HTML."
 
 #. NoaPc
 #: 00000002.xhp
@@ -898,14 +916,14 @@ msgctxt ""
 msgid "Frames"
 msgstr "Kadroj"
 
-#. omvuA
+#. XiZyR
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3157909\n"
 "help.text"
-msgid "Frames are useful for designing the layout of <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> pages. $[officename] uses floating frames into which you can place objects such as graphics, movie files and sound. The context menu of a frame shows the options for restoring or editing frame contents. Some of these commands are also listed in <emph>Edit - Object</emph> when the frame is selected."
-msgstr "Kadroj utilas por fasoni <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link>-paĝojn. $[officename] uzas glitajn kadrojn en kiuj oni povas meti objektojn, ekzemple grafikaĵojn, videojn kaj sondosierojn. La kunteksta menuo de kadro havas pluajn eblojn por restaŭri aŭ redakti kadran enhavon. Iuj komandoj listiĝas en <emph>Redakti - Objekto</emph> kiam oni elektas la kadron."
+msgid "Frames are useful for designing the layout of <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> pages. $[officename] uses floating frames into which you can place objects such as graphics, movie files and sound. The context menu of a frame shows the options for restoring or editing frame contents. Some of these commands are also listed in <emph>Edit - Object</emph> when the frame is selected."
+msgstr "Kadroj utilas por fasoni <link href=\"text/shared/00/00000002.xhp#html\">HTML</link>-paĝojn. $[officename] uzas glitajn kadrojn en kiuj oni povas meti objektojn, ekzemple grafikaĵojn, videojn kaj sondosierojn. La kunteksta menuo de kadro havas pluajn eblojn por restaŭri aŭ redakti kadran enhavon. Iuj komandoj listiĝas en <emph>Redakti - Objekto</emph> kiam oni elektas la kadron."
 
 #. 3xGWj
 #: 00000002.xhp
@@ -916,14 +934,14 @@ msgctxt ""
 msgid "FTP"
 msgstr "FTP"
 
-#. LJ8Pq
+#. fRYUi
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3147335\n"
 "help.text"
-msgid "FTP stands for File Transfer Protocol and is the standard transfer protocol for files in the Internet. An FTP server is a program on a computer connected to the Internet which stores files to be transmitted with the aid of FTP. While FTP is responsible for transmitting and downloading Internet files, <link href=\"text/shared/00/00000002.xhp#http\" name=\"HTTP\">HTTP</link> (Hypertext Transfer Protocol) provides the connection setup and data transfer between WWW servers and clients."
-msgstr "FTP (File Transfer Protocol - dosiertransiga protokolo) estas normo pri la movado de dosieroj tra la Interreto. FTP-servilo estas programo en komputilo konektita al la Interreto, kiu konservas dosierojn transigotajn per FTP. Dum FTP respondecas pri transigado kaj elŝutado de dosieroj, <link href=\"text/shared/00/00000002.xhp#http\" name=\"HTTP\">HTTP</link> (HiperTeksta Transiga Protokolo) provizas la konektan agordon kaj datumtransigon inter TTT-serviloj kaj klientoj."
+msgid "FTP stands for File Transfer Protocol and is the standard transfer protocol for files in the Internet. An FTP server is a program on a computer connected to the Internet which stores files to be transmitted with the aid of FTP. While FTP is responsible for transmitting and downloading Internet files, <link href=\"text/shared/00/00000002.xhp#http\">HTTP</link> (Hypertext Transfer Protocol) provides the connection setup and data transfer between WWW servers and clients."
+msgstr "FTP (File Transfer Protocol - dosiertransiga protokolo) estas normo pri la movado de dosieroj tra la Interreto. FTP-servilo estas programo en komputilo konektita al la Interreto, kiu konservas dosierojn transigotajn per FTP. Dum FTP respondecas pri transigado kaj elŝutado de dosieroj, <link href=\"text/shared/00/00000002.xhp#http\">HTTP</link> (HiperTeksta Transiga Protokolo) provizas la konektan agordon kaj datumtransigon inter TTT-serviloj kaj klientoj."
 
 #. DfnEq
 #: 00000002.xhp
@@ -943,14 +961,14 @@ msgctxt ""
 msgid "HTML"
 msgstr "HTML"
 
-#. BRhCV
+#. iTVXF
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3161459\n"
 "help.text"
-msgid "HTML (Hypertext Markup Language) is a document code language, which is used as the file format for WWW documents. It is derived from <link href=\"text/shared/00/00000002.xhp#sgml\" name=\"SGML\">SGML</link> and integrates text, graphics, videos and sound."
-msgstr "HTML (HiperTeksta MarkoLingvo) estas dokumenta kodlingvo, uzata kiel la dosiera formato por TTT-dokumentoj. Ĝi estas bazita sur <link href=\"text/shared/00/00000002.xhp#sgml\" name=\"SGML\">SGML</link> kaj kunigas tekstojn, grafikaĵojn, videojn kaj sondosierojn."
+msgid "HTML (Hypertext Markup Language) is a document code language, which is used as the file format for WWW documents. It is derived from <link href=\"text/shared/00/00000002.xhp#sgml\">SGML</link> and integrates text, graphics, videos and sound."
+msgstr "HTML (HiperTeksta MarkoLingvo) estas dokumenta kodlingvo, uzata kiel la dosiera formato por TTT-dokumentoj. Ĝi estas bazita sur <link href=\"text/shared/00/00000002.xhp#sgml\">SGML</link> kaj kunigas tekstojn, grafikaĵojn, videojn kaj sondosierojn."
 
 #. RWrXM
 #: 00000002.xhp
@@ -1042,23 +1060,23 @@ msgctxt ""
 msgid "ImageMap"
 msgstr "BildoMapo"
 
-#. vbAkm
+#. NnAbR
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3154685\n"
 "help.text"
-msgid "An ImageMap is a reference-sensitive graphic or frame. You can click on defined areas of the graphic or frame to go to a target (<link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link>), which is linked with the area. The reference areas, along with the linked URLs and corresponding text displayed when resting the mouse pointer on these areas, are defined in the <link href=\"text/shared/01/02220000.xhp\" name=\"ImageMap Editor\">ImageMap Editor</link>."
-msgstr "ImageMap estas referencdistinga grafikaĵo aŭ kadro. Vi povas alklaki sur difinitaj zonoj de la grafikaĵo aŭ kadro por iri al celata (<link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link>), kiu estas ligita al la zono. La referencaj zonoj, kun la ligitaj URL-oj kaj rilata teksto vidigata kiam la musmontrilo ŝvebas super tiuj zonoj, estas agorditaj en la <link href=\"text/shared/01/02220000.xhp\" name=\"ImageMap Editor\">ImageMap Editor</link>."
+msgid "An ImageMap is a reference-sensitive graphic or frame. You can click on defined areas of the graphic or frame to go to a target (<link href=\"text/shared/00/00000002.xhp#url\">URL</link>), which is linked with the area. The reference areas, along with the linked URLs and corresponding text displayed when resting the mouse pointer on these areas, are defined in the <link href=\"text/shared/01/02220000.xhp\">ImageMap Editor</link>."
+msgstr "ImageMap estas referencdistinga grafikaĵo aŭ kadro. Vi povas alklaki sur difinitaj zonoj de la grafikaĵo aŭ kadro por iri al celata (<link href=\"text/shared/00/00000002.xhp#url\">URL</link>), kiu estas ligita al la zono. La referencaj zonoj, kun la ligitaj URL-oj kaj rilata teksto vidigata kiam la musmontrilo ŝvebas super tiuj zonoj, estas agorditaj en la <link href=\"text/shared/01/02220000.xhp\">ImageMap Editor</link>."
 
-#. CzwEW
+#. 8SEEo
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3153178\n"
 "help.text"
-msgid "There are two different types of ImageMaps. A Client Side ImageMap is evaluated on the client computer, which loaded the graphic from the Internet, while a Server Side ImageMap is evaluated on the server computer which provides the <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> page on the Internet. In server evaluation, clicking an ImageMap sends the relative coordinates of the cursor within the image to the server, and a dedicated program on the server responds. In the client evaluation, clicking a defined hotspot of the ImageMap activates the URL, as if it were a normal text link. The URL appears below the mouse pointer when passing across the ImageMap."
-msgstr "Ekzistas du tipoj de BildoMapoj. Klientflanka bildomapo kalkuliĝas en la klienta komputilo, kiu ŝargis la grafikaĵon el la Interreto, dum servilflanka bildomapo kalkuliĝas en la servila komputilo, kiu provizas la <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link>-paĝon en la Interreto. En servila kalkulado, alklaki bildomapon sendas la relativajn koordinatojn de la kursoro en la bildo al la servilo, kaj speciala servila programo respondas. En klientflanka kalkulado, alklaki difinitan retkaptejon de la bildomapo aktivigas la URL-on, kvazaŭ ĝi estus normala teksta ligilo. La URL aperas sub la musmontrilo kiam ĝi pasas trans la bildomapo."
+msgid "There are two different types of ImageMaps. A Client Side ImageMap is evaluated on the client computer, which loaded the graphic from the Internet, while a Server Side ImageMap is evaluated on the server computer which provides the <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> page on the Internet. In server evaluation, clicking an ImageMap sends the relative coordinates of the cursor within the image to the server, and a dedicated program on the server responds. In the client evaluation, clicking a defined hotspot of the ImageMap activates the URL, as if it were a normal text link. The URL appears below the mouse pointer when passing across the ImageMap."
+msgstr "Ekzistas du tipoj de BildoMapoj. Klientflanka bildomapo kalkuliĝas en la klienta komputilo, kiu ŝargis la grafikaĵon el la Interreto, dum servilflanka bildomapo kalkuliĝas en la servila komputilo, kiu provizas la <link href=\"text/shared/00/00000002.xhp#html\">HTML</link>-paĝon en la Interreto. En servila kalkulado, alklaki bildomapon sendas la relativajn koordinatojn de la kursoro en la bildo al la servilo, kaj speciala servila programo respondas. En klientflanka kalkulado, alklaki difinitan retkaptejon de la bildomapo aktivigas la URL-on, kvazaŭ ĝi estus normala teksta ligilo. La URL aperas sub la musmontrilo kiam ĝi pasas trans la bildomapo."
 
 #. Tk4uc
 #: 00000002.xhp
@@ -1159,23 +1177,23 @@ msgctxt ""
 msgid "Client Side ImageMap"
 msgstr "Klientflanka BildoMapo"
 
-#. DKeXA
+#. HN6DX
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3151290\n"
 "help.text"
-msgid "The area of the picture or frame where the reader can click is indicated by the appearance of the linked <link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link> when the mouse passes over the area. The ImageMap is stored in a layer below the picture and contains information about the referenced regions. The only disadvantage of Client Side ImageMaps is that older Web browsers cannot read them; a disadvantage that will, however, resolve itself in time."
-msgstr "La zonon de la bildo aŭ kadro kie leganto povas alklaki indikas la aspekto de la ligita <link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link> kiam la musmontrilo pasas sur la zono. La BildoMapo estas konservebla en tavolo sub la bildo kaj enhavas informon pri la referencitaj zonoj. La sola malavantago de klientflankaj bildomapoj estas ke plimalnovaj TTT-legiloj ne povas legi ilin; tiu malavantaĝo solviĝos eventuale."
+msgid "The area of the picture or frame where the reader can click is indicated by the appearance of the linked <link href=\"text/shared/00/00000002.xhp#url\">URL</link> when the mouse passes over the area. The ImageMap is stored in a layer below the picture and contains information about the referenced regions. The only disadvantage of Client Side ImageMaps is that older Web browsers cannot read them; a disadvantage that will, however, resolve itself in time."
+msgstr "La zonon de la bildo aŭ kadro kie leganto povas alklaki indikas la aspekto de la ligita <link href=\"text/shared/00/00000002.xhp#url\">URL</link> kiam la musmontrilo pasas sur la zono. La BildoMapo estas konservebla en tavolo sub la bildo kaj enhavas informon pri la referencitaj zonoj. La sola malavantago de klientflankaj bildomapoj estas ke plimalnovaj TTT-legiloj ne povas legi ilin; tiu malavantaĝo solviĝos eventuale."
 
-#. kB898
+#. 7Dq9J
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3149664\n"
 "help.text"
-msgid "When saving the ImageMap, select the file type <emph>SIP - StarView ImageMap</emph>. This saves the ImageMap directly in a format which can be applied to every active picture or frame in your document. However, if you just want to use the ImageMap on the current picture or frame, you do not have to save it in any special format. After defining the regions, simply click <emph>Apply</emph>. Nothing more is necessary. Client Side ImageMaps saved in <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> format are inserted directly into the page in HTML code."
-msgstr "Kiam vi konservas je la ImageMap, elektu la tipon de dosiero <emph>SIP - StarView ImageMap</emph>. Tio rekte konservas je la ImageMap en formato kiujn vi povas apliki al ĉiu aktiva bildo aŭ kadro en via dokumento. Se vi volas nur uzi je la ImageMap en la aktuala bildo aŭ kadro, vi ne devas konservi ĝin en ajna speciala formato. Agordinte la zonojn, simple alklaku al <emph>Apliki</emph>. Nenion pli. ImageMap konservita ĉe la kliento en formato <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> rekte enmetiĝas en la paĝon en HTML-kodo."
+msgid "When saving the ImageMap, select the file type <emph>SIP - StarView ImageMap</emph>. This saves the ImageMap directly in a format which can be applied to every active picture or frame in your document. However, if you just want to use the ImageMap on the current picture or frame, you do not have to save it in any special format. After defining the regions, simply click <emph>Apply</emph>. Nothing more is necessary. Client Side ImageMaps saved in <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> format are inserted directly into the page in HTML code."
+msgstr "Kiam vi konservas je la ImageMap, elektu la tipon de dosiero <emph>SIP - StarView ImageMap</emph>. Tio rekte konservas je la ImageMap en formato kiujn vi povas apliki al ĉiu aktiva bildo aŭ kadro en via dokumento. Se vi volas nur uzi je la ImageMap en la aktuala bildo aŭ kadro, vi ne devas konservi ĝin en ajna speciala formato. Agordinte la zonojn, simple alklaku al <emph>Apliki</emph>. Nenion pli. ImageMap konservita ĉe la kliento en formato <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> rekte enmetiĝas en la paĝon en HTML-kodo."
 
 #. JCSdG
 #: 00000002.xhp
@@ -1249,14 +1267,14 @@ msgctxt ""
 msgid "SGML stands for \"Standard Generalized Markup Language\". SGML is based on the idea that documents have structural and other semantic elements that can be described without reference to how such elements should be displayed. The actual display of such a document may vary, depending on the output medium and style preferences. In structured texts, SGML not only defines structures (in the DTD = Document Type Definition) but also ensures they are consistently used."
 msgstr "SGML estas mallongigo de \"Standard Generalized Markup Language\" (Norma Ĝenerala MarkoLingvo). SGML estas bazita sur la ideo ke dokumentoj havas strukturajn kaj aliajn semantikajn elementojn kiuj estas priskribeblaj sen referi al kiel tiuj elementoj vidiĝu. La vidigo eble diversos, depende de la eliga medio kaj stilaj preferoj. En strukturitaj tekstoj, SGML ne nur difinas strukturojn (en la DTD, la DokumentoTipa Difino) sed ankaŭ certigas ke ili estas konsekvence uzataj."
 
-#. SD7LT
+#. hSUP3
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3148747\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> is a specialized application of SGML. This means that most Web browsers support only a limited range of SGML standards and that almost all SGML-enabled systems can produce attractive HTML pages."
-msgstr "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> estas speciala aplikaĵo de SGML. Tio signifas ke plejmultaj TTT-legiloj subtenas nur limigitan amplekson de SGML-normoj kaj ke preskaŭ ĉiuj SGML-kongruaj sistemoj povas produkti allogajn HTML-paĝojn."
+msgid "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> is a specialized application of SGML. This means that most Web browsers support only a limited range of SGML standards and that almost all SGML-enabled systems can produce attractive HTML pages."
+msgstr "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> estas speciala aplikaĵo de SGML. Tio signifas ke plejmultaj TTT-legiloj subtenas nur limigitan amplekson de SGML-normoj kaj ke preskaŭ ĉiuj SGML-kongruaj sistemoj povas produkti allogajn HTML-paĝojn."
 
 #. M2LKq
 #: 00000002.xhp
@@ -1303,14 +1321,14 @@ msgctxt ""
 msgid "Tags"
 msgstr "Etikedoj"
 
-#. JYJaQ
+#. cH38H
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3156360\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> pages contain certain structural and formatting instructions called tags. Tags are code words enclosed by brackets in the document description language HTML. Many tags contain text or hyperlink references between the opening and closing brackets. For example, titles are marked by the tags <h1> at the beginning and </h1> at the end of the title. Some tags only appear on their own such as <br> for a line break or <img ...> to link a graphic."
-msgstr "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link>-paĝoj enhavas strukturajn kaj formatajn komandojn nomitajn etikedoj. Etikedoj estas kodvortoj ĉirkaŭitaj de angulkrampoj en la dokumentpriskriba lingvo HTML. Multaj etikedoj enhavas tekston aŭ hiperligilan referencon inter la komenca kaj fina angulkrampoj. Ekzemple, titolo estas markebla per la etikedoj <h1> komence kaj </h1> ĉe la fino de la titolo. Iuj etikedoj aperas nur sole, ekzemple <br> por linisalto aŭ <img ...> por ligi grafikaĵon."
+msgid "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> pages contain certain structural and formatting instructions called tags. Tags are code words enclosed by brackets in the document description language HTML. Many tags contain text or hyperlink references between the opening and closing brackets. For example, titles are marked by the tags <h1> at the beginning and </h1> at the end of the title. Some tags only appear on their own such as <br> for a line break or <img ...> to link a graphic."
+msgstr "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link>-paĝoj enhavas strukturajn kaj formatajn komandojn nomitajn etikedoj. Etikedoj estas kodvortoj ĉirkaŭitaj de angulkrampoj en la dokumentpriskriba lingvo HTML. Multaj etikedoj enhavas tekston aŭ hiperligilan referencon inter la komenca kaj fina angulkrampoj. Ekzemple, titolo estas markebla per la etikedoj <h1> komence kaj </h1> ĉe la fino de la titolo. Iuj etikedoj aperas nur sole, ekzemple <br> por linisalto aŭ <img ...> por ligi grafikaĵon."
 
 #. c7EwD
 #: 00000002.xhp
@@ -2041,14 +2059,14 @@ msgctxt ""
 msgid "<bookmark_value>common terms;glossaries</bookmark_value><bookmark_value>glossaries;common terms</bookmark_value><bookmark_value>terminology;general glossary</bookmark_value>"
 msgstr "<bookmark_value>oftaj terminoj;glosaroj</bookmark_value><bookmark_value>glosaroj;oftaj terminoj</bookmark_value><bookmark_value>terminologio;ĝenerala glosaro</bookmark_value>"
 
-#. MGCGZ
+#. SVv3u
 #: 00000005.xhp
 msgctxt ""
 "00000005.xhp\n"
 "hd_id3154896\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000005.xhp\" name=\"General Glossary\">General Glossary</link>"
-msgstr "<link href=\"text/shared/00/00000005.xhp\" name=\"General Glossary\">Ĝenerala glosaro</link>"
+msgid "<link href=\"text/shared/00/00000005.xhp\">General Glossary</link>"
+msgstr "<link href=\"text/shared/00/00000005.xhp\">Ĝenerala glosaro</link>"
 
 #. qDfo9
 #: 00000005.xhp
@@ -2509,13 +2527,13 @@ msgctxt ""
 msgid "Link"
 msgstr "Ligo"
 
-#. mknz4
+#. FEwQD
 #: 00000005.xhp
 msgctxt ""
 "00000005.xhp\n"
 "par_id3150092\n"
 "help.text"
-msgid "The <menuitem>Links to External Files</menuitem> command is found in the <menuitem>Edit</menuitem> menu. The command can only be activated when at least one link is contained in the current document. When you insert a picture, for example, you can either insert the picture directly into the document or insert the picture as a link."
+msgid "The <menuitem>External Links</menuitem> command is found in the <menuitem>Edit</menuitem> menu. The command can only be activated when at least one link is contained in the current document. When you insert a picture, for example, you can either insert the picture directly into the document or insert the picture as a link."
 msgstr ""
 
 #. ePu6N
@@ -2536,13 +2554,13 @@ msgctxt ""
 msgid "If you insert the object as a link, only a reference to the file name is inserted. The file size of the document increases only by the path and file reference. If you open your document on another computer, however, the linked file must be in exactly the same position as given by the reference in order to view the object in the document."
 msgstr "Se vi enmetas la objekton kiel ligilon, tiam enmetiĝas nur referenco al la dosiernomo. Pligrandiĝas la grando de la dokumento je nur la vojprefikso kaj la dosiera referenco. Se vi malfermas vian dokumenton per alia komputilo, tamen, la ligita dosiero devas esti en precize la sama pozicio kiel donita en la referenco por vidi la objekton en la dokumento."
 
-#. rCGYB
+#. yFkxJ
 #: 00000005.xhp
 msgctxt ""
 "00000005.xhp\n"
 "par_id3153334\n"
 "help.text"
-msgid "Use <menuitem>Edit - Links to External Files</menuitem> to see which files are inserted as links. The links can be removed if required. This will break the link and insert the object directly."
+msgid "Use <menuitem>Edit - External Links</menuitem> to see which files are inserted as links. The links can be removed if required. This will break the link and insert the object directly."
 msgstr ""
 
 #. LuQ5G
@@ -2662,13 +2680,13 @@ msgctxt ""
 msgid "Object Linking and Embedding (OLE) objects can be linked to a target document or may also be embedded. Embedding inserts a copy of the object and details of the source program in the target document. If you want to edit the object, simply activate the source program by double-clicking on the object."
 msgstr "La objektoj de Object Linking and Embedding (OLE) (objekta ligado kaj enkorpigado ) estas ligeblaj al cela dokumento aŭ enkorpigeblaj. Enkorpigo enmetas kopion de la objekto kaj detalojn pri la fontprogramo en la celan dokumenton. Se vi volas redakti la objekton, simple aktivigu la fontprogramon duoble alkalkante al la objekto."
 
-#. JFDxS
+#. 3PsN4
 #: 00000005.xhp
 msgctxt ""
 "00000005.xhp\n"
 "par_id781653403974567\n"
 "help.text"
-msgid "If an OLE object is linked to a target document, then the target document must be available in the location specified in the link. Deleting or moving the target document will make it impossible to open the linked OLE object. You can use the <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\" name=\"relative\"><menuitem>Save URLs relative to file system</menuitem></link> option in the <link href=\"text/shared/optionen/01010200.xhp\" name=\"General Load/Save Options\"><menuitem>General</menuitem></link> section of Load/Save Options to configure your system to save links <link href=\"text/shared/00/00000005.xhp#saving\" name=\"relative saving\"><menuitem>relative</menuitem></link> to your filesystem."
+msgid "If an OLE object is linked to a target document, then the target document must be available in the location specified in the link. Deleting or moving the target document will make it impossible to open the linked OLE object. You can use the <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\"><menuitem>Save URLs relative to file system</menuitem></link> option in the <link href=\"text/shared/optionen/01010200.xhp\"><menuitem>General</menuitem></link> section of Load/Save Options to configure your system to save links <link href=\"text/shared/00/00000005.xhp#saving\"><menuitem>relative</menuitem></link> to your filesystem."
 msgstr ""
 
 #. 3YbnY
@@ -3400,14 +3418,14 @@ msgctxt ""
 msgid "About Import and Export Filters"
 msgstr "Pri importaj kaj eksportaj filtriloj"
 
-#. VUDKv
+#. MS5pq
 #: 00000020.xhp
 msgctxt ""
 "00000020.xhp\n"
 "par_id3143272\n"
 "help.text"
-msgid "In $[officename], apart from its own <link href=\"text/shared/00/00000021.xhp\" name=\"XML formats\">XML formats</link> you can also open and save many foreign XML formats."
-msgstr "En $[officename], aldone al ĝiaj propraj <link href=\"text/shared/00/00000021.xhp\" name=\"XML formats\">XML-formatoj</link>, vi povas malfermi kaj konservi multajn fremdajn XML-formatojn."
+msgid "In $[officename], apart from its own <link href=\"text/shared/00/00000021.xhp\">XML formats</link> you can also open and save many foreign XML formats."
+msgstr "En $[officename], aldone al ĝiaj propraj <link href=\"text/shared/00/00000021.xhp\">XML-formatoj</link>, vi povas malfermi kaj konservi multajn fremdajn XML-formatojn."
 
 #. 28Hne
 #: 00000020.xhp
@@ -3427,14 +3445,14 @@ msgctxt ""
 msgid "BASIC Macros in Microsoft Office Documents"
 msgstr ""
 
-#. F4FjN
+#. RtBCP
 #: 00000020.xhp
 msgctxt ""
 "00000020.xhp\n"
 "par_id3156211\n"
 "help.text"
-msgid "In <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\" name=\"Load/Save - VBA Properties\">Load/Save - VBA Properties</link> you can specify the settings for the VBA macro codes in MS Office documents. VBA macros are unable to run in $[officename]; they must first be converted and adapted. Often you only want to use $[officename] to change the visible content of a Word, Excel or PowerPoint file and then save the file again in Microsoft Office format without changing the macros they contain. You can set the behavior of $[officename] as desired: Either the VBA macros are saved in commented form as a subroutine of $[officename] and when the document is saved in MS Office format are written back correctly again, or you can select the Microsoft Office macros to be removed when loading. The last option is an effective protection against viruses within the Microsoft Office documents."
-msgstr "En <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferoj</caseinline><defaultinline>Iloj - Agordaĵoj</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\" name=\"Load/Save - VBA Properties\">Ŝargi/Konservi - VBA-atributoj</link> vi povas agordi la VBA-makroajn kodojn en dokumentoj de MS Office. VBA-makrooj ne povas ruli en $[officename]; oni devas konverti kaj adapti ilin. Ofte oni volas uzi je $[officename] por nur ŝanĝi la videblan enhavon de dokumento kaj ree konservi ĝin en MS-formato sen ŝanĝi la enhavatajn makroojn. Vi povas agordi la konduton de $[officename] laŭ desiro: aŭ la VBA-makroojn konservi en komenta formo kiel subprogramo de $[officename] kaj kiam vi konservas la dokumenton en MS-formato la makrooj estas ĝuste skribitaj, aŭ vi povas elekti forigi la MS Office-makroojn dum ŝargado. Tiu lasta eblo protektas kontraŭ virusoj en la MS Office-dokumentoj."
+msgid "In <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\">Load/Save - VBA Properties</link> you can specify the settings for the VBA macro codes in MS Office documents. VBA macros are unable to run in $[officename]; they must first be converted and adapted. Often you only want to use $[officename] to change the visible content of a Word, Excel or PowerPoint file and then save the file again in Microsoft Office format without changing the macros they contain. You can set the behavior of $[officename] as desired: Either the VBA macros are saved in commented form as a subroutine of $[officename] and when the document is saved in MS Office format are written back correctly again, or you can select the Microsoft Office macros to be removed when loading. The last option is an effective protection against viruses within the Microsoft Office documents."
+msgstr "En <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferoj</caseinline><defaultinline>Iloj - Agordaĵoj</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\">Ŝargi/Konservi - VBA-atributoj</link> vi povas agordi la VBA-makroajn kodojn en dokumentoj de MS Office. VBA-makrooj ne povas ruli en $[officename]; oni devas konverti kaj adapti ilin. Ofte oni volas uzi je $[officename] por nur ŝanĝi la videblan enhavon de dokumento kaj ree konservi ĝin en MS-formato sen ŝanĝi la enhavatajn makroojn. Vi povas agordi la konduton de $[officename] laŭ desiro: aŭ la VBA-makroojn konservi en komenta formo kiel subprogramo de $[officename] kaj kiam vi konservas la dokumenton en MS-formato la makrooj estas ĝuste skribitaj, aŭ vi povas elekti forigi la MS Office-makroojn dum ŝargado. Tiu lasta eblo protektas kontraŭ virusoj en la MS Office-dokumentoj."
 
 #. fkNEM
 #: 00000020.xhp
@@ -3490,14 +3508,14 @@ msgctxt ""
 msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Importing is normally not problematic. Even redlining information and controls are imported (and exported) so that $[officename] recognizes inserted or deleted text in Word documents as well as font attributes that have been modified. Different coloring for each author and the time of such changes is also included. When graphic text boxes and labels are imported from templates, most of the attributes are also imported as direct paragraph and drawing attributes. However, some of the attributes may be lost during the import procedure.</defaultinline></switchinline>"
 msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Importi normale estas senprobleme. Eĉ ruĝlinia informo kaj regiloj estas importeblaj (kaj eksporteblaj), do $[officename]  rekonas enmetitan aŭ forigitan tekston en Word-dukumentoj, kaj tiparajn atributojn ŝanĝitajn. Diferencaj koloroj por ĉiu aŭtoro kaj la horo de ŝanĝoj estas inkludataj. Kiam grafikaj tekstaj kadroj kaj etikedoj estas importataj el ŝablonoj, plejaj atributoj ankaŭ importiĝas kiel rektaj alineaj kaj desegnaj atributoj. Tamen, iuj atributoj eble perdiĝos dum importado.</defaultinline></switchinline>"
 
-#. zi6y8
+#. wK697
 #: 00000020.xhp
 msgctxt ""
 "00000020.xhp\n"
 "par_id3149095\n"
 "help.text"
-msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>It is also possible to import and export <link href=\"text/shared/00/00000005.xhp#rtf\" name=\"RTF\">RTF</link> files. This file format can be used to exchange formatted texts across various applications and platforms. In this way, many formats read by most programs will be transferred without a problem. The clipboard uses RTF format when you insert part of a spreadsheet from $[officename] Calc through <link href=\"text/shared/00/00000005.xhp\" name=\"DDE\">DDE</link> into $[officename] Writer.</defaultinline></switchinline>"
-msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Ankaŭ eblas importi kaj eksporti <link href=\"text/shared/00/00000005.xhp#rtf\" name=\"RTF\">RTF</link>-dosierojn. Tiu dosiera formato estas uzebla por interŝanĝi formatitajn tekstojn inter diversaj aplikaĵoj kaj platformoj. Tiel plejmultaj programoj povas legi multajn formatojn kaj transporti ilin senprobleme. La tondejo uzas la RTF-formaton kiam vi enmetas parton de kalkultabelo el $[officename] Tabelilo tra<link href=\"text/shared/00/00000005.xhp\" name=\"DDE\">DDE</link> en $[officename] Verkilon.</defaultinline></switchinline>"
+msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>It is also possible to import and export <link href=\"text/shared/00/00000005.xhp#rtf\">RTF</link> files. This file format can be used to exchange formatted texts across various applications and platforms. In this way, many formats read by most programs will be transferred without a problem. The clipboard uses RTF format when you insert part of a spreadsheet from $[officename] Calc through <link href=\"text/shared/00/00000005.xhp\">DDE</link> into $[officename] Writer.</defaultinline></switchinline>"
+msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Ankaŭ eblas importi kaj eksporti <link href=\"text/shared/00/00000005.xhp#rtf\">RTF</link>-dosierojn. Tiu dosiera formato estas uzebla por interŝanĝi formatitajn tekstojn inter diversaj aplikaĵoj kaj platformoj. Tiel plejmultaj programoj povas legi multajn formatojn kaj transporti ilin senprobleme. La tondejo uzas la RTF-formaton kiam vi enmetas parton de kalkultabelo el $[officename] Tabelilo tra<link href=\"text/shared/00/00000005.xhp\">DDE</link> en $[officename] Verkilon.</defaultinline></switchinline>"
 
 #. yJeZD
 #: 00000020.xhp
@@ -3553,14 +3571,14 @@ msgctxt ""
 msgid "When exporting to HTML, the character set selected in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Load/Save - HTML Compatibility</emph> is used. Characters not present there are written in a substitute form, which is displayed correctly in modern web browsers. When exporting such characters, you will receive an appropriate warning."
 msgstr "Dum eksportado al HTML, uziĝas la signaro elektita en <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferoj</emph></caseinline><defaultinline><emph>Iloj - Agordaro</emph></defaultinline></switchinline><emph> - Ŝargi/konservi - HTML-kongruo</emph>. Signoj tie ne prezentitaj skribiĝas en substitua formo, kiu vidiĝas ĝuste per modernaj TTT-legiloj. Eksportante tiajn signojn, vi ricevas taŭgan averton."
 
-#. kEb5n
+#. u99vh
 #: 00000020.xhp
 msgctxt ""
 "00000020.xhp\n"
 "par_id3153146\n"
 "help.text"
-msgid "If, in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Load/Save - HTML Compatibility</emph>, you select Mozilla Firefox or $[officename] Writer as the export option, upon export all important font attributes are exported as direct attributes (for example, text color, font size, bold, italic, and so on) in CSS1 styles. (<link href=\"text/shared/00/00000002.xhp\" name=\"CSS\">CSS</link> stands for Cascading Style Sheets.) Importing is also carried out according to this standard."
-msgstr "Se, en <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferoj</emph></caseinline><defaultinline><emph>Iloj - Agordaro</emph></defaultinline></switchinline><emph> - Ŝargi/konservi - HTML-kongruo</emph>, vi elektas eksportan eblon Mozilla Firefox, aŭ $[officename]-Verkilo, dum eksportado ĉiuj gravaj tiparaj atributoj eksportiĝas kiel rektaj atributoj (ekzemple, teksta koloro, tipara grando, grasa, kursiva, ktp) en CSS1-stiloj. (<link href=\"text/shared/00/00000002.xhp\" name=\"CSS\">CSS</link> signifas Cascading Style Sheets (laŭtemaj stilfolioj)). Importado ankaŭ okazas laŭ tiu normo."
+msgid "If, in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Load/Save - HTML Compatibility</emph>, you select Mozilla Firefox or $[officename] Writer as the export option, upon export all important font attributes are exported as direct attributes (for example, text color, font size, bold, italic, and so on) in CSS1 styles. (<link href=\"text/shared/00/00000002.xhp\">CSS</link> stands for Cascading Style Sheets.) Importing is also carried out according to this standard."
+msgstr "Se, en <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferoj</emph></caseinline><defaultinline><emph>Iloj - Agordaro</emph></defaultinline></switchinline><emph> - Ŝargi/konservi - HTML-kongruo</emph>, vi elektas eksportan eblon Mozilla Firefox, aŭ $[officename]-Verkilo, dum eksportado ĉiuj gravaj tiparaj atributoj eksportiĝas kiel rektaj atributoj (ekzemple, teksta koloro, tipara grando, grasa, kursiva, ktp) en CSS1-stiloj. (<link href=\"text/shared/00/00000002.xhp\">CSS</link> signifas Cascading Style Sheets (laŭtemaj stilfolioj)). Importado ankaŭ okazas laŭ tiu normo."
 
 #. XP7i4
 #: 00000020.xhp
@@ -3886,14 +3904,14 @@ msgctxt ""
 msgid "Multipage-TIFFs are allowed when graphics are imported or exported in TIFF format. The graphics are retrieved as a set of individual pictures in a single file, for example, the individual pages of a fax."
 msgstr "Plurpaĝaj TIFF-dosieroj eblas kiam vi importas aŭ eksportas grafikaĵojn en TIFF-formato. La grafikaĵoj eniras kiel aro de unuopaj bildoj en unu dosiero, ekzemple, la unuopaj paĝoj de fakso."
 
-#. Mw8sa
+#. 8UHb8
 #: 00000020.xhp
 msgctxt ""
 "00000020.xhp\n"
 "par_id3159153\n"
 "help.text"
-msgid "Some $[officename] Draw and $[officename] Impress options can be accessed through <emph>File - Export</emph>. See <link href=\"text/shared/00/00000200.xhp\" name=\"Graphics Export Options\">Graphics Export Options</link> for more information."
-msgstr "Eblas aliri iujn agordojn de $[officename]-Desegnilo and $[officename]-Prezentilo per <emph>Dosiero - Eksporti</emph>. Vidu je <link href=\"text/shared/00/00000200.xhp\" name=\"Graphics Export Options\">Grafikaĵaj eksportaj agordoj</link> por plua informo."
+msgid "Some $[officename] Draw and $[officename] Impress options can be accessed through <emph>File - Export</emph>. See <link href=\"text/shared/00/00000200.xhp\">Graphics Export Options</link> for more information."
+msgstr "Eblas aliri iujn agordojn de $[officename]-Desegnilo and $[officename]-Prezentilo per <emph>Dosiero - Eksporti</emph>. Vidu je <link href=\"text/shared/00/00000200.xhp\">Grafikaĵaj eksportaj agordoj</link> por plua informo."
 
 #. xZeB3
 #: 00000020.xhp
@@ -3958,14 +3976,14 @@ msgctxt ""
 msgid "<bookmark_value>exporting; XML files</bookmark_value>      <bookmark_value>XML file formats</bookmark_value>      <bookmark_value>extensions; file formats</bookmark_value>      <bookmark_value>suffixes in file formats</bookmark_value>      <bookmark_value>document types in $[officename]</bookmark_value>      <bookmark_value>file formats; changing $[officename] defaults</bookmark_value>      <bookmark_value>defaults;file formats in $[officename]</bookmark_value>      <bookmark_value>file formats;OpenDocument/XML</bookmark_value>      <bookmark_value>OpenDocument file formats</bookmark_value>      <bookmark_value>ODF file formats</bookmark_value>"
 msgstr "<bookmark_value>eksporti; XML-dosieroj</bookmark_value><bookmark_value>XML-dosieraj formatoj</bookmark_value><bookmark_value>kromprogramoj;dosieraj formatoj</bookmark_value><bookmark_value>sufiksoj en dosieraj formatoj</bookmark_value><bookmark_value>tipoj de dokumentoj en  $[officename]</bookmark_value><bookmark_value>dosieraj formatoj; ŝanĝi apriorojn de $[officename]</bookmark_value><bookmark_value>aprioroj;dosieraj formatoj en $[officename]</bookmark_value><bookmark_value>dosieraj formatoj;OpenDocument/XML</bookmark_value><bookmark_value>OpenDocument-dosieraj formatoj</bookmark_value><bookmark_value>ODF-dosieraj formatoj</bookmark_value>"
 
-#. ng7dZ
+#. C4uCR
 #: 00000021.xhp
 msgctxt ""
 "00000021.xhp\n"
 "hd_id3154408\n"
 "help.text"
-msgid "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\" name=\"XML File Formats\">XML File Formats</link></variable>"
-msgstr "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\" name=\"XML File Formats\">XML-dosieraj formatoj</link></variable>"
+msgid "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\">XML File Formats</link></variable>"
+msgstr "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\">XML-dosieraj formatoj</link></variable>"
 
 #. XE7fE
 #: 00000021.xhp
@@ -3976,14 +3994,14 @@ msgctxt ""
 msgid "<ahelp hid=\"HID_DID_SAVE_PACKED_XML\">By default, $[officename] loads and saves files in the OpenDocument file format.</ahelp>"
 msgstr "<ahelp hid=\"HID_DID_SAVE_PACKED_XML\">Apriore, $[officename] ŝargas kaj konservas dosierojn en la OpenDocument-formato.</ahelp>"
 
-#. TPGpr
+#. RXMyQ
 #: 00000021.xhp
 msgctxt ""
 "00000021.xhp\n"
 "par_idN10725\n"
 "help.text"
-msgid "The OpenDocument file format (ODF) is a standardized file format used by many software applications. You can find more information at the Wikipedia site: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\" name=\"English Wikipedia: OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
-msgstr "La OpenDocument-formato (ODF) estas normigita dosiera formato uzata de multaj programaroj. Plua informo troviĝas ĉe la retejo de Wikipedia: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\" name=\"English Wikipedia: OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
+msgid "The OpenDocument file format (ODF) is a standardized file format used by many software applications. You can find more information at the Wikipedia site: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
+msgstr "La OpenDocument-formato (ODF) estas normigita dosiera formato uzata de multaj programaroj. Plua informo troviĝas ĉe la retejo de Wikipedia: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
 
 #. GEoMF
 #: 00000021.xhp
@@ -4525,14 +4543,14 @@ msgctxt ""
 msgid "In current versions, you can select to save your documents using ODF 1.2 or ODF 1.0/1.1 (for backward compatibility). Choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - Load/Save - General</menuitem> and select the ODF format version."
 msgstr "En aktualaj versioj, vi povas elekti konservi viajn dokumentojn per ODF 1.2 aŭ ODF 1.0/1.1 (por retrokongruo). Elektu je <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferoj</menuitem></caseinline><defaultinline><menuitem>Iloj - Agordaĵoj</menuitem></defaultinline></switchinline><menuitem> - Ŝargi/konservi - Ĝenerala</menuitem> kaj elektu la ODF-formatan version."
 
-#. wCawc
+#. pNsir
 #: 00000021.xhp
 msgctxt ""
 "00000021.xhp\n"
 "par_id3146907\n"
 "help.text"
-msgid "If you want to define another file format as the default, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\" name=\"Load/Save - General\"><menuitem>Load/Save - General</menuitem></link> to find alternative file formats for each $[officename] document type."
-msgstr "Se vi volas agordi alian dosieran formaton la apriora, elektu je <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferoj</menuitem></caseinline><defaultinline><menuitem>Iloj - Agordaĵoj</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\" name=\"Load/Save - General\"><menuitem>Ŝargi/konservi - Ĝenerala</menuitem></link> por serĉi alternativajn dosierajn formatojn por ĉiu dokumenta tipo de $[officename]."
+msgid "If you want to define another file format as the default, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\"><menuitem>Load/Save - General</menuitem></link> to find alternative file formats for each $[officename] document type."
+msgstr "Se vi volas agordi alian dosieran formaton la apriora, elektu je <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferoj</menuitem></caseinline><defaultinline><menuitem>Iloj - Agordaĵoj</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\"><menuitem>Ŝargi/konservi - Ĝenerala</menuitem></link> por serĉi alternativajn dosierajn formatojn por ĉiu dokumenta tipo de $[officename]."
 
 #. RrpAt
 #: 00000021.xhp
@@ -4669,23 +4687,23 @@ msgctxt ""
 msgid "<variable id=\"siehe\">See also... </variable>"
 msgstr "<variable id=\"siehe\">Rigardu ankaŭ...</variable>"
 
-#. dA7YM
+#. aT96F
 #: 00000099.xhp
 msgctxt ""
 "00000099.xhp\n"
 "par_id3143206\n"
 "help.text"
-msgid "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\" name=\"Tools Menu - Scenarios\">Tools Menu - Scenarios</link></variable>"
-msgstr "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\" name=\"Tools Menu - Scenarios\">Ilomenuo - Scenaroj</link></variable>"
+msgid "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\">Tools Menu - Scenarios</link></variable>"
+msgstr "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\">Ilomenuo - Scenaroj</link></variable>"
 
-#. BCND6
+#. zZE5T
 #: 00000099.xhp
 msgctxt ""
 "00000099.xhp\n"
 "par_id3156069\n"
 "help.text"
-msgid "On the help page for <link href=\"text/shared/guide/main.xhp\" name=\"$[officename] general\">$[officename] general</link> you can find instructions that are applicable to all modules, such as working with windows and menus, customizing $[officename], data sources, Gallery, and drag and drop."
-msgstr "En la helpa paĝo por <link href=\"text/shared/guide/main.xhp\" name=\"$[officename] general\">$[officename] ĝenerala</link> troviĝas instrukcioj kiuj rilatas al ĉiuj moduloj, ekzemple prilabori fenestrojn kaj menuojn, adapti je $[officename], datumfontoj, Galerio, kaj ŝovmeti."
+msgid "On the help page for <link href=\"text/shared/guide/main.xhp\">$[officename] general</link> you can find instructions that are applicable to all modules, such as working with windows and menus, customizing $[officename], data sources, Gallery, and drag and drop."
+msgstr "En la helpa paĝo por <link href=\"text/shared/guide/main.xhp\">$[officename] ĝenerala</link> troviĝas instrukcioj kiuj rilatas al ĉiuj moduloj, ekzemple prilabori fenestrojn kaj menuojn, adapti je $[officename], datumfontoj, Galerio, kaj ŝovmeti."
 
 #. v53RG
 #: 00000099.xhp
@@ -5074,14 +5092,14 @@ msgctxt ""
 msgid "<ahelp hid=\".\" visibility=\"hidden\">Specifies that you do not wish to use compression.</ahelp>"
 msgstr "<ahelp hid=\".\" visibility=\"hidden\">Agordas ke vi ne volas uzi densigon.</ahelp>"
 
-#. KHHgh
+#. owoXD
 #: 00000200.xhp
 msgctxt ""
 "00000200.xhp\n"
 "par_id3147250\n"
 "help.text"
-msgid "See <link href=\"text/shared/00/00000020.xhp\" name=\"Import and Export Filter Information\">Import and Export Filter Information</link> for more information about filters."
-msgstr "See <link href=\"text/shared/00/00000020.xhp\" name=\"Import and Export Filter Information\">Importi kaj eksporti filtrilan informon</link> por plua informo pri filtriloj."
+msgid "See <link href=\"text/shared/00/00000020.xhp\">Import and Export Filter Information</link> for more information about filters."
+msgstr "See <link href=\"text/shared/00/00000020.xhp\">Importi kaj eksporti filtrilan informon</link> por plua informo pri filtriloj."
 
 #. GUBNE
 #: 00000206.xhp
@@ -5128,14 +5146,14 @@ msgctxt ""
 msgid "<ahelp hid=\"modules/scalc/ui/imoptdialog/charsetlist\">Select the character set from the options used for import/export.</ahelp>"
 msgstr "<ahelp hid=\"modules/scalc/ui/imoptdialog/charsetlist\">Elektu la signaron el la ebloj uzataj por importi/eksporti.</ahelp>"
 
-#. 3jYHJ
+#. G4AHh
 #: 00000206.xhp
 msgctxt ""
 "00000206.xhp\n"
 "par_id3152942\n"
 "help.text"
-msgid "For further information regarding filters, refer to the topic: <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Information about Import and Export Filters</link>."
-msgstr "Por informo, rigardu je <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Informo pri importaj kaj eksportaj filtriloj</link>."
+msgid "For further information regarding filters, refer to the topic: <link href=\"text/shared/00/00000020.xhp\">Information about Import and Export Filters</link>."
+msgstr "Por informo, rigardu je <link href=\"text/shared/00/00000020.xhp\">Informo pri importaj kaj eksportaj filtriloj</link>."
 
 #. XFQiC
 #: 00000207.xhp
@@ -5353,14 +5371,14 @@ msgctxt ""
 msgid "Text Import"
 msgstr "Teksta Importo"
 
-#. RBPZC
+#. qGdAM
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "hd_id3150960\n"
 "help.text"
-msgid "Text Import"
-msgstr "Teksta Importo"
+msgid "<variable id=\"TextImporth1\"><link href=\"text/shared/00/00000208.xhp\">Text Import</link></variable>"
+msgstr ""
 
 #. gtCCw
 #: 00000208.xhp
@@ -5425,14 +5443,14 @@ msgctxt ""
 msgid "If Language is set to Default (for CSV import) or Automatic (for HTML import), Calc will use the globally set language. If Language is set to a specific language, that language will be used when importing numbers."
 msgstr "Se Lingvo estas agordita al la Apriora (por CSV-importo) aŭ Aŭtomata (por HTML-importo), Tabelilo uzos la malloke agorditan lingvon. Se Lingvo estas agordita a specifa lingvo, uzos tiun lingvon kiam importanta numerojn."
 
-#. 4AA96
+#. zGQuN
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "par_id314949586\n"
 "help.text"
-msgid "When importing an HTML document, the Language selection can conflict with the global HTML option <link href=\"text/shared/optionen/01030500.xhp\" name=\"Use\">Use 'English (USA)' locale for numbers</link>. The global HTML option is effective only when the Automatic language option is selected. If you select a specific language in the HTML Import Options dialog, the global HTML option is ignored."
-msgstr "Por importi HTML-dokumenton, la Lingvo elektita povas konflikti kun la malloka HTML-eblo. <link href=\"text/shared/optionen/01030500.xhp\" name=\"Use\">Uzu 'Anglan (Usono)'-lokaĵaron por numeroj</link>. La malloka HTML-eblo estas aktiva nur kiam la Aŭtomata lingvo estas elektita. Se vi elektas specifan lingvon en la dialogo HTML-importaj agordoj, malatentas la HTML-eblon."
+msgid "When importing an HTML document, the Language selection can conflict with the global HTML option <link href=\"text/shared/optionen/01030500.xhp\">Use 'English (USA)' locale for numbers</link>. The global HTML option is effective only when the Automatic language option is selected. If you select a specific language in the HTML Import Options dialog, the global HTML option is ignored."
+msgstr "Por importi HTML-dokumenton, la Lingvo elektita povas konflikti kun la malloka HTML-eblo. <link href=\"text/shared/optionen/01030500.xhp\">Uzu 'Anglan (Usono)'-lokaĵaron por numeroj</link>. La malloka HTML-eblo estas aktiva nur kiam la Aŭtomata lingvo estas elektita. Se vi elektas specifan lingvon en la dialogo HTML-importaj agordoj, malatentas la HTML-eblon."
 
 #. 7EbAk
 #: 00000208.xhp
@@ -5731,14 +5749,14 @@ msgctxt ""
 msgid "Skip empty cells"
 msgstr "Preterlasi vakajn ĉelojn"
 
-#. 9Xqaa
+#. YVysE
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "par_id171220172144419125\n"
 "help.text"
-msgid "<ahelp hid=\".\">When this option is enabled, Calc preserves previous content of cells when pasting empty ones. Otherwise, Calc deletes content of previous cells.</ahelp>"
-msgstr "<ahelp hid=\".\">Kiam ĉi tiu eblo estas ŝaltita, Tabelilo konservas la enhavon de ĉeloj kiam oni algluas vakajn. Alie, Tabelilo forigas la enhavon de ekzistantaj ĉeloj.</ahelp>"
+msgid "<ahelp hid=\".\">Available when using <menuitem>Paste Special</menuitem>: when this option is enabled, Calc preserves previous content of cells when pasting empty ones. Otherwise, Calc deletes content of previous cells.</ahelp>"
+msgstr ""
 
 #. zFFRP
 #: 00000208.xhp
@@ -5748,6 +5766,24 @@ msgctxt ""
 "help.text"
 msgid "In <emph>Text to Columns</emph> conversion, if cell content begins with a separator and this option is disabled, then first column will be emptied."
 msgstr "En <emph>Teksto al kolumnoj</emph> konvertado, se ĉelenhavo komencas per disigilo kaj ĉi tiu eblo estas malŝaltita, tiam la unua kolumno vakiĝos."
+
+#. 8iYFC
+#: 00000208.xhp
+msgctxt ""
+"00000208.xhp\n"
+"hd_id151656941561432\n"
+"help.text"
+msgid "Evaluate formulas"
+msgstr ""
+
+#. vEoW6
+#: 00000208.xhp
+msgctxt ""
+"00000208.xhp\n"
+"par_id601656941717698\n"
+"help.text"
+msgid "Determines whether formula expressions starting with a = equal sign character are to be evaluated as formulas or imported as textual data. If checked evaluate formulas on input. Otherwise formulas are input as text."
+msgstr ""
 
 #. vMAUg
 #: 00000208.xhp
@@ -5956,15 +5992,6 @@ msgctxt ""
 msgid "Date format"
 msgstr "Data formato"
 
-#. mJwDd
-#: 00000208.xhp
-msgctxt ""
-"00000208.xhp\n"
-"par_id3156212\n"
-"help.text"
-msgid "6"
-msgstr "6"
-
 #. tMGAw
 #: 00000208.xhp
 msgctxt ""
@@ -5973,15 +6000,6 @@ msgctxt ""
 "help.text"
 msgid "Two characters each are taken for day, month, and year in the selected order."
 msgstr "Po du signoj por tago, monato kaj jaro en la elektita ordo."
-
-#. WVtBD
-#: 00000208.xhp
-msgctxt ""
-"00000208.xhp\n"
-"par_id3147352\n"
-"help.text"
-msgid "8"
-msgstr "8"
 
 #. wQEwm
 #: 00000208.xhp
@@ -6046,23 +6064,23 @@ msgctxt ""
 msgid "If you want to use a fixed width to separate the imported data into columns, click in the ruler to set the width boundaries."
 msgstr "Se vi volas uzi fiksan larĝon por disigi la importotajn datumojn en kolumnojn, alklaku en la mezurilo por agordi la larĝolimojn."
 
-#. EUV3y
+#. wi7B2
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "par_id3155746\n"
 "help.text"
-msgid "<link href=\"text/shared/guide/keyboard.xhp\" name=\"Navigating Without the Mouse\">Navigating Without the Mouse</link>"
-msgstr "<link href=\"text/shared/guide/keyboard.xhp\" name=\"Navigating Without the Mouse\">Navigi sen muso</link>"
+msgid "<link href=\"text/shared/guide/keyboard.xhp\">Navigating Without the Mouse</link>"
+msgstr "<link href=\"text/shared/guide/keyboard.xhp\">Navigi sen muso</link>"
 
-#. BuDVW
+#. kDzVv
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "par_id3146120\n"
 "help.text"
-msgid "For more information, see <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Information about Import and Export Filters</link>."
-msgstr "Por informo, rigardu je <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Informo pri importaj kaj eksportaj filtriloj</link>."
+msgid "<link href=\"text/shared/00/00000020.xhp\">Information about Import and Export Filters</link>."
+msgstr ""
 
 #. nkesm
 #: 00000215.xhp
@@ -7477,6 +7495,15 @@ msgctxt ""
 msgid "Choose <menuitem>Data - Text to Columns</menuitem> (Calc)."
 msgstr ""
 
+#. 4frVs
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id161656944575459\n"
+"help.text"
+msgid "Copy data to clipboard, then choose <menuitem>Edit - Paste Special - Paste Special</menuitem> (Calc)."
+msgstr ""
+
 #. 9uDDp
 #: 00000401.xhp
 msgctxt ""
@@ -8494,14 +8521,41 @@ msgctxt ""
 msgid "Choose <menuitem>Tools - Thesaurus</menuitem>."
 msgstr ""
 
-#. F6EnA
+#. C5ABq
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_id3149884\n"
 "help.text"
-msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Komando</caseinline><defaultinline>Stir</defaultinline></switchinline>+F7"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F7</keycode>"
+msgstr ""
+
+#. RYHXW
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id641655489196783\n"
+"help.text"
+msgid "On the <emph>Tools</emph> bar, click"
+msgstr ""
+
+#. 3jnPY
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id751655488651997\n"
+"help.text"
+msgid "<image src=\"cmd/lc_thesaurus.svg\" id=\"img_id111655488651999\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111655488652000\">Icon Thesaurus</alt></image>"
+msgstr ""
+
+#. ue2A6
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id11655488652002\n"
+"help.text"
+msgid "Thesaurus"
+msgstr ""
 
 #. BkJ2M
 #: 00000406.xhp
@@ -8521,14 +8575,14 @@ msgctxt ""
 msgid "<variable id=\"mediaplayer\">Choose <emph>Tools - Media Player</emph>.</variable>"
 msgstr "<variable id=\"mediaplayer\">Elektu je <emph>Iloj - Spektilo</emph>.</variable>"
 
-#. a4RZA
+#. FYZdN
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_id3151385\n"
 "help.text"
-msgid "<variable id=\"makro\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>, or press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+F11 (if not assigned by your system).</variable>"
-msgstr "<variable id=\"makro\">Elektu je <emph>Iloj - Makrooj - Mastrumi makroojn - %PRODUCTNAME-BASIC</emph>, aŭ premu je <switchinline select=\"sys\"><caseinline select=\"MAC\">Opt</caseinline><defaultinline>Alt</defaultinline></switchinline>+F11 (se ne agordita de via sistemo).</variable>"
+msgid "<variable id=\"makro\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>, or press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+F11 (if not assigned by your system).</variable>"
+msgstr ""
 
 #. igagv
 #: 00000406.xhp
@@ -8575,23 +8629,23 @@ msgctxt ""
 msgid "Choose <emph>Tools - Macros - Record Macro</emph>."
 msgstr "Elektu je <emph>Iloj - Makrooj - Registri makroon</emph>."
 
-#. WBX8f
+#. feCZF
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_id3150398\n"
 "help.text"
-msgid "<variable id=\"passwort\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>,<br/>click the <emph>Organizer</emph> button,<br/>click the <emph>Libraries</emph> tab,<br/>and then click the <emph>Password</emph> button.</variable>"
-msgstr "<variable id=\"passwort\">Elektu je <emph>Iloj - Makrooj - Organizi makroojn - %PRODUCTNAME-BASIC</emph>,<br/>klaku al la butono  <emph>Organizilo</emph>,<br/>klaku al la langeto <emph>Bibliotekoj</emph>,<br/> kaj klaku al la butono <emph>Pasvorto</emph>.</variable>"
+msgid "<variable id=\"passwort\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>,<br/>click the <emph>Organizer</emph> button,<br/>click the <emph>Libraries</emph> tab,<br/>and then click the <emph>Password</emph> button.</variable>"
+msgstr ""
 
-#. rBcj4
+#. baigi
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_id3150498\n"
 "help.text"
-msgid "<variable id=\"liborganizer\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>,<br/>click the <widget>Organizer</widget> button.</variable>"
-msgstr "<variable id=\"liborganizer\">Elektu je <emph>Iloj - Makrooj - Organizi makroojn - %PRODUCTNAME-BASIC</emph>,<br/>klaku al la butono <widget>Organizilo</widget>.</variable>"
+msgid "<variable id=\"liborganizer\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>,<br/>click the <widget>Organizer</widget> button.</variable>"
+msgstr ""
 
 #. SqBL5
 #: 00000406.xhp
@@ -8656,22 +8710,22 @@ msgctxt ""
 msgid "<variable id=\"menue\">Choose <emph>Tools - Customize - Menus</emph> tab.</variable>"
 msgstr "<variable id=\"menue\">Elektu langeton <emph>Iloj - Adapti - Menuoj</emph>.</variable>"
 
-#. xzidF
+#. P8ZsE
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_idN108E9\n"
 "help.text"
-msgid "<variable id=\"menuenew\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the gear  <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon gear menu</alt></image> dropdown menu and choose <menuitem>Add</menuitem>.</variable>"
+msgid "<variable id=\"menuenew\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the hamburger <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon Hamburger menu</alt></image> dropdown menu and choose <menuitem>Add</menuitem>.</variable>"
 msgstr ""
 
-#. hg8cr
+#. rryfk
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_idN10919\n"
 "help.text"
-msgid "<variable id=\"menuemove\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the gear   <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon gear menu</alt></image>  dropdown menu and choose <menuitem>Move</menuitem>.</variable>"
+msgid "<variable id=\"menuemove\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the hamburger <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon Hamburger menu</alt></image>  dropdown menu and choose <menuitem>Move</menuitem>.</variable>"
 msgstr ""
 
 #. nNuX4
@@ -10006,6 +10060,294 @@ msgctxt ""
 msgid "Format Menu"
 msgstr "Formata Menuo"
 
+#. KHgFt
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3156426\n"
+"help.text"
+msgid "Open <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimize Size</menuitem></link> dropdown menu from <link href=\"text/swriter/main0204.xhp\"><menuitem>Table</menuitem></link> bar, click"
+msgstr ""
+
+#. GHptw
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id481655731478873\n"
+"help.text"
+msgid "Open <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimize Size</menuitem></link> dropdown menu from <menuitem>Table</menuitem> bar, click"
+msgstr ""
+
+#. LNCUB
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id271654223353638\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Minimal Row Height</menuitem>."
+msgstr ""
+
+#. Gh5VB
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id151655731003155\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Minimal Row Height</menuitem>."
+msgstr ""
+
+#. CZ6Az
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id451655738489793\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Minimal Row Height</menuitem>."
+msgstr ""
+
+#. UEWjA
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id751654222949632\n"
+"help.text"
+msgid "<image src=\"cmd/lc_setminimalrowheight.svg\" id=\"img_id731654222949632\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id541654222949632\">Minimal Row Height Icon</alt></image>"
+msgstr ""
+
+#. kp47D
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id961654222949632\n"
+"help.text"
+msgid "Minimal Row Height"
+msgstr ""
+
+#. NN4r3
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3155536\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Optimal Row Height</menuitem>."
+msgstr ""
+
+#. pCsAR
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id621655731074115\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Optimal Row Height</menuitem>."
+msgstr ""
+
+#. zLApF
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id741655738425233\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Optimal Row Height</menuitem>."
+msgstr ""
+
+#. U2ETB
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145222\n"
+"help.text"
+msgid "<image id=\"img_id3145228\" src=\"cmd/lc_setoptimalrowheight.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145228\">Icon Optimal Row Height</alt></image>"
+msgstr ""
+
+#. meaVC
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153545\n"
+"help.text"
+msgid "Optimal Row Height"
+msgstr ""
+
+#. zvEoa
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153569\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Distribute Rows Evenly</menuitem>."
+msgstr ""
+
+#. vVi3q
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id701655731168178\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Distribute Rows Evenly</menuitem>."
+msgstr ""
+
+#. ZFAHG
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id801655738379330\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Distribute Rows Evenly</menuitem>."
+msgstr ""
+
+#. aALKw
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145297\n"
+"help.text"
+msgid "<image id=\"img_id3155994\" src=\"cmd/lc_distributerows.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155994\">Icon Distribute Rows Evenly</alt></image>"
+msgstr ""
+
+#. tgSLB
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153206\n"
+"help.text"
+msgid "Distribute Rows Evenly"
+msgstr ""
+
+#. 8znyd
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id51654220677297\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Minimal Column Width</menuitem>."
+msgstr ""
+
+#. EFZvU
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id691655731247050\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Minimal Column Width</menuitem>."
+msgstr ""
+
+#. bqVXT
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id941655738180090\n"
+"help.text"
+msgid "Select columns in table, right-click, choose <menuitem>Size - Minimal Column Width</menuitem>."
+msgstr ""
+
+#. UvZy2
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id11654222599271\n"
+"help.text"
+msgid "<image src=\"cmd/lc_setminimalcolumnwidth.svg\" id=\"img_id541654222599271\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451654222599271\">Minimal Column Width Icon</alt></image>"
+msgstr ""
+
+#. 4Vw5o
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id161654222599272\n"
+"help.text"
+msgid "Minimal Column Width"
+msgstr ""
+
+#. pNAs2
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3154752\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Optimal Column Width</menuitem>."
+msgstr ""
+
+#. RnQAg
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id471655731343905\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Optimal Column Width</menuitem>."
+msgstr ""
+
+#. hphNu
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id701655738103242\n"
+"help.text"
+msgid "Select columns in table, right-click, choose <menuitem>Size - Optimal Column Width</menuitem>."
+msgstr ""
+
+#. C6MQK
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3157881\n"
+"help.text"
+msgid "<image id=\"img_id3157888\" src=\"cmd/lc_setoptimalcolumnwidth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157888\">Icon Optimal Column Width</alt></image>"
+msgstr ""
+
+#. c9tX3
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3150524\n"
+"help.text"
+msgid "Optimal Column Width"
+msgstr ""
+
+#. ow3LU
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3159219\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Distribute Columns Evenly</menuitem>."
+msgstr ""
+
+#. zFDHf
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id991655731434331\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Distribute Columns Evenly</menuitem>."
+msgstr ""
+
+#. LGcd8
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id151654212978990\n"
+"help.text"
+msgid "<variable id=\"RightClickSize\">Select columns in table, right-click, choose <menuitem>Size - Distribute Columns Evenly</menuitem>.</variable>"
+msgstr ""
+
+#. 7hd74
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145179\n"
+"help.text"
+msgid "<image id=\"img_id3145186\" src=\"cmd/lc_distributecolumns.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145186\">Icon Distribute Columns Evenly</alt></image>"
+msgstr ""
+
+#. m2sdA
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3151364\n"
+"help.text"
+msgid "Distribute Columns Evenly"
+msgstr ""
+
 #. yUJ5g
 #: 00040500.xhp
 msgctxt ""
@@ -10114,13 +10456,13 @@ msgctxt ""
 msgid "Choose <emph>Format - Cells - Font</emph> tab (spreadsheets)."
 msgstr "Elektu langeton <emph>Formato - Ĉeloj - Tiparo</emph> (kalkultabeloj)."
 
-#. EpBDi
+#. UqWpS
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3156306\n"
 "help.text"
-msgid "Menu <menuitem>Format - Page - Header/Footer</menuitem> - <emph>Edit</emph> button (spreadsheets)."
+msgid "Menu <menuitem>Format - Page Style - Header/Footer</menuitem> - <emph>Edit</emph> button (spreadsheets)."
 msgstr ""
 
 #. f7aHb
@@ -10141,14 +10483,14 @@ msgctxt ""
 msgid "Choose <emph>View - Styles</emph> - open context menu of an entry and choose <emph>Modify/New - Font Effects</emph> tab."
 msgstr "Elektu menueroj <emph>Vido - Stiloj</emph> - malfermu kuntekstan menuon de elemento kaj elektu langeton <emph>Ŝanĝi/Nova - Tiparaj efektoj</emph>."
 
-#. kGqRz
+#. 5k7D4
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3159176\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
-msgstr "Menuo <emph>Formato - Paĝo -Paĝokapo/Paĝopiedo</emph> - <emph>Redakti</emph>-butonon (kalkultabeloj)."
+msgid "Menu <emph>Format - Page Style - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
+msgstr ""
 
 #. PGTCS
 #: 00040500.xhp
@@ -10168,14 +10510,14 @@ msgctxt ""
 msgid "Choose <emph>View - Styles</emph> - open context menu of an entry and click <emph>Modify/New - Alignment</emph> tab."
 msgstr "Elektu menuerojn <emph>Vido - Stiloj</emph> - malfermu kuntekstan menuon kaj klaku al <emph>Ŝanĝi/New - Ĝisrandigo</emph>."
 
-#. YynRy
+#. E3vEQ
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3151385\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
-msgstr "Menuo <emph>Formato - Paĝo - Paĝokapo/Paĝopiedo</emph> - <emph>Redakti</emph>-butonon (kalkultabeloj)."
+msgid "Menu <emph>Format - Page Style - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
+msgstr ""
 
 #. cExz7
 #: 00040500.xhp
@@ -10429,14 +10771,14 @@ msgctxt ""
 msgid "Menu <emph>Format - Paragraph</emph> - <emph>Border</emph> tab - <emph>Padding</emph>."
 msgstr "Menuo <emph>Formato - Alineo</emph> - <emph>Border</emph> tabo - <emph>Ŝtopado</emph>."
 
-#. krmqa
+#. oErGE
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3159130\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Border - Padding</emph>."
-msgstr "Menuo <emph>Formato - Paĝo - Bordero - Ŝtopado</emph>."
+msgid "Menu <emph>Format - Page Style - Border - Padding</emph>."
+msgstr ""
 
 #. PGrMv
 #: 00040500.xhp
@@ -10474,32 +10816,32 @@ msgctxt ""
 msgid "Choose <emph>Format - Frame and Object - Properties - Area</emph> tab."
 msgstr "Elektu langeton <emph>Formato - Kadro kaj objekto - Atributoj - Zono</emph>."
 
-#. E8n2o
+#. WnzDC
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3151321\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Background</emph> tab."
-msgstr "Elektu langeton <emph>Formato - Paĝo - Fono</emph>."
+msgid "Choose <emph>Format - Page Style - Background</emph> tab."
+msgstr ""
 
-#. mesKL
+#. XSpZK
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3154510\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Header - More</emph> button."
-msgstr "Elektu butonon <emph>Formato - Paĝo -Paĝokapo -  Pli</emph>."
+msgid "Choose <emph>Format - Page Style - Header - More</emph> button."
+msgstr ""
 
-#. 3wGuN
+#. BRTp2
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3159110\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Footer - More</emph> button."
-msgstr "Elektu butonon <emph>Formato - Paĝo - Paĝopiedo - Pli</emph>."
+msgid "Choose <emph>Format - Page Style - Footer - More</emph> button."
+msgstr ""
 
 #. RKBDo
 #: 00040500.xhp
@@ -10555,14 +10897,14 @@ msgctxt ""
 msgid "Choose <menuitem>Styles - Manage Styles</menuitem> - open context menu of an entry and choose <menuitem>Modify/New - Organizer</menuitem> tab."
 msgstr "Elektu menuerojn <menuitem>Stiloj - Mastrumi stilojn</menuitem> - malfermu kuntekstan menuon de elemento kaj elektu langeton <menuitem>Ŝanĝi/Nova - Organizilo</menuitem>."
 
-#. Z2AF5
+#. oZUMH
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3146788\n"
 "help.text"
-msgid "<variable id=\"Calcseiteverwaltenh1\">Choose <menuitem>Format - Page - Organizer</menuitem> tab.</variable>"
-msgstr "<variable id=\"Calcseiteverwaltenh1\">Elektu langeton<menuitem>Formato - Paĝo - Organizilo</menuitem>. </variable>"
+msgid "<variable id=\"Calcseiteverwaltenh1\">Choose <menuitem>Format - Page Style - Organizer</menuitem> tab.</variable>"
+msgstr ""
 
 #. Y2ck5
 #: 00040500.xhp
@@ -10627,13 +10969,13 @@ msgctxt ""
 msgid "Choose <menuitem>Page - Properties - Page</menuitem> tab."
 msgstr ""
 
-#. sZU8Q
+#. FSBTR
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id731601602622257\n"
 "help.text"
-msgid "Choose <menuitem>Format - Page - Page</menuitem> tab."
+msgid "Choose <menuitem>Format - Page Style - Page</menuitem> tab."
 msgstr ""
 
 #. gMqXo
@@ -10672,14 +11014,14 @@ msgctxt ""
 msgid "Choose <menuitem>Format - Page Style - Page</menuitem> tab (Writer)."
 msgstr ""
 
-#. w3yEG
+#. 6KGHN
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3155515\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Header</emph> tab."
-msgstr "Elektu langeton <emph>Formato - Paĝo - Paĝokapo</emph>."
+msgid "Choose <emph>Format - Page Style - Header</emph> tab."
+msgstr ""
 
 #. jZj9w
 #: 00040500.xhp
@@ -10690,14 +11032,14 @@ msgctxt ""
 msgid "Choose <emph>View - Styles</emph> - open context menu of a page style entry and choose <emph>Modify/New - Header</emph> tab."
 msgstr "Elektu menuerojn <emph>Vido - Stiloj</emph> - malfermu kuntekstan menuon de elemento kaj elektu langeton <emph>Ŝanĝi/Nova - Paĝokapo</emph>."
 
-#. Ge6bC
+#. nJY9z
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3145618\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Footer</emph> tab."
-msgstr "Elektu langeton <emph>Formato - Paĝo - Paĝopiedo</emph>."
+msgid "Choose <emph>Format - Page Style - Footer</emph> tab."
+msgstr ""
 
 #. 5gs5x
 #: 00040500.xhp
@@ -12634,14 +12976,14 @@ msgctxt ""
 msgid "Choose <menuitem>Styles - Manage Styles</menuitem> (<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command+T</keycode></caseinline><defaultinline><keycode>F11</keycode></defaultinline></switchinline>) - choose Cell or Page style - open context menu - choose <menuitem>Modify/New - Background</menuitem> tab."
 msgstr ""
 
-#. LzEQU
+#. 4F4Kh
 #: 00040502.xhp
 msgctxt ""
 "00040502.xhp\n"
 "par_id771592156369992\n"
 "help.text"
-msgid "Choose <menuitem>Format - Page - Background</menuitem> tab"
-msgstr "Elektu langeton <menuitem>Formato - Paĝo - Fono</menuitem>"
+msgid "Choose <menuitem>Format - Page Style - Background</menuitem> tab"
+msgstr ""
 
 #. NP4xZ
 #: 00040502.xhp
@@ -14056,13 +14398,13 @@ msgctxt ""
 msgid "Showing and Hiding Docked Windows"
 msgstr "Vidigi kaj kaŝi endokigitajn fenestrojn"
 
-#. AXPtD
+#. YaebL
 #: 01000000.xhp
 msgctxt ""
 "01000000.xhp\n"
 "par_id3149948\n"
 "help.text"
-msgid "Every <link href=\"text/shared/00/00000005.xhp#docking\" name=\"docked\">docked</link> window has an icon to control the display properties of the window."
+msgid "Every <link href=\"text/shared/00/00000005.xhp#docking\">docked</link> window has an icon to control the display properties of the window."
 msgstr ""
 
 #. jJcsB
@@ -14281,14 +14623,14 @@ msgctxt ""
 msgid "General"
 msgstr "Ĝenerala"
 
-#. GAKXh
+#. jEYzL
 #: 01050000.xhp
 msgctxt ""
 "01050000.xhp\n"
 "hd_id3158397\n"
 "help.text"
-msgid "<link href=\"text/shared/00/01050000.xhp\" name=\"General\">General</link>"
-msgstr "<link href=\"text/shared/00/01050000.xhp\" name=\"General\">Ĝenerala</link>"
+msgid "<link href=\"text/shared/00/01050000.xhp\">General</link>"
+msgstr "<link href=\"text/shared/00/01050000.xhp\">Ĝenerala</link>"
 
 #. hDAjC
 #: 01050000.xhp
@@ -15010,22 +15352,22 @@ msgctxt ""
 msgid "<variable id=\"litdat\">Choose <menuitem>Tools - Bibliography Database</menuitem>.</variable>"
 msgstr ""
 
-#. moWAi
+#. EaFwu
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3149281\n"
 "help.text"
-msgid "<variable id=\"link\">Choose <menuitem>Edit - Links to External Files</menuitem>.</variable>"
+msgid "<variable id=\"link\">Choose <menuitem>Edit - External Links</menuitem>.</variable>"
 msgstr ""
 
-#. HNF2W
+#. xSMBV
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3159339\n"
 "help.text"
-msgid "<variable id=\"linkae\">Choose <menuitem>Edit - Links to External Files - Modify</menuitem> (DDE links only).</variable>"
+msgid "<variable id=\"linkae\">Choose <menuitem>Edit - External Links - Modify</menuitem> (DDE links only).</variable>"
 msgstr ""
 
 #. bgzTi

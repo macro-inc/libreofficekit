@@ -19,10 +19,12 @@
 
 #pragma once
 
+#include <rtl/ustring.hxx>
+
 // this are the defines for the position of the settings in the
 // ViewSettingsSequence
 
-#define SC_VIEWSETTINGS_COUNT               24
+#define SC_VIEWSETTINGS_COUNT               25
 
 #define SC_VIEW_ID                          0
 #define SC_TABLE_VIEWSETTINGS               1
@@ -48,6 +50,7 @@
 #define SC_RASTERSUBX                       21
 #define SC_RASTERSUBY                       22
 #define SC_RASTERSYNC                       23
+#define SC_FORMULA_BAR_HEIGHT               24
 
 // this are the defines for the position of the settings in the
 // TableViewSettingsSequence
@@ -68,32 +71,34 @@
 #define SC_TABLE_ZOOM_TYPE                  11
 #define SC_TABLE_ZOOM_VALUE                 12
 #define SC_TABLE_PAGE_VIEW_ZOOM_VALUE       13
+#define SC_FORMULA_BAR_HEIGHT_VALUE         14
 #define SC_TABLE_SHOWGRID                   15
 
-#define SC_CURSORPOSITIONX                  "CursorPositionX"
-#define SC_CURSORPOSITIONY                  "CursorPositionY"
-#define SC_HORIZONTALSPLITMODE              "HorizontalSplitMode"
-#define SC_VERTICALSPLITMODE                "VerticalSplitMode"
-#define SC_HORIZONTALSPLITPOSITION          "HorizontalSplitPosition"
-#define SC_VERTICALSPLITPOSITION            "VerticalSplitPosition"
+inline constexpr OUStringLiteral SC_CURSORPOSITIONX = u"CursorPositionX";
+inline constexpr OUStringLiteral SC_CURSORPOSITIONY = u"CursorPositionY";
+inline constexpr OUStringLiteral SC_HORIZONTALSPLITMODE = u"HorizontalSplitMode";
+inline constexpr OUStringLiteral SC_VERTICALSPLITMODE = u"VerticalSplitMode";
+inline constexpr OUStringLiteral SC_HORIZONTALSPLITPOSITION = u"HorizontalSplitPosition";
+inline constexpr OUStringLiteral SC_VERTICALSPLITPOSITION = u"VerticalSplitPosition";
 #define SC_HORIZONTALSPLITPOSITION_TWIPS    "HorizontalSplitPositionTwips"
 #define SC_VERTICALSPLITPOSITION_TWIPS      "VerticalSplitPositionTwips"
-#define SC_ACTIVESPLITRANGE                 "ActiveSplitRange"
-#define SC_POSITIONLEFT                     "PositionLeft"
-#define SC_POSITIONRIGHT                    "PositionRight"
-#define SC_POSITIONTOP                      "PositionTop"
-#define SC_POSITIONBOTTOM                   "PositionBottom"
+inline constexpr OUStringLiteral SC_ACTIVESPLITRANGE = u"ActiveSplitRange";
+inline constexpr OUStringLiteral SC_POSITIONLEFT = u"PositionLeft";
+inline constexpr OUStringLiteral SC_POSITIONRIGHT = u"PositionRight";
+inline constexpr OUStringLiteral SC_POSITIONTOP = u"PositionTop";
+inline constexpr OUStringLiteral SC_POSITIONBOTTOM = u"PositionBottom";
 #define SC_TABLESELECTED                    "TableSelected"
 
-#define SC_TABLES                           "Tables"
-#define SC_ACTIVETABLE                      "ActiveTable"
-#define SC_HORIZONTALSCROLLBARWIDTH         "HorizontalScrollbarWidth"
+inline constexpr OUStringLiteral SC_TABLES = u"Tables";
+inline constexpr OUStringLiteral SC_ACTIVETABLE = u"ActiveTable";
+inline constexpr OUStringLiteral SC_HORIZONTALSCROLLBARWIDTH = u"HorizontalScrollbarWidth";
 #define SC_RELHORIZONTALTABBARWIDTH         "RelativeHorizontalTabbarWidth"
-#define SC_ZOOMTYPE                         "ZoomType"
-#define SC_ZOOMVALUE                        "ZoomValue"
-#define SC_PAGEVIEWZOOMVALUE                "PageViewZoomValue"
-#define SC_SHOWPAGEBREAKPREVIEW             "ShowPageBreakPreview"
-#define SC_VIEWID                           "ViewId"
+inline constexpr OUStringLiteral SC_ZOOMTYPE = u"ZoomType";
+inline constexpr OUStringLiteral SC_ZOOMVALUE = u"ZoomValue";
+inline constexpr OUStringLiteral SC_PAGEVIEWZOOMVALUE = u"PageViewZoomValue";
+inline constexpr OUStringLiteral SC_SHOWPAGEBREAKPREVIEW = u"ShowPageBreakPreview";
+inline constexpr OUStringLiteral SC_FORMULABARHEIGHT = u"FormulaBarHeight";
+inline constexpr OUStringLiteral SC_VIEWID = u"ViewId";
 #define SC_VIEW                             "view"
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

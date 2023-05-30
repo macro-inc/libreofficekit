@@ -27,7 +27,6 @@
 #include <unicode/regex.h>
 
 using namespace ::com::sun::star;
-typedef U_ICU_NAMESPACE::UnicodeString IcuUniString;
 
 class TestTextSearch : public test::BootstrapFixtureBase
 {
@@ -39,12 +38,14 @@ public:
     void testSearches();
     void testWildcardSearch();
     void testApostropheSearch();
+    void testTdf138410();
 
     CPPUNIT_TEST_SUITE(TestTextSearch);
     CPPUNIT_TEST(testICU);
     CPPUNIT_TEST(testSearches);
     CPPUNIT_TEST(testWildcardSearch);
     CPPUNIT_TEST(testApostropheSearch);
+    CPPUNIT_TEST(testTdf138410);
     CPPUNIT_TEST_SUITE_END();
 private:
     uno::Reference<util::XTextSearch> m_xSearch;
@@ -59,11 +60,11 @@ void TestTextSearch::testICU()
 
     OUString aString( "abcdefgh" );
     OUString aPattern( "e" );
-    IcuUniString aSearchPat( reinterpret_cast<const UChar*>(aPattern.getStr()), aPattern.getLength() );
+    icu::UnicodeString aSearchPat( reinterpret_cast<const UChar*>(aPattern.getStr()), aPattern.getLength() );
 
     std::unique_ptr<icu::RegexMatcher> pRegexMatcher(new icu::RegexMatcher( aSearchPat, nSearchFlags, nErr ));
 
-    IcuUniString aSource( reinterpret_cast<const UChar*>(aString.getStr()), aString.getLength() );
+    icu::UnicodeString aSource( reinterpret_cast<const UChar*>(aString.getStr()), aString.getLength() );
     pRegexMatcher->reset( aSource );
 
     CPPUNIT_ASSERT( pRegexMatcher->find( 0, nErr ) );
@@ -76,10 +77,10 @@ void TestTextSearch::testICU()
     OUString aString2( "acababaabcababadcdaa" );
     OUString aPattern2( "a" );
 
-    IcuUniString aSearchPat2( reinterpret_cast<const UChar*>(aPattern2.getStr()), aPattern2.getLength() );
+    icu::UnicodeString aSearchPat2( reinterpret_cast<const UChar*>(aPattern2.getStr()), aPattern2.getLength() );
     pRegexMatcher.reset(new icu::RegexMatcher( aSearchPat2, nSearchFlags, nErr ));
 
-    IcuUniString aSource2( reinterpret_cast<const UChar*>(aString2.getStr()), aString2.getLength() );
+    icu::UnicodeString aSource2( reinterpret_cast<const UChar*>(aString2.getStr()), aString2.getLength() );
     pRegexMatcher->reset( aSource2 );
 
     CPPUNIT_ASSERT( pRegexMatcher->find( 0, nErr ) );
@@ -401,6 +402,125 @@ void TestTextSearch::testApostropheSearch()
     // search backwards
     aRes = m_xSearch->searchBackward( str, str.getLength(), startPos );
     CPPUNIT_ASSERT( aRes.subRegExpressions > 0 );
+}
+
+void TestTextSearch::testTdf138410()
+{
+    OUString str(u"\u0643\u064f\u062a\u064f\u0628 \u0643\u062a\u0628");
+    sal_Int32 startPos = 0, endPos = str.getLength();
+
+    util::SearchOptions aOptions;
+    aOptions.algorithmType = util::SearchAlgorithms_ABSOLUTE;
+
+    util::SearchResult aRes;
+
+    // A) base alone
+    // The search string will be found whether it is followed by a mark in the
+    // text or not, and whether IGNORE_DIACRITICS_CTL is set or not.
+
+    // set options
+    aOptions.searchString = u"\u0643";
+    aOptions.transliterateFlags = 0;
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), aRes.endOffset[0]);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(7), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(6), aRes.endOffset[0]);
+
+    // check with transliteration
+    aOptions.transliterateFlags = static_cast<int>(TransliterationFlags::IGNORE_DIACRITICS_CTL);
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), aRes.endOffset[0]);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(7), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(6), aRes.endOffset[0]);
+
+    // b) base+mark
+    // The search string will be found when followed by a mark in the text, or
+    // when IGNORE_DIACRITICS_CTL is set whether it is followed by a mark or
+    // not.
+
+    // set options
+    aOptions.searchString = u"\u0643\u064f";
+    aOptions.transliterateFlags = 0;
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), aRes.endOffset[0]);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.endOffset[0]);
+
+    // check with transliteration
+    aOptions.transliterateFlags = static_cast<int>(TransliterationFlags::IGNORE_DIACRITICS_CTL);
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), aRes.endOffset[0]);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(7), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(6), aRes.endOffset[0]);
+
+    // b) mark alone
+    // The search string will be found only when IGNORE_DIACRITICS_CTL is not
+    // set.
+
+    // set options
+    aOptions.searchString = u"\u064f";
+    aOptions.transliterateFlags = 0;
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), aRes.endOffset[0]);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT(aRes.subRegExpressions > 0);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(4), aRes.startOffset[0]);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(3), aRes.endOffset[0]);
+
+    // with ignore marks the mark will not be found
+    aOptions.transliterateFlags = static_cast<int>(TransliterationFlags::IGNORE_DIACRITICS_CTL);
+    m_xSearch->setOptions(aOptions);
+
+    // search forward
+    aRes = m_xSearch->searchForward(str, startPos, endPos);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.subRegExpressions);
+
+    // search backwards
+    aRes = m_xSearch->searchBackward(str, endPos, startPos);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), aRes.subRegExpressions);
 }
 
 void TestTextSearch::setUp()

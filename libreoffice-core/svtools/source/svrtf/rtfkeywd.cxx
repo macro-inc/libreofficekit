@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/string_view.hxx>
 #include <rtl/ustring.hxx>
 #include <svtools/rtfkeywd.hxx>
 #include <svtools/rtftoken.h>
@@ -1111,12 +1112,6 @@ static RTF_TokenEntry aRTFTokenTab[] = {
         {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_FLYCOLUMN),     RTF_FLY_COLUMN},
         {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_FLYPAGE),       RTF_FLY_PAGE},
 
-        {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_BRDBOX),        RTF_BRDBOX},
-        {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_BRDLNCOL),      RTF_BRDLINE_COL},
-        {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_BRDLNIN),       RTF_BRDLINE_IN},
-        {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_BRDLNOUT),      RTF_BRDLINE_OUT},
-        {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_BRDLNDIST),     RTF_BRDLINE_DIST},
-
         {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_SHADOW),        RTF_SHADOW},
         {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_SHDWDIST),      RTF_SHDW_DIST},
         {std::u16string_view(u"" OOO_STRING_SVTOOLS_RTF_SHDWSTYLE),     RTF_SHDW_STYLE},
@@ -1175,7 +1170,7 @@ static RTF_TokenEntry aRTFTokenTab[] = {
 };
 
 
-int GetRTFToken( const OUString& rSearch )
+int GetRTFToken( std::u16string_view rSearch )
 {
     if( !bSortKeyWords )
     {
@@ -1187,12 +1182,12 @@ int GetRTFToken( const OUString& rSearch )
         bSortKeyWords = true;
     }
 
-    auto findCompare = [](const RTF_TokenEntry & lhs, const OUString & s)
+    auto findCompare = [](const RTF_TokenEntry & lhs, std::u16string_view s)
         {
-            return s.compareToIgnoreAsciiCase(lhs.sToken) > 0;
+            return o3tl::compareToIgnoreAsciiCase(s, lhs.sToken) > 0;
         };
     auto findIt = std::lower_bound( std::begin(aRTFTokenTab), std::end(aRTFTokenTab), rSearch, findCompare);
-    if (findIt != std::end(aRTFTokenTab) && rSearch.compareToIgnoreAsciiCase(findIt->sToken)==0)
+    if (findIt != std::end(aRTFTokenTab) && o3tl::compareToIgnoreAsciiCase(rSearch, findIt->sToken)==0)
         return findIt->nToken;
 
     return 0;

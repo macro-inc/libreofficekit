@@ -147,7 +147,7 @@ protected:
 
     Size CalcRel( const SwFormatFrameSize &rSz ) const;
 
-    SwFlyFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor );
+    SwFlyFrame( SwFlyFrameFormat*, SwFrame*, SwFrame *pAnchor, bool bFollow = false );
 
     virtual void DestroyImpl() override;
     virtual ~SwFlyFrame() override;
@@ -198,6 +198,9 @@ public:
     static void UnchainFrames( SwFlyFrame *pMaster, SwFlyFrame *pFollow );
 
     SwFlyFrame *FindChainNeighbour( SwFrameFormat const &rFormat, SwFrame *pAnch = nullptr );
+
+    /// Is this fly allowed to split across pages? (Disabled by default.)
+    bool IsFlySplitAllowed() const;
 
     // #i26791#
     const SwVirtFlyDrawObj* GetVirtDrawObj() const;

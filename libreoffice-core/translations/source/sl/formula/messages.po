@@ -1,10 +1,10 @@
 #. extracted from formula/inc
 msgid ""
 msgstr ""
-"Project-Id-Version: LibreOffice 7.2\n"
+"Project-Id-Version: LibreOffice 7.5\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-02-10 22:25+0100\n"
-"PO-Revision-Date: 2021-03-02 21:38+0200\n"
+"POT-Creation-Date: 2023-01-06 18:18+0100\n"
+"PO-Revision-Date: 2022-12-23 14:07+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: sl.libreoffice.org\n"
 "MIME-Version: 1.0\n"
@@ -2251,8 +2251,8 @@ msgstr "_Išči"
 
 #: formula/uiconfig/ui/functionpage.ui:45
 msgctxt "functionpage|extended_tip|search"
-msgid "Search for a part of the function name."
-msgstr "Iščite po delu imena funkcije."
+msgid "Search for a function name. Also matches function descriptions."
+msgstr "Iščite po delu imena funkcije. Pokaže zadetke tudi v opisu funkcij."
 
 #: formula/uiconfig/ui/functionpage.ui:60
 msgctxt "functionpage|label1"

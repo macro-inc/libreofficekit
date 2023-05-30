@@ -36,9 +36,11 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <cppuhelper/weak.hxx>
+#include <embeddedobj/embeddedupdate.hxx>
 #include <rtl/ref.hxx>
 #include <map>
 #include <memory>
+#include <svtools/filechangedchecker.hxx>
 
 namespace com::sun::star {
     namespace embed {
@@ -76,6 +78,7 @@ class Interceptor;
  * document model successfully.
  */
 class OCommonEmbeddedObject : public css::embed::XEmbeddedObject
+                            , public css::embed::EmbeddedUpdate
                             , public css::embed::XEmbedPersist2
                             , public css::embed::XLinkageSupport
                             , public css::embed::XInplaceObject
@@ -116,8 +119,6 @@ protected:
 
     css::uno::Sequence< css::embed::VerbDescriptor > m_aObjectVerbs;
 
-    css::uno::Sequence< sal_Int32 > m_aAcceptedStates;
-    css::uno::Sequence< sal_Int32 > m_pIntermediateStatesSeqs[NUM_SUPPORTED_STATES][NUM_SUPPORTED_STATES];
     std::map< sal_Int32, sal_Int32 > m_aVerbTable;
 
     css::uno::Reference< css::embed::XEmbeddedClient > m_xClientSite;
@@ -141,6 +142,9 @@ protected:
 
     bool m_bIsLinkURL;
     bool m_bLinkTempFileChanged;
+    ::std::unique_ptr< FileChangedChecker > m_pLinkFile;
+    bool m_bOleUpdate;
+    bool m_bInHndFunc;
 
     // embedded object related stuff
     OUString m_aEntryName;
@@ -193,6 +197,16 @@ private:
 
     void Deactivate();
 
+    // when State = CopyTempToLink        -> the user pressed the save button
+    //                                       when change in embedded part then copy to the linked-file
+    //              CopyLinkToTemp        -> the user pressed the refresh button
+    //                                       when change in linked-file then copy to the embedded part (temp-file)
+    //              CopyLinkToTempInit    -> create the temp file
+    //              CopyLinkToTempRefresh -> when save and Link change but not temp then update temp
+    enum class CopyBackToOLELink {NoCopy, CopyTempToLink, CopyLinkToTemp, CopyLinkToTempInit, CopyLinkToTempRefresh};
+
+    void handleLinkedOLE( CopyBackToOLELink eState );
+
     void StateChangeNotification_Impl( bool bBeforeChange, sal_Int32 nOldState, sal_Int32 nNewState,::osl::ResettableMutexGuard& _rGuard );
 
     void SwitchStateTo_Impl( sal_Int32 nNextState );
@@ -237,14 +251,17 @@ private:
                     const css::uno::Sequence< css::beans::PropertyValue >& lArguments,
                     const css::uno::Sequence< css::beans::PropertyValue >& lObjArgs );
 
+protected:
+    void SetInplaceActiveState();
+
 public:
     OCommonEmbeddedObject(
-        const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        css::uno::Reference< css::uno::XComponentContext > xContext,
         const css::uno::Sequence< css::beans::NamedValue >& aObjectProps );
 
     // no persistence for linked objects, so the descriptors are provided in constructor
     OCommonEmbeddedObject(
-        const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        css::uno::Reference< css::uno::XComponentContext > xContext,
         const css::uno::Sequence< css::beans::NamedValue >& aObjectProps,
         const css::uno::Sequence< css::beans::PropertyValue >& aMediaDescr,
         const css::uno::Sequence< css::beans::PropertyValue >& aObjectDescr );
@@ -293,6 +310,10 @@ public:
     virtual sal_Int64 SAL_CALL getStatus( sal_Int64 nAspect ) override;
 
     virtual void SAL_CALL setContainerName( const OUString& sName ) override;
+
+// EmbeddedUpdate
+
+    virtual void SetOleState(bool bIsOleUpdate) override;
 
 
 // XVisualObject

@@ -34,6 +34,7 @@
 #include <vcl/EnumContext.hxx>
 #include <vcl/svapp.hxx>
 #include <svx/clipfmtitem.hxx>
+#include <svx/statusitem.hxx>
 
 #include <cellsh.hxx>
 #include <sc.hrc>
@@ -673,7 +674,13 @@ void ScCellShell::GetHLinkState( SfxItemSet& rSet )
     SvxHyperlinkItem aHLinkItem;
     if ( !GetViewData().GetView()->HasBookmarkAtCursor( &aHLinkItem ) )
     {
-        //! put selected text into item?
+        // tdf#80043 - put selected text into item
+        ScViewData& rData       = GetViewData();
+        ScDocument& rDoc        = rData.GetDocument();
+        SCCOL       nPosX       = rData.GetCurX();
+        SCROW       nPosY       = rData.GetCurY();
+        SCTAB       nTab        = rData.GetTabNo();
+        aHLinkItem.SetName(rDoc.GetString(nPosX, nPosY, nTab));
     }
 
     rSet.Put(aHLinkItem);
@@ -868,7 +875,7 @@ void ScCellShell::GetState(SfxItemSet &rSet)
 
             //  calculations etc. with date/time/Fail/position&size together
 
-            // #i34458# The SfxStringItem belongs only into SID_TABLE_CELL. It no longer has to be
+            // #i34458# The SvxStatusItem belongs only into SID_TABLE_CELL. It no longer has to be
             // duplicated in SID_ATTR_POSITION or SID_ATTR_SIZE for SvxPosSizeStatusBarControl.
             case SID_TABLE_CELL:
                 {
@@ -877,7 +884,7 @@ void ScCellShell::GetState(SfxItemSet &rSet)
 
                     // In interpreter may happen via rescheduled Basic
                     if ( rDoc.IsInInterpreter() )
-                        rSet.Put( SfxStringItem( nWhich, "..." ) );
+                        rSet.Put( SvxStatusItem( SID_TABLE_CELL, "...", StatusCategory::Formula ) );
                     else
                     {
                         FormulaError nErrCode = FormulaError::NONE;
@@ -887,7 +894,9 @@ void ScCellShell::GetState(SfxItemSet &rSet)
 
                         OUString aFuncStr;
                         if ( pTabViewShell->GetFunction( aFuncStr, nErrCode ) )
-                            rSet.Put( SfxStringItem( nWhich, aFuncStr ) );
+                        {
+                            rSet.Put( SvxStatusItem( SID_TABLE_CELL, aFuncStr, StatusCategory::Formula ) );
+                        }
                     }
                 }
                 break;

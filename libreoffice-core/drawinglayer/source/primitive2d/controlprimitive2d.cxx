@@ -24,15 +24,17 @@
 #include <com/sun/star/awt/XControl.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
+#include <utility>
+#include <rtl/ustrbuf.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/awt/PosSize.hpp>
 #include <vcl/bitmapex.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
 #include <vcl/window.hxx>
@@ -197,7 +199,7 @@ namespace drawinglayer::primitive2d
 
                                 // create primitive
                                 xRetval = new BitmapPrimitive2D(
-                                    VCLUnoHelper::CreateVCLXBitmap(aContent),
+                                    aContent,
                                     aBitmapTransform);
                             }
                             catch( const uno::Exception& )
@@ -217,11 +219,11 @@ namespace drawinglayer::primitive2d
             // create a gray placeholder hairline polygon in object size
             basegfx::B2DRange aObjectRange(0.0, 0.0, 1.0, 1.0);
             aObjectRange.transform(getTransform());
-            const basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aObjectRange));
+            basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aObjectRange));
             const basegfx::BColor aGrayTone(0xc0 / 255.0, 0xc0 / 255.0, 0xc0 / 255.0);
 
             // The replacement object may also get a text like 'empty group' here later
-            Primitive2DReference xRetval(new PolygonHairlinePrimitive2D(aOutline, aGrayTone));
+            Primitive2DReference xRetval(new PolygonHairlinePrimitive2D(std::move(aOutline), aGrayTone));
 
             return xRetval;
         }
@@ -241,21 +243,22 @@ namespace drawinglayer::primitive2d
         }
 
         ControlPrimitive2D::ControlPrimitive2D(
-            const basegfx::B2DHomMatrix& rTransform,
-            const uno::Reference< awt::XControlModel >& rxControlModel)
-        :   maTransform(rTransform),
-            mxControlModel(rxControlModel)
+            basegfx::B2DHomMatrix aTransform,
+            uno::Reference< awt::XControlModel > xControlModel,
+            uno::Reference<awt::XControl> xXControl,
+            ::std::u16string_view const rTitle,
+            ::std::u16string_view const rDescription)
+        :   maTransform(std::move(aTransform)),
+            mxControlModel(std::move(xControlModel)),
+            mxXControl(std::move(xXControl))
         {
-        }
-
-        ControlPrimitive2D::ControlPrimitive2D(
-            const basegfx::B2DHomMatrix& rTransform,
-            const uno::Reference< awt::XControlModel >& rxControlModel,
-            const uno::Reference< awt::XControl >& rxXControl)
-        :   maTransform(rTransform),
-            mxControlModel(rxControlModel),
-            mxXControl(rxXControl)
-        {
+            ::rtl::OUStringBuffer buf(rTitle);
+            if (!rTitle.empty() && !rDescription.empty())
+            {
+                buf.append(" - ");
+            }
+            buf.append(rDescription);
+            m_AltText = buf.makeStringAndClear();
         }
 
         const uno::Reference< awt::XControl >& ControlPrimitive2D::getXControl() const
@@ -271,38 +274,37 @@ namespace drawinglayer::primitive2d
         bool ControlPrimitive2D::operator==(const BasePrimitive2D& rPrimitive) const
         {
             // use base class compare operator
-            if(BufferedDecompositionPrimitive2D::operator==(rPrimitive))
+            if(!BufferedDecompositionPrimitive2D::operator==(rPrimitive))
+                return false;
+
+            const ControlPrimitive2D& rCompare = static_cast<const ControlPrimitive2D&>(rPrimitive);
+
+            if(getTransform() != rCompare.getTransform())
+                return false;
+
+            // check if ControlModel references both are/are not
+            if (getControlModel().is() != rCompare.getControlModel().is())
+                return false;
+
+            if(getControlModel().is())
             {
-                const ControlPrimitive2D& rCompare = static_cast<const ControlPrimitive2D&>(rPrimitive);
-
-                if(getTransform() == rCompare.getTransform())
-                {
-                    // check if ControlModel references both are/are not
-                    bool bRetval(getControlModel().is() == rCompare.getControlModel().is());
-
-                    if(bRetval && getControlModel().is())
-                    {
-                        // both exist, check for equality
-                        bRetval = (getControlModel() == rCompare.getControlModel());
-                    }
-
-                    if(bRetval)
-                    {
-                        // check if XControl references both are/are not
-                        bRetval = (getXControl().is() == rCompare.getXControl().is());
-                    }
-
-                    if(bRetval && getXControl().is())
-                    {
-                        // both exist, check for equality
-                        bRetval = (getXControl() == rCompare.getXControl());
-                    }
-
-                    return bRetval;
-                }
+                // both exist, check for equality
+                if (getControlModel() != rCompare.getControlModel())
+                    return false;
             }
 
-            return false;
+                // check if XControl references both are/are not
+            if (getXControl().is() != rCompare.getXControl().is())
+                return false;
+
+            if(getXControl().is())
+            {
+                // both exist, check for equality
+                if (getXControl() != rCompare.getXControl())
+                    return false;
+            }
+
+            return true;
         }
 
         basegfx::B2DRange ControlPrimitive2D::getB2DRange(const geometry::ViewInformation2D& /*rViewInformation*/) const
@@ -317,7 +319,6 @@ namespace drawinglayer::primitive2d
         {
             // this primitive is view-dependent related to the scaling. If scaling has changed,
             // destroy existing decomposition. To detect change, use size of unit size in view coordinates
-            std::unique_lock aGuard( m_aMutex );
             const basegfx::B2DVector aNewScaling(rViewInformation.getObjectToViewTransformation() * basegfx::B2DVector(1.0, 1.0));
 
             if(!getBuffered2DDecomposition().empty())
@@ -336,7 +337,6 @@ namespace drawinglayer::primitive2d
             }
 
             // use parent implementation
-            aGuard.unlock();
             BufferedDecompositionPrimitive2D::get2DDecomposition(rVisitor, rViewInformation);
         }
 

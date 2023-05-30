@@ -23,7 +23,7 @@
 #include <comphelper/accimplaccess.hxx>
 #include <comphelper/uno3.hxx>
 #include <com/sun/star/lang/XEventListener.hpp>
-#include <vcl/vclptr.hxx>
+#include <rtl/ref.hxx>
 
 namespace vcl { class Window; }
 namespace com::sun::star::awt { class XWindow; }
@@ -68,14 +68,14 @@ namespace toolkit
     private:
 
         // XAccessibleContext
-        virtual sal_Int32 SAL_CALL getAccessibleChildCount(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleChildCount(  ) override;
+        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent(  ) override;
         virtual sal_Int16 SAL_CALL getAccessibleRole(  ) override;
         virtual OUString SAL_CALL getAccessibleDescription(  ) override;
         virtual OUString SAL_CALL getAccessibleName(  ) override;
         virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL getAccessibleStateSet(  ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleStateSet(  ) override;
 
         // XAccessibleComponent
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleAtPoint( const css::awt::Point& aPoint ) override;

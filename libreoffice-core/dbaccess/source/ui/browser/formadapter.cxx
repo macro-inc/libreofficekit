@@ -249,9 +249,7 @@ void SbaXFormAdapter::AttachForm(const Reference< css::sdbc::XRowSet >& xNewMast
         if (xLoadable->isLoaded())
         {
             css::lang::EventObject aEvt(*this);
-            ::comphelper::OInterfaceIteratorHelper2 aIt(m_aLoadListeners);
-            while (aIt.hasMoreElements())
-                static_cast< css::form::XLoadListener*>(aIt.next())->unloaded(aEvt);
+            m_aLoadListeners.notifyEach( &css::form::XLoadListener::unloaded, aEvt );
         }
     }
 
@@ -267,9 +265,7 @@ void SbaXFormAdapter::AttachForm(const Reference< css::sdbc::XRowSet >& xNewMast
     if (xLoadable->isLoaded())
     {
         css::lang::EventObject aEvt(*this);
-        ::comphelper::OInterfaceIteratorHelper2 aIt(m_aLoadListeners);
-        while (aIt.hasMoreElements())
-            static_cast< css::form::XLoadListener*>(aIt.next())->loaded(aEvt);
+        m_aLoadListeners.notifyEach( &css::form::XLoadListener::loaded, aEvt );
     }
 
     // TODO : perhaps _all_ of our listeners should be notified about our new state
@@ -1312,9 +1308,8 @@ void SAL_CALL SbaXFormAdapter::setFastPropertyValue(sal_Int32 nHandle, const Any
 
         aValue >>= m_sName;
 
-        ::comphelper::OInterfaceIteratorHelper2 aIt(*m_aPropertyChangeListeners.getContainer(PROPERTY_NAME));
-        while (aIt.hasMoreElements())
-            static_cast< css::beans::XPropertyChangeListener*>(aIt.next())->propertyChange(aEvt);
+        m_aPropertyChangeListeners.getContainer(PROPERTY_NAME)->notifyEach(
+            &XPropertyChangeListener::propertyChange, aEvt );
 
         return;
     }
@@ -1328,7 +1323,7 @@ Any SAL_CALL SbaXFormAdapter::getFastPropertyValue(sal_Int32 nHandle)
     OSL_ENSURE(xSet.is(), "SAL_CALL SbaXFormAdapter::getFastPropertyValue : have no master form !");
 
     if (m_nNamePropHandle == nHandle)
-        return makeAny(m_sName);
+        return Any(m_sName);
 
     return xSet->getFastPropertyValue(nHandle);
 }
@@ -1341,7 +1336,7 @@ OUString SAL_CALL SbaXFormAdapter::getName()
 
 void SAL_CALL SbaXFormAdapter::setName(const OUString& aName)
 {
-    setPropertyValue(PROPERTY_NAME, makeAny(aName));
+    setPropertyValue(PROPERTY_NAME, Any(aName));
 }
 
 // css::io::XPersistObject
@@ -1619,7 +1614,7 @@ void SbaXFormAdapter::implInsert(const Any& aElement, sal_Int32 nIndex, const OU
     try
     {
         if (pNewElName)
-            xElementSet->setPropertyValue(PROPERTY_NAME, makeAny(*pNewElName));
+            xElementSet->setPropertyValue(PROPERTY_NAME, Any(*pNewElName));
 
         xElementSet->getPropertyValue(PROPERTY_NAME) >>= sName;
     }
@@ -1649,9 +1644,7 @@ void SbaXFormAdapter::implInsert(const Any& aElement, sal_Int32 nIndex, const OU
     aEvt.Source = *this;
     aEvt.Accessor <<= nIndex;
     aEvt.Element <<= xElement;
-    ::comphelper::OInterfaceIteratorHelper2 aIt(m_aContainerListeners);
-    while (aIt.hasMoreElements())
-        static_cast< css::container::XContainerListener*>(aIt.next())->elementInserted(aEvt);
+    m_aContainerListeners.notifyEach( &XContainerListener::elementInserted, aEvt );
 }
 
 sal_Int32 SbaXFormAdapter::implGetPos(const OUString& rName)
@@ -1700,7 +1693,7 @@ Any SAL_CALL SbaXFormAdapter::getByName(const OUString& aName)
     {
         throw css::container::NoSuchElementException();
     }
-    return makeAny(m_aChildren[nPos]);
+    return Any(m_aChildren[nPos]);
 }
 
 Sequence< OUString > SAL_CALL SbaXFormAdapter::getElementNames()
@@ -1754,10 +1747,7 @@ void SAL_CALL SbaXFormAdapter::removeByIndex(sal_Int32 _rIndex)
     css::container::ContainerEvent aEvt;
     aEvt.Source = *this;
     aEvt.Element <<= xAffected;
-    ::comphelper::OInterfaceIteratorHelper2 aIt(m_aContainerListeners);
-    while (aIt.hasMoreElements())
-        static_cast< css::container::XContainerListener*>(aIt.next())->elementRemoved(aEvt);
-
+    m_aContainerListeners.notifyEach( &XContainerListener::elementRemoved, aEvt );
 }
 
 // css::container::XIndexReplace
@@ -1817,9 +1807,7 @@ void SAL_CALL SbaXFormAdapter::replaceByIndex(sal_Int32 _rIndex, const Any& Elem
     aEvt.Element <<= xElement;
     aEvt.ReplacedElement <<= xOld;
 
-    ::comphelper::OInterfaceIteratorHelper2 aIt(m_aContainerListeners);
-    while (aIt.hasMoreElements())
-        static_cast< css::container::XContainerListener*>(aIt.next())->elementReplaced(aEvt);
+    m_aContainerListeners.notifyEach( &XContainerListener::elementReplaced, aEvt );
 }
 
 // css::container::XIndexAccess
@@ -1834,7 +1822,7 @@ Any SAL_CALL SbaXFormAdapter::getByIndex(sal_Int32 _rIndex)
         throw css::lang::IndexOutOfBoundsException();
 
     Reference< css::form::XFormComponent >  xElement = *(m_aChildren.begin() + _rIndex);
-    return makeAny(xElement);
+    return Any(xElement);
 }
 
 // css::container::XContainer

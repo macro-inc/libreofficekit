@@ -56,7 +56,6 @@
 
 #include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/table/CellAddress.hpp>
-#include <unotools/resmgr.hxx>
 #include <rtl/math.hxx>
 #include <algorithm>
 #include <memory>
@@ -104,7 +103,7 @@ void SAL_CALL LpsolveSolver::solve()
 
     // collect variables in vector (?)
 
-    auto aVariableCells = comphelper::sequenceToContainer<std::vector<table::CellAddress>>(maVariables);
+    const auto & aVariableCells = maVariables;
     size_t nVariables = aVariableCells.size();
     size_t nVar = 0;
 

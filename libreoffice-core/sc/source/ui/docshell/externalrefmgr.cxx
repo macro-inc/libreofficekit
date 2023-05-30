@@ -27,6 +27,7 @@
 #include <scextopt.hxx>
 #include <rangenam.hxx>
 #include <formulacell.hxx>
+#include <utility>
 #include <viewdata.hxx>
 #include <tabvwsh.hxx>
 #include <sc.hrc>
@@ -436,7 +437,7 @@ void ScExternalRefCache::Table::getAllNumberFormats(vector<sal_uInt32>& rNumFmts
 
 bool ScExternalRefCache::Table::isRangeCached(SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2) const
 {
-    return maCachedRanges.In(ScRange(nCol1, nRow1, 0, nCol2, nRow2, 0));
+    return maCachedRanges.Contains(ScRange(nCol1, nRow1, 0, nCol2, nRow2, 0));
 }
 
 void ScExternalRefCache::Table::setCachedCell(SCCOL nCol, SCROW nRow)
@@ -457,7 +458,7 @@ void ScExternalRefCache::Table::setWholeTableCached()
 
 bool ScExternalRefCache::Table::isInCachedRanges(SCCOL nCol, SCROW nRow) const
 {
-    return maCachedRanges.In(ScRange(nCol, nRow, 0, nCol, nRow, 0));
+    return maCachedRanges.Contains(ScRange(nCol, nRow, 0, nCol, nRow, 0));
 }
 
 ScExternalRefCache::TokenRef ScExternalRefCache::Table::getEmptyOrNullToken(
@@ -471,8 +472,8 @@ ScExternalRefCache::TokenRef ScExternalRefCache::Table::getEmptyOrNullToken(
     return TokenRef();
 }
 
-ScExternalRefCache::TableName::TableName(const OUString& rUpper, const OUString& rReal) :
-    maUpperName(rUpper), maRealName(rReal)
+ScExternalRefCache::TableName::TableName(OUString aUpper, OUString aReal) :
+    maUpperName(std::move(aUpper)), maRealName(std::move(aReal))
 {
 }
 
@@ -481,9 +482,10 @@ ScExternalRefCache::CellFormat::CellFormat() :
 {
 }
 
-ScExternalRefCache::ScExternalRefCache()
- : mxFakeDoc(new ScDocument())
-{}
+ScExternalRefCache::ScExternalRefCache(const ScDocument& rDoc)
+    : mrDoc(rDoc)
+{
+}
 
 ScExternalRefCache::~ScExternalRefCache() {}
 
@@ -710,9 +712,9 @@ ScExternalRefCache::TokenArrayRef ScExternalRefCache::getCellRangeData(
             if (!bFirstTab)
                 pArray->AddOpCode(ocSep);
 
-            ScMatrixToken aToken(xMat);
+            ScMatrixToken aToken(std::move(xMat));
             if (!pArray)
-                pArray = std::make_shared<ScTokenArray>(*mxFakeDoc);
+                pArray = std::make_shared<ScTokenArray>(mrDoc);
             pArray->AddToken(aToken);
 
             bFirstTab = false;
@@ -863,7 +865,7 @@ void ScExternalRefCache::setCellRangeData(sal_uInt16 nFileId, const ScRange& rRa
             };
             ScMatrix::StringOpFunction aStringFunc = [=](size_t row, size_t col, svl::SharedString val) -> void
             {
-                pTabData->setCell(col + nCol1, row + nRow1, new formula::FormulaStringToken(val), 0, false);
+                pTabData->setCell(col + nCol1, row + nRow1, new formula::FormulaStringToken(std::move(val)), 0, false);
             };
             ScMatrix::EmptyOpFunction aEmptyFunc = [](size_t /*row*/, size_t /*col*/) -> void
             {
@@ -871,7 +873,7 @@ void ScExternalRefCache::setCellRangeData(sal_uInt16 nFileId, const ScRange& rRa
             };
             pMat->ExecuteOperation(std::pair<size_t, size_t>(0, 0),
                     std::pair<size_t, size_t>(nRow2-nRow1, nCol2-nCol1),
-                    aDoubleFunc, aBoolFunc, aStringFunc, aEmptyFunc);
+                    std::move(aDoubleFunc), std::move(aBoolFunc), std::move(aStringFunc), std::move(aEmptyFunc));
             // Mark the whole range 'cached'.
             pTabData->setCachedCellRange(nCol1, nRow1, nCol2, nRow2);
         }
@@ -1480,7 +1482,11 @@ void ScExternalRefLink::Closed()
     else
     {
         // The source document has changed.
-        ScDocShell* pDocShell = ScDocShell::GetViewData()->GetDocShell();
+        ScViewData* pViewData = ScDocShell::GetViewData();
+        if (!pViewData)
+            return ERROR_GENERAL;
+
+        ScDocShell* pDocShell = pViewData->GetDocShell();
         ScDocShellModificator aMod(*pDocShell);
         pMgr->switchSrcFile(mnFileId, aFile, aFilter);
         aMod.SetDocumentModified();
@@ -1503,24 +1509,24 @@ static FormulaToken* convertToToken( ScDocument& rHostDoc, const ScDocument& rSr
 {
     if (rCell.hasEmptyValue())
     {
-        bool bInherited = (rCell.meType == CELLTYPE_FORMULA);
+        bool bInherited = (rCell.getType() == CELLTYPE_FORMULA);
         return new ScEmptyCellToken(bInherited, false);
     }
 
-    switch (rCell.meType)
+    switch (rCell.getType())
     {
         case CELLTYPE_EDIT:
         case CELLTYPE_STRING:
         {
             OUString aStr = rCell.getString(&rSrcDoc);
             svl::SharedString aSS = rHostDoc.GetSharedStringPool().intern(aStr);
-            return new formula::FormulaStringToken(aSS);
+            return new formula::FormulaStringToken(std::move(aSS));
         }
         case CELLTYPE_VALUE:
-            return new formula::FormulaDoubleToken(rCell.mfValue);
+            return new formula::FormulaDoubleToken(rCell.getDouble());
         case CELLTYPE_FORMULA:
         {
-            ScFormulaCell* pFCell = rCell.mpFormula;
+            ScFormulaCell* pFCell = rCell.getFormula();
             FormulaError nError = pFCell->GetErrCode();
             if (nError != FormulaError::NONE)
                 return new FormulaErrorToken( nError);
@@ -1532,7 +1538,7 @@ static FormulaToken* convertToToken( ScDocument& rHostDoc, const ScDocument& rSr
             else
             {
                 svl::SharedString aSS = rHostDoc.GetSharedStringPool().intern( pFCell->GetString().getString());
-                return new formula::FormulaStringToken(aSS);
+                return new formula::FormulaStringToken(std::move(aSS));
             }
         }
         default:
@@ -1643,7 +1649,7 @@ static std::unique_ptr<ScTokenArray> lcl_fillEmptyMatrix(const ScDocument& rDoc,
     SCSIZE nR = static_cast<SCSIZE>(rRange.aEnd.Row()-rRange.aStart.Row()+1);
     ScMatrixRef xMat = new ScMatrix(nC, nR);
 
-    ScMatrixToken aToken(xMat);
+    ScMatrixToken aToken(std::move(xMat));
     unique_ptr<ScTokenArray> pArray(new ScTokenArray(rDoc));
     pArray->AddToken(aToken);
     return pArray;
@@ -1654,7 +1660,7 @@ bool isLinkUpdateAllowedInDoc(const ScDocument& rDoc)
 {
     SfxObjectShell* pDocShell = rDoc.GetDocumentShell();
     if (!pDocShell)
-        return false;
+        return rDoc.IsFunctionAccess();
 
     return pDocShell->GetEmbeddedObjectContainer().getUserAllowsLinkUpdate();
 }
@@ -1662,6 +1668,7 @@ bool isLinkUpdateAllowedInDoc(const ScDocument& rDoc)
 
 ScExternalRefManager::ScExternalRefManager(ScDocument& rDoc) :
     mrDoc(rDoc),
+    maRefCache(rDoc),
     mbInReferenceMarking(false),
     mbUserInteractionEnabled(true),
     mbDocTimerEnabled(true),
@@ -1873,7 +1880,7 @@ void putRangeDataIntoCache(
     else
     {
         // Array is empty.  Fill it with an empty matrix of the required size.
-        pArray = lcl_fillEmptyMatrix(*rRefCache.getFakeDoc(), rCacheRange);
+        pArray = lcl_fillEmptyMatrix(rRefCache.getDoc(), rCacheRange);
 
         // Make sure to set this range 'cached', to prevent unnecessarily
         // accessing the src document time and time again.
@@ -2076,7 +2083,7 @@ ScExternalRefCache::TokenArrayRef ScExternalRefManager::getDoubleRefTokens(
     if (!pSrcDoc)
     {
         // Source document is not reachable.  Throw a reference error.
-        pArray = std::make_shared<ScTokenArray>(*maRefCache.getFakeDoc());
+        pArray = std::make_shared<ScTokenArray>(maRefCache.getDoc());
         pArray->AddToken(FormulaErrorToken(FormulaError::NoRef));
         return pArray;
     }
@@ -2569,9 +2576,9 @@ SfxObjectShellRef ScExternalRefManager::loadSrcDocument(sal_uInt16 nFileId, OUSt
         SfxMedium* pMedium = pShell->GetMedium();
         if (pMedium)
         {
-            const SfxPoolItem* pItem;
-            if (pMedium->GetItemSet()->GetItemState( SID_MACROEXECMODE, false, &pItem ) == SfxItemState::SET &&
-                    static_cast<const SfxUInt16Item*>(pItem)->GetValue() != css::document::MacroExecMode::NEVER_EXECUTE)
+            const SfxUInt16Item* pItem = pMedium->GetItemSet()->GetItemIfSet( SID_MACROEXECMODE, false );
+            if (pItem &&
+                    pItem->GetValue() != css::document::MacroExecMode::NEVER_EXECUTE)
                 pSet->Put( SfxUInt16Item( SID_MACROEXECMODE, css::document::MacroExecMode::USE_CONFIG));
         }
 
@@ -2715,7 +2722,7 @@ void ScExternalRefManager::addFilesToLinkManager()
         maybeLinkExternalFile( nFileId, true);
 }
 
-void ScExternalRefManager::SrcFileData::maybeCreateRealFileName(const OUString& rOwnDocName)
+void ScExternalRefManager::SrcFileData::maybeCreateRealFileName(std::u16string_view rOwnDocName)
 {
     if (maRelativeName.isEmpty())
         // No relative path given.  Nothing to do.
@@ -2931,22 +2938,22 @@ public:
         {
             ScExternalRefCache::TokenRef pTok;
             ScRefCellValue aCell = mpCurCol->GetCellValue(maBlockPos, nRow);
-            switch (aCell.meType)
+            switch (aCell.getType())
             {
                 case CELLTYPE_STRING:
                 case CELLTYPE_EDIT:
                 {
                     OUString aStr = aCell.getString(&mpCurCol->GetDoc());
                     svl::SharedString aSS = mrStrPool.intern(aStr);
-                    pTok.reset(new formula::FormulaStringToken(aSS));
+                    pTok.reset(new formula::FormulaStringToken(std::move(aSS)));
                 }
                 break;
                 case CELLTYPE_VALUE:
-                    pTok.reset(new formula::FormulaDoubleToken(aCell.mfValue));
+                    pTok.reset(new formula::FormulaDoubleToken(aCell.getDouble()));
                 break;
                 case CELLTYPE_FORMULA:
                 {
-                    sc::FormulaResultValue aRes = aCell.mpFormula->GetResult();
+                    sc::FormulaResultValue aRes = aCell.getFormula()->GetResult();
                     switch (aRes.meType)
                     {
                         case sc::FormulaResultValue::Value:
@@ -2956,7 +2963,7 @@ public:
                         {
                             // Re-intern the string to the host document pool.
                             svl::SharedString aInterned = mrStrPool.intern(aRes.maString.getString());
-                            pTok.reset(new formula::FormulaStringToken(aInterned));
+                            pTok.reset(new formula::FormulaStringToken(std::move(aInterned)));
                         }
                         break;
                         case sc::FormulaResultValue::Error:

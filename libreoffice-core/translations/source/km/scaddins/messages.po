@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,11 +234,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "បញ្ជី​តម្លៃ​កាលបរិច្ឆេទ តំណាង​ឲ្យ​ថ្ងៃ​ឈប់​ (វិស្សមកាល ថ្ងៃ​សម្រាក​ ។ល។)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "ត្រឡប់​តម្លៃ​  'ពិត' ​បើ​ចំនួន​ជា​លេខ​គូ"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr ""
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -252,11 +252,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "ចំនួន"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "ត្រឡប់​តម្លៃ​ 'ពិត'​ ​បើ​ចំនួន​ជា​លេខ​សេស​"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr ""
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -420,11 +420,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "ចំនួន​ដែល​គុណ​ជាមួយ​ pi"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "ត្រឡប់​ចំនួន​គត់​ចៃដន្យ រវាង​ចំនួន​ដែល​អ្នក​បញ្ជាក់​លម្អិត"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr ""
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -432,11 +432,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "បាត"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "ចំនួន​គត់​តូច​បំផុត​ដែល​​បាន​ត្រឡប់"
+msgid "The smallest integer that can be returned"
+msgstr ""
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -444,11 +444,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "កំពូល"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "ចំនួន​គត់​ធំ​បំផុត​​ដែល​បាន​ត្រឡប់"
+msgid "The largest integer that can be returned"
+msgstr ""
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156

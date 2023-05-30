@@ -34,7 +34,7 @@
 
 #include <frmfmt.hxx>
 
-SwNoTextNode::SwNoTextNode( const SwNodeIndex & rWhere,
+SwNoTextNode::SwNoTextNode( SwNode& rWhere,
                   const SwNodeType nNdType,
                   SwGrfFormatColl *pGrfColl,
                   SwAttrSet const * pAutoAttr ) :
@@ -117,8 +117,8 @@ const tools::PolyPolygon *SwNoTextNode::HasContour() const
                 if ( !bPixelGrf && m_bPixelContour )
                 {
                     basegfx::B2DSize aDPI = GetGraphic().GetPPI();
-                    nGrfDPIx = aDPI.getX();
-                    nGrfDPIy = aDPI.getY();
+                    nGrfDPIx = aDPI.getWidth();
+                    nGrfDPIy = aDPI.getHeight();
                 }
             }
             OSL_ENSURE( !bPixelGrf || aGrfMap == aContourMap,

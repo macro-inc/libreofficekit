@@ -21,9 +21,14 @@
 #include <comphelper/string.hxx>
 #include <svtools/htmlkywd.hxx>
 #include <svtools/htmlout.hxx>
+#include <rtl/xmlencode.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 #include <fmtfld.hxx>
 #include <doc.hxx>
+#include <docsh.hxx>
+#include <view.hxx>
+#include <wrtsh.hxx>
 #include <breakit.hxx>
 #include <ndtxt.hxx>
 #include <txtfld.hxx>
@@ -285,15 +290,17 @@ static Writer& OutHTML_SwField( Writer& rWrt, const SwField* pField,
         if( !aName.isEmpty() )
         {
             sOut.append(" " OOO_STRING_SVTOOLS_HTML_O_name "=\"");
-            rWrt.Strm().WriteOString( sOut.makeStringAndClear() );
-            HTMLOutFuncs::Out_String( rWrt.Strm(), aName, rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+            rWrt.Strm().WriteOString( sOut );
+            sOut.setLength(0);
+            HTMLOutFuncs::Out_String( rWrt.Strm(), aName );
             sOut.append('\"');
         }
         if( !aValue.isEmpty() )
         {
             sOut.append(" " OOO_STRING_SVTOOLS_HTML_O_value "=\"");
-            rWrt.Strm().WriteOString( sOut.makeStringAndClear() );
-            HTMLOutFuncs::Out_String( rWrt.Strm(), aValue, rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+            rWrt.Strm().WriteOString( sOut );
+            sOut.setLength(0);
+            HTMLOutFuncs::Out_String( rWrt.Strm(), aValue );
             sOut.append('\"');
         }
         if( bNumFormat )
@@ -301,15 +308,15 @@ static Writer& OutHTML_SwField( Writer& rWrt, const SwField* pField,
             OSL_ENSURE( nFormat, "number format is 0" );
             sOut.append(HTMLOutFuncs::CreateTableDataOptionsValNum(
                 bNumValue, dNumValue, nFormat,
-                *rHTMLWrt.m_pDoc->GetNumberFormatter(), rHTMLWrt.m_eDestEnc,
-                &rHTMLWrt.m_aNonConvertableCharacters));
+                *rHTMLWrt.m_pDoc->GetNumberFormatter()));
         }
         if( bFixed )
         {
             sOut.append(' ').append(OOO_STRING_SVTOOLS_HTML_O_sdfixed);
         }
         sOut.append('>');
-        rWrt.Strm().WriteOString( sOut.makeStringAndClear() );
+        rWrt.Strm().WriteOString( sOut );
+        sOut.setLength(0);
     }
 
     // output content of the field
@@ -408,8 +415,7 @@ static Writer& OutHTML_SwField( Writer& rWrt, const SwField* pField,
                     }
                 }
 
-                HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand.copy( nPos, nChunkLen ),
-                    rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+                HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand.copy( nPos, nChunkLen ) );
 
                 rHTMLWrt.m_bTagOn = false;
                 while( nItems )
@@ -418,8 +424,7 @@ static Writer& OutHTML_SwField( Writer& rWrt, const SwField* pField,
             }
             else
             {
-                HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand.copy( nPos, nChunkLen ),
-                    rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+                HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand.copy( nPos, nChunkLen ) );
             }
             nPos = nEndPos;
         }
@@ -427,13 +432,12 @@ static Writer& OutHTML_SwField( Writer& rWrt, const SwField* pField,
     }
     else
     {
-        HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand,
-              rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+        HTMLOutFuncs::Out_String( rWrt.Strm(), sExpand );
     }
 
     // Output the closing tag.
     if( pTypeStr )
-        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), OStringConcatenation(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_sdfield), false );
+        HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_sdfield), false );
 
     return rWrt;
 }
@@ -459,7 +463,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
         // TODO: HTML-Tags are written without entities, that for, characters
         // not contained in the destination encoding are lost!
         OString sTmp(OUStringToOString(rText,
-            static_cast<SwHTMLWriter&>(rWrt).m_eDestEnc));
+            RTL_TEXTENCODING_UTF8));
         rWrt.Strm().WriteOString( sTmp ).WriteChar( '>' );
     }
     else if( SwFieldIds::Postit == pFieldTyp->Which() )
@@ -470,7 +474,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
         bool bWritten = false;
 
         if( (rComment.getLength() >= 6 && rComment.startsWith("<") && rComment.endsWith(">") &&
-             rComment.copy( 1, 4 ).equalsIgnoreAsciiCase( OOO_STRING_SVTOOLS_HTML_meta) ) ||
+             o3tl::equalsIgnoreAsciiCase(rComment.subView( 1, 4 ), u"" OOO_STRING_SVTOOLS_HTML_meta) ) ||
             (rComment.getLength() >= 7 &&
              rComment.startsWith( "<!--" ) &&
              rComment.endsWith( "-->" )) )
@@ -480,7 +484,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
             // TODO: HTML-Tags are written without entities, that for,
             // characters not contained in the destination encoding are lost!
             OString sTmp(OUStringToOString(sComment,
-                static_cast<SwHTMLWriter&>(rWrt).m_eDestEnc));
+                RTL_TEXTENCODING_UTF8));
             rWrt.Strm().WriteOString( sTmp );
             bWritten = true;
         }
@@ -496,7 +500,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
                 // characters not contained in the destination encoding are
                 // lost!
                 OString sTmp(OUStringToOString(sComment,
-                    static_cast<SwHTMLWriter&>(rWrt).m_eDestEnc));
+                    RTL_TEXTENCODING_UTF8));
                 rWrt.Strm().WriteOString( sTmp );
                 bWritten = true;
             }
@@ -510,7 +514,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
             OString sOut =
                 "<" OOO_STRING_SVTOOLS_HTML_comment
                 " " +
-                OUStringToOString(sComment, static_cast<SwHTMLWriter&>(rWrt).m_eDestEnc) +
+                OUStringToOString(rtl::encodeForXml(sComment), RTL_TEXTENCODING_UTF8) +
                 " -->";
             rWrt.Strm().WriteOString( sOut );
         }
@@ -531,7 +535,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
         // otherwise is the script content itself. Since only JavaScript
         // is in fields, it must be JavaScript ...:)
         HTMLOutFuncs::OutScript( rWrt.Strm(), rWrt.GetBaseURL(), aContents, rType, JAVASCRIPT,
-                                 aURL, nullptr, nullptr, rHTMLWrt.m_eDestEnc, &rHTMLWrt.m_aNonConvertableCharacters );
+                                 aURL, nullptr, nullptr );
 
         if( rHTMLWrt.m_bLFPossible )
             rHTMLWrt.OutNewLine( true );
@@ -540,10 +544,11 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
     {
         const SwTextField *pTextField = rField.GetTextField();
         OSL_ENSURE( pTextField, "Where is the txt fld?" );
-        if( pTextField )
+        if (pTextField && rWrt.m_pDoc->GetDocShell() && rWrt.m_pDoc->GetDocShell()->GetView())
         {
             // ReqIF-XHTML doesn't allow specifying a background color.
-            bool bFieldShadings = SwViewOption::IsFieldShadings() && !rHTMLWrt.mbReqIF;
+            const SwViewOption* pViewOptions = rWrt.m_pDoc->GetDocShell()->GetView()->GetWrtShell().GetViewOptions();
+            bool bFieldShadings = pViewOptions->IsFieldShadings() && !rHTMLWrt.mbReqIF;
             if (bFieldShadings)
             {
                 // If there is a text portion background started already, that should have priority.
@@ -560,10 +565,11 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
                 sOut.append(sCSS1_P_background);
                 sOut.append(": ");
 
-                Color& rColor = SwViewOption::GetFieldShadingsColor();
+                const Color& rColor = pViewOptions->GetFieldShadingsColor();
                 sOut.append(GetCSS1_Color(rColor));
                 sOut.append("\">");
-                rWrt.Strm().WriteOString(sOut.makeStringAndClear());
+                rWrt.Strm().WriteOString(sOut);
+                sOut.setLength(0);
             }
 
             OutHTML_SwField( rWrt, pField, pTextField->GetTextNode(),
@@ -571,7 +577,7 @@ Writer& OutHTML_SwFormatField( Writer& rWrt, const SfxPoolItem& rHt )
 
             if (bFieldShadings)
                 HTMLOutFuncs::Out_AsciiTag(
-                    rWrt.Strm(), OStringConcatenation(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false);
+                    rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_span), false);
         }
     }
     return rWrt;

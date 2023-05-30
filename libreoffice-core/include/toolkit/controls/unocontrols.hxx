@@ -49,6 +49,7 @@
 #include <cppuhelper/implbase5.hxx>
 #include <cppuhelper/implbase4.hxx>
 #include <cppuhelper/implbase1.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/uno3.hxx>
 #include <tools/gen.hxx>
 
@@ -125,7 +126,7 @@ private:
 public:
 
                                 UnoEditControl();
-    OUString             GetComponentServiceName() override;
+    OUString             GetComponentServiceName() const override;
     TextListenerMultiplexer&    GetTextListeners()  { return maTextListeners; }
 
     void                        ImplSetPeerProperty( const OUString& rPropName, const css::uno::Any& rVal ) override;
@@ -207,7 +208,7 @@ class UnoFileControl final : public UnoEditControl
 {
 public:
                         UnoFileControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     // css::lang::XServiceInfo
     OUString SAL_CALL getImplementationName() override;
@@ -285,7 +286,7 @@ private:
 public:
 
                         UnoButtonControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     void SAL_CALL createPeer( const css::uno::Reference< css::awt::XToolkit >& Toolkit, const css::uno::Reference< css::awt::XWindowPeer >& Parent ) override;
     void SAL_CALL dispose(  ) override;
@@ -362,7 +363,7 @@ private:
 public:
 
                             UnoImageControlControl();
-    OUString         GetComponentServiceName() override;
+    OUString         GetComponentServiceName() const override;
 
     void SAL_CALL dispose(  ) override;
 
@@ -423,7 +424,7 @@ private:
 public:
 
                             UnoRadioButtonControl();
-    OUString         GetComponentServiceName() override;
+    OUString         GetComponentServiceName() const override;
 
     void SAL_CALL createPeer( const css::uno::Reference< css::awt::XToolkit >& Toolkit, const css::uno::Reference< css::awt::XWindowPeer >& Parent ) override;
     void SAL_CALL dispose(  ) override;
@@ -501,7 +502,7 @@ private:
 public:
 
                             UnoCheckBoxControl();
-    OUString         GetComponentServiceName() override;
+    OUString         GetComponentServiceName() const override;
 
     void SAL_CALL createPeer( const css::uno::Reference< css::awt::XToolkit >& Toolkit, const css::uno::Reference< css::awt::XWindowPeer >& Parent ) override;
     void SAL_CALL dispose(  ) override;
@@ -573,7 +574,7 @@ private:
 public:
     UnoFixedHyperlinkControl();
 
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoControlBase::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -642,7 +643,7 @@ class UnoFixedTextControl final : public UnoControlBase,
 {
 public:
                         UnoFixedTextControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoControlBase::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -704,7 +705,7 @@ class UnoGroupBoxControl final : public UnoControlBase
 {
 public:
                         UnoGroupBoxControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     sal_Bool SAL_CALL isTransparent(  ) override;
 
@@ -814,7 +815,7 @@ private:
 
 protected:
     std::unique_ptr<UnoControlListBoxModel_Data>  m_xData;
-    ::comphelper::OInterfaceContainerHelper2             m_aItemListListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XItemListListener> m_aItemListListeners;
 };
 
 
@@ -830,7 +831,7 @@ class UnoListBoxControl final : public UnoListBoxControl_Base
 {
 public:
                         UnoListBoxControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     void SAL_CALL createPeer( const css::uno::Reference< css::awt::XToolkit >& Toolkit, const css::uno::Reference< css::awt::XWindowPeer >& Parent ) override;
     void SAL_CALL dispose(  ) override;
@@ -936,7 +937,7 @@ private:
 public:
 
                         UnoComboBoxControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     void SAL_CALL createPeer( const css::uno::Reference< css::awt::XToolkit >& Toolkit, const css::uno::Reference< css::awt::XWindowPeer >& Parent ) override;
     void SAL_CALL disposing( const css::lang::EventObject& Source ) override { UnoEditControl::disposing( Source ); }
@@ -1061,7 +1062,7 @@ private:
     TriState         mbLongFormat;
 public:
                             UnoDateFieldControl();
-    OUString         GetComponentServiceName() override;
+    OUString         GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoSpinFieldControl::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1137,7 +1138,7 @@ private:
 
 public:
                         UnoTimeFieldControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoSpinFieldControl::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1211,7 +1212,7 @@ private:
 
 public:
                         UnoNumericFieldControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoSpinFieldControl::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1287,7 +1288,7 @@ private:
 
 public:
                         UnoCurrencyFieldControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoSpinFieldControl::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1361,7 +1362,7 @@ class UnoPatternFieldControl final : public UnoSpinFieldControl,
 
 public:
                         UnoPatternFieldControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoSpinFieldControl::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1418,7 +1419,7 @@ class UnoProgressBarControl final : public UnoControlBase,
 {
 public:
                                 UnoProgressBarControl();
-    OUString             GetComponentServiceName() override;
+    OUString             GetComponentServiceName() const override;
 
     css::uno::Any  SAL_CALL queryInterface( const css::uno::Type & rType ) override { return UnoControlBase::queryInterface(rType); }
     css::uno::Any  SAL_CALL queryAggregation( const css::uno::Type & rType ) override;
@@ -1473,7 +1474,7 @@ class UnoFixedLineControl final : public UnoControlBase
 {
 public:
                         UnoFixedLineControl();
-    OUString     GetComponentServiceName() override;
+    OUString     GetComponentServiceName() const override;
 
     sal_Bool SAL_CALL isTransparent(  ) override;
 

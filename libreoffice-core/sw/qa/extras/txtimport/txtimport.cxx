@@ -49,7 +49,7 @@ public:
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf112191)
 {
-    load(mpTestDocumentPath, "bullets.odt");
+    createSwDoc("bullets.odt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -79,7 +79,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf112191)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf8withoutbom)
 {
-    load(mpTestDocumentPath, "UTF8WITHOUTBOM.txt");
+    createSwDoc("UTF8WITHOUTBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -92,7 +92,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf8withoutbom)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf8withbom)
 {
-    load(mpTestDocumentPath, "UTF8WITHBOM.txt");
+    createSwDoc("UTF8WITHBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -105,7 +105,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf8withbom)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16lewithoutbom)
 {
-    load(mpTestDocumentPath, "UTF16LEWITHOUTBOM.txt");
+    createSwDoc("UTF16LEWITHOUTBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -118,7 +118,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16lewithoutbom)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16lewithbom)
 {
-    load(mpTestDocumentPath, "UTF16LEWITHBOM.txt");
+    createSwDoc("UTF16LEWITHBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -129,9 +129,22 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16lewithbom)
     CPPUNIT_ASSERT_EQUAL(OUString(u"漢a'"), xPara->getString());
 }
 
+CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf92161_gb18030)
+{
+    createSwDoc("GB18030.txt");
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    CPPUNIT_ASSERT(pTextDoc);
+    SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
+    CPPUNIT_ASSERT(pDoc);
+
+    uno::Reference<text::XTextRange> xPara(getParagraph(1));
+
+    CPPUNIT_ASSERT_EQUAL(OUString(u"盖闻天地之数，有十二万九千六百岁为一元。"), xPara->getString());
+}
+
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16bewithoutbom)
 {
-    load(mpTestDocumentPath, "UTF16BEWITHOUTBOM.txt");
+    createSwDoc("UTF16BEWITHOUTBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -144,7 +157,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16bewithoutbom)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16bewithbom)
 {
-    load(mpTestDocumentPath, "UTF16BEWITHBOM.txt");
+    createSwDoc("UTF16BEWITHBOM.txt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
@@ -157,7 +170,8 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf60145_utf16bewithbom)
 
 CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf115088)
 {
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->Insert("1");
     pWrtShell->SplitNode();
@@ -166,7 +180,7 @@ CPPUNIT_TEST_FIXTURE(TxtImportTest, testTdf115088)
     pWrtShell->SelAll();
     dispatchCommand(mxComponent, ".uno:Cut", {});
     pWrtShell->Insert("test");
-    pWrtShell->Left(CRSR_SKIP_CHARS, /*bSelect=*/false, 4, /*bBasicCall=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/false, 4, /*bBasicCall=*/false);
     dispatchCommand(mxComponent, ".uno:PasteUnformatted", {});
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     OUString aActual = xTextDocument->getText()->getString().copy(0, 2);

@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -44,10 +46,12 @@ class tdf144940(UITestCase):
                     xFileName.executeAction("TYPE", mkPropertyValues({"KEYCODE":"BACKSPACE"}))
                     xFileName.executeAction("TYPE", mkPropertyValues({"TEXT": xFilePath}))
 
+            self.ui_test.wait_until_file_is_available(xFilePath)
+
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as document:
 
-                xPageStyles = document.StyleFamilies.getByIndex(1)
-                xDefaultPageStyle = xPageStyles.getByIndex(0)
+                xPageStyles = document.StyleFamilies[1]
+                xDefaultPageStyle = xPageStyles[0]
 
                 # Without the fix in place, this test would have failed with
                 # AssertionError: False is not true

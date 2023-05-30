@@ -29,11 +29,11 @@
 #include <com/sun/star/datatransfer/clipboard/XFlushableClipboard.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/toolkit/lstbox.hxx>
 #include <vcl/unohelp2.hxx>
 #include <vcl/settings.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -41,9 +41,9 @@
 namespace
 {
     /// @throws css::lang::IndexOutOfBoundsException
-    void checkIndex_Impl( sal_Int32 _nIndex, const OUString& _sText )
+    void checkIndex_Impl( sal_Int32 _nIndex, std::u16string_view _sText )
     {
-        if ( _nIndex < 0 || _nIndex > _sText.getLength() )
+        if ( _nIndex < 0 || _nIndex > static_cast<sal_Int32>(_sText.size()) )
             throw css::lang::IndexOutOfBoundsException();
     }
 }
@@ -59,13 +59,13 @@ using namespace ::com::sun::star;
 
 // Ctor() and Dtor()
 
-VCLXAccessibleListItem::VCLXAccessibleListItem(sal_Int32 _nIndexInParent, const rtl::Reference< VCLXAccessibleList >& _xParent)
+VCLXAccessibleListItem::VCLXAccessibleListItem(sal_Int32 _nIndexInParent, rtl::Reference< VCLXAccessibleList > _xParent)
     : VCLXAccessibleListItem_BASE(m_aMutex)
     , m_nIndexInParent(_nIndexInParent)
     , m_bSelected(false)
     , m_bVisible(false)
     , m_nClientId(0)
-    , m_xParent(_xParent)
+    , m_xParent(std::move(_xParent))
 {
     assert(m_xParent.is());
     ::accessibility::IComboListBoxHelper* pListBoxHelper = m_xParent->getListBoxHelper();
@@ -192,12 +192,12 @@ Reference< XAccessibleContext > SAL_CALL VCLXAccessibleListItem::getAccessibleCo
 
 // XAccessibleContext
 
-sal_Int32 SAL_CALL VCLXAccessibleListItem::getAccessibleChildCount(  )
+sal_Int64 SAL_CALL VCLXAccessibleListItem::getAccessibleChildCount(  )
 {
     return 0;
 }
 
-Reference< XAccessible > SAL_CALL VCLXAccessibleListItem::getAccessibleChild( sal_Int32 )
+Reference< XAccessible > SAL_CALL VCLXAccessibleListItem::getAccessibleChild( sal_Int64 )
 {
     return Reference< XAccessible >();
 }
@@ -209,7 +209,7 @@ Reference< XAccessible > SAL_CALL VCLXAccessibleListItem::getAccessibleParent(  
     return m_xParent;
 }
 
-sal_Int32 SAL_CALL VCLXAccessibleListItem::getAccessibleIndexInParent(  )
+sal_Int64 SAL_CALL VCLXAccessibleListItem::getAccessibleIndexInParent(  )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
     return m_nIndexInParent;
@@ -240,36 +240,36 @@ Reference< XAccessibleRelationSet > SAL_CALL VCLXAccessibleListItem::getAccessib
     return new utl::AccessibleRelationSetHelper;
 }
 
-Reference< XAccessibleStateSet > SAL_CALL VCLXAccessibleListItem::getAccessibleStateSet(  )
+sal_Int64 SAL_CALL VCLXAccessibleListItem::getAccessibleStateSet(  )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        pStateSetHelper->AddState( AccessibleStateType::TRANSIENT );
+        nStateSet |= AccessibleStateType::TRANSIENT;
 
         ::accessibility::IComboListBoxHelper* pListBoxHelper = m_xParent.is() ? m_xParent->getListBoxHelper() : nullptr;
         if (pListBoxHelper && pListBoxHelper->IsEnabled())
         {
-            pStateSetHelper->AddState( AccessibleStateType::SELECTABLE );
-            pStateSetHelper->AddState( AccessibleStateType::ENABLED );
-            pStateSetHelper->AddState( AccessibleStateType::SENSITIVE );
+            nStateSet |= AccessibleStateType::SELECTABLE;
+            nStateSet |= AccessibleStateType::ENABLED;
+            nStateSet |= AccessibleStateType::SENSITIVE;
         }
 
         if ( m_bSelected )
-            pStateSetHelper->AddState( AccessibleStateType::SELECTED );
+            nStateSet |= AccessibleStateType::SELECTED;
         if ( m_bVisible )
         {
-            pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::VISIBLE;
+            nStateSet |= AccessibleStateType::SHOWING;
         }
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 Locale SAL_CALL VCLXAccessibleListItem::getLocale(  )

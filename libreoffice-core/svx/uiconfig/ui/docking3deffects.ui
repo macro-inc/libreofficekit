@@ -993,7 +993,7 @@
                     <property name="adjustment">adjustment6</property>
                     <child internal-child="accessible">
                       <object class="AtkObject" id="slant-atkobject">
-                        <property name="AtkObject::accessible-description" translatable="yes" context="docking3deffects|extended_tip|slant">Enter an angle from 0 to 90 degrees for casting the shadow.</property>
+                        <property name="AtkObject::accessible-description" translatable="yes" context="docking3deffects|extended_tip|slant">Enter an angle from 0 to 90 degrees for an imaginary plane on which the shadow is cast.</property>
                       </object>
                     </child>
                   </object>
@@ -1231,7 +1231,6 @@
                     <property name="valign">center</property>
                     <property name="xalign">0</property>
                     <property name="draw-indicator">True</property>
-                    <property name="label" translatable="no"></property>
                     <child>
                       <placeholder/>
                     </child>
@@ -1470,7 +1469,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1494,7 +1492,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1513,7 +1510,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1532,7 +1528,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1551,7 +1546,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1570,7 +1564,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1589,7 +1582,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -1608,7 +1600,6 @@
                         <property name="valign">start</property>
                         <property name="xalign">0</property>
                         <property name="draw-indicator">True</property>
-                        <property name="label" translatable="no"></property>
                         <child>
                           <placeholder/>
                         </child>
@@ -2091,7 +2082,6 @@
                     <property name="hexpand">True</property>
                     <property name="xalign">0</property>
                     <property name="draw-indicator">True</property>
-                    <property name="label" translatable="no"></property>
                     <child>
                       <placeholder/>
                     </child>
@@ -2115,7 +2105,6 @@
                     <property name="hexpand">True</property>
                     <property name="xalign">0</property>
                     <property name="draw-indicator">True</property>
-                    <property name="label" translatable="no"></property>
                     <child>
                       <placeholder/>
                     </child>
@@ -2260,7 +2249,6 @@
                     <property name="hexpand">True</property>
                     <property name="xalign">0</property>
                     <property name="draw-indicator">True</property>
-                    <property name="label" translatable="no"></property>
                     <child>
                       <placeholder/>
                     </child>

@@ -32,8 +32,8 @@
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weakref.hxx>
-#include <rtl/ref.hxx>
 #include <map>
+#include <utility>
 
 
 namespace logging
@@ -64,7 +64,7 @@ namespace logging
         // </attributes>
 
     public:
-        EventLogger( const Reference< XComponentContext >& _rxContext, const OUString& _rName );
+        EventLogger( const Reference< XComponentContext >& _rxContext, OUString _aName );
 
         // XLogger
         virtual OUString SAL_CALL getName() override;
@@ -114,11 +114,11 @@ namespace logging
 
     }
 
-    EventLogger::EventLogger( const Reference< XComponentContext >& _rxContext, const OUString& _rName )
+    EventLogger::EventLogger( const Reference< XComponentContext >& _rxContext, OUString _aName )
         :m_aHandlers( m_aMutex )
         ,m_nEventNumber( 0 )
         ,m_nLogLevel( css::logging::LogLevel::OFF )
-        ,m_sName( _rName )
+        ,m_sName(std::move( _aName ))
     {
         osl_atomic_increment( &m_refCount );
         {

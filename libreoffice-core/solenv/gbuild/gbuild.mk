@@ -68,6 +68,10 @@ gb_VERBOSE := $(verbose)
 
 include $(GBUILDDIR)/Helper.mk
 
+include $(GBUILDDIR)/Conditions.mk
+
+include $(SRCDIR)/solenv/inc/langlist.mk
+
 # optional extensions that should never be essential
 ifneq ($(wildcard $(GBUILDDIR)/extensions/pre_*.mk),)
 include $(wildcard $(GBUILDDIR)/extensions/pre_*.mk)
@@ -146,6 +150,13 @@ ifeq ($(gb_ENABLE_SYMBOLS_FOR),no)
 gb_ENABLE_SYMBOLS_FOR :=
 endif
 
+# Detect whether symbols should be enabled for the given gbuild target.
+# enable if: no "-TARGET" defined AND [module is enabled OR "TARGET" defined]
+gb_target_symbols_enabled = \
+ $(and $(if $(filter -$(1),$(ENABLE_SYMBOLS_FOR)),,$(true)),\
+       $(or $(gb_Module_CURRENTMODULE_SYMBOLS_ENABLED),\
+            $(filter $(1),$(ENABLE_SYMBOLS_FOR))))
+
 ifeq ($(BLOCK_PCH),)
 gb_ENABLE_PCH := $(ENABLE_PCH)
 else
@@ -183,7 +194,10 @@ endif
 
 include $(GBUILDDIR)/ExternalExecutable.mk
 include $(GBUILDDIR)/TargetLocations.mk
-include $(GBUILDDIR)/Tempfile.mk
+
+define gb_var2file
+$(file >$(1),$(2))$(1)
+endef
 
 $(eval $(call gb_Helper_init_registries))
 include $(SRCDIR)/Repository.mk
@@ -192,6 +206,8 @@ $(eval $(call gb_Helper_collect_knownlibs))
 
 gb_Library_DLLPOSTFIX := lo
 gb_RUN_CONFIGURE :=
+
+gb_CONFIGURE_PLATFORMS := --build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)
 
 # Include platform/cpu/compiler specific config/definitions
 
@@ -219,10 +235,6 @@ gb_GLOBALDEFS := \
 	$(gb_OSDEFS) \
 	$(gb_COMPILERDEFS) \
 	$(gb_CPUDEFS) \
-
-ifeq ($(ENABLE_WASM_STRIP),TRUE)
-gb_GLOBALDEFS += -DENABLE_WASM_STRIP
-endif
 
 ifeq ($(gb_ENABLE_DBGUTIL),$(true))
 gb_GLOBALDEFS += -DDBG_UTIL
@@ -283,7 +295,6 @@ gb_TEST_ENV_VARS += SAL_DISABLE_SYNCHRONOUS_PRINTER_DETECTION=1
 ifeq (,$(SAL_USE_VCLPLUGIN))
 gb_TEST_ENV_VARS += SAL_USE_VCLPLUGIN=svp
 endif
-gb_TEST_ENV_VARS += UNO_HOME=file://$$I/program
 
 # This is used to detect whether LibreOffice is being built (as opposed to building
 # 3rd-party code). Used for tag deprecation for API we want to

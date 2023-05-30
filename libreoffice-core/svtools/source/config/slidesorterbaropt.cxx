@@ -26,6 +26,7 @@
 
 #include <comphelper/lok.hxx>
 #include <comphelper/sequence.hxx>
+#include <mutex>
 
 using namespace ::utl;
 using namespace ::osl;
@@ -46,6 +47,13 @@ constexpr OUStringLiteral PROPERTYNAME_VISIBLE_SLIDESORTERVIEW = u"SlideSorterVi
 #define PROPERTYHANDLE_VISIBLE_SLIDESORTERVIEW 4
 constexpr OUStringLiteral PROPERTYNAME_VISIBLE_DRAWVIEW = u"DrawView";
 #define PROPERTYHANDLE_VISIBLE_DRAWVIEW        5
+
+static std::mutex & GetInitMutex()
+{
+    static std::mutex theSvtSlideSorterBarOptionsMutex;
+    return theSvtSlideSorterBarOptionsMutex;
+}
+
 
 class SvtSlideSorterBarOptions_Impl : public ConfigItem
 {
@@ -308,7 +316,7 @@ void SvtSlideSorterBarOptions_Impl::ImplCommit()
 Sequence< OUString > SvtSlideSorterBarOptions_Impl::GetPropertyNames()
 {
     // Build list of configuration key names.
-    const OUString pProperties[] =
+    return
     {
         PROPERTYNAME_VISIBLE_IMPRESSVIEW,
         PROPERTYNAME_VISIBLE_OUTLINEVIEW,
@@ -317,9 +325,6 @@ Sequence< OUString > SvtSlideSorterBarOptions_Impl::GetPropertyNames()
         PROPERTYNAME_VISIBLE_SLIDESORTERVIEW,
         PROPERTYNAME_VISIBLE_DRAWVIEW,
     };
-
-    // Initialize return sequence with these list and run
-    return Sequence< OUString >( pProperties, SAL_N_ELEMENTS( pProperties ) );
 }
 
 void SvtSlideSorterBarOptions_Impl::SetVisibleViewImpl( bool& bVisibleView, bool bVisible )
@@ -338,7 +343,7 @@ namespace {
 SvtSlideSorterBarOptions::SvtSlideSorterBarOptions()
 {
     // Global access, must be guarded (multithreading!).
-    MutexGuard aGuard( GetInitMutex() );
+    std::unique_lock aGuard( GetInitMutex() );
 
     m_pImpl = g_pSlideSorterBarOptions.lock();
     if( !m_pImpl )
@@ -351,7 +356,7 @@ SvtSlideSorterBarOptions::SvtSlideSorterBarOptions()
 SvtSlideSorterBarOptions::~SvtSlideSorterBarOptions()
 {
     // Global access, must be guarded (multithreading!)
-    MutexGuard aGuard( GetInitMutex() );
+    std::unique_lock aGuard( GetInitMutex() );
 
     m_pImpl.reset();
 }
@@ -415,12 +420,6 @@ bool SvtSlideSorterBarOptions::GetVisibleDrawView() const
 void SvtSlideSorterBarOptions::SetVisibleDrawView(bool bVisible)
 {
     m_pImpl->SetVisibleDrawView( bVisible );
-}
-
-Mutex & SvtSlideSorterBarOptions::GetInitMutex()
-{
-    static osl::Mutex theSvtSlideSorterBarOptionsMutex;
-    return theSvtSlideSorterBarOptionsMutex;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

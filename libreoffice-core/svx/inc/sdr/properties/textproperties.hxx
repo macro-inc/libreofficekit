@@ -40,8 +40,7 @@ namespace sdr::properties
             virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
 
             // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
-            virtual bool WantItemSetInItemSetChanged() const override final { return true; }
+            virtual void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich) override;
 
             /// Get the TextProvider related to our SdrObject
             virtual const svx::ITextProvider& getTextProvider() const;
@@ -60,7 +59,8 @@ namespace sdr::properties
             virtual std::unique_ptr<BaseProperties> Clone(SdrObject& rObj) const override;
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // force default attributes for a specific object type, called from
             // DefaultProperties::GetObjectItemSet() if a new ItemSet is created
@@ -79,6 +79,7 @@ namespace sdr::properties
 
             // #i101556# versioning support
             virtual sal_uInt32 getVersion() const override;
+            void increaseVersion() { maVersion++; }
         };
 } // end of namespace sdr::properties
 

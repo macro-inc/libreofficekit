@@ -27,7 +27,7 @@
 #include "xmlSection.hxx"
 #include "xmlEnums.hxx"
 #include "xmlFunction.hxx"
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <com/sun/star/sdb/CommandType.hpp>
 #include "xmlMasterFields.hxx"
@@ -188,7 +188,7 @@ void OXMLReport::endFastElement(sal_Int32)
     Reference< XFunctions > xFunctions = m_xReportDefinition->getFunctions();
     const ORptFilter::TGroupFunctionMap& aFunctions = m_rImport.getFunctions();
     for (const auto& rEntry : aFunctions)
-        xFunctions->insertByIndex(xFunctions->getCount(),uno::makeAny(rEntry.second));
+        xFunctions->insertByIndex(xFunctions->getCount(),uno::Any(rEntry.second));
 
     if ( !m_aMasterFields.empty() )
         m_xReportDefinition->setMasterFields(Sequence< OUString>(&*m_aMasterFields.begin(),m_aMasterFields.size()));

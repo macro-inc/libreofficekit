@@ -36,6 +36,7 @@
 #include <sectfrm.hxx>
 #include <ftnfrm.hxx>
 #include <pagefrm.hxx>
+#include <IDocumentSettingAccess.hxx>
 
 #undef WIDOWTWIPS
 
@@ -135,6 +136,48 @@ bool SwTextFrameBreak::IsInside( SwTextMargin const &rLine ) const
         // If everything is inside the existing frame the result is true;
         bFit = nDiff >= 0;
 
+        // If it didn't fit, try to add the space of footnotes that are anchored
+        // in frames below (in next-chain of) this one as they will need to move
+        // forward anyway if this frame is split.
+        // - except if in tables (need to check if row is splittable?
+        //   also, multiple columns looks difficult)
+        if (!bFit && !m_pFrame->IsInTab())
+        {
+            if (SwFootnoteBossFrame const*const pBoss = m_pFrame->FindFootnoteBossFrame())
+            {
+                if (SwFootnoteContFrame const*const pCont = pBoss->FindFootnoteCont())
+                {
+                    SwContentFrame const* pContent(m_pFrame);
+                    while (pContent->HasFollow())
+                    {
+                        pContent = pContent->GetFollow();
+                    }
+                    // start with first text frame that isn't a follow
+                    // (ignoring Keep attribute for now, MakeAll should handle it?)
+                    pContent = pContent->GetNextContentFrame();
+                    ::std::set<SwContentFrame const*> nextFrames;
+                    while (pBoss->IsAnLower(pContent))
+                    {
+                        nextFrames.insert(pContent);
+                        pContent = pContent->GetNextContentFrame();
+                    }
+                    SwTwips nNextFootnotes(0);
+                    for (SwFootnoteFrame const* pFootnote = static_cast<SwFootnoteFrame const*>(pCont->Lower());
+                         pFootnote != nullptr;
+                         pFootnote = static_cast<SwFootnoteFrame const*>(pFootnote->GetNext()))
+                    {
+                        SwContentFrame const*const pAnchor = pFootnote->GetRef();
+                        if (nextFrames.find(pAnchor) != nextFrames.end())
+                        {
+                            nNextFootnotes += aRectFnSet.GetHeight(pFootnote->getFrameArea());
+                        }
+                    }
+                    bFit = 0 <= nDiff + nNextFootnotes;
+                    SAL_INFO_IF(bFit, "sw.core", "no text frame break because ignoring "
+                            << nNextFootnotes << " footnote height");
+                }
+            }
+        }
         if (!bFit && rLine.MaybeHasHints() && m_pFrame->GetFollow()
             // if using same footnote container as the follow, pointless to try?
             && m_pFrame->FindFootnoteBossFrame() != m_pFrame->GetFollow()->FindFootnoteBossFrame())
@@ -267,7 +310,17 @@ WidowsAndOrphans::WidowsAndOrphans( SwTextFrame *pNewFrame, const SwTwips nRst,
 
     bool bResetFlags = false;
 
-    if ( m_pFrame->IsInTab() )
+    bool bWordTableCell = false;
+    if (m_pFrame->IsInFly())
+    {
+        // Enable widow / orphan control in Word-style table cells in split rows, at least inside
+        // flys.
+        const SwDoc& rDoc = m_pFrame->GetTextNodeForParaProps()->GetDoc();
+        const IDocumentSettingAccess& rIDSA = rDoc.getIDocumentSettingAccess();
+        bWordTableCell = rIDSA.get(DocumentSettingId::TABLE_ROW_KEEP);
+    }
+
+    if ( m_pFrame->IsInTab() && !bWordTableCell )
     {
         // For compatibility reasons, we disable Keep/Widows/Orphans
         // inside splittable row frames:
@@ -477,13 +530,37 @@ bool WidowsAndOrphans::FindWidows( SwTextFrame *pFrame, SwTextMargin &rLine )
         }
         if( nLines <= nNeed )
             return false;
+
+        if (pFrame->IsInTab())
+        {
+            const SwFrame* pRow = pFrame;
+            while (pRow && !pRow->IsRowFrame())
+            {
+                pRow = pRow->GetUpper();
+            }
+
+            if (pRow->HasFixSize())
+            {
+                // This is a follow frame and our side is fixed.
+                const SwAttrSet& rSet = pFrame->GetTextNodeForParaProps()->GetSwAttrSet();
+                const SvxOrphansItem& rOrph = rSet.GetOrphans();
+                if (nLines <= rOrph.GetValue())
+                {
+                    // If the master gives us a line as part of widow control, then its orphan
+                    // control will move everything to the follow, which is worse than having no
+                    // widow / orphan control at all.  Don't send a Widows prepare hint, in this
+                    // case.
+                    return true;
+                }
+            }
+        }
     }
 
     pMaster->Prepare( PrepareHint::Widows, static_cast<void*>(&nNeed) );
     return true;
 }
 
-bool WidowsAndOrphans::WouldFit( SwTextMargin &rLine, SwTwips &rMaxHeight, bool bTst )
+bool WidowsAndOrphans::WouldFit( SwTextMargin &rLine, SwTwips &rMaxHeight, bool bTst, bool bMoveBwd )
 {
     // Here it does not matter, if pFrame is swapped or not.
     // IsInside() takes care of itself
@@ -500,11 +577,34 @@ bool WidowsAndOrphans::WouldFit( SwTextMargin &rLine, SwTwips &rMaxHeight, bool 
     rLine.Top();
     SwTwips nLineSum = rLine.GetLineHeight();
 
-    while( nMinLines > rLine.GetLineNr() )
+    // tdf#146500 for MoveBwd(), want at least 1 line with non-fly
+    bool hasNonFly(!bMoveBwd);
+    while (nMinLines > rLine.GetLineNr() || !hasNonFly)
     {
         if( !rLine.NextLine() )
-            return false;
+        {
+            if (nMinLines > rLine.GetLineNr())
+                return false;
+            else
+                break;
+        }
         nLineSum += rLine.GetLineHeight();
+        for (SwLinePortion const* pPortion = rLine.GetCurr()->GetFirstPortion();
+                !hasNonFly && pPortion; pPortion = pPortion->GetNextPortion())
+        {
+            switch (pPortion->GetWhichPor())
+            {
+                case PortionType::Fly:
+                case PortionType::Glue:
+                case PortionType::Margin:
+                    break;
+                default:
+                {
+                    hasNonFly = true;
+                    break;
+                }
+            }
+        }
     }
 
     // We do not fit

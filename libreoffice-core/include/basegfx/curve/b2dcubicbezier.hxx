@@ -42,7 +42,6 @@ namespace basegfx
         B2DCubicBezier();
         B2DCubicBezier(const B2DCubicBezier& rBezier);
         B2DCubicBezier(const B2DPoint& rStart, const B2DPoint& rControlPointA, const B2DPoint& rControlPointB, const B2DPoint& rEnd);
-        ~B2DCubicBezier();
 
         // assignment operator
         B2DCubicBezier& operator=(const B2DCubicBezier& rBezier);
@@ -79,10 +78,10 @@ namespace basegfx
         double getLength(double fDeviation = 0.01) const;
 
         // get distance between start and end point
-        double getEdgeLength() const;
+        SAL_DLLPRIVATE double getEdgeLength() const;
 
         // get length of control polygon
-        double getControlPolygonLength() const;
+        SAL_DLLPRIVATE double getControlPolygonLength() const;
 
         // data interface
         const B2DPoint& getStartPoint() const { return maStartPoint; }
@@ -116,13 +115,13 @@ namespace basegfx
             and the end point
             #i37443# allow the criteria to get unsharp in recursions
         */
-        void adaptiveSubdivideByAngle(B2DPolygon& rTarget, double fAngleBound) const;
+        SAL_DLLPRIVATE void adaptiveSubdivideByAngle(B2DPolygon& rTarget, double fAngleBound) const;
 
         /** #i37443# adaptive subdivide by nCount subdivisions
             no start point is added, but all necessary created edges
             and the end point
         */
-        void adaptiveSubdivideByCount(B2DPolygon& rTarget, sal_uInt32 nCount) const;
+        SAL_DLLPRIVATE void adaptiveSubdivideByCount(B2DPolygon& rTarget, sal_uInt32 nCount) const;
 
         /** Subdivide cubic bezier segment.
 
@@ -144,21 +143,24 @@ namespace basegfx
             @param fDistanceBound
             Bound on the maximal distance of the approximation to the
             true curve.
+
+            @param nRecurseLimit
+            Bound on recursion for the bezier case.
         */
-        void adaptiveSubdivideByDistance(B2DPolygon& rTarget, double fDistanceBound) const;
+        void adaptiveSubdivideByDistance(B2DPolygon& rTarget, double fDistanceBound, int nRecurseLimit = 30) const;
 
         // get point at given relative position
         B2DPoint interpolatePoint(double t) const;
 
         // calculate the smallest distance from given point to this cubic bezier segment
         // and return the value. The relative position on the segment is returned in rCut.
-        double getSmallestDistancePointToBezierSegment(const B2DPoint& rTestPoint, double& rCut) const;
+        SAL_DLLPRIVATE double getSmallestDistancePointToBezierSegment(const B2DPoint& rTestPoint, double& rCut) const;
 
         // do a split at position t and fill both resulting segments
         void split(double t, B2DCubicBezier* pBezierA, B2DCubicBezier* pBezierB) const;
 
         // extract snippet from fStart to fEnd from this bezier
-        B2DCubicBezier snippet(double fStart, double fEnd) const;
+        SAL_DLLPRIVATE B2DCubicBezier snippet(double fStart, double fEnd) const;
 
         // get range including control points
         B2DRange getRange() const;
@@ -172,7 +174,7 @@ namespace basegfx
             @return
             Returns true if there was at least one extremum found
         */
-        bool getMinimumExtremumPosition(double& rfResult) const;
+        SAL_DLLPRIVATE bool getMinimumExtremumPosition(double& rfResult) const;
 
         /** Get all extremum pos of this segment
 
@@ -186,13 +188,13 @@ namespace basegfx
             anymore. Since there is an upper maximum of 4 values, it makes
             sense to use reserve(4) at the vector as preparation.
         */
-        void getAllExtremumPositions(::std::vector< double >& rResults) const;
+        SAL_DLLPRIVATE void getAllExtremumPositions(::std::vector< double >& rResults) const;
 
         /// apply transformation given in matrix form
         void transform(const basegfx::B2DHomMatrix& rMatrix);
 
         /// fround content
-        void fround();
+        SAL_DLLPRIVATE void fround();
     };
 } // end of namespace basegfx
 

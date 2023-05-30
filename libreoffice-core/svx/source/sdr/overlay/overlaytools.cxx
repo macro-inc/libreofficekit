@@ -23,11 +23,12 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonHatchPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
@@ -57,8 +58,8 @@ OverlayStaticRectanglePrimitive::OverlayStaticRectanglePrimitive(
 void OverlayStaticRectanglePrimitive::create2DDecomposition(Primitive2DContainer& rContainer, const geometry::ViewInformation2D& /*rViewInformation*/) const
 {
     Primitive2DContainer aPrimitive2DSequence;
-    const double fHalfWidth = maSize.getX() * getDiscreteUnit() / 2.0;
-    const double fHalfHeight = maSize.getY() * getDiscreteUnit() / 2.0;
+    const double fHalfWidth = maSize.getWidth() * getDiscreteUnit() / 2.0;
+    const double fHalfHeight = maSize.getHeight() * getDiscreteUnit() / 2.0;
 
     basegfx::B2DRange aRange(
         maPosition.getX() - fHalfWidth, maPosition.getY() - fHalfHeight,
@@ -81,7 +82,7 @@ void OverlayStaticRectanglePrimitive::create2DDecomposition(Primitive2DContainer
 
         // create fill primitive
         const Primitive2DReference aFill(
-            new PolyPolygonColorPrimitive2D(aPolyPolygon, maFillColor));
+            new PolyPolygonColorPrimitive2D(std::move(aPolyPolygon), maFillColor));
 
         aPrimitive2DSequence = Primitive2DContainer(2);
         aPrimitive2DSequence[0] = aFill;
@@ -99,7 +100,7 @@ void OverlayStaticRectanglePrimitive::create2DDecomposition(Primitive2DContainer
         }
     }
 
-    rContainer.insert(rContainer.end(), aPrimitive2DSequence.begin(), aPrimitive2DSequence.end());
+    rContainer.append(std::move(aPrimitive2DSequence));
 }
 
 bool OverlayStaticRectanglePrimitive::operator==(const BasePrimitive2D& rPrimitive) const
@@ -183,7 +184,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
             rContainer.push_back(
                 new BitmapPrimitive2D(
-                    VCLUnoHelper::CreateVCLXBitmap(getBitmapEx()),
+                    getBitmapEx(),
                     aTransform));
         }
 
@@ -247,7 +248,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
             rContainer.push_back(
                 new PolygonMarkerPrimitive2D(
-                    aPolygon,
+                    std::move(aPolygon),
                     getRGBColorA(),
                     getRGBColorB(),
                     getDiscreteDashLength()));
@@ -297,69 +298,46 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
             if(!aInnerRange.isEmpty() && basegfx::fTools::more(getDiscreteUnit(), 0.0) && getTransparence() <= 1.0)
             {
-                basegfx::B2DRange aOuterRange(getObjectRange());
-
-                // grow/shrink inner/outer polygons
-                aOuterRange.grow(getDiscreteUnit() * getDiscreteGrow());
-                aInnerRange.grow(getDiscreteUnit() * -getDiscreteShrink());
-
-                // convert to polygons
-                const double fFullGrow(getDiscreteGrow() + getDiscreteShrink());
-                const double fRelativeRadiusX(fFullGrow / aOuterRange.getWidth());
-                const double fRelativeRadiusY(fFullGrow / aOuterRange.getHeight());
-                basegfx::B2DPolygon aOuterPolygon(
-                    basegfx::utils::createPolygonFromRect(
-                        aOuterRange,
-                        fRelativeRadiusX,
-                        fRelativeRadiusY));
-                basegfx::B2DPolygon aInnerPolygon(
-                    basegfx::utils::createPolygonFromRect(
-                        aInnerRange));
-
-                // apply evtl. existing rotation
-                if(!basegfx::fTools::equalZero(getRotation()))
+                if (!Application::GetSettings().GetStyleSettings().GetHighContrastMode())
                 {
-                    const basegfx::B2DHomMatrix aTransform(basegfx::utils::createRotateAroundPoint(
-                        getObjectRange().getMinX(), getObjectRange().getMinY(), getRotation()));
+                    basegfx::B2DRange aOuterRange(aInnerRange);
+                    // grow/shrink inner/outer polygons
+                    aOuterRange.grow(getDiscreteUnit() * getDiscreteGrow());
+                    aInnerRange.grow(getDiscreteUnit() * -getDiscreteShrink());
 
-                    aOuterPolygon.transform(aTransform);
-                    aInnerPolygon.transform(aTransform);
-                }
+                    // convert to polygons
+                    const double fFullGrow(getDiscreteGrow() + getDiscreteShrink());
+                    const double fRelativeRadiusX(fFullGrow / aOuterRange.getWidth());
+                    const double fRelativeRadiusY(fFullGrow / aOuterRange.getHeight());
+                    basegfx::B2DPolygon aOuterPolygon(
+                        basegfx::utils::createPolygonFromRect(
+                            aOuterRange,
+                            fRelativeRadiusX,
+                            fRelativeRadiusY));
+                    basegfx::B2DPolygon aInnerPolygon(
+                        basegfx::utils::createPolygonFromRect(
+                            aInnerRange));
 
-                // create filled primitive
-                basegfx::B2DPolyPolygon aPolyPolygon;
+                    // apply evtl. existing rotation
+                    if(!basegfx::fTools::equalZero(getRotation()))
+                    {
+                        const basegfx::B2DHomMatrix aTransform(basegfx::utils::createRotateAroundPoint(
+                            getObjectRange().getMinX(), getObjectRange().getMinY(), getRotation()));
 
-                aPolyPolygon.append(aOuterPolygon);
-                aPolyPolygon.append(aInnerPolygon);
+                        aOuterPolygon.transform(aTransform);
+                        aInnerPolygon.transform(aTransform);
+                    }
 
-                if(Application::GetSettings().GetStyleSettings().GetHighContrastMode())
-                {
-                    // for high contrast, use hatch
-                    const basegfx::BColor aHighContrastLineColor(Application::GetSettings().GetStyleSettings().GetFontColor().getBColor());
-                    const basegfx::BColor aEmptyColor(0.0, 0.0, 0.0);
-                    const double fHatchRotation(basegfx::deg2rad(45));
-                    const double fDiscreteHatchDistance(3.0);
-                    const drawinglayer::attribute::FillHatchAttribute aFillHatchAttribute(
-                        drawinglayer::attribute::HatchStyle::Single,
-                        fDiscreteHatchDistance * getDiscreteUnit(),
-                        fHatchRotation - getRotation(),
-                        aHighContrastLineColor,
-                        3, // same default as VCL, a minimum of three discrete units (pixels) offset
-                        false);
-                    const Primitive2DReference aHatch(
-                        new PolyPolygonHatchPrimitive2D(
-                            aPolyPolygon,
-                            aEmptyColor,
-                            aFillHatchAttribute));
+                    // create filled primitive
+                    basegfx::B2DPolyPolygon aPolyPolygon;
 
-                    aRetval = Primitive2DContainer { aHatch };
-                }
-                else
-                {
+                    aPolyPolygon.append(aOuterPolygon);
+                    aPolyPolygon.append(aInnerPolygon);
+
                     // create fill primitive
                     const Primitive2DReference aFill(
                         new PolyPolygonColorPrimitive2D(
-                            aPolyPolygon,
+                            std::move(aPolyPolygon),
                             getColor()));
 
                     aRetval = Primitive2DContainer { aFill };
@@ -375,9 +353,32 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
                         aRetval = Primitive2DContainer { aFillTransparent };
                     }
                 }
+                else
+                {
+                    basegfx::B2DPolygon aInnerPolygon(
+                        basegfx::utils::createPolygonFromRect(
+                            aInnerRange));
+
+                    // apply evtl. existing rotation
+                    if(!basegfx::fTools::equalZero(getRotation()))
+                    {
+                        const basegfx::B2DHomMatrix aTransform(basegfx::utils::createRotateAroundPoint(
+                            getObjectRange().getMinX(), getObjectRange().getMinY(), getRotation()));
+
+                        aInnerPolygon.transform(aTransform);
+                    }
+
+                    // for high contrast, use a thick stroke
+                    const basegfx::BColor aHighContrastLineColor(Application::GetSettings().GetStyleSettings().GetHighlightColor().getBColor());
+                    const attribute::LineAttribute aLineAttribute(aHighContrastLineColor, getDiscreteUnit() * getDiscreteGrow());
+
+                    const Primitive2DReference aStroke(new PolygonStrokePrimitive2D(aInnerPolygon, aLineAttribute));
+
+                    aRetval = Primitive2DContainer { aStroke };
+                }
             }
 
-            rContainer.insert(rContainer.end(), aRetval.begin(), aRetval.end());
+            rContainer.append(std::move(aRetval));
         }
 
         bool OverlayRectanglePrimitive::operator==( const BasePrimitive2D& rPrimitive ) const
@@ -435,7 +436,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
                     rContainer.push_back(
                         new PolygonMarkerPrimitive2D(
-                            aLine,
+                            std::move(aLine),
                             getRGBColorA(),
                             getRGBColorB(),
                             getDiscreteDashLength()));
@@ -451,7 +452,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
                     rContainer.push_back(
                         new PolygonMarkerPrimitive2D(
-                            aLine,
+                            std::move(aLine),
                             getRGBColorA(),
                             getRGBColorB(),
                             getDiscreteDashLength()));
@@ -468,7 +469,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
                     rContainer.push_back(
                         new PolygonMarkerPrimitive2D(
-                            aLineA,
+                            std::move(aLineA),
                             getRGBColorA(),
                             getRGBColorB(),
                             getDiscreteDashLength()));
@@ -478,7 +479,7 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
 
                     rContainer.push_back(
                         new PolygonMarkerPrimitive2D(
-                            aLineB,
+                            std::move(aLineB),
                             getRGBColorA(),
                             getRGBColorB(),
                             getDiscreteDashLength()));
@@ -529,50 +530,50 @@ sal_uInt32 OverlayStaticRectanglePrimitive::getPrimitive2DID() const
             if(getViewport().isEmpty())
                 return;
 
-            basegfx::B2DPolygon aLine;
 
             // Left lines
-            aLine.append(basegfx::B2DPoint(getViewport().getMinX(), getRollingRectangle().getMinY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMinY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine1;
+            aLine1.append(basegfx::B2DPoint(getViewport().getMinX(), getRollingRectangle().getMinY()));
+            aLine1.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMinY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine1), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getViewport().getMinX(), getRollingRectangle().getMaxY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMaxY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine2;
+            aLine2.append(basegfx::B2DPoint(getViewport().getMinX(), getRollingRectangle().getMaxY()));
+            aLine2.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMaxY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine2), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
             // Right lines
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMinY()));
-            aLine.append(basegfx::B2DPoint(getViewport().getMaxX(), getRollingRectangle().getMinY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine3;
+            aLine3.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMinY()));
+            aLine3.append(basegfx::B2DPoint(getViewport().getMaxX(), getRollingRectangle().getMinY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine3), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMaxY()));
-            aLine.append(basegfx::B2DPoint(getViewport().getMaxX(), getRollingRectangle().getMaxY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine4;
+            aLine4.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMaxY()));
+            aLine4.append(basegfx::B2DPoint(getViewport().getMaxX(), getRollingRectangle().getMaxY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine4), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
             // Top lines
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getViewport().getMinY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMinY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine5;
+            aLine5.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getViewport().getMinY()));
+            aLine5.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMinY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine5), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getViewport().getMinY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMinY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine6;
+            aLine6.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getViewport().getMinY()));
+            aLine6.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMinY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine6), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
             // Bottom lines
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMaxY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getViewport().getMaxY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine7;
+            aLine7.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getRollingRectangle().getMaxY()));
+            aLine7.append(basegfx::B2DPoint(getRollingRectangle().getMinX(), getViewport().getMaxY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine7), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
-            aLine.clear();
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMaxY()));
-            aLine.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getViewport().getMaxY()));
-            rContainer.push_back(new PolygonMarkerPrimitive2D(aLine, getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
+            basegfx::B2DPolygon aLine8;
+            aLine8.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getRollingRectangle().getMaxY()));
+            aLine8.append(basegfx::B2DPoint(getRollingRectangle().getMaxX(), getViewport().getMaxY()));
+            rContainer.push_back(new PolygonMarkerPrimitive2D(std::move(aLine8), getRGBColorA(), getRGBColorB(), getDiscreteDashLength()));
 
         }
 

@@ -35,6 +35,7 @@
 #include <com/sun/star/awt/PosSize.hpp>
 #include <com/sun/star/awt/XView.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/awt/InvalidateStyle.hpp>
 #include <com/sun/star/util/XModeChangeListener.hpp>
@@ -46,15 +47,18 @@
 #include <vcl/canvastools.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
+#include <comphelper/lok.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <drawinglayer/primitive2d/controlprimitive2d.hxx>
+
+#include <utility>
 
 /*
 
@@ -116,6 +120,7 @@ namespace sdr::contact {
     using ::com::sun::star::awt::XView;
     using ::com::sun::star::awt::WindowEvent;
     using ::com::sun::star::beans::XPropertySet;
+    using ::com::sun::star::beans::XPropertySetInfo;
     using ::com::sun::star::lang::XComponent;
     using ::com::sun::star::awt::XWindowPeer;
     using ::com::sun::star::beans::XPropertyChangeListener;
@@ -276,6 +281,10 @@ namespace sdr::contact {
     static void adjustControlGeometry_throw( const ControlHolder& _rControl, const tools::Rectangle& _rLogicBoundingRect,
         const basegfx::B2DHomMatrix& _rViewTransformation, const ::basegfx::B2DHomMatrix& _rZoomLevelNormalization )
     {
+        // In the LOK case, control geometry is handled by LokControlHandler
+        if (comphelper::LibreOfficeKit::isActive())
+            return;
+
         OSL_PRECOND( _rControl.is(), "UnoControlContactHelper::adjustControlGeometry_throw: illegal control!" );
         if ( !_rControl.is() )
             return;
@@ -551,7 +560,7 @@ namespace sdr::contact {
             @precond
                 We're not disposed.
         */
-        bool    getUnoObject( SdrUnoObj*& _out_rpObject ) const;
+        SdrUnoObj*    getUnoObject() const;
 
         /** ensures that we have an ->XControl
 
@@ -799,8 +808,8 @@ namespace sdr::contact {
             ) const override;
 
     public:
-        explicit LazyControlCreationPrimitive2D( const ::rtl::Reference< ViewObjectContactOfUnoControl_Impl >& _pVOCImpl )
-            :m_pVOCImpl( _pVOCImpl )
+        explicit LazyControlCreationPrimitive2D( ::rtl::Reference< ViewObjectContactOfUnoControl_Impl > _pVOCImpl )
+            :m_pVOCImpl(std::move( _pVOCImpl ))
         {
             ENSURE_OR_THROW( m_pVOCImpl.is(), "Illegal argument." );
             getTransformation( m_pVOCImpl->getViewContact(), m_aTransformation );
@@ -904,18 +913,15 @@ namespace sdr::contact {
     }
 
 
-    bool ViewObjectContactOfUnoControl_Impl::getUnoObject( SdrUnoObj*& _out_rpObject ) const
+    SdrUnoObj* ViewObjectContactOfUnoControl_Impl::getUnoObject() const
     {
         OSL_PRECOND( !impl_isDisposed_nofail(), "ViewObjectContactOfUnoControl_Impl::getUnoObject: already disposed()" );
         if ( impl_isDisposed_nofail() )
-            _out_rpObject = nullptr;
-        else
-        {
-            _out_rpObject = dynamic_cast< SdrUnoObj* >( m_pAntiImpl->GetViewContact().TryToGetSdrObject() );
-            DBG_ASSERT( _out_rpObject || !m_pAntiImpl->GetViewContact().TryToGetSdrObject(),
-                "ViewObjectContactOfUnoControl_Impl::getUnoObject: invalid SdrObject!" );
-        }
-        return ( _out_rpObject != nullptr );
+            return nullptr;
+        auto pRet = dynamic_cast< SdrUnoObj* >( m_pAntiImpl->GetViewContact().TryToGetSdrObject() );
+        DBG_ASSERT( pRet || !m_pAntiImpl->GetViewContact().TryToGetSdrObject(),
+            "ViewObjectContactOfUnoControl_Impl::getUnoObject: invalid SdrObject!" );
+        return pRet;
     }
 
 
@@ -927,8 +933,8 @@ namespace sdr::contact {
 
         try
         {
-            SdrUnoObj* pUnoObject( nullptr );
-            if ( getUnoObject( pUnoObject ) )
+            SdrUnoObj* pUnoObject = getUnoObject();
+            if ( pUnoObject )
             {
                 const tools::Rectangle aRect( pUnoObject->GetLogicRect() );
                 UnoControlContactHelper::adjustControlGeometry_throw( m_aControl, aRect, _rViewTransformation, m_aZoomLevelNormalization );
@@ -1033,8 +1039,8 @@ namespace sdr::contact {
             UnoControlContactHelper::disposeAndClearControl_nothrow( m_aControl );
         }
 
-        SdrUnoObj* pUnoObject( nullptr );
-        if ( !getUnoObject( pUnoObject ) )
+        SdrUnoObj* pUnoObject = getUnoObject();
+        if ( !pUnoObject )
             return false;
 
         ControlHolder aControl;
@@ -1090,6 +1096,12 @@ namespace sdr::contact {
 
             Reference< css::uno::XComponentContext > xContext = ::comphelper::getProcessComponentContext();
             _out_rControl = Reference<XControl>( xContext->getServiceManager()->createInstanceWithContext(sControlServiceName, xContext), UNO_QUERY_THROW );
+
+            // tdf#150886 for calc/writer/impress make forms ignore the platform theme
+            Reference<XPropertySet> xModelProperties(xControlModel, UNO_QUERY);
+            Reference<XPropertySetInfo> xInfo = xModelProperties ? xModelProperties->getPropertySetInfo() : nullptr;
+            if (xInfo && xInfo->hasPropertyByName("StandardTheme"))
+                xModelProperties->setPropertyValue("StandardTheme", Any(!_rUnoObject.getSdrModelFromSdrObject().AreControlsThemed()));
 
             // knit the model and the control
             _out_rControl.setModel( xControlModel );
@@ -1159,8 +1171,8 @@ namespace sdr::contact {
         if ( !impl_getPageView_nothrow( pPageView ) )
             return;
 
-        SdrUnoObj* pUnoObject( nullptr );
-        if ( !getUnoObject( pUnoObject ) )
+        SdrUnoObj* pUnoObject = getUnoObject();
+        if ( !pUnoObject )
             return;
 
         SdrPageViewAccess aPVAccess( *pPageView );
@@ -1273,8 +1285,8 @@ namespace sdr::contact {
 
     bool ViewObjectContactOfUnoControl_Impl::isPrintableControl() const
     {
-        SdrUnoObj* pUnoObject( nullptr );
-        if ( !getUnoObject( pUnoObject ) )
+        SdrUnoObj* pUnoObject = getUnoObject();
+        if ( !pUnoObject )
             return false;
 
         bool bIsPrintable = false;
@@ -1550,15 +1562,16 @@ namespace sdr::contact {
             // use the default mechanism. This will create a ControlPrimitive2D without
             // handing over a XControl. If not even a XControlModel exists, it will
             // create the SdrObject fallback visualisation
-            const drawinglayer::primitive2d::Primitive2DContainer& aTmp = rViewContactOfUnoControl.getViewIndependentPrimitive2DContainer();
-            rContainer.insert(rContainer.end(), aTmp.begin(), aTmp.end());
+            rViewContactOfUnoControl.getViewIndependentPrimitive2DContainer(rContainer);
             return;
         }
 
         // create a primitive and hand over the existing xControl. This will
         // allow the primitive to not need to create another one on demand.
         rContainer.push_back( new ::drawinglayer::primitive2d::ControlPrimitive2D(
-            m_aTransformation, xControlModel, rControl.getControl() ) );
+            m_aTransformation, xControlModel, rControl.getControl(),
+            m_pVOCImpl->getViewContact().GetSdrObject().GetTitle(),
+            m_pVOCImpl->getViewContact().GetSdrObject().GetDescription()) );
     }
 
     sal_uInt32 LazyControlCreationPrimitive2D::getPrimitive2DID() const
@@ -1647,25 +1660,24 @@ namespace sdr::contact {
     }
 
 
-    drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfUnoControl::createPrimitive2DSequence(const DisplayInfo& /*rDisplayInfo*/) const
+    void ViewObjectContactOfUnoControl::createPrimitive2DSequence(const DisplayInfo& /*rDisplayInfo*/, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
     {
         if ( m_pImpl->isDisposed() )
             // our control already died.
             // TODO: Is it worth re-creating the control? Finally, this is a pathological situation, it means some instance
             // disposed the control though it doesn't own it. So, /me thinks we should not bother here.
-            return drawinglayer::primitive2d::Primitive2DContainer();
+            return;
 
         if ( GetObjectContact().getViewInformation2D().getViewTransformation().isIdentity() )
             // remove this when #i115754# is fixed
-            return drawinglayer::primitive2d::Primitive2DContainer();
+            return;
 
         // ignore existing controls which are in alive mode and manually switched to "invisible" #i102090#
         const ControlHolder& rControl( m_pImpl->getExistentControl() );
         if ( rControl.is() && !rControl.isDesignMode() && !rControl.isVisible() )
-            return drawinglayer::primitive2d::Primitive2DContainer();
+            return;
 
-        ::drawinglayer::primitive2d::Primitive2DReference xPrimitive( new LazyControlCreationPrimitive2D( m_pImpl ) );
-        return ::drawinglayer::primitive2d::Primitive2DContainer { xPrimitive };
+        rVisitor.visit( new LazyControlCreationPrimitive2D( m_pImpl ) );
     }
 
 
@@ -1768,11 +1780,11 @@ namespace sdr::contact {
     }
 
 
-    drawinglayer::primitive2d::Primitive2DContainer UnoControlPrintOrPreviewContact::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo ) const
+    void UnoControlPrintOrPreviewContact::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor ) const
     {
         if ( !m_pImpl->isPrintableControl() )
-            return drawinglayer::primitive2d::Primitive2DContainer();
-        return ViewObjectContactOfUnoControl::createPrimitive2DSequence( rDisplayInfo );
+            return;
+        ViewObjectContactOfUnoControl::createPrimitive2DSequence( rDisplayInfo, rVisitor );
     }
 
 

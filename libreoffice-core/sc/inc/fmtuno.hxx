@@ -126,7 +126,7 @@ private:
 
 public:
                             ScTableConditionalEntry() = delete;
-                            ScTableConditionalEntry(const ScCondFormatEntryItem& aItem);
+                            ScTableConditionalEntry(ScCondFormatEntryItem aItem);
     virtual                 ~ScTableConditionalEntry() override;
 
     void                    GetData(ScCondFormatEntryItem& rData) const;
@@ -189,7 +189,7 @@ private:
 public:
 
                             ScTableValidationObj() = delete;
-                            ScTableValidationObj(const ScDocument& rDoc, sal_uLong nKey,
+                            ScTableValidationObj(const ScDocument& rDoc, sal_uInt32 nKey,
                                                 const formula::FormulaGrammar::Grammar eGrammar);
     virtual                 ~ScTableValidationObj() override;
 

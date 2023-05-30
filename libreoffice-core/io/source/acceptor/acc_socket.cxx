@@ -21,14 +21,14 @@
 
 #include <unordered_set>
 
-#include <osl/mutex.hxx>
-#include <rtl/ustrbuf.hxx>
+#include <mutex>
 #include <rtl/ref.hxx>
 #include <com/sun/star/connection/XConnection.hpp>
 #include <com/sun/star/connection/XConnectionBroadcaster.hpp>
 #include <com/sun/star/connection/ConnectionSetupException.hpp>
 #include <com/sun/star/io/IOException.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 using namespace ::osl;
 using namespace ::cppu;
@@ -50,7 +50,7 @@ namespace io_acceptor {
 
     {
     public:
-        explicit SocketConnection( const OUString & sConnectionDescription );
+        explicit SocketConnection( OUString sConnectionDescription );
 
         virtual sal_Int32 SAL_CALL read( css::uno::Sequence< sal_Int8 >& aReadBytes,
                                          sal_Int32 nBytesToRead ) override;
@@ -70,7 +70,7 @@ namespace io_acceptor {
         oslInterlockedCount m_nStatus;
         OUString m_sDescription;
 
-        ::osl::Mutex _mutex;
+        std::mutex _mutex;
         bool     _started;
         bool     _closed;
         bool     _error;
@@ -85,7 +85,7 @@ namespace io_acceptor {
         XStreamListener_hash_set listeners;
 
         {
-            ::osl::MutexGuard guard(pCon->_mutex);
+            std::unique_lock guard(pCon->_mutex);
             if(!*notified)
             {
                 *notified = true;
@@ -130,9 +130,9 @@ namespace io_acceptor {
     }
 
 
-    SocketConnection::SocketConnection( const OUString &sConnectionDescription) :
+    SocketConnection::SocketConnection( OUString sConnectionDescription) :
         m_nStatus( 0 ),
-        m_sDescription( sConnectionDescription ),
+        m_sDescription(std::move( sConnectionDescription )),
         _started(false),
         _closed(false),
         _error(false)
@@ -253,24 +253,24 @@ namespace io_acceptor {
     // XConnectionBroadcaster
     void SAL_CALL SocketConnection::addStreamListener(const Reference<XStreamListener> & aListener)
     {
-        MutexGuard guard(_mutex);
+        std::unique_lock guard(_mutex);
 
         _listeners.insert(aListener);
     }
 
     void SAL_CALL SocketConnection::removeStreamListener(const Reference<XStreamListener> & aListener)
     {
-        MutexGuard guard(_mutex);
+        std::unique_lock guard(_mutex);
 
         _listeners.erase(aListener);
     }
 
-    SocketAcceptor::SocketAcceptor( const OUString &sSocketName,
+    SocketAcceptor::SocketAcceptor( OUString sSocketName,
                                     sal_uInt16 nPort,
                                     bool bTcpNoDelay,
-                                    const OUString &sConnectionDescription) :
-        m_sSocketName( sSocketName ),
-        m_sConnectionDescription( sConnectionDescription ),
+                                    OUString sConnectionDescription) :
+        m_sSocketName(std::move( sSocketName )),
+        m_sConnectionDescription(std::move( sConnectionDescription )),
         m_nPort( nPort ),
         m_bTcpNoDelay( bTcpNoDelay ),
         m_bClosed( false )

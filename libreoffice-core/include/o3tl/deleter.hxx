@@ -14,9 +14,6 @@
 
 #include <cstdlib>
 
-#include <com/sun/star/uno/Exception.hpp>
-#include <sal/log.hxx>
-
 #if defined(__COVERITY__)
 #define suppress_fun_call_w_exception(expr)                                                        \
     do                                                                                             \
@@ -25,14 +22,8 @@
         {                                                                                          \
             expr;                                                                                  \
         }                                                                                          \
-        catch (const css::uno::Exception& ex)                                                      \
+        catch (...)                                                                                \
         {                                                                                          \
-            SAL_WARN("vcl.app", "Fatal exception: " << exceptionToString(ex));                     \
-            std::terminate();                                                                      \
-        }                                                                                          \
-        catch (const std::exception& e)                                                            \
-        {                                                                                          \
-            SAL_WARN("vcl.app", "Fatal exception: " << e.what());                                  \
             std::terminate();                                                                      \
         }                                                                                          \
     } while (false)
@@ -67,6 +58,7 @@ template <typename uniqueptr> void reset_preserve_ptr_during(uniqueptr& ptr)
     // e.g. SdrObject::GetBroadcaster() is called during the destructor
     // in SdrEdgeObj::Notify(). So delete first, then clear the pointer
     delete ptr.get();
+    // coverity[leaked_storage] - not a leak, deleted on line above
     (void)ptr.release();
 }
 }

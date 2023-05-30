@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -24,7 +26,6 @@ class tdf140117(UITestCase):
 
                     xPageSytle = document.getStyleFamilies().getByIndex(2)
                     xHeaderText = xPageSytle.getByIndex(0).HeaderText.String
-                    xHeaderFirstText = xPageSytle.getByIndex(0).HeaderTextFirst.String
                     xHeaderLeftText = xPageSytle.getByIndex(0).HeaderTextLeft.String
                     xHeaderRightText = xPageSytle.getByIndex(0).HeaderTextRight.String
 

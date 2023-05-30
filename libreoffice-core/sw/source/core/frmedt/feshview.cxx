@@ -90,6 +90,7 @@
 #include <sfx2/lokhelper.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <calbck.hxx>
+#include <flyfrms.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <svx/svxids.hrc>
 #include <osl/diagnose.h>
@@ -150,7 +151,7 @@ SwFlyFrame *GetFlyFromMarked( const SdrMarkList *pLst, SwViewShell *pSh )
     return nullptr;
 }
 
-static void lcl_GrabCursor( SwFEShell* pSh, SwFlyFrame* pOldSelFly)
+static void lcl_GrabCursor( SwFEShell* pSh, SwFlyFrame* pOldSelFly, SwFrameFormat* pNewDrawFormat = nullptr)
 {
     const SwFrameFormat *pFlyFormat = pSh->SelFlyGrabCursor();
     if( pFlyFormat && !pSh->ActionPend() &&
@@ -170,7 +171,21 @@ static void lcl_GrabCursor( SwFEShell* pSh, SwFlyFrame* pOldSelFly)
         // --> assure consistent cursor
         pSh->KillPams();
         pSh->ClearMark();
-        pSh->SetCursor( pSh->Imp()->GetDrawView()->GetAllMarkedRect().TopLeft(), true);
+        if (pNewDrawFormat)
+        {
+            // If we selected a draw shape format, move the cursor to its anchor position.
+            // SetCursor() may pick something inside, which is not wanted: code later assumes that
+            // the cursor is at the anchor point if a shape is selected.
+            const SwPosition* pContentAnchor = pNewDrawFormat->GetAnchor().GetContentAnchor();
+            if (pContentAnchor)
+            {
+                pSh->SetSelection(SwPaM(*pContentAnchor));
+            }
+        }
+        else
+        {
+            pSh->SetCursor( pSh->Imp()->GetDrawView()->GetAllMarkedRect().TopLeft(), true);
+        }
     }
 }
 
@@ -277,6 +292,27 @@ bool SwFEShell::SelectObj( const Point& rPt, sal_uInt8 nFlag, SdrObject *pObj )
         }
     }
 
+    if (rMrkList.GetMarkCount() == 1)
+    {
+        SwFlyFrame* pSelFly = ::GetFlyFromMarked(&rMrkList, this);
+        if (pSelFly && pSelFly->IsFlySplitAllowed())
+        {
+            auto pMaster = static_cast<SwFlyAtContentFrame*>(pSelFly);
+            while (pMaster->IsFollow())
+            {
+                pMaster = pMaster->GetPrecede();
+            }
+            if (pMaster != pSelFly)
+            {
+                // A follow fly frame is selected, select the master instead. Selection of a follow
+                // would not be ideal, since one can't customize its vertical position (always
+                // starts at the top of the page).
+                pDView->UnmarkAll();
+                pDView->MarkObj(pMaster->DrawObj(), Imp()->GetPageView(), bAddSelect, bEnterGroup);
+            }
+        }
+    }
+
     if ( rMrkList.GetMarkCount() == 1 )
     {
         SwFlyFrame *pSelFly = ::GetFlyFromMarked( &rMrkList, this );
@@ -284,6 +320,7 @@ bool SwFEShell::SelectObj( const Point& rPt, sal_uInt8 nFlag, SdrObject *pObj )
             pSelFly->SelectionHasChanged(this);
     }
 
+    SwFrameFormat* pNewDrawFormat = nullptr;
     if (!(nFlag & SW_ALLOW_TEXTBOX))
     {
         // If the fly frame is a textbox of a shape, then select the shape instead.
@@ -302,6 +339,8 @@ bool SwFEShell::SelectObj( const Point& rPt, sal_uInt8 nFlag, SdrObject *pObj )
                 SdrObject* pShape = pShapeFormat->FindSdrObject();
                 pDView->UnmarkAll();
                 pDView->MarkObj(pShape, Imp()->GetPageView(), bAddSelect, bEnterGroup);
+                // Remember that this frame format was marked for selection.
+                pNewDrawFormat = pShapeFormat;
                 break;
             }
         }
@@ -309,7 +348,7 @@ bool SwFEShell::SelectObj( const Point& rPt, sal_uInt8 nFlag, SdrObject *pObj )
 
     if ( bRet )
     {
-        ::lcl_GrabCursor(this, pOldSelFly);
+        ::lcl_GrabCursor(this, pOldSelFly, pNewDrawFormat);
         if ( GetCntType() & CNT_GRF )
         {
             const SwFlyFrame *pTmp = GetFlyFromMarked( &rMrkList, this );
@@ -817,8 +856,7 @@ const SwFrameFormat* SwFEShell::SelFlyGrabCursor()
                 {
                     assert(pCFrame->IsNoTextFrame());
                     SwContentNode *const pCNode = static_cast<SwNoTextFrame *>(pCFrame)->GetNode();
-                    pCursor->GetPoint()->nNode = *pCNode;
-                    pCursor->GetPoint()->nContent.Assign( pCNode, 0 );
+                    pCursor->GetPoint()->Assign(*pCNode);
                 }
 
                 SwRect& rChrRect = const_cast<SwRect&>(GetCharRect());
@@ -1070,7 +1108,7 @@ void SwFEShell::SelectionToTop( bool bTop )
             if (auto pFormat = FindFrameFormat(pObj))
             {
                 // If it has not textframe skip...
-                if (!SwTextBoxHelper::isTextBoxShapeHasValidTextFrame(pFormat))
+                if (!SwTextBoxHelper::isTextBox(pFormat, RES_DRAWFRMFMT, pObj))
                     continue;
                 // If it has a textframe so it is a textbox, get its page
                 if (auto pDrwModel
@@ -1100,7 +1138,7 @@ void SwFEShell::SelectionToTop( bool bTop )
                             // If this object is a textbox, two level increasing needed
                             // (one for the shape and one for the frame)
                             if (auto pNextFormat = FindFrameFormat(pNextObj))
-                                if (SwTextBoxHelper::isTextBox(pNextFormat, RES_DRAWFRMFMT)
+                                if (SwTextBoxHelper::isTextBox(pNextFormat, RES_DRAWFRMFMT, pNextObj)
                                     || SwTextBoxHelper::isTextBox(pNextFormat, RES_FLYFRMFMT))
                                     nShift++;
                         }
@@ -1139,7 +1177,7 @@ void SwFEShell::SelectionToBottom( bool bBottom )
             if (auto pFormat = FindFrameFormat(pObj))
             {
                 // If the shape has not textframes skip.
-                if (!SwTextBoxHelper::isTextBoxShapeHasValidTextFrame(pFormat))
+                if (!SwTextBoxHelper::isTextBox(pFormat, RES_DRAWFRMFMT, pObj))
                     continue;
                 // If has, move the shape to correct level with...
                 if (auto pDrwModel
@@ -1152,7 +1190,7 @@ void SwFEShell::SelectionToBottom( bool bBottom )
                         {
                             // If the lower has no textframe, just do nothing, else move by one lower
                             if (auto pNextFormat = FindFrameFormat(pNextObj))
-                                if (SwTextBoxHelper::isTextBox(pNextFormat, RES_DRAWFRMFMT)
+                                if (SwTextBoxHelper::isTextBox(pNextFormat, RES_DRAWFRMFMT, pNextObj)
                                     || SwTextBoxHelper::isTextBox(pNextFormat, RES_FLYFRMFMT))
                                     pPage->SetObjectOrdNum(pObj->GetOrdNum(), pObj->GetOrdNum() - 1);
                         }
@@ -1490,8 +1528,8 @@ bool SwFEShell::ShouldObjectBeSelected(const Point& rPt)
             SwContact* pContact = static_cast<SwContact*>(pObj->GetUserCall());
             if (pContact && !pContact->ObjAnchoredAtPage() )
             {
-                const SwPosition& rPos = pContact->GetContentAnchor();
-                bool bInHdrFtr = GetDoc()->IsInHeaderFooter( rPos.nNode );
+                const SwNode& rAnchorNode = pContact->GetAnchorNode();
+                bool bInHdrFtr = GetDoc()->IsInHeaderFooter( rAnchorNode );
                 if (IsHeaderFooterEdit() != bInHdrFtr)
                 {
                     bRet = false;
@@ -1560,8 +1598,13 @@ namespace
     };
 }
 
-const SdrObject* SwFEShell::GetBestObject( bool bNext, GotoObjFlags eType, bool bFlat, const svx::ISdrObjectFilter* pFilter )
+const SdrObject* SwFEShell::GetBestObject(bool bNext, GotoObjFlags eType, bool bFlat,
+                                          const svx::ISdrObjectFilter* pFilter,
+                                          bool* pbWrapped)
 {
+    if (pbWrapped)
+        *pbWrapped = false;
+
     if( !Imp()->HasDrawView() )
         return nullptr;
 
@@ -1735,7 +1778,8 @@ const SdrObject* SwFEShell::GetBestObject( bool bNext, GotoObjFlags eType, bool 
         if( bNext ? (aBestPos.getX() == LONG_MAX) : (aBestPos.getX() == 0) )
         {
             pBest = pTop;
-            SvxSearchDialogWrapper::SetSearchLabel( bNext ? SearchLabel::EndWrapped : SearchLabel::StartWrapped );
+            if (pbWrapped && pBest)
+                *pbWrapped = true;
         }
     }
 
@@ -1746,7 +1790,8 @@ bool SwFEShell::GotoObj( bool bNext, GotoObjFlags eType )
 {
     SvxSearchDialogWrapper::SetSearchLabel( SearchLabel::Empty );
 
-    const SdrObject* pBest = GetBestObject( bNext, eType );
+    bool bWrapped(false);
+    const SdrObject* pBest = GetBestObject(bNext, eType, true, nullptr, &bWrapped);
 
     if ( !pBest )
     {
@@ -1769,6 +1814,11 @@ bool SwFEShell::GotoObj( bool bNext, GotoObjFlags eType )
             MakeVisible( SwRect(pBest->GetCurrentBoundRect()) );
     }
     CallChgLnk();
+
+    if (bWrapped)
+        SvxSearchDialogWrapper::SetSearchLabel(bNext ? SearchLabel::EndWrapped :
+                                                       SearchLabel::StartWrapped);
+
     return true;
 }
 
@@ -1782,7 +1832,7 @@ bool SwFEShell::BeginCreate( SdrObjKind eSdrObjectKind, const Point &rPos )
     if ( GetPageNumber( rPos ) )
     {
         Imp()->GetDrawView()->SetCurrentObj( eSdrObjectKind );
-        if ( eSdrObjectKind == OBJ_CAPTION )
+        if ( eSdrObjectKind == SdrObjKind::Caption )
             bRet = Imp()->GetDrawView()->BegCreateCaptionObj(
                         rPos, Size( lMinBorder - MINFLY, lMinBorder - MINFLY ),
                         GetOut() );
@@ -1853,8 +1903,8 @@ bool SwFEShell::EndCreate( SdrCreateCmd eSdrCreateCmd )
 
 bool SwFEShell::ImpEndCreate()
 {
-    OSL_ENSURE( Imp()->GetDrawView()->GetMarkedObjectList().GetMarkCount() == 1,
-            "New object not selected." );
+    if (Imp()->GetDrawView()->GetMarkedObjectList().GetMarkCount() == 0)
+        return false;
 
     SdrObject& rSdrObj = *Imp()->GetDrawView()->GetMarkedObjectList().GetMark(0)->GetMarkedSdrObj();
 
@@ -1886,12 +1936,6 @@ bool SwFEShell::ImpEndCreate()
     const tools::Rectangle &rBound = rSdrObj.GetSnapRect();
     Point aPt( rBound.TopRight() );
 
-    // alien identifier should end up on defaults
-    // duplications possible!!
-    sal_uInt16 nIdent = SdrInventor::Default == rSdrObj.GetObjInventor()
-                        ? rSdrObj.GetObjIdentifier()
-                        : 0xFFFF;
-
     // default for controls character bound, otherwise paragraph bound.
     SwFormatAnchor aAnch;
     const SwFrame *pAnch = nullptr;
@@ -1904,10 +1948,10 @@ bool SwFEShell::ImpEndCreate()
         GetLayout()->GetModelPositionForViewPoint( &aPos, aPoint, &aState );
 
         // characterbinding not allowed in readonly-content
-        if( !aPos.nNode.GetNode().IsProtect() )
+        if( !aPos.GetNode().IsProtect() )
         {
             std::pair<Point, bool> const tmp(aPoint, true);
-            pAnch = aPos.nNode.GetNode().GetContentNode()->getLayoutFrame(GetLayout(), &aPos, &tmp);
+            pAnch = aPos.GetNode().GetContentNode()->getLayoutFrame(GetLayout(), &aPos, &tmp);
             SwRect aTmp;
             pAnch->GetCharRect( aTmp, aPos );
 
@@ -1926,7 +1970,7 @@ bool SwFEShell::ImpEndCreate()
 
             // anchor in header/footer also not allowed.
             if( bCharBound )
-                bCharBound = !GetDoc()->IsInHeaderFooter( aPos.nNode );
+                bCharBound = !GetDoc()->IsInHeaderFooter( aPos.GetNode() );
 
             if( bCharBound )
             {
@@ -1943,7 +1987,7 @@ bool SwFEShell::ImpEndCreate()
         // of <nIdent> - value <0xFFFF> indicates control objects, which aren't
         // allowed in header/footer.
         //bool bBodyOnly = OBJ_NONE != nIdent;
-        bool bBodyOnly = 0xFFFF == nIdent;
+        bool bBodyOnly = SdrInventor::Default != rSdrObj.GetObjInventor();
         bool bAtPage = false;
         const SwFrame* pPage = nullptr;
         SwCursorMoveState aState( CursorMoveState::SetOnlyText );
@@ -1952,14 +1996,14 @@ bool SwFEShell::ImpEndCreate()
         GetLayout()->GetModelPositionForViewPoint( &aPos, aPoint, &aState );
 
         // do not set in ReadnOnly-content
-        if (aPos.nNode.GetNode().IsProtect())
+        if (aPos.GetNode().IsProtect())
         {
             // then only page bound. Or should we
             // search the next not-readonly position?
             bAtPage = true;
         }
 
-        SwContentNode* pCNode = aPos.nNode.GetNode().GetContentNode();
+        SwContentNode* pCNode = aPos.GetNode().GetContentNode();
         std::pair<Point, bool> const tmp(aPoint, false);
         pAnch = pCNode ? pCNode->getLayoutFrame(GetLayout(), nullptr, &tmp) : nullptr;
         if (!pAnch)
@@ -2000,15 +2044,15 @@ bool SwFEShell::ImpEndCreate()
             {
                 std::pair<SwTextNode const*, sal_Int32> const pos(
                     static_cast<SwTextFrame const*>(pAnch)->MapViewToModel(TextFrameIndex(0)));
-                aPos.nNode = *pos.first;
+                aPos.Assign( *pos.first );
             }
             else
             {
-                aPos.nNode = *static_cast<const SwNoTextFrame*>(pAnch)->GetNode();
+                aPos.Assign( *static_cast<const SwNoTextFrame*>(pAnch)->GetNode() );
             }
 
             // do not set in ReadnOnly-content
-            if( aPos.nNode.GetNode().IsProtect() )
+            if( aPos.GetNode().IsProtect() )
                 // then only page bound. Or should we
                 // search the next not-readonly position?
                 bAtPage = true;
@@ -2065,7 +2109,7 @@ bool SwFEShell::ImpEndCreate()
         }
     }
 
-    if( OBJ_NONE == nIdent )
+    if( SdrInventor::Default == rSdrObj.GetObjInventor() && rSdrObj.GetObjIdentifier() == SdrObjKind::NONE )
     {
         // For OBJ_NONE a fly is inserted.
         const tools::Long nWidth = rBound.Right()  - rBound.Left();
@@ -2095,8 +2139,7 @@ bool SwFEShell::ImpEndCreate()
             pPg = pNewPage.get();
         }
         pPg->RecalcObjOrdNums();
-        SdrObject* pRemovedObject = pPg->RemoveObject( rSdrObj.GetOrdNumDirect() );
-        SdrObject::Free( pRemovedObject );
+        pPg->RemoveObject( rSdrObj.GetOrdNumDirect() );
         GetDoc()->GetIDocumentUndoRedo().DoDrawUndo(true);
 
         SwFlyFrame* pFlyFrame;
@@ -2164,7 +2207,7 @@ bool SwFEShell::ImpEndCreate()
             text::PositionLayoutDir::PositionInLayoutDirOfAnchor );
         // #i44344#, #i44681# - positioning attributes already set
         pFormat->PosAttrSet();
-        pFormat->SetName(rSdrObj.GetName());
+        pFormat->SetFormatName(rSdrObj.GetName());
 
         SwDrawContact *pContact = new SwDrawContact( pFormat, &rSdrObj );
         // #i35635#
@@ -2172,10 +2215,10 @@ bool SwFEShell::ImpEndCreate()
         if( bCharBound )
         {
             OSL_ENSURE( aAnch.GetAnchorId() == RndStdIds::FLY_AS_CHAR, "wrong AnchorType" );
-            SwTextNode *pNd = aAnch.GetContentAnchor()->nNode.GetNode().GetTextNode();
+            SwTextNode *pNd = aAnch.GetAnchorNode()->GetTextNode();
             SwFormatFlyCnt aFormat( pFormat );
             pNd->InsertItem(aFormat,
-                            aAnch.GetContentAnchor()->nContent.GetIndex(), 0 );
+                            aAnch.GetAnchorContentOffset(), 0 );
             SwFormatVertOrient aVertical( pFormat->GetVertOrient() );
             aVertical.SetVertOrient( text::VertOrientation::LINE_CENTER );
             pFormat->SetFormatAttr( aVertical );
@@ -2431,7 +2474,7 @@ Point SwFEShell::GetObjAbsPos() const
     return Imp()->GetDrawView()->GetDragStat().GetActionRect().TopLeft();
 }
 
-bool SwFEShell::IsGroupSelected()
+bool SwFEShell::IsGroupSelected(bool bAllowDiagams)
 {
     if ( IsObjSelected() )
     {
@@ -2447,6 +2490,15 @@ bool SwFEShell::IsGroupSelected()
                  RndStdIds::FLY_AS_CHAR != static_cast<SwDrawContact*>(GetUserCall(pObj))->
                                       GetFormat()->GetAnchor().GetAnchorId() )
             {
+                if(!bAllowDiagams)
+                {
+                    // Don't allow enter Diagrams
+                    if(pObj->isDiagram())
+                    {
+                        return false;
+                    }
+                }
+
                 return true;
             }
         }
@@ -2571,7 +2623,7 @@ void SwFEShell::GroupSelection()
 // The individual objects get a copy of the anchor and the contactobject of the group
 void SwFEShell::UnGroupSelection()
 {
-    if ( IsGroupSelected() )
+    if ( IsGroupSelected(true) )
     {
         StartAllAction();
         StartUndo( SwUndoId::START );
@@ -2640,8 +2692,7 @@ bool SwFEShell::GotoFly( const OUString& rName, FlyCntType eType, bool bSelFrame
                         assert(pCFrame->IsNoTextFrame());
                         SwContentNode *const pCNode = static_cast<SwNoTextFrame *>(pCFrame)->GetNode();
 
-                        pCursor->GetPoint()->nNode = *pCNode;
-                        pCursor->GetPoint()->nContent.Assign( pCNode, 0 );
+                        pCursor->GetPoint()->Assign(*pCNode);
                     }
 
                     SwRect& rChrRect = const_cast<SwRect&>(GetCharRect());
@@ -3026,7 +3077,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
 {
     SdrView* pDrawView = GetDrawView();
     SdrModel* pDrawModel = pDrawView->GetModel();
-    SdrObject* pObj = SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj = SdrObjFactory::MakeNewObject(
         *pDrawModel,
         SdrInventor::Default,
         eSdrObjectKind);
@@ -3034,7 +3085,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
     if(pObj)
     {
         tools::Rectangle aRect(rRect);
-        if(OBJ_CARC == eSdrObjectKind || OBJ_CCUT == eSdrObjectKind)
+        if(SdrObjKind::CircleArc == eSdrObjectKind || SdrObjKind::CircleCut == eSdrObjectKind)
         {
             // force quadratic
             if(aRect.GetWidth() > aRect.GetHeight())
@@ -3055,21 +3106,21 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
         Point aStart = aRect.TopLeft();
         Point aEnd = aRect.BottomRight();
 
-        if(dynamic_cast<const SdrCircObj*>( pObj) !=  nullptr)
+        if(dynamic_cast<const SdrCircObj*>( pObj.get()) !=  nullptr)
         {
             SfxItemSet aAttr(pDrawModel->GetItemPool());
             aAttr.Put(makeSdrCircStartAngleItem(9000_deg100));
             aAttr.Put(makeSdrCircEndAngleItem(0_deg100));
             pObj->SetMergedItemSet(aAttr);
         }
-        else if(auto pPathObj = dynamic_cast<SdrPathObj*>( pObj))
+        else if(auto pPathObj = dynamic_cast<SdrPathObj*>( pObj.get()))
         {
             basegfx::B2DPolyPolygon aPoly;
 
             switch(eSdrObjectKind)
             {
-                case OBJ_PATHLINE:
-                case OBJ_PATHFILL:
+                case SdrObjKind::PathLine:
+                case SdrObjKind::PathFill:
                 {
                     basegfx::B2DPolygon aInnerPoly;
 
@@ -3091,8 +3142,8 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
                     aPoly.append(aInnerPoly);
                 }
                 break;
-                case OBJ_FREELINE:
-                case OBJ_FREEFILL:
+                case SdrObjKind::FreehandLine:
+                case SdrObjKind::FreehandFill:
                 {
                     basegfx::B2DPolygon aInnerPoly;
 
@@ -3113,8 +3164,8 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
                     aPoly.append(aInnerPoly);
                 }
                 break;
-                case OBJ_POLY:
-                case OBJ_PLIN:
+                case SdrObjKind::Polygon:
+                case SdrObjKind::PolyLine:
                 {
                     basegfx::B2DPolygon aInnerPoly;
                     sal_Int32 nWdt(aRect.GetWidth());
@@ -3129,7 +3180,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
                     aInnerPoly.append(basegfx::B2DPoint(aRect.Left() + (nWdt * 80) / 100, aRect.Top() + (nHgt * 75) / 100));
                     aInnerPoly.append(basegfx::B2DPoint(aRect.Bottom(), aRect.Right()));
 
-                    if(OBJ_PLIN == eSdrObjectKind)
+                    if(SdrObjKind::PolyLine == eSdrObjectKind)
                     {
                         aInnerPoly.append(basegfx::B2DPoint(aRect.Center().getX(), aRect.Bottom()));
                     }
@@ -3141,7 +3192,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
                     aPoly.append(aInnerPoly);
                 }
                 break;
-                case OBJ_LINE :
+                case SdrObjKind::Line :
                 {
                     sal_Int32 nYMiddle((aRect.Top() + aRect.Bottom()) / 2);
                     basegfx::B2DPolygon aTempPoly;
@@ -3160,7 +3211,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
 
             pPathObj->SetPathPoly(aPoly);
         }
-        else if(auto pMeasureObj = dynamic_cast<SdrMeasureObj*>( pObj))
+        else if(auto pMeasureObj = dynamic_cast<SdrMeasureObj*>( pObj.get()))
         {
             sal_Int32 nYMiddle((aRect.Top() + aRect.Bottom()) / 2);
             pMeasureObj->SetPoint(Point(aStart.X(), nYMiddle), 0);
@@ -3170,7 +3221,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
             SetLineEnds(aAttr, *pObj, nSlotId);
             pObj->SetMergedItemSet(aAttr);
         }
-        else if(auto pCaptionObj = dynamic_cast<SdrCaptionObj*>( pObj))
+        else if(auto pCaptionObj = dynamic_cast<SdrCaptionObj*>( pObj.get()))
         {
             bool bVerticalText = ( SID_DRAW_TEXT_VERTICAL == nSlotId ||
                                             SID_DRAW_CAPTION_VERTICAL == nSlotId );
@@ -3187,7 +3238,7 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
             pCaptionObj->SetTailPos(
                 aRect.TopLeft() - Point(aRect.GetWidth() / 2, aRect.GetHeight() / 2));
         }
-        else if(auto pText = dynamic_cast<SdrTextObj*>( pObj))
+        else if(auto pText = DynCastSdrTextObj( pObj.get()))
         {
             pText->SetLogicRect(aRect);
 
@@ -3219,12 +3270,12 @@ void SwFEShell::CreateDefaultShape( SdrObjKind eSdrObjectKind, const tools::Rect
             }
         }
         SdrPageView* pPageView = pDrawView->GetSdrPageView();
-        SdrCreateView::SetupObjLayer(pPageView, pDrawView->GetActiveLayer(), pObj);
+        SdrCreateView::SetupObjLayer(pPageView, pDrawView->GetActiveLayer(), pObj.get());
         // switch undo off or this combined with ImpEndCreate will cause two undos
         // see comment made in SwFEShell::EndCreate (we create our own undo-object!)
         const bool bUndo(GetDoc()->GetIDocumentUndoRedo().DoesUndo());
         GetDoc()->GetIDocumentUndoRedo().DoUndo(false);
-        pDrawView->InsertObjectAtView(pObj, *pPageView);
+        pDrawView->InsertObjectAtView(pObj.get(), *pPageView);
         GetDoc()->GetIDocumentUndoRedo().DoUndo(bUndo);
     }
     ImpEndCreate();

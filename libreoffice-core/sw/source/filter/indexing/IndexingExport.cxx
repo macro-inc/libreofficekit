@@ -12,7 +12,6 @@
 
 #include <ndtxt.hxx>
 #include <ndole.hxx>
-#include <ndnotxt.hxx>
 #include <ndgrf.hxx>
 #include <svx/svdobj.hxx>
 #include <svx/svdotext.hxx>
@@ -119,7 +118,7 @@ public:
 
         m_rXmlWriter.endElement();
 
-        SdrTextObj* pTextObject = dynamic_cast<SdrTextObj*>(pObject);
+        SdrTextObj* pTextObject = DynCastSdrTextObj(pObject);
         if (!pTextObject)
             return;
 

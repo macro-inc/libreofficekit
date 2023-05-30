@@ -52,6 +52,10 @@ struct ImplPostEventData;
 struct ImplTimerData;
 struct ImplIdleData;
 struct ImplConfigData;
+namespace rtl
+{
+    class OStringBuffer;
+}
 namespace vcl::font
 {
     class DirectFontSubstitution;
@@ -133,6 +137,7 @@ typedef std::pair<VclPtr<vcl::Window>, ImplPostEventData *> ImplPostEventPair;
 
 struct ImplSVAppData
 {
+    ImplSVAppData();
     ~ImplSVAppData();
 
     std::optional<AllSettings> mxSettings;           // Application settings
@@ -141,7 +146,7 @@ struct ImplSVAppData
     std::vector<Link<VclWindowEvent&,bool> >
                             maKeyListeners;       // listeners for key events only (eg, extended toolkit)
     std::vector<ImplPostEventPair> maPostedEventList;
-    ImplAccelManager*       mpAccelMgr;           // Accelerator Manager
+    ImplAccelManager*       mpAccelMgr = nullptr; // Accelerator Manager
     std::optional<OUString> mxAppName;            // Application name
     std::optional<OUString> mxAppFileName;        // Abs. Application FileName
     std::optional<OUString> mxDisplayName;        // Application Display Name
@@ -155,10 +160,11 @@ struct ImplSVAppData
     SystemWindowFlags       mnSysWinMode = SystemWindowFlags(0); // Mode, when SystemWindows should be created
     bool                    mbInAppMain = false;            // is Application::Main() on stack
     bool                    mbInAppExecute = false;         // is Application::Execute() on stack
-    bool                    mbAppQuit = false;              // is Application::Quit() called
+    volatile bool           mbAppQuit = false;              // is Application::Quit() called, volatile because we read/write from different threads
     bool                    mbSettingsInit = false;         // true: Settings are initialized
     DialogCancelMode meDialogCancel = DialogCancelMode::Off; // true: All Dialog::Execute() calls will be terminated immediately with return false
     bool mbRenderToBitmaps = false; // set via svp / headless plugin
+    bool m_bUseSystemLoop = false;
 
     SvFileStream*       mpEventTestInput = nullptr;
     Idle*               mpEventTestingIdle = nullptr;
@@ -267,6 +273,7 @@ struct ImplSVWinData
     StartAutoScrollFlags    mnAutoScrollFlags = StartAutoScrollFlags::NONE; // auto scroll flags
     bool                    mbNoDeactivate = false;         // true: do not execute Deactivate
     bool                    mbNoSaveFocus = false;          // true: menus must not save/restore focus
+    bool                    mbIsLiveResize = false;         // true: skip waiting for events and low priority timers
 };
 
 typedef std::vector< std::pair< OUString, FieldUnit > > FieldUnitStringList;
@@ -325,6 +332,8 @@ struct ImplSVNWFData
     bool                    mbFlatMenu = false;             // no popup 3D border
     bool                    mbNoFocusRects = false;         // on Aqua/Gtk3 use native focus rendering, except for flat buttons
     bool                    mbNoFocusRectsForFlatButtons = false; // on Gtk3 native focusing is also preferred for flat buttons
+    bool                    mbNoFrameJunctionForPopups = false; // on Gtk4 popups are done via popovers and a toolbar menu won't align to its toolitem, so
+                                                                // omit the effort the creation a visual junction
     bool                    mbCenteredTabs = false;         // on Aqua, tabs are centered
     bool                    mbNoActiveTabTextRaise = false; // on Aqua the text for the selected tab
                                                             // should not "jump up" a pixel
@@ -425,6 +434,9 @@ struct ImplSVData
     LibreOfficeKitPollCallback mpPollCallback = nullptr;
     LibreOfficeKitWakeCallback mpWakeCallback = nullptr;
     void *mpPollClosure = nullptr;
+
+    void dropCaches();
+    void dumpState(rtl::OStringBuffer &rState);
 };
 
 css::uno::Reference<css::i18n::XCharacterClassification> const& ImplGetCharClass();
@@ -463,5 +475,9 @@ struct ImplSVEvent
 };
 
 extern int nImplSysDialog;
+
+inline SalData* GetSalData() { return ImplGetSVData()->mpSalData; }
+inline void SetSalData(SalData* pData) { ImplGetSVData()->mpSalData = pData; }
+inline SalInstance* GetSalInstance() { return ImplGetSVData()->mpDefInst; }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

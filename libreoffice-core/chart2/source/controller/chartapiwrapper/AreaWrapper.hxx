@@ -20,7 +20,7 @@
 
 #include <WrappedPropertySet.hxx>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -40,7 +40,7 @@ class AreaWrapper : public ::cppu::ImplInheritanceHelper<
                     >
 {
 public:
-    explicit AreaWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+    explicit AreaWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
     virtual ~AreaWrapper() override;
 
     /// XServiceInfo declarations
@@ -72,7 +72,7 @@ protected:
 
 private:
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;
-    ::comphelper::OInterfaceContainerHelper2      m_aEventListenerContainer;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> m_aEventListenerContainer;
 };
 
 } //  namespace chart::wrapper

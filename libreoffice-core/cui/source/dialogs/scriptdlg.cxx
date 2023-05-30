@@ -50,10 +50,11 @@
 #include <comphelper/SetFlagContextHelper.hxx>
 #include <comphelper/documentinfo.hxx>
 #include <comphelper/processfactory.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <svtools/imagemgr.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace css::uno;
@@ -63,7 +64,7 @@ using namespace css::document;
 
 void SvxScriptOrgDialog::delUserData(const weld::TreeIter& rIter)
 {
-    SFEntry* pUserData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(rIter).toInt64());
+    SFEntry* pUserData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(rIter));
     if (pUserData)
     {
         delete pUserData;
@@ -298,9 +299,9 @@ void SvxScriptOrgDialog::RequestSubEntries(const weld::TreeIter& rRootEntry, Ref
 
 void SvxScriptOrgDialog::insertEntry(const OUString& rText, const OUString& rBitmap,
     const weld::TreeIter* pParent, bool bChildrenOnDemand, std::unique_ptr<SFEntry> && aUserData,
-    const OUString& factoryURL, bool bSelect)
+    std::u16string_view factoryURL, bool bSelect)
 {
-    if (rBitmap == RID_CUIBMP_DOC && !factoryURL.isEmpty())
+    if (rBitmap == RID_CUIBMP_DOC && !factoryURL.empty())
     {
         OUString aImage = SvFileInformationManager::GetFileImageId(INetURLObject(factoryURL));
         insertEntry(rText, aImage, pParent, bChildrenOnDemand, std::move(aUserData), bSelect);
@@ -313,7 +314,7 @@ void SvxScriptOrgDialog::insertEntry(
     const OUString& rText, const OUString& rBitmap, const weld::TreeIter* pParent,
     bool bChildrenOnDemand, std::unique_ptr<SFEntry> && aUserData, bool bSelect)
 {
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(aUserData.release()))); // XXX possible leak
+    OUString sId(weld::toId(aUserData.release())); // XXX possible leak
     m_xScriptsBox->insert(pParent, -1, &rText, &sId, nullptr, nullptr,
                           bChildrenOnDemand, m_xScratchIter.get());
     m_xScriptsBox->set_image(*m_xScratchIter, rBitmap);
@@ -326,7 +327,7 @@ void SvxScriptOrgDialog::insertEntry(
 
 IMPL_LINK(SvxScriptOrgDialog, ExpandingHdl, const weld::TreeIter&, rIter, bool)
 {
-    SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(rIter).toInt64());
+    SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(rIter));
 
     Reference< browse::XBrowseNode > node;
     Reference< XModel > model;
@@ -370,21 +371,21 @@ CuiInputDialog::CuiInputDialog(weld::Window * pParent, InputDialogMode nMode)
 
 // ScriptOrgDialog ------------------------------------------------------------
 
-SvxScriptOrgDialog::SvxScriptOrgDialog(weld::Window* pParent, const OUString& language)
+SvxScriptOrgDialog::SvxScriptOrgDialog(weld::Window* pParent, OUString language)
     : SfxDialogController(pParent, "cui/ui/scriptorganizer.ui", "ScriptOrganizerDialog")
     , m_pParent(pParent)
-    , m_sLanguage(language)
-    , m_delErrStr(CuiResId(RID_SVXSTR_DELFAILED))
-    , m_delErrTitleStr(CuiResId(RID_SVXSTR_DELFAILED_TITLE))
-    , m_delQueryStr(CuiResId(RID_SVXSTR_DELQUERY))
-    , m_delQueryTitleStr(CuiResId(RID_SVXSTR_DELQUERY_TITLE))
-    , m_createErrStr(CuiResId(RID_SVXSTR_CREATEFAILED))
-    , m_createDupStr(CuiResId(RID_SVXSTR_CREATEFAILEDDUP))
-    , m_createErrTitleStr(CuiResId(RID_SVXSTR_CREATEFAILED_TITLE))
-    , m_renameErrStr(CuiResId(RID_SVXSTR_RENAMEFAILED))
-    , m_renameErrTitleStr(CuiResId(RID_SVXSTR_RENAMEFAILED_TITLE))
-    , m_sMyMacros(CuiResId(RID_SVXSTR_MYMACROS))
-    , m_sProdMacros(CuiResId(RID_SVXSTR_PRODMACROS))
+    , m_sLanguage(std::move(language))
+    , m_delErrStr(CuiResId(RID_CUISTR_DELFAILED))
+    , m_delErrTitleStr(CuiResId(RID_CUISTR_DELFAILED_TITLE))
+    , m_delQueryStr(CuiResId(RID_CUISTR_DELQUERY))
+    , m_delQueryTitleStr(CuiResId(RID_CUISTR_DELQUERY_TITLE))
+    , m_createErrStr(CuiResId(RID_CUISTR_CREATEFAILED))
+    , m_createDupStr(CuiResId(RID_CUISTR_CREATEFAILEDDUP))
+    , m_createErrTitleStr(CuiResId(RID_CUISTR_CREATEFAILED_TITLE))
+    , m_renameErrStr(CuiResId(RID_CUISTR_RENAMEFAILED))
+    , m_renameErrTitleStr(CuiResId(RID_CUISTR_RENAMEFAILED_TITLE))
+    , m_sMyMacros(CuiResId(RID_CUISTR_MYMACROS))
+    , m_sProdMacros(CuiResId(RID_CUISTR_PRODMACROS))
     , m_xScriptsBox(m_xBuilder->weld_tree_view("scripts"))
     , m_xScratchIter(m_xScriptsBox->make_iterator())
     , m_xRunButton(m_xBuilder->weld_button("ok"))
@@ -530,7 +531,7 @@ IMPL_LINK_NOARG(SvxScriptOrgDialog, ScriptSelectHdl, weld::TreeView&, void)
     if (!m_xScriptsBox->get_selected(xIter.get()))
         return;
 
-    SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(*xIter).toInt64());
+    SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(*xIter));
 
     Reference< browse::XBrowseNode > node;
     if (userData)
@@ -558,7 +559,7 @@ IMPL_LINK(SvxScriptOrgDialog, ButtonHdl, weld::Button&, rButton, void)
     std::unique_ptr<weld::TreeIter> xIter = m_xScriptsBox->make_iterator();
     if (!m_xScriptsBox->get_selected(xIter.get()))
         return;
-    SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(*xIter).toInt64());
+    SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(*xIter));
     if (!userData)
         return;
 
@@ -602,7 +603,7 @@ IMPL_LINK(SvxScriptOrgDialog, ButtonHdl, weld::Button&, rButton, void)
         bool bParent = m_xScriptsBox->iter_parent(*xParentIter);
         while (bParent && !mspNode.is() )
         {
-            SFEntry* mspUserData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(*xParentIter).toInt64());
+            SFEntry* mspUserData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(*xParentIter));
             mspNode.set( mspUserData->GetNode() , UNO_QUERY );
             bParent = m_xScriptsBox->iter_parent(*xParentIter);
         }
@@ -679,7 +680,7 @@ IMPL_LINK(SvxScriptOrgDialog, ButtonHdl, weld::Button&, rButton, void)
 Reference< browse::XBrowseNode > SvxScriptOrgDialog::getBrowseNode(const weld::TreeIter& rEntry)
 {
     Reference< browse::XBrowseNode > node;
-    SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(rEntry).toInt64());
+    SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(rEntry));
     if (userData)
     {
         node = userData->GetNode();
@@ -690,7 +691,7 @@ Reference< browse::XBrowseNode > SvxScriptOrgDialog::getBrowseNode(const weld::T
 Reference< XModel > SvxScriptOrgDialog::getModel(const weld::TreeIter& rEntry)
 {
     Reference< XModel > model;
-    SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(rEntry).toInt64());
+    SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(rEntry));
     if ( userData )
     {
         model = userData->GetModel();
@@ -757,7 +758,7 @@ void SvxScriptOrgDialog::createEntry(const weld::TreeIter& rEntry)
             }
             for( const Reference< browse::XBrowseNode >& n : std::as_const(childNodes) )
             {
-                if (OUStringConcatenation(aNewName+extn) == n->getName())
+                if (Concat2View(aNewName+extn) == n->getName())
                 {
                     bFound = true;
                     break;
@@ -784,7 +785,7 @@ void SvxScriptOrgDialog::createEntry(const weld::TreeIter& rEntry)
                 bValid = true;
                 for( const Reference< browse::XBrowseNode >& n : std::as_const(childNodes) )
                 {
-                    if (OUStringConcatenation(aUserSuppliedName+extn) == n->getName())
+                    if (Concat2View(aUserSuppliedName+extn) == n->getName())
                     {
                         bValid = false;
                         OUString aError = m_createErrStr + m_createDupStr;
@@ -852,7 +853,7 @@ void SvxScriptOrgDialog::createEntry(const weld::TreeIter& rEntry)
             // loaded, this will prevent RequestingChildren ( called
             // from vcl via RequestingChildren ) from
             // creating new ( duplicate ) children
-            SFEntry* userData = reinterpret_cast<SFEntry*>(m_xScriptsBox->get_id(rEntry).toInt64());
+            SFEntry* userData = weld::fromId<SFEntry*>(m_xScriptsBox->get_id(rEntry));
             if ( userData &&  !userData->isLoaded() )
             {
                 userData->setLoaded();
@@ -1048,7 +1049,7 @@ void SvxScriptOrgDialog::RestorePreviousSelection()
     sal_Int32 nIndex = 0;
     while (nIndex != -1)
     {
-        OUString aTmp( aStoredEntry.getToken( 0, ';', nIndex ) );
+        std::u16string_view aTmp( o3tl::getToken(aStoredEntry, 0, ';', nIndex ) );
 
         bool bTmpEntry;
         if (!xEntry)
@@ -1090,14 +1091,14 @@ namespace {
 
 OUString ReplaceString(
     const OUString& source,
-    const OUString& token,
+    std::u16string_view token,
     std::u16string_view value )
 {
     sal_Int32 pos = source.indexOf( token );
 
     if ( pos != -1 && !value.empty() )
     {
-        return source.replaceAt( pos, token.getLength(), value );
+        return source.replaceAt( pos, token.size(), value );
     }
     else
     {
@@ -1113,20 +1114,20 @@ OUString FormatErrorString(
     std::u16string_view type,
     std::u16string_view message )
 {
-    OUString result = unformatted.copy( 0 );
+    OUString result = unformatted;
 
-    result = ReplaceString(result, "%LANGUAGENAME", language );
-    result = ReplaceString(result, "%SCRIPTNAME", script );
-    result = ReplaceString(result, "%LINENUMBER", line );
+    result = ReplaceString(result, u"%LANGUAGENAME", language );
+    result = ReplaceString(result, u"%SCRIPTNAME", script );
+    result = ReplaceString(result, u"%LINENUMBER", line );
 
     if ( !type.empty() )
     {
-        result += "\n\n" + CuiResId(RID_SVXSTR_ERROR_TYPE_LABEL) + " " + type;
+        result += "\n\n" + CuiResId(RID_CUISTR_ERROR_TYPE_LABEL) + " " + type;
     }
 
     if ( !message.empty() )
     {
-        result += "\n\n" + CuiResId(RID_SVXSTR_ERROR_MESSAGE_LABEL) + " " + message;
+        result += "\n\n" + CuiResId(RID_CUISTR_ERROR_MESSAGE_LABEL) + " " + message;
     }
 
     return result;
@@ -1135,7 +1136,7 @@ OUString FormatErrorString(
 OUString GetErrorMessage(
     const provider::ScriptErrorRaisedException& eScriptError )
 {
-    OUString unformatted = CuiResId( RID_SVXSTR_ERROR_AT_LINE );
+    OUString unformatted = CuiResId( RID_CUISTR_ERROR_AT_LINE );
 
     OUString unknown("UNKNOWN");
     OUString language = unknown;
@@ -1160,11 +1161,11 @@ OUString GetErrorMessage(
     if ( eScriptError.lineNum != -1 )
     {
         line = OUString::number( eScriptError.lineNum );
-        unformatted = CuiResId( RID_SVXSTR_ERROR_AT_LINE );
+        unformatted = CuiResId( RID_CUISTR_ERROR_AT_LINE );
     }
     else
     {
-        unformatted = CuiResId( RID_SVXSTR_ERROR_RUNNING );
+        unformatted = CuiResId( RID_CUISTR_ERROR_RUNNING );
     }
 
     return FormatErrorString(
@@ -1174,7 +1175,7 @@ OUString GetErrorMessage(
 OUString GetErrorMessage(
     const provider::ScriptExceptionRaisedException& eScriptException )
 {
-    OUString unformatted = CuiResId( RID_SVXSTR_EXCEPTION_AT_LINE );
+    OUString unformatted = CuiResId( RID_CUISTR_EXCEPTION_AT_LINE );
 
     OUString unknown("UNKNOWN");
     OUString language = unknown;
@@ -1200,11 +1201,11 @@ OUString GetErrorMessage(
     if ( eScriptException.lineNum != -1 )
     {
         line = OUString::number( eScriptException.lineNum );
-        unformatted = CuiResId( RID_SVXSTR_EXCEPTION_AT_LINE );
+        unformatted = CuiResId( RID_CUISTR_EXCEPTION_AT_LINE );
     }
     else
     {
-        unformatted = CuiResId( RID_SVXSTR_EXCEPTION_RUNNING );
+        unformatted = CuiResId( RID_CUISTR_EXCEPTION_RUNNING );
     }
 
     if ( !eScriptException.exceptionType.isEmpty() )
@@ -1219,7 +1220,7 @@ OUString GetErrorMessage(
 OUString GetErrorMessage(
     const provider::ScriptFrameworkErrorException& sError )
 {
-    OUString unformatted = CuiResId( RID_SVXSTR_FRAMEWORK_ERROR_RUNNING );
+    OUString unformatted = CuiResId( RID_CUISTR_FRAMEWORK_ERROR_RUNNING );
 
     OUString language("UNKNOWN");
 
@@ -1237,9 +1238,8 @@ OUString GetErrorMessage(
     }
     if ( sError.errorType == provider::ScriptFrameworkErrorType::NOTSUPPORTED )
     {
-        message =
-            CuiResId(  RID_SVXSTR_ERROR_LANG_NOT_SUPPORTED );
-        message = ReplaceString(message, "%LANGUAGENAME", language );
+        message = CuiResId(RID_CUISTR_ERROR_LANG_NOT_SUPPORTED);
+        message = ReplaceString(message, u"%LANGUAGENAME", language );
 
     }
     else
@@ -1320,7 +1320,7 @@ IMPL_STATIC_LINK( SvxScriptErrorDialog, ShowDialog, void*, p, void )
     OUString message = xData->sMessage;
 
     if ( message.isEmpty() )
-        message = CuiResId( RID_SVXSTR_ERROR_TITLE );
+        message = CuiResId( RID_CUISTR_ERROR_TITLE );
 
     std::shared_ptr<weld::MessageDialog> xBox;
     xBox.reset(Application::CreateMessageDialog(
@@ -1329,7 +1329,7 @@ IMPL_STATIC_LINK( SvxScriptErrorDialog, ShowDialog, void*, p, void )
             VclButtonsType::Ok,
             message));
 
-    xBox->set_title(CuiResId(RID_SVXSTR_ERROR_TITLE));
+    xBox->set_title(CuiResId(RID_CUISTR_ERROR_TITLE));
 
     xBox->runAsync(xBox, [](sal_Int32 /*nResult*/) {});
 }

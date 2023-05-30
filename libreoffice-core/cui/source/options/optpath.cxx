@@ -36,12 +36,13 @@
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/ui/dialogs/ExecutableDialogResults.hpp>
 #include <com/sun/star/ui/dialogs/XAsynchronousExecutableDialog.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
-#include <com/sun/star/ui/dialogs/FilePicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
+#include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/util/thePathSettings.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace css;
 using namespace css::beans;
@@ -66,7 +67,7 @@ struct OptPath_Impl
     Reference< css::util::XPathSettings >   m_xPathSettings;
 
     OptPath_Impl()
-        : m_sMultiPathDlg(CuiResId(RID_SVXSTR_EDIT_PATHS))
+        : m_sMultiPathDlg(CuiResId(RID_CUISTR_EDIT_PATHS))
     {
     }
 };
@@ -135,16 +136,16 @@ static OUString getCfgName_Impl( SvtPathOptions::Paths _nHandle )
 
 #define MULTIPATH_DELIMITER     ';'
 
-static OUString Convert_Impl( const OUString& rValue )
+static OUString Convert_Impl( std::u16string_view rValue )
 {
-    if (rValue.isEmpty())
+    if (rValue.empty())
         return OUString();
 
     sal_Int32 nPos = 0;
     OUStringBuffer aReturn;
     for (;;)
     {
-        OUString aValue = rValue.getToken( 0, MULTIPATH_DELIMITER, nPos );
+        OUString aValue( o3tl::getToken(rValue, 0, MULTIPATH_DELIMITER, nPos ) );
         INetURLObject aObj( aValue );
         if ( aObj.GetProtocol() == INetProtocol::File )
             aReturn.append(aObj.PathToFileName());
@@ -211,7 +212,7 @@ IMPL_LINK(SvxPathTabPage, HeaderBarClick, int, nColumn, void)
 SvxPathTabPage::~SvxPathTabPage()
 {
     for (int i = 0, nEntryCount = m_xPathBox->n_children(); i < nEntryCount; ++i)
-        delete reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(i).toInt64());
+        delete weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(i));
 }
 
 std::unique_ptr<SfxTabPage> SvxPathTabPage::Create( weld::Container* pPage, weld::DialogController* pController,
@@ -224,7 +225,7 @@ bool SvxPathTabPage::FillItemSet( SfxItemSet* )
 {
     for (int i = 0, nEntryCount = m_xPathBox->n_children(); i < nEntryCount; ++i)
     {
-        PathUserData_Impl* pPathImpl = reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(i).toInt64());
+        PathUserData_Impl* pPathImpl = weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(i));
         SvtPathOptions::Paths nRealId = pPathImpl->nRealId;
         if (pPathImpl->bItemStateSet )
             SetPathList( nRealId, pPathImpl->sUserPath, pPathImpl->sWritablePath );
@@ -250,39 +251,39 @@ void SvxPathTabPage::Reset( const SfxItemSet* )
         switch (static_cast<SvtPathOptions::Paths>(i))
         {
             case SvtPathOptions::Paths::AutoCorrect:
-                pId = RID_SVXSTR_KEY_AUTOCORRECT_DIR;
+                pId = RID_CUISTR_KEY_AUTOCORRECT_DIR;
                 break;
             case SvtPathOptions::Paths::AutoText:
-                pId = RID_SVXSTR_KEY_GLOSSARY_PATH;
+                pId = RID_CUISTR_KEY_GLOSSARY_PATH;
                 break;
             case SvtPathOptions::Paths::Backup:
-                pId = RID_SVXSTR_KEY_BACKUP_PATH;
+                pId = RID_CUISTR_KEY_BACKUP_PATH;
                 break;
             case SvtPathOptions::Paths::Gallery:
-                pId = RID_SVXSTR_KEY_GALLERY_DIR;
+                pId = RID_CUISTR_KEY_GALLERY_DIR;
                 break;
             case SvtPathOptions::Paths::Graphic:
-                pId = RID_SVXSTR_KEY_GRAPHICS_PATH;
+                pId = RID_CUISTR_KEY_GRAPHICS_PATH;
                 break;
             case SvtPathOptions::Paths::Temp:
-                pId = RID_SVXSTR_KEY_TEMP_PATH;
+                pId = RID_CUISTR_KEY_TEMP_PATH;
                 break;
             case SvtPathOptions::Paths::Template:
-                pId = RID_SVXSTR_KEY_TEMPLATE_PATH;
+                pId = RID_CUISTR_KEY_TEMPLATE_PATH;
                 break;
             case SvtPathOptions::Paths::Dictionary:
-                pId = RID_SVXSTR_KEY_DICTIONARY_PATH;
+                pId = RID_CUISTR_KEY_DICTIONARY_PATH;
                 break;
             case SvtPathOptions::Paths::Classification:
-                pId = RID_SVXSTR_KEY_CLASSIFICATION_PATH;
+                pId = RID_CUISTR_KEY_CLASSIFICATION_PATH;
                 break;
 #if OSL_DEBUG_LEVEL > 1
             case SvtPathOptions::Paths::Linguistic:
-                pId = RID_SVXSTR_KEY_LINGUISTIC_DIR;
+                pId = RID_CUISTR_KEY_LINGUISTIC_DIR;
                 break;
 #endif
             case SvtPathOptions::Paths::Work:
-                pId = RID_SVXSTR_KEY_WORK_PATH;
+                pId = RID_CUISTR_KEY_WORK_PATH;
                 break;
             default: break;
         }
@@ -322,7 +323,7 @@ void SvxPathTabPage::Reset( const SfxItemSet* )
             pPathImpl->sWritablePath = sWritable;
             pPathImpl->bReadOnly = bReadOnly;
 
-            OUString sId = OUString::number(reinterpret_cast<sal_Int64>(pPathImpl));
+            OUString sId = weld::toId(pPathImpl);
             m_xPathBox->set_id(*xIter, sId);
         }
     }
@@ -338,7 +339,7 @@ IMPL_LINK_NOARG(SvxPathTabPage, PathSelect_Impl, weld::TreeView&, void)
     int nEntry = m_xPathBox->get_selected_index();
     if (nEntry != -1)
     {
-        PathUserData_Impl* pPathImpl = reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(nEntry).toInt64());
+        PathUserData_Impl* pPathImpl = weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(nEntry));
         bEnable = !pPathImpl->bReadOnly;
     }
     sal_uInt16 nSelCount = m_xPathBox->count_selected_rows();
@@ -349,7 +350,7 @@ IMPL_LINK_NOARG(SvxPathTabPage, PathSelect_Impl, weld::TreeView&, void)
 IMPL_LINK_NOARG(SvxPathTabPage, StandardHdl_Impl, weld::Button&, void)
 {
     m_xPathBox->selected_foreach([this](weld::TreeIter& rEntry){
-        PathUserData_Impl* pPathImpl = reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(rEntry).toInt64());
+        PathUserData_Impl* pPathImpl = weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(rEntry));
         OUString aOldPath = SvtDefaultOptions::GetDefaultPath( pPathImpl->nRealId );
 
         if ( !aOldPath.isEmpty() )
@@ -362,13 +363,13 @@ IMPL_LINK_NOARG(SvxPathTabPage, StandardHdl_Impl, weld::Button&, void)
             do
             {
                 bool bFound = false;
-                const OUString sOnePath = aOldPath.getToken( 0, MULTIPATH_DELIMITER, nOldPos );
+                const std::u16string_view sOnePath = o3tl::getToken(aOldPath, 0, MULTIPATH_DELIMITER, nOldPos );
                 if ( !sInternal.isEmpty() )
                 {
                     sal_Int32 nInternalPos = 0;
                     do
                     {
-                        if ( sInternal.getToken( 0, MULTIPATH_DELIMITER, nInternalPos ) == sOnePath )
+                        if ( o3tl::getToken(sInternal, 0, MULTIPATH_DELIMITER, nInternalPos ) == sOnePath )
                             bFound = true;
                     }
                     while ( !bFound && nInternalPos >= 0 );
@@ -420,7 +421,7 @@ void SvxPathTabPage::ChangeCurrentEntry( const OUString& _rFolder )
     }
 
     OUString sInternal, sUser, sWritable;
-    PathUserData_Impl* pPathImpl = reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(nEntry).toInt64());
+    PathUserData_Impl* pPathImpl = weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(nEntry));
     bool bReadOnly = false;
     GetPathList( pPathImpl->nRealId, sInternal, sUser, sWritable, bReadOnly );
     sUser = pPathImpl->sUserPath;
@@ -470,7 +471,7 @@ IMPL_LINK_NOARG(SvxPathTabPage, DoubleClickPathHdl_Impl, weld::TreeView&, bool)
 IMPL_LINK_NOARG(SvxPathTabPage, PathHdl_Impl, weld::Button&, void)
 {
     int nEntry = m_xPathBox->get_cursor_index();
-    PathUserData_Impl* pPathImpl = nEntry != -1 ? reinterpret_cast<PathUserData_Impl*>(m_xPathBox->get_id(nEntry).toInt64()) : nullptr;
+    PathUserData_Impl* pPathImpl = nEntry != -1 ? weld::fromId<PathUserData_Impl*>(m_xPathBox->get_id(nEntry)) : nullptr;
     if (!pPathImpl || pPathImpl->bReadOnly)
         return;
 
@@ -658,7 +659,7 @@ void SvxPathTabPage::GetPathList(
 
 
 void SvxPathTabPage::SetPathList(
-    SvtPathOptions::Paths _nPathHandle, const OUString& _rUserPath, const OUString& _rWritablePath )
+    SvtPathOptions::Paths _nPathHandle, std::u16string_view _rUserPath, const OUString& _rWritablePath )
 {
     OUString sCfgName = getCfgName_Impl( _nPathHandle );
 
@@ -677,7 +678,7 @@ void SvxPathTabPage::SetPathList(
         OUString* pArray = aPathSeq.getArray();
         sal_Int32 nPos = 0;
         for ( sal_Int32 i = 0; i < nCount; ++i )
-            pArray[i] = _rUserPath.getToken( 0, MULTIPATH_DELIMITER, nPos );
+            pArray[i] = o3tl::getToken(_rUserPath, 0, MULTIPATH_DELIMITER, nPos );
         Any aValue( aPathSeq );
         pImpl->m_xPathSettings->setPropertyValue(
             sCfgName + POSTFIX_USER, aValue);

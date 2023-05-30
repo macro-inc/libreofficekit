@@ -9,6 +9,7 @@
 
 #include <config_feature_desktop.h>
 #include <config_options.h>
+#include <config_vclplug.h>
 
 #include <memory>
 #include <string_view>
@@ -18,11 +19,13 @@
 #include <comphelper/lok.hxx>
 #include <i18nutil/unicode.hxx>
 #include <jsdialog/enabled.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <osl/module.hxx>
 #include <sal/log.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/resmgr.hxx>
+#include <utility>
 #include <vcl/builder.hxx>
 #include <vcl/dialoghelper.hxx>
 #include <vcl/menu.hxx>
@@ -42,7 +45,7 @@
 #include <vcl/toolkit/menubtn.hxx>
 #include <vcl/mnemonic.hxx>
 #include <vcl/toolkit/prgsbar.hxx>
-#include <vcl/scrbar.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/split.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/toolkit/svtabbx.hxx>
@@ -76,7 +79,7 @@
 #include <salinst.hxx>
 #include <strings.hrc>
 #include <treeglue.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <verticaltabctrl.hxx>
 #include <wizdlg.hxx>
 #include <tools/svlibrary.h>
@@ -107,6 +110,8 @@ namespace
             return IMG_COPY;
         else if (sType == u"edit-paste")
             return IMG_PASTE;
+        else if (sType == u"document-open")
+            return IMG_OPEN;
         else if (sType == u"open-menu-symbolic")
             return IMG_MENU;
         else if (sType == u"window-close-symbolic")
@@ -208,10 +213,11 @@ std::unique_ptr<weld::Builder> Application::CreateInterimBuilder(vcl::Window* pP
 }
 
 weld::MessageDialog* Application::CreateMessageDialog(weld::Widget* pParent, VclMessageType eMessageType,
-                                                      VclButtonsType eButtonType, const OUString& rPrimaryMessage)
+                                                      VclButtonsType eButtonType, const OUString& rPrimaryMessage,
+                                                      const ILibreOfficeKitNotifier* pNotifier)
 {
     if (comphelper::LibreOfficeKit::isActive())
-        return JSInstanceBuilder::CreateMessageDialog(pParent, eMessageType, eButtonType, rPrimaryMessage);
+        return JSInstanceBuilder::CreateMessageDialog(pParent, eMessageType, eButtonType, rPrimaryMessage, pNotifier);
     else
         return ImplGetSVData()->mpDefInst->CreateMessageDialog(pParent, eMessageType, eButtonType, rPrimaryMessage);
 }
@@ -250,7 +256,7 @@ namespace weld
 
     void MetricSpinButton::update_width_chars()
     {
-        int min, max;
+        sal_Int64 min, max;
         m_xSpinButton->get_range(min, max);
         auto width = std::max(m_xSpinButton->get_pixel_size(format_number(min)).Width(),
                               m_xSpinButton->get_pixel_size(format_number(max)).Width());
@@ -266,11 +272,12 @@ namespace weld
         return nValue;
     }
 
-    int SpinButton::denormalize(int nValue) const
+    sal_Int64 SpinButton::denormalize(sal_Int64 nValue) const
     {
         const int nFactor = Power10(get_digits());
 
-        if ((nValue < (SAL_MIN_INT32 + nFactor)) || (nValue > (SAL_MAX_INT32 - nFactor)))
+        if ((nValue < (std::numeric_limits<sal_Int64>::min() + nFactor)) ||
+            (nValue > (std::numeric_limits<sal_Int64>::max() - nFactor)))
         {
             return nValue / nFactor;
         }
@@ -282,7 +289,7 @@ namespace weld
         return (nValue + nHalf) / nFactor;
     }
 
-    OUString MetricSpinButton::format_number(int nValue) const
+    OUString MetricSpinButton::format_number(sal_Int64 nValue) const
     {
         OUString aStr;
 
@@ -330,7 +337,7 @@ namespace weld
     {
         int step, page;
         get_increments(step, page, m_eSrcUnit);
-        int value = get_value(m_eSrcUnit);
+        sal_Int64 value = get_value(m_eSrcUnit);
         m_xSpinButton->set_digits(digits);
         set_increments(step, page, m_eSrcUnit);
         set_value(value, m_eSrcUnit);
@@ -343,7 +350,7 @@ namespace weld
         {
             int step, page;
             get_increments(step, page, m_eSrcUnit);
-            int value = get_value(m_eSrcUnit);
+            sal_Int64 value = get_value(m_eSrcUnit);
             m_eSrcUnit = eUnit;
             set_increments(step, page, m_eSrcUnit);
             set_value(value, m_eSrcUnit);
@@ -352,14 +359,9 @@ namespace weld
         }
     }
 
-    int MetricSpinButton::ConvertValue(int nValue, FieldUnit eInUnit, FieldUnit eOutUnit) const
+    sal_Int64 MetricSpinButton::ConvertValue(sal_Int64 nValue, FieldUnit eInUnit, FieldUnit eOutUnit) const
     {
-        auto nRet = vcl::ConvertValue(nValue, 0, m_xSpinButton->get_digits(), eInUnit, eOutUnit);
-        if (nRet > SAL_MAX_INT32)
-            nRet = SAL_MAX_INT32;
-        else if (nRet < SAL_MIN_INT32)
-            nRet = SAL_MIN_INT32;
-        return nRet;
+        return vcl::ConvertValue(nValue, 0, m_xSpinButton->get_digits(), eInUnit, eOutUnit);
     }
 
     IMPL_LINK(MetricSpinButton, spin_button_input, int*, result, bool)
@@ -442,19 +444,19 @@ namespace weld
 }
 
 VclBuilder::VclBuilder(vcl::Window* pParent, const OUString& sUIDir, const OUString& sUIFile,
-                       const OString& sID, const css::uno::Reference<css::frame::XFrame>& rFrame,
+                       OString sID, css::uno::Reference<css::frame::XFrame> xFrame,
                        bool bLegacy, const NotebookBarAddonsItem* pNotebookBarAddonsItem)
     : m_pNotebookBarAddonsItem(pNotebookBarAddonsItem
                                    ? new NotebookBarAddonsItem(*pNotebookBarAddonsItem)
                                    : new NotebookBarAddonsItem{})
-    , m_sID(sID)
+    , m_sID(std::move(sID))
     , m_sHelpRoot(OUStringToOString(sUIFile, RTL_TEXTENCODING_UTF8))
     , m_pStringReplace(Translate::GetReadStringHook())
     , m_pParent(pParent)
     , m_bToplevelParentFound(false)
     , m_bLegacy(bLegacy)
     , m_pParserState(new ParserState)
-    , m_xFrame(rFrame)
+    , m_xFrame(std::move(xFrame))
 {
     m_bToplevelHasDeferredInit = pParent &&
         ((pParent->IsSystemWindow() && static_cast<SystemWindow*>(pParent)->isDeferredInit()) ||
@@ -518,8 +520,6 @@ VclBuilder::VclBuilder(vcl::Window* pParent, const OUString& sUIDir, const OUStr
                     pSource->SetAccessibleRelationLabeledBy(pTarget);
                 else if (rType == "label-for")
                     pSource->SetAccessibleRelationLabelFor(pTarget);
-                else if (rType == "member-of")
-                    pSource->SetAccessibleRelationMemberOf(pTarget);
                 else
                 {
                     SAL_WARN("vcl.builder", "unhandled a11y relation :" << rType);
@@ -546,9 +546,13 @@ VclBuilder::VclBuilder(vcl::Window* pParent, const OUString& sUIDir, const OUStr
         }
     }
 
+#ifndef NDEBUG
+    o3tl::sorted_vector<OUString> models;
+#endif
     //Set ComboBox models when everything has been imported
     for (auto const& elem : m_pParserState->m_aModelMaps)
     {
+        assert(models.insert(elem.m_sValue).second && "a liststore or treestore is used in duplicate widgets");
         vcl::Window* pTarget = get(elem.m_sID);
         ListBox *pListBoxTarget = dynamic_cast<ListBox*>(pTarget);
         ComboBox *pComboBoxTarget = dynamic_cast<ComboBox*>(pTarget);
@@ -1030,9 +1034,8 @@ namespace
         VclBuilder::stringmap::iterator aFind = rMap.find(OString("relief"));
         if (aFind != rMap.end())
         {
-            if (aFind->second == "half")
-                nBits = WB_FLATBUTTON | WB_BEVELBUTTON;
-            else if (aFind->second == "none")
+            assert(aFind->second != "half" && "relief of 'half' unsupported");
+            if (aFind->second == "none")
                 nBits = WB_FLATBUTTON;
             rMap.erase(aFind);
         }
@@ -1190,7 +1193,7 @@ namespace
         Image aImage(vcl::CommandInfoProvider::GetImageForCommand(aCommand, rFrame));
         pButton->SetModeImage(aImage);
 
-        pButton->SetCommandHandler(aCommand);
+        pButton->SetCommandHandler(aCommand, rFrame);
     }
 
     VclPtr<Button> extractStockAndBuildPushButton(vcl::Window *pParent, VclBuilder::stringmap &rMap, bool bToggle)
@@ -1476,7 +1479,42 @@ void VclBuilderPreload()
 }
 
 #if defined DISABLE_DYNLOADING && !HAVE_FEATURE_DESKTOP
+
+// This ifdef branch is mainly for building for the Collabora Online
+// -based mobile apps for Android and iOS.
+
 extern "C" VclBuilder::customMakeWidget lo_get_custom_widget_func(const char* name);
+
+#elif defined EMSCRIPTEN && !ENABLE_QT5
+
+// This branch is mainly for building for WASM, and especially for
+// Collabora Online in the browser, where code from core and Collabora
+// Online is compiled to WASM and linked into a single WASM binary.
+// (Not for Allotropia's Qt-based LibreOffice in the browser.)
+
+// When building core for WASM it doesn't use the same
+// solenv/bin/native-code.py thing as the mobile apps, even if in both
+// cases everything is linked statically. So there is no generated
+// native-code.h, and we can't use lo_get_custom_widget_func() from
+// that. So cheat and duplicate the code from an existing generated
+// native-code.h. It's just a handful of lines anyway.
+
+extern "C" void makeNotebookbarTabControl(VclPtr<vcl::Window> &rRet, const VclPtr<vcl::Window> &pParent, VclBuilder::stringmap &rVec);
+extern "C" void makeNotebookbarToolBox(VclPtr<vcl::Window> &rRet, const VclPtr<vcl::Window> &pParent, VclBuilder::stringmap &rVec);
+
+static struct { const char *name; VclBuilder::customMakeWidget func; } custom_widgets[] = {
+    { "makeNotebookbarTabControl", makeNotebookbarTabControl },
+    { "makeNotebookbarToolBox", makeNotebookbarToolBox },
+};
+
+static VclBuilder::customMakeWidget lo_get_custom_widget_func(const char* name)
+{
+    for (size_t i = 0; i < sizeof(custom_widgets) / sizeof(custom_widgets[0]); i++)
+        if (strcmp(name, custom_widgets[i].name) == 0)
+            return custom_widgets[i].func;
+    return nullptr;
+}
+
 #endif
 
 namespace
@@ -1536,7 +1574,9 @@ VclBuilder::customMakeWidget GetCustomMakeWidget(const OString& rName)
         else
             pFunction = reinterpret_cast<VclBuilder::customMakeWidget>(
                 aI->second->getFunctionSymbol(sFunction));
-#elif !HAVE_FEATURE_DESKTOP
+#elif !HAVE_FEATURE_DESKTOP || (defined EMSCRIPTEN && !ENABLE_QT5)
+        // This ifdef branch is mainly for building for either the
+        // Android or iOS apps, or the Collabora Online as WASM thing.
         pFunction = lo_get_custom_widget_func(sFunction.toUtf8().getStr());
         SAL_WARN_IF(!pFunction, "vcl.builder", "Could not find " << sFunction);
         assert(pFunction);
@@ -1867,7 +1907,6 @@ VclPtr<vcl::Window> VclBuilder::makeObject(vcl::Window *pParent, const OString &
         //a) make SvHeaderTabListBox/SvTabListBox the default target for GtkTreeView
         //b) remove the non-drop down mode of ListBox and convert
         //   everything over to SvHeaderTabListBox/SvTabListBox
-        //c) remove the users of makeSvTabListBox and makeSvTreeListBox
         extractModel(id, rMap);
         WinBits nWinStyle = WB_CLIPCHILDREN|WB_LEFT|WB_VCENTER|WB_3DLOOK;
         if (m_bLegacy)
@@ -2091,10 +2130,9 @@ VclPtr<vcl::Window> VclBuilder::makeObject(vcl::Window *pParent, const OString &
             {
                 nItemId = ToolBoxItemId(pToolBox->GetItemCount() + 1);
                     //TODO: ImplToolItems::size_type -> sal_uInt16!
-                pToolBox->InsertItem(nItemId, extractLabel(rMap), nBits);
                 if (aCommand.isEmpty() && !m_bLegacy)
                     aCommand = OUString::fromUtf8(id);
-                pToolBox->SetItemCommand(nItemId, aCommand);
+                pToolBox->InsertItem(nItemId, extractLabel(rMap), aCommand, nBits);
             }
 
             pToolBox->SetHelpId(nItemId, m_sHelpRoot + id);
@@ -2406,7 +2444,7 @@ namespace BuilderUtils
             { "list box",              AccessibleRole::UNKNOWN },
             { "grouping",              AccessibleRole::GROUP_BOX },
             { "image map",             AccessibleRole::IMAGE_MAP },
-            { "notification",          AccessibleRole::UNKNOWN },
+            { "notification",          AccessibleRole::NOTIFICATION },
             { "info bar",              AccessibleRole::UNKNOWN },
             { "level bar",             AccessibleRole::UNKNOWN },
             { "title bar",             AccessibleRole::UNKNOWN },
@@ -2490,6 +2528,15 @@ VclPtr<vcl::Window> VclBuilder::insertObject(vcl::Window *pParent, const OString
         else
             BuilderUtils::set_properties(pCurrentChild, rProps);
 
+        // tdf#119827 handle size before scale so we can trivially
+        // scale on the current font size whether size is present
+        // or not.
+        VclBuilder::stringmap::iterator aSize = rPango.find(OString("size"));
+        if (aSize != rPango.end())
+        {
+            pCurrentChild->set_font_attribute(aSize->first, aSize->second);
+            rPango.erase(aSize);
+        }
         for (auto const& elem : rPango)
         {
             const OString &rKey = elem.first;
@@ -3395,7 +3442,7 @@ namespace
             return vcl::KeyCode(KEY_MULTIPLY, bShift, bMod1, bMod2, bMod3);
         else if (rKey.first.getLength() > 1 && rKey.first[0] == 'F')
         {
-            sal_uInt32 nIndex = rKey.first.copy(1).toUInt32();
+            sal_uInt32 nIndex = o3tl::toUInt32(rKey.first.subView(1));
             assert(nIndex >= 1 && nIndex <= 26);
             return vcl::KeyCode(KEY_F1 + nIndex - 1, bShift, bMod1, bMod2, bMod3);
         }
@@ -4384,8 +4431,8 @@ VclBuilder::ParserState::ParserState()
     , m_nLastMenuItemId(0)
 {}
 
-VclBuilder::MenuAndId::MenuAndId(const OString &rId, Menu *pMenu)
-    : m_sID(rId)
+VclBuilder::MenuAndId::MenuAndId(OString aId, Menu *pMenu)
+    : m_sID(std::move(aId))
     , m_pMenu(pMenu)
 {}
 

@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-06-12 16:30+0000\n"
+"POT-Creation-Date: 2023-02-09 12:12+0100\n"
+"PO-Revision-Date: 2023-03-08 23:34+0000\n"
 "Last-Translator: A S Alam <amanpreet.alam@gmail.com>\n"
-"Language-Team: Punjabi <https://translations.documentfoundation.org/projects/libo_ui-master/sdmessages/pa/>\n"
+"Language-Team: Punjabi <https://translations.documentfoundation.org/projects/libo_ui-7-5/sdmessages/pa/>\n"
 "Language: pa-IN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1548642494.000000\n"
 
 #. WDjkB
@@ -287,10 +287,9 @@ msgstr "ਫਾਇਲ ਫਾਰਮੈਟ ਵਿੱਚ $(ARG1)(row,col) ਉੱਤ�
 
 #. cXzDt
 #: sd/inc/errhdl.hrc:32 sd/inc/errhdl.hrc:34
-#, fuzzy
 msgctxt "RID_SD_ERRHDL"
 msgid "Format error discovered in the file in sub-document $(ARG1) at position $(ARG2)(row,col)."
-msgstr "ਸਬ-ਡੌਕੂਮੈਂਟ $(ARG1) ਵਿੱਚ ਫਾਇਲ ਵਿੱਚ ਫਾਰਮੈਟ ਗਲਤੀ ਸਥਿਤੀ $(ARG2)(ਕਤਾਰ,ਕਾਲਮ) ਉੱਤੇ ਖੋਜੀ ਹੈ।"
+msgstr "ਸਬ-ਡੌਕੂਮੈਂਟ $(ARG1) ਵਿੱਚ ਫਾਇਲ ਵਿੱਚ ਫਾਰਮੈਟ ਗਲਤੀ $(ARG2)(ਕਤਾਰ,ਕਾਲਮ) ਥਾਂ ਉੱਤੇ ਖੋਜੀ ਹੈ।"
 
 #. BA5TS
 #: sd/inc/family.hrc:29
@@ -652,7 +651,7 @@ msgstr "ਰੇਖਾ ਅੰਤ"
 #: sd/inc/strings.hrc:67
 msgctxt "STR_DESC_LINEEND"
 msgid "Please enter a name for the new arrow style:"
-msgstr ""
+msgstr "ਨਵੇਂ ਤੀਰ ਸ਼ੈਲੀ ਲਈ ਨਾਂ ਦਿਓ ਜੀ:"
 
 #. 7y2Si
 #: sd/inc/strings.hrc:68
@@ -698,7 +697,7 @@ msgstr "ਸਲਾਈਡ ਨਾਂ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹ�
 #: sd/inc/strings.hrc:74
 msgctxt "STR_WARN_PAGE_EXISTS_DRAW"
 msgid "The page name already exists or is invalid. Please enter another name."
-msgstr ""
+msgstr "ਸਫ਼ਾ ਨਾਂ ਪਹਿਲਾਂ ਹੀ ਮੌਜੂਦ ਹੈ ਜਾਂ ਗਲਤ ਹੈ। ਹੋਰ ਨਾਂ ਦਿਓ ਜੀ।"
 
 #. ryfEt
 #: sd/inc/strings.hrc:75
@@ -1175,7 +1174,7 @@ msgstr "ਮਾਈਕਰੋ"
 #: sd/inc/strings.hrc:151
 msgctxt "STR_FULLSCREEN_SLIDESHOW"
 msgid "Presenting: %s"
-msgstr ""
+msgstr "ਪੇਸ਼ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ: %s"
 
 #. uo4o3
 #. To translators: this is the spinbutton in the slidesorter toolbar to set the number of slides to show per row
@@ -1425,7 +1424,7 @@ msgstr "ਸਭ ਡਰਾਇੰਗ ਆਬਜੈਕਟ ਦਾ ਗਰੁੱਪ-ਵ�
 #: sd/inc/strings.hrc:196
 msgctxt "STR_IMPRESS_DOCUMENT_FULLTYPE_80"
 msgid "%PRODUCTNAME %PRODUCTVERSION Presentation"
-msgstr ""
+msgstr "%PRODUCTNAME %PRODUCTVERSION ਪੇਸ਼ਕਾਰੀ"
 
 #. BJiWE
 #: sd/inc/strings.hrc:197
@@ -1638,7 +1637,7 @@ msgstr "ਫਾਇਲ $(URL1) ਨੂੰ $(URL2) ਉੱਤੇ ਕਾਪੀ ਨਹ�
 #: sd/inc/strings.hrc:232
 msgctxt "STR_STATUSBAR_MASTERPAGE"
 msgid "Slide Master name. Right-click for list or click for dialog."
-msgstr ""
+msgstr "ਸਲਾਈਡ ਮਾਸਟਰ ਨਾਂ। ਸੂਚੀ ਲਈ ਸੱਜਾ-ਕਲਿੱਕ ਜਾਂ ਡਾਈਲਾਗ ਲਈ ਕਲਿੱਕ ਕਰੋ।"
 
 #. HcDvJ
 #: sd/inc/strings.hrc:233
@@ -1656,7 +1655,7 @@ msgstr "ਸਫ਼ੇ ਦਾ ਨਾਂ ਬਦਲੋ"
 #: sd/inc/strings.hrc:235
 msgctxt "STR_TOOLTIP_RENAME"
 msgid "Duplicate or empty names are not possible"
-msgstr ""
+msgstr "ਦੂਹਰੇ ਜਾਂ ਖਾਲੀ ਨਾਂ ਸੰਭਵ ਨਹੀਂ ਹਨ"
 
 #. FUm5F
 #: sd/inc/strings.hrc:236
@@ -1668,7 +1667,7 @@ msgstr "ਨਾਂ"
 #: sd/inc/strings.hrc:237
 msgctxt "STR_TITLE_RENAMEMASTER"
 msgid "Rename Master Slide"
-msgstr ""
+msgstr "ਮਾਸਟਰ ਸਲਾਈਡ ਦਾ ਨਾਂ ਬਦਲੋ"
 
 #. rWiXQ
 #: sd/inc/strings.hrc:238
@@ -1992,7 +1991,7 @@ msgstr "ਆਉਟ-ਲਾਈਨ ਟੈਕਸਟ ਫਾਰਮੈਟ ਸੋਧਣ �
 #: sd/inc/strings.hrc:292
 msgctxt "STR_PRESOBJ_MPTITLE_MOBILE"
 msgid "Double-tap to edit the title text format"
-msgstr ""
+msgstr "ਟਾਈਟਲ ਲਿਖਤ ਫ਼ਾਰਮੈਟ ਸੋਧਣ ਲਈ ਦੋ-ਵਾਰ ਛੂਹੋ"
 
 #. eMDBG
 #: sd/inc/strings.hrc:293
@@ -2064,85 +2063,85 @@ msgstr ""
 #: sd/inc/strings.hrc:304
 msgctxt "STR_PRESOBJ_TITLE"
 msgid "Click to add Title"
-msgstr ""
+msgstr "ਟਾਈਟਲ ਜੋੜਨ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 
 #. HVQNr
 #: sd/inc/strings.hrc:305
 msgctxt "STR_PRESOBJ_OUTLINE"
 msgid "Click to add Text"
-msgstr ""
+msgstr "ਲਿਖਤ ਜੋੜਨ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 
 #. NUirL
 #: sd/inc/strings.hrc:306
 msgctxt "STR_PRESOBJ_TEXT"
 msgid "Click to add Text"
-msgstr ""
+msgstr "ਲਿਖਤ ਜੋੜਨ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 
 #. 2u7FR
 #: sd/inc/strings.hrc:307
 msgctxt "STR_PRESOBJ_NOTESTEXT"
 msgid "Click to add Notes"
-msgstr ""
+msgstr "ਨੋਟਿਸ ਜੋੜਨ ਲਈ ਕਲਿੱਕ ਕਰੋ"
 
 #. js2X9
 #: sd/inc/strings.hrc:308
 msgctxt "STR_PRESOBJ_TITLE_MOBILE"
 msgid "Double-tap to add Title"
-msgstr ""
+msgstr "ਟਾਈਟਲ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਛੂਹੋ"
 
 #. jLtyS
 #: sd/inc/strings.hrc:309
 msgctxt "STR_PRESOBJ_OUTLINE_MOBILE"
 msgid "Double-tap to add Text"
-msgstr ""
+msgstr "ਲਿਖਤ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਛੂਹੋ"
 
 #. KAFJh
 #: sd/inc/strings.hrc:310
 msgctxt "STR_PRESOBJ_TEXT_MOBILE"
 msgid "Double-tap to add Text"
-msgstr ""
+msgstr "ਲਿਖਤ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਛੂਹੋ"
 
 #. ksTwQ
 #: sd/inc/strings.hrc:311
 msgctxt "STR_PRESOBJ_TEXT_MOBILE"
 msgid "Tap to edit text"
-msgstr ""
+msgstr "ਲਿਖਤ ਸੋਧਣ ਲਈ ਛੂਹੋ"
 
 #. bRhRR
 #: sd/inc/strings.hrc:312
 msgctxt "STR_PRESOBJ_NOTESTEXT_MOBILE"
 msgid "Double-tap to add Notes"
-msgstr ""
+msgstr "ਨੋਟਿਸ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਛੂਹੋ"
 
 #. ZqPtT
 #: sd/inc/strings.hrc:313
 msgctxt "STR_PRESOBJ_GRAPHIC"
 msgid "Double-click to add an Image"
-msgstr ""
+msgstr "ਚਿੱਤਰ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਕਲਿੱਕ ਕਰੋ"
 
 #. HGVA3
 #: sd/inc/strings.hrc:314
 msgctxt "STR_PRESOBJ_OBJECT"
 msgid "Double-click to add an Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਕਲਿੱਕ ਕਰੋ"
 
 #. XjW6w
 #: sd/inc/strings.hrc:315
 msgctxt "STR_PRESOBJ_CHART"
 msgid "Double-click to add a Chart"
-msgstr ""
+msgstr "ਚਾਰਟ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਕਲਿੱਕ ਕਰੋ"
 
 #. eKgCA
 #: sd/inc/strings.hrc:316
 msgctxt "STR_PRESOBJ_ORGCHART"
 msgid "Double-click to add an Organization Chart"
-msgstr ""
+msgstr "ਸੰਗਠਨ ਚਾਰਟ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਕਲਿੱਕ ਕਰੋ"
 
 #. wW4E4
 #: sd/inc/strings.hrc:317
 msgctxt "STR_PRESOBJ_TABLE"
 msgid "Double-click to add a Spreadsheet"
-msgstr ""
+msgstr "ਸਪਰੈਡਸ਼ੀਟ ਜੋੜਨ ਲਈ ਦੋ ਵਾਰ ਕਲਿੱਕ ਕਰੋ"
 
 #. nBtJo
 #: sd/inc/strings.hrc:318
@@ -2160,7 +2159,7 @@ msgstr "ਟਾਈਟਲ"
 #: sd/inc/strings.hrc:320
 msgctxt "STR_STANDARD_STYLESHEET_NAME"
 msgid "Default Drawing Style"
-msgstr ""
+msgstr "ਮੂਲ ਡਰਾਇੰਗ ਸਟਾਈਲ"
 
 #. pxfDw
 #: sd/inc/strings.hrc:321
@@ -2172,19 +2171,19 @@ msgstr "ਸਲਾਈਡਾਂ ਹਲਾਓ"
 #: sd/inc/strings.hrc:322
 msgctxt "STR_INSERT_PAGES"
 msgid "Insert Pages"
-msgstr ""
+msgstr "ਸਫ਼ੇ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. 7Z6kC
 #: sd/inc/strings.hrc:323
 msgctxt "STR_INSERT_PAGE_DRAW"
 msgid "Insert Page"
-msgstr ""
+msgstr "ਸਫ਼ਾ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. CMhGm
 #: sd/inc/strings.hrc:324
 msgctxt "STR_SLIDE_SETUP_TITLE"
 msgid "Slide Properties"
-msgstr ""
+msgstr "ਸਲਾਈਡ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ"
 
 #. pA7rP
 #: sd/inc/strings.hrc:326
@@ -2196,7 +2195,7 @@ msgstr "ਬਿਨਾਂ ਭਰਨ ਨਾਲ ਆਬੈਕਟ"
 #: sd/inc/strings.hrc:327
 msgctxt "STR_POOLSHEET_OBJNOLINENOFILL"
 msgid "Object with no fill and no line"
-msgstr ""
+msgstr "ਬਿਨਾਂ ਭਰਨ ਦੇ ਆਬਜੈਕਟ ਅਤੇ ਕੋਈ ਰੇਖਾ ਨਹੀਂ"
 
 #. YCmiq
 #: sd/inc/strings.hrc:328
@@ -2208,7 +2207,7 @@ msgstr "ਟੈਕਸਟ"
 #: sd/inc/strings.hrc:329
 msgctxt "STR_POOLSHEET_A4"
 msgid "A4"
-msgstr ""
+msgstr "A4"
 
 #. EEK5c
 #: sd/inc/strings.hrc:330
@@ -2256,67 +2255,67 @@ msgstr ""
 #: sd/inc/strings.hrc:337
 msgctxt "STR_POOLSHEET_GRAPHIC"
 msgid "Graphic"
-msgstr ""
+msgstr "ਗਰਾਫ਼ਿਕ"
 
 #. o4g3u
 #: sd/inc/strings.hrc:338
 msgctxt "STR_POOLSHEET_GRAPHIC"
 msgid "Shapes"
-msgstr ""
+msgstr "ਸ਼ਕਲਾਂ"
 
 #. i6AnZ
 #: sd/inc/strings.hrc:339
 msgctxt "STR_POOLSHEET_LINES"
 msgid "Lines"
-msgstr ""
+msgstr "ਲਾਈਨਾਂ"
 
 #. 2ohzZ
 #: sd/inc/strings.hrc:340
 msgctxt "STR_POOLSHEET_MEASURE"
 msgid "Arrow Line"
-msgstr ""
+msgstr "ਤੀਰ ਲਾਈਨ"
 
 #. mLCYV
 #: sd/inc/strings.hrc:341
 msgctxt "STR_POOLSHEET_LINES_DASHED"
 msgid "Dashed Line"
-msgstr ""
+msgstr "ਡੱਬੀਦਾਰ ਲਾਈਨ"
 
 #. xtD8b
 #: sd/inc/strings.hrc:343
 msgctxt "STR_POOLSHEET_FILLED"
 msgid "Filled"
-msgstr ""
+msgstr "ਭਰੇ"
 
 #. BGGf5
 #: sd/inc/strings.hrc:344
 msgctxt "STR_POOLSHEET_FILLED_BLUE"
 msgid "Filled Blue"
-msgstr ""
+msgstr "ਨੀਲਾ ਭਰਿਆ"
 
 #. sGCBw
 #: sd/inc/strings.hrc:345
 msgctxt "STR_POOLSHEET_FILLED_GREEN"
 msgid "Filled Green"
-msgstr ""
+msgstr "ਹਰਾ ਭਰਿਆ"
 
 #. xfoEY
 #: sd/inc/strings.hrc:346
 msgctxt "STR_POOLSHEET_FILLED_YELLOW"
 msgid "Filled Yellow"
-msgstr ""
+msgstr "ਪੀਲਾ ਭਰਿਆ"
 
 #. eEKGF
 #: sd/inc/strings.hrc:347
 msgctxt "STR_POOLSHEET_FILLED_RED"
 msgid "Filled Red"
-msgstr ""
+msgstr "ਲਾਲ ਭਰਿਆ"
 
 #. uHgQH
 #: sd/inc/strings.hrc:349
 msgctxt "STR_POOLSHEET_OUTLINE"
 msgid "Outlined"
-msgstr ""
+msgstr "ਰੂਪ-ਰੇਖਾ"
 
 #. 2eHMC
 #: sd/inc/strings.hrc:350
@@ -2390,44 +2389,14 @@ msgctxt "STR_SAVE_DOC"
 msgid "Save Document"
 msgstr "ਡੌਕੂਮੈਂਟ ਸੰਭਾਲੋ"
 
-#. VCFFA
-#: sd/inc/strings.hrc:363
-msgctxt "STR_POOLSHEET_BANDED_CELL"
-msgid "Banding cell"
-msgstr "ਬੈਂਡਿੰਗ ਸੈੱਲ"
-
-#. FBzD4
-#: sd/inc/strings.hrc:364
-msgctxt "STR_POOLSHEET_HEADER"
-msgid "Header"
-msgstr "ਹੈੱਡਰ"
-
-#. kut56
-#: sd/inc/strings.hrc:365
-msgctxt "STR_POOLSHEET_TOTAL"
-msgid "Total line"
-msgstr "ਕੁੱਲ ਲਾਈਨ"
-
-#. 4UBCG
-#: sd/inc/strings.hrc:366
-msgctxt "STR_POOLSHEET_FIRST_COLUMN"
-msgid "First column"
-msgstr "ਪਹਿਲਾਂ ਕਾਲਮ"
-
-#. f3Zfa
-#: sd/inc/strings.hrc:367
-msgctxt "STR_POOLSHEET_LAST_COLUMN"
-msgid "Last column"
-msgstr "ਆਖਰੀ ਕਾਲਮ"
-
 #. HAeDt
-#: sd/inc/strings.hrc:368
+#: sd/inc/strings.hrc:363
 msgctxt "STR_SHRINK_FONT_SIZE"
 msgid "Shrink font size"
 msgstr ""
 
 #. 7uDfu
-#: sd/inc/strings.hrc:369
+#: sd/inc/strings.hrc:364
 msgctxt "STR_GROW_FONT_SIZE"
 msgid "Grow font size"
 msgstr ""
@@ -2435,673 +2404,657 @@ msgstr ""
 #. E9zvq
 #. Names and descriptions of the Draw/Impress accessibility views
 #. ==============================================================
-#: sd/inc/strings.hrc:374
+#: sd/inc/strings.hrc:369
 msgctxt "SID_SD_A11Y_D_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "ਡਰਾਇੰਗ ਝਲਕ"
 
 #. GfnmX
-#: sd/inc/strings.hrc:375
+#: sd/inc/strings.hrc:370
 msgctxt "SID_SD_A11Y_I_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "ਡਰਾਇੰਗ ਝਲਕ"
 
 #. YCVqM
-#: sd/inc/strings.hrc:376
+#: sd/inc/strings.hrc:371
 msgctxt "SID_SD_A11Y_I_OUTLINEVIEW_N"
 msgid "Outline View"
 msgstr "ਢਾਂਚਾ ਝਲਕ"
 
 #. k2hXi
-#: sd/inc/strings.hrc:377
+#: sd/inc/strings.hrc:372
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_N"
 msgid "Slides View"
 msgstr "ਸਲਾਈਡ ਝਲਕ"
 
 #. A22hR
-#: sd/inc/strings.hrc:378
+#: sd/inc/strings.hrc:373
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_D"
 msgid "This is where you sort slides."
 msgstr "ਇਹ ਉਹ ਥਾਂ ਹੈ, ਜਿਥੇ ਸਲਾਈਡ ਕ੍ਰਮਬੱਧ ਹੈ"
 
 #. vyX8L
-#: sd/inc/strings.hrc:379
+#: sd/inc/strings.hrc:374
 msgctxt "SID_SD_A11Y_I_NOTESVIEW_N"
 msgid "Notes View"
 msgstr "ਸੂਚਨਾ ਝਲਕ"
 
 #. qr5ov
-#: sd/inc/strings.hrc:380
+#: sd/inc/strings.hrc:375
 msgctxt "SID_SD_A11Y_I_HANDOUTVIEW_N"
 msgid "Handout View"
 msgstr "ਹੈਂਡਆਉਟ ਝਲਕ"
 
 #. Ycpb4
-#: sd/inc/strings.hrc:381
-#, fuzzy
+#: sd/inc/strings.hrc:376
 msgctxt "SID_SD_A11Y_P_TITLE_N"
 msgid "PresentationTitle"
-msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ"
+msgstr "ਪੇਸ਼ਕਾਰੀ-ਟਾਈਟਲ"
 
 #. 4WCzf
-#: sd/inc/strings.hrc:382
+#: sd/inc/strings.hrc:377
 msgctxt "SID_SD_A11Y_P_OUTLINER_N"
 msgid "PresentationOutliner"
 msgstr ""
 
 #. cBoMF
-#: sd/inc/strings.hrc:383
+#: sd/inc/strings.hrc:378
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N"
 msgid "PresentationSubtitle"
 msgstr ""
 
 #. 8KV99
-#: sd/inc/strings.hrc:384
-#, fuzzy
+#: sd/inc/strings.hrc:379
 msgctxt "SID_SD_A11Y_P_PAGE_N"
 msgid "PresentationPage"
-msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ"
+msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ-ਸਫ਼ਾ"
 
 #. R6kyg
-#: sd/inc/strings.hrc:385
-#, fuzzy
+#: sd/inc/strings.hrc:380
 msgctxt "SID_SD_A11Y_P_NOTES_N"
 msgid "PresentationNotes"
-msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ"
+msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ-ਨੋਟਿਸ"
 
 #. X8c9Z
-#: sd/inc/strings.hrc:386
-#, fuzzy
+#: sd/inc/strings.hrc:381
 msgctxt "SID_SD_A11Y_P_HANDOUT_N"
 msgid "Handout"
 msgstr "ਹੈਂਡਆਉਟ"
 
 #. FeAdu
-#: sd/inc/strings.hrc:387
+#: sd/inc/strings.hrc:382
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N"
 msgid "UnknownAccessiblePresentationShape"
 msgstr ""
 
 #. sA8of
-#: sd/inc/strings.hrc:388
-#, fuzzy
+#: sd/inc/strings.hrc:383
 msgctxt "SID_SD_A11Y_P_FOOTER_N"
 msgid "PresentationFooter"
-msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ ਮੋਡ"
+msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ-ਫ਼ੁੱਟਰ"
 
 #. KAC6Z
-#: sd/inc/strings.hrc:389
-#, fuzzy
+#: sd/inc/strings.hrc:384
 msgctxt "SID_SD_A11Y_P_HEADER_N"
 msgid "PresentationHeader"
-msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ"
+msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ-ਹੈੱਡਰ"
 
 #. EfHeH
-#: sd/inc/strings.hrc:390
+#: sd/inc/strings.hrc:385
 msgctxt "SID_SD_A11Y_P_DATE_N"
 msgid "PresentationDateAndTime"
 msgstr ""
 
 #. WosPZ
-#: sd/inc/strings.hrc:391
+#: sd/inc/strings.hrc:386
 msgctxt "SID_SD_A11Y_P_NUMBER_N"
 msgid "PresentationPageNumber"
 msgstr ""
 
 #. kCGsH
-#: sd/inc/strings.hrc:392
+#: sd/inc/strings.hrc:387
 msgctxt "SID_SD_A11Y_D_PRESENTATION"
 msgid "%PRODUCTNAME Presentation"
 msgstr "%PRODUCTNAME ਪਰਿਜੈਂਟੇਸ਼ਨ"
 
 #. ubJop
-#: sd/inc/strings.hrc:393
+#: sd/inc/strings.hrc:388
 msgctxt "SID_SD_A11Y_P_TITLE_N_STYLE"
 msgid "Title"
 msgstr "ਟਾਈਟਲ"
 
 #. Va4KF
-#: sd/inc/strings.hrc:394
+#: sd/inc/strings.hrc:389
 #, fuzzy
 msgctxt "SID_SD_A11Y_P_OUTLINER_N_STYLE"
 msgid "Outliner"
 msgstr "ਢਾਂਚਾ"
 
 #. 6FKRE
-#: sd/inc/strings.hrc:395
+#: sd/inc/strings.hrc:390
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N_STYLE"
 msgid "Subtitle"
 msgstr "ਸਬ-ਟਾਈਟਲ"
 
 #. eSBEi
-#: sd/inc/strings.hrc:396
+#: sd/inc/strings.hrc:391
 msgctxt "SID_SD_A11Y_P_PAGE_N_STYLE"
 msgid "Page"
 msgstr "ਸਫ਼ਾ"
 
 #. WEaeZ
-#: sd/inc/strings.hrc:397
-#, fuzzy
+#: sd/inc/strings.hrc:392
 msgctxt "SID_SD_A11Y_P_NOTES_N_STYLE"
 msgid "Notes"
 msgstr "ਨੋਟਸ"
 
 #. buhox
-#: sd/inc/strings.hrc:398
-#, fuzzy
+#: sd/inc/strings.hrc:393
 msgctxt "SID_SD_A11Y_P_HANDOUT_N_STYLE"
 msgid "Handout"
 msgstr "ਹੈਂਡਆਉਟ"
 
 #. 4xBQg
-#: sd/inc/strings.hrc:399
+#: sd/inc/strings.hrc:394
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N_STYLE"
 msgid "Unknown Accessible Presentation Shape"
 msgstr ""
 
 #. CGegB
-#: sd/inc/strings.hrc:400
+#: sd/inc/strings.hrc:395
 msgctxt "SID_SD_A11Y_P_FOOTER_N_STYLE"
 msgid "Footer"
 msgstr "ਫੁੱਟਰ"
 
 #. SrrR4
-#: sd/inc/strings.hrc:401
+#: sd/inc/strings.hrc:396
 msgctxt "SID_SD_A11Y_P_HEADER_N_STYLE"
 msgid "Header"
 msgstr "ਹੈੱਡਰ"
 
 #. CCwKy
-#: sd/inc/strings.hrc:402
+#: sd/inc/strings.hrc:397
 msgctxt "SID_SD_A11Y_P_DATE_N_STYLE"
 msgid "Date"
 msgstr "ਮਿਤੀ"
 
 #. EFmn4
-#: sd/inc/strings.hrc:403
-#, fuzzy
+#: sd/inc/strings.hrc:398
 msgctxt "SID_SD_A11Y_P_NUMBER_N_STYLE"
 msgid "Number"
 msgstr "ਅੰਕ"
 
 #. wFpMQ
-#: sd/inc/strings.hrc:404
-#, fuzzy
+#: sd/inc/strings.hrc:399
 msgctxt "SID_SD_A11Y_D_PRESENTATION_READONLY"
 msgid "(read-only)"
-msgstr " (ਕੇਵਲ ਪੜ੍ਹਨ ਲਈ)"
+msgstr "(ਸਿਰਫ਼ ਪੜ੍ਹਨ ਲਈ)"
 
 #. EV4W5
-#: sd/inc/strings.hrc:406
+#: sd/inc/strings.hrc:401
 msgctxt "STR_CUSTOMANIMATION_REPEAT_NONE"
 msgid "none"
 msgstr "ਕੋਈ ਨਹੀਂ"
 
 #. 9izAz
-#: sd/inc/strings.hrc:407
+#: sd/inc/strings.hrc:402
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_NEXT_CLICK"
 msgid "Until next click"
 msgstr "ਅਗਲੀ ਵਾਰ ਦਬਾਉਣ ਤੱਕ"
 
 #. oEQ7B
-#: sd/inc/strings.hrc:408
+#: sd/inc/strings.hrc:403
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_END_OF_SLIDE"
 msgid "Until end of slide"
 msgstr "ਸਲਾਇਡ ਖਤਮ ਹੋਣ ਤੱਕ"
 
 #. Lf9gB
-#: sd/inc/strings.hrc:409
-#, fuzzy
+#: sd/inc/strings.hrc:404
 msgctxt "STR_CUSTOMANIMATION_DIRECTION_PROPERTY"
 msgid "Direction:"
-msgstr "ਦਿਸ਼ਾ"
+msgstr "ਦਿਸ਼ਾ:"
 
 #. xxDXG
-#: sd/inc/strings.hrc:410
-#, fuzzy
+#: sd/inc/strings.hrc:405
 msgctxt "STR_CUSTOMANIMATION_ZOOM_PROPERTY"
 msgid "Zoom:"
-msgstr "ਜ਼ੂਮ"
+msgstr "ਜ਼ੂਮ:"
 
 #. SvBeK
-#: sd/inc/strings.hrc:411
+#: sd/inc/strings.hrc:406
 #, fuzzy
 msgctxt "STR_CUSTOMANIMATION_SPOKES_PROPERTY"
 msgid "Spokes:"
 msgstr "ਬੋਲਿਆ"
 
 #. eJ4qZ
-#: sd/inc/strings.hrc:412
-#, fuzzy
+#: sd/inc/strings.hrc:407
 msgctxt "STR_CUSTOMANIMATION_FIRST_COLOR_PROPERTY"
 msgid "First color:"
-msgstr "ਪਹਿਲਾਂ ਕਾਲਮ"
+msgstr "ਪਹਿਲਾਂ ਰੰਗ:"
 
 #. CSbCE
-#: sd/inc/strings.hrc:413
-#, fuzzy
+#: sd/inc/strings.hrc:408
 msgctxt "STR_CUSTOMANIMATION_SECOND_COLOR_PROPERTY"
 msgid "Second color:"
-msgstr "ਦੂਜਾ ਰੰਗ"
+msgstr "ਦੂਜਾ ਰੰਗ:"
 
 #. cZUiD
-#: sd/inc/strings.hrc:414
-#, fuzzy
+#: sd/inc/strings.hrc:409
 msgctxt "STR_CUSTOMANIMATION_FILL_COLOR_PROPERTY"
 msgid "Fill color:"
-msgstr "ਪਹਿਲਾਂ ਕਾਲਮ"
+msgstr "ਭਰਨ ਰੰਗ:"
 
 #. U5ZDL
-#: sd/inc/strings.hrc:415
+#: sd/inc/strings.hrc:410
 msgctxt "STR_CUSTOMANIMATION_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "ਸਟਾਈਲ:"
 
 #. vKLER
-#: sd/inc/strings.hrc:416
-#, fuzzy
+#: sd/inc/strings.hrc:411
 msgctxt "STR_CUSTOMANIMATION_FONT_PROPERTY"
 msgid "Font:"
-msgstr "ਫੋਂਟ"
+msgstr "ਫੋਂਟ:"
 
 #. Fdsks
-#: sd/inc/strings.hrc:417
-#, fuzzy
+#: sd/inc/strings.hrc:412
 msgctxt "STR_CUSTOMANIMATION_FONT_COLOR_PROPERTY"
 msgid "Font color:"
-msgstr "ਪਹਿਲਾਂ ਕਾਲਮ"
+msgstr "ਫ਼ੋਂਟ ਰੰਗ:"
 
 #. nT7dm
-#: sd/inc/strings.hrc:418
+#: sd/inc/strings.hrc:413
 msgctxt "STR_CUSTOMANIMATION_FONT_SIZE_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "ਸਟਾਈਲ:"
 
 #. q24Fe
-#: sd/inc/strings.hrc:419
-#, fuzzy
+#: sd/inc/strings.hrc:414
 msgctxt "STR_CUSTOMANIMATION_FONT_STYLE_PROPERTY"
 msgid "Typeface:"
-msgstr "ਟਾਇਪਫੇਸ"
+msgstr "ਟਾਇਪਫੇਸ:"
 
 #. nAqeR
-#: sd/inc/strings.hrc:420
-#, fuzzy
+#: sd/inc/strings.hrc:415
 msgctxt "STR_CUSTOMANIMATION_LINE_COLOR_PROPERTY"
 msgid "Line color:"
-msgstr "ਰੇਖਾ ਰੰਗ"
+msgstr "ਲਾਈਨ ਰੰਗ:"
 
 #. w7G4Q
-#: sd/inc/strings.hrc:421
-#, fuzzy
+#: sd/inc/strings.hrc:416
 msgctxt "STR_CUSTOMANIMATION_SIZE_PROPERTY"
 msgid "Font size:"
-msgstr "ਫੋਂਟ ਆਕਾਰ"
+msgstr "ਫੋਂਟ ਆਕਾਰ:"
 
 #. R3GgU
-#: sd/inc/strings.hrc:422
-#, fuzzy
+#: sd/inc/strings.hrc:417
 msgctxt "STR_CUSTOMANIMATION_SCALE_PROPERTY"
 msgid "Size:"
-msgstr "ਆਕਾਰ"
+msgstr "ਆਕਾਰ:"
 
 #. YEwoz
-#: sd/inc/strings.hrc:423
-#, fuzzy
+#: sd/inc/strings.hrc:418
 msgctxt "STR_CUSTOMANIMATION_AMOUNT_PROPERTY"
 msgid "Amount:"
-msgstr "Amount"
+msgstr "ਮਾਤਰਾ:"
 
 #. wiQPZ
-#: sd/inc/strings.hrc:424
-#, fuzzy
+#: sd/inc/strings.hrc:419
 msgctxt "STR_CUSTOMANIMATION_COLOR_PROPERTY"
 msgid "Color:"
-msgstr "ਰੰਗ"
+msgstr "ਰੰਗ:"
 
 #. f5u6C
-#: sd/inc/strings.hrc:425
+#: sd/inc/strings.hrc:420
 msgctxt "STR_CUSTOMANIMATION_NO_SOUND"
 msgid "(No sound)"
 msgstr "(ਕੋਈ ਧੁਨੀ ਨਹੀਂ)"
 
 #. N7jGX
-#: sd/inc/strings.hrc:426
+#: sd/inc/strings.hrc:421
 msgctxt "STR_CUSTOMANIMATION_STOP_PREVIOUS_SOUND"
 msgid "(Stop previous sound)"
 msgstr "(ਪਿਛਲੀ ਧੁਨੀ ਰੋਕੋ)"
 
 #. vasqr
-#: sd/inc/strings.hrc:427
+#: sd/inc/strings.hrc:422
 msgctxt "STR_CUSTOMANIMATION_BROWSE_SOUND"
 msgid "Other sound..."
 msgstr "ਹੋਰ ਧੁਨੀ..."
 
 #. CjvLY
-#: sd/inc/strings.hrc:428
+#: sd/inc/strings.hrc:423
 msgctxt "STR_CUSTOMANIMATION_SAMPLE"
 msgid "Sample"
 msgstr "ਸੈਂਪਲ"
 
 #. CdYt2
-#: sd/inc/strings.hrc:429
+#: sd/inc/strings.hrc:424
 msgctxt "STR_CUSTOMANIMATION_TRIGGER"
 msgid "Trigger"
 msgstr "ਤਬਦੀਲ"
 
 #. Evkrq
-#: sd/inc/strings.hrc:430
+#: sd/inc/strings.hrc:425
 msgctxt "STR_CUSTOMANIMATION_USERPATH"
 msgid "User paths"
-msgstr ""
+msgstr "ਵਰਤੋਂਕਾਰ ਮਾਗਰ"
 
 #. EcciE
-#: sd/inc/strings.hrc:431
+#: sd/inc/strings.hrc:426
 msgctxt "STR_CUSTOMANIMATION_ENTRANCE"
 msgid "Entrance: %1"
-msgstr ""
+msgstr "ਦਾਖਲਾ: %1"
 
 #. Zydrz
-#: sd/inc/strings.hrc:432
+#: sd/inc/strings.hrc:427
 msgctxt "STR_CUSTOMANIMATION_EMPHASIS"
 msgid "Emphasis: %1"
 msgstr ""
 
 #. kW2DL
-#: sd/inc/strings.hrc:433
+#: sd/inc/strings.hrc:428
 msgctxt "STR_CUSTOMANIMATION_EXIT"
 msgid "Exit: %1"
-msgstr ""
+msgstr "ਬਾਹਰ: %1"
 
 #. iKFbF
-#: sd/inc/strings.hrc:434
+#: sd/inc/strings.hrc:429
 msgctxt "STR_CUSTOMANIMATION_MOTION_PATHS"
 msgid "Motion Paths: %1"
 msgstr ""
 
 #. kg9Yv
-#: sd/inc/strings.hrc:435
+#: sd/inc/strings.hrc:430
 msgctxt "STR_CUSTOMANIMATION_MISC"
 msgid "Misc: %1"
-msgstr ""
+msgstr "ਫ਼ੁਟਕਲ: %1"
 
 #. Ep4QY
-#: sd/inc/strings.hrc:436
+#: sd/inc/strings.hrc:431
 msgctxt "STR_SLIDETRANSITION_NONE"
 msgid "None"
 msgstr "ਕੋਈ ਨਹੀਂ"
 
 #. KAsTD
-#: sd/inc/strings.hrc:438
+#: sd/inc/strings.hrc:433
 msgctxt "STR_ANNOTATION_TODAY"
 msgid "Today,"
 msgstr "ਅੱਜ,"
 
 #. DEYnN
-#: sd/inc/strings.hrc:439
+#: sd/inc/strings.hrc:434
 msgctxt "STR_ANNOTATION_YESTERDAY"
 msgid "Yesterday,"
 msgstr "ਕੱਲ੍ਹ,"
 
 #. bh3FZ
-#: sd/inc/strings.hrc:440
+#: sd/inc/strings.hrc:435
 msgctxt "STR_ANNOTATION_NOAUTHOR"
 msgid "(no author)"
 msgstr "(ਕੋਈ ਲੇਖਕ ਨਹੀਂ)"
 
 #. AvNV8
-#: sd/inc/strings.hrc:441
+#: sd/inc/strings.hrc:436
 msgctxt "STR_ANNOTATION_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress reached the end of the presentation. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME ਇੰਪਰੈੱਸ ਡੌਕੂਮੈਂਟ ਦੇ ਅੰਤ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਸ਼ੁਰੂ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. P5gKe
-#: sd/inc/strings.hrc:442
+#: sd/inc/strings.hrc:437
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress reached the beginning of the presentation. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME ਇੰਪਰੈੱਸ ਡੌਕੂਮੈਂਟ ਦੇ ਸ਼ੁਰੂ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਆਖੀਰ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. KGmdL
-#: sd/inc/strings.hrc:443
+#: sd/inc/strings.hrc:438
 msgctxt "STR_ANNOTATION_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the end of the document. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME ਡਰਾਅ ਡੌਕੂਮੈਂਟ ਦੇ ਅੰਤ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਸ਼ੁਰੂ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. oEn6r
-#: sd/inc/strings.hrc:444
+#: sd/inc/strings.hrc:439
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the beginning of the document. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME ਡਰਾਅ ਡੌਕੂਮੈਂਟ ਦੇ ਸ਼ੁਰੂ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਆਖੀਰ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. eP7Vm
-#: sd/inc/strings.hrc:445
+#: sd/inc/strings.hrc:440
 msgctxt "STR_ANNOTATION_UNDO_INSERT"
 msgid "Insert Comment"
 msgstr "ਟਿੱਪਣੀ ਸ਼ਾਮਲ"
 
 #. s4c9W
-#: sd/inc/strings.hrc:446
+#: sd/inc/strings.hrc:441
 msgctxt "STR_ANNOTATION_UNDO_DELETE"
 msgid "Delete Comment(s)"
 msgstr "ਟਿੱਪਣੀਆਂ ਹਟਾਓ"
 
 #. bxiPE
-#: sd/inc/strings.hrc:447
+#: sd/inc/strings.hrc:442
 msgctxt "STR_ANNOTATION_UNDO_MOVE"
 msgid "Move Comment"
 msgstr "ਟਿੱਪਣੀ ਹਿਲਾਓ"
 
 #. hQbpd
-#: sd/inc/strings.hrc:448
+#: sd/inc/strings.hrc:443
 msgctxt "STR_ANNOTATION_UNDO_EDIT"
 msgid "Edit Comment"
 msgstr "ਟਿੱਪਣੀ ਸੋਧ"
 
 #. g6k7E
-#: sd/inc/strings.hrc:449
+#: sd/inc/strings.hrc:444
 msgctxt "STR_ANNOTATION_REPLY"
 msgid "Reply to %1"
 msgstr "%1 ਨੂੰ ਜਵਾਬ"
 
 #. NMTpu
-#: sd/inc/strings.hrc:451
+#: sd/inc/strings.hrc:446
 msgctxt "RID_DRAW_MEDIA_TOOLBOX"
 msgid "Media Playback"
 msgstr "ਮਾਧਿਅਮ ਚਲਾਉ"
 
 #. Q76cw
-#: sd/inc/strings.hrc:452
+#: sd/inc/strings.hrc:447
 msgctxt "RID_DRAW_TABLE_TOOLBOX"
 msgid "Table"
 msgstr "ਟੇਬਲ"
 
 #. xCRmu
-#: sd/inc/strings.hrc:454
+#: sd/inc/strings.hrc:449
 msgctxt "STR_IMPRESS_PRINT_UI_GROUP_NAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 6KbnP
-#: sd/inc/strings.hrc:455
+#: sd/inc/strings.hrc:450
 msgctxt "STR_IMPRESS_PRINT_UI_CONTENT"
 msgid "Document"
 msgstr "ਡੌਕੂਮੈਂਟ"
 
 #. uBxPs
-#: sd/inc/strings.hrc:456
+#: sd/inc/strings.hrc:451
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDESPERPAGE"
 msgid "Slides per page:"
-msgstr ""
+msgstr "ਹਰ ਸਫ਼ੇ ਲਈ ਸਲਾਈਡਾਂ:"
 
 #. EPBUK
-#: sd/inc/strings.hrc:457
+#: sd/inc/strings.hrc:452
 msgctxt "STR_IMPRESS_PRINT_UI_ORDER"
 msgid "Order:"
-msgstr ""
+msgstr "ਲੜੀ:"
 
 #. BFEFJ
-#: sd/inc/strings.hrc:458
-#, fuzzy
+#: sd/inc/strings.hrc:453
 msgctxt "STR_IMPRESS_PRINT_UI_INCLUDE_CONTENT"
 msgid "~Contents"
-msgstr "ਸਮੱਗਰੀ"
+msgstr "ਸਮੱਗਰੀ(~C)"
 
 #. AdWKp
-#: sd/inc/strings.hrc:459
-#, fuzzy
+#: sd/inc/strings.hrc:454
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_NAME"
 msgid "~Slide name"
 msgstr "ਸਲਾਈਡ ਨਾਂ(~S)"
 
 #. GkLky
-#: sd/inc/strings.hrc:460
-#, fuzzy
+#: sd/inc/strings.hrc:455
 msgctxt "STR_DRAW_PRINT_UI_IS_PRINT_NAME"
 msgid "P~age name"
-msgstr "ਸਫ਼ਾ ਨਾਂ(~a)"
+msgstr "ਸਫ਼ੇ ਦਾ ਨਾਂ(~a)"
 
 #. EFkVE
-#: sd/inc/strings.hrc:461
-#, fuzzy
+#: sd/inc/strings.hrc:456
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_DATE"
 msgid "~Date and time"
-msgstr "ਮਿਤੀ ਅਤੇ ਸਮਾਂ"
+msgstr "ਤਾਰੀਖ ਅਤੇ ਸਮਾਂ(~D)"
 
 #. ZcDFL
-#: sd/inc/strings.hrc:462
+#: sd/inc/strings.hrc:457
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_HIDDEN"
 msgid "Hidden pages"
 msgstr "ਸਫ਼ੇ ਲੁਕਵੇਂ"
 
 #. CSUbC
-#: sd/inc/strings.hrc:463
+#: sd/inc/strings.hrc:458
 msgctxt "STR_IMPRESS_PRINT_UI_QUALITY"
 msgid "Color"
 msgstr "ਰੰਗ"
 
 #. WmYKp
-#: sd/inc/strings.hrc:464
-#, fuzzy
+#: sd/inc/strings.hrc:459
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_OPTIONS"
 msgid "~Size"
-msgstr "ਆਕਾਰ"
+msgstr "ਆਕਾਰ(~S)"
 
 #. qDGVE
-#: sd/inc/strings.hrc:465
+#: sd/inc/strings.hrc:460
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE"
 msgid "Brochure"
 msgstr "ਪੈਂਫਲਿਟ"
 
 #. K7m8L
-#: sd/inc/strings.hrc:466
-#, fuzzy
+#: sd/inc/strings.hrc:461
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_SIDES"
 msgid "Page sides"
-msgstr "ਪੇਜ਼ ਪਾਸੇ"
+msgstr "ਸਫ਼ਾ ਪਾਸੇ"
 
 #. 8AzJi
-#: sd/inc/strings.hrc:467
+#: sd/inc/strings.hrc:462
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE_INCLUDE"
 msgid "Include"
 msgstr "ਸ਼ਾਮਿਲ"
 
 #. AEeCf
-#: sd/inc/strings.hrc:468
-#, fuzzy
+#: sd/inc/strings.hrc:463
 msgctxt "STR_IMPRESS_PRINT_UI_PAPER_TRAY"
 msgid "~Use only paper tray from printer preferences"
-msgstr "ਪਰਿੰਟਰ ਪਸੰਦ ਤੋਂ ਕੇਵਲ ਪੇਪਰ ਟਰੇ ਹੀ ਵਰਤੋਂ(~U)"
+msgstr "ਸਿਰਫ਼਼ ਪਰਿੰਟਰ ਪਸੰਦ ਤੋਂ ਪੇਪਰ ਟਰੇ ਹੀ ਵਰਤੋਂ(~U)"
 
 #. jBxbU
-#: sd/inc/strings.hrc:469
+#: sd/inc/strings.hrc:464
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_RANGE"
 msgid "Pages:"
 msgstr "ਸਫ਼ੇ:"
 
 #. a3tSp
-#: sd/inc/strings.hrc:470
+#: sd/inc/strings.hrc:465
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDE_RANGE"
 msgid "Slides:"
-msgstr ""
+msgstr "ਸਲਾਈਡਾਂ:"
 
 #. pPiWM
-#: sd/inc/strings.hrc:472
+#: sd/inc/strings.hrc:467
 msgctxt "STR_SAR_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress has searched to the end of the presentation. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME ਇੰਪਰੈੱਸ ਡੌਕੂਮੈਂਟ ਦੇ ਅੰਤ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਸ਼ੁਰੂ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. buKAC
-#: sd/inc/strings.hrc:473
+#: sd/inc/strings.hrc:468
 msgctxt "STR_SAR_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress has searched to the beginning of the presentation. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME ਇੰਪਰੈੱਸ ਡੌਕੂਮੈਂਟ ਦੇ ਸ਼ੁਰੂ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਆਖੀਰ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. iiE2i
-#: sd/inc/strings.hrc:474
+#: sd/inc/strings.hrc:469
 msgctxt "STR_SAR_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the end of the document. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME ਡਰਾਅ ਦੇ ਅੰਤ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਸ਼ੁਰੂ ਤੋਂ ਜਾਰੀ ਰੱਖਣਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. RAhiP
-#: sd/inc/strings.hrc:475
+#: sd/inc/strings.hrc:470
 msgctxt "STR_SAR_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the beginning of the document. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME ਡਰਾਅ ਡੌਕੂਮੈਂਟ ਦੇ ਸ਼ੁਰੂ ਉੱਤੇ ਪੁੱਜ ਗਿਆ ਹੈ। ਕੀ ਤੁਸੀਂ ਆਖੀਰ ਤੋਂ ਸ਼ੁਰੂ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?"
 
 #. 6GhtE
-#: sd/inc/strings.hrc:477
+#: sd/inc/strings.hrc:472
 msgctxt "STR_ANIMATION_DIALOG_TITLE"
 msgid "Animation"
-msgstr ""
+msgstr "ਐਨੀਮੇਸ਼ਨ"
 
 #. X9CWA
-#: sd/inc/strings.hrc:479
+#: sd/inc/strings.hrc:474
 msgctxt "RID_SVXSTR_EDIT_GRAPHIC"
 msgid "Link"
-msgstr ""
+msgstr "ਲਿੰਕ"
 
 #. yYhnC
-#: sd/inc/strings.hrc:481
+#: sd/inc/strings.hrc:476
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Next"
-msgstr ""
+msgstr "ਅੱਗੇ(~N)"
 
 #. YG7NQ
-#: sd/inc/strings.hrc:482
+#: sd/inc/strings.hrc:477
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Previous"
-msgstr ""
+msgstr "ਪਿੱਛੇ(~P)"
 
 #. A9eJu
-#: sd/inc/strings.hrc:483
+#: sd/inc/strings.hrc:478
 msgctxt "RID_SVXSTR_MENU_FIRST"
 msgid "~First Slide"
-msgstr ""
+msgstr "ਪਹਿਲੀ ਸਲਾਈਡ(~F)"
 
 #. CVatA
-#: sd/inc/strings.hrc:484
+#: sd/inc/strings.hrc:479
 msgctxt "RID_SVXSTR_MENU_LAST"
 msgid "~Last Slide"
-msgstr ""
+msgstr "ਆਖਰੀ ਸਲਾਈਡ(~L)"
 
 #. Wkvpi
-#: sd/inc/strings.hrc:486
+#: sd/inc/strings.hrc:481
 msgctxt "STR_CLOSE_PANE"
 msgid "Close Pane"
+msgstr "ਬਾਹੀ ਬੰਦ ਕਰੋ"
+
+#. KfamK
+#: sd/inc/strings.hrc:482
+msgctxt "STR_INSERT_TABLESTYLE"
+msgid "Add a new design"
+msgstr "ਨਵਾਂ ਡਿਜ਼ਾਇਨ ਜੋੜੋ"
+
+#. a9JBA
+#: sd/inc/strings.hrc:483
+msgctxt "STR_REMOVE_TABLESTYLE"
+msgid ""
+"The selected style is in use in this document.\n"
+"If you will delete this style, tables using it will revert to the default style.\n"
+"Do you still wish to delete this style?\n"
 msgstr ""
 
 #. xNozF
 #: sd/uiconfig/sdraw/ui/breakdialog.ui:8
-#, fuzzy
 msgctxt "breakdialog|BreakDialog"
 msgid "Break"
-msgstr "ਬਰੇਕ(~B)"
+msgstr "ਬਰੇਕ"
 
 #. reFAv
 #: sd/uiconfig/sdraw/ui/breakdialog.ui:56
 msgctxt "breakdialog|label1"
 msgid "Processing metafile:"
-msgstr ""
+msgstr "ਮੇਟਾਫ਼ਾਇਲ ਉੱਤੇ ਕਾਰਵਾਈ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ:"
 
 #. 4SJMQ
 #: sd/uiconfig/sdraw/ui/breakdialog.ui:68
@@ -3111,10 +3064,9 @@ msgstr ""
 
 #. FAC8K
 #: sd/uiconfig/sdraw/ui/breakdialog.ui:80
-#, fuzzy
 msgctxt "breakdialog|label3"
 msgid "Inserted drawing objects:"
-msgstr "ਡਰਾਇੰਗ ਆਬਜੈਕਟ ਹਟਾਓ"
+msgstr "ਸ਼ਾਮਲ ਕੀਤਾ ਡਰਾਇੰਗ ਆਬਜੈਕਟ:"
 
 #. 7gBGN
 #: sd/uiconfig/sdraw/ui/bulletsandnumbering.ui:8
@@ -3136,10 +3088,9 @@ msgstr "ਸਥਿਤੀ"
 
 #. nFfDs
 #: sd/uiconfig/sdraw/ui/bulletsandnumbering.ui:187
-#, fuzzy
 msgctxt "bulletsandnumbering|customize"
 msgid "Customize"
-msgstr "ਸੋਧ"
+msgstr "ਕਸਟਮਾਈਜ਼"
 
 #. ta9cx
 #: sd/uiconfig/sdraw/ui/copydlg.ui:26
@@ -3163,26 +3114,25 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/copydlg.ui:70
 msgctxt "copydlg|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "ਸਾਰੀਆਂ ਤਬਦੀਲੀਆਂ ਸੰਭਾਲਦਾ ਹੈ ਅਤੇ ਡਾਈਲਾਗ ਬੰਦ ਕਰਦਾ ਹੈ।"
 
 #. AiFRo
 #: sd/uiconfig/sdraw/ui/copydlg.ui:89
 msgctxt "copydlg|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "ਡਾਈਲਾਗ ਬੰਦ ਕਰਦਾ ਅਤੇ ਸਾਰੀਆਂ ਤਬਦੀਲੀਆਂ ਖ਼ਾਰਜ ਕਰਦਾ ਹੈ।"
 
 #. HhrrQ
 #: sd/uiconfig/sdraw/ui/copydlg.ui:139
-#, fuzzy
 msgctxt "copydlg|label4"
 msgid "Number of _copies:"
-msgstr "ਕਾਪੀਆਂ ਦੀ ਗਿਣਤੀ(_C)"
+msgstr "ਕਾਪੀਆਂ ਦੀ ਗਿਣਤੀ(_c):"
 
 #. qgJLc
 #: sd/uiconfig/sdraw/ui/copydlg.ui:160
 msgctxt "copydlg|extended_tip|copies"
 msgid "Enter the number of copies you want to make."
-msgstr ""
+msgstr "ਜਿੰਨੀਆਂ ਕਾਪੀਆਂ ਦੀ ਗਿਣਤੀ ਦਿਓ, ਜੋ ਤੁਸੀ ਬਣਾਉਣੀਆਂ ਚਾਹੁੰਦੇ ਹੋ।"
 
 #. 3fqDJ
 #: sd/uiconfig/sdraw/ui/copydlg.ui:175
@@ -3198,24 +3148,21 @@ msgstr "ਚੋਣ ਤੋਂ ਮੁੱਲ"
 
 #. 27j9Q
 #: sd/uiconfig/sdraw/ui/copydlg.ui:218
-#, fuzzy
 msgctxt "copydlg|label5"
 msgid "_X axis:"
-msgstr "_X ਧੁਰਾ"
+msgstr "_X ਧੁਰਾ:"
 
 #. G5trD
 #: sd/uiconfig/sdraw/ui/copydlg.ui:232
-#, fuzzy
 msgctxt "copydlg|label6"
 msgid "_Y axis:"
-msgstr "_Y-ਧੁਰਾ"
+msgstr "_Y-ਧੁਰਾ:"
 
 #. gHkmD
 #: sd/uiconfig/sdraw/ui/copydlg.ui:246
-#, fuzzy
 msgctxt "copydlg|label7"
 msgid "_Angle:"
-msgstr "ਕੋਣ(_A)"
+msgstr "ਕੋਣ(_A):"
 
 #. a63ej
 #: sd/uiconfig/sdraw/ui/copydlg.ui:266
@@ -3243,17 +3190,15 @@ msgstr "ਟਿਕਾਓ"
 
 #. 3Dyw2
 #: sd/uiconfig/sdraw/ui/copydlg.ui:354
-#, fuzzy
 msgctxt "copydlg|label8"
 msgid "_Width:"
-msgstr "ਚੌੜਾਈ(_W)"
+msgstr "ਚੌੜਾਈ(_W):"
 
 #. YuAHc
 #: sd/uiconfig/sdraw/ui/copydlg.ui:368
-#, fuzzy
 msgctxt "copydlg|label9"
 msgid "_Height:"
-msgstr "ਉਚਾਈ(_H)"
+msgstr "ਉਚਾਈ(_H):"
 
 #. pLxaH
 #: sd/uiconfig/sdraw/ui/copydlg.ui:388
@@ -3275,23 +3220,21 @@ msgstr "ਵਧਾਓ"
 
 #. ENMbc
 #: sd/uiconfig/sdraw/ui/copydlg.ui:456
-#, fuzzy
 msgctxt "copydlg|label10"
 msgid "_Start:"
-msgstr "ਸ਼ੁਰੂ(_S)"
+msgstr "ਸ਼ੁਰੂ(_S):"
 
 #. Z6aqk
 #: sd/uiconfig/sdraw/ui/copydlg.ui:470
-#, fuzzy
 msgctxt "copydlg|endlabel"
 msgid "_End:"
-msgstr "ਅੰਤ(_E)"
+msgstr "ਅੰਤ(_E):"
 
 #. ULShA
 #: sd/uiconfig/sdraw/ui/copydlg.ui:494
 msgctxt "copydlg|extended_tip|start"
 msgid "Choose a color for the selected object."
-msgstr ""
+msgstr "ਚੁਣੇ ਆਬਜੈਕਟ ਲਈ ਰੰਗ ਚੁਣੋ।"
 
 #. AAoBa
 #: sd/uiconfig/sdraw/ui/copydlg.ui:517
@@ -3319,10 +3262,9 @@ msgstr "ਅੰਤਰ-ਫਿੱਕਾ"
 
 #. FXGbk
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:102
-#, fuzzy
 msgctxt "crossfadedialog|orientation"
 msgid "Same orientation"
-msgstr "ਸਫ਼ਾ ਸਥਿਤੀ(_E)"
+msgstr "ਉਹੀ ਸਥਿਤੀ"
 
 #. PAGv2
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:110
@@ -3346,7 +3288,7 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:144
 msgctxt "crossfadedialog|label2"
 msgid "Increments:"
-msgstr ""
+msgstr "ਵਾਧਾ:"
 
 #. d2wBc
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:163
@@ -3394,13 +3336,13 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:155
 msgctxt "dlgsnap|xlabel"
 msgid "_X:"
-msgstr ""
+msgstr "_X:"
 
 #. AAfto
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:168
 msgctxt "dlgsnap|ylabel"
 msgid "_Y:"
-msgstr ""
+msgstr "_Y:"
 
 #. pMnkL
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:183
@@ -3458,21 +3400,18 @@ msgstr ""
 
 #. MuBBG
 #: sd/uiconfig/sdraw/ui/drawchardialog.ui:8
-#, fuzzy
 msgctxt "drawchardialog|DrawCharDialog"
 msgid "Character"
 msgstr "ਅੱਖਰ"
 
 #. GsQBk
 #: sd/uiconfig/sdraw/ui/drawchardialog.ui:136
-#, fuzzy
 msgctxt "drawchardialog|RID_SVXPAGE_CHAR_NAME"
 msgid "Fonts"
 msgstr "ਫੋਂਟ"
 
 #. 7LgAf
 #: sd/uiconfig/sdraw/ui/drawchardialog.ui:183
-#, fuzzy
 msgctxt "drawchardialog|RID_SVXPAGE_CHAR_EFFECTS"
 msgid "Font Effects"
 msgstr "ਫੋਂਟ ਪ੍ਰਭਾਵ"
@@ -3487,13 +3426,13 @@ msgstr "ਸਥਿਤੀ"
 #: sd/uiconfig/sdraw/ui/drawchardialog.ui:279
 msgctxt "drawchardialog|RID_SVXPAGE_BKG"
 msgid "Highlighting"
-msgstr ""
+msgstr "ਉਘਾੜਨਾ"
 
 #. 7FuBt
 #: sd/uiconfig/sdraw/ui/drawpagedialog.ui:8
 msgctxt "drawpagedialog|DrawPageDialog"
 msgid "Page Properties"
-msgstr ""
+msgstr "ਸਫ਼ੇ ਦੀਆਂ ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ"
 
 #. Py4db
 #: sd/uiconfig/sdraw/ui/drawpagedialog.ui:136
@@ -3517,7 +3456,7 @@ msgstr "ਪਾਰਦਰਸ਼ਤਾ"
 #: sd/uiconfig/sdraw/ui/drawpagedialog.ui:279
 msgctxt "drawpagedialog|RID_SVXPAGE_THEME"
 msgid "Theme"
-msgstr ""
+msgstr "ਥੀਮ"
 
 #. cKCg3
 #: sd/uiconfig/sdraw/ui/drawparadialog.ui:8
@@ -3529,11 +3468,10 @@ msgstr "ਪ੍ਹੈਰਾ"
 #: sd/uiconfig/sdraw/ui/drawparadialog.ui:136
 msgctxt "drawparadialog|labelTP_PARA_STD"
 msgid "Indents & Spacing"
-msgstr ""
+msgstr "ਹਾਸ਼ੀਏ ਤੋਂ ਦੂਰ ਤੇ ਫ਼ਾਸਲਾ"
 
 #. xDCfw
 #: sd/uiconfig/sdraw/ui/drawparadialog.ui:183
-#, fuzzy
 msgctxt "drawparadialog|labelTP_PARA_ASIAN"
 msgid "Asian Typography"
 msgstr "ਏਸ਼ੀਆਈਂ ਟਾਈਪੋਗਰਾਫ਼ੀ"
@@ -3546,7 +3484,6 @@ msgstr "ਟੈਬ"
 
 #. QSCGY
 #: sd/uiconfig/sdraw/ui/drawparadialog.ui:279
-#, fuzzy
 msgctxt "drawparadialog|labelTP_PARA_ALIGN"
 msgid "Alignment"
 msgstr "ਇਕਸਾਰ"
@@ -3591,7 +3528,7 @@ msgstr "ਸਮੱਗਰੀ"
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:101
 msgctxt "drawprinteroptions|originalcolors"
 msgid "Original colors"
-msgstr ""
+msgstr "ਅਸਲ ਰੰਗ"
 
 #. 4hoE9
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:110
@@ -3671,10 +3608,10 @@ msgctxt "drawprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated pages"
 msgstr "ਦੁਹਰਾਏ ਸਫ਼ਿਆਂ ਨਾਲ ਪੇਪਰ ਦੀ ਸ਼ੀਟ"
 
-#. T6HHy
+#. dBYC3
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:269
 msgctxt "drawprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
+msgid "Specifies that pages are to be printed in tiled format. If the pages are smaller than the paper, the page will be repeated multiple times on one sheet of paper."
 msgstr ""
 
 #. qbU9A
@@ -3687,14 +3624,13 @@ msgstr "ਆਕਾਰ"
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:8
 msgctxt "drawprtldialog|DrawPRTLDialog"
 msgid "Presentation Layout"
-msgstr ""
+msgstr "ਪੇਸ਼ਕਾਰੀ ਖਾਕਾ"
 
 #. qhGQW
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:138
-#, fuzzy
 msgctxt "drawprtldialog|RID_SVXPAGE_LINE"
 msgid "Line"
-msgstr "ਰੇਖਾ"
+msgstr "ਲਾਈਨ"
 
 #. GLDvd
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:185
@@ -3722,7 +3658,6 @@ msgstr "ਫੋਂਟ"
 
 #. NLcur
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:377
-#, fuzzy
 msgctxt "drawprtldialog|RID_SVXPAGE_CHAR_EFFECTS"
 msgid "Font Effects"
 msgstr "ਫੋਂਟ ਪ੍ਰਭਾਵ"
@@ -3731,7 +3666,7 @@ msgstr "ਫੋਂਟ ਪ੍ਰਭਾਵ"
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:425
 msgctxt "drawprtldialog|RID_SVXPAGE_STD_PARAGRAPH"
 msgid "Indents & Spacing"
-msgstr ""
+msgstr "ਹਾਸ਼ੀਏ ਤੋਂ ਦੂਰ ਤੇ ਫ਼ਾਸਲਾ"
 
 #. hQgNU
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:473
@@ -3759,21 +3694,18 @@ msgstr "ਚਿੱਤਰ"
 
 #. ANGDj
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:665
-#, fuzzy
 msgctxt "drawprtldialog|RID_SVXPAGE_NUM_OPTIONS"
 msgid "Customize"
-msgstr "ਸੋਧ"
+msgstr "ਕਸਟਮਾਈਜ਼"
 
 #. 32Vhx
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:713
-#, fuzzy
 msgctxt "drawprtldialog|RID_SVXPAGE_ALIGN_PARAGRAPH"
 msgid "Alignment"
 msgstr "ਇਕਸਾਰ"
 
 #. 9DBTB
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:761
-#, fuzzy
 msgctxt "drawprtldialog|RID_SVXPAGE_PARA_ASIAN"
 msgid "Asian Typography"
 msgstr "ਏਸ਼ੀਆਈਂ ਟਾਈਪੋਗਰਾਫ਼ੀ"
@@ -3788,7 +3720,7 @@ msgstr "ਟੈਬ"
 #: sd/uiconfig/sdraw/ui/drawprtldialog.ui:857
 msgctxt "drawprtldialog|RID_SVXPAGE_BKG"
 msgid "Highlighting"
-msgstr ""
+msgstr "ਉਘਾੜਨਾ"
 
 #. w9EdD
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:8
@@ -3800,7 +3732,7 @@ msgstr "ਲੇਅਰ ਸ਼ਾਮਿਲ"
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:100
 msgctxt "insertlayer|extended_tip|name"
 msgid "Enter a name for the new layer."
-msgstr ""
+msgstr "ਨਵੀਂ ਪਰਤ ਲਈ ਨਾਂ ਦਿਓ।"
 
 #. kWarA
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:109
@@ -3812,7 +3744,7 @@ msgstr "ਨਾਂ(_N)"
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:140
 msgctxt "insertlayer|extended_tip|title"
 msgid "Enter the title of the layer."
-msgstr ""
+msgstr "ਲੇਅਰ ਲਈ ਟਾਈਟਲ ਦਿਓ।"
 
 #. hCTSd
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:149
@@ -3821,55 +3753,61 @@ msgid "_Title"
 msgstr "ਟਾਈਟਲ(_T)"
 
 #. KKC7D
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:188
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:189
 msgctxt "insertlayer|extended_tip|textview"
 msgid "Enter a description of the layer."
-msgstr ""
+msgstr "ਪਰਤ ਲਈ ਵਰਣਨ ਦਿਓ।"
 
 #. g2K4k
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:199
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:200
 msgctxt "insertlayer|description"
 msgid "_Description"
 msgstr "ਵੇਰਵਾ(_D)"
 
 #. DTUy2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:215
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:228
 msgctxt "insertlayer|visible"
 msgid "_Visible"
 msgstr "ਦਿੱਖ(_V)"
 
 #. oXY4U
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:223
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:236
 msgctxt "insertlayer|extended_tip|visible"
 msgid "Show or hide the layer."
-msgstr ""
+msgstr "ਪਰਤ ਵੇਖਾਓ ਜਾਂ ਓਹਲੇ ਕਰੋ।"
 
 #. BtGRo
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:235
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:248
 msgctxt "insertlayer|printable"
 msgid "_Printable"
 msgstr "ਪਰਿੰਟ-ਯੋਗ(_P)"
 
 #. VASG2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:243
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:256
 msgctxt "insertlayer|extended_tip|printable"
 msgid "When printing, print or ignore this particular layer."
 msgstr ""
 
 #. E6EKN
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:255
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:268
 msgctxt "insertlayer|locked"
 msgid "_Locked"
 msgstr "ਤਾਲਾਬੰਦ(_L)"
 
 #. uaSTH
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:263
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:276
 msgctxt "insertlayer|extended_tip|locked"
 msgid "Prevent elements on the layer from being edited."
 msgstr ""
 
-#. ogtGC
+#. WzZxq
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:292
+msgctxt "insertlayer|properties"
+msgid "Properties"
+msgstr "ਵਿਸ਼ੇਸ਼ਤਾਵਾਂ"
+
+#. ogtGC
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:321
 msgctxt "insertlayer|extended_tip|InsertLayerDialog"
 msgid "Inserts a new layer in the document. Layers are only available in Draw, not in Impress."
 msgstr ""
@@ -3878,7 +3816,7 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/insertslidesdialog.ui:18
 msgctxt "insertslidesdialog|InsertSlidesDialog"
 msgid "Insert Slides/Objects"
-msgstr ""
+msgstr "ਸਲਾਈਡਾਂ/ਆਬਜੈਕਟ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. FsBqJ
 #: sd/uiconfig/sdraw/ui/insertslidesdialog.ui:94
@@ -3910,11 +3848,17 @@ msgctxt "namedesign|NameDesignDialog"
 msgid "Name HTML Design"
 msgstr ""
 
+#. PGoPa
+#: sd/uiconfig/sdraw/ui/navigatorcontextmenu.ui:12
+msgctxt "navigatorcontextmenu|STR_RENAME"
+msgid "Rename..."
+msgstr "...ਨਾਂ ਬਦਲੋ"
+
 #. V3FWt
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:3162
 msgctxt "drawnotebookbar|FileLabel"
 msgid "_File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(_F)"
 
 #. exwEC
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:3181
@@ -3926,423 +3870,424 @@ msgstr "ਮਦਦ(_H)"
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:3237
 msgctxt "drawnotebookbar|FileLabel"
 msgid "~File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(~F)"
 
 #. EQ6HL
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:4606
 msgctxt "drawnotebookbar|HomeMenuButton"
 msgid "_Home"
-msgstr ""
+msgstr "ਮੁੱਖ(_H)"
 
 #. jtFqm
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:4705
 msgctxt "drawnotebookbar|HomeLabel"
 msgid "~Home"
-msgstr ""
+msgstr "ਮੁੱਖ(~H)"
 
 #. zoUaS
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:5436
 msgctxt "drawnotebookbar|FieldMenuButton"
 msgid "Fiel_d"
-msgstr ""
+msgstr "ਖੇਤਰ(_d)"
 
 #. S5FkE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5619
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5596
 msgctxt "drawnotebookbar|InsertMenuButton"
 msgid "_Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(_I)"
 
 #. Z3UCg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5723
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5700
 msgctxt "drawnotebookbar|InsertLabel"
 msgid "~Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(~I)"
 
 #. TVDXM
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6423
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6400
 msgctxt "drawnotebookbar|PageMenuButton"
 msgid "_Layout"
-msgstr ""
+msgstr "ਖਾਕਾ(_L)"
 
 #. Rv7x4
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6508
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6485
 msgctxt "drawnotebookbar|PageLabel"
 msgid "~Layout"
-msgstr ""
+msgstr "ਖਾਕਾ(~L)"
 
 #. BQcfo
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7046
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7023
 msgctxt "drawnotebookbar|ReviewMenuButton"
 msgid "_Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(_R)"
 
 #. prpcY
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7129
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7106
 msgctxt "drawnotebookbar|ReviewLabel"
 msgid "~Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(~R)"
 
 #. EiuB6
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8158
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8135
 msgctxt "drawnotebookbar|ViewMenuButton"
 msgid "_View"
-msgstr ""
+msgstr "ਵੇਖੋ(_V)"
 
 #. EF3TH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8243
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8220
 msgctxt "drawnotebookbar|ViewLabel"
 msgid "~View"
-msgstr ""
+msgstr "ਵੇਖੋ(~V)"
 
 #. 94L75
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9588
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9565
 msgctxt "drawnotebookbar|TextMenuButton"
 msgid "T_ext"
-msgstr ""
+msgstr "ਲਿਖਤ(_e)"
 
 #. PQtWE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9683
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9660
 msgctxt "drawnotebookbar|ReferencesLabel"
 msgid "T~ext"
-msgstr ""
+msgstr "ਲਿਖਤ(~e)"
 
 #. tNq7H
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10585
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10562
 msgctxt "drawnotebookbar|TableMenuButton"
 msgid "_Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(_T)"
 
 #. 9pJGh
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10669
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10646
 msgctxt "drawnotebookbar|TableLabel"
 msgid "~Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(~T)"
 
 #. ECD4J
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11196
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:12513
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14307
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11173
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:12490
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14284
 msgctxt "drawnotebookbar|ConvertMenuButton"
 msgid "Convert"
-msgstr ""
+msgstr "ਬਦਲੋ"
 
 #. 4Z6aZ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11864
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11841
 msgctxt "drawnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
-msgstr ""
+msgstr "ਚਿੱਤਰ(_g)"
 
 #. 7FoFi
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11973
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11950
 msgctxt "drawnotebookbar|ImageLabel"
 msgid "Ima~ge"
-msgstr ""
+msgstr "ਚਿੱਤਰ(~g)"
 
 #. 6SADm
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13724
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13701
 msgctxt "drawnotebookbar|DrawMenuButton"
 msgid "_Draw"
-msgstr ""
+msgstr "ਵਾਹੋ(_D)"
 
 #. 6S8qN
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13830
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13807
 msgctxt "drawnotebookbar|DrawLabel"
 msgid "~Draw"
-msgstr ""
+msgstr "ਵਾਹੋ(~D)"
 
 #. QAEDd
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14663
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14640
 msgctxt "drawnotebookbar|ObjectMenuButton"
 msgid "_Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ(_O)"
 
 #. SL4NA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14770
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14747
 msgctxt "drawnotebookbar|ObjectLabel"
 msgid "~Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ(~O)"
 
 #. 4aAxG
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15271
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15248
 msgctxt "drawnotebookbar|MediaMenuButton"
 msgid "_Media"
-msgstr ""
+msgstr "ਮੀਡੀਆ(_M)"
 
 #. ed3LH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15375
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15352
 msgctxt "drawnotebookbar|MediaLabel"
 msgid "~Media"
-msgstr ""
+msgstr "ਮੀਡੀਆ(~M)"
 
 #. FAL6c
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16183
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16160
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "ਫਾਰਮ(_r)"
 
 #. oaAJU
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16267
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16244
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "Fo~rm"
-msgstr ""
+msgstr "ਫ਼ਾਰਮ(~r)"
 
 #. ZBVGA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17054
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17031
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "3_d"
-msgstr ""
+msgstr "3_d"
 
 #. fEyRX
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17161
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17138
+#, fuzzy
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "3~d"
-msgstr ""
+msgstr "3~d"
 
 #. 7ZLQw
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17685
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17662
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "_Master"
-msgstr ""
+msgstr "ਮਾਸਟਰ(_M)"
 
 #. oiXVg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17769
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17746
 msgctxt "DrawNotebookbar|MasterLabel"
 msgid "~Master"
-msgstr ""
+msgstr "ਮਾਸਟਰ(~M)"
 
 #. yzvja
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17826
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17803
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "E_xtension"
-msgstr ""
+msgstr "ਇਕਸਟੈਨਸ਼ਨ(_x)"
 
 #. L3eG5
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17900
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17877
 msgctxt "drawnotebookbar|ExtensionLabel"
 msgid "E~xtension"
-msgstr ""
+msgstr "ਇਕਸਟੈਨਸ਼ਨ(~x)"
 
 #. dkNUg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18812
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18789
 msgctxt "drawnotebookbar|ToolsMenuButton"
 msgid "_Tools"
-msgstr ""
+msgstr "ਟੂਲ(_T)"
 
 #. Je8XQ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18896
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18873
 msgctxt "drawnotebookbar|DevLabel"
 msgid "~Tools"
-msgstr ""
+msgstr "ਟੂਲ(~T)"
 
 #. uuFFm
 #: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:2953
 msgctxt "notebookbar_draw_compact|FileMenuButton"
 msgid "_File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(_F)"
 
 #. oum9B
 #: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:3002
 msgctxt "notebookbar_draw_compact|FileLabel"
 msgid "~File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(~F)"
 
 #. FcC26
 #: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:4395
 msgctxt "notebookbar_draw_compact|HomeMenuButton"
 msgid "_Home"
-msgstr ""
+msgstr "ਮੁੱਖ(_H)"
 
 #. msJmR
 #: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:4447
 msgctxt "notebookbar_draw_compact|HomeLabel"
 msgid "~Home"
-msgstr ""
+msgstr "ਮੁੱਖ(~H)"
 
 #. j6zsX
 #: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5006
 msgctxt "notebookbar_draw_compact|FieldMenuButton"
 msgid "Fiel_d"
-msgstr ""
+msgstr "ਖੇਤਰ(_d)"
 
 #. ZDsWu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5546
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5507
 msgctxt "notebookbar_draw_compact|InsertMenuButton"
 msgid "_Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(_I)"
 
 #. d8cey
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5597
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5558
 msgctxt "notebookbar_draw_compact|InsertLabel"
 msgid "~Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(~I)"
 
 #. kkPza
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6296
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6257
 msgctxt "notebookbar_draw_compact|LayoutMenuButton"
 msgid "Layout"
-msgstr ""
+msgstr "ਖਾਕਾ"
 
 #. 2wBCF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6348
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6309
 msgctxt "notebookbar_draw_compact|LayoutLabel"
 msgid "~Layout"
-msgstr ""
+msgstr "ਖਾਕਾ(~L)"
 
 #. GG7uL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6863
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6824
 msgctxt "notebookbar_draw_compact|ReviewMenuButton"
 msgid "_Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(_R)"
 
 #. twxEq
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6915
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6876
 msgctxt "notebookbar_draw_compact|ReviewLabel"
 msgid "~Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(~R)"
 
 #. H5eNL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7610
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7571
 msgctxt "notebookbar_draw_compact|ViewMenuButton"
 msgid "_View"
-msgstr ""
+msgstr "ਵੇਖੋ(_V)"
 
 #. GGEXu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7662
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7623
 msgctxt "notebookbar_draw_compact|ViewLabel"
 msgid "~View"
-msgstr ""
+msgstr "ਵੇਖੋ(~V)"
 
 #. CqEAM
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9144
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9105
 msgctxt "notebookbar_draw_compact|TextMenuButton"
 msgid "T_ext"
-msgstr ""
+msgstr "ਲਿਖਤ(_e)"
 
 #. LFcJC
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9198
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9159
 msgctxt "notebookbar_draw_compact|ReferencesLabel"
 msgid "T~ext"
-msgstr ""
+msgstr "ਲਿਖਤ(~e)"
 
 #. sdACh
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10891
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10852
 msgctxt "notebookbar_draw_compact|TableMenuButton"
 msgid "T_able"
 msgstr "ਸਾਰਣੀ(_a)"
 
 #. GEmbu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10942
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10903
 msgctxt "notebookbar_draw_compact|TableLabel"
 msgid "~Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(~T)"
 
 #. EGCcN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12291
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12252
 msgctxt "notebookbar_draw_compact|ImageMenuButton"
 msgid "Image"
-msgstr ""
+msgstr "ਚਿੱਤਰ"
 
 #. 2eQcW
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12343
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12304
 msgctxt "notebookbar_draw_compact|ImageLabel"
 msgid "Ima~ge"
-msgstr ""
+msgstr "ਚਿੱਤਰ(~g)"
 
 #. CezAN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14177
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14138
 msgctxt "notebookbar_draw_compact|DrawMenuButton"
 msgid "D_raw"
-msgstr ""
+msgstr "ਵਾਹੋ(_r)"
 
 #. tAMd5
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14232
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14193
 msgctxt "notebookbar_draw_compact|ShapeLabel"
 msgid "~Draw"
-msgstr ""
+msgstr "ਵਾਹੋ(~D)"
 
 #. A49xv
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15231
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15192
 msgctxt "notebookbar_draw_compact|ObjectMenuButton"
 msgid "Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ"
 
 #. 3gubF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15287
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15248
 msgctxt "notebookbar_draw_compact|FrameLabel"
 msgid "~Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ(~O)"
 
 #. fDRf9
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16432
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16393
 msgctxt "notebookbar_draw_compact|MediaButton"
 msgid "_Media"
-msgstr ""
+msgstr "ਮੀਡੀਆ(_M)"
 
 #. dAbX4
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16486
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16447
 msgctxt "notebookbar_draw_compact|MediaLabel"
 msgid "~Media"
-msgstr ""
+msgstr "ਮੀਡੀਆ(~M)"
 
 #. SCSH8
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17723
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17684
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "Fo_rm"
 msgstr "ਫਾਰਮ(_r)"
 
 #. vzdXF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17778
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17739
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "Fo~rm"
-msgstr ""
+msgstr "ਫ਼ਾਰਮ(~r)"
 
 #. zEK2o
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18299
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18260
 msgctxt "notebookbar_draw_compact|PrintPreviewButton"
 msgid "_Master"
-msgstr ""
+msgstr "ਮਾਸਟਰ(_M)"
 
 #. S3huE
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18351
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18312
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "~Master"
-msgstr ""
+msgstr "ਮਾਸਟਰ(~M)"
 
 #. T3Z8R
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19313
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19274
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "3_d"
-msgstr ""
+msgstr "3_d"
 
 #. ZCuDe
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19368
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19329
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "3~d"
-msgstr ""
+msgstr "3~d"
 
 #. YpLRj
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19447
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19408
 msgctxt "notebookbar_draw_compact|ExtensionMenuButton"
 msgid "E_xtension"
-msgstr ""
+msgstr "ਇਕਸਟੈਨਸ਼ਨ(_x)"
 
 #. uRrEt
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19505
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19466
 msgctxt "notebookbar_draw_compact|ExtensionLabel"
 msgid "E~xtension"
-msgstr ""
+msgstr "ਇਕਸਟੈਨਸ਼ਨ(~x)"
 
 #. L3xmd
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20506
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20467
 msgctxt "notebookbar_draw_compact|ToolsMenuButton"
 msgid "_Tools"
-msgstr ""
+msgstr "ਟੂਲ(_T)"
 
 #. LhBTk
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20558
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20519
 msgctxt "notebookbar_draw_compact|DevLabel"
 msgid "~Tools"
-msgstr ""
+msgstr "ਟੂਲ(~T)"
 
 #. BN8VW
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:2322
@@ -4360,13 +4305,13 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:3054
 msgctxt "draw_notebookbar_groupedbar_compact|fileb"
 msgid "_File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(_F)"
 
 #. DRGus
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:3162
 msgctxt "draw_notebookbar_groupedbar_compact|editb"
 msgid "_Edit"
-msgstr ""
+msgstr "ਸੋਧ(_E)"
 
 #. vbFke
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:3288
@@ -4374,14 +4319,14 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:12853
 msgctxt "draw_notebookbar_groupedbar_compact|insertText"
 msgid "_Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(_I)"
 
 #. 4p9DA
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:3444
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:12468
 msgctxt "draw_notebookbar_groupedbar_compact|draw"
 msgid "D_raw"
-msgstr ""
+msgstr "ਵਾਹੋ(_r)"
 
 #. DsE2d
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:3872
@@ -4400,7 +4345,7 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:13120
 msgctxt "draw_notebookbar_groupedbar_compact|reviewb"
 msgid "_Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(_R)"
 
 #. Pxoj8
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:4119
@@ -4408,7 +4353,7 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:13231
 msgctxt "draw_notebookbar_groupedbar_compact|viewT"
 msgid "_View"
-msgstr ""
+msgstr "ਵੇਖੋ(_V)"
 
 #. cjxQa
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:4228
@@ -4428,20 +4373,20 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:5490
 msgctxt "draw_notebookbar_groupedbar_compact|formatt"
 msgid "F_ont"
-msgstr ""
+msgstr "ਫ਼ੋਂਟ(_o)"
 
 #. pUqDJ
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:4793
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:5719
 msgctxt "draw_notebookbar_groupedbar_compact|paragrapht"
 msgid "_Paragraph"
-msgstr ""
+msgstr "ਪ੍ਹੈਰਾ(_P)"
 
 #. MRg9E
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:5976
 msgctxt "draw_notebookbar_groupedbar_compact|rowscolumnst"
 msgid "_Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(_T)"
 
 #. QzCG4
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:6641
@@ -4454,7 +4399,7 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:11370
 msgctxt "draw_notebookbar_groupedbar_compact|editdrawb"
 msgid "D_raw"
-msgstr ""
+msgstr "ਵਾਹੋ(_r)"
 
 #. dc5qG
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:7332
@@ -4470,20 +4415,20 @@ msgstr ""
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:7783
 msgctxt "draw_notebookbar_groupedbar_compact|draw"
 msgid "_Shape"
-msgstr ""
+msgstr "ਸ਼ਕਲ(_S)"
 
 #. R5YZh
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:8049
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:12198
 msgctxt "draw_notebookbar_groupedbar_compact|viewDrawb"
 msgid "Grou_p"
-msgstr ""
+msgstr "ਗਰੁੱਪ(_p)"
 
 #. TCPHC
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:8285
 msgctxt "draw_notebookbar_groupedbar_compact|3Db"
 msgid "3_D"
-msgstr ""
+msgstr "3_D"
 
 #. hgFay
 #: sd/uiconfig/sdraw/ui/notebookbar_groupedbar_compact.ui:8512
@@ -5539,7 +5484,7 @@ msgid "Deletes the selected element or elements without requiring confirmation."
 msgstr ""
 
 #. 8Cf3C
-#: sd/uiconfig/simpress/ui/customslideshows.ui:267
+#: sd/uiconfig/simpress/ui/customslideshows.ui:264
 msgctxt "customslideshows|extended_tip|CustomSlideShows"
 msgid "Defines a custom slide show using slides within the current presentation. You can then pick slides to meet the needs of your audience. You can create as many custom slide shows as you want."
 msgstr ""
@@ -6063,10 +6008,9 @@ msgstr "ਵਾਧੂ ਵੱਡਾ"
 
 #. dgg5q
 #: sd/uiconfig/simpress/ui/fontstylemenu.ui:12
-#, fuzzy
 msgctxt "fontstylemenu|bold"
 msgid "Bold"
-msgstr "ਗੂੜੇ"
+msgstr "ਗੂੜਾ"
 
 #. HgpdJ
 #: sd/uiconfig/simpress/ui/fontstylemenu.ui:20
@@ -6076,23 +6020,21 @@ msgstr "ਤਿਰਛੇ"
 
 #. A5UUL
 #: sd/uiconfig/simpress/ui/fontstylemenu.ui:28
-#, fuzzy
 msgctxt "fontstylemenu|underline"
 msgid "Underlined"
-msgstr "ਹੇਠਾਂ ਲਾਈਨ"
+msgstr "ਹੇਠਾਂ ਰੇਖਾ"
 
 #. BnypD
 #: sd/uiconfig/simpress/ui/headerfooterdialog.ui:8
-#, fuzzy
 msgctxt "headerfooterdialog|HeaderFooterDialog"
 msgid "Header and Footer"
-msgstr "ਹੈੱਡਰ ਅਤੇ ਫੁੱਟਨੋਟ(~H)..."
+msgstr "ਹੈੱਡਰ ਅਤੇ ਫੁੱਟਨੋਟ"
 
 #. HmAnf
 #: sd/uiconfig/simpress/ui/headerfooterdialog.ui:24
 msgctxt "headerfooterdialog|apply_all"
 msgid "Appl_y to All"
-msgstr ""
+msgstr "ਸਭ ਤੇ ਲਾਗੂ ਕਰੋ(_y)"
 
 #. X6wby
 #: sd/uiconfig/simpress/ui/headerfooterdialog.ui:33
@@ -6126,10 +6068,9 @@ msgstr ""
 
 #. BgFsS
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:35
-#, fuzzy
 msgctxt "headerfootertab|header_cb"
 msgid "Heade_r"
-msgstr "ਹੈੱਡਰ"
+msgstr "ਹੈੱਡਰ(_r)"
 
 #. 7qH6R
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:44
@@ -6141,7 +6082,7 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:64
 msgctxt "headerfootertab|header_label"
 msgid "Header _text:"
-msgstr ""
+msgstr "ਹੈੱਡਰ ਲਿਖਤ(_t):"
 
 #. uNdGZ
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:83
@@ -6151,23 +6092,21 @@ msgstr ""
 
 #. ruQCk
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:105
-#, fuzzy
 msgctxt "headerfootertab|datetime_cb"
 msgid "_Date and time"
-msgstr "ਮਿਤੀ ਅਤੇ ਸਮਾਂ"
+msgstr "ਤਾਰੀਖ ਅਤੇ ਸਮਾਂ(_D)"
 
 #. tUcmE
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:113
 msgctxt "headerfootertab|extended_tip|datetime_cb"
 msgid "Adds the date and time to the slide."
-msgstr ""
+msgstr "ਸਲਾਈਡ ਲਈ ਤਾਰੀਖ ਤੇ ਸਮਾਂ ਜੋੜਦਾ ਹੈ।"
 
 #. LDq83
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:137
-#, fuzzy
 msgctxt "headerfootertab|rb_fixed"
 msgid "Fi_xed"
-msgstr "ਸਥਿਰ"
+msgstr "ਸਥਿਰ(_x)"
 
 #. RrPiS
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:149
@@ -6183,10 +6122,9 @@ msgstr ""
 
 #. Zch2Q
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:195
-#, fuzzy
 msgctxt "headerfootertab|rb_auto"
 msgid "_Variable"
-msgstr "ਮੁੱਲ"
+msgstr "ਮੁੱਲ(_V)"
 
 #. CA8yX
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:207
@@ -6202,10 +6140,9 @@ msgstr ""
 
 #. iDwM5
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:242
-#, fuzzy
 msgctxt "headerfootertab|language_label"
 msgid "_Language:"
-msgstr "ਭਾਸ਼ਾ(_L)"
+msgstr "ਭਾਸ਼ਾ(_L):"
 
 #. BCGcC
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:258
@@ -6215,10 +6152,9 @@ msgstr ""
 
 #. mDMwW
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:271
-#, fuzzy
 msgctxt "headerfootertab|language_label1"
 msgid "_Format:"
-msgstr "ਫਾਰਮੈਟ(_F)"
+msgstr "ਫਾਰਮੈਟ(_F):"
 
 #. htD4f
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:315
@@ -6455,10 +6391,10 @@ msgctxt "impressprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated slides"
 msgstr "ਦੁਹਰਾਈਆਂ ਸਲਾਈਡਾਂ ਨਾਲ ਪੇਪਰ ਦੀ ਸ਼ੀਟ"
 
-#. BkFHA
+#. NDyEg
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:411
 msgctxt "impressprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
+msgid "Specifies that slides are to be printed in tiled format. If the slides are smaller than the paper, the slide will be repeated multiple times on one sheet of paper."
 msgstr ""
 
 #. xa7tq
@@ -6511,10 +6447,9 @@ msgstr ""
 
 #. ECoVa
 #: sd/uiconfig/simpress/ui/interactionpage.ui:91
-#, fuzzy
 msgctxt "interactionpage|fttree"
 msgid "Target:"
-msgstr "ਟਾਰਗੇਟ"
+msgstr "ਟਾਰਗੇਟ:"
 
 #. tFofb
 #: sd/uiconfig/simpress/ui/interactionpage.ui:150
@@ -6548,10 +6483,9 @@ msgstr ""
 
 #. xDPqu
 #: sd/uiconfig/simpress/ui/interactionpage.ui:323
-#, fuzzy
 msgctxt "interactionpage|find"
 msgid "_Find"
-msgstr "ਖੋਜ"
+msgstr "ਖੋਜੋ(_F)"
 
 #. AMQ6d
 #: sd/uiconfig/simpress/ui/interactionpage.ui:330
@@ -6603,43 +6537,39 @@ msgstr ""
 
 #. Ed2VQ
 #: sd/uiconfig/simpress/ui/layoutmenu.ui:12
-#, fuzzy
 msgctxt "layoutmenu|apply"
 msgid "Apply to _Selected Slides"
-msgstr "ਚੁਣੀਆਂ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ(~S)"
+msgstr "ਚੁਣੀਆਂ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ(_S)"
 
 #. r6oAh
 #: sd/uiconfig/simpress/ui/layoutmenu.ui:26
-#, fuzzy
 msgctxt "layoutmenu|insert"
 msgid "_Insert Slide"
-msgstr "ਸਲਾਈਡ ਸ਼ਾਮਿਲ"
+msgstr "ਸਲਾਈਡ ਸ਼ਾਮਲ(_I)"
 
 #. e84v4
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:55
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:60
 msgctxt "layoutwindow|label5"
 msgid "Horizontal"
-msgstr ""
+msgstr "ਲੇਟਵਾਂ"
 
 #. usUqJ
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:107
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:112
 msgctxt "layoutwindow|label6"
 msgid "Vertical"
-msgstr ""
+msgstr "ਖੜ੍ਹਵਾਂ"
 
 #. uydrR
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:8
-#, fuzzy
 msgctxt "masterlayoutdlg|MasterLayoutDialog"
 msgid "Master Elements"
-msgstr "ਮਾਸਟਰ ਐਲੀਮੈਂਟ(~E)..."
+msgstr "ਮਾਸਟਰ ਐਲੀਮੈਂਟ"
 
 #. 2kiHn
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:92
-#, fuzzy
 msgctxt "masterlayoutdlg|header"
 msgid "_Header"
-msgstr "ਹੈੱਡਰ"
+msgstr "ਹੈੱਡਰ(_H)"
 
 #. r7Aa8
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:100
@@ -6649,10 +6579,9 @@ msgstr ""
 
 #. iccus
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:112
-#, fuzzy
 msgctxt "masterlayoutdlg|datetime"
 msgid "_Date/time"
-msgstr "ਮਿਤੀ ਅਤੇ ਸਮਾਂ(_d)"
+msgstr "ਤਾਰੀਖ/ਸਮਾਂ(_D)"
 
 #. LcYxF
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:120
@@ -6674,10 +6603,9 @@ msgstr ""
 
 #. AyWZh
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:152
-#, fuzzy
 msgctxt "masterlayoutdlg|pagenumber"
 msgid "_Page number"
-msgstr "ਸਫ਼ਾ ਨਾਂ(~a)"
+msgstr "ਸਫ਼ਾ ਨੰਬਰ(_P)"
 
 #. y3BDS
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:160
@@ -6689,14 +6617,13 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:172
 msgctxt "masterlayoutdlg|slidenumber"
 msgid "_Slide number"
-msgstr ""
+msgstr "ਸਲਾਈਡ ਨੰਬਰ(_S)"
 
 #. StLxB
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:191
-#, fuzzy
 msgctxt "masterlayoutdlg|Placeholders"
 msgid "Placeholders"
-msgstr "ਟਿਕਾਣਾ"
+msgstr "ਟਿਕਾਣੇ"
 
 #. 2iPYT
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:216
@@ -6706,49 +6633,45 @@ msgstr ""
 
 #. 69Akr
 #: sd/uiconfig/simpress/ui/mastermenu.ui:12
-#, fuzzy
 msgctxt "mastermenu|applyall"
 msgid "_Apply to All Slides"
-msgstr "ਸਭ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ(~A)"
+msgstr "ਸਭ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ ਕਰੋ(_A)"
 
 #. VRgjP
 #: sd/uiconfig/simpress/ui/mastermenu.ui:20
-#, fuzzy
 msgctxt "mastermenu|applyselect"
 msgid "Apply to _Selected Slides"
-msgstr "ਚੁਣੀਆਂ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ(~S)"
+msgstr "ਚੁਣੀਆਂ ਸਲਾਈਡਾਂ 'ਤੇ ਲਾਗੂ ਕਰੋ(_S)"
 
 #. JqkU5
 #: sd/uiconfig/simpress/ui/mastermenu.ui:34
-#, fuzzy
 msgctxt "mastermenu|large"
 msgid "Show _Large Preview"
-msgstr "ਵੱਡੀ ਝਲਕ ਵੇਖਾਓ(~L)"
+msgstr "ਵੱਡੀ ਝਲਕ ਵੇਖਾਓ(_L)"
 
 #. hTJCE
 #: sd/uiconfig/simpress/ui/mastermenu.ui:42
-#, fuzzy
 msgctxt "mastermenu|small"
 msgid "Show S_mall Preview"
-msgstr "ਛੋਟੀ ਝਲਕ ਵੇਖਾਓ(~M)"
+msgstr "ਛੋਟੀ ਝਲਕ ਵੇਖਾਓ(_m)"
 
 #. qF7zf
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:12
 msgctxt "navigatorpanelSTR_DRAGTYPE_URL"
 msgid "Insert as Hyperlink"
-msgstr ""
+msgstr "ਹਾਈਪਰ-ਲਿੰਕ ਵਜੋਂ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. ptpuN
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:20
 msgctxt "navigatorpanel|STR_DRAGTYPE_LINK"
 msgid "Insert as Link"
-msgstr ""
+msgstr "ਲਿੰਕ ਵਜੋਂ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. z7JSR
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:29
 msgctxt "navigatorpanel|STR_DRAGTYPE_EMBEDDED"
 msgid "Insert as Copy"
-msgstr ""
+msgstr "ਕਾਪੀ ਵਜੋਂ ਸ਼ਾਮਲ ਕਰੋ"
 
 #. 3rY8r
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:65
@@ -6758,25 +6681,24 @@ msgstr "ਡੌਕੂਮੈਂਟ"
 
 #. wavgT
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:68
-#, fuzzy
 msgctxt "navigatorpanel|documents-atkobject"
 msgid "Active Window"
-msgstr "ਸਰਗਰਮ ਝਰੋਖਾ"
+msgstr "ਸਰਗਰਮ ਵਿੰਡੋ"
 
 #. gcSNb
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:69
 msgctxt "navigatorpanel|extended_tip|documents"
 msgid "Lists currently open documents."
-msgstr ""
+msgstr "ਇਸ ਵੇਲੇ ਖੁੱਲ੍ਹੇ ਦਸਤਾਵੇਜ਼ਾਂ ਦੀ ਸੂਚੀ ਹੈ"
 
 #. D6ag8
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:119
 msgctxt "navigatorpanel|STR_OBJECTS_TREE"
 msgid "Page Tree"
-msgstr ""
+msgstr "ਸਫ਼ਾ ਲੜੀ"
 
 #. e6gMq
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:121
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
 msgctxt "navigatorpanel|extended_tip|tree"
 msgid "Lists available slides. Double-click a slide to make it the active slide."
 msgstr ""
@@ -6785,7 +6707,7 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:142
 msgctxt "navigatorpanel|first|tooltip_text"
 msgid "First Slide"
-msgstr ""
+msgstr "ਪਹਿਲੀ ਸਲਾਈਡ"
 
 #. Lqedn
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:146
@@ -6794,89 +6716,88 @@ msgid "Jumps to the first page."
 msgstr ""
 
 #. NWPFk
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:158
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:159
 msgctxt "navigatorpanel|previous|tooltip_text"
 msgid "Previous Slide"
-msgstr ""
+msgstr "ਪਿਛਲੀ ਸਲਾਈਡ"
 
 #. PJUma
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:162
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:163
 msgctxt "navigatorpanel|extended_tip|previous"
 msgid "Moves back one page."
 msgstr ""
 
 #. bkvQE
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:174
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:176
 msgctxt "navigatorpanel|next|tooltip_text"
 msgid "Next Slide"
 msgstr "ਅਗਲੀ ਸਲਾਈਡ"
 
 #. zbUVG
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:178
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:180
 msgctxt "navigatorpanel|extended_tip|next"
 msgid "Move forward one page."
 msgstr ""
 
 #. FVSHF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:190
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:193
 msgctxt "navigatorpanel|last|tooltip_text"
 msgid "Last Slide"
-msgstr ""
+msgstr "ਆਖਰੀ ਸਲਾਈਡ"
 
 #. aPU7Y
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:194
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:197
 msgctxt "navigatorpanel|extended_tip|last"
 msgid "Jumps to the last page."
 msgstr ""
 
 #. mHVom
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:218
-#, fuzzy
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
 msgctxt "navigatorpanel|dragmode|tooltip_text"
 msgid "Drag Mode"
 msgstr "ਚੁੱਕਣ ਢੰਗ"
 
 #. BEJEZ
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:226
 msgctxt "navigatorpanel|extended_tip|dragmode"
 msgid "Drag and drop slides and named objects into the active slide."
 msgstr ""
 
 #. Qb5a9
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:234
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:239
 msgctxt "navigatorpanel|shapes|tooltip_text"
 msgid "Show Shapes"
-msgstr ""
+msgstr "ਸ਼ਕਲਾਂ ਵੇਖੋ"
 
 #. EUeae
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:238
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:243
 msgctxt "navigatorpanel|extended_tip|shapes"
 msgid "In the submenu you can choose to display a list of all shapes or only the named shapes. Use drag-and-drop in the list to reorder the shapes. When you set the focus to a slide and press the Tab key, the next shape in the defined order is selected."
 msgstr ""
 
 #. DzQZC
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:261
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:266
 msgctxt "navigatorpanel|extended_tip|NavigatorPanel"
 msgid "Opens the Navigator, where you can quickly jump to other slides or move between open files."
 msgstr ""
 
 #. pzb3K
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:272
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:277
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_NAMED_SHAPES"
 msgid "Named shapes"
 msgstr ""
 
 #. dLEPF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:281
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:286
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_ALL_SHAPES"
 msgid "All shapes"
-msgstr ""
+msgstr "ਸਭ ਸ਼ਕਲਾਂ"
 
 #. qGFEo
 #: sd/uiconfig/simpress/ui/notebookbar.ui:3196
 msgctxt "impressnotebookbar|FileLabel"
 msgid "_File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(_F)"
 
 #. PyC4c
 #: sd/uiconfig/simpress/ui/notebookbar.ui:3215
@@ -6888,222 +6809,222 @@ msgstr "ਮਦਦ(_H)"
 #: sd/uiconfig/simpress/ui/notebookbar.ui:3271
 msgctxt "impressnotebookbar|FileLabel"
 msgid "~File"
-msgstr ""
+msgstr "ਫ਼ਾਇਲ(~F)"
 
 #. XRcKU
 #: sd/uiconfig/simpress/ui/notebookbar.ui:4791
 msgctxt "impressnotebookbar|HomeMenuButton"
 msgid "_Home"
-msgstr ""
+msgstr "ਮੁੱਖ(_H)"
 
 #. XqFQv
 #: sd/uiconfig/simpress/ui/notebookbar.ui:4891
 msgctxt "impressnotebookbar|HomeLabel"
 msgid "~Home"
-msgstr ""
+msgstr "ਮੁੱਖ(~H)"
 
 #. DEQhQ
 #: sd/uiconfig/simpress/ui/notebookbar.ui:5493
 msgctxt "impressnotebookbar|FieldMenuButton"
 msgid "Fiel_d"
-msgstr ""
+msgstr "ਖੇਤਰ(_d)"
 
 #. 9GEAC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6031
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6008
 msgctxt "impressnotebookbar|InsertMenuButton"
 msgid "_Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(_I)"
 
 #. t3YwN
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6134
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6111
 msgctxt "impressnotebookbar|InsertLabel"
 msgid "~Insert"
-msgstr ""
+msgstr "ਸ਼ਾਮਲ(~I)"
 
 #. 58fjG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6909
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6886
 msgctxt "impressnotebookbar|SlideMenuButton"
 msgid "_Layout"
-msgstr ""
+msgstr "ਖਾਕਾ(_L)"
 
 #. ArPLp
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6971
 msgctxt "impressnotebookbar|LayoutLabel"
 msgid "~Layout"
-msgstr ""
+msgstr "ਖਾਕਾ(~L)"
 
 #. vRtjP
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7458
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7435
 msgctxt "impressnotebookbar|SlideShowMenuButton"
 msgid "_Slide Show"
-msgstr ""
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(_S)"
 
 #. nV5FC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7542
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7519
 msgctxt "impressnotebookbar|ReferencesLabel"
 msgid "~Slide Show"
-msgstr ""
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(~S)"
 
 #. sDdGm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8078
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8055
 msgctxt "impressnotebookbar|ReviewMenuButton"
 msgid "_Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(~R)"
 
 #. drk6E
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8161
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8138
 msgctxt "impressnotebookbar|ReviewLabel"
 msgid "~Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(~R)"
 
 #. vjE5w
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9380
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9357
 msgctxt "impressnotebookbar|ViewMenuButton"
 msgid "_View"
-msgstr ""
+msgstr "ਵੇਖੋ(_V)"
 
 #. KJK9J
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9465
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9442
 msgctxt "impressnotebookbar|ViewLabel"
 msgid "~View"
-msgstr ""
+msgstr "ਵੇਖੋ(~V)"
 
 #. bWC2b
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10359
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10336
 msgctxt "impressnotebookbar|TableMenuButton"
 msgid "_Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(_T)"
 
 #. dmEJG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10443
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10420
 msgctxt "impressnotebookbar|TableLabel"
 msgid "~Table"
-msgstr ""
+msgstr "ਸਾਰਣੀ(~T)"
 
 #. Cn8TS
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10968
-#: sd/uiconfig/simpress/ui/notebookbar.ui:12222
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14034
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10945
+#: sd/uiconfig/simpress/ui/notebookbar.ui:12199
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14011
 msgctxt "impressnotebookbar|ConvertMenuButton"
 msgid "Convert"
-msgstr ""
+msgstr "ਬਦਲੋ"
 
 #. do5DT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11638
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11615
 msgctxt "impressnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
-msgstr ""
+msgstr "ਚਿੱਤਰ(_g)"
 
 #. XCSMA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11747
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11724
 msgctxt "impressnotebookbar|ImageLabel"
 msgid "Ima~ge"
-msgstr ""
+msgstr "ਚਿੱਤਰ(~g)"
 
 #. nTy3C
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13449
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13426
 msgctxt "impressnotebookbar|DrawMenuButton"
 msgid "_Draw"
-msgstr ""
+msgstr "ਡਰਾਅ(_D)"
 
 #. BfNQD
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13556
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13533
 msgctxt "impressnotebookbar|DrawLabel"
 msgid "~Draw"
-msgstr ""
+msgstr "ਡਰਾਅ(~D)"
 
 #. p3Faf
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14390
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14367
 msgctxt "impressnotebookbar|ObjectMenuButton"
 msgid "_Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ(_O)"
 
 #. wL8mu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14497
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14474
 msgctxt "impressnotebookbar|ObjectLabel"
 msgid "~Object"
-msgstr ""
+msgstr "ਆਬਜੈਕਟ(~O)"
 
 #. AAosj
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14998
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14975
 msgctxt "impressnotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr ""
 
 #. GgHEg
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15102
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15079
 msgctxt "impressnotebookbar|MediaLabel"
 msgid "~Media"
 msgstr ""
 
 #. W9oCC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15910
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15887
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "ਫਾਰਮ(_r)"
 
 #. 7sAbT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15971
 msgctxt "ImpressNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr ""
 
 #. aAdZJ
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16789
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16766
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "_Master"
 msgstr ""
 
 #. XAZEm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16873
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16850
 msgctxt "ImpressNotebookbar|MasterLabel"
 msgid "~Master"
 msgstr ""
 
 #. DyZAq
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17683
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17660
 msgctxt "ImpressNotebookbar|FormMenuButton"
 msgid "_View"
 msgstr ""
 
 #. rUJFu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17767
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17744
 msgctxt "ImpressNotebookbar|View2Label"
 msgid "~Outline"
 msgstr ""
 
 #. pA8DH
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18554
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18531
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "3_d"
 msgstr ""
 
 #. xwrog
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18661
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18638
 msgctxt "impressnotebookbar|FormLabel"
 msgid "3~d"
 msgstr ""
 
 #. syaDA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18718
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18695
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "E_xtension"
 msgstr ""
 
 #. Nwrnv
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18792
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18769
 msgctxt "impressnotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr ""
 
 #. rBSXA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19755
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19732
 msgctxt "impressnotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr ""
 
 #. DTNDB
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19839
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19816
 msgctxt "impressnotebookbar|DevLabel"
 msgid "~Tools"
 msgstr ""
@@ -7139,181 +7060,181 @@ msgid "Fiel_d"
 msgstr ""
 
 #. 927AD
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5832
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5793
 msgctxt "notebookbar_impress_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr ""
 
 #. ZPHaB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5883
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5844
 msgctxt "notebookbar_impress_compact|InsertLabel"
 msgid "~Insert"
 msgstr ""
 
 #. zEEiz
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6669
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6630
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "Layout"
 msgstr ""
 
 #. EZeGS
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6721
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6682
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Layout"
 msgstr ""
 
 #. sMsGk
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7236
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7197
 msgctxt "notebookbar_impress_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr ""
 
 #. pZ4A3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7288
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7249
 msgctxt "notebookbar_impress_compact|ReviewLabel"
 msgid "~Review"
 msgstr ""
 
 #. cRSR3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7825
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7786
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "_Slide Show"
 msgstr ""
 
 #. KAo9c
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7877
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7838
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Slide Show"
 msgstr ""
 
 #. URjcx
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8709
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8670
 msgctxt "notebookbar_impress_compact|ViewMenuButton"
 msgid "_View"
 msgstr ""
 
 #. SScpo
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8761
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8722
 msgctxt "notebookbar_impress_compact|ViewLabel"
 msgid "~View"
 msgstr ""
 
 #. CzCMC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10445
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10406
 msgctxt "notebookbar_impress_compact|TableMenuButton"
 msgid "T_able"
 msgstr "ਸਾਰਣੀ(_a)"
 
 #. mnepU
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10496
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10457
 msgctxt "notebookbar_impress_compact|TableLabel"
 msgid "~Table"
 msgstr ""
 
 #. BzXPB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11843
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11804
 msgctxt "notebookbar_impress_compact|ImageMenuButton"
 msgid "Image"
 msgstr ""
 
 #. wD2ow
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11898
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11859
 msgctxt "notebookbar_impress_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr ""
 
 #. ZqPYr
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13673
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13634
 msgctxt "notebookbar_impress_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr ""
 
 #. 78DU3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13725
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13686
 msgctxt "notebookbar_impress_compact|ShapeLabel"
 msgid "~Draw"
 msgstr ""
 
 #. uv2FE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14722
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14683
 msgctxt "notebookbar_impress_compact|ObjectMenuButton"
 msgid "Object"
 msgstr ""
 
 #. FSjqt
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14774
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14735
 msgctxt "notebookbar_impress_compact|FrameLabel"
 msgid "~Object"
 msgstr ""
 
 #. t3Fmv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15917
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15878
 msgctxt "notebookbar_impress_compact|MediaButton"
 msgid "_Media"
 msgstr ""
 
 #. HbptL
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15968
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15929
 msgctxt "notebookbar_impress_compact|MediaLabel"
 msgid "~Media"
 msgstr ""
 
 #. NNqQ2
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17205
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17166
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "Fo_rm"
 msgstr "ਫਾਰਮ(_r)"
 
 #. DpFpM
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17257
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17218
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "Fo~rm"
 msgstr ""
 
 #. MNUFm
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18009
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17970
 msgctxt "notebookbar_impress_compact|PrintPreviewButton"
 msgid "_Master"
 msgstr ""
 
 #. NUiWE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18061
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18022
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "~Master"
 msgstr ""
 
 #. 4f9xG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19021
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18982
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "3_d"
 msgstr ""
 
 #. ntfL7
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19073
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19034
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "3~d"
 msgstr ""
 
 #. ntjaC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19152
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19113
 msgctxt "notebookbar_impress_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr ""
 
 #. Tu5f8
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19210
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19171
 msgctxt "notebookbar_impress_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr ""
 
 #. abvtG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20211
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20172
 msgctxt "notebookbar_impress_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr ""
 
 #. oKhkv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20263
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20224
 msgctxt "notebookbar_impress_compact|DevLabel"
 msgid "~Tools"
 msgstr ""
@@ -7499,13 +7420,13 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_compact.ui:10665
 msgctxt "notebookbar_groupedbar_compact|graphicB"
 msgid "_Media"
-msgstr ""
+msgstr "ਮੀਡੀਆ(_M)"
 
 #. w6MPS
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_compact.ui:12294
 msgctxt "notebookbar_groupedbar_compact|oleB"
 msgid "_Master"
-msgstr ""
+msgstr "ਮਾਸਟਰ(_M)"
 
 #. MGQxe
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_compact.ui:13347
@@ -7515,24 +7436,21 @@ msgstr "ਫਾਰਮ(_r)"
 
 #. xBYsC
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_compact.ui:14082
-#, fuzzy
 msgctxt "notebookbar_groupedbar_compact|menub"
 msgid "_Menu"
-msgstr "ਮੇਨੂ"
+msgstr "ਮੇਨੂ(_M)"
 
 #. EsADr
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:2976
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|menub"
 msgid "_Menu"
-msgstr "ਮੇਨੂ"
+msgstr "ਮੇਨੂ(_M)"
 
 #. Ch63h
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3028
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|toolsb"
 msgid "_Tools"
-msgstr "ਟੂਲ"
+msgstr "ਟੂਲ(_T)"
 
 #. kdH4L
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3081
@@ -7542,31 +7460,27 @@ msgstr "ਮਦਦ(_H)"
 
 #. bkg23
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3187
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|fileb"
 msgid "_File"
-msgstr "ਫਾਇਲ"
+msgstr "ਫਾਇਲ(_F)"
 
 #. aqbEs
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3420
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|editb"
 msgid "_Edit"
-msgstr "ਸੋਧ(~E)"
+msgstr "ਸੋਧ(_E)"
 
 #. S4ZPU
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3577
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|slideshowb"
 msgid "_Slide Show"
-msgstr "ਸਲਾਈਡ ਸ਼ੋ"
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(_S)"
 
 #. ZShaH
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3770
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|paragraphstylet"
 msgid "S_lide"
-msgstr "ਸਲਾਈਡ"
+msgstr "ਸਲਾਈਡ(_l)"
 
 #. dS4bE
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:3919
@@ -7578,21 +7492,19 @@ msgstr "ਸ਼ਾਮਿਲ(_I)"
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:4255
 msgctxt "notebookbar_groupedbar_full|draw"
 msgid "D_raw"
-msgstr ""
+msgstr "ਡਰਾਅ(_r)"
 
 #. gQQfL
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:4439
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|reviewb"
 msgid "_Review"
-msgstr "Review"
+msgstr "ਪੜਤਾਲ(_R)"
 
 #. BHDdD
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:4585
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|viewb"
 msgid "_View"
-msgstr "ਵੇਖੋ"
+msgstr "ਵੇਖੋ(_V)"
 
 #. MECyG
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:4867
@@ -7600,33 +7512,29 @@ msgstr "ਵੇਖੋ"
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:9631
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:11022
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:12254
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|arrangedrawb"
 msgid "_Arrange"
-msgstr "ਇਕਸਾਰ"
+msgstr "ਇਕਸਾਰ(_A)"
 
 #. ZZz6G
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:5024
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|slideshowt"
 msgid "_Slide Show"
-msgstr "ਸਲਾਈਡ ਸ਼ੋ"
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(_S)"
 
 #. etFeN
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:5267
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:6510
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|formatd"
 msgid "F_ormat"
-msgstr "ਫਾਰਮੈਟ"
+msgstr "ਫਾਰਮੈਟ(_o)"
 
 #. sdehG
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:5578
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:6821
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|paragraphTextb"
 msgid "_Paragraph"
-msgstr "ਪ੍ਹੈਰਾ"
+msgstr "ਪ੍ਹੈਰਾਗਰਾਫ਼(_P)"
 
 #. ncg2G
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:5818
@@ -7636,23 +7544,21 @@ msgstr "ਸ਼ਾਮਿਲ(_I)"
 
 #. 6isa9
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:5980
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|viewt"
 msgid "_View"
-msgstr "ਵੇਖੋ"
+msgstr "ਵੇਖੋ(_V)"
 
 #. sorSJ
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:6128
 msgctxt "notebookbar_groupedbar_full|reviewp"
 msgid "_Review"
-msgstr ""
+msgstr "ਪੜਤਾਲ(_R)"
 
 #. jHLaW
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:6267
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|slideshowtt"
 msgid "_Slide Show"
-msgstr "ਸਲਾਈਡ ਸ਼ੋ"
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(_S)"
 
 #. Ew7Ho
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:6996
@@ -7662,29 +7568,27 @@ msgstr "ਸਾਰਣੀ(_a)"
 
 #. i8XUZ
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:7256
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|rowscolumnst"
 msgid "R_ows"
-msgstr "ਕਤਾਰਾਂ"
+msgstr "ਕਤਾਰਾਂ(_o)"
 
 #. 4nboE
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:7378
 msgctxt "notebookbar_groupedbar_full|calculatet"
 msgid "_Calc"
-msgstr ""
+msgstr "ਕੈਲਸ(_C)"
 
 #. WfzeY
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:7704
 msgctxt "notebookbar_groupedbar_full|drawb"
 msgid "D_raw"
-msgstr ""
+msgstr "ਡਰਾਅ(_r)"
 
 #. QNg9L
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:7989
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|editdrawb"
 msgid "_Edit"
-msgstr "ਸੋਧ(~E)"
+msgstr "ਸੋਧ(_E)"
 
 #. BfnGg
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:8541
@@ -7696,65 +7600,57 @@ msgstr "ਗਰਿੱਡ(_G)"
 
 #. 3i55T
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:8683
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|viewDrawb"
 msgid "Grou_p"
-msgstr "ਗਰੁੱਪ"
+msgstr "ਗਰੁੱਪ(_p)"
 
 #. fNGFB
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:8822
 msgctxt "notebookbar_groupedbar_full|3Db"
 msgid "3_D"
-msgstr ""
+msgstr "3_D"
 
 #. SbHmx
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:9078
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|graphicB"
 msgid "_Graphic"
-msgstr "ਗਰਾਫਿਕਸ"
+msgstr "ਗਰਾਫਿਕ(_G)"
 
 #. DDTxx
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:9243
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|colorb"
 msgid "C_olor"
-msgstr "ਰੰਗ"
+msgstr "ਰੰਗ(_o)"
 
 #. eLnnF
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:10172
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|media"
 msgid "_Media"
-msgstr "ਮੀਡਿਆ"
+msgstr "ਮੀਡਿਆ(_M)"
 
 #. duFFM
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:10347
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|slideshowOLE"
 msgid "_Slide Show"
-msgstr "ਸਲਾਈਡ ਸ਼ੋ"
+msgstr "ਸਲਾਈਡ ਸ਼ੋ(_S)"
 
 #. wrKzp
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:10622
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|editdrawb"
 msgid "F_rame"
-msgstr "ਫਰੇਮ"
+msgstr "ਫਰੇਮ(_r)"
 
 #. EMvnF
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:11320
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|viewtOLE"
 msgid "_View"
-msgstr "ਵੇਖੋ"
+msgstr "ਵੇਖੋ(_V)"
 
 #. DQLzy
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:11480
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|oleB"
 msgid "_Master Page"
-msgstr "ਮਾਸਟਰ ਪੇਜ਼"
+msgstr "ਮਾਸਟਰ ਪੇਜ਼(_M)"
 
 #. QLjsG
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:11711
@@ -7766,21 +7662,19 @@ msgstr "ਸ਼ਾਮਿਲ(_I)"
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:11936
 msgctxt "notebookbar_groupedbar_full|drawm"
 msgid "D_raw"
-msgstr ""
+msgstr "ਡਰਾਅ(_r)"
 
 #. tcCdm
 #: sd/uiconfig/simpress/ui/notebookbar_groupedbar_full.ui:12416
-#, fuzzy
 msgctxt "notebookbar_groupedbar_full|masterviewm"
 msgid "_View"
-msgstr "ਵੇਖੋ"
+msgstr "ਵੇਖੋ(_V)"
 
 #. TRHHB
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:49
-#, fuzzy
 msgctxt "notebookbar_groups|layout01"
 msgid "Blank"
-msgstr "ਸਾਫ਼"
+msgstr "ਖਾਲੀ"
 
 #. 8fsnY
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:57
@@ -7790,10 +7684,9 @@ msgstr "ਮੁੱਖ ਸਲਾਈਡ"
 
 #. VAnE3
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:65
-#, fuzzy
 msgctxt "notebookbar_groups|layout03"
 msgid "Title, Text"
-msgstr "ਟਾਇਟਲ ਪਾਠ"
+msgstr "ਟਾਈਟਲ, ਲਿਖਤ"
 
 #. V64P7
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:73
@@ -7815,14 +7708,12 @@ msgstr "ਹਾਇਪਰਲਿੰਕ"
 
 #. LbUtj
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:118
-#, fuzzy
 msgctxt "notebookbar_groups|footnote"
 msgid "Footnote"
 msgstr "ਫੁੱਟਨੋਟ"
 
 #. BkhhA
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:127
-#, fuzzy
 msgctxt "notebookbar_groups|endnote"
 msgid "Endnote"
 msgstr "ਐਂਡ-ਨੋਟ"
@@ -7835,7 +7726,6 @@ msgstr "ਬੁੱਕਮਾਰਕ"
 
 #. JE3bf
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:151
-#, fuzzy
 msgctxt "notebookbar_groups|crossreference"
 msgid "Cross-Reference"
 msgstr "ਕਰਾਂਸ-ਰੈਫਰੈਂਸ"
@@ -7844,13 +7734,13 @@ msgstr "ਕਰਾਂਸ-ਰੈਫਰੈਂਸ"
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:168
 msgctxt "notebookbar_groups|master01"
 msgid "Master 1"
-msgstr ""
+msgstr "ਮਾਸਟਰ 1"
 
 #. 4j2fv
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:177
 msgctxt "notebookbar_groups|master02"
 msgid "Master 2"
-msgstr ""
+msgstr "ਮਾਸਟਰ 2"
 
 #. Dz9y9
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:257
@@ -7860,7 +7750,6 @@ msgstr "ਡਿਫਾਲਟ"
 
 #. 7YLfF
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:265
-#, fuzzy
 msgctxt "notebookbar_groups|shapestylenofill"
 msgid "No Fill"
 msgstr "ਭਰਨਾ ਨਹੀਂ"
@@ -7873,17 +7762,15 @@ msgstr ""
 
 #. F32mr
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:287
-#, fuzzy
 msgctxt "notebookbar_groups|shapestyletitle1"
 msgid "Title 1"
-msgstr "ਟਾਈਟਲ1"
+msgstr "ਟਾਈਟਲ 1"
 
 #. BH8CJ
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:295
-#, fuzzy
 msgctxt "notebookbar_groups|shapestyletitle2"
 msgid "Title 2"
-msgstr "ਟਾਈਟਲ2"
+msgstr "ਟਾਈਟਲ 2"
 
 #. CsPMA
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:495
@@ -7893,14 +7780,12 @@ msgstr "ਫਾਇਲ"
 
 #. FHC5q
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:651
-#, fuzzy
 msgctxt "notebookbar_groups|clipboardgrouplabel"
 msgid "Clipboard"
 msgstr "ਕਲਿੱਪਬੋਰਡ"
 
 #. ffHa2
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:697
-#, fuzzy
 msgctxt "notebookbar_groups|shapestyleb"
 msgid "Style"
 msgstr "ਸ਼ੈਲੀ"
@@ -7915,7 +7800,7 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:852
 msgctxt "notebookbar_groups|shrinkb"
 msgid " "
-msgstr ""
+msgstr " "
 
 #. nyg3m
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1190
@@ -7925,17 +7810,15 @@ msgstr "ਟੈਕਸਟ"
 
 #. cCSaA
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1240
-#, fuzzy
 msgctxt "notebookbar_groups|startshowb"
 msgid "Start"
-msgstr "ਸ਼ੁਰੂ(_S)"
+msgstr "ਸ਼ੁਰੂ"
 
 #. vgG6B
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1266
-#, fuzzy
 msgctxt "notebookbar_groups|masterb"
 msgid "Master"
-msgstr "ਮਾਸਟਰ(~M)"
+msgstr "ਮਾਸਟਰ"
 
 #. k69y9
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1286
@@ -7945,10 +7828,9 @@ msgstr "ਲੇਆਉਟ"
 
 #. mfi7o
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1318
-#, fuzzy
 msgctxt "notebookbar_groups|animationb"
 msgid "Animation"
-msgstr "ਸਜੀਵ"
+msgstr "ਐਨੀਮੇਸ਼ਨ"
 
 #. Dxvi5
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1336
@@ -7971,21 +7853,18 @@ msgstr "ਸ਼ਕਲਾਂ"
 
 #. geGED
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1471
-#, fuzzy
 msgctxt "notebookbar_groups|linksb"
 msgid "Links"
-msgstr "ਲਿੰਕ(~L)"
+msgstr "ਲਿੰਕ"
 
 #. txpNZ
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1585
-#, fuzzy
 msgctxt "notebookbar_groups|insertgrouplabel"
 msgid "Insert"
 msgstr "ਸ਼ਾਮਲ"
 
 #. Du8Qw
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1621
-#, fuzzy
 msgctxt "notebookbar_groups|imagestyleb"
 msgid "Style"
 msgstr "ਸ਼ੈਲੀ"
@@ -7998,17 +7877,15 @@ msgstr "ਮੁੜ-ਸੈੱਟ"
 
 #. w6XXT
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1709
-#, fuzzy
 msgctxt "notebookbar_groups|wrapb"
 msgid "Wrap"
 msgstr "ਸਮੇਟੋ"
 
 #. QdS8h
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1725
-#, fuzzy
 msgctxt "notebookbar_groups|lockb"
 msgid "Lock"
-msgstr "ਡੌਕ"
+msgstr "ਲਾਕ"
 
 #. VUCKC
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1770
@@ -8030,7 +7907,6 @@ msgstr "ਅਨੁਕੂਲ"
 
 #. EpwrB
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1844
-#, fuzzy
 msgctxt "notebookbar_groups|wrapon"
 msgid "Parallel"
 msgstr "ਸਮਾਂਤਰ"
@@ -8051,21 +7927,19 @@ msgstr "ਬਾਅਦ"
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1871
 msgctxt "notebookbar_groups|wrapthrough"
 msgid "Through"
-msgstr ""
+msgstr "ਆਰ-ਪਾਰ"
 
 #. WEBWT
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1886
-#, fuzzy
 msgctxt "notebookbar_groups|wrapcontour"
 msgid "Contour"
-msgstr "ਢਾਂਚਾ"
+msgstr ""
 
 #. d7AtT
 #: sd/uiconfig/simpress/ui/notebookbar_groups.ui:1895
-#, fuzzy
 msgctxt "notebookbar_groups|contourdialog"
 msgid "Edit Contour"
-msgstr "ਪਾਠ ਢਾਂਚਾ"
+msgstr ""
 
 #. 7k6fG
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:57
@@ -8081,10 +7955,9 @@ msgstr ""
 
 #. 5DjoQ
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:80
-#, fuzzy
 msgctxt "optimpressgeneralpage|newdoclbl"
 msgid "New Document"
-msgstr "ਨਵਾ ਦਸਤਾਵੇਜ"
+msgstr "ਨਵਾਂ ਦਸਤਾਵੇਜ਼"
 
 #. EE26t
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:110
@@ -8110,23 +7983,23 @@ msgctxt "extended_tip|enremotcont"
 msgid "Specifies that you want to enable Bluetooth remote control while Impress is running."
 msgstr ""
 
+#. dQSDT
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:149
+msgctxt "optimpressgeneralpage|enprsntconsfullscreen"
+msgid "Fullscreen presenter console"
+msgstr ""
+
+#. BPu2B
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:157
+msgctxt "extended_tip|enprsntconsfullscreen"
+msgid "Specifies that you want to show the Presenter Console in fullscreen mode."
+msgstr ""
+
 #. txHfw
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:153
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:172
 msgctxt "optimpressgeneralpage|label7"
 msgid "Presentation"
 msgstr "ਪਰਿਜੈੱਟੇਸ਼ਨ"
-
-#. 3BkYq
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:182
-msgctxt "optimpressgeneralpage|printermetrics"
-msgid "Us_e printer metrics for document formatting"
-msgstr ""
-
-#. mTuAd
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:190
-msgctxt "extended_tip|printermetrics"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen. If this box is not checked, a printer independent layout will be used for screen display and printing."
-msgstr ""
 
 #. VVZZf
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:201
@@ -8381,6 +8254,201 @@ msgstr "ਪੂਰੀ ਸਕਰੀਨ"
 #: sd/uiconfig/simpress/ui/photoalbum.ui:372
 msgctxt "photoalbum|insert_as_link_check"
 msgid "Link images"
+msgstr ""
+
+#. c5owK
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:41
+msgctxt "pmimagespage|STR_REMOVE_CROP_AREA"
+msgid "_Delete cropped image areas"
+msgstr ""
+
+#. bw3Ac
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:55
+msgctxt "pmimagespage|STR_EMBED_LINKED_GRAPHICS"
+msgid "_Embed external images"
+msgstr ""
+
+#. vF2CP
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:76
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "Reduce _image resolution"
+msgstr ""
+
+#. aCEmS
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:92
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "<no change>"
+msgstr ""
+
+#. 7Jqdo
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:93
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "96 DPI (screen resolution)"
+msgstr ""
+
+#. JXujg
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:94
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "150 DPI (projector resolution)"
+msgstr ""
+
+#. 76mBF
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:95
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "300 DPI (print resolution)"
+msgstr ""
+
+#. G5zaJ
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:96
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "600 DPI (print resolution)"
+msgstr ""
+
+#. 2hKhk
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:113
+msgctxt "pmimagespage|STR_LOSSLESS_COMPRESSION"
+msgid "_Lossless compression"
+msgstr ""
+
+#. GLtSt
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:128
+msgctxt "pmimagespage|STR_JPEG_COMPRESSION"
+msgid "_JPEG compression"
+msgstr ""
+
+#. 22Nif
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:152
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "_Quality in %"
+msgstr ""
+
+#. xYnbA
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:187
+msgctxt "pmimagespages|STR_GRAPHIC_OPTIMIZATION"
+msgid "Choose settings for optimizing images"
+msgstr ""
+
+#. w6qX4
+#: sd/uiconfig/simpress/ui/pminfodialog.ui:29
+msgctxt "pminfodialog|ask"
+msgid "_Open newly created presentation"
+msgstr ""
+
+#. 9HUiB
+#: sd/uiconfig/simpress/ui/pmintropage.ui:40
+msgctxt "pmintropage|STR_INTRODUCTION_T"
+msgid ""
+"The Presentation Minimizer is used to reduce the file size of the current presentation. Images will be compressed and data, that is no longer needed, will be removed.\n"
+"\n"
+"        At the last step of the wizard you can choose to apply the changes to the current presentation or to create an optimized new version of the presentation."
+msgstr ""
+
+#. WwLQG
+#: sd/uiconfig/simpress/ui/pmintropage.ui:73
+msgctxt "pmintropage:STR_REMOVE"
+msgid "_Delete"
+msgstr ""
+
+#. NPMR9
+#: sd/uiconfig/simpress/ui/pmintropage.ui:95
+msgctxt "pmintropage|STR_CHOSE_SETTINGS"
+msgid "_Choose settings for Presentation Minimizer"
+msgstr ""
+
+#. FtXuZ
+#: sd/uiconfig/simpress/ui/pmintropage.ui:120
+msgctxt "pmintropage|STR_INTRODUCTION"
+msgid "Introduction"
+msgstr ""
+
+#. kJS2d
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:36
+msgctxt "pmimagespage|STR_OLE_REPLACE"
+msgid "Create static replacement images for OLE objects"
+msgstr ""
+
+#. LkYsy
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:51
+msgctxt "pmobjectspage|STR_ALL_OLE_OBJECTS"
+msgid "For _all OLE objects"
+msgstr ""
+
+#. hocJG
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:67
+msgctxt "pmobjectspage|STR_ALIEN_OLE_OBJECTS_ONLY"
+msgid "_For OLE objects not based on OpenDocument format"
+msgstr ""
+
+#. CcCfe
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:106
+msgctxt "pmobjectspages|STR_OLE_OPTIMIZATION"
+msgid "Choose settings for replacing OLE objects"
+msgstr ""
+
+#. bRB3B
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:36
+msgctxt "pmslidespage|STR_DELETE_MASTER_PAGES"
+msgid "Delete unused _master slides"
+msgstr ""
+
+#. wDvum
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:50
+msgctxt "pmslidespage|STR_DELETE_HIDDEN_SLIDES"
+msgid "Delete hidden _slides"
+msgstr ""
+
+#. EoDRG
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:64
+msgctxt "pmslidespage|STR_CUSTOM_SHOW"
+msgid "Delete slides that are not used for the _custom slide show"
+msgstr ""
+
+#. TEzVE
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:97
+msgctxt "pmslidespage|STR_DELETE_NOTES_PAGES"
+msgid "_Clear notes"
+msgstr ""
+
+#. Jsmp2
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:115
+msgctxt "pmslidespages|STR_CHOOSE_SLIDES"
+msgid "Choose which slides to delete"
+msgstr ""
+
+#. cBtLF
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:47
+msgctxt "pmsummarypage|STR_APPLY_TO_CURRENT"
+msgid "_Apply changes to current presentation"
+msgstr ""
+
+#. mBhDk
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:63
+msgctxt "pmsummarypage|STR_SAVE_AS"
+msgid "_Duplicate presentation before applying changes"
+msgstr ""
+
+#. PiAHE
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:105
+msgctxt "pmsummarypage|STR_SAVE_SETTINGS"
+msgid "_Save settings as"
+msgstr ""
+
+#. ExrdK
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:182
+msgctxt "pmsummarypage|STR_CURRENT_FILESIZE"
+msgid "Current file size:"
+msgstr ""
+
+#. ZcrFM
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:194
+msgctxt "pmsummarypage|STR_ESTIMATED_FILESIZE"
+msgid "Estimated new file size:"
+msgstr ""
+
+#. Ubstx
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:250
+msgctxt "pmsummarypages|STR_SUMMARY_TITLE"
+msgid "Choose where to apply the following changes"
 msgstr ""
 
 #. LAEo2
@@ -9968,7 +10036,7 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:324
 msgctxt "slidetransitionspanel|label2"
 msgid "Advance Slide"
-msgstr ""
+msgstr "ਅਗਲੀ ਸਲਾਈਡ"
 
 #. czZBc
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:350
@@ -10038,17 +10106,15 @@ msgstr ""
 
 #. 3KfJE
 #: sd/uiconfig/simpress/ui/tabledesignpanel.ui:66
-#, fuzzy
 msgctxt "tabledesignpanel|UseFirstColumnStyle"
 msgid "Fi_rst column"
-msgstr "ਪਹਿਲਾਂ ਕਾਲਮ"
+msgstr "ਪਹਿਲਾਂ ਕਾਲਮ(_r)"
 
 #. HLRSH
 #: sd/uiconfig/simpress/ui/tabledesignpanel.ui:80
-#, fuzzy
 msgctxt "tabledesignpanel|UseLastColumnStyle"
 msgid "_Last column"
-msgstr "ਆਖਰੀ ਕਾਲਮ"
+msgstr "ਆਖਰੀ ਕਾਲਮ(_L)"
 
 #. z5zRG
 #: sd/uiconfig/simpress/ui/tabledesignpanel.ui:94
@@ -10056,12 +10122,83 @@ msgctxt "tabledesignpanel|UseBandingColumnStyle"
 msgid "Ba_nded columns"
 msgstr ""
 
+#. fKBVs
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:152
+msgctxt "tabledesignpanel|menunew"
+msgid "New"
+msgstr "ਨਵਾਂ"
+
+#. U5Noi
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:160
+msgctxt "tabledesignpanel|menuclone"
+msgid "Clone"
+msgstr ""
+
+#. ZsSkp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:168
+msgctxt "tabledesignpanel|menudelete"
+msgid "Delete"
+msgstr "ਹਟਾਓ"
+
+#. RWsRb
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:176
+msgctxt "tabledesignpanel|menureset"
+msgid "Reset"
+msgstr "ਮੁੜ-ਸੈੱਟ ਕਰੋ"
+
+#. ZCDY2
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:184
+msgctxt "tabledesignpanel|menuformat"
+msgid "Format"
+msgstr "ਫ਼ਾਰਮੈਟ"
+
+#. 8myJL
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:194
+msgctxt "tabledesignpanel|menufirstrow"
+msgid "Header row..."
+msgstr ""
+
+#. ZeuD3
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:202
+msgctxt "tabledesignpanel|menulastrow"
+msgid "Total row..."
+msgstr ""
+
+#. 3yZqr
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:210
+msgctxt "tabledesignpanel|menuoddrows"
+msgid "Banded rows..."
+msgstr ""
+
+#. JzTgZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:224
+msgctxt "tabledesignpanel|menufirstcolumn"
+msgid "First column..."
+msgstr ""
+
+#. f5bFZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:232
+msgctxt "tabledesignpanel|menulastcolumn"
+msgid "Last column..."
+msgstr ""
+
+#. MhPWp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:240
+msgctxt "tabledesignpanel|menuoddcolumns"
+msgid "Banded columns..."
+msgstr ""
+
+#. fUFnD
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:254
+msgctxt "tabledesignpanel|menubody"
+msgid "Other cells..."
+msgstr ""
+
 #. FvyKu
 #: sd/uiconfig/simpress/ui/templatedialog.ui:8
-#, fuzzy
 msgctxt "templatedialog|TemplateDialog"
 msgid "Graphic Styles"
-msgstr "ਗਰਾਫਿਕਸ ਫਾਇਲਾਂ"
+msgstr "ਗਰਾਫਿਕ ਸਟਾਈਲ"
 
 #. 38ZeG
 #: sd/uiconfig/simpress/ui/templatedialog.ui:41
@@ -10077,7 +10214,6 @@ msgstr "ਪਰਬੰਧਕ"
 
 #. 5d7Zo
 #: sd/uiconfig/simpress/ui/templatedialog.ui:199
-#, fuzzy
 msgctxt "templatedialog|line"
 msgid "Line"
 msgstr "ਰੇਖਾ"
@@ -10109,7 +10245,6 @@ msgstr "ਫੋਂਟ"
 
 #. tuaZJ
 #: sd/uiconfig/simpress/ui/templatedialog.ui:439
-#, fuzzy
 msgctxt "templatedialog|fonteffect"
 msgid "Font Effects"
 msgstr "ਫੋਂਟ ਪ੍ਰਭਾਵ"
@@ -10118,7 +10253,7 @@ msgstr "ਫੋਂਟ ਪ੍ਰਭਾਵ"
 #: sd/uiconfig/simpress/ui/templatedialog.ui:487
 msgctxt "templatedialog|indents"
 msgid "Indents & Spacing"
-msgstr ""
+msgstr "ਹਾਸ਼ੀਏ ਤੋਂ ਦੂਰੀ ਤੇ ਫ਼ਾਸਲਾ"
 
 #. siGDD
 #: sd/uiconfig/simpress/ui/templatedialog.ui:535
@@ -10147,7 +10282,6 @@ msgstr "ਕੁਨੈਕਟਰ"
 
 #. nBYNb
 #: sd/uiconfig/simpress/ui/templatedialog.ui:727
-#, fuzzy
 msgctxt "templatedialog|alignment"
 msgid "Alignment"
 msgstr "ਇਕਸਾਰ"
@@ -10167,7 +10301,6 @@ msgstr "ਟੈਬ"
 
 #. WtrUB
 #: sd/uiconfig/simpress/ui/templatedialog.ui:871
-#, fuzzy
 msgctxt "templatedialog|background"
 msgid "Highlighting"
 msgstr "ਉਘਾੜਨ"

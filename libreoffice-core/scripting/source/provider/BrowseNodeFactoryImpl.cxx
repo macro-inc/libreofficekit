@@ -30,7 +30,7 @@
 #include <com/sun/star/script/browse/BrowseNodeFactoryViewTypes.hpp>
 #include <com/sun/star/script/browse/BrowseNodeTypes.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "BrowseNodeFactoryImpl.hxx"
 #include <util/MiscUtils.hxx>
@@ -143,9 +143,9 @@ public:
 
 struct alphaSort
 {
-    bool operator()( const OUString& a, std::u16string_view b )
+    bool operator()( std::u16string_view a, std::u16string_view b )
     {
-        return a.compareTo( b ) < 0;
+        return a.compare( b ) < 0;
     }
 };
 class LocationBrowseNode :
@@ -266,8 +266,8 @@ std::vector< Reference< browse::XBrowseNode > > getAllBrowseNodes( const Referen
     {
         xFac = provider::theMasterScriptProviderFactory::get( xCtx );
 
-        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( makeAny( OUString("user") ) ), UNO_QUERY_THROW );
-        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( makeAny( OUString("share") ) ), UNO_QUERY_THROW );
+        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( Any( OUString("user") ) ), UNO_QUERY_THROW );
+        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( Any( OUString("share") ) ), UNO_QUERY_THROW );
     }
     // TODO proper exception handling, should throw
     catch( const Exception& )
@@ -295,7 +295,7 @@ std::vector< Reference< browse::XBrowseNode > > getAllBrowseNodes( const Referen
                 {
                     Reference< document::XEmbeddedScripts > xScripts( model, UNO_QUERY );
                     if ( xScripts.is() )
-                        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( makeAny( model ) ), UNO_QUERY_THROW );
+                        locnBNs[ mspIndex++ ].set( xFac->createScriptProvider( Any( model ) ), UNO_QUERY_THROW );
                 }
             }
         }

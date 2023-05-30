@@ -41,9 +41,8 @@
 #endif
 #include <quartz/utils.h>
 #ifdef IOS
-#include "saldatabasic.hxx"
+#include <ios/iosinst.hxx>
 #endif
-#include <sft.hxx>
 
 using namespace vcl;
 
@@ -191,7 +190,7 @@ void drawPattern50(void*, CGContextRef rContext)
 }
 
 AquaGraphicsBackend::AquaGraphicsBackend(AquaSharedAttributes& rShared)
-    : AquaGraphicsBackendBase(rShared)
+    : AquaGraphicsBackendBase(rShared, this)
 {
 }
 
@@ -267,7 +266,7 @@ tools::Long AquaGraphicsBackend::GetGraphicsWidth() const
     {
         if (mrShared.mbWindow && mrShared.mpFrame)
         {
-            width = mrShared.mpFrame->maGeometry.nWidth;
+            width = mrShared.mpFrame->maGeometry.width();
         }
     }
 #endif
@@ -905,8 +904,7 @@ void AquaGraphicsBackend::drawBitmap(const SalTwoRect& rPosAry, const SalBitmap&
     if (!mrShared.checkContext())
         return;
 
-    const QuartzSalBitmap& rBitmap = static_cast<const QuartzSalBitmap&>(rSalBitmap);
-    CGImageRef xImage = rBitmap.CreateCroppedImage(
+    CGImageRef xImage = rSalBitmap.CreateCroppedImage(
         static_cast<int>(rPosAry.mnSrcX), static_cast<int>(rPosAry.mnSrcY),
         static_cast<int>(rPosAry.mnSrcWidth), static_cast<int>(rPosAry.mnSrcHeight));
     if (!xImage)
@@ -926,11 +924,9 @@ void AquaGraphicsBackend::drawBitmap(const SalTwoRect& rPosAry, const SalBitmap&
     if (!mrShared.checkContext())
         return;
 
-    const QuartzSalBitmap& rBitmap = static_cast<const QuartzSalBitmap&>(rSalBitmap);
-    const QuartzSalBitmap& rMask = static_cast<const QuartzSalBitmap&>(rTransparentBitmap);
-
-    CGImageRef xMaskedImage(rBitmap.CreateWithMask(rMask, rPosAry.mnSrcX, rPosAry.mnSrcY,
-                                                   rPosAry.mnSrcWidth, rPosAry.mnSrcHeight));
+    CGImageRef xMaskedImage(rSalBitmap.CreateWithMask(rTransparentBitmap, rPosAry.mnSrcX,
+                                                      rPosAry.mnSrcY, rPosAry.mnSrcWidth,
+                                                      rPosAry.mnSrcHeight));
     if (!xMaskedImage)
         return;
 
@@ -947,9 +943,8 @@ void AquaGraphicsBackend::drawMask(const SalTwoRect& rPosAry, const SalBitmap& r
     if (!mrShared.checkContext())
         return;
 
-    const QuartzSalBitmap& rBitmap = static_cast<const QuartzSalBitmap&>(rSalBitmap);
-    CGImageRef xImage = rBitmap.CreateColorMask(rPosAry.mnSrcX, rPosAry.mnSrcY, rPosAry.mnSrcWidth,
-                                                rPosAry.mnSrcHeight, nMaskColor);
+    CGImageRef xImage = rSalBitmap.CreateColorMask(
+        rPosAry.mnSrcX, rPosAry.mnSrcY, rPosAry.mnSrcWidth, rPosAry.mnSrcHeight, nMaskColor);
     if (!xImage)
         return;
 
@@ -1225,9 +1220,7 @@ bool AquaGraphicsBackend::drawAlphaBitmap(const SalTwoRect& rTR, const SalBitmap
     if (rTR.mnDestWidth < 0 || rTR.mnDestHeight < 0)
         return false;
 
-    const QuartzSalBitmap& rSrcSalBmp = static_cast<const QuartzSalBitmap&>(rSrcBitmap);
-    const QuartzSalBitmap& rMaskSalBmp = static_cast<const QuartzSalBitmap&>(rAlphaBmp);
-    CGImageRef xMaskedImage = rSrcSalBmp.CreateWithMask(rMaskSalBmp, rTR.mnSrcX, rTR.mnSrcY,
+    CGImageRef xMaskedImage = rSrcBitmap.CreateWithMask(rAlphaBmp, rTR.mnSrcX, rTR.mnSrcY,
                                                         rTR.mnSrcWidth, rTR.mnSrcHeight);
     if (!xMaskedImage)
         return false;
@@ -1260,14 +1253,12 @@ bool AquaGraphicsBackend::drawTransformedBitmap(const basegfx::B2DPoint& rNull,
     // get the Quartz image
     CGImageRef xImage = nullptr;
     const Size aSize = rSrcBitmap.GetSize();
-    const QuartzSalBitmap& rSrcSalBmp = static_cast<const QuartzSalBitmap&>(rSrcBitmap);
-    const QuartzSalBitmap* pMaskSalBmp = static_cast<const QuartzSalBitmap*>(pAlphaBmp);
 
-    if (!pMaskSalBmp)
-        xImage = rSrcSalBmp.CreateCroppedImage(0, 0, int(aSize.Width()), int(aSize.Height()));
+    if (!pAlphaBmp)
+        xImage = rSrcBitmap.CreateCroppedImage(0, 0, int(aSize.Width()), int(aSize.Height()));
     else
-        xImage = rSrcSalBmp.CreateWithMask(*pMaskSalBmp, 0, 0, int(aSize.Width()),
-                                           int(aSize.Height()));
+        xImage
+            = rSrcBitmap.CreateWithMask(*pAlphaBmp, 0, 0, int(aSize.Width()), int(aSize.Height()));
 
     if (!xImage)
         return false;

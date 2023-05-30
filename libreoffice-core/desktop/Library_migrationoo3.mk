@@ -12,14 +12,14 @@ $(eval $(call gb_Library_Library,migrationoo3))
 $(eval $(call gb_Library_use_sdk_api,migrationoo3))
 
 $(eval $(call gb_Library_use_libraries,migrationoo3,\
+    comphelper \
     cppu \
     cppuhelper \
     sal \
-    tl \
     utl \
 ))
 
-$(eval $(call gb_Library_set_componentfile,migrationoo3,desktop/source/migration/services/migrationoo3))
+$(eval $(call gb_Library_set_componentfile,migrationoo3,desktop/source/migration/services/migrationoo3,services))
 
 $(eval $(call gb_Library_add_exception_objects,migrationoo3,\
     desktop/source/migration/services/oo3extensionmigration \

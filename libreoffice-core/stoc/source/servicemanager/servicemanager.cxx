@@ -23,8 +23,8 @@
 #include <osl/mutex.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/factory.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <cppuhelper/implbase.hxx>
@@ -55,6 +55,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace css::uno;
@@ -205,8 +206,8 @@ sal_Bool PropertySetInfo_Impl::hasPropertyByName( OUString const & name )
 class ImplementationEnumeration_Impl : public WeakImplHelper< XEnumeration >
 {
 public:
-    explicit ImplementationEnumeration_Impl( const HashSet_Ref & rImplementationMap )
-        : aImplementationMap( rImplementationMap )
+    explicit ImplementationEnumeration_Impl( HashSet_Ref xImplementationMap )
+        : aImplementationMap(std::move( xImplementationMap ))
         , aIt( aImplementationMap.begin() )
         {}
 
@@ -288,11 +289,11 @@ void OServiceManager_Listener::disposing(const EventObject & rEvt )
     }
     catch( const IllegalArgumentException & )
     {
-        TOOLS_WARN_EXCEPTION( "stoc", "" );
+        OSL_FAIL( "IllegalArgumentException caught" );
     }
     catch( const NoSuchElementException & )
     {
-        TOOLS_WARN_EXCEPTION( "stoc", "" );
+        OSL_FAIL( "NoSuchElementException caught" );
     }
 }
 
@@ -300,10 +301,6 @@ void OServiceManager_Listener::disposing(const EventObject & rEvt )
 /*****************************************************************************
     class OServiceManager
 *****************************************************************************/
-struct OServiceManagerMutex
-{
-    Mutex m_mutex;
-};
 
 typedef WeakComponentImplHelper<
     lang::XMultiServiceFactory, lang::XMultiComponentFactory, lang::XServiceInfo,
@@ -312,7 +309,7 @@ typedef WeakComponentImplHelper<
     beans::XPropertySet > t_OServiceManager_impl;
 
 class OServiceManager
-    : public OServiceManagerMutex
+    : public cppu::BaseMutex
     , public t_OServiceManager_impl
 {
 public:
@@ -426,7 +423,7 @@ typedef WeakComponentImplHelper<
     container::XSet, container::XContentEnumerationAccess,
     beans::XPropertySet > t_OServiceManagerWrapper_impl;
 
-class OServiceManagerWrapper : public OServiceManagerMutex, public t_OServiceManagerWrapper_impl
+class OServiceManagerWrapper : public cppu::BaseMutex, public t_OServiceManagerWrapper_impl
 {
     Reference< XComponentContext > m_xContext;
     Reference< XMultiComponentFactory > m_root;
@@ -528,7 +525,7 @@ void SAL_CALL OServiceManagerWrapper::setPropertyValue(
                 static_cast<OWeakObject *>(this), 1 );
         }
 
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         m_xContext = xContext;
 
     }
@@ -543,9 +540,9 @@ Any SAL_CALL OServiceManagerWrapper::getPropertyValue(
 {
     if ( PropertyName == "DefaultContext" )
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         if( m_xContext.is() )
-            return makeAny( m_xContext );
+            return Any( m_xContext );
         else
             return Any();
     }
@@ -565,7 +562,7 @@ void OServiceManagerWrapper::disposing()
 
 OServiceManagerWrapper::OServiceManagerWrapper(
     Reference< XComponentContext > const & xContext )
-    : t_OServiceManagerWrapper_impl( m_mutex )
+    : t_OServiceManagerWrapper_impl( m_aMutex )
     , m_xContext( xContext )
     , m_root( xContext->getServiceManager() )
 {
@@ -581,7 +578,7 @@ OServiceManagerWrapper::OServiceManagerWrapper(
  * Create a ServiceManager
  */
 OServiceManager::OServiceManager( Reference< XComponentContext > const & xContext )
-    : t_OServiceManager_impl( m_mutex )
+    : t_OServiceManager_impl( m_aMutex )
     , m_xContext( xContext )
     , m_bInDisposing( false )
 {}
@@ -599,7 +596,7 @@ void OServiceManager::disposing()
     // dispose all factories
     HashSet_Ref aImpls;
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         m_bInDisposing = true;
         aImpls = m_ImplementationMap;
     }
@@ -611,16 +608,16 @@ void OServiceManager::disposing()
             if( xComp.is() )
                 xComp->dispose();
         }
-        catch (const RuntimeException &)
+        catch (const RuntimeException & exc)
         {
-            TOOLS_INFO_EXCEPTION("stoc", "RuntimeException occurred upon disposing factory:");
+            SAL_INFO("stoc", "RuntimeException occurred upon disposing factory: " << exc);
         }
     }
 
     // dispose
     HashSet_Ref aImplMap;
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         // erase all members
         m_ServiceMap = HashMultimap_OWString_Interface();
         aImplMap = m_ImplementationMap;
@@ -645,7 +642,7 @@ Reference<XPropertySetInfo > OServiceManager::getPropertySetInfo()
             "DefaultContext", -1, cppu::UnoType<decltype(m_xContext)>::get(), 0 ) };
         Reference< beans::XPropertySetInfo > xInfo( new PropertySetInfo_Impl( seq ) );
 
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         if (! m_xPropertyInfo.is())
         {
             m_xPropertyInfo = xInfo;
@@ -673,7 +670,7 @@ void OServiceManager::setPropertyValue(
             static_cast<OWeakObject *>(this), 1 );
     }
 
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     m_xContext = xContext;
 }
 
@@ -682,9 +679,9 @@ Any OServiceManager::getPropertyValue(const OUString& PropertyName)
     check_undisposed();
     if ( PropertyName == "DefaultContext" )
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         if( m_xContext.is() )
-            return makeAny( m_xContext );
+            return Any( m_xContext );
         else
             return Any();
     }
@@ -728,7 +725,7 @@ void OServiceManager::removeVetoableChangeListener(
 Reference<XEventListener > OServiceManager::getFactoryListener()
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     if( !xFactoryListener.is() )
         xFactoryListener = new OServiceManager_Listener( this );
     return xFactoryListener;
@@ -739,7 +736,7 @@ Sequence< OUString > OServiceManager::getUniqueAvailableServiceNames(
     HashSet_OWString & aNameSet )
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     for( const auto& rEntry : m_ServiceMap )
         aNameSet.insert( rEntry.first );
 
@@ -796,9 +793,9 @@ Reference< XInterface > OServiceManager::createInstanceWithContext(
                 }
             }
         }
-        catch (const lang::DisposedException &)
+        catch (const lang::DisposedException & exc)
         {
-            TOOLS_INFO_EXCEPTION("stoc", "");
+            SAL_INFO("stoc", "DisposedException occurred: " << exc);
         }
     }
 
@@ -848,9 +845,9 @@ Reference< XInterface > OServiceManager::createInstanceWithArgumentsAndContext(
                 }
             }
         }
-        catch (const lang::DisposedException &)
+        catch (const lang::DisposedException & exc)
         {
-            TOOLS_INFO_EXCEPTION("stoc", "DisposedException occurred:");
+            SAL_INFO("stoc", "DisposedException occurred: " << exc);
         }
     }
 
@@ -914,7 +911,7 @@ Sequence< Reference< XInterface > > OServiceManager::queryServiceFactories(
 {
     Sequence< Reference< XInterface > > ret;
 
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     ::std::pair<
           HashMultimap_OWString_Interface::iterator,
           HashMultimap_OWString_Interface::iterator> p(
@@ -963,7 +960,7 @@ Reference<XEnumeration > OServiceManager::createContentEnumeration(
 Reference<XEnumeration > OServiceManager::createEnumeration()
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     return new ImplementationEnumeration_Impl( m_ImplementationMap );
 }
 
@@ -978,7 +975,7 @@ Type OServiceManager::getElementType()
 sal_Bool OServiceManager::hasElements()
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     return !m_ImplementationMap.empty();
 }
 
@@ -989,13 +986,13 @@ sal_Bool OServiceManager::has( const Any & Element )
     if( Element.getValueTypeClass() == TypeClass_INTERFACE )
     {
         Reference<XInterface > xEle( Element, UNO_QUERY_THROW );
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         return m_ImplementationMap.find( xEle ) !=
             m_ImplementationMap.end();
     }
     else if (auto implName = o3tl::tryAccess<OUString>(Element))
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         return m_ImplementationNameMap.find( *implName ) !=
             m_ImplementationNameMap.end();
     }
@@ -1015,7 +1012,7 @@ void OServiceManager::insert( const Any & Element )
     Reference<XInterface > xEle( Element, UNO_QUERY_THROW );
 
     {
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     HashSet_Ref::iterator aIt = m_ImplementationMap.find( xEle );
     if( aIt != m_ImplementationMap.end() )
     {
@@ -1067,7 +1064,7 @@ void OServiceManager::remove( const Any & Element )
     }
     else if (auto implName = o3tl::tryAccess<OUString>(Element))
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         HashMap_OWString_Interface::const_iterator const iFind(
             m_ImplementationNameMap.find( *implName ) );
         if (iFind == m_ImplementationNameMap.end())
@@ -1090,7 +1087,7 @@ void OServiceManager::remove( const Any & Element )
     if( xComp.is() )
         xComp->removeEventListener( getFactoryListener() );
 
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     HashSet_Ref::iterator aIt = m_ImplementationMap.find( xEle );
     if( aIt == m_ImplementationMap.end() )
     {
@@ -1208,7 +1205,7 @@ void ORegistryServiceManager::dispose()
         return;
     OServiceManager::dispose();
     // dispose
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     // erase all members
     m_xRegistry.clear();
     m_xRootKey.clear();
@@ -1224,7 +1221,7 @@ Reference<XRegistryKey > ORegistryServiceManager::getRootKey()
 {
     if( !m_xRootKey.is() )
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         //  DefaultRegistry suchen !!!!
         if( !m_xRegistry.is() && !m_searchedRegistry )
         {
@@ -1269,7 +1266,7 @@ Reference<XInterface > ORegistryServiceManager::loadWithImplementationName(
             else
                 xMgr.set( this );
             ret = createSingleRegistryFactory( xMgr, name, xImpKey );
-            insert( makeAny( ret ) );
+            insert( Any( ret ) );
             // Remember this factory as loaded in contrast to inserted ( XSet::insert)
             // factories. Those loaded factories in this set are candidates for being
             // released on an unloading notification.
@@ -1341,7 +1338,7 @@ void ORegistryServiceManager::fillAllNamesFromRegistry( HashSet_OWString & rSet 
 void ORegistryServiceManager::initialize(const Sequence< Any >& Arguments)
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     if (Arguments.hasElements())
     {
         m_xRootKey.clear();
@@ -1358,7 +1355,7 @@ void ORegistryServiceManager::initialize(const Sequence< Any >& Arguments)
 Sequence< OUString > ORegistryServiceManager::getAvailableServiceNames()
 {
     check_undisposed();
-    MutexGuard aGuard( m_mutex );
+    MutexGuard aGuard( m_aMutex );
     // all names
     HashSet_OWString aNameSet;
 
@@ -1387,7 +1384,7 @@ Sequence< Reference< XInterface > > ORegistryServiceManager::queryServiceFactori
     }
     else
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         Reference< XInterface > x( loadWithServiceName( aServiceName, xContext ) );
         if (! x.is())
             x = loadWithImplementationName( aServiceName, xContext );
@@ -1400,7 +1397,7 @@ Reference<XEnumeration > ORegistryServiceManager::createContentEnumeration(
     const OUString& aServiceName )
 {
     check_undisposed();
-    MutexGuard aGuard(m_mutex);
+    MutexGuard aGuard(m_aMutex);
     // get all implementation names registered under this service name from the registry
     const Sequence<OUString> aImpls = getFromServiceName( aServiceName );
     // load and insert all factories specified by the registry
@@ -1428,7 +1425,7 @@ Reference<XPropertySetInfo > ORegistryServiceManager::getPropertySetInfo()
         };
         Reference< beans::XPropertySetInfo > xInfo( new PropertySetInfo_Impl( seq ) );
 
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         if (! m_xPropertyInfo.is())
         {
             m_xPropertyInfo = xInfo;
@@ -1442,9 +1439,9 @@ Any ORegistryServiceManager::getPropertyValue(const OUString& PropertyName)
     check_undisposed();
     if ( PropertyName == "Registry" )
     {
-        MutexGuard aGuard( m_mutex );
+        MutexGuard aGuard( m_aMutex );
         if( m_xRegistry.is() )
-            return makeAny( m_xRegistry );
+            return Any( m_xRegistry );
         else
             return Any();
     }

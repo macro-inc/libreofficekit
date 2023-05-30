@@ -34,10 +34,10 @@
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <rtl/ref.hxx>
 #include <comphelper/enumhelper.hxx>
+#include <rtl/ref.hxx>
 #include <sfx2/app.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/eventcfg.hxx>
 #include <eventsupplier.hxx>
 
@@ -61,7 +61,7 @@ class SfxGlobalEvents_Impl : public ::cppu::WeakImplHelper< css::lang::XServiceI
                                                             >
 {
     std::mutex m_aLock;
-    css::uno::Reference< css::container::XNameReplace > m_xEvents;
+    rtl::Reference< GlobalEventConfig > m_xEvents;
     css::uno::Reference< css::document::XEventListener > m_xJobExecutorListener;
     ::comphelper::OInterfaceContainerHelper4<document::XEventListener> m_aLegacyListeners;
     ::comphelper::OInterfaceContainerHelper4<document::XDocumentEventListener> m_aDocumentListeners;
@@ -168,35 +168,35 @@ uno::Reference< container::XNameReplace > SAL_CALL SfxGlobalEvents_Impl::getEven
 
 void SAL_CALL SfxGlobalEvents_Impl::addEventListener(const uno::Reference< document::XEventListener >& xListener)
 {
-    std::scoped_lock g(m_aLock);
+    std::unique_lock g(m_aLock);
     if (m_disposed)
         throw css::lang::DisposedException();
-    m_aLegacyListeners.addInterface(xListener);
+    m_aLegacyListeners.addInterface(g, xListener);
 }
 
 
 void SAL_CALL SfxGlobalEvents_Impl::removeEventListener(const uno::Reference< document::XEventListener >& xListener)
 {
-    std::scoped_lock g(m_aLock);
+    std::unique_lock g(m_aLock);
     // The below removeInterface will silently do nothing when m_disposed
-    m_aLegacyListeners.removeInterface(xListener);
+    m_aLegacyListeners.removeInterface(g, xListener);
 }
 
 
 void SAL_CALL SfxGlobalEvents_Impl::addDocumentEventListener( const uno::Reference< document::XDocumentEventListener >& Listener )
 {
-    std::scoped_lock g(m_aLock);
+    std::unique_lock g(m_aLock);
     if (m_disposed)
         throw css::lang::DisposedException();
-    m_aDocumentListeners.addInterface( Listener );
+    m_aDocumentListeners.addInterface( g, Listener );
 }
 
 
 void SAL_CALL SfxGlobalEvents_Impl::removeDocumentEventListener( const uno::Reference< document::XDocumentEventListener >& Listener )
 {
-    std::scoped_lock g(m_aLock);
+    std::unique_lock g(m_aLock);
     // The below removeInterface will silently do nothing when m_disposed:
-    m_aDocumentListeners.removeInterface( Listener );
+    m_aDocumentListeners.removeInterface( g, Listener );
 }
 
 
@@ -257,7 +257,6 @@ void SfxGlobalEvents_Impl::dispose() {
         tmpModels.clear();
         g.lock();
         m_aLegacyListeners.disposeAndClear(g, {static_cast<OWeakObject *>(this)});
-        g.lock(); // because disposeAndClear is going to want to unlock()
         m_aDocumentListeners.disposeAndClear(g, {static_cast<OWeakObject *>(this)});
     }
     for (auto const & i: listeners) {
@@ -450,7 +449,7 @@ void SfxGlobalEvents_Impl::implts_notifyJobExecution(const document::EventObject
 
 void SfxGlobalEvents_Impl::implts_checkAndExecuteEventBindings(const document::DocumentEvent& aEvent)
 {
-    css::uno::Reference<css::container::XNameReplace> events;
+    rtl::Reference<GlobalEventConfig> events;
     {
         std::scoped_lock g(m_aLock);
         events = m_xEvents;
@@ -460,10 +459,11 @@ void SfxGlobalEvents_Impl::implts_checkAndExecuteEventBindings(const document::D
     }
     try
     {
-        uno::Any aAny;
         if ( events->hasByName( aEvent.EventName ) )
-            aAny = events->getByName(aEvent.EventName);
-        SfxEvents_Impl::Execute(aAny, aEvent, nullptr);
+        {
+            uno::Sequence < beans::PropertyValue > aAny = events->getByName2(aEvent.EventName);
+            SfxEvents_Impl::Execute(aAny, aEvent, nullptr);
+        }
     }
     catch ( uno::RuntimeException const & )
     {
@@ -478,43 +478,21 @@ void SfxGlobalEvents_Impl::implts_checkAndExecuteEventBindings(const document::D
 
 void SfxGlobalEvents_Impl::implts_notifyListener(const document::DocumentEvent& aEvent)
 {
-    std::optional<comphelper::OInterfaceIteratorHelper4<document::XEventListener>> aIt1;
-    std::optional<comphelper::OInterfaceIteratorHelper4<document::XDocumentEventListener>> aIt2;
-
-    {
-        std::scoped_lock g(m_aLock);
-        aIt1.emplace(m_aLegacyListeners);
-        aIt2.emplace(m_aDocumentListeners);
-    }
+    std::unique_lock g(m_aLock);
 
     document::EventObject aLegacyEvent(aEvent.Source, aEvent.EventName);
-    while (aIt1->hasMoreElements())
-    {
-        auto xListener = aIt1->next();
-        try
+    m_aLegacyListeners.forEach(g,
+        [&aLegacyEvent](const css::uno::Reference<document::XEventListener>& xListener)
         {
             xListener->notifyEvent(aLegacyEvent);
         }
-        catch (css::lang::DisposedException const& exc)
-        {
-            if (exc.Context == xListener)
-                aIt1->remove();
-        }
-    }
-
-    while (aIt2->hasMoreElements())
-    {
-        auto xListener = aIt2->next();
-        try
+    );
+    m_aDocumentListeners.forEach(g,
+        [&aEvent](const css::uno::Reference<document::XDocumentEventListener>& xListener)
         {
             xListener->documentEventOccured(aEvent);
         }
-        catch (css::lang::DisposedException const& exc)
-        {
-            if (exc.Context == xListener)
-                aIt2->remove();
-        }
-    }
+    );
 }
 
 

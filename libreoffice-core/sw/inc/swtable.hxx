@@ -19,7 +19,6 @@
 #ifndef INCLUDED_SW_INC_SWTABLE_HXX
 #define INCLUDED_SW_INC_SWTABLE_HXX
 
-#include <tools/solar.h>
 #include <tools/ref.hxx>
 #include "tblenum.hxx"
 #include "swtypes.hxx"
@@ -155,6 +154,9 @@ public:
 
     // @@@ public copy ctor, but no copy assignment?
     SwTable( const SwTable& rTable );       // no copy of the lines !!
+
+    virtual const SwTable* DynCastTable() const override { return this; }
+
 private:
     // @@@ public copy ctor, but no copy assignment?
     SwTable & operator= (const SwTable &) = delete;
@@ -163,7 +165,7 @@ private:
     bool NewMerge( SwDoc*, const SwSelBoxes&, const SwSelBoxes& rMerged,
                    SwUndoTableMerge* );
     bool NewSplitRow( SwDoc&, const SwSelBoxes&, sal_uInt16, bool );
-    std::unique_ptr<SwBoxSelection> CollectBoxSelection( const SwPaM& rPam ) const;
+    std::optional<SwBoxSelection> CollectBoxSelection( const SwPaM& rPam ) const;
     void InsertSpannedRow( SwDoc& rDoc, sal_uInt16 nIdx, sal_uInt16 nCnt );
     bool InsertRow_( SwDoc*, const SwSelBoxes&, sal_uInt16 nCnt, bool bBehind );
     bool NewInsertCol( SwDoc&, const SwSelBoxes& rBoxes, sal_uInt16 nCnt, bool );
@@ -300,7 +302,7 @@ public:
     bool IsTableComplex() const;
 
     // Returns true if table or selection is balanced.
-    bool IsTableComplexForChart( const OUString& rSel ) const;
+    bool IsTableComplexForChart( std::u16string_view aSel ) const;
 
     // Search all content-bearing boxes of the base line on which this box stands.
     // rBoxes as a return value for immediate use.
@@ -352,6 +354,9 @@ public:
     bool IsDeleted() const;
     // is it a table with deleted row(s)
     bool HasDeletedRow() const;
+    // it doesn't contain box content (except single empty nested tables of the boxes
+    // which could remain after deletion of text content of the selected table)
+    bool IsEmpty() const;
 };
 
 /// SwTableLine is one table row in the document model.
@@ -395,7 +400,8 @@ public:
 
     bool hasSoftPageBreak() const;
 
-    // it doesn't contain box content
+    // it doesn't contain box content (except single empty nested tables of the boxes
+    // which could remain after deletion of text content of the selected table row)
     bool IsEmpty() const;
 
     // Update TextChangesOnly property based on the redlines of the table row.
@@ -408,6 +414,8 @@ public:
     // Cache also the type of the redline associated to the changed table row.
     SwRedlineTable::size_type UpdateTextChangesOnly(
         SwRedlineTable::size_type& rRedlinePos, bool bUpdateProperty = true) const;
+    // is it a tracked row
+    bool IsTracked(SwRedlineTable::size_type& rRedlinePos, bool bOnlyDeleted = false) const;
     // is it a tracked deleted row
     bool IsDeleted(SwRedlineTable::size_type& rRedlinePos) const;
     // set/get (if it's possible, cached) redline type
@@ -471,8 +479,10 @@ public:
     void RemoveFromTable();
     const SwStartNode *GetSttNd() const { return m_pStartNode; }
     SwNodeOffset GetSttIdx() const;
-    // it doesn't contain box content
-    bool IsEmpty() const;
+    // it doesn't contain box content or if bWithRemainingNestedTable = true,
+    // it contains only an empty nested table as box content (which
+    // could remain after deletion of the text content of the selected box).
+    bool IsEmpty( bool bWithRemainingNestedTable = true ) const;
 
     // Search next/previous box with content.
     SwTableBox* FindNextBox( const SwTable&, const SwTableBox*,
@@ -512,7 +522,7 @@ public:
     void SetSaveUserColor(std::optional<Color> p ) { mxUserColor = p; }
     void SetSaveNumFormatColor( std::optional<Color> p ) { mxNumFormatColor = p; }
 
-    sal_Int32 getRowSpan() const;
+    sal_Int32 getRowSpan() const { return mnRowSpan; }
     void setRowSpan( sal_Int32 nNewRowSpan );
     bool getDummyFlag() const;
     void setDummyFlag( bool bDummy );

@@ -47,17 +47,18 @@
 #include <bookmark.hxx>
 #include <fltshell.hxx>
 #include <rdfhelper.hxx>
+#include <utility>
 
 using namespace com::sun::star;
 
-static SwContentNode* GetContentNode(SwDoc& rDoc, SwNodeIndex& rIdx, bool bNext)
+static SwContentNode* GetContentNode(SwDoc& rDoc, SwPosition& rPos, bool bNext)
 {
-    SwContentNode * pCNd = rIdx.GetNode().GetContentNode();
-    if(!pCNd && nullptr == (pCNd = bNext ? rDoc.GetNodes().GoNext(&rIdx)
-                                     : SwNodes::GoPrevious(&rIdx)))
+    SwContentNode * pCNd = rPos.GetNode().GetContentNode();
+    if(!pCNd && nullptr == (pCNd = bNext ? rDoc.GetNodes().GoNext(&rPos)
+                                     : SwNodes::GoPrevious(&rPos)))
     {
-        pCNd = bNext ? SwNodes::GoPrevious(&rIdx)
-                     : rDoc.GetNodes().GoNext(&rIdx);
+        pCNd = bNext ? SwNodes::GoPrevious(&rPos)
+                     : rDoc.GetNodes().GoNext(&rPos);
         OSL_ENSURE(pCNd, "no ContentNode found");
     }
     return pCNd;
@@ -122,35 +123,33 @@ bool SwFltStackEntry::MakeRegion(SwDoc& rDoc, SwPaM& rRegion, RegionMode const e
         return false;
     }
     // The content indices always apply to the node!
-    rRegion.GetPoint()->nNode = rMkPos.m_nNode.GetIndex() + 1;
-    SwContentNode* pCNd = GetContentNode(rDoc, rRegion.GetPoint()->nNode, true);
+    rRegion.GetPoint()->Assign( rMkPos.m_nNode.GetIndex() + 1 );
+    SwContentNode* pCNd = GetContentNode(rDoc, *rRegion.GetPoint(), true);
 
     SAL_WARN_IF(pCNd->Len() < rMkPos.m_nContent, "sw.ww8",
         "invalid content index " << rMkPos.m_nContent << " but text node has only " << pCNd->Len());
-    rRegion.GetPoint()->nContent.Assign(pCNd,
-            std::min<sal_Int32>(rMkPos.m_nContent, pCNd->Len()));
+    rRegion.GetPoint()->SetContent( std::min<sal_Int32>(rMkPos.m_nContent, pCNd->Len()) );
     rRegion.SetMark();
     if (rMkPos.m_nNode != rPtPos.m_nNode)
     {
         SwNodeOffset n = rPtPos.m_nNode.GetIndex() + 1;
-        SwNodes& rNodes = rRegion.GetPoint()->nNode.GetNodes();
+        SwNodes& rNodes = rRegion.GetPoint()->GetNodes();
         if (n >= rNodes.Count())
             return false;
-        rRegion.GetPoint()->nNode = n;
-        pCNd = GetContentNode(rDoc, rRegion.GetPoint()->nNode, false);
+        rRegion.GetPoint()->Assign(n);
+        pCNd = GetContentNode(rDoc, *rRegion.GetPoint(), false);
     }
     SAL_WARN_IF(pCNd->Len() < rPtPos.m_nContent, "sw.ww8",
         "invalid content index " << rPtPos.m_nContent << " but text node has only " << pCNd->Len());
-    rRegion.GetPoint()->nContent.Assign(pCNd,
-            std::min<sal_Int32>(rPtPos.m_nContent, pCNd->Len()));
-    OSL_ENSURE( CheckNodesRange( rRegion.Start()->nNode,
-                             rRegion.End()->nNode, true ),
+    rRegion.GetPoint()->SetContent( std::min<sal_Int32>(rPtPos.m_nContent, pCNd->Len()) );
+    OSL_ENSURE( CheckNodesRange( rRegion.Start()->GetNode(),
+                             rRegion.End()->GetNode(), true ),
              "attribute or similar crosses section-boundaries" );
     bool bRet = true;
     if (eCheck & RegionMode::CheckNodes)
     {
-        bRet &= CheckNodesRange(rRegion.Start()->nNode,
-                                rRegion.End()->nNode, true);
+        bRet &= CheckNodesRange(rRegion.Start()->GetNode(),
+                                rRegion.End()->GetNode(), true);
     }
     if (eCheck & RegionMode::CheckFieldmark)
     {
@@ -183,8 +182,8 @@ SwFltControlStack::~SwFltControlStack()
 // same paragraph further out by one character.
 void SwFltControlStack::MoveAttrs(const SwPosition& rPos, MoveAttrsMode eMode)
 {
-    SwNodeOffset nPosNd = rPos.nNode.GetIndex();
-    sal_uInt16 nPosCt = rPos.nContent.GetIndex() - 1;
+    SwNodeOffset nPosNd = rPos.GetNodeIndex();
+    sal_uInt16 nPosCt = rPos.GetContentIndex() - 1;
 
     for (size_t i = 0, nCnt = m_Entries.size(); i < nCnt; ++i)
     {
@@ -286,7 +285,7 @@ void SwFltControlStack::DeleteAndDestroy(Entries::size_type nCnt)
 // type.  This makes them disappear from the doc structure. Only
 // attributes from the same paragraph as rPos are removed. Used for
 // graphic apos -> images.
-void SwFltControlStack::StealAttr(const SwNodeIndex& rNode)
+void SwFltControlStack::StealAttr(const SwNode& rNode)
 {
     size_t nCnt = m_Entries.size();
 
@@ -437,9 +436,9 @@ static bool MakePoint(const SwFltStackEntry& rEntry, SwDoc& rDoc,
     if (nMk >= rMkNodes.Count())
         return false;
 
-    rRegion.GetPoint()->nNode = nMk;
-    SwContentNode* pCNd = GetContentNode(rDoc, rRegion.GetPoint()->nNode, true);
-    rRegion.GetPoint()->nContent.Assign(pCNd, rEntry.m_aMkPos.m_nContent);
+    rRegion.GetPoint()->Assign(nMk);
+    GetContentNode(rDoc, *rRegion.GetPoint(), true);
+    rRegion.GetPoint()->SetContent(rEntry.m_aMkPos.m_nContent);
     return true;
 }
 
@@ -451,8 +450,8 @@ static bool MakeBookRegionOrPoint(const SwFltStackEntry& rEntry, SwDoc& rDoc,
 {
     if (rEntry.MakeRegion(rDoc, rRegion, SwFltStackEntry::RegionMode::CheckNodes))
     {
-        if (rRegion.GetPoint()->nNode.GetNode().FindTableBoxStartNode()
-              != rRegion.GetMark()->nNode.GetNode().FindTableBoxStartNode())
+        if (rRegion.GetPoint()->GetNode().FindTableBoxStartNode()
+              != rRegion.GetMark()->GetNode().FindTableBoxStartNode())
         {
             rRegion.Exchange();         // invalid range
             rRegion.DeleteMark();       // -> both to mark
@@ -471,15 +470,15 @@ static bool MakeBookRegionOrPoint(const SwFltStackEntry& rEntry, SwDoc& rDoc,
 //                                   out: start of valid range
 // rTmpEnd is an out parameter
 // Returns true for valid range
-static bool IterateNumrulePiece( const SwNodeIndex& rEnd,
+static bool IterateNumrulePiece( const SwPosition& rEnd,
                                 SwNodeIndex& rTmpStart, SwNodeIndex& rTmpEnd )
 {
-    while( ( rTmpStart <= rEnd )
+    while( ( rTmpStart <= rEnd.GetNode() )
            && !( rTmpStart.GetNode().IsTextNode() ) )    // look for valid start
         ++rTmpStart;
 
     rTmpEnd = rTmpStart;
-    while( ( rTmpEnd <= rEnd )
+    while( ( rTmpEnd <= rEnd.GetNode() )
            && ( rTmpEnd.GetNode().IsTextNode() ) )       // look for valid end + 1
         ++rTmpEnd;
 
@@ -531,9 +530,9 @@ void SwFltControlStack::SetAttrInDoc(const SwPosition& rTmpPos,
             {
                 if (rEntry.MakeRegion(m_rDoc, aRegion, SwFltStackEntry::RegionMode::CheckNodes))
                 {
-                    SwNodeIndex aTmpStart( aRegion.Start()->nNode );
+                    SwNodeIndex aTmpStart( aRegion.Start()->GetNode() );
                     SwNodeIndex aTmpEnd( aTmpStart );
-                    SwNodeIndex& rRegEndNd = aRegion.End()->nNode;
+                    SwPosition& rRegEndNd = *aRegion.End();
                     while( IterateNumrulePiece( rRegEndNd,
                                                 aTmpStart, aTmpEnd ) )
                     {
@@ -589,9 +588,9 @@ void SwFltControlStack::SetAttrInDoc(const SwPosition& rTmpPos,
             if (MakeBookRegionOrPoint(rEntry, m_rDoc, aRegion))
             {
                 SwTextNode const*const pTextNode(
-                        aRegion.End()->nNode.GetNode().GetTextNode());
+                        aRegion.End()->GetNode().GetTextNode());
                 SwTextField const*const pField = pTextNode ? pTextNode->GetFieldTextAttrAt(
-                        aRegion.End()->nContent.GetIndex() - 1, true) : nullptr;
+                        aRegion.End()->GetContentIndex() - 1, ::sw::GetTextAttrMode::Default) : nullptr;
                 if (pField)
                 {
                     SwPostItField const*const pPostIt(
@@ -607,7 +606,7 @@ void SwFltControlStack::SetAttrInDoc(const SwPosition& rTmpPos,
                             // Adjust the start of the range to actually cover the comment, similar
                             // to what the UI and the UNO API does.
                             aRegion.SetMark();
-                            --aRegion.Start()->nContent;
+                            aRegion.Start()->AdjustContent(-1);
                         }
 
                         m_rDoc.getIDocumentMarkAccess()->makeAnnotationMark(aRegion, OUString());
@@ -631,9 +630,9 @@ void SwFltControlStack::SetAttrInDoc(const SwPosition& rTmpPos,
             if (MakeBookRegionOrPoint(rEntry, m_rDoc, aRegion))
             {
                 SwFltRDFMark* pMark = static_cast<SwFltRDFMark*>(rEntry.m_pAttr.get());
-                if (aRegion.GetNode().IsTextNode())
+                if (aRegion.GetPointNode().IsTextNode())
                 {
-                    SwTextNode& rTextNode = *aRegion.GetNode().GetTextNode();
+                    SwTextNode& rTextNode = *aRegion.GetPointNode().GetTextNode();
 
                     for (const std::pair<OUString, OUString>& rAttribute : pMark->GetAttributes())
                     {
@@ -664,7 +663,7 @@ void SwFltControlStack::SetAttrInDoc(const SwPosition& rTmpPos,
             SwContentNode* pNd = nullptr;
             if( !pTOXAttr->HadBreakItem() || !pTOXAttr->HadPageDescItem() )
             {
-                pNd = pPoint->nNode.GetNode().GetContentNode();
+                pNd = pPoint->GetNode().GetContentNode();
                 if( pNd )
                 {
                     const SfxItemSet* pSet = pNd->GetpSwAttrSet();
@@ -764,15 +763,15 @@ const SfxPoolItem* SwFltControlStack::GetOpenStackAttr(const SwPosition& rPos, s
 
 void SwFltControlStack::Delete(const SwPaM &rPam)
 {
-    const SwPosition *pStt = rPam.Start(), *pEnd = rPam.End();
+    auto [pStt, pEnd] = rPam.StartEnd(); // SwPosition*
 
     if( !rPam.HasMark() || *pStt >= *pEnd )
         return;
 
-    SwNodeIndex aStartNode(pStt->nNode, -1);
-    const sal_Int32 nStartIdx = pStt->nContent.GetIndex();
-    SwNodeIndex aEndNode(pEnd->nNode, -1);
-    const sal_Int32 nEndIdx = pEnd->nContent.GetIndex();
+    SwNodeIndex aStartNode(pStt->GetNode(), -1);
+    const sal_Int32 nStartIdx = pStt->GetContentIndex();
+    SwNodeIndex aEndNode(pEnd->GetNode(), -1);
+    const sal_Int32 nEndIdx = pEnd->GetContentIndex();
 
     // We don't support deleting content that is over one node, or removing a node.
     OSL_ENSURE(aEndNode == aStartNode, "nodes must be the same, or this method extended");
@@ -892,8 +891,9 @@ void SwFltAnchorListener::Notify(const SfxHint& rHint)
 {
     if (rHint.GetId() == SfxHintId::Dying)
         m_pFltAnchor->SetFrameFormat(nullptr);
-    else if (auto pDrawFrameFormatHint = dynamic_cast<const sw::DrawFrameFormatHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwDrawFrameFormat)
     {
+        auto pDrawFrameFormatHint = static_cast<const sw::DrawFrameFormatHint*>(&rHint);
         if (pDrawFrameFormatHint->m_eId != sw::DrawFrameFormatHintId::DYING)
             return;
         m_pFltAnchor->SetFrameFormat(nullptr);
@@ -923,12 +923,12 @@ SwFltRedline* SwFltRedline::Clone( SfxItemPool* ) const
 }
 
 // methods of SwFltBookmark follow
-SwFltBookmark::SwFltBookmark( const OUString& rNa, const OUString& rVa,
+SwFltBookmark::SwFltBookmark( const OUString& rNa, OUString aVa,
                               tools::Long nHand, const bool bIsTOCBookmark )
     : SfxPoolItem( RES_FLTR_BOOKMARK )
     , mnHandle( nHand )
     , maName( rNa )
-    , maVal( rVa )
+    , maVal(std::move( aVa ))
     , mbIsTOCBookmark( bIsTOCBookmark )
 {
     // eSrc: CHARSET_DONTKNOW for no transform at operator <<
@@ -1042,8 +1042,11 @@ void FrameDeleteWatch::Notify(const SfxHint& rHint)
     bool bDying = false;
     if (rHint.GetId() == SfxHintId::Dying)
         bDying = true;
-    else if (auto pDrawFrameFormatHint = dynamic_cast<const sw::DrawFrameFormatHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwDrawFrameFormat)
+    {
+        auto pDrawFrameFormatHint = static_cast<const sw::DrawFrameFormatHint*>(&rHint);
         bDying = pDrawFrameFormatHint->m_eId == sw::DrawFrameFormatHintId::DYING;
+    }
     if (bDying)
     {
         m_pFormat = nullptr;

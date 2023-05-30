@@ -38,20 +38,19 @@
 
 #include <memory>
 #include <vector>
-#include <iterator>
 #include <algorithm>
-#include <cstdlib>
+#include <cassert>
 #include <cstring>
 #include <limits.h>
 #include <cmath>
 
-#define EDGE_LEFT       1
-#define EDGE_TOP        2
-#define EDGE_RIGHT      4
-#define EDGE_BOTTOM     8
-#define EDGE_HORZ       (EDGE_RIGHT | EDGE_LEFT)
-#define EDGE_VERT       (EDGE_TOP | EDGE_BOTTOM)
-#define SMALL_DVALUE    0.0000001
+constexpr int EDGE_LEFT   = 1;
+constexpr int EDGE_TOP    = 2;
+constexpr int EDGE_RIGHT  = 4;
+constexpr int EDGE_BOTTOM = 8;
+constexpr int EDGE_HORZ   = EDGE_RIGHT | EDGE_LEFT;
+constexpr int EDGE_VERT   = EDGE_TOP | EDGE_BOTTOM;
+constexpr double SMALL_DVALUE = 0.0000001;
 #define FSQRT2          1.4142135623730950488016887242097
 
 static double ImplGetParameter( const Point& rCenter, const Point& rPt, double fWR, double fHR )
@@ -122,7 +121,7 @@ ImplPolygon::ImplPolygon( const tools::Rectangle& rRect, sal_uInt32 nHorzRound, 
     if ( !rRect.IsEmpty() )
     {
         tools::Rectangle aRect( rRect );
-        aRect.Justify();            // SJ: i9140
+        aRect.Normalize();            // SJ: i9140
 
         nHorzRound = std::min( nHorzRound, static_cast<sal_uInt32>(std::abs( aRect.GetWidth() >> 1 )) );
         nVertRound = std::min( nVertRound, static_cast<sal_uInt32>(std::abs( aRect.GetHeight() >> 1 )) );
@@ -1106,8 +1105,8 @@ void Polygon::Optimize( PolyOptimizeFlags nOptimizeFlags )
 
 /** Recursively subdivide cubic bezier curve via deCasteljau.
 
-   @param rPointIter
-   Output iterator, where the subdivided polylines are written to.
+   @param rPoints
+   Output vector, where the subdivided polylines are written to.
 
    @param d
    Squared difference of curve to a straight line
@@ -1120,7 +1119,7 @@ void Polygon::Optimize( PolyOptimizeFlags nOptimizeFlags )
    curve does not deviate more than one pixel from a straight line.
 
 */
-static void ImplAdaptiveSubdivide( ::std::back_insert_iterator< ::std::vector< Point > >& rPointIter,
+static void ImplAdaptiveSubdivide( std::vector<Point>& rPoints,
                                    const double old_d2,
                                    int recursionDepth,
                                    const double d2,
@@ -1156,7 +1155,8 @@ static void ImplAdaptiveSubdivide( ::std::back_insert_iterator< ::std::vector< P
     // stop if distance from line is guaranteed to be bounded by d
     if( old_d2 > d2 &&
         recursionDepth < maxRecursionDepth &&
-        distance2 >= d2 )
+        distance2 >= d2 &&
+        rPoints.size() < SAL_MAX_UINT16 )
     {
         // deCasteljau bezier arc, split at t=0.5
         // Foley/vanDam, p. 508
@@ -1172,15 +1172,15 @@ static void ImplAdaptiveSubdivide( ::std::back_insert_iterator< ::std::vector< P
 
         // subdivide further
         ++recursionDepth;
-        ImplAdaptiveSubdivide(rPointIter, distance2, recursionDepth, d2, L1x, L1y, L2x, L2y, L3x, L3y, L4x, L4y);
-        ImplAdaptiveSubdivide(rPointIter, distance2, recursionDepth, d2, R1x, R1y, R2x, R2y, R3x, R3y, R4x, R4y);
+        ImplAdaptiveSubdivide(rPoints, distance2, recursionDepth, d2, L1x, L1y, L2x, L2y, L3x, L3y, L4x, L4y);
+        ImplAdaptiveSubdivide(rPoints, distance2, recursionDepth, d2, R1x, R1y, R2x, R2y, R3x, R3y, R4x, R4y);
     }
     else
     {
         // requested resolution reached.
         // Add end points to output iterator.
         // order is preserved, since this is so to say depth first traversal.
-        *rPointIter++ = Point( FRound(P1x), FRound(P1y) );
+        rPoints.push_back(Point(FRound(P1x), FRound(P1y)));
     }
 }
 
@@ -1196,7 +1196,6 @@ void Polygon::AdaptiveSubdivide( Polygon& rResult, const double d ) const
         sal_uInt16 nPts( GetSize() );
         ::std::vector< Point > aPoints;
         aPoints.reserve( nPts );
-        ::std::back_insert_iterator< ::std::vector< Point > > aPointIter( aPoints );
 
         for(i=0; i<nPts;)
         {
@@ -1210,7 +1209,7 @@ void Polygon::AdaptiveSubdivide( Polygon& rResult, const double d ) const
                     ( PolyFlags::Control == mpImplPolygon->mxFlagAry[ i + 2 ] ) &&
                     ( PolyFlags::Normal == P4 || PolyFlags::Smooth == P4 || PolyFlags::Symmetric == P4 ) )
                 {
-                    ImplAdaptiveSubdivide( aPointIter, d*d+1.0, 0, d*d,
+                    ImplAdaptiveSubdivide( aPoints, d*d+1.0, 0, d*d,
                                            mpImplPolygon->mxPointAry[ i ].X(),   mpImplPolygon->mxPointAry[ i ].Y(),
                                            mpImplPolygon->mxPointAry[ i+1 ].X(), mpImplPolygon->mxPointAry[ i+1 ].Y(),
                                            mpImplPolygon->mxPointAry[ i+2 ].X(), mpImplPolygon->mxPointAry[ i+2 ].Y(),
@@ -1220,7 +1219,7 @@ void Polygon::AdaptiveSubdivide( Polygon& rResult, const double d ) const
                 }
             }
 
-            *aPointIter++ = mpImplPolygon->mxPointAry[ i++ ];
+            aPoints.push_back(mpImplPolygon->mxPointAry[i++]);
 
             if (aPoints.size() >= SAL_MAX_UINT16)
             {
@@ -1433,8 +1432,8 @@ void Polygon::Rotate( const Point& rCenter, double fSin, double fCos )
 
         const tools::Long nX = rPt.X() - nCenterX;
         const tools::Long nY = rPt.Y() - nCenterY;
-        rPt.setX( FRound( fCos * nX + fSin * nY ) + nCenterX );
-        rPt.setY( - FRound( fSin * nX - fCos * nY ) + nCenterY );
+        rPt.setX( FRound(fCos * nX + fSin * nY + nCenterX) );
+        rPt.setY( FRound(-(fSin * nX - fCos * nY - nCenterY)) );
     }
 }
 
@@ -1444,9 +1443,9 @@ void Polygon::Clip( const tools::Rectangle& rRect )
     // Use PolyPolygon::Clip().
     assert( !HasFlags());
 
-    // #105251# Justify rect before edge filtering
+    // #105251# Normalize rect before edge filtering
     tools::Rectangle               aJustifiedRect( rRect );
-    aJustifiedRect.Justify();
+    aJustifiedRect.Normalize();
 
     sal_uInt16              nSourceSize = mpImplPolygon->mnPoints;
     ImplPolygonPointFilter  aPolygon( nSourceSize );
@@ -1580,7 +1579,7 @@ void Polygon::Insert( sal_uInt16 nPos, const tools::Polygon& rPoly )
 
 Point& Polygon::operator[]( sal_uInt16 nPos )
 {
-    DBG_ASSERT( nPos < mpImplPolygon->mnPoints, "Polygon::[]: nPos >= nPoints" );
+    assert( nPos < mpImplPolygon->mnPoints );
 
     return mpImplPolygon->mxPointAry[nPos];
 }
@@ -1676,7 +1675,12 @@ void Polygon::ImplRead( SvStream& rIStream )
     if ( bHasPolyFlags )
     {
         mpImplPolygon->mxFlagAry.reset(new PolyFlags[mpImplPolygon->mnPoints]);
-        rIStream.ReadBytes(mpImplPolygon->mxFlagAry.get(), mpImplPolygon->mnPoints);
+        auto nRead = rIStream.ReadBytes(mpImplPolygon->mxFlagAry.get(), mpImplPolygon->mnPoints);
+        if (nRead != mpImplPolygon->mnPoints)
+        {
+            SAL_WARN("tools", "Short read");
+            memset(mpImplPolygon->mxFlagAry.get() + nRead, 0, mpImplPolygon->mnPoints - nRead);
+        }
     }
 }
 

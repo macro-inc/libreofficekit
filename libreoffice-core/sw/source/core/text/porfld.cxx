@@ -21,6 +21,7 @@
 
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/i18n/XBreakIterator.hpp>
+#include <utility>
 #include <vcl/graph.hxx>
 #include <editeng/brushitem.hxx>
 #include <vcl/metric.hxx>
@@ -72,8 +73,8 @@ void SwFieldPortion::TakeNextOffset( const SwFieldPortion* pField )
     m_bFollow = true;
 }
 
-SwFieldPortion::SwFieldPortion(const OUString &rExpand, std::unique_ptr<SwFont> pFont, bool bPlaceHold, TextFrameIndex const nFieldLen)
-    : m_aExpand(rExpand), m_pFont(std::move(pFont)), m_nNextOffset(0)
+SwFieldPortion::SwFieldPortion(OUString aExpand, std::unique_ptr<SwFont> pFont, bool bPlaceHold, TextFrameIndex const nFieldLen)
+    : m_aExpand(std::move(aExpand)), m_pFont(std::move(pFont)), m_nNextOffset(0)
     , m_nNextScriptChg(COMPLETE_STRING), m_nFieldLen(nFieldLen), m_nViewWidth(0)
     , m_bFollow( false ), m_bLeft( false), m_bHide( false)
     , m_bCenter (false), m_bHasFollow( false )
@@ -120,7 +121,7 @@ sal_uInt16 SwFieldPortion::GetViewWidth( const SwTextSizeInfo &rInf ) const
     // even though this is const, nViewWidth should be computed at the very end:
     SwFieldPortion* pThis = const_cast<SwFieldPortion*>(this);
     if( !Width() && rInf.OnWin() && !rInf.GetOpt().IsPagePreview() &&
-            !rInf.GetOpt().IsReadonly() && SwViewOption::IsFieldShadings() )
+            !rInf.GetOpt().IsReadonly() && rInf.GetOpt().IsFieldShadings() )
     {
         if( !m_nViewWidth )
             pThis->m_nViewWidth = rInf.GetTextSize(OUString(' ')).Width();
@@ -137,7 +138,7 @@ namespace {
  */
 class SwFieldSlot
 {
-    std::shared_ptr<vcl::text::TextLayoutCache> m_pOldCachedVclData;
+    std::shared_ptr<const vcl::text::TextLayoutCache> m_pOldCachedVclData;
     const OUString *pOldText;
     OUString aText;
     TextFrameIndex nIdx;
@@ -454,7 +455,7 @@ bool SwFieldPortion::GetExpText( const SwTextSizeInfo &rInf, OUString &rText ) c
     rText = m_aExpand;
     if( rText.isEmpty() && rInf.OnWin() &&
         !rInf.GetOpt().IsPagePreview() && !rInf.GetOpt().IsReadonly() &&
-            SwViewOption::IsFieldShadings() &&
+            rInf.GetOpt().IsFieldShadings() &&
             !HasFollow() )
         rText = " ";
     return true;
@@ -462,14 +463,32 @@ bool SwFieldPortion::GetExpText( const SwTextSizeInfo &rInf, OUString &rText ) c
 
 void SwFieldPortion::HandlePortion( SwPortionHandler& rPH ) const
 {
-    sal_Int32 nH = 0;
-    sal_Int32 nW = 0;
+    rPH.Special( GetLen(), m_aExpand, GetWhichPor() );
+}
+
+void SwFieldPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                               TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwFieldPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("expand"), BAD_CAST(m_aExpand.toUtf8().getStr()));
+
     if (m_pFont)
     {
-        nH = m_pFont->GetSize(m_pFont->GetActual()).Height();
-        nW = m_pFont->GetSize(m_pFont->GetActual()).Width();
+        // do not use Color::AsRGBHexString() as that omits the transparency
+        (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("font-color"), "%08" SAL_PRIxUINT32, sal_uInt32(m_pFont->GetColor()));
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("font-height"), BAD_CAST(OString::number(m_pFont->GetSize(m_pFont->GetActual()).Height()).getStr()));
+        (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("font-width"), BAD_CAST(OString::number(m_pFont->GetSize(m_pFont->GetActual()).Width()).getStr()));
+        {
+            std::stringstream ss;
+            ss << m_pFont->GetWeight();
+            (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("font-weight"), BAD_CAST(ss.str().c_str()));
+        }
     }
-    rPH.Special( GetLen(), m_aExpand, GetWhichPor(), nH, nW, m_pFont.get() );
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 SwPosSize SwFieldPortion::GetTextSize( const SwTextSizeInfo &rInf ) const

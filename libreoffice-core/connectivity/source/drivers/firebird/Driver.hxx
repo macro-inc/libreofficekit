@@ -33,7 +33,9 @@ namespace connectivity::firebird
         // The SQL dialect in use
         // Has to be used in various isc_* calls.
         // 3: Is IB6 -- minimum required for delimited identifiers.
-        const int FIREBIRD_SQL_DIALECT = 3;
+        // SQL_DIALECT_V6 = 3, it's the last current version
+        // SQL_DIALECT_CURRENT is an alias for SQL_DIALECT_V6
+        // See src/dsql/sqlda_pub.h for full details
 
         typedef ::cppu::WeakComponentImplHelper<   css::sdbc::XDriver,
                                                    css::sdbcx::XDataDefinitionSupplier,
@@ -43,8 +45,8 @@ namespace connectivity::firebird
         {
         private:
             css::uno::Reference<css::uno::XComponentContext> m_aContext;
-            ::utl::TempFile m_firebirdTMPDirectory;
-            ::utl::TempFile m_firebirdLockDirectory;
+            ::utl::TempFileNamed m_firebirdTMPDirectory;
+            ::utl::TempFileNamed m_firebirdLockDirectory;
 
         protected:
             ::osl::Mutex                m_aMutex;       // mutex is need to control member access

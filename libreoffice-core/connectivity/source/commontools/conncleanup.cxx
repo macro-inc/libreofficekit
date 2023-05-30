@@ -23,7 +23,7 @@
 #include <com/sun/star/sdbc/XRowSet.hpp>
 #include <com/sun/star/sdbc/XConnection.hpp>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 
 namespace dbtools
@@ -50,7 +50,7 @@ namespace dbtools
 
         try
         {
-            xProps->setPropertyValue( ACTIVE_CONNECTION_PROPERTY_NAME, makeAny( _rxConnection ) );
+            xProps->setPropertyValue( ACTIVE_CONNECTION_PROPERTY_NAME, Any( _rxConnection ) );
             m_xOriginalConnection = _rxConnection;
             startPropertyListening( xProps );
         }

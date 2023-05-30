@@ -25,7 +25,6 @@
 #include <sdr/primitive3d/sdrattributecreator3d.hxx>
 #include <basegfx/polygon/b3dpolygon.hxx>
 #include <basegfx/polygon/b3dpolypolygontools.hxx>
-#include <memory>
 
 
 namespace sdr::contact
@@ -159,7 +158,7 @@ namespace sdr::contact
             const basegfx::B3DHomMatrix aWorldTransform;
             const drawinglayer::primitive3d::Primitive3DReference xReference(
                 new drawinglayer::primitive3d::SdrPolyPolygonPrimitive3D(
-                    aPolyPolygon3D, aWorldTransform, aTextureSize, aAttribute, aSdr3DObjectAttribute));
+                    std::move(aPolyPolygon3D), aWorldTransform, aTextureSize, aAttribute, aSdr3DObjectAttribute));
             xRetval = { xReference };
 
             return xRetval;

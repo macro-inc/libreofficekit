@@ -22,12 +22,11 @@
 #include <ShapeFactory.hxx>
 #include <ObjectIdentifier.hxx>
 #include <LabelPositionHelper.hxx>
+#include <ChartType.hxx>
 
 #include <com/sun/star/chart/DataLabelPlacement.hpp>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <com/sun/star/drawing/XShapes.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 
 #include <limits>
 
@@ -36,7 +35,7 @@ namespace chart
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
-BubbleChart::BubbleChart( const uno::Reference<XChartType>& xChartTypeModel
+BubbleChart::BubbleChart( const rtl::Reference<ChartType>& xChartTypeModel
                      , sal_Int32 nDimensionCount )
         : VSeriesPlotter( xChartTypeModel, nDimensionCount, false )
         , m_fMaxLogicBubbleSize( 0.0 )
@@ -88,8 +87,8 @@ void BubbleChart::calculateBubbleSizeScalingFactor()
     drawing::Position3D aSceneMinPos( m_pMainPosHelper->transformLogicToScene( m_pMainPosHelper->getLogicMinX(),m_pMainPosHelper->getLogicMinY(),fLogicZ, false ) );
     drawing::Position3D aSceneMaxPos( m_pMainPosHelper->transformLogicToScene( m_pMainPosHelper->getLogicMaxX(),m_pMainPosHelper->getLogicMaxY(),fLogicZ, false ) );
 
-    awt::Point aScreenMinPos( LabelPositionHelper(m_nDimension,m_xLogicTarget,m_pShapeFactory).transformSceneToScreenPosition( aSceneMinPos ) );
-    awt::Point aScreenMaxPos( LabelPositionHelper(m_nDimension,m_xLogicTarget,m_pShapeFactory).transformSceneToScreenPosition( aSceneMaxPos ) );
+    awt::Point aScreenMinPos( LabelPositionHelper(m_nDimension,m_xLogicTarget).transformSceneToScreenPosition( aSceneMinPos ) );
+    awt::Point aScreenMaxPos( LabelPositionHelper(m_nDimension,m_xLogicTarget).transformSceneToScreenPosition( aSceneMaxPos ) );
 
     sal_Int32 nWidth = abs( aScreenMaxPos.X - aScreenMinPos.X );
     sal_Int32 nHeight = abs( aScreenMaxPos.Y - aScreenMinPos.Y );
@@ -163,16 +162,14 @@ void BubbleChart::createShapes()
     if( m_aZSlots.empty() ) //no series
         return;
 
-    OSL_ENSURE(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is(),"BubbleChart is not proper initialized");
-    if(!(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is()))
+    OSL_ENSURE(m_xLogicTarget.is()&&m_xFinalTarget.is(),"BubbleChart is not proper initialized");
+    if(!(m_xLogicTarget.is()&&m_xFinalTarget.is()))
         return;
 
     //therefore create an own group for the texts and the error bars to move them to front
     //(because the text group is created after the series group the texts are displayed on top)
-    uno::Reference< drawing::XShapes > xSeriesTarget(
-        createGroupShape( m_xLogicTarget ));
-    uno::Reference< drawing::XShapes > xTextTarget(
-        m_pShapeFactory->createGroup2D( m_xFinalTarget ));
+    rtl::Reference<SvxShapeGroupAnyD> xSeriesTarget = createGroupShape( m_xLogicTarget );
+    rtl::Reference< SvxShapeGroup > xTextTarget = ShapeFactory::createGroup2D( m_xFinalTarget );
 
     //update/create information for current group
     double fLogicZ = 1.0;//as defined
@@ -209,7 +206,7 @@ void BubbleChart::createShapes()
                     bool bHasFillColorMapping = pSeries->hasPropertyMapping("FillColor");
                     bool bHasBorderColorMapping = pSeries->hasPropertyMapping("LineColor");
 
-                    uno::Reference< drawing::XShapes > xSeriesGroupShape_Shapes = getSeriesGroupShape(pSeries.get(), xSeriesTarget);
+                    rtl::Reference<SvxShapeGroupAnyD> xSeriesGroupShape_Shapes = getSeriesGroupShape(pSeries.get(), xSeriesTarget);
 
                     sal_Int32 nAttachedAxisIndex = pSeries->getAttachedAxisIndex();
                     PlottingPositionHelper& rPosHelper
@@ -263,19 +260,18 @@ void BubbleChart::createShapes()
                     //create a group shape for this point and add to the series shape:
                     OUString aPointCID = ObjectIdentifier::createPointCID(
                         pSeries->getPointCID_Stub(), nIndex );
-                    uno::Reference< drawing::XShapes > xPointGroupShape_Shapes(
+                    rtl::Reference<SvxShapeGroupAnyD> xPointGroupShape_Shapes(
                         createGroupShape(xSeriesGroupShape_Shapes,aPointCID) );
-                    uno::Reference<drawing::XShape> xPointGroupShape_Shape( xPointGroupShape_Shapes, uno::UNO_QUERY );
 
                     {
                         nCreatedPoints++;
 
                         //create data point
                         drawing::Direction3D aSymbolSize = transformToScreenBubbleSize( fBubbleSize );
-                        uno::Reference<drawing::XShape> xShape = m_pShapeFactory->createCircle2D( xPointGroupShape_Shapes
+                        rtl::Reference<SvxShapeCircle> xShape = ShapeFactory::createCircle2D( xPointGroupShape_Shapes
                                 , aScenePosition, aSymbolSize );
 
-                        setMappedProperties( xShape
+                        PropertyMapper::setMappedProperties( *xShape
                                 , pSeries->getPropertiesOfPoint( nIndex )
                                 , PropertyMapper::getPropertyNameMapForFilledSeriesProperties() );
 
@@ -284,8 +280,7 @@ void BubbleChart::createShapes()
                             double nPropVal = pSeries->getValueByProperty(nIndex, "FillColor");
                             if(!std::isnan(nPropVal))
                             {
-                                uno::Reference< beans::XPropertySet > xProps( xShape, uno::UNO_QUERY_THROW );
-                                xProps->setPropertyValue("FillColor", uno::Any(static_cast<sal_Int32>(nPropVal)));
+                                xShape->SvxShape::setPropertyValue("FillColor", uno::Any(static_cast<sal_Int32>(nPropVal)));
                             }
                         }
                         if(bHasBorderColorMapping)
@@ -293,8 +288,7 @@ void BubbleChart::createShapes()
                             double nPropVal = pSeries->getValueByProperty(nIndex, "LineColor");
                             if(!std::isnan(nPropVal))
                             {
-                                uno::Reference< beans::XPropertySet > xProps( xShape, uno::UNO_QUERY_THROW );
-                                xProps->setPropertyValue("LineColor", uno::Any(static_cast<sal_Int32>(nPropVal)));
+                                xShape->SvxShape::setPropertyValue("LineColor", uno::Any(static_cast<sal_Int32>(nPropVal)));
                             }
                         }
 
@@ -339,7 +333,7 @@ void BubbleChart::createShapes()
                                 break;
                             }
 
-                            awt::Point aScreenPosition2D( LabelPositionHelper(m_nDimension,m_xLogicTarget,m_pShapeFactory)
+                            awt::Point aScreenPosition2D( LabelPositionHelper(m_nDimension,m_xLogicTarget)
                                 .transformSceneToScreenPosition( aScenePosition3D ) );
                             sal_Int32 nOffset = 0;
                             if(eAlignment!=LABEL_ALIGN_CENTER)
@@ -351,7 +345,7 @@ void BubbleChart::createShapes()
 
                     //remove PointGroupShape if empty
                     if(!xPointGroupShape_Shapes->getCount())
-                        xSeriesGroupShape_Shapes->remove(xPointGroupShape_Shape);
+                        xSeriesGroupShape_Shapes->remove(xPointGroupShape_Shapes);
 
                 }//next series in x slot (next y slot)
             }//next x slot

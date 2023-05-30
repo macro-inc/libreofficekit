@@ -31,8 +31,6 @@ class LocaleDataWrapper;
 class SvtSysLocale_Impl;
 class SvtSysLocaleOptions;
 
-namespace osl { class Mutex; }
-
 /**
     SvtSysLocale provides a refcounted single instance of an application wide
     LocaleDataWrapper and <type>CharClass</type> which always
@@ -48,8 +46,6 @@ class UNOTOOLS_DLLPUBLIC SvtSysLocale
 
     std::shared_ptr<SvtSysLocale_Impl>  pImpl;
 
-    UNOTOOLS_DLLPRIVATE static  ::osl::Mutex&               GetMutex();
-
 public:
                                         SvtSysLocale();
                                         ~SvtSysLocale();
@@ -64,12 +60,6 @@ public:
             SvtSysLocaleOptions&        GetOptions() const;
             const LanguageTag&          GetLanguageTag() const;
             const LanguageTag&          GetUILanguageTag() const;
-
-    /** Get the best MIME encoding matching the system locale, or if that isn't
-        determinable one that matches the UI locale, or UTF8 if everything else
-        fails.
-     */
-    static  rtl_TextEncoding    GetBestMimeEncoding();
 };
 
 #endif  // INCLUDED_SVTOOLS_SYSLOCALE_HXX

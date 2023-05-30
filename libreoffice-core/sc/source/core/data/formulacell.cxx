@@ -51,7 +51,6 @@
 
 #include <comphelper/threadpool.hxx>
 #include <editeng/editobj.hxx>
-#include <tools/cpuid.hxx>
 #include <formula/errorcodes.hxx>
 #include <svl/intitem.hxx>
 #include <svl/numformat.hxx>
@@ -441,7 +440,7 @@ void adjustRangeName(formula::FormulaToken* pToken, ScDocument& rNewDoc, const S
     {
         // If this happened we have a real problem.
         pToken->SetIndex(0);
-        OSL_FAIL("inserting the range name should not fail");
+        assert(!"inserting the range name should not fail");
         return;
     }
 
@@ -554,23 +553,25 @@ sc::FormulaGroupAreaListener* ScFormulaCellGroup::getAreaListener(
     if (it == m_AreaListeners.end() || m_AreaListeners.key_comp()(aKey, it->first))
     {
         // Insert a new one.
-        it = m_AreaListeners.insert(
-            it, std::make_pair(aKey, std::make_unique<sc::FormulaGroupAreaListener>(
-                rRange, (*ppTopCell)->GetDocument(), (*ppTopCell)->aPos, mnLength, bStartFixed, bEndFixed)));
+        it = m_AreaListeners.emplace_hint(
+             it, std::piecewise_construct,
+             std::forward_as_tuple(aKey),
+             std::forward_as_tuple(
+                rRange, (*ppTopCell)->GetDocument(), (*ppTopCell)->aPos, mnLength, bStartFixed, bEndFixed));
     }
 
-    return it->second.get();
+    return &it->second;
 }
 
 void ScFormulaCellGroup::endAllGroupListening( ScDocument& rDoc )
 {
-    for (const auto& rEntry : m_AreaListeners)
+    for (auto& rEntry : m_AreaListeners)
     {
-        sc::FormulaGroupAreaListener *const pListener = rEntry.second.get();
-        ScRange aListenRange = pListener->getListeningRange();
+        sc::FormulaGroupAreaListener& rListener = rEntry.second;
+        ScRange aListenRange = rListener.getListeningRange();
         // This "always listen" special range is never grouped.
         bool bGroupListening = (aListenRange != BCA_LISTEN_ALWAYS);
-        rDoc.EndListeningArea(aListenRange, bGroupListening, pListener);
+        rDoc.EndListeningArea(aListenRange, bGroupListening, &rListener);
     }
 
     m_AreaListeners.clear();
@@ -926,6 +927,9 @@ ScFormulaCell::~ScFormulaCell()
     if (!mxGroup || !mxGroup->mpCode)
         // Formula token is not shared.
         delete pCode;
+
+    if (mxGroup && mxGroup->mpTopCell == this)
+        mxGroup->mpTopCell = nullptr;
 }
 
 ScFormulaCell* ScFormulaCell::Clone() const
@@ -1286,9 +1290,8 @@ void ScFormulaCell::CompileXML( sc::CompileFormulaContext& rCxt, ScProgress& rPr
 
             // The initial '=' is optional in ODFF.
             const sal_Int32 nLeadingEqual = (aFormula.getLength() > 0 && aFormula[0] == '=') ? 1 : 0;
-            OUString aShouldBe = aShouldBeBuf.makeStringAndClear();
-            if (aFormula.getLength() == aShouldBe.getLength() + nLeadingEqual &&
-                    aFormula.match( aShouldBe, nLeadingEqual))
+            if (aFormula.getLength() == aShouldBeBuf.getLength() + nLeadingEqual &&
+                    aFormula.match( aShouldBeBuf, nLeadingEqual))
             {
                 // Put them in the same formula group.
                 ScFormulaCellGroupRef xGroup = pPreviousCell->GetCellGroup();
@@ -1855,10 +1858,7 @@ bool ScFormulaCell::Interpret(SCROW nStartOffset, SCROW nEndOffset)
             // It additionally also should mean that the recursion/iteration
             // ends here as it must had been triggered by this free-flying
             // out-of-sheets cell
-            /* TODO: replace by a simple rRecursionHelper.EndIteration() call
-             * if the assertions hold. */
             const bool bOnlyThis = (rRecursionHelper.GetList().size() == 1);
-            assert(bOnlyThis);
             rRecursionHelper.GetList().remove_if([this](const ScFormulaRecursionEntry& r){return r.pCell == this;});
             if (bOnlyThis)
             {
@@ -2331,6 +2331,8 @@ void ScFormulaCell::InterpretTail( ScInterpreterContext& rContext, ScInterpretTa
         OSL_ENSURE( pCode->GetCodeError() != FormulaError::NONE, "no RPN code and no errors ?!?!" );
         ResetDirty();
     }
+
+    pCode->ClearRecalcModeMustAfterImport();
 }
 
 void ScFormulaCell::HandleStuffAfterParallelCalculation(ScInterpreter* pInterpreter)
@@ -2546,7 +2548,7 @@ void ScFormulaCell::SetDirty( bool bDirtyFlag )
         // the FormulaTree, once in there it would be assumed that its
         // dependents already had been tracked and it would be skipped on a
         // subsequent notify. Postpone tracking until all listeners are set.
-        if (!rDocument.IsImportingXML())
+        if (!rDocument.IsImportingXML() && !rDocument.IsInsertingFromOtherDoc())
             rDocument.TrackFormulas();
     }
 
@@ -2647,10 +2649,6 @@ void ScFormulaCell::AddRecalcMode( ScRecalcMode nBits )
 {
     if ( (nBits & ScRecalcMode::EMask) != ScRecalcMode::NORMAL )
         SetDirtyVar();
-    if ( nBits & ScRecalcMode::ONLOAD_ONCE )
-    {   // OnLoadOnce is used only to set Dirty after filter import.
-        nBits = (nBits & ~ScRecalcMode::EMask) | ScRecalcMode::NORMAL;
-    }
     pCode->AddRecalcMode( nBits );
 }
 
@@ -3123,7 +3121,7 @@ bool ScFormulaCell::UpdatePosOnShift( const sc::RefUpdateContext& rCxt )
         // No movement.
         return false;
 
-    if (!rCxt.maRange.In(aPos))
+    if (!rCxt.maRange.Contains(aPos))
         return false;
 
     // This formula cell itself is being shifted during cell range
@@ -3208,7 +3206,7 @@ bool checkCompileColRowName(
                 ScAddress aAbs = rRef.toAbs(rDoc, aPos);
                 if (rDoc.ValidAddress(aAbs))
                 {
-                    if (rCxt.maRange.In(aAbs))
+                    if (rCxt.maRange.Contains(aAbs))
                         return true;
                 }
             }
@@ -3377,7 +3375,7 @@ bool ScFormulaCell::UpdateReferenceOnMove(
         aUndoPos = *pUndoCellPos;
     ScAddress aOldPos( aPos );
 
-    bool bCellInMoveTarget = rCxt.maRange.In(aPos);
+    bool bCellInMoveTarget = rCxt.maRange.Contains(aPos);
 
     if ( bCellInMoveTarget )
     {
@@ -3455,7 +3453,7 @@ bool ScFormulaCell::UpdateReferenceOnMove(
             // #i36299# Don't duplicate action during cut&paste / drag&drop
             // on a cell in the range moved, start/end listeners is done
             // via ScDocument::DeleteArea() and ScDocument::CopyFromClip().
-            && !(rDocument.IsInsertingFromOtherDoc() && rCxt.maRange.In(aPos));
+            && !(rDocument.IsInsertingFromOtherDoc() && rCxt.maRange.Contains(aPos));
 
         if ( bNewListening )
             EndListeningTo(rDocument, pOldCode.get(), aOldPos);
@@ -3508,7 +3506,7 @@ bool ScFormulaCell::UpdateReferenceOnCopy(
         aUndoPos = *pUndoCellPos;
     ScAddress aOldPos( aPos );
 
-    if (rCxt.maRange.In(aPos))
+    if (rCxt.maRange.Contains(aPos))
     {
         // The cell is being moved or copied to a new position. I guess the
         // position has been updated prior to this call?  Determine
@@ -3801,7 +3799,7 @@ void ScFormulaCell::UpdateTranspose( const ScRange& rSource, const ScAddress& rD
                 rDest.Tab() + rSource.aEnd.Tab() - rSource.aStart.Tab() ) );
 
     // cell within range
-    if ( aDestRange.In( aOldPos ) )
+    if ( aDestRange.Contains( aOldPos ) )
     {
         // References of these cells were not changed by ScTokenArray::AdjustReferenceOnMove()
         // Count back Positions
@@ -4665,7 +4663,7 @@ bool ScFormulaCell::InterpretFormulaGroup(SCROW nStartOffset, SCROW nEndOffset)
         nEndOffset = nMaxOffset;
     }
 
-    if (nEndOffset == nStartOffset)
+    if (nEndOffset == nStartOffset && forceType == ForceCalculationNone)
         return false; // Do not use threads for a single row.
 
     // Guard against endless recursion of Interpret() calls, for this to work

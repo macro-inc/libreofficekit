@@ -45,9 +45,9 @@ class SwUndoAttr final : public SwUndo, private SwUndRng
     OUString m_aChrFormatName;
 
     void RemoveIdx( SwDoc& rDoc );
-
+    void redoAttribute(SwPaM& rPam, sw::UndoRedoContext& rContext);
 public:
-    SwUndoAttr( const SwPaM&, const SfxItemSet &, const SetAttrMode nFlags );
+    SwUndoAttr( const SwPaM&, SfxItemSet, const SetAttrMode nFlags );
     SwUndoAttr( const SwPaM&, const SfxPoolItem&, const SetAttrMode nFlags );
 
     virtual ~SwUndoAttr() override;
@@ -176,6 +176,16 @@ public:
     std::unique_ptr<SwUndoFormatAttr> ReleaseUndo() { return std::move(m_pUndo); }
 };
 
+class SwDocModifyAndUndoGuard final
+{
+    SwDoc* doc;
+    std::unique_ptr<SwUndoFormatAttrHelper> helper;
+
+public:
+    SwDocModifyAndUndoGuard(SwFormat& format);
+    ~SwDocModifyAndUndoGuard();
+};
+
 class SwUndoMoveLeftMargin final : public SwUndo, private SwUndRng
 {
     const std::unique_ptr<SwHistory> m_pHistory;
@@ -216,7 +226,7 @@ class SwUndoChangeFootNote final : public SwUndo, private SwUndRng
     const bool m_bEndNote;
 
 public:
-    SwUndoChangeFootNote( const SwPaM& rRange, const OUString& rText,
+    SwUndoChangeFootNote( const SwPaM& rRange, OUString aText,
                           bool bIsEndNote );
     virtual ~SwUndoChangeFootNote() override;
 

@@ -59,13 +59,13 @@ bool AnnotationMarkCoversCommentAnchor(const sw::mark::IMark* pAnnotationMark,
         // This can be the as-char case: the comment placeholder character is exactly between the
         // annotation mark start and end.
         SwPosition aPosition(rMarkStart);
-        ++aPosition.nContent;
+        aPosition.AdjustContent(+1);
         if (aPosition != rAnchorPos)
         {
             return false;
         }
 
-        ++aPosition.nContent;
+        aPosition.AdjustContent(+1);
         if (aPosition != rMarkEnd)
         {
             return false;
@@ -74,12 +74,12 @@ bool AnnotationMarkCoversCommentAnchor(const sw::mark::IMark* pAnnotationMark,
         return true;
     }
 
-    if (rMarkStart.nNode != rMarkEnd.nNode)
+    if (rMarkStart.GetNode() != rMarkEnd.GetNode())
     {
         return false;
     }
 
-    return rMarkEnd.nContent.GetIndex() == rMarkStart.nContent.GetIndex() + 1;
+    return rMarkEnd.GetContentIndex() == rMarkStart.GetContentIndex() + 1;
 }
 
 /**
@@ -131,7 +131,7 @@ SwPostItHelper::SwLayoutStatus SwPostItHelper::getLayoutInfos(
     const sw::mark::IMark* pAnnotationMark )
 {
     SwLayoutStatus aRet = INVISIBLE;
-    SwTextNode* pTextNode = rAnchorPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNode = rAnchorPos.GetNode().GetTextNode();
     if ( pTextNode == nullptr )
         return aRet;
 
@@ -169,8 +169,8 @@ SwPostItHelper::SwLayoutStatus SwPostItHelper::getLayoutInfos(
                 if (pAnnotationMark != nullptr)
                 {
                     const SwPosition& rAnnotationStartPos = pAnnotationMark->GetMarkStart();
-                    o_rInfo.mnStartNodeIdx = rAnnotationStartPos.nNode.GetIndex();
-                    o_rInfo.mnStartContent = rAnnotationStartPos.nContent.GetIndex();
+                    o_rInfo.mnStartNodeIdx = rAnnotationStartPos.GetNodeIndex();
+                    o_rInfo.mnStartContent = rAnnotationStartPos.GetContentIndex();
                 }
                 else
                 {
@@ -215,7 +215,7 @@ SwPostItHelper::SwLayoutStatus SwPostItHelper::getLayoutInfos(
         }
     }
 
-    return ( (aRet==VISIBLE) && SwScriptInfo::IsInHiddenRange( *pTextNode , rAnchorPos.nContent.GetIndex()) )
+    return ( (aRet==VISIBLE) && SwScriptInfo::IsInHiddenRange( *pTextNode , rAnchorPos.GetContentIndex()) )
              ? HIDDEN
              : aRet;
 }
@@ -253,8 +253,7 @@ SwPosition SwAnnotationItem::GetAnchorPosition() const
     SwTextField* pTextField = mrFormatField.GetTextField();
     SwTextNode* pTextNode = pTextField->GetpTextNode();
 
-    SwPosition aPos( *pTextNode );
-    aPos.nContent.Assign( pTextNode, pTextField->GetStart() );
+    SwPosition aPos( *pTextNode, pTextField->GetStart() );
     return aPos;
 }
 

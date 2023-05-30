@@ -20,6 +20,7 @@
 
 #include <TimerTriggeredControllerLock.hxx>
 #include <rtl/ustring.hxx>
+#include <rtl/ref.hxx>
 
 #include <map>
 #include <memory>
@@ -36,8 +37,6 @@ namespace com::sun::star::chart2 {
     class XDataSeriesContainer;
     class XDataSeries;
     class XChartType;
-    class XChartTypeTemplate;
-    struct InterpretedData;
     namespace data {
         class XDataProvider;
         class XLabeledDataSequence;
@@ -46,7 +45,11 @@ namespace com::sun::star::chart2 {
 
 namespace chart
 {
-
+class ChartType;
+class ChartTypeTemplate;
+class DataSeries;
+struct InterpretedData;
+class LabeledDataSequence;
 class RangeSelectionHelper;
 
 struct DialogModelTimeBasedInfo
@@ -61,33 +64,31 @@ struct DialogModelTimeBasedInfo
 class DialogModel
 {
 public:
-    explicit DialogModel(
-        const css::uno::Reference< css::chart2::XChartDocument > & xChartDocument,
-        const css::uno::Reference< css::uno::XComponentContext > & xContext );
+    explicit DialogModel( rtl::Reference<::chart::ChartModel> xChartDocument );
     ~DialogModel();
 
     typedef std::pair<
                 OUString,
-                std::pair< css::uno::Reference< css::chart2::XDataSeries >,
-                             css::uno::Reference< css::chart2::XChartType > > >
+                std::pair< rtl::Reference< ::chart::DataSeries >,
+                             rtl::Reference< ::chart::ChartType > > >
         tSeriesWithChartTypeByName;
 
     typedef std::map< OUString, OUString >
         tRolesWithRanges;
 
     void setTemplate(
-        const css::uno::Reference< css::chart2::XChartTypeTemplate > & xTemplate );
+        const rtl::Reference< ::chart::ChartTypeTemplate > & xTemplate );
 
     std::shared_ptr< RangeSelectionHelper > const &
         getRangeSelectionHelper() const;
 
-    css::uno::Reference< css::frame::XModel >
+    const rtl::Reference<::chart::ChartModel> &
         getChartModel() const;
 
     css::uno::Reference< css::chart2::data::XDataProvider >
         getDataProvider() const;
 
-    std::vector< css::uno::Reference< css::chart2::XDataSeriesContainer > >
+    std::vector< rtl::Reference< ::chart::ChartType > >
         getAllDataSeriesContainers() const;
 
     std::vector< tSeriesWithChartTypeByName >
@@ -96,7 +97,7 @@ public:
     static tRolesWithRanges getRolesWithRanges(
         const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
         const OUString & aRoleOfSequenceForLabel,
-        const css::uno::Reference< css::chart2::XChartType > & xChartType );
+        const rtl::Reference< ::chart::ChartType > & xChartType );
 
     enum class MoveDirection
     {
@@ -107,15 +108,15 @@ public:
                      MoveDirection eDirection );
 
     /// @return the newly inserted series
-    css::uno::Reference<
-            css::chart2::XDataSeries > insertSeriesAfter(
+    rtl::Reference<
+            ::chart::DataSeries > insertSeriesAfter(
                 const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-                const css::uno::Reference< css::chart2::XChartType > & xChartType,
+                const rtl::Reference< ::chart::ChartType > & xChartType,
                 bool bCreateDataCachedSequences = false );
 
     void deleteSeries(
         const css::uno::Reference< css::chart2::XDataSeries > & xSeries,
-        const css::uno::Reference< css::chart2::XChartType > & xChartType );
+        const rtl::Reference< ::chart::ChartType > & xChartType );
 
     css::uno::Reference< css::chart2::data::XLabeledDataSequence >
         getCategories() const;
@@ -150,14 +151,10 @@ public:
     ChartModel& getModel() const;
 
 private:
-    css::uno::Reference< css::chart2::XChartDocument >
+    rtl::Reference<::chart::ChartModel>
         m_xChartDocument;
 
-    css::uno::Reference< css::chart2::XChartTypeTemplate >
-        m_xTemplate;
-
-    css::uno::Reference< css::uno::XComponentContext >
-        m_xContext;
+    rtl::Reference< ::chart::ChartTypeTemplate > m_xTemplate;
 
     mutable std::shared_ptr< RangeSelectionHelper >
         m_spRangeSelectionHelper;
@@ -166,8 +163,8 @@ private:
 
 private:
     void applyInterpretedData(
-        const css::chart2::InterpretedData & rNewData,
-        const std::vector< css::uno::Reference< css::chart2::XDataSeries > > & rSeriesToReUse );
+        const InterpretedData & rNewData,
+        const std::vector< rtl::Reference< ::chart::DataSeries > > & rSeriesToReUse );
 
     sal_Int32 countSeries() const;
 

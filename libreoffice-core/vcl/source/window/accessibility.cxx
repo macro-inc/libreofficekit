@@ -21,6 +21,7 @@
 #include <vcl/toolkit/fixed.hxx>
 #include <vcl/window.hxx>
 #include <vcl/menu.hxx>
+#include <vcl/mnemonic.hxx>
 #include <vcl/wrkwin.hxx>
 
 #include <window.h>
@@ -46,7 +47,6 @@ ImplAccessibleInfos::ImplAccessibleInfos()
     nAccessibleRole = 0xFFFF;
     pLabeledByWindow = nullptr;
     pLabelForWindow = nullptr;
-    pMemberOfWindow = nullptr;
 }
 
 ImplAccessibleInfos::~ImplAccessibleInfos()
@@ -439,7 +439,7 @@ OUString Window::getDefaultAccessibleName() const
             break;
     }
 
-    return OutputDevice::GetNonMnemonicString( aAccessibleName );
+    return removeMnemonicFromString( aAccessibleName );
 }
 
 void Window::SetAccessibleDescription( const OUString& rDescription )
@@ -490,18 +490,8 @@ void Window::SetAccessibleRelationLabelFor( vcl::Window* pLabelFor )
     mpWindowImpl->mpAccessibleInfos->pLabelForWindow = pLabelFor;
 }
 
-void Window::SetAccessibleRelationMemberOf( vcl::Window* pMemberOfWin )
-{
-    if ( !mpWindowImpl->mpAccessibleInfos )
-        mpWindowImpl->mpAccessibleInfos.reset( new ImplAccessibleInfos );
-    mpWindowImpl->mpAccessibleInfos->pMemberOfWindow = pMemberOfWin;
-}
-
 vcl::Window* Window::GetAccessibleRelationMemberOf() const
 {
-    if (mpWindowImpl->mpAccessibleInfos && mpWindowImpl->mpAccessibleInfos->pMemberOfWindow)
-        return mpWindowImpl->mpAccessibleInfos->pMemberOfWindow;
-
     if (!isContainerWindow(this) && !isContainerWindow(GetParent()))
         return getLegacyNonLayoutAccessibleRelationMemberOf();
 
@@ -583,27 +573,24 @@ FindFocusedEditableText(uno::Reference<accessibility::XAccessibleContext> const&
     if (!xContext.is())
         return uno::Reference<accessibility::XAccessibleEditableText>();
 
-    uno::Reference<accessibility::XAccessibleStateSet> xState = xContext->getAccessibleStateSet();
-    if (xState.is())
+    sal_Int64 nState = xContext->getAccessibleStateSet();
+    if (nState & accessibility::AccessibleStateType::FOCUSED)
     {
-        if (xState->contains(accessibility::AccessibleStateType::FOCUSED))
-        {
-            uno::Reference<accessibility::XAccessibleEditableText> xText(xContext, uno::UNO_QUERY);
-            if (xText.is())
-                return xText;
-            if (xState->contains(accessibility::AccessibleStateType::MANAGES_DESCENDANTS))
-                return uno::Reference<accessibility::XAccessibleEditableText>();
-        }
+        uno::Reference<accessibility::XAccessibleEditableText> xText(xContext, uno::UNO_QUERY);
+        if (xText.is())
+            return xText;
+        if (nState & accessibility::AccessibleStateType::MANAGES_DESCENDANTS)
+            return uno::Reference<accessibility::XAccessibleEditableText>();
     }
 
     bool bSafeToIterate = true;
-    sal_Int32 nCount = xContext->getAccessibleChildCount();
+    sal_Int64 nCount = xContext->getAccessibleChildCount();
     if (nCount < 0 || nCount > SAL_MAX_UINT16 /* slow enough for anyone */)
         bSafeToIterate = false;
     if (!bSafeToIterate)
         return uno::Reference<accessibility::XAccessibleEditableText>();
 
-    for (sal_Int32 i = 0; i < xContext->getAccessibleChildCount(); ++i)
+    for (sal_Int64 i = 0; i < xContext->getAccessibleChildCount(); ++i)
     {
         uno::Reference<accessibility::XAccessible> xChild = xContext->getAccessibleChild(i);
         if (!xChild.is())

@@ -20,6 +20,7 @@
 #include "PieChartType.hxx"
 #include <PropertyHelper.hxx>
 #include <PolarCoordinateSystem.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <servicenames_charttypes.hxx>
 #include <AxisIndexDefines.hxx>
@@ -42,79 +43,50 @@ enum
     PROP_PIECHARTTYPE_3DRELATIVEHEIGHT
 };
 
-void lcl_AddPropertiesToVector(
-    std::vector< Property > & rOutProperties )
+
+::chart::tPropertyValueMap& StaticPieChartTypeDefaults()
 {
-    rOutProperties.emplace_back( "UseRings",
+    static ::chart::tPropertyValueMap aStaticDefaults =
+        []()
+        {
+            ::chart::tPropertyValueMap aOutMap;
+            ::chart::PropertyHelper::setPropertyValueDefault( aOutMap, PROP_PIECHARTTYPE_USE_RINGS, false );
+            ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( aOutMap, PROP_PIECHARTTYPE_3DRELATIVEHEIGHT, 100 );
+            return aOutMap;
+        }();
+    return aStaticDefaults;
+}
+
+::cppu::OPropertyArrayHelper& StaticPieChartTypeInfoHelper()
+{
+    static ::cppu::OPropertyArrayHelper aPropHelper(
+        []()
+        {
+            std::vector< css::beans::Property > aProperties {
+                { "UseRings",
                   PROP_PIECHARTTYPE_USE_RINGS,
                   cppu::UnoType<bool>::get(),
                   beans::PropertyAttribute::BOUND
-                  | beans::PropertyAttribute::MAYBEDEFAULT );
-    rOutProperties.emplace_back( "3DRelativeHeight",
+                  | beans::PropertyAttribute::MAYBEDEFAULT },
+                { "3DRelativeHeight",
                   PROP_PIECHARTTYPE_3DRELATIVEHEIGHT,
                   cppu::UnoType<sal_Int32>::get(),
-                  beans::PropertyAttribute::MAYBEVOID );
+                  beans::PropertyAttribute::MAYBEVOID }
+            };
+            std::sort( aProperties.begin(), aProperties.end(),
+                         ::chart::PropertyNameLess() );
+
+            return comphelper::containerToSequence( aProperties );
+        }());
+    return aPropHelper;
 }
 
-struct StaticPieChartTypeDefaults_Initializer
+uno::Reference< beans::XPropertySetInfo >& StaticPieChartTypeInfo()
 {
-    ::chart::tPropertyValueMap* operator()()
-    {
-        static ::chart::tPropertyValueMap aStaticDefaults;
-        lcl_AddDefaultsToMap( aStaticDefaults );
-        return &aStaticDefaults;
-    }
-private:
-    static void lcl_AddDefaultsToMap( ::chart::tPropertyValueMap & rOutMap )
-    {
-        ::chart::PropertyHelper::setPropertyValueDefault( rOutMap, PROP_PIECHARTTYPE_USE_RINGS, false );
-        ::chart::PropertyHelper::setPropertyValueDefault< sal_Int32 >( rOutMap, PROP_PIECHARTTYPE_3DRELATIVEHEIGHT, 100 );
-    }
-};
-
-struct StaticPieChartTypeDefaults : public rtl::StaticAggregate< ::chart::tPropertyValueMap, StaticPieChartTypeDefaults_Initializer >
-{
-};
-
-struct StaticPieChartTypeInfoHelper_Initializer
-{
-    ::cppu::OPropertyArrayHelper* operator()()
-    {
-        static ::cppu::OPropertyArrayHelper aPropHelper( lcl_GetPropertySequence() );
-        return &aPropHelper;
-    }
-
-private:
-    static Sequence< Property > lcl_GetPropertySequence()
-    {
-        std::vector< css::beans::Property > aProperties;
-        lcl_AddPropertiesToVector( aProperties );
-
-        std::sort( aProperties.begin(), aProperties.end(),
-                     ::chart::PropertyNameLess() );
-
-        return comphelper::containerToSequence( aProperties );
-    }
-
-};
-
-struct StaticPieChartTypeInfoHelper : public rtl::StaticAggregate< ::cppu::OPropertyArrayHelper, StaticPieChartTypeInfoHelper_Initializer >
-{
-};
-
-struct StaticPieChartTypeInfo_Initializer
-{
-    uno::Reference< beans::XPropertySetInfo >* operator()()
-    {
-        static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
-            ::cppu::OPropertySetHelper::createPropertySetInfo(*StaticPieChartTypeInfoHelper::get() ) );
-        return &xPropertySetInfo;
-    }
-};
-
-struct StaticPieChartTypeInfo : public rtl::StaticAggregate< uno::Reference< beans::XPropertySetInfo >, StaticPieChartTypeInfo_Initializer >
-{
-};
+    static uno::Reference< beans::XPropertySetInfo > xPropertySetInfo(
+        ::cppu::OPropertySetHelper::createPropertySetInfo( StaticPieChartTypeInfoHelper() ) );
+    return xPropertySetInfo;
+}
 
 } // anonymous namespace
 
@@ -139,21 +111,26 @@ uno::Reference< util::XCloneable > SAL_CALL PieChartType::createClone()
     return uno::Reference< util::XCloneable >( new PieChartType( *this ));
 }
 
+rtl::Reference< ChartType > PieChartType::cloneChartType() const
+{
+    return new PieChartType( *this );
+}
+
 // ____ XChartType ____
 OUString SAL_CALL PieChartType::getChartType()
 {
     return CHART2_SERVICE_NAME_CHARTTYPE_PIE;
 }
 
-Reference< chart2::XCoordinateSystem > SAL_CALL
-    PieChartType::createCoordinateSystem( ::sal_Int32 DimensionCount )
+rtl::Reference< ::chart::BaseCoordinateSystem >
+    PieChartType::createCoordinateSystem2( sal_Int32 DimensionCount )
 {
-    Reference< chart2::XCoordinateSystem > xResult(
-        new PolarCoordinateSystem( DimensionCount ));
+    rtl::Reference< PolarCoordinateSystem > xResult =
+        new PolarCoordinateSystem( DimensionCount );
 
     for( sal_Int32 i=0; i<DimensionCount; ++i )
     {
-        Reference< chart2::XAxis > xAxis( xResult->getAxisByDimension( i, MAIN_AXIS_INDEX ) );
+        rtl::Reference< Axis > xAxis = xResult->getAxisByDimension2( i, MAIN_AXIS_INDEX );
         if( !xAxis.is() )
         {
             OSL_FAIL("a created coordinate system should have an axis for each dimension");
@@ -186,25 +163,26 @@ uno::Sequence< OUString > PieChartType::getSupportedPropertyRoles()
 }
 
 // ____ OPropertySet ____
-uno::Any PieChartType::GetDefaultValue( sal_Int32 nHandle ) const
+void PieChartType::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
-    const tPropertyValueMap& rStaticDefaults = *StaticPieChartTypeDefaults::get();
+    const tPropertyValueMap& rStaticDefaults = StaticPieChartTypeDefaults();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____
 ::cppu::IPropertyArrayHelper & SAL_CALL PieChartType::getInfoHelper()
 {
-    return *StaticPieChartTypeInfoHelper::get();
+    return StaticPieChartTypeInfoHelper();
 }
 
 // ____ XPropertySet ____
 uno::Reference< beans::XPropertySetInfo > SAL_CALL PieChartType::getPropertySetInfo()
 {
-    return *StaticPieChartTypeInfo::get();
+    return StaticPieChartTypeInfo();
 }
 
 OUString SAL_CALL PieChartType::getImplementationName()

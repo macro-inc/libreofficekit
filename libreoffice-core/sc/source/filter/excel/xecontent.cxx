@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <utility>
 #include <xecontent.hxx>
 
 #include <vector>
@@ -55,6 +56,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/relationship.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::oox;
 
@@ -280,7 +282,7 @@ sal_uInt32 XclExpMergedcells::GetBaseXFId( const ScAddress& rPos ) const
     for ( size_t i = 0, nRanges = rNCRanges.size(); i < nRanges; ++i, ++aIt )
     {
         const ScRange & rScRange = rNCRanges[ i ];
-        if( rScRange.In( rPos ) )
+        if( rScRange.Contains( rPos ) )
             return *aIt;
     }
     return EXC_XFID_NOTFOUND;
@@ -430,9 +432,9 @@ XclExpHyperlink::XclExpHyperlink( const XclExpRoot& rRoot, const SvxURLField& rU
 
         if (nSepPos != -1)
         {
-            OUString aSheetName(aTextMark.copy(0, nSepPos));
+            std::u16string_view aSheetName(aTextMark.subView(0, nSepPos));
 
-            if (aSheetName.indexOf(' ') != -1 && aSheetName[0] != '\'')
+            if (aSheetName.find(' ') != std::u16string_view::npos && aSheetName[0] != '\'')
             {
                 aTextMark = "'" + aTextMark.replaceAt(nSepPos, 0, u"'");
             }
@@ -460,7 +462,7 @@ XclExpHyperlink::XclExpHyperlink( const XclExpRoot& rRoot, const SvxURLField& rU
         mnFlags |= EXC_HLINK_MARK;
 
         OUString location = XclXmlUtils::ToOUString(*mxTextMark);
-        if (!location.isEmpty() && msTarget.endsWith(OUStringConcatenation("#" + location)))
+        if (!location.isEmpty() && msTarget.endsWith(Concat2View("#" + location)))
             msTarget = msTarget.copy(0, msTarget.getLength() - location.getLength() - 1);
     }
 
@@ -1472,11 +1474,11 @@ void XclExpColorScale::SaveXml( XclExpXmlStream& rStrm )
     rWorksheet->endElement( XML_cfRule );
 }
 
-XclExpDataBar::XclExpDataBar( const XclExpRoot& rRoot, const ScDataBarFormat& rFormat, sal_Int32 nPriority, const OString& rGUID):
+XclExpDataBar::XclExpDataBar( const XclExpRoot& rRoot, const ScDataBarFormat& rFormat, sal_Int32 nPriority, OString aGUID):
     XclExpRoot( rRoot ),
     mrFormat( rFormat ),
     mnPriority( nPriority ),
-    maGUID(rGUID)
+    maGUID(std::move(aGUID))
 {
     const ScRange & rRange = rFormat.GetRange().front();
     ScAddress aAddr = rRange.aStart;
@@ -1671,7 +1673,7 @@ void lcl_SetValidationText(const OUString& rText, XclExpString& rValidationText)
 
 } // namespace
 
-XclExpDV::XclExpDV( const XclExpRoot& rRoot, sal_uLong nScHandle ) :
+XclExpDV::XclExpDV( const XclExpRoot& rRoot, sal_uInt32 nScHandle ) :
     XclExpRecord( EXC_ID_DV ),
     XclExpRoot( rRoot ),
     mnFlags( 0 ),
@@ -1760,8 +1762,8 @@ XclExpDV::XclExpDV( const XclExpRoot& rRoot, sal_uLong nScHandle ) :
                         sal_Int32 nStringIx = 0;
                         for(;;)
                         {
-                            const OUString aToken( aString.getToken( 0, '\n', nStringIx ) );
-                            if (aToken.indexOf(",") != -1)
+                            const std::u16string_view aToken( o3tl::getToken(aString, 0, '\n', nStringIx ) );
+                            if (aToken.find(',') != std::u16string_view::npos)
                             {
                                 sListBuf.append('"');
                                 sListBuf.append(aToken);
@@ -1774,7 +1776,8 @@ XclExpDV::XclExpDV( const XclExpRoot& rRoot, sal_uLong nScHandle ) :
                             sFormulaBuf.append( aToken );
                             if (nStringIx<0)
                                 break;
-                            mxString1->Append(OUString(u'\0'));
+                            sal_Unicode cUnicodeChar = 0;
+                            mxString1->Append( std::u16string_view(&cUnicodeChar, 1) );
                             sFormulaBuf.append( ',' );
                             sListBuf.append( ',' );
                         }
@@ -1843,7 +1846,7 @@ XclExpDV::XclExpDV( const XclExpRoot& rRoot, sal_uLong nScHandle ) :
     else
     {
         OSL_FAIL( "XclExpDV::XclExpDV - missing core data" );
-        mnScHandle = ULONG_MAX;
+        mnScHandle = SAL_MAX_UINT32;
     }
 }
 
@@ -1859,7 +1862,7 @@ void XclExpDV::InsertCellRange( const ScRange& rRange )
 bool XclExpDV::Finalize()
 {
     GetAddressConverter().ConvertRangeList( maXclRanges, maScRanges, true );
-    return (mnScHandle != ULONG_MAX) && !maXclRanges.empty();
+    return (mnScHandle != SAL_MAX_UINT32) && !maXclRanges.empty();
 }
 
 void XclExpDV::WriteBody( XclExpStream& rStrm )
@@ -1936,7 +1939,7 @@ XclExpDval::~XclExpDval()
 {
 }
 
-void XclExpDval::InsertCellRange( const ScRange& rRange, sal_uLong nScHandle )
+void XclExpDval::InsertCellRange( const ScRange& rRange, sal_uInt32 nScHandle )
 {
     if( GetBiff() == EXC_BIFF8 )
     {
@@ -1981,7 +1984,7 @@ void XclExpDval::SaveXml( XclExpXmlStream& rStrm )
     rWorksheet->endElement( XML_dataValidations );
 }
 
-XclExpDV& XclExpDval::SearchOrCreateDv( sal_uLong nScHandle )
+XclExpDV& XclExpDval::SearchOrCreateDv( sal_uInt32 nScHandle )
 {
     // test last found record
     if( mxLastFoundDV && (mxLastFoundDV->GetScHandle() == nScHandle) )
@@ -1994,7 +1997,7 @@ XclExpDV& XclExpDval::SearchOrCreateDv( sal_uLong nScHandle )
         size_t nFirstPos = 0;
         size_t nLastPos = maDVList.GetSize() - 1;
         bool bLoop = true;
-        sal_uLong nCurrScHandle = ::std::numeric_limits< sal_uLong >::max();
+        sal_uInt32 nCurrScHandle = ::std::numeric_limits< sal_uInt32 >::max();
         while( (nFirstPos <= nLastPos) && bLoop )
         {
             nCurrPos = (nFirstPos + nLastPos) / 2;
@@ -2032,7 +2035,7 @@ void XclExpDval::WriteBody( XclExpStream& rStrm )
 XclExpWebQuery::XclExpWebQuery(
         const OUString& rRangeName,
         const OUString& rUrl,
-        const OUString& rSource,
+        std::u16string_view rSource,
         sal_Int32 nRefrSecs ) :
     maDestRange( rRangeName ),
     maUrl( rUrl ),
@@ -2044,12 +2047,12 @@ XclExpWebQuery::XclExpWebQuery(
     OUString aNewTables;
     OUString aAppendTable;
     bool bExitLoop = false;
-    if (!rSource.isEmpty())
+    if (!rSource.empty())
     {
         sal_Int32 nStringIx = 0;
         do
         {
-            OUString aToken( rSource.getToken( 0, ';', nStringIx ) );
+            OUString aToken( o3tl::getToken(rSource, 0, ';', nStringIx ) );
             mbEntireDoc = ScfTools::IsHTMLDocName( aToken );
             bExitLoop = mbEntireDoc || ScfTools::IsHTMLTablesName( aToken );
             if( !bExitLoop && ScfTools::GetHTMLNameFromName( aToken, aAppendTable ) )

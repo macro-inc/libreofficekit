@@ -31,6 +31,7 @@
 #include <comphelper/scopeguard.hxx>
 #include <CustomAnimationList.hxx>
 #include <CustomAnimationPreset.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/image.hxx>
@@ -39,8 +40,7 @@
 #include <vcl/weldutils.hxx>
 #include <tools/debug.hxx>
 #include <tools/gen.hxx>
-#include <tools/diagnose_ex.h>
-#include <osl/diagnose.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <sdresid.hxx>
 
@@ -228,8 +228,8 @@ static OUString getDescription( const Any& rTarget, bool bWithText )
 class CustomAnimationListEntryItem
 {
 public:
-    CustomAnimationListEntryItem(const OUString& aDescription,
-                                 const CustomAnimationEffectPtr& pEffect);
+    CustomAnimationListEntryItem(OUString aDescription,
+                                 CustomAnimationEffectPtr pEffect);
     const CustomAnimationEffectPtr& getEffect() const { return mpEffect; }
 
     Size GetSize(const vcl::RenderContext& rRenderContext);
@@ -247,9 +247,9 @@ public:
     static const ::tools::Long nItemMinHeight = 38;
 };
 
-CustomAnimationListEntryItem::CustomAnimationListEntryItem(const OUString& aDescription, const CustomAnimationEffectPtr& pEffect)
-    : msDescription(aDescription)
-    , mpEffect(pEffect)
+CustomAnimationListEntryItem::CustomAnimationListEntryItem(OUString aDescription, CustomAnimationEffectPtr pEffect)
+    : msDescription(std::move(aDescription))
+    , mpEffect(std::move(pEffect))
 {
     if (!mpEffect)
         return;
@@ -276,7 +276,7 @@ IMPL_STATIC_LINK(CustomAnimationList, CustomRenderHdl, weld::TreeView::render_ar
     bool bSelected = std::get<2>(aPayload);
     const OUString& rId = std::get<3>(aPayload);
 
-    CustomAnimationListEntryItem* pItem = reinterpret_cast<CustomAnimationListEntryItem*>(rId.toInt64());
+    CustomAnimationListEntryItem* pItem = weld::fromId<CustomAnimationListEntryItem*>(rId);
 
     pItem->Paint(rRenderContext, rRect, bSelected);
 }
@@ -286,7 +286,7 @@ IMPL_STATIC_LINK(CustomAnimationList, CustomGetSizeHdl, weld::TreeView::get_size
     vcl::RenderContext& rRenderContext = aPayload.first;
     const OUString& rId = aPayload.second;
 
-    CustomAnimationListEntryItem* pItem = reinterpret_cast<CustomAnimationListEntryItem*>(rId.toInt64());
+    CustomAnimationListEntryItem* pItem = weld::fromId<CustomAnimationListEntryItem*>(rId);
     if (!pItem)
         return Size(CustomAnimationListEntryItem::nIconWidth, CustomAnimationListEntryItem::nItemMinHeight);
     return pItem->GetSize(rRenderContext);
@@ -525,21 +525,21 @@ sal_Int8 CustomAnimationList::ExecuteDrop(const ExecuteDropEvent& rEvt)
     if( bMovingEffect && bMoveNotSelf && bHaveSequence )
     {
         CustomAnimationListEntryItem* pTarget = xDndEffectInsertBefore ?
-                                                    reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xDndEffectInsertBefore).toInt64()) :
+                                                    weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xDndEffectInsertBefore)) :
                                                     nullptr;
 
         // Build list of effects
         std::vector< CustomAnimationEffectPtr > aEffects;
         for( const auto &pEntry : mDndEffectsSelected )
         {
-            CustomAnimationListEntryItem* pCustomAnimationEffect = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*pEntry).toInt64());
+            CustomAnimationListEntryItem* pCustomAnimationEffect = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*pEntry));
             aEffects.push_back(pCustomAnimationEffect->getEffect());
         }
 
         // Callback to observer to have it update the model.
         // If pTarget is null, pass nullptr to indicate end of list.
         mpController->onDragNDropComplete(
-            aEffects,
+            std::move(aEffects),
             pTarget ? pTarget->getEffect() : nullptr );
 
         // Reset selection
@@ -589,7 +589,7 @@ IMPL_LINK(CustomAnimationList, KeyInputHdl, const KeyEvent&, rKEvt, bool)
             if (mxTreeView->get_cursor(xEntry.get()))
             {
                 auto aRect = mxTreeView->get_row_area(*xEntry);
-                const Point aPos(aRect.getWidth() / 2, aRect.getHeight() / 2);
+                const Point aPos(aRect.getOpenWidth() / 2, aRect.getOpenHeight() / 2);
                 const CommandEvent aCEvt(aPos, CommandEventId::ContextMenu);
                 CommandHdl(aCEvt);
                 return true;
@@ -610,7 +610,7 @@ void CustomAnimationList::select( const CustomAnimationEffectPtr& pEffect )
     {
         do
         {
-            CustomAnimationListEntryItem* pTestEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry).toInt64());
+            CustomAnimationListEntryItem* pTestEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry));
             if (pTestEntry->getEffect() == pEffect)
             {
                 mxTreeView->select(*xEntry);
@@ -689,7 +689,7 @@ void CustomAnimationList::update()
         // save selection, current, and expand (visible) states
         mxTreeView->all_foreach([this, &aVisible, &nFirstVis, &xLastVisibleEntry,
                                  &aSelected, &nFirstSelOld, &pFirstSelEffect, &xLastSelectedEntry](weld::TreeIter& rEntry){
-            CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry).toInt64());
+            CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry));
             CustomAnimationEffectPtr pEffect(pEntry->getEffect());
             if (pEffect)
             {
@@ -725,7 +725,7 @@ void CustomAnimationList::update()
 
         if (xLastSelectedEntry)
         {
-            CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xLastSelectedEntry).toInt64());
+            CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xLastSelectedEntry));
             pLastSelEffect = pEntry->getEffect();
             nLastSelOld = weld::GetAbsPos(*mxTreeView, *xLastSelectedEntry);
         }
@@ -735,7 +735,7 @@ void CustomAnimationList::update()
 
         if (mxTreeView->get_cursor(xEntry.get()))
         {
-            CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry).toInt64());
+            CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry));
             aCurrent = pEntry->getEffect();
         }
     }
@@ -763,7 +763,7 @@ void CustomAnimationList::update()
 
                 mxEntries.emplace_back(std::make_unique<CustomAnimationListEntryItem>(aDescription, nullptr));
 
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(mxEntries.back().get())));
+                OUString sId(weld::toId(mxEntries.back().get()));
                 mxTreeView->insert(nullptr, -1, &aDescription, &sId, nullptr, nullptr, false, nullptr);
                 std::for_each( pIS->getBegin(), pIS->getEnd(), stl_append_effect_func( *this ) );
                 mxLastParentEntry.reset();
@@ -791,7 +791,7 @@ void CustomAnimationList::update()
         {
             do
             {
-                CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry).toInt64());
+                CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry));
 
                 CustomAnimationEffectPtr pEffect( pEntry->getEffect() );
                 if (pEffect)
@@ -902,7 +902,7 @@ void CustomAnimationList::append( CustomAnimationEffectPtr pEffect )
 
         mxEntries.emplace_back(std::make_unique<CustomAnimationListEntryItem>(aDescription, pEffect));
 
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(mxEntries.back().get())));
+        OUString sId(weld::toId(mxEntries.back().get()));
 
         if (xParentEntry)
         {
@@ -932,14 +932,23 @@ static void selectShape(weld::TreeView* pTreeList, const Reference< XShape >& xS
     if (!pTreeList->get_iter_first(*xEntry))
         return;
 
+    bool bFirstEntry = true;
+
     do
     {
-        CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(pTreeList->get_id(*xEntry).toInt64());
+        CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(pTreeList->get_id(*xEntry));
         CustomAnimationEffectPtr pEffect(pEntry->getEffect());
         if (pEffect)
         {
             if (pEffect->getTarget() == xShape)
+            {
                 pTreeList->select(*xEntry);
+                if (bFirstEntry)
+                {
+                    pTreeList->scroll_to_row(*xEntry);
+                    bFirstEntry = false;
+                }
+            }
         }
     } while (pTreeList->iter_next(*xEntry));
 }
@@ -1070,7 +1079,7 @@ bool CustomAnimationList::isExpanded( const CustomAnimationEffectPtr& pEffect ) 
         do
         {
             CustomAnimationListEntryItem* pEntry =
-                reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry).toInt64());
+                weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry));
             if (pEntry->getEffect() == pEffect)
             {
                 if (mxTreeView->get_iter_depth(*xEntry)) // no parent, keep expanded default of true
@@ -1094,7 +1103,7 @@ bool CustomAnimationList::isVisible(const CustomAnimationEffectPtr& pEffect) con
     {
         do
         {
-            CustomAnimationListEntryItem* pTestEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry).toInt64());
+            CustomAnimationListEntryItem* pTestEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xEntry));
             if (pTestEntry->getEffect() == pEffect)
                 return weld::IsEntryVisible(*mxTreeView, *xEntry);
         } while (mxTreeView->iter_next(*xEntry));
@@ -1107,7 +1116,7 @@ EffectSequence CustomAnimationList::getSelection() const
     EffectSequence aSelection;
 
     mxTreeView->selected_foreach([this, &aSelection](weld::TreeIter& rEntry){
-        CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry).toInt64());
+        CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry));
         CustomAnimationEffectPtr pEffect(pEntry->getEffect());
         if (pEffect)
             aSelection.push_back(pEffect);
@@ -1123,7 +1132,7 @@ EffectSequence CustomAnimationList::getSelection() const
             {
                 if (!mxTreeView->is_selected(*xChild))
                 {
-                    CustomAnimationListEntryItem* pChild = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xChild).toInt64());
+                    CustomAnimationListEntryItem* pChild = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(*xChild));
                     const CustomAnimationEffectPtr& pChildEffect( pChild->getEffect() );
                     if( pChildEffect )
                         aSelection.push_back( pChildEffect );
@@ -1171,7 +1180,7 @@ IMPL_LINK(CustomAnimationList, CommandHdl, const CommandEvent&, rCEvt, bool)
     sal_Int16 nEntries = 0;
 
     mxTreeView->selected_foreach([this, &nNodeType, &nEntries](weld::TreeIter& rEntry){
-        CustomAnimationListEntryItem* pEntry = reinterpret_cast<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry).toInt64());
+        CustomAnimationListEntryItem* pEntry = weld::fromId<CustomAnimationListEntryItem*>(mxTreeView->get_id(rEntry));
         CustomAnimationEffectPtr pEffect(pEntry->getEffect());
 
         nEntries++;

@@ -28,7 +28,7 @@
 #include <dbase/DConnection.hxx>
 #include <dbase/DColumns.hxx>
 #include <tools/config.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <dbase/DIndex.hxx>
 #include <dbase/DIndexes.hxx>
 #include <comphelper/processfactory.hxx>
@@ -39,6 +39,7 @@
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <comphelper/property.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <o3tl/string_view.hxx>
 #include <comphelper/string.hxx>
 #include <unotools/configmgr.hxx>
 #include <unotools/tempfile.hxx>
@@ -54,6 +55,7 @@
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
 #include <tools/date.hxx>
+#include <i18nutil/calendar.hxx>
 
 #include <algorithm>
 #include <cassert>
@@ -132,13 +134,13 @@ void lcl_CalcJulDate(sal_Int32& _nJulianDate,sal_Int32& _nJulianTime, const css:
     if ( aDateTime.Year <= 0 )
     {
         _nJulianDate = static_cast<sal_Int32>((365.25 * iy0) - 0.75)
-            + static_cast<sal_Int32>(30.6001 * (im0 + 1) )
+            + static_cast<sal_Int32>(i18nutil::monthDaysWithoutJanFeb * (im0 + 1) )
             + aDateTime.Day + 1720994;
     } // if ( rDateTime.Year <= 0 )
     else
     {
         _nJulianDate = static_cast<sal_Int32>(365.25 * iy0)
-            + static_cast<sal_Int32>(30.6001 * (im0 + 1))
+            + static_cast<sal_Int32>(i18nutil::monthDaysWithoutJanFeb * (im0 + 1))
             + aDateTime.Day + 1720994;
     }
     double JD = _nJulianDate + 0.5;
@@ -164,8 +166,8 @@ void lcl_CalDate(sal_Int32 _nJulianDate,sal_Int32 _nJulianTime,css::util::DateTi
         sal_Int64 kb = ka + 1524;
         sal_Int64 kc = static_cast<sal_Int64>((static_cast<double>(kb) - 122.1) / 365.25);
         sal_Int64 kd = static_cast<sal_Int64>(static_cast<double>(kc) * 365.25);
-        sal_Int64 ke = static_cast<sal_Int64>(static_cast<double>(kb - kd) / 30.6001);
-        _rDateTime.Day = static_cast<sal_uInt16>(kb - kd - static_cast<sal_Int64>( static_cast<double>(ke) * 30.6001 ));
+        sal_Int64 ke = static_cast<sal_Int64>(static_cast<double>(kb - kd) / i18nutil::monthDaysWithoutJanFeb);
+        _rDateTime.Day = static_cast<sal_uInt16>(kb - kd - static_cast<sal_Int64>( static_cast<double>(ke) * i18nutil::monthDaysWithoutJanFeb ));
         if ( ke > 13 )
             _rDateTime.Month = static_cast<sal_uInt16>(ke - 13);
         else
@@ -763,7 +765,7 @@ Any SAL_CALL ODbaseTable::queryInterface( const Type & rType )
 }
 
 
-Sequence< sal_Int8 > ODbaseTable::getUnoTunnelId()
+const Sequence< sal_Int8 > & ODbaseTable::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();
@@ -783,7 +785,7 @@ bool ODbaseTable::fetchRow(OValueRefRow& _rRow, const OSQLColumns & _rCols, bool
         return false;
 
     // Read the data
-    bool bIsCurRecordDeleted = static_cast<char>(m_pBuffer[0]) == '*';
+    bool bIsCurRecordDeleted = m_pBuffer[0] == '*';
 
     // only read the bookmark
 
@@ -951,9 +953,9 @@ bool ODbaseTable::fetchRow(OValueRefRow& _rRow, const OSQLColumns & _rCols, bool
                         (*_rRow)[i]->setNull();
                         break;
                     }
-                    const sal_uInt16  nYear   = static_cast<sal_uInt16>(aStr.copy( 0, 4 ).toInt32());
-                    const sal_uInt16  nMonth  = static_cast<sal_uInt16>(aStr.copy( 4, 2 ).toInt32());
-                    const sal_uInt16  nDay    = static_cast<sal_uInt16>(aStr.copy( 6, 2 ).toInt32());
+                    const sal_uInt16  nYear   = static_cast<sal_uInt16>(o3tl::toInt32(aStr.subView( 0, 4 )));
+                    const sal_uInt16  nMonth  = static_cast<sal_uInt16>(o3tl::toInt32(aStr.subView( 4, 2 )));
+                    const sal_uInt16  nDay    = static_cast<sal_uInt16>(o3tl::toInt32(aStr.subView( 6, 2 )));
 
                     const css::util::Date aDate(nDay,nMonth,nYear);
                     *(*_rRow)[i] = aDate;
@@ -1004,9 +1006,6 @@ bool ODbaseTable::fetchRow(OValueRefRow& _rRow, const OSQLColumns & _rCols, bool
 void ODbaseTable::FileClose()
 {
     ::osl::MutexGuard aGuard(m_aMutex);
-    // if not everything has been written yet
-    if (m_pMemoStream && m_pMemoStream->IsWritable())
-        m_pMemoStream->Flush();
 
     m_pMemoStream.reset();
 
@@ -1017,7 +1016,7 @@ bool ODbaseTable::CreateImpl()
 {
     OSL_ENSURE(!m_pFileStream, "SequenceError");
 
-    if ( m_pConnection->isCheckEnabled() && ::dbtools::convertName2SQLName(m_Name,OUString()) != m_Name )
+    if ( m_pConnection->isCheckEnabled() && ::dbtools::convertName2SQLName(m_Name, u"") != m_Name )
     {
         const OUString sError( getConnection()->getResources().getResourceStringWithSubstitution(
                 STR_SQL_NAME_ERROR,
@@ -1415,12 +1414,11 @@ bool ODbaseTable::CreateMemoFile(const INetURLObject& aFile)
     m_pMemoStream->Seek(0);
     (*m_pMemoStream).WriteUInt32( 1 );                  // pointer to the first free block
 
-    m_pMemoStream->Flush();
     m_pMemoStream.reset();
     return true;
 }
 
-bool ODbaseTable::Drop_Static(const OUString& _sUrl, bool _bHasMemoFields, OCollection* _pIndexes )
+bool ODbaseTable::Drop_Static(std::u16string_view _sUrl, bool _bHasMemoFields, OCollection* _pIndexes )
 {
     INetURLObject aURL;
     aURL.SetURL(_sUrl);
@@ -1457,7 +1455,7 @@ bool ODbaseTable::Drop_Static(const OUString& _sUrl, bool _bHasMemoFields, OColl
             try
             {
                 ::ucbhelper::Content aDeleteContent( aURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ), Reference< XCommandEnvironment >(), comphelper::getProcessComponentContext() );
-                aDeleteContent.executeCommand( "delete", makeAny( true ) );
+                aDeleteContent.executeCommand( "delete", Any( true ) );
             }
             catch(const Exception&)
             {
@@ -1650,7 +1648,7 @@ Reference<XPropertySet> ODbaseTable::isUniqueByColumnName(sal_Int32 _nColumnPos)
     return Reference<XPropertySet>();
 }
 
-static double toDouble(const OString& rString)
+static double toDouble(std::string_view rString)
 {
     return ::rtl::math::stringToDouble( rString, '.', ',' );
 }
@@ -2195,7 +2193,7 @@ void ODbaseTable::alterColumn(sal_Int32 index,
 
         rtl::Reference<ODbaseTable> pNewTable = new ODbaseTable(m_pTables,static_cast<ODbaseConnection*>(m_pConnection));
         Reference<XPropertySet> xHoldTable = pNewTable;
-        pNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),makeAny(sTempName));
+        pNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),Any(sTempName));
         Reference<XAppend> xAppend(pNewTable->getColumns(),UNO_QUERY);
         OSL_ENSURE(xAppend.is(),"ODbaseTable::alterColumn: No XAppend interface!");
 
@@ -2337,7 +2335,7 @@ namespace
                                                 Any(sNewName),
                                                 css::beans::PropertyState_DIRECT_VALUE } };
             Sequence< Any > aValues;
-            aContent.executeCommand( "setPropertyValues",makeAny(aProps) ) >>= aValues;
+            aContent.executeCommand( "setPropertyValues",Any(aProps) ) >>= aValues;
             if(aValues.hasElements() && aValues[0].hasValue())
                 throw Exception("setPropertyValues returned non-zero", nullptr);
         }
@@ -2367,7 +2365,7 @@ void ODbaseTable::addColumn(const Reference< XPropertySet >& _xNewColumn)
     OUString sTempName = createTempFile();
 
     rtl::Reference xNewTable(new ODbaseTable(m_pTables,static_cast<ODbaseConnection*>(m_pConnection)));
-    xNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),makeAny(sTempName));
+    xNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),Any(sTempName));
     {
         Reference<XAppend> xAppend(xNewTable->getColumns(),UNO_QUERY);
         bool bCase = getConnection()->getMetaData()->supportsMixedCaseQuotedIdentifiers();
@@ -2425,7 +2423,7 @@ void ODbaseTable::dropColumn(sal_Int32 _nPos)
     OUString sTempName = createTempFile();
 
     rtl::Reference xNewTable(new ODbaseTable(m_pTables,static_cast<ODbaseConnection*>(m_pConnection)));
-    xNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),makeAny(sTempName));
+    xNewTable->setPropertyValue(OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_NAME),Any(sTempName));
     {
         Reference<XAppend> xAppend(xNewTable->getColumns(),UNO_QUERY);
         bool bCase = getConnection()->getMetaData()->supportsMixedCaseQuotedIdentifiers();
@@ -2479,16 +2477,14 @@ OUString ODbaseTable::createTempFile()
     if ( aIdent.lastIndexOf('/') != (aIdent.getLength()-1) )
         aIdent += "/";
 
-    OUString sTempName(aIdent);
     OUString sExt("." + m_pConnection->getExtension());
-    OUString sName(m_Name);
-    TempFile aTempFile(sName, true, &sExt, &sTempName);
-    if(!aTempFile.IsValid())
+    OUString aTempFileURL = utl::CreateTempURL(m_Name, true, sExt, &aIdent);
+    if(aTempFileURL.isEmpty())
         getConnection()->throwGenericSQLException(STR_COULD_NOT_ALTER_TABLE, *this);
 
     INetURLObject aURL;
     aURL.SetSmartProtocol(INetProtocol::File);
-    aURL.SetURL(aTempFile.GetURL());
+    aURL.SetURL(aTempFileURL);
 
     OUString sNewName(aURL.getName().copy(0, aURL.getName().getLength() - sExt.getLength()));
 
@@ -2685,7 +2681,7 @@ bool ODbaseTable::ReadMemo(std::size_t nBlockNo, ORowSetValue& aVariable)
 
             } while (!bReady && !m_pMemoStream->eof());
 
-            aVariable = OStringToOUString(aBStr.makeStringAndClear(),
+            aVariable = OStringToOUString(aBStr,
                 m_eEncoding);
 
         } break;
@@ -2719,7 +2715,7 @@ bool ODbaseTable::ReadMemo(std::size_t nBlockNo, ORowSetValue& aVariable)
                     //pad it out with ' ' to expected length on short read
                     sal_Int32 nRequested = sal::static_int_cast<sal_Int32>(nLength);
                     comphelper::string::padToLength(aBuffer, nRequested, ' ');
-                    aVariable = OStringToOUString(aBuffer.makeStringAndClear(), m_eEncoding);
+                    aVariable = OStringToOUString(aBuffer, m_eEncoding);
                 } // if ( bIsText )
                 else
                 {

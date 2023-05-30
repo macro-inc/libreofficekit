@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-06-29 13:08+0200\n"
-"PO-Revision-Date: 2022-08-22 14:05+0000\n"
-"Last-Translator: Petualang Sejati <dwienix@gmail.com>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-01-25 11:31+0000\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <https://translations.documentfoundation.org/projects/libo_help-master/textscalc02/id/>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -25,14 +25,14 @@ msgctxt ""
 msgid "Number format: Currency"
 msgstr "Format angka: Mata uang"
 
-#. qnxQS
+#. uC76y
 #: 02130000.xhp
 msgctxt ""
 "02130000.xhp\n"
 "hd_id3152892\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02130000.xhp\" name=\"Number format: Currency\">Number format: Currency</link>"
-msgstr "<link href=\"text/scalc/02/02130000.xhp\" name=\"Format Angka: Mata Uang\">Format angka: Mata Uang</link>"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Format angka: Mata Uang</link>"
 
 #. mDBPb
 #: 02130000.xhp
@@ -50,7 +50,7 @@ msgctxt ""
 "par_id3155267\n"
 "help.text"
 msgid "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Currency Number Format Icon</alt></image>"
-msgstr "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Ikon Format Nomor Mata Uang</alt></image>"
+msgstr "<image src=\"cmd/sc_currencyfield.svg\" id=\"img_id3159096\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159096\">Ikon Format Bilangan Mata Uang</alt></image>"
 
 #. KBVhJ
 #: 02130000.xhp
@@ -61,14 +61,14 @@ msgctxt ""
 msgid "Number Format: Currency"
 msgstr "Format Angka: Mata Uang"
 
-#. CDopB
+#. NGRbJ
 #: 02130000.xhp
 msgctxt ""
 "02130000.xhp\n"
 "par_id3146776\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>."
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Sel - Angka</link>."
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Format - Sel - Angka</link>."
 
 #. fjGg6
 #: 02140000.xhp
@@ -79,14 +79,14 @@ msgctxt ""
 msgid "Number format: Percent"
 msgstr "Format Angka: Persen"
 
-#. vpFDA
+#. uZTmE
 #: 02140000.xhp
 msgctxt ""
 "02140000.xhp\n"
 "hd_id3156329\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02140000.xhp\" name=\"Number format: Percent\">Number format: Percent</link>"
-msgstr "<link href=\"text/scalc/02/02140000.xhp\" name=\"Format angka: Persen\">Format angka: Persen</link>"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Format angka: Persen</link>"
 
 #. fzGGF
 #: 02140000.xhp
@@ -131,7 +131,7 @@ msgctxt ""
 "par_id3149260\n"
 "help.text"
 msgid "You can also enter a percentage sign (%) after a number in a cell:"
-msgstr "Anda juga dapat memasukkan tanda persentase (%) usai angka di dalam sel:"
+msgstr "Anda juga dapat memasukkan tanda persentase (%) setelah angka di dalam sel:"
 
 #. LKtGp
 #: 02140000.xhp
@@ -140,7 +140,7 @@ msgctxt ""
 "par_id3155411\n"
 "help.text"
 msgid "1% corresponds to 0.01"
-msgstr "1% sama dengan 0.01"
+msgstr "1% sama dengan 0,01"
 
 #. CwAEt
 #: 02140000.xhp
@@ -149,7 +149,7 @@ msgctxt ""
 "par_id3145749\n"
 "help.text"
 msgid "1 + 16% corresponds to 116% or 1.16"
-msgstr "1 + 16% sama dengan 116% atau 1.16"
+msgstr "1 + 16% sama dengan 116% atau 1,16"
 
 #. j7BsM
 #: 02140000.xhp
@@ -158,16 +158,16 @@ msgctxt ""
 "par_id3148575\n"
 "help.text"
 msgid "1%% corresponds to 0.0001"
-msgstr "1%% sama dengan 0.0001"
+msgstr "1%% sama dengan 0,001"
 
-#. DA27s
+#. a8EDH
 #: 02140000.xhp
 msgctxt ""
 "02140000.xhp\n"
 "par_id3159153\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>"
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">format - sel - angka</link>"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Format - Sel - Angka</link>"
 
 #. bX9GB
 #: 02150000.xhp
@@ -176,16 +176,16 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Number format: Default"
-msgstr "Format angka: Standar"
+msgstr "Format angka: Baku"
 
-#. di5Pr
+#. C4AsN
 #: 02150000.xhp
 msgctxt ""
 "02150000.xhp\n"
 "hd_id3149182\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02150000.xhp\" name=\"Number format: Default\">Number format: Default</link>"
-msgstr "<link href=\"text/scalc/02/02150000.xhp\" name=\"Format angka: Standar\">Format angka: Standar</link>"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Format angka: Baku</link>"
 
 #. CkVDA
 #: 02150000.xhp
@@ -194,7 +194,7 @@ msgctxt ""
 "par_id3163802\n"
 "help.text"
 msgid "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Applies the default number format to the selected cells.</ahelp>"
-msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Menerapkan bentuk angka standar pada sel yang dipilih.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatStandard\" visibility=\"visible\">Menerapkan bentuk angka baku pada sel yang dipilih.</ahelp>"
 
 #. MpiW2
 #: 02150000.xhp
@@ -214,14 +214,14 @@ msgctxt ""
 msgid "Number Format: Standard"
 msgstr "Format Angka: Standar"
 
-#. JDEfG
+#. 2JKys
 #: 02150000.xhp
 msgctxt ""
 "02150000.xhp\n"
 "par_id3154908\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>."
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">format - sel - angka</link>"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">format - Sel - Angka</link>."
 
 #. BhR4Z
 #: 02160000.xhp
@@ -232,14 +232,14 @@ msgctxt ""
 msgid "Number Format: Add Decimal Place"
 msgstr "Format Angka: Tambah Tempat Desimal"
 
-#. VsEUD
+#. BdJjx
 #: 02160000.xhp
 msgctxt ""
 "02160000.xhp\n"
 "hd_id3150275\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02160000.xhp\" name=\"Number Format: Add Decimal Place\">Number Format: Add Decimal Place</link>"
-msgstr "<link href=\"text/scalc/02/02160000.xhp\" name=\"Format Angka: Tambah Letak Desimal\">Format Angka: Tambah Letak Desimal</link>"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Format Angka: Tambah Letak Desimal</link>"
 
 #. jhPg6
 #: 02160000.xhp
@@ -277,14 +277,14 @@ msgctxt ""
 msgid "Number Format: Delete Decimal Place"
 msgstr "Format Angka: Hapus Tempat Desimal"
 
-#. ENVTM
+#. ixjiG
 #: 02170000.xhp
 msgctxt ""
 "02170000.xhp\n"
 "hd_id3149164\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02170000.xhp\" name=\"Number Format: Delete Decimal Place\">Number Format: Delete Decimal Place</link>"
-msgstr "<link href=\"text/scalc/02/02170000.xhp\" name=\"Format Angka: Hapus Letak Desimal\">Format Angka: Hapus Letak Desimal</link>"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Format Angka: Hapus Letak Desimal</link>"
 
 #. Eip8y
 #: 02170000.xhp
@@ -293,7 +293,7 @@ msgctxt ""
 "par_id3147264\n"
 "help.text"
 msgid "<ahelp hid=\".uno:NumberFormatDecDecimals\">Removes one decimal place from the numbers in the selected cells.</ahelp>"
-msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Membuat satu letak desimal dari bilangan dalam sel yang dipilih.</ahelp>"
+msgstr "<ahelp hid=\".uno:NumberFormatDecDecimals\">Menghapus satu letak desimal dari bilangan dalam sel yang dipilih.</ahelp>"
 
 #. FCfMZ
 #: 02170000.xhp
@@ -331,14 +331,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
 msgstr "<bookmark_value>bilah rumus; nama wilayah lembar</bookmark_value><bookmark_value>nama wilayah lembar</bookmark_value><bookmark_value>menampilkan; rujukan sel</bookmark_value><bookmark_value>rujukan sel; menampilkan</bookmark_value>"
 
-#. zo9WM
+#. ywEet
 #: 06010000.xhp
 msgctxt ""
 "06010000.xhp\n"
 "hd_id3156326\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06010000.xhp\" name=\"Name Box\">Name Box</link>"
-msgstr "<link href=\"text/scalc/02/06010000.xhp\" name=\"Kotak Nama\">Kotak Nama</link>"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Kotak Nama</link>"
 
 #. bJypW
 #: 06010000.xhp
@@ -394,14 +394,14 @@ msgctxt ""
 msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
 msgstr "<bookmark_value>fungsi;ikon fungsi jumlah</bookmark_value>   <bookmark_value>bilah rumus;fungsi jumlah</bookmark_value>   <bookmark_value>ikon jumlah</bookmark_value> <bookmark_value>tombol JumlahOtomatis, lihat ikon jumlah</bookmark_value>"
 
-#. vYDYK
+#. CiNzL
 #: 06030000.xhp
 msgctxt ""
 "06030000.xhp\n"
 "hd_id3157909\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06030000.xhp\" name=\"Sum\">Select Function</link>"
-msgstr "<link href=\"text/scalc/02/06030000.xhp\" name=\"Sum\">Pilih Fungsi</link>"
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr "<link href=\"text/scalc/02/06030000.xhp\">Pilih Fungsi</link>"
 
 #. KEkiG
 #: 06030000.xhp
@@ -446,7 +446,7 @@ msgctxt ""
 "par_id3156444\n"
 "help.text"
 msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
-msgstr "$[officename] secara otomatis menyarankan rentang sel, asalkan spreadsheet berisi data. Jika rentang sel sudah berisi fungsi, Anda dapat menggabungkannya dengan yang baru untuk menghasilkan fungsi yang diterapkan ke rentang data. Jika rentang berisi filter, fungsi Subtotal dimasukkan sebagai ganti fungsi yang dipilih."
+msgstr "$[officename] secara otomatis menyarankan rentang sel, asalkan lembar sebar berisi data. Jika rentang sel sudah berisi fungsi, Anda dapat menggabungkannya dengan yang baru untuk menghasilkan fungsi yang diterapkan ke rentang data. Jika rentang berisi filter, fungsi Sub total dimasukkan sebagai ganti fungsi yang dipilih."
 
 #. vpnqf
 #: 06030000.xhp
@@ -455,7 +455,7 @@ msgctxt ""
 "par_id3153189\n"
 "help.text"
 msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
-msgstr "Klik ikon <emph>Terima</emph> untuk menggunakan rumus yang ditampilkan di baris input atau <emph>Batal</emph>."
+msgstr "Klik ikon <emph>Terima</emph> untuk menggunakan rumus yang ditampilkan di baris masukan atau <emph>Batal</emph>."
 
 #. TVD6h
 #: 06030000.xhp
@@ -536,16 +536,16 @@ msgctxt ""
 "bm_id3150084\n"
 "help.text"
 msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
-msgstr "<bookmark_value>baris rumus; fungsi</bookmark_value><bookmark_value>fungsi; ikon baris rumus</bookmark_value>"
+msgstr "<bookmark_value>baris rumus; fungsi</bookmark_value><bookmark_value>fungsi; ikon bilah rumus</bookmark_value>"
 
-#. tnkP3
+#. ZGqd9
 #: 06040000.xhp
 msgctxt ""
 "06040000.xhp\n"
 "hd_id3150084\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06040000.xhp\" name=\"Function\">Function</link>"
-msgstr "<link href=\"text/scalc/02/06040000.xhp\" name=\"Fungsi\">Fungsi</link>"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Fungsi</link>"
 
 #. TnbLt
 #: 06040000.xhp
@@ -554,7 +554,7 @@ msgctxt ""
 "par_id3151245\n"
 "help.text"
 msgid "<ahelp hid=\"HID_INSWIN_FUNC\">Adds a formula to the current cell. Click this icon, and then enter the formula in the <emph>Input line</emph>.</ahelp>"
-msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Menambahkan rumus pada sel bersangkutan. Klik ikon ini, lalu masukkan rumus pada <emph>baris Masukan</emph>.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_FUNC\">Menambahkan rumus pada sel bersangkutan. Klik ikon ini, lalu masukkan rumus pada <emph>Baris masukan</emph>.</ahelp>"
 
 #. WH6iw
 #: 06040000.xhp
@@ -592,23 +592,23 @@ msgctxt ""
 msgid "Input line"
 msgstr "Baris masukan"
 
-#. CXdQo
+#. Vteqe
 #: 06050000.xhp
 msgctxt ""
 "06050000.xhp\n"
 "hd_id3153821\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06050000.xhp\" name=\"Input line\">Input line</link>"
-msgstr "<link href=\"text/scalc/02/06050000.xhp\" name=\"Baris masukan\">Baris masukan</link>"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Baris masukan</link>"
 
-#. 4R8nP
+#. Dgf7D
 #: 06050000.xhp
 msgctxt ""
 "06050000.xhp\n"
 "par_id3155922\n"
 "help.text"
-msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\" name=\"Function Wizard\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
-msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Memasukkan rumus yang hendak Anda tambah ke sel bersangkutan. Anda bisa menklik ikon <link href=\"text/scalc/01/04060000.xhp\" name=\"Pemandu Fungsi\">Pemandu Fungsi</link> untuk menyisipkan fungsi yang telah ditentukan sebelumnya ke dalam formula/rumus.</ahelp>"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Memasukkan rumus yang hendak Anda tambah ke sel bersangkutan. Anda bisa menklik ikon <link href=\"text/scalc/01/04060000.xhp\">Wahana Pandu Fungsi</link> untuk menyisipkan fungsi yang telah ditentukan sebelumnya ke dalam formula/rumus.</ahelp>"
 
 #. pBxxB
 #: 06060000.xhp
@@ -628,14 +628,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
 msgstr "<bookmark_value>baris rumus; membatalkan masukan</bookmark_value><bookmark_value>fungsi; ikon membatalkan masukan</bookmark_value>"
 
-#. nYGqw
+#. 4mACq
 #: 06060000.xhp
 msgctxt ""
 "06060000.xhp\n"
 "hd_id3154514\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06060000.xhp\" name=\"Cancel\">Cancel</link>"
-msgstr "<link href=\"text/scalc/02/06060000.xhp\" name=\"Batal\">Batal</link>"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Batal</link>"
 
 #. uafDY
 #: 06060000.xhp
@@ -644,7 +644,7 @@ msgctxt ""
 "par_id3153823\n"
 "help.text"
 msgid "<ahelp hid=\"HID_INSWIN_CANCEL\">Clears the contents of the <emph>Input line</emph>, or cancels the changes that you made to an existing formula.</ahelp>"
-msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Membersihkan isi dari <emph>baris Masukan</emph>, atau membatalkan perubahan yang Anda buat pada rumus yang ada.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_CANCEL\">Membersihkan isi dari <emph>Baris masukan</emph>, atau membatalkan perubahan yang Anda buat pada rumus yang ada.</ahelp>"
 
 #. DjEeK
 #: 06060000.xhp
@@ -682,14 +682,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
 msgstr "<bookmark_value>baris rumus; menerima masukan</bookmark_value><bookmark_value>fungsi; ikon menerima masukan</bookmark_value>"
 
-#. SK35g
+#. EnHFH
 #: 06070000.xhp
 msgctxt ""
 "06070000.xhp\n"
 "hd_id3143267\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06070000.xhp\" name=\"Accept\">Accept</link>"
-msgstr "<link href=\"text/scalc/02/06070000.xhp\" name=\"Terima\">Terima</link>"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Terima</link>"
 
 #. BBvqG
 #: 06070000.xhp
@@ -727,14 +727,14 @@ msgctxt ""
 msgid "Theme Selection"
 msgstr "Pemilihan Tema"
 
-#. 7zx5b
+#. nuJj7
 #: 06080000.xhp
 msgctxt ""
 "06080000.xhp\n"
 "hd_id3153087\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06080000.xhp\" name=\"Theme Selection\">Theme Selection</link>"
-msgstr "<link href=\"text/scalc/02/06080000.xhp\" name=\"Theme Selection\">Pemilihan Tema</link>"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Pemilihan Tema</link>"
 
 #. rVKiP
 #: 06080000.xhp
@@ -743,7 +743,7 @@ msgctxt ""
 "par_id3154515\n"
 "help.text"
 msgid "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Applies a formatting style to the selected cells.</ahelp></variable> The styles include font, border, and background color information."
-msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Menerapkan gaya pemformatan pada sel yang dipilih.</ahelp></variable> Gaya tersebut termasuklah di dalamnya informasi mengenai huruf, garis tepi, dan warna latar belakang."
+msgstr "<variable id=\"thementext\"><ahelp hid=\".uno:ChooseDesign\">Menerapkan gaya pemformatan pada sel yang dipilih.</ahelp></variable> Gaya tersebut termasuk informasi fonta, garis tepi, dan warna latar belakang."
 
 #. SEmnU
 #: 06080000.xhp
@@ -781,14 +781,14 @@ msgctxt ""
 msgid "Position in document"
 msgstr "Posisi dalam dokumen"
 
-#. RiLaz
+#. BNLiM
 #: 08010000.xhp
 msgctxt ""
 "08010000.xhp\n"
 "hd_id3145119\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/08010000.xhp\" name=\"Position in document\">Position in document</link>"
-msgstr "<link href=\"text/scalc/02/08010000.xhp\" name=\"Posisi dalam dokumen\">Posisi dalam dokumen</link>"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Posisi dalam dokumen</link>"
 
 #. L7Xk5
 #: 08010000.xhp
@@ -817,14 +817,14 @@ msgctxt ""
 msgid "<bookmark_value>formulas;status bar</bookmark_value>"
 msgstr "<bookmark_value>rumus;baris status</bookmark_value>"
 
-#. MFGFm
+#. FVYfS
 #: 08080000.xhp
 msgctxt ""
 "08080000.xhp\n"
 "hd_id3147335\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/08080000.xhp\" name=\"Standard Formula, Date/Time, Error Warning\">Standard Formula, Date/Time, Error Warning</link>"
-msgstr "<link href=\"text/scalc/02/08080000.xhp\" name=\"Rumus Standar, Tanggal/Waktu, Peringatan Kesalahan\">Rumus Standar, Tanggal/Waktu, Peringatan Kesalahan</link>"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Rumus Standar, Tanggal/Waktu, Peringatan Kesalahan</link>"
 
 #. gvyvx
 #: 08080000.xhp
@@ -842,16 +842,16 @@ msgctxt ""
 "par_id3155061\n"
 "help.text"
 msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
-msgstr "Untuk mengubah formula default yang ditampilkan, klik kanan pada field, lalu pilih formula yang diinginkan. Formula yang tersedia: Rata-rata, hitung nilai (COUNTA), hitung angka (COUNT), maksimum, minimum, jumlah, atau nihil."
+msgstr "Untuk mengubah formula default yang ditampilkan, klik kanan pada field, lalu pilih formula yang diinginkan. Formula yang tersedia: Rata-rata, hitung nilai (COUNTA), hitung angka (COUNT), Maksimum, Minimum, Jumlah, atau Nihil."
 
-#. hAizh
+#. dC4rs
 #: 08080000.xhp
 msgctxt ""
 "08080000.xhp\n"
 "par_id3153969\n"
 "help.text"
-msgid "<link href=\"text/scalc/05/02140000.xhp\" name=\"Error codes\">Error codes</link>"
-msgstr "<link href=\"text/scalc/05/02140000.xhp\" name=\"Kode kesalahan\">Kode kesalahan</link>"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Kode kesalahan</link>"
 
 #. 2fX5w
 #: 10050000.xhp
@@ -871,14 +871,14 @@ msgctxt ""
 msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
 msgstr "<bookmark_value>tampilan halaman; menaikkan skala</bookmark_value><bookmark_value>menaikkan skala dalam tampilan halaman</bookmark_value><bookmark_value>penzuman;memperbesar tampilan halaman</bookmark_value>"
 
-#. XBiGZ
+#. GESuX
 #: 10050000.xhp
 msgctxt ""
 "10050000.xhp\n"
 "hd_id3148491\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/10050000.xhp\" name=\"Zoom In\">Zoom In</link>"
-msgstr "<link href=\"text/scalc/02/10050000.xhp\" name=\"Perbesar\">Perbesar</link>"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Perbesar</link>"
 
 #. Uq4Tv
 #: 10050000.xhp
@@ -887,7 +887,7 @@ msgctxt ""
 "par_id3145069\n"
 "help.text"
 msgid "<ahelp hid=\".uno:ZoomIn\">Enlarges the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
-msgstr "<ahelp hid=\".uno:ZoomIn\">Memperbesar tampilan layar dari dokumen bersangkutan. Faktor teropong yang dipakai pada saat itu dapat dilihat pada <emph>Bilah Status</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomIn\">Memperbesar tampilan layar dari dokumen bersangkutan. Faktor zum yang dipakai pada saat itu dapat dilihat pada <emph>Bilah Status</emph>.</ahelp>"
 
 #. GBXen
 #: 10050000.xhp
@@ -896,7 +896,7 @@ msgctxt ""
 "par_id3145171\n"
 "help.text"
 msgid "The maximum zoom factor is 400%."
-msgstr "Faktor maksimum teropong adalah 400%."
+msgstr "Faktor maksimum zum adalah 400%."
 
 #. dD3H5
 #: 10050000.xhp
@@ -934,14 +934,14 @@ msgctxt ""
 msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
 msgstr "<bookmark_value>tampilan halaman;menyusutkan skala</bookmark_value><bookmark_value>meneropong;menyusutkan tampilan halaman</bookmark_value>"
 
-#. fwoCG
+#. Ffzbc
 #: 10060000.xhp
 msgctxt ""
 "10060000.xhp\n"
 "hd_id3153561\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/10060000.xhp\" name=\"Zoom Out\">Zoom Out</link>"
-msgstr "<link href=\"text/scalc/02/10060000.xhp\" name=\"Perkecil\">Perkecil</link>"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Perkecil</link>"
 
 #. BgFbq
 #: 10060000.xhp
@@ -950,7 +950,7 @@ msgctxt ""
 "par_id3151246\n"
 "help.text"
 msgid "<ahelp hid=\".uno:ZoomOut\">Reduces the screen display of the current document. The current zoom factor is displayed on the <emph>Status Bar</emph>.</ahelp>"
-msgstr "<ahelp hid=\".uno:ZoomOut\">Menyusutkan tampilan layar dari dokumen bersangkutan. Faktor teropong yang dipakai pada saat itu ditampilkan pada <emph>Bilah Status</emph>.</ahelp>"
+msgstr "<ahelp hid=\".uno:ZoomOut\">Menyusutkan tampilan layar dari dokumen bersangkutan. Faktor zum yang dipakai pada saat itu ditampilkan pada <emph>Bilah Status</emph>.</ahelp>"
 
 #. Czu2U
 #: 10060000.xhp
@@ -959,7 +959,7 @@ msgctxt ""
 "par_id3150398\n"
 "help.text"
 msgid "The minimum zoom factor is 20%."
-msgstr "Faktor minimum teropong adalah 20%."
+msgstr "Faktor minimum zum adalah 20%."
 
 #. DN9qj
 #: 10060000.xhp
@@ -977,7 +977,7 @@ msgctxt ""
 "par_id3150440\n"
 "help.text"
 msgid "Zooming Out"
-msgstr "Perkecil"
+msgstr "Memperkecil"
 
 #. BwqAM
 #: 18010000.xhp
@@ -997,14 +997,14 @@ msgctxt ""
 msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
 msgstr "<bookmark_value>menyisipkan; objek, ikon baris alat</bookmark_value>"
 
-#. nuhSb
+#. pM9zg
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3156329\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/18010000.xhp\" name=\"Insert\">Insert</link>"
-msgstr "<link href=\"text/scalc/02/18010000.xhp\" name=\"Sisip\">Sisip</link>"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Sisip</link>"
 
 #. UfEHG
 #: 18010000.xhp
@@ -1013,7 +1013,7 @@ msgctxt ""
 "par_id3147336\n"
 "help.text"
 msgid "<ahelp hid=\".uno:InsertCtrl\">Click the arrow next to the icon to open the <emph>Insert </emph>toolbar, where you can add graphics and special characters to the current sheet.</ahelp>"
-msgstr "<ahelp hid=\".uno:InsertCtrl\">Klik panah di samping ikon untuk membuka bilah alat <emph>Sisip</emph>, di mana Anda bisa menambahkan grafik dan karakter khusus ke dalam lembar saat ini.</ahelp>"
+msgstr "<ahelp hid=\".uno:InsertCtrl\">Klik panah di samping ikon untuk membuka bilah alat <emph>Sisip</emph>, dimana Anda bisa menambahkan grafik dan karakter khusus ke dalam lembar saat ini.</ahelp>"
 
 #. DnSkt
 #: 18010000.xhp
@@ -1022,7 +1022,7 @@ msgctxt ""
 "par_id3148664\n"
 "help.text"
 msgid "Tools bar icon:"
-msgstr "Ikon bilah Perkakas:"
+msgstr "Ikon bilah perkakas:"
 
 #. Eaf8D
 #: 18010000.xhp
@@ -1049,61 +1049,61 @@ msgctxt ""
 "par_id3153188\n"
 "help.text"
 msgid "You can select the following icons:"
-msgstr "Anda dapat memilik ikon-ikon berikut:"
+msgstr "Anda dapat memilih ikon-ikon berikut:"
 
-#. mimKi
+#. CCP2V
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id4283883\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04160500.xhp\" name=\"Floating Frame\">Floating Frame</link>"
-msgstr "<link href=\"text/shared/01/04160500.xhp\" name=\"Bingkai Mengambang\">Bingkai Mengambang</link>"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Bingkai Mengambang</link>"
 
-#. hJCq8
+#. gdmkZ
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3149410\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04100000.xhp\" name=\"Special Character\">Special Character</link>"
-msgstr "<link href=\"text/shared/01/04100000.xhp\" name=\"Karakter Khusus\">Karakter Khusus</link>"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Karakter Khusus</link>"
 
-#. 9YdEG
+#. FDin8
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3151117\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04140000.xhp\" name=\"From File\">From File</link>"
-msgstr "<link href=\"text/shared/01/04140000.xhp\" name=\"dari Berkas\">Dari Berkas</link>"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Dari Berkas</link>"
 
-#. kBXFP
+#. UKJsG
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3633533\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04160300.xhp\" name=\"Formula\">Formula</link>"
-msgstr "<link href=\"text/shared/01/04160300.xhp\" name=\"Rumus\">Rumus</link>"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Rumus</link>"
 
-#. MABzX
+#. sCB8B
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "par_idN10769\n"
 "help.text"
-msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Insert Chart\">Chart</link>"
-msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Sisip Bagan\">Bagan</link>"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Bagan</link>"
 
-#. 98CKi
+#. zc6Yi
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id7581408\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04150100.xhp\" name=\"OLE Object\">OLE Object</link>"
-msgstr "<link href=\"text/shared/01/04150100.xhp\" name=\"Objek OLE\">Objek OLE</link>"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">Objek OLE</link>"
 
 #. QMjWB
 #: 18020000.xhp
@@ -1123,14 +1123,14 @@ msgctxt ""
 msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
 msgstr "<bookmark_value>menyisipkan; sel, ikon bilah alat</bookmark_value>"
 
-#. CMJXh
+#. RysCQ
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3150275\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/18020000.xhp\" name=\"Insert Cells\">Insert Cells</link>"
-msgstr "<link href=\"text/scalc/02/18020000.xhp\" name=\"Sisip Sel\">Sisip Sel</link>"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Sisip Sel</link>"
 
 #. iTWkf
 #: 18020000.xhp
@@ -1148,7 +1148,7 @@ msgctxt ""
 "par_id3150398\n"
 "help.text"
 msgid "Tools bar icon:"
-msgstr "Ikon bilah Perkakas:"
+msgstr "Ikon bilah perkakas:"
 
 #. eqHih
 #: 18020000.xhp
@@ -1157,40 +1157,40 @@ msgctxt ""
 "par_id3150767\n"
 "help.text"
 msgid "You can select the following icons:"
-msgstr "Anda dapat memilik ikon-ikon berikut:"
+msgstr "Anda dapat memilih ikon-ikon berikut:"
 
-#. m2qTa
+#. JPhcE
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3150439\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Insert Cells Down\">Insert Cells Down</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Sisip Sel ke Bawah\">Sisip Sel ke Bawah</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Sisip Sel ke Bawah</link>"
 
-#. CLMtB
+#. c3Xmu
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3146119\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Insert Cells Right\">Insert Cells Right</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Sisip Sel di Kiri\">Sisip Sel di Kiri</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Sisip Sel di Kanan</link>"
 
-#. nv4or
+#. XXyxu
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3153190\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Rows\">Rows</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Baris\">Baris</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Baris</link>"
 
-#. ojZTY
+#. i4ifJ
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3153726\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Columns\">Columns</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Kolom\">Kolom</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Kolom</link>"

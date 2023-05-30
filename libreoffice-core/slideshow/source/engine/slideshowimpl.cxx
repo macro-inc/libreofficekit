@@ -18,13 +18,15 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <config_features.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/interfacecontainer.h>
 #include <cppuhelper/supportsservice.hxx>
 
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <cppcanvas/polypolygon.hxx>
@@ -80,6 +82,7 @@
 #include "pointersymbol.hxx"
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -198,7 +201,7 @@ class SlideShowImpl : private cppu::BaseMutex,
 {
 public:
     explicit SlideShowImpl(
-        uno::Reference<uno::XComponentContext> const& xContext );
+        uno::Reference<uno::XComponentContext> xContext );
 
     /** Notify that the transition phase of the current slide
         has ended.
@@ -400,7 +403,7 @@ private:
     UnoViewContainer                        maViewContainer;
 
     /// all registered slide show listeners
-    comphelper::OInterfaceContainerHelper2         maListenerContainer;
+    comphelper::OInterfaceContainerHelper3<presentation::XSlideShowListener> maListenerContainer;
 
     /// map of vectors, containing all registered listeners for a shape
     ShapeEventListenerMap                   maShapeEventListeners;
@@ -537,7 +540,7 @@ struct SlideShowImpl::SeparateListenerImpl : public EventHandler,
 };
 
 SlideShowImpl::SlideShowImpl(
-    uno::Reference<uno::XComponentContext> const& xContext )
+    uno::Reference<uno::XComponentContext> xContext )
     : SlideShowImplBase(m_aMutex),
       maViewContainer(),
       maListenerContainer( m_aMutex ),
@@ -561,7 +564,7 @@ SlideShowImpl::SlideShowImpl(
       mpWaitSymbol(),
       mpPointerSymbol(),
       mpCurrentSlideTransitionSound(),
-      mxComponentContext( xContext ),
+      mxComponentContext(std::move( xContext )),
       mxOptionalTransitionFactory(),
       mpCurrentSlide(),
       mpPrefetchSlide(),
@@ -871,7 +874,7 @@ ActivitySharedPtr SlideShowImpl::createSlideTransition(
                 0.0,
                 0.0,
                 ShapeSharedPtr(),
-                basegfx::B2DSize( rEnteringSlide->getSlideSize() ) ),
+                basegfx::B2DVector( rEnteringSlide->getSlideSize() ) ),
             pTransition,
             true ));
 }
@@ -1161,7 +1164,7 @@ void SlideShowImpl::displaySlide(
         }
     } // finally
 
-    maListenerContainer.forEach<presentation::XSlideShowListener>(
+    maListenerContainer.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideTransitionStarted();
@@ -1195,7 +1198,7 @@ void SlideShowImpl::redisplayCurrentSlide()
         makeEvent( [this] () { this->notifySlideTransitionEnded(true); },
             "SlideShowImpl::notifySlideTransitionEnded"));
 
-    maListenerContainer.forEach<presentation::XSlideShowListener>(
+    maListenerContainer.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideTransitionStarted();
@@ -1747,7 +1750,9 @@ sal_Bool SlideShowImpl::setProperty( beans::PropertyValue const& rProperty )
         if (!(rProperty.Value >>= visible))
             return false;
 
-        mpPointerSymbol->setVisible(visible);
+        if (!mbShowPaused)
+            mpPointerSymbol->setVisible(visible);
+
         return true;
     }
 
@@ -1757,7 +1762,9 @@ sal_Bool SlideShowImpl::setProperty( beans::PropertyValue const& rProperty )
         if (! (rProperty.Value >>= pos))
             return false;
 
-        mpPointerSymbol->viewsChanged(pos);
+        if (!mbShowPaused)
+            mpPointerSymbol->viewsChanged(pos);
+
         return true;
     }
 
@@ -1832,7 +1839,7 @@ void SlideShowImpl::addShapeEventListener(
         // no entry for this shape -> create one
         aIter = maShapeEventListeners.emplace(
                 xShape,
-                std::make_shared<comphelper::OInterfaceContainerHelper2>(
+                std::make_shared<comphelper::OInterfaceContainerHelper3<css::presentation::XShapeEventListener>>(
                     m_aMutex)).first;
     }
 
@@ -2252,7 +2259,7 @@ void SlideShowImpl::notifySlideAnimationsEnded()
         }
     } // finally
 
-    maListenerContainer.forEach<presentation::XSlideShowListener>(
+    maListenerContainer.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideAnimationsEnded();
@@ -2298,7 +2305,7 @@ void SlideShowImpl::notifySlideEnded (const bool bReverse)
                  // shape animations (drawing layer and
                  // GIF) will not be stopped.
 
-    maListenerContainer.forEach<presentation::XSlideShowListener>(
+    maListenerContainer.forEach(
         [&bReverse]( const uno::Reference< presentation::XSlideShowListener >& xListener )
         { return xListener->slideEnded( bReverse ); } );
 }
@@ -2307,7 +2314,7 @@ bool SlideShowImpl::notifyHyperLinkClicked( OUString const& hyperLink )
 {
     osl::MutexGuard const guard( m_aMutex );
 
-    maListenerContainer.forEach<presentation::XSlideShowListener>(
+    maListenerContainer.forEach(
         [&hyperLink]( const uno::Reference< presentation::XSlideShowListener >& xListener )
         { return xListener->hyperLinkClicked( hyperLink ); } );
     return true;
@@ -2325,14 +2332,14 @@ bool SlideShowImpl::handleAnimationEvent( const AnimationNodeSharedPtr& rNode )
     switch( rNode->getState() )
     {
     case AnimationNode::ACTIVE:
-        maListenerContainer.forEach<presentation::XSlideShowListener>(
+        maListenerContainer.forEach(
             [&xNode]( const uno::Reference< animations::XAnimationListener >& xListener )
             { return xListener->beginEvent( xNode ); } );
         break;
 
     case AnimationNode::FROZEN:
     case AnimationNode::ENDED:
-        maListenerContainer.forEach<presentation::XSlideShowListener>(
+        maListenerContainer.forEach(
             [&xNode]( const uno::Reference< animations::XAnimationListener >& xListener )
             { return xListener->endEvent( xNode ); } );
         if(mpCurrentSlide->isPaintOverlayActive())
@@ -2349,6 +2356,9 @@ std::shared_ptr<avmedia::MediaTempFile> SlideShowImpl::getMediaTempFile(const OU
 {
     std::shared_ptr<avmedia::MediaTempFile> aRet;
 
+#if !HAVE_FEATURE_AVMEDIA
+    (void)aUrl;
+#else
     if (!mxSBD.is())
         return aRet;
 
@@ -2372,6 +2382,7 @@ std::shared_ptr<avmedia::MediaTempFile> SlideShowImpl::getMediaTempFile(const OU
 
         xInStream->closeInput();
     }
+#endif
 
     return aRet;
 }

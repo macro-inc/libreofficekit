@@ -47,12 +47,12 @@ class SwEditRegionDlg final : public SfxDialogController
 {
     bool            m_bSubRegionsFilled;
 
-    SwWrtShell&             rSh;
+    SwWrtShell&             m_rSh;
     SectReprs_t             m_SectReprs;
-    const SwSection*        pCurrSect;
+    const SwSection*        m_pCurrSect;
     std::unique_ptr<sfx2::DocumentInserter> m_pDocInserter;
 
-    bool            bDontCheckPasswd :1;
+    bool            m_bDontCheckPasswd :1;
 
     std::unique_ptr<weld::Entry> m_xCurName;
     std::unique_ptr<weld::TreeView>  m_xTree;
@@ -227,7 +227,7 @@ public:
 
 class SwInsertSectionTabDialog final : public SfxTabDialogController
 {
-    SwWrtShell&     rWrtSh;
+    SwWrtShell&     m_rWrtSh;
     std::unique_ptr<SwSectionData> m_pSectionData;
 
     virtual void    PageCreated(const OString& rId, SfxTabPage &rPage) override;
@@ -242,7 +242,7 @@ public:
 
 class SwSectionPropertyTabDialog final : public SfxTabDialogController
 {
-    SwWrtShell& rWrtSh;
+    SwWrtShell& m_rWrtSh;
 
     virtual void    PageCreated(const OString& rId, SfxTabPage &rPage) override;
 public:

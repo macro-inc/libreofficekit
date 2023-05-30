@@ -29,6 +29,7 @@
 #include <comphelper/propstate.hxx>
 #include <comphelper/comphelperdllapi.h>
 
+#include <cstddef>
 #include <map>
 #include <memory>
 #include <vector>
@@ -49,20 +50,15 @@ namespace internal
     struct OPropertyAccessor
     {
         sal_Int32   nOriginalHandle;
-        sal_Int32   nPos;
+        std::size_t nPos;
         bool        bAggregate;
 
-        OPropertyAccessor(sal_Int32 _nOriginalHandle, sal_Int32 _nPos, bool _bAggregate)
+        OPropertyAccessor(sal_Int32 _nOriginalHandle, std::size_t _nPos, bool _bAggregate)
             :nOriginalHandle(_nOriginalHandle) ,nPos(_nPos) ,bAggregate(_bAggregate) { }
-        OPropertyAccessor()
-            :nOriginalHandle(-1) ,nPos(-1) ,bAggregate(false) { }
 
         bool operator==(const OPropertyAccessor& rOb) const { return nPos == rOb.nPos; }
         bool operator <(const OPropertyAccessor& rOb) const { return nPos < rOb.nPos; }
     };
-
-    typedef std::map< sal_Int32, OPropertyAccessor >  PropertyAccessorMap;
-    typedef PropertyAccessorMap::const_iterator     ConstPropertyAccessorMapIterator;
 }
 
 
@@ -95,7 +91,7 @@ class COMPHELPER_DLLPUBLIC OPropertyArrayAggregationHelper final : public ::cppu
     friend class OPropertySetAggregationHelper;
 
     std::vector<css::beans::Property>         m_aProperties;
-    internal::PropertyAccessorMap             m_aPropertyAccessors;
+    std::map< sal_Int32, internal::OPropertyAccessor > m_aPropertyAccessors;
 
 public:
     /** construct the object.

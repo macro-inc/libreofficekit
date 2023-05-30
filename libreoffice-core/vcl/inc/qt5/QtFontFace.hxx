@@ -25,8 +25,6 @@
 #include <font/PhysicalFontFace.hxx>
 
 #include <tools/ref.hxx>
-#include <vcl/fontcapabilities.hxx>
-#include <vcl/fontcharmap.hxx>
 
 #include <QtCore/QString>
 #include <QtGui/QFont>
@@ -51,26 +49,20 @@ public:
     sal_IntPtr GetFontId() const override;
 
     QFont CreateFont() const;
-    int GetFontTable(const char pTagName[5], unsigned char*) const;
-
-    FontCharMapRef GetFontCharMap() const override;
-    bool GetFontCapabilities(vcl::FontCapabilities&) const override;
-    bool HasChar(sal_uInt32 cChar) const;
 
     rtl::Reference<LogicalFontInstance>
     CreateFontInstance(const vcl::font::FontSelectPattern& rFSD) const override;
+
+    hb_blob_t* GetHbTable(hb_tag_t nTag) const override;
 
 private:
     typedef enum { Font, FontDB } FontIdType;
 
     QtFontFace(const QtFontFace&);
-    QtFontFace(const FontAttributes&, const QString& rFontID, const FontIdType);
+    QtFontFace(const FontAttributes&, QString rFontID, const FontIdType);
 
     const QString m_aFontId;
     const FontIdType m_eFontIdType;
-    mutable FontCharMapRef m_xCharMap;
-    mutable vcl::FontCapabilities m_aFontCapabilities;
-    mutable bool m_bFontCapabilitiesRead;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

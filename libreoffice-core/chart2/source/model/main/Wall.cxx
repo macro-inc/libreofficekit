@@ -24,7 +24,6 @@
 #include <PropertyHelper.hxx>
 #include <ModifyListenerHelper.hxx>
 #include <com/sun/star/drawing/LineStyle.hpp>
-#include <tools/diagnose_ex.h>
 
 #include <vector>
 #include <algorithm>
@@ -107,18 +106,25 @@ namespace chart
 {
 
 Wall::Wall() :
-        ::property::OPropertySet( m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 Wall::Wall( const Wall & rOther ) :
         impl::Wall_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 Wall::~Wall()
 {}
+
+// ____ XTypeProvider ____
+uno::Sequence< css::uno::Type > SAL_CALL Wall::getTypes()
+{
+    return ::comphelper::concatSequences(
+        impl::Wall_Base::getTypes(),
+        ::property::OPropertySet::getTypes());
+}
 
 // ____ XCloneable ____
 uno::Reference< util::XCloneable > SAL_CALL Wall::createClone()
@@ -127,13 +133,14 @@ uno::Reference< util::XCloneable > SAL_CALL Wall::createClone()
 }
 
 // ____ OPropertySet ____
-uno::Any Wall::GetDefaultValue( sal_Int32 nHandle ) const
+void Wall::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticWallDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL Wall::getInfoHelper()
@@ -150,28 +157,12 @@ uno::Reference< beans::XPropertySetInfo > SAL_CALL Wall::getPropertySetInfo()
 // ____ XModifyBroadcaster ____
 void SAL_CALL Wall::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL Wall::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

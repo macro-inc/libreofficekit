@@ -22,7 +22,7 @@
 #include <xmloff/xmltoken.hxx>
 #include <strings.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace dbaxml
 {
@@ -118,7 +118,7 @@ OXMLServerDatabase::OXMLServerDatabase( ODBFilter& rImport,
     }
     try
     {
-        xDataSource->setPropertyValue(PROPERTY_URL,makeAny(sURL.makeStringAndClear()));
+        xDataSource->setPropertyValue(PROPERTY_URL,Any(sURL.makeStringAndClear()));
     }
     catch(const Exception&)
     {

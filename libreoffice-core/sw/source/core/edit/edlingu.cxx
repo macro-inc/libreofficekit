@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <com/sun/star/frame/XModel.hpp>
 #include <com/sun/star/linguistic2/ProofreadingResult.hpp>
 #include <com/sun/star/linguistic2/XProofreadingIterator.hpp>
 #include <com/sun/star/linguistic2/XHyphenatedWord.hpp>
@@ -55,6 +54,7 @@
 #include <docsh.hxx>
 #include <txatbase.hxx>
 #include <txtfrm.hxx>
+#include <comphelper/propertyvalue.hxx>
 
 using namespace ::svx;
 using namespace ::com::sun::star;
@@ -121,11 +121,11 @@ class SwSpellIter : public SwLinguIter
     bool m_bBackToStartOfSentence;
 
     void    CreatePortion(uno::Reference< XSpellAlternatives > const & xAlt,
-                linguistic2::ProofreadingResult* pGrammarResult,
+                const linguistic2::ProofreadingResult* pGrammarResult,
                 bool bIsField, bool bIsHidden);
 
     void    AddPortion(uno::Reference< XSpellAlternatives > const & xAlt,
-                       linguistic2::ProofreadingResult* pGrammarResult,
+                       const linguistic2::ProofreadingResult* pGrammarResult,
                        const SpellContentPositions& rDeletedRedlines);
 public:
     SwSpellIter()
@@ -366,7 +366,7 @@ uno::Any SwConvIter::Continue( sal_uInt16* pPageCnt, sal_uInt16* pPageSt )
     //!! Please check SwSpellIter also when modifying this
     //!!
 
-    uno::Any    aConvRet( makeAny( OUString() ) );
+    uno::Any    aConvRet{ OUString() };
     SwEditShell *pMySh = GetSh();
     if( !pMySh )
         return aConvRet;
@@ -417,7 +417,7 @@ uno::Any SwConvIter::Continue( sal_uInt16* pPageCnt, sal_uInt16* pPageSt )
             --GetCursorCnt();
         }
     }while ( bGoOn );
-    return makeAny( aConvText );
+    return Any( aConvText );
 }
 
 bool SwHyphIter::IsAuto()
@@ -529,16 +529,16 @@ void SwHyphIter::Ignore()
     DelSoftHyph( *pCursor );
 
     // and continue
-    pCursor->Start()->nContent = pCursor->End()->nContent;
+    pCursor->Start()->SetContent( pCursor->End()->GetContentIndex() );
     pCursor->SetMark();
 }
 
 void SwHyphIter::DelSoftHyph( SwPaM &rPam )
 {
     const SwPosition* pStt = rPam.Start();
-    const sal_Int32 nStart = pStt->nContent.GetIndex();
-    const sal_Int32 nEnd   = rPam.End()->nContent.GetIndex();
-    SwTextNode *pNode = pStt->nNode.GetNode().GetTextNode();
+    const sal_Int32 nStart = pStt->GetContentIndex();
+    const sal_Int32 nEnd   = rPam.End()->GetContentIndex();
+    SwTextNode *pNode = pStt->GetNode().GetTextNode();
     pNode->DelSoftHyph( nStart, nEnd );
 }
 
@@ -550,15 +550,14 @@ void SwHyphIter::InsertSoftHyph( const sal_Int32 nHyphPos )
         return;
 
     SwPaM *pCursor = pMySh->GetCursor();
-    SwPosition* pSttPos = pCursor->Start();
-    SwPosition* pEndPos = pCursor->End();
+    auto [pSttPos, pEndPos] = pCursor->StartEnd(); // SwPosition*
 
-    const sal_Int32 nLastHyphLen = GetEnd()->nContent.GetIndex() -
-                          pSttPos->nContent.GetIndex();
+    const sal_Int32 nLastHyphLen = GetEnd()->GetContentIndex() -
+                          pSttPos->GetContentIndex();
 
-    if( pSttPos->nNode != pEndPos->nNode || !nLastHyphLen )
+    if( pSttPos->GetNode() != pEndPos->GetNode() || !nLastHyphLen )
     {
-        OSL_ENSURE( pSttPos->nNode == pEndPos->nNode,
+        OSL_ENSURE( pSttPos->GetNode() == pEndPos->GetNode(),
                 "SwHyphIter::InsertSoftHyph: node warp during hyphenation" );
         OSL_ENSURE(nLastHyphLen, "SwHyphIter::InsertSoftHyph: missing HyphContinue()");
         *pSttPos = *pEndPos;
@@ -569,7 +568,7 @@ void SwHyphIter::InsertSoftHyph( const sal_Int32 nHyphPos )
     {
         SwDoc *pDoc = pMySh->GetDoc();
         DelSoftHyph( *pCursor );
-        pSttPos->nContent += nHyphPos;
+        pSttPos->AdjustContent( +nHyphPos );
         SwPaM aRg( *pSttPos );
         pDoc->getIDocumentContentOperations().InsertString( aRg, OUString(CHAR_SOFTHYPHEN) );
     }
@@ -839,15 +838,15 @@ void SwEditShell::HandleCorrectionError(const OUString& aText, SwPosition aPos, 
                                         SwRect& rSelectRect)
 {
     // save the start and end positions of the line and the starting point
-    SwNode const& rNode(GetCursor()->GetPoint()->nNode.GetNode());
+    SwNode const& rNode(GetCursor()->GetPoint()->GetNode());
     Push();
     LeftMargin();
-    const sal_Int32 nLineStart = &rNode == &GetCursor()->GetPoint()->nNode.GetNode()
-        ? GetCursor()->GetPoint()->nContent.GetIndex()
+    const sal_Int32 nLineStart = &rNode == &GetCursor()->GetPoint()->GetNode()
+        ? GetCursor()->GetPoint()->GetContentIndex()
         : 0;
     RightMargin();
-    const sal_Int32 nLineEnd = &rNode == &GetCursor()->GetPoint()->nNode.GetNode()
-        ? GetCursor()->GetPoint()->nContent.GetIndex()
+    const sal_Int32 nLineEnd = &rNode == &GetCursor()->GetPoint()->GetNode()
+        ? GetCursor()->GetPoint()->GetContentIndex()
         : rNode.GetTextNode()->Len();
     Pop(PopMode::DeleteCurrent);
 
@@ -864,7 +863,7 @@ void SwEditShell::HandleCorrectionError(const OUString& aText, SwPosition aPos, 
     while (pChar && *pChar-- == CH_TXTATR_INWORD)
         ++nRight;
 
-    aPos.nContent = nBegin + nLeft;
+    aPos.SetContent( nBegin + nLeft );
     SwPaM* pCursor = GetCursor();
     *pCursor->GetPoint() = aPos;
     pCursor->SetMark();
@@ -876,12 +875,12 @@ void SwEditShell::HandleCorrectionError(const OUString& aText, SwPosition aPos, 
                             ? nLineEnd : (nBegin + nLen - nLeft - nRight);
     Push();
     pCursor->DeleteMark();
-    SwIndex& rContent = GetCursor()->GetPoint()->nContent;
-    rContent = nWordStart;
+    SwPosition& rPtPos = *GetCursor()->GetPoint();
+    rPtPos.SetContent(nWordStart);
     SwRect aStartRect;
     SwCursorMoveState aState;
     aState.m_bRealWidth = true;
-    SwContentNode* pContentNode = pCursor->GetContentNode();
+    SwContentNode* pContentNode = pCursor->GetPointContentNode();
     std::pair<Point, bool> tmp;
     if (pPt)
     {
@@ -891,7 +890,7 @@ void SwEditShell::HandleCorrectionError(const OUString& aText, SwPosition aPos, 
     SwContentFrame *const pContentFrame = pContentNode->getLayoutFrame(GetLayout(), pCursor->GetPoint(), pPt ? &tmp : nullptr);
 
     pContentFrame->GetCharRect( aStartRect, *pCursor->GetPoint(), &aState );
-    rContent = nWordEnd - 1;
+    rPtPos.SetContent(nWordEnd - 1);
     SwRect aEndRect;
     pContentFrame->GetCharRect( aEndRect, *pCursor->GetPoint(),&aState );
     rSelectRect = aStartRect.Union( aEndRect );
@@ -919,14 +918,14 @@ uno::Reference< XSpellAlternatives >
     SwTextNode *pNode = nullptr;
     SwWrongList *pWrong = nullptr;
     if (pPt && GetLayout()->GetModelPositionForViewPoint( &aPos, *const_cast<Point*>(pPt), &eTmpState ))
-        pNode = aPos.nNode.GetNode().GetTextNode();
+        pNode = aPos.GetNode().GetTextNode();
     if (nullptr == pNode)
-        pNode = pCursor->GetNode().GetTextNode();
+        pNode = pCursor->GetPointNode().GetTextNode();
     if (nullptr != pNode)
         pWrong = pNode->GetWrong();
     if (nullptr != pWrong && !pNode->IsInProtectSect())
     {
-        sal_Int32 nBegin = aPos.nContent.GetIndex();
+        sal_Int32 nBegin = aPos.GetContentIndex();
         sal_Int32 nLen = 1;
         if (pWrong->InWrongWord(nBegin, nLen) && !pNode->IsSymbolAt(nBegin))
         {
@@ -934,6 +933,7 @@ uno::Reference< XSpellAlternatives >
             // TODO: this doesn't handle fieldmarks properly
             ModelToViewHelper const aConversionMap(*pNode, GetLayout(),
                 ExpandMode::ExpandFields | ExpandMode::ExpandFootnote | ExpandMode::ReplaceMode
+                | ExpandMode::HideFieldmarkCommands
                 | (GetLayout()->IsHideRedlines() ? ExpandMode::HideDeletions : ExpandMode(0))
                 | (GetViewOptions()->IsShowHiddenChar() ? ExpandMode(0) : ExpandMode::HideInvisible));
             auto const nBeginView(aConversionMap.ConvertToViewPosition(nBegin));
@@ -956,10 +956,7 @@ uno::Reference< XSpellAlternatives >
                     // than returning e.g. 16 suggestions and using only the
                     // first 7. Thus we hand down the value to use to that
                     // implementation here by providing an additional parameter.
-                    Sequence< PropertyValue > aPropVals(1);
-                    PropertyValue &rVal = aPropVals.getArray()[0];
-                    rVal.Name = UPN_MAX_NUMBER_OF_SUGGESTIONS;
-                    rVal.Value <<= sal_Int16(7);
+                    Sequence< PropertyValue > aPropVals ( { comphelper::makePropertyValue( UPN_MAX_NUMBER_OF_SUGGESTIONS, sal_Int16(7)) } );
 
                     xSpellAlt = xSpell->spell( aWord, static_cast<sal_uInt16>(eActLang), aPropVals );
                 }
@@ -967,7 +964,7 @@ uno::Reference< XSpellAlternatives >
 
             if ( xSpellAlt.is() )   // error found?
             {
-                HandleCorrectionError( aText, aPos, nBegin, nLen, pPt, rSelectRect );
+                HandleCorrectionError( aText, std::move(aPos), nBegin, nLen, pPt, rSelectRect );
             }
         }
     }
@@ -992,14 +989,14 @@ bool SwEditShell::GetGrammarCorrection(
     SwTextNode *pNode = nullptr;
     SwGrammarMarkUp *pWrong = nullptr;
     if (pPt && GetLayout()->GetModelPositionForViewPoint( &aPos, *const_cast<Point*>(pPt), &eTmpState ))
-        pNode = aPos.nNode.GetNode().GetTextNode();
+        pNode = aPos.GetNode().GetTextNode();
     if (nullptr == pNode)
-        pNode = pCursor->GetNode().GetTextNode();
+        pNode = pCursor->GetPointNode().GetTextNode();
     if (nullptr != pNode)
         pWrong = pNode->GetGrammarCheck();
     if (nullptr != pWrong && !pNode->IsInProtectSect())
     {
-        sal_Int32 nBegin = aPos.nContent.GetIndex();
+        sal_Int32 nBegin = aPos.GetContentIndex();
         sal_Int32 nLen = 1;
         if (pWrong->InWrongWord(nBegin, nLen))
         {
@@ -1044,7 +1041,7 @@ bool SwEditShell::GetGrammarCorrection(
 
             if (rResult.aErrors.hasElements())    // error found?
             {
-                HandleCorrectionError( aText, aPos, nBegin, nLen, pPt, rSelectRect );
+                HandleCorrectionError( aText, std::move(aPos), nBegin, nLen, pPt, rSelectRect );
             }
         }
     }
@@ -1152,8 +1149,8 @@ void SwEditShell::ApplyChangedSentence(const svx::SpellPortions& rNewPortions, b
             }
             if ( !pCursor->HasMark() )
                 pCursor->SetMark();
-            pCursor->GetPoint()->nContent = aCurrentOldPosition->nLeft;
-            pCursor->GetMark()->nContent = aCurrentOldPosition->nRight;
+            pCursor->GetPoint()->SetContent( aCurrentOldPosition->nLeft );
+            pCursor->GetMark()->SetContent( aCurrentOldPosition->nRight );
             sal_uInt16 nScriptType = SvtLanguageOptions::GetI18NScriptTypeOfLanguage( aCurrentNewPortion->eLanguage );
             sal_uInt16 nLangWhichId = RES_CHRATR_LANGUAGE;
             switch(nScriptType)
@@ -1167,6 +1164,22 @@ void SwEditShell::ApplyChangedSentence(const svx::SpellPortions& rNewPortions, b
                 // ... and apply language if necessary
                 if(aCurrentNewPortion->eLanguage != aCurrentOldPortion->eLanguage)
                     SetAttrItem( SvxLanguageItem(aCurrentNewPortion->eLanguage, nLangWhichId) );
+
+                // if there is a comment inside the original word, don't delete it:
+                // but keep it at the end of the replacement
+                // TODO: keep all the comments with a recursive function
+                sal_Int32 nCommentPos(pCursor->GetText().indexOf(OUStringChar(CH_TXTATR_INWORD)));
+                if ( nCommentPos > -1 )
+                {
+                    // delete the original word after the comment
+                    pCursor->GetPoint()->AdjustContent(nCommentPos + 1);
+
+                    mxDoc->getIDocumentContentOperations().ReplaceRange(*pCursor, OUString(), false);
+                    // and select only the remaining part before the comment
+                    pCursor->GetPoint()->AdjustContent(-(nCommentPos + 1));
+                    pCursor->GetMark()->AdjustContent(-1);
+                }
+
                 mxDoc->getIDocumentContentOperations().ReplaceRange(*pCursor, aCurrentNewPortion->sText, false);
             }
             else if(aCurrentNewPortion->eLanguage != aCurrentOldPortion->eLanguage)
@@ -1191,8 +1204,8 @@ void SwEditShell::ApplyChangedSentence(const svx::SpellPortions& rNewPortions, b
         SpellContentPositions::const_iterator aCurrentEndPosition = rLastPositions.end();
         --aCurrentEndPosition;
         SpellContentPositions::const_iterator aCurrentStartPosition = rLastPositions.begin();
-        pCursor->GetPoint()->nContent = aCurrentStartPosition->nLeft;
-        pCursor->GetMark()->nContent = aCurrentEndPosition->nRight;
+        pCursor->GetPoint()->SetContent( aCurrentStartPosition->nLeft );
+        pCursor->GetMark()->SetContent( aCurrentEndPosition->nRight );
 
         // delete the sentence completely
         mxDoc->getIDocumentContentOperations().DeleteAndJoin(*pCursor);
@@ -1251,15 +1264,15 @@ static SpellContentPositions lcl_CollectDeletedRedlines(SwEditShell const * pSh)
     {
         SwPaM *pCursor = pSh->GetCursor();
         const SwPosition* pStartPos = pCursor->Start();
-        const SwTextNode* pTextNode = pCursor->GetNode().GetTextNode();
+        const SwTextNode* pTextNode = pCursor->GetPointNode().GetTextNode();
 
         SwRedlineTable::size_type nAct = pDoc->getIDocumentRedlineAccess().GetRedlinePos( *pTextNode, RedlineType::Any );
-        const sal_Int32 nStartIndex = pStartPos->nContent.GetIndex();
+        const sal_Int32 nStartIndex = pStartPos->GetContentIndex();
         for ( ; nAct < pDoc->getIDocumentRedlineAccess().GetRedlineTable().size(); nAct++ )
         {
             const SwRangeRedline* pRed = pDoc->getIDocumentRedlineAccess().GetRedlineTable()[ nAct ];
 
-            if ( pRed->Start()->nNode > pTextNode->GetIndex() )
+            if ( pRed->Start()->GetNode() > *pTextNode )
                 break;
 
             if( RedlineType::Delete == pRed->GetType() )
@@ -1288,7 +1301,7 @@ static void lcl_CutRedlines( SpellContentPositions& aDeletedRedlines, SwEditShel
     {
         SwPaM *pCursor = pSh->GetCursor();
         const SwPosition* pEndPos = pCursor->End();
-        const sal_Int32 nEnd = pEndPos->nContent.GetIndex();
+        const sal_Int32 nEnd = pEndPos->GetContentIndex();
         while(!aDeletedRedlines.empty() &&
                 aDeletedRedlines.back().nLeft > nEnd)
         {
@@ -1411,17 +1424,16 @@ bool SwSpellIter::SpellSentence(svx::SpellPortions& rPortions, bool bIsGrammarCh
         pMySh->GoEndSentence();
         if( bGrammarErrorFound )
         {
-            const ModelToViewHelper aConversionMap(static_cast<SwTextNode&>(pCursor->GetNode()), pMySh->GetLayout());
+            const ModelToViewHelper aConversionMap(static_cast<SwTextNode&>(pCursor->GetPointNode()), pMySh->GetLayout());
             const OUString& aExpandText = aConversionMap.getViewText();
             sal_Int32 nSentenceEnd =
                 aConversionMap.ConvertToViewPosition( aGrammarResult.nBehindEndOfSentencePosition );
             // remove trailing space
             if( aExpandText[nSentenceEnd - 1] == ' ' )
                 --nSentenceEnd;
-            if( pCursor->End()->nContent.GetIndex() < nSentenceEnd )
+            if( pCursor->End()->GetContentIndex() < nSentenceEnd )
             {
-                pCursor->End()->nContent.Assign(
-                    pCursor->End()->nNode.GetNode().GetContentNode(), nSentenceEnd);
+                pCursor->End()->SetContent(nSentenceEnd);
             }
         }
 
@@ -1535,7 +1547,7 @@ static LanguageType lcl_GetLanguage(SwEditShell& rSh)
 
 /// create a text portion at the given position
 void SwSpellIter::CreatePortion(uno::Reference< XSpellAlternatives > const & xAlt,
-                        linguistic2::ProofreadingResult* pGrammarResult,
+                        const linguistic2::ProofreadingResult* pGrammarResult,
         bool bIsField, bool bIsHidden)
 {
     svx::SpellPortion aPortion;
@@ -1569,14 +1581,14 @@ void SwSpellIter::CreatePortion(uno::Reference< XSpellAlternatives > const & xAl
     aPortion.xAlternatives = xAlt;
     SpellContentPosition aPosition;
     SwPaM *pCursor = GetSh()->GetCursor();
-    aPosition.nLeft = pCursor->Start()->nContent.GetIndex();
-    aPosition.nRight = pCursor->End()->nContent.GetIndex();
+    aPosition.nLeft = pCursor->Start()->GetContentIndex();
+    aPosition.nRight = pCursor->End()->GetContentIndex();
     m_aLastPortions.push_back(aPortion);
     m_aLastPositions.push_back(aPosition);
 }
 
 void    SwSpellIter::AddPortion(uno::Reference< XSpellAlternatives > const & xAlt,
-                                linguistic2::ProofreadingResult* pGrammarResult,
+                                const linguistic2::ProofreadingResult* pGrammarResult,
                                 const SpellContentPositions& rDeletedRedlines)
 {
     SwEditShell *pMySh = GetSh();
@@ -1600,36 +1612,36 @@ void    SwSpellIter::AddPortion(uno::Reference< XSpellAlternatives > const & xAl
         // iterate over the text to find changes in language
         // set the mark equal to the point
         *pCursor->GetMark() = aStart;
-        SwTextNode* pTextNode = pCursor->GetNode().GetTextNode();
+        SwTextNode* pTextNode = pCursor->GetPointNode().GetTextNode();
         LanguageType eStartLanguage = lcl_GetLanguage(*GetSh());
         SpellContentPosition  aNextRedline = lcl_FindNextDeletedRedline(
-                    rDeletedRedlines, aStart.nContent.GetIndex() );
-        if( aNextRedline.nLeft == aStart.nContent.GetIndex() )
+                    rDeletedRedlines, aStart.GetContentIndex() );
+        if( aNextRedline.nLeft == aStart.GetContentIndex() )
         {
             // select until the end of the current redline
-            const sal_Int32 nEnd = aEnd.nContent.GetIndex() < aNextRedline.nRight ?
-                        aEnd.nContent.GetIndex() : aNextRedline.nRight;
-            pCursor->GetPoint()->nContent.Assign( pTextNode, nEnd );
+            const sal_Int32 nEnd = aEnd.GetContentIndex() < aNextRedline.nRight ?
+                        aEnd.GetContentIndex() : aNextRedline.nRight;
+            pCursor->GetPoint()->SetContent( nEnd );
             CreatePortion(xAlt, pGrammarResult, false, true);
             aStart = *pCursor->End();
             // search for next redline
             aNextRedline = lcl_FindNextDeletedRedline(
-                        rDeletedRedlines, aStart.nContent.GetIndex() );
+                        rDeletedRedlines, aStart.GetContentIndex() );
         }
         while(*pCursor->GetPoint() < aEnd)
         {
             // #125786 in table cell with fixed row height the cursor might not move forward
-            if(!GetSh()->Right(1, CRSR_SKIP_CELLS))
+            if(!GetSh()->Right(1, SwCursorSkipMode::Cells))
                 break;
 
             bool bField = false;
             // read the character at the current position to check if it's a field
             sal_Unicode const cChar =
-                pTextNode->GetText()[pCursor->GetMark()->nContent.GetIndex()];
+                pTextNode->GetText()[pCursor->GetMark()->GetContentIndex()];
             if( CH_TXTATR_BREAKWORD == cChar || CH_TXTATR_INWORD == cChar)
             {
                 const SwTextAttr* pTextAttr = pTextNode->GetTextAttrForCharAt(
-                    pCursor->GetMark()->nContent.GetIndex() );
+                    pCursor->GetMark()->GetContentIndex() );
                 const sal_uInt16 nWhich = pTextAttr
                     ? pTextAttr->Which()
                     : RES_TXTATR_END;
@@ -1650,7 +1662,7 @@ void    SwSpellIter::AddPortion(uno::Reference< XSpellAlternatives > const & xAl
             }
 
             LanguageType eCurLanguage = lcl_GetLanguage(*GetSh());
-            bool bRedline = aNextRedline.nLeft == pCursor->GetPoint()->nContent.GetIndex();
+            bool bRedline = aNextRedline.nLeft == pCursor->GetPoint()->GetContentIndex();
             // create a portion if the next character
             //  - is a field,
             //  - is at the beginning of a deleted redline
@@ -1674,7 +1686,7 @@ void    SwSpellIter::AddPortion(uno::Reference< XSpellAlternatives > const & xAl
                 if(bField)
                 {
                     *pCursor->GetMark() = *pCursor->GetPoint();
-                    GetSh()->Right(1, CRSR_SKIP_CELLS);
+                    GetSh()->Right(1, SwCursorSkipMode::Cells);
                     CreatePortion(xAlt, pGrammarResult, true, false);
                     aStart = *pCursor->End();
                 }
@@ -1684,14 +1696,14 @@ void    SwSpellIter::AddPortion(uno::Reference< XSpellAlternatives > const & xAl
             {
                 *pCursor->GetMark() = *pCursor->GetPoint();
                 // select until the end of the current redline
-                const sal_Int32 nEnd = aEnd.nContent.GetIndex() < aNextRedline.nRight ?
-                            aEnd.nContent.GetIndex() : aNextRedline.nRight;
-                pCursor->GetPoint()->nContent.Assign( pTextNode, nEnd );
+                const sal_Int32 nEnd = aEnd.GetContentIndex() < aNextRedline.nRight ?
+                            aEnd.GetContentIndex() : aNextRedline.nRight;
+                pCursor->GetPoint()->SetContent( nEnd );
                 CreatePortion(xAlt, pGrammarResult, false, true);
                 aStart = *pCursor->End();
                 // search for next redline
                 aNextRedline = lcl_FindNextDeletedRedline(
-                            rDeletedRedlines, aStart.nContent.GetIndex() );
+                            rDeletedRedlines, aStart.GetContentIndex() );
             }
             *pCursor->GetMark() = *pCursor->GetPoint();
         }
@@ -1705,16 +1717,16 @@ void SwEditShell::IgnoreGrammarErrorAt( SwPaM& rErrorPosition )
 {
     SwTextNode *pNode;
     SwWrongList *pWrong;
-    SwNodeIndex aIdx = rErrorPosition.Start()->nNode;
-    SwNodeIndex aEndIdx = rErrorPosition.Start()->nNode;
-    sal_Int32 nStart = rErrorPosition.Start()->nContent.GetIndex();
+    SwNodeIndex aIdx(rErrorPosition.Start()->GetNode());
+    SwNodeIndex aEndIdx(rErrorPosition.Start()->GetNode());
+    sal_Int32 nStart = rErrorPosition.Start()->GetContentIndex();
     sal_Int32 nEnd = COMPLETE_STRING;
     while( aIdx <= aEndIdx )
     {
         pNode = aIdx.GetNode().GetTextNode();
         if( pNode ) {
             if( aIdx == aEndIdx )
-                nEnd = rErrorPosition.End()->nContent.GetIndex();
+                nEnd = rErrorPosition.End()->GetContentIndex();
             pWrong = pNode->GetGrammarCheck();
             if( pWrong )
                 pWrong->RemoveEntry( nStart, nEnd );

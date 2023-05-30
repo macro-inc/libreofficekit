@@ -28,7 +28,7 @@
 #include <comphelper/propertyvalue.hxx>
 #include <sal/macros.h>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -140,9 +140,7 @@ bool OptimizerSettings::operator==( const OptimizerSettings& rOptimizerSettings 
         && ( rOptimizerSettings.mbDeleteUnusedMasterPages == mbDeleteUnusedMasterPages )
         && ( rOptimizerSettings.mbDeleteHiddenSlides == mbDeleteHiddenSlides )
         && ( rOptimizerSettings.mbDeleteNotesPages == mbDeleteNotesPages );
-//      && ( rOptimizerSettings.mbOpenNewDocument == mbOpenNewDocument );
 }
-
 
 ConfigurationAccess::ConfigurationAccess( const Reference< uno::XComponentContext >& rxContext ) :
     mxContext( rxContext )

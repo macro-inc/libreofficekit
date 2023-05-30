@@ -25,6 +25,33 @@
 #include <graphic/DetectorTools.hxx>
 #include <tools/solar.h>
 #include <tools/zcodec.hxx>
+#include <tools/fract.hxx>
+#include <filter/WebpReader.hxx>
+#include <vcl/TypeSerializer.hxx>
+#include <vcl/outdev.hxx>
+#include <utility>
+
+constexpr sal_uInt32 SVG_CHECK_SIZE = 2048;
+constexpr sal_uInt32 WMF_EMF_CHECK_SIZE = 44;
+constexpr sal_uInt32 DATA_SIZE = 640;
+
+namespace
+{
+class SeekGuard
+{
+public:
+    SeekGuard(SvStream& rStream, sal_uInt64 nStartPosition)
+        : mrStream(rStream)
+        , mnStartPosition(nStartPosition)
+    {
+    }
+    ~SeekGuard() { mrStream.Seek(mnStartPosition); }
+
+private:
+    SvStream& mrStream;
+    sal_uInt64 mnStartPosition;
+};
+}
 
 namespace vcl
 {
@@ -51,7 +78,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkMET())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -61,17 +88,18 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkBMP())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
 
-    if (!bTest || rFormatExtension.startsWith("WMF") || rFormatExtension.startsWith("EMF"))
+    if (!bTest || rFormatExtension.startsWith("WMF") || rFormatExtension.startsWith("WMZ")
+        || rFormatExtension.startsWith("EMF") || rFormatExtension.startsWith("EMZ"))
     {
         bSomethingTested = true;
-        if (aDetector.checkWMForEMF())
+        if (aDetector.checkWMF() || aDetector.checkEMF())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -81,7 +109,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkPCX())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -91,7 +119,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkTIF())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -101,7 +129,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkGIF())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -111,7 +139,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkPNG())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -121,7 +149,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkJPG())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -131,7 +159,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkSVM())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -141,7 +169,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkPCD())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -151,7 +179,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkPSD())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -161,7 +189,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkEPS())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -170,7 +198,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
     {
         if (aDetector.checkDXF())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -180,7 +208,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkPCT())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -189,9 +217,9 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         || rFormatExtension.startsWith("PPM"))
     {
         bSomethingTested = true;
-        if (aDetector.checkPBMorPGMorPPM())
+        if (aDetector.checkPBM() || aDetector.checkPGM() || aDetector.checkPPM())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -201,7 +229,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkRAS())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -211,7 +239,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkXPM())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -224,7 +252,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
     {
         if (aDetector.checkXBM())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -237,7 +265,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
     {
         if (aDetector.checkSVG())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -251,7 +279,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkTGA())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -260,7 +288,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
     {
         if (aDetector.checkMOV())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -269,7 +297,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
     {
         if (aDetector.checkPDF())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -279,7 +307,7 @@ bool peekGraphicFormat(SvStream& rStream, OUString& rFormatExtension, bool bTest
         bSomethingTested = true;
         if (aDetector.checkWEBP())
         {
-            rFormatExtension = aDetector.msDetectedFormat;
+            rFormatExtension = getImportFormatShortName(aDetector.getMetadata().mnFormat);
             return true;
         }
     }
@@ -333,13 +361,17 @@ bool isPCT(SvStream& rStream, sal_uLong nStreamPos, sal_uLong nStreamLen)
 
 } // end anonymous namespace
 
-GraphicFormatDetector::GraphicFormatDetector(SvStream& rStream, OUString const& rFormatExtension)
+GraphicFormatDetector::GraphicFormatDetector(SvStream& rStream, OUString aFormatExtension,
+                                             bool bExtendedInfo)
     : mrStream(rStream)
-    , maExtension(rFormatExtension)
+    , maExtension(std::move(aFormatExtension))
     , mnFirstLong(0)
     , mnSecondLong(0)
     , mnStreamPosition(0)
     , mnStreamLength(0)
+    , mbExtendedInfo(bExtendedInfo)
+    , mbWasCompressed(false)
+    , maMetadata()
 {
 }
 
@@ -353,6 +385,7 @@ bool GraphicFormatDetector::detect()
 
     mnStreamPosition = mrStream.Tell();
     mnStreamLength = mrStream.remainingSize();
+    SeekGuard aGuard(mrStream, mnStreamPosition);
 
     if (!mnStreamLength)
     {
@@ -393,6 +426,7 @@ bool GraphicFormatDetector::checkMET()
 {
     if (maFirstBytes[2] != 0xd3)
         return false;
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     mrStream.SetEndian(SvStreamEndian::BIG);
     mrStream.Seek(mnStreamPosition);
     sal_uInt16 nFieldSize;
@@ -415,12 +449,14 @@ bool GraphicFormatDetector::checkMET()
     if (mrStream.GetError())
         return false;
 
-    msDetectedFormat = "MET";
+    maMetadata.mnFormat = GraphicFileFormat::MET;
     return true;
 }
 
 bool GraphicFormatDetector::checkBMP()
 {
+    SeekGuard aGuard(mrStream, mnStreamPosition);
+    bool bRet = false;
     sal_uInt8 nOffset;
 
     // We're possibly also able to read an OS/2 bitmap array
@@ -441,24 +477,144 @@ bool GraphicFormatDetector::checkBMP()
              && maFirstBytes[8 + nOffset] == 0x00 && maFirstBytes[9 + nOffset] == 0x00)
             || maFirstBytes[14 + nOffset] == 0x28 || maFirstBytes[14 + nOffset] == 0x0c)
         {
-            msDetectedFormat = "BMP";
-            return true;
+            maMetadata.mnFormat = GraphicFileFormat::BMP;
+            bRet = true;
+            if (mbExtendedInfo)
+            {
+                sal_uInt32 nTemp32;
+                sal_uInt16 nTemp16;
+                sal_uInt32 nCompression;
+
+                mrStream.SetEndian(SvStreamEndian::LITTLE);
+                mrStream.Seek(mnStreamPosition + nOffset + 2);
+
+                // up to first info
+                mrStream.SeekRel(0x10);
+
+                // Pixel width
+                mrStream.ReadUInt32(nTemp32);
+                maMetadata.maPixSize.setWidth(nTemp32);
+
+                // Pixel height
+                mrStream.ReadUInt32(nTemp32);
+                maMetadata.maPixSize.setHeight(nTemp32);
+
+                // Planes
+                mrStream.ReadUInt16(nTemp16);
+                maMetadata.mnPlanes = nTemp16;
+
+                // BitCount
+                mrStream.ReadUInt16(nTemp16);
+                maMetadata.mnBitsPerPixel = nTemp16;
+
+                // Compression
+                mrStream.ReadUInt32(nTemp32);
+                nCompression = nTemp32;
+
+                // logical width
+                mrStream.SeekRel(4);
+                mrStream.ReadUInt32(nTemp32);
+                sal_uInt32 nXPelsPerMeter = 0;
+                if (nTemp32)
+                {
+                    maMetadata.maLogSize.setWidth((maMetadata.maPixSize.Width() * 100000)
+                                                  / nTemp32);
+                    nXPelsPerMeter = nTemp32;
+                }
+
+                // logical height
+                mrStream.ReadUInt32(nTemp32);
+                sal_uInt32 nYPelsPerMeter = 0;
+                if (nTemp32)
+                {
+                    maMetadata.maLogSize.setHeight((maMetadata.maPixSize.Height() * 100000)
+                                                   / nTemp32);
+                    nYPelsPerMeter = nTemp32;
+                }
+
+                // further validation, check for rational values
+                if ((maMetadata.mnBitsPerPixel > 24) || (nCompression > 3))
+                {
+                    maMetadata.mnFormat = GraphicFileFormat::NOT;
+                    bRet = false;
+                }
+
+                if (bRet && nXPelsPerMeter && nYPelsPerMeter)
+                {
+                    maMetadata.maPreferredMapMode
+                        = MapMode(MapUnit::MapMM, Point(), Fraction(1000, nXPelsPerMeter),
+                                  Fraction(1000, nYPelsPerMeter));
+
+                    maMetadata.maPreferredLogSize
+                        = Size(maMetadata.maPixSize.getWidth(), maMetadata.maPixSize.getHeight());
+                }
+            }
         }
+    }
+    return bRet;
+}
+
+bool GraphicFormatDetector::checkWMF()
+{
+    sal_uInt64 nCheckSize = std::min<sal_uInt64>(mnStreamLength, 256);
+    sal_uInt8 sExtendedOrDecompressedFirstBytes[WMF_EMF_CHECK_SIZE];
+    sal_uInt64 nDecompressedSize = nCheckSize;
+    // check if it is gzipped -> wmz
+    checkAndUncompressBuffer(sExtendedOrDecompressedFirstBytes, WMF_EMF_CHECK_SIZE,
+                             nDecompressedSize);
+    if (mnFirstLong == 0xd7cdc69a || mnFirstLong == 0x01000900)
+    {
+        if (mbWasCompressed)
+            maMetadata.mnFormat = GraphicFileFormat::WMZ;
+        else
+            maMetadata.mnFormat = GraphicFileFormat::WMF;
+        return true;
     }
     return false;
 }
 
-bool GraphicFormatDetector::checkWMForEMF()
+bool GraphicFormatDetector::checkEMF()
 {
-    if (mnFirstLong == 0xd7cdc69a || mnFirstLong == 0x01000900)
+    sal_uInt64 nCheckSize = std::min<sal_uInt64>(mnStreamLength, 256);
+    sal_uInt8 sExtendedOrDecompressedFirstBytes[WMF_EMF_CHECK_SIZE];
+    sal_uInt64 nDecompressedSize = nCheckSize;
+    // check if it is gzipped -> emz
+    sal_uInt8* pCheckArray = checkAndUncompressBuffer(sExtendedOrDecompressedFirstBytes,
+                                                      WMF_EMF_CHECK_SIZE, nDecompressedSize);
+    if (mnFirstLong == 0x01000000 && pCheckArray[40] == 0x20 && pCheckArray[41] == 0x45
+        && pCheckArray[42] == 0x4d && pCheckArray[43] == 0x46)
     {
-        msDetectedFormat = "WMF";
-        return true;
-    }
-    else if (mnFirstLong == 0x01000000 && maFirstBytes[40] == 0x20 && maFirstBytes[41] == 0x45
-             && maFirstBytes[42] == 0x4d && maFirstBytes[43] == 0x46)
-    {
-        msDetectedFormat = "EMF";
+        if (mbWasCompressed)
+            maMetadata.mnFormat = GraphicFileFormat::EMZ;
+        else
+            maMetadata.mnFormat = GraphicFileFormat::EMF;
+        if (mbExtendedInfo)
+        {
+            sal_Int32 nBoundLeft = 0, nBoundTop = 0, nBoundRight = 0, nBoundBottom = 0;
+            sal_Int32 nFrameLeft = 0, nFrameTop = 0, nFrameRight = 0, nFrameBottom = 0;
+            nBoundLeft = pCheckArray[8] | (pCheckArray[9] << 8) | (pCheckArray[10] << 16)
+                         | (pCheckArray[11] << 24);
+            nBoundTop = pCheckArray[12] | (pCheckArray[13] << 8) | (pCheckArray[14] << 16)
+                        | (pCheckArray[15] << 24);
+            nBoundRight = pCheckArray[16] | (pCheckArray[17] << 8) | (pCheckArray[18] << 16)
+                          | (pCheckArray[19] << 24);
+            nBoundBottom = pCheckArray[20] | (pCheckArray[21] << 8) | (pCheckArray[22] << 16)
+                           | (pCheckArray[23] << 24);
+            nFrameLeft = pCheckArray[24] | (pCheckArray[25] << 8) | (pCheckArray[26] << 16)
+                         | (pCheckArray[27] << 24);
+            nFrameTop = pCheckArray[28] | (pCheckArray[29] << 8) | (pCheckArray[30] << 16)
+                        | (pCheckArray[31] << 24);
+            nFrameRight = pCheckArray[32] | (pCheckArray[33] << 8) | (pCheckArray[34] << 16)
+                          | (pCheckArray[35] << 24);
+            nFrameBottom = pCheckArray[36] | (pCheckArray[37] << 8) | (pCheckArray[38] << 16)
+                           | (pCheckArray[39] << 24);
+            // size in pixels
+            maMetadata.maPixSize.setWidth(nBoundRight - nBoundLeft + 1);
+            maMetadata.maPixSize.setHeight(nBoundBottom - nBoundTop + 1);
+            // size in 0.01mm units
+            maMetadata.maLogSize.setWidth(nFrameRight - nFrameLeft + 1);
+            maMetadata.maLogSize.setHeight(nFrameBottom - nFrameTop + 1);
+        }
         return true;
     }
     return false;
@@ -466,28 +622,199 @@ bool GraphicFormatDetector::checkWMForEMF()
 
 bool GraphicFormatDetector::checkPCX()
 {
-    if (maFirstBytes[0] != 0x0a)
-        return false;
-
-    sal_uInt8 nVersion = maFirstBytes[1];
-    sal_uInt8 nEncoding = maFirstBytes[2];
-    if ((nVersion == 0 || nVersion == 2 || nVersion == 3 || nVersion == 5) && nEncoding <= 1)
+    // ! Because 0x0a can be interpreted as LF too ...
+    // we can't be sure that this special sign represent a PCX file only.
+    // Every Ascii file is possible here :-(
+    // We must detect the whole header.
+    bool bRet = false;
+    sal_uInt8 cByte = 0;
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    mrStream.SetEndian(SvStreamEndian::LITTLE);
+    mrStream.ReadUChar(cByte);
+    if (cByte == 0x0a)
     {
-        msDetectedFormat = "PCX";
-        return true;
-    }
+        maMetadata.mnFormat = GraphicFileFormat::PCX;
+        mrStream.SeekRel(1);
+        // compression
+        mrStream.ReadUChar(cByte);
+        bRet = (cByte == 0 || cByte == 1);
+        if (bRet)
+        {
+            sal_uInt16 nTemp16;
+            sal_uInt16 nXmin;
+            sal_uInt16 nXmax;
+            sal_uInt16 nYmin;
+            sal_uInt16 nYmax;
+            sal_uInt16 nDPIx;
+            sal_uInt16 nDPIy;
 
-    return false;
+            // Bits/Pixel
+            mrStream.ReadUChar(cByte);
+            maMetadata.mnBitsPerPixel = cByte;
+
+            // image dimensions
+            mrStream.ReadUInt16(nTemp16);
+            nXmin = nTemp16;
+            mrStream.ReadUInt16(nTemp16);
+            nYmin = nTemp16;
+            mrStream.ReadUInt16(nTemp16);
+            nXmax = nTemp16;
+            mrStream.ReadUInt16(nTemp16);
+            nYmax = nTemp16;
+
+            maMetadata.maPixSize.setWidth(nXmax - nXmin + 1);
+            maMetadata.maPixSize.setHeight(nYmax - nYmin + 1);
+
+            // resolution
+            mrStream.ReadUInt16(nTemp16);
+            nDPIx = nTemp16;
+            mrStream.ReadUInt16(nTemp16);
+            nDPIy = nTemp16;
+
+            // set logical size
+            MapMode aMap(MapUnit::MapInch, Point(), Fraction(1, nDPIx), Fraction(1, nDPIy));
+            maMetadata.maLogSize = OutputDevice::LogicToLogic(maMetadata.maPixSize, aMap,
+                                                              MapMode(MapUnit::Map100thMM));
+
+            // number of color planes
+            cByte = 5; // Illegal value in case of EOF.
+            mrStream.SeekRel(49);
+            mrStream.ReadUChar(cByte);
+            maMetadata.mnPlanes = cByte;
+
+            bRet = (maMetadata.mnPlanes <= 4);
+        }
+    }
+    return bRet;
 }
 
 bool GraphicFormatDetector::checkTIF()
 {
-    if (mnFirstLong == 0x49492a00 || mnFirstLong == 0x4d4d002a)
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    mrStream.Seek(mnStreamPosition);
+    bool bRet = false;
+    sal_uInt8 cByte1 = 0;
+    sal_uInt8 cByte2 = 1;
+
+    mrStream.ReadUChar(cByte1);
+    mrStream.ReadUChar(cByte2);
+    if (cByte1 == cByte2)
     {
-        msDetectedFormat = "TIF";
-        return true;
+        bool bDetectOk = false;
+
+        if (cByte1 == 0x49)
+        {
+            mrStream.SetEndian(SvStreamEndian::LITTLE);
+            bDetectOk = true;
+        }
+        else if (cByte1 == 0x4d)
+        {
+            mrStream.SetEndian(SvStreamEndian::BIG);
+            bDetectOk = true;
+        }
+
+        if (bDetectOk)
+        {
+            sal_uInt16 nTemp16 = 0;
+
+            mrStream.ReadUInt16(nTemp16);
+            if (nTemp16 == 0x2a)
+            {
+                maMetadata.mnFormat = GraphicFileFormat::TIF;
+                bRet = true;
+
+                if (mbExtendedInfo)
+                {
+                    sal_uLong nCount;
+                    sal_uLong nMax = DATA_SIZE - 48;
+                    sal_uInt32 nTemp32 = 0;
+
+                    // Offset of the first IFD
+                    mrStream.ReadUInt32(nTemp32);
+                    nCount = nTemp32 + 2;
+                    mrStream.SeekRel(nCount - 0x08);
+
+                    if (nCount < nMax)
+                    {
+                        bool bOk = false;
+
+                        // read tags till we find Tag256 ( Width )
+                        // do not read more bytes than DATA_SIZE
+                        mrStream.ReadUInt16(nTemp16);
+                        while (nTemp16 != 256)
+                        {
+                            bOk = nCount < nMax;
+                            if (!bOk)
+                            {
+                                break;
+                            }
+                            mrStream.SeekRel(10);
+                            mrStream.ReadUInt16(nTemp16);
+                            nCount += 12;
+                        }
+
+                        if (bOk)
+                        {
+                            // width
+                            mrStream.ReadUInt16(nTemp16);
+                            mrStream.SeekRel(4);
+                            if (nTemp16 == 3)
+                            {
+                                mrStream.ReadUInt16(nTemp16);
+                                maMetadata.maPixSize.setWidth(nTemp16);
+                                mrStream.SeekRel(2);
+                            }
+                            else
+                            {
+                                mrStream.ReadUInt32(nTemp32);
+                                maMetadata.maPixSize.setWidth(nTemp32);
+                            }
+
+                            // height
+                            mrStream.SeekRel(2);
+                            mrStream.ReadUInt16(nTemp16);
+                            mrStream.SeekRel(4);
+                            if (nTemp16 == 3)
+                            {
+                                mrStream.ReadUInt16(nTemp16);
+                                maMetadata.maPixSize.setHeight(nTemp16);
+                                mrStream.SeekRel(2);
+                            }
+                            else
+                            {
+                                mrStream.ReadUInt32(nTemp32);
+                                maMetadata.maPixSize.setHeight(nTemp32);
+                            }
+
+                            // Bits/Pixel
+                            mrStream.ReadUInt16(nTemp16);
+                            if (nTemp16 == 258)
+                            {
+                                mrStream.SeekRel(6);
+                                mrStream.ReadUInt16(nTemp16);
+                                maMetadata.mnBitsPerPixel = nTemp16;
+                                mrStream.SeekRel(2);
+                            }
+                            else
+                                mrStream.SeekRel(-2);
+
+                            // compression
+                            mrStream.ReadUInt16(nTemp16);
+                            if (nTemp16 == 259)
+                            {
+                                mrStream.SeekRel(6);
+                                mrStream.ReadUInt16(nTemp16); // compression
+                                mrStream.SeekRel(2);
+                            }
+                            else
+                                mrStream.SeekRel(-2);
+                        }
+                    }
+                }
+            }
+        }
     }
-    return false;
+    return bRet;
 }
 
 bool GraphicFormatDetector::checkGIF()
@@ -495,7 +822,14 @@ bool GraphicFormatDetector::checkGIF()
     if (mnFirstLong == 0x47494638 && (maFirstBytes[4] == 0x37 || maFirstBytes[4] == 0x39)
         && maFirstBytes[5] == 0x61)
     {
-        msDetectedFormat = "GIF";
+        maMetadata.mnFormat = GraphicFileFormat::GIF;
+        if (mbExtendedInfo)
+        {
+            sal_uInt16 nWidth = maFirstBytes[6] | (maFirstBytes[7] << 8);
+            sal_uInt16 nHeight = maFirstBytes[8] | (maFirstBytes[9] << 8);
+            maMetadata.maPixSize = Size(nWidth, nHeight);
+            maMetadata.mnBitsPerPixel = ((maFirstBytes[10] & 112) >> 4) + 1;
+        }
         return true;
     }
     return false;
@@ -503,9 +837,106 @@ bool GraphicFormatDetector::checkGIF()
 
 bool GraphicFormatDetector::checkPNG()
 {
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     if (mnFirstLong == 0x89504e47 && mnSecondLong == 0x0d0a1a0a)
     {
-        msDetectedFormat = "PNG";
+        maMetadata.mnFormat = GraphicFileFormat::PNG;
+        if (mbExtendedInfo)
+        {
+            sal_uInt32 nTemp32;
+            mrStream.Seek(mnStreamPosition + 8);
+            do
+            {
+                sal_uInt8 cByte = 0;
+
+                // IHDR-Chunk
+                mrStream.SeekRel(8);
+
+                // width
+                mrStream.ReadUInt32(nTemp32);
+                if (!mrStream.good())
+                    break;
+                maMetadata.maPixSize.setWidth(nTemp32);
+
+                // height
+                mrStream.ReadUInt32(nTemp32);
+                if (!mrStream.good())
+                    break;
+                maMetadata.maPixSize.setHeight(nTemp32);
+
+                // Bits/Pixel
+                mrStream.ReadUChar(cByte);
+                if (!mrStream.good())
+                    break;
+                maMetadata.mnBitsPerPixel = cByte;
+
+                // Colour type - check whether it supports alpha values
+                sal_uInt8 cColType = 0;
+                mrStream.ReadUChar(cColType);
+                if (!mrStream.good())
+                    break;
+                maMetadata.mbIsAlpha = maMetadata.mbIsTransparent
+                    = (cColType == 4 || cColType == 6);
+
+                // Planes always 1;
+                // compression always
+                maMetadata.mnPlanes = 1;
+
+                sal_uInt32 nLen32 = 0;
+                nTemp32 = 0;
+
+                mrStream.SeekRel(7);
+
+                // read up to the start of the image
+                mrStream.ReadUInt32(nLen32);
+                mrStream.ReadUInt32(nTemp32);
+                while (mrStream.good() && nTemp32 != 0x49444154)
+                {
+                    if (nTemp32 == 0x70485973) // physical pixel dimensions
+                    {
+                        sal_uLong nXRes;
+                        sal_uLong nYRes;
+
+                        // horizontal resolution
+                        nTemp32 = 0;
+                        mrStream.ReadUInt32(nTemp32);
+                        nXRes = nTemp32;
+
+                        // vertical resolution
+                        nTemp32 = 0;
+                        mrStream.ReadUInt32(nTemp32);
+                        nYRes = nTemp32;
+
+                        // unit
+                        cByte = 0;
+                        mrStream.ReadUChar(cByte);
+
+                        if (cByte)
+                        {
+                            if (nXRes)
+                                maMetadata.maLogSize.setWidth(
+                                    (maMetadata.maPixSize.Width() * 100000) / nXRes);
+
+                            if (nYRes)
+                                maMetadata.maLogSize.setHeight(
+                                    (maMetadata.maPixSize.Height() * 100000) / nYRes);
+                        }
+
+                        nLen32 -= 9;
+                    }
+                    else if (nTemp32 == 0x74524e53) // transparency
+                    {
+                        maMetadata.mbIsTransparent = true;
+                        maMetadata.mbIsAlpha = (cColType != 0 && cColType != 2);
+                    }
+
+                    // skip forward to next chunk
+                    mrStream.SeekRel(4 + nLen32);
+                    mrStream.ReadUInt32(nLen32);
+                    mrStream.ReadUInt32(nTemp32);
+                }
+            } while (false);
+        }
         return true;
     }
     return false;
@@ -517,7 +948,7 @@ bool GraphicFormatDetector::checkJPG()
          && maFirstBytes[8] == 0x49 && maFirstBytes[9] == 0x46)
         || (mnFirstLong == 0xffd8fffe) || (0xffd8ff00 == (mnFirstLong & 0xffffff00)))
     {
-        msDetectedFormat = "JPG";
+        maMetadata.mnFormat = GraphicFileFormat::JPG;
         return true;
     }
     return false;
@@ -525,18 +956,77 @@ bool GraphicFormatDetector::checkJPG()
 
 bool GraphicFormatDetector::checkSVM()
 {
-    if (mnFirstLong == 0x53564744 && maFirstBytes[4] == 0x49)
+    sal_uInt32 n32 = 0;
+    bool bRet = false;
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    mrStream.SetEndian(SvStreamEndian::LITTLE);
+    mrStream.ReadUInt32(n32);
+    if (n32 == 0x44475653)
     {
-        msDetectedFormat = "SVM";
-        return true;
+        sal_uInt8 cByte = 0;
+        mrStream.ReadUChar(cByte);
+        if (cByte == 0x49)
+        {
+            maMetadata.mnFormat = GraphicFileFormat::SVM;
+            bRet = true;
+
+            if (mbExtendedInfo)
+            {
+                sal_uInt32 nTemp32;
+                sal_uInt16 nTemp16;
+
+                mrStream.SeekRel(0x04);
+
+                // width
+                nTemp32 = 0;
+                mrStream.ReadUInt32(nTemp32);
+                maMetadata.maLogSize.setWidth(nTemp32);
+
+                // height
+                nTemp32 = 0;
+                mrStream.ReadUInt32(nTemp32);
+                maMetadata.maLogSize.setHeight(nTemp32);
+
+                // read MapUnit and determine PrefSize
+                nTemp16 = 0;
+                mrStream.ReadUInt16(nTemp16);
+                maMetadata.maLogSize = OutputDevice::LogicToLogic(
+                    maMetadata.maLogSize, MapMode(static_cast<MapUnit>(nTemp16)),
+                    MapMode(MapUnit::Map100thMM));
+            }
+        }
     }
-    else if (maFirstBytes[0] == 0x56 && maFirstBytes[1] == 0x43 && maFirstBytes[2] == 0x4C
-             && maFirstBytes[3] == 0x4D && maFirstBytes[4] == 0x54 && maFirstBytes[5] == 0x46)
+    else
     {
-        msDetectedFormat = "SVM";
-        return true;
+        mrStream.SeekRel(-4);
+        n32 = 0;
+        mrStream.ReadUInt32(n32);
+
+        if (n32 == 0x4D4C4356)
+        {
+            sal_uInt16 nTmp16 = 0;
+
+            mrStream.ReadUInt16(nTmp16);
+
+            if (nTmp16 == 0x4654)
+            {
+                maMetadata.mnFormat = GraphicFileFormat::SVM;
+                bRet = true;
+
+                if (mbExtendedInfo)
+                {
+                    MapMode aMapMode;
+                    mrStream.SeekRel(0x06);
+                    TypeSerializer aSerializer(mrStream);
+                    aSerializer.readMapMode(aMapMode);
+                    aSerializer.readSize(maMetadata.maLogSize);
+                    maMetadata.maLogSize = OutputDevice::LogicToLogic(
+                        maMetadata.maLogSize, aMapMode, MapMode(MapUnit::Map100thMM));
+                }
+            }
+        }
     }
-    return false;
+    return bRet;
 }
 
 bool GraphicFormatDetector::checkPCD()
@@ -544,12 +1034,13 @@ bool GraphicFormatDetector::checkPCD()
     if (mnStreamLength < 2055)
         return false;
     char sBuffer[8];
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     mrStream.Seek(mnStreamPosition + 2048);
     sBuffer[mrStream.ReadBytes(sBuffer, 7)] = 0;
 
     if (strncmp(sBuffer, "PCD_IPI", 7) == 0)
     {
-        msDetectedFormat = "PCD";
+        maMetadata.mnFormat = GraphicFileFormat::PCD;
         return true;
     }
     return false;
@@ -557,12 +1048,49 @@ bool GraphicFormatDetector::checkPCD()
 
 bool GraphicFormatDetector::checkPSD()
 {
+    SeekGuard aGuard(mrStream, mnStreamPosition);
+    bool bRet = false;
     if ((mnFirstLong == 0x38425053) && ((mnSecondLong >> 16) == 1))
     {
-        msDetectedFormat = "PSD";
-        return true;
+        maMetadata.mnFormat = GraphicFileFormat::PSD;
+        bRet = true;
+        if (mbExtendedInfo)
+        {
+            sal_uInt16 nChannels = 0;
+            sal_uInt32 nRows = 0;
+            sal_uInt32 nColumns = 0;
+            sal_uInt16 nDepth = 0;
+            sal_uInt16 nMode = 0;
+            mrStream.Seek(mnStreamPosition + 6);
+            mrStream.SeekRel(6); // Pad
+            mrStream.ReadUInt16(nChannels)
+                .ReadUInt32(nRows)
+                .ReadUInt32(nColumns)
+                .ReadUInt16(nDepth)
+                .ReadUInt16(nMode);
+            if ((nDepth == 1) || (nDepth == 8) || (nDepth == 16))
+            {
+                maMetadata.mnBitsPerPixel = (nDepth == 16) ? 8 : nDepth;
+                switch (nChannels)
+                {
+                    case 4:
+                    case 3:
+                        maMetadata.mnBitsPerPixel = 24;
+                        [[fallthrough]];
+                    case 2:
+                    case 1:
+                        maMetadata.maPixSize.setWidth(nColumns);
+                        maMetadata.maPixSize.setHeight(nRows);
+                        break;
+                    default:
+                        bRet = false;
+                }
+            }
+            else
+                bRet = false;
+        }
     }
-    return false;
+    return bRet;
 }
 
 bool GraphicFormatDetector::checkEPS()
@@ -571,12 +1099,12 @@ bool GraphicFormatDetector::checkEPS()
 
     if (mnFirstLong == 0xC5D0D3C6)
     {
-        msDetectedFormat = "EPS";
+        maMetadata.mnFormat = GraphicFileFormat::EPS;
         return true;
     }
     else if (checkArrayForMatchingStrings(pFirstBytesAsCharArray, 30, { "%!PS-Adobe", " EPS" }))
     {
-        msDetectedFormat = "EPS";
+        maMetadata.mnFormat = GraphicFileFormat::EPS;
         return true;
     }
 
@@ -587,7 +1115,7 @@ bool GraphicFormatDetector::checkDXF()
 {
     if (strncmp(reinterpret_cast<char*>(maFirstBytes.data()), "AutoCAD Binary DXF", 18) == 0)
     {
-        msDetectedFormat = "DXF";
+        maMetadata.mnFormat = GraphicFileFormat::DXF;
         return true;
     }
 
@@ -613,7 +1141,7 @@ bool GraphicFormatDetector::checkDXF()
         if (i + 7 < 256
             && (strncmp(reinterpret_cast<char*>(maFirstBytes.data() + i), "SECTION", 7) == 0))
         {
-            msDetectedFormat = "DXF";
+            maMetadata.mnFormat = GraphicFileFormat::DXF;
             return true;
         }
     }
@@ -622,35 +1150,50 @@ bool GraphicFormatDetector::checkDXF()
 
 bool GraphicFormatDetector::checkPCT()
 {
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     if (isPCT(mrStream, mnStreamPosition, mnStreamLength))
     {
-        msDetectedFormat = "PCT";
+        maMetadata.mnFormat = GraphicFileFormat::PCT;
         return true;
     }
     return false;
 }
 
-bool GraphicFormatDetector::checkPBMorPGMorPPM()
+bool GraphicFormatDetector::checkPBM()
 {
-    if (maFirstBytes[0] == 'P')
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    sal_uInt8 nFirst = 0, nSecond = 0, nThird = 0;
+    mrStream.ReadUChar(nFirst).ReadUChar(nSecond).ReadUChar(nThird);
+    if (nFirst == 'P' && ((nSecond == '1') || (nSecond == '4')) && isspace(nThird))
     {
-        switch (maFirstBytes[1])
-        {
-            case '1':
-            case '4':
-                msDetectedFormat = "PBM";
-                return true;
+        maMetadata.mnFormat = GraphicFileFormat::PBM;
+        return true;
+    }
+    return false;
+}
 
-            case '2':
-            case '5':
-                msDetectedFormat = "PGM";
-                return true;
+bool GraphicFormatDetector::checkPGM()
+{
+    sal_uInt8 nFirst = 0, nSecond = 0, nThird = 0;
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    mrStream.ReadUChar(nFirst).ReadUChar(nSecond).ReadUChar(nThird);
+    if (nFirst == 'P' && ((nSecond == '2') || (nSecond == '5')) && isspace(nThird))
+    {
+        maMetadata.mnFormat = GraphicFileFormat::PGM;
+        return true;
+    }
+    return false;
+}
 
-            case '3':
-            case '6':
-                msDetectedFormat = "PPM";
-                return true;
-        }
+bool GraphicFormatDetector::checkPPM()
+{
+    sal_uInt8 nFirst = 0, nSecond = 0, nThird = 0;
+    SeekGuard aGuard(mrStream, mrStream.Tell());
+    mrStream.ReadUChar(nFirst).ReadUChar(nSecond).ReadUChar(nThird);
+    if (nFirst == 'P' && ((nSecond == '3') || (nSecond == '6')) && isspace(nThird))
+    {
+        maMetadata.mnFormat = GraphicFileFormat::PPM;
+        return true;
     }
     return false;
 }
@@ -659,7 +1202,7 @@ bool GraphicFormatDetector::checkRAS()
 {
     if (mnFirstLong == 0x59a66a95)
     {
-        msDetectedFormat = "RAS";
+        maMetadata.mnFormat = GraphicFileFormat::RAS;
         return true;
     }
     return false;
@@ -670,7 +1213,7 @@ bool GraphicFormatDetector::checkXPM()
     const char* pFirstBytesAsCharArray = reinterpret_cast<char*>(maFirstBytes.data());
     if (matchArrayWithString(pFirstBytesAsCharArray, 256, "/* XPM */"))
     {
-        msDetectedFormat = "XPM";
+        maMetadata.mnFormat = GraphicFileFormat::XPM;
         return true;
     }
     return false;
@@ -681,6 +1224,7 @@ bool GraphicFormatDetector::checkXBM()
     sal_uInt64 nSize = std::min<sal_uInt64>(mnStreamLength, 2048);
     std::unique_ptr<sal_uInt8[]> pBuffer(new sal_uInt8[nSize]);
 
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     mrStream.Seek(mnStreamPosition);
     nSize = mrStream.ReadBytes(pBuffer.get(), nSize);
 
@@ -688,7 +1232,7 @@ bool GraphicFormatDetector::checkXBM()
 
     if (checkArrayForMatchingStrings(pBufferAsCharArray, nSize, { "#define", "_width" }))
     {
-        msDetectedFormat = "XBM";
+        maMetadata.mnFormat = GraphicFileFormat::XBM;
         return true;
     }
     return false;
@@ -696,34 +1240,17 @@ bool GraphicFormatDetector::checkXBM()
 
 bool GraphicFormatDetector::checkSVG()
 {
-    sal_uInt8* pCheckArray = maFirstBytes.data();
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     sal_uInt64 nCheckSize = std::min<sal_uInt64>(mnStreamLength, 256);
-
-    sal_uInt8 sExtendedOrDecompressedFirstBytes[2048];
+    sal_uInt8 sExtendedOrDecompressedFirstBytes[SVG_CHECK_SIZE];
     sal_uInt64 nDecompressedSize = nCheckSize;
-
-    bool bIsGZip(false);
-
     // check if it is gzipped -> svgz
-    if (maFirstBytes[0] == 0x1F && maFirstBytes[1] == 0x8B)
-    {
-        ZCodec aCodec;
-        mrStream.Seek(mnStreamPosition);
-        aCodec.BeginCompression(ZCODEC_DEFAULT_COMPRESSION, /*gzLib*/ true);
-        auto nDecompressedOut = aCodec.Read(mrStream, sExtendedOrDecompressedFirstBytes, 2048);
-        // ZCodec::Decompress returns -1 on failure
-        nDecompressedSize = nDecompressedOut < 0 ? 0 : nDecompressedOut;
-        nCheckSize = std::min<sal_uInt64>(nDecompressedSize, 256);
-        aCodec.EndCompression();
-        pCheckArray = sExtendedOrDecompressedFirstBytes;
-
-        bIsGZip = true;
-    }
-
+    sal_uInt8* pCheckArray = checkAndUncompressBuffer(sExtendedOrDecompressedFirstBytes,
+                                                      SVG_CHECK_SIZE, nDecompressedSize);
+    nCheckSize = std::min<sal_uInt64>(nDecompressedSize, 256);
     bool bIsSvg(false);
-
+    bool bIsGZip = (nDecompressedSize > 0);
     const char* pCheckArrayAsCharArray = reinterpret_cast<char*>(pCheckArray);
-
     // check for XML
     // #119176# SVG files which have no xml header at all have shown up this is optional
     // check for "xml" then "version" then "DOCTYPE" and "svg" tags
@@ -770,7 +1297,10 @@ bool GraphicFormatDetector::checkSVG()
 
     if (bIsSvg)
     {
-        msDetectedFormat = "SVG";
+        if (mbWasCompressed)
+            maMetadata.mnFormat = GraphicFileFormat::SVGZ;
+        else
+            maMetadata.mnFormat = GraphicFileFormat::SVG;
         return true;
     }
     return false;
@@ -778,6 +1308,7 @@ bool GraphicFormatDetector::checkSVG()
 
 bool GraphicFormatDetector::checkTGA()
 {
+    SeekGuard aGuard(mrStream, mnStreamPosition);
     // Check TGA ver.2 footer bytes
     if (mnStreamLength > 18)
     {
@@ -788,7 +1319,7 @@ bool GraphicFormatDetector::checkTGA()
         if (mrStream.ReadBytes(sFooterBytes, 18) == 18
             && memcmp(sFooterBytes, "TRUEVISION-XFILE.", SAL_N_ELEMENTS(sFooterBytes)) == 0)
         {
-            msDetectedFormat = "TGA";
+            maMetadata.mnFormat = GraphicFileFormat::TGA;
             return true;
         }
     }
@@ -796,7 +1327,7 @@ bool GraphicFormatDetector::checkTGA()
     // Fallback to file extension check
     if (maExtension.startsWith("TGA"))
     {
-        msDetectedFormat = "TGA";
+        maMetadata.mnFormat = GraphicFileFormat::TGA;
         return true;
     }
     return false;
@@ -809,7 +1340,7 @@ bool GraphicFormatDetector::checkMOV()
         || (maFirstBytes[4] == 'm' && maFirstBytes[5] == 'o' && maFirstBytes[6] == 'o'
             && maFirstBytes[7] == 'v' && maFirstBytes[11] == 'l' && maFirstBytes[12] == 'm'))
     {
-        msDetectedFormat = "MOV";
+        maMetadata.mnFormat = GraphicFileFormat::MOV;
         return true;
     }
     return false;
@@ -820,7 +1351,7 @@ bool GraphicFormatDetector::checkPDF()
     if (maFirstBytes[0] == '%' && maFirstBytes[1] == 'P' && maFirstBytes[2] == 'D'
         && maFirstBytes[3] == 'F' && maFirstBytes[4] == '-')
     {
-        msDetectedFormat = "PDF";
+        maMetadata.mnFormat = GraphicFileFormat::PDF;
         return true;
     }
     return false;
@@ -832,10 +1363,46 @@ bool GraphicFormatDetector::checkWEBP()
         && maFirstBytes[3] == 'F' && maFirstBytes[8] == 'W' && maFirstBytes[9] == 'E'
         && maFirstBytes[10] == 'B' && maFirstBytes[11] == 'P')
     {
-        msDetectedFormat = "WEBP";
+        maMetadata.mnFormat = GraphicFileFormat::WEBP;
+        if (mbExtendedInfo)
+        {
+            mrStream.Seek(mnStreamPosition);
+            ReadWebpInfo(mrStream, maMetadata.maPixSize, maMetadata.mnBitsPerPixel,
+                         maMetadata.mbIsAlpha);
+            maMetadata.mbIsTransparent = maMetadata.mbIsAlpha;
+        }
         return true;
     }
     return false;
+}
+
+const GraphicMetadata& GraphicFormatDetector::getMetadata() { return maMetadata; }
+
+sal_uInt8* GraphicFormatDetector::checkAndUncompressBuffer(sal_uInt8* aUncompressedBuffer,
+                                                           sal_uInt32 nSize, sal_uInt64& nRetSize)
+{
+    SeekGuard aGuard(mrStream, mnStreamPosition);
+    if (ZCodec::IsZCompressed(mrStream))
+    {
+        ZCodec aCodec;
+        mrStream.Seek(mnStreamPosition);
+        aCodec.BeginCompression(ZCODEC_DEFAULT_COMPRESSION, /*gzLib*/ true);
+        auto nDecompressedOut = aCodec.Read(mrStream, aUncompressedBuffer, nSize);
+        // ZCodec::Decompress returns -1 on failure
+        nRetSize = nDecompressedOut < 0 ? 0 : nDecompressedOut;
+        aCodec.EndCompression();
+        // Recalculate first/second long
+        for (int i = 0; i < 4; ++i)
+        {
+            mnFirstLong = (mnFirstLong << 8) | sal_uInt32(aUncompressedBuffer[i]);
+            mnSecondLong = (mnSecondLong << 8) | sal_uInt32(aUncompressedBuffer[i + 4]);
+        }
+        mbWasCompressed = true;
+        return aUncompressedBuffer;
+    }
+    nRetSize = 0;
+    mbWasCompressed = false;
+    return maFirstBytes.data();
 }
 
 } // vcl namespace

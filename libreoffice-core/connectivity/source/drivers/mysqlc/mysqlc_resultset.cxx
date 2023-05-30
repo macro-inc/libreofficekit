@@ -30,6 +30,8 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <comphelper/seqstream.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace rtl;
 
@@ -51,14 +53,13 @@ namespace
 {
 // copied from string misc, it should be replaced when library is not an
 // extension anymore
-std::vector<OString> lcl_split(const OString& rStr, char cSeparator)
+std::vector<OString> lcl_split(std::string_view rStr, char cSeparator)
 {
     std::vector<OString> vec;
     sal_Int32 idx = 0;
     do
     {
-        OString kw = rStr.getToken(0, cSeparator, idx);
-        kw = kw.trim();
+        OString kw(o3tl::trim(o3tl::getToken(rStr, 0, cSeparator, idx)));
         if (!kw.isEmpty())
         {
             vec.push_back(kw);
@@ -107,7 +108,7 @@ OResultSet::OResultSet(OConnection& rConn, OCommonStatement* pStmt, MYSQL_RES* p
     : OResultSet_BASE(m_aMutex)
     , OPropertySetHelper(OResultSet_BASE::rBHelper)
     , m_pMysql(rConn.getMysqlConnection())
-    , m_aStatement(static_cast<OWeakObject*>(pStmt))
+    , m_aStatement(css::uno::Reference<css::uno::XWeak>(static_cast<OWeakObject*>(pStmt)))
     , m_pResult(pResult)
     , m_encoding(_encoding)
 {
@@ -181,7 +182,7 @@ void OResultSet::disposing()
         mysql_free_result(m_pResult);
         m_pResult = nullptr;
     }
-    m_aStatement = nullptr;
+    m_aStatement.clear();
     m_xMetaData = nullptr;
 }
 
@@ -292,24 +293,23 @@ Date SAL_CALL OResultSet::getDate(sal_Int32 column)
     if (checkNull(column))
         return d;
 
-    OString dateStr = m_aRows[m_nRowPosition][column - 1];
+    const OString& dateStr = m_aRows[m_nRowPosition][column - 1];
 
-    OString dateString(dateStr);
-    OString token;
+    std::string_view dateString(dateStr);
     sal_Int32 nIndex = 0, i = 0;
     do
     {
-        token = dateString.getToken(0, '-', nIndex);
+        std::string_view token = o3tl::getToken(dateString, 0, '-', nIndex);
         switch (i)
         {
             case 0:
-                d.Year = static_cast<sal_uInt16>(token.toUInt32());
+                d.Year = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
             case 1:
-                d.Month = static_cast<sal_uInt16>(token.toUInt32());
+                d.Month = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
             case 2:
-                d.Day = static_cast<sal_uInt16>(token.toUInt32());
+                d.Day = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
             default:;
         }
@@ -467,25 +467,28 @@ Time SAL_CALL OResultSet::getTime(sal_Int32 column)
     if (checkNull(column))
         return t;
 
-    OString sVal = m_aRows[m_nRowPosition][column - 1];
-    OString timeString{ sVal.getStr(), getDataLength(column) };
-    OString token;
+    const OString& sVal = m_aRows[m_nRowPosition][column - 1];
+    std::string_view timeString{ sVal.getStr(), o3tl::make_unsigned(getDataLength(column)) };
     sal_Int32 nIndex, i = 0;
 
-    nIndex = timeString.indexOf(' ') + 1;
+    size_t idx = timeString.find(' ');
+    if (idx == std::string_view::npos)
+        nIndex = 0;
+    else
+        nIndex = idx + 1;
     do
     {
-        token = timeString.getToken(0, ':', nIndex);
+        std::string_view token = o3tl::getToken(timeString, 0, ':', nIndex);
         switch (i)
         {
             case 0:
-                t.Hours = static_cast<sal_uInt16>(token.toUInt32());
+                t.Hours = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
             case 1:
-                t.Minutes = static_cast<sal_uInt16>(token.toUInt32());
+                t.Minutes = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
             case 2:
-                t.Seconds = static_cast<sal_uInt16>(token.toUInt32());
+                t.Seconds = static_cast<sal_uInt16>(o3tl::toUInt32(token));
                 break;
         }
         i++;
@@ -507,7 +510,7 @@ DateTime SAL_CALL OResultSet::getTimestamp(sal_Int32 column)
 
     // YY-MM-DD HH:MM:SS
     std::vector<OString> dateAndTime
-        = lcl_split(OString{ sVal.getStr(), getDataLength(column) }, ' ');
+        = lcl_split(std::string_view(sVal.getStr(), getDataLength(column)), ' ');
 
     auto dateParts = lcl_split(dateAndTime.at(0), '-');
     auto timeParts = lcl_split(dateAndTime.at(1), ':');
@@ -1007,21 +1010,16 @@ uno::Sequence<sal_Int32> SAL_CALL OResultSet::deleteRows(const uno::Sequence<Any
 
 IPropertyArrayHelper* OResultSet::createArrayHelper() const
 {
-    uno::Sequence<Property> aProps(5);
-    Property* pProperties = aProps.getArray();
-    sal_Int32 nPos = 0;
-    pProperties[nPos++] = Property("FetchDirection", PROPERTY_ID_FETCHDIRECTION,
-                                   cppu::UnoType<sal_Int32>::get(), 0);
-    pProperties[nPos++]
-        = Property("FetchSize", PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-    pProperties[nPos++] = Property("IsBookmarkable", PROPERTY_ID_ISBOOKMARKABLE,
-                                   cppu::UnoType<bool>::get(), PropertyAttribute::READONLY);
-    pProperties[nPos++] = Property("ResultSetConcurrency", PROPERTY_ID_RESULTSETCONCURRENCY,
-                                   cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-    pProperties[nPos++] = Property("ResultSetType", PROPERTY_ID_RESULTSETTYPE,
-                                   cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-
-    return new OPropertyArrayHelper(aProps);
+    return new OPropertyArrayHelper{
+        { { "FetchDirection", PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0 },
+          { "FetchSize", PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0 },
+          { "IsBookmarkable", PROPERTY_ID_ISBOOKMARKABLE, cppu::UnoType<bool>::get(),
+            PropertyAttribute::READONLY },
+          { "ResultSetConcurrency", PROPERTY_ID_RESULTSETCONCURRENCY,
+            cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY },
+          { "ResultSetType", PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(),
+            PropertyAttribute::READONLY } }
+    };
 }
 
 IPropertyArrayHelper& OResultSet::getInfoHelper() { return *getArrayHelper(); }
@@ -1097,7 +1095,7 @@ css::uno::Reference<css::beans::XPropertySetInfo> SAL_CALL OResultSet::getProper
 
 void OResultSet::checkColumnIndex(sal_Int32 index)
 {
-    if (index < 1 || index > static_cast<int>(m_aFields.size()))
+    if (index < 1 || o3tl::make_unsigned(index) > m_aFields.size())
     {
         /* static object for efficiency or thread safety is a problem ? */
         throw SQLException("index out of range", *this, OUString(), 1, Any());

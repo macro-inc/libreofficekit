@@ -23,8 +23,9 @@
 #include <querycontroller.hxx>
 #include <sqlbison.hxx>
 #include <vcl/split.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -658,7 +659,7 @@ namespace
                     if  ( field->isAggregateFunction() )
                     {
                         OSL_ENSURE(!field->GetFunction().isEmpty(),"Function name must not be empty! ;-(");
-                        OUStringBuffer aTmpStr2( field->GetFunction() + "(" + aTmpStr.makeStringAndClear() + ")");
+                        OUStringBuffer aTmpStr2( field->GetFunction() + "(" + aTmpStr + ")");
                         aTmpStr = aTmpStr2;
                     }
 
@@ -670,7 +671,8 @@ namespace
                         aTmpStr.append(" AS ");
                         aTmpStr.append(::dbtools::quoteName(aQuote, rFieldAlias));
                     }
-                    aFieldListStr.append(aTmpStr.makeStringAndClear());
+                    aFieldListStr.append(aTmpStr);
+                    aTmpStr.setLength(0);
                     aFieldListStr.append(", ");
                 }
             }
@@ -919,7 +921,7 @@ namespace
                     {
                         aWorkStr += quoteTableAlias(bMulti,field->GetAlias(),aQuote) + ::dbtools::quoteName(aQuote, aColumnName);
                     }
-                    aWorkStr += " " + OUString( ";ASC;DESC" ).getToken( static_cast<sal_uInt16>(eOrder), ';' ) + ",";
+                    aWorkStr += OUString::Concat(" ") + o3tl::getToken( u";ASC;DESC", static_cast<sal_uInt16>(eOrder), ';' ) + ",";
                 }
             }
 
@@ -1819,27 +1821,26 @@ namespace
         else
             return false;
 
-        if ( eJoinType == CROSS_JOIN || bNatural )
-        {
+        if ( eJoinType != CROSS_JOIN && !bNatural )
+            return true;
 
-            OQueryTableWindow*  pLeftWindow = static_cast<OQueryTableView*>(_pView->getTableView())->FindTable( getTableRange(_pView,pNode->getChild(0)) );
-            OQueryTableWindow*  pRightWindow = static_cast<OQueryTableView*>(_pView->getTableView())->FindTable( getTableRange(_pView,pRightTableRef) );
-            OSL_ENSURE(pLeftWindow && pRightWindow,"Table Windows could not be found!");
-            if ( !pLeftWindow || !pRightWindow )
-                return false;
+        OQueryTableWindow*  pLeftWindow = static_cast<OQueryTableView*>(_pView->getTableView())->FindTable( getTableRange(_pView,pNode->getChild(0)) );
+        OQueryTableWindow*  pRightWindow = static_cast<OQueryTableView*>(_pView->getTableView())->FindTable( getTableRange(_pView,pRightTableRef) );
+        OSL_ENSURE(pLeftWindow && pRightWindow,"Table Windows could not be found!");
+        if ( !pLeftWindow || !pRightWindow )
+            return false;
 
-            OTableFieldDescRef aDragLeft  = new OTableFieldDesc();
-            aDragLeft->SetTabWindow(pLeftWindow);
-            aDragLeft->SetTable(pLeftWindow->GetTableName());
-            aDragLeft->SetAlias(pLeftWindow->GetAliasName());
+        OTableFieldDescRef aDragLeft  = new OTableFieldDesc();
+        aDragLeft->SetTabWindow(pLeftWindow);
+        aDragLeft->SetTable(pLeftWindow->GetTableName());
+        aDragLeft->SetAlias(pLeftWindow->GetAliasName());
 
-            OTableFieldDescRef aDragRight = new OTableFieldDesc();
-            aDragRight->SetTabWindow(pRightWindow);
-            aDragRight->SetTable(pRightWindow->GetTableName());
-            aDragRight->SetAlias(pRightWindow->GetAliasName());
+        OTableFieldDescRef aDragRight = new OTableFieldDesc();
+        aDragRight->SetTabWindow(pRightWindow);
+        aDragRight->SetTable(pRightWindow->GetTableName());
+        aDragRight->SetAlias(pRightWindow->GetAliasName());
 
-            insertConnection(_pView,eJoinType,aDragLeft,aDragRight,bNatural);
-        }
+        insertConnection(_pView,eJoinType,aDragLeft,aDragRight,bNatural);
 
         return true;
     }
@@ -2172,7 +2173,7 @@ namespace
                         if ( SQL_ISRULE(pColumnRef,general_set_fct) )
                         {
                             aInfo->SetFunctionType(nFunctionType|FKT_AGGREGATE);
-                            aInfo->SetFunction(comphelper::string::stripEnd(aColumns.getToken(0,'('), ' '));
+                            aInfo->SetFunction(OUString(comphelper::string::stripEnd(o3tl::getToken(aColumns,0,'('), ' ')));
                         }
                         else
                             aInfo->SetFunctionType(nFunctionType|FKT_OTHER);
@@ -2680,7 +2681,7 @@ void OQueryDesignView::fillValidFields(std::u16string_view sAliasName, weld::Com
 
 bool OQueryDesignView::PreNotify(NotifyEvent& rNEvt)
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS)
+    if (rNEvt.GetType() == NotifyEventType::GETFOCUS)
     {
         if ( m_pSelectionBox && m_pSelectionBox->HasChildPathFocus() )
             m_eChildFocus = SELECTION;
@@ -2777,7 +2778,7 @@ OUString OQueryDesignView::getStatement()
     if (!aCriteriaListStr.isEmpty())
     {
         aSqlCmd.append(" WHERE ");
-        aSqlCmd.append(aCriteriaListStr.makeStringAndClear());
+        aSqlCmd.append(aCriteriaListStr);
     }
     Reference<XDatabaseMetaData> xMeta;
     if ( xConnection.is() )
@@ -2791,7 +2792,7 @@ OUString OQueryDesignView::getStatement()
     if(!aHavingStr.isEmpty())
     {
         aSqlCmd.append(" HAVING ");
-        aSqlCmd.append(aHavingStr.makeStringAndClear());
+        aSqlCmd.append(aHavingStr);
     }
     // ----------------- construct sorting and attach ------------
     OUString sOrder;

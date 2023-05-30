@@ -31,12 +31,14 @@
 #include <QtSystem.hxx>
 #include <QtTools.hxx>
 #include <QtTransferable.hxx>
+#if CHECK_ANY_QT_USING_X11
+#include <QtX11Support.hxx>
+#endif
 
 #include <QtCore/QMimeData>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 #include <QtCore/QThread>
-#include <QtCore/QVersionNumber>
 #include <QtGui/QDragMoveEvent>
 #include <QtGui/QDropEvent>
 #include <QtGui/QIcon>
@@ -50,16 +52,10 @@
 #endif
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QMainWindow>
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11
+#if CHECK_QT5_USING_X11
 #include <QtX11Extras/QX11Info>
-#include <xcb/xproto.h>
-#if QT5_HAVE_XCB_ICCCM
-#include <xcb/xcb_icccm.h>
-#endif
 #endif
 
-#include <saldatabasic.hxx>
 #include <window.h>
 #include <vcl/syswin.hxx>
 
@@ -70,9 +66,8 @@
 
 #include <unx/fontmanager.hxx>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11 && QT5_HAVE_XCB_ICCCM
+#if CHECK_QT5_USING_X11 && QT5_HAVE_XCB_ICCCM
 static bool g_bNeedsWmHintsWindowGroup = true;
-static xcb_atom_t g_aXcbClientLeaderAtom = 0;
 #endif
 
 static void SvpDamageHandler(void* handle, sal_Int32 nExtentsX, sal_Int32 nExtentsY,
@@ -117,13 +112,12 @@ QtFrame::QtFrame(QtFrame* pParent, SalFrameStyleFlags nStyle, bool bUseCairo)
     , m_bDefaultPos(true)
     , m_bFullScreen(false)
     , m_bFullScreenSpanAll(false)
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11)                                      \
-    || (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT6_USING_X11)
+#if CHECK_ANY_QT_USING_X11
     , m_nKeyModifiers(ModKeyFlags::NONE)
 #endif
     , m_nInputLanguage(LANGUAGE_DONTKNOW)
 {
-    QtInstance* pInst = static_cast<QtInstance*>(GetSalData()->m_pInstance);
+    QtInstance* pInst = GetQtInstance();
     pInst->insertFrame(this);
 
     m_aDamageHandler.handle = this;
@@ -185,6 +179,8 @@ QtFrame::QtFrame(QtFrame* pParent, SalFrameStyleFlags nStyle, bool bUseCairo)
             m_pQWidget->setAttribute(Qt::WA_AlwaysShowToolTips);
     }
 
+    FillSystemEnvData(m_aSystemData, reinterpret_cast<sal_IntPtr>(this), m_pQWidget);
+
     QWindow* pChildWindow = windowHandle();
     connect(pChildWindow, &QWindow::screenChanged, this, &QtFrame::screenChanged);
 
@@ -195,8 +191,6 @@ QtFrame::QtFrame(QtFrame* pParent, SalFrameStyleFlags nStyle, bool bUseCairo)
             pChildWindow->setTransientParent(pParentWindow);
     }
 
-    FillSystemEnvData(m_aSystemData, reinterpret_cast<sal_IntPtr>(this), m_pQWidget);
-
     SetIcon(SV_ICON_ID_OFFICE);
 
     fixICCCMwindowGroup();
@@ -206,10 +200,14 @@ void QtFrame::screenChanged(QScreen*) { m_pQWidget->fakeResize(); }
 
 void QtFrame::FillSystemEnvData(SystemEnvData& rData, sal_IntPtr pWindow, QWidget* pWidget)
 {
+    assert(rData.platform == SystemEnvData::Platform::Invalid);
+    assert(rData.toolkit == SystemEnvData::Toolkit::Invalid);
     if (QGuiApplication::platformName() == "wayland")
         rData.platform = SystemEnvData::Platform::Wayland;
     else if (QGuiApplication::platformName() == "xcb")
         rData.platform = SystemEnvData::Platform::Xcb;
+    else if (QGuiApplication::platformName() == "wasm")
+        rData.platform = SystemEnvData::Platform::WASM;
     else
     {
         // maybe add a SystemEnvData::Platform::Unsupported to avoid special cases and not abort?
@@ -225,62 +223,16 @@ void QtFrame::FillSystemEnvData(SystemEnvData& rData, sal_IntPtr pWindow, QWidge
 
 void QtFrame::fixICCCMwindowGroup()
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11 && QT5_HAVE_XCB_ICCCM
-    // older Qt5 just sets WM_CLIENT_LEADER, but not the XCB_ICCCM_WM_HINT_WINDOW_GROUP
-    // see Qt commit 0de4b326d8 ("xcb: fix issue with dialogs hidden by other windows")
-    // or QTBUG-46626. So LO has to set this itself to help some WMs.
+#if CHECK_QT5_USING_X11 && QT5_HAVE_XCB_ICCCM
     if (!g_bNeedsWmHintsWindowGroup)
         return;
     g_bNeedsWmHintsWindowGroup = false;
 
+    assert(m_aSystemData.platform != SystemEnvData::Platform::Invalid);
     if (m_aSystemData.platform != SystemEnvData::Platform::Xcb)
         return;
-    if (QVersionNumber::fromString(qVersion()) >= QVersionNumber(5, 12))
-        return;
 
-    xcb_connection_t* conn = QX11Info::connection();
-    xcb_window_t win = asChild()->winId();
-
-    xcb_icccm_wm_hints_t hints;
-
-    xcb_get_property_cookie_t prop_cookie = xcb_icccm_get_wm_hints_unchecked(conn, win);
-    if (!xcb_icccm_get_wm_hints_reply(conn, prop_cookie, &hints, nullptr))
-        return;
-
-    if (hints.flags & XCB_ICCCM_WM_HINT_WINDOW_GROUP)
-        return;
-
-    if (g_aXcbClientLeaderAtom == 0)
-    {
-        const char* const leader_name = "WM_CLIENT_LEADER\0";
-        xcb_intern_atom_cookie_t atom_cookie
-            = xcb_intern_atom(conn, 1, strlen(leader_name), leader_name);
-        xcb_intern_atom_reply_t* atom_reply = xcb_intern_atom_reply(conn, atom_cookie, nullptr);
-        if (!atom_reply)
-            return;
-        g_aXcbClientLeaderAtom = atom_reply->atom;
-        free(atom_reply);
-    }
-
-    g_bNeedsWmHintsWindowGroup = true;
-
-    prop_cookie = xcb_get_property(conn, 0, win, g_aXcbClientLeaderAtom, XCB_ATOM_WINDOW, 0, 1);
-    xcb_get_property_reply_t* prop_reply = xcb_get_property_reply(conn, prop_cookie, nullptr);
-    if (!prop_reply)
-        return;
-
-    if (xcb_get_property_value_length(prop_reply) != 4)
-    {
-        free(prop_reply);
-        return;
-    }
-
-    xcb_window_t leader = *static_cast<xcb_window_t*>(xcb_get_property_value(prop_reply));
-    free(prop_reply);
-
-    hints.flags |= XCB_ICCCM_WM_HINT_WINDOW_GROUP;
-    hints.window_group = leader;
-    xcb_icccm_set_wm_hints(conn, win, &hints);
+    g_bNeedsWmHintsWindowGroup = QtX11Support::fixICCCMwindowGroup(asChild()->winId());
 #else
     (void)this; // avoid loplugin:staticmethods
 #endif
@@ -288,7 +240,7 @@ void QtFrame::fixICCCMwindowGroup()
 
 QtFrame::~QtFrame()
 {
-    QtInstance* pInst = static_cast<QtInstance*>(GetSalData()->m_pInstance);
+    QtInstance* pInst = GetQtInstance();
     pInst->eraseFrame(this);
     delete asChild();
     m_aSystemData.aShellWindow = 0;
@@ -349,7 +301,7 @@ void QtFrame::ReleaseGraphics(SalGraphics* pSalGraph)
 
 bool QtFrame::PostEvent(std::unique_ptr<ImplSVEvent> pData)
 {
-    QtInstance* pInst = static_cast<QtInstance*>(GetSalData()->m_pInstance);
+    QtInstance* pInst = GetQtInstance();
     pInst->PostEvent(this, pData.release(), SalEvent::UserEvent);
     return true;
 }
@@ -369,7 +321,20 @@ QWindow* QtFrame::windowHandle() const
 {
     // set attribute 'Qt::WA_NativeWindow' first to make sure a window handle actually exists
     QWidget* pChild = asChild();
-    pChild->setAttribute(Qt::WA_NativeWindow);
+    assert(pChild->window() == pChild);
+    switch (m_aSystemData.platform)
+    {
+        case SystemEnvData::Platform::Wayland:
+        case SystemEnvData::Platform::Xcb:
+            pChild->setAttribute(Qt::WA_NativeWindow);
+            break;
+        case SystemEnvData::Platform::WASM:
+            // no idea, why Qt::WA_NativeWindow breaks the menubar for EMSCRIPTEN
+            break;
+        case SystemEnvData::Platform::Invalid:
+            std::abort();
+            break;
+    }
     return pChild->windowHandle();
 }
 
@@ -432,8 +397,6 @@ void QtFrame::SetIcon(sal_uInt16 nIcon)
 
 void QtFrame::SetMenu(SalMenu*) {}
 
-void QtFrame::DrawMenuBar() { /* not needed */}
-
 void QtFrame::SetExtendedFrameStyle(SalExtStyle /*nExtStyle*/) { /* not needed */}
 
 void QtFrame::Show(bool bVisible, bool bNoActivate)
@@ -442,7 +405,7 @@ void QtFrame::Show(bool bVisible, bool bNoActivate)
     if (bVisible == asChild()->isVisible())
         return;
 
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     assert(pSalInst);
 
     if (!bVisible) // hide
@@ -528,7 +491,7 @@ Size QtFrame::CalcDefaultSize()
     {
         if (!m_bFullScreenSpanAll)
         {
-            aSize = toSize(QGuiApplication::screens().at(maGeometry.nDisplayScreenNumber)->size());
+            aSize = toSize(QGuiApplication::screens().at(maGeometry.screen())->size());
         }
         else
         {
@@ -568,9 +531,9 @@ void QtFrame::SetPosSize(tools::Long nX, tools::Long nY, tools::Long nWidth, too
         if (isChild(false) || !m_pQWidget->isMaximized())
         {
             if (!(nFlags & SAL_FRAME_POSSIZE_WIDTH))
-                nWidth = maGeometry.nWidth;
+                nWidth = maGeometry.width();
             else if (!(nFlags & SAL_FRAME_POSSIZE_HEIGHT))
-                nHeight = maGeometry.nHeight;
+                nHeight = maGeometry.height();
 
             if (nWidth > 0 && nHeight > 0)
             {
@@ -586,9 +549,9 @@ void QtFrame::SetPosSize(tools::Long nX, tools::Long nY, tools::Long nWidth, too
             // assume the resize happened
             // needed for calculations and will eventually be corrected by events
             if (nWidth > 0)
-                maGeometry.nWidth = nWidth;
+                maGeometry.setWidth(nWidth);
             if (nHeight > 0)
-                maGeometry.nHeight = nHeight;
+                maGeometry.setHeight(nHeight);
         }
     }
 
@@ -603,21 +566,20 @@ void QtFrame::SetPosSize(tools::Long nX, tools::Long nY, tools::Long nWidth, too
     {
         const SalFrameGeometry& aParentGeometry = m_pParent->maGeometry;
         if (QGuiApplication::isRightToLeft())
-            nX = aParentGeometry.nX + aParentGeometry.nWidth - nX - maGeometry.nWidth - 1;
+            nX = aParentGeometry.x() + aParentGeometry.width() - nX - maGeometry.width() - 1;
         else
-            nX += aParentGeometry.nX;
-        nY += aParentGeometry.nY + menuBarOffset();
+            nX += aParentGeometry.x();
+        nY += aParentGeometry.y() + menuBarOffset();
     }
 
     if (!(nFlags & SAL_FRAME_POSSIZE_X))
-        nX = maGeometry.nX;
+        nX = maGeometry.x();
     else if (!(nFlags & SAL_FRAME_POSSIZE_Y))
-        nY = maGeometry.nY;
+        nY = maGeometry.y();
 
     // assume the reposition happened
     // needed for calculations and will eventually be corrected by events later
-    maGeometry.nX = nX;
-    maGeometry.nY = nY;
+    maGeometry.setPos({ nX, nY });
 
     m_bDefaultPos = false;
     asChild()->move(round(nX / devicePixelRatioF()), round(nY / devicePixelRatioF()));
@@ -648,7 +610,7 @@ void QtFrame::SetModal(bool bModal)
     if (!isWindow() || asChild()->isModal() == bModal)
         return;
 
-    auto* pSalInst(static_cast<QtInstance*>(GetSalData()->m_pInstance));
+    auto* pSalInst(GetQtInstance());
     assert(pSalInst);
     pSalInst->RunInMainThread([this, bModal]() {
 
@@ -657,7 +619,16 @@ void QtFrame::SetModal(bool bModal)
 
         // modality change is only effective if the window is hidden
         if (bWasVisible)
+        {
             pChild->hide();
+            if (QGuiApplication::platformName() == "xcb")
+            {
+                SAL_WARN("vcl.qt", "SetModal called after Show - apply delay");
+                // tdf#152979 give QXcbConnection some time to avoid
+                // "qt.qpa.xcb: internal error:  void QXcbWindow::setNetWmStateOnUnmappedWindow() called on mapped window"
+                QThread::msleep(100);
+            }
+        }
 
         pChild->setWindowModality(bModal ? Qt::WindowModal : Qt::NonModal);
 
@@ -668,71 +639,64 @@ void QtFrame::SetModal(bool bModal)
 
 bool QtFrame::GetModal() const { return isWindow() && windowHandle()->isModal(); }
 
-void QtFrame::SetWindowState(const SalFrameState* pState)
+void QtFrame::SetWindowState(const vcl::WindowData* pState)
 {
     if (!isWindow() || !pState || isChild(true, false))
         return;
 
-    const WindowStateMask nMaxGeometryMask
-        = WindowStateMask::X | WindowStateMask::Y | WindowStateMask::Width | WindowStateMask::Height
-          | WindowStateMask::MaximizedX | WindowStateMask::MaximizedY
-          | WindowStateMask::MaximizedWidth | WindowStateMask::MaximizedHeight;
+    const vcl::WindowDataMask nMaxGeometryMask
+        = vcl::WindowDataMask::PosSize | vcl::WindowDataMask::MaximizedX
+          | vcl::WindowDataMask::MaximizedY | vcl::WindowDataMask::MaximizedWidth
+          | vcl::WindowDataMask::MaximizedHeight;
 
-    if ((pState->mnMask & WindowStateMask::State) && (pState->mnState & WindowStateState::Maximized)
-        && !isMaximized() && (pState->mnMask & nMaxGeometryMask) == nMaxGeometryMask)
+    if ((pState->mask() & vcl::WindowDataMask::State)
+        && (pState->state() & vcl::WindowState::Maximized) && !isMaximized()
+        && (pState->mask() & nMaxGeometryMask) == nMaxGeometryMask)
     {
         const qreal fRatio = devicePixelRatioF();
         QWidget* const pChild = asChild();
-        pChild->resize(ceil(pState->mnWidth / fRatio), ceil(pState->mnHeight / fRatio));
-        pChild->move(ceil(pState->mnX / fRatio), ceil(pState->mnY / fRatio));
+        pChild->resize(ceil(pState->width() / fRatio), ceil(pState->height() / fRatio));
+        pChild->move(ceil(pState->x() / fRatio), ceil(pState->y() / fRatio));
         SetWindowStateImpl(Qt::WindowMaximized);
     }
-    else if (pState->mnMask
-             & (WindowStateMask::X | WindowStateMask::Y | WindowStateMask::Width
-                | WindowStateMask::Height))
+    else if (pState->mask() & vcl::WindowDataMask::PosSize)
     {
         sal_uInt16 nPosSizeFlags = 0;
-        if (pState->mnMask & WindowStateMask::X)
+        if (pState->mask() & vcl::WindowDataMask::X)
             nPosSizeFlags |= SAL_FRAME_POSSIZE_X;
-        if (pState->mnMask & WindowStateMask::Y)
+        if (pState->mask() & vcl::WindowDataMask::Y)
             nPosSizeFlags |= SAL_FRAME_POSSIZE_Y;
-        if (pState->mnMask & WindowStateMask::Width)
+        if (pState->mask() & vcl::WindowDataMask::Width)
             nPosSizeFlags |= SAL_FRAME_POSSIZE_WIDTH;
-        if (pState->mnMask & WindowStateMask::Height)
+        if (pState->mask() & vcl::WindowDataMask::Height)
             nPosSizeFlags |= SAL_FRAME_POSSIZE_HEIGHT;
-        SetPosSize(pState->mnX, pState->mnY, pState->mnWidth, pState->mnHeight, nPosSizeFlags);
+        SetPosSize(pState->x(), pState->y(), pState->width(), pState->height(), nPosSizeFlags);
     }
-    else if (pState->mnMask & WindowStateMask::State && !isChild())
+    else if (pState->mask() & vcl::WindowDataMask::State && !isChild())
     {
-        if (pState->mnState & WindowStateState::Maximized)
+        if (pState->state() & vcl::WindowState::Maximized)
             SetWindowStateImpl(Qt::WindowMaximized);
-        else if (pState->mnState & WindowStateState::Minimized)
+        else if (pState->state() & vcl::WindowState::Minimized)
             SetWindowStateImpl(Qt::WindowMinimized);
         else
             SetWindowStateImpl(Qt::WindowNoState);
     }
 }
 
-bool QtFrame::GetWindowState(SalFrameState* pState)
+bool QtFrame::GetWindowState(vcl::WindowData* pState)
 {
-    pState->mnState = WindowStateState::Normal;
-    pState->mnMask = WindowStateMask::State;
-    if (isMinimized() /*|| !windowHandle()*/)
-        pState->mnState |= WindowStateState::Minimized;
+    pState->setState(vcl::WindowState::Normal);
+    pState->setMask(vcl::WindowDataMask::State);
+    if (isMinimized())
+        pState->rState() |= vcl::WindowState::Minimized;
     else if (isMaximized())
-    {
-        pState->mnState |= WindowStateState::Maximized;
-    }
+        pState->rState() |= vcl::WindowState::Maximized;
     else
     {
         // we want the frame position and the client area size
         QRect rect = scaledQRect({ asChild()->pos(), asChild()->size() }, devicePixelRatioF());
-        pState->mnX = rect.x();
-        pState->mnY = rect.y();
-        pState->mnWidth = rect.width();
-        pState->mnHeight = rect.height();
-        pState->mnMask |= WindowStateMask::X | WindowStateMask::Y | WindowStateMask::Width
-                          | WindowStateMask::Height;
+        pState->setPosSize(toRectangle(rect));
+        pState->rMask() |= vcl::WindowDataMask::PosSize;
     }
 
     return true;
@@ -756,7 +720,7 @@ void QtFrame::ShowFullScreen(bool bFullScreen, sal_Int32 nScreen)
     if (m_bFullScreen)
     {
         m_aRestoreGeometry = m_pTopLevel->geometry();
-        m_nRestoreScreen = maGeometry.nDisplayScreenNumber;
+        m_nRestoreScreen = maGeometry.screen();
         SetScreenNumber(m_bFullScreenSpanAll ? m_nRestoreScreen : nScreen);
         if (!m_bFullScreenSpanAll)
             windowHandle()->showFullScreen();
@@ -773,22 +737,25 @@ void QtFrame::ShowFullScreen(bool bFullScreen, sal_Int32 nScreen)
 
 void QtFrame::StartPresentation(bool bStart)
 {
-// meh - so there's no Qt platform independent solution
-// https://forum.qt.io/topic/38504/solved-qdialog-in-fullscreen-disable-os-screensaver
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11
+#if CHECK_ANY_QT_USING_X11
+    // meh - so there's no Qt platform independent solution
+    // https://forum.qt.io/topic/38504/solved-qdialog-in-fullscreen-disable-os-screensaver
+    assert(m_aSystemData.platform != SystemEnvData::Platform::Invalid);
+    const bool bIsX11 = m_aSystemData.platform == SystemEnvData::Platform::Xcb;
     std::optional<unsigned int> aRootWindow;
     std::optional<Display*> aDisplay;
 
+#if CHECK_QT5_USING_X11
     if (QX11Info::isPlatformX11())
     {
         aRootWindow = QX11Info::appRootWindow();
         aDisplay = QX11Info::display();
     }
+#endif
 
-    m_ScreenSaverInhibitor.inhibit(bStart, u"presentation", QX11Info::isPlatformX11(), aRootWindow,
-                                   aDisplay);
+    m_ScreenSaverInhibitor.inhibit(bStart, u"presentation", bIsX11, aRootWindow, aDisplay);
 #else
-    (void)bStart;
+    Q_UNUSED(bStart)
 #endif
 }
 
@@ -808,7 +775,11 @@ void QtFrame::ToTop(SalFrameToTop nFlags)
     if (isWindow() && !(nFlags & SalFrameToTop::GrabFocusOnly))
         pWidget->raise();
     if ((nFlags & SalFrameToTop::RestoreWhenMin) || (nFlags & SalFrameToTop::ForegroundTask))
+    {
+        if (nFlags & SalFrameToTop::RestoreWhenMin)
+            pWidget->setWindowState(pWidget->windowState() & ~Qt::WindowMinimized);
         pWidget->activateWindow();
+    }
     else if ((nFlags & SalFrameToTop::GrabFocus) || (nFlags & SalFrameToTop::GrabFocusOnly))
     {
         if (!(nFlags & SalFrameToTop::GrabFocusOnly))
@@ -823,7 +794,7 @@ void QtFrame::SetPointer(PointerStyle ePointerStyle)
         return;
     m_ePointerStyle = ePointerStyle;
 
-    m_pQWidget->setCursor(static_cast<QtData*>(GetSalData())->getCursor(ePointerStyle));
+    m_pQWidget->setCursor(GetQtData()->getCursor(ePointerStyle));
 }
 
 void QtFrame::CaptureMouse(bool bMouse)
@@ -859,7 +830,7 @@ bool QtFrame::ShowTooltip(const OUString& rText, const tools::Rectangle& rHelpAr
 {
     QRect aHelpArea(toQRect(rHelpArea));
     if (QGuiApplication::isRightToLeft())
-        aHelpArea.moveLeft(maGeometry.nWidth - aHelpArea.width() - aHelpArea.left() - 1);
+        aHelpArea.moveLeft(maGeometry.width() - aHelpArea.width() - aHelpArea.left() - 1);
     m_aTooltipText = rText;
     m_aTooltipArea = aHelpArea;
     return true;
@@ -997,6 +968,9 @@ OUString QtFrame::GetKeyName(sal_uInt16 nKeyCode)
             case KEY_BRACKETRIGHT:
                 nRetCode = Qt::Key_BracketRight;
                 break;
+            case KEY_COLON:
+                nRetCode = Qt::Key_Colon;
+                break;
             case KEY_SEMICOLON:
                 nRetCode = Qt::Key_Semicolon;
                 break;
@@ -1125,6 +1099,7 @@ void QtFrame::UpdateSettings(AllSettings& rSettings)
     // Text
     style.SetFieldTextColor(aText);
     style.SetFieldRolloverTextColor(aText);
+    style.SetListBoxWindowTextColor(aText);
     style.SetWindowTextColor(aText);
     style.SetToolTextColor(aText);
 
@@ -1132,6 +1107,7 @@ void QtFrame::UpdateSettings(AllSettings& rSettings)
     style.SetFieldColor(aBase);
     style.SetWindowColor(aBase);
     style.SetActiveTabColor(aBase);
+    style.SetListBoxWindowBackgroundColor(aBase);
     style.SetAlternatingRowColor(toColor(pal.color(QPalette::Active, QPalette::AlternateBase)));
 
     // Buttons
@@ -1169,6 +1145,8 @@ void QtFrame::UpdateSettings(AllSettings& rSettings)
     // Selection
     style.SetHighlightColor(aHigh);
     style.SetHighlightTextColor(aHighText);
+    style.SetListBoxWindowHighlightColor(aHigh);
+    style.SetListBoxWindowHighlightTextColor(aHighText);
     style.SetActiveColor(aHigh);
     style.SetActiveTextColor(aHighText);
 
@@ -1258,7 +1236,7 @@ SalFrame::SalPointerState QtFrame::GetPointerState()
 {
     SalPointerState aState;
     aState.maPos = toPoint(QCursor::pos() * devicePixelRatioF());
-    aState.maPos.Move(-maGeometry.nX, -maGeometry.nY);
+    aState.maPos.Move(-maGeometry.x(), -maGeometry.y());
     aState.mnState = GetMouseModCode(QGuiApplication::mouseButtons())
                      | GetKeyModCode(QGuiApplication::keyboardModifiers());
     return aState;
@@ -1344,31 +1322,19 @@ void QtFrame::SetScreenNumber(unsigned int nScreen)
         nScreen = static_cast<sal_uInt32>(screenNumber(primaryScreen));
     }
 
-    maGeometry.nDisplayScreenNumber = nScreen;
+    maGeometry.setScreen(nScreen);
 }
 
 void QtFrame::SetApplicationID(const OUString& rWMClass)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11
+#if CHECK_QT5_USING_X11
+    assert(m_aSystemData.platform != SystemEnvData::Platform::Invalid);
     if (m_aSystemData.platform != SystemEnvData::Platform::Xcb || !m_pTopLevel)
         return;
 
-    OString aResClass = OUStringToOString(rWMClass, RTL_TEXTENCODING_ASCII_US);
-    const char* pResClass
-        = !aResClass.isEmpty() ? aResClass.getStr() : SalGenericSystem::getFrameClassName();
-    OString aResName = SalGenericSystem::getFrameResName();
-
-    // the WM_CLASS data consists of two concatenated cstrings, including the terminating '\0' chars
-    const uint32_t data_len = aResName.getLength() + 1 + strlen(pResClass) + 1;
-    char* data = new char[data_len];
-    memcpy(data, aResName.getStr(), aResName.getLength() + 1);
-    memcpy(data + aResName.getLength() + 1, pResClass, strlen(pResClass) + 1);
-
-    xcb_change_property(QX11Info::connection(), XCB_PROP_MODE_REPLACE, m_pTopLevel->winId(),
-                        XCB_ATOM_WM_CLASS, XCB_ATOM_STRING, 8, data_len, data);
-    delete[] data;
+    QtX11Support::setApplicationID(m_pTopLevel->winId(), rWMClass);
 #else
-    (void)rWMClass;
+    Q_UNUSED(rWMClass);
 #endif
 }
 
@@ -1376,6 +1342,7 @@ void QtFrame::ResolveWindowHandle(SystemEnvData& rData) const
 {
     if (!rData.pWidget)
         return;
+    assert(rData.platform != SystemEnvData::Platform::Invalid);
     if (rData.platform != SystemEnvData::Platform::Wayland)
         rData.SetWindowHandle(static_cast<QWidget*>(rData.pWidget)->winId());
 }

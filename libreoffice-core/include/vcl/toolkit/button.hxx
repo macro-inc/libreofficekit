@@ -30,7 +30,7 @@
 #include <memory>
 #include <vector>
 
-namespace com::sun::star::frame { struct FeatureStateEvent; }
+namespace com::sun::star::frame { struct FeatureStateEvent; class XFrame; }
 template <class T> class VclPtr;
 
 class Color;
@@ -80,7 +80,7 @@ public:
     const Link<Button*,void>& GetClickHdl() const { return maClickHdl; }
 
     /// Setup handler for UNO commands so that commands like .uno:Something are handled automagically by this button.
-    void                SetCommandHandler(const OUString& aCommand);
+    void                SetCommandHandler(const OUString& aCommand, const css::uno::Reference<css::frame::XFrame>& rFrame);
     OUString const &    GetCommand() const { return maCommand; }
 
     void                SetModeImage( const Image& rImage );
@@ -181,6 +181,9 @@ public:
 
     void DumpAsPropertyTree(tools::JsonWriter&) override;
 
+    bool isToggleButton() { return mbIsToggleButton; }
+    void setToggleButton(bool bIsToggleButton) { mbIsToggleButton = bIsToggleButton; }
+
 protected:
     PushButtonDropdownStyle mnDDStyle;
     bool            mbIsActive;
@@ -218,6 +221,7 @@ private:
     TriState        meState;
     bool            mbPressed;
     bool            mbIsAction;
+    bool            mbIsToggleButton = false;
 };
 
 inline void PushButton::Check( bool bCheck )

@@ -22,7 +22,7 @@
 
 #include <rtl/ustring.hxx>
 #include <sfx2/dllapi.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <tools/link.hxx>
 #include <memory>
 #include <vector>
@@ -62,7 +62,7 @@ public:
         Compare,
         Merge
     };
-    DocumentInserter(weld::Window* pParent, const OUString& rFactory, const Mode mode = Mode::Insert);
+    DocumentInserter(weld::Window* pParent, OUString aFactory, const Mode mode = Mode::Insert);
     ~DocumentInserter();
 
     void                    StartExecuteModal( const Link<sfx2::FileDialogHelper*,void>& _rDialogClosedLink );

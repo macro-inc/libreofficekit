@@ -66,21 +66,22 @@ namespace sdr::properties
             return std::unique_ptr<BaseProperties>(new CircleProperties(*this, rObj));
         }
 
-        void CircleProperties::ItemSetChanged(const SfxItemSet* pSet)
+        void CircleProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich)
         {
             SdrCircObj& rObj = static_cast<SdrCircObj&>(GetSdrObject());
 
             // call parent
-            RectangleProperties::ItemSetChanged(pSet);
+            RectangleProperties::ItemSetChanged(aChangedItems, nDeletedWhich);
 
             // local changes
             rObj.ImpSetAttrToCircInfo();
         }
 
-        void CircleProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void CircleProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             // call parent (always first thing to do, may create the SfxItemSet)
-            RectangleProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr);
+            RectangleProperties::SetStyleSheet(pNewStyleSheet, bDontRemoveHardAttr, bBroadcast);
 
             // local changes
             SdrCircObj& rObj = static_cast<SdrCircObj&>(GetSdrObject());

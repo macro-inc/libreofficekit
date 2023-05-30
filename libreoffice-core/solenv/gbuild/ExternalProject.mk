@@ -184,9 +184,9 @@ endef
 #
 # gb_ExternalProject_use_libraries external libraries
 define gb_ExternalProject_use_libraries
-ifneq (,$$(filter-out $(gb_Library_KNOWNLIBS),$(2)))
+ifneq (,$$(filter-out $(gb_Library_KNOWNLIBS) $(gb_LinkTarget__syslib),$(2)))
 $$(eval $$(call gb_Output_info,currently known libraries are: $(sort $(gb_Library_KNOWNLIBS)),ALL))
-$$(eval $$(call gb_Output_error,Cannot link against library/libraries $$(filter-out $(gb_Library_KNOWNLIBS),$(2)). Libraries must be registered in Repository.mk or RepositoryExternal.mk))
+$$(eval $$(call gb_Output_error,Cannot link against library/libraries $$(filter-out $(gb_Library_KNOWNLIBS) $(gb_LinkTarget__syslib),$(2)). Libraries must be registered in Repository.mk or RepositoryExternal.mk))
 endif
 ifneq (,$$(filter $$(gb_MERGEDLIBS),$(2)))
 $$(eval $$(call gb_Output_error,Cannot link against library/libraries $$(filter $$(gb_MERGEDLIBS),$(2)) because they are merged.))
@@ -206,6 +206,14 @@ $(call gb_ExternalProject_get_preparation_target,$(1)) : \
 
 endef
 
+# Returns flags to include in CFLAGS/CXXFLAGS to enable optimizations and/or debugging.
+# gb_ExternalProject_get_build_flags project
+gb_ExternalProject_get_build_flags = $(call gb_LinkTarget__get_debugflags,ExternalProject_$(1))
+
+# Returns flags to include in LDFLAGS to enable optimizations and/or debugging.
+# gb_ExternalProject_get_link_flags project
+gb_ExternalProject_get_link_flags = $(LDFLAGS) $(USE_LD) $(call gb_LinkTarget__get_debugldflags,ExternalProject_$(1))
+
 # Run a target command
 #
 # This provides a wrapper that changes to the right directory,
@@ -222,7 +230,8 @@ $(call gb_Helper_print_on_error,cd $(EXTERNAL_WORKDIR)/$(3) && \
 	unset Platform && \
 	$(if $(WRAPPERS),export $(WRAPPERS) &&) \
 	$(if $(NMAKE),export $(NMAKE) &&) \
-	$(gb_COMPILER_SETUP) $(2) && touch $@,$(EXTERNAL_WORKDIR)/$(if $(3),$(3)/,)$(if $(4),$(4),$(1).log))
+	$(if $(gb_COMPILER_SETUP),export $(gb_COMPILER_SETUP) &&) \
+	$(2) && touch $@,$(EXTERNAL_WORKDIR)/$(if $(3),$(3)/,)$(if $(4),$(4),$(1).log))
 )
 endef
 

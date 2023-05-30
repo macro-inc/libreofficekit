@@ -43,6 +43,7 @@
 #include <com/sun/star/sdbcx/Privilege.hpp>
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <cppuhelper/exc_hlp.hxx>
+#include <o3tl/safeint.hxx>
 
 #include "pq_xtables.hxx"
 #include "pq_xviews.hxx"
@@ -55,7 +56,6 @@ using osl::MutexGuard;
 using com::sun::star::beans::XPropertySet;
 
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::Sequence;
@@ -111,16 +111,16 @@ void Tables::refresh()
             OUString name = xRow->getString( TABLE_INDEX_NAME+1);
             OUString schema = xRow->getString( TABLE_INDEX_SCHEMA+1);
             pTable->setPropertyValue_NoBroadcast_public(
-                st.CATALOG_NAME , makeAny(xRow->getString( TABLE_INDEX_CATALOG+1) ) );
-            pTable->setPropertyValue_NoBroadcast_public( st.NAME , makeAny( name ) );
-            pTable->setPropertyValue_NoBroadcast_public( st.SCHEMA_NAME , makeAny( schema ));
+                st.CATALOG_NAME , Any(xRow->getString( TABLE_INDEX_CATALOG+1) ) );
+            pTable->setPropertyValue_NoBroadcast_public( st.NAME , Any( name ) );
+            pTable->setPropertyValue_NoBroadcast_public( st.SCHEMA_NAME , Any( schema ));
             pTable->setPropertyValue_NoBroadcast_public(
-                st.TYPE , makeAny( xRow->getString( TABLE_INDEX_TYPE+1) ) );
+                st.TYPE , Any( xRow->getString( TABLE_INDEX_TYPE+1) ) );
             pTable->setPropertyValue_NoBroadcast_public(
-                st.DESCRIPTION , makeAny( xRow->getString( TABLE_INDEX_REMARKS+1) ) );
+                st.DESCRIPTION , Any( xRow->getString( TABLE_INDEX_REMARKS+1) ) );
             pTable->setPropertyValue_NoBroadcast_public(
                 st.PRIVILEGES ,
-                makeAny( sal_Int32( css::sdbcx::Privilege::SELECT |
+                Any( sal_Int32( css::sdbcx::Privilege::SELECT |
                            css::sdbcx::Privilege::INSERT |
                            css::sdbcx::Privilege::UPDATE |
                            css::sdbcx::Privilege::DELETE |
@@ -131,7 +131,7 @@ void Tables::refresh()
                            css::sdbcx::Privilege::DROP ) ) );
 
             {
-                m_values.push_back( makeAny( prop ) );
+                m_values.push_back( Any( prop ) );
                 map[ schema + "." + name ] = tableIndex;
                 ++tableIndex;
             }
@@ -311,7 +311,7 @@ void Tables::appendByDescriptor(
 void Tables::dropByIndex( sal_Int32 index )
 {
     osl::MutexGuard guard( m_xMutex->GetMutex() );
-    if( index < 0 ||  index >= static_cast<sal_Int32>(m_values.size()) )
+    if( index < 0 ||  o3tl::make_unsigned(index) >= m_values.size() )
     {
         throw css::lang::IndexOutOfBoundsException(
             "TABLES: Index out of range (allowed 0 to " + OUString::number(m_values.size() -1)

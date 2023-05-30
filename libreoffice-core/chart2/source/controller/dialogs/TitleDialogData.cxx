@@ -19,12 +19,12 @@
 
 #include <sal/config.h>
 
-#include <com/sun/star/frame/XModel.hpp>
-
 #include <TitleDialogData.hxx>
 #include <TitleHelper.hxx>
 #include <ChartModelHelper.hxx>
+#include <Diagram.hxx>
 #include <AxisHelper.hxx>
+#include <ChartModel.hxx>
 
 namespace chart
 {
@@ -39,9 +39,9 @@ TitleDialogData::TitleDialogData( std::unique_ptr<ReferenceSizeProvider> pRefSiz
 {
 }
 
-void TitleDialogData::readFromModel( const uno::Reference< frame::XModel>& xChartModel )
+void TitleDialogData::readFromModel( const rtl::Reference<::chart::ChartModel>& xChartModel )
 {
-    uno::Reference< XDiagram > xDiagram = ChartModelHelper::findDiagram(xChartModel);
+    rtl::Reference< Diagram > xDiagram = ChartModelHelper::findDiagram(xChartModel);
 
     //get possibilities
     uno::Sequence< sal_Bool > aAxisPossibilityList;
@@ -57,8 +57,8 @@ void TitleDialogData::readFromModel( const uno::Reference< frame::XModel>& xChar
     auto pTextList = aTextList.getArray();
     //find out which title exists and get their text
     //main title:
-    for( sal_Int32 nTitleIndex = static_cast< sal_Int32 >( TitleHelper::TITLE_BEGIN);
-         nTitleIndex < static_cast< sal_Int32 >( TitleHelper::NORMAL_TITLE_END );
+    for( auto nTitleIndex = +TitleHelper::TITLE_BEGIN;
+         nTitleIndex < +TitleHelper::NORMAL_TITLE_END;
          nTitleIndex++)
     {
         uno::Reference< XTitle > xTitle =  TitleHelper::getTitle(
@@ -69,13 +69,13 @@ void TitleDialogData::readFromModel( const uno::Reference< frame::XModel>& xChar
 }
 
 bool TitleDialogData::writeDifferenceToModel(
-                          const uno::Reference< frame::XModel >& xChartModel
+                          const rtl::Reference<::chart::ChartModel>& xChartModel
                         , const uno::Reference< uno::XComponentContext >& xContext
-                        , TitleDialogData* pOldState )
+                        , const TitleDialogData* pOldState )
 {
     bool bChanged = false;
-    for( sal_Int32 nN = static_cast< sal_Int32 >( TitleHelper::TITLE_BEGIN );
-         nN < static_cast< sal_Int32 >( TitleHelper::NORMAL_TITLE_END );
+    for( auto nN = +TitleHelper::TITLE_BEGIN;
+         nN < +TitleHelper::NORMAL_TITLE_END;
          nN++)
     {
         if( !pOldState || ( pOldState->aExistenceList[nN] != aExistenceList[nN] ) )

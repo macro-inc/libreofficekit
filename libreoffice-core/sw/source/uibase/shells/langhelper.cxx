@@ -177,21 +177,24 @@ namespace SwLangHelper
                 // when setting a new language attribute
                 if (bForSelection)
                 {
-                    const SwViewOption* pVOpt = rView.GetWrtShellPtr()->GetViewOptions();
-                    EEControlBits nCntrl = pEditEngine->GetControlWord();
-                    // turn off
-                    nCntrl &= ~EEControlBits::ONLINESPELLING;
-                    pEditEngine->SetControlWord(nCntrl);
-
-                    //turn back on
-                    if (pVOpt->IsOnlineSpell())
-                        nCntrl |= EEControlBits::ONLINESPELLING;
-                    else
+                    if (SwWrtShell* pWrtShell = rView.GetWrtShellPtr())
+                    {
+                        const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
+                        EEControlBits nCntrl = pEditEngine->GetControlWord();
+                        // turn off
                         nCntrl &= ~EEControlBits::ONLINESPELLING;
-                    pEditEngine->SetControlWord(nCntrl);
+                        pEditEngine->SetControlWord(nCntrl);
 
-                    pEditEngine->CompleteOnlineSpelling();
-                    rEditView.Invalidate();
+                        //turn back on
+                        if (pVOpt->IsOnlineSpell())
+                            nCntrl |= EEControlBits::ONLINESPELLING;
+                        else
+                            nCntrl &= ~EEControlBits::ONLINESPELLING;
+                        pEditEngine->SetControlWord(nCntrl);
+
+                        pEditEngine->CompleteOnlineSpelling();
+                        rEditView.Invalidate();
+                    }
                 }
 
                 if (!bForSelection)
@@ -515,13 +518,13 @@ namespace SwLangHelper
         // string for guessing language
         OUString aText;
         SwPaM *pCursor = rSh.GetCursor();
-        SwTextNode *pNode = pCursor->GetNode().GetTextNode();
+        SwTextNode *pNode = pCursor->GetPointNode().GetTextNode();
         if (pNode)
         {
             aText = pNode->GetText();
             if (!aText.isEmpty())
             {
-                sal_Int32 nEnd = pCursor->GetPoint()->nContent.GetIndex();
+                sal_Int32 nEnd = pCursor->GetPoint()->GetContentIndex();
                 // at most 100 chars to the left...
                 const sal_Int32 nStt = nEnd > 100 ? nEnd - 100 : 0;
                 // ... and 100 to the right of the cursor position

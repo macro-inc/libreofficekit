@@ -34,7 +34,6 @@
 
 using xforms::Convert;
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using namespace utl;
 
 Convert::Convert()
@@ -51,6 +50,36 @@ namespace
 
     Any lcl_toAny_OUString( const OUString& rStr )
     { return Any(rStr); }
+
+    OUString lcl_toXSD_bool( const Any& rAny )
+    { bool b = false; rAny >>= b; return b ? OUString("true") : OUString("false"); }
+
+    Any lcl_toAny_bool( const OUString& rStr )
+    {
+        bool b = ( rStr == "true"  ||  rStr == "1" );
+        return Any( b );
+    }
+
+    OUString lcl_toXSD_double( const Any& rAny )
+    {
+        double f = 0.0;
+        rAny >>= f;
+
+        return std::isfinite( f )
+            ? rtl::math::doubleToUString( f, rtl_math_StringFormat_Automatic,
+                                        rtl_math_DecimalPlaces_Max, '.',
+                                        true )
+            : OUString();
+    }
+
+
+    Any lcl_toAny_double( const OUString& rString )
+    {
+        rtl_math_ConversionStatus eStatus;
+        double f = rtl::math::stringToDouble(
+            rString.replace(',','.'), '.', ',', &eStatus );
+        return ( eStatus == rtl_math_ConversionStatus_Ok ) ? Any( f ) : Any();
+    }
 
     void lcl_appendInt32ToBuffer( const sal_Int32 _nValue, OUStringBuffer& _rBuffer, sal_Int16 _nMinDigits )
     {
@@ -86,7 +115,7 @@ namespace
     }
 
 
-    css::util::Date lcl_toUNODate( const OUString& rString )
+    css::util::Date lcl_toUNODate( std::u16string_view rString )
     {
         css::util::Date aDate( 1, 1, 1900 );
 
@@ -112,7 +141,7 @@ namespace
 
     Any lcl_toAny_UNODate( const OUString& rString )
     {
-        return makeAny( lcl_toUNODate( rString ) );
+        return Any( lcl_toUNODate( rString ) );
     }
 
 
@@ -148,7 +177,7 @@ namespace
     }
 
 
-    css::util::Time lcl_toUNOTime( const OUString& rString )
+    css::util::Time lcl_toUNOTime( std::u16string_view rString )
     {
         css::util::Time aTime;
 
@@ -182,7 +211,7 @@ namespace
 
     Any lcl_toAny_UNOTime( const OUString& rString )
     {
-        return makeAny( lcl_toUNOTime( rString ) );
+        return Any( lcl_toUNOTime( rString ) );
     }
 
 
@@ -218,14 +247,14 @@ namespace
         }
         else
         {
-            aDate = lcl_toUNODate( rString.copy( 0, nDateTimeSep ) );
-            aTime = lcl_toUNOTime( rString.copy( nDateTimeSep + 1 ) );
+            aDate = lcl_toUNODate( rString.subView( 0, nDateTimeSep ) );
+            aTime = lcl_toUNOTime( rString.subView( nDateTimeSep + 1 ) );
         }
         css::util::DateTime aDateTime(
             aTime.NanoSeconds, aTime.Seconds, aTime.Minutes, aTime.Hours,
             aDate.Day, aDate.Month, aDate.Year, aTime.IsUTC
         );
-        return makeAny( aDateTime );
+        return Any( aDateTime );
     }
 }
 
@@ -233,6 +262,8 @@ namespace
 void Convert::init()
 {
     maMap[ cppu::UnoType<OUString>::get() ] = Convert_t(&lcl_toXSD_OUString, &lcl_toAny_OUString);
+    maMap[ cppu::UnoType<bool>::get() ] = Convert_t(&lcl_toXSD_bool, &lcl_toAny_bool);
+    maMap[ cppu::UnoType<double>::get() ] = Convert_t(&lcl_toXSD_double, &lcl_toAny_double);
     maMap[ cppu::UnoType<css::util::Date>::get() ] = Convert_t( &lcl_toXSD_UNODate, &lcl_toAny_UNODate );
     maMap[ cppu::UnoType<css::util::Time>::get() ] = Convert_t( &lcl_toXSD_UNOTime, &lcl_toAny_UNOTime );
     maMap[ cppu::UnoType<css::util::DateTime>::get() ] = Convert_t( &lcl_toXSD_UNODateTime, &lcl_toAny_UNODateTime );

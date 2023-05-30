@@ -229,6 +229,21 @@ public:
 
 };
 
+/// Interface for the insert -> fields -> page number wizard dialog
+class AbstractSwPageNumberDlg : public VclAbstractDialog
+{
+protected:
+    virtual ~AbstractSwPageNumberDlg() override = default;
+public:
+    virtual int GetPageNumberPosition() const = 0;
+    virtual int GetPageNumberAlignment() const = 0;
+};
+
+/**
+ * Interface for the insert -> more breaks -> manual break dialog. It's implemented by
+ * AbstractSwBreakDlg_Impl, but SwTextShell only knows about this interface and the
+ * SwAbstractDialogFactory::CreateSwBreakDlg() factory.
+ */
 class AbstractSwBreakDlg
 {
 protected:
@@ -319,6 +334,11 @@ public:
     virtual std::shared_ptr<SfxDialogController> GetController() = 0;
 };
 
+/**
+ * Interface for e.g. the insert -> bookmark -> rename dialog. It's implemented by
+ * AbstractSwRenameXNamedDlg_Impl, but SwInsertBookmarkDlg only knows about this interface and the
+ * SwAbstractDialogFactory::CreateSwRenameXNamedDlg() factory.
+ */
 class AbstractSwRenameXNamedDlg : public VclAbstractDialog
 {
 protected:
@@ -346,8 +366,6 @@ class AbstractSwModalRedlineAcceptDlg : public VclAbstractDialog
 {
 protected:
     virtual ~AbstractSwModalRedlineAcceptDlg() override = default;
-public:
-    virtual void            AcceptAll( bool bAccept ) = 0;
 };
 
 class AbstractMarkFloatDlg : public VclAbstractDialog
@@ -403,7 +421,7 @@ public:
     virtual VclPtr<SfxAbstractDialog> CreateSwAddressAbstractDlg(weld::Window* pParent, const SfxItemSet& rSet) = 0;
     virtual VclPtr<AbstractSwAsciiFilterDlg>  CreateSwAsciiFilterDlg(weld::Window* pParent, SwDocShell& rDocSh,
                                                                 SvStream* pStream) = 0;
-    virtual VclPtr<VclAbstractDialog> CreateSwInsertBookmarkDlg(weld::Window *pParent, SwWrtShell &rSh) = 0;
+    virtual VclPtr<VclAbstractDialog> CreateSwInsertBookmarkDlg(weld::Window *pParent, SwWrtShell &rSh, OUString const* pSelected) = 0;
     virtual VclPtr<VclAbstractDialog> CreateSwContentControlDlg(weld::Window *pParent, SwWrtShell &rSh) = 0;
 
     virtual VclPtr<AbstractSwContentControlListItemDlg>
@@ -467,6 +485,7 @@ public:
         css::uno::Reference< css::container::XNamed > & xNamed,
         css::uno::Reference< css::container::XNameAccess > & xNameAccess) = 0;
     virtual VclPtr<AbstractSwModalRedlineAcceptDlg> CreateSwModalRedlineAcceptDlg(weld::Window *pParent) = 0;
+    virtual VclPtr<AbstractSwPageNumberDlg> CreateSwPageNumberDlg(weld::Window* pParent) = 0;
 
     virtual VclPtr<VclAbstractDialog>          CreateTableMergeDialog(weld::Window* pParent, bool& rWithPrev) = 0;
     virtual VclPtr<SfxAbstractTabDialog>       CreateFrameTabDialog(const OUString &rDialogType,

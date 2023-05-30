@@ -19,7 +19,7 @@
 
 #include <oox/helper/modelobjecthelper.hxx>
 
-#include <com/sun/star/awt/Gradient.hpp>
+#include <com/sun/star/awt/Gradient2.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/drawing/LineDash.hpp>
 #include <com/sun/star/drawing/Hatch.hpp>
@@ -28,6 +28,7 @@
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/awt/XBitmap.hpp>
 #include <oox/helper/containerhelper.hxx>
+#include <utility>
 #include <osl/diagnose.h>
 
 namespace oox {
@@ -37,9 +38,9 @@ using namespace ::com::sun::star::drawing;
 using namespace ::com::sun::star::lang;
 using namespace ::com::sun::star::uno;
 
-ObjectContainer::ObjectContainer( const Reference< XMultiServiceFactory >& rxModelFactory, const OUString& rServiceName ) :
+ObjectContainer::ObjectContainer( const Reference< XMultiServiceFactory >& rxModelFactory, OUString aServiceName ) :
     mxModelFactory( rxModelFactory ),
-    maServiceName( rServiceName ),
+    maServiceName(std::move( aServiceName )),
     mnIndex( 0 )
 {
     OSL_ENSURE( mxModelFactory.is(), "ObjectContainer::ObjectContainer - missing service factory" );
@@ -122,9 +123,19 @@ OUString ModelObjectHelper::insertLineDash( const LineDash& rDash )
     return maDashContainer.insertObject( gaDashNameBase, Any( rDash ), true );
 }
 
+OUString ModelObjectHelper::insertFillGradient( const awt::Gradient2& rGradient )
+{
+    return maGradientContainer.insertObject( gaGradientNameBase, Any( rGradient ), true );
+}
+
 OUString ModelObjectHelper::insertFillGradient( const awt::Gradient& rGradient )
 {
     return maGradientContainer.insertObject( gaGradientNameBase, Any( rGradient ), true );
+}
+
+OUString ModelObjectHelper::insertTransGrandient( const awt::Gradient2& rGradient )
+{
+    return maTransGradContainer.insertObject( gaTransGradNameBase, Any( rGradient ), true );
 }
 
 OUString ModelObjectHelper::insertTransGrandient( const awt::Gradient& rGradient )

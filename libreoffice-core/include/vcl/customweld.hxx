@@ -30,7 +30,7 @@ public:
     }
     // rRect is in Logical units rather than Pixels
     virtual void Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect) = 0;
-    virtual void Resize() {}
+    virtual void Resize() { Invalidate(); }
     virtual bool MouseButtonDown(const MouseEvent&) { return false; }
     virtual bool MouseMove(const MouseEvent&) { return false; }
     virtual bool MouseButtonUp(const MouseEvent&) { return false; }
@@ -110,10 +110,10 @@ public:
     {
         return m_pDrawingArea->get_clipboard();
     }
-    void SetDragDataTransferrable(rtl::Reference<TransferDataContainer>& rTransferrable,
-                                  sal_uInt8 eDNDConstants)
+    void SetDragDataTransferable(rtl::Reference<TransferDataContainer>& rTransferable,
+                                 sal_uInt8 eDNDConstants)
     {
-        m_pDrawingArea->enable_drag_source(rTransferrable, eDNDConstants);
+        m_pDrawingArea->enable_drag_source(rTransferable, eDNDConstants);
         m_pDrawingArea->connect_drag_begin(LINK(this, CustomWidgetController, DragBeginHdl));
     }
     // return true to disallow drag, false to allow

@@ -19,13 +19,10 @@
 
 #include <sal/config.h>
 
-#include <utility>
-
 #include <rtl/ustring.hxx>
 #include <svl/itemset.hxx>
 #include <svl/setitem.hxx>
 #include <svl/poolitem.hxx>
-#include <tools/debug.hxx>
 
 SfxSetItem::SfxSetItem( sal_uInt16 which, const SfxItemSet &rSet) :
     SfxPoolItem(which),
@@ -47,12 +44,7 @@ SfxSetItem::SfxSetItem( const SfxSetItem& rCopy, SfxItemPool *pPool ) :
     SfxPoolItem(rCopy),
     maSet(rCopy.maSet.CloneAsValue(true, pPool))
 {
-    assert(!dynamic_cast<const SfxAllItemSet*>(&rCopy) && "cannot handle SfxAllItemSet here");
-}
-
-
-SfxSetItem::~SfxSetItem()
-{
+    assert(!dynamic_cast<const SfxAllItemSet*>(&rCopy.maSet) && "cannot handle SfxAllItemSet here");
 }
 
 

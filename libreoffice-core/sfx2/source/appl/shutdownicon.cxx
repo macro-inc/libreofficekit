@@ -23,7 +23,6 @@
 #include "shutdownicon.hxx"
 #include <sfx2/strings.hrc>
 #include <sfx2/app.hxx>
-#include <osl/mutex.hxx>
 #include <svtools/imagemgr.hxx>
 #include <com/sun/star/task/InteractionHandler.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
@@ -56,6 +55,7 @@
 #include <osl/file.hxx>
 #include <osl/module.hxx>
 #include <rtl/ref.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <sfx2/sfxresid.hxx>
@@ -139,12 +139,11 @@ void ShutdownIcon::deInitSystray()
 }
 
 
-ShutdownIcon::ShutdownIcon( const css::uno::Reference< XComponentContext > & rxContext ) :
-    ShutdownIconServiceBase( m_aMutex ),
+ShutdownIcon::ShutdownIcon( css::uno::Reference< XComponentContext > xContext ) :
     m_bVeto ( false ),
     m_bListenForTermination ( false ),
     m_bSystemDialogs( false ),
-    m_xContext( rxContext ),
+    m_xContext(std::move( xContext )),
     m_bInitialized( false )
 {
     m_bSystemDialogs = officecfg::Office::Common::Misc::UseSystemFileDialog::get();
@@ -223,10 +222,7 @@ void ShutdownIcon::FromTemplate()
     if ( !xDisp.is() )
         return;
 
-    Sequence<PropertyValue> aArgs(1);
-    PropertyValue* pArg = aArgs.getArray();
-    pArg[0].Name = "Referer";
-    pArg[0].Value <<= OUString("private:user");
+    Sequence<PropertyValue> aArgs { comphelper::makePropertyValue("Referer", OUString("private:user")) };
     css::uno::Reference< css::frame::XNotifyingDispatch > xNotifier(xDisp, UNO_QUERY);
     if (xNotifier.is())
     {
@@ -237,7 +233,7 @@ void ShutdownIcon::FromTemplate()
         xDisp->dispatch( aTargetURL, aArgs );
 }
 
-OUString ShutdownIcon::GetUrlDescription( const OUString& aUrl )
+OUString ShutdownIcon::GetUrlDescription( std::u16string_view aUrl )
 {
     ::SolarMutexGuard aGuard;
 
@@ -466,12 +462,12 @@ ShutdownIcon* ShutdownIcon::createInstance()
 void ShutdownIcon::init()
 {
     css::uno::Reference < XDesktop2 > xDesktop = Desktop::create( m_xContext );
-    osl::MutexGuard aGuard(m_aMutex);
+    std::unique_lock aGuard(m_aMutex);
     m_xDesktop = xDesktop;
 }
 
 
-void SAL_CALL ShutdownIcon::disposing()
+void ShutdownIcon::disposing(std::unique_lock<std::mutex>&)
 {
     m_xContext.clear();
     m_xDesktop.clear();
@@ -490,7 +486,7 @@ void SAL_CALL ShutdownIcon::disposing( const css::lang::EventObject& )
 void SAL_CALL ShutdownIcon::queryTermination( const css::lang::EventObject& )
 {
     SAL_INFO("sfx.appl", "ShutdownIcon::queryTermination: veto is " << m_bVeto);
-    osl::MutexGuard  aGuard( m_aMutex );
+    std::unique_lock  aGuard( m_aMutex );
 
     if ( m_bVeto )
         throw css::frame::TerminationVetoException();
@@ -504,7 +500,7 @@ void SAL_CALL ShutdownIcon::notifyTermination( const css::lang::EventObject& )
 
 void SAL_CALL ShutdownIcon::initialize( const css::uno::Sequence< css::uno::Any>& aArguments )
 {
-    ::osl::ResettableMutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     // third argument only sets veto, everything else will be ignored!
     if (aArguments.getLength() > 2)
@@ -523,9 +519,9 @@ void SAL_CALL ShutdownIcon::initialize( const css::uno::Sequence< css::uno::Any>
                 bool bQuickstart = ::cppu::any2bool( aArguments[0] );
                 if( !bQuickstart && !GetAutostart() )
                     return;
-                aGuard.clear();
+                aGuard.unlock();
                 init ();
-                aGuard.reset();
+                aGuard.lock();
                 if ( !m_xDesktop.is() )
                     return;
 

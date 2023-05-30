@@ -24,34 +24,50 @@
 #include <editeng/editids.hrc>
 #include <svl/typedwhich.hxx>
 
-class SfxInt32Item;
-class SfxPointItem;
+class OfaPtrItem;
+class OfaXColorListItem;
+class SdrAngleItem;
 class SfxBoolItem;
-class SfxUInt32Item;
+class SfxInt32Item;
+class SfxInt64Item;
+class SfxIntegerListItem;
+class SfxPointItem;
 class SfxRectangleItem;
-class SvxPageItem;
-class SvxSizeItem;
-class SvxLongULSpaceItem;
-class SvxLongLRSpaceItem;
-class SvxPostItAuthorItem;
-class SvxPostItDateItem;
-class SvxPostItTextItem;
-class SvxPostItIdItem;
-class SvxColorListItem;
-class SvxColorItem;
-class SvxGradientListItem;
-class SvxRulerItem;
-class SvxNumberInfoItem;
-class SvxHatchListItem;
+class SfxStringItem;
+class SfxUInt32Item;
 class SvxBitmapListItem;
-class SvxPatternListItem;
+class SvxBoxInfoItem;
+class SvxBrushItem;
+class SvxChartColorTableItem;
+class SvxColorItem;
+class SvxColorListItem;
+class SvxColumnItem;
 class SvxDashListItem;
+class SvxDoubleItem;
+class SvxGradientListItem;
+class SvxGridItem;
+class SvxHatchListItem;
 class SvxLineEndListItem;
 class SvxLineItem;
-class SvxBoxInfoItem;
-class SfxStringItem;
+class SvxLongLRSpaceItem;
+class SvxLongULSpaceItem;
+class SvxNumberInfoItem;
+class SvxObjectItem;
+class SvxPageItem;
+class SvxPagePosSizeItem;
+class SvxPatternListItem;
+class SvxPostItAuthorItem;
+class SvxPostItDateItem;
+class SvxPostItIdItem;
+class SvxPostItTextItem;
+class SvxRulerItem;
 class SvxSetItem;
-class SdrAngleItem;
+class SvxSizeItem;
+class SvxStatusItem;
+class SvxSmartTagItem;
+class SvxViewLayoutItem;
+class SvxZoomSliderItem;
+class XFillGradientItem;
 
 // member IDs
 
@@ -84,7 +100,7 @@ class SdrAngleItem;
 #define FID_SEARCH_OFF                      (FID_SVX_START + 1)
 #define FID_SEARCH_NOW                      (FID_SVX_START + 2)
 
-#define SID_CHARMAP                         (FID_SVX_START + 3)
+#define SID_CHARMAP                         TypedWhichId<SfxStringItem>(FID_SVX_START + 3)
 
 #define FID_SEARCH_SEARCHSET                (FID_SVX_START + 4)
 #define FID_SEARCH_REPLACESET               (FID_SVX_START + 5)
@@ -125,8 +141,8 @@ class SdrAngleItem;
 #define SID_SIZE_PAGE_WIDTH                 (SID_SD_START+98)
 #define SID_INSERT_MATH                     (SID_SD_START+106)
 #define SID_SIZE_VISAREA                    (SID_SD_START+114)
-#define SID_ATTR_SYMBOLTYPE                 (SID_SD_START+115)  // used by Chart and SvxLineTabPage
-#define SID_ATTR_SYMBOLSIZE                 (SID_SD_START+116)
+#define SID_ATTR_SYMBOLTYPE                 TypedWhichId<SfxInt32Item>(SID_SD_START+115)  // used by Chart and SvxLineTabPage
+#define SID_ATTR_SYMBOLSIZE                 TypedWhichId<SvxSizeItem>(SID_SD_START+116)
 #define SID_HELPLINES_MOVE                  (SID_SD_START+153)
 #define SID_GRID_USE                        (SID_SD_START+154)
 #define ID_VAL_MOUSESTART_X                 (SID_SD_START+200)
@@ -151,16 +167,16 @@ class SdrAngleItem;
 #define SID_DASH                            (SID_SD_START+267)
 #define SID_TEXT_FITTOSIZE_VERTICAL         (SID_SD_START+286)
 #define SID_GRID_VISIBLE                    (SID_SD_START+322)
-#define ID_VAL_USEFIRSTROWSTYLE             (SID_SD_START+323)
-#define ID_VAL_USELASTROWSTYLE              (SID_SD_START+324)
-#define ID_VAL_USEBANDINGROWSTYLE           (SID_SD_START+325)
-#define ID_VAL_USEFIRSTCOLUMNSTYLE          (SID_SD_START+326)
-#define ID_VAL_USELASTCOLUMNSTYLE           (SID_SD_START+327)
-#define ID_VAL_USEBANDINGCOLUMNSTYLE        (SID_SD_START+328)
+#define ID_VAL_USEFIRSTROWSTYLE             TypedWhichId<SfxBoolItem>(SID_SD_START+323)
+#define ID_VAL_USELASTROWSTYLE              TypedWhichId<SfxBoolItem>(SID_SD_START+324)
+#define ID_VAL_USEBANDINGROWSTYLE           TypedWhichId<SfxBoolItem>(SID_SD_START+325)
+#define ID_VAL_USEFIRSTCOLUMNSTYLE          TypedWhichId<SfxBoolItem>(SID_SD_START+326)
+#define ID_VAL_USELASTCOLUMNSTYLE           TypedWhichId<SfxBoolItem>(SID_SD_START+327)
+#define ID_VAL_USEBANDINGCOLUMNSTYLE        TypedWhichId<SfxBoolItem>(SID_SD_START+328)
 
 // Writer IDs
 
-#define FN_EDIT                 (SID_SW_START +  100)
+#define FN_EDIT                 (SID_SW_START +  100) // 20100
 #define FN_NUM_BULLET_OFF       (FN_EDIT + 37)  // numbering off
 #define FN_NUM_BULLET_ON        (FN_EDIT + 38)  // numbering with bullets on
 #define FN_NUM_NUMBERING_ON     (FN_EDIT + 44)  // numbering on
@@ -168,7 +184,7 @@ class SdrAngleItem;
 #define FN_NUM_NUM_RULE_INDEX   (FN_EDIT + 121)
 #define FN_OUTLINE_RULE_INDEX   (FN_EDIT + 122)
 
-#define FN_INSERT               (SID_SW_START +  300)
+#define FN_INSERT               (SID_SW_START +  300) // 20300
 #define FN_DELETE_BOOKMARK      (FN_INSERT + 1)
 #define FN_INSERT_BREAK         (FN_INSERT + 3)
 #define FN_INSERT_SOFT_HYPHEN   (FN_INSERT + 43)    /* optional hyphen */
@@ -177,19 +193,19 @@ class SdrAngleItem;
 #define FN_INSERT_HARDHYPHEN    (FN_INSERT + 85)    /* hyphen without break*/
 
 //!! be aware to not overwrite something that is used in sw/inc/cmdid.h already !!
-#define FN_FORMAT               (SID_SW_START +  400)
+#define FN_FORMAT               (SID_SW_START +  400) // 20400
 #define FN_FORMAT_RESET         (FN_FORMAT + 69)
 
-#define FN_EXTRA                (SID_SW_START +  600)
+#define FN_EXTRA                (SID_SW_START +  600) // 20600
 
-#define FN_SELECTION            (SID_SW_START +  900)
+#define FN_SELECTION            (SID_SW_START +  900) // 20900
 #define FN_END_OF_DOCUMENT      (FN_SELECTION +  8)
 #define FN_START_DOC_DIRECT     (FN_SELECTION + 78)
 #define FN_END_DOC_DIRECT       (FN_SELECTION + 79)
 
 #define FN_PARAM                (SID_SW_START + 1100)
-#define FN_PARAM_FILTER         (FN_PARAM + 30)
-#define FN_PARAM_FIELD_CONTENT  (FN_PARAM + 55)
+#define FN_PARAM_FILTER         TypedWhichId<SfxStringItem>(FN_PARAM + 30)
+#define FN_PARAM_FIELD_CONTENT  TypedWhichId<SfxStringItem>(FN_PARAM + 55)
 
 #define FN_PGPREVIEW            (SID_SW_START + 1250)
 #define FN_SHOW_MULTIPLE_PAGES  (FN_PGPREVIEW + 2)
@@ -225,9 +241,9 @@ class SdrAngleItem;
 
 #define SID_RULER_CHANGE_STATE                          ( SID_SVX_START + 78 )
 #define SID_RULER_NULL_OFFSET                           TypedWhichId<SfxPointItem>( SID_SVX_START + 79 )
-#define SID_RULER_BORDERS                               TypedWhichId<SvxRulerItem>( SID_SVX_START + 80 )
-#define SID_RULER_OBJECT                                TypedWhichId<SvxRulerItem>( SID_SVX_START + 81 )
-#define SID_RULER_PAGE_POS                              TypedWhichId<SvxRulerItem>( SID_SVX_START + 82 )
+#define SID_RULER_BORDERS                               TypedWhichId<SvxColumnItem>( SID_SVX_START + 80 )
+#define SID_RULER_OBJECT                                TypedWhichId<SvxObjectItem>( SID_SVX_START + 81 )
+#define SID_RULER_PAGE_POS                              TypedWhichId<SvxPagePosSizeItem>( SID_SVX_START + 82 )
 #define SID_RULER_ACT_LINE_ONLY                         TypedWhichId<SfxBoolItem>( SID_SVX_START + 83 )
 #define SID_RULER_LR_MIN_MAX                            TypedWhichId<SfxUInt32Item>( SID_SVX_START + 84 )
 #define SID_ATTR_NUMBERFORMAT_VALUE                     TypedWhichId<SfxUInt32Item>( SID_SVX_START + 85 )
@@ -328,8 +344,8 @@ class SdrAngleItem;
 #define SID_DIALOG_TESTMODE                             ( SID_SVX_START + 200 )
 #define SID_FRAME_LINESTYLE                             TypedWhichId<SvxLineItem>( SID_SVX_START + 201 )
 #define SID_FRAME_LINECOLOR                             TypedWhichId<SvxColorItem>( SID_SVX_START + 202 )
-#define SID_ATTR_LINE_WIDTH_ARG                         ( SID_SVX_START + 203 )
-#define SID_FILL_GRADIENT_JSON                          ( SID_SVX_START + 204 )
+#define SID_ATTR_LINE_WIDTH_ARG                         TypedWhichId<SvxDoubleItem>( SID_SVX_START + 203 )
+#define SID_FILL_GRADIENT_JSON                          TypedWhichId<SfxStringItem>( SID_SVX_START + 204 )
 #define SID_SEARCHDLG_SEARCHSTRINGS                     ( SID_SVX_START + 215 )
 #define SID_SEARCHDLG_REPLACESTRINGS                    ( SID_SVX_START + 216 )
 #define SID_ATTR_TABLE                                  ( SID_SVX_START + 217 )
@@ -340,7 +356,7 @@ class SdrAngleItem;
 #define SID_ATTR_ZOOM_USER                              TypedWhichId<SfxUInt16Item>( SID_SVX_START + 222 )
 #define SID_ATTR_POSITION                               TypedWhichId<SfxPointItem>( SID_SVX_START + 223 )
 #define SID_ATTR_SIZE                                   TypedWhichId<SvxSizeItem>( SID_SVX_START + 224 )
-#define SID_TABLE_CELL                                  ( SID_SVX_START + 225 )
+#define SID_TABLE_CELL                                  TypedWhichId<SvxStatusItem>( SID_SVX_START + 225 )
 #define SID_ATTR_ALIGN_MARGIN                           ( SID_SVX_START + 228 )
 #define SID_ATTR_ALIGN_STACKED                          ( SID_SVX_START + 229 )
 #define SID_ATTR_ALIGN_LINEBREAK                        ( SID_SVX_START + 230 )
@@ -361,6 +377,8 @@ class SdrAngleItem;
 #define SID_SPELLCHECK_IGNORE                           ( SID_SVX_START + 246 )
 #define SID_SPELLCHECK_IGNORE_ALL                       ( SID_SVX_START + 247 )
 #define SID_SPELLCHECK_APPLY_SUGGESTION                 ( SID_SVX_START + 248 )
+#define SID_REGENERATE_DIAGRAM                          ( SID_SVX_START + 249 )
+#define SID_EDIT_DIAGRAM                                ( SID_SVX_START + 450 )
 
 // CAUTION! Range <250 .. 250> used by EditEngine (!)
 
@@ -384,38 +402,38 @@ class SdrAngleItem;
 #define SID_GALLERY_FORMATS                             ( SID_SVX_START + 280 )
 #define SID_OBJECT_HELL                                 ( SID_SVX_START + 282 )
 #define SID_OBJECT_HEAVEN                               ( SID_SVX_START + 283 )
-#define SID_ATTR_LONG_ULSPACE                           ( SID_SVX_START + 284 )
-#define SID_ATTR_LONG_LRSPACE                           ( SID_SVX_START + 285 )
+#define SID_ATTR_LONG_ULSPACE                           TypedWhichId<SvxLongULSpaceItem>( SID_SVX_START + 284 )
+#define SID_ATTR_LONG_LRSPACE                           TypedWhichId<SvxLongLRSpaceItem>( SID_SVX_START + 285 )
 #define SID_FRAME_TO_TOP                                ( SID_SVX_START + 286 )
 #define SID_FRAME_TO_BOTTOM                             ( SID_SVX_START + 287 )
-#define SID_SEARCH_SEARCHSET                            ( SID_SVX_START + 292 )
-#define SID_SEARCH_REPLACESET                           ( SID_SVX_START + 293 )
+#define SID_SEARCH_SEARCHSET                            TypedWhichId<SvxSetItem>( SID_SVX_START + 292 )
+#define SID_SEARCH_REPLACESET                           TypedWhichId<SvxSetItem>( SID_SVX_START + 293 )
 #define SID_SET_SUPER_SCRIPT                            ( SID_SVX_START + 294 )
 #define SID_SET_SUB_SCRIPT                              ( SID_SVX_START + 295 )
 #define SID_CHAR_DLG                                    ( SID_SVX_START + 296 )
 #define SID_PARA_DLG                                    ( SID_SVX_START + 297 )
-#define SID_ATTR_GRID_OPTIONS                           ( SID_SVX_START + 298 )
+#define SID_ATTR_GRID_OPTIONS                           TypedWhichId<SvxGridItem>( SID_SVX_START + 298 )
 #define SID_ATTR_FILL_SHADOW                            ( SID_SVX_START + 299 )
 
 // CAUTION! Range <300 .. 300> used by EditEngine (!)
 
 #define SID_ATTR_LINEEND_STYLE                          ( SID_SVX_START + 301 )
-#define SID_ATTR_TRANSFORM_SHEAR                        ( SID_SVX_START + 304 )
+#define SID_ATTR_TRANSFORM_SHEAR                        TypedWhichId<SdrAngleItem>( SID_SVX_START + 304 )
 #define SID_ATTR_TRANSFORM_SHEAR_X                      ( SID_SVX_START + 305 )
 #define SID_ATTR_TRANSFORM_SHEAR_Y                      ( SID_SVX_START + 306 )
-#define SID_ATTR_TRANSFORM_SHEAR_VERTICAL               ( SID_SVX_START + 307 )
+#define SID_ATTR_TRANSFORM_SHEAR_VERTICAL               TypedWhichId<SfxBoolItem>( SID_SVX_START + 307 )
 #define SID_ATTR_TRANSFORM_RESIZE_REF_X                 ( SID_SVX_START + 308 )
 #define SID_ATTR_TRANSFORM_RESIZE_REF_Y                 ( SID_SVX_START + 309 )
-#define SID_ATTR_TRANSFORM_AUTOWIDTH                    ( SID_SVX_START + 310 )
-#define SID_ATTR_TRANSFORM_AUTOHEIGHT                   ( SID_SVX_START + 311 )
-#define SID_ATTR_TRANSFORM_HORI_RELATION                ( SID_SVX_START + 312 )
-#define SID_ATTR_TRANSFORM_VERT_RELATION                ( SID_SVX_START + 313 )
-#define SID_ATTR_TRANSFORM_HORI_ORIENT                  ( SID_SVX_START + 314 )
+#define SID_ATTR_TRANSFORM_AUTOWIDTH                    TypedWhichId<SfxBoolItem>( SID_SVX_START + 310 )
+#define SID_ATTR_TRANSFORM_AUTOHEIGHT                   TypedWhichId<SfxBoolItem>( SID_SVX_START + 311 )
+#define SID_ATTR_TRANSFORM_HORI_RELATION                TypedWhichId<SfxInt16Item>( SID_SVX_START + 312 )
+#define SID_ATTR_TRANSFORM_VERT_RELATION                TypedWhichId<SfxInt16Item>( SID_SVX_START + 313 )
+#define SID_ATTR_TRANSFORM_HORI_ORIENT                  TypedWhichId<SfxInt16Item>( SID_SVX_START + 314 )
 #define SID_ATTR_TRANSFORM_IN_VERTICAL_TEXT             ( SID_SVX_START + 315 )
 #define SID_ATTR_TRANSFORM_IN_RTL_TEXT                  ( SID_SVX_START + 316 )
-#define SID_ATTR_TRANSFORM_HORI_MIRROR                  ( SID_SVX_START + 317 )
-#define SID_ATTR_TRANSFORM_ANCHOR                       ( SID_SVX_START + 318 )
-#define SID_ATTR_TRANSFORM_VERT_ORIENT                  ( SID_SVX_START + 319 )
+#define SID_ATTR_TRANSFORM_HORI_MIRROR                  TypedWhichId<SfxBoolItem>( SID_SVX_START + 317 )
+#define SID_ATTR_TRANSFORM_ANCHOR                       TypedWhichId<SfxInt16Item>( SID_SVX_START + 318 )
+#define SID_ATTR_TRANSFORM_VERT_ORIENT                  TypedWhichId<SfxInt16Item>( SID_SVX_START + 319 )
 #define SID_ATTR_GLOW_RADIUS                            ( SID_SVX_START + 320 )
 #define SID_ATTR_GLOW_COLOR                             ( SID_SVX_START + 321 )
 #define SID_ATTR_GLOW_TRANSPARENCY                      ( SID_SVX_START + 322 )
@@ -431,9 +449,10 @@ class SdrAngleItem;
 #define SID_ATTR_TEXTCOLUMNS_NUMBER                     ( SID_SVX_START + 340 )
 #define SID_ATTR_TEXTCOLUMNS_SPACING                    ( SID_SVX_START + 341 )
 
-#define SID_ATTR_COLOR_THEME_INDEX                      ( SID_SVX_START + 342 )
-#define SID_ATTR_COLOR_LUM_MOD                          ( SID_SVX_START + 343 )
-#define SID_ATTR_COLOR_LUM_OFF                          ( SID_SVX_START + 344 )
+#define SID_ATTR_COLOR_THEME_REFERENCE                  TypedWhichId<SvxColorItem>( SID_SVX_START + 342 )
+#define SID_ATTR_COLOR_THEME_INDEX                      TypedWhichId<SfxInt16Item>( SID_SVX_START + 343 )
+#define SID_ATTR_COLOR_LUM_MOD                          TypedWhichId<SfxInt16Item>( SID_SVX_START + 344 )
+#define SID_ATTR_COLOR_LUM_OFF                          TypedWhichId<SfxInt16Item>( SID_SVX_START + 345 )
 
 #define SID_SB_CONNECTIONPOOLING                        ( SID_SVX_START + 348 )
 #define SID_SB_DBREGISTEROPTIONS                        ( SID_SVX_START + 349 )
@@ -444,7 +463,7 @@ class SdrAngleItem;
 // CAUTION! Range <363 .. 363> used by EditEngine (!)
 
 #define SID_ATTR_TEXT_FITTOSIZE                         ( SID_SVX_START + 367 )
-#define SID_ATTR_BRUSH_ROW                              ( SID_SVX_START + 368 )
+#define SID_ATTR_BRUSH_ROW                              TypedWhichId<SvxBrushItem>( SID_SVX_START + 368 )
 #define SID_OPTFILTER_MSOFFICE                          ( SID_SVX_START + 369 )
 #define SID_IMAP                                        ( SID_SVX_START + 371 )
 #define SID_IMAP_EXEC                                   ( SID_SVX_START + 374 )
@@ -472,7 +491,7 @@ class SdrAngleItem;
 #define SID_DRAWTBX_RECTANGLES                          ( SID_SVX_START + 399 )
 #define SID_DRAWTBX_ELLIPSES                            ( SID_SVX_START + 400 )
 #define SID_DRAWTBX_LINES                               ( SID_SVX_START + 401 )
-#define SID_BACKGRND_DESTINATION                        ( SID_SVX_START + 404 )
+#define SID_BACKGRND_DESTINATION                        TypedWhichId<SfxUInt16Item>( SID_SVX_START + 404 )
 #define SID_ATTR_FLASH                                  ( SID_SVX_START + 406 )
 
 // CAUTION! Range <413 .. 413> used by EditEngine (!)
@@ -488,13 +507,13 @@ class SdrAngleItem;
 #define SID_TABLE_INSERT_ROW_BEFORE                     ( SID_SVX_START + 420 )
 #define SID_TABLE_INSERT_ROW_AFTER                      ( SID_SVX_START + 421 )
 
-#define SID_ATTR_3D_INTERN                              ( SID_SVX_START + 422 )
+#define SID_ATTR_3D_INTERN                              TypedWhichId<SfxUInt32Item>( SID_SVX_START + 422 )
 #define SID_PSZ_FUNCTION                                ( SID_SVX_START + 423 )
 
 // CAUTION! <424 > used by sfxids (!)
 #define SID_TABLE_INSERT_COL_DLG                        ( SID_SVX_START + 426 )
 #define SID_TABLE_INSERT_ROW_DLG                        ( SID_SVX_START + 427 )
-#define SID_TABLE_PARAM_INSERT_AFTER                    ( SID_SVX_START + 428 )
+#define SID_TABLE_PARAM_INSERT_AFTER                    TypedWhichId<SfxBoolItem>( SID_SVX_START + 428 )
 
 #define SID_TABLEDESIGN                                 ( SID_SVX_START + 429 )
 #define SID_GENERAL_OPTIONS                             ( SID_SVX_START + 432 )
@@ -502,17 +521,17 @@ class SdrAngleItem;
 #define SID_SD_EDITOPTIONS                              ( SID_SVX_START + 434 )
 #define SID_SC_EDITOPTIONS                              ( SID_SVX_START + 435 )
 #define SID_SM_EDITOPTIONS                              ( SID_SVX_START + 436 )
-#define SID_SCH_EDITOPTIONS                             ( SID_SVX_START + 437 )
+#define SID_SCH_EDITOPTIONS                             TypedWhichId<SvxChartColorTableItem>( SID_SVX_START + 437 )
 #define SID_SW_ONLINEOPTIONS                            ( SID_SVX_START + 439 )
-#define SID_GET_COLORLIST                               ( SID_SVX_START + 441 )
+#define SID_GET_COLORLIST                               TypedWhichId<OfaXColorListItem>( SID_SVX_START + 441 )
 #define SID_OUTLINE_TO_IMPRESS                          ( SID_SVX_START + 443 )
 #define SID_SPELLCHECKER_CHANGED                        ( SID_SVX_START + 446 )
 #define SID_SD_GRAPHIC_OPTIONS                          ( SID_SVX_START + 447 )
 #define SID_SM_TP_PRINTOPTIONS                          ( SID_SVX_START + 448 )
 #define SID_SB_STARBASEOPTIONS                          ( SID_SVX_START + 450 )
-#define SID_SWREGISTER_COLLECTION                       ( SID_SVX_START + 451 )
+#define SID_SWREGISTER_COLLECTION                       TypedWhichId<SfxStringItem>( SID_SVX_START + 451 )
 #define SID_FILTER_DLG                                  ( SID_SVX_START + 452 )
-#define SID_ATTR_BRUSH_TABLE                            ( SID_SVX_START + 453 )
+#define SID_ATTR_BRUSH_TABLE                            TypedWhichId<SvxBrushItem>( SID_SVX_START + 453 )
 #define SID_GROUP                                       ( SID_SVX_START + 454 )
 #define SID_UNGROUP                                     ( SID_SVX_START + 455 )
 #define SID_SET_DEFAULT                                 ( SID_SVX_START + 456 )
@@ -526,7 +545,7 @@ class SdrAngleItem;
 #define SID_DRAW_FREELINE                               ( SID_SVX_START + 463 )
 #define SID_DRAW_FREELINE_NOFILL                        ( SID_SVX_START + 464 )
 #define SID_DRAW_TEXT_MARQUEE                           ( SID_SVX_START + 465 )
-#define SID_SWREGISTER_MODE                             ( SID_SVX_START + 467 )
+#define SID_SWREGISTER_MODE                             TypedWhichId<SfxBoolItem>( SID_SVX_START + 467 )
 #define SID_GRFFILTER                                   ( SID_SVX_START + 469 )
 #define SID_GRFFILTER_INVERT                            ( SID_SVX_START + 470 )
 #define SID_GRFFILTER_SMOOTH                            ( SID_SVX_START + 471 )
@@ -550,9 +569,9 @@ class SdrAngleItem;
 
 // CAUTION! Range <587 .. 587> used by EditEngine (!)
 
-#define SID_PARAGRAPH_FIRST_LINE_INDENT                 ( SID_SVX_START + 588 )
-#define SID_PARAGRAPH_LEFT_INDENT                       ( SID_SVX_START + 589 )
-#define SID_PARAGRAPH_RIGHT_INDENT                      ( SID_SVX_START + 590 )
+#define SID_PARAGRAPH_FIRST_LINE_INDENT                 TypedWhichId<SfxStringItem>( SID_SVX_START + 588 )
+#define SID_PARAGRAPH_LEFT_INDENT                       TypedWhichId<SfxStringItem>( SID_SVX_START + 589 )
+#define SID_PARAGRAPH_RIGHT_INDENT                      TypedWhichId<SfxStringItem>( SID_SVX_START + 590 )
 
 // CAUTION! Range <591 .. 591> used by EditEngine (!)
 
@@ -576,7 +595,7 @@ class SdrAngleItem;
 #define SID_FM_DELETEROWS                               ( SID_SVX_START + 610 )
 //FREE
 //FREE
-#define SID_FM_CTL_PROPERTIES                           ( SID_SVX_START + 613 )
+#define SID_FM_CTL_PROPERTIES                           TypedWhichId<SfxBoolItem>( SID_SVX_START + 613 )
 #define SID_FM_PROPERTIES                               ( SID_SVX_START + 614 )
 #define SID_FM_TAB_DIALOG                               ( SID_SVX_START + 615 )
 #define SID_FM_RECORD_FIRST                             ( SID_SVX_START + 616 )
@@ -611,7 +630,7 @@ class SdrAngleItem;
 #define SID_CONVERT_TO_3D                               ( SID_SVX_START + 648 )
 #define SID_CONVERT_TO_3D_LATHE_FAST                    ( SID_SVX_START + 649 )
 #define SID_ATTR_3D_END                                   SID_CONVERT_TO_3D_LATHE_FAST
-#define SID_ATTR_NUMBERFORMAT_NOLANGUAGE                ( SID_SVX_START + 700 )
+#define SID_ATTR_NUMBERFORMAT_NOLANGUAGE                TypedWhichId<SfxBoolItem>( SID_SVX_START + 700 )
 
 #define SID_MORE_FMSLOTS_START                          ( SID_SVX_START + 702 )
 #define SID_FM_SHOW_PROPERTY_BROWSER                    ( SID_SVX_START + 703 )
@@ -665,7 +684,6 @@ class SdrAngleItem;
 #define SID_PARAGRAPH_CHANGE_STATE                      ( SID_SVX_START + 754 )
 
 #define SID_ATTR_SHADOW_BLUR                            ( SID_SVX_START + 755 )
-
 //FREE
 //FREE
 //FREE
@@ -689,8 +707,8 @@ class SdrAngleItem;
 
 // CAUTION! Range <855 .. 855> used by EditEngine (!)
 
-#define SID_PARAM_NUM_PRESET                            ( SID_SVX_START + 856 )
-#define SID_PARAM_CUR_NUM_LEVEL                         ( SID_SVX_START + 859 )
+#define SID_PARAM_NUM_PRESET                            TypedWhichId<SfxBoolItem>( SID_SVX_START + 856 )
+#define SID_PARAM_CUR_NUM_LEVEL                         TypedWhichId<SfxUInt16Item>( SID_SVX_START + 859 )
 #define SID_CREATE_SW_DRAWVIEW                          ( SID_SVX_START + 860 )
 #define SID_ATTR_GRAF_LUMINANCE                         ( SID_SVX_START + 863 )
 #define SID_ATTR_GRAF_CONTRAST                          ( SID_SVX_START + 864 )
@@ -698,18 +716,18 @@ class SdrAngleItem;
 #define SID_ATTR_GRAF_GREEN                             ( SID_SVX_START + 866 )
 #define SID_ATTR_GRAF_BLUE                              ( SID_SVX_START + 867 )
 #define SID_ATTR_GRAF_GAMMA                             ( SID_SVX_START + 868 )
-#define SID_ATTR_GRAF_TRANSPARENCE                      ( SID_SVX_START + 869 )
+#define SID_ATTR_GRAF_TRANSPARENCE                      TypedWhichId<SfxUInt16Item>( SID_SVX_START + 869 )
 #define SID_ATTR_GRAF_INVERT                            ( SID_SVX_START + 870 )
-#define SID_ATTR_GRAF_MODE                              ( SID_SVX_START + 871 )
+#define SID_ATTR_GRAF_MODE                              TypedWhichId<SfxUInt16Item>( SID_SVX_START + 871 )
 
 // CAUTION! Range <877 .. 877> used by EditEngine (!)
 
-#define SID_ATTR_GRAF_KEEP_ZOOM                         ( SID_SVX_START + 882 )
+#define SID_ATTR_GRAF_KEEP_ZOOM                         TypedWhichId<SfxBoolItem>( SID_SVX_START + 882 )
 #define SID_ATTR_GRAF_CROP                              ( SID_SVX_START + 883 )
-#define SID_ATTR_GRAF_FRMSIZE                           ( SID_SVX_START + 884 )
-#define SID_ATTR_GRAF_FRMSIZE_PERCENT                   ( SID_SVX_START + 885 )
-#define SID_ATTR_GRAF_GRAPHIC                           ( SID_SVX_START + 886 )
-#define SID_DRAW_TEXT_VERTICAL                              SID_ATTR_CHAR_VERTICAL
+#define SID_ATTR_GRAF_FRMSIZE                           TypedWhichId<SvxSizeItem>( SID_SVX_START + 884 )
+#define SID_ATTR_GRAF_FRMSIZE_PERCENT                   TypedWhichId<SvxSizeItem>( SID_SVX_START + 885 )
+#define SID_ATTR_GRAF_GRAPHIC                           TypedWhichId<SvxBrushItem>( SID_SVX_START + 886 )
+#define SID_DRAW_TEXT_VERTICAL                          SID_ATTR_CHAR_VERTICAL
 
 // CAUTION! Range <887 .. 903> used by EditEngine (!)
 
@@ -742,7 +760,7 @@ class SdrAngleItem;
 #define SID_INSERT_VFIXEDLINE                           ( SID_SVX_START + 929 )
 #define SID_READONLY_MODE                               ( SID_SVX_START + 930 )
 #define SID_ATTR_ALIGN_HYPHENATION                      ( SID_SVX_START + 931 )
-#define SID_ATTR_NUMBERFORMAT_SOURCE                    ( SID_SVX_START + 932 )
+#define SID_ATTR_NUMBERFORMAT_SOURCE                    TypedWhichId<SfxBoolItem>( SID_SVX_START + 932 )
 
 #define SID_RULER_BORDER_DISTANCE                       ( SID_SVX_START + 935 )
 #define SID_INSERT_DATEFIELD                            ( SID_SVX_START + 936 )
@@ -767,7 +785,7 @@ class SdrAngleItem;
 
 #define SID_RULER_TEXT_RIGHT_TO_LEFT                    ( SID_SVX_START + 952 )
 #define SID_ATTR_HDFT_DYNAMIC_SPACING                   ( SID_SVX_START + 953 )
-#define SID_ATTR_NUMBERFORMAT_ADD_AUTO                  ( SID_SVX_START + 954 )
+#define SID_ATTR_NUMBERFORMAT_ADD_AUTO                  TypedWhichId<SfxBoolItem>( SID_SVX_START + 954 )
 #define SID_OPEN_HYPERLINK                              ( SID_SVX_START + 955 )
 #define SID_CTLFONT_STATE                               ( SID_SVX_START + 956 )
 #define SID_VERTICALTEXT_STATE                          ( SID_SVX_START + 957 )
@@ -783,7 +801,7 @@ class SdrAngleItem;
 #define SID_EXTRUSION_LIGHTING_FLOATER                  ( SID_SVX_START + 967 )
 #define SID_EXTRUSION_SURFACE_FLOATER                   ( SID_SVX_START + 968 )
 #define SID_EXTRUSION_3D_COLOR                          ( SID_SVX_START + 969 )
-#define SID_EXTRUSION_DEPTH                             ( SID_SVX_START + 970 )
+#define SID_EXTRUSION_DEPTH                             TypedWhichId<SvxDoubleItem>( SID_SVX_START + 970 )
 #define SID_EXTRUSION_DIRECTION                         ( SID_SVX_START + 971 )
 #define SID_EXTRUSION_PROJECTION                        ( SID_SVX_START + 972 )
 #define SID_EXTRUSION_LIGHTING_DIRECTION                ( SID_SVX_START + 973 )
@@ -812,8 +830,8 @@ class SdrAngleItem;
 
 // CAUTION! Range <994 .. 998> used by EditEngine (!)
 
-#define SID_ATTR_TRANSFORM_HORI_POSITION                ( SID_SVX_START + 999 )
-#define SID_ATTR_TRANSFORM_VERT_POSITION                ( SID_SVX_START + 1000 )
+#define SID_ATTR_TRANSFORM_HORI_POSITION                TypedWhichId<SfxInt32Item>( SID_SVX_START + 999 )
+#define SID_ATTR_TRANSFORM_VERT_POSITION                TypedWhichId<SfxInt32Item>( SID_SVX_START + 1000 )
 // Available for use 1001
 #define SID_ALIGN_ANY_LEFT                              ( SID_SVX_START + 1002 )
 #define SID_ALIGN_ANY_HCENTER                           ( SID_SVX_START + 1003 )
@@ -834,7 +852,7 @@ class SdrAngleItem;
 #define SID_DLG_TYPE                                    ( SID_SVX_START + 1018 )
 #define SID_TABPAGE_POS                                 ( SID_SVX_START + 1019 )
 #define SID_GRAPHIC                                     ( SID_SVX_START + 1020 )
-#define SID_OBJECT_LIST                                 ( SID_SVX_START + 1021 )
+#define SID_OBJECT_LIST                                 TypedWhichId<OfaPtrItem>( SID_SVX_START + 1021 )
 #define SID_ATTR_SET                                    ( SID_SVX_START + 1022 )
 #define SID_CHAR_FMT_LIST_BOX                           ( SID_SVX_START + 1023 )
 #define SID_METRIC_ITEM                                 TypedWhichId<SfxUInt16Item>( SID_SVX_START + 1024 )
@@ -875,7 +893,7 @@ class SdrAngleItem;
 #define SID_INSERT_ZWSP                                 ( SID_SVX_START + 1058 )   /* insert ZWJ - invisible space, keep words together*/
 #define SID_INSERT_WJ                                   ( SID_SVX_START + 1059 )   /* insert WJ  - Word Joiner */
 #define SID_OPTIONS_DATABASES                           ( SID_SVX_START + 1060 )
-#define SID_OPEN_SMARTTAGMENU                           ( SID_SVX_START + 1061 )
+#define SID_OPEN_SMARTTAGMENU                           TypedWhichId<SvxSmartTagItem>( SID_SVX_START + 1061 )
 
 // CAUTION! Range <1062 .. 1069> used by include/sfx2/sfxsids.hrc
 
@@ -931,7 +949,7 @@ class SdrAngleItem;
 #define SID_COMPRESS_GRAPHIC                            ( SID_SVX_START + 1117 )
 #define SID_FRAME_UP                                    ( SID_SVX_START + 1118 )
 #define SID_FRAME_DOWN                                  ( SID_SVX_START + 1119 )
-#define SID_ATTR_SPECIALCHAR                            ( SID_SVX_START + 1120 )
+#define SID_ATTR_SPECIALCHAR                            TypedWhichId<SfxStringItem>( SID_SVX_START + 1120 )
 #define SID_ROTATE_GRAPHIC_LEFT                         ( SID_SVX_START + 1121 )
 #define SID_ROTATE_GRAPHIC_RIGHT                        ( SID_SVX_START + 1122 )
 #define SID_ROTATE_GRAPHIC_180                          ( SID_SVX_START + 1123 )
@@ -949,13 +967,14 @@ class SdrAngleItem;
 
 #define SID_CELL_FORMAT_BORDER                          ( SID_SVX_START + 1132 )
 #define SID_CHAR_DLG_EFFECT                             ( SID_SVX_START + 1133 )
-
+#define SID_CHAR_DLG_POSITION                           ( SID_SVX_START + 1134 )
+#define SID_ATTR_FILL_USE_SLIDE_BACKGROUND              ( SID_SVX_START + 1135 )
 #define FN_SVX_SET_NUMBER                               ( SID_SVX_START + 1136 )
 #define FN_SVX_SET_BULLET                               ( SID_SVX_START + 1137 )
 #define FN_SVX_SET_OUTLINE                              ( SID_SVX_START + 1138 )
 
-#define SID_ATTR_BORDER_STYLES                          ( SID_SVX_START + 1140 )
-#define SID_ATTR_BORDER_DEFAULT_WIDTH                   ( SID_SVX_START + 1141 )
+#define SID_ATTR_BORDER_STYLES                          TypedWhichId<SfxIntegerListItem>( SID_SVX_START + 1140 )
+#define SID_ATTR_BORDER_DEFAULT_WIDTH                   TypedWhichId<SfxInt64Item>( SID_SVX_START + 1141 )
 // 1142 is used by editeng (SID_ATTR_CHAR_GRABBAG)
 
 #define SID_OFFER_IMPORT                                ( SID_SVX_START + 1143 )
@@ -971,7 +990,7 @@ class SdrAngleItem;
 
 #define SID_ATTR_PAGE_COLOR                             ( SID_SVX_START + 1152 )
 // 1153 is used by editeng (SID_ATTR_CHAR_BACK_COLOR)
-#define SID_ATTR_PAGE_GRADIENT                          ( SID_SVX_START + 1154 )
+#define SID_ATTR_PAGE_GRADIENT                          TypedWhichId<XFillGradientItem>( SID_SVX_START + 1154 )
 #define SID_ATTR_PAGE_HATCH                             ( SID_SVX_START + 1155 )
 #define SID_ATTR_PAGE_BITMAP                            ( SID_SVX_START + 1156 )
 #define SID_ATTR_PAGE_FILLSTYLE                         ( SID_SVX_START + 1157 )
@@ -1030,11 +1049,12 @@ class SdrAngleItem;
 #define SID_ATTR_POSTIT_POSITION_Y                      TypedWhichId<SfxInt32Item>( SID_SVX_START + 1205 )
 
 #define SID_INSERT_TREECONTROL                          ( SID_SVX_START + 1206 )
-#define SID_ATTR_VIEWLAYOUT                             ( SID_SVX_START + 1207 )
-#define SID_ATTR_ZOOMSLIDER                             ( SID_SVX_START + 1208 )
+#define SID_ATTR_VIEWLAYOUT                             TypedWhichId<SvxViewLayoutItem>( SID_SVX_START + 1207 )
+#define SID_ATTR_ZOOMSLIDER                             TypedWhichId<SvxZoomSliderItem>( SID_SVX_START + 1208 )
+// Can be either SfxStringItem or SfxStringListItem
 #define SID_LANGUAGE_STATUS                             ( SID_SVX_START + 1209 )
 #define SID_CHAR_DLG_FOR_PARAGRAPH                      ( SID_SVX_START + 1210 )
-#define SID_SET_DOCUMENT_LANGUAGE                       ( SID_SVX_START + 1211 )
+#define SID_SET_DOCUMENT_LANGUAGE                       TypedWhichId<SfxBoolItem>( SID_SVX_START + 1211 )
 
 // IMPORTANT NOTE: adjust SID_SVX_FIRSTFREE, when adding new slot id
 #define SID_SVX_FIRSTFREE                               ( SID_SVX_START + 1211 + 1 )

@@ -26,8 +26,7 @@
 #include "xmlCondPrtExpr.hxx"
 #include "xmlFormatCondition.hxx"
 #include <osl/diagnose.h>
-#include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace rptxml
 {
@@ -94,7 +93,7 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > OXMLReportElement::cre
         case XML_ELEMENT(REPORT, XML_FORMAT_CONDITION):
             {
                 uno::Reference< report::XFormatCondition > xNewCond = m_xComponent->createFormatCondition();
-                m_xComponent->insertByIndex(m_xComponent->getCount(),uno::makeAny(xNewCond));
+                m_xComponent->insertByIndex(m_xComponent->getCount(),uno::Any(xNewCond));
                 rImport.GetProgressBarHelper()->Increment( PROGRESS_BAR_STEP );
                 xContext = new OXMLFormatCondition( rImport,xAttrList,xNewCond);
             }

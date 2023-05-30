@@ -22,6 +22,7 @@
 #include <com/sun/star/sdbcx/XTablesSupplier.hpp>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <map>
+#include <string_view>
 #include <connectivity/CommonTools.hxx>
 #include <OTypeInfo.hxx>
 #include <TConnection.hxx>
@@ -56,7 +57,7 @@ namespace connectivity::ado
             css::uno::WeakReference< css::sdbcx::XTablesSupplier>      m_xCatalog;
             ODriver*                    m_pDriver;
         private:
-            WpADOConnection*            m_pAdoConnection;
+            WpADOConnection             m_aAdoConnection;
             OCatalog*                   m_pCatalog;
             sal_Int32                   m_nEngineType;
             bool                        m_bClosed;
@@ -71,7 +72,7 @@ namespace connectivity::ado
             OConnection(ODriver*        _pDriver);
             //  OConnection(const SQLHANDLE _pConnectionHandle);
             ~OConnection() override;
-            void construct(const OUString& url,const css::uno::Sequence< css::beans::PropertyValue >& info);
+            void construct(std::u16string_view url,const css::uno::Sequence< css::beans::PropertyValue >& info);
 
             //XUnoTunnel
             virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
@@ -106,7 +107,7 @@ namespace connectivity::ado
             virtual css::uno::Any SAL_CALL getWarnings(  ) override;
             virtual void SAL_CALL clearWarnings(  ) override;
 
-            WpADOConnection* getConnection() { return m_pAdoConnection; }
+            WpADOConnection& getConnection() { return m_aAdoConnection; }
             void setCatalog(const css::uno::WeakReference< css::sdbcx::XTablesSupplier>& _xCat) { m_xCatalog = _xCat; }
             void setCatalog(OCatalog* _pCatalog) { m_pCatalog = _pCatalog; }
 

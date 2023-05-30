@@ -43,20 +43,21 @@
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <metadata.hxx>
 #include <osl/mutex.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <core_resource.hxx>
 #include <helpids.h>
 #include <strings.hrc>
 #include <PropertyForward.hxx>
+#include <utility>
 
 namespace rptui
 {
 
 using namespace ::com::sun::star;
 
-DataProviderHandler::DataProviderHandler(uno::Reference< uno::XComponentContext > const & context)
+DataProviderHandler::DataProviderHandler(uno::Reference< uno::XComponentContext > context)
     :DataProviderHandler_Base(m_aMutex)
-    ,m_xContext(context)
+    ,m_xContext(std::move(context))
 {
     try
     {
@@ -347,12 +348,12 @@ uno::Sequence< beans::Property > SAL_CALL DataProviderHandler::getSupportedPrope
     {
         rptui::OPropertyInfoService::getExcludeProperties( aNewProps, m_xFormComponentHandler );
         beans::Property aValue;
-        static const std::u16string_view s_pProperties[] =
+        static const rtl::OUStringConstExpr s_pProperties[] =
         {
-             u"" PROPERTY_CHARTTYPE
-            ,u"" PROPERTY_MASTERFIELDS
-            ,u"" PROPERTY_DETAILFIELDS
-            ,u"" PROPERTY_PREVIEW_COUNT
+             PROPERTY_CHARTTYPE
+            ,PROPERTY_MASTERFIELDS
+            ,PROPERTY_DETAILFIELDS
+            ,PROPERTY_PREVIEW_COUNT
         };
 
         for (const auto & rName : s_pProperties)
@@ -426,10 +427,10 @@ void SAL_CALL DataProviderHandler::actuatingPropertyChanged(const OUString & Act
             bool bModified = xReport->isModified();
             // this fills the chart again
             ::comphelper::NamedValueCollection aArgs;
-            aArgs.put( "CellRangeRepresentation", uno::makeAny( OUString( "all" ) ) );
-            aArgs.put( "HasCategories", uno::makeAny( true ) );
-            aArgs.put( "FirstCellAsLabel", uno::makeAny( true ) );
-            aArgs.put( "DataRowSource", uno::makeAny( chart::ChartDataRowSource_COLUMNS ) );
+            aArgs.put( "CellRangeRepresentation", uno::Any( OUString( "all" ) ) );
+            aArgs.put( "HasCategories", uno::Any( true ) );
+            aArgs.put( "FirstCellAsLabel", uno::Any( true ) );
+            aArgs.put( "DataRowSource", uno::Any( chart::ChartDataRowSource_COLUMNS ) );
             uno::Reference< chart2::data::XDataReceiver > xReceiver(m_xChartModel,uno::UNO_QUERY_THROW);
             xReceiver->setArguments( aArgs.getPropertyValues() );
             if ( !bModified )

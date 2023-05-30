@@ -179,6 +179,12 @@ private:
      */
     bool m_bLoaded;
 
+    /** @short  If we already brought it to front; do not do that again
+                (the user could switch elsewhere after the first activation,
+                and we shouldn't nag them again).
+     */
+    bool m_bFocusedAndToFront = false;
+
     /** @short      holds an XActionLock on the internal used task member.
 
         @seealso    m_xTargetFrame
@@ -200,7 +206,7 @@ public:
         @throw  A RuntimeException in case any internal process indicates, that
                 the whole runtime can't be used any longer.
      */
-    LoadEnv(const css::uno::Reference< css::uno::XComponentContext >& xContext);
+    LoadEnv(css::uno::Reference< css::uno::XComponentContext >  xContext);
 
     /** @short  deinitialize an instance of this class in the right way.
      */
@@ -533,6 +539,11 @@ private:
                 loading the document.
      */
     bool impl_filterHasInteractiveDialog() const;
+
+    /** @short  checks if this should bring to front and get focus on load,
+                according to user settings and to the load flags.
+     */
+    bool shouldFocusAndToFront() const;
 };
 
 } // namespace framework

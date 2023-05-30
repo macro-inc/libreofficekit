@@ -231,18 +231,6 @@ public:
     virtual void ClearDevFontCache() override;
     virtual bool AddTempDevFont(vcl::font::PhysicalFontCollection*, const OUString& rFileURL,
                                 const OUString& rFontName) override;
-    virtual bool CreateFontSubset(const OUString& rToFile, const vcl::font::PhysicalFontFace* pFont,
-                                  const sal_GlyphId* pGlyphIds, const sal_uInt8* pEncoding,
-                                  sal_Int32* pWidths, int nGlyphs,
-                                  FontSubsetInfo& rInfo // out parameter
-                                  ) override;
-
-    virtual const void* GetEmbedFontData(const vcl::font::PhysicalFontFace*,
-                                         tools::Long* pDataLen) override;
-    virtual void FreeEmbedFontData(const void* pData, tools::Long nDataLen) override;
-
-    virtual void GetGlyphWidths(const vcl::font::PhysicalFontFace*, bool bVertical,
-                                std::vector<sal_Int32>& rWidths, Ucs2UIntMap& rUnicodeEnc) override;
 
     virtual std::unique_ptr<GenericSalLayout> GetTextLayout(int nFallbackLevel) override;
     virtual void DrawTextLayout(const GenericSalLayout&) override;

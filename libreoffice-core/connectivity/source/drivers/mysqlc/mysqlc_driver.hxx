@@ -21,24 +21,21 @@
 #include "mysqlc_connection.hxx"
 
 #include <com/sun/star/sdbc/XDriver.hpp>
-#include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-
-#include <cppuhelper/compbase2.hxx>
-#include <osl/module.h>
+#include <com/sun/star/sdbcx/XDataDefinitionSupplier.hpp>
+#include <cppuhelper/compbase.hxx>
 
 namespace connectivity::mysqlc
 {
-using css::sdbc::SQLException;
-using css::uno::Exception;
 using css::uno::Reference;
-using css::uno::RuntimeException;
 using css::uno::Sequence;
 
 Reference<css::uno::XInterface>
 MysqlCDriver_CreateInstance(const Reference<css::lang::XMultiServiceFactory>& _rxFactory);
 
-typedef ::cppu::WeakComponentImplHelper2<css::sdbc::XDriver, css::lang::XServiceInfo> ODriver_BASE;
+typedef ::cppu::WeakComponentImplHelper<css::sdbc::XDriver, css::sdbcx::XDataDefinitionSupplier,
+                                        css::lang::XServiceInfo>
+    ODriver_BASE;
 
 typedef void* (*OMysqlCConnection_CreateInstanceFunction)(void* _pDriver);
 
@@ -50,10 +47,6 @@ protected:
     OWeakRefArray m_xConnections; // vector containing a list
         // of all the Connection objects
         // for this Driver
-#ifdef BUNDLE_MARIADB
-    oslModule m_hCConnModule;
-    bool m_bAttemptedLoadCConn;
-#endif
 public:
     explicit MysqlCDriver(const Reference<css::lang::XMultiServiceFactory>& _rxFactory);
 
@@ -82,6 +75,12 @@ public:
     const Reference<css::lang::XMultiServiceFactory>& getFactory() const { return m_xFactory; }
 
     static rtl_TextEncoding getDefaultEncoding() { return RTL_TEXTENCODING_UTF8; }
+
+    // XDataDefinitionSupplier
+    virtual css::uno::Reference<css::sdbcx::XTablesSupplier> SAL_CALL getDataDefinitionByConnection(
+        const css::uno::Reference<css::sdbc::XConnection>& rxConnection) override;
+    virtual css::uno::Reference<css::sdbcx::XTablesSupplier> SAL_CALL getDataDefinitionByURL(
+        const OUString& rsURL, const css::uno::Sequence<css::beans::PropertyValue>& rInfo) override;
 };
 
 } /* connectivity::mysqlc */

@@ -43,6 +43,7 @@ public:
     static sal_Unicode getUnicodeScriptStart(css::i18n::UnicodeScript type);
     static sal_Unicode getUnicodeScriptEnd(css::i18n::UnicodeScript type);
     static sal_uInt8 getUnicodeDirection(const sal_Unicode ch);
+    static sal_uInt32 GetMirroredChar(sal_uInt32);
     static bool isControl(const sal_Unicode ch);
     static bool isAlpha(const sal_Unicode ch);
     static bool isSpace(const sal_Unicode ch);
@@ -82,6 +83,15 @@ public:
     //Format a number as a percentage according to the rules of the given
     //language, e.g. 100 -> "100%" for en-US vs "100 %" for de-DE
     static OUString formatPercent(double dNumber, const LanguageTag& rLangTag);
+
+    /** Map a LanguageTag's language ISO 639 code or script ISO 15924 code or
+        language-script or locale to Latin/Asian/Complex/Weak. If more than one
+        script is used with a language(-country) tag then the first (default)
+        script is mapped for that language.
+
+        @return a css::i18n::ScriptType value.
+     */
+    static sal_Int16 getScriptClassFromLanguageTag(const LanguageTag& rLanguageTag);
 };
 
 /*

@@ -24,6 +24,7 @@
 #include <comphelper/broadcasthelper.hxx>
 #include <comphelper/propertycontainer.hxx>
 #include <comphelper/proparrhlp.hxx>
+#include <rtl/ref.hxx>
 
 // interfaces and types
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -40,6 +41,8 @@ namespace com::sun::star::chart2 { class XInternalDataProvider; }
 
 namespace chart
 {
+class InternalDataProvider;
+class ModifyEventForwarder;
 
 namespace impl
 {
@@ -76,11 +79,11 @@ public:
         lifetime is at least as long as the one of this object.
      */
     UncachedDataSequence(
-        const css::uno::Reference< css::chart2::XInternalDataProvider > & xIntDataProv,
-        const OUString & rRangeRepresentation );
+        rtl::Reference< InternalDataProvider > xIntDataProv,
+        OUString aRangeRepresentation );
     UncachedDataSequence(
-        const css::uno::Reference< css::chart2::XInternalDataProvider > & xIntDataProv,
-        const OUString & rRangeRepresentation,
+        rtl::Reference< InternalDataProvider > xIntDataProv,
+        OUString aRangeRepresentation,
         const OUString & rRole );
     UncachedDataSequence( const UncachedDataSequence & rSource );
     virtual ~UncachedDataSequence() override;
@@ -160,10 +163,9 @@ private:
      */
     void registerProperties();
 
-    css::uno::Reference< css::chart2::XInternalDataProvider > m_xDataProvider;
-    OUString                 m_aSourceRepresentation;
-    css::uno::Reference< css::util::XModifyListener >
-        m_xModifyEventForwarder;
+    rtl::Reference< InternalDataProvider > m_xDataProvider;
+    OUString m_aSourceRepresentation;
+    rtl::Reference<ModifyEventForwarder> m_xModifyEventForwarder;
 };
 
 }  // namespace chart

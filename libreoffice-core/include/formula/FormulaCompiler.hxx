@@ -83,12 +83,13 @@ public:
     {
         OpCodeHashMap           maHashMap;                  /// Hash map of symbols, OUString -> OpCode
         std::unique_ptr<OUString[]> mpTable;                /// Array of symbols, OpCode -> OUString, offset==OpCode
-        ExternalHashMap         maExternalHashMap;         /// Hash map of ocExternal, Filter String -> AddIn String
-        ExternalHashMap         maReverseExternalHashMap;  /// Hash map of ocExternal, AddIn String -> Filter String
+        ExternalHashMap         maExternalHashMap;          /// Hash map of ocExternal, Filter String -> AddIn String
+        ExternalHashMap         maReverseExternalHashMap;   /// Hash map of ocExternal, AddIn String -> Filter String
         FormulaGrammar::Grammar meGrammar;                  /// Grammar, language and reference convention
         sal_uInt16              mnSymbols;                  /// Count of OpCode symbols
-        bool                    mbCore      : 1;            /// If mapping was setup by core, not filters
-        bool                    mbEnglish   : 1;            /// If English symbols and external names
+        bool                    mbCore          : 1;        /// If mapping was setup by core, not filters
+        bool                    mbEnglish       : 1;        /// If English symbols and external names
+        bool                    mbEnglishLocale : 1;        /// If English locale for numbers
 
         OpCodeMap( const OpCodeMap& ) = delete;
         OpCodeMap& operator=( const OpCodeMap& ) = delete;
@@ -101,7 +102,8 @@ public:
             meGrammar( eGrammar),
             mnSymbols( nSymbols),
             mbCore( bCore),
-            mbEnglish ( FormulaGrammar::isEnglish(eGrammar) )
+            mbEnglish ( FormulaGrammar::isEnglish(eGrammar) ),
+            mbEnglishLocale ( mbEnglish )
         {
         }
 
@@ -145,6 +147,10 @@ public:
             be English as well)? */
         bool isEnglish() const { return mbEnglish; }
 
+        /** Are inline numbers parsed/formatted in en-US locale, as opposed
+            to default locale? */
+        bool isEnglishLocale() const { return mbEnglishLocale; }
+
         /// Is it an ODF 1.1 compatibility mapping?
         bool isPODF() const { return FormulaGrammar::isPODF( meGrammar); }
 
@@ -166,7 +172,8 @@ public:
         void putExternal( const OUString & rSymbol, const OUString & rAddIn );
 
         /** Put entry of symbol String and AddIn international String pair,
-            failing silently if rAddIn name already exists. */
+            not warning just info as used for AddIn collection and setting up
+            alias names. */
         void putExternalSoftly( const OUString & rSymbol, const OUString & rAddIn );
 
         /// Core implementation of XFormulaOpCodeMapper::getMappings()
@@ -195,12 +202,55 @@ public:
     typedef std::shared_ptr< const OpCodeMap >  OpCodeMapPtr;
     typedef std::shared_ptr< OpCodeMap >        NonConstOpCodeMapPtr;
 
+protected:
+    /** Get finalized OpCodeMap for formula language.
+
+        Creates/returns a singleton instance of an OpCodeMap that contains
+        external AddIn mappings if the derived class supports them. Do not call
+        at this base class as it results in a permanent mapping without AddIns
+        even for derived classes (unless it is for the implementation of the
+        temporary GetOpCodeMap()).
+
+        @param nLanguage
+            One of css::sheet::FormulaLanguage constants.
+        @return Map for nLanguage. If nLanguage is unknown, a NULL map is returned.
+     */
+    OpCodeMapPtr GetFinalOpCodeMap( const sal_Int32 nLanguage ) const;
+
+public:
     /** Get OpCodeMap for formula language.
+
+        Returns either the finalized OpCodeMap (created by GetFinalOpCodeMap()
+        of a derived class) for nLanguage if there is such, or if not then a
+        temporary map of which its singleton is reset immediately and the
+        temporary will get destroyed by the caller's scope. A temporary map
+        created at this base class does *not* contain AddIn mappings.
+
         @param nLanguage
             One of css::sheet::FormulaLanguage constants.
         @return Map for nLanguage. If nLanguage is unknown, a NULL map is returned.
      */
     OpCodeMapPtr GetOpCodeMap( const sal_Int32 nLanguage ) const;
+
+    /** Destroy the singleton OpCodeMap for formula language.
+
+        This unconditionally destroys the underlying singleton instance of the
+        map to be reinitialized again later on the next GetOpCodeMap() call.
+        Use if the base class FormulaCompiler::GetOpCodeMap() was called and
+        created the map (i.e. HasOpCodeMap() before returned false) and later a
+        derived class like ScCompiler shall initialize it including AddIns.
+
+        @param nLanguage
+            One of css::sheet::FormulaLanguage constants.
+     */
+    void DestroyOpCodeMap( const sal_Int32 nLanguage );
+
+    /** Whether the singleton OpCodeMap for formula language exists already.
+
+        @param nLanguage
+            One of css::sheet::FormulaLanguage constants.
+     */
+    bool HasOpCodeMap( const sal_Int32 nLanguage ) const;
 
     /** Create an internal symbol map from API mapping.
         @param bEnglish
@@ -369,14 +419,22 @@ protected:
     bool mbComputeII;  // whether to attempt computing implicit intersection ranges while building the RPN array.
     bool mbMatrixFlag; // whether the formula is a matrix formula (needed for II computation)
 
+public:
+    enum InitSymbols
+    {
+        ASK = 0,
+        INIT,
+        DESTROY
+    };
+
 private:
-    void InitSymbolsNative() const;    /// only SymbolsNative, on first document creation
-    void InitSymbolsEnglish() const;   /// only SymbolsEnglish, maybe later
-    void InitSymbolsPODF() const;      /// only SymbolsPODF, on demand
-    void InitSymbolsAPI() const;       /// only SymbolsAPI, on demand
-    void InitSymbolsODFF() const;      /// only SymbolsODFF, on demand
-    void InitSymbolsEnglishXL() const; /// only SymbolsEnglishXL, on demand
-    void InitSymbolsOOXML() const;     /// only SymbolsOOXML, on demand
+    bool InitSymbolsNative( InitSymbols ) const;    /// only SymbolsNative, on first document creation
+    bool InitSymbolsEnglish( InitSymbols ) const;   /// only SymbolsEnglish, maybe later
+    bool InitSymbolsPODF( InitSymbols ) const;      /// only SymbolsPODF, on demand
+    bool InitSymbolsAPI( InitSymbols ) const;       /// only SymbolsAPI, on demand
+    bool InitSymbolsODFF( InitSymbols ) const;      /// only SymbolsODFF, on demand
+    bool InitSymbolsEnglishXL( InitSymbols ) const; /// only SymbolsEnglishXL, on demand
+    bool InitSymbolsOOXML( InitSymbols ) const;     /// only SymbolsOOXML, on demand
 
     void loadSymbols(const std::pair<const char*, int>* pSymbols, FormulaGrammar::Grammar eGrammar, NonConstOpCodeMapPtr& rxMap,
             SeparatorType eSepType = SeparatorType::SEMICOLON_BASE) const;

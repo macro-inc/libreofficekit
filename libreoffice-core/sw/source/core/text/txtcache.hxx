@@ -41,7 +41,10 @@ public:
     void SetPara(SwParaPortion* pNew, bool bDelete)
     {
         if (!bDelete)
+        {
+            // coverity[leaked_storage] - intentional, ownership transferred
             (void)m_pLine.release();
+        }
         m_pLine.reset(pNew);
     }
 };

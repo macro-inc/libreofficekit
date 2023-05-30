@@ -25,6 +25,7 @@
 
 #include <comphelper/lok.hxx>
 #include <comphelper/configurationhelper.hxx>
+#include <utility>
 #include <vcl/window.hxx>
 #include <vcl/syswin.hxx>
 
@@ -34,8 +35,8 @@
 
 namespace framework{
 
-PersistentWindowState::PersistentWindowState(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-    : m_xContext              (xContext                     )
+PersistentWindowState::PersistentWindowState(css::uno::Reference< css::uno::XComponentContext >  xContext)
+    : m_xContext              (std::move(xContext                     ))
     , m_bWindowStateAlreadySet(false                    )
 {
 }
@@ -192,7 +193,7 @@ void PersistentWindowState::implst_setWindowStateOnConfig(
             "org.openoffice.Setup/",
             OUString::Concat("Office/Factories/*[\"") + sModuleName + "\"]",
             "ooSetupFactoryWindowAttributes",
-            css::uno::makeAny(sWindowState),
+            css::uno::Any(sWindowState),
             ::comphelper::EConfigurationModes::Standard);
     }
     catch(const css::uno::RuntimeException&)
@@ -214,7 +215,7 @@ OUString PersistentWindowState::implst_getWindowStateFromWindow(const css::uno::
         // check for system window is necessary to guarantee correct pointer cast!
         if ( pWindow && pWindow->IsSystemWindow() )
         {
-            WindowStateMask const nMask = WindowStateMask::All & ~WindowStateMask::Minimized;
+            vcl::WindowDataMask const nMask = vcl::WindowDataMask::All & ~vcl::WindowDataMask::Minimized;
             sWindowState = OStringToOUString(
                             static_cast<SystemWindow*>(pWindow.get())->GetWindowState(nMask),
                             RTL_TEXTENCODING_UTF8);

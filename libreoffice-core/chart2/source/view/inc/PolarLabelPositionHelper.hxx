@@ -27,14 +27,13 @@ namespace chart
 
 class PolarPlottingPositionHelper;
 
-class PolarLabelPositionHelper : public LabelPositionHelper
+class PolarLabelPositionHelper final : public LabelPositionHelper
 {
 public:
     PolarLabelPositionHelper(
         PolarPlottingPositionHelper* pPosHelper
         , sal_Int32 nDimensionCount
-        , const css::uno::Reference< css::drawing::XShapes >& xLogicTarget
-        , ShapeFactory* pShapeFactory );
+        , const rtl::Reference<SvxShapeGroupAnyD>& xLogicTarget );
     virtual ~PolarLabelPositionHelper() override;
 
     css::awt::Point getLabelScreenPositionAndAlignmentForLogicValues(

@@ -22,6 +22,7 @@
 #include <comphelper/string.hxx>
 #include <unotools/charclass.hxx>
 #include <osl/thread.h>
+#include <o3tl/string_view.hxx>
 #include <global.hxx>
 
 const char pStrFix[] = "FIX";
@@ -29,7 +30,7 @@ const char pStrFix[] = "FIX";
 //  The option string can no longer contain a semicolon (because of pick list),
 //  therefore, starting with version 336 comma instead
 
-ScImportOptions::ScImportOptions( const OUString& rStr )
+ScImportOptions::ScImportOptions( std::u16string_view rStr )
 {
     // Use the same string format as ScAsciiOptions,
     // because the import options string is passed here when a CSV file is loaded and saved again.
@@ -52,37 +53,37 @@ ScImportOptions::ScImportOptions( const OUString& rStr )
 
     sal_Int32 nIdx{ 0 };
     // first 3 tokens: common
-    OUString aToken( rStr.getToken( 0, ',', nIdx ) );
+    OUString aToken( o3tl::getToken(rStr, 0, ',', nIdx ) );
     if( aToken.equalsIgnoreAsciiCase( pStrFix ) )
         bFixedWidth = true;
     else
         nFieldSepCode = ScAsciiOptions::GetWeightedFieldSep( aToken, true);
-    nTextSepCode  = static_cast<sal_Unicode>(rStr.getToken(0, ',', nIdx).toInt32());
-    aStrFont      = rStr.getToken(0, ',', nIdx);
+    nTextSepCode  = static_cast<sal_Unicode>(o3tl::toInt32(o3tl::getToken(rStr, 0, ',', nIdx)));
+    aStrFont      = o3tl::getToken(rStr, 0, ',', nIdx);
     eCharSet      = ScGlobal::GetCharsetValue(aStrFont);
 
     if ( nTokenCount == 4 )
     {
         // compatibility with old options string: "Save as shown" as 4th token, numeric
-        bSaveAsShown = rStr.getToken(0, ',', nIdx).toInt32() != 0;
+        bSaveAsShown = o3tl::toInt32(o3tl::getToken(rStr, 0, ',', nIdx)) != 0;
         bQuoteAllText = true;   // use old default then
     }
     else
     {
         // look at the same positions as in ScAsciiOptions
         if ( nTokenCount >= 7 )
-            bQuoteAllText = rStr.getToken(3, ',', nIdx) == "true";  // 7th token
+            bQuoteAllText = o3tl::getToken(rStr, 3, ',', nIdx) == u"true";  // 7th token
         if ( nTokenCount >= 8 )
-            bSaveNumberAsSuch = rStr.getToken(0, ',', nIdx) == "true";
+            bSaveNumberAsSuch = o3tl::getToken(rStr, 0, ',', nIdx) == u"true";
         if ( nTokenCount >= 9 )
-            bSaveAsShown = rStr.getToken(0, ',', nIdx) == "true";
+            bSaveAsShown = o3tl::getToken(rStr, 0, ',', nIdx) == u"true";
         if ( nTokenCount >= 10 )
-            bSaveFormulas = rStr.getToken(0, ',', nIdx) == "true";
+            bSaveFormulas = o3tl::getToken(rStr, 0, ',', nIdx) == u"true";
         if ( nTokenCount >= 11 )
-            bRemoveSpace = rStr.getToken(0, ',', nIdx) == "true";
+            bRemoveSpace = o3tl::getToken(rStr, 0, ',', nIdx) == u"true";
         if ( nTokenCount >= 12 )
         {
-            const OUString aTok(rStr.getToken(0, ',', nIdx));
+            const OUString aTok(o3tl::getToken(rStr,0, ',', nIdx));
             if (aTok == "-1")
                 nSheetToExport = -1;    // all
             else if (aTok.isEmpty() || CharClass::isAsciiNumeric(aTok))
@@ -92,7 +93,7 @@ ScImportOptions::ScImportOptions( const OUString& rStr )
         }
         if ( nTokenCount >= 13 )
             // If present, defaults to "false".
-            bEvaluateFormulas = rStr.getToken(0, ',', nIdx) == "true";
+            bEvaluateFormulas = o3tl::getToken(rStr, 0, ',', nIdx) == u"true";
     }
 }
 

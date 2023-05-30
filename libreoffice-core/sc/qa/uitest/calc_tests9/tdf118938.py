@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,9 +18,6 @@ class tdf118938(UITestCase):
     def test_tdf118938(self):
         with self.ui_test.load_file(get_url_for_data_file("tdf118938.xlsx")):
             #The document was created in Calc after this fix.
-            calcDoc = self.xUITest.getTopFocusWindow()
-            gridwin = calcDoc.getChild("grid_window")
-
             document = self.ui_test.get_component()
 
             # Without the fix in place, this test would have failed with

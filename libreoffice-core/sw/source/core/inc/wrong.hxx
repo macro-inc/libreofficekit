@@ -23,7 +23,6 @@
 #include <com/sun/star/container/NoSuchElementException.hpp>
 #include <com/sun/star/container/XStringKeyMap.hpp>
 
-#include <com/sun/star/util/Color.hpp>
 #include <com/sun/star/awt/FontUnderline.hpp>
 #include <com/sun/star/uno/Any.hxx>
 
@@ -75,13 +74,13 @@ public:
     Color mColor;
     WrongAreaLineType mLineType;
 
-    SwWrongArea( const OUString& rType,
+    SwWrongArea( OUString aType,
                  WrongListType listType,
                  css::uno::Reference< css::container::XStringKeyMap > const & xPropertyBag,
                  sal_Int32 nPos,
                  sal_Int32 nLen);
 
-    SwWrongArea( const OUString& rType,
+    SwWrongArea( OUString aType,
                  css::uno::Reference< css::container::XStringKeyMap > const & xPropertyBag,
                  sal_Int32 nPos,
                  sal_Int32 nLen,
@@ -110,7 +109,7 @@ private:
         {
         }
 
-        return COL_LIGHTBLUE;
+        return SwViewOption::GetCurrentViewOptions().GetGrammarColor();
     }
 
     static WrongAreaLineType getGrammarLineType( css::uno::Reference< css::container::XStringKeyMap > const & xPropertyBag )
@@ -176,7 +175,7 @@ private:
         {
         }
 
-        return SwViewOption::GetSmarttagColor( );
+        return SwViewOption::GetCurrentViewOptions().GetSmarttagColor();
     }
 
     static WrongAreaLineType getSmartLineType( css::uno::Reference< css::container::XStringKeyMap > const & xPropertyBag )
@@ -225,7 +224,7 @@ private:
     {
         if (WRONGLIST_SPELL == listType)
         {
-            return SwViewOption::GetSpellColor();
+            return SwViewOption::GetCurrentViewOptions().GetSpellColor();
         }
         else if (WRONGLIST_GRAMMAR == listType)
         {
@@ -236,7 +235,7 @@ private:
             return  getSmartColor(xPropertyBag);
         }
 
-        return SwViewOption::GetSpellColor();
+        return SwViewOption::GetCurrentViewOptions().GetSpellColor();
     }
 
     static WrongAreaLineType getWrongAreaLineType(WrongListType listType,
@@ -260,7 +259,7 @@ private:
 
 };
 
-class SwWrongList
+class SAL_DLLPUBLIC_RTTI SwWrongList
 {
     std::vector<SwWrongArea> maList;
     WrongListType            meType;

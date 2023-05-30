@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-08 14:37+0200\n"
-"PO-Revision-Date: 2022-08-22 14:03+0000\n"
-"Last-Translator: Meskó Balázs <meskobalazs@gmail.com>\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
+"Last-Translator: Gábor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <https://translations.documentfoundation.org/projects/libo_ui-master/scmessages/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -1246,7 +1246,7 @@ msgstr "Hiba: Osztás nullával"
 #: sc/inc/globstr.hrc:219
 msgctxt "STR_LONG_ERR_NO_VALUE"
 msgid "Error: No value"
-msgstr "Hiba: Nincs érték"
+msgstr "Hiba: Hiányzó érték"
 
 #. kHwc6
 #. ERROR.TYPE( #REF! ) == 4
@@ -1466,9 +1466,9 @@ msgid ""
 "a table range of at least\n"
 "3 × 3 cells must be selected."
 msgstr ""
-"Az automatikus formázás táblázattartományon\n"
-"való alkalmazásához legalább\n"
-"3 × 3-as cellát kell kijelölni."
+"Az automatikus formázáshoz\n"
+"legalább 3 × 3-as cellatartományt\n"
+"jelöljön ki."
 
 #. iySox
 #: sc/inc/globstr.hrc:261
@@ -1516,13 +1516,13 @@ msgstr "Lotus-fájlok importálása"
 #: sc/inc/globstr.hrc:268
 msgctxt "STR_IMPORT_DBF"
 msgid "Import dBASE files"
-msgstr "dBase-fájlok importálása"
+msgstr "dBASE-fájlok importálása"
 
 #. uyTFS
 #: sc/inc/globstr.hrc:269
 msgctxt "STR_EXPORT_DBF"
 msgid "dBASE export"
-msgstr "dBase exportálása"
+msgstr "Exportálás dBASE formátumba"
 
 #. CtHUj
 #: sc/inc/globstr.hrc:270
@@ -1908,17 +1908,17 @@ msgctxt "STR_SCATTR_PAGE_SCALE"
 msgid "Reduce/enlarge printout"
 msgstr "Nyomtatási kép nagyítása/kicsinyítése"
 
-#. CXqDX
+#. jYSCo
 #: sc/inc/globstr.hrc:333
 msgctxt "STR_SCATTR_PAGE_SCALETOPAGES"
-msgid "Fit print range(s) on number of pages"
-msgstr "Nyomtatási tartományok illesztése az oldalak számához"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Nyomtatási tartományok zsugorítása az oldalak számához"
 
-#. kDAZk
+#. P4CCx
 #: sc/inc/globstr.hrc:334
 msgctxt "STR_SCATTR_PAGE_SCALETO"
-msgid "Fit print range(s) to width/height"
-msgstr "Nyomtatási tartományok illesztése a szélességhez/magassághoz"
+msgid "Shrink print range(s) to width/height"
+msgstr "Nyomtatási tartományok zsugorítása a szélességhez/magassághoz"
 
 #. fnrU6
 #: sc/inc/globstr.hrc:335
@@ -2000,11 +2000,11 @@ msgctxt "STR_ON"
 msgid "on"
 msgstr "be"
 
-#. NqkbD
+#. RryEg
 #: sc/inc/globstr.hrc:348
 msgctxt "STR_RELOAD_TABLES"
-msgid "Security Warning: Automatic update of external links has been disabled."
-msgstr ""
+msgid "Automatic update of external links has been disabled."
+msgstr "A külső hivatkozások automatikus frissítése letiltva."
 
 #. qkto7
 #: sc/inc/globstr.hrc:349
@@ -2134,7 +2134,7 @@ msgstr "Tartalom törlése"
 #: sc/inc/globstr.hrc:367
 msgctxt "STR_QUICKHELP_REF"
 msgid "%1 R  × %2 C"
-msgstr "%1 S  × %2 O"
+msgstr "%1 sor × oszlop"
 
 #. NJpDi
 #: sc/inc/globstr.hrc:368
@@ -2306,7 +2306,7 @@ msgstr "Tömbterület illesztése"
 #: sc/inc/globstr.hrc:395
 msgctxt "STR_TIP_RESIZEMATRIX"
 msgid "Array formula  %1 R × %2 C"
-msgstr "Tömbképlet  %1 S × %2 O"
+msgstr "Tömbképlet: %1 sor × oszlop"
 
 #. nkxuG
 #: sc/inc/globstr.hrc:396
@@ -3088,11 +3088,11 @@ msgctxt "STR_UNDO_FORMULA_TO_VALUE"
 msgid "Convert Formula To Value"
 msgstr "Képlet értékké alakítása"
 
-#. dsjqi
+#. BywKj
 #: sc/inc/globstr.hrc:515
 msgctxt "STR_UNQUOTED_STRING"
-msgid "Strings without quotes are interpreted as column/row labels."
-msgstr "Az idézőjelek nélküli szövegek oszlop/sorcímkeként lesznek értelmezve."
+msgid "Strings without quotes are interpreted as defined names or references or column/row labels."
+msgstr "Az idézőjelek nélküli szövegek definiált névként vagy hivatkozásként vagy oszlop/sorcímkeként lesznek értelmezve."
 
 #. rHjns
 #: sc/inc/globstr.hrc:516
@@ -3254,43 +3254,43 @@ msgstr "Behúzás: "
 #: sc/inc/globstr.hrc:542
 msgctxt "STR_UNDO_INSERT_SPARKLINE"
 msgid "Insert Sparkline Group"
-msgstr ""
+msgstr "Értékgörbecsoport beszúrása"
 
 #. LiBMo
 #: sc/inc/globstr.hrc:543
 msgctxt "STR_UNDO_DELETE_SPARKLINE"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Értékgörbe törlése"
 
 #. f2V6A
 #: sc/inc/globstr.hrc:544
 msgctxt "STR_UNDO_DELETE_SPARKLINE_GROUP"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Értékgörbecsoport törlése"
 
 #. 6sxnX
 #: sc/inc/globstr.hrc:545
 msgctxt "STR_UNDO_EDIT_SPARKLINE_GROUP"
 msgid "Edit Sparkline Group"
-msgstr ""
+msgstr "Értékgörbecsoport szerkesztése"
 
 #. CBBMB
 #: sc/inc/globstr.hrc:546
 msgctxt "STR_UNDO_GROUP_SPARKLINES"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Értékgörbék csoportosítása"
 
 #. vv2eo
 #: sc/inc/globstr.hrc:547
 msgctxt "STR_UNDO_UNGROUP_SPARKLINES"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Értékgörbék szétbontása"
 
 #. ux3mX
 #: sc/inc/globstr.hrc:548
 msgctxt "STR_UNDO_EDIT_SPARKLINE"
 msgid "Edit Sparkline"
-msgstr ""
+msgstr "Értékgörbe szerkesztése"
 
 #. dB8cp
 #: sc/inc/pvfundlg.hrc:28
@@ -6869,11 +6869,11 @@ msgctxt "SC_OPCODE_RANDOM"
 msgid "Returns a random number between 0 and 1."
 msgstr "Egy 0 és 1 közötti véletlen számot ad eredményül."
 
-#. QugqG
+#. Le6a5
 #: sc/inc/scfuncs.hrc:1064
 msgctxt "SC_OPCODE_IS_EVEN"
-msgid "Returns TRUE if value is an even integer."
-msgstr "IGAZ értéket ad vissza, ha az érték páros egész."
+msgid "Returns TRUE if the value truncated to integer is even."
+msgstr "IGAZ értéket ad vissza, ha az egészre csonkított érték páros."
 
 #. aEG3g
 #: sc/inc/scfuncs.hrc:1065
@@ -6887,11 +6887,11 @@ msgctxt "SC_OPCODE_IS_EVEN"
 msgid "The value to be tested."
 msgstr "A vizsgálandó érték."
 
-#. M8AAF
+#. FXDi6
 #: sc/inc/scfuncs.hrc:1072
 msgctxt "SC_OPCODE_IS_ODD"
-msgid "Returns TRUE if value is an odd integer."
-msgstr "IGAZ értéket ad vissza, ha az érték páratlan egész."
+msgid "Returns TRUE if the value truncated to integer is odd."
+msgstr "IGAZ értéket ad vissza, ha az egészre csonkított érték páratlan."
 
 #. 4scb6
 #: sc/inc/scfuncs.hrc:1073
@@ -15247,11 +15247,11 @@ msgctxt "SC_OPCODE_FIXED"
 msgid "Decimals"
 msgstr "Tizedesjegyek"
 
-#. ACFqC
+#. CTmcM
 #: sc/inc/scfuncs.hrc:3751
 msgctxt "SC_OPCODE_FIXED"
-msgid "Decimal places. The number of fixed decimal places that are to be displayed."
-msgstr "Tizedesjegyek. A fixen megjelenítendő tizedesjegyek száma."
+msgid "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."
+msgstr "Tizedesjegyek. A fixen megjelenítendő tizedesjegyek száma. Alapértelmezés: 2."
 
 #. fdn6N
 #: sc/inc/scfuncs.hrc:3752
@@ -16520,11 +16520,11 @@ msgctxt "SC_OPCODE_RANDOM_NV"
 msgid "Returns a random number between 0 and 1, non-volatile."
 msgstr "Egy 0 és 1 közötti véletlen számot ad eredményül, ami nem változó."
 
-#. op2W5
+#. fDQYY
 #: sc/inc/scfuncs.hrc:4147
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "Returns a random integer between the numbers you specify, non-volatile."
-msgstr "A megadott számok közötti véletlen számmal tér vissza, ami nem változó."
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."
+msgstr "A megadott alsó érték és felső érték közötti véletlen számmal tér vissza (azokat is beleértve), nem változó."
 
 #. o3i8h
 #: sc/inc/scfuncs.hrc:4148
@@ -16532,11 +16532,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Bottom"
 msgstr "Alsó"
 
-#. HdKGo
+#. 7kUdh
 #: sc/inc/scfuncs.hrc:4149
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The smallest integer returned."
-msgstr "Az a legkisebb szám, amely a függvény eredménye lehet."
+msgid "The smallest integer that can be returned."
+msgstr "A legkisebb visszaadható egész."
 
 #. 8s6nU
 #: sc/inc/scfuncs.hrc:4150
@@ -16544,11 +16544,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Top"
 msgstr "Felső"
 
-#. x9uuF
+#. AmoKE
 #: sc/inc/scfuncs.hrc:4151
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The largest integer returned."
-msgstr "Az a legnagyobb szám, amely a függvény eredménye lehet."
+msgid "The largest integer that can be returned."
+msgstr "A legnagyobb visszaadható egész."
 
 #. pDDme
 #: sc/inc/scstyles.hrc:29
@@ -16651,7 +16651,7 @@ msgstr "Első 10"
 #: sc/inc/strings.hrc:36
 msgctxt "SCSTR_BOTTOM10FILTER"
 msgid "Bottom 10"
-msgstr ""
+msgstr "Utolsó 10"
 
 #. FNDLK
 #: sc/inc/strings.hrc:37
@@ -16669,132 +16669,120 @@ msgstr "Nem üres"
 #: sc/inc/strings.hrc:39
 msgctxt "SCSTR_FILTER_COLOR"
 msgid "Filter by Color"
-msgstr ""
+msgstr "Szűrés szín szerint"
 
 #. EYFT8
 #: sc/inc/strings.hrc:40
 msgctxt "SCSTR_FILTER_CONDITION"
 msgid "Filter by Condition"
-msgstr ""
+msgstr "Szűrés feltétel szerint"
 
-#. 5LENV
-#: sc/inc/strings.hrc:41
-msgctxt "SCSTR_FILTER_TEXT_COLOR"
-msgid "Text Color"
-msgstr "Szövegszín"
-
-#. BtGE4
-#: sc/inc/strings.hrc:42
-msgctxt "SCSTR_FILTER_BACKGROUND_COLOR"
-msgid "Background Color"
-msgstr "Háttérszín"
-
-#. td5Gr
+#. PWtxn
 #. This must match the translation of the same strings of standardfilterdialog|cond
-#: sc/inc/strings.hrc:44
+#: sc/inc/strings.hrc:42
 msgctxt "STANDARDFILTERDIALOG_COND"
-msgid "Text color"
-msgstr "Szövegszín"
+msgid "Font color"
+msgstr "Betűszín"
 
 #. sGJCz
-#: sc/inc/strings.hrc:45
+#: sc/inc/strings.hrc:43
 msgctxt "STANDARDFILTERDIALOG_COND"
 msgid "Background color"
 msgstr "Háttérszín"
 
 #. teYGB
-#: sc/inc/strings.hrc:46
+#: sc/inc/strings.hrc:44
 msgctxt "SCSTR_FILTER_NO_FILL"
 msgid "No Fill"
 msgstr "Nincs kitöltés"
 
 #. 8DPvA
-#: sc/inc/strings.hrc:47
+#: sc/inc/strings.hrc:45
 msgctxt "SCSTR_FILTER_AUTOMATIC_COLOR"
 msgid "Automatic"
 msgstr "Automatikus"
 
 #. Wgy7r
-#: sc/inc/strings.hrc:48
+#: sc/inc/strings.hrc:46
 msgctxt "SCSTR_NONAME"
 msgid "unnamed"
 msgstr "névtelen"
 
 #. JAf3n
-#: sc/inc/strings.hrc:49
+#: sc/inc/strings.hrc:47
 msgctxt "SCSTR_INSERT_RTL"
 msgid "Shift cells left"
 msgstr "Cellákat balra tolja"
 
 #. CW4Wh
 #. "%1 is replaced to column letter, such as 'Column A'"
-#: sc/inc/strings.hrc:51
+#: sc/inc/strings.hrc:49
 msgctxt "SCSTR_COLUMN_LETTER"
 msgid "Column %1"
-msgstr ""
+msgstr "%1 oszlop"
 
 #. CJrpZ
-#: sc/inc/strings.hrc:52
+#: sc/inc/strings.hrc:50
 msgctxt "SCSTR_COLUMN"
 msgid "Column"
-msgstr ""
+msgstr "Oszlop"
 
 #. Bjnch
-#: sc/inc/strings.hrc:53
+#: sc/inc/strings.hrc:51
 msgctxt "SCSTR_ROW"
 msgid "Row"
-msgstr ""
+msgstr "Sor"
 
 #. 7p8BN
-#: sc/inc/strings.hrc:54
+#: sc/inc/strings.hrc:52
 msgctxt "SCSTR_TABLE"
 msgid "Sheet"
 msgstr "Munkalap"
 
 #. ArnTD
-#: sc/inc/strings.hrc:55
+#: sc/inc/strings.hrc:53
 msgctxt "SCSTR_NAME"
 msgid "Name"
 msgstr "Név"
 
 #. BxrBH
-#: sc/inc/strings.hrc:56
+#: sc/inc/strings.hrc:54
 msgctxt "SCSTR_APDTABLE"
 msgid "Append Sheet"
 msgstr "Munkalap hozzáfűzése"
 
 #. sba4F
-#: sc/inc/strings.hrc:57
+#: sc/inc/strings.hrc:55
 msgctxt "SCSTR_RENAMETAB"
 msgid "Rename Sheet"
 msgstr "Munkalap átnevezése"
 
 #. EEcgV
-#: sc/inc/strings.hrc:58
+#: sc/inc/strings.hrc:56
 msgctxt "SCSTR_SET_TAB_BG_COLOR"
 msgid "Tab Color"
 msgstr "Fül színe"
 
 #. sTank
-#: sc/inc/strings.hrc:59
+#: sc/inc/strings.hrc:57
 msgctxt "SCSTR_NO_TAB_BG_COLOR"
 msgid "Default"
 msgstr "Alapértelmezett"
 
 #. yEEuF
-#: sc/inc/strings.hrc:60
+#: sc/inc/strings.hrc:58
 msgctxt "SCSTR_RENAMEOBJECT"
 msgid "Name Object"
 msgstr "Objektum elnevezése"
 
 #. 3FHKw
-#: sc/inc/strings.hrc:61
+#: sc/inc/strings.hrc:59
 msgctxt "STR_INSERTGRAPHIC"
 msgid "Insert Image"
 msgstr "Kép beszúrása"
 
 #. bKv77
-#: sc/inc/strings.hrc:62
+#: sc/inc/strings.hrc:60
 msgctxt "SCSTR_TOTAL"
 msgid "One result found"
 msgid_plural "%1 results found"
@@ -16802,1782 +16790,1788 @@ msgstr[0] "Egy találat van"
 msgstr[1] "%1 találat van"
 
 #. 7GkKi
-#: sc/inc/strings.hrc:63
+#: sc/inc/strings.hrc:61
 msgctxt "SCSTR_SKIPPED"
 msgid "(only %1 are listed)"
 msgstr "(csak %1 jelenik meg)"
 
+#. khhRt
+#: sc/inc/strings.hrc:62
+msgctxt "SCSTR_RESULTS_CLAMPED"
+msgid "More than %1 results found (stopped counting)"
+msgstr "Több, mint %1 találat (számolás leállítva)"
+
 #. YxFpr
 #. Attribute
-#: sc/inc/strings.hrc:65
+#: sc/inc/strings.hrc:64
 msgctxt "SCSTR_PROTECTDOC"
 msgid "Protect Spreadsheet Structure"
 msgstr "Munkafüzet-struktúra védelme"
 
 #. SQCpD
-#: sc/inc/strings.hrc:66
+#: sc/inc/strings.hrc:65
 msgctxt "SCSTR_UNPROTECTDOC"
 msgid "Unprotect Spreadsheet Structure"
 msgstr "Munkafüzet-struktúra védelmének feloldása"
 
 #. rAV3G
-#: sc/inc/strings.hrc:67
+#: sc/inc/strings.hrc:66
 msgctxt "SCSTR_UNPROTECTTAB"
 msgid "Unprotect Sheet"
 msgstr "Munkalapvédelem megszüntetése"
 
 #. K7w3B
-#: sc/inc/strings.hrc:68
+#: sc/inc/strings.hrc:67
 msgctxt "SCSTR_CHG_PROTECT"
 msgid "Protect Records"
 msgstr "Változásnapló védelme"
 
 #. DLDBg
-#: sc/inc/strings.hrc:69
+#: sc/inc/strings.hrc:68
 msgctxt "SCSTR_CHG_UNPROTECT"
 msgid "Unprotect Records"
 msgstr "Változásnapló védelmének feloldása"
 
 #. rFdAS
-#: sc/inc/strings.hrc:70
+#: sc/inc/strings.hrc:69
 msgctxt "SCSTR_PASSWORD"
 msgid "Password:"
 msgstr "Jelszó:"
 
 #. dd2wC
-#: sc/inc/strings.hrc:71
+#: sc/inc/strings.hrc:70
 msgctxt "SCSTR_PASSWORDOPT"
 msgid "Password (optional):"
 msgstr "Jelszó (opcionális):"
 
 #. dTBug
-#: sc/inc/strings.hrc:72
+#: sc/inc/strings.hrc:71
 msgctxt "SCSTR_WRONGPASSWORD"
 msgid "Incorrect Password"
 msgstr "Helytelen jelszó"
 
 #. bkGuJ
-#: sc/inc/strings.hrc:73
+#: sc/inc/strings.hrc:72
 msgctxt "SCSTR_END"
 msgid "~End"
 msgstr "~Vége"
 
 #. XNnTf
-#: sc/inc/strings.hrc:74
+#: sc/inc/strings.hrc:73
 msgctxt "SCSTR_UNKNOWN"
 msgid "Unknown"
 msgstr "Ismeretlen"
 
 #. NoEfk
-#: sc/inc/strings.hrc:75
+#: sc/inc/strings.hrc:74
 msgctxt "SCSTR_VALID_MINIMUM"
 msgid "~Minimum"
 msgstr "~Minimum"
 
 #. gKahz
-#: sc/inc/strings.hrc:76
+#: sc/inc/strings.hrc:75
 msgctxt "SCSTR_VALID_MAXIMUM"
 msgid "~Maximum"
 msgstr "~Maximum"
 
 #. nmeHF
-#: sc/inc/strings.hrc:77
+#: sc/inc/strings.hrc:76
 msgctxt "SCSTR_VALID_VALUE"
 msgid "~Value"
 msgstr "É~rték"
 
 #. g8Cow
-#: sc/inc/strings.hrc:78
+#: sc/inc/strings.hrc:77
 msgctxt "SCSTR_VALID_FORMULA"
 msgid "~Formula"
 msgstr "Képle~t"
 
 #. 6YEEk
-#: sc/inc/strings.hrc:79
+#: sc/inc/strings.hrc:78
 msgctxt "SCSTR_VALID_RANGE"
 msgid "~Source"
 msgstr "F~orrás"
 
 #. FA84s
-#: sc/inc/strings.hrc:80
+#: sc/inc/strings.hrc:79
 msgctxt "SCSTR_VALID_LIST"
 msgid "~Entries"
 msgstr "~Bejegyzések"
 
 #. vhcaA
 #. for dialogues:
-#: sc/inc/strings.hrc:82
+#: sc/inc/strings.hrc:81
 msgctxt "SCSTR_CHARSET_USER"
 msgid "System"
 msgstr "Rendszer"
 
 #. 2tobg
-#: sc/inc/strings.hrc:83
+#: sc/inc/strings.hrc:82
 msgctxt "SCSTR_COLUMN_USER"
 msgid "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide"
 msgstr "Standard;Szöveg;Dátum (NHÉ);Dátum (HNÉ);Dátum (ÉHN);Magyar;Elrejtés"
 
 #. px75F
-#: sc/inc/strings.hrc:84
+#: sc/inc/strings.hrc:83
 msgctxt "SCSTR_FIELDSEP_TAB"
 msgid "Tab"
 msgstr "Tabulátor"
 
 #. ZGpGp
-#: sc/inc/strings.hrc:85
+#: sc/inc/strings.hrc:84
 msgctxt "SCSTR_FIELDSEP_SPACE"
 msgid "space"
 msgstr "szóköz"
 
 #. C8dAj
-#: sc/inc/strings.hrc:86
+#: sc/inc/strings.hrc:85
 msgctxt "SCSTR_UNDO_GRAFFILTER"
 msgid "Image Filter"
 msgstr "Képszűrő"
 
 #. CfBRk
-#: sc/inc/strings.hrc:87
+#: sc/inc/strings.hrc:86
 msgctxt "STR_CAPTION_DEFAULT_TEXT"
 msgid "Text"
 msgstr "Szöveg"
 
 #. X6bVC
 #. Select tables dialog title
-#: sc/inc/strings.hrc:89
+#: sc/inc/strings.hrc:88
 msgctxt "STR_DLG_SELECTTABLES_TITLE"
 msgid "Select Sheets"
 msgstr "Munkalapok kijelölése"
 
 #. GYoSL
-#: sc/inc/strings.hrc:90
+#: sc/inc/strings.hrc:89
 msgctxt "STR_DLG_SELECTTABLE_TITLE"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Ugrás munkalapra"
 
 #. iHTDF
-#: sc/inc/strings.hrc:91
+#: sc/inc/strings.hrc:90
 msgctxt "STR_DLG_SELECTTABLE_MASK"
 msgid "~Type a Sheet Name"
-msgstr ""
+msgstr "Írjon be egy m~unkalapnevet"
 
 #. SEDS2
 #. Select tables dialog listbox
-#: sc/inc/strings.hrc:93
+#: sc/inc/strings.hrc:92
 msgctxt "STR_DLG_SELECTTABLES_LBNAME"
 msgid "~Selected sheets"
 msgstr "~Kijelölt munkalapok"
 
 #. szfzF
-#: sc/inc/strings.hrc:94
+#: sc/inc/strings.hrc:93
 msgctxt "STR_DLG_SELECTTABLE_LBNAME"
 msgid "~Sheets"
-msgstr ""
+msgstr "M~unkalapok"
 
 #. SfEhE
-#: sc/inc/strings.hrc:95
+#: sc/inc/strings.hrc:94
 msgctxt "STR_ACC_CSVRULER_NAME"
 msgid "Ruler"
 msgstr "Vonalzó"
 
 #. 3VwsT
-#: sc/inc/strings.hrc:96
+#: sc/inc/strings.hrc:95
 msgctxt "STR_ACC_CSVRULER_DESCR"
 msgid "This ruler manages objects at fixed positions."
 msgstr "Ez a vonalzó rögzített pozíciójú objektumokat kezel."
 
 #. 7Ream
-#: sc/inc/strings.hrc:97
+#: sc/inc/strings.hrc:96
 msgctxt "STR_ACC_CSVGRID_NAME"
 msgid "Preview"
 msgstr "Előnézet"
 
 #. uSKyF
-#: sc/inc/strings.hrc:98
+#: sc/inc/strings.hrc:97
 msgctxt "STR_ACC_CSVGRID_DESCR"
 msgid "This sheet shows how the data will be arranged in the document."
 msgstr "A lapon megnézheti, hogyan kerülnek elrendezésre az adatok a dokumentumban."
 
 #. MwTAm
-#: sc/inc/strings.hrc:99
+#: sc/inc/strings.hrc:98
 msgctxt "STR_ACC_DOC_NAME"
 msgid "Document view"
 msgstr "Dokumentumnézet"
 
 #. NFaas
-#: sc/inc/strings.hrc:100
+#: sc/inc/strings.hrc:99
 msgctxt "STR_ACC_TABLE_NAME"
 msgid "Sheet %1"
 msgstr "%1. munkalap"
 
 #. 2qRJG
-#: sc/inc/strings.hrc:101
+#: sc/inc/strings.hrc:100
 msgctxt "STR_ACC_CELL_NAME"
 msgid "Cell %1"
 msgstr "%1. cella"
 
 #. KD4PA
-#: sc/inc/strings.hrc:102
+#: sc/inc/strings.hrc:101
 msgctxt "STR_ACC_LEFTAREA_NAME"
 msgid "Left area"
 msgstr "Bal oldali terület"
 
 #. 56AkM
-#: sc/inc/strings.hrc:103
+#: sc/inc/strings.hrc:102
 msgctxt "STR_ACC_PREVIEWDOC_NAME"
 msgid "Page preview"
 msgstr "Oldal előnézete"
 
 #. RA4AS
-#: sc/inc/strings.hrc:104
+#: sc/inc/strings.hrc:103
 msgctxt "STR_ACC_CENTERAREA_NAME"
 msgid "Center area"
 msgstr "Középső terület"
 
 #. 2hpwq
-#: sc/inc/strings.hrc:105
+#: sc/inc/strings.hrc:104
 msgctxt "STR_ACC_RIGHTAREA_NAME"
 msgid "Right area"
 msgstr "Jobb oldali terület"
 
 #. FrXgq
-#: sc/inc/strings.hrc:106
+#: sc/inc/strings.hrc:105
 msgctxt "STR_ACC_HEADER_NAME"
 msgid "Header of page %1"
 msgstr "%1. oldal élőfeje"
 
 #. BwF8D
-#: sc/inc/strings.hrc:107
+#: sc/inc/strings.hrc:106
 msgctxt "STR_ACC_FOOTER_NAME"
 msgid "Footer of page %1"
 msgstr "%1. oldal élőlába"
 
 #. 9T4c8
-#: sc/inc/strings.hrc:108
+#: sc/inc/strings.hrc:107
 msgctxt "STR_ACC_EDITLINE_NAME"
 msgid "Input line"
 msgstr "Beviteli sor"
 
 #. ejFak
-#: sc/inc/strings.hrc:109
+#: sc/inc/strings.hrc:108
 msgctxt "STR_ACC_EDITLINE_DESCR"
 msgid "This is where you enter or edit text, numbers and formulas."
 msgstr "Itt begépelhet és szerkeszthet szöveget, számokat és képleteket."
 
 #. XX585
-#: sc/inc/strings.hrc:110
+#: sc/inc/strings.hrc:109
 msgctxt "SCSTR_MEDIASHELL"
 msgid "Media Playback"
 msgstr "Médialejátszás"
 
 #. SuAaA
-#: sc/inc/strings.hrc:111
+#: sc/inc/strings.hrc:110
 msgctxt "RID_SCSTR_ONCLICK"
 msgid "Mouse button pressed"
 msgstr "Egérgomb lenyomása"
 
 #. 4prfv
-#: sc/inc/strings.hrc:112
+#: sc/inc/strings.hrc:111
 msgctxt "STR_ACC_TOOLBAR_FORMULA"
 msgid "Formula Tool Bar"
 msgstr "Képlet eszköztár"
 
 #. nAcNZ
-#: sc/inc/strings.hrc:113
+#: sc/inc/strings.hrc:112
 msgctxt "STR_ACC_DOC_SPREADSHEET"
 msgid "%PRODUCTNAME Spreadsheets"
 msgstr "%PRODUCTNAME-munkafüzet"
 
 #. 8UMap
-#: sc/inc/strings.hrc:114
+#: sc/inc/strings.hrc:113
 msgctxt "STR_ACC_DOC_SPREADSHEET_READONLY"
 msgid "(read-only)"
 msgstr "(csak olvasható)"
 
 #. fDxgL
-#: sc/inc/strings.hrc:115
+#: sc/inc/strings.hrc:114
 msgctxt "STR_ACC_DOC_PREVIEW_SUFFIX"
 msgid "(Preview mode)"
 msgstr "(Előnézet mód)"
 
 #. ZwiH6
-#: sc/inc/strings.hrc:116
+#: sc/inc/strings.hrc:115
 msgctxt "SCSTR_PRINTOPT_PAGES"
 msgid "Pages:"
 msgstr "Oldalak:"
 
 #. FYjDY
-#: sc/inc/strings.hrc:117
+#: sc/inc/strings.hrc:116
 msgctxt "SCSTR_PRINTOPT_SUPPRESSEMPTY"
 msgid "~Suppress output of empty pages"
 msgstr "Ü~res oldalak kihagyása"
 
 #. GQNVf
-#: sc/inc/strings.hrc:118
+#: sc/inc/strings.hrc:117
 msgctxt "SCSTR_PRINTOPT_ALLSHEETS"
 msgid "Print All Sheets"
 msgstr "Minden munkalap nyomtatása"
 
 #. xcKcm
-#: sc/inc/strings.hrc:119
+#: sc/inc/strings.hrc:118
 msgctxt "SCSTR_PRINTOPT_SELECTEDSHEETS"
 msgid "Print Selected Sheets"
 msgstr "Kijelölt munkalapok nyomtatása"
 
 #. e7kTj
-#: sc/inc/strings.hrc:120
+#: sc/inc/strings.hrc:119
 msgctxt "SCSTR_PRINTOPT_SELECTEDCELLS"
 msgid "Print Selected Cells"
 msgstr "Kijelölt cellák nyomtatása"
 
 #. z4DB6
-#: sc/inc/strings.hrc:121
+#: sc/inc/strings.hrc:120
 msgctxt "SCSTR_PRINTOPT_FROMWHICH"
 msgid "From which:"
 msgstr "Ettől kezdve:"
 
 #. v5EK2
-#: sc/inc/strings.hrc:122
+#: sc/inc/strings.hrc:121
 msgctxt "SCSTR_PRINTOPT_PRINTALLPAGES"
 msgid "All ~Pages"
 msgstr "Összes ~oldal"
 
 #. cvNuW
-#: sc/inc/strings.hrc:123
+#: sc/inc/strings.hrc:122
 msgctxt "SCSTR_PRINTOPT_PRINTPAGES"
 msgid "Pa~ges:"
 msgstr "Ol~dalak:"
 
 #. Pw9Pu
-#: sc/inc/strings.hrc:124
+#: sc/inc/strings.hrc:123
 msgctxt "SCSTR_PRINTOPT_PRODNAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 4BEKq
-#: sc/inc/strings.hrc:125
+#: sc/inc/strings.hrc:124
 msgctxt "SCSTR_DDEDOC_NOT_LOADED"
 msgid "The following DDE source could not be updated possibly because the source document was not open. Please launch the source document and try again."
 msgstr "A következő DDE-forrás nem volt frissíthető valószínűleg azért, mert a forrásdokumentum nem volt nyitva. Indítsa újra a forrásdokumentumot, és próbálja újra."
 
 #. kGmko
-#: sc/inc/strings.hrc:126
+#: sc/inc/strings.hrc:125
 msgctxt "SCSTR_EXTDOC_NOT_LOADED"
 msgid "The following external file could not be loaded. Data linked from this file did not get updated."
 msgstr "A következő külső fájlt nem sikerült betölteni. Az ebből a fájlból hivatkozott adatok nem lettek frissítve."
 
 #. BvtFc
-#: sc/inc/strings.hrc:127
+#: sc/inc/strings.hrc:126
 msgctxt "SCSTR_UPDATE_EXTDOCS"
 msgid "Updating external links."
 msgstr "Külső hivatkozások frissítése."
 
 #. MACSv
-#: sc/inc/strings.hrc:128
+#: sc/inc/strings.hrc:127
 msgctxt "SCSTR_FORMULA_SYNTAX_CALC_A1"
 msgid "Calc A1"
 msgstr "Calc A1"
 
 #. xEQCB
-#: sc/inc/strings.hrc:129
+#: sc/inc/strings.hrc:128
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_A1"
 msgid "Excel A1"
 msgstr "Excel A1"
 
 #. KLkBH
-#: sc/inc/strings.hrc:130
+#: sc/inc/strings.hrc:129
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_R1C1"
 msgid "Excel R1C1"
 msgstr "Excel R1C1"
 
 #. pr4wW
-#: sc/inc/strings.hrc:131
+#: sc/inc/strings.hrc:130
 msgctxt "SCSTR_COL_LABEL"
 msgid "Range contains column la~bels"
 msgstr "A ~tartomány oszlopcímkéket tartalmaz"
 
 #. mJyFP
-#: sc/inc/strings.hrc:132
+#: sc/inc/strings.hrc:131
 msgctxt "SCSTR_ROW_LABEL"
 msgid "Range contains ~row labels"
 msgstr "A tartomány ~sorcímkéket tartalmaz"
 
 #. ujjcx
-#: sc/inc/strings.hrc:133
+#: sc/inc/strings.hrc:132
 msgctxt "SCSTR_VALERR"
 msgid "Invalid value"
 msgstr "Érvénytelen érték"
 
 #. SoLXN
-#: sc/inc/strings.hrc:134
+#: sc/inc/strings.hrc:133
 msgctxt "STR_NOFORMULASPECIFIED"
 msgid "No formula specified."
 msgstr "Nem adott meg képletet."
 
 #. YFnCS
-#: sc/inc/strings.hrc:135
+#: sc/inc/strings.hrc:134
 msgctxt "STR_NOCOLROW"
 msgid "Neither row or column specified."
 msgstr "Sem oszlopot, sem sort nem adott meg."
 
 #. 6YQh2
-#: sc/inc/strings.hrc:136
+#: sc/inc/strings.hrc:135
 msgctxt "STR_WRONGFORMULA"
 msgid "Undefined name or range."
 msgstr "Meghatározatlan név vagy tartomány."
 
 #. 4aHCG
-#: sc/inc/strings.hrc:137
+#: sc/inc/strings.hrc:136
 msgctxt "STR_WRONGROWCOL"
 msgid "Undefined name or wrong cell reference."
 msgstr "Meghatározatlan név vagy helytelen cellahivatkozás."
 
 #. G8KPr
-#: sc/inc/strings.hrc:138
+#: sc/inc/strings.hrc:137
 msgctxt "STR_NOCOLFORMULA"
 msgid "Formulas don't form a column."
 msgstr "A képletek nem alkotnak oszlopot."
 
 #. uSxCb
-#: sc/inc/strings.hrc:139
+#: sc/inc/strings.hrc:138
 msgctxt "STR_NOROWFORMULA"
 msgid "Formulas don't form a row."
 msgstr "A képletek nem alkotnak sort."
 
 #. PknB5
-#: sc/inc/strings.hrc:140
+#: sc/inc/strings.hrc:139
 msgctxt "STR_ADD_AUTOFORMAT_TITLE"
 msgid "Add AutoFormat"
 msgstr "Automatikus formázás hozzáadása"
 
 #. 7KuSQ
-#: sc/inc/strings.hrc:141
+#: sc/inc/strings.hrc:140
 msgctxt "STR_RENAME_AUTOFORMAT_TITLE"
 msgid "Rename AutoFormat"
 msgstr "Automatikus formázás átnevezése"
 
 #. hqtgD
-#: sc/inc/strings.hrc:142
+#: sc/inc/strings.hrc:141
 msgctxt "STR_ADD_AUTOFORMAT_LABEL"
 msgid "Name"
 msgstr "Név"
 
 #. L9jQU
-#: sc/inc/strings.hrc:143
+#: sc/inc/strings.hrc:142
 msgctxt "STR_DEL_AUTOFORMAT_TITLE"
 msgid "Delete AutoFormat"
 msgstr "Automatikus formázás törlése"
 
 #. KCDoJ
-#: sc/inc/strings.hrc:144
+#: sc/inc/strings.hrc:143
 msgctxt "STR_DEL_AUTOFORMAT_MSG"
 msgid "Do you really want to delete the # AutoFormat?"
 msgstr "Tényleg törli az automatikus formázást: # ?"
 
 #. GDdL3
-#: sc/inc/strings.hrc:145
+#: sc/inc/strings.hrc:144
 msgctxt "STR_BTN_AUTOFORMAT_CLOSE"
 msgid "~Close"
 msgstr "~Bezárás"
 
 #. DAuNm
-#: sc/inc/strings.hrc:146
+#: sc/inc/strings.hrc:145
 msgctxt "STR_JAN"
 msgid "Jan"
 msgstr "Jan"
 
 #. WWzNg
-#: sc/inc/strings.hrc:147
+#: sc/inc/strings.hrc:146
 msgctxt "STR_FEB"
 msgid "Feb"
 msgstr "Febr"
 
 #. CCC3U
-#: sc/inc/strings.hrc:148
+#: sc/inc/strings.hrc:147
 msgctxt "STR_MAR"
 msgid "Mar"
 msgstr "Márc"
 
 #. cr7Jq
-#: sc/inc/strings.hrc:149
+#: sc/inc/strings.hrc:148
 msgctxt "STR_NORTH"
 msgid "North"
 msgstr "Észak"
 
 #. wHYPw
-#: sc/inc/strings.hrc:150
+#: sc/inc/strings.hrc:149
 msgctxt "STR_MID"
 msgid "Mid"
 msgstr "Közép"
 
 #. sxDHC
-#: sc/inc/strings.hrc:151
+#: sc/inc/strings.hrc:150
 msgctxt "STR_SOUTH"
 msgid "South"
 msgstr "Dél"
 
 #. CWcdp
-#: sc/inc/strings.hrc:152
+#: sc/inc/strings.hrc:151
 msgctxt "STR_SUM"
 msgid "Total"
 msgstr "Összeg"
 
 #. MMCxb
-#: sc/inc/strings.hrc:153
+#: sc/inc/strings.hrc:152
 msgctxt "SCSTR_UNDO_PAGE_ANCHOR"
 msgid "Page Anchor"
 msgstr "Oldalhorgony"
 
 #. fFFQ8
-#: sc/inc/strings.hrc:154
+#: sc/inc/strings.hrc:153
 msgctxt "SCSTR_UNDO_CELL_ANCHOR"
 msgid "Cell Anchor"
 msgstr "Cellahorgony"
 
 #. rTGKc
-#: sc/inc/strings.hrc:155
+#: sc/inc/strings.hrc:154
 msgctxt "SCSTR_CONDITION"
 msgid "Condition "
 msgstr "Feltétel "
 
 #. 56Wmj
 #. content description strings are also use        d in ScLinkTargetsObj
-#: sc/inc/strings.hrc:158
+#: sc/inc/strings.hrc:157
 msgctxt "SCSTR_CONTENT_ROOT"
 msgid "Contents"
 msgstr "Tartalom"
 
 #. wLN3J
-#: sc/inc/strings.hrc:159
+#: sc/inc/strings.hrc:158
 msgctxt "SCSTR_CONTENT_TABLE"
 msgid "Sheets"
 msgstr "munkalap"
 
 #. 3ZhJn
-#: sc/inc/strings.hrc:160
+#: sc/inc/strings.hrc:159
 msgctxt "SCSTR_CONTENT_RANGENAME"
 msgid "Range names"
 msgstr "tartománynév"
 
 #. jjQeD
-#: sc/inc/strings.hrc:161
+#: sc/inc/strings.hrc:160
 msgctxt "SCSTR_CONTENT_DBAREA"
 msgid "Database ranges"
 msgstr "adatbázis-tartomány"
 
 #. kbHfD
-#: sc/inc/strings.hrc:162
+#: sc/inc/strings.hrc:161
 msgctxt "SCSTR_CONTENT_GRAPHIC"
 msgid "Images"
 msgstr "kép"
 
 #. 3imVs
-#: sc/inc/strings.hrc:163
+#: sc/inc/strings.hrc:162
 msgctxt "SCSTR_CONTENT_OLEOBJECT"
 msgid "OLE objects"
 msgstr "OLE-objektum"
 
 #. T28Cj
-#: sc/inc/strings.hrc:164
+#: sc/inc/strings.hrc:163
 msgctxt "SCSTR_CONTENT_NOTE"
 msgid "Comments"
 msgstr "megjegyzés"
 
 #. 5UcFo
-#: sc/inc/strings.hrc:165
+#: sc/inc/strings.hrc:164
 msgctxt "SCSTR_CONTENT_AREALINK"
 msgid "Linked areas"
 msgstr "Kapcsolt területek"
 
 #. HzVgF
-#: sc/inc/strings.hrc:166
+#: sc/inc/strings.hrc:165
 msgctxt "SCSTR_CONTENT_DRAWING"
 msgid "Drawing objects"
 msgstr "rajzobjektum"
 
 #. sCafb
-#: sc/inc/strings.hrc:167
+#: sc/inc/strings.hrc:166
 msgctxt "SCSTR_ACTIVE"
 msgid "active"
 msgstr "Aktív"
 
 #. q6EmB
-#: sc/inc/strings.hrc:168
+#: sc/inc/strings.hrc:167
 msgctxt "SCSTR_NOTACTIVE"
 msgid "inactive"
 msgstr "inaktív"
 
 #. Gr6xn
-#: sc/inc/strings.hrc:169
+#: sc/inc/strings.hrc:168
 msgctxt "SCSTR_HIDDEN"
 msgid "hidden"
 msgstr "rejtett"
 
 #. vnwQr
-#: sc/inc/strings.hrc:170
+#: sc/inc/strings.hrc:169
 msgctxt "SCSTR_ACTIVEWIN"
 msgid "Active Window"
 msgstr "Aktív ablak"
 
 #. yo3cD
-#: sc/inc/strings.hrc:171
+#: sc/inc/strings.hrc:170
 msgctxt "SCSTR_QHLP_SCEN_LISTBOX"
 msgid "Scenario Name"
 msgstr "Eset neve"
 
 #. oWz3B
-#: sc/inc/strings.hrc:172
+#: sc/inc/strings.hrc:171
 msgctxt "SCSTR_QHLP_SCEN_COMMENT"
 msgid "Comment"
 msgstr "Megjegyzés"
 
 #. tNLKD
-#: sc/inc/strings.hrc:174
+#: sc/inc/strings.hrc:173
 msgctxt "STR_MENU_SORT_ASC"
 msgid "Sort Ascending"
 msgstr "Növekvő sorrend"
 
 #. S6kbN
-#: sc/inc/strings.hrc:175
+#: sc/inc/strings.hrc:174
 msgctxt "STR_MENU_SORT_DESC"
 msgid "Sort Descending"
 msgstr "Csökkenő sorrend"
 
 #. BDYHo
-#: sc/inc/strings.hrc:176
+#: sc/inc/strings.hrc:175
 msgctxt "STR_MENU_SORT_CUSTOM"
 msgid "Custom Sort"
 msgstr "Egyéni rendezés"
 
 #. bpBbA
-#: sc/inc/strings.hrc:178
+#: sc/inc/strings.hrc:177
 msgctxt "SCSTR_QHELP_POSWND"
 msgid "Name Box"
 msgstr "Névdoboz"
 
 #. GeNTF
-#: sc/inc/strings.hrc:179
+#: sc/inc/strings.hrc:178
 msgctxt "SCSTR_QHELP_INPUTWND"
 msgid "Input line"
 msgstr "Beviteli sor"
 
 #. E6mnF
-#: sc/inc/strings.hrc:180
+#: sc/inc/strings.hrc:179
 msgctxt "SCSTR_QHELP_BTNCALC"
 msgid "Function Wizard"
 msgstr "Függvénytündér"
 
 #. rU6xA
-#: sc/inc/strings.hrc:181
+#: sc/inc/strings.hrc:180
 msgctxt "SCSTR_QHELP_BTNOK"
 msgid "Accept"
 msgstr "Elfogadás"
 
 #. NC6DB
-#: sc/inc/strings.hrc:182
+#: sc/inc/strings.hrc:181
 msgctxt "SCSTR_QHELP_BTNCANCEL"
 msgid "Cancel"
 msgstr "Mégse"
 
 #. 9JUCF
-#: sc/inc/strings.hrc:183
+#: sc/inc/strings.hrc:182
 msgctxt "SCSTR_QHELP_BTNSUM"
 msgid "Select Function"
 msgstr "Válasszon függvényt"
 
 #. kFqE4
-#: sc/inc/strings.hrc:184
+#: sc/inc/strings.hrc:183
 msgctxt "SCSTR_QHELP_BTNEQUAL"
 msgid "Formula"
 msgstr "Képlet"
 
 #. dPqKq
-#: sc/inc/strings.hrc:185
+#: sc/inc/strings.hrc:184
 msgctxt "SCSTR_QHELP_EXPAND_FORMULA"
 msgid "Expand Formula Bar"
 msgstr "Képlet eszköztár lenyitása"
 
 #. ENx2Q
-#: sc/inc/strings.hrc:186
+#: sc/inc/strings.hrc:185
 msgctxt "SCSTR_QHELP_COLLAPSE_FORMULA"
 msgid "Collapse Formula Bar"
 msgstr "Képlet eszköztár összecsukása"
 
 #. nSD8r
-#: sc/inc/strings.hrc:188
+#: sc/inc/strings.hrc:187
 msgctxt "STR_UNKNOWN_USER_CONFLICT"
 msgid "Unknown User"
 msgstr "Ismeretlen felhasználó"
 
 #. HDiei
-#: sc/inc/strings.hrc:190
+#: sc/inc/strings.hrc:189
 msgctxt "STR_CHG_INSERT_COLS"
 msgid "Column inserted"
 msgstr "Oszlop beszúrva"
 
 #. brecA
-#: sc/inc/strings.hrc:191
+#: sc/inc/strings.hrc:190
 msgctxt "STR_CHG_INSERT_ROWS"
 msgid "Row inserted "
 msgstr "Sor beszúrva "
 
 #. nBf8B
-#: sc/inc/strings.hrc:192
+#: sc/inc/strings.hrc:191
 msgctxt "STR_CHG_INSERT_TABS"
 msgid "Sheet inserted "
 msgstr "Munkalap beszúrva "
 
 #. Td8iF
-#: sc/inc/strings.hrc:193
+#: sc/inc/strings.hrc:192
 msgctxt "STR_CHG_DELETE_COLS"
 msgid "Column deleted"
 msgstr "Oszlop törölve"
 
 #. 8Kopo
-#: sc/inc/strings.hrc:194
+#: sc/inc/strings.hrc:193
 msgctxt "STR_CHG_DELETE_ROWS"
 msgid "Row deleted"
 msgstr "Sor törölve"
 
 #. DynWz
-#: sc/inc/strings.hrc:195
+#: sc/inc/strings.hrc:194
 msgctxt "STR_CHG_DELETE_TABS"
 msgid "Sheet deleted"
 msgstr "Munkalap törölve"
 
 #. 6f9S9
-#: sc/inc/strings.hrc:196
+#: sc/inc/strings.hrc:195
 msgctxt "STR_CHG_MOVE"
 msgid "Range moved"
 msgstr "Tartomány áthelyezve"
 
 #. UpHkf
-#: sc/inc/strings.hrc:197
+#: sc/inc/strings.hrc:196
 msgctxt "STR_CHG_CONTENT"
 msgid "Changed contents"
 msgstr "Megváltozott tartalom"
 
 #. cefNw
-#: sc/inc/strings.hrc:198
+#: sc/inc/strings.hrc:197
 msgctxt "STR_CHG_CONTENT_WITH_CHILD"
 msgid "Changed contents"
 msgstr "Megváltozott tartalom"
 
 #. DcsSq
-#: sc/inc/strings.hrc:199
+#: sc/inc/strings.hrc:198
 msgctxt "STR_CHG_CHILD_CONTENT"
 msgid "Changed to "
 msgstr "Megváltoztatva "
 
 #. naPuN
-#: sc/inc/strings.hrc:200
+#: sc/inc/strings.hrc:199
 msgctxt "STR_CHG_CHILD_ORGCONTENT"
 msgid "Original"
 msgstr "Eredeti"
 
 #. cbtSw
-#: sc/inc/strings.hrc:201
+#: sc/inc/strings.hrc:200
 msgctxt "STR_CHG_REJECT"
 msgid "Changes rejected"
 msgstr "Változtatások elutasítva"
 
 #. rGkvk
-#: sc/inc/strings.hrc:202
+#: sc/inc/strings.hrc:201
 msgctxt "STR_CHG_ACCEPTED"
 msgid "Accepted"
 msgstr "Elfogadva"
 
 #. FRREF
-#: sc/inc/strings.hrc:203
+#: sc/inc/strings.hrc:202
 msgctxt "STR_CHG_REJECTED"
 msgid "Rejected"
 msgstr "Elutasítva"
 
 #. bG7Pb
-#: sc/inc/strings.hrc:204
+#: sc/inc/strings.hrc:203
 msgctxt "STR_CHG_NO_ENTRY"
 msgid "No Entry"
 msgstr "Nincs bejegyzés"
 
 #. i2doZ
-#: sc/inc/strings.hrc:205
+#: sc/inc/strings.hrc:204
 msgctxt "STR_CHG_EMPTY"
 msgid "<empty>"
 msgstr "<üres>"
 
 #. dAt5Q
-#: sc/inc/strings.hrc:207
+#: sc/inc/strings.hrc:206
 msgctxt "STR_NOT_PROTECTED"
 msgid "Not protected"
 msgstr "Nem védett"
 
 #. 3TDDs
-#: sc/inc/strings.hrc:208
+#: sc/inc/strings.hrc:207
 msgctxt "STR_NOT_PASS_PROTECTED"
 msgid "Not password-protected"
 msgstr "Nem jelszóvédett"
 
 #. qBe6G
-#: sc/inc/strings.hrc:209
+#: sc/inc/strings.hrc:208
 msgctxt "STR_HASH_BAD"
 msgid "Hash incompatible"
 msgstr "Nem kompatibilis jelszókivonat"
 
 #. XoAEE
-#: sc/inc/strings.hrc:210
+#: sc/inc/strings.hrc:209
 msgctxt "STR_HASH_GOOD"
 msgid "Hash compatible"
 msgstr "Kompatibilis jelszókivonat"
 
 #. MHDYB
-#: sc/inc/strings.hrc:211
+#: sc/inc/strings.hrc:210
 msgctxt "STR_RETYPE"
 msgid "Re-type"
 msgstr "Még egyszer"
 
 #. bFjd9
 #. MovingAverageDialog
-#: sc/inc/strings.hrc:214
+#: sc/inc/strings.hrc:213
 msgctxt "STR_MOVING_AVERAGE_UNDO_NAME"
 msgid "Moving Average"
 msgstr "Mozgóátlag"
 
 #. ZUkPQ
 #. ExponentialSmoothingDialog
-#: sc/inc/strings.hrc:216
+#: sc/inc/strings.hrc:215
 msgctxt "STR_EXPONENTIAL_SMOOTHING_UNDO_NAME"
 msgid "Exponential Smoothing"
 msgstr "Exponenciális simítás"
 
 #. LAfqT
 #. AnalysisOfVarianceDialog
-#: sc/inc/strings.hrc:218
+#: sc/inc/strings.hrc:217
 msgctxt "STR_ANALYSIS_OF_VARIANCE_UNDO_NAME"
 msgid "Analysis of Variance"
 msgstr "Szórásnégyzet elemzése"
 
 #. 8v4W5
-#: sc/inc/strings.hrc:219
+#: sc/inc/strings.hrc:218
 msgctxt "STR_LABEL_ANOVA"
 msgid "Analysis of Variance (ANOVA)"
 msgstr "Varianciaanalízis (ANOVA)"
 
 #. NY8WD
-#: sc/inc/strings.hrc:220
+#: sc/inc/strings.hrc:219
 msgctxt "STR_ANOVA_SINGLE_FACTOR_LABEL"
 msgid "ANOVA - Single Factor"
 msgstr "Variancianalízis - egy tényezős"
 
 #. AFnEZ
-#: sc/inc/strings.hrc:221
+#: sc/inc/strings.hrc:220
 msgctxt "STR_ANOVA_TWO_FACTOR_LABEL"
 msgid "ANOVA - Two Factor"
 msgstr "Variancianalízis - két tényezős"
 
 #. hBPGD
-#: sc/inc/strings.hrc:222
+#: sc/inc/strings.hrc:221
 msgctxt "STR_ANOVA_LABEL_GROUPS"
 msgid "Groups"
 msgstr "Csoportok"
 
 #. DiUWy
-#: sc/inc/strings.hrc:223
+#: sc/inc/strings.hrc:222
 msgctxt "STR_ANOVA_LABEL_BETWEEN_GROUPS"
 msgid "Between Groups"
 msgstr "Csoportok között"
 
 #. fBh3S
-#: sc/inc/strings.hrc:224
+#: sc/inc/strings.hrc:223
 msgctxt "STR_ANOVA_LABEL_WITHIN_GROUPS"
 msgid "Within Groups"
 msgstr "Csoportokon belül"
 
 #. DFcw4
-#: sc/inc/strings.hrc:225
+#: sc/inc/strings.hrc:224
 msgctxt "STR_ANOVA_LABEL_SOURCE_OF_VARIATION"
 msgid "Source of Variation"
 msgstr "Variancia forrása"
 
 #. KYbb8
-#: sc/inc/strings.hrc:226
+#: sc/inc/strings.hrc:225
 msgctxt "STR_ANOVA_LABEL_SS"
 msgid "SS"
 msgstr "SS"
 
 #. j7j6E
-#: sc/inc/strings.hrc:227
+#: sc/inc/strings.hrc:226
 msgctxt "STR_ANOVA_LABEL_DF"
 msgid "df"
 msgstr "df"
 
 #. 6QJED
-#: sc/inc/strings.hrc:228
+#: sc/inc/strings.hrc:227
 msgctxt "STR_ANOVA_LABEL_MS"
 msgid "MS"
 msgstr "MS"
 
 #. JcWo9
-#: sc/inc/strings.hrc:229
+#: sc/inc/strings.hrc:228
 msgctxt "STR_ANOVA_LABEL_F"
 msgid "F"
 msgstr "F"
 
 #. a43mP
-#: sc/inc/strings.hrc:230
+#: sc/inc/strings.hrc:229
 msgctxt "STR_ANOVA_LABEL_SIGNIFICANCE_F"
 msgid "Significance F"
 msgstr "F-szignifikancia"
 
 #. MMmsS
-#: sc/inc/strings.hrc:231
+#: sc/inc/strings.hrc:230
 msgctxt "STR_ANOVA_LABEL_P_VALUE"
 msgid "P-value"
 msgstr "P-érték"
 
 #. UoaCS
-#: sc/inc/strings.hrc:232
+#: sc/inc/strings.hrc:231
 msgctxt "STR_ANOVA_LABEL_F_CRITICAL"
 msgid "F critical"
 msgstr "F-kritikus"
 
 #. oJD9H
-#: sc/inc/strings.hrc:233
+#: sc/inc/strings.hrc:232
 msgctxt "STR_ANOVA_LABEL_TOTAL"
 msgid "Total"
 msgstr "Összesen"
 
 #. kvSFC
 #. CorrelationDialog
-#: sc/inc/strings.hrc:235
+#: sc/inc/strings.hrc:234
 msgctxt "STR_CORRELATION_UNDO_NAME"
 msgid "Correlation"
 msgstr "Korreláció"
 
 #. WC4SJ
-#: sc/inc/strings.hrc:236
+#: sc/inc/strings.hrc:235
 msgctxt "STR_CORRELATION_LABEL"
 msgid "Correlations"
 msgstr "Korrelációk"
 
 #. AAb7T
 #. CovarianceDialog
-#: sc/inc/strings.hrc:238
+#: sc/inc/strings.hrc:237
 msgctxt "STR_COVARIANCE_UNDO_NAME"
 msgid "Covariance"
 msgstr "Kovariancia"
 
 #. VyxUL
-#: sc/inc/strings.hrc:239
+#: sc/inc/strings.hrc:238
 msgctxt "STR_COVARIANCE_LABEL"
 msgid "Covariances"
 msgstr "Kovarianciák"
 
 #. 8gmqu
 #. DescriptiveStatisticsDialog
-#: sc/inc/strings.hrc:241
+#: sc/inc/strings.hrc:240
 msgctxt "STR_DESCRIPTIVE_STATISTICS_UNDO_NAME"
 msgid "Descriptive Statistics"
 msgstr "Leíró statisztika"
 
 #. FGXC5
-#: sc/inc/strings.hrc:242
+#: sc/inc/strings.hrc:241
 msgctxt "STRID_CALC_MEAN"
 msgid "Mean"
 msgstr "Átlag"
 
 #. 2sHVR
-#: sc/inc/strings.hrc:243
+#: sc/inc/strings.hrc:242
 msgctxt "STRID_CALC_STD_ERROR"
 msgid "Standard Error"
 msgstr "Standard hiba"
 
 #. KrDBB
-#: sc/inc/strings.hrc:244
+#: sc/inc/strings.hrc:243
 msgctxt "STRID_CALC_MODE"
 msgid "Mode"
 msgstr "Mód"
 
 #. AAbEo
-#: sc/inc/strings.hrc:245
+#: sc/inc/strings.hrc:244
 msgctxt "STRID_CALC_MEDIAN"
 msgid "Median"
 msgstr "Medián"
 
 #. h2HaP
-#: sc/inc/strings.hrc:246
+#: sc/inc/strings.hrc:245
 msgctxt "STRID_CALC_VARIANCE"
 msgid "Variance"
 msgstr "Szórásnégyzet"
 
 #. 3uYMC
-#: sc/inc/strings.hrc:247
+#: sc/inc/strings.hrc:246
 msgctxt "STRID_CALC_STD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Szórás"
 
 #. JTx7f
-#: sc/inc/strings.hrc:248
+#: sc/inc/strings.hrc:247
 msgctxt "STRID_CALC_KURTOSIS"
 msgid "Kurtosis"
 msgstr "Lapultság"
 
 #. EXJJt
-#: sc/inc/strings.hrc:249
+#: sc/inc/strings.hrc:248
 msgctxt "STRID_CALC_SKEWNESS"
 msgid "Skewness"
 msgstr "Ferdeség"
 
 #. HkRYo
-#: sc/inc/strings.hrc:250
+#: sc/inc/strings.hrc:249
 msgctxt "STRID_CALC_RANGE"
 msgid "Range"
 msgstr "Tartomány"
 
 #. LHk8p
-#: sc/inc/strings.hrc:251
+#: sc/inc/strings.hrc:250
 msgctxt "STRID_CALC_MIN"
 msgid "Minimum"
 msgstr "Minimum"
 
 #. LtMJs
-#: sc/inc/strings.hrc:252
+#: sc/inc/strings.hrc:251
 msgctxt "STRID_CALC_MAX"
 msgid "Maximum"
 msgstr "Maximum"
 
 #. Q5r5c
-#: sc/inc/strings.hrc:253
+#: sc/inc/strings.hrc:252
 msgctxt "STRID_CALC_SUM"
 msgid "Sum"
 msgstr "Összeg"
 
 #. s8K23
-#: sc/inc/strings.hrc:254
+#: sc/inc/strings.hrc:253
 msgctxt "STRID_CALC_COUNT"
 msgid "Count"
 msgstr "Darab"
 
 #. pU8QG
-#: sc/inc/strings.hrc:255
+#: sc/inc/strings.hrc:254
 msgctxt "STRID_CALC_FIRST_QUARTILE"
 msgid "First Quartile"
 msgstr "Első negyed"
 
 #. PGXzY
-#: sc/inc/strings.hrc:256
+#: sc/inc/strings.hrc:255
 msgctxt "STRID_CALC_THIRD_QUARTILE"
 msgid "Third Quartile"
 msgstr "Harmadik negyed"
 
 #. gABRP
 #. RandomNumberGeneratorDialog
-#: sc/inc/strings.hrc:258
+#: sc/inc/strings.hrc:257
 msgctxt "STR_UNDO_DISTRIBUTION_TEMPLATE"
 msgid "Random ($(DISTRIBUTION))"
-msgstr "Véletlenszerű ($(DISTRIBUTION))"
+msgstr "Random ($(DISTRIBUTION))"
 
 #. A8Rc9
-#: sc/inc/strings.hrc:259
+#: sc/inc/strings.hrc:258
 msgctxt "STR_DISTRIBUTION_UNIFORM_REAL"
 msgid "Uniform"
 msgstr "Egyenletes"
 
 #. 9ke8L
-#: sc/inc/strings.hrc:260
+#: sc/inc/strings.hrc:259
 msgctxt "STR_DISTRIBUTION_UNIFORM_INTEGER"
 msgid "Uniform Integer"
 msgstr "Egyenletes egész"
 
 #. GC2LH
-#: sc/inc/strings.hrc:261
+#: sc/inc/strings.hrc:260
 msgctxt "STR_DISTRIBUTION_NORMAL"
 msgid "Normal"
 msgstr "Normál"
 
 #. XjQ2x
-#: sc/inc/strings.hrc:262
+#: sc/inc/strings.hrc:261
 msgctxt "STR_DISTRIBUTION_CAUCHY"
 msgid "Cauchy"
 msgstr "Cauchy"
 
 #. G5CqB
-#: sc/inc/strings.hrc:263
+#: sc/inc/strings.hrc:262
 msgctxt "STR_DISTRIBUTION_BERNOULLI"
 msgid "Bernoulli"
 msgstr "Bernoulli"
 
 #. GpJUB
-#: sc/inc/strings.hrc:264
+#: sc/inc/strings.hrc:263
 msgctxt "STR_DISTRIBUTION_BINOMIAL"
 msgid "Binomial"
 msgstr "Binomiális"
 
 #. 6yJKm
-#: sc/inc/strings.hrc:265
+#: sc/inc/strings.hrc:264
 msgctxt "STR_DISTRIBUTION_NEGATIVE_BINOMIAL"
 msgid "Negative Binomial"
 msgstr "Negatív binomiális"
 
 #. zzpmN
-#: sc/inc/strings.hrc:266
+#: sc/inc/strings.hrc:265
 msgctxt "STR_DISTRIBUTION_CHI_SQUARED"
 msgid "Chi Squared"
 msgstr "Khi-négyzet"
 
 #. NGBzX
-#: sc/inc/strings.hrc:267
+#: sc/inc/strings.hrc:266
 msgctxt "STR_DISTRIBUTION_GEOMETRIC"
 msgid "Geometric"
 msgstr "Mértani"
 
 #. BNZPE
-#: sc/inc/strings.hrc:268
+#: sc/inc/strings.hrc:267
 msgctxt "STR_RNG_PARAMETER_MINIMUM"
 msgid "Minimum"
 msgstr "Minimum"
 
 #. EThhi
-#: sc/inc/strings.hrc:269
+#: sc/inc/strings.hrc:268
 msgctxt "STR_RNG_PARAMETER_MAXIMUM"
 msgid "Maximum"
 msgstr "Maximum"
 
 #. RPYEG
-#: sc/inc/strings.hrc:270
+#: sc/inc/strings.hrc:269
 msgctxt "STR_RNG_PARAMETER_MEAN"
 msgid "Mean"
 msgstr "Átlag"
 
 #. VeqrX
-#: sc/inc/strings.hrc:271
+#: sc/inc/strings.hrc:270
 msgctxt "STR_RNG_PARAMETER_STANDARD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Szórás"
 
 #. ChwWE
-#: sc/inc/strings.hrc:272
+#: sc/inc/strings.hrc:271
 msgctxt "STR_RNG_PARAMETER_STANDARD_MEDIAN"
 msgid "Median"
 msgstr "Medián"
 
 #. SzgEb
-#: sc/inc/strings.hrc:273
+#: sc/inc/strings.hrc:272
 msgctxt "STR_RNG_PARAMETER_STANDARD_SIGMA"
 msgid "Sigma"
 msgstr "Szigma"
 
 #. 94TBK
-#: sc/inc/strings.hrc:274
+#: sc/inc/strings.hrc:273
 msgctxt "STR_RNG_PARAMETER_STANDARD_PROBABILITY"
 msgid "p Value"
 msgstr "p-érték"
 
 #. AfUsB
-#: sc/inc/strings.hrc:275
+#: sc/inc/strings.hrc:274
 msgctxt "STR_RNG_PARAMETER_STANDARD_NUMBER_OF_TRIALS"
 msgid "Number of Trials"
 msgstr "A kísérletek száma"
 
 #. DdfR6
-#: sc/inc/strings.hrc:276
+#: sc/inc/strings.hrc:275
 msgctxt "STR_RNG_PARAMETER_STANDARD_NU_VALUE"
 msgid "nu Value"
 msgstr "nu érték"
 
 #. gygpC
 #. SamplingDialog
-#: sc/inc/strings.hrc:278
+#: sc/inc/strings.hrc:277
 msgctxt "STR_SAMPLING_UNDO_NAME"
 msgid "Sampling"
 msgstr "Mintavétel"
 
 #. zLuBp
 #. Names of dialogs
-#: sc/inc/strings.hrc:280
+#: sc/inc/strings.hrc:279
 msgctxt "STR_FTEST"
 msgid "F-test"
 msgstr "F-próba"
 
 #. bQEfv
-#: sc/inc/strings.hrc:281
+#: sc/inc/strings.hrc:280
 msgctxt "STR_FTEST_UNDO_NAME"
 msgid "F-test"
 msgstr "F-próba"
 
 #. UdsVZ
-#: sc/inc/strings.hrc:282
+#: sc/inc/strings.hrc:281
 msgctxt "STR_TTEST"
 msgid "Paired t-test"
 msgstr "Páros t-próba"
 
 #. A7xTa
-#: sc/inc/strings.hrc:283
+#: sc/inc/strings.hrc:282
 msgctxt "STR_TTEST_UNDO_NAME"
 msgid "Paired t-test"
 msgstr "Páros t-próba"
 
 #. dWPSe
-#: sc/inc/strings.hrc:284
+#: sc/inc/strings.hrc:283
 msgctxt "STR_ZTEST"
 msgid "z-test"
 msgstr "z-próba"
 
 #. QvZ7V
-#: sc/inc/strings.hrc:285
+#: sc/inc/strings.hrc:284
 msgctxt "STR_ZTEST_UNDO_NAME"
 msgid "z-test"
 msgstr "z-próba"
 
 #. D6AqL
-#: sc/inc/strings.hrc:286
+#: sc/inc/strings.hrc:285
 msgctxt "STR_CHI_SQUARE_TEST"
 msgid "Test of Independence (Chi-Square)"
 msgstr "Függetlenségi próba (Khi-négyzet)"
 
 #. PvFSb
-#: sc/inc/strings.hrc:287
+#: sc/inc/strings.hrc:286
 msgctxt "STR_REGRESSION_UNDO_NAME"
 msgid "Regression"
 msgstr "Regresszió"
 
 #. NXrYh
-#: sc/inc/strings.hrc:288
+#: sc/inc/strings.hrc:287
 msgctxt "STR_REGRESSION"
 msgid "Regression"
 msgstr "Regresszió"
 
 #. AM5WV
-#: sc/inc/strings.hrc:289
+#: sc/inc/strings.hrc:288
 msgctxt "STR_FOURIER_ANALYSIS_UNDO_NAME"
 msgid "Fourier Analysis"
 msgstr "Fourier-analízis"
 
 #. hd6yJ
-#: sc/inc/strings.hrc:290
+#: sc/inc/strings.hrc:289
 msgctxt "STR_FOURIER_ANALYSIS"
 msgid "Fourier Analysis"
 msgstr "Fourier-analízis"
 
 #. KNJ5s
 #. Common
-#: sc/inc/strings.hrc:292
+#: sc/inc/strings.hrc:291
 msgctxt "STR_COLUMN_LABEL_TEMPLATE"
 msgid "Column %NUMBER%"
 msgstr "%NUMBER%. oszlop"
 
 #. aTAGd
-#: sc/inc/strings.hrc:293
+#: sc/inc/strings.hrc:292
 msgctxt "STR_ROW_LABEL_TEMPLATE"
 msgid "Row %NUMBER%"
 msgstr "%NUMBER%. sor"
 
 #. nAbaC
-#: sc/inc/strings.hrc:294
+#: sc/inc/strings.hrc:293
 msgctxt "STR_LABEL_ALPHA"
 msgid "Alpha"
 msgstr "Alfa"
 
 #. FZZCu
-#: sc/inc/strings.hrc:295
+#: sc/inc/strings.hrc:294
 msgctxt "STR_VARIABLE_1_LABEL"
 msgid "Variable 1"
 msgstr "1. változó"
 
 #. pnyaa
-#: sc/inc/strings.hrc:296
+#: sc/inc/strings.hrc:295
 msgctxt "STR_VARIABLE_2_LABEL"
 msgid "Variable 2"
 msgstr "2. változó"
 
 #. LU4CC
-#: sc/inc/strings.hrc:297
+#: sc/inc/strings.hrc:296
 msgctxt "STR_HYPOTHESIZED_MEAN_DIFFERENCE_LABEL"
 msgid "Hypothesized Mean Difference"
 msgstr "Elméleti középeltérés"
 
 #. sCNt9
-#: sc/inc/strings.hrc:298
+#: sc/inc/strings.hrc:297
 msgctxt "STR_OBSERVATIONS_LABEL"
 msgid "Observations"
 msgstr "Megfigyelések"
 
 #. arX5v
-#: sc/inc/strings.hrc:299
+#: sc/inc/strings.hrc:298
 msgctxt "STR_OBSERVED_MEAN_DIFFERENCE_LABEL"
 msgid "Observed Mean Difference"
 msgstr "Megfigyelt középeltérés"
 
 #. dr3Gt
-#: sc/inc/strings.hrc:300
+#: sc/inc/strings.hrc:299
 msgctxt "STR_LABEL_RSQUARED"
 msgid "R^2"
 msgstr "R^2"
 
 #. pnhCA
-#: sc/inc/strings.hrc:301
+#: sc/inc/strings.hrc:300
 msgctxt "STR_LABEL_ADJUSTED_RSQUARED"
 msgid "Adjusted R^2"
 msgstr "Módosított R^2"
 
 #. ACsNA
-#: sc/inc/strings.hrc:302
+#: sc/inc/strings.hrc:301
 msgctxt "STR_LABEL_XVARIABLES_COUNT"
 msgid "Count of X variables"
 msgstr "X változók száma"
 
 #. kEPsb
-#: sc/inc/strings.hrc:303
+#: sc/inc/strings.hrc:302
 msgctxt "STR_DEGREES_OF_FREEDOM_LABEL"
 msgid "df"
 msgstr "df"
 
 #. FYUYT
-#: sc/inc/strings.hrc:304
+#: sc/inc/strings.hrc:303
 msgctxt "STR_P_VALUE_LABEL"
 msgid "P-value"
 msgstr "P-érték"
 
 #. S3BHc
-#: sc/inc/strings.hrc:305
+#: sc/inc/strings.hrc:304
 msgctxt "STR_CRITICAL_VALUE_LABEL"
 msgid "Critical Value"
 msgstr "Kritikus érték"
 
 #. wgpT3
-#: sc/inc/strings.hrc:306
+#: sc/inc/strings.hrc:305
 msgctxt "STR_TEST_STATISTIC_LABEL"
 msgid "Test Statistic"
 msgstr "Próbastatisztika"
 
 #. kTwBX
-#: sc/inc/strings.hrc:307
+#: sc/inc/strings.hrc:306
 msgctxt "STR_LABEL_LOWER"
 msgid "Lower"
 msgstr "Alsó"
 
 #. GgFPs
-#: sc/inc/strings.hrc:308
+#: sc/inc/strings.hrc:307
 msgctxt "STR_LABEL_Upper"
 msgid "Upper"
 msgstr "Felső"
 
 #. hkXzo
-#: sc/inc/strings.hrc:309
+#: sc/inc/strings.hrc:308
 msgctxt "STR_MESSAGE_INVALID_INPUT_RANGE"
 msgid "Input range is invalid."
 msgstr "A bemeneti tartomány érvénytelen."
 
 #. rTFFF
-#: sc/inc/strings.hrc:310
+#: sc/inc/strings.hrc:309
 msgctxt "STR_MESSAGE_INVALID_OUTPUT_ADDR"
 msgid "Output address is not valid."
 msgstr "A kimeneti cím érvénytelen."
 
 #. rtSox
 #. RegressionDialog
-#: sc/inc/strings.hrc:312
+#: sc/inc/strings.hrc:311
 msgctxt "STR_LABEL_LINEAR"
 msgid "Linear"
 msgstr "Lineáris"
 
 #. kVG6g
-#: sc/inc/strings.hrc:313
+#: sc/inc/strings.hrc:312
 msgctxt "STR_LABEL_LOGARITHMIC"
 msgid "Logarithmic"
 msgstr "Logaritmikus"
 
 #. wmyFW
-#: sc/inc/strings.hrc:314
+#: sc/inc/strings.hrc:313
 msgctxt "STR_LABEL_POWER"
 msgid "Power"
 msgstr "Hatvány"
 
 #. GabFM
-#: sc/inc/strings.hrc:315
+#: sc/inc/strings.hrc:314
 msgctxt "STR_MESSAGE_XINVALID_RANGE"
 msgid "Independent variable(s) range is not valid."
 msgstr "A független változók tartománya érvénytelen."
 
 #. 8x8DM
-#: sc/inc/strings.hrc:316
+#: sc/inc/strings.hrc:315
 msgctxt "STR_MESSAGE_YINVALID_RANGE"
 msgid "Dependent variable(s) range is not valid."
 msgstr "A függő változók tartománya érvénytelen."
 
 #. E7BD2
-#: sc/inc/strings.hrc:317
+#: sc/inc/strings.hrc:316
 msgctxt "STR_MESSAGE_INVALID_CONFIDENCE_LEVEL"
 msgid "Confidence level must be in the interval (0, 1)."
 msgstr "A megbízhatósági szintnek a (0, 1) intervallumban kell lennie."
 
 #. ZdyQs
-#: sc/inc/strings.hrc:318
+#: sc/inc/strings.hrc:317
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_COLUMN"
 msgid "Y variable range cannot have more than 1 column."
 msgstr "Az Y változó tartománya nem tartalmazhat 1-nél több oszlopot."
 
 #. UpZqC
-#: sc/inc/strings.hrc:319
+#: sc/inc/strings.hrc:318
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_ROW"
 msgid "Y variable range cannot have more than 1 row."
 msgstr "Az Y változó tartománya nem tartalmazhat 1-nél több sort."
 
 #. DrsBe
-#: sc/inc/strings.hrc:320
+#: sc/inc/strings.hrc:319
 msgctxt "STR_MESSAGE_UNIVARIATE_NUMOBS_MISMATCH"
 msgid "Univariate regression : The observation count in X and Y must match."
 msgstr "Egyváltozós regresszió: a megfigyelések számának X és Y esetén egyeznie kell."
 
 #. KuttF
-#: sc/inc/strings.hrc:321
+#: sc/inc/strings.hrc:320
 msgctxt "STR_MESSAGE_MULTIVARIATE_NUMOBS_MISMATCH"
 msgid "Multivariate regression : The observation count in X and Y must match."
 msgstr "Többváltozós regresszió: a megfigyelések számának X és Y esetén egyeznie kell."
 
 #. 6Cghz
-#: sc/inc/strings.hrc:322
+#: sc/inc/strings.hrc:321
 msgctxt "STR_LABEL_REGRESSION_MODEL"
 msgid "Regression Model"
 msgstr "Regressziós modell"
 
 #. bmR5w
-#: sc/inc/strings.hrc:323
+#: sc/inc/strings.hrc:322
 msgctxt "STR_LABEL_REGRESSION_STATISTICS"
 msgid "Regression Statistics"
 msgstr "Regresszióstatisztika"
 
 #. RNHCx
-#: sc/inc/strings.hrc:324
+#: sc/inc/strings.hrc:323
 msgctxt "STR_LABEL_RESIDUAL"
 msgid "Residual"
 msgstr "Maradvány"
 
 #. 4DANj
-#: sc/inc/strings.hrc:325
+#: sc/inc/strings.hrc:324
 msgctxt "STR_LABEL_CONFIDENCE_LEVEL"
 msgid "Confidence level"
 msgstr "Megbízhatósági szint"
 
 #. 9LhbX
-#: sc/inc/strings.hrc:326
+#: sc/inc/strings.hrc:325
 msgctxt "STR_LABEL_COEFFICIENTS"
 msgid "Coefficients"
 msgstr "Együtthatók"
 
 #. nyH7s
-#: sc/inc/strings.hrc:327
+#: sc/inc/strings.hrc:326
 msgctxt "STR_LABEL_TSTATISTIC"
 msgid "t-Statistic"
 msgstr "t-statisztika"
 
 #. PGno2
-#: sc/inc/strings.hrc:328
+#: sc/inc/strings.hrc:327
 msgctxt "STR_LABEL_INTERCEPT"
 msgid "Intercept"
 msgstr "Metszéspont"
 
 #. oa4Cm
-#: sc/inc/strings.hrc:329
+#: sc/inc/strings.hrc:328
 msgctxt "STR_LABEL_PREDICTEDY"
 msgid "Predicted Y"
 msgstr "Előrejelzett Y"
 
 #. QFEjs
-#: sc/inc/strings.hrc:330
+#: sc/inc/strings.hrc:329
 msgctxt "STR_LINEST_RAW_OUTPUT_TITLE"
 msgid "LINEST raw output"
 msgstr "LIN.ILL nyers kimenet"
 
 #. bk7FH
 #. F Test
-#: sc/inc/strings.hrc:332
+#: sc/inc/strings.hrc:331
 msgctxt "STR_FTEST_P_RIGHT_TAIL"
 msgid "P (F<=f) right-tail"
 msgstr "P (F<=f) jobb oldalas"
 
 #. CkHJw
-#: sc/inc/strings.hrc:333
+#: sc/inc/strings.hrc:332
 msgctxt "STR_FTEST_F_CRITICAL_RIGHT_TAIL"
 msgid "F Critical right-tail"
 msgstr "F kritikus jobb oldalas"
 
 #. J7yMZ
-#: sc/inc/strings.hrc:334
+#: sc/inc/strings.hrc:333
 msgctxt "STR_FTEST_P_LEFT_TAIL"
 msgid "P (F<=f) left-tail"
 msgstr "P (F<=f) bal oldalas"
 
 #. R3BNC
-#: sc/inc/strings.hrc:335
+#: sc/inc/strings.hrc:334
 msgctxt "STR_FTEST_F_CRITICAL_LEFT_TAIL"
 msgid "F Critical left-tail"
 msgstr "F Critical bal oldalas"
 
 #. Bve5D
-#: sc/inc/strings.hrc:336
+#: sc/inc/strings.hrc:335
 msgctxt "STR_FTEST_P_TWO_TAIL"
 msgid "P two-tail"
 msgstr "P kétoldalas"
 
 #. 4YZrT
-#: sc/inc/strings.hrc:337
+#: sc/inc/strings.hrc:336
 msgctxt "STR_FTEST_F_CRITICAL_TWO_TAIL"
 msgid "F Critical two-tail"
 msgstr "F kritikus kétoldalas"
 
 #. qaf4N
 #. t Test
-#: sc/inc/strings.hrc:339
+#: sc/inc/strings.hrc:338
 msgctxt "STR_TTEST_PEARSON_CORRELATION"
 msgid "Pearson Correlation"
 msgstr "Pearson-korreláció"
 
 #. C6BU8
-#: sc/inc/strings.hrc:340
+#: sc/inc/strings.hrc:339
 msgctxt "STR_TTEST_VARIANCE_OF_THE_DIFFERENCES"
 msgid "Variance of the Differences"
 msgstr "Az eltérések szórása"
 
 #. j8NuP
-#: sc/inc/strings.hrc:341
+#: sc/inc/strings.hrc:340
 msgctxt "STR_TTEST_T_STAT"
 msgid "t Stat"
 msgstr "t stat"
 
 #. bKoeX
-#: sc/inc/strings.hrc:342
+#: sc/inc/strings.hrc:341
 msgctxt "STR_TTEST_P_ONE_TAIL"
 msgid "P (T<=t) one-tail"
 msgstr "P (T<=t) egyoldalas"
 
 #. dub8R
-#: sc/inc/strings.hrc:343
+#: sc/inc/strings.hrc:342
 msgctxt "STR_TTEST_T_CRITICAL_ONE_TAIL"
 msgid "t Critical one-tail"
 msgstr "t kritikus egyoldalas"
 
 #. FrDDz
-#: sc/inc/strings.hrc:344
+#: sc/inc/strings.hrc:343
 msgctxt "STR_TTEST_P_TWO_TAIL"
 msgid "P (T<=t) two-tail"
 msgstr "P (T<=t) kétoldalas"
 
 #. RQqAd
-#: sc/inc/strings.hrc:345
+#: sc/inc/strings.hrc:344
 msgctxt "STR_TTEST_T_CRITICAL_TWO_TAIL"
 msgid "t Critical two-tail"
 msgstr "t kritikus kétoldalas"
 
 #. kDCsZ
 #. Z Test
-#: sc/inc/strings.hrc:347
+#: sc/inc/strings.hrc:346
 msgctxt "STR_ZTEST_Z_VALUE"
 msgid "z"
 msgstr "z"
 
 #. CF8D5
-#: sc/inc/strings.hrc:348
+#: sc/inc/strings.hrc:347
 msgctxt "STR_ZTEST_KNOWN_VARIANCE"
 msgid "Known Variance"
 msgstr "Ismert szórásnégyzet"
 
 #. cYWDr
-#: sc/inc/strings.hrc:349
+#: sc/inc/strings.hrc:348
 msgctxt "STR_ZTEST_P_ONE_TAIL"
 msgid "P (Z<=z) one-tail"
 msgstr "P (Z<=z) egyoldalas"
 
 #. DmEVf
-#: sc/inc/strings.hrc:350
+#: sc/inc/strings.hrc:349
 msgctxt "STR_ZTEST_Z_CRITICAL_ONE_TAIL"
 msgid "z Critical one-tail"
 msgstr "z kritikus egyoldalas"
 
 #. G8PeP
-#: sc/inc/strings.hrc:351
+#: sc/inc/strings.hrc:350
 msgctxt "STR_ZTEST_P_TWO_TAIL"
 msgid "P (Z<=z) two-tail"
 msgstr "P (Z<=z) kétoldalas"
 
 #. rGBfK
-#: sc/inc/strings.hrc:352
+#: sc/inc/strings.hrc:351
 msgctxt "STR_ZTEST_Z_CRITICAL_TWO_TAIL"
 msgid "z Critical two-tail"
 msgstr "z kritikus kétoldalas"
 
 #. mCsCB
 #. Fourier Analysis
-#: sc/inc/strings.hrc:354
+#: sc/inc/strings.hrc:353
 msgctxt "STR_FOURIER_TRANSFORM"
 msgid "Fourier Transform"
 msgstr "Fourier-transzformáció"
 
 #. sc3hp
-#: sc/inc/strings.hrc:355
+#: sc/inc/strings.hrc:354
 msgctxt "STR_INVERSE_FOURIER_TRANSFORM"
 msgid "Inverse Fourier Transform"
 msgstr "Inverz Fourier-transzformáció"
 
 #. AtC94
-#: sc/inc/strings.hrc:356
+#: sc/inc/strings.hrc:355
 msgctxt "STR_REAL_PART"
 msgid "Real"
 msgstr "Valós"
 
 #. SoyPr
-#: sc/inc/strings.hrc:357
+#: sc/inc/strings.hrc:356
 msgctxt "STR_IMAGINARY_PART"
 msgid "Imaginary"
 msgstr "Képzetes"
 
 #. ymnyT
-#: sc/inc/strings.hrc:358
+#: sc/inc/strings.hrc:357
 msgctxt "STR_MAGNITUDE_PART"
 msgid "Magnitude"
 msgstr "Magnitúdó"
 
 #. NGmmD
-#: sc/inc/strings.hrc:359
+#: sc/inc/strings.hrc:358
 msgctxt "STR_PHASE_PART"
 msgid "Phase"
 msgstr "Fázis"
 
 #. E7Eez
-#: sc/inc/strings.hrc:360
+#: sc/inc/strings.hrc:359
 msgctxt "STR_MESSAGE_INVALID_NUMCOLS"
 msgid "More than two columns selected in grouped by column mode."
 msgstr "Kettőnél több oszlop lett kiválasztva oszlop szerint csoportosítás módban."
 
 #. wF2RV
-#: sc/inc/strings.hrc:361
+#: sc/inc/strings.hrc:360
 msgctxt "STR_MESSAGE_INVALID_NUMROWS"
 msgid "More than two rows selected in grouped by row mode."
 msgstr "Kettőnél több oszlop lett kiválasztva sor szerint csoportosítás módban."
 
 #. DRbrH
-#: sc/inc/strings.hrc:362
+#: sc/inc/strings.hrc:361
 msgctxt "STR_MESSAGE_NODATA_IN_RANGE"
 msgid "No data in input range."
 msgstr "Nincs adat a bemeneti tartományban."
 
 #. gjC2w
-#: sc/inc/strings.hrc:363
+#: sc/inc/strings.hrc:362
 msgctxt "STR_MESSAGE_OUTPUT_TOO_LONG"
 msgid "Output is too long to write into the sheet."
 msgstr "A kimenet túl hosszú ahhoz, hogy kiírásra kerüljön a munkalapra."
 
 #. SnGyL
-#: sc/inc/strings.hrc:364
+#: sc/inc/strings.hrc:363
 msgctxt "STR_INPUT_DATA_RANGE"
 msgid "Input data range"
 msgstr "Bemeneti adattartomány"
 
 #. EaQGL
 #. infobar for allowing links to update or not
-#: sc/inc/strings.hrc:366
+#: sc/inc/strings.hrc:365
 msgctxt "STR_ENABLE_CONTENT"
 msgid "Allow updating"
 msgstr "Frissítés engedélyezése"
 
 #. aJDFG
 #. tooltip for the "Allow updating" infobar button
-#: sc/inc/strings.hrc:368
+#: sc/inc/strings.hrc:367
 msgctxt "STR_ENABLE_CONTENT_TOOLTIP"
 msgid "Only allow updating if you trust this document."
-msgstr ""
+msgstr "Csak akkor engedélyezze a frissítést, ha megbízik ebben a dokumentumban."
 
 #. w5Gd7
 #. Insert image dialog
-#: sc/inc/strings.hrc:370
+#: sc/inc/strings.hrc:369
 msgctxt "STR_ANCHOR_TO_CELL"
 msgid "To cell"
 msgstr "Cellára"
 
 #. itvXY
-#: sc/inc/strings.hrc:371
+#: sc/inc/strings.hrc:370
 msgctxt "STR_ANCHOR_TO_CELL_RESIZE"
 msgid "To cell (resize with cell)"
 msgstr "Cellára (átméretezés a cellával)"
 
 #. P8vG7
-#: sc/inc/strings.hrc:372
+#: sc/inc/strings.hrc:371
 msgctxt "STR_ANCHOR_TO_PAGE"
 msgid "To page"
 msgstr "Oldalra"
 
 #. SSc6B
-#: sc/inc/strings.hrc:374
+#: sc/inc/strings.hrc:373
 msgctxt "sharedocumentdlg|nouserdata"
 msgid "No user data available."
 msgstr "Felhasználói adatok nem állnak rendelkezésre."
 
 #. FFnfu
-#: sc/inc/strings.hrc:375
+#: sc/inc/strings.hrc:374
 msgctxt "sharedocumentdlg|exclusive"
 msgid "(exclusive access)"
 msgstr "(kizárólagos hozzáférés)"
 
 #. hitQA
-#: sc/inc/strings.hrc:376
+#: sc/inc/strings.hrc:375
 msgctxt "STR_NO_NAMED_RANGES_AVAILABLE"
 msgid "No named ranges available in the selected document"
 msgstr "Nem állnak rendelkezésre nevesített tartományok a kijelölt dokumentumban"
 
 #. hnAZx
-#: sc/inc/strings.hrc:377
+#: sc/inc/strings.hrc:376
 msgctxt "STR_BORDER_HAIRLINE"
 msgid "Hairline (%s pt)"
 msgstr "Hajszálvékony (%s pt)"
 
 #. E9Dhi
-#: sc/inc/strings.hrc:378
+#: sc/inc/strings.hrc:377
 msgctxt "STR_BORDER_VERY_THIN"
 msgid "Very thin (%s pt)"
 msgstr "Nagyon vékony (%s pt)"
 
 #. KGVAw
-#: sc/inc/strings.hrc:379
+#: sc/inc/strings.hrc:378
 msgctxt "STR_BORDER_THIN"
 msgid "Thin (%s pt)"
 msgstr "Vékony (%s pt)"
 
 #. V6PRY
-#: sc/inc/strings.hrc:380
+#: sc/inc/strings.hrc:379
 msgctxt "STR_BORDER_MEDIUM"
 msgid "Medium (%s pt)"
 msgstr "Közepes (%s pt)"
 
 #. GyeKi
-#: sc/inc/strings.hrc:381
+#: sc/inc/strings.hrc:380
 msgctxt "STR_BORDER_THICK"
 msgid "Thick (%s pt)"
 msgstr "Vastag (%s pt)"
 
 #. QvEAB
-#: sc/inc/strings.hrc:382
+#: sc/inc/strings.hrc:381
 msgctxt "STR_BORDER_EXTRA_THICK"
 msgid "Extra thick (%s pt)"
 msgstr "Extra vastag (%s pt)"
 
 #. v9kkb
-#: sc/inc/strings.hrc:383
+#: sc/inc/strings.hrc:382
 msgctxt "STR_BORDER_DOUBLE_1"
 msgid "Double Hairline (%s pt)"
 msgstr "Dupla hajszálvékony (%s pt)"
 
 #. KzKEy
-#: sc/inc/strings.hrc:384
+#: sc/inc/strings.hrc:383
 msgctxt "STR_BORDER_DOUBLE_2"
 msgid "Thin/Medium (%s pt)"
 msgstr "Vékony/Közepes (%s pt)"
 
 #. HD8tG
-#: sc/inc/strings.hrc:385
+#: sc/inc/strings.hrc:384
 msgctxt "STR_BORDER_DOUBLE_3"
 msgid "Medium/Hairline (%s pt)"
 msgstr "Közepes/Hajszálvékony (%s pt)"
 
 #. ygGcU
-#: sc/inc/strings.hrc:386
+#: sc/inc/strings.hrc:385
 msgctxt "STR_BORDER_DOUBLE_4"
 msgid "Medium/Medium (%s pt)"
 msgstr "Közepes/Közepes (%s pt)"
@@ -18585,19 +18579,19 @@ msgstr "Közepes/Közepes (%s pt)"
 #. z9YGZ
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: sc/inc/strings.hrc:390
+#: sc/inc/strings.hrc:389
 msgctxt "sortoptionspage|extended_tip|sortuserlb"
 msgid "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists."
-msgstr ""
+msgstr "Jelölje ki az alkalmazni kívánt egyéni rendezési sorrendet. Egyéni rendezési sorrend megadásához válassza az Eszközök - Beállítások - %PRODUCTNAME Calc - Rendezett listák lehetőséget."
 
 #. T5A7R
-#: sc/inc/strings.hrc:391
+#: sc/inc/strings.hrc:390
 msgctxt "subtotaloptionspage|extended_tip|lbuserdef"
 msgid "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists."
 msgstr "Egyéni rendezési sorrendet használ, amelyet a Beállítások párbeszédablakban a %PRODUCTNAME Calc - Rendezett listák panelen adott meg."
 
 #. gbz6Y
-#: sc/inc/strings.hrc:392
+#: sc/inc/strings.hrc:391
 msgctxt "extended_tip|annot"
 msgid "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box."
 msgstr "Megadja, hogy egy kis téglalap a cella jobb felső sarkában jelezze, hogy ott van egy megjegyzés. A megjegyzés csak akkor jelenik meg, ha engedélyezi a tippeket a Beállítások párbeszédablak %PRODUCTNAME - Általános paneljén."
@@ -19236,37 +19230,37 @@ msgstr "Darabszám"
 #: sc/uiconfig/scalc/ui/autosum.ui:52
 msgctxt "autosum|counta"
 msgid "CountA"
-msgstr ""
+msgstr "Értékek száma"
 
 #. TGUCo
 #: sc/uiconfig/scalc/ui/autosum.ui:60
 msgctxt "autosum|product"
 msgid "Product"
-msgstr ""
+msgstr "Szorzat"
 
 #. GNEDE
 #: sc/uiconfig/scalc/ui/autosum.ui:68
 msgctxt "autosum|stdev"
 msgid "Stdev"
-msgstr ""
+msgstr "Szórás"
 
 #. cAEpr
 #: sc/uiconfig/scalc/ui/autosum.ui:76
 msgctxt "autosum|stdevp"
 msgid "StdevP"
-msgstr ""
+msgstr "SzórásP"
 
 #. DAdFH
 #: sc/uiconfig/scalc/ui/autosum.ui:84
 msgctxt "autosum|var"
 msgid "Var"
-msgstr ""
+msgstr "Variancia"
 
 #. 7GuBA
 #: sc/uiconfig/scalc/ui/autosum.ui:92
 msgctxt "autosum|varp"
 msgid "VarP"
-msgstr ""
+msgstr "VarianciaP"
 
 #. j9TVx
 #: sc/uiconfig/scalc/ui/cellprotectionpage.ui:32
@@ -19317,37 +19311,37 @@ msgstr ""
 "Ezt az „Eszközök” menü „Munkalap védelme” elemét választva érheti el."
 
 #. bVREg
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:118
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:121
 msgctxt "cellprotectionpage|LabelProtection"
 msgid "Protection"
 msgstr "Védelem"
 
 #. A5DFp
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:148
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:151
 msgctxt "cellprotectionpage|checkHidePrinting"
 msgid "Hide _when printing"
 msgstr "N_em nyomtatható"
 
 #. ZosAc
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:157
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:160
 msgctxt "cellprotectionpage|extended_tip|checkHidePrinting"
 msgid "Keeps the selected cells from being printed."
 msgstr "A kijelölt cellákat nem engedi nyomtatni."
 
 #. QqUqE
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:172
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:175
 msgctxt "cellprotectionpage|label4"
 msgid "The cells selected will be omitted when printing."
 msgstr "A kiválasztott cellák nyomtatásban nem jelennek meg."
 
 #. 8RuyP
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:188
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:194
 msgctxt "cellprotectionpage|label3"
 msgid "Print"
 msgstr "Nyomtatás"
 
 #. DPWp6
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:202
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:208
 msgctxt "cellprotectionpage|extended_tip|CellProtectionPage"
 msgid "Defines protection options for selected cells."
 msgstr "Védelmi beállításokat határoz meg a kijelölt cellák számára."
@@ -21495,85 +21489,85 @@ msgid "Data Entry Form is a tool to make table data entry easy in spreadsheets."
 msgstr "Az adatbeviteli űrlap eszköz célja a táblázatos adatbevitel megkönnyítése a munkafüzetekbe."
 
 #. 6DQYr
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:25
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:22
 msgctxt "dataproviderdlg/okaybtn"
 msgid "Okay"
 msgstr "OK"
 
 #. Ah2h8
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:38
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:35
 msgctxt "dataproviderdlg/cancelbtn"
 msgid "Cancel"
 msgstr "Mégse"
 
 #. a7EFA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:88
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:86
 msgctxt "dataproviderdlg|db_name"
 msgid "Database Range:"
 msgstr "Adatbázis-tartomány"
 
 #. pSQ4F
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:113
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:111
 msgctxt "dataproviderdlg/provider"
 msgid "Data Provider:"
 msgstr "Adatszolgáltató:"
 
 #. RGiXi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:138
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:136
 msgctxt "dataproviderdlg/url"
 msgid "URL:"
 msgstr "URL:"
 
 #. GKDQA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:161
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:159
 msgctxt "dataproviderdlg/browse_btn"
 msgid "Browse"
 msgstr "Tallózás"
 
 #. GABzG
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:175
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:173
 msgctxt "dataproviderdlg/id"
 msgid "Id / Xpath:"
 msgstr "Azonosító / XPath:"
 
 #. pwS4k
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:203
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:201
 msgctxt "dataproviderdlg/lbSource"
 msgid "Source"
 msgstr "Forrás"
 
 #. fHfGq
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:237
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:236
 msgctxt "dataproviderdlg/transformation_add"
 msgid "Add"
 msgstr "Hozzáadás"
 
 #. Smoiv
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:241
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:240
 msgctxt "dataproviderdlg/AddTransformation_tooltip"
 msgid "Add Transformations"
 msgstr "Transzformációk hozzáadása"
 
 #. cSgeU
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:297
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:296
 msgctxt "dataproviderdlg/transformation"
 msgid "Transformations"
 msgstr "Átalakítások"
 
 #. gpeXB
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:353
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:352
 msgctxt "dataproviderdlg/apply"
 msgid "Apply"
 msgstr "Alkalmaz"
 
 #. bDVwi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:357
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:356
 msgctxt "dataproviderdlg/apply_tooltiptext"
 msgid "Apply Changes"
 msgstr "Módosítások alkalmazása"
 
 #. 6pCFs
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:376
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:375
 msgctxt "dataproviderdlg/preview"
 msgid "Preview"
 msgstr "Előnézet"
@@ -22902,34 +22896,34 @@ msgstr "A párbeszédablak beállításainak segítségével automatikusan áll�
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:12
 msgctxt "filterdropdown|more"
 msgid "Add row"
-msgstr ""
+msgstr "Sor hozzáadása"
 
 #. WCqFM
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:20
 msgctxt "filterdropdown|less"
 msgid "Remove row"
-msgstr ""
+msgstr "Sor eltávolítása"
 
 #. cd5X5
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:150
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:158
 msgctxt "filterdropdown|STR_EDIT_SEARCH_ITEMS"
 msgid "Search items..."
 msgstr "Elemek keresése…"
 
 #. zKwWE
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:184
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:192
 msgctxt "filterdropdown|STR_BTN_TOGGLE_ALL"
 msgid "All"
 msgstr "Összes"
 
 #. JsSz6
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:203
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:211
 msgctxt "filterdropdown|STR_BTN_SELECT_CURRENT"
 msgid "Show only the current item."
 msgstr "Csak az aktuális elem megjelenítése."
 
 #. vBQYB
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:218
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:226
 msgctxt "filterdropdown|STR_BTN_UNSELECT_CURRENT"
 msgid "Hide only the current item."
 msgstr "Csak az aktuális elem elrejtése."
@@ -22938,13 +22932,13 @@ msgstr "Csak az aktuális elem elrejtése."
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:148
 msgctxt "filtersubdropdown|background"
 msgid "Background Color"
-msgstr ""
+msgstr "Háttérszín"
 
-#. EZpYM
+#. ca9FH
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:205
 msgctxt "filtersubdropdown|textcolor"
-msgid "Text Color"
-msgstr ""
+msgid "Font Color"
+msgstr "Betűszín"
 
 #. XYJHx
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:28
@@ -23307,106 +23301,100 @@ msgid "Produces the Fourier analysis of a data set by computing the Discrete Fou
 msgstr "Előállítja az adathalmaz Fourier analízisét a diszkrét Fourier transzformáció kiszámításával egy komplex számokat tartalmazó bemeneti tömbre, néhány gyors Fourier transzformációs algoritmussal."
 
 #. FEwZR
-#: sc/uiconfig/scalc/ui/functionpanel.ui:63
+#: sc/uiconfig/scalc/ui/functionpanel.ui:54
 msgctxt "functionpanel|insert|tooltip_text"
 msgid "Insert Function into calculation sheet"
 msgstr "Függvény beszúrása a számítási munkalapba"
 
 #. L79E6
-#: sc/uiconfig/scalc/ui/functionpanel.ui:78
+#: sc/uiconfig/scalc/ui/functionpanel.ui:69
 msgctxt "functionpanel|category"
 msgid "Last Used"
 msgstr "Utolsó használat"
 
 #. uRXDm
-#: sc/uiconfig/scalc/ui/functionpanel.ui:79
+#: sc/uiconfig/scalc/ui/functionpanel.ui:70
 msgctxt "functionpanel|category"
 msgid "All"
 msgstr "Összes"
 
 #. Fk97C
-#: sc/uiconfig/scalc/ui/functionpanel.ui:80
+#: sc/uiconfig/scalc/ui/functionpanel.ui:71
 msgctxt "functionpanel|category"
 msgid "Database"
 msgstr "Adatbázis"
 
 #. hCefc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:81
+#: sc/uiconfig/scalc/ui/functionpanel.ui:72
 msgctxt "functionpanel|category"
 msgid "Date&Time"
 msgstr "Dátum és idő"
 
 #. Cj6Vy
-#: sc/uiconfig/scalc/ui/functionpanel.ui:82
+#: sc/uiconfig/scalc/ui/functionpanel.ui:73
 msgctxt "functionpanel|category"
 msgid "Financial"
 msgstr "Pénzügyi"
 
 #. gS2PB
-#: sc/uiconfig/scalc/ui/functionpanel.ui:83
+#: sc/uiconfig/scalc/ui/functionpanel.ui:74
 msgctxt "functionpanel|category"
 msgid "Information"
 msgstr "Információ"
 
 #. rMqtg
-#: sc/uiconfig/scalc/ui/functionpanel.ui:84
+#: sc/uiconfig/scalc/ui/functionpanel.ui:75
 msgctxt "functionpanel|category"
 msgid "Logical"
 msgstr "Logikai"
 
 #. 6cFkD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:85
+#: sc/uiconfig/scalc/ui/functionpanel.ui:76
 msgctxt "functionpanel|category"
 msgid "Mathematical"
 msgstr "Matematikai"
 
 #. RdQeE
-#: sc/uiconfig/scalc/ui/functionpanel.ui:86
+#: sc/uiconfig/scalc/ui/functionpanel.ui:77
 msgctxt "functionpanel|category"
 msgid "Array"
 msgstr "Adattömb"
 
 #. h4kRr
-#: sc/uiconfig/scalc/ui/functionpanel.ui:87
+#: sc/uiconfig/scalc/ui/functionpanel.ui:78
 msgctxt "functionpanel|category"
 msgid "Statistical"
 msgstr "Statisztikai"
 
 #. 6XCsS
-#: sc/uiconfig/scalc/ui/functionpanel.ui:88
+#: sc/uiconfig/scalc/ui/functionpanel.ui:79
 msgctxt "functionpanel|category"
 msgid "Spreadsheet"
 msgstr "Munkafüzet"
 
 #. DwfB5
-#: sc/uiconfig/scalc/ui/functionpanel.ui:89
+#: sc/uiconfig/scalc/ui/functionpanel.ui:80
 msgctxt "functionpanel|category"
 msgid "Text"
 msgstr "Szöveg"
 
 #. BCiyc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:90
+#: sc/uiconfig/scalc/ui/functionpanel.ui:81
 msgctxt "functionpanel|category"
 msgid "Add-in"
 msgstr "Kiegészítő"
 
 #. tDNFD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:94
+#: sc/uiconfig/scalc/ui/functionpanel.ui:85
 msgctxt "functionpanel|extended_tip|category"
 msgid "Displays the available functions."
 msgstr "Megjeleníti az elérhető funkciókat."
 
 #. V9ATp
-#: sc/uiconfig/scalc/ui/functionpanel.ui:141
+#: sc/uiconfig/scalc/ui/functionpanel.ui:133
 msgctxt "functionpanel|extended_tip|funclist"
 msgid "Displays the available functions."
 msgstr "Megjeleníti az elérhető funkciókat."
-
-#. rmQie
-#: sc/uiconfig/scalc/ui/functionpanel.ui:175
-msgctxt "functionpanel|funcdesc"
-msgid "label"
-msgstr "Címke"
 
 #. dmA3u
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:8
@@ -23490,31 +23478,31 @@ msgstr "Megnyit egy párbeszédablakot, amelyen egy változóval megoldhat egy e
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:16
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Ugrás munkalapra"
 
 #. ybsRg
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:103
 msgctxt "gotosheetdialog|extended_tip|entry-mask"
 msgid "Type some letters of sheet name to find it."
-msgstr ""
+msgstr "Írjon be pár betűt a munkalap nevéből a megkereséséhez."
 
 #. Xuqh4
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:112
 msgctxt "gotosheetdialog|label-mask"
 msgid "_Type a sheet name"
-msgstr ""
+msgstr "Írjon be egy m_unkalapnevet"
 
 #. DpWr7
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:174
 msgctxt "gotosheetdialog|label-sheets"
 msgid "_Sheets"
-msgstr ""
+msgstr "M_unkalapok"
 
 #. F6iSH
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:197
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Displays a list of all visible sheets in your spreadsheet document."
-msgstr ""
+msgstr "Megjeleníti a munkafüzetben található összes látható munkalapot."
 
 #. XMHEU
 #: sc/uiconfig/scalc/ui/groupbydate.ui:27
@@ -23847,55 +23835,55 @@ msgid "Use the buttons to change the font or insert field commands such as date,
 msgstr "A gombokkal megváltoztathatja a betűtípust, és beilleszthet mezőket, például dátum, idő stb."
 
 #. WBsTf
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:503
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:506
 msgctxt "headerfootercontent|label1"
 msgid "Note"
 msgstr "Megjegyzés"
 
 #. X2HEK
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:525
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:528
 msgctxt "headerfootercontent|labelSTR_HF_NONE_IN_BRACKETS"
 msgid "(none)"
 msgstr "(nincs)"
 
 #. RSazM
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:537
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:540
 msgctxt "headerfootercontent|labelSTR_PAGE"
 msgid "Page"
 msgstr "Oldal"
 
 #. CMDYZ
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:549
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:552
 msgctxt "headerfootercontent|labelSTR_HF_OF_QUESTION"
 msgid "of ?"
 msgstr "/ ?"
 
 #. jQyGW
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:561
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:564
 msgctxt "headerfootercontent|labelSTR_HF_CONFIDENTIAL"
 msgid "Confidential"
 msgstr "Titkos"
 
 #. EeAAh
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:573
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:576
 msgctxt "headerfootercontent|labelSTR_HF_CREATED_BY"
 msgid "Created by"
 msgstr "Készítette"
 
 #. CASF2
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:585
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:588
 msgctxt "headerfootercontent|labelSTR_HF_CUSTOMIZED"
 msgid "Customized"
 msgstr "Testre szabott"
 
 #. wZN6q
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:597
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:600
 msgctxt "headerfootercontent|labelSTR_HF_OF"
 msgid "of"
 msgstr "/"
 
 #. SDx4X
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:614
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:617
 msgctxt "headerfootercontent|extended_tip|HeaderFooterContent"
 msgid "Defines or formats a header or footer for a Page Style."
 msgstr "Az oldalstílus élőfej- vagy élőlábformátumát határozza meg."
@@ -25161,177 +25149,177 @@ msgid "Fiel_d"
 msgstr "Me_ző"
 
 #. VCk9a
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5882
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5859
 msgctxt "CalcNotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Beszúrás"
 
 #. HnjBi
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5987
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5964
 msgctxt "CalcNotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "~Beszúrás"
 
 #. xmARL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6388
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6413
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6841
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6365
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6390
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6818
 msgctxt "CalcNotebookbar|objectalign|tooltip_text"
 msgid "Object Align"
 msgstr "Objektumigazítás"
 
 #. vruXQ
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7062
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7039
 msgctxt "CalcNotebookbar|LayoutMenuButton"
 msgid "_Layout"
 msgstr "_Elrendezés"
 
 #. eWinY
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7146
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7123
 msgctxt "CalcNotebookbar|PageLayoutLabel"
 msgid "~Layout"
 msgstr "~Elrendezés"
 
 #. pnWd5
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8423
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8400
 msgctxt "CalcNotebookbar|StatisticsMenuButton"
 msgid "_Statistics"
 msgstr "_Statisztika"
 
 #. BiHBE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8474
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8451
 msgctxt "CalcNotebookbar|DataMenuButton"
 msgid "_Data"
 msgstr "_Adatok"
 
 #. xzx9j
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8580
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8557
 msgctxt "CalcNotebookbar|DataLabel"
 msgid "~Data"
 msgstr "~Adatok"
 
 #. CBEHA
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9383
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9360
 msgctxt "CalcNotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Véleményezés"
 
 #. 7FXbr
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9468
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9445
 msgctxt "CalcNotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Véleményezés"
 
 #. NT37F
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10354
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10331
 msgctxt "CalcNotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Nézet"
 
 #. rPdAq
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10439
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10416
 msgctxt "CalcNotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Nézet"
 
 #. SAv6Z
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11548
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11525
 msgctxt "CalcNotebookbar|ImageMenuButton"
 msgid "Ima_ge"
 msgstr "Ké_p"
 
 #. rwprK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11669
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11646
 msgctxt "CalcNotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "Ké~p"
 
 #. EjbzV
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12850
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12827
 msgctxt "CalcNotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "_Rajz"
 
 #. iagRv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12957
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12934
 msgctxt "CalcNotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Rajz"
 
 #. EgeGL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13415
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13392
 msgctxt "CalcNotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Átalakítás"
 
 #. PRmbH
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13705
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13682
 msgctxt "CalcNotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Objektum"
 
 #. xTKVv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13812
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13789
 msgctxt "CalcNotebookbar|FrameLabel"
 msgid "~Object"
 msgstr "~Objektum"
 
 #. cHyKz
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14371
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14348
 msgctxt "CalcNotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "Méd_ia"
 
 #. CJ2qx
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14476
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14453
 msgctxt "CalcNotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Média"
 
 #. eQK6A
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14858
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14835
 msgctxt "CalcNotebookbar|PrintMenuButton"
 msgid "_Print"
 msgstr "_Nyomtatás"
 
 #. sCGyG
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14941
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14918
 msgctxt "CalcNotebookbar|PrintLabel"
 msgid "~Print"
 msgstr "~Nyomtatás"
 
 #. 5JVAt
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15749
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15726
 msgctxt "CalcNotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Ű~rlap"
 
 #. CCEAK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15833
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15810
 msgctxt "CalcNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Ű~rlap"
 
 #. DHeyE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15890
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15867
 msgctxt "CalcNotebookbar|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Ki_terjesztés"
 
 #. 4ZDL7
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15964
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15941
 msgctxt "CalcNotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Ki~terjesztés"
 
 #. 3Ec6T
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17153
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17130
 msgctxt "CalcNotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Eszközök"
 
 #. 8HTEk
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17237
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17214
 msgctxt "CalcNotebookbar|ToolsLabel"
 msgid "~Tools"
 msgstr "~Eszközök"
@@ -25350,7 +25338,7 @@ msgstr "~Fájl"
 
 #. UWfVg
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:3545
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6152
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6113
 msgctxt "notebookbar_compact|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Adja meg a kijelölt cellák szegélyeit."
@@ -25374,163 +25362,163 @@ msgid "Fiel_d"
 msgstr "Me_ző"
 
 #. zveKA
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5637
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5598
 msgctxt "notebookbar_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "_Beszúrás"
 
 #. CDXv3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5692
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5653
 msgctxt "notebookbar_compact|InsertLabel"
 msgid "~Insert"
 msgstr "~Beszúrás"
 
 #. EvytN
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6273
 msgctxt "notebookbar_compact|PageMenuButton"
 msgid "_Layout"
 msgstr "_Elrendezés"
 
 #. TbQMa
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6364
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6325
 msgctxt "notebookbar_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "~Elrendezés"
 
 #. QqjZP
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7199
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7160
 msgctxt "notebookbar_compact|Statistics"
 msgid "_Statistics"
 msgstr "_Statisztika"
 
 #. GFZNz
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7264
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7225
 msgctxt "notebookbar_compact|DataMenuButton"
 msgid "_Data"
 msgstr "_Adatok"
 
 #. TCt7E
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7315
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7276
 msgctxt "notebookbar_compact|DataLabel"
 msgid "~Data"
 msgstr "A~dat"
 
 #. jYD7j
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7997
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7958
 msgctxt "notebookbar_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Véleményezés"
 
 #. Lbj5B
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8049
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8010
 msgctxt "notebookbar_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Véleményezés"
 
 #. 35kA2
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8716
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8677
 msgctxt "notebookbar_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Nézet"
 
 #. ZGh8C
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8768
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8729
 msgctxt "notebookbar_compact|ViewLabel"
 msgid "~View"
 msgstr "~Nézet"
 
 #. dV94w
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10082
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10043
 msgctxt "notebookbar_compact|GraphicMenuButton"
 msgid "Im_age"
 msgstr "_Kép"
 
 #. ekWoX
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10134
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10095
 msgctxt "notebookbar_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "Ké~p"
 
 #. 8eQN8
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11504
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11465
 msgctxt "notebookbar_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "_Rajzolás"
 
 #. FBf68
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11556
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11517
 msgctxt "notebookbar_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "~Rajzolás"
 
 #. DoVwy
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12507
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12468
 msgctxt "notebookbar_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Objektum"
 
 #. JXKiY
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12559
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12520
 msgctxt "notebookbar_compact|FrameLabel"
 msgid "~Object"
 msgstr "O~bjektum"
 
 #. q8wnS
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13259
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13220
 msgctxt "notebookbar_compact|MediaButton"
 msgid "_Media"
 msgstr "Méd_ia"
 
 #. 7HDt3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13273
 msgctxt "notebookbar_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Média"
 
 #. vSDok
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13871
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13832
 msgctxt "notebookbar_compact|PrintPreviewButton"
 msgid "Print"
 msgstr "Nyomtatás"
 
 #. goiqQ
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13923
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13884
 msgctxt "notebookbar_compact|FormLabel"
 msgid "~Print"
 msgstr "Nyo~mtatás"
 
 #. EBGs5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15237
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15198
 msgctxt "notebookbar_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Ű~rlap"
 
 #. EKA8X
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15289
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15250
 msgctxt "notebookbar_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Ű~rlap"
 
 #. 8SvE5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15368
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15329
 msgctxt "notebookbar_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Ki_terjesztés"
 
 #. WH5NR
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15426
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15387
 msgctxt "notebookbar_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Ki~terjesztés"
 
 #. 8fhwb
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16427
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16388
 msgctxt "notebookbar_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Eszközök"
 
 #. kpc43
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16479
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16440
 msgctxt "notebookbar_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Eszközök"
@@ -26522,7 +26510,7 @@ msgstr "Engedélyezze ezt a Microsoft Excellel való interoperabilitás vagy job
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:139
 msgctxt "extended_tip|match"
 msgid "Specifies that the search criteria you set for the Calc database functions must match the whole cell exactly. When both, the Search criteria = and <> must apply to whole cells box and the Enable wildcards in formulas box are marked, Calc behaves exactly as Microsoft Excel when searching cells in the database functions."
-msgstr ""
+msgstr "Megadja, hogy a Calc-adatbázisfüggvényekben beállított keresési feltételek pontosan illeszkedjenek az egész cellára. Ha Az = és <> keresési feltétel a teljes cellára vonatkozik és a Helyettesítő karakterek engedélyezése a képletekben négyzetek be vannak jelölve, akkor a Calc pontosan úgy viselkedik, mint a Microsoft Excel a cellák adatbázisfüggvényekkel való keresésekor."
 
 #. 5Wn8V
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:150
@@ -26804,7 +26792,7 @@ msgstr "Billentyűparancsok"
 #: sc/uiconfig/scalc/ui/optcompatibilitypage.ui:86
 msgctxt "extended_tip|OptCompatibilityPage"
 msgid "Defines compatibility options for Calc."
-msgstr ""
+msgstr "Kompatibilitási beállításokat ad meg a Calchoz."
 
 #. Jcvih
 #: sc/uiconfig/scalc/ui/optdefaultpage.ui:36
@@ -27014,7 +27002,7 @@ msgstr "Elválasztó jelek"
 #: sc/uiconfig/scalc/ui/optformula.ui:421
 msgctxt "extended_tip|OptFormula"
 msgid "Defines formula syntax options and loading options for Calc."
-msgstr ""
+msgstr "Képletszintaxis- és betöltési beállításokat ad meg a Calchoz."
 
 #. cCfAk
 #: sc/uiconfig/scalc/ui/optimalcolwidthdialog.ui:8
@@ -27338,7 +27326,7 @@ msgstr "Irányított beillesztés"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:130
 msgctxt "pastespecial|paste_values_only|label"
 msgid "Values Only"
-msgstr ""
+msgstr "Csak értékek"
 
 #. XyU8o
 #: sc/uiconfig/scalc/ui/pastespecial.ui:134
@@ -27356,7 +27344,7 @@ msgstr "Számok, szöveg, dátumok és képletek eredményeinek beszúrása."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:153
 msgctxt "pastespecial|paste_values_formats|label"
 msgid "Values & Formats"
-msgstr ""
+msgstr "Értékek és formázások"
 
 #. 7GuDi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:157
@@ -27374,7 +27362,7 @@ msgstr "Cellaértékek, képleteredmények és cellaformázások beillesztése."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:176
 msgctxt "pastespecial|paste_format|label"
 msgid "Formats Only"
-msgstr ""
+msgstr "Csak formázások"
 
 #. Cvyjn
 #: sc/uiconfig/scalc/ui/pastespecial.ui:180
@@ -27392,7 +27380,7 @@ msgstr "Csak a formázások beillesztése a forrás tartományból a cél tartom
 #: sc/uiconfig/scalc/ui/pastespecial.ui:199
 msgctxt "pastespecial|paste_transpose|label"
 msgid "Transpose All"
-msgstr ""
+msgstr "Összes transzponálása"
 
 #. sbLGi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:203
@@ -27410,7 +27398,7 @@ msgstr "A cellatartalmak beillesztése transzponálva, így az oszlopokból soro
 #: sc/uiconfig/scalc/ui/pastespecial.ui:229
 msgctxt "pastespecial|cbImmediately"
 msgid "Run immediately"
-msgstr ""
+msgstr "Futtatás azonnal"
 
 #. 7a9JE
 #: sc/uiconfig/scalc/ui/pastespecial.ui:238
@@ -27428,7 +27416,7 @@ msgstr "Előbeállítások"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:290
 msgctxt "pastespecial|paste_all"
 msgid "All"
-msgstr ""
+msgstr "Összes"
 
 #. Labin
 #: sc/uiconfig/scalc/ui/pastespecial.ui:298
@@ -27440,7 +27428,7 @@ msgstr "Beilleszti az aktuális dokumentumba a cellák tartalmát, a megjegyzés
 #: sc/uiconfig/scalc/ui/pastespecial.ui:309
 msgctxt "pastespecial|numbers"
 msgid "Numbers"
-msgstr ""
+msgstr "Számok"
 
 #. SCVEu
 #: sc/uiconfig/scalc/ui/pastespecial.ui:317
@@ -27452,7 +27440,7 @@ msgstr "Számokat tartalmazó cellákat szúr be."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:328
 msgctxt "pastespecial|text"
 msgid "Text"
-msgstr ""
+msgstr "Szöveg"
 
 #. JWDk5
 #: sc/uiconfig/scalc/ui/pastespecial.ui:336
@@ -27464,7 +27452,7 @@ msgstr "Szöveget tartalmazó cellákat szúr be."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:347
 msgctxt "pastespecial|datetime"
 msgid "Date & time"
-msgstr ""
+msgstr "Dátum és idő"
 
 #. jq6Md
 #: sc/uiconfig/scalc/ui/pastespecial.ui:355
@@ -27476,7 +27464,7 @@ msgstr "Dátum- és időértékeket tartalmazó cellákat szúr be."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:366
 msgctxt "pastespecial|formats"
 msgid "Formats"
-msgstr ""
+msgstr "Formázások"
 
 #. ehyEf
 #: sc/uiconfig/scalc/ui/pastespecial.ui:374
@@ -27488,7 +27476,7 @@ msgstr "Cellaformázási jellemzőket szúr be."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:385
 msgctxt "pastespecial|comments"
 msgid "Comments"
-msgstr ""
+msgstr "Megjegyzések"
 
 #. 3uP7i
 #: sc/uiconfig/scalc/ui/pastespecial.ui:393
@@ -27500,7 +27488,7 @@ msgstr "Cellához csatolt megjegyzéseket szúr be. Ha a meglévő cellához meg
 #: sc/uiconfig/scalc/ui/pastespecial.ui:404
 msgctxt "pastespecial|objects"
 msgid "Objects"
-msgstr ""
+msgstr "Objektumok"
 
 #. DZsnr
 #: sc/uiconfig/scalc/ui/pastespecial.ui:412
@@ -27512,7 +27500,7 @@ msgstr "Objektumokat szúr be a kijelölt cellatartományba. Ezek lehetnek OLE-o
 #: sc/uiconfig/scalc/ui/pastespecial.ui:423
 msgctxt "pastespecial|formulas"
 msgid "Formulas"
-msgstr ""
+msgstr "Képletek"
 
 #. Na5Ba
 #: sc/uiconfig/scalc/ui/pastespecial.ui:431
@@ -27530,7 +27518,7 @@ msgstr "Beillesztés"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:477
 msgctxt "pastespecial|no_shift"
 msgid "Don't shift"
-msgstr ""
+msgstr "Nincs eltolás"
 
 #. q3Xv3
 #: sc/uiconfig/scalc/ui/pastespecial.ui:486
@@ -27542,7 +27530,7 @@ msgstr "A beszúrt cellák lecserélik a kijelölt cellákat."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:498
 msgctxt "pastespecial|move_down"
 msgid "Down"
-msgstr ""
+msgstr "Le"
 
 #. BNALN
 #: sc/uiconfig/scalc/ui/pastespecial.ui:507
@@ -27554,7 +27542,7 @@ msgstr "Amikor cellákat szúr be a vágólapról, a célcellák lefelé tolódn
 #: sc/uiconfig/scalc/ui/pastespecial.ui:519
 msgctxt "pastespecial|move_right"
 msgid "Right"
-msgstr ""
+msgstr "Jobbra"
 
 #. GEFe7
 #: sc/uiconfig/scalc/ui/pastespecial.ui:528
@@ -27572,7 +27560,7 @@ msgstr "Cellák eltolása"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:588
 msgctxt "pastespecial|link"
 msgid "As Link"
-msgstr ""
+msgstr "Hivatkozásként"
 
 #. Bg9dc
 #: sc/uiconfig/scalc/ui/pastespecial.ui:596
@@ -27584,7 +27572,7 @@ msgstr "A cellatartományt hivatkozásként szúrja be, így a cellákon a forr�
 #: sc/uiconfig/scalc/ui/pastespecial.ui:607
 msgctxt "pastespecial|transpose"
 msgid "Transpose"
-msgstr ""
+msgstr "Transzponálás"
 
 #. P3eE4
 #: sc/uiconfig/scalc/ui/pastespecial.ui:615
@@ -27596,7 +27584,7 @@ msgstr "A vágólapon levő tartomány sorai a beillesztéskor a kimeneti tartom
 #: sc/uiconfig/scalc/ui/pastespecial.ui:626
 msgctxt "pastespecial|skip_empty"
 msgid "Skip empty cells"
-msgstr ""
+msgstr "Üres cellák kihagyása"
 
 #. BodqB
 #: sc/uiconfig/scalc/ui/pastespecial.ui:630
@@ -27620,7 +27608,7 @@ msgstr "Beállítások"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:681
 msgctxt "pastespecial|none"
 msgid "None"
-msgstr ""
+msgstr "Nincs"
 
 #. 7GKDG
 #: sc/uiconfig/scalc/ui/pastespecial.ui:690
@@ -27632,7 +27620,7 @@ msgstr "Cellatartomány vágólapról történő beillesztésekor nem hajt végr
 #: sc/uiconfig/scalc/ui/pastespecial.ui:702
 msgctxt "pastespecial|add"
 msgid "Add"
-msgstr ""
+msgstr "Hozzáadás"
 
 #. bNyh2
 #: sc/uiconfig/scalc/ui/pastespecial.ui:711
@@ -27644,7 +27632,7 @@ msgstr "A vágólapon található cellák értékét hozzáadja a célcellák é
 #: sc/uiconfig/scalc/ui/pastespecial.ui:723
 msgctxt "pastespecial|subtract"
 msgid "Subtract"
-msgstr ""
+msgstr "Kivonás"
 
 #. 2SKbT
 #: sc/uiconfig/scalc/ui/pastespecial.ui:732
@@ -27656,7 +27644,7 @@ msgstr "A vágólapon található cellák értékét kivonja a célcellák ért�
 #: sc/uiconfig/scalc/ui/pastespecial.ui:744
 msgctxt "pastespecial|multiply"
 msgid "Multiply"
-msgstr ""
+msgstr "Szorzás"
 
 #. jkRDm
 #: sc/uiconfig/scalc/ui/pastespecial.ui:753
@@ -27668,7 +27656,7 @@ msgstr "A vágólapon található cellák értékét megszorozza a célcellák �
 #: sc/uiconfig/scalc/ui/pastespecial.ui:765
 msgctxt "pastespecial|divide"
 msgid "Divide"
-msgstr ""
+msgstr "Osztás"
 
 #. 9VKdS
 #: sc/uiconfig/scalc/ui/pastespecial.ui:774
@@ -27682,11 +27670,11 @@ msgctxt "pastespecial|label2"
 msgid "Operations"
 msgstr "Műveletek"
 
-#. ypkML
-#: sc/uiconfig/scalc/ui/pastespecial.ui:825
+#. cBodz
+#: sc/uiconfig/scalc/ui/pastespecial.ui:824
 msgctxt "pastespecial|extended_tip|PasteSpecial"
-msgid "Inserts the contents of the clipboard into the current file in a format that you can specify."
-msgstr "A vágólap aktuális tartalmát választható formátumban beszúrja a jelenlegi fájlba."
+msgid "Inserts the contents of the clipboard into the current document in a format that you can specify."
+msgstr "A vágólap aktuális tartalmát választható formátumban beszúrja a jelenlegi dokumentumba."
 
 #. AqzPf
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:16
@@ -28346,7 +28334,7 @@ msgstr "Üres oldalak kihagyása"
 #: sc/uiconfig/scalc/ui/printeroptions.ui:29
 msgctxt "printeroptions|extended_tip|suppressemptypages"
 msgid "If checked, empty pages that have no cell contents or drawing objects are not printed."
-msgstr ""
+msgstr "Ha be van jelölve, akkor a cellatartalmat vagy rajzobjektumot nem tartalmazó oldalak nem lesznek kinyomtatva."
 
 #. tkryr
 #: sc/uiconfig/scalc/ui/printeroptions.ui:38
@@ -28570,10 +28558,10 @@ msgctxt "randomnumbergenerator|enable-rounding-check"
 msgid "Enable rounding"
 msgstr "Kerekítés engedélyezése"
 
-#. 8n4v9
+#. 6cz4t
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:418
 msgctxt "randomnumbergenerator|extended_tip|enable-rounding-check"
-msgid "Truncate the number to a given number of Decimal Places."
+msgid "Round the number to a given number of Decimal Places."
 msgstr "A számot a megadott Tizedesjegyek értéknek megfelelően kerekíti."
 
 #. nRvWV
@@ -29290,38 +29278,26 @@ msgctxt "scgeneralpage|enter_paste_mode_cb"
 msgid "Press Enter to paste and clear clipboard"
 msgstr "Nyomja meg az Entert a vágólap beillesztéséhez és törléséhez"
 
-#. LFenu
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
-msgctxt "scgeneralpage|textfmtcb"
-msgid "Use printer metrics for text formatting"
-msgstr "A nyomtató mérettáblázatának használata a szövegformázáshoz"
-
-#. ECUd7
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:385
-msgctxt "extended_tip|textfmtcb"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen."
-msgstr "Megadja, hogy a nyomtató mérettáblázata egyúttal a képernyőn való megjelenítésre is érvényes legyen."
-
 #. zW9SZ
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:397
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
 msgctxt "scgeneralpage|markhdrcb"
 msgid "Highlight sele_ction in column/row headers"
 msgstr "Sor- és os_zlopfejlécek kiemelése kijelöléskor"
 
 #. payBv
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:405
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:386
 msgctxt "extended_tip|markhdrcb"
 msgid "Specifies whether to highlight column and row headers in the selected columns or rows."
 msgstr "Megadja, hogy a kijelölt sorok, illetve oszlopok fejlécei ki legyenek-e emelve."
 
 #. KGWyE
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:417
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:398
 msgctxt "scgeneralpage|sortrefupdatecb"
 msgid "Update references when sorting range of cells"
 msgstr "Hivatkozások frissítése cellatartományok rendezésekor"
 
 #. M9G8o
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:439
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:420
 msgctxt "scgeneralpage|label3"
 msgid "Input Settings"
 msgstr "Beviteli beállítások"
@@ -29486,13 +29462,13 @@ msgstr "A kimutatástábla adatforrásaként a kiválasztott cellákat fogja has
 #: sc/uiconfig/scalc/ui/selectsource.ui:162
 msgctxt "selectsource|database"
 msgid "_Data source registered in Calc"
-msgstr ""
+msgstr "Calcban _regisztrált adatforrás"
 
 #. ZDHcm
 #: sc/uiconfig/scalc/ui/selectsource.ui:171
 msgctxt "selectsource|extended_tip|database"
 msgid "Uses a table or query in a database that is registered in Calc as the data source for the pivot table."
-msgstr ""
+msgstr "A Calc által nyilvántartott táblát vagy lekérdezést használ az adatbázisban a kimutatástábla adatforrásaként."
 
 #. ZDghg
 #: sc/uiconfig/scalc/ui/selectsource.ui:183
@@ -29657,19 +29633,19 @@ msgid "Note: Changes to formatting attributes like fonts, colors, and number for
 msgstr "Megjegyzés: a formázási attribútumok, például a betűkészletek, színek és számformátumok változásai nem lesznek mentve, és egyes funkciók, például a diagramok és rajzobjektumok szerkesztése nem állnak rendelkezésre megosztott üzemmódban. Kapcsolja ki a megosztott üzemmódot, hogy kizárólagos hozzáférése legyen, mert ez szükséges ezekhez a változásokhoz és funkciókhoz."
 
 #. dQz77
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:187
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:190
 msgctxt "sharedocumentdlg|name"
 msgid "Name"
 msgstr "Név"
 
 #. EC8AA
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:200
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:203
 msgctxt "sharedocumentdlg|accessed"
 msgid "Accessed"
 msgstr "Hozzáférés ideje"
 
 #. hHHJG
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:224
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:227
 msgctxt "sharedocumentdlg|label1"
 msgid "Users Currently Accessing This Spreadsheet"
 msgstr "A munkafüzethez jelenleg hozzáférő felhasználók"
@@ -29902,17 +29878,17 @@ msgctxt "sheetprintpage|comboLB_SCALEMODE"
 msgid "Reduce/enlarge printout"
 msgstr "Nyomtatási kép nagyítása/kicsinyítése"
 
-#. GxZyi
+#. i7BEB
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:645
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) to width/height"
-msgstr "Nyomtatási tartományok illesztése a szélességhez/magassághoz"
+msgid "Shrink print range(s) to width/height"
+msgstr "Nyomtatási tartományok zsugorítása a szélességhez/magassághoz"
 
-#. Y2GhT
+#. KzA6v
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:646
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) on number of pages"
-msgstr "Nyomtatási tartományok illesztése az oldalak számához"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Nyomtatási tartományok zsugorítása az oldalak számához"
 
 #. AzkrF
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:650
@@ -30023,97 +29999,97 @@ msgid "Displays a list of all hidden sheets in your spreadsheet document."
 msgstr "Megjeleníti a munkafüzetben található összes rejtett munkalapot."
 
 #. ktHTz
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:52
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:53
 msgctxt "sidebaralignment|horizontalalignment|tooltip_text"
 msgid "Horizontal Alignment"
 msgstr "Vízszintes igazítás"
 
 #. U8BWH
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:109
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:114
 msgctxt "sidebaralignment|verticalalignment|tooltip_text"
 msgid "Vertical Alignment"
 msgstr "Függőleges igazítás"
 
-#. etrVi
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:237
-msgctxt "sidebaralignment|leftindent|tooltip_text"
-msgid "Indents from the left edge."
-msgstr "A cella bal oldalától húz beljebb."
-
 #. qtoY5
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:266
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:243
 msgctxt "sidebaralignment|orientationlabel"
 msgid "Text _orientation:"
 msgstr "Szö_vegirány:"
 
 #. Ume2A
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:281
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:257
 msgctxt "sidebaralignment|orientationdegrees|tooltip_text"
 msgid "Select the angle for rotation."
 msgstr "Válassza ki a forgatás szögét."
 
 #. KEG9k
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:308
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:270
 msgctxt "sidebaralignment|stacked"
 msgid "Vertically stacked"
 msgstr "_Függőlegesen halmozott"
 
 #. ZE4wU
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:336
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:295
 msgctxt "sidebaralignment|bottom|tooltip_text"
 msgid "Text Extension From Lower Cell Border"
 msgstr "Szöveg kiterjesztése az alsó cellakerettől"
 
 #. CgVBh
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:312
 msgctxt "sidebaralignment|top|tooltip_text"
 msgid "Text Extension From Upper Cell Border"
 msgstr "Szöveg kiterjesztése a felső cellakerettől"
 
 #. TSALx
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:329
 msgctxt "sidebaralignment|standard|tooltip_text"
 msgid "Text Extension Inside Cell"
 msgstr "Szöveg kiterjesztése a cellán belül"
 
 #. xruhe
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:349
 msgctxt "sidebaralignment|wraptext"
 msgid "Wrap text"
 msgstr "Szöveg tördelése"
 
 #. uTKvq
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:402
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
 msgctxt "sidebaralignment|wraptext|tooltip_text"
 msgid "Wrap texts automatically."
 msgstr "Automatikus szövegtördelés."
 
 #. Ae65n
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:415
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:366
 msgctxt "sidebaralignment|mergecells"
 msgid "Merge cells"
 msgstr "Cellák egyesítése"
 
 #. NK2BS
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:419
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
 msgctxt "sidebaralignment|mergecells|tooltip_text"
 msgid "Joins the selected cells into one."
 msgstr "A kijelölt cellák egyesítése egy cellává."
 
+#. etrVi
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:385
+msgctxt "sidebaralignment|leftindent|tooltip_text"
+msgid "Indents from the left edge."
+msgstr "A cella bal oldalától húz beljebb."
+
 #. FdKBk
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:433
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
 msgctxt "sidebaralignment|leftindentlabel"
 msgid "_Indent:"
 msgstr "Be_húzás:"
 
 #. BBGFK
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:23
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:22
 msgctxt "sidebarcellappearance|cellbackgroundlabel"
 msgid "_Background:"
 msgstr "_Háttér:"
 
 #. bjHWc
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:37
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:36
 msgctxt "sidebarcellappearance|cellbackgroundcolor|tooltip_text"
 msgid "Select the background color of the selected cells."
 msgstr "Válassza ki a kijelölt cellák háttérszínét."
@@ -30125,199 +30101,199 @@ msgid "Select the background color of the selected cells."
 msgstr "Válassza ki a kijelölt cellák háttérszínét."
 
 #. DKEkN
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:71
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:72
 msgctxt "sidebarcellappearance|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Kijelölt cellák szegélyeinek megadása."
 
 #. D2TVi
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:92
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:93
 msgctxt "sidebarcellappearance|borderlinecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Válassza ki a szegélyek vonalszínét."
 
 #. GqfZD
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:101
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:103
 msgctxt "sidebarcellappearance|linecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Válassza ki a szegélyek vonalszínét."
 
 #. 8AUBs
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:111
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:113
 msgctxt "sidebarcellappearance|borderlinecolor-atkobject"
 msgid "Border Line Color"
 msgstr "Szegély vonalszíne"
 
 #. VgXDF
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:132
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:135
 msgctxt "sidebarcellappearance|linestyle|tooltip_text"
 msgid "Select the line style of the borders."
 msgstr "Válassza ki a szegélyek vonalstílusát."
 
 #. jaxhA
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:142
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:145
 msgctxt "sidebarcellappearance|borderlinestyle-atkobject"
 msgid "Border Line Style"
 msgstr "Szegély vonalstílusa"
 
 #. CNqCC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:71
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
 msgctxt "sidebarnumberformat|numberformatcombobox|tooltip_text"
 msgid "Select a category of contents."
 msgstr "Válasszon egy tartalomkategóriát."
 
 #. EeECn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:75
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:85
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "General"
 msgstr "Általános"
 
 #. SmpsG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:76
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:86
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Number"
 msgstr "Szám"
 
 #. 8FGeM
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:77
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:87
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Percent"
 msgstr "Százalék"
 
 #. bHC79
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:78
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Currency"
 msgstr "Pénznem"
 
 #. Lh2G6
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:79
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:89
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Date "
 msgstr "Dátum "
 
 #. EUCxB
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:80
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:90
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Time"
 msgstr "Idő"
 
 #. EukSF
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:91
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Scientific"
 msgstr "Tudományos"
 
 #. AQV5y
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:82
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:92
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Fraction"
 msgstr "Tört"
 
 #. kQGBu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:83
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:93
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Boolean Value"
 msgstr "Logikai érték"
 
 #. Gv2sX
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:84
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:94
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Text"
 msgstr "Szöveg"
 
 #. ypKG8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:98
 msgctxt "sidebarnumberformat|numberformatcombobox-atkobject"
 msgid "Category"
 msgstr "Kategória"
 
 #. FqFzG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:120
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:117
 msgctxt "sidebarnumberformat|decimalplaceslabel"
 msgid "_Decimal places:"
 msgstr "_Tizedesjegyek:"
 
 #. xen2B
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:134
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:131
 msgctxt "sidebarnumberformat|denominatorplaceslabel"
 msgid "Den_ominator places:"
 msgstr "_Nevező számjegyei:"
 
 #. cdFDC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:162
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:158
 msgctxt "sidebarnumberformat|denominatorplaces|tooltip_text"
 msgid "Enter the number of places for the denominator that you want to display."
 msgstr "Adja meg a nevezőben megjelenítendő számjegyek számát."
 
 #. ySDGH
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:167
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:163
 msgctxt "sidebarnumberformat|denominatorplaces-atkobject"
 msgid "Denominator Places"
 msgstr "Nevező számjegyei"
 
 #. EaLbU
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:181
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:177
 msgctxt "sidebarnumberformat|decimalplaces|tooltip_text"
 msgid "Enter the number of decimal places that you want to display."
 msgstr "Adja meg a megjelenítendő tizedesjegyek számát."
 
 #. 5tvJA
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:186
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:182
 msgctxt "sidebarnumberformat|decimalplaces-atkobject"
 msgid "Decimal Places"
 msgstr "Tizedesjegyek"
 
 #. 4h3mG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:219
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:202
 msgctxt "sidebarnumberformat|leadingzeroeslabel"
 msgid "Leading _zeroes:"
 msgstr "Ve_zető nullák:"
 
 #. 35pSE
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:234
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:215
 msgctxt "sidebarnumberformat|leadingzeroes|tooltip_text"
 msgid "Enter the maximum number of zeroes to display before the decimal point."
 msgstr "Adja meg a tizedesvessző előtt megjelenítendő nullák maximális számát."
 
 #. UFTBa
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:240
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:221
 msgctxt "sidebarnumberformat|leadingzeroes-atkobject"
 msgid "Leading Zeroes"
 msgstr "Vezető nullák"
 
 #. jkDKD
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:259
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:232
 msgctxt "sidebarnumberformat|negativenumbersred"
 msgid "_Negative numbers in red"
 msgstr "Neg_atív számok pirossal"
 
 #. apRL8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:263
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:236
 msgctxt "sidebarnumberformat|negativenumbersred|tooltip_text"
 msgid "Changes the font color of negative numbers to red."
 msgstr "A negatív számok betűszínét pirosra váltja."
 
 #. BJ9Gy
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:275
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:249
 msgctxt "sidebarnumberformat|thousandseparator"
 msgid "_Thousands separator"
 msgstr "_Ezreselválasztó"
 
 #. ykEWn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:279
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:253
 msgctxt "sidebarnumberformat|thousandseparator|tooltip_text"
 msgid "Inserts a separator between thousands."
 msgstr "Ezreselválasztó beszúrása."
 
 #. pGpRu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:291
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:266
 msgctxt "sidebarnumberformat|engineeringnotation"
 msgid "_Engineering notation"
 msgstr "_Műszaki jelölés"
 
 #. 9CEjC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:294
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:269
 msgctxt "sidebarnumberformat|engineeringnotation|tooltip_text"
 msgid "Ensures that exponent is a multiple of 3."
 msgstr "Biztosítja, hogy a kitevő mindig 3 többszöröse legyen."
@@ -30358,11 +30334,11 @@ msgctxt "solverdlg|options"
 msgid "O_ptions..."
 msgstr "B_eállítások..."
 
-#. UABF3
+#. 8BGxk
 #: sc/uiconfig/scalc/ui/solverdlg.ui:60
 msgctxt "solverdlg|extended_tip|options"
-msgid "Opens the Solver Options dialog."
-msgstr "Megnyitja a Megoldó beállításai párbeszédablakot."
+msgid "Opens the solver’s Options dialog."
+msgstr "Megnyitja a megoldó Beállítások párbeszédablakát."
 
 #. 8hMNV
 #: sc/uiconfig/scalc/ui/solverdlg.ui:72
@@ -30788,37 +30764,37 @@ msgstr "Adja meg meg a kijelölt tartomány rendezési beállításait."
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:79
 msgctxt "sortcriteriapage|topdown"
 msgid "Top to bottom (sort rows)"
-msgstr ""
+msgstr "Felülről lefelé (sorok rendezése)"
 
 #. eNaAT
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:94
 msgctxt "sortcriteriapage|leftright"
 msgid "Left to right (sort columns)"
-msgstr ""
+msgstr "Balról jobbra (oszlopok rendezése)"
 
 #. vTci8
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:112
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:111
 msgctxt "sortcriteriapage|lbDirection"
 msgid "Direction:"
-msgstr ""
+msgstr "Irány:"
 
 #. 6YQSB
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:122
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:121
 msgctxt "sortcriteriapage|header"
 msgid "Range contains..."
-msgstr ""
+msgstr "Tartomány tartalmazza..."
 
 #. E9DMu
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:138
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:137
 msgctxt "sortcriteriapage|lbHeader"
 msgid "Headers:"
-msgstr ""
+msgstr "Fejlécek:"
 
 #. 5oaCb
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:155
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:154
 msgctxt "sortcriteriapage|lbOptions"
 msgid "Sort Options"
-msgstr ""
+msgstr "Rendezési beállítások"
 
 #. PqGRt
 #: sc/uiconfig/scalc/ui/sortdialog.ui:8
@@ -31082,223 +31058,223 @@ msgstr "Tipp: A rendezési tartomány automatikusan észlelhető. Helyezze a cel
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:8
 msgctxt "SparklineDialog"
 msgid "Sparkline Data Range"
-msgstr ""
+msgstr "Értékgörbe adattartománya"
 
 #. mdCMa
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:120
 msgctxt "SparklineDataRangeDialog|cell-range-label"
 msgid "Data range:"
-msgstr ""
+msgstr "Adattartomány:"
 
 #. 59Wvr
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:24
 msgctxt "SparklineDialog"
 msgid "Sparkline Properties"
-msgstr ""
+msgstr "Értékgörbe tulajdonságai"
 
 #. ZGEum
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:182
 msgctxt "SparklineDialog|label_InputRange"
 msgid "Input range:"
-msgstr ""
+msgstr "Bemeneti tartomány:"
 
 #. X2vrF
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:199
 msgctxt "SparklineDialog|label_OutputRange"
 msgid "Output range:"
-msgstr ""
+msgstr "Kimeneti tartomány:"
 
 #. faM2q
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:218
 msgctxt "SparklineDialog|label-data"
 msgid "Data"
-msgstr ""
+msgstr "Adatok"
 
 #. GXiV2
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:250
 msgctxt "SparklineDialog|label_Series"
 msgid "Series:"
-msgstr ""
+msgstr "Sorozat:"
 
 #. wBmc6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:283
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:285
 msgctxt "SparklineDialog|checkButton_Negative"
 msgid "Negative points:"
-msgstr ""
+msgstr "Negatív pontok:"
 
 #. ySwZA
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:319
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:323
 msgctxt "SparklineDialog|checkButton_High"
 msgid "High points:"
-msgstr ""
+msgstr "Magas pontok:"
 
 #. DJKw7
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:355
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:361
 msgctxt "SparklineDialog|checkButton_Low"
 msgid "Low points:"
-msgstr ""
+msgstr "Alacsony pontok:"
 
 #. q5qaV
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:391
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:399
 msgctxt "SparklineDialog|checkButton_Marker"
 msgid "Marker:"
-msgstr ""
+msgstr "Jelölő:"
 
 #. 4yLTi
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:427
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:437
 msgctxt "SparklineDialog|checkButton_First"
 msgid "First point:"
-msgstr ""
+msgstr "Első pont:"
 
 #. EYEEJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:463
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:475
 msgctxt "SparklineDialog|checkButton_Last"
 msgid "Last point:"
-msgstr ""
+msgstr "Utolsó pont:"
 
 #. mP9Uy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:503
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:517
 msgctxt "SparklineDialog|label_Colors"
 msgid "Colors"
-msgstr ""
+msgstr "Színek"
 
 #. a9F7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:537
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:551
 msgctxt "SparklineDialog|label_LineWidth"
 msgid "Line width:"
-msgstr ""
+msgstr "Vonalvastagság:"
 
 #. ofAyv
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:552
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:566
 msgctxt "SparklineDialog|spinButton_LineWidth"
 msgid "1,00"
-msgstr ""
+msgstr "1,00"
 
 #. 4ciyB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:570
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:584
 msgctxt "SparklineDialog|label_DisplayEmptyCellsAs"
 msgid "Display empty cells as:"
-msgstr ""
+msgstr "Üres cellák megjelenítése mint:"
 
 #. K3oCB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:585
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:599
 msgctxt "SparklineDialog|optionEmpty_Gap"
 msgid "Gap"
-msgstr ""
+msgstr "Hézag"
 
 #. fzBds
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:586
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:600
 msgctxt "SparklineDialog|optionEmpty_Zero"
 msgid "Zero"
-msgstr ""
+msgstr "Nulla"
 
 #. tGCDf
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:587
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:601
 msgctxt "SparklineDialog|optionEmpty_Span"
 msgid "Span"
-msgstr ""
+msgstr "Nyújtás"
 
 #. fkB5s
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:597
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:611
 msgctxt "SparklineDialog|checkButton_Hidden"
 msgid "Display hidden"
-msgstr ""
+msgstr "Rejtett megjelenítése"
 
 #. gxx8E
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:612
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:626
 msgctxt "SparklineDialog|checkButton_RTL"
 msgid "Right-to-left"
-msgstr ""
+msgstr "Jobbról balra"
 
 #. GJfmJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:631
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
 msgctxt "SparklineDialog|optionType_Line"
 msgid "Line"
-msgstr ""
+msgstr "Vonal"
 
 #. 2ZDbw
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:632
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:646
 msgctxt "SparklineDialog|optionType_Column"
 msgid "Column"
-msgstr ""
+msgstr "Oszlop"
 
 #. UirXW
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:633
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:647
 msgctxt "SparklineDialog|optionType_Stacked"
 msgid "Stacked"
-msgstr ""
+msgstr "Halmozott"
 
 #. zmCsJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:659
 msgctxt "SparklineDialog|label_Type"
 msgid "Type:"
-msgstr ""
+msgstr "Típus:"
 
 #. o8rnM
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:661
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:675
 msgctxt "SparklineDialog|label_Properties"
 msgid "Properties"
-msgstr ""
+msgstr "Tulajdonságok"
 
 #. uQaJH
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:694
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:708
 msgctxt "SparklineDialog|option_MinAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "Egyedi"
 
 #. BCX7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:695
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:709
 msgctxt "SparklineDialog|option_MinAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Csoportos"
 
 #. SubB5
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:696
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:710
 msgctxt "SparklineDialog|option_MinAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Egyéni"
 
 #. T8Arr
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:724
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:738
 msgctxt "SparklineDialog|option_MaxAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "Egyedi"
 
 #. DDfCP
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:725
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:739
 msgctxt "SparklineDialog|option_MaxAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Csoportos"
 
 #. C2Huq
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:726
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:740
 msgctxt "SparklineDialog|option_MaxAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Egyéni"
 
-#. JFSoc
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:753
+#. kiBE8
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:767
 msgctxt "SparklineDialog|label_AxisMaximum"
-msgid "Vertical maximum"
-msgstr ""
+msgid "Vertical maximum:"
+msgstr "Függőleges maximum:"
 
 #. MEvJy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:768
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:782
 msgctxt "SparklineDialog|label_AxisMinimum"
 msgid "Vertical minimum:"
-msgstr ""
+msgstr "Függőleges minimum:"
 
 #. EMPn4
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:780
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:794
 msgctxt "SparklineDialog|checkBox_DisplayX"
 msgid "Display X axis"
-msgstr ""
+msgstr "X tengely megjelenítése"
 
 #. uAAF6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:800
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:814
 msgctxt "SparklineDialog|label_Axes"
 msgid "Axes"
-msgstr ""
+msgstr "Tengelyek"
 
 #. p9BBw
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:29
@@ -31588,14 +31564,14 @@ msgctxt "standardfilterdialog|cond"
 msgid "Does not end with"
 msgstr "Vége nem ez"
 
-#. XCG8Q
+#. 3PahC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:433
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:472
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:511
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:550
 msgctxt "standardfilterdialog|cond"
-msgid "Text color"
-msgstr "Szövegszín"
+msgid "Font color"
+msgstr "Betűszín"
 
 #. 5Wa7m
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:434
@@ -32078,7 +32054,7 @@ msgstr "_Karakterkészlet:"
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:133
 msgctxt "textimportcsv|textlanguage"
 msgid "_Locale:"
-msgstr ""
+msgstr "_Területi beállítás:"
 
 #. GAQTV
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:147
@@ -32372,7 +32348,7 @@ msgstr "Automatikus"
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:148
 msgctxt "textimportoptions|label2"
 msgid "Select the Locale to Use for Import"
-msgstr ""
+msgstr "Importáláshoz használt területi beállítás kiválasztása"
 
 #. iRYr7
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:169
@@ -32663,130 +32639,130 @@ msgid "Specifies when grid lines will be displayed. Default is to display grid l
 msgstr "Meghatározza, hogy mikor jelenjenek meg a rácsvonalak. Az alapértelmezés az, hogy a rácsvonalak csak olyan cellák körül jelennek meg, amelyeknek nincs háttérszínük. Választhatja azt is, hogy a háttérszínnel rendelkező cellák körül is megjelenjen a rácsvonal."
 
 #. yajBD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:468
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:469
 msgctxt "extended_tip|color"
 msgid "Specifies a color for the grid lines in the current document."
 msgstr "Megadja a rácsvonalak színét az aktuális dokumentumban."
 
 #. BpEmt
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:482
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:483
 msgctxt "tpviewpage|labelCursor"
 msgid "Pointe_r:"
 msgstr "M_utató:"
 
 #. AmbjZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:494
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:495
 msgctxt "tpviewpage|radiobuttonThemed"
 msgid "T_hemed"
 msgstr "Témá_zott"
 
 #. xQTDE
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:498
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:499
 msgctxt "tpviewpage|radiobuttonThemedTip"
 msgid "Show the pointer as defined in the icon theme, typically as fat cross."
-msgstr ""
+msgstr "A mutatót az ikontéma által megadott módon jeleníti meg, általában vastag keresztként."
 
 #. 3HxpG
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:510
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:511
 msgctxt "tpviewpage|radiobuttonSystem"
 msgid "S_ystem"
 msgstr "_Rendszer"
 
 #. weVdC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:514
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:515
 msgctxt "tpviewpage|radiobuttonSystemTip"
 msgid "Show the pointer as system default, typically an arrow pointer."
-msgstr ""
+msgstr "A mutatót a rendszer alapértelmezéseként jeleníti meg, általában nyíl mutatóként."
 
 #. Cb4AM
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:530
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:531
 msgctxt "tpviewpage|label1"
 msgid "Visual Aids"
 msgstr "Vizuális segítségek"
 
 #. Qd5Rp
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:561
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:562
 msgctxt "tpviewpage|objgrf_label"
 msgid "Ob_jects/Images:"
 msgstr "O_bjektumok/képek:"
 
 #. vLBFR
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:575
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:576
 msgctxt "tpviewpage|diagram_label"
 msgid "Char_ts:"
 msgstr "_Diagramok:"
 
 #. q544D
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:589
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:590
 msgctxt "tpviewpage|draw_label"
 msgid "_Drawing objects:"
 msgstr "Raj_zobjektumok:"
 
 #. mpELg
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:604
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
 msgctxt "tpviewpage|objgrf"
 msgid "Show"
 msgstr "Megjelenítés"
 
 #. Kx6yJ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:606
 msgctxt "tpviewpage|objgrf"
 msgid "Hide"
 msgstr "Elrejtés"
 
 #. oKpbX
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:609
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:610
 msgctxt "extended_tip|objgrf"
 msgid "Defines if objects and graphics are shown or hidden."
 msgstr "Megadja, hogy az objektumok és grafikák megjelenjenek vagy rejtettek legyenek."
 
 #. wFBeZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:623
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
 msgctxt "tpviewpage|diagram"
 msgid "Show"
 msgstr "Megjelenítés"
 
 #. H7MAB
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:625
 msgctxt "tpviewpage|diagram"
 msgid "Hide"
 msgstr "Elrejtés"
 
 #. oVE9C
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:628
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:629
 msgctxt "extended_tip|diagram"
 msgid "Defines if charts in your document are shown or hidden."
 msgstr "Megadja, hogy diagramok megjelenjenek vagy rejtettek legyenek."
 
 #. YaiTQ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:642
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
 msgctxt "tpviewpage|draw"
 msgid "Show"
 msgstr "Megjelenítés"
 
 #. DST5a
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:644
 msgctxt "tpviewpage|draw"
 msgid "Hide"
 msgstr "Elrejtés"
 
 #. FDGKD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:647
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:648
 msgctxt "extended_tip|draw"
 msgid "Defines if drawing objects in your document are shown or hidden."
 msgstr "Megadja, hogy a rajzobjektumok megjelenjenek vagy rejtettek legyenek."
 
 #. E6GxC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:662
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:663
 msgctxt "tpviewpage|label2"
 msgid "Objects"
 msgstr "Objektumok"
 
 #. AnHPF
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:686
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:687
 msgctxt "extended_tip|TpViewPage"
 msgid "Defines which elements of the Calc main window are displayed. You can also show or hide highlighting of values in tables."
-msgstr ""
+msgstr "Megadja, hogy a Calc fő ablakában mely elemek látsszanak. Beállíthatja azt is, hogy az értékek ki legyenek-e emelve vagy sem."
 
 #. AnLEa
 #: sc/uiconfig/scalc/ui/ttestdialog.ui:95
@@ -32980,11 +32956,11 @@ msgctxt "validationcriteriapage|liststore2"
 msgid "invalid range"
 msgstr "érvénytelen tartomány"
 
-#. 89CdB
+#. 8udun
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:84
 msgctxt "validationcriteriapage|extended_tip|data"
-msgid "Select the comparative operator that you want to use."
-msgstr "Válassza ki a használni kívánt összehasonlító operátort."
+msgid "Select the comparison operator that you want to use."
+msgstr "Válassza ki a használni kívánt összehasonlító operátor típusát."
 
 #. RCFrD
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:97
@@ -33053,13 +33029,13 @@ msgid "A valid source can only consist of a contiguous selection of rows and col
 msgstr "Érvényes forrásnak számít sorok vagy oszlopok folytonos kijelölése, vagy egy képlet, amelynek eredménye egy terület vagy tömb."
 
 #. 9v4Ah
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:286
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:289
 msgctxt "validationcriteriapage|extended_tip|max"
 msgid "Enter the maximum value for the data validation option that you selected in the Allow box."
 msgstr "Írja be az Engedélyezés listában választott adatérvényességi ellenőrzéshez a legnagyobb megengedett értéket."
 
 #. 3HjmP
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:309
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:312
 msgctxt "validationcriteriapage|extended_tip|ValidationCriteriaPage"
 msgid "Specify the validation rules for the selected cell(s)."
 msgstr "Adja meg a kijelölt cellák érvényesítési szabályait."
@@ -33158,13 +33134,13 @@ msgstr "Írja be az üzenetet, amely a munkalapon cella vagy cellatartomány kij
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:13
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "%PRODUCTNAME Calc found an error in the formula entered."
-msgstr ""
+msgstr "A Calc hibát talált a beírt képletben."
 
 #. 7BDGp
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:14
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "Do you want to accept the correction proposed below?"
-msgstr ""
+msgstr "Elfogadja a felajánlott javítást?"
 
 #. pSFWN
 #: sc/uiconfig/scalc/ui/xmlsourcedialog.ui:23

@@ -39,7 +39,7 @@
 #include <com/sun/star/ucb/SimpleFileAccess.hpp>
 #include <com/sun/star/ui/dialogs/ExtendedFilePickerElementIds.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
-#include <com/sun/star/ui/dialogs/FilePicker.hpp>
+#include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
 #include <com/sun/star/ui/dialogs/XFilePickerControlAccess.hpp>
 #include <comphelper/processfactory.hxx>
 #include <sfx2/dispatch.hxx>
@@ -50,7 +50,7 @@
 #include <svl/whiter.hxx>
 #include <svx/svdundo.hxx>
 #include <svx/svxids.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <vcl/commandevent.hxx>
 #include <vcl/weld.hxx>
@@ -232,12 +232,10 @@ void DialogWindow::NotifyUndoActionHdl( std::unique_ptr<SdrUndoAction> )
 
 void DialogWindow::DoInit()
 {
-    GetHScrollBar()->Show();
-    GetVScrollBar()->Show();
     m_pEditor->SetScrollBars( GetHScrollBar(), GetVScrollBar() );
 }
 
-void DialogWindow::DoScroll( ScrollBar*  )
+void DialogWindow::DoScroll( Scrollable*  )
 {
     m_pEditor->DoScroll();
 }
@@ -392,7 +390,7 @@ void DialogWindow::GetState( SfxItemSet& rSet )
 void DialogWindow::ExecuteCommand( SfxRequest& rReq )
 {
     const sal_uInt16 nSlotId(rReq.GetSlot());
-    SdrObjKind nInsertObj(OBJ_NONE);
+    SdrObjKind nInsertObj(SdrObjKind::NONE);
 
     switch ( nSlotId )
     {
@@ -425,100 +423,100 @@ void DialogWindow::ExecuteCommand( SfxRequest& rReq )
             break;
 
         case SID_INSERT_FORM_RADIO:
-            nInsertObj = OBJ_DLG_FORMRADIO;
+            nInsertObj = SdrObjKind::BasicDialogFormRadio;
             break;
         case SID_INSERT_FORM_CHECK:
-            nInsertObj = OBJ_DLG_FORMCHECK;
+            nInsertObj = SdrObjKind::BasicDialogFormCheck;
             break;
         case SID_INSERT_FORM_LIST:
-            nInsertObj = OBJ_DLG_FORMLIST;
+            nInsertObj = SdrObjKind::BasicDialogFormList;
             break;
         case SID_INSERT_FORM_COMBO:
-            nInsertObj = OBJ_DLG_FORMCOMBO;
+            nInsertObj = SdrObjKind::BasicDialogFormCombo;
             break;
         case SID_INSERT_FORM_SPIN:
-            nInsertObj = OBJ_DLG_FORMSPIN;
+            nInsertObj = SdrObjKind::BasicDialogFormSpin;
             break;
         case SID_INSERT_FORM_VSCROLL:
-            nInsertObj = OBJ_DLG_FORMVSCROLL;
+            nInsertObj = SdrObjKind::BasicDialogFormVerticalScroll;
             break;
         case SID_INSERT_FORM_HSCROLL:
-            nInsertObj = OBJ_DLG_FORMHSCROLL;
+            nInsertObj = SdrObjKind::BasicDialogFormHorizontalScroll;
             break;
         case SID_INSERT_PUSHBUTTON:
-            nInsertObj = OBJ_DLG_PUSHBUTTON;
+            nInsertObj = SdrObjKind::BasicDialogPushButton;
             break;
         case SID_INSERT_RADIOBUTTON:
-            nInsertObj = OBJ_DLG_RADIOBUTTON;
+            nInsertObj = SdrObjKind::BasicDialogRadioButton;
             break;
         case SID_INSERT_CHECKBOX:
-            nInsertObj = OBJ_DLG_CHECKBOX;
+            nInsertObj = SdrObjKind::BasicDialogCheckbox;
             break;
         case SID_INSERT_LISTBOX:
-            nInsertObj = OBJ_DLG_LISTBOX;
+            nInsertObj = SdrObjKind::BasicDialogListbox;
             break;
         case SID_INSERT_COMBOBOX:
-            nInsertObj = OBJ_DLG_COMBOBOX;
+            nInsertObj = SdrObjKind::BasicDialogCombobox;
             break;
         case SID_INSERT_GROUPBOX:
-            nInsertObj = OBJ_DLG_GROUPBOX;
+            nInsertObj = SdrObjKind::BasicDialogGroupBox;
             break;
         case SID_INSERT_EDIT:
-            nInsertObj = OBJ_DLG_EDIT;
+            nInsertObj = SdrObjKind::BasicDialogEdit;
             break;
         case SID_INSERT_FIXEDTEXT:
-            nInsertObj = OBJ_DLG_FIXEDTEXT;
+            nInsertObj = SdrObjKind::BasicDialogFixedText;
             break;
         case SID_INSERT_IMAGECONTROL:
-            nInsertObj = OBJ_DLG_IMAGECONTROL;
+            nInsertObj = SdrObjKind::BasicDialogImageControl;
             break;
         case SID_INSERT_PROGRESSBAR:
-            nInsertObj = OBJ_DLG_PROGRESSBAR;
+            nInsertObj = SdrObjKind::BasicDialogProgressbar;
             break;
         case SID_INSERT_HSCROLLBAR:
-            nInsertObj = OBJ_DLG_HSCROLLBAR;
+            nInsertObj = SdrObjKind::BasicDialogHorizontalScrollbar;
             break;
         case SID_INSERT_VSCROLLBAR:
-            nInsertObj = OBJ_DLG_VSCROLLBAR;
+            nInsertObj = SdrObjKind::BasicDialogVerticalScrollbar;
             break;
         case SID_INSERT_HFIXEDLINE:
-            nInsertObj = OBJ_DLG_HFIXEDLINE;
+            nInsertObj = SdrObjKind::BasicDialogHorizontalFixedLine;
             break;
         case SID_INSERT_VFIXEDLINE:
-            nInsertObj = OBJ_DLG_VFIXEDLINE;
+            nInsertObj = SdrObjKind::BasicDialogVerticalFixedLine;
             break;
         case SID_INSERT_DATEFIELD:
-            nInsertObj = OBJ_DLG_DATEFIELD;
+            nInsertObj = SdrObjKind::BasicDialogDateField;
             break;
         case SID_INSERT_TIMEFIELD:
-            nInsertObj = OBJ_DLG_TIMEFIELD;
+            nInsertObj = SdrObjKind::BasicDialogTimeField;
             break;
         case SID_INSERT_NUMERICFIELD:
-            nInsertObj = OBJ_DLG_NUMERICFIELD;
+            nInsertObj = SdrObjKind::BasicDialogNumericField;
             break;
         case SID_INSERT_CURRENCYFIELD:
-            nInsertObj = OBJ_DLG_CURRENCYFIELD;
+            nInsertObj = SdrObjKind::BasicDialogCurencyField;
             break;
         case SID_INSERT_FORMATTEDFIELD:
-            nInsertObj = OBJ_DLG_FORMATTEDFIELD;
+            nInsertObj = SdrObjKind::BasicDialogFormattedField;
             break;
         case SID_INSERT_PATTERNFIELD:
-            nInsertObj = OBJ_DLG_PATTERNFIELD;
+            nInsertObj = SdrObjKind::BasicDialogPatternField;
             break;
         case SID_INSERT_FILECONTROL:
-            nInsertObj = OBJ_DLG_FILECONTROL;
+            nInsertObj = SdrObjKind::BasicDialogFileControl;
             break;
         case SID_INSERT_SPINBUTTON:
-            nInsertObj = OBJ_DLG_SPINBUTTON;
+            nInsertObj = SdrObjKind::BasicDialogSpinButton;
             break;
         case SID_INSERT_GRIDCONTROL:
-            nInsertObj = OBJ_DLG_GRIDCONTROL;
+            nInsertObj = SdrObjKind::BasicDialogGridControl;
             break;
         case SID_INSERT_HYPERLINKCONTROL:
-            nInsertObj = OBJ_DLG_HYPERLINKCONTROL;
+            nInsertObj = SdrObjKind::BasicDialogHyperlinkControl;
             break;
         case SID_INSERT_TREECONTROL:
-            nInsertObj = OBJ_DLG_TREECONTROL;
+            nInsertObj = SdrObjKind::BasicDialogTreeControl;
             break;
         case SID_INSERT_SELECT:
             m_nControlSlotId = nSlotId;
@@ -556,7 +554,7 @@ void DialogWindow::ExecuteCommand( SfxRequest& rReq )
             break;
     }
 
-    if ( nInsertObj )
+    if ( nInsertObj != SdrObjKind::NONE )
     {
         m_nControlSlotId = nSlotId;
         GetEditor().SetMode( DlgEditor::INSERT );
@@ -625,7 +623,7 @@ void DialogWindow::SaveDialog()
     if( aDlg.Execute() != ERRCODE_NONE )
         return;
 
-    Sequence< OUString > aPaths = xFP->getSelectedFiles();
+    OUString aSelectedFileURL = xFP->getSelectedFiles()[0];
 
     // export dialog model to xml
     Reference< container::XNameContainer > xDialogModel = GetDialog();
@@ -637,9 +635,9 @@ void DialogWindow::SaveDialog()
     Reference< XOutputStream > xOutput;
     try
     {
-        if( xSFI->exists( aPaths[0] ) )
-            xSFI->kill( aPaths[0] );
-        xOutput = xSFI->openFileWrite( aPaths[0] );
+        if( xSFI->exists(aSelectedFileURL) )
+            xSFI->kill(aSelectedFileURL);
+        xOutput = xSFI->openFileWrite(aSelectedFileURL);
     }
     catch(const Exception& )
     {}
@@ -682,7 +680,7 @@ void DialogWindow::SaveDialog()
 
         if( bResource )
         {
-            INetURLObject aURLObj("");
+            INetURLObject aURLObj(aSelectedFileURL);
             aURLObj.removeExtension();
             OUString aDialogName( aURLObj.getName() );
             aURLObj.removeSegment();
@@ -1236,7 +1234,7 @@ void DialogWindow::InitSettings()
     SetTextColor( rStyleSettings.GetFieldTextColor() );
     SetTextFillColor();
 
-    SetBackground( rStyleSettings.GetFieldColor() );
+    SetBackground(rStyleSettings.GetFaceColor());
 }
 
 css::uno::Reference< css::accessibility::XAccessible > DialogWindow::CreateAccessible()
@@ -1248,6 +1246,7 @@ OString DialogWindow::GetHid () const
 {
     return HID_BASICIDE_DIALOGWINDOW;
 }
+
 ItemType DialogWindow::GetType () const
 {
     return TYPE_DIALOG;

@@ -98,8 +98,8 @@ protected:
 public:
 
     SdXMLShapeContext( SvXMLImport& rImport,
-        const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
-        css::uno::Reference< css::drawing::XShapes > const & rShapes,
+        css::uno::Reference< css::xml::sax::XFastAttributeList> xAttrList,
+        css::uno::Reference< css::drawing::XShapes > xShapes,
         bool bTemporaryShape);
     virtual ~SdXMLShapeContext() override;
 
@@ -527,6 +527,8 @@ class SdXMLFloatingFrameShapeContext : public SdXMLShapeContext
 private:
     OUString maFrameName;
     OUString maHref;
+
+    css::uno::Reference<css::drawing::XShape> CreateFloatingFrameShape() const;
 
 public:
 

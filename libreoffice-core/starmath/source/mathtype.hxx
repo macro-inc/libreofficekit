@@ -21,6 +21,8 @@
 
 #include <node.hxx>
 
+#include <o3tl/sorted_vector.hxx>
+
 class SfxMedium;
 class SotStorage;
 class SvStream;
@@ -44,7 +46,7 @@ struct LessMathTypeFont
     }
 };
 
-typedef ::std::set< MathTypeFont, LessMathTypeFont > MathTypeFontSet;
+typedef o3tl::sorted_vector< MathTypeFont, LessMathTypeFont > MathTypeFontSet;
 
 class MathType
 {
@@ -151,7 +153,6 @@ private:
     int nPendingAttributes;
     sal_uInt64 nInsertion;
 
-    std::vector<sal_Int16> aSizeTable;
     sal_Int16 nLSize;
     sal_Int16 nDSize;
     sal_Int16 nCurSize;

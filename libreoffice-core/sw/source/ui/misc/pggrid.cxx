@@ -19,7 +19,6 @@
 
 #include <cmdid.h>
 #include <hintids.hxx>
-#include <swtypes.hxx>
 #include <svx/colorbox.hxx>
 #include <editeng/sizeitem.hxx>
 #include <editeng/lrspitem.hxx>
@@ -91,11 +90,9 @@ SwTextGridPage::SwTextGridPage(weld::Container* pPage, weld::DialogController* p
     m_xDisplayCB->connect_toggled(LINK(this, SwTextGridPage, DisplayGridHdl));
 
     //Get the default paper mode
-    SwView *pView   = ::GetActiveView();
-    if( pView )
+    if (SwView *pView = GetActiveView())
     {
-        SwWrtShell* pSh = pView->GetWrtShellPtr();
-        if( pSh )
+        if (SwWrtShell* pSh = pView->GetWrtShellPtr())
         {
             m_bSquaredMode = pSh->GetDoc()->IsSquaredPageMode();
         }
@@ -152,11 +149,13 @@ bool SwTextGridPage::FillItemSet(SfxItemSet *rSet)
     }
 
     // draw ticks of ruler
-    SwView * pView = ::GetActiveView();
-    if ( m_bHRulerChanged )
-        pView->GetHRuler().DrawTicks();
-    if ( m_bVRulerChanged )
-        pView->GetVRuler().DrawTicks();
+    if (SwView * pView = GetActiveView())
+    {
+        if ( m_bHRulerChanged )
+            pView->GetHRuler().DrawTicks();
+        if ( m_bVRulerChanged )
+            pView->GetVRuler().DrawTicks();
+    }
     return bRet;
 }
 
@@ -225,34 +224,39 @@ DeactivateRC SwTextGridPage::DeactivatePage( SfxItemSet* )
 
 void SwTextGridPage::PutGridItem(SfxItemSet& rSet)
 {
-        SwTextGridItem aGridItem;
-        aGridItem.SetGridType(m_xNoGridRB->get_active() ? GRID_NONE :
-            m_xLinesGridRB->get_active() ? GRID_LINES_ONLY : GRID_LINES_CHARS );
-        aGridItem.SetSnapToChars(m_xSnapToCharsCB->get_active());
-        aGridItem.SetLines( static_cast< sal_uInt16 >(m_xLinesPerPageNF->get_value()) );
-        aGridItem.SetBaseHeight( static_cast< sal_uInt16 >(
-            m_bRubyUserValue ? m_nRubyUserValue :
-                m_xTextSizeMF->denormalize(m_xTextSizeMF->get_value(FieldUnit::TWIP))) );
-        aGridItem.SetRubyHeight( static_cast< sal_uInt16 >(m_xRubySizeMF->denormalize(m_xRubySizeMF->get_value(FieldUnit::TWIP))) );
-        aGridItem.SetBaseWidth( static_cast< sal_uInt16 >(m_xCharWidthMF->denormalize(m_xCharWidthMF->get_value(FieldUnit::TWIP))) );
-        aGridItem.SetRubyTextBelow(m_xRubyBelowCB->get_active());
-        aGridItem.SetSquaredMode(m_bSquaredMode);
-        aGridItem.SetDisplayGrid(m_xDisplayCB->get_active());
-        aGridItem.SetPrintGrid(m_xPrintCB->get_active());
-        aGridItem.SetColor(m_xColorLB->GetSelectEntryColor());
-        rSet.Put(aGridItem);
+    SwTextGridItem aGridItem;
+    aGridItem.SetGridType(m_xNoGridRB->get_active() ? GRID_NONE :
+        m_xLinesGridRB->get_active() ? GRID_LINES_ONLY : GRID_LINES_CHARS );
+    aGridItem.SetSnapToChars(m_xSnapToCharsCB->get_active());
+    aGridItem.SetLines( static_cast< sal_uInt16 >(m_xLinesPerPageNF->get_value()) );
+    aGridItem.SetBaseHeight( static_cast< sal_uInt16 >(
+        m_bRubyUserValue ? m_nRubyUserValue :
+            m_xTextSizeMF->denormalize(m_xTextSizeMF->get_value(FieldUnit::TWIP))) );
+    // Tdf#151544: set ruby height from the value get from UI only when in square page mode.
+    // When in normal mode, the ruby height should be zero.
+    if (m_bSquaredMode)
+        aGridItem.SetRubyHeight(static_cast<sal_uInt16>(m_xRubySizeMF->denormalize(m_xRubySizeMF->get_value(FieldUnit::TWIP))));
+    else
+        aGridItem.SetRubyHeight(0);
+    aGridItem.SetBaseWidth( static_cast< sal_uInt16 >(m_xCharWidthMF->denormalize(m_xCharWidthMF->get_value(FieldUnit::TWIP))) );
+    aGridItem.SetRubyTextBelow(m_xRubyBelowCB->get_active());
+    aGridItem.SetSquaredMode(m_bSquaredMode);
+    aGridItem.SetDisplayGrid(m_xDisplayCB->get_active());
+    aGridItem.SetPrintGrid(m_xPrintCB->get_active());
+    aGridItem.SetColor(m_xColorLB->GetSelectEntryColor());
+    rSet.Put(aGridItem);
 
-        SwView * pView = ::GetActiveView();
-        if ( aGridItem.GetGridType() != GRID_NONE )
+    SwView * pView = ::GetActiveView();
+    if (pView && aGridItem.GetGridType() != GRID_NONE)
+    {
+        if ( aGridItem.GetGridType() == GRID_LINES_CHARS )
         {
-            if ( aGridItem.GetGridType() == GRID_LINES_CHARS )
-            {
-                m_bHRulerChanged = true;
-            }
-            m_bVRulerChanged = true;
-            pView->GetHRuler().SetCharWidth(static_cast<tools::Long>(m_xCharWidthMF->get_value(FieldUnit::TWIP)/56.7));
-            pView->GetVRuler().SetLineHeight(static_cast<tools::Long>(m_xTextSizeMF->get_value(FieldUnit::TWIP)/56.7));
+            m_bHRulerChanged = true;
         }
+        m_bVRulerChanged = true;
+        pView->GetHRuler().SetCharWidth(m_xCharWidthMF->get_value(FieldUnit::MM));
+        pView->GetVRuler().SetLineHeight(m_xTextSizeMF->get_value(FieldUnit::MM));
+    }
 }
 
 void SwTextGridPage::UpdatePageSize(const SfxItemSet& rSet)
@@ -275,19 +279,18 @@ void SwTextGridPage::UpdatePageSize(const SfxItemSet& rSet)
     sal_Int32 nDistanceLR = rLRSpace.GetLeft() + rLRSpace.GetRight();
     sal_Int32 nDistanceUL = rULSpace.GetUpper() + rULSpace.GetLower();
 
-    for( sal_Int32 nId : { SID_ATTR_PAGE_HEADERSET, SID_ATTR_PAGE_FOOTERSET })
+    for( const TypedWhichId<SvxSetItem> & nId : { SID_ATTR_PAGE_HEADERSET, SID_ATTR_PAGE_FOOTERSET })
     {
-        const SfxPoolItem* pItem;
-        if( SfxItemState::SET == rSet.GetItemState( nId, false, &pItem ) )
+        if( const SvxSetItem* pItem = rSet.GetItemIfSet( nId, false ) )
         {
-            const SfxItemSet& rExtraSet = static_cast<const SvxSetItem*>(pItem)->GetItemSet();
+            const SfxItemSet& rExtraSet = pItem->GetItemSet();
             const SfxBoolItem& rOn =
-                static_cast<const SfxBoolItem&>(rExtraSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_ON ) ));
+                rExtraSet.Get( rSet.GetPool()->GetWhich( SID_ATTR_PAGE_ON ) );
 
             if ( rOn.GetValue() )
             {
                 const SvxSizeItem& rSizeItem =
-                    static_cast<const SvxSizeItem&>(rExtraSet.Get(rSet.GetPool()->GetWhich(SID_ATTR_PAGE_SIZE)));
+                    rExtraSet.Get(rSet.GetPool()->GetWhich(SID_ATTR_PAGE_SIZE));
                 nDistanceUL += rSizeItem.GetSize().Height();
             }
         }
@@ -387,7 +390,6 @@ IMPL_LINK(SwTextGridPage, CharorLineChangedHdl, weld::SpinButton&, rField, void)
             assert(nValue && "div-by-zero");
             auto nHeight = m_aPageSize.Height() / nValue;
             m_xTextSizeMF->set_value(m_xTextSizeMF->normalize(nHeight), FieldUnit::TWIP);
-            m_xRubySizeMF->set_value(0, FieldUnit::TWIP);
             SetLinesOrCharsRanges( *m_xLinesRangeFT , m_xLinesPerPageNF->get_max() );
 
             m_nRubyUserValue = nHeight;
@@ -463,20 +465,43 @@ IMPL_LINK(SwTextGridPage, GridTypeHdl, weld::Toggleable&, rButton, void)
     if (!rButton.get_active())
         return;
 
-    const bool bNoGrid = m_xNoGridRB.get() == &rButton;
-    m_xLayoutFL->set_sensitive(!bNoGrid);
-    m_xDisplayFL->set_sensitive(!bNoGrid);
-
-    //one special case
-    if (!bNoGrid)
-        DisplayGridHdl(*m_xDisplayCB);
-
-    bool bEnable = m_xCharsGridRB.get() == &rButton;
-    m_xSnapToCharsCB->set_sensitive(bEnable);
-
-    bEnable = m_xLinesGridRB.get() == &rButton;
-    if (bEnable && !m_bSquaredMode)
+    if (m_xNoGridRB.get() == &rButton)
     {
+        // GRID_NONE mode:
+        //   "Layout" and "Display" sections should all be disabled.
+        m_xLayoutFL->set_sensitive(false);
+        m_xDisplayFL->set_sensitive(false);
+    }
+    else
+    {
+        // GRID_LINES_ONLY or GRID_LINES_CHARS mode:
+        //   "Layout" and "Display" sections should all be enabled;
+        //   DisplayGridHdl should be executed;
+        m_xLayoutFL->set_sensitive(true);
+        m_xDisplayFL->set_sensitive(true);
+        DisplayGridHdl(*m_xDisplayCB);
+    }
+
+    if (m_xCharsGridRB.get() == &rButton)
+    {
+        // GRID_LINES_CHARS mode:
+        //   "Snap to character" should be enabled;
+        //   "Characters per line" should be enabled;
+        //   "Characters range" should be enabled;
+        m_xSnapToCharsCB->set_sensitive(true);
+        m_xCharsPerLineFT->set_sensitive(true);
+        m_xCharsPerLineNF->set_sensitive(true);
+        m_xCharsRangeFT->set_sensitive(true);
+        m_xCharWidthFT->set_sensitive(true);
+        m_xCharWidthMF->set_sensitive(true);
+    }
+    else
+    {
+        // GRID_NONE or GRID_LINES_ONLY mode:
+        //   "Snap to character" should be disabled;
+        //   "Characters per line" should be disabled;
+        //   "Characters range" should be disabled;
+        m_xSnapToCharsCB->set_sensitive(false);
         m_xCharsPerLineFT->set_sensitive(false);
         m_xCharsPerLineNF->set_sensitive(false);
         m_xCharsRangeFT->set_sensitive(false);
@@ -484,9 +509,12 @@ IMPL_LINK(SwTextGridPage, GridTypeHdl, weld::Toggleable&, rButton, void)
         m_xCharWidthMF->set_sensitive(false);
     }
 
-    //recalc which dependencies are sensitive
-    if (!bNoGrid)
+    if (m_xNoGridRB.get() != &rButton)
+    {
+        // GRID_LINES_ONLY or GRID_LINES_CHARS mode: (additionally)
+        //   TextSizeChangedHdl should be executed to recalculate which dependencies are sensitive.
         TextSizeChangedHdl(*m_xTextSizeMF);
+    }
 
     GridModifyHdl();
 }

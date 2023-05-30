@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-04-26 13:59+0200\n"
-"PO-Revision-Date: 2022-03-13 10:19+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-02-01 09:33+0000\n"
 "Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
 "Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/uuimessages/ro/>\n"
 "Language: ro\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1522253070.000000\n"
 
 #. DLY8p
@@ -48,6 +48,9 @@ msgid ""
 "$(ARG1)\n"
 "which are too large to store in binary format. If you wish users that don't have access to the library password to be able to run macros in those module(s) you must split those modules into a number of smaller modules. Do you wish to continue to save/export this library?"
 msgstr ""
+"Sunteți pe cale să salvați/exportați o bibliotecă BASIC protejată cu parolă, care conține module(e)\n"
+"$(ARG1)\n"
+"care sunt prea mari pentru a fi stocate în format binar. Dacă doriți ca utilizatorii care nu au acces la parola bibliotecii să poată executa macrocomenzi în modulele respective, trebuie să scindați acele module într-un număr de module mai mici. Doriți să continuați să salvați/exportați această bibliotecă?"
 
 #. 3rNDF
 #: uui/inc/ids.hrc:43
@@ -126,7 +129,7 @@ msgstr "Eroare generală de intrare/ieșire la accesarea $(ARG1)."
 #: uui/inc/ids.hrc:65
 msgctxt "RID_UUI_ERRHDL"
 msgid "An attempt was made to access $(ARG1) in an invalid way."
-msgstr "A avut loc o încercare de accesare a $(ARG1) într-un mod incorect."
+msgstr "A avut loc o încercare de accesare a $(ARG1) într-un mod nevalid."
 
 #. Y6bwq
 #: uui/inc/ids.hrc:67
@@ -138,7 +141,7 @@ msgstr "$(ARG1) conține caractere nevalide."
 #: uui/inc/ids.hrc:69
 msgctxt "RID_UUI_ERRHDL"
 msgid "The device (drive) $(ARG1) is invalid."
-msgstr "Dispozitivul (unitatea) $(ARG1) este nevalid(ă)."
+msgstr "Dispozitivul (unitatea) $(ARG1) nu este valid."
 
 #. Ykhp2
 #: uui/inc/ids.hrc:71
@@ -357,12 +360,12 @@ msgid ""
 "\n"
 "Should %PRODUCTNAME repair the file?\n"
 msgstr ""
-"Fișierul '$(ARG1)' este defect prin urmare nu poate fi deschis. %PRODUCTNAME poate încerca să repare fișierul.\n"
+"Fișierul „$(ARG1)” este corupt și, prin urmare, nu poate fi deschis. %PRODUCTNAME poate încerca să repare fișierul.\n"
 "\n"
-"Defectarea poate fi rezultatul manipulării documentului sau defectarea structurală a documentului datorită transmisiei datelor.\n"
+"Coruperea poate fi rezultatul manipulării documentelor sau al deteriorării structurale a documentelor din cauza transmiterii datelor.\n"
 "\n"
-"Recomandarea e sa nu se încreadă în conținutul documentului restaurat\n"
-"Execuția macro-urilor este dezactivată pentru acest document.\n"
+"Vă recomandăm să nu aveți încredere în conținutul documentului reparat.\n"
+"Execuția macrocomenzilor este dezactivată pentru acest document.\n"
 "\n"
 "Ar trebui ca %PRODUCTNAME să repare fișierul?\n"
 
@@ -412,7 +415,7 @@ msgstr ""
 #: uui/inc/ids.hrc:151
 msgctxt "RID_UUI_ERRHDL"
 msgid "The form contains invalid data. Do you still want to continue?"
-msgstr "Acest formular conține date nevalide. Doriți totuși să continuați?"
+msgstr "Formularul conține date nevalide. Încă vreți să continuați?"
 
 #. DSoD4
 #: uui/inc/ids.hrc:153
@@ -476,15 +479,15 @@ msgid ""
 "\n"
 "You should check to make sure that your computer's time is correct."
 msgstr ""
-"$(ARG1) este un site web care folosește un certificat de securitate pentru a cripta datele în timpul transmisiei, dar certificatul a expirat la $(ARG2).\n"
+"$(ARG1) este un site web care folosește un certificat de securitate pentru a cripta datele în timpul transmisiei, dar certificatul său a expirat pe $(ARG2).\n"
 "\n"
-"Verificați și asigurați-vă că data și ora de pe calculatorul dumneavoastră sunt corecte."
+"Ar trebui să verificați pentru a vă asigura că ora calculatorului dumneavoastră este corectă."
 
 #. 8GuAn
 #: uui/inc/ids.hrc:168
 msgctxt "STR_UUI_SSLWARN_EXPIRED_TITLE"
 msgid "Security Warning: Server Certificate Invalid"
-msgstr "Avertisment de securitate: Certificat invalid de la server"
+msgstr "Avertisment de securitate: certificatul serverului nu este valid"
 
 #. iyR2A
 #: uui/inc/ids.hrc:169
@@ -516,15 +519,15 @@ msgid ""
 "\n"
 "If you suspect the certificate shown, please cancel the connection and notify the site administrator."
 msgstr ""
-"Certificatul nu a putut fi validat. Ar trebui să examinați certificatul siteului cu atenție.\n"
+"Certificatul nu a putut fi validat. Ar trebui să examinați cu atenție certificatul acestui site web.\n"
 "\n"
-"Dacă nu aveți încredere în certificatul afișat, anulați conexiunea și să anunțați administratorul pagini web."
+"Dacă aveți vreo suspiciune în privința certificatului afișat, anulați conexiunea și notificați administratorul site-ului web."
 
 #. Aj227
 #: uui/inc/ids.hrc:172
 msgctxt "STR_UUI_SSLWARN_INVALID_TITLE"
 msgid "Security Warning: Domain Name Mismatch"
-msgstr "Avertisment de securitate: Numele domeniului nu se potrivește"
+msgstr "Avertisment de securitate: numele domeniului nu se potrivește"
 
 #. wH3TZ
 msgctxt "stock"
@@ -733,64 +736,28 @@ msgctxt "STR_LOCKFAILED_OPENREADONLY_NOTIFY_BTN"
 msgid "~Notify"
 msgstr ""
 
-#. u5nuY
+#. q5Dhj
 #: uui/inc/strings.hrc:50
-msgctxt "STR_OPENLOCKED_TITLE"
-msgid "Document in Use"
-msgstr "Document în uz"
-
-#. qcayz
-#: uui/inc/strings.hrc:51
-msgctxt "STR_OPENLOCKED_MSG"
+msgctxt "STR_OPENLOCKED_HIDDEN_DATA"
 msgid ""
-"Document file '$(ARG1)' is locked for editing by:\n"
-"\n"
-"$(ARG2)\n"
-"\n"
-"Open document read-only or open a copy of the document for editing.\n"
-"Select Notify to open read-only and get notified when the document becomes editable.$(ARG3)"
+"Document Name: $(ARG1)\n"
+"User Name: $(ARG2)"
 msgstr ""
-
-#. VF7vT
-#: uui/inc/strings.hrc:52
-msgctxt "STR_OPENLOCKED_ALLOWIGNORE_MSG"
-msgid ""
-"\n"
-"You may also ignore the file locking and open the document for editing."
-msgstr ""
-
-#. tc7YZ
-#: uui/inc/strings.hrc:53
-msgctxt "STR_OPENLOCKED_OPENREADONLY_BTN"
-msgid "Open ~Read-Only"
-msgstr "Deschide doa~r pentru citire"
-
-#. anQNW
-#: uui/inc/strings.hrc:54
-msgctxt "STR_OPENLOCKED_OPENREADONLY_NOTIFY_BTN"
-msgid "~Notify"
-msgstr ""
-
-#. TsA54
-#: uui/inc/strings.hrc:55
-msgctxt "STR_OPENLOCKED_OPENCOPY_BTN"
-msgid "Open ~Copy"
-msgstr "Des~chide o copie"
 
 #. EXAAf
-#: uui/inc/strings.hrc:56
+#: uui/inc/strings.hrc:51
 msgctxt "STR_UNKNOWNUSER"
 msgid "Unknown User"
 msgstr "Utilizator necunoscut"
 
 #. PFEwD
-#: uui/inc/strings.hrc:58
+#: uui/inc/strings.hrc:53
 msgctxt "STR_FILECHANGED_TITLE"
 msgid "Document Has Been Changed by Others"
 msgstr "Documentul a fost modificat de către alții"
 
 #. umCKE
-#: uui/inc/strings.hrc:59
+#: uui/inc/strings.hrc:54
 msgctxt "STR_FILECHANGED_MSG"
 msgid ""
 "The file has been changed since it was opened for editing in %PRODUCTNAME. Saving your version of the document will overwrite changes made by others.\n"
@@ -799,19 +766,19 @@ msgid ""
 msgstr ""
 
 #. DGYmK
-#: uui/inc/strings.hrc:60
+#: uui/inc/strings.hrc:55
 msgctxt "STR_FILECHANGED_SAVEANYWAY_BTN"
 msgid "~Save Anyway"
 msgstr "~Salvează oricum"
 
 #. YBz5F
-#: uui/inc/strings.hrc:62
+#: uui/inc/strings.hrc:57
 msgctxt "STR_TRYLATER_TITLE"
 msgid "Document in Use"
 msgstr "Document în uz"
 
 #. 4Fimj
-#: uui/inc/strings.hrc:63
+#: uui/inc/strings.hrc:58
 msgctxt "STR_TRYLATER_MSG"
 msgid ""
 "Document file '$(ARG1)' is locked for editing by:\n"
@@ -822,7 +789,7 @@ msgid ""
 msgstr ""
 
 #. b3UBG
-#: uui/inc/strings.hrc:64
+#: uui/inc/strings.hrc:59
 msgctxt "STR_OVERWRITE_IGNORELOCK_MSG"
 msgid ""
 "Document file '$(ARG1)' is locked for editing by:\n"
@@ -833,19 +800,19 @@ msgid ""
 msgstr ""
 
 #. 8JFLZ
-#: uui/inc/strings.hrc:65
+#: uui/inc/strings.hrc:60
 msgctxt "STR_TRYLATER_RETRYSAVING_BTN"
 msgid "~Retry Saving"
 msgstr "Încea~rcă salvarea din nou"
 
 #. 6iCzM
-#: uui/inc/strings.hrc:66
+#: uui/inc/strings.hrc:61
 msgctxt "STR_TRYLATER_SAVEAS_BTN"
 msgid "~Save As..."
 msgstr "~Salveaza Ca..."
 
 #. nqrvC
-#: uui/inc/strings.hrc:68
+#: uui/inc/strings.hrc:63
 msgctxt "STR_RENAME_OR_REPLACE"
 msgid ""
 "A file with the name \"%NAME\" already exists in the location \"%FOLDER\".\n"
@@ -855,7 +822,7 @@ msgstr ""
 "Selectați Înlocuire pentru a suprascrie sau introduceți un nume nou."
 
 #. 3bJvA
-#: uui/inc/strings.hrc:69
+#: uui/inc/strings.hrc:64
 msgctxt "STR_NAME_CLASH_RENAME_ONLY"
 msgid ""
 "A file with the name \"%NAME\" already exists in the location \"%FOLDER\".\n"
@@ -865,49 +832,49 @@ msgstr ""
 "Introduceți un nume nou."
 
 #. Bapqc
-#: uui/inc/strings.hrc:70
+#: uui/inc/strings.hrc:65
 msgctxt "STR_SAME_NAME_USED"
 msgid "Please provide a different file name!"
 msgstr "Introduceți un nume nou de fișier!"
 
 #. BsaWY
-#: uui/inc/strings.hrc:72
+#: uui/inc/strings.hrc:67
 msgctxt "STR_ERROR_PASSWORD_TO_OPEN_WRONG"
 msgid "The password is incorrect. The file cannot be opened."
 msgstr "Parola este greșită. Fișierul nu poate fi deschis."
 
 #. WQbYF
-#: uui/inc/strings.hrc:73
+#: uui/inc/strings.hrc:68
 msgctxt "STR_ERROR_PASSWORD_TO_MODIFY_WRONG"
 msgid "The password is incorrect. The file cannot be modified."
 msgstr "Parola este incorectă. Fișierul nu poate fi modificat."
 
 #. Gq9FJ
-#: uui/inc/strings.hrc:74
+#: uui/inc/strings.hrc:69
 msgctxt "STR_ERROR_MASTERPASSWORD_WRONG"
 msgid "The master password is incorrect."
 msgstr "Parola master este incorectă."
 
 #. pRwHM
-#: uui/inc/strings.hrc:75
+#: uui/inc/strings.hrc:70
 msgctxt "STR_ERROR_SIMPLE_PASSWORD_WRONG"
 msgid "The password is incorrect."
 msgstr "Parola este incorectă."
 
 #. DwdJn
-#: uui/inc/strings.hrc:76
+#: uui/inc/strings.hrc:71
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The password confirmation does not match."
 msgstr "Confirmarea parolei nu se potrivește cu parola."
 
 #. dwGow
-#: uui/inc/strings.hrc:78
+#: uui/inc/strings.hrc:73
 msgctxt "STR_LOCKCORRUPT_TITLE"
 msgid "Lock file is corrupted"
 msgstr ""
 
 #. nkUGA
-#: uui/inc/strings.hrc:79
+#: uui/inc/strings.hrc:74
 msgctxt "STR_LOCKCORRUPT_MSG"
 msgid ""
 "The lock file is corrupted and probably empty. Opening the document read-only and closing it again removes the corrupted lock file.\n"
@@ -916,25 +883,25 @@ msgid ""
 msgstr ""
 
 #. fKEYB
-#: uui/inc/strings.hrc:80
+#: uui/inc/strings.hrc:75
 msgctxt "STR_LOCKCORRUPT_OPENREADONLY_BTN"
 msgid "Open ~Read-Only"
 msgstr "Deschide doa~r pentru citire"
 
 #. qRAcY
-#: uui/inc/strings.hrc:81
+#: uui/inc/strings.hrc:76
 msgctxt "STR_LOCKCORRUPT_OPENREADONLY_NOTIFY_BTN"
 msgid "~Notify"
 msgstr ""
 
 #. rBAR3
-#: uui/inc/strings.hrc:83
+#: uui/inc/strings.hrc:78
 msgctxt "STR_RELOADEDITABLE_TITLE"
 msgid "Document is now editable"
 msgstr ""
 
 #. cVZuC
-#: uui/inc/strings.hrc:84
+#: uui/inc/strings.hrc:79
 msgctxt "STR_RELOADEDITABLE_MSG"
 msgid ""
 "Document file '$(ARG1)' is now editable \n"
@@ -943,7 +910,7 @@ msgid ""
 msgstr ""
 
 #. vynDE
-#: uui/inc/strings.hrc:85
+#: uui/inc/strings.hrc:80
 msgctxt "STR_RELOADEDITABLE_BTN"
 msgid "~Reload"
 msgstr ""
@@ -1068,36 +1035,39 @@ msgid ""
 "\n"
 "Macros may contain viruses. Disabling macros for a document is always safe. If you disable macros you may lose functionality provided by the document macros."
 msgstr ""
+"Documentul conține macrocomenzi pentru documente.\n"
+"\n"
+"Macrocomenzile pot conține viruși. Dezactivarea macrocomenzilor pentru un document este întotdeauna sigură. Dacă dezactivați macrocomenzile, este posibil să pierdeți funcționalitatea oferită de macrocomenzile documentului."
 
 #. svTn6
 #: uui/uiconfig/ui/macrowarnmedium.ui:27
 msgctxt "macrowarnmedium|cancel"
 msgid "_Disable Macros"
-msgstr "_Dezactivează macrourile"
+msgstr "_Dezactivează macrocomenzile"
 
 #. o4c9e
 #: uui/uiconfig/ui/macrowarnmedium.ui:43
 msgctxt "macrowarnmedium|ok"
 msgid "_Enable Macros"
-msgstr "Activează macrouril_e"
+msgstr "Activ_ează macrocomenzile"
 
 #. tYAFs
 #: uui/uiconfig/ui/macrowarnmedium.ui:89
 msgctxt "macrowarnmedium|descr1Label"
 msgid "The document contains document macros signed by:"
-msgstr "Acest document conține macrocomenzi semnate de:"
+msgstr "Documentul conține macrocomenzi de document semnate de:"
 
 #. SBMFJ
 #: uui/uiconfig/ui/macrowarnmedium.ui:98
 msgctxt "macrowarnmedium|alwaysTrustCheckbutton"
 msgid "_Always trust macros from this source"
-msgstr "_Aveți întotdeauna încredere în macrocomenzile din această sursă"
+msgstr "_Aveți întotdeauna încredere în macrocomenzile de la această sursă"
 
 #. hWGP7
 #: uui/uiconfig/ui/macrowarnmedium.ui:128
 msgctxt "macrowarnmedium|viewSignsButton"
 msgid "_View Signatures…"
-msgstr "Vizualizare semnături..."
+msgstr "_Vizualizează semnăturile…"
 
 #. BABeG
 #: uui/uiconfig/ui/masterpassworddlg.ui:8
@@ -1184,7 +1154,7 @@ msgid "Caution: If you forget the master password, you will be unable to access 
 msgstr "Atenție: Dacă uitați parola principală, nu veți putea accesa nicio informație protejată de el. Parola ține cont de majuscule."
 
 #. BHvee
-#: uui/uiconfig/ui/setmasterpassworddlg.ui:202
+#: uui/uiconfig/ui/setmasterpassworddlg.ui:205
 msgctxt "setmasterpassworddlg|extended_tip|SetMasterPasswordDialog"
 msgid "Assign a master password to protect the access to a saved password."
 msgstr ""

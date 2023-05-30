@@ -9,9 +9,14 @@
 
 #include <test/sheet/globalsheetsettings.hxx>
 
+#include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/configuration/theDefaultProvider.hpp>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Reference.hxx>
+#include <com/sun/star/util/XChangesBatch.hpp>
+
+#include <comphelper/processfactory.hxx>
 
 #include <cppunit/TestAssert.h>
 
@@ -23,100 +28,75 @@ namespace apitest
 void GlobalSheetSettings::testGlobalSheetSettingsProperties()
 {
     uno::Reference<beans::XPropertySet> xGlobalSheetSettings(init(), UNO_QUERY_THROW);
+    auto configProvider
+        = css::configuration::theDefaultProvider::get(comphelper::getProcessComponentContext());
+
+    auto DoCheck = [&xGlobalSheetSettings, &configProvider](
+                       const OUString& propName, const auto& origValue, const auto& newValue,
+                       const OUString& regNodeName, const OUString& regValueName) {
+        OString sMessage = "PropertyValue " + propName.toUtf8();
+        css::uno::Any aOrigValue(origValue), aNewValue(newValue);
+
+        css::uno::Sequence<css::uno::Any> args{ css::uno::Any(
+            css::beans::NamedValue("nodepath", css::uno::Any(regNodeName))) };
+        css::uno::Reference<beans::XPropertySet> xRegNodeRO(
+            configProvider->createInstanceWithArguments(
+                "com.sun.star.configuration.ConfigurationAccess", args),
+            css::uno::UNO_QUERY_THROW);
+        css::uno::Reference<beans::XPropertySet> xRegNodeRW(
+            configProvider->createInstanceWithArguments(
+                "com.sun.star.configuration.ConfigurationUpdateAccess", args),
+            css::uno::UNO_QUERY_THROW);
+        css::uno::Reference<css::util::XChangesBatch> xBatch(xRegNodeRW, css::uno::UNO_QUERY_THROW);
+
+        // 1. Check initial value
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aOrigValue,
+                                     xGlobalSheetSettings->getPropertyValue(propName));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aOrigValue,
+                                     xRegNodeRO->getPropertyValue(regValueName));
+
+        // 2. Check setting the value through GlobalSheetSettings
+        xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aNewValue,
+                                     xGlobalSheetSettings->getPropertyValue(propName));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aNewValue,
+                                     xRegNodeRO->getPropertyValue(regValueName));
+
+        // 3. Check setting the value through ConfigurationUpdateAccess
+        xRegNodeRW->setPropertyValue(regValueName, aOrigValue);
+        xBatch->commitChanges();
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aOrigValue,
+                                     xRegNodeRO->getPropertyValue(regValueName));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(sMessage.getStr(), aOrigValue,
+                                     xGlobalSheetSettings->getPropertyValue(propName));
+    };
+
+    OUString node = "/org.openoffice.Office.Calc/Input";
+    DoCheck("MoveSelection", true, false, node, "MoveSelection");
+    DoCheck("MoveDirection", sal_Int16(0), sal_Int16(1), node, "MoveSelectionDirection");
+    DoCheck("EnterEdit", false, true, node, "SwitchToEditMode");
+    DoCheck("ExtendFormat", false, true, node, "ExpandFormatting");
+    DoCheck("RangeFinder", true, false, node, "ShowReference");
+    DoCheck("ExpandReferences", false, true, node, "ExpandReference");
+    DoCheck("MarkHeader", true, false, node, "HighlightSelection");
+    DoCheck("UseTabCol", false, true, node, "UseTabCol");
+    DoCheck("ReplaceCellsWarning", true, false, node, "ReplaceCellsWarning");
+
+    node = "/org.openoffice.Office.Calc/Layout/Other/MeasureUnit";
+    DoCheck("Metric", sal_Int16(8), sal_Int16(1), node, "NonMetric"); // Test uses en-US locale
+
+    node = "/org.openoffice.Office.Calc/Input";
+    DoCheck("DoAutoComplete", true, false, node, "AutoInput");
+
+    node = "/org.openoffice.Office.Calc/Content/Update";
+    DoCheck("LinkUpdateMode", sal_Int16(2), sal_Int16(1), node, "Link");
+
+    node = "/org.openoffice.Office.Calc/Print/";
+    DoCheck("PrintAllSheets", false, true, node + "Other", "AllSheets");
+    DoCheck("PrintEmptyPages", false, true, node + "Page", "EmptyPages");
+
     OUString propName;
     uno::Any aNewValue;
-
-    propName = "MoveSelection";
-    bool aMoveSelection = false;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMoveSelection);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue MoveSelection", aMoveSelection);
-
-    aNewValue <<= false;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMoveSelection);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue MoveSelection", !aMoveSelection);
-
-    propName = "MoveDirection";
-    sal_Int16 aMoveDirection = 42;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMoveDirection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to get PropertyValue MoveDirection", sal_Int16(0),
-                                 aMoveDirection);
-
-    aNewValue <<= sal_Int16(1);
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMoveDirection);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to set PropertyValue MoveDirection", sal_Int16(1),
-                                 aMoveDirection);
-
-    propName = "EnterEdit";
-    bool aEnterEdit = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aEnterEdit);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue EnterEdit", !aEnterEdit);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aEnterEdit);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue EnterEdit", aEnterEdit);
-
-    propName = "ExtendFormat";
-    bool aExtendFormat = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aExtendFormat);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue ExtendFormat", !aExtendFormat);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aExtendFormat);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue ExtendFormat", aExtendFormat);
-
-    propName = "RangeFinder";
-    bool aRangeFinder = false;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aRangeFinder);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue RangeFinder", aRangeFinder);
-
-    aNewValue <<= false;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aRangeFinder);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue RangeFinder", !aRangeFinder);
-
-    propName = "ExpandReferences";
-    bool aExpandReferences = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aExpandReferences);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue ExpandReferences", !aExpandReferences);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aExpandReferences);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue ExpandReferences", aExpandReferences);
-
-    propName = "MarkHeader";
-    bool aMarkHeader = false;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMarkHeader);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue MarkHeader", aMarkHeader);
-
-    aNewValue <<= false;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMarkHeader);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue MarkHeader", !aMarkHeader);
-
-    propName = "UseTabCol";
-    bool aUseTabCol = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aUseTabCol);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue UseTabCol", !aUseTabCol);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aUseTabCol);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue UseTabCol", aUseTabCol);
-
-    propName = "Metric";
-    sal_Int16 aMetric = 42;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMetric);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to get PropertyValue Metric", sal_Int16(8), aMetric);
-
-    aNewValue <<= sal_Int16(1);
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aMetric);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to set PropertyValue Metric", sal_Int16(1), aMetric);
 
     propName = "Scale";
     sal_Int16 aScale = 42;
@@ -127,16 +107,6 @@ void GlobalSheetSettings::testGlobalSheetSettingsProperties()
     xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
     CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aScale);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to set PropertyValue Scale", sal_Int16(-1), aScale);
-
-    propName = "DoAutoComplete";
-    bool aDoAutoComplete = false;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aDoAutoComplete);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue DoAutoComplete", aDoAutoComplete);
-
-    aNewValue <<= false;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aDoAutoComplete);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue DoAutoComplete", !aDoAutoComplete);
 
     propName = "StatusBarFunction";
     sal_Int16 aStatusBarFunction = 42;
@@ -173,59 +143,6 @@ void GlobalSheetSettings::testGlobalSheetSettingsProperties()
     xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
     CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aUserLists);
     CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue UserLists", !aUserLists.hasElements());
-
-    propName = "LinkUpdateMode";
-    sal_Int16 aLinkUpdateMode = 42;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aLinkUpdateMode);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to get PropertyValue LinkUpdateMode", sal_Int16(2),
-                                 aLinkUpdateMode);
-
-    aNewValue <<= sal_Int16(1);
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aLinkUpdateMode);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Unable to set PropertyValue LinkUpdateMode", sal_Int16(1),
-                                 aLinkUpdateMode);
-
-    propName = "PrintAllSheets";
-    bool aPrintAllSheets = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aPrintAllSheets);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue PrintAllSheets", !aPrintAllSheets);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aPrintAllSheets);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue PrintAllSheets", aPrintAllSheets);
-
-    propName = "PrintEmptyPages";
-    bool aPrintEmptyPages = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aPrintEmptyPages);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue PrintEmptyPages", !aPrintEmptyPages);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aPrintEmptyPages);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue PrintEmptyPages", aPrintEmptyPages);
-
-    propName = "UsePrinterMetrics";
-    bool aUsePrinterMetrics = true;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aUsePrinterMetrics);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue UsePrinterMetrics", !aUsePrinterMetrics);
-
-    aNewValue <<= true;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aUsePrinterMetrics);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue UsePrinterMetrics", aUsePrinterMetrics);
-
-    propName = "ReplaceCellsWarning";
-    bool aReplaceCellsWarning = false;
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aReplaceCellsWarning);
-    CPPUNIT_ASSERT_MESSAGE("Unable to get PropertyValue ReplaceCellsWarning", aReplaceCellsWarning);
-
-    aNewValue <<= false;
-    xGlobalSheetSettings->setPropertyValue(propName, aNewValue);
-    CPPUNIT_ASSERT(xGlobalSheetSettings->getPropertyValue(propName) >>= aReplaceCellsWarning);
-    CPPUNIT_ASSERT_MESSAGE("Unable to set PropertyValue ReplaceCellsWarning",
-                           !aReplaceCellsWarning);
 }
 }
 

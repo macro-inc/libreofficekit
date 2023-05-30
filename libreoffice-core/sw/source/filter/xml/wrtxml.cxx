@@ -27,7 +27,6 @@
 #include <com/sun/star/document/XExporter.hpp>
 #include <com/sun/star/document/XFilter.hpp>
 #include <com/sun/star/frame/XModule.hpp>
-#include <com/sun/star/frame/XModel.hpp>
 
 #include <officecfg/Office/Common.hxx>
 #include <comphelper/fileformat.h>
@@ -35,11 +34,10 @@
 #include <comphelper/genericpropertyset.hxx>
 #include <comphelper/propertysetinfo.hxx>
 #include <vcl/errinf.hxx>
+#include <osl/diagnose.h>
 #include <sal/log.hxx>
-#include <o3tl/any.hxx>
 #include <svx/xmlgrhlp.hxx>
 #include <svx/xmleohlp.hxx>
-#include <unotools/saveopt.hxx>
 #include <svl/stritem.hxx>
 #include <sfx2/frame.hxx>
 #include <sfx2/docfile.hxx>
@@ -89,12 +87,12 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
 
     if (pMediumItemSet)
     {
-        const SfxUnoAnyItem* pStatusBarItem = static_cast<const SfxUnoAnyItem*>(
-           pMediumItemSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL));
+        const SfxUnoAnyItem* pStatusBarItem =
+           pMediumItemSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
         if (pStatusBarItem)
             pStatusBarItem->GetValue() >>= xStatusIndicator;
-        const SfxStringItem* pDocHierarchItem = static_cast<const SfxStringItem*>(
-            pMediumItemSet->GetItem(SID_DOC_HIERARCHICALNAME));
+        const SfxStringItem* pDocHierarchItem =
+            pMediumItemSet->GetItem(SID_DOC_HIERARCHICALNAME);
         if (pDocHierarchItem)
             aDocHierarchicalName = pDocHierarchItem->GetValue();
         const SfxBoolItem* pNoEmbDS = pMediumItemSet->GetItem(SID_NO_EMBEDDED_DS);
@@ -131,7 +129,7 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
     // the user.
 
     // create XPropertySet with three properties for status indicator
-    comphelper::PropertyMapEntry const aInfoMap[] =
+    static comphelper::PropertyMapEntry const aInfoMap[] =
     {
         { OUString("ProgressRange"), 0,
               ::cppu::UnoType<sal_Int32>::get(),
@@ -182,7 +180,6 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
         { OUString("NoEmbDataSet"), 0,
               cppu::UnoType<bool>::get(),
               beans::PropertyAttribute::MAYBEVOID, 0 },
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
     uno::Reference< beans::XPropertySet > xInfoSet(
                 comphelper::GenericPropertySet_CreateInstance(
@@ -190,7 +187,7 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
 
     xInfoSet->setPropertyValue( "TargetStorage", Any( m_xStg ) );
 
-    xInfoSet->setPropertyValue("NoEmbDataSet", makeAny(bNoEmbDS));
+    xInfoSet->setPropertyValue("NoEmbDataSet", Any(bNoEmbDS));
 
     if (m_bShowProgress)
     {
@@ -206,7 +203,7 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
         xInfoSet->setPropertyValue("ProgressMax", Any(static_cast < sal_Int32 >( -1 )));
     }
 
-    xInfoSet->setPropertyValue( "UsePrettyPrinting", makeAny(officecfg::Office::Common::Save::Document::PrettyPrinting::get()) );
+    xInfoSet->setPropertyValue( "UsePrettyPrinting", Any(officecfg::Office::Common::Save::Document::PrettyPrinting::get()) );
 
     uno::Reference<lang::XComponent> const xModelComp(m_pDoc->GetDocShell()->GetModel());
     uno::Reference<drawing::XDrawPageSupplier> const xDPS(xModelComp, uno::UNO_QUERY);
@@ -220,14 +217,14 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
     // TODO: ideally this would be stored per-view...
     SwRootFrame const*const pLayout(m_pDoc->getIDocumentLayoutAccess().GetCurrentLayout());
     isShowChanges = pLayout == nullptr || !pLayout->IsHideRedlines();
-    xInfoSet->setPropertyValue("ShowChanges", makeAny(isShowChanges));
+    xInfoSet->setPropertyValue("ShowChanges", Any(isShowChanges));
     // ... and hide redlines for export
     nRedlineFlags &= ~RedlineFlags::ShowMask;
     nRedlineFlags |= RedlineFlags::ShowInsert;
     m_pDoc->getIDocumentRedlineAccess().SetRedlineFlags( nRedlineFlags );
 
     // Set base URI
-    xInfoSet->setPropertyValue( "BaseURI", makeAny( GetBaseURL() ) );
+    xInfoSet->setPropertyValue( "BaseURI", Any( GetBaseURL() ) );
 
     if( SfxObjectCreateMode::EMBEDDED == m_pDoc->GetDocShell()->GetCreateMode() )
     {
@@ -235,12 +232,12 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
             ? aDocHierarchicalName
             : OUString( "dummyObjectName" ) );
 
-        xInfoSet->setPropertyValue( "StreamRelPath", makeAny( aName ) );
+        xInfoSet->setPropertyValue( "StreamRelPath", Any( aName ) );
     }
 
     if( m_bBlock )
     {
-        xInfoSet->setPropertyValue( "AutoTextMode", makeAny(true) );
+        xInfoSet->setPropertyValue( "AutoTextMode", Any(true) );
     }
 
     // #i69627#
@@ -248,7 +245,7 @@ ErrCode SwXMLWriter::Write_(const SfxItemSet* pMediumItemSet)
     if ( bOASIS &&
          docfunc::HasOutlineStyleToBeWrittenAsNormalListStyle( *m_pDoc ) )
     {
-        xInfoSet->setPropertyValue( "OutlineStyleAsNormalListStyle", makeAny( true ) );
+        xInfoSet->setPropertyValue( "OutlineStyleAsNormalListStyle", Any( true ) );
     }
 
     // filter arguments
@@ -510,7 +507,7 @@ bool SwXMLWriter::WriteThroughComponent(
         xSet->setPropertyValue("MediaType", Any(OUString("text/xml")) );
 
         // even plain stream should be encrypted in encrypted documents
-        xSet->setPropertyValue( "UseCommonStoragePasswordEncryption", makeAny(true) );
+        xSet->setPropertyValue( "UseCommonStoragePasswordEncryption", Any(true) );
 
         // set buffer and create outputstream
         uno::Reference< io::XOutputStream > xOutputStream = xStream->getOutputStream();
@@ -522,7 +519,7 @@ bool SwXMLWriter::WriteThroughComponent(
         OSL_ENSURE( xInfoSet.is(), "missing property set" );
         if( xInfoSet.is() )
         {
-            xInfoSet->setPropertyValue( "StreamName", makeAny( sStreamName ) );
+            xInfoSet->setPropertyValue( "StreamName", Any( sStreamName ) );
         }
 
         // write the stuff
@@ -581,7 +578,7 @@ bool SwXMLWriter::WriteThroughComponent(
 }
 
 void GetXMLWriter(
-    [[maybe_unused]] const OUString& /*rName*/, const OUString& rBaseURL, WriterRef& xRet )
+    [[maybe_unused]] std::u16string_view /*rName*/, const OUString& rBaseURL, WriterRef& xRet )
 {
     xRet = new SwXMLWriter( rBaseURL );
 }

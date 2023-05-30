@@ -18,22 +18,24 @@
  */
 
 #include "StockChartTypeTemplate.hxx"
+#include "ColumnChartType.hxx"
+#include "CandleStickChartType.hxx"
+#include "LineChartType.hxx"
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include "StockDataInterpreter.hxx"
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
+#include <BaseCoordinateSystem.hxx>
 #include <servicenames_charttypes.hxx>
-#include <com/sun/star/chart2/XChartTypeContainer.hpp>
-#include <com/sun/star/chart2/XDataSeriesContainer.hpp>
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <PropertyHelper.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
-#include <vector>
 #include <algorithm>
+#include <cstddef>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -127,7 +129,6 @@ StockChartTypeTemplate::StockChartTypeTemplate(
     StockVariant eVariant,
     bool bJapaneseStyle ) :
         ChartTypeTemplate( xContext, rServiceName ),
-        ::property::OPropertySet( m_aMutex ),
     m_eStockVariant( eVariant )
 {
     setFastPropertyValue_NoBroadcast(
@@ -145,14 +146,16 @@ StockChartTypeTemplate::StockChartTypeTemplate(
 
 StockChartTypeTemplate::~StockChartTypeTemplate()
 {}
+
 // ____ OPropertySet ____
-uno::Any StockChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle ) const
+void StockChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = GetStaticStockChartTypeTemplateDefaults();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL StockChartTypeTemplate::getInfoHelper()
@@ -182,13 +185,13 @@ sal_Int32 StockChartTypeTemplate::getAxisCountByDimension( sal_Int32 nDimension 
     return bHasVolume ? 2 : 1;
 }
 
-void SAL_CALL StockChartTypeTemplate::applyStyle(
-    const Reference< chart2::XDataSeries >& xSeries,
+void StockChartTypeTemplate::applyStyle2(
+    const rtl::Reference< DataSeries >& xSeries,
     ::sal_Int32 nChartTypeIndex,
     ::sal_Int32 nSeriesIndex,
     ::sal_Int32 nSeriesCount )
 {
-    ChartTypeTemplate::applyStyle( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
+    ChartTypeTemplate::applyStyle2( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
     try
     {
         sal_Int32 nNewAxisIndex = 0;
@@ -198,9 +201,7 @@ void SAL_CALL StockChartTypeTemplate::applyStyle(
         if( bHasVolume && nChartTypeIndex != 0 )
             nNewAxisIndex = 1;
 
-        Reference< beans::XPropertySet > xProp( xSeries, uno::UNO_QUERY );
-        if( xProp.is() )
-            xProp->setPropertyValue( "AttachedAxisIndex", uno::Any( nNewAxisIndex ) );
+        xSeries->setPropertyValue( "AttachedAxisIndex", uno::Any( nNewAxisIndex ) );
 
         if( bHasVolume && nChartTypeIndex==0 )
         {
@@ -210,13 +211,10 @@ void SAL_CALL StockChartTypeTemplate::applyStyle(
         else
         {
             //ensure that lines are on
-            if( xProp.is() )
-            {
-                drawing::LineStyle eStyle = drawing::LineStyle_NONE;
-                xProp->getPropertyValue( "LineStyle" ) >>= eStyle;
-                if( eStyle == drawing::LineStyle_NONE )
-                    xProp->setPropertyValue( "LineStyle", uno::Any( drawing::LineStyle_SOLID ));
-            }
+            drawing::LineStyle eStyle = drawing::LineStyle_NONE;
+            xSeries->getPropertyValue( "LineStyle" ) >>= eStyle;
+            if( eStyle == drawing::LineStyle_NONE )
+                xSeries->setPropertyValue( "LineStyle", uno::Any( drawing::LineStyle_SOLID ));
         }
 
     }
@@ -226,66 +224,57 @@ void SAL_CALL StockChartTypeTemplate::applyStyle(
     }
 }
 
-void SAL_CALL StockChartTypeTemplate::resetStyles(
-    const Reference< chart2::XDiagram >& xDiagram )
+void StockChartTypeTemplate::resetStyles2(
+    const rtl::Reference< ::chart::Diagram >& xDiagram )
 {
-    ChartTypeTemplate::resetStyles( xDiagram );
+    ChartTypeTemplate::resetStyles2( xDiagram );
     if( getDimension() == 3 )
     {
-        std::vector< Reference< chart2::XDataSeries > > aSeriesVec(
-            DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
+        std::vector< rtl::Reference< DataSeries > > aSeriesVec =
+            DiagramHelper::getDataSeriesFromDiagram( xDiagram );
         for (auto const& series : aSeriesVec)
         {
-            Reference< beans::XPropertySet > xProp(series, uno::UNO_QUERY);
-            if( xProp.is() )
-                xProp->setPropertyValue( "AttachedAxisIndex", uno::Any( sal_Int32(0) ) );
+            series->setPropertyValue( "AttachedAxisIndex", uno::Any( sal_Int32(0) ) );
         }
     }
 
     DiagramHelper::setVertical( xDiagram, false );
 }
 
-Reference< XChartType > StockChartTypeTemplate::getChartTypeForIndex( sal_Int32 nChartTypeIndex )
+rtl::Reference< ChartType > StockChartTypeTemplate::getChartTypeForIndex( sal_Int32 nChartTypeIndex )
 {
-    Reference< XChartType > xCT;
-    Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY );
-    if(xFact.is())
+    rtl::Reference< ChartType > xCT;
+    bool bHasVolume = false;
+    getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_VOLUME ) >>= bHasVolume;
+    if( bHasVolume )
     {
-        bool bHasVolume = false;
-        getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_VOLUME ) >>= bHasVolume;
-        if( bHasVolume )
-        {
-            if( nChartTypeIndex == 0 )
-                xCT.set( xFact->createInstance( CHART2_SERVICE_NAME_CHARTTYPE_COLUMN ), uno::UNO_QUERY );
-            else if( nChartTypeIndex == 1 )
-                xCT.set( xFact->createInstance( CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK ), uno::UNO_QUERY );
-            else
-                xCT.set( xFact->createInstance( CHART2_SERVICE_NAME_CHARTTYPE_LINE ), uno::UNO_QUERY );
-        }
+        if( nChartTypeIndex == 0 )
+            xCT = new ColumnChartType();
+        else if( nChartTypeIndex == 1 )
+            xCT = new CandleStickChartType();
         else
-        {
-            if( nChartTypeIndex == 0 )
-                xCT.set( xFact->createInstance( CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK ), uno::UNO_QUERY );
-            else
-                xCT.set( xFact->createInstance( CHART2_SERVICE_NAME_CHARTTYPE_LINE ), uno::UNO_QUERY );
-        }
+            xCT = new LineChartType();
+    }
+    else
+    {
+        if( nChartTypeIndex == 0 )
+            xCT = new CandleStickChartType();
+        else
+            xCT = new LineChartType();
     }
     return xCT;
 }
 
 void StockChartTypeTemplate::createChartTypes(
-    const Sequence< Sequence< Reference< XDataSeries > > > & aSeriesSeq,
-    const Sequence< Reference< XCoordinateSystem > > & rCoordSys,
-    const Sequence< Reference< XChartType > >& /* aOldChartTypesSeq */ )
+    const std::vector< std::vector< rtl::Reference< DataSeries > > > & aSeriesSeq,
+    const std::vector< rtl::Reference< BaseCoordinateSystem > > & rCoordSys,
+    const std::vector< rtl::Reference< ChartType > >& /* aOldChartTypesSeq */ )
 {
-    if( !rCoordSys.hasElements() )
+    if( rCoordSys.empty() )
         return;
 
     try
     {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
         bool bHasVolume = false;
         bool bShowFirst = false;
         bool bJapaneseStyle = false;
@@ -296,63 +285,49 @@ void StockChartTypeTemplate::createChartTypes(
         getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_JAPANESE ) >>= bJapaneseStyle;
         getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_LOW_HIGH ) >>= bShowHighLow;
 
-        sal_Int32 nSeriesIndex = 0;
+        std::size_t nSeriesIndex = 0;
 
-        std::vector< Reference< chart2::XChartType > > aChartTypeVec;
+        std::vector< rtl::Reference< ChartType > > aChartTypeVec;
         // Bars (Volume)
         if( bHasVolume )
         {
             // chart type
-            Reference< XChartType > xCT(
-                xFact->createInstance(
-                    CHART2_SERVICE_NAME_CHARTTYPE_COLUMN ), uno::UNO_QUERY_THROW );
+            rtl::Reference< ChartType > xCT = new ColumnChartType();
             aChartTypeVec.push_back( xCT );
 
-            if( aSeriesSeq.getLength() > nSeriesIndex &&
-                aSeriesSeq[nSeriesIndex].hasElements() )
+            if( aSeriesSeq.size() > nSeriesIndex &&
+               !aSeriesSeq[nSeriesIndex].empty() )
             {
-                Reference< XDataSeriesContainer > xDSCnt( xCT, uno::UNO_QUERY_THROW );
-                xDSCnt->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
+                xCT->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
             }
             ++nSeriesIndex;
         }
 
-        Reference< XChartType > xCT(
-            xFact->createInstance(
-                CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK ), uno::UNO_QUERY_THROW );
+        rtl::Reference< ChartType > xCT = new CandleStickChartType();
         aChartTypeVec.push_back( xCT );
 
-        Reference< beans::XPropertySet > xCTProp( xCT, uno::UNO_QUERY );
-        if( xCTProp.is())
-        {
-            xCTProp->setPropertyValue( "Japanese", uno::Any( bJapaneseStyle ));
-            xCTProp->setPropertyValue( "ShowFirst", uno::Any( bShowFirst ));
-            xCTProp->setPropertyValue( "ShowHighLow", uno::Any( bShowHighLow ));
-        }
+        xCT->setPropertyValue( "Japanese", uno::Any( bJapaneseStyle ));
+        xCT->setPropertyValue( "ShowFirst", uno::Any( bShowFirst ));
+        xCT->setPropertyValue( "ShowHighLow", uno::Any( bShowHighLow ));
 
-        if( aSeriesSeq.getLength() > nSeriesIndex &&
-            aSeriesSeq[ nSeriesIndex ].hasElements() )
+        if( aSeriesSeq.size() > nSeriesIndex &&
+            !aSeriesSeq[ nSeriesIndex ].empty() )
         {
-            Reference< XDataSeriesContainer > xDSCnt( xCT, uno::UNO_QUERY_THROW );
-            xDSCnt->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
+            xCT->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
         }
         ++nSeriesIndex;
 
         // Lines (remaining series)
-        if( aSeriesSeq.getLength() > nSeriesIndex &&
-            aSeriesSeq[ nSeriesIndex ].hasElements() )
+        if( aSeriesSeq.size() > nSeriesIndex &&
+            !aSeriesSeq[ nSeriesIndex ].empty() )
         {
-            xCT.set(
-                xFact->createInstance(
-                    CHART2_SERVICE_NAME_CHARTTYPE_LINE ), uno::UNO_QUERY_THROW );
+            xCT = new LineChartType();
             aChartTypeVec.push_back( xCT );
 
-            Reference< XDataSeriesContainer > xDSCnt( xCT, uno::UNO_QUERY_THROW );
-            xDSCnt->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
+            xCT->setDataSeries( aSeriesSeq[ nSeriesIndex ] );
         }
 
-        Reference< XChartTypeContainer > xCTCnt( rCoordSys[ 0 ], uno::UNO_QUERY_THROW );
-        xCTCnt->setChartTypes( comphelper::containerToSequence(aChartTypeVec) );
+        rCoordSys[ 0 ]->setChartTypes( aChartTypeVec );
     }
     catch( const uno::Exception & )
     {
@@ -360,10 +335,10 @@ void StockChartTypeTemplate::createChartTypes(
     }
 }
 
-// ____ XChartTypeTemplate ____
-sal_Bool SAL_CALL StockChartTypeTemplate::matchesTemplate(
-    const uno::Reference< XDiagram >& xDiagram,
-    sal_Bool /* bAdaptProperties */ )
+// ____ ChartTypeTemplate ____
+bool StockChartTypeTemplate::matchesTemplate2(
+    const rtl::Reference< ::chart::Diagram >& xDiagram,
+    bool /* bAdaptProperties */ )
 {
     bool bResult = false;
 
@@ -378,34 +353,25 @@ sal_Bool SAL_CALL StockChartTypeTemplate::matchesTemplate(
         getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_OPEN ) >>= bHasOpenValue;
         getFastPropertyValue( PROP_STOCKCHARTTYPE_TEMPLATE_JAPANESE ) >>= bHasJapaneseStyle;
 
-        Reference< chart2::XChartType > xVolumeChartType;
-        Reference< chart2::XChartType > xCandleStickChartType;
-        Reference< chart2::XChartType > xLineChartType;
+        rtl::Reference< ChartType > xVolumeChartType;
+        rtl::Reference< ChartType > xCandleStickChartType;
+        rtl::Reference< ChartType > xLineChartType;
         sal_Int32 nNumberOfChartTypes = 0;
 
-        Reference< XCoordinateSystemContainer > xCooSysCnt(
-            xDiagram, uno::UNO_QUERY_THROW );
-        const Sequence< Reference< XCoordinateSystem > > aCooSysSeq(
-            xCooSysCnt->getCoordinateSystems());
-        for( Reference< XCoordinateSystem > const & coords : aCooSysSeq )
+        for( rtl::Reference< BaseCoordinateSystem > const & coords : xDiagram->getBaseCoordinateSystems() )
         {
-            Reference< XChartTypeContainer > xCTCnt( coords, uno::UNO_QUERY_THROW );
-            const Sequence< Reference< XChartType > > aChartTypeSeq( xCTCnt->getChartTypes());
-            for( Reference< XChartType >  const & chartType : aChartTypeSeq )
+            for( rtl::Reference< ChartType >  const & chartType : coords->getChartTypes2() )
             {
-                if( chartType.is())
-                {
-                    ++nNumberOfChartTypes;
-                    if( nNumberOfChartTypes > 3 )
-                        break;
-                    OUString aCTService = chartType->getChartType();
-                    if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_COLUMN )
-                        xVolumeChartType.set( chartType );
-                    else if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK )
-                        xCandleStickChartType.set( chartType );
-                    else if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_LINE )
-                        xLineChartType.set( chartType );
-                }
+                ++nNumberOfChartTypes;
+                if( nNumberOfChartTypes > 3 )
+                    break;
+                OUString aCTService = chartType->getChartType();
+                if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_COLUMN )
+                    xVolumeChartType = chartType;
+                else if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK )
+                    xCandleStickChartType = chartType;
+                else if( aCTService == CHART2_SERVICE_NAME_CHARTTYPE_LINE )
+                    xLineChartType = chartType;
             }
             if( nNumberOfChartTypes > 3 )
                 break;
@@ -416,18 +382,14 @@ sal_Bool SAL_CALL StockChartTypeTemplate::matchesTemplate(
             bResult = true;
 
             // check for japanese style
-            Reference< beans::XPropertySet > xCTProp( xCandleStickChartType, uno::UNO_QUERY );
-            if( xCTProp.is())
-            {
-                bool bJapaneseProp = false;
-                xCTProp->getPropertyValue( "Japanese") >>= bJapaneseProp;
-                bResult = bResult && ( bHasJapaneseStyle == bJapaneseProp );
+            bool bJapaneseProp = false;
+            xCandleStickChartType->getPropertyValue( "Japanese") >>= bJapaneseProp;
+            bResult = bResult && ( bHasJapaneseStyle == bJapaneseProp );
 
-                // in old chart japanese == showFirst
-                bool bShowFirstProp = false;
-                xCTProp->getPropertyValue( "ShowFirst") >>= bShowFirstProp;
-                bResult = bResult && ( bHasOpenValue == bShowFirstProp );
-            }
+            // in old chart japanese == showFirst
+            bool bShowFirstProp = false;
+            xCandleStickChartType->getPropertyValue( "ShowFirst") >>= bShowFirstProp;
+            bResult = bResult && ( bHasOpenValue == bShowFirstProp );
         }
     }
     catch( const uno::Exception & )
@@ -438,17 +400,14 @@ sal_Bool SAL_CALL StockChartTypeTemplate::matchesTemplate(
     return bResult;
 }
 
-Reference< XChartType > SAL_CALL StockChartTypeTemplate::getChartTypeForNewSeries(
-        const uno::Sequence< Reference< chart2::XChartType > >& aFormerlyUsedChartTypes )
+rtl::Reference< ChartType > StockChartTypeTemplate::getChartTypeForNewSeries2(
+        const std::vector< rtl::Reference< ChartType > >& aFormerlyUsedChartTypes )
 {
-    Reference< chart2::XChartType > xResult;
+    rtl::Reference< ChartType > xResult;
 
     try
     {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
-        xResult.set( xFact->createInstance(
-                         CHART2_SERVICE_NAME_CHARTTYPE_LINE ), uno::UNO_QUERY_THROW );
+        xResult = new LineChartType();
         ChartTypeTemplate::copyPropertiesFromOldToNewCoordinateSystem( aFormerlyUsedChartTypes, xResult );
     }
     catch( const uno::Exception & )
@@ -459,7 +418,7 @@ Reference< XChartType > SAL_CALL StockChartTypeTemplate::getChartTypeForNewSerie
     return xResult;
 }
 
-Reference< XDataInterpreter > SAL_CALL StockChartTypeTemplate::getDataInterpreter()
+rtl::Reference< DataInterpreter > StockChartTypeTemplate::getDataInterpreter2()
 {
     if( ! m_xDataInterpreter.is())
         m_xDataInterpreter.set( new StockDataInterpreter( m_eStockVariant ) );

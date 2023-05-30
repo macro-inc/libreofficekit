@@ -23,17 +23,18 @@
 #include <tools/urlobj.hxx>
 #include <rtl/character.hxx>
 #include <osl/file.hxx>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-static OUString lcl_CheckGroupName( const OUString& rGroupName )
+static OUString lcl_CheckGroupName( std::u16string_view aGroupName )
 {
-    OUStringBuffer sRet;
+    OUStringBuffer sRet(aGroupName.size());
     //group name should contain only A-Z and a-z and spaces
-    for( sal_Int32 i = 0; i < rGroupName.getLength(); i++ )
+    for( size_t i = 0; i < aGroupName.size(); i++ )
     {
-        sal_Unicode cChar = rGroupName[i];
+        sal_Unicode cChar = aGroupName[i];
         if (rtl::isAsciiAlphanumeric(cChar) ||
             cChar == '_' || cChar == 0x20)
         {
@@ -44,8 +45,8 @@ static OUString lcl_CheckGroupName( const OUString& rGroupName )
     return sRet.makeStringAndClear();
 }
 
-SwVbaTemplate::SwVbaTemplate( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const OUString& rFullUrl )
-    : SwVbaTemplate_BASE( rParent, rContext ), msFullUrl( rFullUrl )
+SwVbaTemplate::SwVbaTemplate( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, OUString aFullUrl )
+    : SwVbaTemplate_BASE( rParent, rContext ), msFullUrl(std::move( aFullUrl ))
 {
 }
 
@@ -106,7 +107,7 @@ SwVbaTemplate::AutoTextEntries( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaAutoTextEntries( this, mxContext, xGroup ) );
     if( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 OUString

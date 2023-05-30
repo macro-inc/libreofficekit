@@ -35,7 +35,6 @@
 #include <vcl/unohelp2.hxx>
 #include <vcl/help.hxx>
 #include <vcl/settings.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <strings.hxx>
 #include <sal/log.hxx>
@@ -67,7 +66,7 @@ VCLXAccessibleToolBoxItem::VCLXAccessibleToolBoxItem( ToolBox* _pToolBox, sal_In
     m_bIndeterminate( false )
 
 {
-    OSL_ENSURE( m_pToolBox, "invalid toolbox" );
+    assert( m_pToolBox );
     m_nItemId = m_pToolBox->GetItemId( m_nIndexInParent );
     m_sOldName = GetText();
     m_bIsChecked = m_pToolBox->IsItemChecked( m_nItemId );
@@ -313,14 +312,14 @@ Reference< XAccessibleContext > SAL_CALL VCLXAccessibleToolBoxItem::getAccessibl
 
 // XAccessibleContext
 
-sal_Int32 SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleChildCount(  )
+sal_Int64 SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleChildCount(  )
 {
     OContextEntryGuard aGuard( this );
 
     return m_xChild.is() ? 1 : 0;
 }
 
-Reference< XAccessible > SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleChild( sal_Int64 i )
 {
     OContextEntryGuard aGuard( this );
 
@@ -338,7 +337,7 @@ Reference< XAccessible > SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleParent
     return m_pToolBox->GetAccessible();
 }
 
-sal_Int32 SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleIndexInParent(  )
+sal_Int64 SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleIndexInParent(  )
 {
     OContextEntryGuard aGuard( this );
 
@@ -384,35 +383,35 @@ Reference< XAccessibleRelationSet > SAL_CALL VCLXAccessibleToolBoxItem::getAcces
     return new utl::AccessibleRelationSetHelper;
 }
 
-Reference< XAccessibleStateSet > SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleStateSet(  )
+sal_Int64 SAL_CALL VCLXAccessibleToolBoxItem::getAccessibleStateSet(  )
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if ( m_pToolBox && !rBHelper.bDisposed && !rBHelper.bInDispose )
     {
-        pStateSetHelper->AddState( AccessibleStateType::FOCUSABLE );
+        nStateSet |= AccessibleStateType::FOCUSABLE;
         if ( m_bIsChecked && m_nRole != AccessibleRole::PANEL )
-            pStateSetHelper->AddState( AccessibleStateType::CHECKED );
+            nStateSet |= AccessibleStateType::CHECKED;
         if ( m_bIndeterminate )
-            pStateSetHelper->AddState( AccessibleStateType::INDETERMINATE );
+            nStateSet |= AccessibleStateType::INDETERMINATE;
         if ( m_pToolBox->IsEnabled() && m_pToolBox->IsItemEnabled( m_nItemId ) )
         {
-            pStateSetHelper->AddState( AccessibleStateType::ENABLED );
-            pStateSetHelper->AddState( AccessibleStateType::SENSITIVE );
+            nStateSet |= AccessibleStateType::ENABLED;
+            nStateSet |= AccessibleStateType::SENSITIVE;
         }
         if ( m_pToolBox->IsItemVisible( m_nItemId ) )
-            pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
+            nStateSet |= AccessibleStateType::VISIBLE;
         if ( m_pToolBox->IsItemReallyVisible( m_nItemId ) )
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
         if ( m_bHasFocus )
-            pStateSetHelper->AddState( AccessibleStateType::FOCUSED );
+            nStateSet |= AccessibleStateType::FOCUSED;
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 // XAccessibleText

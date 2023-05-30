@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-09-10 12:25+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2023-02-28 22:08+0000\n"
 "Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
-"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/tr/>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-7-5/scaddinsmessages/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1507247784.000000\n"
 
 #. i8Y7Z
@@ -240,11 +240,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Tatil günleri tarih değerleri listesi (izinler, tatiller, bayramlar vb...)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Çift sayı için 'true' döndürür"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr "Tamsayıya bölünen sayı çift ise 'true' değerini döndürür"
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -258,11 +258,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "Sayı"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Eğer sayı tek ise 'true' değeri döner"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr "Tamsayıya bölünen sayı tek ise 'true' değerini döndürür"
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -426,11 +426,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "Pi ile çarpılacak sayı"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Belirtilen sayılar arasından rasgele bir tamsayı döner"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr "Belirtilen Alt ve Üst değerler arasında rastgele bir tamsayı döndürür (her ikisi de dahil)"
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -438,11 +438,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Alt"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Dönen en küçük tamsayı"
+msgid "The smallest integer that can be returned"
+msgstr "Döndürülebilecek en küçük tamsayı"
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -450,11 +450,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Üst"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "En büyük tamsayı verildi"
+msgid "The largest integer that can be returned"
+msgstr "Döndürülebilecek en büyük tamsayı"
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156
@@ -4727,7 +4727,7 @@ msgstr "En üst sınır (üst sınır olmaması için 0 olarak atayın)"
 #: scaddins/inc/pricing.hrc:104
 msgctxt "PRICING_FUNCDESC_OptProbInMoney"
 msgid "Probability that an asset will at maturity end up between two barrier levels, assuming it follows dS/S = mu dt + vol dW (if the last two optional parameters (Strike, PutCall) are specified, the probability of S_T in [Strike, UpperBarrier] for a Call and S_T in [LowerBarrier, Strike] for a Put will be returned)"
-msgstr "Bir varlığın vade sonunda  dS/S = mu dt + vol dW (son iki isteğe bağlı parametre (Kullanım, SatAl) tanımlanmışsa, bir Al için [Kullanım, ÜstSınır] ifadesinde S_T ve bir Sat için [AltSınır, Kullanım] ifadesinde S_T dödürme olasılığı) şeklinde ilerlediği kabul edilerek iki sınır seviyesi arasında kalma olasılığı"
+msgstr "Bir varlığın vade sonunda dS/S = mu dt + vol dW (son iki isteğe bağlı parametre (Kullanım, SatAl) tanımlanmışsa, bir Al için [Kullanım, ÜstSınır] ifadesinde S_T ve bir Sat için [AltSınır, Kullanım] ifadesinde S_T dödürme olasılığı) şeklinde ilerlediği kabul edilerek iki sınır seviyesi arasında kalma olasılığı"
 
 #. jFDzR
 #: scaddins/inc/pricing.hrc:105

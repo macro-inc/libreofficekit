@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -69,7 +71,7 @@ class findReplace(UITestCase):
                 with self.ui_test.execute_blocking_action(format.executeAction, args=('CLICK', ())) as dialog:
                     xTabs = dialog.getChild("tabcontrol")
                     select_pos(xTabs, "0")
-                    xSizeFont = dialog.getChild("westsizelb-cjk")
+                    xSizeFont = dialog.getChild("cbWestSize")
                     xSizeFont.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
                     xSizeFont.executeAction("TYPE", mkPropertyValues({"TEXT":"16"}))    #set font size 16
 
@@ -98,20 +100,27 @@ class findReplace(UITestCase):
                 searchterm.executeAction("TYPE", mkPropertyValues({"TEXT":"T(est|other)\\>"}))   #find
                 replaceterm = xDialog.getChild("replaceterm")
                 replaceterm.executeAction("TYPE", mkPropertyValues({"TEXT":"replaced$1"})) #replace
+
+                # Deselect similarity before selecting regex
+                xSimilarity = xDialog.getChild("similarity")
+                if get_state_as_dict(xSimilarity)['Selected'] == 'true':
+                    xSimilarity.executeAction("CLICK", tuple())
+
                 regexp = xDialog.getChild("regexp")
-                regexp.executeAction("CLICK", tuple())   #regular expressions
+                regexp.executeAction("CLICK", tuple())
+                self.assertEqual("true", get_state_as_dict(regexp)['Selected'])
                 replaceall = xDialog.getChild("replaceall")
                 replaceall.executeAction("CLICK", tuple())
                 #verify
                 self.assertEqual(document.Text.String[0:27], "replacedest number1 testnot")
+
+                # Deselect regex button, otherwise it might affect other tests
                 regexp.executeAction("CLICK", tuple())
-
-
+                self.assertEqual("false", get_state_as_dict(regexp)['Selected'])
 
         #tdf116242  ţ ț
     def test_tdf116242_replace_t_with_cedilla(self):
         with self.ui_test.load_file(get_url_for_data_file("tdf116242.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
 
             with self.ui_test.execute_modeless_dialog_through_command(".uno:SearchDialog", close_button="close") as xDialog:
                 searchterm = xDialog.getChild("searchterm")
@@ -129,7 +138,7 @@ class findReplace(UITestCase):
 
         #Bug 98417 - FIND & REPLACE: Add 'Find Previous' button
     def test_tdf98417_find_previous_writer(self):
-        with self.ui_test.load_file(get_url_for_data_file("findReplace.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("findReplace.odt")):
             xWriterDoc = self.xUITest.getTopFocusWindow()
             xWriterEdit = xWriterDoc.getChild("writer_edit")
             with self.ui_test.execute_modeless_dialog_through_command(".uno:SearchDialog", close_button="close") as xDialog:

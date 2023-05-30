@@ -120,6 +120,33 @@ void ClrScheme::ToAny(css::uno::Any& rVal) const
     rVal <<= comphelper::containerToSequence(aRet);
 }
 
+void ClrScheme::fill(model::ColorSet& rColorSet) const
+{
+    for (const auto& [nToken, rColor] : maClrScheme)
+    {
+        switch (nToken)
+        {
+            case XML_tx1:
+            case XML_dk1: rColorSet.add(model::ThemeColorType::Dark1, rColor); break;
+            case XML_bg1:
+            case XML_lt1: rColorSet.add(model::ThemeColorType::Light1, rColor); break;
+            case XML_tx2:
+            case XML_dk2: rColorSet.add(model::ThemeColorType::Dark2, rColor); break;
+            case XML_bg2:
+            case XML_lt2: rColorSet.add(model::ThemeColorType::Light2, rColor); break;
+            case XML_accent1: rColorSet.add(model::ThemeColorType::Accent1, rColor); break;
+            case XML_accent2: rColorSet.add(model::ThemeColorType::Accent2, rColor); break;
+            case XML_accent3: rColorSet.add(model::ThemeColorType::Accent3, rColor); break;
+            case XML_accent4: rColorSet.add(model::ThemeColorType::Accent4, rColor); break;
+            case XML_accent5: rColorSet.add(model::ThemeColorType::Accent5, rColor); break;
+            case XML_accent6: rColorSet.add(model::ThemeColorType::Accent6, rColor); break;
+            case XML_hlink: rColorSet.add(model::ThemeColorType::Hyperlink, rColor); break;
+            case XML_folHlink: rColorSet.add(model::ThemeColorType::FollowedHyperlink, rColor); break;
+            default: break;
+        }
+    }
+}
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

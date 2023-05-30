@@ -12,6 +12,7 @@ $(eval $(call gb_CppunitTest_CppunitTest,sc_uicalc))
 $(eval $(call gb_CppunitTest_use_externals,sc_uicalc, \
 	boost_headers \
 	mdds_headers \
+	libxml2 \
 ))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,sc_uicalc, \
@@ -25,7 +26,9 @@ $(eval $(call gb_CppunitTest_use_libraries,sc_uicalc, \
     i18nlangtag \
     sal \
     sc \
+    scqahelper \
     sfx \
+    subsequenttest \
     svl \
     svl \
     svx \
@@ -51,5 +54,9 @@ $(eval $(call gb_CppunitTest_use_vcl,sc_uicalc))
 $(eval $(call gb_CppunitTest_use_rdb,sc_uicalc,services))
 
 $(eval $(call gb_CppunitTest_use_configuration,sc_uicalc))
+
+$(eval $(call gb_CppunitTest_add_arguments,sc_uicalc, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

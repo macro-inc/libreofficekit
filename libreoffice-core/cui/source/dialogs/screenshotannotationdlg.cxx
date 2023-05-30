@@ -35,7 +35,7 @@
 #include <vcl/bitmapex.hxx>
 #include <vcl/customweld.hxx>
 #include <vcl/event.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/salgtype.hxx>
 #include <vcl/virdev.hxx>
@@ -202,7 +202,7 @@ ScreenshotAnnotationDlg_Impl::ScreenshotAnnotationDlg_Impl(
     mxVirtualBufferDevice(nullptr),
     mpHilighted(nullptr),
     maPicture(this),
-    maSaveAsText(CuiResId(RID_SVXSTR_SAVE_SCREENSHOT_AS))
+    maSaveAsText(CuiResId(RID_CUISTR_SAVE_SCREENSHOT_AS))
 {
     VclPtr<VirtualDevice> xParentDialogSurface(rParentDialog.screenshot());
     maParentDialogSize = xParentDialogSurface->GetOutputSizePixel();
@@ -341,8 +341,8 @@ IMPL_LINK_NOARG(ScreenshotAnnotationDlg_Impl, saveButtonHandler, weld::Button&, 
         mxVirtualBufferDevice->GetOutputSizePixel()));
 
     // write as PNG
-    vcl::PNGWriter aPNGWriter(aTargetBitmap);
-    aPNGWriter.Write(aNew);
+    vcl::PngImageWriter aPNGWriter(aNew);
+    aPNGWriter.write(aTargetBitmap);
 }
 
 weld::ScreenShotEntry* ScreenshotAnnotationDlg_Impl::CheckHit(const basegfx::B2IPoint& rPosition)

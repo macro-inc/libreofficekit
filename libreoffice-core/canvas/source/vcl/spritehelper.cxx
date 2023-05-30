@@ -26,18 +26,14 @@
 #include <basegfx/range/b2drectangle.hxx>
 #include <basegfx/utils/canvastools.hxx>
 #include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/alpha.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/canvastools.hxx>
 #include <vcl/outdev.hxx>
-#include <vcl/BitmapMonochromeFilter.hxx>
-#include <vcl/skia/SkiaHelper.hxx>
 
 #include <canvas/canvastools.hxx>
-#include <config_features.h>
 
-#include "impltools.hxx"
 #include "spritehelper.hxx"
 
 using namespace ::com::sun::star;

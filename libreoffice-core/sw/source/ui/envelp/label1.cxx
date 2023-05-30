@@ -68,20 +68,17 @@ void SwLabDlg::ReplaceGroup_( const OUString &rMake )
 {
     // Remove old entries
     m_pRecs->erase(m_pRecs->begin() + 1, m_pRecs->end());
-    aLabelsCfg.FillLabels(rMake, *m_pRecs);
-    aLstGroup = rMake;
+    m_aLabelsCfg.FillLabels(rMake, *m_pRecs);
+    m_aLstGroup = rMake;
 }
 
 void SwLabDlg::PageCreated(const OString &rId, SfxTabPage &rPage)
 {
     if (rId == "labels")
     {
-        if (m_bLabel)
-        {
-            static_cast<SwLabPage*>(&rPage)->SetDBManager(pDBManager);
-            static_cast<SwLabPage*>(&rPage)->InitDatabaseBox();
-        }
-        else
+        static_cast<SwLabPage*>(&rPage)->SetDBManager(m_pDBManager);
+        static_cast<SwLabPage*>(&rPage)->InitDatabaseBox();
+        if (!m_bLabel)
             static_cast<SwLabPage*>(&rPage)->SetToBusinessCard();
     }
     else if (rId == "options")
@@ -91,9 +88,9 @@ void SwLabDlg::PageCreated(const OString &rId, SfxTabPage &rPage)
 SwLabDlg::SwLabDlg(weld::Window* pParent, const SfxItemSet& rSet,
                                 SwDBManager* pDBManager_, bool bLabel)
     : SfxTabDialogController(pParent, "modules/swriter/ui/labeldialog.ui", "LabelDialog", &rSet)
-    , pDBManager(pDBManager_)
+    , m_pDBManager(pDBManager_)
     , m_pPrtPage(nullptr)
-    , aTypeIds(50, 10)
+    , m_aTypeIds(50, 10)
     , m_pRecs(new SwLabRecs)
     , m_bLabel(bLabel)
 {
@@ -121,35 +118,32 @@ SwLabDlg::SwLabDlg(weld::Window* pParent, const SfxItemSet& rSet,
         m_pRecs->insert( m_pRecs->begin(), std::move(pRec));
 
     size_t nLstGroup = 0;
-    const std::vector<OUString>& rMan = aLabelsCfg.GetManufacturers();
+    const std::vector<OUString>& rMan = m_aLabelsCfg.GetManufacturers();
     for(size_t nMan = 0; nMan < rMan.size(); ++nMan)
     {
-        aMakes.push_back(rMan[nMan]);
+        m_aMakes.push_back(rMan[nMan]);
         if ( rMan[nMan] == aItem.m_aLstMake )
             nLstGroup = nMan;
     }
 
-    if ( !aMakes.empty() )
-        ReplaceGroup_( aMakes[nLstGroup] );
+    if ( !m_aMakes.empty() )
+        ReplaceGroup_( m_aMakes[nLstGroup] );
 
     if (m_xExampleSet)
         m_xExampleSet->Put(aItem);
 
     AddTabPage("format", SwLabFormatPage::Create, nullptr);
     AddTabPage("options", SwLabPrtPage::Create, nullptr);
+    AddTabPage("labels", SwLabPage::Create, nullptr);
     m_sBusinessCardDlg = SwResId(STR_BUSINESS_CARDS);
 
     if (m_bLabel)
     {
         RemoveTabPage("business");
         RemoveTabPage("private");
-        RemoveTabPage("medium");
-        AddTabPage("labels", SwLabPage::Create, nullptr);
     }
     else
     {
-        RemoveTabPage("labels");
-        AddTabPage("medium", SwLabPage::Create, nullptr);
         AddTabPage("business", SwBusinessDataPage::Create, nullptr );
         AddTabPage("private", SwPrivateDataPage::Create, nullptr);
         m_xDialog->set_title(m_sBusinessCardDlg);
@@ -215,8 +209,8 @@ Printer *SwLabDlg::GetPrt()
 
 SwLabPage::SwLabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rSet)
     : SfxTabPage(pPage, pController, "modules/swriter/ui/cardmediumpage.ui", "CardMediumPage", &rSet)
-    , pDBManager(nullptr)
-    , aItem(static_cast<const SwLabItem&>(rSet.Get(FN_LABEL)))
+    , m_pDBManager(nullptr)
+    , m_aItem(static_cast<const SwLabItem&>(rSet.Get(FN_LABEL)))
     , m_xAddressFrame(m_xBuilder->weld_widget("addressframe"))
     , m_xAddrBox(m_xBuilder->weld_check_button("address"))
     , m_xWritingEdit(m_xBuilder->weld_text_view("textview"))
@@ -275,7 +269,6 @@ void SwLabPage::SetToBusinessCard()
     m_xSheetButton->set_help_id(HID_BUSINESS_FMT_PAGE_SHEET);
     m_xMakeBox->set_help_id(HID_BUSINESS_FMT_PAGE_BRAND);
     m_xTypeBox->set_help_id(HID_BUSINESS_FMT_PAGE_TYPE);
-    m_xAddressFrame->hide();
 };
 
 IMPL_LINK_NOARG(SwLabPage, AddrHdl, weld::Toggleable&, void)
@@ -291,15 +284,15 @@ IMPL_LINK_NOARG(SwLabPage, AddrHdl, weld::Toggleable&, void)
 
 IMPL_LINK( SwLabPage, DatabaseHdl, weld::ComboBox&, rListBox, void )
 {
-    sActDBName = m_xDatabaseLB->get_active_text();
+    m_sActDBName = m_xDatabaseLB->get_active_text();
 
     weld::WaitObject aObj(GetParentSwLabDlg()->getDialog());
 
     if (&rListBox == m_xDatabaseLB.get())
-        GetDBManager()->GetTableNames(*m_xTableLB, sActDBName);
+        GetDBManager()->GetTableNames(*m_xTableLB, m_sActDBName);
 
     if (&rListBox == m_xDatabaseLB.get() || &rListBox == m_xTableLB.get())
-        GetDBManager()->GetColumnNames(*m_xDBFieldLB, sActDBName, m_xTableLB->get_active_text());
+        GetDBManager()->GetColumnNames(*m_xDBFieldLB, m_sActDBName, m_xTableLB->get_active_text());
 
     if (!m_xDatabaseLB->get_active_text().isEmpty() && !m_xTableLB->get_active_text().isEmpty()
             && !m_xDBFieldLB->get_active_text().isEmpty())
@@ -336,7 +329,7 @@ IMPL_LINK_NOARG(SwLabPage, MakeHdl, weld::ComboBox&, void)
 
     const OUString aMake = m_xMakeBox->get_active_text();
     GetParentSwLabDlg()->ReplaceGroup( aMake );
-    aItem.m_aLstMake = aMake;
+    m_aItem.m_aLstMake = aMake;
 
     const bool   bCont    = m_xContButton->get_active();
     const size_t nCount   = GetParentSwLabDlg()->Recs().size();
@@ -364,7 +357,7 @@ IMPL_LINK_NOARG(SwLabPage, MakeHdl, weld::ComboBox&, void)
         if(bInsert)
         {
             GetParentSwLabDlg()->TypeIds().push_back(i);
-            if ( !nLstType && aType == aItem.m_aLstType )
+            if ( !nLstType && aType == m_aItem.m_aLstType )
                 nLstType = GetParentSwLabDlg()->TypeIds().size();
         }
     }
@@ -373,7 +366,7 @@ IMPL_LINK_NOARG(SwLabPage, MakeHdl, weld::ComboBox&, void)
         m_xTypeBox->append_text(m_xHiddenSortTypeBox->get_text(nEntry));
     }
     if (nLstType)
-        m_xTypeBox->set_active_text(aItem.m_aLstType);
+        m_xTypeBox->set_active_text(m_aItem.m_aLstType);
     else
         m_xTypeBox->set_active(0);
     TypeHdl(*m_xTypeBox);
@@ -382,7 +375,7 @@ IMPL_LINK_NOARG(SwLabPage, MakeHdl, weld::ComboBox&, void)
 IMPL_LINK_NOARG(SwLabPage, TypeHdl, weld::ComboBox&, void)
 {
     DisplayFormat();
-    aItem.m_aType = m_xTypeBox->get_active_text();
+    m_aItem.m_aType = m_xTypeBox->get_active_text();
 }
 
 void SwLabPage::DisplayFormat()
@@ -395,7 +388,7 @@ void SwLabPage::DisplayFormat()
     xField->set_range(0, INT_MAX - 1, FieldUnit::NONE);
 
     SwLabRec* pRec = GetSelectedEntryPos();
-    aItem.m_aLstType = pRec->m_aType;
+    m_aItem.m_aLstType = pRec->m_aType;
     setfldval(*xField, pRec->m_nWidth);
     xField->reformat();
     const OUString aWString = xField->get_text();
@@ -427,13 +420,13 @@ void SwLabPage::InitDatabaseBox()
     for (const OUString& rDataName : aDataNames)
         m_xDatabaseLB->append_text(rDataName);
     sal_Int32 nIdx{ 0 };
-    OUString sDBName = sActDBName.getToken( 0, DB_DELIM, nIdx );
-    OUString sTableName = sActDBName.getToken( 0, DB_DELIM, nIdx );
+    OUString sDBName = m_sActDBName.getToken( 0, DB_DELIM, nIdx );
+    OUString sTableName = m_sActDBName.getToken( 0, DB_DELIM, nIdx );
     m_xDatabaseLB->set_active_text(sDBName);
     if( !sDBName.isEmpty() && GetDBManager()->GetTableNames(*m_xTableLB, sDBName))
     {
         m_xTableLB->set_active_text(sTableName);
-        GetDBManager()->GetColumnNames(*m_xDBFieldLB, sActDBName, sTableName);
+        GetDBManager()->GetColumnNames(*m_xDBFieldLB, m_sActDBName, sTableName);
     }
     else
         m_xDBFieldLB->clear();
@@ -464,7 +457,7 @@ void SwLabPage::FillItem(SwLabItem& rItem)
     rItem.m_bCont    = m_xContButton->get_active();
     rItem.m_aMake    = m_xMakeBox->get_active_text();
     rItem.m_aType    = m_xTypeBox->get_active_text();
-    rItem.m_sDBName  = sActDBName;
+    rItem.m_sDBName  = m_sActDBName;
 
     SwLabRec* pRec = GetSelectedEntryPos();
     pRec->FillItem( rItem );
@@ -475,8 +468,8 @@ void SwLabPage::FillItem(SwLabItem& rItem)
 
 bool SwLabPage::FillItemSet(SfxItemSet* rSet)
 {
-    FillItem( aItem );
-    rSet->Put( aItem );
+    FillItem( m_aItem );
+    rSet->Put( m_aItem );
 
     return true;
 }
@@ -493,19 +486,19 @@ void SwLabPage::Reset(const SfxItemSet* rSet)
         OUString& rStr = GetParentSwLabDlg()->Makes()[i];
         m_xMakeBox->append_text(rStr);
 
-        if ( rStr == aItem.m_aLstMake)
+        if ( rStr == m_aItem.m_aLstMake)
             nLstGroup = i;
     }
 
     m_xMakeBox->set_active( nLstGroup );
     MakeHdl(*m_xMakeBox);
 
-    aItem = static_cast<const SwLabItem&>( rSet->Get(FN_LABEL));
-    OUString sDBName  = aItem.m_sDBName;
+    m_aItem = static_cast<const SwLabItem&>( rSet->Get(FN_LABEL));
+    OUString sDBName  = m_aItem.m_sDBName;
 
-    OUString aWriting(convertLineEnd(aItem.m_aWriting, GetSystemLineEnd()));
+    OUString aWriting(convertLineEnd(m_aItem.m_aWriting, GetSystemLineEnd()));
 
-    m_xAddrBox->set_active( aItem.m_bAddr );
+    m_xAddrBox->set_active( m_aItem.m_bAddr );
     m_xWritingEdit->set_text( aWriting );
 
     for(const auto& rMake : GetParentSwLabDlg()->Makes())
@@ -514,17 +507,17 @@ void SwLabPage::Reset(const SfxItemSet* rSet)
             m_xMakeBox->append_text(rMake);
     }
 
-    m_xMakeBox->set_active_text(aItem.m_aMake);
+    m_xMakeBox->set_active_text(m_aItem.m_aMake);
     //save the current type
-    OUString sType(aItem.m_aType);
+    OUString sType(m_aItem.m_aType);
     MakeHdl(*m_xMakeBox);
-    aItem.m_aType = sType;
+    m_aItem.m_aType = sType;
     //#102806# a newly added make may not be in the type ListBox already
-    if (m_xTypeBox->find_text(aItem.m_aType) == -1 && !aItem.m_aMake.isEmpty())
-        GetParentSwLabDlg()->UpdateGroup( aItem.m_aMake );
-    if (m_xTypeBox->find_text(aItem.m_aType) != -1)
+    if (m_xTypeBox->find_text(m_aItem.m_aType) == -1 && !m_aItem.m_aMake.isEmpty())
+        GetParentSwLabDlg()->UpdateGroup( m_aItem.m_aMake );
+    if (m_xTypeBox->find_text(m_aItem.m_aType) != -1)
     {
-        m_xTypeBox->set_active_text(aItem.m_aType);
+        m_xTypeBox->set_active_text(m_aItem.m_aType);
         TypeHdl(*m_xTypeBox);
     }
     if (m_xDatabaseLB->find_text(sDBName) != -1)
@@ -533,7 +526,7 @@ void SwLabPage::Reset(const SfxItemSet* rSet)
         DatabaseHdl(*m_xDatabaseLB);
     }
 
-    if (aItem.m_bCont)
+    if (m_aItem.m_bCont)
         m_xContButton->set_active(true);
     else
         m_xSheetButton->set_active(true);

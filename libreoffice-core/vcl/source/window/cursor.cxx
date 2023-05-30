@@ -43,6 +43,12 @@ struct ImplCursorData
     VclPtr<vcl::Window> mpWindow;           // assigned window
 };
 
+namespace
+{
+const char* pDisableCursorIndicator(getenv("SAL_DISABLE_CURSOR_INDICATOR"));
+bool bDisableCursorIndicator(nullptr != pDisableCursorIndicator);
+}
+
 static tools::Rectangle ImplCursorInvert(vcl::RenderContext* pRenderContext, ImplCursorData const * pData)
 {
     tools::Rectangle aPaintRect;
@@ -65,19 +71,22 @@ static tools::Rectangle ImplCursorInvert(vcl::RenderContext* pRenderContext, Imp
             aPoly[2].AdjustX(1 );
 
             // apply direction flag after slant to use the correct shape
-            if ( pData->mnDirection != CursorDirection::NONE)
+            if (!bDisableCursorIndicator && pData->mnDirection != CursorDirection::NONE)
             {
                 Point pAry[7];
-                int delta = 3*aRect.getWidth()+1;
+                // Related system settings for "delta" could be:
+                // gtk cursor-aspect-ratio and  windows SPI_GETCARETWIDTH
+                int delta = (aRect.getOpenHeight() * 4 / 100) + 1;
                 if( pData->mnDirection == CursorDirection::LTR )
                 {
                     // left-to-right
                     pAry[0] = aPoly.GetPoint( 0 );
                     pAry[1] = aPoly.GetPoint( 1 );
                     pAry[2] = pAry[1];
-                    pAry[2].AdjustX(delta );
+                    pAry[2].AdjustX(delta);
+                    pAry[2].AdjustY(delta);
                     pAry[3] =  pAry[1];
-                    pAry[3].AdjustY(delta );
+                    pAry[3].AdjustY(delta * 2);
                     pAry[4] = aPoly.GetPoint( 2 );
                     pAry[5] = aPoly.GetPoint( 3 );
                     pAry[6] = aPoly.GetPoint( 4 );
@@ -90,9 +99,10 @@ static tools::Rectangle ImplCursorInvert(vcl::RenderContext* pRenderContext, Imp
                     pAry[2] = aPoly.GetPoint( 2 );
                     pAry[3] = aPoly.GetPoint( 3 );
                     pAry[4] = pAry[0];
-                    pAry[4].AdjustY(delta );
+                    pAry[4].AdjustY(delta*2);
                     pAry[5] =  pAry[0];
-                    pAry[5].AdjustX( -delta );
+                    pAry[5].AdjustX(-delta);
+                    pAry[5].AdjustY(delta);
                     pAry[6] = aPoly.GetPoint( 4 );
                 }
                 aPoly = tools::Polygon( 7, pAry);

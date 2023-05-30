@@ -19,9 +19,13 @@
 
 #pragma once
 
+#include <com/sun/star/awt/ColorStop.hpp>
 #include <com/sun/star/io/XOutputStream.hpp>
 #include <xmloff/xmlstyle.hxx>
 #include <rtl/ustring.hxx>
+#include <sal/types.h>
+
+#include <vector>
 
 // draw:gradient context
 
@@ -30,12 +34,17 @@ class XMLGradientStyleContext: public SvXMLStyleContext
 private:
     css::uno::Any          maAny;
     OUString               maStrName;
+    std::vector<css::awt::ColorStop> maColorStopVec;
 
 public:
 
     XMLGradientStyleContext( SvXMLImport& rImport, sal_Int32 nElement,
                            const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList );
     virtual ~XMLGradientStyleContext() override;
+
+    virtual css::uno::Reference<css::xml::sax::XFastContextHandler> SAL_CALL createFastChildContext(
+        sal_Int32 nElement,
+        const css::uno::Reference<css::xml::sax::XFastAttributeList>& AttrList) override;
 
     virtual void SAL_CALL endFastElement(sal_Int32 nElement) override;
 
@@ -91,6 +100,7 @@ class XMLTransGradientStyleContext: public SvXMLStyleContext
 private:
     css::uno::Any          maAny;
     OUString               maStrName;
+    std::vector<css::awt::ColorStop> maColorStopVec; // Transparency is handled as color gray.
 
 public:
 
@@ -98,9 +108,25 @@ public:
                            const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList );
     virtual ~XMLTransGradientStyleContext() override;
 
+    virtual css::uno::Reference<css::xml::sax::XFastContextHandler> SAL_CALL createFastChildContext(
+        sal_Int32 nElement,
+        const css::uno::Reference<css::xml::sax::XFastAttributeList>& AttrList) override;
+
     virtual void SAL_CALL endFastElement(sal_Int32 nElement) override;
 
     virtual bool IsTransient() const override;
+};
+
+class XMLTransparencyStopContext: public SvXMLStyleContext
+{
+private:
+
+public:
+
+    XMLTransparencyStopContext(SvXMLImport& rImport, sal_Int32 nElement,
+                           const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList,
+                           std::vector<css::awt::ColorStop>& rColorStopVec);
+    virtual ~XMLTransparencyStopContext() override;
 };
 
 // draw:marker context

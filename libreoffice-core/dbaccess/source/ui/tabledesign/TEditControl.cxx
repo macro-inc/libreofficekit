@@ -36,6 +36,7 @@
 #include <connectivity/dbtools.hxx>
 #include <SqlNameEdit.hxx>
 #include <TableRowExchange.hxx>
+#include <o3tl/safeint.hxx>
 #include <sot/storage.hxx>
 #include <svx/svxids.hrc>
 #include <UITools.hxx>
@@ -477,7 +478,7 @@ void OTableEditorCtrl::CursorMoved()
     OTableRowView::CursorMoved();
 }
 
-sal_Int32 OTableEditorCtrl::HasFieldName( const OUString& rFieldName )
+sal_Int32 OTableEditorCtrl::HasFieldName( std::u16string_view rFieldName )
 {
 
     Reference<XConnection> xCon = GetView()->getController().getConnection();
@@ -970,7 +971,7 @@ void OTableEditorCtrl::SetCellData( sal_Int32 nRow, sal_uInt16 nColId, const css
 
         case FIELD_PROPERTY_BOOL_DEFAULT:
             sValue = GetView()->GetDescWin()->BoolStringPersistent(::comphelper::getString(_rNewData));
-            pFieldDescr->SetControlDefault(makeAny(sValue));
+            pFieldDescr->SetControlDefault(Any(sValue));
             break;
 
         case FIELD_PROPERTY_FORMAT:
@@ -1050,7 +1051,7 @@ Any OTableEditorCtrl::GetCellData( sal_Int32 nRow, sal_uInt16 nColId )
             break;
     }
 
-    return makeAny(sValue);
+    return Any(sValue);
 }
 
 OUString OTableEditorCtrl::GetCellText( sal_Int32 nRow, sal_uInt16 nColId ) const
@@ -1602,7 +1603,7 @@ void OTableEditorCtrl::SwitchType( const TOTypeInfoSP& _pType )
         // Store the old description
         pDescrWin->SaveData( pActFieldDescr );
 
-    if ( nRow < 0 || nRow > static_cast<tools::Long>(m_pRowList->size()) )
+    if ( nRow < 0 || o3tl::make_unsigned(nRow) > m_pRowList->size() )
         return;
     // Show the new description
     std::shared_ptr<OTableRow>  pRow = (*m_pRowList)[nRow];
@@ -1660,7 +1661,7 @@ void OTableEditorCtrl::DeactivateCell(bool bUpdate)
 
 bool OTableEditorCtrl::PreNotify( NotifyEvent& rNEvt )
 {
-    if (rNEvt.GetType() == MouseNotifyEvent::GETFOCUS)
+    if (rNEvt.GetType() == NotifyEventType::GETFOCUS)
     {
         if( pHelpTextCell && pHelpTextCell->HasChildPathFocus() )
             m_eChildFocus = HELPTEXT;

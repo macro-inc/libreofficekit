@@ -18,7 +18,6 @@
  */
 
 
-#include <vector>
 #include "sortresult.hxx"
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
@@ -26,11 +25,8 @@
 #include <com/sun/star/ucb/ListActionType.hpp>
 #include <com/sun/star/ucb/XAnyCompare.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <cppuhelper/interfacecontainer.hxx>
-#include <comphelper/interfacecontainer2.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <memory>
 
 using namespace com::sun::star::beans;
@@ -92,16 +88,6 @@ public:
     virtual Sequence< Property > SAL_CALL getProperties() override;
     virtual Property SAL_CALL getPropertyByName( const OUString& aName ) override;
     virtual sal_Bool SAL_CALL hasPropertyByName( const OUString& Name ) override;
-};
-
-typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
-    PropertyChangeListenerContainer_Impl;
-
-class PropertyChangeListeners_Impl : public PropertyChangeListenerContainer_Impl
-{
-public:
-    PropertyChangeListeners_Impl()
-    : PropertyChangeListenerContainer_Impl( getContainerMutex() ) {}
 };
 
 
@@ -199,7 +185,7 @@ void SAL_CALL SortedResultSet::addEventListener(
 
     if ( !mpDisposeEventListeners )
         mpDisposeEventListeners =
-                    new OInterfaceContainerHelper2( getContainerMutex() );
+                    new OInterfaceContainerHelper3<XEventListener>( getContainerMutex() );
 
     mpDisposeEventListeners->addInterface( Listener );
 }
@@ -819,7 +805,7 @@ void SAL_CALL SortedResultSet::addPropertyChangeListener(
 
     if ( !mpPropChangeListeners )
         mpPropChangeListeners.reset(
-                    new PropertyChangeListeners_Impl() );
+                    new comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertyChangeListener, OUString>(getContainerMutex()) );
 
     mpPropChangeListeners->addInterface( PropertyName, Listener );
 }
@@ -844,7 +830,7 @@ void SAL_CALL SortedResultSet::addVetoableChangeListener(
 
     if ( !mpVetoChangeListeners )
         mpVetoChangeListeners.reset(
-                    new PropertyChangeListeners_Impl() );
+                    new comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XVetoableChangeListener, OUString>(getContainerMutex()) );
 
     mpVetoChangeListeners->addInterface( PropertyName, Listener );
 }
@@ -1194,27 +1180,15 @@ void SortedResultSet::PropertyChanged( const PropertyChangeEvent& rEvt )
         return;
 
     // Notify listeners interested especially in the changed property.
-    OInterfaceContainerHelper2* pPropsContainer =
+    OInterfaceContainerHelper3<XPropertyChangeListener>* pPropsContainer =
             mpPropChangeListeners->getContainer( rEvt.PropertyName );
     if ( pPropsContainer )
-    {
-        OInterfaceIteratorHelper2 aIter( *pPropsContainer );
-        while ( aIter.hasMoreElements() )
-        {
-            static_cast< XPropertyChangeListener* >( aIter.next() )->propertyChange( rEvt );
-        }
-    }
+        pPropsContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvt );
 
     // Notify listeners interested in all properties.
     pPropsContainer = mpPropChangeListeners->getContainer( OUString() );
     if ( pPropsContainer )
-    {
-        OInterfaceIteratorHelper2 aIter( *pPropsContainer );
-        while ( aIter.hasMoreElements() )
-        {
-            static_cast< XPropertyChangeListener* >( aIter.next() )->propertyChange( rEvt );
-        }
-    }
+        pPropsContainer->notifyEach( &XPropertyChangeListener::propertyChange, rEvt );
 }
 
 

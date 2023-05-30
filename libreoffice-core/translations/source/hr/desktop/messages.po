@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-04 16:15+0000\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-10-22 12:19+0000\n"
 "Last-Translator: Milo Ivir <mail@milotype.de>\n"
 "Language-Team: Croatian <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/hr/>\n"
 "Language: hr\n"
@@ -919,11 +919,11 @@ msgctxt "extensionmanager|label1"
 msgid "Display Extensions"
 msgstr "Prikaži dodatke"
 
-#. yTB9y
+#. WREKY
 #: desktop/uiconfig/ui/extensionmanager.ui:162
 msgctxt "extensionmanager|search"
-msgid "Search ..."
-msgstr ""
+msgid "Search..."
+msgstr "Traži..."
 
 #. BAVdg
 #: desktop/uiconfig/ui/extensionmanager.ui:191
@@ -1007,7 +1007,7 @@ msgstr "Zbirku dodataka možeš pronaći na webu."
 #: desktop/uiconfig/ui/extensionmanager.ui:399
 msgctxt "extensionmanager|extended_tip|ExtensionManagerDialog"
 msgid "The Extension Manager adds, removes, disables, enables, and updates extensions."
-msgstr ""
+msgstr "Upravljač dodataka dodaje, uklanja, isključuje, uključuje i aktualizira dodatke."
 
 #. EGwkP
 #: desktop/uiconfig/ui/installforalldialog.ui:12

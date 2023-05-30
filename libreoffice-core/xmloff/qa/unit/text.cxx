@@ -7,81 +7,61 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyValues.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/text/BibliographyDataType.hpp>
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
-#include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/drawing/XDrawPageSupplier.hpp>
+#include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
+#include <com/sun/star/text/XTextFramesSupplier.hpp>
 
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <unotools/tempfile.hxx>
-#include <unotools/ucbstreamhelper.hxx>
+#include <docmodel/uno/UnoTheme.hxx>
+#include <docmodel/theme/Theme.hxx>
 
 using namespace ::com::sun::star;
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/xmloff/qa/unit/data/";
-
 /// Covers xmloff/source/text/ fixes.
-class XmloffStyleTest : public test::BootstrapFixture,
-                        public unotest::MacrosTest,
-                        public XmlTestTools
+class XmloffStyleTest : public UnoApiXmlTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
+    XmloffStyleTest();
     void registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx) override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
 };
+
+XmloffStyleTest::XmloffStyleTest()
+    : UnoApiXmlTest("/xmloff/qa/unit/data/")
+{
+}
 
 void XmloffStyleTest::registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx)
 {
     XmlTestTools::registerODFNamespaces(pXmlXpathCtx);
 }
 
-void XmloffStyleTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void XmloffStyleTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testMailMergeInEditeng)
 {
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "mail-merge-editeng.odt";
-    getComponent() = loadFromDesktop(aURL);
     // Without the accompanying fix in place, this test would have failed, as unexpected
     // <text:database-display> in editeng text aborted the whole import process.
+    loadFromURL(u"mail-merge-editeng.odt");
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCommentResolved)
 {
-    getComponent() = loadFromDesktop("private:factory/swriter");
+    mxComponent = loadFromDesktop("private:factory/swriter");
     uno::Sequence<beans::PropertyValue> aCommentProps = comphelper::InitPropertySequence({
-        { "Text", uno::makeAny(OUString("comment")) },
+        { "Text", uno::Any(OUString("comment")) },
     });
-    dispatchCommand(getComponent(), ".uno:InsertAnnotation", aCommentProps);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    dispatchCommand(mxComponent, ".uno:InsertAnnotation", aCommentProps);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
@@ -90,19 +70,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCommentResolved)
     uno::Reference<beans::XPropertySet> xPortion(xPortionEnum->nextElement(), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xField(xPortion->getPropertyValue("TextField"),
                                                uno::UNO_QUERY);
-    xField->setPropertyValue("Resolved", uno::makeAny(true));
+    xField->setPropertyValue("Resolved", uno::Any(true));
 
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    getComponent()->dispose();
-
-    getComponent() = loadFromDesktop(aTempFile.GetURL());
-    xTextDocument.set(getComponent(), uno::UNO_QUERY);
+    saveAndReload("writer8");
+    xTextDocument.set(mxComponent, uno::UNO_QUERY);
     xParaEnumAccess.set(xTextDocument->getText(), uno::UNO_QUERY);
     xParaEnum = xParaEnumAccess->createEnumeration();
     xPara.set(xParaEnum->nextElement(), uno::UNO_QUERY);
@@ -119,8 +90,8 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCommentResolved)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testBibliographyLocalUrl)
 {
     // Given a document with a biblio field, with non-empty LocalURL:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xFactory(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xField(
         xFactory->createInstance("com.sun.star.text.TextField.Bibliography"), uno::UNO_QUERY);
     uno::Sequence<beans::PropertyValue> aFields = {
@@ -131,29 +102,20 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testBibliographyLocalUrl)
         comphelper::makePropertyValue("URL", OUString("http://www.example.com/test.pdf#page=1")),
         comphelper::makePropertyValue("LocalURL", OUString("file:///home/me/test.pdf")),
     };
-    xField->setPropertyValue("Fields", uno::makeAny(aFields));
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    xField->setPropertyValue("Fields", uno::Any(aFields));
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     uno::Reference<text::XTextContent> xContent(xField, uno::UNO_QUERY);
     xText->insertTextContent(xCursor, xContent, /*bAbsorb=*/false);
 
     // When invoking ODT export + import on it:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = {
-        comphelper::makePropertyValue("FilterName", OUString("writer8")),
-    };
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
+    saveAndReload("writer8");
     // Without the accompanying fix in place, this test would have resulted in an assertion failure,
     // as LocalURL was mapped to XML_TOKEN_INVALID.
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    getComponent()->dispose();
-    validate(aTempFile.GetFileName(), test::ODF);
-    getComponent() = loadFromDesktop(aTempFile.GetURL());
 
     // Then make sure that LocalURL is preserved:
-    xTextDocument.set(getComponent(), uno::UNO_QUERY);
+    xTextDocument.set(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParaEnum = xParaEnumAccess->createEnumeration();
@@ -169,22 +131,18 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testBibliographyLocalUrl)
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCommentTableBorder)
 {
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "comment-table-border.fodt";
     // Without the accompanying fix in place, this failed to load, as a comment that started in a
     // table and ended outside a table aborted the whole importer.
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"comment-table-border.fodt");
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testParaStyleListLevel)
 {
     // Given a document with style:list-level="...":
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "para-style-list-level.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"para-style-list-level.fodt");
 
     // Then make sure we map that to the paragraph style's numbering level:
-    uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(getComponent(),
+    uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(mxComponent,
                                                                          uno::UNO_QUERY);
     uno::Reference<container::XNameAccess> xStyleFamilies
         = xStyleFamiliesSupplier->getStyleFamilies();
@@ -196,25 +154,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testParaStyleListLevel)
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(1), nNumberingLevel);
 
     // Test the export as well:
-
-    // Given a doc model that has a para style with NumberingLevel=2:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-
-    // When exporting that to ODT:
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
+    save("writer8");
 
     // Then make sure we save the style's numbering level:
-    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess
-        = packages::zip::ZipFileAccess::createWithURL(mxComponentContext, aTempFile.GetURL());
-    uno::Reference<io::XInputStream> xInputStream(xNameAccess->getByName("styles.xml"),
-                                                  uno::UNO_QUERY);
-    std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
     // Without the accompanying fix in place, this failed with:
     // - XPath '/office:document-styles/office:styles/style:style[@style:name='mystyle']' no attribute 'list-level' exist
     // i.e. a custom NumberingLevel was lost on save.
@@ -225,13 +168,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testParaStyleListLevel)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContinueNumberingWord)
 {
     // Given a document, which is produced by Word and contains text:continue-numbering="true":
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "continue-numbering-word.odt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"continue-numbering-word.odt");
 
     // Then make sure that the numbering from the 1st para is continued on the 3rd para:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<container::XEnumerationAccess> xParaEnumAccess(xTextDocument->getText(),
                                                                   uno::UNO_QUERY);
@@ -247,35 +187,43 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContinueNumberingWord)
     CPPUNIT_ASSERT_EQUAL(OUString("2."), aActual);
 }
 
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testListId)
+{
+    // Given a document with a simple list (no continue-list="..." attribute):
+    loadFromURL(u"list-id.fodt");
+
+    // When storing that document as ODF:
+    save("writer8");
+
+    // Then make sure that unreferenced xml:id="..." attributes are not written:
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // Without the accompanying fix in place, this failed with:
+    // - XPath '//text:list' unexpected 'id' attribute
+    // i.e. xml:id="..." was written unconditionally, even when no other list needed it.
+    assertXPathNoAttribute(pXmlDoc, "//text:list", "id");
+}
+
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testClearingBreakExport)
 {
     // Given a document with a clearing break:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextContent> xLineBreak(
         xMSF->createInstance("com.sun.star.text.LineBreak"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xLineBreakProps(xLineBreak, uno::UNO_QUERY);
     // SwLineBreakClear::ALL;
     sal_Int16 eClear = 3;
-    xLineBreakProps->setPropertyValue("Clear", uno::makeAny(eClear));
+    xLineBreakProps->setPropertyValue("Clear", uno::Any(eClear));
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertTextContent(xCursor, xLineBreak, /*bAbsorb=*/false);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this failed with:
     // - XPath '//text:line-break' number of nodes is incorrect
     // i.e. the clearing break was lost on export.
@@ -285,13 +233,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testClearingBreakExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testClearingBreakImport)
 {
     // Given an ODF document with a clearing break:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "clearing-break.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"clearing-break.fodt");
 
     // Then make sure that the "clear" attribute is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -318,12 +263,78 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testClearingBreakImport)
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int16>(3), eClear);
 }
 
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testRelativeWidth)
+{
+    // Given a document with an 50% wide text frame:
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(mxComponent,
+                                                                         uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xStyleFamilies
+        = xStyleFamiliesSupplier->getStyleFamilies();
+    uno::Reference<container::XNameAccess> xStyleFamily(xStyleFamilies->getByName("PageStyles"),
+                                                        uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xStyle(xStyleFamily->getByName("Standard"), uno::UNO_QUERY);
+    // Body frame width is 6cm (2+2cm margin).
+    xStyle->setPropertyValue("Width", uno::Any(static_cast<sal_Int32>(10000)));
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextContent> xTextFrame(
+        xMSF->createInstance("com.sun.star.text.TextFrame"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xTextFrameProps(xTextFrame, uno::UNO_QUERY);
+    xTextFrameProps->setPropertyValue("RelativeWidth", uno::Any(static_cast<sal_Int16>(50)));
+    uno::Reference<text::XText> xText = xTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    xText->insertTextContent(xCursor, xTextFrame, /*bAbsorb=*/false);
+    // Body frame width is 16cm.
+    xStyle->setPropertyValue("Width", uno::Any(static_cast<sal_Int32>(20000)));
+
+    save("writer8");
+
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // Without the accompanying fix in place, this failed with:
+    // - Expected: 3.1492in (8cm)
+    // - Actual  : 0.0161in (0.04 cm)
+    // i.e. the fallback width value wasn't the expected half of the body frame width, but a smaller
+    // value.
+    assertXPath(pXmlDoc, "//draw:frame", "width", "3.1492in");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testScaleWidthAndHeight)
+{
+    // Given a broken document where both IsSyncHeightToWidth and IsSyncWidthToHeight are set to
+    // true:
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextContent> xTextFrame(
+        xMSF->createInstance("com.sun.star.text.TextFrame"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xTextFrameProps(xTextFrame, uno::UNO_QUERY);
+    xTextFrameProps->setPropertyValue("Width", uno::Any(static_cast<sal_Int16>(2000)));
+    xTextFrameProps->setPropertyValue("Height", uno::Any(static_cast<sal_Int16>(1000)));
+    xTextFrameProps->setPropertyValue("IsSyncHeightToWidth", uno::Any(true));
+    xTextFrameProps->setPropertyValue("IsSyncWidthToHeight", uno::Any(true));
+    uno::Reference<text::XText> xText = xTextDocument->getText();
+    uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
+    xText->insertTextContent(xCursor, xTextFrame, /*bAbsorb=*/false);
+
+    // When exporting to ODT:
+    save("writer8");
+
+    // Then make sure that we still export a non-zero size:
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // Without the accompanying fix in place, this failed with:
+    // - Expected: 0.7874in
+    // - Actual  : 0in
+    // i.e. the exported size was 0, not 2000 mm100 in inches.
+    assertXPath(pXmlDoc, "//draw:frame", "width", "0.7874in");
+}
+
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContentControlExport)
 {
     // Given a document with a content control around one or more text portions:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "test", /*bAbsorb=*/false);
@@ -332,22 +343,14 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContentControlExport)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::makeAny(true));
+    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::Any(true));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this failed with:
     // - XPath '//loext:content-control' number of nodes is incorrect
     // i.e. the content control was lost on export.
@@ -357,13 +360,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContentControlImport)
 {
     // Given an ODF document with a content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -391,9 +391,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCheckboxContentControlExport)
 {
     // Given a document with a checkbox content control around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, OUString(u"☐"), /*bAbsorb=*/false);
@@ -402,25 +402,17 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCheckboxContentControlExport)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("Checkbox", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("Checked", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("CheckedState", uno::makeAny(OUString(u"☒")));
-    xContentControlProps->setPropertyValue("UncheckedState", uno::makeAny(OUString(u"☐")));
+    xContentControlProps->setPropertyValue("Checkbox", uno::Any(true));
+    xContentControlProps->setPropertyValue("Checked", uno::Any(true));
+    xContentControlProps->setPropertyValue("CheckedState", uno::Any(OUString(u"☒")));
+    xContentControlProps->setPropertyValue("UncheckedState", uno::Any(OUString(u"☐")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     assertXPath(pXmlDoc, "//loext:content-control", "checkbox", "true");
     assertXPath(pXmlDoc, "//loext:content-control", "checked", "true");
     assertXPath(pXmlDoc, "//loext:content-control", "checked-state", u"☒");
@@ -430,13 +422,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCheckboxContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCheckboxContentControlImport)
 {
     // Given an ODF document with a checkbox content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-checkbox.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-checkbox.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -475,9 +464,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testCheckboxContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlExport)
 {
     // Given a document with a dropdown content control around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "choose an item", /*bAbsorb=*/false);
@@ -507,18 +496,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     assertXPath(pXmlDoc, "//loext:content-control", "dropdown", "true");
     // Without the accompanying fix in place, this failed with:
     // - Expected: 1
@@ -536,13 +517,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlImport)
 {
     // Given an ODF document with a dropdown content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-dropdown.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-dropdown.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -583,9 +561,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPictureContentControlExport)
 {
     // Given a document with a picture content control around an as-char image:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     uno::Reference<beans::XPropertySet> xTextGraphic(
@@ -603,18 +581,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPictureContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - XPath '//loext:content-control' no attribute 'picture' exist
     assertXPath(pXmlDoc, "//loext:content-control", "picture", "true");
@@ -623,13 +593,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPictureContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPictureContentControlImport)
 {
     // Given an ODF document with a picture content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-picture.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-picture.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -653,9 +620,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPictureContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDateContentControlExport)
 {
     // Given a document with a date content control around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "choose a date", /*bAbsorb=*/false);
@@ -672,20 +639,12 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDateContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - XPath '//loext:content-control' no attribute 'date' exist
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
     assertXPath(pXmlDoc, "//loext:content-control", "date", "true");
     assertXPath(pXmlDoc, "//loext:content-control", "date-format", "YYYY-MM-DD");
     assertXPath(pXmlDoc, "//loext:content-control", "date-rfc-language-tag", "en-US");
@@ -695,13 +654,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDateContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDateContentControlImport)
 {
     // Given an ODF document with a date content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-date.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-date.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -734,9 +690,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDateContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPlainTextContentControlExport)
 {
     // Given a document with a plain text content control around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "test", /*bAbsorb=*/false);
@@ -749,18 +705,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPlainTextContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - XPath '//loext:content-control' no attribute 'plain-text' exist
     // i.e. the plain text content control was turned into a rich text one on export.
@@ -770,13 +718,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPlainTextContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPlainTextContentControlImport)
 {
     // Given an ODF document with a plain-text content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-plain-text.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-plain-text.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -800,9 +745,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPlainTextContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testComboBoxContentControlExport)
 {
     // Given a document with a combo box content control around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "test", /*bAbsorb=*/false);
@@ -815,18 +760,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testComboBoxContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - XPath '//loext:content-control' no attribute 'combobox' exist
     // i.e. the combo box content control was turned into a drop-down one on export.
@@ -836,9 +773,9 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testComboBoxContentControlExport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAliasContentControlExport)
 {
     // Given a document with a content control and its alias around a text portion:
-    getComponent() = loadFromDesktop("private:factory/swriter");
-    uno::Reference<lang::XMultiServiceFactory> xMSF(getComponent(), uno::UNO_QUERY);
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
     uno::Reference<text::XTextCursor> xCursor = xText->createTextCursor();
     xText->insertString(xCursor, "test", /*bAbsorb=*/false);
@@ -849,39 +786,34 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAliasContentControlExport)
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
     xContentControlProps->setPropertyValue("Alias", uno::Any(OUString("my alias")));
     xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("my tag")));
+    xContentControlProps->setPropertyValue("Id", uno::Any(static_cast<sal_Int32>(-2147483648)));
+    xContentControlProps->setPropertyValue("TabIndex", uno::Any(sal_uInt32(3)));
+    xContentControlProps->setPropertyValue("Lock", uno::Any(OUString("unlocked")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::Any(OUString("writer8")) },
-    });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
-    validate(aTempFile.GetFileName(), test::ODF);
+    save("writer8");
 
     // Then make sure the expected markup is used:
-    std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     // Without the accompanying fix in place, this test would have failed with:
     // - Expression: prop
     // - XPath '//loext:content-control' no attribute 'alias' exist
     // i.e. alias was lost on export.
     assertXPath(pXmlDoc, "//loext:content-control", "alias", "my alias");
     assertXPath(pXmlDoc, "//loext:content-control", "tag", "my tag");
+    assertXPath(pXmlDoc, "//loext:content-control", "id", "-2147483648");
+    assertXPath(pXmlDoc, "//loext:content-control", "tab-index", "3");
+    assertXPath(pXmlDoc, "//loext:content-control", "lock", "unlocked");
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testComboBoxContentControlImport)
 {
     // Given an ODF document with a plain-text content control:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-combo-box.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-combo-box.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -905,13 +837,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testComboBoxContentControlImport)
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAliasContentControlImport)
 {
     // Given an ODF document with a content control and its alias/tag:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-alias.fodt";
-
-    // When loading that document:
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-alias.fodt");
 
     // Then make sure that the content control is not lost on import:
-    uno::Reference<text::XTextDocument> xTextDocument(getComponent(), uno::UNO_QUERY);
+    uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xTextDocument->getText(),
                                                                     uno::UNO_QUERY);
     uno::Reference<container::XEnumeration> xParagraphs = xParagraphsAccess->createEnumeration();
@@ -935,25 +864,189 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAliasContentControlImport)
     OUString aTag;
     xContentControlProps->getPropertyValue("Tag") >>= aTag;
     CPPUNIT_ASSERT_EQUAL(OUString("my tag"), aTag);
+    sal_Int32 nId = 0;
+    xContentControlProps->getPropertyValue("Id") >>= nId;
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2147483647), nId);
+    sal_uInt32 nTabIndex;
+    xContentControlProps->getPropertyValue("TabIndex") >>= nTabIndex;
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt32>(4), nTabIndex);
+    OUString aLock;
+    xContentControlProps->getPropertyValue("Lock") >>= aLock;
+    CPPUNIT_ASSERT_EQUAL(OUString("sdtContentLocked"), aLock);
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testDropdownContentControlAutostyleExport)
 {
     // Given a document with a dropdown content control, and formatting that forms an autostyle in
     // ODT:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "content-control-dropdown.docx";
-    getComponent() = loadFromDesktop(aURL);
+    loadFromURL(u"content-control-dropdown.docx");
 
     // When saving that document to ODT, then make sure no assertion failure happens:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
+    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
     uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
         { "FilterName", uno::Any(OUString("writer8")) },
     });
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
     // Without the accompanying fix in place, this test would have failed, we had duplicated XML
     // attributes.
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
+    xStorable->storeToURL(maTempFile.GetURL(), aStoreProps);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testScaleWidthRedline)
+{
+    // Given a document with change tracking enabled, one image is part of a delete redline:
+    loadFromURL(u"scale-width-redline.fodt");
+    dispatchCommand(mxComponent, ".uno:TrackChanges", {});
+    dispatchCommand(mxComponent, ".uno:GoToEndOfLine", {});
+    dispatchCommand(mxComponent, ".uno:EndOfParaSel", {});
+    dispatchCommand(mxComponent, ".uno:Delete", {});
+
+    // When saving to ODT:
+    save("writer8");
+
+    // Then make sure that a non-zero size is written to the output:
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 6.1728in
+    // - Actual  : 0in
+    // i.e. the deleted image had zero size, which is incorrect.
+    assertXPath(pXmlDoc, "//draw:frame[@draw:name='Image45']", "width", "6.1728in");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testThemeExport)
+{
+    mxComponent = loadFromDesktop("private:factory/swriter");
+
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
+    uno::Reference<beans::XPropertySet> xPageProps(xDrawPage, uno::UNO_QUERY);
+
+    auto pTheme = std::make_shared<model::Theme>("My Theme");
+    std::unique_ptr<model::ColorSet> pColorSet(new model::ColorSet("My Color Scheme"));
+    pColorSet->add(model::ThemeColorType::Dark1, 0x101010);
+    pColorSet->add(model::ThemeColorType::Light1, 0x202020);
+    pColorSet->add(model::ThemeColorType::Dark2, 0x303030);
+    pColorSet->add(model::ThemeColorType::Light2, 0x404040);
+    pColorSet->add(model::ThemeColorType::Accent1, 0x505050);
+    pColorSet->add(model::ThemeColorType::Accent2, 0x606060);
+    pColorSet->add(model::ThemeColorType::Accent3, 0x707070);
+    pColorSet->add(model::ThemeColorType::Accent4, 0x808080);
+    pColorSet->add(model::ThemeColorType::Accent5, 0x909090);
+    pColorSet->add(model::ThemeColorType::Accent6, 0xa0a0a0);
+    pColorSet->add(model::ThemeColorType::Hyperlink, 0xb0b0b0);
+    pColorSet->add(model::ThemeColorType::FollowedHyperlink, 0xc0c0c0);
+    pTheme->SetColorSet(std::move(pColorSet));
+
+    uno::Reference<util::XTheme> xTheme = model::theme::createXTheme(pTheme);
+    xPageProps->setPropertyValue("Theme", uno::Any(xTheme));
+
+    // Export to ODT:
+    save("writer8");
+
+    // Check if the 12 colors are written in the XML:
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color", 12);
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[1]", "name",
+                "dk1");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[1]", "color",
+                "#101010");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[2]", "name",
+                "lt1");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[2]", "color",
+                "#202020");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[12]", "name",
+                "folHlink");
+    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[12]", "color",
+                "#c0c0c0");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testFloatingTableExport)
+{
+    // Given a document with a floating table:
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    // Insert a table:
+    uno::Sequence<beans::PropertyValue> aArgs = {
+        comphelper::makePropertyValue("Rows", static_cast<sal_Int32>(1)),
+        comphelper::makePropertyValue("Columns", static_cast<sal_Int32>(1)),
+    };
+    dispatchCommand(mxComponent, ".uno:InsertTable", aArgs);
+    // Select it:
+    dispatchCommand(mxComponent, ".uno:SelectAll", {});
+    // Wrap in a fly:
+    aArgs = {
+        comphelper::makePropertyValue("AnchorType", static_cast<sal_uInt16>(0)),
+    };
+    dispatchCommand(mxComponent, ".uno:InsertFrame", aArgs);
+    // Mark it as a floating table:
+    uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xFrame(
+        xTextFramesSupplier->getTextFrames()->getByName("Frame1"), uno::UNO_QUERY);
+    xFrame->setPropertyValue("IsSplitAllowed", uno::Any(true));
+
+    // When saving to ODT:
+    save("writer8");
+
+    // Then make sure we write a floating table, not a textframe containing a table:
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - XPath '//draw:frame' no attribute 'may-break-between-pages' exist
+    // i.e. no floating table was exported.
+    assertXPath(pXmlDoc, "//draw:frame", "may-break-between-pages", "true");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testFloatingTableImport)
+{
+    // Given a document with a floating table (loext:may-break-between-pages="true"), when importing
+    // that document:
+    loadFromURL(u"floattable.fodt");
+
+    // Then make sure that the matching text frame property is set:
+    uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xFrame(
+        xTextFramesSupplier->getTextFrames()->getByName("Frame1"), uno::UNO_QUERY);
+    bool bIsSplitAllowed = false;
+    // Without the accompanying fix in place, this test would have failed, the property was false.
+    xFrame->getPropertyValue("IsSplitAllowed") >>= bIsSplitAllowed;
+    CPPUNIT_ASSERT(bIsSplitAllowed);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testParagraphScopedTabDistance)
+{
+    // Given a document with paragraph scoped default tab stop distance (loext:tab-stop-distance="0.5cm")
+    loadFromURL(u"paragraph-tab-stop-distance.fodp");
+
+    uno::Reference<drawing::XDrawPagesSupplier> xDoc(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xPage(xDoc->getDrawPages()->getByIndex(0),
+                                             uno::UNO_QUERY_THROW);
+
+    uno::Reference<beans::XPropertySet> xShape(xPage->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<text::XText> xText
+        = uno::Reference<text::XTextRange>(xShape, uno::UNO_QUERY_THROW)->getText();
+
+    uno::Reference<container::XEnumerationAccess> paraEnumAccess(xText, uno::UNO_QUERY);
+    uno::Reference<container::XEnumeration> paraEnum(paraEnumAccess->createEnumeration());
+    uno::Reference<text::XTextRange> xParagraph(paraEnum->nextElement(), uno::UNO_QUERY_THROW);
+
+    uno::Reference<container::XEnumerationAccess> runEnumAccess(xParagraph, uno::UNO_QUERY);
+    uno::Reference<container::XEnumeration> runEnum = runEnumAccess->createEnumeration();
+    uno::Reference<text::XTextRange> xRun(runEnum->nextElement(), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xPropSet(xRun, uno::UNO_QUERY_THROW);
+
+    // Make sure the tab stop default distance is imported correctly
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 10000
+    // - Actual  : 0
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(10000),
+                         xPropSet->getPropertyValue("ParaTabStopDefaultDistance").get<sal_Int32>());
+
+    // Save the imported file to test the export too
+    save("impress8");
+
+    // Then make sure we write the tab-stop-distance
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
+    assertXPath(pXmlDoc, "//style:style[@style:name='P1']/style:paragraph-properties",
+                "tab-stop-distance", "10cm");
+
+    assertXPath(pXmlDoc, "//text:p[@text:style-name='P1']");
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

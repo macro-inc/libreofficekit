@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-06 16:24+0000\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-10-21 14:17+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Asturian <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/ast/>\n"
 "Language: ast\n"
@@ -919,11 +919,11 @@ msgctxt "extensionmanager|label1"
 msgid "Display Extensions"
 msgstr "Amosar estensiones"
 
-#. yTB9y
+#. WREKY
 #: desktop/uiconfig/ui/extensionmanager.ui:162
 msgctxt "extensionmanager|search"
-msgid "Search ..."
-msgstr ""
+msgid "Search..."
+msgstr "Guetar..."
 
 #. BAVdg
 #: desktop/uiconfig/ui/extensionmanager.ui:191
@@ -1079,7 +1079,7 @@ msgstr "Llei l'alcuerdu de llicencia completu. Usa la barra de movimientu o'l bo
 #: desktop/uiconfig/ui/licensedialog.ui:160
 msgctxt "licensedialog|label5"
 msgid "Accept the License Agreement for the extension by pressing the 'Accept' button."
-msgstr "Aceutar l'alcuerdu de llicencia de la estensión primiendo'l botón «Aceutar»."
+msgstr "Aceuta l'alcuerdu de llicencia de la estensión calcando'l botón «Aceutar»."
 
 #. ydBcE
 #: desktop/uiconfig/ui/licensedialog.ui:173

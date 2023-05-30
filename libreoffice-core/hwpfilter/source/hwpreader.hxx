@@ -20,9 +20,13 @@
 #ifndef INCLUDED_HWPFILTER_SOURCE_HWPREADER_HXX
 #define INCLUDED_HWPFILTER_SOURCE_HWPREADER_HXX
 
+#include <sal/config.h>
+
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <rtl/ustring.hxx>
 #include <sal/alloca.h>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
@@ -65,7 +69,7 @@ using namespace ::com::sun::star::xml::sax;
 #include "drawdef.h"
 #include "attributes.hxx"
 
-#define WRITER_IMPORTER_NAME "com.sun.star.comp.Writer.XMLImporter"
+inline constexpr OUStringLiteral WRITER_IMPORTER_NAME = u"com.sun.star.comp.Writer.XMLImporter";
 
 struct HwpReaderPrivate;
 /**
@@ -88,6 +92,8 @@ public:
     {
         m_rxDocumentHandler = xHandler;
     }
+
+    bool importHStream(std::unique_ptr<HStream> stream);
 private:
     Reference< XDocumentHandler > m_rxDocumentHandler;
     rtl::Reference<AttributeListImpl> mxList;
@@ -124,7 +130,7 @@ private:
     void makeFormula(TxtBox *hbox);
     void makeHyperText(TxtBox *hbox);
     void makePicture(Picture *hbox);
-    void makePictureDRAW(HWPDrawingObject *drawobj, Picture *hbox);
+    void makePictureDRAW(HWPDrawingObject *drawobj, const Picture *hbox);
     void makeLine();
     void makeHidden(Hidden *hbox);
     void makeFootnote(Footnote *hbox);
@@ -144,8 +150,12 @@ private:
     void makeTableStyle(Table *);
     void parseCharShape(CharShape const *);
     void parseParaShape(ParaShape const *);
-    static char* getTStyleName(int, char *);
-    static char* getPStyleName(int, char *);
+    static OUString getTStyleName(int);
+    static OUString getPStyleName(int);
+
+    void startEl(const OUString& el);
+    void endEl(const OUString& el);
+    void chars(const OUString& s);
 };
 
 

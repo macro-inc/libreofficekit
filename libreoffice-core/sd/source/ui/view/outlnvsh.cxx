@@ -39,7 +39,6 @@
 #include <sfx2/dispatch.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <vcl/commandevent.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/settings.hxx>
 
 #include <sal/log.hxx>
@@ -957,7 +956,7 @@ void OutlineViewShell::GetMenuState( SfxItemSet &rSet )
                     else
                     {
                         // check if the object is in edit, then if it's temporarily not empty
-                        SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+                        SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
                         if( pTextObj )
                         {
                             if( pTextObj->CanCreateEditOutlinerParaObject() )
@@ -1050,7 +1049,7 @@ void OutlineViewShell::GetMenuState( SfxItemSet &rSet )
 /**
  * gets invoked when ScrollBar is used
  */
-void OutlineViewShell::VirtHScrollHdl(ScrollBar* pHScroll)
+void OutlineViewShell::VirtHScrollHdl(ScrollAdaptor* pHScroll)
 {
     ::tools::Long   nThumb = pHScroll->GetThumbPos();
     ::tools::Long   nRange = pHScroll->GetRange().Len();
@@ -1071,7 +1070,7 @@ void OutlineViewShell::VirtHScrollHdl(ScrollBar* pHScroll)
     pOutlinerView->ShowCursor(false);
 }
 
-void OutlineViewShell::VirtVScrollHdl(ScrollBar* pVScroll)
+void OutlineViewShell::VirtVScrollHdl(ScrollAdaptor* pVScroll)
 {
     ::tools::Long nThumb = pVScroll->GetThumbPos();
     ::tools::Long nRange = pVScroll->GetRange().Len();
@@ -1460,9 +1459,8 @@ void OutlineViewShell::GetAttrState( SfxItemSet& rSet )
 
             case SID_STYLE_EDIT:
             {
-                std::unique_ptr<SfxPoolItem> pItem;
-                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-                SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+                std::unique_ptr<SfxUInt16Item> pFamilyItem;
+                GetViewFrame()->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
                 if (pFamilyItem && static_cast<SfxStyleFamily>(pFamilyItem->GetValue()) == SfxStyleFamily::Pseudo)
                 {
                     SfxItemSetFixed<SID_STATUS_LAYOUT, SID_STATUS_LAYOUT> aSet(*rSet.GetPool());

@@ -49,8 +49,6 @@ public:
     rtl_TextEncoding    GetCharSet() const                              { return meCharSet; }
     const Size&         GetFontSize() const                      { return maAverageFontSize; }
 
-    bool                IsSymbolFont() const                            { return mbSymbolFlag; }
-
     void                SetFamilyName( const OUString& sFamilyName )    { maFamilyName = sFamilyName; }
     void                SetStyleName( const OUString& sStyleName )      { maStyleName = sStyleName; }
     void                SetFamilyType( const FontFamily eFontFamily )   { meFamily = eFontFamily; }
@@ -72,8 +70,6 @@ public:
         maAverageFontSize = rSize;
     }
 
-    void                SetSymbolFlag( const bool bSymbolFlag )         { mbSymbolFlag = bSymbolFlag; }
-
     // straight properties, no getting them from AskConfig()
     FontFamily          GetFamilyTypeNoAsk() const                      { return meFamily; }
     FontWeight          GetWeightNoAsk() const                          { return meWeight; }
@@ -92,6 +88,10 @@ public:
     void                SetCalculatedAverageFontWidth(tools::Long nNew) { mnCalculatedAverageFontWidth = nNew; }
 
     bool                operator==( const ImplFont& ) const;
+    bool                EqualIgnoreColor( const ImplFont& ) const;
+
+    size_t              GetHashValue() const;
+    size_t              GetHashValueIgnoreColor() const;
 
 private:
     friend class vcl::Font;
@@ -115,6 +115,7 @@ private:
     FontRelief          meRelief;
     FontEmphasisMark    meEmphasisMark;
     FontKerning         meKerning;
+    short               mnSpacing;
     Size                maAverageFontSize;
     rtl_TextEncoding    meCharSet;
 
@@ -122,8 +123,7 @@ private:
     LanguageTag         maCJKLanguageTag;
 
     // Flags - device independent
-    bool                mbSymbolFlag:1,
-                        mbOutline:1,
+    bool                mbOutline:1,
                         mbConfigLookup:1,   // config lookup should only be done once
                         mbShadow:1,
                         mbVertical:1,

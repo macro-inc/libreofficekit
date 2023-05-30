@@ -105,9 +105,7 @@ SbMethod* CreateMacro( SbModule* pModule, const OUString& rMacroName )
             aOUSource = aOUSource.copy( 0, nSourceLen-1 );
     }
 
-    OUString aSubStr = "Sub " + aMacroName + "\n\nEnd Sub";
-
-    aOUSource += aSubStr;
+    aOUSource += "Sub " + aMacroName + "\n\nEnd Sub";
 
     // update module in library
     StarBASIC* pBasic = dynamic_cast<StarBASIC*>(pModule->GetParent());
@@ -180,24 +178,24 @@ bool RenameDialog (
     if ( !rDocument.renameDialog( rLibName, rOldName, rNewName, xExistingDialog ) )
         return false;
 
-    if (pWin && pShell)
+    if (!pWin || !pShell)
+        return true;
+
+    // set new name in window
+    pWin->SetName( rNewName );
+
+    // update property browser
+    pWin->UpdateBrowser();
+
+    // update tabwriter
+    sal_uInt16 nId = pShell->GetWindowId( pWin );
+    DBG_ASSERT( nId, "No entry in Tabbar!" );
+    if ( nId )
     {
-        // set new name in window
-        pWin->SetName( rNewName );
-
-        // update property browser
-        pWin->UpdateBrowser();
-
-        // update tabwriter
-        sal_uInt16 nId = pShell->GetWindowId( pWin );
-        DBG_ASSERT( nId, "No entry in Tabbar!" );
-        if ( nId )
-        {
-            TabBar& rTabBar = pShell->GetTabBar();
-            rTabBar.SetPageText( nId, rNewName );
-            rTabBar.Sort();
-            rTabBar.MakeVisible( rTabBar.GetCurPageId() );
-        }
+        TabBar& rTabBar = pShell->GetTabBar();
+        rTabBar.SetPageText( nId, rNewName );
+        rTabBar.Sort();
+        rTabBar.MakeVisible( rTabBar.GetCurPageId() );
     }
     return true;
 }

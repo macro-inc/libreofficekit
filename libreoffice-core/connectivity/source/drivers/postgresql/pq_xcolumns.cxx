@@ -38,6 +38,7 @@
 
 #include <string_view>
 
+#include <o3tl/safeint.hxx>
 #include <o3tl/string_view.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -49,6 +50,7 @@
 #include <com/sun/star/sdbc/ColumnValue.hpp>
 
 #include <cppuhelper/exc_hlp.hxx>
+#include <utility>
 
 #include "pq_xcolumns.hxx"
 #include "pq_xcolumn.hxx"
@@ -61,7 +63,6 @@ using osl::MutexGuard;
 using com::sun::star::beans::XPropertySet;
 
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::Reference;
 using com::sun::star::uno::RuntimeException;
@@ -75,9 +76,9 @@ using com::sun::star::sdbc::SQLException;
 namespace pq_sdbc_driver
 {
 
-static Any isCurrency( const OUString & typeName )
+static Any isCurrency( std::u16string_view typeName )
 {
-    return Any( typeName.equalsIgnoreAsciiCase("money") );
+    return Any( o3tl::equalsIgnoreAsciiCase(typeName, u"money") );
 }
 
 // static sal_Bool isAutoIncrement8( const OUString & typeName )
@@ -109,11 +110,11 @@ Columns::Columns(
         const ::rtl::Reference< comphelper::RefCountedMutex > & refMutex,
         const css::uno::Reference< css::sdbc::XConnection >  & origin,
         ConnectionSettings *pSettings,
-        const OUString &schemaName,
-        const OUString &tableName)
+        OUString schemaName,
+        OUString tableName)
     : Container( refMutex, origin, pSettings,  "COLUMN" ),
-      m_schemaName( schemaName ),
-      m_tableName( tableName )
+      m_schemaName(std::move( schemaName )),
+      m_tableName(std::move( tableName ))
 {}
 
 Columns::~Columns()
@@ -185,25 +186,25 @@ OUString columnMetaData2SDBCX(
     OUString typeName  = xRow->getString( TYPE_NAME );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.NAME, makeAny( name ) );
+        st.NAME, Any( name ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.TYPE, makeAny( xRow->getInt( DATA_TYPE ) ) );
+        st.TYPE, Any( xRow->getInt( DATA_TYPE ) ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.TYPE_NAME, makeAny( typeName ) );
+        st.TYPE_NAME, Any( typeName ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.PRECISION, makeAny( xRow->getInt( COLUMN_SIZE ) ) );
+        st.PRECISION, Any( xRow->getInt( COLUMN_SIZE ) ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.SCALE, makeAny( xRow->getInt( DECIMAL_DIGITS ) ) );
+        st.SCALE, Any( xRow->getInt( DECIMAL_DIGITS ) ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.IS_NULLABLE, makeAny( xRow->getInt( IS_NULLABLE ) ) );
+        st.IS_NULLABLE, Any( xRow->getInt( IS_NULLABLE ) ) );
 
     pBase->setPropertyValue_NoBroadcast_public(
-        st.DEFAULT_VALUE, makeAny( xRow->getString( DEFAULT_VALUE ) ) );
+        st.DEFAULT_VALUE, Any( xRow->getString( DEFAULT_VALUE ) ) );
 
 //     pBase->setPropertyValue_NoBroadcast_public(
 //         st.DESCRIPTION, makeAny( xRow->getString( DESCRIPTION ) ) );
@@ -213,7 +214,7 @@ OUString columnMetaData2SDBCX(
 //             st.HELP_TEXT, makeAny( xRow->getString( DESCRIPTION ) ) );
 //     else // for key columns, etc. ...
     pBase->setPropertyValue_NoBroadcast_public(
-            st.DESCRIPTION, makeAny( xRow->getString( DESCRIPTION ) ) );
+            st.DESCRIPTION, Any( xRow->getString( DESCRIPTION ) ) );
 
 
     // maybe a better criterion than the type name can be found in future
@@ -316,7 +317,7 @@ void Columns::refresh()
 //                     name ) );
 
             {
-                m_values.push_back( makeAny( prop ) );
+                m_values.push_back( Any( prop ) );
                 map[ name ] = columnIndex;
                 ++columnIndex;
             }
@@ -461,7 +462,7 @@ void Columns::appendByDescriptor(
     osl::MutexGuard guard( m_xMutex->GetMutex() );
     Statics & st = getStatics();
     Reference< XPropertySet > past = createDataDescriptor();
-    past->setPropertyValue( st.IS_NULLABLE, makeAny( css::sdbc::ColumnValue::NULLABLE ) );
+    past->setPropertyValue( st.IS_NULLABLE, Any( css::sdbc::ColumnValue::NULLABLE ) );
     alterColumnByDescriptor(
         m_schemaName, m_tableName, m_pSettings, m_origin->createStatement() , past, future  );
 
@@ -493,7 +494,7 @@ void Columns::appendByDescriptor(
 void Columns::dropByIndex( sal_Int32 index )
 {
     osl::MutexGuard guard( m_xMutex->GetMutex() );
-    if( index < 0 ||  index >= static_cast<sal_Int32>(m_values.size()) )
+    if( index < 0 ||  o3tl::make_unsigned(index) >= m_values.size() )
     {
         throw css::lang::IndexOutOfBoundsException(
             "COLUMNS: Index out of range (allowed 0 to "

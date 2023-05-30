@@ -34,6 +34,7 @@
 #include <map>
 #include <memory>
 #include <com/sun/star/awt/VclWindowPeerAttribute.hpp>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -47,9 +48,9 @@ struct UnoControlHolder
     OUString                        msName;
 
 public:
-    UnoControlHolder( const OUString& rName, const uno::Reference< awt::XControl > & rControl )
-    :   mxControl( rControl ),
-        msName( rName )
+    UnoControlHolder( OUString aName, uno::Reference< awt::XControl > xControl )
+    :   mxControl(std::move( xControl )),
+        msName(std::move( aName ))
     {
     }
 
@@ -334,8 +335,8 @@ private:
     uno::Reference< awt::XControlContainer > mxControlContainer;
 
 public:
-    explicit DialogStepChangedListener( uno::Reference< awt::XControlContainer > const & xControlContainer )
-        : mxControlContainer( xControlContainer ) {}
+    explicit DialogStepChangedListener( uno::Reference< awt::XControlContainer > xControlContainer )
+        : mxControlContainer(std::move( xControlContainer )) {}
 
     // XEventListener
     virtual void SAL_CALL disposing( const  lang::EventObject& Source ) override;
@@ -521,7 +522,7 @@ uno::Any SAL_CALL UnoControlContainer::getByIdentifier( ::sal_Int32 _nIdentifier
     uno::Reference< awt::XControl > xControl;
     if ( !mpControls->getControlForIdentifier( _nIdentifier, xControl ) )
         throw container::NoSuchElementException();
-    return uno::makeAny( xControl );
+    return uno::Any( xControl );
 }
 
 uno::Sequence< ::sal_Int32 > SAL_CALL UnoControlContainer::getIdentifiers(  )

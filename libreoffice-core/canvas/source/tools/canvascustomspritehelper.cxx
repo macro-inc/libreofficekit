@@ -30,7 +30,7 @@
 #include <basegfx/utils/canvastools.hxx>
 #include <basegfx/vector/b2dsize.hxx>
 #include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <base/canvascustomspritehelper.hxx>
 #include <canvas/canvastools.hxx>
@@ -191,16 +191,14 @@ namespace canvas
         if( xBitmap->hasAlpha() )
             return;
 
-        const geometry::IntegerSize2D& rInputSize(
-            xBitmap->getSize() );
-        const ::basegfx::B2DSize& rOurSize(
-            rSprite->getSizePixel() );
+        const geometry::IntegerSize2D& rInputSize(xBitmap->getSize());
+        basegfx::B2DSize rOurSize(rSprite->getSizePixel().getX(), rSprite->getSizePixel().getY());
 
         ::basegfx::B2DHomMatrix aTransform;
         if( tools::isInside(
                 ::basegfx::B2DRectangle( 0.0,0.0,
-                                         rOurSize.getX(),
-                                         rOurSize.getY() ),
+                                         rOurSize.getWidth(),
+                                         rOurSize.getHeight() ),
                 ::basegfx::B2DRectangle( 0.0,0.0,
                                          rInputSize.Width,
                                          rInputSize.Height ),

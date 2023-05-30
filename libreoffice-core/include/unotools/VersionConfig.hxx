@@ -9,9 +9,11 @@
  */
 #pragma once
 
-#include <officecfg/Office/Common.hxx>
 #include <officecfg/Setup.hxx>
 #include <unotools/configmgr.hxx>
+#include <o3tl/string_view.hxx>
+
+#include <com/sun/star/lang/IllegalArgumentException.hpp>
 
 namespace utl
 {
@@ -24,19 +26,28 @@ namespace utl
 static bool isProductVersionUpgraded(bool aUpdateVersion)
 {
     OUString sSetupVersion = utl::ConfigManager::getProductVersion();
-    sal_Int32 iCurrent
-        = sSetupVersion.getToken(0, '.').toInt32() * 10 + sSetupVersion.getToken(1, '.').toInt32();
+    sal_Int32 iCurrent = o3tl::toInt32(o3tl::getToken(sSetupVersion, 0, '.')) * 10
+                         + o3tl::toInt32(o3tl::getToken(sSetupVersion, 1, '.'));
     OUString sLastVersion = officecfg::Setup::Product::ooSetupLastVersion::get().value_or("0.0");
-    sal_Int32 iLast
-        = sLastVersion.getToken(0, '.').toInt32() * 10 + sLastVersion.getToken(1, '.').toInt32();
+    sal_Int32 iLast = o3tl::toInt32(o3tl::getToken(sLastVersion, 0, '.')) * 10
+                      + o3tl::toInt32(o3tl::getToken(sLastVersion, 1, '.'));
     if (iCurrent > iLast)
     {
-        if (aUpdateVersion && !officecfg::Setup::Product::ooSetupLastVersion::isReadOnly())
+        if (aUpdateVersion)
         { //update lastversion
-            std::shared_ptr<comphelper::ConfigurationChanges> batch(
-                comphelper::ConfigurationChanges::create());
-            officecfg::Setup::Product::ooSetupLastVersion::set(sSetupVersion, batch);
-            batch->commit();
+            try
+            {
+                std::shared_ptr<comphelper::ConfigurationChanges> batch(
+                    comphelper::ConfigurationChanges::create());
+                officecfg::Setup::Product::ooSetupLastVersion::set(sSetupVersion, batch);
+                batch->commit();
+            }
+            catch (css::lang::IllegalArgumentException&)
+            { //If the value was readOnly.
+                SAL_WARN("desktop.updater", "Updating property ooSetupLastVersion to version "
+                                                << sSetupVersion
+                                                << " failed (read-only property?)");
+            }
         }
         return true;
     }

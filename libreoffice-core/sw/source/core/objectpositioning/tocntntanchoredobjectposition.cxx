@@ -41,10 +41,12 @@
 #include <fmtwrapinfluenceonobjpos.hxx>
 #include <sortedobjs.hxx>
 #include <textboxhelper.hxx>
+#include <flyfrms.hxx>
 
-using namespace objectpositioning;
 using namespace ::com::sun::star;
 
+namespace objectpositioning
+{
 SwToContentAnchoredObjectPosition::SwToContentAnchoredObjectPosition( SdrObject& _rDrawObj )
     : SwAnchoredObjectPosition ( _rDrawObj ),
       mpVertPosOrientFrame( nullptr ),
@@ -188,6 +190,9 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
     // determine frame the object position has to be oriented at.
     const SwTextFrame* pOrientFrame = &rAnchorTextFrame;
     const SwTextFrame* pAnchorFrameForVertPos;
+    // If true, this means that the anchored object is a split fly frame and it's not a master but
+    // one of the follows.
+    bool bFollowSplitFly = false;
     {
         // if object is at-character anchored, determine character-rectangle
         // and frame, position has to be oriented at.
@@ -223,6 +228,36 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
             pOrientFrame = &(const_cast<SwTextFrame&>(rAnchorTextFrame).GetFrameAtOfst(
                 rAnchorTextFrame.MapModelToViewPos(*rAnch.GetContentAnchor())));
             mpToCharOrientFrame = pOrientFrame;
+        }
+        else if (SwFlyFrame* pFlyFrame = GetAnchoredObj().DynCastFlyFrame())
+        {
+            // See if this fly is split. If so, then the anchor is also split. All anchors are
+            // empty, except the last follow.
+            if (pFlyFrame->IsFlySplitAllowed())
+            {
+                auto pFlyAtContentFrame = static_cast<SwFlyAtContentFrame*>(pFlyFrame);
+                // Decrement pFly to point to the master; increment pAnchor to point to the correct
+                // follow anchor.
+                SwFlyAtContentFrame* pFly = pFlyAtContentFrame;
+                SwTextFrame* pAnchor = const_cast<SwTextFrame*>(&rAnchorTextFrame);
+                while (pFly->GetPrecede())
+                {
+                    pFly = pFly->GetPrecede();
+                    if (!pAnchor)
+                    {
+                        SAL_WARN("sw.core", "SwToContentAnchoredObjectPosition::CalcPosition: fly "
+                                            "chain length is longer then anchor chain length");
+                        break;
+                    }
+                    pAnchor = pAnchor->GetFollow();
+                }
+                if (pAnchor && pAnchor->GetPrecede())
+                {
+                    pOrientFrame = pAnchor;
+                    // Anchored object has a precede, so it's a follow.
+                    bFollowSplitFly = true;
+                }
+            }
         }
     }
     aRectFnSet.Refresh(pOrientFrame);
@@ -569,6 +604,27 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
                     nVertOffsetToFrameAnchorPos += aRectFnSet.YDiff(nPageBottom, nTopOfOrient);
                 }
                 nRelPosY = nVertOffsetToFrameAnchorPos + aVert.GetPos();
+                if (bFollowSplitFly)
+                {
+                    // This is a follow of a split fly: shift it up to match the anchor position,
+                    // because the vertical offset is meant to be handled only on the first page.
+                    nRelPosY -= aVert.GetPos();
+
+                    if (aVert.GetRelationOrient() == text::RelOrientation::PAGE_FRAME
+                        && rPageAlignLayFrame.IsPageFrame())
+                    {
+                        // Master is positioned relative to the edge of the page, with an offset.
+                        // Follow will have no offset, but is relative to the bottom of the header.
+                        auto& rPageFrame = static_cast<const SwPageFrame&>(rPageAlignLayFrame);
+                        const SwLayoutFrame* pBodyFrame = rPageFrame.FindBodyCont();
+                        if (pBodyFrame)
+                        {
+                            SwTwips nDiff = pBodyFrame->getFrameArea().Top()
+                                            - rPageFrame.getFrameArea().Top();
+                            nRelPosY += nDiff;
+                        }
+                    }
+                }
             }
 
             // <pUpperOfOrientFrame>: layout frame, at which the position has to
@@ -1211,5 +1267,6 @@ const SwFrame& SwToContentAnchoredObjectPosition::GetHoriVirtualAnchor(
     return *pHoriVirtAnchFrame;
 }
 
+}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

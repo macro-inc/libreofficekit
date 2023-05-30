@@ -17,12 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_XAccessibleSelection_idl__
-#define __com_sun_star_accessibility_XAccessibleSelection_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <com/sun/star/lang/IndexOutOfBoundsException.idl>
-
 module com { module sun { module star { module accessibility {
 
  interface XAccessible;
@@ -59,7 +53,7 @@ interface XAccessibleSelection : ::com::sun::star::uno::XInterface
             the result of
             XAccessibleContext::getAccessibleChildCount()-1.
     */
-    void selectAccessibleChild ([in] long nChildIndex)
+    void selectAccessibleChild ([in] hyper nChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Determines if the specified child of this object is selected.
@@ -76,7 +70,7 @@ interface XAccessibleSelection : ::com::sun::star::uno::XInterface
             the result of
             XAccessibleContext::getAccessibleChildCount()-1.
     */
-    boolean isAccessibleChildSelected ([in] long nChildIndex)
+    boolean isAccessibleChildSelected ([in] hyper nChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Clears the selection, so that no children of the
@@ -104,7 +98,7 @@ interface XAccessibleSelection : ::com::sun::star::uno::XInterface
             Returns the number of selected children of this object or 0 if
             no child is selected.
     */
-    long getSelectedAccessibleChildCount ();
+    hyper getSelectedAccessibleChildCount ();
 
     /** Returns the specified selected Accessible child.
 
@@ -125,7 +119,7 @@ interface XAccessibleSelection : ::com::sun::star::uno::XInterface
             the result of
             XAccessibleRelationSet::getAccessibleChildCount()-1.
     */
-    XAccessible getSelectedAccessibleChild ([in] long nSelectedChildIndex)
+    XAccessible getSelectedAccessibleChild ([in] hyper nSelectedChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Removes the specified child from the set of this object's
@@ -142,12 +136,10 @@ interface XAccessibleSelection : ::com::sun::star::uno::XInterface
             but not including, the result of
             XAccessibleContext::getAccessibleChildCount().
     */
-    void deselectAccessibleChild ([in] long nChildIndex)
+    void deselectAccessibleChild ([in] hyper nChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

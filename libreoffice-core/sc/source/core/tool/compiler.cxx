@@ -32,6 +32,7 @@
 #include <svl/sharedstringpool.hxx>
 #include <sal/log.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <rtl/character.hxx>
 #include <unotools/charclass.hxx>
@@ -48,7 +49,6 @@
 #include <rtl/math.hxx>
 #include <rtl/ustring.hxx>
 #include <stdlib.h>
-#include <math.h>
 #include <rangenam.hxx>
 #include <dbdata.hxx>
 #include <document.hxx>
@@ -77,6 +77,7 @@ using namespace formula;
 using namespace ::com::sun::star;
 using ::std::vector;
 
+osl::Mutex                          ScCompiler::maMutex;
 const CharClass*                    ScCompiler::pCharClassEnglish = nullptr;
 const CharClass*                    ScCompiler::pCharClassLocalized = nullptr;
 const ScCompiler::Convention*       ScCompiler::pConventions[ ]   = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
@@ -110,6 +111,9 @@ void ScCompiler::fillFromAddInMap( const NonConstOpCodeMapPtr& xMap,FormulaGramm
     size_t nSymbolOffset;
     switch( _eGrammar )
     {
+        // XFunctionAccess and XCell::setFormula()/getFormula() API always used
+        // PODF grammar symbols, keep it.
+        case FormulaGrammar::GRAM_API:
         case FormulaGrammar::GRAM_PODF:
             nSymbolOffset = offsetof( AddInMap, pUpper);
             break;
@@ -121,15 +125,30 @@ void ScCompiler::fillFromAddInMap( const NonConstOpCodeMapPtr& xMap,FormulaGramm
             nSymbolOffset = offsetof( AddInMap, pEnglish);
             break;
     }
-    const AddInMap* pMap = g_aAddInMap;
-    const AddInMap* const pStop = pMap + GetAddInMapCount();
-    for ( ; pMap < pStop; ++pMap)
+    const AddInMap* const pStop = g_aAddInMap + GetAddInMapCount();
+    for (const AddInMap* pMap = g_aAddInMap; pMap < pStop; ++pMap)
     {
         char const * const * ppSymbol =
             reinterpret_cast< char const * const * >(
                     reinterpret_cast< char const * >(pMap) + nSymbolOffset);
         xMap->putExternal( OUString::createFromAscii( *ppSymbol),
                 OUString::createFromAscii( pMap->pOriginal));
+    }
+    if (_eGrammar == FormulaGrammar::GRAM_API)
+    {
+        // Add English names additionally to programmatic names, so they
+        // can be used in XCell::setFormula() non-localized API calls.
+        // Note the reverse map will still deliver programmatic names for
+        // XCell::getFormula().
+        nSymbolOffset = offsetof( AddInMap, pEnglish);
+        for (const AddInMap* pMap = g_aAddInMap; pMap < pStop; ++pMap)
+        {
+            char const * const * ppSymbol =
+                reinterpret_cast< char const * const * >(
+                        reinterpret_cast< char const * >(pMap) + nSymbolOffset);
+            xMap->putExternal( OUString::createFromAscii( *ppSymbol),
+                    OUString::createFromAscii( pMap->pOriginal));
+        }
     }
 }
 
@@ -155,8 +174,8 @@ void ScCompiler::fillFromAddInCollectionEnglishName( const NonConstOpCodeMapPtr&
         const ScUnoAddInFuncData* pFuncData = pColl->GetFuncData(i);
         if (pFuncData)
         {
-            OUString aName;
-            if (pFuncData->GetExcelName( LANGUAGE_ENGLISH_US, aName))
+            const OUString aName( pFuncData->GetUpperEnglish());
+            if (!aName.isEmpty())
                 xMap->putExternalSoftly( aName, pFuncData->GetOriginalName());
             else
                 xMap->putExternalSoftly( pFuncData->GetUpperName(),
@@ -206,9 +225,12 @@ const CharClass* ScCompiler::GetCharClassEnglish()
 {
     if (!pCharClassEnglish)
     {
-        css::lang::Locale aLocale( "en", "US", "");
-        pCharClassEnglish = new CharClass(
-                ::comphelper::getProcessComponentContext(), LanguageTag( aLocale));
+        osl::MutexGuard aGuard(maMutex);
+        if (!pCharClassEnglish)
+        {
+            pCharClassEnglish = new CharClass( ::comphelper::getProcessComponentContext(),
+                    LanguageTag( LANGUAGE_ENGLISH_US));
+        }
     }
     return pCharClassEnglish;
 }
@@ -219,8 +241,12 @@ const CharClass* ScCompiler::GetCharClassLocalized()
     {
         // Switching UI language requires restart; if not, we would have to
         // keep track of that.
-        pCharClassLocalized = new CharClass(
-                ::comphelper::getProcessComponentContext(), Application::GetSettings().GetUILanguageTag());
+        osl::MutexGuard aGuard(maMutex);
+        if (!pCharClassLocalized)
+        {
+            pCharClassLocalized = new CharClass( ::comphelper::getProcessComponentContext(),
+                    Application::GetSettings().GetUILanguageTag());
+        }
     }
     return pCharClassLocalized;
 }
@@ -234,17 +260,17 @@ void ScCompiler::SetGrammar( const FormulaGrammar::Grammar eGrammar )
     if( eGrammar == FormulaGrammar::GRAM_EXTERNAL )
     {
         meGrammar = eGrammar;
-        mxSymbols = GetOpCodeMap( css::sheet::FormulaLanguage::NATIVE);
+        mxSymbols = GetFinalOpCodeMap( css::sheet::FormulaLanguage::NATIVE);
     }
     else
     {
         FormulaGrammar::Grammar eMyGrammar = eGrammar;
         const sal_Int32 nFormulaLanguage = FormulaGrammar::extractFormulaLanguage( eMyGrammar);
-        OpCodeMapPtr xMap = GetOpCodeMap( nFormulaLanguage);
+        OpCodeMapPtr xMap = GetFinalOpCodeMap( nFormulaLanguage);
         OSL_ENSURE( xMap, "ScCompiler::SetGrammar: unknown formula language");
         if (!xMap)
         {
-            xMap = GetOpCodeMap( css::sheet::FormulaLanguage::NATIVE);
+            xMap = GetFinalOpCodeMap( css::sheet::FormulaLanguage::NATIVE);
             eMyGrammar = xMap->getGrammar();
         }
 
@@ -437,9 +463,6 @@ return;
 /* # */     t[35] &=  ~ScCharFlags::WordSep;
 /* # */     t[35] |=   ScCharFlags::Word;
 /* % */     t[37] |=   ScCharFlags::Word;
-/* ' */     t[39] |=   ScCharFlags::Word;
-
-/* % */     t[37] |=   ScCharFlags::Word;
 /* & */     t[38] |=   ScCharFlags::Word;
 /* ' */     t[39] |=   ScCharFlags::Word;
 /* ( */     t[40] |=   ScCharFlags::Word;
@@ -467,20 +490,20 @@ return;
 /* ~ */     t[126]|=   ScCharFlags::Word;
 }
 
-static bool lcl_isValidQuotedText( const OUString& rFormula, sal_Int32 nSrcPos, ParseResult& rRes )
+static bool lcl_isValidQuotedText( std::u16string_view rFormula, size_t nSrcPos, ParseResult& rRes )
 {
     // Tokens that start at ' can have anything in them until a final '
     // but '' marks an escaped '
     // We've earlier guaranteed that a string containing '' will be
     // surrounded by '
-    if (nSrcPos < rFormula.getLength() && rFormula[nSrcPos] == '\'')
+    if (nSrcPos < rFormula.size() && rFormula[nSrcPos] == '\'')
     {
-        sal_Int32 nPos = nSrcPos+1;
-        while (nPos < rFormula.getLength())
+        size_t nPos = nSrcPos+1;
+        while (nPos < rFormula.size())
         {
             if (rFormula[nPos] == '\'')
             {
-                if ( (nPos+1 == rFormula.getLength()) || (rFormula[nPos+1] != '\'') )
+                if ( (nPos+1 == rFormula.size()) || (rFormula[nPos+1] != '\'') )
                 {
                     rRes.TokenType = KParseType::SINGLE_QUOTE_NAME;
                     rRes.EndPos = nPos+1;
@@ -666,7 +689,7 @@ static bool lcl_parseExternalName(
     if (aTmpName[nNameLen-1] == '!')
     {
         // Check against #REF!.
-        if (aTmpName.toString().equalsIgnoreAsciiCase("#REF!"))
+        if (OUString::unacquired(aTmpName).equalsIgnoreAsciiCase("#REF!"))
             return false;
     }
 
@@ -1575,7 +1598,7 @@ struct ConventionXL_OOX : public ConventionXL_A1
         {
             rBuffer.append('\'');
             ConventionXL_OOX::makeExternalDocStr( rBuffer, nFileId);
-            rBuffer.append( aBuf.copy(1));
+            rBuffer.append( aBuf.subView(1));
         }
         else
         {
@@ -2130,8 +2153,8 @@ std::vector<ScCompiler::Whitespace> ScCompiler::NextSymbol(bool bInArray)
     sal_Unicode cSep = mxSymbols->getSymbolChar( ocSep);
     sal_Unicode cArrayColSep = mxSymbols->getSymbolChar( ocArrayColSep);
     sal_Unicode cArrayRowSep = mxSymbols->getSymbolChar( ocArrayRowSep);
-    sal_Unicode cDecSep = (mxSymbols->isEnglish() ? '.' : ScGlobal::getLocaleData().getNumDecimalSep()[0]);
-    sal_Unicode cDecSepAlt = (mxSymbols->isEnglish() ? 0 : ScGlobal::getLocaleData().getNumDecimalSepAlt().toChar());
+    sal_Unicode cDecSep = (mxSymbols->isEnglishLocale() ? '.' : ScGlobal::getLocaleData().getNumDecimalSep()[0]);
+    sal_Unicode cDecSepAlt = (mxSymbols->isEnglishLocale() ? 0 : ScGlobal::getLocaleData().getNumDecimalSepAlt().toChar());
 
     // special symbols specific to address convention used
     sal_Unicode cSheetPrefix = pConv->getSpecialSymbol(ScCompiler::Convention::ABS_SHEET_PREFIX);
@@ -3062,13 +3085,13 @@ bool ScCompiler::ParseOpCode( const OUString& rName, bool bInArray )
     return bFound;
 }
 
-bool ScCompiler::ParseOpCode2( const OUString& rName )
+bool ScCompiler::ParseOpCode2( std::u16string_view rName )
 {
     bool bFound = false;
     sal_uInt16 i;
 
     for( i = ocInternalBegin; i <= ocInternalEnd && !bFound; i++ )
-        bFound = rName.equalsAscii( pInternal[ i-ocInternalBegin ] );
+        bFound = o3tl::equalsAscii( rName, pInternal[ i-ocInternalBegin ] );
 
     if (bFound)
     {
@@ -3144,7 +3167,7 @@ bool ScCompiler::ParseValue( const OUString& rSym )
     }
 
     double fVal;
-    sal_uInt32 nIndex = mxSymbols->isEnglish() ? mpFormatter->GetStandardIndex(LANGUAGE_ENGLISH_US) : 0;
+    sal_uInt32 nIndex = mxSymbols->isEnglishLocale() ? mpFormatter->GetStandardIndex(LANGUAGE_ENGLISH_US) : 0;
 
     if (!mpFormatter->IsNumberFormat(rSym, nIndex, fVal))
         return false;
@@ -3350,10 +3373,7 @@ bool ScCompiler::ParseSingleReference( const OUString& rName, const OUString* pE
             // A named range named e.g. 'num1' is valid with 1k columns, but would become a reference
             // when the document is opened later with 16k columns. Resolve the conflict by not
             // considering it a reference.
-            OUString aUpper;
-            bool bAsciiUpper = ToUpperAsciiOrI18nIsAscii( aUpper, rName );
-            if (bAsciiUpper || mbCharClassesDiffer)
-                aUpper = ScGlobal::getCharClass().uppercase( rName );
+            OUString aUpper( ScGlobal::getCharClass().uppercase( rName ));
             mnCurrentSheetTab = aAddr.Tab(); // temporarily set for ParseNamedRange()
             if(ParseNamedRange( aUpper, true )) // only check
                 return false;
@@ -3404,7 +3424,7 @@ bool ScCompiler::ParseReference( const OUString& rName, const OUString* pErrRef 
     mnCurrentSheetTab = -1;
 
     sal_Unicode ch1 = rName[0];
-    sal_Unicode cDecSep = ( mxSymbols->isEnglish() ? '.' : ScGlobal::getLocaleData().getNumDecimalSep()[0] );
+    sal_Unicode cDecSep = ( mxSymbols->isEnglishLocale() ? '.' : ScGlobal::getLocaleData().getNumDecimalSep()[0] );
     if ( ch1 == cDecSep )
         return false;
     // Code further down checks only if cDecSep=='.' so simply obtaining the
@@ -4249,7 +4269,8 @@ void ScCompiler::AutoCorrectParsedSymbol()
                 else
                     nRefs--;
             }
-            aSymbol = aSym.makeStringAndClear() + aTmp1;
+            aSymbol = aSym + aTmp1;
+            aSym.setLength(0);
         }
         else
             bColons = false;
@@ -4286,7 +4307,7 @@ void ScCompiler::AutoCorrectParsedSymbol()
                 while ( *p && rtl::isAsciiDigit( *p ) )
                     aStr2.append(*p++);
                 aRef[j] = OUString( p );
-                aRef[j] += aStr2.makeStringAndClear();
+                aRef[j] += aStr2;
                 if ( bColons || aRef[j] != aOld )
                 {
                     bChanged = true;
@@ -4313,10 +4334,10 @@ void ScCompiler::AutoCorrectParsedSymbol()
 
 bool ScCompiler::ToUpperAsciiOrI18nIsAscii( OUString& rUpper, const OUString& rOrg ) const
 {
-    if (FormulaGrammar::isODFF( meGrammar ))
+    if (FormulaGrammar::isODFF( meGrammar) || FormulaGrammar::isOOXML( meGrammar))
     {
-        // ODFF has a defined set of English function names, avoid i18n
-        // overhead.
+        // ODFF and OOXML have defined sets of English function names, avoid
+        // i18n overhead.
         rUpper = rOrg.toAsciiUpperCase();
         return true;
     }
@@ -4463,6 +4484,7 @@ bool ScCompiler::NextNewToken( bool bInArray )
     // ParseReference().
 
     OUString aUpper;
+    bool bAsciiUpper = false;
 
 Label_Rewind:
 
@@ -4482,7 +4504,7 @@ Label_Rewind:
 
         mbRewind = false;
         aUpper.clear();
-        bool bAsciiUpper = false;
+        bAsciiUpper = false;
 
         if (bAsciiNonAlnum)
         {
@@ -4553,6 +4575,8 @@ Label_Rewind:
             // more likely in that localized language than in the formula
             // language. This in corner cases needs to continue to work for
             // existing documents and environments.
+            // Do not change bAsciiUpper from here on for the lowercase() call
+            // below in the ocBad case to use the correct CharClass.
             aUpper = ScGlobal::getCharClass().uppercase( aOrg );
         }
 
@@ -4616,7 +4640,8 @@ Label_Rewind:
     // Provide single token information and continue. Do not set an error, that
     // would prematurely end compilation. Simple unknown names are handled by
     // the interpreter.
-    aUpper = pCharClass->lowercase( aUpper );
+    // Use the same CharClass that was used for uppercase.
+    aUpper = ((bAsciiUpper || mbCharClassesDiffer) ? ScGlobal::getCharClass() : *pCharClass).lowercase( aUpper );
     svl::SharedString aSS = rDoc.GetSharedStringPool().intern(aUpper);
     maRawToken.SetString(aSS.getData(), aSS.getDataIgnoreCase());
     maRawToken.NewOpCode( ocBad );
@@ -5329,8 +5354,11 @@ void ScCompiler::CreateStringFromSingleRef( OUStringBuffer& rBuffer, const Formu
         if (rDoc.HasStringData(aAbs.Col(), aAbs.Row(), aAbs.Tab()))
         {
             OUString aStr = rDoc.GetString(aAbs, mpInterpreterContext);
-            EnQuote( aStr );
+            // Enquote to SingleQuoted.
+            aStr = aStr.replaceAll(u"'", u"''");
+            rBuffer.append('\'');
             rBuffer.append(aStr);
+            rBuffer.append('\'');
         }
         else
         {
@@ -5473,25 +5501,6 @@ void ScCompiler::LocalizeString( OUString& rName ) const
     ScGlobal::GetAddInCollection()->LocalizeString( rName );
 }
 
-// Put quotes around string if non-alphanumeric characters are contained,
-// quote characters contained within are escaped by '\\'.
-bool ScCompiler::EnQuote( OUString& rStr )
-{
-    sal_Int32 nType = ScGlobal::getCharClass().getStringType( rStr, 0, rStr.getLength() );
-    if ( !CharClass::isNumericType( nType )
-            && CharClass::isAlphaNumericType( nType ) )
-        return false;
-
-    sal_Int32 nPos = 0;
-    while ( (nPos = rStr.indexOf( '\'', nPos)) != -1 )
-    {
-        rStr = rStr.replaceAt( nPos, 0, u"\\" );
-        nPos += 2;
-    }
-    rStr = "'" + rStr + "'";
-    return true;
-}
-
 FormulaTokenRef ScCompiler::ExtendRangeReference( FormulaToken & rTok1, FormulaToken & rTok2 )
 {
     return extendRangeReference( rDoc.GetSheetLimits(), rTok1, rTok2, aPos, true/*bReuseDoubleRef*/ );
@@ -5503,6 +5512,7 @@ void ScCompiler::fillAddInToken(::std::vector< css::sheet::FormulaOpCodeMapEntry
     sheet::FormulaOpCodeMapEntry aEntry;
     aEntry.Token.OpCode = ocExternal;
 
+    const LanguageTag aEnglishLanguageTag(LANGUAGE_ENGLISH_US);
     ScUnoAddInCollection* pColl = ScGlobal::GetAddInCollection();
     const tools::Long nCount = pColl->GetFuncCount();
     for (tools::Long i=0; i < nCount; ++i)
@@ -5512,8 +5522,12 @@ void ScCompiler::fillAddInToken(::std::vector< css::sheet::FormulaOpCodeMapEntry
         {
             if ( _bIsEnglish )
             {
+                // This is used with OOXML import, so GetExcelName() is really
+                // wanted here until we'll have a parameter to differentiate
+                // from the general css::sheet::XFormulaOpCodeMapper case and
+                // use pFuncData->GetUpperEnglish().
                 OUString aName;
-                if (pFuncData->GetExcelName( LANGUAGE_ENGLISH_US, aName))
+                if (pFuncData->GetExcelName( aEnglishLanguageTag, aName))
                     aEntry.Name = aName;
                 else
                     aEntry.Name = pFuncData->GetUpperName();
@@ -5550,7 +5564,7 @@ bool ScCompiler::HandleColRowName()
     for ( size_t i = 0, nPairs = pRL->size(); i < nPairs; ++i )
     {
         const ScRangePair & rR = (*pRL)[i];
-        if ( rR.GetRange(0).In( aAbs ) )
+        if ( rR.GetRange(0).Contains( aAbs ) )
         {
             bInList = bValidName = true;
             aRange = rR.GetRange(1);
@@ -6174,7 +6188,8 @@ bool ScCompiler::HandleIIOpCodeInternal(FormulaToken* token, FormulaToken*** ppp
         mPendingImplicitIntersectionOptimizations.emplace_back( pppToken[0], token );
         return true;
     }
-    else if ((nOpCode >= SC_OPCODE_START_BIN_OP && nOpCode < SC_OPCODE_STOP_BIN_OP)
+    else if ((nOpCode >= SC_OPCODE_START_BIN_OP && nOpCode < SC_OPCODE_STOP_BIN_OP
+                && nOpCode != ocAnd && nOpCode != ocOr)
               || nOpCode == ocRound || nOpCode == ocRoundUp || nOpCode == ocRoundDown)
     {
         if (nNumParams != 2)
@@ -6234,7 +6249,8 @@ bool ScCompiler::HandleIIOpCodeInternal(FormulaToken* token, FormulaToken*** ppp
         bool possibleII = false;
         for( int i = 0; i < nNumParams; ++i )
         {
-            if( ParameterMayBeImplicitIntersection( token, i ))
+            if( ParameterMayBeImplicitIntersection( token, i )
+                && (*pppToken[i])->GetType() == svDoubleRef)
             {
                 possibleII = true;
                 break;
@@ -6452,89 +6468,178 @@ void ScCompiler::AnnotateTrimOnDoubleRefs()
     // OpCode of the "root" operator (which is already in RPN array).
     OpCode eOpCode = (*(pCode - 1))->GetOpCode();
     // eOpCode can be some operator which does not change with operands with or contains zero values.
-    if (eOpCode != ocSum)
-        return;
-
-    FormulaToken** ppTok = pCode - 2; // exclude the root operator.
-    // The following loop runs till a "pattern" is found or there is a mismatch
-    // and marks the push DoubleRef arguments as trimmable when there is a match.
-    // The pattern is
-    // SUM(IF(<reference|double>=<reference|double>, <then-clause>)<a some operands with operators / or *>)
-    // such that one of the operands of ocEqual is a double-ref.
-    // Examples of formula that matches this are:
-    //   SUM(IF(D:D=$A$1,F:F)*$H$1*2.3/$G$2)
-    //   SUM((IF(D:D=$A$1,F:F)*$H$1*2.3/$G$2)*$H$2*5/$G$3)
-    //   SUM(IF(E:E=16,F:F)*$H$1*100)
-    bool bTillClose = true;
-    bool bCloseTillIf = false;
-    sal_Int16 nToksTillIf = 0;
-    constexpr sal_Int16 MAXDIST_IF = 15;
-    while (*ppTok)
+    if (eOpCode == ocSum)
     {
-        FormulaToken* pTok = *ppTok;
-        OpCode eCurrOp = pTok->GetOpCode();
-        ++nToksTillIf;
-
-        // TODO : Is there a better way to handle this ?
-        // ocIf is too far off from the sum opcode.
-        if (nToksTillIf > MAXDIST_IF)
-            return;
-
-        switch (eCurrOp)
+        FormulaToken** ppTok = pCode - 2; // exclude the root operator.
+        // The following loop runs till a "pattern" is found or there is a mismatch
+        // and marks the push DoubleRef arguments as trimmable when there is a match.
+        // The pattern is
+        // SUM(IF(<reference|double>=<reference|double>, <then-clause>)<a some operands with operators / or *>)
+        // such that one of the operands of ocEqual is a double-ref.
+        // Examples of formula that matches this are:
+        //   SUM(IF(D:D=$A$1,F:F)*$H$1*2.3/$G$2)
+        //   SUM((IF(D:D=$A$1,F:F)*$H$1*2.3/$G$2)*$H$2*5/$G$3)
+        //   SUM(IF(E:E=16,F:F)*$H$1*100)
+        bool bTillClose = true;
+        bool bCloseTillIf = false;
+        sal_Int16 nToksTillIf = 0;
+        constexpr sal_Int16 MAXDIST_IF = 15;
+        while (*ppTok)
         {
-            case ocDiv:
-            case ocMul:
-                if (!bTillClose)
-                    return;
-                break;
-            case ocPush:
+            FormulaToken* pTok = *ppTok;
+            OpCode eCurrOp = pTok->GetOpCode();
+            ++nToksTillIf;
 
-                break;
-            case ocClose:
-                if (bTillClose)
-                {
-                    bTillClose = false;
-                    bCloseTillIf = true;
-                }
-                else
-                    return;
-                break;
-            case ocIf:
-                {
-                    if (!bCloseTillIf)
+            // TODO : Is there a better way to handle this ?
+            // ocIf is too far off from the sum opcode.
+            if (nToksTillIf > MAXDIST_IF)
+                return;
+
+            switch (eCurrOp)
+            {
+                case ocDiv:
+                case ocMul:
+                    if (!bTillClose)
                         return;
+                    break;
+                case ocPush:
 
-                    if (!pTok->IsInForceArray())
-                        return;
-
-                    const short nJumpCount = pTok->GetJump()[0];
-                    if (nJumpCount != 2) // Should have THEN but no ELSE.
-                        return;
-
-                    OpCode eCompOp = (*(ppTok - 1))->GetOpCode();
-                    if (eCompOp != ocEqual)
-                        return;
-
-                    FormulaToken* pLHS = *(ppTok - 2);
-                    FormulaToken* pRHS = *(ppTok - 3);
-                    if (((pLHS->GetType() == svSingleRef || pLHS->GetType() == svDouble) && pRHS->GetType() == svDoubleRef) ||
-                        ((pRHS->GetType() == svSingleRef || pRHS->GetType() == svDouble) && pLHS->GetType() == svDoubleRef))
+                    break;
+                case ocClose:
+                    if (bTillClose)
                     {
-                        if (pLHS->GetType() == svDoubleRef)
+                        bTillClose = false;
+                        bCloseTillIf = true;
+                    }
+                    else
+                        return;
+                    break;
+                case ocIf:
+                    {
+                        if (!bCloseTillIf)
+                            return;
+
+                        if (!pTok->IsInForceArray())
+                            return;
+
+                        const short nJumpCount = pTok->GetJump()[0];
+                        if (nJumpCount != 2) // Should have THEN but no ELSE.
+                            return;
+
+                        OpCode eCompOp = (*(ppTok - 1))->GetOpCode();
+                        if (eCompOp != ocEqual)
+                            return;
+
+                        FormulaToken* pLHS = *(ppTok - 2);
+                        FormulaToken* pRHS = *(ppTok - 3);
+                        if (((pLHS->GetType() == svSingleRef || pLHS->GetType() == svDouble) && pRHS->GetType() == svDoubleRef) ||
+                            ((pRHS->GetType() == svSingleRef || pRHS->GetType() == svDouble) && pLHS->GetType() == svDoubleRef))
+                        {
+                            if (pLHS->GetType() == svDoubleRef)
+                                pLHS->GetDoubleRef()->SetTrimToData(true);
+                            else
+                                pRHS->GetDoubleRef()->SetTrimToData(true);
+                            return;
+                        }
+                    }
+                    break;
+                default:
+                    return;
+            }
+            --ppTok;
+        }
+    }
+    else if (eOpCode == ocSumProduct)
+    {
+        FormulaToken** ppTok = pCode - 2; // exclude the root operator.
+        // The following loop runs till a "pattern" is found or there is a mismatch
+        // and marks the push DoubleRef arguments as trimmable when there is a match.
+        // The pattern is
+        // SUMPRODUCT(IF(<reference|double>=<reference|double>, <then-clause>)<a some operands with operators / or *>)
+        // such that one of the operands of ocEqual is a double-ref.
+        // Examples of formula that matches this are:
+        //   SUMPRODUCT(IF($A:$A=$L12;$D:$D*G:G))
+        bool bTillClose = true;
+        bool bCloseTillIf = false;
+        sal_Int16 nToksTillIf = 0;
+        constexpr sal_Int16 MAXDIST_IF = 15;
+        while (*ppTok)
+        {
+            FormulaToken* pTok = *ppTok;
+            OpCode eCurrOp = pTok->GetOpCode();
+            ++nToksTillIf;
+
+            // TODO : Is there a better way to handle this ?
+            // ocIf is too far off from the sum opcode.
+            if (nToksTillIf > MAXDIST_IF)
+                return;
+
+            switch (eCurrOp)
+            {
+                case ocDiv:
+                case ocMul:
+                    {
+                        if (!pTok->IsInForceArray())
+                            break;
+                        FormulaToken* pLHS = *(ppTok - 1);
+                        FormulaToken* pRHS = *(ppTok - 2);
+                        StackVar lhsType = pLHS->GetType();
+                        StackVar rhsType = pRHS->GetType();
+                        if (lhsType == svDoubleRef && rhsType == svDoubleRef)
+                        {
                             pLHS->GetDoubleRef()->SetTrimToData(true);
-                        else
                             pRHS->GetDoubleRef()->SetTrimToData(true);
+                        }
+                    }
+                    break;
+                case ocPush:
+                    break;
+                case ocClose:
+                    if (bTillClose)
+                    {
+                        bTillClose = false;
+                        bCloseTillIf = true;
+                    }
+                    else
+                        return;
+                    break;
+                case ocIf:
+                    {
+                        if (!bCloseTillIf)
+                            return;
+
+                        if (!pTok->IsInForceArray())
+                            return;
+
+                        const short nJumpCount = pTok->GetJump()[0];
+                        if (nJumpCount != 2) // Should have THEN but no ELSE.
+                            return;
+
+                        OpCode eCompOp = (*(ppTok - 1))->GetOpCode();
+                        if (eCompOp != ocEqual)
+                            return;
+
+                        FormulaToken* pLHS = *(ppTok - 2);
+                        FormulaToken* pRHS = *(ppTok - 3);
+                        StackVar lhsType = pLHS->GetType();
+                        StackVar rhsType = pRHS->GetType();
+                        if (lhsType == svDoubleRef && (rhsType == svSingleRef || rhsType == svDouble))
+                        {
+                            pLHS->GetDoubleRef()->SetTrimToData(true);
+                        }
+                        if ((lhsType == svSingleRef || lhsType == svDouble) && rhsType == svDoubleRef)
+                        {
+                            pRHS->GetDoubleRef()->SetTrimToData(true);
+                        }
                         return;
                     }
-                }
-                break;
-            default:
-                return;
+                    break;
+                default:
+                    return;
+            }
+            --ppTok;
         }
-        --ppTok;
     }
-
-    return;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

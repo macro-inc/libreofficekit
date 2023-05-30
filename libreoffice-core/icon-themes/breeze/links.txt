@@ -476,6 +476,8 @@ cmd/32/fa/deleterecord.png cmd/32/ar/deleterecord.png
 cmd/32/fa/incrementlevel.png cmd/ar/incrementlevel.png
 cmd/32/fa/incrementsublevels.png cmd/ar/incrementsublevels.png
 cmd/32/fa/insertneutralparagraph.png cmd/32/ar/insertneutralparagraph.png
+cmd/32/fa/jumpdownthislevel.png cmd/32/ar/jumpdownthislevel.png
+cmd/32/fa/jumpupthislevel.png cmd/32/ar/jumpupthislevel.png
 cmd/32/fa/linenumberdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/fa/linenumberingdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/fa/movedown.png cmd/ar/movedown.png
@@ -516,6 +518,8 @@ cmd/32/he/deleterecord.png cmd/32/ar/deleterecord.png
 cmd/32/he/incrementlevel.png cmd/ar/incrementlevel.png
 cmd/32/he/incrementsublevels.png cmd/ar/incrementsublevels.png
 cmd/32/he/insertneutralparagraph.png cmd/32/ar/insertneutralparagraph.png
+cmd/32/he/jumpdownthislevel.png cmd/32/ar/jumpdownthislevel.png
+cmd/32/he/jumpupthislevel.png cmd/32/ar/jumpupthislevel.png
 cmd/32/he/linenumberdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/he/linenumberingdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/he/movedown.png cmd/ar/movedown.png
@@ -608,6 +612,8 @@ cmd/32/ur/deleterecord.png cmd/32/ar/deleterecord.png
 cmd/32/ur/incrementlevel.png cmd/ar/incrementlevel.png
 cmd/32/ur/incrementsublevels.png cmd/ar/incrementsublevels.png
 cmd/32/ur/insertneutralparagraph.png cmd/32/ar/insertneutralparagraph.png
+cmd/32/ur/jumpdownthislevel.png cmd/32/ar/jumpdownthislevel.png
+cmd/32/ur/jumpupthislevel.png cmd/32/ar/jumpupthislevel.png
 cmd/32/ur/linenumberdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/ur/linenumberingdialog.png cmd/32/ar/linenumberingdialog.png
 cmd/32/ur/movedown.png cmd/ar/movedown.png
@@ -670,6 +676,8 @@ cmd/fa/lc_deleterecord.png cmd/ar/lc_deleterecord.png
 cmd/fa/lc_incrementlevel.png cmd/ar/lc_incrementlevel.png
 cmd/fa/lc_incrementsublevels.png cmd/ar/lc_incrementsublevels.png
 cmd/fa/lc_insertneutralparagraph.png cmd/ar/lc_insertneutralparagraph.png
+cmd/fa/lc_jumpdownthislevel.png cmd/ar/lc_jumpdownthislevel.png
+cmd/fa/lc_jumpupthislevel.png cmd/ar/lc_jumpupthislevel.png
 cmd/fa/lc_linenumberdialog.png cmd/ar/lc_linenumberingdialog.png
 cmd/fa/lc_linenumberingdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/fa/lc_movedown.png cmd/ar/lc_movedown.png
@@ -702,6 +710,8 @@ cmd/fa/sc_deleterecord.png cmd/ar/sc_deleterecord.png
 cmd/fa/sc_incrementlevel.png cmd/ar/sc_incrementlevel.png
 cmd/fa/sc_incrementsublevels.png cmd/ar/sc_incrementsublevels.png
 cmd/fa/sc_insertneutralparagraph.png cmd/ar/sc_insertneutralparagraph.png
+cmd/fa/sc_jumpdownthislevel.png cmd/ar/sc_jumpdownthislevel.png
+cmd/fa/sc_jumpupthislevel.png cmd/ar/sc_jumpupthislevel.png
 cmd/fa/sc_linenumberdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/fa/sc_linenumberingdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/fa/sc_movedown.png cmd/ar/sc_movedown.png
@@ -750,6 +760,8 @@ cmd/he/lc_deleterecord.png cmd/ar/lc_deleterecord.png
 cmd/he/lc_incrementlevel.png cmd/ar/lc_incrementlevel.png
 cmd/he/lc_incrementsublevels.png cmd/ar/lc_incrementsublevels.png
 cmd/he/lc_insertneutralparagraph.png cmd/ar/lc_insertneutralparagraph.png
+cmd/he/lc_jumpdownthislevel.png cmd/ar/lc_jumpdownthislevel.png
+cmd/he/lc_jumpupthislevel.png cmd/ar/lc_jumpupthislevel.png
 cmd/he/lc_linenumberdialog.png cmd/ar/lc_linenumberingdialog.png
 cmd/he/lc_linenumberingdialog.png cmd/ar/lc_linenumberingdialog.png
 cmd/he/lc_movedown.png cmd/ar/lc_movedown.png
@@ -782,6 +794,8 @@ cmd/he/sc_deleterecord.png cmd/ar/sc_deleterecord.png
 cmd/he/sc_incrementlevel.png cmd/ar/sc_incrementlevel.png
 cmd/he/sc_incrementsublevels.png cmd/ar/sc_incrementsublevels.png
 cmd/he/sc_insertneutralparagraph.png cmd/ar/sc_insertneutralparagraph.png
+cmd/he/sc_jumpdownthislevel.png cmd/ar/sc_jumpdownthislevel.png
+cmd/he/sc_jumpupthislevel.png cmd/ar/sc_jumpupthislevel.png
 cmd/he/sc_linenumberdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/he/sc_linenumberingdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/he/sc_movedown.png cmd/ar/sc_movedown.png
@@ -934,6 +948,8 @@ cmd/ur/lc_deleterecord.png cmd/ar/lc_deleterecord.png
 cmd/ur/lc_incrementlevel.png cmd/ar/lc_incrementlevel.png
 cmd/ur/lc_incrementsublevels.png cmd/ar/lc_incrementsublevels.png
 cmd/ur/lc_insertneutralparagraph.png cmd/ar/lc_insertneutralparagraph.png
+cmd/ur/lc_jumpdownthislevel.png cmd/ar/lc_jumpdownthislevel.png
+cmd/ur/lc_jumpupthislevel.png cmd/ar/lc_jumpupthislevel.png
 cmd/ur/lc_linenumberdialog.png cmd/ar/lc_linenumberingdialog.png
 cmd/ur/lc_linenumberingdialog.png cmd/ar/lc_linenumberingdialog.png
 cmd/ur/lc_movedown.png cmd/ar/lc_movedown.png
@@ -966,6 +982,8 @@ cmd/ur/sc_deleterecord.png cmd/ar/sc_deleterecord.png
 cmd/ur/sc_incrementlevel.png cmd/ar/sc_incrementlevel.png
 cmd/ur/sc_incrementsublevels.png cmd/ar/sc_incrementsublevels.png
 cmd/ur/sc_insertneutralparagraph.png cmd/ar/sc_insertneutralparagraph.png
+cmd/ur/sc_jumpdownthislevel.png cmd/ar/sc_jumpdownthislevel.png
+cmd/ur/sc_jumpupthislevel.png cmd/ar/sc_jumpupthislevel.png
 cmd/ur/sc_linenumberdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/ur/sc_linenumberingdialog.png cmd/ar/sc_linenumberingdialog.png
 cmd/ur/sc_movedown.png cmd/ar/sc_movedown.png
@@ -1033,19 +1051,16 @@ cmd/32/colorview.png cmd/32/graphicfilterinvert.png
 cmd/32/grafinvert.png cmd/32/graphicfilterinvert.png
 cmd/32/grafmode.png cmd/32/graphicdialog.png
 cmd/32/graphicfilterposter.png cmd/32/graphicdialog.png
-cmd/32/objecttitledescription.png cmd/32/insertcaptiondialog.png
 
 cmd/lc_colorview.png cmd/lc_graphicfilterinvert.png
 cmd/lc_grafinvert.png cmd/lc_graphicfilterinvert.png
 cmd/lc_grafmode.png cmd/lc_graphicdialog.png
 cmd/lc_graphicfilterposter.png cmd/lc_graphicdialog.png
-cmd/lc_objecttitledescription.png cmd/lc_insertcaptiondialog.png
 
 cmd/sc_colorview.png cmd/sc_graphicfilterinvert.png
 cmd/sc_grafinvert.png cmd/sc_graphicfilterinvert.png
 cmd/sc_grafmode.png cmd/sc_graphicdialog.png
 cmd/sc_graphicfilterposter.png cmd/sc_graphicdialog.png
-cmd/sc_objecttitledescription.png cmd/sc_insertcaptiondialog.png
 
 # shapes
 cmd/32/arrowshapes.left-right-arrow.png cmd/32/arrowshapes.png
@@ -1054,7 +1069,6 @@ cmd/32/basicshapes.circle-pie.png cmd/32/pie.png
 cmd/32/basicshapes.parallelogram.png cmd/32/flowchartshapes.flowchart-data.png
 cmd/32/basicshapes.round-rectangle.png cmd/32/rect_rounded.png
 cmd/32/calloutshapes.round-rectangular-callout.png cmd/32/calloutshapes.png
-cmd/32/emojicontrol.png cmd/32/symbolshapes.png
 cmd/32/fontworkshapetype.fontwork-circle-pour.png cmd/32/basicshapes.ring.png
 cmd/32/flowchartshapes.png cmd/32/flowchartshapes.flowchart-document.png
 cmd/32/flowchartshapes.flowchart-alternate-process.png cmd/32/basicshapes.round-quadrat.png
@@ -1075,7 +1089,6 @@ cmd/lc_basicshapes.circle-pie.png cmd/lc_pie.png
 cmd/lc_basicshapes.parallelogram.png cmd/lc_flowchartshapes.flowchart-data.png
 cmd/lc_basicshapes.round-rectangle.png cmd/lc_rect_rounded.png
 cmd/lc_calloutshapes.round-rectangular-callout.png cmd/lc_calloutshapes.png
-cmd/lc_emojicontrol.png cmd/lc_symbolshapes.png
 cmd/lc_fontworkshapetype.fontwork-circle-pour.png cmd/lc_basicshapes.ring.png
 cmd/lc_flowchartshapes.png cmd/lc_flowchartshapes.flowchart-document.png
 cmd/lc_flowchartshapes.flowchart-alternate-process.png cmd/lc_basicshapes.round-quadrat.png
@@ -1096,7 +1109,6 @@ cmd/sc_basicshapes.circle-pie.png cmd/sc_pie.png
 cmd/sc_basicshapes.parallelogram.png cmd/sc_flowchartshapes.flowchart-data.png
 cmd/sc_basicshapes.round-rectangle.png cmd/sc_rect_rounded.png
 cmd/sc_calloutshapes.round-rectangular-callout.png cmd/sc_calloutshapes.png
-cmd/sc_emojicontrol.png cmd/sc_symbolshapes.png
 cmd/sc_fontworkshapetype.fontwork-circle-pour.png cmd/sc_basicshapes.ring.png
 cmd/sc_flowchartshapes.png cmd/sc_flowchartshapes.flowchart-document.png
 cmd/sc_flowchartshapes.flowchart-alternate-process.png cmd/sc_basicshapes.round-quadrat.png
@@ -2272,7 +2284,6 @@ res/im30821.png cmd/sc_insertscript.png
 res/im30826.png res/odm_16_8.png
 res/info.png cmd/lc_helpindex.png
 res/info_16.png cmd/sc_helpindex.png
-res/lc05504.png cmd/lc_print.png
 res/lc05509.png cmd/lc_print.png
 res/lc05539.png cmd/lc_designerdialog.png
 res/lc05678.png cmd/lc_inserthyperlinkcontrol.png
@@ -2280,9 +2291,6 @@ res/lc05700.png cmd/lc_redo.png
 res/lc05701.png cmd/lc_undo.png
 res/lc05710.png cmd/lc_cut.png
 res/lc05711.png cmd/lc_copy.png
-res/lc05961.png cmd/lc_recsearch.png
-res/lc06300.png cmd/lc_nextrecord.png
-res/lc06301.png cmd/lc_prevrecord.png
 res/lc10711.png cmd/lc_removefiltersort.png
 res/lc10715.png cmd/lc_datafilterstandardfilter.png
 res/lc10716.png cmd/lc_datafilterautofilter.png
@@ -2414,8 +2422,6 @@ res/sx10728.png cmd/sc_formattedfield.png
 res/sx10757.png cmd/sc_timefield.png
 res/sx10768.png cmd/sc_scrollbar.png
 res/sx10769.png cmd/sc_spinbutton.png
-res/sx18002.png res/plus.png
-res/sx18003.png res/minus.png
 
 # sc
 # ==============================================
@@ -2504,9 +2510,7 @@ sfx2/res/deleterow.png cmd/sc_cancel.png
 sfx2/res/doccl.png cmd/sc_newdoc.png
 sfx2/res/exec_action.png cmd/sc_config.png
 sfx2/res/favourite.png cmd/sc_insertbookmark.png
-sfx2/res/favourite_big.png cmd/lc_insertbookmark.png
 sfx2/res/hlpdoc.png cmd/sc_helpindex.png
-sfx2/res/indexon_big.png cmd/lc_defaultnumbering.png
 sfx2/res/indexon_small.png cmd/sc_defaultnumbering.png
 sfx2/res/minus.png res/minus.png
 sfx2/res/newex.png res/plus.png
@@ -2519,28 +2523,16 @@ sfx2/res/styfam1.png cmd/sc_charfontname.png
 sfx2/res/styfam2.png cmd/sc_controlcodes.png
 sfx2/res/styfam3.png cmd/sc_linestyle.png
 sfx2/res/styfam4.png cmd/sc_showsinglepage.png
-sfx2/res/symphony/sidebar-3d-large.png cmd/lc_cube.png
-sfx2/res/symphony/sidebar-3d-small.png cmd/sc_cube.png
 sfx2/res/symphony/sidebar-animation-large.png cmd/lc_diaeffect.png
-sfx2/res/symphony/sidebar-animation-small.png cmd/sc_diaeffect.png
-sfx2/res/symphony/sidebar-colors-large.png cmd/lc_bmpmask.png
 sfx2/res/symphony/sidebar-colors-small.png cmd/sc_bmpmask.png
-sfx2/res/symphony/sidebar-eyedropper-large.png cmd/lc_bmpmask.png
-sfx2/res/symphony/sidebar-eyedropper-small.png cmd/sc_bmpmask.png
 sfx2/res/symphony/sidebar-functions-large.png cmd/lc_dbviewfunctions.png
-sfx2/res/symphony/sidebar-functions-small.png cmd/sc_dbviewfunctions.png
 sfx2/res/symphony/sidebar-gallery-large.png cmd/lc_gallery.png
-sfx2/res/symphony/sidebar-gallery-small.png cmd/sc_gallery.png
 sfx2/res/symphony/sidebar-navigator-large.png cmd/lc_navigator.png
-sfx2/res/symphony/sidebar-navigator-small.png cmd/sc_navigator.png
 sfx2/res/symphony/sidebar-property-large.png cmd/lc_formproperties.png
 sfx2/res/symphony/sidebar-property-small.png cmd/sc_formproperties.png
 sfx2/res/symphony/sidebar-style-large.png cmd/lc_formdesigntools.png
-sfx2/res/symphony/sidebar-style-small.png cmd/sc_formdesigntools.png
 sfx2/res/symphony/sidebar-template-large.png cmd/lc_slidemasterpage.png
-sfx2/res/symphony/sidebar-template-small.png cmd/sc_slidemasterpage.png
 sfx2/res/symphony/sidebar-transition-large.png cmd/lc_slidechangewindow.png
-sfx2/res/symphony/sidebar-transition-small.png cmd/sc_slidechangewindow.png
 
 # startmath
 # ==============================================
@@ -2690,12 +2682,9 @@ sw/res/nc20008.png cmd/sc_insertreferencefield.png
 sw/res/nc20009.png cmd/sc_insertindexesentry.png
 sw/res/nc20010.png cmd/sc_shownote.png
 sw/res/nc20011.png sd/res/sf01.png
+sw/res/nc20012.png cmd/sc_insertfootnote.png
+sw/res/nc20013.png cmd/sc_insertendnote.png
 sw/res/sc20244.png sw/res/sc20234.png
-
-sw/res/re01.png cmd/lc_unsetcellsreadonly.png
-sw/res/re02.png cmd/lc_unsetcellsreadonly.png
-sw/res/re03.png cmd/sc_protect.png
-sw/res/re04.png cmd/sc_protect.png
 
 sw/res/sc20171.png cmd/sc_downsearch.png
 sw/res/sc20172.png cmd/sc_prevrecord.png
@@ -2741,6 +2730,9 @@ sw/res/sr20016.png cmd/sc_recsearch.png
 sw/res/sr20017.png cmd/sc_insertindexesentry.png
 sw/res/sr20018.png cmd/sc_inserttable.png
 sw/res/sr20019.png cmd/sc_remove.png
+sw/res/sr20020.png sw/res/sc20234.png
+sw/res/sr20021.png cmd/sc_addfield.png
+sw/res/sr20022.png cmd/sc_addfield.png
 
 sw/res/sx01.png cmd/sc_dbviewqueries.png
 sw/res/sx02.png cmd/sc_dbviewtables.png
@@ -2944,6 +2936,47 @@ cmd/sc_librelogo-right.png cmd/sc_rotateright.png
 cmd/sc_librelogo-run.png cmd/sc_runbasic.png
 cmd/sc_librelogo-stop.png cmd/sc_basicstop.png
 cmd/sc_librelogo-translate.png cmd/sc_editglossary.png
+
+# Contextual Single UI (Writer)
+cmd/32/zoom-more.png cmd/32/controlproperties.png
+cmd/32/accepttrackedchanges-more.png cmd/32/controlproperties.png
+cmd/32/fontdialog-more.png cmd/32/controlproperties.png
+cmd/32/paragraphdialog-more.png cmd/32/controlproperties.png
+cmd/32/tabledialog-more.png cmd/32/controlproperties.png
+cmd/32/transformdialog-more.png cmd/32/controlproperties.png
+cmd/32/graphicdialog-more.png cmd/32/controlproperties.png
+cmd/32/framedialog-more.png cmd/32/controlproperties.png
+cmd/32/objectdialog-more.png cmd/32/controlproperties.png
+cmd/32/borderdialog-more.png cmd/32/controlproperties.png
+cmd/32/textwrap-more.png cmd/32/controlproperties.png
+cmd/32/formatarea-more.png cmd/32/controlproperties.png
+cmd/32/formatline-more.png cmd/32/controlproperties.png
+cmd/lc_zoom-more.png cmd/lc_controlproperties.png
+cmd/lc_accepttrackedchanges-more.png cmd/lc_controlproperties.png
+cmd/lc_fontdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_paragraphdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_tabledialog-more.png cmd/lc_controlproperties.png
+cmd/lc_transformdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_graphicdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_framedialog-more.png cmd/lc_controlproperties.png
+cmd/lc_objectdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_borderdialog-more.png cmd/lc_controlproperties.png
+cmd/lc_textwrap-more.png cmd/lc_controlproperties.png
+cmd/lc_formatarea-more.png cmd/lc_controlproperties.png
+cmd/lc_formatline-more.png cmd/lc_controlproperties.png
+cmd/sc_zoom-more.png cmd/sc_controlproperties.png
+cmd/sc_accepttrackedchanges-more.png cmd/sc_controlproperties.png
+cmd/sc_fontdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_paragraphdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_tabledialog-more.png cmd/sc_controlproperties.png
+cmd/sc_transformdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_graphicdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_framedialog-more.png cmd/sc_controlproperties.png
+cmd/sc_objectdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_borderdialog-more.png cmd/sc_controlproperties.png
+cmd/sc_textwrap-more.png cmd/sc_controlproperties.png
+cmd/sc_formatarea-more.png cmd/sc_controlproperties.png
+cmd/sc_formatline-more.png cmd/sc_controlproperties.png
 
 # other
 cmd/32/openxmlfiltersettings.png cmd/32/managexmlsource.png

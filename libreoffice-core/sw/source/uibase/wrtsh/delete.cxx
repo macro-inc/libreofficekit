@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <cmdid.h>
 #include <hintids.hxx>
 #include <wrtsh.hxx>
 #include <swcrsr.hxx>
@@ -200,12 +199,12 @@ bool SwWrtShell::DelLeft()
         // #i4032# Don't actually call a 'delete' if we
         // changed the table cell, compare DelRight().
         const SwStartNode * pSNdOld = pWasInTableNd ?
-                                      GetCursor()->GetNode().FindTableBoxStartNode() :
+                                      GetCursor()->GetPointNode().FindTableBoxStartNode() :
                                       nullptr;
 
         // If the cursor is at the beginning of a paragraph, try to step
         // backwards. On failure we are done.
-        bool bDoSomething = SwCursorShell::Left(1,CRSR_SKIP_CHARS);
+        bool bDoSomething = SwCursorShell::Left(1,SwCursorSkipMode::Chars);
 
         if (bDoSomething)
         {
@@ -216,7 +215,7 @@ bool SwWrtShell::DelLeft()
             if (bDoSomething)
             {
                 const SwStartNode* pSNdNew = pIsInTableNd ?
-                    GetCursor()->GetNode().FindTableBoxStartNode() :
+                    GetCursor()->GetPointNode().FindTableBoxStartNode() :
                     nullptr;
 
                 // #i4032# Don't actually call a 'delete' if we
@@ -235,7 +234,7 @@ bool SwWrtShell::DelLeft()
         SwCursorShell::Pop(SwCursorShell::PopMode::DeleteStack);
 
         OpenMark();
-        SwCursorShell::Right(1,CRSR_SKIP_CHARS);
+        SwCursorShell::Right(1,SwCursorSkipMode::Chars);
         SwCursorShell::SwapPam();
         bSwap = true;
     }
@@ -243,8 +242,7 @@ bool SwWrtShell::DelLeft()
     {
         // If we are just to the right to a fieldmark, then remove it completely
         const SwPosition* pCurPos = GetCursor()->GetPoint();
-        SwPosition aPrevChar(*pCurPos);
-        --aPrevChar.nContent;
+        SwPosition aPrevChar(*pCurPos->GetContentNode(), pCurPos->GetContentIndex() - 1);
         sw::mark::IFieldmark* pFm = getIDocumentMarkAccess()->getFieldmarkAt(aPrevChar);
         if (pFm && pFm->GetMarkEnd() == *pCurPos)
         {
@@ -256,7 +254,7 @@ bool SwWrtShell::DelLeft()
         }
 
         OpenMark();
-        SwCursorShell::Left(1, CRSR_SKIP_CHARS);
+        SwCursorShell::Left(1, SwCursorSkipMode::Chars);
         if (SvtScriptType::ASIAN == GetScriptType())
         {
             sal_uInt32 nCode = GetChar(false);
@@ -269,7 +267,7 @@ bool SwWrtShell::DelLeft()
             if ( unicode::isIVSSelector( nCode ) )
             {
                 SwCursorShell::Push();
-                SwCursorShell::Left(1, CRSR_SKIP_CHARS);
+                SwCursorShell::Left(1, SwCursorSkipMode::Chars);
                 OUString sStr = GetSelText();
                 nCode = sStr.iterateCodePoints( &o3tl::temporary(sal_Int32(0)) );
                 if ( unicode::isCJKIVSCharacter( nCode ) )
@@ -285,9 +283,7 @@ bool SwWrtShell::DelLeft()
     CloseMark( bRet );
     if (!bRet)
     {   // false indicates HasReadonlySel failed
-        std::unique_ptr<weld::Builder> xBuilder(Application::CreateBuilder(GetView().GetFrameWeld(), "modules/swriter/ui/inforeadonlydialog.ui"));
-        std::unique_ptr<weld::MessageDialog> xInfo(xBuilder->weld_message_dialog("InfoReadonlyDialog"));
-        xInfo->run();
+        InfoReadOnlyDialog();
     }
     return bRet;
 }
@@ -303,7 +299,7 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
     if(nSelection & SelectionType::Text)
         nSelection = SelectionType::Text;
 
-    switch( nSelection & ~SelectionType::Ornament )
+    switch( nSelection & ~SelectionType::Ornament & ~SelectionType::Media )
     {
     case SelectionType::PostIt:
     case SelectionType::Text:
@@ -345,7 +341,7 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
             const SwTableNode* pWasInTableNd = IsCursorInTable();
             // #108049# Save the startnode of the current cell
             const SwStartNode* pSNdOld = pWasInTableNd ?
-                GetCursor()->GetNode().FindTableBoxStartNode() : nullptr;
+                GetCursor()->GetPointNode().FindTableBoxStartNode() : nullptr;
             bool bCheckDelFull = SelectionType::Text & nSelection && SwCursorShell::IsSttPara();
             bool bDelFull = false;
             bool bDoNothing = false;
@@ -357,7 +353,7 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
             // may be a numbering in front of the next paragraph.
             SwCursorShell::Push();
 
-            if (SwCursorShell::Right(1, CRSR_SKIP_CHARS))
+            if (SwCursorShell::Right(1, SwCursorSkipMode::Chars))
             {
                 const SwTableNode* pCurrTableNd = IsCursorInTable();
                 bDelFull = bCheckDelFull && pCurrTableNd && pCurrTableNd != pWasInTableNd;
@@ -366,7 +362,7 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
                     // #108049# Save the startnode of the current cell.
                     // May be different to pSNdOld as we have moved.
                     const SwStartNode* pSNdNew = pCurrTableNd ?
-                        GetCursor()->GetNode().FindTableBoxStartNode() : nullptr;
+                        GetCursor()->GetPointNode().FindTableBoxStartNode() : nullptr;
 
                     // tdf#115132 Only keep cursor position instead of deleting
                     // if we have moved to a different cell
@@ -401,14 +397,12 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
         }
 
         OpenMark();
-        SwCursorShell::Right(1, CRSR_SKIP_CELLS);
+        SwCursorShell::Right(1, SwCursorSkipMode::Cells);
         bRet = Delete(true);
         CloseMark( bRet );
         if (!bRet)
         {   // false indicates HasReadonlySel failed
-            std::unique_ptr<weld::Builder> xBuilder(Application::CreateBuilder(GetView().GetFrameWeld(), "modules/swriter/ui/inforeadonlydialog.ui"));
-            std::unique_ptr<weld::MessageDialog> xInfo(xBuilder->weld_message_dialog("InfoReadonlyDialog"));
-            xInfo->run();
+            InfoReadOnlyDialog();
         }
         break;
 
@@ -427,7 +421,7 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
             Point aTmpPt = GetObjRect().TopLeft();
 
             // Remember the anchor of the selected object before deletion.
-            std::unique_ptr<SwPosition> pAnchor;
+            std::optional<SwPosition> oAnchor;
             RndStdIds eAnchorId = RndStdIds::FLY_AT_PARA;
             SwFlyFrame* pFly = GetSelectedFlyFrame();
             SwFrameFormat* pFormat = nullptr;
@@ -449,18 +443,18 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
                         eAnchorId = pFormat->GetAnchor().GetAnchorId();
                     }
                     if ((eAnchorId == RndStdIds::FLY_AS_CHAR || eAnchorId == RndStdIds::FLY_AT_CHAR)
-                        && pFormat->GetAnchor().GetContentAnchor())
+                        && pFormat->GetAnchor().GetAnchorNode())
                     {
-                        pAnchor.reset(new SwPosition(*pFormat->GetAnchor().GetContentAnchor()));
+                        oAnchor.emplace(*pFormat->GetAnchor().GetContentAnchor());
                         // set cursor before the anchor point
                         if ( IsRedlineOn() )
-                            *GetCurrentShellCursor().GetPoint() = *pAnchor;
+                            *GetCurrentShellCursor().GetPoint() = *oAnchor;
                     }
                 }
             }
 
             // track changes: create redline at anchor point of the image to record the deletion
-            if ( IsRedlineOn() && pAnchor && SelectionType::Graphic & nSelection && pFormat &&
+            if ( IsRedlineOn() && oAnchor && SelectionType::Graphic & nSelection && pFormat &&
                     ( eAnchorId == RndStdIds::FLY_AT_CHAR || eAnchorId == RndStdIds::FLY_AS_CHAR ) )
             {
                 sal_Int32 nRedlineLength = 1;
@@ -477,32 +471,32 @@ bool SwWrtShell::DelRight(bool const isReplaceHeuristic)
                     Insert( OUStringChar(CH_TXT_TRACKED_DUMMY_CHAR) +
                             OUStringChar(CH_TXT_TRACKED_DUMMY_CHAR) );
                     SwFormatAnchor anchor(RndStdIds::FLY_AT_CHAR);
-                    SwCursorShell::Left(1, CRSR_SKIP_CHARS);
+                    SwCursorShell::Left(1, SwCursorSkipMode::Chars);
                     anchor.SetAnchor(GetCursor()->GetPoint());
                     GetDoc()->SetAttr(anchor, *pFormat);
                     SetRedlineFlags( eOld );
-                    SwCursorShell::Left(1, CRSR_SKIP_CHARS);
+                    SwCursorShell::Left(1, SwCursorSkipMode::Chars);
                 }
                 OpenMark();
-                SwCursorShell::Right(nRedlineLength, CRSR_SKIP_CHARS);
+                SwCursorShell::Right(nRedlineLength, SwCursorSkipMode::Chars);
                 bRet = Delete(false);
                 CloseMark( bRet );
             }
             else
                 DelSelectedObj();
 
-            if (pAnchor)
+            if (oAnchor)
             {
-                SwTextNode* pTextNode = pAnchor->nNode.GetNode().GetTextNode();
+                SwTextNode* pTextNode = oAnchor->GetNode().GetTextNode();
                 if (pTextNode)
                 {
                     const SwTextField* pField(
-                        pTextNode->GetFieldTextAttrAt(pAnchor->nContent.GetIndex(), true));
+                        pTextNode->GetFieldTextAttrAt(oAnchor->GetContentIndex(), ::sw::GetTextAttrMode::Default));
                     if (pField
                         && dynamic_cast<const SwPostItField*>(pField->GetFormatField().GetField()))
                     {
                         // Remove the comment of the deleted object.
-                        *GetCurrentShellCursor().GetPoint() = *pAnchor;
+                        *GetCurrentShellCursor().GetPoint() = *oAnchor;
                         DelRight();
                     }
                 }
@@ -609,7 +603,7 @@ bool SwWrtShell::DelToEndOfSentence()
     {
         Push();
         ClearMark();
-        if (SwCursorShell::Right(1,CRSR_SKIP_CHARS))
+        if (SwCursorShell::Right(1,SwCursorSkipMode::Chars))
         {
             SetMark();
             if (!IsEndPara()) // can only be at the end if it's empty

@@ -19,7 +19,6 @@
 #pragma once
 
 #include <com/sun/star/lang/XEventListener.hpp>
-#include <com/sun/star/util/XModifyListener.hpp>
 #include <com/sun/star/view/XSelectionChangeListener.hpp>
 #include <cppuhelper/weakref.hxx>
 #include <cppuhelper/implbase.hxx>
@@ -47,9 +46,6 @@ public:
     explicit WeakListenerAdapter( const css::uno::Reference< Listener > & xListener ) :
             m_xListener( xListener )
     {}
-    explicit WeakListenerAdapter( const css::uno::WeakReference< Listener > & xListener ) :
-            m_xListener( xListener )
-    {}
 
 protected:
     // ____ XEventListener (base of all listeners) ____
@@ -71,20 +67,7 @@ private:
     css::uno::WeakReference< Listener > m_xListener;
 };
 
-class WeakModifyListenerAdapter :
-        public WeakListenerAdapter< css::util::XModifyListener >
-{
-public:
-    explicit WeakModifyListenerAdapter(
-        const css::uno::WeakReference< css::util::XModifyListener > & xListener );
-    virtual ~WeakModifyListenerAdapter() override;
-
-protected:
-    // ____ XModifyListener ____
-    virtual void SAL_CALL modified( const css::lang::EventObject& aEvent ) override;
-};
-
-class WeakSelectionChangeListenerAdapter :
+class WeakSelectionChangeListenerAdapter final :
         public WeakListenerAdapter< css::view::XSelectionChangeListener >
 {
 public:

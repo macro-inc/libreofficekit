@@ -19,7 +19,7 @@
 
 #include <tools/fract.hxx>
 #include <tools/debug.hxx>
-#include <tools/stream.hxx>
+#include <o3tl/hash_combine.hxx>
 #include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
@@ -181,6 +181,9 @@ namespace
         // Avoid overflow and preserve normalization
         sal_Int32 gcd1 = std::gcd(i.numerator(), den);
         sal_Int32 gcd2 = std::gcd(num, i.denominator());
+
+        if (!gcd1 || !gcd2)
+            return true;
 
         bool fail = false;
         fail |= o3tl::checked_multiply(i.numerator() / gcd1, num / gcd2, num);
@@ -469,6 +472,62 @@ static void rational_ReduceInaccurate(boost::rational<sal_Int32>& rRational, uns
     }
 
     rRational.assign( bNeg ? -nMul : nMul, nDiv );
+}
+
+size_t Fraction::GetHashValue() const
+{
+    size_t hash = 0;
+    o3tl::hash_combine( hash, mnNumerator );
+    o3tl::hash_combine( hash, mnDenominator );
+    o3tl::hash_combine( hash, mbValid );
+    return hash;
+}
+
+Fraction Fraction::MakeFraction( tools::Long nN1, tools::Long nN2, tools::Long nD1, tools::Long nD2 )
+{
+    if( nD1 == 0 || nD2 == 0 ) //under these bad circumstances the following while loop will be endless
+    {
+        SAL_WARN("tools.fraction", "Invalid parameter for ImplMakeFraction");
+        return Fraction( 1, 1 );
+    }
+
+    tools::Long i = 1;
+
+    if ( nN1 < 0 ) { i = -i; nN1 = -nN1; }
+    if ( nN2 < 0 ) { i = -i; nN2 = -nN2; }
+    if ( nD1 < 0 ) { i = -i; nD1 = -nD1; }
+    if ( nD2 < 0 ) { i = -i; nD2 = -nD2; }
+    // all positive; i sign
+
+    assert( nN1 >= std::numeric_limits<sal_Int32>::min() );
+    assert( nN1 <= std::numeric_limits<sal_Int32>::max( ));
+    assert( nD1 >= std::numeric_limits<sal_Int32>::min() );
+    assert( nD1 <= std::numeric_limits<sal_Int32>::max( ));
+    assert( nN2 >= std::numeric_limits<sal_Int32>::min() );
+    assert( nN2 <= std::numeric_limits<sal_Int32>::max( ));
+    assert( nD2 >= std::numeric_limits<sal_Int32>::min() );
+    assert( nD2 <= std::numeric_limits<sal_Int32>::max( ));
+
+    boost::rational<sal_Int32> a = toRational(i*nN1, nD1);
+    boost::rational<sal_Int32> b = toRational(nN2, nD2);
+    bool bFail = checked_multiply_by(a, b);
+
+    while ( bFail ) {
+        if ( nN1 > nN2 )
+            nN1 = (nN1 + 1) / 2;
+        else
+            nN2 = (nN2 + 1) / 2;
+        if ( nD1 > nD2 )
+            nD1 = (nD1 + 1) / 2;
+        else
+            nD2 = (nD2 + 1) / 2;
+
+        a = toRational(i*nN1, nD1);
+        b = toRational(nN2, nD2);
+        bFail = checked_multiply_by(a, b);
+    }
+
+    return Fraction(a.numerator(), a.denominator());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

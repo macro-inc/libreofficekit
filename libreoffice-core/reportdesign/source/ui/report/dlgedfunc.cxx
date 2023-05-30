@@ -16,7 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#include <vcl/scrbar.hxx>
 #include <vcl/seleng.hxx>
 #include <vcl/ptrstyle.hxx>
 #include <com/sun/star/embed/EmbedStates.hpp>
@@ -48,7 +47,7 @@
 #include <UndoEnv.hxx>
 #include <RptModel.hxx>
 #include <comphelper/propertysequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #define DEFAUL_MOVE_SIZE    100
 namespace rptui
@@ -86,8 +85,8 @@ void DlgEdFunc::ForceScroll( const Point& rPos )
     aWorkArea = pScrollWindow->PixelToLogic( aWorkArea );
     if( !aOutRect.Contains( rPos ) && aWorkArea.Contains( rPos ) )
     {
-        ScrollBar& rHScroll = pScrollWindow->GetHScroll();
-        ScrollBar& rVScroll = pScrollWindow->GetVScroll();
+        ScrollAdaptor& rHScroll = pScrollWindow->GetHScroll();
+        ScrollAdaptor& rVScroll = pScrollWindow->GetVScroll();
         ScrollType eH = ScrollType::LineDown,eV = ScrollType::LineDown;
         if( rPos.X() < aOutRect.Left() )
             eH = ScrollType::LineUp;
@@ -99,8 +98,21 @@ void DlgEdFunc::ForceScroll( const Point& rPos )
         else if( rPos.Y() <= aOutRect.Bottom() )
             eV = ScrollType::DontKnow;
 
-        rHScroll.DoScrollAction(eH);
-        rVScroll.DoScrollAction(eV);
+        if (eH != ScrollType::DontKnow)
+        {
+            auto nCurrentPos = rHScroll.GetThumbPos();
+            auto nLineSize = rHScroll.GetLineSize();
+            assert(eH == ScrollType::LineUp || eH == ScrollType::LineDown);
+            rHScroll.DoScroll(eH == ScrollType::LineUp ? (nCurrentPos - nLineSize) : (nCurrentPos + nLineSize));
+        }
+
+        if (eV != ScrollType::DontKnow)
+        {
+            auto nCurrentPos = rVScroll.GetThumbPos();
+            auto nLineSize = rVScroll.GetLineSize();
+            assert(eV == ScrollType::LineUp || eV == ScrollType::LineDown);
+            rVScroll.DoScroll(eV == ScrollType::LineUp ? (nCurrentPos - nLineSize) : (nCurrentPos + nLineSize));
+        }
     }
 
     aScrollTimer.Start();
@@ -139,7 +151,7 @@ static Color lcl_setColorOfObject(const uno::Reference< uno::XInterface >& _xObj
         {
             aAny >>= nBackColor;
             // try to set background color at the ReportComponent
-            uno::Any aBlackColorAny = uno::makeAny(_nColorTRGB);
+            uno::Any aBlackColorAny(_nColorTRGB);
             xProp->setPropertyValue(PROPERTY_CONTROLBACKGROUND, aBlackColorAny);
         }
     }
@@ -375,11 +387,11 @@ void DlgEdFunc::activateOle(SdrObject* _pObj)
     if ( !_pObj )
         return;
 
-    const sal_uInt16 nSdrObjKind = _pObj->GetObjIdentifier();
+    const SdrObjKind nSdrObjKind = _pObj->GetObjIdentifier();
 
     //  OLE: activate
 
-    if (nSdrObjKind != OBJ_OLE2)
+    if (nSdrObjKind != SdrObjKind::OLE2)
         return;
 
     SdrOle2Obj* pOleObj = dynamic_cast<SdrOle2Obj*>(_pObj);
@@ -537,7 +549,7 @@ bool DlgEdFunc::isOnlyCustomShapeMarked() const
     {
         SdrMark* pMark = rMarkList.GetMark(i);
         SdrObject* pObj = pMark->GetMarkedSdrObj();
-        if (pObj->GetObjIdentifier() != OBJ_CUSTOMSHAPE)
+        if (pObj->GetObjIdentifier() != SdrObjKind::CustomShape)
         {
             // we found an object in the marked objects, which is not a custom shape.
             bReturn = false;
@@ -597,7 +609,7 @@ bool DlgEdFunc::isRectangleHit(const MouseEvent& rMEvt)
             }
         }
     }
-    else if (aVEvt.mpObj && (aVEvt.mpObj->GetObjIdentifier() != OBJ_CUSTOMSHAPE) && !m_bSelectionMode)
+    else if (aVEvt.mpObj && (aVEvt.mpObj->GetObjIdentifier() != SdrObjKind::CustomShape) && !m_bSelectionMode)
     {
         colorizeOverlappedObject(aVEvt.mpObj);
     }
@@ -643,11 +655,11 @@ bool DlgEdFuncInsert::MouseButtonDown( const MouseEvent& rMEvt )
         return true;
 
     SdrViewEvent aVEvt;
-    sal_Int16 nId = m_rView.GetCurrentObjIdentifier();
+    SdrObjKind nId = m_rView.GetCurrentObjIdentifier();
 
     const SdrHitKind eHit = m_rView.PickAnything(rMEvt, SdrMouseEventKind::BUTTONDOWN, aVEvt);
 
-    if (eHit == SdrHitKind::UnmarkedObject && nId != OBJ_CUSTOMSHAPE)
+    if (eHit == SdrHitKind::UnmarkedObject && nId != SdrObjKind::CustomShape)
     {
         // there is an object under the mouse cursor, but not a customshape
         m_pParent->getSectionWindow()->getViewsWindow()->BrkAction();

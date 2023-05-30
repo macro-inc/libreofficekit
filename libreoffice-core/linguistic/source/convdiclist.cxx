@@ -38,7 +38,7 @@
 #include <ucbhelper/content.hxx>
 #include <unotools/localfilehelper.hxx>
 #include <unotools/lingucfg.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include "convdic.hxx"
 #include "convdiclist.hxx"
@@ -53,7 +53,7 @@ using namespace com::sun::star::container;
 using namespace com::sun::star::linguistic2;
 using namespace linguistic;
 
-static OUString GetConvDicMainURL( std::u16string_view rDicName, const OUString &rDirectoryURL )
+static OUString GetConvDicMainURL( std::u16string_view rDicName, std::u16string_view rDirectoryURL )
 {
     // build URL to use for new (persistent) dictionaries
 
@@ -163,7 +163,6 @@ uno::Reference< XConversionDictionary > ConvDicNameContainer::GetByName(
 
 uno::Type SAL_CALL ConvDicNameContainer::getElementType(  )
 {
-    MutexGuard  aGuard( GetLinguMutex() );
     return cppu::UnoType<XConversionDictionary>::get();
 }
 
@@ -179,7 +178,7 @@ uno::Any SAL_CALL ConvDicNameContainer::getByName( const OUString& rName )
     uno::Reference< XConversionDictionary > xRes( GetByName( rName ) );
     if (!xRes.is())
         throw NoSuchElementException();
-    return makeAny( xRes );
+    return Any( xRes );
 }
 
 uno::Sequence< OUString > SAL_CALL ConvDicNameContainer::getElementNames(  )
@@ -254,7 +253,7 @@ void SAL_CALL ConvDicNameContainer::removeByName( const OUString& rName )
             ::ucbhelper::Content    aCnt( aObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ),
                                     uno::Reference< css::ucb::XCommandEnvironment >(),
                                     comphelper::getProcessComponentContext() );
-            aCnt.executeCommand( "delete", makeAny( true ) );
+            aCnt.executeCommand( "delete", Any( true ) );
         }
         catch( ... )
         {

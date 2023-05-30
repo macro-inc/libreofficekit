@@ -22,12 +22,13 @@
 #include <UserDefinedProperties.hxx>
 #include <CloneHelper.hxx>
 #include <ModifyListenerHelper.hxx>
-#include "Axis.hxx"
+#include <Axis.hxx>
+#include <ChartType.hxx>
 #include <com/sun/star/chart2/AxisType.hpp>
 #include <com/sun/star/container/NoSuchElementException.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <o3tl/safeint.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
@@ -116,15 +117,14 @@ namespace chart
 
 BaseCoordinateSystem::BaseCoordinateSystem(
     sal_Int32 nDimensionCount /* = 2 */ ) :
-        ::property::OPropertySet( m_aMutex ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        m_xModifyEventForwarder( new ModifyEventForwarder() ),
         m_nDimensionCount( nDimensionCount )
  {
     m_aAllAxis.resize( m_nDimensionCount );
     for( sal_Int32 nN=0; nN<m_nDimensionCount; nN++ )
     {
         m_aAllAxis[nN].resize( 1 );
-        Reference< chart2::XAxis > xAxis( new Axis );
+        rtl::Reference< Axis > xAxis( new Axis );
         m_aAllAxis[nN][0] = xAxis;
 
         ModifyListenerHelper::addListenerToAllElements( m_aAllAxis[nN], m_xModifyEventForwarder );
@@ -151,19 +151,21 @@ BaseCoordinateSystem::BaseCoordinateSystem(
 BaseCoordinateSystem::BaseCoordinateSystem(
     const BaseCoordinateSystem & rSource ) :
         impl::BaseCoordinateSystem_Base(rSource),
-        ::property::OPropertySet( rSource, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        ::property::OPropertySet( rSource ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() ),
     m_nDimensionCount( rSource.m_nDimensionCount )
 {
     m_aAllAxis.resize(rSource.m_aAllAxis.size());
     tAxisVecVecType::size_type nN=0;
     for( nN=0; nN<m_aAllAxis.size(); nN++ )
-        CloneHelper::CloneRefVector<chart2::XAxis>( rSource.m_aAllAxis[nN], m_aAllAxis[nN] );
-    CloneHelper::CloneRefVector<chart2::XChartType>( rSource.m_aChartTypes, m_aChartTypes );
+        CloneHelper::CloneRefVector( rSource.m_aAllAxis[nN], m_aAllAxis[nN] );
+    for (const auto & rxChartType : rSource.m_aChartTypes)
+        m_aChartTypes.push_back(rxChartType->cloneChartType());
 
     for( nN=0; nN<m_aAllAxis.size(); nN++ )
         ModifyListenerHelper::addListenerToAllElements( m_aAllAxis[nN], m_xModifyEventForwarder );
-    ModifyListenerHelper::addListenerToAllElements( m_aChartTypes, m_xModifyEventForwarder );
+    for (const auto & rxChartType : m_aChartTypes)
+        rxChartType->addModifyListener( m_xModifyEventForwarder );
 }
 
 BaseCoordinateSystem::~BaseCoordinateSystem()
@@ -172,7 +174,8 @@ BaseCoordinateSystem::~BaseCoordinateSystem()
     {
         for(const tAxisVecVecType::value_type & i : m_aAllAxis)
             ModifyListenerHelper::removeListenerFromAllElements( i, m_xModifyEventForwarder );
-        ModifyListenerHelper::removeListenerFromAllElements( m_aChartTypes, m_xModifyEventForwarder );
+        for (const auto & rxChartType : m_aChartTypes)
+            rxChartType->removeModifyListener( m_xModifyEventForwarder );
     }
     catch( const uno::Exception & )
     {
@@ -197,13 +200,41 @@ void SAL_CALL BaseCoordinateSystem::setAxisByDimension(
     if( nIndex < 0 )
         throw lang::IndexOutOfBoundsException();
 
+    assert(!xAxis || dynamic_cast<Axis*>(xAxis.get()));
+
     if( m_aAllAxis[ nDimensionIndex ].size() < o3tl::make_unsigned( nIndex+1 ))
     {
         m_aAllAxis[ nDimensionIndex ].resize( nIndex+1 );
         m_aAllAxis[ nDimensionIndex ][nIndex] = nullptr;
     }
 
-    Reference< chart2::XAxis > xOldAxis( m_aAllAxis[ nDimensionIndex ][nIndex] );
+    rtl::Reference< Axis > xOldAxis( m_aAllAxis[ nDimensionIndex ][nIndex] );
+    if( xOldAxis.is())
+        ModifyListenerHelper::removeListener( xOldAxis, m_xModifyEventForwarder );
+    m_aAllAxis[ nDimensionIndex ][nIndex] = dynamic_cast<Axis*>(xAxis.get());
+    if( xAxis.is())
+        ModifyListenerHelper::addListener( xAxis, m_xModifyEventForwarder );
+    fireModifyEvent();
+}
+
+void BaseCoordinateSystem::setAxisByDimension(
+    sal_Int32 nDimensionIndex,
+    const rtl::Reference< Axis >& xAxis,
+    sal_Int32 nIndex )
+{
+    if( nDimensionIndex < 0 || nDimensionIndex >= getDimension() )
+        throw lang::IndexOutOfBoundsException();
+
+    if( nIndex < 0 )
+        throw lang::IndexOutOfBoundsException();
+
+    if( m_aAllAxis[ nDimensionIndex ].size() < o3tl::make_unsigned( nIndex+1 ))
+    {
+        m_aAllAxis[ nDimensionIndex ].resize( nIndex+1 );
+        m_aAllAxis[ nDimensionIndex ][nIndex] = nullptr;
+    }
+
+    rtl::Reference< Axis > xOldAxis( m_aAllAxis[ nDimensionIndex ][nIndex] );
     if( xOldAxis.is())
         ModifyListenerHelper::removeListener( xOldAxis, m_xModifyEventForwarder );
     m_aAllAxis[ nDimensionIndex ][nIndex] = xAxis;
@@ -226,6 +257,20 @@ Reference< chart2::XAxis > SAL_CALL BaseCoordinateSystem::getAxisByDimension(
     return m_aAllAxis[ nDimensionIndex ][nAxisIndex];
 }
 
+const rtl::Reference< Axis > & BaseCoordinateSystem::getAxisByDimension2(
+            sal_Int32 nDimensionIndex, sal_Int32 nAxisIndex ) const
+{
+    if( nDimensionIndex < 0 || nDimensionIndex >= m_nDimensionCount )
+        throw lang::IndexOutOfBoundsException();
+
+    OSL_ASSERT( m_aAllAxis.size() == static_cast< size_t >( m_nDimensionCount));
+
+    if( nAxisIndex < 0 || o3tl::make_unsigned(nAxisIndex) > m_aAllAxis[ nDimensionIndex ].size() )
+        throw lang::IndexOutOfBoundsException();
+
+    return m_aAllAxis[ nDimensionIndex ][nAxisIndex];
+}
+
 sal_Int32 SAL_CALL BaseCoordinateSystem::getMaximumAxisIndexByDimension( sal_Int32 nDimensionIndex )
 {
     if( nDimensionIndex < 0 || nDimensionIndex >= getDimension() )
@@ -243,19 +288,23 @@ sal_Int32 SAL_CALL BaseCoordinateSystem::getMaximumAxisIndexByDimension( sal_Int
 // ____ XChartTypeContainer ____
 void SAL_CALL BaseCoordinateSystem::addChartType( const Reference< chart2::XChartType >& aChartType )
 {
-    if( std::find( m_aChartTypes.begin(), m_aChartTypes.end(), aChartType )
+    auto pChartType = dynamic_cast<ChartType*>(aChartType.get());
+    assert(pChartType);
+
+    if( std::find( m_aChartTypes.begin(), m_aChartTypes.end(), pChartType )
         != m_aChartTypes.end())
         throw lang::IllegalArgumentException("type not found", static_cast<cppu::OWeakObject*>(this), 1);
 
-    m_aChartTypes.push_back( aChartType );
+    m_aChartTypes.push_back( pChartType );
     ModifyListenerHelper::addListener( aChartType, m_xModifyEventForwarder );
     fireModifyEvent();
 }
 
 void SAL_CALL BaseCoordinateSystem::removeChartType( const Reference< chart2::XChartType >& aChartType )
 {
-    std::vector< uno::Reference< chart2::XChartType > >::iterator
-          aIt( std::find( m_aChartTypes.begin(), m_aChartTypes.end(), aChartType ));
+    auto pChartType = dynamic_cast<ChartType*>(aChartType.get());
+    assert(pChartType);
+    auto aIt( std::find( m_aChartTypes.begin(), m_aChartTypes.end(), pChartType ));
     if( aIt == m_aChartTypes.end())
         throw container::NoSuchElementException(
             "The given chart type is no element of the container",
@@ -268,42 +317,43 @@ void SAL_CALL BaseCoordinateSystem::removeChartType( const Reference< chart2::XC
 
 Sequence< Reference< chart2::XChartType > > SAL_CALL BaseCoordinateSystem::getChartTypes()
 {
-    return comphelper::containerToSequence( m_aChartTypes );
+    return comphelper::containerToSequence< Reference< chart2::XChartType > >( m_aChartTypes );
 }
 
 void SAL_CALL BaseCoordinateSystem::setChartTypes( const Sequence< Reference< chart2::XChartType > >& aChartTypes )
 {
-    ModifyListenerHelper::removeListenerFromAllElements( m_aChartTypes, m_xModifyEventForwarder );
-    m_aChartTypes = comphelper::sequenceToContainer<std::vector< css::uno::Reference< css::chart2::XChartType > >>( aChartTypes );
-    ModifyListenerHelper::addListenerToAllElements( m_aChartTypes, m_xModifyEventForwarder );
+    for (auto const & aChartType : m_aChartTypes)
+        aChartType->removeModifyListener( m_xModifyEventForwarder );
+    m_aChartTypes.clear();
+    for (auto const & aChartType : aChartTypes)
+    {
+        auto pChartType = dynamic_cast<ChartType*>(aChartType.get());
+        assert(pChartType);
+        m_aChartTypes.push_back(pChartType);
+        pChartType->addModifyListener( m_xModifyEventForwarder );
+    }
+    fireModifyEvent();
+}
+
+void BaseCoordinateSystem::setChartTypes( const std::vector< rtl::Reference< ChartType > >& aChartTypes )
+{
+    for (auto const & aChartType : m_aChartTypes)
+        aChartType->removeModifyListener( m_xModifyEventForwarder );
+    m_aChartTypes = aChartTypes;
+    for (auto const & aChartType : m_aChartTypes)
+        aChartType->addModifyListener( m_xModifyEventForwarder );
     fireModifyEvent();
 }
 
 // ____ XModifyBroadcaster ____
 void SAL_CALL BaseCoordinateSystem::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2" );
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL BaseCoordinateSystem::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2" );
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -330,13 +380,14 @@ void BaseCoordinateSystem::fireModifyEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any BaseCoordinateSystem::GetDefaultValue( sal_Int32 nHandle ) const
+void BaseCoordinateSystem::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticCooSysDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____

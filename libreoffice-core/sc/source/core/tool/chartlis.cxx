@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <chartlis.hxx>
@@ -40,9 +41,9 @@ class ScChartUnoData
     uno::Reference< chart::XChartData >                     xSource;
 
 public:
-            ScChartUnoData( const uno::Reference< chart::XChartDataChangeEventListener >& rL,
-                            const uno::Reference< chart::XChartData >& rS ) :
-                    xListener( rL ), xSource( rS ) {}
+            ScChartUnoData( uno::Reference< chart::XChartDataChangeEventListener > xL,
+                            uno::Reference< chart::XChartData > xS ) :
+                    xListener(std::move( xL )), xSource(std::move( xS )) {}
 
     const uno::Reference< chart::XChartDataChangeEventListener >& GetListener() const   { return xListener; }
     const uno::Reference< chart::XChartData >& GetSource() const                        { return xSource; }
@@ -95,20 +96,19 @@ void ScChartListener::ExternalRefListener::removeFileId(sal_uInt16 nFileId)
     maFileIds.erase(nFileId);
 }
 
-ScChartListener::ScChartListener( const OUString& rName, ScDocument& rDocP,
+ScChartListener::ScChartListener( OUString aName, ScDocument& rDocP,
         const ScRangeListRef& rRangeList ) :
-    mpTokens(new vector<ScTokenRef>),
-    maName(rName),
+    maName(std::move(aName)),
     mrDoc( rDocP ),
     bUsed( false ),
     bDirty( false )
 {
-    ScRefTokenHelper::getTokensFromRangeList(&rDocP, *mpTokens, *rRangeList);
+    ScRefTokenHelper::getTokensFromRangeList(&rDocP, maTokens, *rRangeList);
 }
 
-ScChartListener::ScChartListener( const OUString& rName, ScDocument& rDocP, std::unique_ptr<vector<ScTokenRef>> pTokens ) :
-    mpTokens(std::move(pTokens)),
-    maName(rName),
+ScChartListener::ScChartListener( OUString aName, ScDocument& rDocP, vector<ScTokenRef> aTokens ) :
+    maTokens(std::move(aTokens)),
+    maName(std::move(aName)),
     mrDoc( rDocP ),
     bUsed( false ),
     bDirty( false )
@@ -154,8 +154,7 @@ uno::Reference< chart::XChartData > ScChartListener::GetUnoSource() const
 
 void ScChartListener::Notify( const SfxHint& rHint )
 {
-    const ScHint* p = dynamic_cast<const ScHint*>(&rHint);
-    if (p && (p->GetId() == SfxHintId::ScDataChanged))
+    if (rHint.GetId() == SfxHintId::ScDataChanged)
         SetUpdateQueue();
 }
 
@@ -187,7 +186,7 @@ void ScChartListener::Update()
 ScRangeListRef ScChartListener::GetRangeList() const
 {
     ScRangeListRef aRLRef(new ScRangeList);
-    ScRefTokenHelper::getRangeListFromTokens(&mrDoc, *aRLRef, *mpTokens, ScAddress());
+    ScRefTokenHelper::getRangeListFromTokens(&mrDoc, *aRLRef, maTokens, ScAddress());
     return aRLRef;
 }
 
@@ -195,7 +194,7 @@ void ScChartListener::SetRangeList( const ScRangeListRef& rNew )
 {
     vector<ScTokenRef> aTokens;
     ScRefTokenHelper::getTokensFromRangeList(&mrDoc, aTokens, *rNew);
-    mpTokens->swap(aTokens);
+    maTokens.swap(aTokens);
 }
 
 namespace {
@@ -264,20 +263,20 @@ private:
 
 void ScChartListener::StartListeningTo()
 {
-    if (!mpTokens || mpTokens->empty())
+    if (maTokens.empty())
         // no references to listen to.
         return;
 
-    for_each(mpTokens->begin(), mpTokens->end(), StartEndListening(mrDoc, *this, true));
+    for_each(maTokens.begin(), maTokens.end(), StartEndListening(mrDoc, *this, true));
 }
 
 void ScChartListener::EndListeningTo()
 {
-    if (!mpTokens || mpTokens->empty())
+    if (maTokens.empty())
         // no references to listen to.
         return;
 
-    for_each(mpTokens->begin(), mpTokens->end(), StartEndListening(mrDoc, *this, false));
+    for_each(maTokens.begin(), maTokens.end(), StartEndListening(mrDoc, *this, false));
 }
 
 void ScChartListener::ChangeListening( const ScRangeListRef& rRangeListRef,
@@ -295,7 +294,7 @@ void ScChartListener::UpdateChartIntersecting( const ScRange& rRange )
     ScTokenRef pToken;
     ScRefTokenHelper::getTokenFromRange(&mrDoc, pToken, rRange);
 
-    if (ScRefTokenHelper::intersects(&mrDoc, *mpTokens, pToken, ScAddress()))
+    if (ScRefTokenHelper::intersects(&mrDoc, maTokens, pToken, ScAddress()))
     {
         // force update (chart has to be loaded), don't use ScChartListener::Update
         mrDoc.UpdateChart(GetName());
@@ -318,8 +317,8 @@ void ScChartListener::SetUpdateQueue()
 
 bool ScChartListener::operator==( const ScChartListener& r ) const
 {
-    bool b1 = (mpTokens && !mpTokens->empty());
-    bool b2 = (r.mpTokens && !r.mpTokens->empty());
+    bool b1 = !maTokens.empty();
+    bool b2 = !r.maTokens.empty();
 
     if (&mrDoc != &r.mrDoc || bUsed != r.bUsed || bDirty != r.bDirty ||
         GetName() != r.GetName() || b1 != b2)
@@ -329,7 +328,7 @@ bool ScChartListener::operator==( const ScChartListener& r ) const
         // both token list instances are empty.
         return true;
 
-    return *mpTokens == *r.mpTokens;
+    return maTokens == r.maTokens;
 }
 
 bool ScChartListener::operator!=( const ScChartListener& r ) const

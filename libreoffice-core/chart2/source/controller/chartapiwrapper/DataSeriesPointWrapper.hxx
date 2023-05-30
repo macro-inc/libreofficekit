@@ -21,15 +21,16 @@
 #include <WrappedPropertySet.hxx>
 #include "ReferenceSizePropertyProvider.hxx"
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XEventListener.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-
+#include <rtl/ref.hxx>
 #include <memory>
 
 namespace com::sun::star::chart2 { class XDataSeries; }
+namespace chart { class DataSeries; }
 
 namespace chart::wrapper
 {
@@ -54,12 +55,12 @@ public:
     };
 
     //this constructor needs an initialize call afterwards
-    explicit DataSeriesPointWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+    explicit DataSeriesPointWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
 
     DataSeriesPointWrapper(eType eType
             , sal_Int32 nSeriesIndexInNewAPI
             , sal_Int32 nPointIndex //ignored for series
-            , const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+            , std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
 
     virtual ~DataSeriesPointWrapper() override;
 
@@ -100,11 +101,11 @@ private:
     virtual css::uno::Any SAL_CALL getPropertyDefault( const OUString& aPropertyName ) override;
 
     //own methods
-    css::uno::Reference< css::chart2::XDataSeries > getDataSeries();
+    rtl::Reference< ::chart::DataSeries > getDataSeries();
     css::uno::Reference< css::beans::XPropertySet > getDataPointProperties();
 
     std::shared_ptr< Chart2ModelContact >         m_spChart2ModelContact;
-    ::comphelper::OInterfaceContainerHelper2      m_aEventListenerContainer;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> m_aEventListenerContainer;
 
     eType               m_eType;
     sal_Int32           m_nSeriesIndexInNewAPI;
@@ -115,7 +116,7 @@ private:
     //this should only be used, if the DataSeriesPointWrapper is initialized via the XInitialize interface
     //because a big change in the chartmodel may lead to a dataseriespointer that is not connected to the model anymore
     //with the indices instead we can always get the new dataseries
-    css::uno::Reference< css::chart2::XDataSeries >     m_xDataSeries;
+    rtl::Reference< ::chart::DataSeries >     m_xDataSeries;
 };
 
 } //  namespace chart::wrapper

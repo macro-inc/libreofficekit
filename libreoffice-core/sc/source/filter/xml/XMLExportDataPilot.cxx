@@ -62,10 +62,6 @@ ScXMLExportDataPilot::ScXMLExportDataPilot(ScXMLExport& rTempExport)
 {
 }
 
-ScXMLExportDataPilot::~ScXMLExportDataPilot()
-{
-}
-
 OUString ScXMLExportDataPilot::getDPOperatorXML(
     const ScQueryOp aFilterOperator, const utl::SearchParam::SearchType eSearchType)
 {
@@ -422,9 +418,17 @@ void ScXMLExportDataPilot::WriteLayoutInfo(const ScDPSaveDimension* pDim)
         case sheet::DataPilotFieldLayoutMode::OUTLINE_SUBTOTALS_BOTTOM:
         sValueStr = GetXMLToken(XML_OUTLINE_SUBTOTALS_BOTTOM);
         break;
+        case sheet::DataPilotFieldLayoutMode::COMPACT_LAYOUT:
+        sValueStr = GetXMLToken(XML_TABULAR_LAYOUT);
+        break;
     }
+
     if (!sValueStr.isEmpty())
         rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_LAYOUT_MODE, sValueStr);
+
+    if (pLayoutInfo->LayoutMode == sheet::DataPilotFieldLayoutMode::COMPACT_LAYOUT)
+        rExport.AddAttribute(XML_NAMESPACE_LO_EXT, XML_LAYOUT_MODE, GetXMLToken(XML_COMPACT_LAYOUT));
+
     SvXMLElementExport aElemDPLLI(rExport, XML_NAMESPACE_TABLE, XML_DATA_PILOT_LAYOUT_INFO, true, true);
 }
 
@@ -598,33 +602,27 @@ void ScXMLExportDataPilot::WriteNumGroupInfo(const ScDPNumGroupInfo& rGroupInfo)
     rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_STEP, sValue);
 }
 
-void ScXMLExportDataPilot::WriteGroupDimAttributes(const ScDPSaveGroupDimension* pGroupDim)
+void ScXMLExportDataPilot::WriteGroupDimAttributes(const ScDPSaveGroupDimension& rGroupDim)
 {
-    if (pGroupDim)
+    OUString aSrcFieldName = ScDPUtil::getSourceDimensionName(rGroupDim.GetSourceDimName());
+    rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_SOURCE_FIELD_NAME, aSrcFieldName);
+    if (rGroupDim.GetDatePart())
     {
-        OUString aSrcFieldName = ScDPUtil::getSourceDimensionName(pGroupDim->GetSourceDimName());
-        rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_SOURCE_FIELD_NAME, aSrcFieldName);
-        if (pGroupDim->GetDatePart())
-        {
-            WriteDatePart(pGroupDim->GetDatePart());
-            WriteNumGroupInfo(pGroupDim->GetDateInfo());
-        }
+        WriteDatePart(rGroupDim.GetDatePart());
+        WriteNumGroupInfo(rGroupDim.GetDateInfo());
     }
 }
 
-void ScXMLExportDataPilot::WriteNumGroupDim(const ScDPSaveNumGroupDimension* pNumGroupDim)
+void ScXMLExportDataPilot::WriteNumGroupDim(const ScDPSaveNumGroupDimension& rNumGroupDim)
 {
-    if (pNumGroupDim)
+    if (rNumGroupDim.GetDatePart())
     {
-        if (pNumGroupDim->GetDatePart())
-        {
-            WriteDatePart(pNumGroupDim->GetDatePart());
-            WriteNumGroupInfo(pNumGroupDim->GetDateInfo());
-        }
-        else
-        {
-            WriteNumGroupInfo(pNumGroupDim->GetInfo());
-        }
+        WriteDatePart(rNumGroupDim.GetDatePart());
+        WriteNumGroupInfo(rNumGroupDim.GetDateInfo());
+    }
+    else
+    {
+        WriteNumGroupInfo(rNumGroupDim.GetInfo());
     }
 }
 
@@ -635,11 +633,12 @@ void ScXMLExportDataPilot::WriteGroupDimElements(const ScDPSaveDimension* pDim, 
     if (pDimData)
     {
         pGroupDim = pDimData->GetNamedGroupDim(pDim->GetName());
-        WriteGroupDimAttributes(pGroupDim);
         pNumGroupDim = pDimData->GetNumGroupDim(pDim->GetName());
-        WriteNumGroupDim(pNumGroupDim);
-
         OSL_ENSURE((!pGroupDim || !pNumGroupDim), "there should be no NumGroup and Group at the same field");
+        if (pGroupDim)
+            WriteGroupDimAttributes(*pGroupDim);
+        else if (pNumGroupDim)
+            WriteNumGroupDim(*pNumGroupDim);
     }
     if (!(pGroupDim || pNumGroupDim))
         return;
@@ -802,6 +801,8 @@ void ScXMLExportDataPilot::WriteDataPilots()
             rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_SHOW_FILTER_BUTTON, XML_FALSE);
         if (!pDPSave->GetDrillDown())
             rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_DRILL_DOWN_ON_DOUBLE_CLICK, XML_FALSE);
+        if (pDPSave->GetExpandCollapse())
+            rExport.AddAttribute(XML_NAMESPACE_LO_EXT, XML_SHOW_DRILL_DOWN_BUTTONS, XML_TRUE);
         if ((*pDPs)[i].GetHeaderLayout())
             rExport.AddAttribute(XML_NAMESPACE_TABLE, XML_HEADER_GRID_LAYOUT, XML_TRUE);
 

@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,11 +9,12 @@
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 from libreoffice.uno.propertyvalue import mkPropertyValues
+from libreoffice.calc.paste_special import reset_default_values
 
 class tdf86253(UITestCase):
 
     def test_tdf86253(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf86253.ods")) as calc_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf86253.ods")):
             xCalcDoc = self.xUITest.getTopFocusWindow()
             gridwin = xCalcDoc.getChild("grid_window")
 
@@ -20,6 +23,7 @@ class tdf86253(UITestCase):
             self.xUITest.executeCommand(".uno:Copy")
             gridwin.executeAction("SELECT", mkPropertyValues({"RANGE": "C1:C17"}))
             with self.ui_test.execute_dialog_through_command(".uno:PasteSpecial") as xDialog:
+                reset_default_values(self, xDialog)
 
                 xtext = xDialog.getChild("text")
                 xnumbers = xDialog.getChild("numbers")
@@ -44,6 +48,5 @@ class tdf86253(UITestCase):
 
                 xTreeEntry = xList.getChild('0')
                 self.assertEqual(get_state_as_dict(xTreeEntry)["Text"], "A1:A6,C1:C17\tCell value >= 0")
-
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

@@ -34,14 +34,13 @@
 #include <strings.hrc>
 
 #include <filtdlg.hxx>
-#include <vcl/menu.hxx>
+#include <svx/colorwindow.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/weld.hxx>
 #include <svl/numformat.hxx>
 #include <svl/sharedstringpool.hxx>
-#include <toolkit/helper/vclunohelper.hxx>
 
 #include <limits>
 
@@ -59,8 +58,8 @@ ScFilterDlg::ScFilterDlg(SfxBindings* pB, SfxChildWindow* pCW, weld::Window* pPa
     , aStrNone(ScResId(SCSTR_NONE))
     , aStrEmpty(ScResId(SCSTR_FILTER_EMPTY))
     , aStrNotEmpty(ScResId(SCSTR_FILTER_NOTEMPTY))
-    , aStrColumn(ScResId(SCSTR_COLUMN))
-    , aStrTextColor(ScResId(SCSTR_FILTER_TEXT_COLOR_COND))
+    , aStrColumn(ScResId(SCSTR_COLUMN_LETTER))
+    , aStrTextColor(ScResId(SCSTR_FILTER_FONT_COLOR_COND))
     , aStrBackgroundColor(ScResId(SCSTR_FILTER_BACKGROUND_COLOR_COND))
     , nWhichQuery(rArgSet.GetPool()->GetWhich(SID_QUERY))
     , theQueryData(static_cast<const ScQueryItem&>(rArgSet.Get(nWhichQuery)).GetQueryData())
@@ -654,7 +653,6 @@ void ScFilterDlg::UpdateColorList(size_t nList)
     else
         return;
 
-    sal_Int32 i = 1;
     maColorLbArr[nPos]->clear();
     for (const auto& rColor : aColors)
     {
@@ -680,8 +678,6 @@ void ScFilterDlg::UpdateColorList(size_t nList)
         {
             maColorLbArr[nPos]->set_active_id(sId);
         }
-
-        i++;
     }
 }
 

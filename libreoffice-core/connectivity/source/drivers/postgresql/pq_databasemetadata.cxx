@@ -84,6 +84,7 @@
 #include <com/sun/star/sdbc/IndexType.hpp>
 #include <com/sun/star/sdbc/ColumnValue.hpp>
 #include <com/sun/star/sdbc/ColumnSearch.hpp>
+#include <utility>
 
 using ::osl::MutexGuard;
 
@@ -114,12 +115,12 @@ namespace pq_sdbc_driver
 #define DEFERRABILITY_NONE                7
 
 DatabaseMetaData::DatabaseMetaData(
-    const ::rtl::Reference< comphelper::RefCountedMutex > & refMutex,
-    const css::uno::Reference< css::sdbc::XConnection >  & origin,
+    ::rtl::Reference< comphelper::RefCountedMutex > refMutex,
+    css::uno::Reference< css::sdbc::XConnection > origin,
     ConnectionSettings *pSettings )
-  : m_xMutex( refMutex ),
+  : m_xMutex(std::move( refMutex )),
     m_pSettings( pSettings ),
-    m_origin( origin ),
+    m_origin(std::move( origin )),
     m_getIntSetting_stmt ( m_origin->prepareStatement("SELECT setting FROM pg_catalog.pg_settings WHERE name=?") )
 {
     init_getReferences_stmt();
@@ -210,10 +211,10 @@ sal_Int32 DatabaseMetaData::getDriverMinorVersion(  )
 sal_Bool DatabaseMetaData::usesLocalFiles(  )
 {
     // LEM TODO:
-    //           http://wiki.openoffice.org/wiki/Documentation/DevGuide/Database/XDatabaseMetaData_Interface
+    //           https://wiki.documentfoundation.org/Documentation/DevGuide/Database_Access#XDatabaseMetaData_Interface
     //           says "Returns true when the catalog name of the
     //           database should not appear in the DatasourceBrowser
-    //           of OpenOffice.org API, otherwise false is returned."
+    //           of LibreOffice API, otherwise false is returned."
     //           So, hmmm, think about it.
     return false;
 }
@@ -310,8 +311,8 @@ OUString DatabaseMetaData::getSQLKeywords(  )
 }
 OUString DatabaseMetaData::getNumericFunctions(  )
 {
-    // See http://www.postgresql.org/docs/9.1/static/functions-math.html
-    // LEM TODO: Err... http://wiki.openoffice.org/wiki/Documentation/DevGuide/Database/Support_Scalar_Functions
+    // See https://www.postgresql.org/docs/9.1/static/functions-math.html
+    // LEM TODO: Err... https://wiki.documentfoundation.org/Documentation/DevGuide/Database_Access#Support_Scalar_Functions
     //           says this should be "Open Group CLI" names, not PostgreSQL names.
     //           Currently this is just a list of supported functions in PostgreSQL, with PostgreSQL names.
     //           And it is my job to map from Open Group CLI names/syntax to PostgreSQL names/syntax. Where? By parsing the SQL???
@@ -1185,30 +1186,30 @@ css::uno::Reference< XResultSet > DatabaseMetaData::getTables(
 namespace
 {
     // sort no schema first, then "public", then normal schemas, then internal schemas
-    int compare_schema(const OUString &nsA, std::u16string_view nsB)
+    int compare_schema(std::u16string_view nsA, std::u16string_view nsB)
     {
-        if (nsA.isEmpty())
+        if (nsA.empty())
         {
             return nsB.empty() ? 0 : -1;
         }
         else if (nsB.empty())
         {
-            assert(!nsA.isEmpty());
+            assert(!nsA.empty());
             return 1;
         }
-        else if(nsA == "public")
+        else if(nsA == u"public")
         {
             return (nsB == u"public") ? 0 : -1;
         }
         else if(nsB == u"public")
         {
-            assert(nsA != "public");
+            assert(nsA != u"public");
             return 1;
         }
-        else if(nsA.startsWith("pg_"))
+        else if(o3tl::starts_with(nsA, u"pg_"))
         {
             if(o3tl::starts_with(nsB, u"pg_"))
-                return nsA.compareTo(nsB);
+                return nsA.compare(nsB);
             else
                 return 1;
         }
@@ -1218,7 +1219,7 @@ namespace
         }
         else
         {
-            return nsA.compareTo(nsB);
+            return nsA.compare(nsB);
         }
     }
 
@@ -1364,9 +1365,9 @@ namespace {
     {
         DatabaseTypeDescription()
         {}
-        DatabaseTypeDescription( const OUString &name, const OUString & type ) :
-            typeName( name ),
-            typeType( type )
+        DatabaseTypeDescription( OUString name, OUString type ) :
+            typeName(std::move( name )),
+            typeType(std::move( type ))
         {}
         DatabaseTypeDescription( const DatabaseTypeDescription &source ) :
             typeName( source.typeName ),
@@ -2086,45 +2087,45 @@ namespace
                 OUString nameB;
                 a[0 /*TYPE_NAME*/] >>= nameA;
                 b[0 /*TYPE_NAME*/] >>= nameB;
-                OUString nsA, tnA, nsB, tnB;
+                std::u16string_view nsA, tnA, nsB, tnB;
 
                 // parse typename into schema and typename
                 sal_Int32 nIndex=0;
-                nsA = nameA.getToken(0, '.', nIndex);
+                nsA = o3tl::getToken(nameA, 0, '.', nIndex);
                 if (nIndex<0)
                 {
                     tnA = nsA;
-                    nsA.clear();
+                    nsA = std::u16string_view();
                 }
                 else
                 {
-                    tnA = nameA.getToken(0, '.', nIndex);
+                    tnA = o3tl::getToken(nameA, 0, '.', nIndex);
                     assert(nIndex < 0);
                 }
 
                 nIndex=0;
-                nsB = nameB.getToken(0, '.', nIndex);
+                nsB = o3tl::getToken(nameB, 0, '.', nIndex);
                 if (nIndex<0)
                 {
                     tnB = nsB;
-                    nsB.clear();
+                    nsB = std::u16string_view();
                 }
                 else
                 {
-                    tnB = nameB.getToken(0, '.', nIndex);
+                    tnB = o3tl::getToken(nameB, 0, '.', nIndex);
                     assert(nIndex < 0);
                 }
 
                 const int ns_comp = compare_schema(nsA, nsB);
                 if(ns_comp == 0)
                 {
-                    if(nsA.isEmpty())
+                    if(nsA.empty())
                     {
-                        assert(nsB.isEmpty());
+                        assert(nsB.empty());
                         // within each type category, sort privileged choice first
-                        if( tnA == "int4" || tnA == "varchar" || tnA == "char" || tnA == "text")
+                        if( tnA == u"int4" || tnA == u"varchar" || tnA == u"char" || tnA == u"text")
                             return true;
-                        if( tnB == "int4" || tnB == "varchar" || tnB == "char" || tnB == "text")
+                        if( tnB == u"int4" || tnB == u"varchar" || tnB == u"char" || tnB == u"text")
                             return false;
                     }
                     return nameA.compareTo( nameB ) < 0;

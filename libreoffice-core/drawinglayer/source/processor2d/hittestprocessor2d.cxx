@@ -20,7 +20,9 @@
 #include <drawinglayer/processor2d/hittestprocessor2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonMarkerPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonWavePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
@@ -231,12 +233,8 @@ namespace drawinglayer::processor2d
                     const geometry::ViewInformation2D aLastViewInformation2D(getViewInformation2D());
 
                     // create new local ViewInformation2D containing transformation
-                    const geometry::ViewInformation2D aViewInformation2D(
-                        getViewInformation2D().getObjectTransformation() * rTransformCandidate.getTransformation(),
-                        getViewInformation2D().getViewTransformation(),
-                        getViewInformation2D().getViewport(),
-                        getViewInformation2D().getVisualizedPage(),
-                        getViewInformation2D().getViewTime());
+                    geometry::ViewInformation2D aViewInformation2D(getViewInformation2D());
+                    aViewInformation2D.setObjectTransformation(getViewInformation2D().getObjectTransformation() * rTransformCandidate.getTransformation());
                     updateViewInformation(aViewInformation2D);
 
                     // process child content recursively
@@ -430,7 +428,7 @@ namespace drawinglayer::processor2d
                         if(!aRange.isEmpty())
                         {
                             const primitive2d::BitmapPrimitive2D& rBitmapCandidate(static_cast< const primitive2d::BitmapPrimitive2D& >(rCandidate));
-                            const BitmapEx aBitmapEx(VCLUnoHelper::GetBitmap(rBitmapCandidate.getXBitmap()));
+                            const BitmapEx aBitmapEx(rBitmapCandidate.getBitmap());
                             const Size& rSizePixel(aBitmapEx.GetSizePixel());
 
                             // When tiled rendering, don't bother with the pixel size of the candidate.

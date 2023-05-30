@@ -22,6 +22,7 @@
 #include <editeng/editeng.hxx>
 #include <editeng/editview.hxx>
 #include <editeng/outliner.hxx>
+#include <editeng/urlfieldhelper.hxx>
 #include <tools/poly.hxx>
 #include <editeng/unolingu.hxx>
 #include <com/sun/star/linguistic2/XDictionary.hpp>
@@ -1415,19 +1416,17 @@ void ImpEditView::ShowCursor( bool bGotoCursor, bool bForceVisCursor )
                 // is cursor at a misspelled word ?
                 Reference< linguistic2::XSpellChecker1 >  xSpeller( pEditEngine->pImpEditEngine->GetSpeller() );
                 bool bIsWrong = xSpeller.is() && IsWrongSpelledWord(aPaM, /*bMarkIfWrong*/ false);
+                EditView* pActiveView = GetEditViewPtr();
 
                 boost::property_tree::ptree aHyperlinkTree;
-                if (const SvxFieldItem* pFld = GetField(aPos, nullptr, nullptr))
+                if (pActiveView && URLFieldHelper::IsCursorAtURLField(*pActiveView))
                 {
-                    if (auto pUrlField = dynamic_cast<const SvxURLField*>(pFld->GetField()))
-                    {
-                        aHyperlinkTree = getHyperlinkPropTree(pUrlField->GetRepresentation(), pUrlField->GetURL());
-                    }
+                    if (const SvxFieldItem* pFld = GetField(aPos, nullptr, nullptr))
+                        if (auto pUrlField = dynamic_cast<const SvxURLField*>(pFld->GetField()))
+                            aHyperlinkTree = getHyperlinkPropTree(pUrlField->GetRepresentation(), pUrlField->GetURL());
                 }
                 else if (GetEditSelection().HasRange())
                 {
-                    EditView* pActiveView = GetEditViewPtr();
-
                     if (pActiveView)
                     {
                         const SvxFieldItem* pFieldItem = pActiveView->GetFieldAtSelection();
@@ -1477,7 +1476,7 @@ void ImpEditView::ShowCursor( bool bGotoCursor, bool bForceVisCursor )
             SvxFont aFont;
             pEditEngine->SeekCursor( aPaM.GetNode(), aPaM.GetIndex()+1, aFont );
 
-            InputContext aInputContext(aFont, InputContextFlags::Text | InputContextFlags::ExtText);
+            InputContext aInputContext(std::move(aFont), InputContextFlags::Text | InputContextFlags::ExtText);
             if (EditViewCallbacks* pCallbacks = getEditViewCallbacks())
                 pCallbacks->EditViewInputContext(aInputContext);
             else if (auto xWindow = GetWindow())
@@ -1739,8 +1738,11 @@ bool ImpEditView::MouseButtonDown( const MouseEvent& rMouseEvent )
     nTravelXPos         = TRAVEL_X_DONTKNOW;
     nExtraCursorFlags   = GetCursorFlags::NONE;
     nCursorBidiLevel    = CURSOR_BIDILEVEL_DONTKNOW;
+    bool bPrevUpdateLayout = pEditEngine->pImpEditEngine->SetUpdateLayout(true);
     bClickedInSelection = IsSelectionAtPoint( rMouseEvent.GetPosPixel() );
-    return pEditEngine->pImpEditEngine->MouseButtonDown( rMouseEvent, GetEditViewPtr() );
+    bool bRet = pEditEngine->pImpEditEngine->MouseButtonDown( rMouseEvent, GetEditViewPtr() );
+    pEditEngine->pImpEditEngine->SetUpdateLayout(bPrevUpdateLayout);
+    return bRet;
 }
 
 bool ImpEditView::MouseMove( const MouseEvent& rMouseEvent )

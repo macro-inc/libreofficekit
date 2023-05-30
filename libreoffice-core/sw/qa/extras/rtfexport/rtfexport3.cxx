@@ -11,10 +11,8 @@
 
 #include <com/sun/star/text/XFootnote.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
-#include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/awt/FontWeight.hpp>
 #include <com/sun/star/text/XEndnotesSupplier.hpp>
-#include <com/sun/star/text/XTextField.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextTablesSupplier.hpp>
 #include <com/sun/star/text/XTextTable.hpp>
@@ -23,6 +21,13 @@
 
 #include <comphelper/sequenceashashmap.hxx>
 #include <tools/UnitConversion.hxx>
+#include <comphelper/propertyvalue.hxx>
+
+#include <unotxdoc.hxx>
+#include <docsh.hxx>
+#include <wrtsh.hxx>
+#include <fmtpdsc.hxx>
+#include <IDocumentContentOperations.hxx>
 
 using namespace css;
 
@@ -57,10 +62,9 @@ DECLARE_RTFEXPORT_TEST(testTdf108949, "tdf108949_footnoteCharFormat.odt")
     uno::Reference<text::XText> xFootnoteText;
     xFootnotes->getByIndex(0) >>= xFootnoteText;
     // This was green (0x00A800), the character property of the footnote character, not the footnote text
-    CPPUNIT_ASSERT_MESSAGE(
-        "Footnote Text color",
-        sal_Int32(0x000000) >= getProperty<sal_Int32>(
-                                   getRun(getParagraphOfText(1, xFootnoteText), 1), "CharColor"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "Footnote Text color", COL_AUTO,
+        getProperty<Color>(getRun(getParagraphOfText(1, xFootnoteText), 1), "CharColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf141964_numId0, "tdf141964_numId0.rtf")
@@ -82,9 +86,8 @@ DECLARE_RTFEXPORT_TEST(testTdf108949_footnote, "tdf108949_footnote.rtf")
     uno::Reference<text::XFootnote> xFootnote;
     xFootnotes->getByIndex(0) >>= xFootnote;
     // The color of the footnote anchor was black (0x000000)
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(
-        "Footnote Character color", Color(0xFF0000),
-        Color(ColorTransparency, getProperty<sal_Int32>(xFootnote->getAnchor(), "CharColor")));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Footnote Character color", Color(0xFF0000),
+                                 getProperty<Color>(xFootnote->getAnchor(), "CharColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf130817, "tdf130817.rtf")
@@ -111,8 +114,7 @@ DECLARE_RTFEXPORT_TEST(testTdf137683_charHighlightNone, "tdf137683_charHighlight
 {
     uno::Reference<beans::XPropertySet> xRun(getRun(getParagraph(1), 1), uno::UNO_QUERY_THROW);
     // This test was failing with a brown charHighlight of 8421376 (0x808000), instead of COL_TRANSPARENT (0xFFFFFFFF)
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(COL_AUTO),
-                         getProperty<sal_Int32>(xRun, "CharHighlight"));
+    CPPUNIT_ASSERT_EQUAL(COL_AUTO, getProperty<Color>(xRun, "CharHighlight"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf116436_tableBackground, "tdf116436_tableBackground.odt")
@@ -123,16 +125,13 @@ DECLARE_RTFEXPORT_TEST(testTdf116436_tableBackground, "tdf116436_tableBackground
                                                     uno::UNO_QUERY);
     uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
     uno::Reference<table::XCell> xCell = xTable->getCellByName("A1");
-    if (mbExported)
-        CPPUNIT_ASSERT_EQUAL(Color(0xF8DF7C),
-                             Color(ColorTransparency, getProperty<sal_Int32>(xCell, "BackColor")));
+    if (isExported())
+        CPPUNIT_ASSERT_EQUAL(Color(0xF8DF7C), getProperty<Color>(xCell, "BackColor"));
     xCell.set(xTable->getCellByName("A6"));
-    CPPUNIT_ASSERT_EQUAL(Color(0x81D41A),
-                         Color(ColorTransparency, getProperty<sal_Int32>(xCell, "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x81D41A), getProperty<Color>(xCell, "BackColor"));
     xCell.set(xTable->getCellByName("B6"));
-    if (mbExported)
-        CPPUNIT_ASSERT_EQUAL(Color(0xFFFBCC),
-                             Color(ColorTransparency, getProperty<sal_Int32>(xCell, "BackColor")));
+    if (isExported())
+        CPPUNIT_ASSERT_EQUAL(Color(0xFFFBCC), getProperty<Color>(xCell, "BackColor"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf122589_firstSection, "tdf122589_firstSection.odt")
@@ -262,16 +261,14 @@ DECLARE_RTFEXPORT_TEST(testTdf117505, "tdf117505.odt")
 
 DECLARE_RTFEXPORT_TEST(testTdf112520, "tdf112520.docx")
 {
-    if (!mbExported)
+    if (!isExported())
         return;
 
     // Assert that the white shape is on top of the yellow one.
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0xffff00),
-                         getProperty<sal_Int32>(getShape(2), "FillColor"));
+    CPPUNIT_ASSERT_EQUAL(Color(0xffff00), getProperty<Color>(getShape(2), "FillColor"));
     CPPUNIT_ASSERT_EQUAL(text::TextContentAnchorType_AT_CHARACTER,
                          getProperty<text::TextContentAnchorType>(getShape(2), "AnchorType"));
-    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0xffffff),
-                         getProperty<sal_Int32>(getShape(3), "FillColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_WHITE, getProperty<Color>(getShape(3), "FillColor"));
     // Without the accompanying fix in place, this test would have failed with
     // 'expected: 4, actual: 2'.
     // This means the draw page was 0/at-char/white, 1/at-char/yellow, 2/at-page/white,
@@ -297,15 +294,14 @@ CPPUNIT_TEST_FIXTURE(Test, testNestedHyperlink)
         xCursor->gotoStart(/*bExpand=*/false);
         xCursor->gotoEnd(/*bExpand=*/true);
         uno::Reference<beans::XPropertySet> xCursorProps(xCursor, uno::UNO_QUERY);
-        xCursorProps->setPropertyValue("HyperLinkURL", uno::makeAny(OUString("http://body.com/")));
+        xCursorProps->setPropertyValue("HyperLinkURL", uno::Any(OUString("http://body.com/")));
         uno::Reference<text::XText> xFootnoteText(xFootnote, uno::UNO_QUERY);
         xCursor = xFootnoteText->createTextCursor();
         xFootnoteText->insertString(xCursor, "x", /*bAbsorb=*/false);
         xCursor->gotoStart(/*bExpand=*/false);
         xCursor->gotoEnd(/*bExpand=*/true);
         xCursorProps.set(xCursor, uno::UNO_QUERY);
-        xCursorProps->setPropertyValue("HyperLinkURL",
-                                       uno::makeAny(OUString("http://footnote.com/")));
+        xCursorProps->setPropertyValue("HyperLinkURL", uno::Any(OUString("http://footnote.com/")));
     }
 
     // When exporting to RTF:
@@ -437,12 +433,184 @@ CPPUNIT_TEST_FIXTURE(Test, testRtlGutter)
     };
 
     // Given a document with RTL gutter, when loading it:
-    load(mpTestDocumentPath, "rtl-gutter.rtf");
+    createSwDoc("rtl-gutter.rtf");
     // Then make sure the section's gutter is still RTL:
     // Without the accompanying fix in place, this test would have failed as \rtlgutter was missing.
     verify();
     reload(mpFilter, "rtl-gutter.rtf");
     verify();
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testNegativePageBorder)
+{
+    {
+        // Given a document with a top margin and a border which has more spacing than the margin on
+        // its 2nd page:
+        createSwDoc();
+        SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+        SwDocShell* pDocShell = pTextDoc->GetDocShell();
+        SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
+        pWrtShell->Insert("first");
+        pWrtShell->SplitNode();
+        pWrtShell->Insert("second");
+        SwPageDesc* pDesc = pWrtShell->FindPageDescByName("Left Page", true);
+        SwPaM aPaM(*pWrtShell->GetCursor()->GetPoint());
+        SwFormatPageDesc aFormatPageDesc(pDesc);
+        pDocShell->GetDoc()->getIDocumentContentOperations().InsertPoolItem(aPaM, aFormatPageDesc);
+        uno::Reference<beans::XPropertySet> xPageStyle(
+            getStyles("PageStyles")->getByName("Left Page"), uno::UNO_QUERY);
+        xPageStyle->setPropertyValue("TopMargin", uno::Any(static_cast<sal_Int32>(501)));
+        table::BorderLine2 aBorder;
+        aBorder.LineWidth = 159;
+        aBorder.OuterLineWidth = 159;
+        xPageStyle->setPropertyValue("TopBorder", uno::Any(aBorder));
+        sal_Int32 nTopBorderDistance = -646;
+        xPageStyle->setPropertyValue("TopBorderDistance", uno::Any(nTopBorderDistance));
+    }
+
+    // When saving that document to RTF:
+    reload(mpFilter, "negative-page-border.rtf");
+
+    // Then make sure that the border distance is negative, so the first line of body text appears
+    // on top of the page border:
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    SwDocShell* pDocShell = pTextDoc->GetDocShell();
+    SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
+    pWrtShell->Down(/*bSelect=*/false);
+    OUString aPageStyle = pWrtShell->GetCurPageStyle();
+    uno::Reference<beans::XPropertySet> xPageStyle(getStyles("PageStyles")->getByName(aPageStyle),
+                                                   uno::UNO_QUERY);
+    auto nTopMargin = xPageStyle->getPropertyValue("TopMargin").get<sal_Int32>();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(501), nTopMargin);
+    auto aTopBorder = xPageStyle->getPropertyValue("TopBorder").get<table::BorderLine2>();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_uInt32>(159), aTopBorder.LineWidth);
+    auto nTopBorderDistance = xPageStyle->getPropertyValue("TopBorderDistance").get<sal_Int32>();
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: -646
+    // - Actual  : 0
+    // i.e. the border negative distance was lost.
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(-646), nTopBorderDistance);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf127806)
+{
+    createSwDoc("tdf127806.rtf");
+    CPPUNIT_ASSERT_EQUAL(2, getShapes());
+
+    CPPUNIT_ASSERT_EQUAL(OUString("com.sun.star.drawing.GroupShape"), getShape(1)->getShapeType());
+    auto xImage = getShape(2);
+    CPPUNIT_ASSERT_EQUAL(OUString("FrameShape"), xImage->getShapeType());
+    awt::Size aSize(xImage->getSize());
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(600), aSize.Height);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(635), aSize.Width);
+
+    reload(mpFilter, "tdf127806.rtf");
+    CPPUNIT_ASSERT_EQUAL(1, getShapes()); // FIXME: We lost one shape on export, that's sucks
+
+    xImage = getShape(1);
+    CPPUNIT_ASSERT_EQUAL(OUString("FrameShape"), xImage->getShapeType());
+
+    aSize = xImage->getSize();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(600), aSize.Height);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(635), aSize.Width);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf148578, "tdf148578.rtf")
+{
+    // \trgaph567 should affect only table cell margings (~1cm),
+    // but do not shift table, since \trleft is not provided
+    uno::Reference<text::XTextTable> xTable(getParagraphOrTable(1), uno::UNO_QUERY);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(0), getProperty<sal_Int32>(xTable, "LeftMargin"));
+
+    uno::Reference<text::XTextRange> xCell(xTable->getCellByName("A1"), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1000),
+                         getProperty<sal_Int32>(xCell, "LeftBorderDistance"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1000),
+                         getProperty<sal_Int32>(xCell, "RightBorderDistance"));
+
+    xCell.set(xTable->getCellByName("B1"), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1000),
+                         getProperty<sal_Int32>(xCell, "LeftBorderDistance"));
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1000),
+                         getProperty<sal_Int32>(xCell, "RightBorderDistance"));
+}
+
+DECLARE_RTFEXPORT_TEST(testInvalidParagraphStyle, "invalidParagraphStyle.rtf")
+{
+    // Given test has character style #30, but referred as paragraph style #30
+    // This was causing exception in finishParagraph(), so numbering and other
+    // properties were not applied. Ensure numbering is still here
+    sal_Int16 numFormat = getNumberingTypeOfParagraph(1);
+    CPPUNIT_ASSERT_EQUAL(style::NumberingType::ARABIC, numFormat);
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf152784_1, "tdf152784_1.rtf")
+{
+    // Ensure that paragraph having style with numbering does not have numbering
+    // since it is not explitly defined in paragraph properties
+    uno::Reference<beans::XPropertySet> xPara(getParagraph(1, "Here should be no numbering!"),
+                                              uno::UNO_QUERY);
+    CPPUNIT_ASSERT(getProperty<OUString>(xPara, "NumberingStyleName").isEmpty());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testFloatingTableExport)
+{
+    // Given a document with a floating table:
+    mxComponent = loadFromDesktop("private:factory/swriter");
+    // Insert a table:
+    uno::Sequence<beans::PropertyValue> aArgs = {
+        comphelper::makePropertyValue("Rows", static_cast<sal_Int32>(1)),
+        comphelper::makePropertyValue("Columns", static_cast<sal_Int32>(1)),
+    };
+    dispatchCommand(mxComponent, ".uno:InsertTable", aArgs);
+    // Select it:
+    dispatchCommand(mxComponent, ".uno:SelectAll", {});
+    // Wrap in a fly:
+    aArgs = {
+        comphelper::makePropertyValue("AnchorType", static_cast<sal_uInt16>(0)),
+    };
+    dispatchCommand(mxComponent, ".uno:InsertFrame", aArgs);
+    // Mark it as a floating table:
+    uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xFrame(
+        xTextFramesSupplier->getTextFrames()->getByName("Frame1"), uno::UNO_QUERY);
+    xFrame->setPropertyValue("IsSplitAllowed", uno::Any(true));
+    // Originally 10, 30 & 40 twips.
+    xFrame->setPropertyValue("VertOrientPosition", uno::Any(static_cast<sal_Int32>(18)));
+    xFrame->setPropertyValue("LeftMargin", uno::Any(static_cast<sal_Int32>(53)));
+    xFrame->setPropertyValue("RightMargin", uno::Any(static_cast<sal_Int32>(71)));
+
+    // When saving to RTF:
+    reload(mpFilter, "floating-table.rtf");
+
+    // Then make sure the floating table is there & has the expected properties:
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
+    xFrame.set(xDrawPage->getByIndex(0), uno::UNO_QUERY);
+    bool bIsSplitAllowed{};
+    xFrame->getPropertyValue("IsSplitAllowed") >>= bIsSplitAllowed;
+    // Without the accompanying fix in place, this test would have failed, the table was not
+    // multi-page.
+    CPPUNIT_ASSERT(bIsSplitAllowed);
+    sal_Int16 nVertOrientRelation{};
+    xFrame->getPropertyValue("VertOrientRelation") >>= nVertOrientRelation;
+    CPPUNIT_ASSERT_EQUAL(text::RelOrientation::FRAME, nVertOrientRelation);
+    sal_Int16 nHoriOrientRelation{};
+    xFrame->getPropertyValue("HoriOrientRelation") >>= nHoriOrientRelation;
+    CPPUNIT_ASSERT_EQUAL(text::RelOrientation::FRAME, nHoriOrientRelation);
+    sal_Int32 nVertOrientPosition{};
+    xFrame->getPropertyValue("VertOrientPosition") >>= nVertOrientPosition;
+    sal_Int32 nExpected = 18;
+    CPPUNIT_ASSERT_EQUAL(nExpected, nVertOrientPosition);
+    sal_Int32 nLeftMargin{};
+    xFrame->getPropertyValue("LeftMargin") >>= nLeftMargin;
+    nExpected = 53;
+    CPPUNIT_ASSERT_EQUAL(nExpected, nLeftMargin);
+    sal_Int32 nRightMargin{};
+    xFrame->getPropertyValue("RightMargin") >>= nRightMargin;
+    nExpected = 71;
+    CPPUNIT_ASSERT_EQUAL(nExpected, nRightMargin);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

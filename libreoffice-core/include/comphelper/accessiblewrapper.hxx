@@ -71,8 +71,6 @@ namespace comphelper
                 m_xParentAccessible;
         css::uno::WeakReference< css::accessibility::XAccessibleContext >
                 m_aContext;
-
-    protected:
         css::uno::Reference< css::accessibility::XAccessible >
                 m_xInnerAccessible;
 
@@ -199,10 +197,10 @@ namespace comphelper
 
         // XAccessibleContext
         /// @throws css::uno::RuntimeException
-        sal_Int32 baseGetAccessibleChildCount(  );
+        sal_Int64 baseGetAccessibleChildCount(  );
         /// @throws css::lang::IndexOutOfBoundsException
         /// @throws css::uno::RuntimeException
-        css::uno::Reference< css::accessibility::XAccessible > baseGetAccessibleChild( sal_Int32 i );
+        css::uno::Reference< css::accessibility::XAccessible > baseGetAccessibleChild( sal_Int64 i );
         /// @throws css::uno::RuntimeException
         css::uno::Reference< css::accessibility::XAccessibleRelationSet > baseGetAccessibleRelationSet(  );
 
@@ -281,15 +279,15 @@ namespace comphelper
         DECLARE_XTYPEPROVIDER( )
 
         // XAccessibleContext
-        virtual sal_Int32 SAL_CALL getAccessibleChildCount(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int32 i ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleChildCount(  ) override;
+        virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleChild( sal_Int64 i ) override;
         virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getAccessibleParent(  ) override;
-        virtual sal_Int32 SAL_CALL getAccessibleIndexInParent(  ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleIndexInParent(  ) override;
         virtual sal_Int16 SAL_CALL getAccessibleRole(  ) override;
         virtual OUString SAL_CALL getAccessibleDescription(  ) override;
         virtual OUString SAL_CALL getAccessibleName(  ) override;
         virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL getAccessibleRelationSet(  ) override;
-        virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL getAccessibleStateSet(  ) override;
+        virtual sal_Int64 SAL_CALL getAccessibleStateSet(  ) override;
         virtual css::lang::Locale SAL_CALL getLocale(  ) override;
 
         // XAccessibleEventBroadcaster

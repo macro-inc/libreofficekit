@@ -20,6 +20,7 @@
 #define INCLUDED_CONNECTIVITY_PARAMETERS_HXX
 
 #include <map>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/sdb/XSingleSelectQueryComposer.hpp>
@@ -27,7 +28,7 @@
 #include <connectivity/dbtoolsdllapi.hxx>
 #include <connectivity/paramwrapper.hxx>
 #include <unotools/sharedunocomponent.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 
 namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::container { class XIndexAccess; }
@@ -87,9 +88,9 @@ namespace dbtools
             ::std::vector< sal_Int32 >  aInnerIndexes;
 
             /// ctor with composer column
-            ParameterMetaData( const css::uno::Reference< css::beans::XPropertySet >& _rxColumn )
+            ParameterMetaData( css::uno::Reference< css::beans::XPropertySet > _xColumn )
                 :eType           ( ParameterClassification::FilledExternally )
-                ,xComposerColumn ( _rxColumn         )
+                ,xComposerColumn (std::move( _xColumn         ))
             {
             }
         };
@@ -98,7 +99,7 @@ namespace dbtools
 
     private:
         ::osl::Mutex&                       m_rMutex;
-        ::comphelper::OInterfaceContainerHelper2  m_aParameterListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::form::XDatabaseParameterListener> m_aParameterListeners;
 
         css::uno::Reference< css::uno::XComponentContext >
                                             m_xContext;

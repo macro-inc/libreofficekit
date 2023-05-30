@@ -7,13 +7,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
+#include <test/unoapixml_test.hxx>
 
 #include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
-#include <com/sun/star/frame/Desktop.hpp>
 
 #include <drawinglayer/tools/primitive2dxmldump.hxx>
 #include <rtl/ustring.hxx>
@@ -30,27 +27,13 @@ using namespace ::com::sun::star;
 namespace
 {
 /// Tests for svx/source/sdr/ code.
-class SdrTest : public test::BootstrapFixture, public unotest::MacrosTest, public XmlTestTools
+class SdrTest : public UnoApiXmlTest
 {
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    virtual void setUp() override
+    SdrTest()
+        : UnoApiXmlTest("svx/qa/unit/data/")
     {
-        test::BootstrapFixture::setUp();
-        mxDesktop.set(frame::Desktop::create(m_xContext));
     }
-
-    virtual void tearDown() override
-    {
-        if (mxComponent.is())
-        {
-            mxComponent->dispose();
-        }
-        test::BootstrapFixture::tearDown();
-    }
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
 
     drawinglayer::primitive2d::Primitive2DContainer
     renderPageToPrimitives(const uno::Reference<drawing::XDrawPage>& xDrawPage);
@@ -76,10 +59,8 @@ SdrTest::renderPageToPrimitives(const uno::Reference<drawing::XDrawPage>& xDrawP
 CPPUNIT_TEST_FIXTURE(SdrTest, testShadowScaleOrigin)
 {
     // Load a document containing a custom shape.
-    test::Directories aDirectories;
-    OUString aURL = aDirectories.getURLFromSrc(u"svx/qa/unit/data/shadow-scale-origin.pptx");
-    getComponent() = loadFromDesktop(aURL);
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"shadow-scale-origin.pptx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence
@@ -99,13 +80,79 @@ CPPUNIT_TEST_FIXTURE(SdrTest, testShadowScaleOrigin)
     CPPUNIT_ASSERT_EQUAL(sal_Int32(-684), fShadowY);
 }
 
+CPPUNIT_TEST_FIXTURE(SdrTest, testShadowAlignment)
+{
+    loadFromURL(u"tdf150020-shadow-alignment.pptx");
+
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
+    {
+        // Page 1 contains 9 shapes with each shadow alignment
+        uno::Reference<drawing::XDrawPage> xDrawPage(
+            xDrawPagesSupplier->getDrawPages()->getByIndex(0), uno::UNO_QUERY);
+        drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence
+            = renderPageToPrimitives(xDrawPage);
+
+        // Examine the created primitives.
+        drawinglayer::Primitive2dXmlDump aDumper;
+        xmlDocUniquePtr pDocument = aDumper.dumpAndParse(xPrimitiveSequence);
+
+        // Without the accompanying fix in place, this test would have failed with:
+        // - Expected: -567
+        // - Actual  : 162
+        // - In <>, attribute 'xy13' of '(//shadow/transform)[1]' incorrect value.
+        // i.e. shadow alignment was ignored while scaling the shadow.
+        assertXPath(pDocument, "(//shadow/transform)[1]", "xy13", "-567");
+        assertXPath(pDocument, "(//shadow/transform)[1]", "xy23", "162");
+
+        assertXPath(pDocument, "(//shadow/transform)[2]", "xy13", "-1794");
+        assertXPath(pDocument, "(//shadow/transform)[2]", "xy23", "162");
+
+        assertXPath(pDocument, "(//shadow/transform)[3]", "xy13", "-3021");
+        assertXPath(pDocument, "(//shadow/transform)[3]", "xy23", "161");
+
+        assertXPath(pDocument, "(//shadow/transform)[4]", "xy13", "-567");
+        assertXPath(pDocument, "(//shadow/transform)[4]", "xy23", "-749");
+
+        assertXPath(pDocument, "(//shadow/transform)[5]", "xy13", "-3021");
+        assertXPath(pDocument, "(//shadow/transform)[5]", "xy23", "-750");
+
+        assertXPath(pDocument, "(//shadow/transform)[6]", "xy13", "-566");
+        assertXPath(pDocument, "(//shadow/transform)[6]", "xy23", "-1691");
+
+        assertXPath(pDocument, "(//shadow/transform)[7]", "xy13", "-1794");
+        assertXPath(pDocument, "(//shadow/transform)[7]", "xy23", "-1693");
+
+        assertXPath(pDocument, "(//shadow/transform)[8]", "xy13", "-3022");
+        assertXPath(pDocument, "(//shadow/transform)[8]", "xy23", "-1691");
+
+        assertXPath(pDocument, "(//shadow/transform)[9]", "xy13", "-1794");
+        assertXPath(pDocument, "(//shadow/transform)[9]", "xy23", "-750");
+    }
+    {
+        // Page 2 contains a table with shadow alignment center
+        uno::Reference<drawing::XDrawPage> xDrawPage(
+            xDrawPagesSupplier->getDrawPages()->getByIndex(1), uno::UNO_QUERY);
+        drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence
+            = renderPageToPrimitives(xDrawPage);
+
+        // Examine the created primitives.
+        drawinglayer::Primitive2dXmlDump aDumper;
+        xmlDocUniquePtr pDocument = aDumper.dumpAndParse(xPrimitiveSequence);
+
+        // Without the accompanying fix in place, this test would have failed with:
+        // - Expected: -5196
+        // - Actual  : 0
+        // - In<>, attribute 'xy13' of '//shadow/transform' incorrect value.
+        assertXPath(pDocument, "//shadow/transform", "xy13", "-5196");
+        assertXPath(pDocument, "//shadow/transform", "xy23", "-2290");
+    }
+}
+
 CPPUNIT_TEST_FIXTURE(SdrTest, testZeroWidthTextWrap)
 {
     // Load a document containing a 0-width shape with text.
-    test::Directories aDirectories;
-    OUString aURL = aDirectories.getURLFromSrc(u"svx/qa/unit/data/0-width-text-wrap.pptx");
-    getComponent() = loadFromDesktop(aURL);
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"0-width-text-wrap.pptx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
     drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence
@@ -124,10 +171,8 @@ CPPUNIT_TEST_FIXTURE(SdrTest, testZeroWidthTextWrap)
 CPPUNIT_TEST_FIXTURE(SdrTest, testSlideBackground)
 {
     // Given a document with a slide what has a linked background image:
-    test::Directories aDirectories;
-    OUString aURL = aDirectories.getURLFromSrc(u"svx/qa/unit/data/slide-background.odp");
-    getComponent() = loadFromDesktop(aURL);
-    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"slide-background.odp");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
     uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
                                                  uno::UNO_QUERY);
 

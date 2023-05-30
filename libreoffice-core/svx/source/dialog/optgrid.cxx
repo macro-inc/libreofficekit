@@ -25,14 +25,14 @@
 #include <svx/dlgutil.hxx>
 
 // local functions
-static void lcl_GetMinMax(weld::MetricSpinButton const& rField, int& nMin, int& nMax)
+static void lcl_GetMinMax(weld::MetricSpinButton const& rField, sal_Int64& nMin, sal_Int64& nMax)
 {
     rField.get_range(nMin, nMax, FieldUnit::TWIP);
     nMin = rField.denormalize(nMin);
     nMax = rField.denormalize(nMax);
 }
 
-static void lcl_SetMinMax(weld::MetricSpinButton& rField, int nMin, int nMax)
+static void lcl_SetMinMax(weld::MetricSpinButton& rField, sal_Int64 nMin, sal_Int64 nMax)
 {
     rField.set_range(rField.normalize(nMin), rField.normalize(nMax), FieldUnit::TWIP);
 }
@@ -114,7 +114,7 @@ SvxGridTabPage::SvxGridTabPage(weld::Container* pPage, weld::DialogController* p
 
     // Set Metrics
     FieldUnit eFUnit = GetModuleFieldUnit( rCoreSet );
-    int nMin, nMax;
+    sal_Int64 nMin, nMax;
 
     lcl_GetMinMax(*m_xMtrFldDrawX, nMin, nMax);
     SetFieldUnit( *m_xMtrFldDrawX, eFUnit, true );
@@ -159,8 +159,7 @@ bool SvxGridTabPage::FillItemSet( SfxItemSet* rCoreSet )
         aGridItem.bSynchronize  = m_xCbxSynchronize->get_active();
         aGridItem.bGridVisible  = m_xCbxGridVisible->get_active();
 
-        MapUnit eUnit =
-            rCoreSet->GetPool()->GetMetric( GetWhich( SID_ATTR_GRID_OPTIONS ) );
+        MapUnit eUnit = rCoreSet->GetPool()->GetMetric( SID_ATTR_GRID_OPTIONS );
         tools::Long nX = GetCoreValue(  *m_xMtrFldDrawX, eUnit );
         tools::Long nY = GetCoreValue( *m_xMtrFldDrawY, eUnit );
 
@@ -176,18 +175,15 @@ bool SvxGridTabPage::FillItemSet( SfxItemSet* rCoreSet )
 
 void SvxGridTabPage::Reset( const SfxItemSet* rSet )
 {
-    const SfxPoolItem* pAttr = nullptr;
+    const SvxGridItem* pGridAttr = nullptr;
 
-    if( SfxItemState::SET == rSet->GetItemState( SID_ATTR_GRID_OPTIONS , false,
-                                    &pAttr ))
+    if( (pGridAttr = rSet->GetItemIfSet( SID_ATTR_GRID_OPTIONS , false )) )
     {
-        const SvxGridItem* pGridAttr = static_cast<const SvxGridItem*>(pAttr);
         m_xCbxUseGridsnap->set_active(pGridAttr->bUseGridsnap);
         m_xCbxSynchronize->set_active(pGridAttr->bSynchronize);
         m_xCbxGridVisible->set_active(pGridAttr->bGridVisible);
 
-        MapUnit eUnit =
-            rSet->GetPool()->GetMetric( GetWhich( SID_ATTR_GRID_OPTIONS ) );
+        MapUnit eUnit = rSet->GetPool()->GetMetric( SID_ATTR_GRID_OPTIONS );
         SetMetricValue( *m_xMtrFldDrawX , pGridAttr->nFldDrawX, eUnit );
         SetMetricValue( *m_xMtrFldDrawY , pGridAttr->nFldDrawY, eUnit );
 
@@ -201,11 +197,9 @@ void SvxGridTabPage::Reset( const SfxItemSet* rSet )
 
 void SvxGridTabPage::ActivatePage( const SfxItemSet& rSet )
 {
-    const SfxPoolItem* pAttr = nullptr;
-    if( SfxItemState::SET == rSet.GetItemState( SID_ATTR_GRID_OPTIONS , false,
-                                    &pAttr ))
+    const SvxGridItem* pGridAttr = nullptr;
+    if( (pGridAttr = rSet.GetItemIfSet( SID_ATTR_GRID_OPTIONS , false )) )
     {
-        const SvxGridItem* pGridAttr = static_cast<const SvxGridItem*>(pAttr);
         m_xCbxUseGridsnap->set_active(pGridAttr->bUseGridsnap);
 
         ChangeGridsnapHdl_Impl(*m_xCbxUseGridsnap);
@@ -213,11 +207,10 @@ void SvxGridTabPage::ActivatePage( const SfxItemSet& rSet )
 
     // Metric Change if necessary (as TabPage is in the dialog, where the
     // metric can be set
-    if( SfxItemState::SET != rSet.GetItemState( SID_ATTR_METRIC , false,
-                                    &pAttr ))
+    const SfxUInt16Item* pItem = rSet.GetItemIfSet( SID_ATTR_METRIC , false );
+    if( !pItem )
         return;
 
-    const SfxUInt16Item* pItem = static_cast<const SfxUInt16Item*>(pAttr);
 
     FieldUnit eFUnit = static_cast<FieldUnit>(static_cast<tools::Long>(pItem->GetValue()));
 
@@ -225,7 +218,7 @@ void SvxGridTabPage::ActivatePage( const SfxItemSet& rSet )
         return;
 
     // Set Metrics
-    int nMin, nMax;
+    sal_Int64 nMin, nMax;
     int nVal = m_xMtrFldDrawX->denormalize(m_xMtrFldDrawX->get_value(FieldUnit::TWIP));
 
     lcl_GetMinMax(*m_xMtrFldDrawX, nMin, nMax);

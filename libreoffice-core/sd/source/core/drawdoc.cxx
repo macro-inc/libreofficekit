@@ -139,6 +139,8 @@ SdDrawDocument::SdDrawDocument(DocumentType eType, SfxObjectShell* pDrDocSh)
 , mbEmbedFontScriptComplex(true)
 , mnImagePreferredDPI(0)
 {
+    m_bThemedControls = false;
+
     mpDrawPageListWatcher.reset(new ImpDrawPageListWatcher(*this));
     mpMasterPageListWatcher.reset(new ImpMasterPageListWatcher(*this));
 
@@ -198,8 +200,7 @@ SdDrawDocument::SdDrawDocument(DocumentType eType, SfxObjectShell* pDrDocSh)
     }
 
     LanguageType eRealLanguage = MsLangId::getRealLanguage( meLanguage );
-    LanguageTag aLanguageTag( eRealLanguage);
-    mpCharClass.reset(new CharClass( aLanguageTag ));
+    mpCharClass.reset(new CharClass( LanguageTag( eRealLanguage) ));
 
     // If the current application language is a language that uses right-to-left text...
     LanguageType eRealCTLLanguage = Application::GetSettings().GetLanguageTag().getLanguageType();
@@ -857,9 +858,9 @@ void SdDrawDocument::NewOrLoadCompleted( SdPage* pPage, SdStyleSheetPool* pSPool
         if (pObj->GetObjInventor() == SdrInventor::Default)
         {
             OutlinerParaObject* pOPO = pObj->GetOutlinerParaObject();
-            sal_uInt16 nId = pObj->GetObjIdentifier();
+            SdrObjKind nId = pObj->GetObjIdentifier();
 
-            if (nId == OBJ_TITLETEXT)
+            if (nId == SdrObjKind::TitleText)
             {
                 if( pOPO && pOPO->GetOutlinerMode() == OutlinerMode::DontKnow )
                     pOPO->SetOutlinerMode( OutlinerMode::TitleObject );
@@ -868,7 +869,7 @@ void SdDrawDocument::NewOrLoadCompleted( SdPage* pPage, SdStyleSheetPool* pSPool
                 if (pTitleSheet)
                     pObj->SetStyleSheet(pTitleSheet, true);
             }
-            else if (nId == OBJ_OUTLINETEXT)
+            else if (nId == SdrObjKind::OutlineText)
             {
                 if( pOPO && pOPO->GetOutlinerMode() == OutlinerMode::DontKnow )
                     pOPO->SetOutlinerMode( OutlinerMode::OutlineObject );
@@ -889,7 +890,7 @@ void SdDrawDocument::NewOrLoadCompleted( SdPage* pPage, SdStyleSheetPool* pSPool
                 }
             }
 
-            if( auto pTextObj = dynamic_cast<SdrTextObj *>( pObj ) )
+            if( auto pTextObj = DynCastSdrTextObj( pObj ) )
                 if (pTextObj->IsEmptyPresObj())
                 {
                     PresObjKind ePresObjKind = pPage->GetPresObjKind(pObj);
@@ -1111,18 +1112,17 @@ void SdDrawDocument::InitLayoutVector()
 
     // get file list from configuration
     const Sequence< OUString > aFiles(
-        officecfg::Office::Impress::Misc::LayoutListFiles::get(xContext) );
+        officecfg::Office::Impress::Misc::LayoutListFiles::get() );
 
-    OUString sFilename;
+    if (aFiles.getLength() == 0)
+        return;
+    const Reference<XDocumentBuilder> xDocBuilder = DocumentBuilder::create( xContext );
+
     for( const auto& rFile : aFiles )
     {
-        sFilename = comphelper::getExpandedUri(xContext, rFile);
+        OUString sFilename = comphelper::getExpandedUri(xContext, rFile);
 
         // load layout file into DOM
-        Reference< XMultiServiceFactory > xServiceFactory(
-            xContext->getServiceManager() , UNO_QUERY_THROW );
-        const Reference<XDocumentBuilder> xDocBuilder(
-            DocumentBuilder::create( comphelper::getComponentContext (xServiceFactory) ));
 
         try
         {
@@ -1150,18 +1150,16 @@ void SdDrawDocument::InitObjectVector()
 
     // get file list from configuration
     const Sequence< OUString > aFiles(
-       officecfg::Office::Impress::Misc::PresObjListFiles::get(xContext) );
+       officecfg::Office::Impress::Misc::PresObjListFiles::get() );
 
-    OUString sFilename;
+    if (aFiles.getLength() == 0)
+        return;
+    const Reference<XDocumentBuilder> xDocBuilder = DocumentBuilder::create( xContext );
     for( const auto& rFile : aFiles )
     {
-        sFilename = comphelper::getExpandedUri(xContext, rFile);
+        OUString sFilename = comphelper::getExpandedUri(xContext, rFile);
 
         // load presentation object file into DOM
-        Reference< XMultiServiceFactory > xServiceFactory(
-            xContext->getServiceManager() , UNO_QUERY_THROW );
-        const Reference<XDocumentBuilder> xDocBuilder(
-            DocumentBuilder::create( comphelper::getComponentContext (xServiceFactory) ));
 
         try
         {

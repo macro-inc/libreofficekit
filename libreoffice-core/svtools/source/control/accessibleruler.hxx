@@ -48,7 +48,7 @@ class SvtRulerAccessible final : public ::cppu::BaseMutex, public SvtRulerAccess
 public:
     //=====  internal  ========================================================
     SvtRulerAccessible(
-        const css::uno::Reference< css::accessibility::XAccessible>& rxParent, Ruler& rRepresentation, const OUString& rName );
+        css::uno::Reference< css::accessibility::XAccessible> xParent, Ruler& rRepresentation, OUString aName );
 
     /// @throws css::uno::RuntimeException
     bool
@@ -89,16 +89,16 @@ public:
 
     //=====  XAccessibleContext  ==============================================
 
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleChildCount() override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
-        getAccessibleChild( sal_Int32 nIndex ) override;
+        getAccessibleChild( sal_Int64 nIndex ) override;
 
     virtual css::uno::Reference< css::accessibility::XAccessible> SAL_CALL
         getAccessibleParent() override;
 
-    virtual sal_Int32 SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleIndexInParent() override;
 
     virtual sal_Int16 SAL_CALL
@@ -113,7 +113,7 @@ public:
     virtual css::uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL
         getAccessibleRelationSet() override;
 
-    virtual css::uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
+    virtual sal_Int64 SAL_CALL
         getAccessibleStateSet() override;
 
     virtual css::lang::Locale SAL_CALL

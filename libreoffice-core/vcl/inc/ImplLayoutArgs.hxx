@@ -35,8 +35,8 @@ public:
     vcl::text::TextLayoutCache const* m_pTextLayoutCache;
 
     // positioning related inputs
-    const DeviceCoordinate* mpDXArray; // in integer pixel units
-    const double* mpAltNaturalDXArray; // in floating point pixel units
+    const double* mpNaturalDXArray; // in floating point pixel units
+    const sal_Bool* mpKashidaArray;
     DeviceCoordinate mnLayoutWidth; // in pixel units
     Degree10 mnOrientation; // in 0-3600 system
 
@@ -45,18 +45,18 @@ public:
     ImplLayoutRuns maFallbackRuns;
 
     ImplLayoutArgs(OUString const& rStr, int nMinCharPos, int nEndCharPos, SalLayoutFlags nFlags,
-                   LanguageTag const& rLanguageTag, vcl::text::TextLayoutCache const* pLayoutCache);
+                   LanguageTag aLanguageTag, vcl::text::TextLayoutCache const* pLayoutCache);
 
     void SetLayoutWidth(DeviceCoordinate nWidth);
-    void SetDXArray(const DeviceCoordinate* pDXArray);
-    void SetAltNaturalDXArray(const double* pDXArray);
+    void SetNaturalDXArray(const double* pDXArray);
+    void SetKashidaArray(const sal_Bool* pKashidaArray);
     void SetOrientation(Degree10 nOrientation);
 
     void ResetPos();
     bool GetNextPos(int* nCharPos, bool* bRTL);
     bool GetNextRun(int* nMinRunPos, int* nEndRunPos, bool* bRTL);
     void AddFallbackRun(int nMinRunPos, int nEndRunPos, bool bRTL);
-    bool HasDXArray() const { return mpDXArray || mpAltNaturalDXArray; }
+    bool HasDXArray() const { return mpNaturalDXArray; }
 
     // methods used by BiDi and glyph fallback
     bool HasFallbackRun() const;

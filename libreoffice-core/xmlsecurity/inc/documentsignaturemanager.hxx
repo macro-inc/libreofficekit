@@ -28,6 +28,7 @@
 #include "documentsignaturehelper.hxx"
 
 #include <com/sun/star/xml/crypto/XSEInitializer.hpp>
+#include <unotools/tempfile.hxx>
 
 namespace com::sun::star
 {
@@ -67,7 +68,7 @@ private:
     css::uno::Sequence<css::uno::Sequence<css::beans::PropertyValue>> m_manifest;
     css::uno::Reference<css::io::XStream> mxSignatureStream;
     css::uno::Reference<css::frame::XModel> mxModel;
-    css::uno::Reference<css::io::XStream> mxTempSignatureStream;
+    rtl::Reference<utl::TempFileFastService> mxTempSignatureStream;
     /// Storage containing all OOXML signatures, unused for ODF.
     css::uno::Reference<css::embed::XStorage> mxTempSignatureStorage;
     css::uno::Reference<css::xml::crypto::XSEInitializer> mxSEInitializer;
@@ -84,7 +85,7 @@ public:
      * Checks if a particular stream is a valid xml stream. Those are treated
      * differently when they are signed (c14n transformation)
      */
-    bool isXML(const OUString& rURI);
+    bool isXML(std::u16string_view rURI);
     bool readManifest();
 
     SignatureStreamHelper ImplOpenSignatureStream(sal_Int32 nStreamOpenMode, bool bTempStream);

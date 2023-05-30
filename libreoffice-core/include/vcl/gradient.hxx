@@ -21,18 +21,20 @@
 #define INCLUDED_VCL_GRADIENT_HXX
 
 #include <sal/types.h>
-#include <vcl/dllapi.h>
 #include <tools/color.hxx>
 #include <tools/degree.hxx>
-
-#include <vcl/vclenum.hxx>
+#include <tools/long.hxx>
 #include <o3tl/cow_wrapper.hxx>
 
+#include <vcl/dllapi.h>
+#include <vcl/vclenum.hxx>
+#include <com/sun/star/awt/GradientStyle.hpp>
 
 namespace tools { class Rectangle; }
 
 class Point;
 class SvStream;
+class GDIMetaFile;
 
 class VCL_DLLPUBLIC Gradient
 {
@@ -44,13 +46,13 @@ public:
                     Gradient();
                     Gradient( const Gradient& rGradient );
                     Gradient( Gradient&& rGradient );
-                    Gradient( GradientStyle eStyle,
+                    Gradient( css::awt::GradientStyle eStyle,
                               const Color& rStartColor,
                               const Color& rEndColor );
                     ~Gradient();
 
-    void            SetStyle( GradientStyle eStyle );
-    GradientStyle   GetStyle() const;
+    void            SetStyle( css::awt::GradientStyle eStyle );
+    css::awt::GradientStyle   GetStyle() const;
 
     void            SetStartColor( const Color& rColor );
     const Color&    GetStartColor() const;
@@ -78,11 +80,19 @@ public:
 
     void            GetBoundRect( const tools::Rectangle& rRect, tools::Rectangle &rBoundRect, Point& rCenter ) const;
 
+    void AddGradientActions(tools::Rectangle const& rRect, GDIMetaFile& rMetaFile);
+
     Gradient&       operator=( const Gradient& rGradient );
     Gradient&       operator=( Gradient&& rGradient );
     bool            operator==( const Gradient& rGradient ) const;
     bool            operator!=( const Gradient& rGradient ) const
                         { return !(Gradient::operator==( rGradient )); }
+
+private:
+    tools::Long GetMetafileSteps(tools::Rectangle const& rRect) const;
+
+    void DrawComplexGradientToMetafile(tools::Rectangle const& rRect, GDIMetaFile& rMetaFile) const;
+    void DrawLinearGradientToMetafile(tools::Rectangle const& rRect, GDIMetaFile& rMetaFile) const;
 };
 
 #endif // INCLUDED_VCL_GRADIENT_HXX

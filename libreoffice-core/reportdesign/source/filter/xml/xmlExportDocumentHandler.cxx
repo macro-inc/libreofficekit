@@ -26,11 +26,11 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/documentconstants.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 #include <xmloff/attrlist.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlement.hxx>
 #include <xmloff/xmluconv.hxx>
-#include <unotools/saveopt.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <connectivity/dbtools.hxx>
 
@@ -69,8 +69,8 @@ static void lcl_correctCellAddress(const OUString & _sName, const uno::Reference
     }
 }
 
-ExportDocumentHandler::ExportDocumentHandler(uno::Reference< uno::XComponentContext > const & context) :
-    m_xContext(context)
+ExportDocumentHandler::ExportDocumentHandler(uno::Reference< uno::XComponentContext > context) :
+    m_xContext(std::move(context))
     ,m_nColumnCount(0)
     ,m_bTableRowsStarted(false)
     ,m_bFirstRowExported(false)

@@ -19,7 +19,6 @@
 
 #include <comphelper/processfactory.hxx>
 #include <comphelper/random.hxx>
-#include <unotools/textsearch.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
@@ -45,7 +44,6 @@
 #include <rangelst.hxx>
 #include <userlist.hxx>
 #include <progress.hxx>
-#include <cellform.hxx>
 #include <queryparam.hxx>
 #include <queryentry.hxx>
 #include <subtotalparam.hxx>
@@ -63,8 +61,8 @@
 #include <bcaslot.hxx>
 #include <reordermap.hxx>
 #include <drwlayer.hxx>
-#include <conditio.hxx>
 #include <queryevaluator.hxx>
+#include <scopetools.hxx>
 
 #include <svl/sharedstringpool.hxx>
 
@@ -726,30 +724,30 @@ void fillSortedColumnArray(
             if (!bOnlyDataAreaExtras)
             {
                 sc::CellStoreType& rCellStore = aSortedCols.at(j)->maCells;
-                switch (rCell.maCell.meType)
+                switch (rCell.maCell.getType())
                 {
                     case CELLTYPE_STRING:
                         assert(rCell.mpAttr);
-                        rCellStore.push_back(*rCell.maCell.mpString);
+                        rCellStore.push_back(*rCell.maCell.getSharedString());
                     break;
                     case CELLTYPE_VALUE:
                         assert(rCell.mpAttr);
-                        rCellStore.push_back(rCell.maCell.mfValue);
+                        rCellStore.push_back(rCell.maCell.getDouble());
                     break;
                     case CELLTYPE_EDIT:
                         assert(rCell.mpAttr);
-                        rCellStore.push_back(rCell.maCell.mpEditText->Clone().release());
+                        rCellStore.push_back(rCell.maCell.getEditText()->Clone().release());
                     break;
                     case CELLTYPE_FORMULA:
                         {
                             assert(rCell.mpAttr);
-                            ScAddress aOldPos = rCell.maCell.mpFormula->aPos;
+                            ScAddress aOldPos = rCell.maCell.getFormula()->aPos;
 
                             const ScAddress aCellPos(nCol1 + j, nRow, nTab);
-                            ScFormulaCell* pNew = rCell.maCell.mpFormula->Clone( aCellPos );
+                            ScFormulaCell* pNew = rCell.maCell.getFormula()->Clone( aCellPos );
                             if (pArray->IsUpdateRefs())
                             {
-                                pNew->CopyAllBroadcasters(*rCell.maCell.mpFormula);
+                                pNew->CopyAllBroadcasters(*rCell.maCell.getFormula());
                                 pNew->GetCode()->AdjustReferenceOnMovedOrigin(aOldPos, aCellPos);
                             }
                             else
@@ -762,7 +760,7 @@ void fillSortedColumnArray(
                                 // Original source cells will be deleted during
                                 // sc::CellStoreType::transfer(), SvtListener is a base
                                 // class, so we need to replace it.
-                                auto it( ::std::find( rCellListeners.begin(), rCellListeners.end(), rCell.maCell.mpFormula));
+                                auto it( ::std::find( rCellListeners.begin(), rCellListeners.end(), rCell.maCell.getFormula()));
                                 if (it != rCellListeners.end())
                                     *it = pNew;
                             }
@@ -1531,7 +1529,7 @@ short ScTable::CompareCell(
 {
     short nRes = 0;
 
-    CellType eType1 = rCell1.meType, eType2 = rCell2.meType;
+    CellType eType1 = rCell1.getType(), eType2 = rCell2.getType();
 
     if (!rCell1.isEmpty())
     {
@@ -1541,12 +1539,12 @@ short ScTable::CompareCell(
             bool bStr1 = ( eType1 != CELLTYPE_VALUE );
             if (eType1 == CELLTYPE_FORMULA)
             {
-                if (rCell1.mpFormula->GetErrCode() != FormulaError::NONE)
+                if (rCell1.getFormula()->GetErrCode() != FormulaError::NONE)
                 {
                     bErr1 = true;
                     bStr1 = false;
                 }
-                else if (rCell1.mpFormula->IsValue())
+                else if (rCell1.getFormula()->IsValue())
                 {
                     bStr1 = false;
                 }
@@ -1556,12 +1554,12 @@ short ScTable::CompareCell(
             bool bStr2 = ( eType2 != CELLTYPE_VALUE );
             if (eType2 == CELLTYPE_FORMULA)
             {
-                if (rCell2.mpFormula->GetErrCode() != FormulaError::NONE)
+                if (rCell2.getFormula()->GetErrCode() != FormulaError::NONE)
                 {
                     bErr2 = true;
                     bStr2 = false;
                 }
-                else if (rCell2.mpFormula->IsValue())
+                else if (rCell2.getFormula()->IsValue())
                 {
                     bStr2 = false;
                 }
@@ -1572,11 +1570,11 @@ short ScTable::CompareCell(
                 OUString aStr1;
                 OUString aStr2;
                 if (eType1 == CELLTYPE_STRING)
-                    aStr1 = rCell1.mpString->getString();
+                    aStr1 = rCell1.getSharedString()->getString();
                 else
                     aStr1 = GetString(nCell1Col, nCell1Row);
                 if (eType2 == CELLTYPE_STRING)
-                    aStr2 = rCell2.mpString->getString();
+                    aStr2 = rCell2.getSharedString()->getString();
                 else
                     aStr2 = GetString(nCell2Col, nCell2Row);
 
@@ -1792,6 +1790,7 @@ void ScTable::Sort(
     const ScSortParam& rSortParam, bool bKeepQuery, bool bUpdateRefs,
     ScProgress* pProgress, sc::ReorderParam* pUndo )
 {
+    sc::DelayDeletingBroadcasters delayDeletingBroadcasters(GetDoc());
     InitSortCollator( rSortParam );
     bGlobalKeepQuery = bKeepQuery;
 
@@ -2609,13 +2608,13 @@ SCSIZE ScTable::Query(const ScQueryParam& rParamOrg, bool bKeepSub)
             for (SCCOL nCol=aParam.nCol1; nCol<=aParam.nCol2 && !bValid; nCol++)
             {
                 ScRefCellValue aCell = GetCellValue(nCol, j);
-                if (aCell.meType != CELLTYPE_FORMULA)
+                if (aCell.getType() != CELLTYPE_FORMULA)
                     continue;
 
-                if (!aCell.mpFormula->IsSubTotal())
+                if (!aCell.getFormula()->IsSubTotal())
                     continue;
 
-                if (RefVisible(aCell.mpFormula))
+                if (RefVisible(aCell.getFormula()))
                     bValid = true;
             }
         }
@@ -2906,14 +2905,6 @@ bool ScTable::HasColHeader( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCR
          * evaluate it has header row, but that doesn't make much sense. */
         return false;
 
-    if (nStartCol == nEndCol)
-    {
-        CellType eFirstCellType = GetCellType(nStartCol, nStartRow);
-        CellType eSecondCellType = GetCellType(nStartCol, nStartRow+1);
-        return ((eFirstCellType == CELLTYPE_STRING || eFirstCellType == CELLTYPE_EDIT) &&
-                (eSecondCellType != CELLTYPE_STRING && eSecondCellType != CELLTYPE_EDIT));
-    }
-
     for (SCCOL nCol=nStartCol; nCol<=nEndCol; nCol++)
     {
         CellType eType = GetCellType( nCol, nStartRow );
@@ -2943,14 +2934,6 @@ bool ScTable::HasRowHeader( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCR
          * evaluate it has header column, but that doesn't make much sense. */
         return false;
 
-    if (nStartRow == nEndRow)
-    {
-        CellType eFirstCellType = GetCellType(nStartCol, nStartRow);
-        CellType eSecondCellType = GetCellType(nStartCol+1, nStartRow);
-        return ((eFirstCellType == CELLTYPE_STRING || eFirstCellType == CELLTYPE_EDIT) &&
-                (eSecondCellType != CELLTYPE_STRING && eSecondCellType != CELLTYPE_EDIT));
-    }
-
     for (SCROW nRow=nStartRow; nRow<=nEndRow; nRow++)
     {
         CellType eType = GetCellType( nStartCol, nRow );
@@ -2979,7 +2962,7 @@ void ScTable::GetFilterEntries( SCCOL nCol, SCROW nRow1, SCROW nRow2, ScFilterEn
 
     sc::ColumnBlockConstPosition aBlockPos;
     aCol[nCol].InitBlockPosition(aBlockPos);
-    aCol[nCol].GetFilterEntries(aBlockPos, nRow1, nRow2, rFilterEntries, bFiltering);
+    aCol[nCol].GetFilterEntries(aBlockPos, nRow1, nRow2, rFilterEntries, bFiltering, false /*bFilteredRow*/);
 }
 
 void ScTable::GetFilteredFilterEntries(
@@ -3001,7 +2984,11 @@ void ScTable::GetFilteredFilterEntries(
     {
         if (queryEvaluator.ValidQuery(j))
         {
-            aCol[nCol].GetFilterEntries(aBlockPos, j, j, rFilterEntries, bFiltering);
+            aCol[nCol].GetFilterEntries(aBlockPos, j, j, rFilterEntries, bFiltering, false/*bFilteredRow*/);
+        }
+        else
+        {
+            aCol[nCol].GetFilterEntries(aBlockPos, j, j, rFilterEntries, bFiltering, true/*bFilteredRow*/);
         }
     }
 }

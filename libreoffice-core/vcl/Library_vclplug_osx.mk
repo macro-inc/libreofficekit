@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,vclplug_osx))
 
+$(eval $(call gb_Library_set_plugin_for,vclplug_osx,vcl))
+
 $(eval $(call gb_Library_set_include,vclplug_osx,\
     $$(INCLUDE) \
     -I$(SRCDIR)/vcl/inc \
@@ -55,22 +57,16 @@ $(eval $(call gb_Library_use_libraries,vclplug_osx,\
     sal \
     salhelper \
     tl \
-    vcl \
 ))
 
 $(eval $(call gb_Library_use_externals,vclplug_osx,\
     boost_headers \
+    epoxy \
     harfbuzz \
     $(if $(filter SKIA,$(BUILD_TYPE)), \
         skia \
     ) \
 ))
-
-ifeq ($(DISABLE_GUI),)
-$(eval $(call gb_Library_use_externals,vclplug_osx,\
-    epoxy \
-))
-endif
 
 $(eval $(call gb_Library_add_defs,vclplug_osx,\
     -DMACOSX_BUNDLE_IDENTIFIER=\"$(MACOSX_BUNDLE_IDENTIFIER)\" \
@@ -157,11 +153,5 @@ $(eval $(call gb_Library_use_system_darwin_frameworks,vclplug_osx,\
     Carbon \
     CoreFoundation \
 ))
-
-ifneq ($(ENABLE_MACOSX_SANDBOX),TRUE)
-$(eval $(call gb_Library_use_libraries,vclplug_osx,\
-    AppleRemote \
-))
-endif
 
 # vim: set noet sw=4 ts=4:

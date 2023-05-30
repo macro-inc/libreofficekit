@@ -37,6 +37,7 @@
 #include <svx/sdangitm.hxx>
 #include <unotools/viewoptions.hxx>
 #include <unotools/localedatawrapper.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/fieldvalues.hxx>
 #include <svl/intitem.hxx>
@@ -59,7 +60,7 @@ PosSizePropertyPanel::PosSizePropertyPanel(
     weld::Widget* pParent,
     const css::uno::Reference<css::frame::XFrame>& rxFrame,
     SfxBindings* pBindings,
-    const css::uno::Reference<css::ui::XSidebar>& rxSidebar)
+    css::uno::Reference<css::ui::XSidebar> xSidebar)
 :   PanelLayout(pParent, "PosSizePropertyPanel", "svx/ui/sidebarpossize.ui"),
     mxFtPosX(m_xBuilder->weld_label("horizontallabel")),
     mxMtrPosX(m_xBuilder->weld_metric_spin_button("horizontalpos", FieldUnit::CM)),
@@ -111,7 +112,7 @@ PosSizePropertyPanel::PosSizePropertyPanel(
     mbAutoWidth(false),
     mbAutoHeight(false),
     mbAdjustEnabled(false),
-    mxSidebar(rxSidebar)
+    mxSidebar(std::move(xSidebar))
 {
     Initialize();
 
@@ -185,9 +186,9 @@ namespace
             const SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
             const SdrObjKind eKind(pObj->GetObjIdentifier());
 
-            if((pObj->GetObjInventor() == SdrInventor::Default) && (OBJ_TEXT == eKind || OBJ_TITLETEXT == eKind || OBJ_OUTLINETEXT == eKind))
+            if((pObj->GetObjInventor() == SdrInventor::Default) && (SdrObjKind::Text == eKind || SdrObjKind::TitleText == eKind || SdrObjKind::OutlineText == eKind))
             {
-                const SdrTextObj* pSdrTextObj = dynamic_cast< const SdrTextObj* >(pObj);
+                const SdrTextObj* pSdrTextObj = DynCastSdrTextObj(pObj);
 
                 if(pSdrTextObj && pSdrTextObj->HasText())
                 {
@@ -429,13 +430,13 @@ IMPL_LINK_NOARG( PosSizePropertyPanel, ClickAutoHdl, weld::Toggleable&, void )
 {
     if ( mxCbxScale->get_active() )
     {
-        mlOldWidth  = std::max(GetCoreValue(*mxMtrWidth,  mePoolUnit), 1);
-        mlOldHeight = std::max(GetCoreValue(*mxMtrHeight, mePoolUnit), 1);
+        mlOldWidth  = std::max(GetCoreValue(*mxMtrWidth,  mePoolUnit), SAL_CONST_INT64(1));
+        mlOldHeight = std::max(GetCoreValue(*mxMtrHeight, mePoolUnit), SAL_CONST_INT64(1));
     }
 
     // mxCbxScale must synchronized with that on Position and Size tabpage on Shape Properties dialog
     SvtViewOptions aPageOpt(EViewType::TabPage, "cui/ui/possizetabpage/PositionAndSize");
-    aPageOpt.SetUserItem( USERITEM_NAME, css::uno::makeAny( OUString::number( int(mxCbxScale->get_active()) ) ) );
+    aPageOpt.SetUserItem( USERITEM_NAME, css::uno::Any( OUString::number( int(mxCbxScale->get_active()) ) ) );
 }
 
 IMPL_LINK_NOARG( PosSizePropertyPanel, RotationHdl, DialControl&, void )
@@ -708,8 +709,8 @@ void PosSizePropertyPanel::NotifyItemUpdate(
 
             if(((nCombinedContext == CombinedEnumContext(Application::DrawImpress, Context::Draw)
                || nCombinedContext == CombinedEnumContext(Application::DrawImpress, Context::TextObject)
-                 ) && OBJ_EDGE == eKind)
-               || OBJ_CAPTION == eKind)
+                 ) && SdrObjKind::Edge == eKind)
+               || SdrObjKind::Caption == eKind)
             {
                 mxFtAngle->set_sensitive(false);
                 mxMtrAngle->set_sensitive(false);
@@ -732,8 +733,8 @@ void PosSizePropertyPanel::NotifyItemUpdate(
 
                 if(((nCombinedContext == CombinedEnumContext(Application::DrawImpress, Context::Draw)
                   || nCombinedContext == CombinedEnumContext(Application::DrawImpress, Context::TextObject)
-                     ) && OBJ_EDGE == eKind)
-                  || OBJ_CAPTION == eKind)
+                     ) && SdrObjKind::Edge == eKind)
+                  || SdrObjKind::Caption == eKind)
                 {
                     isNoEdge = false;
                     break;
@@ -863,7 +864,10 @@ void PosSizePropertyPanel::MetricState( SfxItemState eState, const SfxPoolItem* 
 
     // #i124409# use the given Item to get the correct UI unit and initialize it
     // and the Fields using it
-    meDlgUnit = GetCurrentUnit(eState,pState);
+    FieldUnit eDlgUnit = GetCurrentUnit(eState, pState);
+    if (eDlgUnit == meDlgUnit)
+        return;
+    meDlgUnit = eDlgUnit;
 
     if (mxMtrPosX->get_text().isEmpty())
         bPosXBlank = true;

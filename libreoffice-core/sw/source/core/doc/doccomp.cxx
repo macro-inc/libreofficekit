@@ -1371,7 +1371,7 @@ bool SwCompareLine::ChangesInLine( const SwCompareLine& rLine,
                 if( !rpInsRing )
                     rpInsRing.reset(pTmp);
                 pTmp->SetMark();
-                pTmp->GetMark()->nContent = nDstFrom + nSkip;
+                pTmp->GetMark()->SetContent(nDstFrom + nSkip);
             }
 
             if ( nSrcFrom < nSrcTo )
@@ -1380,7 +1380,7 @@ bool SwCompareLine::ChangesInLine( const SwCompareLine& rLine,
                 rDstDoc.GetIDocumentUndoRedo().DoUndo( false );
                 SwPaM aCpyPam( rSrcNd, nSrcFrom );
                 aCpyPam.SetMark();
-                aCpyPam.GetPoint()->nContent = nSrcTo;
+                aCpyPam.GetPoint()->SetContent(nSrcTo);
                 aCpyPam.GetDoc().getIDocumentContentOperations().CopyRange( aCpyPam, *aPam.GetPoint(),
                     SwCopyFlags::CheckPosInFly);
                 rDstDoc.GetIDocumentUndoRedo().DoUndo( bUndo );
@@ -1390,7 +1390,7 @@ bool SwCompareLine::ChangesInLine( const SwCompareLine& rLine,
                     rpDelRing.reset(pTmp);
 
                 pTmp->SetMark();
-                pTmp->GetMark()->nContent = nDstTo + nSkip;
+                pTmp->GetMark()->SetContent(nDstTo + nSkip);
                 nSkip += nSrcTo - nSrcFrom;
 
                 if( rpInsRing )
@@ -1548,7 +1548,7 @@ void CompareData::ShowDelete(
     SwNodeIndex aInsPos( *pLineNd, nOffset );
     SwNodeIndex aSavePos( aInsPos, -1 );
 
-    rData.m_rDoc.GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aInsPos);
+    rData.m_rDoc.GetDocumentContentOperationsManager().CopyWithFlyInFly(aRg, aInsPos.GetNode());
     m_rDoc.getIDocumentState().SetModified();
     ++aSavePos;
 
@@ -1566,8 +1566,8 @@ void CompareData::ShowDelete(
         SwPaM* pCorr = m_pInsertRing->GetPrev();
         if( *pCorr->GetPoint() == *pTmp->GetPoint() )
         {
-            SwNodeIndex aTmpPos( pTmp->GetMark()->nNode, -1 );
-            *pCorr->GetPoint() = SwPosition( aTmpPos );
+            SwNodeIndex aTmpPos( pTmp->GetMark()->GetNode(), -1 );
+            pCorr->GetPoint()->Assign( aTmpPos );
         }
     }
 }
@@ -1663,27 +1663,26 @@ void CompareData::SetRedlinesToDoc( bool bUseDocInfo )
                                     OUString(), nullptr );
         do {
             // #i65201#: Expand again, see comment above.
-            if( pTmp->GetPoint()->nContent == 0 )
+            if( pTmp->GetPoint()->GetContentIndex() == 0 )
             {
-                ++pTmp->GetPoint()->nNode;
-                pTmp->GetPoint()->nContent.Assign( pTmp->GetContentNode(), 0 );
+                pTmp->GetPoint()->Adjust(SwNodeOffset(1));
             }
             // #i101009#
             // prevent redlines that end on structural end node
             if (& GetEndOfContent() ==
-                & pTmp->GetPoint()->nNode.GetNode())
+                & pTmp->GetPoint()->GetNode())
             {
-                --pTmp->GetPoint()->nNode;
-                SwContentNode *const pContentNode( pTmp->GetContentNode() );
-                pTmp->GetPoint()->nContent.Assign( pContentNode,
-                        pContentNode ? pContentNode->Len() : 0 );
+                pTmp->GetPoint()->Adjust(SwNodeOffset(-1));
+                SwContentNode *const pContentNode( pTmp->GetPointContentNode() );
+                if( pContentNode )
+                    pTmp->GetPoint()->SetContent( pContentNode->Len() );
                 // tdf#106218 try to avoid losing a paragraph break here:
-                if (pTmp->GetMark()->nContent == 0)
+                if (pTmp->GetMark()->GetContentIndex() == 0)
                 {
-                    SwNodeIndex const prev(pTmp->GetMark()->nNode, -1);
+                    SwNodeIndex const prev(pTmp->GetMark()->GetNode(), -1);
                     if (prev.GetNode().IsTextNode())
                     {
-                        *pTmp->GetMark() = SwPosition(
+                        pTmp->GetMark()->Assign(
                             *prev.GetNode().GetTextNode(),
                             prev.GetNode().GetTextNode()->Len());
                     }
@@ -1707,27 +1706,26 @@ void CompareData::SetRedlinesToDoc( bool bUseDocInfo )
         return;
 
     do {
-        if( pTmp->GetPoint()->nContent == 0 )
+        if( pTmp->GetPoint()->GetContentIndex() == 0 )
         {
-            ++pTmp->GetPoint()->nNode;
-            pTmp->GetPoint()->nContent.Assign( pTmp->GetContentNode(), 0 );
+            pTmp->GetPoint()->Adjust(SwNodeOffset(1));
         }
         // #i101009#
         // prevent redlines that end on structural end node
         if (& GetEndOfContent() ==
-            & pTmp->GetPoint()->nNode.GetNode())
+            & pTmp->GetPoint()->GetNode())
         {
-            --pTmp->GetPoint()->nNode;
-            SwContentNode *const pContentNode( pTmp->GetContentNode() );
-            pTmp->GetPoint()->nContent.Assign( pContentNode,
-                    pContentNode ? pContentNode->Len() : 0 );
+            pTmp->GetPoint()->Adjust(SwNodeOffset(-1));
+            SwContentNode *const pContentNode( pTmp->GetPointContentNode() );
+            if( pContentNode )
+                pTmp->GetPoint()->SetContent( pContentNode->Len() );
             // tdf#106218 try to avoid losing a paragraph break here:
-            if (pTmp->GetMark()->nContent == 0)
+            if (pTmp->GetMark()->GetContentIndex() == 0)
             {
-                SwNodeIndex const prev(pTmp->GetMark()->nNode, -1);
+                SwNodeIndex const prev(pTmp->GetMark()->GetNode(), -1);
                 if (prev.GetNode().IsTextNode())
                 {
-                    *pTmp->GetMark() = SwPosition(
+                    pTmp->GetMark()->Assign(
                         *prev.GetNode().GetTextNode(),
                         prev.GetNode().GetTextNode()->Len());
                 }
@@ -1741,14 +1739,15 @@ void CompareData::SetRedlinesToDoc( bool bUseDocInfo )
     if( pTmp->GetNext() != m_pInsertRing.get() )
     {
         do {
+            // coverity[deref_arg] - the SwPaM delete moves a new entry into GetNext()
             SwPosition& rSttEnd = *pTmp->End(),
                       & rEndStt = *pTmp->GetNext()->Start();
             const SwContentNode* pCNd;
             if( rSttEnd == rEndStt ||
-                (!rEndStt.nContent.GetIndex() &&
-                rEndStt.nNode.GetIndex() - 1 == rSttEnd.nNode.GetIndex() &&
-                nullptr != ( pCNd = rSttEnd.nNode.GetNode().GetContentNode() ) &&
-                rSttEnd.nContent.GetIndex() == pCNd->Len()))
+                (!rEndStt.GetContentIndex() &&
+                rEndStt.GetNodeIndex() - 1 == rSttEnd.GetNodeIndex() &&
+                nullptr != ( pCNd = rSttEnd.GetNode().GetContentNode() ) &&
+                rSttEnd.GetContentIndex() == pCNd->Len()))
             {
                 if( pTmp->GetNext() == m_pInsertRing.get() )
                 {
@@ -1770,6 +1769,7 @@ void CompareData::SetRedlinesToDoc( bool bUseDocInfo )
     }
 
     do {
+        // coverity[deref_arg] - pTmp is valid here
         if (IDocumentRedlineAccess::AppendResult::APPENDED ==
                 m_rDoc.getIDocumentRedlineAccess().AppendRedline(
                     new SwRangeRedline(aRedlnData, *pTmp), true) &&
@@ -1921,7 +1921,7 @@ SaveMergeRedline::SaveMergeRedline( const SwNode& rDstNd,
 
     const SwPosition* pStt = rSrcRedl.Start();
     if( rDstNd.IsContentNode() )
-        aPos.nContent.Assign( const_cast<SwContentNode*>(static_cast<const SwContentNode*>(&rDstNd)), pStt->nContent.GetIndex() );
+        aPos.SetContent( pStt->GetContentIndex() );
     pDestRedl = new SwRangeRedline( rSrcRedl.GetRedlineData(), aPos );
 
     if( RedlineType::Delete != pDestRedl->GetType() )
@@ -1931,10 +1931,10 @@ SaveMergeRedline::SaveMergeRedline( const SwNode& rDstNd,
     const SwPosition* pEnd = rSrcRedl.End();
 
     pDestRedl->SetMark();
-    pDestRedl->GetPoint()->nNode += pEnd->nNode.GetIndex() -
-                                    pStt->nNode.GetIndex();
-    pDestRedl->GetPoint()->nContent.Assign( pDestRedl->GetContentNode(),
-                                            pEnd->nContent.GetIndex() );
+    pDestRedl->GetPoint()->Adjust( pEnd->GetNodeIndex() -
+                                    pStt->GetNodeIndex() );
+    if( pDestRedl->GetPointContentNode() )
+        pDestRedl->GetPoint()->SetContent( pEnd->GetContentIndex() );
 }
 
 sal_uInt16 SaveMergeRedline::InsertRedline(SwPaM* pLastDestRedline)
@@ -1947,8 +1947,8 @@ sal_uInt16 SaveMergeRedline::InsertRedline(SwPaM* pLastDestRedline)
         // the part was inserted so copy it from the SourceDoc
         ::sw::UndoGuard const undoGuard(rDoc.GetIDocumentUndoRedo());
 
-        SwNodeIndex aSaveNd( pDestRedl->GetPoint()->nNode, -1 );
-        const sal_Int32 nSaveCnt = pDestRedl->GetPoint()->nContent.GetIndex();
+        SwNodeIndex aSaveNd( pDestRedl->GetPoint()->GetNode(), -1 );
+        const sal_Int32 nSaveCnt = pDestRedl->GetPoint()->GetContentIndex();
 
         RedlineFlags eOld = rDoc.getIDocumentRedlineAccess().GetRedlineFlags();
         rDoc.getIDocumentRedlineAccess().SetRedlineFlags_intern(eOld | RedlineFlags::Ignore);
@@ -1961,9 +1961,7 @@ sal_uInt16 SaveMergeRedline::InsertRedline(SwPaM* pLastDestRedline)
 
         pDestRedl->SetMark();
         ++aSaveNd;
-        pDestRedl->GetMark()->nNode = aSaveNd;
-        pDestRedl->GetMark()->nContent.Assign( aSaveNd.GetNode().GetContentNode(),
-                                                nSaveCnt );
+        pDestRedl->GetMark()->Assign( aSaveNd, nSaveCnt );
 
         if( pLastDestRedline && *pLastDestRedline->GetPoint() == *pDestRedl->GetPoint() )
             *pLastDestRedline->GetPoint() = *pDestRedl->GetMark();
@@ -2104,7 +2102,7 @@ tools::Long SwDoc::MergeDoc( const SwDoc& rDoc )
         SwNodeOffset nMyEndOfExtra = GetNodes().GetEndOfExtras().GetIndex();
         for(const SwRangeRedline* pRedl : rSrcRedlTable)
         {
-            SwNodeOffset nNd = pRedl->GetPoint()->nNode.GetIndex();
+            SwNodeOffset nNd = pRedl->GetPoint()->GetNodeIndex();
             RedlineType eType = pRedl->GetType();
             if( nEndOfExtra < nNd &&
                 ( RedlineType::Insert == eType || RedlineType::Delete == eType ))

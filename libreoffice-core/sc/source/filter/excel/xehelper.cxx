@@ -23,6 +23,11 @@
 
 #include <com/sun/star/i18n/XBreakIterator.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
+#include <com/sun/star/uri/XUriReference.hpp>
+#include <com/sun/star/uri/XUriReferenceFactory.hpp>
+#include <com/sun/star/uri/UriReferenceFactory.hpp>
+#include <comphelper/processfactory.hxx>
+#include <o3tl/string_view.hxx>
 #include <sfx2/objsh.hxx>
 #include <vcl/font.hxx>
 #include <tools/urlobj.hxx>
@@ -39,6 +44,7 @@
 #include <editeng/escapementitem.hxx>
 #include <editeng/svxfont.hxx>
 #include <editeng/editids.hrc>
+#include <osl/file.hxx>
 
 #include <document.hxx>
 #include <docpool.hxx>
@@ -387,7 +393,7 @@ XclExpStringRef lclCreateFormattedString(
         // Excel start position of this portion
         sal_Int32 nXclPortionStart = xString->Len();
         // add portion text to Excel string
-        XclExpStringHelper::AppendString( *xString, rRoot, rText.copy( nPortionPos, nPortionEnd - nPortionPos ) );
+        XclExpStringHelper::AppendString( *xString, rRoot, rText.subView( nPortionPos, nPortionEnd - nPortionPos ) );
         if( nXclPortionStart < xString->Len() )
         {
             // insert font into buffer
@@ -464,10 +470,9 @@ XclExpStringRef lclCreateFormattedString(
             if( aSel.nStartPos + 1 == aSel.nEndPos )
             {
                 // test if the character is a text field
-                const SfxPoolItem* pItem;
-                if( aEditSet.GetItemState( EE_FEATURE_FIELD, false, &pItem ) == SfxItemState::SET )
+                if( const SvxFieldItem* pItem = aEditSet.GetItemIfSet( EE_FEATURE_FIELD, false ) )
                 {
-                    const SvxFieldData* pField = static_cast< const SvxFieldItem* >( pItem )->GetField();
+                    const SvxFieldData* pField = pItem->GetField();
                     if( const SvxURLField* pUrlField = dynamic_cast<const SvxURLField*>( pField )  )
                     {
                         // convert URL field to string representation
@@ -542,7 +547,7 @@ XclExpStringRef XclExpStringHelper::CreateString(
     return xString;
 }
 
-void XclExpStringHelper::AppendString( XclExpString& rXclString, const XclExpRoot& rRoot, const OUString& rString )
+void XclExpStringHelper::AppendString( XclExpString& rXclString, const XclExpRoot& rRoot, std::u16string_view rString )
 {
     if( rRoot.GetBiff() == EXC_BIFF8 )
         rXclString.Append( rString );
@@ -553,7 +558,7 @@ void XclExpStringHelper::AppendString( XclExpString& rXclString, const XclExpRoo
 void XclExpStringHelper::AppendChar( XclExpString& rXclString, const XclExpRoot& rRoot, sal_Unicode cChar )
 {
     if( rRoot.GetBiff() == EXC_BIFF8 )
-        rXclString.Append( OUString(cChar) );
+        rXclString.Append( rtl::OUStringChar(cChar) );
     else
         rXclString.AppendByte( cChar, rRoot.GetTextEncoding() );
 }
@@ -807,11 +812,11 @@ void XclExpHFConverter::AppendPortion( const EditTextObject* pTextObj, sal_Unico
 
 // --- text content or text fields ---
 
-                const SfxPoolItem* pItem;
+                const SvxFieldItem* pItem;
                 if( (aSel.nStartPos + 1 == aSel.nEndPos) &&     // fields are single characters
-                    (aEditSet.GetItemState( EE_FEATURE_FIELD, false, &pItem ) == SfxItemState::SET) )
+                    (pItem = aEditSet.GetItemIfSet( EE_FEATURE_FIELD, false )) )
                 {
-                    if( const SvxFieldData* pFieldData = static_cast< const SvxFieldItem* >( pItem )->GetField() )
+                    if( const SvxFieldData* pFieldData = pItem->GetField() )
                     {
                         if( dynamic_cast<const SvxPageField*>( pFieldData) !=  nullptr )
                             aParaText.append("&P");
@@ -864,7 +869,8 @@ void XclExpHFConverter::AppendPortion( const EditTextObject* pTextObj, sal_Unico
             aSel.nStartPos = aSel.nEndPos;
         }
 
-        aText = ScGlobal::addToken( aText, aParaText.makeStringAndClear(), '\n' );
+        aText = ScGlobal::addToken( aText, aParaText, '\n' );
+        aParaText.setLength(0);
         if( nParaHeight == 0 )
             nParaHeight = aFontData.mnHeight * 20;  // points -> twips
         nHeight += nParaHeight;
@@ -883,61 +889,53 @@ void XclExpHFConverter::AppendPortion( const EditTextObject* pTextObj, sal_Unico
 
 namespace {
 
-/** Encodes special parts of the URL, i.e. directory separators and volume names.
-    @param pTableName  Pointer to a table name to be encoded in this URL, or 0. */
-OUString lclEncodeDosUrl(
-    XclBiff eBiff, const OUString& rUrl, std::u16string_view rBase, const OUString* pTableName)
+/** Encodes special parts of the path, i.e. directory separators and volume names.
+    @param pTableName  Pointer to a table name to be encoded in this path, or 0. */
+OUString lclEncodeDosPath(
+    XclBiff eBiff, std::u16string_view path, bool bIsRel, const OUString* pTableName)
 {
     OUStringBuffer aBuf;
 
-    if (!rUrl.isEmpty())
+    if (!path.empty())
     {
-        OUString aOldUrl = rUrl;
         aBuf.append(EXC_URLSTART_ENCODED);
 
-        if ( aOldUrl.getLength() > 2 && aOldUrl.startsWith("\\\\") )
+        if ( path.length() > 2 && o3tl::starts_with(path, u"\\\\") )
         {
             // UNC
             aBuf.append(EXC_URL_DOSDRIVE).append('@');
-            aOldUrl = aOldUrl.copy(2);
+            path = path.substr(2);
         }
-        else if ( aOldUrl.getLength() > 2 && aOldUrl.match(":\\", 1) )
+        else if ( path.length() > 2 && o3tl::starts_with(path.substr(1), u":\\") )
         {
-            // drive letter
-            sal_Unicode cThisDrive = rBase.empty() ? ' ' : rBase[0];
-            sal_Unicode cDrive = aOldUrl[0];
-            if (cThisDrive == cDrive)
-                // This document and the referenced document are under the same drive.
-                aBuf.append(EXC_URL_DRIVEROOT);
-            else
-                aBuf.append(EXC_URL_DOSDRIVE).append(cDrive);
-            aOldUrl = aOldUrl.copy(3);
+            aBuf.append(EXC_URL_DOSDRIVE).append(path[0]);
+            path = path.substr(3);
         }
-        else
+        else if ( !bIsRel )
         {
             // URL probably points to a document on a Unix-like file system
             aBuf.append(EXC_URL_DRIVEROOT);
         }
 
         // directories
-        sal_Int32 nPos = -1;
-        while((nPos = aOldUrl.indexOf('\\')) != -1)
+        auto nPos = std::u16string_view::npos;
+        while((nPos = path.find('\\')) != std::u16string_view::npos)
         {
-            if ( aOldUrl.startsWith("..") )
+            if ( o3tl::starts_with(path, u"..") )
                 // parent dir (NOTE: the MS-XLS spec doesn't mention this, and
                 // Excel seems confused by this token).
                 aBuf.append(EXC_URL_PARENTDIR);
             else
-                aBuf.append(aOldUrl.subView(0,nPos)).append(EXC_URL_SUBDIR);
+                aBuf.append(path.substr(0,nPos)).append(EXC_URL_SUBDIR);
 
-            aOldUrl = aOldUrl.copy(nPos + 1);
+            path = path.substr(nPos + 1);
         }
 
         // file name
         if (pTableName)    // enclose file name in brackets if table name follows
-            aBuf.append('[').append(aOldUrl).append(']');
+            aBuf.append('[').append(path).append(']');
         else
-            aBuf.append(aOldUrl);
+            aBuf.append(path);
     }
     else    // empty URL -> self reference
     {
@@ -967,13 +965,44 @@ OUString lclEncodeDosUrl(
     return aBuf.makeStringAndClear();
 }
 
+bool isUrlRelative(const OUString& aUrl)
+{
+    css::uno::Reference<css::uri::XUriReferenceFactory> xUriFactory(
+        css::uri::UriReferenceFactory::create(
+            comphelper::getProcessComponentContext()));
+    css::uno::Reference<css::uri::XUriReference> xUri(xUriFactory->parse(aUrl));
+
+    return !xUri->isAbsolute();
+}
+
 } // namespace
 
-OUString XclExpUrlHelper::EncodeUrl( const XclExpRoot& rRoot, const OUString& rAbsUrl, const OUString* pTableName )
+OUString XclExpUrlHelper::EncodeUrl( const XclExpRoot& rRoot, std::u16string_view rAbsUrl, const OUString* pTableName )
 {
-    OUString aDosUrl = INetURLObject(rAbsUrl).getFSysPath(FSysStyle::Dos);
-    OUString aDosBase = INetURLObject(rRoot.GetBasePath()).getFSysPath(FSysStyle::Dos);
-    return lclEncodeDosUrl(rRoot.GetBiff(), aDosUrl, aDosBase, pTableName);
+    OUString aDosPath;
+    bool bIsRel = false;
+
+    if (rRoot.IsRelUrl())
+    {
+        OUString aUrlPath = INetURLObject::GetRelURL(
+            rRoot.GetBasePath(), OUString(rAbsUrl),
+            INetURLObject::EncodeMechanism::All,
+            INetURLObject::DecodeMechanism::NONE,
+            RTL_TEXTENCODING_UTF8, FSysStyle::Detect
+        );
+
+        if (isUrlRelative(aUrlPath))
+        {
+            bIsRel = true;
+            osl::FileBase::getSystemPathFromFileURL(aUrlPath, aDosPath);
+            aDosPath = aDosPath.replaceAll(u"/", u"\\");
+        }
+    }
+
+    if (!bIsRel)
+        aDosPath = INetURLObject(rAbsUrl).getFSysPath(FSysStyle::Dos);
+
+    return lclEncodeDosPath(rRoot.GetBiff(), aDosPath, bIsRel, pTableName);
 }
 
 OUString XclExpUrlHelper::EncodeDde( std::u16string_view rApplic, std::u16string_view rTopic )

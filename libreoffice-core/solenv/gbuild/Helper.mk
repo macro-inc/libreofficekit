@@ -116,6 +116,7 @@ define gb_Helper_collect_knownlibs
 gb_Library_KNOWNLIBS := $$(foreach group,$$(gb_Library_VALIDGROUPS),$$(gb_Library_$$(group)))
 gb_Executable_KNOWN := $$(foreach group,$$(gb_Executable_VALIDGROUPS),$$(gb_Executable_$$(group)))
 gb_Jar_KNOWN := $$(foreach group,$$(gb_Jar_VALIDGROUPS),$$(gb_Jar_$$(group)))
+gb_Fuzzers_KNOWN := $$(filter %fuzzer,$$(foreach group,$$(gb_Executable_VALIDGROUPS),$$(gb_Executable_$$(group))))
 
 endef
 
@@ -196,6 +197,13 @@ gb_Library_MODULE_$(2) += $(filter-out $(gb_MERGEDLIBS),$(3))
 
 $(if $(filter UNOVERLIBS RTVERLIBS,$(1)),\
 	gb_SdkLinkLibrary_MODULE_sdk += $(3))
+
+endef
+
+# a plugin is a library, why can't be dynamically linked and must be dlopen'd, but must be linked static
+define gb_Helper_register_plugins_for_install
+$(call gb_Helper_register_libraries_for_install,$(1),$(2),$(3))
+gb_Library_KNOWNPLUGINS += $(3)
 
 endef
 
@@ -280,6 +288,13 @@ else mv $(1) $(2) $(if $(3),&& touch -r $(3) $(2)); \
 fi
 endef
 
+# call gb_Helper_copy_if_different_and_touch,source,target,optional-touch-reference-file
+define gb_Helper_copy_if_different_and_touch
+if ! cmp -s $(1) $(2); then \
+    cp $(1) $(2) $(if $(3),&& touch -r $(3) $(2)); \
+fi
+endef
+
 define gb_Helper_define_if_set
 $(foreach def,$(1),$(if $(filter TRUE YES,$($(def))),-D$(def)))
 endef
@@ -311,11 +326,9 @@ define gb_Helper_optionals_or
 $(call gb_Helper_optional,$(1),$(2),$(3))
 endef
 
-gb_Helper_optionals_and_token = $(subst $(gb_SPACE),_,gb $(sort $(1)))
-
 # call gb_Helper_optionals_and,build_types,if-true,if-false
 define gb_Helper_optionals_and
-$(if $(filter $(call gb_Helper_optionals_and_token,$(1)),$(call gb_Helper_optionals_and_token,$(filter $(1),$(BUILD_TYPE)))),$(2),$(3))
+$(if $(strip $(filter-out $(filter $(1),$(BUILD_TYPE)),$(1))),$(3),$(2))
 endef
 
 ifeq ($(WITH_LOCALES),)

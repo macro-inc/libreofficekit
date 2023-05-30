@@ -22,7 +22,8 @@
 #include <pdfiprocessor.hxx>
 #include <pdfihelper.hxx>
 
-
+#include <com/sun/star/i18n/BreakIterator.hpp>
+#include <com/sun/star/i18n/ScriptType.hpp>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/range/b2drange.hxx>
 #include <sal/log.hxx>
@@ -156,8 +157,8 @@ void PolyPolyElement::visitedBy( ElementTreeVisitor&                          rV
 #if OSL_DEBUG_LEVEL > 0
 void PolyPolyElement::emitStructure( int nLevel)
 {
-    SAL_WARN( "sdext", std::string(nLevel, ' ') << "<" << typeid( *this ).name() << " " << this << ">" );
-    SAL_WARN( "sdext", "path=" );
+    SAL_INFO( "sdext", std::string(nLevel, ' ') << "<" << typeid( *this ).name() << " " << this << ">" );
+    SAL_INFO( "sdext", "path=" );
     int nPoly = PolyPoly.count();
     for( int i = 0; i < nPoly; i++ )
     {
@@ -169,11 +170,11 @@ void PolyPolyElement::emitStructure( int nLevel)
             basegfx::B2DPoint aPoint = aPoly.getB2DPoint( n );
             buff.append( " (" + OUString::number(aPoint.getX()) + "," + OUString::number(aPoint.getY()) + ")");
         }
-        SAL_WARN( "sdext", "    " << buff.makeStringAndClear() );
+        SAL_INFO( "sdext", "    " << buff.makeStringAndClear() );
     }
     for (auto const& child : Children)
         child->emitStructure( nLevel+1 );
-    SAL_WARN( "sdext", std::string(nLevel, ' ') << "</" << typeid( *this ).name() << ">");
+    SAL_INFO( "sdext", std::string(nLevel, ' ') << "</" << typeid( *this ).name() << ">");
 }
 #endif
 
@@ -192,7 +193,7 @@ bool ParagraphElement::isSingleLined( PDFIProcessor const & rProc ) const
         if( dynamic_cast< ParagraphElement* >(rxChild.get()) != nullptr )
             return false;
 
-        pText = dynamic_cast< TextElement* >(rxChild.get());
+        pText = rxChild->dynCastAsTextElement();
         if( pText )
         {
             const FontAttributes& rFont = rProc.getFont( pText->FontId );
@@ -226,7 +227,7 @@ double ParagraphElement::getLineHeight( PDFIProcessor& rProc ) const
             if( lh > line_h )
                 line_h = lh;
         }
-        else if( (pText = dynamic_cast< TextElement* >( rxChild.get() )) != nullptr )
+        else if( (pText = rxChild->dynCastAsTextElement()) != nullptr )
         {
             const FontAttributes& rFont = rProc.getFont( pText->FontId );
             double lh = pText->h;
@@ -243,9 +244,9 @@ TextElement* ParagraphElement::getFirstTextChild() const
 {
     TextElement* pText = nullptr;
     auto it = std::find_if(Children.begin(), Children.end(),
-        [](const std::unique_ptr<Element>& rxElem) { return dynamic_cast<TextElement*>(rxElem.get()) != nullptr; });
+        [](const std::unique_ptr<Element>& rxElem) { return rxElem->dynCastAsTextElement() != nullptr; });
     if (it != Children.end())
-        pText = dynamic_cast<TextElement*>(it->get());
+        pText = (*it)->dynCastAsTextElement();
     return pText;
 }
 
@@ -270,7 +271,7 @@ bool PageElement::resolveHyperlink( const std::list<std::unique_ptr<Element>>::i
         if( (*it)->x >= pLink->x && (*it)->x + (*it)->w <= pLink->x + pLink->w &&
             (*it)->y >= pLink->y && (*it)->y + (*it)->h <= pLink->y + pLink->h )
         {
-            TextElement* pText = dynamic_cast<TextElement*>(it->get());
+            TextElement* pText = (*it)->dynCastAsTextElement();
             if( pText )
             {
                 if( pLink->Children.empty() )
@@ -332,6 +333,14 @@ void PageElement::resolveUnderlines( PDFIProcessor const & rProc )
     // FIXME: currently the algorithm used is quadratic
     // this could be solved by some sorting beforehand
 
+    std::vector<Element*> textAndHypers;
+    textAndHypers.reserve(Children.size());
+    for (auto const & p : Children)
+    {
+        if (p->dynCastAsTextElement() || dynamic_cast<HyperlinkElement*>(p.get()))
+            textAndHypers.push_back(p.get());
+    }
+
     auto poly_it = Children.begin();
     while( poly_it != Children.end() )
     {
@@ -372,16 +381,15 @@ void PageElement::resolveUnderlines( PDFIProcessor const & rProc )
             u_y = r_x; r_x = l_x; l_x = u_y;
         }
         u_y = aPoly.getB2DPoint(0).getY();
-        for( const auto& rxChild : Children )
+        for( Element* pEle : textAndHypers )
         {
-            Element* pEle = rxChild.get();
             if( pEle->y <= u_y && pEle->y + pEle->h*1.1 >= u_y )
             {
                 // first: is the element underlined completely ?
                 if( pEle->x + pEle->w*0.1 >= l_x &&
                     pEle->x + pEle->w*0.9 <= r_x )
                 {
-                    TextElement* pText = dynamic_cast< TextElement* >(pEle);
+                    TextElement* pText = pEle->dynCastAsTextElement();
                     if( pText )
                     {
                         const GraphicsContext& rTextGC = rProc.getGraphicsContext( pText->GCId );
@@ -394,25 +402,20 @@ void PageElement::resolveUnderlines( PDFIProcessor const & rProc )
                             pText->FontId = rProc.getFontId( aAttr );
                         }
                     }
-                    else if( dynamic_cast< HyperlinkElement* >(pEle) )
+                    else // must be HyperlinkElement
                         bRemovePoly = true;
                 }
                 // second: hyperlinks may be larger than their underline
                 // since they are just arbitrary rectangles in the action definition
-                else if( dynamic_cast< HyperlinkElement* >(pEle) != nullptr &&
-                         l_x >= pEle->x && r_x <= pEle->x+pEle->w )
+                else if( l_x >= pEle->x && r_x <= pEle->x+pEle->w &&
+                        dynamic_cast< HyperlinkElement* >(pEle) != nullptr )
                 {
                     bRemovePoly = true;
                 }
             }
         }
         if( bRemovePoly )
-        {
-            auto next_it = poly_it;
-            ++next_it;
-            Children.erase( poly_it );
-            poly_it = next_it;
-        }
+            poly_it = Children.erase( poly_it );
         else
             ++poly_it;
     }
@@ -428,6 +431,18 @@ void DocumentElement::visitedBy( ElementTreeVisitor&                          rV
     rVisitor.visit(*this, rParentIt);
 }
 
+bool isComplex(const css::uno::Reference<css::i18n::XBreakIterator>& rBreakIterator, TextElement* const pTextElem) {
+    OUString str(pTextElem->Text.toString());
+    for(int i=0; i< str.getLength(); i++)
+    {
+        sal_Int16 nType = rBreakIterator->getScriptType(str, i);
+        if (nType == css::i18n::ScriptType::COMPLEX)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 }
 

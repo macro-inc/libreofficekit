@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,desktop_detector))
 
+$(eval $(call gb_Library_set_plugin_for,desktop_detector,vcl))
+
 $(eval $(call gb_Library_set_include,desktop_detector,\
     $$(INCLUDE) \
     -I$(SRCDIR)/vcl/inc \
@@ -31,7 +33,6 @@ $(eval $(call gb_Library_add_defs,desktop_detector,\
 $(eval $(call gb_Library_use_sdk_api,desktop_detector))
 
 $(eval $(call gb_Library_use_libraries,desktop_detector,\
-    vcl \
     tl \
     utl \
     sot \
@@ -65,7 +66,7 @@ $(eval $(call gb_Library_add_exception_objects,desktop_detector,\
 
 ifeq ($(OS), $(filter LINUX %BSD SOLARIS, $(OS)))
 $(eval $(call gb_Library_add_libs,desktop_detector,\
-	-lm $(DLOPEN_LIBS) \
+	-lm $(UNIX_DLAPI_LIBS) \
 ))
 endif
 

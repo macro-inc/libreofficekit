@@ -21,9 +21,11 @@
 
 #include <string_view>
 
+#include <o3tl/string_view.hxx>
 #include <svl/eitem.hxx>
 #include <svl/intitem.hxx>
 #include "optsave.hxx"
+#include <treeopt.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <comphelper/processfactory.hxx>
 #include <unotools/moduleoptions.hxx>
@@ -36,9 +38,10 @@
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/docfilt.hxx>
+#include <svtools/restartdialog.hxx>
 #include <unotools/optionsdlg.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <officecfg/Office/Recovery.hxx>
 
 #include <sfx2/fcontnr.hxx>
@@ -224,7 +227,7 @@ void SvxSaveTabPage::DetectHiddenControls()
 bool SvxSaveTabPage::FillItemSet( SfxItemSet* rSet )
 {
     auto xChanges = comphelper::ConfigurationChanges::create();
-    bool bModified = false;
+    bool bModified = false, bRequestRestart = false;
     if(m_xLoadUserSettingsCB->get_state_changed_from_saved())
         officecfg::Office::Common::Load::UserDefinedSettings::set(m_xLoadUserSettingsCB->get_active(), xChanges);
 
@@ -239,55 +242,54 @@ bool SvxSaveTabPage::FillItemSet( SfxItemSet* rSet )
 
     if ( m_xDocInfoCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_ATTR_DOCINFO ),
+        rSet->Put( SfxBoolItem( SID_ATTR_DOCINFO,
                                m_xDocInfoCB->get_active() ) );
         bModified = true;
     }
 
     if ( m_xBackupCB->get_sensitive() && m_xBackupCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_ATTR_BACKUP ),
-                               m_xBackupCB->get_active() ) );
+        rSet->Put( SfxBoolItem( SID_ATTR_BACKUP, m_xBackupCB->get_active() ) );
         bModified = true;
     }
 
     if ( m_xAutoSaveCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_ATTR_AUTOSAVE ),
+        rSet->Put( SfxBoolItem( SID_ATTR_AUTOSAVE,
                                m_xAutoSaveCB->get_active() ) );
-        bModified = true;
+        bModified = bRequestRestart = true;
     }
     if ( m_xWarnAlienFormatCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_ATTR_WARNALIENFORMAT ),
+        rSet->Put( SfxBoolItem( SID_ATTR_WARNALIENFORMAT,
                                m_xWarnAlienFormatCB->get_active() ) );
         bModified = true;
     }
 
     if ( m_xAutoSaveEdit->get_value_changed_from_saved() )
     {
-        rSet->Put( SfxUInt16Item( GetWhich( SID_ATTR_AUTOSAVEMINUTE ),
+        rSet->Put( SfxUInt16Item( SID_ATTR_AUTOSAVEMINUTE,
                                  static_cast<sal_uInt16>(m_xAutoSaveEdit->get_value()) ) );
-        bModified = true;
+        bModified = bRequestRestart = true;
     }
 
     if ( m_xUserAutoSaveCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_ATTR_USERAUTOSAVE ),
+        rSet->Put( SfxBoolItem( SID_ATTR_USERAUTOSAVE,
                                m_xUserAutoSaveCB->get_active() ) );
         bModified = true;
     }
     // save relatively
     if ( m_xRelativeFsysCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_SAVEREL_FSYS ),
+        rSet->Put( SfxBoolItem( SID_SAVEREL_FSYS,
                                m_xRelativeFsysCB->get_active() ) );
         bModified = true;
     }
 
     if ( m_xRelativeInetCB->get_state_changed_from_saved() )
     {
-        rSet->Put( SfxBoolItem( GetWhich( SID_SAVEREL_INET ),
+        rSet->Put( SfxBoolItem( SID_SAVEREL_INET,
                                m_xRelativeInetCB->get_active() ) );
         bModified = true;
     }
@@ -322,10 +324,18 @@ bool SvxSaveTabPage::FillItemSet( SfxItemSet* rSet )
         aModuleOpt.SetFactoryDefaultFilter(SvtModuleOptions::EFactory::WRITERGLOBAL, pImpl->aDefaultArr[APP_WRITER_GLOBAL]);
 
     xChanges->commit();
+
+    if (bRequestRestart)
+    {
+        OfaTreeOptionsDialog* pParentDlg(static_cast<OfaTreeOptionsDialog*>(GetDialogController()));
+        if (pParentDlg)
+            pParentDlg->SetNeedsRestart(svtools::RESTART_REASON_SAVE);
+    }
+
     return bModified;
 }
 
-static bool isODFFormat( const OUString& sFilter )
+static bool isODFFormat( std::u16string_view sFilter )
 {
     static const char* aODFFormats[] =
     {
@@ -349,7 +359,7 @@ static bool isODFFormat( const OUString& sFilter )
     int i = 0;
     while ( aODFFormats[i] != nullptr )
     {
-        if ( sFilter.equalsAscii( aODFFormats[i++] ) )
+        if ( o3tl::equalsAscii( sFilter, aODFFormats[i++] ) )
         {
             bRet = true;
             break;
@@ -565,7 +575,7 @@ IMPL_LINK( SvxSaveTabPage, FilterHdl_Impl, weld::ComboBox&, rBox, void )
             {
                 OUString sId;
                 if (pImpl->aODFArr[nData][i])
-                    sId = OUString::number(reinterpret_cast<sal_Int64>(pImpl.get()));
+                    sId = weld::toId(pImpl.get());
                 m_xSaveAsLB->append(sId, rUIFilters[i]);
                 if (rFilters[i] == pImpl->aDefaultArr[nData])
                     sSelect = rUIFilters[i];

@@ -29,6 +29,7 @@
 #include <formulaparser.hxx>
 #include <richstringcontext.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::xls {
 
@@ -184,7 +185,16 @@ void SheetDataContext::onEndElement()
             mrSheetData.setValueCell( maCellData, maCellValue.toDouble() );
         break;
         case XML_b:
-            mrSheetData.setBooleanCell( maCellData, maCellValue.toDouble() != 0.0 );
+            {
+                // Some generators may write true or false instead of 1 or 0.
+                /* XXX NOTE: PivotCacheItem::readBool() may suffer from this as
+                 * well, but for now let's assume that software writing this
+                 * here wrong won't write pivot caches at all.. */
+                bool bValue = (maCellValue.toDouble() != 0.0);
+                if (!bValue && maCellValue.equalsIgnoreAsciiCase(u"true"))
+                    bValue = true;
+                mrSheetData.setBooleanCell( maCellData, bValue );
+            }
         break;
         case XML_e:
             mrSheetData.setErrorCell( maCellData, maCellValue );
@@ -289,16 +299,16 @@ void SheetDataContext::importRow( const AttributeList& rAttribs )
     sal_Int32 nIndex = 0;
     while( nIndex >= 0 )
     {
-        OUString aColSpanToken = aColSpansText.getToken( 0, ' ', nIndex );
-        sal_Int32 nSepPos = aColSpanToken.indexOf( ':' );
-        if( (0 < nSepPos) && (nSepPos + 1 < aColSpanToken.getLength()) )
+        std::u16string_view aColSpanToken = o3tl::getToken(aColSpansText, 0, ' ', nIndex );
+        size_t nSepPos = aColSpanToken.find( ':' );
+        if( (0 < nSepPos) && (nSepPos + 1 < aColSpanToken.size()) )
         {
             // OOXML uses 1-based integer column indexes, row model expects 0-based colspans
-            const sal_Int32 nCol1 = aColSpanToken.copy( 0, nSepPos ).toInt32() - 1;
+            const sal_Int32 nCol1 = o3tl::toInt32(aColSpanToken.substr( 0, nSepPos )) - 1;
             const bool bValid1 = mrAddressConv.checkCol( nCol1, true);
             if (bValid1)
             {
-                const sal_Int32 nCol2 = aColSpanToken.copy( nSepPos + 1 ).toInt32() - 1;
+                const sal_Int32 nCol2 = o3tl::toInt32(aColSpanToken.substr( nSepPos + 1 )) - 1;
                 mrAddressConv.checkCol( nCol2, true);
             }
         }
@@ -311,9 +321,9 @@ void SheetDataContext::importRow( const AttributeList& rAttribs )
 bool SheetDataContext::importCell( const AttributeList& rAttribs )
 {
     bool bValid = true;
-    const char* p = rAttribs.getChar(XML_r);
+    std::string_view p = rAttribs.getView(XML_r);
 
-    if (!p)
+    if (p.empty())
     {
         ++mnCol;
         ScAddress aAddress( mnCol, mnRow, mnSheet );

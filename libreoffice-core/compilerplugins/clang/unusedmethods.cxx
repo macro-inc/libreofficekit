@@ -17,6 +17,8 @@
 
 #include "clang/AST/Attr.h"
 
+#include "config_clang.h"
+
 #include "plugin.hxx"
 
 /**
@@ -82,6 +84,8 @@ public:
 
     virtual void run() override
     {
+        handler.enableTreeWideAnalysisMode();
+
         StringRef fn(handler.getMainFileName());
         // ignore external code, makes this run faster
         if (fn.contains("UnpackedTarball"))
@@ -131,8 +135,6 @@ private:
     MyFuncInfo niceName(const FunctionDecl* functionDecl);
     std::string toString(SourceLocation loc);
     void functionTouchedFromExpr( const FunctionDecl* calleeFunctionDecl, const Expr* expr );
-    bool ignoreLocation(SourceLocation loc);
-    bool checkIgnoreLocation(SourceLocation loc);
 
     CXXRecordDecl const * currentCxxRecordDecl = nullptr;
     FunctionDecl const * currentFunctionDecl = nullptr;
@@ -144,10 +146,6 @@ MyFuncInfo UnusedMethods::niceName(const FunctionDecl* functionDecl)
     {
         if (functionDecl->getInstantiatedFromMemberFunction())
             functionDecl = functionDecl->getInstantiatedFromMemberFunction();
-#if CLANG_VERSION < 90000
-        else if (functionDecl->getClassScopeSpecializationPattern())
-            functionDecl = functionDecl->getClassScopeSpecializationPattern();
-#endif
         else if (functionDecl->getTemplateInstantiationPattern())
             functionDecl = functionDecl->getTemplateInstantiationPattern();
         else
@@ -199,41 +197,6 @@ MyFuncInfo UnusedMethods::niceName(const FunctionDecl* functionDecl)
     return aInfo;
 }
 
-/**
- * Our need to see everything conflicts with the PCH code in pluginhandler::ignoreLocation,
- * so we have to do this ourselves.
- */
-bool UnusedMethods::ignoreLocation(SourceLocation loc)
-{
-    static std::unordered_map<SourceLocation, bool> checkedMap;
-    auto it = checkedMap.find(loc);
-    if (it != checkedMap.end())
-        return it->second;
-    bool ignore = checkIgnoreLocation(loc);
-    checkedMap.emplace(loc, ignore);
-    return ignore;
-}
-
-bool UnusedMethods::checkIgnoreLocation(SourceLocation loc)
-{
-    // simplified form of the code in PluginHandler::checkIgnoreLocation
-    SourceLocation expansionLoc = compiler.getSourceManager().getExpansionLoc( loc );
-    if( compiler.getSourceManager().isInSystemHeader( expansionLoc ))
-        return true;
-    PresumedLoc presumedLoc = compiler.getSourceManager().getPresumedLoc( expansionLoc );
-    if( presumedLoc.isInvalid())
-        return true;
-    const char* bufferName = presumedLoc.getFilename();
-    if (bufferName == NULL
-        || loplugin::hasPathnamePrefix(bufferName, SRCDIR "/external/")
-        || loplugin::hasPathnamePrefix(bufferName, WORKDIR "/"))
-        return true;
-    if( loplugin::hasPathnamePrefix(bufferName, BUILDDIR "/")
-        || loplugin::hasPathnamePrefix(bufferName, SRCDIR "/") )
-        return false; // ok
-    return true;
-}
-
 std::string UnusedMethods::toString(SourceLocation loc)
 {
     SourceLocation expansionLoc = compiler.getSourceManager().getExpansionLoc( loc );
@@ -262,7 +225,7 @@ void UnusedMethods::logCallToRootMethods(const FunctionDecl* functionDecl, std::
     {
         while (functionDecl->getTemplateInstantiationPattern())
             functionDecl = functionDecl->getTemplateInstantiationPattern();
-        if (functionDecl->getLocation().isValid() && !ignoreLocation( compat::getBeginLoc(functionDecl) )
+        if (functionDecl->getLocation().isValid() && !ignoreLocation( functionDecl->getBeginLoc() )
              && !functionDecl->isExternC())
             funcSet.insert(niceName(functionDecl));
     }
@@ -307,7 +270,7 @@ gotfunc:
     {
         const FunctionDecl* parentFunctionOfCallSite = getParentFunctionDecl(expr);
         if (parentFunctionOfCallSite != calleeFunctionDecl) {
-            if (!parentFunctionOfCallSite || !ignoreLocation(compat::getBeginLoc(parentFunctionOfCallSite))) {
+            if (!parentFunctionOfCallSite || !ignoreLocation(parentFunctionOfCallSite->getBeginLoc())) {
                 calledFromOutsideSet.insert(niceName(calleeFunctionDecl));
             }
         }
@@ -347,7 +310,7 @@ bool UnusedMethods::VisitCXXConstructExpr( const CXXConstructExpr* constructExpr
     const CXXConstructorDecl* constructorDecl = constructExpr->getConstructor();
     constructorDecl = constructorDecl->getCanonicalDecl();
 
-    if (!constructorDecl->getLocation().isValid() || ignoreLocation(compat::getBeginLoc(constructorDecl))) {
+    if (!constructorDecl->getLocation().isValid() || ignoreLocation(constructorDecl->getBeginLoc())) {
         return true;
     }
 
@@ -378,7 +341,7 @@ bool UnusedMethods::VisitFunctionDecl( const FunctionDecl* functionDecl )
     {
         return true;
     }
-    if (!canonicalFunctionDecl->getLocation().isValid() || ignoreLocation(compat::getBeginLoc(canonicalFunctionDecl))) {
+    if (!canonicalFunctionDecl->getLocation().isValid() || ignoreLocation(canonicalFunctionDecl->getBeginLoc())) {
         return true;
     }
     // ignore method overrides, since the call will show up as being directed to the root method
@@ -408,7 +371,7 @@ bool UnusedMethods::VisitDeclRefExpr( const DeclRefExpr* declRefExpr )
     {
         const FunctionDecl* parentFunctionOfCallSite = getParentFunctionDecl(declRefExpr);
         if (parentFunctionOfCallSite != functionDecl) {
-            if (!parentFunctionOfCallSite || !ignoreLocation(compat::getBeginLoc(parentFunctionOfCallSite))) {
+            if (!parentFunctionOfCallSite || !ignoreLocation(parentFunctionOfCallSite->getBeginLoc())) {
                 calledFromOutsideSet.insert(niceName(functionDecl));
             }
         }

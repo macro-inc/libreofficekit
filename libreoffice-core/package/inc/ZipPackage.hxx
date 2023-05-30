@@ -30,15 +30,12 @@
 #include <com/sun/star/beans/NamedValue.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/xml/crypto/CipherID.hpp>
-#include <com/sun/star/lang/IllegalArgumentException.hpp>
 #include <comphelper/refcountedmutex.hxx>
 #include <rtl/ref.hxx>
 
 #include "HashMaps.hxx"
 #include "ZipFile.hxx"
-#include <osl/file.h>
 #include <vector>
-#include <memory>
 #include <optional>
 
 class ZipOutputStream;
@@ -120,7 +117,7 @@ class ZipPackage final : public cppu::WeakImplHelper
             const css::uno::Reference< css::io::XInputStream >& xTempStream );
 
 public:
-    ZipPackage( const css::uno::Reference < css::uno::XComponentContext > &xContext );
+    ZipPackage( css::uno::Reference < css::uno::XComponentContext > xContext );
     virtual ~ZipPackage() override;
     ZipFile& getZipFile() { return *m_pZipFile;}
     sal_Int32 getFormat() const { return m_nFormat; }
@@ -150,7 +147,7 @@ public:
     // XUnoTunnel
     virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
     /// @throws css::uno::RuntimeException
-    static css::uno::Sequence < sal_Int8 > getUnoTunnelId();
+    static const css::uno::Sequence < sal_Int8 > & getUnoTunnelId();
     // XPropertySet
     virtual css::uno::Reference< css::beans::XPropertySetInfo > SAL_CALL getPropertySetInfo(  ) override;
     virtual void SAL_CALL setPropertyValue( const OUString& aPropertyName, const css::uno::Any& aValue ) override;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface domain="sw">
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkMenu" id="navmenu">
@@ -45,10 +45,19 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="806">
+      <object class="GtkMenuItem" id="copy">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE">Delete</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_COPY_ENTRY">_Copy</property>
+        <property name="use-underline">True</property>
+        <accelerator key="C" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletechapter">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_CHAPTER">Delete Chapter</property>
         <property name="use-underline">True</property>
         <accelerator key="Delete" signal="activate"/>
       </object>
@@ -57,7 +66,7 @@
       <object class="GtkMenuItem" id="801">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_PROMOTE_CHAPTER">Promote Chapter</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_PROMOTE_CHAPTER">Move Chapter Up</property>
         <property name="use-underline">True</property>
         <accelerator key="Up" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
@@ -66,7 +75,7 @@
       <object class="GtkMenuItem" id="802">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DEMOTE_CHAPTER">Demote Chapter</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DEMOTE_CHAPTER">Move Chapter Down</property>
         <property name="use-underline">True</property>
         <accelerator key="Down" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
@@ -75,7 +84,7 @@
       <object class="GtkMenuItem" id="803">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_PROMOTE_LEVEL">Promote Level</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_PROMOTE_LEVEL">Promote Outline Level</property>
         <property name="use-underline">True</property>
         <accelerator key="Left" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
@@ -84,7 +93,7 @@
       <object class="GtkMenuItem" id="804">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DEMOTE_LEVEL">Demote Level</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DEMOTE_LEVEL">Demote Outline Level</property>
         <property name="use-underline">True</property>
         <accelerator key="Right" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
@@ -130,10 +139,99 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="501">
+      <object class="GtkMenuItem" id="deletetable">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_ENTRY">_Delete</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_TABLE">Delete Table</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deleteframe">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_FRAME">Delete Frame</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deleteimage">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_IMAGE">Delete Image</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deleteoleobject">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_OLE_OBJECT">Delete OLE object</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletebookmark">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_BOOKMARK">Delete Bookmark</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletehyperlink">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_HYPERLINK">Delete Hyperlink</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletereference">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_REFERENCE">Delete Reference</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deleteindex">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_INDEX">Delete Index</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletecomment">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_COMMENT">Delete Comment</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletedrawingobject">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_DRAWING_OBJECT">Delete Drawing object</property>
+        <property name="use-underline">True</property>
+        <accelerator key="Delete" signal="activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="deletefield">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_DELETE_FIELD">Delete Field</property>
         <property name="use-underline">True</property>
         <accelerator key="Delete" signal="activate"/>
       </object>
@@ -194,20 +292,6 @@
       <object class="GtkSeparatorMenuItem" id="separator3">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="1">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_OUTLINE_LEVEL">Outline Level</property>
-        <property name="use-underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="outlinelevel">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-          </object>
-        </child>
       </object>
     </child>
     <child>
@@ -329,9 +413,39 @@
       </object>
     </child>
     <child>
+      <object class="GtkCheckMenuItem" id="endnotetracking">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_ENDNOTE_TRACKING">Endnote Tracking</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkCheckMenuItem" id="sort">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_SORT_ALPHABETICALLY">Sort Alphabetically</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
       <object class="GtkSeparatorMenuItem">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes" context="navigatorcontextmenu|STR_OUTLINE_LEVEL">Outline Level</property>
+        <property name="use-underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="outlinelevel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+        </child>
       </object>
     </child>
     <child>

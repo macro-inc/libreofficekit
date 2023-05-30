@@ -821,14 +821,14 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         // Common data
         aRow[4] = ODatabaseMetaDataResultSet::getQuoteValue(); // Literal quote marks
         aRow[5] = ODatabaseMetaDataResultSet::getQuoteValue(); // Literal quote marks
-        aRow[7] = new ORowSetValueDecorator(true); // Nullable
-        aRow[8] = new ORowSetValueDecorator(true); // Case sensitive
-        aRow[10] = new ORowSetValueDecorator(false); // Is unsigned
+        aRow[7] = new ORowSetValueDecorator(ORowSetValue(true)); // Nullable
+        aRow[8] = new ORowSetValueDecorator(ORowSetValue(true)); // Case sensitive
+        aRow[10] = new ORowSetValueDecorator(ORowSetValue(false)); // Is unsigned
         // FIXED_PREC_SCALE: docs state "can it be a money value? " however
         // in reality this causes Base to treat all numbers as money formatted
         // by default which is wrong (and formatting as money value is still
         // possible for all values).
-        aRow[11] = new ORowSetValueDecorator(false);
+        aRow[11] = new ORowSetValueDecorator(ORowSetValue(false));
         // Localised Type Name -- TODO: implement (but can be null):
         aRow[13] = new ORowSetValueDecorator();
         aRow[16] = new ORowSetValueDecorator();             // Unused
@@ -842,7 +842,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(OUString("length")); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -854,7 +854,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(OUString("length")); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -888,7 +888,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -904,7 +904,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
             aRow[6] = new ORowSetValueDecorator(); // Create Params
             aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-            aRow[12] = new ORowSetValueDecorator(true); // Autoincrement
+            aRow[12] = new ORowSetValueDecorator(ORowSetValue(true)); // Autoincrement
             aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
             aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         }
@@ -928,7 +928,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         {
             aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-            aRow[12] = new ORowSetValueDecorator(true); // Autoincrement
+            aRow[12] = new ORowSetValueDecorator(ORowSetValue(true)); // Autoincrement
         }
 
         aRow[6] = new ORowSetValueDecorator(OUString("PRECISION,SCALE")); // Create params
@@ -972,7 +972,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -984,7 +984,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -996,7 +996,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::FULL)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -1008,7 +1008,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::NONE)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
@@ -1020,12 +1020,13 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTypeInfo()
         aRow[6] = new ORowSetValueDecorator(); // Create Params
         aRow[9] = new ORowSetValueDecorator(
                 sal_Int16(ColumnSearch::BASIC)); // Searchable
-        aRow[12] = new ORowSetValueDecorator(false); // Autoincrement
+        aRow[12] = new ORowSetValueDecorator(ORowSetValue(false)); // Autoincrement
         aRow[14] = ODatabaseMetaDataResultSet::get0Value(); // Minimum scale
         aRow[15] = ODatabaseMetaDataResultSet::get0Value(); // Max scale
         tmp.push_back(aRow);
         return tmp;
     }();
+    // [-loplugin:redundantfcast] false positive:
     pResultSet->setRows(ODatabaseMetaDataResultSet::ORows(aResults));
     return pResultSet;
 }
@@ -1476,7 +1477,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getImportedKeys(
 uno::Reference< XResultSet > ODatabaseMetaData::lcl_getKeys(const bool bIsImport, std::u16string_view table )
 {
     rtl::Reference<ODatabaseMetaDataResultSet> pResultSet = new
-        ODatabaseMetaDataResultSet(ODatabaseMetaDataResultSet::eImportedKeys);
+        ODatabaseMetaDataResultSet(bIsImport?ODatabaseMetaDataResultSet::eImportedKeys:ODatabaseMetaDataResultSet::eExportedKeys);
 
     uno::Reference< XStatement > statement = m_pConnection->createStatement();
 
@@ -1679,7 +1680,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getIndexInfo(
         }
 
         // 4. NON_UNIQUE -- i.e. specifically negate here.
-        aCurrentRow[4] = new ORowSetValueDecorator(xRow->getShort(5) == 0);
+        aCurrentRow[4] = new ORowSetValueDecorator(ORowSetValue(xRow->getShort(5) == 0));
         // 6. INDEX NAME
         aCurrentRow[6] = new ORowSetValueDecorator(sanitizeIdentifier(xRow->getString(4)));
 
@@ -1701,7 +1702,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getIndexInfo(
         aResults.push_back(aCurrentRow);
     }
     rtl::Reference<ODatabaseMetaDataResultSet> pResultSet = new
-            ODatabaseMetaDataResultSet(ODatabaseMetaDataResultSet::ePrimaryKeys);
+            ODatabaseMetaDataResultSet(ODatabaseMetaDataResultSet::eIndexInfo);
     pResultSet->setRows( std::move(aResults) );
 
     return pResultSet;
@@ -1772,7 +1773,7 @@ uno::Reference< XResultSet > SAL_CALL ODatabaseMetaData::getTablePrivileges(
         aRow[4] = new ORowSetValueDecorator(sanitizeIdentifier(xRow->getString(2))); // 4. GRANTOR
         aRow[5] = new ORowSetValueDecorator(sanitizeIdentifier(xRow->getString(3))); // 5. GRANTEE
         aRow[6] = new ORowSetValueDecorator(xRow->getString(4)); // 6. Privilege
-        aRow[7] = new ORowSetValueDecorator(bool(xRow->getBoolean(5))); // 7. Is Grantable
+        aRow[7] = new ORowSetValueDecorator(ORowSetValue(bool(xRow->getBoolean(5)))); // 7. Is Grantable
 
         aResults.push_back(aRow);
     }

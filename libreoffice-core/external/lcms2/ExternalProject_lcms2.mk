@@ -28,10 +28,10 @@ $(call gb_ExternalProject_get_state_target,lcms2,build):
 	$(call gb_Trace_StartRange,lcms2,EXTERNAL)
 	$(call gb_ExternalProject_run,build,\
 		$(gb_RUN_CONFIGURE) ./configure --without-jpeg --without-tiff --with-pic \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-			$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
+			$(gb_CONFIGURE_PLATFORMS) \
+			$(if $(CROSS_COMPILING),$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
 			CPPFLAGS=" $(SOLARINC)" \
-			CFLAGS='$(CFLAGS) $(if $(debug),$(gb_DEBUGINFO_FLAGS)) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS))' \
+			CFLAGS='$(CFLAGS) $(call gb_ExternalProject_get_build_flags,lcms2)' \
 			$(if $(DISABLE_DYNLOADING), \
 				--enable-static --disable-shared \
 			, \

@@ -29,7 +29,6 @@
 #include "canvasfont.hxx"
 #include "impltools.hxx"
 
-
 /* Definition of TextLayout class */
 
 namespace vclcanvas
@@ -45,12 +44,12 @@ namespace vclcanvas
         TextLayout(const TextLayout&) = delete;
         const TextLayout& operator=(const TextLayout&) = delete;
 
-        TextLayout( const css::rendering::StringContext&                aText,
-                    sal_Int8                                            nDirection,
-                    const CanvasFont::Reference&                        rFont,
-                    const css::uno::Reference<
-                          css::rendering::XGraphicDevice>&              xDevice,
-                    const OutDevProviderSharedPtr&                      rOutDev );
+        TextLayout( css::rendering::StringContext                 aText,
+                    sal_Int8                                      nDirection,
+                    CanvasFont::Reference                         rFont,
+                    css::uno::Reference<
+                          css::rendering::XGraphicDevice>         xDevice,
+                    OutDevProviderSharedPtr                       xOutDev );
 
         /// Dispose all internal references
         virtual void SAL_CALL disposing() override;
@@ -85,7 +84,7 @@ namespace vclcanvas
                    const css::rendering::RenderState&              renderState ) const;
 
     private:
-        void setupTextOffsets( sal_Int32* outputOffsets,
+        KernArray setupTextOffsets(
                                const css::uno::Sequence< double >& inputOffsets,
                                const css::rendering::ViewState&    viewState,
                                const css::rendering::RenderState&  renderState     ) const;

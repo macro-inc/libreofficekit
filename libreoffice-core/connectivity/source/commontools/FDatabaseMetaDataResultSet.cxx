@@ -27,6 +27,7 @@
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <connectivity/dbexception.hxx>
+#include <o3tl/safeint.hxx>
 #include <o3tl/unreachable.hxx>
 #include <TConnection.hxx>
 
@@ -44,7 +45,6 @@ using namespace ::com::sun::star::lang;
 ODatabaseMetaDataResultSet::ODatabaseMetaDataResultSet()
     :ODatabaseMetaDataResultSet_BASE(m_aMutex)
     ,::comphelper::OPropertyContainer(ODatabaseMetaDataResultSet_BASE::rBHelper)
-    ,m_aStatement(nullptr)
     ,m_nColPos(0)
     ,m_bBOF(true)
     ,m_bEOF(true)
@@ -56,7 +56,6 @@ ODatabaseMetaDataResultSet::ODatabaseMetaDataResultSet()
 ODatabaseMetaDataResultSet::ODatabaseMetaDataResultSet( MetaDataResultSetType _eType )
     :ODatabaseMetaDataResultSet_BASE(m_aMutex)
     ,::comphelper::OPropertyContainer(ODatabaseMetaDataResultSet_BASE::rBHelper)
-    ,m_aStatement(nullptr)
     ,m_nColPos(0)
     ,m_bBOF(true)
     ,m_bEOF(true)
@@ -111,7 +110,7 @@ void ODatabaseMetaDataResultSet::disposing()
     OPropertySetHelper::disposing();
 
     ::osl::MutexGuard aGuard(m_aMutex);
-    m_aStatement    = nullptr;
+    m_aStatement.clear();
     m_xMetaData.clear();
     m_aRowsIter = m_aRows.end();
     m_aRows.clear();
@@ -173,7 +172,7 @@ sal_Int32 SAL_CALL ODatabaseMetaDataResultSet::findColumn( const OUString& colum
 
 void ODatabaseMetaDataResultSet::checkIndex(sal_Int32 columnIndex )
 {
-    if(columnIndex >= static_cast<sal_Int32>((*m_aRowsIter).size()) || columnIndex < 1)
+    if(columnIndex < 1 || o3tl::make_unsigned(columnIndex) >= (*m_aRowsIter).size())
         ::dbtools::throwInvalidIndexException(*this);
 }
 
@@ -313,21 +312,17 @@ sal_Bool SAL_CALL ODatabaseMetaDataResultSet::isAfterLast(  )
 }
 
 
-SAL_WNOUNREACHABLE_CODE_PUSH
-
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::isFirst(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::isLast(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
-
-SAL_WNOUNREACHABLE_CODE_POP
 
 
 void SAL_CALL ODatabaseMetaDataResultSet::beforeFirst(  )
@@ -352,40 +347,36 @@ void SAL_CALL ODatabaseMetaDataResultSet::close(  )
 }
 
 
-SAL_WNOUNREACHABLE_CODE_PUSH
-
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::first(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::last(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::absolute( sal_Int32 /*row*/ )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::relative( sal_Int32 /*row*/ )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::previous(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
-
-SAL_WNOUNREACHABLE_CODE_POP
 
 
 Reference< XInterface > SAL_CALL ODatabaseMetaDataResultSet::getStatement(  )
@@ -394,27 +385,23 @@ Reference< XInterface > SAL_CALL ODatabaseMetaDataResultSet::getStatement(  )
 }
 
 
-SAL_WNOUNREACHABLE_CODE_PUSH
-
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::rowDeleted(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::rowInserted(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::rowUpdated(  )
 {
     ::dbtools::throwFunctionSequenceException(*this);
-    return false;
+    O3TL_UNREACHABLE;
 }
-
-SAL_WNOUNREACHABLE_CODE_POP
 
 
 sal_Bool SAL_CALL ODatabaseMetaDataResultSet::isBeforeFirst(  )

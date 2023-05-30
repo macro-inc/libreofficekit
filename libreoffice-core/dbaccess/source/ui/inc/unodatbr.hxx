@@ -31,8 +31,10 @@
 #include <com/sun/star/sdb/application/DatabaseObject.hpp>
 #include <com/sun/star/sdb/application/DatabaseObjectContainer.hpp>
 #include <com/sun/star/sdb/XDatabaseRegistrationsListener.hpp>
+#include <comphelper/interfacecontainer2.hxx>
 #include <cppuhelper/implbase5.hxx>
 #include "callbacks.hxx"
+#include <utility>
 #include <vcl/transfer.hxx>
 #include <svx/dataaccessdescriptor.hxx>
 #include "TableCopyHelper.hxx"
@@ -73,7 +75,7 @@ namespace dbaui
             bool                        bEnabled;
 
             ExternalFeature() : bEnabled( false ) { }
-            ExternalFeature( const css::util::URL& _rURL ) : aURL( _rURL ), bEnabled( false ) { }
+            ExternalFeature( css::util::URL _aURL ) : aURL(std::move( _aURL )), bEnabled( false ) { }
         };
 
         typedef std::map< sal_uInt16, ExternalFeature >  ExternalFeaturesMap;
@@ -355,7 +357,7 @@ namespace dbaui
         std::unique_ptr<weld::TreeIter> implAppendEntry(
             const weld::TreeIter* pParent,
             const OUString& rName,
-            DBTreeListUserData* pUserData);
+            const DBTreeListUserData* pUserData);
 
         /// loads the grid control with the data object specified (which may be a table, a query or a command)
         bool implLoadAnything(const OUString& _rDataSourceName, const OUString& _rCommand,

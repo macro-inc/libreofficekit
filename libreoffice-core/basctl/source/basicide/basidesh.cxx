@@ -19,8 +19,10 @@
 
 #include <config_options.h>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <basic/basmgr.hxx>
+#include <svx/zoomsliderctrl.hxx>
+#include <svx/zoomslideritem.hxx>
 #include <svx/svxids.hrc>
 #include <iderid.hxx>
 #include <strings.hrc>
@@ -43,6 +45,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <svl/srchitem.hxx>
 #include <tools/debug.hxx>
+#include <unotools/viewoptions.hxx>
 
 #if defined(DISABLE_DYNLOADING) || ENABLE_MERGELIBS
 /* Avoid clash with the ones from svx/source/form/typemap.cxx */
@@ -74,6 +77,8 @@
 
 namespace basctl
 {
+constexpr OUStringLiteral BASIC_IDE_EDITOR_WINDOW = u"BasicIDEEditorWindow";
+constexpr OUStringLiteral BASIC_IDE_CURRENT_ZOOM = u"CurrentZoom";
 
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star;
@@ -159,9 +164,8 @@ unsigned Shell::nShellCount = 0;
 Shell::Shell( SfxViewFrame* pFrame_, SfxViewShell* /* pOldShell */ ) :
     SfxViewShell( pFrame_, SfxViewShellFlags::NO_NEWWINDOW ),
     m_aCurDocument( ScriptDocument::getApplicationScriptDocument() ),
-    aHScrollBar( VclPtr<ScrollBar>::Create(&GetViewFrame()->GetWindow(), WinBits( WB_HSCROLL | WB_DRAG )) ),
-    aVScrollBar( VclPtr<ScrollBar>::Create(&GetViewFrame()->GetWindow(), WinBits( WB_VSCROLL | WB_DRAG )) ),
-    aScrollBarBox( VclPtr<ScrollBarBox>::Create(&GetViewFrame()->GetWindow(), WinBits( WB_SIZEABLE )) ),
+    aHScrollBar( VclPtr<ScrollAdaptor>::Create(&GetViewFrame()->GetWindow(), true) ),
+    aVScrollBar( VclPtr<ScrollAdaptor>::Create(&GetViewFrame()->GetWindow(), false) ),
     pLayout(nullptr),
     aObjectCatalog(VclPtr<ObjectCatalog>::Create(&GetViewFrame()->GetWindow())),
     m_bAppBasicModified( false ),
@@ -186,6 +190,7 @@ void Shell::Init()
 
     LibBoxControl::RegisterControl( SID_BASICIDE_LIBSELECTOR );
     LanguageBoxControl::RegisterControl( SID_BASICIDE_CURRENT_LANG );
+    SvxZoomSliderControl::RegisterControl( SID_ATTR_ZOOMSLIDER );
 
     GetViewFrame()->GetWindow().SetBackground(
         GetViewFrame()->GetWindow().GetSettings().GetStyleSettings().GetWindowColor()
@@ -200,6 +205,7 @@ void Shell::Init()
     nCurKey = 100;
     InitScrollBars();
     InitTabBar();
+    InitZoomLevel();
 
     SetCurLib( ScriptDocument::getApplicationScriptDocument(), "Standard", false, false );
 
@@ -231,7 +237,6 @@ Shell::~Shell()
     SetCurWindow( nullptr );
 
     aObjectCatalog.disposeAndClear();
-    aScrollBarBox.disposeAndClear();
     aVScrollBar.disposeAndClear();
     aHScrollBar.disposeAndClear();
 
@@ -255,6 +260,10 @@ Shell::~Shell()
     pDialogLayout.disposeAndClear();
     pModulLayout.disposeAndClear();
     pTabBar.disposeAndClear();
+
+    // Remember current zoom level
+    SvtViewOptions(EViewType::Window, BASIC_IDE_EDITOR_WINDOW).SetUserItem(
+        BASIC_IDE_CURRENT_ZOOM, Any(m_nCurrentZoomSliderValue));
 }
 
 void Shell::onDocumentCreated( const ScriptDocument& /*_rDocument*/ )
@@ -357,6 +366,44 @@ void Shell::onDocumentModeChanged( const ScriptDocument& _rDocument )
     }
 }
 
+void Shell::InitZoomLevel()
+{
+    m_nCurrentZoomSliderValue = DEFAULT_ZOOM_LEVEL;
+    SvtViewOptions aWinOpt(EViewType::Window, BASIC_IDE_EDITOR_WINDOW);
+    if (aWinOpt.Exists())
+    {
+        try
+        {
+            aWinOpt.GetUserItem(BASIC_IDE_CURRENT_ZOOM) >>= m_nCurrentZoomSliderValue;
+        }
+        catch(const css::container::NoSuchElementException&)
+        { TOOLS_WARN_EXCEPTION("basctl.basicide", "Zoom level not defined"); }
+    }
+}
+
+// Applies the new zoom level to all open editor windows
+void Shell::SetGlobalEditorZoomLevel(sal_uInt16 nNewZoomLevel)
+{
+    for (auto const& window : aWindowTable)
+    {
+        ModulWindow* pModuleWindow = dynamic_cast<ModulWindow*>(window.second.get());
+        if (pModuleWindow)
+        {
+            EditorWindow& pEditorWindow = pModuleWindow->GetEditorWindow();
+            pEditorWindow.SetEditorZoomLevel(nNewZoomLevel);
+        }
+    }
+
+    // Update the zoom slider value based on the new global zoom level
+    m_nCurrentZoomSliderValue = nNewZoomLevel;
+
+    if (SfxBindings* pBindings = GetBindingsPtr())
+    {
+        pBindings->Invalidate( SID_BASICIDE_CURRENT_ZOOM );
+        pBindings->Invalidate( SID_ATTR_ZOOMSLIDER );
+    }
+}
+
 void Shell::StoreAllWindowData( bool bPersistent )
 {
     for (auto const& window : aWindowTable)
@@ -410,13 +457,7 @@ void Shell::InitScrollBars()
     aVScrollBar->SetPageSize( 2000 );
     aHScrollBar->SetLineSize( 300 );
     aHScrollBar->SetPageSize( 2000 );
-    aHScrollBar->Enable();
-    aVScrollBar->Enable();
-    aVScrollBar->Show();
-    aHScrollBar->Show();
-    aScrollBarBox->Show();
 }
-
 
 void Shell::InitTabBar()
 {
@@ -425,12 +466,10 @@ void Shell::InitTabBar()
     pTabBar->SetSelectHdl( LINK( this, Shell, TabBarHdl ) );
 }
 
-
 void Shell::OuterResizePixel( const Point &rPos, const Size &rSize )
 {
     AdjustPosSizePixel( rPos, rSize );
 }
-
 
 IMPL_LINK( Shell, TabBarHdl, ::TabBar *, pCurTabBar, void )
 {
@@ -889,12 +928,6 @@ void Shell::InvalidateControlSlots()
     pBindings->Invalidate( SID_INSERT_HYPERLINKCONTROL );
     pBindings->Invalidate( SID_INSERT_TREECONTROL );
     pBindings->Invalidate( SID_CHOOSE_CONTROLS );
-}
-
-void Shell::EnableScrollbars( bool bEnable )
-{
-    aHScrollBar->Enable(bEnable);
-    aVScrollBar->Enable(bEnable);
 }
 
 void Shell::SetCurLib( const ScriptDocument& rDocument, const OUString& aLibName, bool bUpdateWindows, bool bCheck )

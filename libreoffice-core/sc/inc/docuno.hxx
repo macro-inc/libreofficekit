@@ -51,7 +51,7 @@
 #include <com/sun/star/util/XChangesNotifier.hpp>
 #include <com/sun/star/uno/XAggregation.hpp>
 #include <cppuhelper/implbase.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <svl/itemprop.hxx>
 #include <vcl/ITiledRenderable.hxx>
 
@@ -108,7 +108,7 @@ private:
     css::uno::Reference<css::uno::XInterface> xChartDataProv;
     css::uno::Reference<css::uno::XInterface> xObjProvider;
 
-    ::comphelper::OInterfaceContainerHelper2 maChangesListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::util::XChangesListener> maChangesListeners;
 
     bool                    FillRenderMarkData( const css::uno::Any& aSelection,
                                                 const css::uno::Sequence< css::beans::PropertyValue >& rOptions,
@@ -522,7 +522,7 @@ private:
     SCCOL                   nEndCol;
 
     rtl::Reference<ScTableColumnObj> GetObjectByIndex_Impl(sal_Int32 nIndex) const;
-    rtl::Reference<ScTableColumnObj> GetObjectByName_Impl(const OUString& aName) const;
+    rtl::Reference<ScTableColumnObj> GetObjectByName_Impl(std::u16string_view aName) const;
 
 public:
                             ScTableColumnsObj(ScDocShell* pDocSh, SCTAB nT,

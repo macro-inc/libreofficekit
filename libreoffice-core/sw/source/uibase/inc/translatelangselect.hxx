@@ -22,7 +22,7 @@
 #include <rtl/string.h>
 #include <vector>
 #include <optional>
-#include <translatehelper.hxx>
+#include "translatehelper.hxx"
 
 class SwWrtShell;
 
@@ -52,7 +52,7 @@ public:
     std::optional<SwLanguageListItem> GetSelectedLanguage();
 
 private:
-    SwWrtShell& rWrtSh;
+    SwWrtShell& m_rWrtSh;
     std::unique_ptr<weld::ComboBox> m_xLanguageListBox;
     std::unique_ptr<weld::Button> m_xBtnCancel;
     std::unique_ptr<weld::Button> m_xBtnTranslate;
@@ -61,7 +61,7 @@ private:
     bool m_bTranslationStarted;
     bool m_bCancelTranslation;
 
-    DECL_LINK(LangSelectHdl, weld::ComboBox&, void);
+    DECL_STATIC_LINK(SwTranslateLangSelectDlg, LangSelectHdl, weld::ComboBox&, void);
     DECL_LINK(LangSelectCancelHdl, weld::Button&, void);
     DECL_LINK(LangSelectTranslateHdl, weld::Button&, void);
 };

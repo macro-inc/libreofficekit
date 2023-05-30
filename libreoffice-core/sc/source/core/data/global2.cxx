@@ -27,6 +27,8 @@
 #include <formula/errorcodes.hxx>
 #include <sal/log.hxx>
 #include <rtl/character.hxx>
+#include <rtl/math.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <global.hxx>
 #include <rangeutl.hxx>
@@ -295,7 +297,7 @@ OUString ScGlobal::GetAbsDocName( const OUString& rFileName,
             aObj.setFinalSlash();       // it IS a path
         }
         else
-            aObj.SetSmartURL("file:///tmp/document");
+            aObj.SetSmartURL(u"file:///tmp/document");
         bool bWasAbs = true;
         aAbsName = aObj.smartRel2Abs( rFileName, bWasAbs ).GetMainURL(INetURLObject::DecodeMechanism::NONE);
         //  returned string must be encoded because it's used directly to create SfxMedium
@@ -322,15 +324,9 @@ OUString ScGlobal::GetAbsDocName( const OUString& rFileName,
 OUString ScGlobal::GetDocTabName( std::u16string_view rFileName,
                                 std::u16string_view rTabName )
 {
-    OUString  aDocTab = OUString::Concat("'") + rFileName;
-    sal_Int32 nPos = 1;
-    while( (nPos = aDocTab.indexOf( '\'', nPos )) != -1 )
-    {   // escape Quotes
-        aDocTab = aDocTab.replaceAt( nPos, 0, u"\\" );
-        nPos += 2;
-    }
-    aDocTab += "'" + OUStringChar(SC_COMPILER_FILE_TAB_SEP) + rTabName;
-        // "'Doc'#Tab"
+    OUString aDocTab(rFileName);
+    // "'Doc'#Tab"
+    aDocTab = "'" + aDocTab.replaceAll(u"'", u"\\'") + "'" + OUStringChar(SC_COMPILER_FILE_TAB_SEP) + rTabName;
     return aDocTab;
 }
 
@@ -447,7 +443,7 @@ Label_fallback_to_unambiguous:
                     const sal_Int32 nLimit[done] = {0,12,31,0,59,59,0};
                     State eState = (bDate ? month : minute);
                     rCurFmtType = (bDate ? SvNumFormatType::DATE : SvNumFormatType::TIME);
-                    nUnit[eState-1] = rStr.copy( 0, nParseEnd).toInt32();
+                    nUnit[eState-1] = o3tl::toInt32(rStr.subView( 0, nParseEnd));
                     const sal_Unicode* pLastStart = p;
                     // Ensure there's no preceding sign. Negative dates
                     // currently aren't handled correctly. Also discard
@@ -473,7 +469,7 @@ Label_fallback_to_unambiguous:
                             // We had at least one digit.
                             if (eState < done)
                             {
-                                nUnit[eState] = rStr.copy( pLastStart - pStart, p - pLastStart).toInt32();
+                                nUnit[eState] = o3tl::toInt32(rStr.subView( pLastStart - pStart, p - pLastStart));
                                 if (nLimit[eState] && nLimit[eState] < nUnit[eState])
                                     rError = nStringNoValueError;
                             }
@@ -544,7 +540,7 @@ Label_fallback_to_unambiguous:
                         // Catch the very last unit at end of string.
                         if (p > pLastStart && eState < done)
                         {
-                            nUnit[eState] = rStr.copy( pLastStart - pStart, p - pLastStart).toInt32();
+                            nUnit[eState] = o3tl::toInt32(rStr.subView( pLastStart - pStart, p - pLastStart));
                             if (nLimit[eState] && nLimit[eState] < nUnit[eState])
                                 rError = nStringNoValueError;
                         }

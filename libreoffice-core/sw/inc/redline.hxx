@@ -56,7 +56,7 @@ class SW_DLLPUBLIC SwRedlineExtraData_FormatColl final : public SwRedlineExtraDa
     sal_uInt16 m_nPoolId;
     bool m_bFormatAll; // don't strip the last paragraph mark
 public:
-    SwRedlineExtraData_FormatColl( const OUString& rColl, sal_uInt16 nPoolFormatId,
+    SwRedlineExtraData_FormatColl( OUString aColl, sal_uInt16 nPoolFormatId,
                                 const SfxItemSet* pSet = nullptr, bool bFormatAll = true );
     virtual ~SwRedlineExtraData_FormatColl() override;
     virtual SwRedlineExtraData* CreateNew() const override;
@@ -103,7 +103,7 @@ public:
 
     // For sw3io: pNext/pExtraData are taken over.
     SwRedlineData( RedlineType eT, std::size_t nAut, const DateTime& rDT,
-                   const OUString& rCmnt, SwRedlineData* pNxt );
+                   OUString aCmnt, SwRedlineData* pNxt );
 
     ~SwRedlineData();
 
@@ -128,6 +128,12 @@ public:
     std::size_t GetAuthor() const                { return m_nAuthor; }
     const OUString& GetComment() const        { return m_sComment; }
     const DateTime& GetTimeStamp() const    { return m_aStamp; }
+    bool IsAnonymized() const
+        {
+            return m_aStamp.GetYear() == 1970 &&
+                    m_aStamp.GetMonth() == 1 && m_aStamp.GetDay() == 1;
+        }
+
     const SwRedlineData* Next() const{ return m_pNext; }
 
     void SetComment( const OUString& rS )     { m_sComment = rS; }
@@ -156,12 +162,11 @@ public:
 class SW_DLLPUBLIC SwRangeRedline final : public SwPaM
 {
     SwRedlineData* m_pRedlineData;
-    SwNodeIndex* m_pContentSect;
+    std::optional<SwNodeIndex> m_oContentSect;
+    std::optional<tools::Long> m_oLOKLastNodeTop;
+    sal_uInt32 m_nId;
     bool m_bDelLastPara : 1;
     bool m_bIsVisible : 1;
-    sal_uInt32 m_nId;
-
-    std::optional<tools::Long> m_oLOKLastNodeTop;
 
     void MoveToSection();
     void CopyToSection();
@@ -177,16 +182,20 @@ public:
     // For sw3io: pData is taken over!
     SwRangeRedline(SwRedlineData* pData, const SwPosition& rPos,
                bool bDelLP) :
-        SwPaM( rPos ), m_pRedlineData( pData ), m_pContentSect( nullptr ),
-        m_bDelLastPara( bDelLP ), m_bIsVisible( true ), m_nId( s_nLastId++ )
-    {}
+        SwPaM( rPos ), m_pRedlineData( pData ),
+        m_nId( s_nLastId++ ), m_bDelLastPara( bDelLP ), m_bIsVisible( true )
+    {
+        GetBound().SetRedline(this);
+        GetBound(false).SetRedline(this);
+    }
     SwRangeRedline( const SwRangeRedline& );
     virtual ~SwRangeRedline() override;
 
     sal_uInt32 GetId() const { return m_nId; }
-    SwNodeIndex* GetContentIdx() const { return m_pContentSect; }
+    const SwNodeIndex* GetContentIdx() const { return m_oContentSect ? &*m_oContentSect : nullptr; }
     // For Undo.
-    void SetContentIdx( const SwNodeIndex* );
+    void SetContentIdx( const SwNodeIndex& );
+    void ClearContentIdx();
 
     bool IsVisible() const { return m_bIsVisible; }
     bool IsDelLastPara() const { return m_bDelLastPara; }
@@ -208,6 +217,9 @@ public:
     OUString const & GetAuthorString( sal_uInt16 nPos = 0 ) const;
     const DateTime& GetTimeStamp( sal_uInt16 nPos = 0) const;
     RedlineType GetType( sal_uInt16 nPos = 0 ) const;
+    // text content of the redline is only an annotation placeholder
+    // (i.e. a comment, but don't confuse it with comment of the redline)
+    bool IsAnnotation() const;
     const OUString& GetComment( sal_uInt16 nPos = 0 ) const;
 
     void SetComment( const OUString& rS ) { m_pRedlineData->SetComment( rS ); }
@@ -332,7 +344,7 @@ class SW_DLLPUBLIC SwRedlineHint final : public SfxHint
 
 namespace sw {
 
-std::vector<SwRangeRedline*> GetAllValidRanges(std::unique_ptr<SwRangeRedline> p);
+std::vector<std::unique_ptr<SwRangeRedline>> GetAllValidRanges(std::unique_ptr<SwRangeRedline> p);
 
 } // namespace sw
 

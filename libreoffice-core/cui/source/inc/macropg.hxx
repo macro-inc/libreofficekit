@@ -30,7 +30,8 @@
 #include <unordered_map>
 #include <vector>
 
-typedef std::unordered_map< OUString, std::pair< OUString, OUString > > EventsHash;
+typedef std::pair<OUString, OUString> EventPair;
+typedef std::unordered_map<OUString, EventPair> EventsHash;
 
 struct EventDisplayName
 {
@@ -54,8 +55,10 @@ class SvxMacroTabPage_ : public SfxTabPage
     DECL_LINK( SelectEvent_Impl, weld::TreeView&, void );
     DECL_LINK( AssignDeleteHdl_Impl, weld::Button&, void );
     DECL_LINK( DoubleClickHdl_Impl, weld::TreeView&, bool );
+    DECL_LINK( DeleteAllHdl_Impl, weld::Button&, void );
 
-    static void GenericHandler_Impl( SvxMacroTabPage_* pThis, const weld::Button* pBtn );
+    void GenericHandler_Impl(const weld::Button* pBtn);
+    const EventPair* LookupEvent(const OUString& rEventName);
 
     css::uno::Reference< css::container::XNameReplace > m_xAppEvents;
 protected:
@@ -64,6 +67,7 @@ protected:
     css::uno::Reference< css::util::XModifiable > m_xModifiable;
     EventsHash m_appEventsHash;
     EventsHash m_docEventsHash;
+    int m_nAssignedEvents;
     bool bDocModified, bAppEvents, bInitialized;
     std::vector< EventDisplayName > aDisplayNames;
 
@@ -71,7 +75,7 @@ protected:
 
     void                        EnableButtons();
     static css::uno::Any  GetPropsByName( const OUString& eventName, EventsHash& eventsHash );
-    static std::pair< OUString, OUString > GetPairFromAny( const css::uno::Any& aAny );
+    static EventPair GetPairFromAny(const css::uno::Any& aAny);
 
 public:
 

@@ -1,19 +1,25 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-# tests for tracked changes ; tdf912270
+#
 
+# tests for tracked changes ; tdf912270
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, type_text
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, type_text, select_by_text
 from libreoffice.uno.propertyvalue import mkPropertyValues
+from tempfile import TemporaryDirectory
+from org.libreoffice.unotest import systemPathToFileUrl
+import os.path
 
 class trackedchanges(UITestCase):
 
     def test_tdf91270(self):
 
-        with self.ui_test.create_doc_in_start_center("writer") as document:
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             xWriterDoc = self.xUITest.getTopFocusWindow()
             xWriterEdit = xWriterDoc.getChild("writer_edit")
@@ -21,7 +27,7 @@ class trackedchanges(UITestCase):
 
             self.xUITest.executeCommand(".uno:TrackChanges")
 
-            selection = self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
+            self.xUITest.executeCommand(".uno:SelectAll")  #select whole text
             self.xUITest.executeCommand(".uno:Cut")   #cut  text
 
             with self.ui_test.execute_modeless_dialog_through_command(".uno:AcceptTrackedChanges", close_button="close"):
@@ -127,8 +133,6 @@ class trackedchanges(UITestCase):
 
     def test_list_of_changes(self):
         with self.ui_test.load_file(get_url_for_data_file("trackedChanges.odt")) as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
-            xWriterEdit = xWriterDoc.getChild("writer_edit")
 
             listText = [
                     "Unknown Author\t01/24/2020 16:19:32\t",
@@ -191,14 +195,12 @@ class trackedchanges(UITestCase):
 
     def test_tdf135018(self):
         with self.ui_test.load_file(get_url_for_data_file("tdf135018.odt")) as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
-            xWriterEdit = xWriterDoc.getChild("writer_edit")
 
             self.assertEqual(5, document.CurrentController.PageCount)
 
             with self.ui_test.execute_modeless_dialog_through_command(".uno:AcceptTrackedChanges", close_button="close") as xTrackDlg:
                 changesList = xTrackDlg.getChild("writerchanges")
-                self.assertEqual(147, len(changesList.getChildren()))
+                self.assertEqual(111, len(changesList.getChildren()))
 
                 # Without the fix in place, it would have crashed here
                 xAccBtn = xTrackDlg.getChild("acceptall")
@@ -209,7 +211,7 @@ class trackedchanges(UITestCase):
                 xUndoBtn = xTrackDlg.getChild("undo")
                 xUndoBtn.executeAction("CLICK", tuple())
 
-                self.assertEqual(147, len(changesList.getChildren()))
+                self.assertEqual(111, len(changesList.getChildren()))
 
 
             # Check the changes are shown after opening the Manage Tracked Changes dialog
@@ -217,8 +219,6 @@ class trackedchanges(UITestCase):
 
     def test_tdf144270_tracked_table_rows(self):
         with self.ui_test.load_file(get_url_for_data_file("TC-table-del-add.docx")) as document:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
-            xWriterEdit = xWriterDoc.getChild("writer_edit")
 
             tables = document.getTextTables()
             self.assertEqual(3, len(tables))
@@ -320,6 +320,75 @@ class trackedchanges(UITestCase):
             tables = document.getTextTables()
             self.assertEqual(3, len(tables))
 
+    def test_tdf148032(self):
+
+        with self.ui_test.load_file(get_url_for_data_file("trackedChanges.odt")):
+
+            # adding new Comment
+            self.xUITest.executeCommand(".uno:InsertAnnotation")
+
+            # wait until the comment is available
+            xComment1 = self.ui_test.wait_until_child_is_available('Comment1')
+
+            xEditView1 = xComment1.getChild("editview")
+            xEditView1.executeAction("TYPE", mkPropertyValues({"TEXT": "This is the First Comment"}))
+            self.assertEqual(get_state_as_dict(xComment1)["Text"], "This is the First Comment" )
+            self.assertEqual(get_state_as_dict(xComment1)["Resolved"], "false" )
+            self.assertEqual(get_state_as_dict(xComment1)["Author"], "Unknown Author" )
+            self.assertEqual(get_state_as_dict(xComment1)["ReadOnly"], "false" )
+
+            xComment1.executeAction("LEAVE", mkPropertyValues({}))
+
+            with self.ui_test.execute_modeless_dialog_through_command(".uno:AcceptTrackedChanges", close_button="close") as xTrackDlg:
+                changesList = xTrackDlg.getChild("writerchanges")
+                self.assertEqual(6, len(changesList.getChildren()))
+
+                xChild = changesList.getChild(0)
+                # This was False (missing comment)
+                self.assertEqual(True, get_state_as_dict(xChild)["Text"].endswith('\tComment added'))
+
+
+    def get_annotation_count(self, document):
+            n = 0
+            textfields = document.getTextFields()
+            for textfield in textfields:
+                if textfield.supportsService("com.sun.star.text.TextField.Annotation"):
+                    n = n + 1
+            return n
+
+    def test_tdf153016_annotation_in_DOC(self):
+        # load a test document, and add a tracked comment
+        with TemporaryDirectory() as tempdir:
+                xFilePath = os.path.join(tempdir, 'temp_drop_down_form_field.doc')
+
+                with self.ui_test.load_file(get_url_for_data_file('drop_down_form_field.doc')) as document:
+
+                    self.xUITest.executeCommand(".uno:TrackChanges")
+                    self.xUITest.executeCommand('.uno:SelectAll')
+
+                    self.assertEqual(0, self.get_annotation_count(document))
+
+                    self.xUITest.executeCommand('.uno:InsertAnnotation')
+
+                    self.assertEqual(1, self.get_annotation_count(document))
+
+                    # Save Copy as
+                    with self.ui_test.execute_dialog_through_command('.uno:SaveAs', close_button="") as xDialog:
+                        xFileName = xDialog.getChild('file_name')
+                        xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'CTRL+A'}))
+                        xFileName.executeAction('TYPE', mkPropertyValues({'KEYCODE':'BACKSPACE'}))
+                        xFileName.executeAction('TYPE', mkPropertyValues({'TEXT': xFilePath}))
+
+                        xOpen = xDialog.getChild("open")
+                        # DOC confirmation dialog is displayed
+                        with self.ui_test.execute_dialog_through_action(xOpen, "CLICK", close_button="save"):
+                            pass
+
+                with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as document:
+                    # This was 2
+                    self.assertEqual(1, self.get_annotation_count(document))
+
+
     def test_tdf147179(self):
         with self.ui_test.load_file(get_url_for_data_file("TC-table-del-add.docx")) as document:
             xWriterDoc = self.xUITest.getTopFocusWindow()
@@ -348,5 +417,88 @@ class trackedchanges(UITestCase):
 
                 # this was "a" (only text of the first cell was selected, not text of the row)
                 self.assertEqual(get_state_as_dict(xWriterEdit)["SelectedText"], "bca" )
+
+    def test_RedlineSuccessorData(self):
+        with TemporaryDirectory() as tempdir:
+            xFilePath = os.path.join(tempdir, "redlinesuccessordata-temp.odt")
+            with self.ui_test.load_file(get_url_for_data_file("redlinesuccessordata.docx")) as document:
+
+                # check tracked deletion in tracked insertion
+                with self.ui_test.execute_modeless_dialog_through_command('.uno:AcceptTrackedChanges', close_button="close") as xTrackDlg:
+                    changesList = xTrackDlg.getChild('writerchanges')
+                    # four children, but only three visible
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['Children'], '4')
+                    self.assertEqual(state['VisibleCount'], '3')
+
+                    # select tracked deletion with RedlineSuccessorData in tree list
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "DOWN"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['SelectEntryText'], 'Kelemen Gábor 2\t05/19/2021 12:35:00\t')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['Children'], '1')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['VisibleChildCount'], '0')
+
+                    # open tree node with the tracked insertion: four visible children
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RIGHT"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['Children'], '4')
+                    self.assertEqual(state['VisibleCount'], '4')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['Children'], '1')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['VisibleChildCount'], '1')
+
+                    # select tracked insertion in tree list
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "DOWN"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['SelectEntryText'], 'First Person\t10/21/2012 23:45:00\t')
+
+                # Save the DOCX document as ODT with a tracked deletion in a tracked insertion
+                with self.ui_test.execute_dialog_through_command(".uno:SaveAs", close_button="open") as xSaveDialog:
+                    xFileName = xSaveDialog.getChild("file_name")
+                    xFileName.executeAction("TYPE", mkPropertyValues({"KEYCODE":"CTRL+A"}))
+                    xFileName.executeAction("TYPE", mkPropertyValues({"KEYCODE":"BACKSPACE"}))
+                    xFileName.executeAction("TYPE", mkPropertyValues({"TEXT": xFilePath}))
+                    xFileTypeCombo = xSaveDialog.getChild("file_type")
+                    select_by_text(xFileTypeCombo, "ODF Text Document (.odt)")
+
+            self.ui_test.wait_until_file_is_available(xFilePath)
+            # load the temporary file, and check ODF roundtrip of the tracked deletion in a tracked insertion
+            with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as document:
+                # check tracked deletion in tracked insertion
+                with self.ui_test.execute_modeless_dialog_through_command('.uno:AcceptTrackedChanges', close_button="close") as xTrackDlg:
+                    changesList = xTrackDlg.getChild('writerchanges')
+                    # four children, but only three visible
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['Children'], '4')
+                    self.assertEqual(state['VisibleCount'], '3')
+
+                    # select tracked deletion with RedlineSuccessorData in tree list
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "DOWN"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['SelectEntryText'], 'Kelemen Gábor 2\t05/19/2021 12:35:00\t')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['Children'], '1')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['VisibleChildCount'], '0')
+
+                    # open tree node with the tracked insertion: four visible children
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RIGHT"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['Children'], '4')
+                    self.assertEqual(state['VisibleCount'], '4')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['Children'], '1')
+                    self.assertEqual(get_state_as_dict(changesList.getChild(1))['VisibleChildCount'], '1')
+
+                    # select tracked insertion in tree list
+                    changesList.executeAction("TYPE", mkPropertyValues({"KEYCODE": "DOWN"}))
+                    state = get_state_as_dict(changesList)
+                    self.assertEqual(state['SelectEntryText'], 'First Person\t10/21/2012 23:45:00\t')
+
+                    # reject all
+                    xAccBtn = xTrackDlg.getChild("rejectall")
+                    xAccBtn.executeAction("CLICK", tuple())
+                    # FIXME why we need double rejectall (dialog-only)?
+                    xAccBtn.executeAction("CLICK", tuple())
+                    self.assertEqual(0, len(changesList.getChildren()))
+                    # This was false, because of not rejected tracked deletion
+                    # of the text "inserts": "Document text inserts document"...
+                    self.assertTrue(document.getText().getString().startswith('Document text document text'))
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

@@ -20,7 +20,6 @@
 #include <sal/config.h>
 
 #include <map>
-#include <string_view>
 
 #include <sal/macros.h>
 #include <fmundo.hxx>
@@ -45,7 +44,7 @@
 
 #include <svx/fmtools.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/event.hxx>
 #include <osl/mutex.hxx>
@@ -126,7 +125,7 @@ private:
             // SfxObjectShellRef is good here since the model controls the lifetime of the shell
             SfxObjectShellRef const xObjectShell = m_rModel.GetObjectShell();
             ENSURE_OR_THROW( xObjectShell.is(), "no object shell!" );
-            xListenerProps->setPropertyValue("Model", makeAny( xObjectShell->GetModel() ) );
+            xListenerProps->setPropertyValue("Model", Any( xObjectShell->GetModel() ) );
 
             m_vbaListener = xScriptListener;
         }
@@ -428,7 +427,7 @@ void FmXUndoEnvironment::Inserted(FmFormObj* pObj)
             }
 
             FmFormPageImpl::setUniqueName( xContent, xForm );
-            xNewParent->insertByIndex( nPos, makeAny( xContent ) );
+            xNewParent->insertByIndex( nPos, Any( xContent ) );
 
             Reference< XEventAttacherManager >  xManager( xNewParent, UNO_QUERY_THROW );
             xManager->registerScriptEvents( nPos, pObj->GetOriginalEvents() );
@@ -537,13 +536,13 @@ void SAL_CALL FmXUndoEnvironment::propertyChange(const PropertyChangeEvent& evt)
             return;
 
         // if it's a "default value" property of a control model, set the according "value" property
-        static const std::u16string_view pDefaultValueProperties[] = {
-            u"" FM_PROP_DEFAULT_TEXT, u"" FM_PROP_DEFAULTCHECKED, u"" FM_PROP_DEFAULT_DATE, u"" FM_PROP_DEFAULT_TIME,
-            u"" FM_PROP_DEFAULT_VALUE, u"" FM_PROP_DEFAULT_SELECT_SEQ, u"" FM_PROP_EFFECTIVE_DEFAULT
+        static constexpr rtl::OUStringConstExpr pDefaultValueProperties[] = {
+            FM_PROP_DEFAULT_TEXT, FM_PROP_DEFAULTCHECKED, FM_PROP_DEFAULT_DATE, FM_PROP_DEFAULT_TIME,
+            FM_PROP_DEFAULT_VALUE, FM_PROP_DEFAULT_SELECT_SEQ, FM_PROP_EFFECTIVE_DEFAULT
         };
-        static const std::u16string_view aValueProperties[] = {
-            u"" FM_PROP_TEXT, u"" FM_PROP_STATE, u"" FM_PROP_DATE, u"" FM_PROP_TIME,
-            u"" FM_PROP_VALUE, u"" FM_PROP_SELECT_SEQ, u"" FM_PROP_EFFECTIVE_VALUE
+        static constexpr rtl::OUStringConstExpr aValueProperties[] = {
+            FM_PROP_TEXT, FM_PROP_STATE, FM_PROP_DATE, FM_PROP_TIME,
+            FM_PROP_VALUE, FM_PROP_SELECT_SEQ, FM_PROP_EFFECTIVE_VALUE
         };
         sal_Int32 nDefaultValueProps = SAL_N_ELEMENTS(pDefaultValueProperties);
         OSL_ENSURE(SAL_N_ELEMENTS(aValueProperties) == nDefaultValueProps,
@@ -554,7 +553,7 @@ void SAL_CALL FmXUndoEnvironment::propertyChange(const PropertyChangeEvent& evt)
             {
                 try
                 {
-                    xSet->setPropertyValue(OUString(aValueProperties[i]), evt.NewValue);
+                    xSet->setPropertyValue(aValueProperties[i], evt.NewValue);
                 }
                 catch(const Exception&)
                 {
@@ -1241,7 +1240,7 @@ void FmUndoModelReplaceAction::Undo()
 
             OUString sName;
             xCurrentAsSet->getPropertyValue( FM_PROP_NAME ) >>= sName;
-            xCurrentsParent->replaceByName( sName, makeAny( xComponent ) );
+            xCurrentsParent->replaceByName( sName, Any( xComponent ) );
 
             m_pObject->SetUnoControlModel(m_xReplaced);
             m_pObject->SetChanged();

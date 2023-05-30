@@ -187,7 +187,18 @@ Any SAL_CALL ConstItemContainer::getByIndex( sal_Int32 Index )
 {
     if ( sal_Int32( m_aItemVector.size()) <= Index )
         throw IndexOutOfBoundsException( OUString(), static_cast<OWeakObject *>(this) );
-    return makeAny( m_aItemVector[Index] );
+    return Any( m_aItemVector[Index] );
+}
+
+namespace
+{
+    std::vector<comphelper::PropertyMapEntry> makePropertyMap(const css::uno::Sequence<css::beans::Property>& rProps)
+    {
+        std::vector<comphelper::PropertyMapEntry> aEntries;
+        for (auto const& it : rProps)
+            aEntries.emplace_back(it.Name, it.Handle, it.Type, it.Attributes, 0);
+        return aEntries;
+    }
 }
 
 // XPropertySet
@@ -195,7 +206,8 @@ Reference< XPropertySetInfo > SAL_CALL ConstItemContainer::getPropertySetInfo()
 {
     // Create structure of propertysetinfo for baseclass "OPropertySetHelper".
     // (Use method "getInfoHelper()".)
-    static Reference< XPropertySetInfo > xInfo(new comphelper::PropertySetInfo(getInfoHelper().getProperties()));
+    static std::vector<comphelper::PropertyMapEntry> aPropertyInfos(makePropertyMap(getInfoHelper().getProperties()));
+    static Reference< XPropertySetInfo > xInfo(new comphelper::PropertySetInfo(aPropertyInfos));
 
     return xInfo;
 }
@@ -207,7 +219,7 @@ void SAL_CALL ConstItemContainer::setPropertyValue( const OUString&, const Any& 
 Any SAL_CALL ConstItemContainer::getPropertyValue( const OUString& PropertyName )
 {
     if ( PropertyName == PROPNAME_UINAME )
-        return makeAny( m_aUIName );
+        return Any( m_aUIName );
 
     throw UnknownPropertyException(PropertyName);
 }
@@ -239,7 +251,7 @@ void SAL_CALL ConstItemContainer::setFastPropertyValue( sal_Int32, const css::un
 Any SAL_CALL ConstItemContainer::getFastPropertyValue( sal_Int32 nHandle )
 {
     if ( nHandle == PROPHANDLE_UINAME )
-        return makeAny( m_aUIName );
+        return Any( m_aUIName );
 
     throw UnknownPropertyException(OUString::number(nHandle));
 }

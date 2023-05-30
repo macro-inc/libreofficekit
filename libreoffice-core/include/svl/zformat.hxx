@@ -459,6 +459,9 @@ public:
     void GetNatNumXml(
             css::i18n::NativeNumberXmlAttributes2& rAttr,
             sal_uInt16 nNumFor ) const;
+    /** Return empty string if no NatNum modifier or unvalid nNumFor
+        otherwhise return "[NatNum1]" or "[NatNum12 ...]" */
+    OUString GetNatNumModifierString( sal_uInt16 nNumFor = 0 ) const;
 
     /** Switches to the first non-"gregorian" calendar, but only if the current
         calendar is "gregorian"; original calendar name and date/time returned,
@@ -469,7 +472,7 @@ public:
         is non-"gregorian" and rOrgCalendar is not empty. Thus a preceding
         ImpSwitchToOtherCalendar() call should have been placed prior to
         calling this method. */
-    void SwitchToGregorianCalendar( const OUString& rOrgCalendar, double fOrgDateTime ) const;
+    void SwitchToGregorianCalendar( std::u16string_view rOrgCalendar, double fOrgDateTime ) const;
 
 #ifdef THE_FUTURE
     /** Switches to the first specified calendar, if any, in subformat nNumFor
@@ -584,7 +587,7 @@ private:
      *         list of language types. These numbers also correspond with the
      *         numbers used by Microsoft Office.
      */
-    SVL_DLLPRIVATE static LocaleType ImpGetLocaleType( const OUString& rString, sal_Int32& nPos );
+    SVL_DLLPRIVATE static LocaleType ImpGetLocaleType( std::u16string_view rString, sal_Int32& nPos );
 
     /** Obtain calendar and numerals from a LocaleType that was parsed from a
         LCID with ImpGetLocaleType().

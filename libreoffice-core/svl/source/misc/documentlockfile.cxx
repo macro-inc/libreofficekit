@@ -101,7 +101,7 @@ bool GenDocumentLockFile::CreateOwnLockFile()
 
         // try to let the file be hidden if possible
         try {
-            aTargetContent.setPropertyValue("IsHidden", uno::makeAny( true ) );
+            aTargetContent.setPropertyValue("IsHidden", uno::Any( true ) );
         } catch( uno::Exception& ) {}
     }
     catch( ucb::NameClashException& )
@@ -159,11 +159,11 @@ void GenDocumentLockFile::RemoveFileDirectly()
     uno::Reference < css::ucb::XCommandEnvironment > xEnv;
     ::ucbhelper::Content aCnt(GetURL(), xEnv, comphelper::getProcessComponentContext());
     aCnt.executeCommand("delete",
-        uno::makeAny(true));
+        uno::Any(true));
 }
 
 
-DocumentLockFile::DocumentLockFile( const OUString& aOrigURL )
+DocumentLockFile::DocumentLockFile( std::u16string_view aOrigURL )
     : GenDocumentLockFile(GenerateOwnLockFileURL(aOrigURL, u".~lock."))
 {
 }
@@ -189,7 +189,7 @@ void DocumentLockFile::WriteEntryToStream( const LockFileEntry& aEntry, const un
             aBuffer.append( ';' );
     }
 
-    OString aStringData( OUStringToOString( aBuffer.makeStringAndClear(), RTL_TEXTENCODING_UTF8 ) );
+    OString aStringData( OUStringToOString( aBuffer, RTL_TEXTENCODING_UTF8 ) );
     uno::Sequence< sal_Int8 > aData( reinterpret_cast<sal_Int8 const *>(aStringData.getStr()), aStringData.getLength() );
     xOutput->writeBytes( aData );
 }

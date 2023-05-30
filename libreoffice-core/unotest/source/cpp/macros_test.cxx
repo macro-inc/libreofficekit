@@ -15,6 +15,9 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/frame/DispatchHelper.hpp>
 #include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/security/CertificateValidity.hpp>
+#include <com/sun/star/security/XCertificate.hpp>
+#include <com/sun/star/xml/crypto/XSecurityEnvironment.hpp>
 
 #include <basic/basrdll.hxx>
 #include <cppunit/TestAssert.h>
@@ -24,6 +27,7 @@
 #include <osl/file.hxx>
 #include <osl/process.h>
 #include <osl/thread.h>
+#include <tools/datetime.hxx>
 #include <unotools/tempfile.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 
@@ -71,9 +75,10 @@ MacrosTest::loadFromDesktop(const OUString& rURL, const OUString& rDocService,
     return xComponent;
 }
 
-void MacrosTest::dispatchCommand(const uno::Reference<lang::XComponent>& xComponent,
-                                 const OUString& rCommand,
-                                 const uno::Sequence<beans::PropertyValue>& rPropertyValues)
+css::uno::Any
+MacrosTest::dispatchCommand(const uno::Reference<lang::XComponent>& xComponent,
+                            const OUString& rCommand,
+                            const uno::Sequence<beans::PropertyValue>& rPropertyValues)
 {
     uno::Reference<frame::XController> xController
         = uno::Reference<frame::XModel>(xComponent, uno::UNO_QUERY_THROW)->getCurrentController();
@@ -85,17 +90,16 @@ void MacrosTest::dispatchCommand(const uno::Reference<lang::XComponent>& xCompon
     uno::Reference<frame::XDispatchHelper> xDispatchHelper(frame::DispatchHelper::create(xContext));
     CPPUNIT_ASSERT(xDispatchHelper.is());
 
-    xDispatchHelper->executeDispatch(xFrame, rCommand, OUString(), 0, rPropertyValues);
+    return xDispatchHelper->executeDispatch(xFrame, rCommand, OUString(), 0, rPropertyValues);
 }
 
-std::unique_ptr<SvStream> MacrosTest::parseExportStream(const utl::TempFile& rTempFile,
+std::unique_ptr<SvStream> MacrosTest::parseExportStream(const OUString& url,
                                                         const OUString& rStreamName)
 {
-    const OUString aUrl = rTempFile.GetURL();
     uno::Reference<uno::XComponentContext> xComponentContext
         = comphelper::getProcessComponentContext();
     uno::Reference<packages::zip::XZipFileAccess2> const xZipNames(
-        packages::zip::ZipFileAccess::createWithURL(xComponentContext, aUrl));
+        packages::zip::ZipFileAccess::createWithURL(xComponentContext, url));
     uno::Reference<io::XInputStream> const xInputStream(xZipNames->getByName(rStreamName),
                                                         uno::UNO_QUERY);
     std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));
@@ -105,8 +109,8 @@ std::unique_ptr<SvStream> MacrosTest::parseExportStream(const utl::TempFile& rTe
 void MacrosTest::setUpNssGpg(const test::Directories& rDirectories, const OUString& rTestName)
 {
     OUString aSourceDir = rDirectories.getURLFromSrc(u"/test/signing-keys/");
-    OUString aTargetDir = rDirectories.getURLFromWorkdir(
-        OUStringConcatenation("CppunitTest/" + rTestName + ".test.user"));
+    OUString aTargetDir
+        = rDirectories.getURLFromWorkdir(Concat2View("CppunitTest/" + rTestName + ".test.user"));
 
     // Set up NSS database in workdir/CppunitTest/
     osl::File::copy(aSourceDir + "cert9.db", aTargetDir + "/cert9.db");
@@ -169,6 +173,55 @@ void MacrosTest::tearDownNssGpg()
 #else
     (void)this;
 #endif
+}
+
+namespace
+{
+struct Valid
+{
+    DateTime now;
+    OUString subjectName;
+    const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& env;
+    Valid(const css::uno::Sequence<css::beans::PropertyValue>& rFilterData,
+          const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& rEnv)
+        : now(DateTime::SYSTEM)
+        , env(rEnv)
+    {
+        for (const auto& propVal : rFilterData)
+        {
+            if (propVal.Name == "SignCertificateSubjectName")
+                propVal.Value >>= subjectName;
+        }
+    }
+    bool operator()(const css::uno::Reference<css::security::XCertificate>& cert) const
+    {
+        if (!now.IsBetween(cert->getNotValidBefore(), cert->getNotValidAfter()))
+            return false;
+        if (!subjectName.isEmpty() && subjectName != cert->getSubjectName())
+            return false;
+        if (env->verifyCertificate(cert, {}) != css::security::CertificateValidity::VALID)
+            return false;
+        return true;
+    }
+};
+}
+
+bool MacrosTest::IsValid(const css::uno::Reference<css::security::XCertificate>& cert,
+                         const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& env)
+{
+    const Valid test({}, env);
+    return test(cert);
+}
+
+css::uno::Reference<css::security::XCertificate> MacrosTest::GetValidCertificate(
+    const css::uno::Sequence<css::uno::Reference<css::security::XCertificate>>& certs,
+    const css::uno::Reference<css::xml::crypto::XSecurityEnvironment>& env,
+    const css::uno::Sequence<css::beans::PropertyValue>& rFilterData)
+{
+    if (auto it = std::find_if(certs.begin(), certs.end(), Valid(rFilterData, env));
+        it != certs.end())
+        return *it;
+    return {};
 }
 }
 

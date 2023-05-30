@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <rootfrm.hxx>
 #include <pagefrm.hxx>
 #include <viewimp.hxx>
@@ -24,14 +26,13 @@
 #include <flyfrm.hxx>
 #include <layact.hxx>
 #include <dview.hxx>
-#include <swmodule.hxx>
 #include <svx/svdpage.hxx>
 #include <accmap.hxx>
 
 #include <officecfg/Office/Common.hxx>
 #include <pagepreviewlayout.hxx>
 #include <comphelper/lok.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <IDocumentLayoutAccess.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <drawdoc.hxx>
@@ -98,7 +99,9 @@ SwViewShellImp::SwViewShellImp( SwViewShell *pParent ) :
 
 SwViewShellImp::~SwViewShellImp()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     m_pAccessibleMap.reset();
+#endif
 
     m_pPagePreviewLayout.reset();
 
@@ -119,20 +122,20 @@ bool SwViewShellImp::AddPaintRect( const SwRect &rRect )
     // In case of tiled rendering the visual area is the last painted tile -> not interesting.
     if ( rRect.Overlaps( m_pShell->VisArea() ) || comphelper::LibreOfficeKit::isActive() )
     {
-        if ( !m_pPaintRegion )
+        if ( !m_oPaintRegion )
         {
             // In case of normal rendering, this makes sure only visible rectangles are painted.
             // Otherwise get the rectangle of the full document, so all paint rectangles are invalidated.
             const SwRect& rArea = comphelper::LibreOfficeKit::isActive() ? m_pShell->GetLayout()->getFrameArea() : m_pShell->VisArea();
-            m_pPaintRegion.reset(new SwRegionRects);
-            m_pPaintRegion->ChangeOrigin(rArea);
+            m_oPaintRegion.emplace();
+            m_oPaintRegion->ChangeOrigin(rArea);
         }
-        if(!m_pPaintRegion->empty())
+        if(!m_oPaintRegion->empty())
         {
             // This function often gets called with rectangles that line up vertically.
             // Try to extend the last one downwards to include the new one (use Union()
             // in case the new one is actually already contained in the last one).
-            SwRect& last = m_pPaintRegion->back();
+            SwRect& last = m_oPaintRegion->back();
             if(last.Left() == rRect.Left() && last.Width() == rRect.Width()
                 && last.Bottom() + 1 >= rRect.Top() && last.Bottom() <= rRect.Bottom())
             {
@@ -140,21 +143,21 @@ bool SwViewShellImp::AddPaintRect( const SwRect &rRect )
                 // And these rectangles lined up vertically often come up in groups
                 // that line up horizontally. Try to extend the previous rectangle
                 // to the right to include the last one.
-                if(m_pPaintRegion->size() > 1)
+                if(m_oPaintRegion->size() > 1)
                 {
-                    SwRect& last2 = (*m_pPaintRegion)[m_pPaintRegion->size() - 2];
+                    SwRect& last2 = (*m_oPaintRegion)[m_oPaintRegion->size() - 2];
                     if(last2.Top() == last.Top() && last2.Height() == last.Height()
                         && last2.Right() + 1 >= last.Left() && last2.Right() <= last2.Right())
                     {
                         last2.Union(last);
-                        m_pPaintRegion->pop_back();
+                        m_oPaintRegion->pop_back();
                         return true;
                     }
                 }
                 return true;
             }
         }
-        (*m_pPaintRegion) += rRect;
+        (*m_oPaintRegion) += rRect;
         return true;
     }
     return false;
@@ -297,7 +300,7 @@ Color SwViewShellImp::GetRetoucheColor() const
                     !officecfg::Office::Common::Accessibility::IsForPagePreviews::get())
             aRet = COL_WHITE;
         else
-            aRet = SwViewOption::GetDocColor();
+            aRet = rSh.GetViewOptions()->GetDocColor();
     }
     return aRet;
 }
@@ -316,6 +319,30 @@ const SwPageFrame *SwViewShellImp::GetFirstVisPage(OutputDevice const * pRenderC
     return m_pFirstVisiblePage;
 }
 
+const SwPageFrame* SwViewShellImp::GetLastVisPage(const OutputDevice* pRenderContext) const
+{
+    const SwViewOption* pSwViewOption = m_pShell->GetViewOptions();
+    const bool bBookMode = pSwViewOption->IsViewLayoutBookMode();
+    const SwPageFrame* pPage = GetFirstVisPage(pRenderContext);
+    const SwPageFrame* pLastVisPage = pPage;
+    SwRect aPageRect = pPage->GetBoundRect(pRenderContext);
+    while (pPage && (pPage->IsEmptyPage() || aPageRect.Overlaps(m_pShell->VisArea())))
+    {
+        pLastVisPage = pPage;
+        pPage = static_cast<const SwPageFrame*>(pPage->GetNext());
+        if (pPage)
+        {
+            aPageRect = pPage->GetBoundRect(pRenderContext);
+            if (bBookMode && pPage->IsEmptyPage())
+            {
+                const SwPageFrame& rFormatPage = pPage->GetFormatPage();
+                aPageRect.SSize(rFormatPage.GetBoundRect(pRenderContext).SSize());
+            }
+        }
+    }
+    return pLastVisPage;
+}
+
 // create page preview layout
 void SwViewShellImp::InitPagePreviewLayout()
 {
@@ -324,6 +351,7 @@ void SwViewShellImp::InitPagePreviewLayout()
         m_pPagePreviewLayout.reset( new SwPagePreviewLayout( *m_pShell, *(m_pShell->GetLayout()) ) );
 }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 void SwViewShellImp::UpdateAccessible()
 {
     // We require a layout and an XModel to be accessible.
@@ -495,5 +523,6 @@ void SwViewShellImp::FireAccessibleEvents()
     if( IsAccessible() )
         GetAccessibleMap().FireEvents();
 }
+#endif // ENABLE_WASM_STRIP_ACCESSIBILITY
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

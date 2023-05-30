@@ -24,6 +24,7 @@
 
 #include <svl/lstner.hxx>
 #include <com/sun/star/awt/Size.hpp>
+#include <com/sun/star/awt/Rectangle.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/datatransfer/XTransferable.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
@@ -34,6 +35,9 @@
 #include <com/sun/star/util/XModeChangeBroadcaster.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
 #include <com/sun/star/util/XUpdatable2.hpp>
+#include <rtl/ref.hxx>
+#include <svx/unopage.hxx>
+#include <svx/unoshape.hxx>
 
 #include <vector>
 #include <memory>
@@ -79,7 +83,7 @@ struct TimeBasedInfo
  * The View is not responsible to handle single user events (that is instead
  * done by the ChartWindow).
  */
-class ChartView final : public ::cppu::WeakImplHelper<
+class OOO_DLLPUBLIC_CHARTVIEW ChartView final : public ::cppu::WeakImplHelper<
     css::lang::XInitialization
         ,css::lang::XServiceInfo
         ,css::datatransfer::XTransferable
@@ -100,8 +104,7 @@ private:
 
 public:
     ChartView() = delete;
-    ChartView(css::uno::Reference< css::uno::XComponentContext > const & xContext,
-               ChartModel& rModel);
+    ChartView(css::uno::Reference<css::uno::XComponentContext> xContext, ChartModel& rModel);
 
     virtual ~ChartView() override;
 
@@ -118,7 +121,7 @@ public:
         css::uno::Reference< css::chart2::XAxis > xAxis
         , ExplicitScaleData&  rExplicitScale
         , ExplicitIncrementData& rExplicitIncrement ) override;
-    virtual css::uno::Reference< css::drawing::XShape >
+    virtual rtl::Reference< SvxShape >
         getShapeForCID( const OUString& rObjectCID ) override;
 
     virtual css::awt::Rectangle getRectangleOfObject( const OUString& rObjectCID, bool bSnapRect=false ) override;
@@ -214,9 +217,9 @@ private: //member
 
     css::uno::Reference< css::lang::XMultiServiceFactory>
             m_xShapeFactory;
-    css::uno::Reference< css::drawing::XDrawPage>
+    rtl::Reference<SvxDrawPage>
             m_xDrawPage;
-    css::uno::Reference< css::drawing::XShapes >
+    rtl::Reference<SvxShapeGroupAnyD>
             mxRootShape;
 
     css::uno::Reference< css::uno::XInterface > m_xDashTable;

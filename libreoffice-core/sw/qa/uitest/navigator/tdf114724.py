@@ -5,6 +5,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 from libreoffice.uno.propertyvalue import mkPropertyValues
@@ -13,7 +14,7 @@ from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 class tdf114724(UITestCase):
 
     def test_track_headings_outline(self):
-        with self.ui_test.load_file(get_url_for_data_file("tdf114724.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf114724.odt")):
             xWriterDoc = self.xUITest.getTopFocusWindow()
             xWriterEdit = xWriterDoc.getChild("writer_edit")
 

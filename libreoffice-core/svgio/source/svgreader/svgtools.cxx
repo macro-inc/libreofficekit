@@ -19,9 +19,9 @@
 
 #include <svgtools.hxx>
 #include <sal/log.hxx>
-#include <osl/diagnose.h>
 #include <tools/color.hxx>
 #include <rtl/math.hxx>
+#include <o3tl/string_view.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <svgtoken.hxx>
@@ -274,7 +274,7 @@ namespace svgio::svgreader
                     rtl_math_ConversionStatus eStatus;
 
                     fNum = rtl::math::stringToDouble(
-                        aNum.makeStringAndClear(), '.', ',',
+                        aNum, '.', ',',
                         &eStatus);
 
                     return eStatus == rtl_math_ConversionStatus_Ok;
@@ -402,7 +402,7 @@ namespace svgio::svgreader
             return false;
         }
 
-        bool readAngle(const OUString& rCandidate, sal_Int32& nPos, double& fAngle, const sal_Int32 nLen)
+        bool readAngle(std::u16string_view rCandidate, sal_Int32& nPos, double& fAngle, const sal_Int32 nLen)
         {
             if(readNumber(rCandidate, nPos, fAngle, nLen))
             {
@@ -418,18 +418,18 @@ namespace svgio::svgreader
                 if(nPos < nLen)
                 {
                     const sal_Unicode aChar(rCandidate[nPos]);
-                    static const char aStrGrad[] = "grad";
-                    static const char aStrRad[] = "rad";
+                    static constexpr std::u16string_view aStrGrad = u"grad";
+                    static constexpr std::u16string_view aStrRad = u"rad";
 
                     switch(aChar)
                     {
                         case u'g' :
                         case u'G' :
                         {
-                            if(rCandidate.matchIgnoreAsciiCase(aStrGrad, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrGrad, nPos))
                             {
                                 // angle in grad
-                                nPos += strlen(aStrGrad);
+                                nPos += aStrGrad.size();
                                 aType = DegreeType::grad;
                             }
                             break;
@@ -437,10 +437,10 @@ namespace svgio::svgreader
                         case u'r' :
                         case u'R' :
                         {
-                            if(rCandidate.matchIgnoreAsciiCase(aStrRad, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrRad, nPos))
                             {
                                 // angle in radians
-                                nPos += strlen(aStrRad);
+                                nPos += aStrRad.size();
                                 aType = DegreeType::rad;
                             }
                             break;
@@ -803,9 +803,9 @@ namespace svgio::svgreader
             return false;
         }
 
-        basegfx::B2DRange readViewBox(const OUString& rCandidate, InfoProvider const & rInfoProvider)
+        basegfx::B2DRange readViewBox(std::u16string_view rCandidate, InfoProvider const & rInfoProvider)
         {
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
 
             if(nLen)
             {
@@ -844,10 +844,10 @@ namespace svgio::svgreader
             return basegfx::B2DRange();
         }
 
-        basegfx::B2DHomMatrix readTransform(const OUString& rCandidate, InfoProvider const & rInfoProvider)
+        basegfx::B2DHomMatrix readTransform(std::u16string_view rCandidate, InfoProvider const & rInfoProvider)
         {
             basegfx::B2DHomMatrix aMatrix;
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
 
             if(nLen)
             {
@@ -858,21 +858,21 @@ namespace svgio::svgreader
                 {
                     const sal_Unicode aChar(rCandidate[nPos]);
                     const sal_Int32 nInitPos(nPos);
-                    static const char aStrMatrix[] = "matrix";
-                    static const char aStrTranslate[] = "translate";
-                    static const char aStrScale[] = "scale";
-                    static const char aStrRotate[] = "rotate";
-                    static const char aStrSkewX[] = "skewX";
-                    static const char aStrSkewY[] = "skewY";
+                    static constexpr std::u16string_view aStrMatrix = u"matrix";
+                    static constexpr std::u16string_view aStrTranslate = u"translate";
+                    static constexpr std::u16string_view aStrScale = u"scale";
+                    static constexpr std::u16string_view aStrRotate = u"rotate";
+                    static constexpr std::u16string_view aStrSkewX = u"skewX";
+                    static constexpr std::u16string_view aStrSkewY = u"skewY";
 
                     switch(aChar)
                     {
                         case u'm' :
                         {
-                            if(rCandidate.match(aStrMatrix, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrMatrix, nPos))
                             {
                                 // matrix element
-                                nPos += strlen(aStrMatrix);
+                                nPos += aStrMatrix.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 SvgNumber aVal;
                                 basegfx::B2DHomMatrix aNew;
@@ -923,10 +923,10 @@ namespace svgio::svgreader
                         }
                         case u't' :
                         {
-                            if(rCandidate.match(aStrTranslate, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrTranslate, nPos))
                             {
                                 // translate element
-                                nPos += strlen(aStrTranslate);
+                                nPos += aStrTranslate.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 SvgNumber aTransX;
 
@@ -947,10 +947,10 @@ namespace svgio::svgreader
                         }
                         case u's' :
                         {
-                            if(rCandidate.match(aStrScale, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrScale, nPos))
                             {
                                 // scale element
-                                nPos += strlen(aStrScale);
+                                nPos += aStrScale.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 SvgNumber aScaleX;
 
@@ -967,10 +967,10 @@ namespace svgio::svgreader
                                         aScaleY.solve(rInfoProvider));
                                 }
                             }
-                            else if(rCandidate.match(aStrSkewX, nPos))
+                            else if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrSkewX, nPos))
                             {
                                 // skewx element
-                                nPos += strlen(aStrSkewX);
+                                nPos += aStrSkewX.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 double fSkewX(0.0);
 
@@ -982,10 +982,10 @@ namespace svgio::svgreader
                                     aMatrix = aMatrix * basegfx::utils::createShearXB2DHomMatrix(tan(fSkewX));
                                 }
                             }
-                            else if(rCandidate.match(aStrSkewY, nPos))
+                            else if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrSkewY, nPos))
                             {
                                 // skewy element
-                                nPos += strlen(aStrSkewY);
+                                nPos += aStrSkewY.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 double fSkewY(0.0);
 
@@ -1001,10 +1001,10 @@ namespace svgio::svgreader
                         }
                         case u'r' :
                         {
-                            if(rCandidate.match(aStrRotate, nPos))
+                            if(o3tl::matchIgnoreAsciiCase(rCandidate, aStrRotate, nPos))
                             {
                                 // rotate element
-                                nPos += strlen(aStrRotate);
+                                nPos += aStrRotate.size();
                                 skip_char(rCandidate, ' ', '(', nPos, nLen);
                                 double fAngle(0.0);
 
@@ -1049,12 +1049,30 @@ namespace svgio::svgreader
             return aMatrix;
         }
 
-        bool readSingleNumber(const OUString& rCandidate, SvgNumber& aNum)
+        bool readSingleNumber(std::u16string_view rCandidate, SvgNumber& aNum)
         {
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
             sal_Int32 nPos(0);
 
             return readNumberAndUnit(rCandidate, nPos, aNum, nLen);
+        }
+
+        bool readLocalLink(std::u16string_view rCandidate, OUString& rURL)
+        {
+            sal_Int32 nPos(0);
+            const sal_Int32 nLen(rCandidate.size());
+
+            skip_char(rCandidate, ' ', nPos, nLen);
+
+            if (nLen && nPos < nLen && '#' == rCandidate[nPos])
+            {
+                ++nPos;
+                rURL = rCandidate.substr(nPos);
+
+                return true;
+            }
+
+            return false;
         }
 
         bool readLocalUrl(const OUString& rCandidate, OUString& rURL)
@@ -1108,7 +1126,7 @@ namespace svgio::svgreader
                 }
                 else
                 {
-                    if(rCandidate.startsWith("none"))
+                    if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(rCandidate), u"none"))
                     {
                         rSvgPaint = SvgPaint(aColor, true, false, false);
                         return true;
@@ -1118,7 +1136,7 @@ namespace svgio::svgreader
                         /// Url is copied to rURL, but needs to be solved outside this helper
                         return false;
                     }
-                    else if(rCandidate.startsWith("currentColor"))
+                    else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(rCandidate), u"currentColor"))
                     {
                         rSvgPaint = SvgPaint(aColor, true, true, true);
                         return true;
@@ -1129,9 +1147,9 @@ namespace svgio::svgreader
             return false;
         }
 
-        bool readSvgNumberVector(const OUString& rCandidate, SvgNumberVector& rSvgNumberVector)
+        bool readSvgNumberVector(std::u16string_view rCandidate, SvgNumberVector& rSvgNumberVector)
         {
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
             rSvgNumberVector.clear();
 
             if(nLen)
@@ -1152,9 +1170,9 @@ namespace svgio::svgreader
             return false;
         }
 
-        SvgAspectRatio readSvgAspectRatio(const OUString& rCandidate)
+        SvgAspectRatio readSvgAspectRatio(std::u16string_view rCandidate)
         {
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
 
             if(nLen)
             {
@@ -1274,10 +1292,10 @@ namespace svgio::svgreader
             return SvgAspectRatio();
         }
 
-        bool readSvgStringVector(const OUString& rCandidate, SvgStringVector& rSvgStringVector)
+        bool readSvgStringVector(std::u16string_view rCandidate, SvgStringVector& rSvgStringVector)
         {
             rSvgStringVector.clear();
-            const sal_Int32 nLen(rCandidate.getLength());
+            const sal_Int32 nLen(rCandidate.size());
 
             if(nLen)
             {
@@ -1308,16 +1326,11 @@ namespace svgio::svgreader
             rMimeType.clear();
             rData.clear();
 
-            if('#' == rCandidate[0])
-            {
-                // local link
-                rXLink = rCandidate.copy(1);
-            }
-            else
+            if(!readLocalLink(rCandidate, rXLink))
             {
                 static const char aStrData[] = "data:";
 
-                if(rCandidate.match(aStrData, 0))
+                if(rCandidate.matchIgnoreAsciiCase(aStrData, 0))
                 {
                     // embedded data
                     sal_Int32 nPos(strlen(aStrData));
@@ -1335,20 +1348,20 @@ namespace svgio::svgreader
                         if(rMimeType.startsWith("image"))
                         {
                             // image data
-                            OUString aData(rCandidate.copy(nPos));
-                            static const char aStrBase64[] = "base64";
+                            std::u16string_view aData(rCandidate.subView(nPos));
+                            static constexpr std::u16string_view aStrBase64 = u"base64";
 
-                            if(aData.startsWith(aStrBase64))
+                            if(o3tl::starts_with(aData, aStrBase64))
                             {
                                 // base64 encoded
-                                nPos = strlen(aStrBase64);
-                                nLen = aData.getLength();
+                                nPos = aStrBase64.size();
+                                nLen = aData.size();
 
                                 skip_char(aData, ' ', ',', nPos, nLen);
 
                                 if(nPos < nLen)
                                 {
-                                    rData = aData.copy(nPos);
+                                    rData = aData.substr(nPos);
                                 }
                             }
                         }
@@ -1360,46 +1373,6 @@ namespace svgio::svgreader
                     rUrl = rCandidate;
                 }
             }
-        }
-
-        OUString convert(const OUString& rCandidate, sal_Unicode nPattern, sal_Unicode nNew, bool bRemove)
-        {
-            const sal_Int32 nLen(rCandidate.getLength());
-
-            if(nLen)
-            {
-                sal_Int32 nPos(0);
-                OUStringBuffer aBuffer;
-                bool bChanged(false);
-
-                while(nPos < nLen)
-                {
-                    const sal_Unicode aChar(rCandidate[nPos]);
-
-                    if(nPattern == aChar)
-                    {
-                        bChanged = true;
-
-                        if(!bRemove)
-                        {
-                            aBuffer.append(nNew);
-                        }
-                    }
-                    else
-                    {
-                        aBuffer.append(aChar);
-                    }
-
-                    nPos++;
-                }
-
-                if(bChanged)
-                {
-                    return aBuffer.makeStringAndClear();
-                }
-            }
-
-            return rCandidate;
         }
 
         // #i125325#
@@ -1500,40 +1473,20 @@ namespace svgio::svgreader
             return rCandidate;
         }
 
-        OUString whiteSpaceHandlingDefault(const OUString& rCandidate)
+        OUString xmlSpaceHandling(const OUString& rCandidate, bool bIsDefault)
         {
-            const sal_Unicode aNewline('\n');
-            const sal_Unicode aTab('\t');
-            const sal_Unicode aSpace(' ');
+            // if xml:space="default" then remove all newline characters, otherwise convert them to space
+            // convert tab to space too
+            OUString aRetval(rCandidate.replaceAll(u"\n", bIsDefault ? u"" : u" ").replaceAll(u"\t", u" "));
 
-            // remove all newline characters
-            OUString aRetval(convert(rCandidate, aNewline, aNewline, true));
-
-            // convert tab to space
-            aRetval = convert(aRetval, aTab, aSpace, false);
-
-            // strip of all leading and trailing spaces
-            aRetval = aRetval.trim();
-
-            // consolidate contiguous space
-            aRetval = consolidateContiguousSpace(aRetval);
+            if(bIsDefault)
+            {
+                // strip of all leading and trailing spaces
+                // and consolidate contiguous space
+                aRetval = consolidateContiguousSpace(aRetval.trim());
+            }
 
             return aRetval;
-        }
-
-        OUString whiteSpaceHandlingPreserve(const OUString& rCandidate)
-        {
-            const sal_Unicode aNewline('\n');
-            const sal_Unicode aTab('\t');
-            const sal_Unicode aSpace(' ');
-
-            // convert newline to space
-            convert(rCandidate, aNewline, aSpace, false);
-
-            // convert tab to space
-            convert(rCandidate, aTab, aSpace, false);
-
-            return rCandidate;
         }
 
         ::std::vector< double > solveSvgNumberVector(const SvgNumberVector& rInput, const InfoProvider& rInfoProvider)

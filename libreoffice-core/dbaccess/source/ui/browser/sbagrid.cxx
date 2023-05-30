@@ -18,7 +18,6 @@
  */
 
 #include <core_resource.hxx>
-#include <helpids.h>
 
 #include <sot/exchange.hxx>
 
@@ -34,26 +33,22 @@
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 #include <com/sun/star/awt/XTextComponent.hpp>
 #include <com/sun/star/sdbc/XResultSetUpdate.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <svl/numuno.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
 #include <vcl/svapp.hxx>
 
-#include <svl/zforlist.hxx>
 #include <cppuhelper/queryinterface.hxx>
 #include <connectivity/dbtools.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/types.hxx>
 #include <com/sun/star/sdbc/DataType.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
-#include <browserids.hxx>
 #include <strings.hrc>
 #include <strings.hxx>
 #include <dbexchange.hxx>
-#include <TableRowExchange.hxx>
-#include <TableRow.hxx>
 #include <svtools/stringtransfer.hxx>
 #include <UITools.hxx>
 #include <TokenWriter.hxx>
@@ -280,13 +275,12 @@ void SbaXGridPeer::NotifyStatusChanged(const css::util::URL& _rUrl, const Refere
         xControl->statusChanged(aEvt);
     else
     {
-        ::comphelper::OInterfaceContainerHelper2 * pIter = m_aStatusListeners.getContainer(_rUrl);
+        ::comphelper::OInterfaceContainerHelper3<css::frame::XStatusListener> * pIter
+            = m_aStatusListeners.getContainer(_rUrl);
 
         if (pIter)
         {
-            ::comphelper::OInterfaceIteratorHelper2 aListIter(*pIter);
-            while (aListIter.hasMoreElements())
-                static_cast< css::frame::XStatusListener*>(aListIter.next())->statusChanged(aEvt);
+            pIter->notifyEach( &XStatusListener::statusChanged, aEvt );
         }
     }
 }
@@ -445,7 +439,8 @@ void SAL_CALL SbaXGridPeer::dispatch(const URL& aURL, const Sequence< PropertyVa
 
 void SAL_CALL SbaXGridPeer::addStatusListener(const Reference< css::frame::XStatusListener > & xControl, const css::util::URL& aURL)
 {
-    ::comphelper::OInterfaceContainerHelper2* pCont = m_aStatusListeners.getContainer(aURL);
+    ::comphelper::OInterfaceContainerHelper3< css::frame::XStatusListener >* pCont
+        = m_aStatusListeners.getContainer(aURL);
     if (!pCont)
         m_aStatusListeners.addInterface(aURL,xControl);
     else
@@ -455,7 +450,7 @@ void SAL_CALL SbaXGridPeer::addStatusListener(const Reference< css::frame::XStat
 
 void SAL_CALL SbaXGridPeer::removeStatusListener(const Reference< css::frame::XStatusListener > & xControl, const css::util::URL& aURL)
 {
-    ::comphelper::OInterfaceContainerHelper2* pCont = m_aStatusListeners.getContainer(aURL);
+    ::comphelper::OInterfaceContainerHelper3< css::frame::XStatusListener >* pCont = m_aStatusListeners.getContainer(aURL);
     if ( pCont )
         pCont->removeInterface(xControl);
 }

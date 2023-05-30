@@ -53,6 +53,9 @@ ColRowSpan::ColRowSpan(SCCOLROW nStart, SCCOLROW nEnd) : mnStart(nStart), mnEnd(
 ColumnSpanSet::ColumnType::ColumnType(SCROW nStart, SCROW nEnd, bool bInit) :
     maSpans(nStart, nEnd+1, bInit), miPos(maSpans.begin()) {}
 
+ColumnSpanSet::ColumnType::ColumnType(const ColumnType& rOther) :
+    maSpans(rOther.maSpans), miPos(maSpans.begin()) {} // NB: copying maSpans invalidates miPos - reset it
+
 ColumnSpanSet::Action::~Action() {}
 void ColumnSpanSet::Action::startColumn(SCTAB /*nTab*/, SCCOL /*nCol*/) {}
 
@@ -74,7 +77,7 @@ ColumnSpanSet::ColumnType& ColumnSpanSet::getColumn(const ScDocument& rDoc, SCTA
         rTab.resize(nCol+1);
 
     if (!rTab[nCol])
-        rTab[nCol].reset(new ColumnType(0, rDoc.MaxRow(), /*bInit*/false));
+        rTab[nCol].emplace(0, rDoc.MaxRow(), /*bInit*/false);
 
     return *rTab[nCol];
 }
@@ -142,6 +145,7 @@ void ColumnSpanSet::scan(
 
         ColumnNonEmptyRangesScanner aScanner(rCol.maSpans, bVal);
         ParseBlock(rSrcCells.begin(), rSrcCells, aScanner, nRow1, nRow2);
+        rCol.miPos = rCol.maSpans.begin();
     }
 }
 
@@ -165,7 +169,7 @@ void ColumnSpanSet::executeAction(ScDocument& rDoc, Action& ac) const
                 break;
 
             ac.startColumn(nTab, nCol);
-            ColumnType& rCol = *rTab[nCol];
+            const ColumnType& rCol = *rTab[nCol];
             ColumnSpansType::const_iterator it = rCol.maSpans.begin(), itEnd = rCol.maSpans.end();
             SCROW nRow1, nRow2;
             nRow1 = it->first;
@@ -203,7 +207,7 @@ void ColumnSpanSet::executeColumnAction(ScDocument& rDoc, ColumnAction& ac) cons
 
             ScColumn& rColumn = pTab->aCol[nCol];
             ac.startColumn(&rColumn);
-            ColumnType& rCol = *rTab[nCol];
+            const ColumnType& rCol = *rTab[nCol];
             ColumnSpansType::const_iterator it = rCol.maSpans.begin(), itEnd = rCol.maSpans.end();
             SCROW nRow1, nRow2;
             nRow1 = it->first;

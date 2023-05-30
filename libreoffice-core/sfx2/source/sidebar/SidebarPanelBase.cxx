@@ -21,7 +21,9 @@
 #include <sfx2/sidebar/IContextChangeReceiver.hxx>
 #include <sfx2/sidebar/PanelLayout.hxx>
 #include <sfx2/sidebar/SidebarModelUpdate.hxx>
-#include <vcl/layout.hxx>
+#include <utility>
+#include <vcl/EnumContext.hxx>
+#include <vcl/svapp.hxx>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <com/sun/star/ui/ContextChangeEventMultiplexer.hpp>
@@ -48,14 +50,13 @@ Reference<ui::XUIElement> SidebarPanelBase::Create (
 }
 
 SidebarPanelBase::SidebarPanelBase (
-    const OUString& rsResourceURL,
-    const css::uno::Reference<css::frame::XFrame>& rxFrame,
+    OUString sResourceURL,
+    css::uno::Reference<css::frame::XFrame> xFrame,
     std::unique_ptr<PanelLayout> xControl,
     const css::ui::LayoutSize& rLayoutSize)
-    : SidebarPanelBaseInterfaceBase(m_aMutex),
-      mxFrame(rxFrame),
+    : mxFrame(std::move(xFrame)),
       mxControl(std::move(xControl)),
-      msResourceURL(rsResourceURL),
+      msResourceURL(std::move(sResourceURL)),
       maLayoutSize(rLayoutSize)
 {
     if (mxFrame.is())
@@ -78,7 +79,7 @@ void SidebarPanelBase::SetParentPanel(sfx2::sidebar::Panel* pPanel)
     mxControl->SetPanel(pPanel);
 }
 
-void SAL_CALL SidebarPanelBase::disposing()
+void SidebarPanelBase::disposing(std::unique_lock<std::mutex>&)
 {
     SolarMutexGuard aGuard;
 

@@ -7,8 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
@@ -24,15 +23,16 @@ namespace
 {
 
 /// Tests the handling of the .uno:ClassificationApply command in various applications.
-class ClassificationTest : public test::BootstrapFixture, public unotest::MacrosTest
+class ClassificationTest : public UnoApiTest
 {
-    uno::Reference<lang::XComponent> mxComponent;
-    void dispatchCommand(const uno::Reference<lang::XComponent>& xComponent, const OUString& rCommand, const uno::Sequence<beans::PropertyValue>& rPropertyValues);
     void testClassification();
 
 public:
-    virtual void setUp() override;
-    virtual void tearDown() override;
+    ClassificationTest()
+        : UnoApiTest("/sfx2/qa/cppunit/data/")
+    {
+    }
+
     void testWriter();
     void testCalc();
     void testImpress();
@@ -44,41 +44,12 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-void ClassificationTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void ClassificationTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
-}
-
-void ClassificationTest::dispatchCommand(const uno::Reference<lang::XComponent>& xComponent, const OUString& rCommand, const uno::Sequence<beans::PropertyValue>& rPropertyValues)
-{
-    uno::Reference<frame::XController> xController = uno::Reference<frame::XModel>(xComponent, uno::UNO_QUERY_THROW)->getCurrentController();
-    CPPUNIT_ASSERT(xController.is());
-    uno::Reference<frame::XDispatchProvider> xFrame(xController->getFrame(), uno::UNO_QUERY);
-    CPPUNIT_ASSERT(xFrame.is());
-
-    uno::Reference<uno::XComponentContext> xContext = ::comphelper::getProcessComponentContext();
-    uno::Reference<frame::XDispatchHelper> xDispatchHelper(frame::DispatchHelper::create(xContext));
-    CPPUNIT_ASSERT(xDispatchHelper.is());
-
-    xDispatchHelper->executeDispatch(xFrame, rCommand, OUString(), 0, rPropertyValues);
-}
-
 void ClassificationTest::testClassification()
 {
     uno::Sequence<beans::PropertyValue> aPropertyValues(comphelper::InitPropertySequence(
     {
-        {"Name", uno::makeAny(OUString("Non-Business"))},
-        {"Type", uno::makeAny(OUString("urn:bails:ExportControl:"))},
+        {"Name", uno::Any(OUString("Non-Business"))},
+        {"Type", uno::Any(OUString("urn:bails:ExportControl:"))},
     }));
     dispatchCommand(mxComponent, ".uno:ClassificationApply", aPropertyValues);
 
@@ -91,8 +62,8 @@ void ClassificationTest::testClassification()
 
     aPropertyValues = comphelper::InitPropertySequence(
     {
-        {"Name", uno::makeAny(OUString("Confidential"))},
-        {"Type", uno::makeAny(OUString("urn:bails:NationalSecurity:"))},
+        {"Name", uno::Any(OUString("Confidential"))},
+        {"Type", uno::Any(OUString("urn:bails:NationalSecurity:"))},
     });
     dispatchCommand(mxComponent, ".uno:ClassificationApply", aPropertyValues);
     aAny = xPropertySet->getPropertyValue("urn:bails:NationalSecurity:BusinessAuthorizationCategory:Identifier");
@@ -100,8 +71,8 @@ void ClassificationTest::testClassification()
 
     aPropertyValues = comphelper::InitPropertySequence(
     {
-        {"Name", uno::makeAny(OUString("Internal Only"))},
-        {"Type", uno::makeAny(OUString("urn:bails:IntellectualProperty:"))},
+        {"Name", uno::Any(OUString("Internal Only"))},
+        {"Type", uno::Any(OUString("urn:bails:IntellectualProperty:"))},
     });
     dispatchCommand(mxComponent, ".uno:ClassificationApply", aPropertyValues);
     aAny = xPropertySet->getPropertyValue("urn:bails:IntellectualProperty:BusinessAuthorizationCategory:Identifier");

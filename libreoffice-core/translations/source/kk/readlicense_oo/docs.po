@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-02-01 16:18+0000\n"
+"POT-Creation-Date: 2023-01-25 12:36+0100\n"
+"PO-Revision-Date: 2022-12-19 14:09+0000\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <https://translations.documentfoundation.org/projects/libo_ui-master/readlicense_oodocs/kk/>\n"
 "Language: kk\n"
@@ -124,14 +124,14 @@ msgctxt ""
 msgid "System Requirements"
 msgstr "Жүйелік талаптар"
 
-#. GmJb9
+#. xQJjD
 #: readme.xrm
 msgctxt ""
 "readme.xrm\n"
 "macxiOSX\n"
 "readmeitem.text"
-msgid "macOS 10.10 (Yosemite) or higher"
-msgstr "macOS 10.10 (Yosemite) немесе жаңалау"
+msgid "macOS 10.14 (Mojave) or higher"
+msgstr "macOS 10.14 (Mojave) немесе жаңалау"
 
 #. zfLqy
 #: readme.xrm
@@ -590,7 +590,7 @@ msgctxt ""
 "abcdef\n"
 "readmeitem.text"
 msgid "Difficulties starting ${PRODUCTNAME} (e.g. applications hang) as well as problems with the screen display are often caused by the graphics card driver. If these problems occur, please update your graphics card driver or try using the graphics driver delivered with your operating system."
-msgstr ""
+msgstr "${PRODUCTNAME} іске қосудағы қиындықтар (мысалы, қолданбалар қатуы) және экран дисплейіне қатысты мәселелер көбінесе графикалық карта драйверінен туындайды. Бұл мәселелер орын алса, графикалық карта драйверін жаңартыңыз немесе операциялық жүйемен жеткізілген графикалық драйверді пайдаланып көріңіз."
 
 #. inrAd
 #: readme.xrm
@@ -707,7 +707,7 @@ msgctxt ""
 "pji76w1\n"
 "readmeitem.text"
 msgid "When sending a document via 'File - Send - Document as Email' or 'Document as PDF Attachment' problems might occur (program crashes or hangs). This is due to the Windows system file \"Mapi\" (Messaging Application Programming Interface) which causes problems in some file versions. Unfortunately, the problem cannot be narrowed down to a certain version number. For more information visit <a href=\"https://www.microsoft.com\">https://www.microsoft.com</a> to search the Microsoft Knowledge Base for \"mapi dll\"."
-msgstr ""
+msgstr "Құжатты \"Файл ▸ Жіберу ▸ Құжатты эл. поштамен\" немесе \"Эл. поштамен PDF ретінде\" арқылы жіберген кезде мәселелер туындауы мүмкін (бағдарламаның құлауы немесе қатып қалуы). Бұл кейбір нұсқалары мәселелерді тудыратын Windows жүйесінің \"Mapi\" (Messaging Application Programming Interface) файлына байланысты. Өкінішке орай, мәселені белгілі бір нұсқа нөміріне байланыстыру мүмкін емес. Қосымша ақпаратты алу үшін <a href=\"https://www.microsoft.com\">https://www.microsoft.com</a>сайтына кіріп, Microsoft білім қорынан \"mapi dll\" іздеңіз."
 
 #. a426D
 #: readme.xrm

@@ -429,12 +429,22 @@ static void checkApplyParagraphMarkFormatToNumbering(SwFont* pNumFnt, SwTextForm
     if( !pIDSA->get(DocumentSettingId::APPLY_PARAGRAPH_MARK_FORMAT_TO_NUMBERING ))
         return;
 
-    SwFormatAutoFormat const& rListAutoFormat(static_cast<SwFormatAutoFormat const&>(rInf.GetTextFrame()->GetTextNodeForParaProps()->GetAttr(RES_PARATR_LIST_AUTOFMT)));
+    SwFormatAutoFormat const& rListAutoFormat(rInf.GetTextFrame()->GetTextNodeForParaProps()->GetAttr(RES_PARATR_LIST_AUTOFMT));
     std::shared_ptr<SfxItemSet> pSet(rListAutoFormat.GetStyleHandle());
 
-    // TODO remove this fallback (for WW8/RTF)
+    // TODO remove this fallback for RTF
+    bool isDOC = pIDSA->get(DocumentSettingId::ADD_FLY_OFFSETS);
     bool isDOCX = pIDSA->get(DocumentSettingId::ADD_VERTICAL_FLY_OFFSETS);
-    if (!isDOCX && !pSet)
+    // tdf#146168 this hack should now only apply to RTF. Any other format (i.e. ODT) should only
+    // follow this fallback hack if it was created from RTF after its current implementation in 7.2.
+    // This can be approximated by 128197's new 6.4.7 compat for RTF MsWordCompMinLineHeightByFly
+    // Anything older than this which has APPLY_PARAGRAPH_MARK_FORMAT_TO_NUMBERING
+    // did not experience this hack, so it shouldn't apply to ODTs created from older RTFs either.
+    // In short: we don't want this hack to apply unless absolutely necessary for RTF.
+    const bool isOnlyRTF
+        = !isDOC && !isDOCX && pIDSA->get(DocumentSettingId::MS_WORD_COMP_MIN_LINE_HEIGHT_BY_FLY);
+
+    if (isOnlyRTF && !pSet)
     {
         TextFrameIndex const nTextLen(rInf.GetTextFrame()->GetText().getLength());
         SwTextNode const* pNode(nullptr);
@@ -553,30 +563,35 @@ static const SwRangeRedline* lcl_GetRedlineAtNodeInsertionOrDeletion( const SwTe
         for( ; nRedlPos < rTable.size() ; ++nRedlPos )
         {
             const SwRangeRedline* pTmp = rTable[ nRedlPos ];
+            SwNodeOffset nStart = pTmp->GetPoint()->GetNodeIndex(),
+                         nEnd = pTmp->GetMark()->GetNodeIndex();
+            if( nStart > nEnd )
+                std::swap(nStart, nEnd);
             if( RedlineType::Delete == pTmp->GetType() ||
                 RedlineType::Insert == pTmp->GetType() )
             {
-                const SwPosition *pRStt = pTmp->Start(), *pREnd = pTmp->End();
-                if( pRStt->nNode <= nNdIdx && pREnd->nNode > nNdIdx )
+                if( nStart <= nNdIdx && nEnd > nNdIdx )
                 {
                     bIsMoved = pTmp->IsMoved();
                     return pTmp;
                 }
             }
+            if( nStart > nNdIdx )
+                break;
         }
     }
     return nullptr;
 }
 
-static void lcl_setRedlineAttr( SwTextFormatInfo &rInf, const SwTextNode& rTextNode, const std::unique_ptr<SwFont>& pNumFnt )
+static bool lcl_setRedlineAttr( SwTextFormatInfo &rInf, const SwTextNode& rTextNode, const std::unique_ptr<SwFont>& pNumFnt )
 {
     if ( rInf.GetVsh()->GetLayout()->IsHideRedlines() )
-        return;
+        return false;
 
     bool bIsMoved;
     const SwRangeRedline* pRedlineNum = lcl_GetRedlineAtNodeInsertionOrDeletion( rTextNode, bIsMoved );
     if (!pRedlineNum)
-        return;
+        return false;
 
     // moved text: dark green with double underline or strikethrough
     if ( bIsMoved )
@@ -586,7 +601,7 @@ static void lcl_setRedlineAttr( SwTextFormatInfo &rInf, const SwTextNode& rTextN
             pNumFnt->SetStrikeout(STRIKEOUT_DOUBLE);
         else
             pNumFnt->SetUnderline(LINESTYLE_DOUBLE);
-        return;
+        return true;
     }
 
     SwAttrPool& rPool = rInf.GetVsh()->GetDoc()->GetAttrPool();
@@ -601,13 +616,14 @@ static void lcl_setRedlineAttr( SwTextFormatInfo &rInf, const SwTextNode& rTextN
     else
         SW_MOD()->GetInsertAuthorAttr(aAuthor, aSet);
 
-    const SfxPoolItem* pItem = nullptr;
-    if (SfxItemState::SET == aSet.GetItemState(RES_CHRATR_COLOR, true, &pItem))
-        pNumFnt->SetColor(static_cast<const SvxColorItem*>(pItem)->GetValue());
-    if (SfxItemState::SET == aSet.GetItemState(RES_CHRATR_UNDERLINE, true, &pItem))
-        pNumFnt->SetUnderline(static_cast<const SvxUnderlineItem*>(pItem)->GetLineStyle());
-    if (SfxItemState::SET == aSet.GetItemState(RES_CHRATR_CROSSEDOUT, true, &pItem))
-        pNumFnt->SetStrikeout( static_cast<const SvxCrossedOutItem*>(pItem)->GetStrikeout() );
+    if (const SvxColorItem* pItem = aSet.GetItemIfSet(RES_CHRATR_COLOR))
+        pNumFnt->SetColor(pItem->GetValue());
+    if (const SvxUnderlineItem* pItem = aSet.GetItemIfSet(RES_CHRATR_UNDERLINE))
+        pNumFnt->SetUnderline(pItem->GetLineStyle());
+    if (const SvxCrossedOutItem* pItem = aSet.GetItemIfSet(RES_CHRATR_CROSSEDOUT))
+        pNumFnt->SetStrikeout( pItem->GetStrikeout() );
+
+    return true;
 }
 
 SwNumberPortion *SwTextFormatter::NewNumberPortion( SwTextFormatInfo &rInf ) const
@@ -736,11 +752,36 @@ SwNumberPortion *SwTextFormatter::NewNumberPortion( SwTextFormatInfo &rInf ) con
             }
             else
             {
-                OUString aText( pTextNd->GetNumString(true, MAXLEVEL, m_pFrame->getRootFrame()) );
-                if ( !aText.isEmpty() )
+                // Show Changes mode shows the actual numbering (SwListRedlineType::HIDDEN) and
+                // the original one (SwListRedlineType::ORIGTEXT) instead of the fake numbering
+                // (SwListRedlineType::SHOW, which counts removed and inserted numbered paragraphs
+                // in a single list)
+                bool bHasHiddenNum = false;
+                OUString aText( pTextNd->GetNumString(true, MAXLEVEL, m_pFrame->getRootFrame(), SwListRedlineType::HIDDEN) );
+                const SwDoc& rDoc = pTextNd->GetDoc();
+                const SwRedlineTable& rTable = rDoc.getIDocumentRedlineAccess().GetRedlineTable();
+                if ( rTable.size() && !rInf.GetVsh()->GetLayout()->IsHideRedlines() )
                 {
-                    aText += pTextNd->GetLabelFollowedBy();
+                    OUString aHiddenText( pTextNd->GetNumString(true, MAXLEVEL, m_pFrame->getRootFrame(), SwListRedlineType::ORIGTEXT) );
+
+                    if ( !aText.isEmpty() || !aHiddenText.isEmpty() )
+                    {
+                        if (aText != aHiddenText && !aHiddenText.isEmpty())
+                        {
+                            bHasHiddenNum = true;
+                            // show also original number after the actual one enclosed in [ and ],
+                            // and replace tabulator with space to avoid messy indentation
+                            // resulted by the longer numbering, e.g. "1.[2.]" instead of "1.".
+                            aText = aText +  "[" + aHiddenText + "]"
+                                     + pTextNd->GetLabelFollowedBy().replaceAll("\t", " ");
+                        }
+                        else if (!aText.isEmpty())
+                            aText += pTextNd->GetLabelFollowedBy();
+                    }
                 }
+                else if (pTextNd->getIDocumentSettingAccess()->get(DocumentSettingId::NO_NUMBERING_SHOW_FOLLOWBY)
+                    || !aText.isEmpty())
+                    aText += pTextNd->GetLabelFollowedBy();
 
                 // Not just an optimization ...
                 // A number portion without text will be assigned a width of 0.
@@ -751,6 +792,28 @@ SwNumberPortion *SwTextFormatter::NewNumberPortion( SwTextFormatInfo &rInf ) con
 
                     // Build a new numbering font basing on the current paragraph font:
                     std::unique_ptr<SwFont> pNumFnt(new SwFont( &rInf.GetCharAttr(), pIDSA ));
+
+                    const SwTextNode& rTextNode = *rInf.GetTextFrame()->GetTextNodeForParaProps();
+                    if (const SwpHints* pHints = rTextNode.GetpSwpHints())
+                    {
+                        // Also look for an empty character hint that sits at the paragraph end:
+                        for (size_t i = 0; i < pHints->Count(); ++i)
+                        {
+                            const SwTextAttr* pHint = pHints->GetSortedByEnd(i);
+                            if (pHint->Which() == RES_TXTATR_AUTOFMT && pHint->GetEnd()
+                                && pHint->GetStart() == *pHint->GetEnd()
+                                && pHint->GetStart() == rTextNode.GetText().getLength())
+                            {
+                                std::shared_ptr<SfxItemSet> pSet
+                                    = pHint->GetAutoFormat().GetStyleHandle();
+                                if (pSet)
+                                {
+                                    pNumFnt->SetDiffFnt(pSet.get(), pIDSA);
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
                     // #i53199#
                     if ( !pIDSA->get(DocumentSettingId::DO_NOT_RESET_PARA_ATTRS_FOR_NUM_FONT) )
@@ -769,7 +832,8 @@ SwNumberPortion *SwTextFormatter::NewNumberPortion( SwTextFormatInfo &rInf ) con
 
                     checkApplyParagraphMarkFormatToNumbering(pNumFnt.get(), rInf, pIDSA, pFormat);
 
-                    lcl_setRedlineAttr( rInf, *pTextNd, pNumFnt );
+                    if ( !lcl_setRedlineAttr( rInf, *pTextNd, pNumFnt ) && bHasHiddenNum )
+                        pNumFnt->SetColor(NON_PRINTING_CHARACTER_COLOR);
 
                     // we do not allow a vertical font
                     pNumFnt->SetVertical( pNumFnt->GetOrientation(), m_pFrame->IsVertical() );

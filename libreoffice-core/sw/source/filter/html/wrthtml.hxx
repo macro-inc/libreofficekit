@@ -63,7 +63,7 @@ class SwHTMLPosFlyFrames;
 class SwTextFootnote;
 enum class HtmlPosition;
 enum class HtmlTokenId : sal_Int16;
-namespace utl { class TempFile; }
+namespace utl { class TempFileNamed; }
 
 extern SwAttrFnTab aHTMLAttrFnTab;
 
@@ -194,7 +194,7 @@ struct HTMLControl
     SwNodeOffset nNdIdx;           // the node in which it's anchored
     sal_Int32 nCount;              // how many controls are on the node
 
-    HTMLControl( const css::uno::Reference<css::container::XIndexContainer>& rForm, SwNodeOffset nIdx );
+    HTMLControl( css::uno::Reference<css::container::XIndexContainer> xForm, SwNodeOffset nIdx );
     ~HTMLControl();
 
     // operators for the sort array
@@ -271,7 +271,7 @@ enum class Css1Background
 
 class SW_DLLPUBLIC SwHTMLWriter : public Writer
 {
-    std::unique_ptr<SwHTMLPosFlyFrames> m_pHTMLPosFlyFrames;
+    SwHTMLPosFlyFrames m_aHTMLPosFlyFrames;
     std::unique_ptr<SwHTMLNumRuleInfo> m_pNumRuleInfo;// current numbering
     std::unique_ptr<SwHTMLNumRuleInfo> m_pNextNumRuleInfo;
     sal_uInt32 m_nHTMLMode;               // description of export configuration
@@ -282,14 +282,16 @@ class SW_DLLPUBLIC SwHTMLWriter : public Writer
     const SwPageDesc *MakeHeader( sal_uInt16& rHeaderAtrs );
     void GetControls();
 
-    void AddLinkTarget( const OUString& rURL );
+    void AddLinkTarget( std::u16string_view aURL );
     void CollectLinkTargets();
 
-    void SetupFilterOptions(const OUString& rFilterOptions);
+    void SetupFilterOptions(std::u16string_view rFilterOptions);
 
 protected:
     ErrCode WriteStream() override;
     void SetupFilterOptions(SfxMedium& rMedium) override;
+    void SetupFilterFromPropertyValues(
+        const css::uno::Sequence<css::beans::PropertyValue>& rPropertyValues);
 
 public:
     std::vector<OUString> m_aImgMapNames;   // written image maps
@@ -306,7 +308,6 @@ public:
     std::optional<std::vector<SwTextFootnote*>> m_xFootEndNotes;
 
     OUString m_aCSS1Selector;           // style selector
-    OUString m_aNonConvertableCharacters;
     OUString m_aBulletGrfs[MAXLEVEL];   // list graphics
 
     css::uno::Reference<css::container::XIndexContainer> mxFormComps; // current form
@@ -347,7 +348,6 @@ public:
                                       // that is not contained in class names)
     SvxFrameDirection   m_nDirection;     // the current direction
 
-    rtl_TextEncoding    m_eDestEnc;
     LanguageType        m_eLang;
 
     // description of the export configuration
@@ -405,7 +405,7 @@ public:
     bool mbSkipHeaderFooter : 1;
     bool mbEmbedImages : 1;
     /// Temporary base URL for paste of images.
-    std::unique_ptr<utl::TempFile> mpTempBaseURL;
+    std::unique_ptr<utl::TempFileNamed> mpTempBaseURL;
     /// If XHTML markup should be written instead of HTML.
     bool mbXHTML = false;
     /// XML namespace, in case of XHTML.
@@ -430,9 +430,12 @@ public:
     /// DPI used when exporting a vector shape as a bitmap.
     std::optional<sal_Int32> m_nShapeDPI;
 
+    /// If set, replace leading tabs with this many non-breaking spaces.
+    std::optional<sal_Int32> m_nLeadingTabWidth;
+
     /// Construct an instance of SwHTMLWriter and optionally give it
     /// the filter options directly, which can also be set via SetupFilterOptions().
-    explicit SwHTMLWriter( const OUString& rBaseURL, const OUString& rFilterOptions = "" );
+    explicit SwHTMLWriter( const OUString& rBaseURL, std::u16string_view rFilterOptions = std::u16string_view() );
     virtual ~SwHTMLWriter() override;
 
     void Out_SwDoc( SwPaM* );       // write the marked range
@@ -449,7 +452,7 @@ public:
 
     // output the FlyFrame anchored at current position
     bool OutFlyFrame( SwNodeOffset nNdIdx, sal_Int32 nContentIdx,
-                      HtmlPosition nPos, HTMLOutContext *pContext = nullptr );
+                      HtmlPosition nPos );
     void OutFrameFormat( AllHtmlFlags nType, const SwFrameFormat& rFormat,
                          const SdrObject *pSdrObj );
 
@@ -470,6 +473,7 @@ public:
 
     void OutBasic(const SwHTMLWriter& rHTMLWrt);
 
+    // Used to indent inner blocks using dl/dd tags
     void OutAndSetDefList( sal_uInt16 nNewLvl );
 
     void OutStyleSheet( const SwPageDesc& rPageDesc );
@@ -587,7 +591,7 @@ public:
     static void GetEEAttrsFromDrwObj( SfxItemSet& rItemSet,
                                       const SdrObject *pObj );
 
-    static sal_uInt16 GetDefListLvl( const OUString& rNm, sal_uInt16 nPoolId );
+    static sal_uInt16 GetDefListLvl( std::u16string_view rNm, sal_uInt16 nPoolId );
 
     sal_uInt32 GetHTMLMode() const
     {
@@ -609,7 +613,7 @@ public:
 
     FieldUnit GetCSS1Unit() const { return m_eCSS1Unit; }
 
-    sal_Int32 indexOfDotLeaders( sal_uInt16 nPoolId, const OUString& rText );
+    sal_Int32 indexOfDotLeaders( sal_uInt16 nPoolId, std::u16string_view rText );
 
     /// Determines the prefix string needed to respect the requested namespace alias.
     OString GetNamespace() const;

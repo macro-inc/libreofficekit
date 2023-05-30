@@ -25,6 +25,7 @@
 #include <tools/debug.hxx>
 
 #include <sot/stg.hxx>
+#include <utility>
 #include "stgelem.hxx"
 #include "stgdir.hxx"
 #include "stgio.hxx"
@@ -330,15 +331,15 @@ bool Storage::IsStorageFile( SvStream* pStream )
 // a storage file, initialize it.
 
 
-Storage::Storage( const OUString& rFile, StreamMode m, bool bDirect )
+Storage::Storage( OUString aFile, StreamMode m, bool bDirect )
     : OLEStorageBase( new StgIo, nullptr, m_nMode )
-    , aName( rFile ), bIsRoot( false )
+    , aName(std::move( aFile )), bIsRoot( false )
 {
     bool bTemp = false;
     if( aName.isEmpty() )
     {
         // no name = temporary name!
-        aName = utl::TempFile::CreateTempName();
+        aName = utl::CreateTempName();
         bTemp = true;
     }
     // the root storage creates the I/O system
@@ -578,6 +579,7 @@ BaseStorage* Storage::OpenStorage( const OUString& rName, StreamMode m, bool bDi
     if( p && p->m_aEntry.GetType() != STG_STORAGE )
     {
         pIo->SetError( SVSTREAM_FILE_NOT_FOUND );
+        // coverity[overwrite_var] - ownership is not here, but with StgDirStrm
         p = nullptr;
     }
 
@@ -625,6 +627,8 @@ BaseStorageStream* Storage::OpenStream( const OUString& rName, StreamMode m, boo
     }
     else if( !ValidateMode( m, p ) )
         p = nullptr;
+    // coverity[Resource leak : FALSE] - "Create" method is called with STG_STREAM line 620,
+    // so we won't enter into this "if" block here.
     if( p && p->m_aEntry.GetType() != STG_STREAM )
     {
         pIo->SetError( SVSTREAM_FILE_NOT_FOUND );

@@ -23,13 +23,13 @@
 #include "element.hxx"
 
 // Xml tools
+#include <utility>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmlexp.hxx>
 #include <xmloff/xmltoken.hxx>
 
 // Extras
-#include <com/sun/star/beans/PropertyAttribute.hpp>
-#include <com/sun/star/xml/sax/Writer.hpp>
+#include <com/sun/star/io/XOutputStream.hpp>
 
 class SfxMedium;
 class SmDocShell;
@@ -77,8 +77,8 @@ public:
     void setUseExportTag(bool bUseExportTag) { m_bUseExportTag = bUseExportTag; }
 
 public:
-    explicit SmMLExportWrapper(css::uno::Reference<css::frame::XModel> const& rRef)
-        : m_xModel(rRef)
+    explicit SmMLExportWrapper(css::uno::Reference<css::frame::XModel> xRef)
+        : m_xModel(std::move(xRef))
         , m_bFlat(true)
         , m_bUseHTMLMLEntities(false)
         , m_pElementTree(nullptr)
@@ -173,12 +173,12 @@ private:
 public:
     /** Exports an attribute of type "length"
      */
-    void exportMlAttributteLength(xmloff::token::XMLTokenEnum pAttribute,
-                                  const SmLengthValue& aLengthValue);
+    void exportMlAttributeLength(xmloff::token::XMLTokenEnum pAttribute,
+                                 const SmLengthValue& aLengthValue);
 
     /** Exports attributes of an element
       */
-    void exportMlAttributtes(const SmMlElement* pMlElement);
+    void exportMlAttributes(const SmMlElement* pMlElement);
 
     /** Exports an element and all it's attributes
       */

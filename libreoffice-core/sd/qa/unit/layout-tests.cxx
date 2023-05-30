@@ -6,38 +6,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-#include "sdmodeltestbase.hxx"
+#include <test/unoapixml_test.hxx>
 
-class SdLayoutTest : public SdModelTestBaseXML
+#include <sfx2/objsh.hxx>
+#include <sfx2/sfxbasemodel.hxx>
+
+class SdLayoutTest : public UnoApiXmlTest
 {
 public:
-    void testTdf104722();
-    void testTdf136949();
-    void testTdf128212();
-    void testColumnsLayout();
-    void tdf143258_testTbRlLayout();
+    SdLayoutTest()
+        : UnoApiXmlTest("/sd/qa/unit/data/")
+    {
+    }
 
-    CPPUNIT_TEST_SUITE(SdLayoutTest);
+    xmlDocUniquePtr load(const char* pName)
+    {
+        loadFromURL(OUString::createFromAscii(pName));
+        SfxBaseModel* pModel = dynamic_cast<SfxBaseModel*>(mxComponent.get());
+        CPPUNIT_ASSERT(pModel);
+        SfxObjectShell* pShell = pModel->GetObjectShell();
+        std::shared_ptr<GDIMetaFile> xMetaFile = pShell->GetPreviewMetaFile();
+        MetafileXmlDump dumper;
 
-    CPPUNIT_TEST(testTdf104722);
-    CPPUNIT_TEST(testTdf136949);
-    CPPUNIT_TEST(testTdf128212);
-    CPPUNIT_TEST(testColumnsLayout);
-    CPPUNIT_TEST(tdf143258_testTbRlLayout);
+        xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
+        CPPUNIT_ASSERT(pXmlDoc);
 
-    CPPUNIT_TEST_SUITE_END();
+        return pXmlDoc;
+    }
 };
 
-void SdLayoutTest::testTdf104722()
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf104722)
 {
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/pptx/tdf104722.pptx"), PPTX);
-
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
+    xmlDocUniquePtr pXmlDoc = load("pptx/tdf104722.pptx");
 
     // Without the fix in place, this would have failed with
     // - Expected: 2093
@@ -45,51 +45,71 @@ void SdLayoutTest::testTdf104722()
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]", "x", "2093");
 
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]", "y", "9273");
-
-    xDocShRef->DoClose();
 }
 
-void SdLayoutTest::testTdf136949()
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf135843)
 {
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/odp/tdf136949.odp"), ODP);
+    xmlDocUniquePtr pXmlDoc = load("pptx/tdf135843.pptx");
 
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
+    // Without the fix, the test fails with:
+    // - Expected: 21165
+    // - Actual  : 4218
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[5]/polyline[1]/point[1]", "x", "21165");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[5]/polyline[1]/point[1]", "y", "3866");
 
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[5]/polyline[1]/point[2]", "x", "21165");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[5]/polyline[1]/point[2]", "y", "5956");
+}
+
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf146876)
+{
+    xmlDocUniquePtr pXmlDoc = load("odp/tdf146876.odp");
+
+    // Check the shape is inside the (5000,8500) - (11500,12500) area
+    for (size_t i = 2; i < 4; ++i)
+    {
+        for (size_t j = 1; j < 6; ++j)
+        {
+            const OString xPath = "/metafile/push[1]/push[1]/push[" + OString::number(i)
+                                  + "]/polyline/point[" + OString::number(j) + "]";
+            const sal_Int32 nX = getXPath(pXmlDoc, xPath, "x").toInt32();
+            const sal_Int32 nY = getXPath(pXmlDoc, xPath, "y").toInt32();
+
+            // Without the fix in place, this test would have failed with
+            // - Expected greater or equal than: 5000
+            // - Actual  : 0
+            CPPUNIT_ASSERT_GREATEREQUAL(sal_Int32(5000), nX);
+            CPPUNIT_ASSERT_LESSEQUAL(sal_Int32(11500), nX);
+
+            CPPUNIT_ASSERT_GREATEREQUAL(sal_Int32(8500), nY);
+            CPPUNIT_ASSERT_LESSEQUAL(sal_Int32(12500), nY);
+        }
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf136949)
+{
+    xmlDocUniquePtr pXmlDoc = load("odp/tdf136949.odp");
 
     // Without the fix in place, this test would have failed with
     // - Expected: 13687
     // - Actual  : 2832
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[7]/polyline/point[1]", "x", "13687");
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[7]/polyline/point[2]", "x", "24759");
-
-    xDocShRef->DoClose();
 }
 
-void SdLayoutTest::testTdf128212()
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf128212)
 {
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/pptx/tdf128212.pptx"), PPTX);
-
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
+    xmlDocUniquePtr pXmlDoc = load("pptx/tdf128212.pptx");
 
     // Without the fix in place, this test would have failed with
     // - Expected: 7797
     // - Actual  : 12068
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray", "x", "4525");
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray", "y", "7797");
-
-    xDocShRef->DoClose();
 }
 
-void SdLayoutTest::testColumnsLayout()
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testColumnsLayout)
 {
     // This tests a 2-column text box's layout
 
@@ -167,14 +187,7 @@ void SdLayoutTest::testColumnsLayout()
         { 2, 608, 30, 10725, 6739 },
     };
 
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/odg/two_columns.odg"), ODG);
-
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
+    xmlDocUniquePtr pXmlDoc = load("odg/two_columns.odg");
 
     for (size_t i = 0; i < SAL_N_ELEMENTS(strings); ++i)
     {
@@ -186,11 +199,9 @@ void SdLayoutTest::testColumnsLayout()
         assertXPath(pXmlDoc, sXPath, "x", OUString::number(x));
         assertXPath(pXmlDoc, sXPath, "y", OUString::number(y));
     }
-
-    xDocShRef->DoClose();
 }
 
-void SdLayoutTest::tdf143258_testTbRlLayout()
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, tdf143258_testTbRlLayout)
 {
     // This tests a 1-column and a 2-column text boxes' layout
 
@@ -218,14 +229,7 @@ void SdLayoutTest::tdf143258_testTbRlLayout()
         { 1, 40, 3, 3213, 9600 },
     };
 
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/odg/tb-rl-textbox.odg"), ODG);
-
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
+    xmlDocUniquePtr pXmlDoc = load("odg/tb-rl-textbox.odg");
 
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/font", SAL_N_ELEMENTS(strings));
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray", SAL_N_ELEMENTS(strings));
@@ -247,48 +251,107 @@ void SdLayoutTest::tdf143258_testTbRlLayout()
         assertXPath(pXmlDoc, sXPath, "x", OUString::number(x));
         assertXPath(pXmlDoc, sXPath, "y", OUString::number(y));
     }
-
-    xDocShRef->DoClose();
 }
 
-CPPUNIT_TEST_SUITE_REGISTRATION(SdLayoutTest);
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf146731)
+{
+    xmlDocUniquePtr pXmlDoc = load("pptx/tdf146731.pptx");
+
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[3]/polyline[1]", "width", "187");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[4]/polyline[1]", "width", "187");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[5]/polyline[1]", "width", "187");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 30
+    // - Actual  : 187
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[6]/polyline[1]", "width", "30");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[7]/polyline[1]", "width", "187");
+}
 
 CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf135843_InsideHBorders)
 {
-    sd::DrawDocShellRef xDocShRef = loadURL(
-        m_directories.getURLFromSrc(u"/sd/qa/unit/data/pptx/tdf135843_insideH.pptx"), PPTX);
+    xmlDocUniquePtr pXmlDoc = load("pptx/tdf135843_insideH.pptx");
 
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
     // Without the fix, the test fails with:
     //- Expected: 34
     //- Actual  : 36
     // We shouldn't see two vertical borders inside the table on ui.
 
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push", 34);
-    xDocShRef->DoClose();
 }
 
 CPPUNIT_TEST_FIXTURE(SdLayoutTest, testBnc480256)
 {
-    sd::DrawDocShellRef xDocShRef
-        = loadURL(m_directories.getURLFromSrc(u"/sd/qa/unit/data/pptx/bnc480256-2.pptx"), PPTX);
+    xmlDocUniquePtr pXmlDoc = load("pptx/bnc480256-2.pptx");
 
-    std::shared_ptr<GDIMetaFile> xMetaFile = xDocShRef->GetPreviewMetaFile();
-    MetafileXmlDump dumper;
-
-    xmlDocUniquePtr pXmlDoc = XmlTestTools::dumpAndParse(dumper, *xMetaFile);
-    CPPUNIT_ASSERT(pXmlDoc);
     // Without the fix, the test fails with:
     //- Expected: #ff0000
     //- Actual  : #ffffff
     // We should see the red vertical border inside the table.
 
     assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/push[8]/linecolor[1]", "color", "#ff0000");
-    xDocShRef->DoClose();
+}
+
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testFitToFrameTextFitting)
+{
+    // This test checks that the text fitting is working correctly when
+    // the textbox is set to "fit to frame" by stretching the text to or
+    // near the textbox boundary. The problem is especially complicated
+    // when the font size is set to a higher number (like 999)
+    //
+    // The text fitting behaviour when "fit by frame" is enabled is to
+    // always fit the text into the text box (without forcing the text
+    // into new line) by shrinking or expanding the text horizontally
+    // and vertically.
+
+    xmlDocUniquePtr pXmlDoc = load("odg/FitToFrameText.odg");
+
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]", "x", "0");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]", "y", "406");
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]/dxarray", "first", "114");
+#ifndef _WIN32 // Windows seems to differ in text layouting, so ignore for now
+    assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[1]/dxarray", "last", "7010");
+#endif
+}
+
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTdf148966)
+{
+    // Test related to IgnoreBreakAfterMultilineField compatibility flag.
+    {
+        xmlDocUniquePtr pXmlDoc = load("pptx/tdf148966.pptx");
+        // Without the accompanying fix, would fail with:
+        // - Expected: 5952
+        // - Actual  : 7814
+        // i.e. Line break after multiline field should have been ignored.
+        assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[3]", "y", "5952");
+    }
+    {
+        xmlDocUniquePtr pXmlDoc = load("odp/tdf148966-withflag.odp");
+        // Without the accompanying fix, would fail with:
+        // - Expected: 5952
+        // - Actual  : 7814
+        // i.e. When IgnoreBreakAfterMultilineField flag is set, line break
+        // after multiline field should have been ignored.
+        assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[3]", "y", "5952");
+    }
+    {
+        xmlDocUniquePtr pXmlDoc = load("odp/tdf148966-withoutflag.odp");
+        assertXPath(pXmlDoc, "/metafile/push[1]/push[1]/textarray[3]", "y", "7814");
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(SdLayoutTest, testTableVerticalText)
+{
+    xmlDocUniquePtr pXmlDoc = load("pptx/tcPr-vert-roundtrip.pptx");
+
+    // Without the accompanying fix, would fail with:
+    // - Expected: -900
+    // - Actual  : 0
+    // - In <>, attribute 'orientation' of '//font[1]' incorrect value.
+    // i.e. table cell text that was supposed to be vertical (rotated 90
+    // degrees) was not vertical.
+    assertXPath(pXmlDoc, "//font[1]", "orientation", "-900");
+    assertXPath(pXmlDoc, "//font[2]", "orientation", "900");
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

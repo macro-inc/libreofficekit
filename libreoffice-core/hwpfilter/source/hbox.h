@@ -25,6 +25,7 @@
 #include <array>
 #include <memory>
 
+#include <rtl/ustring.hxx>
 #include <sal/types.h>
 
 #include "hwplib.h"
@@ -360,7 +361,9 @@ struct TxtBox: public FBox
 /**
  * Paragraph list
  */
-    std::vector<std::vector<std::unique_ptr<HWPPara>>> plists;
+    typedef std::vector<std::unique_ptr<HWPPara>> plist_t;
+    typedef std::vector<plist_t> plists_t;
+    plists_t plists;
 
 /**
  * Caption
@@ -969,7 +972,7 @@ class Outline: public HBox
         Outline();
 
         virtual bool Read(HWPFile &hwpf) override;
-        hchar_string GetUnicode() const;
+        OUString GetUnicode() const;
 };
 
 /* Bundle of spaces (30) */

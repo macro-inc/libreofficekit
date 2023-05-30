@@ -22,16 +22,16 @@
 
 #include <tools/ref.hxx>
 #include <vcl/dllapi.h>
+#include <vector>
 
 class ImplFontCharMap;
 typedef tools::SvRef<ImplFontCharMap> ImplFontCharMapRef;
 
-class CmapResult;
-
 class ImplFontCharMap final : public SvRefBase
 {
 public:
-    explicit            ImplFontCharMap( const CmapResult& );
+    explicit            ImplFontCharMap(bool bMicrosoftSymbolMap,
+                                        std::vector<sal_uInt32> aRangeCodes);
     virtual             ~ImplFontCharMap() override;
 
 private:
@@ -40,19 +40,16 @@ private:
                         ImplFontCharMap( const ImplFontCharMap& ) = delete;
     void                operator=( const ImplFontCharMap& ) = delete;
 
-    static ImplFontCharMapRef const & getDefaultMap( bool bSymbols=false);
+    static ImplFontCharMapRef const & getDefaultMap(bool bMicrosoftSymbolMap = false);
     bool                isDefaultMap() const;
 
 private:
-    const sal_uInt32*   mpRangeCodes;     // pairs of StartCode/(EndCode+1)
-    const int*          mpStartGlyphs;    // range-specific mapper to glyphs
-    const sal_uInt16*   mpGlyphIds;       // individual glyphid mappings
-    int                 mnRangeCount;
+    std::vector<sal_uInt32> maRangeCodes; // pairs of StartCode/(EndCode+1)
     int                 mnCharCount;      // covered codepoints
-    const bool m_bSymbolic;
+    const bool m_bMicrosoftSymbolMap;
 };
 
-bool VCL_DLLPUBLIC ParseCMAP( const unsigned char* pRawData, int nRawLength, CmapResult& );
+bool VCL_DLLPUBLIC HasMicrosoftSymbolCmap(const unsigned char* pRawData, int nRawLength);
 
 #endif // INCLUDED_VCL_INC_IMPFONTCHARMAP_HXX
 

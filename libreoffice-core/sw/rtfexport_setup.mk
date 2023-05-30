@@ -27,6 +27,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_rtfexport$(1), \
     i18nlangtag \
     sal \
     sfx \
+    subsequenttest \
     svl \
     sw \
     swqahelper \
@@ -35,6 +36,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_rtfexport$(1), \
     utl \
     vcl \
     tl \
+    basegfx \
 ))
 
 $(eval $(call gb_CppunitTest_use_externals,sw_rtfexport$(1),\

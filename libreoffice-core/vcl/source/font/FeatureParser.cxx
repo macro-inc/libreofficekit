@@ -10,6 +10,7 @@
 
 #include <vcl/font/FeatureParser.hxx>
 #include <vcl/font/Feature.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace vcl::font
 {
@@ -23,25 +24,25 @@ OUString trimFontNameFeatures(OUString const& rFontName)
     return rFontName.copy(0, nPrefixIdx);
 }
 
-FeatureParser::FeatureParser(OUString const& rFontName)
+FeatureParser::FeatureParser(std::u16string_view rFontName)
 {
-    sal_Int32 nPrefixIdx{ rFontName.indexOf(vcl::font::FeaturePrefix) };
+    size_t nPrefixIdx{ rFontName.find(vcl::font::FeaturePrefix) };
 
-    if (nPrefixIdx < 0)
+    if (nPrefixIdx == std::u16string_view::npos)
         return;
 
-    OUString sName = rFontName.copy(++nPrefixIdx);
+    std::u16string_view sName(rFontName.substr(++nPrefixIdx));
     sal_Int32 nIndex = 0;
     do
     {
-        OUString sToken = sName.getToken(0, vcl::font::FeatureSeparator, nIndex);
+        std::u16string_view sToken = o3tl::getToken(sName, 0, vcl::font::FeatureSeparator, nIndex);
 
         sal_Int32 nInnerIdx{ 0 };
-        OUString sID = sToken.getToken(0, '=', nInnerIdx);
+        std::u16string_view sID = o3tl::getToken(sToken, 0, '=', nInnerIdx);
 
-        if (sID == "lang")
+        if (sID == u"lang")
         {
-            m_sLanguage = sToken.getToken(0, '=', nInnerIdx);
+            m_sLanguage = o3tl::getToken(sToken, 0, '=', nInnerIdx);
         }
         else
         {
@@ -53,14 +54,11 @@ FeatureParser::FeatureParser(OUString const& rFontName)
     } while (nIndex >= 0);
 }
 
-std::unordered_map<uint32_t, uint32_t> FeatureParser::getFeaturesMap() const
+std::unordered_map<uint32_t, int32_t> FeatureParser::getFeaturesMap() const
 {
-    std::unordered_map<uint32_t, uint32_t> aResultMap;
+    std::unordered_map<uint32_t, int32_t> aResultMap;
     for (auto const& rFeat : m_aFeatures)
-    {
-        if (rFeat.m_nValue != 0)
-            aResultMap.emplace(rFeat.m_nTag, rFeat.m_nValue);
-    }
+        aResultMap.emplace(rFeat.m_nTag, rFeat.m_nValue);
     return aResultMap;
 }
 

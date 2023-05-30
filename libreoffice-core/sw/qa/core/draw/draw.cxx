@@ -10,7 +10,6 @@
 #include <swmodeltestbase.hxx>
 
 #include <svx/svdpage.hxx>
-#include <unotools/mediadescriptor.hxx>
 
 #include <IDocumentDrawModelAccess.hxx>
 #include <docsh.hxx>
@@ -19,21 +18,24 @@
 #include <frameformats.hxx>
 #include <textboxhelper.hxx>
 
-#include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/table/BorderLine2.hpp>
 #include <com/sun/star/text/XTextFramesSupplier.hpp>
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/draw/data/";
 
 /// Covers sw/source/core/draw/ fixes.
 class SwCoreDrawTest : public SwModelTestBase
 {
+public:
+    SwCoreDrawTest()
+        : SwModelTestBase("/sw/qa/core/draw/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testTextboxDeleteAsChar)
 {
     // Load a document with an as-char shape in it that has a textbox and an image in it.
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "as-char-textbox.docx");
+    createSwDoc("as-char-textbox.docx");
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     SdrPage* pPage = pDoc->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
     sal_Int32 nActual = pPage->GetObjCount();
@@ -59,7 +61,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testTextboxUndoOrdNum)
     // - picture
     // - draw format + fly format and a picture in it
     // - picture
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "textbox-undo-ordnum.docx");
+    createSwDoc("textbox-undo-ordnum.docx");
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     const SwFrameFormats& rFormats = *pDoc->GetSpzFrameFormats();
     // Test the state before del + undo.
@@ -106,17 +109,10 @@ CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testTextboxUndoOrdNum)
 CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testTdf107727FrameBorder)
 {
     // Load a document with a textframe without border, one with only left border
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "tdf107727_FrameBorder.odt";
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.text.TextDocument", {});
+    createSwDoc("tdf107727_FrameBorder.odt");
 
     // Export to RTF and reload
-    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    utl::MediaDescriptor aMediaDescriptor;
-    aMediaDescriptor["FilterName"] <<= OUString("Rich Text Format");
-    xStorable->storeToURL(aTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-    mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument", {});
+    reload("Rich Text Format", nullptr);
 
     // Get frame without border and inspect it.
     uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
@@ -144,12 +140,10 @@ CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testTdf107727FrameBorder)
 CPPUNIT_TEST_FIXTURE(SwCoreDrawTest, testSdtTextboxHeader)
 {
     // Given a 2 page document, same header on both pages, content control in the header and
-    // shape+fly pair (textbox) anchored in the same header:
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + "sdt-textbox-header.docx";
-
+    // shape+fly pair (textbox) anchored in the same header
     // When loading that document, then make sure that layout doesn't fail with an assertion because
     // the "master SdrObj should have the highest index" invariant doesn't hold:
-    mxComponent = loadFromDesktop(aURL, "com.sun.star.text.TextDocument", {});
+    createSwDoc("sdt-textbox-header.docx");
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

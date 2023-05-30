@@ -329,7 +329,7 @@ bool ScTabView::IsMarking( SCCOL nCol, SCROW nRow, SCTAB nTab ) const
         && nBlockStartZ == nTab;
 }
 
-void ScTabView::InitOwnBlockMode()
+void ScTabView::InitOwnBlockMode( const ScRange& rMarkRange )
 {
     if (IsBlockMode())
         return;
@@ -340,12 +340,12 @@ void ScTabView::InitOwnBlockMode()
         GetSelEngine()->CursorPosChanging( false, false );
 
     meBlockMode = Own;
-    nBlockStartX = 0;
-    nBlockStartY = 0;
-    nBlockStartZ = 0;
-    nBlockEndX = 0;
-    nBlockEndY = 0;
-    nBlockEndZ = 0;
+    nBlockStartX = rMarkRange.aStart.Col();
+    nBlockStartY = rMarkRange.aStart.Row();
+    nBlockStartZ = rMarkRange.aStart.Tab();
+    nBlockEndX = rMarkRange.aEnd.Col();
+    nBlockEndY = rMarkRange.aEnd.Row();
+    nBlockEndZ = rMarkRange.aEnd.Tab();
 
     SelectionChanged();     // status is checked with mark set
 }
@@ -1443,6 +1443,11 @@ void ScTabView::MakeDrawLayer()
     }
 }
 
+IMPL_STATIC_LINK_NOARG(ScTabView, InstallLOKNotifierHdl, void*, vcl::ILibreOfficeKitNotifier*)
+{
+    return GetpApp();
+}
+
 void ScTabView::ErrorMessage(TranslateId pGlobStrId)
 {
     if ( SC_MOD()->IsInExecuteDrop() )
@@ -1468,6 +1473,10 @@ void ScTabView::ErrorMessage(TranslateId pGlobStrId)
     m_xMessageBox.reset(Application::CreateMessageDialog(pParent,
                                                          VclMessageType::Info, VclButtonsType::Ok,
                                                          ScResId(pGlobStrId)));
+
+    if (comphelper::LibreOfficeKit::isActive())
+        m_xMessageBox->SetInstallLOKNotifierHdl(LINK(this, ScTabView, InstallLOKNotifierHdl));
+
     weld::Window* pGrabOnClose = bFocus ? pParent : nullptr;
     m_xMessageBox->runAsync(m_xMessageBox, [this, pGrabOnClose](sal_Int32 /*nResult*/) {
         m_xMessageBox.reset();

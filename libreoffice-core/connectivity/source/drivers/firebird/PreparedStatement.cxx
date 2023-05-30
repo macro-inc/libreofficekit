@@ -20,8 +20,6 @@
 #include <sal/config.h>
 #include <cmath>
 
-#include <string_view>
-
 #include "Connection.hxx"
 #include "PreparedStatement.hxx"
 #include "ResultSet.hxx"
@@ -384,7 +382,7 @@ sal_Int64 toNumericWithoutDecimalPlace(const OUString& sSource)
             sBuffer.append(sNumber.subView(0, nDotIndex));
         }
         sBuffer.append(sNumber.subView(nDotIndex + 1));
-        return sBuffer.makeStringAndClear().toInt64();
+        return o3tl::toInt64(sBuffer);
     }
 }
 
@@ -572,7 +570,7 @@ void OPreparedStatement::openBlobForWriting(isc_blob_handle& rBlobHandle, ISC_QU
     if (aErr)
     {
         evaluateStatusVector(m_statusVector,
-                             OUStringConcatenation("setBlob failed on " + m_sSqlStatement),
+                             Concat2View("setBlob failed on " + m_sSqlStatement),
                              *this);
         assert(false);
     }
@@ -818,7 +816,7 @@ void SAL_CALL OPreparedStatement::setObjectWithInfo( sal_Int32 parameterIndex, c
         sBuffer.append(sValue);
         if(sValue.indexOf('.') != -1) // there is a dot
         {
-            for(sal_Int32 i=sValue.copy(sValue.indexOf('.')+1).getLength(); i<scale;i++)
+            for(sal_Int32 i=sValue.subView(sValue.indexOf('.')+1).size(); i<scale;i++)
             {
                 sBuffer.append('0');
             }
@@ -960,9 +958,12 @@ void SAL_CALL OPreparedStatement::setBytes(sal_Int32 nParameterIndex,
     }
     else if( dType == SQL_TEXT )
     {
+            if (pVar->sqllen < xBytes.getLength())
+                dbtools::throwSQLException("Data too big for this field",
+                                           dbtools::StandardSQLState::INVALID_SQL_DATA_TYPE, *this);
             setParameterNull(nParameterIndex, false);
             memcpy(pVar->sqldata, xBytes.getConstArray(), xBytes.getLength() );
-            // Fill remainder with spaces
+            // Fill remainder with zeroes
             memset(pVar->sqldata + xBytes.getLength(), 0, pVar->sqllen - xBytes.getLength());
     }
     else

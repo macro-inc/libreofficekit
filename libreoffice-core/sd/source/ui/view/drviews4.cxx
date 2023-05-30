@@ -35,10 +35,10 @@
 #include <svx/svdopath.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <editeng/editview.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/cursor.hxx>
 #include <vcl/commandevent.hxx>
-#include <vcl/menu.hxx>
+#include <vcl/dialoghelper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weldutils.hxx>
 
@@ -208,13 +208,13 @@ bool DrawViewShell::KeyInput (const KeyEvent& rKEvt, ::sd::Window* pWin)
                 {
                     SdrObject* pObj = aIter.Next();
 
-                    if(auto pSdrTextObj = dynamic_cast<SdrTextObj *>( pObj ))
+                    if(auto pSdrTextObj = DynCastSdrTextObj( pObj ))
                     {
                         SdrInventor nInv(pObj->GetObjInventor());
-                        sal_uInt16  nKnd(pObj->GetObjIdentifier());
+                        SdrObjKind  nKnd(pObj->GetObjIdentifier());
 
                         if(SdrInventor::Default == nInv &&
-                            (OBJ_TITLETEXT == nKnd || OBJ_OUTLINETEXT == nKnd || OBJ_TEXT == nKnd)
+                            (SdrObjKind::TitleText == nKnd || SdrObjKind::OutlineText == nKnd || SdrObjKind::Text == nKnd)
                             && bDidVisitOldObject)
                         {
                             pCandidate = pSdrTextObj;
@@ -249,15 +249,18 @@ bool DrawViewShell::KeyInput (const KeyEvent& rKEvt, ::sd::Window* pWin)
             bRet = ViewShell::KeyInput(rKEvt, pWin);
             //If object is marked , the corresponding entry is set true , else
             //the corresponding entry is set false .
-            if(KEY_TAB == rKEvt.GetKeyCode().GetCode())
+            if(KEY_TAB == rKEvt.GetKeyCode().GetCode()
+                    || KEY_ESCAPE == rKEvt.GetKeyCode().GetCode())
+
             {
                FreshNavigatrTree();
             }
         }
+        if (!bRet && !mbReadOnly) // tdf#139804
+        {
+            bRet = GetView()->KeyInput(rKEvt, pWin);
+        }
     }
-
-    if (!bRet)
-        bRet = GetView()->KeyInput(rKEvt, pWin);
 
     return bRet;
 }
@@ -300,13 +303,19 @@ void DrawViewShell::StartRulerDrag (
 
 void DrawViewShell::FreshNavigatrTree()
 {
-    SfxChildWindow* pWindow = GetViewFrame()->GetChildWindow( SID_NAVIGATOR );
+    SfxViewFrame *pViewFrame = GetViewFrame();
+    if (!pViewFrame)
+        return;
+    SfxChildWindow* pWindow = pViewFrame->GetChildWindow( SID_NAVIGATOR );
     if( pWindow )
     {
         SdNavigatorFloat* pNavWin = static_cast<SdNavigatorFloat*>( pWindow->GetWindow() );
         if( pNavWin )
             pNavWin->FreshTree( GetDoc() );
     }
+    // sidebar version
+    SfxBindings& rBindings = pViewFrame->GetBindings();
+    rBindings.Invalidate(SID_NAVIGATOR_STATE, true);
 }
 
 void DrawViewShell::MouseButtonDown(const MouseEvent& rMEvt,
@@ -324,7 +333,7 @@ void DrawViewShell::MouseButtonDown(const MouseEvent& rMEvt,
     SfxInPlaceClient* pIPClient = GetViewShell()->GetIPClient();
     bool bIsOleActive = ( pIPClient && pIPClient->IsObjectInPlaceActive() );
 
-    if ( bIsOleActive && PopupMenu::IsInExecute() )
+    if (bIsOleActive && vcl::IsInPopupMenuExecute())
         return;
 
     if ( IsInputLocked() )
@@ -392,7 +401,7 @@ void DrawViewShell::MouseMove(const MouseEvent& rMEvt, ::sd::Window* pWin)
     if (GetDoc())
     {
         ConfigureAppBackgroundColor();
-        mpDrawView->SetApplicationBackgroundColor( mnAppBackgroundColor );
+        mpDrawView->SetApplicationBackgroundColor( GetViewOptions().mnAppBackgroundColor );
     }
 
     ViewShell::MouseMove(rMEvt, pWin);
@@ -574,7 +583,9 @@ void DrawViewShell::Command(const CommandEvent& rCEvt, ::sd::Window* pWin)
         // helper line
         if ( mpDrawView->PickHelpLine( aMPos, nHitLog, *GetActiveWindow()->GetOutDev(), nHelpLine, pPV) )
         {
-            ShowSnapLineContextMenu(*pPV, nHelpLine, rCEvt.GetMousePosPixel());
+            ::tools::Rectangle aRect(rCEvt.GetMousePosPixel(), Size(10, 10));
+            weld::Window* pParent = weld::GetPopupParent(*pWin, aRect);
+            ShowSnapLineContextMenu(pParent, aRect, *pPV, nHelpLine);
             return;
         }
         // is gluepoint under cursor marked?
@@ -678,7 +689,7 @@ void DrawViewShell::Command(const CommandEvent& rCEvt, ::sd::Window* pWin)
                             }
                             else
                             {
-                                if( (pObj->GetObjInventor() == SdrInventor::Default) && (pObj->GetObjIdentifier() == OBJ_TABLE) )
+                                if( (pObj->GetObjInventor() == SdrInventor::Default) && (pObj->GetObjIdentifier() == SdrObjKind::Table) )
                                 {
                                     aPopupId = "table";
                                 }
@@ -692,71 +703,72 @@ void DrawViewShell::Command(const CommandEvent& rCEvt, ::sd::Window* pWin)
                     else
                     {
                         SdrInventor nInv = pObj->GetObjInventor();
-                        sal_uInt16  nId  = pObj->GetObjIdentifier();
+                        SdrObjKind  nId  = pObj->GetObjIdentifier();
 
                         if (nInv == SdrInventor::Default)
                         {
                             switch ( nId )
                             {
-                                case OBJ_OUTLINETEXT:
-                                case OBJ_CAPTION:
-                                case OBJ_TITLETEXT:
-                                case OBJ_TEXT:
+                                case SdrObjKind::OutlineText:
+                                case SdrObjKind::Caption:
+                                case SdrObjKind::TitleText:
+                                case SdrObjKind::Text:
                                     aPopupId = "textbox";
                                     break;
 
-                                case OBJ_PATHLINE:
-                                case OBJ_PLIN:
+                                case SdrObjKind::PathLine:
+                                case SdrObjKind::PolyLine:
                                     aPopupId = "curve";
                                     break;
 
-                                case OBJ_FREELINE:
-                                case OBJ_EDGE:
+                                case SdrObjKind::FreehandLine:
+                                case SdrObjKind::Edge:
                                     aPopupId = "connector";
                                     break;
 
-                                case OBJ_LINE:
+                                case SdrObjKind::Line:
                                     aPopupId = "line";
                                     break;
 
-                                case OBJ_MEASURE:
+                                case SdrObjKind::Measure:
                                     aPopupId = "measure";
                                     break;
 
-                                case OBJ_RECT:
-                                case OBJ_CIRC:
-                                case OBJ_FREEFILL:
-                                case OBJ_PATHFILL:
-                                case OBJ_POLY:
-                                case OBJ_SECT:
-                                case OBJ_CARC:
-                                case OBJ_CCUT:
-                                case OBJ_CUSTOMSHAPE:
+                                case SdrObjKind::Rectangle:
+                                case SdrObjKind::CircleOrEllipse:
+                                case SdrObjKind::FreehandFill:
+                                case SdrObjKind::PathFill:
+                                case SdrObjKind::Polygon:
+                                case SdrObjKind::CircleSection:
+                                case SdrObjKind::CircleArc:
+                                case SdrObjKind::CircleCut:
+                                case SdrObjKind::CustomShape:
                                     aPopupId = "draw";
                                     break;
 
-                                case OBJ_GRUP:
+                                case SdrObjKind::Group:
                                     aPopupId = "group";
                                     break;
 
-                                case OBJ_GRAF:
+                                case SdrObjKind::Graphic:
                                     aPopupId = "graphic";
                                     break;
 
-                                case OBJ_OLE2:
+                                case SdrObjKind::OLE2:
                                     aPopupId = "oleobject";
                                     break;
-                                case OBJ_MEDIA:
+                                case SdrObjKind::Media:
                                     aPopupId = "media";
                                     break;
-                                case OBJ_TABLE:
+                                case SdrObjKind::Table:
                                     aPopupId = "table";
                                     break;
+                                default: ;
                             }
                         }
                         else if( nInv == SdrInventor::E3d )
                         {
-                            if( nId == E3D_SCENE_ID )
+                            if( nId == SdrObjKind::E3D_Scene )
                             {
                                 if( !mpDrawView->IsGroupEntered() )
                                     aPopupId = "3dscene";
@@ -928,41 +940,27 @@ void DrawViewShell::UnlockInput()
         mnLockCount--;
 }
 
-void DrawViewShell::ShowSnapLineContextMenu (
-    SdrPageView& rPageView,
-    const sal_uInt16 nSnapLineIndex,
-    const Point& rMouseLocation)
+void DrawViewShell::ShowSnapLineContextMenu(weld::Window* pParent, const ::tools::Rectangle& rRect,
+                                            SdrPageView& rPageView, const sal_uInt16 nSnapLineIndex)
 {
     const SdrHelpLine& rHelpLine (rPageView.GetHelpLines()[nSnapLineIndex]);
-    ScopedVclPtrInstance<PopupMenu> pMenu;
+    std::unique_ptr<weld::Builder> xBuilder(Application::CreateBuilder(nullptr, "modules/simpress/ui/snapmenu.ui"));
+    std::unique_ptr<weld::Menu> xMenu(xBuilder->weld_menu("menu"));
 
     if (rHelpLine.GetKind() == SdrHelpLineKind::Point)
     {
-        pMenu->InsertItem(
-            SID_SET_SNAPITEM,
-            SdResId(STR_POPUP_EDIT_SNAPPOINT));
-        pMenu->InsertSeparator();
-        pMenu->InsertItem(
-            SID_DELETE_SNAPITEM,
-            SdResId(STR_POPUP_DELETE_SNAPPOINT));
+        xMenu->append(OUString::number(SID_SET_SNAPITEM), SdResId(STR_POPUP_EDIT_SNAPPOINT));
+        xMenu->append_separator("separator");
+        xMenu->append(OUString::number(SID_DELETE_SNAPITEM), SdResId(STR_POPUP_DELETE_SNAPPOINT));
     }
     else
     {
-        pMenu->InsertItem(
-            SID_SET_SNAPITEM,
-            SdResId(STR_POPUP_EDIT_SNAPLINE));
-        pMenu->InsertSeparator();
-        pMenu->InsertItem(
-            SID_DELETE_SNAPITEM,
-            SdResId(STR_POPUP_DELETE_SNAPLINE));
+        xMenu->append(OUString::number(SID_SET_SNAPITEM), SdResId(STR_POPUP_EDIT_SNAPLINE));
+        xMenu->append_separator("separator");
+        xMenu->append(OUString::number(SID_DELETE_SNAPITEM), SdResId(STR_POPUP_DELETE_SNAPLINE));
     }
 
-    pMenu->RemoveDisabledEntries(false);
-
-    const sal_uInt16 nResult = pMenu->Execute(
-        GetActiveWindow(),
-        ::tools::Rectangle(rMouseLocation, Size(10,10)),
-        PopupMenuFlags::ExecuteDown);
+    const int nResult = xMenu->popup_at_rect(pParent, rRect).toInt32();
     switch (nResult)
     {
         case SID_SET_SNAPITEM:

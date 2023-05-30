@@ -28,7 +28,6 @@
 
 #include <i18nutil/paper.hxx>
 
-#include <cstdlib>
 #include <unotools/configmgr.hxx>
 #include <com/sun/star/lang/Locale.hpp>
 
@@ -166,7 +165,11 @@ const PageDesc aDinTab[] =
 
 const size_t nTabSize = SAL_N_ELEMENTS(aDinTab);
 
-#define MAXSLOPPY 21
+// tdf#151107 make this not just large enough for rounding errors on our side
+// but also large enough to match where the ppd side rounded up to the next
+// point. Seen with C5/C6/C65 envelopes which can be found over 1 point away
+// from the values in aDinTab
+#define MAXSLOPPY PT2MM100(1.25)
 
 void PaperInfo::doSloppyFit(bool bAlsoTryRotated)
 {

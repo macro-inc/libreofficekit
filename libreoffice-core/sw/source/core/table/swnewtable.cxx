@@ -326,15 +326,15 @@ static void lcl_ChangeRowSpan( const SwTable& rTable, const tools::Long nDiff,
     and prepares the selected cells for merging
 */
 
-std::unique_ptr<SwBoxSelection> SwTable::CollectBoxSelection( const SwPaM& rPam ) const
+std::optional<SwBoxSelection> SwTable::CollectBoxSelection( const SwPaM& rPam ) const
 {
     OSL_ENSURE( m_bNewModel, "Don't call me for old tables" );
     if( m_aLines.empty() )
-        return nullptr;
-    const SwNode* pStartNd = rPam.Start()->nNode.GetNode().FindTableBoxStartNode();
-    const SwNode* pEndNd = rPam.End()->nNode.GetNode().FindTableBoxStartNode();
+        return std::nullopt;
+    const SwNode* pStartNd = rPam.Start()->GetNode().FindTableBoxStartNode();
+    const SwNode* pEndNd = rPam.End()->GetNode().FindTableBoxStartNode();
     if( !pStartNd || !pEndNd || pStartNd == pEndNd )
-        return nullptr;
+        return std::nullopt;
 
     const size_t nLines = m_aLines.size();
     size_t nTop = 0;
@@ -369,12 +369,12 @@ std::unique_ptr<SwBoxSelection> SwTable::CollectBoxSelection( const SwPaM& rPam 
         }
     }
     if( nFound < 2 )
-        return nullptr;
+        return std::nullopt;
 
     bool bOkay = true;
     tools::Long nMid = ( nMin + nMax ) / 2;
 
-    auto pRet(std::make_unique<SwBoxSelection>());
+    std::optional<SwBoxSelection> pRet(std::in_place);
     std::vector< std::pair< SwTableBox*, tools::Long > > aNewWidthVector;
     size_t nCheckBottom = nBottom;
     tools::Long nLeftSpan = 0;
@@ -816,7 +816,7 @@ bool SwTable::PrepareMerge( const SwPaM& rPam, SwSelBoxes& rBoxes,
     }
     CHECK_TABLE( *this )
     // We have to assert a "rectangular" box selection before we start to merge
-    std::unique_ptr< SwBoxSelection > pSel( CollectBoxSelection( rPam ) );
+    std::optional< SwBoxSelection > pSel( CollectBoxSelection( rPam ) );
     if (!pSel || pSel->isEmpty())
         return false;
     // Now we should have a rectangle of boxes,
@@ -884,11 +884,12 @@ bool SwTable::PrepareMerge( const SwPaM& rPam, SwSelBoxes& rBoxes,
                 // we do not transfer this paragraph.
                 if( !IsEmptyBox( *pBox, aChkPam ) )
                 {
-                    SwNodeIndex& rInsPosNd = aInsPos.nNode;
+                    SwNode& rInsPosNd = aInsPos.GetNode();
                     SwPaM aPam( aInsPos );
-                    aPam.GetPoint()->nNode.Assign( *pBox->GetSttNd()->EndOfSectionNode(), -1 );
-                    SwContentNode* pCNd = aPam.GetContentNode();
-                    aPam.GetPoint()->nContent.Assign( pCNd, pCNd ? pCNd->Len() : 0 );
+                    aPam.GetPoint()->Assign( *pBox->GetSttNd()->EndOfSectionNode(), SwNodeOffset(-1) );
+                    SwContentNode* pCNd = aPam.GetPointContentNode();
+                    if( pCNd )
+                        aPam.GetPoint()->SetContent( pCNd->Len() );
                     SwNodeIndex aSttNdIdx( *pBox->GetSttNd(), 1 );
                     bool const bUndo = pDoc->GetIDocumentUndoRedo().DoesUndo();
                     if( pUndo )
@@ -900,7 +901,7 @@ bool SwTable::PrepareMerge( const SwPaM& rPam, SwSelBoxes& rBoxes,
                     {
                         pDoc->GetIDocumentUndoRedo().DoUndo(bUndo);
                     }
-                    SwNodeRange aRg( aSttNdIdx, aPam.GetPoint()->nNode );
+                    SwNodeRange aRg( aSttNdIdx.GetNode(), aPam.GetPoint()->GetNode() );
                     if( pUndo )
                         pUndo->MoveBoxContent( *pDoc, aRg, rInsPosNd );
                     else
@@ -948,14 +949,14 @@ bool SwTable::PrepareMerge( const SwPaM& rPam, SwSelBoxes& rBoxes,
                     if( nCurrLine )
                     {
                         SwPaM aPam( *pBox->GetSttNd(), 0 );
-                        aPam.GetPoint()->nNode++;
-                        SwTextNode* pNd = aPam.GetNode().GetTextNode();
+                        aPam.GetPoint()->Adjust(SwNodeOffset(+1));
+                        SwTextNode* pNd = aPam.GetPointNode().GetTextNode();
                         while( pNd )
                         {
                             pNd->SetCountedInList( false );
 
-                            aPam.GetPoint()->nNode++;
-                            pNd = aPam.GetNode().GetTextNode();
+                            aPam.GetPoint()->Adjust(SwNodeOffset(+1));
+                            pNd = aPam.GetPointNode().GetTextNode();
                         }
                     }
                 }
@@ -1531,8 +1532,7 @@ bool SwTable::InsertRow( SwDoc* pDoc, const SwSelBoxes& rBoxes,
                             SwContentNode* pCNd = aIdx.GetNode().GetContentNode();
                             if( pCNd && pCNd->IsTextNode() && pCNd->GetTextNode()->GetNumRule() )
                             {
-                                SwPosition aPos( *pCNd->GetTextNode() );
-                                SwPaM aPam( aPos, aPos );
+                                SwPaM aPam( *pCNd->GetTextNode(), *pCNd->GetTextNode() );
                                 pDoc->DelNumRules( aPam );
                             }
                         }
@@ -1675,8 +1675,8 @@ void SwTable::CreateSelection(  const SwPaM& rPam, SwSelBoxes& rBoxes,
     OSL_ENSURE( m_bNewModel, "Don't call me for old tables" );
     if( m_aLines.empty() )
         return;
-    const SwNode* pStartNd = rPam.GetPoint()->nNode.GetNode().FindTableBoxStartNode();
-    const SwNode* pEndNd = rPam.GetMark()->nNode.GetNode().FindTableBoxStartNode();
+    const SwNode* pStartNd = rPam.GetPoint()->GetNode().FindTableBoxStartNode();
+    const SwNode* pEndNd = rPam.GetMark()->GetNode().FindTableBoxStartNode();
     if( !pStartNd || !pEndNd )
         return;
     CreateSelection( pStartNd, pEndNd, rBoxes, eSearch, bChkProtected );
@@ -2133,12 +2133,16 @@ void SwTable::ConvertSubtableBox(sal_uInt16 const nRow, sal_uInt16 const nBox)
     assert(!pSubTableBox->GetTabLines().empty());
     // are relative (%) heights possible? apparently not
     SwFormatFrameSize const outerSize(pSourceLine->GetFrameFormat()->GetFrameSize());
+    if (outerSize.GetHeightSizeType() != SwFrameSize::Variable)
+    {   // tdf#145871 clear fixed size in first row
+        pSourceLine->ClaimFrameFormat();
+        pSourceLine->GetFrameFormat()->ResetFormatAttr(RES_FRM_SIZE);
+    }
     tools::Long minHeights(0);
     {
-        SwFormatFrameSize const* pSize(nullptr);
         SwFrameFormat const& rSubLineFormat(*pSubTableBox->GetTabLines()[0]->GetFrameFormat());
-        if (rSubLineFormat.GetItemState(RES_FRM_SIZE, true,
-            reinterpret_cast<SfxPoolItem const**>(&pSize)) == SfxItemState::SET)
+        SwFormatFrameSize const* pSize = rSubLineFormat.GetItemIfSet(RES_FRM_SIZE);
+        if (pSize)
         {   // for first row, apply height from inner row to outer row.
             // in case the existing outer row height was larger than the entire
             // subtable, the last inserted row needs to be tweaked (below)
@@ -2157,9 +2161,8 @@ void SwTable::ConvertSubtableBox(sal_uInt16 const nRow, sal_uInt16 const nBox)
             pSourceLine->GetTabBoxes().size() - 1 + pSubLine->GetTabBoxes().size(),
             nullptr);
         SwFrameFormat const& rSubLineFormat(*pSubLine->GetFrameFormat());
-        SwFormatFrameSize const* pSize(nullptr);
-        if (rSubLineFormat.GetItemState(RES_FRM_SIZE, true,
-            reinterpret_cast<SfxPoolItem const**>(&pSize)) == SfxItemState::SET)
+        SwFormatFrameSize const* pSize = rSubLineFormat.GetItemIfSet(RES_FRM_SIZE);
+        if (pSize)
         {   // for rows 2..N, copy inner row height to outer row
             pNewLine->ClaimFrameFormat();
             pNewLine->GetFrameFormat()->SetFormatAttr(*pSize);
@@ -2179,6 +2182,7 @@ void SwTable::ConvertSubtableBox(sal_uInt16 const nRow, sal_uInt16 const nBox)
             {
                 lastSize.SetHeightSizeType(SwFrameSize::Minimum);
             }
+            pNewLine->ClaimFrameFormat();
             pNewLine->GetFrameFormat()->SetFormatAttr(lastSize);
         }
         SfxPoolItem const* pRowBrush(nullptr);
@@ -2200,7 +2204,7 @@ void SwTable::ConvertSubtableBox(sal_uInt16 const nRow, sal_uInt16 const nBox)
                         pSourceBox, j+k, 1);
                     // insert dummy text node...
                     pDoc->GetNodes().MakeTextNode(
-                            SwNodeIndex(*pSourceBox->GetSttNd(), +1),
+                            SwNodeIndex(*pSourceBox->GetSttNd(), +1).GetNode(),
                             pDoc->GetDfltTextFormatColl());
                     SwNodeRange content(*pSourceBox->GetSttNd(), SwNodeOffset(+2),
                             *pSourceBox->GetSttNd()->EndOfSectionNode());
@@ -2211,14 +2215,13 @@ void SwTable::ConvertSubtableBox(sal_uInt16 const nRow, sal_uInt16 const nBox)
 #if 0
                     pDoc->GetNodes().MoveNodes(content, pDoc->GetNodes(), insPos, false);
 #else
-                    pDoc->getIDocumentContentOperations().MoveNodeRange(content, insPos, SwMoveFlags::NO_DELFRMS|SwMoveFlags::REDLINES);
+                    pDoc->getIDocumentContentOperations().MoveNodeRange(content, insPos.GetNode(), SwMoveFlags::NO_DELFRMS|SwMoveFlags::REDLINES);
 #endif
                     // delete the empty node that was bundled in the new box
                     pDoc->GetNodes().Delete(insPos);
                     if (pRowBrush)
                     {
-                        SfxPoolItem const* pCellBrush(nullptr);
-                        if (pNewBox->GetFrameFormat()->GetItemState(RES_BACKGROUND, true, &pCellBrush) != SfxItemState::SET)
+                        if (pNewBox->GetFrameFormat()->GetItemState(RES_BACKGROUND, true) != SfxItemState::SET)
                         {   // set inner row background on inner cell
                             pNewBox->ClaimFrameFormat();
                             pNewBox->GetFrameFormat()->SetFormatAttr(*pRowBrush);
@@ -2298,6 +2301,7 @@ bool SwTable::CanConvertSubtables() const
                     return false;
                 }
                 haveSubtable = true;
+                bool haveNonFixedInnerLine(false);
                 for (SwTableLine const*const pInnerLine : pBox->GetTabLines())
                 {
                     // bitmap row background will look different
@@ -2314,11 +2318,33 @@ bool SwTable::CanConvertSubtables() const
                             return false;
                         }
                     }
+                    if (SwFormatFrameSize const* pSize = rRowFormat.GetItemIfSet(RES_FRM_SIZE))
+                    {
+                        if (pSize->GetHeightSizeType() != SwFrameSize::Fixed)
+                        {
+                            haveNonFixedInnerLine = true;
+                        }
+                    }
+                    else
+                    {
+                        haveNonFixedInnerLine = true; // default
+                    }
                     for (SwTableBox const*const pInnerBox : pInnerLine->GetTabBoxes())
                     {
                         if (!pInnerBox->GetTabLines().empty())
                         {
                             return false; // nested subtable :(
+                        }
+                    }
+                }
+                if (haveNonFixedInnerLine)
+                {
+                    if (SwFormatFrameSize const* pSize = pLine->GetFrameFormat()->GetItemIfSet(RES_FRM_SIZE))
+                    {
+                        if (pSize->GetHeightSizeType() != SwFrameSize::Variable)
+                        {
+                            // not possible to distribute fixed outer row height on rows without layout
+                            return false;
                         }
                     }
                 }
@@ -2359,6 +2385,8 @@ bool SwTable::CanConvertSubtables() const
 
 void SwTable::ConvertSubtables()
 {
+    FndBox_ all(nullptr, nullptr);
+    all.DelFrames(*this); // tdf#151375 avoid UAF by frames on deleted cells
     for (size_t i = 0; i < GetTabLines().size(); ++i)
     {
         SwTableLine *const pLine(GetTabLines()[i]);
@@ -2374,6 +2402,7 @@ void SwTable::ConvertSubtables()
     }
     GCLines();
     m_bNewModel = true;
+    all.MakeFrames(*this);
 #if 0
     // note: outline nodes (and ordinary lists) are sorted by MoveNodes() itself
     //       (this could change order inside table of contents, but that's a

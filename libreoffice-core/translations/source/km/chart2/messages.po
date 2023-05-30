@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:18+0100\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
 "PO-Revision-Date: 2018-10-21 19:35+0000\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -853,260 +853,266 @@ msgctxt "STR_PROPERTY_ROLE_BORDERCOLOR"
 msgid "Border Color"
 msgstr "ពណ៌​ស៊ុម"
 
+#. KSB4c
+#: chart2/inc/strings.hrc:148
+msgctxt "STR_DATA_TABLE"
+msgid "Data Table"
+msgstr ""
+
 #. TuRxr
-#: chart2/inc/strings.hrc:149
+#: chart2/inc/strings.hrc:150
 msgctxt "STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
 msgid "From Data Table"
 msgstr "ពី​តារាង​ទិន្នន័យ"
 
 #. aPEDY
-#: chart2/inc/strings.hrc:150
+#: chart2/inc/strings.hrc:151
 msgctxt "STR_REGRESSION_LINEAR"
 msgid "Linear"
 msgstr "លីនេអ៊ែរ"
 
 #. nD8ay
-#: chart2/inc/strings.hrc:151
+#: chart2/inc/strings.hrc:152
 msgctxt "STR_REGRESSION_LOG"
 msgid "Logarithmic"
 msgstr "ឡូការីត"
 
 #. CotSJ
-#: chart2/inc/strings.hrc:152
+#: chart2/inc/strings.hrc:153
 msgctxt "STR_REGRESSION_EXP"
 msgid "Exponential"
 msgstr "អ៊ិចស្ប៉ូណង់ស្យែល"
 
 #. HqBJV
-#: chart2/inc/strings.hrc:153
+#: chart2/inc/strings.hrc:154
 msgctxt "STR_REGRESSION_POWER"
 msgid "Power"
 msgstr "ស្វ័យ​គុណ"
 
 #. dBiUj
-#: chart2/inc/strings.hrc:154
+#: chart2/inc/strings.hrc:155
 msgctxt "STR_REGRESSION_POLYNOMIAL"
 msgid "Polynomial"
 msgstr "ពហុធា"
 
 #. FWi4g
-#: chart2/inc/strings.hrc:155
+#: chart2/inc/strings.hrc:156
 msgctxt "STR_REGRESSION_MOVING_AVERAGE"
 msgid "Moving average"
 msgstr "បម្លាស់ទី​មធ្យម"
 
 #. psj3B
-#: chart2/inc/strings.hrc:156
+#: chart2/inc/strings.hrc:157
 msgctxt "STR_REGRESSION_MEAN"
 msgid "Mean"
 msgstr "មេដ្យាន"
 
 #. C8FVd
-#: chart2/inc/strings.hrc:158
+#: chart2/inc/strings.hrc:159
 msgctxt "STR_TYPE_COLUMN"
 msgid "Column"
 msgstr "ជួរឈរ"
 
 #. SWPnA
-#: chart2/inc/strings.hrc:159
+#: chart2/inc/strings.hrc:160
 msgctxt "STR_TYPE_BAR"
 msgid "Bar"
 msgstr "របារ"
 
 #. xUnpz
-#: chart2/inc/strings.hrc:160
+#: chart2/inc/strings.hrc:161
 msgctxt "STR_TYPE_AREA"
 msgid "Area"
 msgstr "ផ្ទៃ"
 
 #. bqxBm
-#: chart2/inc/strings.hrc:161
+#: chart2/inc/strings.hrc:162
 msgctxt "STR_TYPE_PIE"
 msgid "Pie"
 msgstr "ចំណិត"
 
 #. GGwEH
-#: chart2/inc/strings.hrc:162
+#: chart2/inc/strings.hrc:163
 msgctxt "STR_PIE_EXPLODED"
 msgid "Exploded Pie Chart"
 msgstr "គំនូស​តាង​ចំណិត​ដែល​បាន​បំបែក"
 
 #. gxFtf
-#: chart2/inc/strings.hrc:163
+#: chart2/inc/strings.hrc:164
 msgctxt "STR_DONUT_EXPLODED"
 msgid "Exploded Donut Chart"
 msgstr "គំនូស​តាង​ដូណាត់​បាន​បំបែក"
 
 #. nsoQ2
-#: chart2/inc/strings.hrc:164
+#: chart2/inc/strings.hrc:165
 msgctxt "STR_DONUT"
 msgid "Donut"
 msgstr "ដូណាត់"
 
 #. 7HjEG
-#: chart2/inc/strings.hrc:165
+#: chart2/inc/strings.hrc:166
 msgctxt "STR_TYPE_LINE"
 msgid "Line"
 msgstr "បន្ទាត់"
 
 #. Miu8E
-#: chart2/inc/strings.hrc:166
+#: chart2/inc/strings.hrc:167
 msgctxt "STR_TYPE_XY"
 msgid "XY (Scatter)"
 msgstr "XY (ពង្រាយ)"
 
 #. LBFRX
-#: chart2/inc/strings.hrc:167
+#: chart2/inc/strings.hrc:168
 msgctxt "STR_POINTS_AND_LINES"
 msgid "Points and Lines"
 msgstr "ចំណុច និង​បន្ទាត់"
 
 #. fjka7
-#: chart2/inc/strings.hrc:168
+#: chart2/inc/strings.hrc:169
 msgctxt "STR_POINTS_ONLY"
 msgid "Points Only"
 msgstr "តែ​ចំណុច"
 
 #. Sz53v
-#: chart2/inc/strings.hrc:169
+#: chart2/inc/strings.hrc:170
 msgctxt "STR_LINES_ONLY"
 msgid "Lines Only"
 msgstr "តែ​បន្ទាត់"
 
 #. AAEA2
-#: chart2/inc/strings.hrc:170
+#: chart2/inc/strings.hrc:171
 msgctxt "STR_LINES_3D"
 msgid "3D Lines"
 msgstr "បន្ទាត់​ត្រីមាត្រ"
 
 #. ABjEg
-#: chart2/inc/strings.hrc:171
+#: chart2/inc/strings.hrc:172
 msgctxt "STR_TYPE_COMBI_COLUMN_LINE"
 msgid "Column and Line"
 msgstr "ជួរឈរ និង​បន្ទាត់"
 
 #. nVKfC
-#: chart2/inc/strings.hrc:172
+#: chart2/inc/strings.hrc:173
 msgctxt "STR_LINE_COLUMN"
 msgid "Columns and Lines"
 msgstr "ជួរឈរ និង​បន្ទាត់"
 
 #. QkQSa
-#: chart2/inc/strings.hrc:173
+#: chart2/inc/strings.hrc:174
 msgctxt "STR_LINE_STACKEDCOLUMN"
 msgid "Stacked Columns and Lines"
 msgstr "ជួរឈរ និង​បន្ទាត់​ជា​ជង់"
 
 #. HGKEx
-#: chart2/inc/strings.hrc:174
+#: chart2/inc/strings.hrc:175
 msgctxt "STR_TYPE_NET"
 msgid "Net"
 msgstr "សំណាញ់"
 
 #. BKUc4
-#: chart2/inc/strings.hrc:175
+#: chart2/inc/strings.hrc:176
 msgctxt "STR_TYPE_STOCK"
 msgid "Stock"
 msgstr "សន្និធិ"
 
 #. oG4gw
-#: chart2/inc/strings.hrc:176
+#: chart2/inc/strings.hrc:177
 msgctxt "STR_STOCK_1"
 msgid "Stock Chart 1"
 msgstr "​គំនូស​តាង​សន្និធិ ១"
 
 #. pSzDo
-#: chart2/inc/strings.hrc:177
+#: chart2/inc/strings.hrc:178
 msgctxt "STR_STOCK_2"
 msgid "Stock Chart 2"
 msgstr "គំនូស​តាង​សន្និធិ ២"
 
 #. aEFDu
-#: chart2/inc/strings.hrc:178
+#: chart2/inc/strings.hrc:179
 msgctxt "STR_STOCK_3"
 msgid "Stock Chart 3"
 msgstr "គំនូស​តាង​​សន្និធិ ៣"
 
 #. jZqox
-#: chart2/inc/strings.hrc:179
+#: chart2/inc/strings.hrc:180
 msgctxt "STR_STOCK_4"
 msgid "Stock Chart 4"
 msgstr "​គំនូស​តាង​សន្និធិ ៤"
 
 #. DNBgg
-#: chart2/inc/strings.hrc:180
+#: chart2/inc/strings.hrc:181
 msgctxt "STR_NORMAL"
 msgid "Normal"
 msgstr "ធម្មតា"
 
 #. EfGVL
-#: chart2/inc/strings.hrc:181
+#: chart2/inc/strings.hrc:182
 msgctxt "STR_STACKED"
 msgid "Stacked"
 msgstr "ជង់"
 
 #. wqtzw
-#: chart2/inc/strings.hrc:182
+#: chart2/inc/strings.hrc:183
 msgctxt "STR_PERCENT"
 msgid "Percent Stacked"
 msgstr "ជង់​ភាគរយ"
 
 #. 52UGB
-#: chart2/inc/strings.hrc:183
+#: chart2/inc/strings.hrc:184
 msgctxt "STR_DEEP"
 msgid "Deep"
 msgstr "ជ្រៅ"
 
 #. dxfuQ
-#: chart2/inc/strings.hrc:184
+#: chart2/inc/strings.hrc:185
 msgctxt "STR_FILLED"
 msgid "Filled"
 msgstr "បានបំពេញ"
 
 #. rC5nu
-#: chart2/inc/strings.hrc:185
+#: chart2/inc/strings.hrc:186
 msgctxt "STR_TYPE_BUBBLE"
 msgid "Bubble"
 msgstr "ពពុះ"
 
 #. N9tXx
-#: chart2/inc/strings.hrc:186
+#: chart2/inc/strings.hrc:187
 msgctxt "STR_BUBBLE_1"
 msgid "Bubble Chart"
 msgstr "គំនូស​តាង​ពពុះ"
 
 #. AjPsf
-#: chart2/inc/strings.hrc:188
+#: chart2/inc/strings.hrc:189
 msgctxt "STR_INVALID_NUMBER"
 msgid "Numbers are required. Check your input."
 msgstr "ត្រូវការ​លេខ ។ ពិនិត្យ​មើល​ការ​បញ្ចូល​របស់​អ្នក ។"
 
 #. ofh4V
-#: chart2/inc/strings.hrc:189
+#: chart2/inc/strings.hrc:190
 msgctxt "STR_STEP_GT_ZERO"
 msgid "The major interval requires a positive number. Check your input."
 msgstr "ចន្លោះ​រង្វើល​ត្រូវការ​លេខ​វិជ្ជមាន ។ ពិនិត្យ​មើល​ការ​បញ្ចូល​របស់​អ្នក ។"
 
 #. EBJjR
-#: chart2/inc/strings.hrc:190
+#: chart2/inc/strings.hrc:191
 msgctxt "STR_BAD_LOGARITHM"
 msgid "The logarithmic scale requires positive numbers. Check your input."
 msgstr "មាត្រដ្ឋាន​ឡូការីត​ត្រូវការ​លេខ​វិជ្ជមាន ។ ពិនិត្យ​មើល​ការ​បញ្ចូល​របស់​អ្នក ។"
 
 #. K8BCB
-#: chart2/inc/strings.hrc:191
+#: chart2/inc/strings.hrc:192
 msgctxt "STR_MIN_GREATER_MAX"
 msgid "The minimum must be lower than the maximum. Check your input."
 msgstr "អប្បបរមា​ត្រូវ​តែ​ទាប​ជាង​អតិបរមា ។ ពិនិត្យ​មើល​ការ​បញ្ចូល​របស់​អ្នក ។"
 
 #. oBR4x
-#: chart2/inc/strings.hrc:192
+#: chart2/inc/strings.hrc:193
 msgctxt "STR_INVALID_INTERVALS"
 msgid "The major interval needs to be greater than the minor interval. Check your input."
 msgstr "ចន្លោះ​ធំ ត្រូវតែ​ធំ​ជាង​ចន្លោះ​តូច ។ ពិនិត្យមើល​ព័ត៌មាន​បញ្ចូល​របស់​អ្នក ។"
 
 #. ZvDEh
-#: chart2/inc/strings.hrc:193
+#: chart2/inc/strings.hrc:194
 msgctxt "STR_INVALID_TIME_UNIT"
 msgid "The major and minor interval need to be greater or equal to the resolution. Check your input."
 msgstr "ចន្លោះ​ធំ និង​ចន្លោះ​តូច ត្រូវតែ​ធំ​ជាង ឬ​ស្មើ​គុណភាព​បង្ហាញ ។ ពិនិត្យមើល​ព័ត៌មាន​បញ្ចូល​របស់​អ្នក ។"
@@ -1605,6 +1611,48 @@ msgstr "បើក​ប្រអប់ ស្លាក​ទិន្នន័�
 msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabels"
 msgid "Opens the Data Labels dialog, which enables you to set the data labels."
 msgstr "បើក​ប្រអប់ ស្លាក​ទិន្នន័យ ដែល​អនុញ្ញាត​ឲ្យ​អ្នក​កំណត់​ស្លាក​ទិន្នន័យ ។"
+
+#. XbRRD
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:8
+msgctxt "dlg_InsertDataTable|dlg_InsertDataTable"
+msgid "Data Table"
+msgstr ""
+
+#. SBrCL
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:85
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show data table"
+msgstr ""
+
+#. y4rFB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:119
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr ""
+
+#. GstZR
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:135
+msgctxt "dlg_InsertDataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr ""
+
+#. KAzDB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:151
+msgctxt "dlg_InsertDataTable|outlineCB"
+msgid "Show outline"
+msgstr ""
+
+#. bm6hN
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:167
+msgctxt "dlg_InsertDataTable|keysCB"
+msgid "Show keys"
+msgstr ""
+
+#. JpXPi
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:187
+msgctxt "dlg_InsertDataTable|dataTablePropertiesLabel"
+msgid "Data Table Properties"
+msgstr ""
 
 #. 3GUtp
 #: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:28
@@ -2216,547 +2264,547 @@ msgid "Show labels"
 msgstr "បង្ហាញ​ស្លាក"
 
 #. 52BFU
-#: chart2/uiconfig/ui/sidebaraxis.ui:38
+#: chart2/uiconfig/ui/sidebaraxis.ui:40
 #, fuzzy
 msgctxt "sidebaraxis|checkbutton_reverse"
 msgid "Reverse direction"
 msgstr "ដាក់បញ្ច្រាស​ទិស"
 
 #. hABaw
-#: chart2/uiconfig/ui/sidebaraxis.ui:63
+#: chart2/uiconfig/ui/sidebaraxis.ui:58
 msgctxt "sidebaraxis|label1"
 msgid "_Label position:"
 msgstr ""
 
 #. JpV6N
-#: chart2/uiconfig/ui/sidebaraxis.ui:77
+#: chart2/uiconfig/ui/sidebaraxis.ui:73
 #, fuzzy
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis"
 msgstr "ជិត​អ័ក្ស"
 
 #. HEMNB
-#: chart2/uiconfig/ui/sidebaraxis.ui:78
+#: chart2/uiconfig/ui/sidebaraxis.ui:74
 #, fuzzy
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis (other side)"
 msgstr "ជិត​អ័ក្ស (ជ្រុង​ផ្សេង​ទៀត)"
 
 #. BE2dT
-#: chart2/uiconfig/ui/sidebaraxis.ui:79
+#: chart2/uiconfig/ui/sidebaraxis.ui:75
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside start"
 msgstr "ចាប់ផ្ដើម​ខាងក្រៅ"
 
 #. rH94z
-#: chart2/uiconfig/ui/sidebaraxis.ui:80
+#: chart2/uiconfig/ui/sidebaraxis.ui:76
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside end"
 msgstr "បញ្ចប់​ខាងក្រៅ"
 
 #. 69LSe
-#: chart2/uiconfig/ui/sidebaraxis.ui:94
+#: chart2/uiconfig/ui/sidebaraxis.ui:90
 #, fuzzy
 msgctxt "sidebaraxis|label2"
 msgid "_Text orientation:"
 msgstr "ទិស​អត្ថបទ"
 
-#. Bqqg6
-#: chart2/uiconfig/ui/sidebarelements.ui:34
-msgctxt "sidebarelements|checkbutton_title"
-msgid "Title"
-msgstr "ចំណង​ជើង"
-
-#. HttnZ
-#: chart2/uiconfig/ui/sidebarelements.ui:51
-#, fuzzy
-msgctxt "sidebarelements|checkbutton_subtitle"
-msgid "Subtitle"
-msgstr "ចំណង​ជើង​រង​"
-
 #. vkhjB
-#: chart2/uiconfig/ui/sidebarelements.ui:102
+#: chart2/uiconfig/ui/sidebarelements.ui:25
 #, fuzzy
 msgctxt "sidebarelements|l"
 msgid "Titles"
 msgstr "ចំណង​ជើង"
 
+#. Bqqg6
+#: chart2/uiconfig/ui/sidebarelements.ui:38
+msgctxt "sidebarelements|checkbutton_title"
+msgid "Title"
+msgstr "ចំណង​ជើង"
+
+#. HttnZ
+#: chart2/uiconfig/ui/sidebarelements.ui:71
+#, fuzzy
+msgctxt "sidebarelements|checkbutton_subtitle"
+msgid "Subtitle"
+msgstr "ចំណង​ជើង​រង​"
+
+#. UVbZR
+#: chart2/uiconfig/ui/sidebarelements.ui:108
+msgctxt "sidebarelements|label_legen"
+msgid "Legend"
+msgstr "តាង"
+
 #. dB6pP
-#: chart2/uiconfig/ui/sidebarelements.ui:131
+#: chart2/uiconfig/ui/sidebarelements.ui:121
 msgctxt "sidebarelements|checkbutton_legend"
 msgid "Show legend"
 msgstr ""
 
 #. XxG3r
-#: chart2/uiconfig/ui/sidebarelements.ui:135
+#: chart2/uiconfig/ui/sidebarelements.ui:125
 msgctxt "sidebarelements|checkbutton_legend|tooltip_text"
 msgid "Show Legend"
 msgstr ""
 
-#. zszn2
-#: chart2/uiconfig/ui/sidebarelements.ui:156
-#, fuzzy
-msgctxt "sidebarelements|placement_label"
-msgid "_Placement:"
-msgstr "ការ​កំណត់​ទី​កន្លែង"
-
 #. N9Vw3
-#: chart2/uiconfig/ui/sidebarelements.ui:172
+#: chart2/uiconfig/ui/sidebarelements.ui:141
 #, fuzzy
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Right"
 msgstr "ស្តាំ"
 
 #. XWGfH
-#: chart2/uiconfig/ui/sidebarelements.ui:173
+#: chart2/uiconfig/ui/sidebarelements.ui:142
 #, fuzzy
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Top"
 msgstr "ខាងលើ"
 
 #. AYbfc
-#: chart2/uiconfig/ui/sidebarelements.ui:174
+#: chart2/uiconfig/ui/sidebarelements.ui:143
 #, fuzzy
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Bottom"
 msgstr "ខាងក្រោម"
 
 #. Hdrnv
-#: chart2/uiconfig/ui/sidebarelements.ui:175
+#: chart2/uiconfig/ui/sidebarelements.ui:144
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Left"
 msgstr "ឆ្វេង​"
 
 #. WxtCZ
-#: chart2/uiconfig/ui/sidebarelements.ui:193
+#: chart2/uiconfig/ui/sidebarelements.ui:154
 msgctxt "sidebarelements|checkbutton_no_overlay"
 msgid "Show the legend without overlapping the chart"
 msgstr ""
 
-#. UVbZR
-#: chart2/uiconfig/ui/sidebarelements.ui:212
-msgctxt "sidebarelements|label_legen"
-msgid "Legend"
-msgstr "តាង"
+#. ScLEM
+#: chart2/uiconfig/ui/sidebarelements.ui:175
+msgctxt "sidebarelements|label_axes"
+msgid "Axes"
+msgstr "អ័ក្ស"
 
 #. Am6Gz
-#: chart2/uiconfig/ui/sidebarelements.ui:242
+#: chart2/uiconfig/ui/sidebarelements.ui:188
 msgctxt "sidebarelements|checkbutton_x_axis"
 msgid "X axis"
 msgstr "អ័ក្ស X"
 
-#. P5gxx
-#: chart2/uiconfig/ui/sidebarelements.ui:256
-#, fuzzy
-msgctxt "sidebarelements|checkbutton_x_axis_title"
-msgid "X axis title"
-msgstr "ចំណង​ជើង​អ័ក្ស X"
-
 #. iMXPp
-#: chart2/uiconfig/ui/sidebarelements.ui:270
+#: chart2/uiconfig/ui/sidebarelements.ui:203
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_y_axis"
 msgid "Y axis"
 msgstr "អ័ក្ស Y"
 
-#. vF4oS
-#: chart2/uiconfig/ui/sidebarelements.ui:284
-#, fuzzy
-msgctxt "sidebarelements|checkbutton_y_axis_title"
-msgid "Y axis title"
-msgstr "ចំណង​ជើង​អ័ក្ស Y"
-
 #. A35cf
-#: chart2/uiconfig/ui/sidebarelements.ui:298
+#: chart2/uiconfig/ui/sidebarelements.ui:218
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_z_axis"
 msgid "Z axis"
 msgstr "អ័ក្ស Z"
 
+#. GoJDH
+#: chart2/uiconfig/ui/sidebarelements.ui:233
+msgctxt "sidebarelements|checkbutton_2nd_x_axis"
+msgid "2nd X axis"
+msgstr ""
+
+#. bGsCM
+#: chart2/uiconfig/ui/sidebarelements.ui:247
+msgctxt "sidebarelements|checkbutton_2nd_y_axis"
+msgid "2nd Y axis"
+msgstr ""
+
+#. P5gxx
+#: chart2/uiconfig/ui/sidebarelements.ui:261
+#, fuzzy
+msgctxt "sidebarelements|checkbutton_x_axis_title"
+msgid "X axis title"
+msgstr "ចំណង​ជើង​អ័ក្ស X"
+
+#. vF4oS
+#: chart2/uiconfig/ui/sidebarelements.ui:276
+#, fuzzy
+msgctxt "sidebarelements|checkbutton_y_axis_title"
+msgid "Y axis title"
+msgstr "ចំណង​ជើង​អ័ក្ស Y"
+
 #. RZFAU
-#: chart2/uiconfig/ui/sidebarelements.ui:312
+#: chart2/uiconfig/ui/sidebarelements.ui:291
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_z_axis_title"
 msgid "Z axis title"
 msgstr "ចំណង​ជើង​អ័ក្ស Z"
 
-#. GoJDH
-#: chart2/uiconfig/ui/sidebarelements.ui:326
-msgctxt "sidebarelements|checkbutton_2nd_x_axis"
-msgid "2nd X axis"
-msgstr ""
-
 #. nsoDZ
-#: chart2/uiconfig/ui/sidebarelements.ui:339
+#: chart2/uiconfig/ui/sidebarelements.ui:306
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
 msgid "2nd X axis title"
 msgstr "ចំណង​ជើង​អ័ក្ស X"
 
-#. bGsCM
-#: chart2/uiconfig/ui/sidebarelements.ui:352
-msgctxt "sidebarelements|checkbutton_2nd_y_axis"
-msgid "2nd Y axis"
-msgstr ""
-
 #. yDNuy
-#: chart2/uiconfig/ui/sidebarelements.ui:365
+#: chart2/uiconfig/ui/sidebarelements.ui:320
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
 msgid "2nd Y axis title"
 msgstr "ចំណង​ជើង​អ័ក្ស Y"
 
-#. ScLEM
-#: chart2/uiconfig/ui/sidebarelements.ui:382
-msgctxt "sidebarelements|label_axes"
-msgid "Axes"
-msgstr "អ័ក្ស"
+#. yeE2v
+#: chart2/uiconfig/ui/sidebarelements.ui:339
+#, fuzzy
+msgctxt "sidebarelements|label_gri"
+msgid "Gridlines"
+msgstr "បន្ទាត់​ក្រឡាចត្រង្គ"
 
 #. RL8AA
-#: chart2/uiconfig/ui/sidebarelements.ui:412
+#: chart2/uiconfig/ui/sidebarelements.ui:352
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
 msgid "Horizontal major"
 msgstr "បន្ទាត់​ផ្ដេក"
 
 #. FYBSZ
-#: chart2/uiconfig/ui/sidebarelements.ui:426
+#: chart2/uiconfig/ui/sidebarelements.ui:367
 msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
 msgid "Vertical major"
 msgstr ""
 
 #. VCTTS
-#: chart2/uiconfig/ui/sidebarelements.ui:440
+#: chart2/uiconfig/ui/sidebarelements.ui:382
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
 msgid "Horizontal minor"
 msgstr "ចូលផ្ដេក"
 
 #. QDFEZ
-#: chart2/uiconfig/ui/sidebarelements.ui:454
+#: chart2/uiconfig/ui/sidebarelements.ui:397
 #, fuzzy
 msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
 msgid "Vertical minor"
 msgstr "ចូលបញ្ឈរ"
 
-#. yeE2v
-#: chart2/uiconfig/ui/sidebarelements.ui:472
-#, fuzzy
-msgctxt "sidebarelements|label_gri"
-msgid "Gridlines"
-msgstr "បន្ទាត់​ក្រឡាចត្រង្គ"
-
 #. uacDo
-#: chart2/uiconfig/ui/sidebarelements.ui:493
+#: chart2/uiconfig/ui/sidebarelements.ui:419
 msgctxt "sidebarelements|text_title"
 msgid "Title"
 msgstr "ចំណង​ជើង"
 
 #. jXGDE
-#: chart2/uiconfig/ui/sidebarelements.ui:504
+#: chart2/uiconfig/ui/sidebarelements.ui:432
 #, fuzzy
 msgctxt "sidebarelements|text_subtitle"
 msgid "Subtitle"
 msgstr "ចំណង​ជើង​រង​"
 
+#. zszn2
+#: chart2/uiconfig/ui/sidebarelements.ui:445
+#, fuzzy
+msgctxt "sidebarelements|placement_label"
+msgid "_Placement:"
+msgstr "ការ​កំណត់​ទី​កន្លែង"
+
 #. SCPM4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:60
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:48
 #, fuzzy
 msgctxt "sidebarerrorbar|label2"
 msgid "Category:"
 msgstr "ប្រភេទ"
 
 #. 8Pb84
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:74
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:63
 #, fuzzy
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Constant"
 msgstr "បង្ខំ"
 
 #. Lz8Lo
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:75
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:64
 #, fuzzy
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Percentage"
 msgstr "ភាគរយ"
 
 #. Ap367
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:76
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:65
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Cell Range or Data Table"
 msgstr ""
 
 #. Lqw6L
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:77
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:66
 #, fuzzy
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard deviation"
 msgstr "គម្លាត​ស្តង់ដារ"
 
 #. qUL78
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:78
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:67
 #, fuzzy
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard error"
 msgstr "កំហុស​ស្តង់ដារ"
 
 #. KUCgB
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:79
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:68
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Variance"
 msgstr "រ៉ាដ្យង់"
 
 #. QDwJu
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:80
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:69
 #, fuzzy
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Error margin"
 msgstr "កំហុស​រឹម"
 
 #. US82z
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:93
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:82
 #, fuzzy
 msgctxt "sidebarerrorbar|label3"
 msgid "Positive (+):"
 msgstr "វិជ្ជមាន (+)"
 
 #. NJdbG
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:94
 #, fuzzy
 msgctxt "sidebarerrorbar|label4"
 msgid "Negative (-):"
 msgstr " អវិជ្ជមាន (-)"
 
 #. GBewc
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:117
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
 #, fuzzy
 msgctxt "sidebarerrorbar|spinbutton_pos"
 msgid "0.00"
 msgstr "0.05"
 
 #. e3GvR
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:132
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:119
 #, fuzzy
 msgctxt "sidebarerrorbar|spinbutton_neg"
 msgid "0.00"
 msgstr "0.05"
 
 #. 34Vax
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:152
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:139
 #, fuzzy
 msgctxt "sidebarerrorbar|radiobutton_positive_negative|tooltip_text"
 msgid "Positive and Negative"
 msgstr "វិជ្ជមាន និង​អវិជ្ជមាន"
 
 #. gETvJ
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:169
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:156
 #, fuzzy
 msgctxt "sidebarerrorbar|radiobutton_positive|tooltip_text"
 msgid "Positive"
 msgstr "វិជ្ជមាន"
 
 #. 3Ur2d
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:186
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:173
 #, fuzzy
 msgctxt "sidebarerrorbar|radiobutton_negative|tooltip_text"
 msgid "Negative"
 msgstr "អវិជ្ជមាន"
 
 #. iCPU4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:209
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:196
 msgctxt "sidebarerrorbar|label5"
 msgid "Indicator"
 msgstr ""
 
 #. qJBsd
-#: chart2/uiconfig/ui/sidebarseries.ui:41
+#: chart2/uiconfig/ui/sidebarseries.ui:38
 msgctxt "sidebarseries|checkbutton_label"
 msgid "Show data labels"
 msgstr ""
 
-#. BsC9D
-#: chart2/uiconfig/ui/sidebarseries.ui:64
-#, fuzzy
-msgctxt "sidebarseries|label_box"
-msgid "P_lacement:"
-msgstr "ការ​កំណត់​ទី​កន្លែង"
-
 #. Dk3GN
-#: chart2/uiconfig/ui/sidebarseries.ui:79
+#: chart2/uiconfig/ui/sidebarseries.ui:56
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Above"
 msgstr "ខាងលើ"
 
 #. e4znD
-#: chart2/uiconfig/ui/sidebarseries.ui:80
+#: chart2/uiconfig/ui/sidebarseries.ui:57
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Below"
 msgstr "ខាងក្រោម"
 
 #. CWwzt
-#: chart2/uiconfig/ui/sidebarseries.ui:81
+#: chart2/uiconfig/ui/sidebarseries.ui:58
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Center"
 msgstr "​កណ្ដាល"
 
 #. osWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:82
+#: chart2/uiconfig/ui/sidebarseries.ui:59
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Outside"
 msgstr "ខាង​ក្រៅ"
 
 #. U3N4S
-#: chart2/uiconfig/ui/sidebarseries.ui:83
+#: chart2/uiconfig/ui/sidebarseries.ui:60
 #, fuzzy
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Inside"
 msgstr "ខាង​ក្នុង"
 
 #. pAmg7
-#: chart2/uiconfig/ui/sidebarseries.ui:84
+#: chart2/uiconfig/ui/sidebarseries.ui:61
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Near origin"
 msgstr "ក្បែរ​ដើម"
 
 #. erC9C
-#: chart2/uiconfig/ui/sidebarseries.ui:109
+#: chart2/uiconfig/ui/sidebarseries.ui:71
 msgctxt "sidebarseries|checkbutton_trendline"
 msgid "Show trendline"
 msgstr ""
 
+#. FFPa2
+#: chart2/uiconfig/ui/sidebarseries.ui:92
+#, fuzzy
+msgctxt "sidebarseries|label1"
+msgid "Error Bars"
+msgstr "របារ​កំហុស X"
+
 #. bXUND
-#: chart2/uiconfig/ui/sidebarseries.ui:140
+#: chart2/uiconfig/ui/sidebarseries.ui:105
 #, fuzzy
 msgctxt "sidebarseries|checkbutton_y_error"
 msgid "Y error bars"
 msgstr "របារ​កំហុស Y"
 
 #. zK6DE
-#: chart2/uiconfig/ui/sidebarseries.ui:155
+#: chart2/uiconfig/ui/sidebarseries.ui:121
 #, fuzzy
 msgctxt "sidebarseries|checkbutton_x_error"
 msgid "X error bars"
 msgstr "របារ​កំហុស X"
 
-#. FFPa2
-#: chart2/uiconfig/ui/sidebarseries.ui:174
-#, fuzzy
-msgctxt "sidebarseries|label1"
-msgid "Error Bars"
-msgstr "របារ​កំហុស X"
-
-#. vhdnt
-#: chart2/uiconfig/ui/sidebarseries.ui:203
-msgctxt "sidebarseries|radiobutton_primary_axis"
-msgid "Primary Y axis"
-msgstr "អ័ក្ស Y មេ"
-
-#. VPWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:219
-msgctxt "sidebarseries|radiobutton_secondary_axis"
-msgid "Secondary Y axis"
-msgstr "អ័ក្ស Y រង"
-
 #. qE5HF
-#: chart2/uiconfig/ui/sidebarseries.ui:239
+#: chart2/uiconfig/ui/sidebarseries.ui:142
 msgctxt "sidebarseries|axis_label"
 msgid "Align Series to Axis"
 msgstr ""
 
 #. fvnkG
-#: chart2/uiconfig/ui/sidebarseries.ui:255
+#: chart2/uiconfig/ui/sidebarseries.ui:157
 msgctxt "sidebarseries|label_series_tmpl"
 msgid "Data series '%1'"
 msgstr ""
 
+#. vhdnt
+#: chart2/uiconfig/ui/sidebarseries.ui:173
+msgctxt "sidebarseries|radiobutton_primary_axis"
+msgid "Primary Y axis"
+msgstr "អ័ក្ស Y មេ"
+
+#. VPWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:189
+msgctxt "sidebarseries|radiobutton_secondary_axis"
+msgid "Secondary Y axis"
+msgstr "អ័ក្ស Y រង"
+
+#. BsC9D
+#: chart2/uiconfig/ui/sidebarseries.ui:218
+#, fuzzy
+msgctxt "sidebarseries|label_box"
+msgid "P_lacement:"
+msgstr "ការ​កំណត់​ទី​កន្លែង"
+
 #. mZfrk
-#: chart2/uiconfig/ui/sidebartype.ui:85
+#: chart2/uiconfig/ui/sidebartype.ui:74
 msgctxt "sidebartype|3dlook"
 msgid "_3D Look"
 msgstr ""
 
 #. mjrkY
-#: chart2/uiconfig/ui/sidebartype.ui:104
+#: chart2/uiconfig/ui/sidebartype.ui:90
 msgctxt "sidebartype|3dscheme"
 msgid "Simple"
 msgstr ""
 
 #. urfc7
-#: chart2/uiconfig/ui/sidebartype.ui:105
+#: chart2/uiconfig/ui/sidebartype.ui:91
 msgctxt "sidebartype|3dscheme"
 msgid "Realistic"
 msgstr ""
 
 #. gYXXE
-#: chart2/uiconfig/ui/sidebartype.ui:126
+#: chart2/uiconfig/ui/sidebartype.ui:105
 msgctxt "sidebartype|shapeft"
 msgid "Sh_ape"
 msgstr ""
 
 #. B6KS5
-#: chart2/uiconfig/ui/sidebartype.ui:187
+#: chart2/uiconfig/ui/sidebartype.ui:153
 msgctxt "sidebartype|stack"
 msgid "_Stack series"
 msgstr ""
 
-#. Yau6n
-#: chart2/uiconfig/ui/sidebartype.ui:207
-msgctxt "sidebartype|ontop"
-msgid "On top"
-msgstr ""
-
-#. f2J43
-#: chart2/uiconfig/ui/sidebartype.ui:221
-msgctxt "sidebartype|percent"
-msgid "Percent"
-msgstr ""
-
-#. iDSaa
-#: chart2/uiconfig/ui/sidebartype.ui:235
-msgctxt "sidebartype|deep"
-msgid "Deep"
-msgstr ""
-
 #. KaS7Z
-#: chart2/uiconfig/ui/sidebartype.ui:263
+#: chart2/uiconfig/ui/sidebartype.ui:170
 msgctxt "sidebartype|linetypeft"
 msgid "_Line type"
 msgstr ""
 
 #. Hqc3N
-#: chart2/uiconfig/ui/sidebartype.ui:278
+#: chart2/uiconfig/ui/sidebartype.ui:183
 msgctxt "sidebartype|linetype"
 msgid "Straight"
 msgstr ""
 
 #. EB58Z
-#: chart2/uiconfig/ui/sidebartype.ui:279
+#: chart2/uiconfig/ui/sidebartype.ui:184
 msgctxt "sidebartype|linetype"
 msgid "Smooth"
 msgstr ""
 
 #. qLn3k
-#: chart2/uiconfig/ui/sidebartype.ui:280
+#: chart2/uiconfig/ui/sidebartype.ui:185
 msgctxt "sidebartype|linetype"
 msgid "Stepped"
 msgstr ""
 
 #. jKDXh
-#: chart2/uiconfig/ui/sidebartype.ui:290
+#: chart2/uiconfig/ui/sidebartype.ui:195
 msgctxt "sidebartype|properties"
 msgid "Properties..."
 msgstr ""
 
 #. xW9CQ
-#: chart2/uiconfig/ui/sidebartype.ui:308
+#: chart2/uiconfig/ui/sidebartype.ui:207
 msgctxt "sidebartype|sort"
 msgid "_Sort by X values"
 msgstr ""
 
 #. thu3G
-#: chart2/uiconfig/ui/sidebartype.ui:330
+#: chart2/uiconfig/ui/sidebartype.ui:223
 msgctxt "sidebartype|nolinesft"
 msgid "_Number of lines"
+msgstr ""
+
+#. Yau6n
+#: chart2/uiconfig/ui/sidebartype.ui:282
+msgctxt "sidebartype|ontop"
+msgid "On top"
+msgstr ""
+
+#. f2J43
+#: chart2/uiconfig/ui/sidebartype.ui:298
+msgctxt "sidebartype|percent"
+msgid "Percent"
+msgstr ""
+
+#. iDSaa
+#: chart2/uiconfig/ui/sidebartype.ui:314
+msgctxt "sidebartype|deep"
+msgid "Deep"
 msgstr ""
 
 #. Ledzw
@@ -4117,6 +4165,36 @@ msgctxt "tp_DataSource|FT_CAPTION_FOR_WIZARD"
 msgid "Customize Data Ranges for Individual Data Series"
 msgstr "ប្ដូរ​ជួរ​ទិន្នន័យ​តាម​តម្រូវ​ការ​​សម្រាប់​ស៊េរី​ទិន្នន័យ​នីមួយៗ"
 
+#. JGgFh
+#: chart2/uiconfig/ui/tp_DataTable.ui:33
+msgctxt "tp_DataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr ""
+
+#. EzGM5
+#: chart2/uiconfig/ui/tp_DataTable.ui:49
+msgctxt "tp_DataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr ""
+
+#. ZTAZY
+#: chart2/uiconfig/ui/tp_DataTable.ui:65
+msgctxt "tp_DataTable|outlineCB"
+msgid "Show outline"
+msgstr ""
+
+#. kPDNa
+#: chart2/uiconfig/ui/tp_DataTable.ui:81
+msgctxt "tp_DataTable|keysCB"
+msgid "Show keys"
+msgstr ""
+
+#. fybMv
+#: chart2/uiconfig/ui/tp_DataTable.ui:101
+msgctxt "tp_axisLabel|textflowL"
+msgid "Data Table Properties"
+msgstr ""
+
 #. tGqhN
 #: chart2/uiconfig/ui/tp_ErrorBars.ui:53
 msgctxt "tp_ErrorBars|RB_NONE"
@@ -5314,11 +5392,11 @@ msgctxt "tp_axisLabel|even"
 msgid "Stagger _even"
 msgstr "ស្លាកគូ"
 
-#. 9EMGj
+#. a6qBM
 #: chart2/uiconfig/ui/tp_axisLabel.ui:113
 msgctxt "tp_axisLabel|extended_tip|even"
-msgid "Stagger numbers on the axes, odd numbers lower than even numbers."
-msgstr "រៀប​ចំនួន​លើ​អ័ក្ស ។ លេខ​សេស​ទាប​ជាង​លេខ​គូ ។"
+msgid "Stagger numbers on the axis, odd numbers lower than even numbers."
+msgstr ""
 
 #. 2JwY3
 #: chart2/uiconfig/ui/tp_axisLabel.ui:125

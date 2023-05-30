@@ -18,13 +18,15 @@
  */
 
 #include "ChartDropTargetHelper.hxx"
+#include <DataSource.hxx>
 #include <DataSourceHelper.hxx>
+#include <ChartModel.hxx>
+#include <Diagram.hxx>
 
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/chart2/data/XDataProvider.hpp>
-#include <com/sun/star/container/XChild.hpp>
 
 #include <sot/formats.hxx>
+#include <utility>
 #include <vector>
 
 using namespace ::com::sun::star;
@@ -60,9 +62,9 @@ namespace chart
 
 ChartDropTargetHelper::ChartDropTargetHelper(
     const Reference< datatransfer::dnd::XDropTarget >& rxDropTarget,
-    const Reference< chart2::XChartDocument > & xChartDocument ) :
+    rtl::Reference<::chart::ChartModel> xChartDocument ) :
         DropTargetHelper( rxDropTarget ),
-        m_xChartDocument( xChartDocument )
+        m_xChartDocument(std::move( xChartDocument ))
 {}
 
 ChartDropTargetHelper::~ChartDropTargetHelper()
@@ -109,25 +111,24 @@ sal_Int8 ChartDropTargetHelper::ExecuteDrop( const ExecuteDropEvent& rEvt )
                 if( aStrings.size() >= 3 && aStrings[0] == "soffice" )
                 {
                     OUString aRangeString( aStrings[2] );
-                    Reference< container::XChild > xChild( m_xChartDocument, uno::UNO_QUERY );
-                    if( xChild.is())
+                    if( m_xChartDocument.is())
                     {
-                        Reference< frame::XModel > xParentModel( xChild->getParent(), uno::UNO_QUERY );
+                        Reference< frame::XModel > xParentModel( m_xChartDocument->getParent(), uno::UNO_QUERY );
                         if( xParentModel.is() &&
                             m_xChartDocument.is())
                         {
                             // @todo: get the title somehow and compare it to
                             // aDocName if successful (the document is the
                             // parent)
-                            Reference< chart2::XDiagram > xDiagram( m_xChartDocument->getFirstDiagram() );
+                            rtl::Reference< Diagram > xDiagram = m_xChartDocument->getFirstChartDiagram();
                             Reference< chart2::data::XDataProvider > xDataProvider( m_xChartDocument->getDataProvider());
                             if( xDataProvider.is() && xDiagram.is() &&
                                 DataSourceHelper::allArgumentsForRectRangeDetected( m_xChartDocument ))
                             {
-                                Reference< chart2::data::XDataSource > xDataSource(
-                                    DataSourceHelper::pressUsedDataIntoRectangularFormat( m_xChartDocument ));
+                                rtl::Reference< DataSource > xDataSource1 =
+                                    DataSourceHelper::pressUsedDataIntoRectangularFormat( m_xChartDocument );
                                 Sequence< beans::PropertyValue > aArguments(
-                                    xDataProvider->detectArguments( xDataSource ));
+                                    xDataProvider->detectArguments( xDataSource1 ));
 
                                 OUString aOldRange;
                                 beans::PropertyValue * pCellRange = nullptr;
@@ -155,8 +156,9 @@ sal_Int8 ChartDropTargetHelper::ExecuteDrop( const ExecuteDropEvent& rEvt )
                                         pCellRange->Value <<= aRangeString;
                                     }
 
-                                    xDataSource.set( xDataProvider->createDataSource( aArguments ));
-                                    xDiagram->setDiagramData( xDataSource, aArguments );
+                                    Reference< chart2::data::XDataSource > xDataSource2 =
+                                        xDataProvider->createDataSource( aArguments );
+                                    xDiagram->setDiagramData( xDataSource2, aArguments );
 
                                     // always return copy state to avoid deletion of the dragged range
                                     nResult = DND_ACTION_COPY;

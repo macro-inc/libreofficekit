@@ -26,15 +26,7 @@
 #include <windows.h>
 #include <rtl/ref.hxx>
 #include "ResIDGenerator.hxx"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 namespace com::sun::star::accessibility {
 class XAccessible;
@@ -43,6 +35,7 @@ class ResIDGenerator;
 class AccObjectManagerAgent;
 class AccEventListener;
 class AccObject;
+enum class UnoMSAAEvent;
 
 /*******************************************************************
 AccObjectWinManager complete the functions:
@@ -95,7 +88,6 @@ private:
     static void InsertAccChildNode(AccObject* pCurObj,AccObject* pParentObj,HWND pWnd);
     static void DeleteAccChildNode(AccObject* pChild);
     void       DeleteFromHwndXAcc(css::accessibility::XAccessible const * pXAcc );
-    int  UpdateAccSelection(css::accessibility::XAccessible* pXAcc);
 
     ::rtl::Reference<AccEventListener> CreateAccEventListener(
             css::accessibility::XAccessible* pXAcc);
@@ -106,23 +98,19 @@ public:
     void DeleteAccObj( css::accessibility::XAccessible* pXAcc );
     void DeleteChildrenAccObj(css::accessibility::XAccessible* pAccObj);
 
-    bool NotifyAccEvent( css::accessibility::XAccessible* pXAcc,short state = 0 );
+    bool NotifyAccEvent(css::accessibility::XAccessible* pXAcc, UnoMSAAEvent eEvent);
 
     LRESULT Get_ToATInterface(HWND hWnd, long lParam, WPARAM wParam);
 
-    void  DecreaseState( css::accessibility::XAccessible* pXAcc,unsigned short pState );
-    void  IncreaseState( css::accessibility::XAccessible* pXAcc,unsigned short pState );
+    void  DecreaseState(css::accessibility::XAccessible* pXAcc, sal_Int64 nState);
+    void  IncreaseState(css::accessibility::XAccessible* pXAcc, sal_Int64 nState);
     void  UpdateState( css::accessibility::XAccessible* pXAcc );
-    void  SetLocation( css::accessibility::XAccessible* pXAcc,
-                       long Top = 0,long left = 0,long width = 0,long height = 0);
 
     void  SetValue( css::accessibility::XAccessible* pXAcc, css::uno::Any pAny );
     void  UpdateValue( css::accessibility::XAccessible* pXAcc );
 
     void  SetAccName( css::accessibility::XAccessible* pXAcc, css::uno::Any newName);
     void  UpdateAccName( css::accessibility::XAccessible* pXAcc );
-
-    void  SetRole( css::accessibility::XAccessible* pXAcc, long Role );
 
     void  UpdateAccFocus( css::accessibility::XAccessible* newFocus );
     void  UpdateAction( css::accessibility::XAccessible* pXAcc );
@@ -140,7 +128,7 @@ public:
 
     void UpdateChildState(css::accessibility::XAccessible* pXAcc);
 
-    bool IsSpecialToolboItem(css::accessibility::XAccessible* pXAcc);
+    bool IsSpecialToolbarItem(css::accessibility::XAccessible* pXAcc);
 
     static short GetRole(css::accessibility::XAccessible* pXAcc);
 

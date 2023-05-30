@@ -29,6 +29,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <sal/log.hxx>
 #include <tools/long.hxx>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
@@ -221,7 +222,7 @@ static uno::Any lcl_createField( const uno::Reference< XHelperInterface >& xPare
     uno::Reference< text::XTextField > xTextField( aSource, uno::UNO_QUERY_THROW );
     uno::Reference< text::XTextDocument > xTextDocument( xModel, uno::UNO_QUERY_THROW );
     uno::Reference< word::XField > xField( new SwVbaField( xParent, xContext, xTextField ) );
-    return uno::makeAny( xField );
+    return uno::Any( xField );
 }
 
 namespace {
@@ -233,7 +234,7 @@ class FieldEnumeration : public ::cppu::WeakImplHelper< css::container::XEnumera
     uno::Reference< frame::XModel > mxModel;
     uno::Reference< container::XEnumeration > mxEnumeration;
 public:
-    FieldEnumeration(  const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, const uno::Reference< frame::XModel >& xModel, const uno::Reference< container::XEnumeration >& xEnumeration ) : mxParent( xParent ), mxContext( xContext ), mxModel( xModel ), mxEnumeration( xEnumeration )
+    FieldEnumeration(  uno::Reference< XHelperInterface >  xParent, uno::Reference< uno::XComponentContext > xContext, uno::Reference< frame::XModel >  xModel, uno::Reference< container::XEnumeration >  xEnumeration ) : mxParent(std::move( xParent )), mxContext(std::move( xContext )), mxModel(std::move( xModel )), mxEnumeration(std::move( xEnumeration ))
     {
     }
     virtual sal_Bool SAL_CALL hasMoreElements(  ) override
@@ -257,7 +258,7 @@ class FieldCollectionHelper : public ::cppu::WeakImplHelper< container::XIndexAc
     uno::Reference< container::XEnumerationAccess > mxEnumerationAccess;
 public:
     /// @throws css::uno::RuntimeException
-    FieldCollectionHelper( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< frame::XModel >& xModel ) : mxParent( xParent ), mxContext( xContext ), mxModel( xModel )
+    FieldCollectionHelper( uno::Reference< XHelperInterface >  xParent, uno::Reference< uno::XComponentContext > xContext, const uno::Reference< frame::XModel >& xModel ) : mxParent(std::move( xParent )), mxContext(std::move( xContext )), mxModel( xModel )
     {
         uno::Reference< text::XTextFieldsSupplier > xSupp( xModel, uno::UNO_QUERY_THROW );
         mxEnumerationAccess.set( xSupp->getTextFields(), uno::UNO_SET_THROW );
@@ -373,7 +374,7 @@ uno::Reference< text::XTextField > SwVbaFields::Create_Field_FileName( const OUS
     }
 
     uno::Reference< beans::XPropertySet > xProps( xTextField, uno::UNO_QUERY_THROW );
-    xProps->setPropertyValue("FileFormat", uno::makeAny( nFileFormat ) );
+    xProps->setPropertyValue("FileFormat", uno::Any( nFileFormat ) );
 
     return xTextField;
 }
@@ -473,7 +474,7 @@ uno::Reference< text::XTextField > SwVbaFields::Create_Field_DocProperty( const 
     if( bCustom )
     {
         uno::Reference< beans::XPropertySet > xProps( xTextField, uno::UNO_QUERY_THROW );
-        xProps->setPropertyValue("Name", uno::makeAny( aDocProperty ) );
+        xProps->setPropertyValue("Name", uno::Any( aDocProperty ) );
     }
 
     return xTextField;

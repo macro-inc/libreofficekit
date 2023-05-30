@@ -25,6 +25,7 @@
 
 #include <algorithm>
 
+#include <o3tl/string_view.hxx>
 #include <rtl/tencinfo.h>
 #include <sal/log.hxx>
 #include <svl/numformat.hxx>
@@ -70,8 +71,7 @@ namespace myImplHelpers
         const SwFormatFrameSize& rSz = rFormat.GetFrameSize();
 
         const SwHeaderAndFooterEatSpacingItem &rSpacingCtrl =
-            sw::util::ItemGet<SwHeaderAndFooterEatSpacingItem>
-            (rFormat, RES_HEADER_FOOTER_EAT_SPACING);
+            rFormat.GetFormatAttr(RES_HEADER_FOOTER_EAT_SPACING);
         if (rSpacingCtrl.GetValue())
             nDist += rSz.GetHeight();
         else
@@ -242,16 +242,19 @@ namespace myImplHelpers
     private:
         MapperImpl<C> maHelper;
         o3tl::sorted_vector<const C*> maUsedStyles;
-        C* MakeNonCollidingStyle(const OUString& rName);
+        C* MakeNonCollidingStyle(const OUString& rName,
+                                 std::map<OUString, sal_Int32>& rCollisions);
     public:
         typedef std::pair<C*, bool> StyleResult;
         explicit StyleMapperImpl(SwDoc &rDoc) : maHelper(rDoc) {}
-        StyleResult GetStyle(const OUString& rName, ww::sti eSti);
+        StyleResult GetStyle(const OUString& rName, ww::sti eSti,
+                             std::map<OUString, sal_Int32>& rCollisions);
     };
 
     template<class C>
     typename StyleMapperImpl<C>::StyleResult
-    StyleMapperImpl<C>::GetStyle(const OUString& rName, ww::sti eSti)
+    StyleMapperImpl<C>::GetStyle(const OUString& rName, ww::sti eSti,
+                                 std::map<OUString, sal_Int32>& rCollisions)
     {
         C *pRet = maHelper.GetBuiltInStyle(eSti);
 
@@ -276,7 +279,7 @@ namespace myImplHelpers
             // No commas allow in SW style names
             if (-1 != nIdx)
                 aName = rName.copy( 0, nIdx );
-            pRet = MakeNonCollidingStyle( aName );
+            pRet = MakeNonCollidingStyle(aName, rCollisions);
         }
 
         if (pRet)
@@ -286,12 +289,13 @@ namespace myImplHelpers
     }
 
     template<class C>
-    C* StyleMapperImpl<C>::MakeNonCollidingStyle(const OUString& rName)
+    C* StyleMapperImpl<C>::MakeNonCollidingStyle(const OUString& rName,
+                                                 std::map<OUString, sal_Int32>& rCollisions)
     {
         OUString aName(rName);
-        C* pColl = 0;
+        C* pColl = nullptr;
 
-        if (0 != (pColl = maHelper.GetStyle(aName)))
+        if (nullptr != (pColl = maHelper.GetStyle(aName)))
         {
             //If the style collides first stick WW- in front of it, unless
             //it already has it and then successively add a larger and
@@ -299,23 +303,32 @@ namespace myImplHelpers
             if (!aName.startsWith("WW-"))
                 aName = "WW-" + aName;
 
-            sal_Int32 nI = 1;
             OUString aBaseName = aName;
+            sal_Int32 nI = 1;
+
+            // if we've seen this basename before then start at
+            // where we finished the last time
+            auto aFind = rCollisions.find(aBaseName);
+            if (aFind != rCollisions.end())
+                nI = aFind->second;
+
             while (
-                    0 != (pColl = maHelper.GetStyle(aName)) &&
+                    nullptr != (pColl = maHelper.GetStyle(aName)) &&
                     (nI < SAL_MAX_INT32)
                   )
             {
                 aName = aBaseName + OUString::number(nI++);
             }
+
+            rCollisions.insert_or_assign(aBaseName, nI);
         }
 
-        return pColl ? 0 : maHelper.MakeStyle(aName);
+        return pColl ? nullptr : maHelper.MakeStyle(aName);
     }
 
-    static OUString FindBestMSSubstituteFont(const OUString &rFont)
+    static OUString FindBestMSSubstituteFont(std::u16string_view rFont)
     {
-        if (IsStarSymbol(rFont))
+        if (IsOpenSymbol(rFont))
             return "Arial Unicode MS";
         return GetSubsFontName(rFont, SubsFontFlags::ONLYONE | SubsFontFlags::MS);
     }
@@ -397,26 +410,25 @@ namespace sw
         {
             if (const SvxBoxItem *pBox = rPage.GetItem<SvxBoxItem>(RES_BOX))
             {
-                dyaHdrTop = pBox->CalcLineSpace( SvxBoxItemLine::TOP, /*bEvenIfNoLine*/true );
-                dyaHdrBottom = pBox->CalcLineSpace( SvxBoxItemLine::BOTTOM, /*bEvenIfNoLine*/true );
+                m_DyaHdrTop = pBox->CalcLineSpace( SvxBoxItemLine::TOP, /*bEvenIfNoLine*/true );
+                m_DyaHdrBottom = pBox->CalcLineSpace( SvxBoxItemLine::BOTTOM, /*bEvenIfNoLine*/true );
             }
             else
             {
-                dyaHdrTop = dyaHdrBottom = 0;
+                m_DyaHdrTop = m_DyaHdrBottom = 0;
             }
-            const SvxULSpaceItem &rUL =
-                ItemGet<SvxULSpaceItem>(rPage, RES_UL_SPACE);
-            dyaHdrTop += rUL.GetUpper();
-            dyaHdrBottom += rUL.GetLower();
+            const SvxULSpaceItem &rUL = rPage.Get(RES_UL_SPACE);
+            m_DyaHdrTop += rUL.GetUpper();
+            m_DyaHdrBottom += rUL.GetLower();
 
-            dyaTop = dyaHdrTop;
-            dyaBottom = dyaHdrBottom;
+            m_DyaTop = m_DyaHdrTop;
+            m_DyaBottom = m_DyaHdrBottom;
 
             const SwFormatHeader *pHd = rPage.GetItem<SwFormatHeader>(RES_HEADER);
             if (pHd && pHd->IsActive() && pHd->GetHeaderFormat())
             {
                 mbHasHeader = true;
-                dyaTop = dyaTop + static_cast< sal_uInt16 >( (myImplHelpers::CalcHdDist(*(pHd->GetHeaderFormat()))) );
+                m_DyaTop = m_DyaTop + static_cast< sal_uInt16 >( (myImplHelpers::CalcHdDist(*(pHd->GetHeaderFormat()))) );
             }
             else
                 mbHasHeader = false;
@@ -425,7 +437,7 @@ namespace sw
             if (pFt && pFt->IsActive() && pFt->GetFooterFormat())
             {
                 mbHasFooter = true;
-                dyaBottom = dyaBottom + static_cast< sal_uInt16 >( (myImplHelpers::CalcFtDist(*(pFt->GetFooterFormat()))) );
+                m_DyaBottom = m_DyaBottom + static_cast< sal_uInt16 >( (myImplHelpers::CalcFtDist(*(pFt->GetFooterFormat()))) );
             }
             else
                 mbHasFooter = false;
@@ -438,7 +450,7 @@ namespace sw
             // both object don't have a header
             if (HasHeader() == rOther.HasHeader())
             {
-                if (dyaTop != rOther.dyaTop)
+                if (m_DyaTop != rOther.m_DyaTop)
                     return false;
             }
 
@@ -446,7 +458,7 @@ namespace sw
             // both object don't have a footer
             if (HasFooter() == rOther.HasFooter())
             {
-                if (dyaBottom != rOther.dyaBottom)
+                if (m_DyaBottom != rOther.m_DyaBottom)
                     return false;
             }
 
@@ -463,9 +475,10 @@ namespace sw
         }
 
         ParaStyleMapper::StyleResult ParaStyleMapper::GetStyle(
-            const OUString& rName, ww::sti eSti)
+            const OUString& rName, ww::sti eSti,
+            std::map<OUString, sal_Int32>& rCollisions)
         {
-            return mpImpl->GetStyle(rName, eSti);
+            return mpImpl->GetStyle(rName, eSti, rCollisions);
         }
 
         CharStyleMapper::CharStyleMapper(SwDoc &rDoc)
@@ -478,12 +491,13 @@ namespace sw
         }
 
         CharStyleMapper::StyleResult CharStyleMapper::GetStyle(
-            const OUString& rName, ww::sti eSti)
+            const OUString& rName, ww::sti eSti,
+            std::map<OUString, sal_Int32>& rCollisions)
         {
-            return mpImpl->GetStyle(rName, eSti);
+            return mpImpl->GetStyle(rName, eSti, rCollisions);
         }
 
-        FontMapExport::FontMapExport(const OUString &rFamilyName)
+        FontMapExport::FontMapExport(std::u16string_view rFamilyName)
         {
             sal_Int32 nIndex = 0;
             msPrimary = GetNextFontToken(rFamilyName, nIndex);
@@ -533,8 +547,8 @@ namespace sw
             if (!rText.isEmpty())
                 nScript = g_pBreakIt->GetBreakIter()->getScriptType(rText, 0);
 
-            rtl_TextEncoding eChrSet = ItemGet<SvxFontItem>(rTextNd,
-                GetWhichOfScript(RES_CHRATR_FONT, nScript)).GetCharSet();
+            TypedWhichId<SvxFontItem> nFontWhichId = GetWhichOfScript(RES_CHRATR_FONT, nScript);
+            rtl_TextEncoding eChrSet = rTextNd.GetAttr(nFontWhichId).GetCharSet();
             eChrSet = GetExtendedTextEncoding(eChrSet);
 
             CharRuns aRunChanges;
@@ -749,14 +763,14 @@ namespace sw
         /** Find cFind in rParams if not embedded in " double quotes.
             Will NOT find '\\' or '"'.
          */
-        static sal_Int32 findUnquoted( const OUString& rParams, sal_Unicode cFind, sal_Int32 nFromPos )
+        static sal_Int32 findUnquoted( std::u16string_view aParams, sal_Unicode cFind, sal_Int32 nFromPos )
         {
-            const sal_Int32 nLen = rParams.getLength();
+            const sal_Int32 nLen = aParams.size();
             if (nFromPos < 0 || nLen <= nFromPos)
                 return -1;
             for (sal_Int32 nI = nFromPos; nI < nLen; ++nI)
             {
-                const sal_Unicode c = rParams[nI];
+                const sal_Unicode c = aParams[nI];
                 if (c == '\\')
                     ++nI;
                 else if (c == '\"')
@@ -765,7 +779,7 @@ namespace sw
                     // While not at the end and not at an unescaped end quote
                     while (nI < nLen)
                     {
-                        if (rParams[nI] == '\"' && rParams[nI-1] != '\\')
+                        if (aParams[nI] == '\"' && aParams[nI-1] != '\\')
                             break;
                         ++nI;
                     }
@@ -782,12 +796,12 @@ namespace sw
         /** Find all rFind in rParams if not embedded in " double quotes and
             replace with rReplace. Will NOT find '\\' or '"'.
          */
-        static bool replaceUnquoted( OUString& rParams, const OUString& rFind, const OUString& rReplace )
+        static bool replaceUnquoted( OUString& rParams, std::u16string_view aFind, std::u16string_view aReplace )
         {
             bool bReplaced = false;
-            if (rFind.isEmpty())
+            if (aFind.empty())
                 return bReplaced;
-            const sal_Unicode cFirst = rFind[0];
+            const sal_Unicode cFirst = aFind[0];
 
             sal_Int32 nLen = rParams.getLength();
             for (sal_Int32 nI = 0; nI < nLen; ++nI)
@@ -808,11 +822,11 @@ namespace sw
                 }
                 else //normal unquoted section
                 {
-                    if (c == cFirst && rParams.match( rFind, nI))
+                    if (c == cFirst && rParams.match( aFind, nI))
                     {
-                        const sal_Int32 nFindLen = rFind.getLength();
-                        const sal_Int32 nDiff = rReplace.getLength() - nFindLen;
-                        rParams = rParams.replaceAt( nI, nFindLen, rReplace);
+                        const sal_Int32 nFindLen = aFind.size();
+                        const sal_Int32 nDiff = aReplace.size() - nFindLen;
+                        rParams = rParams.replaceAt( nI, nFindLen, aReplace);
                         nI += nFindLen + nDiff - 1;
                         nLen += nDiff;
                         bReplaced = true;
@@ -842,8 +856,8 @@ namespace sw
             // effectively changes from Gengou to Gregorian calendar. Legacy
             // because it wasn't supported a decade ago and now moot? Or is
             // that a Word specialty?
-            bForceJapanese |= replaceUnquoted( rParams, "ee", "yyyy");
-            bForceJapanese |= replaceUnquoted( rParams, "EE", "YYYY");
+            bForceJapanese |= replaceUnquoted( rParams, u"ee", u"yyyy");
+            bForceJapanese |= replaceUnquoted( rParams, u"EE", u"YYYY");
             if (LANGUAGE_FRENCH != nDocLang)
             {
                 // Handle the 'a' case here
@@ -857,8 +871,8 @@ namespace sw
             }
 
             // Force to NatNum when finding one of 'oOA'
-            bool bForceNatNum  = replaceUnquoted( rParams, "o", "m")
-                                 || replaceUnquoted( rParams, "O", "M");
+            bool bForceNatNum  = replaceUnquoted( rParams, u"o", u"m")
+                                 || replaceUnquoted( rParams, u"O", u"M");
             if (LANGUAGE_FRENCH != nDocLang)
             {
                 // Handle the 'A' case here
@@ -1038,18 +1052,18 @@ namespace sw
             return nKey;
         }
 
-        bool IsPreviousAM(OUString const & rParams, sal_Int32 nPos)
+        bool IsPreviousAM(std::u16string_view rParams, sal_Int32 nPos)
         {
-            return nPos>=2 && rParams.matchIgnoreAsciiCase("am", nPos-2);
+            return nPos>=2 && o3tl::matchIgnoreAsciiCase(rParams, u"am", nPos-2);
         }
-        bool IsNextPM(OUString const & rParams, sal_Int32 nPos)
+        bool IsNextPM(std::u16string_view rParams, sal_Int32 nPos)
         {
-            return nPos+2<rParams.getLength() && rParams.matchIgnoreAsciiCase("pm", nPos+1);
+            return o3tl::make_unsigned(nPos+2)<rParams.size() && o3tl::matchIgnoreAsciiCase(rParams, u"pm", nPos+1);
         }
-        bool IsNotAM(OUString const & rParams, sal_Int32 nPos)
+        bool IsNotAM(std::u16string_view rParams, sal_Int32 nPos)
         {
             ++nPos;
-            return nPos>=rParams.getLength() || (rParams[nPos]!='M' && rParams[nPos]!='m');
+            return o3tl::make_unsigned(nPos)>=rParams.size() || (rParams[nPos]!='M' && rParams[nPos]!='m');
         }
 
         void SwapQuotesInField(OUString &rFormat)

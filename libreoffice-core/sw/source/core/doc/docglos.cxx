@@ -142,6 +142,13 @@ bool SwDoc::InsertGlossary( SwTextBlocks& rBlock, const OUString& rEntry,
         {
             SwDoc* pGDoc = rBlock.GetDoc();
 
+            // tdf#53023 - remove the last empty paragraph (check SwXMLTextBlockParContext dtor)
+            if (mbInsOnlyTextGlssry)
+            {
+                SwPaM aPaM(*pGDoc->GetNodes()[pGDoc->GetNodes().GetEndOfContent().GetIndex() - 1]);
+                pGDoc->getIDocumentContentOperations().DelFullPara(aPaM);
+            }
+
             // Update all fixed fields, with the right DocInfo.
             // FIXME: UGLY: Because we cannot limit the range in which to do
             // field updates, we must update the fixed fields at the glossary
@@ -164,26 +171,26 @@ bool SwDoc::InsertGlossary( SwTextBlocks& rBlock, const OUString& rEntry,
             aCpyPam.SetMark();
 
             // till the nodes array's end
-            aCpyPam.GetPoint()->nNode = pGDoc->GetNodes().GetEndOfContent().GetIndex()-SwNodeOffset(1);
-            pContentNd = aCpyPam.GetContentNode();
-            aCpyPam.GetPoint()->nContent.Assign(
-                    pContentNd, pContentNd ? pContentNd->Len() : 0 );
+            aCpyPam.GetPoint()->Assign( pGDoc->GetNodes().GetEndOfContent().GetIndex()-SwNodeOffset(1) );
+            pContentNd = aCpyPam.GetPointContentNode();
+            if (pContentNd)
+                aCpyPam.GetPoint()->SetContent( pContentNd->Len() );
 
             GetIDocumentUndoRedo().StartUndo( SwUndoId::INSGLOSSARY, nullptr );
             SwPaM *_pStartCursor = &rPaM, *_pStartCursor2 = _pStartCursor;
             do {
 
                 SwPosition& rInsPos = *_pStartCursor->GetPoint();
-                SwStartNode* pBoxSttNd = const_cast<SwStartNode*>(rInsPos.nNode.GetNode().
+                SwStartNode* pBoxSttNd = const_cast<SwStartNode*>(rInsPos.GetNode().
                                             FindTableBoxStartNode());
 
                 if( pBoxSttNd && SwNodeOffset(2) == pBoxSttNd->EndOfSectionIndex() -
                                       pBoxSttNd->GetIndex() &&
-                    aCpyPam.GetPoint()->nNode != aCpyPam.GetMark()->nNode )
+                    aCpyPam.GetPoint()->GetNode() != aCpyPam.GetMark()->GetNode() )
                 {
                     // We copy more than one Node to the current Box.
                     // However, we have to remove the BoxAttributes then.
-                    ClearBoxNumAttrs( rInsPos.nNode );
+                    ClearBoxNumAttrs( rInsPos.GetNode() );
                 }
 
                 SwDontExpandItem aACD;

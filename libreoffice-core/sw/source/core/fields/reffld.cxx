@@ -47,6 +47,7 @@
 #include <IMark.hxx>
 #include <crossrefbookmark.hxx>
 #include <ftnidx.hxx>
+#include <utility>
 #include <viewsh.hxx>
 #include <unofldmid.h>
 #include <SwStyleNameMapper.hxx>
@@ -236,8 +237,7 @@ static void lcl_formatReferenceLanguage( OUString& rRefText,
     // (http://publications.europa.eu/code/hu/hu-120700.htm,
     // http://publications.europa.eu/code/hu/hu-4100600.htm)
 
-    LanguageTag aLanguageTag(eLang);
-    CharClass aCharClass( aLanguageTag );
+    CharClass aCharClass(( LanguageTag(eLang) ));
     sal_Int32 nLen = rRefText.getLength();
     sal_Int32 i;
     // substring of rRefText starting with letter or number
@@ -347,11 +347,11 @@ static void lcl_formatReferenceLanguage( OUString& rRefText,
 
 /// get references
 SwGetRefField::SwGetRefField( SwGetRefFieldType* pFieldType,
-                              const OUString& rSetRef, const OUString& rSetReferenceLanguage, sal_uInt16 nSubTyp,
+                              OUString aSetRef, OUString aSetReferenceLanguage, sal_uInt16 nSubTyp,
                               sal_uInt16 nSequenceNo, sal_uLong nFormat )
     : SwField( pFieldType, nFormat ),
-      m_sSetRefName( rSetRef ),
-      m_sSetReferenceLanguage( rSetReferenceLanguage ),
+      m_sSetRefName( std::move(aSetRef) ),
+      m_sSetReferenceLanguage( std::move(aSetReferenceLanguage) ),
       m_nSubType( nSubTyp ),
       m_nSeqNo( nSequenceNo )
 {
@@ -399,10 +399,10 @@ const SwTextNode* SwGetRefField::GetReferencedTextNode() const
 }
 
 // strikethrough for tooltips using Unicode combining character
-static OUString lcl_formatStringByCombiningCharacter(const OUString& sText, const sal_Unicode cChar)
+static OUString lcl_formatStringByCombiningCharacter(std::u16string_view sText, const sal_Unicode cChar)
 {
-    OUStringBuffer sRet;
-    for (sal_Int32 i = 0; i < sText.getLength(); ++i)
+    OUStringBuffer sRet(sText.size() * 2);
+    for (size_t i = 0; i < sText.size(); ++i)
     {
         sRet.append(sText[i]);
         sRet.append(cChar);
@@ -727,8 +727,7 @@ void SwGetRefField::UpdateField( const SwTextField* pFieldTextAttr )
             if( !pFieldTextAttr || !pFieldTextAttr->GetpTextNode() )
                 break;
 
-            LanguageTag aLanguageTag( GetLanguage());
-            LocaleDataWrapper aLocaleData( aLanguageTag );
+            LocaleDataWrapper aLocaleData(( LanguageTag( GetLanguage() ) ));
 
             // first a "short" test - in case both are in the same node
             if( pFieldTextAttr->GetpTextNode() == pTextNd )
@@ -1231,8 +1230,8 @@ SwTextNode* SwGetRefFieldType::FindAnchor( SwDoc* pDoc, const OUString& rRefMark
                 const ::sw::mark::IMark* pBkmk = *ppMark;
                 const SwPosition* pPos = &pBkmk->GetMarkStart();
 
-                pTextNd = pPos->nNode.GetNode().GetTextNode();
-                *pStt = pPos->nContent.GetIndex();
+                pTextNd = pPos->GetNode().GetTextNode();
+                *pStt = pPos->GetContentIndex();
                 if(pEnd)
                 {
                     if(!pBkmk->IsExpanded())
@@ -1246,8 +1245,8 @@ SwTextNode* SwGetRefFieldType::FindAnchor( SwDoc* pDoc, const OUString& rRefMark
                             *pEnd = pTextNd->Len();
                         }
                     }
-                    else if(pBkmk->GetOtherMarkPos().nNode == pBkmk->GetMarkPos().nNode)
-                        *pEnd = pBkmk->GetMarkEnd().nContent.GetIndex();
+                    else if(pBkmk->GetOtherMarkPos().GetNode() == pBkmk->GetMarkPos().GetNode())
+                        *pEnd = pBkmk->GetMarkEnd().GetContentIndex();
                     else
                         *pEnd = -1;
                 }
@@ -1271,7 +1270,7 @@ SwTextNode* SwGetRefFieldType::FindAnchor( SwDoc* pDoc, const OUString& rRefMark
                     }
                     // otherwise: the position at the start of the footnote
                     // will be mapped to something visible at least...
-                    SwNodeIndex* pIdx = pFootnoteIdx->GetStartNode();
+                    const SwNodeIndex* pIdx = pFootnoteIdx->GetStartNode();
                     if( pIdx )
                     {
                         SwNodeIndex aIdx( *pIdx, 1 );
@@ -1309,7 +1308,7 @@ private:
     static sal_uInt16 GetFirstUnusedId( std::set<sal_uInt16> &rIds );
 
 public:
-    explicit RefIdsMap( const OUString& rName ) : aName( rName ), bInit( false ) {}
+    explicit RefIdsMap( OUString _aName ) : aName(std::move( _aName )), bInit( false ) {}
 
     void Check( SwDoc& rDoc, SwDoc& rDestDoc, SwGetRefField& rField, bool bField );
 

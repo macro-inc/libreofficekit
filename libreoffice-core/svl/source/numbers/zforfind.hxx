@@ -193,7 +193,7 @@ private:
     // decimal separator has to be '.'
     // If bForceFraction==true the string is taken to be the fractional part
     // of 0.1234 without the leading 0. (thus being just "1234").
-    static double StringToDouble( const OUString& rStr,
+    static double StringToDouble( std::u16string_view aStr,
                                   bool bForceFraction = false );
 
     // Next number/string symbol
@@ -261,7 +261,7 @@ private:
 
     // Skip a special character
     static inline bool SkipChar( sal_Unicode c,
-                                 const OUString& rString,
+                                 std::u16string_view rString,
                                  sal_Int32& nPos );
 
     // Skip blank
@@ -274,7 +274,7 @@ private:
                                    sal_Int32& nPos );
 
     // Recognizes exactly ,111 as group separator
-    inline bool GetThousandSep( const OUString& rString,
+    inline bool GetThousandSep( std::u16string_view rString,
                                 sal_Int32& nPos,
                                 sal_uInt16 nStringPos ) const;
     // Get boolean value
@@ -297,20 +297,20 @@ private:
                       sal_Int32& nPos );
 
     // Get decimal separator and advance string position
-    inline bool GetDecSep( const OUString& rString,
+    inline bool GetDecSep( std::u16string_view rString,
                            sal_Int32& nPos ) const;
 
     // Get hundredth seconds separator and advance string position
-    inline bool GetTime100SecSep( const OUString& rString,
+    inline bool GetTime100SecSep( std::u16string_view rString,
                                   sal_Int32& nPos ) const;
 
     // Get sign  and advance string position
     // Including special case '('
-    int GetSign( const OUString& rString,
+    int GetSign( std::u16string_view rString,
                  sal_Int32& nPos );
 
     // Get sign of exponent and advance string position
-    static short GetESign( const OUString& rString,
+    static short GetESign( std::u16string_view rString,
                            sal_Int32& nPos );
 
     // Get next number as array offset
@@ -338,7 +338,8 @@ private:
 
     // Analyze middle substring
     bool ScanMidString( const OUString& rString,
-                        sal_uInt16 nStringPos );
+                        sal_uInt16 nStringPos,
+                        sal_uInt16 nCurNumCount );
 
 
     // Analyze end of string
@@ -427,6 +428,13 @@ private:
         NfEvalDateFormat setting.
      */
     bool IsAcceptableIso8601();
+
+    /** If month name in the middle was parsed, get the corresponding
+        LongDateOrder in GetDateRef().
+     */
+    LongDateOrder GetMiddleMonthLongDateOrder( bool bFormatTurn,
+                                               const LocaleDataWrapper* pLoc,
+                                               DateOrder eDateOrder );
 };
 
 #endif // INCLUDED_SVL_SOURCE_NUMBERS_ZFORFIND_HXX

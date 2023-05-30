@@ -8,6 +8,7 @@
  */
 
 #include <desktop/minidump.hxx>
+#include <sal/log.hxx>
 
 #include <map>
 #include <fstream>
@@ -131,27 +132,21 @@ static bool uploadContent(std::map<std::string, std::string>& parameters, std::s
     if (!ca_certificate_file.empty())
         curl_easy_setopt(curl, CURLOPT_CAINFO, ca_certificate_file.c_str());
 
-    curl_httppost* formpost = nullptr;
-    curl_httppost* lastptr = nullptr;
+    curl_mime* mime = curl_mime_init(curl);
     std::string additional_data = generate_json(parameters);
-    curl_formadd(&formpost, &lastptr,
-            CURLFORM_COPYNAME, "AdditionalData",
-            CURLFORM_COPYCONTENTS, additional_data.c_str(),
-            CURLFORM_END);
+    curl_mimepart* part = curl_mime_addpart(mime);
+    curl_mime_name(part, "AdditionalData");
+    curl_mime_data(part, additional_data.c_str(), CURL_ZERO_TERMINATED);
 
-    curl_formadd(&formpost, &lastptr,
-            CURLFORM_COPYNAME, "Version",
-            CURLFORM_COPYCONTENTS, version.c_str(),
-            CURLFORM_END);
+    part = curl_mime_addpart(mime);
+    curl_mime_name(part, "Version");
+    curl_mime_data(part, version.c_str(), CURL_ZERO_TERMINATED);
 
-    std::string response_body;
-    long response_code;
-    curl_formadd(&formpost, &lastptr,
-            CURLFORM_COPYNAME, "upload_file_minidump",
-            CURLFORM_FILE, file.c_str(),
-            CURLFORM_END);
+    part = curl_mime_addpart(mime);
+    curl_mime_name(part, "upload_file_minidump");
+    curl_mime_filedata(part, file.c_str());
 
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+    curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
 
 
     // Disable 100-continue header.
@@ -161,6 +156,7 @@ static bool uploadContent(std::map<std::string, std::string>& parameters, std::s
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    std::string response_body;
     curl_easy_setopt(curl, CURLOPT_WRITEDATA,
             static_cast<void *>(&response_body));
 
@@ -168,18 +164,14 @@ static bool uploadContent(std::map<std::string, std::string>& parameters, std::s
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1);
 
     CURLcode cc = curl_easy_perform(curl);
+    long response_code;
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-#ifndef NDEBUG
-    if (cc != CURLE_OK)
-        fprintf(stderr, "Failed to send http request to %s, error: %s\n",
-                url.c_str(),
-                curl_easy_strerror(cc));
-#endif
+    SAL_WARN_IF(cc != CURLE_OK, "desktop",
+            "Failed to send http request to " <<
+            url.c_str() <<
+            ", error: " <<
+            curl_easy_strerror(cc));
 
-    if (formpost != nullptr)
-    {
-        curl_formfree(formpost);
-    }
     if (headerlist != nullptr)
     {
         curl_slist_free_all(headerlist);

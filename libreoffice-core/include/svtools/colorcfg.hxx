@@ -38,6 +38,7 @@ enum ColorConfigEntry
     LINKS               ,
     LINKSVISITED        ,
     SPELL         ,
+    GRAMMAR       ,
     SMARTTAGS     ,
     SHADOWCOLOR         ,
     WRITERTEXTGRID      ,
@@ -56,6 +57,7 @@ enum ColorConfigEntry
     CALCPAGEBREAK       ,
     CALCPAGEBREAKMANUAL,
     CALCPAGEBREAKAUTOMATIC,
+    CALCHIDDENROWCOL    ,
     CALCDETECTIVE       ,
     CALCDETECTIVEERROR       ,
     CALCREFERENCE       ,
@@ -107,6 +109,7 @@ public:
     // instead of the automatic color
     ColorConfigValue        GetColorValue(ColorConfigEntry eEntry, bool bSmart = true) const;
     static Color            GetDefaultColor(ColorConfigEntry eEntry);
+    const OUString&         GetCurrentSchemeName() const;
 };
 
 class SVT_DLLPUBLIC EditableColorConfig

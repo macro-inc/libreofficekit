@@ -31,7 +31,7 @@
 
 #include <sax/tools/converter.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlimp.hxx>
@@ -455,7 +455,7 @@ XMLAnimationsEffectContext::XMLAnimationsEffectContext( SvXMLImport& rImport,
                 maShapeId = aIter.toString();
                 break;
             case XML_ELEMENT(DRAW, XML_COLOR):
-                ::sax::Converter::convertColor(maDimColor, aIter.toString());
+                ::sax::Converter::convertColor(maDimColor, aIter.toView());
                 break;
 
             case XML_ELEMENT(PRESENTATION, XML_EFFECT):
@@ -547,16 +547,16 @@ void XMLAnimationsEffectContext::endFastElement(sal_Int32 )
                         const AnimationEffect eEffect = ImplSdXMLgetEffect( meEffect, meDirection, mnStartScale, meKind == XMLE_SHOW );
 
                         if (mbTextEffect)
-                            xSet->setPropertyValue( gsTextEffect, makeAny( eEffect ) );
+                            xSet->setPropertyValue( gsTextEffect, Any( eEffect ) );
                         else
-                            xSet->setPropertyValue( gsEffect, makeAny( eEffect ) );
-                        xSet->setPropertyValue( gsSpeed, makeAny( meSpeed ) );
+                            xSet->setPropertyValue( gsEffect, Any( eEffect ) );
+                        xSet->setPropertyValue( gsSpeed, Any( meSpeed ) );
 
                         if( eEffect == AnimationEffect_PATH && !maPathShapeId.isEmpty() )
                         {
                             Reference< XShape > xPath( GetImport().getInterfaceToIdentifierMapper().getReference( maPathShapeId ), UNO_QUERY );
                             if( xPath.is() )
-                                xSet->setPropertyValue( gsAnimPath, makeAny( xPath ) );
+                                xSet->setPropertyValue( gsAnimPath, Any( xPath ) );
                         }
                     }
                 }

@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:11+0200\n"
-"PO-Revision-Date: 2022-05-03 12:46+0000\n"
-"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-19 17:18+0000\n"
+"Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textschart01/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1565410144.000000\n"
 
 #. DsZFP
@@ -25,14 +25,14 @@ msgctxt ""
 msgid "Data Table"
 msgstr "Datentabelle"
 
-#. uFKwH
+#. Pf9FP
 #: 03010000.xhp
 msgctxt ""
 "03010000.xhp\n"
 "hd_id3150869\n"
 "help.text"
-msgid "<link href=\"text/schart/01/03010000.xhp\" name=\"Data Table\">Data Table</link>"
-msgstr "<link href=\"text/schart/01/03010000.xhp\" name=\"Data Table\">Datentabelle</link>"
+msgid "<link href=\"text/schart/01/03010000.xhp\">Data Table</link>"
+msgstr "<link href=\"text/schart/01/03010000.xhp\">Datentabelle</link>"
 
 #. EvUD4
 #: 03010000.xhp
@@ -86,7 +86,7 @@ msgctxt ""
 "par_id8141117\n"
 "help.text"
 msgid "When you create a chart that is based on default data, or when you copy a chart into your document, you can open the Data Table dialog to enter your own data. The chart responds to the data in a live preview."
-msgstr "Wenn Sie ein auf Standarddaten basierendes Diagramm erstellen oder ein Diagramm in ein Dokument kopieren, können Sie den Dialog \"Datentabelle\" öffnen und eigene Daten eingeben. Die eingegebenen Daten werden in einer Live-Vorschau im Diagramm dargestellt."
+msgstr "Wenn Sie ein auf standardmäßigen Daten basierendes Diagramm erstellen oder ein Diagramm in ein Dokument kopieren, können Sie den Dialog „Datentabelle“ öffnen und eigene Daten eingeben. Die eingegebenen Daten werden in einer Live-Vorschau im Diagramm dargestellt."
 
 #. VoGXA
 #: 03010000.xhp
@@ -673,14 +673,14 @@ msgctxt ""
 msgid "<bookmark_value>data labels in charts</bookmark_value>      <bookmark_value>labels; for charts</bookmark_value>      <bookmark_value>charts; data labels</bookmark_value>      <bookmark_value>data values in charts</bookmark_value>      <bookmark_value>chart legends; showing icons with labels</bookmark_value>"
 msgstr "<bookmark_value>Datenbeschriftungen in Diagrammen</bookmark_value><bookmark_value>Beschriftungen; Diagramme</bookmark_value><bookmark_value>Diagramme; Datenbeschriftungen</bookmark_value><bookmark_value>Datenwerte in Diagrammen</bookmark_value><bookmark_value>Diagrammlegenden; Symbole mit Beschriftungen anzeigen</bookmark_value>"
 
-#. jWyvv
+#. UKRDA
 #: 04030000.xhp
 msgctxt ""
 "04030000.xhp\n"
 "hd_id3150275\n"
 "help.text"
-msgid "<variable id=\"datenbeschriftung\"><link href=\"text/schart/01/04030000.xhp\" name=\"Data labels\">Data Labels</link></variable>"
-msgstr "<variable id=\"datenbeschriftung\"><link href=\"text/schart/01/04030000.xhp\" name=\"Data labels\">Datenbeschriftung</link></variable>"
+msgid "<variable id=\"datenbeschriftung\"><link href=\"text/schart/01/04030000.xhp\">Data Labels</link></variable>"
+msgstr "<variable id=\"datenbeschriftung\"><link href=\"text/schart/01/04030000.xhp\">Datenbeschriftung</link></variable>"
 
 #. C3Fy5
 #: 04030000.xhp
@@ -689,7 +689,7 @@ msgctxt ""
 "par_id3154684\n"
 "help.text"
 msgid "<variable id=\"besch\"><ahelp hid=\".uno:InsertMenuDataLabels\">Opens the<emph> Data Labels </emph>dialog, which enables you to set the data labels.</ahelp></variable>"
-msgstr "<variable id=\"besch\"><ahelp hid=\".uno:InsertMenuDataLabels\">Öffnet den Dialog <emph>Datenbeschriftung</emph>, in welchem Sie das Aussehen der Datenbeschriftung festlegen.</ahelp></variable>"
+msgstr "<variable id=\"besch\"><ahelp hid=\".uno:InsertMenuDataLabels\">Öffnet den Dialog <emph>Datenbeschriftung</emph>, in dem Sie das Aussehen der Datenbeschriftung festlegen.</ahelp></variable>"
 
 #. EwAhi
 #: 04030000.xhp
@@ -824,7 +824,7 @@ msgctxt ""
 "par_id6668904\n"
 "help.text"
 msgid "<ahelp hid=\".\">Selects the separator between multiple text strings for the same object.</ahelp>"
-msgstr "<ahelp hid=\".\">Wählt das Trennzeichen zwischen mehreren Textzeichenketten für das gleiche Objekt.</ahelp>"
+msgstr "<ahelp hid=\".\">Wählt das Trennzeichen zwischen mehreren Textzeichenfolgen für das gleiche Objekt.</ahelp>"
 
 #. cg8Ec
 #: 04030000.xhp
@@ -1004,7 +1004,7 @@ msgctxt ""
 "par_id3166428\n"
 "help.text"
 msgid "Use this area to assign a second axis to your chart. If a data series is already assigned to this axis, $[officename] automatically displays the axis and the label. You can turn off these settings later on. If no data has been assigned to this axis and you activate this area, the values of the primary Y axis are applied to the secondary axis."
-msgstr "In diesem Bereich können Sie Ihrem Diagramm eine zweite Achse zuweisen. Ist bereits eine Datenreihe dieser Achse zugeordnet, zeigt $[officename] automatisch Achse und Beschriftung an. Sie können diese Standardeinstellung nachträglich abschalten. Wenn Sie diesen Bereich aktivieren und der Achse keine Daten zugeordnet sind, werden für die sekundäre Achse die Werte der primären Y-Achse übernommen."
+msgstr "In diesem Bereich können Sie Ihrem Diagramm eine zweite Achse zuweisen. Ist bereits eine Datenreihe dieser Achse zugeordnet, zeigt $[officename] automatisch Achse und Beschriftung an. Sie können diese standardmäßige Einstellung nachträglich abschalten. Wenn Sie diesen Bereich aktivieren und der Achse keine Daten zugeordnet sind, werden für die sekundäre Achse die Werte der primären Y-Achse übernommen."
 
 #. oEY8r
 #: 04040000.xhp
@@ -1060,14 +1060,14 @@ msgctxt ""
 msgid "X/Y Error Bars"
 msgstr "X-/Y-Fehlerbalken"
 
-#. 3gFip
+#. o7uyC
 #: 04050000.xhp
 msgctxt ""
 "04050000.xhp\n"
 "hd_id3147428\n"
 "help.text"
-msgid "<link href=\"text/schart/01/04050000.xhp\" name=\"Y Error Bars\">X/Y Error Bars</link>"
-msgstr "<link href=\"text/schart/01/04050000.xhp\" name=\"Y Error Bars\">X-/Y-Fehlerbalken</link>"
+msgid "<link href=\"text/schart/01/04050000.xhp\">X/Y Error Bars</link>"
+msgstr "<link href=\"text/schart/01/04050000.xhp\">X-/Y-Fehlerbalken</link>"
 
 #. VufWr
 #: 04050000.xhp
@@ -1697,7 +1697,7 @@ msgctxt ""
 "par_id180820161627109994\n"
 "help.text"
 msgid "Default equation uses <item type=\"literal\">x</item> for abscissa variable, and <item type=\"literal\">f(x)</item> for ordinate variable. To change these names, select the trend line, choose <item type=\"menuitem\">Format - Format Selection – Type</item> and enter names in <item type=\"literal\">X Variable Name</item> and <item type=\"literal\">Y Variable Name</item> edit boxes."
-msgstr "Die Standardgleichung verwendet <item type=\"literal\">x</item> als Abzissenvariable und <item type=\"literal\">f(x)</item> als Ordinatenvariable. Um die Namen zu ändern, wählen Sie die Trendlinie aus, wählen <item type=\"menuitem\">Format – Auswahl formatieren… – Register: Typ</item> und geben Namen in die Textfelder <item type=\"literal\">X-Variablenname</item> und <item type=\"literal\">Y-Variablenname</item> ein."
+msgstr "Die standardmäßige Gleichung verwendet <item type=\"literal\">x</item> als Abzissenvariable und <item type=\"literal\">f(x)</item> als Ordinatenvariable. Um die Namen zu ändern, wählen Sie die Trendlinie aus, wählen <item type=\"menuitem\">Format – Auswahl formatieren… – Register: Typ</item> und geben Namen in die Textfelder <item type=\"literal\">X-Variablenname</item> und <item type=\"literal\">Y-Variablenname</item> ein."
 
 #. jAs3d
 #: 04050100.xhp
@@ -2230,14 +2230,14 @@ msgctxt ""
 msgid "<bookmark_value>aligning; 2D charts</bookmark_value>         <bookmark_value>charts; aligning</bookmark_value>         <bookmark_value>pie charts;options</bookmark_value>"
 msgstr "<bookmark_value>Ausrichten; 2D-Diagramme</bookmark_value><bookmark_value>Diagramme; ausrichten</bookmark_value><bookmark_value>Kreisdiagramme; Optionen</bookmark_value>"
 
-#. VZy93
+#. wGM8h
 #: 04060000.xhp
 msgctxt ""
 "04060000.xhp\n"
 "hd_id3149400\n"
 "help.text"
-msgid "<link href=\"text/schart/01/04060000.xhp\" name=\"Options\">Options</link>"
-msgstr "<link href=\"text/schart/01/04060000.xhp\" name=\"Optionen\">Optionen</link>"
+msgid "<link href=\"text/schart/01/04060000.xhp\">Options</link>"
+msgstr "<link href=\"text/schart/01/04060000.xhp\">Optionen</link>"
 
 #. FFqBA
 #: 04060000.xhp
@@ -2417,7 +2417,7 @@ msgctxt ""
 "par_id2527237\n"
 "help.text"
 msgid "Available for pie and donut charts. <ahelp hid=\".\">The default direction in which the pieces of a pie chart are ordered is counterclockwise. Enable the <emph>Clockwise direction</emph> checkbox to draw the pieces in opposite direction.</ahelp>"
-msgstr "Verfügbar für Kreis- und Ringdiagramme. <ahelp hid=\".\">Die Standardrichtung, in welche die Stücke eines Kreisdiagramms angeordnet sind, ist entgegen dem Uhrzeigersinn. Aktivieren Sie das Markierfeld <emph>Ausrichtung im Uhrzeigersinn</emph>, um die Stücke in die entgegengesetzte Richtung zu ziehen.</ahelp>"
+msgstr "Verfügbar für Kreis- und Ringdiagramme. <ahelp hid=\".\">Die standardmäßige Richtung, in welche die Stücke eines Kreisdiagramms angeordnet sind, ist entgegen dem Uhrzeigersinn. Aktivieren Sie das Markierfeld <emph>Ausrichtung im Uhrzeigersinn</emph>, um die Stücke in die entgegengesetzte Richtung zu ziehen.</ahelp>"
 
 #. BiqZr
 #: 04060000.xhp
@@ -2444,7 +2444,7 @@ msgctxt ""
 "par_id553910\n"
 "help.text"
 msgid "In 3D pie and donut charts that were created with older versions of the software, the starting angle is 0 degrees instead of 90 degrees. For old and new 2D charts the default starting angle is 90 degrees."
-msgstr "In 3D-Kreis- und Ringdiagrammen, die mit älteren Versionen der Software erstellt wurden, ist der Startpunkt 0 Grad statt 90 Grad. Für alte und neue 2D-Diagramme ist der Standardstartpunkt 90 Grad."
+msgstr "In 3D-Kreis- und Ringdiagrammen, die mit älteren Versionen der Software erstellt wurden, ist der Startpunkt 0 Grad statt 90 Grad. Für alte und neue 2D-Diagramme ist der standardmäßige Startpunkt 90 Grad."
 
 #. 9xzEe
 #: 04060000.xhp
@@ -2588,7 +2588,7 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Grids"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. 7Qu9B
 #: 04070000.xhp
@@ -2597,7 +2597,7 @@ msgctxt ""
 "bm_id3147434\n"
 "help.text"
 msgid "<bookmark_value>axes; inserting grids</bookmark_value>  <bookmark_value>grids; inserting in charts</bookmark_value>"
-msgstr "<bookmark_value>Achsen; Gitternetzlinien einfügen</bookmark_value><bookmark_value>Gitternetzlinien; in Diagramme einfügen</bookmark_value>"
+msgstr "<bookmark_value>Achsen; Gitterlinien einfügen</bookmark_value><bookmark_value>Gitterlinien; in Diagramme einfügen</bookmark_value>"
 
 #. xYnZh
 #: 04070000.xhp
@@ -2606,7 +2606,7 @@ msgctxt ""
 "hd_id3147434\n"
 "help.text"
 msgid "Grids"
-msgstr "Gitternetzlinien"
+msgstr "Gitterlinien"
 
 #. BPAAF
 #: 04070000.xhp
@@ -2615,7 +2615,7 @@ msgctxt ""
 "par_id3146974\n"
 "help.text"
 msgid "<variable id=\"gitter\"><ahelp hid=\".\">You can divide the axes into sections by assigning gridlines to them. This allows you to get a better overview of the chart, especially if you are working with large charts.</ahelp> </variable> The Y axis major grid is activated by default."
-msgstr "<variable id=\"gitter\"><ahelp hid=\".\">Mit Gitternetzlinien lassen sich die Achsen in verschiedene Abschnitte unterteilen. Besonders bei der Arbeit mit großen Diagrammen erhalten Sie dadurch einen besseren Überblick über das Diagramm.</ahelp></variable> Das Hauptgitternetz der Y-Achse ist standardmäßig aktiviert."
+msgstr "<variable id=\"gitter\"><ahelp hid=\".\">Mit Gitterlinien lassen sich die Achsen in verschiedene Abschnitte unterteilen. Besonders bei der Arbeit mit großen Diagrammen erhalten Sie dadurch eine bessere Übersicht über das Diagramm.</ahelp></variable> Das Hauptgitterlinien der Y-Achse ist standardmäßig aktiviert."
 
 #. EaERh
 #: 04070000.xhp
@@ -2624,7 +2624,7 @@ msgctxt ""
 "hd_id3156286\n"
 "help.text"
 msgid "Major grids"
-msgstr "Hauptgitter"
+msgstr "Hauptgitterlinien"
 
 #. jMxC8
 #: 04070000.xhp
@@ -2633,7 +2633,7 @@ msgctxt ""
 "par_id3154511\n"
 "help.text"
 msgid "Defines the axis to be set as the major grid."
-msgstr "Bestimmt die als Hauptgitter zu verwendende Achse."
+msgstr "Bestimmt die als Hauptgitterlinien zu verwendende Achse."
 
 #. YFW67
 #: 04070000.xhp
@@ -2651,7 +2651,7 @@ msgctxt ""
 "par_id3150749\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryX\">Adds gridlines to the X axis of the chart.</ahelp>"
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryX\">Fügt Gitternetzlinien für die X-Achse des Diagramms ein.</ahelp>"
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryX\">Fügt Gitterlinien für die X-Achse des Diagramms ein.</ahelp>"
 
 #. jw52A
 #: 04070000.xhp
@@ -2660,7 +2660,7 @@ msgctxt ""
 "par_id3154754\n"
 "help.text"
 msgid "<variable id=\"sytextxgitter\"><ahelp hid=\".uno:ToggleGridVertical\">The <emph>Vertical Grids</emph> icon on the <emph>Formatting</emph> bar toggles the visibility of the grid display for the X axis.</ahelp></variable> It switches between the three states: no grid, major grid and both major and minor grids displayed. The change will affect check boxes in <emph>Insert - Grids</emph>."
-msgstr "<variable id=\"sytextxgitter\"><ahelp hid=\".uno:ToggleGridVertical\">Das Symbol <emph>Vertikales Gitter</emph> in der Symbolleiste <emph>Formatierungen</emph> blendet das Gitter der X-Achse ein oder aus.</ahelp></variable> Es wechselt zwischen den drei Möglichkeiten: kein Gitter, Hauptgitter, Haupt- und Hilfsgitter. Der Wechsel wirkt sich auch auf die Einstellungen unter <emph>Einfügen – Gitter…</emph> aus."
+msgstr "<variable id=\"sytextxgitter\"><ahelp hid=\".uno:ToggleGridVertical\">Das Symbol <emph>Vertikale Gitterlinien</emph> in der Symbolleiste <emph>Formatierungen</emph> blendet die Gitterlinien der X-Achse ein oder aus.</ahelp></variable> Es wechselt zwischen den drei Möglichkeiten: keine Gitterlinien, Hauptgitterlinien, Haupt- und Hilfsgitterlinien. Der Wechsel wirkt sich auch auf die Einstellungen unter <emph>Einfügen – Gitterlinien…</emph> aus."
 
 #. b5caj
 #: 04070000.xhp
@@ -2678,7 +2678,7 @@ msgctxt ""
 "par_id3147004\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryY\">Adds gridlines to the Y axis of the chart.</ahelp>"
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryY\">Fügt Gitternetzlinien für die Y-Achse des Diagramms ein.</ahelp>"
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryY\">Fügt Gitterlinien für die Y-Achse des Diagramms ein.</ahelp>"
 
 #. wKyUB
 #: 04070000.xhp
@@ -2687,7 +2687,7 @@ msgctxt ""
 "par_id3150344\n"
 "help.text"
 msgid "<variable id=\"sytextygitter\"><ahelp hid=\".uno:ToggleGridHorizontal\">The <emph>Horizontal Grids</emph> icon on the <emph>Formatting</emph> bar toggles the visibility of the grid display for the Y axis.</ahelp></variable> It switches between the three states: no grid, major grid and both major and minor grids displayed. The change will affect check boxes in <emph>Insert - Grids</emph>."
-msgstr "<variable id=\"sytextygitter\"><ahelp hid=\".uno:ToggleGridHorizontal\">Das Symbol <emph>Horizontales Gitter</emph> in der Symbolleiste <emph>Formatierungen</emph> blendet das Gitter der Y-Achse ein oder aus.</ahelp></variable> Es wechselt zwischen den drei Möglichkeiten: kein Gitter, Hauptgitter, Haupt- und Hilfsgitter. Der Wechsel wirkt sich auch auf die Einstellungen unter <emph>Einfügen – Gitter…</emph> aus."
+msgstr "<variable id=\"sytextygitter\"><ahelp hid=\".uno:ToggleGridHorizontal\">Das Symbol <emph>Horizontale Gitterlinien</emph> in der Symbolleiste <emph>Formatierungen</emph> blendet die Gitterlinien der Y-Achse ein oder aus.</ahelp></variable> Es wechselt zwischen den drei Möglichkeiten: keine Gitterlinien, Hauptgitterlinien, Haupt- und Hilfsgitterlinien. Der Wechsel wirkt sich auch auf die Einstellungen unter <emph>Einfügen – Gitterlinien…</emph> aus."
 
 #. LnVn3
 #: 04070000.xhp
@@ -2705,7 +2705,7 @@ msgctxt ""
 "par_id3155378\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryZ\">Adds gridlines to the Z axis of the chart.</ahelp> This option is only available if you're working with 3D charts."
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryZ\">Fügt Gitternetzlinien für die Z-Achse des Diagramms ein.</ahelp> Diese Option steht nur bei der Arbeit mit 3D-Diagrammen zur Verfügung."
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/primaryZ\">Fügt Gitterlinien für die Z-Achse des Diagramms ein.</ahelp> Diese Option steht nur bei der Arbeit mit 3D-Diagrammen zur Verfügung."
 
 #. ttEwy
 #: 04070000.xhp
@@ -2714,7 +2714,7 @@ msgctxt ""
 "hd_id3146978\n"
 "help.text"
 msgid "Minor grids"
-msgstr "Hilfsgitter"
+msgstr "Hilfsgitterlinien"
 
 #. XwARg
 #: 04070000.xhp
@@ -2723,7 +2723,7 @@ msgctxt ""
 "par_id3156449\n"
 "help.text"
 msgid "Use this area to assign a minor grid for each axis. Assigning minor grids to the axis reduces the distance between the major grids."
-msgstr "Hier können Sie für jede Achse ein Hilfsgitter einfügen und dadurch die Abstände der Unterteilung weiter verkleinern. Allerdings muss dazu das zugehörige Hauptgitter eingeschaltet sein."
+msgstr "Hier können Sie für jede Achse Hilfsgitterlinien einfügen und dadurch die Abstände der Unterteilung weiter verkleinern. Allerdings muss dazu die zugehörigen Hauptgitterlinien eingeschaltet sein."
 
 #. 9qctc
 #: 04070000.xhp
@@ -2741,7 +2741,7 @@ msgctxt ""
 "par_id3148704\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryX\">Adds gridlines that subdivide the X axis into smaller sections.</ahelp>"
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryX\">Fügt Gitternetzlinien zur Unterteilung der X-Achse in kleinere Abschnitte ein.</ahelp>"
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryX\">Fügt Gitterlinien zur Unterteilung der X-Achse in kleinere Abschnitte ein.</ahelp>"
 
 #. UVBEm
 #: 04070000.xhp
@@ -2759,7 +2759,7 @@ msgctxt ""
 "par_id3154536\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryY\">Adds gridlines that subdivide the Y axis into smaller sections.</ahelp>"
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryY\">Fügt Gitternetzlinien zur Unterteilung der Y-Achse in kleinere Abschnitte ein.</ahelp>"
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryY\">Fügt Gitterlinien zur Unterteilung der Y-Achse in kleinere Abschnitte ein.</ahelp>"
 
 #. mDcfy
 #: 04070000.xhp
@@ -2777,7 +2777,7 @@ msgctxt ""
 "par_id3153247\n"
 "help.text"
 msgid "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryZ\">Adds gridlines that subdivide the Z axis into smaller sections.</ahelp> This option is only available if you're working with 3D charts."
-msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryZ\">Fügt Gitternetzlinien zur Unterteilung der Z-Achse in kleinere Abschnitte ein.</ahelp> Diese Option steht nur bei der Arbeit mit 3D-Diagrammen zur Verfügung."
+msgstr "<ahelp hid=\"modules/schart/ui/insertgriddlg/secondaryZ\">Fügt Gitterlinien zur Unterteilung der Z-Achse in kleinere Abschnitte ein.</ahelp> Diese Option steht nur bei der Arbeit mit 3D-Diagrammen zur Verfügung."
 
 #. GrPzW
 #: 05010000.xhp
@@ -2815,77 +2815,77 @@ msgctxt ""
 msgid "<variable id=\"objekteigenschaften\"><ahelp hid=\".\">Formats the selected object.</ahelp></variable> Depending on the object selected, the command opens dialogs that you can also open by choosing the following commands from the <emph>Format</emph> menu:"
 msgstr "<variable id=\"objekteigenschaften\"><ahelp hid=\".\">Formatiert das ausgewählte Objekt.</ahelp></variable> In Abhängigkeit von dem ausgewählten Objekt öffnet der Befehl Dialoge, die Sie auch über die Befehle unter <emph>Format</emph> aufrufen können:"
 
-#. vHgCk
+#. vxgDS
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3153418\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05060000.xhp\" name=\"Chart Wall\">Chart Wall</link>"
-msgstr "<link href=\"text/schart/01/05060000.xhp\" name=\"Chart Wall\">Diagrammwand</link>"
+msgid "<link href=\"text/schart/01/05060000.xhp\">Chart Wall</link>"
+msgstr "<link href=\"text/schart/01/05060000.xhp\">Diagrammwand</link>"
 
-#. QqxBP
+#. Jwpdd
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3155766\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05080000.xhp\" name=\"Chart Area\">Chart Area</link>"
-msgstr "<link href=\"text/schart/01/05080000.xhp\" name=\"Chart Area\">Diagrammfläche</link>"
+msgid "<link href=\"text/schart/01/05080000.xhp\">Chart Area</link>"
+msgstr "<link href=\"text/schart/01/05080000.xhp\">Diagrammfläche</link>"
 
-#. 2V4zT
+#. C2ohG
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3154255\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05070000.xhp\" name=\"Chart Floor\">Chart Floor</link>"
-msgstr "<link href=\"text/schart/01/05070000.xhp\" name=\"Chart Floor\">Diagrammboden</link>"
+msgid "<link href=\"text/schart/01/05070000.xhp\">Chart Floor</link>"
+msgstr "<link href=\"text/schart/01/05070000.xhp\">Diagrammboden</link>"
 
-#. bAPbZ
+#. 5jmdC
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3146313\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020100.xhp\" name=\"Title\">Title</link>"
-msgstr "<link href=\"text/schart/01/05020100.xhp\" name=\"Titel\">Titel</link>"
+msgid "<link href=\"text/schart/01/05020100.xhp\">Title</link>"
+msgstr "<link href=\"text/schart/01/05020100.xhp\">Titel</link>"
 
-#. HDCGU
+#. h5EFN
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3150297\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05030000.xhp\" name=\"Legend\">Legend</link>"
-msgstr "<link href=\"text/schart/01/05030000.xhp\" name=\"Legend\">Legende</link>"
+msgid "<link href=\"text/schart/01/05030000.xhp\">Legend</link>"
+msgstr "<link href=\"text/schart/01/05030000.xhp\">Legende</link>"
 
-#. AFjzr
+#. xb9VA
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3143219\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040100.xhp\" name=\"X Axis\">X Axis</link>"
-msgstr "<link href=\"text/schart/01/05040100.xhp\" name=\"X Axis\">X-Achse</link>"
+msgid "<link href=\"text/schart/01/05040100.xhp\">X Axis</link>"
+msgstr "<link href=\"text/schart/01/05040100.xhp\">X-Achse</link>"
 
-#. PBGAy
+#. Eoz2Y
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3150207\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040200.xhp\" name=\"Y Axis\">Y Axis</link>"
-msgstr "<link href=\"text/schart/01/05040200.xhp\" name=\"Y Axis\">Y-Achse</link>"
+msgid "<link href=\"text/schart/01/05040200.xhp\">Y Axis</link>"
+msgstr "<link href=\"text/schart/01/05040200.xhp\">Y-Achse</link>"
 
-#. fda89
+#. 7eFxE
 #: 05010000.xhp
 msgctxt ""
 "05010000.xhp\n"
 "hd_id3166432\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"Grid\">Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Gitter\">Gitter</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Gitterlinien</link>"
 
 #. J6GAJ
 #: 05010100.xhp
@@ -2896,14 +2896,14 @@ msgctxt ""
 msgid "Data Point"
 msgstr "Datenpunkt"
 
-#. 23fqY
+#. bAmek
 #: 05010100.xhp
 msgctxt ""
 "05010100.xhp\n"
 "hd_id3153768\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05010100.xhp\" name=\"Data Point\">Data Point</link>"
-msgstr "<link href=\"text/schart/01/05010100.xhp\" name=\"Datenpunkt\">Datenpunkt</link>"
+msgid "<link href=\"text/schart/01/05010100.xhp\">Data Point</link>"
+msgstr "<link href=\"text/schart/01/05010100.xhp\">Datenpunkt</link>"
 
 #. GP7Gq
 #: 05010100.xhp
@@ -2932,14 +2932,14 @@ msgctxt ""
 msgid "Data Series"
 msgstr "Datenreihe"
 
-#. XqZBr
+#. frn5K
 #: 05010200.xhp
 msgctxt ""
 "05010200.xhp\n"
 "hd_id3150449\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05010200.xhp\" name=\"Data Series\">Data Series</link>"
-msgstr "<link href=\"text/schart/01/05010200.xhp\" name=\"Data Series\">Datenreihe</link>"
+msgid "<link href=\"text/schart/01/05010200.xhp\">Data Series</link>"
+msgstr "<link href=\"text/schart/01/05010200.xhp\">Datenreihe</link>"
 
 #. gW2W2
 #: 05010200.xhp
@@ -2959,14 +2959,14 @@ msgctxt ""
 msgid "Any changes made here affect the entire data series. For example, if you change the color, all elements belonging to this data series will change color."
 msgstr "Änderungen, die Sie hier vornehmen, wirken sich auf die gesamte Datenreihe aus. Ändern Sie beispielsweise die Farbe, so werden alle Elemente, die zu dieser Datenreihe gehören, farblich ebenso verändert."
 
-#. ncg3c
+#. V76Fn
 #: 05010200.xhp
 msgctxt ""
 "05010200.xhp\n"
 "hd_id3146916\n"
 "help.text"
-msgid "<link href=\"text/schart/01/04050000.xhp\" name=\"Y Error Bars\">Y Error Bars</link>"
-msgstr "<link href=\"text/schart/01/04050000.xhp\" name=\"Y Error Bars\">Y-Fehlerbalken</link>"
+msgid "<link href=\"text/schart/01/04050000.xhp\">Y Error Bars</link>"
+msgstr "<link href=\"text/schart/01/04050000.xhp\">Y-Fehlerbalken</link>"
 
 #. VsfnB
 #: 05020000.xhp
@@ -2986,14 +2986,14 @@ msgctxt ""
 msgid "<bookmark_value>titles; formatting charts</bookmark_value><bookmark_value>formatting; chart titles</bookmark_value>"
 msgstr "<bookmark_value>Titel; Diagramme formatieren</bookmark_value><bookmark_value>Formatierung; Diagrammtitel</bookmark_value>"
 
-#. Jfh4e
+#. oZeTX
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3150791\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020000.xhp\" name=\"Title\">Title</link>"
-msgstr "<link href=\"text/schart/01/05020000.xhp\" name=\"Titel\">Titel</link>"
+msgid "<link href=\"text/schart/01/05020000.xhp\">Title</link>"
+msgstr "<link href=\"text/schart/01/05020000.xhp\">Titel</link>"
 
 #. pj2hY
 #: 05020000.xhp
@@ -3004,59 +3004,59 @@ msgctxt ""
 msgid "The<emph> Title </emph>menu command opens a submenu for editing the properties of the titles in the chart."
 msgstr "<emph>Titel </emph>öffnet ein Untermenü für die Bearbeitung der Eigenschaften der Diagrammtitel."
 
-#. rXXck
+#. dhEAr
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3155414\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020100.xhp\" name=\"Main title\">Main title</link>"
-msgstr "<link href=\"text/schart/01/05020100.xhp\" name=\"Haupttitel\">Haupttitel</link>"
+msgid "<link href=\"text/schart/01/05020100.xhp\">Main title</link>"
+msgstr "<link href=\"text/schart/01/05020100.xhp\">Haupttitel</link>"
 
-#. SiCVe
+#. JETPX
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3156441\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020100.xhp\" name=\"Subtitle\">Subtitle</link>"
-msgstr "<link href=\"text/schart/01/05020100.xhp\" name=\"Untertitel\">Untertitel</link>"
+msgid "<link href=\"text/schart/01/05020100.xhp\">Subtitle</link>"
+msgstr "<link href=\"text/schart/01/05020100.xhp\">Untertitel</link>"
 
-#. LiMC5
+#. 4ACfQ
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3151073\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020100.xhp\" name=\"X-axis title\">X-axis title</link>"
-msgstr "<link href=\"text/schart/01/05020100.xhp\" name=\"X-axis title\">X-Achsentitel</link>"
+msgid "<link href=\"text/schart/01/05020100.xhp\">X-axis title</link>"
+msgstr "<link href=\"text/schart/01/05020100.xhp\">X-Achsentitel</link>"
 
-#. fZFZC
+#. 7aABb
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3154732\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020200.xhp\" name=\"Y-axis title\">Y-axis title</link>"
-msgstr "<link href=\"text/schart/01/05020200.xhp\" name=\"Y-axis title\">Y-Achsentitel</link>"
+msgid "<link href=\"text/schart/01/05020200.xhp\">Y-axis title</link>"
+msgstr "<link href=\"text/schart/01/05020200.xhp\">Y-Achsentitel</link>"
 
-#. dMUSA
+#. 2DHTT
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3154017\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020100.xhp\" name=\"Z-axis title\">Z-axis title</link>"
-msgstr "<link href=\"text/schart/01/05020100.xhp\" name=\"Z-axis title\">Z-Achsentitel</link>"
+msgid "<link href=\"text/schart/01/05020100.xhp\">Z-axis title</link>"
+msgstr "<link href=\"text/schart/01/05020100.xhp\">Z-Achsentitel</link>"
 
-#. L4bi3
+#. GYDDh
 #: 05020000.xhp
 msgctxt ""
 "05020000.xhp\n"
 "hd_id3153711\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020200.xhp\" name=\"All titles\">All titles</link>"
-msgstr "<link href=\"text/schart/01/05020200.xhp\" name=\"Alle Titel\">Alle Titel</link>"
+msgid "<link href=\"text/schart/01/05020200.xhp\">All titles</link>"
+msgstr "<link href=\"text/schart/01/05020200.xhp\">Alle Titel</link>"
 
 #. Mr6ew
 #: 05020100.xhp
@@ -3112,14 +3112,14 @@ msgctxt ""
 msgid "<bookmark_value>aligning;titles in charts</bookmark_value><bookmark_value>titles;alignment (charts)</bookmark_value>"
 msgstr "<bookmark_value>Ausrichten; Titel in Diagrammen</bookmark_value><bookmark_value>Titel; Ausrichtung (Diagramme)</bookmark_value>"
 
-#. krg6b
+#. xxfY5
 #: 05020101.xhp
 msgctxt ""
 "05020101.xhp\n"
 "hd_id3150793\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020101.xhp\" name=\"Alignment\">Alignment</link>"
-msgstr "<link href=\"text/schart/01/05020101.xhp\" name=\"Ausrichtung\">Ausrichtung</link>"
+msgid "<link href=\"text/schart/01/05020101.xhp\">Alignment</link>"
+msgstr "<link href=\"text/schart/01/05020101.xhp\">Ausrichtung</link>"
 
 #. AAgmZ
 #: 05020101.xhp
@@ -3184,14 +3184,14 @@ msgctxt ""
 msgid "Alignment"
 msgstr "Anpassung"
 
-#. yFppQ
+#. AES4P
 #: 05020201.xhp
 msgctxt ""
 "05020201.xhp\n"
 "hd_id3149656\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05020201.xhp\" name=\"Alignment\">Alignment</link>"
-msgstr "<link href=\"text/schart/01/05020201.xhp\" name=\"Ausrichtung\">Ausrichtung</link>"
+msgid "<link href=\"text/schart/01/05020201.xhp\">Alignment</link>"
+msgstr "<link href=\"text/schart/01/05020201.xhp\">Ausrichtung</link>"
 
 #. MoFiE
 #: 05020201.xhp
@@ -3526,14 +3526,14 @@ msgctxt ""
 msgid "<variable id=\"legende\"><ahelp hid=\".uno:Legend\">Defines the border, area and character attributes for a legend.</ahelp></variable>"
 msgstr "<variable id=\"legende\"><ahelp hid=\".uno:Legend\">Legt Linien-, Flächen- und Zeichenattribute einer Legende fest.</ahelp></variable>"
 
-#. 73CU8
+#. w6aAv
 #: 05030000.xhp
 msgctxt ""
 "05030000.xhp\n"
 "hd_id3147344\n"
 "help.text"
-msgid "<link href=\"text/schart/01/04020000.xhp\" name=\"Display\">Display</link>"
-msgstr "<link href=\"text/schart/01/04020000.xhp\" name=\"Anordnung\">Anordnung</link>"
+msgid "<link href=\"text/schart/01/04020000.xhp\">Display</link>"
+msgstr "<link href=\"text/schart/01/04020000.xhp\">Anordnung</link>"
 
 #. 5GZjq
 #: 05040000.xhp
@@ -3544,14 +3544,14 @@ msgctxt ""
 msgid "Axis"
 msgstr "Achse"
 
-#. FxB4P
+#. xoHGL
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3149456\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040000.xhp\" name=\"Axis\">Axis</link>"
-msgstr "<link href=\"text/schart/01/05040000.xhp\" name=\"Achse\">Achse</link>"
+msgid "<link href=\"text/schart/01/05040000.xhp\">Axis</link>"
+msgstr "<link href=\"text/schart/01/05040000.xhp\">Achse</link>"
 
 #. xasRG
 #: 05040000.xhp
@@ -3571,32 +3571,32 @@ msgctxt ""
 msgid "The tabs in the dialogs depend on the chart type selected."
 msgstr "Welche Register die Dialoge haben, ist abhängig vom gewählten Diagrammtyp."
 
-#. d7D6P
+#. mXUiF
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3153729\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040100.xhp\" name=\"X axis\">X axis</link>"
-msgstr "<link href=\"text/schart/01/05040100.xhp\" name=\"X axis\">X-Achse</link>"
+msgid "<link href=\"text/schart/01/05040100.xhp\">X axis</link>"
+msgstr "<link href=\"text/schart/01/05040100.xhp\">X-Achse</link>"
 
-#. bAHPT
+#. Zw52q
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3147394\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040200.xhp\" name=\"Y axis\">Y axis</link>"
-msgstr "<link href=\"text/schart/01/05040200.xhp\" name=\"Y axis\">Y-Achse</link>"
+msgid "<link href=\"text/schart/01/05040200.xhp\">Y axis</link>"
+msgstr "<link href=\"text/schart/01/05040200.xhp\">Y-Achse</link>"
 
-#. 4To7Z
+#. LLGG5
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3153160\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040100.xhp\" name=\"Secondary X Axis\">Secondary X Axis</link>"
-msgstr "<link href=\"text/schart/01/05040100.xhp\" name=\"Secondary X Axis\">Sekundäre X-Achse</link>"
+msgid "<link href=\"text/schart/01/05040100.xhp\">Secondary X Axis</link>"
+msgstr "<link href=\"text/schart/01/05040100.xhp\">Sekundäre X-Achse</link>"
 
 #. Xv7dg
 #: 05040000.xhp
@@ -3607,14 +3607,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:DiagramAxisA\">Opens a dialog where you can edit the properties of the secondary X axis. To insert a secondary X axis, choose <emph>Insert - Axes</emph> and select <emph>X axis</emph>.</ahelp>"
 msgstr "<ahelp hid=\".uno:DiagramAxisA\">Legen Sie unter anderem den Linienstil, die Schriftart und die Schreibrichtung der Achsenbeschriftung für die sekundäre X-Achse fest. Um eine sekundäre X-Achse einzufügen, wählen Sie <emph>Einfügen – Achsen…</emph> und aktivieren <emph>X-Achse</emph>.</ahelp>"
 
-#. 27jDa
+#. Kmpne
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3145640\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040200.xhp\" name=\"Secondary Y Axis\">Secondary Y Axis</link>"
-msgstr "<link href=\"text/schart/01/05040200.xhp\" name=\"Secondary Y Axis\">Sekundäre Y-Achse</link>"
+msgid "<link href=\"text/schart/01/05040200.xhp\">Secondary Y Axis</link>"
+msgstr "<link href=\"text/schart/01/05040200.xhp\">Sekundäre Y-Achse</link>"
 
 #. DqEpJ
 #: 05040000.xhp
@@ -3625,23 +3625,23 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:DiagramAxisB\">Opens a dialog where you can edit the properties of the secondary Y axis. To insert a secondary Y axis, choose <emph>Insert - Axes</emph> and select <emph>Y axis</emph>.</ahelp>"
 msgstr "<ahelp hid=\".uno:DiagramAxisB\">Legen Sie unter anderem den Linienstil, die Schriftart und die Schreibrichtung der Achsenbeschriftung für die sekundäre Y-Achse fest. Um eine sekundäre Y-Achse einzufügen, wählen Sie <emph>Einfügen – Achsen…</emph> und aktivieren <emph>Y-Achse</emph>.</ahelp>"
 
-#. WZh2Z
+#. o5eER
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3145228\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040100.xhp\" name=\"Z axis\">Z axis</link>"
-msgstr "<link href=\"text/schart/01/05040100.xhp\" name=\"Z axis\">Z-Achse</link>"
+msgid "<link href=\"text/schart/01/05040100.xhp\">Z axis</link>"
+msgstr "<link href=\"text/schart/01/05040100.xhp\">Z-Achse</link>"
 
-#. 7WMzM
+#. EF2GB
 #: 05040000.xhp
 msgctxt ""
 "05040000.xhp\n"
 "hd_id3147345\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040100.xhp\" name=\"All axes\">All axes</link>"
-msgstr "<link href=\"text/schart/01/05040100.xhp\" name=\"All axes\">Alle Achsen</link>"
+msgid "<link href=\"text/schart/01/05040100.xhp\">All axes</link>"
+msgstr "<link href=\"text/schart/01/05040100.xhp\">Alle Achsen</link>"
 
 #. baran
 #: 05040100.xhp
@@ -3679,14 +3679,14 @@ msgctxt ""
 msgid "<variable id=\"achsen\"><ahelp hid=\".\">Opens a dialog, where you can edit the properties of the selected axis.</ahelp></variable> The name of the dialog depends on the selected axis."
 msgstr "<variable id=\"achsen\"><ahelp hid=\".\">Öffnet einen Dialog, in dem Sie die Eigenschaften der ausgewählten Achse bearbeiten können.</ahelp></variable> Der Name des Dialogs ist von der jeweils ausgewählten Achse abhängig."
 
-#. k52jm
+#. KmBV5
 #: 05040100.xhp
 msgctxt ""
 "05040100.xhp\n"
 "par_id3149667\n"
 "help.text"
-msgid "The <link href=\"text/schart/01/05040200.xhp\" name=\"Y axis\">Y axis</link> has an enhanced dialog. For X-Y charts, the X axis chart is also enhanced by the <link href=\"text/schart/01/05040201.xhp\" name=\"Scaling\"><emph>Scaling</emph></link> tab."
-msgstr "Die <link href=\"text/schart/01/05040200.xhp\" name=\"Y axis\">Y-Achse</link> verfügt über einen erweiterten Dialog, bei XY-Diagrammen ist auch der Dialog X-Achse um das Register <link href=\"text/schart/01/05040201.xhp\" name=\"Scaling\"><emph>Skalierung</emph></link> erweitert."
+msgid "The <link href=\"text/schart/01/05040200.xhp\">Y axis</link> has an enhanced dialog. For X-Y charts, the X axis chart is also enhanced by the <link href=\"text/schart/01/05040201.xhp\"><emph>Scaling</emph></link> tab."
+msgstr "Die <link href=\"text/schart/01/05040200.xhp\">Y-Achse</link> verfügt über einen erweiterten Dialog, bei XY-Diagrammen ist auch der Dialog X-Achse um das Register <link href=\"text/schart/01/05040201.xhp\"><emph>Skalierung</emph></link> erweitert."
 
 #. 5KDFE
 #: 05040100.xhp
@@ -3751,14 +3751,14 @@ msgctxt ""
 msgid "<bookmark_value>scaling; axes</bookmark_value><bookmark_value>logarithmic scaling along axes</bookmark_value><bookmark_value>charts;scaling axes</bookmark_value><bookmark_value>X axes;scaling</bookmark_value><bookmark_value>Y axes; scaling</bookmark_value>"
 msgstr "<bookmark_value>Skalierung; Achsen</bookmark_value><bookmark_value>Logarithmische Skalierung entlang Achsen</bookmark_value><bookmark_value>Diagramme; Achsenskalierung</bookmark_value><bookmark_value>x-Achsen; Skalierung</bookmark_value><bookmark_value>y-Achsen; Skalierung</bookmark_value>"
 
-#. kwALA
+#. jwMAw
 #: 05040201.xhp
 msgctxt ""
 "05040201.xhp\n"
 "hd_id3150868\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040201.xhp\" name=\"Scale\">Scale</link>"
-msgstr "<link href=\"text/schart/01/05040201.xhp\" name=\"Skalierung\">Skalierung</link>"
+msgid "<link href=\"text/schart/01/05040201.xhp\">Scale</link>"
+msgstr "<link href=\"text/schart/01/05040201.xhp\">Skalierung</link>"
 
 #. ZGujx
 #: 05040201.xhp
@@ -4039,14 +4039,14 @@ msgctxt ""
 msgid "<bookmark_value>positioning; axes</bookmark_value><bookmark_value>charts;positioning axes</bookmark_value><bookmark_value>X axes;positioning</bookmark_value><bookmark_value>Y axes;positioning</bookmark_value><bookmark_value>axes;interval marks</bookmark_value>"
 msgstr "<bookmark_value>Positionierung; Achsen</bookmark_value><bookmark_value>Diagramme; Positionierung der Achsen</bookmark_value><bookmark_value>x-Achsen; positionieren</bookmark_value><bookmark_value>y-Achsen; positionieren</bookmark_value><bookmark_value>Achsen; Intervallmarkierung</bookmark_value>"
 
-#. JEfPK
+#. qxi6Y
 #: 05040202.xhp
 msgctxt ""
 "05040202.xhp\n"
 "hd_id3150868\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05040202.xhp\" name=\"positioning\">Positioning</link>"
-msgstr "<link href=\"text/schart/01/05040202.xhp\" name=\"positioning\">Positionierung</link>"
+msgid "<link href=\"text/schart/01/05040202.xhp\">Positioning</link>"
+msgstr "<link href=\"text/schart/01/05040202.xhp\">Positionierung</link>"
 
 #. sHVmL
 #: 05040202.xhp
@@ -4307,7 +4307,7 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Grid"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. 6WJr8
 #: 05050000.xhp
@@ -4316,16 +4316,16 @@ msgctxt ""
 "bm_id3155602\n"
 "help.text"
 msgid "<bookmark_value>grids; formatting axes</bookmark_value><bookmark_value>axes; formatting grids</bookmark_value>"
-msgstr "<bookmark_value>Tabellenraster; Achsen formatieren</bookmark_value><bookmark_value>Achsen; Gitterlinien formatieren</bookmark_value>"
+msgstr "<bookmark_value>Gitterlinien; Achsen formatieren</bookmark_value><bookmark_value>Achsen; Gitterlinien formatieren</bookmark_value>"
 
-#. WCwbv
+#. eX5Ah
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3155602\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050000.xhp\" name=\"Grid\">Grid</link>"
-msgstr "<link href=\"text/schart/01/05050000.xhp\" name=\"Gitter\">Gitter</link>"
+msgid "<link href=\"text/schart/01/05050000.xhp\">Grid</link>"
+msgstr "<link href=\"text/schart/01/05050000.xhp\">Gitterlinien</link>"
 
 #. wrhBD
 #: 05050000.xhp
@@ -4334,70 +4334,70 @@ msgctxt ""
 "par_id3155764\n"
 "help.text"
 msgid "Opens a submenu, where you select the grid you want to format."
-msgstr "Öffnet ein Untermenü, in dem Sie das zu formatierende Gitter wählen."
+msgstr "Öffnet ein Untermenü, in dem Sie die zu formatierenden Gitterlinien wählen."
 
-#. hUUha
+#. k6RCs
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3150045\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"X Axis Major Grid\">X Axis Major Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"X Axis Major Grid\">Hauptgitter X-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">X Axis Major Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hauptgitterlinien X-Achse</link>"
 
-#. bzjCW
+#. wKC6p
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3145228\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"Y Axis Major Grid\">Y Axis Major Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Y Axis Major Grid\">Hauptgitter Y-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">Y Axis Major Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hauptgitterlinien Y-Achse</link>"
 
-#. HYSXB
+#. hURtG
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3147346\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"Z Axis Major Grid\">Z Axis Major Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Z Axis Major Grid\">Hauptgitter Z-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">Z Axis Major Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hauptgitterlinien Z-Achse</link>"
 
-#. PCETn
+#. tCoy7
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3154021\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"X Axis Minor Grid\">X Axis Minor Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"X Axis Minor Grid\">Hilfsgitter X-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">X Axis Minor Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hilfsgitterlinien X-Achse</link>"
 
-#. VEqkq
+#. ifAAW
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3150307\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"Y Axis Minor Grid\">Y Axis Minor Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Y Axis Minor Grid\">Hilfsgitter Y-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">Y Axis Minor Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hilfsgitterlinien Y-Achse</link>"
 
-#. XRkcC
+#. PDJFw
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3166428\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"Z Axis minor Grid\">Z Axis minor Grid</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Z Axis minor Grid\">Hilfsgitter Z-Achse</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">Z Axis minor Grid</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Hilfsgitterlinien Z-Achse</link>"
 
-#. vdS2r
+#. VAF9J
 #: 05050000.xhp
 msgctxt ""
 "05050000.xhp\n"
 "hd_id3145585\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05050100.xhp\" name=\"All Axis Grids\">All Axis Grids</link>"
-msgstr "<link href=\"text/schart/01/05050100.xhp\" name=\"Alle Achsengitter\">Alle Achsengitter</link>"
+msgid "<link href=\"text/schart/01/05050100.xhp\">All Axis Grids</link>"
+msgstr "<link href=\"text/schart/01/05050100.xhp\">Gitterlinien aller Achsen</link>"
 
 #. g7BqG
 #: 05050100.xhp
@@ -4406,7 +4406,7 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Grid"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. 6C6rP
 #: 05050100.xhp
@@ -4415,7 +4415,7 @@ msgctxt ""
 "bm_id3150398\n"
 "help.text"
 msgid "<bookmark_value>X axes;grid formatting</bookmark_value><bookmark_value>Y axes;grid formatting</bookmark_value><bookmark_value>Z axes; grid formatting</bookmark_value>"
-msgstr "<bookmark_value>X-Achsen; Tabellengitter formatieren</bookmark_value><bookmark_value>Y-Achsen; Tabellengitter formatieren</bookmark_value><bookmark_value>Z-Achsen; Tabellengitter formatieren</bookmark_value>"
+msgstr "<bookmark_value>X-Achsen; Gitterlinien formatieren</bookmark_value><bookmark_value>Y-Achsen; Gitterlinien formatieren</bookmark_value><bookmark_value>Z-Achsen; Gitterlinien formatieren</bookmark_value>"
 
 #. h3HmA
 #: 05050100.xhp
@@ -4424,7 +4424,7 @@ msgctxt ""
 "hd_id3150398\n"
 "help.text"
 msgid "Grid"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. dYG27
 #: 05050100.xhp
@@ -4433,7 +4433,7 @@ msgctxt ""
 "par_id3152577\n"
 "help.text"
 msgid "<variable id=\"gitter\"><ahelp hid=\".uno:DiagramGridAll\">Opens the <emph>Grid</emph> dialog for defining grid properties.</ahelp></variable>"
-msgstr "<variable id=\"gitter\"><ahelp hid=\".uno:DiagramGridAll\">Öffnet den Dialog <emph>Gitter</emph> zum Festlegen von Gitter-Eigenschaften.</ahelp></variable>"
+msgstr "<variable id=\"gitter\"><ahelp hid=\".uno:DiagramGridAll\">Öffnet den Dialog <emph>Gitterlinien</emph> zum Festlegen von Gitterlinien-Eigenschaften.</ahelp></variable>"
 
 #. CbCCK
 #: 05060000.xhp
@@ -4552,14 +4552,14 @@ msgctxt ""
 msgid "Arrangement"
 msgstr "Anordnung"
 
-#. EUoBF
+#. LDTZg
 #: 05120000.xhp
 msgctxt ""
 "05120000.xhp\n"
 "hd_id3159153\n"
 "help.text"
-msgid "<link href=\"text/schart/01/05120000.xhp\" name=\"Arrangement\">Arrangement</link>"
-msgstr "<link href=\"text/schart/01/05120000.xhp\" name=\"Anordnung\">Anordnung</link>"
+msgid "<link href=\"text/schart/01/05120000.xhp\">Arrangement</link>"
+msgstr "<link href=\"text/schart/01/05120000.xhp\">Anordnung</link>"
 
 #. fUrWy
 #: 05120000.xhp
@@ -4830,6 +4830,240 @@ msgctxt ""
 "help.text"
 msgid "<link href=\"text/schart/01/type_column_line.xhp\">Column and Line</link>"
 msgstr "<link href=\"text/schart/01/type_column_line.xhp\">Säulen und Linien</link>"
+
+#. VYHvi
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"tit\n"
+"help.text"
+msgid "Data Table"
+msgstr "Datentabelle"
+
+#. pDBTX
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"bm_id3156441\n"
+"help.text"
+msgid "<bookmark_value>chart; data tables</bookmark_value>    <bookmark_value>insert data tables in charts</bookmark_value>"
+msgstr "<bookmark_value>Diagramme; Datentabellen</bookmark_value><bookmark_value>Einfügen; Datentabellen in Diagrammen</bookmark_value>"
+
+#. zG8yu
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id861665495783520\n"
+"help.text"
+msgid "<variable id=\"data_table_h1\"><link href=\"text/schart/01/data_table.xhp\">Chart Data Table</link></variable>"
+msgstr "<variable id=\"data_table_h1\"><link href=\"text/schart/01/data_table.xhp\">Diagramm-Datentabelle</link></variable>"
+
+#. d3MTA
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id131665495992109\n"
+"help.text"
+msgid "Inserts a <emph>Chart Data Table</emph> and configure its appearance."
+msgstr "Fügt eine <emph>Diagrammdatentabelle</emph> ein und konfiguriert deren Aussehen."
+
+#. hSg8E
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id731665773779796\n"
+"help.text"
+msgid "Chart data tables allow to visualize the data represented by the chart. A table containing the data is placed at the bottom of the chart."
+msgstr "Diagrammdatentabellen ermöglichen die Visualisierung der durch das Diagramm dargestellten Daten. Am unteren Rand des Diagramms wird eine Tabelle mit den Daten platziert."
+
+#. nGg9m
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id541665496100217\n"
+"help.text"
+msgid "Double-click the chart object to enter edit mode and choose <menuitem>Insert - Data Table</menuitem>"
+msgstr "Doppelklicken Sie auf das Diagrammobjekt, um in den Bearbeitungsmodus zu wechseln, und wählen Sie <menuitem>Einfügen – Datentabelle…</menuitem>"
+
+#. pGEgv
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id81665496208459\n"
+"help.text"
+msgid "If the chart already has a <emph>Data Table</emph>, double-click the chart to enter edit mode and do one of the following:"
+msgstr "Wenn das Diagramm bereits eine <emph>Datentabelle</emph> enthält, doppelklicken Sie auf das Diagramm, um in den Bearbeitungsmodus zu wechseln, und führen Sie einen der folgenden Schritte aus:"
+
+#. ntScE
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id431665496330435\n"
+"help.text"
+msgid "Right-click the data table and choose <menuitem>Format - Selection</menuitem>."
+msgstr "Klicken Sie mit der rechten Maustaste auf die Datentabelle und wählen Sie <menuitem>Format – Auswahl formatieren…</menuitem>."
+
+#. GY5FW
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id431665496331262\n"
+"help.text"
+msgid "Double-click the <emph>Data Table</emph>."
+msgstr "Doppelklicken Sie auf die <emph>Datentabelle</emph>."
+
+#. BPQcM
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"bm_id181665496962192\n"
+"help.text"
+msgid "<bookmark_value>chart; remove data table</bookmark_value>"
+msgstr "<bookmark_value>Diagramm; Datentabelle entfernen</bookmark_value>"
+
+#. LND7v
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id891665496566910\n"
+"help.text"
+msgid "To remove the data table:"
+msgstr "Um die Datentabelle zu entfernen:"
+
+#. sC5D7
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id701665496615511\n"
+"help.text"
+msgid "Double-click the chart to enter edit mode."
+msgstr "Doppelklicken Sie auf das Diagramm, um in den Bearbeitungsmodus zu wechseln."
+
+#. KGjkj
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id721665496616565\n"
+"help.text"
+msgid "Choose <menuitem>Insert - Data Table</menuitem>."
+msgstr "Wählen Sie <menuitem>Einfügen – Datentabelle…</menuitem>"
+
+#. CaLtM
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id841665496617023\n"
+"help.text"
+msgid "Uncheck the option <menuitem>Show data table</menuitem>."
+msgstr "Deaktivieren Sie die Option <menuitem>Datentabelle anzeigen</menuitem>."
+
+#. W8sr5
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id621665496873285\n"
+"help.text"
+msgid "Show data table"
+msgstr "Datentabelle anzeigen"
+
+#. S42it
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id901665496890334\n"
+"help.text"
+msgid "Check this option to show the data table in the chart. Uncheck this option if you want to remove the data table from the chart."
+msgstr "Aktivieren Sie diese Option, um die Datentabelle im Diagramm anzuzeigen. Deaktivieren Sie diese Option, wenn Sie die Datentabelle vom Diagramm entfernen möchten."
+
+#. ybrCy
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id71665496992777\n"
+"help.text"
+msgid "Data table properties"
+msgstr "Datentabellen-Eigenschaften"
+
+#. GrWMT
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id571665497168086\n"
+"help.text"
+msgid "Format properties of the data table:"
+msgstr "Formateigenschaften der Datentabelle"
+
+#. 5tT7C
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id61665497013657\n"
+"help.text"
+msgid "Show horizontal border"
+msgstr "Horizontalen Rahmen anzeigen"
+
+#. yGFEW
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id681665497198015\n"
+"help.text"
+msgid "Show or hide internal row borders."
+msgstr "Blendet die inneren Linien zwischen Zeilen ein oder aus."
+
+#. CGuAE
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id82166549702485\n"
+"help.text"
+msgid "Show vertical border"
+msgstr "Vertikalen Rahmen anzeigen"
+
+#. h5YZC
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id681665497198016\n"
+"help.text"
+msgid "Show or hide internal column borders."
+msgstr "Blendet die inneren Linien zwischen Spalten ein oder aus."
+
+#. 8ZYS2
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id731665497089724\n"
+"help.text"
+msgid "Show outline"
+msgstr "Umrandung zeigen"
+
+#. dBV6E
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id681665497198017\n"
+"help.text"
+msgid "Show or hide borders around the table."
+msgstr "Blendet die Umrandung der Tabelle ein oder aus."
+
+#. YvKdx
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"hd_id311665497090098\n"
+"help.text"
+msgid "Show keys"
+msgstr "Schlüssel anzeigen"
+
+#. exJ2p
+#: data_table.xhp
+msgctxt ""
+"data_table.xhp\n"
+"par_id681665497198018\n"
+"help.text"
+msgid "Show or hide the key associated with each data series, which is the same key used in the chart legend."
+msgstr "Blendet die Schlüssel zu jeder Datenreihe ein oder aus. Die Schlüssel entsprechen denen in der Diagrammlegende."
 
 #. kQknt
 #: smooth_line_properties.xhp
@@ -6170,7 +6404,7 @@ msgctxt ""
 "par_id6354869\n"
 "help.text"
 msgid "Minor grids"
-msgstr "Hilfsgitter"
+msgstr "Hilfsgitterlinien"
 
 #. NBCSF
 #: type_column_line.xhp
@@ -7025,7 +7259,7 @@ msgctxt ""
 "par_id1911679\n"
 "help.text"
 msgid "Based on <emph>open, low, high</emph>, and <emph>close</emph> column Type 2 generates the traditional \"candle stick\" chart. Type 2 draws the vertical line between the bottom and top price and adds a rectangle in front, which visualizes the range between the opening and closing price. If you click on the rectangle you see more information in the status bar. %PRODUCTNAME uses different fill colors for rising values (the opening price is lower than the closing price) and falling values."
-msgstr "Bei Typ 2 wird basierend auf den Spalten mit den <emph>Eröffnungs-, Tiefst-, Höchst-</emph> und <emph>Schlusswerten</emph> ein so genanntes \"Candlestick-Chart\" (auch \"Kerzendiagramm\") erstellt. In einem Diagramm des Typs 2 wird eine vertikale Linie zwischen den Tiefst- und Höchstwerten gezeichnet und mit einem davor gestellten Rechteck wird die Differenz zwischen Eröffnungs- und Schlusswert dargestellt. Zudem werden in %PRODUCTNAME steigende Werte (Kursanstiege) (Eröffungswert niedriger als Schlusswert) und fallende Werte (Kursverluste) durch unterschiedliche Füllfarben verdeutlicht."
+msgstr "Bei Typ 2 wird basierend auf den Spalten mit den <emph>Eröffnungs-, Tiefst-, Höchst-</emph> und <emph>Schlusswerten</emph> ein sogenanntes \"Candlestick-Chart\" (auch \"Kerzendiagramm\") erstellt. In einem Diagramm des Typs 2 wird eine vertikale Linie zwischen den Tiefst- und Höchstwerten gezeichnet und mit einem davorgestellten Rechteck wird die Differenz zwischen Eröffnungs- und Schlusswert dargestellt. Zudem werden in %PRODUCTNAME steigende Werte (Kursanstiege) (Eröffnungswert niedriger als Schlusswert) und fallende Werte (Kursverluste) durch unterschiedliche Füllfarben verdeutlicht."
 
 #. 8FqfW
 #: type_stock.xhp
@@ -7358,7 +7592,7 @@ msgctxt ""
 "par_id2377697\n"
 "help.text"
 msgid "The legend shows the value from the range, which you entered in the <emph>Range for Name</emph> field in the <emph>Data Range</emph> dialog. The default entry is the column header of the closing price column."
-msgstr "In der Legende werden die Werte des Bereichs angezeigt, die Sie in das <emph>Bereich für Namen</emph>-Feld im Dialog <emph>Datenreihen</emph> eingegeben haben. Als Standardeintrag wird der Spaltenname der Schlusswertespalte gewählt."
+msgstr "In der Legende werden die Werte des Bereichs angezeigt, die Sie in das Feld <emph>Bereich für Namen</emph> im Dialog <emph>Datenreihen</emph> eingegeben haben. Als standardmäßiger Eintrag wird der Spaltenname der Schlusswertespalte gewählt."
 
 #. ENNoh
 #: type_stock.xhp
@@ -7502,7 +7736,7 @@ msgctxt ""
 "par_id4634235\n"
 "help.text"
 msgid "The chart is created with default settings. After the chart is finished, you can edit its properties to change the appearance. Line styles and icons can be changed on the <emph>Line</emph> tab page of the data series properties dialog."
-msgstr "Das Diagramm wird anhand der Standard-Einstellungen erstellt. Das Aussehen des fertigen Diagramms können Sie ändern, indem Sie seine Eigenschaften bearbeiten. Die Linienstile und Symbole können Sie im Register <emph>Linie</emph> des Dialogs Eigenschaften der Datenreihe ändern."
+msgstr "Das Diagramm wird anhand der standardmäßigen Einstellungen erstellt. Das Aussehen des fertigen Diagramms können Sie ändern, indem Sie seine Eigenschaften bearbeiten. Die Linienstile und Symbole können Sie im Register <emph>Linie</emph> des Dialogs „Eigenschaften“ der Datenreihe ändern."
 
 #. 6AcaE
 #: type_xy.xhp
@@ -7547,7 +7781,7 @@ msgctxt ""
 "par_id6571550\n"
 "help.text"
 msgid "Each data point is shown by an icon. %PRODUCTNAME uses default icons with different forms and colors for each data series. The default colors are set in <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"menuitem\">%PRODUCTNAME - Preferences</item></caseinline><defaultinline><item type=\"menuitem\">Tools - Options</item></defaultinline></switchinline><item type=\"menuitem\"> - Charts - Default Colors</item>."
-msgstr "Jeder Datenpunkt wird mit einem Symbol angezeigt. %PRODUCTNAME nutzt Standardsymbole mit verschiedenen Formen und Farben für die unterschiedlichen Datenreihen. Die Standardfarben werden in <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"menuitem\">%PRODUCTNAME – Einstellungen</item></caseinline><defaultinline><item type=\"menuitem\">Extras – Optionen…</item></defaultinline></switchinline><item type=\"menuitem\"> – Diagramme – Standardfarben</item> festgelegt."
+msgstr "Jeder Datenpunkt wird mit einem Symbol angezeigt. %PRODUCTNAME nutzt standardmäßige Symbole mit verschiedenen Formen und Farben für die unterschiedlichen Datenreihen. Die standardmäßige Farben werden in <switchinline select=\"sys\"><caseinline select=\"MAC\"><item type=\"menuitem\">%PRODUCTNAME – Einstellungen</item></caseinline><defaultinline><item type=\"menuitem\">Extras – Optionen…</item></defaultinline></switchinline><item type=\"menuitem\"> – Diagramme – Standardfarben</item> festgelegt."
 
 #. esJ88
 #: type_xy.xhp
@@ -8033,7 +8267,7 @@ msgctxt ""
 "par_id4776757\n"
 "help.text"
 msgid "Grids"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. AqCaa
 #: wiz_chart_elements.xhp
@@ -8096,7 +8330,7 @@ msgctxt ""
 "par_id8915372\n"
 "help.text"
 msgid "Minor grids"
-msgstr "Hilfsgitter"
+msgstr "Hilfsgitterlinien"
 
 #. FrycP
 #: wiz_chart_elements.xhp

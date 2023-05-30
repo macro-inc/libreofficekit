@@ -20,20 +20,23 @@
 
 #include "ItemConverter.hxx"
 #include <com/sun/star/uno/Sequence.h>
+#include <rtl/ref.hxx>
 
 namespace com::sun::star::chart2 { class XCoordinateSystem; }
 namespace com::sun::star::frame { class XModel; }
 namespace com::sun::star::uno { class XComponentContext; }
+namespace chart { class ChartModel; }
+namespace chart { class BaseCoordinateSystem; }
 
 namespace chart::wrapper
 {
 
-class SeriesOptionsItemConverter : public ItemConverter
+class SeriesOptionsItemConverter final : public ItemConverter
 {
 public:
     SeriesOptionsItemConverter(
-        const css::uno::Reference< css::frame::XModel > & xChartModel,
-        const css::uno::Reference< css::uno::XComponentContext > & xContext,
+        const rtl::Reference<::chart::ChartModel> & xChartModel,
+        css::uno::Reference< css::uno::XComponentContext > xContext,
         const css::uno::Reference< css::beans::XPropertySet > & rPropertySet,
         SfxItemPool& rItemPool );
     virtual ~SeriesOptionsItemConverter() override;
@@ -46,7 +49,7 @@ protected:
     virtual bool ApplySpecialItem( sal_uInt16 nWhichId, const SfxItemSet & rItemSet ) override;
 
 private:
-    css::uno::Reference< css::frame::XModel >  m_xChartModel;
+    rtl::Reference<::chart::ChartModel>  m_xChartModel;
     css::uno::Reference< css::uno::XComponentContext>   m_xCC;
 
     bool m_bAttachToMainAxis;
@@ -64,7 +67,7 @@ private:
     sal_Int32 m_nStartingAngle;
 
     bool m_bClockwise;
-    css::uno::Reference< css::chart2::XCoordinateSystem > m_xCooSys;
+    rtl::Reference< ::chart::BaseCoordinateSystem > m_xCooSys;
 
     css::uno::Sequence< sal_Int32 > m_aSupportedMissingValueTreatments;
     sal_Int32 m_nMissingValueTreatment;

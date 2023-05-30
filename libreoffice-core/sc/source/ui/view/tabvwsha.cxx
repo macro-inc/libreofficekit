@@ -306,7 +306,7 @@ void ScTabViewShell::GetState( SfxItemSet& rSet )
                 {
                     const Fraction& rZoomY = GetViewData().GetZoomY();
                     tools::Long nZoom = tools::Long(rZoomY * 100);
-                    if (nZoom >= tools::Long(MAXZOOM))
+                    if (nZoom >= MAXZOOM)
                         rSet.DisableItem(nWhich);
                 }
                 break;
@@ -314,7 +314,7 @@ void ScTabViewShell::GetState( SfxItemSet& rSet )
                 {
                     const Fraction& rZoomY = GetViewData().GetZoomY();
                     tools::Long nZoom = tools::Long(rZoomY * 100);
-                    if (nZoom <= tools::Long(MINZOOM))
+                    if (nZoom <= MINZOOM)
                         rSet.DisableItem(nWhich);
                 }
                 break;
@@ -507,6 +507,11 @@ void ScTabViewShell::GetState( SfxItemSet& rSet )
                     rSet.DisableItem( nWhich );     // enabled only if several sheets are selected
                 break;
 
+            case FID_TOGGLEHIDDENCOLROW:
+                const svtools::ColorConfig& rColorCfg = SC_MOD()->GetColorConfig();
+                rSet.Put( SfxBoolItem( nWhich, rColorCfg.GetColorValue(svtools::CALCHIDDENROWCOL).bIsVisible) );
+                break;
+
         } // switch ( nWitch )
         nWhich = aIter.NextWhich();
     } // while ( nWitch )
@@ -522,7 +527,6 @@ void ScTabViewShell::ExecuteCellFormatDlg(SfxRequest& rReq, const OString &rName
     const ScPatternAttr*    pOldAttrs       = GetSelectionPattern();
 
     auto pOldSet = std::make_shared<SfxItemSet>(pOldAttrs->GetItemSet());
-    std::unique_ptr<SvxNumberInfoItem> pNumberInfoItem;
 
     pOldSet->MergeRange(XATTR_FILLSTYLE, XATTR_FILLCOLOR);
 
@@ -561,7 +565,7 @@ void ScTabViewShell::ExecuteCellFormatDlg(SfxRequest& rReq, const OString &rName
         aLineInner->SetValid( SvxBoxInfoItemValidFlags::LEFT, aTempInfo->IsValid(SvxBoxInfoItemValidFlags::RIGHT));
         aLineInner->SetValid( SvxBoxInfoItemValidFlags::RIGHT, aTempInfo->IsValid(SvxBoxInfoItemValidFlags::LEFT));
 
-        pOldSet->Put( *aNewFrame );
+        pOldSet->Put( std::move(aNewFrame) );
     }
     else
     {
@@ -574,10 +578,9 @@ void ScTabViewShell::ExecuteCellFormatDlg(SfxRequest& rReq, const OString &rName
     pOldSet->Put( SfxUInt32Item( ATTR_VALUE_FORMAT,
         pOldAttrs->GetNumberFormat( rDoc.GetFormatTable() ) ) );
 
-    pNumberInfoItem = MakeNumberInfoItem(rDoc, GetViewData());
-
+    std::unique_ptr<SvxNumberInfoItem> pNumberInfoItem = MakeNumberInfoItem(rDoc, GetViewData());
     pOldSet->MergeRange( SID_ATTR_NUMBERFORMAT_INFO, SID_ATTR_NUMBERFORMAT_INFO );
-    pOldSet->Put(*pNumberInfoItem );
+    pOldSet->Put( std::move(pNumberInfoItem) );
 
     bInFormatDialog = true;
     ScAbstractDialogFactory* pFact = ScAbstractDialogFactory::Create();
@@ -596,11 +599,9 @@ void ScTabViewShell::ExecuteCellFormatDlg(SfxRequest& rReq, const OString &rName
         if ( nResult == RET_OK )
         {
             const SfxItemSet* pOutSet = pDlg->GetOutputItemSet();
-
-            const SfxPoolItem* pItem=nullptr;
-            if(pOutSet->GetItemState(SID_ATTR_NUMBERFORMAT_INFO,true,&pItem)==SfxItemState::SET)
+            if(const SvxNumberInfoItem* pItem = pOutSet->GetItemIfSet(SID_ATTR_NUMBERFORMAT_INFO))
             {
-                UpdateNumberFormatter(static_cast<const SvxNumberInfoItem&>(*pItem));
+                UpdateNumberFormatter(*pItem);
             }
 
             ApplyAttributes(pOutSet, pOldSet.get());
@@ -704,14 +705,14 @@ void ScTabViewShell::UpdateInputHandler( bool bForce /* = sal_False */, bool bSt
         if (!bHideAll)
         {
             ScRefCellValue rCell(rDoc, aPos);
-            if (rCell.meType == CELLTYPE_FORMULA)
+            if (rCell.getType() == CELLTYPE_FORMULA)
             {
                 if (!bHideFormula)
-                    aString = rCell.mpFormula->GetFormula();
+                    aString = rCell.getFormula()->GetFormula();
             }
-            else if (rCell.meType == CELLTYPE_EDIT)
+            else if (rCell.getType() == CELLTYPE_EDIT)
             {
-                pObject = rCell.mpEditText;
+                pObject = rCell.getEditText();
             }
             else
             {
@@ -719,13 +720,22 @@ void ScTabViewShell::UpdateInputHandler( bool bForce /* = sal_False */, bool bSt
                 sal_uInt32 nNumFmt = rDoc.GetNumberFormat( aPos );
 
                 aString = ScCellFormat::GetInputString( rCell, nNumFmt, *pFormatter, rDoc );
-                if (rCell.meType == CELLTYPE_STRING)
+                if (rCell.getType() == CELLTYPE_STRING)
                 {
                     // Put a ' in front if necessary, so that the string is not
                     // unintentionally interpreted as a number, and to show the
                     // user that it is a string (#35060#).
-                    //! also for numberformat "Text"? -> then remove when editing
-                    if ( pFormatter->IsNumberFormat(aString, nNumFmt, o3tl::temporary(double())) )
+                    // If cell is not formatted as Text, a leading apostrophe
+                    // needs another prepended, also '=' or '+' or '-'
+                    // otherwise starting a formula.
+                    // NOTE: this corresponds with
+                    // sc/source/core/data/column3.cxx ScColumn::ParseString()
+                    // removing one apostrophe.
+                    // For number format Text IsNumberFormat() would never
+                    // result in numeric anyway.
+                    if (!pFormatter->IsTextFormat(nNumFmt) && (aString.startsWith("'")
+                                || aString.startsWith("=") || aString.startsWith("+") || aString.startsWith("-")
+                                || pFormatter->IsNumberFormat(aString, nNumFmt, o3tl::temporary(double()))))
                         aString = "'" + aString;
                 }
             }

@@ -22,12 +22,9 @@
 
 #include <sal/types.h>
 #include <svx/sdr/contact/viewcontact.hxx>
-#include <svx/sdtakitm.hxx>
 #include <svx/svxdllapi.h>
 
 class SdrObject;
-class GeoStat;
-class Bitmap;
 
 namespace sdr::contact {
 
@@ -37,10 +34,6 @@ protected:
     // the owner of this ViewContact. Set from constructor and not
     // to be changed in any way.
     SdrObject&                                      mrObject;
-
-    // Remember AnimationKind of object. Used to find out if that kind
-    // has changed in ActionChanged()
-    SdrTextAniKind                                  meRememberedAnimationKind;
 
     // Create an Object-Specific ViewObjectContact, set ViewContact and
     // ObjectContact. Always needs to return something.

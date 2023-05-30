@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:04+0200\n"
-"PO-Revision-Date: 2022-05-12 09:11+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-12-27 11:24+0000\n"
 "Last-Translator: SteenRønnow <steen.roennow@mail.dk>\n"
 "Language-Team: Danish <https://translations.documentfoundation.org/projects/libo_help-master/textshared/da/>\n"
 "Language: da\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1550903012.000000\n"
 
 #. fcmzq
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>Find toolbar</bookmark_value>"
 msgstr "<bookmark_value>Værktøjslinjen Søg</bookmark_value>"
 
-#. WXRY5
+#. JS8DE
 #: find_toolbar.xhp
 msgctxt ""
 "find_toolbar.xhp\n"
 "hd_id701641581066778\n"
 "help.text"
-msgid "<link href=\"/text/shared/find_toolbar.xhp\" name=\"Find Bar\">Find Bar</link>"
-msgstr "<link href=\"/text/shared/find_toolbar.xhp\" name=\"Find Bar\">Søgelinjen</link>"
+msgid "<link href=\"/text/shared/find_toolbar.xhp\">Find Bar</link>"
+msgstr "<link href=\"/text/shared/find_toolbar.xhp\">Søgelinjen</link>"
 
 #. X55wK
 #: find_toolbar.xhp
@@ -214,14 +214,14 @@ msgctxt ""
 msgid "Find and Replace"
 msgstr "Find og erstat"
 
-#. 8GXhw
+#. cDswH
 #: find_toolbar.xhp
 msgctxt ""
 "find_toolbar.xhp\n"
 "par_id761641582194558\n"
 "help.text"
-msgid "Opens the <link href=\"text/swriter/guide/finding.xhp\" name=\"Find_Replace\">Find and Replace</link> dialog, which provides more options for searching the document."
-msgstr "Åbner dialogen <link href=\"text/swriter/guide/finding.xhp\" name=\"Find_Replace\">Søg og erstat</link>, som giver flere miligheder for søgning i dokumentet."
+msgid "Opens the <link href=\"text/swriter/guide/finding.xhp\">Find and Replace</link> dialog, which provides more options for searching the document."
+msgstr "Åbner dialogen <link href=\"text/swriter/guide/finding.xhp\">Søg og erstat</link>, som giver flere miligheder for søgning i dokumentet."
 
 #. rx3mH
 #: find_toolbar.xhp
@@ -284,7 +284,7 @@ msgctxt ""
 "par_id81646926301557\n"
 "help.text"
 msgid "<image src=\"cmd/lc_fontworkgalleryfloater.svg\" id=\"img_id311646926301559\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id331646926301560\">Icon Fontwork Gallery</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_fontworkgalleryfloater.svg\" id=\"img_id311646926301559\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id331646926301560\">Ikonet Fontwork-galleri</alt></image>"
 
 #. zBxMN
 #: fontwork_toolbar.xhp
@@ -293,7 +293,7 @@ msgctxt ""
 "par_idN10571\n"
 "help.text"
 msgid "Opens the Fontwork Gallery where you can select another preview. Click <emph>OK</emph> to apply the new set of properties to your Fontwork object."
-msgstr ""
+msgstr "Åbner Fontwork-galleriet, hvor du kan vælge en anden forhåndsvisning. Klik på <emph>OK</emph> for at bruge det nye sæt egenskaber på Fontwork-objektet."
 
 #. nG6ME
 #: fontwork_toolbar.xhp
@@ -311,7 +311,7 @@ msgctxt ""
 "par_id51646926964588\n"
 "help.text"
 msgid "<image src=\"cmd/lc_fontwork.svg\" id=\"img_id801646926964589\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761646926964590\">Icon Fontwork Shape</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_fontwork.svg\" id=\"img_id801646926964589\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id761646926964590\">Ikonet Fontwork-figur</alt></image>"
 
 #. CTe3i
 #: fontwork_toolbar.xhp
@@ -338,7 +338,7 @@ msgctxt ""
 "par_id501646927155677\n"
 "help.text"
 msgid "<image src=\"cmd/lc_fontworksameletterheights.svg\" id=\"img_id41646927155678\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141646927155679\">Icon Fontwork Same Letter Height</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_fontworksameletterheights.svg\" id=\"img_id41646927155678\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id141646927155679\">Ikonet Fontwork samme bogstavhøjde</alt></image>"
 
 #. dyVEY
 #: fontwork_toolbar.xhp
@@ -365,7 +365,7 @@ msgctxt ""
 "par_id211646927242197\n"
 "help.text"
 msgid "<image src=\"cmd/lc_alignhorizontalcenter.svg\" id=\"img_id281646927242198\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id731646927242199\">Icon Fontwork Alignment</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_alignhorizontalcenter.svg\" id=\"img_id281646927242198\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id731646927242199\">Ikonet Fontwork-justering</alt></image>"
 
 #. FvBdo
 #: fontwork_toolbar.xhp
@@ -401,7 +401,7 @@ msgctxt ""
 "par_id251646927506111\n"
 "help.text"
 msgid "<image src=\"cmd/lc_spacing.svg\" id=\"img_id441646927506112\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821646927506113\">Icon Fontwork Character Spacing</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_spacing.svg\" id=\"img_id441646927506112\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id821646927506113\">Ikonet Fontwork-tegnafstand</alt></image>"
 
 #. WLvKk
 #: fontwork_toolbar.xhp
@@ -410,7 +410,7 @@ msgctxt ""
 "par_id791646928579114\n"
 "help.text"
 msgid "Select the character spacing values to apply to the Fontwork object."
-msgstr ""
+msgstr "Vælg de tegnafstandsværdier, som skal anvendes på Fontwork-objektet."
 
 #. xERFF
 #: fontwork_toolbar.xhp
@@ -419,7 +419,7 @@ msgctxt ""
 "par_idN10621\n"
 "help.text"
 msgid "<emph>Custom:</emph> Opens the Fontwork Character Spacing dialog where you can enter a new character spacing value."
-msgstr ""
+msgstr "<emph>Brugerdefineret:</emph> Åbner dialogen Fontwork-tegnafstand, hvor du kan angive tegnafstandens nye værdi."
 
 #. sgFfF
 #: fontwork_toolbar.xhp
@@ -428,7 +428,7 @@ msgctxt ""
 "par_idN1063C\n"
 "help.text"
 msgid "<ahelp hid=\".\"><emph>Value:</emph> enter the Fontwork character spacing value.</ahelp>"
-msgstr "<ahelp hid=\".\"><emph>Værdi:</emph> Skriv tegnafgstandsværdien for Fontwork.</ahelp>"
+msgstr "<ahelp hid=\".\"><emph>Værdi:</emph> Skriv tegnafstandsværdien for Fontwork.</ahelp>"
 
 #. 2aGeB
 #: fontwork_toolbar.xhp
@@ -437,7 +437,7 @@ msgctxt ""
 "hd_id981646929182163\n"
 "help.text"
 msgid "Toggle Extrusion"
-msgstr ""
+msgstr "Slå ekstrudering til/fra"
 
 #. FcnBM
 #: fontwork_toolbar.xhp
@@ -446,7 +446,7 @@ msgctxt ""
 "par_id611646929193237\n"
 "help.text"
 msgid "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id951646929193238\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id211646929193239\">Icon Toggle Extrusion</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_extrusiontoggle.png\" id=\"img_id951646929193238\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id211646929193239\">Ikonet Slå ekstrudering til/fra</alt></image>"
 
 #. Dems2
 #: fontwork_toolbar.xhp
@@ -455,7 +455,7 @@ msgctxt ""
 "par_id191646929193241\n"
 "help.text"
 msgid "Switches the 3D effects on and off for the Fontwork objects."
-msgstr ""
+msgstr "Slår 3D-effektene til/fra på Fontwork-objekterne."
 
 #. yEKhT
 #: main0108.xhp
@@ -466,14 +466,14 @@ msgctxt ""
 msgid "Help"
 msgstr "Hjælp"
 
-#. C9KAH
+#. NncHM
 #: main0108.xhp
 msgctxt ""
 "main0108.xhp\n"
 "hd_id3155364\n"
 "help.text"
-msgid "<link href=\"text/shared/main0108.xhp\" name=\"Help\">Help</link>"
-msgstr "<link href=\"text/shared/main0108.xhp\" name=\"Hjælp\">Hjælp</link>"
+msgid "<link href=\"text/shared/main0108.xhp\">Help</link>"
+msgstr "<link href=\"text/shared/main0108.xhp\">Hjælp</link>"
 
 #. 2BAjw
 #: main0108.xhp
@@ -601,14 +601,14 @@ msgctxt ""
 msgid "Get Involved"
 msgstr "Deltag"
 
-#. ZiLDo
+#. B4y6k
 #: main0108.xhp
 msgctxt ""
 "main0108.xhp\n"
 "par_id501629934998665\n"
 "help.text"
-msgid "Opens the <link href=\"https://www.libreoffice.org/community/get-involved/\" name=\"get involved\">community Get Involved page</link> in the web browser. The page describe areas of interest where you can collaborate with the %PRODUCTNAME community."
-msgstr "Åbner siden <link href=\"https://www.libreoffice.org/community/get-involved/\" name=\"get involved\">fællesskabet Deltag</link> i netlæseren.Siden beskriver de interesseområder, hvor du kan samarbejde med %PRODUCTNAME-fællesskabet."
+msgid "Opens the <link href=\"https://www.libreoffice.org/community/get-involved/\">community Get Involved page</link> in the web browser. The page describe areas of interest where you can collaborate with the %PRODUCTNAME community."
+msgstr "Åbner siden <link href=\"https://www.libreoffice.org/community/get-involved/\">fællesskabet Deltag</link> i netlæseren.Siden beskriver de interesseområder, hvor du kan samarbejde med %PRODUCTNAME-fællesskabet."
 
 #. YrMYp
 #: main0108.xhp
@@ -637,14 +637,14 @@ msgctxt ""
 msgid "Your donation, which is purely optional, supports our worldwide community."
 msgstr "Din donation, som er helt frivillig, understøtter vort verdensomspændende fællesskab."
 
-#. gGbbH
+#. vDfYC
 #: main0108.xhp
 msgctxt ""
 "main0108.xhp\n"
 "par_id611629934882669\n"
 "help.text"
-msgid "If you like the software, <link href=\"https://www.libreoffice.org/donate/\" name=\"donation\">please consider a donation</link>."
-msgstr "Hvis du kan lide softwaren, <link href=\"https://www.libreoffice.org/donate/\" name=\"donation\">overvej venligst en donation</link>."
+msgid "If you like the software, <link href=\"https://www.libreoffice.org/donate/\">please consider a donation</link>."
+msgstr "Hvis du kan lide softwaren, <link href=\"https://www.libreoffice.org/donate/\">overvej venligst en donation</link>."
 
 #. sWFkG
 #: main0108.xhp
@@ -727,14 +727,14 @@ msgctxt ""
 msgid "Standard Bar"
 msgstr "Standardlinje"
 
-#. Fa7DE
+#. YMneF
 #: main0201.xhp
 msgctxt ""
 "main0201.xhp\n"
 "hd_id3154186\n"
 "help.text"
-msgid "<link href=\"text/shared/main0201.xhp\" name=\"Standard Bar\">Standard Bar</link>"
-msgstr "<link href=\"text/shared/main0201.xhp\" name=\"Standardlinje\">Standardlinje</link>"
+msgid "<link href=\"text/shared/main0201.xhp\">Standard Bar</link>"
+msgstr "<link href=\"text/shared/main0201.xhp\">Standardlinje</link>"
 
 #. 7CoDc
 #: main0201.xhp
@@ -745,14 +745,14 @@ msgctxt ""
 msgid "<ahelp hid=\"RID_ENVTOOLBOX\">The <emph>Standard</emph> bar is available in every $[officename] application.</ahelp>"
 msgstr "<ahelp hid=\"RID_ENVTOOLBOX\"><emph>Standardlinjen</emph> er tilgængelig i alle $[officename]-programmer.</ahelp>"
 
-#. 98hpw
+#. FHN8A
 #: main0201.xhp
 msgctxt ""
 "main0201.xhp\n"
 "hd_id3166460\n"
 "help.text"
-msgid "<link href=\"text/shared/01/01020000.xhp\" name=\"Open File\">Open File</link>"
-msgstr "<link href=\"text/shared/01/01020000.xhp\" name=\"Åbn fil\">Åbn fil</link>"
+msgid "<link href=\"text/shared/01/01020000.xhp\">Open File</link>"
+msgstr "<link href=\"text/shared/01/01020000.xhp\">Åbn fil</link>"
 
 #. qCdSB
 #: main0201.xhp
@@ -826,14 +826,14 @@ msgctxt ""
 msgid "Creates a chart in the current document."
 msgstr "Opretter et diagram i det aktuelle dokument."
 
-#. jr7Pf
+#. JEF2H
 #: main0201.xhp
 msgctxt ""
 "main0201.xhp\n"
 "par_idN108C4\n"
 "help.text"
-msgid "<link href=\"text/shared/02/01171200.xhp\" name=\"Display Grid\">Display Grid</link>"
-msgstr "<link href=\"text/shared/02/01171200.xhp\" name=\"Vis gitter\">Vis gitter</link>"
+msgid "<link href=\"text/shared/02/01171200.xhp\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\">Vis gitter</link>"
 
 #. JHY4h
 #: main0201.xhp
@@ -916,14 +916,14 @@ msgctxt ""
 msgid "Table Bar"
 msgstr "Værktøjslinjen Tabel"
 
-#. LQoEC
+#. Cu754
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id3145587\n"
 "help.text"
-msgid "<link href=\"text/shared/main0204.xhp\" name=\"Table Bar\">Table Bar</link>"
-msgstr "<link href=\"text/shared/main0204.xhp\" name=\"Table Bar\">Værktøjslinjen Tabel</link>"
+msgid "<link href=\"text/shared/main0204.xhp\">Table Bar</link>"
+msgstr "<link href=\"text/shared/main0204.xhp\">Værktøjslinjen Tabel</link>"
 
 #. WByv5
 #: main0204.xhp
@@ -934,41 +934,41 @@ msgctxt ""
 msgid "<ahelp hid=\".\">The <emph>Table</emph> Bar contains functions you need when working with tables. It appears when you move the cursor into a table.</ahelp>"
 msgstr "<ahelp hid=\".\">Værktøjslinjen <emph>Tabel</emph> består af funktioner som du skal bruge når du arbejder med tabeller. Værktøjslinjen viser sig når du flytter markøren ind i en tabel.</ahelp>"
 
-#. dw5H8
+#. eCSur
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id319945759\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05210100.xhp\" name=\"Area Style / Filling\">Area Style / Filling</link>"
-msgstr "<link href=\"text/shared/01/05210100.xhp\" name=\"Area Style / Filling\">Flade stil / fyld</link>"
+msgid "<link href=\"text/shared/01/05210100.xhp\">Area Style / Filling</link>"
+msgstr "<link href=\"text/shared/01/05210100.xhp\">Flade stil / fyld</link>"
 
-#. 7DJKV
+#. GsoVm
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id3147592\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05100100.xhp\" name=\"Merge Cells\">Merge Cells</link>"
-msgstr "<link href=\"text/shared/01/05100100.xhp\" name=\"Merge Cells\">Flet celler</link>"
+msgid "<link href=\"text/shared/01/05100100.xhp\">Merge Cells</link>"
+msgstr "<link href=\"text/shared/01/05100100.xhp\">Flet celler</link>"
 
-#. 6Rajq
+#. KVWGF
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id3147820\n"
 "help.text"
-msgid "<link href=\"text/swriter/01/05110500.xhp\" name=\"Delete Row\">Delete Row</link>"
-msgstr "<link href=\"text/swriter/01/05110500.xhp\" name=\"Delete Row\">Slet række</link>"
+msgid "<link href=\"text/swriter/01/05110500.xhp\">Delete Row</link>"
+msgstr "<link href=\"text/swriter/01/05110500.xhp\">Slet række</link>"
 
-#. AmFfA
+#. WddDC
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id3147231\n"
 "help.text"
-msgid "<link href=\"text/swriter/01/05120500.xhp\" name=\"Delete Column\">Delete Column</link>"
-msgstr "<link href=\"text/swriter/01/05120500.xhp\" name=\"Delete Column\">Slet kolonne</link>"
+msgid "<link href=\"text/swriter/01/05120500.xhp\">Delete Column</link>"
+msgstr "<link href=\"text/swriter/01/05120500.xhp\">Slet kolonne</link>"
 
 #. RhSva
 #: main0204.xhp
@@ -1006,14 +1006,14 @@ msgctxt ""
 msgid "Table Design"
 msgstr "Tabeldesign"
 
-#. BieMU
+#. hCDEC
 #: main0204.xhp
 msgctxt ""
 "main0204.xhp\n"
 "hd_id947820\n"
 "help.text"
-msgid "<link href=\"text/simpress/01/05090000m.xhp\" name=\"Table Properties\">Table Properties</link>"
-msgstr "<link href=\"text/simpress/01/05090000m.xhp\" name=\"Table Properties\">Tabelegenskaber</link>"
+msgid "<link href=\"text/simpress/01/05090000m.xhp\">Table Properties</link>"
+msgstr "<link href=\"text/simpress/01/05090000m.xhp\">Tabelegenskaber</link>"
 
 #. usfD4
 #: main0208.xhp
@@ -1024,14 +1024,14 @@ msgctxt ""
 msgid "Status Bar in $[officename] Basic Documents"
 msgstr "Statuslinje i $[officename] Basic-dokumenter"
 
-#. GaCPr
+#. PUnxS
 #: main0208.xhp
 msgctxt ""
 "main0208.xhp\n"
 "hd_id3148520\n"
 "help.text"
-msgid "<link href=\"text/shared/main0208.xhp\" name=\"Status Bar in $[officename] Basic Documents\">Status Bar in $[officename] Basic Documents</link>"
-msgstr "<link href=\"text/shared/main0208.xhp\" name=\"Statuslinje i $[officename] Basic-dokumenter\">Statuslinje i $[officename] Basic-dokumenter</link>"
+msgid "<link href=\"text/shared/main0208.xhp\">Status Bar in $[officename] Basic Documents</link>"
+msgstr "<link href=\"text/shared/main0208.xhp\">Statuslinje i $[officename] Basic-dokumenter</link>"
 
 #. TMY8Z
 #: main0208.xhp
@@ -1051,14 +1051,14 @@ msgctxt ""
 msgid "Table Data Bar"
 msgstr "Tabeldatalinjen"
 
-#. tijsh
+#. 8uZqF
 #: main0212.xhp
 msgctxt ""
 "main0212.xhp\n"
 "hd_id3147102\n"
 "help.text"
-msgid "<link href=\"text/shared/main0212.xhp\" name=\"Table Data Bar\">Table Data Bar</link>"
-msgstr "<link href=\"text/shared/main0212.xhp\" name=\"Tabeldatalinjen\">Tabeldatalinjen</link>"
+msgid "<link href=\"text/shared/main0212.xhp\">Table Data Bar</link>"
+msgstr "<link href=\"text/shared/main0212.xhp\">Tabeldatalinjen</link>"
 
 #. 2HEsY
 #: main0212.xhp
@@ -1168,14 +1168,14 @@ msgctxt ""
 msgid "<bookmark_value>toolbars; Form Navigation bar</bookmark_value><bookmark_value>Navigation bar;forms</bookmark_value><bookmark_value>sorting; data in forms</bookmark_value><bookmark_value>data; sorting in forms</bookmark_value><bookmark_value>forms;sorting data</bookmark_value>"
 msgstr "<bookmark_value>værktøjslinjer; formularnavigationslinje</bookmark_value><bookmark_value>navigationslinje;formularer</bookmark_value><bookmark_value>sortere; data i formularer</bookmark_value><bookmark_value>data; sortere i formularer</bookmark_value><bookmark_value>formularer;sortere data</bookmark_value>"
 
-#. kjAoz
+#. AJsK5
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "hd_id3157896\n"
 "help.text"
-msgid "<link href=\"text/shared/main0213.xhp\" name=\"Form Navigation Bar\">Form Navigation Bar</link>"
-msgstr "<link href=\"text/shared/main0213.xhp\" name=\"Formularnavigationslinje\">Formularnavigationslinje</link>"
+msgid "<link href=\"text/shared/main0213.xhp\">Form Navigation Bar</link>"
+msgstr "<link href=\"text/shared/main0213.xhp\">Formularnavigationslinje</link>"
 
 #. WUXQ3
 #: main0213.xhp
@@ -1204,14 +1204,14 @@ msgctxt ""
 msgid "You can use the Navigation bar icon on the <link href=\"text/shared/02/01170000.xhp\">More Controls </link> bar to add a Navigation bar to a form."
 msgstr "Du kan bruge ikonet Navigationslinje  på linjen <link href=\"text/shared/02/01170000.xhp\">Flere Kontrolelementer </link> til at tilføj en Navigationslinje til en formular."
 
-#. SBnTx
+#. qrGJo
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "par_id3157910\n"
 "help.text"
-msgid "The Navigation bar is only visible for forms connected to a database. In the <link href=\"text/sdatabase/04030000.xhp\" name=\"Design view\">Design view</link> of a form, the Navigation bar is not available. See also <link href=\"text/shared/main0212.xhp\" name=\"Database Bar\">Table Data bar</link>."
-msgstr "Navigationslinjen er synlig ved formularer, der er forbundet med en database. Navigationslinjen er ikke tilgængelig i en formulars <link href=\"text/sdatabase/04030000.xhp\" name=\"Design view\">Designvisning</link>. Se også (værktøjslfinjen) <link href=\"text/shared/main0212.xhp\" name=\"Database Bar\">Tabeldata</link>."
+msgid "The Navigation bar is only visible for forms connected to a database. In the <link href=\"text/sdatabase/04030000.xhp\">Design view</link> of a form, the Navigation bar is not available. See also <link href=\"text/shared/main0212.xhp\">Table Data bar</link>."
+msgstr "Navigationslinjen er synlig ved formularer, der er forbundet med en database. Navigationslinjen er ikke tilgængelig i en formulars <link href=\"text/sdatabase/04030000.xhp\">Designvisning</link>. Se også (værktøjslfinjen) <link href=\"text/shared/main0212.xhp\">Tabeldata</link>."
 
 #. tqTbR
 #: main0213.xhp
@@ -1222,32 +1222,32 @@ msgctxt ""
 msgid "You can control the view of data with the sorting and filtering functions. Original tables are not changed."
 msgstr "Du kan kontrollere visningen af data med funktionerne til sortering og filtrering. Dette ændrer ikke de originale tabeller i databasen."
 
-#. F2yBf
+#. X4S8m
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "par_id3153062\n"
 "help.text"
-msgid "The current sort order or filter is saved with the current document. If a filter is set, the <emph>Apply Filter</emph> icon on the <emph>Navigation</emph> bar is activated. Sorting and filtering features in the document can also be configured in the <emph>Form Properties</emph> dialog. (Choose <emph>Form Properties - Data</emph> - properties <link href=\"text/shared/02/01170203.xhp\" name=\"Sort\"><emph>Sort</emph></link> and <link href=\"text/shared/02/01170203.xhp\" name=\"Filter\"><emph>Filter</emph></link>)."
-msgstr "Den aktuelle sorteringsrækkefølge eller det aktuelle filter bliver gemt med det aktuelle dokument. Hvis der er indstillet et filter, bliver ikonet <emph>Anvend filter</emph> på linjen <emph>Navigation</emph> aktiveret. Sorterings-  og filtreringsegenskaber i dokumentet kan også tilpasses i dialogen <emph>Formularegenskaber</emph>. (Vælg <emph>Formularegenskaber - Data</emph> - egenskaber <link href=\"text/shared/02/01170203.xhp\" name=\"Sort\"><emph>Sorter</emph></link> og <link href=\"text/shared/02/01170203.xhp\" name=\"Filter\"><emph>Filtrer</emph></link>)."
+msgid "The current sort order or filter is saved with the current document. If a filter is set, the <emph>Apply Filter</emph> icon on the <emph>Navigation</emph> bar is activated. Sorting and filtering features in the document can also be configured in the <emph>Form Properties</emph> dialog. (Choose <emph>Form Properties - Data</emph> - properties <link href=\"text/shared/02/01170203.xhp\"><emph>Sort</emph></link> and <link href=\"text/shared/02/01170203.xhp\"><emph>Filter</emph></link>)."
+msgstr "Den aktuelle sorteringsrækkefølge eller det aktuelle filter bliver gemt med det aktuelle dokument. Hvis der er indstillet et filter, bliver ikonet <emph>Anvend filter</emph> på linjen <emph>Navigation</emph> aktiveret. Sorterings-  og filtreringsegenskaber i dokumentet kan også tilpasses i dialogen <emph>Formularegenskaber</emph>. (Vælg <emph>Formularegenskaber - Data</emph> - egenskaber <link href=\"text/shared/02/01170203.xhp\"><emph>Sorter</emph></link> og <link href=\"text/shared/02/01170203.xhp\"><emph>Filtrer</emph></link>)."
 
-#. XXEDY
+#. ABJo3
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "par_id3149810\n"
 "help.text"
-msgid "If an SQL statement is the basis for a form (see <emph>Form Properties</emph> - tab <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\" name=\"Data Source\"><emph>Data Source</emph></link>), then the filter and sort functions are only available when the SQL statement refers to only one table and is not written in the native SQL mode."
-msgstr "Hvis en SQL-sætning er grundlaget for en formular (se fanebladet <emph>Formularegenskaber</emph> - <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\" name=\"Data Source\"><emph>Datakilde</emph></link>), så er filteret og sorteringsfunktionerne kun tilgængelige, når SQL-sætningen kun henviser til én tabel og ikke er skrevet i den indbyggede SQL-tilstand."
+msgid "If an SQL statement is the basis for a form (see <emph>Form Properties</emph> - tab <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\"><emph>Data Source</emph></link>), then the filter and sort functions are only available when the SQL statement refers to only one table and is not written in the native SQL mode."
+msgstr "Hvis en SQL-sætning er grundlaget for en formular (se fanebladet <emph>Formularegenskaber</emph> - <emph>Data</emph> - <link href=\"text/shared/02/01170203.xhp\"><emph>Datakilde</emph></link>), så er filteret og sorteringsfunktionerne kun tilgængelige, når SQL-sætningen kun henviser til én tabel og ikke er skrevet i den indbyggede SQL-tilstand."
 
-#. Ck3Di
+#. CcBXr
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "hd_id3156448\n"
 "help.text"
-msgid "<link href=\"text/shared/02/12100200.xhp\" name=\"Find Record\">Find Record</link>"
-msgstr "<link href=\"text/shared/02/12100200.xhp\" name=\"Søg datapost\">Søg datapost</link>"
+msgid "<link href=\"text/shared/02/12100200.xhp\">Find Record</link>"
+msgstr "<link href=\"text/shared/02/12100200.xhp\">Søg datapost</link>"
 
 #. daKA6
 #: main0213.xhp
@@ -1283,7 +1283,7 @@ msgctxt ""
 "par_id3154013\n"
 "help.text"
 msgid "<image id=\"img_id3150010\" src=\"cmd/lc_firstrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150010\">Icon First Record</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150010\" src=\"cmd/lc_firstrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150010\">Ikonet Første post</alt></image>"
 
 #. VCqM6
 #: main0213.xhp
@@ -1310,7 +1310,7 @@ msgctxt ""
 "par_id3145647\n"
 "help.text"
 msgid "<image id=\"img_id3147394\" src=\"cmd/lc_prevrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147394\">Icon Previous Record</alt>                        </image>"
-msgstr ""
+msgstr "<image id=\"img_id3147394\" src=\"cmd/lc_prevrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147394\">Ikonet Forrige post</alt>                        </image>"
 
 #. gitqo
 #: main0213.xhp
@@ -1337,7 +1337,7 @@ msgctxt ""
 "par_id3146913\n"
 "help.text"
 msgid "<image id=\"img_id3150753\" src=\"cmd/lc_nextrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150753\">Icon Next Record</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150753\" src=\"cmd/lc_nextrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150753\">Ikonet Næste post</alt></image>"
 
 #. BJBj8
 #: main0213.xhp
@@ -1364,7 +1364,7 @@ msgctxt ""
 "par_id3155337\n"
 "help.text"
 msgid "<image id=\"img_id3163808\" src=\"cmd/lc_lastrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icon Last Record</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3163808\" src=\"cmd/lc_lastrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Ikonet Sidste post</alt></image>"
 
 #. 65BvC
 #: main0213.xhp
@@ -1391,7 +1391,7 @@ msgctxt ""
 "par_id3149735\n"
 "help.text"
 msgid "<image id=\"img_id3155578\" src=\"cmd/lc_newrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155578\">Icon New Record</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3155578\" src=\"cmd/lc_newrecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155578\">Ikonet Ny post</alt></image>"
 
 #. e4GJo
 #: main0213.xhp
@@ -1418,7 +1418,7 @@ msgctxt ""
 "par_id3150647\n"
 "help.text"
 msgid "<image id=\"img_id3150941\" src=\"cmd/lc_recsave.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150941\">Icon</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150941\" src=\"cmd/lc_recsave.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150941\">Ikon</alt></image>"
 
 #. Dbdf5
 #: main0213.xhp
@@ -1445,7 +1445,7 @@ msgctxt ""
 "par_id3166423\n"
 "help.text"
 msgid "<image id=\"img_id3156138\" src=\"cmd/lc_recundo.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156138\">Icon Undo Data Entry</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3156138\" src=\"cmd/lc_recundo.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3156138\">ikonet Fortryd og dataindtasting</alt></image>"
 
 #. GAZ7t
 #: main0213.xhp
@@ -1472,7 +1472,7 @@ msgctxt ""
 "par_id3145584\n"
 "help.text"
 msgid "<image id=\"img_id3166434\" src=\"cmd/lc_deleterecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3166434\">Icon Delete Record</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3166434\" src=\"cmd/lc_deleterecord.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3166434\">Ikonet Slet post</alt></image>"
 
 #. noMmE
 #: main0213.xhp
@@ -1490,7 +1490,7 @@ msgctxt ""
 "hd_id161647003427601\n"
 "help.text"
 msgid "Refresh Control"
-msgstr ""
+msgstr "Opdater kontrol"
 
 #. zuPjH
 #: main0213.xhp
@@ -1499,7 +1499,7 @@ msgctxt ""
 "par_id861647005853278\n"
 "help.text"
 msgid "<image src=\"cmd/lc_refreshformcontrol.svg\" id=\"img_id901647005853278\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id581647005853278\">Icon Refresh Control</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/lc_refreshformcontrol.svg\" id=\"img_id901647005853278\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id581647005853278\">Ikonet Opdater kontrol</alt></image>"
 
 #. 8RmLu
 #: main0213.xhp
@@ -1508,16 +1508,16 @@ msgctxt ""
 "par_id811647005853278\n"
 "help.text"
 msgid "Refresh current control"
-msgstr ""
+msgstr "Opdater aktuel kontrol"
 
-#. BUNUA
+#. AqwfH
 #: main0213.xhp
 msgctxt ""
 "main0213.xhp\n"
 "hd_id3148599\n"
 "help.text"
-msgid "<link href=\"text/shared/02/12100100.xhp\" name=\"Sort\">Sort</link>"
-msgstr "<link href=\"text/shared/02/12100100.xhp\" name=\"Sorter\">Sorter</link>"
+msgid "<link href=\"text/shared/02/12100100.xhp\">Sort</link>"
+msgstr "<link href=\"text/shared/02/12100100.xhp\">Sorter</link>"
 
 #. oSJoq
 #: main0214.xhp
@@ -1528,14 +1528,14 @@ msgctxt ""
 msgid "Query Design Bar"
 msgstr "Værktøjslinjen Forespørgselsdesign"
 
-#. pgVF2
+#. Q6Prc
 #: main0214.xhp
 msgctxt ""
 "main0214.xhp\n"
 "hd_id3159176\n"
 "help.text"
-msgid "<link href=\"text/shared/main0214.xhp\" name=\"Query Design Bar\">Query Design Bar</link>"
-msgstr "<link href=\"text/shared/main0214.xhp\" name=\"Værktøjslinjen Forespørgselsdesign \">Værktøjslinjen Forespørgselsdesign </link>"
+msgid "<link href=\"text/shared/main0214.xhp\">Query Design Bar</link>"
+msgstr "<link href=\"text/shared/main0214.xhp\">Værktøjslinjen Forespørgselsdesign </link>"
 
 #. YwUQD
 #: main0214.xhp
@@ -1555,14 +1555,14 @@ msgctxt ""
 msgid "Depending on whether you have created the query or view in the <emph>Design</emph> or <emph>SQL</emph> tab page, the following icons appear:"
 msgstr "Afhængigt af om du har oprettet forespørgslen eller set den under fanebladet <emph>Design</emph> eller <emph>SQL</emph>, vil de følgende ikoner vises:"
 
-#. KJCRF
+#. 56jjt
 #: main0214.xhp
 msgctxt ""
 "main0214.xhp\n"
 "hd_id3151384\n"
 "help.text"
-msgid "<link href=\"text/shared/02/14020100.xhp\" name=\"Add Tables\">Add Tables</link>"
-msgstr "<link href=\"text/shared/02/14020100.xhp\" name=\"Tilføj tabeller\">Tilføj tabeller</link>"
+msgid "<link href=\"text/shared/02/14020100.xhp\">Add Tables</link>"
+msgstr "<link href=\"text/shared/02/14020100.xhp\">Tilføj tabeller</link>"
 
 #. FZFsy
 #: main0214.xhp
@@ -1582,14 +1582,14 @@ msgctxt ""
 msgid "Form Design Toolbar"
 msgstr "Værktøjslinjen Formulardesign"
 
-#. rtMHP
+#. BMAxN
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "hd_id3148520\n"
 "help.text"
-msgid "<link href=\"text/shared/main0226.xhp\" name=\"Form Design Toolbar\">Form Design Toolbar</link>"
-msgstr "<link href=\"text/shared/main0226.xhp\" name=\"Værktøjslinjen Formulardesign\">Værktøjslinjen Formulardesign</link>"
+msgid "<link href=\"text/shared/main0226.xhp\">Form Design Toolbar</link>"
+msgstr "<link href=\"text/shared/main0226.xhp\">Værktøjslinjen Formulardesign</link>"
 
 #. r7rXm
 #: main0226.xhp
@@ -1600,14 +1600,14 @@ msgctxt ""
 msgid "The Form Design toolbar becomes visible as soon as you select a form object when working in the design mode."
 msgstr "Værktøjslinjen Formulardesign bliver synlig, så snart du markerer et formularobjekt, når der arbejdes i designtilstanden."
 
-#. zfC9k
+#. YJDCw
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "hd_id3163802\n"
 "help.text"
-msgid "<link href=\"text/shared/02/01170400.xhp\" name=\"Add Field\">Add Field</link>"
-msgstr "<link href=\"text/shared/02/01170400.xhp\" name=\"Tilføj felt\">Tilføj felt</link>"
+msgid "<link href=\"text/shared/02/01170400.xhp\">Add Field</link>"
+msgstr "<link href=\"text/shared/02/01170400.xhp\">Tilføj felt</link>"
 
 #. ibj9F
 #: main0226.xhp
@@ -1616,7 +1616,7 @@ msgctxt ""
 "hd_id3146815\n"
 "help.text"
 msgid "Automatic Control Focus"
-msgstr ""
+msgstr "Automatisk kontrolfokus"
 
 #. gg2Ag
 #: main0226.xhp
@@ -1625,34 +1625,34 @@ msgctxt ""
 "par_id3150261\n"
 "help.text"
 msgid "<image id=\"img_id3149351\" src=\"cmd/sc_autocontrolfocus.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149351\">Icon</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3149351\" src=\"cmd/sc_autocontrolfocus.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149351\">Ikon</alt></image>"
 
-#. ZbBmL
+#. 5WaEw
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "par_id3109848\n"
 "help.text"
-msgid "<ahelp hid=\".uno:AutoControlFocus\">If <emph>Automatic Control Focus</emph> is activated, the first form control will be selected when you open the document. If the button is not activated, the text will be selected after opening. The <link href=\"text/shared/02/01170300.xhp\" name=\"Tab Order\">Tab Order</link> that you have specified determines which is the first form control.</ahelp>"
+msgid "<ahelp hid=\".uno:AutoControlFocus\">If <emph>Automatic Control Focus</emph> is activated, the first form control will be selected when you open the document. If the button is not activated, the text will be selected after opening. The <link href=\"text/shared/02/01170300.xhp\">Tab Order</link> that you have specified determines which is the first form control.</ahelp>"
 msgstr ""
 
-#. pE5xB
+#. QhszV
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "hd_id3150398\n"
 "help.text"
-msgid "<link href=\"text/shared/02/01171200.xhp\" name=\"Display Grid\">Display Grid</link>"
-msgstr "<link href=\"text/shared/02/01171200.xhp\" name=\"Vis gitter\">Vis gitter</link>"
+msgid "<link href=\"text/shared/02/01171200.xhp\">Display Grid</link>"
+msgstr "<link href=\"text/shared/02/01171200.xhp\">Vis gitter</link>"
 
-#. s84CM
+#. gtiLC
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "hd_id3148798\n"
 "help.text"
-msgid "<link href=\"text/shared/02/01171300.xhp\" name=\"Snap to Grid\">Snap to Grid</link>"
-msgstr "<link href=\"text/shared/02/01171300.xhp\" name=\"Fastgør til gitter\">Fastgør til gitter</link>"
+msgid "<link href=\"text/shared/02/01171300.xhp\">Snap to Grid</link>"
+msgstr "<link href=\"text/shared/02/01171300.xhp\">Fastgør til gitter</link>"
 
 #. ph5uF
 #: main0226.xhp
@@ -1663,14 +1663,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:GridUse\">Specifies that you can move objects only between grid points.</ahelp>"
 msgstr "<ahelp hid=\".uno:GridUse\">Bestemmer at du kun kan flytte objekter mellem gitterpunkter.</ahelp>"
 
-#. Z5NNA
+#. VWNKD
 #: main0226.xhp
 msgctxt ""
 "main0226.xhp\n"
 "hd_id3148920\n"
 "help.text"
-msgid "<link href=\"text/shared/02/01171400.xhp\" name=\"Helplines While Moving\">Helplines While Moving</link>"
-msgstr "<link href=\"text/shared/02/01171400.xhp\" name=\"Helplines While Moving\">Hjælpelinjer ved flytning</link>"
+msgid "<link href=\"text/shared/02/01171400.xhp\">Helplines While Moving</link>"
+msgstr "<link href=\"text/shared/02/01171400.xhp\">Hjælpelinjer ved flytning</link>"
 
 #. 94V64
 #: main0227.xhp
@@ -1690,14 +1690,14 @@ msgctxt ""
 msgid "<bookmark_value>lines; editing points</bookmark_value><bookmark_value>curves; editing points</bookmark_value><bookmark_value>Edit Points bar</bookmark_value>"
 msgstr "<bookmark_value>linjer; redigere punkter</bookmark_value><bookmark_value>kurver; redigere punkter</bookmark_value><bookmark_value>Rediger punkter - værktøjslinje</bookmark_value>"
 
-#. JUFAm
+#. iFKff
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "hd_id3149987\n"
 "help.text"
-msgid "<link href=\"text/shared/main0227.xhp\" name=\"Edit Points Bar\">Edit Points Bar</link>"
-msgstr "<link href=\"text/shared/main0227.xhp\" name=\"Værktøjslinjen Rediger punkter\">Værktøjslinjen Rediger punkter</link>"
+msgid "<link href=\"text/shared/main0227.xhp\">Edit Points Bar</link>"
+msgstr "<link href=\"text/shared/main0227.xhp\">Værktøjslinjen Rediger punkter</link>"
 
 #. N5vQq
 #: main0227.xhp
@@ -1726,23 +1726,23 @@ msgctxt ""
 msgid "Edit Points"
 msgstr "Rediger punkter"
 
-#. 2NY7B
+#. w2P7j
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3159151\n"
 "help.text"
-msgid "The <link href=\"text/shared/01/05270000.xhp\" name=\"Edit Points\"><emph>Edit Points</emph></link> icon allows you to activate or deactivate the edit mode for Bézier objects. In the edit mode, individual points of the drawing object can be selected."
-msgstr "Ikonet <link href=\"text/shared/01/05270000.xhp\" name=\"Edit Points\"><emph>Rediger punkter</emph></link> giver dig mulighed for at aktivere eller deaktivere redigeringstilstanden for Bézierobjekter. I redigeringstilstanden kan du vælge de individuelle punkter for tegneobjektet."
+msgid "The <link href=\"text/shared/01/05270000.xhp\"><emph>Edit Points</emph></link> icon allows you to activate or deactivate the edit mode for Bézier objects. In the edit mode, individual points of the drawing object can be selected."
+msgstr "Ikonet <link href=\"text/shared/01/05270000.xhp\"><emph>Rediger punkter</emph></link> giver dig mulighed for at aktivere eller deaktivere redigeringstilstanden for Bézierobjekter. I redigeringstilstanden kan du vælge de individuelle punkter for tegneobjektet."
 
-#. 9CP8C
+#. GtMer
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3145366\n"
 "help.text"
-msgid "<image id=\"img_id3153951\" src=\"cmd/sc_toggleobjectbeziermode.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153951\">Icon</alt></image>"
-msgstr "<image id=\"img_id3153951\" src=\"cmd/sc_toggleobjectbeziermode.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3153951\">Ikon</alt></image>"
+msgid "<image id=\"img_id3153951\" src=\"cmd/lc_toggleobjectbeziermode.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153951\">Icon Edit Points</alt></image>"
+msgstr ""
 
 #. wNGCc
 #: main0227.xhp
@@ -1780,14 +1780,14 @@ msgctxt ""
 msgid "Point at the curve between two points or within a closed curve and drag the mouse to shift the entire curve without distorting the form."
 msgstr "Peg mellem to punkter på kurven eller indenfor en lukket kurve, og træk musen for at flytte hele kurven uden at ændre dens form."
 
-#. 3TVgA
+#. 2FrPH
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3154096\n"
 "help.text"
-msgid "<image id=\"img_id3149377\" src=\"cmd/sc_beziermove.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149377\">Icon</alt></image>"
-msgstr "<image id=\"img_id3149377\" src=\"cmd/sc_beziermove.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149377\">Ikon</alt></image>"
+msgid "<image id=\"img_id3149377\" src=\"cmd/lc_beziermove.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149377\">Icon Move Points</alt></image>"
+msgstr ""
 
 #. BFM7Z
 #: main0227.xhp
@@ -1825,14 +1825,14 @@ msgctxt ""
 msgid "If you wish to create a corner point you must first insert either a smooth or a symmetrical point which is then converted to a corner point by using <emph>Corner Point</emph>."
 msgstr "Hvis du ønsker at oprette et hjørnepunkt, skal du først indsætte enten et udjævnings- eller et symmetripunkt, som dernæst kan konverteres til et hjørnepunkt ved at benytte <emph>Definer hjørnepunkter</emph>."
 
-#. wFzbF
+#. N35P4
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3153838\n"
 "help.text"
-msgid "<image id=\"img_id3146969\" src=\"cmd/sc_bezierinsert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146969\">Icon</alt></image>"
-msgstr "<image id=\"img_id3146969\" src=\"cmd/sc_bezierinsert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146969\">Ikon</alt></image>"
+msgid "<image id=\"img_id3146969\" src=\"cmd/lc_bezierinsert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146969\">Icon Insert Points</alt></image>"
+msgstr ""
 
 #. Dfg35
 #: main0227.xhp
@@ -1870,14 +1870,14 @@ msgctxt ""
 msgid "First select the points to be deleted, and then click this icon, or press Del."
 msgstr "Marker først punkterne, som skal slettes, og klik dernæst på dette ikon, eller tryk Del."
 
-#. 7E9oE
+#. 5FFCM
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3147321\n"
 "help.text"
-msgid "<image id=\"img_id3146920\" src=\"cmd/sc_bezierdelete.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146920\">Icon</alt></image>"
-msgstr "<image id=\"img_id3146920\" src=\"cmd/sc_bezierdelete.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3146920\">Ikon</alt></image>"
+msgid "<image id=\"img_id3146920\" src=\"cmd/lc_bezierdelete.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146920\">Icon Delete Points</alt></image>"
+msgstr ""
 
 #. 6i377
 #: main0227.xhp
@@ -1906,14 +1906,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BezierCutLine\">The<emph> Split Curve </emph>icon splits a curve. Select the point or points where you want to split the curve, then click the icon</ahelp>."
 msgstr "<ahelp hid=\".uno:BezierCutLine\">Ikonet <emph>Opdel kurve</emph> opdeler en kurve. Marker det punkt eller de punkter, hvor du vil opdele kurven, og klik så på ikonet</ahelp>."
 
-#. iVMWF
+#. pHdF6
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3153788\n"
 "help.text"
-msgid "<image id=\"img_id3148489\" src=\"cmd/sc_beziercutline.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148489\">Icon</alt></image>"
-msgstr "<image id=\"img_id3148489\" src=\"cmd/sc_beziercutline.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148489\">Ikon</alt></image>"
+msgid "<image id=\"img_id3148489\" src=\"cmd/lc_beziercutline.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148489\">Icon Split Curve</alt></image>"
+msgstr ""
 
 #. vmsiD
 #: main0227.xhp
@@ -1951,14 +1951,14 @@ msgctxt ""
 msgid "If a certain section of the curve is straight, the end points of the line have a maximum of one control point each. They cannot be modified to round points unless the straight line is converted back to a curve."
 msgstr "Hvis en bestemt del af kurven er lige, vil endepunkterne for linjen hver have højst et kontrolpunkt. De kan ikke ændres til runde punkter, med mindre den rette linje konverteres tilbage til en kurve."
 
-#. rrpRW
+#. L7FMu
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3158212\n"
 "help.text"
-msgid "<image id=\"img_id3149036\" src=\"cmd/sc_bezierconvert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149036\">Icon</alt></image>"
-msgstr "<image id=\"img_id3149036\" src=\"cmd/sc_bezierconvert.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3149036\">Ikon</alt></image>"
+msgid "<image id=\"img_id3149036\" src=\"cmd/lc_bezierconvert.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149036\">Icon Convert to Curve</alt></image>"
+msgstr ""
 
 #. PtsWF
 #: main0227.xhp
@@ -1987,14 +1987,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BezierEdge\">Converts the selected point or points into corner points.</ahelp> Corner points have two movable control points, which are independent from each other. A curved line, therefore, does not go straight through a corner point, but forms a corner."
 msgstr "<ahelp hid=\".uno:BezierEdge\">Konverterer den eller de valgte punkter til hjørnepunkter.</ahelp> Hjørnepunkter har to flytbare kontrolpunkter, som er uafhængige af hinanden. En kurvet linje går derfor ikke lige gennem et hjørnepunkt, men former et hjørne."
 
-#. xjYEG
+#. nGTf9
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3154576\n"
 "help.text"
-msgid "<image id=\"img_id3154201\" src=\"cmd/sc_bezieredge.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154201\">Icon</alt></image>"
-msgstr "<image id=\"img_id3154201\" src=\"cmd/sc_bezieredge.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3154201\">Ikon</alt></image>"
+msgid "<image id=\"img_id3154201\" src=\"cmd/lc_bezieredge.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3154201\">Icon Corner Point</alt></image>"
+msgstr ""
 
 #. eLuKD
 #: main0227.xhp
@@ -2023,14 +2023,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BezierSmooth\">Converts a corner point or symmetrical point into a smooth point.</ahelp> Both control points of the corner point are aligned in parallel, and can only be moved simultaneously. The control points may differentiate in length, allowing you to vary the degree of curvature."
 msgstr "<ahelp hid=\".uno:BezierSmooth\">Konverterer et hjørnepunkt eller symmetrisk punkt til et udjævningspunkt.</ahelp> Begge hjørnepunktets kontrolpunkter er justeret parallelt, og kan kun flyttes samtidigt. Kontrolpunkterne kan have forskellig længde, hvilket giver dig mulighed for at variere graden af krumning."
 
-#. KCCis
+#. DAXKE
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3148813\n"
 "help.text"
-msgid "<image id=\"img_id3151183\" src=\"cmd/sc_beziersmooth.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151183\">Icon</alt></image>"
-msgstr "<image id=\"img_id3151183\" src=\"cmd/sc_beziersmooth.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3151183\">Ikon</alt></image>"
+msgid "<image id=\"img_id3151183\" src=\"cmd/lc_beziersmooth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151183\">Icon Smooth Transition</alt></image>"
+msgstr ""
 
 #. MLk9o
 #: main0227.xhp
@@ -2059,14 +2059,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BezierSymmetric\">This icon converts a corner point or a smooth point into a symmetrical point.</ahelp> Both control points of the corner point are aligned in parallel and have the same length. They can only be moved simultaneously and the degree of curvature is the same in both directions."
 msgstr "<ahelp hid=\".uno:BezierSymmetric\">Dette ikon konverterer et hjørne- eller udjævningspunkt til et symmetripunkt.</ahelp> Begge hjørnepunktets kontrolpunkter er justeret parallelt og har samme længde. De kan kun flyttes samtidigt, og graden af krumning er den samme i begge retninger."
 
-#. 4obZh
+#. DAqSZ
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3153818\n"
 "help.text"
-msgid "<image id=\"img_id3159218\" src=\"cmd/sc_beziersymmetric.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159218\">Icon</alt></image>"
-msgstr "<image id=\"img_id3159218\" src=\"cmd/sc_beziersymmetric.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3159218\">Ikon</alt></image>"
+msgid "<image id=\"img_id3159218\" src=\"cmd/lc_beziersymmetric.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3159218\">Icon Symmetric Transition</alt></image>"
+msgstr ""
 
 #. 2Byoz
 #: main0227.xhp
@@ -2095,14 +2095,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BezierClose\">Closes a line or a curve.</ahelp> A line is closed by connecting the last point with the first point, indicated by an enlarged square."
 msgstr "<ahelp hid=\".uno:BezierClose\">Lukker en linje eller en kurve.</ahelp> En linje lukkes ved at forbinde det sidste punkt med det første punkt. Dette indikeres af et forstørret kvadrat."
 
-#. eJCFP
+#. evNGB
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3154344\n"
 "help.text"
-msgid "<image id=\"img_id3148607\" src=\"cmd/sc_bezierclose.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148607\">Icon</alt></image>"
-msgstr "<image id=\"img_id3148607\" src=\"cmd/sc_bezierclose.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3148607\">Ikon</alt></image>"
+msgid "<image id=\"img_id3148607\" src=\"cmd/lc_bezierclose.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148607\">Icon Close Bézier</alt></image>"
+msgstr ""
 
 #. 29q2Q
 #: main0227.xhp
@@ -2122,23 +2122,23 @@ msgctxt ""
 msgid "Eliminate Points"
 msgstr "Eliminer punkter"
 
-#. FjTtf
+#. Bk6z5
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3149441\n"
 "help.text"
-msgid "<ahelp hid=\".uno:BezierEliminatePoints\">Marks the current point or the selected points for deletion.</ahelp> This happens in the event that the point is located on a straight line. If you convert a curve or a polygon with the <emph>Convert to Curve </emph>icon into a straight line or you change a curve with the mouse so that a point lies on the straight line, it is removed. The angle from which the point reduction is to take place <switchinline select=\"appl\"><caseinline select=\"DRAW\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\" name=\"Drawing - Grid\"><emph>%PRODUCTNAME Draw - Grid</emph></link> in the Options dialog box</caseinline><caseinline select=\"IMPRESS\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\" name=\"Presentation - Grid\"><emph>%PRODUCTNAME Impress - Grid</emph></link> in the Options dialog box</caseinline><defaultinline>is 15° by default.</defaultinline></switchinline>"
-msgstr "<ahelp hid=\".uno:BezierEliminatePoints\">Markerer det aktuelle punkt eller de valgte punkter til sletning.</ahelp> Dette sker, hvis punktet ligger på en ret linje. Hvis du konverterer en kurve eller en polygon til en ret linje med ikonet <emph>Konverter til kurve</emph>, eller hvis du ændrer en kurve med musen, således at et punkt ligger på den rette linje, fjernes det. Den vinkel, hvorfra punktreduktionen skal foregå, <switchinline select=\"appl\"><caseinline select=\"DRAW\">kan sættes ved at vælge <link href=\"text/shared/optionen/01070300.xhp\" name=\"Drawing - Grid\"><emph>%PRODUCTNAME Draw - Gitter</emph></link> i dialogfeltet Indstillinger</caseinline><caseinline select=\"IMPRESS\">kan sættes ved at vælge <link href=\"text/shared/optionen/01070300.xhp\" name=\"Presentation - Grid\"><emph>%PRODUCTNAME Impress - Gitter</emph></link> i dialogfeltet Indstillinger</caseinline><defaultinline> er 15° som standard.</defaultinline></switchinline>"
+msgid "<ahelp hid=\".uno:BezierEliminatePoints\">Marks the current point or the selected points for deletion.</ahelp> This happens in the event that the point is located on a straight line. If you convert a curve or a polygon with the <emph>Convert to Curve </emph>icon into a straight line or you change a curve with the mouse so that a point lies on the straight line, it is removed. The angle from which the point reduction is to take place <switchinline select=\"appl\"><caseinline select=\"DRAW\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Draw - Grid</emph></link> in the Options dialog box</caseinline><caseinline select=\"IMPRESS\">can be set by choosing <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Impress - Grid</emph></link> in the Options dialog box</caseinline><defaultinline>is 15° by default.</defaultinline></switchinline>"
+msgstr "<ahelp hid=\".uno:BezierEliminatePoints\">Markerer det aktuelle punkt eller de valgte punkter til sletning.</ahelp> Dette sker, hvis punktet ligger på en ret linje. Hvis du konverterer en kurve eller en polygon til en ret linje med ikonet <emph>Konverter til kurve</emph>, eller hvis du ændrer en kurve med musen, således at et punkt ligger på den rette linje, fjernes det. Den vinkel, hvorfra punktreduktionen skal foregå, <switchinline select=\"appl\"><caseinline select=\"DRAW\">kan sættes ved at vælge <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Draw - Gitter</emph></link> i dialogfeltet Indstillinger</caseinline><caseinline select=\"IMPRESS\">kan sættes ved at vælge <link href=\"text/shared/optionen/01070300.xhp\"><emph>%PRODUCTNAME Impress - Gitter</emph></link> i dialogfeltet Indstillinger</caseinline><defaultinline> er 15° som standard.</defaultinline></switchinline>"
 
-#. ACe6t
+#. RCPw8
 #: main0227.xhp
 msgctxt ""
 "main0227.xhp\n"
 "par_id3148970\n"
 "help.text"
-msgid "<image id=\"img_id3155385\" src=\"cmd/sc_beziereliminatepoints.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155385\">Icon</alt></image>"
-msgstr "<image id=\"img_id3155385\" src=\"cmd/sc_beziereliminatepoints.png\" width=\"0.222inch\" height=\"0.222inch\"><alt id=\"alt_id3155385\">Ikon</alt></image>"
+msgid "<image id=\"img_id3155385\" src=\"cmd/lc_beziereliminatepoints.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155385\">Icon Eliminate Points</alt></image>"
+msgstr ""
 
 #. vHE4T
 #: main0227.xhp
@@ -2158,14 +2158,14 @@ msgctxt ""
 msgid "Shortcut Keys"
 msgstr "Genvejstaster"
 
-#. GQ7jZ
+#. 7fYZK
 #: main0400.xhp
 msgctxt ""
 "main0400.xhp\n"
 "hd_id3149495\n"
 "help.text"
-msgid "<link href=\"text/shared/main0400.xhp\" name=\"Shortcut Keys\">Shortcut Keys</link>"
-msgstr "<link href=\"text/shared/main0400.xhp\" name=\"Genvejstaster\">Genvejstaster</link>"
+msgid "<link href=\"text/shared/main0400.xhp\">Shortcut Keys</link>"
+msgstr "<link href=\"text/shared/main0400.xhp\">Genvejstaster</link>"
 
 #. WPGJg
 #: main0400.xhp
@@ -2185,14 +2185,14 @@ msgctxt ""
 msgid "Glossaries"
 msgstr "Ordforklaring"
 
-#. BG5LJ
+#. CDvUF
 #: main0500.xhp
 msgctxt ""
 "main0500.xhp\n"
 "hd_id3156183\n"
 "help.text"
-msgid "<link href=\"text/shared/main0500.xhp\" name=\"Glossaries\">Glossaries</link>"
-msgstr "<link href=\"text/shared/main0500.xhp\" name=\"Ordforklaring\">Ordforklaring</link>"
+msgid "<link href=\"text/shared/main0500.xhp\">Glossaries</link>"
+msgstr "<link href=\"text/shared/main0500.xhp\">Ordforklaring</link>"
 
 #. dziDW
 #: main0500.xhp
@@ -2212,14 +2212,14 @@ msgctxt ""
 msgid "Java Platform Support"
 msgstr "Understøttelse af Java-platform"
 
-#. sAfDU
+#. Cwsus
 #: main0650.xhp
 msgctxt ""
 "main0650.xhp\n"
 "hd_id3153089\n"
 "help.text"
-msgid "<link href=\"text/shared/main0650.xhp\" name=\"Java Platform Support\">Java Platform Support</link>"
-msgstr "<link href=\"text/shared/main0650.xhp\" name=\"Understøttelse af Java-platform\">Understøttelse af Java-platform</link>"
+msgid "<link href=\"text/shared/main0650.xhp\">Java Platform Support</link>"
+msgstr "<link href=\"text/shared/main0650.xhp\">Understøttelse af Java-platform</link>"
 
 #. dPzDx
 #: main0650.xhp
@@ -2248,14 +2248,14 @@ msgctxt ""
 msgid "The Java platform support needs to be activated under $[officename] to run Java applications."
 msgstr "Understøttelse af Java-platform skal aktiveres under $[officename] for at køre Java-programmer."
 
-#. KmhjC
+#. H2Vk4
 #: main0650.xhp
 msgctxt ""
 "main0650.xhp\n"
 "par_id3155892\n"
 "help.text"
-msgid "Enable Java platform support by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\" name=\"$[officename] - Advanced\"><emph>$[officename] - Advanced</emph></link>."
-msgstr "Aktiver understøttelse af Java-platform ved at vælge <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Indstillinger</emph></caseinline><defaultinline><emph>Funktioner - Indstillinger</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\" name=\"$[officename] - Advanced\"><emph>$[officename] - Avanceret</emph></link>."
+msgid "Enable Java platform support by choosing <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\"><emph>$[officename] - Advanced</emph></link>."
+msgstr "Aktiver understøttelse af Java-platform ved at vælge <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Indstillinger</emph></caseinline><defaultinline><emph>Funktioner - Indstillinger</emph></defaultinline></switchinline><emph> - </emph><link href=\"text/shared/optionen/java.xhp\"><emph>$[officename] - Avanceret</emph></link>."
 
 #. NcDL4
 #: main0650.xhp
@@ -2284,23 +2284,59 @@ msgctxt ""
 msgid "$[officename] and the Internet"
 msgstr "$[officename] og internettet"
 
-#. GCzks
+#. QrCDK
 #: main0800.xhp
 msgctxt ""
 "main0800.xhp\n"
 "hd_id3153089\n"
 "help.text"
-msgid "<link href=\"text/shared/main0800.xhp\" name=\"$[officename] and the Internet\">$[officename] and the Internet</link>"
-msgstr "<link href=\"text/shared/main0800.xhp\" name=\"$[officename] og internettet\">$[officename] og internettet</link>"
+msgid "<link href=\"text/shared/main0800.xhp\">$[officename] and the Internet</link>"
+msgstr "<link href=\"text/shared/main0800.xhp\">$[officename] og internettet</link>"
 
-#. NUe4Y
+#. C7HK8
 #: main0800.xhp
 msgctxt ""
 "main0800.xhp\n"
 "par_id3155150\n"
 "help.text"
-msgid "This section provides information on the subject of the Internet. An <link href=\"text/shared/00/00000002.xhp\" name=\"Internet glossary\">Internet glossary</link> explains the most important terms."
-msgstr "Denne sektion giver information om emnet på internettet. En <link href=\"text/shared/00/00000002.xhp\" name=\"Internet glossary\">Internetordliste</link> forklarer det vigtigste termer."
+msgid "This section provides information on the subject of the Internet. An <link href=\"text/shared/00/00000002.xhp\">Internet glossary</link> explains the most important terms."
+msgstr "Denne sektion giver information om emnet på internettet. En <link href=\"text/shared/00/00000002.xhp\">Internetordliste</link> forklarer det vigtigste termer."
+
+#. vLYDy
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"tit\n"
+"help.text"
+msgid "Media Playback Toolbar"
+msgstr ""
+
+#. 8f3GM
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"hd_id701655505104052\n"
+"help.text"
+msgid "<variable id=\"h1\"><link href=\"text/shared/mediaplay_toolbar.xhp\">Media Playback Toolbar</link></variable>"
+msgstr ""
+
+#. ELZkF
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"par_id821655505104055\n"
+"help.text"
+msgid "Open the Media Playback toolbar"
+msgstr ""
+
+#. GpFS2
+#: mediaplay_toolbar.xhp
+msgctxt ""
+"mediaplay_toolbar.xhp\n"
+"par_id411655505224585\n"
+"help.text"
+msgid "Choose <menuitem>View - Toolbars - Media Playback</menuitem>."
+msgstr ""
 
 #. NJGJa
 #: need_help.xhp

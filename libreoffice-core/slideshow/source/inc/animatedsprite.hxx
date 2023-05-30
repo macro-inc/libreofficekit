@@ -22,6 +22,7 @@
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/point/b2dpoint.hxx>
+#include <basegfx/vector/b2dsize.hxx>
 #include <basegfx/polygon/b2dpolypolygon.hxx>
 
 #include "viewlayer.hxx"
@@ -59,7 +60,7 @@ namespace slideshow::internal
                 Priority of the sprite. Must remain static over the
                 lifetime of this object
              */
-            AnimatedSprite( const ViewLayerSharedPtr&   rViewLayer,
+            AnimatedSprite( ViewLayerSharedPtr          xViewLayer,
                             const ::basegfx::B2DSize&   rSpriteSizePixel,
                             double                      nSpritePrio );
             AnimatedSprite(const AnimatedSprite&) = delete;

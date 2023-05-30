@@ -36,12 +36,17 @@ fuzzer_externals = \
     libjpeg \
     libpng \
     libtiff \
+    libwebp \
     openssl \
     expat \
     mythes \
     hyphen \
     hunspell \
     zlib \
+
+fuzzer_statics = \
+     findsofficepath \
+     ulingu \
 
 fuzzer_core_libraries = \
     avmedia \
@@ -61,6 +66,7 @@ fuzzer_core_libraries = \
     deployment \
     deploymentmisc \
     drawinglayer \
+    drawinglayercore \
     editeng \
     emfio \
     file \
@@ -145,6 +151,9 @@ fuzzer_core_libraries = \
     gcc3_uno \
     salhelper \
     sal \
+    index_data \
+    localedata_en \
+    localedata_others \
 
 fuzzer_calc_libraries = \
     analysis \
@@ -172,7 +181,6 @@ fuzzer_writer_libraries = \
     guesslang \
 
 fuzzer_draw_libraries = \
-    sdfilt \
     sd \
     sdd \
     icg \

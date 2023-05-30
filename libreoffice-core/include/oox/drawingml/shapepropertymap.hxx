@@ -70,6 +70,7 @@ enum class ShapeProperty
     FillBitmapRectanglePoint,
     FillHatch,                    ///< Explicit fill hatch or name of a fill hatch stored in a global container.
     FillBackground,
+    FillUseSlideBackground,
     FillBitmapName,
     ShadowXDistance,
     ShadowSizeX,
@@ -128,7 +129,7 @@ public:
     }
     bool setProperty(ShapeProperty ePropId, const ::Color& rValue)
     {
-        return setAnyProperty(ePropId, css::uno::makeAny(rValue));
+        return setAnyProperty(ePropId, css::uno::Any(rValue));
     }
 
     using PropertyMap::setAnyProperty;

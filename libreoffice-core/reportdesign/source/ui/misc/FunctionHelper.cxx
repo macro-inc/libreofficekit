@@ -20,8 +20,8 @@
 #include <FunctionHelper.hxx>
 
 #include <o3tl/safeint.hxx>
-#include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 #include <formula/funcvarargs.h>
 
 
@@ -30,8 +30,8 @@ namespace rptui
 
     using namespace ::com::sun::star;
 
-FunctionManager::FunctionManager(const uno::Reference< report::meta::XFunctionManager>& _xMgr)
-: m_xMgr(_xMgr)
+FunctionManager::FunctionManager(uno::Reference< report::meta::XFunctionManager> _xMgr)
+: m_xMgr(std::move(_xMgr))
 {
 }
 FunctionManager::~FunctionManager()
@@ -133,8 +133,8 @@ OUString FunctionCategory::getName() const
     return m_xCategory->getName();
 }
 
-FunctionDescription::FunctionDescription(const formula::IFunctionCategory* _pFunctionCategory,const uno::Reference< report::meta::XFunctionDescription>& _xFunctionDescription)
-: m_xFunctionDescription(_xFunctionDescription)
+FunctionDescription::FunctionDescription(const formula::IFunctionCategory* _pFunctionCategory, uno::Reference< report::meta::XFunctionDescription> _xFunctionDescription)
+: m_xFunctionDescription(std::move(_xFunctionDescription))
 , m_pFunctionCategory(_pFunctionCategory)
 {
     m_aParameter = m_xFunctionDescription->getArguments();

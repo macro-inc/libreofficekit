@@ -24,8 +24,11 @@
 #include <com/sun/star/chart2/data/LabelOrigin.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
 #include <com/sun/star/frame/XModel.hpp>
+#include <comphelper/diagnose_ex.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <osl/mutex.hxx>
+#include <o3tl/deleter.hxx>
+#include <o3tl/string_view.hxx>
+#include <mutex>
 #include <vcl/svapp.hxx>
 
 #include "XMLRangeHelper.hxx"
@@ -149,24 +152,19 @@ IMPL_LINK_NOARG( SwChartLockController_Helper, DoUnlockAllCharts, Timer *, void 
     UnlockAllCharts();
 }
 
-static osl::Mutex &    GetChartMutex()
+static std::mutex &    GetChartMutex()
 {
-    static osl::Mutex   aMutex;
+    static std::mutex aMutex;
     return aMutex;
 }
 
 static void LaunchModifiedEvent(
-        ::comphelper::OInterfaceContainerHelper2 &rICH,
+        ::comphelper::OInterfaceContainerHelper4<util::XModifyListener> &rICH,
         const uno::Reference< uno::XInterface > &rxI )
 {
     lang::EventObject aEvtObj( rxI );
-    comphelper::OInterfaceIteratorHelper2 aIt( rICH );
-    while (aIt.hasMoreElements())
-    {
-        uno::Reference< util::XModifyListener > xRef( aIt.next(), uno::UNO_QUERY );
-        if (xRef.is())
-            xRef->modified( aEvtObj );
-    }
+    std::unique_lock aGuard(GetChartMutex());
+    rICH.notifyEach( aGuard, &util::XModifyListener::modified, aEvtObj );
 }
 
 /**
@@ -176,12 +174,12 @@ static void LaunchModifiedEvent(
  */
 bool FillRangeDescriptor(
         SwRangeDescriptor &rDesc,
-        const OUString &rCellRangeName )
+        std::u16string_view rCellRangeName )
 {
-    sal_Int32 nToken = -1 == rCellRangeName.indexOf('.') ? 0 : 1;
-    OUString aCellRangeNoTableName( rCellRangeName.getToken( nToken, '.' ) );
-    OUString aTLName( aCellRangeNoTableName.getToken(0, ':') );  // name of top left cell
-    OUString aBRName( aCellRangeNoTableName.getToken(1, ':') );  // name of bottom right cell
+    sal_Int32 nToken = std::u16string_view::npos == rCellRangeName.find('.') ? 0 : 1;
+    std::u16string_view aCellRangeNoTableName( o3tl::getToken(rCellRangeName, nToken, '.' ) );
+    OUString aTLName( o3tl::getToken(aCellRangeNoTableName, 0, ':') );  // name of top left cell
+    OUString aBRName( o3tl::getToken(aCellRangeNoTableName, 1, ':') );  // name of bottom right cell
     if(aTLName.isEmpty() || aBRName.isEmpty())
         return false;
 
@@ -208,13 +206,19 @@ static OUString GetCellRangeName( const SwFrameFormat &rTableFormat, SwUnoCursor
     SwUnoTableCursor* pUnoTableCursor = dynamic_cast<SwUnoTableCursor*>(&rTableCursor);
     if (!pUnoTableCursor)
         return OUString();
+
+    // tdf#132714 empty outdated selection cache to avoid crashing in ActualizeSelection()
+    size_t nCount = pUnoTableCursor->GetSelectedBoxesCount();
+    while (nCount--)
+        pUnoTableCursor->DeleteBox(nCount);
+
     pUnoTableCursor->MakeBoxSels();
 
     const SwStartNode*  pStart;
     const SwTableBox*   pStartBox   = nullptr;
     const SwTableBox*   pEndBox     = nullptr;
 
-    pStart = pUnoTableCursor->GetPoint()->nNode.GetNode().FindTableBoxStartNode();
+    pStart = pUnoTableCursor->GetPoint()->GetNode().FindTableBoxStartNode();
     if (pStart)
     {
         const SwTable* pTable = SwTable::FindTable( &rTableFormat );
@@ -223,7 +227,7 @@ static OUString GetCellRangeName( const SwFrameFormat &rTableFormat, SwUnoCursor
 
         if(pUnoTableCursor->HasMark())
         {
-            pStart = pUnoTableCursor->GetMark()->nNode.GetNode().FindTableBoxStartNode();
+            pStart = pUnoTableCursor->GetMark()->GetNode().FindTableBoxStartNode();
             pStartBox = pTable->GetTableBox( pStart->GetIndex());
         }
         OSL_ENSURE( pStartBox, "start box not found" );
@@ -271,7 +275,7 @@ static OUString GetRangeRepFromTableAndCells( std::u16string_view rTableName,
 }
 
 static bool GetTableAndCellsFromRangeRep(
-        const OUString &rRangeRepresentation,
+        std::u16string_view rRangeRepresentation,
         OUString &rTableName,
         OUString &rStartCell,
         OUString &rEndCell,
@@ -282,16 +286,16 @@ static bool GetTableAndCellsFromRangeRep(
     OUString aTableName;    // table name
     OUString aStartCell;  // name of top left cell
     OUString aEndCell;    // name of bottom right cell
-    sal_Int32 nIdx = rRangeRepresentation.indexOf( '.' );
-    if (nIdx >= 0)
+    size_t nIdx = rRangeRepresentation.find( '.' );
+    if (nIdx != std::u16string_view::npos)
     {
-        aTableName = rRangeRepresentation.copy( 0, nIdx );
-        OUString aRange = rRangeRepresentation.copy( nIdx + 1 ); // cell range
-        sal_Int32 nPos = aRange.indexOf( ':' );
-        if (nPos >= 0) // a cell-range like "Table1.A2:D4"
+        aTableName = rRangeRepresentation.substr( 0, nIdx );
+        std::u16string_view aRange = rRangeRepresentation.substr( nIdx + 1 ); // cell range
+        size_t nPos = aRange.find( ':' );
+        if (nPos != std::u16string_view::npos) // a cell-range like "Table1.A2:D4"
         {
-            aStartCell = aRange.copy( 0, nPos );
-            aEndCell   = aRange.copy( nPos + 1 );
+            aStartCell = aRange.substr( 0, nPos );
+            aEndCell   = aRange.substr( nPos + 1 );
 
             // need to switch start and end cell ?
             // (does not check for normalization here)
@@ -343,7 +347,7 @@ static void GetTableByName( const SwDoc &rDoc, std::u16string_view rTableName,
 
 static void GetFormatAndCreateCursorFromRangeRep(
         const SwDoc    *pDoc,
-        const OUString &rRangeRepresentation,   // must be a single range (i.e. so called sub-range)
+        std::u16string_view rRangeRepresentation,   // must be a single range (i.e. so called sub-range)
         SwFrameFormat    **ppTableFormat,     // will be set to the table format of the table used in the range representation
         std::shared_ptr<SwUnoCursor>&   rpUnoCursor )   // will be set to cursor spanning the cell range (cursor will be created!)
 {
@@ -396,7 +400,7 @@ static void GetFormatAndCreateCursorFromRangeRep(
             if(pBRBox)
             {
                 pUnoCursor->SetMark();
-                pUnoCursor->GetPoint()->nNode = *pBRBox->GetSttNd();
+                pUnoCursor->GetPoint()->Assign( *pBRBox->GetSttNd() );
                 pUnoCursor->Move( fnMoveForward, GoInNode );
                 SwUnoTableCursor& rCursor =
                     dynamic_cast<SwUnoTableCursor&>(*pUnoCursor);
@@ -409,7 +413,7 @@ static void GetFormatAndCreateCursorFromRangeRep(
     }
 }
 
-static bool GetSubranges( const OUString &rRangeRepresentation,
+static bool GetSubranges( std::u16string_view rRangeRepresentation,
         uno::Sequence< OUString > &rSubRanges, bool bNormalize )
 {
     bool bRes = true;
@@ -424,7 +428,7 @@ static bool GetSubranges( const OUString &rRangeRepresentation,
         sal_Int32 nPos = 0;
         for( sal_Int32 i = 0; i < nLen && bRes; ++i )
         {
-            const OUString aRange( rRangeRepresentation.getToken( 0, ';', nPos ) );
+            const OUString aRange( o3tl::getToken(rRangeRepresentation, 0, ';', nPos ) );
             if (!aRange.isEmpty())
             {
                 pRanges[nCnt] = aRange;
@@ -504,7 +508,6 @@ static void SortSubranges( uno::Sequence< OUString > &rSubRanges, bool bCmpByCol
 }
 
 SwChartDataProvider::SwChartDataProvider( const SwDoc& rSwDoc ) :
-    m_aEventListeners( GetChartMutex() ),
     m_pDoc( &rSwDoc )
 {
     m_bDisposed = false;
@@ -648,7 +651,13 @@ uno::Reference< chart2::data::XDataSource > SwChartDataProvider::Impl_createData
     // get a character map in the size of the table to mark
     // all the ranges to use in
     sal_Int32 nRows = pTable->GetTabLines().size();
-    sal_Int32 nCols = pTable->GetTabLines().front()->GetTabBoxes().size();
+    sal_Int32 nCols = 0;
+    // As per tdf#149718 one should know that some cells can be merged together.
+    // Therefore, the number of columns (boxes in each row) are not necessarily
+    // equal. Here, we calculate the maximum number of columns in all rows.
+    for (sal_Int32 i = 0; i < nRows; ++i)
+        nCols = std::max(nCols, static_cast<sal_Int32>(pTable->GetTabLines()[i]->GetTabBoxes().size()));
+
     std::vector<std::vector<char>> aMap(nRows);
     for (sal_Int32 i = 0; i < nRows; ++i)
         aMap[i].resize(nCols);
@@ -751,9 +760,9 @@ uno::Reference< chart2::data::XDataSource > SwChartDataProvider::Impl_createData
     {
         sal_Int32 nFirstSeqLen = 0;
         sal_Int32 nFirstSeqLabelIdx = -1;
-        bool bFirstFound = false;
         for (oi = 0; oi < oiEnd; ++oi)
         {
+            bool bFirstFound = false;
             // row/col used at all?
             if (aDataStartIdx[oi] != -1 &&
                 (!bFirstIsLabel || aLabelIdx[oi] != -1))
@@ -932,10 +941,10 @@ uno::Reference< chart2::data::XDataSource > SAL_CALL SwChartDataProvider::create
  * contains multiple ranges.
  */
 OUString SwChartDataProvider::GetBrokenCellRangeForExport(
-    const OUString &rCellRangeRepresentation )
+    std::u16string_view rCellRangeRepresentation )
 {
     // check that we do not have multiple ranges
-    if (-1 == rCellRangeRepresentation.indexOf( ';' ))
+    if (std::u16string_view::npos == rCellRangeRepresentation.find( ';' ))
     {
         // get current cell and table names
         OUString aTableName, aStartCell, aEndCell;
@@ -1293,7 +1302,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL SwChartDataProvider::detectArgume
 }
 
 uno::Reference< chart2::data::XDataSequence > SwChartDataProvider::Impl_createDataSequenceByRangeRepresentation(
-        const OUString& rRangeRepresentation, bool bTestOnly )
+        std::u16string_view rRangeRepresentation, bool bTestOnly )
 {
     if (m_bDisposed)
         throw lang::DisposedException();
@@ -1363,7 +1372,7 @@ void SAL_CALL SwChartDataProvider::dispose(  )
 {
     bool bMustDispose( false );
     {
-        osl::MutexGuard  aGuard( GetChartMutex() );
+        std::unique_lock aGuard( GetChartMutex() );
         bMustDispose = !m_bDisposed;
         if (!m_bDisposed)
             m_bDisposed = true;
@@ -1381,23 +1390,24 @@ void SAL_CALL SwChartDataProvider::dispose(  )
 
     // require listeners to release references to this object
     lang::EventObject aEvtObj( static_cast< chart2::data::XDataProvider * >(this) );
-    m_aEventListeners.disposeAndClear( aEvtObj );
+    std::unique_lock aGuard( GetChartMutex() );
+    m_aEventListeners.disposeAndClear( aGuard, aEvtObj );
 }
 
 void SAL_CALL SwChartDataProvider::addEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEventListeners.addInterface( rxListener );
+        m_aEventListeners.addInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartDataProvider::removeEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEventListeners.removeInterface( rxListener );
+        m_aEventListeners.removeInterface( aGuard, rxListener );
 }
 
 OUString SAL_CALL SwChartDataProvider::getImplementationName(  )
@@ -1782,8 +1792,6 @@ SwChartDataSequence::SwChartDataSequence(
         SwFrameFormat& rTableFormat,
         const std::shared_ptr<SwUnoCursor>& pTableCursor ) :
     m_pFormat(&rTableFormat),
-    m_aEvtListeners( GetChartMutex() ),
-    m_aModifyListeners( GetChartMutex() ),
     m_aRowLabelText( SwResId( STR_CHART2_ROW_LABEL_TEXT ) ),
     m_aColLabelText( SwResId( STR_CHART2_COL_LABEL_TEXT ) ),
     m_xDataProvider( &rProvider ),
@@ -1829,8 +1837,6 @@ SwChartDataSequence::SwChartDataSequence( const SwChartDataSequence &rObj ) :
     SwChartDataSequenceBaseClass(rObj),
     SvtListener(),
     m_pFormat( rObj.m_pFormat ),
-    m_aEvtListeners( GetChartMutex() ),
-    m_aModifyListeners( GetChartMutex() ),
     m_aRole( rObj.m_aRole ),
     m_aRowLabelText( SwResId(STR_CHART2_ROW_LABEL_TEXT) ),
     m_aColLabelText( SwResId(STR_CHART2_COL_LABEL_TEXT) ),
@@ -1991,16 +1997,16 @@ uno::Sequence< OUString > SAL_CALL SwChartDataSequence::generateLabel(
                         if (pBuf < pEnd && ('0' <= *pBuf && *pBuf <= '9'))
                         {
                             OUString aRplc;
-                            OUString aNew;
+                            std::u16string_view aNew;
                             if (bUseCol)
                             {
                                 aRplc = "%COLUMNLETTER";
-                                aNew = aCellName.copy(0, pBuf - aCellName.getStr());
+                                aNew = aCellName.subView(0, pBuf - aCellName.getStr());
                             }
                             else
                             {
                                 aRplc = "%ROWNUMBER";
-                                aNew = OUString(pBuf, (aCellName.getStr() + nLen) - pBuf);
+                                aNew = std::u16string_view(pBuf, (aCellName.getStr() + nLen) - pBuf);
                             }
                             aText = aText.replaceFirst( aRplc, aNew );
                         }
@@ -2052,14 +2058,22 @@ uno::Sequence< OUString > SAL_CALL SwChartDataSequence::getTextualData()
 uno::Sequence< uno::Any > SAL_CALL SwChartDataSequence::getData()
 {
     SolarMutexGuard aGuard;
-    auto vCells(GetCells());
-    uno::Sequence< uno::Any > vAnyData(vCells.size());
-    std::transform(vCells.begin(),
-        vCells.end(),
-        vAnyData.getArray(),
-        [] (decltype(vCells)::value_type& xCell)
-            { return static_cast<SwXCell*>(xCell.get())->GetAny(); });
-    return vAnyData;
+    try
+    {
+        auto vCells(GetCells());
+        uno::Sequence< uno::Any > vAnyData(vCells.size());
+        std::transform(vCells.begin(),
+            vCells.end(),
+            vAnyData.getArray(),
+            [] (decltype(vCells)::value_type& xCell)
+                { return static_cast<SwXCell*>(xCell.get())->GetAny(); });
+        return vAnyData;
+    }
+    catch (const lang::DisposedException&)
+    {
+        TOOLS_WARN_EXCEPTION( "sw", "unexpected exception caught" );
+    }
+    return uno::Sequence< uno::Any >{};
 }
 
 uno::Sequence< double > SAL_CALL SwChartDataSequence::getNumericalData()
@@ -2203,17 +2217,17 @@ void SAL_CALL SwChartDataSequence::setModified(
 void SAL_CALL SwChartDataSequence::addModifyListener(
         const uno::Reference< util::XModifyListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aModifyListeners.addInterface( rxListener );
+        m_aModifyListeners.addInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartDataSequence::removeModifyListener(
         const uno::Reference< util::XModifyListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aModifyListeners.removeInterface( rxListener );
+        m_aModifyListeners.removeInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartDataSequence::disposing( const lang::EventObject& rSource )
@@ -2230,7 +2244,7 @@ void SAL_CALL SwChartDataSequence::dispose(  )
 {
     bool bMustDispose( false );
     {
-        osl::MutexGuard  aGuard( GetChartMutex() );
+        std::unique_lock aGuard( GetChartMutex() );
         bMustDispose = !m_bDisposed;
         if (!m_bDisposed)
             m_bDisposed = true;
@@ -2277,24 +2291,25 @@ void SAL_CALL SwChartDataSequence::dispose(  )
 
     // require listeners to release references to this object
     lang::EventObject aEvtObj( static_cast< chart2::data::XDataSequence * >(this) );
-    m_aModifyListeners.disposeAndClear( aEvtObj );
-    m_aEvtListeners.disposeAndClear( aEvtObj );
+    std::unique_lock aGuard( GetChartMutex() );
+    m_aModifyListeners.disposeAndClear( aGuard, aEvtObj );
+    m_aEvtListeners.disposeAndClear( aGuard, aEvtObj );
 }
 
 void SAL_CALL SwChartDataSequence::addEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEvtListeners.addInterface( rxListener );
+        m_aEvtListeners.addInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartDataSequence::removeEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEvtListeners.removeInterface( rxListener );
+        m_aEvtListeners.removeInterface( aGuard, rxListener );
 }
 
 bool SwChartDataSequence::DeleteBox( const SwTableBox &rBox )
@@ -2308,8 +2323,8 @@ bool SwChartDataSequence::DeleteBox( const SwTableBox &rBox )
     // if the implementation cursor gets affected (i.e. the box where it is located
     // in gets removed) we need to move it before that... (otherwise it does not need to change)
 
-    const SwStartNode* pPointStartNode = m_pTableCursor->GetPoint()->nNode.GetNode().FindTableBoxStartNode();
-    const SwStartNode* pMarkStartNode  = m_pTableCursor->GetMark()->nNode.GetNode().FindTableBoxStartNode();
+    const SwStartNode* pPointStartNode = m_pTableCursor->GetPoint()->GetNode().FindTableBoxStartNode();
+    const SwStartNode* pMarkStartNode  = m_pTableCursor->GetMark()->GetNode().FindTableBoxStartNode();
 
     if (!m_pTableCursor->HasMark() || (pPointStartNode == rBox.GetSttNd()  &&  pMarkStartNode == rBox.GetSttNd()))
     {
@@ -2389,8 +2404,7 @@ bool SwChartDataSequence::DeleteBox( const SwTableBox &rBox )
                         m_pTableCursor->GetPoint() : m_pTableCursor->GetMark();
             if (pPos)
             {
-                pPos->nNode     = aNewPos.nNode;
-                pPos->nContent  = aNewPos.nContent;
+                *pPos = aNewPos;
             }
             else {
                 OSL_FAIL( "neither point nor mark available for change" );
@@ -2449,17 +2463,18 @@ void SwChartDataSequence::ExtendTo( bool bExtendCol,
 
     // get range descriptor (cell range) for current data-sequence
 
-    pStartNd = pUnoTableCursor->GetPoint()->nNode.GetNode().FindTableBoxStartNode();
+    pStartNd = pUnoTableCursor->GetPoint()->GetNode().FindTableBoxStartNode();
     pEndBox = pTable->GetTableBox( pStartNd->GetIndex() );
     const OUString aEndBox( pEndBox->GetName() );
 
-    pStartNd = pUnoTableCursor->GetMark()->nNode.GetNode().FindTableBoxStartNode();
+    pStartNd = pUnoTableCursor->GetMark()->GetNode().FindTableBoxStartNode();
     pStartBox = pTable->GetTableBox( pStartNd->GetIndex() );
     const OUString aStartBox( pStartBox->GetName() );
 
     SwRangeDescriptor aDesc;
     // note that cell range here takes the newly added rows/cols already into account
-    FillRangeDescriptor( aDesc, aStartBox + ":" + aEndBox );
+    OUString sDescrip = aStartBox + ":" + aEndBox;
+    FillRangeDescriptor( aDesc, sDescrip );
 
     bool bChanged = false;
     OUString aNewStartCell;
@@ -2507,16 +2522,14 @@ void SwChartDataSequence::ExtendTo( bool bExtendCol,
         const SwTableBox *pNewStartBox = pTable->GetTableBox( aNewStartCell );
         const SwTableBox *pNewEndBox   = pTable->GetTableBox( aNewEndCell );
         pUnoTableCursor->SetMark();
-        pUnoTableCursor->GetPoint()->nNode = *pNewEndBox->GetSttNd();
-        pUnoTableCursor->GetMark()->nNode  = *pNewStartBox->GetSttNd();
+        pUnoTableCursor->GetPoint()->Assign( *pNewEndBox->GetSttNd() );
+        pUnoTableCursor->GetMark()->Assign( *pNewStartBox->GetSttNd() );
         pUnoTableCursor->Move( fnMoveForward, GoInNode );
         pUnoTableCursor->MakeBoxSels();
     }
 }
 
-SwChartLabeledDataSequence::SwChartLabeledDataSequence() :
-    m_aEventListeners( GetChartMutex() ),
-    m_aModifyListeners( GetChartMutex() )
+SwChartLabeledDataSequence::SwChartLabeledDataSequence()
 {
     m_bDisposed = false;
 }
@@ -2639,14 +2652,17 @@ uno::Sequence< OUString > SAL_CALL SwChartLabeledDataSequence::getSupportedServi
 void SAL_CALL SwChartLabeledDataSequence::disposing(
         const lang::EventObject& rSource )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     uno::Reference< uno::XInterface > xRef( rSource.Source );
     if (xRef == m_xData)
         m_xData.clear();
     if (xRef == m_xLabels)
         m_xLabels.clear();
     if (!m_xData.is() && !m_xLabels.is())
+    {
+        aGuard.unlock();
         dispose();
+    }
 }
 
 void SAL_CALL SwChartLabeledDataSequence::modified(
@@ -2661,24 +2677,24 @@ void SAL_CALL SwChartLabeledDataSequence::modified(
 void SAL_CALL SwChartLabeledDataSequence::addModifyListener(
         const uno::Reference< util::XModifyListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aModifyListeners.addInterface( rxListener );
+        m_aModifyListeners.addInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartLabeledDataSequence::removeModifyListener(
         const uno::Reference< util::XModifyListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aModifyListeners.removeInterface( rxListener );
+        m_aModifyListeners.removeInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartLabeledDataSequence::dispose(  )
 {
     bool bMustDispose( false );
     {
-        osl::MutexGuard  aGuard( GetChartMutex() );
+        std::unique_lock aGuard( GetChartMutex() );
         bMustDispose = !m_bDisposed;
         if (!m_bDisposed)
             m_bDisposed = true;
@@ -2689,25 +2705,26 @@ void SAL_CALL SwChartLabeledDataSequence::dispose(  )
 
         // require listeners to release references to this object
         lang::EventObject aEvtObj( static_cast< chart2::data::XLabeledDataSequence * >(this) );
-        m_aModifyListeners.disposeAndClear( aEvtObj );
-        m_aEventListeners.disposeAndClear( aEvtObj );
+        std::unique_lock aGuard( GetChartMutex() );
+        m_aModifyListeners.disposeAndClear( aGuard, aEvtObj );
+        m_aEventListeners.disposeAndClear( aGuard, aEvtObj );
     }
 }
 
 void SAL_CALL SwChartLabeledDataSequence::addEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEventListeners.addInterface( rxListener );
+        m_aEventListeners.addInterface( aGuard, rxListener );
 }
 
 void SAL_CALL SwChartLabeledDataSequence::removeEventListener(
         const uno::Reference< lang::XEventListener >& rxListener )
 {
-    osl::MutexGuard  aGuard( GetChartMutex() );
+    std::unique_lock aGuard( GetChartMutex() );
     if (!m_bDisposed && rxListener.is())
-        m_aEventListeners.removeInterface( rxListener );
+        m_aEventListeners.removeInterface( aGuard, rxListener );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

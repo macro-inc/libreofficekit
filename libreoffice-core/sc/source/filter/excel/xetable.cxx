@@ -1705,7 +1705,7 @@ void XclExpColinfo::WriteBody( XclExpStream& rStrm )
 
 void XclExpColinfo::SaveXml( XclExpXmlStream& rStrm )
 {
-    const double nExcelColumnWidth = mnScWidth  / static_cast< double >( convertTwipToMm100( GetCharWidth() ) );
+    const double nExcelColumnWidth = mnScWidth / convertTwipToMm100<double>(GetCharWidth());
 
     // tdf#101363 In MS specification the output value is set with double precision after delimiter:
     // =Truncate(({width in pixels} - 5)/{Maximum Digit Width} * 100 + 0.5)/100
@@ -2461,6 +2461,7 @@ XclExpRow& XclExpRowBuffer::GetOrCreateRow( sal_uInt32 nXclRow, bool bRowAlwaysE
     }
     const bool bFound = itr != maRowMap.end();
     // bFoundHigher: nXclRow was identical to the previous entry, so not explicitly created earlier
+    // coverity[deref_iterator : FALSE] - clearly itr if only derefed if bFound which checks for valid itr
     const bool bFoundHigher = bFound && itr->first != nXclRow;
     if( bFound && !bFoundHigher )
         return *itr->second;
@@ -2625,11 +2626,11 @@ XclExpCellTable::XclExpCellTable( const XclExpRoot& rRoot ) :
 
         OUString aAddNoteText;    // additional text to be appended to a note
 
-        switch (rScCell.meType)
+        switch (rScCell.getType())
         {
             case CELLTYPE_VALUE:
             {
-                double fValue = rScCell.mfValue;
+                double fValue = rScCell.getDouble();
 
                 if (pPattern)
                 {
@@ -2667,7 +2668,7 @@ XclExpCellTable::XclExpCellTable( const XclExpRoot& rRoot ) :
             case CELLTYPE_STRING:
             {
                 xCell = new XclExpLabelCell(
-                    GetRoot(), aXclPos, pPattern, nMergeBaseXFId, rScCell.mpString->getString());
+                    GetRoot(), aXclPos, pPattern, nMergeBaseXFId, rScCell.getSharedString()->getString());
             }
             break;
 
@@ -2675,7 +2676,7 @@ XclExpCellTable::XclExpCellTable( const XclExpRoot& rRoot ) :
             {
                 XclExpHyperlinkHelper aLinkHelper( GetRoot(), aScPos );
                 xCell = new XclExpLabelCell(
-                    GetRoot(), aXclPos, pPattern, nMergeBaseXFId, rScCell.mpEditText, aLinkHelper);
+                    GetRoot(), aXclPos, pPattern, nMergeBaseXFId, rScCell.getEditText(), aLinkHelper);
 
                 // add a single created HLINK record to the record list
                 if( aLinkHelper.HasLinkRecord() )
@@ -2701,7 +2702,7 @@ XclExpCellTable::XclExpCellTable( const XclExpRoot& rRoot ) :
 
                 xCell = new XclExpFormulaCell(
                     GetRoot(), aXclPos, pPattern, nMergeBaseXFId,
-                    *rScCell.mpFormula, maArrayBfr, maShrfmlaBfr, maTableopBfr);
+                    *rScCell.getFormula(), maArrayBfr, maShrfmlaBfr, maTableopBfr);
             }
             break;
 
@@ -2751,7 +2752,7 @@ XclExpCellTable::XclExpCellTable( const XclExpRoot& rRoot ) :
             // data validation
             if( ScfTools::CheckItem( rItemSet, ATTR_VALIDDATA, false ) )
             {
-                sal_uLong nScHandle = rItemSet.Get( ATTR_VALIDDATA ).GetValue();
+                sal_uInt32 nScHandle = rItemSet.Get( ATTR_VALIDDATA ).GetValue();
                 ScRange aScRange( aScPos );
                 aScRange.aEnd.SetCol( nLastScCol );
                 mxDval->InsertCellRange( aScRange, nScHandle );

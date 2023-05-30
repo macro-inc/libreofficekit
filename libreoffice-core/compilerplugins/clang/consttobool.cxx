@@ -15,9 +15,8 @@
 
 #include "clang/Basic/Builtins.h"
 
-#include "config_clang.h"
-
 #include "check.hxx"
+#include "compat.hxx"
 #include "plugin.hxx"
 
 // Find implicit conversions from non-'bool' constants (e.g., 'sal_False') to 'bool'.
@@ -87,10 +86,6 @@ public:
         return ret;
     }
 
-#if CLANG_VERSION < 110000
-    bool TraverseUnaryLNot(UnaryOperator* expr) { return TraverseUnaryOperator(expr); }
-#endif
-
     bool PreTraverseBinaryOperator(BinaryOperator* expr)
     {
         if (expr->getOpcode() == BO_LAnd)
@@ -120,10 +115,6 @@ public:
         }
         return ret;
     }
-
-#if CLANG_VERSION < 110000
-    bool TraverseBinLAnd(BinaryOperator* expr) { return TraverseBinaryOperator(expr); }
-#endif
 
     bool VisitImplicitCastExpr(ImplicitCastExpr const* expr)
     {
@@ -155,7 +146,7 @@ public:
         {
             if (auto const e = dyn_cast<clang::StringLiteral>(sub->IgnoreParenImpCasts()))
             {
-                if (e->isAscii()) // somewhat randomly restrict to plain literals
+                if (compat::isOrdinary(e)) // somewhat randomly restrict to plain literals
                 {
                     if (compiler.getSourceManager().isMacroArgExpansion(l)
                         && Lexer::getImmediateMacroName(l, compiler.getSourceManager(),

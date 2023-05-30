@@ -21,7 +21,8 @@
 #include <formfeaturedispatcher.hxx>
 
 #include <comphelper/namedvaluecollection.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 
 namespace svx
@@ -35,12 +36,12 @@ namespace svx
     using namespace ::com::sun::star::util;
     using namespace ::com::sun::star::form::runtime;
 
-    OSingleFeatureDispatcher::OSingleFeatureDispatcher( const URL& _rFeatureURL, const sal_Int16 _nFormFeature,
+    OSingleFeatureDispatcher::OSingleFeatureDispatcher( URL _aFeatureURL, const sal_Int16 _nFormFeature,
             const Reference< XFormOperations >& _rxFormOperations, ::osl::Mutex& _rMutex )
         :m_rMutex( _rMutex )
         ,m_aStatusListeners( _rMutex )
         ,m_xFormOperations( _rxFormOperations )
-        ,m_aFeatureURL( _rFeatureURL )
+        ,m_aFeatureURL(std::move( _aFeatureURL ))
         ,m_nFormFeature( _nFormFeature )
         ,m_bLastKnownEnabled( false )
     {
@@ -96,14 +97,14 @@ namespace svx
         }
         else
         {
-            ::comphelper::OInterfaceIteratorHelper2 aIter( m_aStatusListeners );
+            ::comphelper::OInterfaceIteratorHelper3 aIter( m_aStatusListeners );
             _rFreeForNotification.clear();
 
             while ( aIter.hasMoreElements() )
             {
                 try
                 {
-                    static_cast< XStatusListener* >( aIter.next() )->statusChanged( aUnoState );
+                    aIter.next()->statusChanged( aUnoState );
                 }
                 catch( const DisposedException& )
                 {

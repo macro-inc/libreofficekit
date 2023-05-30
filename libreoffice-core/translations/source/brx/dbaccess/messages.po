@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
 "PO-Revision-Date: 2020-01-07 12:19+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Bodo <https://weblate.documentfoundation.org/projects/libo_ui-master/dbaccessmessages/brx/>\n"
@@ -1906,11 +1906,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "स्प्रेडशीट फोरमान बिलाइनि लामा"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "नोंथांनि सिस्टेम आव ODBC डाटा फुंखानि मुं"
+msgid "Name of the ODBC data source"
+msgstr ""
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -2237,24 +2237,20 @@ msgstr ""
 "जगायग्रा-थि फज'नाय फोरखौ महर दानो थाखाय 'ब्राउज'आव क्लिक खालाम।\n"
 "गाहायनि फज'नाय फोराव जदिहाय नोंथाङा थि नङाब्ला अननानै नोंथांनि सिस्टेम खुंगिरिजों सोमोन्दो खालाम।"
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "ODBC डाटाबेसआव मोनसे फोनांजाब गायसन।"
+msgid "Set up a connection to an ODBC data source"
+msgstr ""
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
-#, fuzzy
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"नोंथाङा फोनांजाब खालामनो लुबैनाय ODBC डाटाबेसनि मुंखौ सोसन।\n"
-"%PRODUCTNAME आव आगोलावनो रेजिस्टार जानाय मोनसे ODBC डाटाबेस सायखनो 'ब्राउज'आव क्लिक खालाम... .\n"
-"गाहायनि फज'नाय फोरनि बागै नोंथाङा थि नङाब्ला नोंथांनि सिस्टेम खुंगिरिजों सोमोन्दो खालाम."
 
 #. dmi7n
 #: dbaccess/inc/strings.hrc:390
@@ -2440,158 +2436,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "गुवारै"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr ""
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr ""
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr ""
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "नोंथाङा बाहायग्राखौ थारैनो हुखुमोरनो सानो नामा?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "डाटाबेसा बाहायग्रा खुंनायखौ मदत होआ."
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "पासवर्डआ गोरोबाखै। अननानै पासवर्ड सोफिन।"
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "अननानै गोसो दि माखासे डाटाबेसफोरा बे ज'जानाय रोखोमखौ मदत खालामा जानो हागौ."
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "फोरमानलाइ फोरखौल सोफादेर जायनि थाखाय थानाय आयदाफोर सोमोन्दो थानाय फोथारफोर मोननैबो फारिलाइ फोरा सिनाय जाथावना जायो।"
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "'%1' फारिलाइ निफ्राय गासै फोरमानलाइफोर दङ; नाथाय  '%2' फारिलाइ निफ्राय फोरमानलाइफोरल' जेराव सोमोन्दो थानाय फोथारनि बेसेनफोरा फोरा गोरोबलायो।"
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "'%1'  निफ्राय आरो  '%2' सिम गासै फोरमानलाइफोर दङ।"
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr ""
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr ""
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr ""
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr ""
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr ""
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr ""
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr ""
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr ""
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr ""
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr ""
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr ""
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr ""
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr ""
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "सुजु..."
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "सोरजि..."
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " - %PRODUCTNAME Base: सोमोन्दो डिजाइन"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "डाटाबेसआ सोमोन्दोफोरखौ मदत खालामा।"
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "जेब्ला नोंथाङा गासैबो सोमोन्दोफोरनि बे फारिलाइखौ हुखुमोरगोन अब्ला गासैबो गोमोरगोन? सालायबाय थानो सानो नामा?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2857,75 +2871,75 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr ""
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 #, fuzzy
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "dBASE फाइल फोरनि लामा"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr ""
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 #, fuzzy
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "ब्राउज"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "सरासनस्रा"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 #, fuzzy
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "बाहायग्रानि मुं:"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 #, fuzzy
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "गोनांथि जानाय पासवर्ड"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 #, fuzzy
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "बाहायग्रानि फोरमान खालामनाय"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 #, fuzzy
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "~JDBC सालायग्रा थाखो"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 #, fuzzy
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "आनजाद थाखो"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 #, fuzzy
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "JDBC आखुथायफोर"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 #, fuzzy
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
@@ -3076,20 +3090,20 @@ msgid "label"
 msgstr "लेबेल"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 #, fuzzy
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "dBASE फाइल फोरनि लामा"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr ""
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 #, fuzzy
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
@@ -3746,27 +3760,27 @@ msgid "Path to the dBASE files:"
 msgstr "dBASE फाइल फोरनि लामा"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr ""
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 #, fuzzy
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "ब्राउज"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 #, fuzzy
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "MySQL JDBC सालायग्रा थाखो:"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 #, fuzzy
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
@@ -5385,42 +5399,27 @@ msgid "User Settings"
 msgstr ""
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 #, fuzzy
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "बाहायग्रा:"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-#, fuzzy
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "~बाहायग्रा दाजाब देर..."
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-#, fuzzy
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "पासवर्डखौ~ सोलाय..."
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-#, fuzzy
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "~बाहायग्राखौ हुखुमोर..."
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr ""
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 #, fuzzy
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "बाहायग्रानि सायखनाय"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 #, fuzzy
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"

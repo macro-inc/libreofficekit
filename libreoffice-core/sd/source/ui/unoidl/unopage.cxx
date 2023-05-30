@@ -29,6 +29,7 @@
 #include <com/sun/star/presentation/AnimationSpeed.hpp>
 #include <com/sun/star/view/PaperOrientation.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
+#include <com/sun/star/util/XTheme.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <comphelper/profilezone.hxx>
 #include <comphelper/servicehelper.hxx>
@@ -38,7 +39,7 @@
 #include <vcl/filter/SvmWriter.hxx>
 #include <vcl/metaact.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <AnnotationEnumeration.hxx>
 #include <createunopageimpl.hxx>
@@ -64,6 +65,7 @@
 #include <DrawDocShell.hxx>
 #include <ViewShell.hxx>
 #include <DrawViewShell.hxx>
+#include <editeng/unoprnms.hxx>
 #include "unoobj.hxx"
 
 #include <strings.hxx>
@@ -73,6 +75,9 @@
 #include <vcl/dibtools.hxx>
 #include <tools/debug.hxx>
 #include <tools/stream.hxx>
+#include <docmodel/uno/UnoTheme.hxx>
+#include <docmodel/theme/Theme.hxx>
+#include <o3tl/string_view.hxx>
 
 using ::com::sun::star::animations::XAnimationNode;
 using ::com::sun::star::animations::XAnimationNodeSupplier;
@@ -98,7 +103,7 @@ enum WID_PAGE
     WID_PAGE_PAGENUMBERVISIBLE, WID_PAGE_DATETIMEVISIBLE, WID_PAGE_DATETIMEFIXED,
     WID_PAGE_DATETIMETEXT, WID_PAGE_DATETIMEFORMAT, WID_TRANSITION_TYPE, WID_TRANSITION_SUBTYPE,
     WID_TRANSITION_DIRECTION, WID_TRANSITION_FADE_COLOR, WID_TRANSITION_DURATION, WID_LOOP_SOUND,
-    WID_NAVORDER, WID_PAGE_PREVIEWMETAFILE, WID_PAGE_THEME
+    WID_NAVORDER, WID_PAGE_PREVIEWMETAFILE, WID_PAGE_THEME, WID_PAGE_THEME_UNO_REPRESENTATION
 };
 
 }
@@ -120,8 +125,8 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { u"" UNO_NAME_PAGE_EFFECT,           WID_PAGE_EFFECT,    ::cppu::UnoType<presentation::FadeEffect>::get(),     0,  0},
         { u"" UNO_NAME_PAGE_HEIGHT,           WID_PAGE_HEIGHT,    ::cppu::UnoType<sal_Int32>::get(),            0,  0},
         { u"" UNO_NAME_PAGE_LAYOUT,           WID_PAGE_LAYOUT,    ::cppu::UnoType<sal_Int16>::get(),            0,  0},
-        { u"" UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                          beans::PropertyAttribute::READONLY, 0},
-        { u"" UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},
+        { UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                          beans::PropertyAttribute::READONLY, 0},
+        { UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},
         { u"" UNO_NAME_PAGE_NUMBER,           WID_PAGE_NUMBER,    ::cppu::UnoType<sal_Int16>::get(),            beans::PropertyAttribute::READONLY, 0},
         { u"" UNO_NAME_PAGE_ORIENTATION,      WID_PAGE_ORIENT,    ::cppu::UnoType<view::PaperOrientation>::get(),0, 0},
         { u"" UNO_NAME_PAGE_SPEED,            WID_PAGE_SPEED,     ::cppu::UnoType<presentation::AnimationSpeed>::get(), 0,  0},
@@ -151,7 +156,6 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { u"" UNO_NAME_PAGE_TRANSITION_DURATION, WID_TRANSITION_DURATION, ::cppu::UnoType<double>::get(),          0,  0},
         { u"LoopSound",                    WID_LOOP_SOUND, cppu::UnoType<bool>::get(),                    0, 0},
         { u"NavigationOrder",              WID_NAVORDER, cppu::UnoType<css::container::XIndexAccess>::get(),0,  0},
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
 #define DRAW_PAGE_NOTES_PROPERTIES \
@@ -161,8 +165,8 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { u"" UNO_NAME_PAGE_TOP,              WID_PAGE_TOP,       ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                \
         { u"" UNO_NAME_PAGE_HEIGHT,           WID_PAGE_HEIGHT,    ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                \
         { u"" UNO_NAME_PAGE_LAYOUT,           WID_PAGE_LAYOUT,    ::cppu::UnoType<sal_Int16>::get(),            0,  0},                                                                \
-        { u"" UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                          beans::PropertyAttribute::READONLY, 0},                                \
-        { u"" UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},                                \
+        { UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                          beans::PropertyAttribute::READONLY, 0},                                \
+        { UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},                                \
         { u"" UNO_NAME_PAGE_NUMBER,           WID_PAGE_NUMBER,    ::cppu::UnoType<sal_Int16>::get(),            beans::PropertyAttribute::READONLY, 0},                                \
         { u"" UNO_NAME_PAGE_ORIENTATION,      WID_PAGE_ORIENT,    ::cppu::UnoType<view::PaperOrientation>::get(),0, 0},                                                                \
         { u"" UNO_NAME_PAGE_WIDTH,            WID_PAGE_WIDTH,     ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                \
@@ -177,8 +181,7 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { u"IsDateTimeFixed",              WID_PAGE_DATETIMEFIXED, cppu::UnoType<bool>::get(),                    0, 0},                                                                 \
         { u"DateTimeText",                 WID_PAGE_DATETIMETEXT, ::cppu::UnoType<OUString>::get(),              0,  0},                                                            \
         { u"DateTimeFormat",               WID_PAGE_DATETIMEFORMAT, ::cppu::UnoType<sal_Int32>::get(),           0,  0},                                                            \
-        { u"NavigationOrder",              WID_NAVORDER, cppu::UnoType<css::container::XIndexAccess>::get(),0,  0},                                                            \
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { u"NavigationOrder",              WID_NAVORDER, cppu::UnoType<css::container::XIndexAccess>::get(),0,  0}
 
     static const SfxItemPropertyMapEntry aDrawPageNotesHandoutPropertyMap_Impl[] =
     {
@@ -197,8 +200,8 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { u"" UNO_NAME_PAGE_RIGHT,            WID_PAGE_RIGHT,     ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                             \
         { u"" UNO_NAME_PAGE_TOP,              WID_PAGE_TOP,       ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                             \
         { u"" UNO_NAME_PAGE_HEIGHT,           WID_PAGE_HEIGHT,    ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                             \
-        { u"" UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                           beans::PropertyAttribute::READONLY, 0},                                             \
-        { u"" UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},                                             \
+        { UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                           beans::PropertyAttribute::READONLY, 0},                                             \
+        { UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},                                             \
         { u"" UNO_NAME_PAGE_NUMBER,           WID_PAGE_NUMBER,    ::cppu::UnoType<sal_Int16>::get(),            beans::PropertyAttribute::READONLY, 0},                                             \
         { u"" UNO_NAME_PAGE_ORIENTATION,      WID_PAGE_ORIENT,    ::cppu::UnoType<view::PaperOrientation>::get(),0, 0},                                                                             \
         { u"" UNO_NAME_PAGE_WIDTH,            WID_PAGE_WIDTH,     ::cppu::UnoType<sal_Int32>::get(),            0,  0},                                                                             \
@@ -208,8 +211,7 @@ static const SvxItemPropertySet* ImplGetDrawPagePropertySet( bool bImpress, Page
         { sUNO_Prop_UserDefinedAttributes,WID_PAGE_USERATTRIBS, cppu::UnoType<css::container::XNameContainer>::get(),         0,     0},                          \
         { sUNO_Prop_BookmarkURL,          WID_PAGE_BOOKMARK,  ::cppu::UnoType<OUString>::get(),             0,  0},                                                                             \
         { u"IsBackgroundDark",             WID_PAGE_ISDARK,    cppu::UnoType<bool>::get(),                        beans::PropertyAttribute::READONLY, 0},                                             \
-        { u"NavigationOrder",              WID_NAVORDER, cppu::UnoType<css::container::XIndexAccess>::get(),0,  0},                                                                         \
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { u"NavigationOrder",              WID_NAVORDER, cppu::UnoType<css::container::XIndexAccess>::get(),0,  0}
 
     static const SfxItemPropertyMapEntry aGraphicPagePropertyMap_Impl[] =
     {
@@ -272,16 +274,17 @@ static const SvxItemPropertySet* ImplGetMasterPagePropertySet( PageKind ePageKin
         { u"" UNO_NAME_PAGE_RIGHT,            WID_PAGE_RIGHT,     ::cppu::UnoType<sal_Int32>::get(),            0,  0},
         { u"" UNO_NAME_PAGE_TOP,              WID_PAGE_TOP,       ::cppu::UnoType<sal_Int32>::get(),            0,  0},
         { u"" UNO_NAME_PAGE_HEIGHT,           WID_PAGE_HEIGHT,    ::cppu::UnoType<sal_Int32>::get(),            0,  0},
-        { u"" UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                           beans::PropertyAttribute::READONLY, 0},
-        { u"" UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},
+        { UNO_NAME_LINKDISPLAYBITMAP,     WID_PAGE_LDBITMAP,  cppu::UnoType<awt::XBitmap>::get(),                           beans::PropertyAttribute::READONLY, 0},
+        { UNO_NAME_LINKDISPLAYNAME,       WID_PAGE_LDNAME,    ::cppu::UnoType<OUString>::get(),             beans::PropertyAttribute::READONLY, 0},
         { u"" UNO_NAME_PAGE_NUMBER,           WID_PAGE_NUMBER,    ::cppu::UnoType<sal_Int16>::get(),            beans::PropertyAttribute::READONLY, 0},
         { u"" UNO_NAME_PAGE_ORIENTATION,      WID_PAGE_ORIENT,    ::cppu::UnoType<view::PaperOrientation>::get(),0, 0},
         { u"" UNO_NAME_PAGE_WIDTH,            WID_PAGE_WIDTH,     ::cppu::UnoType<sal_Int32>::get(),            0,  0},
         { u"BackgroundFullSize",           WID_PAGE_BACKFULL,  cppu::UnoType<bool>::get(),                        0, 0},
         { sUNO_Prop_UserDefinedAttributes,WID_PAGE_USERATTRIBS, cppu::UnoType<css::container::XNameContainer>::get(),         0,     0},
         { u"IsBackgroundDark",             WID_PAGE_ISDARK,    cppu::UnoType<bool>::get(),                        beans::PropertyAttribute::READONLY, 0},
-        { u"Theme", WID_PAGE_THEME, cppu::UnoType<uno::Sequence< beans::PropertyValue >>::get(), 0,  0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { u"Theme", WID_PAGE_THEME, cppu::UnoType<util::XTheme>::get(), 0,  0},
+        // backwards compatible view of the theme for use in tests
+        { u"ThemeUnoRepresentation", WID_PAGE_THEME_UNO_REPRESENTATION, cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get(), 0,  0}
     };
 
     static const SfxItemPropertyMapEntry aHandoutMasterPagePropertyMap_Impl[] =
@@ -305,8 +308,7 @@ static const SvxItemPropertySet* ImplGetMasterPagePropertySet( PageKind ePageKin
         { u"IsDateTimeVisible",            WID_PAGE_DATETIMEVISIBLE, cppu::UnoType<bool>::get(),                  0, 0},
         { u"IsDateTimeFixed",              WID_PAGE_DATETIMEFIXED, cppu::UnoType<bool>::get(),                    0, 0},
         { u"DateTimeText",                 WID_PAGE_DATETIMETEXT, ::cppu::UnoType<OUString>::get(),              0,  0},
-        { u"DateTimeFormat",               WID_PAGE_DATETIMEFORMAT, ::cppu::UnoType<sal_Int32>::get(),           0,  0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { u"DateTimeFormat",               WID_PAGE_DATETIMEFORMAT, ::cppu::UnoType<sal_Int32>::get(),           0,  0}
     };
 
     const SvxItemPropertySet* pRet = nullptr;
@@ -391,7 +393,7 @@ void SdGenericDrawPage::UpdateModel()
 }
 
 // this is called whenever a SdrObject must be created for an empty api shape wrapper
-SdrObject * SdGenericDrawPage::CreateSdrObject_( const Reference< drawing::XShape >& xShape )
+rtl::Reference<SdrObject> SdGenericDrawPage::CreateSdrObject_( const Reference< drawing::XShape >& xShape )
 {
     if( nullptr == SvxFmDrawPage::mpPage || !xShape.is() )
         return nullptr;
@@ -400,8 +402,7 @@ SdrObject * SdGenericDrawPage::CreateSdrObject_( const Reference< drawing::XShap
     static const OUStringLiteral aPrefix( u"com.sun.star.presentation." );
     if( !aType.startsWith( aPrefix ) )
     {
-        SdrObject* pObj = SvxFmDrawPage::CreateSdrObject_( xShape );
-        return pObj;
+        return SvxFmDrawPage::CreateSdrObject_( xShape );
     }
 
     aType = aType.copy( aPrefix.getLength() );
@@ -488,7 +489,7 @@ SdrObject * SdGenericDrawPage::CreateSdrObject_( const Reference< drawing::XShap
     const awt::Size aSize( aRect.GetWidth(), aRect.GetHeight() );
     xShape->setSize( aSize );
 
-    SdrObject *pPresObj = nullptr;
+    rtl::Reference<SdrObject> pPresObj;
     if( (eObjKind == PresObjKind::Table) || (eObjKind == PresObjKind::Media) )
     {
         pPresObj = SvxFmDrawPage::CreateSdrObject_( xShape );
@@ -496,7 +497,7 @@ SdrObject * SdGenericDrawPage::CreateSdrObject_( const Reference< drawing::XShap
         {
             SdDrawDocument& rDoc(static_cast< SdDrawDocument& >(GetPage()->getSdrModelFromSdrPage()));
             pPresObj->NbcSetStyleSheet(rDoc.GetDefaultStyleSheet(), true);
-            GetPage()->InsertPresObj( pPresObj, eObjKind );
+            GetPage()->InsertPresObj( pPresObj.get(), eObjKind );
         }
     }
     else
@@ -556,7 +557,7 @@ Any SAL_CALL SdGenericDrawPage::queryInterface( const uno::Type & rType )
         const PageKind ePageKind = GetPage() ? GetPage()->GetPageKind() : PageKind::Standard;
 
         if( ePageKind == PageKind::Standard )
-            return makeAny( Reference< XAnimationNodeSupplier >( this ) );
+            return Any( Reference< XAnimationNodeSupplier >( this ) );
     }
     else
         return SvxDrawPage::queryInterface( rType );
@@ -976,8 +977,20 @@ void SAL_CALL SdGenericDrawPage::setPropertyValue( const OUString& aPropertyName
         case WID_PAGE_THEME:
         {
             SdrPage* pPage = GetPage();
-            std::unique_ptr<svx::Theme> pTheme = svx::Theme::FromAny(aValue);
-            pPage->getSdrPageProperties().SetTheme(std::move(pTheme));
+            uno::Reference<util::XTheme> xTheme;
+            if (aValue >>= xTheme)
+            {
+                auto& rUnoTheme = dynamic_cast<UnoTheme&>(*xTheme);
+                pPage->getSdrPageProperties().SetTheme(rUnoTheme.getTheme());
+            }
+            break;
+        }
+
+        case WID_PAGE_THEME_UNO_REPRESENTATION:
+        {
+            SdrPage* pPage = GetPage();
+            std::shared_ptr<model::Theme> pTheme = model::Theme::FromAny(aValue);
+            pPage->getSdrPageProperties().SetTheme(pTheme);
             break;
         }
 
@@ -1298,11 +1311,20 @@ Any SAL_CALL SdGenericDrawPage::getPropertyValue( const OUString& PropertyName )
     case WID_PAGE_THEME:
     {
         SdrPage* pPage = GetPage();
-        svx::Theme* pTheme = pPage->getSdrPageProperties().GetTheme();
+        css::uno::Reference<css::util::XTheme> xTheme;
+        auto pTheme = pPage->getSdrPageProperties().GetTheme();
         if (pTheme)
-        {
+            xTheme = model::theme::createXTheme(pTheme);
+        aAny <<= xTheme;
+        break;
+    }
+
+    case WID_PAGE_THEME_UNO_REPRESENTATION:
+    {
+        SdrPage* pPage = GetPage();
+        auto pTheme = pPage->getSdrPageProperties().GetTheme();
+        if (pTheme)
             pTheme->ToAny(aAny);
-        }
         else
         {
             beans::PropertyValues aValues;
@@ -1394,10 +1416,10 @@ Reference< drawing::XShape >  SdGenericDrawPage::CreateShape(SdrObject *pObj) co
 
         if(pObj->GetObjInventor() == SdrInventor::Default)
         {
-            sal_uInt32 nInventor = pObj->GetObjIdentifier();
+            SdrObjKind nInventor = pObj->GetObjIdentifier();
             switch( nInventor )
             {
-            case OBJ_TITLETEXT:
+            case SdrObjKind::TitleText:
                 pShape = new SvxShapeText( pObj );
                 if( GetPage()->GetPageKind() == PageKind::Notes && GetPage()->IsMasterPage() )
                 {
@@ -1410,11 +1432,12 @@ Reference< drawing::XShape >  SdGenericDrawPage::CreateShape(SdrObject *pObj) co
                 }
                 eKind = PresObjKind::NONE;
                 break;
-            case OBJ_OUTLINETEXT:
+            case SdrObjKind::OutlineText:
                 pShape = new SvxShapeText( pObj );
                 pShape->SetShapeType("com.sun.star.presentation.OutlinerShape");
                 eKind = PresObjKind::NONE;
                 break;
+            default: ;
             }
         }
 
@@ -1551,17 +1574,17 @@ OUString SdGenericDrawPage::getBookmarkURL() const
     return aRet.makeStringAndClear();
 }
 
-void SdGenericDrawPage::setBookmarkURL( OUString const & rURL )
+void SdGenericDrawPage::setBookmarkURL( std::u16string_view rURL )
 {
     if( !SvxFmDrawPage::mpPage )
         return;
 
-    sal_Int32 nIndex = rURL.indexOf( '#' );
-    if( nIndex == -1 )
+    size_t nIndex = rURL.find( '#' );
+    if( nIndex == std::u16string_view::npos )
         return;
 
-    const OUString aFileName( rURL.copy( 0, nIndex ) );
-    const OUString aBookmarkName( SdDrawPage::getUiNameFromPageApiName( rURL.copy( nIndex+1 )  ) );
+    const OUString aFileName( rURL.substr( 0, nIndex ) );
+    const OUString aBookmarkName( SdDrawPage::getUiNameFromPageApiName( OUString(rURL.substr( nIndex+1 ))  ) );
 
     if( !aFileName.isEmpty() && !aBookmarkName.isEmpty() )
     {
@@ -1936,7 +1959,7 @@ Any SAL_CALL SdPageLinkTargets::getByName( const OUString& aName )
         if( pObj )
         {
             Reference< beans::XPropertySet > aRef( pObj->getUnoShape(), uno::UNO_QUERY );
-            return makeAny( aRef );
+            return Any( aRef );
         }
     }
 
@@ -2046,7 +2069,7 @@ Any SAL_CALL SdDrawPage::queryInterface( const uno::Type & rType )
 {
     if( rType == cppu::UnoType<drawing::XMasterPageTarget>::get() )
     {
-        return makeAny( Reference< drawing::XMasterPageTarget >( this ) );
+        return Any( Reference< drawing::XMasterPageTarget >( this ) );
     }
     else if( IsImpressDocument()
              && rType == cppu::UnoType<presentation::XPresentationPage>::get() )
@@ -2054,7 +2077,7 @@ Any SAL_CALL SdDrawPage::queryInterface( const uno::Type & rType )
         SdPage * p = dynamic_cast<SdPage *>(SvxDrawPage::mpPage);
         if( p == nullptr || p->GetPageKind() != PageKind::Handout )
         {
-            return makeAny( Reference< presentation::XPresentationPage >( this ) );
+            return Any( Reference< presentation::XPresentationPage >( this ) );
         }
     }
 
@@ -2170,16 +2193,15 @@ OUString getUiNameFromPageApiNameImpl( const OUString& rApiName )
     const OUString aDefPageName( sEmptyPageName );
     if( rApiName.startsWith( aDefPageName ) )
     {
-        OUString aNumber( rApiName.copy( aDefPageName.getLength() ) );
+        std::u16string_view aNumber( rApiName.subView( aDefPageName.getLength() ) );
 
         // create the page number
-        sal_Int32 nPageNumber = aNumber.toInt32();
+        sal_Int32 nPageNumber = o3tl::toInt32(aNumber);
 
         // check if there are non number characters in the number part
-        const sal_Int32 nChars = aNumber.getLength();
-        const sal_Unicode* pString = aNumber.getStr();
-        sal_Int32 nChar;
-        for( nChar = 0; nChar < nChars; nChar++, pString++ )
+        const size_t nChars = aNumber.size();
+        const sal_Unicode* pString = aNumber.data();
+        for( size_t nChar = 0; nChar < nChars; nChar++, pString++ )
         {
             if((*pString < '0') || (*pString > '9'))
             {

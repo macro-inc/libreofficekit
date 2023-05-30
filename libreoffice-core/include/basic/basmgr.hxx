@@ -19,7 +19,8 @@
 #ifndef INCLUDED_BASIC_BASMGR_HXX
 #define INCLUDED_BASIC_BASMGR_HXX
 
-#include <vcl/errcode.hxx>
+#include <utility>
+#include <comphelper/errcode.hxx>
 #include <svl/SfxBroadcaster.hxx>
 #include <basic/sbstar.hxx>
 #include <basic/basicdllapi.h>
@@ -27,6 +28,7 @@
 #include <string_view>
 #include <vector>
 
+namespace basic { class SfxScriptLibraryContainer; }
 namespace com::sun::star::script { class XLibraryContainer; }
 namespace com::sun::star::script { class XPersistentLibraryContainer; }
 namespace com::sun::star::script { class XStarBasicAccess; }
@@ -67,21 +69,11 @@ class BasicLibInfo;
 
 namespace basic { class ImplRepository; }
 
-// Library password handling for 5.0 documents
-class BASIC_DLLPUBLIC OldBasicPassword
-{
-public:
-    virtual void     setLibraryPassword( const OUString& rLibraryName, const OUString& rPassword ) = 0;
-
-protected:
-    ~OldBasicPassword() {}
-};
-
 struct LibraryContainerInfo
 {
     css::uno::Reference< css::script::XPersistentLibraryContainer > mxScriptCont;
     css::uno::Reference< css::script::XPersistentLibraryContainer > mxDialogCont;
-    OldBasicPassword* mpOldBasicPassword;
+    basic::SfxScriptLibraryContainer* mpOldBasicPassword;
 
     LibraryContainerInfo()
         :mpOldBasicPassword( nullptr )
@@ -90,12 +82,12 @@ struct LibraryContainerInfo
 
     LibraryContainerInfo
     (
-        css::uno::Reference< css::script::XPersistentLibraryContainer > const & xScriptCont,
-        css::uno::Reference< css::script::XPersistentLibraryContainer > const & xDialogCont,
-        OldBasicPassword* pOldBasicPassword
+        css::uno::Reference< css::script::XPersistentLibraryContainer > xScriptCont,
+        css::uno::Reference< css::script::XPersistentLibraryContainer > xDialogCont,
+        basic::SfxScriptLibraryContainer* pOldBasicPassword
     )
-        : mxScriptCont( xScriptCont )
-        , mxDialogCont( xDialogCont )
+        : mxScriptCont(std::move( xScriptCont ))
+        , mxDialogCont(std::move( xDialogCont ))
         , mpOldBasicPassword( pOldBasicPassword )
     {}
 };
@@ -124,7 +116,7 @@ private:
     void            ImpCreateStdLib( StarBASIC* pParentFromStdLib );
     void            ImpMgrNotLoaded(  const OUString& rStorageName  );
     BasicLibInfo*   CreateLibInfo();
-    void            LoadBasicManager( SotStorage& rStorage, const OUString& rBaseURL );
+    void            LoadBasicManager( SotStorage& rStorage, std::u16string_view rBaseURL );
     void            LoadOldBasicManager( SotStorage& rStorage );
     bool            ImplLoadBasic( SvStream& rStrm, StarBASICRef& rOldBasic ) const;
     static bool     ImplEncryptStream( SvStream& rStream );
@@ -132,7 +124,7 @@ private:
     static void     CheckModules( StarBASIC* pBasic, bool bReference );
 
 public:
-                    BasicManager( SotStorage& rStorage, const OUString& rBaseURL, StarBASIC* pParentFromStdLib = nullptr, OUString const * pLibPath = nullptr, bool bDocMgr = false );
+                    BasicManager( SotStorage& rStorage, std::u16string_view rBaseURL, StarBASIC* pParentFromStdLib = nullptr, OUString const * pLibPath = nullptr, bool bDocMgr = false );
                     BasicManager( StarBASIC* pStdLib, OUString const * pLibPath = nullptr, bool bDocMgr = false );
 
     virtual ~BasicManager() override;
@@ -143,9 +135,9 @@ public:
     const OUString& GetName() const                         { return aName; }
 
 
-    sal_uInt16      GetLibCount() const;
-    StarBASIC*      GetLib( sal_uInt16 nLib ) const;
-    StarBASIC*      GetLib( std::u16string_view rName ) const;
+    sal_uInt16 GetLibCount() const;
+    StarBASIC* GetLib( sal_uInt16 nLib ) const;
+    StarBASIC* GetLib( std::u16string_view rName ) const;
     sal_uInt16      GetLibId( std::u16string_view rName ) const;
 
     OUString        GetLibName( sal_uInt16 nLib );
@@ -173,13 +165,12 @@ public:
     /** sets a global constant in the basic library, referring to some UNO object, to a new value.
 
         If a constant with this name already existed before, its value is changed, and the old constant is
-        returned. If it does not yet exist, it is newly created, and inserted into the basic library.
+        returned in pOldValue. If it does not yet exist, it is newly created, and inserted into the basic library.
     */
-    css::uno::Any
-                    SetGlobalUNOConstant( const OUString& rName, const css::uno::Any& _rValue );
+    void            SetGlobalUNOConstant( const OUString& rName, const css::uno::Any& _rValue, css::uno::Any* pOldValue = nullptr );
 
     /** retrieves a global constant in the basic library, referring to some UNO object, returns true if a value is found ( value is in aOut ) false otherwise. */
-                    bool GetGlobalUNOConstant( const OUString& rName, css::uno::Any& aOut );
+    bool            GetGlobalUNOConstant( const OUString& rName, css::uno::Any& aOut );
     /** determines whether there are password-protected modules whose size exceeds the
         legacy module size
         @param _out_rModuleNames

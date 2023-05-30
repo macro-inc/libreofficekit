@@ -29,6 +29,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
 #include <sal/log.hxx>
+#include <utility>
 
 using namespace oox::core;
 using namespace ::com::sun::star;
@@ -39,9 +40,9 @@ using namespace ::com::sun::star::xml::sax;
 
 namespace oox::drawingml {
 
-ShapeGroupContext::ShapeGroupContext( FragmentHandler2 const & rParent, ShapePtr const & pMasterShapePtr, ShapePtr const & pGroupShapePtr )
+ShapeGroupContext::ShapeGroupContext( FragmentHandler2 const & rParent, ShapePtr const & pMasterShapePtr, ShapePtr pGroupShapePtr )
 : FragmentHandler2( rParent )
-, mpGroupShapePtr( pGroupShapePtr )
+, mpGroupShapePtr(std::move( pGroupShapePtr ))
 {
     if( pMasterShapePtr )
         mpGroupShapePtr->setWps(pMasterShapePtr->getWps());
@@ -60,14 +61,14 @@ ContextHandlerRef ShapeGroupContext::onCreateContext( sal_Int32 aElementToken, c
     case XML_cNvPr:
     {
         mpGroupShapePtr->setHidden( rAttribs.getBool( XML_hidden, false ) );
-        mpGroupShapePtr->setId( rAttribs.getString( XML_id ).get() );
-        mpGroupShapePtr->setName( rAttribs.getString( XML_name ).get() );
+        mpGroupShapePtr->setId( rAttribs.getStringDefaulted( XML_id ) );
+        mpGroupShapePtr->setName( rAttribs.getStringDefaulted( XML_name ) );
         break;
     }
     case XML_ph:
         mpGroupShapePtr->setSubType( rAttribs.getToken( XML_type, FastToken::DONTKNOW ) );
         if( rAttribs.hasAttribute( XML_idx ) )
-            mpGroupShapePtr->setSubTypeIndex( rAttribs.getString( XML_idx ).get().toInt32() );
+            mpGroupShapePtr->setSubTypeIndex( rAttribs.getInteger( XML_idx, 0 ) );
         break;
     // nvSpPr CT_ShapeNonVisual end
 
@@ -85,7 +86,8 @@ ContextHandlerRef ShapeGroupContext::onCreateContext( sal_Int32 aElementToken, c
         {
             ShapePtr pShape = std::make_shared<Shape>("com.sun.star.drawing.ConnectorShape");
             pShape->setLockedCanvas(mpGroupShapePtr->getLockedCanvas());
-            return new ConnectorShapeContext( *this, mpGroupShapePtr, pShape );
+            return new ConnectorShapeContext(*this, mpGroupShapePtr, pShape,
+                                             pShape->getConnectorShapeProperties());
         }
     case XML_grpSp:         // group shape
         return new ShapeGroupContext( *this, mpGroupShapePtr, std::make_shared<Shape>( "com.sun.star.drawing.GroupShape" ) );

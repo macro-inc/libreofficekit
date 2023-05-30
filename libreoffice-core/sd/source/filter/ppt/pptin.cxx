@@ -40,6 +40,7 @@
 #include <svx/xlineit0.hxx>
 
 #include <sfx2/docinf.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <strings.hrc>
 #include <strings.hxx>
@@ -180,7 +181,7 @@ ImplSdPPTImport::ImplSdPPTImport( SdDrawDocument* pDocument, SotStorage& rStorag
 
     if ( mbDocumentFound )
     {
-        sal_uLong nOldPos = rStCtrl.Tell();
+        sal_uInt64 nOldPos = rStCtrl.Tell();
 
         mxPicturesStream = rStorage_.OpenSotStream( "Pictures", StreamMode::STD_READ );
         pStData = mxPicturesStream.get();
@@ -425,7 +426,7 @@ bool ImplSdPPTImport::Import()
                                             do
                                             {
                                                 aStringAry[nTokenCount] =
-                                                    OUStringToOString(aString.getToken( 0, ',', nPos ), RTL_TEXTENCODING_UTF8);
+                                                    OUStringToOString(o3tl::getToken(aString, 0, ',', nPos ), RTL_TEXTENCODING_UTF8);
                                             }
                                             while ( ++nTokenCount < SAL_N_ELEMENTS(aStringAry) && nPos >= 0 );
 
@@ -657,7 +658,7 @@ bool ImplSdPPTImport::Import()
                             aLayoutName = static_cast<SdPage*>( mpDoc->GetMasterPage( nMasterNum - 1 ) )->GetName();
                     }
                     pPage->SetName( aLayoutName );
-                    aLayoutName += SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+                    aLayoutName += SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
                     pPage->SetLayoutName( aLayoutName );
 
                     // set stylesheets
@@ -781,9 +782,9 @@ bool ImplSdPPTImport::Import()
                         break;
                     }
                 }
-                SdrObject* pObj = ImportPageBackgroundObject( *pMPage, pE->nBackgroundOffset );   // import background
+                rtl::Reference<SdrObject> pObj = ImportPageBackgroundObject( *pMPage, pE->nBackgroundOffset );   // import background
                 if ( pObj )
-                    pMPage->NbcInsertObject( pObj );
+                    pMPage->NbcInsertObject( pObj.get() );
 
                 bool bNewAnimationsUsed = false;
                 ProcessData aProcessData( (*pList)[ m_nCurrentPageNum ], SdPageCapsule(pMPage) );
@@ -826,11 +827,11 @@ bool ImplSdPPTImport::Import()
                                                         ::tools::Rectangle aEmpty;
                                                         if (!aHd2.SeekToBegOfRecord(rStCtrl))
                                                             break;
-                                                        SdrObject* pImpObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, /*nCalledByGroup*/0, /*pShapeId*/ nullptr );
+                                                        rtl::Reference<SdrObject> pImpObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, /*nCalledByGroup*/0, /*pShapeId*/ nullptr );
                                                         if ( pImpObj )
                                                         {
                                                             pImpObj->SetLayer( mnBackgroundObjectsLayerID );
-                                                            pMPage->NbcInsertObject( pImpObj );
+                                                            pMPage->NbcInsertObject( pImpObj.get() );
                                                         }
                                                     }
                                                 }
@@ -883,7 +884,7 @@ bool ImplSdPPTImport::Import()
 
                 // background object
                 pObj = pMPage->GetObj( 0 );
-                if ( pObj && pObj->GetObjIdentifier() == OBJ_RECT )
+                if ( pObj && pObj->GetObjIdentifier() == SdrObjKind::Rectangle )
                 {
                     if ( pMPage->GetPageKind() == PageKind::Standard )
                     {
@@ -909,7 +910,7 @@ bool ImplSdPPTImport::Import()
                         }
 
                         pMPage->RemoveObject(pObj->GetOrdNum());
-                        SdrObject::Free(pObj);
+                        pObj.clear();
                     }
                 }
             }
@@ -1462,9 +1463,9 @@ void ImplSdPPTImport::SetHeaderFooterPageSettings( SdPage* pPage, const PptSlide
                 bVisible = false;
                 rStCtrl.Seek( nPosition );
                 ProcessData aProcessData( rSlidePersist, SdPageCapsule(pPage) );
-                SdrObject* pObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, /*nCalledByGroup*/0, /*pShapeId*/nullptr );
+                rtl::Reference<SdrObject> pObj = ImportObj( rStCtrl, aProcessData, aEmpty, aEmpty, /*nCalledByGroup*/0, /*pShapeId*/nullptr );
                 if ( pObj )
-                    pPage->NbcInsertObject( pObj, 0 );
+                    pPage->NbcInsertObject( pObj.get(), 0 );
             }
         }
         OUString aPlaceHolderString = pHFE->pPlaceholder[ i ];
@@ -1529,7 +1530,7 @@ bool Ppt97AnimationStlSortHelper::operator()( const std::pair< SdrObject*, Ppt97
 
 void ImplSdPPTImport::ImportPageEffect( SdPage* pPage, const bool bNewAnimationsUsed )
 {
-    sal_uLong nOldFilePos = rStCtrl.Tell();
+    sal_uInt64 nOldFilePos = rStCtrl.Tell();
 
     // set PageKind at page (up to now only PageKind::Standard or PageKind::Notes)
     if ( pPage->GetPageKind() == PageKind::Standard )
@@ -1969,7 +1970,7 @@ OUString ImplSdPPTImport::ReadSound(sal_uInt32 nSoundRef) const
                                 aGalleryDir = SvtPathOptions().GetGalleryPath();
                             // Use last token delimited by ';'. copy(lastIndexOf+1) works whether
                             // string is empty or not and whether ';' is there or not.
-                            INetURLObject aGalleryUserSound( aGalleryDir.copy(aGalleryDir.lastIndexOf(';')+1) );
+                            INetURLObject aGalleryUserSound( aGalleryDir.subView(aGalleryDir.lastIndexOf(';')+1) );
 
                             aGalleryUserSound.Append( aRetval );
                             const auto nRemainingSize = rStCtrl.remainingSize();
@@ -2589,28 +2590,23 @@ SdrObject* ImplSdPPTImport::ApplyTextObj( PPTTextObj* pTextObj, SdrTextObj* pObj
             }
         }
     }
-    if ( pRet != pText )
-    {
-        SdrObject* pFree( pText );
-        SdrObject::Free( pFree );
-    }
     return pRet;
 }
 
-SdrObject* ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSDffClientData& rClientData, ::tools::Rectangle& rTextRect, SdrObject* pRet )
+rtl::Reference<SdrObject> ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSDffClientData& rClientData, ::tools::Rectangle& rTextRect, SdrObject* pRet )
 {
-    SdrObject* pObj = SdrPowerPointImport::ProcessObj( rSt, rData, rClientData, rTextRect, pRet );
+    rtl::Reference<SdrObject> pObj = SdrPowerPointImport::ProcessObj( rSt, rData, rClientData, rTextRect, pRet );
 
     // read animation effect of object
     if ( pObj )
     {
         // further setup placeholder objects
-        if (dynamic_cast<const SdrPageObj*>(pObj))
+        if (dynamic_cast<const SdrPageObj*>(pObj.get()))
         {
             const ProcessData& rProcessData=static_cast<const ProcessData&>(rClientData);
             if(rProcessData.pPage.page)
                 static_cast<SdPage *>(rProcessData.pPage.page)->InsertPresObj(
-                    pObj, PresObjKind::Page );
+                    pObj.get(), PresObjKind::Page );
         }
 
         DffRecordHeader aMasterShapeHd;
@@ -2649,10 +2645,10 @@ SdrObject* ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSD
 
                                     bool bDontAnimateInvisibleShape = false;
                                     {
-                                        SdrTextObj* pTextObj = dynamic_cast<SdrTextObj*>(pObj);
+                                        SdrTextObj* pTextObj = DynCastSdrTextObj(pObj.get());
 
                                         if( pTextObj && pTextObj->HasText() &&
-                                            dynamic_cast< SdrObjGroup *>( pObj ) ==  nullptr &&
+                                            dynamic_cast< SdrObjGroup *>( pObj.get() ) ==  nullptr &&
                                             pAnimation->HasAnimateAssociatedShape() )
                                         {
                                             const SfxItemSet& rObjItemSet = pObj->GetMergedItemSet();
@@ -2670,7 +2666,7 @@ SdrObject* ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSD
                                     //maybe some actions necessary to ensure that animations on master pages are played before animations on normal pages
                                     //maybe todo in future: bool bIsEffectOnMasterPage = !bInhabitanceChecked;?
 
-                                    maAnimations[pObj] = pAnimation;
+                                    maAnimations[pObj.get()] = pAnimation;
 
                                     bAnimationInfoFound = true;
                                 }
@@ -2709,7 +2705,7 @@ SdrObject* ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSD
                                             aMediaURL = ReadSound( nRef );
                                         if ( !aMediaURL.isEmpty() )
                                         {
-                                            SdrMediaObj* pMediaObj = new SdrMediaObj(
+                                            rtl::Reference<SdrMediaObj> pMediaObj = new SdrMediaObj(
                                                 pObj->getSdrModelFromSdrObject(),
                                                 pObj->GetSnapRect());
                                             pMediaObj->SetMergedItemSet( pObj->GetMergedItemSet() );
@@ -2717,16 +2713,15 @@ SdrObject* ImplSdPPTImport::ProcessObj( SvStream& rSt, DffObjData& rData, SvxMSD
                                             //--remove object from maAnimations list and add the new object instead
                                             Ppt97AnimationPtr pAnimation;
                                             {
-                                                tAnimationMap::iterator aFound = maAnimations.find( pObj );
+                                                tAnimationMap::iterator aFound = maAnimations.find( pObj.get() );
                                                 if( aFound != maAnimations.end() )
                                                 {
                                                     pAnimation = (*aFound).second;
                                                     maAnimations.erase(aFound);
                                                 }
-                                                maAnimations[pMediaObj] = pAnimation;
+                                                maAnimations[pMediaObj.get()] = pAnimation;
                                             }
 
-                                            SdrObject::Free( pObj );
                                             pObj = pMediaObj;  // SJ: hoping that pObj is not inserted in any list
                                             pMediaObj->setURL( aMediaURL, ""/*TODO?*/ );
                                         }
@@ -2771,7 +2766,7 @@ ImplSdPPTImport::ReadFormControl( tools::SvRef<SotStorage>& rSrc1, css::uno::Ref
 }
 
 // exported function
-extern "C" SAL_DLLPUBLIC_EXPORT sal_Bool ImportPPT(
+SAL_DLLPUBLIC_EXPORT bool ImportPPT(
         SdDrawDocument* pDocument, SvStream& rDocStream, SotStorage& rStorage, SfxMedium& rMedium )
 {
     std::unique_ptr<SdPPTImport> pImport( new SdPPTImport( pDocument, rDocStream, rStorage, rMedium ));

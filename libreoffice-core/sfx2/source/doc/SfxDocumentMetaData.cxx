@@ -63,11 +63,11 @@
 
 #include <rtl/ustrbuf.hxx>
 #include <tools/datetime.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/mutex.hxx>
 #include <comphelper/fileformat.h>
 #include <cppuhelper/basemutex.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <comphelper/sequence.hxx>
@@ -118,7 +118,7 @@
 namespace {
 
 /// a list of attribute-lists, where attribute means name and content
-typedef std::vector<std::vector<std::pair<const char*, OUString> > >
+typedef std::vector<std::vector<std::pair<OUString, OUString> > >
         AttrVector;
 
 typedef ::cppu::WeakComponentImplHelper<
@@ -239,7 +239,7 @@ protected:
     const css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
     /// for notification
-    ::comphelper::OInterfaceContainerHelper2 m_NotifyListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::util::XModifyListener> m_NotifyListeners;
     /// flag: false means not initialized yet, or disposed
     bool m_isInitialized;
     /// flag
@@ -270,8 +270,8 @@ protected:
     /// initialize state from given DOM tree
     void init(const css::uno::Reference<css::xml::dom::XDocument>& i_xDom);
     /// update element in DOM tree
-    void updateElement(const char *i_name,
-        std::vector<std::pair<const char *, OUString> >* i_pAttrs = nullptr);
+    void updateElement(const OUString & i_name,
+        std::vector<std::pair<OUString, OUString> >* i_pAttrs = nullptr);
     /// update user-defined meta data and attributes in DOM tree
     void updateUserDefinedAndAttributes();
     /// create empty DOM tree (XDocument)
@@ -282,19 +282,19 @@ protected:
     /// get text of standard meta data element
     OUString getMetaText(const char* i_name) const;
     /// set text of standard meta data element iff not equal to existing text
-    bool setMetaText(const char* i_name,
+    bool setMetaText(const OUString& i_name,
         const OUString & i_rValue);
     /// set text of standard meta data element iff not equal to existing text
-    void setMetaTextAndNotify(const char* i_name,
+    void setMetaTextAndNotify(const OUString& i_name,
         const OUString & i_rValue);
     /// get text of standard meta data element's attribute
-    OUString getMetaAttr(const char* i_name,
-        const char* i_attr) const;
+    OUString getMetaAttr(const OUString& i_name,
+        const OUString& i_attr) const;
     /// get text of a list of standard meta data elements (multiple occ.)
     css::uno::Sequence< OUString > getMetaList(
         const char* i_name) const;
     /// set text of a list of standard meta data elements (multiple occ.)
-    bool setMetaList(const char* i_name,
+    bool setMetaList(const OUString& i_name,
         const css::uno::Sequence< OUString > & i_rValue,
         AttrVector const*);
     void createUserDefined();
@@ -338,24 +338,39 @@ public:
     }
 };
 
+constexpr OUStringLiteral sMetaPageCount = u"meta:page-count";
+constexpr OUStringLiteral sMetaTableCount = u"meta:table-count";
+constexpr OUStringLiteral sMetaDrawCount = u"meta:draw-count";
+constexpr OUStringLiteral sMetaImageCount = u"meta:image-count";
+constexpr OUStringLiteral sMetaObjectCount = u"meta:object-count";
+constexpr OUStringLiteral sMetaOleObjectCount = u"meta:ole-object-count";
+constexpr OUStringLiteral sMetaParagraphCount = u"meta:paragraph-count";
+constexpr OUStringLiteral sMetaWordCount = u"meta:word-count";
+constexpr OUStringLiteral sMetaCharacterCount = u"meta:character-count";
+constexpr OUStringLiteral sMetaRowCount = u"meta:row-count";
+constexpr OUStringLiteral sMetaFrameCount = u"meta:frame-count";
+constexpr OUStringLiteral sMetaSentenceCount = u"meta:sentence-count";
+constexpr OUStringLiteral sMetaSyllableCount = u"meta:syllable-count";
+constexpr OUStringLiteral sMetaNonWhitespaceCharacterCount = u"meta:non-whitespace-character-count";
+constexpr OUStringLiteral sMetaCellCount = u"meta:cell-count";
+
 // NB: keep these two arrays in sync!
-const char* s_stdStatAttrs[] = {
-    "meta:page-count",
-    "meta:table-count",
-    "meta:draw-count",
-    "meta:image-count",
-    "meta:object-count",
-    "meta:ole-object-count",
-    "meta:paragraph-count",
-    "meta:word-count",
-    "meta:character-count",
-    "meta:row-count",
-    "meta:frame-count",
-    "meta:sentence-count",
-    "meta:syllable-count",
-    "meta:non-whitespace-character-count",
-    "meta:cell-count",
-    nullptr
+constexpr rtl::OUStringConstExpr s_stdStatAttrs[] = {
+    sMetaPageCount,
+    sMetaTableCount,
+    sMetaDrawCount,
+    sMetaImageCount,
+    sMetaObjectCount,
+    sMetaOleObjectCount,
+    sMetaParagraphCount,
+    sMetaWordCount,
+    sMetaCharacterCount,
+    sMetaRowCount,
+    sMetaFrameCount,
+    sMetaSentenceCount,
+    sMetaSyllableCount,
+    sMetaNonWhitespaceCharacterCount,
+    sMetaCellCount
 };
 
 // NB: keep these two arrays in sync!
@@ -399,10 +414,11 @@ const char* s_stdMeta[] = {
     nullptr
 };
 
-const char* s_stdMetaList[] = {
-    "meta:keyword",             // string*
-    "meta:user-defined",        // ...*
-    nullptr
+constexpr OUStringLiteral sMetaKeyword = u"meta:keyword";
+constexpr OUStringLiteral sMetaUserDefined = u"meta:user-defined";
+constexpr rtl::OUStringConstExpr s_stdMetaList[] {
+    sMetaKeyword,             // string*
+    sMetaUserDefined,        // ...*
 };
 
 constexpr OUStringLiteral s_nsXLink = u"http://www.w3.org/1999/xlink";
@@ -424,8 +440,7 @@ bool isValidDateTime(const css::util::DateTime & i_rDateTime)
 }
 
 std::pair< OUString, OUString >
-getQualifier(const char* i_name) {
-    OUString nm = OUString::createFromAscii(i_name);
+getQualifier(const OUString& nm) {
     sal_Int32 ix = nm.indexOf(u':');
     if (ix == -1) {
         return std::make_pair(OUString(), nm);
@@ -436,9 +451,8 @@ getQualifier(const char* i_name) {
 
 // get namespace for standard qualified names
 // NB: only call this with statically known strings!
-OUString getNameSpace(const char* i_qname) noexcept
+OUString getNameSpace(const OUString& i_qname) noexcept
 {
-    assert(i_qname);
     OUString ns;
     OUString n = getQualifier(i_qname).first;
     if ( n == "xlink" ) ns = s_nsXLink;
@@ -589,7 +603,7 @@ SfxDocumentMetaData::getURLProperties(
         }
         xPropArg->addProperty("StreamName",
                 css::beans::PropertyAttribute::MAYBEVOID,
-                css::uno::makeAny(OUString(s_meta)));
+                css::uno::Any(OUString(s_meta)));
     } catch (const css::uno::Exception &) {
         // ignore
     }
@@ -632,13 +646,12 @@ SfxDocumentMetaData::getMetaText(const char* i_name) const
 }
 
 bool
-SfxDocumentMetaData::setMetaText(const char* i_name,
+SfxDocumentMetaData::setMetaText(const OUString& name,
         const OUString & i_rValue)
     // throw (css::uno::RuntimeException)
 {
     checkInit();
 
-    const OUString name( OUString::createFromAscii(i_name) );
     assert(m_meta.find(name) != m_meta.end());
     css::uno::Reference<css::xml::dom::XNode> xNode = m_meta.find(name)->second;
 
@@ -668,7 +681,7 @@ SfxDocumentMetaData::setMetaText(const char* i_name,
                     }
                 }
             } else { // insert
-                xNode.set(m_xDoc->createElementNS(getNameSpace(i_name), name),
+                xNode.set(m_xDoc->createElementNS(getNameSpace(name), name),
                             css::uno::UNO_QUERY_THROW);
                 m_xParent->appendChild(xNode);
                 m_meta[name] = xNode;
@@ -687,7 +700,7 @@ SfxDocumentMetaData::setMetaText(const char* i_name,
 }
 
 void
-SfxDocumentMetaData::setMetaTextAndNotify(const char* i_name,
+SfxDocumentMetaData::setMetaTextAndNotify(const OUString & i_name,
         const OUString & i_rValue)
     // throw (css::uno::RuntimeException)
 {
@@ -699,10 +712,9 @@ SfxDocumentMetaData::setMetaTextAndNotify(const char* i_name,
 }
 
 OUString
-SfxDocumentMetaData::getMetaAttr(const char* i_name, const char* i_attr) const
+SfxDocumentMetaData::getMetaAttr(const OUString& name, const OUString& i_attr) const
 //        throw (css::uno::RuntimeException)
 {
-    OUString name = OUString::createFromAscii(i_name);
     assert(m_meta.find(name) != m_meta.end());
     css::uno::Reference<css::xml::dom::XNode> xNode = m_meta.find(name)->second;
     if (xNode.is()) {
@@ -731,7 +743,7 @@ SfxDocumentMetaData::getMetaList(const char* i_name) const
 }
 
 bool
-SfxDocumentMetaData::setMetaList(const char* i_name,
+SfxDocumentMetaData::setMetaList(const OUString& name,
         const css::uno::Sequence<OUString> & i_rValue,
         AttrVector const* i_pAttrs)
     // throw (css::uno::RuntimeException)
@@ -741,7 +753,6 @@ SfxDocumentMetaData::setMetaList(const char* i_name,
            (static_cast<size_t>(i_rValue.getLength()) == i_pAttrs->size()));
 
     try {
-        OUString name = OUString::createFromAscii(i_name);
         assert(m_metaList.find(name) != m_metaList.end());
         std::vector<css::uno::Reference<css::xml::dom::XNode> > & vec =
             m_metaList[name];
@@ -787,7 +798,7 @@ SfxDocumentMetaData::setMetaList(const char* i_name,
         // insert new meta data nodes into DOM tree
         for (sal_Int32 i = 0; i < i_rValue.getLength(); ++i) {
             css::uno::Reference<css::xml::dom::XElement> xElem(
-                m_xDoc->createElementNS(getNameSpace(i_name), name),
+                m_xDoc->createElementNS(getNameSpace(name), name),
                 css::uno::UNO_SET_THROW);
             css::uno::Reference<css::xml::dom::XNode> xNode(xElem,
                 css::uno::UNO_QUERY_THROW);
@@ -798,8 +809,7 @@ SfxDocumentMetaData::setMetaList(const char* i_name,
                 for (auto const& elem : (*i_pAttrs)[i])
                 {
                     xElem->setAttributeNS(getNameSpace(elem.first),
-                        OUString::createFromAscii(elem.first),
-                        elem.second);
+                        elem.first, elem.second);
                 }
             }
             xNode->appendChild(xTextNode);
@@ -839,9 +849,9 @@ propsToStrings(css::uno::Reference<css::beans::XPropertySet> const & i_xPropSet)
             // ignore
         }
         const css::uno::Type & type = any.getValueType();
-        std::vector<std::pair<const char*, OUString> > as;
+        std::vector<std::pair<OUString, OUString> > as;
         as.emplace_back("meta:name", name);
-        const char* vt = "meta:value-type";
+        static constexpr OUStringLiteral vt = u"meta:value-type";
 
         // convert according to type
         if (type == ::cppu::UnoType<bool>::get()) {
@@ -920,10 +930,9 @@ propsToStrings(css::uno::Reference<css::beans::XPropertySet> const & i_xPropSet)
 
 // remove the given element from the DOM, and iff i_pAttrs != 0 insert new one
 void
-SfxDocumentMetaData::updateElement(const char *i_name,
-        std::vector<std::pair<const char *, OUString> >* i_pAttrs)
+SfxDocumentMetaData::updateElement(const OUString& name,
+        std::vector<std::pair<OUString, OUString> >* i_pAttrs)
 {
-    OUString name = OUString::createFromAscii(i_name);
     try {
         // remove old element
         css::uno::Reference<css::xml::dom::XNode> xNode =
@@ -935,14 +944,14 @@ SfxDocumentMetaData::updateElement(const char *i_name,
         // add new element
         if (nullptr != i_pAttrs) {
             css::uno::Reference<css::xml::dom::XElement> xElem(
-                m_xDoc->createElementNS(getNameSpace(i_name), name),
+                m_xDoc->createElementNS(getNameSpace(name), name),
                     css::uno::UNO_SET_THROW);
             xNode.set(xElem, css::uno::UNO_QUERY_THROW);
             // set attributes
             for (auto const& elem : *i_pAttrs)
             {
                 xElem->setAttributeNS(getNameSpace(elem.first),
-                    OUString::createFromAscii(elem.first), elem.second);
+                    elem.first, elem.second);
             }
             m_xParent->appendChild(xNode);
         }
@@ -967,7 +976,7 @@ void SfxDocumentMetaData::updateUserDefinedAndAttributes()
             &udStringsAttrs.second);
 
     // update elements with attributes
-    std::vector<std::pair<const char *, OUString> > attributes;
+    std::vector<std::pair<OUString, OUString> > attributes;
     if (!m_TemplateName.isEmpty() || !m_TemplateURL.isEmpty()
             || isValidDateTime(m_TemplateDate)) {
         attributes.emplace_back("xlink:type", OUString("simple"));
@@ -1034,6 +1043,65 @@ SfxDocumentMetaData::checkInit() const // throw (css::uno::RuntimeException)
     assert(m_xDoc.is() && m_xParent.is());
 }
 
+void extractTagAndNamespaceUri(std::u16string_view aChildNodeName,
+                std::u16string_view& rTagName, std::u16string_view& rNamespaceURI)
+{
+    size_t idx = aChildNodeName.find(':');
+    assert(idx != std::u16string_view::npos);
+    std::u16string_view aPrefix = aChildNodeName.substr(0, idx);
+    rTagName = aChildNodeName.substr(idx + 1);
+    if (aPrefix == u"dc")
+        rNamespaceURI = s_nsDC;
+    else if (aPrefix == u"meta")
+        rNamespaceURI = s_nsODFMeta;
+    else if (aPrefix == u"office")
+        rNamespaceURI = s_nsODF;
+    else
+        assert(false);
+}
+
+
+css::uno::Reference<css::xml::dom::XElement> getChildNodeByName(
+                const css::uno::Reference<css::xml::dom::XNode>& xNode,
+                std::u16string_view aChildNodeName)
+{
+    css::uno::Reference< css::xml::dom::XNodeList > xList = xNode->getChildNodes();
+    if (!xList)
+        return nullptr;
+    std::u16string_view aTagName, aNamespaceURI;
+    extractTagAndNamespaceUri(aChildNodeName, aTagName, aNamespaceURI);
+
+    const sal_Int32 nLength(xList->getLength());
+    for (sal_Int32 a(0); a < nLength; a++)
+    {
+        const css::uno::Reference< css::xml::dom::XElement > xChild(xList->item(a), css::uno::UNO_QUERY);
+        if (xChild && xChild->getNodeName() == aTagName && aNamespaceURI == xChild->getNamespaceURI())
+            return xChild;
+    }
+    return nullptr;
+}
+
+
+std::vector<css::uno::Reference<css::xml::dom::XNode> > getChildNodeListByName(
+                const css::uno::Reference<css::xml::dom::XNode>& xNode,
+                std::u16string_view aChildNodeName)
+{
+    css::uno::Reference< css::xml::dom::XNodeList > xList = xNode->getChildNodes();
+    if (!xList)
+        return {};
+    std::u16string_view aTagName, aNamespaceURI;
+    extractTagAndNamespaceUri(aChildNodeName, aTagName, aNamespaceURI);
+    std::vector<css::uno::Reference<css::xml::dom::XNode>> aList;
+    const sal_Int32 nLength(xList->getLength());
+    for (sal_Int32 a(0); a < nLength; a++)
+    {
+        const css::uno::Reference< css::xml::dom::XElement > xChild(xList->item(a), css::uno::UNO_QUERY);
+        if (xChild && xChild->getNodeName() == aTagName && aNamespaceURI == xChild->getNamespaceURI())
+            aList.push_back(xChild);
+    }
+    return aList;
+}
+
 // initialize state from DOM tree
 void SfxDocumentMetaData::init(
         const css::uno::Reference<css::xml::dom::XDocument>& i_xDoc)
@@ -1041,16 +1109,10 @@ void SfxDocumentMetaData::init(
     if (!i_xDoc.is())
         throw css::uno::RuntimeException("SfxDocumentMetaData::init: no DOM tree given", *this);
 
-    css::uno::Reference<css::xml::xpath::XXPathAPI> xPath = css::xml::xpath::XPathAPI::create(m_xContext);
-
     m_isInitialized = false;
     m_xDoc = i_xDoc;
 
     // select nodes for standard meta data stuff
-    xPath->registerNS("xlink", s_nsXLink);
-    xPath->registerNS("dc", s_nsDC);
-    xPath->registerNS("office", s_nsODF);
-    xPath->registerNS("meta", s_nsODFMeta);
     // NB: we do not handle the single-XML-file ODF variant, which would
     //     have the root element office:document.
     //     The root of such documents must be converted in the importer!
@@ -1058,7 +1120,9 @@ void SfxDocumentMetaData::init(
         m_xDoc, css::uno::UNO_QUERY_THROW);
     m_xParent.clear();
     try {
-        m_xParent = xPath->selectSingleNode(xDocNode, "/child::office:document-meta/child::office:meta");
+        css::uno::Reference<css::xml::dom::XNode> xChild = getChildNodeByName(xDocNode, u"office:document-meta");
+        if (xChild)
+            m_xParent = getChildNodeByName(xChild, u"office:meta");
     } catch (const css::uno::Exception &) {
     }
 
@@ -1089,17 +1153,20 @@ void SfxDocumentMetaData::init(
                 }
             }
             if (!xRElem.is()) {
+                static constexpr OUStringLiteral sOfficeDocumentMeta = u"office:document-meta";
                 xRElem = i_xDoc->createElementNS(
-                    s_nsODF, "office:document-meta");
+                    s_nsODF, sOfficeDocumentMeta);
                 css::uno::Reference<css::xml::dom::XNode> xRNode(xRElem,
                     css::uno::UNO_QUERY_THROW);
                 i_xDoc->appendChild(xRNode);
             }
-            xRElem->setAttributeNS(s_nsODF, "office:version", "1.0");
+            static constexpr OUStringLiteral sOfficeVersion = u"office:version";
+            xRElem->setAttributeNS(s_nsODF, sOfficeVersion, "1.0");
             // does not exist, otherwise m_xParent would not be null
+            static constexpr OUStringLiteral sOfficeMeta = u"office:meta";
             css::uno::Reference<css::xml::dom::XNode> xParent (
-                i_xDoc->createElementNS(s_nsODF, "office:meta"),
-            css::uno::UNO_QUERY_THROW);
+                i_xDoc->createElementNS(s_nsODF, sOfficeMeta),
+                css::uno::UNO_QUERY_THROW);
             xRElem->appendChild(xParent);
             m_xParent = xParent;
         } catch (const css::xml::dom::DOMException &) {
@@ -1121,36 +1188,32 @@ void SfxDocumentMetaData::init(
         // The ODF spec says that handling multiple occurrences is
         // application-specific.
         css::uno::Reference<css::xml::dom::XNode> xNode =
-            xPath->selectSingleNode(m_xParent, "child::" + name);
+                getChildNodeByName(m_xParent, name);
         // Do not create an empty element if it is missing;
         // for certain elements, such as dateTime, this would be invalid
         m_meta[name] = xNode;
     }
 
     // select nodes for elements of which we handle all occurrences
-    for (const char **pName = s_stdMetaList; *pName != nullptr; ++pName) {
-        OUString name = OUString::createFromAscii(*pName);
-        css::uno::Reference<css::xml::dom::XNodeList> nodes =
-            xPath->selectNodeList(m_xParent, "child::" + name);
-        std::vector<css::uno::Reference<css::xml::dom::XNode> > v;
-        v.reserve(nodes->getLength());
-        for (sal_Int32 i = 0; i < nodes->getLength(); ++i)
-        {
-            v.push_back(nodes->item(i));
-        }
-        m_metaList[name] = v;
+    for (const auto & name : s_stdMetaList) {
+        std::vector<css::uno::Reference<css::xml::dom::XNode> > nodes =
+            getChildNodeListByName(m_xParent, OUString(name));
+        m_metaList[name] = nodes;
     }
 
     // initialize members corresponding to attributes from DOM nodes
-    m_TemplateName  = getMetaAttr("meta:template", "xlink:title");
-    m_TemplateURL   = getMetaAttr("meta:template", "xlink:href");
+    static constexpr OUStringLiteral sMetaTemplate = u"meta:template";
+    static constexpr OUStringLiteral sMetaAutoReload = u"meta:auto-reload";
+    static constexpr OUStringLiteral sMetaHyperlinkBehaviour = u"meta:hyperlink-behaviour";
+    m_TemplateName  = getMetaAttr(sMetaTemplate, "xlink:title");
+    m_TemplateURL   = getMetaAttr(sMetaTemplate, "xlink:href");
     m_TemplateDate  =
-        textToDateTimeDefault(getMetaAttr("meta:template", "meta:date"));
-    m_AutoloadURL   = getMetaAttr("meta:auto-reload", "xlink:href");
+        textToDateTimeDefault(getMetaAttr(sMetaTemplate, "meta:date"));
+    m_AutoloadURL   = getMetaAttr(sMetaAutoReload, "xlink:href");
     m_AutoloadSecs  =
-        textToDuration(getMetaAttr("meta:auto-reload", "meta:delay"));
+        textToDuration(getMetaAttr(sMetaAutoReload, "meta:delay"));
     m_DefaultTarget =
-        getMetaAttr("meta:hyperlink-behaviour", "office:target-frame-name");
+        getMetaAttr(sMetaHyperlinkBehaviour, "office:target-frame-name");
 
 
     std::vector<css::uno::Reference<css::xml::dom::XNode> > & vec =
@@ -1588,8 +1651,7 @@ SfxDocumentMetaData::getDocumentStatistics()
     checkInit();
     ::std::vector<css::beans::NamedValue> stats;
     for (size_t i = 0; s_stdStats[i] != nullptr; ++i) {
-        const char * aName = s_stdStatAttrs[i];
-        OUString text = getMetaAttr("meta:document-statistic", aName);
+        OUString text = getMetaAttr("meta:document-statistic", s_stdStatAttrs[i]);
         if (text.isEmpty()) continue;
         css::beans::NamedValue stat;
         stat.Name = OUString::createFromAscii(s_stdStats[i]);
@@ -1614,7 +1676,7 @@ SfxDocumentMetaData::setDocumentStatistics(
     {
         osl::MutexGuard g(m_aMutex);
         checkInit();
-        std::vector<std::pair<const char *, OUString> > attributes;
+        std::vector<std::pair<OUString, OUString> > attributes;
         for (const auto& rValue : the_value) {
             const OUString name = rValue.Name;
             // inefficiently search for matching attribute
@@ -1810,13 +1872,13 @@ SfxDocumentMetaData::storeToStorage(
         css::uno::UNO_QUERY_THROW);
     xStreamProps->setPropertyValue(
         "MediaType",
-        css::uno::makeAny(OUString("text/xml")));
+        css::uno::Any(OUString("text/xml")));
     xStreamProps->setPropertyValue(
         "Compressed",
-        css::uno::makeAny(false));
+        css::uno::Any(false));
     xStreamProps->setPropertyValue(
         "UseCommonStoragePasswordEncryption",
-        css::uno::makeAny(false));
+        css::uno::Any(false));
     css::uno::Reference<css::io::XOutputStream> xOutStream =
         xStream->getOutputStream();
     if (!xOutStream.is()) throw css::uno::RuntimeException();
@@ -1938,7 +2000,7 @@ SfxDocumentMetaData::storeToMedium(const OUString & URL,
         }
 
         throw css::task::ErrorCodeIOException(
-            "SfxDocumentMetaData::storeToMedium <" + URL + "> Commit failed: " + nError.toHexString(),
+            "SfxDocumentMetaData::storeToMedium <" + URL + "> Commit failed: " + nError.toString(),
             css::uno::Reference< css::uno::XInterface >(), sal_uInt32(nError));
 
     }
@@ -2123,11 +2185,10 @@ void SfxDocumentMetaData::createUserDefined()
         m_xUserDefined, css::uno::UNO_QUERY);
     if (xMB.is())
     {
-        const std::vector<css::uno::Reference<css::uno::XInterface> >
+        const std::vector<css::uno::Reference<css::util::XModifyListener> >
             listeners(m_NotifyListeners.getElements());
         for (const auto& l : listeners) {
-            xMB->addModifyListener(
-                css::uno::Reference< css::util::XModifyListener >(l, css::uno::UNO_QUERY) );
+            xMB->addModifyListener(l);
         }
     }
 }

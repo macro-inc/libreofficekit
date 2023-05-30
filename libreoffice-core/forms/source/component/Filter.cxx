@@ -22,8 +22,6 @@
 #include <config_features.h>
 #include <config_fuzzers.h>
 
-#include <string_view>
-
 #include "Filter.hxx"
 #include <strings.hrc>
 #include <frm_resource.hxx>
@@ -58,7 +56,7 @@
 #include <connectivity/predicateinput.hxx>
 #include <o3tl/safeint.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/gen.hxx>
 
 
@@ -137,7 +135,7 @@ namespace frm
     }
 
 
-    OUString OFilterControl::GetComponentServiceName()
+    OUString OFilterControl::GetComponentServiceName() const
     {
         OUString aServiceName;
         switch (m_nControlClass)
@@ -185,8 +183,8 @@ namespace frm
                 case FormComponentType::CHECKBOX:
                 {
                     // checkboxes always have a tristate-mode
-                    xVclWindow->setProperty( PROPERTY_TRISTATE, makeAny( true ) );
-                    xVclWindow->setProperty( PROPERTY_STATE, makeAny( sal_Int32( TRISTATE_INDET ) ) );
+                    xVclWindow->setProperty( PROPERTY_TRISTATE, Any( true ) );
+                    xVclWindow->setProperty( PROPERTY_STATE, Any( sal_Int32( TRISTATE_INDET ) ) );
 
                     Reference< XCheckBox >  xBox( getPeer(), UNO_QUERY_THROW );
                     xBox->addItemListener( this );
@@ -196,7 +194,7 @@ namespace frm
 
                 case FormComponentType::RADIOBUTTON:
                 {
-                    xVclWindow->setProperty( PROPERTY_STATE, makeAny( sal_Int32( TRISTATE_FALSE ) ) );
+                    xVclWindow->setProperty( PROPERTY_STATE, Any( sal_Int32( TRISTATE_FALSE ) ) );
 
                     Reference< XRadioButton >  xRadio( getPeer(), UNO_QUERY_THROW );
                     xRadio->addItemListener( this );
@@ -212,7 +210,7 @@ namespace frm
 
                 case FormComponentType::COMBOBOX:
                 {
-                    xVclWindow->setProperty(PROPERTY_AUTOCOMPLETE, makeAny( true ) );
+                    xVclWindow->setProperty(PROPERTY_AUTOCOMPLETE, Any( true ) );
                     [[fallthrough]];
                 }
 
@@ -232,7 +230,7 @@ namespace frm
             Reference< XPropertySet > xModel( getModel(), UNO_QUERY_THROW );
             Reference< XPropertySetInfo > xModelPSI( xModel->getPropertySetInfo(), UNO_SET_THROW );
             if ( xModelPSI->hasPropertyByName( PROPERTY_READONLY ) )
-                xVclWindow->setProperty( PROPERTY_READONLY, makeAny( false ) );
+                xVclWindow->setProperty( PROPERTY_READONLY, Any( false ) );
         }
         catch( const Exception& )
         {
@@ -357,9 +355,9 @@ namespace frm
             m_aText = sText;
             TextEvent aEvt;
             aEvt.Source = *this;
-            ::comphelper::OInterfaceIteratorHelper2 aIt( m_aTextListeners );
+            ::comphelper::OInterfaceIteratorHelper3 aIt(m_aTextListeners);
             while( aIt.hasMoreElements() )
-                static_cast<XTextListener *>(aIt.next())->textChanged( aEvt );
+                aIt.next()->textChanged(aEvt);
         }
 #endif
     }
@@ -510,32 +508,31 @@ namespace frm
             default:
                 return true;
         }
-        if ( m_aText != aText )
+        if ( m_aText == aText )
+            return true;
+        // check the text with the SQL-Parser
+        OUString aNewText = aText.trim();
+        if ( !aNewText.isEmpty() )
         {
-            // check the text with the SQL-Parser
-            OUString aNewText = aText.trim();
-            if ( !aNewText.isEmpty() )
+            ::dbtools::OPredicateInputController aPredicateInput( m_xContext, m_xConnection, getParseContext() );
+            OUString sErrorMessage;
+            if ( !aPredicateInput.normalizePredicateString( aNewText, m_xField, &sErrorMessage ) )
             {
-                ::dbtools::OPredicateInputController aPredicateInput( m_xContext, m_xConnection, getParseContext() );
-                OUString sErrorMessage;
-                if ( !aPredicateInput.normalizePredicateString( aNewText, m_xField, &sErrorMessage ) )
-                {
-                    // display the error and outta here
-                    SQLContext aError;
-                    aError.Message = ResourceManager::loadString(RID_STR_SYNTAXERROR);
-                    aError.Details = sErrorMessage;
-                    displayException( aError );
-                    return false;
-                }
+                // display the error and outta here
+                SQLContext aError;
+                aError.Message = ResourceManager::loadString(RID_STR_SYNTAXERROR);
+                aError.Details = sErrorMessage;
+                displayException( aError );
+                return false;
             }
-
-            setText(aNewText);
-            TextEvent aEvt;
-            aEvt.Source = *this;
-            ::comphelper::OInterfaceIteratorHelper2 aIt( m_aTextListeners );
-            while( aIt.hasMoreElements() )
-                static_cast< XTextListener* >( aIt.next() )->textChanged( aEvt );
         }
+
+        setText(aNewText);
+        TextEvent aEvt;
+        aEvt.Source = *this;
+        ::comphelper::OInterfaceIteratorHelper3 aIt(m_aTextListeners);
+        while( aIt.hasMoreElements() )
+            aIt.next()->textChanged(aEvt);
 #endif
         return true;
     }
@@ -733,7 +730,7 @@ namespace frm
     {
         try
         {
-            Reference< XExecutableDialog > xErrorDialog = ErrorMessageDialog::create( m_xContext, "",  m_xMessageParent, makeAny(_rExcept));
+            Reference< XExecutableDialog > xErrorDialog = ErrorMessageDialog::create( m_xContext, "",  m_xMessageParent, Any(_rExcept));
             xErrorDialog->execute();
         }
         catch( const Exception& )

@@ -27,10 +27,12 @@
 
 #include <drawinglayer/attribute/fillhatchattribute.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonHatchPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <osl/diagnose.h>
 #include <rtl/ustrbuf.hxx>
 #include <memory>
 
@@ -57,8 +59,7 @@ XHatchEntry* XHatchList::GetHatch(tools::Long nIndex) const
 
 uno::Reference< container::XNameContainer > XHatchList::createInstance()
 {
-    return uno::Reference< container::XNameContainer >(
-        SvxUnoXHatchTable_createInstance( this ), uno::UNO_QUERY );
+    return SvxUnoXHatchTable_createInstance( *this );
 }
 
 bool XHatchList::Create()
@@ -86,7 +87,7 @@ BitmapEx XHatchList::CreateBitmap( tools::Long nIndex, const Size& rSize) const
         const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
 
         // prepare polygon geometry for rectangle
-        const basegfx::B2DPolygon aRectangle(
+        basegfx::B2DPolygon aRectangle(
             basegfx::utils::createPolygonFromRect(
                 basegfx::B2DRange(0.0, 0.0, rSize.Width(), rSize.Height())));
 
@@ -116,7 +117,7 @@ BitmapEx XHatchList::CreateBitmap( tools::Long nIndex, const Size& rSize) const
         const basegfx::B2DVector aScaleVector(aScaleMatrix * basegfx::B2DVector(1.0, 0.0));
         const double fScaleValue(aScaleVector.getLength());
 
-        const drawinglayer::attribute::FillHatchAttribute aFillHatch(
+        drawinglayer::attribute::FillHatchAttribute aFillHatch(
             aHatchStyle,
             static_cast<double>(rHatch.GetDistance()) * fScaleValue,
             toRadians(rHatch.GetAngle()),
@@ -129,11 +130,11 @@ BitmapEx XHatchList::CreateBitmap( tools::Long nIndex, const Size& rSize) const
             new drawinglayer::primitive2d::PolyPolygonHatchPrimitive2D(
                 basegfx::B2DPolyPolygon(aRectangle),
                 aBlack,
-                aFillHatch));
+                std::move(aFillHatch)));
 
         const drawinglayer::primitive2d::Primitive2DReference aBlackRectanglePrimitive(
             new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-                aRectangle,
+                std::move(aRectangle),
                 aBlack));
 
         // prepare VirtualDevice

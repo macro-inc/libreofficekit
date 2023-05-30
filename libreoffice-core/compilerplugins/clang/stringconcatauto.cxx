@@ -20,6 +20,8 @@ and so their lifecycle should not extend the lifecycle of those temporaries.
 
 #ifndef LO_CLANG_SHARED_PLUGINS
 
+#include "config_clang.h"
+
 #include "plugin.hxx"
 #include "check.hxx"
 
@@ -71,7 +73,7 @@ bool StringConcatAuto::checkDecl( const DeclaratorDecl* decl, QualType type, con
     if( isa< ParmVarDecl >( decl )) // parameters should be fine, temporaries should exist during the call
         return true;
     std::string fileName = getFilenameOfLocation(
-        compiler.getSourceManager().getSpellingLoc(compat::getBeginLoc(decl))).str();
+        compiler.getSourceManager().getSpellingLoc(decl->getBeginLoc())).str();
     loplugin::normalizeDotDotInFilePath(fileName);
     if (loplugin::isSamePathname(fileName, SRCDIR "/include/rtl/string.hxx")
         || loplugin::isSamePathname(fileName, SRCDIR "/include/rtl/ustring.hxx")
@@ -81,14 +83,8 @@ bool StringConcatAuto::checkDecl( const DeclaratorDecl* decl, QualType type, con
         return true;
     auto const tc = loplugin::TypeCheck( type.getNonReferenceType().getCanonicalType());
     const char* typeString = nullptr;
-    if( tc.Struct("OUStringConcat").Namespace("rtl").GlobalNamespace())
-        typeString = "OUString";
-    else if( tc.Struct("OStringConcat").Namespace("rtl").GlobalNamespace())
-        typeString = "OString";
-    else if( tc.Struct("OUStringNumber").Namespace("rtl").GlobalNamespace())
-        typeString = "OUString";
-    else if( tc.Struct("OStringNumber").Namespace("rtl").GlobalNamespace())
-        typeString = "OString";
+    if( tc.Struct("StringConcat").Namespace("rtl").GlobalNamespace())
+        typeString = "O(U)String";
     else
         return true;
     report( DiagnosticsEngine::Warning,

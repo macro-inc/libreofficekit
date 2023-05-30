@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
 "PO-Revision-Date: 2018-11-11 07:30+0000\n"
 "Last-Translator: biraj <brnet00@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1897,11 +1897,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "স্প্রেডশীট নথির পাথ"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "আপনার সিস্টেমের ODBC ডাটা সোর্সের নাম"
+msgid "Name of the ODBC data source"
+msgstr ""
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -2225,23 +2225,20 @@ msgstr ""
 "সেবা প্রদানকারীর সুনির্দিষ্ট সেটিংসমূহ কনফিগার করতে 'ব্রাউজ' ক্লিক করুন।\n"
 "নিম্নোক্ত সেটিংস সম্পর্কে আপনি যদি অনিশ্চিত হয়ে থাকেন তবে অনুগ্রহ করে আপনার সিস্টেম প্রশাসকের সাথে যোগাযোগ করুন।"
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "ODBC ডাটাবেসে একটি সংযোগ সেট আপ করুন"
+msgid "Set up a connection to an ODBC data source"
+msgstr ""
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"আপনি যে ODBC ডাটাবেসের সাথে সংযুক্ত হতে চান তার নাম দিন।\n"
-"%PRODUCTNAME এ ইতিমধ্যেই নিবন্ধিত আছে এমন একটি ODBC ডাটাবেস নির্বাচন করতে 'ব্রাউজ...' ক্লিক করুন।\n"
-"নিম্নোক্ত সেটিংস সম্পর্কে আপনি যদি অনিশ্চিত হয়ে থাকেন তবে অনুগ্রহ করে আপনার সিস্টেম প্রশাসকের সাথে যোগাযোগ করুন।"
 
 #. dmi7n
 #: dbaccess/inc/strings.hrc:390
@@ -2424,158 +2421,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "বিস্তারিত"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr ""
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr ""
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr ""
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "আপনি কি সত্যিই এই ব্যবহারকারীকে মুছে ফেলতে চান?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "ডাটাবেসটি ব্যবহারকারীর পরিচালনা সমর্থন করেনা।"
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "পাসওয়ার্ডটি মেলেনি। অনুগ্রহ করে পাসওয়ার্ডটি পুনরায় দিন।"
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "মনে রাখবেন, কিছু ডাটাবেস এই ধরনের সংযুক্তি সমর্থন নাও করতে পারে।"
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "শুধুমাত্র সেসব রেকর্ড অন্তর্ভুক্ত করে যা উভয় টেবিলের একই ক্ষেত্রের জন্য অভিন্ন।"
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "টেবিল '%1' এর সব রেকর্ড কিন্তু টেবিল '%2' এর শুধুমাত্র সেইসব রেকর্ড যা প্রথম টেবিলের সাথে মিলে।"
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "'%1' এবং '%2' এর সব রেকর্ড ধারণ করে।"
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr "'%1' এবং '%2' এর সব রেকর্ডের কার্টেসিয়ান গুণফল ধারণ করে।"
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr "গন্তব্য ডাটাবেস ভিউ সমর্থন করেনা।"
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr "গন্তব্য ডাটাবেস প্রাইমারি কী সমর্থন করেনা।"
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr "কোনো ডাটা সন্নিবেশ ডেসক্রিপটর খুঁজে পাওয়া যায়নি, বা কোনো ডাটা সন্নিবেশ ডেসক্রিপটর সব প্রয়োজনীয় তথ্য প্রদান করতে সক্ষম নয়"
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr "এই মূহুর্তে শুধুমাত্র টেবিল এবং কোয়েরিসমূহ সমর্থিত।"
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr "অনুলিপি উৎসের ফলাফল সেট অবশ্যই বুকমার্ক সমর্থন করবে।"
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr "কলামের $pos$ অবস্থানে উৎসের কলামের ধরন ($type$) অসমর্থিত।"
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr "প্রারম্ভিক প্যারামিটারের সংখ্যা অকার্যকর।"
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr "আরম্ভের সময় একটি ত্রুটি দেখা দিয়েছে।"
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr "কপি সোর্স ডেস্ক্রিপ্টরের অসমর্থিত সেটিং: $name$।"
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr "একটি কোয়েরি অনুলিপি করতে, সংযোগ অবশ্যই কোয়েরি দানে সক্ষম হবে।"
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr "মিথস্ক্রিয়া হ্যান্ডলার অকার্যকর।"
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr "এই রিলেশনটি ইতিমধ্যেই বিদ্যমান। আপনি কি এটি সম্পাদনা বা নতুন একটি তৈরি করতে চান?"
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "সম্পাদনা..."
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "তৈরি..."
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " - %PRODUCTNAME বেস: রিলেশন ডিজাইন"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "ডাটাবেসটি কোনো রিলেশন সমর্থন করেনা।"
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "আপনি এই টেবিলটি মুছে ফেললে সংশ্লিষ্ট সব রিলেশনও মুছে যাবে। আপনি কি চালিয়ে যেতে চান?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2829,73 +2844,73 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr ""
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 #, fuzzy
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "dBASE ফাইলগুলির পথ"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr "নতুন তৈরি করুন (_C)"
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 #, fuzzy
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "ব্রাউজ করুন (_B)"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "সাধারণ"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 #, fuzzy
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "ব্যবহারকারীর নাম (_U)"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "পাসওয়ার্ড প্রয়োজন"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 #, fuzzy
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "ব্যবহারকারীর প্রমাণীকরণ"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 #, fuzzy
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "_JDBC ড্রাইভার শ্রেণী"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "পরীক্ষণ শ্রেণী"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 #, fuzzy
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "JDBC বৈশিষ্ট্যাবলী"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
 msgstr "পরীক্ষণ সংযোগ"
@@ -3038,20 +3053,20 @@ msgid "label"
 msgstr "লেবেল"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 #, fuzzy
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "dBASE ফাইলগুলির পথ"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr "নতুন তৈরি করুন (_C)"
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 #, fuzzy
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
@@ -3691,27 +3706,27 @@ msgid "Path to the dBASE files:"
 msgstr "dBASE ফাইলগুলির পথ"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr "নতুন তৈরি করুন (_C)"
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 #, fuzzy
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "ব্রাউজ করুন (_B)"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 #, fuzzy
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "JDBC ড্রাইভার ক্লাস (_r)"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 #, fuzzy
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
@@ -5286,38 +5301,26 @@ msgid "User Settings"
 msgstr "ব্যবহারকারী বিন্যাস"
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "ব্যবহারকারী (_e):"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "ব্যবহারকারী যোগ করুন (_A)..."
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "পাসওয়ার্ড পরিবর্তন করুন (_P)..."
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "ব্যবহারকারী মুছে ফেলুন (_D)... "
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr ""
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 #, fuzzy
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "ব্যবহারকারী নির্বাচন"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 #, fuzzy
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"

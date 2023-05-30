@@ -20,7 +20,7 @@
 #ifndef INCLUDED_BASIC_SBMETH_HXX
 #define INCLUDED_BASIC_SBMETH_HXX
 
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <basic/sbxmeth.hxx>
 #include <basic/sbdef.hxx>
 #include <basic/basicdllapi.h>
@@ -48,7 +48,9 @@ class BASIC_DLLPUBLIC SbMethod : public SbxMethod
     BASIC_DLLPRIVATE SbMethod( const SbMethod& );
     virtual bool LoadData( SvStream&, sal_uInt16 ) override;
     virtual bool StoreData( SvStream& ) const override;
+#if HAVE_FEATURE_SCRIPTING
     virtual ~SbMethod() override;
+#endif
 
 public:
     SBX_DECL_PERSIST_NODATA(SBXID_BASICMETHOD,2);

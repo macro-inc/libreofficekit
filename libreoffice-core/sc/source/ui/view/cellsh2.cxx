@@ -49,6 +49,7 @@
 #include <uiitems.hxx>
 #include <dbdocfun.hxx>
 #include <reffact.hxx>
+#include <utility>
 #include <validat.hxx>
 #include <validate.hxx>
 #include <datamapper.hxx>
@@ -99,9 +100,9 @@ static bool lcl_GetTextToColumnsRange( const ScViewData& rData, ScRange& rRange,
 
     if ( bDoEmptyCheckOnly )
     {
-        if ( bRet && rDoc.IsBlockEmpty( rRange.aStart.Tab(), rRange.aStart.Col(),
-                                         rRange.aStart.Row(), rRange.aEnd.Col(),
-                                         rRange.aEnd.Row() ) )
+        if ( bRet && rDoc.IsBlockEmpty( rRange.aStart.Col(), rRange.aStart.Row(),
+                                        rRange.aEnd.Col(),  rRange.aEnd.Row(),
+                                        rRange.aStart.Tab() ) )
         {
             bRet = false;
         }
@@ -210,8 +211,8 @@ namespace
     {
         std::shared_ptr<SfxDialogController> m_xDlg;
     public:
-        ScValidationRegisteredDlg(weld::Window* pParent, const std::shared_ptr<SfxDialogController>& rDlg)
-            : m_xDlg(rDlg)
+        ScValidationRegisteredDlg(weld::Window* pParent, std::shared_ptr<SfxDialogController> xDlg)
+            : m_xDlg(std::move(xDlg))
         {
             SC_MOD()->RegisterRefController(static_cast<sal_uInt16>(ScValidationDlg::SLOTID), m_xDlg, pParent);
         }
@@ -440,30 +441,30 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
 
                         aSortParam.bInplace = true;             // from Basic always
 
-                        const SfxPoolItem* pItem;
-                        if ( pArgs->GetItemState( SID_SORT_BYROW, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.bByRow = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_HASHEADER, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.bHasHeader = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_CASESENS, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.bCaseSens = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_NATURALSORT, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.bNaturalSort = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_INCCOMMENTS, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.aDataAreaExtras.mbCellNotes = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_INCIMAGES, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.aDataAreaExtras.mbCellDrawObjects = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_ATTRIBS, true, &pItem ) == SfxItemState::SET )
-                            aSortParam.aDataAreaExtras.mbCellFormats = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pArgs->GetItemState( SID_SORT_USERDEF, true, &pItem ) == SfxItemState::SET )
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_BYROW ) )
+                            aSortParam.bByRow = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_HASHEADER ) )
+                            aSortParam.bHasHeader = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_CASESENS ) )
+                            aSortParam.bCaseSens = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_NATURALSORT ) )
+                            aSortParam.bNaturalSort = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_INCCOMMENTS ) )
+                            aSortParam.aDataAreaExtras.mbCellNotes = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_INCIMAGES ) )
+                            aSortParam.aDataAreaExtras.mbCellDrawObjects = pItem->GetValue();
+                        if ( const SfxBoolItem* pItem = pArgs->GetItemIfSet( SID_SORT_ATTRIBS ) )
+                            aSortParam.aDataAreaExtras.mbCellFormats = pItem->GetValue();
+                        if ( const SfxUInt16Item* pItem = pArgs->GetItemIfSet( SID_SORT_USERDEF ) )
                         {
-                            sal_uInt16 nUserIndex = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+                            sal_uInt16 nUserIndex = pItem->GetValue();
                             aSortParam.bUserDef = ( nUserIndex != 0 );
                             if ( nUserIndex )
                                 aSortParam.nUserIndex = nUserIndex - 1;     // Basic: 1-based
                         }
 
                         SCCOLROW nField0 = 0;
+                        const SfxPoolItem* pItem = nullptr;
                         if ( pArgs->GetItemState( FN_PARAM_1, true, &pItem ) == SfxItemState::SET )
                             nField0 = static_cast<const SfxInt32Item*>(pItem)->GetValue();
                         aSortParam.maKeyState[0].bDoSort = ( nField0 != 0 );
@@ -520,8 +521,8 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                                 if ( nResult == RET_OK )
                                 {
                                     const SfxItemSet* pOutSet = pDlg->GetOutputItemSet();
-                                    const ScSortParam& rOutParam = static_cast<const ScSortItem&>(
-                                        pOutSet->Get( SCITEM_SORTDATA )).GetSortData();
+                                    const ScSortParam& rOutParam =
+                                        pOutSet->Get( SCITEM_SORTDATA ).GetSortData();
 
                                     // subtotal when needed new
 
@@ -594,8 +595,8 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                 if ( pArgs )
                 {
                     OSL_FAIL("SID_FILTER with arguments?");
-                    pTabViewShell->Query( static_cast<const ScQueryItem&>(
-                            pArgs->Get( SCITEM_QUERYDATA )).GetQueryData(), nullptr, true );
+                    pTabViewShell->Query(
+                            pArgs->Get( SCITEM_QUERYDATA ).GetQueryData(), nullptr, true );
                     rReq.Done();
                 }
                 else
@@ -615,8 +616,8 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                 if ( pArgs )
                 {
                     OSL_FAIL("SID_SPECIAL_FILTER with arguments?");
-                    pTabViewShell->Query( static_cast<const ScQueryItem&>(
-                            pArgs->Get( SCITEM_QUERYDATA )).GetQueryData(), nullptr, true );
+                    pTabViewShell->Query(
+                            pArgs->Get( SCITEM_QUERYDATA ).GetQueryData(), nullptr, true );
                     rReq.Done();
                 }
                 else
@@ -632,12 +633,10 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
 
         case FID_FILTER_OK:
             {
-                const SfxPoolItem* pItem;
-                if ( pReqArgs && SfxItemState::SET ==
-                        pReqArgs->GetItemState( SCITEM_QUERYDATA, true, &pItem ) )
+                const ScQueryItem* pQueryItem;
+                if ( pReqArgs && (pQueryItem =
+                        pReqArgs->GetItemIfSet( SCITEM_QUERYDATA )) )
                 {
-                    const ScQueryItem& rQueryItem = static_cast<const ScQueryItem&>(*pItem);
-
                     SCTAB nCurTab = GetViewData().GetTabNo();
                     SCTAB nRefTab = GetViewData().GetRefTabNo();
 
@@ -651,10 +650,10 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                     }
 
                     ScRange aAdvSource;
-                    if (rQueryItem.GetAdvancedQuerySource(aAdvSource))
-                        pTabViewShell->Query( rQueryItem.GetQueryData(), &aAdvSource, true );
+                    if (pQueryItem->GetAdvancedQuerySource(aAdvSource))
+                        pTabViewShell->Query( pQueryItem->GetQueryData(), &aAdvSource, true );
                     else
-                        pTabViewShell->Query( rQueryItem.GetQueryData(), nullptr, true );
+                        pTabViewShell->Query( pQueryItem->GetQueryData(), nullptr, true );
                     rReq.Done( *pReqArgs );
                 }
             }
@@ -687,9 +686,9 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
 
         case SID_PIVOT_TABLE:
             {
-                const SfxPoolItem* pItem;
-                if ( pReqArgs && SfxItemState::SET ==
-                        pReqArgs->GetItemState( SCITEM_PIVOTDATA, true, &pItem ) )
+                const ScPivotItem* pPItem;
+                if ( pReqArgs && (pPItem =
+                        pReqArgs->GetItemIfSet( SCITEM_PIVOTDATA )) )
                 {
                     SCTAB nCurTab = GetViewData().GetTabNo();
                     SCTAB nRefTab = GetViewData().GetRefTabNo();
@@ -706,7 +705,6 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                     const ScDPObject* pDPObject = pTabViewShell->GetDialogDPObject();
                     if ( pDPObject )
                     {
-                        const ScPivotItem* pPItem = static_cast<const ScPivotItem*>(pItem);
                         bool bSuccess = pTabViewShell->MakePivotTable(
                             pPItem->GetData(), pPItem->GetDestRange(), pPItem->IsNewSheet(), *pDPObject );
                         SfxBoolItem aRet(0, bSuccess);
@@ -830,7 +828,6 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
         case FID_VALIDATION:
         case FID_CURRENTVALIDATION:
             {
-                const SfxPoolItem* pItem;
                 const SfxItemSet* pArgs = rReq.GetArgs();
                 if ( pArgs )
                 {
@@ -855,7 +852,7 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                     SCROW nCurY = GetViewData().GetCurY();
                     SCTAB nTab = GetViewData().GetTabNo();
                     ScAddress aCursorPos( nCurX, nCurY, nTab );
-                    sal_uLong nIndex = rDoc.GetAttr(
+                    sal_uInt32 nIndex = rDoc.GetAttr(
                                 nCurX, nCurY, nTab, ATTR_VALIDDATA )->GetValue();
                     if ( nIndex )
                     {
@@ -907,13 +904,13 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                     {
                         const SfxItemSet* pOutSet = xDlg->GetOutputItemSet();
 
-                        if ( pOutSet->GetItemState( FID_VALID_MODE, true, &pItem ) == SfxItemState::SET )
-                            eMode = static_cast<ScValidationMode>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
-                        if ( pOutSet->GetItemState( FID_VALID_CONDMODE, true, &pItem ) == SfxItemState::SET )
-                            eOper = static_cast<ScConditionMode>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
-                        if ( pOutSet->GetItemState( FID_VALID_VALUE1, true, &pItem ) == SfxItemState::SET )
+                        if ( const SfxUInt16Item* pItem = pOutSet->GetItemIfSet( FID_VALID_MODE ) )
+                            eMode = static_cast<ScValidationMode>(pItem->GetValue());
+                        if ( const SfxUInt16Item* pItem = pOutSet->GetItemIfSet( FID_VALID_CONDMODE ) )
+                            eOper = static_cast<ScConditionMode>(pItem->GetValue());
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_VALUE1 ) )
                         {
-                            OUString aTemp1 = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                            OUString aTemp1 = pItem->GetValue();
                             if (eMode == SC_VALID_DATE || eMode == SC_VALID_TIME)
                             {
                                 sal_uInt32 nNumIndex = 0;
@@ -928,9 +925,9 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                             else
                                 aExpr1 = aTemp1;
                         }
-                        if ( pOutSet->GetItemState( FID_VALID_VALUE2, true, &pItem ) == SfxItemState::SET )
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_VALUE2 ) )
                         {
-                            OUString aTemp2 = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                            OUString aTemp2 = pItem->GetValue();
                             if (eMode == SC_VALID_DATE || eMode == SC_VALID_TIME)
                             {
                                 sal_uInt32 nNumIndex = 0;
@@ -946,15 +943,11 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                                     if (wraparound > 0) {
                                         if (eOper == ScConditionMode::Between) {
                                             eOper = ScConditionMode::NotBetween;
-                                            OUString tmp = aExpr1;
-                                            aExpr1 = aExpr2;
-                                            aExpr2 = tmp;
+                                            std::swap( aExpr1, aExpr2 );
                                         }
                                         else if (eOper == ScConditionMode::NotBetween) {
                                             eOper = ScConditionMode::Between;
-                                            OUString tmp = aExpr1;
-                                            aExpr1 = aExpr2;
-                                            aExpr2 = tmp;
+                                            std::swap( aExpr1, aExpr2 );
                                         }
                                     }
                                 }
@@ -962,26 +955,26 @@ void ScCellShell::ExecuteDB( SfxRequest& rReq )
                             else
                                 aExpr2 = aTemp2;
                         }
-                        if ( pOutSet->GetItemState( FID_VALID_BLANK, true, &pItem ) == SfxItemState::SET )
-                            bBlank = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pOutSet->GetItemState( FID_VALID_LISTTYPE, true, &pItem ) == SfxItemState::SET )
-                            nListType = static_cast<const SfxInt16Item*>(pItem)->GetValue();
+                        if ( const SfxBoolItem* pItem = pOutSet->GetItemIfSet( FID_VALID_BLANK ) )
+                            bBlank = pItem->GetValue();
+                        if ( const SfxInt16Item* pItem = pOutSet->GetItemIfSet( FID_VALID_LISTTYPE ) )
+                            nListType = pItem->GetValue();
 
-                        if ( pOutSet->GetItemState( FID_VALID_SHOWHELP, true, &pItem ) == SfxItemState::SET )
-                            bShowHelp = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pOutSet->GetItemState( FID_VALID_HELPTITLE, true, &pItem ) == SfxItemState::SET )
-                            aHelpTitle = static_cast<const SfxStringItem*>(pItem)->GetValue();
-                        if ( pOutSet->GetItemState( FID_VALID_HELPTEXT, true, &pItem ) == SfxItemState::SET )
-                            aHelpText = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                        if ( const SfxBoolItem* pItem = pOutSet->GetItemIfSet( FID_VALID_SHOWHELP ) )
+                            bShowHelp = pItem->GetValue();
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_HELPTITLE ) )
+                            aHelpTitle = pItem->GetValue();
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_HELPTEXT ) )
+                            aHelpText = pItem->GetValue();
 
-                        if ( pOutSet->GetItemState( FID_VALID_SHOWERR, true, &pItem ) == SfxItemState::SET )
-                            bShowError = static_cast<const SfxBoolItem*>(pItem)->GetValue();
-                        if ( pOutSet->GetItemState( FID_VALID_ERRSTYLE, true, &pItem ) == SfxItemState::SET )
-                            eErrStyle = static_cast<ScValidErrorStyle>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
-                        if ( pOutSet->GetItemState( FID_VALID_ERRTITLE, true, &pItem ) == SfxItemState::SET )
-                            aErrTitle = static_cast<const SfxStringItem*>(pItem)->GetValue();
-                        if ( pOutSet->GetItemState( FID_VALID_ERRTEXT, true, &pItem ) == SfxItemState::SET )
-                            aErrText = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                        if ( const SfxBoolItem* pItem = pOutSet->GetItemIfSet( FID_VALID_SHOWERR ) )
+                            bShowError = pItem->GetValue();
+                        if ( const SfxUInt16Item* pItem = pOutSet->GetItemIfSet( FID_VALID_ERRSTYLE ) )
+                            eErrStyle = static_cast<ScValidErrorStyle>(pItem->GetValue());
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_ERRTITLE ) )
+                            aErrTitle = pItem->GetValue();
+                        if ( const SfxStringItem* pItem = pOutSet->GetItemIfSet( FID_VALID_ERRTEXT ) )
+                            aErrText = pItem->GetValue();
 
                         ScValidationData aData( eMode, eOper, aExpr1, aExpr2, rDoc, aCursorPos );
                         aData.SetIgnoreBlank( bBlank );

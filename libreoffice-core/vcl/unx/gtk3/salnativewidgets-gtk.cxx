@@ -1802,7 +1802,7 @@ bool GtkSalGraphics::drawNativeControl( ControlType nType, ControlPart nPart, co
         return false;
     }
 
-    cairo_t *cr = getCairoContext(false);
+    cairo_t *cr = getCairoContext();
     clipRegion(cr);
     cairo_translate(cr, rControlRegion.Left(), rControlRegion.Top());
 
@@ -2306,6 +2306,7 @@ bool GtkSalGraphics::updateSettings(AllSettings& rSettings)
     aStyleSet.SetButtonTextColor( aTextColor );
     aStyleSet.SetDefaultActionButtonTextColor(aTextColor);
     aStyleSet.SetActionButtonTextColor(aTextColor);
+    aStyleSet.SetListBoxWindowTextColor( aTextColor );
     aStyleSet.SetRadioCheckTextColor( aTextColor );
     aStyleSet.SetGroupTextColor( aTextColor );
     aStyleSet.SetLabelTextColor( aTextColor );
@@ -2412,6 +2413,8 @@ bool GtkSalGraphics::updateSettings(AllSettings& rSettings)
         ::Color aHighlightTextColor = getColor( text_color );
         aStyleSet.SetHighlightColor( aHighlightColor );
         aStyleSet.SetHighlightTextColor( aHighlightTextColor );
+        aStyleSet.SetListBoxWindowHighlightColor( aHighlightColor );
+        aStyleSet.SetListBoxWindowHighlightTextColor( aHighlightTextColor );
         // make active like highlight, except with a small contrast. Note, see
         // a GtkListBoxRow in a GtkStackSidebar for a gtk widget with a
         // difference between highlighted and highlighted with focus.
@@ -2419,12 +2422,19 @@ bool GtkSalGraphics::updateSettings(AllSettings& rSettings)
         aStyleSet.SetActiveColor( aHighlightColor );
         aStyleSet.SetActiveTextColor( aHighlightTextColor );
 
+        // warning color
+        GdkRGBA warning_color;
+        if (gtk_style_context_lookup_color(pCStyle, "warning_color", &warning_color))
+            aStyleSet.SetWarningColor(getColor(warning_color));
+
         // field background color
         style_context_set_state(pCStyle, GTK_STATE_FLAG_NORMAL);
         ::Color aBackFieldColor = style_context_get_background_color(pCStyle);
         aStyleSet.SetFieldColor( aBackFieldColor );
         // This baby is the default page/paper color
         aStyleSet.SetWindowColor( aBackFieldColor );
+        // listbox background color
+        aStyleSet.SetListBoxWindowBackgroundColor( aBackFieldColor );
 
 #if GTK_CHECK_VERSION(4, 0, 0)
         double caretAspectRatio = 0.04f;
@@ -2819,6 +2829,9 @@ void GtkSalData::initNWF()
     pSVData->maNWFData.mbNoFocusRects = true;
     pSVData->maNWFData.mbNoFocusRectsForFlatButtons = true;
     pSVData->maNWFData.mbAutoAccel = true;
+#if GTK_CHECK_VERSION(4, 0, 0)
+    pSVData->maNWFData.mbNoFrameJunctionForPopups = true;
+#endif
 
 #if defined(GDK_WINDOWING_WAYLAND)
     //gnome#768128 for the car crash that is wayland

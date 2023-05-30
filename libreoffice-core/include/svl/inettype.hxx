@@ -103,7 +103,6 @@ inline constexpr OUStringLiteral CONTENT_TYPE_STR_IMAGE_PCX = u"image/pcx";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_IMAGE_PNG = u"image/png";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_IMAGE_TIFF = u"image/tiff";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_IMAGE_BMP = u"image/x-MS-bmp";
-inline constexpr OUStringLiteral CONTENT_TYPE_STR_IMAGE_WEBP = u"image/webp";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_INET_MSG_RFC822 = u"message/rfc822";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_INET_MULTI_ALTERNATIVE = u"multipart/alternative";
 inline constexpr OUStringLiteral CONTENT_TYPE_STR_INET_MULTI_DIGEST = u"multipart/digest";
@@ -250,9 +249,9 @@ public:
 
     static INetContentType GetContentType4Extension(OUString const& rExtension);
 
-    static INetContentType GetContentTypeFromURL(OUString const& rURL);
+    static INetContentType GetContentTypeFromURL(std::u16string_view aURL);
 
-    static bool GetExtensionFromURL(OUString const& rURL, OUString& rExtension);
+    static bool GetExtensionFromURL(std::u16string_view rURL, OUString& rExtension);
 
     static bool parse(OUString const& rMediaType, OUString& rType, OUString& rSubType,
                       INetContentTypeParameterList* pParameters = nullptr);

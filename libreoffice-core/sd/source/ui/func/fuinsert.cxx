@@ -21,18 +21,21 @@
 
 #include <fuinsert.hxx>
 #include <comphelper/storagehelper.hxx>
-#include <editeng/outlobj.hxx>
+#include <comphelper/propertysequence.hxx>
+#include <editeng/sizeitem.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <svx/svxdlg.hxx>
+#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/embed/EmbedVerbs.hpp>
 #include <com/sun/star/embed/NoVisualAreaSizeException.hpp>
 #include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
+#include <com/sun/star/frame/XDispatchProvider.hpp>
+#include <com/sun/star/media/XPlayer.hpp>
 
 #include <svl/stritem.hxx>
-#include <sfx2/docfile.hxx>
+#include <sfx2/dispatch.hxx>
 #include <sfx2/msgpool.hxx>
 #include <sfx2/msg.hxx>
 #include <svtools/insdlg.hxx>
@@ -67,7 +70,6 @@
 #include <sdpage.hxx>
 #include <sdgrffilter.hxx>
 #include <vcl/svapp.hxx>
-#include <memory>
 #include <vcl/weld.hxx>
 #include <vcl/errinf.hxx>
 #include <vcl/graphicfilter.hxx>
@@ -119,8 +121,8 @@ void FuInsertGraphic::DoExecute( SfxRequest& rReq )
         aFileName = static_cast<const SfxStringItem*>(pItem)->GetValue();
 
         OUString aFilterName;
-        if ( pArgs->GetItemState( FN_PARAM_FILTER, true, &pItem ) == SfxItemState::SET )
-            aFilterName = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        if ( const SfxStringItem* pFilterItem = pArgs->GetItemIfSet( FN_PARAM_FILTER ) )
+            aFilterName = pFilterItem->GetValue();
 
         if ( pArgs->GetItemState( FN_PARAM_1, true, &pItem ) == SfxItemState::SET )
             bAsLink = static_cast<const SfxBoolItem*>(pItem)->GetValue();
@@ -353,7 +355,7 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                 aRect = ::tools::Rectangle(aPos, aSize);
             }
 
-            SdrOle2Obj* pOleObj = new SdrOle2Obj(
+            rtl::Reference<SdrOle2Obj> pOleObj = new SdrOle2Obj(
                 mpView->getSdrModelFromSdrView(),
                 svt::EmbeddedObjectRef( xObj, nAspect ),
                 aObjName,
@@ -366,7 +368,7 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                 SdPage* pPage = static_cast< SdPage* >(pPickObj->getSdrPageFromSdrObject());
                 if(pPage && pPage->IsPresObj(pPickObj))
                 {
-                    pPage->InsertPresObj( pOleObj, ePresObjKind );
+                    pPage->InsertPresObj( pOleObj.get(), ePresObjKind );
                     pOleObj->SetUserCall(pPickObj->GetUserCall());
                 }
 
@@ -381,9 +383,9 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
 
             bool bRet = true;
             if( pPickObj )
-                mpView->ReplaceObjectAtView(pPickObj, *pPV, pOleObj );
+                mpView->ReplaceObjectAtView(pPickObj, *pPV, pOleObj.get() );
             else
-                bRet = mpView->InsertObjectAtView(pOleObj, *pPV, SdrInsertFlags::SETDEFLAYER);
+                bRet = mpView->InsertObjectAtView(pOleObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER);
 
             if (bRet && !comphelper::LibreOfficeKit::isActive())
             {
@@ -408,7 +410,7 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                 aVisualSize.Width = aTmp.Width();
                 aVisualSize.Height = aTmp.Height();
                 xObj->setVisualAreaSize( nAspect, aVisualSize );
-                mpViewShell->ActivateObject(pOleObj, embed::EmbedVerbs::MS_OLEVERB_SHOW);
+                mpViewShell->ActivateObject(pOleObj.get(), embed::EmbedVerbs::MS_OLEVERB_SHOW);
 
                 if (nSlotId == SID_INSERT_DIAGRAM)
                 {
@@ -535,7 +537,7 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                         SdrObject* pObj = pMark->GetMarkedSdrObj();
 
                         if (pObj->GetObjInventor() == SdrInventor::Default &&
-                        pObj->GetObjIdentifier() == OBJ_OLE2)
+                            pObj->GetObjIdentifier() == SdrObjKind::OLE2)
                         {
                             if ( !static_cast<SdrOle2Obj*>(pObj)->GetObjRef().is() )
                             {
@@ -583,13 +585,13 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                     Point aPnt ((aPageSize.Width()  - aSize.Width())  / 2,
                         (aPageSize.Height() - aSize.Height()) / 2);
                     ::tools::Rectangle aRect (aPnt, aSize);
-                    SdrOle2Obj* pObj = new SdrOle2Obj(
+                    rtl::Reference<SdrOle2Obj> pObj = new SdrOle2Obj(
                         mpView->getSdrModelFromSdrView(),
                         aObjRef,
                         aName,
                         aRect);
 
-                    if( mpView->InsertObjectAtView(pObj, *pPV, SdrInsertFlags::SETDEFLAYER) )
+                    if( mpView->InsertObjectAtView(pObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER) )
                     {
                         //  Math objects change their object size during InsertObject.
                         //  New size must be set in SdrObject, or a wrong scale will be set at
@@ -624,7 +626,7 @@ void FuInsertOLE::DoExecute( SfxRequest& rReq )
                                 xObj->setVisualAreaSize( nAspect, aSz );
                             }
 
-                            mpViewShell->ActivateObject(pObj, embed::EmbedVerbs::MS_OLEVERB_SHOW);
+                            mpViewShell->ActivateObject(pObj.get(), embed::EmbedVerbs::MS_OLEVERB_SHOW);
                         }
 
                         Size aVisSizePixel = mpWindow->GetOutputSizePixel();
@@ -667,6 +669,11 @@ void FuInsertAVMedia::DoExecute( SfxRequest& rReq )
     const SfxItemSet*   pReqArgs = rReq.GetArgs();
     bool                bAPI = false;
 
+    const SvxSizeItem* pSizeItem = rReq.GetArg<SvxSizeItem>(FN_PARAM_1);
+    const SfxBoolItem* pLinkItem = rReq.GetArg<SfxBoolItem>(FN_PARAM_2);
+    const bool bSizeUnknown = !pSizeItem;
+    Size aPrefSize;
+
     if( pReqArgs )
     {
         const SfxStringItem* pStringItem = dynamic_cast<const SfxStringItem*>( &pReqArgs->Get( rReq.GetSlot() )  );
@@ -678,57 +685,82 @@ void FuInsertAVMedia::DoExecute( SfxRequest& rReq )
         }
     }
 
-    bool bLink(true);
+    bool bLink(pLinkItem ? pLinkItem->GetValue() : true);
     if (!(bAPI
         || ::avmedia::MediaWindow::executeMediaURLDialog(mpWindow ? mpWindow->GetFrameWeld() : nullptr, aURL, & bLink)
        ))
         return;
 
-    Size aPrefSize;
-
-    if( mpWindow )
-        mpWindow->EnterWait();
-
-    if( !::avmedia::MediaWindow::isMediaURL( aURL, "", true, &aPrefSize ) )
+    if (!bSizeUnknown)
     {
-        if( mpWindow )
-            mpWindow->LeaveWait();
-
-        if( !bAPI )
-            ::avmedia::MediaWindow::executeFormatErrorBox(mpWindow->GetFrameWeld());
+        aPrefSize = pSizeItem->GetSize();
     }
     else
     {
-        Point       aPos;
-        Size        aSize;
-        sal_Int8    nAction = DND_ACTION_COPY;
-
-        if( aPrefSize.Width() && aPrefSize.Height() )
-        {
-            if( mpWindow )
-                aSize = mpWindow->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
-            else
-                aSize = Application::GetDefaultDevice()->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
-        }
-        else
-            aSize = Size( 5000, 5000 );
-
+        // If we don't have a size then try and find that out, the resulted might be deliver async, so dispatch a follow up
+        // effort to insert the video, this time with a size.
         if( mpWindow )
-        {
-            aPos = mpWindow->PixelToLogic( ::tools::Rectangle( aPos, mpWindow->GetOutputSizePixel() ).Center() );
-            aPos.AdjustX( -(aSize.Width() >> 1) );
-            aPos.AdjustY( -(aSize.Height() >> 1) );
-        }
+            mpWindow->EnterWait();
 
-        mpView->InsertMediaURL( aURL, nAction, aPos, aSize, bLink ) ;
+        css::uno::Reference<css::frame::XDispatchProvider> xDispatchProvider(mpViewShell->GetViewFrame()->GetFrame().GetFrameInterface(), css::uno::UNO_QUERY);
+
+        rtl::Reference<avmedia::PlayerListener> xPlayerListener(new avmedia::PlayerListener(
+            [xDispatchProvider, aURL, bLink](const css::uno::Reference<css::media::XPlayer>& rPlayer){
+                css::awt::Size aSize = rPlayer->getPreferredPlayerWindowSize();
+                avmedia::MediaWindow::dispatchInsertAVMedia(xDispatchProvider, aSize, aURL, bLink);
+            }));
+
+        const bool bIsMediaURL = ::avmedia::MediaWindow::isMediaURL(aURL, "", true, xPlayerListener);
 
         if( mpWindow )
             mpWindow->LeaveWait();
+
+        if (!bIsMediaURL && !bAPI)
+            ::avmedia::MediaWindow::executeFormatErrorBox(mpWindow->GetFrameWeld());
+
+        return;
     }
+
+    InsertMediaURL(aURL, aPrefSize, bLink);
+
 #else
     (void)rReq;
 #endif
 }
+
+#if HAVE_FEATURE_AVMEDIA
+void FuInsertAVMedia::InsertMediaURL(const OUString& rURL, const Size& rPrefSize, bool bLink)
+{
+    if( mpWindow )
+        mpWindow->EnterWait();
+
+    Point       aPos;
+    Size        aSize;
+    sal_Int8    nAction = DND_ACTION_COPY;
+
+    if (rPrefSize.Width() && rPrefSize.Height())
+    {
+        if( mpWindow )
+            aSize = mpWindow->PixelToLogic(rPrefSize, MapMode(MapUnit::Map100thMM));
+        else
+            aSize = Application::GetDefaultDevice()->PixelToLogic(rPrefSize, MapMode(MapUnit::Map100thMM));
+    }
+    else
+        aSize = Size( 5000, 5000 );
+
+    if( mpWindow )
+    {
+        aPos = mpWindow->PixelToLogic( ::tools::Rectangle( aPos, mpWindow->GetOutputSizePixel() ).Center() );
+        aPos.AdjustX( -(aSize.Width() >> 1) );
+        aPos.AdjustY( -(aSize.Height() >> 1) );
+    }
+
+    mpView->InsertMediaURL(rURL, nAction, aPos, aSize, bLink);
+
+    if( mpWindow )
+        mpWindow->LeaveWait();
+}
+#endif
 
 } // end of namespace sd
 

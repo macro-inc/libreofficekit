@@ -28,6 +28,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
 #include <oox/token/properties.hxx>
+#include <utility>
 
 using namespace oox::core;
 using namespace ::com::sun::star;
@@ -37,9 +38,9 @@ using namespace ::com::sun::star::text;
 namespace oox::ppt {
 
 // CT_Shape
-PPTGraphicShapeContext::PPTGraphicShapeContext( ContextHandler2Helper const & rParent, const SlidePersistPtr& rSlidePersistPtr, const oox::drawingml::ShapePtr& pMasterShapePtr, const oox::drawingml::ShapePtr& pShapePtr )
+PPTGraphicShapeContext::PPTGraphicShapeContext( ContextHandler2Helper const & rParent, SlidePersistPtr pSlidePersistPtr, const oox::drawingml::ShapePtr& pMasterShapePtr, const oox::drawingml::ShapePtr& pShapePtr )
 : oox::drawingml::GraphicShapeContext( rParent, pMasterShapePtr, pShapePtr )
-, mpSlidePersistPtr( rSlidePersistPtr )
+, mpSlidePersistPtr(std::move( pSlidePersistPtr ))
 {
 }
 
@@ -51,14 +52,14 @@ ContextHandlerRef PPTGraphicShapeContext::onCreateContext( sal_Int32 aElementTok
 //  case NMSP_PPT|XML_drElemPr:
 //      break;
     case PPT_TOKEN(cNvPr):
-        mpShapePtr->setId( rAttribs.getString( XML_id ).get() );
-        mpShapePtr->setName( rAttribs.getString( XML_name ).get() );
+        mpShapePtr->setId( rAttribs.getStringDefaulted( XML_id ) );
+        mpShapePtr->setName( rAttribs.getStringDefaulted( XML_name ) );
         break;
     case PPT_TOKEN(ph):
     {
         sal_Int32 nSubType( rAttribs.getToken( XML_type, XML_obj ) );
         mpShapePtr->setSubType( nSubType );
-        OUString sIdx( rAttribs.getString( XML_idx ).get() );
+        OUString sIdx( rAttribs.getStringDefaulted( XML_idx ) );
         bool bHasIdx = !sIdx.isEmpty();
         sal_Int32 nIdx = sIdx.toInt32();
         if( rAttribs.hasAttribute( XML_idx ) )

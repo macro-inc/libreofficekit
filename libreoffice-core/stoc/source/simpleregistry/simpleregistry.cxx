@@ -21,12 +21,13 @@
 
 #include <cstdlib>
 #include <mutex>
+#include <optional>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/registry/InvalidRegistryException.hpp>
 #include <com/sun/star/registry/InvalidValueException.hpp>
-#include <com/sun/star/registry/MergeConflictException.hpp>
 #include <com/sun/star/registry/RegistryKeyType.hpp>
 #include <com/sun/star/registry/XRegistryKey.hpp>
 #include <com/sun/star/registry/XSimpleRegistry.hpp>
@@ -58,7 +59,12 @@ class SimpleRegistry:
         css::registry::XSimpleRegistry, css::lang::XServiceInfo >
 {
 public:
-    SimpleRegistry() {}
+    SimpleRegistry(): registry_(Registry()) {}
+
+    ~SimpleRegistry() {
+        std::scoped_lock guard(mutex_);
+        registry_.reset();
+    }
 
     std::mutex mutex_;
 
@@ -95,15 +101,20 @@ private:
         return names;
     }
 
-    Registry registry_;
+    std::optional<Registry> registry_;
 };
 
 class Key: public cppu::WeakImplHelper< css::registry::XRegistryKey > {
 public:
     Key(
-        rtl::Reference< SimpleRegistry > const & registry,
+        rtl::Reference< SimpleRegistry > registry,
         RegistryKey const & key):
-        registry_(registry), key_(key) {}
+        registry_(std::move(registry)), key_(key) {}
+
+    ~Key() {
+        std::scoped_lock guard(registry_->mutex_);
+        key_.reset();
+    }
 
 private:
     virtual OUString SAL_CALL getKeyName() override;
@@ -175,23 +186,23 @@ private:
     virtual OUString SAL_CALL getResolvedName(OUString const & aKeyName) override;
 
     rtl::Reference< SimpleRegistry > registry_;
-    RegistryKey key_;
+    std::optional<RegistryKey> key_;
 };
 
 OUString Key::getKeyName() {
     std::scoped_lock guard(registry_->mutex_);
-    return key_.getName();
+    return key_->getName();
 }
 
 sal_Bool Key::isReadOnly()
 {
     std::scoped_lock guard(registry_->mutex_);
-    return key_.isReadOnly();
+    return key_->isReadOnly();
 }
 
 sal_Bool Key::isValid() {
     std::scoped_lock guard(registry_->mutex_);
-    return key_.isValid();
+    return key_->isValid();
 }
 
 css::registry::RegistryKeyType Key::getKeyType(OUString const & )
@@ -204,7 +215,7 @@ css::registry::RegistryValueType Key::getValueType()
     std::scoped_lock guard(registry_->mutex_);
     RegValueType type;
     sal_uInt32 size;
-    RegError err = key_.getValueInfo(OUString(), &type, &size);
+    RegError err = key_->getValueInfo(OUString(), &type, &size);
     switch (err) {
     case RegError::NO_ERROR:
         break;
@@ -244,7 +255,7 @@ sal_Int32 Key::getLongValue()
 {
     std::scoped_lock guard(registry_->mutex_);
     sal_Int32 value;
-    RegError err = key_.getValue(OUString(), &value);
+    RegError err = key_->getValue(OUString(), &value);
     switch (err) {
     case RegError::NO_ERROR:
         break;
@@ -265,7 +276,7 @@ sal_Int32 Key::getLongValue()
 void Key::setLongValue(sal_Int32 value)
 {
     std::scoped_lock guard(registry_->mutex_);
-    RegError err = key_.setValue(
+    RegError err = key_->setValue(
         OUString(), RegValueType::LONG, &value, sizeof (sal_Int32));
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
@@ -279,7 +290,7 @@ css::uno::Sequence< sal_Int32 > Key::getLongListValue()
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryValueList< sal_Int32 > list;
-    RegError err = key_.getLongListValue(OUString(), list);
+    RegError err = key_->getLongListValue(OUString(), list);
     switch (err) {
     case RegError::NO_ERROR:
         break;
@@ -315,9 +326,8 @@ css::uno::Sequence< sal_Int32 > Key::getLongListValue()
 void Key::setLongListValue(css::uno::Sequence< sal_Int32 > const & seqValue)
 {
     std::scoped_lock guard(registry_->mutex_);
-    auto list = comphelper::sequenceToContainer<std::vector<sal_Int32>>(seqValue);
-    RegError err = key_.setLongListValue(
-        OUString(), list.data(), static_cast< sal_uInt32 >(list.size()));
+    RegError err = key_->setLongListValue(
+        OUString(), seqValue.getConstArray(), static_cast< sal_uInt32 >(seqValue.getLength()));
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key setLongListValue:"
@@ -331,7 +341,7 @@ OUString Key::getAsciiValue()
     std::scoped_lock guard(registry_->mutex_);
     RegValueType type;
     sal_uInt32 size;
-    RegError err = key_.getValueInfo(OUString(), &type, &size);
+    RegError err = key_->getValueInfo(OUString(), &type, &size);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getAsciiValue:"
@@ -359,7 +369,7 @@ OUString Key::getAsciiValue()
             static_cast< OWeakObject * >(this));
     }
     std::vector< char > list(size);
-    err = key_.getValue(OUString(), list.data());
+    err = key_->getValue(OUString(), list.data());
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getAsciiValue:"
@@ -403,7 +413,7 @@ void Key::setAsciiValue(OUString const & value)
             " value not UTF-16",
             static_cast< OWeakObject * >(this));
     }
-    RegError err = key_.setValue(
+    RegError err = key_->setValue(
         OUString(), RegValueType::STRING,
         const_cast< char * >(utf8.getStr()), utf8.getLength() + 1);
         // +1 for terminating null (error in underlying registry.cxx)
@@ -419,7 +429,7 @@ css::uno::Sequence< OUString > Key::getAsciiListValue()
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryValueList< char * > list;
-    RegError err = key_.getStringListValue(OUString(), list);
+    RegError err = key_->getStringListValue(OUString(), list);
     switch (err) {
     case RegError::NO_ERROR:
         break;
@@ -492,7 +502,7 @@ void Key::setAsciiListValue(
     {
         list2.push_back(const_cast< char * >(rItem.getStr()));
     }
-    RegError err = key_.setStringListValue(
+    RegError err = key_->setStringListValue(
         OUString(), list2.data(), static_cast< sal_uInt32 >(list2.size()));
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
@@ -508,7 +518,7 @@ OUString Key::getStringValue()
     std::scoped_lock guard(registry_->mutex_);
     RegValueType type;
     sal_uInt32 size;
-    RegError err = key_.getValueInfo(OUString(), &type, &size);
+    RegError err = key_->getValueInfo(OUString(), &type, &size);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getStringValue:"
@@ -537,7 +547,7 @@ OUString Key::getStringValue()
             static_cast< OWeakObject * >(this));
     }
     std::vector< sal_Unicode > list(size);
-    err = key_.getValue(OUString(), list.data());
+    err = key_->getValue(OUString(), list.data());
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getStringValue:"
@@ -557,7 +567,7 @@ OUString Key::getStringValue()
 void Key::setStringValue(OUString const & value)
 {
     std::scoped_lock guard(registry_->mutex_);
-    RegError err = key_.setValue(
+    RegError err = key_->setValue(
         OUString(), RegValueType::UNICODE,
         const_cast< sal_Unicode * >(value.getStr()),
         (value.getLength() + 1) * sizeof (sal_Unicode));
@@ -574,7 +584,7 @@ css::uno::Sequence< OUString > Key::getStringListValue()
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryValueList< sal_Unicode * > list;
-    RegError err = key_.getUnicodeListValue(OUString(), list);
+    RegError err = key_->getUnicodeListValue(OUString(), list);
     switch (err) {
     case RegError::NO_ERROR:
         break;
@@ -617,7 +627,7 @@ void Key::setStringListValue(
     list.reserve(seqValue.getLength());
     std::transform(seqValue.begin(), seqValue.end(), std::back_inserter(list),
         [](const OUString& rValue) -> sal_Unicode* { return const_cast<sal_Unicode*>(rValue.getStr()); });
-    RegError err = key_.setUnicodeListValue(
+    RegError err = key_->setUnicodeListValue(
         OUString(), list.data(), static_cast< sal_uInt32 >(list.size()));
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
@@ -633,7 +643,7 @@ css::uno::Sequence< sal_Int8 > Key::getBinaryValue()
     std::scoped_lock guard(registry_->mutex_);
     RegValueType type;
     sal_uInt32 size;
-    RegError err = key_.getValueInfo(OUString(), &type, &size);
+    RegError err = key_->getValueInfo(OUString(), &type, &size);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getBinaryValue:"
@@ -653,7 +663,7 @@ css::uno::Sequence< sal_Int8 > Key::getBinaryValue()
             static_cast< OWeakObject * >(this));
     }
     css::uno::Sequence< sal_Int8 > value(static_cast< sal_Int32 >(size));
-    err = key_.getValue(OUString(), value.getArray());
+    err = key_->getValue(OUString(), value.getArray());
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getBinaryValue:"
@@ -666,7 +676,7 @@ css::uno::Sequence< sal_Int8 > Key::getBinaryValue()
 void Key::setBinaryValue(css::uno::Sequence< sal_Int8 > const & value)
 {
     std::scoped_lock guard(registry_->mutex_);
-    RegError err = key_.setValue(
+    RegError err = key_->setValue(
         OUString(), RegValueType::BINARY,
         const_cast< sal_Int8 * >(value.getConstArray()),
         static_cast< sal_uInt32 >(value.getLength()));
@@ -683,7 +693,7 @@ css::uno::Reference< css::registry::XRegistryKey > Key::openKey(
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryKey key;
-    RegError err = key_.openKey(aKeyName, key);
+    RegError err = key_->openKey(aKeyName, key);
     switch (err) {
     case RegError::NO_ERROR:
         return new Key(registry_, key);
@@ -702,7 +712,7 @@ css::uno::Reference< css::registry::XRegistryKey > Key::createKey(
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryKey key;
-    RegError err = key_.createKey(aKeyName, key);
+    RegError err = key_->createKey(aKeyName, key);
     switch (err) {
     case RegError::NO_ERROR:
         return new Key(registry_, key);
@@ -719,7 +729,7 @@ css::uno::Reference< css::registry::XRegistryKey > Key::createKey(
 void Key::closeKey()
 {
     std::scoped_lock guard(registry_->mutex_);
-    RegError err = key_.closeKey();
+    RegError err = key_->closeKey();
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key closeKey:"
@@ -731,7 +741,7 @@ void Key::closeKey()
 void Key::deleteKey(OUString const & rKeyName)
 {
     std::scoped_lock guard(registry_->mutex_);
-    RegError err = key_.deleteKey(rKeyName);
+    RegError err = key_->deleteKey(rKeyName);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key deleteKey:"
@@ -745,7 +755,7 @@ Key::openKeys()
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryKeyArray list;
-    RegError err = key_.openSubKeys(OUString(), list);
+    RegError err = key_->openSubKeys(OUString(), list);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key openKeys:"
@@ -773,7 +783,7 @@ css::uno::Sequence< OUString > Key::getKeyNames()
 {
     std::scoped_lock guard(registry_->mutex_);
     RegistryKeyNames list;
-    RegError err = key_.getKeyNames(OUString(), list);
+    RegError err = key_->getKeyNames(OUString(), list);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getKeyNames:"
@@ -821,7 +831,7 @@ OUString Key::getResolvedName(OUString const & aKeyName)
 {
     std::scoped_lock guard(registry_->mutex_);
     OUString resolved;
-    RegError err = key_.getResolvedKeyName(aKeyName, resolved);
+    RegError err = key_->getResolvedKeyName(aKeyName, resolved);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry key getResolvedName:"
@@ -833,7 +843,7 @@ OUString Key::getResolvedName(OUString const & aKeyName)
 
 OUString SimpleRegistry::getURL() {
     std::scoped_lock guard(mutex_);
-    return registry_.getName();
+    return registry_->getName();
 }
 
 void SimpleRegistry::open(
@@ -842,9 +852,9 @@ void SimpleRegistry::open(
     std::scoped_lock guard(mutex_);
     RegError err = (rURL.isEmpty() && bCreate)
         ? RegError::REGISTRY_NOT_EXISTS
-        : registry_.open(rURL, bReadOnly ? RegAccessMode::READONLY : RegAccessMode::READWRITE);
+        : registry_->open(rURL, bReadOnly ? RegAccessMode::READONLY : RegAccessMode::READWRITE);
     if (err == RegError::REGISTRY_NOT_EXISTS && bCreate) {
-        err = registry_.create(rURL);
+        err = registry_->create(rURL);
     }
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
@@ -856,13 +866,13 @@ void SimpleRegistry::open(
 
 sal_Bool SimpleRegistry::isValid() {
     std::scoped_lock guard(mutex_);
-    return registry_.isValid();
+    return registry_->isValid();
 }
 
 void SimpleRegistry::close()
 {
     std::scoped_lock guard(mutex_);
-    RegError err = registry_.close();
+    RegError err = registry_->close();
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry.close:"
@@ -874,7 +884,7 @@ void SimpleRegistry::close()
 void SimpleRegistry::destroy()
 {
     std::scoped_lock guard(mutex_);
-    RegError err = registry_.destroy(OUString());
+    RegError err = registry_->destroy(OUString());
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry.destroy:"
@@ -887,7 +897,7 @@ css::uno::Reference< css::registry::XRegistryKey > SimpleRegistry::getRootKey()
 {
     std::scoped_lock guard(mutex_);
     RegistryKey root;
-    RegError err = registry_.openRootKey(root);
+    RegError err = registry_->openRootKey(root);
     if (err != RegError::NO_ERROR) {
         throw css::registry::InvalidRegistryException(
             "com.sun.star.registry.SimpleRegistry.getRootKey:"
@@ -900,33 +910,13 @@ css::uno::Reference< css::registry::XRegistryKey > SimpleRegistry::getRootKey()
 sal_Bool SimpleRegistry::isReadOnly()
 {
     std::scoped_lock guard(mutex_);
-    return registry_.isReadOnly();
+    return registry_->isReadOnly();
 }
 
 void SimpleRegistry::mergeKey(
-    OUString const & aKeyName, OUString const & aUrl)
+    OUString const &, OUString const &)
 {
-    std::scoped_lock guard(mutex_);
-    RegistryKey root;
-    RegError err = registry_.openRootKey(root);
-    if (err == RegError::NO_ERROR) {
-        err = registry_.mergeKey(root, aKeyName, aUrl, false);
-    }
-    switch (err) {
-    case RegError::NO_ERROR:
-    case RegError::MERGE_CONFLICT:
-        break;
-    case RegError::MERGE_ERROR:
-        throw css::registry::MergeConflictException(
-            "com.sun.star.registry.SimpleRegistry.mergeKey:"
-            " underlying Registry::mergeKey() = RegError::MERGE_ERROR",
-            static_cast< cppu::OWeakObject * >(this));
-    default:
-        throw css::registry::InvalidRegistryException(
-            "com.sun.star.registry.SimpleRegistry.mergeKey:"
-            " underlying Registry::getRootKey/mergeKey() = " + OUString::number(static_cast<int>(err)),
-            static_cast< OWeakObject * >(this));
-    }
+    throw css::uno::RuntimeException("css.registry.SimpleRegistry::mergeKey: not implemented");
 }
 
 }

@@ -104,17 +104,17 @@ namespace emfplushelper
         float penWidth;
         sal_Int32 startCap;
         sal_Int32 endCap;
-        sal_Int32 lineJoin;
-        float miterLimit;
+        basegfx::B2DLineJoin maLineJoin;
+        double fMiterMinimumAngle;
         sal_Int32 dashStyle;
         sal_Int32 dashCap;
         float dashOffset;
         std::vector<float> dashPattern;
         sal_Int32 alignment;
         std::vector<float> compoundArray;
-        sal_Int32 customStartCapLen;
+        sal_uInt32 customStartCapLen;
         std::unique_ptr<EMFPCustomLineCap> customStartCap;
-        sal_Int32 customEndCapLen;
+        sal_uInt32 customEndCapLen;
         std::unique_ptr<EMFPCustomLineCap> customEndCap;
 
         EMFPPen();
@@ -123,9 +123,7 @@ namespace emfplushelper
 
         void Read(SvStream& s, EmfPlusHelperData const & rR);
 
-        static sal_Int8 lcl_convertStrokeCap(sal_uInt32 nEmfStroke);
         drawinglayer::attribute::StrokeAttribute GetStrokeAttribute(const double aTransformation) const;
-        basegfx::B2DLineJoin GetLineJoinType() const;
     };
 }
 

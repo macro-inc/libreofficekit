@@ -26,6 +26,7 @@
 #include "tableundo.hxx"
 #include <svx/svdmodel.hxx>
 #include <svx/svdotable.hxx>
+#include <utility>
 
 
 using namespace ::com::sun::star::uno;
@@ -42,9 +43,9 @@ const sal_Int32 Property_OptimalHeight = 1;
 const sal_Int32 Property_IsVisible = 2;
 const sal_Int32 Property_IsStartOfNewPage = 3;
 
-TableRow::TableRow( const TableModelRef& xTableModel, sal_Int32 nRow, sal_Int32 nColumns )
+TableRow::TableRow( TableModelRef xTableModel, sal_Int32 nRow, sal_Int32 nColumns )
 : TableRowBase( getStaticPropertySetInfo() )
-, mxTableModel( xTableModel )
+, mxTableModel(std::move( xTableModel ))
 , mnRow( nRow )
 , mnHeight( 0 )
 , mbOptimalHeight( true )
@@ -112,7 +113,7 @@ void TableRow::insertColumns( sal_Int32 nIndex, sal_Int32 nCount, CellVector::it
         maCells.insert( maCells.begin() + nIndex, *pIter, (*pIter) + nCount );
     else
     {
-        maCells.reserve( maCells.size() + nCount );
+        maCells.reserve( std::max<size_t>(maCells.size() + nCount, maCells.size() * 2) );
         for ( sal_Int32 i = 0; i < nCount; i++ )
             maCells.insert( maCells.begin() + nIndex + i, mxTableModel->createCell() );
     }

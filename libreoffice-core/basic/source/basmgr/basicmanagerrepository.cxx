@@ -27,13 +27,14 @@
 #include <com/sun/star/document/XStorageBasedDocument.hpp>
 #include <com/sun/star/document/XEmbeddedScripts.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
+#include <o3tl/string_view.hxx>
 #include <svtools/ehdl.hxx>
 #include <svtools/sfxecode.hxx>
 #include <unotools/pathoptions.hxx>
 #include <svl/hint.hxx>
 #include <vcl/svapp.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/documentinfo.hxx>
@@ -42,6 +43,7 @@
 #include <sot/storage.hxx>
 
 #include <map>
+#include <mutex>
 
 
 namespace basic
@@ -206,8 +208,8 @@ namespace basic
     {
         tools::SvRef<SvRefBase>& repository = GetSbxData_Impl().mrImplRepository;
         {
-            static osl::Mutex aMutex;
-            osl::MutexGuard aGuard(aMutex);
+            static std::mutex aMutex;
+            std::unique_lock aGuard(aMutex);
             if (!repository)
                 repository = new ImplRepository;
         }
@@ -283,7 +285,7 @@ namespace basic
 
         // The first dir in the path as destination:
         OUString aFileName( aAppBasic.getName() );
-        aAppBasic = INetURLObject( aAppBasicDir.getToken(1, ';') );
+        aAppBasic = INetURLObject( o3tl::getToken(aAppBasicDir, 1, ';') );
         DBG_ASSERT(aAppBasic.GetProtocol() != INetProtocol::NotValid,
             OString("Invalid URL: \"" +
                     OUStringToOString(aAppBasicDir, osl_getThreadTextEncoding()) +
@@ -298,7 +300,7 @@ namespace basic
         // Dialog container
         rtl::Reference<SfxDialogLibraryContainer> pDialogCont = new SfxDialogLibraryContainer( Reference< XStorage >() );
 
-        LibraryContainerInfo aInfo( pBasicCont, pDialogCont, static_cast< OldBasicPassword* >( pBasicCont.get() ) );
+        LibraryContainerInfo aInfo( pBasicCont, pDialogCont, pBasicCont.get() );
         pBasicManager->SetLibraryContainerInfo( aInfo );
 
         // global constants
@@ -380,7 +382,7 @@ namespace basic
         try
         {
             // ensure there's a standard library in the basic container
-            OUString aStdLibName( "Standard" );
+            static constexpr OUStringLiteral aStdLibName( u"Standard" );
             if ( !_rxBasicLibraries->hasByName( aStdLibName ) )
             {
                 _rxBasicLibraries->createLibrary( aStdLibName );
@@ -429,7 +431,7 @@ namespace basic
 
             // Storage and BaseURL are only needed by binary documents!
             tools::SvRef<SotStorage> xDummyStor = new SotStorage( OUString() );
-            _out_rpBasicManager.reset(new BasicManager( *xDummyStor, OUString() /* TODO/LATER: xStorage */,
+            _out_rpBasicManager.reset(new BasicManager( *xDummyStor, u"" /* TODO/LATER: xStorage */,
                                                                 pAppBasic,
                                                                 &aAppBasicDir, true ));
             if ( !_out_rpBasicManager->GetErrors().empty() )
@@ -460,7 +462,7 @@ namespace basic
         }
 
         // knit the containers with the BasicManager
-        LibraryContainerInfo aInfo( xBasicLibs, xDialogLibs, dynamic_cast< OldBasicPassword* >( xBasicLibs.get() ) );
+        LibraryContainerInfo aInfo( xBasicLibs, xDialogLibs, dynamic_cast< SfxScriptLibraryContainer* >( xBasicLibs.get() ) );
         OSL_ENSURE( aInfo.mpOldBasicPassword, "ImplRepository::impl_createManagerForModel: wrong BasicLibraries implementation!" );
         _out_rpBasicManager->SetLibraryContainerInfo( aInfo );
 

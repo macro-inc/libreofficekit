@@ -129,29 +129,36 @@ class SdtBlockHelper
 {
 public:
     SdtBlockHelper()
-        : m_bHasId(false)
+        : m_nId(0)
         , m_bStartedSdt(false)
+        , m_bShowingPlaceHolder(false)
+        , m_nTabIndex(0)
         , m_nSdtPrToken(0)
     {}
 
-    bool m_bHasId;
+    sal_Int32 m_nId;
     bool m_bStartedSdt;
     rtl::Reference<sax_fastparser::FastAttributeList> m_pTokenChildren;
     rtl::Reference<sax_fastparser::FastAttributeList> m_pTokenAttributes;
     rtl::Reference<sax_fastparser::FastAttributeList> m_pTextAttrs;
     rtl::Reference<sax_fastparser::FastAttributeList> m_pDataBindingAttrs;
     OUString m_aColor;
+    OUString m_aAppearance;
     OUString m_aPlaceHolderDocPart;
+    bool m_bShowingPlaceHolder;
     OUString m_aAlias;
+    OUString m_aTag;
+    sal_Int32 m_nTabIndex;
+    OUString m_aLock;
     sal_Int32 m_nSdtPrToken;
 
     void DeleteAndResetTheLists();
 
-    void WriteSdtBlock(::sax_fastparser::FSHelperPtr& pSerializer, bool bRunTextIsOn, bool bParagraphHasDrawing);
-    void WriteExtraParams(::sax_fastparser::FSHelperPtr& pSerializer);
+    void WriteSdtBlock(const ::sax_fastparser::FSHelperPtr& pSerializer, bool bRunTextIsOn, bool bParagraphHasDrawing);
+    void WriteExtraParams(const ::sax_fastparser::FSHelperPtr& pSerializer);
 
     /// Closes a currently open SDT block.
-    void EndSdtBlock(::sax_fastparser::FSHelperPtr& pSerializer);
+    void EndSdtBlock(const ::sax_fastparser::FSHelperPtr& pSerializer);
 
     void GetSdtParamsFromGrabBag(const uno::Sequence<beans::PropertyValue>& aGrabBagSdt);
 };
@@ -229,12 +236,12 @@ public:
     ///
     /// Start of the tag that encloses the run, fills the info according to
     /// the value of pRedlineData.
-    void StartRedline( const SwRedlineData * pRedlineData );
+    void StartRedline( const SwRedlineData * pRedlineData, bool bLastRun );
 
     /// Output redlining.
     ///
     /// End of the tag that encloses the run.
-    void EndRedline( const SwRedlineData * pRedlineData );
+    void EndRedline( const SwRedlineData * pRedlineData, bool bLastRun );
 
     virtual void SetStateOfFlyFrame( FlyProcessingState nStateOfFlyFrame ) override;
     virtual void SetAnchorIsLinkedToNode( bool bAnchorLinkedToNode ) override;
@@ -287,7 +294,7 @@ public:
 
     /// Start of a style in the styles table.
     virtual void StartStyle( const OUString& rName, StyleType eType,
-            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nId,
+            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwId, sal_uInt16 nSlot,
             bool bAutoUpdate ) override;
 
     /// End of a style in the styles table.
@@ -400,7 +407,6 @@ public:
     void WriteBookmarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds, const SwRedlineData* pRedlineData = nullptr );
     void WriteFinalBookmarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds );
     void WriteAnnotationMarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds );
-    void PushRelIdCache();
     /// End possibly opened paragraph sdt block.
     void EndParaSdtBlock();
 
@@ -725,18 +731,9 @@ protected:
     /// Writes a clearing line break at the end of run properties, if there are any.
     void WriteLineBreak();
 
-    /// Reference to the export, where to get the data from
-    DocxExport &m_rExport;
-
-    /// Fast serializer to output the data
-    ::sax_fastparser::FSHelperPtr m_pSerializer;
-
-    /// DrawingML access
-    oox::drawingml::DrawingML &m_rDrawingML;
-
 private:
 
-    void DoWriteBookmarkTagStart(const OUString & bookmarkName);
+    void DoWriteBookmarkTagStart(std::u16string_view bookmarkName);
     void DoWriteBookmarkTagEnd(sal_Int32 nId);
     void DoWriteMoveRangeTagStart(const OString & bookmarkName,
             bool bFrom, const SwRedlineData* pRedlineData);
@@ -771,11 +768,20 @@ private:
     void WriteContentControlEnd();
 
     void StartField_Impl( const SwTextNode* pNode, sal_Int32 nPos, FieldInfos const & rInfos, bool bWriteRun = false );
-    void DoWriteCmd( const OUString& rCmd );
+    void DoWriteCmd( std::u16string_view rCmd );
     void CmdField_Impl( const SwTextNode* pNode, sal_Int32 nPos, FieldInfos const & rInfos, bool bWriteRun );
     void CmdEndField_Impl( const SwTextNode* pNode, sal_Int32 nPos, bool bWriteRun );
     void EndField_Impl( const SwTextNode* pNode, sal_Int32 nPos, FieldInfos& rInfos );
     void DoWriteFieldRunProperties( const SwTextNode* pNode, sal_Int32 nPos, bool bWriteCombChars = false );
+
+    /// Reference to the export, where to get the data from
+    DocxExport &m_rExport;
+
+    /// Fast serializer to output the data
+    ::sax_fastparser::FSHelperPtr m_pSerializer;
+
+    /// DrawingML access
+    oox::drawingml::DrawingML &m_rDrawingML;
 
     rtl::Reference<sax_fastparser::FastAttributeList> m_pFontsAttrList;
     rtl::Reference<sax_fastparser::FastAttributeList> m_pEastAsianLayoutAttrList;
@@ -868,6 +874,9 @@ private:
     /// Name of the last opened bookmark.
     OString m_sLastOpenedBookmark;
 
+    /// Set of ids of the saved bookmarks (used only for moveRange, yet)
+    std::unordered_set<sal_Int32> m_rSavedBookmarksIds;
+
     /// Maps of the annotation marks ids
     std::map<OString, sal_Int32> m_rOpenedAnnotationMarksIds;
 
@@ -912,7 +921,7 @@ private:
     bool m_closeHyperlinkInPreviousRun;
     bool m_startedHyperlink;
     // Count nested HyperLinks
-    sal_Int32 m_nHyperLinkCount;
+    std::stack<sal_Int32> m_nHyperLinkCount;
     sal_Int16 m_nFieldsInHyperlink;
 
     // If the exported numbering rule defines the outlines
@@ -927,14 +936,14 @@ private:
         Size size;
         const SdrObject* pSdrObj;
     };
-    std::unique_ptr< std::vector<PostponedGraphic> > m_pPostponedGraphic;
+    std::optional< std::vector<PostponedGraphic> > m_oPostponedGraphic;
     struct PostponedDiagram
     {
         PostponedDiagram( const SdrObject* o, const SwFrameFormat* frm ) : object( o ), frame( frm ) {};
         const SdrObject* object;
         const SwFrameFormat* frame;
     };
-    std::unique_ptr< std::vector<PostponedDiagram> > m_pPostponedDiagrams;
+    std::optional< std::vector<PostponedDiagram> > m_oPostponedDiagrams;
 
     struct PostponedDrawing
     {
@@ -942,8 +951,8 @@ private:
         const SdrObject* object;
         const SwFrameFormat* frame;
     };
-    std::unique_ptr< std::vector<PostponedDrawing> > m_pPostponedDMLDrawings;
-    std::unique_ptr< std::vector<PostponedDrawing> > m_pPostponedCustomShape;
+    std::optional< std::vector<PostponedDrawing> > m_oPostponedDMLDrawings;
+    std::optional< std::vector<PostponedDrawing> > m_oPostponedCustomShape;
 
     struct PostponedOLE
     {
@@ -952,7 +961,7 @@ private:
         const Size size;
         const SwFlyFrameFormat* frame;
     };
-    std::unique_ptr< std::vector<PostponedOLE> > m_pPostponedOLEs;
+    std::optional< std::vector<PostponedOLE> > m_oPostponedOLEs;
 
     struct PostponedMathObjects
     {
@@ -972,11 +981,19 @@ private:
     std::vector<PostponedChart> m_aPostponedCharts;
     std::vector<const SdrObject*> m_aPostponedFormControls;
     std::vector<PostponedDrawing> m_aPostponedActiveXControls;
-    const SwField* pendingPlaceholder;
+    const SwField* m_PendingPlaceholder;
 
+    enum class ParentStatus
+    {
+        None,
+        IsParent,
+        HasParent
+    };
     struct PostItDOCXData{
         sal_Int32 id;
         sal_Int32 lastParaId = 0; // [MS-DOCX] 2.5.3.1 CT_CommentEx needs paraId attribute
+        ParentStatus parentStatus = ParentStatus::None;
+        size_t parentIndex = 0;
     };
     /// Maps postit fields to ID's, used in commentRangeStart/End, commentReference and comment.xml.
     std::vector<std::pair<const SwPostItField*, PostItDOCXData>> m_postitFields;
@@ -992,13 +1009,13 @@ private:
 
     std::unique_ptr<TableReference> m_tableReference;
 
-    std::map< OUString, EmbeddedFontRef > fontFilesMap; // font file url to data
+    std::map< OUString, EmbeddedFontRef > m_FontFilesMap; // font file url to data
 
     // Remember first cell (used for default borders/margins) of each table
-    std::vector<ww8::WW8TableNodeInfoInner::Pointer_t> tableFirstCells;
+    std::vector<ww8::WW8TableNodeInfoInner::Pointer_t> m_TableFirstCells;
     // Remember last open and closed cells on each level
-    std::vector<sal_Int32> lastOpenCell;
-    std::vector<sal_Int32> lastClosedCell;
+    std::vector<sal_Int32> m_LastOpenCell;
+    std::vector<sal_Int32> m_LastClosedCell;
 
     std::optional<css::drawing::FillStyle> m_oFillStyle;
     /// If FormatBox() already handled fill style / gradient.
@@ -1011,15 +1028,6 @@ private:
     bool m_bParaBeforeAutoSpacing,m_bParaAfterAutoSpacing;
     // store hardcoded value which was set during import.
     sal_Int32 m_nParaBeforeSpacing,m_nParaAfterSpacing;
-
-    std::pair<OString, OUString> getExistingGraphicRelId(BitmapChecksum aChecksum);
-    void cacheGraphicRelId(BitmapChecksum nChecksum, OString const & rRelId, OUString const & rFileName);
-
-    /// RelId <-> Graphic* cache, so that in case of alternate content, the same graphic only gets written once.
-    std::stack< std::map<BitmapChecksum, std::pair<OString, OUString>> > m_aRelIdCache;
-
-    /// RelId <-> BitmapChecksum cache, similar to m_aRelIdCache, but used for non-Writer graphics, handled in oox.
-    std::stack< std::map<BitmapChecksum, std::pair<OUString, OUString>> > m_aSdrRelIdCache;
 
     SdtBlockHelper m_aParagraphSdt;
     SdtBlockHelper m_aRunSdt;
@@ -1062,8 +1070,8 @@ public:
     static void WriteFootnoteEndnotePr( ::sax_fastparser::FSHelperPtr const & fs, int tag, const SwEndNoteInfo& info, int listtag );
 
     bool HasPostitFields() const;
-    enum class hasResolved { no, yes };
-    hasResolved WritePostitFields();
+    enum class hasProperties { no, yes };
+    hasProperties WritePostitFields();
     void WritePostItFieldsResolved();
 
     /// VMLTextExport
@@ -1071,9 +1079,6 @@ public:
     virtual void WriteVMLTextBox(css::uno::Reference<css::drawing::XShape> xShape) override;
     /// DMLTextExport
     virtual void WriteTextBox(css::uno::Reference<css::drawing::XShape> xShape) override;
-    virtual OUString FindRelId(BitmapChecksum nChecksum) override;
-    virtual OUString FindFileName(BitmapChecksum nChecksum) override;
-    virtual void CacheRelId(BitmapChecksum nChecksum, const OUString& rRelId, const OUString& rFileName) override;
     virtual css::uno::Reference<css::text::XTextFrame> GetUnoTextFrame(
         css::uno::Reference<css::drawing::XShape> xShape) override;
     virtual oox::drawingml::DrawingML& GetDrawingML() override;
@@ -1092,6 +1097,32 @@ public:
     void pushToTableExportContext(DocxTableExportContext& rContext);
     /// Restores from the remembered state.
     void popFromTableExportContext(DocxTableExportContext const & rContext);
+
+    static OString convertToOOXMLHoriOrient(sal_Int16 nOrient, bool bIsPosToggle);
+    static OString convertToOOXMLVertOrient(sal_Int16 nOrient);
+    static OString convertToOOXMLVertOrientRel(sal_Int16 nOrientRel);
+    static OString convertToOOXMLHoriOrientRel(sal_Int16 nOrientRel);
+    static void ImplCellMargins( sax_fastparser::FSHelperPtr const & pSerializer, const SvxBoxItem& rBox, sal_Int32 tag, bool bUseStartEnd, const SvxBoxItem* pDefaultMargins = nullptr);
+    static void AddToAttrList(rtl::Reference<sax_fastparser::FastAttributeList>& pAttrList, sal_Int32 nAttrs, ...);
+    static void AddToAttrList(rtl::Reference<sax_fastparser::FastAttributeList>& pAttrList, sal_Int32 nAttrName, const char* sAttrValue);
+
+    static const sal_Int32 Tag_StartParagraph_1 = 1;
+    static const sal_Int32 Tag_StartParagraph_2 = 2;
+    static const sal_Int32 Tag_WriteSdtBlock = 3;
+    static const sal_Int32 Tag_StartParagraphProperties = 4;
+    static const sal_Int32 Tag_InitCollectedParagraphProperties = 5;
+    static const sal_Int32 Tag_StartRun_1 = 6;
+    static const sal_Int32 Tag_StartRun_2 = 7;
+    static const sal_Int32 Tag_StartRun_3 = 8;
+    static const sal_Int32 Tag_EndRun_1 = 9;
+    static const sal_Int32 Tag_EndRun_2 = 10;
+    static const sal_Int32 Tag_StartRunProperties = 11;
+    static const sal_Int32 Tag_InitCollectedRunProperties = 12;
+    static const sal_Int32 Tag_Redline_1 = 13;
+    static const sal_Int32 Tag_Redline_2 = 14;
+    static const sal_Int32 Tag_TableDefinition = 15;
+    static const sal_Int32 Tag_OutputFlyFrame = 16;
+    static const sal_Int32 Tag_StartSection = 17;
 };
 
 /**

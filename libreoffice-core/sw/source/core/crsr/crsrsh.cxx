@@ -17,7 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <memory>
+#include <config_wasm_strip.h>
+
 #include <com/sun/star/text/XTextRange.hpp>
 
 #include <hintids.hxx>
@@ -86,8 +87,7 @@ using namespace util;
  */
 static void CheckRange( SwCursor* pCurrentCursor )
 {
-    const SwPosition *pStt = pCurrentCursor->Start(),
-        *pEnd = pCurrentCursor->End();
+    auto [pStt, pEnd] = pCurrentCursor->StartEnd(); // SwPosition*
 
     SwPaM *pTmpDel = nullptr,
           *pTmp = pCurrentCursor->GetNext();
@@ -95,8 +95,7 @@ static void CheckRange( SwCursor* pCurrentCursor )
     // Search the complete ring
     while( pTmp != pCurrentCursor )
     {
-        const SwPosition *pTmpStt = pTmp->Start(),
-                        *pTmpEnd = pTmp->End();
+        auto [pTmpStt, pTmpEnd] = pTmp->StartEnd(); // SwPosition*
         if( *pStt <= *pTmpStt )
         {
             if( *pEnd > *pTmpStt ||
@@ -199,13 +198,13 @@ SwCursor* SwCursorShell::GetCursor( bool bMakeTableCursor ) const
         if( bMakeTableCursor && m_pTableCursor->IsCursorMovedUpdate() )
         {
             //don't re-create 'parked' cursors
-            if( m_pTableCursor->GetPoint()->nNode.GetIndex() &&
-                m_pTableCursor->GetMark()->nNode.GetIndex() )
+            if( m_pTableCursor->GetPoint()->GetNodeIndex() &&
+                m_pTableCursor->GetMark()->GetNodeIndex() )
             {
-                const SwContentNode* pCNd = m_pTableCursor->GetContentNode();
+                const SwContentNode* pCNd = m_pTableCursor->GetPointContentNode();
                 if( pCNd && pCNd->getLayoutFrame( GetLayout() ) )
                 {
-                    pCNd = m_pTableCursor->GetContentNode(false);
+                    pCNd = m_pTableCursor->GetMarkContentNode();
                     if( pCNd && pCNd->getLayoutFrame( GetLayout() ) )
                     {
                         SwShellTableCursor* pTC = m_pTableCursor;
@@ -229,9 +228,9 @@ void SwCursorShell::StartAction()
     if( !ActionPend() )
     {
         // save for update of the ribbon bar
-        const SwNode& rNd = m_pCurrentCursor->GetPoint()->nNode.GetNode();
+        const SwNode& rNd = m_pCurrentCursor->GetPoint()->GetNode();
         m_nCurrentNode = rNd.GetIndex();
-        m_nCurrentContent = m_pCurrentCursor->GetPoint()->nContent.GetIndex();
+        m_nCurrentContent = m_pCurrentCursor->GetPoint()->GetContentIndex();
         m_nCurrentNdTyp = rNd.GetNodeType();
         if( rNd.IsTextNode() )
             m_nLeftFramePos = SwCallLink::getLayoutFrame( GetLayout(), *rNd.GetTextNode(), m_nCurrentContent, true );
@@ -243,7 +242,7 @@ void SwCursorShell::StartAction()
 
 void SwCursorShell::EndAction( const bool bIdleEnd )
 {
-    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWithTable() && ExtendedSelectedAll());
+    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWith_() != StartsWith::None && ExtendedSelectedAll());
     bool bVis = m_bSVCursorVis;
 
     // Idle-formatting?
@@ -321,7 +320,7 @@ void SwCursorShell::EndCursorMove( const bool bIdleEnd )
 #endif
 }
 
-bool SwCursorShell::LeftRight( bool bLeft, sal_uInt16 nCnt, sal_uInt16 nMode,
+bool SwCursorShell::LeftRight( bool bLeft, sal_uInt16 nCnt, SwCursorSkipMode nMode,
                              bool bVisualAllowed )
 {
     if( IsTableMode() )
@@ -347,13 +346,13 @@ bool SwCursorShell::LeftRight( bool bLeft, sal_uInt16 nCnt, sal_uInt16 nMode,
     // 2. CASE: Cursor is at beginning of numbered paragraph. A move
     // to the left will simply set the bInFrontOfLabel flag:
     else if (bLeft
-        && pShellCursor->GetPoint()->nNode.GetNode().IsTextNode()
+        && pShellCursor->GetPoint()->GetNode().IsTextNode()
         && static_cast<SwTextFrame const*>(
-            pShellCursor->GetPoint()->nNode.GetNode().GetTextNode()->getLayoutFrame(GetLayout())
+            pShellCursor->GetPoint()->GetNode().GetTextNode()->getLayoutFrame(GetLayout())
             )->MapModelToViewPos(*pShellCursor->GetPoint()) == TextFrameIndex(0)
         && !pShellCursor->IsInFrontOfLabel()
         && !pShellCursor->HasMark()
-        && nullptr != (pTextNd = sw::GetParaPropsNode(*GetLayout(), pShellCursor->GetPoint()->nNode))
+        && nullptr != (pTextNd = sw::GetParaPropsNode(*GetLayout(), pShellCursor->GetPoint()->GetNode()))
         && pTextNd->HasVisibleNumberingOrBullet())
     {
         SetInFrontOfLabel( true );
@@ -407,7 +406,7 @@ void SwCursorShell::MarkListLevel( const OUString& sListId,
 void SwCursorShell::UpdateMarkedListLevel()
 {
     SwTextNode const*const pTextNd = sw::GetParaPropsNode(*GetLayout(),
-            GetCursor_()->GetPoint()->nNode);
+            GetCursor_()->GetPoint()->GetNode());
 
     if ( !pTextNd )
         return;
@@ -548,8 +547,8 @@ bool SwCursorShell::LRMargin( bool bLeft, bool bAPI)
 
     if ( bLeft && !bTableMode && bRet && bWasAtLM && !GetCursor_()->HasMark() )
     {
-        const SwTextNode * pTextNd = GetCursor_()->GetNode().GetTextNode();
-        assert(sw::GetParaPropsNode(*GetLayout(), GetCursor_()->GetPoint()->nNode) == pTextNd);
+        const SwTextNode * pTextNd = GetCursor_()->GetPointNode().GetTextNode();
+        assert(sw::GetParaPropsNode(*GetLayout(), GetCursor_()->GetPoint()->GetNode()) == pTextNd);
         if ( pTextNd && pTextNd->HasVisibleNumberingOrBullet() )
             SetInFrontOfLabel( true );
     }
@@ -596,18 +595,19 @@ void SwCursorShell::ExtendedSelectAll(bool bFootnotes)
 {
     SwNodes& rNodes = GetDoc()->GetNodes();
     SwPosition* pPos = m_pCurrentCursor->GetPoint();
-    pPos->nNode = bFootnotes ? rNodes.GetEndOfPostIts() : rNodes.GetEndOfAutotext();
-    pPos->nContent.Assign( rNodes.GoNext( &pPos->nNode ), 0 );
+    pPos->Assign( bFootnotes ? rNodes.GetEndOfPostIts() : rNodes.GetEndOfAutotext() );
+    rNodes.GoNext( pPos );
     pPos = m_pCurrentCursor->GetMark();
-    pPos->nNode = rNodes.GetEndOfContent();
-    SwContentNode* pCNd = SwNodes::GoPrevious( &pPos->nNode );
-    pPos->nContent.Assign( pCNd, pCNd ? pCNd->Len() : 0 );
+    pPos->Assign(rNodes.GetEndOfContent());
+    SwContentNode* pCNd = SwNodes::GoPrevious( pPos );
+    if (pCNd)
+        pPos->AssignEndIndex(*pCNd);
 }
 
 bool SwCursorShell::ExtendedSelectedAll()
 {
     SwNodes& rNodes = GetDoc()->GetNodes();
-    SwNodeIndex nNode = rNodes.GetEndOfAutotext();
+    SwNodeIndex nNode(rNodes.GetEndOfAutotext());
     SwContentNode* pStart = rNodes.GoNext(&nNode);
     if (!pStart)
         return false;
@@ -623,12 +623,26 @@ bool SwCursorShell::ExtendedSelectedAll()
     return aStart == *pShellCursor->Start() && aEnd == *pShellCursor->End();
 }
 
-bool SwCursorShell::StartsWithTable()
+typename SwCursorShell::StartsWith SwCursorShell::StartsWith_()
 {
     SwNodes& rNodes = GetDoc()->GetNodes();
     SwNodeIndex nNode(rNodes.GetEndOfExtras());
     SwContentNode* pContentNode = rNodes.GoNext(&nNode);
-    return pContentNode->FindTableNode();
+    if (pContentNode->FindTableNode())
+    {
+        return StartsWith::Table;
+    }
+    if (pContentNode->GetTextNode()->IsHidden())
+    {
+        return StartsWith::HiddenPara;
+    }
+    nNode = rNodes.GetEndOfContent();
+    pContentNode = SwNodes::GoPrevious(&nNode);
+    if (pContentNode->GetTextNode()->IsHidden())
+    {
+        return StartsWith::HiddenPara;
+    }
+    return StartsWith::None;
 }
 
 bool SwCursorShell::MovePage( SwWhichPage fnWhichPage, SwPosPage fnPosPage )
@@ -644,7 +658,7 @@ bool SwCursorShell::MovePage( SwWhichPage fnWhichPage, SwPosPage fnPosPage )
         SwCursorSaveState aSaveState( *m_pCurrentCursor );
         Point& rPt = m_pCurrentCursor->GetPtPos();
         std::pair<Point, bool> tmp(rPt, false);
-        SwContentFrame * pFrame = m_pCurrentCursor->GetContentNode()->
+        SwContentFrame * pFrame = m_pCurrentCursor->GetPointContentNode()->
             getLayoutFrame(GetLayout(), m_pCurrentCursor->GetPoint(), &tmp);
         if( pFrame && GetFrameInPage( pFrame, fnWhichPage, fnPosPage, m_pCurrentCursor ) &&
             !m_pCurrentCursor->IsSelOvr( SwCursorSelOverFlags::Toggle |
@@ -659,7 +673,7 @@ bool SwCursorShell::MovePage( SwWhichPage fnWhichPage, SwPosPage fnPosPage )
 
 bool SwCursorShell::isInHiddenTextFrame(SwShellCursor* pShellCursor)
 {
-    SwContentNode *pCNode = pShellCursor->GetContentNode();
+    SwContentNode *pCNode = pShellCursor->GetPointContentNode();
     std::pair<Point, bool> tmp(pShellCursor->GetPtPos(), false);
     SwContentFrame *const pFrame = pCNode
         ? pCNode->getLayoutFrame(GetLayout(), pShellCursor->GetPoint(), &tmp)
@@ -671,7 +685,7 @@ bool SwCursorShell::isInHiddenTextFrame(SwShellCursor* pShellCursor)
 static bool IsAtStartOrEndOfFrame(SwCursorShell const*const pShell,
     SwShellCursor const*const pShellCursor, SwMoveFnCollection const& fnPosPara)
 {
-    SwContentNode *const pCNode = pShellCursor->GetContentNode();
+    SwContentNode *const pCNode = pShellCursor->GetPointContentNode();
     assert(pCNode); // surely can't have moved otherwise?
     std::pair<Point, bool> tmp(pShellCursor->GetPtPos(), false);
     SwContentFrame const*const pFrame = pCNode->getLayoutFrame(
@@ -731,10 +745,10 @@ bool SwCursorShell::MoveSection( SwWhichSection fnWhichSect,
 
 // position cursor
 
-static SwFrame* lcl_IsInHeaderFooter( const SwNodeIndex& rIdx, Point& rPt )
+static SwFrame* lcl_IsInHeaderFooter( SwNode& rNd, Point& rPt )
 {
     SwFrame* pFrame = nullptr;
-    SwContentNode* pCNd = rIdx.GetNode().GetContentNode();
+    SwContentNode* pCNd = rNd.GetContentNode();
     if( pCNd )
     {
         std::pair<Point, bool> tmp(rPt, false);
@@ -752,7 +766,7 @@ static SwFrame* lcl_IsInHeaderFooter( const SwNodeIndex& rIdx, Point& rPt )
 bool SwCursorShell::IsInHeaderFooter( bool* pbInHeader ) const
 {
     Point aPt;
-    SwFrame* pFrame = ::lcl_IsInHeaderFooter( m_pCurrentCursor->GetPoint()->nNode, aPt );
+    SwFrame* pFrame = ::lcl_IsInHeaderFooter( m_pCurrentCursor->GetPoint()->GetNode(), aPt );
     if( pFrame && pbInHeader )
         *pbInHeader = pFrame->IsHeaderFrame();
     return nullptr != pFrame;
@@ -770,7 +784,7 @@ int SwCursorShell::SetCursor( const Point &rLPt, bool bOnlyText, bool bBlock )
                                     bOnlyText ?  CursorMoveState::SetOnlyText : CursorMoveState::NONE );
     aTmpState.m_bSetInReadOnly = IsReadOnlyAvailable();
 
-    SwTextNode const*const pTextNd = sw::GetParaPropsNode(*GetLayout(), pCursor->GetPoint()->nNode);
+    SwTextNode const*const pTextNd = sw::GetParaPropsNode(*GetLayout(), pCursor->GetPoint()->GetNode());
 
     if ( pTextNd && !IsTableMode() &&
         // #i37515# No bInFrontOfLabel during selection
@@ -796,9 +810,9 @@ int SwCursorShell::SetCursor( const Point &rLPt, bool bOnlyText, bool bBlock )
     if( CursorMoveState::RightMargin == aTmpState.m_eState )
         m_eMvState = CursorMoveState::RightMargin;
     // is the new position in header or footer?
-    SwFrame* pFrame = lcl_IsInHeaderFooter( aPos.nNode, aPt );
-    if( IsTableMode() && !pFrame && aPos.nNode.GetNode().StartOfSectionNode() ==
-        pCursor->GetPoint()->nNode.GetNode().StartOfSectionNode() )
+    SwFrame* pFrame = lcl_IsInHeaderFooter( aPos.GetNode(), aPt );
+    if( IsTableMode() && !pFrame && aPos.GetNode().StartOfSectionNode() ==
+        pCursor->GetPoint()->GetNode().StartOfSectionNode() )
         // same table column and not in header/footer -> back
         return bRet;
 
@@ -821,14 +835,14 @@ int SwCursorShell::SetCursor( const Point &rLPt, bool bOnlyText, bool bBlock )
                 if( pFrame->getFrameArea().Contains( rCurrentCursorPt ))
                     return bRet;
             }
-            else if( aPos.nNode.GetNode().IsContentNode() )
+            else if( aPos.GetNode().IsContentNode() )
             {
                 // in the same frame?
                 std::pair<Point, bool> tmp(m_aCharRect.Pos(), false);
-                SwFrame* pOld = static_cast<SwContentNode&>(aPos.nNode.GetNode()).getLayoutFrame(
+                SwFrame* pOld = static_cast<SwContentNode&>(aPos.GetNode()).getLayoutFrame(
                                 GetLayout(), nullptr, &tmp);
                 tmp.first = aPt;
-                SwFrame* pNew = static_cast<SwContentNode&>(aPos.nNode.GetNode()).getLayoutFrame(
+                SwFrame* pNew = static_cast<SwContentNode&>(aPos.GetNode()).getLayoutFrame(
                                 GetLayout(), nullptr, &tmp);
                 if( pNew == pOld )
                     return bRet;
@@ -838,7 +852,7 @@ int SwCursorShell::SetCursor( const Point &rLPt, bool bOnlyText, bool bBlock )
     else
     {
         // SSelection over not allowed sections or if in header/footer -> different
-        if( !CheckNodesRange( aPos.nNode, pCursor->GetMark()->nNode, true )
+        if( !CheckNodesRange( aPos.GetNode(), pCursor->GetMark()->GetNode(), true )
             || ( pFrame && !pFrame->getFrameArea().Contains( pCursor->GetMkPos() ) ))
             return bRet;
 
@@ -1079,14 +1093,14 @@ bool SwCursorShell::IsSelOnePara() const
     {
         return false;
     }
-    if (m_pCurrentCursor->GetPoint()->nNode == m_pCurrentCursor->GetMark()->nNode)
+    if (m_pCurrentCursor->GetPoint()->GetNode() == m_pCurrentCursor->GetMark()->GetNode())
     {
         return true;
     }
     if (GetLayout()->HasMergedParas())
     {
         SwContentFrame const*const pFrame(GetCurrFrame(false));
-        auto const n(m_pCurrentCursor->GetMark()->nNode.GetIndex());
+        auto const n(m_pCurrentCursor->GetMark()->GetNodeIndex());
         return FrameContainsNode(*pFrame, n);
     }
     return false;
@@ -1096,7 +1110,7 @@ bool SwCursorShell::IsSttPara() const
 {
     if (GetLayout()->HasMergedParas())
     {
-        SwTextNode const*const pNode(m_pCurrentCursor->GetPoint()->nNode.GetNode().GetTextNode());
+        SwTextNode const*const pNode(m_pCurrentCursor->GetPoint()->GetNode().GetTextNode());
         if (pNode)
         {
             SwTextFrame const*const pFrame(static_cast<SwTextFrame*>(
@@ -1108,14 +1122,14 @@ bool SwCursorShell::IsSttPara() const
             }
         }
     }
-    return m_pCurrentCursor->GetPoint()->nContent == 0;
+    return m_pCurrentCursor->GetPoint()->GetContentIndex() == 0;
 }
 
 bool SwCursorShell::IsEndPara() const
 {
     if (GetLayout()->HasMergedParas())
     {
-        SwTextNode const*const pNode(m_pCurrentCursor->GetPoint()->nNode.GetNode().GetTextNode());
+        SwTextNode const*const pNode(m_pCurrentCursor->GetPoint()->GetNode().GetTextNode());
         if (pNode)
         {
             SwTextFrame const*const pFrame(static_cast<SwTextFrame*>(
@@ -1127,7 +1141,7 @@ bool SwCursorShell::IsEndPara() const
             }
         }
     }
-    return m_pCurrentCursor->GetPoint()->nContent == m_pCurrentCursor->GetContentNode()->Len();
+    return m_pCurrentCursor->GetPoint()->GetContentIndex() == m_pCurrentCursor->GetPointContentNode()->Len();
 }
 
 bool SwCursorShell::IsEndOfTable() const
@@ -1145,12 +1159,12 @@ bool SwCursorShell::IsEndOfTable() const
     SwNodeIndex const lastNode(*pEndTableNode, -2);
     SAL_WARN_IF(!lastNode.GetNode().GetTextNode(), "sw.core",
             "text node expected");
-    return (lastNode == m_pCurrentCursor->GetPoint()->nNode);
+    return (lastNode == m_pCurrentCursor->GetPoint()->GetNode());
 }
 
 bool SwCursorShell::IsCursorInFootnote() const
 {
-    SwStartNodeType aStartNodeType = m_pCurrentCursor->GetNode().StartOfSectionNode()->GetStartNodeType();
+    SwStartNodeType aStartNodeType = m_pCurrentCursor->GetPointNode().StartOfSectionNode()->GetStartNodeType();
     return aStartNodeType == SwStartNodeType::SwFootnoteStartNode;
 }
 
@@ -1410,7 +1424,7 @@ void SwCursorShell::GoNextPrevCursorSetSearchLabel(const bool bNext)
 
 void SwCursorShell::Paint(vcl::RenderContext& rRenderContext, const tools::Rectangle &rRect)
 {
-    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWithTable() && ExtendedSelectedAll());
+    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWith_() != StartsWith::None && ExtendedSelectedAll());
     CurrShell aCurr( this );
 
     // always switch off all cursors when painting
@@ -1495,7 +1509,7 @@ void SwCursorShell::UpdateCursorPos()
     SwShellCursor* pShellCursor = getShellCursor( true );
     Size aOldSz( GetDocSize() );
 
-    if( isInHiddenTextFrame(pShellCursor) )
+    if (isInHiddenTextFrame(pShellCursor) && !ExtendedSelectedAll())
     {
         SwCursorMoveState aTmpState( CursorMoveState::NONE );
         aTmpState.m_bSetInReadOnly = IsReadOnlyAvailable();
@@ -1516,18 +1530,17 @@ void SwCursorShell::UpdateCursorPos()
 }
 
 // #i65475# - if Point/Mark in hidden sections, move them out
-static bool lcl_CheckHiddenSection( SwNodeIndex& rIdx )
+static bool lcl_CheckHiddenSection( SwPosition& rPos )
 {
     bool bOk = true;
-    const SwSectionNode* pSectNd = rIdx.GetNode().FindSectionNode();
+    const SwSectionNode* pSectNd = rPos.GetNode().FindSectionNode();
     if( pSectNd && pSectNd->GetSection().IsHiddenFlag() )
     {
-        SwNodeIndex aTmp( *pSectNd );
         const SwNode* pFrameNd =
-            rIdx.GetNodes().FindPrvNxtFrameNode( aTmp, pSectNd->EndOfSectionNode() );
+            rPos.GetNodes().FindPrvNxtFrameNode( *pSectNd, pSectNd->EndOfSectionNode() );
         bOk = pFrameNd != nullptr;
         SAL_WARN_IF(!bOk, "sw.core", "found no Node with Frames");
-        rIdx = aTmp;
+        rPos.Assign( *(bOk ? pFrameNd : pSectNd) );
     }
     return bOk;
 }
@@ -1535,7 +1548,7 @@ static bool lcl_CheckHiddenSection( SwNodeIndex& rIdx )
 /// Try to set the cursor to the next visible content node.
 static void lcl_CheckHiddenPara( SwPosition& rPos )
 {
-    SwNodeIndex aTmp( rPos.nNode );
+    SwNodeIndex aTmp( rPos.GetNode() );
     SwTextNode* pTextNd = aTmp.GetNode().GetTextNode();
     while( pTextNd && pTextNd->HasHiddenCharAttribute( true ) )
     {
@@ -1547,9 +1560,10 @@ static void lcl_CheckHiddenPara( SwPosition& rPos )
     }
 
     if ( pTextNd )
-        rPos = SwPosition( aTmp, SwIndex( pTextNd, 0 ) );
+        rPos.Assign( *pTextNd, 0 );
 }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
 namespace {
 
 // #i27301# - helper class that notifies the accessibility about invalid text
@@ -1571,6 +1585,7 @@ class SwNotifyAccAboutInvalidTextSelections
 };
 
 }
+#endif
 
 void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
 {
@@ -1584,7 +1599,9 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
         return; // if not then no update
     }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     SwNotifyAccAboutInvalidTextSelections aInvalidateTextSelections( *this );
+#endif
 
     if ( m_bIgnoreReadonly )
     {
@@ -1602,10 +1619,10 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
     // then the table mode is active (also if it is already active: m_pTableCursor)
     SwPaM* pTstCursor = getShellCursor( true );
     if( pTstCursor->HasMark() && !m_pBlockCursor &&
-        mxDoc->IsIdxInTable( pTstCursor->GetPoint()->nNode ) &&
+        SwDoc::IsInTable( pTstCursor->GetPoint()->GetNode() ) &&
           ( m_pTableCursor ||
-            pTstCursor->GetNode().StartOfSectionNode() !=
-            pTstCursor->GetNode( false ).StartOfSectionNode() ) && !mbSelectAll)
+            pTstCursor->GetPointNode().StartOfSectionNode() !=
+            pTstCursor->GetMarkNode().StartOfSectionNode() ) && !mbSelectAll)
     {
         SwShellCursor* pITmpCursor = getShellCursor( true );
         Point aTmpPt( pITmpCursor->GetPtPos() );
@@ -1613,8 +1630,8 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
         SwPosition* pPos = pITmpCursor->GetPoint();
 
         // Bug 65475 (1999) - if Point/Mark in hidden sections, move them out
-        lcl_CheckHiddenSection( pPos->nNode );
-        lcl_CheckHiddenSection( pITmpCursor->GetMark()->nNode );
+        lcl_CheckHiddenSection( *pPos );
+        lcl_CheckHiddenSection( *pITmpCursor->GetMark() );
 
         // Move cursor out of hidden paragraphs
         if ( !GetViewOptions()->IsShowHiddenChar() )
@@ -1624,7 +1641,7 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
         }
 
         std::pair<Point, bool> const tmp(aTmpPt, false);
-        SwContentFrame *pTableFrame = pPos->nNode.GetNode().GetContentNode()->
+        SwContentFrame *pTableFrame = pPos->GetNode().GetContentNode()->
                               getLayoutFrame( GetLayout(), pPos, &tmp);
 
         OSL_ENSURE( pTableFrame, "Table Cursor not in Content ??" );
@@ -1642,7 +1659,7 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
             if ( !bInRepeatedHeadline )
             {
                 std::pair<Point, bool> const tmp1(aTmpMk, false);
-                SwContentFrame* pMarkTableFrame = pITmpCursor->GetContentNode( false )->
+                SwContentFrame* pMarkTableFrame = pITmpCursor->GetMarkContentNode()->
                     getLayoutFrame(GetLayout(), pITmpCursor->GetMark(), &tmp1);
                 OSL_ENSURE( pMarkTableFrame, "Table Cursor not in Content ??" );
 
@@ -1752,8 +1769,10 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
                 m_pVisibleCursor->Show(); // show again
             }
             m_eMvState = CursorMoveState::NONE;  // state for cursor travelling - GetModelPositionForViewPoint
-            if (Imp()->IsAccessible())
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
+            if (Imp()->IsAccessible() && m_bSendAccessibleCursorEvents)
                 Imp()->InvalidateAccessibleCursorPosition( pTableFrame );
+#endif
             return;
         }
     }
@@ -1776,7 +1795,7 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
     {
         SwShellCursor* pShellCursor = getShellCursor( true );
         bool bChgState = true;
-        const SwSectionNode* pSectNd = pShellCursor->GetNode().FindSectionNode();
+        const SwSectionNode* pSectNd = pShellCursor->GetPointNode().FindSectionNode();
         if( pSectNd && ( pSectNd->GetSection().IsHiddenFlag() ||
             ( !IsReadOnlyAvailable() &&
               pSectNd->GetSection().IsProtectFlag() &&
@@ -1829,14 +1848,14 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
         bool bPointIsStart = ( rCmp.Start() == rCmp.GetPoint() );
 
         // move point; forward if it's the start, backwards if it's the end
-        if( ! rCmp.GetPoint()->nNode.GetNode().IsContentNode() )
+        if( ! rCmp.GetPoint()->GetNode().IsContentNode() )
             rCmp.Move( bPointIsStart ? fnMoveForward : fnMoveBackward,
                         GoInContent );
 
         // move mark (if exists); forward if it's the start, else backwards
         if( rCmp.HasMark() )
         {
-            if( ! rCmp.GetMark()->nNode.GetNode().IsContentNode() )
+            if( ! rCmp.GetMark()->GetNode().IsContentNode() )
             {
                 rCmp.Exchange();
                 rCmp.Move( !bPointIsStart ? fnMoveForward : fnMoveBackward,
@@ -1857,7 +1876,7 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
         do {
             bAgainst = false;
             std::pair<Point, bool> const tmp1(pShellCursor->GetPtPos(), false);
-            pFrame = pShellCursor->GetContentNode()->getLayoutFrame(GetLayout(),
+            pFrame = pShellCursor->GetPointContentNode()->getLayoutFrame(GetLayout(),
                         pShellCursor->GetPoint(), &tmp1);
             // if the Frame doesn't exist anymore, the complete Layout has to be
             // created, because there used to be a Frame here!
@@ -1867,7 +1886,7 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
                 {
                     CalcLayout();
                     std::pair<Point, bool> const tmp(pShellCursor->GetPtPos(), false);
-                    pFrame = pShellCursor->GetContentNode()->getLayoutFrame(
+                    pFrame = pShellCursor->GetPointContentNode()->getLayoutFrame(
                                 GetLayout(), pShellCursor->GetPoint(), &tmp);
                 }  while( !pFrame );
             }
@@ -2024,8 +2043,10 @@ void SwCursorShell::UpdateCursor( sal_uInt16 eFlags, bool bIdleEnd )
 
     m_eMvState = CursorMoveState::NONE; // state for cursor travelling - GetModelPositionForViewPoint
 
-    if (Imp()->IsAccessible())
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
+    if (Imp()->IsAccessible() && m_bSendAccessibleCursorEvents)
         Imp()->InvalidateAccessibleCursorPosition( pFrame );
+#endif
 
     // switch from blinking cursor to read-only-text-selection cursor
     const sal_uInt64 nBlinkTime = GetOut()->GetSettings().GetStyleSettings().
@@ -2133,7 +2154,7 @@ void SwCursorShell::RefreshBlockCursor()
     SwShellCursor &rBlock = m_pBlockCursor->getShellCursor();
     Point aPt = rBlock.GetPtPos();
     std::pair<Point, bool> const tmp(aPt, false);
-    SwContentFrame* pFrame = rBlock.GetContentNode()->getLayoutFrame(
+    SwContentFrame* pFrame = rBlock.GetPointContentNode()->getLayoutFrame(
             GetLayout(), rBlock.GetPoint(), &tmp);
     Point aMk;
     if( m_pBlockCursor->getEndPoint() && m_pBlockCursor->getStartPoint() )
@@ -2265,14 +2286,16 @@ void SwCursorShell::Push()
 */
 bool SwCursorShell::Pop(PopMode const eDelete)
 {
-    ::std::unique_ptr<SwCallLink> pLink(::std::make_unique<SwCallLink>(*this)); // watch Cursor-Moves; call Link if needed
-    return Pop(eDelete, ::std::move(pLink));
+    std::optional<SwCallLink> aLink(std::in_place, *this); // watch Cursor-Moves; call Link if needed
+    return Pop(eDelete, aLink);
 }
 
 bool SwCursorShell::Pop(PopMode const eDelete,
-        [[maybe_unused]] ::std::unique_ptr<SwCallLink> const pLink)
+        [[maybe_unused]] std::optional<SwCallLink>& roLink)
 {
-    assert(pLink); // parameter exists only to be deleted before return
+    // parameter exists only to be deleted before return
+    assert(roLink);
+    comphelper::ScopeGuard aGuard( [&]() { roLink.reset(); } );
 
     // are there any left?
     if (nullptr == m_pStackCursor)
@@ -2347,8 +2370,8 @@ void SwCursorShell::Combine()
     SwCursorSaveState aSaveState(*m_pStackCursor);
     // stack cursor & current cursor in same Section?
     assert(!m_pStackCursor->HasMark() ||
-            CheckNodesRange(m_pStackCursor->GetMark()->nNode,
-                            m_pCurrentCursor->GetPoint()->nNode, true));
+            CheckNodesRange(m_pStackCursor->GetMark()->GetNode(),
+                            m_pCurrentCursor->GetPoint()->GetNode(), true));
     *m_pStackCursor->GetPoint() = *m_pCurrentCursor->GetPoint();
     m_pStackCursor->GetPtPos() = m_pCurrentCursor->GetPtPos();
 
@@ -2446,7 +2469,7 @@ void SwCursorShell::ShellLoseFocus()
 
 void SwCursorShell::ShellGetFocus()
 {
-    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWithTable() && ExtendedSelectedAll());
+    comphelper::FlagRestorationGuard g(mbSelectAll, StartsWith_() != StartsWith::None && ExtendedSelectedAll());
 
     m_bHasFocus = true;
     if( !m_bBasicHideCursor && VisArea().Width() )
@@ -2461,7 +2484,7 @@ SwContentFrame *SwCursorShell::GetCurrFrame( const bool bCalcFrame ) const
 {
     CurrShell aCurr( const_cast<SwCursorShell*>(this) );
     SwContentFrame *pRet = nullptr;
-    SwContentNode *pNd = m_pCurrentCursor->GetContentNode();
+    SwContentNode *pNd = m_pCurrentCursor->GetPointContentNode();
     if ( pNd )
     {
         if ( bCalcFrame )
@@ -2512,14 +2535,9 @@ void SwCursorShell::SwClientNotify(const SwModify&, const SfxHint& rHint)
         // SwTextNode::Insert(SwTextHint*, sal_uInt16); we react here and thus do
         // not need to send the expensive RES_FMT_CHG in Insert.
         CallChgLnk();
-    switch(nWhich)
+    if( nWhich == RES_OBJECTDYING )
     {
-        case RES_OBJECTDYING:
-            EndListeningAll();
-            break;
-        case RES_GRAPHIC_SWAPIN:
-            if(m_aGrfArrivedLnk.IsSet())
-                m_aGrfArrivedLnk.Call(*this);
+        EndListeningAll();
     }
 
 }
@@ -2558,14 +2576,14 @@ OUString SwCursorShell::GetSelText() const
     if (GetLayout()->HasMergedParas())
     {
         SwContentFrame const*const pFrame(GetCurrFrame(false));
-        if (FrameContainsNode(*pFrame, m_pCurrentCursor->GetMark()->nNode.GetIndex()))
+        if (pFrame && FrameContainsNode(*pFrame, m_pCurrentCursor->GetMark()->GetNodeIndex()))
         {
             OUStringBuffer buf;
             SwPosition const*const pStart(m_pCurrentCursor->Start());
             SwPosition const*const pEnd(m_pCurrentCursor->End());
-            for (SwNodeOffset i = pStart->nNode.GetIndex(); i <= pEnd->nNode.GetIndex(); ++i)
+            for (SwNodeOffset i = pStart->GetNodeIndex(); i <= pEnd->GetNodeIndex(); ++i)
             {
-                SwNode const& rNode(*pStart->nNode.GetNodes()[i]);
+                SwNode const& rNode(*pStart->GetNodes()[i]);
                 assert(!rNode.IsEndNode());
                 if (rNode.IsStartNode())
                 {
@@ -2573,11 +2591,11 @@ OUString SwCursorShell::GetSelText() const
                 }
                 else if (rNode.IsTextNode())
                 {
-                    sal_Int32 const nStart(i == pStart->nNode.GetIndex()
-                            ? pStart->nContent.GetIndex()
+                    sal_Int32 const nStart(i == pStart->GetNodeIndex()
+                            ? pStart->GetContentIndex()
                             : 0);
-                    sal_Int32 const nEnd(i == pEnd->nNode.GetIndex()
-                            ? pEnd->nContent.GetIndex()
+                    sal_Int32 const nEnd(i == pEnd->GetNodeIndex()
+                            ? pEnd->GetContentIndex()
                             : rNode.GetTextNode()->Len());
                     buf.append(rNode.GetTextNode()->GetExpandText(
                                 GetLayout(),
@@ -2589,15 +2607,15 @@ OUString SwCursorShell::GetSelText() const
             aText = buf.makeStringAndClear();
         }
     }
-    else if( m_pCurrentCursor->GetPoint()->nNode.GetIndex() ==
-        m_pCurrentCursor->GetMark()->nNode.GetIndex() )
+    else if( m_pCurrentCursor->GetPoint()->GetNodeIndex() ==
+        m_pCurrentCursor->GetMark()->GetNodeIndex() )
     {
-        SwTextNode* pTextNd = m_pCurrentCursor->GetNode().GetTextNode();
+        SwTextNode* pTextNd = m_pCurrentCursor->GetPointNode().GetTextNode();
         if( pTextNd )
         {
-            const sal_Int32 nStt = m_pCurrentCursor->Start()->nContent.GetIndex();
+            const sal_Int32 nStt = m_pCurrentCursor->Start()->GetContentIndex();
             aText = pTextNd->GetExpandText(GetLayout(), nStt,
-                    m_pCurrentCursor->End()->nContent.GetIndex() - nStt );
+                    m_pCurrentCursor->End()->GetContentIndex() - nStt );
         }
     }
     return aText;
@@ -2615,11 +2633,11 @@ sal_Unicode SwCursorShell::GetChar( bool bEnd, tools::Long nOffset )
 
     const SwPosition* pPos = !m_pCurrentCursor->HasMark() ? m_pCurrentCursor->GetPoint()
                                 : bEnd ? m_pCurrentCursor->End() : m_pCurrentCursor->Start();
-    SwTextNode* pTextNd = pPos->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = pPos->GetNode().GetTextNode();
     if( !pTextNd )
         return 0;
 
-    const sal_Int32 nPos = pPos->nContent.GetIndex();
+    const sal_Int32 nPos = pPos->GetContentIndex();
     const OUString& rStr = pTextNd->GetText();
     sal_Unicode cCh = 0;
 
@@ -2640,10 +2658,10 @@ bool SwCursorShell::ExtendSelection( bool bEnd, sal_Int32 nCount )
         return false; // no selection
 
     SwPosition* pPos = bEnd ? m_pCurrentCursor->End() : m_pCurrentCursor->Start();
-    SwTextNode* pTextNd = pPos->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = pPos->GetNode().GetTextNode();
     assert(pTextNd);
 
-    sal_Int32 nPos = pPos->nContent.GetIndex();
+    sal_Int32 nPos = pPos->GetContentIndex();
     if( bEnd )
     {
         if ((nPos + nCount) <= pTextNd->GetText().getLength())
@@ -2658,7 +2676,7 @@ bool SwCursorShell::ExtendSelection( bool bEnd, sal_Int32 nCount )
 
     SwCallLink aLk( *this ); // watch Cursor-Moves; call Link if needed
 
-    pPos->nContent = nPos;
+    pPos->SetContent(nPos)  ;
     UpdateCursor();
 
     return true;
@@ -2683,7 +2701,7 @@ bool SwCursorShell::SetVisibleCursor( const Point &rPt )
     SetInFrontOfLabel( false ); // #i27615#
 
     // show only in TextNodes
-    SwTextNode* pTextNd = aPos.nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNd = aPos.GetNode().GetTextNode();
     if( !pTextNd )
         return false;
 
@@ -2738,7 +2756,7 @@ bool SwCursorShell::IsOverReadOnlyPos( const Point& rPt ) const
     SwPaM aPam( *m_pCurrentCursor->GetPoint() );
     GetLayout()->GetModelPositionForViewPoint( aPam.GetPoint(), aPt );
     // form view
-    return aPam.HasReadonlySel( GetViewOptions()->IsFormView() );
+    return aPam.HasReadonlySel(GetViewOptions()->IsFormView(), false);
 }
 
 /** Get the number of elements in the ring of cursors
@@ -2762,14 +2780,14 @@ sal_uInt16 SwCursorShell::GetCursorCnt( bool bAll ) const
 
 bool SwCursorShell::IsStartOfDoc() const
 {
-    if( m_pCurrentCursor->GetPoint()->nContent.GetIndex() )
+    if( m_pCurrentCursor->GetPoint()->GetContentIndex() )
         return false;
 
     // after EndOfIcons comes the content selection (EndNd+StNd+ContentNd)
     SwNodeIndex aIdx( GetDoc()->GetNodes().GetEndOfExtras(), 2 );
     if( !aIdx.GetNode().IsContentNode() )
         GetDoc()->GetNodes().GoNext( &aIdx );
-    return aIdx == m_pCurrentCursor->GetPoint()->nNode;
+    return aIdx == m_pCurrentCursor->GetPoint()->GetNode();
 }
 
 bool SwCursorShell::IsEndOfDoc() const
@@ -2779,8 +2797,8 @@ bool SwCursorShell::IsEndOfDoc() const
     if( !pCNd )
         pCNd = SwNodes::GoPrevious( &aIdx );
 
-    return aIdx == m_pCurrentCursor->GetPoint()->nNode &&
-            pCNd->Len() == m_pCurrentCursor->GetPoint()->nContent.GetIndex();
+    return aIdx == m_pCurrentCursor->GetPoint()->GetNode() &&
+            pCNd->Len() == m_pCurrentCursor->GetPoint()->GetContentIndex();
 }
 
 /** Invalidate cursors
@@ -2809,8 +2827,7 @@ bool SwCursorShell::ParkTableCursor()
 
 void SwCursorShell::ParkPams( SwPaM* pDelRg, SwShellCursor** ppDelRing )
 {
-    const SwPosition *pStt = pDelRg->Start(),
-        *pEnd = pDelRg->End();
+    auto [pStt, pEnd] = pDelRg->StartEnd(); // SwPosition*
 
     SwPaM *pTmpDel = nullptr, *pTmp = *ppDelRing;
 
@@ -2821,8 +2838,7 @@ void SwCursorShell::ParkPams( SwPaM* pDelRg, SwShellCursor** ppDelRing )
         if (!pTmp)
             break;
 
-        const SwPosition *pTmpStt = pTmp->Start(),
-                        *pTmpEnd = pTmp->End();
+        auto [pTmpStt, pTmpEnd] = pTmp->StartEnd(); // SwPosition*
         // If a SPoint or GetMark are in a cursor area then cancel the old area.
         // During comparison keep in mind that End() is outside the area.
         if( *pStt <= *pTmpStt )
@@ -2862,8 +2878,7 @@ void SwCursorShell::ParkPams( SwPaM* pDelRg, SwShellCursor** ppDelRing )
             }
             else
             {
-                pTmpDel->GetPoint()->nContent.Assign(nullptr, 0);
-                pTmpDel->GetPoint()->nNode = SwNodeOffset(0);
+                pTmpDel->GetPoint()->Assign(SwNodeOffset(0));
                 pTmpDel->DeleteMark();
             }
             pTmpDel = nullptr;
@@ -2881,9 +2896,9 @@ void SwCursorShell::ParkPams( SwPaM* pDelRg, SwShellCursor** ppDelRing )
 
     @param rIdx ???
 */
-void SwCursorShell::ParkCursor( const SwNodeIndex &rIdx )
+void SwCursorShell::ParkCursor( const SwNode &rIdx )
 {
-    SwNode *pNode = &rIdx.GetNode();
+    const SwNode *pNode = &rIdx;
 
     // create a new PaM
     SwPaM aNew( *GetCursor()->GetPoint() );
@@ -2894,18 +2909,18 @@ void SwCursorShell::ParkCursor( const SwNodeIndex &rIdx )
         {
             // the given node is in a table, thus park cursor to table node
             // (outside of the table)
-            aNew.GetPoint()->nNode = *pNode->StartOfSectionNode();
+            aNew.GetPoint()->Assign( *pNode->StartOfSectionNode() );
         }
         else
             // Also on the start node itself. Then we need to request the start
             // node always via its end node! (StartOfSelection of StartNode is
             // the parent)
-            aNew.GetPoint()->nNode = *pNode->EndOfSectionNode()->StartOfSectionNode();
+            aNew.GetPoint()->Assign( *pNode->EndOfSectionNode()->StartOfSectionNode() );
     }
     else
-        aNew.GetPoint()->nNode = *pNode->StartOfSectionNode();
+        aNew.GetPoint()->Assign( *pNode->StartOfSectionNode() );
     aNew.SetMark();
-    aNew.GetPoint()->nNode = *pNode->EndOfSectionNode();
+    aNew.GetPoint()->Assign(*pNode->EndOfSectionNode());
 
     // take care of all shells
     for(SwViewShell& rTmp : GetRingContainer())
@@ -2921,13 +2936,12 @@ void SwCursorShell::ParkCursor( const SwNodeIndex &rIdx )
                 // set table cursor always to 0 and the current one always to
                 // the beginning of the table
                 SwPaM* pTCursor = pSh->GetTableCrs();
-                SwNode* pTableNd = pTCursor->GetPoint()->nNode.GetNode().FindTableNode();
+                SwNode* pTableNd = pTCursor->GetPoint()->GetNode().FindTableNode();
                 if ( pTableNd )
                 {
-                    pTCursor->GetPoint()->nContent.Assign(nullptr, 0);
-                    pTCursor->GetPoint()->nNode = SwNodeOffset(0);
+                    pTCursor->GetPoint()->Assign(SwNodeOffset(0));
                     pTCursor->DeleteMark();
-                    pSh->m_pCurrentCursor->GetPoint()->nNode = *pTableNd;
+                    pSh->m_pCurrentCursor->GetPoint()->Assign( *pTableNd );
                 }
             }
         }
@@ -2961,11 +2975,12 @@ SwCursorShell::SwCursorShell( SwCursorShell& rShell, vcl::Window *pInitWin )
     CurrShell aCurr( this );
     // only keep the position of the current cursor of the copy shell
     m_pCurrentCursor = new SwShellCursor( *this, *(rShell.m_pCurrentCursor->GetPoint()) );
-    m_pCurrentCursor->GetContentNode()->Add( this );
+    m_pCurrentCursor->GetPointContentNode()->Add( this );
 
     m_bAllProtect = m_bVisPortChgd = m_bChgCallFlag = m_bInCMvVisportChgd =
     m_bGCAttr = m_bIgnoreReadonly = m_bSelTableCells = m_bBasicHideCursor =
     m_bOverwriteCursor = false;
+    m_bSendAccessibleCursorEvents = true;
     m_bCallChgLnk = m_bHasFocus = m_bAutoUpdateCells = true;
     m_bSVCursorVis = true;
     m_bSetCursorInReadOnly = true;
@@ -3001,7 +3016,7 @@ SwCursorShell::SwCursorShell( SwDoc& rDoc, vcl::Window *pInitWin,
     SwNodeIndex aNodeIdx( *rNds.GetEndOfContent().StartOfSectionNode() );
     SwContentNode* pCNd = rNds.GoNext( &aNodeIdx ); // go to the first ContentNode
 
-    m_pCurrentCursor = new SwShellCursor( *this, SwPosition( aNodeIdx, SwIndex( pCNd, 0 )));
+    m_pCurrentCursor = new SwShellCursor( *this, SwPosition( aNodeIdx, pCNd, 0 ) );
 
     // Register shell as dependent at current node. As a result all attribute
     // changes can be forwarded via the Link.
@@ -3010,6 +3025,7 @@ SwCursorShell::SwCursorShell( SwDoc& rDoc, vcl::Window *pInitWin,
     m_bAllProtect = m_bVisPortChgd = m_bChgCallFlag = m_bInCMvVisportChgd =
     m_bGCAttr = m_bIgnoreReadonly = m_bSelTableCells = m_bBasicHideCursor =
     m_bOverwriteCursor = false;
+    m_bSendAccessibleCursorEvents = true;
     m_bCallChgLnk = m_bHasFocus = m_bAutoUpdateCells = true;
     m_bSVCursorVis = true;
     m_bSetCursorInReadOnly = true;
@@ -3070,8 +3086,8 @@ bool SwCursorShell::ShouldWait() const
         return true;
 
     SwPaM* pPam = GetCursor();
-    return pPam->Start()->nNode.GetIndex() + SwNodeOffset(10) <
-            pPam->End()->nNode.GetIndex();
+    return pPam->Start()->GetNodeIndex() + SwNodeOffset(10) <
+            pPam->End()->GetNodeIndex();
 }
 
 size_t SwCursorShell::UpdateTableSelBoxes()
@@ -3137,10 +3153,10 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
         ClearMark();
 
     // first check for frames
-    SwNodeIndex& rNdIdx = m_pCurrentCursor->GetPoint()->nNode;
-    SwNodeOffset nNdIdx = rNdIdx.GetIndex(); // keep backup
+    SwPosition& rNdPos = *m_pCurrentCursor->GetPoint();
+    SwNodeOffset nNdIdx = rNdPos.GetNodeIndex(); // keep backup
     SwNodes& rNds = mxDoc->GetNodes();
-    SwContentNode* pCNd = rNdIdx.GetNode().GetContentNode();
+    SwContentNode* pCNd = rNdPos.GetNode().GetContentNode();
     const SwContentFrame * pFrame;
 
     if (pCNd && nullptr != (pFrame = pCNd->getLayoutFrame(GetLayout(), m_pCurrentCursor->GetPoint())) &&
@@ -3150,19 +3166,19 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
         // skip protected frame
         SwPaM aPam( *m_pCurrentCursor->GetPoint() );
         aPam.SetMark();
-        aPam.GetMark()->nNode = rNds.GetEndOfContent();
-        aPam.GetPoint()->nNode = *pCNd->EndOfSectionNode();
+        aPam.GetMark()->Assign( rNds.GetEndOfContent() );
+        aPam.GetPoint()->Assign( *pCNd->EndOfSectionNode() );
 
         bool bFirst = false;
         if( nullptr == (pCNd = ::GetNode( aPam, bFirst, fnMoveForward )))
         {
-            aPam.GetMark()->nNode = *rNds.GetEndOfPostIts().StartOfSectionNode();
+            aPam.GetMark()->Assign( *rNds.GetEndOfPostIts().StartOfSectionNode() );
             pCNd = ::GetNode( aPam, bFirst, fnMoveBackward );
         }
 
         if( !pCNd ) // should *never* happen
         {
-            rNdIdx = nNdIdx; // back to old node
+            rNdPos.Assign(nNdIdx); // back to old node
             return false;
         }
         *m_pCurrentCursor->GetPoint() = *aPam.GetPoint();
@@ -3170,48 +3186,47 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
     else if( bOnlyText && pCNd && pCNd->IsNoTextNode() )
     {
         // set to beginning of document
-        rNdIdx = mxDoc->GetNodes().GetEndOfExtras();
-        m_pCurrentCursor->GetPoint()->nContent.Assign( mxDoc->GetNodes().GoNext(
-                                                            &rNdIdx ), 0 );
-        nNdIdx = rNdIdx.GetIndex();
+        rNdPos.Assign( mxDoc->GetNodes().GetEndOfExtras() );
+        mxDoc->GetNodes().GoNext( &rNdPos );
+        nNdIdx = rNdPos.GetNodeIndex();
     }
 
     bool bOk = true;
 
     // #i9059# cursor may not stand in protected cells
     //         (unless cursor in protected areas is OK.)
-    const SwTableNode* pTableNode = rNdIdx.GetNode().FindTableNode();
+    const SwTableNode* pTableNode = rNdPos.GetNode().FindTableNode();
     if( !IsReadOnlyAvailable()  &&
-        pTableNode != nullptr  &&  rNdIdx.GetNode().IsProtect() )
+        pTableNode != nullptr  &&  rNdPos.GetNode().IsProtect() )
     {
         // we're in a table, and we're in a protected area, so we're
         // probably in a protected cell.
 
         // move forward into non-protected area.
-        SwPaM aPam( rNdIdx.GetNode(), 0 );
-        while( aPam.GetNode().IsProtect() &&
+        SwPaM aPam( rNdPos.GetNode(), 0 );
+        while( aPam.GetPointNode().IsProtect() &&
                aPam.Move( fnMoveForward, GoInContent ) )
             ; // nothing to do in the loop; the aPam.Move does the moving!
 
         // didn't work? then go backwards!
-        if( aPam.GetNode().IsProtect() )
+        if( aPam.GetPointNode().IsProtect() )
         {
-            SwPaM aTmpPaM( rNdIdx.GetNode(), 0 );
+            SwPaM aTmpPaM( rNdPos.GetNode(), 0 );
             aPam = aTmpPaM;
-            while( aPam.GetNode().IsProtect() &&
+            while( aPam.GetPointNode().IsProtect() &&
                    aPam.Move( fnMoveBackward, GoInContent ) )
                 ; // nothing to do in the loop; the aPam.Move does the moving!
         }
 
         // if we're successful, set the new position
-        if( ! aPam.GetNode().IsProtect() )
+        if( ! aPam.GetPointNode().IsProtect() )
         {
             *m_pCurrentCursor->GetPoint() = *aPam.GetPoint();
         }
     }
 
     // in a protected frame
-    const SwSectionNode* pSectNd = rNdIdx.GetNode().FindSectionNode();
+    const SwSectionNode* pSectNd = rNdPos.GetNode().FindSectionNode();
     if( pSectNd && ( pSectNd->GetSection().IsHiddenFlag() ||
         ( !IsReadOnlyAvailable() &&
            pSectNd->GetSection().IsProtectFlag() )) )
@@ -3226,10 +3241,10 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
                 for (;;)
                 {
                     if (bGoNextSection)
-                        pCNd = rNds.GoNextSection( &rNdIdx,
+                        pCNd = rNds.GoNextSection( &rNdPos,
                                             true, !IsReadOnlyAvailable() );
                     else
-                        pCNd = SwNodes::GoPrevSection( &rNdIdx,
+                        pCNd = SwNodes::GoPrevSection( &rNdPos,
                                             true, !IsReadOnlyAvailable() );
                     if ( pCNd == nullptr) break;
                     // moved inside a table -> check if it is protected
@@ -3258,7 +3273,7 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
                     }
                 }
 
-                if( bOk && rNdIdx.GetIndex() < rNds.GetEndOfExtras().GetIndex() )
+                if( bOk && rNdPos.GetNodeIndex() < rNds.GetEndOfExtras().GetIndex() )
                 {
                     // also check for Fly - might be protected as well
                     pFrame = pCNd->getLayoutFrame(GetLayout(), nullptr, nullptr);
@@ -3277,19 +3292,19 @@ bool SwCursorShell::FindValidContentNode( bool bOnlyText )
             {
                 if( !nLoopCnt )
                     bGoNextSection = false;
-                rNdIdx = nNdIdx;
+                rNdPos.Assign( nNdIdx );
             }
         }
     }
     if( bOk )
     {
-        pCNd = rNdIdx.GetNode().GetContentNode();
-        const sal_Int32 nContent = rNdIdx.GetIndex() < nNdIdx ? pCNd->Len() : 0;
-        m_pCurrentCursor->GetPoint()->nContent.Assign( pCNd, nContent );
+        pCNd = rNdPos.GetNode().GetContentNode();
+        const sal_Int32 nContent = rNdPos.GetNodeIndex() < nNdIdx ? pCNd->Len() : 0;
+        m_pCurrentCursor->GetPoint()->SetContent( nContent );
     }
     else
     {
-        pCNd = rNdIdx.GetNode().GetContentNode();
+        pCNd = rNdPos.GetNode().GetContentNode();
         // if cursor in hidden frame, always move it
         if (!pCNd || !pCNd->getLayoutFrame(GetLayout(), nullptr, nullptr))
         {
@@ -3355,33 +3370,15 @@ void SwCursorShell::SetReadOnlyAvailable( bool bFlag )
     }
 }
 
-bool SwCursorShell::HasReadonlySel() const
+bool SwCursorShell::HasReadonlySel(bool const isReplace) const
 {
+    // Treat selections that span over start or end of paragraph of an outline node
+    // with folded outline content as read-only.
     if (GetViewOptions()->IsShowOutlineContentVisibilityButton())
     {
-        // Treat selections that span over start or end of paragraph of an outline node
-        // with folded outline content as read-only.
         SwWrtShell* pWrtSh = GetDoc()->GetDocShell()->GetWrtShell();
-        if (pWrtSh)
-        {
-            for(const SwPaM& rPaM : GetCursor()->GetRingContainer())
-            {
-                SwPaM aPaM(*rPaM.GetMark(), *rPaM.GetPoint());
-                aPaM.Normalize();
-                SwNodeIndex aPointIdx(aPaM.GetPoint()->nNode.GetNode());
-                SwNodeIndex aMarkIdx(aPaM.GetMark()->nNode.GetNode());
-                if (aPointIdx == aMarkIdx)
-                    continue;
-                // If any nodes in PaM are folded outline content nodes, then set read-only.
-                SwOutlineNodes::size_type nPos;
-                for (SwNodeIndex aIdx = aPointIdx; aIdx <= aMarkIdx; aIdx++)
-                {
-                    if (GetDoc()->GetNodes().GetOutLineNds().Seek_Entry(&(aIdx.GetNode()), &nPos) &&
-                            !pWrtSh->GetAttrOutlineContentVisible(nPos))
-                        return true;
-                }
-            }
-        }
+        if (pWrtSh && pWrtSh->HasFoldedOutlineContentSelected())
+            return true;
     }
     bool bRet = false;
     // If protected area is to be ignored, then selections are never read-only.
@@ -3392,13 +3389,13 @@ bool SwCursorShell::HasReadonlySel() const
         if ( m_pTableCursor != nullptr )
         {
             bRet = m_pTableCursor->HasReadOnlyBoxSel()
-                   || m_pTableCursor->HasReadonlySel( GetViewOptions()->IsFormView() );
+                   || m_pTableCursor->HasReadonlySel(GetViewOptions()->IsFormView(), isReplace);
         }
         else
         {
             for(const SwPaM& rCursor : m_pCurrentCursor->GetRingContainer())
             {
-                if( rCursor.HasReadonlySel( GetViewOptions()->IsFormView() ) )
+                if (rCursor.HasReadonlySel(GetViewOptions()->IsFormView(), isReplace))
                 {
                     bRet = true;
                     break;
@@ -3413,18 +3410,14 @@ bool SwCursorShell::IsSelFullPara() const
 {
     bool bRet = false;
 
-    if( m_pCurrentCursor->GetPoint()->nNode.GetIndex() ==
-        m_pCurrentCursor->GetMark()->nNode.GetIndex() && !m_pCurrentCursor->IsMultiSelection() )
+    if( m_pCurrentCursor->GetPoint()->GetNodeIndex() ==
+        m_pCurrentCursor->GetMark()->GetNodeIndex() && !m_pCurrentCursor->IsMultiSelection() )
     {
-        sal_Int32 nStt = m_pCurrentCursor->GetPoint()->nContent.GetIndex();
-        sal_Int32 nEnd = m_pCurrentCursor->GetMark()->nContent.GetIndex();
+        sal_Int32 nStt = m_pCurrentCursor->GetPoint()->GetContentIndex();
+        sal_Int32 nEnd = m_pCurrentCursor->GetMark()->GetContentIndex();
         if( nStt > nEnd )
-        {
-            sal_Int32 nTmp = nStt;
-            nStt = nEnd;
-            nEnd = nTmp;
-        }
-        const SwContentNode* pCNd = m_pCurrentCursor->GetContentNode();
+            std::swap( nStt, nEnd );
+        const SwContentNode* pCNd = m_pCurrentCursor->GetPointContentNode();
         bRet = pCNd && !nStt && nEnd == pCNd->Len();
     }
     return bRet;
@@ -3468,10 +3461,10 @@ bool SwCursorShell::SelectHiddenRange()
     if ( !GetViewOptions()->IsShowHiddenChar() && !m_pCurrentCursor->HasMark() )
     {
         SwPosition& rPt = *m_pCurrentCursor->GetPoint();
-        const SwTextNode* pNode = rPt.nNode.GetNode().GetTextNode();
+        const SwTextNode* pNode = rPt.GetNode().GetTextNode();
         if ( pNode )
         {
-            const sal_Int32 nPos = rPt.nContent.GetIndex();
+            const sal_Int32 nPos = rPt.GetContentIndex();
 
             // check if nPos is in hidden range
             sal_Int32 nHiddenStart;
@@ -3481,7 +3474,7 @@ bool SwCursorShell::SelectHiddenRange()
             {
                 // make selection:
                 m_pCurrentCursor->SetMark();
-                m_pCurrentCursor->GetMark()->nContent = nHiddenEnd;
+                m_pCurrentCursor->GetMark()->SetContent(nHiddenEnd);
                 bRet = true;
             }
         }
@@ -3490,7 +3483,7 @@ bool SwCursorShell::SelectHiddenRange()
     return bRet;
 }
 
-sal_uLong SwCursorShell::Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
+sal_Int32 SwCursorShell::Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
                              bool bSearchInNotes,
                              SwDocPositions eStart, SwDocPositions eEnd,
                              bool& bCancel,
@@ -3502,14 +3495,14 @@ sal_uLong SwCursorShell::Find_Text( const i18nutil::SearchOptions2& rSearchOpt,
     delete m_pTableCursor;
     m_pTableCursor = nullptr;
     SwCallLink aLk( *this ); // watch Cursor-Moves; call Link if needed
-    sal_uLong nRet = m_pCurrentCursor->Find_Text(rSearchOpt, bSearchInNotes, eStart, eEnd,
+    sal_Int32 nRet = m_pCurrentCursor->Find_Text(rSearchOpt, bSearchInNotes, eStart, eEnd,
                                      bCancel, eRng, bReplace, GetLayout());
     if( nRet || bCancel )
         UpdateCursor();
     return nRet;
 }
 
-sal_uLong SwCursorShell::FindFormat( const SwTextFormatColl& rFormatColl,
+sal_Int32 SwCursorShell::FindFormat( const SwTextFormatColl& rFormatColl,
                              SwDocPositions eStart, SwDocPositions eEnd,
                              bool& bCancel,
                              FindRanges eRng,
@@ -3520,14 +3513,14 @@ sal_uLong SwCursorShell::FindFormat( const SwTextFormatColl& rFormatColl,
     delete m_pTableCursor;
     m_pTableCursor = nullptr;
     SwCallLink aLk( *this ); // watch Cursor-Moves; call Link if needed
-    sal_uLong nRet = m_pCurrentCursor->FindFormat(rFormatColl, eStart, eEnd, bCancel, eRng,
+    sal_Int32 nRet = m_pCurrentCursor->FindFormat(rFormatColl, eStart, eEnd, bCancel, eRng,
                                      pReplFormat );
     if( nRet )
         UpdateCursor();
     return nRet;
 }
 
-sal_uLong SwCursorShell::FindAttrs( const SfxItemSet& rSet,
+sal_Int32 SwCursorShell::FindAttrs( const SfxItemSet& rSet,
                              bool bNoCollections,
                              SwDocPositions eStart, SwDocPositions eEnd,
                              bool& bCancel,
@@ -3540,7 +3533,7 @@ sal_uLong SwCursorShell::FindAttrs( const SfxItemSet& rSet,
     delete m_pTableCursor;
     m_pTableCursor = nullptr;
     SwCallLink aLk( *this ); // watch Cursor-Moves; call Link if needed
-    sal_uLong nRet = m_pCurrentCursor->FindAttrs(rSet, bNoCollections, eStart, eEnd,
+    sal_Int32 nRet = m_pCurrentCursor->FindAttrs(rSet, bNoCollections, eStart, eEnd,
                          bCancel, eRng, pSearchOpt, rReplSet, GetLayout());
     if( nRet )
         UpdateCursor();
@@ -3593,10 +3586,10 @@ static const SwStartNode* lcl_NodeContext( const SwNode& rNode )
 
    @param aPos the position to check.
 */
-bool sw_PosOk(const SwPosition & aPos)
+static bool sw_PosOk(const SwPosition & aPos)
 {
-    return nullptr != aPos.nNode.GetNode().GetContentNode() &&
-           aPos.nContent.GetIdxReg();
+    return nullptr != aPos.GetNode().GetContentNode() &&
+           aPos.GetContentNode();
 }
 
 /**
@@ -3638,21 +3631,36 @@ void SwCursorShell::ClearUpCursors()
         pStartCursor->DeleteMark();
         bChanged = true;
     }
+    if (pStartCursor->GetPoint()->GetNode().IsTableNode())
+    {
+        // tdf#106959: When cursor points to start of a table, the proper content
+        // node is the first one inside the table, not the previous one
+        SwNodes& aNodes = GetDoc()->GetNodes();
+        SwNodeIndex aIdx(pStartCursor->GetPoint()->GetNode());
+        if (SwNode* pNode = aNodes.GoNext(&aIdx))
+        {
+            SwPaM aTmpPam(*pNode);
+            *pStartCursor = aTmpPam;
+            bChanged = true;
+        }
+    }
     if( !sw_PosOk( *pStartCursor->GetPoint() ) )
     {
         SwNodes & aNodes = GetDoc()->GetNodes();
-        const SwNode* pStart = lcl_NodeContext( pStartCursor->GetPoint()->nNode.GetNode() );
-        SwNodeIndex aIdx( pStartCursor->GetPoint()->nNode );
+        const SwNode* pStart = lcl_NodeContext( pStartCursor->GetPoint()->GetNode() );
+        SwNodeIndex aIdx( pStartCursor->GetPoint()->GetNode() );
         SwNode * pNode = SwNodes::GoPrevious(&aIdx);
         if( pNode == nullptr || lcl_NodeContext( *pNode ) != pStart )
-            aNodes.GoNext( &aIdx );
-        if( pNode == nullptr || lcl_NodeContext( *pNode ) != pStart )
         {
-            // If the start entry of the ring is invalid replace it with a
-            // cursor pointing to the beginning of the first content node in the
-            // document.
-            aIdx = *(aNodes.GetEndOfContent().StartOfSectionNode());
             pNode = aNodes.GoNext( &aIdx );
+            if( pNode == nullptr || lcl_NodeContext( *pNode ) != pStart )
+            {
+                // If the start entry of the ring is invalid replace it with a
+                // cursor pointing to the beginning of the first content node in the
+                // document.
+                aIdx = *(aNodes.GetEndOfContent().StartOfSectionNode());
+                pNode = aNodes.GoNext( &aIdx );
+            }
         }
         bool bFound = (pNode != nullptr);
 
@@ -3732,14 +3740,11 @@ static void lcl_FillTextRange( uno::Reference<text::XTextRange>& rRange,
                    SwTextNode& rNode, sal_Int32 nBegin, sal_Int32 nLen )
 {
     // create SwPosition for nStartIndex
-    SwIndex aIndex( &rNode, nBegin );
-    SwPosition aStartPos( rNode, aIndex );
-
+    SwPosition aStartPos( rNode, nBegin );
     // create SwPosition for nEndIndex
-    SwPosition aEndPos( aStartPos );
-    aEndPos.nContent = nBegin + nLen;
+    SwPosition aEndPos( rNode, nBegin + nLen );
 
-    const uno::Reference<text::XTextRange> xRange =
+    const rtl::Reference<SwXTextRange> xRange =
         SwXTextRange::CreateXTextRange(rNode.GetDoc(), aStartPos, &aEndPos);
 
     rRange = xRange;
@@ -3754,7 +3759,7 @@ void SwCursorShell::GetSmartTagTerm( std::vector< OUString >& rSmartTagTypes,
 
     SwPaM* pCursor = GetCursor();
     SwPosition aPos( *pCursor->GetPoint() );
-    SwTextNode *pNode = aPos.nNode.GetNode().GetTextNode();
+    SwTextNode *pNode = aPos.GetNode().GetTextNode();
     if ( !pNode || pNode->IsInProtectSect() )
         return;
 
@@ -3762,7 +3767,7 @@ void SwCursorShell::GetSmartTagTerm( std::vector< OUString >& rSmartTagTypes,
     if ( !pSmartTagList )
         return;
 
-    sal_Int32 nCurrent = aPos.nContent.GetIndex();
+    sal_Int32 nCurrent = aPos.GetContentIndex();
     sal_Int32 nBegin = nCurrent;
     sal_Int32 nLen = 1;
 
@@ -3795,7 +3800,7 @@ void SwCursorShell::GetSmartTagRect( const Point& rPt, SwRect& rSelectRect )
 
     if( !GetLayout()->GetModelPositionForViewPoint( &aPos, aPt, &eTmpState ) )
         return;
-    pNode = aPos.nNode.GetNode().GetTextNode();
+    pNode = aPos.GetNode().GetTextNode();
     if( !pNode )
         return;
     pSmartTagList = pNode->GetSmartTags();
@@ -3804,7 +3809,7 @@ void SwCursorShell::GetSmartTagRect( const Point& rPt, SwRect& rSelectRect )
     if( pNode->IsInProtectSect() )
         return;
 
-    sal_Int32 nBegin = aPos.nContent.GetIndex();
+    sal_Int32 nBegin = aPos.GetContentIndex();
     sal_Int32 nLen = 1;
 
     if (!pSmartTagList->InWrongWord(nBegin, nLen) || pNode->IsSymbolAt(nBegin))
@@ -3816,9 +3821,9 @@ void SwCursorShell::GetSmartTagRect( const Point& rPt, SwRect& rSelectRect )
     //save the start and end positions of the line and the starting point
     Push();
     LeftMargin();
-    const sal_Int32 nLineStart = GetCursor()->GetPoint()->nContent.GetIndex();
+    const sal_Int32 nLineStart = GetCursor()->GetPoint()->GetContentIndex();
     RightMargin();
-    const sal_Int32 nLineEnd = GetCursor()->GetPoint()->nContent.GetIndex();
+    const sal_Int32 nLineEnd = GetCursor()->GetPoint()->GetContentIndex();
     Pop(PopMode::DeleteCurrent);
 
     // make sure the selection build later from the data below does not
@@ -3834,7 +3839,7 @@ void SwCursorShell::GetSmartTagRect( const Point& rPt, SwRect& rSelectRect )
     while (pChar && *pChar-- == CH_TXTATR_INWORD)
         ++nRight;
 
-    aPos.nContent = nBegin + nLeft;
+    aPos.SetContent( nBegin + nLeft );
     pCursor = GetCursor();
     *pCursor->GetPoint() = aPos;
     pCursor->SetMark();
@@ -3846,18 +3851,18 @@ void SwCursorShell::GetSmartTagRect( const Point& rPt, SwRect& rSelectRect )
     const sal_Int32 nWordEnd = std::min(nBegin + nLen - nLeft - nRight, nLineEnd);
     Push();
     pCursor->DeleteMark();
-    SwIndex& rContent = GetCursor()->GetPoint()->nContent;
-    rContent = nWordStart;
+    SwPosition& rPos = *GetCursor()->GetPoint();
+    rPos.SetContent( nWordStart );
     SwRect aStartRect;
     SwCursorMoveState aState;
     aState.m_bRealWidth = true;
-    SwContentNode* pContentNode = pCursor->GetContentNode();
+    SwContentNode* pContentNode = pCursor->GetPointContentNode();
     std::pair<Point, bool> const tmp(rPt, false);
     SwContentFrame *pContentFrame = pContentNode->getLayoutFrame(
             GetLayout(), pCursor->GetPoint(), &tmp);
 
     pContentFrame->GetCharRect( aStartRect, *pCursor->GetPoint(), &aState );
-    rContent = nWordEnd - 1;
+    rPos.SetContent( nWordEnd - 1 );
     SwRect aEndRect;
     pContentFrame->GetCharRect( aEndRect, *pCursor->GetPoint(),&aState );
     rSelectRect = aStartRect.Union( aEndRect );

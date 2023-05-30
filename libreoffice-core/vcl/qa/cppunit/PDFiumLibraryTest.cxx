@@ -77,8 +77,8 @@ void PDFiumLibraryTest::testDocument()
     CPPUNIT_ASSERT_EQUAL(1, pDocument->getPageCount());
 
     auto aSize = pDocument->getPageSize(0);
-    CPPUNIT_ASSERT_EQUAL(612.0, aSize.getX());
-    CPPUNIT_ASSERT_EQUAL(792.0, aSize.getY());
+    CPPUNIT_ASSERT_EQUAL(612.0, aSize.getWidth());
+    CPPUNIT_ASSERT_EQUAL(792.0, aSize.getHeight());
 }
 
 void PDFiumLibraryTest::testPages()
@@ -433,7 +433,7 @@ void PDFiumLibraryTest::testAnnotationsDifferentTypes()
 
 void PDFiumLibraryTest::testTools()
 {
-    OUString sConverted = vcl::pdf::convertPdfDateToISO8601("D:20200612201322+02'00");
+    OUString sConverted = vcl::pdf::convertPdfDateToISO8601(u"D:20200612201322+02'00");
 
     css::util::DateTime aDateTime;
     CPPUNIT_ASSERT(utl::ISO8601parseDateTime(sConverted, aDateTime));

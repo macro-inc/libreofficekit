@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:18+0100\n"
-"PO-Revision-Date: 2022-05-22 13:27+0000\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
+"PO-Revision-Date: 2022-12-07 12:12+0000\n"
 "Last-Translator: Dimitris Spingos <dmtrs32@gmail.com>\n"
 "Language-Team: Greek <https://translations.documentfoundation.org/projects/libo_ui-master/chart2messages/el/>\n"
 "Language: el\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1547407975.000000\n"
 
 #. NCRDD
@@ -853,260 +853,266 @@ msgctxt "STR_PROPERTY_ROLE_BORDERCOLOR"
 msgid "Border Color"
 msgstr "Χρώμα περιγράμματος"
 
+#. KSB4c
+#: chart2/inc/strings.hrc:148
+msgctxt "STR_DATA_TABLE"
+msgid "Data Table"
+msgstr "Πίνακας δεδομένων"
+
 #. TuRxr
-#: chart2/inc/strings.hrc:149
+#: chart2/inc/strings.hrc:150
 msgctxt "STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
 msgid "From Data Table"
 msgstr "Από τον πίνακα δεδομένων"
 
 #. aPEDY
-#: chart2/inc/strings.hrc:150
+#: chart2/inc/strings.hrc:151
 msgctxt "STR_REGRESSION_LINEAR"
 msgid "Linear"
 msgstr "Γραμμική"
 
 #. nD8ay
-#: chart2/inc/strings.hrc:151
+#: chart2/inc/strings.hrc:152
 msgctxt "STR_REGRESSION_LOG"
 msgid "Logarithmic"
 msgstr "Λογαριθμική"
 
 #. CotSJ
-#: chart2/inc/strings.hrc:152
+#: chart2/inc/strings.hrc:153
 msgctxt "STR_REGRESSION_EXP"
 msgid "Exponential"
 msgstr "Εκθετική"
 
 #. HqBJV
-#: chart2/inc/strings.hrc:153
+#: chart2/inc/strings.hrc:154
 msgctxt "STR_REGRESSION_POWER"
 msgid "Power"
 msgstr "Δύναμη"
 
 #. dBiUj
-#: chart2/inc/strings.hrc:154
+#: chart2/inc/strings.hrc:155
 msgctxt "STR_REGRESSION_POLYNOMIAL"
 msgid "Polynomial"
 msgstr "Πολυωνυμική"
 
 #. FWi4g
-#: chart2/inc/strings.hrc:155
+#: chart2/inc/strings.hrc:156
 msgctxt "STR_REGRESSION_MOVING_AVERAGE"
 msgid "Moving average"
 msgstr "Κινούμενος μέσος όρος"
 
 #. psj3B
-#: chart2/inc/strings.hrc:156
+#: chart2/inc/strings.hrc:157
 msgctxt "STR_REGRESSION_MEAN"
 msgid "Mean"
 msgstr "Μέση τιμή"
 
 #. C8FVd
-#: chart2/inc/strings.hrc:158
+#: chart2/inc/strings.hrc:159
 msgctxt "STR_TYPE_COLUMN"
 msgid "Column"
 msgstr "Στήλη"
 
 #. SWPnA
-#: chart2/inc/strings.hrc:159
+#: chart2/inc/strings.hrc:160
 msgctxt "STR_TYPE_BAR"
 msgid "Bar"
 msgstr "Γραμμή"
 
 #. xUnpz
-#: chart2/inc/strings.hrc:160
+#: chart2/inc/strings.hrc:161
 msgctxt "STR_TYPE_AREA"
 msgid "Area"
 msgstr "Περιοχή"
 
 #. bqxBm
-#: chart2/inc/strings.hrc:161
+#: chart2/inc/strings.hrc:162
 msgctxt "STR_TYPE_PIE"
 msgid "Pie"
 msgstr "Πίτα"
 
 #. GGwEH
-#: chart2/inc/strings.hrc:162
+#: chart2/inc/strings.hrc:163
 msgctxt "STR_PIE_EXPLODED"
 msgid "Exploded Pie Chart"
 msgstr "Διάγραμμα κομμένης πίτας"
 
 #. gxFtf
-#: chart2/inc/strings.hrc:163
+#: chart2/inc/strings.hrc:164
 msgctxt "STR_DONUT_EXPLODED"
 msgid "Exploded Donut Chart"
 msgstr "Διάγραμμα κομμένου δακτυλίου"
 
 #. nsoQ2
-#: chart2/inc/strings.hrc:164
+#: chart2/inc/strings.hrc:165
 msgctxt "STR_DONUT"
 msgid "Donut"
 msgstr "Δακτύλιος"
 
 #. 7HjEG
-#: chart2/inc/strings.hrc:165
+#: chart2/inc/strings.hrc:166
 msgctxt "STR_TYPE_LINE"
 msgid "Line"
 msgstr "Γραμμή"
 
 #. Miu8E
-#: chart2/inc/strings.hrc:166
+#: chart2/inc/strings.hrc:167
 msgctxt "STR_TYPE_XY"
 msgid "XY (Scatter)"
 msgstr "XY (Διασπορά)"
 
 #. LBFRX
-#: chart2/inc/strings.hrc:167
+#: chart2/inc/strings.hrc:168
 msgctxt "STR_POINTS_AND_LINES"
 msgid "Points and Lines"
 msgstr "Σημεία και γραμμές"
 
 #. fjka7
-#: chart2/inc/strings.hrc:168
+#: chart2/inc/strings.hrc:169
 msgctxt "STR_POINTS_ONLY"
 msgid "Points Only"
 msgstr "Μόνο σημεία"
 
 #. Sz53v
-#: chart2/inc/strings.hrc:169
+#: chart2/inc/strings.hrc:170
 msgctxt "STR_LINES_ONLY"
 msgid "Lines Only"
 msgstr "Μόνο γραμμές"
 
 #. AAEA2
-#: chart2/inc/strings.hrc:170
+#: chart2/inc/strings.hrc:171
 msgctxt "STR_LINES_3D"
 msgid "3D Lines"
 msgstr "Γραμμές 3Δ"
 
 #. ABjEg
-#: chart2/inc/strings.hrc:171
+#: chart2/inc/strings.hrc:172
 msgctxt "STR_TYPE_COMBI_COLUMN_LINE"
 msgid "Column and Line"
 msgstr "Στήλη και γραμμή"
 
 #. nVKfC
-#: chart2/inc/strings.hrc:172
+#: chart2/inc/strings.hrc:173
 msgctxt "STR_LINE_COLUMN"
 msgid "Columns and Lines"
 msgstr "Στήλες και γραμμές"
 
 #. QkQSa
-#: chart2/inc/strings.hrc:173
+#: chart2/inc/strings.hrc:174
 msgctxt "STR_LINE_STACKEDCOLUMN"
 msgid "Stacked Columns and Lines"
 msgstr "Στήλες και γραμμές σε στοίβα"
 
 #. HGKEx
-#: chart2/inc/strings.hrc:174
+#: chart2/inc/strings.hrc:175
 msgctxt "STR_TYPE_NET"
 msgid "Net"
 msgstr "Δίκτυο"
 
 #. BKUc4
-#: chart2/inc/strings.hrc:175
+#: chart2/inc/strings.hrc:176
 msgctxt "STR_TYPE_STOCK"
 msgid "Stock"
 msgstr "Μετοχή"
 
 #. oG4gw
-#: chart2/inc/strings.hrc:176
+#: chart2/inc/strings.hrc:177
 msgctxt "STR_STOCK_1"
 msgid "Stock Chart 1"
 msgstr "Διάγραμμα μετοχών 1"
 
 #. pSzDo
-#: chart2/inc/strings.hrc:177
+#: chart2/inc/strings.hrc:178
 msgctxt "STR_STOCK_2"
 msgid "Stock Chart 2"
 msgstr "Διάγραμμα μετοχών 2"
 
 #. aEFDu
-#: chart2/inc/strings.hrc:178
+#: chart2/inc/strings.hrc:179
 msgctxt "STR_STOCK_3"
 msgid "Stock Chart 3"
 msgstr "Διάγραμμα μετοχών 3"
 
 #. jZqox
-#: chart2/inc/strings.hrc:179
+#: chart2/inc/strings.hrc:180
 msgctxt "STR_STOCK_4"
 msgid "Stock Chart 4"
 msgstr "Διάγραμμα μετοχών 4"
 
 #. DNBgg
-#: chart2/inc/strings.hrc:180
+#: chart2/inc/strings.hrc:181
 msgctxt "STR_NORMAL"
 msgid "Normal"
 msgstr "Κανονικά"
 
 #. EfGVL
-#: chart2/inc/strings.hrc:181
+#: chart2/inc/strings.hrc:182
 msgctxt "STR_STACKED"
 msgid "Stacked"
 msgstr "Σωρευμένο"
 
 #. wqtzw
-#: chart2/inc/strings.hrc:182
+#: chart2/inc/strings.hrc:183
 msgctxt "STR_PERCENT"
 msgid "Percent Stacked"
 msgstr "Ποσοστό σε στοίβα"
 
 #. 52UGB
-#: chart2/inc/strings.hrc:183
+#: chart2/inc/strings.hrc:184
 msgctxt "STR_DEEP"
 msgid "Deep"
 msgstr "Σε βάθος"
 
 #. dxfuQ
-#: chart2/inc/strings.hrc:184
+#: chart2/inc/strings.hrc:185
 msgctxt "STR_FILLED"
 msgid "Filled"
 msgstr "Με γέμισμα"
 
 #. rC5nu
-#: chart2/inc/strings.hrc:185
+#: chart2/inc/strings.hrc:186
 msgctxt "STR_TYPE_BUBBLE"
 msgid "Bubble"
 msgstr "Φυσαλίδα"
 
 #. N9tXx
-#: chart2/inc/strings.hrc:186
+#: chart2/inc/strings.hrc:187
 msgctxt "STR_BUBBLE_1"
 msgid "Bubble Chart"
 msgstr "Διάγραμμα φυσαλίδας"
 
 #. AjPsf
-#: chart2/inc/strings.hrc:188
+#: chart2/inc/strings.hrc:189
 msgctxt "STR_INVALID_NUMBER"
 msgid "Numbers are required. Check your input."
 msgstr "Απαιτούνται αριθμοί. Ελέγξτε την καταχώρισή σας."
 
 #. ofh4V
-#: chart2/inc/strings.hrc:189
+#: chart2/inc/strings.hrc:190
 msgctxt "STR_STEP_GT_ZERO"
 msgid "The major interval requires a positive number. Check your input."
 msgstr "Το κύριο διάστημα απαιτεί θετικό αριθμό. Ελέγξτε την καταχώρισή σας."
 
 #. EBJjR
-#: chart2/inc/strings.hrc:190
+#: chart2/inc/strings.hrc:191
 msgctxt "STR_BAD_LOGARITHM"
 msgid "The logarithmic scale requires positive numbers. Check your input."
 msgstr "Η λογαριθμική κλίμακα απαιτεί θετικούς αριθμούς. Ελέγξτε την καταχώρισή σας."
 
 #. K8BCB
-#: chart2/inc/strings.hrc:191
+#: chart2/inc/strings.hrc:192
 msgctxt "STR_MIN_GREATER_MAX"
 msgid "The minimum must be lower than the maximum. Check your input."
 msgstr "Το ελάχιστο πρέπει να είναι μικρότερο από το μέγιστο. Ελέγξτε την καταχώρισή σας."
 
 #. oBR4x
-#: chart2/inc/strings.hrc:192
+#: chart2/inc/strings.hrc:193
 msgctxt "STR_INVALID_INTERVALS"
 msgid "The major interval needs to be greater than the minor interval. Check your input."
 msgstr "Το κύριο διάστημα πρέπει να είναι μεγαλύτερο από το δευτερεύον διάστημα. Ελέγξτε την καταχώρισή σας."
 
 #. ZvDEh
-#: chart2/inc/strings.hrc:193
+#: chart2/inc/strings.hrc:194
 msgctxt "STR_INVALID_TIME_UNIT"
 msgid "The major and minor interval need to be greater or equal to the resolution. Check your input."
 msgstr "Το κύριο και δευτερεύον διάστημα πρέπει να είναι μεγαλύτερο ή ίσιο από την ανάλυση. Ελέγξτε την καταχώρισή σας."
@@ -1602,6 +1608,48 @@ msgstr "Ανοίγει το παράθυρο διαλόγου  Ετικέτες 
 msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabels"
 msgid "Opens the Data Labels dialog, which enables you to set the data labels."
 msgstr "Ανοίγει το παράθυρο διαλόγου  Ετικέτες δεδομένων , το οποίο σας επιτρέπει να ορίσετε τις ετικέτες των δεδομένων."
+
+#. XbRRD
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:8
+msgctxt "dlg_InsertDataTable|dlg_InsertDataTable"
+msgid "Data Table"
+msgstr "Πίνακας δεδομένων"
+
+#. SBrCL
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:85
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show data table"
+msgstr "Εμφάνιση πίνακα δεδομένων"
+
+#. y4rFB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:119
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Εμφάνιση οριζόντιου περιγράμματος"
+
+#. GstZR
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:135
+msgctxt "dlg_InsertDataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Εμφάνιση κάθετου περιγράμματος"
+
+#. KAzDB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:151
+msgctxt "dlg_InsertDataTable|outlineCB"
+msgid "Show outline"
+msgstr "Εμφάνιση διάρθρωσης"
+
+#. bm6hN
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:167
+msgctxt "dlg_InsertDataTable|keysCB"
+msgid "Show keys"
+msgstr "Εμφάνιση κλειδιών"
+
+#. JpXPi
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:187
+msgctxt "dlg_InsertDataTable|dataTablePropertiesLabel"
+msgid "Data Table Properties"
+msgstr "Ιδιότητες πίνακα δεδομένων"
 
 #. 3GUtp
 #: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:28
@@ -2210,508 +2258,508 @@ msgid "Show labels"
 msgstr "Εμφάνιση ετικετών"
 
 #. 52BFU
-#: chart2/uiconfig/ui/sidebaraxis.ui:38
+#: chart2/uiconfig/ui/sidebaraxis.ui:40
 msgctxt "sidebaraxis|checkbutton_reverse"
 msgid "Reverse direction"
 msgstr "Αντίστροφη κατεύθυνση"
 
 #. hABaw
-#: chart2/uiconfig/ui/sidebaraxis.ui:63
+#: chart2/uiconfig/ui/sidebaraxis.ui:58
 msgctxt "sidebaraxis|label1"
 msgid "_Label position:"
 msgstr "Θέση _ετικέτας:"
 
 #. JpV6N
-#: chart2/uiconfig/ui/sidebaraxis.ui:77
+#: chart2/uiconfig/ui/sidebaraxis.ui:73
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis"
 msgstr "Κοντά στον άξονα"
 
 #. HEMNB
-#: chart2/uiconfig/ui/sidebaraxis.ui:78
+#: chart2/uiconfig/ui/sidebaraxis.ui:74
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis (other side)"
 msgstr "Κοντά στον άξονα (άλλη πλευρά)"
 
 #. BE2dT
-#: chart2/uiconfig/ui/sidebaraxis.ui:79
+#: chart2/uiconfig/ui/sidebaraxis.ui:75
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside start"
 msgstr "Εξωτερική αρχή"
 
 #. rH94z
-#: chart2/uiconfig/ui/sidebaraxis.ui:80
+#: chart2/uiconfig/ui/sidebaraxis.ui:76
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside end"
 msgstr "Εξωτερικό τέλος"
 
 #. 69LSe
-#: chart2/uiconfig/ui/sidebaraxis.ui:94
+#: chart2/uiconfig/ui/sidebaraxis.ui:90
 msgctxt "sidebaraxis|label2"
 msgid "_Text orientation:"
 msgstr "_Προσανατολισμός κειμένου:"
 
+#. vkhjB
+#: chart2/uiconfig/ui/sidebarelements.ui:25
+msgctxt "sidebarelements|l"
+msgid "Titles"
+msgstr "Τίτλοι"
+
 #. Bqqg6
-#: chart2/uiconfig/ui/sidebarelements.ui:34
+#: chart2/uiconfig/ui/sidebarelements.ui:38
 msgctxt "sidebarelements|checkbutton_title"
 msgid "Title"
 msgstr "Τίτλος"
 
 #. HttnZ
-#: chart2/uiconfig/ui/sidebarelements.ui:51
+#: chart2/uiconfig/ui/sidebarelements.ui:71
 msgctxt "sidebarelements|checkbutton_subtitle"
 msgid "Subtitle"
 msgstr "Υπότιτλος"
 
-#. vkhjB
-#: chart2/uiconfig/ui/sidebarelements.ui:102
-msgctxt "sidebarelements|l"
-msgid "Titles"
-msgstr "Τίτλοι"
+#. UVbZR
+#: chart2/uiconfig/ui/sidebarelements.ui:108
+msgctxt "sidebarelements|label_legen"
+msgid "Legend"
+msgstr "Υπόμνημα"
 
 #. dB6pP
-#: chart2/uiconfig/ui/sidebarelements.ui:131
+#: chart2/uiconfig/ui/sidebarelements.ui:121
 msgctxt "sidebarelements|checkbutton_legend"
 msgid "Show legend"
 msgstr "Εμφάνιση υπομνήματος"
 
 #. XxG3r
-#: chart2/uiconfig/ui/sidebarelements.ui:135
+#: chart2/uiconfig/ui/sidebarelements.ui:125
 msgctxt "sidebarelements|checkbutton_legend|tooltip_text"
 msgid "Show Legend"
 msgstr "Εμφάνιση υπομνήματος"
 
-#. zszn2
-#: chart2/uiconfig/ui/sidebarelements.ui:156
-msgctxt "sidebarelements|placement_label"
-msgid "_Placement:"
-msgstr "Τοπο_θέτηση:"
-
 #. N9Vw3
-#: chart2/uiconfig/ui/sidebarelements.ui:172
+#: chart2/uiconfig/ui/sidebarelements.ui:141
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Right"
 msgstr "Δεξιά"
 
 #. XWGfH
-#: chart2/uiconfig/ui/sidebarelements.ui:173
+#: chart2/uiconfig/ui/sidebarelements.ui:142
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Top"
 msgstr "Επάνω"
 
 #. AYbfc
-#: chart2/uiconfig/ui/sidebarelements.ui:174
+#: chart2/uiconfig/ui/sidebarelements.ui:143
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Bottom"
 msgstr "Κάτω"
 
 #. Hdrnv
-#: chart2/uiconfig/ui/sidebarelements.ui:175
+#: chart2/uiconfig/ui/sidebarelements.ui:144
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Left"
 msgstr "Αριστερά"
 
 #. WxtCZ
-#: chart2/uiconfig/ui/sidebarelements.ui:193
+#: chart2/uiconfig/ui/sidebarelements.ui:154
 msgctxt "sidebarelements|checkbutton_no_overlay"
 msgid "Show the legend without overlapping the chart"
 msgstr "Εμφάνιση του υπομνήματος χωρίς επικάλυψη του διαγράμματος"
 
-#. UVbZR
-#: chart2/uiconfig/ui/sidebarelements.ui:212
-msgctxt "sidebarelements|label_legen"
-msgid "Legend"
-msgstr "Υπόμνημα"
-
-#. Am6Gz
-#: chart2/uiconfig/ui/sidebarelements.ui:242
-msgctxt "sidebarelements|checkbutton_x_axis"
-msgid "X axis"
-msgstr "Άξονας X"
-
-#. P5gxx
-#: chart2/uiconfig/ui/sidebarelements.ui:256
-msgctxt "sidebarelements|checkbutton_x_axis_title"
-msgid "X axis title"
-msgstr "Τίτλος άξονα Χ"
-
-#. iMXPp
-#: chart2/uiconfig/ui/sidebarelements.ui:270
-msgctxt "sidebarelements|checkbutton_y_axis"
-msgid "Y axis"
-msgstr "Άξονας Υ"
-
-#. vF4oS
-#: chart2/uiconfig/ui/sidebarelements.ui:284
-msgctxt "sidebarelements|checkbutton_y_axis_title"
-msgid "Y axis title"
-msgstr "Τίτλος άξονα Υ"
-
-#. A35cf
-#: chart2/uiconfig/ui/sidebarelements.ui:298
-msgctxt "sidebarelements|checkbutton_z_axis"
-msgid "Z axis"
-msgstr "Άξονας Ζ"
-
-#. RZFAU
-#: chart2/uiconfig/ui/sidebarelements.ui:312
-msgctxt "sidebarelements|checkbutton_z_axis_title"
-msgid "Z axis title"
-msgstr "Τίτλος άξονα Ζ"
-
-#. GoJDH
-#: chart2/uiconfig/ui/sidebarelements.ui:326
-msgctxt "sidebarelements|checkbutton_2nd_x_axis"
-msgid "2nd X axis"
-msgstr "2ος άξονας Χ"
-
-#. nsoDZ
-#: chart2/uiconfig/ui/sidebarelements.ui:339
-msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
-msgid "2nd X axis title"
-msgstr "Τίτλος δεύτερου άξονα Χ"
-
-#. bGsCM
-#: chart2/uiconfig/ui/sidebarelements.ui:352
-msgctxt "sidebarelements|checkbutton_2nd_y_axis"
-msgid "2nd Y axis"
-msgstr "2ος άξονας Υ"
-
-#. yDNuy
-#: chart2/uiconfig/ui/sidebarelements.ui:365
-msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
-msgid "2nd Y axis title"
-msgstr "Τίτλος δεύτερου άξονα Υ"
-
 #. ScLEM
-#: chart2/uiconfig/ui/sidebarelements.ui:382
+#: chart2/uiconfig/ui/sidebarelements.ui:175
 msgctxt "sidebarelements|label_axes"
 msgid "Axes"
 msgstr "Άξονες"
 
+#. Am6Gz
+#: chart2/uiconfig/ui/sidebarelements.ui:188
+msgctxt "sidebarelements|checkbutton_x_axis"
+msgid "X axis"
+msgstr "Άξονας X"
+
+#. iMXPp
+#: chart2/uiconfig/ui/sidebarelements.ui:203
+msgctxt "sidebarelements|checkbutton_y_axis"
+msgid "Y axis"
+msgstr "Άξονας Υ"
+
+#. A35cf
+#: chart2/uiconfig/ui/sidebarelements.ui:218
+msgctxt "sidebarelements|checkbutton_z_axis"
+msgid "Z axis"
+msgstr "Άξονας Ζ"
+
+#. GoJDH
+#: chart2/uiconfig/ui/sidebarelements.ui:233
+msgctxt "sidebarelements|checkbutton_2nd_x_axis"
+msgid "2nd X axis"
+msgstr "2ος άξονας Χ"
+
+#. bGsCM
+#: chart2/uiconfig/ui/sidebarelements.ui:247
+msgctxt "sidebarelements|checkbutton_2nd_y_axis"
+msgid "2nd Y axis"
+msgstr "2ος άξονας Υ"
+
+#. P5gxx
+#: chart2/uiconfig/ui/sidebarelements.ui:261
+msgctxt "sidebarelements|checkbutton_x_axis_title"
+msgid "X axis title"
+msgstr "Τίτλος άξονα Χ"
+
+#. vF4oS
+#: chart2/uiconfig/ui/sidebarelements.ui:276
+msgctxt "sidebarelements|checkbutton_y_axis_title"
+msgid "Y axis title"
+msgstr "Τίτλος άξονα Υ"
+
+#. RZFAU
+#: chart2/uiconfig/ui/sidebarelements.ui:291
+msgctxt "sidebarelements|checkbutton_z_axis_title"
+msgid "Z axis title"
+msgstr "Τίτλος άξονα Ζ"
+
+#. nsoDZ
+#: chart2/uiconfig/ui/sidebarelements.ui:306
+msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
+msgid "2nd X axis title"
+msgstr "Τίτλος δεύτερου άξονα Χ"
+
+#. yDNuy
+#: chart2/uiconfig/ui/sidebarelements.ui:320
+msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
+msgid "2nd Y axis title"
+msgstr "Τίτλος δεύτερου άξονα Υ"
+
+#. yeE2v
+#: chart2/uiconfig/ui/sidebarelements.ui:339
+msgctxt "sidebarelements|label_gri"
+msgid "Gridlines"
+msgstr "Γραμμές πλέγματος"
+
 #. RL8AA
-#: chart2/uiconfig/ui/sidebarelements.ui:412
+#: chart2/uiconfig/ui/sidebarelements.ui:352
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
 msgid "Horizontal major"
 msgstr "Κύριος οριζόντιος"
 
 #. FYBSZ
-#: chart2/uiconfig/ui/sidebarelements.ui:426
+#: chart2/uiconfig/ui/sidebarelements.ui:367
 msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
 msgid "Vertical major"
 msgstr "Κύριος κάθετος"
 
 #. VCTTS
-#: chart2/uiconfig/ui/sidebarelements.ui:440
+#: chart2/uiconfig/ui/sidebarelements.ui:382
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
 msgid "Horizontal minor"
 msgstr "Δευτερεύον οριζόντιος"
 
 #. QDFEZ
-#: chart2/uiconfig/ui/sidebarelements.ui:454
+#: chart2/uiconfig/ui/sidebarelements.ui:397
 msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
 msgid "Vertical minor"
 msgstr "Δευτερεύον κάθετος"
 
-#. yeE2v
-#: chart2/uiconfig/ui/sidebarelements.ui:472
-msgctxt "sidebarelements|label_gri"
-msgid "Gridlines"
-msgstr "Γραμμές πλέγματος"
-
 #. uacDo
-#: chart2/uiconfig/ui/sidebarelements.ui:493
+#: chart2/uiconfig/ui/sidebarelements.ui:419
 msgctxt "sidebarelements|text_title"
 msgid "Title"
 msgstr "Τίτλος"
 
 #. jXGDE
-#: chart2/uiconfig/ui/sidebarelements.ui:504
+#: chart2/uiconfig/ui/sidebarelements.ui:432
 msgctxt "sidebarelements|text_subtitle"
 msgid "Subtitle"
 msgstr "Υπότιτλος"
 
+#. zszn2
+#: chart2/uiconfig/ui/sidebarelements.ui:445
+msgctxt "sidebarelements|placement_label"
+msgid "_Placement:"
+msgstr "Τοπο_θέτηση:"
+
 #. SCPM4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:60
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:48
 msgctxt "sidebarerrorbar|label2"
 msgid "Category:"
 msgstr "Κατηγορία:"
 
 #. 8Pb84
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:74
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:63
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Constant"
 msgstr "Σταθερά"
 
 #. Lz8Lo
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:75
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:64
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Percentage"
 msgstr "Ποσοστό"
 
 #. Ap367
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:76
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:65
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Cell Range or Data Table"
 msgstr "Περιοχή κελιού ή πίνακας δεδομένων"
 
 #. Lqw6L
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:77
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:66
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard deviation"
 msgstr "Τυπική απόκλιση"
 
 #. qUL78
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:78
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:67
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard error"
 msgstr "Τυπικό σφάλμα"
 
 #. KUCgB
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:79
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:68
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Variance"
 msgstr "Διακύμανση"
 
 #. QDwJu
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:80
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:69
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Error margin"
 msgstr "Περιθώριο σφάλματος"
 
 #. US82z
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:93
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:82
 msgctxt "sidebarerrorbar|label3"
 msgid "Positive (+):"
 msgstr "Θετικός (+):"
 
 #. NJdbG
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:94
 msgctxt "sidebarerrorbar|label4"
 msgid "Negative (-):"
 msgstr "Αρνητικός (-):"
 
 #. GBewc
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:117
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
 msgctxt "sidebarerrorbar|spinbutton_pos"
 msgid "0.00"
 msgstr "0,00"
 
 #. e3GvR
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:132
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:119
 msgctxt "sidebarerrorbar|spinbutton_neg"
 msgid "0.00"
 msgstr "0,00"
 
 #. 34Vax
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:152
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:139
 msgctxt "sidebarerrorbar|radiobutton_positive_negative|tooltip_text"
 msgid "Positive and Negative"
 msgstr "Θετικός και αρνητικός"
 
 #. gETvJ
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:169
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:156
 msgctxt "sidebarerrorbar|radiobutton_positive|tooltip_text"
 msgid "Positive"
 msgstr "Θετικός"
 
 #. 3Ur2d
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:186
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:173
 msgctxt "sidebarerrorbar|radiobutton_negative|tooltip_text"
 msgid "Negative"
 msgstr "Αρνητικός"
 
 #. iCPU4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:209
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:196
 msgctxt "sidebarerrorbar|label5"
 msgid "Indicator"
 msgstr "Δείκτης"
 
 #. qJBsd
-#: chart2/uiconfig/ui/sidebarseries.ui:41
+#: chart2/uiconfig/ui/sidebarseries.ui:38
 msgctxt "sidebarseries|checkbutton_label"
 msgid "Show data labels"
 msgstr "Εμφάνιση ετικετών δεδομένων"
 
-#. BsC9D
-#: chart2/uiconfig/ui/sidebarseries.ui:64
-msgctxt "sidebarseries|label_box"
-msgid "P_lacement:"
-msgstr "Τοπο_θέτηση:"
-
 #. Dk3GN
-#: chart2/uiconfig/ui/sidebarseries.ui:79
+#: chart2/uiconfig/ui/sidebarseries.ui:56
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Above"
 msgstr "Πάνω από"
 
 #. e4znD
-#: chart2/uiconfig/ui/sidebarseries.ui:80
+#: chart2/uiconfig/ui/sidebarseries.ui:57
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Below"
 msgstr "Κάτω από"
 
 #. CWwzt
-#: chart2/uiconfig/ui/sidebarseries.ui:81
+#: chart2/uiconfig/ui/sidebarseries.ui:58
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Center"
 msgstr "Κέντρο"
 
 #. osWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:82
+#: chart2/uiconfig/ui/sidebarseries.ui:59
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Outside"
 msgstr "Εξωτερικά"
 
 #. U3N4S
-#: chart2/uiconfig/ui/sidebarseries.ui:83
+#: chart2/uiconfig/ui/sidebarseries.ui:60
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Inside"
 msgstr "Εσωτερικά"
 
 #. pAmg7
-#: chart2/uiconfig/ui/sidebarseries.ui:84
+#: chart2/uiconfig/ui/sidebarseries.ui:61
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Near origin"
 msgstr "Κοντά στο αρχικό"
 
 #. erC9C
-#: chart2/uiconfig/ui/sidebarseries.ui:109
+#: chart2/uiconfig/ui/sidebarseries.ui:71
 msgctxt "sidebarseries|checkbutton_trendline"
 msgid "Show trendline"
 msgstr "Εμφάνιση γραμμής τάσης"
 
+#. FFPa2
+#: chart2/uiconfig/ui/sidebarseries.ui:92
+msgctxt "sidebarseries|label1"
+msgid "Error Bars"
+msgstr "Γραμμές σφάλματος"
+
 #. bXUND
-#: chart2/uiconfig/ui/sidebarseries.ui:140
+#: chart2/uiconfig/ui/sidebarseries.ui:105
 msgctxt "sidebarseries|checkbutton_y_error"
 msgid "Y error bars"
 msgstr "Γραμμές σφάλματος Υ"
 
 #. zK6DE
-#: chart2/uiconfig/ui/sidebarseries.ui:155
+#: chart2/uiconfig/ui/sidebarseries.ui:121
 msgctxt "sidebarseries|checkbutton_x_error"
 msgid "X error bars"
 msgstr "Γραμμές σφάλματος Χ"
 
-#. FFPa2
-#: chart2/uiconfig/ui/sidebarseries.ui:174
-msgctxt "sidebarseries|label1"
-msgid "Error Bars"
-msgstr "Γραμμές σφάλματος"
-
-#. vhdnt
-#: chart2/uiconfig/ui/sidebarseries.ui:203
-msgctxt "sidebarseries|radiobutton_primary_axis"
-msgid "Primary Y axis"
-msgstr "Πρωτεύων άξονας Υ"
-
-#. VPWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:219
-msgctxt "sidebarseries|radiobutton_secondary_axis"
-msgid "Secondary Y axis"
-msgstr "Δευτερεύων άξονας Υ"
-
 #. qE5HF
-#: chart2/uiconfig/ui/sidebarseries.ui:239
+#: chart2/uiconfig/ui/sidebarseries.ui:142
 msgctxt "sidebarseries|axis_label"
 msgid "Align Series to Axis"
 msgstr "Στοίχιση σειράς στον άξονα"
 
 #. fvnkG
-#: chart2/uiconfig/ui/sidebarseries.ui:255
+#: chart2/uiconfig/ui/sidebarseries.ui:157
 msgctxt "sidebarseries|label_series_tmpl"
 msgid "Data series '%1'"
 msgstr "Σειρά δεδομένων '%1'"
 
+#. vhdnt
+#: chart2/uiconfig/ui/sidebarseries.ui:173
+msgctxt "sidebarseries|radiobutton_primary_axis"
+msgid "Primary Y axis"
+msgstr "Πρωτεύων άξονας Υ"
+
+#. VPWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:189
+msgctxt "sidebarseries|radiobutton_secondary_axis"
+msgid "Secondary Y axis"
+msgstr "Δευτερεύων άξονας Υ"
+
+#. BsC9D
+#: chart2/uiconfig/ui/sidebarseries.ui:218
+msgctxt "sidebarseries|label_box"
+msgid "P_lacement:"
+msgstr "Τοπο_θέτηση:"
+
 #. mZfrk
-#: chart2/uiconfig/ui/sidebartype.ui:85
+#: chart2/uiconfig/ui/sidebartype.ui:74
 msgctxt "sidebartype|3dlook"
 msgid "_3D Look"
 msgstr "_3Δ Εμφάνιση"
 
 #. mjrkY
-#: chart2/uiconfig/ui/sidebartype.ui:104
+#: chart2/uiconfig/ui/sidebartype.ui:90
 msgctxt "sidebartype|3dscheme"
 msgid "Simple"
 msgstr "Απλός"
 
 #. urfc7
-#: chart2/uiconfig/ui/sidebartype.ui:105
+#: chart2/uiconfig/ui/sidebartype.ui:91
 msgctxt "sidebartype|3dscheme"
 msgid "Realistic"
 msgstr "Πραγματιστικός"
 
 #. gYXXE
-#: chart2/uiconfig/ui/sidebartype.ui:126
+#: chart2/uiconfig/ui/sidebartype.ui:105
 msgctxt "sidebartype|shapeft"
 msgid "Sh_ape"
 msgstr "Σ_χήμα"
 
 #. B6KS5
-#: chart2/uiconfig/ui/sidebartype.ui:187
+#: chart2/uiconfig/ui/sidebartype.ui:153
 msgctxt "sidebartype|stack"
 msgid "_Stack series"
 msgstr "Σειρά _στοίβαξης"
 
-#. Yau6n
-#: chart2/uiconfig/ui/sidebartype.ui:207
-msgctxt "sidebartype|ontop"
-msgid "On top"
-msgstr "Επάνω"
-
-#. f2J43
-#: chart2/uiconfig/ui/sidebartype.ui:221
-msgctxt "sidebartype|percent"
-msgid "Percent"
-msgstr "Ποσοστό"
-
-#. iDSaa
-#: chart2/uiconfig/ui/sidebartype.ui:235
-msgctxt "sidebartype|deep"
-msgid "Deep"
-msgstr "Βαθιά"
-
 #. KaS7Z
-#: chart2/uiconfig/ui/sidebartype.ui:263
+#: chart2/uiconfig/ui/sidebartype.ui:170
 msgctxt "sidebartype|linetypeft"
 msgid "_Line type"
 msgstr "Τύπος _γραμμής"
 
 #. Hqc3N
-#: chart2/uiconfig/ui/sidebartype.ui:278
+#: chart2/uiconfig/ui/sidebartype.ui:183
 msgctxt "sidebartype|linetype"
 msgid "Straight"
 msgstr "Ευθεία"
 
 #. EB58Z
-#: chart2/uiconfig/ui/sidebartype.ui:279
+#: chart2/uiconfig/ui/sidebartype.ui:184
 msgctxt "sidebartype|linetype"
 msgid "Smooth"
 msgstr "Ομαλά"
 
 #. qLn3k
-#: chart2/uiconfig/ui/sidebartype.ui:280
+#: chart2/uiconfig/ui/sidebartype.ui:185
 msgctxt "sidebartype|linetype"
 msgid "Stepped"
 msgstr "Σταδιακά"
 
 #. jKDXh
-#: chart2/uiconfig/ui/sidebartype.ui:290
+#: chart2/uiconfig/ui/sidebartype.ui:195
 msgctxt "sidebartype|properties"
 msgid "Properties..."
 msgstr "Ιδιότητες..."
 
 #. xW9CQ
-#: chart2/uiconfig/ui/sidebartype.ui:308
+#: chart2/uiconfig/ui/sidebartype.ui:207
 msgctxt "sidebartype|sort"
 msgid "_Sort by X values"
 msgstr "Τα_ξινόμηση κατά τιμές X"
 
 #. thu3G
-#: chart2/uiconfig/ui/sidebartype.ui:330
+#: chart2/uiconfig/ui/sidebartype.ui:223
 msgctxt "sidebartype|nolinesft"
 msgid "_Number of lines"
 msgstr "Αρι_θμός γραμμών"
+
+#. Yau6n
+#: chart2/uiconfig/ui/sidebartype.ui:282
+msgctxt "sidebartype|ontop"
+msgid "On top"
+msgstr "Επάνω"
+
+#. f2J43
+#: chart2/uiconfig/ui/sidebartype.ui:298
+msgctxt "sidebartype|percent"
+msgid "Percent"
+msgstr "Ποσοστό"
+
+#. iDSaa
+#: chart2/uiconfig/ui/sidebartype.ui:314
+msgctxt "sidebartype|deep"
+msgid "Deep"
+msgstr "Βαθιά"
 
 #. Ledzw
 #: chart2/uiconfig/ui/smoothlinesdlg.ui:22
@@ -4063,6 +4111,36 @@ msgctxt "tp_DataSource|FT_CAPTION_FOR_WIZARD"
 msgid "Customize Data Ranges for Individual Data Series"
 msgstr "Προσαρμογή περιοχών δεδομένων για μεμονωμένες σειρές δεδομένων"
 
+#. JGgFh
+#: chart2/uiconfig/ui/tp_DataTable.ui:33
+msgctxt "tp_DataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Εμφάνιση οριζόντιου περιγράμματος"
+
+#. EzGM5
+#: chart2/uiconfig/ui/tp_DataTable.ui:49
+msgctxt "tp_DataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Εμφάνιση κάθετου περιγράμματος"
+
+#. ZTAZY
+#: chart2/uiconfig/ui/tp_DataTable.ui:65
+msgctxt "tp_DataTable|outlineCB"
+msgid "Show outline"
+msgstr "Εμφάνιση διάρθρωσης"
+
+#. kPDNa
+#: chart2/uiconfig/ui/tp_DataTable.ui:81
+msgctxt "tp_DataTable|keysCB"
+msgid "Show keys"
+msgstr "Εμφάνιση κλειδιών"
+
+#. fybMv
+#: chart2/uiconfig/ui/tp_DataTable.ui:101
+msgctxt "tp_axisLabel|textflowL"
+msgid "Data Table Properties"
+msgstr "Ιδιότητες πίνακα δεδομένων"
+
 #. tGqhN
 #: chart2/uiconfig/ui/tp_ErrorBars.ui:53
 msgctxt "tp_ErrorBars|RB_NONE"
@@ -5251,11 +5329,11 @@ msgctxt "tp_axisLabel|even"
 msgid "Stagger _even"
 msgstr "Εναλλα_σσόμενος άρτιος"
 
-#. 9EMGj
+#. a6qBM
 #: chart2/uiconfig/ui/tp_axisLabel.ui:113
 msgctxt "tp_axisLabel|extended_tip|even"
-msgid "Stagger numbers on the axes, odd numbers lower than even numbers."
-msgstr "Αναπτύσσει αναλυτικά του αριθμούς στους άξονες, με τους περιττούς αριθμούς χαμηλότερα από τους άρτιους."
+msgid "Stagger numbers on the axis, odd numbers lower than even numbers."
+msgstr "Κλιμακωτοί αριθμοί στον άξονα, περιττοί αριθμοί χαμηλότερα από τους άρτιους αριθμούς."
 
 #. 2JwY3
 #: chart2/uiconfig/ui/tp_axisLabel.ui:125

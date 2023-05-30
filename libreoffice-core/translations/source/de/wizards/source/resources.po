@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2022-07-26 09:17+0000\n"
-"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-01-23 11:30+0000\n"
+"Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Das Verzeichnis '%1' konnte nicht erstellt werden.<BR>Möglicherweise ist auf Ihrer Festplatte nicht genügend Speicherplatz vorhanden."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Das Textdokument konnte nicht erzeugt werden.<BR>Überprüfen Sie bitte, ob das Modul 'PRODUCTNAME Writer' installiert ist."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "Das Textdokument konnte nicht erstellt werden.<BR>Bitte überprüfen Sie, ob das Modul „%PRODUCTNAME Writer“ installiert ist."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Das Tabellendokument konnte nicht erzeugt werden.<BR>Überprüfen Sie bitte, ob das Modul 'PRODUCTNAME Calc' installiert ist."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "Das Tabellendokument konnte nicht erstellt werden.<BR>Bitte prüfen Sie, ob das Modul „%PRODUCTNAME Calc“ installiert ist."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Die Präsentation konnte nicht erzeugt werden.<BR>Überprüfen Sie bitte, ob das Modul 'PRODUCTNAME Impress' installiert ist."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "Die Präsentation konnte nicht erstellt werden.<BR>Bitte überprüfen Sie, ob das Modul „%PRODUCTNAME Impress“ installiert ist."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Die Zeichnung konnte nicht erzeugt werden.<BR>Überprüfen Sie bitte, ob das Modul 'PRODUCTNAME Draw' installiert ist."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "Die Zeichnung konnte nicht erstellt werden.<BR>Bitte überprüfen Sie, ob das Modul „%PRODUCTNAME Draw“ installiert ist."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Die Formel konnte nicht erzeugt werden.<BR>Überprüfen Sie bitte, ob das Modul 'PRODUCTNAME Math' installiert ist."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "Das Formeldokument konnte nicht erstellt werden.<BR>Bitte prüfen Sie, ob das Modul „%PRODUCTNAME Math“ installiert ist."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -212,7 +212,7 @@ msgctxt ""
 "RID_COMMON_21\n"
 "property.text"
 msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
-msgstr "Der Assistent kann nicht ausgeführt werden, da wichtige Dateien nicht gefunden werden konnten.\\nUnter »Extras ▸ Optionen… ▸ %PRODUCTNAME ▸ Pfade« können Sie die Standardeinstellungen der Pfade durch Klick auf die Schaltfläche »Standard« wiederherstellen.\\nRufen Sie danach den Assistenten erneut auf."
+msgstr "Der Assistent kann nicht ausgeführt werden, da wichtige Dateien nicht gefunden werden konnten.\\nUnter »Extras ▸ Optionen… ▸ %PRODUCTNAME ▸ Pfade« können Sie die Voreinstellungen der Pfade durch Klick auf die Schaltfläche »Standard« wiederherstellen.\\nRufen Sie danach den Assistenten erneut auf."
 
 #. GohbP
 #: resources_en_US.properties
@@ -1220,7 +1220,7 @@ msgctxt ""
 "RID_DB_COMMON_8\n"
 "property.text"
 msgid "No database has been installed. At least one database is required before the wizard for forms can be started."
-msgstr "Es ist keine Datenbank installiert. Mindestens eine Datenbank ist erforderlich, bevor der Formular-Assistent gestartet werden kann."
+msgstr "Es ist keine Datenbank installiert. Mindestens eine Datenbank ist erforderlich, bevor der Formularassistent gestartet werden kann."
 
 #. GCAgB
 #: resources_en_US.properties
@@ -1508,7 +1508,7 @@ msgctxt ""
 "RID_QUERY_9\n"
 "property.text"
 msgid "Match ~all of the following"
-msgstr "Entspricht ~allen folgenden Bedingungen"
+msgstr "Übereinstimmung mit ~allen folgenden Bedingungen"
 
 #. 4xM3Z
 #: resources_en_US.properties
@@ -1517,7 +1517,7 @@ msgctxt ""
 "RID_QUERY_10\n"
 "property.text"
 msgid "~Match any of the following"
-msgstr "~Entspricht einigen der folgenden Bedingungen"
+msgstr "Übereinstimmung mit ~einer der folgenden Bedingungen"
 
 #. WLFFc
 #: resources_en_US.properties
@@ -1535,7 +1535,7 @@ msgctxt ""
 "RID_QUERY_12\n"
 "property.text"
 msgid "~Summary query (Shows only results of aggregate functions.)"
-msgstr "~Zusammenfassende Abfrage (zeigt nur Ergebnisse von Aggregat-Funktionen)"
+msgstr "~Zusammenfassende Abfrage (zeigt nur Ergebnisse von Aggregatfunktionen)"
 
 #. SdQBk
 #: resources_en_US.properties
@@ -1544,7 +1544,7 @@ msgctxt ""
 "RID_QUERY_16\n"
 "property.text"
 msgid "Aggregate functions"
-msgstr "Aggregat-Funktionen"
+msgstr "Aggregatfunktionen"
 
 #. tFNb2
 #: resources_en_US.properties
@@ -1850,7 +1850,7 @@ msgctxt ""
 "RID_QUERY_55\n"
 "property.text"
 msgid "Aggregate functions:"
-msgstr "Agregat-Funktionen:"
+msgstr "Agregatfunktionen:"
 
 #. mArUE
 #: resources_en_US.properties
@@ -1859,7 +1859,7 @@ msgctxt ""
 "RID_QUERY_56\n"
 "property.text"
 msgid "No aggregate functions were assigned."
-msgstr "Es wurden keine Aggregat-Funktionen festgelegt."
+msgstr "Es wurden keine Aggregatfunktionen festgelegt."
 
 #. uDTRV
 #: resources_en_US.properties
@@ -2048,7 +2048,7 @@ msgctxt ""
 "RID_QUERY_88\n"
 "property.text"
 msgid "A field that has not been assigned an aggregate function must be used in a group."
-msgstr "Sie müssen ein Feld, dem keine Aggregat-Funktion zugewiesen ist, als Gruppierung verwenden."
+msgstr "Sie müssen ein Feld, dem keine Aggregatfunktion zugewiesen ist, als Gruppierung verwenden."
 
 #. 2C2nu
 #: resources_en_US.properties
@@ -2066,7 +2066,7 @@ msgctxt ""
 "RID_QUERY_90\n"
 "property.text"
 msgid "The aggregate function <FUNCTION> has been assigned twice to the fieldname '<NUMERICFIELD>'."
-msgstr "Die Aggregat-Funktion <FUNCTION> wurde dem Feldnamen '<NUMERICFIELD>' zweimal zugeordnet."
+msgstr "Die Aggregatfunktion <FUNCTION> wurde dem Feldnamen '<NUMERICFIELD>' zweimal zugeordnet."
 
 #. s2MGE
 #: resources_en_US.properties
@@ -2129,7 +2129,7 @@ msgctxt ""
 "RID_FORM_0\n"
 "property.text"
 msgid "Form Wizard"
-msgstr "Formular-Assistent"
+msgstr "Formularassistent"
 
 #. H4MXV
 #: resources_en_US.properties
@@ -3841,6 +3841,15 @@ msgctxt ""
 msgid "Lithuanian Litas"
 msgstr "Litauischer Litas"
 
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "Kroatische Kuna"
+
 #. eDjBr
 #: resources_en_US.properties
 msgctxt ""
@@ -4802,7 +4811,7 @@ msgctxt ""
 "SearchInSubDir\n"
 "property.text"
 msgid "Including subdirectories"
-msgstr "inklusive Unterverzeichnisse"
+msgstr "Inklusive Unterverzeichnisse"
 
 #. Juv8i
 #: resources_en_US.properties

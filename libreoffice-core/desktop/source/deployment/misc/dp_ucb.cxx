@@ -19,8 +19,6 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <dp_misc.h>
 #include <dp_ucb.h>
 #include <rtl/uri.hxx>
@@ -199,7 +197,7 @@ std::vector<sal_Int8> readFile( ::ucbhelper::Content & ucb_content )
 }
 
 
-bool readLine( OUString * res, OUString const & startingWith,
+bool readLine( OUString * res, std::u16string_view startingWith,
                ::ucbhelper::Content & ucb_content, rtl_TextEncoding textenc )
 {
     // read whole file:
@@ -213,7 +211,7 @@ bool readLine( OUString * res, OUString const & startingWith,
         {
             OUStringBuffer buf;
             sal_Int32 start = pos;
-            pos += startingWith.getLength();
+            pos += startingWith.size();
             for (;;)
             {
                 pos = file.indexOf( LF, pos );

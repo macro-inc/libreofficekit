@@ -133,9 +133,7 @@ class SwAccessibleParagraph :
     static void OrderRange(sal_Int32& nBegin, sal_Int32& nEnd)
     {
         if( nBegin > nEnd )
-        {
-            sal_Int32 nTmp = nBegin; nBegin = nEnd; nEnd = nTmp;
-        }
+            std::swap( nBegin, nEnd );
     }
 
     const SwRangeRedline* GetRedlineAtIndex();
@@ -167,7 +165,7 @@ protected:
     // Set states for getAccessibleStateSet.
     // This derived class additionally sets MULTILINE(1), MULTISELECTABLE(+),
     // FOCUSABLE(+) and FOCUSED(+)
-    virtual void GetStates( ::utl::AccessibleStateSetHelper& rStateSet ) override;
+    virtual void GetStates( sal_Int64& rStateSet ) override;
 
     virtual void InvalidateContent_( bool bVisibleDataFired ) override;
 
@@ -205,10 +203,10 @@ protected:
                                   const OUString& rText,
                                   sal_Int32 nPos );
     bool GetLineBoundary( css::i18n::Boundary& rBound,
-                              const OUString& rText,
+                              std::u16string_view aText,
                               sal_Int32 nPos );
     static bool GetParagraphBoundary( css::i18n::Boundary& rBound,
-                                   const OUString& rText );
+                                   std::u16string_view aText );
     bool GetAttributeBoundary( css::i18n::Boundary& rBound,
                                    sal_Int32 nPos );
     bool GetGlyphBoundary( css::i18n::Boundary& rBound,
@@ -327,19 +325,19 @@ public:
 
     // XAccessibleSelection
     virtual void SAL_CALL selectAccessibleChild(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     virtual sal_Bool SAL_CALL isAccessibleChildSelected(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
     virtual void SAL_CALL clearAccessibleSelection(  ) override;
     virtual void SAL_CALL selectAllAccessibleChildren(  ) override;
-    virtual sal_Int32 SAL_CALL getSelectedAccessibleChildCount(  ) override;
+    virtual sal_Int64 SAL_CALL getSelectedAccessibleChildCount(  ) override;
     virtual css::uno::Reference< css::accessibility::XAccessible > SAL_CALL getSelectedAccessibleChild(
-        sal_Int32 nSelectedChildIndex ) override;
+        sal_Int64 nSelectedChildIndex ) override;
 
     // index has to be treated as global child index.
     virtual void SAL_CALL deselectAccessibleChild(
-        sal_Int32 nChildIndex ) override;
+        sal_Int64 nChildIndex ) override;
 
     // XAccessibleHypertext
     virtual sal_Int32 SAL_CALL getHyperLinkCount() override;

@@ -22,25 +22,15 @@
 #include <postmac.h>
 
 #include "ios/iosinst.hxx"
+#include "quartz/salgdi.h"
+#include "headless/svpdata.hxx"
 #include "headless/svpdummies.hxx"
-#include "unx/gendata.hxx"
 #include "quartz/utils.h"
 #include <vcl/layout.hxx>
 #include <vcl/settings.hxx>
 
 // Totally wrong of course but doesn't seem to harm much in the iOS app.
 static int viewWidth = 1, viewHeight = 1;
-
-class IosSalData : public GenericUnixSalData
-{
-public:
-    explicit IosSalData(SalInstance *pInstance)
-        : GenericUnixSalData(pInstance)
-    {
-    }
-    virtual void ErrorTrapPush() {}
-    virtual bool ErrorTrapPop( bool ) { return false; }
-};
 
 void IosSalInstance::GetWorkArea( tools::Rectangle& rRect )
 {
@@ -52,10 +42,7 @@ IosSalInstance *IosSalInstance::getInstance()
 {
     if (!ImplGetSVData())
         return NULL;
-    IosSalData *pData = static_cast<IosSalData *>(ImplGetSVData()->mpSalData);
-    if (!pData)
-        return NULL;
-    return static_cast<IosSalInstance *>(pData->m_pInstance);
+    return static_cast<IosSalInstance *>(GetSalInstance());
 }
 
 IosSalInstance::IosSalInstance( std::unique_ptr<SalYieldMutex> pMutex )
@@ -134,7 +121,7 @@ public:
 
 SalFrame *IosSalInstance::CreateChildFrame( SystemParentData* pParent, SalFrameStyleFlags nStyle )
 {
-    pParent = NULL;
+    (void)pParent;
     return new IosSalFrame( this, NULL, nStyle );
 }
 
@@ -143,44 +130,24 @@ SalFrame *IosSalInstance::CreateFrame( SalFrame* pParent, SalFrameStyleFlags nSt
     return new IosSalFrame( this, pParent, nStyle );
 }
 
-void SalAbort( const OUString& rErrorText, bool bDumpCore )
-{
-    (void) bDumpCore;
-
-    NSLog(@"SalAbort: %s", OUStringToOString(rErrorText, osl_getThreadTextEncoding()).getStr() );
-}
-
-const OUString& SalGetDesktopEnvironment()
-{
-    static OUString aEnv( "iOS" );
-    return aEnv;
-}
-
 SalData::SalData() :
-    m_pInstance( 0 ),
-    mpFontList( 0 ),
     mxRGBSpace( CGColorSpaceCreateDeviceRGB() ),
     mxGraySpace( CGColorSpaceCreateDeviceGray() )
 {
+    SetSalData(this);
 }
 
 SalData::~SalData()
 {
+    CGColorSpaceRelease(mxRGBSpace);
+    CGColorSpaceRelease(mxGraySpace);
 }
 
-// This is our main entry point:
-SalInstance *CreateSalInstance()
+extern "C" SalInstance *create_SalInstance()
 {
     IosSalInstance* pInstance = new IosSalInstance( std::make_unique<SvpSalYieldMutex>() );
-    new IosSalData( pInstance );
-    pInstance->AcquireYieldMutex();
+    new SvpSalData();
     return pInstance;
-}
-
-void DestroySalInstance( SalInstance *pInst )
-{
-    pInst->ReleaseYieldMutexAll();
-    delete pInst;
 }
 
 int IosSalSystem::ShowNativeDialog( const OUString& rTitle,

@@ -25,7 +25,6 @@
 #include <rtl/ref.hxx>
 
 #include <vector>
-#include <memory>
 
 #include <basecontainercontrol.hxx>
 
@@ -37,8 +36,8 @@ namespace unocontrols {
 class ProgressBar;
 
 #define PROGRESSMONITOR_FREEBORDER                      10                                                      // border around and between the controls
-#define PROGRESSMONITOR_DEFAULT_TOPIC                   ""
-#define PROGRESSMONITOR_DEFAULT_TEXT                    ""
+inline constexpr OUStringLiteral PROGRESSMONITOR_DEFAULT_TOPIC  = u"";
+inline constexpr OUStringLiteral PROGRESSMONITOR_DEFAULT_TEXT = u"";
 #define PROGRESSMONITOR_LINECOLOR_BRIGHT                sal_Int32(Color( 0xFF, 0xFF, 0xFF ))             // white
 #define PROGRESSMONITOR_LINECOLOR_SHADOW                sal_Int32(Color( 0x00, 0x00, 0x00 ))             // black
 #define PROGRESSMONITOR_DEFAULT_WIDTH                   350

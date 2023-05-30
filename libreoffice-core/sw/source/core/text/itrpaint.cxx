@@ -127,6 +127,7 @@ void SwTextPainter::DrawTextLine( const SwRect &rPaint, SwSaveClip &rClip,
 
     // maybe catch-up adjustment
     GetAdjusted();
+    AddExtraBlankWidth();
     GetInfo().SetpSpaceAdd( m_pCurr->GetpLLSpaceAdd() );
     GetInfo().ResetSpaceIdx();
     GetInfo().SetKanaComp( m_pCurr->GetpKanaComp() );
@@ -243,7 +244,7 @@ void SwTextPainter::DrawTextLine( const SwRect &rPaint, SwSaveClip &rClip,
     SwTextGridItem const*const pGrid(GetGridItem(GetTextFrame()->FindPageFrame()));
     const bool bAdjustBaseLine =
         GetLineInfo().HasSpecialAlign( GetTextFrame()->IsVertical() ) ||
-        ( nullptr != pGrid );
+        ( nullptr != pGrid ) || m_pCurr->GetHangingBaseline();
     const SwTwips nLineBaseLine = GetInfo().GetPos().Y() + nTmpAscent;
     if ( ! bAdjustBaseLine )
         GetInfo().Y( nLineBaseLine );
@@ -543,12 +544,11 @@ void SwTextPainter::CheckSpecialUnderline( const SwLinePortion* pPor,
         sal_Int32 nTmp(0);
         for (auto const& e : pMerged->extents)
         {
-            const SfxPoolItem* pItem;
-            if (SfxItemState::SET == e.pNode->GetSwAttrSet().GetItemState(
-                        RES_CHRATR_UNDERLINE, true, &pItem))
+            if (const SvxUnderlineItem* pItem = e.pNode->GetSwAttrSet().GetItemIfSet(
+                        RES_CHRATR_UNDERLINE))
             {
                 const bool bUnderSelect(m_pFont->GetUnderline() ==
-                    static_cast<SvxUnderlineItem const*>(pItem)->GetLineStyle());
+                    pItem->GetLineStyle());
                 aUnderMulti.Select(Range(nTmp, nTmp + e.nEnd - e.nStart - 1),
                         bUnderSelect);
             }

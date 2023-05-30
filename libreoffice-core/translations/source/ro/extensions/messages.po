@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
 "POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-06 16:25+0000\n"
+"PO-Revision-Date: 2023-02-06 18:34+0000\n"
 "Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
 "Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/extensionsmessages/ro/>\n"
 "Language: ro\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1542024685.000000\n"
 
 #. cBx8W
@@ -229,7 +229,7 @@ msgstr "Trimite formularul"
 #: extensions/inc/stringarrays.hrc:68
 msgctxt "RID_RSC_ENUM_BUTTONTYPE"
 msgid "Reset form"
-msgstr "Resetează formularul"
+msgstr "Restabilește formularul"
 
 #. dvtFb
 #: extensions/inc/stringarrays.hrc:69
@@ -763,7 +763,7 @@ msgstr "Niciodată"
 #: extensions/inc/stringarrays.hrc:237
 msgctxt "RID_RSC_ENUM_WHEEL_BEHAVIOR"
 msgid "When focused"
-msgstr "Când este în prim plan"
+msgstr "Când este focalizat"
 
 #. YXySA
 #: extensions/inc/stringarrays.hrc:238
@@ -883,7 +883,7 @@ msgstr "Separator de mii"
 #: extensions/inc/strings.hrc:38
 msgctxt "RID_STR_PRINTABLE"
 msgid "Printable"
-msgstr "Imprimabil"
+msgstr "Tipăribil"
 
 #. EBE9n
 #: extensions/inc/strings.hrc:39
@@ -1387,7 +1387,7 @@ msgstr "Tip expediere"
 #: extensions/inc/strings.hrc:122
 msgctxt "RID_STR_DEFAULT_STATE"
 msgid "Default status"
-msgstr "Starea implicită"
+msgstr "Stare implicită"
 
 #. 7PXL5
 #: extensions/inc/strings.hrc:123
@@ -1399,7 +1399,7 @@ msgstr "Criptare transfer"
 #: extensions/inc/strings.hrc:124
 msgctxt "RID_STR_DEFAULTVALUE"
 msgid "Default value"
-msgstr "Valoarea implicită"
+msgstr "Valoare implicită"
 
 #. CMMC4
 #: extensions/inc/strings.hrc:125
@@ -1417,7 +1417,7 @@ msgstr "Dată implicită"
 #: extensions/inc/strings.hrc:127
 msgctxt "RID_STR_DEFAULTTIME"
 msgid "Default time"
-msgstr "Ora implicită"
+msgstr "Oră implicită"
 
 #. GA9tS
 #: extensions/inc/strings.hrc:128
@@ -1477,13 +1477,13 @@ msgstr "A intervenit o eroare"
 #: extensions/inc/strings.hrc:137
 msgctxt "RID_STR_EVT_FOCUSGAINED"
 msgid "When receiving focus"
-msgstr "Focus la primire"
+msgstr "La primirea focalizării"
 
 #. eCKWw
 #: extensions/inc/strings.hrc:138
 msgctxt "RID_STR_EVT_FOCUSLOST"
 msgid "When losing focus"
-msgstr "Focus la pierdere"
+msgstr "La pierderea focalizării"
 
 #. 3d7Bg
 #: extensions/inc/strings.hrc:139
@@ -1717,7 +1717,7 @@ msgstr "Derulare la stânga"
 #: extensions/inc/strings.hrc:177
 msgctxt "RID_STR_DEFAULT_SCROLLVALUE"
 msgid "Default scroll value"
-msgstr "Valoare de defilare implicită"
+msgstr "Valoare de derulare implicită"
 
 #. UYujs
 #: extensions/inc/strings.hrc:178
@@ -2207,7 +2207,7 @@ msgstr "Date"
 #: extensions/inc/strings.hrc:262
 msgctxt "RID_EMBED_IMAGE_PLACEHOLDER"
 msgid "<Embedded-Image>"
-msgstr "<Embedded-Image>"
+msgstr "<Imagine încorporată>"
 
 #. jTsR3
 #: extensions/inc/strings.hrc:263
@@ -2307,7 +2307,7 @@ msgstr "Control de tip imagine"
 #: extensions/inc/strings.hrc:280
 msgctxt "RID_STR_PROPTITLE_FILECONTROL"
 msgid "File Selection"
-msgstr "Selecție fișier"
+msgstr "Selecție de fișier"
 
 #. a7gAj
 #: extensions/inc/strings.hrc:281
@@ -3130,7 +3130,7 @@ msgstr ""
 #: extensions/uiconfig/sabpilot/ui/datasourcepage.ui:43
 msgctxt "datasourcepage|embed"
 msgid "Embed this address book definition into the current document."
-msgstr "Încorporează această definiție agendă în documentul curent."
+msgstr "Încorporează această definiție a agendei în documentul curent."
 
 #. jcF56
 #: extensions/uiconfig/sabpilot/ui/datasourcepage.ui:66
@@ -3202,13 +3202,13 @@ msgstr "Doriți să fie selectat implicit un câmp de opțiune?"
 #: extensions/uiconfig/sabpilot/ui/defaultfieldselectionpage.ui:39
 msgctxt "defaultfieldselectionpage|defaultselectionyes"
 msgid "_Yes, the following:"
-msgstr "_Da, următoarea:"
+msgstr "_Da, următorul:"
 
 #. gWYi6
 #: extensions/uiconfig/sabpilot/ui/defaultfieldselectionpage.ui:79
 msgctxt "defaultfieldselectionpage|defaultselectionno"
 msgid "No, one particular field is not going to be selected."
-msgstr "Nu, nu va fi selectată niciuna."
+msgstr "Nu, nu va fi selectat niciunul."
 
 #. XXEB7
 #: extensions/uiconfig/sabpilot/ui/fieldassignpage.ui:15
@@ -3875,7 +3875,7 @@ msgstr ""
 #: extensions/uiconfig/sbibliography/ui/mappingdialog.ui:8
 msgctxt "mappingdialog|MappingDialog"
 msgid "Column Layout for Table “%1”"
-msgstr "Aranjament de coloană pentru tabelul „%1”"
+msgstr "Aspect de coloană pentru tabelul „%1”"
 
 #. ZttGm
 #: extensions/uiconfig/sbibliography/ui/mappingdialog.ui:101
@@ -4097,7 +4097,7 @@ msgstr "Sursă de date"
 #: extensions/uiconfig/sbibliography/ui/toolbar.ui:67
 msgctxt "toolbar|TBC_BT_AUTOFILTER"
 msgid "AutoFilter"
-msgstr "Filtrare automată"
+msgstr "Filtru automat"
 
 #. Xbpge
 #: extensions/uiconfig/sbibliography/ui/toolbar.ui:79

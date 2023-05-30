@@ -27,6 +27,7 @@
 
 #include <rtl/ref.hxx>
 #include <svl/style.hxx>
+#include <svl/grabbagitem.hxx>
 #include <svx/sdtaitm.hxx>
 #include "tablemodel.hxx"
 #include <editeng/unotext.hxx>
@@ -46,8 +47,7 @@ class UNLESS_MERGELIBS(SVXCORE_DLLPUBLIC) Cell final : public SdrText,
                 public SvxUnoTextBase,
                 public css::table::XMergeableCell,
                 public css::awt::XLayoutConstrains,
-                public css::lang::XEventListener,
-                public ::cppu::OWeakObject
+                public css::lang::XEventListener
 {
     friend class CellUndo;
 
@@ -210,6 +210,8 @@ private:
     tools::Rectangle       maCellRect;
 
     css::uno::Reference< css::table::XTable > mxTable;
+
+    std::unique_ptr<SfxGrabBagItem> mpGrabBagItem = {};
 };
 
 

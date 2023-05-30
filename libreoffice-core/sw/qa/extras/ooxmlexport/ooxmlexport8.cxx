@@ -7,8 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <memory>
-#include <string_view>
 
 #ifdef MACOSX
 #define __ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES 0
@@ -21,30 +19,15 @@
 
 #include <IDocumentSettingAccess.hxx>
 #include <com/sun/star/awt/XBitmap.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/XControlShape.hpp>
-#include <com/sun/star/drawing/PointSequenceSequence.hpp>
-#include <com/sun/star/drawing/TextVerticalAdjust.hpp>
-#include <com/sun/star/graphic/XGraphic.hpp>
-#include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 #include <com/sun/star/text/RelOrientation.hpp>
 #include <com/sun/star/text/TableColumnSeparator.hpp>
-#include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/text/VertOrientation.hpp>
 #include <com/sun/star/text/WrapTextMode.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
-#include <com/sun/star/text/XTextFramesSupplier.hpp>
 #include <com/sun/star/style/BreakType.hpp>
-#include <com/sun/star/style/ParagraphAdjust.hpp>
 #include <com/sun/star/table/ShadowFormat.hpp>
-#include <com/sun/star/table/BorderLine2.hpp>
 #include <com/sun/star/table/TableBorder2.hpp>
-#include <com/sun/star/container/XNameContainer.hpp>
-#include <com/sun/star/text/XNumberingRulesSupplier.hpp>
-#include <com/sun/star/text/XTextTablesSupplier.hpp>
-#include <com/sun/star/drawing/XShapes.hpp>
-#include <com/sun/star/text/XTextFieldsSupplier.hpp>
 
 #include <tools/UnitConversion.hxx>
 #include <unotools/fltrcfg.hxx>
@@ -52,9 +35,9 @@
 #include <oox/drawingml/drawingmltypes.hxx>
 #include <xmloff/odffields.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <IDocumentMarkAccess.hxx>
-#include <IMark.hxx>
 #include <bordertest.hxx>
 #include <unotxdoc.hxx>
 #include <docsh.hxx>
@@ -78,15 +61,6 @@ public:
         }
         return nullptr;
     }
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
-    }
 };
 
 DECLARE_OOXMLEXPORT_TEST(testN751054, "n751054.docx")
@@ -95,8 +69,9 @@ DECLARE_OOXMLEXPORT_TEST(testN751054, "n751054.docx")
     CPPUNIT_ASSERT(eValue != text::TextContentAnchorType_AS_CHARACTER);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf48569, "tdf48569.odt")
+CPPUNIT_TEST_FIXTURE(Test, testTdf48569)
 {
+    loadAndReload("tdf48569.odt");
     CPPUNIT_ASSERT_EQUAL(2, getShapes());
     CPPUNIT_ASSERT_EQUAL(1, getPages());
     // File crashing while saving in LO
@@ -203,9 +178,9 @@ xray image.FillColor
 */
     uno::Reference<drawing::XShape> image = getShape(1);
     uno::Reference<beans::XPropertySet> imageProperties(image, uno::UNO_QUERY);
-    sal_Int32 fillColor;
+    Color fillColor;
     imageProperties->getPropertyValue( "FillColor" ) >>= fillColor;
-    CPPUNIT_ASSERT_EQUAL( sal_Int32( 0xc0504d ), fillColor );
+    CPPUNIT_ASSERT_EQUAL( Color( 0xc0504d ), fillColor );
 }
 
 DECLARE_OOXMLEXPORT_TEST(testN747461, "n747461.docx")
@@ -489,8 +464,9 @@ DECLARE_OOXMLEXPORT_TEST(testTDF91122, "tdf91122.docx")
     }
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testFdo76803, "fdo76803.docx")
+CPPUNIT_TEST_FIXTURE(Test, testFdo76803)
 {
+    loadAndReload("fdo76803.docx");
     // The ContourPolyPolygon was wrong
     uno::Reference<beans::XPropertySet> xPropertySet(getShape(1), uno::UNO_QUERY);
 
@@ -537,9 +513,10 @@ DECLARE_OOXMLEXPORT_TEST(testTDF91260, "tdf91260.docx")
 
 DECLARE_OOXMLEXPORT_TEST(testFdo74357, "fdo74357.docx")
 {
-    // Floating table wasn't converted to a textframe.
-    // This was 0.
-    CPPUNIT_ASSERT_EQUAL(1, getShapes());
+    // Normal outer table, floating inner table.
+    uno::Reference<text::XTextTablesSupplier> xTextTablesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xIndexAccess(xTextTablesSupplier->getTextTables(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), xIndexAccess->getCount());
 
     // Bottom margin of the first paragraph was too large, causing a layout problem.
     // This was 494.
@@ -716,7 +693,7 @@ DECLARE_OOXMLEXPORT_TEST(testGroupshapeSmarttag, "groupshape-smarttag.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("Box 2"), xShape->getString());
 
     // Font size of the shape text was 10.
-    CPPUNIT_ASSERT_EQUAL(12.f, getProperty<float>(xShape->getText(), "CharHeight"));
+    CPPUNIT_ASSERT_EQUAL(12.f, getProperty<float>(getParagraphOfText(1, xShape->getText()), "CharHeight"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testN793262, "n793262.docx")
@@ -736,42 +713,48 @@ DECLARE_OOXMLEXPORT_TEST(testN793262, "n793262.docx")
 
 DECLARE_OOXMLEXPORT_TEST(testN793998, "n793998.docx")
 {
-    sal_Int32 nTextPortion = parseDump("/root/page/body/txt/Text[1]", "nWidth").toInt32(); // Width of the first (text) portion
-    sal_Int32 nTabPortion = parseDump("/root/page/body/txt/Text[2]", "nWidth").toInt32(); // Width of the second (tab) portion
+    sal_Int32 nTextPortion = parseDump("/root/page/body/txt/SwParaPortion/SwLineLayout/child::*[1]", "width").toInt32(); // Width of the first (text) portion
+    sal_Int32 nTabPortion = parseDump("/root/page/body/txt/SwParaPortion/SwLineLayout/child::*[2]", "width").toInt32(); // Width of the second (tab) portion
     sal_Int32 nParagraph = parseDump("/root/page/body/txt/infos/bounds", "width").toInt32(); // Width of the paragraph
     sal_Int32 const nRightMargin = 3000;
     // The problem was that the tab portion didn't ignore the right margin, so text + tab width wasn't larger than body (paragraph - right margin) width.
     CPPUNIT_ASSERT(nTextPortion + nTabPortion > nParagraph - nRightMargin);
 }
 
-DECLARE_OOXMLEXPORT_TEST(testN779642, "n779642.docx")
+CPPUNIT_TEST_FIXTURE(Test, testN779642)
 {
-    uno::Reference<text::XTextTablesSupplier> xTextTablesSupplier(mxComponent, uno::UNO_QUERY);
+    auto verify = [this]() {
+        uno::Reference<text::XTextTablesSupplier> xTextTablesSupplier(mxComponent, uno::UNO_QUERY);
 
-    // First problem: check that we have 2 tables, nesting caused the
-    // creation of outer one to fail
-    uno::Reference<container::XIndexAccess> xTables(xTextTablesSupplier->getTextTables(), uno::UNO_QUERY);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of imported tables", sal_Int32(2), xTables->getCount());
+        // First problem: check that we have 2 tables, nesting caused the
+        // creation of outer one to fail
+        uno::Reference<container::XIndexAccess> xTables(xTextTablesSupplier->getTextTables(), uno::UNO_QUERY);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong number of imported tables", sal_Int32(2), xTables->getCount());
 
-    // Second problem: check that the outer table is in a frame, at the bottom of the page
-    uno::Reference<text::XTextTable> xTextTable(xTextTablesSupplier->getTextTables()->getByName("Table2"), uno::UNO_QUERY);
-    uno::Reference<beans::XPropertySet> xAnchor(xTextTable->getAnchor(), uno::UNO_QUERY);
-    uno::Any aFrame = xAnchor->getPropertyValue("TextFrame");
-    uno::Reference<beans::XPropertySet> xFrame;
-    aFrame >>= xFrame;
-    sal_Int16 nValue;
-    xFrame->getPropertyValue("VertOrient") >>= nValue;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation", text::VertOrientation::BOTTOM, nValue);
-    xFrame->getPropertyValue("VertOrientRelation") >>= nValue;
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation relation", text::RelOrientation::PAGE_PRINT_AREA, nValue);
+        // Second problem: check that the outer table is in a frame, at the bottom of the page
+        uno::Reference<text::XTextTable> xTextTable(xTextTablesSupplier->getTextTables()->getByName("Table2"), uno::UNO_QUERY);
+        uno::Reference<beans::XPropertySet> xAnchor(xTextTable->getAnchor(), uno::UNO_QUERY);
+        uno::Any aFrame = xAnchor->getPropertyValue("TextFrame");
+        uno::Reference<beans::XPropertySet> xFrame;
+        aFrame >>= xFrame;
+        sal_Int16 nValue;
+        xFrame->getPropertyValue("VertOrient") >>= nValue;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation", text::VertOrientation::BOTTOM, nValue);
+        xFrame->getPropertyValue("VertOrientRelation") >>= nValue;
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("Wrong vertical orientation relation", text::RelOrientation::PAGE_PRINT_AREA, nValue);
 
-    // tdf#106572 - perhaps not the best test to hijack since this file
-    // produces an error in Word, but it nicely matches danger points,
-    // and has a different first footer, so nice visual confirmation.
-    discardDumpedLayout();
-    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
-    // There is no footer text on the first page.
-    assertXPath(pXmlDoc, "/root/page[1]/footer/txt", 0);
+        // tdf#106572 - perhaps not the best test to hijack since this file
+        // produces an error in Word, but it nicely matches danger points,
+        // and has a different first footer, so nice visual confirmation.
+        discardDumpedLayout();
+        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+        // There is no footer text on the first page.
+        assertXPath(pXmlDoc, "/root/page[1]/footer/txt", 0);
+    };
+    createSwDoc("n779642.docx");
+    verify();
+    reload(mpFilter, "n779642.docx");
+    verify();
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTbLrHeight, "tblr-height.docx")
@@ -813,6 +796,9 @@ DECLARE_OOXMLEXPORT_TEST(testFdo53985, "fdo53985.docx")
     CPPUNIT_ASSERT_EQUAL_MESSAGE("TextSection is protected", true, getProperty<bool>(xSect, "IsProtected"));
     xSect.set(xSections->getByIndex(3), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Section3 is protected", false, getProperty<bool>(xSect, "IsProtected"));
+
+    // This was increasing by 3 every round-trip - an extra paragraph after each table in sections
+    CPPUNIT_ASSERT_EQUAL(9, getParagraphs());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testFdo59638, "fdo59638.docx")
@@ -917,7 +903,7 @@ DECLARE_OOXMLEXPORT_TEST(testConditionalstylesTablelook, "conditionalstyles-tbll
     uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
     uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
     // Background was -1.
-    CPPUNIT_ASSERT_EQUAL(Color(0x7F7F7F), Color(ColorTransparency, getProperty<sal_Int32>(xTable->getCellByName("A1"), "BackColor")));
+    CPPUNIT_ASSERT_EQUAL(Color(0x7F7F7F), getProperty<Color>(xTable->getCellByName("A1"), "BackColor"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testFdo63685, "fdo63685.docx")
@@ -1023,7 +1009,7 @@ DECLARE_OOXMLEXPORT_TEST(testN820509, "n820509.docx")
     // M.d.yyyy date format was unhandled.
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
-    if (mbExported)
+    if (isExported())
     {
         uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
         uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(), uno::UNO_QUERY);
@@ -1070,6 +1056,18 @@ DECLARE_OOXMLEXPORT_TEST(testN820509, "n820509.docx")
     }
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf151548_activeContentDemo, "tdf151548_activeContentDemo.docm")
+{
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
+    SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
+    IDocumentMarkAccess* pMarkAccess = pDoc->getIDocumentMarkAccess();
+    for(auto aIter = pMarkAccess->getFieldmarksBegin(); aIter != pMarkAccess->getFieldmarksEnd(); ++aIter)
+    {
+        const OUString sName = (*aIter)->GetName();
+        CPPUNIT_ASSERT(sName == "Check1" || sName == "Text1" || sName == "Dropdown1");
+    }
+}
+
 DECLARE_OOXMLEXPORT_TEST(testN830205, "n830205.docx")
 {
     // Previously import just crashed (due to infinite recursion).
@@ -1102,28 +1100,51 @@ DECLARE_OOXMLEXPORT_TEST(testTableAutoColumnFixedSize2, "table-auto-column-fixed
 DECLARE_OOXMLEXPORT_TEST(testFdo46361, "fdo46361.docx")
 {
     uno::Reference<container::XIndexAccess> xGroupShape(getShape(1), uno::UNO_QUERY);
-    uno::Reference<drawing::XShape> xShape(xGroupShape->getByIndex(0), uno::UNO_QUERY);
-    // This was CENTER.
-    CPPUNIT_ASSERT_EQUAL(drawing::TextVerticalAdjust_TOP, getProperty<drawing::TextVerticalAdjust>(xShape, "TextVerticalAdjust"));
-    uno::Reference<text::XText> xText = uno::Reference<text::XTextRange>(xShape, uno::UNO_QUERY_THROW)->getText();
-    uno::Reference<text::XTextRange> xParagraph = getParagraphOfText(1, xText);
-    // This was LEFT.
-    CPPUNIT_ASSERT_EQUAL(style::ParagraphAdjust_CENTER, static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(xParagraph, "ParaAdjust")));
-    // This was black, not green.
-    CPPUNIT_ASSERT_EQUAL(Color(0x008000), Color(ColorTransparency, getProperty<sal_Int32>(getRun(xParagraph, 1), "CharColor")));
-    // \n char was missing due to unhandled w:br.
-    uno::Reference<text::XText> xShapeText(xGroupShape->getByIndex(1), uno::UNO_QUERY_THROW);
-    CPPUNIT_ASSERT_EQUAL(OUString("text\ntext"), xShapeText->getString());
-    // \n chars were missing, due to unhandled multiple w:p tags.
-    xShapeText.set(xGroupShape->getByIndex(2), uno::UNO_QUERY_THROW);
-    CPPUNIT_ASSERT_EQUAL(OUString("text\ntext\n"), xShapeText->getString());
+    uno::Reference<text::XTextRange> xTextBox;
 
-    // tdf#128153 The first and second lines are directly specified as centered. Make sure that doesn't change.
-    xParagraph.set(getParagraphOfText(2, xShapeText->getText(), "text"));
-    CPPUNIT_ASSERT_EQUAL(style::ParagraphAdjust_CENTER, static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(xParagraph, "ParaAdjust")));
-    // The last paragraph should be left aligned.
-    xParagraph.set(getParagraphOfText(3, xShapeText->getText(), ""));
-    CPPUNIT_ASSERT_MESSAGE("You FIXED me!", style::ParagraphAdjust_LEFT != static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(xParagraph, "ParaAdjust")));
+    // FIXME:
+    // uno::Reference<drawing::XShape> xShape(xGroupShape->getByIndex(0), uno::UNO_QUERY);
+    // CPPUNIT_ASSERT_EQUAL(drawing::TextVerticalAdjust_TOP, getProperty<drawing::TextVerticalAdjust>(xShape, "TextVerticalAdjust"));
+
+    // This was CENTER
+    xTextBox.set(xGroupShape->getByIndex(0), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(style::ParagraphAdjust_CENTER,
+                         static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(
+                             getParagraphOfText(1, xTextBox->getText()), "ParaAdjust")));
+    // This was BLACK
+    CPPUNIT_ASSERT_EQUAL(
+        Color(0x008000),
+              getProperty<Color>(getRun(getParagraphOfText(1, xTextBox->getText()), 1),
+                                     "CharColor"));
+    // Count the paragraphs
+    xTextBox.set(xGroupShape->getByIndex(1), uno::UNO_QUERY_THROW);
+    const auto& sText1 = xTextBox->getString();
+
+    xTextBox.set(xGroupShape->getByIndex(2), uno::UNO_QUERY_THROW);
+    const auto& sText2 = xTextBox->getString();
+
+    sal_Int32 nCount1 = 0;
+    sal_Int32 nCount2 = 0;
+
+    for (sal_Int32 i = 0; i < sText1.getLength(); i++)
+        if (sText1[i] == '\n')
+            nCount1++;
+    for (sal_Int32 i = 0; i < sText2.getLength(); i++)
+        if (sText2[i] == '\n')
+            nCount2++;
+
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1), nCount1);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), nCount2);
+
+    // This was CENTER
+    CPPUNIT_ASSERT_EQUAL(style::ParagraphAdjust_CENTER,
+                         static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(
+                             getParagraphOfText(2, xTextBox->getText(), "text"), "ParaAdjust")));
+
+    // This must not be left.
+    CPPUNIT_ASSERT_MESSAGE("You FIXED me!", style::ParagraphAdjust_LEFT !=
+                         static_cast<style::ParagraphAdjust>(getProperty<sal_Int16>(
+                             getParagraphOfText(3, xTextBox->getText(), ""), "ParaAdjust")));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testFdo65632, "fdo65632.docx")
@@ -1208,9 +1229,9 @@ DECLARE_OOXMLEXPORT_TEST(testVmlTextVerticalAdjust, "vml-text-vertical-adjust.do
 DECLARE_OOXMLEXPORT_TEST(testFdo69636, "fdo69636.docx")
 {
     // The problem was that the mso-layout-flow-alt:bottom-to-top VML shape property wasn't handled for sw text frames.
+    // Note: VML is no longer used on import. OOXML import uses WritingMode2::BT_LR now.
     uno::Reference<beans::XPropertySet> xPropertySet(getShape(1), uno::UNO_QUERY);
-    comphelper::SequenceAsHashMap aCustomShapeGeometry(xPropertySet->getPropertyValue("CustomShapeGeometry"));
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(-270), aCustomShapeGeometry["TextPreRotateAngle"].get<sal_Int32>());
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(text::WritingMode2::BT_LR), getProperty<sal_Int16>(xPropertySet, "WritingMode"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testChartProp, "chart-prop.docx")

@@ -44,7 +44,7 @@
 
 #include <cppuhelper/compbase12.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <connectivity/paramwrapper.hxx>
 #include <connectivity/FValue.hxx>
 #include <connectivity/warningscontainer.hxx>
@@ -94,9 +94,9 @@ namespace dbaccess
         std::vector<bool>                         m_aParametersSet;
         std::vector<bool>                         m_aReadOnlyDataColumns;
 
-        ::comphelper::OInterfaceContainerHelper2    m_aRowsetListeners;
-        ::comphelper::OInterfaceContainerHelper2    m_aApproveListeners;
-        ::comphelper::OInterfaceContainerHelper2    m_aRowsChangeListener;
+        ::comphelper::OInterfaceContainerHelper3<css::sdbc::XRowSetListener> m_aRowsetListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::sdb::XRowSetApproveListener> m_aApproveListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::sdb::XRowsChangeListener> m_aRowsChangeListener;
 
         ::dbtools::WarningsContainer                m_aWarnings;
 
@@ -257,7 +257,7 @@ namespace dbaccess
 
     // css::lang::XUnoTunnel
         virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-        static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
     // css::uno::XAggregation
         virtual css::uno::Any SAL_CALL queryAggregation( const css::uno::Type& aType ) override;
@@ -489,7 +489,7 @@ namespace dbaccess
 
     // css::lang::XUnoTunnel
         virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-        static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
     // OComponentHelper
         virtual void SAL_CALL disposing() override;

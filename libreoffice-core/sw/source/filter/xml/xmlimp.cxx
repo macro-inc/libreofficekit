@@ -30,7 +30,6 @@
 
 #include <o3tl/any.hxx>
 #include <xmloff/xmlnamespace.hxx>
-#include <xmloff/xmltkmap.hxx>
 #include <xmloff/xmlictxt.hxx>
 #include <xmloff/txtimp.hxx>
 #include <xmloff/XMLTextShapeImportHelper.hxx>
@@ -62,10 +61,9 @@
 #include <svx/xmleohlp.hxx>
 #include <sfx2/printer.hxx>
 #include <xmloff/xmluconv.hxx>
-#include <unotools/saveopt.hxx>
 #include <unotools/streamwrap.hxx>
 #include <tools/UnitConversion.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <vcl/svapp.hxx>
 #include <unotxdoc.hxx>
@@ -326,7 +324,8 @@ SwXMLImport::SwXMLImport(
     m_bBlock( false ),
     m_bOrganizerMode( false ),
     m_bInititedXForms( false ),
-    m_pDoc( nullptr )
+    m_pDoc( nullptr ),
+    m_sDefTableName(SwResId(STR_TABLE_DEFNAME))
 {
     InitItemImport();
 }
@@ -339,6 +338,9 @@ SwXMLImport::~SwXMLImport() noexcept
         ClearShapeImport();
     }
     FinitItemImport();
+    // Call cleanup() here because the destruction of some stuff like XMLRedlineImportHelper will cast
+    // to cast their mrImport to SwXMLImport and that is illegal after this destructor is done.
+    cleanup();
 }
 
 void SwXMLImport::setTextInsertMode(
@@ -534,7 +536,7 @@ void SwXMLImport::startDocument()
         }
         if( pCursorSh )
         {
-            const uno::Reference<text::XTextRange> xInsertTextRange(
+            const rtl::Reference<SwXTextRange> xInsertTextRange(
                 SwXTextRange::CreateXTextRange(
                     *pDoc, *pCursorSh->GetCursor()->GetPoint(), nullptr ) );
             setTextInsertMode( xInsertTextRange );
@@ -568,7 +570,7 @@ void SwXMLImport::startDocument()
 
     if( (getImportFlags() & SvXMLImportFlags::CONTENT) && !IsStylesOnlyMode() )
     {
-        m_pSttNdIdx.reset(new SwNodeIndex( pDoc->GetNodes() ));
+        m_oSttNdIdx.emplace( pDoc->GetNodes() );
         if( IsInsertMode() )
         {
             SwPaM *pPaM = pTextCursor->GetPaM();
@@ -576,7 +578,7 @@ void SwXMLImport::startDocument()
 
             // Split once and remember the node that has been split.
             pDoc->getIDocumentContentOperations().SplitNode( *pPos, false );
-            *m_pSttNdIdx = pPos->nNode.GetIndex()-1;
+            *m_oSttNdIdx = pPos->GetNodeIndex()-1;
 
             // Split again.
             pDoc->getIDocumentContentOperations().SplitNode( *pPos, false );
@@ -646,48 +648,47 @@ void SwXMLImport::endDocument()
         OTextCursorHelper* pTextCursor = comphelper::getFromUnoTunnel<OTextCursorHelper>(xCursorTunnel);
         assert(pTextCursor && "SwXTextCursor missing");
         SwPaM *pPaM = pTextCursor->GetPaM();
-        if( IsInsertMode() && m_pSttNdIdx->GetIndex() )
+        if( IsInsertMode() && m_oSttNdIdx->GetIndex() )
         {
             // If we are in insert mode, join the split node that is in front
             // of the new content with the first new node. Or in other words:
             // Revert the first split node.
-            SwTextNode* pTextNode = m_pSttNdIdx->GetNode().GetTextNode();
-            SwNodeIndex aNxtIdx( *m_pSttNdIdx );
+            SwTextNode* pTextNode = m_oSttNdIdx->GetNode().GetTextNode();
+            SwNodeIndex aNxtIdx( *m_oSttNdIdx );
             if( pTextNode && pTextNode->CanJoinNext( &aNxtIdx ) &&
-                m_pSttNdIdx->GetIndex() + 1 == aNxtIdx.GetIndex() )
+                m_oSttNdIdx->GetIndex() + 1 == aNxtIdx.GetIndex() )
             {
                 // If the PaM points to the first new node, move the PaM to the
                 // end of the previous node.
-                if( pPaM->GetPoint()->nNode == aNxtIdx )
+                if( pPaM->GetPoint()->GetNode() == aNxtIdx.GetNode() )
                 {
-                    pPaM->GetPoint()->nNode = *m_pSttNdIdx;
-                    pPaM->GetPoint()->nContent.Assign( pTextNode,
+                    pPaM->GetPoint()->Assign( *pTextNode,
                                             pTextNode->GetText().getLength());
                 }
 
 #if OSL_DEBUG_LEVEL > 0
                 // !!! This should be impossible !!!!
-                OSL_ENSURE( m_pSttNdIdx->GetIndex()+1 !=
-                                        pPaM->GetBound().nNode.GetIndex(),
+                OSL_ENSURE( m_oSttNdIdx->GetIndex()+1 !=
+                                        pPaM->GetBound().GetNodeIndex(),
                         "PaM.Bound1 point to new node " );
-                OSL_ENSURE( m_pSttNdIdx->GetIndex()+1 !=
-                                        pPaM->GetBound( false ).nNode.GetIndex(),
+                OSL_ENSURE( m_oSttNdIdx->GetIndex()+1 !=
+                                        pPaM->GetBound( false ).GetNodeIndex(),
                         "PaM.Bound2 points to new node" );
 
-                if( m_pSttNdIdx->GetIndex()+1 ==
-                                        pPaM->GetBound().nNode.GetIndex() )
+                if( m_oSttNdIdx->GetIndex()+1 ==
+                                        pPaM->GetBound().GetNodeIndex() )
                 {
                     const sal_Int32 nCntPos =
-                            pPaM->GetBound().nContent.GetIndex();
-                    pPaM->GetBound().nContent.Assign( pTextNode,
+                            pPaM->GetBound().GetContentIndex();
+                    pPaM->GetBound().SetContent(
                             pTextNode->GetText().getLength() + nCntPos );
                 }
-                if( m_pSttNdIdx->GetIndex()+1 ==
-                                pPaM->GetBound( false ).nNode.GetIndex() )
+                if( m_oSttNdIdx->GetIndex()+1 ==
+                                pPaM->GetBound( false ).GetNodeIndex() )
                 {
                     const sal_Int32 nCntPos =
-                            pPaM->GetBound( false ).nContent.GetIndex();
-                    pPaM->GetBound( false ).nContent.Assign( pTextNode,
+                            pPaM->GetBound( false ).GetContentIndex();
+                    pPaM->GetBound( false ).SetContent(
                             pTextNode->GetText().getLength() + nCntPos );
                 }
 #endif
@@ -713,14 +714,14 @@ void SwXMLImport::endDocument()
         }
 
         SwPosition* pPos = pPaM->GetPoint();
-        OSL_ENSURE( !pPos->nContent.GetIndex(), "last paragraph isn't empty" );
-        if( !pPos->nContent.GetIndex() )
+        OSL_ENSURE( !pPos->GetContentIndex(), "last paragraph isn't empty" );
+        if( !pPos->GetContentIndex() )
         {
             SwTextNode* pCurrNd;
-            SwNodeOffset nNodeIdx = pPos->nNode.GetIndex();
+            SwNodeOffset nNodeIdx = pPos->GetNodeIndex();
             pDoc = &pPaM->GetDoc();
 
-            OSL_ENSURE( pPos->nNode.GetNode().IsContentNode(),
+            OSL_ENSURE( pPos->GetNode().IsContentNode(),
                         "insert position is not a content node" );
             if( !IsInsertMode() )
             {
@@ -730,13 +731,16 @@ void SwXMLImport::endDocument()
                      ( pPrev->IsEndNode() &&
                       pPrev->StartOfSectionNode()->IsSectionNode() ) )
                 {
-                    SwContentNode* pCNd = pPaM->GetContentNode();
+                    SwContentNode* pCNd = pPaM->GetPointContentNode();
                     if( pCNd && pCNd->StartOfSectionIndex()+2 <
                         pCNd->EndOfSectionIndex() )
                     {
-                        pPaM->GetBound().nContent.Assign( nullptr, 0 );
-                        pPaM->GetBound(false).nContent.Assign( nullptr, 0 );
-                        pDoc->GetNodes().Delete( pPaM->GetPoint()->nNode );
+                        SwNode& rDelNode = pPaM->GetPoint()->GetNode();
+                        // move so we don't have a dangling SwContentIndex to the deleted node
+                        pPaM->GetPoint()->Adjust(SwNodeOffset(+1));
+                        if (pPaM->HasMark())
+                            pPaM->GetMark()->Adjust(SwNodeOffset(+1));
+                        pDoc->GetNodes().Delete( rDelNode );
                     }
                 }
             }
@@ -744,9 +748,9 @@ void SwXMLImport::endDocument()
             {
                 // Id we're in insert mode, the empty node is joined with
                 // the next and the previous one.
-                if( pCurrNd->CanJoinNext( &pPos->nNode ))
+                if( pCurrNd->CanJoinNext( pPos ))
                 {
-                    SwTextNode* pNextNd = pPos->nNode.GetNode().GetTextNode();
+                    SwTextNode* pNextNd = pPos->GetNode().GetTextNode();
                     bool endNodeFound = pDoc->GetNodes()[nNodeIdx-1]->IsEndNode();
                     SwNode *pLastPar = pDoc->GetNodes()[nNodeIdx -2];
                     if ( !pLastPar->IsTextNode() ) {
@@ -757,7 +761,6 @@ void SwXMLImport::endDocument()
                         pNextNd->ChgFormatColl(pLastPar->GetTextNode()->GetTextColl());
                     }
 
-                    pPos->nContent.Assign( pNextNd, 0 );
                     pPaM->SetMark(); pPaM->DeleteMark();
                     pNextNd->JoinPrev();
 
@@ -765,16 +768,18 @@ void SwXMLImport::endDocument()
                     // but only if one has been inserted and
                     // no endNode found to avoid removing section
                     if( pNextNd->CanJoinPrev(/* &pPos->nNode*/ ) && !endNodeFound &&
-                         *m_pSttNdIdx != pPos->nNode )
+                         *m_oSttNdIdx != pPos->GetNode() )
                     {
                         pNextNd->JoinPrev();
                     }
                 }
                 else if (pCurrNd->GetText().isEmpty())
                 {
-                    pPos->nContent.Assign( nullptr, 0 );
                     pPaM->SetMark(); pPaM->DeleteMark();
-                    pDoc->GetNodes().Delete( pPos->nNode );
+                    SwNode& rDelNode = pPos->GetNode();
+                    // move so we don't have a dangling SwContentIndex to the deleted node
+                    pPaM->GetPoint()->Adjust(SwNodeOffset(+1));
+                    pDoc->GetNodes().Delete( rDelNode );
                     pPaM->Move( fnMoveBackward );
                 }
             }
@@ -822,30 +827,32 @@ void SwXMLImport::endDocument()
 
     GetTextImport()->ResetCursor();
 
-    m_pSttNdIdx.reset();
+    m_oSttNdIdx.reset();
 
+    // tdf#150753: pDoc may be null e.g. when the package lacks content.xml;
+    // we should not forget to tidy up here, including unlocking draw model
+    if (!pDoc)
+        pDoc = getDoc();
+    assert(pDoc);
     // SJ: #i49801# -> now permitting repaints
-    if ( pDoc )
+    if (getImportFlags() == SvXMLImportFlags::ALL)
     {
-        if( getImportFlags() == SvXMLImportFlags::ALL )
-        {
-            // Notify math objects. If we are in the package filter this will
-            // be done by the filter object itself
-            if( IsInsertMode() )
-                pDoc->PrtOLENotify( false );
-            else if ( pDoc->IsOLEPrtNotifyPending() )
-                pDoc->PrtOLENotify( true );
+        // Notify math objects. If we are in the package filter this will
+        // be done by the filter object itself
+        if (IsInsertMode())
+            pDoc->PrtOLENotify(false);
+        else if (pDoc->IsOLEPrtNotifyPending())
+            pDoc->PrtOLENotify(true);
 
-            assert(pDoc->IsInReading());
-            assert(pDoc->IsInXMLImport());
-            pDoc->SetInReading(false);
-            pDoc->SetInXMLImport(false);
-        }
-
-        SwDrawModel* pDrawModel = pDoc->getIDocumentDrawModelAccess().GetDrawModel();
-        if ( pDrawModel )
-            pDrawModel->setLock(false);
+        assert(pDoc->IsInReading());
+        assert(pDoc->IsInXMLImport());
+        pDoc->SetInReading(false);
+        pDoc->SetInXMLImport(false);
     }
+
+    SwDrawModel* pDrawModel = pDoc->getIDocumentDrawModelAccess().GetDrawModel();
+    if (pDrawModel)
+        pDrawModel->setLock(false);
 
     // #i90243#
     if ( m_bInititedXForms )
@@ -874,8 +881,6 @@ void SwXMLImport::endDocument()
         }
     }
 
-#if 1
-    if (!pDoc) { pDoc = SwImport::GetDocFromXMLImport(*this); }
     for (SwNodeOffset i(0); i < pDoc->GetNodes().Count(); ++i)
     {
         if (SwTableNode *const pTableNode = pDoc->GetNodes()[i]->GetTableNode())
@@ -888,7 +893,6 @@ void SwXMLImport::endDocument()
         }
         // don't skip to the end; nested tables could have subtables too...
     }
-#endif
 
     // delegate to parent: takes care of error handling
     SvXMLImport::endDocument();
@@ -947,16 +951,16 @@ void SwXMLImport::MergeListsAtDocumentInsertPosition(SwDoc *pDoc)
     if (! pDoc)
         return;
 
-    if (! IsInsertMode() || ! m_pSttNdIdx->GetIndex())
+    if (! IsInsertMode() || ! m_oSttNdIdx->GetIndex())
         return;
 
     SwNodeOffset index(1);
 
     // the last node of the main document where we have inserted a document
-    SwNode* const node1 = pDoc->GetNodes()[m_pSttNdIdx->GetIndex() + 0];
+    SwNode* const node1 = pDoc->GetNodes()[m_oSttNdIdx->GetIndex() + 0];
 
     // the first node of the inserted document
-    SwNode* node2 = pDoc->GetNodes()[m_pSttNdIdx->GetIndex() + index];
+    SwNode* node2 = pDoc->GetNodes()[m_oSttNdIdx->GetIndex() + index];
 
     if (! (node1 && node2
         && (node1->GetNodeType() == node2->GetNodeType())
@@ -1069,7 +1073,7 @@ void SwXMLImport::MergeListsAtDocumentInsertPosition(SwDoc *pDoc)
             return;
         }
 
-        node2 = pDoc->GetNodes()[m_pSttNdIdx->GetIndex() + index];
+        node2 = pDoc->GetNodes()[m_oSttNdIdx->GetIndex() + index];
     }
 }
 
@@ -1302,6 +1306,9 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
     bool bSubtractFlysAnchoredAtFlys = false;
     bool bEmptyDbFieldHidesPara = false;
     bool bCollapseEmptyCellPara = false;
+    bool bAutoFirstLineIndentDisregardLineSpace = false;
+    bool bHyphenateURLs = false;
+    bool bDropCapPunctuation = false;
 
     const PropertyValue* currentDatabaseDataSource = nullptr;
     const PropertyValue* currentDatabaseCommand = nullptr;
@@ -1393,6 +1400,14 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
                     bEmptyDbFieldHidesPara = true;
                 else if (rValue.Name == "CollapseEmptyCellPara")
                     bCollapseEmptyCellPara = true;
+                else if (rValue.Name == "AutoFirstLineIndentDisregardLineSpace")
+                    bAutoFirstLineIndentDisregardLineSpace = true;
+                else if (rValue.Name == "HyphenateURLs")
+                {
+                    bHyphenateURLs = true;
+                }
+                else if ( rValue.Name == "DropCapPunctuation" )
+                    bDropCapPunctuation = true;
             }
             catch( Exception& )
             {
@@ -1430,42 +1445,42 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
 
     if( ! bAddExternalLeading )
     {
-        xProps->setPropertyValue( "AddExternalLeading", makeAny( false ) );
+        xProps->setPropertyValue( "AddExternalLeading", Any( false ) );
     }
 
     if( ! bUseFormerLineSpacing )
     {
-        xProps->setPropertyValue( "UseFormerLineSpacing", makeAny( true ) );
+        xProps->setPropertyValue( "UseFormerLineSpacing", Any( true ) );
     }
 
     if( !bUseFormerObjectPositioning )
     {
-        xProps->setPropertyValue( "UseFormerObjectPositioning", makeAny( true ) );
+        xProps->setPropertyValue( "UseFormerObjectPositioning", Any( true ) );
     }
 
     if( !bUseOldNumbering )
     {
-        xProps->setPropertyValue( "UseOldNumbering", makeAny(true) );
+        xProps->setPropertyValue( "UseOldNumbering", Any(true) );
     }
 
     if( !bAddParaSpacingToTableCells )
     {
         xProps->setPropertyValue( "AddParaSpacingToTableCells",
-            makeAny( false ) );
+            Any( false ) );
     }
     if (!bAddParaLineSpacingToTableCells)
     {
-        xProps->setPropertyValue("AddParaLineSpacingToTableCells", makeAny(false));
+        xProps->setPropertyValue("AddParaLineSpacingToTableCells", Any(false));
     }
 
     if( !bUseFormerTextWrapping )
     {
-        xProps->setPropertyValue( "UseFormerTextWrapping", makeAny( true ) );
+        xProps->setPropertyValue( "UseFormerTextWrapping", Any( true ) );
     }
 
     if (!bConsiderWrapOnObjPos && bAreUserSettingsFromDocument)
     {
-        xProps->setPropertyValue( "ConsiderTextWrapOnObjPos", makeAny( false ) );
+        xProps->setPropertyValue( "ConsiderTextWrapOnObjPos", Any( false ) );
     }
 
     // #i47448#
@@ -1482,40 +1497,40 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
     if( !bIgnoreFirstLineIndentInNumbering && bDocumentPriorSO8 )
     {
         xProps->setPropertyValue( "IgnoreFirstLineIndentInNumbering",
-            makeAny( true ) );
+            Any( true ) );
     }
 
     // This flag has to be set for all documents < SO8
     if ( !bDoNotJustifyLinesWithManualBreak && bDocumentPriorSO8 )
     {
         xProps->setPropertyValue( "DoNotJustifyLinesWithManualBreak",
-            makeAny( true ) );
+            Any( true ) );
     }
 
     // This flag has to be set for all documents < SO8
     if ( !bDoNotResetParaAttrsForNumFont && bDocumentPriorSO8 )
     {
         xProps->setPropertyValue( "DoNotResetParaAttrsForNumFont",
-            makeAny( true ) );
+            Any( true ) );
     }
 
     // This flag has to be set for all documents < SO8
     if ( !bDoNotCaptureDrawObjsOnPage && bDocumentPriorSO8 )
     {
         xProps->setPropertyValue( "DoNotCaptureDrawObjsOnPage",
-            makeAny( true ) );
+            Any( true ) );
     }
 
     // This flag has to be set for all documents < SO8
     if ( !bClipAsCharacterAnchoredWriterFlyFrames && bDocumentPriorSO8 )
     {
         xProps->setPropertyValue( "ClipAsCharacterAnchoredWriterFlyFrames",
-            makeAny( true ) );
+            Any( true ) );
     }
 
     if ( !bUnixForceZeroExtLeading )
     {
-        xProps->setPropertyValue( "UnxForceZeroExtLeading", makeAny( true ) );
+        xProps->setPropertyValue( "UnxForceZeroExtLeading", Any( true ) );
     }
 
     // Old LO versions had 66 as the value for small caps percentage, later changed to 80.
@@ -1524,12 +1539,12 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
     // are considered to be old files, so set the compatibility option too.
     if ( !bSmallCapsPercentage66 )
     {
-        xProps->setPropertyValue( "SmallCapsPercentage66", makeAny( true ) );
+        xProps->setPropertyValue( "SmallCapsPercentage66", Any( true ) );
     }
 
     if ( !bTabOverflow )
     {
-        xProps->setPropertyValue( "TabOverflow", makeAny( false ) );
+        xProps->setPropertyValue( "TabOverflow", Any( false ) );
     }
 
     if (bTabOverMarginValue)
@@ -1541,16 +1556,33 @@ void SwXMLImport::SetConfigurationSettings(const Sequence < PropertyValue > & aC
             uno::Any(document::PrinterIndependentLayout::HIGH_RESOLUTION));
 
     if (!bPropLineSpacingShrinksFirstLine)
-        xProps->setPropertyValue("PropLineSpacingShrinksFirstLine", makeAny(false));
+        xProps->setPropertyValue("PropLineSpacingShrinksFirstLine", Any(false));
 
     if (!bSubtractFlysAnchoredAtFlys && bAreUserSettingsFromDocument)
-        xProps->setPropertyValue("SubtractFlysAnchoredAtFlys", makeAny(true));
+        xProps->setPropertyValue("SubtractFlysAnchoredAtFlys", Any(true));
 
     if (!bEmptyDbFieldHidesPara && bAreUserSettingsFromDocument)
-        xProps->setPropertyValue("EmptyDbFieldHidesPara", makeAny(false));
+        xProps->setPropertyValue("EmptyDbFieldHidesPara", Any(false));
 
     if (!bCollapseEmptyCellPara)
-        xProps->setPropertyValue("CollapseEmptyCellPara", makeAny(false));
+        xProps->setPropertyValue("CollapseEmptyCellPara", Any(false));
+
+    if (!bAutoFirstLineIndentDisregardLineSpace)
+        xProps->setPropertyValue("AutoFirstLineIndentDisregardLineSpace", Any(false));
+
+    if (!bHyphenateURLs)
+    {
+        xProps->setPropertyValue("HyphenateURLs", Any(true));
+    }
+
+    // LO 7.4 and previous versions had different drop cap punctuation: very long dashes.
+    // In order to keep backwards compatibility, DropCapPunctuation option is written to .odt
+    // files, and the default for new documents is 'true'. Files without this option
+    // are considered to be old files, so set the compatibility option too.
+    if ( !bDropCapPunctuation )
+    {
+        xProps->setPropertyValue( "DropCapPunctuation", Any( false ) );
+    }
 
     SwDoc *pDoc = getDoc();
     SfxPrinter *pPrinter = pDoc->getIDocumentDeviceAccess().getPrinter( false );
@@ -1583,11 +1615,11 @@ void SwXMLImport::SetDocumentSpecificSettings(
     {
         if ( m_xLateInitSettings->hasByName( _rSettingsGroupName ) )
         {
-            m_xLateInitSettings->replaceByName( _rSettingsGroupName, makeAny( _rSettings ) );
+            m_xLateInitSettings->replaceByName( _rSettingsGroupName, Any( _rSettings ) );
             OSL_FAIL( "SwXMLImport::SetDocumentSpecificSettings: already have settings for this model!" );
         }
         else
-            m_xLateInitSettings->insertByName( _rSettingsGroupName, makeAny( _rSettings ) );
+            m_xLateInitSettings->insertByName( _rSettingsGroupName, Any( _rSettings ) );
     }
     catch( const Exception& )
     {
@@ -1612,16 +1644,6 @@ void SwXMLImport::initialize(
             }
         }
     }
-}
-
-SwDoc* SwImport::GetDocFromXMLImport( SvXMLImport const & rImport )
-{
-    auto pTextDoc = comphelper::getFromUnoTunnel<SwXTextDocument>(rImport.GetModel());
-    assert( pTextDoc );
-    assert( pTextDoc->GetDocShell() );
-    SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
-    OSL_ENSURE( pDoc, "Where is my document?" );
-    return pDoc;
 }
 
 void SwXMLImport::initXForms()
@@ -1775,8 +1797,8 @@ extern "C" SAL_DLLPUBLIC_EXPORT bool TestImportDOCX(SvStream &rStream)
     uno::Reference<document::XImporter> xImporter(xFilter, uno::UNO_QUERY_THROW);
     uno::Sequence<beans::PropertyValue> aArgs(comphelper::InitPropertySequence(
     {
-        { "InputStream", uno::makeAny(xStream) },
-        { "InputMode", uno::makeAny(true) },
+        { "InputStream", uno::Any(xStream) },
+        { "InputMode", uno::Any(true) },
     }));
     xImporter->setTargetDocument(xModel);
 

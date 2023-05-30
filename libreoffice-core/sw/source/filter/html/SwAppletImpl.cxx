@@ -115,7 +115,7 @@ SwApplet_Impl::SwApplet_Impl( SfxItemPool& rPool ) :
 
 void SwApplet_Impl::CreateApplet( const OUString& rCode, const OUString& rName,
                                   bool bMayScript, const OUString& rCodeBase,
-                                  const OUString& rDocumentBaseURL )
+                                  std::u16string_view rDocumentBaseURL )
 {
     comphelper::EmbeddedObjectContainer aCnt;
     OUString aName;
@@ -131,18 +131,18 @@ void SwApplet_Impl::CreateApplet( const OUString& rCode, const OUString& rName,
     uno::Reference < beans::XPropertySet > xSet( m_xApplet->getComponent(), uno::UNO_QUERY );
     if ( xSet.is() )
     {
-        xSet->setPropertyValue("AppletCode", uno::makeAny( rCode ) );
-        xSet->setPropertyValue("AppletName", uno::makeAny( rName ) );
-        xSet->setPropertyValue("AppletIsScript", uno::makeAny( bMayScript ) );
-        xSet->setPropertyValue("AppletDocBase", uno::makeAny( sDocBase ) );
+        xSet->setPropertyValue("AppletCode", uno::Any( rCode ) );
+        xSet->setPropertyValue("AppletName", uno::Any( rName ) );
+        xSet->setPropertyValue("AppletIsScript", uno::Any( bMayScript ) );
+        xSet->setPropertyValue("AppletDocBase", uno::Any( sDocBase ) );
         if ( !rCodeBase.isEmpty() )
-            xSet->setPropertyValue("AppletCodeBase", uno::makeAny( rCodeBase ) );
+            xSet->setPropertyValue("AppletCodeBase", uno::Any( rCodeBase ) );
         else
-            xSet->setPropertyValue("AppletCodeBase", uno::makeAny( sDocBase ) );
+            xSet->setPropertyValue("AppletCodeBase", uno::Any( sDocBase ) );
     }
 }
 #if HAVE_FEATURE_JAVA
-bool SwApplet_Impl::CreateApplet( const OUString& rBaseURL )
+bool SwApplet_Impl::CreateApplet( std::u16string_view rBaseURL )
 {
     OUString aCode, aName, aCodeBase;
     bool bMayScript = false;
@@ -179,7 +179,7 @@ void SwApplet_Impl::FinishApplet()
     {
         uno::Sequence < beans::PropertyValue > aProps;
         m_aCommandList.FillSequence( aProps );
-        xSet->setPropertyValue("AppletCommands", uno::makeAny( aProps ) );
+        xSet->setPropertyValue("AppletCommands", uno::Any( aProps ) );
     }
 }
 

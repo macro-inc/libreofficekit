@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2020-10-17 12:29+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-03-07 09:34+0000\n"
 "Last-Translator: Miloš Šrámek <msramek22@gmail.com>\n"
-"Language-Team: Slovak <https://weblate.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/sk/>\n"
+"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-7-5/wizardssourceresources/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1557772943.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Priečinok '%1' nemohol byť vytvorený.<BR>Pravdepodobne nemáte dosť miesta na disku."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Nemohol byť vytvorený textový dokument.<BR>Prosím preverte či je modul 'PRODUCTNAME Writer' nainštalovaný."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "Textový dokument nemohol byť vytvorený.<BR>Skontrolujte, či je nainštalovaný „%PRODUCTNAME Writer“."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Zošit nemohol byť vytvorený.<BR>Prosím preverte či je nainštalovaný modul 'PRODUCTNAME Calc'."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "Tabuľkový dokument nemohol byť vytvorený.<BR>Skontrolujte, či je nainštalovaný „%PRODUCTNAME Calc“."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Prezentácia nemohla byť vytvorená.<BR>Prosím preverte či je nainštalovaný modul 'PRODUCTNAME Impress'."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "Prezentáciu nebolo možné vytvoriť.<BR>Skontrolujte, či je nainštalovaný modul %PRODUCTNAME Impress."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Kresba nemohla byť vytvorená.<BR>Prosím preverte či je nainštalovaný modul 'PRODUCTNAME Draw'."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "Kresba nemohla byť vytvorená.<BR>Skontrolujte, či je nainštalovaný „%PRODUCTNAME Draw“."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Vzorec nemohol byť vytvorený.<BR>Prosím preverte či je nainštalovaný modul 'PRODUCTNAME Math'."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "Vzorec nemohol byť vytvorený.<BR>Skontrolujte, či je nainštalovaný „%PRODUCTNAME Math“."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -1535,7 +1535,7 @@ msgctxt ""
 "RID_QUERY_12\n"
 "property.text"
 msgid "~Summary query (Shows only results of aggregate functions.)"
-msgstr "~Súhrnný dotaz (zobrazí iba výsledok agregačných funkcií)"
+msgstr "~Súhrnný dotaz (zobrazí len výsledok agregačných funkcií)"
 
 #. SdQBk
 #: resources_en_US.properties
@@ -2237,7 +2237,7 @@ msgctxt ""
 "RID_FORM_19\n"
 "property.text"
 msgid "The join '<FIELDNAME1>' and '<FIELDNAME2>' has been selected twice.\\nBut joins may only be used once."
-msgstr "Prepojenie '<FIELDNAME1>' a '<FIELDNAME2>' bolo vybrané dvakrát.\\nPrepojenia (joins) môžu byť použité iba raz."
+msgstr "Prepojenie '<FIELDNAME1>' a '<FIELDNAME2>' bolo vybrané dvakrát.\\nPrepojenia (joins) môžu byť použité len raz."
 
 #. 9uFd2
 #: resources_en_US.properties
@@ -3840,6 +3840,15 @@ msgctxt ""
 "property.text"
 msgid "Lithuanian Litas"
 msgstr "Litovská lita"
+
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "Chorvátska kuna"
 
 #. eDjBr
 #: resources_en_US.properties

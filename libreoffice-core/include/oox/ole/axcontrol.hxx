@@ -312,7 +312,7 @@ public:
         properties. */
     static void         convertAxState(
                             PropertyMap& rPropMap,
-                            const OUString& rValue,
+                            std::u16string_view rValue,
                             sal_Int32 nMultiSelect,
                             ApiDefaultStateMode eDefStateMode,
                             bool bAwtModel );
@@ -671,7 +671,7 @@ class OOX_DLLPUBLIC AxOptionButtonModel final : public AxMorphDataModelBase
 public:
     explicit            AxOptionButtonModel();
 
-    /** Returns the group name used to goup several option buttons together. */
+    /** Returns the group name used to group several option buttons together. */
     const OUString& getGroupName() const { return maGroupName; }
 
     virtual ApiControlType getControlType() const override;
@@ -897,7 +897,7 @@ public:
 class OOX_DLLPUBLIC EmbeddedControl
 {
 public:
-    explicit            EmbeddedControl( const OUString& rName );
+    explicit            EmbeddedControl( OUString aName );
 
     /** Creates and returns the internal control model of the specified type. */
     template< typename ModelType >
@@ -909,7 +909,7 @@ public:
 
     /** Creates and returns the internal control model according to the passed
         MS class identifier. */
-    ControlModelBase*   createModelFromGuid( const OUString& rClassId );
+    ControlModelBase*   createModelFromGuid( std::u16string_view rClassId );
 
     /** Returns true, if the internal control model exists. */
     bool         hasModel() const { return bool(mxModel); }

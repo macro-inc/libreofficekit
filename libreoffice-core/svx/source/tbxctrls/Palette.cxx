@@ -21,6 +21,7 @@
 #include <tools/stream.hxx>
 
 #include <palettes.hxx>
+#include <utility>
 
 Palette::~Palette()
 {
@@ -30,10 +31,10 @@ PaletteASE::~PaletteASE()
 {
 }
 
-PaletteASE::PaletteASE( const OUString &rFPath, const OUString &rFName ) :
+PaletteASE::PaletteASE( OUString aFPath, OUString aFName ) :
     mbValidPalette( false ),
-    maFPath ( rFPath ),
-    maASEPaletteName  ( rFName )
+    maFPath (std::move( aFPath )),
+    maASEPaletteName  (std::move( aFName ))
 {
     LoadPalette();
 }
@@ -170,15 +171,20 @@ void PaletteASE::LoadPalette()
     mbValidPalette = true;
 }
 
+Palette* PaletteASE::Clone() const
+{
+    return new PaletteASE(*this);
+}
+
 // PaletteGPL ------------------------------------------------------------------
 
-static OString lcl_getToken(const OString& rStr, sal_Int32& index);
+static OString lcl_getToken(OStringBuffer& rStr, sal_Int32& index);
 
-PaletteGPL::PaletteGPL( const OUString &rFPath, const OUString &rFName ) :
+PaletteGPL::PaletteGPL( OUString aFPath, OUString aFName ) :
     mbLoadedPalette( false ),
     mbValidPalette( false ),
-    maFName( rFName ),
-    maFPath( rFPath )
+    maFName(std::move( aFName )),
+    maFPath(std::move( aFPath ))
 {
     LoadPaletteHeader();
 }
@@ -254,7 +260,7 @@ void PaletteGPL::LoadPalette()
 
     if( !mbValidPalette ) return;
 
-    OString aLine;
+    OStringBuffer aLine;
     do {
         if (aLine[0] != '#' && aLine[0] != '\n')
         {
@@ -274,9 +280,9 @@ void PaletteGPL::LoadPalette()
             if(token.isEmpty()) continue;
             sal_Int32 b = token.toInt32();
 
-            OString name;
+            std::string_view name;
             if(nIndex != -1)
-                name = aLine.copy(nIndex);
+                name = std::string_view(aLine).substr(nIndex);
 
             maColors.emplace_back(
                 Color(r, g, b),
@@ -285,9 +291,14 @@ void PaletteGPL::LoadPalette()
     } while (aFile.ReadLine(aLine));
 }
 
+Palette* PaletteGPL::Clone() const
+{
+    return new PaletteGPL(*this);
+}
+
 // finds first token in rStr from index, separated by whitespace
 // returns position of next token in index
-static OString lcl_getToken(const OString& rStr, sal_Int32& index)
+static OString lcl_getToken(OStringBuffer& rStr, sal_Int32& index)
 {
     sal_Int32 substart, toklen = 0;
     OUString aWhitespaceChars( " \n\t" );
@@ -317,15 +328,15 @@ static OString lcl_getToken(const OString& rStr, sal_Int32& index)
     if(index == rStr.getLength())
         index = -1;
 
-    return rStr.copy(substart, toklen);
+    return OString(std::string_view(rStr).substr(substart, toklen));
 }
 
 // PaletteSOC ------------------------------------------------------------------
 
-PaletteSOC::PaletteSOC( const OUString &rFPath, const OUString &rFName ) :
+PaletteSOC::PaletteSOC( OUString aFPath, OUString aFName ) :
     mbLoadedPalette( false ),
-    maFPath( rFPath ),
-    maSOCPaletteName( rFName )
+    maFPath(std::move( aFPath )),
+    maSOCPaletteName(std::move( aFName ))
 {
 }
 
@@ -359,6 +370,11 @@ void PaletteSOC::LoadColorSet(SvxColorValueSet& rColorSet)
 bool PaletteSOC::IsValid()
 {
     return true;
+}
+
+Palette* PaletteSOC::Clone() const
+{
+    return new PaletteSOC(*this);
 }
 
 namespace svx

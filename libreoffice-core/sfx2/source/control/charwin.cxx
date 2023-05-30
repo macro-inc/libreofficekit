@@ -21,6 +21,7 @@
 #include <vcl/virdev.hxx>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
+#include <vcl/weldutils.hxx>
 #include <sfx2/charwin.hxx>
 #include <comphelper/dispatchcommand.hxx>
 #include <comphelper/propertyvalue.hxx>
@@ -43,9 +44,9 @@ void SvxCharView::SetDrawingArea(weld::DrawingArea* pDrawingArea)
     const StyleSettings& rStyleSettings = Application::GetSettings().GetStyleSettings();
     vcl::Font aFont = rStyleSettings.GetLabelFont();
     const Size aFontSize = aFont.GetFontSize();
-    aFont.SetFontSize(Size(aFontSize.Width() * 2.5, aFontSize.Height() * 2.5));
+    aFont.SetFontSize(Size(aFontSize.Width() * 2, aFontSize.Height() * 2));
     mxVirDev->Push(PUSH_ALLFONT);
-    mxVirDev->SetFont(aFont);
+    weld::SetPointFont(*mxVirDev, aFont);
     pDrawingArea->set_size_request(mxVirDev->approximate_digit_width() * 2,
                                    mxVirDev->GetTextHeight());
     mxVirDev->Pop();
@@ -135,6 +136,7 @@ void SvxCharView::Paint(vcl::RenderContext& rRenderContext, const tools::Rectang
     Color aHighlightTextColor(rStyleSettings.GetHighlightTextColor());
     Color aFillColor(rStyleSettings.GetWindowColor());
     Color aTextColor(rStyleSettings.GetWindowTextColor());
+    Color aShadowColor(rStyleSettings.GetShadowColor());
 
     const OUString aText = GetText();
 
@@ -201,6 +203,7 @@ void SvxCharView::Paint(vcl::RenderContext& rRenderContext, const tools::Rectang
     else
     {
         rRenderContext.SetFillColor(aFillColor);
+        rRenderContext.SetLineColor(aShadowColor);
         rRenderContext.DrawRect(tools::Rectangle(Point(0, 0), aSize));
 
         rRenderContext.SetTextColor(aWindowTextColor);

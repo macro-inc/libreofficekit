@@ -29,7 +29,6 @@
 #include "ring.hxx"
 #include <type_traits>
 #include <vector>
-#include <memory>
 #include <optional>
 
 class SwModify;
@@ -39,6 +38,7 @@ class SwAttrSet;
 class SwCellFrame;
 class SwTabFrame;
 class SwRowFrame;
+class SwTable;
 
 /*
     SwModify and SwClient cooperate in propagating attribute changes.
@@ -124,6 +124,7 @@ namespace sw
             virtual const SwCellFrame* DynCastCellFrame() const { return nullptr; }
             virtual const SwTabFrame* DynCastTabFrame() const { return nullptr; }
             virtual const SwRowFrame* DynCastRowFrame() const { return nullptr; }
+            virtual const SwTable* DynCastTable() const { return nullptr; }
     };
     enum class IteratorMode { Exact, UnwrapMulti };
 }
@@ -222,7 +223,9 @@ namespace sw
     // Still: in the long run the SwClient/SwModify interface should not be
     // used anymore, in which case a BroadcasterMixin should be enough instead
     // then.
-    class SW_DLLPUBLIC BroadcastingModify : public SwModify, public BroadcasterMixin {
+    class SW_DLLPUBLIC SAL_LOPLUGIN_ANNOTATE("crosscast") BroadcastingModify :
+        public SwModify, public BroadcasterMixin
+    {
         public:
             virtual void CallSwClientNotify(const SfxHint& rHint) const override;
     };
@@ -327,6 +330,11 @@ namespace sw::detail
     inline const CastDest * internal_dyn_cast(const sw::WriterListener * pSource)
     {
         return dynamic_cast<const CastDest *>(pSource);
+    }
+    template<>
+    inline const SwTable* internal_dyn_cast(const sw::WriterListener * pSource)
+    {
+        return pSource->DynCastTable();
     }
     template<>
     inline const SwCellFrame* internal_dyn_cast(const sw::WriterListener * pSource)

@@ -26,7 +26,6 @@
 #include <sfx2/viewfrm.hxx>
 #include <basic/sbstar.hxx>
 #include <basic/sberrors.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <svl/stritem.hxx>
 #include <svl/whiter.hxx>
@@ -387,20 +386,20 @@ void ScTabViewShell::ExecuteTable( SfxRequest& rReq )
                     OUString      aErrMsg ( ScResId( STR_INVALIDTABNAME ) );
                     OUString aName;
                     OUString      aDlgTitle;
-                    const char* pHelpId = nullptr;
+                    OString sHelpId;
 
                     switch ( nSlot )
                     {
                         case FID_TAB_APPEND:
                             aDlgTitle = ScResId(SCSTR_APDTABLE);
                             rDoc.CreateValidTabName( aName );
-                            pHelpId = HID_SC_APPEND_NAME;
+                            sHelpId = HID_SC_APPEND_NAME;
                             break;
 
                         case FID_TAB_RENAME:
                             aDlgTitle = ScResId(SCSTR_RENAMETAB);
                             rDoc.GetName( rViewData.GetTabNo(), aName );
-                            pHelpId = HID_SC_RENAME_NAME;
+                            sHelpId = HID_SC_RENAME_NAME;
                             break;
                     }
 
@@ -409,7 +408,7 @@ void ScTabViewShell::ExecuteTable( SfxRequest& rReq )
                     ScopedVclPtr<AbstractScStringInputDlg> pDlg(pFact->CreateScStringInputDlg(
                         GetFrameWeld(), aDlgTitle, ScResId(SCSTR_NAME),
                         aName, GetStaticInterface()->GetSlot(nSlot)->GetCommand(),
-                        pHelpId));
+                        sHelpId));
 
 
                     while ( !bDone && nRet == RET_OK )
@@ -593,6 +592,42 @@ void ScTabViewShell::ExecuteTable( SfxRequest& rReq )
 
                     MoveTable( nDoc, nTab, bCpy, &aTabName );
                 }
+            }
+            break;
+
+        case FID_TAB_DUPLICATE:
+            {
+                // Get info about current document and selected tab
+                SCTAB nTab = rViewData.GetTabNo();
+                OUString aDocName = GetViewData().GetDocShell()->GetTitle();
+                sal_uInt16 nDoc = 0;
+                bool bCpy = true;
+
+                SfxObjectShell* pSh = SfxObjectShell::GetFirst();
+                ScDocShell* pScSh = nullptr;
+                sal_uInt16 i = 0;
+
+                // Determine the index of the current document
+                while ( pSh )
+                {
+                    pScSh = dynamic_cast<ScDocShell*>( pSh );
+
+                    if( pScSh )
+                    {
+                        pScSh->GetTitle();
+
+                        if (aDocName == pScSh->GetTitle())
+                        {
+                            nDoc = i;
+                            break;
+                        }
+                        // Only count ScDocShell
+                        i++;
+                    }
+                    pSh = SfxObjectShell::GetNext( *pSh );
+                }
+
+                MoveTable( nDoc, nTab + 1, bCpy );
             }
             break;
 
@@ -862,7 +897,14 @@ void ScTabViewShell::ExecuteTable( SfxRequest& rReq )
                     }
                 }
                 break;
-
+        case FID_TOGGLEHIDDENCOLROW:
+                {
+                    svtools::EditableColorConfig aEditableConfig;
+                    svtools::ColorConfigValue aValue = aEditableConfig.GetColorValue(svtools::CALCHIDDENROWCOL);
+                    aValue.bIsVisible = !aValue.bIsVisible;
+                    aEditableConfig.SetColorValue(svtools::CALCHIDDENROWCOL, aValue);
+                }
+                break;
         default:
                 OSL_FAIL("unknown message for ViewShell");
                 break;
@@ -944,6 +986,13 @@ void ScTabViewShell::GetStateTable( SfxItemSet& rSet )
                 break;
 
             case FID_TAB_MOVE:
+                if (   !rDoc.IsDocEditable()
+                    || rDoc.GetChangeTrack() != nullptr
+                    || nTabCount > MAXTAB)
+                    rSet.DisableItem( nWhich );
+                break;
+
+            case FID_TAB_DUPLICATE:
                 if (   !rDoc.IsDocEditable()
                     || rDoc.GetChangeTrack() != nullptr
                     || nTabCount > MAXTAB)

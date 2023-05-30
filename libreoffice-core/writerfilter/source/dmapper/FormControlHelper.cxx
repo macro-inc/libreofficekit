@@ -34,10 +34,13 @@
 #include <com/sun/star/text/VertOrientation.hpp>
 #include <com/sun/star/uno/Any.hxx>
 
+#include <o3tl/safeint.hxx>
+
 #include "FormControlHelper.hxx"
+#include <utility>
 #include <xmloff/odffields.hxx>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace writerfilter::dmapper {
 
@@ -129,8 +132,8 @@ uno::Reference<container::XIndexContainer> FormControlHelper::FormControlHelper_
 
 FormControlHelper::FormControlHelper(FieldId eFieldId,
                                      uno::Reference<text::XTextDocument> const& xTextDocument,
-                                     FFDataHandler::Pointer_t const & pFFData)
-    : m_pFFData(pFFData), m_pImpl(new FormControlHelper_Impl)
+                                     FFDataHandler::Pointer_t pFFData)
+    : m_pFFData(std::move(pFFData)), m_pImpl(new FormControlHelper_Impl)
 {
     m_pImpl->m_eFieldId = eFieldId;
     m_pImpl->rTextDocument = xTextDocument;
@@ -222,18 +225,18 @@ void FormControlHelper::processField(uno::Reference<text::XFormField> const& xFo
 
     OUString sTmp = m_pFFData->getEntryMacro();
     if ( !sTmp.isEmpty() )
-        xNameCont->insertByName( "EntryMacro", uno::makeAny(sTmp) );
+        xNameCont->insertByName( "EntryMacro", uno::Any(sTmp) );
     sTmp = m_pFFData->getExitMacro();
     if ( !sTmp.isEmpty() )
-        xNameCont->insertByName( "ExitMacro", uno::makeAny(sTmp) );
+        xNameCont->insertByName( "ExitMacro", uno::Any(sTmp) );
 
     sTmp = m_pFFData->getHelpText();
     if ( !sTmp.isEmpty() )
-        xNameCont->insertByName( "Help", uno::makeAny(sTmp) );
+        xNameCont->insertByName( "Help", uno::Any(sTmp) );
 
     sTmp = m_pFFData->getStatusText();
     if ( !sTmp.isEmpty() )
-        xNameCont->insertByName( "Hint", uno::makeAny(sTmp) );
+        xNameCont->insertByName( "Hint", uno::Any(sTmp) );
 
     if (m_pImpl->m_eFieldId == FIELD_FORMTEXT )
     {
@@ -250,21 +253,21 @@ void FormControlHelper::processField(uno::Reference<text::XFormField> const& xFo
 
         sTmp = m_pFFData->getTextType();
         if ( !sTmp.isEmpty() )
-            xNameCont->insertByName( "Type", uno::makeAny(sTmp) );
+            xNameCont->insertByName( "Type", uno::Any(sTmp) );
 
         const sal_uInt16 nMaxLength = m_pFFData->getTextMaxLength();
         if ( nMaxLength )
         {
-            xNameCont->insertByName( "MaxLength", uno::makeAny(nMaxLength) );
+            xNameCont->insertByName( "MaxLength", uno::Any(nMaxLength) );
         }
 
         sTmp = m_pFFData->getTextDefault();
         if ( !sTmp.isEmpty() )
-            xNameCont->insertByName( "Content", uno::makeAny(sTmp) );
+            xNameCont->insertByName( "Content", uno::Any(sTmp) );
 
         sTmp = m_pFFData->getTextFormat();
         if ( !sTmp.isEmpty() )
-            xNameCont->insertByName( "Format", uno::makeAny(sTmp) );
+            xNameCont->insertByName( "Format", uno::Any(sTmp) );
     }
     else if (m_pImpl->m_eFieldId == FIELD_FORMCHECKBOX )
     {
@@ -280,17 +283,18 @@ void FormControlHelper::processField(uno::Reference<text::XFormField> const& xFo
         if (!rEntries.empty())
         {
             if ( xNameCont->hasByName(ODF_FORMDROPDOWN_LISTENTRY) )
-                xNameCont->replaceByName(ODF_FORMDROPDOWN_LISTENTRY, uno::makeAny(comphelper::containerToSequence(rEntries)));
+                xNameCont->replaceByName(ODF_FORMDROPDOWN_LISTENTRY, uno::Any(comphelper::containerToSequence(rEntries)));
             else
-                xNameCont->insertByName(ODF_FORMDROPDOWN_LISTENTRY, uno::makeAny(comphelper::containerToSequence(rEntries)));
+                xNameCont->insertByName(ODF_FORMDROPDOWN_LISTENTRY, uno::Any(comphelper::containerToSequence(rEntries)));
 
             sal_Int32 nResult = m_pFFData->getDropDownResult().toInt32();
-            if ( nResult )
+            // 0 is valid, but also how toInt32 reports parse error, but it's a sensible default...
+            if (0 <= nResult && o3tl::make_unsigned(nResult) < rEntries.size())
             {
                 if ( xNameCont->hasByName(ODF_FORMDROPDOWN_RESULT) )
-                    xNameCont->replaceByName(ODF_FORMDROPDOWN_RESULT, uno::makeAny( nResult ) );
+                    xNameCont->replaceByName(ODF_FORMDROPDOWN_RESULT, uno::Any( nResult ) );
                 else
-                    xNameCont->insertByName(ODF_FORMDROPDOWN_RESULT, uno::makeAny( nResult ) );
+                    xNameCont->insertByName(ODF_FORMDROPDOWN_RESULT, uno::Any( nResult ) );
             }
         }
     }
@@ -356,10 +360,10 @@ void FormControlHelper::insertControl(uno::Reference<text::XTextRange> const& xT
     uno::Reference<beans::XPropertySet> xShapeProps(xShape, uno::UNO_QUERY);
 
     sal_uInt16 nTmp = sal_uInt16(text::TextContentAnchorType_AS_CHARACTER);
-    xShapeProps->setPropertyValue("AnchorType", uno::makeAny<sal_uInt16>(nTmp));
+    xShapeProps->setPropertyValue("AnchorType", uno::Any(sal_uInt16(nTmp)));
 
     nTmp = text::VertOrientation::CENTER;
-    xShapeProps->setPropertyValue("VertOrient", uno::makeAny<sal_uInt16>(nTmp));
+    xShapeProps->setPropertyValue("VertOrient", uno::Any(sal_uInt16(nTmp)));
 
     xShapeProps->setPropertyValue("TextRange", uno::Any(xTextRange));
 

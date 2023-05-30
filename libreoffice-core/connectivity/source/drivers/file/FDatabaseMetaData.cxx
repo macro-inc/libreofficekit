@@ -30,7 +30,7 @@
 #include <file/FTable.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/servicehelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <ucbhelper/content.hxx>
 
 using namespace com::sun::star::ucb;
@@ -73,6 +73,7 @@ Reference< XResultSet > SAL_CALL ODatabaseMetaData::getColumns(
 
 namespace
 {
+#if !ENABLE_FUZZERS
     sal_Int16 isCaseSensitiveParentFolder( const OUString& _rFolderOrDoc, std::u16string_view _rDocName )
     {
         sal_Int16 nIsCS = 1;
@@ -151,6 +152,7 @@ namespace
 
         return nIsCS;
     }
+#endif
 }
 
 

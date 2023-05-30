@@ -22,16 +22,8 @@
 #include "Resource.h"       // main symbols
 #include <com/sun/star/accessibility/XAccessible.hpp>
 #include <com/sun/star/accessibility/XAccessibleSelection.hpp>
-#include <AccObjectManagerAgent.hxx>
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
+#include <AccObjectManagerAgent.hxx>
 
 /**
  * CEnumVariant implements IEnumVARIANT interface.
@@ -43,10 +35,9 @@ class ATL_NO_VTABLE CEnumVariant :
 {
 public:
     CEnumVariant()
-            :m_lLBound(0),
+            :m_nCurrent(0),
             pUNOInterface(nullptr)
     {
-        m_lCurrent = m_lLBound;
     }
 
     virtual ~CEnumVariant() {};
@@ -99,8 +90,7 @@ public:
 
 private:
 
-    long m_lCurrent;
-    long m_lLBound;
+    sal_Int64 m_nCurrent;
     css::accessibility::XAccessible* pUNOInterface;
     css::uno::Reference<css::accessibility::XAccessibleSelection>
         m_pXAccessibleSelection;

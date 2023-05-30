@@ -76,7 +76,8 @@ enum SwTextPortionType
     PORTION_ANNOTATION,
     PORTION_ANNOTATION_END,
     PORTION_LINEBREAK,
-    PORTION_CONTENT_CONTROL
+    PORTION_CONTENT_CONTROL,
+    PORTION_LIST_AUTOFMT
 };
 
 class SwXTextPortion : public cppu::WeakImplHelper
@@ -111,17 +112,21 @@ private:
         m_xMeta;
     css::uno::Reference<css::text::XTextContent> m_xLineBreak;
     css::uno::Reference<css::text::XTextContent> m_xContentControl;
-    std::unique_ptr< css::uno::Any > m_pRubyText;
-    std::unique_ptr< css::uno::Any > m_pRubyStyle;
-    std::unique_ptr< css::uno::Any > m_pRubyAdjust;
-    std::unique_ptr< css::uno::Any > m_pRubyIsAbove;
-    std::unique_ptr< css::uno::Any > m_pRubyPosition;
+    std::optional< css::uno::Any > m_oRubyText;
+    std::optional< css::uno::Any > m_oRubyStyle;
+    std::optional< css::uno::Any > m_oRubyAdjust;
+    std::optional< css::uno::Any > m_oRubyIsAbove;
+    std::optional< css::uno::Any > m_oRubyPosition;
     sw::UnoCursorPointer m_pUnoCursor;
 
     SwFrameFormat*                  m_pFrameFormat;
     const SwTextPortionType     m_ePortionType;
 
     bool                        m_bIsCollapsed;
+
+    /// Expose the paragraph's RES_PARATR_LIST_AUTOFMT, not the char props of the underlying (empty)
+    /// text.
+    bool m_bIsListAutoFormat;
 
     void init(const SwUnoCursor* pPortionCursor);
 
@@ -152,13 +157,13 @@ protected:
     virtual void Notify(const SfxHint& rHint) override;
 
 public:
-    SwXTextPortion(const SwUnoCursor* pPortionCursor, css::uno::Reference< css::text::XText > const& rParent, SwTextPortionType   eType   );
-    SwXTextPortion(const SwUnoCursor* pPortionCursor, css::uno::Reference< css::text::XText > const& rParent, SwFrameFormat& rFormat );
+    SwXTextPortion(const SwUnoCursor* pPortionCursor, css::uno::Reference< css::text::XText > xParent, SwTextPortionType   eType   );
+    SwXTextPortion(const SwUnoCursor* pPortionCursor, css::uno::Reference< css::text::XText > xParent, SwFrameFormat& rFormat );
 
     // for Ruby
     SwXTextPortion(const SwUnoCursor* pPortionCursor,
         SwTextRuby const& rAttr,
-        css::uno::Reference< css::text::XText > const& xParent,
+        css::uno::Reference< css::text::XText > xParent,
         bool bIsEnd );
 
     //XTextRange
@@ -257,9 +262,10 @@ class SwXTextPortionEnumeration final
     virtual ~SwXTextPortionEnumeration() override;
 
 public:
+    /// @param bOnlyTextFields tries to return less data, but may return more than just text fields
     SwXTextPortionEnumeration(SwPaM& rParaCursor,
             css::uno::Reference< css::text::XText > const & xParent,
-            const sal_Int32 nStart, const sal_Int32 nEnd );
+            const sal_Int32 nStart, const sal_Int32 nEnd, bool bOnlyTextFields = false );
 
     SwXTextPortionEnumeration(SwPaM& rParaCursor,
         TextRangeList_t && rPortions );

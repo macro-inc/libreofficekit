@@ -74,4 +74,3 @@ modules/swriter/ui/bibliographyentry.ui
 modules/swriter/ui/inforeadonlydialog.ui
 modules/swriter/ui/inforeadonlydialog.ui
 modules/swriter/ui/inforeadonlydialog.ui
-modules/swriter/ui/floatingnavigation.ui

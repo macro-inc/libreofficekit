@@ -21,27 +21,17 @@
 #define INCLUDED_L10NTOOLS_INC_EXPORT_HXX
 
 #include <sal/config.h>
-#include "po.hxx"
 
-#include <cstddef>
-#include <fstream>
+#include <rtl/string.hxx>
 
-#include <osl/file.hxx>
-#include <osl/file.h>
-
-#include <iterator>
 #include <set>
 #include <unordered_map>
 #include <memory>
 #include <vector>
-#include <queue>
-#include <string>
 #include <string_view>
 
 #ifdef _WIN32
 #include <direct.h>
-#else
-#include <unistd.h>
 #endif
 
 #define NO_TRANSLATE_ISO        "x-no-translate"
@@ -64,8 +54,8 @@ typedef std::unordered_map<OString, bool>
 class ResData
 {
 public:
-    ResData( const OString &rGId );
-    ResData( const OString &rGId , const OString &rFilename );
+    ResData( OString rGId );
+    ResData( OString sGId , OString sFilename );
 
     OString sResTyp;
     OString sId;
@@ -130,11 +120,11 @@ class MergeDataFile
         void InsertEntry(std::string_view rTYP, std::string_view rGID,
             std::string_view rLID, const OString &nLang,
             const OString &rTEXT, const OString &rQHTEXT,
-            const OString &rTITLE, const OString &sFilename,
+            const OString &rTITLE, std::string_view sFilename,
             bool bFirstLang, bool bCaseSensitive);
     public:
         explicit MergeDataFile(
-            const OString &rFileName, const OString& rFile,
+            const OString &rFileName, std::string_view rFile,
             bool bCaseSensitive, bool bWithQtz = true );
         ~MergeDataFile();
 
@@ -145,7 +135,7 @@ class MergeDataFile
         MergeEntrys *GetMergeEntrysCaseSensitive( ResData *pResData );
 
         static OString CreateKey(std::string_view rTYP, std::string_view rGID,
-            std::string_view rLID, const OString& rFilename, bool bCaseSensitive);
+            std::string_view rLID, std::string_view rFilename, bool bCaseSensitive);
 };
 
 

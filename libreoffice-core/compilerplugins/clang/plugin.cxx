@@ -15,6 +15,7 @@
 #include <cstddef>
 #include <string>
 
+#include <clang/AST/ParentMapContext.h>
 #include <clang/Basic/FileManager.h>
 #include <clang/Lex/Lexer.h>
 
@@ -23,10 +24,6 @@
 #include "compat.hxx"
 #include "pluginhandler.hxx"
 #include "check.hxx"
-
-#if CLANG_VERSION >= 110000
-#include "clang/AST/ParentMapContext.h"
-#endif
 
 /*
 Base classes for plugin actions.
@@ -38,7 +35,7 @@ namespace {
 
 Expr const * skipImplicit(Expr const * expr) {
     if (auto const e = dyn_cast<MaterializeTemporaryExpr>(expr)) {
-        expr = compat::getSubExpr(e)->IgnoreImpCasts();
+        expr = e->getSubExpr()->IgnoreImpCasts();
     }
     if (auto const e = dyn_cast<CXXBindTemporaryExpr>(expr)) {
         expr = e->getSubExpr();
@@ -129,6 +126,183 @@ Plugin::Plugin( const InstantiationData& data )
 DiagnosticBuilder Plugin::report( DiagnosticsEngine::Level level, StringRef message, SourceLocation loc ) const
 {
     return handler.report( level, name, message, compiler, loc );
+}
+
+bool Plugin::suppressWarningAt(SourceLocation location) const {
+    auto const start = compiler.getSourceManager().getSpellingLoc(location);
+    auto const startInfo = compiler.getSourceManager().getDecomposedLoc(start);
+    auto invalid = false;
+    auto const buf = compiler.getSourceManager().getBufferData(startInfo.first, &invalid);
+    if (invalid) {
+        if (isDebugMode()) {
+            report(DiagnosticsEngine::Fatal, "failed to getBufferData", start);
+        }
+        return false;
+    }
+    auto const label = std::string("[-loplugin:").append(name).append("]");
+    // Look back to the beginning of the previous line:
+    auto loc = start;
+    auto locInfo = startInfo;
+    auto cur = loc;
+    enum class State { Normal, Slash, Comment };
+    auto state = State::Normal;
+    auto newlines = 0;
+    for (auto prev = cur;;) {
+        auto prevInfo = compiler.getSourceManager().getDecomposedLoc(prev);
+        if (prev == compiler.getSourceManager().getLocForStartOfFile(prevInfo.first)) {
+            if (state == State::Comment && isDebugMode()) {
+                report(
+                    DiagnosticsEngine::Fatal,
+                    "beginning of file while looking for beginning of comment", prev);
+            }
+            break;
+        }
+        Token tok;
+        if (Lexer::getRawToken(
+                Lexer::GetBeginningOfToken(
+                    prev.getLocWithOffset(-1), compiler.getSourceManager(), compiler.getLangOpts()),
+                tok, compiler.getSourceManager(), compiler.getLangOpts(), true))
+        {
+            if (isDebugMode()) {
+                report(
+                    DiagnosticsEngine::Fatal, "failed to getRawToken",
+                    prev.getLocWithOffset(-1));
+            }
+            break;
+        }
+        if (tok.getLocation() == cur) {
+            // Keep walking back, character by character, through whitespace preceding the current
+            // token, which Clang treats as nominally belonging to that token (so the above
+            // Lexer::getRawToken/Lexer::GetBeginningOfToken will have produced just the same tok
+            // again):
+            prev = prev.getLocWithOffset(-1);
+            continue;
+        }
+        cur = tok.getLocation();
+        prev = cur;
+        if (state == State::Comment) {
+            // Lexer::GetBeginningOfToken (at least towards Clang 15, still) only re-scans from the
+            // start of the current line, so if we saw the end of a multi-line /*...*/ comment, we
+            // saw that as individual '/' and '*' faux-tokens, at which point we must (hopefully?)
+            // actually be at the end of such a multi-line comment, so we keep walking back to the
+            // first '/*' we encounter (TODO: which still need not be the real start of the comment,
+            // if the comment contains embedded '/*', but we could determine that only if we
+            // re-scanned from the start of the file):
+            if (!tok.is(tok::comment)) {
+                continue;
+            }
+            SmallVector<char, 256> tmp;
+            bool invalid = false;
+            auto const spell = Lexer::getSpelling(
+                prev, tmp, compiler.getSourceManager(), compiler.getLangOpts(), &invalid);
+            if (invalid) {
+                if (isDebugMode()) {
+                    report(DiagnosticsEngine::Fatal, "failed to getSpelling", prev);
+                }
+            } else if (!spell.startswith("/*")) {
+                continue;
+            }
+        }
+        prevInfo = compiler.getSourceManager().getDecomposedLoc(prev);
+        auto const end = prev.getLocWithOffset(tok.getLength());
+        auto const endInfo = compiler.getSourceManager().getDecomposedLoc(end);
+        assert(prevInfo.first == endInfo .first);
+        assert(prevInfo.second <= endInfo.second);
+        assert(endInfo.first == locInfo.first);
+        // Whitespace between tokens is found at the end of prev, from end to loc (unless this is a
+        // multi-line comment, in which case the whitespace has already been inspected as the
+        // whitespace following the comment's final '/' faux-token):
+        StringRef ws;
+        if (state != State::Comment) {
+            assert(endInfo.second <= locInfo.second);
+            ws = buf.substr(endInfo.second, locInfo.second - endInfo.second);
+        }
+        for (std::size_t i = 0;;) {
+            auto const j = ws.find('\n', i);
+            if (j == StringRef::npos) {
+                break;
+            }
+            ++newlines;
+            if (newlines == 2) {
+                break;
+            }
+            i = j + 1;
+        }
+        if (newlines == 2) {
+            break;
+        }
+        auto str = buf.substr(prevInfo.second, endInfo.second - prevInfo.second);
+        if (tok.is(tok::comment) && str.contains(label)) {
+            return true;
+        }
+        for (std::size_t i = 0;;) {
+            auto const j = str.find('\n', i);
+            if (j == StringRef::npos) {
+                break;
+            }
+            ++newlines;
+            if (newlines == 2) {
+                break;
+            }
+            i = j + 1;
+        }
+        if (newlines == 2) {
+            break;
+        }
+        loc = prev;
+        locInfo = prevInfo;
+        switch (state) {
+        case State::Normal:
+            if (tok.is(tok::slash)) {
+                state = State::Slash;
+            }
+            break;
+        case State::Slash:
+            state = tok.is(tok::star) && ws.empty() ? State::Comment : State::Normal;
+                //TODO: check for "ws is only folding whitespace" rather than for `ws.empty()` (but
+                // then, we must not count newlines in that whitespace twice, first as part of the
+                // whitespace following the comment's semi-final '*' faux-token and then as part of
+                // the comment token's content)
+            break;
+        case State::Comment:
+            state = State::Normal;
+        }
+    }
+    // Look forward to the end of the current line:
+    loc = start;
+    locInfo = startInfo;
+    for (;;) {
+        Token tok;
+        if (Lexer::getRawToken(loc, tok, compiler.getSourceManager(), compiler.getLangOpts(), true))
+        {
+            if (isDebugMode()) {
+                report(DiagnosticsEngine::Fatal, "failed to getRawToken", loc);
+            }
+            break;
+        }
+        // Whitespace between tokens is found at the beginning, from loc to beg:
+        auto const beg = tok.getLocation();
+        auto const begInfo = compiler.getSourceManager().getDecomposedLoc(beg);
+        assert(begInfo.first == locInfo.first);
+        assert(begInfo.second >= locInfo.second);
+        if (buf.substr(locInfo.second, begInfo.second - locInfo.second).contains('\n')) {
+            break;
+        }
+        auto const next = beg.getLocWithOffset(tok.getLength());
+        auto const nextInfo = compiler.getSourceManager().getDecomposedLoc(next);
+        assert(nextInfo.first == begInfo.first);
+        assert(nextInfo.second >= begInfo.second);
+        auto const str = buf.substr(begInfo.second, nextInfo.second - begInfo.second);
+        if (tok.is(tok::comment) && str.contains(label)) {
+            return true;
+        }
+        if (tok.is(tok::eof) || str.contains('\n')) {
+            break;
+        }
+        loc = next;
+        locInfo = nextInfo;
+    }
+    return false;
 }
 
 void normalizeDotDotInFilePath( std::string & s )
@@ -285,7 +459,8 @@ bool Plugin::isInUnoIncludeFile(SourceLocation spellingLocation) const
            || hasPathnamePrefix(name, SRCDIR "/include/sal/")
            || hasPathnamePrefix(name, SRCDIR "/include/salhelper/")
            || hasPathnamePrefix(name, SRCDIR "/include/typelib/")
-           || hasPathnamePrefix(name, SRCDIR "/include/uno/"));
+           || hasPathnamePrefix(name, SRCDIR "/include/uno/")
+           || hasPathnamePrefix(name, SDKDIR "/include/"));
 }
 
 bool Plugin::isInUnoIncludeFile(const FunctionDecl* functionDecl) const
@@ -722,6 +897,16 @@ bool isSamePathname(StringRef pathname, StringRef other)
         pathname, other, [](StringRef p, StringRef a) { return p == a; });
 }
 
+bool isSameUnoIncludePathname(StringRef fullPathname, StringRef includePathname)
+{
+    llvm::SmallVector<char, 256> buf;
+    if (isSamePathname(fullPathname, (SRCDIR "/include/" + includePathname).toStringRef(buf))) {
+        return true;
+    }
+    buf.clear();
+    return isSamePathname(fullPathname, (SDKDIR "/include/" + includePathname).toStringRef(buf));
+}
+
 bool hasCLanguageLinkageType(FunctionDecl const * decl) {
     assert(decl != nullptr);
     if (decl->isExternC()) {
@@ -816,6 +1001,42 @@ bool hasExternalLinkage(VarDecl const * decl) {
         }
     }
     return true;
+}
+
+bool isSmartPointerType(QualType qt)
+{
+    // First check whether the object type as written is, or is derived from, std::unique_ptr or
+    // std::shared_ptr, in case the get member function is declared at a base class of that std
+    // type:
+    if (loplugin::isDerivedFrom(
+            qt->getAsCXXRecordDecl(),
+            [](Decl const * decl) {
+                auto const dc = loplugin::DeclCheck(decl);
+                return dc.ClassOrStruct("unique_ptr").StdNamespace()
+                    || dc.ClassOrStruct("shared_ptr").StdNamespace();
+            }))
+        return true;
+
+    // Then check the object type coerced to the type of the get member function, in
+    // case the type-as-written is derived from one of these types (tools::SvRef is
+    // final, but the rest are not):
+    auto const tc2 = loplugin::TypeCheck(qt);
+    if (tc2.ClassOrStruct("unique_ptr").StdNamespace()
+           || tc2.ClassOrStruct("shared_ptr").StdNamespace()
+           || tc2.Class("Reference").Namespace("uno").Namespace("star")
+                .Namespace("sun").Namespace("com").GlobalNamespace()
+           || tc2.Class("Reference").Namespace("rtl").GlobalNamespace()
+           || tc2.Class("SvRef").Namespace("tools").GlobalNamespace()
+           || tc2.Class("WeakReference").Namespace("tools").GlobalNamespace()
+           || tc2.Class("ScopedReadAccess").Namespace("Bitmap").GlobalNamespace()
+           || tc2.Class("ScopedVclPtrInstance").GlobalNamespace()
+           || tc2.Class("VclPtr").GlobalNamespace()
+           || tc2.Class("ScopedVclPtr").GlobalNamespace()
+           || tc2.Class("intrusive_ptr").Namespace("boost").GlobalNamespace())
+    {
+        return true;
+    }
+    return false;
 }
 
 bool isSmartPointerType(const Expr* e)

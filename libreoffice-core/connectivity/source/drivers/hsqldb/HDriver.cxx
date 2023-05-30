@@ -50,7 +50,8 @@
 #include <strings.hrc>
 #include <resource/sharedresources.hxx>
 #include <i18nlangtag/languagetag.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <memory>
 
@@ -235,7 +236,7 @@ namespace connectivity
                 // security: permitted Java classes
                 NamedValue aPermittedClasses(
                     "hsqldb.method_class_names",
-                    makeAny( lcl_getPermittedJavaMethods_nothrow( m_xContext ) )
+                    Any( lcl_getPermittedJavaMethods_nothrow( m_xContext ) )
                 );
                 aProperties.put( "SystemProperties", Sequence< NamedValue >( &aPermittedClasses, 1 ) );
 
@@ -251,15 +252,15 @@ namespace connectivity
                             std::unique_ptr<SvStream> pStream( ::utl::UcbStreamHelper::CreateStream(xStream) );
                             if (pStream)
                             {
-                                OString sLine;
+                                OStringBuffer sLine;
                                 OString sVersionString;
                                 while ( pStream->ReadLine(sLine) )
                                 {
                                     if ( sLine.isEmpty() )
                                         continue;
                                     sal_Int32 nIdx {0};
-                                    const OString sIniKey = sLine.getToken(0, '=', nIdx);
-                                    const OString sValue = sLine.getToken(0, '=', nIdx);
+                                    const std::string_view sIniKey = o3tl::getToken(sLine, 0, '=', nIdx);
+                                    const OString sValue(o3tl::getToken(sLine, 0, '=', nIdx));
                                     if( sIniKey == "hsqldb.compatible_version" )
                                     {
                                         sVersionString = sValue;
@@ -275,9 +276,9 @@ namespace connectivity
                                 if (!sVersionString.isEmpty())
                                 {
                                     sal_Int32 nIdx {0};
-                                    const sal_Int32 nMajor = sVersionString.getToken(0, '.', nIdx).toInt32();
-                                    const sal_Int32 nMinor = sVersionString.getToken(0, '.', nIdx).toInt32();
-                                    const sal_Int32 nMicro = sVersionString.getToken(0, '.', nIdx).toInt32();
+                                    const sal_Int32 nMajor = o3tl::toInt32(o3tl::getToken(sVersionString, 0, '.', nIdx));
+                                    const sal_Int32 nMinor = o3tl::toInt32(o3tl::getToken(sVersionString, 0, '.', nIdx));
+                                    const sal_Int32 nMicro = o3tl::toInt32(o3tl::getToken(sVersionString, 0, '.', nIdx));
                                     if (     nMajor > 1
                                         || ( nMajor == 1 && nMinor > 8 )
                                         || ( nMajor == 1 && nMinor == 8 && nMicro > 0 ) )
@@ -290,6 +291,37 @@ namespace connectivity
                         } // if ( xStream.is() )
                         ::comphelper::disposeComponent(xStream);
                     }
+
+                    // disallow any database/script files that contain a "SCRIPT[.*]" entry (this is belt and braces
+                    // in that bundled hsqldb 1.8.0 is patched to also reject them)
+                    //
+                    // hsqldb 2.6.0 release notes have: added system role SCRIPT_OPS for export / import of database structure and data
+                    // which seems to provide a builtin way to do this with contemporary hsqldb
+                    static const OUStringLiteral sScript(u"script");
+                    if (!bIsNewDatabase && xStorage->isStreamElement(sScript))
+                    {
+                        Reference<XStream > xStream = xStorage->openStreamElement(sScript, ElementModes::READ);
+                        if (xStream.is())
+                        {
+                            std::unique_ptr<SvStream> pStream(::utl::UcbStreamHelper::CreateStream(xStream));
+                            if (pStream)
+                            {
+                                OStringBuffer sLine;
+                                while (pStream->ReadLine(sLine))
+                                {
+                                    OString sText = sLine.makeStringAndClear().trim();
+                                    if (sText.startsWithIgnoreAsciiCase("SCRIPT"))
+                                    {
+                                        ::connectivity::SharedResources aResources;
+                                        sMessage = aResources.getResourceString(STR_COULD_NOT_LOAD_FILE).replaceFirst("$filename$", sSystemPath);
+                                        break;
+                                    }
+                                }
+                            }
+                        } // if ( xStream.is() )
+                        ::comphelper::disposeComponent(xStream);
+                    }
+
                 }
                 catch(Exception&)
                 {
@@ -357,8 +389,7 @@ namespace connectivity
                     Reference<XTransactionBroadcaster> xBroad(xStorage,UNO_QUERY);
                     if ( xBroad.is() )
                     {
-                        Reference<XTransactionListener> xListener(*this,UNO_QUERY);
-                        xBroad->addTransactionListener(xListener);
+                        xBroad->addTransactionListener(Reference<XTransactionListener>(this));
                     }
                 }
             }

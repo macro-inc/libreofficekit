@@ -8,8 +8,7 @@
  *
  */
 
-#ifndef INCLUDED_VCL_ITILEDRENDERABLE_HXX
-#define INCLUDED_VCL_ITILEDRENDERABLE_HXX
+#pragma once
 
 #include "i18nutil/widthfolding.hxx"
 #include <tools/gen.hxx>
@@ -44,7 +43,7 @@ namespace vcl
     extern const std::map <PointerStyle, OString> gaLOKPointerMap;
 
 
-class VCL_DLLPUBLIC ITiledRenderable
+class VCL_DLLPUBLIC SAL_LOPLUGIN_ANNOTATE("crosscast") ITiledRenderable
 {
 public:
 
@@ -371,8 +370,11 @@ public:
      */
     virtual void setPaintTextEdit(bool) {}
 
+    /// Decides if it's OK to call getCommandValues(rCommand).
+    virtual bool supportsCommand(std::u16string_view /*rCommand*/) { return false; }
+
     /// Returns a json mapping of the possible values for the given command.
-    virtual void getCommandValues(tools::JsonWriter& /*rJsonWriter*/, const OString& /*rCommand*/)
+    virtual void getCommandValues(tools::JsonWriter& /*rJsonWriter*/, std::string_view /*rCommand*/)
     {
     }
 
@@ -386,13 +388,12 @@ public:
     {
     }
 
-    /// Used to initialize appearance flags
-    virtual void initializeAppearanceFlags()
-    {
-    }
+    /**
+     * Returns an opaque string reflecting the render state of a component
+     * eg. 'PD' - P for non-printing-characters, D for dark-mode.
+     */
+    virtual OString getViewRenderState() { return rtl::OString(); }
 };
 } // namespace vcl
-
-#endif // INCLUDED_VCL_ITILEDRENDERABLE_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

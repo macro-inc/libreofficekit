@@ -53,6 +53,7 @@
 #include <memory>
 #include <cppuhelper/implbase.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 GalleryBrowserMode GalleryBrowser2::meInitMode = GALLERYBROWSERMODE_ICON;
 
@@ -112,7 +113,7 @@ private:
     static void Execute( const CommandInfo &rCmdInfo,
                   const css::uno::Sequence< css::beans::PropertyValue > &rArguments );
 
-    void MenuSelectHdl(const OString& rIdent);
+    void MenuSelectHdl(std::string_view rIdent);
     void BackgroundMenuSelectHdl(sal_uInt16 nId);
 public:
     GalleryThemePopup(weld::Widget* pParent,
@@ -286,12 +287,12 @@ void GalleryThemePopup::ExecutePopup(weld::Widget* pParent, const ::Point &rPos)
     MenuSelectHdl(mxPopupMenu->popup_at_rect(pParent, tools::Rectangle(rPos, Size(1,1))));
 }
 
-void GalleryThemePopup::MenuSelectHdl(const OString& rIdent)
+void GalleryThemePopup::MenuSelectHdl(std::string_view rIdent)
 {
-    if (rIdent.isEmpty())
+    if (rIdent.empty())
         return;
 
-    sal_uInt16 nSubMenuId = rIdent.toUInt32();
+    sal_uInt16 nSubMenuId = o3tl::toUInt32(rIdent);
     if (nSubMenuId)
     {
         BackgroundMenuSelectHdl(nSubMenuId-1);
@@ -485,20 +486,20 @@ void GalleryBrowser2::TogglePreview()
     GetViewWindow()->grab_focus();
 }
 
-void GalleryBrowser2::ShowContextMenu(const CommandEvent& rCEvt)
+bool GalleryBrowser2::ShowContextMenu(const CommandEvent& rCEvt)
 {
     Point aMousePos = rCEvt.GetMousePosPixel();
     Point aSelPos;
     const sal_uInt32 nItemId = ImplGetSelectedItemId( rCEvt.IsMouseEvent() ? &aMousePos : nullptr, aSelPos );
 
     if( !(mpCurTheme && nItemId && ( nItemId <= mpCurTheme->GetObjectCount() )) )
-        return;
+        return false;
 
     ImplSelectItemId( nItemId );
 
     css::uno::Reference< css::frame::XFrame > xFrame( GetFrame() );
     if ( !xFrame.is() )
-        return;
+        return false;
 
     weld::Widget* pParent = GetViewWindow();
     mnCurActionPos = nItemId - 1;
@@ -510,6 +511,7 @@ void GalleryBrowser2::ShowContextMenu(const CommandEvent& rCEvt)
             GALLERYBROWSERMODE_PREVIEW == GetMode(),
             this ) );
     xPopup->ExecutePopup(pParent, aSelPos);
+    return true;
 }
 
 bool GalleryBrowser2::ViewBoxHasFocus() const
@@ -606,8 +608,8 @@ void GalleryBrowser2::SelectTheme( std::u16string_view rThemeName )
     m_xHelper.set(new GalleryTransferable(mpCurTheme, 0, true));
     rtl::Reference<TransferDataContainer> xHelper(m_xHelper);
     mxListView->enable_drag_source(xHelper, DND_ACTION_COPY | DND_ACTION_LINK);
-    mxIconView->SetDragDataTransferrable(xHelper, DND_ACTION_COPY | DND_ACTION_LINK);
-    mxPreview->SetDragDataTransferrable(xHelper, DND_ACTION_COPY | DND_ACTION_LINK);
+    mxIconView->SetDragDataTransferable(xHelper, DND_ACTION_COPY | DND_ACTION_LINK);
+    mxPreview->SetDragDataTransferable(xHelper, DND_ACTION_COPY | DND_ACTION_LINK);
 
     mxIconView->SetTheme(mpCurTheme);
     mxPreview->SetTheme(mpCurTheme);

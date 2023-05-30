@@ -23,7 +23,6 @@
 #include "fmtfld.hxx"
 #include <cstddef>
 #include <vcl/vclptr.hxx>
-#include <tools/solar.h>
 #include "SidebarWindowsTypes.hxx"
 #include "nodeoffset.hxx"
 
@@ -115,6 +114,7 @@ public:
     virtual SwPosition GetAnchorPosition() const = 0;
     virtual bool UseElement(SwRootFrame const&, IDocumentRedlineAccess const&) = 0;
     virtual const SwFormatField& GetFormatField() const = 0;
+    virtual SwFormatField& GetFormatField() = 0;
     virtual const SfxBroadcaster* GetBroadcaster() const = 0;
     virtual VclPtr<sw::annotation::SwAnnotationWin> GetSidebarWindow( SwEditWin& rEditWin,
                                                                 SwPostItMgr& aMgr) = 0;
@@ -134,6 +134,10 @@ public:
     virtual SwPosition GetAnchorPosition() const override;
     virtual bool UseElement(SwRootFrame const&, IDocumentRedlineAccess const&) override;
     virtual const SwFormatField& GetFormatField() const override
+    {
+        return mrFormatField;
+    }
+    SwFormatField& GetFormatField() override
     {
         return mrFormatField;
     }

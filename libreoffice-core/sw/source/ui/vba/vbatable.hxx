@@ -33,12 +33,20 @@ class SwVbaTable : public SwVbaTable_BASE
     css::uno::Reference< css::text::XTextTable > mxTextTable;
 public:
     /// @throws css::uno::RuntimeException
-    SwVbaTable( const css::uno::Reference< ooo::vba::XHelperInterface >& rParent, const css::uno::Reference< css::uno::XComponentContext >& rContext, const css::uno::Reference< css::text::XTextDocument >& rDocument, const css::uno::Reference< css::text::XTextTable >& xTextTable);
+    SwVbaTable( const css::uno::Reference< ooo::vba::XHelperInterface >& rParent, const css::uno::Reference< css::uno::XComponentContext >& rContext, css::uno::Reference< css::text::XTextDocument > xDocument, const css::uno::Reference< css::text::XTextTable >& xTextTable);
     virtual css::uno::Reference< ::ooo::vba::word::XRange > SAL_CALL Range(  ) override;
     virtual void SAL_CALL Select(  ) override;
     virtual void SAL_CALL Delete(  ) override;
-    virtual OUString SAL_CALL getName( ) override;
+    virtual OUString SAL_CALL getName(  ) override;
     virtual css::uno::Any SAL_CALL Borders( const css::uno::Any& aIndex ) override;
+    virtual double SAL_CALL getBottomPadding(  ) override;
+    virtual void SAL_CALL setBottomPadding( double fValue ) override;
+    virtual double SAL_CALL getLeftPadding(  ) override;
+    virtual void SAL_CALL setLeftPadding( double fValue ) override;
+    virtual double SAL_CALL getRightPadding(  ) override;
+    virtual void SAL_CALL setRightPadding( double fValue ) override;
+    virtual double SAL_CALL getTopPadding(  ) override;
+    virtual void SAL_CALL setTopPadding( double fValue ) override;
     virtual css::uno::Any SAL_CALL Rows( const css::uno::Any& aIndex ) override;
     virtual css::uno::Any SAL_CALL Columns( const css::uno::Any& aIndex ) override;
 

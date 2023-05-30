@@ -151,6 +151,11 @@ enum SwDocumentSettingsPropertyHandles
     HANDLE_GUTTER_AT_TOP,
     HANDLE_FOOTNOTE_IN_COLUMN_TO_PAGEEND,
     HANDLE_IMAGE_PREFERRED_DPI,
+    HANDLE_AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE,
+    HANDLE_HYPHENATE_URLS,
+    HANDLE_WORD_LIKE_WRAP_FOR_AS_CHAR_FLYS,
+    HANDLE_NO_NUMBERING_SHOW_FOLLOWBY,
+    HANDLE_DROP_CAP_PUNCTUATION
 };
 
 }
@@ -248,6 +253,11 @@ static rtl::Reference<MasterPropertySetInfo> lcl_createSettingsInfo()
         { OUString("GutterAtTop"), HANDLE_GUTTER_AT_TOP, cppu::UnoType<bool>::get(), 0 },
         { OUString("FootnoteInColumnToPageEnd"), HANDLE_FOOTNOTE_IN_COLUMN_TO_PAGEEND, cppu::UnoType<bool>::get(), 0 },
         { OUString("ImagePreferredDPI"), HANDLE_IMAGE_PREFERRED_DPI, cppu::UnoType<sal_Int32>::get(), 0 },
+        { OUString("AutoFirstLineIndentDisregardLineSpace"), HANDLE_AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE, cppu::UnoType<bool>::get(), 0 },
+        { OUString("HyphenateURLs"), HANDLE_HYPHENATE_URLS, cppu::UnoType<bool>::get(), 0 },
+        { OUString("WordLikeWrapForAsCharFlys"), HANDLE_WORD_LIKE_WRAP_FOR_AS_CHAR_FLYS, cppu::UnoType<bool>::get(), 0 },
+        { OUString("NoNumberingShowFollowBy"), HANDLE_NO_NUMBERING_SHOW_FOLLOWBY, cppu::UnoType<bool>::get(), 0 },
+        { OUString("DropCapPunctuation"), HANDLE_DROP_CAP_PUNCTUATION, cppu::UnoType<bool>::get(), 0 },
 
 /*
  * As OS said, we don't have a view when we need to set this, so I have to
@@ -299,14 +309,14 @@ Any SAL_CALL SwXDocumentSettings::queryInterface( const Type& rType )
 {
         return ::cppu::queryInterface(rType,
                                       // OWeakObject interfaces
-                                      &dynamic_cast<XInterface&>(dynamic_cast<OWeakObject&>(*this)),
-                                      &dynamic_cast<XWeak&>(*this),
+                                      static_cast<XInterface*>(static_cast<OWeakObject*>(this)),
+                                      static_cast<XWeak*>(this),
                                       // my own interfaces
-                                      &dynamic_cast<XPropertySet&>(*this),
-                                      &dynamic_cast<XPropertyState&>(*this),
-                                      &dynamic_cast<XMultiPropertySet&>(*this),
-                                      &dynamic_cast<XServiceInfo&>(*this),
-                                      &dynamic_cast<XTypeProvider&>(*this));
+                                      static_cast<XPropertySet*>(this),
+                                      static_cast<XPropertyState*>(this),
+                                      static_cast<XMultiPropertySet*>(this),
+                                      static_cast<XServiceInfo*>(this),
+                                      static_cast<XTypeProvider*>(this));
 }
 void SwXDocumentSettings::acquire ()
     noexcept
@@ -482,8 +492,7 @@ void SwXDocumentSettings::_setSingleValue( const comphelper::PropertyInfo & rInf
         {
             bool bIsKern = *o3tl::doAccess<bool>(rValue);
             mpDoc->getIDocumentSettingAccess().set(DocumentSettingId::KERN_ASIAN_PUNCTUATION, bIsKern);
-            SwEditShell* pEditSh = mpDoc->GetEditShell();
-            if(pEditSh)
+            if (SwEditShell* pEditSh = mpDoc->GetEditShell())
                 pEditSh->ChgHyphenation();
         }
         break;
@@ -1039,6 +1048,50 @@ void SwXDocumentSettings::_setSingleValue( const comphelper::PropertyInfo & rInf
             }
         }
         break;
+        case HANDLE_AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE:
+        {
+            bool bTmp;
+            if (rValue >>= bTmp)
+            {
+                mpDoc->getIDocumentSettingAccess().set(
+                    DocumentSettingId::AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE, bTmp);
+            }
+        }
+        break;
+        case HANDLE_HYPHENATE_URLS:
+        {
+            bool bTmp;
+            if (rValue >>= bTmp)
+            {
+                mpDoc->getIDocumentSettingAccess().set(
+                    DocumentSettingId::HYPHENATE_URLS, bTmp);
+            }
+        }
+        break;
+        case HANDLE_WORD_LIKE_WRAP_FOR_AS_CHAR_FLYS:
+        {
+            bool bTmp;
+            if (rValue >>= bTmp)
+                mpDoc->getIDocumentSettingAccess().set(
+                    DocumentSettingId::WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML, bTmp);
+        }
+        break;
+        case HANDLE_NO_NUMBERING_SHOW_FOLLOWBY:
+        {
+            bool bTmp;
+            if (rValue >>= bTmp)
+                mpDoc->getIDocumentSettingAccess().set(
+                    DocumentSettingId::NO_NUMBERING_SHOW_FOLLOWBY, bTmp);
+        }
+        break;
+        case HANDLE_DROP_CAP_PUNCTUATION:
+        {
+            bool bTmp;
+            if (rValue >>= bTmp)
+                mpDoc->getIDocumentSettingAccess().set(
+                    DocumentSettingId::DROP_CAP_PUNCTUATION, bTmp);
+        }
+        break;
         default:
             throw UnknownPropertyException(OUString::number(rInfo.mnHandle));
     }
@@ -1082,8 +1135,7 @@ void SwXDocumentSettings::_getSingleValue( const comphelper::PropertyInfo & rInf
     {
         case HANDLE_FORBIDDEN_CHARS:
         {
-            Reference<XForbiddenCharacters> xRet(*mpModel->GetPropertyHelper(), UNO_QUERY);
-            rValue <<= xRet;
+            rValue <<= Reference<XForbiddenCharacters>(mpModel->GetPropertyHelper());
         }
         break;
         case HANDLE_LINK_UPDATE_MODE:
@@ -1554,6 +1606,36 @@ void SwXDocumentSettings::_getSingleValue( const comphelper::PropertyInfo & rInf
         case HANDLE_IMAGE_PREFERRED_DPI:
         {
             rValue <<= mpDoc->getIDocumentSettingAccess().getImagePreferredDPI();
+        }
+        break;
+        case HANDLE_AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE:
+        {
+            rValue <<= mpDoc->getIDocumentSettingAccess().get(
+                DocumentSettingId::AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE);
+        }
+        break;
+        case HANDLE_HYPHENATE_URLS:
+        {
+            rValue <<= mpDoc->getIDocumentSettingAccess().get(
+                DocumentSettingId::HYPHENATE_URLS);
+        }
+        break;
+        case HANDLE_WORD_LIKE_WRAP_FOR_AS_CHAR_FLYS:
+        {
+            rValue <<= mpDoc->getIDocumentSettingAccess().get(
+                DocumentSettingId::WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML);
+        }
+        break;
+        case HANDLE_NO_NUMBERING_SHOW_FOLLOWBY:
+        {
+            rValue <<= mpDoc->getIDocumentSettingAccess().get(
+                DocumentSettingId::NO_NUMBERING_SHOW_FOLLOWBY);
+        }
+        break;
+        case HANDLE_DROP_CAP_PUNCTUATION:
+        {
+            rValue <<= mpDoc->getIDocumentSettingAccess().get(
+                DocumentSettingId::DROP_CAP_PUNCTUATION);
         }
         break;
         default:

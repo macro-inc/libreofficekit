@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <stdio.h>
@@ -91,26 +90,33 @@ void SAL_CALL SvxShowCharSetAcc::disposing()
     m_pParent = nullptr;
 }
 
-
 IMPLEMENT_FORWARD_XINTERFACE2( SvxShowCharSetAcc, OAccessibleSelectionHelper, OAccessibleHelper_Base )
 IMPLEMENT_FORWARD_XTYPEPROVIDER2( SvxShowCharSetAcc, OAccessibleSelectionHelper, OAccessibleHelper_Base )
 
-bool SvxShowCharSetAcc::implIsSelected( sal_Int32 nAccessibleChildIndex )
+bool SvxShowCharSetAcc::implIsSelected( sal_Int64 nAccessibleChildIndex )
 {
-    return m_pParent && m_pParent->IsSelected(
-        sal::static_int_cast<sal_uInt16>(nAccessibleChildIndex));
+    if (!m_pParent)
+        return false;
+
+    if (nAccessibleChildIndex < 0 || nAccessibleChildIndex >= getAccessibleChildCount())
+        throw IndexOutOfBoundsException();
+
+    return m_pParent->IsSelected(sal::static_int_cast<sal_uInt16>(nAccessibleChildIndex));
 }
 
-        // select the specified child => watch for special ChildIndexes (ACCESSIBLE_SELECTION_CHILD_xxx)
-void SvxShowCharSetAcc::implSelect(sal_Int32 nAccessibleChildIndex, bool bSelect)
+// select the specified child => watch for special ChildIndexes (ACCESSIBLE_SELECTION_CHILD_xxx)
+void SvxShowCharSetAcc::implSelect(sal_Int64 nAccessibleChildIndex, bool bSelect)
 {
-    if ( m_pParent )
-    {
-        if ( bSelect )
-            m_pParent->SelectIndex(nAccessibleChildIndex, true);
-        else
-            m_pParent->DeSelect();
-    }
+    if (!m_pParent)
+        return;
+
+    if (nAccessibleChildIndex < 0 || nAccessibleChildIndex >= getAccessibleChildCount())
+        throw IndexOutOfBoundsException();
+
+    if (bSelect)
+        m_pParent->SelectIndex(nAccessibleChildIndex, true);
+    else
+        m_pParent->DeSelect();
 }
 
 css::awt::Rectangle SvxShowCharSetAcc::implGetBounds()
@@ -131,14 +137,14 @@ css::awt::Rectangle SvxShowCharSetAcc::implGetBounds()
     return aRet;
 }
 
-sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleChildCount()
+sal_Int64 SAL_CALL SvxShowCharSetAcc::getAccessibleChildCount()
 {
     OExternalLockGuard aGuard( this );
 
     return m_pParent->getMaxCharCount();
 }
 
-uno::Reference< css::accessibility::XAccessible > SAL_CALL SvxShowCharSetAcc::getAccessibleChild( sal_Int32 i )
+uno::Reference< css::accessibility::XAccessible > SAL_CALL SvxShowCharSetAcc::getAccessibleChild( sal_Int64 i )
 {
     OExternalLockGuard aGuard( this );
 
@@ -190,33 +196,33 @@ uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL SvxShowCha
 }
 
 
-uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL SvxShowCharSetAcc::getAccessibleStateSet()
+sal_Int64 SAL_CALL SvxShowCharSetAcc::getAccessibleStateSet()
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if (m_pParent)
     {
         // SELECTABLE
-        pStateSet->AddState( AccessibleStateType::FOCUSABLE );
+        nStateSet |= AccessibleStateType::FOCUSABLE;
         if (m_pParent->HasFocus())
         {
-            pStateSet->AddState( AccessibleStateType::FOCUSED );
-            pStateSet->AddState( AccessibleStateType::ACTIVE );
+            nStateSet |= AccessibleStateType::FOCUSED;
+            nStateSet |= AccessibleStateType::ACTIVE;
         }
         if (m_pParent->IsEnabled())
         {
-            pStateSet->AddState( AccessibleStateType::ENABLED );
-            pStateSet->AddState( AccessibleStateType::SENSITIVE );
+            nStateSet |= AccessibleStateType::ENABLED;
+            nStateSet |= AccessibleStateType::SENSITIVE;
         }
         if (m_pParent->IsVisible())
-            pStateSet->AddState( AccessibleStateType::VISIBLE );
+            nStateSet |= AccessibleStateType::VISIBLE;
 
-        pStateSet->AddState( AccessibleStateType::MANAGES_DESCENDANTS );
+        nStateSet |= AccessibleStateType::MANAGES_DESCENDANTS;
     }
 
-    return pStateSet;
+    return nStateSet;
 }
 
 
@@ -339,19 +345,19 @@ sal_Bool SAL_CALL SvxShowCharSetAcc::isAccessibleSelected( sal_Int32 nRow, sal_I
     return m_pParent->GetSelectIndexId() == getAccessibleIndex(nRow,nColumn);
 }
 
-sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn )
+sal_Int64 SAL_CALL SvxShowCharSetAcc::getAccessibleIndex( sal_Int32 nRow, sal_Int32 nColumn )
 {
-    return (nRow*COLUMN_COUNT) + nColumn;
+    return (static_cast<sal_Int64>(nRow) * COLUMN_COUNT) + nColumn;
 }
 
-sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleRow( sal_Int32 nChildIndex )
+sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleRow( sal_Int64 nChildIndex )
 {
     OExternalLockGuard aGuard( this );
 
     return SvxShowCharSet::GetRowPos(sal::static_int_cast<sal_uInt16>(nChildIndex));
 }
 
-sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleColumn( sal_Int32 nChildIndex )
+sal_Int32 SAL_CALL SvxShowCharSetAcc::getAccessibleColumn( sal_Int64 nChildIndex )
 {
     OExternalLockGuard aGuard( this );
 
@@ -384,13 +390,13 @@ void SvxShowCharSetItemAcc::ParentDestroyed()
     mpParent = nullptr;
 }
 
-sal_Int32 SAL_CALL SvxShowCharSetItemAcc::getAccessibleChildCount()
+sal_Int64 SAL_CALL SvxShowCharSetItemAcc::getAccessibleChildCount()
 {
     return 0;
 }
 
 
-uno::Reference< css::accessibility::XAccessible > SAL_CALL SvxShowCharSetItemAcc::getAccessibleChild( sal_Int32 /*i*/ )
+uno::Reference< css::accessibility::XAccessible > SAL_CALL SvxShowCharSetItemAcc::getAccessibleChild( sal_Int64 /*i*/ )
 {
     throw lang::IndexOutOfBoundsException();
 }
@@ -462,37 +468,37 @@ uno::Reference< css::accessibility::XAccessibleRelationSet > SAL_CALL SvxShowCha
 }
 
 
-uno::Reference< css::accessibility::XAccessibleStateSet > SAL_CALL SvxShowCharSetItemAcc::getAccessibleStateSet()
+sal_Int64 SAL_CALL SvxShowCharSetItemAcc::getAccessibleStateSet()
 {
     OExternalLockGuard aGuard( this );
 
-    rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( mpParent )
     {
         if (mpParent->mrParent.IsEnabled())
         {
-            pStateSet->AddState( css::accessibility::AccessibleStateType::ENABLED );
+            nStateSet |= css::accessibility::AccessibleStateType::ENABLED;
             // SELECTABLE
-            pStateSet->AddState( css::accessibility::AccessibleStateType::SELECTABLE );
-            pStateSet->AddState( css::accessibility::AccessibleStateType::FOCUSABLE );
+            nStateSet |= css::accessibility::AccessibleStateType::SELECTABLE;
+            nStateSet |= css::accessibility::AccessibleStateType::FOCUSABLE;
         }
 
         // SELECTED
         if( mpParent->mrParent.GetSelectIndexId() == mpParent->mnId )
         {
-            pStateSet->AddState( css::accessibility::AccessibleStateType::SELECTED );
-            pStateSet->AddState( css::accessibility::AccessibleStateType::FOCUSED );
+            nStateSet |= css::accessibility::AccessibleStateType::SELECTED;
+            nStateSet |= css::accessibility::AccessibleStateType::FOCUSED;
         }
         if ( mpParent->mnId >= mpParent->mrParent.FirstInView() && mpParent->mnId <= mpParent->mrParent.LastInView() )
         {
-            pStateSet->AddState( AccessibleStateType::VISIBLE );
-            pStateSet->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::VISIBLE;
+            nStateSet |= AccessibleStateType::SHOWING;
         }
-        pStateSet->AddState( AccessibleStateType::TRANSIENT );
+        nStateSet |= AccessibleStateType::TRANSIENT;
     }
 
-    return pStateSet;
+    return nStateSet;
 }
 
 

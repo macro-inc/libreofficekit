@@ -67,7 +67,7 @@ namespace XSLT
 
         static const sal_Int32 OUTPUT_BUFFER_SIZE;
         static const sal_Int32 INPUT_BUFFER_SIZE;
-        LibXSLTTransformer* m_transformer;
+        rtl::Reference<LibXSLTTransformer> m_transformer;
         Sequence<sal_Int8> m_readBuf;
         Sequence<sal_Int8> m_writeBuf;
 
@@ -131,7 +131,7 @@ namespace XSLT
     public:
 
         // ctor...
-        LibXSLTTransformer(const css::uno::Reference<css::uno::XComponentContext> &r);
+        LibXSLTTransformer(css::uno::Reference<css::uno::XComponentContext> x);
 
         //  XServiceInfo
         virtual sal_Bool SAL_CALL supportsService(const OUString& sServiceName) override;

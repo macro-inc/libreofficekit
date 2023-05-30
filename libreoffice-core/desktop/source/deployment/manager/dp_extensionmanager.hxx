@@ -20,13 +20,14 @@
 #pragma once
 
 #include <strings.hrc>
-#include <dp_misc.h>
 #include <dp_shared.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <com/sun/star/deployment/XExtensionManager.hpp>
 #include <com/sun/star/deployment/XPackageManager.hpp>
 #include <com/sun/star/deployment/XPackageManagerFactory.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
+#include <com/sun/star/uno/XComponentContext.hpp>
 #include <osl/mutex.hxx>
 #include <vector>
 #include <unordered_map>
@@ -37,7 +38,7 @@ typedef std::unordered_map<
     OUString,
     std::vector<css::uno::Reference<css::deployment::XPackage> > > id2extensions;
 
-class ExtensionManager : private ::dp_misc::MutexHolder,
+class ExtensionManager : private cppu::BaseMutex,
         public ::cppu::WeakComponentImplHelper< css::deployment::XExtensionManager, css::lang::XServiceInfo >
 {
 public:

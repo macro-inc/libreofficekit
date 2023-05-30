@@ -18,12 +18,11 @@
  */
 
 #include <sfx2/sidebar/Theme.hxx>
-#include <sidebar/Tools.hxx>
 #include <sfx2/app.hxx>
 
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace css;
 using namespace css::uno;
@@ -37,8 +36,7 @@ Theme& Theme::GetCurrentTheme()
 }
 
 Theme::Theme()
-    : ThemeInterfaceBase(m_aMutex),
-      mbIsHighContrastMode(Application::GetSettings().GetStyleSettings().GetHighContrastMode()),
+    : mbIsHighContrastMode(Application::GetSettings().GetStyleSettings().GetHighContrastMode()),
       mbIsHighContrastModeSetManually(false)
 {
     SetupPropertyMaps();
@@ -143,7 +141,7 @@ void Theme::UpdateTheme()
     }
 }
 
-void SAL_CALL Theme::disposing()
+void Theme::disposing(std::unique_lock<std::mutex>&)
 {
     SolarMutexGuard aGuard;
 

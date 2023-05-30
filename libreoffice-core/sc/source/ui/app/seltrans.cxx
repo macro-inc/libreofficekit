@@ -88,16 +88,16 @@ rtl::Reference<ScSelectionTransferObj> ScSelectionTransferObj::CreateFromView( S
                     if ( nMarkCount == 1 )
                     {
                         SdrObject* pObj = rMarkList.GetMark(0)->GetMarkedSdrObj();
-                        sal_uInt16 nSdrObjKind = pObj->GetObjIdentifier();
+                        SdrObjKind nSdrObjKind = pObj->GetObjIdentifier();
 
-                        if ( nSdrObjKind == OBJ_GRAF )
+                        if ( nSdrObjKind == SdrObjKind::Graphic )
                         {
                             if ( static_cast<SdrGrafObj*>(pObj)->GetGraphic().GetType() == GraphicType::Bitmap )
                                 eMode = SC_SELTRANS_DRAW_BITMAP;
                             else
                                 eMode = SC_SELTRANS_DRAW_GRAPHIC;
                         }
-                        else if ( nSdrObjKind == OBJ_OLE2 )
+                        else if ( nSdrObjKind == SdrObjKind::OLE2 )
                             eMode = SC_SELTRANS_DRAW_OLE;
                         else if ( lcl_IsURLButton( pObj ) )
                             eMode = SC_SELTRANS_DRAW_BOOKMARK;
@@ -288,7 +288,7 @@ void ScSelectionTransferObj::CreateCellData()
                 aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
                 // maSize is set in ScTransferObj ctor
 
-                rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), aObjDesc );
+                rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), std::move(aObjDesc) );
 
                 // SetDragHandlePos is not used - there is no mouse position
                 //? pTransferObj->SetVisibleTab( nTab );
@@ -338,7 +338,7 @@ void ScSelectionTransferObj::CreateDrawData()
             aObjDesc.maDisplayName = pDocSh->GetMedium()->GetURLObject().GetURLNoPass();
             // maSize is set in ScDrawTransferObj ctor
 
-            rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, aObjDesc );
+            rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pModel), pDocSh, std::move(aObjDesc) );
 
             SfxObjectShellRef aPersistRef( aDragShellRef.get() );
             pTransferObj->SetDrawPersist( aPersistRef );    // keep persist for ole objects alive

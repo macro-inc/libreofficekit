@@ -27,7 +27,7 @@ FuConstUnoControl::FuConstUnoControl(ScTabViewShell& rViewSh, vcl::Window* pWin,
                                      SdrModel* pDoc, const SfxRequest& rReq)
     : FuConstruct(rViewSh, pWin, pViewP, pDoc, rReq)
     , nInventor(SdrInventor::Unknown)
-    , nIdentifier(OBJ_NONE)
+    , nIdentifier(SdrObjKind::NONE)
 {
     const SfxUInt32Item* pInventorItem = rReq.GetArg<SfxUInt32Item>(SID_FM_CONTROL_INVENTOR);
     const SfxUInt16Item* pIdentifierItem = rReq.GetArg<SfxUInt16Item>(SID_FM_CONTROL_IDENTIFIER);
@@ -100,11 +100,11 @@ void FuConstUnoControl::Deactivate()
 }
 
 // Create default drawing objects via keyboard
-SdrObjectUniquePtr FuConstUnoControl::CreateDefaultObject(const sal_uInt16 /* nID */, const tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstUnoControl::CreateDefaultObject(const sal_uInt16 /* nID */, const tools::Rectangle& rRectangle)
 {
     // case SID_FM_CREATE_CONTROL:
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         *pDrDoc,
         pView->GetCurrentObjInventor(),
         pView->GetCurrentObjIdentifier()));

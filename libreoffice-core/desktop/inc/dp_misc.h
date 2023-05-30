@@ -23,7 +23,6 @@
 
 #include <string_view>
 
-#include <osl/mutex.hxx>
 #include <osl/process.h>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
@@ -34,14 +33,6 @@ namespace dp_misc {
 
 const char CR = 0x0d;
 const char LF = 0x0a;
-
-
-class MutexHolder
-{
-    mutable ::osl::Mutex m_mutex;
-protected:
-    ::osl::Mutex & getMutex() const { return m_mutex; }
-};
 
 
 inline void try_dispose( css::uno::Reference< css::uno::XInterface> const & x )
@@ -73,7 +64,7 @@ OUString expandUnoRcUrl( OUString const & url );
     be again encoded for use in an "expand" URL.
  */
 DESKTOP_DEPLOYMENTMISC_DLLPUBLIC OUString makeURL(
-    OUString const & baseURL, OUString const & relPath );
+    std::u16string_view baseURL, OUString const & relPath );
 
 
 /** appends a relative path to a url.
@@ -82,7 +73,7 @@ DESKTOP_DEPLOYMENTMISC_DLLPUBLIC OUString makeURL(
     of an system path.
  */
 DESKTOP_DEPLOYMENTMISC_DLLPUBLIC OUString makeURLAppendSysPathSegment(
-    OUString const & baseURL, OUString const & relPath );
+    std::u16string_view baseURL, OUString const & relPath );
 
 
 DESKTOP_DEPLOYMENTMISC_DLLPUBLIC OUString generateRandomPipeId();

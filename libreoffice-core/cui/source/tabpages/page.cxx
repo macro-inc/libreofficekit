@@ -22,7 +22,6 @@
 #include <sfx2/objsh.hxx>
 #include <sfx2/printer.hxx>
 #include <sfx2/viewsh.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <svtools/unitconv.hxx>
@@ -81,7 +80,7 @@ const SvxPageUsage aArr[] =
 
 static sal_uInt16 PageUsageToPos_Impl( SvxPageUsage nUsage )
 {
-    for ( size_t i = 0; i < SAL_N_ELEMENTS(aArr); ++i )
+    for ( size_t i = 0; i < std::size(aArr); ++i )
         if ( aArr[i] ==  nUsage )
             return i;
     return 3;
@@ -90,7 +89,7 @@ static sal_uInt16 PageUsageToPos_Impl( SvxPageUsage nUsage )
 
 static SvxPageUsage PosToPageUsage_Impl( sal_uInt16 nPos )
 {
-    if ( nPos >= SAL_N_ELEMENTS(aArr) )
+    if ( nPos >= std::size(aArr) )
         return SvxPageUsage::NONE;
     return aArr[nPos];
 }
@@ -150,7 +149,6 @@ SvxPageDescPage::SvxPageDescPage(weld::Container* pPage, weld::DialogController*
     , m_xPaperSizeBox(new SvxPaperSizeListBox(m_xBuilder->weld_combo_box("comboPageFormat")))
     , m_xPaperWidthEdit(m_xBuilder->weld_metric_spin_button("spinWidth", FieldUnit::CM))
     , m_xPaperHeightEdit(m_xBuilder->weld_metric_spin_button("spinHeight", FieldUnit::CM))
-    , m_xOrientationFT(m_xBuilder->weld_label("labelOrientation"))
     , m_xPortraitBtn(m_xBuilder->weld_radio_button("radiobuttonPortrait"))
     , m_xLandscapeBtn(m_xBuilder->weld_radio_button("radiobuttonLandscape"))
     , m_xTextFlowLbl(m_xBuilder->weld_label("labelTextFlow"))
@@ -197,13 +195,15 @@ SvxPageDescPage::SvxPageDescPage(weld::Container* pPage, weld::DialogController*
     bool bCJK = SvtCJKOptions::IsAsianTypographyEnabled();
     bool bCTL = aCTLLanguageOptions.IsCTLFontEnabled();
     bool bWeb = false;
-    const SfxPoolItem* pItem;
 
-    SfxObjectShell* pShell;
-    if(SfxItemState::SET == rAttr.GetItemState(SID_HTML_MODE, false, &pItem) ||
-        ( nullptr != (pShell = SfxObjectShell::Current()) &&
-                    nullptr != (pItem = pShell->GetItem(SID_HTML_MODE))))
-        bWeb = 0 != (static_cast<const SfxUInt16Item*>(pItem)->GetValue() & HTMLMODE_ON);
+    const SfxUInt16Item* pHtmlModeItem = rAttr.GetItemIfSet(SID_HTML_MODE, false);
+    if (!pHtmlModeItem)
+    {
+        if (SfxObjectShell* pShell = SfxObjectShell::Current())
+            pHtmlModeItem = pShell->GetItem(SID_HTML_MODE);
+    }
+    if (pHtmlModeItem)
+        bWeb = 0 != (pHtmlModeItem->GetValue() & HTMLMODE_ON);
 
     //  fill text flow listbox with valid entries
 
@@ -360,12 +360,11 @@ void SvxPageDescPage::Reset( const SfxItemSet* rSet )
             static_cast<sal_uInt16>(ConvertLong_Impl( static_cast<tools::Long>(rULSpace.GetLower()), eUnit )) );
     }
 
-    if (rSet->HasItem(SID_ATTR_CHAR_GRABBAG, &pItem))
+    if (const SfxGrabBagItem* pGragbagItem = rSet->GetItemIfSet(SID_ATTR_CHAR_GRABBAG))
     {
-        const auto& rGrabBagItem = static_cast<const SfxGrabBagItem&>(*pItem);
         bool bGutterAtTop{};
-        auto it = rGrabBagItem.GetGrabBag().find("GutterAtTop");
-        if (it != rGrabBagItem.GetGrabBag().end())
+        auto it = pGragbagItem->GetGrabBag().find("GutterAtTop");
+        if (it != pGragbagItem->GetGrabBag().end())
         {
             it->second >>= bGutterAtTop;
         }
@@ -379,17 +378,17 @@ void SvxPageDescPage::Reset( const SfxItemSet* rSet )
             // Left.
             m_xGutterPositionLB->set_active(0);
         }
-        it = rGrabBagItem.GetGrabBag().find("RtlGutter");
+        it = pGragbagItem->GetGrabBag().find("RtlGutter");
         bool bRtlGutter{};
-        if (it != rGrabBagItem.GetGrabBag().end())
+        if (it != pGragbagItem->GetGrabBag().end())
         {
             it->second >>= bRtlGutter;
             m_xRtlGutterCB->set_active(bRtlGutter);
             m_xRtlGutterCB->show();
         }
-        it = rGrabBagItem.GetGrabBag().find("BackgroundFullSize");
+        it = pGragbagItem->GetGrabBag().find("BackgroundFullSize");
         bool isBackgroundFullSize{};
-        if (it != rGrabBagItem.GetGrabBag().end())
+        if (it != pGragbagItem->GetGrabBag().end())
         {
             it->second >>= isBackgroundFullSize;
             m_xBackgroundFullSizeCB->set_active(isBackgroundFullSize);
@@ -584,15 +583,14 @@ void SvxPageDescPage::Reset( const SfxItemSet* rSet )
 
     if(SfxItemState::SET == rSet->GetItemState(SID_SWREGISTER_MODE))
     {
-        m_xRegisterCB->set_active(static_cast<const SfxBoolItem&>(rSet->Get(
-                                  SID_SWREGISTER_MODE)).GetValue());
+        m_xRegisterCB->set_active(rSet->Get(SID_SWREGISTER_MODE).GetValue());
         m_xRegisterCB->save_state();
         RegisterModify(*m_xRegisterCB);
     }
     if(SfxItemState::SET == rSet->GetItemState(SID_SWREGISTER_COLLECTION))
     {
         m_xRegisterLB->set_active_text(
-                static_cast<const SfxStringItem&>(rSet->Get(SID_SWREGISTER_COLLECTION)).GetValue());
+                rSet->Get(SID_SWREGISTER_COLLECTION).GetValue());
         m_xRegisterLB->save_value();
     }
 
@@ -666,8 +664,7 @@ bool SvxPageDescPage::FillItemSet( SfxItemSet* rSet )
     if (rOldSet.HasItem(SID_ATTR_CHAR_GRABBAG))
     {
         // Set gutter position.
-        SfxGrabBagItem aGrabBagItem(
-                static_cast<const SfxGrabBagItem&>(rOldSet.Get(SID_ATTR_CHAR_GRABBAG)));
+        SfxGrabBagItem aGrabBagItem(rOldSet.Get(SID_ATTR_CHAR_GRABBAG));
         if (m_xGutterPositionLB->get_value_changed_from_saved())
         {
             bool bGutterAtTop = m_xGutterPositionLB->get_active() == 1;
@@ -852,7 +849,7 @@ bool SvxPageDescPage::FillItemSet( SfxItemSet* rSet )
     if (m_xRegisterCB->get_visible() &&
        (m_xRegisterCB->get_active() || m_xRegisterCB->get_state_changed_from_saved()))
     {
-        const SfxBoolItem& rRegItem = static_cast<const SfxBoolItem&>(rOldSet.Get(SID_SWREGISTER_MODE));
+        const SfxBoolItem& rRegItem = rOldSet.Get(SID_SWREGISTER_MODE);
         std::unique_ptr<SfxBoolItem> pRegItem(rRegItem.Clone());
         bool bCheck = m_xRegisterCB->get_active();
         pRegItem->SetValue(bCheck);
@@ -1137,7 +1134,7 @@ void SvxPageDescPage::ResetBackground_Impl(const SfxItemSet& rSet)
     {
         const SvxSetItem& rSetItem = static_cast< const SvxSetItem& >(rSet.Get(nWhich, false));
         const SfxItemSet& rTmpSet = rSetItem.GetItemSet();
-        const SfxBoolItem& rOn = static_cast< const SfxBoolItem& >(rTmpSet.Get(GetWhich(SID_ATTR_PAGE_ON)));
+        const SfxBoolItem& rOn = rTmpSet.Get(GetWhich(SID_ATTR_PAGE_ON));
 
         if(rOn.GetValue())
         {
@@ -1173,7 +1170,7 @@ void SvxPageDescPage::ResetBackground_Impl(const SfxItemSet& rSet)
     {
         const SvxSetItem& rSetItem = static_cast< const SvxSetItem& >(rSet.Get(nWhich,false));
         const SfxItemSet& rTmpSet = rSetItem.GetItemSet();
-        const SfxBoolItem& rOn = static_cast< const SfxBoolItem& >(rTmpSet.Get(GetWhich(SID_ATTR_PAGE_ON)));
+        const SfxBoolItem& rOn = rTmpSet.Get(GetWhich(SID_ATTR_PAGE_ON));
 
         if(rOn.GetValue())
         {
@@ -1246,12 +1243,12 @@ void SvxPageDescPage::InitHeadFoot_Impl( const SfxItemSet& rSet )
     {
         const SfxItemSet& rHeaderSet = pSetItem->GetItemSet();
         const SfxBoolItem& rHeaderOn =
-            static_cast<const SfxBoolItem&>(rHeaderSet.Get( GetWhich( SID_ATTR_PAGE_ON ) ));
+            rHeaderSet.Get( GetWhich( SID_ATTR_PAGE_ON ) );
 
         if ( rHeaderOn.GetValue() )
         {
-            const SvxSizeItem& rSize = static_cast<const SvxSizeItem&>(
-                rHeaderSet.Get( GetWhich( SID_ATTR_PAGE_SIZE ) ));
+            const SvxSizeItem& rSize =
+                rHeaderSet.Get( GetWhich( SID_ATTR_PAGE_SIZE ) );
             const SvxULSpaceItem& rUL = static_cast<const SvxULSpaceItem&>(
                 rHeaderSet.Get( GetWhich( SID_ATTR_ULSPACE ) ));
             tools::Long nDist = rUL.GetLower();
@@ -1301,12 +1298,12 @@ void SvxPageDescPage::InitHeadFoot_Impl( const SfxItemSet& rSet )
 
     const SfxItemSet& rFooterSet = pSetItem->GetItemSet();
     const SfxBoolItem& rFooterOn =
-        static_cast<const SfxBoolItem&>(rFooterSet.Get( GetWhich( SID_ATTR_PAGE_ON ) ));
+        rFooterSet.Get( GetWhich( SID_ATTR_PAGE_ON ) );
 
     if ( rFooterOn.GetValue() )
     {
-        const SvxSizeItem& rSize = static_cast<const SvxSizeItem&>(
-            rFooterSet.Get( GetWhich( SID_ATTR_PAGE_SIZE ) ));
+        const SvxSizeItem& rSize =
+            rFooterSet.Get( GetWhich( SID_ATTR_PAGE_SIZE ) );
         const SvxULSpaceItem& rUL = static_cast<const SvxULSpaceItem&>(
             rFooterSet.Get( GetWhich( SID_ATTR_ULSPACE ) ));
         tools::Long nDist = rUL.GetUpper();

@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -12,11 +14,7 @@ class tdf133348(UITestCase):
 
         with self.ui_test.create_doc_in_start_center("writer") as document:
 
-            xWriterDoc = self.xUITest.getTopFocusWindow()
-            xWriterEdit = xWriterDoc.getChild("writer_edit")
-
-
-            selection = self.xUITest.executeCommand(".uno:SelectAll")
+            self.xUITest.executeCommand(".uno:SelectAll")
             xArgs = mkPropertyValues({"Text": "C1"})
             self.xUITest.executeCommandWithParameters(".uno:InsertAnnotation", xArgs)
 
@@ -31,7 +29,6 @@ class tdf133348(UITestCase):
                 actionProps = mkPropertyValues(props)
                 xFirstName.executeAction("TYPE", actionProps)
 
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             xArgs = mkPropertyValues({"Text": "C2"})
             self.xUITest.executeCommandWithParameters(".uno:ReplyComment", xArgs)
 
@@ -53,6 +50,4 @@ class tdf133348(UITestCase):
             # all comments have been deleted
             self.assertFalse(document.TextFields.createEnumeration().hasMoreElements())
 
-
 # vim: set shiftwidth=4 softtabstop=4 expandtab:
-

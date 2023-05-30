@@ -16,8 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SW_SOURCE_UI_ENVELP_LABPRT_HXX
-#define INCLUDED_SW_SOURCE_UI_ENVELP_LABPRT_HXX
+#pragma once
 
 #include <sfx2/tabdlg.hxx>
 
@@ -28,7 +27,7 @@ class SwLabItem;
 
 class SwLabPrtPage : public SfxTabPage
 {
-    VclPtr<Printer> pPrinter; // for the shaft setting - unfortunately
+    VclPtr<Printer> m_pPrinter; // for the shaft setting - unfortunately
 
     std::unique_ptr<weld::RadioButton> m_xPageButton;
     std::unique_ptr<weld::RadioButton> m_xSingleButton;
@@ -58,9 +57,7 @@ public:
     void FillItem(SwLabItem& rItem);
     virtual bool FillItemSet(SfxItemSet* rSet) override;
     virtual void Reset(const SfxItemSet* rSet) override;
-    Printer* GetPrt() { return pPrinter; }
+    Printer* GetPrt() { return m_pPrinter; }
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

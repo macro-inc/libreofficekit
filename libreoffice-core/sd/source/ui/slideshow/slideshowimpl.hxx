@@ -21,10 +21,10 @@
 
 #include <memory>
 #include <sal/config.h>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <com/sun/star/presentation/ClickAction.hpp>
 #include <com/sun/star/presentation/XSlideShowListener.hpp>
 #include <com/sun/star/presentation/XSlideShowController.hpp>
@@ -84,7 +84,7 @@ class SlideShowListenerProxy : private ::cppu::BaseMutex,
         public ::cppu::WeakImplHelper< css::presentation::XSlideShowListener, css::presentation::XShapeEventListener >
 {
 public:
-    SlideShowListenerProxy( const rtl::Reference< SlideshowImpl >& xController, const css::uno::Reference< css::presentation::XSlideShow >& xSlideShow );
+    SlideShowListenerProxy( rtl::Reference< SlideshowImpl > xController, css::uno::Reference< css::presentation::XSlideShow > xSlideShow );
     virtual ~SlideShowListenerProxy() override;
 
     void addAsSlideShowListener();
@@ -117,14 +117,14 @@ public:
     virtual void SAL_CALL click(const css::uno::Reference< css::drawing::XShape > & xShape, const css::awt::MouseEvent & aOriginalEvent) override;
 
 private:
-    ::comphelper::OInterfaceContainerHelper2 maListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::presentation::XSlideShowListener> maListeners;
     rtl::Reference< SlideshowImpl > mxController;
     css::uno::Reference< css::presentation::XSlideShow > mxSlideShow;
 };
 
-typedef ::cppu::WeakComponentImplHelper< css::presentation::XSlideShowController, css::container::XIndexAccess > SlideshowImplBase;
+typedef comphelper::WeakComponentImplHelper< css::presentation::XSlideShowController, css::container::XIndexAccess > SlideshowImplBase;
 
-class SlideshowImpl final : private ::cppu::BaseMutex, public SlideshowImplBase
+class SlideshowImpl final : public SlideshowImplBase
 {
 friend class SlideShow;
 friend class SlideShowView;
@@ -185,8 +185,8 @@ public:
     /// @throws css::uno::RuntimeException
     void hyperLinkClicked(const OUString & hyperLink);
     void click(const css::uno::Reference< css::drawing::XShape > & xShape);
-    bool swipe(const CommandSwipeData &rSwipeData);
-    bool longpress(const CommandLongPressData& rLongPressData);
+    bool swipe(const CommandGestureSwipeData &rSwipeData);
+    bool longpress(const CommandGestureLongPressData& rLongPressData);
 
     /// ends the presentation async
     void endPresentation();
@@ -207,7 +207,7 @@ private:
     // This function is called upon disposing the component,
     // if your component needs special work when it becomes
     // disposed, do it here.
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // internal
     bool startShow( PresentationSettingsEx const * pPresSettings );
@@ -242,7 +242,7 @@ private:
     DECL_LINK( updateHdl, Timer *, void );
     DECL_LINK( ReadyForNextInputHdl, Timer *, void );
     DECL_LINK( endPresentationHdl, void*, void );
-    void ContextMenuSelectHdl(const OString& rIdent);
+    void ContextMenuSelectHdl(std::string_view rIdent);
     DECL_LINK( ContextMenuHdl, void*, void );
     DECL_LINK( deactivateHdl, Timer *, void );
     DECL_LINK( EventListenerHdl, VclSimpleEvent&, void );

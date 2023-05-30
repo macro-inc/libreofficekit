@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbalistlevel.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <com/sun/star/style/NumberingType.hpp>
 #include <ooo/vba/word/WdListNumberStyle.hpp>
@@ -26,7 +27,7 @@
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaListLevel::SwVbaListLevel( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, SwVbaListHelperRef const & pHelper, sal_Int32 nLevel ) : SwVbaListLevel_BASE( rParent, rContext ), pListHelper( pHelper ), mnLevel( nLevel )
+SwVbaListLevel::SwVbaListLevel( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, SwVbaListHelperRef  pHelper, sal_Int32 nLevel ) : SwVbaListLevel_BASE( rParent, rContext ), pListHelper(std::move( pHelper )), mnLevel( nLevel )
 {
 }
 
@@ -88,7 +89,7 @@ void SAL_CALL SwVbaListLevel::setAlignment( ::sal_Int32 _alignment )
             throw uno::RuntimeException();
         }
     }
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "Adjust", uno::makeAny( nAlignment ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "Adjust", uno::Any( nAlignment ) );
 }
 
 uno::Reference< ::ooo::vba::word::XFont > SAL_CALL SwVbaListLevel::getFont()
@@ -149,7 +150,7 @@ void SAL_CALL SwVbaListLevel::setNumberPosition( float _numberposition )
     pListHelper->getPropertyValueWithNameAndLevel( mnLevel, "IndentAt" ) >>= nIndentAt;
 
     sal_Int32 nFirstLineIndent = nNumberPosition - nIndentAt;
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "FirstLineIndent", uno::makeAny( nFirstLineIndent ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "FirstLineIndent", uno::Any( nFirstLineIndent ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaListLevel::getNumberStyle()
@@ -287,7 +288,7 @@ void SAL_CALL SwVbaListLevel::setNumberStyle( ::sal_Int32 _numberstyle )
         }
     }
 
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "NumberingType", uno::makeAny( nNumberingType ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "NumberingType", uno::Any( nNumberingType ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaListLevel::getResetOnHigher()
@@ -311,7 +312,7 @@ void SAL_CALL SwVbaListLevel::setResetOnHigher( ::sal_Int32 /*_resetonhigher*/ )
 void SAL_CALL SwVbaListLevel::setStartAt( ::sal_Int32 _startat )
 {
     sal_Int16 nStartWith = static_cast<sal_Int16>(_startat);
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "StartWith", uno::makeAny( nStartWith ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "StartWith", uno::Any( nStartWith ) );
 }
 
 float SAL_CALL SwVbaListLevel::getTabPosition()
@@ -325,7 +326,7 @@ float SAL_CALL SwVbaListLevel::getTabPosition()
 void SAL_CALL SwVbaListLevel::setTabPosition( float _tabposition )
 {
     sal_Int32 nTabPosition = Millimeter::getInHundredthsOfOneMillimeter( _tabposition );
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "ListtabStopPosition", uno::makeAny( nTabPosition ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "ListtabStopPosition", uno::Any( nTabPosition ) );
 }
 
 float SAL_CALL SwVbaListLevel::getTextPosition()
@@ -348,8 +349,8 @@ void SAL_CALL SwVbaListLevel::setTextPosition( float _textposition )
 
     nIndentAt = Millimeter::getInHundredthsOfOneMillimeter( _textposition );
     nFirstLineIndent = nAlignedAt - nIndentAt;
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "IndentAt", uno::makeAny( nIndentAt ) );
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "FirstLineIndent", uno::makeAny( nFirstLineIndent ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "IndentAt", uno::Any( nIndentAt ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "FirstLineIndent", uno::Any( nFirstLineIndent ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaListLevel::getTrailingCharacter()
@@ -363,7 +364,7 @@ void SAL_CALL SwVbaListLevel::setTextPosition( float _textposition )
 void SAL_CALL SwVbaListLevel::setTrailingCharacter( ::sal_Int32 _trailingcharacter )
 {
     sal_Int16 nLabelFollowedBy = static_cast<sal_Int16>(_trailingcharacter);
-    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "LabelFollowedBy", uno::makeAny( nLabelFollowedBy ) );
+    pListHelper->setPropertyValueWithNameAndLevel( mnLevel, "LabelFollowedBy", uno::Any( nLabelFollowedBy ) );
 }
 
 OUString

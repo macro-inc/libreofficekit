@@ -23,7 +23,6 @@
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/fieldvalues.hxx>
-#include <vcl/image.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/virdev.hxx>
@@ -43,6 +42,7 @@
 #include <editeng/protitem.hxx>
 #include <osl/diagnose.h>
 #include <rtl/math.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "rlrcitem.hxx"
 #include <memory>
@@ -881,11 +881,16 @@ void SvxRuler::UpdatePara(const SvxLRSpaceItem *pItem) // new value of paragraph
     }
 }
 
-void SvxRuler::UpdateParaBorder()
+void SvxRuler::UpdateBorder(const SvxLRSpaceItem * pItem)
 {
     /* Border distance */
     if(bActive)
     {
+        if (pItem)
+            mxBorderItem.reset(new SvxLRSpaceItem(*pItem));
+        else
+            mxBorderItem.reset();
+
         StartListening_Impl();
     }
 }
@@ -964,6 +969,9 @@ void SvxRuler::SetDefTabDist(tools::Long inDefTabDist)  // New distance for Defa
         UpdateFrame(); // hack: try to get lAppNullOffset initialized
     /* New distance is set for DefaultTabs */
     lDefTabDist = inDefTabDist;
+    if( !lDefTabDist )
+        lDefTabDist = 1;
+
     UpdateTabs();
 }
 
@@ -1019,10 +1027,10 @@ void SvxRuler::UpdateTabs()
         const tools::Long lPosPixel = ConvertHPosPixel(lParaIndent) + lLastTab;
         const tools::Long lRightIndent = ConvertHPosPixel(nRightFrameMargin - mxParaItem->GetRight());
 
-        tools::Long nDefTabDist = ConvertHPosPixel(lDefTabDist);
-
-        if( !nDefTabDist )
-            nDefTabDist = 1;
+        tools::Long lCurrentDefTabDist = lDefTabDist;
+        if(mxTabStopItem->GetDefaultDistance())
+            lCurrentDefTabDist = mxTabStopItem->GetDefaultDistance();
+        tools::Long nDefTabDist = ConvertHPosPixel(lCurrentDefTabDist);
 
         const sal_uInt16 nDefTabBuf = lPosPixel > lRightIndent || lLastTab > lRightIndent
                     ? 0
@@ -1058,13 +1066,13 @@ void SvxRuler::UpdateTabs()
         }
 
         // Adjust to previous-to-first default tab stop
-        lLastTabOffsetLogic -= lLastTabOffsetLogic % lDefTabDist;
+        lLastTabOffsetLogic -= lLastTabOffsetLogic % lCurrentDefTabDist;
 
         // fill the rest with default Tabs
         for (j = 0; j < nDefTabBuf; ++j)
         {
             //simply add the default distance to the last position
-            lLastTabOffsetLogic += lDefTabDist;
+            lLastTabOffsetLogic += lCurrentDefTabDist;
             if (bRTL)
             {
                 mpTabs[nTabCount + TAB_GAP].nPos =
@@ -1206,6 +1214,9 @@ tools::Long SvxRuler::GetLeftFrameMargin() const
         nLeft = mxColumnItem->GetActiveColumnDescription().nStart;
     }
 
+    if (mxBorderItem && (!mxColumnItem || mxColumnItem->IsTable()))
+        nLeft += mxBorderItem->GetLeft();
+
     return nLeft;
 }
 
@@ -1256,6 +1267,9 @@ tools::Long SvxRuler::GetRightFrameMargin() const
         lResult += mxLRSpaceItem->GetRight();
     else if(!bHorz && mxULSpaceItem)
         lResult += mxULSpaceItem->GetLower();
+
+    if (bHorz && mxBorderItem && (!mxColumnItem || mxColumnItem->IsTable()))
+        lResult += mxBorderItem->GetRight();
 
     if(bHorz)
         lResult = mxPagePosItem->GetWidth() - lResult;
@@ -2698,7 +2712,7 @@ void SvxRuler::CalcMinMax()
                     nMaxLeft = lNullPix;
                 else
                     nMaxLeft = mpBorders[nIdx - 1].nPos + mpBorders[nIdx - 1].nWidth + lNullPix;
-                if(nIdx == mxColumnItem->GetActColumn())
+                if (mxColumnItem && nIdx == mxColumnItem->GetActColumn())
                 {
                     if(bRTL)
                     {
@@ -2891,6 +2905,7 @@ void SvxRuler::CalcMinMax()
                 break;
             }
           case RulerDragSize::N2:
+            if (mxColumnItem)
             {
                 nMaxLeft = lNullPix + mpBorders[nIdx].nPos;
                 if(nIdx == mxColumnItem->Count()-2) { // last column
@@ -2913,7 +2928,7 @@ void SvxRuler::CalcMinMax()
                         nMaxRight += mpBorders[nIdx].nPos +
                             mpBorders[nIdx].nWidth;
                     }
-            }
+                }
                 nMaxRight -= glMinFrame;
                 nMaxRight -= mpBorders[nIdx].nWidth;
                 break;
@@ -3257,14 +3272,14 @@ void SvxRuler::MenuSelect(std::string_view ident)
     if (ident.empty())
         return;
     /* Handler of the context menus for switching the unit of measurement */
-    SetUnit(vcl::EnglishStringToMetric(OUString::fromUtf8(ident)));
+    SetUnit(vcl::EnglishStringToMetric(ident));
 }
 
-void SvxRuler::TabMenuSelect(const OString& rIdent)
+void SvxRuler::TabMenuSelect(std::string_view rIdent)
 {
-    if (rIdent.isEmpty())
+    if (rIdent.empty())
         return;
-    sal_Int32 nId = rIdent.toInt32();
+    sal_Int32 nId = o3tl::toInt32(rIdent);
     /* Handler of the tab menu for setting the type */
     if (mxTabStopItem && mxTabStopItem->Count() > mxRulerImpl->nIdx)
     {
@@ -3338,7 +3353,7 @@ void SvxRuler::Command( const CommandEvent& rCommandEvent )
             for ( sal_uInt16 i = nCount; i; --i )
             {
                 OString sIdent = xMenu->get_id(i - 1);
-                FieldUnit eMenuUnit = vcl::EnglishStringToMetric(OUString::fromUtf8(sIdent));
+                FieldUnit eMenuUnit = vcl::EnglishStringToMetric(sIdent);
                 xMenu->set_active(sIdent, eMenuUnit == eUnit);
                 if( bReduceMetric )
                 {

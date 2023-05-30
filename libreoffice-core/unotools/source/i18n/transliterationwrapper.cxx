@@ -19,11 +19,10 @@
 
 #include <sal/config.h>
 
-#include <sal/log.hxx>
 #include <unotools/transliterationwrapper.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <i18nutil/transliteration.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/i18n/Transliteration.hpp>
 

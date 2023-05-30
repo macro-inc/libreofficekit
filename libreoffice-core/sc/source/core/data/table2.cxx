@@ -50,7 +50,6 @@
 #include <rowheightcontext.hxx>
 #include <listenercontext.hxx>
 #include <compressedarray.hxx>
-#include <brdcst.hxx>
 #include <refdata.hxx>
 #include <docsh.hxx>
 
@@ -60,6 +59,7 @@
 #include <o3tl/safeint.hxx>
 #include <o3tl/unit_conversion.hxx>
 #include <osl/diagnose.h>
+#include <sal/log.hxx>
 #include <svl/poolcach.hxx>
 #include <unotools/charclass.hxx>
 #include <math.h>
@@ -1281,7 +1281,7 @@ void ScTable::DetachFormulaCells(
 {
     nCol2 = ClampToAllocatedColumns(nCol2);
     for (SCCOL nCol = nCol1; nCol <= nCol2; ++nCol)
-        aCol[nCol].DetachFormulaCells(rCxt, nRow1, nRow2, nullptr);
+        aCol[nCol].DetachFormulaCells(rCxt, nRow1, nRow2);
 }
 
 void ScTable::SetDirtyFromClip(
@@ -1787,10 +1787,10 @@ double* ScTable::GetValueCell( SCCOL nCol, SCROW nRow )
     return CreateColumnIfNotExists(nCol).GetValueCell(nRow);
 }
 
-OUString ScTable::GetInputString( SCCOL nCol, SCROW nRow, const svl::SharedString** pShared ) const
+OUString ScTable::GetInputString( SCCOL nCol, SCROW nRow, bool bForceSystemLocale ) const
 {
     if (ValidColRow(nCol, nRow) && nCol < GetAllocatedColumnsCount())
-        return aCol[nCol].GetInputString( nRow, pShared );
+        return aCol[nCol].GetInputString( nRow, bForceSystemLocale );
     else
         return OUString();
 }
@@ -2122,32 +2122,26 @@ void ScTable::SetAllFormulasDirty( const sc::SetFormulaDirtyContext& rCxt )
 
 void ScTable::SetDirty( const ScRange& rRange, ScColumn::BroadcastMode eMode )
 {
-    bool bOldAutoCalc = rDocument.GetAutoCalc();
-    rDocument.SetAutoCalc( false );    // avoid multiple recalculations
+    sc::AutoCalcSwitch aSwitch(rDocument, false);
     SCCOL nCol2 = rRange.aEnd.Col();
     nCol2 = ClampToAllocatedColumns(nCol2);
     for (SCCOL i=rRange.aStart.Col(); i<=nCol2; i++)
         aCol[i].SetDirty(rRange.aStart.Row(), rRange.aEnd.Row(), eMode);
-    rDocument.SetAutoCalc( bOldAutoCalc );
 }
 
 void ScTable::SetTableOpDirty( const ScRange& rRange )
 {
-    bool bOldAutoCalc = rDocument.GetAutoCalc();
-    rDocument.SetAutoCalc( false );    // no multiple recalculation
+    sc::AutoCalcSwitch aSwitch(rDocument, false);
     const SCCOL nCol2 = ClampToAllocatedColumns(rRange.aEnd.Col());
     for (SCCOL i=rRange.aStart.Col(); i<=nCol2; i++)
         aCol[i].SetTableOpDirty( rRange );
-    rDocument.SetAutoCalc( bOldAutoCalc );
 }
 
 void ScTable::SetDirtyAfterLoad()
 {
-    bool bOldAutoCalc = rDocument.GetAutoCalc();
-    rDocument.SetAutoCalc( false );    // avoid multiple recalculations
+    sc::AutoCalcSwitch aSwitch(rDocument, false);
     for (SCCOL i=0; i < aCol.size(); i++)
         aCol[i].SetDirtyAfterLoad();
-    rDocument.SetAutoCalc( bOldAutoCalc );
 }
 
 void ScTable::SetDirtyIfPostponed()
@@ -2362,7 +2356,7 @@ void ScTable::SetMergedCells( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2
         ApplyFlags(nCol1+1, nRow1+1, nCol2, nRow2, ScMF::Hor | ScMF::Ver);
 }
 
-bool ScTable::IsBlockEmpty( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2, bool bIgnoreNotes ) const
+bool ScTable::IsBlockEmpty( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 ) const
 {
     if (!(ValidCol(nCol1) && ValidCol(nCol2)))
     {
@@ -2373,12 +2367,12 @@ bool ScTable::IsBlockEmpty( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2, 
     bool bEmpty = true;
     for (SCCOL i=nCol1; i<=nCol2 && bEmpty; i++)
     {
-        bEmpty = aCol[i].IsEmptyBlock( nRow1, nRow2 );
+        bEmpty = aCol[i].IsEmptyData( nRow1, nRow2 );
         if (bEmpty)
         {
             bEmpty = aCol[i].IsSparklinesEmptyBlock(nRow1, nRow2);
         }
-        if (!bIgnoreNotes && bEmpty)
+        if (bEmpty)
         {
             bEmpty = aCol[i].IsNotesEmptyBlock(nRow1, nRow2);
         }
@@ -2479,14 +2473,12 @@ void ScTable::FindMaxRotCol( RowInfo* pRowInfo, SCSIZE nArrCount, SCCOL nX1, SCC
             const ScPatternAttr* pPattern = aIter.GetNext( nAttrCol, nAttrRow1, nAttrRow2 );
             while ( pPattern )
             {
-                const SfxPoolItem* pCondItem;
-                if ( pPattern->GetItemSet().GetItemState( ATTR_CONDITIONAL, true, &pCondItem )
-                        == SfxItemState::SET )
+                if ( const ScCondFormatItem* pCondItem = pPattern->GetItemSet().GetItemIfSet( ATTR_CONDITIONAL ) )
                 {
                     //  Run through all formats, so that each cell does not have to be
                     //  handled individually
 
-                    const ScCondFormatIndexes& rCondFormatData = static_cast<const ScCondFormatItem*>(pCondItem)->GetCondFormatData();
+                    const ScCondFormatIndexes& rCondFormatData = pCondItem->GetCondFormatData();
                     ScStyleSheetPool* pStylePool = rDocument.GetStyleSheetPool();
                     if (mpCondFormatList && pStylePool && !rCondFormatData.empty())
                     {
@@ -2905,6 +2897,20 @@ void ScTable::ApplyPatternArea( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol,
         CreateColumnIfNotExists(i).ApplyPatternArea(nStartRow, nEndRow, rAttr, pDataArray, pIsChanged);
 }
 
+namespace
+{
+    std::vector<ScAttrEntry> duplicateScAttrEntries(ScDocument& rDocument, const std::vector<ScAttrEntry>& rOrigData)
+    {
+        std::vector<ScAttrEntry> aData(rOrigData);
+        for (size_t nIdx = 0; nIdx < aData.size(); ++nIdx)
+        {
+            ScPatternAttr aNewPattern(*aData[nIdx].pPattern);
+            aData[nIdx].pPattern = &rDocument.GetPool()->Put(aNewPattern);
+        }
+        return aData;
+    }
+}
+
 void ScTable::SetAttrEntries( SCCOL nStartCol, SCCOL nEndCol, std::vector<ScAttrEntry> && vNewData)
 {
     if (!ValidCol(nStartCol) || !ValidCol(nEndCol))
@@ -2916,7 +2922,7 @@ void ScTable::SetAttrEntries( SCCOL nStartCol, SCCOL nEndCol, std::vector<ScAttr
             // If we would like set all columns to same attrs, then change only attrs for not existing columns
             nEndCol = aCol.size() - 1;
             for (SCCOL i = nStartCol; i <= nEndCol; i++)
-                aCol[i].SetAttrEntries( std::vector<ScAttrEntry>(vNewData));
+                aCol[i].SetAttrEntries(duplicateScAttrEntries(rDocument, vNewData));
             aDefaultColData.SetAttrEntries(std::move(vNewData));
         }
         else
@@ -2929,7 +2935,7 @@ void ScTable::SetAttrEntries( SCCOL nStartCol, SCCOL nEndCol, std::vector<ScAttr
     {
         CreateColumnIfNotExists( nEndCol );
         for (SCCOL i = nStartCol; i < nEndCol; i++) // all but last need a copy
-            aCol[i].SetAttrEntries( std::vector<ScAttrEntry>(vNewData));
+            aCol[i].SetAttrEntries(duplicateScAttrEntries(rDocument, vNewData));
         aCol[nEndCol].SetAttrEntries( std::move(vNewData));
     }
 }
@@ -3611,7 +3617,7 @@ tools::Long ScTable::GetRowHeight( SCROW nStartRow, SCROW nEndRow, bool bHiddenA
         return (nEndRow - nStartRow + 1) * static_cast<tools::Long>(ScGlobal::nStdRowHeight);
 }
 
-tools::Long ScTable::GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double fScale, const tools::Long* pnMaxHeight ) const
+tools::Long ScTable::GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double fScale ) const
 {
     OSL_ENSURE(ValidRow(nStartRow) && ValidRow(nEndRow),"wrong row number");
 
@@ -3638,21 +3644,8 @@ tools::Long ScTable::GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double 
                     SCROW nSegmentEnd = std::min( nLastRow, aSegmentIter.getLastPos() );
 
                     // round-down a single height value, multiply resulting (pixel) values
-                    const tools::Long nOneHeight = static_cast<tools::Long>( nRowVal * fScale );
-                    // sometimes scaling results in zero height
-                    if (nOneHeight)
-                    {
-                        SCROW nRowsInSegment = nSegmentEnd + 1 - nRow;
-                        if (pnMaxHeight)
-                        {
-                            nRowsInSegment = std::min(nRowsInSegment, static_cast<SCROW>(*pnMaxHeight / nOneHeight + 1));
-                            nHeight += nOneHeight * nRowsInSegment;
-                            if (nHeight > *pnMaxHeight)
-                                return nHeight;
-                        }
-                        else
-                            nHeight += nOneHeight * nRowsInSegment;
-                    }
+                    tools::Long nOneHeight = static_cast<tools::Long>( nRowVal * fScale );
+                    nHeight += nOneHeight * ( nSegmentEnd + 1 - nRow );
 
                     nRow = nSegmentEnd + 1;
                 }
@@ -3662,17 +3655,7 @@ tools::Long ScTable::GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double 
         return nHeight;
     }
     else
-    {
-        const tools::Long nOneHeight = static_cast<tools::Long>(ScGlobal::nStdRowHeight * fScale);
-        SCROW nRowsInSegment = nEndRow - nStartRow + 1;
-        if (pnMaxHeight)
-        {
-            nRowsInSegment = std::min(nRowsInSegment, static_cast<SCROW>(*pnMaxHeight / nOneHeight + 1));
-            return nOneHeight * nRowsInSegment;
-        }
-        else
-            return static_cast<tools::Long>(nRowsInSegment * nOneHeight);
-    }
+        return static_cast<tools::Long>((nEndRow - nStartRow + 1) * ScGlobal::nStdRowHeight * fScale);
 }
 
 sal_uInt16 ScTable::GetOriginalHeight( SCROW nRow ) const       // non-0 even if hidden
@@ -4122,10 +4105,10 @@ void ScTable::DoAutoOutline( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SC
         {
             ScRefCellValue aCell = aCol[nCol].GetCellValue(nRow);
 
-            if (aCell.meType != CELLTYPE_FORMULA)
+            if (aCell.getType() != CELLTYPE_FORMULA)
                 continue;
 
-            if (!aCell.mpFormula->HasRefListExpressibleAsOneReference(aRef))
+            if (!aCell.getFormula()->HasRefListExpressibleAsOneReference(aRef))
                 continue;
 
             if ( aRef.aStart.Col() == nCol && aRef.aEnd.Col() == nCol &&
@@ -4177,7 +4160,7 @@ void ScTable::CopyData( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW n
             ScCellValue aCell;
             aCell.assign(rDocument, ScAddress(nCol, nRow, nTab));
 
-            if (aCell.meType == CELLTYPE_FORMULA)
+            if (aCell.getType() == CELLTYPE_FORMULA)
             {
                 sc::RefUpdateContext aCxt(rDocument);
                 aCxt.meMode = URM_COPY;
@@ -4185,8 +4168,8 @@ void ScTable::CopyData( SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW n
                 aCxt.mnColDelta = nDestCol - nStartCol;
                 aCxt.mnRowDelta = nDestRow - nStartRow;
                 aCxt.mnTabDelta = nDestTab - nTab;
-                aCell.mpFormula->UpdateReference(aCxt);
-                aCell.mpFormula->aPos = aDest;
+                aCell.getFormula()->UpdateReference(aCxt);
+                aCell.getFormula()->aPos = aDest;
             }
 
             if (bThisTab)
@@ -4310,7 +4293,7 @@ SCROW ScTable::GetRowForHeight(tools::Long nHeight) const
 
     ScFlatUInt16RowSegments::RangeData aRowHeightRange;
     aRowHeightRange.mnRow2 = -1;
-    aRowHeightRange.mnValue = 0; // silence MSVC C4701
+    aRowHeightRange.mnValue = 1; // silence MSVC C4701
 
     for (SCROW nRow = 0; nRow <= rDocument.MaxRow(); ++nRow)
     {

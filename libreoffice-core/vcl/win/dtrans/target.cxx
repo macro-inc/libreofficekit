@@ -23,7 +23,7 @@
 #include <o3tl/any.hxx>
 
 #include <stdio.h>
-#include "target.hxx"
+#include <win/dnd_target.hxx>
 #include "idroptarget.hxx"
 #include "globals.hxx"
 #include "targetdropcontext.hxx"
@@ -210,7 +210,7 @@ DWORD WINAPI DndTargetOleSTAFunc(LPVOID pParams)
         // for a later call to AttachThreadInput
         for (;;)
         {
-            auto const bRet = GetMessageW(&msg, nullptr, 0, 0);
+            int const bRet = GetMessageW(&msg, nullptr, 0, 0);
             if (bRet == 0)
             {
                 break;

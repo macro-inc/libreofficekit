@@ -24,8 +24,8 @@
 #include <svx/sdr/contact/displayinfo.hxx>
 #include <svtools/colorcfg.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <sdr/contact/objectcontactofobjlistpainter.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <svx/svdpage.hxx>
@@ -67,6 +67,8 @@ public:
     virtual bool isOutputToPrinter() const override;
     virtual bool isOutputToRecordingMetaFile() const override;
     virtual bool isOutputToPDFFile() const override;
+    virtual bool isExportTaggedPDF() const override;
+    virtual ::vcl::PDFExtOutDevData const* GetPDFExtOutDevData() const override;
     virtual bool isDrawModeGray() const override;
     virtual bool isDrawModeHighContrast() const override;
     virtual SdrPageView* TryToGetSdrPageView() const override;
@@ -124,20 +126,21 @@ drawinglayer::primitive2d::Primitive2DContainer PagePrimitiveExtractor::createPr
     {
         // update own ViewInformation2D for visualized page
         const drawinglayer::geometry::ViewInformation2D& rOriginalViewInformation = mrViewObjectContactOfPageObj.GetObjectContact().getViewInformation2D();
-        const drawinglayer::geometry::ViewInformation2D aNewViewInformation2D(
-            rOriginalViewInformation.getObjectTransformation(),
-            rOriginalViewInformation.getViewTransformation(),
+        drawinglayer::geometry::ViewInformation2D aNewViewInformation2D(rOriginalViewInformation);
 
-            // #i101075# use empty range for page content here to force
-            // the content not to be physically clipped in any way. This
-            // would be possible, but would require the internal transformation
-            // which maps between the page visualisation object and the page
-            // content, including the aspect ratios (for details see in
-            // PagePreviewPrimitive2D::create2DDecomposition)
-            basegfx::B2DRange(),
+        // #i101075# use empty range for page content here to force
+        // the content not to be physically clipped in any way. This
+        // would be possible, but would require the internal transformation
+        // which maps between the page visualisation object and the page
+        // content, including the aspect ratios (for details see in
+        // PagePreviewPrimitive2D::create2DDecomposition)
+        aNewViewInformation2D.setViewport(basegfx::B2DRange());
 
-            GetXDrawPageForSdrPage(pStartPage),
-            0.0); // no time; page previews are not animated
+        aNewViewInformation2D.setVisualizedPage(GetXDrawPageForSdrPage(pStartPage));
+
+        // no time; page previews are not animated
+        aNewViewInformation2D.setViewTime(0.0);
+
         updateViewInformation2D(aNewViewInformation2D);
 
         // create copy of DisplayInfo to set PagePainting
@@ -176,14 +179,15 @@ void PagePrimitiveExtractor::InvalidatePartOfView(const basegfx::B2DRange& rRang
 bool PagePrimitiveExtractor::isOutputToPrinter() const { return mrViewObjectContactOfPageObj.GetObjectContact().isOutputToPrinter(); }
 bool PagePrimitiveExtractor::isOutputToRecordingMetaFile() const { return mrViewObjectContactOfPageObj.GetObjectContact().isOutputToRecordingMetaFile(); }
 bool PagePrimitiveExtractor::isOutputToPDFFile() const { return mrViewObjectContactOfPageObj.GetObjectContact().isOutputToPDFFile(); }
+bool PagePrimitiveExtractor::isExportTaggedPDF() const { return mrViewObjectContactOfPageObj.GetObjectContact().isExportTaggedPDF(); }
+::vcl::PDFExtOutDevData const* PagePrimitiveExtractor::GetPDFExtOutDevData() const { return mrViewObjectContactOfPageObj.GetObjectContact().GetPDFExtOutDevData(); }
 bool PagePrimitiveExtractor::isDrawModeGray() const { return mrViewObjectContactOfPageObj.GetObjectContact().isDrawModeGray(); }
 bool PagePrimitiveExtractor::isDrawModeHighContrast() const { return mrViewObjectContactOfPageObj.GetObjectContact().isDrawModeHighContrast(); }
 SdrPageView* PagePrimitiveExtractor::TryToGetSdrPageView() const { return mrViewObjectContactOfPageObj.GetObjectContact().TryToGetSdrPageView(); }
 OutputDevice* PagePrimitiveExtractor::TryToGetOutputDevice() const { return mrViewObjectContactOfPageObj.GetObjectContact().TryToGetOutputDevice(); }
 
-drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::createPrimitive2DSequence(const DisplayInfo& /*rDisplayInfo*/) const
+void ViewObjectContactOfPageObj::createPrimitive2DSequence(const DisplayInfo& /*rDisplayInfo*/, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
-    drawinglayer::primitive2d::Primitive2DContainer xRetval;
     const SdrPageObj& rPageObject(static_cast< ViewContactOfPageObj& >(GetViewContact()).GetPageObj());
     const SdrPage* pPage = rPageObject.GetReferencedPage();
     const svtools::ColorConfig aColorConfig;
@@ -225,7 +229,7 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::crea
             svtools::ColorConfigValue aBorderConfig = aColorConfig.GetColorValue(svtools::DOCBOUNDARIES);
             const Color aBorderColor = aBorderConfig.bIsVisible ? aBorderConfig.nColor : aDocColor;
             const basegfx::B2DRange aPageBound(0.0, 0.0, fPageWidth, fPageHeight);
-            const basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aPageBound));
+            basegfx::B2DPolygon aOutline(basegfx::utils::createPolygonFromRect(aPageBound));
 
             // add replacement fill
             xPageContent[0] = drawinglayer::primitive2d::Primitive2DReference(
@@ -233,7 +237,7 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::crea
 
             // add replacement border
             xPageContent[1] = drawinglayer::primitive2d::Primitive2DReference(
-                new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aOutline, aBorderColor.getBColor()));
+                new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aOutline), aBorderColor.getBColor()));
         }
         else
         {
@@ -263,7 +267,7 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::crea
             const uno::Reference< drawing::XDrawPage > xDrawPage(GetXDrawPageForSdrPage(const_cast< SdrPage*>(pPage)));
             const drawinglayer::primitive2d::Primitive2DReference xPagePreview(new drawinglayer::primitive2d::PagePreviewPrimitive2D(
                 xDrawPage, aPageObjectTransform, fPageWidth, fPageHeight, std::move(xPageContent)));
-            xRetval = drawinglayer::primitive2d::Primitive2DContainer { xPagePreview };
+            rVisitor.visit(xPagePreview);
         }
     }
     else if(bCreateGrayFrame)
@@ -273,7 +277,7 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::crea
         const drawinglayer::primitive2d::Primitive2DReference xFrameHit(
             drawinglayer::primitive2d::createHiddenGeometryPrimitives2D(
                 aPageObjectTransform));
-        xRetval = drawinglayer::primitive2d::Primitive2DContainer { xFrameHit };
+        rVisitor.visit(xFrameHit);
     }
 
     // add a gray outline frame, except not when printing
@@ -284,12 +288,10 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContactOfPageObj::crea
         aOwnOutline.transform(aPageObjectTransform);
 
         const drawinglayer::primitive2d::Primitive2DReference xGrayFrame(
-            new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aOwnOutline, aFrameColor.getBColor()));
+            new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aOwnOutline), aFrameColor.getBColor()));
 
-        xRetval.push_back(xGrayFrame);
+        rVisitor.visit(xGrayFrame);
     }
-
-    return xRetval;
 }
 
 ViewObjectContactOfPageObj::ViewObjectContactOfPageObj(ObjectContact& rObjectContact, ViewContact& rViewContact)

@@ -22,9 +22,10 @@
 #include <algorithm>
 #include <string_view>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/event.hxx>
@@ -157,7 +158,7 @@ static bool ImplIsPatternChar( sal_Unicode cChar, char cEditMask )
     try
     {
         OUString aCharStr(cChar);
-        nType = ImplGetCharClass()->getStringType( aCharStr, 0, aCharStr.getLength(),
+        nType = ImplGetCharClass()->getCharacterType( aCharStr, 0,
                 Application::GetSettings().GetLanguageTag().getLocale() );
     }
     catch (const css::uno::Exception&)
@@ -324,13 +325,13 @@ static OUString ImplPatternReformat( const OUString& rStr,
     return aOutStr.makeStringAndClear();
 }
 
-static void ImplPatternMaxPos( const OUString& rStr, const OString& rEditMask,
+static void ImplPatternMaxPos( std::u16string_view rStr, const OString& rEditMask,
                                sal_uInt16 nFormatFlags, bool bSameMask,
                                sal_Int32 nCursorPos, sal_Int32& rPos )
 {
 
     // last position must not be longer than the contained string
-    sal_Int32 nMaxPos = rStr.getLength();
+    sal_Int32 nMaxPos = rStr.size();
 
     // if non empty literals are allowed ignore blanks at the end as well
     if ( bSameMask && !(nFormatFlags & PATTERN_FORMAT_EMPTYLITERALS) )
@@ -481,7 +482,7 @@ static sal_Int32 ImplPatternLeftPos(std::string_view rEditMask, sal_Int32 nCurso
     return nNewPos;
 }
 
-static sal_Int32 ImplPatternRightPos( const OUString& rStr, const OString& rEditMask,
+static sal_Int32 ImplPatternRightPos( std::u16string_view rStr, const OString& rEditMask,
                                        sal_uInt16 nFormatFlags, bool bSameMask,
                                        sal_Int32 nCursorPos )
 {
@@ -521,7 +522,7 @@ namespace
 
 static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEvent& rKEvt,
                                         const OString& rEditMask,
-                                        const OUString& rLiteralMask,
+                                        std::u16string_view rLiteralMask,
                                         bool bStrictFormat,
                                         bool bSameMask,
                                         bool& rbInKeyInput )
@@ -554,7 +555,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
             // Use the start of selection as minimum; even a small position is allowed in case that
             // all was selected by the focus
             Selection aSel( aOldSel );
-            aSel.Justify();
+            aSel.Normalize();
             nCursorPos = aSel.Min();
             aSel.Max() = ImplPatternRightPos( rEdit.GetText(), rEditMask, nFormatFlags, bSameMask, nCursorPos );
             if ( bShift )
@@ -591,7 +592,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
             // Use the start of selection as minimum; even a small position is allowed in case that
             // all was selected by the focus
             Selection aSel( aOldSel );
-            aSel.Justify();
+            aSel.Normalize();
             nCursorPos = static_cast<sal_Int32>(aSel.Min());
             ImplPatternMaxPos( rEdit.GetText(), rEditMask, nFormatFlags, bSameMask, nCursorPos, nNewPos );
             aSel.Max() = nNewPos;
@@ -608,7 +609,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
             OUStringBuffer    aStr( aOldStr );
             Selection   aSel = aOldSel;
 
-            aSel.Justify();
+            aSel.Normalize();
             nNewPos = static_cast<sal_Int32>(aSel.Min());
 
              // if selection then delete it
@@ -618,8 +619,8 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
                     aStr.remove( static_cast<sal_Int32>(aSel.Min()), static_cast<sal_Int32>(aSel.Len()) );
                 else
                 {
-                    OUString aRep = rLiteralMask.copy( static_cast<sal_Int32>(aSel.Min()), static_cast<sal_Int32>(aSel.Len()) );
-                    aStr.remove( aSel.Min(), aRep.getLength() );
+                    std::u16string_view aRep = rLiteralMask.substr( static_cast<sal_Int32>(aSel.Min()), static_cast<sal_Int32>(aSel.Len()) );
+                    aStr.remove( aSel.Min(), aRep.size() );
                     aStr.insert( aSel.Min(), aRep );
                 }
             }
@@ -631,7 +632,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
                     nNewPos = ImplPatternLeftPos( rEditMask, nTempPos );
                 }
                 else
-                    nTempPos = ImplPatternRightPos( aStr.toString(), rEditMask, nFormatFlags, bSameMask, nNewPos );
+                    nTempPos = ImplPatternRightPos( aStr, rEditMask, nFormatFlags, bSameMask, nNewPos );
 
                 if ( nNewPos != nTempPos )
                 {
@@ -647,12 +648,13 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
                 }
             }
 
-            if ( aOldStr != aStr.toString() )
+            OUString sStr = aStr.makeStringAndClear();
+            if ( aOldStr != sStr )
             {
                 if ( bSameMask )
-                    aStr = ImplPatternReformat( aStr.toString(), rEditMask, rLiteralMask, nFormatFlags );
+                    sStr = ImplPatternReformat( sStr, rEditMask, rLiteralMask, nFormatFlags );
                 rbInKeyInput = true;
-                rEdit.SetText( aStr.toString(), Selection( nNewPos ) );
+                rEdit.SetText( sStr, Selection( nNewPos ) );
                 rEdit.SetModified();
                 rbInKeyInput = false;
             }
@@ -676,7 +678,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
         return false;
 
     Selection aSel = aOldSel;
-    aSel.Justify();
+    aSel.Normalize();
     nNewPos = aSel.Min();
 
     if ( nNewPos < rEditMask.getLength() )
@@ -747,7 +749,7 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
             {
                 // possibly extend string until cursor position
                 if ( aStr.getLength() < nNewPos )
-                    aStr.append( rLiteralMask.subView(aStr.getLength(), nNewPos-aStr.getLength()) );
+                    aStr.append( rLiteralMask.substr(aStr.getLength(), nNewPos-aStr.getLength()) );
                 if ( nNewPos < aStr.getLength() )
                     aStr.insert( cChar, nNewPos );
                 else if ( nNewPos < rEditMask.getLength() )
@@ -762,8 +764,8 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
             if ( aSel.Len() )
             {
                 // delete selection
-                OUString aRep = rLiteralMask.copy( aSel.Min(), aSel.Len() );
-                aStr.remove( aSel.Min(), aRep.getLength() );
+                std::u16string_view aRep = rLiteralMask.substr( aSel.Min(), aSel.Len() );
+                aStr.remove( aSel.Min(), aRep.size() );
                 aStr.insert( aSel.Min(), aRep );
             }
 
@@ -776,8 +778,9 @@ static bool ImplPatternProcessKeyInput( IEditImplementation& rEdit, const KeyEve
         if ( !bError )
         {
             rbInKeyInput = true;
-            Selection aNewSel( ImplPatternRightPos( aStr.toString(), rEditMask, nFormatFlags, bSameMask, nNewPos ) );
-            rEdit.SetText( aStr.toString(), aNewSel );
+            const OUString sStr = aStr.makeStringAndClear();
+            Selection aNewSel( ImplPatternRightPos( sStr, rEditMask, nFormatFlags, bSameMask, nNewPos ) );
+            rEdit.SetText( sStr, aNewSel );
             rEdit.SetModified();
             rbInKeyInput = false;
         }
@@ -796,7 +799,7 @@ namespace
         {
             OUStringBuffer aBuf(rLiteralMask);
             if (rEditMask.getLength() < aBuf.getLength())
-                aBuf.remove(rEditMask.getLength(), aBuf.getLength() - rEditMask.getLength());
+                aBuf.setLength(rEditMask.getLength());
             else
                 comphelper::string::padToLength(aBuf, rEditMask.getLength(), ' ');
             rLiteralMask = aBuf.makeStringAndClear();
@@ -1065,7 +1068,7 @@ namespace
 
 bool PatternField::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         EditImplementation aAdapt(*GetField());
         if ( ImplPatternProcessKeyInput( aAdapt, *rNEvt.GetKeyEvent(), GetEditMask(), GetLiteralMask(),
@@ -1079,9 +1082,9 @@ bool PatternField::PreNotify( NotifyEvent& rNEvt )
 
 bool PatternField::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -1118,7 +1121,7 @@ void PatternBox::dispose()
 
 bool PatternBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         EditImplementation aAdapt(*GetField());
         if ( ImplPatternProcessKeyInput( aAdapt, *rNEvt.GetKeyEvent(), GetEditMask(), GetLiteralMask(),
@@ -1132,9 +1135,9 @@ bool PatternBox::PreNotify( NotifyEvent& rNEvt )
 
 bool PatternBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();
@@ -1193,7 +1196,7 @@ static sal_uInt16 ImplCutNumberFromString( OUString& rStr )
     while (i2 != rStr.getLength() && rStr[i2] >= '0' && rStr[i2] <= '9') {
         ++i2;
     }
-    sal_Int32 nValue = rStr.copy(i1, i2-i1).toInt32();
+    sal_Int32 nValue = o3tl::toInt32(rStr.subView(i1, i2-i1));
     rStr = rStr.copy(std::min(i2+1, rStr.getLength()));
     return nValue;
 }
@@ -1615,7 +1618,7 @@ bool DateFormatter::ImplAllowMalformedInput() const
     return !IsEnforceValidValue();
 }
 
-int DateFormatter::GetDateArea(ExtDateFieldFormat eFormat, const OUString& rText, int nCursor, const LocaleDataWrapper& rLocaleDataWrapper)
+int DateFormatter::GetDateArea(ExtDateFieldFormat& eFormat, std::u16string_view rText, int nCursor, const LocaleDataWrapper& rLocaleDataWrapper)
 {
     sal_Int8 nDateArea = 0;
 
@@ -1627,12 +1630,12 @@ int DateFormatter::GetDateArea(ExtDateFieldFormat eFormat, const OUString& rText
     else
     {
         // search area
-        sal_Int32 nPos = 0;
+        size_t nPos = 0;
         OUString aDateSep = ImplGetDateSep(rLocaleDataWrapper, eFormat);
         for ( sal_Int8 i = 1; i <= 3; i++ )
         {
-            nPos = rText.indexOf( aDateSep, nPos );
-            if (nPos < 0 || nPos >= nCursor)
+            nPos = rText.find( aDateSep, nPos );
+            if (nPos == std::u16string_view::npos || static_cast<sal_Int32>(nPos) >= nCursor)
             {
                 nDateArea = i;
                 break;
@@ -1653,7 +1656,7 @@ void DateField::ImplDateSpinArea( bool bUp )
 
     Date aDate( GetDate() );
     Selection aSelection = GetField()->GetSelection();
-    aSelection.Justify();
+    aSelection.Normalize();
     OUString aText( GetText() );
     if ( static_cast<sal_Int32>(aSelection.Len()) == aText.getLength() )
         ImplDateIncrementDay( aDate, bUp );
@@ -1875,7 +1878,7 @@ void DateFormatter::ImplNewFieldValue( const Date& rDate )
         return;
 
     Selection aSelection = GetField()->GetSelection();
-    aSelection.Justify();
+    aSelection.Normalize();
     OUString aText = GetField()->GetText();
 
     // If selected until the end then keep it that way
@@ -2021,7 +2024,7 @@ void DateField::dispose()
 
 bool DateField::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && IsStrictFormat() &&
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && IsStrictFormat() &&
          ( GetExtDateFormat() != ExtDateFieldFormat::SystemLong ) &&
          !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
@@ -2034,9 +2037,9 @@ bool DateField::PreNotify( NotifyEvent& rNEvt )
 
 bool DateField::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() )
         {
@@ -2126,7 +2129,7 @@ void DateBox::dispose()
 
 bool DateBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && IsStrictFormat() &&
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && IsStrictFormat() &&
          ( GetExtDateFormat() != ExtDateFieldFormat::SystemLong ) &&
          !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
@@ -2150,9 +2153,9 @@ void DateBox::DataChanged( const DataChangedEvent& rDCEvt )
 
 bool DateBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() )
         {
@@ -2390,17 +2393,17 @@ bool TimeFormatter::TextToTime(std::u16string_view rStr, tools::Time& rTime,
                     return false;
                 if ( !aStr.isEmpty() && aStr[0] == '-' )
                     bNegative = true;
-                nNanoSec = aStr.toString().toInt64();
+                nNanoSec = o3tl::toInt64(aStr);
             }
             else
-                nSecond = static_cast<short>(aStr.toString().toInt32());
+                nSecond = static_cast<short>(o3tl::toInt32(aStr));
         }
         else
-            nMinute = static_cast<short>(aStr.toString().toInt32());
+            nMinute = static_cast<short>(o3tl::toInt32(aStr));
     }
     else if ( nSepPos < 0 )
     {
-        nSecond = static_cast<short>(aStr.toString().toInt32());
+        nSecond = static_cast<short>(o3tl::toInt32(aStr));
         nMinute += nSecond / 60;
         nSecond %= 60;
         nHour += nMinute / 60;
@@ -2408,7 +2411,7 @@ bool TimeFormatter::TextToTime(std::u16string_view rStr, tools::Time& rTime,
     }
     else
     {
-        nSecond = static_cast<short>(aStr.copy( 0, nSepPos ).makeStringAndClear().toInt32());
+        nSecond = static_cast<short>(o3tl::toInt32(aStr.subView( 0, nSepPos )));
         aStr.remove( 0, nSepPos+1 );
 
         nSepPos = aStr.indexOf( rLocaleDataWrapper.getTimeSep() );
@@ -2417,7 +2420,7 @@ bool TimeFormatter::TextToTime(std::u16string_view rStr, tools::Time& rTime,
         if ( nSepPos >= 0 )
         {
             nMinute = nSecond;
-            nSecond = static_cast<short>(aStr.copy( 0, nSepPos ).makeStringAndClear().toInt32());
+            nSecond = static_cast<short>(o3tl::toInt32(aStr.subView( 0, nSepPos )));
             aStr.remove( 0, nSepPos+1 );
 
             nSepPos = aStr.indexOf( rLocaleDataWrapper.getTimeSep() );
@@ -2427,7 +2430,7 @@ bool TimeFormatter::TextToTime(std::u16string_view rStr, tools::Time& rTime,
             {
                 nHour   = nMinute;
                 nMinute = nSecond;
-                nSecond = static_cast<short>(aStr.copy( 0, nSepPos ).makeStringAndClear().toInt32());
+                nSecond = static_cast<short>(o3tl::toInt32(aStr.subView( 0, nSepPos )));
                 aStr.remove( 0, nSepPos+1 );
             }
             else
@@ -2443,7 +2446,7 @@ bool TimeFormatter::TextToTime(std::u16string_view rStr, tools::Time& rTime,
             nHour += nMinute / 60;
             nMinute %= 60;
         }
-        nNanoSec = aStr.toString().toInt64();
+        nNanoSec = o3tl::toInt64(aStr);
     }
 
     if ( nNanoSec )
@@ -2579,7 +2582,7 @@ bool TimeFormatter::ImplAllowMalformedInput() const
     return !IsEnforceValidValue();
 }
 
-int TimeFormatter::GetTimeArea(TimeFieldFormat eFormat, const OUString& rText, int nCursor,
+int TimeFormatter::GetTimeArea(TimeFieldFormat eFormat, std::u16string_view rText, int nCursor,
                                      const LocaleDataWrapper& rLocaleDataWrapper)
 {
     int nTimeArea = 0;
@@ -2588,18 +2591,18 @@ int TimeFormatter::GetTimeArea(TimeFieldFormat eFormat, const OUString& rText, i
     if (eFormat != TimeFieldFormat::F_SEC_CS)
     {
         //Which area is the cursor in of HH:MM:SS.TT
-        for ( sal_Int32 i = 1, nPos = 0; i <= 4; i++ )
+        for ( size_t i = 1, nPos = 0; i <= 4; i++ )
         {
-            sal_Int32 nPos1 = rText.indexOf(rLocaleDataWrapper.getTimeSep(), nPos);
-            sal_Int32 nPos2 = rText.indexOf(rLocaleDataWrapper.getTime100SecSep(), nPos);
+            size_t nPos1 = rText.find(rLocaleDataWrapper.getTimeSep(), nPos);
+            size_t nPos2 = rText.find(rLocaleDataWrapper.getTime100SecSep(), nPos);
             //which ever comes first, bearing in mind that one might not be there
-            if (nPos1 >= 0 && nPos2 >= 0)
+            if (nPos1 != std::u16string_view::npos && nPos2 != std::u16string_view::npos)
                 nPos = std::min(nPos1, nPos2);
-            else if (nPos1 >= 0)
+            else if (nPos1 != std::u16string_view::npos)
                 nPos = nPos1;
             else
                 nPos = nPos2;
-            if (nPos < 0 || nPos >= nCursor)
+            if (nPos == std::u16string_view::npos || static_cast<sal_Int32>(nPos) >= nCursor)
             {
                 nTimeArea = i;
                 break;
@@ -2610,8 +2613,8 @@ int TimeFormatter::GetTimeArea(TimeFieldFormat eFormat, const OUString& rText, i
     }
     else
     {
-        sal_Int32 nPos = rText.indexOf(rLocaleDataWrapper.getTime100SecSep());
-        if (nPos < 0 || nPos >= nCursor)
+        size_t nPos = rText.find(rLocaleDataWrapper.getTime100SecSep());
+        if (nPos == std::u16string_view::npos || static_cast<sal_Int32>(nPos) >= nCursor)
             nTimeArea = 3;
         else
             nTimeArea = 4;
@@ -2621,7 +2624,7 @@ int TimeFormatter::GetTimeArea(TimeFieldFormat eFormat, const OUString& rText, i
 }
 
 tools::Time TimeFormatter::SpinTime(bool bUp, const tools::Time& rTime, TimeFieldFormat eFormat,
-                                    bool bDuration, const OUString& rText, int nCursor,
+                                    bool bDuration, std::u16string_view rText, int nCursor,
                                     const LocaleDataWrapper& rLocaleDataWrapper)
 {
     tools::Time aTime(rTime);
@@ -2739,7 +2742,7 @@ void TimeFormatter::ImplNewFieldValue( const tools::Time& rTime )
         return;
 
     Selection aSelection = GetField()->GetSelection();
-    aSelection.Justify();
+    aSelection.Normalize();
     OUString aText = GetField()->GetText();
 
     // If selected until the end then keep it that way
@@ -2894,7 +2897,7 @@ void TimeField::dispose()
 
 bool TimeField::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplTimeProcessKeyInput( *rNEvt.GetKeyEvent(), IsStrictFormat(), IsDuration(), GetFormat(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -2905,9 +2908,9 @@ bool TimeField::PreNotify( NotifyEvent& rNEvt )
 
 bool TimeField::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
         {
@@ -3036,7 +3039,7 @@ void TimeBox::dispose()
 
 bool TimeBox::PreNotify( NotifyEvent& rNEvt )
 {
-    if ( (rNEvt.GetType() == MouseNotifyEvent::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
+    if ( (rNEvt.GetType() == NotifyEventType::KEYINPUT) && !rNEvt.GetKeyEvent()->GetKeyCode().IsMod2() )
     {
         if ( ImplTimeProcessKeyInput( *rNEvt.GetKeyEvent(), IsStrictFormat(), IsDuration(), GetFormat(), ImplGetLocaleDataWrapper() ) )
             return true;
@@ -3047,9 +3050,9 @@ bool TimeBox::PreNotify( NotifyEvent& rNEvt )
 
 bool TimeBox::EventNotify( NotifyEvent& rNEvt )
 {
-    if ( rNEvt.GetType() == MouseNotifyEvent::GETFOCUS )
+    if ( rNEvt.GetType() == NotifyEventType::GETFOCUS )
         MarkToBeReformatted( false );
-    else if ( rNEvt.GetType() == MouseNotifyEvent::LOSEFOCUS )
+    else if ( rNEvt.GetType() == NotifyEventType::LOSEFOCUS )
     {
         if ( MustBeReformatted() && (!GetText().isEmpty() || !IsEmptyFieldValueEnabled()) )
             Reformat();

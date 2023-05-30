@@ -26,7 +26,6 @@
 #include <comphelper/lok.hxx>
 #include <svx/svxids.hrc>
 
-#include <vcl/commandinfoprovider.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -41,7 +40,7 @@
 
 #include <tools/datetime.hxx>
 #include <tools/UnitConversion.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/bindings.hxx>
@@ -54,9 +53,6 @@
 #include <editeng/fhgtitem.hxx>
 #include <editeng/outlobj.hxx>
 #include <editeng/postitem.hxx>
-#include <editeng/wghtitem.hxx>
-#include <editeng/udlnitem.hxx>
-#include <editeng/crossedoutitem.hxx>
 
 #include <svx/postattr.hxx>
 
@@ -164,8 +160,7 @@ OUString getAnnotationDateTimeString( const Reference< XAnnotation >& xAnnotatio
 }
 
 AnnotationManagerImpl::AnnotationManagerImpl( ViewShellBase& rViewShellBase )
-: AnnotationManagerImplBase( m_aMutex )
-, mrBase( rViewShellBase )
+: mrBase( rViewShellBase )
 , mpDoc( rViewShellBase.GetDocument() )
 , mbShowAnnotations( true )
 , mnUpdateTagsEvent( nullptr )
@@ -200,7 +195,7 @@ void AnnotationManagerImpl::init()
 }
 
 // WeakComponentImplHelper
-void SAL_CALL AnnotationManagerImpl::disposing ()
+void AnnotationManagerImpl::disposing (std::unique_lock<std::mutex>&)
 {
     try
     {
@@ -327,10 +322,9 @@ void AnnotationManagerImpl::ExecuteInsertAnnotation(SfxRequest const & rReq)
     OUString sText;
     if (pArgs)
     {
-        const SfxPoolItem* pPoolItem = nullptr;
-        if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_POSTIT_TEXT, true, &pPoolItem))
+        if (const SfxStringItem* pPoolItem = pArgs->GetItemIfSet(SID_ATTR_POSTIT_TEXT))
         {
-            sText = static_cast<const SfxStringItem*>(pPoolItem)->GetValue();
+            sText = pPoolItem->GetValue();
         }
     }
 
@@ -399,20 +393,19 @@ void AnnotationManagerImpl::ExecuteEditAnnotation(SfxRequest const & rReq)
     if (mpDoc->IsUndoEnabled())
         mpDoc->BegUndo(SdResId(STR_ANNOTATION_UNDO_EDIT));
 
-    const SfxPoolItem* pPoolItem = nullptr;
-    if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_POSTIT_ID, true, &pPoolItem))
+    if (const SvxPostItIdItem* pPoolItem = pArgs->GetItemIfSet(SID_ATTR_POSTIT_ID))
     {
-        sal_uInt32 nId = static_cast<const SvxPostItIdItem*>(pPoolItem)->GetValue().toUInt32();
+        sal_uInt32 nId = pPoolItem->GetValue().toUInt32();
         xAnnotation = GetAnnotationById(nId);
     }
-    if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_POSTIT_TEXT, true, &pPoolItem))
-        sText = static_cast<const SfxStringItem*>(pPoolItem)->GetValue();
+    if (const SfxStringItem* pPoolItem = pArgs->GetItemIfSet(SID_ATTR_POSTIT_TEXT))
+        sText = pPoolItem->GetValue();
 
-    if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_POSTIT_POSITION_X, true, &pPoolItem))
-        nPositionX = static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
+    if (const SfxInt32Item* pPoolItem = pArgs->GetItemIfSet(SID_ATTR_POSTIT_POSITION_X))
+        nPositionX = pPoolItem->GetValue();
 
-    if (SfxItemState::SET == pArgs->GetItemState(SID_ATTR_POSTIT_POSITION_Y, true, &pPoolItem))
-        nPositionY = static_cast<const SfxInt32Item*>(pPoolItem)->GetValue();
+    if (const SfxInt32Item* pPoolItem = pArgs->GetItemIfSet(SID_ATTR_POSTIT_POSITION_Y))
+        nPositionY = pPoolItem->GetValue();
 
     if (xAnnotation.is())
     {

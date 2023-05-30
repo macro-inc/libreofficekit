@@ -138,6 +138,7 @@ class SdrVertShearAllItem;
 class SdrVertShearOneItem;
 class SdrYesNoItem;
 class SfxBoolItem;
+class SfxGrabBagItem;
 class SfxInt16Item;
 class SfxUInt16Item;
 class SfxUInt32Item;
@@ -159,6 +160,7 @@ class SvxBoxInfoItem;
 class SvxBoxItem;
 class SvxColorItem;
 class SvxLineItem;
+class SvxRectangleAlignmentItem;
 class SvxTextRotateItem;
 class SvxWritingModeItem;
 class XColorItem;
@@ -175,6 +177,7 @@ class SdrRotateAllItem;
 class Svx3DTextureKindItem;
 class Svx3DTextureModeItem;
 class SvXMLAttrContainerItem;
+class SvxFrameDirectionItem;
 
 constexpr sal_uInt16 SDRATTR_START (XATTR_START);                    /* 1000   */
                                                                                                              /* Pool V4*/ /* Pool V3*/ /* Pool V2*/
@@ -189,7 +192,8 @@ constexpr TypedWhichId<SfxVoidItem>    SDRATTR_SHADOWPERSP        (SDRATTR_SHADO
 constexpr TypedWhichId<SdrMetricItem>  SDRATTR_SHADOWSIZEX        (SDRATTR_SHADOW_FIRST+ 7);
 constexpr TypedWhichId<SdrMetricItem>  SDRATTR_SHADOWSIZEY        (SDRATTR_SHADOW_FIRST+ 8);
 constexpr TypedWhichId<SdrMetricItem>  SDRATTR_SHADOWBLUR         (SDRATTR_SHADOW_FIRST+ 9);
-constexpr sal_uInt16                   SDRATTR_SHADOW_LAST        (SDRATTR_SHADOWBLUR);                      /* 1078   */ /* 1078   */ /* 1061   */ /* Pool V1: 1039 */
+constexpr TypedWhichId<SvxRectangleAlignmentItem> SDRATTR_SHADOWALIGNMENT(SDRATTR_SHADOW_FIRST + 10);
+constexpr sal_uInt16                   SDRATTR_SHADOW_LAST        (SDRATTR_SHADOWALIGNMENT);                 /* 1078   */ /* 1078   */ /* 1061   */ /* Pool V1: 1039 */
 
 constexpr sal_uInt16                             SDRATTR_CAPTION_FIRST     (SDRATTR_SHADOW_LAST + 1);        /* 1080   */ /* 1080   */ /* 1063   */ /* Pool V1: 1041 */
 constexpr TypedWhichId<SdrCaptionTypeItem>       SDRATTR_CAPTIONTYPE       (SDRATTR_CAPTION_FIRST+ 0);       /*   1080 */ /*   1080 */ /*   1063 */
@@ -231,7 +235,8 @@ constexpr TypedWhichId<SvXMLAttrContainerItem>     SDRATTR_XMLATTRIBUTES        
 constexpr TypedWhichId<SdrTextFixedCellHeightItem> SDRATTR_TEXT_USEFIXEDCELLHEIGHT (SDRATTR_MISC_FIRST +23);     /*   1121 */ /*   1121 */ /*   1104 */             /* Pool V2 */
 constexpr TypedWhichId<SdrOnOffItem>               SDRATTR_TEXT_WORDWRAP           (SDRATTR_MISC_FIRST +24);     /*   1122 */ /*   1122 */ /*   1105 */             /* Pool V2 */
 constexpr TypedWhichId<SfxStringItem>              SDRATTR_TEXT_CHAINNEXTNAME      (SDRATTR_MISC_FIRST +25);     /*   1123 */ /*   1123 */ /*   1106 */             /* Pool V2 */
-constexpr sal_uInt16                               SDRATTR_MISC_LAST               (SDRATTR_TEXT_CHAINNEXTNAME); /* 1125   */ /* 1125   */ /* 1108   */ /* Pool V1: 1056 */
+constexpr TypedWhichId<SdrOnOffItem>               SDRATTR_TEXT_CLIPVERTOVERFLOW   (SDRATTR_MISC_FIRST +26);
+constexpr sal_uInt16                               SDRATTR_MISC_LAST               (SDRATTR_TEXT_CLIPVERTOVERFLOW); /* 1126   */ /* 1125   */ /* 1108   */ /* Pool V1: 1056 */
 
 constexpr sal_uInt16                              SDRATTR_EDGE_FIRST         (SDRATTR_MISC_LAST + 1);    /* 1127   */ /* Pool V4 */
 constexpr TypedWhichId<SdrEdgeKindItem>           SDRATTR_EDGEKIND           (SDRATTR_EDGE_FIRST + 0);   /*   1127 */ /* Pool V4 */
@@ -415,7 +420,8 @@ constexpr TypedWhichId<SvxBoxInfoItem>    SDRATTR_TABLE_BORDER_INNER  (SDRATTR_T
 constexpr TypedWhichId<SvxLineItem>       SDRATTR_TABLE_BORDER_TLBR   (SDRATTR_TABLE_FIRST+2);
 constexpr TypedWhichId<SvxLineItem>       SDRATTR_TABLE_BORDER_BLTR   (SDRATTR_TABLE_FIRST+3);
 constexpr TypedWhichId<SvxTextRotateItem> SDRATTR_TABLE_TEXT_ROTATION (SDRATTR_TABLE_FIRST+4);
-constexpr sal_uInt16                      SDRATTR_TABLE_LAST          (SDRATTR_TABLE_TEXT_ROTATION);
+constexpr TypedWhichId<SfxGrabBagItem>    SDRATTR_TABLE_GRABBAG       (SDRATTR_TABLE_FIRST+5);
+constexpr sal_uInt16                      SDRATTR_TABLE_LAST          (SDRATTR_TABLE_GRABBAG);
 
 constexpr sal_uInt16                  SDRATTR_GLOW_FIRST (SDRATTR_TABLE_LAST+1);
 constexpr TypedWhichId<SdrMetricItem> SDRATTR_GLOW_RADIUS   (SDRATTR_GLOW_FIRST+0);
@@ -432,7 +438,11 @@ constexpr TypedWhichId<SfxInt16Item> SDRATTR_TEXTCOLUMNS_NUMBER(SDRATTR_TEXTCOLU
 constexpr TypedWhichId<SdrMetricItem> SDRATTR_TEXTCOLUMNS_SPACING(SDRATTR_TEXTCOLUMNS_FIRST + 1);
 constexpr sal_uInt16 SDRATTR_TEXTCOLUMNS_LAST(SDRATTR_TEXTCOLUMNS_SPACING);
 
-constexpr sal_uInt16 SDRATTR_END (SDRATTR_TEXTCOLUMNS_LAST);      /* 1357 */ /* 1333 V4+++*/ /* 1243 V4+++*/  /*1213*/ /*1085*/ /*1040*/ /*Pool V2: 1123,V1: 1065 */
+constexpr sal_uInt16                          SDRATTR_WRITINGMODE2_FIRST(SDRATTR_TEXTCOLUMNS_LAST + 1);
+constexpr TypedWhichId<SvxFrameDirectionItem> SDRATTR_WRITINGMODE2(SDRATTR_WRITINGMODE2_FIRST + 0);
+constexpr sal_uInt16                          SDRATTR_WRITINGMODE2_LAST(SDRATTR_WRITINGMODE2);
+
+constexpr sal_uInt16 SDRATTR_END (SDRATTR_WRITINGMODE2_LAST);      /* 1357 */ /* 1333 V4+++*/ /* 1243 V4+++*/  /*1213*/ /*1085*/ /*1040*/ /*Pool V2: 1123,V1: 1065 */
 
 #endif // INCLUDED_SVX_SVDDEF_HXX
 

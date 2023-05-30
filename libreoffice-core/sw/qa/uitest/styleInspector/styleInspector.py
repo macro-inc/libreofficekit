@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,7 +9,7 @@
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from com.sun.star.rdf.URIs import RDF_TYPE, RDFS_COMMENT, RDFS_LABEL, ODF_PREFIX, ODF_SUFFIX, LO_EXT_SHADING
+from com.sun.star.rdf.URIs import LO_EXT_SHADING
 
 class styleNavigator(UITestCase):
 
@@ -24,7 +26,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text without formatting and default style
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('1').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('2').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('3').getChildren()))
@@ -34,7 +36,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text with direct formatting
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('1').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('2').getChildren()))
 
@@ -52,7 +54,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text with paragraph direct formatting
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
 
             xParDirFormatting = xListBox.getChild('1')
             self.assertEqual(7, len(xParDirFormatting.getChildren()))
@@ -73,7 +75,7 @@ class styleNavigator(UITestCase):
             xParStyle = xListBox.getChild('0')
             self.assertEqual(3, len(xParStyle.getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xParStyle.getChild('0'))['Text'])
-            self.assertEqual(137, len(xParStyle.getChild('0').getChildren()))
+            self.assertEqual(140, len(xParStyle.getChild('0').getChildren()))
             self.assertEqual("Heading\t", get_state_as_dict(xParStyle.getChild('1'))['Text'])
             self.assertEqual(28, len(xParStyle.getChild('1').getChildren()))
 
@@ -107,7 +109,7 @@ class styleNavigator(UITestCase):
             xParStyle = xListBox.getChild('0')
             self.assertEqual(3, len(xParStyle.getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xParStyle.getChild('0'))['Text'])
-            self.assertEqual(137, len(xParStyle.getChild('0').getChildren()))
+            self.assertEqual(140, len(xParStyle.getChild('0').getChildren()))
             self.assertEqual("Text Body\t", get_state_as_dict(xParStyle.getChild('1'))['Text'])
             self.assertEqual(6, len(xParStyle.getChild('1').getChildren()))
 
@@ -142,7 +144,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text without metadata
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('1').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('2').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('3').getChildren()))
@@ -152,7 +154,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text with paragraph metadata showed under direct paragraph formatting
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
 
             xParDirFormatting = xListBox.getChild('1')
             self.assertEqual(1, len(xParDirFormatting.getChildren()))
@@ -205,7 +207,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text without metadata
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('1').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('2').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('3').getChildren()))
@@ -215,7 +217,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text with paragraph metadata showed under direct paragraph formatting
             self.assertEqual(1, len(xListBox.getChild('1').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('1').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('1').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('1').getChild('0').getChildren()))
 
             # Outer bookmark
             xBookmarkFormatting = xListBox.getChild('0')
@@ -262,7 +264,7 @@ class styleNavigator(UITestCase):
             # The cursor is on text without metadata
             self.assertEqual(1, len(xListBox.getChild('0').getChildren()))
             self.assertEqual("Default Paragraph Style\t", get_state_as_dict(xListBox.getChild('0').getChild('0'))['Text'])
-            self.assertEqual(137, len(xListBox.getChild('0').getChild('0').getChildren()))
+            self.assertEqual(140, len(xListBox.getChild('0').getChild('0').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('1').getChildren()))
             self.assertEqual(0, len(xListBox.getChild('2').getChildren()))
 

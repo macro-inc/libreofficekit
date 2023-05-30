@@ -20,20 +20,12 @@
 // SOActiveX.cpp : Implementation of CSOActiveX
 
 #include "StdAfx2.h"
+#include <so_activex.h>
 #include "SOActiveX.h"
 #include "SOComWindowPeer.h"
 #include "SODispatchInterceptor.h"
 #include "SOActionsApproval.h"
 #include "com_uno_helper.h"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
-#include <so_activex.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 #define STAROFFICE_WINDOWCLASS L"SOParentWindow"
 
@@ -359,7 +351,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CSOActiveX::Load( LPPROPERTYBAG pPropBag, LPER
         // all information from the 'object' tag is in strings
         if (aVal[ind].vt == VT_BSTR && !wcscmp(aPropNames[ind].pstrName, L"src"))
         {
-            mCurFileUrl = wcsdup( aVal[ind].bstrVal );
+            mCurFileUrl.AssignBSTR(aVal[ind].bstrVal);
         }
         else if( aVal[ind].vt == VT_BSTR
                 && !wcscmp(aPropNames[ind].pstrName, L"readonly"))
@@ -384,16 +376,10 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CSOActiveX::Load( LPPROPERTYBAG pPropBag, LPER
         return hr;
 
     mbReadyForActivation = FALSE;
-    if (BSTR bStrUrl = SysAllocString(mCurFileUrl))
-    {
-        hr = CBindStatusCallback<CSOActiveX>::Download(
-            this, &CSOActiveX::CallbackCreateXInputStream, bStrUrl, m_spClientSite, FALSE);
-        SysFreeString(bStrUrl);
-        if (hr == MK_S_ASYNCHRONOUS)
-            hr = S_OK;
-    }
-    else
-        hr = E_OUTOFMEMORY;
+    hr = CBindStatusCallback<CSOActiveX>::Download(
+        this, &CSOActiveX::CallbackCreateXInputStream, mCurFileUrl, m_spClientSite, FALSE);
+    if (hr == MK_S_ASYNCHRONOUS)
+        hr = S_OK;
 
     if ( !SUCCEEDED( hr ) )
     {
@@ -800,13 +786,6 @@ HRESULT CSOActiveX::LoadURLToFrame( )
 
     HRESULT hr = CallDispatchMethod( mCurFileUrl, aArgNames, aArgVals, nCount );
     if( !SUCCEEDED( hr ) ) return hr;
-
-    CComVariant aBarName( L"MenuBarVisible" );
-    CComVariant aBarVis;
-    aBarVis.vt = VT_BOOL; aBarVis.boolVal = VARIANT_FALSE;
-    hr = CallDispatchMethod( L"slot:6661", &aBarName, &aBarVis, 1 );
-    // does not work for some documents, but it is no error
-    // if( !SUCCEEDED( hr ) ) return hr;
 
     // try to get the model and set the presentation specific property, the setting will fail for other document formats
     CComPtr<IDispatch> pdispController;

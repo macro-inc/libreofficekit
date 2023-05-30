@@ -31,11 +31,10 @@ class SvXMLAttrContainerItem;
 
 class SvXMLImportItemMapper
 {
-protected:
     SvXMLItemMapEntriesRef mrMapEntries;
 
 public:
-    explicit SvXMLImportItemMapper( SvXMLItemMapEntriesRef const & rMapEntries );
+    explicit SvXMLImportItemMapper( SvXMLItemMapEntriesRef aMapEntries );
     virtual ~SvXMLImportItemMapper();
 
     /** fills the given itemset with the attributes in the given list */

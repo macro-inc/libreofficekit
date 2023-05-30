@@ -207,40 +207,40 @@ css::uno::Sequence< css::beans::PropertyValue > Generic3DProperties::getCameraAt
     css::uno::Sequence<css::beans::PropertyValue> aSeq(6);
     auto pSeq = aSeq.getArray();
     sal_Int32 nSize = 0;
-    if( mfFieldOfVision.has() )
+    if( mfFieldOfVision.has_value() )
     {
         pSeq[nSize].Name = "fov";
-        pSeq[nSize].Value <<= mfFieldOfVision.use();
+        pSeq[nSize].Value <<= *mfFieldOfVision;
         nSize++;
     }
-    if( mfZoom.has() )
+    if( mfZoom.has_value() )
     {
         pSeq[nSize].Name = "zoom";
-        pSeq[nSize].Value <<= mfZoom.use();
+        pSeq[nSize].Value <<= *mfZoom;
         nSize++;
     }
-    if( mnPreset.has() )
+    if( mnPreset.has_value() )
     {
         pSeq[nSize].Name = "prst";
-        pSeq[nSize].Value <<= getCameraPrstName( mnPreset.use() );
+        pSeq[nSize].Value <<= getCameraPrstName( *mnPreset );
         nSize++;
     }
-    if( maCameraRotation.mnLatitude.has() )
+    if( maCameraRotation.mnLatitude.has_value() )
     {
         pSeq[nSize].Name = "rotLat";
-        pSeq[nSize].Value <<= maCameraRotation.mnLatitude.use();
+        pSeq[nSize].Value <<= *maCameraRotation.mnLatitude;
         nSize++;
     }
-    if( maCameraRotation.mnLongitude.has() )
+    if( maCameraRotation.mnLongitude.has_value() )
     {
         pSeq[nSize].Name = "rotLon";
-        pSeq[nSize].Value <<= maCameraRotation.mnLongitude.use();
+        pSeq[nSize].Value <<= *maCameraRotation.mnLongitude;
         nSize++;
     }
-    if( maCameraRotation.mnRevolution.has() )
+    if( maCameraRotation.mnRevolution.has_value() )
     {
         pSeq[nSize].Name = "rotRev";
-        pSeq[nSize].Value <<= maCameraRotation.mnRevolution.use();
+        pSeq[nSize].Value <<= *maCameraRotation.mnRevolution;
         nSize++;
     }
     aSeq.realloc( nSize );
@@ -252,34 +252,34 @@ css::uno::Sequence< css::beans::PropertyValue > Generic3DProperties::getLightRig
     css::uno::Sequence<css::beans::PropertyValue> aSeq(5);
     auto pSeq = aSeq.getArray();
     sal_Int32 nSize = 0;
-    if( mnLightRigDirection.has() )
+    if( mnLightRigDirection.has_value() )
     {
         pSeq[nSize].Name = "dir";
-        pSeq[nSize].Value <<= getLightRigDirName( mnLightRigDirection.use() );
+        pSeq[nSize].Value <<= getLightRigDirName( *mnLightRigDirection );
         nSize++;
     }
-    if( mnLightRigType.has() )
+    if( mnLightRigType.has_value() )
     {
         pSeq[nSize].Name = "rig";
-        pSeq[nSize].Value <<= getLightRigName( mnLightRigType.use() );
+        pSeq[nSize].Value <<= getLightRigName( *mnLightRigType );
         nSize++;
     }
-    if( maLightRigRotation.mnLatitude.has() )
+    if( maLightRigRotation.mnLatitude.has_value() )
     {
         pSeq[nSize].Name = "rotLat";
-        pSeq[nSize].Value <<= maLightRigRotation.mnLatitude.use();
+        pSeq[nSize].Value <<= *maLightRigRotation.mnLatitude;
         nSize++;
     }
-    if( maLightRigRotation.mnLongitude.has() )
+    if( maLightRigRotation.mnLongitude.has_value() )
     {
         pSeq[nSize].Name = "rotLon";
-        pSeq[nSize].Value <<= maLightRigRotation.mnLongitude.use();
+        pSeq[nSize].Value <<= *maLightRigRotation.mnLongitude;
         nSize++;
     }
-    if( maLightRigRotation.mnRevolution.has() )
+    if( maLightRigRotation.mnRevolution.has_value() )
     {
         pSeq[nSize].Name = "rotRev";
-        pSeq[nSize].Value <<= maLightRigRotation.mnRevolution.use();
+        pSeq[nSize].Value <<= *maLightRigRotation.mnRevolution;
         nSize++;
     }
     aSeq.realloc( nSize );
@@ -291,22 +291,22 @@ css::uno::Sequence< css::beans::PropertyValue > Generic3DProperties::getBevelAtt
     css::uno::Sequence<css::beans::PropertyValue> aSeq(3);
     auto pSeq = aSeq.getArray();
     sal_Int32 nSize = 0;
-    if( rProps.mnPreset.has() )
+    if( rProps.mnPreset.has_value() )
     {
         pSeq[nSize].Name = "prst";
-        pSeq[nSize].Value <<= getBevelPresetTypeString( rProps.mnPreset.use() );
+        pSeq[nSize].Value <<= getBevelPresetTypeString( *rProps.mnPreset );
         nSize++;
     }
-    if( rProps.mnWidth.has() )
+    if( rProps.mnWidth.has_value() )
     {
         pSeq[nSize].Name = "w";
-        pSeq[nSize].Value <<= rProps.mnWidth.use();
+        pSeq[nSize].Value <<= *rProps.mnWidth;
         nSize++;
     }
-    if( rProps.mnHeight.has() )
+    if( rProps.mnHeight.has_value() )
     {
         pSeq[nSize].Name = "h";
-        pSeq[nSize].Value <<= rProps.mnHeight.use();
+        pSeq[nSize].Value <<= *rProps.mnHeight;
         nSize++;
     }
     aSeq.realloc( nSize );
@@ -335,40 +335,40 @@ css::uno::Sequence< css::beans::PropertyValue > Generic3DProperties::getShape3DA
     css::uno::Sequence<css::beans::PropertyValue> aSeq(8);
     auto pSeq = aSeq.getArray();
     sal_Int32 nSize = 0;
-    if( mnExtrusionH.has() )
+    if( mnExtrusionH.has_value() )
     {
         pSeq[nSize].Name = "extrusionH";
-        pSeq[nSize].Value <<= mnExtrusionH.use();
+        pSeq[nSize].Value <<= *mnExtrusionH;
         nSize++;
     }
-    if( mnContourW.has() )
+    if( mnContourW.has_value() )
     {
         pSeq[nSize].Name = "contourW";
-        pSeq[nSize].Value <<= mnContourW.use();
+        pSeq[nSize].Value <<= *mnContourW;
         nSize++;
     }
-    if( mnShapeZ.has() )
+    if( mnShapeZ.has_value() )
     {
         pSeq[nSize].Name = "z";
-        pSeq[nSize].Value <<= mnShapeZ.use();
+        pSeq[nSize].Value <<= *mnShapeZ;
         nSize++;
     }
-    if( mnMaterial.has() )
+    if( mnMaterial.has_value() )
     {
         pSeq[nSize].Name = "prstMaterial";
-        pSeq[nSize].Value <<= getPresetMaterialTypeString( mnMaterial.use() );
+        pSeq[nSize].Value <<= getPresetMaterialTypeString( *mnMaterial );
         nSize++;
     }
-    if( maTopBevelProperties.has() )
+    if( maTopBevelProperties.has_value() )
     {
         pSeq[nSize].Name = "bevelT";
-        pSeq[nSize].Value <<= getBevelAttributes( maTopBevelProperties.use() );
+        pSeq[nSize].Value <<= getBevelAttributes( *maTopBevelProperties );
         nSize++;
     }
-    if( maBottomBevelProperties.has() )
+    if( maBottomBevelProperties.has_value() )
     {
         pSeq[nSize].Name = "bevelB";
-        pSeq[nSize].Value <<= getBevelAttributes( maBottomBevelProperties.use() );
+        pSeq[nSize].Value <<= getBevelAttributes( *maBottomBevelProperties );
         nSize++;
     }
     if( maExtrusionColor.isUsed() )

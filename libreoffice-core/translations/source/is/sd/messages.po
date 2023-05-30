@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-02-01 10:35+0000\n"
+"POT-Creation-Date: 2023-02-09 12:12+0100\n"
+"PO-Revision-Date: 2023-02-01 09:32+0000\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>\n"
 "Language-Team: Icelandic <https://translations.documentfoundation.org/projects/libo_ui-master/sdmessages/is/>\n"
 "Language: is\n"
@@ -651,7 +651,7 @@ msgstr "Endir línu"
 #: sd/inc/strings.hrc:67
 msgctxt "STR_DESC_LINEEND"
 msgid "Please enter a name for the new arrow style:"
-msgstr ""
+msgstr "Settu inn heiti á nýja örvastílnum:"
 
 #. 7y2Si
 #: sd/inc/strings.hrc:68
@@ -2392,44 +2392,14 @@ msgctxt "STR_SAVE_DOC"
 msgid "Save Document"
 msgstr "Vista skjal"
 
-#. VCFFA
-#: sd/inc/strings.hrc:363
-msgctxt "STR_POOLSHEET_BANDED_CELL"
-msgid "Banding cell"
-msgstr "Litbreyttur reitur"
-
-#. FBzD4
-#: sd/inc/strings.hrc:364
-msgctxt "STR_POOLSHEET_HEADER"
-msgid "Header"
-msgstr "Haus"
-
-#. kut56
-#: sd/inc/strings.hrc:365
-msgctxt "STR_POOLSHEET_TOTAL"
-msgid "Total line"
-msgstr "Fjöldi lína"
-
-#. 4UBCG
-#: sd/inc/strings.hrc:366
-msgctxt "STR_POOLSHEET_FIRST_COLUMN"
-msgid "First column"
-msgstr "Fyrsti dálkur"
-
-#. f3Zfa
-#: sd/inc/strings.hrc:367
-msgctxt "STR_POOLSHEET_LAST_COLUMN"
-msgid "Last column"
-msgstr "Seinasti dálkur"
-
 #. HAeDt
-#: sd/inc/strings.hrc:368
+#: sd/inc/strings.hrc:363
 msgctxt "STR_SHRINK_FONT_SIZE"
 msgid "Shrink font size"
 msgstr "Minnka stærð leturs"
 
 #. 7uDfu
-#: sd/inc/strings.hrc:369
+#: sd/inc/strings.hrc:364
 msgctxt "STR_GROW_FONT_SIZE"
 msgid "Grow font size"
 msgstr "Auka stærð leturs"
@@ -2437,627 +2407,642 @@ msgstr "Auka stærð leturs"
 #. E9zvq
 #. Names and descriptions of the Draw/Impress accessibility views
 #. ==============================================================
-#: sd/inc/strings.hrc:374
+#: sd/inc/strings.hrc:369
 msgctxt "SID_SD_A11Y_D_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "Teiknisýn"
 
 #. GfnmX
-#: sd/inc/strings.hrc:375
+#: sd/inc/strings.hrc:370
 msgctxt "SID_SD_A11Y_I_DRAWVIEW_N"
 msgid "Drawing View"
 msgstr "Teiknisýn"
 
 #. YCVqM
-#: sd/inc/strings.hrc:376
+#: sd/inc/strings.hrc:371
 msgctxt "SID_SD_A11Y_I_OUTLINEVIEW_N"
 msgid "Outline View"
 msgstr "Efnisskipulagssýn"
 
 #. k2hXi
-#: sd/inc/strings.hrc:377
+#: sd/inc/strings.hrc:372
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_N"
 msgid "Slides View"
 msgstr "Skyggnusýn"
 
 #. A22hR
-#: sd/inc/strings.hrc:378
+#: sd/inc/strings.hrc:373
 msgctxt "SID_SD_A11Y_I_SLIDEVIEW_D"
 msgid "This is where you sort slides."
 msgstr "Þetta er þar sem hægt er að endurraða skyggnum."
 
 #. vyX8L
-#: sd/inc/strings.hrc:379
+#: sd/inc/strings.hrc:374
 msgctxt "SID_SD_A11Y_I_NOTESVIEW_N"
 msgid "Notes View"
 msgstr "Glósusýn"
 
 #. qr5ov
-#: sd/inc/strings.hrc:380
+#: sd/inc/strings.hrc:375
 msgctxt "SID_SD_A11Y_I_HANDOUTVIEW_N"
 msgid "Handout View"
 msgstr "Handritssýn"
 
 #. Ycpb4
-#: sd/inc/strings.hrc:381
+#: sd/inc/strings.hrc:376
 msgctxt "SID_SD_A11Y_P_TITLE_N"
 msgid "PresentationTitle"
 msgstr "KynningarTitill"
 
 #. 4WCzf
-#: sd/inc/strings.hrc:382
+#: sd/inc/strings.hrc:377
 msgctxt "SID_SD_A11Y_P_OUTLINER_N"
 msgid "PresentationOutliner"
 msgstr "KynningarEfnisskipan"
 
 #. cBoMF
-#: sd/inc/strings.hrc:383
+#: sd/inc/strings.hrc:378
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N"
 msgid "PresentationSubtitle"
 msgstr "KynningarUndirtexti"
 
 #. 8KV99
-#: sd/inc/strings.hrc:384
+#: sd/inc/strings.hrc:379
 msgctxt "SID_SD_A11Y_P_PAGE_N"
 msgid "PresentationPage"
 msgstr "KynningarSíða"
 
 #. R6kyg
-#: sd/inc/strings.hrc:385
+#: sd/inc/strings.hrc:380
 msgctxt "SID_SD_A11Y_P_NOTES_N"
 msgid "PresentationNotes"
 msgstr "KynningarMinnisblöð"
 
 #. X8c9Z
-#: sd/inc/strings.hrc:386
+#: sd/inc/strings.hrc:381
 msgctxt "SID_SD_A11Y_P_HANDOUT_N"
 msgid "Handout"
 msgstr "Dreifiblað"
 
 #. FeAdu
-#: sd/inc/strings.hrc:387
+#: sd/inc/strings.hrc:382
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N"
 msgid "UnknownAccessiblePresentationShape"
 msgstr "ÓþekktAðgengisKynningarForm"
 
 #. sA8of
-#: sd/inc/strings.hrc:388
+#: sd/inc/strings.hrc:383
 msgctxt "SID_SD_A11Y_P_FOOTER_N"
 msgid "PresentationFooter"
 msgstr "KynningarFótur"
 
 #. KAC6Z
-#: sd/inc/strings.hrc:389
+#: sd/inc/strings.hrc:384
 msgctxt "SID_SD_A11Y_P_HEADER_N"
 msgid "PresentationHeader"
 msgstr "KynningarHaus"
 
 #. EfHeH
-#: sd/inc/strings.hrc:390
+#: sd/inc/strings.hrc:385
 msgctxt "SID_SD_A11Y_P_DATE_N"
 msgid "PresentationDateAndTime"
 msgstr "KynningarDagsetningOgTími"
 
 #. WosPZ
-#: sd/inc/strings.hrc:391
+#: sd/inc/strings.hrc:386
 msgctxt "SID_SD_A11Y_P_NUMBER_N"
 msgid "PresentationPageNumber"
 msgstr "KynningarBlaðsíðuNúmer"
 
 #. kCGsH
-#: sd/inc/strings.hrc:392
+#: sd/inc/strings.hrc:387
 msgctxt "SID_SD_A11Y_D_PRESENTATION"
 msgid "%PRODUCTNAME Presentation"
 msgstr "%PRODUCTNAME kynning"
 
 #. ubJop
-#: sd/inc/strings.hrc:393
+#: sd/inc/strings.hrc:388
 msgctxt "SID_SD_A11Y_P_TITLE_N_STYLE"
 msgid "Title"
 msgstr "Titill"
 
 #. Va4KF
-#: sd/inc/strings.hrc:394
+#: sd/inc/strings.hrc:389
 msgctxt "SID_SD_A11Y_P_OUTLINER_N_STYLE"
 msgid "Outliner"
 msgstr "Efnisskipan"
 
 #. 6FKRE
-#: sd/inc/strings.hrc:395
+#: sd/inc/strings.hrc:390
 msgctxt "SID_SD_A11Y_P_SUBTITLE_N_STYLE"
 msgid "Subtitle"
 msgstr "Skjátexti"
 
 #. eSBEi
-#: sd/inc/strings.hrc:396
+#: sd/inc/strings.hrc:391
 msgctxt "SID_SD_A11Y_P_PAGE_N_STYLE"
 msgid "Page"
 msgstr "Síða"
 
 #. WEaeZ
-#: sd/inc/strings.hrc:397
+#: sd/inc/strings.hrc:392
 msgctxt "SID_SD_A11Y_P_NOTES_N_STYLE"
 msgid "Notes"
 msgstr "Athugasemdir"
 
 #. buhox
-#: sd/inc/strings.hrc:398
+#: sd/inc/strings.hrc:393
 msgctxt "SID_SD_A11Y_P_HANDOUT_N_STYLE"
 msgid "Handout"
 msgstr "Dreifiblað"
 
 #. 4xBQg
-#: sd/inc/strings.hrc:399
+#: sd/inc/strings.hrc:394
 msgctxt "SID_SD_A11Y_P_UNKNOWN_N_STYLE"
 msgid "Unknown Accessible Presentation Shape"
 msgstr "Óþekkt aðgengiskynningarform"
 
 #. CGegB
-#: sd/inc/strings.hrc:400
+#: sd/inc/strings.hrc:395
 msgctxt "SID_SD_A11Y_P_FOOTER_N_STYLE"
 msgid "Footer"
 msgstr "Síðufótur"
 
 #. SrrR4
-#: sd/inc/strings.hrc:401
+#: sd/inc/strings.hrc:396
 msgctxt "SID_SD_A11Y_P_HEADER_N_STYLE"
 msgid "Header"
 msgstr "Síðuhaus"
 
 #. CCwKy
-#: sd/inc/strings.hrc:402
+#: sd/inc/strings.hrc:397
 msgctxt "SID_SD_A11Y_P_DATE_N_STYLE"
 msgid "Date"
 msgstr "Dagsetning"
 
 #. EFmn4
-#: sd/inc/strings.hrc:403
+#: sd/inc/strings.hrc:398
 msgctxt "SID_SD_A11Y_P_NUMBER_N_STYLE"
 msgid "Number"
 msgstr "Númer"
 
 #. wFpMQ
-#: sd/inc/strings.hrc:404
+#: sd/inc/strings.hrc:399
 msgctxt "SID_SD_A11Y_D_PRESENTATION_READONLY"
 msgid "(read-only)"
 msgstr "(skrifvarið)"
 
 #. EV4W5
-#: sd/inc/strings.hrc:406
+#: sd/inc/strings.hrc:401
 msgctxt "STR_CUSTOMANIMATION_REPEAT_NONE"
 msgid "none"
 msgstr "engar"
 
 #. 9izAz
-#: sd/inc/strings.hrc:407
+#: sd/inc/strings.hrc:402
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_NEXT_CLICK"
 msgid "Until next click"
 msgstr "Til næsta smells"
 
 #. oEQ7B
-#: sd/inc/strings.hrc:408
+#: sd/inc/strings.hrc:403
 msgctxt "STR_CUSTOMANIMATION_REPEAT_UNTIL_END_OF_SLIDE"
 msgid "Until end of slide"
 msgstr "Til loka skyggnu"
 
 #. Lf9gB
-#: sd/inc/strings.hrc:409
+#: sd/inc/strings.hrc:404
 msgctxt "STR_CUSTOMANIMATION_DIRECTION_PROPERTY"
 msgid "Direction:"
 msgstr "Stefna:"
 
 #. xxDXG
-#: sd/inc/strings.hrc:410
+#: sd/inc/strings.hrc:405
 msgctxt "STR_CUSTOMANIMATION_ZOOM_PROPERTY"
 msgid "Zoom:"
 msgstr "Aðdráttur:"
 
 #. SvBeK
-#: sd/inc/strings.hrc:411
+#: sd/inc/strings.hrc:406
 msgctxt "STR_CUSTOMANIMATION_SPOKES_PROPERTY"
 msgid "Spokes:"
 msgstr "Spælar:"
 
 #. eJ4qZ
-#: sd/inc/strings.hrc:412
+#: sd/inc/strings.hrc:407
 msgctxt "STR_CUSTOMANIMATION_FIRST_COLOR_PROPERTY"
 msgid "First color:"
 msgstr "Fyrsti litur:"
 
 #. CSbCE
-#: sd/inc/strings.hrc:413
+#: sd/inc/strings.hrc:408
 msgctxt "STR_CUSTOMANIMATION_SECOND_COLOR_PROPERTY"
 msgid "Second color:"
 msgstr "Seinni litur:"
 
 #. cZUiD
-#: sd/inc/strings.hrc:414
+#: sd/inc/strings.hrc:409
 msgctxt "STR_CUSTOMANIMATION_FILL_COLOR_PROPERTY"
 msgid "Fill color:"
 msgstr "Fyllilitur:"
 
 #. U5ZDL
-#: sd/inc/strings.hrc:415
+#: sd/inc/strings.hrc:410
 msgctxt "STR_CUSTOMANIMATION_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "Stíll:"
 
 #. vKLER
-#: sd/inc/strings.hrc:416
+#: sd/inc/strings.hrc:411
 msgctxt "STR_CUSTOMANIMATION_FONT_PROPERTY"
 msgid "Font:"
 msgstr "Letur:"
 
 #. Fdsks
-#: sd/inc/strings.hrc:417
+#: sd/inc/strings.hrc:412
 msgctxt "STR_CUSTOMANIMATION_FONT_COLOR_PROPERTY"
 msgid "Font color:"
 msgstr "Litur á letri:"
 
 #. nT7dm
-#: sd/inc/strings.hrc:418
+#: sd/inc/strings.hrc:413
 msgctxt "STR_CUSTOMANIMATION_FONT_SIZE_STYLE_PROPERTY"
 msgid "Style:"
 msgstr "Stíll:"
 
 #. q24Fe
-#: sd/inc/strings.hrc:419
+#: sd/inc/strings.hrc:414
 msgctxt "STR_CUSTOMANIMATION_FONT_STYLE_PROPERTY"
 msgid "Typeface:"
 msgstr "Leturgerð:"
 
 #. nAqeR
-#: sd/inc/strings.hrc:420
+#: sd/inc/strings.hrc:415
 msgctxt "STR_CUSTOMANIMATION_LINE_COLOR_PROPERTY"
 msgid "Line color:"
 msgstr "Litur línu:"
 
 #. w7G4Q
-#: sd/inc/strings.hrc:421
+#: sd/inc/strings.hrc:416
 msgctxt "STR_CUSTOMANIMATION_SIZE_PROPERTY"
 msgid "Font size:"
 msgstr "Leturstærð:"
 
 #. R3GgU
-#: sd/inc/strings.hrc:422
+#: sd/inc/strings.hrc:417
 msgctxt "STR_CUSTOMANIMATION_SCALE_PROPERTY"
 msgid "Size:"
 msgstr "Stærð:"
 
 #. YEwoz
-#: sd/inc/strings.hrc:423
+#: sd/inc/strings.hrc:418
 msgctxt "STR_CUSTOMANIMATION_AMOUNT_PROPERTY"
 msgid "Amount:"
 msgstr "Upphæð:"
 
 #. wiQPZ
-#: sd/inc/strings.hrc:424
+#: sd/inc/strings.hrc:419
 msgctxt "STR_CUSTOMANIMATION_COLOR_PROPERTY"
 msgid "Color:"
 msgstr "Litur:"
 
 #. f5u6C
-#: sd/inc/strings.hrc:425
+#: sd/inc/strings.hrc:420
 msgctxt "STR_CUSTOMANIMATION_NO_SOUND"
 msgid "(No sound)"
 msgstr "(Ekkert hljóð)"
 
 #. N7jGX
-#: sd/inc/strings.hrc:426
+#: sd/inc/strings.hrc:421
 msgctxt "STR_CUSTOMANIMATION_STOP_PREVIOUS_SOUND"
 msgid "(Stop previous sound)"
 msgstr "(Stöðva fyrra hljóð)"
 
 #. vasqr
-#: sd/inc/strings.hrc:427
+#: sd/inc/strings.hrc:422
 msgctxt "STR_CUSTOMANIMATION_BROWSE_SOUND"
 msgid "Other sound..."
 msgstr "Annað hljóð..."
 
 #. CjvLY
-#: sd/inc/strings.hrc:428
+#: sd/inc/strings.hrc:423
 msgctxt "STR_CUSTOMANIMATION_SAMPLE"
 msgid "Sample"
 msgstr "Sýnishorn"
 
 #. CdYt2
-#: sd/inc/strings.hrc:429
+#: sd/inc/strings.hrc:424
 msgctxt "STR_CUSTOMANIMATION_TRIGGER"
 msgid "Trigger"
 msgstr "Vekjari"
 
 #. Evkrq
-#: sd/inc/strings.hrc:430
+#: sd/inc/strings.hrc:425
 msgctxt "STR_CUSTOMANIMATION_USERPATH"
 msgid "User paths"
 msgstr "Slóðir notanda"
 
 #. EcciE
-#: sd/inc/strings.hrc:431
+#: sd/inc/strings.hrc:426
 msgctxt "STR_CUSTOMANIMATION_ENTRANCE"
 msgid "Entrance: %1"
 msgstr "Upphaf: %1"
 
 #. Zydrz
-#: sd/inc/strings.hrc:432
+#: sd/inc/strings.hrc:427
 msgctxt "STR_CUSTOMANIMATION_EMPHASIS"
 msgid "Emphasis: %1"
 msgstr "Áhersla: %1"
 
 #. kW2DL
-#: sd/inc/strings.hrc:433
+#: sd/inc/strings.hrc:428
 msgctxt "STR_CUSTOMANIMATION_EXIT"
 msgid "Exit: %1"
 msgstr "Lokun: %1"
 
 #. iKFbF
-#: sd/inc/strings.hrc:434
+#: sd/inc/strings.hrc:429
 msgctxt "STR_CUSTOMANIMATION_MOTION_PATHS"
 msgid "Motion Paths: %1"
 msgstr "Hreyfingaferlar: %1"
 
 #. kg9Yv
-#: sd/inc/strings.hrc:435
+#: sd/inc/strings.hrc:430
 msgctxt "STR_CUSTOMANIMATION_MISC"
 msgid "Misc: %1"
 msgstr "Ýmisl.: %1"
 
 #. Ep4QY
-#: sd/inc/strings.hrc:436
+#: sd/inc/strings.hrc:431
 msgctxt "STR_SLIDETRANSITION_NONE"
 msgid "None"
 msgstr "Engar"
 
 #. KAsTD
-#: sd/inc/strings.hrc:438
+#: sd/inc/strings.hrc:433
 msgctxt "STR_ANNOTATION_TODAY"
 msgid "Today,"
 msgstr "Í dag,"
 
 #. DEYnN
-#: sd/inc/strings.hrc:439
+#: sd/inc/strings.hrc:434
 msgctxt "STR_ANNOTATION_YESTERDAY"
 msgid "Yesterday,"
 msgstr "Í gær,"
 
 #. bh3FZ
-#: sd/inc/strings.hrc:440
+#: sd/inc/strings.hrc:435
 msgctxt "STR_ANNOTATION_NOAUTHOR"
 msgid "(no author)"
 msgstr "(enginn höfundur)"
 
 #. AvNV8
-#: sd/inc/strings.hrc:441
+#: sd/inc/strings.hrc:436
 msgctxt "STR_ANNOTATION_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress reached the end of the presentation. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME Impress fór að enda kynningarinnar. Viltu halda áfram frá upphafinu?"
 
 #. P5gKe
-#: sd/inc/strings.hrc:442
+#: sd/inc/strings.hrc:437
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress reached the beginning of the presentation. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME Impress fór að upphafi kynningarinnar. Viltu halda áfram frá endanum?"
 
 #. KGmdL
-#: sd/inc/strings.hrc:443
+#: sd/inc/strings.hrc:438
 msgctxt "STR_ANNOTATION_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the end of the document. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME Draw fór að enda skjalsins. Viltu halda áfram frá upphafinu?"
 
 #. oEn6r
-#: sd/inc/strings.hrc:444
+#: sd/inc/strings.hrc:439
 msgctxt "STR_ANNOTATION_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw reached the beginning of the document. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME Draw fór að upphafi skjalsins. Viltu halda áfram frá endanum?"
 
 #. eP7Vm
-#: sd/inc/strings.hrc:445
+#: sd/inc/strings.hrc:440
 msgctxt "STR_ANNOTATION_UNDO_INSERT"
 msgid "Insert Comment"
 msgstr "Setja inn athugasemd"
 
 #. s4c9W
-#: sd/inc/strings.hrc:446
+#: sd/inc/strings.hrc:441
 msgctxt "STR_ANNOTATION_UNDO_DELETE"
 msgid "Delete Comment(s)"
 msgstr "Eyða athugasemd(um)"
 
 #. bxiPE
-#: sd/inc/strings.hrc:447
+#: sd/inc/strings.hrc:442
 msgctxt "STR_ANNOTATION_UNDO_MOVE"
 msgid "Move Comment"
 msgstr "Færa athugasemd"
 
 #. hQbpd
-#: sd/inc/strings.hrc:448
+#: sd/inc/strings.hrc:443
 msgctxt "STR_ANNOTATION_UNDO_EDIT"
 msgid "Edit Comment"
 msgstr "Breyta athugasemd"
 
 #. g6k7E
-#: sd/inc/strings.hrc:449
+#: sd/inc/strings.hrc:444
 msgctxt "STR_ANNOTATION_REPLY"
 msgid "Reply to %1"
 msgstr "Svara %1"
 
 #. NMTpu
-#: sd/inc/strings.hrc:451
+#: sd/inc/strings.hrc:446
 msgctxt "RID_DRAW_MEDIA_TOOLBOX"
 msgid "Media Playback"
 msgstr "Afspilun"
 
 #. Q76cw
-#: sd/inc/strings.hrc:452
+#: sd/inc/strings.hrc:447
 msgctxt "RID_DRAW_TABLE_TOOLBOX"
 msgid "Table"
 msgstr "Tafla"
 
 #. xCRmu
-#: sd/inc/strings.hrc:454
+#: sd/inc/strings.hrc:449
 msgctxt "STR_IMPRESS_PRINT_UI_GROUP_NAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 6KbnP
-#: sd/inc/strings.hrc:455
+#: sd/inc/strings.hrc:450
 msgctxt "STR_IMPRESS_PRINT_UI_CONTENT"
 msgid "Document"
 msgstr "Skjal"
 
 #. uBxPs
-#: sd/inc/strings.hrc:456
+#: sd/inc/strings.hrc:451
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDESPERPAGE"
 msgid "Slides per page:"
 msgstr "Skyggnur á síðu:"
 
 #. EPBUK
-#: sd/inc/strings.hrc:457
+#: sd/inc/strings.hrc:452
 msgctxt "STR_IMPRESS_PRINT_UI_ORDER"
 msgid "Order:"
 msgstr "Uppröðun:"
 
 #. BFEFJ
-#: sd/inc/strings.hrc:458
+#: sd/inc/strings.hrc:453
 msgctxt "STR_IMPRESS_PRINT_UI_INCLUDE_CONTENT"
 msgid "~Contents"
 msgstr "~Innihald"
 
 #. AdWKp
-#: sd/inc/strings.hrc:459
+#: sd/inc/strings.hrc:454
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_NAME"
 msgid "~Slide name"
 msgstr "Heiti ~skyggnu"
 
 #. GkLky
-#: sd/inc/strings.hrc:460
+#: sd/inc/strings.hrc:455
 msgctxt "STR_DRAW_PRINT_UI_IS_PRINT_NAME"
 msgid "P~age name"
 msgstr "~Heiti síðu"
 
 #. EFkVE
-#: sd/inc/strings.hrc:461
+#: sd/inc/strings.hrc:456
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_DATE"
 msgid "~Date and time"
 msgstr "~Dagsetning og tími"
 
 #. ZcDFL
-#: sd/inc/strings.hrc:462
+#: sd/inc/strings.hrc:457
 msgctxt "STR_IMPRESS_PRINT_UI_IS_PRINT_HIDDEN"
 msgid "Hidden pages"
 msgstr "Faldar síður"
 
 #. CSUbC
-#: sd/inc/strings.hrc:463
+#: sd/inc/strings.hrc:458
 msgctxt "STR_IMPRESS_PRINT_UI_QUALITY"
 msgid "Color"
 msgstr "Litur"
 
 #. WmYKp
-#: sd/inc/strings.hrc:464
+#: sd/inc/strings.hrc:459
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_OPTIONS"
 msgid "~Size"
 msgstr "~Stærð"
 
 #. qDGVE
-#: sd/inc/strings.hrc:465
+#: sd/inc/strings.hrc:460
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE"
 msgid "Brochure"
 msgstr "Bæklingur"
 
 #. K7m8L
-#: sd/inc/strings.hrc:466
+#: sd/inc/strings.hrc:461
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_SIDES"
 msgid "Page sides"
 msgstr "Hliðar blaðsíðu"
 
 #. 8AzJi
-#: sd/inc/strings.hrc:467
+#: sd/inc/strings.hrc:462
 msgctxt "STR_IMPRESS_PRINT_UI_BROCHURE_INCLUDE"
 msgid "Include"
 msgstr "Taka með"
 
 #. AEeCf
-#: sd/inc/strings.hrc:468
+#: sd/inc/strings.hrc:463
 msgctxt "STR_IMPRESS_PRINT_UI_PAPER_TRAY"
 msgid "~Use only paper tray from printer preferences"
 msgstr "Nota eingöng~u pappírsbakka sem tilgreindur er í prentarastillingum"
 
 #. jBxbU
-#: sd/inc/strings.hrc:469
+#: sd/inc/strings.hrc:464
 msgctxt "STR_IMPRESS_PRINT_UI_PAGE_RANGE"
 msgid "Pages:"
 msgstr "Síður:"
 
 #. a3tSp
-#: sd/inc/strings.hrc:470
+#: sd/inc/strings.hrc:465
 msgctxt "STR_IMPRESS_PRINT_UI_SLIDE_RANGE"
 msgid "Slides:"
 msgstr "Skyggnur:"
 
 #. pPiWM
-#: sd/inc/strings.hrc:472
+#: sd/inc/strings.hrc:467
 msgctxt "STR_SAR_WRAP_FORWARD"
 msgid "%PRODUCTNAME Impress has searched to the end of the presentation. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME Impress er búið að leita allt til enda kynningarinnar. Viltu halda áfram frá upphafinu?"
 
 #. buKAC
-#: sd/inc/strings.hrc:473
+#: sd/inc/strings.hrc:468
 msgctxt "STR_SAR_WRAP_BACKWARD"
 msgid "%PRODUCTNAME Impress has searched to the beginning of the presentation. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME Impress er búið að leita allt til upphafs kynningarinnar. Viltu halda áfram frá endinum?"
 
 #. iiE2i
-#: sd/inc/strings.hrc:474
+#: sd/inc/strings.hrc:469
 msgctxt "STR_SAR_WRAP_FORWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the end of the document. Do you want to continue at the beginning?"
 msgstr "%PRODUCTNAME Draw er búið að leita allt til enda skjalsins. Viltu halda áfram frá upphafinu?"
 
 #. RAhiP
-#: sd/inc/strings.hrc:475
+#: sd/inc/strings.hrc:470
 msgctxt "STR_SAR_WRAP_BACKWARD_DRAW"
 msgid "%PRODUCTNAME Draw has searched to the beginning of the document. Do you want to continue at the end?"
 msgstr "%PRODUCTNAME Draw er búið að leita allt til upphafsskjalsins. Viltu halda áfram frá endinum?"
 
 #. 6GhtE
-#: sd/inc/strings.hrc:477
+#: sd/inc/strings.hrc:472
 msgctxt "STR_ANIMATION_DIALOG_TITLE"
 msgid "Animation"
 msgstr "Hreyfingar"
 
 #. X9CWA
-#: sd/inc/strings.hrc:479
+#: sd/inc/strings.hrc:474
 msgctxt "RID_SVXSTR_EDIT_GRAPHIC"
 msgid "Link"
 msgstr "Tengill"
 
 #. yYhnC
-#: sd/inc/strings.hrc:481
+#: sd/inc/strings.hrc:476
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Next"
 msgstr "~Næsta"
 
 #. YG7NQ
-#: sd/inc/strings.hrc:482
+#: sd/inc/strings.hrc:477
 msgctxt "RID_SVXSTR_MENU_NEXT"
 msgid "~Previous"
 msgstr "~Fyrra"
 
 #. A9eJu
-#: sd/inc/strings.hrc:483
+#: sd/inc/strings.hrc:478
 msgctxt "RID_SVXSTR_MENU_FIRST"
 msgid "~First Slide"
 msgstr "~Fyrsta skyggna"
 
 #. CVatA
-#: sd/inc/strings.hrc:484
+#: sd/inc/strings.hrc:479
 msgctxt "RID_SVXSTR_MENU_LAST"
 msgid "~Last Slide"
 msgstr "~Seinasta skyggna"
 
 #. Wkvpi
-#: sd/inc/strings.hrc:486
+#: sd/inc/strings.hrc:481
 msgctxt "STR_CLOSE_PANE"
 msgid "Close Pane"
+msgstr "Loka hliðarspjaldi"
+
+#. KfamK
+#: sd/inc/strings.hrc:482
+msgctxt "STR_INSERT_TABLESTYLE"
+msgid "Add a new design"
+msgstr ""
+
+#. a9JBA
+#: sd/inc/strings.hrc:483
+msgctxt "STR_REMOVE_TABLESTYLE"
+msgid ""
+"The selected style is in use in this document.\n"
+"If you will delete this style, tables using it will revert to the default style.\n"
+"Do you still wish to delete this style?\n"
 msgstr ""
 
 #. xNozF
@@ -3148,7 +3133,7 @@ msgstr "_Fjöldi afrita:"
 #: sd/uiconfig/sdraw/ui/copydlg.ui:160
 msgctxt "copydlg|extended_tip|copies"
 msgid "Enter the number of copies you want to make."
-msgstr "Settu inn fjöldi afrita sem þú vilt gera."
+msgstr "Settu inn fjölda afrita sem þú vilt gera."
 
 #. 3fqDJ
 #: sd/uiconfig/sdraw/ui/copydlg.ui:175
@@ -3220,13 +3205,13 @@ msgstr "_Hæð:"
 #: sd/uiconfig/sdraw/ui/copydlg.ui:388
 msgctxt "copydlg|extended_tip|width"
 msgid "Enter the amount by which you want to enlarge or reduce the width of the duplicate object."
-msgstr ""
+msgstr "Settu inn það magn sem þú vilt stækka eða minnka um breidd tvítekna hlutarins."
 
 #. LP58A
 #: sd/uiconfig/sdraw/ui/copydlg.ui:407
 msgctxt "copydlg|extended_tip|height"
 msgid "Enter the amount by which you want to enlarge or reduce the height of the duplicate object."
-msgstr ""
+msgstr "Settu inn það magn sem þú vilt stækka eða minnka um hæð tvítekna hlutarins."
 
 #. Jvt8m
 #: sd/uiconfig/sdraw/ui/copydlg.ui:422
@@ -3250,13 +3235,13 @@ msgstr "_Endar:"
 #: sd/uiconfig/sdraw/ui/copydlg.ui:494
 msgctxt "copydlg|extended_tip|start"
 msgid "Choose a color for the selected object."
-msgstr "Veldu lit fyrir valinn hlut."
+msgstr "Veldu lit fyrir valda hlutinn."
 
 #. AAoBa
 #: sd/uiconfig/sdraw/ui/copydlg.ui:517
 msgctxt "copydlg|extended_tip|end"
 msgid "Choose a color for the duplicate object. If you are making more than one copy, this color is applied to the last copy."
-msgstr ""
+msgstr "Veldu lit fyrir tvítekna hlutinn. Ef þú ert að gera fleiri en eitt afrit, verður þessi litur settur á síðasta afritið."
 
 #. F3A93
 #: sd/uiconfig/sdraw/ui/copydlg.ui:532
@@ -3286,7 +3271,7 @@ msgstr "Sama stefna"
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:110
 msgctxt "crossfadedialog|extended_tip|orientation"
 msgid "Applies a smooth transition between the selected objects."
-msgstr ""
+msgstr "Setur mýkta millifærslu milli völdu atriðanna."
 
 #. SmBMK
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:122
@@ -3298,7 +3283,7 @@ msgstr "Eiginleikar krossblöndunar"
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:130
 msgctxt "crossfadedialog|extended_tip|attributes"
 msgid "Applies cross-fading to the line and fill properties of the selected objects."
-msgstr ""
+msgstr "Setur krossblöndun á línuna og fyllieiginleika völdu atriðanna."
 
 #. CehQE
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:144
@@ -3310,7 +3295,7 @@ msgstr "Vaxtarþrep:"
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:163
 msgctxt "crossfadedialog|extended_tip|increments"
 msgid "Enter the number of shapes you want between the two selected objects."
-msgstr ""
+msgstr "Settu inn fjölda lagana sem þú vilt hafa á milli tveggja völdu hlutanna."
 
 #. MnqQG
 #: sd/uiconfig/sdraw/ui/crossfadedialog.ui:178
@@ -3340,13 +3325,13 @@ msgstr "Eyðir völdum grippunkti eða griplínu."
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:124
 msgctxt "dlgsnap|extended_tip|x"
 msgid "Enter the amount of space you want between the snap point or line and the left edge of the page."
-msgstr ""
+msgstr "Settu inn stærð bils sem þú vilt hafa á milli grippunkts eða línu og vinstri jaðars síðunnar."
 
 #. iBvKZ
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:142
 msgctxt "dlgsnap|extended_tip|y"
 msgid "Enter the amount of space you want between the snap point or line and the top edge of the page."
-msgstr ""
+msgstr "Settu inn stærð bils sem þú vilt hafa á milli grippunkts eða línu og efri jaðars síðunnar."
 
 #. GSJeV
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:155
@@ -3412,7 +3397,7 @@ msgstr "Tegund"
 #: sd/uiconfig/sdraw/ui/dlgsnap.ui:340
 msgctxt "dlgsnap|extended_tip|SnapObjectDialog"
 msgid "Inserts a snap point or snap line (also known as guide) that you can use to quickly align objects."
-msgstr ""
+msgstr "Setur inn grippunkt eða griplínu (einnig þekkt sem stoðlína) sem þú getur notað til fljótlegrar uppröðunar atriða."
 
 #. MuBBG
 #: sd/uiconfig/sdraw/ui/drawchardialog.ui:8
@@ -3472,7 +3457,7 @@ msgstr "Gegnsæi"
 #: sd/uiconfig/sdraw/ui/drawpagedialog.ui:279
 msgctxt "drawpagedialog|RID_SVXPAGE_THEME"
 msgid "Theme"
-msgstr ""
+msgstr "Þema"
 
 #. cKCg3
 #: sd/uiconfig/sdraw/ui/drawparadialog.ui:8
@@ -3616,7 +3601,7 @@ msgstr "Dreifa á mörgum blöðum"
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:248
 msgctxt "drawprinteroptions|extended_tip|distributeonmultiple"
 msgid "Prints a large format document, such as a poster or banner, by distributing the document page across multiple sheets of paper. The distribution option calculates how many sheets of paper are needed. You can then piece together the sheets."
-msgstr ""
+msgstr "Prentar út stór snið skjala, eins og t.d. kynningarspjöld eða borða, með því að dreifa skjalinu á mörg pappírsblöð. Dreifingareiginleikinn reiknar hve mörg blöð séu nauðsynleg. Síðan getur þú fest blöðin saman."
 
 #. kAHyQ
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:260
@@ -3624,11 +3609,11 @@ msgctxt "drawprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated pages"
 msgstr "Flísaleggja síðu með endurteknum síðum"
 
-#. T6HHy
+#. dBYC3
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:269
 msgctxt "drawprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
-msgstr "Tilgreinir að síðurnar verði prentaðar flísalagt. Ef síður eða skyggnur eru minni en pappírinn, eru síður eða skyggnur endurteknar á hverri blaðsíðu."
+msgid "Specifies that pages are to be printed in tiled format. If the pages are smaller than the paper, the page will be repeated multiple times on one sheet of paper."
+msgstr ""
 
 #. qbU9A
 #: sd/uiconfig/sdraw/ui/drawprinteroptions.ui:285
@@ -3769,55 +3754,61 @@ msgid "_Title"
 msgstr "_Titill"
 
 #. KKC7D
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:188
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:189
 msgctxt "insertlayer|extended_tip|textview"
 msgid "Enter a description of the layer."
 msgstr "Settu inn lýsingu á laginu."
 
 #. g2K4k
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:199
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:200
 msgctxt "insertlayer|description"
 msgid "_Description"
 msgstr "_Lýsing"
 
 #. DTUy2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:215
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:228
 msgctxt "insertlayer|visible"
 msgid "_Visible"
 msgstr "_Sýnileg"
 
 #. oXY4U
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:223
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:236
 msgctxt "insertlayer|extended_tip|visible"
 msgid "Show or hide the layer."
 msgstr "Birta eða fela lagið."
 
 #. BtGRo
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:235
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:248
 msgctxt "insertlayer|printable"
 msgid "_Printable"
 msgstr "_Prentanlegt"
 
 #. VASG2
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:243
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:256
 msgctxt "insertlayer|extended_tip|printable"
 msgid "When printing, print or ignore this particular layer."
 msgstr "Prenta eða hunsa þetta lag við prentun."
 
 #. E6EKN
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:255
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:268
 msgctxt "insertlayer|locked"
 msgid "_Locked"
 msgstr "_Læst"
 
 #. uaSTH
-#: sd/uiconfig/sdraw/ui/insertlayer.ui:263
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:276
 msgctxt "insertlayer|extended_tip|locked"
 msgid "Prevent elements on the layer from being edited."
 msgstr "Koma í veg fyrir að  atriðum á laginu sé breytt."
 
-#. ogtGC
+#. WzZxq
 #: sd/uiconfig/sdraw/ui/insertlayer.ui:292
+msgctxt "insertlayer|properties"
+msgid "Properties"
+msgstr ""
+
+#. ogtGC
+#: sd/uiconfig/sdraw/ui/insertlayer.ui:321
 msgctxt "insertlayer|extended_tip|InsertLayerDialog"
 msgid "Inserts a new layer in the document. Layers are only available in Draw, not in Impress."
 msgstr "Setur inn nýtt lag í skjalið. Lög eru aðeins í boði í Draw, ekki í Impress."
@@ -3850,13 +3841,19 @@ msgstr "Tengi_ll"
 #: sd/uiconfig/sdraw/ui/insertslidesdialog.ui:121
 msgctxt "insertslidesdialog|extended_tip|links"
 msgid "Inserts a file or some file elements as a link that is automatically updated when the source file is modified."
-msgstr ""
+msgstr "Setur inn sem tengil skrá eða hluta úr skrá sem uppfærist þegar þessari upprunaskrá er breytt."
 
 #. 4X9cK
 #: sd/uiconfig/sdraw/ui/namedesign.ui:8
 msgctxt "namedesign|NameDesignDialog"
 msgid "Name HTML Design"
 msgstr "Nefna HTML-hönnun"
+
+#. PGoPa
+#: sd/uiconfig/sdraw/ui/navigatorcontextmenu.ui:12
+msgctxt "navigatorcontextmenu|STR_RENAME"
+msgid "Rename..."
+msgstr ""
 
 #. V3FWt
 #: sd/uiconfig/sdraw/ui/notebookbar.ui:3162
@@ -3895,189 +3892,189 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. S5FkE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5619
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5596
 msgctxt "drawnotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. Z3UCg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:5723
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:5700
 msgctxt "drawnotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. TVDXM
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6423
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6400
 msgctxt "drawnotebookbar|PageMenuButton"
 msgid "_Layout"
 msgstr "_Framsetning"
 
 #. Rv7x4
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:6508
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:6485
 msgctxt "drawnotebookbar|PageLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. BQcfo
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7046
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7023
 msgctxt "drawnotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. prpcY
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:7129
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:7106
 msgctxt "drawnotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "Yfi~rfara"
 
 #. EiuB6
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8158
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8135
 msgctxt "drawnotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. EF3TH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:8243
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:8220
 msgctxt "drawnotebookbar|ViewLabel"
 msgid "~View"
 msgstr "S~koða"
 
 #. 94L75
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9588
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9565
 msgctxt "drawnotebookbar|TextMenuButton"
 msgid "T_ext"
 msgstr "T_exti"
 
 #. PQtWE
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:9683
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:9660
 msgctxt "drawnotebookbar|ReferencesLabel"
 msgid "T~ext"
 msgstr "T~exti"
 
 #. tNq7H
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10585
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10562
 msgctxt "drawnotebookbar|TableMenuButton"
 msgid "_Table"
 msgstr "_Tafla"
 
 #. 9pJGh
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:10669
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:10646
 msgctxt "drawnotebookbar|TableLabel"
 msgid "~Table"
 msgstr "~Tafla"
 
 #. ECD4J
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11196
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:12513
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14307
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11173
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:12490
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14284
 msgctxt "drawnotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Umbreyta"
 
 #. 4Z6aZ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11864
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11841
 msgctxt "drawnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
 msgstr "M_ynd"
 
 #. 7FoFi
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:11973
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:11950
 msgctxt "drawnotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "M~ynd"
 
 #. 6SADm
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13724
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13701
 msgctxt "drawnotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "Tei_kna"
 
 #. 6S8qN
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:13830
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:13807
 msgctxt "drawnotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "Tei~kna"
 
 #. QAEDd
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14663
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14640
 msgctxt "drawnotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Hlutur"
 
 #. SL4NA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:14770
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:14747
 msgctxt "drawnotebookbar|ObjectLabel"
 msgid "~Object"
 msgstr "~Hlutur"
 
 #. 4aAxG
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15271
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15248
 msgctxt "drawnotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Margmiðlun"
 
 #. ed3LH
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:15375
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:15352
 msgctxt "drawnotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Margmiðlun"
 
 #. FAL6c
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16183
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16160
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. oaAJU
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:16267
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:16244
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. ZBVGA
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17054
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17031
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "3_d"
 msgstr "Þríví_dd"
 
 #. fEyRX
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17161
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17138
 msgctxt "DrawNotebookbar|FormLabel"
 msgid "3~d"
 msgstr "Þríví~dd"
 
 #. 7ZLQw
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17685
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17662
 msgctxt "DrawNotebookbar|FormMenuButton"
 msgid "_Master"
 msgstr "_Yfirsíða"
 
 #. oiXVg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17769
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17746
 msgctxt "DrawNotebookbar|MasterLabel"
 msgid "~Master"
 msgstr "~Yfirsíða"
 
 #. yzvja
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17826
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17803
 msgctxt "drawnotebookbar|FormMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. L3eG5
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:17900
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:17877
 msgctxt "drawnotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. dkNUg
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18812
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18789
 msgctxt "drawnotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. Je8XQ
-#: sd/uiconfig/sdraw/ui/notebookbar.ui:18896
+#: sd/uiconfig/sdraw/ui/notebookbar.ui:18873
 msgctxt "drawnotebookbar|DevLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -4113,181 +4110,181 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. ZDsWu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5546
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5507
 msgctxt "notebookbar_draw_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. d8cey
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5597
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:5558
 msgctxt "notebookbar_draw_compact|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. kkPza
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6296
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6257
 msgctxt "notebookbar_draw_compact|LayoutMenuButton"
 msgid "Layout"
 msgstr "Útlit"
 
 #. 2wBCF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6348
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6309
 msgctxt "notebookbar_draw_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. GG7uL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6863
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6824
 msgctxt "notebookbar_draw_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. twxEq
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6915
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:6876
 msgctxt "notebookbar_draw_compact|ReviewLabel"
 msgid "~Review"
 msgstr "Yfi~rfara"
 
 #. H5eNL
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7610
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7571
 msgctxt "notebookbar_draw_compact|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. GGEXu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7662
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:7623
 msgctxt "notebookbar_draw_compact|ViewLabel"
 msgid "~View"
 msgstr "S~koða"
 
 #. CqEAM
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9144
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9105
 msgctxt "notebookbar_draw_compact|TextMenuButton"
 msgid "T_ext"
 msgstr "T_exti"
 
 #. LFcJC
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9198
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:9159
 msgctxt "notebookbar_draw_compact|ReferencesLabel"
 msgid "T~ext"
 msgstr "T~exti"
 
 #. sdACh
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10891
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10852
 msgctxt "notebookbar_draw_compact|TableMenuButton"
 msgid "T_able"
 msgstr "T_afla"
 
 #. GEmbu
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10942
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:10903
 msgctxt "notebookbar_draw_compact|TableLabel"
 msgid "~Table"
 msgstr "~Tafla"
 
 #. EGCcN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12291
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12252
 msgctxt "notebookbar_draw_compact|ImageMenuButton"
 msgid "Image"
 msgstr "Mynd"
 
 #. 2eQcW
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12343
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:12304
 msgctxt "notebookbar_draw_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "M~ynd"
 
 #. CezAN
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14177
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14138
 msgctxt "notebookbar_draw_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "Tei_kna"
 
 #. tAMd5
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14232
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:14193
 msgctxt "notebookbar_draw_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "Tei~kna"
 
 #. A49xv
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15231
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15192
 msgctxt "notebookbar_draw_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Hlutur"
 
 #. 3gubF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15287
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:15248
 msgctxt "notebookbar_draw_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Hlutur"
 
 #. fDRf9
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16432
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16393
 msgctxt "notebookbar_draw_compact|MediaButton"
 msgid "_Media"
 msgstr "_Margmiðlun"
 
 #. dAbX4
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16486
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:16447
 msgctxt "notebookbar_draw_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Myndefni"
 
 #. SCSH8
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17723
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17684
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. vzdXF
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17778
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:17739
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. zEK2o
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18299
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18260
 msgctxt "notebookbar_draw_compact|PrintPreviewButton"
 msgid "_Master"
 msgstr "_Yfirsíða"
 
 #. S3huE
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18351
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:18312
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "~Master"
 msgstr "~Yfirsíða"
 
 #. T3Z8R
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19313
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19274
 msgctxt "notebookbar_draw_compact|FormButton"
 msgid "3_d"
 msgstr "Þríví_dd"
 
 #. ZCuDe
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19368
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19329
 msgctxt "notebookbar_draw_compact|FormLabel"
 msgid "3~d"
 msgstr "Þríví~dd"
 
 #. YpLRj
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19447
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19408
 msgctxt "notebookbar_draw_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. uRrEt
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19505
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:19466
 msgctxt "notebookbar_draw_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. L3xmd
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20506
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20467
 msgctxt "notebookbar_draw_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. LhBTk
-#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20558
+#: sd/uiconfig/sdraw/ui/notebookbar_compact.ui:20519
 msgctxt "notebookbar_draw_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -4533,7 +4530,7 @@ msgstr "Forskoða"
 #: sd/uiconfig/sdraw/ui/vectorize.ui:52
 msgctxt "vectorize|extended_tip|preview"
 msgid "Previews the converted image without applying the changes."
-msgstr ""
+msgstr "Forskoðar umbreyttu myndina án þess að virkja breytingarnar."
 
 #. 4LBUQ
 #: sd/uiconfig/sdraw/ui/vectorize.ui:126
@@ -4569,7 +4566,7 @@ msgstr "Stærð flísa:"
 #: sd/uiconfig/sdraw/ui/vectorize.ui:210
 msgctxt "vectorize|extended_tip|tiles"
 msgid "Enter the size of the rectangle for the background fill."
-msgstr ""
+msgstr "Settu inn stærð ferhyrningsins fyrir bakgrunnsfyllinguna."
 
 #. 2jDqG
 #: sd/uiconfig/sdraw/ui/vectorize.ui:221
@@ -4713,7 +4710,7 @@ msgstr "Hröðun í byrjun"
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:117
 msgctxt "customanimationeffecttab|extended_tip|smooth_start"
 msgid "Enable this option to assign a gradually increasing speed to the start of the effect."
-msgstr ""
+msgstr "Virkjaðu þennan möguleika til að úthluta stigvaxandi hraða á upphaf brellu."
 
 #. C7CRJ
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:129
@@ -4725,7 +4722,7 @@ msgstr "Hæging við endi"
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:136
 msgctxt "customanimationeffecttab|extended_tip|smooth_end"
 msgid "Enable this option to assign a gradually decreasing speed to the end of the effect."
-msgstr ""
+msgstr "Virkjaðu þennan möguleika til að úthluta stigminnkandi hraða á enda brellu."
 
 #. n6GjH
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:159
@@ -4761,7 +4758,7 @@ msgstr "De_kkja lit:"
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:258
 msgctxt "customanimationeffecttab|extended_tip|sound_list"
 msgid "Select a sound from the Gallery or select one of the special entries."
-msgstr ""
+msgstr "Veldu hljóð úr safninu eða veldu eina af sérfærslunum."
 
 #. XcRTu
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:278
@@ -4773,19 +4770,19 @@ msgstr "Spilar völdu hljóðskrána."
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:309
 msgctxt "customanimationeffecttab|extended_tip|dim_color_list"
 msgid "Select the dim color."
-msgstr ""
+msgstr "Veldu dekkingarlitinn."
 
 #. qAefu
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:327
 msgctxt "customanimationeffecttab|text_delay_label"
 msgid "Delay between characters"
-msgstr ""
+msgstr "Töf á milli stafa"
 
 #. DQV2T
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:348
 msgctxt "customanimationeffecttab|extended_tip|text_delay"
 msgid "Specifies the percentage of delay between animations of words or letters."
-msgstr ""
+msgstr "Tilgreinir prósentuhlutfall tafar á milli hreyfinga á orðum eða stöfum."
 
 #. mimJe
 #: sd/uiconfig/simpress/ui/customanimationeffecttab.ui:372
@@ -4975,7 +4972,7 @@ msgstr "Textahreyfing"
 #: sd/uiconfig/simpress/ui/customanimationspanel.ui:140
 msgctxt "customanimationspanel|extended_tip|custom_animation_list"
 msgid "The animation list displays all animations for the current slide."
-msgstr ""
+msgstr "Listinn yfir hreyfimyndir sýnir allar hreyfimyndir í í fyrirliggjandi skyggnu."
 
 #. VBxbo
 #: sd/uiconfig/simpress/ui/customanimationspanel.ui:171
@@ -5245,7 +5242,7 @@ msgstr "Sjálfvirkt _eftir:"
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:70
 msgctxt "customanimationtexttab|extended_tip|auto_after"
 msgid "If \"Group text - By 1st level paragraphs\" is selected, the paragraphs are animated one after the other."
-msgstr ""
+msgstr "Ef \"Hópa texta - Eftir 1. stigs málsgreinum\" er valið, verða málsgreinar hreyfðar hver á eftir annarri."
 
 #. KEqJZ
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:84
@@ -5293,19 +5290,19 @@ msgstr "Eftir 5. stigs málsgreinum"
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:94
 msgctxt "customanimationtexttab|extended_tip|group_text_list"
 msgid "Specifies how multiple paragraphs are animated"
-msgstr ""
+msgstr "Tilgreinir hvernig hreyfingu er beitt á margar málsgreinar"
 
 #. LDD3y
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:112
 msgctxt "customanimationtexttab|animate_shape"
 msgid "Animate attached _shape"
-msgstr "Láta tengt form hreyfast"
+msgstr "Láta tengt _form hreyfast"
 
 #. T6S58
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:120
 msgctxt "customanimationtexttab|extended_tip|animate_shape"
 msgid "Deselect this box to animate only the text, not the shape."
-msgstr ""
+msgstr "Afvelja þennan reit til að hreyfa einungis textann, ekki lögunina."
 
 #. ir4kZ
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:132
@@ -5317,7 +5314,7 @@ msgstr "Í öfugr_i röð"
 #: sd/uiconfig/simpress/ui/customanimationtexttab.ui:140
 msgctxt "customanimationtexttab|extended_tip|reverse_order"
 msgid "Animates the paragraphs in reverse order."
-msgstr ""
+msgstr "Hreyfir málsgreinarnar í öfugri röð."
 
 #. QGBar
 #: sd/uiconfig/simpress/ui/customanimationtimingtab.ui:44
@@ -5425,7 +5422,7 @@ msgstr "Vistar allar breytingar og lokar glugga."
 #: sd/uiconfig/simpress/ui/customslideshows.ui:137
 msgctxt "customslideshows|extended_tip|customshowlist"
 msgid "Lists the custom slide shows that are available."
-msgstr ""
+msgstr "Telur upp tiltækar sérsniðnar skyggnusýningar."
 
 #. 3qYYK
 #: sd/uiconfig/simpress/ui/customslideshows.ui:174
@@ -5455,10 +5452,10 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/customslideshows.ui:231
 msgctxt "customslideshows|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. 8Cf3C
-#: sd/uiconfig/simpress/ui/customslideshows.ui:267
+#: sd/uiconfig/simpress/ui/customslideshows.ui:264
 msgctxt "customslideshows|extended_tip|CustomSlideShows"
 msgid "Defines a custom slide show using slides within the current presentation. You can then pick slides to meet the needs of your audience. You can create as many custom slide shows as you want."
 msgstr ""
@@ -5563,7 +5560,7 @@ msgstr "_Fast"
 #: sd/uiconfig/simpress/ui/dlgfield.ui:108
 msgctxt "dlgfield|extended_tip|fixedRB"
 msgid "Displays the content of the field when the field was inserted."
-msgstr ""
+msgstr "Birtir efni gagnasviðsins eins og það var þegar gagnasviðið var sett inn."
 
 #. VKhAG
 #: sd/uiconfig/simpress/ui/dlgfield.ui:120
@@ -5575,7 +5572,7 @@ msgstr "_Breytilegt"
 #: sd/uiconfig/simpress/ui/dlgfield.ui:129
 msgctxt "dlgfield|extended_tip|varRB"
 msgid "Displays the current value of the field."
-msgstr ""
+msgstr "Birtir núverandi gildi gagnasviðsins."
 
 #. RAGYv
 #: sd/uiconfig/simpress/ui/dlgfield.ui:145
@@ -5599,7 +5596,7 @@ msgstr "Veldu tungumál fyrir reitinn."
 #: sd/uiconfig/simpress/ui/dlgfield.ui:222
 msgctxt "dlgfield|extended_tip|formatLB"
 msgid "Select a display format for the field."
-msgstr ""
+msgstr "Veldu birtingarsnið fyrir reitinn."
 
 #. fmuQT
 #: sd/uiconfig/simpress/ui/dlgfield.ui:231
@@ -5611,7 +5608,7 @@ msgstr "_Snið"
 #: sd/uiconfig/simpress/ui/dlgfield.ui:264
 msgctxt "dlgfield|extended_tip|EditFieldsDialog"
 msgid "Edits the properties of an inserted field."
-msgstr ""
+msgstr "Breytir eiginleikum innsetts gagnasviðs."
 
 #. daSn5
 #: sd/uiconfig/simpress/ui/dockinganimation.ui:96
@@ -5737,7 +5734,7 @@ msgstr "Bitamyndahlutur"
 #: sd/uiconfig/simpress/ui/dockinganimation.ui:345
 msgctxt "dockinganimation|extended_tip|bitmap"
 msgid "Combines images into a single image."
-msgstr ""
+msgstr "Sameinar myndir í eina mynd."
 
 #. TjdBX
 #: sd/uiconfig/simpress/ui/dockinganimation.ui:363
@@ -5989,7 +5986,7 @@ msgstr ""
 #: sd/uiconfig/simpress/ui/headerfooterdialog.ui:52
 msgctxt "headerfooterdialog|extended_tip|apply"
 msgid "Applies the current settings to the selected slides."
-msgstr ""
+msgstr "Beitir fyrirliggjandi stillingum á valdar skyggnur."
 
 #. WcG5C
 #: sd/uiconfig/simpress/ui/headerfooterdialog.ui:145
@@ -6073,7 +6070,7 @@ msgstr "_Breytilegt"
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:207
 msgctxt "headerfootertab|extended_tip|rb_auto"
 msgid "Displays the date and time that the slide was created. Select a date format from the list."
-msgstr ""
+msgstr "Birtir dagsetningu og tíma þegar skyggnan var búin til. Veldu dagsetningasnið úr listanum."
 
 #. fXSJq
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:229
@@ -6091,7 +6088,7 @@ msgstr "_Tungumál:"
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:258
 msgctxt "headerfootertab|extended_tip|datetime_format_list"
 msgid "Displays the date and time that the slide was created. Select a date format from the list."
-msgstr ""
+msgstr "Birtir dagsetningu og tíma þegar skyggnan var búin til. Veldu dagsetningasnið úr listanum."
 
 #. mDMwW
 #: sd/uiconfig/simpress/ui/headerfootertab.ui:271
@@ -6325,7 +6322,7 @@ msgstr "Dreifa á mörgum blöðum"
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:390
 msgctxt "impressprinteroptions|extended_tip|distributeonmultiple"
 msgid "Prints a large format document, such as a poster or banner, by distributing the document page across multiple sheets of paper. The distribution option calculates how many sheets of paper are needed. You can then piece together the sheets."
-msgstr ""
+msgstr "Prentar út stór snið skjala, eins og t.d. kynningarspjöld eða borða, með því að dreifa skjalinu á mörg pappírsblöð. Dreifingareiginleikinn reiknar hve mörg blöð séu nauðsynleg. Síðan getur þú fest blöðin saman."
 
 #. gCjUa
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:402
@@ -6333,10 +6330,10 @@ msgctxt "impressprinteroptions|tilesheet"
 msgid "Tile sheet of paper with repeated slides"
 msgstr "Flísaleggja síðu með endurteknum skyggnum"
 
-#. BkFHA
+#. NDyEg
 #: sd/uiconfig/simpress/ui/impressprinteroptions.ui:411
 msgctxt "impressprinteroptions|extended_tip|tilesheet"
-msgid "Specifies that pages are to be printed in tiled format. If the pages or slides are smaller than the paper, repeat the pages or slides on one sheet of paper."
+msgid "Specifies that slides are to be printed in tiled format. If the slides are smaller than the paper, the slide will be repeated multiple times on one sheet of paper."
 msgstr ""
 
 #. xa7tq
@@ -6433,7 +6430,7 @@ msgstr "_Finna"
 #: sd/uiconfig/simpress/ui/interactionpage.ui:330
 msgctxt "interactionpage|extended_tip|find"
 msgid "Searches for the specified slide or object."
-msgstr ""
+msgstr "Leitar að tiltekinni skyggnu eða hlut."
 
 #. WCrdD
 #: sd/uiconfig/simpress/ui/interactionpage.ui:361
@@ -6445,31 +6442,31 @@ msgstr "Slóðarheiti"
 #: sd/uiconfig/simpress/ui/interactionpage.ui:362
 msgctxt "interactionpage|extended_tip|sound"
 msgid "Enter a path to the audio file you want to open, or click Browse to locate the file."
-msgstr ""
+msgstr "Settu inn slóð á hljóðskrána sem þú vilt opna eða smelltu á 'Skoða' til að staðsetja skrána."
 
 #. bnuz3
 #: sd/uiconfig/simpress/ui/interactionpage.ui:381
 msgctxt "interactionpage|extended_tip|bookmark"
 msgid "Enter the name of the slide or the object that you want to look for."
-msgstr ""
+msgstr "Settu inn heiti skyggnunnar eða hlutarins sem þú vilt finna."
 
 #. aFqHG
 #: sd/uiconfig/simpress/ui/interactionpage.ui:400
 msgctxt "interactionpage|extended_tip|document"
 msgid "Enter a path to the file you want to open, or click Browse to locate the file."
-msgstr ""
+msgstr "Settu inn slóð á skrána sem þú vilt opna eða smelltu á 'Skoða' til að staðsetja skrána."
 
 #. ZTeCG
 #: sd/uiconfig/simpress/ui/interactionpage.ui:419
 msgctxt "interactionpage|extended_tip|program"
 msgid "Enter a path to the program you want to start, or click Browse to locate the program."
-msgstr ""
+msgstr "Settu inn slóð á forritið sem þú vilt ræsa eða smelltu á 'Skoða' til að staðsetja skrána."
 
 #. Mocvx
 #: sd/uiconfig/simpress/ui/interactionpage.ui:438
 msgctxt "interactionpage|extended_tip|macro"
 msgid "Enter a path to the macro you want to run, or click Browse to locate the macro."
-msgstr ""
+msgstr "Settu inn slóð á fjölvann sem þú vilt keyra eða smelltu á 'Skoða' til að staðsetja fjölvann."
 
 #. UwxJE
 #: sd/uiconfig/simpress/ui/interactionpage.ui:473
@@ -6490,13 +6487,13 @@ msgid "_Insert Slide"
 msgstr "Setja _inn skyggnu"
 
 #. e84v4
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:55
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:60
 msgctxt "layoutwindow|label5"
 msgid "Horizontal"
 msgstr "Lárétt"
 
 #. usUqJ
-#: sd/uiconfig/simpress/ui/layoutwindow.ui:107
+#: sd/uiconfig/simpress/ui/layoutwindow.ui:112
 msgctxt "layoutwindow|label6"
 msgid "Vertical"
 msgstr "Lóðrétt"
@@ -6529,7 +6526,7 @@ msgstr "_Dagsetning/Tími"
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:120
 msgctxt "masterlayoutdlg|extended_tip|datetime"
 msgid "Adds a date/time placeholder to the master slide."
-msgstr ""
+msgstr "Bætir frátökutákni fyrir dagsetningu og tíma á yfirskyggnuna."
 
 #. SFrZg
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:132
@@ -6541,7 +6538,7 @@ msgstr "Síðu_fótur"
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:140
 msgctxt "masterlayoutdlg|extended_tip|footer"
 msgid "Adds a footer placeholder to the master slide."
-msgstr ""
+msgstr "Bætir frátökutákni fyrir síðufót á yfirskyggnuna."
 
 #. AyWZh
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:152
@@ -6553,7 +6550,7 @@ msgstr "_Blaðsíðunúmer"
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:160
 msgctxt "masterlayoutdlg|extended_tip|pagenumber"
 msgid "Adds a slide number placeholder to the master slide."
-msgstr ""
+msgstr "Bætir frátökutákni fyrir númer skyggnu á yfirskyggnuna."
 
 #. DEikC
 #: sd/uiconfig/simpress/ui/masterlayoutdlg.ui:172
@@ -6631,19 +6628,19 @@ msgstr "Virkur gluggi"
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:69
 msgctxt "navigatorpanel|extended_tip|documents"
 msgid "Lists currently open documents."
-msgstr ""
+msgstr "Gerir lista yfir þau skjöl sem eru opin."
 
 #. D6ag8
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:119
 msgctxt "navigatorpanel|STR_OBJECTS_TREE"
 msgid "Page Tree"
 msgstr "Greinaskoðun síðu"
 
 #. e6gMq
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:121
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:120
 msgctxt "navigatorpanel|extended_tip|tree"
 msgid "Lists available slides. Double-click a slide to make it the active slide."
-msgstr ""
+msgstr "Gerir lista yfir tiltækar skyggnur. Tvísmelltu á skyggnu til að gera hana virka."
 
 #. LKqE8
 #: sd/uiconfig/simpress/ui/navigatorpanel.ui:142
@@ -6658,79 +6655,79 @@ msgid "Jumps to the first page."
 msgstr "Hoppar á fyrstu síðuna."
 
 #. NWPFk
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:158
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:159
 msgctxt "navigatorpanel|previous|tooltip_text"
 msgid "Previous Slide"
 msgstr "Fyrri skyggna"
 
 #. PJUma
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:162
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:163
 msgctxt "navigatorpanel|extended_tip|previous"
 msgid "Moves back one page."
 msgstr "Fer aftur um eina síðu."
 
 #. bkvQE
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:174
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:176
 msgctxt "navigatorpanel|next|tooltip_text"
 msgid "Next Slide"
 msgstr "Næsta skyggna"
 
 #. zbUVG
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:178
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:180
 msgctxt "navigatorpanel|extended_tip|next"
 msgid "Move forward one page."
 msgstr "Fer áfram um eina síðu."
 
 #. FVSHF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:190
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:193
 msgctxt "navigatorpanel|last|tooltip_text"
 msgid "Last Slide"
 msgstr "Seinasta skyggna"
 
 #. aPU7Y
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:194
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:197
 msgctxt "navigatorpanel|extended_tip|last"
 msgid "Jumps to the last page."
 msgstr "Hoppar á síðustu síðuna."
 
 #. mHVom
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:218
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
 msgctxt "navigatorpanel|dragmode|tooltip_text"
 msgid "Drag Mode"
 msgstr "Dráttarhamur"
 
 #. BEJEZ
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:222
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:226
 msgctxt "navigatorpanel|extended_tip|dragmode"
 msgid "Drag and drop slides and named objects into the active slide."
-msgstr ""
+msgstr "Dragðu og slepptu skyggnur og nefnda hluti inn í virku skyggnuna."
 
 #. Qb5a9
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:234
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:239
 msgctxt "navigatorpanel|shapes|tooltip_text"
 msgid "Show Shapes"
 msgstr "Sýna form"
 
 #. EUeae
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:238
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:243
 msgctxt "navigatorpanel|extended_tip|shapes"
 msgid "In the submenu you can choose to display a list of all shapes or only the named shapes. Use drag-and-drop in the list to reorder the shapes. When you set the focus to a slide and press the Tab key, the next shape in the defined order is selected."
 msgstr ""
 
 #. DzQZC
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:261
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:266
 msgctxt "navigatorpanel|extended_tip|NavigatorPanel"
 msgid "Opens the Navigator, where you can quickly jump to other slides or move between open files."
-msgstr ""
+msgstr "Opnar uppbyggingargluggann, þar sem hægt er að stökkva í aðrar skyggnur eða fara á milli opinna skráa."
 
 #. pzb3K
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:272
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:277
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_NAMED_SHAPES"
 msgid "Named shapes"
 msgstr "Nefnd form"
 
 #. dLEPF
-#: sd/uiconfig/simpress/ui/navigatorpanel.ui:281
+#: sd/uiconfig/simpress/ui/navigatorpanel.ui:286
 msgctxt "navigatorpanel|STR_NAVIGATOR_SHOW_ALL_SHAPES"
 msgid "All shapes"
 msgstr "Öll form"
@@ -6772,201 +6769,201 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. 9GEAC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6031
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6008
 msgctxt "impressnotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. t3YwN
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6134
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6111
 msgctxt "impressnotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. 58fjG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6909
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6886
 msgctxt "impressnotebookbar|SlideMenuButton"
 msgid "_Layout"
 msgstr "_Framsetning"
 
 #. ArPLp
-#: sd/uiconfig/simpress/ui/notebookbar.ui:6994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:6971
 msgctxt "impressnotebookbar|LayoutLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. vRtjP
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7458
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7435
 msgctxt "impressnotebookbar|SlideShowMenuButton"
 msgid "_Slide Show"
 msgstr "_Skyggnusýning"
 
 #. nV5FC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:7542
+#: sd/uiconfig/simpress/ui/notebookbar.ui:7519
 msgctxt "impressnotebookbar|ReferencesLabel"
 msgid "~Slide Show"
 msgstr "Sk~yggnusýning"
 
 #. sDdGm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8078
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8055
 msgctxt "impressnotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. drk6E
-#: sd/uiconfig/simpress/ui/notebookbar.ui:8161
+#: sd/uiconfig/simpress/ui/notebookbar.ui:8138
 msgctxt "impressnotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "Yfirfa~ra"
 
 #. vjE5w
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9380
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9357
 msgctxt "impressnotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. KJK9J
-#: sd/uiconfig/simpress/ui/notebookbar.ui:9465
+#: sd/uiconfig/simpress/ui/notebookbar.ui:9442
 msgctxt "impressnotebookbar|ViewLabel"
 msgid "~View"
 msgstr "S~koða"
 
 #. bWC2b
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10359
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10336
 msgctxt "impressnotebookbar|TableMenuButton"
 msgid "_Table"
 msgstr "_Tafla"
 
 #. dmEJG
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10443
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10420
 msgctxt "impressnotebookbar|TableLabel"
 msgid "~Table"
 msgstr "~Tafla"
 
 #. Cn8TS
-#: sd/uiconfig/simpress/ui/notebookbar.ui:10968
-#: sd/uiconfig/simpress/ui/notebookbar.ui:12222
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14034
+#: sd/uiconfig/simpress/ui/notebookbar.ui:10945
+#: sd/uiconfig/simpress/ui/notebookbar.ui:12199
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14011
 msgctxt "impressnotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Umbreyta"
 
 #. do5DT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11638
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11615
 msgctxt "impressnotebookbar|GraphicMenuButton"
 msgid "Ima_ge"
 msgstr "M_ynd"
 
 #. XCSMA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:11747
+#: sd/uiconfig/simpress/ui/notebookbar.ui:11724
 msgctxt "impressnotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "M~ynd"
 
 #. nTy3C
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13449
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13426
 msgctxt "impressnotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "Tei_kna"
 
 #. BfNQD
-#: sd/uiconfig/simpress/ui/notebookbar.ui:13556
+#: sd/uiconfig/simpress/ui/notebookbar.ui:13533
 msgctxt "impressnotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Teikna"
 
 #. p3Faf
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14390
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14367
 msgctxt "impressnotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Hlutur"
 
 #. wL8mu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14497
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14474
 msgctxt "impressnotebookbar|ObjectLabel"
 msgid "~Object"
 msgstr "~Hlutur"
 
 #. AAosj
-#: sd/uiconfig/simpress/ui/notebookbar.ui:14998
+#: sd/uiconfig/simpress/ui/notebookbar.ui:14975
 msgctxt "impressnotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Margmiðlun"
 
 #. GgHEg
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15102
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15079
 msgctxt "impressnotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Margmiðlun"
 
 #. W9oCC
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15910
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15887
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. 7sAbT
-#: sd/uiconfig/simpress/ui/notebookbar.ui:15994
+#: sd/uiconfig/simpress/ui/notebookbar.ui:15971
 msgctxt "ImpressNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. aAdZJ
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16789
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16766
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "_Master"
 msgstr "_Yfirsíða"
 
 #. XAZEm
-#: sd/uiconfig/simpress/ui/notebookbar.ui:16873
+#: sd/uiconfig/simpress/ui/notebookbar.ui:16850
 msgctxt "ImpressNotebookbar|MasterLabel"
 msgid "~Master"
 msgstr "~Yfirsíða"
 
 #. DyZAq
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17683
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17660
 msgctxt "ImpressNotebookbar|FormMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. rUJFu
-#: sd/uiconfig/simpress/ui/notebookbar.ui:17767
+#: sd/uiconfig/simpress/ui/notebookbar.ui:17744
 msgctxt "ImpressNotebookbar|View2Label"
 msgid "~Outline"
 msgstr "~Efnisskipan"
 
 #. pA8DH
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18554
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18531
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "3_d"
 msgstr "Þríví_dd"
 
 #. xwrog
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18661
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18638
 msgctxt "impressnotebookbar|FormLabel"
 msgid "3~d"
 msgstr "Þríví~dd"
 
 #. syaDA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18718
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18695
 msgctxt "impressnotebookbar|FormMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. Nwrnv
-#: sd/uiconfig/simpress/ui/notebookbar.ui:18792
+#: sd/uiconfig/simpress/ui/notebookbar.ui:18769
 msgctxt "impressnotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. rBSXA
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19755
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19732
 msgctxt "impressnotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. DTNDB
-#: sd/uiconfig/simpress/ui/notebookbar.ui:19839
+#: sd/uiconfig/simpress/ui/notebookbar.ui:19816
 msgctxt "impressnotebookbar|DevLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -7002,181 +6999,181 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. 927AD
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5832
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5793
 msgctxt "notebookbar_impress_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. ZPHaB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5883
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:5844
 msgctxt "notebookbar_impress_compact|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. zEEiz
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6669
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6630
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "Layout"
 msgstr "Framsetning"
 
 #. EZeGS
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6721
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:6682
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. sMsGk
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7236
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7197
 msgctxt "notebookbar_impress_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. pZ4A3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7288
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7249
 msgctxt "notebookbar_impress_compact|ReviewLabel"
 msgid "~Review"
 msgstr "Yfirfa~ra"
 
 #. cRSR3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7825
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7786
 msgctxt "notebookbar_impress_compact|LayoutMenuButton"
 msgid "_Slide Show"
 msgstr "_Skyggnusýning"
 
 #. KAo9c
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7877
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:7838
 msgctxt "notebookbar_impress_compact|LayoutLabel"
 msgid "~Slide Show"
 msgstr "Sk~yggnusýning"
 
 #. URjcx
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8709
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8670
 msgctxt "notebookbar_impress_compact|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. SScpo
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8761
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:8722
 msgctxt "notebookbar_impress_compact|ViewLabel"
 msgid "~View"
 msgstr "S~koða"
 
 #. CzCMC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10445
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10406
 msgctxt "notebookbar_impress_compact|TableMenuButton"
 msgid "T_able"
 msgstr "Ta_fla"
 
 #. mnepU
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10496
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:10457
 msgctxt "notebookbar_impress_compact|TableLabel"
 msgid "~Table"
 msgstr "Ta~fla"
 
 #. BzXPB
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11843
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11804
 msgctxt "notebookbar_impress_compact|ImageMenuButton"
 msgid "Image"
 msgstr "Mynd"
 
 #. wD2ow
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11898
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:11859
 msgctxt "notebookbar_impress_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "M~ynd"
 
 #. ZqPYr
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13673
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13634
 msgctxt "notebookbar_impress_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "Tei_kna"
 
 #. 78DU3
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13725
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:13686
 msgctxt "notebookbar_impress_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "Tei~kna"
 
 #. uv2FE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14722
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14683
 msgctxt "notebookbar_impress_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Hlutur"
 
 #. FSjqt
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14774
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:14735
 msgctxt "notebookbar_impress_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Hlutur"
 
 #. t3Fmv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15917
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15878
 msgctxt "notebookbar_impress_compact|MediaButton"
 msgid "_Media"
 msgstr "_Margmiðlun"
 
 #. HbptL
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15968
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:15929
 msgctxt "notebookbar_impress_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Margmiðlun"
 
 #. NNqQ2
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17205
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17166
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. DpFpM
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17257
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17218
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. MNUFm
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18009
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:17970
 msgctxt "notebookbar_impress_compact|PrintPreviewButton"
 msgid "_Master"
 msgstr "_Yfirsíða"
 
 #. NUiWE
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18061
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18022
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "~Master"
 msgstr "~Yfirsíða"
 
 #. 4f9xG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19021
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:18982
 msgctxt "notebookbar_impress_compact|FormButton"
 msgid "3_d"
 msgstr "Þríví_dd"
 
 #. ntfL7
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19073
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19034
 msgctxt "notebookbar_impress_compact|FormLabel"
 msgid "3~d"
 msgstr "Þríví~dd"
 
 #. ntjaC
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19152
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19113
 msgctxt "notebookbar_impress_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. Tu5f8
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19210
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:19171
 msgctxt "notebookbar_impress_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. abvtG
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20211
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20172
 msgctxt "notebookbar_impress_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. oKhkv
-#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20263
+#: sd/uiconfig/simpress/ui/notebookbar_compact.ui:20224
 msgctxt "notebookbar_impress_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -7918,23 +7915,23 @@ msgctxt "extended_tip|enremotcont"
 msgid "Specifies that you want to enable Bluetooth remote control while Impress is running."
 msgstr ""
 
+#. dQSDT
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:149
+msgctxt "optimpressgeneralpage|enprsntconsfullscreen"
+msgid "Fullscreen presenter console"
+msgstr ""
+
+#. BPu2B
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:157
+msgctxt "extended_tip|enprsntconsfullscreen"
+msgid "Specifies that you want to show the Presenter Console in fullscreen mode."
+msgstr ""
+
 #. txHfw
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:153
+#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:172
 msgctxt "optimpressgeneralpage|label7"
 msgid "Presentation"
 msgstr "Kynning"
-
-#. 3BkYq
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:182
-msgctxt "optimpressgeneralpage|printermetrics"
-msgid "Us_e printer metrics for document formatting"
-msgstr "Nota stillingar pr_entara til að forma skjalið"
-
-#. mTuAd
-#: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:190
-msgctxt "extended_tip|printermetrics"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen. If this box is not checked, a printer independent layout will be used for screen display and printing."
-msgstr ""
 
 #. VVZZf
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:201
@@ -7976,7 +7973,7 @@ msgstr "_Mælieining:"
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:302
 msgctxt "extended_tip|units"
 msgid "Determines the Unit of measurement for presentations."
-msgstr ""
+msgstr "Skilgreinir mælieiningar fyrir skyggnukynningar."
 
 #. S8VMD
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:327
@@ -7988,7 +7985,7 @@ msgstr "Inn_dráttarmerki:"
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:350
 msgctxt "extended_tip|metricFields"
 msgid "Defines the spacing between tab stops."
-msgstr ""
+msgstr "Skilgreinir bil á milli inndráttarmerkja."
 
 #. oSmuC
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:367
@@ -8048,7 +8045,7 @@ msgstr "Einungis textasvæði er veljanlegt"
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:486
 msgctxt "extended_tip|textselected"
 msgid "Specifies whether to select a text box by clicking the text."
-msgstr ""
+msgstr "Tilgreinir hvort eigi að velja textareit með því að smella á textann."
 
 #. 9SB2g
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:501
@@ -8090,7 +8087,7 @@ msgstr "Kvarði"
 #: sd/uiconfig/simpress/ui/optimpressgeneralpage.ui:705
 msgctxt "extended_tip|OptSavePage"
 msgid "Defines the general options for drawing or presentation documents."
-msgstr ""
+msgstr "Skilgreinir almenna valkosti fyrir teikningar eða kynningaskjöl."
 
 #. sGCUC
 #: sd/uiconfig/simpress/ui/photoalbum.ui:16
@@ -8188,6 +8185,201 @@ msgctxt "photoalbum|insert_as_link_check"
 msgid "Link images"
 msgstr "Tengja myndir"
 
+#. c5owK
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:41
+msgctxt "pmimagespage|STR_REMOVE_CROP_AREA"
+msgid "_Delete cropped image areas"
+msgstr ""
+
+#. bw3Ac
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:55
+msgctxt "pmimagespage|STR_EMBED_LINKED_GRAPHICS"
+msgid "_Embed external images"
+msgstr ""
+
+#. vF2CP
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:76
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "Reduce _image resolution"
+msgstr ""
+
+#. aCEmS
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:92
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "<no change>"
+msgstr ""
+
+#. 7Jqdo
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:93
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "96 DPI (screen resolution)"
+msgstr ""
+
+#. JXujg
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:94
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "150 DPI (projector resolution)"
+msgstr ""
+
+#. 76mBF
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:95
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "300 DPI (print resolution)"
+msgstr ""
+
+#. G5zaJ
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:96
+msgctxt "pmimagespage|LB_RESOLUTION"
+msgid "600 DPI (print resolution)"
+msgstr ""
+
+#. 2hKhk
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:113
+msgctxt "pmimagespage|STR_LOSSLESS_COMPRESSION"
+msgid "_Lossless compression"
+msgstr ""
+
+#. GLtSt
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:128
+msgctxt "pmimagespage|STR_JPEG_COMPRESSION"
+msgid "_JPEG compression"
+msgstr ""
+
+#. 22Nif
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:152
+msgctxt "pmimagespage|STR_IMAGE_RESOLUTION"
+msgid "_Quality in %"
+msgstr ""
+
+#. xYnbA
+#: sd/uiconfig/simpress/ui/pmimagespage.ui:187
+msgctxt "pmimagespages|STR_GRAPHIC_OPTIMIZATION"
+msgid "Choose settings for optimizing images"
+msgstr ""
+
+#. w6qX4
+#: sd/uiconfig/simpress/ui/pminfodialog.ui:29
+msgctxt "pminfodialog|ask"
+msgid "_Open newly created presentation"
+msgstr ""
+
+#. 9HUiB
+#: sd/uiconfig/simpress/ui/pmintropage.ui:40
+msgctxt "pmintropage|STR_INTRODUCTION_T"
+msgid ""
+"The Presentation Minimizer is used to reduce the file size of the current presentation. Images will be compressed and data, that is no longer needed, will be removed.\n"
+"\n"
+"        At the last step of the wizard you can choose to apply the changes to the current presentation or to create an optimized new version of the presentation."
+msgstr ""
+
+#. WwLQG
+#: sd/uiconfig/simpress/ui/pmintropage.ui:73
+msgctxt "pmintropage:STR_REMOVE"
+msgid "_Delete"
+msgstr ""
+
+#. NPMR9
+#: sd/uiconfig/simpress/ui/pmintropage.ui:95
+msgctxt "pmintropage|STR_CHOSE_SETTINGS"
+msgid "_Choose settings for Presentation Minimizer"
+msgstr ""
+
+#. FtXuZ
+#: sd/uiconfig/simpress/ui/pmintropage.ui:120
+msgctxt "pmintropage|STR_INTRODUCTION"
+msgid "Introduction"
+msgstr ""
+
+#. kJS2d
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:36
+msgctxt "pmimagespage|STR_OLE_REPLACE"
+msgid "Create static replacement images for OLE objects"
+msgstr ""
+
+#. LkYsy
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:51
+msgctxt "pmobjectspage|STR_ALL_OLE_OBJECTS"
+msgid "For _all OLE objects"
+msgstr ""
+
+#. hocJG
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:67
+msgctxt "pmobjectspage|STR_ALIEN_OLE_OBJECTS_ONLY"
+msgid "_For OLE objects not based on OpenDocument format"
+msgstr ""
+
+#. CcCfe
+#: sd/uiconfig/simpress/ui/pmobjectspage.ui:106
+msgctxt "pmobjectspages|STR_OLE_OPTIMIZATION"
+msgid "Choose settings for replacing OLE objects"
+msgstr ""
+
+#. bRB3B
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:36
+msgctxt "pmslidespage|STR_DELETE_MASTER_PAGES"
+msgid "Delete unused _master slides"
+msgstr ""
+
+#. wDvum
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:50
+msgctxt "pmslidespage|STR_DELETE_HIDDEN_SLIDES"
+msgid "Delete hidden _slides"
+msgstr ""
+
+#. EoDRG
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:64
+msgctxt "pmslidespage|STR_CUSTOM_SHOW"
+msgid "Delete slides that are not used for the _custom slide show"
+msgstr ""
+
+#. TEzVE
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:97
+msgctxt "pmslidespage|STR_DELETE_NOTES_PAGES"
+msgid "_Clear notes"
+msgstr ""
+
+#. Jsmp2
+#: sd/uiconfig/simpress/ui/pmslidespage.ui:115
+msgctxt "pmslidespages|STR_CHOOSE_SLIDES"
+msgid "Choose which slides to delete"
+msgstr ""
+
+#. cBtLF
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:47
+msgctxt "pmsummarypage|STR_APPLY_TO_CURRENT"
+msgid "_Apply changes to current presentation"
+msgstr ""
+
+#. mBhDk
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:63
+msgctxt "pmsummarypage|STR_SAVE_AS"
+msgid "_Duplicate presentation before applying changes"
+msgstr ""
+
+#. PiAHE
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:105
+msgctxt "pmsummarypage|STR_SAVE_SETTINGS"
+msgid "_Save settings as"
+msgstr ""
+
+#. ExrdK
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:182
+msgctxt "pmsummarypage|STR_CURRENT_FILESIZE"
+msgid "Current file size:"
+msgstr ""
+
+#. ZcrFM
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:194
+msgctxt "pmsummarypage|STR_ESTIMATED_FILESIZE"
+msgid "Estimated new file size:"
+msgstr ""
+
+#. Ubstx
+#: sd/uiconfig/simpress/ui/pmsummarypage.ui:250
+msgctxt "pmsummarypages|STR_SUMMARY_TITLE"
+msgid "Choose where to apply the following changes"
+msgstr ""
+
 #. LAEo2
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:13
 msgctxt "presentationdialog|PresentationDialog"
@@ -8240,13 +8432,13 @@ msgstr "_Sérsniðin skyggnusýning:"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:201
 msgctxt "presentationdialog|extended_tip|customslideshow"
 msgid "Runs a custom slide show in the order that you defined in Slide Show - Custom Slide Show."
-msgstr ""
+msgstr "Keyrir sérsniðna skyggnusýningu í þeirri röð sem þú hefur skilgreint í 'Skyggnusýning - Sérsniðin skyggnusýning'."
 
 #. PG83u
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:220
 msgctxt "presentationdialog|extended_tip|customslideshow_cb"
 msgid "Runs a custom slide show in the order that you defined in Slide Show - Custom Slide Show."
-msgstr ""
+msgstr "Keyrir sérsniðna skyggnusýningu í þeirri röð sem þú hefur skilgreint í 'Skyggnusýning - Sérsniðin skyggnusýning'."
 
 #. 7vRFv
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:241
@@ -8318,7 +8510,7 @@ msgstr "Í _glugga"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:437
 msgctxt "presentationdialog|extended_tip|window"
 msgid "Slide show runs in the Impress program window."
-msgstr ""
+msgstr "Skyggnusýning keyrir í forritsglugga Impress."
 
 #. DAKWY
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:448
@@ -8378,7 +8570,7 @@ msgstr "Skipta _handvirkt um skyggnur"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:560
 msgctxt "presentationdialog|extended_tip|manualslides"
 msgid "Slides never change automatically when this box is selected."
-msgstr ""
+msgstr "Aldrei er skipt sjálfvirkt á milli skyggna þegar merkt er í þennan reit."
 
 #. e4tCG
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:571
@@ -8402,7 +8594,7 @@ msgstr "Músarbendill sem _penni"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:598
 msgctxt "presentationdialog|extended_tip|pointeraspen"
 msgid "Changes the mouse pointer to a pen which you can use to draw on slides during the presentation."
-msgstr ""
+msgstr "Breytir músarbendlinum í penna sem þú getur notað til að teikna á skyggnur á meðan kynningu stendur."
 
 #. YqoxU
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:609
@@ -8414,7 +8606,7 @@ msgstr "Hrey_fingar leyfðar"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:617
 msgctxt "presentationdialog|extended_tip|animationsallowed"
 msgid "Displays all frames of animated GIF files during the slide show."
-msgstr ""
+msgstr "Birtir alla ramma GIF-hreyfimynda á meðan skyggnusýningu stendur."
 
 #. ZvDVF
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:628
@@ -8426,7 +8618,7 @@ msgstr "Skipta um skyggnur með sme_lli á bakgrunn"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:636
 msgctxt "presentationdialog|extended_tip|changeslidesbyclick"
 msgid "Advances to the next slide when you click on the background of a slide."
-msgstr ""
+msgstr "Fer yfir á næstu skyggnu þegar þú smellir á bakgrunn skyggnu."
 
 #. tA4uX
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:647
@@ -8438,7 +8630,7 @@ msgstr "Kynningin er _alltaf efst"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:655
 msgctxt "presentationdialog|extended_tip|alwaysontop"
 msgid "The Impress window remains on top during the presentation. No other program will show its window in front of your presentation."
-msgstr ""
+msgstr "Impress-glugginn helst efstur á meðan kynningu stendur. Ekkert annað forrit getur birt glugga frá sér framan við kynninguna þína."
 
 #. zdH6V
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:673
@@ -8450,7 +8642,7 @@ msgstr "Valkostir"
 #: sd/uiconfig/simpress/ui/presentationdialog.ui:710
 msgctxt "presentationdialog|extended_tip|PresentationDialog"
 msgid "Defines settings for your slide show, including which slide to start from, the way you advance the slides, the type of presentation, and pointer options."
-msgstr ""
+msgstr "Skilgreinir stillingar fyrir skyggnusýninguna þína, þar með talið á hvaða skyggnu eigi að byrja, hvernig farið sé á milli skyggna, tegund kynningar og valkosti bendils."
 
 #. Byo4C
 #: sd/uiconfig/simpress/ui/prntopts.ui:33
@@ -8474,7 +8666,7 @@ msgstr "_Passa á síðu"
 #: sd/uiconfig/simpress/ui/prntopts.ui:64
 msgctxt "extended_tip|fittopgrb"
 msgid "Specifies whether to scale down objects that are beyond the margins of the current printer, so that they fit on the paper in the printer."
-msgstr ""
+msgstr "Tilgreinir hvort kvarða eigi niður hluti sem eru utan prentanlegra spássía á tilteknum prentara, þannig að þeir passi á pappírinn í prentaranum."
 
 #. 7Jqsg
 #: sd/uiconfig/simpress/ui/prntopts.ui:75
@@ -8516,31 +8708,31 @@ msgstr "Veldu möguleikann 'Bæklingur' til að prenta skjalið á bæklingsform
 #: sd/uiconfig/simpress/ui/prntopts.ui:143
 msgctxt "prntopts|frontcb"
 msgid "Fr_ont"
-msgstr "Fr_am"
+msgstr "Fr_amhlið"
 
 #. afFiH
 #: sd/uiconfig/simpress/ui/prntopts.ui:155
 msgctxt "extended_tip|frontcb"
 msgid "Select Front to print the front of a brochure."
-msgstr ""
+msgstr "Veldu Framhlið til að prenta framhlið bæklings."
 
 #. RmDFe
 #: sd/uiconfig/simpress/ui/prntopts.ui:167
 msgctxt "prntopts|backcb"
 msgid "Ba_ck"
-msgstr "A_ftur"
+msgstr "Ba_khlið"
 
 #. B3z27
 #: sd/uiconfig/simpress/ui/prntopts.ui:179
 msgctxt "extended_tip|backcb"
 msgid "Select Back to print the back of a brochure."
-msgstr ""
+msgstr "Veldu Bakhlið til að prenta bakhlið bæklings."
 
 #. NsWL6
 #: sd/uiconfig/simpress/ui/prntopts.ui:201
 msgctxt "prntopts|label3"
 msgid "Page Options"
-msgstr "Síðustillingar"
+msgstr "Valkostir síðu"
 
 #. Cwizr
 #: sd/uiconfig/simpress/ui/prntopts.ui:231
@@ -8588,7 +8780,7 @@ msgstr "_Faldar síður"
 #: sd/uiconfig/simpress/ui/prntopts.ui:300
 msgctxt "extended_tip|hiddenpgcb"
 msgid "Specifies whether to print the pages that are hidden from the presentation."
-msgstr ""
+msgstr "Tilgreinir hvort prenta eigi síður sem eru faldar í kynningunni."
 
 #. XuHA2
 #: sd/uiconfig/simpress/ui/prntopts.ui:315
@@ -8672,7 +8864,7 @@ msgstr "Innihald"
 #: sd/uiconfig/simpress/ui/prntopts.ui:539
 msgctxt "extended_tip|prntopts"
 msgid "Specifies print settings within a drawing or presentation document."
-msgstr ""
+msgstr "Tilgreinir prentstillingar innan teikningar eða kynningarskjals."
 
 #. QRYoE
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:21
@@ -8762,7 +8954,7 @@ msgstr "Virkja hönnunarsnið"
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:298
 msgctxt "publishingdialog|extended_tip|page1"
 msgid "Determines the settings for publishing Draw or Impress documents in HTML format."
-msgstr ""
+msgstr "Skilgreinir stillingar fyrir útgáfu Draw- eða Impress-skjala á HTML-sniði."
 
 #. 9Wotv
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:335
@@ -8966,7 +9158,7 @@ msgstr "Staðlað H_TML-snið"
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:904
 msgctxt "publishingdialog|extended_tip|standardRadiobutton"
 msgid "Creates standard HTML pages from export pages."
-msgstr ""
+msgstr "Útbýr staðlaðar HTML-síður úr útflutningssíðum."
 
 #. 2D85A
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:919
@@ -9038,7 +9230,7 @@ msgstr "Lág (_640 × 480 dílar)"
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:1132
 msgctxt "publishingdialog|extended_tip|resolution1Radiobutton"
 msgid "Select the low resolution to keep the file size small, even for presentations with many slides."
-msgstr ""
+msgstr "Veldu lágupplausn til að halda skráastærðinni lítilli, jafnvel fyrir kynningar með mörgum skyggnum."
 
 #. U7WAx
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:1144
@@ -9074,7 +9266,7 @@ msgstr "Fullt HD (1_920 × 1080 mynddílar)"
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:1195
 msgctxt "publishingdialog|extended_tip|resolution4Radiobutton"
 msgid "Select a full HD resolution for a very high-quality slide display."
-msgstr ""
+msgstr "Veldu fulla hágæðaupplausn fyrir mjög há gæði skyggnusýningar."
 
 #. zsvW6
 #: sd/uiconfig/simpress/ui/publishingdialog.ui:1211
@@ -9404,7 +9596,7 @@ msgstr "Skjár"
 #: sd/uiconfig/simpress/ui/sdviewpage.ui:114
 msgctxt "extended_tip|SdViewPage"
 msgid "Specifies the available display modes."
-msgstr ""
+msgstr "Skilgreinir alla tiltæka birtingarhami."
 
 #. 7DgNY
 #: sd/uiconfig/simpress/ui/sidebarslidebackground.ui:38
@@ -9626,7 +9818,7 @@ msgstr "Birtir glugga með tiltækum yfirskyggnum, þar sem þú getur valið fr
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:59
 msgctxt "slidetransitionspanel|extended_tip|transitions_icons"
 msgid "Select the slide transition you want to use for the selected slides."
-msgstr ""
+msgstr "Veldu þá skyggnuskiptingu sem þú vilt nota fyrir völdu skyggnurnar."
 
 #. VYdF2
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:100
@@ -9674,7 +9866,7 @@ msgstr "Annað hljóð..."
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:157
 msgctxt "slidetransitionspanel|extended_tip|sound_list"
 msgid "Lists sounds that can played during the slide transition."
-msgstr ""
+msgstr "Telur upp þau hljóð sem hægt er að spila við skyggnuskiptinguna."
 
 #. YUk3y
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:168
@@ -9698,7 +9890,7 @@ msgstr "Tilbrigði:"
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:206
 msgctxt "slidetransitionspanel|extended_tip|variant_list"
 msgid "Select a variation of the transition."
-msgstr ""
+msgstr "Veldu tilbrigði af millifærslunni."
 
 #. F6RuQ
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:224
@@ -9716,7 +9908,7 @@ msgstr "Við músarsmell"
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:263
 msgctxt "slidetransitionspanel|extended_tip|rb_mouse_click"
 msgid "Select to advance to the next slide on a mouse click."
-msgstr ""
+msgstr "Veldu þetta til að fara áfram á næstu skyggnu við músarsmell."
 
 #. bFejF
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:275
@@ -9752,7 +9944,7 @@ msgstr "Nota millifærslu á allar skyggnur"
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:357
 msgctxt "slidetransitionspanel|extended_tip|apply_to_all"
 msgid "Applies the selected slide transition to all slides in the current presentation document."
-msgstr ""
+msgstr "Virkjar valda millifærslu á allar skyggnur í fyrirliggjandi kynningarskjali."
 
 #. K7BfA
 #: sd/uiconfig/simpress/ui/slidetransitionspanel.ui:392
@@ -9825,6 +10017,78 @@ msgstr "Seinasti dá_lkur"
 msgctxt "tabledesignpanel|UseBandingColumnStyle"
 msgid "Ba_nded columns"
 msgstr "M_islitir dálkar"
+
+#. fKBVs
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:152
+msgctxt "tabledesignpanel|menunew"
+msgid "New"
+msgstr ""
+
+#. U5Noi
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:160
+msgctxt "tabledesignpanel|menuclone"
+msgid "Clone"
+msgstr ""
+
+#. ZsSkp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:168
+msgctxt "tabledesignpanel|menudelete"
+msgid "Delete"
+msgstr ""
+
+#. RWsRb
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:176
+msgctxt "tabledesignpanel|menureset"
+msgid "Reset"
+msgstr ""
+
+#. ZCDY2
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:184
+msgctxt "tabledesignpanel|menuformat"
+msgid "Format"
+msgstr ""
+
+#. 8myJL
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:194
+msgctxt "tabledesignpanel|menufirstrow"
+msgid "Header row..."
+msgstr ""
+
+#. ZeuD3
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:202
+msgctxt "tabledesignpanel|menulastrow"
+msgid "Total row..."
+msgstr ""
+
+#. 3yZqr
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:210
+msgctxt "tabledesignpanel|menuoddrows"
+msgid "Banded rows..."
+msgstr ""
+
+#. JzTgZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:224
+msgctxt "tabledesignpanel|menufirstcolumn"
+msgid "First column..."
+msgstr ""
+
+#. f5bFZ
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:232
+msgctxt "tabledesignpanel|menulastcolumn"
+msgid "Last column..."
+msgstr ""
+
+#. MhPWp
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:240
+msgctxt "tabledesignpanel|menuoddcolumns"
+msgid "Banded columns..."
+msgstr ""
+
+#. fUFnD
+#: sd/uiconfig/simpress/ui/tabledesignpanel.ui:254
+msgctxt "tabledesignpanel|menubody"
+msgid "Other cells..."
+msgstr ""
 
 #. FvyKu
 #: sd/uiconfig/simpress/ui/templatedialog.ui:8

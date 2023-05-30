@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-03-21 12:31+0100\n"
-"PO-Revision-Date: 2022-08-22 14:04+0000\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
+"PO-Revision-Date: 2023-02-04 06:43+0000\n"
 "Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textscalc00/de/>\n"
 "Language: de\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1564805193.000000\n"
 
 #. E9tti
@@ -268,14 +268,14 @@ msgctxt ""
 msgid "<variable id=\"awehe\">Choose <emph>View - Value Highlighting</emph>.</variable>"
 msgstr "<variable id=\"awehe\">Wählen Sie <emph>Ansicht – Werte hervorheben</emph>.</variable>"
 
-#. QGcfY
+#. qwAMw
 #: 00000403.xhp
 msgctxt ""
 "00000403.xhp\n"
 "par_id3148947\n"
 "help.text"
-msgid "<variable id=\"rechenleiste\">Choose <emph>View - Formula Bar</emph> or <emph>View - Toolbars - Formula Bar</emph>.</variable>"
-msgstr "<variable id=\"rechenleiste\">Wählen Sie <emph>Ansicht – Rechenleiste</emph> oder <emph>Ansicht – Symbolleisten – Rechenleiste</emph>.</variable>"
+msgid "<variable id=\"rechenleiste\">Choose <emph>View - Formula Bar</emph>.</variable>"
+msgstr "<variable id=\"rechenleiste\">Wählen Sie <emph>Ansicht - Rechenleiste</emph>.</variable>"
 
 #. G6udN
 #: 00000403.xhp
@@ -817,23 +817,23 @@ msgctxt ""
 msgid "<variable id=\"fotenb\">Choose <emph>Sheet - Show Sheet</emph>.</variable>"
 msgstr "<variable id=\"fotenb\">Wählen Sie <emph>Tabelle – Tabelle einblenden…</emph>.</variable>"
 
-#. bJzNC
+#. MwZaB
 #: 00000405.xhp
 msgctxt ""
 "00000405.xhp\n"
 "par_idN1077A\n"
 "help.text"
-msgid "<variable id=\"foste\">Choose <emph>Format - Page</emph>.</variable>"
-msgstr "<variable id=\"foste\">Wählen Sie <emph>Format – Seite…</emph>.</variable>"
+msgid "<variable id=\"foste\">Choose <emph>Format - Page Style</emph>.</variable>"
+msgstr "<variable id=\"foste\">WählenSie <emph>Format - Seitenvorlage</emph>.</variable>"
 
-#. KrDGC
+#. ds3hg
 #: 00000405.xhp
 msgctxt ""
 "00000405.xhp\n"
 "par_id3155508\n"
 "help.text"
-msgid "<variable id=\"fostel\">Choose <emph>Format - Page - Sheet</emph> tab.</variable>"
-msgstr "<variable id=\"fostel\">Wählen Sie <emph>Format – Seite… – Register: Tabelle</emph>.</variable>"
+msgid "<variable id=\"fostel\">Choose <emph>Format - Page Style - Sheet</emph> tab.</variable>"
+msgstr "<variable id=\"fostel\">Wählen Sie <emph>Format - Seitenvorlage... - Register: Tabelle</emph>.</variable>"
 
 #. CqGPT
 #: 00000405.xhp
@@ -880,6 +880,195 @@ msgctxt ""
 msgid "<variable id=\"fodbbe\">Choose <emph>Format - Print Ranges - Edit</emph>.</variable>"
 msgstr "<variable id=\"fodbbe\">Wählen Sie <emph>Format – Druckbereiche – Bearbeiten…</emph>.</variable>"
 
+#. 2mGMo
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3154618\n"
+"help.text"
+msgid "<variable id=\"bedingte\">Choose <menuitem>Format - Conditional - Condition</menuitem>.</variable>"
+msgstr "<variable id=\"bedingte\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Bedingung...</menuitem> .</variable>"
+
+#. 36aUL
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id141663543112100\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "Klicken Sie in der Symbolleiste <emph>Formatierung</emph> auf"
+
+#. VqVh2
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id1001663540244130\n"
+"help.text"
+msgid "<image src=\"cmd/lc_conditionalformatdialog.svg\" id=\"img_id461663540244131\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201663540244132\">Icon Conditional Format - Condition</alt></image>"
+msgstr "<image src=\"cmd/lc_conditionalformatdialog.svg\" id=\"img_id461663540244131\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id201663540244132\">Symbol für Bedingte Formatierung – Bedingung…</alt></image>"
+
+#. CdDAq
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id151663540244134\n"
+"help.text"
+msgid "Conditional Format"
+msgstr "Bedingte Formatierung"
+
+#. GBExF
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id31663542115011\n"
+"help.text"
+msgid "<variable id=\"conditionalcolorscale\">Choose <menuitem>Format - Conditional - Color Scale</menuitem></variable>"
+msgstr "<variable id=\"conditionalcolorscale\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Farbbalken...</menuitem></variable>"
+
+#. QPRux
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id211663543104186\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "Klicken Sie in der Symbolleiste <emph>Formatierung</emph> auf"
+
+#. ZHE33
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id431663540719713\n"
+"help.text"
+msgid "<image src=\"cmd/lc_colorscaleformatdialog.svg\" id=\"img_id551663540719714\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381663540719715\">Icon Color Scale</alt></image>"
+msgstr "<image src=\"cmd/lc_colorscaleformatdialog.svg\" id=\"img_id551663540719714\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id381663540719715\">Symbol für Farbbalken</alt></image>"
+
+#. UJbUX
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id841663540719717\n"
+"help.text"
+msgid "Color Scale"
+msgstr "Farbbalken"
+
+#. BCKnF
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id491663542108169\n"
+"help.text"
+msgid "<variable id=\"conditionaldatabar\">Choose <menuitem>Format - Conditional - Data Bar</menuitem></variable>"
+msgstr "<variable id=\"conditionaldatabar\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Datenbalken...</menuitem></variable>"
+
+#. YJvXG
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id81663543094977\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "Klicken Sie in der Symbolleiste <emph>Formatierung</emph> auf"
+
+#. qKAB8
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id301663541161943\n"
+"help.text"
+msgid "<image src=\"cmd/lc_databarformatdialog.svg\" id=\"img_id601663541161944\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id21663541161945\">Icon Data Bar</alt></image>"
+msgstr "<image src=\"cmd/lc_databarformatdialog.svg\" id=\"img_id601663541161944\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id21663541161945\">Symbol für Datenbalken</alt></image>"
+
+#. DhB6e
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id101663541161947\n"
+"help.text"
+msgid "Data Bar"
+msgstr "Datenbalken"
+
+#. AaxGU
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id851663542093712\n"
+"help.text"
+msgid "<variable id=\"conditionaliconset\">Choose <menuitem>Format - Conditional - Icon Set</menuitem></variable>"
+msgstr "<variable id=\"conditionaliconset\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Symbolsatz...</menuitem></variable>"
+
+#. j6oAH
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id501663543087343\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "Klicken Sie in der Symbolleiste <emph>Formatierung</emph> auf"
+
+#. BKDA9
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id51663541228728\n"
+"help.text"
+msgid "<image src=\"cmd/lc_iconsetformatdialog.svg\" id=\"img_id511663541228729\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261663541228730\">Icon Icon Set</alt></image>"
+msgstr "<image src=\"cmd/lc_iconsetformatdialog.svg\" id=\"img_id511663541228729\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id261663541228730\">Symbol für Symbolsatz</alt></image>"
+
+#. xL9EB
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id61663541228732\n"
+"help.text"
+msgid "Icon Set"
+msgstr "Symbolsatz"
+
+#. t4dp2
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id391663542070705\n"
+"help.text"
+msgid "<variable id=\"conditionaldate\">Choose <menuitem>Format - Conditional - Date</menuitem></variable>"
+msgstr "<variable id=\"conditionaldate\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Datum...</menuitem></variable>"
+
+#. bETCm
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id351663543077670\n"
+"help.text"
+msgid "On the <emph>Formatting</emph> bar, click"
+msgstr "Klicken Sie in der Symbolleiste <emph>Formatierung</emph> auf"
+
+#. dUBco
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id371663541317147\n"
+"help.text"
+msgid "<image src=\"cmd/lc_conddateformatdialog.svg\" id=\"img_id61663541317148\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id641663541317149\">Icon Date</alt></image>"
+msgstr "<image src=\"cmd/lc_conddateformatdialog.svg\" id=\"img_id61663541317148\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id641663541317149\">Symbol für Datum</alt></image>"
+
+#. TPxGF
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id121663541317151\n"
+"help.text"
+msgid "Date"
+msgstr "Datum"
+
+#. ZJawN
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id641663542045446\n"
+"help.text"
+msgid "<variable id=\"conditionalmanage\">Choose <menuitem>Format - Conditional - Manage</menuitem></variable>"
+msgstr "<variable id=\"conditionalmanage\">Wählen Sie <menuitem>Format - Bedingte Formatierung - Verwalten...</menuitem></variable>"
+
 #. gWWhE
 #: 00000405.xhp
 msgctxt ""
@@ -915,15 +1104,6 @@ msgctxt ""
 "help.text"
 msgid "AutoFormat"
 msgstr "AutoFormat"
-
-#. d2VYa
-#: 00000405.xhp
-msgctxt ""
-"00000405.xhp\n"
-"par_id3154618\n"
-"help.text"
-msgid "<variable id=\"bedingte\">Choose <emph>Format - Conditional</emph>.</variable>"
-msgstr "<variable id=\"bedingte\">Wählen Sie <emph>Format – Bedingte Formatierung</emph>.</variable>"
 
 #. aFWLc
 #: 00000406.xhp
@@ -1184,7 +1364,7 @@ msgctxt ""
 "par_id21645217233263\n"
 "help.text"
 msgid "Press <keycode>Shift</keycode>+<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F9</keycode>"
-msgstr "Drücken Sie <keycode>Umschalt</keycode>+<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Befehl</keycode></caseinline><defaultinline><keycode>Strg</keycode></defaultinline></switchinline>+<keycode>F9</keycode>"
+msgstr "Drücken Sie <switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Befehl</keycode></caseinline><defaultinline><keycode>Strg</keycode></defaultinline></switchinline><keycode>+Umschalt+F9</keycode>"
 
 #. soEE4
 #: 00000406.xhp
@@ -1778,7 +1958,7 @@ msgctxt ""
 "par_id3153297\n"
 "help.text"
 msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Current selection</emph>."
-msgstr "Wählen Sie <emph>Einfügen – Pivot-Tabelle…</emph> und aktivieren Sie im Dialog <emph>Quelle wählen</emph> die Option <emph>Aktuelle Auswahl</emph>."
+msgstr "Wählen Sie <emph>Einfügen – Pivot-Tabelle…</emph> und aktivieren Sie im Dialog <emph>Quelle auswählen</emph> die Option <emph>Aktuelle Auswahl</emph>."
 
 #. GACGc
 #: 00000412.xhp
@@ -1787,7 +1967,7 @@ msgctxt ""
 "par_id3145118\n"
 "help.text"
 msgid "Choose <emph>Insert - Pivot Table</emph>, in the <emph>Select Source</emph> dialog choose the option <emph>Data source registered in $[officename]</emph>, click <emph>OK</emph> to see <emph>Select Data Source</emph> dialog."
-msgstr "Wählen Sie <emph>Einfügen – Pivot-Tabelle…</emph> , aktivieren Sie im Dialog <emph>Quelle wählen</emph> die Option <emph>In $[officename] angemeldete Datenquelle</emph> und klicken Sie auf <emph>OK</emph>, um den Dialog <emph>Datenquelle auswählen</emph> zu öffnen."
+msgstr "Wählen Sie <emph>Einfügen – Pivot-Tabelle…</emph>, aktivieren Sie im Dialog <emph>Quelle auswählen</emph> die Option <emph>In $[officename] angemeldete Datenquelle</emph> und klicken Sie auf <emph>OK</emph>, um den Dialog <emph>Datenquelle auswählen</emph> zu öffnen."
 
 #. yTKVJ
 #: 00000412.xhp

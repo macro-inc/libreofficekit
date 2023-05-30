@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-04 16:15+0000\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2023-03-06 12:32+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
-"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/es/>\n"
+"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-7-5/desktopmessages/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1565190821.000000\n"
 
 #. v2iwK
@@ -919,11 +919,11 @@ msgctxt "extensionmanager|label1"
 msgid "Display Extensions"
 msgstr "Mostrar extensiones"
 
-#. yTB9y
+#. WREKY
 #: desktop/uiconfig/ui/extensionmanager.ui:162
 msgctxt "extensionmanager|search"
-msgid "Search ..."
-msgstr "Buscar ..."
+msgid "Search..."
+msgstr "Buscar…"
 
 #. BAVdg
 #: desktop/uiconfig/ui/extensionmanager.ui:191
@@ -1055,7 +1055,7 @@ msgstr "Rechazar"
 #: desktop/uiconfig/ui/licensedialog.ui:70
 msgctxt "licensedialog|head"
 msgid "Please follow these steps to proceed with the installation of the extension:"
-msgstr "Siga estos pasos para continuar con la instalación de la extensión:"
+msgstr "Siga estos pasos para proceder con la instalación de la extensión:"
 
 #. tEDSx
 #: desktop/uiconfig/ui/licensedialog.ui:92
@@ -1079,7 +1079,7 @@ msgstr "Lea el acuerdo completo. Utilice la barra de desplazamiento o el botón 
 #: desktop/uiconfig/ui/licensedialog.ui:160
 msgctxt "licensedialog|label5"
 msgid "Accept the License Agreement for the extension by pressing the 'Accept' button."
-msgstr "Si está de acuerdo con el contrato, pulse «Aceptar»."
+msgstr "Si está de acuerdo con el contrato, pulse en «Aceptar»."
 
 #. ydBcE
 #: desktop/uiconfig/ui/licensedialog.ui:173

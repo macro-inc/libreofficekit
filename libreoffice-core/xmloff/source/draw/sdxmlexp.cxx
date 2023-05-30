@@ -51,7 +51,7 @@
 #include <com/sun/star/util/MeasureUnit.hpp>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/gen.hxx>
 #include <sax/tools/converter.hxx>
 #include <xmloff/xmlaustp.hxx>
@@ -73,8 +73,9 @@
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 #include <com/sun/star/util/Color.hpp>
-
-#include <comphelper/sequenceashashmap.hxx>
+#include <docmodel/uno/UnoTheme.hxx>
+#include <docmodel/theme/Theme.hxx>
+#include <o3tl/enumrange.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -1610,7 +1611,7 @@ void SdXMLExport::ImpWritePresentationStyles()
 
 void SdXMLExport::ExportMeta_()
 {
-    uno::Sequence<beans::NamedValue> stats { { "ObjectCount", uno::makeAny(mnObjectCount) } };
+    uno::Sequence<beans::NamedValue> stats { { "ObjectCount", uno::Any(mnObjectCount) } };
 
     // update document statistics at the model
     uno::Reference<document::XDocumentPropertiesSupplier> xPropSup(GetModel(),
@@ -1693,7 +1694,7 @@ void SdXMLExport::ExportContent_()
                         if( nIndex != -1 )
                         {
                             OUString aFileName( aBookmarkURL.copy( 0, nIndex ) );
-                            OUString aBookmarkName( aBookmarkURL.copy( nIndex+1 ) );
+                            std::u16string_view aBookmarkName( aBookmarkURL.subView( nIndex+1 ) );
 
                             aBookmarkURL = GetRelativeReference( aFileName ) + "#" + aBookmarkName;
                         }
@@ -2031,6 +2032,8 @@ void SdXMLExport::collectAutoStyles()
     if (mbAutoStylesCollected)
         return;
 
+    css::uno::Sequence<OUString> aAutoStylePropNames = GetAutoStylePool()->GetPropertyNames();
+
     Reference< beans::XPropertySet > xInfoSet( getExportInfo() );
     if( xInfoSet.is() )
     {
@@ -2070,7 +2073,7 @@ void SdXMLExport::collectAutoStyles()
             {
                 Reference< XDrawPage > xHandoutPage( xHandoutSupp->getHandoutMasterPage() );
                 if( xHandoutPage.is() && xHandoutPage->getCount())
-                    GetShapeExport()->collectShapesAutoStyles( xHandoutPage );
+                    GetShapeExport()->collectShapesAutoStyles( xHandoutPage, aAutoStylePropNames );
             }
         }
 
@@ -2098,7 +2101,7 @@ void SdXMLExport::collectAutoStyles()
                 GetShapeExport()->setPresentationStylePrefix( aMasterPageNamePrefix );
 
                 if(xMasterPage.is() && xMasterPage->getCount())
-                    GetShapeExport()->collectShapesAutoStyles( xMasterPage );
+                    GetShapeExport()->collectShapesAutoStyles( xMasterPage, aAutoStylePropNames );
 
                 if(IsImpress())
                 {
@@ -2112,7 +2115,7 @@ void SdXMLExport::collectAutoStyles()
                             GetFormExport()->examineForms( xNotesPage );
 
                             if(xNotesPage->getCount())
-                                GetShapeExport()->collectShapesAutoStyles( xNotesPage );
+                                GetShapeExport()->collectShapesAutoStyles( xNotesPage, aAutoStylePropNames );
                         }
                     }
                 }
@@ -2163,7 +2166,7 @@ void SdXMLExport::collectAutoStyles()
 
                 // prepare object infos
                 if(xDrawPage.is() && xDrawPage->getCount())
-                    GetShapeExport()->collectShapesAutoStyles( xDrawPage );
+                    GetShapeExport()->collectShapesAutoStyles( xDrawPage, aAutoStylePropNames );
 
                 // prepare presentation notes page object infos (ONLY if presentation)
                 if(IsImpress())
@@ -2178,7 +2181,7 @@ void SdXMLExport::collectAutoStyles()
                             GetFormExport()->examineForms( xNotesPage );
 
                             if(xNotesPage->getCount())
-                                GetShapeExport()->collectShapesAutoStyles( xNotesPage );
+                                GetShapeExport()->collectShapesAutoStyles( xNotesPage, aAutoStylePropNames );
                         }
                     }
                 }
@@ -2365,56 +2368,42 @@ void SdXMLExport::exportFormsElement( const Reference< XDrawPage >& xDrawPage )
 
 void SdXMLExport::ExportThemeElement(const uno::Reference<drawing::XDrawPage>& xDrawPage)
 {
-    uno::Reference<beans::XPropertySet> xPropertySet(xDrawPage, uno::UNO_QUERY);
-    if (!xPropertySet.is())
-        return;
-
-    comphelper::SequenceAsHashMap aMap(xPropertySet->getPropertyValue("Theme"));
-    if (aMap.empty())
-    {
-        return;
-    }
-
     if ((getSaneDefaultVersion() & SvtSaveOptions::ODFSVER_EXTENDED) == 0)
     {
         // Do not export in standard ODF 1.3 or older.
         return;
     }
 
-    auto it = aMap.find("Name");
-    if (it != aMap.end())
-    {
-        OUString aName;
-        it->second >>= aName;
-        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, aName);
-    }
+    uno::Reference<beans::XPropertySet> xPropertySet(xDrawPage, uno::UNO_QUERY);
+    if (!xPropertySet.is())
+        return;
+
+    uno::Reference<util::XTheme> xTheme;
+    xPropertySet->getPropertyValue("Theme") >>= xTheme;
+    if (!xTheme.is())
+        return;
+
+    auto* pUnoTheme = dynamic_cast<UnoTheme*>(xTheme.get());
+    if (!pUnoTheme)
+        return;
+
+    auto pTheme = pUnoTheme->getTheme();
+
+    if (!pTheme->GetName().isEmpty())
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, pTheme->GetName());
     SvXMLElementExport aTheme(*this, XML_NAMESPACE_LO_EXT, XML_THEME, true, true);
 
-    uno::Sequence<util::Color> aColors;
-    it = aMap.find("ColorScheme");
-    if (it != aMap.end())
-    {
-        it->second >>= aColors;
-    }
-    if (!aColors.hasElements())
-    {
-        return;
-    }
-
-    it = aMap.find("ColorSchemeName");
-    if (it != aMap.end())
-    {
-        OUString aName;
-        it->second >>= aName;
-        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, aName);
-    }
+    auto* pColorSet = pTheme->GetColorSet();
+    if (!pColorSet->getName().isEmpty())
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, pColorSet->getName());
     SvXMLElementExport aColorTable(*this, XML_NAMESPACE_LO_EXT, XML_COLOR_TABLE, true, true);
 
-    static const XMLTokenEnum aColorTokens[] = {
-        XML_DK1, // Background 1
-        XML_LT1, // Text 1
-        XML_DK2, // Background 2
-        XML_LT2, // Text 2
+    static const XMLTokenEnum aColorTokens[] =
+    {
+        XML_DK1, // Text 1
+        XML_LT1, // Background 1
+        XML_DK2, // Text 2
+        XML_LT2, // Background 2
         XML_ACCENT1,
         XML_ACCENT2,
         XML_ACCENT3,
@@ -2424,17 +2413,17 @@ void SdXMLExport::ExportThemeElement(const uno::Reference<drawing::XDrawPage>& x
         XML_HLINK, // Hyperlink
         XML_FOLHLINK, // Followed hyperlink
     };
-    for (size_t nColor = 0; nColor < aColors.size(); ++nColor)
+
+    for (auto eThemeColorType : o3tl::enumrange<model::ThemeColorType>())
     {
-        // Import goes via svx::Theme::FromAny(), which sanitizes user input.
-        assert(nColor < SAL_N_ELEMENTS(aColorTokens));
+        if (eThemeColorType == model::ThemeColorType::Unknown)
+            continue;
 
+        auto nColor = size_t(eThemeColorType);
         AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, GetXMLToken(aColorTokens[nColor]));
-
         OUStringBuffer sValue;
-        sax::Converter::convertColor(sValue, aColors[nColor]);
+        sax::Converter::convertColor(sValue, pColorSet->getColor(eThemeColorType));
         AddAttribute(XML_NAMESPACE_LO_EXT, XML_COLOR, sValue.makeStringAndClear());
-
         SvXMLElementExport aColor(*this, XML_NAMESPACE_LO_EXT, XML_COLOR, true, true);
     }
 }

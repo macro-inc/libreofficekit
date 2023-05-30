@@ -68,7 +68,7 @@
 
 #include <sfx2/notebookbar/SfxNotebookBar.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/lokhelper.hxx>
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <editeng/editview.hxx>
@@ -441,7 +441,7 @@ void ViewShellBase::InitializeFramework()
 {
 }
 
-OUString ViewShellBase::GetSelectionText(bool bCompleteWords)
+OUString ViewShellBase::GetSelectionText(bool bCompleteWords, bool /*bOnlyASample*/)
 {
     std::shared_ptr<ViewShell> const pMainShell(GetMainViewShell());
     DrawViewShell *const pDrawViewShell(
@@ -997,7 +997,7 @@ int ViewShellBase::getEditMode() const
 
 void ViewShellBase::setEditMode(int nMode)
 {
-    ViewShell* pViewShell = framework::FrameworkHelper::Instance(*const_cast<ViewShellBase*>(this))->GetViewShell(FrameworkHelper::msCenterPaneURL).get();
+    ViewShell* pViewShell = framework::FrameworkHelper::Instance(*this)->GetViewShell(FrameworkHelper::msCenterPaneURL).get();
 
     if (DrawViewShell* pDrawViewShell = dynamic_cast<DrawViewShell*>(pViewShell))
     {
@@ -1044,7 +1044,7 @@ void ViewShellBase::NotifyCursor(SfxViewShell* pOtherShell) const
             ::tools::Rectangle aRectangle = pOutlinerView->GetOutputArea();
             vcl::Window* pWin = pThisShell->GetActiveWindow();
             if (pWin && pWin->GetMapMode().GetMapUnit() == MapUnit::Map100thMM)
-                aRectangle = OutputDevice::LogicToLogic(aRectangle, MapMode(MapUnit::Map100thMM), MapMode(MapUnit::MapTwip));
+                aRectangle = o3tl::toTwips(aRectangle, o3tl::Length::mm100);
             OString sRectangle = aRectangle.toString();
             SfxLokHelper::notifyOtherView(&pDrawViewShell->GetViewShellBase(), pOtherShell, LOK_CALLBACK_VIEW_LOCK, "rectangle", sRectangle);
         }

@@ -151,7 +151,7 @@ static bool enabled = false;
            Unfortunately this can increase memory consumption drastically until the non transient parent
            is destroyed and finally all the transients are released.
         */
-        if ( ! rxAccessibleContext -> getAccessibleStateSet() -> contains ( AccessibleStateType::TRANSIENT ) )
+        if ( ! (rxAccessibleContext -> getAccessibleStateSet() & AccessibleStateType::TRANSIENT ) )
         #endif
         {
             [ dAllWrapper setObject: aWrapper forKey: nKey ];
@@ -165,19 +165,32 @@ static bool enabled = false;
             id parent = [aWrapper accessibilityAttributeValue:NSAccessibilityParentAttribute];
             if (parent) {
                 if ([parent isKindOfClass:[NSView class]]) {
-                    // SAL_DEBUG("Wrapper INIT: " << [[aWrapper description] UTF8String] << " ==> " << [[parent description] UTF8String]);
                     NSView *parentView = static_cast<NSView *>(parent);
-                    [parentView addSubview:aWrapper positioned:NSWindowBelow relativeTo:nil];
+
+                    // tdf#146765 Fix infinite recursion in -[NSView visibleRect]
+                    // HACK: Adding a subview to an NSView that is not attached
+                    // to an NSWindow leads to infinite recursion in the native
+                    // NSViewGetVisibleRect() function. This seems to be a new
+                    // behavior starting with macOS 12.6.2.
+                    // In the case of tdf#146765, we end up here because
+                    // -[AquaA11yWrapper childrenAttribute] is called by a
+                    // wrapper that is already attached to an NSWindow. That is
+                    // normal. What isn't normal is that the child wrapper's
+                    // unignored accessible parent is a differnt wrapper than
+                    // the caller and that different wrapper is not yet
+                    // attached to an NSWindow.
+                    // TODO: switch the AquaA11yWrapper class to inherit the
+                    // lightweight NSAccessibilityElement class instead of the
+                    // NSView class to possibly avoid the need for this hack.
+                    NSWindow *window = [parentView window];
+                    SAL_WARN_IF(!window, "vcl.a11y","Can't add subview. Parent view's window is nil!");
+                    if (window)
+                        [parentView addSubview:aWrapper positioned:NSWindowBelow relativeTo:nil];
                 } else if ([parent isKindOfClass:NSClassFromString(@"SalFrameWindow")]) {
                     NSWindow *window = static_cast<NSWindow *>(parent);
                     NSView *salView = [window contentView];
-                    // SAL_DEBUG("Wrapper INIT SAL: " << [[aWrapper description] UTF8String] << " ==> " << [[salView description] UTF8String]);
                     [salView addSubview:aWrapper positioned:NSWindowBelow relativeTo:nil];
-                } else {
-                    // SAL_DEBUG("Wrapper INIT: !! " << [[aWrapper description] UTF8String] << " !==>! " << [[parent description] UTF8String] << "!!");
                 }
-            } else {
-                // SAL_DEBUG("Wrapper INIT: " << [[aWrapper description] UTF8String] << " ==> NO PARENT");
             }
         }
     }

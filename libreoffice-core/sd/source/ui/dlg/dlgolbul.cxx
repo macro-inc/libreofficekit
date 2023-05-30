@@ -69,10 +69,10 @@ OutlineBulletDlg::OutlineBulletDlg(weld::Window* pParent, const SfxItemSet* pAtt
             {
                 switch(pObj->GetObjIdentifier())
                 {
-                case OBJ_TITLETEXT:
+                case SdrObjKind::TitleText:
                     m_bTitle = true;
                     break;
-                case OBJ_OUTLINETEXT:
+                case SdrObjKind::OutlineText:
                     bOutliner = true;
                     break;
                 default:
@@ -88,9 +88,9 @@ OutlineBulletDlg::OutlineBulletDlg(weld::Window* pParent, const SfxItemSet* pAtt
         if(bOutliner)
         {
             SfxStyleSheetBasePool* pSSPool = pView->GetDocSh()->GetStyleSheetPool();
-            SfxStyleSheetBase* pFirstStyleSheet = pSSPool->Find( STR_LAYOUT_OUTLINE " 1", SfxStyleFamily::Pseudo);
+            SfxStyleSheetBase* pFirstStyleSheet = pSSPool->Find( STR_LAYOUT_OUTLINE + " 1", SfxStyleFamily::Pseudo);
             if( pFirstStyleSheet )
-                pFirstStyleSheet->GetItemSet().GetItemState(EE_PARA_NUMBULLET, false, reinterpret_cast<const SfxPoolItem**>(&pItem));
+                pItem = pFirstStyleSheet->GetItemSet().GetItemIfSet(EE_PARA_NUMBULLET, false);
         }
 
         if( pItem == nullptr )

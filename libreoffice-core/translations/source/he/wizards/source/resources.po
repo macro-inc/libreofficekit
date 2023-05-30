@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2020-12-29 17:36+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-03-06 12:32+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Hebrew <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/he/>\n"
+"Language-Team: Hebrew <https://translations.documentfoundation.org/projects/libo_ui-7-5/wizardssourceresources/he/>\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.4\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1565698003.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "לא ניתן ליצור את התיקייה '%1'.<BR>יכול להיות שאין מקום בכונן שלך."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "לא ניתן ליצור את מסמך הטקסט.<BR>נא לבדוק אם מודול הכתבן של PRODUCTNAME מותקן."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "לא ניתן ליצור את מסמך הטקסט.‏‪<BR>‬‏נא לבדוק אם מודול ‚%PRODUCTNAME Writer’ מותקן."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "לא ניתן ליצור את הגיליון האלקטרוני.‏‪<BR>‬‏נא לבדוק אם מודול 'PRODUCTNAME Calc' מותקן."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "לא ניתן ליצור את הגיליון האלקטרוני.‏‪<BR>‬‏נא לבדוק אם מודול ‚%PRODUCTNAME Calc’ מותקן."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "לא ניתן ליצור את המצגת.<BR>נא לבדוק אם מודול המצגות של PRODUCTNAME מותקן."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "לא ניתן ליצור את המצגת.‏‪<BR>‬‏נא לבדוק אם מודול ‚%PRODUCTNAME Impress’ מותקן."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "לא ניתן ליצור את הציור.<BR>נא לבדוק אם מודול הצייר של PRODUCTNAME מותקן."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "לא ניתן ליצור את הציור.‏‪<BR>‬‏נא לבדוק אם מודול ‚%PRODUCTNAME Draw’ מותקן."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "לא ניתן ליצור את הנוסחה.<BR>נא לבדוק אם מודול הנוסחאות של PRODUCTNAME מותקן."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "לא ניתן ליצור את הנוסחה.‏‪<BR>‬‏נא לבדוק אם מודול ‚%PRODUCTNAME Math’ מותקן."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -212,7 +212,7 @@ msgctxt ""
 "RID_COMMON_21\n"
 "property.text"
 msgid "The wizard could not be run, because important files were not found.\\nUnder 'Tools - Options - %PRODUCTNAME - Paths' click the 'Default' button to reset the paths to the original default settings.\\nThen run the wizard again."
-msgstr "לא ניתן להפעיל את האשף, כיוון שקבצים חיוניים לא נמצאו.\\nתחת ‚כלים - אפשרויות - %PRODUCTNAME - נתיבים’ יש ללחוץ על הכפתור ‚בררת מחדל’ כדי לאפס את הנתיבים להגדרות בררת המחדל.\\nלאחר מכן יש להפעיל את האשף מחדש."
+msgstr "לא ניתן להפעיל את האשף, כיוון שקבצים חיוניים לא נמצאו.\\nתחת ‚כלים - אפשרויות - %PRODUCTNAME - נתיבים’ יש ללחוץ על הכפתור ‚ברירת מחדל’ כדי לאפס את הנתיבים להגדרות בררת המחדל.\\nלאחר מכן יש להפעיל את האשף מחדש."
 
 #. GohbP
 #: resources_en_US.properties
@@ -950,7 +950,7 @@ msgctxt ""
 "RID_REPORT_100\n"
 "property.text"
 msgid "Default"
-msgstr "בררת מחדל"
+msgstr "ברירת מחדל"
 
 #. Bca59
 #: resources_en_US.properties
@@ -1094,7 +1094,7 @@ msgctxt ""
 "RID_REPORT_116\n"
 "property.text"
 msgid "Default"
-msgstr "בררת מחדל"
+msgstr "ברירת מחדל"
 
 #. 927HM
 #: resources_en_US.properties
@@ -3840,6 +3840,15 @@ msgctxt ""
 "property.text"
 msgid "Lithuanian Litas"
 msgstr "ליטאס ליטאי"
+
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "קונה קרואטית"
 
 #. eDjBr
 #: resources_en_US.properties

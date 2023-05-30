@@ -22,6 +22,7 @@
 #include <postwin.h>
 #include <shlobj.h>
 #endif
+#include <o3tl/char16_t2wchar_t.hxx>
 #include <osl/mutex.hxx>
 #include <rtl/uri.hxx>
 #include <sal/log.hxx>
@@ -63,7 +64,7 @@
 #include <cstdio>
 #include <vcl/dibtools.hxx>
 #include <vcl/filter/PngImageReader.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/graphicfilter.hxx>
 #include <memory>
 #include <utility>
@@ -76,6 +77,7 @@ using namespace ::com::sun::star::io;
 using namespace ::com::sun::star::datatransfer;
 using namespace ::com::sun::star::datatransfer::clipboard;
 using namespace ::com::sun::star::datatransfer::dnd;
+using namespace std::literals::string_view_literals;
 
 
 #define TOD_SIG1 0x01234567
@@ -130,23 +132,12 @@ static OUString ImplGetParameterString( const TransferableObjectDescriptor& rObj
     {
         // the display name might contain unacceptable characters, encode all of them
         // this seems to be the only parameter currently that might contain such characters
-        sal_Bool pToAccept[128];
-        for (sal_Bool & rb : pToAccept)
-            rb = false;
-
-        const char aQuotedParamChars[] =
-            "()<>@,;:/[]?=!#$&'*+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`abcdefghijklmnopqrstuvwxyz{|}~. ";
-
-        for ( sal_Int32 nInd = 0; nInd < RTL_CONSTASCII_LENGTH(aQuotedParamChars); ++nInd )
-        {
-            sal_Unicode nChar = aQuotedParamChars[nInd];
-            if ( nChar < 128 )
-                pToAccept[nChar] = true;
-        }
+        static constexpr auto pToAccept = rtl::createUriCharClass(
+            u8"()<>@,;:/[]?=!#$&'*+-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`abcdefghijklmnopqrstuvwxyz{|}~. ");
 
         aParams += ";displayname=\""
             + rtl::Uri::encode(
-                rObjDesc.maDisplayName, pToAccept, rtl_UriEncodeIgnoreEscapes,
+                rObjDesc.maDisplayName, pToAccept.data(), rtl_UriEncodeIgnoreEscapes,
                 RTL_TEXTENCODING_UTF8)
             + "\"";
     }
@@ -677,9 +668,9 @@ bool TransferableHelper::SetBitmapEx( const BitmapEx& rBitmapEx, const DataFlavo
 
             aFilterData.getArray()[aFilterData.getLength() - 1].Value <<= 1;
 #endif
-            vcl::PNGWriter aPNGWriter(rBitmapEx, &aFilterData);
-
-            aPNGWriter.Write(aMemStm);
+            vcl::PngImageWriter aPNGWriter(aMemStm);
+            aPNGWriter.setParameters(aFilterData);
+            aPNGWriter.write(rBitmapEx);
         }
         else
         {
@@ -784,10 +775,11 @@ bool TransferableHelper::SetINetBookmark( const INetBookmark& rBmk,
         case SotClipboardFormatId::NETSCAPE_BOOKMARK:
         {
             Sequence< sal_Int8 > aSeq( 2048 );
+            char* pSeq = reinterpret_cast< char* >( aSeq.getArray() );
 
-            memset( aSeq.getArray(), 0, 2048 );
-            strcpy( reinterpret_cast< char* >( aSeq.getArray() ), OUStringToOString(rBmk.GetURL(), eSysCSet).getStr() );
-            strcpy( reinterpret_cast< char* >( aSeq.getArray() ) + 1024, OUStringToOString(rBmk.GetDescription(), eSysCSet).getStr() );
+            // strncpy fills the rest with nulls, as we need
+            strncpy( pSeq, OUStringToOString(rBmk.GetURL(), eSysCSet).getStr(), 1024 );
+            strncpy( pSeq + 1024, OUStringToOString(rBmk.GetDescription(), eSysCSet).getStr(), 1024 );
 
             maAny <<= aSeq;
         }
@@ -796,23 +788,21 @@ bool TransferableHelper::SetINetBookmark( const INetBookmark& rBmk,
 #ifdef _WIN32
         case SotClipboardFormatId::FILEGRPDESCRIPTOR:
         {
-            Sequence< sal_Int8 >    aSeq( sizeof( FILEGROUPDESCRIPTOR ) );
-            FILEGROUPDESCRIPTOR*    pFDesc = reinterpret_cast<FILEGROUPDESCRIPTOR*>(aSeq.getArray());
-            FILEDESCRIPTOR&         rFDesc1 = pFDesc->fgd[ 0 ];
+            Sequence< sal_Int8 >    aSeq( sizeof( FILEGROUPDESCRIPTORW ) );
+            FILEGROUPDESCRIPTORW*   pFDesc = reinterpret_cast<FILEGROUPDESCRIPTORW*>(aSeq.getArray());
+            FILEDESCRIPTORW&        rFDesc1 = pFDesc->fgd[ 0 ];
 
             pFDesc->cItems = 1;
-            memset( &rFDesc1, 0, sizeof( FILEDESCRIPTOR ) );
+            memset( &rFDesc1, 0, sizeof( rFDesc1 ) );
             rFDesc1.dwFlags = FD_LINKUI;
 
-            OStringBuffer aStr(OUStringToOString(
-                rBmk.GetDescription(), eSysCSet));
-            for( sal_Int32 nChar = 0; nChar < aStr.getLength(); ++nChar )
-                if( strchr( "\\/:*?\"<>|", aStr[nChar] ) )
-                    aStr.remove(nChar--, 1);
+            OUStringBuffer aStr(rBmk.GetDescription());
+            for( size_t nChar = 0; (nChar = std::u16string_view(aStr).find_first_of(u"\\/:*?\"<>|"sv, nChar)) != std::u16string_view::npos; )
+                aStr.remove(nChar, 1);
 
             aStr.insert(0, "Shortcut to ");
             aStr.append(".URL");
-            strcpy( rFDesc1.cFileName, aStr.getStr() );
+            wcscpy( rFDesc1.cFileName, o3tl::toW(aStr.getStr()) );
 
             maAny <<= aSeq;
         }
@@ -1567,7 +1557,7 @@ bool TransferableDataHelper::GetBitmapEx( const DataFlavor& rFlavor, BitmapEx& r
             // it's a JPEG, import to BitmapEx
             GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
             Graphic aGraphic;
-            if (rFilter.ImportGraphic(aGraphic, "", *xStm) == ERRCODE_NONE)
+            if (rFilter.ImportGraphic(aGraphic, u"", *xStm) == ERRCODE_NONE)
                 rBmpEx = aGraphic.GetBitmapEx();
         }
 
@@ -1894,16 +1884,15 @@ bool TransferableDataHelper::GetINetBookmark( const css::datatransfer::DataFlavo
 
             if (aSeq.getLength())
             {
-                FILEGROUPDESCRIPTOR const * pFDesc = reinterpret_cast<FILEGROUPDESCRIPTOR const *>(aSeq.getConstArray());
+                FILEGROUPDESCRIPTORW const * pFDesc = reinterpret_cast<FILEGROUPDESCRIPTORW const *>(aSeq.getConstArray());
 
                 if( pFDesc->cItems )
                 {
-                    OString aDesc( pFDesc->fgd[ 0 ].cFileName );
-                    rtl_TextEncoding    eTextEncoding = osl_getThreadTextEncoding();
+                    OUString aDesc( o3tl::toU(pFDesc->fgd[ 0 ].cFileName) );
 
-                    if( ( aDesc.getLength() > 4 ) && aDesc.copy(aDesc.getLength() - 4).equalsIgnoreAsciiCase(".URL") )
+                    if( ( aDesc.getLength() > 4 ) && aDesc.endsWithIgnoreAsciiCase(".URL") )
                     {
-                        std::unique_ptr<SvStream> pStream(::utl::UcbStreamHelper::CreateStream( INetURLObject( OStringToOUString(aDesc, eTextEncoding) ).GetMainURL( INetURLObject::DecodeMechanism::NONE ),
+                        std::unique_ptr<SvStream> pStream(::utl::UcbStreamHelper::CreateStream( INetURLObject( aDesc ).GetMainURL( INetURLObject::DecodeMechanism::NONE ),
                                                                                   StreamMode::STD_READ ));
 
                         if( !pStream || pStream->GetError() )
@@ -1924,18 +1913,33 @@ bool TransferableDataHelper::GetINetBookmark( const css::datatransfer::DataFlavo
                         if( pStream )
                         {
                             OString aLine;
-                            bool    bSttFnd = false;
+                            bool bInA = false, bInW = false, bAFound = false;
 
                             while( pStream->ReadLine( aLine ) )
                             {
-                                if (aLine.equalsIgnoreAsciiCase("[InternetShortcut]"))
-                                    bSttFnd = true;
-                                else if (bSttFnd && aLine.copy(0, 4).equalsIgnoreAsciiCase("URL="))
+                                if (aLine.startsWithIgnoreAsciiCase("[InternetShortcut", &aLine))
                                 {
+                                    // May be [InternetShortcut], or [InternetShortcut.A], or
+                                    // [InternetShortcut.W] (the latter has UTF-7-encoded URL)
+                                    bInW = aLine.equalsIgnoreAsciiCase(".W]");
+                                    bInA = !bAFound && !bInW
+                                           && (aLine == "]" || aLine.equalsIgnoreAsciiCase(".A]"));
+                                }
+                                else if (aLine.startsWith("["))
+                                {
+                                    bInA = bInW = false;
+                                }
+                                else if ((bInA || bInW) && aLine.startsWithIgnoreAsciiCase("URL="))
+                                {
+                                    auto eTextEncoding = bInW ? RTL_TEXTENCODING_UTF7
+                                                              : osl_getThreadTextEncoding();
                                     rBmk = INetBookmark( OStringToOUString(aLine.subView(4), eTextEncoding),
-                                                         OStringToOUString(aDesc.subView(0, aDesc.getLength() - 4), eTextEncoding) );
+                                                         aDesc.copy(0, aDesc.getLength() - 4) );
                                     bRet = true;
-                                    break;
+                                    if (bInW)
+                                        break;
+                                    else
+                                        bAFound = true; // Keep looking for "W"
                                 }
                             }
                         }
@@ -1995,7 +1999,7 @@ bool TransferableDataHelper::GetFileList( FileList& rFileList ) const
             {
                 if( aFlavor.MimeType.indexOf( "text/uri-list" ) > -1 )
                 {
-                    OString aDiskString;
+                    OStringBuffer aDiskString;
 
                     while( xStm->ReadLine( aDiskString ) )
                         if( !aDiskString.isEmpty() && aDiskString[0] != '#' )

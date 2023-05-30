@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-08-24 10:11+0000\n"
-"Last-Translator: Juan C. Sanz <juancsanzc@hotmail.com>\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-02-15 14:24+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1564940711.000000\n"
 
 #. W5ukN
@@ -824,7 +824,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Sheet ~Events..."
-msgstr "Sucesos de hoja…"
+msgstr "~Eventos de hoja…"
 
 #. QfBmZ
 #: CalcCommands.xcu
@@ -894,7 +894,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom In"
-msgstr "Aumentar"
+msgstr "Acercar"
 
 #. HNcyc
 #: CalcCommands.xcu
@@ -904,7 +904,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom Out"
-msgstr "Reducir"
+msgstr "Alejar"
 
 #. H46Pa
 #: CalcCommands.xcu
@@ -2106,15 +2106,15 @@ msgctxt ""
 msgid "Sparklines"
 msgstr "Minigráficos"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr "Insertar minigráfico…"
+msgid "Sparkline..."
+msgstr "Minigráfico…"
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -3444,7 +3444,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Recalculate Hard"
-msgstr "Recalculación incondicional"
+msgstr "Recálculo incondicional"
 
 #. zPLSW
 #: CalcCommands.xcu
@@ -5654,7 +5654,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Standard (Single Mode)"
-msgstr "Estándar (modo de barra única)"
+msgstr "Estándar (modo barra única)"
 
 #. UGtGP
 #: CalcWindowState.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "~Barras de error Y..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Tabla de datos…"
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -5784,7 +5794,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Format Selection..."
-msgstr "Formato de selección..."
+msgstr "Formato de selección…"
 
 #. 2Mrjz
 #: ChartCommands.xcu
@@ -6535,6 +6545,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Formato de etiqueta de datos individual…"
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Insertar tabla de datos"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Eliminar tabla de datos"
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -9614,7 +9644,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Scaling at the current document"
-msgstr ""
+msgstr "Escala en el documento actual"
 
 #. hTkgv
 #: DrawImpressCommands.xcu
@@ -10344,7 +10374,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom & Pan"
-msgstr "Escala y panorámica"
+msgstr "Zum y panorámica"
 
 #. GPG85
 #: DrawImpressCommands.xcu
@@ -10354,7 +10384,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Zoom & Pan (Ctrl to Zoom Out, Shift to Pan)"
-msgstr "Escala y panorámica (Ctrl para alejarse, Mayús para panoramizar)"
+msgstr "Zum y panorámica (Ctrl para alejarse, Mayús para panoramizar)"
 
 #. BRCmr
 #: DrawImpressCommands.xcu
@@ -12134,7 +12164,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. AkJdM
 #: DrawWindowState.xcu
@@ -12524,7 +12554,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. aihBG
 #: Effects.xcu
@@ -12774,7 +12804,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Fade in and Zoom"
-msgstr "Intensificar y ampliar"
+msgstr "Intensificar y acercar"
 
 #. 26GwM
 #: Effects.xcu
@@ -13354,7 +13384,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Fade out and Zoom"
-msgstr "Atenuar y escalar"
+msgstr "Atenuar y alejar"
 
 #. qzyys
 #: Effects.xcu
@@ -13474,7 +13504,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. ipZZC
 #: Effects.xcu
@@ -16534,7 +16564,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Rectangle, Rounded"
-msgstr "Rectángulo, redondeado"
+msgstr "Rectángulo redondeado"
 
 #. 7EYYb
 #: GenericCommands.xcu
@@ -17614,7 +17644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Vertical Scroll"
-msgstr "Desplazamiento vertical"
+msgstr "Pergamino vertical"
 
 #. kUmYD
 #: GenericCommands.xcu
@@ -17624,7 +17654,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Horizontal Scroll"
-msgstr "Desplazamiento horizontal"
+msgstr "Pergamino horizontal"
 
 #. ix6Fr
 #: GenericCommands.xcu
@@ -17984,7 +18014,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Zoom"
-msgstr "Escala"
+msgstr "~Zum"
 
 #. RZ28W
 #: GenericCommands.xcu
@@ -17994,7 +18024,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Zoom..."
-msgstr "~Escala..."
+msgstr "~Zum…"
 
 #. xTbFE
 #: GenericCommands.xcu
@@ -18254,7 +18284,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Outline Font Effect"
-msgstr "Efecto contorno"
+msgstr "Contorno tipográfico"
 
 #. ND6wH
 #: GenericCommands.xcu
@@ -18754,7 +18784,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. cG9KB
 #: GenericCommands.xcu
@@ -18774,7 +18804,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom In"
-msgstr "Aumentar"
+msgstr "Acercar"
 
 #. W9gHw
 #: GenericCommands.xcu
@@ -18794,7 +18824,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom Out"
-msgstr "Reducir"
+msgstr "Alejar"
 
 #. BY3gD
 #: GenericCommands.xcu
@@ -18994,7 +19024,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Line with Arrow/Circle"
-msgstr "Línea con flecha/círculo al final"
+msgstr "Línea con flecha/círculo"
 
 #. 5yGWK
 #: GenericCommands.xcu
@@ -19004,7 +19034,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Line with Circle/Arrow"
-msgstr "Línea con flecha/círculo al final"
+msgstr "Línea con círculo/flecha"
 
 #. 52JCc
 #: GenericCommands.xcu
@@ -19104,7 +19134,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Rectangle, Rounded"
-msgstr "Rectángulo, redondeado"
+msgstr "Rectángulo redondeado"
 
 #. 5CDYv
 #: GenericCommands.xcu
@@ -20826,7 +20856,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Object Zoom"
-msgstr "Escala de objetos"
+msgstr "Zum de objetos"
 
 #. kpKCn
 #: GenericCommands.xcu
@@ -22198,26 +22228,6 @@ msgctxt ""
 msgid "Delete C~ontents..."
 msgstr "Eliminar c~ontenido..."
 
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Emoyi"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Insertar emoyi"
-
 #. tEjpF
 #: GenericCommands.xcu
 msgctxt ""
@@ -22496,7 +22506,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Image~Map"
-msgstr "~Mapa de imagen"
+msgstr "Imagen interactiva"
 
 #. ERUDC
 #: GenericCommands.xcu
@@ -22566,7 +22576,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Rectangle, Unfilled"
-msgstr "Rectángulo, sin relleno"
+msgstr "Rectángulo sin relleno"
 
 #. NddKQ
 #: GenericCommands.xcu
@@ -22696,7 +22706,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Circle, Unfilled"
-msgstr "Circulo, sin relleno"
+msgstr "Círculo, sin relleno"
 
 #. necNE
 #: GenericCommands.xcu
@@ -22726,7 +22736,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Circle Pie, Unfilled"
-msgstr "Círculo, sin relleno"
+msgstr "Sector de círculo, sin relleno"
 
 #. XDEDF
 #: GenericCommands.xcu
@@ -23477,6 +23487,36 @@ msgctxt ""
 "value.text"
 msgid "Toggle Automatic Spell Checking"
 msgstr "Alternar revisión ortográfica automática"
+
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Revisión de accesibilidad automática"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "Revisión de accesibilidad automática"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Alternar revisión de accesibilidad automática"
 
 #. 4DCmg
 #: GenericCommands.xcu
@@ -27796,7 +27836,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Slide View"
-msgstr "Vista diapositiva"
+msgstr "Vista de diapositivas"
 
 #. 6xE8P
 #: ImpressWindowState.xcu
@@ -27856,7 +27896,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. pvbBN
 #: ImpressWindowState.xcu
@@ -27956,7 +27996,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Standard (Single Mode)"
-msgstr "Estándar (modo de barra única)"
+msgstr "Estándar (modo barra única)"
 
 #. SoDWX
 #: ImpressWindowState.xcu
@@ -28337,6 +28377,16 @@ msgctxt ""
 "value.text"
 msgid "~Others"
 msgstr "~Otros"
+
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Abrir grupo Elementos"
 
 #. uXvss
 #: MathWindowState.xcu
@@ -29976,7 +30026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Field ~Hidden Paragraphs"
-msgstr "Campo párrafos ~ocultos"
+msgstr "Párrafos ~ocultos"
 
 #. 9cxv4
 #: WriterCommands.xcu
@@ -30057,7 +30107,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Preview Zoom"
-msgstr "Escala de la previsualización"
+msgstr "Zum de previsualización"
 
 #. BAjyc
 #: WriterCommands.xcu
@@ -30207,7 +30257,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Update Indexes and ~Tables"
-msgstr ""
+msgstr "Actualizar índices y sumarios"
 
 #. XPn5o
 #: WriterCommands.xcu
@@ -30237,7 +30287,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Update ~Index"
-msgstr ""
+msgstr "Actualizar índ~ice"
 
 #. 3sfQu
 #: WriterCommands.xcu
@@ -30267,7 +30317,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Reject Track Change"
-msgstr "Rechazar cambio"
+msgstr "Rechazar cambio rastreado"
 
 #. ABbj4
 #: WriterCommands.xcu
@@ -30347,7 +30397,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accept Track Change"
-msgstr "Aceptar cambio"
+msgstr "Aceptar cambio rastreado"
 
 #. E4nSp
 #: WriterCommands.xcu
@@ -30529,15 +30579,15 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Mostrar cambios"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
-msgstr "Mostrar ~cambios"
+msgid "Show Tracked ~Changes"
+msgstr ""
 
 #. sMgCx
 #: WriterCommands.xcu
@@ -30597,7 +30647,17 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
-msgstr ""
+msgstr "Muestra un botón junto a los títulos y subtítulos para facilitar el replegado del esquema. Incluso sin el botón, puede replegar el esquema con el Navegador."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Mostrar contenido de esquema hasta el nivel…"
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30607,7 +30667,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show tracked deletions in margin"
-msgstr "Mostrar eliminaciones registradas en margen"
+msgstr "Mostrar eliminaciones registradas al margen"
 
 #. 3GVrG
 #: WriterCommands.xcu
@@ -30617,7 +30677,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show tracked deletions in margin"
-msgstr "Mostrar eliminaciones registradas en margen"
+msgstr "Mostrar eliminaciones registradas al margen"
 
 #. QFi68
 #: WriterCommands.xcu
@@ -30978,6 +31038,26 @@ msgctxt ""
 "value.text"
 msgid "Insert Date Content Control"
 msgstr "Insertar control de contenido Fecha"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Insertar control de contenido Texto sin formato"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Insertar control de contenido Cuadro combinado"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -32079,6 +32159,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Portada…"
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Traducir…"
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32127,7 +32217,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Image Properties"
-msgstr "Propiedades de la imagen"
+msgstr "Propiedades de imagen"
 
 #. UC94s
 #: WriterCommands.xcu
@@ -32479,6 +32569,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Filas ~encima"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Insertar filas encima"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32499,6 +32599,16 @@ msgctxt ""
 msgid "Rows ~Below"
 msgstr "Filas ~debajo"
 
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Insertar filas debajo"
+
 #. bxCPN
 #: WriterCommands.xcu
 msgctxt ""
@@ -32507,7 +32617,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Columns..."
-msgstr "~Columnas..."
+msgstr "~Columnas…"
 
 #. sVEB6
 #: WriterCommands.xcu
@@ -32519,15 +32629,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Insertar columnas antes"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
+msgid "Columns B~efore"
 msgstr "Columnas ~antes"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Insertar columnas antes"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32539,15 +32659,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Insertar columnas después"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
-msgstr "Columnas ~después"
+msgid "Columns A~fter"
+msgstr "Columnas de~spués"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Insertar columnas después"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -32607,7 +32737,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Rows ~Above"
-msgstr ""
+msgstr "Filas ~encima"
 
 #. fmNGn
 #: WriterCommands.xcu
@@ -32737,7 +32867,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Row"
-msgstr "Seleccionar la fila"
+msgstr "Seleccionar fila"
 
 #. LpUtu
 #: WriterCommands.xcu
@@ -33147,7 +33277,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr "Descender un nivel con subpuntos"
+msgstr "Disminuir nivel de esquema con subpárrafos"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33167,7 +33297,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr "Ascender un nivel con subpuntos"
+msgstr "Aumentar nivel de esquema con subpárrafos"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33177,7 +33307,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr "Subir con subniveles"
+msgstr "Subir elemento con subpárrafos"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33197,7 +33327,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr "Bajar con subniveles"
+msgstr "Bajar elemento con subpárrafos"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -33767,7 +33897,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Optimal"
-msgstr "Óptim~o"
+msgstr "~Ideal"
 
 #. EFP2w
 #: WriterCommands.xcu
@@ -34788,6 +34918,166 @@ msgctxt ""
 "value.text"
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Clonar formato (pulse dos veces con el ratón u oprima Ctrl/⌘ para cambiar el comportamiento)"
+
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Zum"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Gestionar control de cambios"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Carácter"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Párrafo"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Propiedades de tabla"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Posición y tamaño"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Propiedades de imagen"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Propiedades de marco"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "Propiedades de objeto OLE"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Ajuste de texto"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Bordes"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Bordes"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Área"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Área"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr ""
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr ""
 
 #. 7PCFf
 #: WriterCommands.xcu
@@ -38527,7 +38817,117 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Standard (Single Mode)"
-msgstr "Estándar (modo de barra única)"
+msgstr "Estándar (modo barra única)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Estándar (modo barra única): Comentario"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Estándar (modo barra única): Forma"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Estándar (modo barra única): Texto con forma"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Estándar (modo barra única): Control de formulario"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Estándar (modo barra única): Marco"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Estándar (modo barra única): Imagen"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Estándar (modo barra única): Multimedia"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Estándar (modo barra única): Objeto OLE"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Estándar (modo barra única): Previsualizar impresión"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Estándar (modo barra única): Tabla"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Estándar (modo barra única): Texto"
 
 #. h6gRt
 #: WriterWindowState.xcu

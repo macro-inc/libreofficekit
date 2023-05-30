@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-02-26 09:37+0000\n"
-"Last-Translator: Hossein <hossein.ir@gmail.com>\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
+"Last-Translator: Hossein <hossein@libreoffice.org>\n"
 "Language-Team: Persian <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/fa/>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1516029766.000000\n"
 
 #. i8Y7Z
@@ -239,10 +239,10 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr ""
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
+msgid "Returns the value 'true' if the number truncated to integer is even"
 msgstr ""
 
 #. CrmYv
@@ -257,10 +257,10 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr ""
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
 msgstr ""
 
 #. EjqfP
@@ -428,10 +428,10 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr ""
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
 msgstr ""
 
 #. F9bnf
@@ -440,10 +440,10 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "پایین"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
+msgid "The smallest integer that can be returned"
 msgstr ""
 
 #. WaokD
@@ -452,10 +452,10 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "بالا"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
+msgid "The largest integer that can be returned"
 msgstr ""
 
 #. 8CDCk
@@ -950,10 +950,9 @@ msgstr ""
 
 #. EzTEV
 #: scaddins/inc/analysis.hrc:309
-#, fuzzy
 msgctxt "ANALYSIS_Delta"
 msgid "Number 1"
-msgstr "عدد "
+msgstr "عدد 1"
 
 #. o2jAx
 #: scaddins/inc/analysis.hrc:310
@@ -963,10 +962,9 @@ msgstr ""
 
 #. H7EGL
 #: scaddins/inc/analysis.hrc:311
-#, fuzzy
 msgctxt "ANALYSIS_Delta"
 msgid "Number 2"
-msgstr "عدد "
+msgstr "عدد 2"
 
 #. 24Q6Q
 #: scaddins/inc/analysis.hrc:312

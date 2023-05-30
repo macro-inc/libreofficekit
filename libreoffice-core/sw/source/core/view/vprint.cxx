@@ -22,6 +22,7 @@
 #include <sfx2/printer.hxx>
 #include <svx/svdview.hxx>
 #include <osl/diagnose.h>
+#include <tools/UnitConversion.hxx>
 
 #include <txtfld.hxx>
 #include <fmtfld.hxx>
@@ -340,7 +341,7 @@ void SwViewShell::FillPrtDoc( SwDoc& rPrtDoc, const SfxPrinter* pPrt)
         SwShellTableCursor* pShellTableCursor = pFESh->GetTableCursor();
 
         const SwContentNode *const pContentNode =
-            pShellTableCursor->Start()->nNode.GetNode().GetContentNode();
+            pShellTableCursor->Start()->GetNode().GetContentNode();
         const SwContentFrame *const pContentFrame = pContentNode ? pContentNode->getLayoutFrame(GetLayout(), pShellTableCursor->Start()) : nullptr;
         if( pContentFrame )
         {
@@ -367,7 +368,9 @@ void SwViewShell::FillPrtDoc( SwDoc& rPrtDoc, const SfxPrinter* pPrt)
         SwNodeIndex aNodeIdx( *rPrtDoc.GetNodes().GetEndOfContent().StartOfSectionNode() );
         SwTextNode* pTextNd = rPrtDoc.GetNodes().GoNext( &aNodeIdx )->GetTextNode();
         SwContentNode *pLastNd =
-            pActCursor->GetContentNode( (*pActCursor->GetMark()) <= (*pActCursor->GetPoint()) );
+            (*pActCursor->GetMark()) <= (*pActCursor->GetPoint())
+            ? pActCursor->GetPointContentNode()
+            : pActCursor->GetMarkContentNode();
         // copy the paragraph attributes of the first paragraph
         if( pLastNd && pLastNd->IsTextNode() )
             static_cast<SwTextNode*>(pLastNd)->CopyCollFormat( *pTextNd );
@@ -395,7 +398,9 @@ void SwViewShell::FillPrtDoc( SwDoc& rPrtDoc, const SfxPrinter* pPrt)
                 if( pTextNd )
                 {
                     SwContentNode *pFirstNd =
-                        pFirstCursor->GetContentNode( (*pFirstCursor->GetMark()) > (*pFirstCursor->GetPoint()) );
+                        (*pFirstCursor->GetMark()) > (*pFirstCursor->GetPoint())
+                        ? pFirstCursor->GetPointContentNode()
+                        : pFirstCursor->GetMarkContentNode();
                     // copy paragraph attributes of the first paragraph
                     if( pFirstNd && pFirstNd->IsTextNode() )
                         static_cast<SwTextNode*>(pFirstNd)->CopyCollFormat( *pTextNd );

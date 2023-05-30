@@ -99,10 +99,8 @@ RTFError RTFDocumentImpl::dispatchSymbol(RTFKeyword nKeyword)
             if (m_aStates.top().getDestination() == Destination::FOOTNOTESEPARATOR)
                 break; // just ignore it - only thing we read in here is CHFTNSEP
             checkFirstRun();
-            bool bNeedPap = m_bNeedPap;
             checkNeedPap();
-            if (bNeedPap)
-                runProps();
+            runProps(); // tdf#152872 paragraph marker formatting
             if (!m_aStates.top().getCurrentBuffer())
             {
                 parBreak();
@@ -114,7 +112,7 @@ RTFError RTFDocumentImpl::dispatchSymbol(RTFKeyword nKeyword)
                     RTFSprms aSprms;
                     aSprms.set(NS_ooxml::LN_tblEnd, new RTFValue(1));
                     writerfilter::Reference<Properties>::Pointer_t pProperties
-                        = new RTFReferenceProperties(aAttributes, aSprms);
+                        = new RTFReferenceProperties(std::move(aAttributes), std::move(aSprms));
                     Mapper().props(pProperties);
                 }
                 m_nCellxMax = 0;
@@ -391,14 +389,26 @@ RTFError RTFDocumentImpl::dispatchSymbol(RTFKeyword nKeyword)
             }
             else
             {
+                bool bFirstRun = m_bFirstRun;
                 checkFirstRun();
-                checkNeedPap();
+                if (bFirstRun || m_bNeedCr)
+                {
+                    // Only send the paragraph properties early if we'll create a new paragraph in a
+                    // bit anyway.
+                    checkNeedPap();
+                }
                 sal_uInt8 const sBreak[] = { 0xc };
                 Mapper().text(sBreak, 1);
-                if (!m_bNeedPap)
+                if (bFirstRun || m_bNeedCr)
                 {
-                    parBreak();
-                    m_bNeedPap = true;
+                    // If we don't have content in the document yet (so the break-before can't move
+                    // to a second layout page) or we already have characters sent (so the paragraph
+                    // properties are already finalized), then continue inserting a fake paragraph.
+                    if (!m_bNeedPap)
+                    {
+                        parBreak();
+                        m_bNeedPap = true;
+                    }
                 }
                 m_bNeedCr = true;
             }

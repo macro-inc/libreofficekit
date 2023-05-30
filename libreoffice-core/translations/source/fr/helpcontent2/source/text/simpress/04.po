@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-07-15 17:18+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-12-07 17:55+0000\n"
 "Last-Translator: sophie <gautier.sophie@gmail.com>\n"
 "Language-Team: French <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress04/fr/>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: LibreOffice\n"
 "X-Project-Style: openoffice\n"
 "X-POOTLE-MTIME: 1559911484.000000\n"
 
@@ -35,14 +35,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; in presentations</bookmark_value><bookmark_value>presentations; shortcut keys</bookmark_value>"
 msgstr "<bookmark_value>Raccourcis clavier;présentations</bookmark_value><bookmark_value>Présentations;raccourcis clavier</bookmark_value>"
 
-#. DRFWj
+#. b9LNb
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3150342\n"
 "help.text"
-msgid "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\" name=\"Shortcut Keys for $[officename] Impress\">Shortcut Keys for $[officename] Impress</link></variable>"
-msgstr "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\" name=\"Raccourcis clavier pour $[officename] Impress\">Raccourcis clavier pour $[officename] Impress</link></variable>"
+msgid "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">Shortcut Keys for $[officename] Impress</link></variable>"
+msgstr "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">Raccourcis clavier pour $[officename] Impress</link></variable>"
 
 #. zEQBA
 #: 01020000.xhp
@@ -53,14 +53,14 @@ msgctxt ""
 msgid "The following is a list of shortcut keys for $[officename] Impress."
 msgstr "La liste suivante répertorie les raccourcis clavier pour $[officename] Impress."
 
-#. Bp3rN
+#. Zzxcg
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3154658\n"
 "help.text"
-msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\" name=\"general shortcut keys\">general shortcut keys</link> in $[officename]."
-msgstr "Vous pouvez aussi utiliser <link href=\"text/shared/04/01010000.xhp\" name=\"les raccourcis clavier généraux\">les raccourcis clavier généraux</link> dans $[officename]."
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys</link> in $[officename]."
+msgstr "Vous pouvez aussi utiliser <link href=\"text/shared/04/01010000.xhp\">les raccourcis clavier généraux</link> dans $[officename]."
 
 #. iVdKg
 #: 01020000.xhp
@@ -332,14 +332,14 @@ msgctxt ""
 msgid "<emph>Effect</emph>"
 msgstr "<emph>Effet</emph>"
 
-#. wvCBg
+#. WGd82
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3154642\n"
 "help.text"
-msgid "Esc"
-msgstr "Échap"
+msgid "Esc or -"
+msgstr "Échap ou -"
 
 #. n4adw
 #: 01020000.xhp
@@ -350,14 +350,14 @@ msgctxt ""
 msgid "End presentation."
 msgstr "Terminer la présentation."
 
-#. CdBqF
+#. QzE6c
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3153625\n"
 "help.text"
-msgid "Spacebar or Right arrow or Down arrow or Page Down or Enter or Return or N"
-msgstr "Barre d'espace ou Flèche vers la droite ou Flèche vers le bas ou Page suivante ou Entrée ou Retour ou N"
+msgid "Left click or Spacebar or Right arrow or Down arrow or Page Down or Enter or Return"
+msgstr "Clic avec le bouton gauche ou la barre d'espace ou la flèche droit ou la flèche vers le bas ou la flèche vers la fin ou entrée ou retour arrière"
 
 #. 7hxGb
 #: 01020000.xhp
@@ -404,14 +404,14 @@ msgctxt ""
 msgid "Type a number of a slide and press Enter to go to the slide."
 msgstr "Saisissez le numéro d'une diapo et appuyez sur Entrée pour aller à cette diapo."
 
-#. 8yYSZ
+#. KNWDg
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id7291787\n"
 "help.text"
-msgid "Left arrow or Up arrow or Page Up or Backspace or P"
-msgstr "Flèche vers la gauche ou Flèche vers le haut ou Page précédente ou Retour arrière ou P"
+msgid "Right click or Left arrow or Up arrow or Page Up or Backspace"
+msgstr "Clic avec le bouton droit ou la flèche gauche ou la flèche vers le haut ou origine ou retour arrière"
 
 #. grY6a
 #: 01020000.xhp
@@ -547,6 +547,60 @@ msgctxt ""
 "help.text"
 msgid "Show white screen until next key or mouse wheel event."
 msgstr "Afficher un écran blanc jusqu'à la prochaine action sur une touche ou sur la molette de la souris."
+
+#. CLAGZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "P"
+msgstr "P"
+
+#. B6AXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr "Utilisez le pointeur de la souris comme stylo"
+
+#. rd5zq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "E"
+msgstr "E"
+
+#. DErwC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr "Efface tout le stylo sur la diapo"
+
+#. tV4qF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commande</caseinline><defaultinline>Ctro</defaultinline></switchinline>+A"
+
+#. XrKhx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr "Désactiver le mode stylo du pointeur"
 
 #. Hd6Y9
 #: 01020000.xhp
@@ -1430,14 +1484,14 @@ msgctxt ""
 msgid "Constrains the movement of the selected object horizontally or vertically."
 msgstr "Impose le mouvement horizontal ou vertical de l'objet sélectionné."
 
-#. mybXe
+#. qvf62
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3154117\n"
 "help.text"
-msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ drag (with <link href=\"text/shared/optionen/01070500.xhp\" name=\"Copy when moving\">Copy when moving</link> option active)"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commande</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ glissé (avec l'option <link href=\"text/shared/optionen/01070500.xhp\" name=\"Copy when moving\">Copie lors du déplacement</link> active)"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ drag (with <link href=\"text/shared/optionen/01070500.xhp\">Copy when moving</link> option active)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commande</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ glissé (avec l'option <link href=\"text/shared/optionen/01070500.xhp\">Copie lors du déplacement</link> active)"
 
 #. Bwos6
 #: 01020000.xhp
@@ -1889,14 +1943,14 @@ msgctxt ""
 msgid "Next slide, or next effect"
 msgstr "Diapo suivante ou effet suivant"
 
-#. umqc2
+#. QxAjW
 #: presenter.xhp
 msgctxt ""
 "presenter.xhp\n"
 "par_id0921200901104120\n"
 "help.text"
-msgid "Left click, right arrow, down arrow, spacebar, page down, enter, return, 'N'"
-msgstr "Clic gauche, flèche droite, flèche vers la bas, barre d'espace, page suivante, entrée, retour, 'N'"
+msgid "Left click, right arrow, down arrow, spacebar, page down, enter, return"
+msgstr "Clic avec le bouton gauche, flèche droite, flèche vers le bas, barre d'espace, flèche vers la fin, entrée, retour"
 
 #. xVgqH
 #: presenter.xhp
@@ -1907,14 +1961,50 @@ msgctxt ""
 msgid "Previous slide, or previous effect"
 msgstr "Diapo précédente ou effet précédent"
 
-#. r8Lqw
+#. vCcu4
 #: presenter.xhp
 msgctxt ""
 "presenter.xhp\n"
 "par_id0921200901104115\n"
 "help.text"
-msgid "Right click, left arrow, up arrow, page up, backspace, 'P'"
-msgstr "Clic droit, flèche gauche, flèche vers le haut, page précédente, retour arrière, 'P'"
+msgid "Right click, left arrow, up arrow, page up, backspace"
+msgstr "Clic avec le bouton droit, flèche gauche, flèche vers le haut, origine, retour arrière"
+
+#. EBm7C
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr "Utiliser le pointer de la souris comme stylo"
+
+#. k6PJG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "'P'"
+msgstr "'P'"
+
+#. dm9Mg
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr "Effacer tout le stylo sur la diapo"
+
+#. X3mGG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "'E'"
+msgstr "'E'"
 
 #. aTM8W
 #: presenter.xhp
@@ -2167,3 +2257,39 @@ msgctxt ""
 "help.text"
 msgid "Ctrl-'3'"
 msgstr "Ctrl+3"
+
+#. JEaUD
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154651\n"
+"help.text"
+msgid "Switch Monitors"
+msgstr "Échanger les écrans"
+
+#. zVJEs
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152943\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'4'"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commande</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'4'"
+
+#. eJrqE
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr "Désactiver le mode stylo du pointeur"
+
+#. yxpoN
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'A'"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Commande</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'A'"

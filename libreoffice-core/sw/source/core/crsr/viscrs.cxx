@@ -57,6 +57,7 @@
 #include <SwGrammarMarkUp.hxx>
 #include <docsh.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/json_writer.hxx>
 #include <cellfrm.hxx>
 #include <wrtsh.hxx>
@@ -127,7 +128,7 @@ OString buildHyperlinkJSON(const OUString& sText, const OUString& sLink)
     std::stringstream aStream;
     boost::property_tree::write_json(aStream, aTree, false);
 
-    return OString(aStream.str().c_str()).trim();
+    return OString(o3tl::trim(aStream.str()));
 }
 
 }
@@ -160,7 +161,7 @@ void SwVisibleCursor::SetPosAndShow(SfxViewShell const * pViewShell)
 
     if ( pTmpCursor && !m_pCursorShell->IsOverwriteCursor() )
     {
-        SwNode& rNode = pTmpCursor->GetPoint()->nNode.GetNode();
+        SwNode& rNode = pTmpCursor->GetPoint()->GetNode();
         if( rNode.IsTextNode() )
         {
             const SwTextNode& rTNd = *rNode.GetTextNode();
@@ -299,10 +300,10 @@ std::optional<OString> SwVisibleCursor::getLOKPayload(int nType, int nViewId) co
                 SwCursorMoveState eTmpState(CursorMoveState::SetOnlyText);
                 SwTextNode *pNode = nullptr;
                 if (m_pCursorShell->GetLayout()->GetModelPositionForViewPoint(&aPos, aPt, &eTmpState))
-                    pNode = aPos.nNode.GetNode().GetTextNode();
+                    pNode = aPos.GetNode().GetTextNode();
                 if (pNode && !pNode->IsInProtectSect())
                 {
-                    sal_Int32 nBegin = aPos.nContent.GetIndex();
+                    sal_Int32 nBegin = aPos.GetContentIndex();
                     sal_Int32 nLen = 1;
 
                     SwWrongList *pWrong = pNode->GetWrong();
@@ -401,7 +402,7 @@ void SwSelPaintRects::Hide()
  */
 static SwRect lcl_getLayoutRect(const Point& rPoint, const SwPosition& rPosition)
 {
-    const SwContentNode* pNode = rPosition.nNode.GetNode().GetContentNode();
+    const SwContentNode* pNode = rPosition.GetNode().GetContentNode();
     std::pair<Point, bool> const tmp(rPoint, true);
     const SwContentFrame* pFrame = pNode->getLayoutFrame(
             pNode->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(),
@@ -578,15 +579,14 @@ void SwSelPaintRects::HighlightInputField()
     if (m_bShowTextInputFieldOverlay)
     {
         SwTextInputField* pCurTextInputFieldAtCursor =
-            dynamic_cast<SwTextInputField*>(SwCursorShell::GetTextFieldAtPos( GetShell()->GetCursor()->Start(), false ));
+            dynamic_cast<SwTextInputField*>(SwCursorShell::GetTextFieldAtPos( GetShell()->GetCursor()->Start(), ::sw::GetTextAttrMode::Expand));
         if ( pCurTextInputFieldAtCursor != nullptr )
         {
             SwTextNode* pTextNode = pCurTextInputFieldAtCursor->GetpTextNode();
             std::unique_ptr<SwShellCursor> pCursorForInputTextField(
                 new SwShellCursor( *GetShell(), SwPosition( *pTextNode, pCurTextInputFieldAtCursor->GetStart() ) ) );
             pCursorForInputTextField->SetMark();
-            pCursorForInputTextField->GetMark()->nNode = *pTextNode;
-            pCursorForInputTextField->GetMark()->nContent.Assign( pTextNode, *(pCurTextInputFieldAtCursor->End()) );
+            pCursorForInputTextField->GetMark()->Assign(*pTextNode, *(pCurTextInputFieldAtCursor->End()) );
 
             pCursorForInputTextField->FillRects();
             SwRects* pRects = pCursorForInputTextField.get();
@@ -637,19 +637,20 @@ void SwSelPaintRects::HighlightContentControl()
     std::vector<OString> aLOKRectangles;
     SwRect aFirstPortionPaintArea;
     SwRect aLastPortionPaintArea;
+    bool bRTL = false;
     std::shared_ptr<SwContentControl> pContentControl;
 
     if (m_bShowContentControlOverlay)
     {
         const SwPosition* pStart = GetShell()->GetCursor()->Start();
-        SwTextNode* pTextNode = pStart->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNode = pStart->GetNode().GetTextNode();
         SwTextContentControl* pCurContentControlAtCursor = nullptr;
         if (pTextNode)
         {
-            // SwTextNode::PARENT because this way we highlight when the user will type inside the
+            // GetTextAttrMode::Parent because this way we highlight when the user will type inside the
             // content control, not outside of it.
             SwTextAttr* pAttr = pTextNode->GetTextAttrAt(
-                pStart->nContent.GetIndex(), RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT);
+                pStart->GetContentIndex(), RES_TXTATR_CONTENTCONTROL, ::sw::GetTextAttrMode::Parent);
             if (pAttr)
             {
                 pCurContentControlAtCursor = static_txtattr_cast<SwTextContentControl*>(pAttr);
@@ -660,9 +661,8 @@ void SwSelPaintRects::HighlightContentControl()
             auto pCursorForContentControl = std::make_unique<SwShellCursor>(
                 *GetShell(), SwPosition(*pTextNode, pCurContentControlAtCursor->GetStart()));
             pCursorForContentControl->SetMark();
-            pCursorForContentControl->GetMark()->nNode = *pTextNode;
-            pCursorForContentControl->GetMark()->nContent.Assign(
-                pTextNode, *(pCurContentControlAtCursor->End()));
+            pCursorForContentControl->GetMark()->Assign(
+                *pTextNode, *(pCurContentControlAtCursor->End()));
 
             pCursorForContentControl->FillRects();
             SwRects* pRects = pCursorForContentControl.get();
@@ -684,6 +684,15 @@ void SwSelPaintRects::HighlightContentControl()
                 aLastPortionPaintArea = (*pRects)[pRects->size() - 1];
             }
             pContentControl = pCurContentControlAtCursor->GetContentControl().GetContentControl();
+
+            // The layout knows if the text node is RTL (either set directly, or inherited from the
+            // environment).
+            SwIterator<SwTextFrame, SwTextNode, sw::IteratorMode::UnwrapMulti> aFrames(*pTextNode);
+            SwTextFrame* pFrame = aFrames.First();
+            if (pFrame)
+            {
+                bRTL = pFrame->IsRightToLeft();
+            }
         }
     }
 
@@ -757,7 +766,15 @@ void SwSelPaintRects::HighlightContentControl()
                     m_pContentControlButton = VclPtr<SwDropDownContentControlButton>::Create(
                         &rEditWin, pContentControl);
                 }
-                m_pContentControlButton->CalcPosAndSize(aLastPortionPaintArea);
+                m_pContentControlButton->SetRTL(bRTL);
+                if (bRTL)
+                {
+                    m_pContentControlButton->CalcPosAndSize(aFirstPortionPaintArea);
+                }
+                else
+                {
+                    m_pContentControlButton->CalcPosAndSize(aLastPortionPaintArea);
+                }
                 m_pContentControlButton->Show();
             }
         }
@@ -821,7 +838,7 @@ void SwSelPaintRects::HighlightContentControl()
     }
 }
 
-VclPtr<SwContentControlButton> SwSelPaintRects::GetContentControlButton() const
+const VclPtr<SwContentControlButton>& SwSelPaintRects::GetContentControlButton() const
 {
     return m_pContentControlButton;
 }
@@ -932,11 +949,11 @@ void SwShellCursor::FillRects()
 {
     // calculate the new rectangles
     if( HasMark() &&
-        GetPoint()->nNode.GetNode().IsContentNode() &&
-        GetPoint()->nNode.GetNode().GetContentNode()->getLayoutFrame( GetShell()->GetLayout() ) &&
-        (GetMark()->nNode == GetPoint()->nNode ||
-        (GetMark()->nNode.GetNode().IsContentNode() &&
-         GetMark()->nNode.GetNode().GetContentNode()->getLayoutFrame( GetShell()->GetLayout() ) )   ))
+        GetPoint()->GetNode().IsContentNode() &&
+        GetPoint()->GetNode().GetContentNode()->getLayoutFrame( GetShell()->GetLayout() ) &&
+        (GetMark()->GetNode() == GetPoint()->GetNode() ||
+        (GetMark()->GetNode().IsContentNode() &&
+         GetMark()->GetNode().GetContentNode()->getLayoutFrame( GetShell()->GetLayout() ) )   ))
         GetShell()->GetLayout()->CalcFrameRects( *this );
 }
 
@@ -1050,6 +1067,33 @@ void SwShellCursor::SaveTableBoxContent( const SwPosition* pPos )
 
 bool SwShellCursor::UpDown( bool bUp, sal_uInt16 nCnt )
 {
+    // tdf#124603 trigger pending spell checking of the node
+    if ( nCnt == 1 )
+    {
+        SwTextNode* pNode = GetPoint()->GetNode().GetTextNode();
+        if( pNode && sw::WrongState::PENDING == pNode->GetWrongDirty() )
+        {
+            SwWrtShell* pShell = pNode->GetDoc().GetDocShell()->GetWrtShell();
+            if ( pShell && !pShell->IsSelection() && !pShell->IsSelFrameMode() )
+            {
+                const SwViewOption* pVOpt = pShell->GetViewOptions();
+                if ( pVOpt && pVOpt->IsOnlineSpell() )
+                {
+                    const bool bOldViewLock = pShell->IsViewLocked();
+                    pShell->LockView( true );
+
+                    SwTextFrame* pFrame(
+                        static_cast<SwTextFrame*>(pNode->getLayoutFrame(GetShell()->GetLayout())));
+                    SwRect aRepaint(pFrame->AutoSpell_(*pNode, 0));
+                    if (aRepaint.HasArea())
+                        pShell->InvalidateWindows(aRepaint);
+
+                    pShell->LockView( bOldViewLock );
+                }
+            }
+        }
+    }
+
     return SwCursor::UpDown( bUp, nCnt,
                             &GetPtPos(), GetShell()->GetUpDownX(),
                             *GetShell()->GetLayout());
@@ -1106,7 +1150,7 @@ void SwShellTableCursor::SaveTableBoxContent( const SwPosition* pPos )
 void SwShellTableCursor::FillRects()
 {
     // Calculate the new rectangles. If the cursor is still "parked" do nothing
-    if (m_SelectedBoxes.empty() || m_bParked || !GetPoint()->nNode.GetIndex())
+    if (m_SelectedBoxes.empty() || m_bParked || !GetPoint()->GetNodeIndex())
         return;
 
     bool bStart = true;
@@ -1176,7 +1220,7 @@ void SwShellTableCursor::FillStartEnd(SwRect& rStart, SwRect& rEnd) const
 bool SwShellTableCursor::Contains( const Point& rPt ) const
 {
     // Calculate the new rectangles. If the cursor is still "parked" do nothing
-    if (m_SelectedBoxes.empty() || m_bParked || !GetPoint()->nNode.GetIndex())
+    if (m_SelectedBoxes.empty() || m_bParked || !GetPoint()->GetNodeIndex())
         return false;
 
     SwNodes& rNds = GetDoc().GetNodes();

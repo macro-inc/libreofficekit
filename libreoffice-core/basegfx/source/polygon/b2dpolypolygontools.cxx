@@ -113,7 +113,7 @@ namespace basegfx::utils
             return rCandidate;
         }
 
-        B2DPolyPolygon adaptiveSubdivideByDistance(const B2DPolyPolygon& rCandidate, double fDistanceBound)
+        B2DPolyPolygon adaptiveSubdivideByDistance(const B2DPolyPolygon& rCandidate, double fDistanceBound, int nRecurseLimit)
         {
             if(rCandidate.areControlPointsUsed())
             {
@@ -123,7 +123,7 @@ namespace basegfx::utils
                 {
                     if(rPolygon.areControlPointsUsed())
                     {
-                        aRetval.append(utils::adaptiveSubdivideByDistance(rPolygon, fDistanceBound));
+                        aRetval.append(utils::adaptiveSubdivideByDistance(rPolygon, fDistanceBound, nRecurseLimit));
                     }
                     else
                     {
@@ -514,7 +514,7 @@ namespace basegfx::utils
             }
 
             B2DPolygon aCurrSegment;
-            const size_t sliceSize=SAL_N_ELEMENTS(numbers)/12;
+            const size_t sliceSize=std::size(numbers)/12;
             const int* pCurrSegment=numbers + nNumber*sliceSize;
             for( size_t i=0; i<sliceSize; i++, pCurrSegment++)
             {
@@ -553,6 +553,7 @@ namespace basegfx::utils
             const css::drawing::PointSequenceSequence& rPointSequenceSequenceSource)
         {
             B2DPolyPolygon aRetval;
+            aRetval.reserve(rPointSequenceSequenceSource.getLength());
             const css::drawing::PointSequence* pPointSequence = rPointSequenceSequenceSource.getConstArray();
             const css::drawing::PointSequence* pPointSeqEnd = pPointSequence + rPointSequenceSequenceSource.getLength();
 

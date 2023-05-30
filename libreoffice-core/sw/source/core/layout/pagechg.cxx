@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <comphelper/lok.hxx>
 #include <ndole.hxx>
 #include <sal/log.hxx>
@@ -403,7 +405,7 @@ static void lcl_MakeObjs( const SwFrameFormats &rTable, SwPageFrame *pPage )
         const SwFormatAnchor &rAnch = pFormat->GetAnchor();
         if ( rAnch.GetPageNum() == pPage->GetPhyPageNum() )
         {
-            if( rAnch.GetContentAnchor() )
+            if( rAnch.GetAnchorNode() )
             {
                 if (RndStdIds::FLY_AT_PAGE == rAnch.GetAnchorId())
                 {
@@ -1345,13 +1347,19 @@ namespace
 
         pPage->PreparePage( bFootnote );
         // If the sibling has no body text, destroy it as long as it is no footnote page.
-        if ( pSibling && !pSibling->IsFootnotePage() &&
-             !pSibling->FindFirstBodyContent() &&
-             (!pRefPage || !isDeleteForbidden(pSibling)) )
+        if (!pSibling)
+            return true;
+        if (pSibling->IsFootnotePage())
+            return true;
+        if (pSibling->FindFirstBodyContent())
+            return true;
+
+        if (!pRefPage || !isDeleteForbidden(pSibling))
         {
             pRoot->RemovePage( pRefSibling, SwRemoveResult::Next ) ;
             return false;
         }
+
         return true;
     }
 }
@@ -1564,7 +1572,7 @@ void SwRootFrame::AssertFlyPages()
     for ( size_t i = 0; i < pTable->size(); ++i )
     {
         const SwFormatAnchor &rAnch = (*pTable)[i]->GetAnchor();
-        if(!rAnch.GetContentAnchor())
+        if(!rAnch.GetAnchorNode())
         {
             const sal_uInt16 nPageNum(rAnch.GetPageNum());
 
@@ -1943,7 +1951,7 @@ void SwRootFrame::UnoRemoveAllActions()
     {
         // #i84729#
         // No end action, if <SwViewShell> instance is currently in its end action.
-        // Recursives calls to <::EndAction()> are not allowed.
+        // Recursive calls to <::EndAction()> are not allowed.
         if ( !rSh.IsInEndAction() )
         {
             OSL_ENSURE(!rSh.GetRestoreActions(), "Restore action count is already set!");
@@ -2075,23 +2083,25 @@ static void lcl_MoveAllLowerObjs( SwFrame* pFrame, const Point& rOffset )
 
 static void lcl_MoveAllLowers( SwFrame* pFrame, const Point& rOffset )
 {
-    const SwRect aFrame( pFrame->getFrameArea() );
-
     // first move the current frame
     // RotateFlyFrame3: moved to transform_translate instead of
     // direct modification to allow the SwFrame evtl. needed own reactions
     pFrame->transform_translate(rOffset);
 
     // Don't forget accessibility:
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( pFrame->IsAccessibleFrame() )
     {
         SwRootFrame *pRootFrame = pFrame->getRootFrame();
         if( pRootFrame && pRootFrame->IsAnyShellAccessible() &&
             pRootFrame->GetCurrShell() )
         {
+            const SwRect aFrame( pFrame->getFrameArea() );
+
             pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( pFrame, aFrame );
         }
     }
+#endif
 
     // the move any objects
     lcl_MoveAllLowerObjs( pFrame, rOffset );

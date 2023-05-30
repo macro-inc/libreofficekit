@@ -18,10 +18,11 @@
  */
 #pragma once
 
-#include "MutexContainer.hxx"
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <com/sun/star/chart2/data/XRangeHighlighter.hpp>
 #include <com/sun/star/view/XSelectionChangeListener.hpp>
+#include <rtl/ref.hxx>
 
 namespace com::sun::star {
     namespace chart2 {
@@ -35,23 +36,25 @@ namespace com::sun::star::view { class XSelectionSupplier; }
 
 namespace chart
 {
+class ChartModel;
+class DataSeries;
+class Diagram;
 
 namespace impl
 {
-typedef ::cppu::WeakComponentImplHelper<
+typedef comphelper::WeakComponentImplHelper<
         css::chart2::data::XRangeHighlighter,
         css::view::XSelectionChangeListener
     >
     RangeHighlighter_Base;
 }
 
-class RangeHighlighter :
-        public MutexContainer,
+class RangeHighlighter final :
         public impl::RangeHighlighter_Base
 {
 public:
     explicit RangeHighlighter(
-        const css::uno::Reference< css::view::XSelectionSupplier > & xSelectionSupplier );
+        const rtl::Reference< ::chart::ChartModel > & xSelectionSupplier );
     virtual ~RangeHighlighter() override;
 
 protected:
@@ -72,7 +75,7 @@ protected:
 
     // ____ WeakComponentImplHelperBase ____
     // is called when dispose() is called at this component
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
 private:
     void fireSelectionEvent();
@@ -80,21 +83,23 @@ private:
     void stopListening();
     void determineRanges();
 
-    void fillRangesForDiagram( const css::uno::Reference< css::chart2::XDiagram > & xDiagram );
+    void fillRangesForDiagram( const rtl::Reference< ::chart::Diagram > & xDiagram );
     void fillRangesForDataSeries( const css::uno::Reference< css::chart2::XDataSeries > & xSeries );
     void fillRangesForCategories( const css::uno::Reference< css::chart2::XAxis > & xAxis );
-    void fillRangesForDataPoint( const css::uno::Reference< css::uno::XInterface > & xDataSeries, sal_Int32 nIndex );
+    void fillRangesForDataPoint( const rtl::Reference< ::chart::DataSeries > & xDataSeries, sal_Int32 nIndex );
     void fillRangesForErrorBars( const css::uno::Reference< css::beans::XPropertySet > & xErrorBar,
                                  const css::uno::Reference< css::chart2::XDataSeries > & xDataSeries );
 
     css::uno::Reference< css::view::XSelectionSupplier >
         m_xSelectionSupplier;
+    rtl::Reference< ::chart::ChartModel > m_xChartModel;
     css::uno::Reference< css::view::XSelectionChangeListener >
         m_xListener;
     css::uno::Sequence< css::chart2::data::HighlightedRange >
         m_aSelectedRanges;
     sal_Int32 m_nAddedListenerCount;
     bool m_bIncludeHiddenCells;
+    comphelper::OInterfaceContainerHelper4<css::view::XSelectionChangeListener> maSelectionChangeListeners;
 };
 
 } //  namespace chart

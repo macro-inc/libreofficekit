@@ -32,7 +32,7 @@
 #include <editeng/eeitem.hxx>
 #include <editeng/editstat.hxx>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svx/sdr/contact/viewobjectcontact.hxx>
 #include <svx/sdr/contact/viewcontact.hxx>
 
@@ -55,9 +55,10 @@ namespace {
     public:
         ViewRedirector();
 
-        virtual drawinglayer::primitive2d::Primitive2DContainer createRedirectedPrimitive2DSequence(
+        virtual void createRedirectedPrimitive2DSequence(
             const sdr::contact::ViewObjectContact& rOriginal,
-            const sdr::contact::DisplayInfo& rDisplayInfo) override;
+            const sdr::contact::DisplayInfo& rDisplayInfo,
+            drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) override;
     };
 }
 
@@ -490,34 +491,38 @@ ViewRedirector::ViewRedirector()
 {
 }
 
-drawinglayer::primitive2d::Primitive2DContainer ViewRedirector::createRedirectedPrimitive2DSequence(
+void ViewRedirector::createRedirectedPrimitive2DSequence(
     const sdr::contact::ViewObjectContact& rOriginal,
-    const sdr::contact::DisplayInfo& rDisplayInfo)
+    const sdr::contact::DisplayInfo& rDisplayInfo,
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor)
 {
     SdrObject* pObject = rOriginal.GetViewContact().TryToGetSdrObject();
 
     if (pObject==nullptr || pObject->getSdrPageFromSdrObject() == nullptr)
     {
         // not a SdrObject visualisation (maybe e.g. page) or no page
-        return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(
+        sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(
             rOriginal,
-            rDisplayInfo);
+            rDisplayInfo,
+            rVisitor);
+        return;
     }
 
     const bool bDoCreateGeometry (pObject->getSdrPageFromSdrObject()->checkVisibility( rOriginal, rDisplayInfo, true));
 
     if ( ! bDoCreateGeometry
-        && (pObject->GetObjInventor() != SdrInventor::Default || pObject->GetObjIdentifier() != OBJ_PAGE))
+        && (pObject->GetObjInventor() != SdrInventor::Default || pObject->GetObjIdentifier() != SdrObjKind::Page))
     {
-        return drawinglayer::primitive2d::Primitive2DContainer();
+        return;
     }
 
     if (pObject->IsEmptyPresObj())
-        return drawinglayer::primitive2d::Primitive2DContainer();
+        return;
 
-    return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(
+    sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(
         rOriginal,
-        rDisplayInfo);
+        rDisplayInfo,
+        rVisitor);
 }
 
 } // end of anonymous namespace

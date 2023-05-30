@@ -49,7 +49,8 @@ namespace sw
     struct SW_DLLPUBLIC FindSdrObjectHint final : SfxHint
     {
         SdrObject*& m_rpObject;
-        FindSdrObjectHint(SdrObject*& rpObject) : m_rpObject(rpObject) {};
+        FindSdrObjectHint(SdrObject*& rpObject)
+            : SfxHint(SfxHintId::SwFindSdrObject), m_rpObject(rpObject) {};
         virtual ~FindSdrObjectHint() override;
     };
 }
@@ -74,7 +75,7 @@ class SW_DLLPUBLIC SwFrameFormat
     // The assigned SwFrmFmt list.
     SwFrameFormats *m_ffList;
 
-    SwTextBoxNode* m_pOtherTextBoxFormat;
+    std::shared_ptr< SwTextBoxNode > m_pOtherTextBoxFormats;
 
     struct change_name
     {
@@ -102,8 +103,8 @@ protected:
 
 public:
 
-    SwTextBoxNode* GetOtherTextBoxFormat() const { return m_pOtherTextBoxFormat; };
-    void SetOtherTextBoxFormat(SwTextBoxNode* pNew) { m_pOtherTextBoxFormat = pNew; };
+    const std::shared_ptr< SwTextBoxNode >& GetOtherTextBoxFormats() const { return m_pOtherTextBoxFormats; };
+    void SetOtherTextBoxFormats(const std::shared_ptr<SwTextBoxNode>& rNew) { m_pOtherTextBoxFormats = rNew; };
 
     virtual ~SwFrameFormat() override;
 
@@ -180,7 +181,7 @@ public:
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const;
 
-    virtual void SetName( const OUString& rNewName, bool bBroadcast=false ) override;
+    virtual void SetFormatName( const OUString& rNewName, bool bBroadcast=false ) override;
     void MoveTableBox(SwTableBox& rTableBox, const SwFrameFormat* pOldFormat);
 };
 
@@ -191,6 +192,8 @@ class SW_DLLPUBLIC SwFlyFrameFormat final : public SwFrameFormat
     friend class SwDoc;
     OUString msTitle;
     OUString msDesc;
+    /// A tooltip has priority over an SwFormatURL and is not persisted to files.
+    OUString msTooltip;
 
     /** Both not existent.
        it stores the previous position of Prt rectangle from RequestObjectResize
@@ -220,6 +223,10 @@ public:
 
     OUString GetObjTitle() const;
     void SetObjTitle( const OUString& rTitle, bool bBroadcast = false );
+
+    const OUString & GetObjTooltip() const;
+    void SetObjTooltip(const OUString& rTooltip);
+
     OUString GetObjDescription() const;
     void SetObjDescription( const OUString& rDescription, bool bBroadcast = false );
 
@@ -273,26 +280,33 @@ namespace sw
     struct DrawFrameFormatHint final: SfxHint
     {
         DrawFrameFormatHintId m_eId;
-        DrawFrameFormatHint(DrawFrameFormatHintId eId) : m_eId(eId) {};
+        DrawFrameFormatHint(DrawFrameFormatHintId eId)
+            : SfxHint(SfxHintId::SwDrawFrameFormat), m_eId(eId) {};
         virtual ~DrawFrameFormatHint() override;
     };
     struct CheckDrawFrameFormatLayerHint final: SfxHint
     {
         bool* m_bCheckControlLayer;
-        CheckDrawFrameFormatLayerHint(bool* bCheckControlLayer) : m_bCheckControlLayer(bCheckControlLayer) {};
+        CheckDrawFrameFormatLayerHint(bool* bCheckControlLayer)
+            : SfxHint(SfxHintId::SwCheckDrawFrameFormatLayer),
+              m_bCheckControlLayer(bCheckControlLayer) {};
         virtual ~CheckDrawFrameFormatLayerHint() override;
     };
     struct ContactChangedHint final: SfxHint
     {
         SdrObject** m_ppObject;
-        ContactChangedHint(SdrObject** ppObject) : m_ppObject(ppObject) {};
+        ContactChangedHint(SdrObject** ppObject)
+            : SfxHint(SfxHintId::SwContactChanged),
+              m_ppObject(ppObject) {};
         virtual ~ContactChangedHint() override;
     };
     struct DrawFormatLayoutCopyHint final : SfxHint
     {
         SwDrawFrameFormat& m_rDestFormat;
         SwDoc& m_rDestDoc;
-        DrawFormatLayoutCopyHint(SwDrawFrameFormat& rDestFormat, SwDoc& rDestDoc) : m_rDestFormat(rDestFormat), m_rDestDoc(rDestDoc) {};
+        DrawFormatLayoutCopyHint(SwDrawFrameFormat& rDestFormat, SwDoc& rDestDoc)
+            : SfxHint(SfxHintId::SwDrawFormatLayoutCopy),
+              m_rDestFormat(rDestFormat), m_rDestDoc(rDestDoc) {};
         virtual ~DrawFormatLayoutCopyHint() override;
     };
     enum class WW8AnchorConv
@@ -315,38 +329,50 @@ namespace sw
     struct SW_DLLPUBLIC WW8AnchorConvHint final : SfxHint
     {
         WW8AnchorConvResult& m_rResult;
-        WW8AnchorConvHint(WW8AnchorConvResult& rResult) : m_rResult(rResult) {};
+        WW8AnchorConvHint(WW8AnchorConvResult& rResult)
+            : SfxHint(SfxHintId::SwWW8AnchorConv),
+              m_rResult(rResult) {};
         virtual ~WW8AnchorConvHint() override;
     };
     struct RestoreFlyAnchorHint final : SfxHint
     {
         const Point m_aPos;
-        RestoreFlyAnchorHint(Point aPos) : m_aPos(aPos) {};
+        RestoreFlyAnchorHint(Point aPos)
+            : SfxHint(SfxHintId::SwRestoreFlyAnchor),
+              m_aPos(aPos) {};
         virtual ~RestoreFlyAnchorHint() override;
     };
     struct CreatePortionHint final : SfxHint
     {
         SwDrawContact** m_ppContact;
-        CreatePortionHint(SwDrawContact** ppContact) : m_ppContact(ppContact) {};
+        CreatePortionHint(SwDrawContact** ppContact)
+            : SfxHint(SfxHintId::SwCreatePortion),
+              m_ppContact(ppContact) {};
         virtual ~CreatePortionHint() override;
     };
     struct CollectTextObjectsHint final : SfxHint
     {
         std::list<SdrTextObj*>& m_rTextObjects;
-        CollectTextObjectsHint(std::list<SdrTextObj*>& rTextObjects) : m_rTextObjects(rTextObjects) {};
+        CollectTextObjectsHint(std::list<SdrTextObj*>& rTextObjects)
+            : SfxHint(SfxHintId::SwCollectTextObjects),
+              m_rTextObjects(rTextObjects) {};
         virtual ~CollectTextObjectsHint() override;
     };
     struct GetZOrderHint final : SfxHint
     {
         sal_uInt32& m_rnZOrder;
-        GetZOrderHint(sal_uInt32& rnZOrder) : m_rnZOrder(rnZOrder) {};
+        GetZOrderHint(sal_uInt32& rnZOrder)
+            : SfxHint(SfxHintId::SwGetZOrder),
+              m_rnZOrder(rnZOrder) {};
         virtual ~GetZOrderHint() override;
     };
     struct GetObjectConnectedHint final : SfxHint
     {
         bool& m_risConnected;
         const SwRootFrame* m_pRoot;
-        GetObjectConnectedHint(bool& risConnected, const SwRootFrame* pRoot) : m_risConnected(risConnected), m_pRoot(pRoot) {};
+        GetObjectConnectedHint(bool& risConnected, const SwRootFrame* pRoot)
+            : SfxHint(SfxHintId::SwGetObjectConnected),
+              m_risConnected(risConnected), m_pRoot(pRoot) {};
         virtual ~GetObjectConnectedHint() override;
     };
 }

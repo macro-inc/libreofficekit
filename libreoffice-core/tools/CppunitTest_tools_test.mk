@@ -39,6 +39,7 @@ $(eval $(call gb_CppunitTest_add_exception_objects,tools_test, \
     tools/qa/cppunit/test_cpu_runtime_detection_SSE2 \
     tools/qa/cppunit/test_cpu_runtime_detection_SSSE3 \
     tools/qa/cppunit/test_Wildcard \
+    tools/qa/cppunit/test_zcodec \
 ))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,tools_test,\
@@ -57,10 +58,13 @@ $(eval $(call gb_CppunitTest_use_sdk_api,tools_test))
 
 $(eval $(call gb_CppunitTest_use_libraries,tools_test, \
     basegfx \
+    comphelper \
     sal \
     tl \
     test \
     unotest \
+    utl \
+    vcl \
 ))
 
 $(eval $(call gb_CppunitTest_use_static_libraries,tools_test, \

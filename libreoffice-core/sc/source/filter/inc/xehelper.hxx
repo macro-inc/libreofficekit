@@ -256,7 +256,7 @@ public:
     static void         AppendString(
                             XclExpString& rXclString,
                             const XclExpRoot& rRoot,
-                            const OUString& rString );
+                            std::u16string_view rString);
 
     /** Appends a character to an Excel string object.
         @descr  Selects the correct Append() function depending on the current
@@ -409,7 +409,7 @@ public:
 
     /** Encodes and returns the URL passed in rAbsUrl to an Excel like URL.
         @param pTableName  Optional pointer to a table name to be encoded in this URL. */
-    static OUString EncodeUrl( const XclExpRoot& rRoot, const OUString& rAbsUrl, const OUString* pTableName = nullptr );
+    static OUString EncodeUrl( const XclExpRoot& rRoot, std::u16string_view rAbsUrl, const OUString* pTableName = nullptr );
     /** Encodes and returns the passed DDE link to an Excel like DDE link. */
     static OUString EncodeDde( std::u16string_view rApplic, std::u16string_view rTopic );
 };

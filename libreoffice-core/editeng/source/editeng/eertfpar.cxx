@@ -31,6 +31,7 @@
 
 #include <svtools/rtftoken.h>
 #include <svtools/htmltokn.h>
+#include <unotools/configmgr.hxx>
 
 using namespace com::sun::star;
 
@@ -53,10 +54,6 @@ RtfImportInfo::RtfImportInfo( RtfImportState eSt, SvParser<int>* pPrsrs, const E
     eState      = eSt;
     nToken      = 0;
     nTokenValue = 0;
-}
-
-RtfImportInfo::~RtfImportInfo()
-{
 }
 
 constexpr MapUnit gRTFMapUnit = MapUnit::MapTwip;
@@ -307,7 +304,6 @@ void EditRTFParser::SetAttrInDoc( SvxRTFItemStackType &rSet )
     EditPaM aEndPaM( pEndNode, rSet.GetEndCnt() );
 
     // If possible adjust the Escapement-Item:
-    const SfxPoolItem* pItem;
 
     // #i66167# adapt font heights to destination MapUnit if necessary
     const MapUnit eDestUnit = mpEditEngine->GetEditDoc().GetItemPool().GetMetric(0);
@@ -316,6 +312,7 @@ void EditRTFParser::SetAttrInDoc( SvxRTFItemStackType &rSet )
         sal_uInt16 const aFntHeightIems[3] = { EE_CHAR_FONTHEIGHT, EE_CHAR_FONTHEIGHT_CJK, EE_CHAR_FONTHEIGHT_CTL };
         for (unsigned short aFntHeightIem : aFntHeightIems)
         {
+            const SfxPoolItem* pItem;
             if (SfxItemState::SET == rSet.GetAttrSet().GetItemState( aFntHeightIem, false, &pItem ))
             {
                 sal_uInt32 nHeight  = static_cast<const SvxFontHeightItem*>(pItem)->GetHeight();
@@ -331,23 +328,29 @@ void EditRTFParser::SetAttrInDoc( SvxRTFItemStackType &rSet )
         }
     }
 
-    if( SfxItemState::SET == rSet.GetAttrSet().GetItemState( EE_CHAR_ESCAPEMENT, false, &pItem ))
+    if( const SvxEscapementItem* pItem = rSet.GetAttrSet().GetItemIfSet( EE_CHAR_ESCAPEMENT, false ) )
     {
         // the correct one
-        tools::Long nEsc = static_cast<const SvxEscapementItem*>(pItem)->GetEsc();
+        tools::Long nEsc = pItem->GetEsc();
         tools::Long nEscFontHeight = 0;
         if( ( DFLT_ESC_AUTO_SUPER != nEsc ) && ( DFLT_ESC_AUTO_SUB != nEsc ) )
         {
             nEsc *= 10; //HalfPoints => Twips was embezzled in RTFITEM.CXX!
             SvxFont aFont;
-            mpEditEngine->SeekCursor(aStartPaM.GetNode(), aStartPaM.GetIndex()+1, aFont);
+            if (utl::ConfigManager::IsFuzzing())
+            {
+                // ofz#24932 detecting RTL vs LTR is slow
+                aFont = aStartPaM.GetNode()->GetCharAttribs().GetDefFont();
+            }
+            else
+                mpEditEngine->SeekCursor(aStartPaM.GetNode(), aStartPaM.GetIndex()+1, aFont);
             nEscFontHeight = aFont.GetFontSize().Height();
         }
         if (nEscFontHeight)
         {
             nEsc = nEsc * 100 / nEscFontHeight;
 
-            SvxEscapementItem aEscItem( static_cast<short>(nEsc), static_cast<const SvxEscapementItem*>(pItem)->GetProportionalHeight(), EE_CHAR_ESCAPEMENT );
+            SvxEscapementItem aEscItem( static_cast<short>(nEsc), pItem->GetProportionalHeight(), EE_CHAR_ESCAPEMENT );
             rSet.GetAttrSet().Put( aEscItem );
         }
     }

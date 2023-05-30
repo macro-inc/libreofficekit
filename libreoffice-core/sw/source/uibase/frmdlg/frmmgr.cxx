@@ -31,6 +31,7 @@
 #include <comphelper/classids.hxx>
 #include <osl/diagnose.h>
 #include <fmtclds.hxx>
+#include <utility>
 #include <wrtsh.hxx>
 #include <view.hxx>
 #include <viewopt.hxx>
@@ -117,8 +118,8 @@ SwFlyFrameAttrMgr::SwFlyFrameAttrMgr( bool bNew, SwWrtShell* pSh, Frmmgr_Type nT
     ::PrepareBoxInfo( m_aSet, *m_pOwnSh );
 }
 
-SwFlyFrameAttrMgr::SwFlyFrameAttrMgr( bool bNew, SwWrtShell* pSh, const SfxItemSet &rSet ) :
-    m_aSet( rSet ),
+SwFlyFrameAttrMgr::SwFlyFrameAttrMgr( bool bNew, SwWrtShell* pSh, SfxItemSet aSet ) :
+    m_aSet(std::move( aSet )),
     m_pOwnSh( pSh ),
     m_bAbsPos( false ),
     m_bNewFrame( bNew ),
@@ -142,10 +143,8 @@ void SwFlyFrameAttrMgr::UpdateAttrMgr()
 
 void SwFlyFrameAttrMgr::UpdateFlyFrame_()
 {
-    const SfxPoolItem* pItem = nullptr;
-
-    if (m_aSet.GetItemState(FN_SET_FRM_NAME, false, &pItem) == SfxItemState::SET)
-        m_pOwnSh->SetFlyName(static_cast<const SfxStringItem *>(pItem)->GetValue());
+    if (const SfxStringItem* pItem = m_aSet.GetItemIfSet(FN_SET_FRM_NAME, false))
+        m_pOwnSh->SetFlyName(pItem->GetValue());
 
     m_pOwnSh->SetModified();
 
@@ -166,14 +165,13 @@ void SwFlyFrameAttrMgr::UpdateFlyFrame()
         return;
 
     //JP 6.8.2001: set never an invalid anchor into the core.
-    const SfxPoolItem *pGItem, *pItem;
-    if( SfxItemState::SET == m_aSet.GetItemState( RES_ANCHOR, false, &pItem ))
+    const SwFormatAnchor *pGItem, *pItem;
+    if( (pItem = m_aSet.GetItemIfSet( RES_ANCHOR, false )) )
     {
         SfxItemSetFixed<RES_ANCHOR, RES_ANCHOR> aGetSet( *m_aSet.GetPool() );
         if( m_pOwnSh->GetFlyFrameAttr( aGetSet ) && 1 == aGetSet.Count() &&
-            SfxItemState::SET == aGetSet.GetItemState( RES_ANCHOR, false, &pGItem )
-            && static_cast<const SwFormatAnchor*>(pGItem)->GetAnchorId() ==
-               static_cast<const SwFormatAnchor*>(pItem)->GetAnchorId() )
+            (pGItem = aGetSet.GetItemIfSet( RES_ANCHOR, false ))
+            && pGItem->GetAnchorId() == pItem->GetAnchorId() )
             m_aSet.ClearItem( RES_ANCHOR );
     }
 
@@ -263,7 +261,7 @@ void SwFlyFrameAttrMgr::SetAbsPos( const Point& rPoint )
 
 // check metrics for correctness
 void SwFlyFrameAttrMgr::ValidateMetrics( SvxSwFrameValidation& rVal,
-        const SwPosition* pToCharContentPos,
+        const SwFormatAnchor* pToCharContentPos,
         bool bOnlyPercentRefValue )
 {
     if (!bOnlyPercentRefValue)

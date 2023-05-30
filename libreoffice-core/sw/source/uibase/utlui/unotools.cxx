@@ -50,6 +50,7 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <comphelper/string.hxx>
 #include <docsh.hxx>
 #include <editsh.hxx>
 #include <swmodule.hxx>
@@ -73,7 +74,7 @@ static void disableScrollBars(uno::Reference< beans::XPropertySet > const & xVie
 
     //To reproduce this problem, in edit->autotext and click through
     //the examples and see if the preview gets a horizontal scrollbar
-    uno::Any aFalseSet(uno::makeAny(false));
+    uno::Any aFalseSet(uno::Any(false));
     xViewProps->setPropertyValue(UNO_NAME_SHOW_ONLINE_LAYOUT, aFalseSet);
 
     xViewProps->setPropertyValue(UNO_NAME_SHOW_HORI_SCROLL_BAR, aFalseSet);
@@ -81,7 +82,7 @@ static void disableScrollBars(uno::Reference< beans::XPropertySet > const & xVie
 
     if (bEnableOnlineMode)
     {
-        xViewProps->setPropertyValue(UNO_NAME_SHOW_ONLINE_LAYOUT, uno::makeAny(true));
+        xViewProps->setPropertyValue(UNO_NAME_SHOW_ONLINE_LAYOUT, uno::Any(true));
     }
 }
 
@@ -339,7 +340,7 @@ IMPL_LINK( SwOneExampleFrame, TimeoutHdl, Timer*, pTimer, void )
                 pSh->Overwrite(SwResId(STR_IDXEXAMPLE_IDXTXT_IMAGE1));
               }
             }
-            while(pSh->Right(sal_uInt16(1), sal_uInt16(1), true));
+            while(pSh->Right(sal_uInt16(1), SwCursorSkipMode::Cells, true));
 
             TOXTypes eTypes[] = { TOX_INDEX, TOX_USER, TOX_CONTENT };
             for (auto eType : eTypes)
@@ -499,7 +500,7 @@ void SwOneExampleFrame::PopupHdl(std::string_view rId)
     std::string_view sZoomValue;
     if (o3tl::starts_with(rId, "zoom", &sZoomValue))
     {
-        sal_Int16 nZoom = rtl_str_toInt64_WithLength(sZoomValue.data(), 10, sZoomValue.length());
+        sal_Int16 nZoom = o3tl::toInt32(sZoomValue);
         uno::Reference< view::XViewSettingsSupplier >  xSettings(m_xController, uno::UNO_QUERY);
         uno::Reference< beans::XPropertySet >  xViewProps = xSettings->getViewSettings();
 

@@ -31,7 +31,6 @@
 #include <editeng/justifyitem.hxx>
 
 #include <attrib.hxx>
-#include <global.hxx>
 #include <docpool.hxx>
 #include <patattr.hxx>
 #include <document.hxx>
@@ -103,7 +102,7 @@ void ScQProStyle::SetFormat( ScDocument *pDoc, sal_uInt8 nCol, sal_uInt16 nRow, 
             break;
 
     }
-    rItemSet.Put( SvxOrientationItem( eOrient, 0) );
+    rItemSet.Put( SvxOrientationItem( eOrient, TypedWhichId<SvxOrientationItem>(0)) );
 
     // Wrap cell contents
     if( nTmp & 0x80 )

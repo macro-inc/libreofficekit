@@ -337,8 +337,6 @@ namespace basegfx
     {
     }
 
-    B2DCubicBezier::~B2DCubicBezier() = default;
-
     // assignment operator
     B2DCubicBezier& B2DCubicBezier::operator=(const B2DCubicBezier&) = default;
 
@@ -612,12 +610,12 @@ namespace basegfx
     }
 
     // adaptive subdivide by distance
-    void B2DCubicBezier::adaptiveSubdivideByDistance(B2DPolygon& rTarget, double fDistanceBound) const
+    void B2DCubicBezier::adaptiveSubdivideByDistance(B2DPolygon& rTarget, double fDistanceBound, int nRecurseLimit) const
     {
         if(isBezier())
         {
             ImpSubDivDistance(maStartPoint, maControlPointA, maControlPointB, maEndPoint, rTarget,
-                fDistanceBound * fDistanceBound, std::numeric_limits<double>::max(), 30);
+                fDistanceBound * fDistanceBound, std::numeric_limits<double>::max(), nRecurseLimit);
         }
         else
         {

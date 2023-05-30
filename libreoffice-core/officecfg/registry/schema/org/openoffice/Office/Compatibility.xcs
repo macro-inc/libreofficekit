@@ -38,12 +38,6 @@
           </enumeration>
         </constraints>
       </prop>
-      <prop oor:name="UsePrinterMetrics" oor:type="xs:boolean" oor:nillable="false">
-        <info>
-          <desc>Use printer metrics for document formatting</desc>
-        </info>
-        <value>false</value>
-      </prop>
       <prop oor:name="AddSpacing" oor:type="xs:boolean" oor:nillable="false">
         <info>
           <desc>Add spacing between paragraphs and tables</desc>
@@ -165,15 +159,15 @@
         <!-- UIHints: Tools - Options - Writer - Compatibility - Global Options -->
         <info>
           <desc>Specifies whether Form menu should be customized for an MSO workflow. The MS compatible Form menu contains only MS compatible form controls.</desc>
-          <label>Reorganize Form menu to have it MS compatible.</label>
+          <label>Reorganize Form menu for Microsoft compatibility.</label>
         </info>
         <value>false</value>
       </prop>
       <prop oor:name="AllowCommentsInFootnotes" oor:type="xs:boolean" oor:nillable="false">
         <info>
             <!-- See tdf#86188 for rationale -->
-            <desc>Specifies whether adding comments to footnotes is allowed. This is allowed for ODF but not in OOXML and can result in invalid docx files being saved.</desc>
-            <label>Allow adding comments to footnotes. Disable for better OOXML interoperability.</label>
+            <desc>Specifies whether adding comments to footnotes etc. is allowed. These are allowed for ODF but not in OOXML and can result in invalid docx files being saved.</desc>
+            <label>Allow adding comments to footnotes, headers and frames. Disable for better OOXML interoperability.</label>
         </info>
         <value>true</value>
       </prop>

@@ -22,26 +22,18 @@
 #include <sdr/properties/pageproperties.hxx>
 #include <svl/itemset.hxx>
 #include <svx/svdobj.hxx>
-#include <svx/xdef.hxx>
 #include <tools/debug.hxx>
 
 
 namespace sdr::properties
 {
-        // create a new itemset
-        SfxItemSet PageProperties::CreateObjectSpecificItemSet(SfxItemPool& rPool)
-        {
-            // override to legally return a valid ItemSet
-            return SfxItemSet(rPool);
-        }
-
         PageProperties::PageProperties(SdrObject& rObj)
-        :   EmptyProperties(rObj)
+        :   BaseProperties(rObj)
         {
         }
 
         PageProperties::PageProperties(const PageProperties& /*rProps*/, SdrObject& rObj)
-        :   EmptyProperties(rObj)
+        :   BaseProperties(rObj)
         {
         }
 
@@ -54,23 +46,23 @@ namespace sdr::properties
             return std::unique_ptr<BaseProperties>(new PageProperties(*this, rObj));
         }
 
+        SfxItemSet PageProperties::CreateObjectSpecificItemSet(SfxItemPool& rPool)
+        {
+            return SfxItemSet(rPool);
+        }
+
         // get itemset. Override here to allow creating the empty itemset
         // without asserting
         const SfxItemSet& PageProperties::GetObjectItemSet() const
         {
             if(!mxEmptyItemSet)
             {
-                mxEmptyItemSet.emplace(const_cast<PageProperties*>(this)->CreateObjectSpecificItemSet(GetSdrObject().GetObjectItemPool()));
+                mxEmptyItemSet.emplace(GetSdrObject().GetObjectItemPool());
             }
 
             DBG_ASSERT(mxEmptyItemSet, "Could not create an SfxItemSet(!)");
 
             return *mxEmptyItemSet;
-        }
-
-        void PageProperties::ItemChange(const sal_uInt16 /*nWhich*/, const SfxPoolItem* /*pNewItem*/)
-        {
-            // #86481# simply ignore item setting on page objects
         }
 
         SfxStyleSheet* PageProperties::GetStyleSheet() const
@@ -79,20 +71,35 @@ namespace sdr::properties
             return nullptr;
         }
 
-        void PageProperties::SetStyleSheet(SfxStyleSheet* /*pStyleSheet*/, bool /*bDontRemoveHardAttr*/)
+        void PageProperties::SetStyleSheet(SfxStyleSheet* /*pStyleSheet*/, bool /*bDontRemoveHardAttr*/,
+                bool /*bBroadcast*/)
         {
             // override to legally ignore the StyleSheet here
-        }
-
-        void PageProperties::PostItemChange(const sal_uInt16 nWhich )
-        {
-            if( (nWhich == XATTR_FILLSTYLE) && mxEmptyItemSet )
-                CleanupFillProperties(*mxEmptyItemSet);
         }
 
         void PageProperties::ClearObjectItem(const sal_uInt16 /*nWhich*/)
         {
             // simply ignore item clearing on page objects
+        }
+
+        void PageProperties::SetObjectItem(const SfxPoolItem& /*rItem*/)
+        {
+            assert(!"PageProperties::SetObjectItem() should never be called");
+        }
+
+        void PageProperties::SetObjectItemDirect(const SfxPoolItem& /*rItem*/)
+        {
+            assert(!"PageProperties::SetObjectItemDirect() should never be called");
+        }
+
+        void PageProperties::ClearObjectItemDirect(const sal_uInt16 /*nWhich*/)
+        {
+            assert(!"PageProperties::ClearObjectItemDirect() should never be called");
+        }
+
+        void PageProperties::SetObjectItemSet(const SfxItemSet& /*rSet*/)
+        {
+            assert(!"PageProperties::SetObjectItemSet() should never be called");
         }
 } // end of namespace
 

@@ -43,6 +43,10 @@ excludelist:
     include/android/compatibility.hxx:
     # TODO check whether actually needed, just silence this for now
     - math.h
+    include/LibreOfficeKit/LibreOfficeKit.h:
+    # the unstable API needs C99's bool
+    - stdbool.h
+    - stdint.h
     include/sfx2/toolbarids.hxx:
     # needed for enum definition
     - sal/types.h
@@ -233,6 +237,9 @@ excludelist:
     include/o3tl/make_shared.hxx:
     # Needed for __COVERITY__
     - o3tl/deleter.hxx
+    include/o3tl/safeint.hxx:
+    # Needed for std::min
+    - algorithm
     include/sot/exchange.hxx:
     # Used in a macro #define
     - com/sun/star/datatransfer/dnd/DNDConstants.hpp
@@ -242,7 +249,7 @@ excludelist:
     include/tools/debug.hxx:
     # Used behind #ifndef
     - tools/toolsdllapi.h
-    include/tools/diagnose_ex.h:
+    include/comphelper/diagnose_ex.hxx:
     # Needed for macros
     - com/sun/star/lang/IllegalArgumentException.hpp
     - com/sun/star/uno/RuntimeException.hpp
@@ -259,9 +266,6 @@ excludelist:
     include/tools/simdsupport.hxx:
     # Needed for CPU intrinsics detection to work
     - emmintrin.h
-    include/unotools/accessiblestatesethelper.hxx:
-    # base class has to be a complete type
-    - com/sun/star/accessibility/XAccessibleStateSet.hpp
     include/unotools/accessiblerelationsethelper.hxx:
     # base class has to be a complete type
     - com/sun/star/accessibility/XAccessibleRelationSet.hpp
@@ -401,7 +405,7 @@ excludelist:
     include/toolkit/helper/macros.hxx:
     # Needed for macros
     - comphelper/servicehelper.hxx
-    - tools/diagnose_ex.h
+    - comphelper/diagnose_ex.hxx
     include/xmloff/attrlist.hxx:
     # base class has to be a complete type
     - com/sun/star/lang/XUnoTunnel.hpp
@@ -525,7 +529,7 @@ excludelist:
     - com/sun/star/task/XInteractionRequest.hpp
     include/basic/sberrors.hxx:
     # Needed for macro defines
-    - vcl/errcode.hxx
+    - comphelper/errcode.hxx
     include/connectivity/BlobHelper.hxx:
     # base class has to be a complete type
     - com/sun/star/sdbc/XBlob.hpp
@@ -748,7 +752,7 @@ excludelist:
     - com/sun/star/accessibility/XAccessibleTextAttributes.hpp
     include/editeng/editerr.hxx:
     # Needed for macro defines
-    - vcl/errcode.hxx
+    - comphelper/errcode.hxx
     include/editeng/eeitem.hxx:
     # Needed for macro defines
     - svl/typedwhich.hxx
@@ -867,7 +871,7 @@ excludelist:
     - svl/typedwhich.hxx
     include/svx/svxerr.hxx:
     # Used in macro definition
-    - vcl/errcode.hxx
+    - comphelper/errcode.hxx
     include/svx/svxids.hrc:
     # Used in macro definition
     - svl/typedwhich.hxx
@@ -921,6 +925,9 @@ excludelist:
     - com/sun/star/text/WritingMode.hpp
     - com/sun/star/graphic/XGraphic.hpp
     - com/sun/star/drawing/QRCode.hpp
+    - com/sun/star/text/XTextColumns.hpp
+    - com/sun/star/drawing/BarCode.hpp
+    - editeng/unoprnms.hxx
     - svx/svddef.hxx
     include/svx/xdef.hxx:
     # Needed for macro defines

@@ -10,15 +10,12 @@
 from libreoffice.uno.propertyvalue import mkPropertyValues
 
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict
-from uitest.debug import sleep
 
 class tdf138556( UITestCase ):
 
     def test_stock_chart13_insert_series( self ):
         #Start LibreOffice Writer
         with self.ui_test.create_doc_in_start_center( "writer" ):
-            xMainTop = self.xUITest.getTopFocusWindow()
 
             #Insert Chart
             self.xUITest.executeCommand( ".uno:InsertObjectChart" )
@@ -44,3 +41,4 @@ class tdf138556( UITestCase ):
                 CoordinateSystems[0].ChartTypes[0].DataSeries[0].DataSequences )
             self.assertEqual( nSequences, 3 )
 
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

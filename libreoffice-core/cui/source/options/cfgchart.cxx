@@ -23,6 +23,7 @@
 #include "cfgchart.hxx"
 #include <dialmgr.hxx>
 #include <strings.hrc>
+#include <utility>
 
 #define ROW_COLOR_COUNT 12
 
@@ -115,14 +116,14 @@ OUString SvxChartColorTable::getDefaultName( size_t _nIndex )
 {
     OUString aName;
 
-    OUString sDefaultNamePrefix;
-    OUString sDefaultNamePostfix;
-    OUString aResName( CuiResId( RID_SVXSTR_DIAGRAM_ROW ) );
+    std::u16string_view sDefaultNamePrefix;
+    std::u16string_view sDefaultNamePostfix;
+    OUString aResName( CuiResId( RID_CUISTR_DIAGRAM_ROW ) );
     sal_Int32 nPos = aResName.indexOf( "$(ROW)" );
     if( nPos != -1 )
     {
-        sDefaultNamePrefix = aResName.copy( 0, nPos );
-        sDefaultNamePostfix = aResName.copy( nPos + sizeof( "$(ROW)" ) - 1 );
+        sDefaultNamePrefix = aResName.subView( 0, nPos );
+        sDefaultNamePostfix = aResName.subView( nPos + sizeof( "$(ROW)" ) - 1 );
     }
     else
     {
@@ -190,41 +191,41 @@ bool SvxChartOptions::RetrieveOptions()
     uno::Sequence< uno::Any > aProperties( aNames.getLength());
     aProperties = GetProperties( aNames );
 
-    if( aProperties.getLength() == aNames.getLength())
+    if( aProperties.getLength() != aNames.getLength())
+        return false;
+
+    // 1. default colors for series
+    maDefColors.clear();
+    uno::Sequence< sal_Int64 > aColorSeq;
+    aProperties[ 0 ] >>= aColorSeq;
+
+    sal_Int32 nCount = aColorSeq.getLength();
+    Color aCol;
+
+    // create strings for entry names
+    OUString aResName( CuiResId( RID_CUISTR_DIAGRAM_ROW ) );
+    std::u16string_view aPrefix, aPostfix;
+    OUString aName;
+    sal_Int32 nPos = aResName.indexOf( "$(ROW)" );
+    if( nPos != -1 )
     {
-        // 1. default colors for series
-        maDefColors.clear();
-        uno::Sequence< sal_Int64 > aColorSeq;
-        aProperties[ 0 ] >>= aColorSeq;
-
-        sal_Int32 nCount = aColorSeq.getLength();
-        Color aCol;
-
-        // create strings for entry names
-        OUString aResName( CuiResId( RID_SVXSTR_DIAGRAM_ROW ) );
-        OUString aPrefix, aPostfix, aName;
-        sal_Int32 nPos = aResName.indexOf( "$(ROW)" );
-        if( nPos != -1 )
-        {
-            aPrefix = aResName.copy( 0, nPos );
-            sal_Int32 idx = nPos + sizeof( "$(ROW)" ) - 1;
-            aPostfix = aResName.copy( idx );
-        }
-        else
-            aPrefix = aResName;
-
-        // set color values
-        for( sal_Int32 i=0; i < nCount; i++ )
-        {
-            aCol = Color(ColorTransparency, aColorSeq[ i ]);
-
-            aName = aPrefix + OUString::number(i + 1) + aPostfix;
-
-            maDefColors.append( XColorEntry( aCol, aName ));
-        }
-        return true;
+        aPrefix = aResName.subView( 0, nPos );
+        sal_Int32 idx = nPos + sizeof( "$(ROW)" ) - 1;
+        aPostfix = aResName.subView( idx );
     }
-    return false;
+    else
+        aPrefix = aResName;
+
+    // set color values
+    for( sal_Int32 i=0; i < nCount; i++ )
+    {
+        aCol = Color(ColorTransparency, aColorSeq[ i ]);
+
+        aName = aPrefix + OUString::number(i + 1) + aPostfix;
+
+        maDefColors.append( XColorEntry( aCol, aName ));
+    }
+    return true;
 }
 
 void SvxChartOptions::ImplCommit()
@@ -258,9 +259,9 @@ void SvxChartOptions::Notify( const css::uno::Sequence< OUString >& )
 
 
 
-SvxChartColorTableItem::SvxChartColorTableItem( sal_uInt16 nWhich_, const SvxChartColorTable& aTable ) :
+SvxChartColorTableItem::SvxChartColorTableItem( sal_uInt16 nWhich_, SvxChartColorTable aTable ) :
     SfxPoolItem( nWhich_ ),
-    m_aColorTable( aTable )
+    m_aColorTable(std::move( aTable ))
 {
 }
 

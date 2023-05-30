@@ -31,7 +31,7 @@ namespace sdr::properties
             virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& rPool) override;
 
             // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
+            virtual void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich) override;
 
         public:
             // basic constructor
@@ -47,7 +47,8 @@ namespace sdr::properties
             virtual std::unique_ptr<BaseProperties> Clone(SdrObject& rObj) const override;
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // force default attributes for a specific object type, called from
             // DefaultProperties::GetObjectItemSet() if a new ItemSet is created

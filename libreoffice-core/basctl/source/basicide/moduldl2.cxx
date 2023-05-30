@@ -38,13 +38,13 @@
 #include <svl/stritem.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 
 #include <com/sun/star/io/Pipe.hpp>
 #include <com/sun/star/ui/dialogs/XFilePicker3.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
+#include <com/sun/star/ui/dialogs/XFolderPicker2.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <com/sun/star/script/DocumentScriptLibraryContainer.hpp>
 #include <com/sun/star/script/DocumentDialogLibraryContainer.hpp>
@@ -63,9 +63,9 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <cassert>
-#include <string_view>
 
 namespace basctl
 {
@@ -103,12 +103,12 @@ public:
 
 namespace
 {
-    int FindEntry(const weld::TreeView& rBox, const OUString& rName)
+    int FindEntry(const weld::TreeView& rBox, std::u16string_view rName)
     {
         int nCount = rBox.n_children();
         for (int i = 0; i < nCount; ++i)
         {
-            if (rName.equalsIgnoreAsciiCase(rBox.get_text(i, 0)))
+            if (o3tl::equalsIgnoreAsciiCase(rName, rBox.get_text(i, 0)))
                 return i;
         }
         return -1;
@@ -346,7 +346,7 @@ LibPage::~LibPage()
         const sal_Int32 nCount = m_xBasicsBox->get_count();
         for (sal_Int32 i = 0; i < nCount; ++i)
         {
-            DocumentEntry* pEntry = reinterpret_cast<DocumentEntry*>(m_xBasicsBox->get_id(i).toInt64());
+            DocumentEntry* pEntry = weld::fromId<DocumentEntry*>(m_xBasicsBox->get_id(i));
             delete pEntry;
         }
     }
@@ -1185,13 +1185,13 @@ void LibPage::FillListBox()
 void LibPage::InsertListBoxEntry( const ScriptDocument& rDocument, LibraryLocation eLocation )
 {
     OUString aEntryText(rDocument.getTitle(eLocation));
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(new DocumentEntry(rDocument, eLocation))));
+    OUString sId(weld::toId(new DocumentEntry(rDocument, eLocation)));
     m_xBasicsBox->append(sId,  aEntryText);
 }
 
 void LibPage::SetCurLib()
 {
-    DocumentEntry* pEntry = reinterpret_cast<DocumentEntry*>(m_xBasicsBox->get_active_id().toInt64());
+    DocumentEntry* pEntry = weld::fromId<DocumentEntry*>(m_xBasicsBox->get_active_id());
     if (!pEntry)
         return;
 
@@ -1220,7 +1220,7 @@ void LibPage::SetCurLib()
             ImpInsertLibEntry(aLibName, nEntry++);
     }
 
-    int nEntry_ = FindEntry(*m_xLibBox, "Standard");
+    int nEntry_ = FindEntry(*m_xLibBox, u"Standard");
     if (nEntry_ == -1 && m_xLibBox->n_children())
         nEntry_ = 0;
     m_xLibBox->set_cursor(nEntry_);

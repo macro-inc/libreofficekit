@@ -29,6 +29,7 @@
 #include <com/sun/star/text/XText.hpp>
 #include <com/sun/star/table/XCellRange.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace css;
@@ -47,14 +48,16 @@ static uno::Any lcl_createTable( const uno::Reference< XHelperInterface >& xPare
     uno::Reference< text::XTextTable > xTextTable( aSource, uno::UNO_QUERY_THROW );
     uno::Reference< text::XTextDocument > xTextDocument( xDocument, uno::UNO_QUERY_THROW );
     uno::Reference< word::XTable > xTable( new SwVbaTable( xParent, xContext, xTextDocument, xTextTable ) );
-    return uno::makeAny( xTable );
+    return uno::Any( xTable );
 }
 
 static bool lcl_isInHeaderFooter( const uno::Reference< text::XTextTable >& xTable )
 {
     uno::Reference< text::XTextContent > xTextContent( xTable, uno::UNO_QUERY_THROW );
     uno::Reference< text::XText > xText = xTextContent->getAnchor()->getText();
-    uno::Reference< lang::XServiceInfo > xServiceInfo( xText, uno::UNO_QUERY_THROW );
+    uno::Reference< lang::XServiceInfo > xServiceInfo( xText, uno::UNO_QUERY );
+    if ( !xServiceInfo )
+        return false;
     OUString aImplName = xServiceInfo->getImplementationName();
     return aImplName == "SwXHeadFootText";
 }
@@ -93,7 +96,7 @@ public:
         if ( Index < 0 || Index >= getCount() )
             throw lang::IndexOutOfBoundsException();
         uno::Reference< text::XTextTable > xTable( mxTables[ Index ], uno::UNO_SET_THROW );
-        return uno::makeAny( xTable );
+        return uno::Any( xTable );
     }
     // XElementAccess
     virtual uno::Type SAL_CALL getElementType(  ) override { return  cppu::UnoType<text::XTextTable>::get(); }
@@ -104,7 +107,7 @@ public:
         if ( !hasByName(aName) )
             throw container::NoSuchElementException();
         uno::Reference< text::XTextTable > xTable( *cachePos, uno::UNO_SET_THROW );
-        return uno::makeAny( xTable );
+        return uno::Any( xTable );
     }
     virtual uno::Sequence< OUString > SAL_CALL getElementNames(  ) override
     {
@@ -140,7 +143,7 @@ class TableEnumerationImpl : public ::cppu::WeakImplHelper< css::container::XEnu
     uno::Reference< container::XIndexAccess > mxIndexAccess;
     sal_Int32 mnCurIndex;
 public:
-    TableEnumerationImpl(  const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, const uno::Reference< frame::XModel >& xDocument, const uno::Reference< container::XIndexAccess >& xIndexAccess ) : mxParent( xParent ), mxContext( xContext ), mxDocument( xDocument ), mxIndexAccess( xIndexAccess ), mnCurIndex(0)
+    TableEnumerationImpl(  uno::Reference< XHelperInterface > xParent, uno::Reference< uno::XComponentContext > xContext, uno::Reference< frame::XModel >  xDocument, uno::Reference< container::XIndexAccess >  xIndexAccess ) : mxParent(std::move( xParent )), mxContext(std::move( xContext )), mxDocument(std::move( xDocument )), mxIndexAccess(std::move( xIndexAccess )), mnCurIndex(0)
     {
     }
     virtual sal_Bool SAL_CALL hasMoreElements(  ) override

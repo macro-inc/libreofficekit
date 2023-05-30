@@ -27,7 +27,6 @@
 #include <VLineProperties.hxx>
 #include <com/sun/star/drawing/PointSequenceSequence.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
-#include <com/sun/star/chart2/XTransformation.hpp>
 
 #include <memory>
 #include <vector>
@@ -75,23 +74,11 @@ GridLinePoints::GridLinePoints( const PlottingPositionHelper* pPosHelper, sal_In
     pPosHelper->doLogicScaling( &MaxX,&MaxY,&MaxZ );
 
     if(!pPosHelper->isMathematicalOrientationX())
-    {
-        double fHelp = MinX;
-        MinX = MaxX;
-        MaxX = fHelp;
-    }
+        std::swap( MinX, MaxX );
     if(!pPosHelper->isMathematicalOrientationY())
-    {
-        double fHelp = MinY;
-        MinY = MaxY;
-        MaxY = fHelp;
-    }
+        std::swap( MinY, MaxY );
     if(pPosHelper->isMathematicalOrientationZ())//z axis in draw is reverse to mathematical
-    {
-        double fHelp = MinZ;
-        MinZ = MaxZ;
-        MaxZ = fHelp;
-    }
+        std::swap( MinZ, MaxZ );
     bool bSwapXY = pPosHelper->isSwapXAndY();
 
     //P0: point on 'back' wall, not on 'left' wall
@@ -138,33 +125,33 @@ void GridLinePoints::update( double fScaledTickValue )
 
 static void addLine2D( drawing::PointSequenceSequence& rPoints, sal_Int32 nIndex
              , const GridLinePoints& rScaledLogicPoints
-             , const Reference< XTransformation > & xTransformation
+             , const XTransformation2& rTransformation
               )
 {
-    drawing::Position3D aPA = SequenceToPosition3D( xTransformation->transform( rScaledLogicPoints.P0 ) );
-    drawing::Position3D aPB = SequenceToPosition3D( xTransformation->transform( rScaledLogicPoints.P1 ) );
+    drawing::Position3D aPA = rTransformation.transform( SequenceToPosition3D(rScaledLogicPoints.P0) );
+    drawing::Position3D aPB = rTransformation.transform( SequenceToPosition3D(rScaledLogicPoints.P1) );
 
     rPoints.getArray()[nIndex]
         = { { static_cast<sal_Int32>(aPA.PositionX), static_cast<sal_Int32>(aPA.PositionY) },
             { static_cast<sal_Int32>(aPB.PositionX), static_cast<sal_Int32>(aPB.PositionY) } };
 }
 
-static void addLine3D( drawing::PolyPolygonShape3D& rPoints, sal_Int32 nIndex
+static void addLine3D( std::vector<std::vector<css::drawing::Position3D>>& rPoints, sal_Int32 nIndex
             , const GridLinePoints& rBasePoints
-            , const Reference< XTransformation > & xTransformation )
+            , const XTransformation2 & rTransformation )
 {
-    drawing::Position3D aPoint = SequenceToPosition3D( xTransformation->transform( rBasePoints.P0 ) );
+    drawing::Position3D aPoint =rTransformation.transform( rBasePoints.P0 );
     AddPointToPoly( rPoints, aPoint, nIndex );
-    aPoint = SequenceToPosition3D( xTransformation->transform( rBasePoints.P1 ) );
+    aPoint = rTransformation.transform( rBasePoints.P1 );
     AddPointToPoly( rPoints, aPoint, nIndex );
-    aPoint = SequenceToPosition3D( xTransformation->transform( rBasePoints.P2 ) );
+    aPoint = rTransformation.transform( rBasePoints.P2 );
     AddPointToPoly( rPoints, aPoint, nIndex );
 }
 
 VCartesianGrid::VCartesianGrid( sal_Int32 nDimensionIndex, sal_Int32 nDimensionCount
-                               , const Sequence< Reference< beans::XPropertySet > > & rGridPropertiesList )
+                               , std::vector< Reference< beans::XPropertySet > >  aGridPropertiesList )
             : VAxisOrGridBase( nDimensionIndex, nDimensionCount )
-            , m_aGridPropertiesList( rGridPropertiesList )
+            , m_aGridPropertiesList( std::move(aGridPropertiesList) )
 {
     m_pPosHelper = new PlottingPositionHelper();
 }
@@ -176,10 +163,10 @@ VCartesianGrid::~VCartesianGrid()
 }
 
 void VCartesianGrid::fillLinePropertiesFromGridModel( std::vector<VLineProperties>& rLinePropertiesList
-                                     , const Sequence< Reference< beans::XPropertySet > > & rGridPropertiesList )
+                                     , const std::vector< Reference< beans::XPropertySet > > & rGridPropertiesList )
 {
     rLinePropertiesList.clear();
-    if( !rGridPropertiesList.hasElements() )
+    if( rGridPropertiesList.empty() )
         return;
 
     VLineProperties aLineProperties;
@@ -195,12 +182,12 @@ void VCartesianGrid::fillLinePropertiesFromGridModel( std::vector<VLinePropertie
 
 void VCartesianGrid::createShapes()
 {
-    if(!m_aGridPropertiesList.hasElements())
+    if(m_aGridPropertiesList.empty())
         return;
     //somehow equal to axis tickmarks
 
     //create named group shape
-    Reference< drawing::XShapes > xGroupShape_Shapes(
+    rtl::Reference< SvxShapeGroupAnyD > xGroupShape_Shapes(
         createGroupShape( m_xLogicTarget, m_aCID ) );
 
     if(!xGroupShape_Shapes.is())
@@ -231,14 +218,14 @@ void VCartesianGrid::createShapes()
         if( !aLinePropertiesList[nDepth].isLineVisible() )
             continue;
 
-        Reference< drawing::XShapes > xTarget( xGroupShape_Shapes );
+        rtl::Reference< SvxShapeGroupAnyD > xTarget( xGroupShape_Shapes );
         if( nDepth > 0 )
         {
-            xTarget.set( createGroupShape( m_xLogicTarget
+            xTarget = createGroupShape( m_xLogicTarget
                 , ObjectIdentifier::addChildParticle( m_aCID, ObjectIdentifier::createChildParticleWithIndex( OBJECTTYPE_SUBGRID, nDepth-1 ) )
-                ) );
+                );
             if(!xTarget.is())
-                xTarget.set( xGroupShape_Shapes );
+                xTarget = xGroupShape_Shapes;
         }
 
         if(m_nDimension==2)
@@ -255,11 +242,11 @@ void VCartesianGrid::createShapes()
                 if( !tick.bPaintIt )
                     continue;
                 aGridLinePoints.update( tick.fScaledTickValue );
-                addLine2D( aPoints, nRealPointCount, aGridLinePoints, m_pPosHelper->getTransformationScaledLogicToScene() );
+                addLine2D( aPoints, nRealPointCount, aGridLinePoints, *m_pPosHelper->getTransformationScaledLogicToScene() );
                 nRealPointCount++;
             }
             aPoints.realloc(nRealPointCount);
-            m_pShapeFactory->createLine2D( xTarget, aPoints, &aLinePropertiesList[nDepth] );
+            ShapeFactory::createLine2D( xTarget, aPoints, &aLinePropertiesList[nDepth] );
 
             //prepare polygon for handle shape:
             drawing::PointSequenceSequence aHandlesPoints(1);
@@ -272,8 +259,8 @@ void VCartesianGrid::createShapes()
             //create handle shape:
             VLineProperties aHandleLineProperties;
             aHandleLineProperties.LineStyle    <<= drawing::LineStyle_NONE;
-            Reference< drawing::XShape > xHandleShape =
-                m_pShapeFactory->createLine2D( xTarget, aHandlesPoints, &aHandleLineProperties );
+            rtl::Reference<SvxShapePolyPolygon> xHandleShape =
+                ShapeFactory::createLine2D( xTarget, aHandlesPoints, &aHandleLineProperties );
             ::chart::ShapeFactory::setShapeName( xHandleShape, "HandlesOnly" );
         }
         else //if(2!=m_nDimension)
@@ -281,10 +268,8 @@ void VCartesianGrid::createShapes()
             GridLinePoints aGridLinePoints( m_pPosHelper, m_nDimensionIndex, m_eLeftWallPos, m_eBackWallPos, m_eBottomPos );
 
             sal_Int32 nPointCount = (*aDepthIter).size();
-            drawing::PolyPolygonShape3D aPoints;
-            aPoints.SequenceX.realloc(nPointCount);
-            aPoints.SequenceY.realloc(nPointCount);
-            aPoints.SequenceZ.realloc(nPointCount);
+            std::vector<std::vector<css::drawing::Position3D>> aPoints;
+            aPoints.resize(nPointCount);
 
             sal_Int32 nRealPointCount = 0;
             sal_Int32 nPolyIndex = 0;
@@ -297,14 +282,12 @@ void VCartesianGrid::createShapes()
                 }
 
                 aGridLinePoints.update( tick.fScaledTickValue );
-                addLine3D( aPoints, nPolyIndex, aGridLinePoints, m_pPosHelper->getTransformationScaledLogicToScene() );
+                addLine3D( aPoints, nPolyIndex, aGridLinePoints, *m_pPosHelper->getTransformationScaledLogicToScene() );
                 nRealPointCount+=3;
                 ++nPolyIndex;
             }
-            aPoints.SequenceX.realloc(nRealPointCount);
-            aPoints.SequenceY.realloc(nRealPointCount);
-            aPoints.SequenceZ.realloc(nRealPointCount);
-            m_pShapeFactory->createLine3D( xTarget, aPoints, aLinePropertiesList[nDepth] );
+            aPoints.resize(nRealPointCount);
+            ShapeFactory::createLine3D( xTarget, aPoints, aLinePropertiesList[nDepth] );
         }
     }
 }

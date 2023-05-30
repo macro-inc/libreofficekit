@@ -2612,6 +2612,41 @@ SfxVoidItem EnterGroup SID_ENTER_GROUP
 ]
 
 
+SfxVoidItem RegenerateDiagram SID_REGENERATE_DIAGRAM
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Modify;
+]
+
+SfxVoidItem EditDiagram SID_EDIT_DIAGRAM
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Modify;
+]
+
+
 SvxEscapementItem Escapement SID_ATTR_CHAR_ESCAPEMENT
 
 [
@@ -3007,6 +3042,25 @@ SfxVoidItem FontDialog SID_CHAR_DLG
 ]
 
 SfxVoidItem FontEffectsDialog SID_CHAR_DLG_EFFECT
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerItem;
+    Asynchron;
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Format;
+]
+
+
+SfxVoidItem FontPositionDialog SID_CHAR_DLG_POSITION
 ()
 [
     AutoUpdate = FALSE,
@@ -10324,7 +10378,7 @@ SfxVoidItem DecrementIndent SID_DEC_INDENT
 ]
 
 
-SfxStringItem StateTableCell SID_TABLE_CELL
+SvxStatusItem StateTableCell SID_TABLE_CELL
 
 [
     AutoUpdate = FALSE,
@@ -11716,7 +11770,7 @@ SfxVoidItem InsertRowsAfter SID_TABLE_INSERT_ROW_AFTER
 ]
 
 SfxBoolItem PrepareMailExport SID_MAIL_PREPAREEXPORT
-()
+(SfxBoolItem On FN_NOUPDATE)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -11732,7 +11786,23 @@ SfxBoolItem PrepareMailExport SID_MAIL_PREPAREEXPORT
     GroupId = SfxGroupId::Explorer;
 ]
 
+/* TODO: SfxBoolItem or XFillUseSlideBackgroundItem ? */
+SfxBoolItem FillUseSlideBackground SID_ATTR_FILL_USE_SLIDE_BACKGROUND
+[
+    AutoUpdate = TRUE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
 
+
+    AccelConfig = FALSE,
+    MenuConfig = FALSE,
+    ToolBoxConfig = FALSE,
+    GroupId = SfxGroupId::Format;
+]
 
 SfxUInt16Item FillTransparence SID_ATTR_FILL_TRANSPARENCE
 [
@@ -12459,6 +12529,23 @@ SfxVoidItem GraphicSizeCheck SID_GRAPHIC_SIZE_CHECK
     GroupId = SfxGroupId::Modify;
 ]
 
+SfxVoidItem ThemeDialog SID_THEME_DIALOG
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = FALSE,
+    MenuConfig = FALSE,
+    ToolBoxConfig = FALSE,
+    GroupId = SfxGroupId::Modify;
+]
+
 SfxVoidItem AccessibilityCheck SID_ACCESSIBILITY_CHECK
 ()
 [
@@ -12474,6 +12561,24 @@ SfxVoidItem AccessibilityCheck SID_ACCESSIBILITY_CHECK
     MenuConfig = FALSE,
     ToolBoxConfig = FALSE,
     GroupId = SfxGroupId::Modify;
+]
+
+SfxBoolItem AccessibilityCheckOnline SID_ACCESSIBILITY_CHECK_ONLINE
+(SfxBoolItem Enable FN_PARAM_1)
+[
+    AutoUpdate = TRUE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
+    Toggle = TRUE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Options;
 ]
 
 XColorItem GlowColor SID_ATTR_GLOW_COLOR

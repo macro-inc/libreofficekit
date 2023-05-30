@@ -19,30 +19,32 @@
 #ifndef INCLUDED_XMLOFF_FAMILIES_HXX
 #define INCLUDED_XMLOFF_FAMILIES_HXX
 
+#include <rtl/ustring.hxx>
+
 /** These defines determine the unique ids for XML style-families
     used in the SvXMLAutoStylePoolP.
  */
 
-#define XML_STYLE_FAMILY_PAGE_MASTER_NAME       "page-layout"
-#define XML_STYLE_FAMILY_PAGE_MASTER_PREFIX     "pm"
-#define XML_STYLE_FAMILY_TABLE_TABLE_STYLES_NAME    "table"
-#define XML_STYLE_FAMILY_TABLE_TABLE_STYLES_PREFIX  "ta"
-#define XML_STYLE_FAMILY_TABLE_COLUMN_STYLES_NAME   "table-column"
-#define XML_STYLE_FAMILY_TABLE_COLUMN_STYLES_PREFIX "co"
-#define XML_STYLE_FAMILY_TABLE_ROW_STYLES_NAME  "table-row"
-#define XML_STYLE_FAMILY_TABLE_ROW_STYLES_PREFIX    "ro"
-#define XML_STYLE_FAMILY_TABLE_CELL_STYLES_NAME "table-cell"
-#define XML_STYLE_FAMILY_TABLE_CELL_STYLES_PREFIX   "ce"
-#define XML_STYLE_FAMILY_SD_GRAPHICS_NAME       u"graphic"
-#define XML_STYLE_FAMILY_SD_GRAPHICS_PREFIX     "gr"
-#define XML_STYLE_FAMILY_SD_PRESENTATION_NAME   u"presentation"
-#define XML_STYLE_FAMILY_SD_PRESENTATION_PREFIX "pr"
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_PAGE_MASTER_NAME = u"page-layout";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_PAGE_MASTER_PREFIX = u"pm";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_TABLE_STYLES_NAME = u"table";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_TABLE_STYLES_PREFIX = u"ta";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_COLUMN_STYLES_NAME = u"table-column";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_COLUMN_STYLES_PREFIX  = u"co";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_ROW_STYLES_NAME = u"table-row";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_ROW_STYLES_PREFIX = u"ro";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_CELL_STYLES_NAME = u"table-cell";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_TABLE_CELL_STYLES_PREFIX = u"ce";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_GRAPHICS_NAME = u"graphic";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_GRAPHICS_PREFIX = u"gr";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_PRESENTATION_NAME = u"presentation";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_PRESENTATION_PREFIX = u"pr";
 #define XML_STYLE_FAMILY_SD_POOL_NAME           u"default"
-#define XML_STYLE_FAMILY_SD_DRAWINGPAGE_NAME    u"drawing-page"
-#define XML_STYLE_FAMILY_SD_DRAWINGPAGE_PREFIX  "dp"
-#define XML_STYLE_FAMILY_SCH_CHART_NAME         u"chart"
-#define XML_STYLE_FAMILY_SCH_CHART_PREFIX       "ch"
-#define XML_STYLE_FAMILY_CONTROL_PREFIX         "ctrl"
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_DRAWINGPAGE_NAME = u"drawing-page";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SD_DRAWINGPAGE_PREFIX = u"dp";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SCH_CHART_NAME = u"chart";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_SCH_CHART_PREFIX = u"ch";
+inline constexpr OUStringLiteral XML_STYLE_FAMILY_CONTROL_PREFIX = u"ctrl";
 
 enum class XmlStyleFamily
 {
@@ -81,18 +83,18 @@ enum class XmlStyleFamily
     SD_PRESENTATION_ID     = 301,
 // families for derived from SvXMLStyleContext
     SD_PAGEMASTERCONTEXT_ID        = 302,
-    SD_PAGEMASTERSTYLECONTEXT_ID   = 306,
-    SD_PRESENTATIONPAGELAYOUT_ID   = 303,
+    SD_PAGEMASTERSTYLECONTEXT_ID   = 303,
+    SD_PRESENTATIONPAGELAYOUT_ID   = 304,
 // family for draw pool
-    SD_POOL_ID             = 304,
+    SD_POOL_ID             = 305,
 // family for presentation drawpage properties
-    SD_DRAWINGPAGE_ID      = 305,
+    SD_DRAWINGPAGE_ID      = 306,
 
-    SD_GRADIENT_ID         = 306,
-    SD_HATCH_ID            = 307,
-    SD_FILL_IMAGE_ID       = 308,
-    SD_MARKER_ID           = 309,
-    SD_STROKE_DASH_ID      = 310,
+    SD_GRADIENT_ID         = 307,
+    SD_HATCH_ID            = 308,
+    SD_FILL_IMAGE_ID       = 309,
+    SD_MARKER_ID           = 310,
+    SD_STROKE_DASH_ID      = 311,
 
 // Chart
 // reserved: 400..499

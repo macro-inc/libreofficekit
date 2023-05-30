@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-07-06 16:22+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-12-19 14:17+0000\n"
 "Last-Translator: Stanislav Horáček <stanislav.horacek@gmail.com>\n"
 "Language-Team: Czech <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress04/cs/>\n"
 "Language: cs\n"
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; in presentations</bookmark_value><bookmark_value>presentations; shortcut keys</bookmark_value>"
 msgstr "<bookmark_value>klávesové zkratky; v prezentacích</bookmark_value><bookmark_value>prezentace; klávesové zkratky</bookmark_value>"
 
-#. DRFWj
+#. b9LNb
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3150342\n"
 "help.text"
-msgid "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\" name=\"Shortcut Keys for $[officename] Impress\">Shortcut Keys for $[officename] Impress</link></variable>"
-msgstr "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\" name=\"Klávesové zkratky pro $[officename] Impress\">Klávesové zkratky pro $[officename] Impress</link></variable>"
+msgid "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">Shortcut Keys for $[officename] Impress</link></variable>"
+msgstr "<variable id=\"impress_keys\"><link href=\"text/simpress/04/01020000.xhp\">Klávesové zkratky pro $[officename] Impress</link></variable>"
 
 #. zEQBA
 #: 01020000.xhp
@@ -52,14 +52,14 @@ msgctxt ""
 msgid "The following is a list of shortcut keys for $[officename] Impress."
 msgstr "Následuje seznam klávesových zkratek $[officename] Impress."
 
-#. Bp3rN
+#. Zzxcg
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3154658\n"
 "help.text"
-msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\" name=\"general shortcut keys\">general shortcut keys</link> in $[officename]."
-msgstr "V $[officename] také můžete použít <link href=\"text/shared/04/01010000.xhp\" name=\"obecné klávesové zkratky\">obecné klávesové zkratky</link>."
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys</link> in $[officename]."
+msgstr "V $[officename] také můžete použít <link href=\"text/shared/04/01010000.xhp\">obecné klávesové zkratky</link>."
 
 #. iVdKg
 #: 01020000.xhp
@@ -331,14 +331,14 @@ msgctxt ""
 msgid "<emph>Effect</emph>"
 msgstr "<emph>Výsledek</emph>"
 
-#. wvCBg
+#. WGd82
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3154642\n"
 "help.text"
-msgid "Esc"
-msgstr "Esc"
+msgid "Esc or -"
+msgstr "Esc nebo -"
 
 #. n4adw
 #: 01020000.xhp
@@ -349,14 +349,14 @@ msgctxt ""
 msgid "End presentation."
 msgstr "Ukončit prezentaci."
 
-#. CdBqF
+#. QzE6c
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3153625\n"
 "help.text"
-msgid "Spacebar or Right arrow or Down arrow or Page Down or Enter or Return or N"
-msgstr "Mezerník nebo šipka vpravo nebo šipka dolů nebo Page down nebo Enter nebo N"
+msgid "Left click or Spacebar or Right arrow or Down arrow or Page Down or Enter or Return"
+msgstr "Klepnutí levým tlačítkem nebo mezerník nebo šipka vpravo nebo šipka dolů nebo Page Down nebo Enter nebo Return"
 
 #. 7hxGb
 #: 01020000.xhp
@@ -403,14 +403,14 @@ msgctxt ""
 msgid "Type a number of a slide and press Enter to go to the slide."
 msgstr "Zadejte číslo snímku a stiskněte Enter - přechod na daný snímek."
 
-#. 8yYSZ
+#. KNWDg
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id7291787\n"
 "help.text"
-msgid "Left arrow or Up arrow or Page Up or Backspace or P"
-msgstr "Šipka vlevo nebo šipka nahoru nebo Page Up nebo Backspace nebo P"
+msgid "Right click or Left arrow or Up arrow or Page Up or Backspace"
+msgstr "Klepnutí pravým tlačítkem nebo šipka vlevo nebo šipka nahoru nebo Page Up nebo Backspace"
 
 #. grY6a
 #: 01020000.xhp
@@ -546,6 +546,60 @@ msgctxt ""
 "help.text"
 msgid "Show white screen until next key or mouse wheel event."
 msgstr "Ukázat bílou obrazovku až do dalšího stisku klávesy nebo pohybu kolečkem na myši."
+
+#. CLAGZ
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "P"
+msgstr "P"
+
+#. B6AXE
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr "Použít ukazatel myši jako pero"
+
+#. rd5zq
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "E"
+msgstr "E"
+
+#. DErwC
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr "Vymazat veškerý rukopis na snímku"
+
+#. tV4qF
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+A"
+
+#. XrKhx
+#: 01020000.xhp
+msgctxt ""
+"01020000.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr "Vypnout režim ukazatele jako pera"
 
 #. Hd6Y9
 #: 01020000.xhp
@@ -1429,14 +1483,14 @@ msgctxt ""
 msgid "Constrains the movement of the selected object horizontally or vertically."
 msgstr "Omezí pohyb vybraného objektu vodorovně nebo svisle."
 
-#. mybXe
+#. qvf62
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3154117\n"
 "help.text"
-msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ drag (with <link href=\"text/shared/optionen/01070500.xhp\" name=\"Copy when moving\">Copy when moving</link> option active)"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+přetažení (s aktivní volbou <link href=\"text/shared/optionen/01070500.xhp\" name=\"Kopírovat při přesunu\">Kopírovat při přesunu</link>)"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ drag (with <link href=\"text/shared/optionen/01070500.xhp\">Copy when moving</link> option active)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+přetažení (s aktivní volbou <link href=\"text/shared/optionen/01070500.xhp\">Kopírovat při přesunu</link>)"
 
 #. Bwos6
 #: 01020000.xhp
@@ -1888,14 +1942,14 @@ msgctxt ""
 msgid "Next slide, or next effect"
 msgstr "Následující snímek nebo následující efekt"
 
-#. umqc2
+#. QxAjW
 #: presenter.xhp
 msgctxt ""
 "presenter.xhp\n"
 "par_id0921200901104120\n"
 "help.text"
-msgid "Left click, right arrow, down arrow, spacebar, page down, enter, return, 'N'"
-msgstr "Klepnutí, šipka vpravo, šipka dolů, mezerník, Page Down, Enter, 'N'"
+msgid "Left click, right arrow, down arrow, spacebar, page down, enter, return"
+msgstr "Klepnutí levým tlačítkem, šipka vpravo, šipka dolů, mezerník, Page Down, Enter, Return"
 
 #. xVgqH
 #: presenter.xhp
@@ -1906,14 +1960,50 @@ msgctxt ""
 msgid "Previous slide, or previous effect"
 msgstr "Předchozí snímek nebo předchozí efekt"
 
-#. r8Lqw
+#. vCcu4
 #: presenter.xhp
 msgctxt ""
 "presenter.xhp\n"
 "par_id0921200901104115\n"
 "help.text"
-msgid "Right click, left arrow, up arrow, page up, backspace, 'P'"
-msgstr "Klepnutí pravým tlačítkem, šipka vlevo, šipka nahoru, Page Up, Backspace, 'P'"
+msgid "Right click, left arrow, up arrow, page up, backspace"
+msgstr "Klepnutí pravým tlačítkem, šipka vlevo, šipka nahoru, Page Up, Backspace"
+
+#. EBm7C
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154643\n"
+"help.text"
+msgid "Use mouse pointer as pen"
+msgstr "Použít ukazatel myši jako pero"
+
+#. k6PJG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152935\n"
+"help.text"
+msgid "'P'"
+msgstr "'P'"
+
+#. dm9Mg
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154644\n"
+"help.text"
+msgid "Erase all ink on slide"
+msgstr "Vymazat veškerý rukopis na snímku"
+
+#. X3mGG
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152936\n"
+"help.text"
+msgid "'E'"
+msgstr "'E'"
 
 #. aTM8W
 #: presenter.xhp
@@ -2166,3 +2256,39 @@ msgctxt ""
 "help.text"
 msgid "Ctrl-'3'"
 msgstr "Ctrl-'3'"
+
+#. JEaUD
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154651\n"
+"help.text"
+msgid "Switch Monitors"
+msgstr "Přepnout monitory"
+
+#. zVJEs
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152943\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'4'"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'4'"
+
+#. eJrqE
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"hd_id3154652\n"
+"help.text"
+msgid "Turn off pointer as pen mode"
+msgstr "Vypnout režim ukazatele jako pera"
+
+#. yxpoN
+#: presenter.xhp
+msgctxt ""
+"presenter.xhp\n"
+"par_id3152944\n"
+"help.text"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'A'"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+'A'"

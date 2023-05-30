@@ -10,7 +10,6 @@
 #pragma once
 
 #include <config_vcl.h>
-#include <tools/long.hxx>
 
 #include <basegfx/point/b2dpoint.hxx>
 typedef basegfx::B2DPoint DevicePoint;

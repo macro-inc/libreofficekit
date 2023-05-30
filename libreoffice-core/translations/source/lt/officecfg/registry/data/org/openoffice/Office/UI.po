@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2021-11-13 08:15+0000\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-02-01 09:33+0000\n"
 "Last-Translator: Modestas Rimkus <modestas.rimkus@gmail.com>\n"
 "Language-Team: Lithuanian <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/lt/>\n"
 "Language: lt\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n % 10 == 1 && (n % 100 < 11 || n % 100 > 19)) ? 0 : ((n % 10 >= 2 && n % 10 <= 9 && (n % 100 < 11 || n % 100 > 19)) ? 1 : 2);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-Project-Style: openoffice\n"
 "X-POOTLE-MTIME: 1566071532.000000\n"
 
@@ -2107,14 +2107,14 @@ msgctxt ""
 msgid "Sparklines"
 msgstr ""
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
+msgid "Sparkline..."
 msgstr ""
 
 #. CoZgJ
@@ -5778,6 +5778,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "Y paklaidos juostos…"
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr ""
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -6537,6 +6547,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Formatuoti vieną duomenų etiketę…"
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr ""
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr ""
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -16489,7 +16519,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~Callout Shapes"
-msgstr ""
+msgstr "Figūrinės išnašos"
 
 #. cGLti
 #: GenericCommands.xcu
@@ -18259,7 +18289,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Outline Font Effect"
-msgstr ""
+msgstr "Kontūras"
 
 #. ND6wH
 #: GenericCommands.xcu
@@ -18659,7 +18689,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Line Spacing: 1.15"
-msgstr ""
+msgstr "Eilučių intervalas: 1,15"
 
 #. q8wJt
 #: GenericCommands.xcu
@@ -20751,7 +20781,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~OLE Object..."
-msgstr ""
+msgstr "OLE objektas…"
 
 #. zKjoT
 #: GenericCommands.xcu
@@ -21011,7 +21041,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Ob~ject"
-msgstr ""
+msgstr "OLE objektas"
 
 #. o5DE2
 #: GenericCommands.xcu
@@ -21202,7 +21232,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Edit Template..."
-msgstr ""
+msgstr "Taisyti šabloną…"
 
 #. 3VmbE
 #: GenericCommands.xcu
@@ -22203,26 +22233,6 @@ msgctxt ""
 "value.text"
 msgid "Delete C~ontents..."
 msgstr "Šalinti turinį…"
-
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Jaustukas"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Įterpti jaustuką"
 
 #. tEjpF
 #: GenericCommands.xcu
@@ -23483,6 +23493,36 @@ msgctxt ""
 "value.text"
 msgid "Toggle Automatic Spell Checking"
 msgstr "Automatinis rašybos tikrinimas"
+
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr ""
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr ""
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr ""
 
 #. 4DCmg
 #: GenericCommands.xcu
@@ -25642,7 +25682,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Comment Thread"
-msgstr ""
+msgstr "Šalinti komentarų giją"
 
 #. s3CwY
 #: GenericCommands.xcu
@@ -25652,7 +25692,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Resolved"
-msgstr "Neaktualus"
+msgstr "Išspręstas"
 
 #. FPVwa
 #: GenericCommands.xcu
@@ -25662,7 +25702,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Resolved Thread"
-msgstr ""
+msgstr "Išspręsta gija"
 
 #. JZHpu
 #: GenericCommands.xcu
@@ -25812,7 +25852,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Lock Toolbars"
-msgstr ""
+msgstr "Įtvirtinti mygtukų juostas"
 
 #. cAUZ8
 #: GenericCommands.xcu
@@ -25822,7 +25862,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Lock or unlock all toolbars"
-msgstr ""
+msgstr "Įtvirtinti arba atlaisvinti visas mygtukų juostas"
 
 #. jLF5j
 #: GenericCommands.xcu
@@ -25902,7 +25942,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Alig~n Objects"
-msgstr ""
+msgstr "Objektų lygiuotė"
 
 #. VK2hz
 #: GenericCommands.xcu
@@ -25982,7 +26022,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. SQ76T
 #: GenericCommands.xcu
@@ -26262,7 +26302,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Anchor Menu"
-msgstr ""
+msgstr "Prieraišas"
 
 #. oNBG8
 #: GenericCommands.xcu
@@ -26282,7 +26322,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Parinkite objekto prieraišą"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -26432,7 +26472,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Word ~Joiner"
-msgstr ""
+msgstr "Žodžių jungtukas"
 
 #. UvwGS
 #: GenericCommands.xcu
@@ -26482,7 +26522,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Columns"
-msgstr ""
+msgstr "Šalinti stulpelius"
 
 #. AG4Qy
 #: GenericCommands.xcu
@@ -26492,7 +26532,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Columns"
-msgstr ""
+msgstr "Šalinti stulpelius"
 
 #. KxsdA
 #: GenericCommands.xcu
@@ -26502,7 +26542,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected columns"
-msgstr ""
+msgstr "Šalinti pažymėtus stulpelius"
 
 #. VL8Wa
 #: GenericCommands.xcu
@@ -26862,7 +26902,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "QR and ~Barcode..."
-msgstr ""
+msgstr "QR arba brūkšninis kodas…"
 
 #. FCYvB
 #: GenericCommands.xcu
@@ -26872,7 +26912,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Edit Barcode..."
-msgstr ""
+msgstr "Taisyti brūkšninį kodą…"
 
 #. HhCdv
 #: GenericCommands.xcu
@@ -28346,6 +28386,16 @@ msgctxt ""
 msgid "~Others"
 msgstr "Simboliai"
 
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr ""
+
 #. uXvss
 #: MathWindowState.xcu
 msgctxt ""
@@ -28925,7 +28975,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Style Inspector"
-msgstr ""
+msgstr "Stilių tyriklis"
 
 #. GEHrf
 #: Sidebar.xcu
@@ -29076,7 +29126,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Style Inspector"
-msgstr ""
+msgstr "Stilių tyriklis"
 
 #. aCGNS
 #: Sidebar.xcu
@@ -30538,14 +30588,14 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Rodyti pataisas"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
+msgid "Show Tracked ~Changes"
 msgstr "Rodyti pataisas"
 
 #. sMgCx
@@ -30606,6 +30656,16 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
+msgstr ""
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
 msgstr ""
 
 #. C5mHk
@@ -30986,6 +31046,26 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
+msgstr ""
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr ""
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
 msgstr ""
 
 #. HxFAE
@@ -31386,7 +31466,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Formula Object..."
-msgstr ""
+msgstr "Formulė…"
 
 #. VaCbZ
 #: WriterCommands.xcu
@@ -32088,6 +32168,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Antraštinis puslapis…"
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr ""
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32236,7 +32326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "None"
-msgstr ""
+msgstr "Teksto nelaužyti"
 
 #. SvFa2
 #: WriterCommands.xcu
@@ -32246,7 +32336,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Parallel"
-msgstr ""
+msgstr "Visiškasis apgaubimas tekstu"
 
 #. YFEFD
 #: WriterCommands.xcu
@@ -32276,7 +32366,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Through"
-msgstr ""
+msgstr "Objektas virš teksto"
 
 #. SocUA
 #: WriterCommands.xcu
@@ -32406,7 +32496,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr ""
+msgstr "Išoriniai saitai…"
 
 #. PCFhM
 #: WriterCommands.xcu
@@ -32488,6 +32578,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Įterpti eilutes aukščiau"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr ""
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32507,6 +32607,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Įterpti eilutes žemiau"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr ""
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32528,15 +32638,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Įterpti stulpelius kairiau"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
-msgstr "Įterpti stulpelius kairiau"
+msgid "Columns B~efore"
+msgstr ""
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr ""
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32548,15 +32668,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Įterpti stulpelius dešiniau"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
-msgstr "Įterpti stulpelius dešiniau"
+msgid "Columns A~fter"
+msgstr ""
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr ""
 
 #. B44pP
 #: WriterCommands.xcu
@@ -33776,7 +33906,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Optimal"
-msgstr ""
+msgstr "Optimalusis apgaubimas tekstu"
 
 #. EFP2w
 #: WriterCommands.xcu
@@ -33996,7 +34126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Before"
-msgstr ""
+msgstr "Iš kairės"
 
 #. LADWG
 #: WriterCommands.xcu
@@ -34016,7 +34146,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "After"
-msgstr ""
+msgstr "Iš dešinės"
 
 #. b5mCd
 #: WriterCommands.xcu
@@ -34436,7 +34566,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show resolved comme~nts"
-msgstr "Rodyti neaktualius komentarus"
+msgstr "Rodyti išspręstus komentarus"
 
 #. R3huy
 #: WriterCommands.xcu
@@ -34446,7 +34576,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Resolved Comments"
-msgstr "Rodyti neaktualius komentarus"
+msgstr "Rodyti išspręstus komentarus"
 
 #. vAGUB
 #: WriterCommands.xcu
@@ -34798,6 +34928,166 @@ msgctxt ""
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Kopijuoti formatą (spustelėkite dukart ir spauskite „Vald“ arba „Cmd“ veiksenai pakeisti)"
 
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr ""
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr ""
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr ""
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr ""
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr ""
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr ""
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr ""
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr ""
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr ""
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr ""
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr ""
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr ""
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr ""
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr ""
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr ""
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr ""
+
 #. 7PCFf
 #: WriterCommands.xcu
 msgctxt ""
@@ -34826,7 +35116,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~List"
-msgstr ""
+msgstr "Sąrašas"
 
 #. ZmR9V
 #: WriterCommands.xcu
@@ -35436,7 +35726,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr ""
+msgstr "Be rašmens stiliaus"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -35596,7 +35886,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Bullet • List Style"
-msgstr ""
+msgstr "Ženklinto sąrašo stilius •"
 
 #. VBvBU
 #: WriterCommands.xcu
@@ -35606,7 +35896,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Bullet • List Style"
-msgstr ""
+msgstr "Ženklinto sąrašo stilius •"
 
 #. BW4E6
 #: WriterCommands.xcu
@@ -35616,7 +35906,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Bullet • List Style"
-msgstr ""
+msgstr "Ženklinto sąrašo stilius •"
 
 #. mqYSC
 #: WriterCommands.xcu
@@ -35626,7 +35916,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering 123 List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius 123"
 
 #. D5sRy
 #: WriterCommands.xcu
@@ -35636,7 +35926,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering 123 List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius 123"
 
 #. 5AJuo
 #: WriterCommands.xcu
@@ -35646,7 +35936,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Numbering 123 List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius 123"
 
 #. xAyDX
 #: WriterCommands.xcu
@@ -35656,7 +35946,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering ABC List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ABC"
 
 #. uENeD
 #: WriterCommands.xcu
@@ -35666,7 +35956,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering ABC List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ABC"
 
 #. c6BjB
 #: WriterCommands.xcu
@@ -35676,7 +35966,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Numbering ABC List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ABC"
 
 #. uxkph
 #: WriterCommands.xcu
@@ -35686,7 +35976,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering abc List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius abc"
 
 #. Lcogs
 #: WriterCommands.xcu
@@ -35696,7 +35986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering abc List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius abc"
 
 #. fYB5d
 #: WriterCommands.xcu
@@ -35706,7 +35996,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Numbering abc List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius abc"
 
 #. UHSTJ
 #: WriterCommands.xcu
@@ -35716,7 +36006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering IVX List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius IVX"
 
 #. QwUVJ
 #: WriterCommands.xcu
@@ -35726,7 +36016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering IVX List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius IVX"
 
 #. jXDLc
 #: WriterCommands.xcu
@@ -35736,7 +36026,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Numbering IVX List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius IVX"
 
 #. Pe4gB
 #: WriterCommands.xcu
@@ -35746,7 +36036,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering ivx List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ivx"
 
 #. dHZMF
 #: WriterCommands.xcu
@@ -35756,7 +36046,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Numbering ivx List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ivx"
 
 #. ZSf5C
 #: WriterCommands.xcu
@@ -35766,7 +36056,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Numbering ivx List Style"
-msgstr ""
+msgstr "Numeruoto sąrašo stilius ivx"
 
 #. EJceH
 #: WriterCommands.xcu
@@ -35776,7 +36066,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Default Table Style"
-msgstr ""
+msgstr "Numatytasis lentelės stilius"
 
 #. 4AbSB
 #: WriterCommands.xcu
@@ -36046,7 +36336,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Style Inspector Deck"
-msgstr ""
+msgstr "Rodyti stilių tyriklio skydelį"
 
 #. joS9f
 #: WriterFormWindowState.xcu
@@ -36386,7 +36676,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. nCSvk
 #: WriterFormWindowState.xcu
@@ -36866,7 +37156,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. v45LV
 #: WriterGlobalWindowState.xcu
@@ -37386,7 +37676,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. 5GFnw
 #: WriterReportWindowState.xcu
@@ -37686,7 +37976,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. gaswH
 #: WriterWebWindowState.xcu
@@ -38346,7 +38636,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. Tgtuj
 #: WriterWindowState.xcu
@@ -38537,6 +38827,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Standartinė juosta (kompaktiška)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr ""
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr ""
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr ""
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr ""
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr ""
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr ""
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr ""
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr ""
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr ""
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr ""
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr ""
 
 #. h6gRt
 #: WriterWindowState.xcu
@@ -38886,7 +39286,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "OLE objektas"
 
 #. URXoj
 #: XFormsWindowState.xcu

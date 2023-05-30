@@ -19,7 +19,7 @@
 #include <memory>
 #include <sal/config.h>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <svx/rubydialog.hxx>
 #include <sfx2/dispatch.hxx>
@@ -83,6 +83,7 @@ class SvxRubyData_Impl : public cppu::WeakImplHelper<css::view::XSelectionChange
     Sequence<PropertyValues> aRubyValues;
     Reference<XController> xController;
     bool bHasSelectionChanged;
+    bool bDisposing;
 
 public:
     SvxRubyData_Impl();
@@ -98,6 +99,7 @@ public:
         return xModel;
     }
     bool HasSelectionChanged() const { return bHasSelectionChanged; }
+    bool IsDisposing() const { return bDisposing; }
     Reference<XRubySelection> const& GetRubySelection()
     {
         xSelection.set(xController, UNO_QUERY);
@@ -120,6 +122,7 @@ public:
 
 SvxRubyData_Impl::SvxRubyData_Impl()
     : bHasSelectionChanged(false)
+    , bDisposing(false)
 {
 }
 
@@ -161,6 +164,7 @@ void SvxRubyData_Impl::disposing(const EventObject&)
     {
     }
     xController = nullptr;
+    bDisposing = true;
 }
 
 void SvxRubyData_Impl::AssertOneEntry()
@@ -188,8 +192,6 @@ SvxRubyDialog::SvxRubyDialog(SfxBindings* pBind, SfxChildWindow* pCW, weld::Wind
     , bModified(false)
     , pBindings(pBind)
     , m_pImpl(new SvxRubyData_Impl)
-    , m_xLeftFT(m_xBuilder->weld_label("basetextft"))
-    , m_xRightFT(m_xBuilder->weld_label("rubytextft"))
     , m_xLeft1ED(m_xBuilder->weld_entry("Left1ED"))
     , m_xRight1ED(m_xBuilder->weld_entry("Right1ED"))
     , m_xLeft2ED(m_xBuilder->weld_entry("Left2ED"))
@@ -271,14 +273,15 @@ void SvxRubyDialog::Close()
 void SvxRubyDialog::Activate()
 {
     SfxModelessDialogController::Activate();
-    if (!m_xContentArea)
+    if (m_pImpl->IsDisposing())
     {
-        // tdf#141967 if Activate is called during tear down bail early
+        // tdf#141967/tdf#152495 if Activate is called during tear down bail early
         return;
     }
+
     //get selection from current view frame
     SfxViewFrame* pCurFrm = SfxViewFrame::Current();
-    Reference<XController> xCtrl = pCurFrm->GetFrame().GetController();
+    Reference<XController> xCtrl(pCurFrm ? pCurFrm->GetFrame().GetController() : nullptr);
     m_pImpl->SetController(xCtrl);
     if (!m_pImpl->HasSelectionChanged())
         return;
@@ -533,10 +536,9 @@ IMPL_LINK_NOARG(SvxRubyDialog, CloseHdl_Impl, weld::Button&, void) { Close(); }
 
 IMPL_LINK_NOARG(SvxRubyDialog, StylistHdl_Impl, weld::Button&, void)
 {
-    std::unique_ptr<SfxPoolItem> pState;
+    std::unique_ptr<SfxBoolItem> pState;
     SfxItemState eState = pBindings->QueryState(SID_STYLE_DESIGNER, pState);
-    if (eState <= SfxItemState::SET || !pState
-        || !static_cast<SfxBoolItem*>(pState.get())->GetValue())
+    if (eState <= SfxItemState::SET || !pState || !pState->GetValue())
     {
         pBindings->GetDispatcher()->Execute(SID_STYLE_DESIGNER,
                                             SfxCallMode::ASYNCHRON | SfxCallMode::RECORD);
@@ -742,11 +744,7 @@ void RubyPreview::Paint(vcl::RenderContext& rRenderContext, const tools::Rectang
 
     sal_Int16 nRubyPos = m_pParentDlg->m_xPositionLB->get_active();
     if (nRubyPos == 1) // BOTTOM
-    {
-        tools::Long nTmp = nYRuby;
-        nYRuby = nYBase;
-        nYBase = nTmp;
-    }
+        std::swap(nYRuby, nYBase);
     else if (nRubyPos == 2) // RIGHT ( vertically )
     {
         // Align the ruby text and base text to the vertical center.

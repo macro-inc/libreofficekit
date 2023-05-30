@@ -33,6 +33,8 @@
 
 #include <com/sun/star/awt/XWindow.hpp>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
+#include <osl/diagnose.h>
+
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::accessibility;
 
@@ -44,7 +46,6 @@ namespace chart
 
 AccessibleTextHelper::AccessibleTextHelper(
     DrawViewWrapper * pDrawViewWrapper ) :
-        impl::AccessibleTextHelper_Base( m_aMutex ),
         m_pDrawViewWrapper( pDrawViewWrapper )
 {}
 
@@ -94,7 +95,7 @@ void SAL_CALL AccessibleTextHelper::initialize( const Sequence< uno::Any >& aArg
 }
 
 // ____ XAccessibleContext ____
-::sal_Int32 SAL_CALL AccessibleTextHelper::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleTextHelper::getAccessibleChildCount()
 {
     if( m_pTextHelper )
     {
@@ -104,7 +105,7 @@ void SAL_CALL AccessibleTextHelper::initialize( const Sequence< uno::Any >& aArg
     return 0;
 }
 
-Reference< XAccessible > SAL_CALL AccessibleTextHelper::getAccessibleChild( ::sal_Int32 i )
+Reference< XAccessible > SAL_CALL AccessibleTextHelper::getAccessibleChild( sal_Int64 i )
 {
     if( m_pTextHelper )
     {
@@ -120,7 +121,7 @@ Reference< XAccessible > SAL_CALL AccessibleTextHelper::getAccessibleParent()
     return Reference< XAccessible >();
 }
 
-::sal_Int32 SAL_CALL AccessibleTextHelper::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleTextHelper::getAccessibleIndexInParent()
 {
     OSL_FAIL( "Not implemented in this helper" );
     return -1;
@@ -150,10 +151,10 @@ Reference< XAccessibleRelationSet > SAL_CALL AccessibleTextHelper::getAccessible
     return Reference< XAccessibleRelationSet >();
 }
 
-Reference< XAccessibleStateSet > SAL_CALL AccessibleTextHelper::getAccessibleStateSet()
+sal_Int64 SAL_CALL AccessibleTextHelper::getAccessibleStateSet()
 {
     OSL_FAIL( "Not implemented in this helper" );
-    return Reference< XAccessibleStateSet >();
+    return 0;
 }
 
 lang::Locale SAL_CALL AccessibleTextHelper::getLocale()

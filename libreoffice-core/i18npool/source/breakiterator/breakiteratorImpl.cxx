@@ -16,6 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+
 #include <config_locales.h>
 
 #include <breakiteratorImpl.hxx>
@@ -81,7 +82,7 @@ static sal_Int32 skipSpace(const OUString& Text, sal_Int32 nPos, sal_Int32 len, 
                 while (nPos < len)
                 {
                     ch = Text.iterateCodePoints(&pos);
-                    if (!u_isWhitespace(ch) && !isZWSP(ch))
+                    if (!u_isUWhiteSpace(ch) && !isZWSP(ch))
                         break;
                     nPos = pos;
                 }
@@ -89,7 +90,7 @@ static sal_Int32 skipSpace(const OUString& Text, sal_Int32 nPos, sal_Int32 len, 
                 while (nPos > 0)
                 {
                     ch = Text.iterateCodePoints(&pos, -1);
-                    if (!u_isWhitespace(ch) && !isZWSP(ch))
+                    if (!u_isUWhiteSpace(ch) && !isZWSP(ch))
                         break;
                     nPos = pos;
                 }

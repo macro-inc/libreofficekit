@@ -45,6 +45,8 @@
 #include "porhyph.hxx"
 #include "pordrop.hxx"
 #include "redlnitr.hxx"
+#include <sortedobjs.hxx>
+#include <fmtanchr.hxx>
 #include <pagefrm.hxx>
 #include <tgrditem.hxx>
 #include <doc.hxx>
@@ -344,6 +346,8 @@ void SwTextFormatter::InsertPortion( SwTextFormatInfo &rInf,
             m_pCurr->Height( pPor->Height(), pPor->IsTextPortion() );
         if( m_pCurr->GetAscent() < pPor->GetAscent() )
             m_pCurr->SetAscent( pPor->GetAscent() );
+        if( m_pCurr->GetHangingBaseline() < pPor->GetHangingBaseline() )
+            m_pCurr->SetHangingBaseline( pPor->GetHangingBaseline() );
 
         if (GetTextFrame()->GetDoc().getIDocumentSettingAccess().get(DocumentSettingId::MS_WORD_COMP_MIN_LINE_HEIGHT_BY_FLY))
         {
@@ -402,7 +406,38 @@ void SwTextFormatter::BuildPortions( SwTextFormatInfo &rInf )
             rInf.SetFull(true);
     }
 
-    SwLinePortion *pPor = NewPortion( rInf );
+    ::std::optional<TextFrameIndex> oMovedFlyIndex;
+    if (SwTextFrame const*const pFollow = GetTextFrame()->GetFollow())
+    {
+        // flys are always on master!
+        if (GetTextFrame()->GetDrawObjs() && pFollow->GetUpper() != GetTextFrame()->GetUpper())
+        {
+            for (SwAnchoredObject const*const pAnchoredObj : *GetTextFrame()->GetDrawObjs())
+            {
+                // tdf#146500 try to stop where a fly is anchored in the follow
+                // that has recently been moved (presumably by splitting this
+                // frame); similar to check in SwFlowFrame::MoveBwd()
+                if (pAnchoredObj->RestartLayoutProcess()
+                    && !pAnchoredObj->IsTmpConsiderWrapInfluence())
+                {
+                    SwFormatAnchor const& rAnchor(pAnchoredObj->GetFrameFormat().GetAnchor());
+                    assert(rAnchor.GetAnchorId() == RndStdIds::FLY_AT_CHAR || rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA);
+                    TextFrameIndex const nAnchor(GetTextFrame()->MapModelToViewPos(*rAnchor.GetContentAnchor()));
+                    if (pFollow->GetOffset() <= nAnchor
+                        && (pFollow->GetFollow() == nullptr
+                            || nAnchor < pFollow->GetFollow()->GetOffset()))
+                    {
+                        if (!oMovedFlyIndex || nAnchor < *oMovedFlyIndex)
+                        {
+                            oMovedFlyIndex.emplace(nAnchor);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    SwLinePortion *pPor = NewPortion(rInf, oMovedFlyIndex);
 
     // Asian grid stuff
     SwTextGridItem const*const pGrid(GetGridItem(m_pFrame->FindPageFrame()));
@@ -510,7 +545,7 @@ void SwTextFormatter::BuildPortions( SwTextFormatInfo &rInf )
                 }
             }
         }
-        else if ( bHasGrid && pGrid->IsSnapToChars() && ! pGridKernPortion && ! m_pMulti && ! pPor->InTabGrp() )
+        else if ( bHasGrid && ! pGridKernPortion && ! m_pMulti && ! pPor->InTabGrp() )
         {
             // insert a grid kerning portion
             pGridKernPortion = pPor->IsKernPortion() ?
@@ -653,7 +688,7 @@ void SwTextFormatter::BuildPortions( SwTextFormatInfo &rInf )
             }
         }
 
-        if ( bHasGrid && pGrid->IsSnapToChars() && pPor != pGridKernPortion && ! m_pMulti && ! pPor->InTabGrp() )
+        if ( bHasGrid && pPor != pGridKernPortion && ! m_pMulti && ! pPor->InTabGrp() )
         {
             TextFrameIndex const nTmp = rInf.GetIdx() + pPor->GetLen();
             const SwTwips nRestWidth = rInf.Width() - rInf.X() - pPor->Width();
@@ -687,15 +722,18 @@ void SwTextFormatter::BuildPortions( SwTextFormatInfo &rInf )
                                  0;
                 const SwTwips nTmpWidth = i * nGridWidth;
                 const SwTwips nKernWidth = std::min(nTmpWidth - nSumWidth, nRestWidth);
-                const SwTwips nKernWidth_1 = nKernWidth / 2;
+                const SwTwips nKernWidth_1 = pGrid->IsSnapToChars() ?
+                    nKernWidth / 2 : 0;
 
                 OSL_ENSURE( nKernWidth <= nRestWidth,
                         "Not enough space left for adjusting non-asian text in grid mode" );
+                if (nKernWidth_1)
+                {
+                    pGridKernPortion->Width( pGridKernPortion->Width() + nKernWidth_1 );
+                    rInf.X( rInf.X() + nKernWidth_1 );
+                }
 
-                pGridKernPortion->Width( pGridKernPortion->Width() + nKernWidth_1 );
-                rInf.X( rInf.X() + nKernWidth_1 );
-
-                if ( ! bFull )
+                if ( ! bFull && nKernWidth - nKernWidth_1 > 0 )
                     new SwKernPortion( *pPor, static_cast<short>(nKernWidth - nKernWidth_1),
                                        false, true );
 
@@ -721,7 +759,7 @@ void SwTextFormatter::BuildPortions( SwTextFormatInfo &rInf )
         {
             (void) rInf.CheckCurrentPosBookmark(); // bookmark was already created inside MultiPortion!
         }
-        pPor = NewPortion( rInf );
+        pPor = NewPortion(rInf, oMovedFlyIndex);
     }
 
     if( !rInf.IsStop() )
@@ -834,6 +872,7 @@ void SwTextFormatter::CalcAscent( SwTextFormatInfo &rInf, SwLinePortion *pPor )
         if( bChg || bFirstPor || !pPor->GetAscent()
             || !rInf.GetLast()->InTextGrp() )
         {
+            pPor->SetHangingBaseline( rInf.GetHangingBaseline() );
             pPor->SetAscent( rInf.GetAscent()  );
             pPor->Height( rInf.GetTextHeight() );
             bCalc = true;
@@ -1008,18 +1047,16 @@ bool SwContentControlPortion::DescribePDFControl(const SwTextPaintInfo& rInf) co
         pDescriptor->Description = pContentControl->GetAlias();
     }
 
-    if (!pContentControl->GetShowingPlaceHolder())
-    {
-        SwPosition aPoint(*pTextNode, nStart);
-        SwPosition aMark(*pTextNode, nEnd);
-        SwPaM aPam(aMark, aPoint);
-        OUString aText = aPam.GetText();
-        static sal_Unicode const aForbidden[] = {
-            CH_TXTATR_BREAKWORD,
-            0
-        };
-        pDescriptor->Text = comphelper::string::removeAny(aText, aForbidden);
-    }
+    // Map the text of the content control to the descriptor's text.
+    SwPosition aPoint(*pTextNode, nStart);
+    SwPosition aMark(*pTextNode, nEnd);
+    SwPaM aPam(aMark, aPoint);
+    OUString aText = aPam.GetText();
+    static sal_Unicode const aForbidden[] = {
+        CH_TXTATR_BREAKWORD,
+        0
+    };
+    pDescriptor->Text = comphelper::string::removeAny(aText, aForbidden);
 
     // Calculate the bounding rectangle of this content control, which can be one or more layout
     // portions in one or more lines.
@@ -1027,11 +1064,19 @@ bool SwContentControlPortion::DescribePDFControl(const SwTextPaintInfo& rInf) co
     auto pTextFrame = const_cast<SwTextFrame*>(rInf.GetTextFrame());
     SwTextSizeInfo aInf(pTextFrame);
     SwTextCursor aLine(pTextFrame, &aInf);
-    SwRect aStartRect;
+    SwRect aStartRect, aEndRect;
     aLine.GetCharRect(&aStartRect, nViewStart);
-    aLocation = aStartRect;
-    SwRect aEndRect;
     aLine.GetCharRect(&aEndRect, nViewEnd);
+
+    // Handling RTL text direction
+    if(rInf.GetTextFrame()->IsRightToLeft())
+    {
+        rInf.GetTextFrame()->SwitchLTRtoRTL( aStartRect );
+        rInf.GetTextFrame()->SwitchLTRtoRTL( aEndRect );
+    }
+    // TODO: handle rInf.GetTextFrame()->IsVertical()
+
+    aLocation = aStartRect;
     aLocation.Union(aEndRect);
     pDescriptor->Location = aLocation.SVRect();
 
@@ -1072,7 +1117,7 @@ namespace sw::mark {
         assert(pBM->GetFieldname() == ODF_FORMDROPDOWN);
         const IFieldmark::parameter_map_t* const pParameters = pBM->GetParameters();
         sal_Int32 nCurrentIdx = 0;
-        const IFieldmark::parameter_map_t::const_iterator pResult = pParameters->find(OUString(ODF_FORMDROPDOWN_RESULT));
+        const IFieldmark::parameter_map_t::const_iterator pResult = pParameters->find(ODF_FORMDROPDOWN_RESULT);
         if(pResult != pParameters->end())
             pResult->second >>= nCurrentIdx;
 
@@ -1136,7 +1181,7 @@ SwTextPortion *SwTextFormatter::WhichTextPor( SwTextFormatInfo &rInf ) const
             SwPaM aPam(aPosition);
             uno::Reference<text::XTextContent> const xRet(
                 SwUnoCursorHelper::GetNestedTextContent(
-                    *aPam.GetNode().GetTextNode(), aPosition.nContent.GetIndex(), false) );
+                    *aPam.GetPointNode().GetTextNode(), aPosition.GetContentIndex(), false) );
             if (xRet.is())
             {
                 const SwDoc & rDoc = rInf.GetTextFrame()->GetDoc();
@@ -1177,12 +1222,12 @@ SwTextPortion *SwTextFormatter::WhichTextPor( SwTextFormatInfo &rInf ) const
         {
             SwTextFrame const*const pFrame(rInf.GetTextFrame());
             SwPosition aPosition(pFrame->MapViewToModelPos(rInf.GetIdx()));
-            SwTextNode* pTextNode = aPosition.nNode.GetNode().GetTextNode();
+            SwTextNode* pTextNode = aPosition.GetNode().GetTextNode();
             SwTextContentControl* pTextContentControl = nullptr;
             if (pTextNode)
             {
-                sal_Int32 nIndex = aPosition.nContent.GetIndex();
-                if (SwTextAttr* pAttr = pTextNode->GetTextAttrAt(nIndex, RES_TXTATR_CONTENTCONTROL, SwTextNode::PARENT))
+                sal_Int32 nIndex = aPosition.GetContentIndex();
+                if (SwTextAttr* pAttr = pTextNode->GetTextAttrAt(nIndex, RES_TXTATR_CONTENTCONTROL, ::sw::GetTextAttrMode::Parent))
                 {
                     pTextContentControl = static_txtattr_cast<SwTextContentControl*>(pAttr);
                 }
@@ -1464,32 +1509,13 @@ SwLinePortion *SwTextFormatter::WhichFirstPortion(SwTextFormatInfo &rInf)
     // check this *last* so that BuildMultiPortion() can find it!
     if (!pPor && rInf.CheckCurrentPosBookmark())
     {
-        auto const bookmark(m_pScriptInfo->GetBookmark(rInf.GetIdx()));
-        if (static_cast<bool>(bookmark))
+        const auto& bookmark = m_pScriptInfo->GetBookmarks(rInf.GetIdx());
+        if (!bookmark.empty())
         {
-            sal_Unicode mark;
-            if ((bookmark & (SwScriptInfo::MarkKind::Start|SwScriptInfo::MarkKind::End))
-                        == (SwScriptInfo::MarkKind::Start|SwScriptInfo::MarkKind::End))
-            {
-                //mark = u'\u2336'; // not in OpenSymbol :(
-                mark = '|';
-                // hmm ... paint U+2345 over U+2346 should be same width?
-                // and U+237F // or U+2E20/U+2E21
-            }
-            else if (bookmark & SwScriptInfo::MarkKind::Start)
-            {
-                mark = '[';
-            }
-            else if (bookmark & SwScriptInfo::MarkKind::End)
-            {
-                mark = ']';
-            }
-            else
-            {
-                assert(bookmark & SwScriptInfo::MarkKind::Point);
-                mark = '|';
-            }
-            pPor = new SwBookmarkPortion(mark);
+            // only for character width, maybe replaced with ] later
+            sal_Unicode mark = '[';
+
+            pPor = new SwBookmarkPortion(mark, bookmark);
         }
     }
 
@@ -1524,8 +1550,16 @@ static bool lcl_OldFieldRest( const SwLineLayout* pCurr )
  *    -> CalcFlyWidth emulates the width and return portion, if needed
  */
 
-SwLinePortion *SwTextFormatter::NewPortion( SwTextFormatInfo &rInf )
+SwLinePortion *SwTextFormatter::NewPortion(SwTextFormatInfo &rInf,
+        ::std::optional<TextFrameIndex> const oMovedFlyIndex)
 {
+    if (oMovedFlyIndex && *oMovedFlyIndex <= rInf.GetIdx())
+    {
+        SAL_WARN_IF(*oMovedFlyIndex != rInf.GetIdx(), "sw.core", "stopping too late, no portion break at fly anchor?");
+        rInf.SetStop(true);
+        return nullptr;
+    }
+
     // Underflow takes precedence
     rInf.SetStopUnderflow( false );
     if( rInf.GetUnderflow() )
@@ -1766,11 +1800,9 @@ SwLinePortion *SwTextFormatter::NewPortion( SwTextFormatInfo &rInf )
                     pInfo = &pDoc->GetFootnoteInfo();
                 const SwAttrSet& rSet = pInfo->GetAnchorCharFormat(const_cast<SwDoc&>(*pDoc))->GetAttrSet();
 
-                const SfxPoolItem* pItem;
                 Degree10 nDir(0);
-                if( SfxItemState::SET == rSet.GetItemState( RES_CHRATR_ROTATE,
-                    true, &pItem ))
-                    nDir = static_cast<const SvxCharRotateItem*>(pItem)->GetValue();
+                if( const SvxCharRotateItem* pItem = rSet.GetItemIfSet( RES_CHRATR_ROTATE ) )
+                    nDir = pItem->GetValue();
 
                 if ( nDir )
                 {
@@ -1890,6 +1922,7 @@ TextFrameIndex SwTextFormatter::FormatLine(TextFrameIndex const nStartPos)
 
         // These values must not be reset by FormatReset();
         const bool bOldNumDone = GetInfo().IsNumDone();
+        const bool bOldFootnoteDone = GetInfo().IsFootnoteDone();
         const bool bOldArrowDone = GetInfo().IsArrowDone();
         const bool bOldErgoDone = GetInfo().IsErgoDone();
 
@@ -1897,6 +1930,7 @@ TextFrameIndex SwTextFormatter::FormatLine(TextFrameIndex const nStartPos)
         FormatReset( GetInfo() );
 
         GetInfo().SetNumDone( bOldNumDone );
+        GetInfo().SetFootnoteDone(bOldFootnoteDone);
         GetInfo().SetArrowDone( bOldArrowDone );
         GetInfo().SetErgoDone( bOldErgoDone );
 
@@ -1908,6 +1942,14 @@ TextFrameIndex SwTextFormatter::FormatLine(TextFrameIndex const nStartPos)
             m_pCurr->SetLen(TextFrameIndex(0));
             m_pCurr->Height( GetFrameRstHeight() + 1, false );
             m_pCurr->SetRealHeight( GetFrameRstHeight() + 1 );
+
+            // Don't oversize the line in case of split flys, so we don't try to move the anchor
+            // of a precede fly forward, next to its follow.
+            if (m_pFrame->HasNonLastSplitFlyDrawObj())
+            {
+                m_pCurr->SetRealHeight(GetFrameRstHeight());
+            }
+
             m_pCurr->Width(0);
             m_pCurr->Truncate();
             return nStartPos;

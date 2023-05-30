@@ -222,6 +222,9 @@ public:
     /** convert string to double number (using ::rtl::math) and DO convert. */
     bool convertDouble(double& rValue, std::u16string_view rString) const;
 
+    /** convert string to double number (using ::rtl::math) and DO convert. */
+    bool convertDouble(double& rValue, std::string_view rString) const;
+
     /** get the Null Date of the XModel and set it to the UnitConverter */
     bool setNullDate (
         const css::uno::Reference <css::frame::XModel>& xModel);
@@ -254,11 +257,6 @@ public:
     static bool convertDateTime( double& fDateTime,
                                 std::string_view rString,
                                 const css::util::Date& aNullDate);
-
-
-    /** convert string to ::basegfx::B3DVector */
-    static bool convertB3DVector( ::basegfx::B3DVector& rVector,
-                              std::u16string_view rValue );
 
     /** convert string to ::basegfx::B3DVector */
     static bool convertB3DVector( ::basegfx::B3DVector& rVector,

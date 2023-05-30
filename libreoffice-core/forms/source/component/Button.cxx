@@ -23,13 +23,15 @@
 #include <services.hxx>
 
 #include <com/sun/star/awt/XVclWindowPeer.hpp>
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/form/FormComponentType.hpp>
 
 #include <comphelper/streamsection.hxx>
 #include <comphelper/basicio.hxx>
 #include <comphelper/property.hxx>
 #include <o3tl/any.hxx>
-#include <tools/diagnose_ex.h>
+#include <o3tl/string_view.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <vcl/svapp.hxx>
@@ -460,7 +462,7 @@ IMPL_LINK_NOARG(OButtonControl, OnClick, void*, void)
         if (FormButtonType_PUSH == *o3tl::doAccess<FormButtonType>(xSet->getPropertyValue(PROPERTY_BUTTONTYPE)))
         {
             // notify the action listeners for a push button
-            ::comphelper::OInterfaceIteratorHelper2 aIter(m_aActionListeners);
+            ::comphelper::OInterfaceIteratorHelper3 aIter(m_aActionListeners);
             ActionEvent aEvt(static_cast<XWeak*>(this), m_aActionCommand);
             while(aIter.hasMoreElements() )
             {
@@ -469,7 +471,7 @@ IMPL_LINK_NOARG(OButtonControl, OnClick, void*, void)
                 // to get notified
                 try
                 {
-                    static_cast< XActionListener* >( aIter.next() )->actionPerformed(aEvt);
+                    aIter.next()->actionPerformed(aEvt);
                 }
 #ifdef DBG_UTIL
                 catch( const RuntimeException& )
@@ -651,10 +653,11 @@ void SAL_CALL OButtonControl::propertyChange( const PropertyChangeEvent& _rEvent
 
 namespace
 {
-    bool isFormControllerURL( const OUString& _rURL )
+    bool isFormControllerURL( std::u16string_view _rURL )
     {
-        return  ( _rURL.getLength() > RTL_CONSTASCII_LENGTH( ".uno:FormController/" ) )
-            &&  ( _rURL.startsWith( ".uno:FormController/" ) );
+        static constexpr std::u16string_view PREFIX = u".uno:FormController/";
+        return  ( _rURL.size() > PREFIX.size() )
+            &&  ( o3tl::starts_with(_rURL, PREFIX ) );
     }
 }
 
@@ -714,7 +717,7 @@ void OButtonControl::featureStateChanged( sal_Int16 _nFeatureId, bool _bEnabled 
         // enable or disable our peer, according to the new state
         Reference< XVclWindowPeer > xPeer( getPeer(), UNO_QUERY );
         if ( xPeer.is() )
-            xPeer->setProperty( PROPERTY_ENABLED, makeAny( m_bEnabledByPropertyValue && _bEnabled ) );
+            xPeer->setProperty( PROPERTY_ENABLED, Any( m_bEnabledByPropertyValue && _bEnabled ) );
             // if we're disabled according to our model's property, then
             // we don't care for the feature state, but *are* disabled.
             // If the model's property states that we're enabled, then we *do*

@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2020-02-10 17:41+0000\n"
-"Last-Translator: kompilainenn <79045_79045@mail.ru>\n"
-"Language-Team: Russian <https://weblate.documentfoundation.org/projects/libo_help-master/textswriter04/ru/>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-02 12:20+0000\n"
+"Last-Translator: bormant <bormant@mail.ru>\n"
+"Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_help-master/textswriter04/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1507118082.000000\n"
 
 #. brcGC
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; in text documents</bookmark_value>         <bookmark_value>text documents; shortcut keys in</bookmark_value>"
 msgstr "<bookmark_value>сочетания клавиш; в текстовых документах</bookmark_value>         <bookmark_value>текстовые документы; сочетания клавиш</bookmark_value>"
 
-#. 35yyT
+#. C9cjF
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3145763\n"
 "help.text"
-msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Shortcut Keys for %PRODUCTNAME Writer\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
-msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Сочетания клавиш для %PRODUCTNAME Writer\">Сочетания клавиш для <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Сочетания клавиш для <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
 
 #. qbPEo
 #: 01020000.xhp
@@ -52,14 +52,14 @@ msgctxt ""
 msgid "You can use shortcut keys to quickly perform common tasks in <item type=\"productname\">%PRODUCTNAME</item>. This section lists the default shortcut keys for <item type=\"productname\">%PRODUCTNAME</item> Writer."
 msgstr "Для быстрого выполнения обычных задач в <item type=\"productname\">%PRODUCTNAME</item> можно пользоваться сочетаниями клавиш. В этом разделе перечислены стандартные сочетания клавиш для <item type=\"productname\">%PRODUCTNAME</item> Writer."
 
-#. NuaiP
+#. WkpSD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3145081\n"
 "help.text"
-msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\" name=\"general shortcut keys in %PRODUCTNAME\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
-msgstr "Можно также  использовать <link href=\"text/shared/04/01010000.xhp\" name=\"общие сочетания клавиш в %PRODUCTNAME\">общие сочетания клавиш в <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgstr "Можно также  использовать <link href=\"text/shared/04/01010000.xhp\">общие сочетания клавиш в <item type=\"productname\">%PRODUCTNAME</item></link>."
 
 #. dQtdg
 #: 01020000.xhp
@@ -266,7 +266,7 @@ msgctxt ""
 "par_id3149957\n"
 "help.text"
 msgid "Spelling"
-msgstr ""
+msgstr "Проверка орфографии"
 
 #. BgpGm
 #: 01020000.xhp
@@ -536,7 +536,7 @@ msgctxt ""
 "par_id3148959\n"
 "help.text"
 msgid "Toggle Ordered List"
-msgstr ""
+msgstr "Нумерованный список"
 
 #. wAUBd
 #: 01020000.xhp
@@ -545,7 +545,7 @@ msgctxt ""
 "hd_id3148979\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">COMMAND</caseinline><defaultinline>CTRL</defaultinline></switchinline>+F12"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F12"
 
 #. Kudcw
 #: 01020000.xhp
@@ -572,7 +572,7 @@ msgctxt ""
 "par_id3152763\n"
 "help.text"
 msgid "Toggle Unordered List"
-msgstr ""
+msgstr "Маркированный список"
 
 #. pneN5
 #: 01020000.xhp
@@ -590,7 +590,7 @@ msgctxt ""
 "par_id3153901\n"
 "help.text"
 msgid "Ordered / Unordered List off"
-msgstr ""
+msgstr "Выкл. нумерованный/маркированный список"
 
 #. HyF9c
 #: 01020000.xhp
@@ -959,7 +959,7 @@ msgctxt ""
 "par_id3148394\n"
 "help.text"
 msgid "Non-breaking hyphen (is not used for hyphenation)"
-msgstr "Неразрывные переносы (не используются для переносов)"
+msgstr "Неразрывные переносы (не используются для расстановки переносов)"
 
 #. GbHDz
 #: 01020000.xhp
@@ -968,7 +968,7 @@ msgctxt ""
 "hd_id3148414\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+multiplication sign * (only on number pad)"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>CTRL</defaultinline></switchinline>+ЗВЁЗДОЧКА(*) на цифровой клавиатуре"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+ЗВЁЗДОЧКА(*) на цифровой клавиатуре"
 
 #. Pjfzz
 #: 01020000.xhp
@@ -1004,7 +1004,7 @@ msgctxt ""
 "hd_id3150281\n"
 "help.text"
 msgid "Shift+Enter"
-msgstr "SHIFT+ВВОД"
+msgstr "Shift+Enter"
 
 #. Swrx8
 #: 01020000.xhp
@@ -1022,7 +1022,7 @@ msgctxt ""
 "hd_id3149422\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">COMMAND</caseinline><defaultinline>CTRL</defaultinline></switchinline>+ВВОД"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
 
 #. AmExs
 #: 01020000.xhp
@@ -1040,7 +1040,7 @@ msgctxt ""
 "hd_id3146967\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Enter"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">COMMAND</caseinline><defaultinline>CTRL</defaultinline></switchinline>+SHIFT+ВВОД"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Enter"
 
 #. smRgr
 #: 01020000.xhp
@@ -1058,7 +1058,7 @@ msgctxt ""
 "hd_id3152906\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">OPTION</caseinline><defaultinline>ALT</defaultinline></switchinline>+ВВОД"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
 
 #. A5Eck
 #: 01020000.xhp
@@ -1076,7 +1076,7 @@ msgctxt ""
 "hd_id3153772\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">OPTION</caseinline><defaultinline>ALT</defaultinline></switchinline>+ВВОД"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+Enter"
 
 #. g9FzE
 #: 01020000.xhp
@@ -1085,7 +1085,7 @@ msgctxt ""
 "par_id3153798\n"
 "help.text"
 msgid "Insert a new paragraph directly before or after a section or table."
-msgstr ""
+msgstr "Вставка нового абзаца непосредственно перед или после раздела или таблицы."
 
 #. D2Ddu
 #: 01020000.xhp
@@ -1094,7 +1094,7 @@ msgctxt ""
 "par_id9535524\n"
 "help.text"
 msgid "For sections, the cursor must be placed at the first or last character. For tables, the cursor must be placed at the first character of the first cell or the last character of the last cell."
-msgstr ""
+msgstr "Для разделов курсор должен быть установлен на первый или последний символ. Для таблиц курсор должен быть установлен на первый символ первой ячейки или на последний символ последней ячейки."
 
 #. SAcMa
 #: 01020000.xhp
@@ -1220,7 +1220,7 @@ msgctxt ""
 "par_id3154093\n"
 "help.text"
 msgid "Go to start of next word"
-msgstr "Перейти к началу следующего слова"
+msgstr "Переход к началу следующего слова"
 
 #. zF2Zr
 #: 01020000.xhp
@@ -1292,7 +1292,7 @@ msgctxt ""
 "par_id1764275\n"
 "help.text"
 msgid "Move cursor to beginning of paragraph. Next keystroke moves cursor to beginning of previous paragraph"
-msgstr ""
+msgstr "Перемещение курсора в начало абзаца. Следующее нажатие переместит курсор в начало предыдущего абзаца"
 
 #. VEwNS
 #: 01020000.xhp
@@ -1744,14 +1744,14 @@ msgctxt ""
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
 msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">COMMAND</caseinline><defaultinline>CTRL</defaultinline></switchinline>+TAB"
 
-#. SDvt2
+#. AFUgU
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3153577\n"
 "help.text"
-msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Следующий вариант <link href=\"text/shared/01/06040600.xhp\" name=\"автозавершения слов\">автозавершения слов</link>"
+msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Следующий вариант <link href=\"text/shared/01/06040600.xhp\">автозавершения слов</link>"
 
 #. qDiED
 #: 01020000.xhp
@@ -1760,16 +1760,16 @@ msgctxt ""
 "hd_id3147360\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">COMMAND</caseinline><defaultinline>СTRL</defaultinline></switchinline>+SHIFT+TAB"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
 
-#. aounX
+#. bVg3F
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3147386\n"
 "help.text"
-msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Использование предыдущего варианта <link href=\"text/shared/01/06040600.xhp\" name=\"автозавершения слов\">автозавершения слов</link>"
+msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Использование предыдущего варианта <link href=\"text/shared/01/06040600.xhp\">автозавершения слов</link>"
 
 #. BqeEo
 #: 01020000.xhp
@@ -1823,7 +1823,7 @@ msgctxt ""
 "hd_id3150396\n"
 "help.text"
 msgid "Shortcut Keys for Paragraphs, List Paragraphs and Heading Levels"
-msgstr ""
+msgstr "Сочетания клавиш для абзацев, списков абзацев и уровней заголовков"
 
 #. AGgt5
 #: 01020000.xhp
@@ -1949,7 +1949,7 @@ msgctxt ""
 "par_id491655382453027\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
-msgstr ""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
 
 #. pARCd
 #: 01020000.xhp
@@ -1960,13 +1960,13 @@ msgctxt ""
 msgid "With the cursor placed anywhere in a heading or list paragraph: Decreases the alignment for all headings. For list paragraphs, decreases the alignment for all paragraphs in the same list."
 msgstr ""
 
-#. U2tpK
+#. wrjFD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id491655382900210\n"
 "help.text"
-msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\" name=\"Position\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
+msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
 msgstr ""
 
 #. Vp3wR
@@ -2264,7 +2264,7 @@ msgctxt ""
 "hd_id3149054\n"
 "help.text"
 msgid "F2 or Enter or any key that produces a character on screen"
-msgstr "F2 или ВВОД или любая клавиша, вызывающая появление символа на экране"
+msgstr "F2 или Enter или любая клавиша, вызывающая появление символа на экране"
 
 #. 3dnSh
 #: 01020000.xhp
@@ -2273,7 +2273,7 @@ msgctxt ""
 "par_id3149890\n"
 "help.text"
 msgid "If a frame is selected: positions the cursor to the end of the text in the frame. If you press any key that produces a character on screen, and the document is in edit mode, the character is appended to the text."
-msgstr "Если выбрана врезка: помещает курсор в конец текста во врезке. Если вы нажмете любую клавишу, которая создает символ на экране, и документ находится в режиме редактирования, то этот символ добавляется к тексту."
+msgstr "Если выбрана врезка: помещает курсор в конец текста во врезке. Если вы нажмёте любую клавишу, которая создаёт символ на экране, и документ находится в режиме редактирования, то этот символ добавляется к тексту."
 
 #. EHxBu
 #: 01020000.xhp

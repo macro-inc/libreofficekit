@@ -41,16 +41,15 @@ $(call gb_ExternalProject_get_state_target,harfbuzz,build) :
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
 			$(if $(gb_FULLDEPS),,--disable-dependency-tracking) \
 			--libdir=$(call gb_UnpackedTarball_get_dir,harfbuzz/src/.libs) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			CXXFLAGS=' \
 				$(if $(filter ANDROID,$(OS)),-DHB_NO_MMAP=1,) \
-				$(if $(call gb_Module__symbols_enabled,harfbuzz),$(gb_DEBUGINFO_FLAGS)) \
-				$(if $(ENABLE_OPTIMIZED), \
-					$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) \
+				$(call gb_ExternalProject_get_build_flags,harfbuzz) \
 				$(if $(ENABLE_RUNTIME_OPTIMIZATIONS),,-frtti) \
 				$(CXXFLAGS) $(CXXFLAGS_CXX11) \
 				$(ICU_UCHAR_TYPE) \
 				$(if $(filter LINUX,$(OS)),-fvisibility=hidden)' \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,harfbuzz)" \
 			MAKE=$(MAKE) \
 		&& (cd $(EXTERNAL_WORKDIR)/src && $(MAKE) lib) \
 	)

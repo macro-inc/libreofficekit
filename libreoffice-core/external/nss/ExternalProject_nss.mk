@@ -36,10 +36,10 @@ $(call gb_ExternalProject_get_state_target,nss,build): \
 		$(if $(filter AARCH64,$(CPUNAME)),USE_64=1 CPU_ARCH=aarch64) \
 		LIB="$(ILIB)" \
 		XCFLAGS="$(SOLARINC) $(ZLIB_CFLAGS)" \
+		NSPR_CONFIGURE_OPTS="$(gb_CONFIGURE_PLATFORMS)" \
 		$(if $(CROSS_COMPILING),\
 			CROSS_COMPILE=1 \
-			$(if $(filter AARCH64,$(CPUNAME)),CPU_ARCH=aarch64) \
-			NSPR_CONFIGURE_OPTS="--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)") \
+			$(if $(filter AARCH64,$(CPUNAME)),CPU_ARCH=aarch64)) \
 		$(MAKE) nss_build_all RC="rc.exe $(SOLARINC)" \
 			NSINSTALL='$(call gb_ExternalExecutable_get_command,python) $(SRCDIR)/external/nss/nsinstall.py' \
 			NSS_DISABLE_GTESTS=1 \
@@ -64,12 +64,10 @@ $(call gb_ExternalProject_get_state_target,nss,build): \
 		$(if $(filter LINUX,$(OS)),$(if $(ENABLE_DBGUTIL),,BUILD_OPT=1)) \
 		$(if $(filter SOLARIS,$(OS)),NS_USE_GCC=1) \
 		$(if $(filter ARM,$(CPUNAME)),NSS_DISABLE_ARM32_NEON=1) \
-		$(if $(CROSS_COMPILING),\
-			CROSS_COMPILE=1 \
-			NSPR_CONFIGURE_OPTS="--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)") \
+		NSPR_CONFIGURE_OPTS="$(gb_CONFIGURE_PLATFORMS)" \
+		$(if $(CROSS_COMPILING),CROSS_COMPILE=1) \
 		$(if $(filter MACOSX-X86_64-arm64,$(OS)-$(CPUNAME)-$(shell uname -m)), \
-			CPU_ARCH=x86_64 \
-			NSPR_CONFIGURE_OPTS="--build=$(subst macos,darwin,$(BUILD_PLATFORM)) --host=$(subst macos,darwin,$(HOST_PLATFORM))") \
+			CPU_ARCH=x86_64) \
 		NSDISTMODE=copy \
 		$(MAKE) \
 			AR="$(AR)" \
@@ -78,7 +76,7 @@ $(call gb_ExternalProject_get_state_target,nss,build): \
 			COMMA=$(COMMA) \
 			CC="$(CC)$(if $(filter iOS,$(OS)), -DNSS_STATIC_SOFTOKEN=1 -DNSS_STATIC_FREEBL=1 -DNSS_STATIC_PKCS11=1)$(if $(filter ANDROID,$(OS)), -D_PR_NO_LARGE_FILES=1 -DSQLITE_DISABLE_LFS=1)" CCC="$(CXX)" \
 			$(if $(CROSS_COMPILING),NSINSTALL="$(if $(filter MACOSX,$(OS_FOR_BUILD)),xcrun python3,$(call gb_ExternalExecutable_get_command,python)) $(SRCDIR)/external/nss/nsinstall.py") \
-			$(if $(filter ANDROID,$(OS)),OS_TARGET=Android OS_TARGET_RELEASE=16 ARCHFLAG="" DEFAULT_COMPILER=clang ANDROID_NDK=$(ANDROID_NDK_HOME) ANDROID_TOOLCHAIN_VERSION=$(ANDROID_GCC_TOOLCHAIN_VERSION) ANDROID_PREFIX=$(HOST_PLATFORM) ANDROID_SYSROOT=$(ANDROID_NDK_HOME)/sysroot ANDROID_TOOLCHAIN=$(ANDROID_BINUTILS_PREBUILT_ROOT)) \
+			$(if $(filter ANDROID,$(OS)),OS_TARGET=Android OS_TARGET_RELEASE=16 ARCHFLAG="" DEFAULT_COMPILER=clang ANDROID_NDK=$(ANDROID_NDK_DIR) ANDROID_TOOLCHAIN_VERSION=$(ANDROID_GCC_TOOLCHAIN_VERSION) ANDROID_PREFIX=$(HOST_PLATFORM) ANDROID_SYSROOT=$(ANDROID_NDK_DIR)/sysroot ANDROID_TOOLCHAIN=$(ANDROID_BINUTILS_PREBUILT_ROOT)) \
 			NSS_DISABLE_GTESTS=1 \
 			nss_build_all \
 		&& rm -f $(call gb_UnpackedTarball_get_dir,nss)/dist/out/lib/*.a \

@@ -37,25 +37,25 @@
 #define RECOVERY_CMDPART_DO_RECOVERY                "/doAutoRecovery"
 #define RECOVERY_CMDPART_DO_BRINGTOFRONT            "/doBringToFront"
 
-#define RECOVERY_CMD_DO_PREPARE_EMERGENCY_SAVE      "vnd.sun.star.autorecovery:/doPrepareEmergencySave"
-#define RECOVERY_CMD_DO_EMERGENCY_SAVE              "vnd.sun.star.autorecovery:/doEmergencySave"
-#define RECOVERY_CMD_DO_RECOVERY                    "vnd.sun.star.autorecovery:/doAutoRecovery"
-#define RECOVERY_CMD_DO_ENTRY_BACKUP                "vnd.sun.star.autorecovery:/doEntryBackup"
-#define RECOVERY_CMD_DO_ENTRY_CLEANUP               "vnd.sun.star.autorecovery:/doEntryCleanUp"
+inline constexpr OUStringLiteral RECOVERY_CMD_DO_PREPARE_EMERGENCY_SAVE = u"vnd.sun.star.autorecovery:/doPrepareEmergencySave";
+inline constexpr OUStringLiteral RECOVERY_CMD_DO_EMERGENCY_SAVE = u"vnd.sun.star.autorecovery:/doEmergencySave";
+inline constexpr OUStringLiteral RECOVERY_CMD_DO_RECOVERY = u"vnd.sun.star.autorecovery:/doAutoRecovery";
+inline constexpr OUStringLiteral RECOVERY_CMD_DO_ENTRY_BACKUP = u"vnd.sun.star.autorecovery:/doEntryBackup";
+inline constexpr OUStringLiteral RECOVERY_CMD_DO_ENTRY_CLEANUP = u"vnd.sun.star.autorecovery:/doEntryCleanUp";
 
-#define PROP_STATUSINDICATOR                        "StatusIndicator"
-#define PROP_DISPATCHASYNCHRON                      "DispatchAsynchron"
-#define PROP_SAVEPATH                               "SavePath"
-#define PROP_ENTRYID                                "EntryID"
+inline constexpr OUStringLiteral PROP_STATUSINDICATOR = u"StatusIndicator";
+inline constexpr OUStringLiteral PROP_DISPATCHASYNCHRON = u"DispatchAsynchron";
+inline constexpr OUStringLiteral PROP_SAVEPATH = u"SavePath";
+inline constexpr OUStringLiteral PROP_ENTRYID = u"EntryID";
 
-#define STATEPROP_ID                                "ID"
-#define STATEPROP_STATE                             "DocumentState"
-#define STATEPROP_ORGURL                            "OriginalURL"
-#define STATEPROP_TEMPURL                           "TempURL"
-#define STATEPROP_FACTORYURL                        "FactoryURL"
-#define STATEPROP_TEMPLATEURL                       "TemplateURL"
-#define STATEPROP_TITLE                             "Title"
-#define STATEPROP_MODULE                            "Module"
+inline constexpr OUStringLiteral STATEPROP_ID = u"ID";
+inline constexpr OUStringLiteral STATEPROP_STATE = u"DocumentState";
+inline constexpr OUStringLiteral STATEPROP_ORGURL = u"OriginalURL";
+inline constexpr OUStringLiteral STATEPROP_TEMPURL = u"TempURL";
+inline constexpr OUStringLiteral STATEPROP_FACTORYURL = u"FactoryURL";
+inline constexpr OUStringLiteral STATEPROP_TEMPLATEURL = u"TemplateURL";
+inline constexpr OUStringLiteral STATEPROP_TITLE = u"Title";
+inline constexpr OUStringLiteral STATEPROP_MODULE = u"Module";
 
 #define RECOVERY_OPERATIONSTATE_START               "start"
 #define RECOVERY_OPERATIONSTATE_STOP                "stop"
@@ -101,7 +101,8 @@ enum ERecoveryState
     E_ORIGINAL_DOCUMENT_RECOVERED,
     E_RECOVERY_FAILED,
     E_RECOVERY_IS_IN_PROGRESS,
-    E_NOT_RECOVERED_YET
+    E_NOT_RECOVERED_YET,
+    E_WILL_BE_DISCARDED,
 };
 
 
@@ -139,12 +140,16 @@ struct TURLInfo
     /// standard icon
     OUString StandardImageId;
 
+    /// user choice to discard
+    bool ShouldDiscard;
+
     public:
 
     TURLInfo()
         : ID           (-1                 )
         , DocState     (EDocStates::Unknown)
         , RecoveryState(E_NOT_RECOVERED_YET)
+        , ShouldDiscard(false)
     {}
 };
 
@@ -210,7 +215,7 @@ class RecoveryCore final : public ::cppu::WeakImplHelper< css::frame::XStatusLis
 
 
         /** @short  TODO */
-        RecoveryCore(const css::uno::Reference< css::uno::XComponentContext >& rxContext,
+        RecoveryCore(css::uno::Reference< css::uno::XComponentContext > xContext,
                            bool                                            bUsedForSaving);
 
 
@@ -233,6 +238,7 @@ class RecoveryCore final : public ::cppu::WeakImplHelper< css::frame::XStatusLis
         void forgetBrokenTempEntries();
         void forgetAllRecoveryEntries();
         void forgetBrokenRecoveryEntries();
+        void forgetAllRecoveryEntriesMarkedForDiscard();
 
 
         /** @short  TODO */
@@ -404,12 +410,14 @@ class RecoveryDialog final : public weld::GenericDialogController
         sal_Int32 m_eRecoveryState;
         bool  m_bWaitForCore;
         bool  m_bWasRecoveryStarted;
+        int   m_aToggleCount;
 
         OUString m_aSuccessRecovStr;
         OUString m_aOrigDocRecovStr;
         OUString m_aRecovFailedStr;
         OUString m_aRecovInProgrStr;
         OUString m_aNotRecovYetStr;
+        OUString m_aWillBeDiscStr;
 
         std::unique_ptr<weld::Label> m_xDescrFT;
         std::unique_ptr<weld::ProgressBar> m_xProgressBar;
@@ -436,9 +444,11 @@ class RecoveryDialog final : public weld::GenericDialogController
     private:
         DECL_LINK(NextButtonHdl, weld::Button&, void);
         DECL_LINK(CancelButtonHdl, weld::Button&, void);
+        DECL_LINK(ToggleRowHdl, const weld::TreeView::iter_col&, void);
 
         OUString impl_getStatusString( const TURLInfo& rInfo ) const;
         static OUString impl_getStatusImage( const TURLInfo& rInfo );
+        void impl_updateItemDescription(int row, const TriState& rState);
 };
 
 

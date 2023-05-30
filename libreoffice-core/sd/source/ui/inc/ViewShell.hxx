@@ -22,8 +22,9 @@
 #include <rtl/ref.hxx>
 
 #include <sfx2/viewsh.hxx>
+#include <svl/typedwhich.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <vcl/prntypes.hxx>
-#include <vcl/scrbar.hxx>
 #include <o3tl/deleter.hxx>
 #include <pres.hxx>
 #include "View.hxx"
@@ -36,6 +37,7 @@ class SdPage;
 class SvxRuler;
 class SdrOle2Obj;       // for the ones, who have undefined parts of SVDRAW
 class SdDrawDocument;
+class SvxNumBulletItem;
 
 namespace weld
 {
@@ -184,7 +186,7 @@ public:
     void SetUIUnit(FieldUnit eUnit);
     void SetDefTabHRuler( sal_uInt16 nDefTab );
 
-    const SfxPoolItem* GetNumBulletItem(SfxItemSet& aNewAttr, sal_uInt16& nNumItemId);
+    const SvxNumBulletItem* GetNumBulletItem(SfxItemSet& aNewAttr, TypedWhichId<SvxNumBulletItem>& nNumItemId);
 
     bool HasRuler() const { return mbHasRulers;}
     void SetRuler(bool bRuler);
@@ -412,7 +414,7 @@ public:
     /// Allows adjusting the point or mark of the selection to a document coordinate.
     void SetCursorMm100Position(const Point& rPosition, bool bPoint, bool bClearMark);
     /// Gets the current selection
-    css::uno::Reference<css::datatransfer::XTransferable> GetSelectionTransferrable() const;
+    css::uno::Reference<css::datatransfer::XTransferable> GetSelectionTransferable() const;
     /// Allows starting or ending a graphic move or resize action.
     void SetGraphicMm100Position(bool bStart, const Point& rPosition);
 
@@ -432,15 +434,13 @@ protected:
     VclPtr<sd::Window> mpContentWindow;
 
     /// Horizontal scroll bar for the current slide is displayed when needed.
-    VclPtr<ScrollBar> mpHorizontalScrollBar;
+    VclPtr<ScrollAdaptor> mpHorizontalScrollBar;
     /// Vertical scroll bar for whole document is always visible.
-    VclPtr<ScrollBar> mpVerticalScrollBar;
+    VclPtr<ScrollAdaptor> mpVerticalScrollBar;
     /// Horizontal ruler is not shown by default.
     VclPtr<SvxRuler> mpHorizontalRuler;
     /// Vertical ruler is not shown by default.
     VclPtr<SvxRuler> mpVerticalRuler;
-    /// Filler of the little square enclosed by the two scroll bars.
-    VclPtr<ScrollBarBox> mpScrollBarBox;
     /// Layer tab bar.
     VclPtr<LayerTabBar> mpLayerTabBar;
 
@@ -455,6 +455,8 @@ protected:
     rtl::Reference<FuPoor>   mxCurrentFunction;
     rtl::Reference<FuPoor>   mxOldFunction;
     std::unique_ptr<ZoomList> mpZoomList;
+    double mfLastZoomScale;
+    double mfAccumulatedZoom = 0;
 
     Point       maViewPos;
     Size        maViewSize;
@@ -489,12 +491,12 @@ protected:
     void ImpSidUndo(SfxRequest& rReq);
     void ImpSidRedo(SfxRequest& rReq);
 
-    DECL_DLLPRIVATE_LINK( HScrollHdl, ScrollBar *, void );
-    DECL_DLLPRIVATE_LINK( VScrollHdl, ScrollBar *, void );
+    DECL_DLLPRIVATE_LINK( HScrollHdl, weld::Scrollbar&, void );
+    DECL_DLLPRIVATE_LINK( VScrollHdl, weld::Scrollbar&, void );
 
     // virtual scroll handler, here, derivative classes can add themselves here
-    virtual void VirtHScrollHdl(ScrollBar* pHScroll);
-    virtual void VirtVScrollHdl(ScrollBar* pVScroll);
+    virtual void VirtHScrollHdl(ScrollAdaptor* pHScroll);
+    virtual void VirtVScrollHdl(ScrollAdaptor* pVScroll);
 
     // virtual functions ruler handling
     virtual VclPtr<SvxRuler> CreateHRuler(::sd::Window* pWin);

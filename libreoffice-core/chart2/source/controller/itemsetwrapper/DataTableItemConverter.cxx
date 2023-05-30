@@ -18,8 +18,11 @@
 #include <ChartModelHelper.hxx>
 #include <ChartModel.hxx>
 #include <CommonConverters.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <Diagram.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
 #include <memory>
 
 #include <osl/diagnose.h>
@@ -50,11 +53,11 @@ ItemPropertyMapType& lclDataTablePropertyMap()
 
 DataTableItemConverter::DataTableItemConverter(
     const uno::Reference<beans::XPropertySet>& rPropertySet, SfxItemPool& rItemPool,
-    SdrModel& rDrawModel, uno::Reference<lang::XMultiServiceFactory> const& xFactory)
+    SdrModel& rDrawModel, const rtl::Reference<::chart::ChartModel>& xChartDoc)
     : ItemConverter(rPropertySet, rItemPool)
 {
     m_aConverters.emplace_back(new GraphicPropertyItemConverter(
-        rPropertySet, rItemPool, rDrawModel, xFactory, GraphicObjectType::LineProperties));
+        rPropertySet, rItemPool, rDrawModel, xChartDoc, GraphicObjectType::LineProperties));
     m_aConverters.emplace_back(new CharacterPropertyItemConverter(rPropertySet, rItemPool));
 }
 

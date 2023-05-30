@@ -45,14 +45,22 @@ public:
     void testTdf126460();
     void testTdf115863();
     void testTdf138818();
+    void testTdf149418();
+    void testTdf74331();
     void testRoundtrip();
+    void testRGB8bits();
+    void testRGB16bits();
 
     CPPUNIT_TEST_SUITE(TiffFilterTest);
     CPPUNIT_TEST(testCVEs);
     CPPUNIT_TEST(testTdf126460);
     CPPUNIT_TEST(testTdf115863);
     CPPUNIT_TEST(testTdf138818);
+    CPPUNIT_TEST(testTdf149418);
+    CPPUNIT_TEST(testTdf74331);
     CPPUNIT_TEST(testRoundtrip);
+    CPPUNIT_TEST(testRGB8bits);
+    CPPUNIT_TEST(testRGB16bits);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -124,6 +132,72 @@ void TiffFilterTest::testTdf138818()
     CPPUNIT_ASSERT_EQUAL(sal_uInt32(46428), aGraphic.GetGfxLink().GetDataSize());
 }
 
+void TiffFilterTest::testTdf149418()
+{
+    OUString aURL = getUrl() + "tdf149418.tif";
+    SvFileStream aFileStream(aURL, StreamMode::READ);
+    Graphic aGraphic;
+    GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
+
+    ErrCode bResult = rFilter.ImportGraphic(aGraphic, aURL, aFileStream);
+
+    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, bResult);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 50938
+    // - Actual  : 50029
+    CPPUNIT_ASSERT_EQUAL(sal_uInt32(50938), aGraphic.GetGfxLink().GetDataSize());
+}
+
+void TiffFilterTest::testTdf74331()
+{
+    OUString aURL = getUrl() + "tdf74331.tif";
+    SvFileStream aFileStream(aURL, StreamMode::READ);
+    Graphic aGraphic;
+    GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
+
+    ErrCode bResult = rFilter.ImportGraphic(aGraphic, aURL, aFileStream);
+
+    CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, bResult);
+
+    Bitmap aBitmap = aGraphic.GetBitmapEx().GetBitmap();
+    Size aSize = aBitmap.GetSizePixel();
+    CPPUNIT_ASSERT_EQUAL(tools::Long(200), aSize.Width());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(200), aSize.Height());
+
+    Bitmap::ScopedReadAccess pReadAccess(aBitmap);
+
+    // Check the image contains different kinds of grays
+    int nGrayCount = 0;
+    int nGray3Count = 0;
+    int nGray7Count = 0;
+    int nLightGrayCount = 0;
+
+    for (tools::Long nX = 1; nX < aSize.Width() - 1; ++nX)
+    {
+        for (tools::Long nY = 1; nY < aSize.Height() - 1; ++nY)
+        {
+            const Color aColor = pReadAccess->GetColor(nY, nX);
+            if (aColor == COL_GRAY)
+                ++nGrayCount;
+            else if (aColor == COL_GRAY3)
+                ++nGray3Count;
+            else if (aColor == COL_GRAY7)
+                ++nGray7Count;
+            else if (aColor == COL_LIGHTGRAY)
+                ++nLightGrayCount;
+        }
+    }
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 313
+    // - Actual  : 0
+    CPPUNIT_ASSERT_EQUAL(313, nGrayCount);
+    CPPUNIT_ASSERT_EQUAL(71, nGray3Count);
+    CPPUNIT_ASSERT_EQUAL(227, nGray7Count);
+    CPPUNIT_ASSERT_EQUAL(165, nLightGrayCount);
+}
+
 void TiffFilterTest::testRoundtrip()
 {
     Bitmap aBitmap(Size(2, 2), vcl::PixelFormat::N24_BPP);
@@ -138,11 +212,11 @@ void TiffFilterTest::testRoundtrip()
     SvMemoryStream aStream;
     GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
     sal_uInt16 nFilterFormat = rFilter.GetExportFormatNumberForShortName(u"tif");
-    rFilter.ExportGraphic(Graphic(BitmapEx(aBitmap)), "none", aStream, nFilterFormat);
+    rFilter.ExportGraphic(Graphic(BitmapEx(aBitmap)), u"none", aStream, nFilterFormat);
     aStream.Seek(STREAM_SEEK_TO_BEGIN);
 
     Graphic aGraphic;
-    ErrCode bResult = rFilter.ImportGraphic(aGraphic, "none", aStream);
+    ErrCode bResult = rFilter.ImportGraphic(aGraphic, u"none", aStream);
     CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, bResult);
     CPPUNIT_ASSERT_EQUAL(GfxLinkType::NativeTif, aGraphic.GetGfxLink().GetType());
     Bitmap aResultBitmap = aGraphic.GetBitmapEx().GetBitmap();
@@ -161,7 +235,81 @@ void TiffFilterTest::testRoundtrip()
 
     CPPUNIT_ASSERT_EQUAL(true, aDetector.detect());
     CPPUNIT_ASSERT_EQUAL(true, aDetector.checkTIF());
-    CPPUNIT_ASSERT_EQUAL(OUString(u"TIF"), aDetector.msDetectedFormat);
+    CPPUNIT_ASSERT_EQUAL(OUString(u"TIF"),
+                         vcl::getImportFormatShortName(aDetector.getMetadata().mnFormat));
+}
+
+void TiffFilterTest::testRGB8bits()
+{
+    const std::initializer_list<std::u16string_view> aNames = {
+        u"red8.tif",
+        u"green8.tif",
+        u"blue8.tif",
+    };
+
+    for (const auto& rName : aNames)
+    {
+        OUString aURL = getUrl() + rName;
+        SvFileStream aFileStream(aURL, StreamMode::READ);
+        Graphic aGraphic;
+        GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
+
+        ErrCode bResult = rFilter.ImportGraphic(aGraphic, aURL, aFileStream);
+        CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, bResult);
+
+        Bitmap aBitmap = aGraphic.GetBitmapEx().GetBitmap();
+        Size aSize = aBitmap.GetSizePixel();
+        CPPUNIT_ASSERT_EQUAL(tools::Long(10), aSize.Width());
+        CPPUNIT_ASSERT_EQUAL(tools::Long(10), aSize.Height());
+
+        Bitmap::ScopedReadAccess pReadAccess(aBitmap);
+        const Color aColor = pReadAccess->GetColor(5, 5);
+
+        if (rName == u"red8.tif")
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTRED, aColor);
+        else if (rName == u"green8.tif")
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTGREEN, aColor);
+        else
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTBLUE, aColor);
+    }
+}
+
+void TiffFilterTest::testRGB16bits()
+{
+    const std::initializer_list<std::u16string_view> aNames = {
+        u"red16.tif",
+        u"green16.tif",
+        u"blue16.tif",
+    };
+
+    for (const auto& rName : aNames)
+    {
+        OUString aURL = getUrl() + rName;
+        SvFileStream aFileStream(aURL, StreamMode::READ);
+        Graphic aGraphic;
+        GraphicFilter& rFilter = GraphicFilter::GetGraphicFilter();
+
+        ErrCode bResult = rFilter.ImportGraphic(aGraphic, aURL, aFileStream);
+        CPPUNIT_ASSERT_EQUAL(ERRCODE_NONE, bResult);
+
+        Bitmap aBitmap = aGraphic.GetBitmapEx().GetBitmap();
+        Size aSize = aBitmap.GetSizePixel();
+        CPPUNIT_ASSERT_EQUAL(tools::Long(10), aSize.Width());
+        CPPUNIT_ASSERT_EQUAL(tools::Long(10), aSize.Height());
+
+        Bitmap::ScopedReadAccess pReadAccess(aBitmap);
+        const Color aColor = pReadAccess->GetColor(5, 5);
+
+        if (rName == u"red16.tif")
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTRED, aColor);
+        else if (rName == u"green16.tif")
+            // tdf#142151: Without the fix in place, this test would have failed with
+            // - Expected: rgba[00ff00ff]
+            // - Actual  : rgba[000000ff]
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTGREEN, aColor);
+        else
+            CPPUNIT_ASSERT_EQUAL(COL_LIGHTBLUE, aColor);
+    }
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TiffFilterTest);

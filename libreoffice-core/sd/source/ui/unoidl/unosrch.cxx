@@ -23,6 +23,7 @@
 #include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
+#include <utility>
 #include <vcl/svapp.hxx>
 
 #include <svx/svdobj.hxx>
@@ -40,14 +41,13 @@ using namespace ::com::sun::star;
 #define WID_SEARCH_CASE         1
 #define WID_SEARCH_WORDS        2
 
-static const SfxItemPropertyMapEntry* ImplGetSearchPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> ImplGetSearchPropertyMap()
 {
     static const SfxItemPropertyMapEntry aSearchPropertyMap_Impl[] =
     {
         { u"" UNO_NAME_SEARCH_BACKWARDS,  WID_SEARCH_BACKWARDS,   cppu::UnoType<bool>::get(),    0,  0 },
         { u"" UNO_NAME_SEARCH_CASE,       WID_SEARCH_CASE,        cppu::UnoType<bool>::get(),    0,  0 },
         { u"" UNO_NAME_SEARCH_WORDS,      WID_SEARCH_WORDS,       cppu::UnoType<bool>::get(),    0,  0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
 
     return aSearchPropertyMap_Impl;
@@ -61,8 +61,8 @@ class SearchContext_impl
     sal_Int32 mnIndex;
 
 public:
-    SearchContext_impl(uno::Reference<drawing::XShapes> const& xShapes)
-        : mxShapes( xShapes ), mnIndex( -1 ) {}
+    SearchContext_impl(uno::Reference<drawing::XShapes> xShapes)
+        : mxShapes(std::move( xShapes )), mnIndex( -1 ) {}
 
     uno::Reference< drawing::XShape > firstShape()
     {
@@ -422,8 +422,6 @@ uno::Reference< text::XTextRange >  SdUnoSearchReplaceShape::Search( const uno::
     std::unique_ptr<sal_Int32[]> pConvertPos( new sal_Int32[nTextLen+2] );
     std::unique_ptr<sal_Int32[]> pConvertPara( new sal_Int32[nTextLen+2] );
 
-    const sal_Unicode* pText = aText.getStr();
-
     sal_Int32* pPos = pConvertPos.get();
     sal_Int32* pPara = pConvertPara.get();
 
@@ -473,7 +471,6 @@ uno::Reference< text::XTextRange >  SdUnoSearchReplaceShape::Search( const uno::
                                         *pPara++ = aStartSel.nStartPara;
 
                                         ndbg += 1;
-                                        pText++;
                                     }
                                     else
                                     {
@@ -494,7 +491,6 @@ uno::Reference< text::XTextRange >  SdUnoSearchReplaceShape::Search( const uno::
                                         *pPara++ = aStartSel.nStartPara;
 
                                         ndbg += 1;
-                                        pText++;
                                     }
                                     else
                                     {
@@ -515,8 +511,6 @@ uno::Reference< text::XTextRange >  SdUnoSearchReplaceShape::Search( const uno::
             {
                 *pPos++ = nLastPos + 1;
                 *pPara++ = nLastPara;
-
-                pText++;
             }
             else
             {

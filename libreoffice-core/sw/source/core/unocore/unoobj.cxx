@@ -41,6 +41,7 @@
 #include <paratr.hxx>
 #include <pam.hxx>
 #include <shellio.hxx>
+#include <unotbl.hxx>
 #include <fmtruby.hxx>
 #include <docsh.hxx>
 #include <docstyle.hxx>
@@ -57,6 +58,7 @@
 #include <unocontentcontrol.hxx>
 #include <unotext.hxx>
 #include <com/sun/star/text/TextMarkupType.hpp>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <unotools/syslocale.hxx>
 #include <i18nlangtag/languagetag.hxx>
@@ -85,6 +87,7 @@ SwUnoInternalPaM::~SwUnoInternalPaM()
 {
     while( GetNext() != this)
     {
+        // coverity[deref_arg] - the delete moves a new entry into GetNext()
         delete GetNext();
     }
 }
@@ -267,11 +270,9 @@ SwUnoCursorHelper::SetPageDesc(
         return false;
     }
     std::unique_ptr<SwFormatPageDesc> pNewDesc;
-    const SfxPoolItem* pItem;
-    if(SfxItemState::SET == rSet.GetItemState( RES_PAGEDESC, true, &pItem ) )
+    if(const SwFormatPageDesc* pItem = rSet.GetItemIfSet( RES_PAGEDESC ))
     {
-        pNewDesc.reset(new SwFormatPageDesc(
-                    *static_cast<const SwFormatPageDesc*>(pItem)));
+        pNewDesc.reset(new SwFormatPageDesc(*pItem));
     }
     if (!pNewDesc)
     {
@@ -301,7 +302,7 @@ SwUnoCursorHelper::SetPageDesc(
         }
         else
         {
-            rSet.Put(*pNewDesc);
+            rSet.Put(std::move(pNewDesc));
         }
     }
     return true;
@@ -385,11 +386,9 @@ lcl_setDropcapCharStyle(SwPaM const & rPam, SfxItemSet & rItemSet,
         throw lang::IllegalArgumentException();
     }
     std::unique_ptr<SwFormatDrop> pDrop;
-    SfxPoolItem const* pItem(nullptr);
-    if (SfxItemState::SET ==
-            rItemSet.GetItemState(RES_PARATR_DROP, true, &pItem))
+    if (const SwFormatDrop* pItem = rItemSet.GetItemIfSet(RES_PARATR_DROP))
     {
-        pDrop.reset(new SwFormatDrop(*static_cast<const SwFormatDrop*>(pItem)));
+        pDrop.reset(new SwFormatDrop(*pItem));
     }
     if (!pDrop)
     {
@@ -397,7 +396,7 @@ lcl_setDropcapCharStyle(SwPaM const & rPam, SfxItemSet & rItemSet,
     }
     const rtl::Reference<SwDocStyleSheet> xStyle(new SwDocStyleSheet(*pStyle));
     pDrop->SetCharFormat(xStyle->GetCharFormat());
-    rItemSet.Put(*pDrop);
+    rItemSet.Put(std::move(pDrop));
 }
 
 static void
@@ -410,11 +409,9 @@ lcl_setRubyCharstyle(SfxItemSet & rItemSet, uno::Any const& rValue)
     }
 
     std::unique_ptr<SwFormatRuby> pRuby;
-    const SfxPoolItem* pItem;
-    if (SfxItemState::SET ==
-            rItemSet.GetItemState(RES_TXTATR_CJK_RUBY, true, &pItem))
+    if (const SwFormatRuby* pItem = rItemSet.GetItemIfSet(RES_TXTATR_CJK_RUBY))
     {
-        pRuby.reset(new SwFormatRuby(*static_cast<const SwFormatRuby*>(pItem)));
+        pRuby.reset(new SwFormatRuby(*pItem));
     }
     if (!pRuby)
     {
@@ -431,7 +428,7 @@ lcl_setRubyCharstyle(SfxItemSet & rItemSet, uno::Any const& rValue)
                 sStyle, SwGetPoolIdFromName::ChrFmt);
         pRuby->SetCharFormatId(nId);
     }
-    rItemSet.Put(*pRuby);
+    rItemSet.Put(std::move(pRuby));
 }
 
 bool
@@ -477,7 +474,7 @@ SwUnoCursorHelper::SetCursorPropertyValue(
         case FN_UNO_PARA_NUM_AUTO_FORMAT:
         {
             // multi selection is not considered
-            SwTextNode *const pTextNd = rPam.GetNode().GetTextNode();
+            SwTextNode *const pTextNd = rPam.GetPointNode().GetTextNode();
             if (!pTextNd)
             {
                 throw lang::IllegalArgumentException();
@@ -514,8 +511,8 @@ SwUnoCursorHelper::SetCursorPropertyValue(
             }
             else if (FN_UNO_PARA_NUM_AUTO_FORMAT == rEntry.nWID)
             {
-                uno::Sequence<beans::NamedValue> props;
-                if (rValue >>= props)
+                std::shared_ptr<SfxItemSet> pAutoStyle;
+                if (uno::Sequence<beans::NamedValue> props; rValue >>= props)
                 {
                     // TODO create own map for this, it contains UNO_NAME_DISPLAY_NAME? or make property readable so ODF export can map it to a automatic style?
                     SfxItemPropertySet const& rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_CHAR_AUTO_STYLE));
@@ -548,10 +545,20 @@ SwUnoCursorHelper::SetCursorPropertyValue(
                         rPropSet.setPropertyValue(*pEntry, prop.Value, items);
                     }
 
+                    IStyleAccess& rStyleAccess = rPam.GetDoc().GetIStyleAccess();
+                    // Add it to the autostyle pool, needed by the ODT export.
+                    pAutoStyle = rStyleAccess.getAutomaticStyle(items, IStyleAccess::AUTO_STYLE_CHAR);
+                }
+                else if (OUString styleName; rValue >>= styleName)
+                {
+                    IStyleAccess& rStyleAccess = rPam.GetDoc().GetIStyleAccess();
+                    pAutoStyle = rStyleAccess.getByName(styleName, IStyleAccess::AUTO_STYLE_CHAR);
+                }
+                if (pAutoStyle)
+                {
                     SwFormatAutoFormat item(RES_PARATR_LIST_AUTOFMT);
-                    // TODO: for ODF export we'd need to add it to the autostyle pool
                     // note: paragraph auto styles have ParaStyleName property for the parent style; character auto styles currently do not because there's a separate hint, but for this it would be a good way to add it in order to export it as style:parent-style-name, see XMLTextParagraphExport::Add()
-                    item.SetStyleHandle(std::make_shared<SfxItemSet>(items));
+                    item.SetStyleHandle(pAutoStyle);
                     pTextNd->SetAttr(item);
                 }
             }
@@ -623,8 +630,8 @@ SwUnoCursorHelper::GetCurTextFormatColl(SwPaM & rPaM, const bool bConditional)
     SwPaM *pTmpCursor = &rPaM;
     do
     {
-        const SwNodeOffset nSttNd = pTmpCursor->Start()->nNode.GetIndex();
-        const SwNodeOffset nEndNd = pTmpCursor->End()->nNode.GetIndex();
+        const SwNodeOffset nSttNd = pTmpCursor->Start()->GetNodeIndex();
+        const SwNodeOffset nEndNd = pTmpCursor->End()->GetNodeIndex();
 
         if( nEndNd - nSttNd >= SwNodeOffset(nMaxLookup) )
         {
@@ -674,13 +681,13 @@ SwDoc* SwXTextCursor::GetDoc()
 
 SwXTextCursor::SwXTextCursor(
         SwDoc & rDoc,
-        uno::Reference< text::XText > const& xParent,
+        uno::Reference< text::XText > xParent,
         const CursorType eType,
         const SwPosition& rPos,
         SwPosition const*const pMark)
     : m_rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_TEXT_CURSOR))
     , m_eType(eType)
-    , m_xParentText(xParent)
+    , m_xParentText(std::move(xParent))
     , m_pUnoCursor(rDoc.CreateUnoCursor(rPos))
 {
     if (pMark)
@@ -690,11 +697,11 @@ SwXTextCursor::SwXTextCursor(
     }
 }
 
-SwXTextCursor::SwXTextCursor(uno::Reference< text::XText > const& xParent,
+SwXTextCursor::SwXTextCursor(uno::Reference< text::XText > xParent,
         SwPaM const& rSourceCursor, const CursorType eType)
     : m_rPropSet(*aSwMapProvider.GetPropertySet(PROPERTY_MAP_TEXT_CURSOR))
     , m_eType(eType)
-    , m_xParentText(xParent)
+    , m_xParentText(std::move(xParent))
     , m_pUnoCursor(rSourceCursor.GetDoc().CreateUnoCursor(*rSourceCursor.GetPoint()))
 {
     if (rSourceCursor.HasMark())
@@ -710,8 +717,8 @@ SwXTextCursor::~SwXTextCursor()
     m_pUnoCursor.reset(nullptr); // need to delete this with SolarMutex held
 }
 
-void SwXTextCursor::DeleteAndInsert(const OUString& rText,
-        const bool bForceExpandHints)
+void SwXTextCursor::DeleteAndInsert(std::u16string_view aText,
+        ::sw::DeleteAndInsertMode const eMode)
 {
     auto pUnoCursor = static_cast<SwCursor*>(m_pUnoCursor.get());
     if (!pUnoCursor)
@@ -720,24 +727,26 @@ void SwXTextCursor::DeleteAndInsert(const OUString& rText,
     // Start/EndAction
     SwDoc& rDoc = pUnoCursor->GetDoc();
     UnoActionContext aAction(&rDoc);
-    const sal_Int32 nTextLen = rText.getLength();
+    const sal_Int32 nTextLen = aText.size();
     rDoc.GetIDocumentUndoRedo().StartUndo(SwUndoId::INSERT, nullptr);
     auto pCurrent = pUnoCursor;
     do
     {
         if (pCurrent->HasMark())
         {
-            rDoc.getIDocumentContentOperations().DeleteAndJoin(*pCurrent);
+            rDoc.getIDocumentContentOperations().DeleteAndJoin(*pCurrent,
+                // is it "delete" or "replace"?
+                (nTextLen != 0 || eMode & ::sw::DeleteAndInsertMode::ForceReplace) ? SwDeleteFlags::ArtificialSelection : SwDeleteFlags::Default);
         }
         if(nTextLen)
         {
             const bool bSuccess(
                 SwUnoCursorHelper::DocInsertStringSplitCR(
-                    rDoc, *pCurrent, rText, bForceExpandHints ) );
+                    rDoc, *pCurrent, aText, bool(eMode & ::sw::DeleteAndInsertMode::ForceExpandHints)));
             OSL_ENSURE( bSuccess, "Doc->Insert(Str) failed." );
 
             SwUnoCursorHelper::SelectPam(*pUnoCursor, true);
-            pCurrent->Left(rText.getLength());
+            pCurrent->Left(aText.size());
         }
         pCurrent = pCurrent->GetNext();
     } while (pCurrent != pUnoCursor);
@@ -1063,32 +1072,23 @@ SwXTextCursor::gotoStart(sal_Bool Expand)
     {
         rUnoCursor.Move( fnMoveBackward, GoInDoc );
         //check, that the cursor is not in a table
-        SwTableNode * pTableNode = rUnoCursor.GetNode().FindTableNode();
-        SwContentNode * pCNode = nullptr;
+        SwTableNode * pTableNode = rUnoCursor.GetPointNode().FindTableNode();
         while (pTableNode)
         {
-            rUnoCursor.GetPoint()->nNode = *pTableNode->EndOfSectionNode();
-            pCNode = GetDoc()->GetNodes().GoNext(&rUnoCursor.GetPoint()->nNode);
+            rUnoCursor.GetPoint()->Assign( *pTableNode->EndOfSectionNode() );
+            SwContentNode* pCNode = GetDoc()->GetNodes().GoNext(rUnoCursor.GetPoint());
             pTableNode = pCNode ? pCNode->FindTableNode() : nullptr;
         }
-        if (pCNode)
-        {
-            rUnoCursor.GetPoint()->nContent.Assign(pCNode, 0);
-        }
         SwStartNode const*const pTmp =
-            rUnoCursor.GetNode().StartOfSectionNode();
+            rUnoCursor.GetPointNode().StartOfSectionNode();
         if (pTmp->IsSectionNode())
         {
             SwSectionNode const*const pSectionStartNode =
                 static_cast<SwSectionNode const*>(pTmp);
             if (pSectionStartNode->GetSection().IsHiddenFlag())
             {
-                pCNode = GetDoc()->GetNodes().GoNextSection(
-                        &rUnoCursor.GetPoint()->nNode, true, false);
-                if (pCNode)
-                {
-                    rUnoCursor.GetPoint()->nContent.Assign(pCNode, 0);
-                }
+                GetDoc()->GetNodes().GoNextSection(
+                        rUnoCursor.GetPoint(), true, false);
             }
         }
     }
@@ -1199,7 +1199,7 @@ SwXTextCursor::gotoRange(
             ;
         }
 
-        const SwStartNode* pOwnStartNode = rOwnCursor.GetNode().FindSttNodeByType(eSearchNodeType);
+        const SwStartNode* pOwnStartNode = rOwnCursor.GetPointNode().FindSttNodeByType(eSearchNodeType);
         while ( pOwnStartNode != nullptr
                 && pOwnStartNode->IsSectionNode())
         {
@@ -1207,7 +1207,7 @@ SwXTextCursor::gotoRange(
         }
 
         const SwStartNode* pTmp =
-            pPam->GetNode().FindSttNodeByType(eSearchNodeType);
+            pPam->GetPointNode().FindSttNodeByType(eSearchNodeType);
         while ( pTmp != nullptr
                 && pTmp->IsSectionNode() )
         {
@@ -1330,13 +1330,13 @@ SwXTextCursor::gotoNextWord(sal_Bool Expand)
     // since the called functions are sometimes a bit unreliable
     // in specific cases...
     SwPosition  *const pPoint     = rUnoCursor.GetPoint();
-    SwNode      *const pOldNode   = &pPoint->nNode.GetNode();
-    sal_Int32 const nOldIndex  = pPoint->nContent.GetIndex();
+    SwNode      *const pOldNode   = &pPoint->GetNode();
+    sal_Int32 const nOldIndex  = pPoint->GetContentIndex();
 
     SwUnoCursorHelper::SelectPam(rUnoCursor, Expand);
     // end of paragraph
-    if (rUnoCursor.GetContentNode() &&
-            (pPoint->nContent == rUnoCursor.GetContentNode()->Len()))
+    if (rUnoCursor.GetPointContentNode() &&
+            (pPoint->GetContentIndex() == rUnoCursor.GetPointContentNode()->Len()))
     {
         rUnoCursor.Right(1);
     }
@@ -1353,8 +1353,8 @@ SwXTextCursor::gotoNextWord(sal_Bool Expand)
     }
 
     // return true if cursor has moved
-    bRet =  (&pPoint->nNode.GetNode() != pOldNode)  ||
-            (pPoint->nContent.GetIndex() != nOldIndex);
+    bRet =  (&pPoint->GetNode() != pOldNode)  ||
+            (pPoint->GetContentIndex() != nOldIndex);
     if (bRet && (CursorType::Meta == m_eType))
     {
         bRet = lcl_ForceIntoMeta(rUnoCursor, m_xParentText,
@@ -1378,27 +1378,27 @@ SwXTextCursor::gotoPreviousWord(sal_Bool Expand)
     // white spaces create problems on the paragraph start
     bool bRet = false;
     SwPosition  *const pPoint     = rUnoCursor.GetPoint();
-    SwNode      *const pOldNode   = &pPoint->nNode.GetNode();
-    sal_Int32 const nOldIndex  = pPoint->nContent.GetIndex();
+    SwNode      *const pOldNode   = &pPoint->GetNode();
+    sal_Int32 const nOldIndex  = pPoint->GetContentIndex();
 
     SwUnoCursorHelper::SelectPam(rUnoCursor, Expand);
     // start of paragraph?
-    if (pPoint->nContent == 0)
+    if (pPoint->GetContentIndex() == 0)
     {
         rUnoCursor.Left(1);
     }
     else
     {
         rUnoCursor.GoPrevWordWT( i18n::WordType::DICTIONARY_WORD );
-        if (pPoint->nContent == 0)
+        if (pPoint->GetContentIndex() == 0)
         {
             rUnoCursor.Left(1);
         }
     }
 
     // return true if cursor has moved
-    bRet =  (&pPoint->nNode.GetNode() != pOldNode)  ||
-            (pPoint->nContent.GetIndex() != nOldIndex);
+    bRet =  (&pPoint->GetNode() != pOldNode)  ||
+            (pPoint->GetContentIndex() != nOldIndex);
     if (bRet && (CursorType::Meta == m_eType))
     {
         bRet = lcl_ForceIntoMeta(rUnoCursor, m_xParentText,
@@ -1421,8 +1421,8 @@ SwXTextCursor::gotoEndOfWord(sal_Bool Expand)
 
     bool bRet = false;
     SwPosition  *const pPoint     = rUnoCursor.GetPoint();
-    SwNode      &      rOldNode   = pPoint->nNode.GetNode();
-    sal_Int32 const nOldIndex  = pPoint->nContent.GetIndex();
+    SwNode      &      rOldNode   = pPoint->GetNode();
+    sal_Int32 const nOldIndex  = pPoint->GetContentIndex();
 
     const sal_Int16 nWordType = i18n::WordType::DICTIONARY_WORD;
     SwUnoCursorHelper::SelectPam(rUnoCursor, Expand);
@@ -1436,8 +1436,7 @@ SwXTextCursor::gotoEndOfWord(sal_Bool Expand)
     bRet = rUnoCursor.IsEndWordWT( nWordType );
     if (!bRet)
     {
-        pPoint->nNode       = rOldNode;
-        pPoint->nContent    = nOldIndex;
+        pPoint->Assign(rOldNode, nOldIndex);
     }
     else if (CursorType::Meta == m_eType)
     {
@@ -1461,8 +1460,8 @@ SwXTextCursor::gotoStartOfWord(sal_Bool Expand)
 
     bool bRet = false;
     SwPosition  *const pPoint     = rUnoCursor.GetPoint();
-    SwNode      &      rOldNode   = pPoint->nNode.GetNode();
-    sal_Int32 const nOldIndex  = pPoint->nContent.GetIndex();
+    SwNode      &      rOldNode   = pPoint->GetNode();
+    sal_Int32 const nOldIndex  = pPoint->GetContentIndex();
 
     const sal_Int16 nWordType = i18n::WordType::DICTIONARY_WORD;
     SwUnoCursorHelper::SelectPam(rUnoCursor, Expand);
@@ -1476,8 +1475,7 @@ SwXTextCursor::gotoStartOfWord(sal_Bool Expand)
     bRet = rUnoCursor.IsStartWordWT( nWordType );
     if (!bRet)
     {
-        pPoint->nNode       = rOldNode;
-        pPoint->nContent    = nOldIndex;
+        pPoint->Assign(rOldNode, nOldIndex);
     }
     else if (CursorType::Meta == m_eType)
     {
@@ -1500,7 +1498,7 @@ SwXTextCursor::isStartOfSentence()
     SwUnoCursor & rUnoCursor( GetCursorOrThrow() );
 
     // start of paragraph?
-    bool bRet = rUnoCursor.GetPoint()->nContent == 0;
+    bool bRet = rUnoCursor.GetPoint()->GetContentIndex() == 0;
     // with mark ->no sentence start
     // (check if cursor is no selection, i.e. it does not have
     // a mark or else point and mark are identical)
@@ -1523,8 +1521,8 @@ SwXTextCursor::isEndOfSentence()
     SwUnoCursor & rUnoCursor( GetCursorOrThrow() );
 
     // end of paragraph?
-    bool bRet = rUnoCursor.GetContentNode() &&
-        (rUnoCursor.GetPoint()->nContent == rUnoCursor.GetContentNode()->Len());
+    bool bRet = rUnoCursor.GetPointContentNode() &&
+        (rUnoCursor.GetPoint()->GetContentIndex() == rUnoCursor.GetPointContentNode()->Len());
     // with mark->no sentence end
     // (check if cursor is no selection, i.e. it does not have
     // a mark or else point and mark are identical)
@@ -1854,7 +1852,7 @@ SwXTextCursor::setString(const OUString& aString)
     const bool bForceExpandHints( (CursorType::Meta == m_eType)
         && dynamic_cast<SwXMeta&>(*m_xParentText)
                 .CheckForOwnMemberMeta(*GetPaM(), true) );
-    DeleteAndInsert(aString, bForceExpandHints);
+    DeleteAndInsert(aString, bForceExpandHints ? ::sw::DeleteAndInsertMode::ForceExpandHints : ::sw::DeleteAndInsertMode::Default);
 }
 
 uno::Any SwUnoCursorHelper::GetPropertyValue(
@@ -1897,9 +1895,8 @@ void SwUnoCursorHelper::SetPropertyValue(
     const uno::Any& rValue,
     const SetAttrMode nAttrMode)
 {
-    uno::Sequence< beans::PropertyValue > aValues{ comphelper::makePropertyValue(rPropertyName,
-                                                                                 rValue)};
-    SetPropertyValues(rPaM, rPropSet, aValues, nAttrMode);
+    beans::PropertyValue aVal { comphelper::makePropertyValue(rPropertyName, rValue) };
+    SetPropertyValues(rPaM, rPropSet, o3tl::span<beans::PropertyValue>(&aVal, 1), nAttrMode);
 }
 
 // FN_UNO_PARA_STYLE is known to set attributes for nodes, inside
@@ -1919,7 +1916,17 @@ void SwUnoCursorHelper::SetPropertyValues(
     const uno::Sequence< beans::PropertyValue > &rPropertyValues,
     const SetAttrMode nAttrMode)
 {
-    if (!rPropertyValues.hasElements())
+    SetPropertyValues(rPaM, rPropSet,
+        o3tl::span<const beans::PropertyValue>(rPropertyValues.getConstArray(), rPropertyValues.getLength()),
+        nAttrMode);
+}
+
+void SwUnoCursorHelper::SetPropertyValues(
+    SwPaM& rPaM, const SfxItemPropertySet& rPropSet,
+    o3tl::span< const beans::PropertyValue > aPropertyValues,
+    const SetAttrMode nAttrMode)
+{
+    if (aPropertyValues.empty())
         return;
 
     SwDoc& rDoc = rPaM.GetDoc();
@@ -1928,8 +1935,8 @@ void SwUnoCursorHelper::SetPropertyValues(
     // Build set of attributes we want to fetch
     WhichRangesContainer aRanges;
     std::vector<std::pair<const SfxItemPropertyMapEntry*, const uno::Any&>> aEntries;
-    aEntries.reserve(rPropertyValues.getLength());
-    for (const auto& rPropVal : rPropertyValues)
+    aEntries.reserve(aPropertyValues.size());
+    for (const auto& rPropVal : aPropertyValues)
     {
         const OUString &rPropertyName = rPropVal.Name;
 
@@ -1954,7 +1961,7 @@ void SwUnoCursorHelper::SetPropertyValues(
     if (!aEntries.empty())
     {
         // Fetch, overwrite, and re-set the attributes from the core
-        SfxItemSet aItemSet(rDoc.GetAttrPool(), aRanges);
+        SfxItemSet aItemSet(rDoc.GetAttrPool(), std::move(aRanges));
 
         bool bPreviousPropertyCausesSideEffectsInNodes = false;
         for (size_t i = 0; i < aEntries.size(); ++i)
@@ -2016,7 +2023,8 @@ SwUnoCursorHelper::GetPropertyStates(
         if(!pEntry)
         {
             if (pNames[i] == UNO_NAME_IS_SKIP_HIDDEN_TEXT ||
-                pNames[i] == UNO_NAME_IS_SKIP_PROTECTED_TEXT)
+                pNames[i] == UNO_NAME_IS_SKIP_PROTECTED_TEXT ||
+                pNames[i] == UNO_NAME_NO_FORMAT_ATTR)
             {
                 pStates[i] = beans::PropertyState_DEFAULT_VALUE;
                 continue;
@@ -2207,9 +2215,9 @@ SwXTextCursor::getPropertySetInfo()
     {
         static SfxItemPropertyMapEntry const aCursorExtMap_Impl[] =
         {
-            { u"" UNO_NAME_IS_SKIP_HIDDEN_TEXT, FN_SKIP_HIDDEN_TEXT, cppu::UnoType<bool>::get(), PROPERTY_NONE,     0},
-            { u"" UNO_NAME_IS_SKIP_PROTECTED_TEXT, FN_SKIP_PROTECTED_TEXT, cppu::UnoType<bool>::get(), PROPERTY_NONE,     0},
-            { u"", 0, css::uno::Type(), 0, 0 }
+            { UNO_NAME_IS_SKIP_HIDDEN_TEXT, FN_SKIP_HIDDEN_TEXT, cppu::UnoType<bool>::get(), PROPERTY_NONE,     0},
+            { UNO_NAME_IS_SKIP_PROTECTED_TEXT, FN_SKIP_PROTECTED_TEXT, cppu::UnoType<bool>::get(), PROPERTY_NONE,     0},
+            { UNO_NAME_NO_FORMAT_ATTR, 0, cppu::UnoType<bool>::get(), PROPERTY_NONE,     0},
         };
         const uno::Reference< beans::XPropertySetInfo >  xInfo =
             m_rPropSet.getPropertySetInfo();
@@ -2250,17 +2258,33 @@ SwXTextCursor::setPropertyValue(
     }
     else if (rPropertyName == UNO_NAME_RESET_PARAGRAPH_LIST_ATTRIBUTES)
     {
-        SwTextNode* pTextNode= GetPaM()->GetNode().GetTextNode();
+        SwTextNode* pTextNode= GetPaM()->GetPointNode().GetTextNode();
 
         if(pTextNode)
         {
             pTextNode->ResetAttr(RES_PARATR_LIST_BEGIN, RES_PARATR_LIST_END);
         }
     }
+    else if (rPropertyName == UNO_NAME_NO_FORMAT_ATTR)
+    {
+        bool bSet(false);
+        if (!(rValue >>= bSet))
+        {
+            throw lang::IllegalArgumentException();
+        }
+        if (bSet)
+        {
+            m_nAttrMode = SetAttrMode::NOFORMATATTR;
+        }
+        else
+        {
+            m_nAttrMode = SetAttrMode::DEFAULT;
+        }
+    }
     else
     {
         SwUnoCursorHelper::SetPropertyValue(rUnoCursor,
-                m_rPropSet, rPropertyName, rValue);
+                m_rPropSet, rPropertyName, rValue, m_nAttrMode);
     }
 }
 
@@ -2573,7 +2597,8 @@ SwXTextCursor::getPropertyDefaults(
             if (!pEntry)
             {
                 if (pNames[i] == UNO_NAME_IS_SKIP_HIDDEN_TEXT ||
-                    pNames[i] == UNO_NAME_IS_SKIP_PROTECTED_TEXT)
+                    pNames[i] == UNO_NAME_IS_SKIP_PROTECTED_TEXT ||
+                    pNames[i] == UNO_NAME_NO_FORMAT_ATTR)
                 {
                     continue;
                 }
@@ -2598,7 +2623,7 @@ void SAL_CALL SwXTextCursor::invalidateMarkings(::sal_Int32 nType)
 
     SwUnoCursor & rUnoCursor( GetCursorOrThrow() );
 
-    SwNode& node = rUnoCursor.GetNode();
+    SwNode& node = rUnoCursor.GetPointNode();
 
     SwTextNode* txtNode = node.GetTextNode();
 
@@ -2980,27 +3005,27 @@ SwXTextCursor::sort(const uno::Sequence< beans::PropertyValue >& rDescriptor)
     SwPosition & rStart = *rUnoCursor.Start();
     SwPosition & rEnd   = *rUnoCursor.End();
 
-    SwNodeIndex aPrevIdx( rStart.nNode, -1 );
-    const SwNodeOffset nOffset = rEnd.nNode.GetIndex() - rStart.nNode.GetIndex();
-    const sal_Int32 nCntStt  = rStart.nContent.GetIndex();
+    SwNodeIndex aPrevIdx( rStart.GetNode(), -1 );
+    const SwNodeOffset nOffset = rEnd.GetNodeIndex() - rStart.GetNodeIndex();
+    const sal_Int32 nCntStt  = rStart.GetContentIndex();
 
     rUnoCursor.GetDoc().SortText(rUnoCursor, aSortOpt);
 
     // update selection
     rUnoCursor.DeleteMark();
-    rUnoCursor.GetPoint()->nNode.Assign( aPrevIdx.GetNode(), +1 );
-    SwContentNode *const pCNd = rUnoCursor.GetContentNode();
+    rUnoCursor.GetPoint()->Assign( aPrevIdx.GetNode(), SwNodeOffset(1) );
+    SwContentNode *const pCNd = rUnoCursor.GetPointContentNode();
     sal_Int32 nLen = pCNd->Len();
     if (nLen > nCntStt)
     {
         nLen = nCntStt;
     }
-    rUnoCursor.GetPoint()->nContent.Assign(pCNd, nLen );
+    rUnoCursor.GetPoint()->SetContent( nLen );
     rUnoCursor.SetMark();
 
-    rUnoCursor.GetPoint()->nNode += nOffset;
-    SwContentNode *const pCNd2 = rUnoCursor.GetContentNode();
-    rUnoCursor.GetPoint()->nContent.Assign( pCNd2, pCNd2->Len() );
+    rUnoCursor.GetPoint()->Adjust(nOffset);
+    SwContentNode *const pCNd2 = rUnoCursor.GetPointContentNode();
+    rUnoCursor.GetPoint()->SetContent( pCNd2->Len() );
 
 }
 

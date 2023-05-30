@@ -29,7 +29,6 @@
 #include <inputhdl.hxx>
 #include <inputwin.hxx>
 
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/sheet/XSpreadsheetDocument.hpp>
@@ -245,7 +244,7 @@ tools::Rectangle ScAccessibleEditObject::GetBoundingBox() const
 
     //=====  XAccessibleContext  ==============================================
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
     ScAccessibleEditObject::getAccessibleChildCount()
 {
     SolarMutexGuard aGuard;
@@ -255,7 +254,7 @@ sal_Int32 SAL_CALL
 }
 
 uno::Reference< XAccessible > SAL_CALL
-    ScAccessibleEditObject::getAccessibleChild(sal_Int32 nIndex)
+    ScAccessibleEditObject::getAccessibleChild(sal_Int64 nIndex)
 {
     SolarMutexGuard aGuard;
     IsObjectValid();
@@ -263,31 +262,30 @@ uno::Reference< XAccessible > SAL_CALL
     return mpTextHelper->GetChild(nIndex);
 }
 
-uno::Reference<XAccessibleStateSet> SAL_CALL
-    ScAccessibleEditObject::getAccessibleStateSet()
+sal_Int64 SAL_CALL ScAccessibleEditObject::getAccessibleStateSet()
 {
     SolarMutexGuard aGuard;
-    uno::Reference<XAccessibleStateSet> xParentStates;
+    sal_Int64 nParentStates = 0;
     if (getAccessibleParent().is())
     {
         uno::Reference<XAccessibleContext> xParentContext = getAccessibleParent()->getAccessibleContext();
-        xParentStates = xParentContext->getAccessibleStateSet();
+        nParentStates = xParentContext->getAccessibleStateSet();
     }
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSet = new utl::AccessibleStateSetHelper();
-    if (IsDefunc(xParentStates))
-        pStateSet->AddState(AccessibleStateType::DEFUNC);
+    sal_Int64 nStateSet = 0;
+    if (IsDefunc(nParentStates))
+        nStateSet |= AccessibleStateType::DEFUNC;
     else
     {
         // all states are const, because this object exists only in one state
-        pStateSet->AddState(AccessibleStateType::EDITABLE);
-        pStateSet->AddState(AccessibleStateType::ENABLED);
-        pStateSet->AddState(AccessibleStateType::SENSITIVE);
-        pStateSet->AddState(AccessibleStateType::MULTI_LINE);
-        pStateSet->AddState(AccessibleStateType::MULTI_SELECTABLE);
-        pStateSet->AddState(AccessibleStateType::SHOWING);
-        pStateSet->AddState(AccessibleStateType::VISIBLE);
+        nStateSet |= AccessibleStateType::EDITABLE;
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::SENSITIVE;
+        nStateSet |= AccessibleStateType::MULTI_LINE;
+        nStateSet |= AccessibleStateType::MULTI_SELECTABLE;
+        nStateSet |= AccessibleStateType::SHOWING;
+        nStateSet |= AccessibleStateType::VISIBLE;
     }
-    return pStateSet;
+    return nStateSet;
 }
 
 OUString
@@ -343,11 +341,10 @@ uno::Sequence<sal_Int8> SAL_CALL
 
     //====  internal  =========================================================
 
-bool ScAccessibleEditObject::IsDefunc(
-    const uno::Reference<XAccessibleStateSet>& rxParentStates)
+bool ScAccessibleEditObject::IsDefunc(sal_Int64 nParentStates)
 {
     return ScAccessibleContextBase::IsDefunc() || !getAccessibleParent().is() ||
-         (rxParentStates.is() && rxParentStates->contains(AccessibleStateType::DEFUNC));
+         (nParentStates & AccessibleStateType::DEFUNC);
 }
 
 OutputDevice* ScAccessibleEditObject::GetOutputDeviceForView()
@@ -449,11 +446,11 @@ sal_Int32 ScAccessibleEditObject::GetFgBgColor( const OUString &strPropColor)
 }
 //=====  XAccessibleSelection  ============================================
 
-void SAL_CALL ScAccessibleEditObject::selectAccessibleChild( sal_Int32 )
+void SAL_CALL ScAccessibleEditObject::selectAccessibleChild( sal_Int64 )
 {
 }
 
-sal_Bool SAL_CALL ScAccessibleEditObject::isAccessibleChildSelected( sal_Int32 nChildIndex )
+sal_Bool SAL_CALL ScAccessibleEditObject::isAccessibleChildSelected( sal_Int64 nChildIndex )
 {
     uno::Reference<XAccessible> xAcc = getAccessibleChild( nChildIndex );
     uno::Reference<XAccessibleContext> xContext;
@@ -482,21 +479,21 @@ void SAL_CALL ScAccessibleEditObject::selectAllAccessibleChildren(  )
 {
 }
 
-sal_Int32 SAL_CALL ScAccessibleEditObject::getSelectedAccessibleChildCount()
+sal_Int64 SAL_CALL ScAccessibleEditObject::getSelectedAccessibleChildCount()
 {
-    sal_Int32 nCount = 0;
-    sal_Int32 TotalCount = getAccessibleChildCount();
-    for( sal_Int32 i = 0; i < TotalCount; i++ )
+    sal_Int64 nCount = 0;
+    sal_Int64 TotalCount = getAccessibleChildCount();
+    for( sal_Int64 i = 0; i < TotalCount; i++ )
         if( isAccessibleChildSelected(i) ) nCount++;
     return nCount;
 }
 
-uno::Reference<XAccessible> SAL_CALL ScAccessibleEditObject::getSelectedAccessibleChild( sal_Int32 nSelectedChildIndex )
+uno::Reference<XAccessible> SAL_CALL ScAccessibleEditObject::getSelectedAccessibleChild( sal_Int64 nSelectedChildIndex )
 {
-    if ( nSelectedChildIndex > getSelectedAccessibleChildCount() )
+    if ( nSelectedChildIndex < 0 || nSelectedChildIndex > getSelectedAccessibleChildCount() )
         throw IndexOutOfBoundsException();
-    sal_Int32 i1, i2;
-    for( i1 = 0, i2 = 0; i1 < getAccessibleChildCount(); i1++ )
+
+    for (sal_Int64 i1 = 0, i2 = 0; i1 < getAccessibleChildCount(); i1++ )
         if( isAccessibleChildSelected(i1) )
         {
             if( i2 == nSelectedChildIndex )
@@ -506,8 +503,7 @@ uno::Reference<XAccessible> SAL_CALL ScAccessibleEditObject::getSelectedAccessib
     return uno::Reference<XAccessible>();
 }
 
-void SAL_CALL ScAccessibleEditObject::deselectAccessibleChild(
-                                                            sal_Int32 )
+void SAL_CALL ScAccessibleEditObject::deselectAccessibleChild(sal_Int64)
 {
 }
 

@@ -30,7 +30,6 @@
 #include <i18nlangtag/mslangid.hxx>
 #include <o3tl/safeint.hxx>
 #include <vcl/svapp.hxx>
-#include <unotools/saveopt.hxx>
 #include <svl/intitem.hxx>
 #include <vcl/settings.hxx>
 
@@ -263,7 +262,7 @@ void SvxGeneralTabPage::InitControls ()
             m_xBuilder->weld_label(vRowInfo[iRow].pTextId)));
         Row& rRow = *vRows.back();
         // fields in the row
-        static unsigned const nFieldCount = SAL_N_ELEMENTS(vFieldInfo);
+        static unsigned const nFieldCount = std::size(vFieldInfo);
         // skipping other (invisible) rows
         while (iField != nFieldCount && vFieldInfo[iField].eRow != eRow)
             ++iField;
@@ -364,11 +363,9 @@ void SvxGeneralTabPage::Reset( const SfxItemSet* rSet )
 {
     SetData_Impl();
 
-    sal_uInt16 const nWhich = GetWhich(SID_FIELD_GRABFOCUS);
-
-    if (rSet->GetItemState(nWhich) == SfxItemState::SET)
+    if (rSet->GetItemState(SID_FIELD_GRABFOCUS) == SfxItemState::SET)
     {
-        EditPosition nField = static_cast<EditPosition>(static_cast<const SfxUInt16Item&>(rSet->Get(nWhich)).GetValue());
+        EditPosition nField = static_cast<EditPosition>(static_cast<const SfxUInt16Item&>(rSet->Get(SID_FIELD_GRABFOCUS)).GetValue());
         if (nField != EditPosition::UNKNOWN)
         {
             for (auto const & i: vFields)

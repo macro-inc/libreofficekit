@@ -26,8 +26,7 @@
 
 #include <tools/link.hxx>
 
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <comphelper/compbase.hxx>
 
 #include <editeng/unoipset.hxx>
 
@@ -49,8 +48,8 @@ class Size;
 namespace vcl { class Window; }
 class SfxRequest;
 class WorkWindow;
-class CommandSwipeData;
-class CommandLongPressData;
+class CommandGestureSwipeData;
+class CommandGestureLongPressData;
 struct ImplSVEvent;
 
 // TODO: Remove
@@ -74,9 +73,9 @@ enum AnimationMode
     ANIMATIONMODE_PREVIEW
 };
 
-typedef ::cppu::WeakComponentImplHelper< css::presentation::XPresentation2, css::lang::XServiceInfo > SlideshowBase;
+typedef comphelper::WeakComponentImplHelper< css::presentation::XPresentation2, css::lang::XServiceInfo > SlideshowBase;
 
-class SlideShow final : private ::cppu::BaseMutex, public SlideshowBase
+class SlideShow final : public SlideshowBase
 {
 public:
     /// used by the model to create a slideshow for it
@@ -110,7 +109,7 @@ public:
 
     // uno api
 
-        virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XServiceInfo
     virtual OUString SAL_CALL getImplementationName(  ) override;
@@ -146,8 +145,8 @@ public:
     /** sets or clears the pause state of the running slideshow.
         !!!! This should only be called by the SdShowWindow !!!!*/
     void pause( bool bPause );
-    bool swipe(const CommandSwipeData &rSwipeData);
-    bool longpress(const CommandLongPressData& rLongPressData);
+    bool swipe(const CommandGestureSwipeData &rSwipeData);
+    bool longpress(const CommandGestureLongPressData& rLongPressData);
 
     // settings
     bool isFullScreen() const;                          // a.k.a. FuSlideShow::IsFullScreen()

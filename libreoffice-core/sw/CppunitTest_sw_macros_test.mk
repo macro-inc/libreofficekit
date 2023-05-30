@@ -25,6 +25,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_macros_test, \
     cppu \
     cppuhelper \
     drawinglayer \
+    docmodel \
     editeng \
     for \
     forui \
@@ -38,6 +39,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_macros_test, \
     sw \
     sfx \
     sot \
+    subsequenttest \
     svl \
     svt \
     svx \
@@ -71,5 +73,9 @@ $(eval $(call gb_CppunitTest_use_vcl,sw_macros_test))
 $(eval $(call gb_CppunitTest_use_rdb,sw_macros_test,services))
 
 $(eval $(call gb_CppunitTest_use_configuration,sw_macros_test))
+
+$(eval $(call gb_CppunitTest_add_arguments,sw_macros_test, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

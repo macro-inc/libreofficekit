@@ -25,6 +25,7 @@
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/mutex.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -47,8 +48,8 @@ struct PopupMenuControllerBaseDispatchInfo
     const URL maURL;
     const Sequence< PropertyValue > maArgs;
 
-    PopupMenuControllerBaseDispatchInfo( const Reference< XDispatch >& xDispatch, const URL& rURL, const Sequence< PropertyValue >& rArgs )
-        : mxDispatch( xDispatch ), maURL( rURL ), maArgs( rArgs ) {}
+    PopupMenuControllerBaseDispatchInfo( const Reference< XDispatch >& xDispatch, URL aURL, const Sequence< PropertyValue >& rArgs )
+        : mxDispatch( xDispatch ), maURL(std::move( aURL )), maArgs( rArgs ) {}
 };
 
 }
@@ -141,7 +142,7 @@ void PopupMenuControllerBase::dispatchCommand( const OUString& sCommandURL,
 
         Reference< XDispatch > xDispatch( xDispatchProvider->queryDispatch( aURL, sTarget, 0 ), UNO_SET_THROW );
 
-        Application::PostUserEvent( LINK(nullptr, PopupMenuControllerBase, ExecuteHdl_Impl), new PopupMenuControllerBaseDispatchInfo( xDispatch, aURL, rArgs ) );
+        Application::PostUserEvent( LINK(nullptr, PopupMenuControllerBase, ExecuteHdl_Impl), new PopupMenuControllerBaseDispatchInfo( xDispatch, std::move(aURL), rArgs ) );
 
     }
     catch( Exception& )
@@ -275,21 +276,20 @@ void SAL_CALL PopupMenuControllerBase::removeStatusListener(
     rBHelper.removeListener( cppu::UnoType<decltype(xControl)>::get(), xControl );
 }
 
-OUString PopupMenuControllerBase::determineBaseURL( const OUString& aURL )
+OUString PopupMenuControllerBase::determineBaseURL( std::u16string_view aURL )
 {
     // Just use the main part of the URL for popup menu controllers
-    sal_Int32     nSchemePart( 0 );
     OUString aMainURL( "vnd.sun.star.popup:" );
 
-    nSchemePart = aURL.indexOf( ':' );
-    if (( nSchemePart > 0 ) &&
-        ( aURL.getLength() > ( nSchemePart+1 )))
+    size_t nSchemePart = aURL.find( ':' );
+    if (( nSchemePart != std::u16string_view::npos && nSchemePart > 0 ) &&
+        ( aURL.size() > ( nSchemePart+1 )))
     {
-        sal_Int32 nQueryPart = aURL.indexOf( '?', nSchemePart );
-        if ( nQueryPart > 0 )
-            aMainURL += aURL.subView( nSchemePart, nQueryPart-nSchemePart );
-        else if ( nQueryPart == -1 )
-            aMainURL += aURL.subView( nSchemePart+1 );
+        size_t nQueryPart = aURL.find( '?', nSchemePart );
+        if ( nQueryPart != std::u16string_view::npos && nQueryPart > 0 )
+            aMainURL += aURL.substr( nSchemePart, nQueryPart-nSchemePart );
+        else if ( nQueryPart == std::u16string_view::npos )
+            aMainURL += aURL.substr( nSchemePart+1 );
     }
 
     return aMainURL;

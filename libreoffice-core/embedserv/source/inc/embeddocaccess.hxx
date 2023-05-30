@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_EMBEDSERV_SOURCE_INC_EMBEDDOCACCESS_HXX
-#define INCLUDED_EMBEDSERV_SOURCE_INC_EMBEDDOCACCESS_HXX
+#pragma once
 
 #define OLESERV_SAVEOBJECT      1
 #define OLESERV_CLOSE           2
@@ -33,7 +32,6 @@
 #pragma clang diagnostic ignored "-Wall"
 #pragma clang diagnostic ignored "-Wextra"
 #pragma clang diagnostic ignored "-Wmicrosoft"
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
 #endif
 #include <atldbcli.h>
 #if defined __clang__
@@ -74,7 +72,5 @@ class EmbeddedDocumentInstanceAccess_Impl : public ::cppu::OWeakObject
     LockedEmbedDocument_Impl GetEmbedDocument();
     void ClearEmbedDocument();
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -20,7 +20,7 @@
 #include <StylesPreviewWindow.hxx>
 
 #include <comphelper/propertyvalue.hxx>
-#include <vcl/settings.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <sfx2/objsh.hxx>
 #include <svl/itemset.hxx>
@@ -28,7 +28,9 @@
 #include <sfx2/sfxsids.hrc>
 #include <sfx2/tplpitem.hxx>
 #include <sfx2/viewsh.hxx>
+#include <vcl/glyphitemcache.hxx>
 #include <vcl/virdev.hxx>
+#include <vcl/settings.hxx>
 
 #include <editeng/editids.hrc>
 #include <editeng/fontitem.hxx>
@@ -55,9 +57,7 @@
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/uno/Sequence.hxx>
-#include <cppuhelper/weak.hxx>
 
-#include <vcl/event.hxx>
 #include <vcl/commandevent.hxx>
 
 StyleStatusListener::StyleStatusListener(
@@ -106,9 +106,9 @@ void StylePoolChangeListener::Notify(SfxBroadcaster& /*rBC*/, const SfxHint& /*r
     m_pPreviewControl->RequestStylesListUpdate();
 }
 
-StyleItemController::StyleItemController(const std::pair<OUString, OUString>& aStyleName)
+StyleItemController::StyleItemController(std::pair<OUString, OUString> aStyleName)
     : m_eStyleFamily(SfxStyleFamily::Para)
-    , m_aStyleName(aStyleName)
+    , m_aStyleName(std::move(aStyleName))
 {
 }
 
@@ -130,8 +130,8 @@ bool StylesPreviewWindow_Base::Command(const CommandEvent& rEvent)
     std::unique_ptr<weld::Builder> xBuilder(
         Application::CreateBuilder(m_xStylesView.get(), "svx/ui/stylemenu.ui"));
     std::unique_ptr<weld::Menu> xMenu(xBuilder->weld_menu("menu"));
-    std::string_view rIdent = xMenu->popup_at_rect(
-        m_xStylesView.get(), tools::Rectangle(rEvent.GetMousePosPixel(), Size(1, 1)));
+    OString rIdent = xMenu->popup_at_rect(m_xStylesView.get(),
+                                          tools::Rectangle(rEvent.GetMousePosPixel(), Size(1, 1)));
     if (rIdent == "update" || rIdent == "edit")
     {
         css::uno::Sequence<css::beans::PropertyValue> aArgs(0);
@@ -355,14 +355,17 @@ void StyleItemController::DrawHighlight(vcl::RenderContext& rRenderContext, Colo
 
 void StyleItemController::DrawText(vcl::RenderContext& rRenderContext)
 {
+    const SalLayoutGlyphs* layoutGlyphs
+        = SalLayoutGlyphsCache::self()->GetLayoutGlyphs(&rRenderContext, m_aStyleName.second);
     tools::Rectangle aTextRect;
-    rRenderContext.GetTextBoundRect(aTextRect, m_aStyleName.second);
+    rRenderContext.GetTextBoundRect(aTextRect, m_aStyleName.second, 0, 0, -1, 0, {}, {},
+                                    layoutGlyphs);
 
     Point aPos(0, 0);
     aPos.AdjustX(LEFT_MARGIN);
     aPos.AdjustY((rRenderContext.GetOutputHeightPixel() - aTextRect.Bottom()) / 2);
 
-    rRenderContext.DrawText(aPos, m_aStyleName.second);
+    rRenderContext.DrawText(aPos, m_aStyleName.second, 0, -1, nullptr, nullptr, layoutGlyphs);
 }
 
 StylesPreviewWindow_Base::StylesPreviewWindow_Base(

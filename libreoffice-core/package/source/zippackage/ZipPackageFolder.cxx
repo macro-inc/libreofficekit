@@ -17,24 +17,20 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <string.h>
-
 #include <ZipPackageFolder.hxx>
-#include <ZipFile.hxx>
 #include <ZipOutputStream.hxx>
 #include <ZipPackageStream.hxx>
 #include <PackageConstants.hxx>
 #include "ZipPackageFolderEnumeration.hxx"
+#include <com/sun/star/io/IOException.hpp>
 #include <com/sun/star/packages/zip/ZipConstants.hpp>
+#include <com/sun/star/packages/zip/ZipException.hpp>
 #include <com/sun/star/embed/StorageFormats.hpp>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <osl/diagnose.h>
 #include <sal/log.hxx>
-#include <rtl/digest.h>
 #include <com/sun/star/beans/PropertyValue.hpp>
-#include <EncryptedDataHeader.hxx>
 
 using namespace com::sun::star;
 using namespace com::sun::star::packages::zip::ZipConstants;
@@ -147,7 +143,7 @@ void ZipPackageFolder::setChildStreamsTypeByExtension( const beans::StringPair& 
     }
 }
 
-css::uno::Sequence < sal_Int8 > ZipPackageFolder::getUnoTunnelId()
+const css::uno::Sequence < sal_Int8 > & ZipPackageFolder::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit lcl_CachedImplId;
     return lcl_CachedImplId.getSeq();
@@ -207,7 +203,7 @@ ZipContentInfo& ZipPackageFolder::doGetByName( const OUString& aName )
 
 uno::Any SAL_CALL ZipPackageFolder::getByName( const OUString& aName )
 {
-    return uno::makeAny ( doGetByName ( aName ).xTunnel );
+    return uno::Any ( doGetByName ( aName ).xTunnel );
 }
 uno::Sequence< OUString > SAL_CALL ZipPackageFolder::getElementNames(  )
 {
@@ -362,12 +358,12 @@ uno::Any SAL_CALL ZipPackageFolder::getPropertyValue( const OUString& PropertyNa
         // if ( m_nFormat != embed::StorageFormats::PACKAGE )
         //  throw UnknownPropertyException(THROW_WHERE );
 
-        return uno::makeAny ( msMediaType );
+        return uno::Any ( msMediaType );
     }
     else if ( PropertyName == "Version" )
-        return uno::makeAny( m_sVersion );
+        return uno::Any( m_sVersion );
     else if ( PropertyName == "Size" )
-        return uno::makeAny ( aEntry.nSize );
+        return uno::Any ( aEntry.nSize );
     else
         throw UnknownPropertyException(PropertyName);
 }

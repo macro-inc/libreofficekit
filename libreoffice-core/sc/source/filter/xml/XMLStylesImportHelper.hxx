@@ -25,6 +25,7 @@
 #include <memory>
 #include <set>
 #include <map>
+#include <utility>
 #include <vector>
 #include <optional>
 
@@ -35,10 +36,10 @@ struct ScMyStyleNumberFormat
     OUString       sStyleName;
     sal_Int32      nNumberFormat;
 
-    explicit ScMyStyleNumberFormat(const OUString& rStyleName) :
-        sStyleName(rStyleName), nNumberFormat(-1) {}
-    ScMyStyleNumberFormat(const OUString& rStyleName, const sal_Int32 nFormat) :
-        sStyleName(rStyleName), nNumberFormat(nFormat) {}
+    explicit ScMyStyleNumberFormat(OUString aStyleName) :
+        sStyleName(std::move(aStyleName)), nNumberFormat(-1) {}
+    ScMyStyleNumberFormat(OUString aStyleName, const sal_Int32 nFormat) :
+        sStyleName(std::move(aStyleName)), nNumberFormat(nFormat) {}
 };
 
 struct LessStyleNumberFormat
@@ -104,7 +105,7 @@ public:
 };
 
 /** map from style name to ScMyStyleRanges */
-typedef std::map<OUString, std::unique_ptr<ScMyStyleRanges>>  ScMyStylesMap;
+typedef std::map<OUString, ScMyStyleRanges>  ScMyStylesMap;
 
 class ScMyStylesImportHelper
 {

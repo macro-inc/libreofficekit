@@ -35,6 +35,7 @@ $(eval $(call gb_Library_add_defs,editeng,\
 
 $(eval $(call gb_Library_use_sdk_api,editeng))
 
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/accessibility/AccessibleComponentBase \
     editeng/source/accessibility/AccessibleContextBase \
@@ -45,6 +46,11 @@ $(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/accessibility/AccessibleSelectionBase \
     editeng/source/accessibility/AccessibleStaticTextBase \
     editeng/source/accessibility/AccessibleStringWrap \
+    editeng/source/uno/unoedprx \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/editeng/editattr \
     editeng/source/editeng/editdata \
     editeng/source/editeng/editdbg \
@@ -110,7 +116,6 @@ $(eval $(call gb_Library_add_exception_objects,editeng,\
     editeng/source/rtf/rtfitem \
     editeng/source/rtf/svxrtf \
     editeng/source/uno/unoedhlp \
-    editeng/source/uno/unoedprx \
     editeng/source/uno/unoedsrc \
     editeng/source/uno/unofdesc \
     editeng/source/uno/unofield \
@@ -133,6 +138,7 @@ $(eval $(call gb_Library_add_exception_objects,editeng,\
 $(eval $(call gb_Library_use_libraries,editeng,\
     xo \
     basegfx \
+    docmodel \
     lng \
     svt \
     tk \

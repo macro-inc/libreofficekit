@@ -46,7 +46,7 @@
 #include <editeng/emphasismarkitem.hxx>
 #include <svx/sdr/table/tabledesign.hxx>
 #include <editeng/autokernitem.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 
 #include <editeng/lrspitem.hxx>
@@ -137,7 +137,7 @@ rtl::Reference<SfxStyleSheetBase> SdStyleSheetPool::Create(const OUString& rName
 
 SfxStyleSheetBase* SdStyleSheetPool::GetTitleSheet(std::u16string_view rLayoutName)
 {
-    OUString aName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR STR_LAYOUT_TITLE;
+    OUString aName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR + STR_LAYOUT_TITLE;
     SfxStyleSheetBase* pResult = Find(aName, SfxStyleFamily::Page);
     return pResult;
 }
@@ -151,7 +151,7 @@ SfxStyleSheetBase* SdStyleSheetPool::GetTitleSheet(std::u16string_view rLayoutNa
 
 void SdStyleSheetPool::CreateOutlineSheetList (std::u16string_view rLayoutName, std::vector<SfxStyleSheetBase*> &rOutlineStyles)
 {
-    OUString aName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE;
+    OUString aName = OUString::Concat(rLayoutName) + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE;
 
     for (sal_Int32 nSheet = 1; nSheet < 10; nSheet++)
     {
@@ -522,50 +522,48 @@ void SdStyleSheetPool::CopyCellSheets(SdStyleSheetPool& rSourcePool)
 
 void SdStyleSheetPool::CopyTableStyles(SdStyleSheetPool const & rSourcePool)
 {
+    XStyleVector aTmpSheets;
+    CopyTableStyles(rSourcePool, aTmpSheets);
+}
+
+void SdStyleSheetPool::CopyTableStyles(SdStyleSheetPool const & rSourcePool, XStyleVector& rCreatedSheets)
+{
     Reference< XIndexAccess > xSource( rSourcePool.mxTableFamily, UNO_QUERY );
     Reference< XNameContainer > xTarget( mxTableFamily, UNO_QUERY );
     Reference< XSingleServiceFactory > xFactory( mxTableFamily, UNO_QUERY );
 
-    if( !(xSource.is() && xFactory.is() && mxTableFamily.is()) )
+    if( !xSource || !xFactory )
         return;
 
     for( sal_Int32 nIndex = 0; nIndex < xSource->getCount(); nIndex++ ) try
     {
-        Reference< XStyle > xSourceTableStyle( xSource->getByIndex( nIndex ), UNO_QUERY );
-        if( xSourceTableStyle.is() )
+        Reference< XNameAccess > xSourceTableStyle( xSource->getByIndex( nIndex ), UNO_QUERY_THROW );
+        Reference< XNameReplace > xNewTableStyle( xFactory->createInstance(), UNO_QUERY_THROW );
+
+        const Sequence< OUString > aStyleNames( xSourceTableStyle->getElementNames() );
+        for( const OUString& aName : aStyleNames )
         {
-            Reference< XStyle > xNewTableStyle( xFactory->createInstance(), UNO_QUERY );
-            if( xNewTableStyle.is() )
+            Reference< XStyle > xSourceStyle( xSourceTableStyle->getByName( aName ), UNO_QUERY );
+            Reference< XStyle > xTargetStyle;
+            if( xSourceStyle.is() ) try
             {
-                Reference< XNameAccess> xSourceNames( xSourceTableStyle, UNO_QUERY_THROW );
-
-                const Sequence< OUString > aStyleNames( xSourceNames->getElementNames() );
-
-                Reference< XNameReplace > xTargetNames( xNewTableStyle, UNO_QUERY );
-
-                for( const OUString& aName : aStyleNames )
-                {
-                    Reference< XStyle > xSourceStyle( xSourceNames->getByName( aName ), UNO_QUERY );
-                    Reference< XStyle > xTargetStyle;
-                    if( xSourceStyle.is() ) try
-                    {
-                        mxCellFamily->getByName( xSourceStyle->getName() ) >>= xTargetStyle;
-                    }
-                    catch( Exception& )
-                    {
-                        TOOLS_WARN_EXCEPTION( "sd", "sd::SdStyleSheetPool::CopyTableStyles()" );
-                    }
-
-                    if( xTargetStyle.is() )
-                        xTargetNames->replaceByName( aName, Any( xTargetStyle ) );
-                }
+                mxCellFamily->getByName( xSourceStyle->getName() ) >>= xTargetStyle;
+            }
+            catch( Exception& )
+            {
+                TOOLS_WARN_EXCEPTION( "sd", "sd::SdStyleSheetPool::CopyTableStyles()" );
             }
 
-            OUString sName( xSourceTableStyle->getName() );
-            if( xTarget->hasByName( sName ) )
-                xTarget->replaceByName( sName, Any( xNewTableStyle ) );
-            else
-                xTarget->insertByName( sName, Any( xNewTableStyle ) );
+            xNewTableStyle->replaceByName( aName, Any( xTargetStyle ) );
+        }
+
+        const OUString sName(Reference<XStyle>(xSourceTableStyle, UNO_QUERY_THROW)->getName());
+        if( xTarget->hasByName( sName ) )
+            Reference<XComponent>(xNewTableStyle, UNO_QUERY_THROW)->dispose();
+        else
+        {
+            rCreatedSheets.emplace_back(xNewTableStyle, UNO_QUERY_THROW);
+            xTarget->insertByName( sName, Any( xNewTableStyle ) );
         }
     }
     catch( Exception& )
@@ -782,7 +780,7 @@ void SdStyleSheetPool::CreateLayoutSheetNames(std::u16string_view rLayoutName, s
     OUString aPrefix(OUString::Concat(rLayoutName) + SD_LT_SEPARATOR);
 
     for (sal_Int32 nLevel = 1; nLevel < 10; nLevel++)
-        aNameList.emplace_back(aPrefix + STR_LAYOUT_OUTLINE " " + OUString::number( nLevel ) );
+        aNameList.emplace_back(aPrefix + STR_LAYOUT_OUTLINE + " " + OUString::number( nLevel ) );
 
     aNameList.emplace_back(aPrefix + STR_LAYOUT_TITLE);
     aNameList.emplace_back(aPrefix + STR_LAYOUT_SUBTITLE);
@@ -973,13 +971,6 @@ void SdStyleSheetPool::UpdateStdNames()
                 case HID_PSEUDOSHEET_BACKGROUND:    pNameId = STR_PSEUDOSHEET_BACKGROUND;   break;
                 case HID_PSEUDOSHEET_NOTES:         pNameId = STR_PSEUDOSHEET_NOTES;        break;
 
-                case HID_SD_CELL_STYLE_DEFAULT:         pNameId = STR_STANDARD_STYLESHEET_NAME; break;
-                case HID_SD_CELL_STYLE_BANDED:          pNameId = STR_POOLSHEET_BANDED_CELL; break;
-                case HID_SD_CELL_STYLE_HEADER:          pNameId = STR_POOLSHEET_HEADER; break;
-                case HID_SD_CELL_STYLE_TOTAL:           pNameId = STR_POOLSHEET_TOTAL; break;
-                case HID_SD_CELL_STYLE_FIRST_COLUMN:    pNameId = STR_POOLSHEET_FIRST_COLUMN; break;
-                case HID_SD_CELL_STYLE_LAST_COLUMN:     pNameId = STR_POOLSHEET_LAST_COLUMN; break;
-
                 default:
                     // 0 or wrong (old) HelpId
                     bHelpKnown = false;
@@ -1118,8 +1109,7 @@ void SdStyleSheetPool::PutNumBulletItem( SfxStyleSheetBase* pSheet,
                     SvxNumberFormat aFrmt( pDefaultRule->GetLevel(i) );
                     aFrmt.SetNumberingType(SVX_NUM_CHAR_SPECIAL);
                     // #i93908# clear suffix for bullet lists
-                    aFrmt.SetPrefix(OUString());
-                    aFrmt.SetSuffix(OUString());
+                    aFrmt.SetListFormat("", "", i);
                     aFrmt.SetStart(1);
                     aFrmt.SetBulletRelSize(45);
                     aFrmt.SetBulletChar( 0x25CF );  // StarBats: 0xF000 + 34

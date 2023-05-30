@@ -21,6 +21,7 @@
 
 #include <string_view>
 
+#include <utility>
 #include <xmloff/xmluconv.hxx>
 
 #include <com/sun/star/util/DateTime.hpp>
@@ -72,7 +73,7 @@ struct SvXMLUnitConverter::Impl
     mutable uno::Reference< i18n::XCharacterClassification > m_xCharClass;
     uno::Reference< uno::XComponentContext > m_xContext;
 
-    Impl(uno::Reference<uno::XComponentContext> const& xContext,
+    Impl(uno::Reference<uno::XComponentContext> xContext,
             sal_Int16 const eCoreMeasureUnit,
             sal_Int16 const eXMLMeasureUnit,
             SvtSaveOptions::ODFSaneDefaultVersion const nODFVersion)
@@ -80,7 +81,7 @@ struct SvXMLUnitConverter::Impl
         , m_eXMLMeasureUnit(eXMLMeasureUnit)
         , m_eODFVersion(nODFVersion)
         , m_aNullDate(30, 12, 1899)
-        , m_xContext(xContext)
+        , m_xContext(std::move(xContext))
     {
         OSL_ENSURE( m_xContext.is(), "got no service manager" );
     }
@@ -348,6 +349,17 @@ bool SvXMLUnitConverter::convertDouble(double& rValue,
         eSrcUnit, m_pImpl->m_eCoreMeasureUnit);
 }
 
+/** convert string to double number (using ::rtl::math) */
+bool SvXMLUnitConverter::convertDouble(double& rValue,
+    std::string_view rString) const
+{
+    sal_Int16 const eSrcUnit = ::sax::Converter::GetUnitFromString(
+            rString, m_pImpl->m_eCoreMeasureUnit);
+
+    return ::sax::Converter::convertDouble(rValue, rString,
+        eSrcUnit, m_pImpl->m_eCoreMeasureUnit);
+}
+
 /** get the Null Date of the XModel and set it to the UnitConverter */
 bool SvXMLUnitConverter::setNullDate(const css::uno::Reference <css::frame::XModel>& xModel)
 {
@@ -539,7 +551,7 @@ bool SvXMLTokenEnumerator::getNextToken( std::u16string_view& rToken )
     return true;
 }
 
-static bool lcl_getPositions(std::u16string_view _sValue, OUString& _rContentX, OUString& _rContentY, OUString& _rContentZ)
+static bool lcl_getPositions(std::string_view _sValue, std::string_view& _rContentX, std::string_view& _rContentY, std::string_view& _rContentZ)
 {
     if(_sValue.empty() || _sValue[0] != '(')
         return false;
@@ -547,7 +559,7 @@ static bool lcl_getPositions(std::u16string_view _sValue, OUString& _rContentX, 
     size_t nPos(1);
     size_t nFound = _sValue.find(' ', nPos);
 
-    if(nFound == std::u16string_view::npos || nFound <= nPos)
+    if(nFound == std::string_view::npos || nFound <= nPos)
         return false;
 
     _rContentX = _sValue.substr(nPos, nFound - nPos);
@@ -555,7 +567,7 @@ static bool lcl_getPositions(std::u16string_view _sValue, OUString& _rContentX, 
     nPos = nFound + 1;
     nFound = _sValue.find(' ', nPos);
 
-    if(nFound == std::u16string_view::npos || nFound <= nPos)
+    if(nFound == std::string_view::npos || nFound <= nPos)
         return false;
 
     _rContentY = _sValue.substr(nPos, nFound - nPos);
@@ -563,77 +575,18 @@ static bool lcl_getPositions(std::u16string_view _sValue, OUString& _rContentX, 
     nPos = nFound + 1;
     nFound = _sValue.find(')', nPos);
 
-    if(nFound == std::u16string_view::npos || nFound <= nPos)
+    if(nFound == std::string_view::npos || nFound <= nPos)
         return false;
 
     _rContentZ = _sValue.substr(nPos, nFound - nPos);
     return true;
-}
 
-static bool lcl_getPositions(std::string_view _sValue,OUString& _rContentX,OUString& _rContentY,OUString& _rContentZ)
-{
-    if(_sValue.empty() || _sValue[0] != '(')
-        return false;
-
-    size_t nPos(1);
-    size_t nFound = _sValue.find(' ', nPos);
-
-    if(nFound == std::string_view::npos || nFound <= nPos)
-        return false;
-
-    _rContentX = OUString::fromUtf8(_sValue.substr(nPos, nFound - nPos));
-
-    nPos = nFound + 1;
-    nFound = _sValue.find(' ', nPos);
-
-    if(nFound == std::string_view::npos || nFound <= nPos)
-        return false;
-
-    _rContentY = OUString::fromUtf8(_sValue.substr(nPos, nFound - nPos));
-
-    nPos = nFound + 1;
-    nFound = _sValue.find(')', nPos);
-
-    if(nFound == std::string_view::npos || nFound <= nPos)
-        return false;
-
-    _rContentZ = OUString::fromUtf8(_sValue.substr(nPos, nFound - nPos));
-    return true;
-
-}
-
-/** convert string to ::basegfx::B3DVector */
-bool SvXMLUnitConverter::convertB3DVector( ::basegfx::B3DVector& rVector, std::u16string_view rValue )
-{
-    OUString aContentX,aContentY,aContentZ;
-    if ( !lcl_getPositions(rValue,aContentX,aContentY,aContentZ) )
-        return false;
-
-    rtl_math_ConversionStatus eStatus;
-
-    rVector.setX(::rtl::math::stringToDouble(aContentX, '.',
-            ',', &eStatus));
-
-    if( eStatus != rtl_math_ConversionStatus_Ok )
-        return false;
-
-    rVector.setY(::rtl::math::stringToDouble(aContentY, '.',
-            ',', &eStatus));
-
-    if( eStatus != rtl_math_ConversionStatus_Ok )
-        return false;
-
-    rVector.setZ(::rtl::math::stringToDouble(aContentZ, '.',
-            ',', &eStatus));
-
-
-    return ( eStatus == rtl_math_ConversionStatus_Ok );
 }
 
 /** convert string to ::basegfx::B3DVector */
 bool SvXMLUnitConverter::convertB3DVector( ::basegfx::B3DVector& rVector, std::string_view rValue )
 {
-    OUString aContentX,aContentY,aContentZ;
+    std::string_view aContentX,aContentY,aContentZ;
     if ( !lcl_getPositions(rValue,aContentX,aContentY,aContentZ) )
         return false;
 
@@ -674,7 +627,7 @@ void SvXMLUnitConverter::convertB3DVector( OUStringBuffer &rBuffer, const ::base
 bool SvXMLUnitConverter::convertPosition3D( drawing::Position3D& rPosition,
     std::string_view rValue ) const
 {
-    OUString aContentX,aContentY,aContentZ;
+    std::string_view aContentX,aContentY,aContentZ;
     if ( !lcl_getPositions(rValue,aContentX,aContentY,aContentZ) )
         return false;
 

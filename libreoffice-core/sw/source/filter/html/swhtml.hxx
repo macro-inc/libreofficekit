@@ -28,13 +28,17 @@
 #include <editeng/svxenum.hxx>
 #include <rtl/ref.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <deletelistener.hxx>
+#include <fmtftn.hxx>
 #include <fltshell.hxx>
 #include <swtypes.hxx>
+#include <txtftn.hxx>
 #include <com/sun/star/drawing/XShape.hpp>
 #include <com/sun/star/form/XFormComponent.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <deque>
 #include <stack>
@@ -143,17 +147,17 @@ class HTMLAttr
     HTMLAttr **m_ppHead; // list head
 
     HTMLAttr( const SwPosition& rPos, const SfxPoolItem& rItem,
-               HTMLAttr **pHd, const std::shared_ptr<HTMLAttrTable>& rAttrTab );
+               HTMLAttr **pHd, std::shared_ptr<HTMLAttrTable> xAttrTab );
 
-    HTMLAttr( const HTMLAttr &rAttr, const SwNodeIndex &rEndPara,
-               sal_Int32 nEndCnt, HTMLAttr **pHd, const std::shared_ptr<HTMLAttrTable>& rAttrTab );
+    HTMLAttr( const HTMLAttr &rAttr, const SwNode &rEndPara,
+               sal_Int32 nEndCnt, HTMLAttr **pHd, std::shared_ptr<HTMLAttrTable> xAttrTab );
 
 public:
 
     ~HTMLAttr();
 
-    HTMLAttr *Clone( const SwNodeIndex& rEndPara, sal_Int32 nEndCnt ) const;
-    void Reset( const SwNodeIndex& rSttPara, sal_Int32 nSttCnt,
+    HTMLAttr *Clone( const SwNode& rEndPara, sal_Int32 nEndCnt ) const;
+    void Reset( const SwNode& rSttPara, sal_Int32 nSttCnt,
                 HTMLAttr **pHd, const std::shared_ptr<HTMLAttrTable>& rAttrTab );
     inline void SetStart( const SwPosition& rPos );
 
@@ -240,7 +244,7 @@ class HTMLAttrContext
 public:
     void ClearSaveDocContext();
 
-    HTMLAttrContext( HtmlTokenId nTokn, sal_uInt16 nPoolId, const OUString& rClass,
+    HTMLAttrContext( HtmlTokenId nTokn, sal_uInt16 nPoolId, OUString aClass,
                       bool bDfltColl=false );
     explicit HTMLAttrContext( HtmlTokenId nTokn );
     ~HTMLAttrContext();
@@ -397,7 +401,7 @@ class SwHTMLParser : public SfxHTMLParser, public SvtListener
     std::vector<HTMLTable*> m_aTables;
     std::shared_ptr<HTMLTable> m_xTable; // current "outermost" table
     SwHTMLForm_Impl* m_pFormImpl;   // current form
-    SdrObject       *m_pMarquee;    // current marquee
+    rtl::Reference<SdrObject> m_pMarquee;    // current marquee
     std::unique_ptr<SwField> m_xField; // current field
     ImageMap        *m_pImageMap;   // current image map
     std::unique_ptr<ImageMaps> m_pImageMaps;  ///< all Image-Maps that have been read
@@ -492,6 +496,9 @@ class SwHTMLParser : public SfxHTMLParser, public SvtListener
 
     std::set<OUString> m_aAllowedRTFOLEMimeTypes;
 
+    /// This is the URL of the outer <object> data if it's not OLE2 or an image.
+    OUString m_aEmbedURL;
+
     void DeleteFormImpl();
 
     void DocumentDetected();
@@ -536,7 +543,7 @@ class SwHTMLParser : public SfxHTMLParser, public SvtListener
     bool DoPositioning( SfxItemSet &rItemSet,
                         SvxCSS1PropertyInfo &rPropInfo,
                         HTMLAttrContext *pContext );
-    bool CreateContainer( const OUString& rClass, SfxItemSet &rItemSet,
+    bool CreateContainer( std::u16string_view rClass, SfxItemSet &rItemSet,
                           SvxCSS1PropertyInfo &rPropInfo,
                           HTMLAttrContext *pContext );
     bool EndSection( bool bLFStripped=false );
@@ -655,8 +662,6 @@ class SwHTMLParser : public SfxHTMLParser, public SvtListener
     // tags realized via character styles
     void NewCharFormat( HtmlTokenId nToken );
 
-    void ClearFootnotesMarksInRange(const SwNodeIndex& rSttIdx, const SwNodeIndex& rEndIdx);
-
     void DeleteSection(SwStartNode* pSttNd);
 
     // <SDFIELD>
@@ -673,7 +678,7 @@ private:
     // Inserting graphics, plug-ins and applets
 
     // search image maps and link with graphic nodes
-    ImageMap *FindImageMap( const OUString& rURL ) const;
+    ImageMap *FindImageMap( std::u16string_view rURL ) const;
     void ConnectImageMaps();
 
     // find anchor of Fly-Frames and set corresponding attributes
@@ -856,8 +861,8 @@ private:
     void InsertLineBreak();
     void InsertHorzRule();
 
-    void FillEndNoteInfo( const OUString& rContent );
-    void FillFootNoteInfo( const OUString& rContent );
+    void FillEndNoteInfo( std::u16string_view aContent );
+    void FillFootNoteInfo( std::u16string_view aContent );
     void InsertFootEndNote( const OUString& rName, bool bEndNote, bool bFixed );
     void FinishFootEndNote();
     void InsertFootEndNoteText();
@@ -873,8 +878,6 @@ private:
     // Are there fly frames in the current paragraph?
     bool HasCurrentParaFlys( bool bNoSurroundOnly = false,
                              bool bSurroundOnly = false ) const;
-
-    bool PendingTableInPaM(SwPaM& rPam) const;
 
     class TableDepthGuard
     {
@@ -915,8 +918,8 @@ protected:
 public:
 
     SwHTMLParser( SwDoc* pD, SwPaM & rCursor, SvStream& rIn,
-                    const OUString& rFileName,
-                    const OUString& rBaseURL,
+                    OUString aFileName,
+                    OUString aBaseURL,
                     bool bReadNewDoc,
                     SfxMedium* pMed, bool bReadUTF8,
                     bool bIgnoreHTMLComments,
@@ -969,8 +972,8 @@ struct SwPending
 
 inline void HTMLAttr::SetStart( const SwPosition& rPos )
 {
-    m_nStartPara = rPos.nNode;
-    m_nStartContent = rPos.nContent.GetIndex();
+    m_nStartPara = rPos.GetNode();
+    m_nStartContent = rPos.GetContentIndex();
     m_nEndPara = m_nStartPara;
     m_nEndContent = m_nStartContent;
 }
@@ -1025,14 +1028,28 @@ inline bool SwHTMLParser::HasStyleOptions( std::u16string_view rStyle,
 
 class SwTextFootnote;
 
-struct SwHTMLTextFootnote
+class SwHTMLTextFootnote
 {
+private:
     OUString sName;
     SwTextFootnote* pTextFootnote;
-    SwHTMLTextFootnote(const OUString &rName, SwTextFootnote* pInTextFootnote)
-        : sName(rName)
+    std::unique_ptr<SvtDeleteListener> xDeleteListener;
+public:
+    SwHTMLTextFootnote(OUString rName, SwTextFootnote* pInTextFootnote)
+        : sName(std::move(rName))
         , pTextFootnote(pInTextFootnote)
+        , xDeleteListener(new SvtDeleteListener(static_cast<SwFormatFootnote&>(pInTextFootnote->GetAttr()).GetNotifier()))
     {
+    }
+    const OUString& GetName() const
+    {
+        return sName;
+    }
+    const SwNodeIndex* GetStartNode() const
+    {
+        if (xDeleteListener->WasDeleted())
+            return nullptr;
+        return pTextFootnote->GetStartNode();
     }
 };
 

@@ -25,6 +25,8 @@
 #include <o3tl/safeint.hxx>
 #include <svl/grabbagitem.hxx>
 #include <svl/itemset.hxx>
+#include <utility>
+#include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -37,7 +39,7 @@
 #include <com/sun/star/sdb/XColumn.hpp>
 #include <comphelper/sequence.hxx>
 #include <comphelper/string.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <vector>
 #include <strings.hrc>
@@ -633,7 +635,7 @@ bool SwCustomizeAddressBlockDialog::HasItem(sal_Int32 nUserData)
         }
     }
     //search for this entry in the content
-    return m_xDragED->GetText().indexOf(OUStringConcatenation("<" + sEntry + ">")) >= 0;
+    return m_xDragED->GetText().indexOf(Concat2View("<" + sEntry + ">")) >= 0;
 }
 
 IMPL_LINK_NOARG(SwCustomizeAddressBlockDialog, SelectionChangedIdleHdl, Timer*, void)
@@ -966,11 +968,11 @@ IMPL_LINK(SwAssignFieldsControl, GotFocusHdl_Impl, weld::Widget&, rBox, void)
 
 SwAssignFieldsDialog::SwAssignFieldsDialog(
         weld::Window* pParent, SwMailMergeConfigItem& rConfigItem,
-        const OUString& rPreview,
+        OUString aPreview,
         bool bIsAddressBlock)
     : SfxDialogController(pParent, "modules/swriter/ui/assignfieldsdialog.ui", "AssignFieldsDialog")
     , m_sNone(SwResId(SW_STR_NONE))
-    , m_rPreviewString(rPreview)
+    , m_rPreviewString(std::move(aPreview))
     , m_rConfigItem(rConfigItem)
     , m_xPreview(new SwAddressPreview(m_xBuilder->weld_scrolled_window("previewwin", true)))
     , m_xMatchingFI(m_xBuilder->weld_label("MATCHING_LABEL"))
@@ -1097,6 +1099,17 @@ bool AddressMultiLineEdit::KeyInput(const KeyEvent& rKEvt)
     if (rKEvt.GetCharCode())
         return true; // handled
     return WeldEditView::KeyInput(rKEvt);
+}
+
+bool AddressMultiLineEdit::Command(const CommandEvent& rCEvt)
+{
+    if (rCEvt.GetCommand() == CommandEventId::StartExtTextInput ||
+        rCEvt.GetCommand() == CommandEventId::EndExtTextInput ||
+        rCEvt.GetCommand() == CommandEventId::ExtTextInput)
+    {
+        return true;
+    }
+    return WeldEditView::Command(rCEvt);
 }
 
 bool AddressMultiLineEdit::MouseButtonDown(const MouseEvent& rMEvt)
@@ -1536,7 +1549,7 @@ namespace
     public:
         DropTargetListener(css::uno::Reference<css::datatransfer::dnd::XDropTarget> xRealDropTarget,
                            SwCustomizeAddressBlockDialog* pParentDialog)
-            : m_xRealDropTarget(xRealDropTarget)
+            : m_xRealDropTarget(std::move(xRealDropTarget))
             , m_pParentDialog(pParentDialog)
         {
         }

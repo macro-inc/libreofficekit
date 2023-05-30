@@ -471,13 +471,14 @@ static sal_Bool send_args(int fd, rtl_uString const *pCwdPath)
     }
 
     nLen = rtl_string_getLength(pOut) + 1;
-    bResult = (write(fd, rtl_string_getStr(pOut), nLen) == (ssize_t) nLen);
+    ssize_t n = write(fd, rtl_string_getStr(pOut), nLen);
+    bResult = (n >= 0 && (size_t) n == nLen);
 
     if ( bResult )
     {
         char resp[SAL_N_ELEMENTS("InternalIPC::ProcessingDone")];
-        ssize_t n = read(fd, resp, SAL_N_ELEMENTS(resp));
-        bResult = n == (ssize_t) SAL_N_ELEMENTS(resp)
+        n = read(fd, resp, SAL_N_ELEMENTS(resp));
+        bResult = n == SAL_N_ELEMENTS(resp)
             && (memcmp(
                     resp, "InternalIPC::ProcessingDone",
                     SAL_N_ELEMENTS(resp))
@@ -721,8 +722,23 @@ static void sigterm_handler(int ignored)
     (void) ignored;
 
     if (g_pProcess) {
-        osl_terminateProcess(g_pProcess); // forward signal to soffice.bin
-        osl_joinProcess(g_pProcess);
+        int SigTermSucceded = 0;
+        oslProcessInfo info;
+        info.Size = sizeof(oslProcessInfo);
+
+        // forward SIGTERM to soffice.bin and give it a chance to semi-gracefully exit
+        // enough to remove named pipe
+        if (osl_getProcessInfo(g_pProcess, osl_Process_IDENTIFIER, &info) == osl_Process_E_None) {
+            TimeValue delay = { 1, 0 }; // 1 sec
+            SigTermSucceded = kill(info.Ident, SIGTERM) == 0 &&
+                              osl_joinProcessWithTimeout(g_pProcess, &delay) == osl_Process_E_None;
+        }
+
+        // didn't work, SIGKILL instead
+        if (!SigTermSucceded) {
+            osl_terminateProcess(g_pProcess); // uses SIGKILL to terminate soffice.bin
+            osl_joinProcess(g_pProcess);
+        }
     }
 
     _exit(255);

@@ -25,6 +25,7 @@
 #include <osl/diagnose.h>
 #include <tools/fract.hxx>
 #include <tools/helpers.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/metaact.hxx>
 #include <vcl/GraphicObject.hxx>
@@ -292,16 +293,16 @@ struct GrfSimpleCacheObj
     Graphic     maGraphic;
     GraphicAttr maAttr;
 
-                GrfSimpleCacheObj( const Graphic& rGraphic, const GraphicAttr& rAttr ) :
-                    maGraphic( rGraphic ), maAttr( rAttr ) {}
+                GrfSimpleCacheObj( Graphic aGraphic, const GraphicAttr& rAttr ) :
+                    maGraphic(std::move( aGraphic )), maAttr( rAttr ) {}
 };
 
 GraphicObject::GraphicObject()
 {
 }
 
-GraphicObject::GraphicObject(const Graphic& rGraphic)
-    : maGraphic(rGraphic)
+GraphicObject::GraphicObject(Graphic aGraphic)
+    : maGraphic(std::move(aGraphic))
 {
 }
 
@@ -541,7 +542,7 @@ void GraphicObject::DrawTiled(OutputDevice& rOut, const tools::Rectangle& rArea,
 }
 
 bool GraphicObject::StartAnimation(OutputDevice& rOut, const Point& rPt, const Size& rSz,
-                                   tools::Long nExtraData,
+                                   tools::Long nRendererId,
                                    OutputDevice* pFirstFrameOutDev)
 {
     bool bRet = false;
@@ -579,7 +580,7 @@ bool GraphicObject::StartAnimation(OutputDevice& rOut, const Point& rPt, const S
             mxSimpleCache->maGraphic.SetAnimationNotifyHdl(GetGraphic().GetAnimationNotifyHdl());
         }
 
-        mxSimpleCache->maGraphic.StartAnimation(rOut, aPt, aSz, nExtraData, pFirstFrameOutDev);
+        mxSimpleCache->maGraphic.StartAnimation(rOut, aPt, aSz, nRendererId, pFirstFrameOutDev);
 
         if( bCropped )
             rOut.Pop();
@@ -592,10 +593,10 @@ bool GraphicObject::StartAnimation(OutputDevice& rOut, const Point& rPt, const S
     return bRet;
 }
 
-void GraphicObject::StopAnimation( const OutputDevice* pOut, tools::Long nExtraData )
+void GraphicObject::StopAnimation( const OutputDevice* pOut, tools::Long nRendererId )
 {
     if (mxSimpleCache)
-        mxSimpleCache->maGraphic.StopAnimation(pOut, nExtraData);
+        mxSimpleCache->maGraphic.StopAnimation(pOut, nRendererId);
 }
 
 const Graphic& GraphicObject::GetGraphic() const
@@ -763,21 +764,21 @@ Graphic GraphicObject::GetTransformedGraphic( const Size& rDestSize, const MapMo
 
             for( size_t nFrame=0; nFrame<aAnim.Count(); ++nFrame )
             {
-                AnimationBitmap aAnimationBitmap( aAnim.Get( nFrame ) );
+                AnimationFrame aAnimationFrame( aAnim.Get( nFrame ) );
 
-                if( !aCropRect.Contains( tools::Rectangle(aAnimationBitmap.maPositionPixel, aAnimationBitmap.maSizePixel) ) )
+                if( !aCropRect.Contains( tools::Rectangle(aAnimationFrame.maPositionPixel, aAnimationFrame.maSizePixel) ) )
                 {
                     // setup actual cropping (relative to frame position)
                     tools::Rectangle aCropRectRel( aCropRect );
-                    aCropRectRel.Move( -aAnimationBitmap.maPositionPixel.X(),
-                                       -aAnimationBitmap.maPositionPixel.Y() );
+                    aCropRectRel.Move( -aAnimationFrame.maPositionPixel.X(),
+                                       -aAnimationFrame.maPositionPixel.Y() );
 
                     // cropping affects this frame, apply it then
                     // do _not_ apply enlargement, this is done below
-                    ImplTransformBitmap( aAnimationBitmap.maBitmapEx, rAttr, Size(), Size(),
+                    ImplTransformBitmap( aAnimationFrame.maBitmapEx, rAttr, Size(), Size(),
                                          aCropRectRel, rDestSize, false );
 
-                    aAnim.Replace( aAnimationBitmap, nFrame );
+                    aAnim.Replace( aAnimationFrame, nFrame );
                 }
                 // else: bitmap completely within crop area,
                 // i.e. nothing is cropped away
@@ -807,11 +808,11 @@ Graphic GraphicObject::GetTransformedGraphic( const Size& rDestSize, const MapMo
 
                 for( size_t nFrame=0; nFrame<aAnim.Count(); ++nFrame )
                 {
-                    AnimationBitmap aAnimationBitmap( aAnim.Get( nFrame ) );
+                    AnimationFrame aAnimationFrame( aAnim.Get( nFrame ) );
 
-                    aAnimationBitmap.maPositionPixel += aPosOffset;
+                    aAnimationFrame.maPositionPixel += aPosOffset;
 
-                    aAnim.Replace( aAnimationBitmap, nFrame );
+                    aAnim.Replace( aAnimationFrame, nFrame );
                 }
             }
 

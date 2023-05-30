@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/chart/xchartdata.hxx>
 #include <test/sheet/cellproperties.hxx>
 #include <test/sheet/sheetcellrange.hxx>
@@ -47,7 +47,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScCellRangeObj : public CalcUnoApiTest,
+class ScCellRangeObj : public UnoApiTest,
                        public apitest::CellProperties,
                        public apitest::SheetCellRange,
                        public apitest::XArrayFormulaRange,
@@ -76,7 +76,6 @@ public:
     ScCellRangeObj();
 
     virtual void setUp() override;
-    virtual void tearDown() override;
     virtual uno::Reference<uno::XInterface> init() override;
     virtual uno::Reference<uno::XInterface> getXCellRangeData() override;
     virtual uno::Reference<uno::XInterface> getXSpreadsheet() override;
@@ -175,13 +174,10 @@ public:
     CPPUNIT_TEST(testSortOOB);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScCellRangeObj::ScCellRangeObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XCellSeries(2, 1)
     , XFormulaQuery(table::CellRangeAddress(0, 15, 15, 15, 15),
                     table::CellRangeAddress(0, 0, 15, 0, 15))
@@ -247,17 +243,9 @@ void ScCellRangeObj::testSortOOB()
 
 void ScCellRangeObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
 
-    OUString aFileURL;
-    createFileURL(u"xcellrangesquery.ods", aFileURL);
-    mxComponent = loadFromDesktop(aFileURL, "com.sun.star.sheet.SpreadsheetDocument");
-}
-
-void ScCellRangeObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
+    loadFromURL(u"xcellrangesquery.ods");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScCellRangeObj);

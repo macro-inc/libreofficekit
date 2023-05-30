@@ -22,7 +22,7 @@
 #include <com/sun/star/xml/sax/XFastSAXSerializable.hpp>
 
 #include <oox/shape/ShapeContextHandler.hxx>
-#include "ShapeDrawingFragmentHandler.hxx"
+#include <oox/shape/ShapeDrawingFragmentHandler.hxx>
 #include "LockedCanvasContext.hxx"
 #include "WpsContext.hxx"
 #include "WpgContext.hxx"
@@ -35,9 +35,8 @@
 #include <oox/token/tokens.hxx>
 #include <oox/drawingml/theme.hxx>
 #include <oox/drawingml/themefragmenthandler.hxx>
-#include <cppuhelper/supportsservice.hxx>
 #include <memory>
-#include <sal/log.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -45,9 +44,10 @@ namespace oox::shape {
 using namespace core;
 using namespace drawingml;
 
-ShapeContextHandler::ShapeContextHandler(const rtl::Reference<ShapeFilterBase>& xFilterBase) :
-  mnStartToken(0),
-  mxShapeFilterBase(xFilterBase)
+ShapeContextHandler::ShapeContextHandler(rtl::Reference<ShapeFilterBase> xFilterBase) :
+  m_bFullWPGSUpport(false),
+  mxShapeFilterBase(std::move(xFilterBase))
+
 {
 }
 
@@ -139,8 +139,12 @@ uno::Reference<xml::sax::XFastContextHandler> const & ShapeContextHandler::getWp
         switch (getBaseToken(nElement))
         {
             case XML_wgp:
-                mxWpgContext.set(static_cast<oox::core::ContextHandler*>(new WpgContext(*rFragmentHandler)));
+            {
+                rtl::Reference<WpgContext> rContext = new WpgContext(*rFragmentHandler, oox::drawingml::ShapePtr());
+                rContext->setFullWPGSupport(m_bFullWPGSUpport);
+                mxWpgContext.set(static_cast<oox::core::ContextHandler*>(rContext.get()));
                 break;
+            }
             default:
                 break;
         }
@@ -211,6 +215,7 @@ ShapeContextHandler::getDiagramShapeContext()
     {
         auto pFragmentHandler = std::make_shared<ShapeFragmentHandler>(*mxShapeFilterBase, msRelationFragmentPath);
         mpShape = std::make_shared<Shape>();
+        mpShape->setSize(maSize);
         mxDiagramShapeContext.set(new DiagramGraphicDataContext(*pFragmentHandler, mpShape));
     }
 
@@ -221,8 +226,9 @@ uno::Reference<xml::sax::XFastContextHandler>
 ShapeContextHandler::getContextHandler(sal_Int32 nElement)
 {
     uno::Reference<xml::sax::XFastContextHandler> xResult;
+    const sal_uInt32 nStartToken = getStartToken();
 
-    switch (getNamespace( mnStartToken ))
+    switch (getNamespace( nStartToken ))
     {
         case NMSP_doc:
         case NMSP_vml:
@@ -232,19 +238,19 @@ ShapeContextHandler::getContextHandler(sal_Int32 nElement)
             xResult.set(getDiagramShapeContext());
             break;
         case NMSP_dmlLockedCanvas:
-            xResult.set(getLockedCanvasContext(mnStartToken));
+            xResult.set(getLockedCanvasContext(nStartToken));
             break;
         case NMSP_dmlChart:
-            xResult.set(getChartShapeContext(mnStartToken));
+            xResult.set(getChartShapeContext(nStartToken));
             break;
         case NMSP_wps:
-            xResult.set(getWpsContext(mnStartToken, nElement));
+            xResult.set(getWpsContext(nStartToken, nElement));
             break;
         case NMSP_wpg:
-            xResult.set(getWpgContext(mnStartToken));
+            xResult.set(getWpgContext(nStartToken));
             break;
         default:
-            xResult.set(getGraphicShapeContext(mnStartToken));
+            xResult.set(getGraphicShapeContext(nStartToken));
             break;
     }
 
@@ -264,7 +270,6 @@ void SAL_CALL ShapeContextHandler::startFastElement
         // Parse the theme relation, if available; the diagram won't have colors without it.
         if (!mpThemePtr && !msRelationFragmentPath.isEmpty())
         {
-            mpThemePtr = std::make_shared<Theme>();
             // Get Target for Type = "officeDocument" from _rels/.rels file
             // aOfficeDocumentFragmentPath is pointing to "word/document.xml" for docx & to "ppt/presentation.xml" for pptx
             FragmentHandlerRef rFragmentHandlerRef(new ShapeFragmentHandler(*mxShapeFilterBase, "/"));
@@ -275,12 +280,19 @@ void SAL_CALL ShapeContextHandler::startFastElement
             FragmentHandlerRef rFragmentHandler(new ShapeFragmentHandler(*mxShapeFilterBase, aOfficeDocumentFragmentPath));
             OUString aThemeFragmentPath = rFragmentHandler->getFragmentPathFromFirstTypeFromOfficeDoc( u"theme" );
 
-            if(!aThemeFragmentPath.isEmpty())
+            if (!aThemeFragmentPath.isEmpty())
             {
+                mpThemePtr = std::make_shared<Theme>();
+                auto pTheme = std::make_shared<model::Theme>();
+                mpThemePtr->setTheme(pTheme);
                 uno::Reference<xml::sax::XFastSAXSerializable> xDoc(mxShapeFilterBase->importFragment(aThemeFragmentPath), uno::UNO_QUERY_THROW);
-                mxShapeFilterBase->importFragment(new ThemeFragmentHandler(*mxShapeFilterBase, aThemeFragmentPath, *mpThemePtr ), xDoc);
+                mxShapeFilterBase->importFragment(new ThemeFragmentHandler(*mxShapeFilterBase, aThemeFragmentPath, *mpThemePtr, *pTheme), xDoc);
                 mxShapeFilterBase->setCurrentTheme(mpThemePtr);
             }
+        }
+        else if (mpThemePtr && !mxShapeFilterBase->getCurrentTheme())
+        {
+            mxShapeFilterBase->setCurrentTheme(mpThemePtr);
         }
 
         createFastChildContext(Element, Attribs);
@@ -423,6 +435,13 @@ ShapeContextHandler::getShape()
                     pShapePtr->setDiagramDoms(mpShape->getDiagramDoms());
                     pShapePtr->keepDiagramDrawing(*mxShapeFilterBase, aFragmentPath);
 
+                    if (mpShape->getFontRefColorForNodes().isUsed())
+                        applyFontRefColor(pShapePtr, mpShape->getFontRefColorForNodes());
+
+                    // migrate IDiagramHelper to new oox::Shape (from mpShape which was loaded
+                    // to pShapePtr where the geometry is now constructed)
+                    mpShape->migrateDiagramHelperToNewShape(pShapePtr);
+
                     if (!mpShape->getChildren().empty())
                     {
                         // first child is diagram background - we want to keep it, as drawingML fallback doesn't contain it
@@ -452,7 +471,7 @@ ShapeContextHandler::getShape()
         //NMSP_dmlChart == getNamespace( mnStartToken ) check is introduced to make sure that
         //mnStartToken is set as NMSP_dmlChart in setStartToken.
         //Only in case it is set then only the below block of code for ChartShapeContext should be executed.
-        else if (mxChartShapeContext.is() && (NMSP_dmlChart == getNamespace( mnStartToken )))
+        else if (mxChartShapeContext.is() && (NMSP_dmlChart == getNamespace( getStartToken() )))
         {
             ChartGraphicDataContext* pChartGraphicDataContext = dynamic_cast<ChartGraphicDataContext*>(mxChartShapeContext.get());
             if (pChartGraphicDataContext)
@@ -510,6 +529,8 @@ ShapeContextHandler::getShape()
         }
     }
 
+    if (xResult)
+        popStartToken();
     return xResult;
 }
 
@@ -533,17 +554,29 @@ void ShapeContextHandler::setRelationFragmentPath(const OUString & the_value)
 
 sal_Int32 ShapeContextHandler::getStartToken() const
 {
-    return mnStartToken;
+    assert(mnStartTokenStack.size() && "This stack must not be empty!");
+    return mnStartTokenStack.top();
 }
 
-void ShapeContextHandler::setStartToken( sal_Int32 _starttoken )
+void ShapeContextHandler::popStartToken()
 {
-    mnStartToken = _starttoken;
+    if (mnStartTokenStack.size() > 1)
+        mnStartTokenStack.pop();
+}
+
+void ShapeContextHandler::pushStartToken( sal_Int32 _starttoken )
+{
+    mnStartTokenStack.push(_starttoken);
 }
 
 void ShapeContextHandler::setPosition(const awt::Point& rPosition)
 {
     maPosition = rPosition;
+}
+
+void ShapeContextHandler::setSize(const awt::Size& rSize)
+{
+    maSize = rSize;
 }
 
 void ShapeContextHandler::setDocumentProperties(const uno::Reference<document::XDocumentProperties>& xDocProps)
@@ -562,6 +595,16 @@ void ShapeContextHandler::setGraphicMapper(css::uno::Reference<css::graphic::XGr
     mxShapeFilterBase->setGraphicMapper(rxGraphicMapper);
 }
 
+void ShapeContextHandler::applyFontRefColor(const oox::drawingml::ShapePtr& pShape,
+                                            const oox::drawingml::Color& rFontRefColor)
+{
+    pShape->getShapeStyleRefs()[XML_fontRef].maPhClr = rFontRefColor;
+    std::vector<oox::drawingml::ShapePtr>& vChildren = pShape->getChildren();
+    for (auto const& child : vChildren)
+    {
+        applyFontRefColor(child, rFontRefColor);
+    }
+}
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

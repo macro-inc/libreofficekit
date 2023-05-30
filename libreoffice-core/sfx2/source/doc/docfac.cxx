@@ -44,6 +44,7 @@
 #include <tools/globname.hxx>
 
 #include <memory>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -70,8 +71,8 @@ SfxFilterContainer* SfxObjectFactory::GetFilterContainer() const
 SfxObjectFactory::SfxObjectFactory
 (
     const SvGlobalName&     rName,
-    const OUString&         sName
-) :    m_sFactoryName( sName ),
+    OUString          sName
+) :    m_sFactoryName(std::move( sName )),
        pImpl( new SfxObjectFactory_Impl )
 {
     pImpl->pFilterContainer = new SfxFilterContainer( m_sFactoryName );
@@ -217,7 +218,7 @@ void SfxObjectFactory::SetSystemTemplate( const OUString& rServiceName, const OU
 
             uno::Reference< frame::XStorable > xStorable( xLoadable, uno::UNO_QUERY );
             xStorable->storeToURL( sUserTemplateURL, aArgs );
-            ::comphelper::ConfigurationHelper::writeRelativeKey( xConfig, sConfPath, PROP_DEF_TEMPL_CHANGED, uno::makeAny( true ));
+            ::comphelper::ConfigurationHelper::writeRelativeKey( xConfig, sConfPath, PROP_DEF_TEMPL_CHANGED, uno::Any( true ));
             ::comphelper::ConfigurationHelper::flush( xConfig );
         }
         else
@@ -226,7 +227,7 @@ void SfxObjectFactory::SetSystemTemplate( const OUString& rServiceName, const OU
 
             xSimpleFileAccess->copy( aBackupURL, sUserTemplateURL );
             xSimpleFileAccess->kill( aBackupURL );
-            ::comphelper::ConfigurationHelper::writeRelativeKey( xConfig, sConfPath, PROP_DEF_TEMPL_CHANGED, uno::makeAny( false ));
+            ::comphelper::ConfigurationHelper::writeRelativeKey( xConfig, sConfPath, PROP_DEF_TEMPL_CHANGED, uno::Any( false ));
             ::comphelper::ConfigurationHelper::flush( xConfig );
         }
     }
@@ -247,7 +248,7 @@ void SfxObjectFactory::SetStandardTemplate( const OUString& rServiceName, const 
     }
 }
 
-OUString SfxObjectFactory::GetStandardTemplate( const OUString& rServiceName )
+OUString SfxObjectFactory::GetStandardTemplate( std::u16string_view rServiceName )
 {
     SvtModuleOptions::EFactory eFac = SvtModuleOptions::ClassifyFactoryByServiceName(rServiceName);
     if (eFac == SvtModuleOptions::EFactory::UNKNOWN_FACTORY)

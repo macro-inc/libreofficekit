@@ -65,7 +65,7 @@ public:
 
                                 SearchThread(SearchProgress* pProgress,
                                              TPGalleryThemeProperties* pBrowser,
-                                             const INetURLObject& rStartURL);
+                                             INetURLObject aStartURL);
 };
 
 class SearchProgress : public weld::GenericDialogController
@@ -81,7 +81,7 @@ private:
     DECL_LINK(ClickCancelBtn, weld::Button&, void);
 
 public:
-    SearchProgress(weld::Window* pParent, TPGalleryThemeProperties* pTabPage, const INetURLObject& rStartURL);
+    SearchProgress(weld::Window* pParent, TPGalleryThemeProperties* pTabPage, INetURLObject aStartURL);
     void LaunchThread();
     virtual ~SearchProgress() override;
 
@@ -268,7 +268,7 @@ public:
     void                SetXChgData( ExchangeData* pData );
     const ExchangeData* GetXChgData() const { return pData; }
 
-    void                StartSearchFiles( const OUString& _rFolderURL, short _nDlgResult );
+    void                StartSearchFiles( std::u16string_view _rFolderURL, short _nDlgResult );
 
     static std::unique_ptr<SfxTabPage>  Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet* rSet);
 };

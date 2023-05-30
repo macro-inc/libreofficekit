@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-08-02 21:51+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-01-23 11:30+0000\n"
 "Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
 "Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/vclmessages/nn/>\n"
 "Language: nn\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1566134044.000000\n"
 
 #. k5jTM
@@ -1380,11 +1380,11 @@ msgctxt "STR_FONT_FEATURE_ID_FALT"
 msgid "Final Glyph on Line Alternates"
 msgstr "Avsluttande glyf på linjealternativ"
 
-#. rKM4e
+#. q3jvz
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:43
 msgctxt "STR_FONT_FEATURE_ID_FRAC"
-msgid "Fraction style:"
-msgstr "Brøkstil:"
+msgid "Fraction style"
+msgstr "Brøkstil"
 
 #. FA4Qr
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:44
@@ -1722,6 +1722,12 @@ msgctxt "STR_FONT_FEATURE_ID_ZERO"
 msgid "Slashed Zero"
 msgstr "Null med skråstrek"
 
+#. 8jmFo
+#: vcl/inc/font/OpenTypeFeatureStrings.hrc:100
+msgctxt "STR_FONT_FEATURE_PARAM_NONE"
+msgid "None"
+msgstr "Ingen"
+
 #. TxdMF
 #: vcl/uiconfig/ui/aboutbox.ui:74
 msgctxt "aboutdialog|buildIdLink"
@@ -1835,6 +1841,62 @@ msgstr "Fann ingen standardskrivar."
 msgctxt "errornoprinterdialog|ErrorNoPrinterDialog"
 msgid "Please choose a printer and try again."
 msgstr "Vel ein skrivar og prøv igjen."
+
+#. puBNZ
+#: vcl/uiconfig/ui/openlockedquerybox.ui:8
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Document in Use"
+msgstr "Dokument i bruk"
+
+#. 4ZftN
+#: vcl/uiconfig/ui/openlockedquerybox.ui:76
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark image"
+msgstr "Spørsmålsteiknsbilete"
+
+#. LCYux
+#: vcl/uiconfig/ui/openlockedquerybox.ui:77
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark icon for dialog box."
+msgstr "Spørsmålsteiknikon for dialogvindauge."
+
+#. j4NGP
+#: vcl/uiconfig/ui/openlockedquerybox.ui:100
+msgctxt "openlockedquerybox|messagetext"
+msgid "This file has been locked by another user."
+msgstr "Denne fila er låst av ein annan brukar."
+
+#. sq7go
+#: vcl/uiconfig/ui/openlockedquerybox.ui:124
+msgctxt "openlockedquerybox|ReadOnlyMessage"
+msgid ""
+"You can open it read only  and\n"
+"receive a notification if ready."
+msgstr ""
+"Du kan opna ho skriveverna og   \n"
+"ta imot eit varsel om ho er klar."
+
+#. nFBTF
+#: vcl/uiconfig/ui/openlockedquerybox.ui:142
+msgctxt "openlockedquerybox|OpenCopyMessage"
+msgid ""
+"You can open a copy on your\n"
+"local system."
+msgstr ""
+"Du kan opna ein kopi på ditt\n"
+"lokale system."
+
+#. W3Sbv
+#: vcl/uiconfig/ui/openlockedquerybox.ui:178
+msgctxt "openlockedquerybox|expandertext"
+msgid "_More Details"
+msgstr "_Fleire detaljar"
+
+#. jEGxc
+#: vcl/uiconfig/ui/openlockedquerybox.ui:264
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Displays information about locked files and further steps to take when opening a locked file."
+msgstr "Viser informasjon om låste filer og om kva du skal gjera vidare når du opnar ei låst fil."
 
 #. DUavz
 #: vcl/uiconfig/ui/printdialog.ui:64
@@ -2032,13 +2094,13 @@ msgstr "Ta med:"
 #: vcl/uiconfig/ui/printdialog.ui:633
 msgctxt "printdialog|liststore3"
 msgid "Odd and Even Pages"
-msgstr "Ulike og like sider"
+msgstr "Oddetals- og partals-lysbilete"
 
 #. 49y67
 #: vcl/uiconfig/ui/printdialog.ui:634
 msgctxt "printdialog|liststore3"
 msgid "Odd Pages"
-msgstr "Ulike sider"
+msgstr "Oddetalssider"
 
 #. 6CkPE
 #: vcl/uiconfig/ui/printdialog.ui:635

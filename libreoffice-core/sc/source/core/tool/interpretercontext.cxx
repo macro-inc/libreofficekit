@@ -24,6 +24,7 @@
 #include <document.hxx>
 #include <formula/token.hxx>
 #include <lookupcache.hxx>
+#include <rangecache.hxx>
 #include <algorithm>
 
 ScInterpreterContextPool ScInterpreterContextPool::aThreadedInterpreterPool(true);
@@ -38,11 +39,7 @@ ScInterpreterContext::ScInterpreterContext(const ScDocument& rDoc, SvNumberForma
 {
 }
 
-ScInterpreterContext::~ScInterpreterContext()
-{
-    ResetTokens();
-    mxScLookupCache.reset();
-}
+ScInterpreterContext::~ScInterpreterContext() { ResetTokens(); }
 
 void ScInterpreterContext::ResetTokens()
 {
@@ -56,7 +53,11 @@ void ScInterpreterContext::ResetTokens()
 
 void ScInterpreterContext::SetDocAndFormatter(const ScDocument& rDoc, SvNumberFormatter* pFormatter)
 {
-    mpDoc = &rDoc;
+    if (mpDoc != &rDoc)
+    {
+        mxScLookupCache.reset();
+        mpDoc = &rDoc;
+    }
     mpFormatter = pFormatter;
 }
 
@@ -67,13 +68,17 @@ void ScInterpreterContext::initFormatTable()
 
 void ScInterpreterContext::Cleanup()
 {
-    // Do not disturb mScLookupCache
+    // Do not disturb mxScLookupCache.
     maConditions.clear();
     maDelayedSetNumberFormat.clear();
     ResetTokens();
 }
 
-void ScInterpreterContext::ClearLookupCache() { mxScLookupCache.reset(); }
+void ScInterpreterContext::ClearLookupCache(const ScDocument* pDoc)
+{
+    if (pDoc == mpDoc)
+        mxScLookupCache.reset();
+}
 
 SvNumFormatType ScInterpreterContext::GetNumberFormatType(sal_uInt32 nFIndex) const
 {
@@ -160,12 +165,12 @@ void ScInterpreterContextPool::ReturnToPool()
 }
 
 // static
-void ScInterpreterContextPool::ClearLookupCaches()
+void ScInterpreterContextPool::ClearLookupCaches(const ScDocument* pDoc)
 {
     for (auto& rPtr : aThreadedInterpreterPool.maPool)
-        rPtr->ClearLookupCache();
+        rPtr->ClearLookupCache(pDoc);
     for (auto& rPtr : aNonThreadedInterpreterPool.maPool)
-        rPtr->ClearLookupCache();
+        rPtr->ClearLookupCache(pDoc);
 }
 
 /* ScThreadedInterpreterContextGetterGuard */

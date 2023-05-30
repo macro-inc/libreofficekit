@@ -33,9 +33,13 @@
 #include <IDocumentStylePoolAccess.hxx>
 #include <tools/datetime.hxx>
 #include <poolfmt.hxx>
+#include <fmtanchr.hxx>
+#include <ftnidx.hxx>
+#include <txtftn.hxx>
 #include <unoredline.hxx>
 #include <DocumentRedlineManager.hxx>
 #include "xmlimp.hxx"
+#include <comphelper/servicehelper.hxx>
 #include <o3tl/any.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <vcl/svapp.hxx>
@@ -88,13 +92,13 @@ namespace {
 class XTextRangeOrNodeIndexPosition
 {
     Reference<XTextRange> m_xRange;
-    std::unique_ptr<SwNodeIndex> m_pIndex;    // pIndex will point to the *previous* node
+    std::optional<SwNodeIndex> m_oIndex;    // pIndex will point to the *previous* node
 
 public:
     XTextRangeOrNodeIndexPosition();
 
     void Set( Reference<XTextRange> const & rRange );
-    void Set( SwNodeIndex const & rIndex );
+    void Set( SwNode const & rIndex );
     void SetAsNodeIndex( Reference<XTextRange> const & rRange );
 
     void CopyPositionInto(SwPosition& rPos, SwDoc & rDoc);
@@ -112,13 +116,13 @@ XTextRangeOrNodeIndexPosition::XTextRangeOrNodeIndexPosition()
 void XTextRangeOrNodeIndexPosition::Set( Reference<XTextRange> const & rRange )
 {
     m_xRange = rRange->getStart();    // set bookmark
-    m_pIndex.reset();
+    m_oIndex.reset();
 }
 
-void XTextRangeOrNodeIndexPosition::Set( SwNodeIndex const & rIndex )
+void XTextRangeOrNodeIndexPosition::Set( SwNode const & rIndex )
 {
-    m_pIndex.reset( new SwNodeIndex(rIndex) );
-    (*m_pIndex)-- ;   // previous node!!!
+    m_oIndex = rIndex;
+    (*m_oIndex)-- ;   // previous node!!!
     m_xRange = nullptr;
 }
 
@@ -140,7 +144,7 @@ void XTextRangeOrNodeIndexPosition::SetAsNodeIndex(
     OSL_ENSURE(bSuccess, "illegal range");
 
     // PaM -> Index
-    Set(aPaM.GetPoint()->nNode);
+    Set(aPaM.GetPoint()->GetNode());
 }
 
 void
@@ -149,7 +153,7 @@ XTextRangeOrNodeIndexPosition::CopyPositionInto(SwPosition& rPos, SwDoc & rDoc)
     OSL_ENSURE(IsValid(), "Can't get Position");
 
     // create PAM from start cursor (if no node index is present)
-    if (nullptr == m_pIndex)
+    if (!m_oIndex.has_value())
     {
         SwUnoInternalPaM aUnoPaM(rDoc);
         bool bSuccess = ::sw::XTextRangeToSwPaM(aUnoPaM, m_xRange);
@@ -159,9 +163,7 @@ XTextRangeOrNodeIndexPosition::CopyPositionInto(SwPosition& rPos, SwDoc & rDoc)
     }
     else
     {
-        rPos.nNode = *m_pIndex;
-        rPos.nNode++;           // pIndex points to previous index !!!
-        rPos.nContent.Assign( rPos.nNode.GetNode().GetContentNode(), 0 );
+        rPos.Assign( m_oIndex->GetNode(), SwNodeOffset(1) ); // pIndex points to previous index !!!
     }
 }
 
@@ -169,12 +171,12 @@ SwDoc* XTextRangeOrNodeIndexPosition::GetDoc()
 {
     OSL_ENSURE(IsValid(), "Can't get Doc");
 
-    return (nullptr != m_pIndex) ? &m_pIndex->GetNodes().GetDoc() : lcl_GetDocViaTunnel(m_xRange);
+    return m_oIndex.has_value() ? &m_oIndex->GetNodes().GetDoc() : lcl_GetDocViaTunnel(m_xRange);
 }
 
 bool XTextRangeOrNodeIndexPosition::IsValid() const
 {
-    return ( m_xRange.is() || (m_pIndex != nullptr) );
+    return m_xRange.is() || m_oIndex.has_value();
 }
 
 // RedlineInfo: temporary storage for redline data
@@ -274,7 +276,7 @@ XMLRedlineImportHelper::XMLRedlineImportHelper(
     // set redline mode to "don't record changes"
     if( bHandleRecordChanges )
     {
-        m_xModelPropertySet->setPropertyValue( g_sRecordChanges, makeAny(false) );
+        m_xModelPropertySet->setPropertyValue( g_sRecordChanges, Any(false) );
     }
 }
 
@@ -341,7 +343,7 @@ XMLRedlineImportHelper::~XMLRedlineImportHelper()
             aAny <<= true;
             m_xModelPropertySet->setPropertyValue( g_sShowChanges, aAny );
             // TODO maybe we need some property for the view-setting?
-            SwDoc *const pDoc(SwImport::GetDocFromXMLImport(m_rImport));
+            SwDoc *const pDoc(static_cast<SwXMLImport&>(m_rImport).getDoc());
             assert(pDoc);
             pDoc->GetDocumentRedlineManager().SetHideRedlines(!m_bShowChanges);
         }
@@ -565,6 +567,73 @@ inline bool XMLRedlineImportHelper::IsReady(const RedlineInfo* pRedline)
              !pRedline->bNeedsAdjustment );
 }
 
+/// recursively check if rPos or its anchor (if in fly or footnote) is in redline section
+static auto RecursiveContains(SwStartNode const& rRedlineSection, SwNode const& rPos) -> bool
+{
+    if (rRedlineSection.GetIndex() <= rPos.GetIndex()
+        && rPos.GetIndex() <= rRedlineSection.EndOfSectionIndex())
+    {
+        return true;
+    }
+    // loop to iterate "up" in the node tree and find an anchored XText
+    for (SwStartNode const* pStartNode = rPos.StartOfSectionNode();
+        pStartNode != nullptr && pStartNode->GetIndex() != SwNodeOffset(0);
+        pStartNode = pStartNode->StartOfSectionNode())
+    {
+        switch (pStartNode->GetStartNodeType())
+        {
+            case SwNormalStartNode:
+            case SwTableBoxStartNode:
+                continue;
+            break;
+            case SwFlyStartNode:
+            {
+                SwFrameFormat const*const pFormat(pStartNode->GetFlyFormat());
+                assert(pFormat);
+                SwFormatAnchor const& rAnchor(pFormat->GetAnchor());
+                if (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PAGE)
+                {
+                    return false;
+                }
+                else if (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_FLY)
+                {   // anchor is on a start node, avoid skipping it:
+                    pStartNode = rAnchor.GetAnchorNode()->GetStartNode();
+                    assert(pStartNode);
+                    // pass the next node to recursive call - it will call
+                    // call StartOfSectionNode on it and go back to pStartNode
+                    SwNodeIndex const next(*pStartNode, +1);
+                    return RecursiveContains(rRedlineSection, next.GetNode());
+                }
+                else
+                {
+                    return RecursiveContains(rRedlineSection, *rAnchor.GetAnchorNode());
+                }
+            }
+            break;
+            case SwFootnoteStartNode:
+            {   // sigh ... need to search
+                for (SwTextFootnote const*const pFootnote : rRedlineSection.GetDoc().GetFootnoteIdxs())
+                {
+                    if (pStartNode == pFootnote->GetStartNode()->GetNode().GetStartNode())
+                    {
+                        return RecursiveContains(rRedlineSection, pFootnote->GetTextNode());
+                    }
+                }
+                assert(false);
+            }
+            break;
+            case SwHeaderStartNode:
+            case SwFooterStartNode:
+                return false; // headers aren't anchored
+            break;
+            default:
+                assert(false);
+            break;
+        }
+    }
+    return false;
+}
+
 void XMLRedlineImportHelper::InsertIntoDocument(RedlineInfo* pRedlineInfo)
 {
     OSL_ENSURE(nullptr != pRedlineInfo, "need redline info");
@@ -612,8 +681,8 @@ void XMLRedlineImportHelper::InsertIntoDocument(RedlineInfo* pRedlineInfo)
         // in sw3io), so no action here
     }
     else if ( m_bIgnoreRedlines ||
-         !CheckNodesRange( aPaM.GetPoint()->nNode,
-                           aPaM.GetMark()->nNode,
+         !CheckNodesRange( aPaM.GetPoint()->GetNode(),
+                           aPaM.GetMark()->GetNode(),
                            true )
          || (pRedlineInfo->pContentIndex
              && (pRedlineInfo->pContentIndex->GetIndex() + 2
@@ -632,16 +701,25 @@ void XMLRedlineImportHelper::InsertIntoDocument(RedlineInfo* pRedlineInfo)
             // They have to be deleted as well (#i80689)!
             if( m_bIgnoreRedlines && pRedlineInfo->pContentIndex != nullptr )
             {
-                SwNodeIndex aIdx( *pRedlineInfo->pContentIndex );
-                const SwNode* pEnd = aIdx.GetNode().EndOfSectionNode();
+                const SwNodeIndex& rIdx( *pRedlineInfo->pContentIndex );
+                const SwNode* pEnd = rIdx.GetNode().EndOfSectionNode();
                 if( pEnd )
                 {
-                    SwNodeIndex aEnd( *pEnd, 1 );
-                    SwPaM aDel( aIdx, aEnd );
+                    SwPaM aDel( rIdx.GetNode(), 0, *pEnd, 1 );
                     pDoc->getIDocumentContentOperations().DeleteRange(aDel);
                 }
             }
         }
+    }
+    else if (pRedlineInfo->pContentIndex != nullptr
+        // should be enough to check 1 position of aPaM bc CheckNodesRange() above
+        && RecursiveContains(*pRedlineInfo->pContentIndex->GetNode().GetStartNode(), aPaM.GetPoint()->GetNode()))
+    {
+        SAL_WARN("sw.xml", "Recursive change tracking, removing");
+        // reuse aPaM to remove it from nodes that will be deleted
+        aPaM.GetPoint()->Assign(pRedlineInfo->pContentIndex->GetNode());
+        aPaM.DeleteMark();
+        pDoc->getIDocumentContentOperations().DeleteSection(&aPaM.GetPoint()->GetNode());
     }
     else
     {
@@ -679,10 +757,10 @@ void XMLRedlineImportHelper::InsertIntoDocument(RedlineInfo* pRedlineInfo)
         // set content node (if necessary)
         if (nullptr != pRedlineInfo->pContentIndex)
         {
-            SwNodeOffset nPoint = aPaM.GetPoint()->nNode.GetIndex();
+            SwNodeOffset nPoint = aPaM.GetPoint()->GetNodeIndex();
             if( nPoint < pRedlineInfo->pContentIndex->GetIndex() ||
                 nPoint > pRedlineInfo->pContentIndex->GetNode().EndOfSectionIndex() )
-                pRedline->SetContentIdx(pRedlineInfo->pContentIndex);
+                pRedline->SetContentIdx(*pRedlineInfo->pContentIndex);
             else
                 SAL_WARN("sw", "Recursive change tracking");
         }

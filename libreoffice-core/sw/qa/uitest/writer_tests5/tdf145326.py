@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -55,6 +57,8 @@ class Tdf145326(UITestCase):
                 xFileName.executeAction('TYPE', mkPropertyValues({'TEXT': xFilePath}))
 
             self.ui_test.close_doc()
+
+            self.ui_test.wait_until_file_is_available(xFilePath)
 
             with self.ui_test.load_file(systemPathToFileUrl(xFilePath)) as doc2:
 

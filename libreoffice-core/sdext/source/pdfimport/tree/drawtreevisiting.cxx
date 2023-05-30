@@ -32,6 +32,7 @@
 #include <com/sun/star/i18n/CharacterClassification.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/i18n/DirectionProperty.hpp>
+#include <comphelper/string.hxx>
 
 #include <string.h>
 #include <string_view>
@@ -122,7 +123,12 @@ void DrawXmlEmitter::visit( TextElement& elem, const std::list< std::unique_ptr<
     }
 
     if (isRTL)  // If so, reverse string
-        str = PDFIProcessor::mirrorString( str );
+    {
+        // First, produce mirrored-image for each code point which has the Bidi_Mirrored property.
+        str = PDFIProcessor::SubstituteBidiMirrored(str);
+        // Then, reverse the code points in the string, in backward order.
+        str = ::comphelper::string::reverseCodePoints(str);
+    }
 
     m_rEmitContext.rEmitter.beginTag( "text:span", aProps );
 
@@ -188,21 +194,30 @@ void DrawXmlEmitter::fillFrameProps( DrawElement&       rElem,
                                      bool               bWasTransformed
                                      )
 {
-    rProps[ "draw:z-index" ] = OUString::number( rElem.ZOrder );
-    rProps[ "draw:style-name"] = rEmitContext.rStyles.getStyleName( rElem.StyleId );
+    static constexpr OUStringLiteral sDrawZIndex = u"draw:z-index";
+    static constexpr OUStringLiteral sDrawStyleName = u"draw:style-name";
+    static constexpr OUStringLiteral sDrawTextStyleName = u"draw:text-style-name";
+    static constexpr OUStringLiteral sSvgX = u"svg:x";
+    static constexpr OUStringLiteral sSvgY = u"svg:y";
+    static constexpr OUStringLiteral sSvgWidth = u"svg:width";
+    static constexpr OUStringLiteral sSvgHeight = u"svg:height";
+    static constexpr OUStringLiteral sDrawTransform = u"draw:transform";
+
+    rProps[ sDrawZIndex ] = OUString::number( rElem.ZOrder );
+    rProps[ sDrawStyleName ] = rEmitContext.rStyles.getStyleName( rElem.StyleId );
 
     if (rElem.IsForText)
-        rProps["draw:text-style-name"] = rEmitContext.rStyles.getStyleName(rElem.TextStyleId);
+        rProps[ sDrawTextStyleName ] = rEmitContext.rStyles.getStyleName(rElem.TextStyleId);
 
     const GraphicsContext& rGC =
         rEmitContext.rProcessor.getGraphicsContext( rElem.GCId );
 
     if (bWasTransformed)
     {
-        rProps[ "svg:x" ]       = convertPixelToUnitString(rElem.x);
-        rProps[ "svg:y" ]       = convertPixelToUnitString(rElem.y);
-        rProps[ "svg:width" ]   = convertPixelToUnitString(rElem.w);
-        rProps[ "svg:height" ]  = convertPixelToUnitString(rElem.h);
+        rProps[ sSvgX ]       = convertPixelToUnitString(rElem.x);
+        rProps[ sSvgY ]       = convertPixelToUnitString(rElem.y);
+        rProps[ sSvgWidth ]   = convertPixelToUnitString(rElem.w);
+        rProps[ sSvgHeight ]  = convertPixelToUnitString(rElem.h);
     }
     else
     {
@@ -236,7 +251,7 @@ void DrawXmlEmitter::fillFrameProps( DrawElement&       rElem,
         aBuf.append(mat.get(1, 2));
         aBuf.append(")");
 
-        rProps["draw:transform"] = aBuf.makeStringAndClear();
+        rProps[ sDrawTransform ] = aBuf.makeStringAndClear();
     }
 }
 
@@ -492,7 +507,7 @@ void DrawXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_pt
             nCurLineElements = 0;
             for( const auto& rxChild : pCurPara->Children )
             {
-                TextElement* pTestText = dynamic_cast<TextElement*>(rxChild.get());
+                TextElement* pTestText = rxChild->dynCastAsTextElement();
                 if( pTestText )
                 {
                     fCurLineHeight = (fCurLineHeight*double(nCurLineElements) + pTestText->h)/double(nCurLineElements+1);
@@ -526,12 +541,12 @@ void DrawXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_pt
             // or perhaps the draw element begins a new paragraph
             else if( next_page_element != elem.Children.end() )
             {
-                TextElement* pText = dynamic_cast<TextElement*>(next_page_element->get());
+                TextElement* pText = (*next_page_element)->dynCastAsTextElement();
                 if( ! pText )
                 {
                     ParagraphElement* pPara = dynamic_cast<ParagraphElement*>(next_page_element->get());
                     if( pPara && ! pPara->Children.empty() )
-                        pText = dynamic_cast<TextElement*>(pPara->Children.front().get());
+                        pText = pPara->Children.front()->dynCastAsTextElement();
                 }
                 if( pText && // check there is a text
                     pDraw->h < pText->h*1.5 && // and it is approx the same height
@@ -560,9 +575,9 @@ void DrawXmlOptimizer::visit( PageElement& elem, const std::list< std::unique_pt
             }
         }
 
-        TextElement* pText = dynamic_cast<TextElement*>(page_element->get());
+        TextElement* pText = (*page_element)->dynCastAsTextElement();
         if( ! pText && pLink && ! pLink->Children.empty() )
-            pText = dynamic_cast<TextElement*>(pLink->Children.front().get());
+            pText = pLink->Children.front()->dynCastAsTextElement();
         if( pText )
         {
             Element* pGeo = pLink ? static_cast<Element*>(pLink) :
@@ -647,15 +662,6 @@ static bool isSpaces(TextElement* pTextElem)
     return true;
 }
 
-static bool notTransformed(const GraphicsContext& GC)
-{
-    return
-        rtl::math::approxEqual(GC.Transformation.get(0,0), 100.00) &&
-        GC.Transformation.get(1,0) == 0.00 &&
-        GC.Transformation.get(0,1) == 0.00 &&
-        rtl::math::approxEqual(GC.Transformation.get(1,1), -100.00);
-}
-
 void DrawXmlOptimizer::optimizeTextElements(Element& rParent)
 {
     if( rParent.Children.empty() ) // this should not happen
@@ -671,22 +677,15 @@ void DrawXmlOptimizer::optimizeTextElements(Element& rParent)
     while( next != rParent.Children.end() )
     {
         bool bConcat = false;
-        TextElement* pCur = dynamic_cast<TextElement*>(it->get());
+        TextElement* pCur = (*it)->dynCastAsTextElement();
 
         if( pCur )
         {
-            TextElement* pNext = dynamic_cast<TextElement*>(next->get());
-            bool isComplex = false;
-            OUString str(pCur->Text.toString());
-            for(int i=0; i< str.getLength(); i++)
-            {
-                sal_Int16 nType = GetBreakIterator()->getScriptType( str, i );
-                if (nType == css::i18n::ScriptType::COMPLEX)
-                    isComplex = true;
-            }
+            TextElement* pNext = (*next)->dynCastAsTextElement();
+            OUString str;
             bool bPara = strspn("ParagraphElement", typeid(rParent).name());
             ParagraphElement* pPara = dynamic_cast<ParagraphElement*>(&rParent);
-            if (bPara && pPara && isComplex)
+            if (bPara && pPara && isComplex(GetBreakIterator(), pCur))
                 pPara->bRtl = true;
             if( pNext )
             {
@@ -696,27 +695,61 @@ void DrawXmlOptimizer::optimizeTextElements(Element& rParent)
                 // line and space optimization; works only in strictly horizontal mode
 
                 // concatenate consecutive text elements unless there is a
-                // font or text color or matrix change, leave a new span in that case
+                // font or text color change, leave a new span in that case
                 if( (pCur->FontId == pNext->FontId || isSpaces(pNext)) &&
                     rCurGC.FillColor.Red == rNextGC.FillColor.Red &&
                     rCurGC.FillColor.Green == rNextGC.FillColor.Green &&
                     rCurGC.FillColor.Blue == rNextGC.FillColor.Blue &&
-                    rCurGC.FillColor.Alpha == rNextGC.FillColor.Alpha &&
-                    (rCurGC.Transformation == rNextGC.Transformation || notTransformed(rNextGC))
+                    rCurGC.FillColor.Alpha == rNextGC.FillColor.Alpha
                     )
                 {
                     pCur->updateGeometryWith( pNext );
-                    // append text to current element
-                    pCur->Text.append( pNext->Text );
-
-                    str = pCur->Text.toString();
-                    for(int i=0; i< str.getLength(); i++)
+                    if (pPara && pPara->bRtl)
                     {
-                        sal_Int16 nType = GetBreakIterator()->getScriptType( str, i );
-                        if (nType == css::i18n::ScriptType::COMPLEX)
-                            isComplex = true;
+                        // Tdf#152083: If RTL, reverse the text in pNext so that its correct order is
+                        // restored when the combined text is reversed in DrawXmlEmitter::visit.
+                        OUString tempStr;
+                        bool bNeedReverse=false;
+                        str = pNext->Text.toString();
+                        for (sal_Int32 i=0; i < str.getLength(); i++)
+                        {
+                            if (str[i] == u' ')
+                            {   // Space char (e.g. the space as in " م") needs special treatment.
+                                //   First, append the space char to pCur.
+                                pCur->Text.append(OUStringChar(str[i]));
+                                //   Then, check whether the tmpStr needs reverse, if so then reverse and append.
+                                if (bNeedReverse)
+                                {
+                                    tempStr = ::comphelper::string::reverseCodePoints(tempStr);
+                                    pCur->Text.append(tempStr);
+                                    tempStr = u"";
+                                }
+                                bNeedReverse = false;
+                            }
+                            else
+                            {
+                                tempStr += OUStringChar(str[i]);
+                                bNeedReverse = true;
+                            }
+                        }
+                        // Do the last append
+                        if (bNeedReverse)
+                        {
+                            tempStr = ::comphelper::string::reverseCodePoints(tempStr);
+                            pCur->Text.append(tempStr);
+                        }
+                        else
+                        {
+                            pCur->Text.append(tempStr);
+                        }
                     }
-                    if (bPara && pPara && isComplex)
+                    else
+                    {
+                        // append text to current element directly without reverse
+                        pCur->Text.append( pNext->Text );
+                    }
+
+                    if (bPara && pPara && isComplex(GetBreakIterator(), pCur))
                         pPara->bRtl = true;
                     // append eventual children to current element
                     // and clear children (else the children just
@@ -831,7 +864,7 @@ void DrawXmlFinalizer::visit( TextElement& elem, const std::list< std::unique_pt
     // TODO: tdf#143095: use system font name rather than PSName
     SAL_INFO("sdext.pdfimport", "The font used in xml is: " << rFont.familyName);
     aFontProps[ "fo:font-family" ] = rFont.familyName;
-    aFontProps[ "style:font-family-asia" ] = rFont.familyName;
+    aFontProps[ "style:font-family-asian" ] = rFont.familyName;
     aFontProps[ "style:font-family-complex" ] = rFont.familyName;
 
     // bold

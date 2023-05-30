@@ -20,6 +20,7 @@
 #ifndef INCLUDED_SDEXT_SOURCE_PDFIMPORT_INC_PDFIPROCESSOR_HXX
 #define INCLUDED_SDEXT_SOURCE_PDFIMPORT_INC_PDFIPROCESSOR_HXX
 
+#include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/task/XStatusIndicator.hpp>
 #include <com/sun/star/geometry/RealSize2D.hpp>
 #include <com/sun/star/geometry/RealRectangle2D.hpp>
@@ -79,7 +80,7 @@ namespace pdfi
 
         static void sortElements( Element* pElement );
 
-        static OUString mirrorString( const OUString& i_rInString );
+        static OUString SubstituteBidiMirrored(const OUString& rString);
 
     private:
         void processGlyphLine();

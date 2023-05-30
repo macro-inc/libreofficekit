@@ -17,15 +17,12 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include <vcl/svapp.hxx>
+#include "ios/iosinst.hxx"
 #include "salprn.hxx"
 #include "quartz/salgdi.h"
+#include "headless/svpdata.hxx"
 #include "headless/svpinst.hxx"
 #include "unx/fontmanager.hxx"
-#include "unx/gendata.hxx"
-
-class FreetypeManager
-{
-};
 
 std::unique_ptr<SalPrinter> SvpSalInstance::CreatePrinter( SalInfoPrinter* /* pInfoPrinter */ )
 {
@@ -111,23 +108,6 @@ void SalGenericInstance::jobEndedPrinterUpdate()
 }
 
 using namespace psp;
-
-GenericUnixSalData::GenericUnixSalData(SalInstance *const pInstance)
-    : m_pDisplay(nullptr)
-    , m_pFreetypeManager(new FreetypeManager)
-    , m_pPrintFontManager(nullptr)
-{
-    m_pInstance = pInstance;
-    SetSalData(this);
-}
-
-GenericUnixSalData::~GenericUnixSalData()
-{
-}
-
-PrintFontManager::~PrintFontManager()
-{
-}
 
 bool AquaGraphicsBackend::drawNativeControl(ControlType /* nType */,
                                             ControlPart /* nPart */,

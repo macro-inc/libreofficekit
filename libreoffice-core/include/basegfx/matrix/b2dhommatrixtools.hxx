@@ -24,6 +24,7 @@
 #include <basegfx/vector/b2dvector.hxx>
 #include <basegfx/point/b2dpoint.hxx>
 #include <basegfx/tuple/b2dtuple.hxx>
+#include <utility>
 #include <basegfx/basegfxdllapi.h>
 
 namespace basegfx { class B2DRange; }
@@ -38,7 +39,7 @@ namespace basegfx::utils
             would introduce slight roundoff errors, instead of exactly
             mirroring the coordinate system)
          */
-        BASEGFX_DLLPUBLIC void createSinCosOrthogonal(double& o_rSin, double& rCos, double fRadiant);
+        void createSinCosOrthogonal(double& o_rSin, double& rCos, double fRadiant);
 
         /** Tooling methods for on-the-fly matrix generation e.g. for inline
             multiplications
@@ -128,7 +129,7 @@ namespace basegfx::utils
         /// special for creating a mapping for a Range rotated around it's center
         /// while keeping AspectRatio unchanged and staying inside the given Range
         /// by optimally using the available space (no overlap or outside allowed)
-        BASEGFX_DLLPUBLIC B2DHomMatrix createRotateAroundCenterKeepAspectRatioStayInsideRange(
+        B2DHomMatrix createRotateAroundCenterKeepAspectRatioStayInsideRange(
             const basegfx::B2DRange& rTargetRange,
             double fRotate);
 
@@ -197,8 +198,8 @@ namespace basegfx::utils
             }
 
         public:
-            B2DHomMatrixBufferedOnDemandDecompose(const B2DHomMatrix& rB2DHomMatrix = B2DHomMatrix())
-            :   maB2DHomMatrix(rB2DHomMatrix),
+            B2DHomMatrixBufferedOnDemandDecompose(B2DHomMatrix aB2DHomMatrix = B2DHomMatrix())
+            :   maB2DHomMatrix(std::move(aB2DHomMatrix)),
                 mfRotate(0.0),
                 mfShearX(0.0),
                 mbDecomposed(false)

@@ -49,7 +49,7 @@ public:
     virtual OOXMLValue* clone() const;
 };
 
-class OOXMLProperty : public Sprm
+class OOXMLProperty final : public Sprm
 {
 public:
     typedef tools::SvRef<OOXMLProperty> Pointer_t;
@@ -65,7 +65,7 @@ private:
     Type_t meType;
 
 public:
-    OOXMLProperty(Id id, const OOXMLValue::Pointer_t& pValue, Type_t eType);
+    OOXMLProperty(Id id, OOXMLValue::Pointer_t pValue, Type_t eType);
     OOXMLProperty(const OOXMLProperty& rSprm) = delete;
     virtual ~OOXMLProperty() override;
 
@@ -79,12 +79,12 @@ public:
     void resolve(Properties& rProperties);
 };
 
-class OOXMLBinaryValue : public OOXMLValue
+class OOXMLBinaryValue final : public OOXMLValue
 {
     mutable OOXMLBinaryObjectReference::Pointer_t mpBinaryObj;
 
 public:
-    explicit OOXMLBinaryValue(OOXMLBinaryObjectReference::Pointer_t const& pBinaryObj);
+    explicit OOXMLBinaryValue(OOXMLBinaryObjectReference::Pointer_t pBinaryObj);
     virtual ~OOXMLBinaryValue() override;
 
     virtual writerfilter::Reference<BinaryObj>::Pointer_t getBinary() override;
@@ -94,14 +94,14 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLBooleanValue : public OOXMLValue
+class OOXMLBooleanValue final : public OOXMLValue
 {
     bool mbValue;
     explicit OOXMLBooleanValue(bool bValue);
 
 public:
     static OOXMLValue::Pointer_t const& Create(bool bValue);
-    static OOXMLValue::Pointer_t const& Create(const char* pValue);
+    static OOXMLValue::Pointer_t const& Create(std::string_view pValue);
 
     virtual ~OOXMLBooleanValue() override;
 
@@ -118,12 +118,12 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLStringValue : public OOXMLValue
+class OOXMLStringValue final : public OOXMLValue
 {
     OUString mStr;
 
 public:
-    explicit OOXMLStringValue(const OUString& rStr);
+    explicit OOXMLStringValue(OUString sStr);
     virtual ~OOXMLStringValue() override;
 
     OOXMLStringValue(OOXMLStringValue const&) = default;
@@ -139,12 +139,12 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLInputStreamValue : public OOXMLValue
+class OOXMLInputStreamValue final : public OOXMLValue
 {
     css::uno::Reference<css::io::XInputStream> mxInputStream;
 
 public:
-    explicit OOXMLInputStreamValue(css::uno::Reference<css::io::XInputStream> const& xInputStream);
+    explicit OOXMLInputStreamValue(css::uno::Reference<css::io::XInputStream> xInputStream);
     virtual ~OOXMLInputStreamValue() override;
 
     virtual css::uno::Any getAny() const override;
@@ -154,7 +154,7 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLPropertySet : public writerfilter::Reference<Properties>
+class OOXMLPropertySet final : public writerfilter::Reference<Properties>
 {
 public:
     typedef std::vector<OOXMLProperty::Pointer_t> OOXMLProperties_t;
@@ -190,7 +190,7 @@ public:
 
 class OOXMLValue;
 
-class OOXMLTable : public writerfilter::Reference<Table>
+class OOXMLTable final : public writerfilter::Reference<Table>
 {
 public:
     typedef tools::SvRef<OOXMLValue> ValuePointer_t;
@@ -211,12 +211,12 @@ private:
     PropertySets_t mPropertySets;
 };
 
-class OOXMLPropertySetValue : public OOXMLValue
+class OOXMLPropertySetValue final : public OOXMLValue
 {
     OOXMLPropertySet::Pointer_t mpPropertySet;
 
 public:
-    explicit OOXMLPropertySetValue(const OOXMLPropertySet::Pointer_t& pPropertySet);
+    explicit OOXMLPropertySetValue(OOXMLPropertySet::Pointer_t pPropertySet);
     virtual ~OOXMLPropertySetValue() override;
 
     OOXMLPropertySetValue(OOXMLPropertySetValue const&) = default;
@@ -233,7 +233,7 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLIntegerValue : public OOXMLValue
+class OOXMLIntegerValue final : public OOXMLValue
 {
     sal_Int32 mnValue;
     explicit OOXMLIntegerValue(sal_Int32 nValue);
@@ -262,7 +262,7 @@ protected:
 
 public:
     explicit OOXMLHexValue(sal_uInt32 nValue);
-    explicit OOXMLHexValue(const char* pValue);
+    explicit OOXMLHexValue(std::string_view pValue);
     virtual ~OOXMLHexValue() override;
 
     OOXMLHexValue(OOXMLHexValue const&) = default;
@@ -277,10 +277,10 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLHexColorValue : public OOXMLHexValue
+class OOXMLHexColorValue final : public OOXMLHexValue
 {
 public:
-    explicit OOXMLHexColorValue(const char* pValue);
+    explicit OOXMLHexColorValue(std::string_view pValue);
 };
 
 class OOXMLUniversalMeasureValue : public OOXMLValue
@@ -289,7 +289,7 @@ private:
     int mnValue;
 
 public:
-    OOXMLUniversalMeasureValue(const char* pValue, sal_uInt32 npPt);
+    OOXMLUniversalMeasureValue(std::string_view pValue, sal_uInt32 npPt);
     virtual ~OOXMLUniversalMeasureValue() override;
 
     OOXMLUniversalMeasureValue(OOXMLUniversalMeasureValue const&) = default;
@@ -304,10 +304,10 @@ public:
 };
 
 /// npPt is quotient defining how much units are in 1 pt
-template <sal_uInt32 npPt> class OOXMLNthPtMeasureValue : public OOXMLUniversalMeasureValue
+template <sal_uInt32 npPt> class OOXMLNthPtMeasureValue final : public OOXMLUniversalMeasureValue
 {
 public:
-    explicit OOXMLNthPtMeasureValue(const char* pValue)
+    explicit OOXMLNthPtMeasureValue(std::string_view pValue)
         : OOXMLUniversalMeasureValue(pValue, npPt)
     {
     }
@@ -320,12 +320,12 @@ typedef OOXMLNthPtMeasureValue<20> OOXMLTwipsMeasureValue;
 /// Handles OOXML's ST_HpsMeasure value.
 typedef OOXMLNthPtMeasureValue<2> OOXMLHpsMeasureValue;
 
-class OOXMLMeasurementOrPercentValue : public OOXMLValue
+class OOXMLMeasurementOrPercentValue final : public OOXMLValue
 {
     int mnValue;
 
 public:
-    explicit OOXMLMeasurementOrPercentValue(const char* pValue);
+    explicit OOXMLMeasurementOrPercentValue(std::string_view pValue);
 
     virtual int getInt() const override;
     virtual OOXMLValue* clone() const override { return new OOXMLMeasurementOrPercentValue(*this); }
@@ -334,12 +334,12 @@ public:
 #endif
 };
 
-class OOXMLShapeValue : public OOXMLValue
+class OOXMLShapeValue final : public OOXMLValue
 {
     css::uno::Reference<css::drawing::XShape> mrShape;
 
 public:
-    explicit OOXMLShapeValue(css::uno::Reference<css::drawing::XShape> const& rShape);
+    explicit OOXMLShapeValue(css::uno::Reference<css::drawing::XShape> xShape);
     virtual ~OOXMLShapeValue() override;
 
     virtual css::uno::Any getAny() const override;
@@ -349,12 +349,12 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLStarMathValue : public OOXMLValue
+class OOXMLStarMathValue final : public OOXMLValue
 {
     css::uno::Reference<css::embed::XEmbeddedObject> component;
 
 public:
-    explicit OOXMLStarMathValue(css::uno::Reference<css::embed::XEmbeddedObject> const& component);
+    explicit OOXMLStarMathValue(css::uno::Reference<css::embed::XEmbeddedObject> component);
     virtual ~OOXMLStarMathValue() override;
 
     virtual css::uno::Any getAny() const override;
@@ -364,7 +364,7 @@ public:
     virtual OOXMLValue* clone() const override;
 };
 
-class OOXMLPropertySetEntryToString : public Properties
+class OOXMLPropertySetEntryToString final : public Properties
 {
     Id mnId;
     OUString mStr;
@@ -379,7 +379,7 @@ public:
     const OUString& getString() const { return mStr; }
 };
 
-class OOXMLPropertySetEntryToInteger : public Properties
+class OOXMLPropertySetEntryToInteger final : public Properties
 {
     Id mnId;
     int mnValue;
@@ -394,7 +394,7 @@ public:
     int getValue() const { return mnValue; }
 };
 
-class OOXMLPropertySetEntryToBool : public Properties
+class OOXMLPropertySetEntryToBool final : public Properties
 {
     Id mnId;
     bool mValue;

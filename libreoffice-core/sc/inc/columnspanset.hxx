@@ -11,6 +11,7 @@
 
 #include "address.hxx"
 
+#include <optional>
 #include <vector>
 #include <mdds/flat_segment_tree.hpp>
 
@@ -57,9 +58,10 @@ private:
         ColumnSpansType::const_iterator miPos;
 
         ColumnType(SCROW nStart, SCROW nEnd, bool bInit);
+        ColumnType(const ColumnType& rOther);
     };
 
-    typedef std::vector<std::unique_ptr<ColumnType>> TableType;
+    typedef std::vector<std::optional<ColumnType>> TableType;
 
     std::vector<TableType> maTables;
 

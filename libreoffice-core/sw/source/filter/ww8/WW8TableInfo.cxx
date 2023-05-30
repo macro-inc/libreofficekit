@@ -28,6 +28,7 @@
 #include <dbgoutsw.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
+#include <rtl/string.hxx>
 
 namespace ww8
 {
@@ -46,10 +47,6 @@ WW8TableNodeInfoInner::WW8TableNodeInfoInner(WW8TableNodeInfo * pParent)
 , mbVertMerge(false)
 , mpTableBox(nullptr)
 , mpTable(nullptr)
-{
-}
-
-WW8TableNodeInfoInner::~WW8TableNodeInfoInner()
 {
 }
 
@@ -580,7 +577,7 @@ WW8TableInfo::processSwTableByLayout(const SwTable * pTable, RowEndInners_t &rLa
             bool bDone = false;
             do
             {
-                SwNode & rNode = aPam.GetPoint()->nNode.GetNode();
+                SwNode & rNode = aPam.GetPoint()->GetNode();
 
                 insertTableNodeInfo(&rNode, pTable, pTableBox, 0, 0, 1, & aRect);
 
@@ -593,7 +590,7 @@ WW8TableInfo::processSwTableByLayout(const SwTable * pTable, RowEndInners_t &rLa
                         bDone = true;
                 }
 
-                aPam.GetPoint()->nNode++;
+                aPam.GetPoint()->Adjust(SwNodeOffset(1));
             }
             while (!bDone);
         }
@@ -705,14 +702,14 @@ WW8TableInfo::processTableBoxLines(const SwTableBox * pBox,
         bool bDone = false;
         while (!bDone)
         {
-            SwNode & rNode = aPaM.GetPoint()->nNode.GetNode();
+            SwNode & rNode = aPaM.GetPoint()->GetNode();
 
             pNodeInfo = insertTableNodeInfo(&rNode, pTable, pBoxToSet, nRow, nCell, nDepth);
 
-            if (aPaM.GetPoint()->nNode == aEndPaM.GetPoint()->nNode)
+            if (aPaM.GetPoint()->GetNode() == aEndPaM.GetPoint()->GetNode())
                 bDone = true;
             else
-                aPaM.GetPoint()->nNode++;
+                aPaM.GetPoint()->Adjust(SwNodeOffset(1));
         }
     }
 
@@ -775,7 +772,7 @@ WW8TableInfo::processTableBox(const SwTable * pTable,
 
         do
         {
-            SwNode & rNode = aPaM.GetPoint()->nNode.GetNode();
+            SwNode & rNode = aPaM.GetPoint()->GetNode();
 
             if (rNode.IsStartNode())
             {
@@ -808,7 +805,7 @@ WW8TableInfo::processTableBox(const SwTable * pTable,
                     bDone = true;
             }
 
-            aPaM.GetPoint()->nNode++;
+            aPaM.GetPoint()->Adjust(SwNodeOffset(1));
         }
         while (!bDone);
 
@@ -1278,8 +1275,9 @@ std::string WW8TableCellGrid::toString()
     static char sBuffer[1024];
     while (aTopsIt != getRowTopsEnd())
     {
-        sprintf(sBuffer, "<row y=\"%" SAL_PRIdINT64 "\">", sal_Int64(*aTopsIt));
-        sResult += sBuffer;
+        sResult += "<row y=\"";
+        sResult += OString::number(*aTopsIt).getStr();
+        sResult += "\">";
 
         CellInfoMultiSet::const_iterator aCellIt = getCellsBegin(*aTopsIt);
         CellInfoMultiSet::const_iterator aCellsEnd = getCellsEnd(*aTopsIt);

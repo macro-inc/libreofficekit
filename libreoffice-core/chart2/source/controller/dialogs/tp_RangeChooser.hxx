@@ -24,11 +24,10 @@
 #include <vcl/wizardmachine.hxx>
 
 namespace chart { class TabPageNotifiable; }
-namespace com::sun::star::chart2 { class XChartTypeTemplate; }
 
 namespace chart
 {
-
+class ChartTypeTemplate;
 class ChartTypeTemplateProvider;
 class DialogModel;
 
@@ -72,14 +71,13 @@ private:
     bool            m_bIsDirty;
 
     OUString                                                m_aLastValidRangeString;
-    css::uno::Reference< css::chart2::XChartTypeTemplate >  m_xCurrentChartTypeTemplate;
+    rtl::Reference< ::chart::ChartTypeTemplate >            m_xCurrentChartTypeTemplate;
     ChartTypeTemplateProvider*                              m_pTemplateProvider;
 
     DialogModel &                                           m_rDialogModel;
     TabPageNotifiable *                                     m_pTabPageNotifiable;
 
     std::unique_ptr<weld::Label> m_xFT_Caption;
-    std::unique_ptr<weld::Label> m_xFT_Range;
     std::unique_ptr<weld::Entry> m_xED_Range;
     std::unique_ptr<weld::Button> m_xIB_Range;
     std::unique_ptr<weld::RadioButton> m_xRB_Rows;

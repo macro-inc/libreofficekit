@@ -20,8 +20,9 @@
 #ifndef INCLUDED_SW_INC_EDIMP_HXX
 #define INCLUDED_SW_INC_EDIMP_HXX
 
-#include <tools/solar.h>
 #include <o3tl/sorted_vector.hxx>
+
+#include "nodeoffset.hxx"
 
 class SwPaM;
 class SwNodeIndex;
@@ -43,7 +44,7 @@ class SwPamRanges
 public:
     SwPamRanges( const SwPaM& rRing );
 
-    void Insert( const SwNodeIndex& rIdx1, const SwNodeIndex& rIdx2 );
+    void Insert( const SwNode& rIdx1, const SwNode& rIdx2 );
     SwPaM& SetPam( size_t nArrPos, SwPaM& rPam );
 
     size_t Count() const

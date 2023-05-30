@@ -22,10 +22,12 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <o3tl/safeint.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 
+#include <utility>
 #include <vcl/metaact.hxx>
 #include <vcl/print.hxx>
 #include <vcl/printer/Options.hxx>
@@ -203,6 +205,7 @@ public:
         mbOrientationFromUser( false ),
         mbPrinterModified( false ),
         meJobState( css::view::PrintableState_JOB_STARTED ),
+        meUserOrientation( Orientation::Portrait ),
         mnDefaultPaperBin( -1 ),
         mnFixedPaperBin( -1 )
     {}
@@ -232,7 +235,7 @@ public:
             if ( (meUserOrientation == Orientation::Portrait && size.Width() > size.Height()) ||
                  (meUserOrientation == Orientation::Landscape && size.Width() < size.Height()) )
             {
-                // coverity[swapped-arguments : FALSE] - this is in the correct order
+                // coverity[swapped_arguments : FALSE] - this is in the correct order
                 size = Size( size.Height(), size.Width() );
             }
         }
@@ -300,9 +303,9 @@ struct PrintJobAsync
     std::shared_ptr<PrinterController>  mxController;
     JobSetup                            maInitSetup;
 
-    PrintJobAsync(const std::shared_ptr<PrinterController>& i_xController,
+    PrintJobAsync(std::shared_ptr<PrinterController>  i_xController,
                   const JobSetup& i_rInitSetup)
-    : mxController( i_xController ), maInitSetup( i_rInitSetup )
+    : mxController(std::move( i_xController )), maInitSetup( i_rInitSetup )
     {}
 
     DECL_LINK( ExecJob, void*, void );
@@ -348,7 +351,7 @@ bool Printer::PreparePrintJob(std::shared_ptr<PrinterController> xController,
             xBox->run();
         }
         xController->setValue( "IsDirect",
-                               css::uno::makeAny( false ) );
+                               css::uno::Any( false ) );
     }
 
     // setup printer
@@ -424,7 +427,7 @@ bool Printer::PreparePrintJob(std::shared_ptr<PrinterController> xController,
                             aBuf.append( "-" );
                             aBuf.append( nPages );
                         }
-                        xController->setValue("PageRange", css::uno::makeAny(aBuf.makeStringAndClear()));
+                        xController->setValue("PageRange", css::uno::Any(aBuf.makeStringAndClear()));
                     }
                 }
             }
@@ -524,7 +527,7 @@ bool Printer::PreparePrintJob(std::shared_ptr<PrinterController> xController,
                     return false;
                 }
                 xController->setValue( "LocalFileName",
-                                       css::uno::makeAny( aFile ) );
+                                       css::uno::Any( aFile ) );
             }
             else if (aDlg.isSingleJobs())
             {
@@ -535,6 +538,16 @@ bool Printer::PreparePrintJob(std::shared_ptr<PrinterController> xController,
         {
         }
     }
+#ifdef MACOSX
+    else
+    {
+        // The PrintDialog updates the printer list in its constructor so do
+        // the same for printers that bring up their own dialog since. Not
+        // sure if this is needed or not on Windows or X11, so limit only to
+        // macOS for now.
+        Printer::updatePrinters();
+    }
+#endif
 
     xController->pushPropertiesToPrinter();
     return true;
@@ -827,7 +840,7 @@ void PrinterController::setPrinter( const VclPtr<Printer>& i_rPrinter )
 
     mpImplData->mxPrinter = i_rPrinter;
     setValue( "Name",
-              css::uno::makeAny( i_rPrinter->GetName() ) );
+              css::uno::Any( i_rPrinter->GetName() ) );
     mpImplData->mnDefaultPaperBin = mpImplData->mxPrinter->GetPaperBin();
     mpImplData->mxPrinter->Push();
     mpImplData->mxPrinter->SetMapMode(MapMode(MapUnit::Map100thMM));
@@ -948,7 +961,7 @@ PrinterController::PageSize vcl::ImplPrinterControllerData::modifyJobSetup( cons
         {
             sal_Int32 nBin = -1;
             rProp.Value >>= nBin;
-            if( nBin >= 0 && nBin < static_cast<sal_Int32>(mxPrinter->GetPaperBinCount()) )
+            if( nBin >= 0 && o3tl::make_unsigned(nBin) < mxPrinter->GetPaperBinCount() )
                 nPaperBin = nBin;
         }
     }
@@ -1699,12 +1712,12 @@ OUString PrinterController::makeEnabled( const OUString& i_rProperty )
                {
                    if( it->second.mnDependsOnEntry != -1 )
                    {
-                       setValue( aDependency, css::uno::makeAny( sal_Int32( it->second.mnDependsOnEntry ) ) );
+                       setValue( aDependency, css::uno::Any( sal_Int32( it->second.mnDependsOnEntry ) ) );
                    }
                }
                else if( pVal->Value >>= bDepVal )
                {
-                   setValue( aDependency, css::uno::makeAny( it->second.mnDependsOnEntry != 0 ) );
+                   setValue( aDependency, css::uno::Any( it->second.mnDependsOnEntry != 0 ) );
                }
                else
                {
@@ -1983,7 +1996,7 @@ css::uno::Any PrinterOptionsHelper::setUIControlOpt(const css::uno::Sequence< OU
 
     SAL_WARN_IF( nUsed != nElements, "vcl.gdi", "nUsed != nElements, probable heap corruption" );
 
-    return css::uno::makeAny( aCtrl );
+    return css::uno::Any( aCtrl );
 }
 
 css::uno::Any PrinterOptionsHelper::setGroupControlOpt(const OUString& i_rID,

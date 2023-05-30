@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-10-20 13:08+0200\n"
-"PO-Revision-Date: 2022-08-03 22:48+0000\n"
-"Last-Translator: HanV <han.velthuis@home.nl>\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2022-11-22 14:11+0000\n"
+"Last-Translator: kees538 <kees538@gmail.com>\n"
 "Language-Team: Dutch <https://translations.documentfoundation.org/projects/libo_help-master/textsimpress00/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -538,23 +538,23 @@ msgctxt ""
 msgid "<variable id=\"uebersicht\">Choose <emph>Insert - Summary Slide</emph></variable>"
 msgstr "<variable id=\"uebersicht\">Kies <emph>Invoegen - Overzichtsdia</emph>.</variable>"
 
-#. Hrdda
+#. DGgU7
 #: 00000404.xhp
 msgctxt ""
 "00000404.xhp\n"
 "par_id3147002\n"
 "help.text"
-msgid "Choose <emph>Insert - Layer</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
-msgstr "Kies <emph>Invoegen - Laag</emph> (alleen in <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+msgid "Choose <menuitem>Insert - Layer</menuitem>"
+msgstr "Kies <menuitem>Invoegen - Laag</menuitem>"
 
-#. EZDXv
+#. FBCVR
 #: 00000404.xhp
 msgctxt ""
 "00000404.xhp\n"
 "par_id3150363\n"
 "help.text"
-msgid "Open context menu of layer tabs - choose <emph>Insert Layer</emph> (<item type=\"productname\">%PRODUCTNAME</item> Draw only)"
-msgstr "Klik met de rechtermuisknop op een laagtab en kies <emph>Laag invoegen</emph> (alleen in <item type=\"productname\">%PRODUCTNAME</item> Draw)"
+msgid "Open context menu of layer tabs - choose <menuitem>Insert Layer</menuitem>"
+msgstr "Open het contextmenu of de lagentabs - kies <menuitem>Laag invoegen</menuitem>"
 
 #. j8G6i
 #: 00000404.xhp
@@ -763,23 +763,23 @@ msgctxt ""
 msgid "On the <emph>Lines and Arrows</emph> toolbar, click the <emph>Dimension Line</emph> icon."
 msgstr "Klik op het pictogram <emph>Maatlijn</emph> op de werkbalk <emph>Lijnen en pijlen</emph>."
 
-#. s6Euy
-#: 00000405.xhp
-msgctxt ""
-"00000405.xhp\n"
-"par_id3152874\n"
-"help.text"
-msgid "In a Draw document, right-click a layer tab and choose <emph>Modify Layer</emph>"
-msgstr "Klik in een Draw-document met de rechtermuisknop op een laagtab en kies <emph>Laag wijzigen</emph>"
-
-#. XDEfU
+#. Jjg8J
 #: 00000405.xhp
 msgctxt ""
 "00000405.xhp\n"
 "par_id3154765\n"
 "help.text"
-msgid "Choose <emph>Format - Layer</emph> (only $[officename] Draw)"
-msgstr "Kies <emph>Opmaak - Laag</emph> (alleen in $[officename] Draw)"
+msgid "Select the layer and choose <menuitem>Format - Layer</menuitem>"
+msgstr "Selecteer de laag en kies <menuitem>Opmaak - Laag</menuitem>"
+
+#. pkbfA
+#: 00000405.xhp
+msgctxt ""
+"00000405.xhp\n"
+"par_id3152874\n"
+"help.text"
+msgid "Open context menu of the layer tab - choose <menuitem>Modify Layer</menuitem>"
+msgstr "Open het contextmenu van de lagentab - kies <menuitem>Laag wijzigen</menuitem>"
 
 #. i9rFk
 #: 00000405.xhp

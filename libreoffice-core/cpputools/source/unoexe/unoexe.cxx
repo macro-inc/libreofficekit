@@ -18,6 +18,7 @@
  */
 
 #include <stdio.h>
+#include <mutex>
 #include <string_view>
 
 #include <sal/main.h>
@@ -28,9 +29,6 @@
 #include <osl/conditn.hxx>
 
 #include <rtl/process.h>
-#include <rtl/string.h>
-#include <rtl/strbuf.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <rtl/ref.hxx>
 
 #include <cppuhelper/bootstrap.hxx>
@@ -48,6 +46,7 @@
 #include <com/sun/star/connection/XConnection.hpp>
 #include <com/sun/star/bridge/XBridgeFactory.hpp>
 #include <com/sun/star/bridge/XBridge.hpp>
+#include <utility>
 
 using namespace osl;
 using namespace cppu;
@@ -173,14 +172,14 @@ static Reference< XInterface > loadComponent(
 
     Reference< XImplementationLoader > xLoader;
 
-    OUString aExt( rLocation.copy( nDot +1 ) );
+    std::u16string_view aExt( rLocation.subView( nDot +1 ) );
 
-    if (aExt == "dll" || aExt == "exe" || aExt == "dylib" || aExt == "so")
+    if (aExt == u"dll" || aExt == u"exe" || aExt == u"dylib" || aExt == u"so")
     {
         createInstance(
             xLoader, xContext, "com.sun.star.loader.SharedLibrary" );
     }
-    else if (aExt == "jar" || aExt == "class")
+    else if (aExt == u"jar" || aExt == u"class")
     {
         createInstance(
             xLoader, xContext, "com.sun.star.loader.Java" );
@@ -232,7 +231,7 @@ class OInstanceProvider
 {
     Reference< XComponentContext > _xContext;
 
-    Mutex                             _aSingleInstanceMutex;
+    std::mutex                        _aSingleInstanceMutex;
     Reference< XInterface >           _xSingleInstance;
     bool                              _bSingleInstance;
 
@@ -248,16 +247,16 @@ class OInstanceProvider
 
 public:
     OInstanceProvider( const Reference< XComponentContext > & xContext,
-                       const OUString & rImplName, const OUString & rLocation,
-                       const OUString & rServiceName, const Sequence< Any > & rInitParams,
-                       bool bSingleInstance, const OUString & rInstanceName )
+                       OUString aImplName, OUString aLocation,
+                       OUString aServiceName, const Sequence< Any > & rInitParams,
+                       bool bSingleInstance, OUString aInstanceName )
         : _xContext( xContext )
         , _bSingleInstance( bSingleInstance )
-        , _aImplName( rImplName )
-        , _aLocation( rLocation )
-        , _aServiceName( rServiceName )
+        , _aImplName(std::move( aImplName ))
+        , _aLocation(std::move( aLocation ))
+        , _aServiceName(std::move( aServiceName ))
         , _aInitParams( rInitParams )
-        , _aInstanceName( rInstanceName )
+        , _aInstanceName(std::move( aInstanceName ))
         {}
 
     // XInstanceProvider
@@ -299,7 +298,7 @@ Reference< XInterface > OInstanceProvider::getInstance( const OUString & rName )
             {
                 if (! _xSingleInstance.is())
                 {
-                    MutexGuard aGuard( _aSingleInstanceMutex );
+                    std::lock_guard aGuard( _aSingleInstanceMutex );
                     if (! _xSingleInstance.is())
                     {
                         _xSingleInstance = createInstance();

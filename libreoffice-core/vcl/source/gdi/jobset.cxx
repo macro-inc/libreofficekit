@@ -30,6 +30,9 @@
 
 namespace {
 
+// used only for compatibility with older versions,
+// printer/driver name are truncated if too long,
+// device name and port name are completely unused
 struct ImplOldJobSetupData
 {
     char    cPrinterName[64];
@@ -259,9 +262,11 @@ SvStream& ReadJobSetup( SvStream& rIStream, JobSetup& rJobSetup )
 
             ImplJobSetup& rJobData = rJobSetup.ImplGetData();
 
-            pData->cPrinterName[SAL_N_ELEMENTS(pData->cPrinterName) - 1] = 0;
+            // use (potentially truncated) printer/driver name from ImplOldJobSetupData as fallback,
+            // gets overwritten below if PRINTER_NAME/DRIVER_NAME keys are set
+            pData->cPrinterName[std::size(pData->cPrinterName) - 1] = 0;
             rJobData.SetPrinterName( OStringToOUString(pData->cPrinterName, aStreamEncoding) );
-            pData->cDriverName[SAL_N_ELEMENTS(pData->cDriverName) - 1] = 0;
+            pData->cDriverName[std::size(pData->cDriverName) - 1] = 0;
             rJobData.SetDriver( OStringToOUString(pData->cDriverName, aStreamEncoding) );
 
             // Are these our new JobSetup files?
@@ -327,6 +332,10 @@ SvStream& ReadJobSetup( SvStream& rIStream, JobSetup& rJobSetup )
                             else if( aValue == "DuplexMode::LongEdge" )
                                 rJobData.SetDuplexMode( DuplexMode::LongEdge );
                         }
+                        else if (aKey == u"PRINTER_NAME")
+                            rJobData.SetPrinterName(aValue);
+                        else if (aKey == u"DRIVER_NAME")
+                            rJobData.SetDriver(aValue);
                         else
                             rJobData.SetValueMap(aKey, aValue);
                     }
@@ -363,9 +372,9 @@ SvStream& WriteJobSetup( SvStream& rOStream, const JobSetup& rJobSetup )
 
             ImplOldJobSetupData aOldData = {};
             OString aPrnByteName(OUStringToOString(rJobData.GetPrinterName(), RTL_TEXTENCODING_UTF8));
-            strncpy(aOldData.cPrinterName, aPrnByteName.getStr(), SAL_N_ELEMENTS(aOldData.cPrinterName) - 1);
+            strncpy(aOldData.cPrinterName, aPrnByteName.getStr(), std::size(aOldData.cPrinterName) - 1);
             OString aDriverByteName(OUStringToOString(rJobData.GetDriver(), RTL_TEXTENCODING_UTF8));
-            strncpy(aOldData.cDriverName, aDriverByteName.getStr(), SAL_N_ELEMENTS(aOldData.cDriverName) - 1);
+            strncpy(aOldData.cDriverName, aDriverByteName.getStr(), std::size(aOldData.cDriverName) - 1);
             int nPos = rOStream.Tell();
             rOStream.WriteUInt16( 0 );
             rOStream.WriteUInt16( JOBSET_FILE605_SYSTEM );
@@ -397,6 +406,12 @@ SvStream& WriteJobSetup( SvStream& rOStream, const JobSetup& rJobSetup )
                     write_uInt16_lenPrefixed_uInt8s_FromOString(rOStream, "DuplexMode::LongEdge");
                     break;
             }
+            // write printer, driver name in full, the ones in aOldData may be truncated
+            write_uInt16_lenPrefixed_uInt8s_FromOUString(rOStream, u"PRINTER_NAME", RTL_TEXTENCODING_UTF8);
+            write_uInt16_lenPrefixed_uInt8s_FromOUString(rOStream, rJobData.GetPrinterName(), RTL_TEXTENCODING_UTF8);
+            write_uInt16_lenPrefixed_uInt8s_FromOUString(rOStream, u"DRIVER_NAME", RTL_TEXTENCODING_UTF8);
+            write_uInt16_lenPrefixed_uInt8s_FromOUString(rOStream, rJobData.GetDriver(), RTL_TEXTENCODING_UTF8);
+
             nLen = sal::static_int_cast<sal_uInt16>(rOStream.Tell() - nPos);
             rOStream.Seek( nPos );
             rOStream.WriteUInt16( nLen );

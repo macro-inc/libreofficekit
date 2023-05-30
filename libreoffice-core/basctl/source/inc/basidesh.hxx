@@ -26,7 +26,7 @@
 #include <sfx2/viewsh.hxx>
 #include <svx/ifaceids.hxx>
 #include <svl/srchitem.hxx>
-#include <vcl/scrbar.hxx>
+#include <svtools/scrolladaptor.hxx>
 #include <map>
 #include <memory>
 #include <string_view>
@@ -40,6 +40,12 @@ class StarBASIC;
 
 namespace basctl
 {
+
+// Used to control zoom level
+constexpr sal_uInt16 MIN_ZOOM_LEVEL = 50;
+constexpr sal_uInt16 DEFAULT_ZOOM_LEVEL = 100;
+constexpr sal_uInt16 MAX_ZOOM_LEVEL = 400;
+
 class Layout;
 class ModulWindow;
 class ModulWindowLayout;
@@ -68,9 +74,10 @@ private:
     OUString            m_aCurLibName;
     std::shared_ptr<LocalizationMgr> m_pCurLocalizationMgr;
 
-    VclPtr<ScrollBar>    aHScrollBar;
-    VclPtr<ScrollBar>    aVScrollBar;
-    VclPtr<ScrollBarBox> aScrollBarBox;
+    // Current value of the zoom slider
+    sal_uInt16            m_nCurrentZoomSliderValue;
+    VclPtr<ScrollAdaptor> aHScrollBar;
+    VclPtr<ScrollAdaptor> aVScrollBar;
     VclPtr<TabBar>       pTabBar;           // basctl::TabBar
     bool                 bCreatingWindow;
 
@@ -93,13 +100,13 @@ private:
     void                Init();
     void                InitTabBar();
     void                InitScrollBars();
+    void                InitZoomLevel();
     void                CheckWindows();
     void                RemoveWindows( const ScriptDocument& rDocument, std::u16string_view rLibName );
     void                UpdateWindows();
     static void         InvalidateBasicIDESlots();
     void                StoreAllWindowData( bool bPersistent = true );
     void                SetMDITitle();
-    void                EnableScrollbars( bool bEnable );
     void                SetCurLib( const ScriptDocument& rDocument, const OUString& aLibName, bool bUpdateWindows = true , bool bCheck = true );
     void                SetCurLibForLocalization( const ScriptDocument& rDocument, const OUString& aLibName );
 
@@ -164,12 +171,17 @@ public:
 
     SfxUndoManager*     GetUndoManager() override;
 
+    void                SetGlobalEditorZoomLevel(sal_uInt16 nNewZoomLevel);
+    sal_uInt16          GetCurrentZoomSliderValue() { return m_nCurrentZoomSliderValue; }
+    static sal_uInt16   GetMinZoom() { return MIN_ZOOM_LEVEL; }
+    static sal_uInt16   GetMaxZoom() { return MAX_ZOOM_LEVEL; }
+
     virtual css::uno::Reference< css::view::XRenderable > GetRenderable() override;
 
     // virtual sal_uInt16           Print( SfxProgress &rProgress, sal_Bool bIsAPI, PrintDialog *pPrintDialog = 0 );
     virtual SfxPrinter*     GetPrinter( bool bCreate = false ) override;
     virtual sal_uInt16      SetPrinter( SfxPrinter *pNewPrinter, SfxPrinterChangeFlags nDiffFlags = SFX_PRINTER_ALL ) override;
-    virtual OUString        GetSelectionText( bool bCompleteWords = false ) override;
+    virtual OUString        GetSelectionText( bool bCompleteWords = false, bool bOnlyASample = false ) override;
     virtual bool            HasSelection( bool bText = true ) const override;
 
     void                GetState( SfxItemSet& );

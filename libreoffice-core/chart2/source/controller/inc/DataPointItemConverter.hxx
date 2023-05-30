@@ -23,6 +23,7 @@
 #include <com/sun/star/uno/Sequence.h>
 
 #include <tools/color.hxx>
+#include <rtl/ref.hxx>
 
 #include <vector>
 
@@ -30,19 +31,20 @@ namespace com::sun::star::awt { struct Size; }
 namespace com::sun::star::chart2 { class XDataSeries; }
 namespace com::sun::star::frame { class XModel; }
 namespace com::sun::star::uno { class XComponentContext; }
-
+namespace chart { class ChartModel; }
+namespace chart { class DataSeries; }
 class SdrModel;
 
 namespace chart::wrapper {
 
-class DataPointItemConverter : public ItemConverter
+class DataPointItemConverter final : public ItemConverter
 {
 public:
     DataPointItemConverter(
-        const css::uno::Reference<css::frame::XModel>& xChartModel,
+        const rtl::Reference<::chart::ChartModel>& xChartModel,
         const css::uno::Reference<css::uno::XComponentContext>& xContext,
         const css::uno::Reference<css::beans::XPropertySet>& rPropertySet,
-        const css::uno::Reference<css::chart2::XDataSeries>& xSeries,
+        const rtl::Reference<::chart::DataSeries>& xSeries,
         SfxItemPool& rItemPool,
         SdrModel& rDrawModel,
         const css::uno::Reference<css::lang::XMultiServiceFactory>& xNamedPropertyContainerFactory,
@@ -80,7 +82,7 @@ private:
     bool                                m_bForbidPercentValue;
     bool                                m_bHideLegendEntry;
     sal_Int32                           m_nPointIndex;
-    css::uno::Reference<css::chart2::XDataSeries> m_xSeries;
+    rtl::Reference<::chart::DataSeries> m_xSeries;
 };
 
 }

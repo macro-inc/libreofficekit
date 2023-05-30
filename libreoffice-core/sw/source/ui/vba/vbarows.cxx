@@ -25,6 +25,7 @@
 #include <ooo/vba/word/WdConstants.hpp>
 #include <ooo/vba/word/WdRulerStyle.hpp>
 #include <basic/sberrors.hxx>
+#include <utility>
 #include "vbacolumns.hxx"
 #include "vbatablehelper.hxx"
 
@@ -42,7 +43,7 @@ class RowsEnumWrapper : public EnumerationHelper_BASE
     sal_Int32 nIndex;
 
 public:
-    RowsEnumWrapper( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< text::XTextTable >& xTextTable ) : mxParent( xParent ), mxContext( xContext ), mxTextTable( xTextTable ), nIndex( 0 )
+    RowsEnumWrapper( const uno::Reference< XHelperInterface >& xParent, uno::Reference< uno::XComponentContext >  xContext, uno::Reference< text::XTextTable >  xTextTable ) : mxParent( xParent ), mxContext(std::move( xContext )), mxTextTable(std::move( xTextTable )), nIndex( 0 )
     {
         mxIndexAccess = mxTextTable->getRows();
     }
@@ -55,7 +56,7 @@ public:
     {
         if( nIndex < mxIndexAccess->getCount() )
         {
-            return uno::makeAny( uno::Reference< word::XRow > ( new SwVbaRow( mxParent, mxContext, mxTextTable, nIndex++ ) ) );
+            return uno::Any( uno::Reference< word::XRow > ( new SwVbaRow( mxParent, mxContext, mxTextTable, nIndex++ ) ) );
         }
         throw container::NoSuchElementException();
     }
@@ -63,13 +64,13 @@ public:
 
 }
 
-SwVbaRows::SwVbaRows( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, const uno::Reference< text::XTextTable >& xTextTable, const uno::Reference< table::XTableRows >& xTableRows ) : SwVbaRows_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( xTableRows, uno::UNO_QUERY_THROW ) ), mxTextTable( xTextTable ), mxTableRows( xTableRows )
+SwVbaRows::SwVbaRows( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, uno::Reference< text::XTextTable >  xTextTable, const uno::Reference< table::XTableRows >& xTableRows ) : SwVbaRows_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( xTableRows, uno::UNO_QUERY_THROW ) ), mxTextTable(std::move( xTextTable )), mxTableRows( xTableRows )
 {
     mnStartRowIndex = 0;
     mnEndRowIndex = m_xIndexAccess->getCount() - 1;
 }
 
-SwVbaRows::SwVbaRows( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, const uno::Reference< text::XTextTable >& xTextTable, const uno::Reference< table::XTableRows >& xTableRows, sal_Int32 nStarIndex, sal_Int32 nEndIndex ) : SwVbaRows_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( xTableRows, uno::UNO_QUERY_THROW ) ), mxTextTable( xTextTable ), mxTableRows( xTableRows ), mnStartRowIndex( nStarIndex ), mnEndRowIndex( nEndIndex )
+SwVbaRows::SwVbaRows( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext > & xContext, uno::Reference< text::XTextTable >  xTextTable, const uno::Reference< table::XTableRows >& xTableRows, sal_Int32 nStarIndex, sal_Int32 nEndIndex ) : SwVbaRows_BASE( xParent, xContext, uno::Reference< container::XIndexAccess >( xTableRows, uno::UNO_QUERY_THROW ) ), mxTextTable(std::move( xTextTable )), mxTableRows( xTableRows ), mnStartRowIndex( nStarIndex ), mnEndRowIndex( nEndIndex )
 {
     if( mnEndRowIndex < mnStartRowIndex )
         throw uno::RuntimeException();
@@ -127,7 +128,7 @@ void SAL_CALL SwVbaRows::setAlignment( ::sal_Int32 _alignment )
         }
     }
     uno::Reference< beans::XPropertySet > xTableProps( mxTextTable, uno::UNO_QUERY_THROW );
-    xTableProps->setPropertyValue("HoriOrient", uno::makeAny( nAlignment ) );
+    xTableProps->setPropertyValue("HoriOrient", uno::Any( nAlignment ) );
 }
 
 uno::Any SAL_CALL SwVbaRows::getAllowBreakAcrossPages()
@@ -145,10 +146,10 @@ uno::Any SAL_CALL SwVbaRows::getAllowBreakAcrossPages()
         }
         if( bSplit != bAllowBreak )
         {
-            return uno::makeAny( sal_Int32(word::WdConstants::wdUndefined) );
+            return uno::Any( sal_Int32(word::WdConstants::wdUndefined) );
         }
     }
-    return uno::makeAny( bAllowBreak );
+    return uno::Any( bAllowBreak );
 }
 
 void SAL_CALL SwVbaRows::setAllowBreakAcrossPages( const uno::Any& _allowbreakacrosspages )
@@ -159,7 +160,7 @@ void SAL_CALL SwVbaRows::setAllowBreakAcrossPages( const uno::Any& _allowbreakac
     for( sal_Int32 index = mnStartRowIndex; index <= mnEndRowIndex; ++index )
     {
         uno::Reference< beans::XPropertySet > xRowProps( xRowsAccess->getByIndex( index ), uno::UNO_QUERY_THROW );
-        xRowProps->setPropertyValue("IsSplitAllowed", uno::makeAny( bAllowBreak ) );
+        xRowProps->setPropertyValue("IsSplitAllowed", uno::Any( bAllowBreak ) );
     }
 }
 
@@ -187,8 +188,8 @@ void SAL_CALL SwVbaRows::setSpaceBetweenColumns( float _spacebetweencolumns )
         for( sal_Int32 column = 0; column < nColumns; ++column )
         {
             uno::Reference< beans::XPropertySet > xCellProps( xCellRange->getCellByPosition( column, row ), uno::UNO_QUERY_THROW );
-            xCellProps->setPropertyValue("LeftBorderDistance", uno::makeAny( nSpace ) );
-            xCellProps->setPropertyValue("RightBorderDistance", uno::makeAny( nSpace ) );
+            xCellProps->setPropertyValue("LeftBorderDistance", uno::Any( nSpace ) );
+            xCellProps->setPropertyValue("RightBorderDistance", uno::Any( nSpace ) );
         }
     }
 }
@@ -237,13 +238,13 @@ void SwVbaRows::setIndentWithAdjustNone( sal_Int32 indent )
     sal_Int32 nMargin = 0;
     xTableProps->getPropertyValue("LeftMargin") >>= nMargin;
     nMargin += indent;
-    xTableProps->setPropertyValue("LeftMargin", uno::makeAny( nMargin ) );
+    xTableProps->setPropertyValue("LeftMargin", uno::Any( nMargin ) );
 }
 
  void SwVbaRows::setIndentWithAdjustFirstColumn( const uno::Reference< word::XColumns >& xColumns, sal_Int32 indent )
  {
     uno::Reference< XCollection > xCol( xColumns, uno::UNO_QUERY_THROW );
-    uno::Reference< word::XColumn > xColumn( xCol->Item( uno::makeAny( sal_Int32(1) ), uno::Any() ), uno::UNO_QUERY_THROW );
+    uno::Reference< word::XColumn > xColumn( xCol->Item( uno::Any( sal_Int32(1) ), uno::Any() ), uno::UNO_QUERY_THROW );
     sal_Int32 nWidth = xColumn->getWidth();
     nWidth -= indent;
     xColumn->setWidth( nWidth );
@@ -274,7 +275,7 @@ void SwVbaRows::setIndentWithAdjustNone( sal_Int32 indent )
     sal_Int32 nColCount = xCol->getCount();
     for( sal_Int32 i = 0; i < nColCount; i++ )
     {
-        uno::Reference< word::XColumn > xColumn( xCol->Item( uno::makeAny( i ), uno::Any() ), uno::UNO_QUERY_THROW );
+        uno::Reference< word::XColumn > xColumn( xCol->Item( uno::Any( i ), uno::Any() ), uno::UNO_QUERY_THROW );
         sal_Int32 nColWidth = xColumn->getWidth();
         sal_Int32 nNewColWidth = static_cast<sal_Int32>( propFactor * nColWidth );
         xColumn->setWidth( nNewColWidth );
@@ -282,7 +283,7 @@ void SwVbaRows::setIndentWithAdjustNone( sal_Int32 indent )
 
     // set the width and position of the table
     setIndentWithAdjustNone( indent );
-    xTableProps->setPropertyValue("Width", uno::makeAny( nNewWidth ) );
+    xTableProps->setPropertyValue("Width", uno::Any( nNewWidth ) );
  }
 
  void SwVbaRows::setIndentWithAdjustSameWidth( const uno::Reference< word::XColumns >& xColumns, sal_Int32 indent )
@@ -299,13 +300,13 @@ void SwVbaRows::setIndentWithAdjustNone( sal_Int32 indent )
     sal_Int32 nNewColWidth = static_cast<sal_Int32>( double( nNewWidth )/nColCount );
     for( sal_Int32 i = 0; i < nColCount; i++ )
     {
-        uno::Reference< word::XColumn > xColumn( xCol->Item( uno::makeAny( i ), uno::Any() ), uno::UNO_QUERY_THROW );
+        uno::Reference< word::XColumn > xColumn( xCol->Item( uno::Any( i ), uno::Any() ), uno::UNO_QUERY_THROW );
         xColumn->setWidth( nNewColWidth );
     }
 
     // set the width and position of the table
     setIndentWithAdjustNone( indent );
-    xTableProps->setPropertyValue("Width", uno::makeAny( nNewWidth ) );
+    xTableProps->setPropertyValue("Width", uno::Any( nNewWidth ) );
  }
 
 void SAL_CALL SwVbaRows::Select(  )
@@ -327,7 +328,7 @@ uno::Any SAL_CALL SwVbaRows::Item( const uno::Any& Index1, const uno::Any& /*not
         {
             throw  lang::IndexOutOfBoundsException("Index out of bounds" );
         }
-        return uno::makeAny( uno::Reference< word::XRow >( new SwVbaRow( this, mxContext, mxTextTable, nIndex - 1 ) ) );
+        return uno::Any( uno::Reference< word::XRow >( new SwVbaRow( this, mxContext, mxTextTable, nIndex - 1 ) ) );
     }
     throw  uno::RuntimeException("Index out of bounds" );
 }

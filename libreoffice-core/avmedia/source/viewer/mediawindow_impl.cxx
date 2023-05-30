@@ -29,16 +29,16 @@
 
 #include <sal/log.hxx>
 #include <comphelper/processfactory.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/securityoptions.hxx>
 #include <vcl/bitmapex.hxx>
-#include <vcl/svapp.hxx>
 #include <vcl/sysdata.hxx>
 #include <vcl/commandevent.hxx>
 #include <vcl/event.hxx>
 #include <vcl/ptrstyle.hxx>
+#include <vcl/svapp.hxx>
 
 #include <com/sun/star/awt/SystemPointer.hpp>
 #include <com/sun/star/lang/XComponent.hpp>
@@ -183,19 +183,10 @@ uno::Reference<media::XPlayer> MediaWindowImpl::createPlayer(const OUString& rUR
     if (!pMimeType || *pMimeType == AVMEDIA_MIMETYPE_COMMON)
     {
         uno::Reference<uno::XComponentContext> xContext(::comphelper::getProcessComponentContext());
-
-        static std::u16string_view aServiceManagers[] =
-        {
-            u"" AVMEDIA_MANAGER_SERVICE_PREFERRED,
-            u"" AVMEDIA_MANAGER_SERVICE_NAME,
-        };
-
-        for (const auto& rServiceName : aServiceManagers)
-        {
-            xPlayer = createPlayer(rURL, OUString(rServiceName), xContext);
-            if (xPlayer)
-                break;
-        }
+        if (Application::GetToolkitName() == "gtk4")
+            xPlayer = createPlayer(rURL, "com.sun.star.comp.avmedia.Manager_Gtk", xContext);
+        else
+            xPlayer = createPlayer(rURL, AVMEDIA_MANAGER_SERVICE_NAME, xContext);
     }
 
     return xPlayer;

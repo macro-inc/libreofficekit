@@ -19,17 +19,15 @@
 
 #pragma once
 
-#include <MutexOwner.hxx>
-
 #include <com/sun/star/drawing/framework/XResourceFactory.hpp>
 #include <com/sun/star/drawing/framework/XConfigurationChangeListener.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 
 namespace com::sun::star::frame { class XController; }
 
 namespace sd::framework {
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XResourceFactory,
     css::drawing::framework::XConfigurationChangeListener
     > PresentationFactoryInterfaceBase;
@@ -38,16 +36,13 @@ typedef ::cppu::WeakComponentImplHelper <
     indicates that a slideshow is running (in another but associated
     application window).
 */
-class PresentationFactory
-    : private sd::MutexOwner,
-      public PresentationFactoryInterfaceBase
+class PresentationFactory final
+    : public PresentationFactoryInterfaceBase
 {
 public:
     PresentationFactory (
         const css::uno::Reference<css::frame::XController>& rxController);
     virtual ~PresentationFactory() override;
-
-    virtual void SAL_CALL disposing() override;
 
     // XResourceFactory
 
@@ -66,6 +61,7 @@ public:
 
     // lang::XEventListener
 
+    using WeakComponentImplHelperBase::disposing;
     virtual void SAL_CALL disposing (
         const css::lang::EventObject& rEventObject) override;
 

@@ -20,6 +20,7 @@
 #include <test/unoapi_test.hxx>
 
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
+#include <com/sun/star/accessibility/AccessibleRelationType.hpp>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/XAccessibleText.hpp>
 #include <com/sun/star/accessibility/XAccessible.hpp>
@@ -33,53 +34,12 @@
 #include <com/sun/star/text/XTextCursor.hpp>
 #include <com/sun/star/text/ControlCharacter.hpp>
 
+#include <test/a11y/AccessibilityTools.hxx>
+
 using namespace com::sun::star;
 using namespace ::com::sun::star::uno;
 using namespace ::com::sun::star::accessibility;
 using namespace css::lang;
-
-namespace
-{
-class AccessibilityTools
-{
-public:
-    static css::uno::Reference<css::accessibility::XAccessibleContext>
-    getAccessibleObjectForRole(const css::uno::Reference<css::accessibility::XAccessible>& xacc,
-                               sal_Int16 role);
-};
-}
-
-css::uno::Reference<css::accessibility::XAccessibleContext>
-AccessibilityTools::getAccessibleObjectForRole(
-    const css::uno::Reference<css::accessibility::XAccessible>& xacc, sal_Int16 role)
-{
-    css::uno::Reference<css::accessibility::XAccessibleContext> ac = xacc->getAccessibleContext();
-    bool isShowing = ac->getAccessibleStateSet()->contains(AccessibleStateType::SHOWING);
-
-    if ((ac->getAccessibleRole() == role) && isShowing)
-    {
-        return ac;
-    }
-    else
-    {
-        int k = ac->getAccessibleChildCount();
-        if (ac->getAccessibleChildCount() > 100)
-        {
-            k = 50;
-        }
-
-        for (int i = 0; i < k; i++)
-        {
-            css::uno::Reference<css::accessibility::XAccessibleContext> ac2
-                = AccessibilityTools::getAccessibleObjectForRole(ac->getAccessibleChild(i), role);
-            if (ac2.is())
-            {
-                return ac2;
-            }
-        }
-    }
-    return nullptr;
-}
 
 class AccessibleRelationSet : public UnoApiTest
 {
@@ -89,9 +49,9 @@ public:
     {
     }
 
-    uno::Reference<lang::XComponent> init(uno::Reference<css::accessibility::XAccessible>& para1,
-                                          uno::Reference<css::accessibility::XAccessible>& para2,
-                                          uno::Reference<css::accessibility::XAccessible>& para3);
+    void init(uno::Reference<css::accessibility::XAccessible>& para1,
+              uno::Reference<css::accessibility::XAccessible>& para2,
+              uno::Reference<css::accessibility::XAccessible>& para3);
     void contents_flows_to_and_from();
 
     CPPUNIT_TEST_SUITE(AccessibleRelationSet);
@@ -99,14 +59,12 @@ public:
     CPPUNIT_TEST_SUITE_END();
 };
 
-uno::Reference<lang::XComponent>
-AccessibleRelationSet::init(uno::Reference<css::accessibility::XAccessible>& para1,
-                            uno::Reference<css::accessibility::XAccessible>& para2,
-                            uno::Reference<css::accessibility::XAccessible>& para3)
+void AccessibleRelationSet::init(uno::Reference<css::accessibility::XAccessible>& para1,
+                                 uno::Reference<css::accessibility::XAccessible>& para2,
+                                 uno::Reference<css::accessibility::XAccessible>& para3)
 {
-    uno::Reference<css::lang::XComponent> xComponent
-        = loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
-    uno::Reference<text::XTextDocument> xTextDoc(xComponent, uno::UNO_QUERY);
+    mxComponent = loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
+    uno::Reference<text::XTextDocument> xTextDoc(mxComponent, uno::UNO_QUERY);
 
     css::uno::Reference<text::XText> oText(xTextDoc->getText(), uno::UNO_SET_THROW);
 
@@ -131,21 +89,17 @@ AccessibleRelationSet::init(uno::Reference<css::accessibility::XAccessible>& par
     para1 = ctx->getAccessibleChild(0);
     para2 = ctx->getAccessibleChild(1);
     para3 = ctx->getAccessibleChild(2);
-    return xComponent;
 }
 
 void AccessibleRelationSet::contents_flows_to_and_from()
 {
     //contents_flows_to
-    std::vector<OUString> types{ "INVALID",       "CONTENT_FLOWS_FROM", "CONTENT_FLOWS_TO",
-                                 "CONTROLLED_BY", "CONTROLLER_FOR",     "LABEL_FOR",
-                                 "LABELED_BY",    "MEMBER_OF",          "SUB_WINDOW_OF" };
 
     css::uno::Reference<css::accessibility::XAccessible> para1;
     css::uno::Reference<css::accessibility::XAccessible> para2;
     css::uno::Reference<css::accessibility::XAccessible> para3;
 
-    uno::Reference<lang::XComponent> xComponent(init(para1, para2, para3));
+    init(para1, para2, para3);
     css::uno::Reference<css::accessibility::XAccessibleContext> oObj(para1, uno::UNO_QUERY_THROW);
     css::uno::Reference<css::accessibility::XAccessibleRelationSet> set
         = oObj->getAccessibleRelationSet();
@@ -160,8 +114,10 @@ void AccessibleRelationSet::contents_flows_to_and_from()
         css::uno::Reference<css::accessibility::XAccessibleText> adummy(
             set->getRelation(0).TargetSet[0], uno::UNO_QUERY_THROW);
         atarget = adummy;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 0", types[2],
-                                     types[firstrelation]);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 0",
+                                     AccessibilityTools::getRelationTypeName(
+                                         accessibility::AccessibleRelationType::CONTENT_FLOWS_TO),
+                                     AccessibilityTools::getRelationTypeName(firstrelation));
 
         css::uno::Reference<css::accessibility::XAccessibleText> paraText2(para2,
                                                                            uno::UNO_QUERY_THROW);
@@ -174,7 +130,8 @@ void AccessibleRelationSet::contents_flows_to_and_from()
     css::uno::Reference<css::accessibility::XAccessibleRelationSet> set2
         = oObj2->getAccessibleRelationSet();
 
-    sal_Int16 relationtypes[2] = { -1, -1 };
+    sal_Int16 relationtypes[2] = { accessibility::AccessibleRelationType::INVALID,
+                                   accessibility::AccessibleRelationType::INVALID };
     css::uno::Reference<css::accessibility::XAccessibleText> atargets[2];
 
     if (set2.is())
@@ -182,14 +139,14 @@ void AccessibleRelationSet::contents_flows_to_and_from()
         CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct count of relations", sal_Int32(2),
                                      set2->getRelationCount());
         sal_Int16 tmprelation = set2->getRelation(0).RelationType;
-        if (tmprelation == 1)
+        if (tmprelation == accessibility::AccessibleRelationType::CONTENT_FLOWS_FROM)
         {
             css::uno::Reference<css::accessibility::XAccessibleText> adummy(
                 set2->getRelation(0).TargetSet[0], uno::UNO_QUERY_THROW);
             atargets[0] = adummy;
             relationtypes[0] = tmprelation;
         }
-        else if (tmprelation == 2)
+        else if (tmprelation == accessibility::AccessibleRelationType::CONTENT_FLOWS_TO)
         {
             css::uno::Reference<css::accessibility::XAccessibleText> adummy(
                 set2->getRelation(0).TargetSet[0], uno::UNO_QUERY_THROW);
@@ -201,14 +158,14 @@ void AccessibleRelationSet::contents_flows_to_and_from()
             CPPUNIT_FAIL("didn't gain correct relation type");
         }
         tmprelation = set2->getRelation(1).RelationType;
-        if (tmprelation == 1)
+        if (tmprelation == accessibility::AccessibleRelationType::CONTENT_FLOWS_FROM)
         {
             css::uno::Reference<css::accessibility::XAccessibleText> adummy(
                 set2->getRelation(1).TargetSet[0], uno::UNO_QUERY_THROW);
             atargets[0] = adummy;
             relationtypes[0] = tmprelation;
         }
-        else if (tmprelation == 2)
+        else if (tmprelation == accessibility::AccessibleRelationType::CONTENT_FLOWS_TO)
         {
             css::uno::Reference<css::accessibility::XAccessibleText> adummy(
                 set2->getRelation(1).TargetSet[0], uno::UNO_QUERY_THROW);
@@ -221,21 +178,23 @@ void AccessibleRelationSet::contents_flows_to_and_from()
         }
     }
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 1", types[1],
-                                 types[relationtypes[0]]);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 1",
+                                 AccessibilityTools::getRelationTypeName(
+                                     accessibility::AccessibleRelationType::CONTENT_FLOWS_FROM),
+                                 AccessibilityTools::getRelationTypeName(relationtypes[0]));
 
     css::uno::Reference<css::accessibility::XAccessibleText> paraText1(para1, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct target paragraph", atargets[0]->getText(),
                                  paraText1->getText());
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 3", types[2],
-                                 types[relationtypes[1]]);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct relation type for paragraph 3",
+                                 AccessibilityTools::getRelationTypeName(
+                                     accessibility::AccessibleRelationType::CONTENT_FLOWS_TO),
+                                 AccessibilityTools::getRelationTypeName(relationtypes[1]));
 
     css::uno::Reference<css::accessibility::XAccessibleText> paraText3(para3, uno::UNO_QUERY_THROW);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("didn't gain correct target paragraph", atargets[1]->getText(),
                                  paraText3->getText());
-
-    closeDocument(xComponent);
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(AccessibleRelationSet);

@@ -35,6 +35,7 @@
 #include <com/sun/star/util/Date.hpp>
 #include <com/sun/star/util/Duration.hpp>
 #include <o3tl/any.hxx>
+#include <o3tl/string_view.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/string.hxx>
@@ -43,7 +44,6 @@
 #include <svl/urihelper.hxx>
 #include <unotools/useroptions.hxx>
 #include <unotools/syslocale.hxx>
-#include <svl/zforlist.hxx>
 #include <libxml/xmlstring.h>
 #include <libxml/xmlwriter.h>
 
@@ -70,6 +70,7 @@
 #include <pagefrm.hxx>
 #include <cntfrm.hxx>
 #include <pam.hxx>
+#include <utility>
 #include <viewsh.hxx>
 #include <dbmgr.hxx>
 #include <shellres.hxx>
@@ -372,6 +373,9 @@ bool SwAuthorField::QueryValue( uno::Any& rAny, sal_uInt16 nWhichId ) const
         rAny <<= m_aContent;
         break;
 
+    case FIELD_PROP_TITLE:
+        break;
+
     default:
         assert(false);
     }
@@ -395,6 +399,9 @@ bool SwAuthorField::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
 
     case FIELD_PROP_PAR1:
         rAny >>= m_aContent;
+        break;
+
+    case FIELD_PROP_TITLE:
         break;
 
     default:
@@ -1273,11 +1280,11 @@ void SwHiddenTextFieldType::SetHiddenFlag( bool bSetHidden )
 
 SwHiddenTextField::SwHiddenTextField( SwHiddenTextFieldType* pFieldType,
                                     bool    bConditional,
-                                    const OUString& rCond,
+                                    OUString aCond,
                                     const OUString& rStr,
                                     bool    bHidden,
                                     SwFieldTypesEnum  nSub) :
-    SwField( pFieldType ), m_aCond(rCond), m_nSubType(nSub),
+    SwField( pFieldType ), m_aCond(std::move(aCond)), m_nSubType(nSub),
     m_bCanToggle(bConditional), m_bIsHidden(bHidden), m_bValid(false)
 {
     if(m_nSubType == SwFieldTypesEnum::ConditionalText)
@@ -1300,11 +1307,11 @@ SwHiddenTextField::SwHiddenTextField( SwHiddenTextFieldType* pFieldType,
 }
 
 SwHiddenTextField::SwHiddenTextField( SwHiddenTextFieldType* pFieldType,
-                                    const OUString& rCond,
-                                    const OUString& rTrue,
-                                    const OUString& rFalse,
+                                    OUString aCond,
+                                    OUString aTrue,
+                                    OUString aFalse,
                                     SwFieldTypesEnum nSub)
-    : SwField( pFieldType ), m_aTRUEText(rTrue), m_aFALSEText(rFalse), m_aCond(rCond), m_nSubType(nSub),
+    : SwField( pFieldType ), m_aTRUEText(std::move(aTrue)), m_aFALSEText(std::move(aFalse)), m_aCond(std::move(aCond)), m_nSubType(nSub),
       m_bIsHidden(true), m_bValid(false)
 {
     m_bCanToggle = !m_aCond.isEmpty();
@@ -1524,15 +1531,15 @@ OUString SwHiddenTextField::GetColumnName(const OUString& rName)
     return rName;
 }
 
-OUString SwHiddenTextField::GetDBName(const OUString& rName, SwDoc& rDoc)
+OUString SwHiddenTextField::GetDBName(std::u16string_view rName, SwDoc& rDoc)
 {
-    sal_Int32 nPos = rName.indexOf(DB_DELIM);
-    if( nPos>=0 )
+    size_t nPos = rName.find(DB_DELIM);
+    if( nPos != std::u16string_view::npos )
     {
-        nPos = rName.indexOf(DB_DELIM, nPos + 1);
+        nPos = rName.find(DB_DELIM, nPos + 1);
 
-        if( nPos>=0 )
-            return rName.copy(0, nPos);
+        if( nPos != std::u16string_view::npos )
+            return OUString(rName.substr(0, nPos));
     }
 
     SwDBData aData = rDoc.GetDBData();
@@ -1540,7 +1547,7 @@ OUString SwHiddenTextField::GetDBName(const OUString& rName, SwDoc& rDoc)
 }
 
 // [aFieldDefinition] value sample : " IF A == B \"TrueText\" \"FalseText\""
-void SwHiddenTextField::ParseIfFieldDefinition(const OUString& aFieldDefinition,
+void SwHiddenTextField::ParseIfFieldDefinition(std::u16string_view aFieldDefinition,
                                                OUString& rCondition,
                                                OUString& rTrue,
                                                OUString& rFalse)
@@ -1557,7 +1564,7 @@ void SwHiddenTextField::ParseIfFieldDefinition(const OUString& aFieldDefinition,
     {
         bool quoted = false;
         bool insideWord = false;
-        for (sal_Int32 i = 0; i < aFieldDefinition.getLength(); i++)
+        for (size_t i = 0; i < aFieldDefinition.size(); i++)
         {
             if (quoted)
             {
@@ -1610,14 +1617,9 @@ void SwHiddenTextField::ParseIfFieldDefinition(const OUString& aFieldDefinition,
 
     // Syntax
     // OUString::copy( sal_Int32 beginIndex, sal_Int32 count )
-    rCondition = aFieldDefinition.copy(conditionBegin, conditionLength);
-    rTrue = aFieldDefinition.copy(trueBegin, trueLength);
-    rFalse = aFieldDefinition.copy(falseBegin);
-
-    // trim
-    rCondition = rCondition.trim();
-    rTrue = rTrue.trim();
-    rFalse = rFalse.trim();
+    rCondition = o3tl::trim(aFieldDefinition.substr(conditionBegin, conditionLength));
+    rTrue = o3tl::trim(aFieldDefinition.substr(trueBegin, trueLength));
+    rFalse = o3tl::trim(aFieldDefinition.substr(falseBegin));
 
     // remove quotes
     if (rCondition.getLength() >= 2)
@@ -1653,8 +1655,8 @@ std::unique_ptr<SwFieldType> SwHiddenParaFieldType::Copy() const
 
 // field for line height 0
 
-SwHiddenParaField::SwHiddenParaField(SwHiddenParaFieldType* pTyp, const OUString& rStr)
-    : SwField(pTyp), m_aCond(rStr)
+SwHiddenParaField::SwHiddenParaField(SwHiddenParaFieldType* pTyp, OUString aStr)
+    : SwField(pTyp), m_aCond(std::move(aStr))
 {
     m_bIsHidden = false;
 }
@@ -1733,21 +1735,25 @@ std::unique_ptr<SwFieldType> SwPostItFieldType::Copy() const
 sal_uInt32 SwPostItField::s_nLastPostItId = 1;
 
 SwPostItField::SwPostItField( SwPostItFieldType* pT,
-        const OUString& rAuthor,
-        const OUString& rText,
-        const OUString& rInitials,
-        const OUString& rName,
+        OUString aAuthor,
+        OUString aText,
+        OUString aInitials,
+        OUString aName,
         const DateTime& rDateTime,
         const bool bResolved,
-        const sal_uInt32 nPostItId
+        const sal_uInt32 nPostItId,
+        const sal_uInt32 nParentId,
+        const sal_uInt32 nParaId
 )
     : SwField( pT )
-    , m_sText( rText )
-    , m_sAuthor( rAuthor )
-    , m_sInitials( rInitials )
-    , m_sName( rName )
+    , m_sText( std::move(aText) )
+    , m_sAuthor( std::move(aAuthor) )
+    , m_sInitials( std::move(aInitials) )
+    , m_sName( std::move(aName) )
     , m_aDateTime( rDateTime )
     , m_bResolved( bResolved )
+    , m_nParentId( nParentId )
+    , m_nParaId( nParaId )
 {
     m_nPostItId = nPostItId == 0 ? s_nLastPostItId++ : nPostItId;
 }
@@ -1790,7 +1796,7 @@ bool SwPostItField::GetResolved() const
 std::unique_ptr<SwField> SwPostItField::Copy() const
 {
     std::unique_ptr<SwPostItField> pRet(new SwPostItField( static_cast<SwPostItFieldType*>(GetTyp()), m_sAuthor, m_sText, m_sInitials, m_sName,
-                                                           m_aDateTime, m_bResolved, m_nPostItId));
+                                                           m_aDateTime, m_bResolved, m_nPostItId, m_nParentId, m_nParaId));
     if (mpText)
         pRet->SetTextObject( *mpText );
 
@@ -1845,6 +1851,16 @@ void SwPostItField::SetPostItId(const sal_uInt32 nPostItId)
     m_nPostItId = nPostItId == 0 ? s_nLastPostItId++ : nPostItId;
 }
 
+void SwPostItField::SetParentId(const sal_uInt32 nParentId)
+{
+    m_nParentId = nParentId;
+}
+
+void SwPostItField::SetParaId(const sal_uInt32 nParaId)
+{
+    m_nParaId = nParaId;
+}
+
 bool SwPostItField::QueryValue( uno::Any& rAny, sal_uInt16 nWhichId ) const
 {
     switch( nWhichId )
@@ -1895,6 +1911,24 @@ bool SwPostItField::QueryValue( uno::Any& rAny, sal_uInt16 nWhichId ) const
             rAny <<= m_aDateTime.GetUNODateTime();
         }
         break;
+    case FIELD_PROP_PAR5:
+        {
+            OUString sTemp;
+            std::stringstream ss;
+            ss << std::uppercase << std::hex << m_nParentId;
+            sTemp = OUString::createFromAscii(ss.str().c_str());
+            rAny <<= sTemp;
+        }
+        break;
+    case FIELD_PROP_PAR6:
+        {
+            OUString sTemp;
+            std::stringstream ss;
+            ss << std::uppercase << std::hex << m_nPostItId;
+            sTemp = OUString::createFromAscii(ss.str().c_str());
+            rAny <<= sTemp;
+        }
+        break;
     default:
         assert(false);
     }
@@ -1937,6 +1971,20 @@ bool SwPostItField::PutValue( const uno::Any& rAny, sal_uInt16 nWhichId )
         if(!(rAny >>= aDateTimeValue))
             return false;
         m_aDateTime = DateTime(aDateTimeValue);
+    }
+    break;
+    case FIELD_PROP_PAR5:
+    {
+        OUString sTemp;
+        rAny >>= sTemp;
+        m_nParentId = sTemp.toInt32(16);
+    }
+    break;
+    case FIELD_PROP_PAR6:
+    {
+        OUString sTemp;
+        rAny >>= sTemp;
+        m_nPostItId = sTemp.toInt32(16);
     }
     break;
     default:
@@ -2231,7 +2279,7 @@ bool SwRefPageGetFieldType::MakeSetList(SetGetExpFields& rTmpLst,
 {
     IDocumentRedlineAccess const& rIDRA(m_rDoc.getIDocumentRedlineAccess());
     std::vector<SwFormatField*> vFields;
-    GatherFields(vFields);
+    m_rDoc.getIDocumentFieldsAccess().GetSysFieldType(SwFieldIds::RefPageSet)->GatherFields(vFields);
     for(auto pFormatField: vFields)
     {
         // update only the GetRef fields
@@ -2254,9 +2302,7 @@ bool SwRefPageGetFieldType::MakeSetList(SetGetExpFields& rTmpLst,
                 // Check if pFrame is not yet connected to the layout.
                 !pFrame->FindPageFrame() )
             {
-                //  create index for determination of the TextNode
-                SwNodeIndex aIdx( rTextNd );
-                pNew.reset( new SetGetExpField( aIdx, pTField ) );
+                pNew.reset( new SetGetExpField( rTextNd, pTField ) );
             }
             else
             {
@@ -2264,8 +2310,8 @@ bool SwRefPageGetFieldType::MakeSetList(SetGetExpFields& rTmpLst,
                 SwPosition aPos( m_rDoc.GetNodes().GetEndOfPostIts() );
                 bool const bResult = GetBodyTextNode( m_rDoc, aPos, *pFrame );
                 OSL_ENSURE(bResult, "where is the Field?");
-                pNew.reset( new SetGetExpField( aPos.nNode, pTField,
-                                            &aPos.nContent ) );
+                pNew.reset( new SetGetExpField( aPos.GetNode(), pTField,
+                                            aPos.GetContentIndex() ) );
             }
 
             rTmpLst.insert( std::move(pNew) );
@@ -2286,8 +2332,7 @@ void SwRefPageGetFieldType::UpdateField( SwTextField const * pTextField,
     if( pTextNode->StartOfSectionIndex() >
         m_rDoc.GetNodes().GetEndOfExtras().GetIndex() )
     {
-        SwNodeIndex aIdx( *pTextNode );
-        SetGetExpField aEndField( aIdx, pTextField );
+        SetGetExpField aEndField( *pTextNode, pTextField );
 
         SetGetExpFields::const_iterator itLast = rSetList.lower_bound( &aEndField );
 
@@ -2386,7 +2431,7 @@ void SwRefPageGetField::ChangeExpansion(const SwFrame& rFrame,
         return ;
 
     //  create index for determination of the TextNode
-    SwPosition aPos( SwNodeIndex( rDoc.GetNodes() ) );
+    SwPosition aPos( rDoc.GetNodes() );
     SwTextNode* pTextNode = const_cast<SwTextNode*>(GetBodyTextNode(rDoc, aPos, rFrame));
 
     // If no layout exists, ChangeExpansion is called for header and
@@ -2394,7 +2439,7 @@ void SwRefPageGetField::ChangeExpansion(const SwFrame& rFrame,
     if(!pTextNode)
         return;
 
-    SetGetExpField aEndField( aPos.nNode, pField, &aPos.nContent );
+    SetGetExpField aEndField( aPos.GetNode(), pField, aPos.GetContentIndex() );
 
     SetGetExpFields::const_iterator itLast = aTmpLst.lower_bound( &aEndField );
 
@@ -2483,8 +2528,8 @@ SwCharFormat* SwJumpEditFieldType::GetCharFormat()
 }
 
 SwJumpEditField::SwJumpEditField( SwJumpEditFieldType* pTyp, sal_uInt32 nForm,
-                                const OUString& rText, const OUString& rHelp )
-    : SwField( pTyp, nForm ), m_sText( rText ), m_sHelp( rHelp )
+                                OUString aText, OUString aHelp )
+    : SwField( pTyp, nForm ), m_sText( std::move(aText) ), m_sHelp( std::move(aHelp) )
 {
 }
 

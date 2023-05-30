@@ -25,6 +25,7 @@
 #include <deque>
 #include <map>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <optional>
@@ -223,7 +224,7 @@ namespace dbaui
             css::util::URL                                        aURL;
             css::uno::Reference< css::frame::XStatusListener >    xListener;
 
-            DispatchTarget(const css::util::URL& rURL, const css::uno::Reference< css::frame::XStatusListener >& rRef) : aURL(rURL), xListener(rRef) { }
+            DispatchTarget(css::util::URL _aURL, css::uno::Reference< css::frame::XStatusListener > xRef) : aURL(std::move(_aURL)), xListener(std::move(xRef)) { }
         };
 
         typedef std::map<sal_uInt16, FeatureState> StateCache;
@@ -289,7 +290,7 @@ namespace dbaui
 
             Must not be called outside <member>describeSupportedFeatures</member>.
 
-            @param _pAsciiCommandURL
+            @param _rCommandURL
                 the URL of the feature command
             @param _nFeatureId
                 the id of the feature. Later references to this feature usually happen by id, not by
@@ -299,7 +300,7 @@ namespace dbaui
                 by the user, see also <type scope="css::frame">CommandGroup</type>.
         */
         void    implDescribeSupportedFeature(
-                    const char* _pAsciiCommandURL,
+                    const OUString& _rCommandURL,
                     sal_uInt16 _nFeatureId,
                     sal_Int16 _nCommandGroup = css::frame::CommandGroup::INTERNAL
                 );

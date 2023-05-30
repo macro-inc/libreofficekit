@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-12-18 11:38+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2023-01-23 11:30+0000\n"
 "Last-Translator: Quentin PAGÈS <quentinantonin@free.fr>\n"
 "Language-Team: Occitan <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/oc/>\n"
 "Language: oc\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.8.1\n"
+"X-Generator: Weblate 4.12.2\n"
 
 #. i8Y7Z
 #: scaddins/inc/analysis.hrc:28
@@ -235,11 +235,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Lista que compren las datas dels jorns caumats (vacanças, jorns feriats, etc...)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Tòrna la valor 'true' se lo nombre es par"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr ""
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -253,11 +253,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "Lo nombre"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Tòrna la valor 'true' se lo nombre es impar"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr ""
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -421,11 +421,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "Lo nombre que multiplica pi"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Tòrna un entièr aleatòri entre los nombres qu'avètz especificats"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr ""
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -433,11 +433,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Inferior"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Lo mai pichon entièr tornat"
+msgid "The smallest integer that can be returned"
+msgstr ""
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -445,11 +445,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Superior"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "Lo mai grand entièr tornat"
+msgid "The largest integer that can be returned"
+msgstr ""
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156
@@ -3639,7 +3639,7 @@ msgstr "Las datas"
 #: scaddins/inc/analysis.hrc:1005
 msgctxt "ANALYSIS_Intrate"
 msgid "Returns the interest rate for a fully invested security"
-msgstr "Tòrna lo taus d'interès per un investiment assegurat completament"
+msgstr "Tòrna lo taus d'interès per un investiment assegurat complètament"
 
 #. QSbCe
 #: scaddins/inc/analysis.hrc:1006

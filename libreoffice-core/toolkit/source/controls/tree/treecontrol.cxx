@@ -97,7 +97,7 @@ Any UnoTreeModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
     case BASEPROPERTY_TREE_SHOWSHANDLES:
         return Any( true );
     case BASEPROPERTY_DEFAULTCONTROL:
-        return uno::makeAny( OUString( "com.sun.star.awt.tree.TreeControl" ) );
+        return uno::Any( OUString( "com.sun.star.awt.tree.TreeControl" ) );
     default:
         return UnoControlModel::ImplGetDefaultValue( nPropId );
     }
@@ -125,7 +125,7 @@ class UnoTreeControl : public UnoTreeControl_Base
 {
 public:
     UnoTreeControl();
-    OUString GetComponentServiceName() override;
+    OUString GetComponentServiceName() const override;
 
     // css::lang::XComponent
     void SAL_CALL dispose(  ) override;
@@ -187,7 +187,7 @@ UnoTreeControl::UnoTreeControl()
 {
 }
 
-OUString UnoTreeControl::GetComponentServiceName()
+OUString UnoTreeControl::GetComponentServiceName() const
 {
     return "Tree";
 }
@@ -451,10 +451,10 @@ void UnoTreeControl::createPeer( const uno::Reference< awt::XToolkit > & rxToolk
 
 void SAL_CALL TreeEditListenerMultiplexer::nodeEditing( const Reference< XTreeNode >& Node )
 {
-    ::comphelper::OInterfaceIteratorHelper2 aIt( *this );
+    ::comphelper::OInterfaceIteratorHelper3 aIt(*this);
     while( aIt.hasMoreElements() )
     {
-        Reference< XTreeEditListener > xListener(static_cast< XTreeEditListener* >( aIt.next() ) );
+        Reference<XTreeEditListener> xListener(aIt.next());
         try
         {
             xListener->nodeEditing( Node );
@@ -474,10 +474,10 @@ void SAL_CALL TreeEditListenerMultiplexer::nodeEditing( const Reference< XTreeNo
 
 void SAL_CALL TreeEditListenerMultiplexer::nodeEdited( const Reference< XTreeNode >& Node, const OUString& NewText )
 {
-    ::comphelper::OInterfaceIteratorHelper2 aIt( *this );
+    ::comphelper::OInterfaceIteratorHelper3 aIt(*this);
     while( aIt.hasMoreElements() )
     {
-        Reference< XTreeEditListener > xListener( static_cast< XTreeEditListener* >( aIt.next() ) );
+        Reference<XTreeEditListener> xListener(aIt.next());
         try
         {
             xListener->nodeEdited( Node, NewText );

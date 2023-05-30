@@ -33,21 +33,22 @@
 #define SCSTR_STDFILTER                             NC_("SCSTR_STDFILTER", "Standard Filter...")
 #define SCSTR_CLEAR_FILTER                          NC_("SCSTR_CLEAR_FILTER", "Clear Filter")
 #define SCSTR_TOP10FILTER                           NC_("SCSTR_TOP10FILTER", "Top 10")
+#define SCSTR_BOTTOM10FILTER                        NC_("SCSTR_BOTTOM10FILTER", "Bottom 10")
 #define SCSTR_FILTER_EMPTY                          NC_("SCSTR_FILTER_EMPTY", "Empty")
 #define SCSTR_FILTER_NOTEMPTY                       NC_("SCSTR_FILTER_NOTEMPTY", "Not Empty")
-#define SCSTR_FILTER_TEXT_COLOR                     NC_("SCSTR_FILTER_TEXT_COLOR", "Text Color")
-#define SCSTR_FILTER_BACKGROUND_COLOR               NC_("SCSTR_FILTER_BACKGROUND_COLOR", "Background Color")
+#define SCSTR_FILTER_COLOR                          NC_("SCSTR_FILTER_COLOR", "Filter by Color")
+#define SCSTR_FILTER_CONDITION                      NC_("SCSTR_FILTER_CONDITION", "Filter by Condition")
 // This must match the translation of the same strings of standardfilterdialog|cond
-#define SCSTR_FILTER_TEXT_COLOR_COND                NC_("STANDARDFILTERDIALOG_COND", "Text color")
+#define SCSTR_FILTER_FONT_COLOR_COND                NC_("STANDARDFILTERDIALOG_COND", "Font color")
 #define SCSTR_FILTER_BACKGROUND_COLOR_COND          NC_("STANDARDFILTERDIALOG_COND", "Background color")
 #define SCSTR_FILTER_NO_FILL                        NC_("SCSTR_FILTER_NO_FILL", "No Fill")
 #define SCSTR_FILTER_AUTOMATIC_COLOR                NC_("SCSTR_FILTER_AUTOMATIC_COLOR", "Automatic")
 #define SCSTR_NONAME                                NC_("SCSTR_NONAME", "unnamed")
 #define SCSTR_INSERT_RTL                            NC_("SCSTR_INSERT_RTL", "Shift cells left")
 // "%1 is replaced to column letter, such as 'Column A'"
-#define SCSTR_COLUMN                                NC_("SCSTR_COLUMN", "Column %1")
-// "%1 is replaced to row number, such as 'Row 1'"
-#define SCSTR_ROW                                   NC_("SCSTR_ROW", "Row %1")
+#define SCSTR_COLUMN_LETTER                         NC_("SCSTR_COLUMN_LETTER", "Column %1")
+#define SCSTR_COLUMN                                NC_("SCSTR_COLUMN", "Column")
+#define SCSTR_ROW                                   NC_("SCSTR_ROW", "Row")
 #define SCSTR_TABLE                                 NC_("SCSTR_TABLE", "Sheet")
 #define SCSTR_NAME                                  NC_("SCSTR_NAME", "Name")
 #define SCSTR_APDTABLE                              NC_("SCSTR_APDTABLE", "Append Sheet")
@@ -81,13 +82,15 @@
 #define SCSTR_COLUMN_USER                           NC_("SCSTR_COLUMN_USER", "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide")
 #define SCSTR_FIELDSEP_TAB                          NC_("SCSTR_FIELDSEP_TAB", "Tab")
 #define SCSTR_FIELDSEP_SPACE                        NC_("SCSTR_FIELDSEP_SPACE", "space")
-#define SCSTR_FORMULA_AUTOCORRECTION                NC_("SCSTR_FORMULA_AUTOCORRECTION", "%PRODUCTNAME Calc found an error in the formula entered.\nDo you want to accept the correction proposed below?\n\n")
 #define SCSTR_UNDO_GRAFFILTER                       NC_("SCSTR_UNDO_GRAFFILTER", "Image Filter")
 #define STR_CAPTION_DEFAULT_TEXT                    NC_("STR_CAPTION_DEFAULT_TEXT", "Text")
 // Select tables dialog title
 #define STR_DLG_SELECTTABLES_TITLE                  NC_("STR_DLG_SELECTTABLES_TITLE", "Select Sheets")
+#define STR_DLG_SELECTTABLE_TITLE                   NC_("STR_DLG_SELECTTABLE_TITLE", "Go to Sheet")
+#define STR_DLG_SELECTTABLE_MASK                    NC_("STR_DLG_SELECTTABLE_MASK", "~Type a Sheet Name")
 // Select tables dialog listbox
 #define STR_DLG_SELECTTABLES_LBNAME                 NC_("STR_DLG_SELECTTABLES_LBNAME", "~Selected sheets")
+#define STR_DLG_SELECTTABLE_LBNAME                  NC_("STR_DLG_SELECTTABLE_LBNAME", "~Sheets")
 #define STR_ACC_CSVRULER_NAME                       NC_("STR_ACC_CSVRULER_NAME", "Ruler")
 #define STR_ACC_CSVRULER_DESCR                      NC_("STR_ACC_CSVRULER_DESCR", "This ruler manages objects at fixed positions.")
 #define STR_ACC_CSVGRID_NAME                        NC_("STR_ACC_CSVGRID_NAME", "Preview")
@@ -360,6 +363,8 @@
 #define STR_INPUT_DATA_RANGE                        NC_("STR_INPUT_DATA_RANGE", "Input data range")
 /*infobar for allowing links to update or not*/
 #define STR_ENABLE_CONTENT                          NC_("STR_ENABLE_CONTENT", "Allow updating")
+/*tooltip for the "Allow updating" infobar button*/
+#define STR_ENABLE_CONTENT_TOOLTIP                  NC_("STR_ENABLE_CONTENT_TOOLTIP", "Only allow updating if you trust this document.")
 /*Insert image dialog*/
 #define STR_ANCHOR_TO_CELL                          NC_("STR_ANCHOR_TO_CELL", "To cell")
 #define STR_ANCHOR_TO_CELL_RESIZE                   NC_("STR_ANCHOR_TO_CELL_RESIZE", "To cell (resize with cell)")
@@ -378,5 +383,11 @@
 #define STR_BORDER_DOUBLE_2                         NC_("STR_BORDER_DOUBLE_2", "Thin/Medium (%s pt)")
 #define STR_BORDER_DOUBLE_3                         NC_("STR_BORDER_DOUBLE_3", "Medium/Hairline (%s pt)")
 #define STR_BORDER_DOUBLE_4                         NC_("STR_BORDER_DOUBLE_4", "Medium/Medium (%s pt)")
+
+// accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
+// in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
+#define STR_A11Y_DESC_SORTUSER                      NC_("sortoptionspage|extended_tip|sortuserlb", "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists.")
+#define STR_A11Y_DESC_USERDEF                       NC_("subtotaloptionspage|extended_tip|lbuserdef", "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists.")
+#define STR_A11Y_DESC_ANNOT                         NC_("extended_tip|annot", "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box.")
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

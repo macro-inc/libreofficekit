@@ -41,7 +41,8 @@
 #include <sdpage.hxx>
 #include <FrameView.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <o3tl/safeint.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -616,7 +617,7 @@ bool SlideSorterModel::DeleteSlide (const SdPage* pPage)
 
     bool bMarkedSelected(false);
 
-    if(nIndex >= 0 && nIndex < static_cast<sal_Int32>(maPageDescriptors.size()))
+    if(nIndex >= 0 && o3tl::make_unsigned(nIndex) < maPageDescriptors.size())
     {
         if (maPageDescriptors[nIndex])
             if (maPageDescriptors[nIndex]->GetPage() != pPage)

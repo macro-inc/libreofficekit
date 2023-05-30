@@ -30,6 +30,9 @@
 
 class IntlWrapper;
 
+/// Defines the vertical position of a fly frame.
+///
+/// For example: from top (orientation), by 1cm (relative position), to the entire page (relation).
 class SW_DLLPUBLIC SwFormatVertOrient final : public SfxPoolItem
 {
     SwTwips         m_nYPos;  ///< Contains *always* the current RelPos.
@@ -62,6 +65,10 @@ public:
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };
 
+/// Defines the horizontal position of a fly frame.
+///
+/// For example: from left (orientation), by 1 cm (relative position), to the entire page
+/// (relation).
 class SW_DLLPUBLIC SwFormatHoriOrient final : public SfxPoolItem
 {
     SwTwips         m_nXPos;              ///< Contains *always* the current RelPos.

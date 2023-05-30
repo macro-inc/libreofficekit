@@ -169,15 +169,22 @@ public:
 
     virtual css::uno::Reference<css::uno::XInterface>
     CreateClipboard(const css::uno::Sequence<css::uno::Any>& i_rArguments) override;
-    virtual css::uno::Reference<css::uno::XInterface> CreateDragSource() override;
-    virtual css::uno::Reference<css::uno::XInterface> CreateDropTarget() override;
+    virtual css::uno::Reference<css::uno::XInterface>
+    ImplCreateDragSource(const SystemEnvData*) override;
+    virtual css::uno::Reference<css::uno::XInterface>
+    ImplCreateDropTarget(const SystemEnvData*) override;
 
     void UpdateStyle(bool bFontsChanged);
 
     void* CreateGStreamerSink(const SystemChildWindow*) override;
 
+    bool DoExecute(int& nExitCode) override;
+    void DoQuit() override;
+
     QtFrame* activePopup() const { return m_pActivePopup; }
     void setActivePopup(QtFrame*);
 };
+
+inline QtInstance* GetQtInstance() { return static_cast<QtInstance*>(GetSalInstance()); }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

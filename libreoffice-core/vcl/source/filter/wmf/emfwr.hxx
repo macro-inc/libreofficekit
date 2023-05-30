@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_VCL_SOURCE_FILTER_WMF_EMFWR_HXX
-#define INCLUDED_VCL_SOURCE_FILTER_WMF_EMFWR_HXX
+#pragma once
 
 #include <vcl/gdimtf.hxx>
 #include <vcl/virdev.hxx>
@@ -75,7 +74,7 @@ private:
     void                ImplWritePolygonRecord( const tools::Polygon& rPoly, bool bClose );
     void                ImplWritePolyPolygonRecord( const tools::PolyPolygon& rPolyPoly );
     void                ImplWriteBmpRecord( const Bitmap& rBmp, const Point& rPt, const Size& rSz, sal_uInt32 nROP );
-    void                ImplWriteTextRecord( const Point& rPos, const OUString& rText, o3tl::span<const sal_Int32> pDXArray, sal_uInt32 nWidth );
+    void                ImplWriteTextRecord( const Point& rPos, const OUString& rText, KernArraySpan pDXArray, sal_uInt32 nWidth );
 
     void                Impl_handleLineInfoPolyPolygons(const LineInfo& rInfo, const basegfx::B2DPolygon& rLinePolygon);
     void                ImplWrite( const GDIMetaFile& rMtf );
@@ -108,7 +107,5 @@ public:
 
     bool WriteEMF(const GDIMetaFile& rMtf);
 };
-
-#endif // INCLUDED_VCL_SOURCE_FILTER_WMF_EMFWR_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -19,11 +19,13 @@
 
 #include <comphelper/processfactory.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <sfx2/objsh.hxx>
 #include <unotools/charclass.hxx>
 #include <sal/log.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 
 #include <com/sun/star/container/XContentEnumerationAccess.hpp>
@@ -58,6 +60,7 @@
 #include <funcdesc.hxx>
 #include <svl/sharedstring.hxx>
 #include <formulaopt.hxx>
+#include <compiler.hxx>
 #include <document.hxx>
 #include <memory>
 
@@ -66,23 +69,23 @@ using namespace com::sun::star;
 #define SC_CALLERPOS_NONE   (-1)
 
 ScUnoAddInFuncData::ScUnoAddInFuncData( const OUString& rNam, const OUString& rLoc,
-                                        const OUString& rDesc,
-                                        sal_uInt16 nCat, const OString& sHelp,
-                                        const uno::Reference<reflection::XIdlMethod>& rFunc,
-                                        const uno::Any& rO,
+                                        OUString aDesc,
+                                        sal_uInt16 nCat, OString sHelp,
+                                        uno::Reference<reflection::XIdlMethod> xFunc,
+                                        uno::Any aO,
                                         tools::Long nAC, const ScAddInArgDesc* pAD,
                                         tools::Long nCP ) :
     aOriginalName( rNam ),
     aLocalName( rLoc ),
     aUpperName( rNam ),
     aUpperLocal( rLoc ),
-    aDescription( rDesc ),
-    xFunction( rFunc ),
-    aObject( rO ),
+    aDescription(std::move( aDesc )),
+    xFunction(std::move( xFunc )),
+    aObject(std::move( aO )),
     nArgCount( nAC ),
     nCallerPos( nCP ),
     nCategory( nCat ),
-    sHelpId( sHelp ),
+    sHelpId(std::move( sHelp )),
     bCompInitialized( false )
 {
     if ( nArgCount )
@@ -92,7 +95,7 @@ ScUnoAddInFuncData::ScUnoAddInFuncData( const OUString& rNam, const OUString& rL
             pArgDescs[i] = pAD[i];
     }
 
-    aUpperName = ScGlobal::getCharClass().uppercase(aUpperName);
+    aUpperName = aUpperName.toAsciiUpperCase();  // programmatic name
     aUpperLocal = ScGlobal::getCharClass().uppercase(aUpperLocal);
 }
 
@@ -138,13 +141,25 @@ void ScUnoAddInFuncData::SetCompNames( ::std::vector< ScUnoAddInFuncData::Locali
     bCompInitialized = true;
 }
 
-bool ScUnoAddInFuncData::GetExcelName( LanguageType eDestLang, OUString& rRetExcelName ) const
+void ScUnoAddInFuncData::SetEnglishName( const OUString& rEnglishName )
+{
+    if (!rEnglishName.isEmpty())
+        aUpperEnglish = ScCompiler::GetCharClassEnglish()->uppercase(rEnglishName);
+    else
+    {
+        // A dumb fallback to not have an empty name, mainly just for the
+        // assignment to ScFuncDesc::mxFuncName for the Function Wizard and
+        // formula input tooltips.
+        aUpperEnglish = aUpperLocal;
+    }
+}
+
+bool ScUnoAddInFuncData::GetExcelName( const LanguageTag& rDestLang, OUString& rRetExcelName, bool bFallbackToAny ) const
 {
     const ::std::vector<LocalizedName>& rCompNames = GetCompNames();
     if ( !rCompNames.empty() )
     {
-        LanguageTag aLanguageTag( eDestLang);
-        const OUString& aSearch( aLanguageTag.getBcp47());
+        const OUString& aSearch( rDestLang.getBcp47());
 
         // First, check exact match without fallback overhead.
         ::std::vector<LocalizedName>::const_iterator itNames = std::find_if(rCompNames.begin(), rCompNames.end(),
@@ -157,7 +172,7 @@ bool ScUnoAddInFuncData::GetExcelName( LanguageType eDestLang, OUString& rRetExc
 
         // Second, try match of fallback search with fallback locales,
         // appending also 'en-US' and 'en' to search if not queried.
-        ::std::vector< OUString > aFallbackSearch( aLanguageTag.getFallbackStrings( true));
+        ::std::vector< OUString > aFallbackSearch( rDestLang.getFallbackStrings( true));
         if (aSearch != "en-US")
         {
             aFallbackSearch.emplace_back("en-US");
@@ -180,9 +195,12 @@ bool ScUnoAddInFuncData::GetExcelName( LanguageType eDestLang, OUString& rRetExc
             }
         }
 
-        // Third, last resort, use first (default) entry.
-        rRetExcelName = rCompNames[0].maName;
-        return true;
+        if (bFallbackToAny)
+        {
+            // Third, last resort, use first (default) entry.
+            rRetExcelName = rCompNames[0].maName;
+            return true;
+        }
     }
     return false;
 }
@@ -226,6 +244,7 @@ void ScUnoAddInCollection::Clear()
     pExactHashMap.reset();
     pNameHashMap.reset();
     pLocalHashMap.reset();
+    pEnglishHashMap.reset();
     ppFuncData.reset();
     nFuncCount = 0;
 
@@ -295,7 +314,7 @@ void ScUnoAddInCollection::Initialize()
     bInitialized = true;        // with or without functions
 }
 
-static sal_uInt16 lcl_GetCategory( const OUString& rName )
+static sal_uInt16 lcl_GetCategory( std::u16string_view rName )
 {
     static const char* aFuncNames[SC_FUNCGROUP_COUNT] =
     {
@@ -314,7 +333,7 @@ static sal_uInt16 lcl_GetCategory( const OUString& rName )
         "Add-In"            // ID_FUNCTION_GRP_ADDINS
     };
     for (sal_uInt16 i=0; i<SC_FUNCGROUP_COUNT; i++)
-        if ( rName.equalsAscii( aFuncNames[i] ) )
+        if ( o3tl::equalsAscii( rName, aFuncNames[i] ) )
             return i+1;                             // IDs start at 1
 
     return ID_FUNCTION_GRP_ADDINS;  // if not found, use Add-In group
@@ -341,7 +360,8 @@ void ScUnoAddInCollection::ReadConfiguration()
 
     ScAddInCfg& rAddInConfig = SC_MOD()->GetAddInCfg();
 
-    // additional, temporary config item for the compatibility names
+    // Additional, temporary config item for the display names and
+    // compatibility names.
     ScLinkConfigItem aAllLocalesConfig( CFGPATH_ADDINS, ConfigItemMode::AllLocales );
     // CommitLink is not used (only reading values)
 
@@ -380,6 +400,8 @@ void ScUnoAddInCollection::ReadConfiguration()
             pNameHashMap.reset( new ScAddInHashMap );
         if ( !pLocalHashMap )
             pLocalHashMap.reset( new ScAddInHashMap );
+        if ( !pEnglishHashMap )
+            pEnglishHashMap.reset( new ScAddInHashMap );
 
         //TODO: get the function information in a single call for all functions?
 
@@ -395,6 +417,7 @@ void ScUnoAddInCollection::ReadConfiguration()
 
             if ( pExactHashMap->find( aFuncName ) == pExactHashMap->end() )
             {
+                OUString aEnglishName;
                 OUString aLocalName;
                 OUString aDescription;
                 sal_uInt16 nCategory = ID_FUNCTION_GRP_ADDINS;
@@ -419,6 +442,35 @@ void ScUnoAddInCollection::ReadConfiguration()
                     nCategory = lcl_GetCategory( aCategoryName );
                 }
 
+                // get English display name
+
+                OUString aDisplayNamePath(aFuncPropPath + CFGSTR_DISPLAYNAME);
+                uno::Sequence<OUString> aDisplayNamePropNames( &aDisplayNamePath, 1 );
+
+                uno::Sequence<uno::Any> aDisplayNameProperties = aAllLocalesConfig.GetProperties( aDisplayNamePropNames );
+                if ( aDisplayNameProperties.getLength() == 1 )
+                {
+                    uno::Sequence<beans::PropertyValue> aLocalEntries;
+                    if ( aDisplayNameProperties[0] >>= aLocalEntries )
+                    {
+                        for ( const beans::PropertyValue& rConfig : std::as_const(aLocalEntries) )
+                        {
+                            // PropertyValue name is the locale ("convert" from
+                            // string to canonicalize).
+                            OUString aLocale( LanguageTag( rConfig.Name, true).getBcp47( false));
+                            // PropertyValue value is the localized value (string in this case).
+                            OUString aName;
+                            rConfig.Value >>= aName;
+                            // Accept 'en' and 'en-...' but prefer 'en-US'.
+                            if (aLocale == "en-US" && !aName.isEmpty())
+                                aEnglishName = aName;
+                            else if (aEnglishName.isEmpty() && (aLocale == "en" || aLocale.startsWith("en-")))
+                                aEnglishName = aName;
+                        }
+                    }
+                }
+                bool bNeedEnglish = aEnglishName.isEmpty();
+
                 // get compatibility names
 
                 ::std::vector<ScUnoAddInFuncData::LocalizedName> aCompNames;
@@ -435,12 +487,23 @@ void ScUnoAddInCollection::ReadConfiguration()
                         for ( const beans::PropertyValue& rConfig : std::as_const(aLocalEntries) )
                         {
                             // PropertyValue name is the locale ("convert" from
-                            // string to canonicalize)
+                            // string to canonicalize).
                             OUString aLocale( LanguageTag( rConfig.Name, true).getBcp47( false));
-                            // PropertyValue value is the localized value (string in this case)
+                            // PropertyValue value is the localized value (string in this case).
                             OUString aName;
                             rConfig.Value >>= aName;
-                            aCompNames.emplace_back( aLocale, aName);
+                            if (!aName.isEmpty())
+                            {
+                                aCompNames.emplace_back( aLocale, aName);
+                                if (bNeedEnglish)
+                                {
+                                    // Accept 'en' and 'en-...' but prefer 'en-US'.
+                                    if (aLocale == "en-US")
+                                        aEnglishName = aName;
+                                    else if (aEnglishName.isEmpty() && (aLocale == "en" || aLocale.startsWith("en-")))
+                                        aEnglishName = aName;
+                                }
+                            }
                         }
                     }
                 }
@@ -527,6 +590,16 @@ void ScUnoAddInCollection::ReadConfiguration()
                 pLocalHashMap->emplace(
                             pData->GetUpperLocal(),
                             pData );
+
+                if (aEnglishName.isEmpty())
+                    SAL_WARN("sc.core", "no English name for " << aLocalName << " " << aFuncName);
+                else
+                {
+                    pEnglishHashMap->emplace(
+                            ScCompiler::GetCharClassEnglish()->uppercase(aEnglishName),
+                            pData );
+                }
+                pData->SetEnglishName(aEnglishName);    // takes care of handling empty
             }
         }
     }
@@ -561,7 +634,7 @@ bool ScUnoAddInCollection::GetExcelName( const OUString& rCalcName,
 {
     const ScUnoAddInFuncData* pFuncData = GetFuncData( rCalcName );
     if ( pFuncData )
-        return pFuncData->GetExcelName( eDestLang, rRetExcelName);
+        return pFuncData->GetExcelName( LanguageTag( eDestLang), rRetExcelName);
     return false;
 }
 
@@ -700,12 +773,20 @@ void ScUnoAddInCollection::ReadFromAddIn( const uno::Reference<uno::XInterface>&
     if ( !(xAddIn.is() && xName.is()) )
         return;
 
-    // fdo50118 when GetUseEnglishFunctionName() returns true, set the
-    // locale to en-US to get English function names
-    if ( SC_MOD()->GetFormulaOptions().GetUseEnglishFuncName() )
-        xAddIn->setLocale( lang::Locale( "en", "US", ""));
-    else
-        xAddIn->setLocale( Application::GetSettings().GetUILanguageTag().getLocale());
+    // Even if GetUseEnglishFunctionName() would return true, do not set the
+    // locale to en-US to get English function names as that also would mix in
+    // English descriptions and parameter names. Also, setting a locale will
+    // reinitialize the Add-In completely, so switching back and forth isn't a
+    // good idea either.
+    xAddIn->setLocale( Application::GetSettings().GetUILanguageTag().getLocale());
+
+    // Instead, in a second run with 'en-US' obtain English names.
+    struct FuncNameData
+    {
+        OUString            aFuncU;
+        ScUnoAddInFuncData* pData;
+    };
+    std::vector<FuncNameData> aFuncNameData;
 
     OUString aServiceName( xName->getServiceName() );
     ScUnoAddInHelpIdGenerator aHelpIdGenerator( aServiceName );
@@ -746,6 +827,8 @@ void ScUnoAddInCollection::ReadFromAddIn( const uno::Reference<uno::XInterface>&
         pNameHashMap.reset( new ScAddInHashMap );
     if ( !pLocalHashMap )
         pLocalHashMap.reset( new ScAddInHashMap );
+    if ( !pEnglishHashMap )
+        pEnglishHashMap.reset( new ScAddInHashMap );
 
     const uno::Reference<reflection::XIdlMethod>* pArray = aMethods.getConstArray();
     for (tools::Long nFuncPos=0; nFuncPos<nNewCount; nFuncPos++)
@@ -896,8 +979,7 @@ void ScUnoAddInCollection::ReadFromAddIn( const uno::Reference<uno::XInterface>&
                         xFunc, aObject,
                         nVisibleCount, pVisibleArgs.get(), nCallerPos ) );
 
-                    const ScUnoAddInFuncData* pData =
-                        ppFuncData[nFuncPos+nOld].get();
+                    ScUnoAddInFuncData* pData = ppFuncData[nFuncPos+nOld].get();
                     pExactHashMap->emplace(
                                 pData->GetOriginalName(),
                                 pData );
@@ -907,15 +989,50 @@ void ScUnoAddInCollection::ReadFromAddIn( const uno::Reference<uno::XInterface>&
                     pLocalHashMap->emplace(
                                 pData->GetUpperLocal(),
                                 pData );
+
+                    aFuncNameData.push_back({aFuncU, pData});
                 }
             }
         }
     }
+
+    const LanguageTag aEnglishLanguageTag(LANGUAGE_ENGLISH_US);
+    xAddIn->setLocale( aEnglishLanguageTag.getLocale());
+    for (const auto& rFunc : aFuncNameData)
+    {
+        OUString aEnglishName;
+        try
+        {
+            aEnglishName = xAddIn->getDisplayFunctionName( rFunc.aFuncU );
+        }
+        catch(uno::Exception&)
+        {
+        }
+        if (aEnglishName.isEmpty()
+                && rFunc.pData->GetExcelName( aEnglishLanguageTag, aEnglishName, false /*bFallbackToAny*/))
+        {
+            // Check our known suffixes and append if not present. Note this
+            // depends on localization (that should not add such suffix, but..)
+            // and is really only a last resort.
+            if (rFunc.pData->GetLocalName().endsWith("_ADD") && !aEnglishName.endsWith("_ADD"))
+                aEnglishName += "_ADD";
+            else if (rFunc.pData->GetLocalName().endsWith("_EXCEL2003") && !aEnglishName.endsWith("_EXCEL2003"))
+                aEnglishName += "_EXCEL2003";
+            SAL_WARN("sc.core", "obtaining English name for " << rFunc.pData->GetLocalName() << " "
+                    << rFunc.pData->GetOriginalName() << " as ExcelName '" << aEnglishName << "'");
+        }
+        SAL_WARN_IF(aEnglishName.isEmpty(), "sc.core", "no English name for "
+                << rFunc.pData->GetLocalName() << " " << rFunc.pData->GetOriginalName());
+        rFunc.pData->SetEnglishName(aEnglishName);  // takes care of handling empty
+        pEnglishHashMap->emplace( rFunc.pData->GetUpperEnglish(), rFunc.pData);
+    }
 }
 
-static void lcl_UpdateFunctionList( const ScFunctionList& rFunctionList, const ScUnoAddInFuncData& rFuncData )
+static void lcl_UpdateFunctionList( const ScFunctionList& rFunctionList, const ScUnoAddInFuncData& rFuncData,
+        bool bEnglishFunctionNames )
 {
-    const OUString& aCompare = rFuncData.GetUpperLocal();    // as used in FillFunctionDescFromData
+    // as used in FillFunctionDescFromData
+    const OUString& aCompare = (bEnglishFunctionNames ? rFuncData.GetUpperEnglish() : rFuncData.GetUpperLocal());
 
     sal_uLong nCount = rFunctionList.GetCount();
     for (sal_uLong nPos=0; nPos<nCount; nPos++)
@@ -923,7 +1040,8 @@ static void lcl_UpdateFunctionList( const ScFunctionList& rFunctionList, const S
         const ScFuncDesc* pDesc = rFunctionList.GetFunction( nPos );
         if ( pDesc && pDesc->mxFuncName && *pDesc->mxFuncName == aCompare )
         {
-            ScUnoAddInCollection::FillFunctionDescFromData( rFuncData, *const_cast<ScFuncDesc*>(pDesc) );
+            ScUnoAddInCollection::FillFunctionDescFromData( rFuncData, *const_cast<ScFuncDesc*>(pDesc),
+                    bEnglishFunctionNames);
             break;
         }
     }
@@ -944,16 +1062,10 @@ static const ScAddInArgDesc* lcl_FindArgDesc( const ScUnoAddInFuncData& rFuncDat
 void ScUnoAddInCollection::UpdateFromAddIn( const uno::Reference<uno::XInterface>& xInterface,
                                             std::u16string_view rServiceName )
 {
+    const bool bEnglishFunctionNames = SC_MOD()->GetFormulaOptions().GetUseEnglishFuncName();
     uno::Reference<lang::XLocalizable> xLoc( xInterface, uno::UNO_QUERY );
     if ( xLoc.is() )        // optional in new add-ins
-    {
-        // fdo50118 when GetUseEnglishFunctionName() returns true, set the
-        // locale to en-US to get English function names
-        if ( SC_MOD()->GetFormulaOptions().GetUseEnglishFuncName() )
-            xLoc->setLocale( lang::Locale( "en", "US", ""));
-        else
-            xLoc->setLocale( Application::GetSettings().GetUILanguageTag().getLocale());
-    }
+        xLoc->setLocale( Application::GetSettings().GetUILanguageTag().getLocale());
 
     // if function list was already initialized, it must be updated
 
@@ -1059,7 +1171,7 @@ void ScUnoAddInCollection::UpdateFromAddIn( const uno::Reference<uno::XInterface
                     pOldData->SetCallerPos( nCallerPos );
 
                     if ( pFunctionList )
-                        lcl_UpdateFunctionList( *pFunctionList, *pOldData );
+                        lcl_UpdateFunctionList( *pFunctionList, *pOldData, bEnglishFunctionNames );
                 }
             }
         }
@@ -1076,7 +1188,7 @@ OUString ScUnoAddInCollection::FindFunction( const OUString& rUpperName, bool bL
 
     if ( bLocalFirst )
     {
-        //  first scan all local names (used for entering formulas)
+        // Only scan local names (used for entering formulas).
 
         ScAddInHashMap::const_iterator iLook( pLocalHashMap->find( rUpperName ) );
         if ( iLook != pLocalHashMap->end() )
@@ -1084,14 +1196,22 @@ OUString ScUnoAddInCollection::FindFunction( const OUString& rUpperName, bool bL
     }
     else
     {
-        //  first scan international names (used when calling a function)
-        //TODO: before that, check for exact match???
+        // First scan international programmatic names (used when calling a
+        // function).
 
         ScAddInHashMap::const_iterator iLook( pNameHashMap->find( rUpperName ) );
         if ( iLook != pNameHashMap->end() )
             return iLook->second->GetOriginalName();
 
-        //  after that, scan all local names (to allow replacing old AddIns with Uno)
+        // Then scan English names (as FunctionAccess API could expect).
+
+        iLook = pEnglishHashMap->find( rUpperName );
+        if ( iLook != pEnglishHashMap->end() )
+            return iLook->second->GetOriginalName();
+
+        // After that, scan all local names; either to allow replacing old
+        // AddIns with Uno, or for functions where the AddIn did not provide an
+        // English name.
 
         iLook = pLocalHashMap->find( rUpperName );
         if ( iLook != pLocalHashMap->end() )
@@ -1152,7 +1272,7 @@ tools::Long ScUnoAddInCollection::GetFuncCount()
     return nFuncCount;
 }
 
-bool ScUnoAddInCollection::FillFunctionDesc( tools::Long nFunc, ScFuncDesc& rDesc )
+bool ScUnoAddInCollection::FillFunctionDesc( tools::Long nFunc, ScFuncDesc& rDesc, bool bEnglishFunctionNames )
 {
     if (!bInitialized)
         Initialize();
@@ -1162,10 +1282,11 @@ bool ScUnoAddInCollection::FillFunctionDesc( tools::Long nFunc, ScFuncDesc& rDes
 
     const ScUnoAddInFuncData& rFuncData = *ppFuncData[nFunc];
 
-    return FillFunctionDescFromData( rFuncData, rDesc );
+    return FillFunctionDescFromData( rFuncData, rDesc, bEnglishFunctionNames );
 }
 
-bool ScUnoAddInCollection::FillFunctionDescFromData( const ScUnoAddInFuncData& rFuncData, ScFuncDesc& rDesc )
+bool ScUnoAddInCollection::FillFunctionDescFromData( const ScUnoAddInFuncData& rFuncData, ScFuncDesc& rDesc,
+        bool bEnglishFunctionNames )
 {
     rDesc.Clear();
 
@@ -1180,7 +1301,7 @@ bool ScUnoAddInCollection::FillFunctionDescFromData( const ScUnoAddInFuncData& r
 
     // nFIndex is set from outside
 
-    rDesc.mxFuncName = rFuncData.GetUpperLocal();     //TODO: upper?
+    rDesc.mxFuncName = (bEnglishFunctionNames ? rFuncData.GetUpperEnglish() : rFuncData.GetUpperLocal());
     rDesc.nCategory = rFuncData.GetCategory();
     rDesc.sHelpId = rFuncData.GetHelpId();
 

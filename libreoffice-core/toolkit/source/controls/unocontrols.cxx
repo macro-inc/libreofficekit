@@ -32,7 +32,6 @@
 #include <controls/formattedcontrol.hxx>
 #include <toolkit/controls/unocontrols.hxx>
 #include <toolkit/helper/property.hxx>
-#include <helper/servicenames.hxx>
 #include <toolkit/helper/macros.hxx>
 
 // for introspection
@@ -42,13 +41,13 @@
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
-#include <vcl/window.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
 #include <helper/imagealign.hxx>
 #include <helper/unopropertyarrayhelper.hxx>
+#include <utility>
 
 using namespace css;
 using namespace css::awt;
@@ -187,7 +186,7 @@ void SAL_CALL UnoEditControl::release(  ) noexcept
 
 IMPLEMENT_FORWARD_XTYPEPROVIDER2( UnoEditControl, UnoControlBase, UnoEditControl_Base )
 
-OUString UnoEditControl::GetComponentServiceName()
+OUString UnoEditControl::GetComponentServiceName() const
 {
     // by default, we want a simple edit field
     OUString sName( "Edit" );
@@ -271,11 +270,23 @@ void UnoEditControl::textChanged(const awt::TextEvent& e)
 
 void UnoEditControl::addTextListener(const uno::Reference< awt::XTextListener > & l)
 {
+    // tdf#150974 some extensions pass null
+    if (!l)
+    {
+        SAL_WARN("toolkit", "null XTextListener");
+        return;
+    }
     maTextListeners.addInterface( l );
 }
 
 void UnoEditControl::removeTextListener(const uno::Reference< awt::XTextListener > & l)
 {
+    // tdf#150974 some extensions pass null
+    if (!l)
+    {
+        SAL_WARN("toolkit", "null XTextListener");
+        return;
+    }
     maTextListeners.removeInterface( l );
 }
 
@@ -544,7 +555,7 @@ UnoFileControl::UnoFileControl()
 {
 }
 
-OUString UnoFileControl::GetComponentServiceName()
+OUString UnoFileControl::GetComponentServiceName() const
 {
     return "filecontrol";
 }
@@ -573,7 +584,7 @@ stardiv_Toolkit_UnoFileControl_get_implementation(
 uno::Any GraphicControlModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
 {
     if ( nPropId == BASEPROPERTY_GRAPHIC )
-        return uno::makeAny( uno::Reference< graphic::XGraphic >() );
+        return uno::Any( uno::Reference< graphic::XGraphic >() );
 
     return UnoControlModel::ImplGetDefaultValue( nPropId );
 }
@@ -594,7 +605,7 @@ void SAL_CALL GraphicControlModel::setFastPropertyValue_NoBroadcast( sal_Int32 n
                 mbAdjustingGraphic = true;
                 OUString sImageURL;
                 OSL_VERIFY( rValue >>= sImageURL );
-                setDependentFastPropertyValue( BASEPROPERTY_GRAPHIC, uno::makeAny( ImageHelper::getGraphicFromURL_nothrow( sImageURL ) ) );
+                setDependentFastPropertyValue( BASEPROPERTY_GRAPHIC, uno::Any( ImageHelper::getGraphicFromURL_nothrow( sImageURL ) ) );
                 mbAdjustingGraphic = false;
             }
             break;
@@ -603,7 +614,7 @@ void SAL_CALL GraphicControlModel::setFastPropertyValue_NoBroadcast( sal_Int32 n
             if ( !mbAdjustingGraphic && ImplHasProperty( BASEPROPERTY_IMAGEURL ) )
             {
                 mbAdjustingGraphic = true;
-                setDependentFastPropertyValue( BASEPROPERTY_IMAGEURL, uno::makeAny( OUString() ) );
+                setDependentFastPropertyValue( BASEPROPERTY_IMAGEURL, uno::Any( OUString() ) );
                 mbAdjustingGraphic = false;
             }
             break;
@@ -614,7 +625,7 @@ void SAL_CALL GraphicControlModel::setFastPropertyValue_NoBroadcast( sal_Int32 n
                 mbAdjustingImagePosition = true;
                 sal_Int16 nUNOValue = 0;
                 OSL_VERIFY( rValue >>= nUNOValue );
-                setDependentFastPropertyValue( BASEPROPERTY_IMAGEPOSITION, uno::makeAny( getExtendedImagePosition( nUNOValue ) ) );
+                setDependentFastPropertyValue( BASEPROPERTY_IMAGEPOSITION, uno::Any( getExtendedImagePosition( nUNOValue ) ) );
                 mbAdjustingImagePosition = false;
             }
             break;
@@ -624,7 +635,7 @@ void SAL_CALL GraphicControlModel::setFastPropertyValue_NoBroadcast( sal_Int32 n
                 mbAdjustingImagePosition = true;
                 sal_Int16 nUNOValue = 0;
                 OSL_VERIFY( rValue >>= nUNOValue );
-                setDependentFastPropertyValue( BASEPROPERTY_IMAGEALIGN, uno::makeAny( getCompatibleImageAlign( translateImagePosition( nUNOValue ) ) ) );
+                setDependentFastPropertyValue( BASEPROPERTY_IMAGEALIGN, uno::Any( getCompatibleImageAlign( translateImagePosition( nUNOValue ) ) ) );
                 mbAdjustingImagePosition = false;
             }
             break;
@@ -664,13 +675,13 @@ uno::Any UnoControlButtonModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
     switch ( nPropId )
     {
     case BASEPROPERTY_DEFAULTCONTROL:
-        return uno::makeAny( OUString( "stardiv.vcl.control.Button" ) );
+        return uno::Any( OUString( "stardiv.vcl.control.Button" ) );
     case BASEPROPERTY_TOGGLE:
-        return uno::makeAny( false );
+        return uno::Any( false );
     case BASEPROPERTY_ALIGN:
-        return uno::makeAny( sal_Int16(PROPERTY_ALIGN_CENTER) );
+        return uno::Any( sal_Int16(PROPERTY_ALIGN_CENTER) );
     case BASEPROPERTY_FOCUSONCLICK:
-        return uno::makeAny( true );
+        return uno::Any( true );
     }
 
     return GraphicControlModel::ImplGetDefaultValue( nPropId );
@@ -718,7 +729,7 @@ UnoButtonControl::UnoButtonControl()
     maComponentInfos.nHeight = 14;
 }
 
-OUString UnoButtonControl::GetComponentServiceName()
+OUString UnoButtonControl::GetComponentServiceName() const
 {
     OUString aName( "pushbutton" );
     uno::Any aVal = ImplGetPropertyValue( GetPropertyName( BASEPROPERTY_PUSHBUTTONTYPE ) );
@@ -768,6 +779,13 @@ void UnoButtonControl::createPeer( const uno::Reference< awt::XToolkit > & rxToo
 
 void UnoButtonControl::addActionListener(const uno::Reference< awt::XActionListener > & l)
 {
+    // tdf#150974 some extensions pass null
+    if (!l)
+    {
+        SAL_WARN("toolkit", "null XActionListener");
+        return;
+    }
+
     maActionListeners.addInterface( l );
     if( getPeer().is() && maActionListeners.getLength() == 1 )
     {
@@ -778,6 +796,13 @@ void UnoButtonControl::addActionListener(const uno::Reference< awt::XActionListe
 
 void UnoButtonControl::removeActionListener(const uno::Reference< awt::XActionListener > & l)
 {
+    // tdf#150974 some extensions pass null
+    if (!l)
+    {
+        SAL_WARN("toolkit", "null XActionListener");
+        return;
+    }
+
     if( getPeer().is() && maActionListeners.getLength() == 1 )
     {
         uno::Reference < awt::XButton >  xButton( getPeer(), uno::UNO_QUERY );
@@ -895,10 +920,10 @@ UnoControlImageControlModel::getSupportedServiceNames()
 uno::Any UnoControlImageControlModel::ImplGetDefaultValue( sal_uInt16 nPropId ) const
 {
     if ( nPropId == BASEPROPERTY_DEFAULTCONTROL )
-        return uno::makeAny( OUString( "stardiv.vcl.control.ImageControl" ) );
+        return uno::Any( OUString( "stardiv.vcl.control.ImageControl" ) );
 
     if ( nPropId == BASEPROPERTY_IMAGE_SCALE_MODE )
-        return makeAny( awt::ImageScaleMode::ANISOTROPIC );
+        return Any( awt::ImageScaleMode::ANISOTROPIC );
 
     return GraphicControlModel::ImplGetDefaultValue( nPropId );
 }
@@ -931,7 +956,7 @@ void SAL_CALL UnoControlImageControlModel::setFastPropertyValue_NoBroadcast( sal
                 mbAdjustingImageScaleMode = true;
                 sal_Int16 nScaleMode( awt::ImageScaleMode::ANISOTROPIC );
                 OSL_VERIFY( _rValue >>= nScaleMode );
-                setDependentFastPropertyValue( BASEPROPERTY_SCALEIMAGE, uno::makeAny( nScaleMode != awt::ImageScaleMode::NONE ) );
+                setDependentFastPropertyValue( BASEPROPERTY_SCALEIMAGE, uno::Any( nScaleMode != awt::ImageScaleMode::NONE ) );
                 mbAdjustingImageScaleMode = false;
             }
             break;
@@ -941,7 +966,7 @@ void SAL_CALL UnoControlImageControlModel::setFastPropertyValue_NoBroadcast( sal
                 mbAdjustingImageScaleMode = true;
                 bool bScale = true;
                 OSL_VERIFY( _rValue >>= bScale );
-                setDependentFastPropertyValue( BASEPROPERTY_IMAGE_SCALE_MODE, uno::makeAny( bScale ? awt::ImageScaleMode::ANISOTROPIC : awt::ImageScaleMode::NONE ) );
+                setDependentFastPropertyValue( BASEPROPERTY_IMAGE_SCALE_MODE, uno::Any( bScale ? awt::ImageScaleMode::ANISOTROPIC : awt::ImageScaleMode::NONE ) );
                 mbAdjustingImageScaleMode = false;
             }
             break;
@@ -972,7 +997,7 @@ UnoImageControlControl::UnoImageControlControl()
     maComponentInfos.nHeight = 100;
 }
 
-OUString UnoImageControlControl::GetComponentServiceName()
+OUString UnoImageControlControl::GetComponentServiceName() const
 {
     return "fixedimage";
 }
@@ -1047,10 +1072,10 @@ uno::Any UnoControlRadioButtonModel::ImplGetDefaultValue( sal_uInt16 nPropId ) c
     switch ( nPropId )
     {
     case BASEPROPERTY_DEFAULTCONTROL:
-        return uno::makeAny( OUString( "stardiv.vcl.control.RadioButton" ) );
+        return uno::Any( OUString( "stardiv.vcl.control.RadioButton" ) );
 
     case BASEPROPERTY_VISUALEFFECT:
-        return uno::makeAny( sal_Int16(awt::VisualEffect::LOOK3D) );
+        return uno::Any( sal_Int16(awt::VisualEffect::LOOK3D) );
     }
 
     return GraphicControlModel::ImplGetDefaultValue( nPropId );
@@ -1099,7 +1124,7 @@ UnoRadioButtonControl::UnoRadioButtonControl()
     maComponentInfos.nHeight = 12;
 }
 
-OUString UnoRadioButtonControl::GetComponentServiceName()
+OUString UnoRadioButtonControl::GetComponentServiceName() const
 {
     return "radiobutton";
 }
@@ -1280,10 +1305,10 @@ uno::Any UnoControlCheckBoxModel::ImplGetDefaultValue( sal_uInt16 nPropId ) cons
     switch ( nPropId )
     {
     case BASEPROPERTY_DEFAULTCONTROL:
-        return uno::makeAny( OUString( "stardiv.vcl.control.CheckBox" ) );
+        return uno::Any( OUString( "stardiv.vcl.control.CheckBox" ) );
 
     case BASEPROPERTY_VISUALEFFECT:
-        return uno::makeAny( sal_Int16(awt::VisualEffect::LOOK3D) );
+        return uno::Any( sal_Int16(awt::VisualEffect::LOOK3D) );
     }
 
     return GraphicControlModel::ImplGetDefaultValue( nPropId );
@@ -1330,7 +1355,7 @@ UnoCheckBoxControl::UnoCheckBoxControl()
     maComponentInfos.nHeight = 12;
 }
 
-OUString UnoCheckBoxControl::GetComponentServiceName()
+OUString UnoCheckBoxControl::GetComponentServiceName() const
 {
     return "checkbox";
 }
@@ -1528,7 +1553,7 @@ UnoFixedHyperlinkControl::UnoFixedHyperlinkControl()
     maComponentInfos.nHeight = 12;
 }
 
-OUString UnoFixedHyperlinkControl::GetComponentServiceName()
+OUString UnoFixedHyperlinkControl::GetComponentServiceName() const
 {
     return "fixedhyperlink";
 }
@@ -1725,7 +1750,7 @@ UnoFixedTextControl::UnoFixedTextControl()
     maComponentInfos.nHeight = 12;
 }
 
-OUString UnoFixedTextControl::GetComponentServiceName()
+OUString UnoFixedTextControl::GetComponentServiceName() const
 {
     return "fixedtext";
 }
@@ -1889,7 +1914,7 @@ UnoGroupBoxControl::UnoGroupBoxControl()
     maComponentInfos.nHeight = 100;
 }
 
-OUString UnoGroupBoxControl::GetComponentServiceName()
+OUString UnoGroupBoxControl::GetComponentServiceName() const
 {
     return "groupbox";
 }
@@ -1933,8 +1958,8 @@ struct ListItem
     {
     }
 
-    explicit ListItem( const OUString& i_rItemText )
-        :ItemText( i_rItemText )
+    explicit ListItem( OUString i_ItemText )
+        :ItemText(std::move( i_ItemText ))
     {
     }
 };
@@ -1967,7 +1992,7 @@ struct UnoControlListBoxModel_Data
 
     const ListItem& getItem( const sal_Int32 i_nIndex ) const
     {
-        if ( ( i_nIndex < 0 ) || ( i_nIndex >= sal_Int32( m_aListItems.size() ) ) )
+        if ( ( i_nIndex < 0 ) || ( o3tl::make_unsigned(i_nIndex) >= m_aListItems.size() ) )
             throw IndexOutOfBoundsException( OUString(), m_rAntiImpl );
         return m_aListItems[ i_nIndex ];
     }
@@ -1979,7 +2004,7 @@ struct UnoControlListBoxModel_Data
 
     ListItem& insertItem( const sal_Int32 i_nIndex )
     {
-        if ( ( i_nIndex < 0 ) || ( i_nIndex > sal_Int32( m_aListItems.size() ) ) )
+        if ( ( i_nIndex < 0 ) || ( o3tl::make_unsigned(i_nIndex) > m_aListItems.size() ) )
             throw IndexOutOfBoundsException( OUString(), m_rAntiImpl );
         return *m_aListItems.insert( m_aListItems.begin() + i_nIndex, ListItem() );
     }
@@ -2003,7 +2028,7 @@ struct UnoControlListBoxModel_Data
 
     void    removeItem( const sal_Int32 i_nIndex )
     {
-        if ( ( i_nIndex < 0 ) || ( i_nIndex >= sal_Int32( m_aListItems.size() ) ) )
+        if ( ( i_nIndex < 0 ) || ( o3tl::make_unsigned(i_nIndex) >= m_aListItems.size() ) )
             throw IndexOutOfBoundsException( OUString(), m_rAntiImpl );
         m_aListItems.erase( m_aListItems.begin() + i_nIndex );
     }
@@ -2335,7 +2360,7 @@ void UnoControlListBoxModel::impl_setStringItemList_nolck( const ::std::vector< 
     m_xData->m_bSettingLegacyProperty = true;
     try
     {
-        setFastPropertyValue( BASEPROPERTY_STRINGITEMLIST, uno::makeAny( aStringItems ) );
+        setFastPropertyValue( BASEPROPERTY_STRINGITEMLIST, uno::Any( aStringItems ) );
     }
     catch( const Exception& )
     {
@@ -2476,7 +2501,7 @@ UnoListBoxControl::UnoListBoxControl()
     maComponentInfos.nHeight = 12;
 }
 
-OUString UnoListBoxControl::GetComponentServiceName()
+OUString UnoListBoxControl::GetComponentServiceName() const
 {
     return "listbox";
 }
@@ -2985,7 +3010,7 @@ css::uno::Sequence<OUString> UnoComboBoxControl::getSupportedServiceNames()
     return comphelper::concatSequences( UnoEditControl::getSupportedServiceNames(), vals);
 }
 
-OUString UnoComboBoxControl::GetComponentServiceName()
+OUString UnoComboBoxControl::GetComponentServiceName() const
 {
     return "combobox";
 }
@@ -3439,7 +3464,7 @@ UnoDateFieldControl::UnoDateFieldControl()
     mbLongFormat = TRISTATE_INDET;
 }
 
-OUString UnoDateFieldControl::GetComponentServiceName()
+OUString UnoDateFieldControl::GetComponentServiceName() const
 {
     return "datefield";
 }
@@ -3706,7 +3731,7 @@ UnoTimeFieldControl::UnoTimeFieldControl()
     mnLast = util::Time( 999999999, 59, 59, 23, false );
 }
 
-OUString UnoTimeFieldControl::GetComponentServiceName()
+OUString UnoTimeFieldControl::GetComponentServiceName() const
 {
     return "timefield";
 }
@@ -3933,7 +3958,7 @@ UnoNumericFieldControl::UnoNumericFieldControl()
     mnLast = 0x7FFFFFFF;
 }
 
-OUString UnoNumericFieldControl::GetComponentServiceName()
+OUString UnoNumericFieldControl::GetComponentServiceName() const
 {
     return "numericfield";
 }
@@ -4153,7 +4178,7 @@ UnoCurrencyFieldControl::UnoCurrencyFieldControl()
     mnLast = 0x7FFFFFFF;
 }
 
-OUString UnoCurrencyFieldControl::GetComponentServiceName()
+OUString UnoCurrencyFieldControl::GetComponentServiceName() const
 {
     return "longcurrencyfield";
 }
@@ -4368,7 +4393,7 @@ UnoPatternFieldControl::UnoPatternFieldControl()
 {
 }
 
-OUString UnoPatternFieldControl::GetComponentServiceName()
+OUString UnoPatternFieldControl::GetComponentServiceName() const
 {
     return "patternfield";
 }
@@ -4544,7 +4569,7 @@ UnoProgressBarControl::UnoProgressBarControl()
 {
 }
 
-OUString UnoProgressBarControl::GetComponentServiceName()
+OUString UnoProgressBarControl::GetComponentServiceName() const
 {
     return "ProgressBar";
 }
@@ -4704,7 +4729,7 @@ UnoFixedLineControl::UnoFixedLineControl()
     maComponentInfos.nHeight = 100;     // ??
 }
 
-OUString UnoFixedLineControl::GetComponentServiceName()
+OUString UnoFixedLineControl::GetComponentServiceName() const
 {
     return "FixedLine";
 }

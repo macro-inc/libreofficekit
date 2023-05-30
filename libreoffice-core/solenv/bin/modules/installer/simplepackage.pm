@@ -18,6 +18,9 @@
 
 package installer::simplepackage;
 
+use strict;
+use warnings;
+
 use Cwd;
 use File::Copy;
 use installer::download;
@@ -309,7 +312,7 @@ sub create_package
 
             print "... $systemcall ...\n";
             my $localreturnvalue = system($systemcall);
-            $infoline = "Systemcall: $systemcall\n";
+            my $infoline = "Systemcall: $systemcall\n";
             push( @installer::globals::logfileinfo, $infoline);
 
             if ($localreturnvalue)
@@ -414,7 +417,7 @@ sub create_package
                 $newappdir =~ s/ /\\ /g;
                 $systemcall = "$ENV{'SRCDIR'}/solenv/bin/macosx-codesign-app-bundle $newappdir";
                 print "... $systemcall ...\n";
-                $infoline = "Systemcall: $systemcall\n";
+                my $infoline = "Systemcall: $systemcall\n";
                 push( @installer::globals::logfileinfo, $infoline);
                 my $output = `$systemcall 2>&1`;
                 if ($?)
@@ -440,7 +443,7 @@ sub create_package
                     $systemcall = "codesign --force --verbose --options=runtime --identifier='$ENV{MACOSX_BUNDLE_IDENTIFIER}.$sdkbinary' --sign '$ENV{MACOSX_CODESIGNING_IDENTITY}' --entitlements $ENV{BUILDDIR}/hardened_runtime.xcent $sdkbindir/$sdkbinary > /tmp/codesign_losdk_$sdkbinary.log 2>&1";
                     print "... $systemcall ...\n";
                     my $returnvalue = system($systemcall);
-                    $infoline = "Systemcall: $systemcall\n";
+                    my $infoline = "Systemcall: $systemcall\n";
                     push( @installer::globals::logfileinfo, $infoline);
 
                     if ($returnvalue)
@@ -459,8 +462,23 @@ sub create_package
             }
         }
         my $megabytes = 1500;
-        $megabytes = 2000 if $ENV{'ENABLE_DEBUG'};
-        $systemcall = "cd $localtempdir && hdiutil create -megabytes $megabytes -srcfolder $folder $archive -ov -fs HFS+ -volname \"$volume_name\" -format UDBZ";
+        $megabytes = 3000 if $ENV{'ENABLE_DEBUG'};
+
+        # tdf#151341 Use lzfse compression instead of bzip2
+        # Several users reported that copying the LibreOffice.app package
+        # in the Finder from a .dmg file compressed with lzfse compression
+        # copies the package several times faster than from a .dmg compressed
+        # with bzip2 compression.
+        # On a mid-2015 Intel MacBook Pro running macOS, copying in the Finder
+        # was at least 5 times faster with lzfse than with bzip2. Also, the
+        # hdiutil man page as of macOS Monterey 12.6.2 has marked bzip2 as
+        # deprecated. lzfse is marked as supported since macOS El Capitan 10.11
+        # so this change appears safe.
+        # The one thing that bzip2 has is better compression so a .dmg with
+        # bzip2 should be smaller than with lzfse. A .dmg built from a debug
+        # build was 262M with bzip2 and 273MB for lzfse. So it appears that
+        # lzfse creates .dmg files that are only 4% or 5% larger than bzip2.
+        $systemcall = "cd $localtempdir && hdiutil create -megabytes $megabytes -srcfolder $folder $archive -ov -fs HFS+ -volname \"$volume_name\" -format ULFO";
         if (( $ref ne "" ) && ( $$ref ne "" ) && system("hdiutil 2>&1 | grep unflatten") == 0) {
             $systemcall .= " && hdiutil unflatten $archive && Rez -a $$ref -o $archive && hdiutil flatten $archive &&";
         }
@@ -616,12 +634,10 @@ sub create_simple_package
             if ($copyreturn)
             {
                 $infoline = "Copy: $source to $destination\n";
-                $returnvalue = 1;
             }
             else
             {
                 $infoline = "ERROR: Could not copy $source to $destination $!\n";
-                $returnvalue = 0;
             }
 
             push(@installer::globals::logfileinfo, $infoline);

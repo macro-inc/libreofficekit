@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-07-12 03:33+0000\n"
+"POT-Creation-Date: 2023-01-09 11:30+0100\n"
+"PO-Revision-Date: 2023-03-07 09:34+0000\n"
 "Last-Translator: Miloš Šrámek <msramek22@gmail.com>\n"
-"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/sk/>\n"
+"Language-Team: Slovak <https://translations.documentfoundation.org/projects/libo_ui-7-5/sfx2messages/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1566300978.000000\n"
 
 #. bHbFE
@@ -427,7 +427,7 @@ msgstr "Tlač..."
 #: include/sfx2/strings.hrc:88
 msgctxt "STR_HELP_BUTTON_ADDBOOKMARK"
 msgid "Add to Bookmarks..."
-msgstr "Pridať k záložkám..."
+msgstr "Pridať do záložiek..."
 
 #. SGFus
 #: include/sfx2/strings.hrc:89
@@ -1107,7 +1107,7 @@ msgstr "Cieľ s týmto názvom už existuje"
 #: include/sfx2/strings.hrc:202
 msgctxt "STR_REDACTION_MULTI_EDIT"
 msgid "You have selected multiple targets, but only one target can be edited at once."
-msgstr "Vybrali ste viac cieľov, ale upravovať možno iba jeden."
+msgstr "Vybrali ste viac cieľov, ale upravovať možno len jeden."
 
 #. BTayC
 #: include/sfx2/strings.hrc:203
@@ -1161,7 +1161,7 @@ msgstr "Vložiť"
 #: include/sfx2/strings.hrc:212
 msgctxt "STR_SFX_EXPLORERFILE_BUTTONINSERT"
 msgid "~Insert"
-msgstr "Vlož~iť"
+msgstr "~Vložiť"
 
 #. DcLFD
 #: include/sfx2/strings.hrc:213
@@ -1175,11 +1175,11 @@ msgctxt "STR_PB_SAVEACOPY"
 msgid "Save a Copy"
 msgstr "Uložiť kópiu"
 
-#. T9mMd
+#. CrEzt
 #: include/sfx2/strings.hrc:215
 msgctxt "STR_PB_COMPAREDOC"
-msgid "Compare to"
-msgstr "Porovnať s"
+msgid "Compare to Original Document"
+msgstr "Porovnať s pôvodným dokumentom"
 
 #. 4qMCh
 #: include/sfx2/strings.hrc:216
@@ -1361,7 +1361,7 @@ msgstr "Tlačiareň je zaneprázdnená"
 #: include/sfx2/strings.hrc:249
 msgctxt "STR_READONLY"
 msgid " (read-only)"
-msgstr " (Iba na čítanie)"
+msgstr " (Len na čítanie)"
 
 #. uL87C
 #: include/sfx2/strings.hrc:250
@@ -1500,7 +1500,7 @@ msgstr "Zapojiť sa"
 #: include/sfx2/strings.hrc:267
 msgctxt "STR_DONATE_TEXT"
 msgid "Your donations support our worldwide community."
-msgstr "Vaše finančné príspevky podporujú našu celosvetovú komunitu."
+msgstr "Vaše finančné príspevky pomáhajú našej celosvetovej komunite."
 
 #. KzgoD
 #: include/sfx2/strings.hrc:268
@@ -1614,7 +1614,7 @@ msgstr "Minimálne jeden podpis má problémy: certifikát sa nepodarilo overiť
 #: include/sfx2/strings.hrc:286
 msgctxt "STR_SIGNATURE_PARTIAL_OK"
 msgid "At least one signature has problems: the document is only partially signed."
-msgstr "Minimálne jeden podpis má problémy: dokument je podpísaný iba čiastočne."
+msgstr "Minimálne jeden podpis má problémy: dokument je podpísaný len čiastočne."
 
 #. mU6ot
 #: include/sfx2/strings.hrc:287
@@ -1664,337 +1664,367 @@ msgctxt "STR_REFRESH_PASSWORD"
 msgid "Refresh Password"
 msgstr "Aktualizovať heslo"
 
+#. JBvAE
+#: include/sfx2/strings.hrc:295
+msgctxt "STR_CONTAINS_MACROS"
+msgid "The document contains macros."
+msgstr "Dokument obsahuje makrá."
+
+#. W7BEM
+#: include/sfx2/strings.hrc:296
+msgctxt "STR_MACROS"
+msgid "Macros"
+msgstr "Makrá"
+
+#. xtAP6
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_EVENTS"
+msgid "Events"
+msgstr "Udalosti"
+
 #. kej8D
 #. Translators: default Impress template names
-#: include/sfx2/strings.hrc:297
+#: include/sfx2/strings.hrc:300
 msgctxt "STR_TEMPLATE_NAME1"
 msgid "Grey Elegant"
 msgstr "Elegantná sivá"
 
 #. FkuLG
-#: include/sfx2/strings.hrc:298
+#: include/sfx2/strings.hrc:301
 msgctxt "STR_TEMPLATE_NAME2"
 msgid "Beehive"
 msgstr "Včelí úľ"
 
 #. uwaPH
-#: include/sfx2/strings.hrc:299
+#: include/sfx2/strings.hrc:302
 msgctxt "STR_TEMPLATE_NAME3"
 msgid "Blue Curve"
 msgstr "Modrá krivka"
 
 #. hHRDz
-#: include/sfx2/strings.hrc:300
+#: include/sfx2/strings.hrc:303
 msgctxt "STR_TEMPLATE_NAME4"
 msgid "Blueprint Plans"
 msgstr "Plán"
 
 #. MAnPU
-#: include/sfx2/strings.hrc:301
+#: include/sfx2/strings.hrc:304
 msgctxt "STR_TEMPLATE_NAME5"
 msgid "Candy"
 msgstr "Cukrík"
 
 #. jEiAn
-#: include/sfx2/strings.hrc:302
+#: include/sfx2/strings.hrc:305
 msgctxt "STR_TEMPLATE_NAME6"
 msgid "Yellow Idea"
 msgstr "Žltý nápad"
 
 #. QDNuB
-#: include/sfx2/strings.hrc:303
+#: include/sfx2/strings.hrc:306
 msgctxt "STR_TEMPLATE_NAME7"
 msgid "DNA"
 msgstr "DNA"
 
 #. XBrCi
-#: include/sfx2/strings.hrc:304
+#: include/sfx2/strings.hrc:307
 msgctxt "STR_TEMPLATE_NAME8"
 msgid "Focus"
 msgstr "Fokus"
 
 #. GADdA
-#: include/sfx2/strings.hrc:305
+#: include/sfx2/strings.hrc:308
 msgctxt "STR_TEMPLATE_NAME9"
 msgid "Forestbird"
 msgstr "Lesný vták"
 
 #. TT8G5
-#: include/sfx2/strings.hrc:306
+#: include/sfx2/strings.hrc:309
 msgctxt "STR_TEMPLATE_NAME10"
 msgid "Freshes"
 msgstr "Svieži"
 
 #. C5N9D
-#: include/sfx2/strings.hrc:307
+#: include/sfx2/strings.hrc:310
 msgctxt "STR_TEMPLATE_NAME11"
 msgid "Inspiration"
 msgstr "Inšpirácia"
 
 #. fCKG9
-#: include/sfx2/strings.hrc:308
+#: include/sfx2/strings.hrc:311
 msgctxt "STR_TEMPLATE_NAME12"
 msgid "Lights"
 msgstr "Svetlá"
 
 #. pcLWs
-#: include/sfx2/strings.hrc:309
+#: include/sfx2/strings.hrc:312
 msgctxt "STR_TEMPLATE_NAME13"
 msgid "Growing Liberty"
 msgstr "Rastúca sloboda"
 
 #. xo2gC
-#: include/sfx2/strings.hrc:310
+#: include/sfx2/strings.hrc:313
 msgctxt "STR_TEMPLATE_NAME14"
 msgid "Metropolis"
 msgstr "Metropolis"
 
 #. FFDBk
-#: include/sfx2/strings.hrc:311
+#: include/sfx2/strings.hrc:314
 msgctxt "STR_TEMPLATE_NAME15"
 msgid "Midnightblue"
 msgstr "Polnočná modrá"
 
 #. yiCzk
-#: include/sfx2/strings.hrc:312
+#: include/sfx2/strings.hrc:315
 msgctxt "STR_TEMPLATE_NAME16"
 msgid "Nature Illustration"
 msgstr "Príroda"
 
 #. cCZzC
-#: include/sfx2/strings.hrc:313
+#: include/sfx2/strings.hrc:316
 msgctxt "STR_TEMPLATE_NAME17"
 msgid "Pencil"
 msgstr "Ceruzka"
 
 #. Ji4Cw
-#: include/sfx2/strings.hrc:314
+#: include/sfx2/strings.hrc:317
 msgctxt "STR_TEMPLATE_NAME18"
 msgid "Piano"
 msgstr "Klavír"
 
 #. mrbiq
-#: include/sfx2/strings.hrc:315
+#: include/sfx2/strings.hrc:318
 msgctxt "STR_TEMPLATE_NAME19"
 msgid "Portfolio"
 msgstr "Portfólio"
 
 #. ysBGy
-#: include/sfx2/strings.hrc:316
+#: include/sfx2/strings.hrc:319
 msgctxt "STR_TEMPLATE_NAME20"
 msgid "Progress"
 msgstr "Postup"
 
 #. gtPt9
-#: include/sfx2/strings.hrc:317
+#: include/sfx2/strings.hrc:320
 msgctxt "STR_TEMPLATE_NAME21"
 msgid "Sunset"
 msgstr "Západ slnka"
 
 #. 73Y2e
-#: include/sfx2/strings.hrc:318
+#: include/sfx2/strings.hrc:321
 msgctxt "STR_TEMPLATE_NAME22"
 msgid "Vintage"
 msgstr "Starožitnosť"
 
 #. MSY8y
-#: include/sfx2/strings.hrc:319
+#: include/sfx2/strings.hrc:322
 msgctxt "STR_TEMPLATE_NAME23"
 msgid "Vivid"
 msgstr "Svieži"
 
 #. QDZBz
 #. Translators: default Writer template names
-#: include/sfx2/strings.hrc:321
+#: include/sfx2/strings.hrc:324
 msgctxt "STR_TEMPLATE_NAME24"
 msgid "CV"
 msgstr "Životopis"
 
 #. Koe3V
-#: include/sfx2/strings.hrc:322
+#: include/sfx2/strings.hrc:325
 msgctxt "STR_TEMPLATE_NAME25"
 msgid "Resume"
 msgstr "Stručný životopis"
 
 #. hCpfD
-#: include/sfx2/strings.hrc:323
+#: include/sfx2/strings.hrc:326
 msgctxt "STR_TEMPLATE_NAME26"
 msgid "Default"
-msgstr "Prednastavené"
+msgstr "Predvolené"
 
 #. d7Hyk
-#: include/sfx2/strings.hrc:324
+#: include/sfx2/strings.hrc:327
 msgctxt "STR_TEMPLATE_NAME27"
 msgid "Modern"
 msgstr "Moderný"
 
 #. CVJEC
-#: include/sfx2/strings.hrc:325
+#: include/sfx2/strings.hrc:328
 msgctxt "STR_TEMPLATE_NAME28"
 msgid "Modern business letter sans-serif"
 msgstr "Moderný obchodný list bezpätkový"
 
 #. 95GeB
-#: include/sfx2/strings.hrc:326
+#: include/sfx2/strings.hrc:329
 msgctxt "STR_TEMPLATE_NAME29"
 msgid "Modern business letter serif"
 msgstr "Moderný obchodný list pätkový"
 
 #. XdU49
-#: include/sfx2/strings.hrc:327
+#: include/sfx2/strings.hrc:330
 msgctxt "STR_TEMPLATE_NAME30"
 msgid "Businesscard with logo"
 msgstr "Vizitka s logom"
 
 #. UAmSj
-#: include/sfx2/strings.hrc:328
+#: include/sfx2/strings.hrc:331
 msgctxt "STR_TEMPLATE_NAME31"
 msgid "Simple"
 msgstr "Jednoduché"
 
 #. W7NVH
-#: include/sfx2/strings.hrc:329
+#: include/sfx2/strings.hrc:332
 msgctxt "STR_TEMPLATE_NAME32"
 msgid "BPMN"
 msgstr "Podnikové procesy (BPMN)"
 
+#. PUBoR
+#: include/sfx2/strings.hrc:333
+msgctxt "STR_TEMPLATE_NAME33"
+msgid "Simplified Chinese Normal"
+msgstr "Bežný pre zjednodušenú čínštinu"
+
 #. ZaGGB
-#: include/sfx2/strings.hrc:331
+#: include/sfx2/strings.hrc:335
 msgctxt "STR_CLEAR_CHAR"
 msgid "Remove"
 msgstr "Odstrániť"
 
 #. JReRY
-#: include/sfx2/strings.hrc:332
+#: include/sfx2/strings.hrc:336
 msgctxt "STR_CLEAR_ALL_CHAR"
 msgid "Clear All"
-msgstr "Všetko zmazať"
+msgstr "Odstrániť všetko"
 
 #. yC8Gs
-#: include/sfx2/strings.hrc:334
+#: include/sfx2/strings.hrc:338
 msgctxt "STR_PASSWORD_LEN"
 msgid "Password length"
 msgstr "Dĺžka hesla"
 
 #. FKFmJ
-#: include/sfx2/strings.hrc:335
+#: include/sfx2/strings.hrc:339
 msgctxt "STR_PASSWORD_WARNING"
 msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
 msgstr "Zadané heslo spôsobuje problémy s interoperabilitou. Zadajte heslo kratšie ako 52 bajtov alebo dlhšie ako 55 bajtov."
 
 #. jBQFN
-#: include/sfx2/strings.hrc:337
+#: include/sfx2/strings.hrc:341
 msgctxt "STR_CTRLCLICKHYPERLINK"
 msgid "%{key}-click to open hyperlink: %{link}"
 msgstr "%{Key} + kliknutím otvoriť hypertextový odkaz: %{link}"
 
 #. jC3AK
-#: include/sfx2/strings.hrc:338
+#: include/sfx2/strings.hrc:342
 msgctxt "STR_CLICKHYPERLINK"
 msgid "Click to open hyperlink: %{link}"
 msgstr "Kliknutím otvoriť hypertextový odkaz: %{link}"
 
 #. eFJMp
-#: include/sfx2/strings.hrc:340
+#: include/sfx2/strings.hrc:344
 msgctxt "STR_STYLEUSEDBY"
 msgid "(used by: %STYLELIST)"
 msgstr "(použité v štýloch: %STYLELIST)"
 
 #. 6UgqW
-#: include/sfx2/strings.hrc:342
+#: include/sfx2/strings.hrc:346
 msgctxt "STR_DOCUMENT"
 msgid "Document"
 msgstr "Dokument"
 
 #. XDGTb
-#: include/sfx2/strings.hrc:343
+#: include/sfx2/strings.hrc:347
 msgctxt "STR_SPREADSHEET"
 msgid "Spreadsheet"
 msgstr "Tabuľkový dokument"
 
 #. 3UZXB
-#: include/sfx2/strings.hrc:344
+#: include/sfx2/strings.hrc:348
 msgctxt "STR_PRESENTATION"
 msgid "Presentation"
 msgstr "Prezentácia"
 
 #. noN5s
-#: include/sfx2/strings.hrc:345
+#: include/sfx2/strings.hrc:349
 msgctxt "STR_DRAWING"
 msgid "Drawing"
 msgstr "Kresba"
 
 #. QpuFo
-#: include/sfx2/strings.hrc:346
+#: include/sfx2/strings.hrc:350
 msgctxt "STR_RECENT"
 msgid "Recently used"
 msgstr "Nedávno použité"
 
 #. EcAjb
-#: include/sfx2/strings.hrc:347
+#: include/sfx2/strings.hrc:351
 msgctxt "STR_NORECENT"
 msgid "No recent characters"
 msgstr "Žiadne nedávne znaky"
 
 #. tfjbD
-#: include/sfx2/strings.hrc:349
+#: include/sfx2/strings.hrc:353
 msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
 msgid "Reset All De~fault Templates"
 msgstr "Obnoviť ~všetky predvolené šablóny"
 
 #. GWuDE
-#: include/sfx2/strings.hrc:350
+#: include/sfx2/strings.hrc:354
 msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
 msgid "Reset De~fault Text Document"
 msgstr "Obnoviť ~predvolený textový dokument"
 
 #. j5eV8
-#: include/sfx2/strings.hrc:351
+#: include/sfx2/strings.hrc:355
 msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
 msgid "Reset De~fault Spreadsheet"
 msgstr "Obnoviť predvolený ~tabuľkový dokument"
 
 #. mWp3t
-#: include/sfx2/strings.hrc:352
+#: include/sfx2/strings.hrc:356
 msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
 msgid "Reset De~fault Presentation"
 msgstr "Obnoviť predvolenú ~prezentáciu"
 
 #. wfExB
-#: include/sfx2/strings.hrc:353
+#: include/sfx2/strings.hrc:357
 msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
 msgid "Reset De~fault Drawing"
 msgstr "Obnoviť predvolenú ~kresbu"
 
 #. BFaGA
-#: include/sfx2/strings.hrc:354
+#: include/sfx2/strings.hrc:358
 msgctxt "STR_ACTION_IMPORT"
 msgid "~Import"
 msgstr "_Importovať"
 
 #. 8Cwfk
-#: include/sfx2/strings.hrc:355
+#: include/sfx2/strings.hrc:359
 msgctxt "STR_ACTION_EXTENSIONS"
 msgid "E~xtensions"
 msgstr "~Rozšírenia"
 
 #. idGvM
-#: include/sfx2/strings.hrc:356
+#: include/sfx2/strings.hrc:360
 msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
 msgid "Rename"
 msgstr "Premenovať"
 
 #. EyjE3
-#: include/sfx2/strings.hrc:357
+#: include/sfx2/strings.hrc:361
 msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
 msgid "Rename Category"
 msgstr "Premenovať kategóriu"
 
 #. T79Eb
-#: include/sfx2/strings.hrc:358
+#: include/sfx2/strings.hrc:362
 msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
 msgid "New Category"
 msgstr "Nová kategória"
+
+#. fCRA7
+#: include/sfx2/strings.hrc:364
+msgctxt "STR_OBJECT_INSPECTOR"
+msgid "UNO Object Inspector"
+msgstr "Prieskumník objektov UNO"
 
 #. wH3TZ
 msgctxt "stock"
@@ -2315,47 +2345,23 @@ msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Personal Correspondence and Documents"
 msgstr "Osobná korešpondencia a dokumenty"
 
-#. 6Dgiz
-#: sfx2/inc/doctempl.hrc:34
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Forms and Contracts"
-msgstr "Formuláre a zmluvy"
-
-#. VCKTG
-#: sfx2/inc/doctempl.hrc:35
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Finances"
-msgstr "Financie"
-
-#. HmqGP
-#: sfx2/inc/doctempl.hrc:36
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Education"
-msgstr "Školenie"
-
-#. xopM8
-#: sfx2/inc/doctempl.hrc:37
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Presentation Backgrounds"
-msgstr "Pozadia prezentácie"
-
 #. tSQLA
-#: sfx2/inc/doctempl.hrc:38
+#: sfx2/inc/doctempl.hrc:34
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Presentations"
 msgstr "Prezentácie"
 
-#. KuNzz
-#: sfx2/inc/doctempl.hrc:39
+#. Fi5fa
+#: sfx2/inc/doctempl.hrc:35
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Miscellaneous"
-msgstr "Rôzne"
+msgid "Drawings"
+msgstr "Kresby"
 
-#. SC4E5
-#: sfx2/inc/doctempl.hrc:40
+#. uw5RC
+#: sfx2/inc/doctempl.hrc:36
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Labels"
-msgstr "Popisy"
+msgid "Localization"
+msgstr "Lokalizácia"
 
 #. Wg9Je
 #: sfx2/source/devtools/DevToolsStrings.hrc:15
@@ -2397,7 +2403,7 @@ msgstr "Predloha snímok %1"
 #: sfx2/source/devtools/DevToolsStrings.hrc:21
 msgctxt "STR_SHEET"
 msgid "Sheet %1"
-msgstr "Tabuľka %1"
+msgstr "Hárok %1"
 
 #. BaABx
 #: sfx2/source/devtools/DevToolsStrings.hrc:23
@@ -2745,13 +2751,13 @@ msgstr "Číslo Social Security (Spojené štáty)"
 #: sfx2/uiconfig/ui/addtargetdialog.ui:234
 msgctxt "addtargetdialog|checkboxCaseSensitive"
 msgid "Match case"
-msgstr "Rozlišovať veľkosť"
+msgstr "Rozlišovať veľkosť písmen"
 
 #. G2u3B
 #: sfx2/uiconfig/ui/addtargetdialog.ui:249
 msgctxt "addtargetdialog|checkboxWholeWords"
 msgid "Whole words only"
-msgstr "Iba celé slová"
+msgstr "Len celé slová"
 
 #. JV66c
 #: sfx2/uiconfig/ui/alienwarndialog.ui:7
@@ -2817,7 +2823,7 @@ msgstr "Obsah"
 #: sfx2/uiconfig/ui/autoredactdialog.ui:161
 msgctxt "autoredactdialog|target"
 msgid "Match case"
-msgstr "Rozlišovať veľkosť"
+msgstr "Rozlišovať veľkosť písmen"
 
 #. obHtC
 #: sfx2/uiconfig/ui/autoredactdialog.ui:174
@@ -2865,7 +2871,7 @@ msgstr "Odstrániť cieľ"
 #: sfx2/uiconfig/ui/bookmarkdialog.ui:8
 msgctxt "bookmarkdialog|BookmarkDialog"
 msgid "Add to Bookmarks"
-msgstr "Pridať k záložkám"
+msgstr "Pridať do záložiek"
 
 #. U6BGv
 #: sfx2/uiconfig/ui/bookmarkdialog.ui:83
@@ -2964,7 +2970,7 @@ msgid "No"
 msgstr "Nie"
 
 #. kDKBB
-#: sfx2/uiconfig/ui/commandpopup.ui:36
+#: sfx2/uiconfig/ui/commandpopup.ui:35
 msgctxt "commandpopup|entry"
 msgid "Search command"
 msgstr "Vyhľadať príkaz"
@@ -3391,14 +3397,20 @@ msgctxt "documentinfopage|thumbnailsavecb"
 msgid "Save preview image with this document"
 msgstr "S týmto dokumentom uložiť obrázok náhľadu"
 
-#. 2GKBr
-#: sfx2/uiconfig/ui/documentinfopage.ui:415
+#. 6bF5w
+#: sfx2/uiconfig/ui/documentinfopage.ui:416
 msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
-msgid "Image preferred DPI"
-msgstr "Uprednostňované DPI obrázka"
+msgid "Preferred resolution for images:"
+msgstr "Uprednostňované rozlíšenie obrázkov:"
+
+#. pukYD
+#: sfx2/uiconfig/ui/documentinfopage.ui:466
+msgctxt "documentinfopage|image-preferred-ppi-unit"
+msgid "ppi"
+msgstr "ppi"
 
 #. VWjRu
-#: sfx2/uiconfig/ui/documentinfopage.ui:479
+#: sfx2/uiconfig/ui/documentinfopage.ui:500
 msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
 msgid "Contains basic information about the current file."
 msgstr "Obsahuje základné informácie o súbore."
@@ -3647,19 +3659,19 @@ msgstr "Hľadaný výra_z"
 #: sfx2/uiconfig/ui/helpsearchpage.ui:122
 msgctxt "helpsearchpage|find"
 msgid "_Find"
-msgstr "_Upraviť"
+msgstr "_Nájsť"
 
 #. ZiE8A
 #: sfx2/uiconfig/ui/helpsearchpage.ui:141
 msgctxt "helpsearchpage|completewords"
 msgid "_Complete words only"
-msgstr "Iba _celé slová"
+msgstr "Len _celé slová"
 
 #. vzqdb
 #: sfx2/uiconfig/ui/helpsearchpage.ui:155
 msgctxt "helpsearchpage|headings"
 msgid "Find in _headings only"
-msgstr "_Hľadať iba v nadpisoch"
+msgstr "_Hľadať len v nadpisoch"
 
 #. JDZho
 #: sfx2/uiconfig/ui/helpwindow.ui:69
@@ -3695,7 +3707,7 @@ msgstr "Pridať do záložiek"
 #: sfx2/uiconfig/ui/helpwindow.ui:134
 msgctxt "helpwindow|searchdialog|tooltip_text"
 msgid "Find on this Page"
-msgstr "Nájsť na prvej strane"
+msgstr "Nájsť na tejto strane"
 
 #. VnXxR
 #: sfx2/uiconfig/ui/infobar.ui:65
@@ -3721,7 +3733,7 @@ msgctxt "licensedialog|show"
 msgid "_Show License"
 msgstr "_Zobraziť licenciu"
 
-#. 3unZa
+#. uCvKD
 #: sfx2/uiconfig/ui/licensedialog.ui:68
 msgctxt "licensedialog|label"
 msgid ""
@@ -3731,17 +3743,17 @@ msgid ""
 "\n"
 "All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
 "\n"
-"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"Copyright © 2000–2023 LibreOffice contributors. All rights reserved.\n"
 "\n"
 "This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
 msgstr ""
 "%PRODUCTNAME je k dispozícii za podmienok licencie Mozilla Public License, v. 2.0, ktorej kópiu nájdete na stránke http://mozilla.org/MPL/2.0/.\n"
 "\n"
-"Doplnkové údaje o autorských právach a licenčných podmienkach tretích strán vzťahujúcich sa na časti tohto programu nájdete v súbore LICENSE.html. Ak sa chcete zoznámiť s detailmi, zvoľte možnosť Zobraziť licenciu (informácie iba v angličtine)\n"
+"Doplnkové údaje o autorských právach a licenčných podmienkach tretích strán vzťahujúcich sa na časti tohto programu nájdete v súbore LICENSE.html. Ak sa chcete zoznámiť s detailmi, zvoľte možnosť Zobraziť licenciu (informácie len v angličtine)\n"
 "\n"
 "Všetky ochranné známky a registrované ochranné známky, ktoré sú tu spomenuté, sú majetkom ich vlastníkov.\n"
 "\n"
-"Copyright © 2000–2022 prispievatelia do LibreOffice. Všetky práva vyhradené.\n"
+"Copyright © 2000–2023 prispievatelia do LibreOffice. Všetky práva vyhradené.\n"
 "\n"
 "Tento produkt vytvorila %OOOVENDOR na základe OpenOffice.org, ktorý je Copyright 2000, 2011 Oracle a/alebo jeho pobočky. %OOOVENDOR ďakuje všetkým členom komunity, podrobnosti nájdete na stránke http://www.libreoffice.org/."
 
@@ -4034,7 +4046,7 @@ msgid "Style"
 msgstr "Štýl"
 
 #. NXG9o
-#: sfx2/uiconfig/ui/managestylepage.ui:227
+#: sfx2/uiconfig/ui/managestylepage.ui:230
 msgctxt "managestylepage|label2"
 msgid "Contains"
 msgstr "Obsahuje"
@@ -4319,7 +4331,7 @@ msgstr "Auto_maticky"
 #: sfx2/uiconfig/ui/optprintpage.ui:531
 msgctxt "extended_tip|reducetransauto"
 msgid "Specifies that the transparency is only printed if the transparent area covers less than a quarter of the entire page."
-msgstr "Určuje, že transparentnosť sa tlačí iba ak priehľadná oblasť pokrýva menej ako štvrtinu strany."
+msgstr "Určuje, že transparentnosť sa tlačí len ak priehľadná oblasť pokrýva menej ako štvrtinu strany."
 
 #. K7P4C
 #: sfx2/uiconfig/ui/optprintpage.ui:542
@@ -4421,13 +4433,13 @@ msgstr "Heslo"
 #: sfx2/uiconfig/ui/password.ui:165
 msgctxt "password|extended_tip|pass1ed"
 msgid "Type a password. A password is case sensitive."
-msgstr "Zadajte heslo. Pri hesle záleží na veľkosti písmen."
+msgstr "Zadajte heslo. V hesle sa rozlišujú malé a veľké písmená."
 
 #. kEcVk
 #: sfx2/uiconfig/ui/password.ui:185
 msgctxt "password|extended_tip|confirm1ed"
 msgid "Re-enter the password."
-msgstr "Zopakujte heslo."
+msgstr "Opakovane zadajte heslo."
 
 #. JBCUB
 #: sfx2/uiconfig/ui/password.ui:200
@@ -4451,13 +4463,13 @@ msgstr "Potvrdiť:"
 #: sfx2/uiconfig/ui/password.ui:267
 msgctxt "password|extended_tip|pass2ed"
 msgid "Type a password. A password is case sensitive."
-msgstr "Zadajte heslo. Pri hesle záleží na veľkosti písmen."
+msgstr "Zadajte heslo. V hesle sa rozlišujú malé a veľké písmená."
 
 #. c4nGS
 #: sfx2/uiconfig/ui/password.ui:287
 msgctxt "password|extended_tip|confirm2ed"
 msgid "Re-enter the password."
-msgstr "Zopakujte heslo."
+msgstr "Opakovane zadajte heslo."
 
 #. mCxpj
 #: sfx2/uiconfig/ui/password.ui:302
@@ -4469,7 +4481,7 @@ msgstr "Druhé heslo"
 #: sfx2/uiconfig/ui/password.ui:338
 msgctxt "password|onlyascii"
 msgid "Only Basic Latin characters can be entered"
-msgstr "Zadané môžu byť iba znaky základnej latinky"
+msgstr "Zadané môžu byť len znaky základnej latinky"
 
 #. AFsUP
 #: sfx2/uiconfig/ui/printeroptionsdialog.ui:8
@@ -4613,7 +4625,7 @@ msgstr "Rozlišovať _veľkosť"
 #: sfx2/uiconfig/ui/searchdialog.ui:139
 msgctxt "searchdialog|wholewords"
 msgid "Whole wor_ds only"
-msgstr "Iba _celé slová"
+msgstr "Len _celé slová"
 
 #. ycWSx
 #: sfx2/uiconfig/ui/searchdialog.ui:153
@@ -4637,7 +4649,7 @@ msgstr "_Otvoriť súbor len na čítanie"
 #: sfx2/uiconfig/ui/securityinfopage.ui:31
 msgctxt "securityinfopage|extended_tip|readonly"
 msgid "Select to allow this document to be opened in read-only mode only."
-msgstr "Zaškrtnutím povolíte otváranie tohoto dokument iba v režime na čítanie."
+msgstr "Zaškrtnutím povolíte otváranie tohoto dokument len v režime na čítanie."
 
 #. GvCw9
 #: sfx2/uiconfig/ui/securityinfopage.ui:42
@@ -4693,131 +4705,149 @@ msgctxt "startcenter|clear_all"
 msgid "Clear Recent Documents"
 msgstr "Vyčistiť Nedávne dokumenty"
 
-#. gCfQ9
-#: sfx2/uiconfig/ui/startcenter.ui:38
-msgctxt "startcenter|filter_writer"
-msgid "Writer Templates"
-msgstr "Šablóny Writer"
-
-#. kj5ts
-#: sfx2/uiconfig/ui/startcenter.ui:45
-msgctxt "startcenter|filter_calc"
-msgid "Calc Templates"
-msgstr "Šablóny Calc"
-
-#. HEYvU
-#: sfx2/uiconfig/ui/startcenter.ui:52
-msgctxt "startcenter|filter_impress"
-msgid "Impress Templates"
-msgstr "Šablóny Impress"
-
-#. uWEpu
-#: sfx2/uiconfig/ui/startcenter.ui:59
-msgctxt "startcenter|filter_draw"
-msgid "Draw Templates"
-msgstr "Šablóny Draw"
-
-#. e3TH8
-#: sfx2/uiconfig/ui/startcenter.ui:72
-msgctxt "startcenter|manage"
-msgid "Manage Templates"
-msgstr "Spravovať šablóny"
+#. zmWnH
+#: sfx2/uiconfig/ui/startcenter.ui:24
+msgctxt "startcenter|clear_unavailable"
+msgid "Clear Unavailable Files"
+msgstr "Zmazať nedostupné súbory"
 
 #. isnw8
-#: sfx2/uiconfig/ui/startcenter.ui:151
+#: sfx2/uiconfig/ui/startcenter.ui:119
 msgctxt "startcenter|open_all"
 msgid "_Open File"
 msgstr "_Otvoriť súbor"
 
 #. 6zjop
-#: sfx2/uiconfig/ui/startcenter.ui:172
+#: sfx2/uiconfig/ui/startcenter.ui:140
 msgctxt "startcenter|open_remote"
 msgid "Remote File_s"
 msgstr "Vzdialené _súbory"
 
 #. ZUnZ9
-#: sfx2/uiconfig/ui/startcenter.ui:205
+#: sfx2/uiconfig/ui/startcenter.ui:173
 msgctxt "startcenter|open_recent"
 msgid "_Recent Documents"
 msgstr "_Nedávne dokumenty"
 
 #. BnkvG
-#: sfx2/uiconfig/ui/startcenter.ui:229
+#: sfx2/uiconfig/ui/startcenter.ui:193
 msgctxt "startcenter|templates_all"
 msgid "T_emplates"
 msgstr "Š_ablóny"
 
 #. JEkqY
-#: sfx2/uiconfig/ui/startcenter.ui:270
+#: sfx2/uiconfig/ui/startcenter.ui:230
 msgctxt "startcenter|create_label"
 msgid "Create:"
 msgstr "Vytvoriť:"
 
 #. SY4iY
-#: sfx2/uiconfig/ui/startcenter.ui:281
+#: sfx2/uiconfig/ui/startcenter.ui:241
 msgctxt "startcenter|writer_all"
 msgid "_Writer Document"
 msgstr "Textový _dokument"
 
 #. Bvz5c
-#: sfx2/uiconfig/ui/startcenter.ui:301
+#: sfx2/uiconfig/ui/startcenter.ui:261
 msgctxt "startcenter|calc_all"
 msgid "_Calc Spreadsheet"
 msgstr "Tabuľkový _dokument"
 
 #. RxGP6
-#: sfx2/uiconfig/ui/startcenter.ui:321
+#: sfx2/uiconfig/ui/startcenter.ui:281
 msgctxt "startcenter|impress_all"
 msgid "_Impress Presentation"
 msgstr "_Prezentácia"
 
 #. 7fE2M
-#: sfx2/uiconfig/ui/startcenter.ui:341
+#: sfx2/uiconfig/ui/startcenter.ui:301
 msgctxt "startcenter|draw_all"
 msgid "_Draw Drawing"
 msgstr "_Kresba"
 
 #. 7wn8r
-#: sfx2/uiconfig/ui/startcenter.ui:361
+#: sfx2/uiconfig/ui/startcenter.ui:321
 msgctxt "startcenter|math_all"
 msgid "_Math Formula"
 msgstr "_Vzorec"
 
 #. nnwDC
-#: sfx2/uiconfig/ui/startcenter.ui:381
+#: sfx2/uiconfig/ui/startcenter.ui:341
 msgctxt "startcenter|database_all"
 msgid "_Base Database"
 msgstr "_Databáza"
 
 #. ZEDmn
-#: sfx2/uiconfig/ui/startcenter.ui:403
+#: sfx2/uiconfig/ui/startcenter.ui:363
 msgctxt "startcenter|althelplabel"
 msgid "He_lp"
 msgstr "Pomo_cník"
 
 #. oqVes
-#: sfx2/uiconfig/ui/startcenter.ui:473
+#: sfx2/uiconfig/ui/startcenter.ui:433
 msgctxt "startcenter|extensions"
 msgid "E_xtensions"
 msgstr "_Rozšírenia"
 
 #. rDw4E
-#: sfx2/uiconfig/ui/startcenter.ui:498
+#: sfx2/uiconfig/ui/startcenter.ui:458
 msgctxt "startcenter|label1"
 msgid "Application"
 msgstr "Aplikácia"
 
 #. UiDMp
-#: sfx2/uiconfig/ui/startcenter.ui:518
+#: sfx2/uiconfig/ui/startcenter.ui:478
 msgctxt "startcenter|all_recent_label"
 msgid "Recent Files List"
 msgstr "Zoznam nedávnych dokumentov"
 
 #. kho2B
-#: sfx2/uiconfig/ui/startcenter.ui:531
+#: sfx2/uiconfig/ui/startcenter.ui:491
 msgctxt "startcenter|local_view_label"
 msgid "Templates List"
 msgstr "Zoznam šablón"
+
+#. FcFBB
+#: sfx2/uiconfig/ui/startcenter.ui:516
+msgctxt "startcenter|filter_label"
+msgid "Filter:"
+msgstr "Filter:"
+
+#. xYGf6
+#: sfx2/uiconfig/ui/startcenter.ui:533
+msgctxt "startcenter|filter_none"
+msgid "All Applications"
+msgstr "Všetky aplikácie"
+
+#. fAxHB
+#: sfx2/uiconfig/ui/startcenter.ui:534
+msgctxt "startcenter|filter_writer"
+msgid "Text Documents"
+msgstr "Textové dokumenty"
+
+#. zdYmN
+#: sfx2/uiconfig/ui/startcenter.ui:535
+msgctxt "startcenter|filter_calc"
+msgid "Spreadsheets"
+msgstr "Tabuľkové dokumenty"
+
+#. DZVJB
+#: sfx2/uiconfig/ui/startcenter.ui:536
+msgctxt "startcenter|filter_impress"
+msgid "Presentations"
+msgstr "Prezentácie"
+
+#. 67F9T
+#: sfx2/uiconfig/ui/startcenter.ui:537
+msgctxt "startcenter|filter_draw"
+msgid "Drawings"
+msgstr "Kresby"
+
+#. ZCQZB
+#: sfx2/uiconfig/ui/startcenter.ui:554
+msgctxt "startcenter|mbActions|tool_tip"
+msgid "Actions"
+msgstr "Akcie"
 
 #. UHrAZ
 #: sfx2/uiconfig/ui/stylecontextmenu.ui:12
@@ -4904,139 +4934,139 @@ msgid "or Create a New Category"
 msgstr "alebo vytvorte novú kategóriu"
 
 #. eUWTy
-#: sfx2/uiconfig/ui/templatedlg.ui:46
+#: sfx2/uiconfig/ui/templatedlg.ui:44
 msgctxt "templatedlg|TemplateDialog"
 msgid "Templates"
 msgstr "Šablóny"
 
 #. rhuYP
-#: sfx2/uiconfig/ui/templatedlg.ui:77
+#: sfx2/uiconfig/ui/templatedlg.ui:76
 msgctxt "templatedlg|hidedialogcb"
 msgid "Show this dialog at startup"
 msgstr "Zobraziť toto dialógové okno pri štarte"
 
 #. 32zsB
-#: sfx2/uiconfig/ui/templatedlg.ui:144
+#: sfx2/uiconfig/ui/templatedlg.ui:143
 msgctxt "templatedlg|search_filter|tooltip_text"
 msgid "Search"
 msgstr "Hľadať"
 
 #. sGZMC
-#: sfx2/uiconfig/ui/templatedlg.ui:148
+#: sfx2/uiconfig/ui/templatedlg.ui:147
 msgctxt "templatedlg|search_filter"
 msgid "Search..."
 msgstr "Hľadať..."
 
 #. DF5YC
-#: sfx2/uiconfig/ui/templatedlg.ui:167
+#: sfx2/uiconfig/ui/templatedlg.ui:166
 msgctxt "templatedlg|action_menu|label"
 msgid "_Manage"
 msgstr "_Spravovať"
 
 #. LUs2m
-#: sfx2/uiconfig/ui/templatedlg.ui:181
+#: sfx2/uiconfig/ui/templatedlg.ui:180
 msgctxt "templatedlg|extended_tip|action_menu"
 msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
 msgstr "Ponúka príkazy na vytvorenie, premenovanie a odstránenie kategórie, obnovenie východiskových šablón a obnovenie správcu šablón."
 
 #. fXVNY
-#: sfx2/uiconfig/ui/templatedlg.ui:208
+#: sfx2/uiconfig/ui/templatedlg.ui:207
 msgctxt "templatedlg|filter_application|tooltip_text"
 msgid "Filter by Application"
 msgstr "Filtrovať podľa aplikácie"
 
 #. tqVhJ
-#: sfx2/uiconfig/ui/templatedlg.ui:210
+#: sfx2/uiconfig/ui/templatedlg.ui:209
 msgctxt "templatedlg|applist"
 msgid "All Applications"
 msgstr "Všetky aplikácie"
 
 #. pD6pU
-#: sfx2/uiconfig/ui/templatedlg.ui:211
+#: sfx2/uiconfig/ui/templatedlg.ui:210
 msgctxt "templatedlg|applist"
 msgid "Text Documents"
 msgstr "Textové dokumenty"
 
 #. eECt7
-#: sfx2/uiconfig/ui/templatedlg.ui:212
+#: sfx2/uiconfig/ui/templatedlg.ui:211
 msgctxt "templatedlg|applist"
 msgid "Spreadsheets"
 msgstr "Tabuľkové dokumenty"
 
 #. ajLbV
-#: sfx2/uiconfig/ui/templatedlg.ui:213
+#: sfx2/uiconfig/ui/templatedlg.ui:212
 msgctxt "templatedlg|applist"
 msgid "Presentations"
 msgstr "Prezentácie"
 
 #. LfUzB
-#: sfx2/uiconfig/ui/templatedlg.ui:214
+#: sfx2/uiconfig/ui/templatedlg.ui:213
 msgctxt "templatedlg|applist"
 msgid "Drawings"
 msgstr "Kresby"
 
 #. t7zE7
-#: sfx2/uiconfig/ui/templatedlg.ui:228
+#: sfx2/uiconfig/ui/templatedlg.ui:227
 msgctxt "templatedlg|filter_folder|tooltip_text"
 msgid "Filter by Category"
 msgstr "Filtrovať podľa kategórie"
 
 #. 93CGw
-#: sfx2/uiconfig/ui/templatedlg.ui:230
+#: sfx2/uiconfig/ui/templatedlg.ui:229
 msgctxt "templatedlg|folderlist"
 msgid "All Categories"
 msgstr "Všetky kategórie"
 
 #. NF9wE
-#: sfx2/uiconfig/ui/templatedlg.ui:251
+#: sfx2/uiconfig/ui/templatedlg.ui:250
 msgctxt "templatedlg|label1"
 msgid "Filter"
 msgstr "Filter"
 
 #. ewTL3
-#: sfx2/uiconfig/ui/templatedlg.ui:357
+#: sfx2/uiconfig/ui/templatedlg.ui:356
 msgctxt "templatedlg|treeviewcolumn1"
 msgid "Name"
 msgstr "Meno"
 
 #. 7EJRA
-#: sfx2/uiconfig/ui/templatedlg.ui:374
+#: sfx2/uiconfig/ui/templatedlg.ui:373
 msgctxt "templatedlg|treeviewcolumn2"
 msgid "Category"
 msgstr "Kategória"
 
 #. AC27i
-#: sfx2/uiconfig/ui/templatedlg.ui:389
+#: sfx2/uiconfig/ui/templatedlg.ui:388
 msgctxt "templatedlg|treeviewcolumn3"
 msgid "Application"
 msgstr "Aplikácia"
 
 #. eSaBw
-#: sfx2/uiconfig/ui/templatedlg.ui:404
+#: sfx2/uiconfig/ui/templatedlg.ui:403
 msgctxt "templatedlg|treeviewcolumn4"
 msgid "Modified"
 msgstr "Zmenené"
 
 #. pNzYA
-#: sfx2/uiconfig/ui/templatedlg.ui:419
+#: sfx2/uiconfig/ui/templatedlg.ui:418
 msgctxt "templatedlg|treeviewcolumn5"
 msgid "Size"
 msgstr "Veľkosť"
 
 #. j39jM
-#: sfx2/uiconfig/ui/templatedlg.ui:445
+#: sfx2/uiconfig/ui/templatedlg.ui:444
 msgctxt "templatedlg|thumbnailviewlabel"
 msgid "Template List"
 msgstr "Zoznam šablón"
 
 #. yEhgP
-#: sfx2/uiconfig/ui/templatedlg.ui:464
+#: sfx2/uiconfig/ui/templatedlg.ui:463
 msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
 msgid "Thumbnail View"
 msgstr "Zobrazenie s miniatúrami"
 
 #. j76ke
-#: sfx2/uiconfig/ui/templatedlg.ui:481
+#: sfx2/uiconfig/ui/templatedlg.ui:480
 msgctxt "templatedlg|list_view_btn|tooltip_text"
 msgid "List View"
 msgstr "Náhľad so zoznamom"

@@ -26,7 +26,7 @@
 #include <tools/debug.hxx>
 #include <tools/stream.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -51,6 +51,7 @@
 #include "convdic.hxx"
 #include "convdicxml.hxx"
 #include <linguistic/misc.hxx>
+#include <utility>
 
 using namespace utl;
 using namespace osl;
@@ -142,13 +143,13 @@ bool IsConvDic( const OUString &rFileURL, LanguageType &nLang, sal_Int16 &nConvT
 
 
 ConvDic::ConvDic(
-        const OUString &rName,
+        OUString aName_,
         LanguageType nLang,
         sal_Int16 nConvType,
         bool bBiDirectional,
         const OUString &rMainURL) :
     aFlushListeners( GetLinguMutex() ),
-    aMainURL(rMainURL), aName(rName), nLanguage(nLang),
+    aMainURL(rMainURL), aName(std::move(aName_)), nLanguage(nLang),
     nConversionType(nConvType),
     nMaxLeftCharCount(0), nMaxRightCharCount(0),
     bMaxCharCountIsValid(true),
@@ -369,7 +370,7 @@ uno::Sequence< OUString > SAL_CALL ConvDic::getConversions(
 {
     MutexGuard  aGuard( GetLinguMutex() );
 
-    if (!pFromRight && eDirection == ConversionDirection_FROM_RIGHT)
+    if (!pFromRight && eDirection != ConversionDirection_FROM_LEFT)
         return uno::Sequence< OUString >();
 
     if (bNeedEntries)
@@ -397,7 +398,7 @@ uno::Sequence< OUString > SAL_CALL ConvDic::getConversionEntries(
 {
     MutexGuard  aGuard( GetLinguMutex() );
 
-    if (!pFromRight && eDirection == ConversionDirection_FROM_RIGHT)
+    if (!pFromRight && eDirection != ConversionDirection_FROM_LEFT)
         return uno::Sequence< OUString >();
 
     if (bNeedEntries)

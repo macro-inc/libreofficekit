@@ -82,12 +82,13 @@
 #include <svx/dataaccessdescriptor.hxx>
 #include <svx/databaseregistrationui.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
 #include <tools/multisel.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/confignode.hxx>
+#include <utility>
 #include <vcl/split.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/toolbox.hxx>
@@ -194,7 +195,7 @@ Any SAL_CALL SbaTableQueryBrowser::queryInterface(const Type& _rType)
     {
         OSL_PRECOND( !!m_aDocScriptSupport, "SbaTableQueryBrowser::queryInterface: did not initialize this, yet!" );
         if ( !!m_aDocScriptSupport && *m_aDocScriptSupport )
-            return makeAny( Reference< XScriptInvocationContext >( this ) );
+            return Any( Reference< XScriptInvocationContext >( this ) );
         return Any();
     }
 
@@ -286,49 +287,49 @@ bool SbaTableQueryBrowser::Construct(vcl::Window* pParent)
     {
         SAL_WARN("dbaccess.ui", "SbaTableQueryBrowser::Construct: could not create (or start listening at) the database context!");
     }
+
     // some help ids
-    if (getBrowserView() && getBrowserView()->getVclControl())
-    {
+    if (!getBrowserView() || !getBrowserView()->getVclControl())
+        return true;
 
-        // create controls and set sizes
-        const tools::Long  nFrameWidth = getBrowserView()->LogicToPixel(::Size(3, 0), MapMode(MapUnit::MapAppFont)).Width();
+    // create controls and set sizes
+    const tools::Long  nFrameWidth = getBrowserView()->LogicToPixel(::Size(3, 0), MapMode(MapUnit::MapAppFont)).Width();
 
-        m_pSplitter = VclPtr<Splitter>::Create(getBrowserView(),WB_HSCROLL);
-        m_pSplitter->SetPosSizePixel( ::Point(0,0), ::Size(nFrameWidth,0) );
-        m_pSplitter->SetBackground( Wallpaper( Application::GetSettings().GetStyleSettings().GetDialogColor() ) );
+    m_pSplitter = VclPtr<Splitter>::Create(getBrowserView(),WB_HSCROLL);
+    m_pSplitter->SetPosSizePixel( ::Point(0,0), ::Size(nFrameWidth,0) );
+    m_pSplitter->SetBackground( Wallpaper( Application::GetSettings().GetStyleSettings().GetDialogColor() ) );
 
-        m_pTreeView = VclPtr<InterimDBTreeListBox>::Create(getBrowserView());
+    m_pTreeView = VclPtr<InterimDBTreeListBox>::Create(getBrowserView());
 
-        weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-        rTreeView.connect_expanding(LINK(this, SbaTableQueryBrowser, OnExpandEntry));
+    weld::TreeView& rTreeView = m_pTreeView->GetWidget();
+    rTreeView.connect_expanding(LINK(this, SbaTableQueryBrowser, OnExpandEntry));
 
-        m_pTreeView->setCopyHandler(LINK(this, SbaTableQueryBrowser, OnCopyEntry));
+    m_pTreeView->setCopyHandler(LINK(this, SbaTableQueryBrowser, OnCopyEntry));
 
-        m_pTreeView->setContextMenuProvider( this );
-        m_pTreeView->setControlActionListener( this );
-        m_pTreeView->SetHelpId(HID_CTL_TREEVIEW);
+    m_pTreeView->setContextMenuProvider( this );
+    m_pTreeView->setControlActionListener( this );
+    m_pTreeView->SetHelpId(HID_CTL_TREEVIEW);
 
-        // a default pos for the splitter, so that the listbox is about 80 (logical) pixels wide
-        m_pSplitter->SetSplitPosPixel(getBrowserView()->LogicToPixel(::Size(80, 0), MapMode(MapUnit::MapAppFont)).Width());
+    // a default pos for the splitter, so that the listbox is about 80 (logical) pixels wide
+    m_pSplitter->SetSplitPosPixel(getBrowserView()->LogicToPixel(::Size(80, 0), MapMode(MapUnit::MapAppFont)).Width());
 
-        getBrowserView()->setSplitter(m_pSplitter);
-        getBrowserView()->setTreeView(m_pTreeView);
+    getBrowserView()->setSplitter(m_pSplitter);
+    getBrowserView()->setTreeView(m_pTreeView);
 
-        // fill view with data
-        rTreeView.set_sort_order(true);
-        rTreeView.set_sort_func([this](const weld::TreeIter& rLeft, const weld::TreeIter& rRight){
-            return OnTreeEntryCompare(rLeft, rRight);
-        });
-        rTreeView.make_sorted();
-        m_pTreeView->SetSelChangeHdl(LINK(this, SbaTableQueryBrowser, OnSelectionChange));
-        m_pTreeView->show_container();
+    // fill view with data
+    rTreeView.set_sort_order(true);
+    rTreeView.set_sort_func([this](const weld::TreeIter& rLeft, const weld::TreeIter& rRight){
+        return OnTreeEntryCompare(rLeft, rRight);
+    });
+    rTreeView.make_sorted();
+    m_pTreeView->SetSelChangeHdl(LINK(this, SbaTableQueryBrowser, OnSelectionChange));
+    m_pTreeView->show_container();
 
-        // TODO
-        getBrowserView()->getVclControl()->SetHelpId(HID_CTL_TABBROWSER);
-        if (getBrowserView()->getVclControl()->GetHeaderBar())
-            getBrowserView()->getVclControl()->GetHeaderBar()->SetHelpId(HID_DATABROWSE_HEADER);
-        InvalidateFeature(ID_BROWSER_EXPLORER);
-    }
+    // TODO
+    getBrowserView()->getVclControl()->SetHelpId(HID_CTL_TABBROWSER);
+    if (getBrowserView()->getVclControl()->GetHeaderBar())
+        getBrowserView()->getVclControl()->GetHeaderBar()->SetHelpId(HID_DATABROWSE_HEADER);
+    InvalidateFeature(ID_BROWSER_EXPLORER);
 
     return true;
 }
@@ -416,7 +417,7 @@ void SbaTableQueryBrowser::impl_sanitizeRowSetClauses_nothrow()
         if ( invalidColumn )
         {
             // reset the complete order statement at both the row set and the parser
-            xRowSetProps->setPropertyValue( PROPERTY_ORDER, makeAny( OUString() ) );
+            xRowSetProps->setPropertyValue( PROPERTY_ORDER, Any( OUString() ) );
             xComposer->setOrder( "" );
         }
 
@@ -469,7 +470,7 @@ bool SbaTableQueryBrowser::InitializeForm( const Reference< XPropertySet > & i_f
     try
     {
         weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed).toUInt64());
+        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed));
         ENSURE_OR_RETURN_FALSE( pData, "SbaTableQueryBrowser::InitializeForm: No user data set at the currently displayed entry!" );
         ENSURE_OR_RETURN_FALSE( pData->xObjectProperties.is(), "SbaTableQueryBrowser::InitializeForm: No table available!" );
 
@@ -523,9 +524,9 @@ void SbaTableQueryBrowser::initializePreviewMode()
     Reference< XPropertySet >  xDataSourceSet(getRowSet(), UNO_QUERY);
     if ( xDataSourceSet.is() )
     {
-        xDataSourceSet->setPropertyValue("AllowInserts",makeAny(false));
-        xDataSourceSet->setPropertyValue("AllowUpdates",makeAny(false));
-        xDataSourceSet->setPropertyValue("AllowDeletes",makeAny(false));
+        xDataSourceSet->setPropertyValue("AllowInserts",Any(false));
+        xDataSourceSet->setPropertyValue("AllowUpdates",Any(false));
+        xDataSourceSet->setPropertyValue("AllowDeletes",Any(false));
     }
 }
 
@@ -546,10 +547,10 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
             if (m_xCurrentlyDisplayed)
             {
                 Sequence< OUString> aProperties(6 + ( m_bPreview ? 5 : 0 ));
-                Sequence< Any> aValues(7 + ( m_bPreview ? 5 : 0 ));
+                Sequence< Any> aValues(6 + ( m_bPreview ? 5 : 0 ));
 
                 weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-                DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed).toUInt64());
+                DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed));
                 OSL_ENSURE( pData->xObjectProperties.is(), "SbaTableQueryBrowser::InitializeGridModel: No table available!" );
                 if ( !pData->xObjectProperties.is() )
                     return;
@@ -641,14 +642,14 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
                     case DataType::BOOLEAN:
                     {
                         aCurrentModelType = "CheckBox";
-                        aInitialValues.emplace_back( "VisualEffect", makeAny( VisualEffect::FLAT ) );
+                        aInitialValues.emplace_back( "VisualEffect", Any( VisualEffect::FLAT ) );
                         sDefaultProperty = PROPERTY_DEFAULTSTATE;
 
                         sal_Int32 nNullable = ColumnValue::NULLABLE_UNKNOWN;
                         OSL_VERIFY( xColumn->getPropertyValue( PROPERTY_ISNULLABLE ) >>= nNullable );
                         aInitialValues.emplace_back(
                             "TriState",
-                            makeAny( ColumnValue::NO_NULLS != nNullable )
+                            Any( ColumnValue::NO_NULLS != nNullable )
                         );
                         if ( ColumnValue::NO_NULLS == nNullable )
                             aDefault <<= sal_Int16(TRISTATE_FALSE);
@@ -657,7 +658,7 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
 
                     case DataType::LONGVARCHAR:
                     case DataType::CLOB:
-                        aInitialValues.emplace_back( "MultiLine", makeAny( true ) );
+                        aInitialValues.emplace_back( "MultiLine", Any( true ) );
                         [[fallthrough]];
                     case DataType::BINARY:
                     case DataType::VARBINARY:
@@ -675,19 +676,19 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
                         sDefaultProperty = PROPERTY_EFFECTIVEDEFAULT;
 
                         if ( xSupplier.is() )
-                            aInitialValues.emplace_back( "FormatsSupplier", makeAny( xSupplier ) );
-                        aInitialValues.emplace_back( "TreatAsNumber", makeAny( bFormattedIsNumeric ) );
+                            aInitialValues.emplace_back( "FormatsSupplier", Any( xSupplier ) );
+                        aInitialValues.emplace_back( "TreatAsNumber", Any( bFormattedIsNumeric ) );
                         aCopyProperties.emplace_back(PROPERTY_FORMATKEY );
                         break;
                 }
 
-                aInitialValues.emplace_back( PROPERTY_CONTROLSOURCE, makeAny( rName ) );
+                aInitialValues.emplace_back( PROPERTY_CONTROLSOURCE, Any( rName ) );
                 OUString sLabel;
                 xColumn->getPropertyValue(PROPERTY_LABEL) >>= sLabel;
                 if ( !sLabel.isEmpty() )
-                    aInitialValues.emplace_back( PROPERTY_LABEL, makeAny( sLabel ) );
+                    aInitialValues.emplace_back( PROPERTY_LABEL, Any( sLabel ) );
                 else
-                    aInitialValues.emplace_back( PROPERTY_LABEL, makeAny( rName ) );
+                    aInitialValues.emplace_back( PROPERTY_LABEL, Any( rName ) );
 
                 Reference< XPropertySet > xGridCol( xColFactory->createColumn( aCurrentModelType ), UNO_SET_THROW );
                 Reference< XPropertySetInfo > xGridColPSI( xGridCol->getPropertySetInfo(), UNO_SET_THROW );
@@ -734,7 +735,7 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
 
                 // don't allow the mouse to scroll in the cells
                 if ( xGridColPSI->hasPropertyByName( PROPERTY_MOUSE_WHEEL_BEHAVIOR ) )
-                    aInitialValues.emplace_back( PROPERTY_MOUSE_WHEEL_BEHAVIOR, makeAny( MouseWheelBehavior::SCROLL_DISABLED ) );
+                    aInitialValues.emplace_back( PROPERTY_MOUSE_WHEEL_BEHAVIOR, Any( MouseWheelBehavior::SCROLL_DISABLED ) );
 
                 // now set all those values
                 for (auto const& property : aInitialValues)
@@ -744,7 +745,7 @@ void SbaTableQueryBrowser::InitializeGridModel(const Reference< css::form::XForm
                 for (auto const& copyPropertyName : aCopyProperties)
                     xGridCol->setPropertyValue( copyPropertyName, xColumn->getPropertyValue(copyPropertyName) );
 
-                xColContainer->insertByName(rName, makeAny(xGridCol));
+                xColContainer->insertByName(rName, Any(xGridCol));
             }
         }
     }
@@ -761,7 +762,7 @@ static Reference<XPropertySet> getColumnHelper(const weld::TreeView& rTreeView,
     Reference<XPropertySet> xRet;
     if (pCurrentlyDisplayed)
     {
-        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*pCurrentlyDisplayed).toUInt64());
+        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*pCurrentlyDisplayed));
         Reference<XColumnsSupplier> xColumnsSup(pData->xObjectProperties,UNO_QUERY);
         Reference<XNameAccess> xNames = xColumnsSup->getColumns();
         OUString aName;
@@ -777,7 +778,7 @@ void SbaTableQueryBrowser::transferChangedControlProperty(const OUString& _rProp
     if (m_xCurrentlyDisplayed)
     {
         weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed).toUInt64());
+        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed));
         Reference< XPropertySet > xObjectProps = pData->xObjectProperties;
         OSL_ENSURE(xObjectProps.is(),"SbaTableQueryBrowser::transferChangedControlProperty: no table/query object!");
         if (xObjectProps.is())
@@ -805,7 +806,7 @@ void SbaTableQueryBrowser::propertyChange(const PropertyChangeEvent& evt)
             if(xProp.is())
             {
                 if(!evt.NewValue.hasValue())
-                    xProp->setPropertyValue(PROPERTY_WIDTH,makeAny(sal_Int32(227)));
+                    xProp->setPropertyValue(PROPERTY_WIDTH,Any(sal_Int32(227)));
                 else
                     xProp->setPropertyValue(PROPERTY_WIDTH,evt.NewValue);
             }
@@ -831,12 +832,12 @@ void SbaTableQueryBrowser::propertyChange(const PropertyChangeEvent& evt)
                     {
                         sal_Int16 nAlign = 0;
                         if(evt.NewValue >>= nAlign)
-                            xProp->setPropertyValue(PROPERTY_ALIGN,makeAny(sal_Int32(nAlign)));
+                            xProp->setPropertyValue(PROPERTY_ALIGN,Any(sal_Int32(nAlign)));
                         else
                             xProp->setPropertyValue(PROPERTY_ALIGN,evt.NewValue);
                     }
                     else
-                        xProp->setPropertyValue(PROPERTY_ALIGN,makeAny(css::awt::TextAlign::LEFT));
+                        xProp->setPropertyValue(PROPERTY_ALIGN,Any(css::awt::TextAlign::LEFT));
                 }
             }
             catch( const Exception& )
@@ -862,12 +863,12 @@ void SbaTableQueryBrowser::propertyChange(const PropertyChangeEvent& evt)
         {
             if (m_xCurrentlyDisplayed)
             {
-                DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed).toUInt64());
+                DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*m_xCurrentlyDisplayed));
                 OSL_ENSURE( pData->xObjectProperties.is(), "No table available!" );
 
                 bool bDefault = !evt.NewValue.hasValue();
                 if (bDefault)
-                    pData->xObjectProperties->setPropertyValue(PROPERTY_ROW_HEIGHT,makeAny(sal_Int32(45)));
+                    pData->xObjectProperties->setPropertyValue(PROPERTY_ROW_HEIGHT,Any(sal_Int32(45)));
                 else
                     pData->xObjectProperties->setPropertyValue(PROPERTY_ROW_HEIGHT,evt.NewValue);
             }
@@ -1037,7 +1038,7 @@ namespace
     struct FilterByEntryDataId : public IEntryFilter
     {
         OUString sId;
-        explicit FilterByEntryDataId( const OUString& _rId ) : sId( _rId ) { }
+        explicit FilterByEntryDataId( OUString _aId ) : sId(std::move( _aId )) { }
 
         virtual ~FilterByEntryDataId() {}
 
@@ -1054,7 +1055,7 @@ namespace
 OUString SbaTableQueryBrowser::getDataSourceAccessor(const weld::TreeIter& rDataSourceEntry) const
 {
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(rDataSourceEntry).toUInt64());
+    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(rDataSourceEntry));
     OSL_ENSURE( pData, "SbaTableQueryBrowser::getDataSourceAccessor: invalid entry data!" );
     OSL_ENSURE( pData->eType == etDatasource, "SbaTableQueryBrowser::getDataSourceAccessor: entry does not denote a data source!" );
     return !pData->sAccessor.isEmpty() ? pData->sAccessor : GetEntryText(rDataSourceEntry);
@@ -1167,7 +1168,7 @@ std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::getObjectEntry(const OUStr
                     {
                         if (ensureEntryObject(*xObject))
                         {
-                            DBTreeListUserData* pParentData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xObject).toUInt64());
+                            DBTreeListUserData* pParentData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xObject));
                             Reference< XNameAccess > xCollection( pParentData->xContainer, UNO_QUERY );
                             sal_Int32 nIndex2 = nIndex;
                             sPath = _rCommand.getToken( 0, '/', nIndex2 );
@@ -1239,13 +1240,13 @@ void SbaTableQueryBrowser::connectExternalDispatches()
             ID_BROWSER_INSERTCONTENT
         };
 
-        for ( size_t i=0; i < SAL_N_ELEMENTS( pURLs ); ++i )
+        for ( size_t i=0; i < std::size( pURLs ); ++i )
         {
             URL aURL;
             aURL.Complete = OUString::createFromAscii( pURLs[i] );
             if ( m_xUrlTransformer.is() )
                 m_xUrlTransformer->parseStrict( aURL );
-            m_aExternalFeatures[ nIds[ i ] ] = ExternalFeature( aURL );
+            m_aExternalFeatures[ nIds[ i ] ] = ExternalFeature( std::move(aURL) );
         }
     }
 
@@ -1345,7 +1346,7 @@ void SAL_CALL SbaTableQueryBrowser::disposing( const css::lang::EventObject& _rS
                 {
                     do
                     {
-                        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xDSLoop).toUInt64());
+                        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xDSLoop));
                         if ( pData && pData->xConnection == xCon )
                         {
                             // we set the connection to null to avoid a second disposing of the connection
@@ -1645,7 +1646,7 @@ FeatureState SbaTableQueryBrowser::GetState(sal_uInt16 nId) const
             std::unique_ptr<weld::TreeIter> xDataSourceEntry = m_pTreeView->GetRootLevelParent(xCurrentEntry.get());
             DBTreeListUserData* pDSData
                 =   xDataSourceEntry
-                ?   reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xDataSourceEntry).toUInt64())
+                ?   weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xDataSourceEntry))
                 :   nullptr;
 
             if ( nId == ID_TREE_CLOSE_CONN )
@@ -2034,7 +2035,7 @@ void SbaTableQueryBrowser::implAddDatasource(const OUString& _rDbName, OUString&
     pDSData->eType = etDatasource;
     pDSData->sAccessor = sDataSourceId;
     pDSData->xConnection = _rxConnection;
-    OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pDSData)));
+    OUString sId(weld::toId(pDSData));
 
     std::unique_ptr<weld::TreeIter> xDatasourceEntry(rTreeView.make_iterator());
     rTreeView.insert(nullptr, -1, &sDSDisplayName, &sId, nullptr, nullptr, false, xDatasourceEntry.get());
@@ -2045,7 +2046,7 @@ void SbaTableQueryBrowser::implAddDatasource(const OUString& _rDbName, OUString&
     {
         DBTreeListUserData* pQueriesData = new DBTreeListUserData;
         pQueriesData->eType = etQueryContainer;
-        sId = OUString::number(reinterpret_cast<sal_uInt64>(pQueriesData));
+        sId = weld::toId(pQueriesData);
 
         std::unique_ptr<weld::TreeIter> xRet(rTreeView.make_iterator());
         rTreeView.insert(xDatasourceEntry.get(), -1, &_rQueryName, &sId,
@@ -2058,7 +2059,7 @@ void SbaTableQueryBrowser::implAddDatasource(const OUString& _rDbName, OUString&
     {
         DBTreeListUserData* pTablesData = new DBTreeListUserData;
         pTablesData->eType = etTableContainer;
-        sId = OUString::number(reinterpret_cast<sal_uInt64>(pTablesData));
+        sId = weld::toId(pTablesData);
 
         std::unique_ptr<weld::TreeIter> xRet(rTreeView.make_iterator());
         rTreeView.insert(xDatasourceEntry.get(), -1, &_rTableName, &sId,
@@ -2089,7 +2090,7 @@ void SbaTableQueryBrowser::populateTree(const Reference<XNameAccess>& _xNameAcce
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
     rTreeView.make_unsorted();
 
-    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(rParent).toUInt64());
+    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(rParent));
     if (pData) // don't ask if the nameaccess is already set see OnExpandEntry views and tables
         pData->xContainer = _xNameAccess;
 
@@ -2120,7 +2121,7 @@ void SbaTableQueryBrowser::populateTree(const Reference<XNameAccess>& _xNameAcce
     rTreeView.make_sorted();
 }
 
-std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::implAppendEntry(const weld::TreeIter* pParent, const OUString& rName, DBTreeListUserData* pUserData)
+std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::implAppendEntry(const weld::TreeIter* pParent, const OUString& rName, const DBTreeListUserData* pUserData)
 {
     EntryType eEntryType = pUserData->eType;
 
@@ -2128,7 +2129,7 @@ std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::implAppendEntry(const weld
 
     OUString aImage = xImageProvider->getImageId(rName, getDatabaseObjectType(eEntryType));
 
-    OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pUserData)));
+    OUString sId(weld::toId(pUserData));
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
     std::unique_ptr<weld::TreeIter> xNewEntry(rTreeView.make_iterator());
     rTreeView.insert(pParent, -1, &rName, &sId, nullptr, nullptr, eEntryType == etQueryContainer, xNewEntry.get());
@@ -2150,7 +2151,7 @@ IMPL_LINK(SbaTableQueryBrowser, OnExpandEntry, const weld::TreeIter&, rParent, b
     std::unique_ptr<weld::TreeIter> xFirstParent = m_pTreeView->GetRootLevelParent(&rParent);
     OSL_ENSURE(xFirstParent,"SbaTableQueryBrowser::OnExpandEntry: No rootlevelparent!");
 
-    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(rParent).toInt64());
+    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(rParent));
     assert(pData && "SbaTableQueryBrowser::OnExpandEntry: No user data!");
 
     if (etTableContainer == pData->eType)
@@ -2238,7 +2239,7 @@ IMPL_LINK(SbaTableQueryBrowser, OnExpandEntry, const weld::TreeIter&, rParent, b
         // we have to expand the queries or bookmarks
         if (ensureEntryObject(rParent))
         {
-            DBTreeListUserData* pParentData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(rParent).toUInt64());
+            DBTreeListUserData* pParentData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(rParent));
             Reference< XNameAccess > xCollection( pParentData->xContainer, UNO_QUERY );
             populateTree(xCollection, rParent, etQuery);
         }
@@ -2252,7 +2253,7 @@ bool SbaTableQueryBrowser::ensureEntryObject(const weld::TreeIter& rEntry)
 
     // the user data of the entry
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-    DBTreeListUserData* pEntryData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(rEntry).toUInt64());
+    DBTreeListUserData* pEntryData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(rEntry));
     OSL_ENSURE(pEntryData,"ensureEntryObject: user data should already be set!");
 
     std::unique_ptr<weld::TreeIter> xDataSourceEntry = m_pTreeView->GetRootLevelParent(&rEntry);
@@ -2275,7 +2276,7 @@ bool SbaTableQueryBrowser::ensureEntryObject(const weld::TreeIter& rEntry)
                 if (rTreeView.iter_compare(*xParent, *xDataSourceEntry) != 0)
                 {
                     OUString aName(rTreeView.get_text(rEntry));
-                    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xParent).toUInt64());
+                    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xParent));
                     try
                     {
                         Reference< XNameAccess > xNameAccess(pData->xContainer,UNO_QUERY);
@@ -2347,17 +2348,17 @@ bool SbaTableQueryBrowser::implLoadAnything(const OUString& _rDataSourceName, co
         Reference<XPropertySet> xProp( getRowSet(), UNO_QUERY_THROW );
         Reference< XLoadable >  xLoadable( xProp, UNO_QUERY_THROW );
         // the values allowing the RowSet to re-execute
-        xProp->setPropertyValue(PROPERTY_DATASOURCENAME, makeAny(_rDataSourceName));
+        xProp->setPropertyValue(PROPERTY_DATASOURCENAME, Any(_rDataSourceName));
         if(_rxConnection.is())
-            xProp->setPropertyValue( PROPERTY_ACTIVE_CONNECTION, makeAny( _rxConnection.getTyped() ) );
+            xProp->setPropertyValue( PROPERTY_ACTIVE_CONNECTION, Any( _rxConnection.getTyped() ) );
 
             // set this _before_ setting the connection, else the rowset would rebuild it ...
-        xProp->setPropertyValue(PROPERTY_COMMAND_TYPE, makeAny(nCommandType));
-        xProp->setPropertyValue(PROPERTY_COMMAND, makeAny(_rCommand));
-        xProp->setPropertyValue(PROPERTY_ESCAPE_PROCESSING, css::uno::makeAny(_bEscapeProcessing));
+        xProp->setPropertyValue(PROPERTY_COMMAND_TYPE, Any(nCommandType));
+        xProp->setPropertyValue(PROPERTY_COMMAND, Any(_rCommand));
+        xProp->setPropertyValue(PROPERTY_ESCAPE_PROCESSING, css::uno::Any(_bEscapeProcessing));
         if ( m_bPreview )
         {
-            xProp->setPropertyValue(PROPERTY_FETCHDIRECTION, makeAny(FetchDirection::FORWARD));
+            xProp->setPropertyValue(PROPERTY_FETCHDIRECTION, Any(FetchDirection::FORWARD));
         }
 
         // the formatter depends on the data source we're working on, so rebuild it here ...
@@ -2427,44 +2428,44 @@ bool SbaTableQueryBrowser::implSelect(const OUString& _rDataSourceName, const OU
                                       const SharedConnection& _rxConnection,
                                       bool _bSelectDirect)
 {
-    if (_rDataSourceName.getLength() && _rCommand.getLength() && (-1 != nCommandType))
+    if (!_rDataSourceName.getLength() || !_rCommand.getLength() || (-1 == nCommandType))
+        return false;
+
+    std::unique_ptr<weld::TreeIter> xDataSource;
+    std::unique_ptr<weld::TreeIter> xCommandType;
+    std::unique_ptr<weld::TreeIter> xCommand = getObjectEntry( _rDataSourceName, _rCommand, nCommandType, &xDataSource, &xCommandType, true, _rxConnection );
+
+    if (xCommand)
     {
-        std::unique_ptr<weld::TreeIter> xDataSource;
-        std::unique_ptr<weld::TreeIter> xCommandType;
-        std::unique_ptr<weld::TreeIter> xCommand = getObjectEntry( _rDataSourceName, _rCommand, nCommandType, &xDataSource, &xCommandType, true, _rxConnection );
+        weld::TreeView& rTreeView = m_pTreeView->GetWidget();
 
-        if (xCommand)
+        bool bSuccess = true;
+        if ( _bSelectDirect )
         {
-            weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-
-            bool bSuccess = true;
-            if ( _bSelectDirect )
-            {
-                bSuccess = implSelect(xCommand.get());
-            }
-            else
-            {
-                rTreeView.select(*xCommand);
-            }
-
-            if ( bSuccess )
-            {
-                rTreeView.scroll_to_row(*xCommand);
-                rTreeView.set_cursor(*xCommand);
-            }
+            bSuccess = implSelect(xCommand.get());
         }
-        else if (!xCommandType)
+        else
         {
-            if (m_xCurrentlyDisplayed)
-            {
-                // tell the old entry (if any) it has been deselected
-                selectPath(m_xCurrentlyDisplayed.get(), false);
-                m_xCurrentlyDisplayed.reset();
-            }
-
-            // we have a command and need to display this in the rowset
-            return implLoadAnything(_rDataSourceName, _rCommand, nCommandType, _bEscapeProcessing, _rxConnection);
+            rTreeView.select(*xCommand);
         }
+
+        if ( bSuccess )
+        {
+            rTreeView.scroll_to_row(*xCommand);
+            rTreeView.set_cursor(*xCommand);
+        }
+    }
+    else if (!xCommandType)
+    {
+        if (m_xCurrentlyDisplayed)
+        {
+            // tell the old entry (if any) it has been deselected
+            selectPath(m_xCurrentlyDisplayed.get(), false);
+            m_xCurrentlyDisplayed.reset();
+        }
+
+        // we have a command and need to display this in the rowset
+        return implLoadAnything(_rDataSourceName, _rCommand, nCommandType, _bEscapeProcessing, _rxConnection);
     }
     return false;
 }
@@ -2482,11 +2483,11 @@ std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::implGetConnectionEntry(con
 {
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
     std::unique_ptr<weld::TreeIter> xCurrentEntry(rTreeView.make_iterator(&rEntry));
-    DBTreeListUserData* pEntryData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xCurrentEntry).toInt64());
+    DBTreeListUserData* pEntryData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xCurrentEntry));
     while (pEntryData->eType != etDatasource)
     {
         rTreeView.iter_parent(*xCurrentEntry);
-        pEntryData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xCurrentEntry).toInt64());
+        pEntryData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xCurrentEntry));
     }
     return xCurrentEntry;
 }
@@ -2497,7 +2498,7 @@ bool SbaTableQueryBrowser::implSelect(const weld::TreeIter* pEntry)
         return false;
 
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-    DBTreeListUserData* pEntryData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*pEntry).toUInt64());
+    DBTreeListUserData* pEntryData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*pEntry));
     switch (pEntryData->eType)
     {
         case etTableOrView:
@@ -2513,11 +2514,11 @@ bool SbaTableQueryBrowser::implSelect(const weld::TreeIter* pEntry)
     // get the entry for the tables or queries
     std::unique_ptr<weld::TreeIter> xContainer = rTreeView.make_iterator(pEntry);
     rTreeView.iter_parent(*xContainer);
-    DBTreeListUserData* pContainerData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xContainer).toUInt64());
+    DBTreeListUserData* pContainerData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xContainer));
 
     // get the entry for the datasource
     std::unique_ptr<weld::TreeIter> xConnection = implGetConnectionEntry(*xContainer);
-    DBTreeListUserData* pConData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xConnection).toUInt64());
+    DBTreeListUserData* pConData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xConnection));
 
     // reinitialize the rowset
     // but first check if it is necessary
@@ -2624,7 +2625,7 @@ bool SbaTableQueryBrowser::implSelect(const weld::TreeIter* pEntry)
             bool bEscapeProcessing = true;
             if(xNameAccess.is() && xNameAccess->hasByName(sSimpleName))
             {
-                DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*pEntry).toUInt64());
+                DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*pEntry));
                 if ( !pData->xObjectProperties.is() )
                 {
                     Reference<XInterface> xObject;
@@ -2725,14 +2726,14 @@ std::unique_ptr<weld::TreeIter> SbaTableQueryBrowser::getEntryFromContainer(cons
             if (rTreeView.iter_children(*xContainer))
             {
                 // 1st child is queries
-                DBTreeListUserData* pQueriesData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xContainer).toUInt64());
+                DBTreeListUserData* pQueriesData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xContainer));
                 if (pQueriesData && pQueriesData->xContainer == rxNameAccess)
                     break;
 
                 if (rTreeView.iter_next_sibling(*xContainer))
                 {
                     // 2nd child is tables
-                    DBTreeListUserData* pTablesData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xContainer).toUInt64());
+                    DBTreeListUserData* pTablesData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xContainer));
                     if (pTablesData && pTablesData->xContainer == rxNameAccess)
                         break;
                 }
@@ -2759,7 +2760,7 @@ void SAL_CALL SbaTableQueryBrowser::elementInserted(const ContainerEvent& rEvent
         rTreeView.make_unsorted();
 
         // insert the new entry into the tree
-        DBTreeListUserData* pContainerData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xEntry).toUInt64());
+        DBTreeListUserData* pContainerData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xEntry));
         OSL_ENSURE(pContainerData, "elementInserted: There must be user data for this type!");
 
         DBTreeListUserData* pNewData = new DBTreeListUserData;
@@ -2824,7 +2825,7 @@ void SAL_CALL SbaTableQueryBrowser::elementRemoved( const ContainerEvent& _rEven
             // unload
             unloadAndCleanup( false ); // don't dispose the connection
 
-            DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xTemp).toUInt64());
+            DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xTemp));
             rTreeView.set_id(*xTemp, OUString());
             delete pData; // the data could be null because we have a table which isn't correct
             rTreeView.remove(*xTemp);
@@ -2839,7 +2840,7 @@ void SAL_CALL SbaTableQueryBrowser::elementRemoved( const ContainerEvent& _rEven
                 {
                     if (rTreeView.get_text(*xChild) == aName)
                     {
-                        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xChild).toUInt64());
+                        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xChild));
                         rTreeView.set_id(*xChild, OUString());
                         delete pData;
                         rTreeView.remove(*xChild);
@@ -2875,7 +2876,7 @@ void SAL_CALL SbaTableQueryBrowser::elementReplaced( const ContainerEvent& _rEve
             std::unique_ptr<weld::TreeIter> xTemp = rTreeView.make_iterator(m_xCurrentlyDisplayed.get());
             unloadAndCleanup( false ); // don't dispose the connection
 
-            DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xTemp).toUInt64());
+            DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xTemp));
             if (pData)
             {
                 if ( etTableOrView == pData->eType )
@@ -2900,7 +2901,7 @@ void SAL_CALL SbaTableQueryBrowser::elementReplaced( const ContainerEvent& _rEve
                 {
                     if (rTreeView.get_text(*xChild) == aName)
                     {
-                        DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xChild).toUInt64());
+                        DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xChild));
                         if (pData)
                         {
                             if ( etTableOrView == pData->eType )
@@ -2968,7 +2969,7 @@ void SbaTableQueryBrowser::disposeConnection(const weld::TreeIter* pDSEntry)
     if (pDSEntry)
     {
         weld::TreeView& rTreeView = m_pTreeView->GetWidget();
-        DBTreeListUserData* pTreeListData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*pDSEntry).toUInt64());
+        DBTreeListUserData* pTreeListData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*pDSEntry));
         if (pTreeListData)
             impl_releaseConnection(pTreeListData->xConnection);
     }
@@ -3004,7 +3005,7 @@ void SbaTableQueryBrowser::closeConnection(const weld::TreeIter& rDSEntry, bool 
                 {
                     std::unique_ptr<weld::TreeIter> xRemove(rTreeView.make_iterator(xElements.get()));
                     bElements = rTreeView.iter_next_sibling(*xElements);
-                    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xRemove).toUInt64());
+                    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xRemove));
                     rTreeView.set_id(*xRemove, OUString());
                     delete pData;
                     rTreeView.remove(*xRemove);
@@ -3252,9 +3253,9 @@ void SbaTableQueryBrowser::impl_initialize()
         try
         {
             Reference< XPropertySet > xRowSetProps(getRowSet(), UNO_QUERY);
-            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_CATALOGNAME,makeAny(aCatalogName));
-            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_SCHEMANAME,makeAny(aSchemaName));
-            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_TABLENAME,makeAny(aTableName));
+            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_CATALOGNAME,Any(aCatalogName));
+            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_SCHEMANAME,Any(aSchemaName));
+            xRowSetProps->setPropertyValue(PROPERTY_UPDATE_TABLENAME,Any(aTableName));
 
         }
         catch(const Exception&)
@@ -3306,7 +3307,7 @@ bool SbaTableQueryBrowser::ensureConnection(const weld::TreeIter* pAnyEntry, Sha
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
     DBTreeListUserData* pDSData =
                 xDSEntry
-            ?   reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xDSEntry).toUInt64())
+            ?   weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xDSEntry))
             :   nullptr;
 
     return ensureConnection(xDSEntry.get(), pDSData, rConnection);
@@ -3327,7 +3328,7 @@ bool SbaTableQueryBrowser::getExistentConnectionFor(const weld::TreeIter* pAnyEn
     weld::TreeView& rTreeView = m_pTreeView->GetWidget();
     DBTreeListUserData* pDSData =
                 xDSEntry
-            ?   reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xDSEntry).toUInt64())
+            ?   weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xDSEntry))
             :   nullptr;
     if (pDSData)
         rConnection = pDSData->xConnection;
@@ -3523,7 +3524,7 @@ Any SbaTableQueryBrowser::getCurrentSelection(weld::TreeView& rControl) const
         return Any();
 
     NamedDatabaseObject aSelectedObject;
-    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xSelected).toUInt64());
+    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xSelected));
     aSelectedObject.Type = static_cast< sal_Int32 >( pData->eType );
 
     switch ( aSelectedObject.Type )
@@ -3544,7 +3545,7 @@ Any SbaTableQueryBrowser::getCurrentSelection(weld::TreeView& rControl) const
         break;
     }
 
-    return makeAny( aSelectedObject );
+    return Any( aSelectedObject );
 }
 
 vcl::Window* SbaTableQueryBrowser::getMenuParent() const
@@ -3781,14 +3782,14 @@ void SbaTableQueryBrowser::impl_cleanupDataSourceEntry(std::u16string_view rData
         do
         {
             // delete any user data of the child entries of the to-be-removed entry
-            const DBTreeListUserData* pData = reinterpret_cast<const DBTreeListUserData*>(rTreeView.get_id(*xChild).toUInt64());
+            const DBTreeListUserData* pData = weld::fromId<const DBTreeListUserData*>(rTreeView.get_id(*xChild));
             rTreeView.set_id(*xChild, OUString());
             delete pData;
         } while (rTreeView.iter_next_sibling(*xChild));
     }
 
     // remove the entry
-    DBTreeListUserData* pData = reinterpret_cast<DBTreeListUserData*>(rTreeView.get_id(*xDataSourceEntry).toUInt64());
+    DBTreeListUserData* pData = weld::fromId<DBTreeListUserData*>(rTreeView.get_id(*xDataSourceEntry));
     rTreeView.set_id(*xDataSourceEntry, OUString());
     delete pData;
     rTreeView.remove(*xDataSourceEntry);

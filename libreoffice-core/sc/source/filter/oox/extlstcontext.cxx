@@ -56,6 +56,12 @@ void ExtCfRuleContext::onStartElement( const AttributeList& rAttribs )
             xRule->importDataBar( rAttribs );
             break;
         }
+        case XLS14_TOKEN( fillColor ):
+        {
+            ExtCfDataBarRuleRef xRule = getCondFormats().createExtCfDataBarRule(mpTarget);
+            xRule->importPositiveFillColor( rAttribs );
+            break;
+        }
         case XLS14_TOKEN( negativeFillColor ):
         {
             ExtCfDataBarRuleRef xRule = getCondFormats().createExtCfDataBarRule(mpTarget);
@@ -283,7 +289,7 @@ void ExtConditionalFormattingContext::onEndElement()
                     maEntries.push_back(std::unique_ptr<ScFormatEntry>(pEntry));
                 }
 
-                assert(maModels.size() == maPriorities.size());
+                assert(maPriorities.size() >= maModels.size());
                 maModels.clear();
             }
 

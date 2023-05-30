@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2022-04-04 09:50+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-03-01 20:16+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
-"Language-Team: Upper Sorbian <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/hsb/>\n"
+"Language-Team: Upper Sorbian <https://translations.documentfoundation.org/projects/libo_ui-7-5/wizardssourceresources/hsb/>\n"
 "Language: hsb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n % 100 == 1) ? 0 : ((n % 100 == 2) ? 1 : ((n % 100 == 3 || n % 100 == 4) ? 2 : 3));\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1556134825.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Zapis '%1' njeda so wutworić.<BR>Snano na wašej tačeli dosć składowanskeho ruma njeje."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Tekstowy dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul 'PRODUCTNAME Writer' je so instalował."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "Tekstowy dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul '%PRODUCTNAME Writer' je so instalował."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Tabelowy dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul 'PRODUCTNAME Calc' je so instalował."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "Tabelowy dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul '%PRODUCTNAME Calc' je so instalował."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Prezentacija dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul 'PRODUCTNAME Impress' je so instalował."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "Prezentacija dokument njeda so wutworić.<BR>Prošu kontrolujće, hač modul '%PRODUCTNAME Impress' je so instalował."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Rysowanka njeda so wutworić.<BR>Prošu kontrolujće, hač modul 'PRODUCTNAME Draw' je so instalował."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "Rysowanka njeda so wutworić.<BR>Prošu kontrolujće, hač modul '%PRODUCTNAME Draw' je so instalował."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Formla njeda so wutworić.<BR>Prošu kontrolujće, hač modul 'PRODUCTNAME Math' je so instalował."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "Formla njeda so wutworić.<BR>Prošu kontrolujće, hač modul '%PRODUCTNAME Math' je so instalował."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -3841,6 +3841,15 @@ msgctxt ""
 msgid "Lithuanian Litas"
 msgstr "Litawski litas"
 
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "Chorwatska Kuna"
+
 #. eDjBr
 #: resources_en_US.properties
 msgctxt ""
@@ -3893,7 +3902,7 @@ msgctxt ""
 "STYLES_0\n"
 "property.text"
 msgid "Theme Selection"
-msgstr "Wuběr temow"
+msgstr "Wuběr drastow"
 
 #. DbGhN
 #: resources_en_US.properties

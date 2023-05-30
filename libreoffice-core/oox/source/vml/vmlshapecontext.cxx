@@ -35,6 +35,7 @@
 
 #include <osl/diagnose.h>
 #include <filter/msfilter/escherex.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::vml {
 
@@ -48,34 +49,34 @@ namespace {
 
 /** Returns the boolean value from the specified VML attribute (if present).
  */
-OptValue< bool > lclDecodeBool( const AttributeList& rAttribs, sal_Int32 nToken )
+std::optional< bool > lclDecodeBool( const AttributeList& rAttribs, sal_Int32 nToken )
 {
-    OptValue< OUString > oValue = rAttribs.getString( nToken );
-    if( oValue.has() ) return OptValue< bool >( ConversionHelper::decodeBool( oValue.get() ) );
-    return OptValue< bool >();
+    std::optional< OUString > oValue = rAttribs.getString( nToken );
+    if( oValue.has_value() ) return std::optional< bool >( ConversionHelper::decodeBool( oValue.value() ) );
+    return std::optional< bool >();
 }
 
 /** Returns the percentage value from the specified VML attribute (if present).
     The value will be normalized (1.0 is returned for 100%).
  */
-OptValue< double > lclDecodePercent( const AttributeList& rAttribs, sal_Int32 nToken, double fDefValue )
+std::optional< double > lclDecodePercent( const AttributeList& rAttribs, sal_Int32 nToken, double fDefValue )
 {
-    OptValue< OUString > oValue = rAttribs.getString( nToken );
-    if( oValue.has() ) return OptValue< double >( ConversionHelper::decodePercent( oValue.get(), fDefValue ) );
-    return OptValue< double >();
+    std::optional< OUString > oValue = rAttribs.getString( nToken );
+    if( oValue.has_value() ) return std::optional< double >( ConversionHelper::decodePercent( oValue.value(), fDefValue ) );
+    return std::optional< double >();
 }
 
 /** #119750# Special method for opacity; it *should* be a percentage value, but there are cases
     where a value relative to 0xffff (65536) is used, ending with an 'f'
  */
-OptValue< double > lclDecodeOpacity( const AttributeList& rAttribs, sal_Int32 nToken, double fDefValue )
+std::optional< double > lclDecodeOpacity( const AttributeList& rAttribs, sal_Int32 nToken, double fDefValue )
 {
-    OptValue< OUString > oValue = rAttribs.getString( nToken );
+    std::optional< OUString > oValue = rAttribs.getString( nToken );
     double fRetval(fDefValue);
 
-    if( oValue.has() )
+    if( oValue.has_value() )
     {
-        const OUString& aString(oValue.get());
+        const OUString& aString(oValue.value());
         const sal_Int32 nLength(aString.getLength());
 
         if(nLength > 0)
@@ -91,34 +92,34 @@ OptValue< double > lclDecodeOpacity( const AttributeList& rAttribs, sal_Int32 nT
         }
     }
 
-    return OptValue< double >(fRetval);
+    return std::optional< double >(fRetval);
 }
 
 /** Returns the integer value pair from the specified VML attribute (if present).
  */
-OptValue< Int32Pair > lclDecodeInt32Pair( const AttributeList& rAttribs, sal_Int32 nToken )
+std::optional< Int32Pair > lclDecodeInt32Pair( const AttributeList& rAttribs, sal_Int32 nToken )
 {
-    OptValue< OUString > oValue = rAttribs.getString( nToken );
-    OptValue< Int32Pair > oRetValue;
-    if( oValue.has() )
+    std::optional< OUString > oValue = rAttribs.getString( nToken );
+    std::optional< Int32Pair > oRetValue;
+    if( oValue.has_value() )
     {
-        OUString aValue1, aValue2;
-        ConversionHelper::separatePair( aValue1, aValue2, oValue.get(), ',' );
-        oRetValue = Int32Pair( aValue1.toInt32(), aValue2.toInt32() );
+        std::u16string_view aValue1, aValue2;
+        ConversionHelper::separatePair( aValue1, aValue2, oValue.value(), ',' );
+        oRetValue = Int32Pair( o3tl::toInt32(aValue1), o3tl::toInt32(aValue2) );
     }
     return oRetValue;
 }
 
 /** Returns the percentage pair from the specified VML attribute (if present).
  */
-OptValue< DoublePair > lclDecodePercentPair( const AttributeList& rAttribs, sal_Int32 nToken )
+std::optional< DoublePair > lclDecodePercentPair( const AttributeList& rAttribs, sal_Int32 nToken )
 {
-    OptValue< OUString > oValue = rAttribs.getString( nToken );
-    OptValue< DoublePair > oRetValue;
-    if( oValue.has() )
+    std::optional< OUString > oValue = rAttribs.getString( nToken );
+    std::optional< DoublePair > oRetValue;
+    if( oValue.has_value() )
     {
-        OUString aValue1, aValue2;
-        ConversionHelper::separatePair( aValue1, aValue2, oValue.get(), ',' );
+        std::u16string_view aValue1, aValue2;
+        ConversionHelper::separatePair( aValue1, aValue2, oValue.value(), ',' );
         oRetValue = DoublePair(
             ConversionHelper::decodePercent( aValue1, 0.0 ),
             ConversionHelper::decodePercent( aValue2, 0.0 ) );
@@ -152,13 +153,13 @@ ContextHandlerRef ShapeLayoutContext::onCreateContext( sal_Int32 nElement, const
     {
         case O_TOKEN( idmap ):
         {
-            OUString aBlockIds = rAttribs.getString( XML_data, OUString() );
+            OUString aBlockIds = rAttribs.getStringDefaulted( XML_data);
             sal_Int32 nIndex = 0;
             while( nIndex >= 0 )
             {
-                OUString aToken = aBlockIds.getToken( 0, ' ', nIndex ).trim();
-                if( !aToken.isEmpty() )
-                    mrDrawing.registerBlockId( aToken.toInt32() );
+                std::u16string_view aToken = o3tl::trim(o3tl::getToken(aBlockIds, 0, ' ', nIndex ));
+                if( !aToken.empty() )
+                    mrDrawing.registerBlockId( o3tl::toInt32(aToken) );
             }
         }
         break;
@@ -246,7 +247,7 @@ ContextHandlerRef ShapeContextBase::createShapeContext( ContextHandler2Helper co
         case VML_TOKEN( shape ):
             if (rAttribs.hasAttribute(XML_path) &&
                     // tdf#122563 skip in the case of empty path
-                    !rAttribs.getString(XML_path, "").isEmpty())
+                    !rAttribs.getStringDefaulted(XML_path).isEmpty())
                 return new ShapeContext( rParent, rShapes.createShape< BezierShape >(), rAttribs );
             else
                 return new ShapeContext( rParent, rShapes.createShape< ComplexShape >(), rAttribs );
@@ -285,7 +286,7 @@ ShapeTypeContext::ShapeTypeContext(ContextHandler2Helper const & rParent,
     // shape identifier and shape name
     bool bHasOspid = rAttribs.hasAttribute( O_TOKEN( spid ) );
     mrTypeModel.maShapeId = rAttribs.getXString( bHasOspid ? O_TOKEN( spid ) : XML_id, OUString() );
-    mrTypeModel.maLegacyId = rAttribs.getString( XML_id, OUString() );
+    mrTypeModel.maLegacyId = rAttribs.getStringDefaulted( XML_id);
     OSL_ENSURE( !mrTypeModel.maShapeId.isEmpty(), "ShapeTypeContext::ShapeTypeContext - missing shape identifier" );
     // builtin shape type identifier
     mrTypeModel.moShapeType = rAttribs.getInteger( O_TOKEN( spt ) );
@@ -299,7 +300,7 @@ ShapeTypeContext::ShapeTypeContext(ContextHandler2Helper const & rParent,
         if( mrTypeModel.maShapeName.startsWith( sShapeTypePrefix ) )
         {
             mrTypeModel.maShapeId = mrTypeModel.maShapeName;
-            mrTypeModel.moShapeType = mrTypeModel.maShapeName.copy(sShapeTypePrefix.getLength()).toInt32();
+            mrTypeModel.moShapeType = o3tl::toInt32(mrTypeModel.maShapeName.subView(sShapeTypePrefix.getLength()));
         }
         else if (mrTypeModel.maShapeName.startsWith("_x0000_t", &tmp))
         {
@@ -311,8 +312,8 @@ ShapeTypeContext::ShapeTypeContext(ContextHandler2Helper const & rParent,
     // coordinate system position/size, CSS style
     mrTypeModel.moCoordPos = lclDecodeInt32Pair( rAttribs, XML_coordorigin );
     mrTypeModel.moCoordSize = lclDecodeInt32Pair( rAttribs, XML_coordsize );
-    setStyle( rAttribs.getString( XML_style, OUString() ) );
-    if( lclDecodeBool( rAttribs, O_TOKEN( hr )).get( false ))
+    setStyle( rAttribs.getStringDefaulted( XML_style) );
+    if( lclDecodeBool( rAttribs, O_TOKEN( hr )).value_or( false ))
     {   // MSO's handling of o:hr width is nowhere near what the spec says:
         // - o:hrpct is not in % but in 0.1%
         // - if o:hrpct is not given, 100% width is assumed
@@ -336,11 +337,11 @@ ShapeTypeContext::ShapeTypeContext(ContextHandler2Helper const & rParent,
     mrTypeModel.maFillModel.moColor = rAttribs.getString( XML_fillcolor );
 
     // For roundrect we may have an arcsize attribute to read
-    mrTypeModel.maArcsize = rAttribs.getString(XML_arcsize, OUString());
+    mrTypeModel.maArcsize = rAttribs.getStringDefaulted(XML_arcsize);
     // editas
-    mrTypeModel.maEditAs = rAttribs.getString(XML_editas, OUString());
+    mrTypeModel.maEditAs = rAttribs.getStringDefaulted(XML_editas);
 
-    mrTypeModel.maAdjustments = rAttribs.getString(XML_adj, OUString());
+    mrTypeModel.maAdjustments = rAttribs.getStringDefaulted(XML_adj);
 }
 
 ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const AttributeList& rAttribs )
@@ -348,16 +349,16 @@ ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const A
     if( isRootElement() ) switch( nElement )
     {
         case VML_TOKEN( stroke ):
-            mrTypeModel.maStrokeModel.moStroked.assignIfUsed( lclDecodeBool( rAttribs, XML_on ) );
+            assignIfUsed( mrTypeModel.maStrokeModel.moStroked, lclDecodeBool( rAttribs, XML_on ) );
             mrTypeModel.maStrokeModel.maStartArrow.moArrowType = rAttribs.getToken( XML_startarrow );
             mrTypeModel.maStrokeModel.maStartArrow.moArrowWidth = rAttribs.getToken( XML_startarrowwidth );
             mrTypeModel.maStrokeModel.maStartArrow.moArrowLength = rAttribs.getToken( XML_startarrowlength );
             mrTypeModel.maStrokeModel.maEndArrow.moArrowType = rAttribs.getToken( XML_endarrow );
             mrTypeModel.maStrokeModel.maEndArrow.moArrowWidth = rAttribs.getToken( XML_endarrowwidth );
             mrTypeModel.maStrokeModel.maEndArrow.moArrowLength = rAttribs.getToken( XML_endarrowlength );
-            mrTypeModel.maStrokeModel.moColor.assignIfUsed( rAttribs.getString( XML_color ) );
+            assignIfUsed( mrTypeModel.maStrokeModel.moColor, rAttribs.getString( XML_color ) );
             mrTypeModel.maStrokeModel.moOpacity = lclDecodeOpacity( rAttribs, XML_opacity, 1.0 );
-            mrTypeModel.maStrokeModel.moWeight.assignIfUsed( rAttribs.getString( XML_weight ) );
+            assignIfUsed( mrTypeModel.maStrokeModel.moWeight, rAttribs.getString( XML_weight ) );
             mrTypeModel.maStrokeModel.moDashStyle = rAttribs.getString( XML_dashstyle );
             mrTypeModel.maStrokeModel.moLineStyle = rAttribs.getToken( XML_linestyle );
             mrTypeModel.maStrokeModel.moEndCap = rAttribs.getToken( XML_endcap );
@@ -368,8 +369,8 @@ ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const A
             // in DOCX shapes use r:id for the relationship id
             // in XLSX they use o:relid
             bool bHasORelId = rAttribs.hasAttribute( O_TOKEN(relid) );
-            mrTypeModel.maFillModel.moFilled.assignIfUsed( lclDecodeBool( rAttribs, XML_on ) );
-            mrTypeModel.maFillModel.moColor.assignIfUsed( rAttribs.getString( XML_color ) );
+            assignIfUsed( mrTypeModel.maFillModel.moFilled, lclDecodeBool( rAttribs, XML_on ) );
+            assignIfUsed( mrTypeModel.maFillModel.moColor, rAttribs.getString( XML_color ) );
             mrTypeModel.maFillModel.moOpacity = lclDecodeOpacity( rAttribs, XML_opacity, 1.0 );
             mrTypeModel.maFillModel.moColor2 = rAttribs.getString( XML_color2 );
             mrTypeModel.maFillModel.moOpacity2 = lclDecodeOpacity( rAttribs, XML_opacity2, 1.0 );
@@ -397,11 +398,11 @@ ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const A
             mrTypeModel.moCropTop = rAttribs.getString(XML_croptop);
 
             // Gain / contrast.
-            OptValue<OUString> oGain = rAttribs.getString(XML_gain);
+            std::optional<OUString> oGain = rAttribs.getString(XML_gain);
             sal_Int32 nGain = 0x10000;
-            if (oGain.has() && oGain.get().endsWith("f"))
+            if (oGain.has_value() && oGain.value().endsWith("f"))
             {
-                nGain = oGain.get().toInt32();
+                nGain = oGain.value().toInt32();
             }
             if (nGain < 0x10000)
             {
@@ -412,11 +413,11 @@ ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const A
             mrTypeModel.mnGain = nGain;
 
             // Blacklevel / brightness.
-            OptValue<OUString> oBlacklevel = rAttribs.getString(XML_blacklevel);
+            std::optional<OUString> oBlacklevel = rAttribs.getString(XML_blacklevel);
             sal_Int16 nBlacklevel = 0;
-            if (oBlacklevel.has() && oBlacklevel.get().endsWith("f"))
+            if (oBlacklevel.has_value() && oBlacklevel.value().endsWith("f"))
             {
-                nBlacklevel = oBlacklevel.get().toInt32();
+                nBlacklevel = oBlacklevel.value().toInt32();
             }
             if (nBlacklevel != 0)
             {
@@ -434,65 +435,65 @@ ContextHandlerRef ShapeTypeContext::onCreateContext( sal_Int32 nElement, const A
         case VML_TOKEN( shadow ):
         {
             mrTypeModel.maShadowModel.mbHasShadow = true;
-            mrTypeModel.maShadowModel.moShadowOn = lclDecodeBool(rAttribs, XML_on).get(false);
-            mrTypeModel.maShadowModel.moColor.assignIfUsed(rAttribs.getString(XML_color));
-            mrTypeModel.maShadowModel.moOffset.assignIfUsed(rAttribs.getString(XML_offset));
+            mrTypeModel.maShadowModel.moShadowOn = lclDecodeBool(rAttribs, XML_on).value_or(false);
+            assignIfUsed(mrTypeModel.maShadowModel.moColor, rAttribs.getString(XML_color));
+            assignIfUsed(mrTypeModel.maShadowModel.moOffset, rAttribs.getString(XML_offset));
             mrTypeModel.maShadowModel.moOpacity = lclDecodePercent(rAttribs, XML_opacity, 1.0);
         }
         break;
         case VML_TOKEN( textpath ):
-            mrTypeModel.maTextpathModel.moString.assignIfUsed(rAttribs.getString(XML_string));
-            mrTypeModel.maTextpathModel.moStyle.assignIfUsed(rAttribs.getString(XML_style));
-            mrTypeModel.maTextpathModel.moTrim.assignIfUsed(lclDecodeBool(rAttribs, XML_trim));
+            assignIfUsed(mrTypeModel.maTextpathModel.moString, rAttribs.getString(XML_string));
+            assignIfUsed(mrTypeModel.maTextpathModel.moStyle, rAttribs.getString(XML_style));
+            assignIfUsed(mrTypeModel.maTextpathModel.moTrim, lclDecodeBool(rAttribs, XML_trim));
         break;
     }
     return nullptr;
 }
 
-OptValue< OUString > ShapeTypeContext::decodeFragmentPath( const AttributeList& rAttribs, sal_Int32 nToken ) const
+std::optional< OUString > ShapeTypeContext::decodeFragmentPath( const AttributeList& rAttribs, sal_Int32 nToken ) const
 {
-    OptValue< OUString > oFragmentPath;
-    OptValue< OUString > oRelId = rAttribs.getString( nToken );
-    if( oRelId.has() )
-        oFragmentPath = getFragmentPathFromRelId( oRelId.get() );
+    std::optional< OUString > oFragmentPath;
+    std::optional< OUString > oRelId = rAttribs.getString( nToken );
+    if( oRelId.has_value() )
+        oFragmentPath = getFragmentPathFromRelId( oRelId.value() );
     return oFragmentPath;
 }
 
-void ShapeTypeContext::setStyle( const OUString& rStyle )
+void ShapeTypeContext::setStyle( std::u16string_view rStyle )
 {
     sal_Int32 nIndex = 0;
     while( nIndex >= 0 )
     {
-        OUString aName, aValue;
-        if( ConversionHelper::separatePair( aName, aValue, rStyle.getToken( 0, ';', nIndex ), ':' ) )
+        std::u16string_view aName, aValue;
+        if( ConversionHelper::separatePair( aName, aValue, o3tl::getToken(rStyle, 0, ';', nIndex ), ':' ) )
         {
-            if( aName == "position" )      mrTypeModel.maPosition = aValue;
-            else if( aName == "z-index" )        mrTypeModel.maZIndex = aValue;
-            else if( aName == "left" )           mrTypeModel.maLeft = aValue;
-            else if( aName == "top" )            mrTypeModel.maTop = aValue;
-            else if( aName == "width" )          mrTypeModel.maWidth = aValue;
-            else if( aName == "height" )         mrTypeModel.maHeight = aValue;
-            else if( aName == "margin-left" )    mrTypeModel.maMarginLeft = aValue;
-            else if( aName == "margin-top" )     mrTypeModel.maMarginTop = aValue;
-            else if( aName == "mso-position-vertical-relative" )  mrTypeModel.maPositionVerticalRelative = aValue;
-            else if( aName == "mso-position-horizontal-relative" )  mrTypeModel.maPositionHorizontalRelative = aValue;
-            else if( aName == "mso-position-horizontal" ) mrTypeModel.maPositionHorizontal = aValue;
-            else if( aName == "mso-position-vertical" ) mrTypeModel.maPositionVertical = aValue;
-            else if( aName == "mso-width-percent" ) mrTypeModel.maWidthPercent = aValue;
-            else if( aName == "mso-width-relative" ) mrTypeModel.maWidthRelative = aValue;
-            else if( aName == "mso-height-percent" ) mrTypeModel.maHeightPercent = aValue;
-            else if( aName == "mso-height-relative" ) mrTypeModel.maHeightRelative = aValue;
-            else if( aName == "mso-fit-shape-to-text" )           mrTypeModel.mbAutoHeight = true;
-            else if( aName == "rotation" )       mrTypeModel.maRotation = aValue;
-            else if( aName == "flip" )       mrTypeModel.maFlip = aValue;
-            else if( aName == "visibility" )
-                mrTypeModel.mbVisible = aValue != "hidden";
-            else if( aName == "mso-wrap-style" ) mrTypeModel.maWrapStyle = aValue;
-            else if ( aName == "v-text-anchor" ) mrTypeModel.maVTextAnchor = aValue;
-            else if ( aName == "mso-wrap-distance-left" ) mrTypeModel.maWrapDistanceLeft = aValue;
-            else if ( aName == "mso-wrap-distance-right" ) mrTypeModel.maWrapDistanceRight = aValue;
-            else if ( aName == "mso-wrap-distance-top" ) mrTypeModel.maWrapDistanceTop = aValue;
-            else if ( aName == "mso-wrap-distance-bottom" ) mrTypeModel.maWrapDistanceBottom = aValue;
+            if( aName == u"position" )      mrTypeModel.maPosition = aValue;
+            else if( aName == u"z-index" )        mrTypeModel.maZIndex = aValue;
+            else if( aName == u"left" )           mrTypeModel.maLeft = aValue;
+            else if( aName == u"top" )            mrTypeModel.maTop = aValue;
+            else if( aName == u"width" )          mrTypeModel.maWidth = aValue;
+            else if( aName == u"height" )         mrTypeModel.maHeight = aValue;
+            else if( aName == u"margin-left" )    mrTypeModel.maMarginLeft = aValue;
+            else if( aName == u"margin-top" )     mrTypeModel.maMarginTop = aValue;
+            else if( aName == u"mso-position-vertical-relative" )  mrTypeModel.maPositionVerticalRelative = aValue;
+            else if( aName == u"mso-position-horizontal-relative" )  mrTypeModel.maPositionHorizontalRelative = aValue;
+            else if( aName == u"mso-position-horizontal" ) mrTypeModel.maPositionHorizontal = aValue;
+            else if( aName == u"mso-position-vertical" ) mrTypeModel.maPositionVertical = aValue;
+            else if( aName == u"mso-width-percent" ) mrTypeModel.maWidthPercent = aValue;
+            else if( aName == u"mso-width-relative" ) mrTypeModel.maWidthRelative = aValue;
+            else if( aName == u"mso-height-percent" ) mrTypeModel.maHeightPercent = aValue;
+            else if( aName == u"mso-height-relative" ) mrTypeModel.maHeightRelative = aValue;
+            else if( aName == u"mso-fit-shape-to-text" )           mrTypeModel.mbAutoHeight = true;
+            else if( aName == u"rotation" )       mrTypeModel.maRotation = aValue;
+            else if( aName == u"flip" )       mrTypeModel.maFlip = aValue;
+            else if( aName == u"visibility" )
+                mrTypeModel.mbVisible = aValue != u"hidden";
+            else if( aName == u"mso-wrap-style" ) mrTypeModel.maWrapStyle = aValue;
+            else if ( aName == u"v-text-anchor" ) mrTypeModel.maVTextAnchor = aValue;
+            else if ( aName == u"mso-wrap-distance-left" ) mrTypeModel.maWrapDistanceLeft = aValue;
+            else if ( aName == u"mso-wrap-distance-right" ) mrTypeModel.maWrapDistanceRight = aValue;
+            else if ( aName == u"mso-wrap-distance-top" ) mrTypeModel.maWrapDistanceTop = aValue;
+            else if ( aName == u"mso-wrap-distance-bottom" ) mrTypeModel.maWrapDistanceBottom = aValue;
         }
     }
 }
@@ -506,14 +507,14 @@ ShapeContext::ShapeContext(ContextHandler2Helper const& rParent,
     // collect shape specific attributes
     mrShapeModel.maType = rAttribs.getXString( XML_type, OUString() );
     // polyline path
-    setPoints( rAttribs.getString( XML_points, OUString() ) );
+    setPoints( rAttribs.getStringDefaulted( XML_points) );
     // line start and end positions
-    setFrom(rAttribs.getString(XML_from, OUString()));
-    setTo(rAttribs.getString(XML_to, OUString()));
-    setControl1(rAttribs.getString(XML_control1, OUString()));
-    setControl2(rAttribs.getString(XML_control2, OUString()));
-    setVmlPath(rAttribs.getString(XML_path, OUString()));
-    setHyperlink(rAttribs.getString(XML_href, OUString()));
+    setFrom(rAttribs.getStringDefaulted(XML_from));
+    setTo(rAttribs.getStringDefaulted(XML_to));
+    setControl1(rAttribs.getStringDefaulted(XML_control1));
+    setControl2(rAttribs.getStringDefaulted(XML_control2));
+    setVmlPath(rAttribs.getStringDefaulted(XML_path));
+    setHyperlink(rAttribs.getStringDefaulted(XML_href));
 }
 
 ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 nElement, const AttributeList& rAttribs )
@@ -535,7 +536,7 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 nElement, const Attri
                 }
                 if (const ShapeType* pShapeType = pShapeContainer->getShapeTypeById(aType))
                 {
-                    nShapeType = pShapeType->getTypeModel().moShapeType.get();
+                    nShapeType = pShapeType->getTypeModel().moShapeType.value();
                 }
             }
             mrShapeModel.mbInGroup = (getParentElement() == VML_TOKEN(group));
@@ -564,19 +565,19 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 nElement, const Attri
             // and is there because of the lines above which change it to TextFrame
             dynamic_cast< SimpleShape& >( mrShape ).setService(
                     "com.sun.star.drawing.RectangleShape");
-            mrShapeModel.maLegacyDiagramPath = getFragmentPathFromRelId(rAttribs.getString(XML_id, OUString()));
+            mrShapeModel.maLegacyDiagramPath = getFragmentPathFromRelId(rAttribs.getStringDefaulted(XML_id));
             break;
         case O_TOKEN( signatureline ):
             mrShapeModel.mbIsSignatureLine = true;
-            mrShapeModel.maSignatureId = rAttribs.getString(XML_id, OUString());
+            mrShapeModel.maSignatureId = rAttribs.getStringDefaulted(XML_id);
             mrShapeModel.maSignatureLineSuggestedSignerName
-                = rAttribs.getString(O_TOKEN(suggestedsigner), OUString());
+                = rAttribs.getStringDefaulted(O_TOKEN(suggestedsigner));
             mrShapeModel.maSignatureLineSuggestedSignerTitle
-                = rAttribs.getString(O_TOKEN(suggestedsigner2), OUString());
+                = rAttribs.getStringDefaulted(O_TOKEN(suggestedsigner2));
             mrShapeModel.maSignatureLineSuggestedSignerEmail
-                = rAttribs.getString(O_TOKEN(suggestedsigneremail), OUString());
+                = rAttribs.getStringDefaulted(O_TOKEN(suggestedsigneremail));
             mrShapeModel.maSignatureLineSigningInstructions
-                = rAttribs.getString(O_TOKEN(signinginstructions), OUString());
+                = rAttribs.getStringDefaulted(O_TOKEN(signinginstructions));
             mrShapeModel.mbSignatureLineShowSignDate = ConversionHelper::decodeBool(
                 rAttribs.getString(XML_showsigndate, "t")); // default is true
             mrShapeModel.mbSignatureLineCanAddComment = ConversionHelper::decodeBool(
@@ -590,7 +591,7 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 nElement, const Attri
     return ShapeTypeContext::onCreateContext( nElement, rAttribs );
 }
 
-void ShapeContext::setPoints(const OUString& rPoints)
+void ShapeContext::setPoints(std::u16string_view rPoints)
 {
     mrShapeModel.maPoints.clear();
     sal_Int32 nIndex = 0;
@@ -598,10 +599,10 @@ void ShapeContext::setPoints(const OUString& rPoints)
     while (nIndex >= 0)
     {
         sal_Int32 nX = ConversionHelper::decodeMeasureToTwip(
-            mrShape.getDrawing().getFilter().getGraphicHelper(), rPoints.getToken(0, ',', nIndex),
+            mrShape.getDrawing().getFilter().getGraphicHelper(), o3tl::getToken(rPoints, 0, ',', nIndex),
             0, true, true);
         sal_Int32 nY = ConversionHelper::decodeMeasureToTwip(
-            mrShape.getDrawing().getFilter().getGraphicHelper(), rPoints.getToken(0, ',', nIndex),
+            mrShape.getDrawing().getFilter().getGraphicHelper(), o3tl::getToken(rPoints, 0, ',', nIndex),
             0, false, true);
         mrShapeModel.maPoints.emplace_back(nX, nY);
     }
@@ -610,11 +611,11 @@ void ShapeContext::setPoints(const OUString& rPoints)
     if (!mrShape.getTypeModel().maWidth.isEmpty() || !mrShape.getTypeModel().maHeight.isEmpty())
         return;
 
-    if (mrShape.getTypeModel().moCoordSize.has())
+    if (mrShape.getTypeModel().moCoordSize.has_value())
     {
-        double fWidth = mrShape.getTypeModel().moCoordSize.get().first;
+        double fWidth = mrShape.getTypeModel().moCoordSize.value().first;
         fWidth = o3tl::convert(fWidth, o3tl::Length::twip, o3tl::Length::pt);
-        double fHeight = mrShape.getTypeModel().moCoordSize.get().second;
+        double fHeight = mrShape.getTypeModel().moCoordSize.value().second;
         fHeight = o3tl::convert(fHeight, o3tl::Length::twip, o3tl::Length::pt);
         mrShape.getTypeModel().maWidth = OUString::number(fWidth) + "pt";
         mrShape.getTypeModel().maHeight = OUString::number(fHeight) + "pt";
@@ -645,8 +646,8 @@ void ShapeContext::setPoints(const OUString& rPoints)
                   o3tl::convert(fMaxY - fMinY, o3tl::Length::twip, o3tl::Length::pt))
               + "pt";
         // Set moCoordSize, otherwise default (1000,1000) is used.
-        mrShape.getTypeModel().moCoordSize.set(
-            Int32Pair(basegfx::fround(fMaxX - fMinX), basegfx::fround(fMaxY - fMinY)));
+        mrShape.getTypeModel().moCoordSize =
+            Int32Pair(basegfx::fround(fMaxX - fMinX), basegfx::fround(fMaxY - fMinY));
     }
 }
 
@@ -719,8 +720,8 @@ ControlShapeContext::ControlShapeContext( ::oox::core::ContextHandler2Helper con
 {
     ::oox::vml::ControlInfo aInfo;
     aInfo.maShapeId = rAttribs.getXString( W_TOKEN( shapeid ), OUString() );
-    aInfo.maFragmentPath = getFragmentPathFromRelId(rAttribs.getString( R_TOKEN(id), OUString() ));
-    aInfo.maName = rAttribs.getString( W_TOKEN( name ), OUString() );
+    aInfo.maFragmentPath = getFragmentPathFromRelId(rAttribs.getStringDefaulted( R_TOKEN(id)));
+    aInfo.maName = rAttribs.getStringDefaulted( W_TOKEN( name ));
     aInfo.mbTextContentShape = true;
     rShapes.getDrawing().registerControl(aInfo);
 }

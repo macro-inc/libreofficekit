@@ -18,10 +18,10 @@
  */
 #pragma once
 
-#include <MutexContainer.hxx>
 #include <WrappedIgnoreProperty.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/XMultiPropertyStates.hpp>
@@ -37,7 +37,7 @@ namespace chart::wrapper
 
 class Chart2ModelContact;
 
-class MinMaxLineWrapper : public MutexContainer
+class MinMaxLineWrapper : public cppu::BaseMutex
                         , public ::cppu::WeakImplHelper
                         < css::lang::XComponent
                         , css::lang::XServiceInfo
@@ -48,7 +48,7 @@ class MinMaxLineWrapper : public MutexContainer
                         >
 {
 public:
-    explicit MinMaxLineWrapper(const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact);
+    explicit MinMaxLineWrapper(std::shared_ptr<Chart2ModelContact> spChart2ModelContact);
     virtual ~MinMaxLineWrapper() override;
 
     /// XServiceInfo declarations
@@ -94,7 +94,7 @@ public:
 
 private: //member
     std::shared_ptr< Chart2ModelContact >   m_spChart2ModelContact;
-    ::comphelper::OInterfaceContainerHelper2      m_aEventListenerContainer;
+    ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener> m_aEventListenerContainer;
 
     WrappedIgnoreProperty               m_aWrappedLineJointProperty;
 };

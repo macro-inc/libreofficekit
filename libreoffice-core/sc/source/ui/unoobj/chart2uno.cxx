@@ -79,25 +79,23 @@ using ::std::shared_ptr;
 
 namespace
 {
-const SfxItemPropertyMapEntry* lcl_GetDataProviderPropertyMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataProviderPropertyMap()
 {
     static const SfxItemPropertyMapEntry aDataProviderPropertyMap_Impl[] =
     {
-        { u"" SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
-        { u"" SC_UNONAME_USE_INTERNAL_DATA_PROVIDER, 0, cppu::UnoType<bool>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_INCLUDEHIDDENCELLS, 0, cppu::UnoType<bool>::get(), 0, 0 },
+        { SC_UNONAME_USE_INTERNAL_DATA_PROVIDER, 0, cppu::UnoType<bool>::get(), 0, 0 },
     };
     return aDataProviderPropertyMap_Impl;
 }
 
-const SfxItemPropertyMapEntry* lcl_GetDataSequencePropertyMap()
+o3tl::span<const SfxItemPropertyMapEntry> lcl_GetDataSequencePropertyMap()
 {
     static const SfxItemPropertyMapEntry aDataSequencePropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_HIDDENVALUES, 0, cppu::UnoType<uno::Sequence<sal_Int32>>::get(),                 0, 0 },
-        {u"" SC_UNONAME_ROLE, 0, cppu::UnoType<css::chart2::data::DataSequenceRole>::get(),                  0, 0 },
-        {u"" SC_UNONAME_INCLUDEHIDDENCELLS, 0,        cppu::UnoType<bool>::get(),                  0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_HIDDENVALUES, 0, cppu::UnoType<uno::Sequence<sal_Int32>>::get(),                 0, 0 },
+        { SC_UNONAME_ROLE, 0, cppu::UnoType<css::chart2::data::DataSequenceRole>::get(),                  0, 0 },
+        { SC_UNONAME_INCLUDEHIDDENCELLS, 0,        cppu::UnoType<bool>::get(),                  0, 0 },
     };
     return aDataSequencePropertyMap_Impl;
 }
@@ -534,7 +532,14 @@ void Chart2Positioner::glueState()
     }
 
     ScComplexRefData aData;
-    ScRefTokenHelper::getDoubleRefDataFromToken(aData, mrRefTokens.front());
+    if (!ScRefTokenHelper::getDoubleRefDataFromToken(aData, mrRefTokens.front()))
+    {
+        SAL_WARN("sc", "Chart2Positioner::glueState getDoubleRefDataFromToken failed");
+        invalidateGlue();
+        mnStartCol = 0;
+        mnStartRow = 0;
+        return;
+    }
     mnStartCol = aData.Ref1.Col();
     mnStartRow = aData.Ref1.Row();
 
@@ -1922,7 +1927,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL ScChart2DataProvider::detectArgum
         func = ::std::for_each(aAllTokens.begin(), aAllTokens.end(), func);
         func.getVector(aTableNumVector);
         aResult.emplace_back( "TableNumberList", -1,
-                                  uno::makeAny( lcl_createTableNumberList( aTableNumVector ) ),
+                                  uno::Any( lcl_createTableNumberList( aTableNumVector ) ),
                                   beans::PropertyState_DIRECT_VALUE );
     }
 
@@ -1930,13 +1935,13 @@ uno::Sequence< beans::PropertyValue > SAL_CALL ScChart2DataProvider::detectArgum
     {
         // DataRowSource (calculated before)
         aResult.emplace_back( "DataRowSource", -1,
-                                  uno::makeAny( eRowSource ), beans::PropertyState_DIRECT_VALUE );
+                                  uno::Any( eRowSource ), beans::PropertyState_DIRECT_VALUE );
         // HasCategories
         aResult.emplace_back( "HasCategories", -1,
-                                  uno::makeAny( bHasCategories ), beans::PropertyState_DIRECT_VALUE );
+                                  uno::Any( bHasCategories ), beans::PropertyState_DIRECT_VALUE );
         // FirstCellAsLabel
         aResult.emplace_back( "FirstCellAsLabel", -1,
-                                  uno::makeAny( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE );
+                                  uno::Any( bFirstCellAsLabel ), beans::PropertyState_DIRECT_VALUE );
     }
 
     // Add the left upper corner to the range if it is missing.
@@ -1961,7 +1966,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL ScChart2DataProvider::detectArgum
 
     // add cell range property
     aResult.emplace_back( "CellRangeRepresentation", -1,
-                              uno::makeAny( sRangeRep ), beans::PropertyState_DIRECT_VALUE );
+                              uno::Any( sRangeRep ), beans::PropertyState_DIRECT_VALUE );
 
     //Sequence Mapping
     bool const bSequencesReordered = true;//todo detect this above or detect this sequence mapping cheaper ...
@@ -2021,7 +2026,7 @@ uno::Sequence< beans::PropertyValue > SAL_CALL ScChart2DataProvider::detectArgum
         if( bDifferentIndexes && !aSequenceMappingVector.empty() )
         {
             aResult.emplace_back( "SequenceMapping", -1,
-                    uno::makeAny( comphelper::containerToSequence(aSequenceMappingVector) )
+                    uno::Any( comphelper::containerToSequence(aSequenceMappingVector) )
                     , beans::PropertyState_DIRECT_VALUE );
         }
     }
@@ -2230,7 +2235,10 @@ OUString SAL_CALL ScChart2DataProvider::convertRangeToXML( const OUString& sRang
     ScRefTokenHelper::compileRangeRepresentation(
         aRefTokens, sRangeRepresentation, *m_pDocument, cSep, m_pDocument->GetGrammar(), true);
     if (aRefTokens.empty())
+    {
+        SAL_WARN("sc", "convertRangeToXML throw IllegalArgumentException from input of: " << sRangeRepresentation);
         throw lang::IllegalArgumentException();
+    }
 
     Tokens2RangeStringXML converter(*m_pDocument);
     converter = ::std::for_each(aRefTokens.begin(), aRefTokens.end(), converter);
@@ -2408,7 +2416,8 @@ void ScChart2DataSequence::HiddenRangeListener::notify()
 ScChart2DataSequence::ScChart2DataSequence( ScDocument* pDoc,
         vector<ScTokenRef>&& rTokens,
         bool bIncludeHiddenCells )
-    : m_bIncludeHiddenCells( bIncludeHiddenCells)
+    : m_xDataArray(new std::vector<Item>)
+    , m_bIncludeHiddenCells( bIncludeHiddenCells)
     , m_nObjectId( 0 )
     , m_pDocument( pDoc)
     , m_aTokens(std::move(rTokens))
@@ -2436,6 +2445,54 @@ ScChart2DataSequence::ScChart2DataSequence( ScDocument* pDoc,
 //      m_aIdentifier = "ID_";
 //      static sal_Int32 nID = 0;
 //      m_aIdentifier += OUString::valueOf( ++nID);
+}
+
+/** called from Clone() */
+ScChart2DataSequence::ScChart2DataSequence(ScDocument* pDoc, const ScChart2DataSequence& r)
+    : m_xDataArray(r.m_xDataArray)
+    , m_aHiddenValues(r.m_aHiddenValues)
+    , m_aRole(r.m_aRole)
+    , m_bIncludeHiddenCells( r.m_bIncludeHiddenCells)
+    , m_nObjectId( 0 )
+    , m_pDocument( pDoc)
+    , m_aPropSet(lcl_GetDataSequencePropertyMap())
+    , m_bGotDataChangedHint(false)
+    , m_bExtDataRebuildQueued(false)
+    , mbTimeBased(false)
+    , mnTimeBasedStart(0)
+    , mnTimeBasedEnd(0)
+    , mnCurrentTab(0)
+{
+    assert(pDoc);
+
+    // Clone tokens.
+    m_aTokens.reserve(r.m_aTokens.size());
+    for (const auto& rxToken : r.m_aTokens)
+    {
+        ScTokenRef p(rxToken->Clone());
+        m_aTokens.push_back(p);
+    }
+
+    m_pDocument->AddUnoObject( *this);
+    m_nObjectId = m_pDocument->GetNewUnoId();
+
+    if (r.m_oRangeIndices)
+        m_oRangeIndices = *r.m_oRangeIndices;
+
+    if (!r.m_pExtRefListener)
+        return;
+
+    // Re-register all external files that the old instance was
+    // listening to.
+
+    ScExternalRefManager* pRefMgr = m_pDocument->GetExternalRefManager();
+    m_pExtRefListener.reset(new ExternalRefListener(*this, m_pDocument));
+    const std::unordered_set<sal_uInt16>& rFileIds = r.m_pExtRefListener->getAllFileIds();
+    for (const auto& rFileId : rFileIds)
+    {
+        pRefMgr->addLinkListener(rFileId, m_pExtRefListener.get());
+        m_pExtRefListener->addFileId(rFileId);
+    }
 }
 
 ScChart2DataSequence::~ScChart2DataSequence()
@@ -2491,7 +2548,7 @@ void ScChart2DataSequence::BuildDataCache()
 {
     m_bExtDataRebuildQueued = false;
 
-    if (!m_aDataArray.empty())
+    if (!m_xDataArray->empty())
         return;
 
     StopListeningToAllExternalRefs();
@@ -2521,6 +2578,26 @@ void ScChart2DataSequence::BuildDataCache()
                     m_pDocument->InitColumnBlockPosition( hint, nTab, nCol );
                     for (SCROW nRow = aRange.aStart.Row(); nRow <= aRange.aEnd.Row(); ++nRow)
                     {
+                        if (nRow == aRange.aEnd.Row())
+                        {
+                            // Excel behavior: if the last row is the totals row, the data
+                            // is not added to the chart. If it's not the last row, the data
+                            // is added like normal.
+                            const auto* rData = m_pDocument->GetDBAtCursor(
+                                nCol, nRow, nTab,
+                                ScDBDataPortion::AREA
+                            );
+                            if (rData && rData->HasTotals())
+                            {
+                                ScRange aTempRange;
+                                rData->GetArea(aTempRange);
+                                if (aTempRange.aEnd.Row() == nRow)
+                                {
+                                    // Current row is totals row, skip
+                                    break;
+                                }
+                            }
+                        }
                         bool bColHidden = m_pDocument->ColHidden(nCol, nTab, nullptr, &nLastCol);
                         bool bRowHidden = m_pDocument->RowHidden(nRow, nTab, nullptr, &nLastRow);
 
@@ -2539,7 +2616,7 @@ void ScChart2DataSequence::BuildDataCache()
                         aItem.maString = m_pDocument->GetString(aAdr);
 
                         ScRefCellValue aCell(*m_pDocument, aAdr, hint);
-                        switch (aCell.meType)
+                        switch (aCell.getType())
                         {
                             case CELLTYPE_VALUE:
                                 aItem.mfValue = aCell.getValue();
@@ -2547,7 +2624,7 @@ void ScChart2DataSequence::BuildDataCache()
                             break;
                             case CELLTYPE_FORMULA:
                             {
-                                ScFormulaCell* pFCell = aCell.mpFormula;
+                                ScFormulaCell* pFCell = aCell.getFormula();
                                 FormulaError nErr = pFCell->GetErrCode();
                                 if (nErr != FormulaError::NONE)
                                     break;
@@ -2568,7 +2645,7 @@ void ScChart2DataSequence::BuildDataCache()
 
                         aItem.mAddress = ScAddress(nCol, nRow, nTab);
 
-                        m_aDataArray.push_back(aItem);
+                        m_xDataArray->push_back(std::move(aItem));
                         ++nDataCount;
                     }
                 }
@@ -2589,7 +2666,7 @@ void ScChart2DataSequence::RebuildDataCache()
 {
     if (!m_bExtDataRebuildQueued)
     {
-        m_aDataArray.clear();
+        m_xDataArray.reset(new std::vector<Item>);
         m_pDocument->BroadcastUno(ScHint(SfxHintId::ScDataChanged, ScAddress()));
         m_bExtDataRebuildQueued = true;
         m_bGotDataChangedHint = true;
@@ -2615,6 +2692,7 @@ sal_Int32 ScChart2DataSequence::FillCacheFromExternalRef(const ScTokenRef& pToke
     pRefMgr->addLinkListener(nFileId, pExtRefListener);
     pExtRefListener->addFileId(nFileId);
 
+    m_xDataArray.reset(new std::vector<Item>);
     ScExternalRefCache::TableTypeRef pTable = pRefMgr->getCacheTable(nFileId, aTabName, false);
     sal_Int32 nDataCount = 0;
     FormulaTokenArrayPlainIterator aIter(*pArray);
@@ -2661,7 +2739,7 @@ sal_Int32 ScChart2DataSequence::FillCacheFromExternalRef(const ScTokenRef& pToke
                         pFormatter->GetOutputString(fVal, nFmt, aItem.maString, &pColor);
                     }
 
-                    m_aDataArray.push_back(aItem);
+                    m_xDataArray->push_back(std::move(aItem));
                     ++nDataCount;
                 }
                 else if (pMat->IsStringOrEmpty(nC, nR))
@@ -2671,7 +2749,7 @@ sal_Int32 ScChart2DataSequence::FillCacheFromExternalRef(const ScTokenRef& pToke
                     aItem.mbIsValue = false;
                     aItem.maString = pMat->GetString(nC, nR).getString();
 
-                    m_aDataArray.emplace_back(aItem);
+                    m_xDataArray->push_back(std::move(aItem));
                     ++nDataCount;
                 }
             }
@@ -2723,38 +2801,6 @@ void ScChart2DataSequence::StopListeningToAllExternalRefs()
     m_pExtRefListener.reset();
 }
 
-void ScChart2DataSequence::CopyData(const ScChart2DataSequence& r)
-{
-    if (!m_pDocument)
-    {
-        OSL_FAIL("document instance is nullptr!?");
-        return;
-    }
-
-    std::vector<Item> aDataArray(r.m_aDataArray);
-    m_aDataArray.swap(aDataArray);
-
-    m_aHiddenValues = r.m_aHiddenValues;
-    m_aRole = r.m_aRole;
-
-    if (r.m_oRangeIndices)
-        m_oRangeIndices = *r.m_oRangeIndices;
-
-    if (!r.m_pExtRefListener)
-        return;
-
-    // Re-register all external files that the old instance was
-    // listening to.
-
-    ScExternalRefManager* pRefMgr = m_pDocument->GetExternalRefManager();
-    m_pExtRefListener.reset(new ExternalRefListener(*this, m_pDocument));
-    const std::unordered_set<sal_uInt16>& rFileIds = r.m_pExtRefListener->getAllFileIds();
-    for (const auto& rFileId : rFileIds)
-    {
-        pRefMgr->addLinkListener(rFileId, m_pExtRefListener.get());
-        m_pExtRefListener->addFileId(rFileId);
-    }
-}
 
 void ScChart2DataSequence::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint)
 {
@@ -2844,7 +2890,7 @@ void ScChart2DataSequence::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint
 
             if ( m_bGotDataChangedHint && m_pDocument )
             {
-                m_aDataArray.clear();
+                m_xDataArray.reset(new std::vector<Item>);
                 lang::EventObject aEvent;
                 aEvent.Source.set(static_cast<cppu::OWeakObject*>(this));
 
@@ -2868,7 +2914,7 @@ void ScChart2DataSequence::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint
         else if (nId == SfxHintId::ScClearCache)
         {
             // necessary after import
-            m_aDataArray.clear();
+            m_xDataArray.reset(new std::vector<Item>);
         }
     }
 }
@@ -2939,10 +2985,10 @@ uno::Sequence< uno::Any> SAL_CALL ScChart2DataSequence::getData()
     {
         // Build a cache for the 1st time...
 
-        sal_Int32 nCount = m_aDataArray.size();
+        sal_Int32 nCount = m_xDataArray->size();
         m_aMixedDataCache.realloc(nCount);
         uno::Any* pArr = m_aMixedDataCache.getArray();
-        for (const Item &rItem : m_aDataArray)
+        for (const Item &rItem : *m_xDataArray)
         {
             if (rItem.mbIsValue)
                 *pArr <<= rItem.mfValue;
@@ -2972,10 +3018,10 @@ uno::Sequence< double > SAL_CALL ScChart2DataSequence::getNumericalData()
 
     BuildDataCache();
 
-    sal_Int32 nCount = m_aDataArray.size();
+    sal_Int32 nCount = m_xDataArray->size();
     uno::Sequence<double> aSeq(nCount);
     double* pArr = aSeq.getArray();
-    for (const Item& rItem : m_aDataArray)
+    for (const Item& rItem : *m_xDataArray)
     {
         *pArr = rItem.mbIsValue ? rItem.mfValue : std::numeric_limits<double>::quiet_NaN();
         ++pArr;
@@ -2995,12 +3041,12 @@ uno::Sequence< OUString > SAL_CALL ScChart2DataSequence::getTextualData()
 
     BuildDataCache();
 
-    sal_Int32 nCount = m_aDataArray.size();
+    sal_Int32 nCount = m_xDataArray->size();
     if ( nCount > 0 )
     {
         aSeq =  uno::Sequence<OUString>(nCount);
         OUString* pArr = aSeq.getArray();
-        for (const Item& rItem : m_aDataArray)
+        for (const Item& rItem : *m_xDataArray)
         {
             *pArr = rItem.maString;
             ++pArr;
@@ -3181,7 +3227,7 @@ sal_uInt32 getDisplayNumberFormat(const ScDocument* pDoc, const ScAddress& rPos)
     {
         // return format of first non-empty cell
         // TODO: use nicer heuristic
-        for (const Item& rItem : m_aDataArray)
+        for (const Item& rItem : *m_xDataArray)
         {
             ScRefCellValue aCell(*m_pDocument, rItem.mAddress);
             if (!aCell.isEmpty() && aCell.hasNumeric())
@@ -3194,13 +3240,13 @@ sal_uInt32 getDisplayNumberFormat(const ScDocument* pDoc, const ScAddress& rPos)
         return 0;
     }
 
-    if (nIndex < 0 || nIndex >= static_cast<sal_Int32>(m_aDataArray.size()))
+    if (nIndex < 0 || o3tl::make_unsigned(nIndex) >= m_xDataArray->size())
     {
         SAL_WARN("sc.ui", "Passed invalid index to getNumberFormatKeyByIndex(). Will return default value '0'.");
         return 0;
     }
 
-    return static_cast<sal_Int32>(getDisplayNumberFormat(m_pDocument, m_aDataArray.at(nIndex).mAddress));
+    return static_cast<sal_Int32>(getDisplayNumberFormat(m_pDocument, m_xDataArray->at(nIndex).mAddress));
 }
 
 // XCloneable ================================================================
@@ -3209,17 +3255,7 @@ uno::Reference< util::XCloneable > SAL_CALL ScChart2DataSequence::createClone()
 {
     SolarMutexGuard aGuard;
 
-    // Clone tokens.
-    vector<ScTokenRef> aTokensNew;
-    aTokensNew.reserve(m_aTokens.size());
-    for (const auto& rxToken : m_aTokens)
-    {
-        ScTokenRef p(rxToken->Clone());
-        aTokensNew.push_back(p);
-    }
-
-    rtl::Reference<ScChart2DataSequence> p(new ScChart2DataSequence(m_pDocument, std::move(aTokensNew), m_bIncludeHiddenCells));
-    p->CopyData(*this);
+    rtl::Reference<ScChart2DataSequence> p(new ScChart2DataSequence(m_pDocument, *this));
     return p;
 }
 
@@ -3326,7 +3362,7 @@ void SAL_CALL ScChart2DataSequence::setPropertyValue(
         if ( !(rValue >>= m_bIncludeHiddenCells))
             throw lang::IllegalArgumentException();
         if( bOldValue != m_bIncludeHiddenCells )
-            m_aDataArray.clear();//data array is dirty now
+            m_xDataArray.reset(new std::vector<Item>);//data array is dirty now
     }
     else if( rPropertyName == "TimeBased" )
     {

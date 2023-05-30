@@ -25,7 +25,7 @@
 #include <com/sun/star/util/XChangesBatch.hpp>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 using namespace ::com::sun::star;
@@ -61,8 +61,8 @@ void ConfigurationAccess::Initialize (
     {
         Sequence<Any> aCreationArguments(comphelper::InitAnyPropertySequence(
         {
-            {"nodepath", makeAny(rsRootName)},
-            {"depth", makeAny(sal_Int32(-1))}
+            {"nodepath", Any(rsRootName)},
+            {"depth", Any(sal_Int32(-1))}
         }));
 
         OUString sAccessService;

@@ -20,15 +20,17 @@
 #pragma once
 
 #include <editeng/outliner.hxx>
+#include <optional>
 #include <svx/svxdllapi.h>
-#include <tools/weakbase.h>
+#include <unotools/weakref.hxx>
 
 class SdrTextObj;
 class SdrPage;
+enum class SdrCompatibilityFlag;
 
 class SVXCORE_DLLPUBLIC SdrOutliner : public Outliner
 {
-    tools::WeakReference<SdrTextObj> mxWeakTextObj;
+    ::unotools::WeakReference<SdrTextObj> mxWeakTextObj;
     const SdrPage* mpVisualizedPage;
 
 public:
@@ -45,6 +47,9 @@ public:
     virtual OUString CalcFieldValue(const SvxFieldItem& rField, sal_Int32 nPara, sal_Int32 nPos, std::optional<Color>& rpTxtColor, std::optional<Color>& rpFldColor) override;
 
     bool hasEditViewCallbacks() const;
+
+    /// @returns state of the SdrCompatibilityFlag
+    virtual std::optional<bool> GetCompatFlag(SdrCompatibilityFlag eFlag) const override;
 };
 
 

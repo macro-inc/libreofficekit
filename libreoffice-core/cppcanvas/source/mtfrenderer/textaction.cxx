@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/rendering/PathCapType.hpp>
 #include <com/sun/star/rendering/PathJoinType.hpp>
@@ -33,6 +33,7 @@
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 
 #include <tools/gen.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/virdev.hxx>
 
@@ -157,7 +158,7 @@ namespace cppcanvas::internal
                 rLayoutWidth = *(std::max_element(rOffsets.begin(), rOffsets.end()));
             }
 
-            uno::Sequence< double > setupDXArray( o3tl::span<const sal_Int32> rCharWidths,
+            uno::Sequence< double > setupDXArray( KernArraySpan    rCharWidths,
                                                   sal_Int32          nLen,
                                                   const OutDevState& rState )
             {
@@ -169,11 +170,10 @@ namespace cppcanvas::internal
                 // array, by circumventing integer-based
                 // OutDev-mapping
                 const double nScale( rState.mapModeTransform.get(0,0) );
-                sal_Int32 const * pCharWidths = rCharWidths.data();
                 for( int i = 0; i < nLen; ++i )
                 {
                     // TODO(F2): use correct scale direction
-                    *pOutputWidths++ = *pCharWidths++ * nScale;
+                    *pOutputWidths++ = rCharWidths[i] * nScale;
                 }
 
                 return aCharWidthSeq;
@@ -187,7 +187,7 @@ namespace cppcanvas::internal
             {
                 // no external DX array given, create one from given
                 // string
-                std::vector<sal_Int32> aCharWidths;
+                KernArray aCharWidths;
 
                 rVDev.GetTextArray( rText, &aCharWidths, nStartPos, nLen );
 
@@ -268,7 +268,7 @@ namespace cppcanvas::internal
                                                                     static_cast<sal_uInt16>(rStringContext.Length) ),
                                     0 );
 
-                return (rState.mapModeTransform * aSize).getX();
+                return (rState.mapModeTransform * aSize).getWidth();
             }
 
             uno::Sequence< double >
@@ -503,8 +503,8 @@ namespace cppcanvas::internal
                     rendering::RenderState aShadowState( rRenderState );
                     ::basegfx::B2DHomMatrix aTranslate;
 
-                    aTranslate.translate( rShadowOffset.getX(),
-                                          rShadowOffset.getY() );
+                    aTranslate.translate(rShadowOffset.getWidth(),
+                                         rShadowOffset.getHeight());
 
                     ::canvas::tools::appendToRenderState(aShadowState, aTranslate);
 
@@ -521,8 +521,8 @@ namespace cppcanvas::internal
                     rendering::RenderState aReliefState( rRenderState );
                     ::basegfx::B2DHomMatrix aTranslate;
 
-                    aTranslate.translate( rReliefOffset.getX(),
-                                          rReliefOffset.getY() );
+                    aTranslate.translate(rReliefOffset.getWidth(),
+                                         rReliefOffset.getHeight());
 
                     ::canvas::tools::appendToRenderState(aReliefState, aTranslate);
 
@@ -555,15 +555,15 @@ namespace cppcanvas::internal
                 // TODO(Q3): Provide this functionality at the B2DRange
                 ::basegfx::B2DRange aTotalBounds( aBounds );
                 aTotalBounds.expand(
-                    ::basegfx::B2DRange( aBounds.getMinX() + rReliefOffset.getX(),
-                                         aBounds.getMinY() + rReliefOffset.getY(),
-                                         aBounds.getMaxX() + rReliefOffset.getX(),
-                                         aBounds.getMaxY() + rReliefOffset.getY() ) );
+                    ::basegfx::B2DRange( aBounds.getMinX() + rReliefOffset.getWidth(),
+                                         aBounds.getMinY() + rReliefOffset.getHeight(),
+                                         aBounds.getMaxX() + rReliefOffset.getWidth(),
+                                         aBounds.getMaxY() + rReliefOffset.getHeight() ) );
                 aTotalBounds.expand(
-                    ::basegfx::B2DRange( aBounds.getMinX() + rShadowOffset.getX(),
-                                         aBounds.getMinY() + rShadowOffset.getY(),
-                                         aBounds.getMaxX() + rShadowOffset.getX(),
-                                         aBounds.getMaxY() + rShadowOffset.getY() ) );
+                    ::basegfx::B2DRange( aBounds.getMinX() + rShadowOffset.getWidth(),
+                                         aBounds.getMinY() + rShadowOffset.getHeight(),
+                                         aBounds.getMaxX() + rShadowOffset.getWidth(),
+                                         aBounds.getMaxY() + rShadowOffset.getHeight() ) );
 
                 return tools::calcDevicePixelBounds( aTotalBounds,
                                                      rViewState,
@@ -579,8 +579,8 @@ namespace cppcanvas::internal
                 const ::basegfx::B2DPolyPolygon aPoly(
                     tools::createTextLinesPolyPolygon( 0.0, nLineWidth,
                                                        rLineInfo ) );
-
-                o_rOverallSize = ::basegfx::utils::getRange( aPoly ).getRange();
+                auto aRange = basegfx::utils::getRange( aPoly ).getRange();
+                o_rOverallSize = basegfx::B2DSize(aRange.getX(), aRange.getY());
 
                 o_rTextLines = ::basegfx::unotools::xPolyPolygonFromB2DPolyPolygon(
                     rCanvas->getUNOCanvas()->getDevice(),
@@ -979,8 +979,8 @@ namespace cppcanvas::internal
                 return calcEffectTextBounds( ::basegfx::unotools::b2DRectangleFromRealRectangle2D(
                                                  queryTextBounds() ),
                                              ::basegfx::B2DRange( 0,0,
-                                                                  maLinesOverallSize.getX(),
-                                                                  maLinesOverallSize.getY() ),
+                                                                  maLinesOverallSize.getWidth(),
+                                                                  maLinesOverallSize.getHeight() ),
                                              maReliefOffset,
                                              maShadowOffset,
                                              aLocalState,
@@ -1505,9 +1505,9 @@ namespace cppcanvas::internal
 
                 return calcEffectTextBounds( ::basegfx::unotools::b2DRectangleFromRealRectangle2D(
                                                  mxTextLayout->queryTextBounds() ),
-                                             ::basegfx::B2DRange( 0,0,
-                                                                  aSize.getX(),
-                                                                  aSize.getY() ),
+                                             basegfx::B2DRange(0, 0,
+                                                               aSize.getWidth(),
+                                                               aSize.getHeight()),
                                              maReliefOffset,
                                              maShadowOffset,
                                              aLocalState,
@@ -1575,7 +1575,7 @@ namespace cppcanvas::internal
                                const ::basegfx::B2DSize&                            rShadowOffset,
                                const ::Color&                                       rShadowColor,
                                const ::basegfx::B2DRectangle&                       rOutlineBounds,
-                               const uno::Reference< rendering::XPolyPolygon2D >&   rTextPoly,
+                               uno::Reference< rendering::XPolyPolygon2D >          xTextPoly,
                                const uno::Sequence< double >&                       rOffsets,
                                VirtualDevice const &                                rVDev,
                                const CanvasSharedPtr&                               rCanvas,
@@ -1586,7 +1586,7 @@ namespace cppcanvas::internal
                                const ::basegfx::B2DSize&                            rShadowOffset,
                                const ::Color&                                       rShadowColor,
                                const ::basegfx::B2DRectangle&                       rOutlineBounds,
-                               const uno::Reference< rendering::XPolyPolygon2D >&   rTextPoly,
+                               uno::Reference< rendering::XPolyPolygon2D >          xTextPoly,
                                const uno::Sequence< double >&                       rOffsets,
                                VirtualDevice const &                                rVDev,
                                const CanvasSharedPtr&                               rCanvas,
@@ -1642,7 +1642,7 @@ namespace cppcanvas::internal
                                                     rVDev.GetFont().GetFontHeight() / 64.0 );
 
                 const double nOutlineWidth(
-                    (rState.mapModeTransform * aFontSize).getY() );
+                    (rState.mapModeTransform * aFontSize).getHeight() );
 
                 return nOutlineWidth < 1.0 ? 1.0 : nOutlineWidth;
             }
@@ -1653,12 +1653,12 @@ namespace cppcanvas::internal
                                           const ::basegfx::B2DSize&                             rShadowOffset,
                                           const ::Color&                                        rShadowColor,
                                           const ::basegfx::B2DRectangle&                        rOutlineBounds,
-                                          const uno::Reference< rendering::XPolyPolygon2D >&    rTextPoly,
+                                          uno::Reference< rendering::XPolyPolygon2D >           xTextPoly,
                                           const uno::Sequence< double >&                        rOffsets,
                                           VirtualDevice const &                                 rVDev,
                                           const CanvasSharedPtr&                                rCanvas,
                                           const OutDevState&                                    rState  ) :
-                mxTextPoly( rTextPoly ),
+                mxTextPoly(std::move( xTextPoly )),
                 maOffsets( rOffsets ),
                 mpCanvas( rCanvas ),
                 mnOutlineWidth( calcOutlineWidth(rState,rVDev) ),
@@ -1695,13 +1695,13 @@ namespace cppcanvas::internal
                                           const ::basegfx::B2DSize&                             rShadowOffset,
                                           const ::Color&                                        rShadowColor,
                                           const ::basegfx::B2DRectangle&                        rOutlineBounds,
-                                          const uno::Reference< rendering::XPolyPolygon2D >&    rTextPoly,
+                                          uno::Reference< rendering::XPolyPolygon2D >           xTextPoly,
                                           const uno::Sequence< double >&                        rOffsets,
                                           VirtualDevice const &                                 rVDev,
                                           const CanvasSharedPtr&                                rCanvas,
                                           const OutDevState&                                    rState,
                                           const ::basegfx::B2DHomMatrix&                        rTextTransform ) :
-                mxTextPoly( rTextPoly ),
+                mxTextPoly(std::move( xTextPoly )),
                 maOffsets( rOffsets ),
                 mpCanvas( rCanvas ),
                 mnOutlineWidth( calcOutlineWidth(rState,rVDev) ),
@@ -1925,9 +1925,9 @@ namespace cppcanvas::internal
                 ::canvas::tools::prependToRenderState(aLocalState, rTransformation);
 
                 return calcEffectTextBounds( maOutlineBounds,
-                                             ::basegfx::B2DRange( 0,0,
-                                                                  maLinesOverallSize.getX(),
-                                                                  maLinesOverallSize.getY() ),
+                                             ::basegfx::B2DRange(0, 0,
+                                                                 maLinesOverallSize.getWidth(),
+                                                                 maLinesOverallSize.getHeight()),
                                              maReliefOffset,
                                              maShadowOffset,
                                              aLocalState,
@@ -1966,7 +1966,7 @@ namespace cppcanvas::internal
                                            const OUString&                  rText,
                                            sal_Int32                        nStartPos,
                                            sal_Int32                        nLen,
-                                           o3tl::span<const sal_Int32>      pDXArray,
+                                           KernArraySpan                    pDXArray,
                                            VirtualDevice&                   rVDev,
                                            const CanvasSharedPtr&           rCanvas,
                                            const OutDevState&               rState,
@@ -2096,7 +2096,7 @@ namespace cppcanvas::internal
                                                              const OUString&                rText,
                                                              sal_Int32                      nStartPos,
                                                              sal_Int32                      nLen,
-                                                             o3tl::span<const sal_Int32>    pDXArray,
+                                                             KernArraySpan                  pDXArray,
                                                              VirtualDevice&                 rVDev,
                                                              const CanvasSharedPtr&         rCanvas,
                                                              const OutDevState&             rState,

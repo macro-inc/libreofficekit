@@ -37,6 +37,7 @@
 #include <sal/config.h>
 
 #include <o3tl/any.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
@@ -79,7 +80,6 @@ using com::sun::star::uno::Reference;
 using com::sun::star::uno::Sequence;
 using com::sun::star::uno::XInterface;
 using com::sun::star::uno::Any;
-using com::sun::star::uno::makeAny;
 
 using com::sun::star::container::XEnumeration;
 using com::sun::star::container::XEnumerationAccess;
@@ -125,7 +125,7 @@ void bufferEscapeConstant( OUStringBuffer & buf, std::u16string_view value, Conn
     strbuf.setLength( len );
     // Previously here RTL_TEXTENCODING_ASCII_US; as we set the PostgreSQL client_encoding to UTF8,
     // we get UTF8 here, too. I'm not sure why it worked well before...
-    buf.append( OStringToOUString( strbuf.makeStringAndClear(), RTL_TEXTENCODING_UTF8 ) );
+    buf.append( OStringToOUString( strbuf, RTL_TEXTENCODING_UTF8 ) );
 }
 
 static void ibufferQuoteConstant( OUStringBuffer & buf, std::u16string_view value, ConnectionSettings *settings )
@@ -315,30 +315,30 @@ bool isWhitespace( sal_Unicode c )
     return ' ' == c || 9 == c || 10 == c || 13 == c;
 }
 
-OUString extractTableFromInsert( const OUString & sql )
+OUString extractTableFromInsert( std::u16string_view sql )
 {
     OUString ret;
-    int i = 0;
-    while (i < sql.getLength() && isWhitespace(sql[i])) { i++; }
+    size_t i = 0;
+    while (i < sql.size() && isWhitespace(sql[i])) { i++; }
 
-    if( sql.matchIgnoreAsciiCase("insert", i) )
+    if( o3tl::matchIgnoreAsciiCase(sql, u"insert", i) )
     {
         i += 6;
-        while (i < sql.getLength() && isWhitespace(sql[i])) { i++; }
-        if( sql.matchIgnoreAsciiCase("into", i) )
+        while (i < sql.size() && isWhitespace(sql[i])) { i++; }
+        if( o3tl::matchIgnoreAsciiCase(sql, u"into", i) )
         {
             i +=4;
-            while (i < sql.getLength() && isWhitespace(sql[i])) { i++; }
+            while (i < sql.size() && isWhitespace(sql[i])) { i++; }
             int start = i;
             bool quote = (sql[i] == '"');
-            for( i++ ; i < sql.getLength() ; i ++ )
+            for( i++ ; i < sql.size() ; i ++ )
             {
                 if( quote && sql[i] == '"' )
                 {
-                    while (i < sql.getLength() && isWhitespace(sql[i])) { i++; }
+                    while (i < sql.size() && isWhitespace(sql[i])) { i++; }
                     if( '.' == sql[i] )
                     {
-                        while (i < sql.getLength() && isWhitespace(sql[i])) { i++; }
+                        while (i < sql.size() && isWhitespace(sql[i])) { i++; }
                         if( '"' == sql[i] )
                         {
                             // the second part of the table name does not use quotes
@@ -361,7 +361,7 @@ OUString extractTableFromInsert( const OUString & sql )
                     }
                 }
             }
-            ret = sql.copy(start, i - start ).trim();
+            ret = o3tl::trim(sql.substr(start, i - start ));
 //             printf( "pq_statement: parsed table name %s from insert\n" ,
 //                     OUStringToOString( ret, RTL_TEXTENCODING_ASCII_US).getStr() );
         }
@@ -596,12 +596,12 @@ OUString array2String( const css::uno::Sequence< Any > &seq )
 }
 
 
-std::vector< Any > parseArray( const OUString & str )
+std::vector< Any > parseArray( std::u16string_view str )
 {
-    int len = str.getLength();
+    size_t len = str.size();
     bool doubleQuote = false;
     int brackets = 0;
-    int i = 0;
+    size_t i = 0;
 
     OUStringBuffer current;
     std::vector<Any> elements;
@@ -644,7 +644,7 @@ std::vector< Any > parseArray( const OUString & str )
             if( brackets == 0 )
             {
                 if( !current.isEmpty() || doubleQuotedValue )
-                    elements.push_back( makeAny( current.makeStringAndClear() ) );
+                    elements.push_back( Any( current.makeStringAndClear() ) );
             }
             else
             {
@@ -673,7 +673,7 @@ std::vector< Any > parseArray( const OUString & str )
         else if( ',' == c && brackets == 1)
         {
             doubleQuotedValue = false;
-            elements.push_back( makeAny( current.makeStringAndClear() ) );
+            elements.push_back( Any( current.makeStringAndClear() ) );
         }
         else if( isWhitespace( c ) )
         {
@@ -890,7 +890,7 @@ css::uno::Sequence< sal_Int32 > string2intarray( const OUString & str )
                 digits.append(OUString(&c, 1));
                 c = str.iterateCodePoints(&start);
             } while ( c );
-            vec.push_back( digits.makeStringAndClear().toInt32() );
+            vec.push_back( o3tl::toInt32(digits) );
             do
             {
                 if(!iswspace(c))

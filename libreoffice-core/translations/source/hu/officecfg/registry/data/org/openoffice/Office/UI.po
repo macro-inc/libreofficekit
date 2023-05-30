@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-08-22 14:03+0000\n"
-"Last-Translator: Meskó Balázs <meskobalazs@gmail.com>\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
+"Last-Translator: Gábor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/hu/>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -464,7 +464,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Duplicate Sheet"
-msgstr "Munkalap duplikálása"
+msgstr "Munkalap megkettőzése"
 
 #. Ui6br
 #: CalcCommands.xcu
@@ -774,7 +774,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr "~Külső hivatkozások…"
+msgstr "~Külső hivatkozások..."
 
 #. FTLfZ
 #: CalcCommands.xcu
@@ -1254,7 +1254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Go to Sheet..."
-msgstr "U~grás a munkalaphoz…"
+msgstr "Ugrás m~unkalapra..."
 
 #. 79aNB
 #: CalcCommands.xcu
@@ -2106,15 +2106,15 @@ msgctxt ""
 msgid "Sparklines"
 msgstr "Értékgörbék"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr "Értékgörbe beszúrása…"
+msgid "Sparkline..."
+msgstr "Értékgörbe..."
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -2154,7 +2154,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Ungroup Sparklines"
-msgstr "Értékgörbecsoport szétbontása"
+msgstr "Értékgörbék szétbontása"
 
 #. MRK2s
 #: CalcCommands.xcu
@@ -2164,7 +2164,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline..."
-msgstr "Értékgörbe szerkesztése…"
+msgstr "Értékgörbe szerkesztése..."
 
 #. cA9mm
 #: CalcCommands.xcu
@@ -2174,7 +2174,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline Group..."
-msgstr "Értékgörbecsoport szerkesztése…"
+msgstr "Értékgörbecsoport szerkesztése..."
 
 #. dTXDB
 #: CalcCommands.xcu
@@ -2404,7 +2404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show Hidden Row/Column Indicator"
-msgstr "Rejtett sorok/oszlopok jelzőjének megjelenítése"
+msgstr "Rejtett sor/oszlop jelölő megjelenítése"
 
 #. nZGvm
 #: CalcCommands.xcu
@@ -2414,7 +2414,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Hidden Row/Column Indicator"
-msgstr "Rejtett sorok/oszlopok jelzője"
+msgstr "Rejtett sor/oszlop jelölő"
 
 #. PMfQA
 #: CalcCommands.xcu
@@ -2424,7 +2424,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show the indicator for hidden rows and columns"
-msgstr "A rejtett sorok és oszlopok jelzőjének megtekintése"
+msgstr "Rejtett sorok és oszlopok jelölőjének megjelenítése"
 
 #. 2TbE2
 #: CalcCommands.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "~Y hibasávok..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Adattábla..."
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -6535,6 +6545,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Egyetlen adatfelirat formázása..."
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Adattábla beszúrása"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Adattábla törlése"
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -9014,7 +9044,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr "~Külső hivatkozások…"
+msgstr "~Külső hivatkozások..."
 
 #. pQhVJ
 #: DrawImpressCommands.xcu
@@ -10694,7 +10724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Rows Evenly"
-msgstr "Sorok egyenletes elosztása"
+msgstr "Sorok egyenlő elosztása"
 
 #. tjGQ2
 #: DrawImpressCommands.xcu
@@ -20196,7 +20226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs up one paragraph"
-msgstr "A kijelölt bekezdések mozgatása egy bekezdéssel felfelé"
+msgstr "A kijelölt bekezdések mozgatása egy bekezdéssel feljebb"
 
 #. GvBYt
 #: GenericCommands.xcu
@@ -20226,7 +20256,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs down one paragraph"
-msgstr "A kijelölt bekezdések mozgatása egy bekezdéssel lefelé"
+msgstr "A kijelölt bekezdések egy bekezdéssel lejjebb való áthelyezése"
 
 #. KQLPA
 #: GenericCommands.xcu
@@ -20256,7 +20286,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Promote outline level of selected list paragraphs"
-msgstr "A kijelölt listabekezdések vázlatlistaszintjének előléptetése"
+msgstr "Kijelölt listabekezdések vázlatszintjének előléptetése"
 
 #. 3WakF
 #: GenericCommands.xcu
@@ -20316,7 +20346,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Demote outline level of selected list paragraphs"
-msgstr "A kijelölt listabekezdések vázlatlistaszintjének lefokozása"
+msgstr "Kijelölt listabekezdések vázlatszintjének lefokozása"
 
 #. BoAR5
 #: GenericCommands.xcu
@@ -20746,7 +20776,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~OLE Object..."
-msgstr "~OLE-objektum…"
+msgstr "~OLE-objektum..."
 
 #. zKjoT
 #: GenericCommands.xcu
@@ -20756,7 +20786,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Open dialog to insert OLE object"
-msgstr "Párbeszédablak megnyitása OLE-objektum beszúrásához"
+msgstr "OLE-objektum beszúrására szolgáló ablak megnyitása"
 
 #. 6B9a2
 #: GenericCommands.xcu
@@ -21006,7 +21036,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Ob~ject"
-msgstr "OLE-ob~jektum"
+msgstr "O~LE-Objektum"
 
 #. o5DE2
 #: GenericCommands.xcu
@@ -21016,7 +21046,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Menu for editing or saving OLE objects"
-msgstr "Menü az OLE-objektumok szerkesztéséhez vagy mentéséhez"
+msgstr "Menü OLE-objektumok szerkesztéséhez vagy mentéséhez"
 
 #. WQPXj
 #: GenericCommands.xcu
@@ -21396,7 +21426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Text B~ox and Shape"
-msgstr "Szövegd~oboz és alakzat"
+msgstr "Szö~vegdoboz és alakzat"
 
 #. zFyfF
 #: GenericCommands.xcu
@@ -21956,7 +21986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split Cells..."
-msgstr "Cellák felosztása…"
+msgstr "Cellák felosztása..."
 
 #. 2gYcx
 #: GenericCommands.xcu
@@ -22066,7 +22096,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select start and end arrowheads for lines."
-msgstr ""
+msgstr "Válassza ki a vonalak kezdő és záró nyílvégeinek stílusát."
 
 #. FDhkx
 #: GenericCommands.xcu
@@ -22197,26 +22227,6 @@ msgctxt ""
 "value.text"
 msgid "Delete C~ontents..."
 msgstr "Tartal~om törlése..."
-
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Emoji"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Emoji beszúrása"
 
 #. tEjpF
 #: GenericCommands.xcu
@@ -23477,6 +23487,36 @@ msgctxt ""
 "value.text"
 msgid "Toggle Automatic Spell Checking"
 msgstr "Automatikus helyesírás-ellenőrzés be/ki"
+
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Automatikus akadálymentesítési ellenőrzés"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "A~utomatikus akadálymentesítési ellenőrzés"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Automatikus akadálymentesítési ellenőrzés be/ki"
 
 #. 4DCmg
 #: GenericCommands.xcu
@@ -25956,7 +25996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Character Font Position..."
-msgstr "Karakter betűpozíciója…"
+msgstr "Karakter betűpozíciója..."
 
 #. fZufx
 #: GenericCommands.xcu
@@ -26516,7 +26556,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Rows"
-msgstr "~Sorok törlése"
+msgstr "So~rok törlése"
 
 #. wjm8K
 #: GenericCommands.xcu
@@ -26766,7 +26806,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Give a label to identify an object"
-msgstr "Címke adása az objektum azonosításához"
+msgstr "Adjon meg címkét egy objektum azonosításához"
 
 #. k5bGq
 #: GenericCommands.xcu
@@ -26786,7 +26826,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Add descriptions of non-text content (for accessibility)"
-msgstr "Leírások hozzáadása a nem szöveges tartalomhoz (akadálymentesítéshez)"
+msgstr "Nem szöveges tartalmak leírásainak megadása (akadálymentesítéshez)"
 
 #. YwMhY
 #: GenericCommands.xcu
@@ -27156,7 +27196,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Graphic Size Check..."
-msgstr "Grafika méretének ellenőrzése…"
+msgstr "Kép méretének ellenőrzése..."
 
 #. ACwaJ
 #: GenericCommands.xcu
@@ -28337,6 +28377,16 @@ msgctxt ""
 "value.text"
 msgid "~Others"
 msgstr "~Egyebek"
+
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Az Elemek panel megnyitása"
 
 #. uXvss
 #: MathWindowState.xcu
@@ -30528,14 +30578,14 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Változáskövetés megjelenítése"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
+msgid "Show Tracked ~Changes"
 msgstr "Követett változások ~megjelenítése"
 
 #. sMgCx
@@ -30597,6 +30647,16 @@ msgctxt ""
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
 msgstr "Megjelenít egy gombot a címsorok és alcímek mellett a vázlatszintek összecsukásához. A Navigátorban enélkül a gomb nélkül is összecsukhatja a vázlatszinteket."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Vázlattartalom megjelenítése egy szintig..."
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30756,7 +30816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Control Properties"
-msgstr "Tartalomvezérlés tulajdonságai"
+msgstr "Tartalomvezérlő-tulajdonságok"
 
 #. npNpZ
 #: WriterCommands.xcu
@@ -30936,7 +30996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Rich Text Content Control"
-msgstr ""
+msgstr "Rich text tartalomvezérlő beszúrása"
 
 #. GH8DZ
 #: WriterCommands.xcu
@@ -30946,7 +31006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Check Box Content Control"
-msgstr ""
+msgstr "Jelölőnégyzet tartalomvezérlő beszúrása"
 
 #. h2RBS
 #: WriterCommands.xcu
@@ -30956,7 +31016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Drop-Down List Content Control"
-msgstr ""
+msgstr "Legördülő lista tartalomvezérlő beszúrása"
 
 #. Avn9E
 #: WriterCommands.xcu
@@ -30966,7 +31026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Picture Content Control"
-msgstr ""
+msgstr "Kép tartalomvezérlő beszúrása"
 
 #. oxa64
 #: WriterCommands.xcu
@@ -30976,7 +31036,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
-msgstr ""
+msgstr "Dátum tartalomvezérlő beszúrása"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Egyszerű szöveg tartalomvezérlő beszúrása"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Kombinált mező tartalomvezérlő beszúrása"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -31436,7 +31516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Object Insert Menu"
-msgstr "OLE-objektum beszúrási menü"
+msgstr "OLE objektum beszúrása menü"
 
 #. DE4Ca
 #: WriterCommands.xcu
@@ -32078,6 +32158,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Címlap..."
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Fordítás..."
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32396,7 +32486,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xternal Links..."
-msgstr "~Külső hivatkozások…"
+msgstr "~Külső hivatkozások..."
 
 #. PCFhM
 #: WriterCommands.xcu
@@ -32478,6 +32568,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Sorok beszúrása ~fölé"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Sorok beszúrása fölé"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32497,6 +32597,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Sorok beszúrása ~alá"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Sorok beszúrása alá"
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32518,15 +32628,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Oszlopok beszúrása elé"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
-msgstr "Oszlopok ~elé"
+msgid "Columns B~efore"
+msgstr "~Oszlopok elé"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Oszlopok beszúrása elé"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32538,15 +32658,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Oszlopok beszúrása utána"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
+msgid "Columns A~fter"
 msgstr "Oszlopok ~utána"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Oszlopok beszúrása utána"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -32976,7 +33106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level"
-msgstr "Vázlatlistaszint lefokozása"
+msgstr "Vázlatszint lefokozása"
 
 #. jzcmc
 #: WriterCommands.xcu
@@ -32996,7 +33126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level"
-msgstr "Vázlatlistaszint előléptetése"
+msgstr "Vázlatszint előléptetése"
 
 #. MdLME
 #: WriterCommands.xcu
@@ -33056,7 +33186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up"
-msgstr "Elem mozgatása felfelé"
+msgstr "Elem feljebb helyezése"
 
 #. F6Rc7
 #: WriterCommands.xcu
@@ -33076,7 +33206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down"
-msgstr "Elem mozgatása lefelé"
+msgstr "Elem lejjebb helyezése"
 
 #. 2GyQ4
 #: WriterCommands.xcu
@@ -33146,7 +33276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr "Vázlatlistaszint lefokozása alpontokkal együtt"
+msgstr "Vázlatszint lefokozása eggyel az alpontokkal együtt"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33166,7 +33296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr "Vázlatlistaszint előléptetése alpontokkal együtt"
+msgstr "Vázlatszint előléptetése eggyel az alpontokkal együtt"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33176,7 +33306,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr "Elem mozgatása felfelé alpontokkal együtt"
+msgstr "Elem mozgatása felfelé az alpontokkal együtt"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33196,7 +33326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr "Elem mozgatása lefelé alpontokkal együtt"
+msgstr "Elem mozgatása lefelé az alpontokkal együtt"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -34096,7 +34226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Column Width: Adjust width of selected columns to fit content"
-msgstr "Minimális oszlopszélesség: A kijelölt oszlopok szélességének módosítása, hogy elférjen a tartalom"
+msgstr "Minimális oszlopszélesség: a kijelölt oszlopok szélességének módosítása a tartalomhoz"
 
 #. vGAT7
 #: WriterCommands.xcu
@@ -34136,7 +34266,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Row Height: Adjust height of selected rows to fit content"
-msgstr "Minimális oszlopszélesség: A kijelölt sorok magasságának módosítása, hogy elférjen a tartalom"
+msgstr "Minimális sormagasság: a kijelölt sorok magasságának módosítása a tartalomhoz"
 
 #. 9RUey
 #: WriterCommands.xcu
@@ -34788,6 +34918,166 @@ msgctxt ""
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Formátumecset (dupla kattintással és a Ctrl vagy Cmd lenyomásával módosíthatja a viselkedést)"
 
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Nagyítás"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Változáskövetés kezelése"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Karakter"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Bekezdés"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Táblázattulajdonságok"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Pozíció és méret"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Képtulajdonságok"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Keret tulajdonságai"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "OLE objektum tulajdonságai"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Szöveg törése"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Szegélyek"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Szegélyek"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Terület"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Terület"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Vonal"
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Vonal"
+
 #. 7PCFf
 #: WriterCommands.xcu
 msgctxt ""
@@ -35426,7 +35716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr "Nincs ~karakterstílus"
+msgstr "Nincs k~arakterstílus"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -38527,6 +38817,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Standard (egyszeres mód)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Standard (egyszeres mód) - Megjegyzés"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Standard (egyszeres mód) - Alakzat"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Standard (egyszeres mód) - Alakzat szövege"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Standard (egyszeres mód) - Űrlapvezérlő"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Standard (egyszeres mód) - Keret"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Standard (egyszeres mód) - Kép"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Standard (egyszeres mód) - Média"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Standard (egyszeres mód) - OLE objektum"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Standard (egyszeres mód) - Nyomtatási előnézet"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Standard (egyszeres mód) - Táblázat"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Standard (egyszeres mód) - Szöveg"
 
 #. h6gRt
 #: WriterWindowState.xcu

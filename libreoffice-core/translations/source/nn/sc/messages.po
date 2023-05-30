@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-08 14:37+0200\n"
-"PO-Revision-Date: 2022-08-02 21:51+0000\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-02-05 17:34+0000\n"
 "Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
 "Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/scmessages/nn/>\n"
 "Language: nn\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1563564342.000000\n"
 
 #. kBovX
@@ -1466,6 +1466,9 @@ msgid ""
 "a table range of at least\n"
 "3 × 3 cells must be selected."
 msgstr ""
+"For å leggja til eit autoformat\n"
+"må du merka eit område \n"
+"på minst 3×3 celler."
 
 #. iySox
 #: sc/inc/globstr.hrc:261
@@ -1513,7 +1516,7 @@ msgstr "Import av Lotus-filer"
 #: sc/inc/globstr.hrc:268
 msgctxt "STR_IMPORT_DBF"
 msgid "Import dBASE files"
-msgstr ""
+msgstr "Importer dBase-filer"
 
 #. uyTFS
 #: sc/inc/globstr.hrc:269
@@ -1705,7 +1708,7 @@ msgstr "Slett ark"
 #: sc/inc/globstr.hrc:299
 msgctxt "STR_UNDO_RENAME_TAB"
 msgid "Rename Sheet"
-msgstr "Gi arket nytt namn"
+msgstr "Gjev arket nytt namn"
 
 #. 8soVt
 #: sc/inc/globstr.hrc:300
@@ -1905,17 +1908,17 @@ msgctxt "STR_SCATTR_PAGE_SCALE"
 msgid "Reduce/enlarge printout"
 msgstr "Forstørr/forminsk utskrifta"
 
-#. CXqDX
+#. jYSCo
 #: sc/inc/globstr.hrc:333
 msgctxt "STR_SCATTR_PAGE_SCALETOPAGES"
-msgid "Fit print range(s) on number of pages"
-msgstr "Tilpass utskriftsområde til tal på sider"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Krymp utskriftsområde(t) til tal på sider"
 
-#. kDAZk
+#. P4CCx
 #: sc/inc/globstr.hrc:334
 msgctxt "STR_SCATTR_PAGE_SCALETO"
-msgid "Fit print range(s) to width/height"
-msgstr "Tilpass utskriftsområde til breidd/høgd"
+msgid "Shrink print range(s) to width/height"
+msgstr "Krymp utskriftsområde(t) til breidd/høgd"
 
 #. fnrU6
 #: sc/inc/globstr.hrc:335
@@ -1997,11 +2000,11 @@ msgctxt "STR_ON"
 msgid "on"
 msgstr "den"
 
-#. NqkbD
+#. RryEg
 #: sc/inc/globstr.hrc:348
 msgctxt "STR_RELOAD_TABLES"
-msgid "Security Warning: Automatic update of external links has been disabled."
-msgstr "Tryggingsvarsel: Automatisk oppdatering av eksterne lenkjer er kopla frå."
+msgid "Automatic update of external links has been disabled."
+msgstr "Automatisk oppdatering av eksterne lenkjer er kopla frå."
 
 #. qkto7
 #: sc/inc/globstr.hrc:349
@@ -2131,7 +2134,7 @@ msgstr "Slett innhald"
 #: sc/inc/globstr.hrc:367
 msgctxt "STR_QUICKHELP_REF"
 msgid "%1 R  × %2 C"
-msgstr ""
+msgstr "%1 R  × %2 K"
 
 #. NJpDi
 #: sc/inc/globstr.hrc:368
@@ -2304,7 +2307,7 @@ msgstr "Tilpass tabellområdet"
 #: sc/inc/globstr.hrc:395
 msgctxt "STR_TIP_RESIZEMATRIX"
 msgid "Array formula  %1 R × %2 C"
-msgstr ""
+msgstr "Matriseformel  %1 R × %2 K"
 
 #. nkxuG
 #: sc/inc/globstr.hrc:396
@@ -2400,7 +2403,7 @@ msgstr "Automatisk"
 #: sc/inc/globstr.hrc:411
 msgctxt "STR_ERR_LONG_NESTED_ARRAY"
 msgid "Nested arrays are not supported."
-msgstr "Nysta tabellar er ikkje støtta."
+msgstr "Nøsta tabellar er ikkje støtta."
 
 #. uPhvo
 #: sc/inc/globstr.hrc:412
@@ -3086,11 +3089,11 @@ msgctxt "STR_UNDO_FORMULA_TO_VALUE"
 msgid "Convert Formula To Value"
 msgstr "Konverter formel til verdi"
 
-#. dsjqi
+#. BywKj
 #: sc/inc/globstr.hrc:515
 msgctxt "STR_UNQUOTED_STRING"
-msgid "Strings without quotes are interpreted as column/row labels."
-msgstr "Strengar utan hermeteikn vert tolka som kolonne-/rad-etikettar."
+msgid "Strings without quotes are interpreted as defined names or references or column/row labels."
+msgstr "Strengar utan sitatteikn vert tolka som definerte namn eller referansar eller kolonne-/rad-etikettar."
 
 #. rHjns
 #: sc/inc/globstr.hrc:516
@@ -3252,43 +3255,43 @@ msgstr "Innrykk: "
 #: sc/inc/globstr.hrc:542
 msgctxt "STR_UNDO_INSERT_SPARKLINE"
 msgid "Insert Sparkline Group"
-msgstr ""
+msgstr "Set inn minidiagram-gruppe"
 
 #. LiBMo
 #: sc/inc/globstr.hrc:543
 msgctxt "STR_UNDO_DELETE_SPARKLINE"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Slett minidiagram"
 
 #. f2V6A
 #: sc/inc/globstr.hrc:544
 msgctxt "STR_UNDO_DELETE_SPARKLINE_GROUP"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Slett minidiagram-gruppa"
 
 #. 6sxnX
 #: sc/inc/globstr.hrc:545
 msgctxt "STR_UNDO_EDIT_SPARKLINE_GROUP"
 msgid "Edit Sparkline Group"
-msgstr ""
+msgstr "Rediger minidiagram-gruppe"
 
 #. CBBMB
 #: sc/inc/globstr.hrc:546
 msgctxt "STR_UNDO_GROUP_SPARKLINES"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Grupper minidiagram"
 
 #. vv2eo
 #: sc/inc/globstr.hrc:547
 msgctxt "STR_UNDO_UNGROUP_SPARKLINES"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Løys opp minidiagramgrupper"
 
 #. ux3mX
 #: sc/inc/globstr.hrc:548
 msgctxt "STR_UNDO_EDIT_SPARKLINE"
 msgid "Edit Sparkline"
-msgstr ""
+msgstr "Rediger minidiagram"
 
 #. dB8cp
 #: sc/inc/pvfundlg.hrc:28
@@ -6867,11 +6870,11 @@ msgctxt "SC_OPCODE_RANDOM"
 msgid "Returns a random number between 0 and 1."
 msgstr "Returnerer eit tilfeldig tal mellom 0 og 1."
 
-#. QugqG
+#. Le6a5
 #: sc/inc/scfuncs.hrc:1064
 msgctxt "SC_OPCODE_IS_EVEN"
-msgid "Returns TRUE if value is an even integer."
-msgstr "Gjev tilbake SANN dersom verdien er eit partal."
+msgid "Returns TRUE if the value truncated to integer is even."
+msgstr "Returnerer SANN viss verdien avrunda til eit heiltal er eit partal."
 
 #. aEG3g
 #: sc/inc/scfuncs.hrc:1065
@@ -6885,11 +6888,11 @@ msgctxt "SC_OPCODE_IS_EVEN"
 msgid "The value to be tested."
 msgstr "Verdien som skal testast."
 
-#. M8AAF
+#. FXDi6
 #: sc/inc/scfuncs.hrc:1072
 msgctxt "SC_OPCODE_IS_ODD"
-msgid "Returns TRUE if value is an odd integer."
-msgstr "Gjev tilbake SANN dersom verdien er eit oddetal."
+msgid "Returns TRUE if the value truncated to integer is odd."
+msgstr "Returnerer SANN viss verdien avrunda til eit heiltal er eit oddetal."
 
 #. 4scb6
 #: sc/inc/scfuncs.hrc:1073
@@ -15245,11 +15248,11 @@ msgctxt "SC_OPCODE_FIXED"
 msgid "Decimals"
 msgstr "Desimalplassar"
 
-#. ACFqC
+#. CTmcM
 #: sc/inc/scfuncs.hrc:3751
 msgctxt "SC_OPCODE_FIXED"
-msgid "Decimal places. The number of fixed decimal places that are to be displayed."
-msgstr "Desimalplassar. Tal på siffer etter komma."
+msgid "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."
+msgstr "Desimalplassar. Tal på faste desimalar som skal visast. Standard er 2."
 
 #. fdn6N
 #: sc/inc/scfuncs.hrc:3752
@@ -16518,11 +16521,11 @@ msgctxt "SC_OPCODE_RANDOM_NV"
 msgid "Returns a random number between 0 and 1, non-volatile."
 msgstr "Returnerer eit tilfeldig tal mellom 0 og 1, ikkje flyktig."
 
-#. op2W5
+#. fDQYY
 #: sc/inc/scfuncs.hrc:4147
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "Returns a random integer between the numbers you specify, non-volatile."
-msgstr "Gjev eit vilkårleg heiltal mellom tala du oppgjev, ikkje flyktig"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."
+msgstr "Returnerer eit tilfeldig heiltal mellom dei gjevne botn- og toppverdiane (begge inkluderte), ikkje-flyktig."
 
 #. o3i8h
 #: sc/inc/scfuncs.hrc:4148
@@ -16530,11 +16533,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Bottom"
 msgstr "Botn"
 
-#. HdKGo
+#. 7kUdh
 #: sc/inc/scfuncs.hrc:4149
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The smallest integer returned."
-msgstr "Det minste heiltalet returnert."
+msgid "The smallest integer that can be returned."
+msgstr "Det minste heiltalet som kan returnerast."
 
 #. 8s6nU
 #: sc/inc/scfuncs.hrc:4150
@@ -16542,11 +16545,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Top"
 msgstr "Topp"
 
-#. x9uuF
+#. AmoKE
 #: sc/inc/scfuncs.hrc:4151
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The largest integer returned."
-msgstr "Det største heiltalet returnert."
+msgid "The largest integer that can be returned."
+msgstr "Det største heiltalet som kan returnerast."
 
 #. pDDme
 #: sc/inc/scstyles.hrc:29
@@ -16649,7 +16652,7 @@ msgstr "10 på topp"
 #: sc/inc/strings.hrc:36
 msgctxt "SCSTR_BOTTOM10FILTER"
 msgid "Bottom 10"
-msgstr ""
+msgstr "Nedste 10"
 
 #. FNDLK
 #: sc/inc/strings.hrc:37
@@ -16667,132 +16670,120 @@ msgstr "Ikkje tom"
 #: sc/inc/strings.hrc:39
 msgctxt "SCSTR_FILTER_COLOR"
 msgid "Filter by Color"
-msgstr ""
+msgstr "Filtrer etter farge"
 
 #. EYFT8
 #: sc/inc/strings.hrc:40
 msgctxt "SCSTR_FILTER_CONDITION"
 msgid "Filter by Condition"
-msgstr ""
+msgstr "Filtrer etter bvilkår"
 
-#. 5LENV
-#: sc/inc/strings.hrc:41
-msgctxt "SCSTR_FILTER_TEXT_COLOR"
-msgid "Text Color"
-msgstr "Tekstfarge"
-
-#. BtGE4
-#: sc/inc/strings.hrc:42
-msgctxt "SCSTR_FILTER_BACKGROUND_COLOR"
-msgid "Background Color"
-msgstr "Bakgrunnsfarge"
-
-#. td5Gr
+#. PWtxn
 #. This must match the translation of the same strings of standardfilterdialog|cond
-#: sc/inc/strings.hrc:44
+#: sc/inc/strings.hrc:42
 msgctxt "STANDARDFILTERDIALOG_COND"
-msgid "Text color"
-msgstr "Tekstfarge"
+msgid "Font color"
+msgstr "Skriftfarge"
 
 #. sGJCz
-#: sc/inc/strings.hrc:45
+#: sc/inc/strings.hrc:43
 msgctxt "STANDARDFILTERDIALOG_COND"
 msgid "Background color"
 msgstr "Bakgrunnsfarge"
 
 #. teYGB
-#: sc/inc/strings.hrc:46
+#: sc/inc/strings.hrc:44
 msgctxt "SCSTR_FILTER_NO_FILL"
 msgid "No Fill"
 msgstr "Ikkje fyll"
 
 #. 8DPvA
-#: sc/inc/strings.hrc:47
+#: sc/inc/strings.hrc:45
 msgctxt "SCSTR_FILTER_AUTOMATIC_COLOR"
 msgid "Automatic"
 msgstr "Automatisk"
 
 #. Wgy7r
-#: sc/inc/strings.hrc:48
+#: sc/inc/strings.hrc:46
 msgctxt "SCSTR_NONAME"
 msgid "unnamed"
 msgstr "namnlaus"
 
 #. JAf3n
-#: sc/inc/strings.hrc:49
+#: sc/inc/strings.hrc:47
 msgctxt "SCSTR_INSERT_RTL"
 msgid "Shift cells left"
 msgstr "Flytt celler til venstre"
 
 #. CW4Wh
 #. "%1 is replaced to column letter, such as 'Column A'"
-#: sc/inc/strings.hrc:51
+#: sc/inc/strings.hrc:49
 msgctxt "SCSTR_COLUMN_LETTER"
 msgid "Column %1"
-msgstr ""
+msgstr "Kolonne %1"
 
 #. CJrpZ
-#: sc/inc/strings.hrc:52
+#: sc/inc/strings.hrc:50
 msgctxt "SCSTR_COLUMN"
 msgid "Column"
-msgstr ""
+msgstr "Kolonne"
 
 #. Bjnch
-#: sc/inc/strings.hrc:53
+#: sc/inc/strings.hrc:51
 msgctxt "SCSTR_ROW"
 msgid "Row"
-msgstr ""
+msgstr "Rad"
 
 #. 7p8BN
-#: sc/inc/strings.hrc:54
+#: sc/inc/strings.hrc:52
 msgctxt "SCSTR_TABLE"
 msgid "Sheet"
 msgstr "Ark"
 
 #. ArnTD
-#: sc/inc/strings.hrc:55
+#: sc/inc/strings.hrc:53
 msgctxt "SCSTR_NAME"
 msgid "Name"
 msgstr "Namn"
 
 #. BxrBH
-#: sc/inc/strings.hrc:56
+#: sc/inc/strings.hrc:54
 msgctxt "SCSTR_APDTABLE"
 msgid "Append Sheet"
 msgstr "Legg til ark"
 
 #. sba4F
-#: sc/inc/strings.hrc:57
+#: sc/inc/strings.hrc:55
 msgctxt "SCSTR_RENAMETAB"
 msgid "Rename Sheet"
 msgstr "Endra namn på ark"
 
 #. EEcgV
-#: sc/inc/strings.hrc:58
+#: sc/inc/strings.hrc:56
 msgctxt "SCSTR_SET_TAB_BG_COLOR"
 msgid "Tab Color"
 msgstr "Fanefarge"
 
 #. sTank
-#: sc/inc/strings.hrc:59
+#: sc/inc/strings.hrc:57
 msgctxt "SCSTR_NO_TAB_BG_COLOR"
 msgid "Default"
 msgstr "Standard"
 
 #. yEEuF
-#: sc/inc/strings.hrc:60
+#: sc/inc/strings.hrc:58
 msgctxt "SCSTR_RENAMEOBJECT"
 msgid "Name Object"
 msgstr "Set namn på objekt"
 
 #. 3FHKw
-#: sc/inc/strings.hrc:61
+#: sc/inc/strings.hrc:59
 msgctxt "STR_INSERTGRAPHIC"
 msgid "Insert Image"
 msgstr "Set inn bilete"
 
 #. bKv77
-#: sc/inc/strings.hrc:62
+#: sc/inc/strings.hrc:60
 msgctxt "SCSTR_TOTAL"
 msgid "One result found"
 msgid_plural "%1 results found"
@@ -16800,1782 +16791,1788 @@ msgstr[0] "Fann eitt resultat"
 msgstr[1] "Fann %1 resultat"
 
 #. 7GkKi
-#: sc/inc/strings.hrc:63
+#: sc/inc/strings.hrc:61
 msgctxt "SCSTR_SKIPPED"
 msgid "(only %1 are listed)"
 msgstr "(berre %1 er lista)"
 
+#. khhRt
+#: sc/inc/strings.hrc:62
+msgctxt "SCSTR_RESULTS_CLAMPED"
+msgid "More than %1 results found (stopped counting)"
+msgstr "Fann meir enn %1 resultat (slutta å telja)"
+
 #. YxFpr
 #. Attribute
-#: sc/inc/strings.hrc:65
+#: sc/inc/strings.hrc:64
 msgctxt "SCSTR_PROTECTDOC"
 msgid "Protect Spreadsheet Structure"
 msgstr "Vern reknearkstrukturen …"
 
 #. SQCpD
-#: sc/inc/strings.hrc:66
+#: sc/inc/strings.hrc:65
 msgctxt "SCSTR_UNPROTECTDOC"
 msgid "Unprotect Spreadsheet Structure"
 msgstr "Opphev vern av reknearkstrukturen"
 
 #. rAV3G
-#: sc/inc/strings.hrc:67
+#: sc/inc/strings.hrc:66
 msgctxt "SCSTR_UNPROTECTTAB"
 msgid "Unprotect Sheet"
 msgstr "Opphev arkvernet"
 
 #. K7w3B
-#: sc/inc/strings.hrc:68
+#: sc/inc/strings.hrc:67
 msgctxt "SCSTR_CHG_PROTECT"
 msgid "Protect Records"
 msgstr "Vern endringar"
 
 #. DLDBg
-#: sc/inc/strings.hrc:69
+#: sc/inc/strings.hrc:68
 msgctxt "SCSTR_CHG_UNPROTECT"
 msgid "Unprotect Records"
 msgstr "Opphev endringsvern"
 
 #. rFdAS
-#: sc/inc/strings.hrc:70
+#: sc/inc/strings.hrc:69
 msgctxt "SCSTR_PASSWORD"
 msgid "Password:"
 msgstr "Passord:"
 
 #. dd2wC
-#: sc/inc/strings.hrc:71
+#: sc/inc/strings.hrc:70
 msgctxt "SCSTR_PASSWORDOPT"
 msgid "Password (optional):"
 msgstr "Passord (valfritt):"
 
 #. dTBug
-#: sc/inc/strings.hrc:72
+#: sc/inc/strings.hrc:71
 msgctxt "SCSTR_WRONGPASSWORD"
 msgid "Incorrect Password"
 msgstr "Feil passord"
 
 #. bkGuJ
-#: sc/inc/strings.hrc:73
+#: sc/inc/strings.hrc:72
 msgctxt "SCSTR_END"
 msgid "~End"
 msgstr "~Slutt"
 
 #. XNnTf
-#: sc/inc/strings.hrc:74
+#: sc/inc/strings.hrc:73
 msgctxt "SCSTR_UNKNOWN"
 msgid "Unknown"
 msgstr "Ukjend"
 
 #. NoEfk
-#: sc/inc/strings.hrc:75
+#: sc/inc/strings.hrc:74
 msgctxt "SCSTR_VALID_MINIMUM"
 msgid "~Minimum"
 msgstr "~Minimum"
 
 #. gKahz
-#: sc/inc/strings.hrc:76
+#: sc/inc/strings.hrc:75
 msgctxt "SCSTR_VALID_MAXIMUM"
 msgid "~Maximum"
 msgstr "~Maksimum"
 
 #. nmeHF
-#: sc/inc/strings.hrc:77
+#: sc/inc/strings.hrc:76
 msgctxt "SCSTR_VALID_VALUE"
 msgid "~Value"
 msgstr "~Verdi"
 
 #. g8Cow
-#: sc/inc/strings.hrc:78
+#: sc/inc/strings.hrc:77
 msgctxt "SCSTR_VALID_FORMULA"
 msgid "~Formula"
 msgstr "~Formel"
 
 #. 6YEEk
-#: sc/inc/strings.hrc:79
+#: sc/inc/strings.hrc:78
 msgctxt "SCSTR_VALID_RANGE"
 msgid "~Source"
 msgstr "~Kjelde"
 
 #. FA84s
-#: sc/inc/strings.hrc:80
+#: sc/inc/strings.hrc:79
 msgctxt "SCSTR_VALID_LIST"
 msgid "~Entries"
 msgstr "~Oppføringar"
 
 #. vhcaA
 #. for dialogues:
-#: sc/inc/strings.hrc:82
+#: sc/inc/strings.hrc:81
 msgctxt "SCSTR_CHARSET_USER"
 msgid "System"
 msgstr "System"
 
 #. 2tobg
-#: sc/inc/strings.hrc:83
+#: sc/inc/strings.hrc:82
 msgctxt "SCSTR_COLUMN_USER"
 msgid "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide"
 msgstr "Standard;Tekst;Dato (DMÅ);Dato (MDÅ);Dato (ÅMD);Engelsk (USA);Gøym"
 
 #. px75F
-#: sc/inc/strings.hrc:84
+#: sc/inc/strings.hrc:83
 msgctxt "SCSTR_FIELDSEP_TAB"
 msgid "Tab"
 msgstr "Tabulator"
 
 #. ZGpGp
-#: sc/inc/strings.hrc:85
+#: sc/inc/strings.hrc:84
 msgctxt "SCSTR_FIELDSEP_SPACE"
 msgid "space"
 msgstr "mellomrom"
 
 #. C8dAj
-#: sc/inc/strings.hrc:86
+#: sc/inc/strings.hrc:85
 msgctxt "SCSTR_UNDO_GRAFFILTER"
 msgid "Image Filter"
 msgstr "Biletfilter"
 
 #. CfBRk
-#: sc/inc/strings.hrc:87
+#: sc/inc/strings.hrc:86
 msgctxt "STR_CAPTION_DEFAULT_TEXT"
 msgid "Text"
 msgstr "Tekst"
 
 #. X6bVC
 #. Select tables dialog title
-#: sc/inc/strings.hrc:89
+#: sc/inc/strings.hrc:88
 msgctxt "STR_DLG_SELECTTABLES_TITLE"
 msgid "Select Sheets"
 msgstr "Vel ark"
 
 #. GYoSL
-#: sc/inc/strings.hrc:90
+#: sc/inc/strings.hrc:89
 msgctxt "STR_DLG_SELECTTABLE_TITLE"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Gå til ark"
 
 #. iHTDF
-#: sc/inc/strings.hrc:91
+#: sc/inc/strings.hrc:90
 msgctxt "STR_DLG_SELECTTABLE_MASK"
 msgid "~Type a Sheet Name"
-msgstr ""
+msgstr "~Skriv eit arknamn"
 
 #. SEDS2
 #. Select tables dialog listbox
-#: sc/inc/strings.hrc:93
+#: sc/inc/strings.hrc:92
 msgctxt "STR_DLG_SELECTTABLES_LBNAME"
 msgid "~Selected sheets"
 msgstr "~Valde ark"
 
 #. szfzF
-#: sc/inc/strings.hrc:94
+#: sc/inc/strings.hrc:93
 msgctxt "STR_DLG_SELECTTABLE_LBNAME"
 msgid "~Sheets"
-msgstr ""
+msgstr "~Ark"
 
 #. SfEhE
-#: sc/inc/strings.hrc:95
+#: sc/inc/strings.hrc:94
 msgctxt "STR_ACC_CSVRULER_NAME"
 msgid "Ruler"
 msgstr "Linjal"
 
 #. 3VwsT
-#: sc/inc/strings.hrc:96
+#: sc/inc/strings.hrc:95
 msgctxt "STR_ACC_CSVRULER_DESCR"
 msgid "This ruler manages objects at fixed positions."
 msgstr "Denne linjalen handsamar objekt som skal stå på ein fast stad."
 
 #. 7Ream
-#: sc/inc/strings.hrc:97
+#: sc/inc/strings.hrc:96
 msgctxt "STR_ACC_CSVGRID_NAME"
 msgid "Preview"
 msgstr "Førehandsvising"
 
 #. uSKyF
-#: sc/inc/strings.hrc:98
+#: sc/inc/strings.hrc:97
 msgctxt "STR_ACC_CSVGRID_DESCR"
 msgid "This sheet shows how the data will be arranged in the document."
 msgstr "Dette arket viser korleis dataa vert fordelte i dokumentet."
 
 #. MwTAm
-#: sc/inc/strings.hrc:99
+#: sc/inc/strings.hrc:98
 msgctxt "STR_ACC_DOC_NAME"
 msgid "Document view"
 msgstr "Dokumentvising"
 
 #. NFaas
-#: sc/inc/strings.hrc:100
+#: sc/inc/strings.hrc:99
 msgctxt "STR_ACC_TABLE_NAME"
 msgid "Sheet %1"
 msgstr "Ark %1"
 
 #. 2qRJG
-#: sc/inc/strings.hrc:101
+#: sc/inc/strings.hrc:100
 msgctxt "STR_ACC_CELL_NAME"
 msgid "Cell %1"
 msgstr "Celle %1"
 
 #. KD4PA
-#: sc/inc/strings.hrc:102
+#: sc/inc/strings.hrc:101
 msgctxt "STR_ACC_LEFTAREA_NAME"
 msgid "Left area"
 msgstr "Venstre område"
 
 #. 56AkM
-#: sc/inc/strings.hrc:103
+#: sc/inc/strings.hrc:102
 msgctxt "STR_ACC_PREVIEWDOC_NAME"
 msgid "Page preview"
 msgstr "Førehandsvising av sida"
 
 #. RA4AS
-#: sc/inc/strings.hrc:104
+#: sc/inc/strings.hrc:103
 msgctxt "STR_ACC_CENTERAREA_NAME"
 msgid "Center area"
 msgstr "Midtområdet"
 
 #. 2hpwq
-#: sc/inc/strings.hrc:105
+#: sc/inc/strings.hrc:104
 msgctxt "STR_ACC_RIGHTAREA_NAME"
 msgid "Right area"
 msgstr "Høgre område"
 
 #. FrXgq
-#: sc/inc/strings.hrc:106
+#: sc/inc/strings.hrc:105
 msgctxt "STR_ACC_HEADER_NAME"
 msgid "Header of page %1"
 msgstr "Topptekst på side %1"
 
 #. BwF8D
-#: sc/inc/strings.hrc:107
+#: sc/inc/strings.hrc:106
 msgctxt "STR_ACC_FOOTER_NAME"
 msgid "Footer of page %1"
 msgstr "Botntekst på side %1"
 
 #. 9T4c8
-#: sc/inc/strings.hrc:108
+#: sc/inc/strings.hrc:107
 msgctxt "STR_ACC_EDITLINE_NAME"
 msgid "Input line"
 msgstr "Inndatalinje"
 
 #. ejFak
-#: sc/inc/strings.hrc:109
+#: sc/inc/strings.hrc:108
 msgctxt "STR_ACC_EDITLINE_DESCR"
 msgid "This is where you enter or edit text, numbers and formulas."
 msgstr "Her kan du skriva inn eller endra tekst, tal og formlar."
 
 #. XX585
-#: sc/inc/strings.hrc:110
+#: sc/inc/strings.hrc:109
 msgctxt "SCSTR_MEDIASHELL"
 msgid "Media Playback"
 msgstr "Medieavspeling"
 
 #. SuAaA
-#: sc/inc/strings.hrc:111
+#: sc/inc/strings.hrc:110
 msgctxt "RID_SCSTR_ONCLICK"
 msgid "Mouse button pressed"
 msgstr "Museknapp trykt ned"
 
 #. 4prfv
-#: sc/inc/strings.hrc:112
+#: sc/inc/strings.hrc:111
 msgctxt "STR_ACC_TOOLBAR_FORMULA"
 msgid "Formula Tool Bar"
 msgstr "Formelverktøyllinje"
 
 #. nAcNZ
-#: sc/inc/strings.hrc:113
+#: sc/inc/strings.hrc:112
 msgctxt "STR_ACC_DOC_SPREADSHEET"
 msgid "%PRODUCTNAME Spreadsheets"
 msgstr "%PRODUCTNAME-rekneark"
 
 #. 8UMap
-#: sc/inc/strings.hrc:114
+#: sc/inc/strings.hrc:113
 msgctxt "STR_ACC_DOC_SPREADSHEET_READONLY"
 msgid "(read-only)"
 msgstr "(skriveverna)"
 
 #. fDxgL
-#: sc/inc/strings.hrc:115
+#: sc/inc/strings.hrc:114
 msgctxt "STR_ACC_DOC_PREVIEW_SUFFIX"
 msgid "(Preview mode)"
 msgstr "(Førehandsvising)"
 
 #. ZwiH6
-#: sc/inc/strings.hrc:116
+#: sc/inc/strings.hrc:115
 msgctxt "SCSTR_PRINTOPT_PAGES"
 msgid "Pages:"
 msgstr "Sider:"
 
 #. FYjDY
-#: sc/inc/strings.hrc:117
+#: sc/inc/strings.hrc:116
 msgctxt "SCSTR_PRINTOPT_SUPPRESSEMPTY"
 msgid "~Suppress output of empty pages"
 msgstr "~Hindra sending av tomme sider"
 
 #. GQNVf
-#: sc/inc/strings.hrc:118
+#: sc/inc/strings.hrc:117
 msgctxt "SCSTR_PRINTOPT_ALLSHEETS"
 msgid "Print All Sheets"
 msgstr "Skriv ut alle arka"
 
 #. xcKcm
-#: sc/inc/strings.hrc:119
+#: sc/inc/strings.hrc:118
 msgctxt "SCSTR_PRINTOPT_SELECTEDSHEETS"
 msgid "Print Selected Sheets"
 msgstr "Skriv ut merkte ark"
 
 #. e7kTj
-#: sc/inc/strings.hrc:120
+#: sc/inc/strings.hrc:119
 msgctxt "SCSTR_PRINTOPT_SELECTEDCELLS"
 msgid "Print Selected Cells"
 msgstr "Skriv ut merkte celler"
 
 #. z4DB6
-#: sc/inc/strings.hrc:121
+#: sc/inc/strings.hrc:120
 msgctxt "SCSTR_PRINTOPT_FROMWHICH"
 msgid "From which:"
 msgstr "Frå kva:"
 
 #. v5EK2
-#: sc/inc/strings.hrc:122
+#: sc/inc/strings.hrc:121
 msgctxt "SCSTR_PRINTOPT_PRINTALLPAGES"
 msgid "All ~Pages"
 msgstr "~Alle sider"
 
 #. cvNuW
-#: sc/inc/strings.hrc:123
+#: sc/inc/strings.hrc:122
 msgctxt "SCSTR_PRINTOPT_PRINTPAGES"
 msgid "Pa~ges:"
 msgstr "~Sider:"
 
 #. Pw9Pu
-#: sc/inc/strings.hrc:124
+#: sc/inc/strings.hrc:123
 msgctxt "SCSTR_PRINTOPT_PRODNAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 4BEKq
-#: sc/inc/strings.hrc:125
+#: sc/inc/strings.hrc:124
 msgctxt "SCSTR_DDEDOC_NOT_LOADED"
 msgid "The following DDE source could not be updated possibly because the source document was not open. Please launch the source document and try again."
 msgstr "Klarte ikkje oppdatera den følgjande DDE-kjelda. Truleg var kjeldedokumentet ikkje opna. Opna kjeldedokumentet og prøv igjen."
 
 #. kGmko
-#: sc/inc/strings.hrc:126
+#: sc/inc/strings.hrc:125
 msgctxt "SCSTR_EXTDOC_NOT_LOADED"
 msgid "The following external file could not be loaded. Data linked from this file did not get updated."
 msgstr "Klarte ikkje lasta inn den følgjande eksterne fila. Difor vart data lenkja frå denne fila heller ikkje oppdaterte."
 
 #. BvtFc
-#: sc/inc/strings.hrc:127
+#: sc/inc/strings.hrc:126
 msgctxt "SCSTR_UPDATE_EXTDOCS"
 msgid "Updating external links."
 msgstr "Oppdaterer eksterne lenkjer."
 
 #. MACSv
-#: sc/inc/strings.hrc:128
+#: sc/inc/strings.hrc:127
 msgctxt "SCSTR_FORMULA_SYNTAX_CALC_A1"
 msgid "Calc A1"
 msgstr "Calc A1"
 
 #. xEQCB
-#: sc/inc/strings.hrc:129
+#: sc/inc/strings.hrc:128
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_A1"
 msgid "Excel A1"
 msgstr "Excel A1"
 
 #. KLkBH
-#: sc/inc/strings.hrc:130
+#: sc/inc/strings.hrc:129
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_R1C1"
 msgid "Excel R1C1"
 msgstr "Excel R1C1"
 
 #. pr4wW
-#: sc/inc/strings.hrc:131
+#: sc/inc/strings.hrc:130
 msgctxt "SCSTR_COL_LABEL"
 msgid "Range contains column la~bels"
 msgstr "Området inneheld ~kolonneoverskrifter"
 
 #. mJyFP
-#: sc/inc/strings.hrc:132
+#: sc/inc/strings.hrc:131
 msgctxt "SCSTR_ROW_LABEL"
 msgid "Range contains ~row labels"
 msgstr "Området inneheld ~radoverskrifter"
 
 #. ujjcx
-#: sc/inc/strings.hrc:133
+#: sc/inc/strings.hrc:132
 msgctxt "SCSTR_VALERR"
 msgid "Invalid value"
 msgstr "Ugyldig verdi"
 
 #. SoLXN
-#: sc/inc/strings.hrc:134
+#: sc/inc/strings.hrc:133
 msgctxt "STR_NOFORMULASPECIFIED"
 msgid "No formula specified."
 msgstr "Ingen formel spesifisert."
 
 #. YFnCS
-#: sc/inc/strings.hrc:135
+#: sc/inc/strings.hrc:134
 msgctxt "STR_NOCOLROW"
 msgid "Neither row or column specified."
 msgstr "Verken rad eller kolonne er vald."
 
 #. 6YQh2
-#: sc/inc/strings.hrc:136
+#: sc/inc/strings.hrc:135
 msgctxt "STR_WRONGFORMULA"
 msgid "Undefined name or range."
 msgstr "Udefinert namn eller område."
 
 #. 4aHCG
-#: sc/inc/strings.hrc:137
+#: sc/inc/strings.hrc:136
 msgctxt "STR_WRONGROWCOL"
 msgid "Undefined name or wrong cell reference."
 msgstr "Udefinert namn eller feil cellereferanse."
 
 #. G8KPr
-#: sc/inc/strings.hrc:138
+#: sc/inc/strings.hrc:137
 msgctxt "STR_NOCOLFORMULA"
 msgid "Formulas don't form a column."
 msgstr "Formlane dannar ikkje ein kolonne."
 
 #. uSxCb
-#: sc/inc/strings.hrc:139
+#: sc/inc/strings.hrc:138
 msgctxt "STR_NOROWFORMULA"
 msgid "Formulas don't form a row."
 msgstr "Formlane dannar ikkje ei rad."
 
 #. PknB5
-#: sc/inc/strings.hrc:140
+#: sc/inc/strings.hrc:139
 msgctxt "STR_ADD_AUTOFORMAT_TITLE"
 msgid "Add AutoFormat"
 msgstr "Legg til autoformat"
 
 #. 7KuSQ
-#: sc/inc/strings.hrc:141
+#: sc/inc/strings.hrc:140
 msgctxt "STR_RENAME_AUTOFORMAT_TITLE"
 msgid "Rename AutoFormat"
 msgstr "Endra namn på autoformat"
 
 #. hqtgD
-#: sc/inc/strings.hrc:142
+#: sc/inc/strings.hrc:141
 msgctxt "STR_ADD_AUTOFORMAT_LABEL"
 msgid "Name"
 msgstr "Namn"
 
 #. L9jQU
-#: sc/inc/strings.hrc:143
+#: sc/inc/strings.hrc:142
 msgctxt "STR_DEL_AUTOFORMAT_TITLE"
 msgid "Delete AutoFormat"
 msgstr "Slett autoformat"
 
 #. KCDoJ
-#: sc/inc/strings.hrc:144
+#: sc/inc/strings.hrc:143
 msgctxt "STR_DEL_AUTOFORMAT_MSG"
 msgid "Do you really want to delete the # AutoFormat?"
 msgstr "Er du sikker på at du vil sletta # autoformatet?"
 
 #. GDdL3
-#: sc/inc/strings.hrc:145
+#: sc/inc/strings.hrc:144
 msgctxt "STR_BTN_AUTOFORMAT_CLOSE"
 msgid "~Close"
 msgstr "~Lukk"
 
 #. DAuNm
-#: sc/inc/strings.hrc:146
+#: sc/inc/strings.hrc:145
 msgctxt "STR_JAN"
 msgid "Jan"
 msgstr "Jan"
 
 #. WWzNg
-#: sc/inc/strings.hrc:147
+#: sc/inc/strings.hrc:146
 msgctxt "STR_FEB"
 msgid "Feb"
 msgstr "Feb"
 
 #. CCC3U
-#: sc/inc/strings.hrc:148
+#: sc/inc/strings.hrc:147
 msgctxt "STR_MAR"
 msgid "Mar"
 msgstr "Mar"
 
 #. cr7Jq
-#: sc/inc/strings.hrc:149
+#: sc/inc/strings.hrc:148
 msgctxt "STR_NORTH"
 msgid "North"
 msgstr "Nord"
 
 #. wHYPw
-#: sc/inc/strings.hrc:150
+#: sc/inc/strings.hrc:149
 msgctxt "STR_MID"
 msgid "Mid"
 msgstr "Midt"
 
 #. sxDHC
-#: sc/inc/strings.hrc:151
+#: sc/inc/strings.hrc:150
 msgctxt "STR_SOUTH"
 msgid "South"
 msgstr "Sør"
 
 #. CWcdp
-#: sc/inc/strings.hrc:152
+#: sc/inc/strings.hrc:151
 msgctxt "STR_SUM"
 msgid "Total"
 msgstr "Totalt"
 
 #. MMCxb
-#: sc/inc/strings.hrc:153
+#: sc/inc/strings.hrc:152
 msgctxt "SCSTR_UNDO_PAGE_ANCHOR"
 msgid "Page Anchor"
 msgstr "Sideanker"
 
 #. fFFQ8
-#: sc/inc/strings.hrc:154
+#: sc/inc/strings.hrc:153
 msgctxt "SCSTR_UNDO_CELL_ANCHOR"
 msgid "Cell Anchor"
 msgstr "Celleanker"
 
 #. rTGKc
-#: sc/inc/strings.hrc:155
+#: sc/inc/strings.hrc:154
 msgctxt "SCSTR_CONDITION"
 msgid "Condition "
 msgstr "Vilkår "
 
 #. 56Wmj
 #. content description strings are also use        d in ScLinkTargetsObj
-#: sc/inc/strings.hrc:158
+#: sc/inc/strings.hrc:157
 msgctxt "SCSTR_CONTENT_ROOT"
 msgid "Contents"
 msgstr "Innhald"
 
 #. wLN3J
-#: sc/inc/strings.hrc:159
+#: sc/inc/strings.hrc:158
 msgctxt "SCSTR_CONTENT_TABLE"
 msgid "Sheets"
 msgstr "Ark"
 
 #. 3ZhJn
-#: sc/inc/strings.hrc:160
+#: sc/inc/strings.hrc:159
 msgctxt "SCSTR_CONTENT_RANGENAME"
 msgid "Range names"
 msgstr "Områdenamn"
 
 #. jjQeD
-#: sc/inc/strings.hrc:161
+#: sc/inc/strings.hrc:160
 msgctxt "SCSTR_CONTENT_DBAREA"
 msgid "Database ranges"
 msgstr "Databaseområde"
 
 #. kbHfD
-#: sc/inc/strings.hrc:162
+#: sc/inc/strings.hrc:161
 msgctxt "SCSTR_CONTENT_GRAPHIC"
 msgid "Images"
 msgstr "Bilete"
 
 #. 3imVs
-#: sc/inc/strings.hrc:163
+#: sc/inc/strings.hrc:162
 msgctxt "SCSTR_CONTENT_OLEOBJECT"
 msgid "OLE objects"
 msgstr "OLE-objekt"
 
 #. T28Cj
-#: sc/inc/strings.hrc:164
+#: sc/inc/strings.hrc:163
 msgctxt "SCSTR_CONTENT_NOTE"
 msgid "Comments"
 msgstr "Merknadar"
 
 #. 5UcFo
-#: sc/inc/strings.hrc:165
+#: sc/inc/strings.hrc:164
 msgctxt "SCSTR_CONTENT_AREALINK"
 msgid "Linked areas"
 msgstr "Kopla område"
 
 #. HzVgF
-#: sc/inc/strings.hrc:166
+#: sc/inc/strings.hrc:165
 msgctxt "SCSTR_CONTENT_DRAWING"
 msgid "Drawing objects"
 msgstr "Teikneobjekt"
 
 #. sCafb
-#: sc/inc/strings.hrc:167
+#: sc/inc/strings.hrc:166
 msgctxt "SCSTR_ACTIVE"
 msgid "active"
 msgstr "aktiv"
 
 #. q6EmB
-#: sc/inc/strings.hrc:168
+#: sc/inc/strings.hrc:167
 msgctxt "SCSTR_NOTACTIVE"
 msgid "inactive"
 msgstr "inaktiv"
 
 #. Gr6xn
-#: sc/inc/strings.hrc:169
+#: sc/inc/strings.hrc:168
 msgctxt "SCSTR_HIDDEN"
 msgid "hidden"
 msgstr "gøymt"
 
 #. vnwQr
-#: sc/inc/strings.hrc:170
+#: sc/inc/strings.hrc:169
 msgctxt "SCSTR_ACTIVEWIN"
 msgid "Active Window"
 msgstr "Aktivt vindauge"
 
 #. yo3cD
-#: sc/inc/strings.hrc:171
+#: sc/inc/strings.hrc:170
 msgctxt "SCSTR_QHLP_SCEN_LISTBOX"
 msgid "Scenario Name"
 msgstr "Namn på senarioet"
 
 #. oWz3B
-#: sc/inc/strings.hrc:172
+#: sc/inc/strings.hrc:171
 msgctxt "SCSTR_QHLP_SCEN_COMMENT"
 msgid "Comment"
 msgstr "Kommentar"
 
 #. tNLKD
-#: sc/inc/strings.hrc:174
+#: sc/inc/strings.hrc:173
 msgctxt "STR_MENU_SORT_ASC"
 msgid "Sort Ascending"
 msgstr "Sorter stigande"
 
 #. S6kbN
-#: sc/inc/strings.hrc:175
+#: sc/inc/strings.hrc:174
 msgctxt "STR_MENU_SORT_DESC"
 msgid "Sort Descending"
 msgstr "Sorter fallande"
 
 #. BDYHo
-#: sc/inc/strings.hrc:176
+#: sc/inc/strings.hrc:175
 msgctxt "STR_MENU_SORT_CUSTOM"
 msgid "Custom Sort"
 msgstr "Tilpassa sortering"
 
 #. bpBbA
-#: sc/inc/strings.hrc:178
+#: sc/inc/strings.hrc:177
 msgctxt "SCSTR_QHELP_POSWND"
 msgid "Name Box"
 msgstr "Namnefelt"
 
 #. GeNTF
-#: sc/inc/strings.hrc:179
+#: sc/inc/strings.hrc:178
 msgctxt "SCSTR_QHELP_INPUTWND"
 msgid "Input line"
 msgstr "Inndatalinje"
 
 #. E6mnF
-#: sc/inc/strings.hrc:180
+#: sc/inc/strings.hrc:179
 msgctxt "SCSTR_QHELP_BTNCALC"
 msgid "Function Wizard"
 msgstr "Funksjonsvegvisar"
 
 #. rU6xA
-#: sc/inc/strings.hrc:181
+#: sc/inc/strings.hrc:180
 msgctxt "SCSTR_QHELP_BTNOK"
 msgid "Accept"
 msgstr "Godta"
 
 #. NC6DB
-#: sc/inc/strings.hrc:182
+#: sc/inc/strings.hrc:181
 msgctxt "SCSTR_QHELP_BTNCANCEL"
 msgid "Cancel"
 msgstr "Avbryt"
 
 #. 9JUCF
-#: sc/inc/strings.hrc:183
+#: sc/inc/strings.hrc:182
 msgctxt "SCSTR_QHELP_BTNSUM"
 msgid "Select Function"
 msgstr "Vel funksjon"
 
 #. kFqE4
-#: sc/inc/strings.hrc:184
+#: sc/inc/strings.hrc:183
 msgctxt "SCSTR_QHELP_BTNEQUAL"
 msgid "Formula"
 msgstr "Formel"
 
 #. dPqKq
-#: sc/inc/strings.hrc:185
+#: sc/inc/strings.hrc:184
 msgctxt "SCSTR_QHELP_EXPAND_FORMULA"
 msgid "Expand Formula Bar"
 msgstr "Ekspander formellinja"
 
 #. ENx2Q
-#: sc/inc/strings.hrc:186
+#: sc/inc/strings.hrc:185
 msgctxt "SCSTR_QHELP_COLLAPSE_FORMULA"
 msgid "Collapse Formula Bar"
 msgstr "Fald saman formellinja"
 
 #. nSD8r
-#: sc/inc/strings.hrc:188
+#: sc/inc/strings.hrc:187
 msgctxt "STR_UNKNOWN_USER_CONFLICT"
 msgid "Unknown User"
 msgstr "Ukjend brukar"
 
 #. HDiei
-#: sc/inc/strings.hrc:190
+#: sc/inc/strings.hrc:189
 msgctxt "STR_CHG_INSERT_COLS"
 msgid "Column inserted"
 msgstr "Kolonne sett inn"
 
 #. brecA
-#: sc/inc/strings.hrc:191
+#: sc/inc/strings.hrc:190
 msgctxt "STR_CHG_INSERT_ROWS"
 msgid "Row inserted "
 msgstr "Rad sett inn "
 
 #. nBf8B
-#: sc/inc/strings.hrc:192
+#: sc/inc/strings.hrc:191
 msgctxt "STR_CHG_INSERT_TABS"
 msgid "Sheet inserted "
 msgstr "Ark sett inn "
 
 #. Td8iF
-#: sc/inc/strings.hrc:193
+#: sc/inc/strings.hrc:192
 msgctxt "STR_CHG_DELETE_COLS"
 msgid "Column deleted"
 msgstr "Kolonne sletta"
 
 #. 8Kopo
-#: sc/inc/strings.hrc:194
+#: sc/inc/strings.hrc:193
 msgctxt "STR_CHG_DELETE_ROWS"
 msgid "Row deleted"
 msgstr "Rad sletta"
 
 #. DynWz
-#: sc/inc/strings.hrc:195
+#: sc/inc/strings.hrc:194
 msgctxt "STR_CHG_DELETE_TABS"
 msgid "Sheet deleted"
 msgstr "Ark sletta"
 
 #. 6f9S9
-#: sc/inc/strings.hrc:196
+#: sc/inc/strings.hrc:195
 msgctxt "STR_CHG_MOVE"
 msgid "Range moved"
 msgstr "Område flytta"
 
 #. UpHkf
-#: sc/inc/strings.hrc:197
+#: sc/inc/strings.hrc:196
 msgctxt "STR_CHG_CONTENT"
 msgid "Changed contents"
 msgstr "Innhald endra"
 
 #. cefNw
-#: sc/inc/strings.hrc:198
+#: sc/inc/strings.hrc:197
 msgctxt "STR_CHG_CONTENT_WITH_CHILD"
 msgid "Changed contents"
 msgstr "Innhaldet er endra"
 
 #. DcsSq
-#: sc/inc/strings.hrc:199
+#: sc/inc/strings.hrc:198
 msgctxt "STR_CHG_CHILD_CONTENT"
 msgid "Changed to "
 msgstr "Endra til "
 
 #. naPuN
-#: sc/inc/strings.hrc:200
+#: sc/inc/strings.hrc:199
 msgctxt "STR_CHG_CHILD_ORGCONTENT"
 msgid "Original"
 msgstr "Opphavleg"
 
 #. cbtSw
-#: sc/inc/strings.hrc:201
+#: sc/inc/strings.hrc:200
 msgctxt "STR_CHG_REJECT"
 msgid "Changes rejected"
 msgstr "Forkasta endringar"
 
 #. rGkvk
-#: sc/inc/strings.hrc:202
+#: sc/inc/strings.hrc:201
 msgctxt "STR_CHG_ACCEPTED"
 msgid "Accepted"
 msgstr "Godteke"
 
 #. FRREF
-#: sc/inc/strings.hrc:203
+#: sc/inc/strings.hrc:202
 msgctxt "STR_CHG_REJECTED"
 msgid "Rejected"
 msgstr "Avvist"
 
 #. bG7Pb
-#: sc/inc/strings.hrc:204
+#: sc/inc/strings.hrc:203
 msgctxt "STR_CHG_NO_ENTRY"
 msgid "No Entry"
 msgstr "Ingen post"
 
 #. i2doZ
-#: sc/inc/strings.hrc:205
+#: sc/inc/strings.hrc:204
 msgctxt "STR_CHG_EMPTY"
 msgid "<empty>"
 msgstr "<tom>"
 
 #. dAt5Q
-#: sc/inc/strings.hrc:207
+#: sc/inc/strings.hrc:206
 msgctxt "STR_NOT_PROTECTED"
 msgid "Not protected"
 msgstr "Ikkje verna"
 
 #. 3TDDs
-#: sc/inc/strings.hrc:208
+#: sc/inc/strings.hrc:207
 msgctxt "STR_NOT_PASS_PROTECTED"
 msgid "Not password-protected"
 msgstr "Ikkje verna av passord"
 
 #. qBe6G
-#: sc/inc/strings.hrc:209
+#: sc/inc/strings.hrc:208
 msgctxt "STR_HASH_BAD"
 msgid "Hash incompatible"
 msgstr "Ugyldig nøkkel"
 
 #. XoAEE
-#: sc/inc/strings.hrc:210
+#: sc/inc/strings.hrc:209
 msgctxt "STR_HASH_GOOD"
 msgid "Hash compatible"
 msgstr "Gyldig nøkkel"
 
 #. MHDYB
-#: sc/inc/strings.hrc:211
+#: sc/inc/strings.hrc:210
 msgctxt "STR_RETYPE"
 msgid "Re-type"
 msgstr "Skriv inn ein gong til"
 
 #. bFjd9
 #. MovingAverageDialog
-#: sc/inc/strings.hrc:214
+#: sc/inc/strings.hrc:213
 msgctxt "STR_MOVING_AVERAGE_UNDO_NAME"
 msgid "Moving Average"
 msgstr "Glidande gjennomsnitt"
 
 #. ZUkPQ
 #. ExponentialSmoothingDialog
-#: sc/inc/strings.hrc:216
+#: sc/inc/strings.hrc:215
 msgctxt "STR_EXPONENTIAL_SMOOTHING_UNDO_NAME"
 msgid "Exponential Smoothing"
 msgstr "Eksponentiell utjamning"
 
 #. LAfqT
 #. AnalysisOfVarianceDialog
-#: sc/inc/strings.hrc:218
+#: sc/inc/strings.hrc:217
 msgctxt "STR_ANALYSIS_OF_VARIANCE_UNDO_NAME"
 msgid "Analysis of Variance"
 msgstr "Variansanalyse"
 
 #. 8v4W5
-#: sc/inc/strings.hrc:219
+#: sc/inc/strings.hrc:218
 msgctxt "STR_LABEL_ANOVA"
 msgid "Analysis of Variance (ANOVA)"
 msgstr "Variansanalyse (ANOVA)"
 
 #. NY8WD
-#: sc/inc/strings.hrc:220
+#: sc/inc/strings.hrc:219
 msgctxt "STR_ANOVA_SINGLE_FACTOR_LABEL"
 msgid "ANOVA - Single Factor"
 msgstr "ANOVA - enkeltfaktor"
 
 #. AFnEZ
-#: sc/inc/strings.hrc:221
+#: sc/inc/strings.hrc:220
 msgctxt "STR_ANOVA_TWO_FACTOR_LABEL"
 msgid "ANOVA - Two Factor"
 msgstr "ANOVA - dobbeltfaktor"
 
 #. hBPGD
-#: sc/inc/strings.hrc:222
+#: sc/inc/strings.hrc:221
 msgctxt "STR_ANOVA_LABEL_GROUPS"
 msgid "Groups"
 msgstr "Grupper"
 
 #. DiUWy
-#: sc/inc/strings.hrc:223
+#: sc/inc/strings.hrc:222
 msgctxt "STR_ANOVA_LABEL_BETWEEN_GROUPS"
 msgid "Between Groups"
 msgstr "Mellom grupper"
 
 #. fBh3S
-#: sc/inc/strings.hrc:224
+#: sc/inc/strings.hrc:223
 msgctxt "STR_ANOVA_LABEL_WITHIN_GROUPS"
 msgid "Within Groups"
 msgstr "I grupper"
 
 #. DFcw4
-#: sc/inc/strings.hrc:225
+#: sc/inc/strings.hrc:224
 msgctxt "STR_ANOVA_LABEL_SOURCE_OF_VARIATION"
 msgid "Source of Variation"
 msgstr "Varianskjelde"
 
 #. KYbb8
-#: sc/inc/strings.hrc:226
+#: sc/inc/strings.hrc:225
 msgctxt "STR_ANOVA_LABEL_SS"
 msgid "SS"
 msgstr "SS"
 
 #. j7j6E
-#: sc/inc/strings.hrc:227
+#: sc/inc/strings.hrc:226
 msgctxt "STR_ANOVA_LABEL_DF"
 msgid "df"
 msgstr "df"
 
 #. 6QJED
-#: sc/inc/strings.hrc:228
+#: sc/inc/strings.hrc:227
 msgctxt "STR_ANOVA_LABEL_MS"
 msgid "MS"
 msgstr "MS"
 
 #. JcWo9
-#: sc/inc/strings.hrc:229
+#: sc/inc/strings.hrc:228
 msgctxt "STR_ANOVA_LABEL_F"
 msgid "F"
 msgstr "F"
 
 #. a43mP
-#: sc/inc/strings.hrc:230
+#: sc/inc/strings.hrc:229
 msgctxt "STR_ANOVA_LABEL_SIGNIFICANCE_F"
 msgid "Significance F"
 msgstr "Signifikans F"
 
 #. MMmsS
-#: sc/inc/strings.hrc:231
+#: sc/inc/strings.hrc:230
 msgctxt "STR_ANOVA_LABEL_P_VALUE"
 msgid "P-value"
 msgstr "P-verdi"
 
 #. UoaCS
-#: sc/inc/strings.hrc:232
+#: sc/inc/strings.hrc:231
 msgctxt "STR_ANOVA_LABEL_F_CRITICAL"
 msgid "F critical"
 msgstr "F-kritisk"
 
 #. oJD9H
-#: sc/inc/strings.hrc:233
+#: sc/inc/strings.hrc:232
 msgctxt "STR_ANOVA_LABEL_TOTAL"
 msgid "Total"
 msgstr "Totalt"
 
 #. kvSFC
 #. CorrelationDialog
-#: sc/inc/strings.hrc:235
+#: sc/inc/strings.hrc:234
 msgctxt "STR_CORRELATION_UNDO_NAME"
 msgid "Correlation"
 msgstr "Korrelasjon"
 
 #. WC4SJ
-#: sc/inc/strings.hrc:236
+#: sc/inc/strings.hrc:235
 msgctxt "STR_CORRELATION_LABEL"
 msgid "Correlations"
 msgstr "Korrelasjonar"
 
 #. AAb7T
 #. CovarianceDialog
-#: sc/inc/strings.hrc:238
+#: sc/inc/strings.hrc:237
 msgctxt "STR_COVARIANCE_UNDO_NAME"
 msgid "Covariance"
 msgstr "Kovarians"
 
 #. VyxUL
-#: sc/inc/strings.hrc:239
+#: sc/inc/strings.hrc:238
 msgctxt "STR_COVARIANCE_LABEL"
 msgid "Covariances"
 msgstr "Kovariansar"
 
 #. 8gmqu
 #. DescriptiveStatisticsDialog
-#: sc/inc/strings.hrc:241
+#: sc/inc/strings.hrc:240
 msgctxt "STR_DESCRIPTIVE_STATISTICS_UNDO_NAME"
 msgid "Descriptive Statistics"
 msgstr "Beskrivande statistikkar"
 
 #. FGXC5
-#: sc/inc/strings.hrc:242
+#: sc/inc/strings.hrc:241
 msgctxt "STRID_CALC_MEAN"
 msgid "Mean"
 msgstr "Middelverdi"
 
 #. 2sHVR
-#: sc/inc/strings.hrc:243
+#: sc/inc/strings.hrc:242
 msgctxt "STRID_CALC_STD_ERROR"
 msgid "Standard Error"
 msgstr "Standardfeil"
 
 #. KrDBB
-#: sc/inc/strings.hrc:244
+#: sc/inc/strings.hrc:243
 msgctxt "STRID_CALC_MODE"
 msgid "Mode"
 msgstr "Modus"
 
 #. AAbEo
-#: sc/inc/strings.hrc:245
+#: sc/inc/strings.hrc:244
 msgctxt "STRID_CALC_MEDIAN"
 msgid "Median"
 msgstr "Median"
 
 #. h2HaP
-#: sc/inc/strings.hrc:246
+#: sc/inc/strings.hrc:245
 msgctxt "STRID_CALC_VARIANCE"
 msgid "Variance"
 msgstr "Varians"
 
 #. 3uYMC
-#: sc/inc/strings.hrc:247
+#: sc/inc/strings.hrc:246
 msgctxt "STRID_CALC_STD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Standardavvik"
 
 #. JTx7f
-#: sc/inc/strings.hrc:248
+#: sc/inc/strings.hrc:247
 msgctxt "STRID_CALC_KURTOSIS"
 msgid "Kurtosis"
 msgstr "Kurtose"
 
 #. EXJJt
-#: sc/inc/strings.hrc:249
+#: sc/inc/strings.hrc:248
 msgctxt "STRID_CALC_SKEWNESS"
 msgid "Skewness"
 msgstr "Skeivskap"
 
 #. HkRYo
-#: sc/inc/strings.hrc:250
+#: sc/inc/strings.hrc:249
 msgctxt "STRID_CALC_RANGE"
 msgid "Range"
 msgstr "Område"
 
 #. LHk8p
-#: sc/inc/strings.hrc:251
+#: sc/inc/strings.hrc:250
 msgctxt "STRID_CALC_MIN"
 msgid "Minimum"
 msgstr "Minimum"
 
 #. LtMJs
-#: sc/inc/strings.hrc:252
+#: sc/inc/strings.hrc:251
 msgctxt "STRID_CALC_MAX"
 msgid "Maximum"
 msgstr "Maksimum"
 
 #. Q5r5c
-#: sc/inc/strings.hrc:253
+#: sc/inc/strings.hrc:252
 msgctxt "STRID_CALC_SUM"
 msgid "Sum"
 msgstr "Sum"
 
 #. s8K23
-#: sc/inc/strings.hrc:254
+#: sc/inc/strings.hrc:253
 msgctxt "STRID_CALC_COUNT"
 msgid "Count"
 msgstr "Tal på"
 
 #. pU8QG
-#: sc/inc/strings.hrc:255
+#: sc/inc/strings.hrc:254
 msgctxt "STRID_CALC_FIRST_QUARTILE"
 msgid "First Quartile"
 msgstr "Første kvartil"
 
 #. PGXzY
-#: sc/inc/strings.hrc:256
+#: sc/inc/strings.hrc:255
 msgctxt "STRID_CALC_THIRD_QUARTILE"
 msgid "Third Quartile"
 msgstr "Tredje kvartil"
 
 #. gABRP
 #. RandomNumberGeneratorDialog
-#: sc/inc/strings.hrc:258
+#: sc/inc/strings.hrc:257
 msgctxt "STR_UNDO_DISTRIBUTION_TEMPLATE"
 msgid "Random ($(DISTRIBUTION))"
 msgstr "Tilfeldig ($(DISTRIBUTION))"
 
 #. A8Rc9
-#: sc/inc/strings.hrc:259
+#: sc/inc/strings.hrc:258
 msgctxt "STR_DISTRIBUTION_UNIFORM_REAL"
 msgid "Uniform"
 msgstr "Likefordelt"
 
 #. 9ke8L
-#: sc/inc/strings.hrc:260
+#: sc/inc/strings.hrc:259
 msgctxt "STR_DISTRIBUTION_UNIFORM_INTEGER"
 msgid "Uniform Integer"
 msgstr "Likefordel heiltal"
 
 #. GC2LH
-#: sc/inc/strings.hrc:261
+#: sc/inc/strings.hrc:260
 msgctxt "STR_DISTRIBUTION_NORMAL"
 msgid "Normal"
 msgstr "Normal"
 
 #. XjQ2x
-#: sc/inc/strings.hrc:262
+#: sc/inc/strings.hrc:261
 msgctxt "STR_DISTRIBUTION_CAUCHY"
 msgid "Cauchy"
 msgstr "Cauchy-fordel"
 
 #. G5CqB
-#: sc/inc/strings.hrc:263
+#: sc/inc/strings.hrc:262
 msgctxt "STR_DISTRIBUTION_BERNOULLI"
 msgid "Bernoulli"
 msgstr "Bernoulli-fordel"
 
 #. GpJUB
-#: sc/inc/strings.hrc:264
+#: sc/inc/strings.hrc:263
 msgctxt "STR_DISTRIBUTION_BINOMIAL"
 msgid "Binomial"
 msgstr "Binomial"
 
 #. 6yJKm
-#: sc/inc/strings.hrc:265
+#: sc/inc/strings.hrc:264
 msgctxt "STR_DISTRIBUTION_NEGATIVE_BINOMIAL"
 msgid "Negative Binomial"
 msgstr "Negativ binomial"
 
 #. zzpmN
-#: sc/inc/strings.hrc:266
+#: sc/inc/strings.hrc:265
 msgctxt "STR_DISTRIBUTION_CHI_SQUARED"
 msgid "Chi Squared"
 msgstr "Kjikvadrert"
 
 #. NGBzX
-#: sc/inc/strings.hrc:267
+#: sc/inc/strings.hrc:266
 msgctxt "STR_DISTRIBUTION_GEOMETRIC"
 msgid "Geometric"
 msgstr "Geometrisk"
 
 #. BNZPE
-#: sc/inc/strings.hrc:268
+#: sc/inc/strings.hrc:267
 msgctxt "STR_RNG_PARAMETER_MINIMUM"
 msgid "Minimum"
 msgstr "Minimum"
 
 #. EThhi
-#: sc/inc/strings.hrc:269
+#: sc/inc/strings.hrc:268
 msgctxt "STR_RNG_PARAMETER_MAXIMUM"
 msgid "Maximum"
 msgstr "Maksimum"
 
 #. RPYEG
-#: sc/inc/strings.hrc:270
+#: sc/inc/strings.hrc:269
 msgctxt "STR_RNG_PARAMETER_MEAN"
 msgid "Mean"
 msgstr "Middelverdi"
 
 #. VeqrX
-#: sc/inc/strings.hrc:271
+#: sc/inc/strings.hrc:270
 msgctxt "STR_RNG_PARAMETER_STANDARD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Standardavvik"
 
 #. ChwWE
-#: sc/inc/strings.hrc:272
+#: sc/inc/strings.hrc:271
 msgctxt "STR_RNG_PARAMETER_STANDARD_MEDIAN"
 msgid "Median"
 msgstr "Median"
 
 #. SzgEb
-#: sc/inc/strings.hrc:273
+#: sc/inc/strings.hrc:272
 msgctxt "STR_RNG_PARAMETER_STANDARD_SIGMA"
 msgid "Sigma"
 msgstr "Sigma"
 
 #. 94TBK
-#: sc/inc/strings.hrc:274
+#: sc/inc/strings.hrc:273
 msgctxt "STR_RNG_PARAMETER_STANDARD_PROBABILITY"
 msgid "p Value"
 msgstr "p-verdi"
 
 #. AfUsB
-#: sc/inc/strings.hrc:275
+#: sc/inc/strings.hrc:274
 msgctxt "STR_RNG_PARAMETER_STANDARD_NUMBER_OF_TRIALS"
 msgid "Number of Trials"
 msgstr "Talet på forsøk"
 
 #. DdfR6
-#: sc/inc/strings.hrc:276
+#: sc/inc/strings.hrc:275
 msgctxt "STR_RNG_PARAMETER_STANDARD_NU_VALUE"
 msgid "nu Value"
 msgstr "nu-verdi"
 
 #. gygpC
 #. SamplingDialog
-#: sc/inc/strings.hrc:278
+#: sc/inc/strings.hrc:277
 msgctxt "STR_SAMPLING_UNDO_NAME"
 msgid "Sampling"
 msgstr "Prøving"
 
 #. zLuBp
 #. Names of dialogs
-#: sc/inc/strings.hrc:280
+#: sc/inc/strings.hrc:279
 msgctxt "STR_FTEST"
 msgid "F-test"
 msgstr "F-test"
 
 #. bQEfv
-#: sc/inc/strings.hrc:281
+#: sc/inc/strings.hrc:280
 msgctxt "STR_FTEST_UNDO_NAME"
 msgid "F-test"
 msgstr "F-test"
 
 #. UdsVZ
-#: sc/inc/strings.hrc:282
+#: sc/inc/strings.hrc:281
 msgctxt "STR_TTEST"
 msgid "Paired t-test"
 msgstr "Para t-test"
 
 #. A7xTa
-#: sc/inc/strings.hrc:283
+#: sc/inc/strings.hrc:282
 msgctxt "STR_TTEST_UNDO_NAME"
 msgid "Paired t-test"
 msgstr "Para t-test"
 
 #. dWPSe
-#: sc/inc/strings.hrc:284
+#: sc/inc/strings.hrc:283
 msgctxt "STR_ZTEST"
 msgid "z-test"
 msgstr "z-test"
 
 #. QvZ7V
-#: sc/inc/strings.hrc:285
+#: sc/inc/strings.hrc:284
 msgctxt "STR_ZTEST_UNDO_NAME"
 msgid "z-test"
 msgstr "z-test"
 
 #. D6AqL
-#: sc/inc/strings.hrc:286
+#: sc/inc/strings.hrc:285
 msgctxt "STR_CHI_SQUARE_TEST"
 msgid "Test of Independence (Chi-Square)"
 msgstr "Sjølvstendetest (Kjikvadrat)"
 
 #. PvFSb
-#: sc/inc/strings.hrc:287
+#: sc/inc/strings.hrc:286
 msgctxt "STR_REGRESSION_UNDO_NAME"
 msgid "Regression"
 msgstr "Regresjon"
 
 #. NXrYh
-#: sc/inc/strings.hrc:288
+#: sc/inc/strings.hrc:287
 msgctxt "STR_REGRESSION"
 msgid "Regression"
 msgstr "Regresjon"
 
 #. AM5WV
-#: sc/inc/strings.hrc:289
+#: sc/inc/strings.hrc:288
 msgctxt "STR_FOURIER_ANALYSIS_UNDO_NAME"
 msgid "Fourier Analysis"
 msgstr "Fourier-analyse"
 
 #. hd6yJ
-#: sc/inc/strings.hrc:290
+#: sc/inc/strings.hrc:289
 msgctxt "STR_FOURIER_ANALYSIS"
 msgid "Fourier Analysis"
 msgstr "Fourier-analyse"
 
 #. KNJ5s
 #. Common
-#: sc/inc/strings.hrc:292
+#: sc/inc/strings.hrc:291
 msgctxt "STR_COLUMN_LABEL_TEMPLATE"
 msgid "Column %NUMBER%"
 msgstr "Kolonne %NUMBER%"
 
 #. aTAGd
-#: sc/inc/strings.hrc:293
+#: sc/inc/strings.hrc:292
 msgctxt "STR_ROW_LABEL_TEMPLATE"
 msgid "Row %NUMBER%"
 msgstr "Rad %NUMBER%"
 
 #. nAbaC
-#: sc/inc/strings.hrc:294
+#: sc/inc/strings.hrc:293
 msgctxt "STR_LABEL_ALPHA"
 msgid "Alpha"
 msgstr "Alfa"
 
 #. FZZCu
-#: sc/inc/strings.hrc:295
+#: sc/inc/strings.hrc:294
 msgctxt "STR_VARIABLE_1_LABEL"
 msgid "Variable 1"
 msgstr "Variabel 1"
 
 #. pnyaa
-#: sc/inc/strings.hrc:296
+#: sc/inc/strings.hrc:295
 msgctxt "STR_VARIABLE_2_LABEL"
 msgid "Variable 2"
 msgstr "Variabel 2"
 
 #. LU4CC
-#: sc/inc/strings.hrc:297
+#: sc/inc/strings.hrc:296
 msgctxt "STR_HYPOTHESIZED_MEAN_DIFFERENCE_LABEL"
 msgid "Hypothesized Mean Difference"
 msgstr "Hypotetisk middeldifferanse"
 
 #. sCNt9
-#: sc/inc/strings.hrc:298
+#: sc/inc/strings.hrc:297
 msgctxt "STR_OBSERVATIONS_LABEL"
 msgid "Observations"
 msgstr "Observasjonar"
 
 #. arX5v
-#: sc/inc/strings.hrc:299
+#: sc/inc/strings.hrc:298
 msgctxt "STR_OBSERVED_MEAN_DIFFERENCE_LABEL"
 msgid "Observed Mean Difference"
 msgstr "Observert middeldifferanse"
 
 #. dr3Gt
-#: sc/inc/strings.hrc:300
+#: sc/inc/strings.hrc:299
 msgctxt "STR_LABEL_RSQUARED"
 msgid "R^2"
 msgstr "R^2"
 
 #. pnhCA
-#: sc/inc/strings.hrc:301
+#: sc/inc/strings.hrc:300
 msgctxt "STR_LABEL_ADJUSTED_RSQUARED"
 msgid "Adjusted R^2"
 msgstr "Justert R^2"
 
 #. ACsNA
-#: sc/inc/strings.hrc:302
+#: sc/inc/strings.hrc:301
 msgctxt "STR_LABEL_XVARIABLES_COUNT"
 msgid "Count of X variables"
 msgstr "Tal på X-variablar"
 
 #. kEPsb
-#: sc/inc/strings.hrc:303
+#: sc/inc/strings.hrc:302
 msgctxt "STR_DEGREES_OF_FREEDOM_LABEL"
 msgid "df"
 msgstr "df"
 
 #. FYUYT
-#: sc/inc/strings.hrc:304
+#: sc/inc/strings.hrc:303
 msgctxt "STR_P_VALUE_LABEL"
 msgid "P-value"
 msgstr "P-verdi"
 
 #. S3BHc
-#: sc/inc/strings.hrc:305
+#: sc/inc/strings.hrc:304
 msgctxt "STR_CRITICAL_VALUE_LABEL"
 msgid "Critical Value"
 msgstr "Kritisk verdi"
 
 #. wgpT3
-#: sc/inc/strings.hrc:306
+#: sc/inc/strings.hrc:305
 msgctxt "STR_TEST_STATISTIC_LABEL"
 msgid "Test Statistic"
 msgstr "Teststatistikk"
 
 #. kTwBX
-#: sc/inc/strings.hrc:307
+#: sc/inc/strings.hrc:306
 msgctxt "STR_LABEL_LOWER"
 msgid "Lower"
 msgstr "Nedre"
 
 #. GgFPs
-#: sc/inc/strings.hrc:308
+#: sc/inc/strings.hrc:307
 msgctxt "STR_LABEL_Upper"
 msgid "Upper"
 msgstr "Øvre"
 
 #. hkXzo
-#: sc/inc/strings.hrc:309
+#: sc/inc/strings.hrc:308
 msgctxt "STR_MESSAGE_INVALID_INPUT_RANGE"
 msgid "Input range is invalid."
 msgstr "Inndataområdet er ugyldig"
 
 #. rTFFF
-#: sc/inc/strings.hrc:310
+#: sc/inc/strings.hrc:309
 msgctxt "STR_MESSAGE_INVALID_OUTPUT_ADDR"
 msgid "Output address is not valid."
 msgstr "Utdataadressat er ugyldig"
 
 #. rtSox
 #. RegressionDialog
-#: sc/inc/strings.hrc:312
+#: sc/inc/strings.hrc:311
 msgctxt "STR_LABEL_LINEAR"
 msgid "Linear"
 msgstr "Lineær"
 
 #. kVG6g
-#: sc/inc/strings.hrc:313
+#: sc/inc/strings.hrc:312
 msgctxt "STR_LABEL_LOGARITHMIC"
 msgid "Logarithmic"
 msgstr "Logaritmisk"
 
 #. wmyFW
-#: sc/inc/strings.hrc:314
+#: sc/inc/strings.hrc:313
 msgctxt "STR_LABEL_POWER"
 msgid "Power"
 msgstr "Potens"
 
 #. GabFM
-#: sc/inc/strings.hrc:315
+#: sc/inc/strings.hrc:314
 msgctxt "STR_MESSAGE_XINVALID_RANGE"
 msgid "Independent variable(s) range is not valid."
 msgstr "Uavhengig variabelområde er ikkje gyldig."
 
 #. 8x8DM
-#: sc/inc/strings.hrc:316
+#: sc/inc/strings.hrc:315
 msgctxt "STR_MESSAGE_YINVALID_RANGE"
 msgid "Dependent variable(s) range is not valid."
 msgstr "Avhengig variabelområde er ikkje gyldig."
 
 #. E7BD2
-#: sc/inc/strings.hrc:317
+#: sc/inc/strings.hrc:316
 msgctxt "STR_MESSAGE_INVALID_CONFIDENCE_LEVEL"
 msgid "Confidence level must be in the interval (0, 1)."
 msgstr "Konfidensnivået må vera i intervallet (0, 1)."
 
 #. ZdyQs
-#: sc/inc/strings.hrc:318
+#: sc/inc/strings.hrc:317
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_COLUMN"
 msgid "Y variable range cannot have more than 1 column."
 msgstr "Y-variabelen kan berre ha 1 kolonne."
 
 #. UpZqC
-#: sc/inc/strings.hrc:319
+#: sc/inc/strings.hrc:318
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_ROW"
 msgid "Y variable range cannot have more than 1 row."
 msgstr "Y-variabelen kan berre ha 1 rad."
 
 #. DrsBe
-#: sc/inc/strings.hrc:320
+#: sc/inc/strings.hrc:319
 msgctxt "STR_MESSAGE_UNIVARIATE_NUMOBS_MISMATCH"
 msgid "Univariate regression : The observation count in X and Y must match."
 msgstr "Univariat regresjon: Observasjonsteljinga i X og Y må samsvara."
 
 #. KuttF
-#: sc/inc/strings.hrc:321
+#: sc/inc/strings.hrc:320
 msgctxt "STR_MESSAGE_MULTIVARIATE_NUMOBS_MISMATCH"
 msgid "Multivariate regression : The observation count in X and Y must match."
 msgstr "Multivariat regresjon: Observasjonsteljinga i X og Y må samsvara."
 
 #. 6Cghz
-#: sc/inc/strings.hrc:322
+#: sc/inc/strings.hrc:321
 msgctxt "STR_LABEL_REGRESSION_MODEL"
 msgid "Regression Model"
 msgstr "Regresjonsmodell"
 
 #. bmR5w
-#: sc/inc/strings.hrc:323
+#: sc/inc/strings.hrc:322
 msgctxt "STR_LABEL_REGRESSION_STATISTICS"
 msgid "Regression Statistics"
 msgstr "Regresjonsstatistikk"
 
 #. RNHCx
-#: sc/inc/strings.hrc:324
+#: sc/inc/strings.hrc:323
 msgctxt "STR_LABEL_RESIDUAL"
 msgid "Residual"
 msgstr "Rest"
 
 #. 4DANj
-#: sc/inc/strings.hrc:325
+#: sc/inc/strings.hrc:324
 msgctxt "STR_LABEL_CONFIDENCE_LEVEL"
 msgid "Confidence level"
 msgstr "Konfidensnivå"
 
 #. 9LhbX
-#: sc/inc/strings.hrc:326
+#: sc/inc/strings.hrc:325
 msgctxt "STR_LABEL_COEFFICIENTS"
 msgid "Coefficients"
 msgstr "Koeffisientar"
 
 #. nyH7s
-#: sc/inc/strings.hrc:327
+#: sc/inc/strings.hrc:326
 msgctxt "STR_LABEL_TSTATISTIC"
 msgid "t-Statistic"
 msgstr "t-statistikk"
 
 #. PGno2
-#: sc/inc/strings.hrc:328
+#: sc/inc/strings.hrc:327
 msgctxt "STR_LABEL_INTERCEPT"
 msgid "Intercept"
 msgstr "Krysspunkt"
 
 #. oa4Cm
-#: sc/inc/strings.hrc:329
+#: sc/inc/strings.hrc:328
 msgctxt "STR_LABEL_PREDICTEDY"
 msgid "Predicted Y"
 msgstr "Estimert Y"
 
 #. QFEjs
-#: sc/inc/strings.hrc:330
+#: sc/inc/strings.hrc:329
 msgctxt "STR_LINEST_RAW_OUTPUT_TITLE"
 msgid "LINEST raw output"
 msgstr "RETTLINJE råresultat"
 
 #. bk7FH
 #. F Test
-#: sc/inc/strings.hrc:332
+#: sc/inc/strings.hrc:331
 msgctxt "STR_FTEST_P_RIGHT_TAIL"
 msgid "P (F<=f) right-tail"
 msgstr "P (F<= f) høgre-side"
 
 #. CkHJw
-#: sc/inc/strings.hrc:333
+#: sc/inc/strings.hrc:332
 msgctxt "STR_FTEST_F_CRITICAL_RIGHT_TAIL"
 msgid "F Critical right-tail"
 msgstr "F kritisk høgre-side"
 
 #. J7yMZ
-#: sc/inc/strings.hrc:334
+#: sc/inc/strings.hrc:333
 msgctxt "STR_FTEST_P_LEFT_TAIL"
 msgid "P (F<=f) left-tail"
 msgstr "P (F<= f) venstre-side"
 
 #. R3BNC
-#: sc/inc/strings.hrc:335
+#: sc/inc/strings.hrc:334
 msgctxt "STR_FTEST_F_CRITICAL_LEFT_TAIL"
 msgid "F Critical left-tail"
 msgstr "F kritisk venstre-side"
 
 #. Bve5D
-#: sc/inc/strings.hrc:336
+#: sc/inc/strings.hrc:335
 msgctxt "STR_FTEST_P_TWO_TAIL"
 msgid "P two-tail"
 msgstr "P tosidig"
 
 #. 4YZrT
-#: sc/inc/strings.hrc:337
+#: sc/inc/strings.hrc:336
 msgctxt "STR_FTEST_F_CRITICAL_TWO_TAIL"
 msgid "F Critical two-tail"
 msgstr "F kritisk tosidig"
 
 #. qaf4N
 #. t Test
-#: sc/inc/strings.hrc:339
+#: sc/inc/strings.hrc:338
 msgctxt "STR_TTEST_PEARSON_CORRELATION"
 msgid "Pearson Correlation"
 msgstr "Pearson-korrelasjon"
 
 #. C6BU8
-#: sc/inc/strings.hrc:340
+#: sc/inc/strings.hrc:339
 msgctxt "STR_TTEST_VARIANCE_OF_THE_DIFFERENCES"
 msgid "Variance of the Differences"
 msgstr "Differensvariansar"
 
 #. j8NuP
-#: sc/inc/strings.hrc:341
+#: sc/inc/strings.hrc:340
 msgctxt "STR_TTEST_T_STAT"
 msgid "t Stat"
 msgstr "t Stat"
 
 #. bKoeX
-#: sc/inc/strings.hrc:342
+#: sc/inc/strings.hrc:341
 msgctxt "STR_TTEST_P_ONE_TAIL"
 msgid "P (T<=t) one-tail"
 msgstr "P (T<=t) einsidig"
 
 #. dub8R
-#: sc/inc/strings.hrc:343
+#: sc/inc/strings.hrc:342
 msgctxt "STR_TTEST_T_CRITICAL_ONE_TAIL"
 msgid "t Critical one-tail"
 msgstr "t kritisk einsidig"
 
 #. FrDDz
-#: sc/inc/strings.hrc:344
+#: sc/inc/strings.hrc:343
 msgctxt "STR_TTEST_P_TWO_TAIL"
 msgid "P (T<=t) two-tail"
 msgstr "P (T<=t) tosidig"
 
 #. RQqAd
-#: sc/inc/strings.hrc:345
+#: sc/inc/strings.hrc:344
 msgctxt "STR_TTEST_T_CRITICAL_TWO_TAIL"
 msgid "t Critical two-tail"
 msgstr "t kritisk tosidig"
 
 #. kDCsZ
 #. Z Test
-#: sc/inc/strings.hrc:347
+#: sc/inc/strings.hrc:346
 msgctxt "STR_ZTEST_Z_VALUE"
 msgid "z"
 msgstr "z"
 
 #. CF8D5
-#: sc/inc/strings.hrc:348
+#: sc/inc/strings.hrc:347
 msgctxt "STR_ZTEST_KNOWN_VARIANCE"
 msgid "Known Variance"
 msgstr "Kjend varians"
 
 #. cYWDr
-#: sc/inc/strings.hrc:349
+#: sc/inc/strings.hrc:348
 msgctxt "STR_ZTEST_P_ONE_TAIL"
 msgid "P (Z<=z) one-tail"
 msgstr "P (Z<=z) einsidig"
 
 #. DmEVf
-#: sc/inc/strings.hrc:350
+#: sc/inc/strings.hrc:349
 msgctxt "STR_ZTEST_Z_CRITICAL_ONE_TAIL"
 msgid "z Critical one-tail"
 msgstr "t kritisk, einsidig"
 
 #. G8PeP
-#: sc/inc/strings.hrc:351
+#: sc/inc/strings.hrc:350
 msgctxt "STR_ZTEST_P_TWO_TAIL"
 msgid "P (Z<=z) two-tail"
 msgstr "P (Z<=z) tosidig"
 
 #. rGBfK
-#: sc/inc/strings.hrc:352
+#: sc/inc/strings.hrc:351
 msgctxt "STR_ZTEST_Z_CRITICAL_TWO_TAIL"
 msgid "z Critical two-tail"
 msgstr "z kritisk tosidig"
 
 #. mCsCB
 #. Fourier Analysis
-#: sc/inc/strings.hrc:354
+#: sc/inc/strings.hrc:353
 msgctxt "STR_FOURIER_TRANSFORM"
 msgid "Fourier Transform"
 msgstr "Fourier-transformering"
 
 #. sc3hp
-#: sc/inc/strings.hrc:355
+#: sc/inc/strings.hrc:354
 msgctxt "STR_INVERSE_FOURIER_TRANSFORM"
 msgid "Inverse Fourier Transform"
 msgstr "Omvendt Pourier-transformering"
 
 #. AtC94
-#: sc/inc/strings.hrc:356
+#: sc/inc/strings.hrc:355
 msgctxt "STR_REAL_PART"
 msgid "Real"
 msgstr "Reell"
 
 #. SoyPr
-#: sc/inc/strings.hrc:357
+#: sc/inc/strings.hrc:356
 msgctxt "STR_IMAGINARY_PART"
 msgid "Imaginary"
 msgstr "Imaginær"
 
 #. ymnyT
-#: sc/inc/strings.hrc:358
+#: sc/inc/strings.hrc:357
 msgctxt "STR_MAGNITUDE_PART"
 msgid "Magnitude"
 msgstr "Storleik"
 
 #. NGmmD
-#: sc/inc/strings.hrc:359
+#: sc/inc/strings.hrc:358
 msgctxt "STR_PHASE_PART"
 msgid "Phase"
 msgstr "Fase"
 
 #. E7Eez
-#: sc/inc/strings.hrc:360
+#: sc/inc/strings.hrc:359
 msgctxt "STR_MESSAGE_INVALID_NUMCOLS"
 msgid "More than two columns selected in grouped by column mode."
 msgstr "Meir enn to kolonnar er merkte i gruppert etter kolonnemodus."
 
 #. wF2RV
-#: sc/inc/strings.hrc:361
+#: sc/inc/strings.hrc:360
 msgctxt "STR_MESSAGE_INVALID_NUMROWS"
 msgid "More than two rows selected in grouped by row mode."
 msgstr "Meir enn to rader er merkte i gruppert etter radmodus."
 
 #. DRbrH
-#: sc/inc/strings.hrc:362
+#: sc/inc/strings.hrc:361
 msgctxt "STR_MESSAGE_NODATA_IN_RANGE"
 msgid "No data in input range."
 msgstr "Ingen data i inndataområdet."
 
 #. gjC2w
-#: sc/inc/strings.hrc:363
+#: sc/inc/strings.hrc:362
 msgctxt "STR_MESSAGE_OUTPUT_TOO_LONG"
 msgid "Output is too long to write into the sheet."
 msgstr "Utdata er for langt for innskriving i arket."
 
 #. SnGyL
-#: sc/inc/strings.hrc:364
+#: sc/inc/strings.hrc:363
 msgctxt "STR_INPUT_DATA_RANGE"
 msgid "Input data range"
 msgstr "Inndataområde"
 
 #. EaQGL
 #. infobar for allowing links to update or not
-#: sc/inc/strings.hrc:366
+#: sc/inc/strings.hrc:365
 msgctxt "STR_ENABLE_CONTENT"
 msgid "Allow updating"
 msgstr "Tillat oppdatering"
 
 #. aJDFG
 #. tooltip for the "Allow updating" infobar button
-#: sc/inc/strings.hrc:368
+#: sc/inc/strings.hrc:367
 msgctxt "STR_ENABLE_CONTENT_TOOLTIP"
 msgid "Only allow updating if you trust this document."
-msgstr ""
+msgstr "Tillet oppdatering berre viss du stolar på dette dokumentet."
 
 #. w5Gd7
 #. Insert image dialog
-#: sc/inc/strings.hrc:370
+#: sc/inc/strings.hrc:369
 msgctxt "STR_ANCHOR_TO_CELL"
 msgid "To cell"
 msgstr "Til celle"
 
 #. itvXY
-#: sc/inc/strings.hrc:371
+#: sc/inc/strings.hrc:370
 msgctxt "STR_ANCHOR_TO_CELL_RESIZE"
 msgid "To cell (resize with cell)"
 msgstr "Til celle (endra storleik med cella)"
 
 #. P8vG7
-#: sc/inc/strings.hrc:372
+#: sc/inc/strings.hrc:371
 msgctxt "STR_ANCHOR_TO_PAGE"
 msgid "To page"
 msgstr "Til side"
 
 #. SSc6B
-#: sc/inc/strings.hrc:374
+#: sc/inc/strings.hrc:373
 msgctxt "sharedocumentdlg|nouserdata"
 msgid "No user data available."
 msgstr "Ingen brukardata tilgjengeleg."
 
 #. FFnfu
-#: sc/inc/strings.hrc:375
+#: sc/inc/strings.hrc:374
 msgctxt "sharedocumentdlg|exclusive"
 msgid "(exclusive access)"
 msgstr "(eksklusiv tilgang)"
 
 #. hitQA
-#: sc/inc/strings.hrc:376
+#: sc/inc/strings.hrc:375
 msgctxt "STR_NO_NAMED_RANGES_AVAILABLE"
 msgid "No named ranges available in the selected document"
 msgstr "Det er ingen namngjevne område tilgjengelege i det merkte dokumentet"
 
 #. hnAZx
-#: sc/inc/strings.hrc:377
+#: sc/inc/strings.hrc:376
 msgctxt "STR_BORDER_HAIRLINE"
 msgid "Hairline (%s pt)"
 msgstr "Hårlinje (%s pt)"
 
 #. E9Dhi
-#: sc/inc/strings.hrc:378
+#: sc/inc/strings.hrc:377
 msgctxt "STR_BORDER_VERY_THIN"
 msgid "Very thin (%s pt)"
 msgstr "Svært tynn (%s pt)"
 
 #. KGVAw
-#: sc/inc/strings.hrc:379
+#: sc/inc/strings.hrc:378
 msgctxt "STR_BORDER_THIN"
 msgid "Thin (%s pt)"
 msgstr "Tynn (%s pt)"
 
 #. V6PRY
-#: sc/inc/strings.hrc:380
+#: sc/inc/strings.hrc:379
 msgctxt "STR_BORDER_MEDIUM"
 msgid "Medium (%s pt)"
 msgstr "Medium (%s pt)"
 
 #. GyeKi
-#: sc/inc/strings.hrc:381
+#: sc/inc/strings.hrc:380
 msgctxt "STR_BORDER_THICK"
 msgid "Thick (%s pt)"
 msgstr "Tykk (%s pt)"
 
 #. QvEAB
-#: sc/inc/strings.hrc:382
+#: sc/inc/strings.hrc:381
 msgctxt "STR_BORDER_EXTRA_THICK"
 msgid "Extra thick (%s pt)"
 msgstr "Ekstra tykk (%s pt)"
 
 #. v9kkb
-#: sc/inc/strings.hrc:383
+#: sc/inc/strings.hrc:382
 msgctxt "STR_BORDER_DOUBLE_1"
 msgid "Double Hairline (%s pt)"
 msgstr "Dobbel hårlinje (%s pt)"
 
 #. KzKEy
-#: sc/inc/strings.hrc:384
+#: sc/inc/strings.hrc:383
 msgctxt "STR_BORDER_DOUBLE_2"
 msgid "Thin/Medium (%s pt)"
 msgstr "Tynn/medium (%s pt)"
 
 #. HD8tG
-#: sc/inc/strings.hrc:385
+#: sc/inc/strings.hrc:384
 msgctxt "STR_BORDER_DOUBLE_3"
 msgid "Medium/Hairline (%s pt)"
 msgstr "Medium/hårlinje (%s pt)"
 
 #. ygGcU
-#: sc/inc/strings.hrc:386
+#: sc/inc/strings.hrc:385
 msgctxt "STR_BORDER_DOUBLE_4"
 msgid "Medium/Medium (%s pt)"
 msgstr "Medium/medium (%s pt)"
@@ -18583,19 +18580,19 @@ msgstr "Medium/medium (%s pt)"
 #. z9YGZ
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: sc/inc/strings.hrc:390
+#: sc/inc/strings.hrc:389
 msgctxt "sortoptionspage|extended_tip|sortuserlb"
 msgid "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists."
-msgstr ""
+msgstr "Vel den tilpassa sorteringsrekkjefølgja du vil bruka. For å definera rekkjefølgja, vel Verktøy → Innstillingar → %PRODUCTNAME Calc → Sorteringslister ."
 
 #. T5A7R
-#: sc/inc/strings.hrc:391
+#: sc/inc/strings.hrc:390
 msgctxt "subtotaloptionspage|extended_tip|lbuserdef"
 msgid "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists."
 msgstr "Brukar ei sjølvvald sorteringsrekkjefølgje som du har oppgjeve under Verktøy → Innstillingar → %PRODUCTNAME Calc → Sorteringslister."
 
 #. gbz6Y
-#: sc/inc/strings.hrc:392
+#: sc/inc/strings.hrc:391
 msgctxt "extended_tip|annot"
 msgid "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box."
 msgstr "Her kan du bestemma at det skal setjast inn ein liten firkant i øvre, høgre hjørne i cella for å visa at det finst ein merknad til cella. Merknaden vert berre vist dersom du slår på tips under %PRODUCTNAME → Generelt i dialogvindauget for innstillingar."
@@ -19234,37 +19231,37 @@ msgstr "Tal på"
 #: sc/uiconfig/scalc/ui/autosum.ui:52
 msgctxt "autosum|counta"
 msgid "CountA"
-msgstr ""
+msgstr "TalpåA"
 
 #. TGUCo
 #: sc/uiconfig/scalc/ui/autosum.ui:60
 msgctxt "autosum|product"
 msgid "Product"
-msgstr ""
+msgstr "Produkt"
 
 #. GNEDE
 #: sc/uiconfig/scalc/ui/autosum.ui:68
 msgctxt "autosum|stdev"
 msgid "Stdev"
-msgstr ""
+msgstr "StdAvvik"
 
 #. cAEpr
 #: sc/uiconfig/scalc/ui/autosum.ui:76
 msgctxt "autosum|stdevp"
 msgid "StdevP"
-msgstr ""
+msgstr "StdAvvikP"
 
 #. DAdFH
 #: sc/uiconfig/scalc/ui/autosum.ui:84
 msgctxt "autosum|var"
 msgid "Var"
-msgstr ""
+msgstr "Var"
 
 #. 7GuBA
 #: sc/uiconfig/scalc/ui/autosum.ui:92
 msgctxt "autosum|varp"
 msgid "VarP"
-msgstr ""
+msgstr "VarP"
 
 #. j9TVx
 #: sc/uiconfig/scalc/ui/cellprotectionpage.ui:32
@@ -19315,37 +19312,37 @@ msgstr ""
 "Vel «Vern dokument» frå verktøymenyen."
 
 #. bVREg
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:118
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:121
 msgctxt "cellprotectionpage|LabelProtection"
 msgid "Protection"
 msgstr "Vern"
 
 #. A5DFp
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:148
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:151
 msgctxt "cellprotectionpage|checkHidePrinting"
 msgid "Hide _when printing"
 msgstr "_Gøym ved utskrift"
 
 #. ZosAc
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:157
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:160
 msgctxt "cellprotectionpage|extended_tip|checkHidePrinting"
 msgid "Keeps the selected cells from being printed."
 msgstr "Kryss av her for å hindra utskrift av dei merkte cellene."
 
 #. QqUqE
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:172
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:175
 msgctxt "cellprotectionpage|label4"
 msgid "The cells selected will be omitted when printing."
 msgstr "Dei merkte cellene kjem ikkje med på utskrifta."
 
 #. 8RuyP
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:188
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:194
 msgctxt "cellprotectionpage|label3"
 msgid "Print"
 msgstr "Skriv ut"
 
 #. DPWp6
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:202
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:208
 msgctxt "cellprotectionpage|extended_tip|CellProtectionPage"
 msgid "Defines protection options for selected cells."
 msgstr "Vel kva slags vern dei merkja cellene skal få."
@@ -21493,85 +21490,85 @@ msgid "Data Entry Form is a tool to make table data entry easy in spreadsheets."
 msgstr "Datainnskivingsskjema er eit verktøy for å gjera det enkelt å skriva inn tabelldata i rekneark."
 
 #. 6DQYr
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:25
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:22
 msgctxt "dataproviderdlg/okaybtn"
 msgid "Okay"
 msgstr "OK"
 
 #. Ah2h8
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:38
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:35
 msgctxt "dataproviderdlg/cancelbtn"
 msgid "Cancel"
 msgstr "Avbryt"
 
 #. a7EFA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:88
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:86
 msgctxt "dataproviderdlg|db_name"
 msgid "Database Range:"
 msgstr "Databaseområde:"
 
 #. pSQ4F
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:113
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:111
 msgctxt "dataproviderdlg/provider"
 msgid "Data Provider:"
 msgstr "Datakjelde:"
 
 #. RGiXi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:138
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:136
 msgctxt "dataproviderdlg/url"
 msgid "URL:"
 msgstr "Nettadresse:"
 
 #. GKDQA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:161
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:159
 msgctxt "dataproviderdlg/browse_btn"
 msgid "Browse"
 msgstr "Bla gjennom"
 
 #. GABzG
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:175
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:173
 msgctxt "dataproviderdlg/id"
 msgid "Id / Xpath:"
 msgstr "Id / Xsti:"
 
 #. pwS4k
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:203
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:201
 msgctxt "dataproviderdlg/lbSource"
 msgid "Source"
 msgstr "Kjelde"
 
 #. fHfGq
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:237
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:236
 msgctxt "dataproviderdlg/transformation_add"
 msgid "Add"
 msgstr "Legg til"
 
 #. Smoiv
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:241
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:240
 msgctxt "dataproviderdlg/AddTransformation_tooltip"
 msgid "Add Transformations"
 msgstr "Legg til transformasjonar"
 
 #. cSgeU
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:297
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:296
 msgctxt "dataproviderdlg/transformation"
 msgid "Transformations"
 msgstr "Transformasjonar"
 
 #. gpeXB
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:353
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:352
 msgctxt "dataproviderdlg/apply"
 msgid "Apply"
 msgstr "Bruk"
 
 #. bDVwi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:357
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:356
 msgctxt "dataproviderdlg/apply_tooltiptext"
 msgid "Apply Changes"
 msgstr "Bruk endringane"
 
 #. 6pCFs
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:376
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:375
 msgctxt "dataproviderdlg/preview"
 msgid "Preview"
 msgstr "Førehandsvising"
@@ -22900,34 +22897,34 @@ msgstr "Lagar automatisk seriar med dei innstillingane gjort i dette dialogvinda
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:12
 msgctxt "filterdropdown|more"
 msgid "Add row"
-msgstr ""
+msgstr "Legg til rad"
 
 #. WCqFM
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:20
 msgctxt "filterdropdown|less"
 msgid "Remove row"
-msgstr ""
+msgstr "Fjern rad"
 
 #. cd5X5
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:150
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:158
 msgctxt "filterdropdown|STR_EDIT_SEARCH_ITEMS"
 msgid "Search items..."
 msgstr "Søk element …"
 
 #. zKwWE
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:184
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:192
 msgctxt "filterdropdown|STR_BTN_TOGGLE_ALL"
 msgid "All"
 msgstr "Alle"
 
 #. JsSz6
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:203
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:211
 msgctxt "filterdropdown|STR_BTN_SELECT_CURRENT"
 msgid "Show only the current item."
 msgstr "Vis berre det gjeldande elementet."
 
 #. vBQYB
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:218
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:226
 msgctxt "filterdropdown|STR_BTN_UNSELECT_CURRENT"
 msgid "Hide only the current item."
 msgstr "Gøym berre det gjeldande elementet."
@@ -22936,13 +22933,13 @@ msgstr "Gøym berre det gjeldande elementet."
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:148
 msgctxt "filtersubdropdown|background"
 msgid "Background Color"
-msgstr ""
+msgstr "Bakgrunnsfarge"
 
-#. EZpYM
+#. ca9FH
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:205
 msgctxt "filtersubdropdown|textcolor"
-msgid "Text Color"
-msgstr ""
+msgid "Font Color"
+msgstr "Skriftfarge"
 
 #. XYJHx
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:28
@@ -23305,106 +23302,100 @@ msgid "Produces the Fourier analysis of a data set by computing the Discrete Fou
 msgstr "Lagar Fourier-analyse for ei datamengd ved å rekna ut DFT (Discrete Fourier Transform) for ein tabell med komplekse tal ved å bruka eit par FFT (Fast Fourier Transform) algoritmar"
 
 #. FEwZR
-#: sc/uiconfig/scalc/ui/functionpanel.ui:63
+#: sc/uiconfig/scalc/ui/functionpanel.ui:54
 msgctxt "functionpanel|insert|tooltip_text"
 msgid "Insert Function into calculation sheet"
 msgstr "Set inn ein funksjon i reknearket"
 
 #. L79E6
-#: sc/uiconfig/scalc/ui/functionpanel.ui:78
+#: sc/uiconfig/scalc/ui/functionpanel.ui:69
 msgctxt "functionpanel|category"
 msgid "Last Used"
 msgstr "Sist brukte"
 
 #. uRXDm
-#: sc/uiconfig/scalc/ui/functionpanel.ui:79
+#: sc/uiconfig/scalc/ui/functionpanel.ui:70
 msgctxt "functionpanel|category"
 msgid "All"
 msgstr "Alle"
 
 #. Fk97C
-#: sc/uiconfig/scalc/ui/functionpanel.ui:80
+#: sc/uiconfig/scalc/ui/functionpanel.ui:71
 msgctxt "functionpanel|category"
 msgid "Database"
 msgstr "Database"
 
 #. hCefc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:81
+#: sc/uiconfig/scalc/ui/functionpanel.ui:72
 msgctxt "functionpanel|category"
 msgid "Date&Time"
 msgstr "Dato og klokkeslett"
 
 #. Cj6Vy
-#: sc/uiconfig/scalc/ui/functionpanel.ui:82
+#: sc/uiconfig/scalc/ui/functionpanel.ui:73
 msgctxt "functionpanel|category"
 msgid "Financial"
 msgstr "Finansielt"
 
 #. gS2PB
-#: sc/uiconfig/scalc/ui/functionpanel.ui:83
+#: sc/uiconfig/scalc/ui/functionpanel.ui:74
 msgctxt "functionpanel|category"
 msgid "Information"
 msgstr "Informasjon"
 
 #. rMqtg
-#: sc/uiconfig/scalc/ui/functionpanel.ui:84
+#: sc/uiconfig/scalc/ui/functionpanel.ui:75
 msgctxt "functionpanel|category"
 msgid "Logical"
 msgstr "Logisk"
 
 #. 6cFkD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:85
+#: sc/uiconfig/scalc/ui/functionpanel.ui:76
 msgctxt "functionpanel|category"
 msgid "Mathematical"
 msgstr "Matematisk"
 
 #. RdQeE
-#: sc/uiconfig/scalc/ui/functionpanel.ui:86
+#: sc/uiconfig/scalc/ui/functionpanel.ui:77
 msgctxt "functionpanel|category"
 msgid "Array"
 msgstr "Matrise"
 
 #. h4kRr
-#: sc/uiconfig/scalc/ui/functionpanel.ui:87
+#: sc/uiconfig/scalc/ui/functionpanel.ui:78
 msgctxt "functionpanel|category"
 msgid "Statistical"
 msgstr "Statistisk"
 
 #. 6XCsS
-#: sc/uiconfig/scalc/ui/functionpanel.ui:88
+#: sc/uiconfig/scalc/ui/functionpanel.ui:79
 msgctxt "functionpanel|category"
 msgid "Spreadsheet"
 msgstr "Rekneark"
 
 #. DwfB5
-#: sc/uiconfig/scalc/ui/functionpanel.ui:89
+#: sc/uiconfig/scalc/ui/functionpanel.ui:80
 msgctxt "functionpanel|category"
 msgid "Text"
 msgstr "Tekst"
 
 #. BCiyc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:90
+#: sc/uiconfig/scalc/ui/functionpanel.ui:81
 msgctxt "functionpanel|category"
 msgid "Add-in"
 msgstr "Tilleggsprogram"
 
 #. tDNFD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:94
+#: sc/uiconfig/scalc/ui/functionpanel.ui:85
 msgctxt "functionpanel|extended_tip|category"
 msgid "Displays the available functions."
 msgstr "Viser dei tilgjengelege funksjonane."
 
 #. V9ATp
-#: sc/uiconfig/scalc/ui/functionpanel.ui:141
+#: sc/uiconfig/scalc/ui/functionpanel.ui:133
 msgctxt "functionpanel|extended_tip|funclist"
 msgid "Displays the available functions."
 msgstr "Viser dei tilgjengelege funksjonane."
-
-#. rmQie
-#: sc/uiconfig/scalc/ui/functionpanel.ui:175
-msgctxt "functionpanel|funcdesc"
-msgid "label"
-msgstr "etikett"
 
 #. dmA3u
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:8
@@ -23488,31 +23479,31 @@ msgstr "Opnar eit dialogvindauge der du kan løysa ei likning med ein variabel."
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:16
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Gå til ark"
 
 #. ybsRg
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:103
 msgctxt "gotosheetdialog|extended_tip|entry-mask"
 msgid "Type some letters of sheet name to find it."
-msgstr ""
+msgstr "Skriv inn nokre bokstavar i arknamnet for å finna det."
 
 #. Xuqh4
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:112
 msgctxt "gotosheetdialog|label-mask"
 msgid "_Type a sheet name"
-msgstr ""
+msgstr "_Skriv eit arknamn"
 
 #. DpWr7
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:174
 msgctxt "gotosheetdialog|label-sheets"
 msgid "_Sheets"
-msgstr ""
+msgstr "_Ark"
 
 #. F6iSH
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:197
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Displays a list of all visible sheets in your spreadsheet document."
-msgstr ""
+msgstr "Viser ei liste over alle synlege ark i reknearkdokumentet."
 
 #. XMHEU
 #: sc/uiconfig/scalc/ui/groupbydate.ui:27
@@ -23845,55 +23836,55 @@ msgid "Use the buttons to change the font or insert field commands such as date,
 msgstr "Bruk knappane til å endra skrift eller setja inn feltkommandoar som dato, klokkeslett, osv."
 
 #. WBsTf
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:503
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:506
 msgctxt "headerfootercontent|label1"
 msgid "Note"
 msgstr "Merknad"
 
 #. X2HEK
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:525
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:528
 msgctxt "headerfootercontent|labelSTR_HF_NONE_IN_BRACKETS"
 msgid "(none)"
 msgstr "(ingen)"
 
 #. RSazM
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:537
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:540
 msgctxt "headerfootercontent|labelSTR_PAGE"
 msgid "Page"
 msgstr "Side"
 
 #. CMDYZ
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:549
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:552
 msgctxt "headerfootercontent|labelSTR_HF_OF_QUESTION"
 msgid "of ?"
 msgstr "av?"
 
 #. jQyGW
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:561
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:564
 msgctxt "headerfootercontent|labelSTR_HF_CONFIDENTIAL"
 msgid "Confidential"
 msgstr "Konfidensiell"
 
 #. EeAAh
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:573
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:576
 msgctxt "headerfootercontent|labelSTR_HF_CREATED_BY"
 msgid "Created by"
 msgstr "Laga av"
 
 #. CASF2
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:585
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:588
 msgctxt "headerfootercontent|labelSTR_HF_CUSTOMIZED"
 msgid "Customized"
 msgstr "Tilpassa"
 
 #. wZN6q
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:597
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:600
 msgctxt "headerfootercontent|labelSTR_HF_OF"
 msgid "of"
 msgstr "av"
 
 #. SDx4X
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:614
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:617
 msgctxt "headerfootercontent|extended_tip|HeaderFooterContent"
 msgid "Defines or formats a header or footer for a Page Style."
 msgstr "Definerer eller formaterer ein topptekst eller botntekst for ein sidestil."
@@ -25159,177 +25150,177 @@ msgid "Fiel_d"
 msgstr "_Felt"
 
 #. VCk9a
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5882
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5859
 msgctxt "CalcNotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "Sett _inn"
 
 #. HnjBi
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5987
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5964
 msgctxt "CalcNotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "~Set inn"
 
 #. xmARL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6388
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6413
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6841
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6365
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6390
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6818
 msgctxt "CalcNotebookbar|objectalign|tooltip_text"
 msgid "Object Align"
 msgstr "Juster objekt"
 
 #. vruXQ
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7062
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7039
 msgctxt "CalcNotebookbar|LayoutMenuButton"
 msgid "_Layout"
 msgstr "_Utforming"
 
 #. eWinY
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7146
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7123
 msgctxt "CalcNotebookbar|PageLayoutLabel"
 msgid "~Layout"
 msgstr "~Utforming"
 
 #. pnWd5
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8423
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8400
 msgctxt "CalcNotebookbar|StatisticsMenuButton"
 msgid "_Statistics"
 msgstr "_Statistikkar"
 
 #. BiHBE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8474
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8451
 msgctxt "CalcNotebookbar|DataMenuButton"
 msgid "_Data"
 msgstr "_Data"
 
 #. xzx9j
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8580
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8557
 msgctxt "CalcNotebookbar|DataLabel"
 msgid "~Data"
 msgstr "~Data"
 
 #. CBEHA
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9383
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9360
 msgctxt "CalcNotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Sjå gjennom"
 
 #. 7FXbr
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9468
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9445
 msgctxt "CalcNotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Sjå gjennom"
 
 #. NT37F
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10354
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10331
 msgctxt "CalcNotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Vis"
 
 #. rPdAq
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10439
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10416
 msgctxt "CalcNotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Vis"
 
 #. SAv6Z
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11548
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11525
 msgctxt "CalcNotebookbar|ImageMenuButton"
 msgid "Ima_ge"
 msgstr "_Bilete"
 
 #. rwprK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11669
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11646
 msgctxt "CalcNotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "_Bilete"
 
 #. EjbzV
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12850
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12827
 msgctxt "CalcNotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "_Teikna"
 
 #. iagRv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12957
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12934
 msgctxt "CalcNotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "~Teikna"
 
 #. EgeGL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13415
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13392
 msgctxt "CalcNotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Konverter"
 
 #. PRmbH
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13705
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13682
 msgctxt "CalcNotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Objekt"
 
 #. xTKVv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13812
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13789
 msgctxt "CalcNotebookbar|FrameLabel"
 msgid "~Object"
 msgstr "~Objekt"
 
 #. cHyKz
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14371
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14348
 msgctxt "CalcNotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Media"
 
 #. CJ2qx
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14476
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14453
 msgctxt "CalcNotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Media"
 
 #. eQK6A
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14858
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14835
 msgctxt "CalcNotebookbar|PrintMenuButton"
 msgid "_Print"
 msgstr "S_kriv ut"
 
 #. sCGyG
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14941
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14918
 msgctxt "CalcNotebookbar|PrintLabel"
 msgid "~Print"
 msgstr "~Skriv ut"
 
 #. 5JVAt
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15749
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15726
 msgctxt "CalcNotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "_Skjema"
 
 #. CCEAK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15833
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15810
 msgctxt "CalcNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "~Skjema"
 
 #. DHeyE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15890
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15867
 msgctxt "CalcNotebookbar|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Ut_viding"
 
 #. 4ZDL7
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15964
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15941
 msgctxt "CalcNotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Ut~viding"
 
 #. 3Ec6T
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17153
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17130
 msgctxt "CalcNotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "Verk_tøy"
 
 #. 8HTEk
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17237
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17214
 msgctxt "CalcNotebookbar|ToolsLabel"
 msgid "~Tools"
 msgstr "~Verktøy"
@@ -25348,7 +25339,7 @@ msgstr "~Fil"
 
 #. UWfVg
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:3545
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6152
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6113
 msgctxt "notebookbar_compact|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Definerer kantane på dei merkte cellene."
@@ -25372,163 +25363,163 @@ msgid "Fiel_d"
 msgstr "_Felt"
 
 #. zveKA
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5637
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5598
 msgctxt "notebookbar_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "Sett _inn"
 
 #. CDXv3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5692
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5653
 msgctxt "notebookbar_compact|InsertLabel"
 msgid "~Insert"
 msgstr "~Set inn"
 
 #. EvytN
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6273
 msgctxt "notebookbar_compact|PageMenuButton"
 msgid "_Layout"
 msgstr "_Utforming"
 
 #. TbQMa
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6364
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6325
 msgctxt "notebookbar_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "~Utforming"
 
 #. QqjZP
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7199
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7160
 msgctxt "notebookbar_compact|Statistics"
 msgid "_Statistics"
 msgstr "_Statistikk"
 
 #. GFZNz
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7264
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7225
 msgctxt "notebookbar_compact|DataMenuButton"
 msgid "_Data"
 msgstr "_Data"
 
 #. TCt7E
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7315
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7276
 msgctxt "notebookbar_compact|DataLabel"
 msgid "~Data"
 msgstr "~Data"
 
 #. jYD7j
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7997
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7958
 msgctxt "notebookbar_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Sjå gjennom"
 
 #. Lbj5B
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8049
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8010
 msgctxt "notebookbar_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Sjå gjennom"
 
 #. 35kA2
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8716
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8677
 msgctxt "notebookbar_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Vis"
 
 #. ZGh8C
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8768
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8729
 msgctxt "notebookbar_compact|ViewLabel"
 msgid "~View"
 msgstr "~Vis"
 
 #. dV94w
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10082
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10043
 msgctxt "notebookbar_compact|GraphicMenuButton"
 msgid "Im_age"
 msgstr "_Bilete"
 
 #. ekWoX
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10134
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10095
 msgctxt "notebookbar_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "~Bilete"
 
 #. 8eQN8
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11504
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11465
 msgctxt "notebookbar_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "_Teikna"
 
 #. FBf68
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11556
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11517
 msgctxt "notebookbar_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "~Teikna"
 
 #. DoVwy
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12507
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12468
 msgctxt "notebookbar_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Objekt"
 
 #. JXKiY
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12559
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12520
 msgctxt "notebookbar_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Objekt"
 
 #. q8wnS
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13259
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13220
 msgctxt "notebookbar_compact|MediaButton"
 msgid "_Media"
 msgstr "_Media"
 
 #. 7HDt3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13273
 msgctxt "notebookbar_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Media"
 
 #. vSDok
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13871
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13832
 msgctxt "notebookbar_compact|PrintPreviewButton"
 msgid "Print"
 msgstr "Skriv ut"
 
 #. goiqQ
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13923
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13884
 msgctxt "notebookbar_compact|FormLabel"
 msgid "~Print"
 msgstr "~Skriv ut"
 
 #. EBGs5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15237
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15198
 msgctxt "notebookbar_compact|FormButton"
 msgid "Fo_rm"
 msgstr "_Skjema"
 
 #. EKA8X
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15289
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15250
 msgctxt "notebookbar_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "~Skjema"
 
 #. 8SvE5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15368
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15329
 msgctxt "notebookbar_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "_Utviding"
 
 #. WH5NR
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15426
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15387
 msgctxt "notebookbar_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "_Utviding"
 
 #. 8fhwb
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16427
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16388
 msgctxt "notebookbar_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verktøy"
 
 #. kpc43
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16479
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16440
 msgctxt "notebookbar_compact|DevLabel"
 msgid "~Tools"
 msgstr "V~erktøy"
@@ -26478,7 +26469,7 @@ msgstr "Oppsetjing av CPU-trådane"
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:91
 msgctxt "optcalculatepage|case"
 msgid "Case se_nsitive"
-msgstr "_Skil store og små bokstavar"
+msgstr "_Skil mellom store og små bokstavar"
 
 #. FF8Nh
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:95
@@ -26520,7 +26511,7 @@ msgstr "Aktivere dette alternativet for interoperabilitet med Microsoft Excel el
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:139
 msgctxt "extended_tip|match"
 msgid "Specifies that the search criteria you set for the Calc database functions must match the whole cell exactly. When both, the Search criteria = and <> must apply to whole cells box and the Enable wildcards in formulas box are marked, Calc behaves exactly as Microsoft Excel when searching cells in the database functions."
-msgstr ""
+msgstr "Spesifiserer at søkjevilkåra du set for funksjonane i Calc-databasen, må samsvare nøyaktig med heile cella. Viss det er merkt av for både «Søkjekriterium = og <> må gjelda heile celler» og «Tillat jokerteikn i formlar», fungerer Calc på same måten som Microsoft Excel når du søkjer i celler i databasefunksjonane."
 
 #. 5Wn8V
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:150
@@ -26802,7 +26793,7 @@ msgstr "Tastaturbindingar"
 #: sc/uiconfig/scalc/ui/optcompatibilitypage.ui:86
 msgctxt "extended_tip|OptCompatibilityPage"
 msgid "Defines compatibility options for Calc."
-msgstr ""
+msgstr "Definerer kompatibilitetsinnstillingar for Calc."
 
 #. Jcvih
 #: sc/uiconfig/scalc/ui/optdefaultpage.ui:36
@@ -27012,7 +27003,7 @@ msgstr "Skiljeteikn"
 #: sc/uiconfig/scalc/ui/optformula.ui:421
 msgctxt "extended_tip|OptFormula"
 msgid "Defines formula syntax options and loading options for Calc."
-msgstr ""
+msgstr "Definerer innstillingar for formelsyntaksen og innstillingane for innlasting for Calc."
 
 #. cCfAk
 #: sc/uiconfig/scalc/ui/optimalcolwidthdialog.ui:8
@@ -27336,7 +27327,7 @@ msgstr "Lim inn utval"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:130
 msgctxt "pastespecial|paste_values_only|label"
 msgid "Values Only"
-msgstr ""
+msgstr "Berre verdiar"
 
 #. XyU8o
 #: sc/uiconfig/scalc/ui/pastespecial.ui:134
@@ -27354,7 +27345,7 @@ msgstr "Limer inn tal, tekst, datoar og resultata av formlar."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:153
 msgctxt "pastespecial|paste_values_formats|label"
 msgid "Values & Formats"
-msgstr ""
+msgstr "Verdiar og format"
 
 #. 7GuDi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:157
@@ -27372,7 +27363,7 @@ msgstr "Limer inn celleverdiar, formelresultat og format brukt på celler."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:176
 msgctxt "pastespecial|paste_format|label"
 msgid "Formats Only"
-msgstr ""
+msgstr "Berre format"
 
 #. Cvyjn
 #: sc/uiconfig/scalc/ui/pastespecial.ui:180
@@ -27390,7 +27381,7 @@ msgstr "Limer berre inn formata frå kjeldeområdet utan å endra verdiane i må
 #: sc/uiconfig/scalc/ui/pastespecial.ui:199
 msgctxt "pastespecial|paste_transpose|label"
 msgid "Transpose All"
-msgstr ""
+msgstr "Transponer alt"
 
 #. sbLGi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:203
@@ -27408,7 +27399,7 @@ msgstr "Set inn innhaldet i den transponerte cella (kolonnar vert konverterte ti
 #: sc/uiconfig/scalc/ui/pastespecial.ui:229
 msgctxt "pastespecial|cbImmediately"
 msgid "Run immediately"
-msgstr ""
+msgstr "Køyr no"
 
 #. 7a9JE
 #: sc/uiconfig/scalc/ui/pastespecial.ui:238
@@ -27426,7 +27417,7 @@ msgstr "Førehandsinnstillingar"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:290
 msgctxt "pastespecial|paste_all"
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #. Labin
 #: sc/uiconfig/scalc/ui/pastespecial.ui:298
@@ -27438,7 +27429,7 @@ msgstr "Limer celleinnhaldet, merknadar, format og objekt inn i det gjeldande do
 #: sc/uiconfig/scalc/ui/pastespecial.ui:309
 msgctxt "pastespecial|numbers"
 msgid "Numbers"
-msgstr ""
+msgstr "Tal"
 
 #. SCVEu
 #: sc/uiconfig/scalc/ui/pastespecial.ui:317
@@ -27450,7 +27441,7 @@ msgstr "Set inn celler som inneheld tal."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:328
 msgctxt "pastespecial|text"
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
 #. JWDk5
 #: sc/uiconfig/scalc/ui/pastespecial.ui:336
@@ -27462,7 +27453,7 @@ msgstr "Set inn celler som inneheld tekst."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:347
 msgctxt "pastespecial|datetime"
 msgid "Date & time"
-msgstr ""
+msgstr "Dato og klokkeslett"
 
 #. jq6Md
 #: sc/uiconfig/scalc/ui/pastespecial.ui:355
@@ -27474,7 +27465,7 @@ msgstr "Set inn celler som inneheld verdiar for dato og klokkeslett."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:366
 msgctxt "pastespecial|formats"
 msgid "Formats"
-msgstr ""
+msgstr "Format"
 
 #. ehyEf
 #: sc/uiconfig/scalc/ui/pastespecial.ui:374
@@ -27486,7 +27477,7 @@ msgstr "Set inn innstillingane for celleformatet."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:385
 msgctxt "pastespecial|comments"
 msgid "Comments"
-msgstr ""
+msgstr "Merknadar"
 
 #. 3uP7i
 #: sc/uiconfig/scalc/ui/pastespecial.ui:393
@@ -27498,7 +27489,7 @@ msgstr "S>et inn merknadar kopla til celler. Dersom du vil leggja merknadane til
 #: sc/uiconfig/scalc/ui/pastespecial.ui:404
 msgctxt "pastespecial|objects"
 msgid "Objects"
-msgstr ""
+msgstr "Objekt"
 
 #. DZsnr
 #: sc/uiconfig/scalc/ui/pastespecial.ui:412
@@ -27510,7 +27501,7 @@ msgstr "Set inn objekt som finst i det merkte celleområdet. Dette kan vera OLE-
 #: sc/uiconfig/scalc/ui/pastespecial.ui:423
 msgctxt "pastespecial|formulas"
 msgid "Formulas"
-msgstr ""
+msgstr "Formlar"
 
 #. Na5Ba
 #: sc/uiconfig/scalc/ui/pastespecial.ui:431
@@ -27528,7 +27519,7 @@ msgstr "Lim inn"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:477
 msgctxt "pastespecial|no_shift"
 msgid "Don't shift"
-msgstr ""
+msgstr "Ikkje flytt"
 
 #. q3Xv3
 #: sc/uiconfig/scalc/ui/pastespecial.ui:486
@@ -27540,7 +27531,7 @@ msgstr "Innsette celler skriv over målcellene."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:498
 msgctxt "pastespecial|move_down"
 msgid "Down"
-msgstr ""
+msgstr "Ned"
 
 #. BNALN
 #: sc/uiconfig/scalc/ui/pastespecial.ui:507
@@ -27552,7 +27543,7 @@ msgstr "Målcellene vert flytte nedover når det vert sett inn celler frå utkli
 #: sc/uiconfig/scalc/ui/pastespecial.ui:519
 msgctxt "pastespecial|move_right"
 msgid "Right"
-msgstr ""
+msgstr "Høgre"
 
 #. GEFe7
 #: sc/uiconfig/scalc/ui/pastespecial.ui:528
@@ -27570,7 +27561,7 @@ msgstr "Flytt celler"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:588
 msgctxt "pastespecial|link"
 msgid "As Link"
-msgstr ""
+msgstr "Som lenkje"
 
 #. Bg9dc
 #: sc/uiconfig/scalc/ui/pastespecial.ui:596
@@ -27582,7 +27573,7 @@ msgstr "Set inn celleområdet som ei lenkje, slik at endringar som vert gjort i 
 #: sc/uiconfig/scalc/ui/pastespecial.ui:607
 msgctxt "pastespecial|transpose"
 msgid "Transpose"
-msgstr ""
+msgstr "Transponer"
 
 #. P3eE4
 #: sc/uiconfig/scalc/ui/pastespecial.ui:615
@@ -27594,7 +27585,7 @@ msgstr "Rader i utvalet som er kopierte til utklippstavla, vert limte inn slik a
 #: sc/uiconfig/scalc/ui/pastespecial.ui:626
 msgctxt "pastespecial|skip_empty"
 msgid "Skip empty cells"
-msgstr ""
+msgstr "Hopp over tomme celler"
 
 #. BodqB
 #: sc/uiconfig/scalc/ui/pastespecial.ui:630
@@ -27618,7 +27609,7 @@ msgstr "Innstillingar"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:681
 msgctxt "pastespecial|none"
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 #. 7GKDG
 #: sc/uiconfig/scalc/ui/pastespecial.ui:690
@@ -27630,7 +27621,7 @@ msgstr "Legg ikkje til ei handling når du limar inn celleområdet frå utklipps
 #: sc/uiconfig/scalc/ui/pastespecial.ui:702
 msgctxt "pastespecial|add"
 msgid "Add"
-msgstr ""
+msgstr "Legg til"
 
 #. bNyh2
 #: sc/uiconfig/scalc/ui/pastespecial.ui:711
@@ -27642,7 +27633,7 @@ msgstr "Legg verdiane i utklippstavla til verdiane i målcellene. Viss utklippst
 #: sc/uiconfig/scalc/ui/pastespecial.ui:723
 msgctxt "pastespecial|subtract"
 msgid "Subtract"
-msgstr ""
+msgstr "Subtraher"
 
 #. 2SKbT
 #: sc/uiconfig/scalc/ui/pastespecial.ui:732
@@ -27654,7 +27645,7 @@ msgstr "Trekkjer verdiane i cellene i utklippstavla frå verdiane i målcellene.
 #: sc/uiconfig/scalc/ui/pastespecial.ui:744
 msgctxt "pastespecial|multiply"
 msgid "Multiply"
-msgstr ""
+msgstr "Multipliser"
 
 #. jkRDm
 #: sc/uiconfig/scalc/ui/pastespecial.ui:753
@@ -27666,7 +27657,7 @@ msgstr "Multipliserer verdiane i cellene i utklippstavla med verdiane i målcell
 #: sc/uiconfig/scalc/ui/pastespecial.ui:765
 msgctxt "pastespecial|divide"
 msgid "Divide"
-msgstr ""
+msgstr "Divider"
 
 #. 9VKdS
 #: sc/uiconfig/scalc/ui/pastespecial.ui:774
@@ -27680,11 +27671,11 @@ msgctxt "pastespecial|label2"
 msgid "Operations"
 msgstr "Operasjonar"
 
-#. ypkML
-#: sc/uiconfig/scalc/ui/pastespecial.ui:825
+#. cBodz
+#: sc/uiconfig/scalc/ui/pastespecial.ui:824
 msgctxt "pastespecial|extended_tip|PasteSpecial"
-msgid "Inserts the contents of the clipboard into the current file in a format that you can specify."
-msgstr "Set innhaldet i utklippstavla inn i den gjeldande fila i eit format som du kan velja sjølv."
+msgid "Inserts the contents of the clipboard into the current document in a format that you can specify."
+msgstr "Set innhaldet i utklippstavla inn i det gjeldande dokumentet i eit format som du kan velja sjølv."
 
 #. AqzPf
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:16
@@ -28344,7 +28335,7 @@ msgstr "Undertrykk utskriving av blanke sider"
 #: sc/uiconfig/scalc/ui/printeroptions.ui:29
 msgctxt "printeroptions|extended_tip|suppressemptypages"
 msgid "If checked, empty pages that have no cell contents or drawing objects are not printed."
-msgstr ""
+msgstr "Viss denne er merkt, vert tomme sider utan celleinnhald eller teikneobjekt ikkje skrivne ut."
 
 #. tkryr
 #: sc/uiconfig/scalc/ui/printeroptions.ui:38
@@ -28568,11 +28559,11 @@ msgctxt "randomnumbergenerator|enable-rounding-check"
 msgid "Enable rounding"
 msgstr "Slå på avrunding"
 
-#. 8n4v9
+#. 6cz4t
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:418
 msgctxt "randomnumbergenerator|extended_tip|enable-rounding-check"
-msgid "Truncate the number to a given number of Decimal Places."
-msgstr "Avkort talet til eit bestemt tal på desimalplassar."
+msgid "Round the number to a given number of Decimal Places."
+msgstr "Avrund talet til eit gjeve tal på desimalar."
 
 #. nRvWV
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:434
@@ -29288,38 +29279,26 @@ msgctxt "scgeneralpage|enter_paste_mode_cb"
 msgid "Press Enter to paste and clear clipboard"
 msgstr "Trykk Enter for å lima inn frå og tøma utklippstavla"
 
-#. LFenu
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
-msgctxt "scgeneralpage|textfmtcb"
-msgid "Use printer metrics for text formatting"
-msgstr "Bruk skrivarinnstillingane til tekstformateringa"
-
-#. ECUd7
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:385
-msgctxt "extended_tip|textfmtcb"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen."
-msgstr "Vel at utskriftsstorleiken skal gjelda for skjermvisinga i tillegg til utskrifta."
-
 #. zW9SZ
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:397
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
 msgctxt "scgeneralpage|markhdrcb"
 msgid "Highlight sele_ction in column/row headers"
 msgstr "Uthev _markering i kolonne-/radoverskrifter"
 
 #. payBv
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:405
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:386
 msgctxt "extended_tip|markhdrcb"
 msgid "Specifies whether to highlight column and row headers in the selected columns or rows."
 msgstr "Bestemmer om kolonne- og radoverskrifter skal uthevast i den merkte kolonnen eller rada."
 
 #. KGWyE
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:417
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:398
 msgctxt "scgeneralpage|sortrefupdatecb"
 msgid "Update references when sorting range of cells"
 msgstr "Oppdater referansar når eit celleområde vert sorter"
 
 #. M9G8o
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:439
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:420
 msgctxt "scgeneralpage|label3"
 msgid "Input Settings"
 msgstr "Inndatainnstillingar"
@@ -29484,13 +29463,13 @@ msgstr "Brukar dei valde cellene som datakjelde for pivottabellen."
 #: sc/uiconfig/scalc/ui/selectsource.ui:162
 msgctxt "selectsource|database"
 msgid "_Data source registered in Calc"
-msgstr ""
+msgstr "_Datakjelde registrert i Calc"
 
 #. ZDHcm
 #: sc/uiconfig/scalc/ui/selectsource.ui:171
 msgctxt "selectsource|extended_tip|database"
 msgid "Uses a table or query in a database that is registered in Calc as the data source for the pivot table."
-msgstr ""
+msgstr "Bruker ein tabell eller ei spørjing i ein database som er registrert i Calc som datakjelde for pivottabellen."
 
 #. ZDghg
 #: sc/uiconfig/scalc/ui/selectsource.ui:183
@@ -29655,19 +29634,19 @@ msgid "Note: Changes to formatting attributes like fonts, colors, and number for
 msgstr "Merk: Formatering, slik som skrift, fargar og talformat, vert ikkje lagra. Funksjonar som redigering av diagram og teikningar er heller ikkje tilgjengelege i delt modus. Det går an å gjera slike endringar likevel om du slår av delt modus."
 
 #. dQz77
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:187
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:190
 msgctxt "sharedocumentdlg|name"
 msgid "Name"
 msgstr "Skriv inn eit namn for objektet"
 
 #. EC8AA
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:200
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:203
 msgctxt "sharedocumentdlg|accessed"
 msgid "Accessed"
 msgstr "Tilgang"
 
 #. hHHJG
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:224
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:227
 msgctxt "sharedocumentdlg|label1"
 msgid "Users Currently Accessing This Spreadsheet"
 msgstr "Brukarar som no arbeidar med dette reknearket"
@@ -29900,17 +29879,17 @@ msgctxt "sheetprintpage|comboLB_SCALEMODE"
 msgid "Reduce/enlarge printout"
 msgstr "Forstørr/forminsk utskrifta"
 
-#. GxZyi
+#. i7BEB
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:645
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) to width/height"
-msgstr "Tilpass utskriftsområde til breidd/høgd"
+msgid "Shrink print range(s) to width/height"
+msgstr "Krymp utskriftsområde(t) til breidd/høgd"
 
-#. Y2GhT
+#. KzA6v
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:646
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) on number of pages"
-msgstr "Tilpass utskriftsområde til tal på sider"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Krymp utskriftsområde(t) til tal på sider"
 
 #. AzkrF
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:650
@@ -30021,97 +30000,97 @@ msgid "Displays a list of all hidden sheets in your spreadsheet document."
 msgstr "Viser ei liste over alle gøymde ark i reknearket."
 
 #. ktHTz
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:52
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:53
 msgctxt "sidebaralignment|horizontalalignment|tooltip_text"
 msgid "Horizontal Alignment"
 msgstr "Vassrett justering"
 
 #. U8BWH
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:109
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:114
 msgctxt "sidebaralignment|verticalalignment|tooltip_text"
 msgid "Vertical Alignment"
 msgstr "Loddrett justering"
 
-#. etrVi
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:237
-msgctxt "sidebaralignment|leftindent|tooltip_text"
-msgid "Indents from the left edge."
-msgstr "Innrykk frå venstre kant."
-
 #. qtoY5
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:266
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:243
 msgctxt "sidebaralignment|orientationlabel"
 msgid "Text _orientation:"
 msgstr "Tekst_retning:"
 
 #. Ume2A
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:281
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:257
 msgctxt "sidebaralignment|orientationdegrees|tooltip_text"
 msgid "Select the angle for rotation."
 msgstr "Vel rotasjonsvinkelen."
 
 #. KEG9k
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:308
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:270
 msgctxt "sidebaralignment|stacked"
 msgid "Vertically stacked"
 msgstr "Loddrett stapla"
 
 #. ZE4wU
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:336
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:295
 msgctxt "sidebaralignment|bottom|tooltip_text"
 msgid "Text Extension From Lower Cell Border"
 msgstr "Tekstutviding frå nedre cellekantlinje"
 
 #. CgVBh
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:312
 msgctxt "sidebaralignment|top|tooltip_text"
 msgid "Text Extension From Upper Cell Border"
 msgstr "Tekstutviding frå øvre cellekantlinje"
 
 #. TSALx
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:329
 msgctxt "sidebaralignment|standard|tooltip_text"
 msgid "Text Extension Inside Cell"
 msgstr "Tekstutviding inne i celle"
 
 #. xruhe
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:349
 msgctxt "sidebaralignment|wraptext"
 msgid "Wrap text"
 msgstr "Bryt tekst"
 
 #. uTKvq
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:402
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
 msgctxt "sidebaralignment|wraptext|tooltip_text"
 msgid "Wrap texts automatically."
 msgstr "Bryt teksten automatisk."
 
 #. Ae65n
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:415
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:366
 msgctxt "sidebaralignment|mergecells"
 msgid "Merge cells"
 msgstr "Flett saman celler"
 
 #. NK2BS
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:419
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
 msgctxt "sidebaralignment|mergecells|tooltip_text"
 msgid "Joins the selected cells into one."
 msgstr "Slår dei merkte cellene saman til éi celle."
 
+#. etrVi
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:385
+msgctxt "sidebaralignment|leftindent|tooltip_text"
+msgid "Indents from the left edge."
+msgstr "Innrykk frå venstre kant."
+
 #. FdKBk
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:433
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
 msgctxt "sidebaralignment|leftindentlabel"
 msgid "_Indent:"
 msgstr "_Innrykk:"
 
 #. BBGFK
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:23
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:22
 msgctxt "sidebarcellappearance|cellbackgroundlabel"
 msgid "_Background:"
 msgstr "_Bakgrunn:"
 
 #. bjHWc
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:37
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:36
 msgctxt "sidebarcellappearance|cellbackgroundcolor|tooltip_text"
 msgid "Select the background color of the selected cells."
 msgstr "Vel bakgrunnsfarge for dei markerte cellene."
@@ -30123,199 +30102,199 @@ msgid "Select the background color of the selected cells."
 msgstr "Vel bakgrunnsfarge for dei markerte cellene."
 
 #. DKEkN
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:71
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:72
 msgctxt "sidebarcellappearance|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Definerer kantane på dei markerte cellene."
 
 #. D2TVi
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:92
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:93
 msgctxt "sidebarcellappearance|borderlinecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Vel linjefargane for kantane."
 
 #. GqfZD
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:101
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:103
 msgctxt "sidebarcellappearance|linecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Vel farge for kantlinjene."
 
 #. 8AUBs
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:111
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:113
 msgctxt "sidebarcellappearance|borderlinecolor-atkobject"
 msgid "Border Line Color"
 msgstr "Kantlinjefarge"
 
 #. VgXDF
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:132
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:135
 msgctxt "sidebarcellappearance|linestyle|tooltip_text"
 msgid "Select the line style of the borders."
 msgstr "Vel linjestilen for kantane."
 
 #. jaxhA
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:142
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:145
 msgctxt "sidebarcellappearance|borderlinestyle-atkobject"
 msgid "Border Line Style"
 msgstr "Kantlinjestil"
 
 #. CNqCC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:71
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
 msgctxt "sidebarnumberformat|numberformatcombobox|tooltip_text"
 msgid "Select a category of contents."
 msgstr "Vel ein innhaldskategori."
 
 #. EeECn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:75
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:85
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "General"
 msgstr "Generelt"
 
 #. SmpsG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:76
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:86
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Number"
 msgstr "Tal"
 
 #. 8FGeM
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:77
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:87
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Percent"
 msgstr "Prosent"
 
 #. bHC79
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:78
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Currency"
 msgstr "Valuta"
 
 #. Lh2G6
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:79
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:89
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Date "
 msgstr "Dato "
 
 #. EUCxB
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:80
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:90
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Time"
 msgstr "Klokkeslett"
 
 #. EukSF
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:91
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Scientific"
 msgstr "Vitskapleg"
 
 #. AQV5y
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:82
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:92
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Fraction"
 msgstr "Brøk"
 
 #. kQGBu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:83
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:93
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Boolean Value"
 msgstr "Bolsk verdi"
 
 #. Gv2sX
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:84
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:94
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Text"
 msgstr "Tekst"
 
 #. ypKG8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:98
 msgctxt "sidebarnumberformat|numberformatcombobox-atkobject"
 msgid "Category"
 msgstr "Kategori"
 
 #. FqFzG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:120
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:117
 msgctxt "sidebarnumberformat|decimalplaceslabel"
 msgid "_Decimal places:"
 msgstr "_Desimalplassar:"
 
 #. xen2B
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:134
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:131
 msgctxt "sidebarnumberformat|denominatorplaceslabel"
 msgid "Den_ominator places:"
 msgstr "_Nemnarplassar:"
 
 #. cdFDC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:162
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:158
 msgctxt "sidebarnumberformat|denominatorplaces|tooltip_text"
 msgid "Enter the number of places for the denominator that you want to display."
 msgstr "Skriv inn kor mange nemnarplassar som skal visast."
 
 #. ySDGH
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:167
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:163
 msgctxt "sidebarnumberformat|denominatorplaces-atkobject"
 msgid "Denominator Places"
 msgstr "Nemnarplassar"
 
 #. EaLbU
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:181
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:177
 msgctxt "sidebarnumberformat|decimalplaces|tooltip_text"
 msgid "Enter the number of decimal places that you want to display."
 msgstr "Skriv inn kor mange desimalplassar som skal visast."
 
 #. 5tvJA
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:186
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:182
 msgctxt "sidebarnumberformat|decimalplaces-atkobject"
 msgid "Decimal Places"
 msgstr "Desimalplassar"
 
 #. 4h3mG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:219
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:202
 msgctxt "sidebarnumberformat|leadingzeroeslabel"
 msgid "Leading _zeroes:"
 msgstr "Leiande _nullar:"
 
 #. 35pSE
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:234
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:215
 msgctxt "sidebarnumberformat|leadingzeroes|tooltip_text"
 msgid "Enter the maximum number of zeroes to display before the decimal point."
 msgstr "Skriv inn det maksimale talet på nullar som skal visast framfor desimalkommaet."
 
 #. UFTBa
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:240
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:221
 msgctxt "sidebarnumberformat|leadingzeroes-atkobject"
 msgid "Leading Zeroes"
 msgstr "Innleiande nullar"
 
 #. jkDKD
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:259
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:232
 msgctxt "sidebarnumberformat|negativenumbersred"
 msgid "_Negative numbers in red"
 msgstr "_Negative tal raude"
 
 #. apRL8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:263
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:236
 msgctxt "sidebarnumberformat|negativenumbersred|tooltip_text"
 msgid "Changes the font color of negative numbers to red."
 msgstr "Endrar skriftfargen for negative tal til raud."
 
 #. BJ9Gy
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:275
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:249
 msgctxt "sidebarnumberformat|thousandseparator"
 msgid "_Thousands separator"
 msgstr "_Tusenskilje"
 
 #. ykEWn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:279
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:253
 msgctxt "sidebarnumberformat|thousandseparator|tooltip_text"
 msgid "Inserts a separator between thousands."
 msgstr "Set inn tusentalskilje"
 
 #. pGpRu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:291
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:266
 msgctxt "sidebarnumberformat|engineeringnotation"
 msgid "_Engineering notation"
 msgstr "_Teknisk notasjon"
 
 #. 9CEjC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:294
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:269
 msgctxt "sidebarnumberformat|engineeringnotation|tooltip_text"
 msgid "Ensures that exponent is a multiple of 3."
 msgstr "Sikrar at eksponent er ein multippel av 3."
@@ -30356,11 +30335,11 @@ msgctxt "solverdlg|options"
 msgid "O_ptions..."
 msgstr "Innstillingar …"
 
-#. UABF3
+#. 8BGxk
 #: sc/uiconfig/scalc/ui/solverdlg.ui:60
 msgctxt "solverdlg|extended_tip|options"
-msgid "Opens the Solver Options dialog."
-msgstr "Opnar dialogvindauget for fleire val."
+msgid "Opens the solver’s Options dialog."
+msgstr "Opnar dialogvindauget for alternativ for problemløysaren."
 
 #. 8hMNV
 #: sc/uiconfig/scalc/ui/solverdlg.ui:72
@@ -30786,37 +30765,37 @@ msgstr "Avgjer sorteringsvala for det valde området."
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:79
 msgctxt "sortcriteriapage|topdown"
 msgid "Top to bottom (sort rows)"
-msgstr ""
+msgstr "Ovanfrå og ned (sorter radene)"
 
 #. eNaAT
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:94
 msgctxt "sortcriteriapage|leftright"
 msgid "Left to right (sort columns)"
-msgstr ""
+msgstr "Frå venstre til høgre (sorter kolonnane)"
 
 #. vTci8
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:112
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:111
 msgctxt "sortcriteriapage|lbDirection"
 msgid "Direction:"
-msgstr ""
+msgstr "Retning:"
 
 #. 6YQSB
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:122
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:121
 msgctxt "sortcriteriapage|header"
 msgid "Range contains..."
-msgstr ""
+msgstr "Området inneheld …"
 
 #. E9DMu
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:138
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:137
 msgctxt "sortcriteriapage|lbHeader"
 msgid "Headers:"
-msgstr ""
+msgstr "Topptekstar:"
 
 #. 5oaCb
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:155
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:154
 msgctxt "sortcriteriapage|lbOptions"
 msgid "Sort Options"
-msgstr ""
+msgstr "Sorteringsalternativ"
 
 #. PqGRt
 #: sc/uiconfig/scalc/ui/sortdialog.ui:8
@@ -31080,223 +31059,223 @@ msgstr "Tips: Sorteringsområdet kan oppdagast automatisk. Set skrivemerket i ei
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:8
 msgctxt "SparklineDialog"
 msgid "Sparkline Data Range"
-msgstr ""
+msgstr "Dataområde for minidiagram"
 
 #. mdCMa
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:120
 msgctxt "SparklineDataRangeDialog|cell-range-label"
 msgid "Data range:"
-msgstr ""
+msgstr "Dataområde:"
 
 #. 59Wvr
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:24
 msgctxt "SparklineDialog"
 msgid "Sparkline Properties"
-msgstr ""
+msgstr "Eigenskapar for minidiagram"
 
 #. ZGEum
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:182
 msgctxt "SparklineDialog|label_InputRange"
 msgid "Input range:"
-msgstr ""
+msgstr "Inndataområde:"
 
 #. X2vrF
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:199
 msgctxt "SparklineDialog|label_OutputRange"
 msgid "Output range:"
-msgstr ""
+msgstr "Utdataområde:"
 
 #. faM2q
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:218
 msgctxt "SparklineDialog|label-data"
 msgid "Data"
-msgstr ""
+msgstr "Data"
 
 #. GXiV2
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:250
 msgctxt "SparklineDialog|label_Series"
 msgid "Series:"
-msgstr ""
+msgstr "Seriar:"
 
 #. wBmc6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:283
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:285
 msgctxt "SparklineDialog|checkButton_Negative"
 msgid "Negative points:"
-msgstr ""
+msgstr "Negative punkt:"
 
 #. ySwZA
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:319
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:323
 msgctxt "SparklineDialog|checkButton_High"
 msgid "High points:"
-msgstr ""
+msgstr "Høge punkt:"
 
 #. DJKw7
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:355
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:361
 msgctxt "SparklineDialog|checkButton_Low"
 msgid "Low points:"
-msgstr ""
+msgstr "Låge punkt:"
 
 #. q5qaV
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:391
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:399
 msgctxt "SparklineDialog|checkButton_Marker"
 msgid "Marker:"
-msgstr ""
+msgstr "Merking:"
 
 #. 4yLTi
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:427
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:437
 msgctxt "SparklineDialog|checkButton_First"
 msgid "First point:"
-msgstr ""
+msgstr "Første punkt:"
 
 #. EYEEJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:463
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:475
 msgctxt "SparklineDialog|checkButton_Last"
 msgid "Last point:"
-msgstr ""
+msgstr "Siste punkt:"
 
 #. mP9Uy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:503
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:517
 msgctxt "SparklineDialog|label_Colors"
 msgid "Colors"
-msgstr ""
+msgstr "Fargar"
 
 #. a9F7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:537
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:551
 msgctxt "SparklineDialog|label_LineWidth"
 msgid "Line width:"
-msgstr ""
+msgstr "Linjebreidd:"
 
 #. ofAyv
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:552
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:566
 msgctxt "SparklineDialog|spinButton_LineWidth"
 msgid "1,00"
-msgstr ""
+msgstr "1.00"
 
 #. 4ciyB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:570
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:584
 msgctxt "SparklineDialog|label_DisplayEmptyCellsAs"
 msgid "Display empty cells as:"
-msgstr ""
+msgstr "Vis tomme celler som:"
 
 #. K3oCB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:585
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:599
 msgctxt "SparklineDialog|optionEmpty_Gap"
 msgid "Gap"
-msgstr ""
+msgstr "Mellomrom"
 
 #. fzBds
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:586
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:600
 msgctxt "SparklineDialog|optionEmpty_Zero"
 msgid "Zero"
-msgstr ""
+msgstr "Null"
 
 #. tGCDf
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:587
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:601
 msgctxt "SparklineDialog|optionEmpty_Span"
 msgid "Span"
-msgstr ""
+msgstr "Spenn"
 
 #. fkB5s
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:597
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:611
 msgctxt "SparklineDialog|checkButton_Hidden"
 msgid "Display hidden"
-msgstr ""
+msgstr "Vis gøymde"
 
 #. gxx8E
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:612
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:626
 msgctxt "SparklineDialog|checkButton_RTL"
 msgid "Right-to-left"
-msgstr ""
+msgstr "Høgre-til-venstre"
 
 #. GJfmJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:631
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
 msgctxt "SparklineDialog|optionType_Line"
 msgid "Line"
-msgstr ""
+msgstr "Linje"
 
 #. 2ZDbw
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:632
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:646
 msgctxt "SparklineDialog|optionType_Column"
 msgid "Column"
-msgstr ""
+msgstr "Kolonne"
 
 #. UirXW
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:633
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:647
 msgctxt "SparklineDialog|optionType_Stacked"
 msgid "Stacked"
-msgstr ""
+msgstr "Stabla"
 
 #. zmCsJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:659
 msgctxt "SparklineDialog|label_Type"
 msgid "Type:"
-msgstr ""
+msgstr "Type:"
 
 #. o8rnM
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:661
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:675
 msgctxt "SparklineDialog|label_Properties"
 msgid "Properties"
-msgstr ""
+msgstr "Eigenskapar"
 
 #. uQaJH
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:694
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:708
 msgctxt "SparklineDialog|option_MinAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "individuell"
 
 #. BCX7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:695
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:709
 msgctxt "SparklineDialog|option_MinAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Grupper"
 
 #. SubB5
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:696
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:710
 msgctxt "SparklineDialog|option_MinAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Tilpassa"
 
 #. T8Arr
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:724
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:738
 msgctxt "SparklineDialog|option_MaxAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "individuell"
 
 #. DDfCP
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:725
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:739
 msgctxt "SparklineDialog|option_MaxAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Grupper"
 
 #. C2Huq
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:726
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:740
 msgctxt "SparklineDialog|option_MaxAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Tilpassa"
 
-#. JFSoc
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:753
+#. kiBE8
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:767
 msgctxt "SparklineDialog|label_AxisMaximum"
-msgid "Vertical maximum"
-msgstr ""
+msgid "Vertical maximum:"
+msgstr "Loddrett maksimum:"
 
 #. MEvJy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:768
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:782
 msgctxt "SparklineDialog|label_AxisMinimum"
 msgid "Vertical minimum:"
-msgstr ""
+msgstr "Loddrett minimum:"
 
 #. EMPn4
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:780
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:794
 msgctxt "SparklineDialog|checkBox_DisplayX"
 msgid "Display X axis"
-msgstr ""
+msgstr "Vis X-aksen"
 
 #. uAAF6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:800
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:814
 msgctxt "SparklineDialog|label_Axes"
 msgid "Axes"
-msgstr ""
+msgstr "Aksar"
 
 #. p9BBw
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:29
@@ -31586,14 +31565,14 @@ msgctxt "standardfilterdialog|cond"
 msgid "Does not end with"
 msgstr "Sluttar ikkje med"
 
-#. XCG8Q
+#. 3PahC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:433
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:472
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:511
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:550
 msgctxt "standardfilterdialog|cond"
-msgid "Text color"
-msgstr "Tekstfarge"
+msgid "Font color"
+msgstr "Skriftfarge"
 
 #. 5Wa7m
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:434
@@ -32076,7 +32055,7 @@ msgstr "_Teiknsett:"
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:133
 msgctxt "textimportcsv|textlanguage"
 msgid "_Locale:"
-msgstr ""
+msgstr "_Nasjonal innstilling:"
 
 #. GAQTV
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:147
@@ -32370,7 +32349,7 @@ msgstr "Automatisk"
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:148
 msgctxt "textimportoptions|label2"
 msgid "Select the Locale to Use for Import"
-msgstr ""
+msgstr "Vel nasjonal innstilling for importen"
 
 #. iRYr7
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:169
@@ -32478,7 +32457,7 @@ msgstr "_Anker"
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:110
 msgctxt "extended_tip|anchor"
 msgid "Specifies whether the anchor icon is displayed when an inserted object, such as a graphic, is selected."
-msgstr "Bestemmer om ankerikonet skal visast når eit innsett objekt, som for eksempel eit biletobjekt, er merkt."
+msgstr "Spesifiserer om ankerikonet skal visast når eit innsett objekt, som for eksempel eit biletobjekt, er merkt."
 
 #. XBGqd
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:121
@@ -32661,130 +32640,130 @@ msgid "Specifies when grid lines will be displayed. Default is to display grid l
 msgstr "Bestemmer når rutenett skal visast. Som standard vert rutenettet berre vist på celler som ikkje har bakgrunnsfarge. Du kan velja at rutenettet skal visast også når cellene har bakgrunnsfarge, eller å gøyma dei."
 
 #. yajBD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:468
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:469
 msgctxt "extended_tip|color"
 msgid "Specifies a color for the grid lines in the current document."
 msgstr "Bestemmer fargen på rutenettet i det gjeldande dokumentet."
 
 #. BpEmt
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:482
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:483
 msgctxt "tpviewpage|labelCursor"
 msgid "Pointe_r:"
 msgstr "_Peikar:"
 
 #. AmbjZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:494
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:495
 msgctxt "tpviewpage|radiobuttonThemed"
 msgid "T_hemed"
 msgstr "_Tema"
 
 #. xQTDE
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:498
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:499
 msgctxt "tpviewpage|radiobuttonThemedTip"
 msgid "Show the pointer as defined in the icon theme, typically as fat cross."
-msgstr ""
+msgstr "Vis markøren slik han er definert i ikontemaet, til vanleg ein feit kross."
 
 #. 3HxpG
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:510
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:511
 msgctxt "tpviewpage|radiobuttonSystem"
 msgid "S_ystem"
 msgstr "S_ystem"
 
 #. weVdC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:514
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:515
 msgctxt "tpviewpage|radiobuttonSystemTip"
 msgid "Show the pointer as system default, typically an arrow pointer."
-msgstr ""
+msgstr "Vis peikaren som i systemstandarden, til vanleg ei pil."
 
 #. Cb4AM
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:530
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:531
 msgctxt "tpviewpage|label1"
 msgid "Visual Aids"
 msgstr "Visuell hjelp"
 
 #. Qd5Rp
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:561
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:562
 msgctxt "tpviewpage|objgrf_label"
 msgid "Ob_jects/Images:"
 msgstr "_Objekt/bilete:"
 
 #. vLBFR
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:575
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:576
 msgctxt "tpviewpage|diagram_label"
 msgid "Char_ts:"
 msgstr "_Diagram:"
 
 #. q544D
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:589
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:590
 msgctxt "tpviewpage|draw_label"
 msgid "_Drawing objects:"
 msgstr "_Teikneobjekt:"
 
 #. mpELg
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:604
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
 msgctxt "tpviewpage|objgrf"
 msgid "Show"
 msgstr "Vis"
 
 #. Kx6yJ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:606
 msgctxt "tpviewpage|objgrf"
 msgid "Hide"
 msgstr "Gøym"
 
 #. oKpbX
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:609
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:610
 msgctxt "extended_tip|objgrf"
 msgid "Defines if objects and graphics are shown or hidden."
 msgstr "Bestemmer om objekt og bilete skal visast eller gøymast."
 
 #. wFBeZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:623
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
 msgctxt "tpviewpage|diagram"
 msgid "Show"
 msgstr "Vis"
 
 #. H7MAB
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:625
 msgctxt "tpviewpage|diagram"
 msgid "Hide"
 msgstr "Gøym"
 
 #. oVE9C
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:628
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:629
 msgctxt "extended_tip|diagram"
 msgid "Defines if charts in your document are shown or hidden."
 msgstr "Bestemmer om diagram skal visast eller gøymast."
 
 #. YaiTQ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:642
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
 msgctxt "tpviewpage|draw"
 msgid "Show"
 msgstr "Vis"
 
 #. DST5a
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:644
 msgctxt "tpviewpage|draw"
 msgid "Hide"
 msgstr "Gøym"
 
 #. FDGKD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:647
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:648
 msgctxt "extended_tip|draw"
 msgid "Defines if drawing objects in your document are shown or hidden."
 msgstr "Bestemmer om teikneobjekt skal visast eller gøymast."
 
 #. E6GxC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:662
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:663
 msgctxt "tpviewpage|label2"
 msgid "Objects"
 msgstr "Objekt"
 
 #. AnHPF
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:686
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:687
 msgctxt "extended_tip|TpViewPage"
 msgid "Defines which elements of the Calc main window are displayed. You can also show or hide highlighting of values in tables."
-msgstr ""
+msgstr "Definerer kva for element i hovudvindauget til Calc som skal visast. Du kan også visa eller gøyma utheving av verdiar i tabellen."
 
 #. AnLEa
 #: sc/uiconfig/scalc/ui/ttestdialog.ui:95
@@ -32978,11 +32957,11 @@ msgctxt "validationcriteriapage|liststore2"
 msgid "invalid range"
 msgstr "ugyldig område"
 
-#. 89CdB
+#. 8udun
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:84
 msgctxt "validationcriteriapage|extended_tip|data"
-msgid "Select the comparative operator that you want to use."
-msgstr "Vel samanlikningsoperatoren som du vil bruka."
+msgid "Select the comparison operator that you want to use."
+msgstr "Vel samanlikningsoperatoren som skal brukast."
 
 #. RCFrD
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:97
@@ -33051,13 +33030,13 @@ msgid "A valid source can only consist of a contiguous selection of rows and col
 msgstr "Ei kjelde må vera eit samanhengande område av rader eller kolonnar, eller ein formel som gjev eit område eller ein tabell."
 
 #. 9v4Ah
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:286
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:289
 msgctxt "validationcriteriapage|extended_tip|max"
 msgid "Enter the maximum value for the data validation option that you selected in the Allow box."
 msgstr "Skriv inn den største moglege verdien for alternativet for datavalideringa som du valde i Tillat-boksen."
 
 #. 3HjmP
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:309
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:312
 msgctxt "validationcriteriapage|extended_tip|ValidationCriteriaPage"
 msgid "Specify the validation rules for the selected cell(s)."
 msgstr "Oppgje reglane for gyldigheit for dei merkte cellene."
@@ -33156,13 +33135,13 @@ msgstr "Skriv inn meldinga som skal visast når celleområdet er merkt på arket
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:13
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "%PRODUCTNAME Calc found an error in the formula entered."
-msgstr ""
+msgstr "%PRODUCTNAME Calc fann ein feil i den innskrivne formelen."
 
 #. 7BDGp
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:14
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "Do you want to accept the correction proposed below?"
-msgstr ""
+msgstr "Vil du å godta rettinga som er føreslått nedanfor?"
 
 #. pSFWN
 #: sc/uiconfig/scalc/ui/xmlsourcedialog.ui:23

@@ -10,6 +10,8 @@
 #pragma once
 
 #include "global.hxx"
+#include <svl/sharedstring.hxx>
+#include <variant>
 
 class ScDocument;
 class ScFormulaCell;
@@ -21,12 +23,6 @@ namespace sc {
 struct ColumnBlockPosition;
 }
 
-namespace svl {
-
-class SharedString;
-
-}
-
 /**
  * Store arbitrary cell value of any kind.  It only stores cell value and
  * nothing else.  It creates a copy of the original cell value, and manages
@@ -34,18 +30,18 @@ class SharedString;
  */
 struct SC_DLLPUBLIC ScCellValue
 {
-    CellType meType;
-    union {
-        double mfValue;
-        svl::SharedString* mpString;
-        EditTextObject* mpEditText;
-        ScFormulaCell* mpFormula;
-    };
+private:
+    /// std::monostate is there to indicate CellType::NONE
+    std::variant<std::monostate, double, svl::SharedString, EditTextObject*, ScFormulaCell*> maData;
+
+    void reset_to_empty();
+public:
 
     ScCellValue();
     ScCellValue( const ScRefCellValue& rCell );
     ScCellValue( double fValue );
     ScCellValue( const svl::SharedString& rString );
+    ScCellValue( std::unique_ptr<EditTextObject> );
     ScCellValue( const ScCellValue& r );
     ScCellValue(ScCellValue&& r) noexcept;
     ~ScCellValue();
@@ -55,8 +51,16 @@ struct SC_DLLPUBLIC ScCellValue
     void set( double fValue );
     void set( const svl::SharedString& rStr );
     void set( const EditTextObject& rEditText );
-    void set( EditTextObject* pEditText );
+    void set( std::unique_ptr<EditTextObject> );
     void set( ScFormulaCell* pFormula );
+
+    CellType getType() const;
+    double getDouble() const { return std::get<double>(maData); }
+    ScFormulaCell* getFormula() const { return std::get<ScFormulaCell*>(maData); }
+    const svl::SharedString* getSharedString() const { return &std::get<svl::SharedString>(maData); }
+    EditTextObject* getEditText() const { return std::get<EditTextObject*>(maData); }
+    EditTextObject* releaseEditText() { auto p = getEditText(); maData = static_cast<EditTextObject*>(nullptr); return p; }
+    ScFormulaCell* releaseFormula() { auto p = getFormula(); maData = static_cast<ScFormulaCell*>(nullptr); return p; }
 
     /**
      * Take cell value from specified position in specified document.
@@ -102,6 +106,7 @@ struct SC_DLLPUBLIC ScCellValue
  */
 struct SC_DLLPUBLIC ScRefCellValue
 {
+private:
     CellType meType;
     union {
         double mfValue;
@@ -109,6 +114,7 @@ struct SC_DLLPUBLIC ScRefCellValue
         const EditTextObject* mpEditText;
         ScFormulaCell* mpFormula;
     };
+public:
 
     ScRefCellValue();
     ScRefCellValue( double fValue );
@@ -123,6 +129,12 @@ struct SC_DLLPUBLIC ScRefCellValue
     ScRefCellValue( ScDocument& rDoc, const ScAddress& rPos, sc::ColumnBlockPosition& rBlockPos );
 
     void clear();
+
+    CellType getType() const { return meType; }
+    double getDouble() const { assert(meType == CELLTYPE_VALUE); return mfValue; }
+    const svl::SharedString* getSharedString() const { assert(meType == CELLTYPE_STRING); return mpString; }
+    const EditTextObject* getEditText() const { assert(meType == CELLTYPE_EDIT); return mpEditText; }
+    ScFormulaCell* getFormula() const { assert(meType == CELLTYPE_FORMULA); return mpFormula; }
 
     /**
      * Take cell value from specified position in specified document.

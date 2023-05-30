@@ -8,6 +8,7 @@
  */
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 #include <officecfg/Office/Impress.hxx>
@@ -55,10 +56,10 @@ namespace sd {
 
         ClientInfoInternal( const OUString& rName,
                             BufferedStreamSocket *pSocket,
-                            const OUString& rPin ):
+                            OUString aPin ):
                 ClientInfo( rName, false ),
                 mpStreamSocket( pSocket ),
-                mPin( rPin ) {}
+                mPin(std::move( aPin )) {}
     };
 }
 
@@ -283,9 +284,9 @@ bool RemoteServer::connectClient( const std::shared_ptr< ClientInfo >& pClient, 
             // Check whether the client is already saved
             Sequence< OUString > aNames = xConfig->getElementNames();
             if (comphelper::findValue(aNames, apClient->mName) != -1)
-                xConfig->replaceByName( apClient->mName, makeAny( xChild ) );
+                xConfig->replaceByName( apClient->mName, Any( xChild ) );
             else
-                xConfig->insertByName( apClient->mName, makeAny( xChild ) );
+                xConfig->insertByName( apClient->mName, Any( xChild ) );
             aValue <<= apClient->mPin;
             xChild->replaceByName("PIN", aValue);
             aChanges->commit();
@@ -348,8 +349,7 @@ void SdDLL::RegisterRemotes()
     if ( Application::IsHeadlessModeEnabled() )
         return;
 
-    uno::Reference< uno::XComponentContext > xContext = comphelper::getProcessComponentContext();
-    if ( xContext.is()  && !officecfg::Office::Impress::Misc::Start::EnableSdremote::get( xContext ) )
+    if ( !officecfg::Office::Impress::Misc::Start::EnableSdremote::get() )
         return;
 
     sd::RemoteServer::setup();

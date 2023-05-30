@@ -21,15 +21,13 @@
 
 #include <iostream>
 
-#include <tools/solar.h>
-
 #include "node.hxx"
 #include "ring.hxx"
 #include "ndarr.hxx"
 #include "nodeoffset.hxx"
 
 /// Marks a node in the document model.
-class SW_DLLPUBLIC SwNodeIndex final : public sw::Ring<SwNodeIndex>
+class SAL_WARN_UNUSED SW_DLLPUBLIC SwNodeIndex final : public sw::Ring<SwNodeIndex>
 {
     SwNode * m_pNode;
 
@@ -59,13 +57,13 @@ class SW_DLLPUBLIC SwNodeIndex final : public sw::Ring<SwNodeIndex>
 
 public:
     SwNodeIndex( SwNodes& rNds, sal_Int32 nIdx ) : SwNodeIndex(rNds, SwNodeOffset(nIdx)) {}
-    SwNodeIndex( SwNodes& rNds, SwNodeOffset nIdx = SwNodeOffset(0) )
+    explicit SwNodeIndex( SwNodes& rNds, SwNodeOffset nIdx = SwNodeOffset(0) )
         : m_pNode( rNds[ nIdx ] )
     {
         RegisterIndex( rNds );
     };
     SwNodeIndex( const SwNodeIndex& rIdx, sal_Int32 nDiff ) : SwNodeIndex(rIdx, SwNodeOffset(nDiff)) {}
-    SwNodeIndex( const SwNodeIndex& rIdx, SwNodeOffset nDiff = SwNodeOffset(0) )
+    SwNodeIndex( const SwNodeIndex& rIdx, SwNodeOffset nDiff )
         : sw::Ring<SwNodeIndex>()
     {
         if( nDiff )
@@ -74,9 +72,10 @@ public:
             m_pNode = rIdx.m_pNode;
         RegisterIndex( m_pNode->GetNodes() );
     }
+    SwNodeIndex( const SwNodeIndex& rIdx ) : SwNodeIndex(rIdx, 0) {}
 
     SwNodeIndex( const SwNode& rNd, sal_Int32 nDiff ) : SwNodeIndex(rNd, SwNodeOffset(nDiff)) {}
-    SwNodeIndex( const SwNode& rNd, SwNodeOffset nDiff = SwNodeOffset(0) )
+    explicit SwNodeIndex( const SwNode& rNd, SwNodeOffset nDiff = SwNodeOffset(0) )
     {
         if( nDiff )
             m_pNode = rNd.GetNodes()[ rNd.GetIndex() + nDiff ];
@@ -109,6 +108,13 @@ public:
     inline bool operator>=( SwNodeOffset ) const;
     inline bool operator==( SwNodeOffset ) const;
     inline bool operator!=( SwNodeOffset ) const;
+
+    bool operator<( const SwNode& rNd ) const { return operator<(rNd.GetIndex()); }
+    bool operator<=( const SwNode& rNd ) const { return operator<=(rNd.GetIndex()); }
+    bool operator>( const SwNode& rNd ) const { return operator>(rNd.GetIndex()); }
+    bool operator>=( const SwNode& rNd ) const { return operator>=(rNd.GetIndex()); }
+    bool operator==( const SwNode& rNd ) const { return m_pNode == &rNd; }
+    bool operator!=( const SwNode& rNd ) const { return m_pNode != &rNd; }
 
     inline SwNodeIndex& operator=( SwNodeOffset );
     inline SwNodeIndex& operator=( const SwNodeIndex& );
@@ -144,6 +150,8 @@ public:
     SwNodeIndex aEnd;
 
     SwNodeRange( const SwNodeIndex &rS, const SwNodeIndex &rE )
+        : aStart( rS ), aEnd( rE ) {};
+    SwNodeRange( const SwNode &rS, const SwNode &rE )
         : aStart( rS ), aEnd( rE ) {};
     SwNodeRange( const SwNodeRange &rRange )
         : aStart( rRange.aStart ), aEnd( rRange.aEnd ) {};

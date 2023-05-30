@@ -19,11 +19,10 @@
 
 #include <unobookmark.hxx>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <osl/mutex.hxx>
 #include <svl/itemprop.hxx>
 #include <svl/listener.hxx>
 #include <vcl/svapp.hxx>
@@ -44,12 +43,10 @@ using namespace ::com::sun::star;
 class SwXBookmark::Impl
     : public SvtListener
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
-    uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    unotools::WeakReference<SwXBookmark> m_wThis;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper3
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     SwDoc* m_pDoc;
     ::sw::mark::IMark* m_pRegisteredBookmark;
     OUString m_sMarkName;
@@ -57,8 +54,7 @@ public:
     OUString m_HideCondition;
 
     Impl( SwDoc *const pDoc )
-        : m_EventListeners(m_Mutex)
-        , m_pDoc(pDoc)
+        : m_pDoc(pDoc)
         , m_pRegisteredBookmark(nullptr)
         , m_bHidden(false)
     {
@@ -83,14 +79,15 @@ void SwXBookmark::Impl::Notify(const SfxHint& rHint)
             return;
         }
         lang::EventObject const ev(xThis);
-        m_EventListeners.disposeAndClear(ev);
+        std::unique_lock aGuard(m_Mutex);
+        m_EventListeners.disposeAndClear(aGuard, ev);
     }
 }
 
 void SwXBookmark::Impl::registerInMark(SwXBookmark& rThis,
         ::sw::mark::IMark* const pBkmk)
 {
-    const uno::Reference<text::XTextContent> xBookmark(&rThis);
+    const rtl::Reference<SwXBookmark> xBookmark(&rThis);
     if (pBkmk)
     {
         EndListeningAll();
@@ -119,7 +116,7 @@ void SwXBookmark::Impl::registerInMark(SwXBookmark& rThis,
     }
     m_pRegisteredBookmark = pBkmk;
     // need a permanent Reference to initialize m_wThis
-    m_wThis = xBookmark;
+    m_wThis = xBookmark.get();
 }
 
 void SwXBookmark::registerInMark(SwXBookmark & rThis,
@@ -157,14 +154,14 @@ SwXBookmark::~SwXBookmark()
 {
 }
 
-uno::Reference<text::XTextContent> SwXBookmark::CreateXBookmark(
+rtl::Reference<SwXBookmark> SwXBookmark::CreateXBookmark(
     SwDoc & rDoc,
     ::sw::mark::IMark *const pBookmark)
 {
     // #i105557#: do not iterate over the registered clients: race condition
     ::sw::mark::MarkBase *const pMarkBase(dynamic_cast< ::sw::mark::MarkBase * >(pBookmark));
     OSL_ENSURE(!pBookmark || pMarkBase, "CreateXBookmark: no MarkBase?");
-    uno::Reference<text::XTextContent> xBookmark;
+    rtl::Reference<SwXBookmark> xBookmark;
     if (pMarkBase)
     {
         xBookmark = pMarkBase->GetXBookmark();
@@ -209,7 +206,8 @@ sal_Int64 SAL_CALL SwXBookmark::getSomething( const uno::Sequence< sal_Int8 >& r
 
 void SwXBookmark::attachToRangeEx(
     const uno::Reference< text::XTextRange > & xTextRange,
-    IDocumentMarkAccess::MarkType eType)
+    IDocumentMarkAccess::MarkType eType,
+    bool const isFieldmarkSeparatorAtStart)
 {
     if (m_pImpl->m_pRegisteredBookmark)
     {
@@ -250,7 +248,10 @@ void SwXBookmark::attachToRangeEx(
     }
     m_pImpl->registerInMark(*this,
         m_pImpl->m_pDoc->getIDocumentMarkAccess()->makeMark(
-            aPam, m_pImpl->m_sMarkName, eType, ::sw::mark::InsertMode::New));
+            aPam, m_pImpl->m_sMarkName, eType, ::sw::mark::InsertMode::New,
+            // note: aPam will be moved fwd by inserting start char, so sep
+            // will be directly following start
+            isFieldmarkSeparatorAtStart ? aPam.Start() : nullptr));
     // #i81002#
     // Check, if bookmark has been created.
     // E.g., the creation of a cross-reference bookmark is suppress,
@@ -302,14 +303,16 @@ void SAL_CALL SwXBookmark::addEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXBookmark::removeEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 OUString SAL_CALL SwXBookmark::getName()
@@ -625,7 +628,8 @@ void SwXFieldmark::attachToRange( const uno::Reference < text::XTextRange >& xTe
 {
 
     attachToRangeEx( xTextRange,
-                     ( m_bReplacementObject ? IDocumentMarkAccess::MarkType::CHECKBOX_FIELDMARK : IDocumentMarkAccess::MarkType::TEXT_FIELDMARK ) );
+         (m_bReplacementObject ? IDocumentMarkAccess::MarkType::CHECKBOX_FIELDMARK : IDocumentMarkAccess::MarkType::TEXT_FIELDMARK),
+         m_isFieldmarkSeparatorAtStart);
 }
 
 OUString SwXFieldmark::getFieldType()
@@ -681,7 +685,7 @@ uno::Reference<container::XNameContainer> SwXFieldmark::getParameters()
     return uno::Reference<container::XNameContainer>(new SwXFieldmarkParameters(pBkm));
 }
 
-uno::Reference<text::XTextContent>
+rtl::Reference<SwXBookmark>
 SwXFieldmark::CreateXFieldmark(SwDoc & rDoc, ::sw::mark::IMark *const pMark,
         bool const isReplacementObject)
 {
@@ -689,7 +693,7 @@ SwXFieldmark::CreateXFieldmark(SwDoc & rDoc, ::sw::mark::IMark *const pMark,
     ::sw::mark::MarkBase *const pMarkBase(
         dynamic_cast< ::sw::mark::MarkBase * >(pMark));
     assert(!pMark || pMarkBase);
-    uno::Reference<text::XTextContent> xMark;
+    rtl::Reference<SwXBookmark> xMark;
     if (pMarkBase)
     {
         xMark = pMarkBase->GetXBookmark();
@@ -709,7 +713,7 @@ SwXFieldmark::CreateXFieldmark(SwDoc & rDoc, ::sw::mark::IMark *const pMark,
         else
             pXBkmk = new SwXFieldmark(isReplacementObject, &rDoc);
 
-        xMark.set(static_cast<::cppu::OWeakObject*>(pXBkmk.get()), uno::UNO_QUERY); // work around ambiguous base
+        xMark = pXBkmk.get();
         pXBkmk->registerInMark(*pXBkmk, pMarkBase);
     }
     return xMark;
@@ -746,6 +750,14 @@ SwXFieldmark::setPropertyValue(const OUString& PropertyName,
 
         pCheckboxFm->SetChecked( bChecked );
     }
+    else if (PropertyName == "PrivateSeparatorAtStart")
+    {
+        bool isFieldmarkSeparatorAtStart{};
+        if (rValue >>= isFieldmarkSeparatorAtStart)
+        {
+            m_isFieldmarkSeparatorAtStart = isFieldmarkSeparatorAtStart;
+        }
+    }
     // this doesn't support any SwXBookmark property
 }
 
@@ -761,7 +773,7 @@ uno::Any SAL_CALL SwXFieldmark::getPropertyValue(const OUString& rPropertyName)
         if ( !pCheckboxFm )
             throw uno::RuntimeException();
 
-        return uno::makeAny( pCheckboxFm->IsChecked() );
+        return uno::Any( pCheckboxFm->IsChecked() );
     }
     return uno::Any(); // this doesn't support any SwXBookmark property
 }
@@ -805,20 +817,20 @@ uno::Reference<text::XTextRange> SAL_CALL SwXFieldmark::getAnchor()
     return SwXBookmark::getAnchor();
 }
 
-uno::Reference<text::XTextRange>
+rtl::Reference<SwXTextRange>
 SwXFieldmark::GetCommand(IFieldmark const& rMark)
 {
     SwPosition const sepPos(sw::mark::FindFieldSep(rMark));
     SwPosition start(rMark.GetMarkStart());
-    ++start.nContent;
+    start.AdjustContent(1);
     return SwXTextRange::CreateXTextRange(*GetDoc(), start, &sepPos);
 }
 
-uno::Reference<text::XTextRange>
+rtl::Reference<SwXTextRange>
 SwXFieldmark::GetResult(IFieldmark const& rMark)
 {
     SwPosition sepPos(sw::mark::FindFieldSep(rMark));
-    ++sepPos.nContent;
+    sepPos.AdjustContent(1);
     SwPosition const& rEnd(rMark.GetMarkEnd());
     return SwXTextRange::CreateXTextRange(*GetDoc(), sepPos, &rEnd);
 }

@@ -146,7 +146,7 @@ void DocumentFocusListener::notifyEvent( const accessibility::AccessibleEventObj
         {
             case accessibility::AccessibleEventId::STATE_CHANGED:
             {
-                sal_Int16 nState = accessibility::AccessibleStateType::INVALID;
+                sal_Int64 nState = accessibility::AccessibleStateType::INVALID;
                 aEvent.NewValue >>= nState;
 
                 if( accessibility::AccessibleStateType::FOCUSED == nState )
@@ -228,11 +228,8 @@ void DocumentFocusListener::attachRecursive(
     const uno::Reference< accessibility::XAccessibleContext >& xContext
 )
 {
-    uno::Reference< accessibility::XAccessibleStateSet > xStateSet =
-        xContext->getAccessibleStateSet();
-
-    if( xStateSet.is() )
-        attachRecursive(xAccessible, xContext, xStateSet);
+    sal_Int64 nStateSet = xContext->getAccessibleStateSet();
+    attachRecursive(xAccessible, xContext, nStateSet);
 }
 
 /*****************************************************************************/
@@ -240,10 +237,10 @@ void DocumentFocusListener::attachRecursive(
 void DocumentFocusListener::attachRecursive(
     const uno::Reference< accessibility::XAccessible >& xAccessible,
     const uno::Reference< accessibility::XAccessibleContext >& xContext,
-    const uno::Reference< accessibility::XAccessibleStateSet >& xStateSet
+    sal_Int64 nStateSet
 )
 {
-    if( xStateSet->contains(accessibility::AccessibleStateType::FOCUSED ) )
+    if( nStateSet & accessibility::AccessibleStateType::FOCUSED )
         atk_wrapper_focus_tracker_notify_when_idle( xAccessible );
 
     uno::Reference< accessibility::XAccessibleEventBroadcaster > xBroadcaster(xContext, uno::UNO_QUERY);
@@ -258,9 +255,9 @@ void DocumentFocusListener::attachRecursive(
 
     xBroadcaster->addAccessibleEventListener(static_cast< accessibility::XAccessibleEventListener *>(this));
 
-    if( ! xStateSet->contains(accessibility::AccessibleStateType::MANAGES_DESCENDANTS ) )
+    if( ! (nStateSet & accessibility::AccessibleStateType::MANAGES_DESCENDANTS) )
     {
-        sal_Int32 n, nmax = xContext->getAccessibleChildCount();
+        sal_Int64 n, nmax = xContext->getAccessibleChildCount();
         for( n = 0; n < nmax; n++ )
         {
             uno::Reference< accessibility::XAccessible > xChild( xContext->getAccessibleChild( n ) );
@@ -290,18 +287,16 @@ void DocumentFocusListener::detachRecursive(
     const uno::Reference< accessibility::XAccessibleContext >& xContext
 )
 {
-    uno::Reference< accessibility::XAccessibleStateSet > xStateSet =
-        xContext->getAccessibleStateSet();
+    sal_Int64 nStateSet = xContext->getAccessibleStateSet();
 
-    if( xStateSet.is() )
-        detachRecursive(xContext, xStateSet);
+    detachRecursive(xContext, nStateSet);
 }
 
 /*****************************************************************************/
 
 void DocumentFocusListener::detachRecursive(
     const uno::Reference< accessibility::XAccessibleContext >& xContext,
-    const uno::Reference< accessibility::XAccessibleStateSet >& xStateSet
+    sal_Int64 nStateSet
 )
 {
     uno::Reference< accessibility::XAccessibleEventBroadcaster > xBroadcaster(xContext, uno::UNO_QUERY);
@@ -311,9 +306,9 @@ void DocumentFocusListener::detachRecursive(
 
     xBroadcaster->removeAccessibleEventListener(static_cast< accessibility::XAccessibleEventListener *>(this));
 
-    if( ! xStateSet->contains(accessibility::AccessibleStateType::MANAGES_DESCENDANTS ) )
+    if( ! (nStateSet & accessibility::AccessibleStateType::MANAGES_DESCENDANTS) )
     {
-        sal_Int32 n, nmax = xContext->getAccessibleChildCount();
+        sal_Int64 n, nmax = xContext->getAccessibleChildCount();
         for( n = 0; n < nmax; n++ )
         {
             uno::Reference< accessibility::XAccessible > xChild( xContext->getAccessibleChild( n ) );
@@ -368,7 +363,6 @@ static void notify_toolbox_item_focus(ToolBox *pToolBox)
     ToolBox::ImplToolItems::size_type nPos = pToolBox->GetItemPos( pToolBox->GetHighlightItemId() );
     if( nPos != ToolBox::ITEM_NOTFOUND )
         atk_wrapper_focus_tracker_notify_when_idle( xContext->getAccessibleChild( nPos ) );
-            //TODO: ToolBox::ImplToolItems::size_type -> sal_Int32
 }
 
 static void handle_toolbox_highlight(vcl::Window *pWindow)
@@ -489,16 +483,12 @@ static void handle_get_focus(::VclWindowEvent const * pEvent)
     if( ! xContext.is() )
         return;
 
-    uno::Reference< accessibility::XAccessibleStateSet > xStateSet =
-        xContext->getAccessibleStateSet();
-
-    if( ! xStateSet.is() )
-        return;
+    sal_Int64 nStateSet = xContext->getAccessibleStateSet();
 
 /* the UNO ToolBox wrapper does not (yet?) support XAccessibleSelection, so we
  * need to add listeners to the children instead of re-using the tabpage stuff
  */
-    if( xStateSet->contains(accessibility::AccessibleStateType::FOCUSED) &&
+    if( (nStateSet & accessibility::AccessibleStateType::FOCUSED) &&
         ( pWindow->GetType() != WindowType::TREELISTBOX ) )
     {
         atk_wrapper_focus_tracker_notify_when_idle( xAccessible );
@@ -509,7 +499,7 @@ static void handle_get_focus(::VclWindowEvent const * pEvent)
         {
             try
             {
-                rDocumentFocusListener.attachRecursive(xAccessible, xContext, xStateSet);
+                rDocumentFocusListener.attachRecursive(xAccessible, xContext, nStateSet);
             }
             catch (const uno::Exception&)
             {

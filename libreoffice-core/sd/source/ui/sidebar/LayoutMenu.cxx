@@ -46,13 +46,12 @@
 #include <sfx2/dispatch.hxx>
 #include <sfx2/request.hxx>
 #include <sfx2/viewfrm.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/cjkoptions.hxx>
 #include <svl/stritem.hxx>
 #include <svl/intitem.hxx>
+#include <utility>
 #include <vcl/commandevent.hxx>
 #include <vcl/image.hxx>
-#include <vcl/weldutils.hxx>
 #include <xmloff/autolayout.hxx>
 
 #include <com/sun/star/drawing/framework/XControllerManager.hpp>
@@ -72,9 +71,9 @@ namespace sd::sidebar {
 
 namespace {
 
-struct snewfoil_value_info
+struct snew_slide_value_info
 {
-    const char* msBmpResId;
+    rtl::OUStringConstExpr msBmpResId;
     TranslateId mpStrResId;
     WritingMode meWritingMode;
     AutoLayout maAutoLayout;
@@ -82,31 +81,33 @@ struct snewfoil_value_info
 
 }
 
-const snewfoil_value_info notes[] =
+constexpr OUStringLiteral EMPTY = u"";
+
+const snew_slide_value_info notes[] =
 {
-    {BMP_FOILN_01, STR_AUTOLAYOUT_NOTES, WritingMode_LR_TB,
+    {BMP_SLIDEN_01, STR_AUTOLAYOUT_NOTES, WritingMode_LR_TB,
      AUTOLAYOUT_NOTES},
-    {"", {}, WritingMode_LR_TB, AUTOLAYOUT_NONE},
+    {EMPTY, {}, WritingMode_LR_TB, AUTOLAYOUT_NONE},
 };
 
-const snewfoil_value_info handout[] =
+const snew_slide_value_info handout[] =
 {
-    {BMP_FOILH_01, STR_AUTOLAYOUT_HANDOUT1, WritingMode_LR_TB,
+    {BMP_SLIDEH_01, STR_AUTOLAYOUT_HANDOUT1, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT1},
-    {BMP_FOILH_02, STR_AUTOLAYOUT_HANDOUT2, WritingMode_LR_TB,
+    {BMP_SLIDEH_02, STR_AUTOLAYOUT_HANDOUT2, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT2},
-    {BMP_FOILH_03, STR_AUTOLAYOUT_HANDOUT3, WritingMode_LR_TB,
+    {BMP_SLIDEH_03, STR_AUTOLAYOUT_HANDOUT3, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT3},
-    {BMP_FOILH_04, STR_AUTOLAYOUT_HANDOUT4, WritingMode_LR_TB,
+    {BMP_SLIDEH_04, STR_AUTOLAYOUT_HANDOUT4, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT4},
-    {BMP_FOILH_06, STR_AUTOLAYOUT_HANDOUT6, WritingMode_LR_TB,
+    {BMP_SLIDEH_06, STR_AUTOLAYOUT_HANDOUT6, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT6},
-    {BMP_FOILH_09, STR_AUTOLAYOUT_HANDOUT9, WritingMode_LR_TB,
+    {BMP_SLIDEH_09, STR_AUTOLAYOUT_HANDOUT9, WritingMode_LR_TB,
      AUTOLAYOUT_HANDOUT9},
-    {"", {}, WritingMode_LR_TB, AUTOLAYOUT_NONE},
+    {EMPTY, {}, WritingMode_LR_TB, AUTOLAYOUT_NONE},
 };
 
-const snewfoil_value_info standard[] =
+const snew_slide_value_info standard[] =
 {
     {BMP_LAYOUT_EMPTY, STR_AUTOLAYOUT_NONE, WritingMode_LR_TB,        AUTOLAYOUT_NONE},
     {BMP_LAYOUT_HEAD03, STR_AUTOLAYOUT_TITLE, WritingMode_LR_TB,       AUTOLAYOUT_TITLE},
@@ -126,7 +127,7 @@ const snewfoil_value_info standard[] =
     {BMP_LAYOUT_VERTICAL01, STR_AL_VERT_TITLE_VERT_OUTLINE, WritingMode_TB_RL, AUTOLAYOUT_VTITLE_VCONTENT},
     {BMP_LAYOUT_HEAD02, STR_AL_TITLE_VERT_OUTLINE, WritingMode_TB_RL, AUTOLAYOUT_TITLE_VCONTENT},
     {BMP_LAYOUT_HEAD02A, STR_AL_TITLE_VERT_OUTLINE_CLIPART,   WritingMode_TB_RL, AUTOLAYOUT_TITLE_2VTEXT},
-    {"", {}, WritingMode_LR_TB, AUTOLAYOUT_NONE}
+    {EMPTY, {}, WritingMode_LR_TB, AUTOLAYOUT_NONE}
 };
 
 class LayoutValueSet : public ValueSet
@@ -157,13 +158,13 @@ public:
 LayoutMenu::LayoutMenu (
     weld::Widget* pParent,
     ViewShellBase& rViewShellBase,
-    const css::uno::Reference<css::ui::XSidebar>& rxSidebar)
+    css::uno::Reference<css::ui::XSidebar> xSidebar)
     : PanelLayout( pParent, "LayoutPanel", "modules/simpress/ui/layoutpanel.ui" ),
       mrBase(rViewShellBase),
       mxLayoutValueSet(new LayoutValueSet(*this)),
       mxLayoutValueSetWin(new weld::CustomWeld(*m_xBuilder, "layoutvalueset", *mxLayoutValueSet)),
       mbIsMainViewChangePending(false),
-      mxSidebar(rxSidebar),
+      mxSidebar(std::move(xSidebar)),
       mbIsDisposed(false)
 {
     implConstruct( *mrBase.GetDocument()->GetDocSh() );
@@ -518,7 +519,7 @@ void LayoutMenu::Fill()
     catch (RuntimeException&)
     {}
 
-    const snewfoil_value_info* pInfo = nullptr;
+    const snew_slide_value_info* pInfo = nullptr;
     if (sCenterPaneViewName == framework::FrameworkHelper::msNotesViewURL)
     {
         pInfo = notes;
@@ -542,7 +543,7 @@ void LayoutMenu::Fill()
     {
         if ((WritingMode_TB_RL != pInfo->meWritingMode) || bVertical)
         {
-            Image aImg("private:graphicrepository/" + OUString::createFromAscii(pInfo->msBmpResId));
+            Image aImg("private:graphicrepository/" + static_cast<const OUString &>(pInfo->msBmpResId));
 
             if (bRightToLeft && (WritingMode_TB_RL != pInfo->meWritingMode))
             { // FIXME: avoid interpolating RTL layouts.

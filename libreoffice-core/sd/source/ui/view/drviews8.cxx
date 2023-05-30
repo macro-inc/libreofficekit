@@ -20,7 +20,6 @@
 #include <DrawViewShell.hxx>
 
 #include <com/sun/star/scanner/XScannerManager2.hpp>
-#include <editeng/outlobj.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <svx/svxids.hrc>
 #include <sfx2/bindings.hxx>
@@ -114,12 +113,12 @@ void DrawViewShell::ScannerEvent()
 
                     if( bInsertNewObject )
                     {
-                        auto pGrafObj = new SdrGrafObj(
+                        rtl::Reference<SdrGrafObj> pGrafObj = new SdrGrafObj(
                             GetView()->getSdrModelFromSdrView(),
                             Graphic(aScanBmp),
                             aRect);
                         SdrPageView* pPV = GetView()->GetSdrPageView();
-                        GetView()->InsertObjectAtView( pGrafObj, *pPV, SdrInsertFlags::SETDEFLAYER );
+                        GetView()->InsertObjectAtView( pGrafObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER );
                     }
                 }
             }

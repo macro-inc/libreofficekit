@@ -19,30 +19,32 @@
 
 #include "DialogModel.hxx"
 #include <RangeSelectionHelper.hxx>
+#include <DataInterpreter.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <DataSourceHelper.hxx>
 #include <DiagramHelper.hxx>
+#include <Diagram.hxx>
 #include <strings.hrc>
 #include <ResId.hxx>
 #include <ControllerLockGuard.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <ChartTypeTemplate.hxx>
 #include <ThreeDHelper.hxx>
 #include <ChartModel.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <LabeledDataSequence.hxx>
 
-#include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/chart2/AxisType.hpp>
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
-#include <com/sun/star/chart2/XChartTypeContainer.hpp>
 #include <com/sun/star/chart2/XDataSeriesContainer.hpp>
-#include <com/sun/star/chart2/data/XDataSink.hpp>
-#include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <rtl/ustring.hxx>
 
 #include <utility>
 #include <algorithm>
+#include <cstddef>
 #include <iterator>
 #include <numeric>
 
@@ -56,14 +58,6 @@ namespace
 {
 constexpr OUStringLiteral lcl_aLabelRole( u"label" );
 
-struct lcl_ChartTypeToSeriesCnt
-{
-    Reference< XDataSeriesContainer > operator() (
-        const Reference< XChartType > & xChartType )
-    {
-        return Reference< XDataSeriesContainer >::query( xChartType );
-    }
-};
 
 OUString lcl_ConvertRole( const OUString & rRoleString )
 {
@@ -125,53 +119,6 @@ lcl_tRoleIndexMap lcl_createRoleIndexMap()
     return aMap;
 }
 
-struct lcl_DataSeriesContainerAppend
-{
-    typedef Reference< XDataSeriesContainer > value_type;
-    typedef std::vector< ::chart::DialogModel::tSeriesWithChartTypeByName > tContainerType;
-
-    explicit lcl_DataSeriesContainerAppend( tContainerType * rCnt )
-            : m_rDestCnt( rCnt )
-    {}
-
-    lcl_DataSeriesContainerAppend & operator= ( const value_type & xVal )
-    {
-        try
-        {
-            if( xVal.is())
-            {
-                const Sequence< Reference< XDataSeries > > aSeq( xVal->getDataSeries());
-                OUString aRole( "values-y" );
-                Reference< XChartType > xCT( xVal, uno::UNO_QUERY );
-                if( xCT.is())
-                    aRole = xCT->getRoleOfSequenceForSeriesLabel();
-                for( Reference< XDataSeries > const & dataSeries : aSeq )
-                {
-                    m_rDestCnt->push_back(
-                        ::chart::DialogModel::tSeriesWithChartTypeByName(
-                            ::chart::DataSeriesHelper::getDataSeriesLabel( dataSeries, aRole ),
-                            std::make_pair( dataSeries, xCT )));
-                }
-            }
-        }
-        catch( const uno::Exception & )
-        {
-            DBG_UNHANDLED_EXCEPTION("chart2");
-        }
-        return *this;
-    }
-
-    // Implement output operator requirements as required by std::copy (and
-    // implement prefix increment in terms of postfix increment to avoid unused
-    // member function warnings for the latter in the common case where
-    // std::copy would not actually need it):
-    lcl_DataSeriesContainerAppend & operator* ()     { return *this; }
-    lcl_DataSeriesContainerAppend & operator++ ()    { return operator++(0); }
-    lcl_DataSeriesContainerAppend & operator++ (int) { return *this; }
-
-private:
-    tContainerType * m_rDestCnt;
-};
 
 struct lcl_RolesWithRangeAppend
 {
@@ -179,9 +126,9 @@ struct lcl_RolesWithRangeAppend
     typedef ::chart::DialogModel::tRolesWithRanges tContainerType;
 
     explicit lcl_RolesWithRangeAppend( tContainerType * rCnt,
-                                       const OUString & aLabelRole )
+                                       OUString aLabelRole )
             : m_rDestCnt( rCnt ),
-              m_aRoleForLabelSeq( aLabelRole )
+              m_aRoleForLabelSeq(std::move( aLabelRole ))
     {}
 
     lcl_RolesWithRangeAppend & operator= ( const value_type & xVal )
@@ -237,16 +184,11 @@ private:
 
 namespace std
 {
-    template<> struct iterator_traits<lcl_DataSeriesContainerAppend>
-    {
-        typedef std::output_iterator_tag iterator_category;
-        typedef Reference< XDataSeriesContainer > value_type;
-    };
-
     template<> struct iterator_traits<lcl_RolesWithRangeAppend>
     {
         typedef std::output_iterator_tag iterator_category;
         typedef Reference< data::XLabeledDataSequence > value_type;
+        typedef value_type& reference;
     };
 }
 
@@ -283,52 +225,43 @@ Sequence< OUString > lcl_CopyExcludingValuesFirst(
     return aOutput;
 }
 
-Reference< XDataSeries > lcl_CreateNewSeries(
-    const Reference< uno::XComponentContext > & xContext,
-    const Reference< XChartType > & xChartType,
+rtl::Reference< ::chart::DataSeries > lcl_CreateNewSeries(
+    const rtl::Reference< ::chart::ChartType > & xChartType,
     sal_Int32 nNewSeriesIndex,
     sal_Int32 nTotalNumberOfSeriesInCTGroup,
-    const Reference< XDiagram > & xDiagram,
-    const Reference< XChartTypeTemplate > & xTemplate,
+    const rtl::Reference< ::chart::Diagram > & xDiagram,
+    const rtl::Reference< ::chart::ChartTypeTemplate > & xTemplate,
     bool bCreateDataCachedSequences )
 {
     // create plain series
-    Reference< XDataSeries > xResult(
-        xContext->getServiceManager()->createInstanceWithContext(
-            "com.sun.star.chart2.DataSeries" ,
-            xContext ), uno::UNO_QUERY );
+    rtl::Reference< ::chart::DataSeries > xResult = new ::chart::DataSeries();
     if( xTemplate.is())
     {
-        Reference< beans::XPropertySet > xResultProp( xResult, uno::UNO_QUERY );
-        if( xResultProp.is())
-        {
-            // @deprecated: correct default color should be found by view
-            // without setting it as hard attribute
-            Reference< XColorScheme > xColorScheme( xDiagram->getDefaultColorScheme());
-            if( xColorScheme.is())
-                xResultProp->setPropertyValue( "Color" , uno::Any( xColorScheme->getColorByIndex( nNewSeriesIndex )));
-        }
-        sal_Int32 nGroupIndex=0;
+        // @deprecated: correct default color should be found by view
+        // without setting it as hard attribute
+        Reference< XColorScheme > xColorScheme( xDiagram->getDefaultColorScheme());
+        if( xColorScheme.is())
+            xResult->setPropertyValue( "Color" , uno::Any( xColorScheme->getColorByIndex( nNewSeriesIndex )));
+        std::size_t nGroupIndex=0;
         if( xChartType.is())
         {
-            Sequence< Reference< XChartType > > aCTs(
+            std::vector< rtl::Reference< ::chart::ChartType > > aCTs(
                 ::chart::DiagramHelper::getChartTypesFromDiagram( xDiagram ));
-            for( ; nGroupIndex<aCTs.getLength(); ++nGroupIndex)
+            for( ; nGroupIndex < aCTs.size(); ++nGroupIndex)
                 if( aCTs[nGroupIndex] == xChartType )
                     break;
-            if( nGroupIndex == aCTs.getLength())
+            if( nGroupIndex == aCTs.size())
                 nGroupIndex = 0;
         }
-        xTemplate->applyStyle( xResult, nGroupIndex, nNewSeriesIndex, nTotalNumberOfSeriesInCTGroup );
+        xTemplate->applyStyle2( xResult, nGroupIndex, nNewSeriesIndex, nTotalNumberOfSeriesInCTGroup );
     }
 
     if( bCreateDataCachedSequences )
     {
         // set chart type specific roles
-        Reference< data::XDataSink > xSink( xResult, uno::UNO_QUERY );
-        if( xChartType.is() && xSink.is())
+        if( xChartType.is() )
         {
-            std::vector< Reference< data::XLabeledDataSequence > > aNewSequences;
+            std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aNewSequences;
             const OUString aRoleOfSeqForSeriesLabel = xChartType->getRoleOfSequenceForSeriesLabel();
             const OUString aLabel(::chart::SchResId(STR_DATA_UNNAMED_SERIES));
             Sequence< OUString > aPossibleRoles( xChartType->getSupportedMandatoryRoles());
@@ -337,7 +270,7 @@ Reference< XDataSeries > lcl_CreateNewSeries(
             //special handling for candlestick type
             if( xTemplate.is())
             {
-                Reference< XDataInterpreter > xInterpreter( xTemplate->getDataInterpreter());
+                rtl::Reference< ::chart::DataInterpreter > xInterpreter( xTemplate->getDataInterpreter2());
                 if( xInterpreter.is())
                 {
                     sal_Int32 nStockVariant;
@@ -381,7 +314,7 @@ Reference< XDataSeries > lcl_CreateNewSeries(
                 aNewSequences.push_back( ::chart::DataSourceHelper::createLabeledDataSequence( xSeq ));
             }
 
-            xSink->setData( comphelper::containerToSequence( aNewSequences ));
+            xResult->setData( aNewSequences );
         }
     }
 
@@ -411,10 +344,8 @@ DialogModelTimeBasedInfo::DialogModelTimeBasedInfo():
 }
 
 DialogModel::DialogModel(
-    const Reference< XChartDocument > & xChartDocument,
-    const Reference< uno::XComponentContext > & xContext ) :
-        m_xChartDocument( xChartDocument ),
-        m_xContext( xContext ),
+    rtl::Reference<::chart::ChartModel> xChartDocument ) :
+        m_xChartDocument(std::move( xChartDocument )),
         m_aTimerTriggeredControllerLock( m_xChartDocument )
 {
 }
@@ -428,7 +359,7 @@ DialogModel::~DialogModel()
 }
 
 void DialogModel::setTemplate(
-    const Reference< XChartTypeTemplate > & xTemplate )
+    const rtl::Reference< ChartTypeTemplate > & xTemplate )
 {
     m_xTemplate = xTemplate;
 }
@@ -443,7 +374,7 @@ std::shared_ptr< RangeSelectionHelper > const &
     return m_spRangeSelectionHelper;
 }
 
-Reference< frame::XModel > DialogModel::getChartModel() const
+const rtl::Reference<::chart::ChartModel> & DialogModel::getChartModel() const
 {
     return m_xChartDocument;
 }
@@ -456,30 +387,25 @@ Reference< data::XDataProvider > DialogModel::getDataProvider() const
     return xResult;
 }
 
-std::vector< Reference< XDataSeriesContainer > >
+std::vector< rtl::Reference< ChartType > >
     DialogModel::getAllDataSeriesContainers() const
 {
-    std::vector< Reference< XDataSeriesContainer > > aResult;
+    std::vector< rtl::Reference< ChartType > > aResult;
 
     try
     {
-        Reference< XDiagram > xDiagram;
-        if( m_xChartDocument.is())
-            xDiagram.set( m_xChartDocument->getFirstDiagram());
+        if( !m_xChartDocument )
+            return {};
+        rtl::Reference< Diagram > xDiagram = m_xChartDocument->getFirstChartDiagram();
         if( xDiagram.is())
         {
-            Reference< XCoordinateSystemContainer > xCooSysCnt(
-                xDiagram, uno::UNO_QUERY_THROW );
-            const Sequence< Reference< XCoordinateSystem > > aCooSysSeq(
-                xCooSysCnt->getCoordinateSystems());
-            for( Reference< XCoordinateSystem > const & coords : aCooSysSeq )
+            const std::vector< rtl::Reference< BaseCoordinateSystem > > & aCooSysSeq(
+                xDiagram->getBaseCoordinateSystems());
+            for( rtl::Reference< BaseCoordinateSystem > const & coords : aCooSysSeq )
             {
-                Reference< XChartTypeContainer > xCTCnt( coords, uno::UNO_QUERY_THROW );
-                const Sequence< Reference< XChartType > > aChartTypeSeq( xCTCnt->getChartTypes());
-                std::transform(
-                    aChartTypeSeq.begin(), aChartTypeSeq.end(),
-                    std::back_inserter( aResult ),
-                    lcl_ChartTypeToSeriesCnt() );
+
+                for (const auto & rxChartType : coords->getChartTypes2())
+                    aResult.push_back(rxChartType);
             }
         }
     }
@@ -495,11 +421,29 @@ std::vector< DialogModel::tSeriesWithChartTypeByName >
     DialogModel::getAllDataSeriesWithLabel() const
 {
     std::vector< tSeriesWithChartTypeByName > aResult;
-    std::vector< Reference< XDataSeriesContainer > > aContainers(
+    std::vector< rtl::Reference< ChartType > > aContainers(
         getAllDataSeriesContainers());
 
-    std::copy( aContainers.begin(), aContainers.end(),
-                 lcl_DataSeriesContainerAppend( &aResult ));
+    for (const auto & rxChartType : aContainers )
+    {
+        try
+        {
+            const std::vector< rtl::Reference< DataSeries > > & aSeq = rxChartType->getDataSeries2();
+            OUString aRole = rxChartType->getRoleOfSequenceForSeriesLabel();
+            for( rtl::Reference< DataSeries > const & dataSeries : aSeq )
+            {
+                aResult.push_back(
+                    ::chart::DialogModel::tSeriesWithChartTypeByName(
+                        ::chart::DataSeriesHelper::getDataSeriesLabel( dataSeries, aRole ),
+                        std::make_pair( dataSeries, rxChartType )));
+            }
+        }
+        catch( const uno::Exception & )
+        {
+            DBG_UNHANDLED_EXCEPTION("chart2");
+        }
+    }
+
     return aResult;
 }
 
@@ -524,15 +468,13 @@ void addMissingRoles(DialogModel::tRolesWithRanges& rResult, const uno::Sequence
  * @param xNewSeries new data series to insert.
  */
 void addNewSeriesToContainer(
-    const Reference<XChartType>& xChartType,
-    const Reference<XDataSeries>& xSeries,
-    const Reference<XDataSeries>& xNewSeries )
+    const rtl::Reference<ChartType>& xChartType,
+    const rtl::Reference<DataSeries>& xSeries,
+    const rtl::Reference<DataSeries>& xNewSeries )
 {
-    Reference<XDataSeriesContainer> xSeriesCnt(xChartType, uno::UNO_QUERY_THROW);
-    auto aSeries = comphelper::sequenceToContainer<std::vector<Reference<XDataSeries> >>(xSeriesCnt->getDataSeries());
+    auto aSeries = xChartType->getDataSeries2();
 
-    std::vector<Reference<XDataSeries> >::iterator aIt =
-        std::find( aSeries.begin(), aSeries.end(), xSeries);
+    auto aIt = std::find( aSeries.begin(), aSeries.end(), xSeries);
 
     if( aIt == aSeries.end())
         // if we have no series we insert at the first position.
@@ -542,7 +484,7 @@ void addNewSeriesToContainer(
         ++aIt;
 
     aSeries.insert(aIt, xNewSeries);
-    xSeriesCnt->setDataSeries(comphelper::containerToSequence(aSeries));
+    xChartType->setDataSeries(aSeries);
 }
 
 }
@@ -550,7 +492,7 @@ void addNewSeriesToContainer(
 DialogModel::tRolesWithRanges DialogModel::getRolesWithRanges(
     const Reference< XDataSeries > & xSeries,
     const OUString & aRoleOfSequenceForLabel,
-    const Reference< chart2::XChartType > & xChartType )
+    const rtl::Reference< ::chart::ChartType > & xChartType )
 {
     DialogModel::tRolesWithRanges aResult;
     try
@@ -588,42 +530,42 @@ void DialogModel::moveSeries(
     m_aTimerTriggeredControllerLock.startTimer();
     ControllerLockGuardUNO aLockedControllers( m_xChartDocument );
 
-    Reference< XDiagram > xDiagram( m_xChartDocument->getFirstDiagram());
+    rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram());
     DiagramHelper::moveSeries( xDiagram, xSeries, eDirection==MoveDirection::Down );
 }
 
-Reference< chart2::XDataSeries > DialogModel::insertSeriesAfter(
-    const Reference< XDataSeries > & xSeries,
-    const Reference< XChartType > & xChartType,
+rtl::Reference< ::chart::DataSeries > DialogModel::insertSeriesAfter(
+    const Reference< XDataSeries > & xUnoSeries,
+    const rtl::Reference< ::chart::ChartType > & xChartType,
     bool bCreateDataCachedSequences /* = false */ )
 {
     m_aTimerTriggeredControllerLock.startTimer();
     ControllerLockGuardUNO aLockedControllers( m_xChartDocument );
-    Reference< XDataSeries > xNewSeries;
+    rtl::Reference< ::chart::DataSeries > xNewSeries;
+    rtl::Reference<DataSeries> xSeries = dynamic_cast<DataSeries*>(xUnoSeries.get());
+    assert(xSeries || !xUnoSeries);
 
     try
     {
-        Reference< chart2::XDiagram > xDiagram( m_xChartDocument->getFirstDiagram() );
+        rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram() );
         ThreeDLookScheme e3DScheme = ThreeDHelper::detectScheme( xDiagram );
 
         sal_Int32 nSeriesInChartType = 0;
         const sal_Int32 nTotalSeries = countSeries();
         if( xChartType.is())
         {
-            Reference< XDataSeriesContainer > xCnt( xChartType, uno::UNO_QUERY_THROW );
-            nSeriesInChartType = xCnt->getDataSeries().getLength();
+            nSeriesInChartType = xChartType->getDataSeries().getLength();
         }
 
         // create new series
-        xNewSeries.set(
+        xNewSeries =
             lcl_CreateNewSeries(
-                m_xContext,
                 xChartType,
                 nTotalSeries, // new series' index
                 nSeriesInChartType,
                 xDiagram,
                 m_xTemplate,
-                bCreateDataCachedSequences ));
+                bCreateDataCachedSequences );
 
         // add new series to container
         if( xNewSeries.is())
@@ -640,7 +582,7 @@ Reference< chart2::XDataSeries > DialogModel::insertSeriesAfter(
 
 void DialogModel::deleteSeries(
     const Reference< XDataSeries > & xSeries,
-    const Reference< XChartType > & xChartType )
+    const rtl::Reference< ChartType > & xChartType )
 {
     m_aTimerTriggeredControllerLock.startTimer();
     ControllerLockGuardUNO aLockedControllers( m_xChartDocument );
@@ -648,15 +590,15 @@ void DialogModel::deleteSeries(
     DataSeriesHelper::deleteSeries( xSeries, xChartType );
 }
 
-Reference< data::XLabeledDataSequence > DialogModel::getCategories() const
+uno::Reference< chart2::data::XLabeledDataSequence > DialogModel::getCategories() const
 {
-    Reference< data::XLabeledDataSequence > xResult;
+    uno::Reference< chart2::data::XLabeledDataSequence > xResult;
     try
     {
         if( m_xChartDocument.is())
         {
-            Reference< chart2::XDiagram > xDiagram( m_xChartDocument->getFirstDiagram());
-            xResult.set( DiagramHelper::getCategoriesFromDiagram( xDiagram ));
+            rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram());
+            xResult = DiagramHelper::getCategoriesFromDiagram( xDiagram );
         }
     }
     catch( const uno::Exception & )
@@ -671,14 +613,14 @@ void DialogModel::setCategories( const Reference< chart2::data::XLabeledDataSequ
     if( !m_xChartDocument.is())
         return;
 
-    Reference< chart2::XDiagram > xDiagram( m_xChartDocument->getFirstDiagram());
+    rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram());
     if( !xDiagram.is())
         return;
 
     // categories
     bool bSupportsCategories = true;
 
-    Reference< XChartType > xFirstChartType( DiagramHelper::getChartTypeByIndex( xDiagram, 0 ) );
+    rtl::Reference< ChartType > xFirstChartType( DiagramHelper::getChartTypeByIndex( xDiagram, 0 ) );
     if( xFirstChartType.is() )
     {
         sal_Int32 nAxisType = ChartTypeHelper::getAxisType( xFirstChartType, 0 ); // x-axis
@@ -689,13 +631,20 @@ void DialogModel::setCategories( const Reference< chart2::data::XLabeledDataSequ
 
 OUString DialogModel::getCategoriesRange() const
 {
-    Reference< data::XLabeledDataSequence > xLSeq( getCategories());
     OUString aRange;
-    if( xLSeq.is())
+    try
     {
-        Reference< data::XDataSequence > xSeq( xLSeq->getValues());
-        if( xSeq.is())
-            aRange = xSeq->getSourceRangeRepresentation();
+        uno::Reference< chart2::data::XLabeledDataSequence > xLSeq( getCategories());
+        if( xLSeq.is())
+        {
+            Reference< data::XDataSequence > xSeq( xLSeq->getValues());
+            if( xSeq.is())
+                aRange = xSeq->getSourceRangeRepresentation();
+        }
+    }
+    catch (const lang::DisposedException&)
+    {
+        TOOLS_WARN_EXCEPTION( "chart2", "unexpected exception caught" );
     }
     return aRange;
 }
@@ -704,7 +653,7 @@ bool DialogModel::isCategoryDiagram() const
 {
     bool bRet = false;
     if( m_xChartDocument.is())
-        bRet = DiagramHelper::isCategoryDiagram( m_xChartDocument->getFirstDiagram() );
+        bRet = DiagramHelper::isCategoryDiagram( m_xChartDocument->getFirstChartDiagram() );
     return bRet;
 }
 
@@ -722,7 +671,7 @@ void DialogModel::detectArguments(
         if( m_xChartDocument.is())
         {
             (void)DataSourceHelper::detectRangeSegmentation(
-                Reference< frame::XModel >( m_xChartDocument, uno::UNO_QUERY_THROW ),
+                m_xChartDocument,
                 rOutRangeString, aSequenceMapping, rOutUseColumns, rOutFirstCellAsLabel, rOutHasCategories );
         }
     }
@@ -761,19 +710,19 @@ void DialogModel::setData(
         Reference< chart2::data::XDataSource > xDataSource(
             xDataProvider->createDataSource( rArguments ) );
 
-        Reference< chart2::XDataInterpreter > xInterpreter(
-            m_xTemplate->getDataInterpreter());
+        rtl::Reference< ::chart::DataInterpreter > xInterpreter(
+            m_xTemplate->getDataInterpreter2());
         if( xInterpreter.is())
         {
-            Reference< chart2::XDiagram > xDiagram( m_xChartDocument->getFirstDiagram() );
+            rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram() );
             ThreeDLookScheme e3DScheme = ThreeDHelper::detectScheme( xDiagram );
 
-            std::vector< Reference< XDataSeries > > aSeriesToReUse(
-                DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
+            std::vector< rtl::Reference< DataSeries > > aSeriesToReUse =
+                DiagramHelper::getDataSeriesFromDiagram( xDiagram );
             applyInterpretedData(
                 xInterpreter->interpretDataSource(
                     xDataSource, rArguments,
-                    comphelper::containerToSequence( aSeriesToReUse )),
+                    aSeriesToReUse ),
                 aSeriesToReUse);
 
             ThreeDHelper::setScheme( xDiagram, e3DScheme );
@@ -817,13 +766,13 @@ sal_Int32 DialogModel::GetRoleIndexForSorting( const OUString & rInternalRoleStr
 
 void DialogModel::applyInterpretedData(
     const InterpretedData & rNewData,
-    const std::vector< Reference< XDataSeries > > & rSeriesToReUse )
+    const std::vector< rtl::Reference< DataSeries > > & rSeriesToReUse )
 {
     if( ! m_xChartDocument.is())
         return;
 
     m_aTimerTriggeredControllerLock.startTimer();
-    Reference< XDiagram > xDiagram( m_xChartDocument->getFirstDiagram());
+    rtl::Reference< Diagram > xDiagram( m_xChartDocument->getFirstChartDiagram());
     if( !xDiagram.is())
         return;
 
@@ -833,43 +782,40 @@ void DialogModel::applyInterpretedData(
         sal_Int32 nGroup = 0;
         sal_Int32 nSeriesCounter = 0;
         sal_Int32 nNewSeriesIndex = static_cast< sal_Int32 >( rSeriesToReUse.size());
-        const sal_Int32 nOuterSize=rNewData.Series.getLength();
+        const sal_Int32 nOuterSize=rNewData.Series.size();
 
         for(; nGroup < nOuterSize; ++nGroup)
         {
-            Sequence< Reference< XDataSeries > > aSeries( rNewData.Series[ nGroup ] );
-            const sal_Int32 nSeriesInGroup = aSeries.getLength();
+            const std::vector< rtl::Reference< DataSeries > > & aSeries( rNewData.Series[ nGroup ] );
+            const sal_Int32 nSeriesInGroup = aSeries.size();
             for( sal_Int32 nSeries=0; nSeries<nSeriesInGroup; ++nSeries, ++nSeriesCounter )
             {
                 if( std::find( rSeriesToReUse.begin(), rSeriesToReUse.end(), aSeries[nSeries] )
                     == rSeriesToReUse.end())
                 {
-                    Reference< beans::XPropertySet > xSeriesProp( aSeries[nSeries], uno::UNO_QUERY );
-                    if( xSeriesProp.is())
+                    if( aSeries[nSeries].is())
                     {
                         // @deprecated: correct default color should be found by view
                         // without setting it as hard attribute
                         Reference< XColorScheme > xColorScheme( xDiagram->getDefaultColorScheme());
                         if( xColorScheme.is())
-                            xSeriesProp->setPropertyValue( "Color" ,
+                            aSeries[nSeries]->setPropertyValue( "Color" ,
                                 uno::Any( xColorScheme->getColorByIndex( nSeriesCounter )));
                     }
-                    m_xTemplate->applyStyle( aSeries[nSeries], nGroup, nNewSeriesIndex++, nSeriesInGroup );
+                    m_xTemplate->applyStyle2( aSeries[nSeries], nGroup, nNewSeriesIndex++, nSeriesInGroup );
                 }
             }
         }
     }
 
     // data series
-    std::vector< Reference< XDataSeriesContainer > > aSeriesCnt( getAllDataSeriesContainers());
-    auto aNewSeries(
-        comphelper::sequenceToContainer<std::vector< Sequence< Reference< XDataSeries > > >>( rNewData.Series ));
+    std::vector< rtl::Reference< ChartType > > aSeriesCnt = getAllDataSeriesContainers();
 
-    OSL_ASSERT( aSeriesCnt.size() == aNewSeries.size());
+    OSL_ASSERT( aSeriesCnt.size() == rNewData.Series.size());
 
-    std::vector< Sequence< Reference< XDataSeries > > >::const_iterator aSrcIt( aNewSeries.begin());
-    std::vector< Reference< XDataSeriesContainer > >::iterator aDestIt( aSeriesCnt.begin());
-    for(; aSrcIt != aNewSeries.end() && aDestIt != aSeriesCnt.end();
+    auto aSrcIt = rNewData.Series.begin();
+    auto aDestIt = aSeriesCnt.begin();
+    for(; aSrcIt != rNewData.Series.end() && aDestIt != aSeriesCnt.end();
         ++aSrcIt, ++aDestIt )
     {
         try
@@ -888,16 +834,13 @@ void DialogModel::applyInterpretedData(
 
 sal_Int32 DialogModel::countSeries() const
 {
-    std::vector< Reference< XDataSeriesContainer > > aCnt( getAllDataSeriesContainers());
+    std::vector< rtl::Reference< ChartType > > aCnt( getAllDataSeriesContainers());
     return std::accumulate( aCnt.begin(), aCnt.end(), 0, lcl_addSeriesNumber());
 }
 
 ChartModel& DialogModel::getModel() const
 {
-    uno::Reference< frame::XModel > xModel = getChartModel();
-    ChartModel* pModel = dynamic_cast<ChartModel*>(xModel.get());
-    assert(pModel);
-    return *pModel;
+    return *m_xChartDocument;
 }
 
 } //  namespace chart

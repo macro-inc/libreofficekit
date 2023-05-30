@@ -17,9 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/stream.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/vectorgraphicdata.hxx>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
@@ -140,16 +141,6 @@ bool VectorGraphicData::operator==(const VectorGraphicData& rCandidate) const
     return false;
 }
 
-void VectorGraphicData::setWmfExternalHeader(const WmfExternal& aExtHeader)
-{
-    if (!mpExternalHeader)
-    {
-        mpExternalHeader.reset( new WmfExternal );
-    }
-
-    *mpExternalHeader = aExtHeader;
-}
-
 void VectorGraphicData::ensurePdfReplacement()
 {
     assert(getType() == VectorGraphicDataType::Pdf);
@@ -205,10 +196,8 @@ void VectorGraphicData::ensureSequenceAndRange()
     {
         case VectorGraphicDataType::Svg:
         {
-            css::uno::Sequence<sal_Int8> aDataSequence(maDataContainer.getSize());
-            std::copy(maDataContainer.cbegin(), maDataContainer.cend(), aDataSequence.getArray());
+            css::uno::Sequence<sal_Int8> aDataSequence = maDataContainer.getAsSequence();
             const uno::Reference<io::XInputStream> xInputStream(new comphelper::SequenceInputStream(aDataSequence));
-
 
             const uno::Reference< graphic::XSvgParser > xSvgParser = graphic::SvgTools::create(xContext);
 
@@ -222,19 +211,13 @@ void VectorGraphicData::ensureSequenceAndRange()
         {
             const uno::Reference< graphic::XEmfParser > xEmfParser = graphic::EmfTools::create(xContext);
 
-            css::uno::Sequence<sal_Int8> aDataSequence(maDataContainer.getSize());
-            std::copy(maDataContainer.cbegin(), maDataContainer.cend(), aDataSequence.getArray());
+            css::uno::Sequence<sal_Int8> aDataSequence = maDataContainer.getAsSequence();
             const uno::Reference<io::XInputStream> xInputStream(new comphelper::SequenceInputStream(aDataSequence));
-
-            uno::Sequence< ::beans::PropertyValue > aPropertySequence;
-
-            if (mpExternalHeader)
-            {
-                aPropertySequence = mpExternalHeader->getSequence();
-            }
 
             if (xInputStream.is())
             {
+                uno::Sequence< ::beans::PropertyValue > aPropertySequence;
+
                 // Pass the size hint of the graphic to the EMF parser.
                 geometry::RealPoint2D aSizeHint;
                 aSizeHint.X = maSizeHint.getX();
@@ -243,9 +226,7 @@ void VectorGraphicData::ensureSequenceAndRange()
 
                 if (!mbEnableEMFPlus)
                 {
-                    auto aVector = comphelper::sequenceToContainer<std::vector<beans::PropertyValue>>(aPropertySequence);
-                    aVector.push_back(comphelper::makePropertyValue("EMFPlusEnable", uno::makeAny(false)));
-                    aPropertySequence = comphelper::containerToSequence(aVector);
+                    aPropertySequence = { comphelper::makePropertyValue("EMFPlusEnable", uno::Any(false)) };
                 }
 
                 maSequence = comphelper::sequenceToContainer<std::deque<css::uno::Reference< css::graphic::XPrimitive2D >>>(xEmfParser->getDecomposition(xInputStream, OUString(), aPropertySequence));
@@ -257,7 +238,7 @@ void VectorGraphicData::ensureSequenceAndRange()
         {
             const uno::Reference<graphic::XPdfDecomposer> xPdfDecomposer = graphic::PdfTools::create(xContext);
             uno::Sequence<beans::PropertyValue> aDecompositionParameters = comphelper::InitPropertySequence({
-                {"PageIndex", uno::makeAny<sal_Int32>(mnPageIndex)},
+                {"PageIndex", uno::Any(sal_Int32(mnPageIndex))},
             });
 
             rtl::Reference<UnoBinaryDataContainer> xDataContainer = new UnoBinaryDataContainer(getBinaryDataContainer());
@@ -310,10 +291,10 @@ std::pair<VectorGraphicData::State, size_t> VectorGraphicData::getSizeBytes() co
 }
 
 VectorGraphicData::VectorGraphicData(
-    const BinaryDataContainer& rDataContainer,
+    BinaryDataContainer aDataContainer,
     VectorGraphicDataType eVectorDataType,
     sal_Int32 nPageIndex)
-:   maDataContainer(rDataContainer),
+:   maDataContainer(std::move(aDataContainer)),
     mbSequenceCreated(false),
     mNestedBitmapSize(0),
     meType(eVectorDataType),
@@ -335,13 +316,11 @@ VectorGraphicData::VectorGraphicData(
     const sal_uInt32 nStmLen(rIStm.remainingSize());
     if (nStmLen)
     {
-        VectorGraphicDataArray aVectorGraphicDataArray(nStmLen);
-        auto pData = aVectorGraphicDataArray.getArray();
-        rIStm.ReadBytes(pData, nStmLen);
+        BinaryDataContainer aData(rIStm, nStmLen);
 
         if (!rIStm.GetError())
         {
-            maDataContainer = BinaryDataContainer(reinterpret_cast<const sal_uInt8*>(pData), nStmLen);
+            maDataContainer = aData;
         }
     }
 }

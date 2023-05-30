@@ -18,6 +18,7 @@
  */
 
 #include <ImplLayoutRuns.hxx>
+#include <algorithm>
 
 void ImplLayoutRuns::AddPos( int nCharPos, bool bRTL )
 {
@@ -52,11 +53,7 @@ void ImplLayoutRuns::AddRun( int nCharPos0, int nCharPos1, bool bRTL )
 
     // swap if needed
     if( bRTL == (nCharPos0 < nCharPos1) )
-    {
-        int nTemp = nCharPos0;
-        nCharPos0 = nCharPos1;
-        nCharPos1 = nTemp;
-    }
+        std::swap( nCharPos0, nCharPos1 );
 
     if (maRuns.size() >= 2 && nCharPos0 == maRuns[maRuns.size() - 2] && nCharPos1 == maRuns[maRuns.size() - 1])
     {
@@ -77,11 +74,7 @@ bool ImplLayoutRuns::PosIsInRun( int nCharPos ) const
     int nMinCharPos = maRuns[ mnRunIndex+0 ];
     int nEndCharPos = maRuns[ mnRunIndex+1 ];
     if( nMinCharPos > nEndCharPos ) // reversed in RTL case
-    {
-        int nTemp = nMinCharPos;
-        nMinCharPos = nEndCharPos;
-        nEndCharPos = nTemp;
-    }
+        std::swap( nMinCharPos, nEndCharPos );
 
     if( nCharPos < nMinCharPos )
         return false;

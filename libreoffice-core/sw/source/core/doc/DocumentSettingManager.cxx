@@ -104,7 +104,11 @@ sw::DocumentSettingManager::DocumentSettingManager(SwDoc &rDoc)
     mbFrameAutowidthWithMorePara(false),
     mbGutterAtTop(false),
     mbFootnoteInColumnToPageEnd(false),
-    mnImagePreferredDPI(0)
+    mnImagePreferredDPI(0),
+    mbAutoFirstLineIndentDisregardLineSpace(true),
+    mbWrapAsCharFlysLikeInOOXML(false),
+    mbNoNumberingShowFollowBy(false),
+    mbDropCapPunctuation(true)
 
     // COMPATIBILITY FLAGS END
 {
@@ -119,7 +123,7 @@ sw::DocumentSettingManager::DocumentSettingManager(SwDoc &rDoc)
         mbParaSpaceMax                      = aOptions.GetDefault( SvtCompatibilityEntry::Index::AddSpacing );
         mbParaSpaceMaxAtPages               = aOptions.GetDefault( SvtCompatibilityEntry::Index::AddSpacingAtPages );
         mbTabCompat                         = !aOptions.GetDefault( SvtCompatibilityEntry::Index::UseOurTabStops );
-        mbUseVirtualDevice                  = !aOptions.GetDefault( SvtCompatibilityEntry::Index::UsePrtMetrics );
+        mbUseVirtualDevice                  = true;
         mbAddExternalLeading                = !aOptions.GetDefault( SvtCompatibilityEntry::Index::NoExtLeading );
         mbOldLineSpacing                    = aOptions.GetDefault( SvtCompatibilityEntry::Index::UseLineSpacing );
         mbAddParaSpacingToTableCells        = aOptions.GetDefault( SvtCompatibilityEntry::Index::AddTableSpacing );
@@ -241,6 +245,12 @@ bool sw::DocumentSettingManager::get(/*[in]*/ DocumentSettingId id) const
         case DocumentSettingId::GUTTER_AT_TOP:
             return mbGutterAtTop;
         case DocumentSettingId::FOOTNOTE_IN_COLUMN_TO_PAGEEND: return mbFootnoteInColumnToPageEnd;
+        case DocumentSettingId::AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE:
+            return mbAutoFirstLineIndentDisregardLineSpace;
+        case DocumentSettingId::HYPHENATE_URLS: return mbHyphenateURLs;
+        case DocumentSettingId::WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML: return mbWrapAsCharFlysLikeInOOXML;
+        case DocumentSettingId::NO_NUMBERING_SHOW_FOLLOWBY: return mbNoNumberingShowFollowBy;
+        case DocumentSettingId::DROP_CAP_PUNCTUATION: return mbDropCapPunctuation;
         default:
             OSL_FAIL("Invalid setting id");
     }
@@ -413,6 +423,26 @@ void sw::DocumentSettingManager::set(/*[in]*/ DocumentSettingId id, /*[in]*/ boo
 
         case DocumentSettingId::SUBTRACT_FLYS:
             mbSubtractFlys = value;
+            break;
+
+        case DocumentSettingId::AUTO_FIRST_LINE_INDENT_DISREGARD_LINE_SPACE:
+            mbAutoFirstLineIndentDisregardLineSpace = value;
+            break;
+
+        case DocumentSettingId::HYPHENATE_URLS:
+            mbHyphenateURLs = value;
+            break;
+
+        case DocumentSettingId::WRAP_AS_CHAR_FLYS_LIKE_IN_OOXML:
+            mbWrapAsCharFlysLikeInOOXML = value;
+            break;
+
+        case DocumentSettingId::NO_NUMBERING_SHOW_FOLLOWBY:
+            mbNoNumberingShowFollowBy = value;
+            break;
+
+        case DocumentSettingId::DROP_CAP_PUNCTUATION:
+            mbDropCapPunctuation = value;
             break;
 
         // COMPATIBILITY FLAGS END
@@ -686,6 +716,7 @@ void sw::DocumentSettingManager::ReplaceCompatibilityOptions(const DocumentSetti
     mbHeaderSpacingBelowLastPara = rSource.mbHeaderSpacingBelowLastPara;
     mbFrameAutowidthWithMorePara = rSource.mbFrameAutowidthWithMorePara;
     mbFootnoteInColumnToPageEnd = rSource.mbFootnoteInColumnToPageEnd;
+    mbDropCapPunctuation = rSource.mbDropCapPunctuation;
 }
 
 sal_uInt32 sw::DocumentSettingManager::Getn32DummyCompatibilityOptions1() const
@@ -1008,6 +1039,10 @@ void sw::DocumentSettingManager::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("mbFootnoteInColumnToPageEnd"));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("value"),
                                 BAD_CAST(OString::boolean(mbFootnoteInColumnToPageEnd).getStr()));
+
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("mbHyphenateURLs"));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("value"),
+                                BAD_CAST(OString::boolean(mbHyphenateURLs).getStr()));
 
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("mnImagePreferredDPI"));
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("value"),

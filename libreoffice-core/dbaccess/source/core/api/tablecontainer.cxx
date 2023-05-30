@@ -17,13 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <apitools.hxx>
 #include <tablecontainer.hxx>
 #include <table.hxx>
 #include <comphelper/property.hxx>
 #include <comphelper/processfactory.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/PropertyState.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
@@ -40,7 +40,7 @@
 #include <sdbcoretools.hxx>
 #include <ContainerMediator.hxx>
 #include <objectnameapproval.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace dbaccess;
 using namespace dbtools;
@@ -62,26 +62,24 @@ namespace
     bool lcl_isPropertySetDefaulted(const Sequence< OUString>& _aNames,const Reference<XPropertySet>& _xProp)
     {
         Reference<XPropertyState> xState(_xProp,UNO_QUERY);
-        if ( xState.is() )
+        if ( !xState )
+            return false;
+        const OUString* pIter = _aNames.getConstArray();
+        const OUString* pEnd   = pIter + _aNames.getLength();
+        for(;pIter != pEnd;++pIter)
         {
-            const OUString* pIter = _aNames.getConstArray();
-            const OUString* pEnd   = pIter + _aNames.getLength();
-            for(;pIter != pEnd;++pIter)
+            try
             {
-                try
-                {
-                    PropertyState aState = xState->getPropertyState(*pIter);
-                    if ( aState != PropertyState_DEFAULT_VALUE )
-                        break;
-                }
-                catch(const Exception&)
-                {
-                    TOOLS_WARN_EXCEPTION("dbaccess", "" );
-                }
+                PropertyState aState = xState->getPropertyState(*pIter);
+                if ( aState != PropertyState_DEFAULT_VALUE )
+                    break;
             }
-            return ( pIter == pEnd );
+            catch(const Exception&)
+            {
+                TOOLS_WARN_EXCEPTION("dbaccess", "" );
+            }
         }
-        return false;
+        return ( pIter == pEnd );
     }
 }
 
@@ -158,7 +156,7 @@ void lcl_createDefinitionObject(const OUString& _rName
     {
         // set as folder
         _xTableDefinition = TableDefinition::createWithName( ::comphelper::getProcessComponentContext(), _rName );
-        _xTableDefinitions->insertByName(_rName,makeAny(_xTableDefinition));
+        _xTableDefinitions->insertByName(_rName,Any(_xTableDefinition));
     }
     Reference<XColumnsSupplier> xColumnsSupplier(_xTableDefinition,UNO_QUERY);
     if ( xColumnsSupplier.is() )
@@ -410,7 +408,7 @@ void SAL_CALL OTableContainer::elementInserted( const ContainerEvent& Event )
             ObjectType xName = createObject(sName);
             insertElement(sName,xName);
             // and notify our listeners
-            ContainerEvent aEvent(static_cast<XContainer*>(this), makeAny(sName), makeAny(xName), Any());
+            ContainerEvent aEvent(static_cast<XContainer*>(this), Any(sName), Any(xName), Any());
             m_aContainerListeners.notifyEach( &XContainerListener::elementInserted, aEvent );
         }
     }

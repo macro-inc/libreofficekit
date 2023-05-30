@@ -23,8 +23,8 @@
 #include <com/sun/star/drawing/framework/XControllerManager.hpp>
 #include <com/sun/star/drawing/framework/XView.hpp>
 #include <comphelper/servicehelper.hxx>
-#include <cppuhelper/compbase.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/compbase.hxx>
+#include <comphelper/diagnose_ex.hxx>
 #include <slideshow.hxx>
 
 namespace com::sun::star::uno { class XComponentContext; }
@@ -39,16 +39,13 @@ namespace sd::framework {
 
 namespace {
 
-typedef ::cppu::WeakComponentImplHelper <lang::XInitialization> PresentationFactoryProviderInterfaceBase;
+typedef comphelper::WeakComponentImplHelper<lang::XInitialization> PresentationFactoryProviderInterfaceBase;
 
 class PresentationFactoryProvider
-    : protected MutexOwner,
-      public PresentationFactoryProviderInterfaceBase
+    : public PresentationFactoryProviderInterfaceBase
 {
 public:
     PresentationFactoryProvider ();
-
-    virtual void SAL_CALL disposing() override;
 
     // XInitialization
 
@@ -56,19 +53,18 @@ public:
         const css::uno::Sequence<css::uno::Any>& aArguments) override;
 };
 
-typedef ::cppu::WeakComponentImplHelper <XView> PresentationViewInterfaceBase;
+typedef comphelper::WeakComponentImplHelper<XView> PresentationViewInterfaceBase;
 
 /** The PresentationView is not an actual view, it is a marker whose
     existence in a configuration indicates that a slideshow is running
     (in another application window).
 */
 class PresentationView
-    : protected MutexOwner,
-      public PresentationViewInterfaceBase
+    : public PresentationViewInterfaceBase
 {
 public:
     explicit PresentationView (const Reference<XResourceId>& rxViewId)
-        : PresentationViewInterfaceBase(maMutex),mxResourceId(rxViewId) {};
+        : mxResourceId(rxViewId) {};
 
     // XView
 
@@ -90,16 +86,11 @@ constexpr OUStringLiteral gsPresentationViewURL = u"private:resource/view/Presen
 
 PresentationFactory::PresentationFactory (
     const Reference<frame::XController>& rxController)
-    : PresentationFactoryInterfaceBase(MutexOwner::maMutex),
-      mxController(rxController)
+    : mxController(rxController)
 {
 }
 
 PresentationFactory::~PresentationFactory()
-{
-}
-
-void SAL_CALL PresentationFactory::disposing()
 {
 }
 
@@ -145,7 +136,7 @@ void SAL_CALL PresentationFactory::disposing (
 
 void PresentationFactory::ThrowIfDisposed() const
 {
-    if (rBHelper.bDisposed || rBHelper.bInDispose)
+    if (m_bDisposed)
     {
         throw lang::DisposedException ("PresentationFactory object has already been disposed",
             const_cast<uno::XWeak*>(static_cast<const uno::XWeak*>(this)));
@@ -157,11 +148,6 @@ namespace {
 //===== PresentationFactoryProvider ===========================================
 
 PresentationFactoryProvider::PresentationFactoryProvider ()
-    : PresentationFactoryProviderInterfaceBase(maMutex)
-{
-}
-
-void PresentationFactoryProvider::disposing()
 {
 }
 

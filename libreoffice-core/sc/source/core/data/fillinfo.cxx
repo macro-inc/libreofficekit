@@ -53,7 +53,7 @@ static void lcl_GetMergeRange( SCCOL nX, SCROW nY, SCSIZE nArrY,
                             SCCOL nX1, SCROW nY1, SCTAB nTab,
                             SCCOL& rStartX, SCROW& rStartY, SCCOL& rEndX, SCROW& rEndY )
 {
-    CellInfo* pInfo = &pRowInfo[nArrY].cellInfo(nX);
+    ScCellInfo* pInfo = &pRowInfo[nArrY].cellInfo(nX);
 
     rStartX = nX;
     rStartY = nY;
@@ -225,6 +225,7 @@ void initRowInfo(const ScDocument* pDoc, RowInfo* pRowInfo, const SCSIZE nMaxRow
             pThisRowInfo->bChanged      = true;
             pThisRowInfo->bAutoFilter   = false;
             pThisRowInfo->bPivotButton  = false;
+            pThisRowInfo->bPivotToggle  = false;
             pThisRowInfo->nRotMaxCol    = SC_ROTMAX_NONE;
 
             ++rArrRow;
@@ -258,7 +259,7 @@ void initCellInfo(RowInfo* pRowInfo, SCSIZE nArrCount, SCCOL nStartCol, SCCOL nR
 
         for (SCCOL nCol = nMinCol-1; nCol <= nRotMax+1; ++nCol) // Preassign cell info
         {
-            CellInfo& rInfo = rThisRowInfo.cellInfo(nCol);
+            ScCellInfo& rInfo = rThisRowInfo.cellInfo(nCol);
             rInfo.pShadowAttr    = pDefShadow;
         }
     }
@@ -283,7 +284,7 @@ void initColWidths(RowInfo* pRowInfo, const ScDocument* pDoc, double fColScale, 
 }
 
 bool handleConditionalFormat(ScConditionalFormatList& rCondFormList, const ScCondFormatIndexes& rCondFormats,
-        CellInfo* pInfo, ScTableInfo* pTableInfo, ScStyleSheetPool* pStlPool,
+        ScCellInfo* pInfo, ScTableInfo* pTableInfo, ScStyleSheetPool* pStlPool,
         const ScAddress& rAddr, bool& bHidden, bool& bHideFormula, bool bTabProtect)
 {
     bool bFound = false;
@@ -309,10 +310,9 @@ bool handleConditionalFormat(ScConditionalFormatList& rCondFormList, const ScCon
                 // TODO: moggi: looks like there is a bug around bHidden and bHideFormula
                 //              They are normally for the whole pattern and not for a single cell
                 // we need to check already here for protected cells
-                const SfxPoolItem* pItem;
-                if ( bTabProtect && pInfo->pConditionSet->GetItemState( ATTR_PROTECTION, true, &pItem ) == SfxItemState::SET )
+                const ScProtectionAttr* pProtAttr;
+                if ( bTabProtect && (pProtAttr = pInfo->pConditionSet->GetItemIfSet( ATTR_PROTECTION )) )
                 {
-                    const ScProtectionAttr* pProtAttr = static_cast<const ScProtectionAttr*>(pItem);
                     bHidden = pProtAttr->GetHideCell();
                     bHideFormula = pProtAttr->GetHideFormula();
 
@@ -508,6 +508,9 @@ void ScDocument::FillInfo(
                         bool bScenario(nOverlap & ScMF::Scenario);
                         bool bPivotPopupButton(nOverlap & ScMF::ButtonPopup);
                         bool bFilterActive(nOverlap & ScMF::HiddenMember);
+                        bool bPivotCollapseButton(nOverlap & ScMF::DpCollapse);
+                        bool bPivotExpandButton(nOverlap & ScMF::DpExpand);
+                        bool bPivotPopupButtonMulti(nOverlap & ScMF::ButtonPopup2);
                         if (bMerged||bHOverlapped||bVOverlapped)
                             bAnyMerged = true;                              // internal
 
@@ -539,11 +542,13 @@ void ScDocument::FillInfo(
                                     pThisRowInfo->bEmptyBack = false;
                                 if (bAutoFilter)
                                     pThisRowInfo->bAutoFilter = true;
-                                if (bPivotButton || bPivotPopupButton)
+                                if (bPivotButton || bPivotPopupButton || bPivotPopupButtonMulti)
                                     pThisRowInfo->bPivotButton = true;
+                                if (bPivotCollapseButton || bPivotExpandButton)
+                                    pThisRowInfo->bPivotToggle = true;
 
-                                CellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
-                                BasicCellInfo* pBasicInfo = &pThisRowInfo->basicCellInfo(nCol);
+                                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
+                                ScBasicCellInfo* pBasicInfo = &pThisRowInfo->basicCellInfo(nCol);
                                 pInfo->pBackground  = pBackground;
                                 pInfo->pPatternAttr = pPattern;
                                 pInfo->bMerged      = bMerged;
@@ -552,6 +557,9 @@ void ScDocument::FillInfo(
                                 pInfo->bAutoFilter  = bAutoFilter;
                                 pInfo->bPivotButton  = bPivotButton;
                                 pInfo->bPivotPopupButton = bPivotPopupButton;
+                                pInfo->bPivotCollapseButton = bPivotCollapseButton;
+                                pInfo->bPivotExpandButton = bPivotExpandButton;
+                                pInfo->bPivotPopupButtonMulti = bPivotPopupButtonMulti;
                                 pInfo->bFilterActive = bFilterActive;
                                 pInfo->pLinesAttr   = pLinesAttr;
                                 pInfo->mpTLBRLine   = pTLBRLine;
@@ -572,7 +580,7 @@ void ScDocument::FillInfo(
                                             bHidden, bHideFormula, bTabProtect);
                                 }
 
-                                if (bHidden || (bFormulaMode && bHideFormula && pInfo->maCell.meType == CELLTYPE_FORMULA))
+                                if (bHidden || (bFormulaMode && bHideFormula && pInfo->maCell.getType() == CELLTYPE_FORMULA))
                                     pBasicInfo->bEmptyCellText = true;
 
                                 ++nArrRow;
@@ -642,7 +650,7 @@ void ScDocument::FillInfo(
         {
             for (SCCOL nCol=nCol1-1; nCol<=nCol2+1; nCol++)                  // 1 more left and right
             {
-                CellInfo* pInfo = &pRowInfo[nArrRow].cellInfo(nCol);
+                ScCellInfo* pInfo = &pRowInfo[nArrRow].cellInfo(nCol);
                 ScPatternAttr* pModifiedPatt = nullptr;
 
                 if ( ValidCol(nCol) && pRowInfo[nArrRow].nRowNo <= MaxRow() )
@@ -659,28 +667,26 @@ void ScDocument::FillInfo(
 
                 if (pCondSet)
                 {
-                    const SfxPoolItem* pItem;
-
                             // Background
-                    if ( pCondSet->GetItemState( ATTR_BACKGROUND, true, &pItem ) == SfxItemState::SET )
+                    if ( const SvxBrushItem* pItem = pCondSet->GetItemIfSet( ATTR_BACKGROUND ) )
                     {
-                        pInfo->pBackground = static_cast<const SvxBrushItem*>(pItem);
+                        pInfo->pBackground = pItem;
                         pRowInfo[nArrRow].bEmptyBack = false;
                     }
 
                             // Border
-                    if ( pCondSet->GetItemState( ATTR_BORDER, true, &pItem ) == SfxItemState::SET )
-                        pInfo->pLinesAttr = static_cast<const SvxBoxItem*>(pItem);
+                    if ( const SvxBoxItem* pItem = pCondSet->GetItemIfSet( ATTR_BORDER ) )
+                        pInfo->pLinesAttr = pItem;
 
-                    if ( pCondSet->GetItemState( ATTR_BORDER_TLBR, true, &pItem ) == SfxItemState::SET )
-                        pInfo->mpTLBRLine = static_cast< const SvxLineItem* >( pItem );
-                    if ( pCondSet->GetItemState( ATTR_BORDER_BLTR, true, &pItem ) == SfxItemState::SET )
-                        pInfo->mpBLTRLine = static_cast< const SvxLineItem* >( pItem );
+                    if ( const SvxLineItem* pItem = pCondSet->GetItemIfSet( ATTR_BORDER_TLBR ) )
+                        pInfo->mpTLBRLine = pItem;
+                    if ( const SvxLineItem* pItem = pCondSet->GetItemIfSet( ATTR_BORDER_BLTR ) )
+                        pInfo->mpBLTRLine = pItem;
 
                             //  Shadow
-                    if ( pCondSet->GetItemState( ATTR_SHADOW, true, &pItem ) == SfxItemState::SET )
+                    if ( const SvxShadowItem* pItem = pCondSet->GetItemIfSet( ATTR_SHADOW ) )
                     {
-                        pInfo->pShadowAttr = static_cast<const SvxShadowItem*>(pItem);
+                        pInfo->pShadowAttr = pItem;
                         bAnyShadow = true;
                     }
                 }
@@ -706,7 +712,7 @@ void ScDocument::FillInfo(
 
             for (SCCOL nCol=nCol1-1; nCol<=nCol2+1; nCol++)                  // 1 more left and right
             {
-                CellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
+                ScCellInfo* pInfo = &pThisRowInfo->cellInfo(nCol);
 
                 if (pInfo->bMerged || pInfo->bHOverlapped || pInfo->bVOverlapped)
                 {
@@ -718,22 +724,23 @@ void ScDocument::FillInfo(
                                         nStartX,nStartY, nEndX,nEndY );
                     const ScPatternAttr* pStartPattern = GetPattern( nStartX,nStartY,nTab );
                     const SfxItemSet* pStartCond = GetCondResult( nStartX,nStartY,nTab );
-                    const SfxPoolItem* pItem;
 
                     // Copy Background (or in output.cxx)
 
-                    if ( !pStartCond || pStartCond->
-                                    GetItemState(ATTR_BACKGROUND,true,&pItem) != SfxItemState::SET )
-                        pItem = &pStartPattern->GetItem(ATTR_BACKGROUND);
-                    pInfo->pBackground = static_cast<const SvxBrushItem*>(pItem);
+                    const SvxBrushItem* pBrushItem = nullptr;
+                    if ( !pStartCond ||
+                        !(pBrushItem = pStartCond->GetItemIfSet(ATTR_BACKGROUND)) )
+                        pBrushItem = &pStartPattern->GetItem(ATTR_BACKGROUND);
+                    pInfo->pBackground = pBrushItem;
                     pRowInfo[nArrRow].bEmptyBack = false;
 
                     // Shadow
 
-                    if ( !pStartCond || pStartCond->
-                                    GetItemState(ATTR_SHADOW,true,&pItem) != SfxItemState::SET )
-                        pItem = &pStartPattern->GetItem(ATTR_SHADOW);
-                    pInfo->pShadowAttr = static_cast<const SvxShadowItem*>(pItem);
+                    const SvxShadowItem* pShadowItem = nullptr;
+                    if ( !pStartCond ||
+                        !(pShadowItem = pStartCond->GetItemIfSet(ATTR_SHADOW)) )
+                        pShadowItem = &pStartPattern->GetItem(ATTR_SHADOW);
+                    pInfo->pShadowAttr = pShadowItem;
                     if (pInfo->pShadowAttr != pDefShadow)
                         bAnyShadow = true;
                 }
@@ -753,7 +760,7 @@ void ScDocument::FillInfo(
                 bool bLeft = ( nCol == nCol1-1 );
                 bool bRight = ( nCol == nCol2+1 );
 
-                CellInfo* pInfo = &pRowInfo[nArrRow].cellInfo(nCol);
+                ScCellInfo* pInfo = &pRowInfo[nArrRow].cellInfo(nCol);
                 const SvxShadowItem* pThisAttr = pInfo->pShadowAttr;
                 SvxShadowLocation eLoc = pThisAttr ? pThisAttr->GetLocation() : SvxShadowLocation::NONE;
                 if (eLoc != SvxShadowLocation::NONE)
@@ -809,8 +816,8 @@ void ScDocument::FillInfo(
                             }
                             if (bBottomDiff && bRightDiff)
                             {
-                                pRowInfo[nArrRow+1].cellInfo(nCol).pHShadowOrigin = pThisAttr;
-                                pRowInfo[nArrRow+1].cellInfo(nCol).eHShadowPart = SC_SHADOW_CORNER;
+                                pRowInfo[nArrRow+1].cellInfo(nCol+1).pHShadowOrigin = pThisAttr;
+                                pRowInfo[nArrRow+1].cellInfo(nCol+1).eHShadowPart = SC_SHADOW_CORNER;
                             }
                             break;
 
@@ -888,8 +895,8 @@ void ScDocument::FillInfo(
     // *** create the frame border array ***
 
     // RowInfo structs are filled in the range [ 0 , nArrCount-1 ],
-    // each RowInfo contains CellInfo structs in the range [ nCol1-1 , nCol2+1 ]
-    // and BasicCellInfo structs in the range [ -1, nCol2+1 ]
+    // each RowInfo contains ScCellInfo structs in the range [ nCol1-1 , nCol2+1 ]
+    // and ScBasicCellInfo structs in the range [ -1, nCol2+1 ]
 
     size_t nColCount = nCol2 - nCol1 + 1 + 2;
     size_t nRowCount = nArrCount;
@@ -904,7 +911,7 @@ void ScDocument::FillInfo(
 
         for( SCCOL nCol = nCol1 - 1; nCol <= nCol2 + 1; ++nCol ) // 1 more left and right
         {
-            const CellInfo& rInfo = rThisRowInfo.cellInfo( nCol );
+            const ScCellInfo& rInfo = rThisRowInfo.cellInfo( nCol );
             const SvxBoxItem* pBox = rInfo.pLinesAttr;
             const SvxLineItem* pTLBR = rInfo.mpTLBRLine;
             const SvxLineItem* pBLTR = rInfo.mpBLTRLine;

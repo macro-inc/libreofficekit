@@ -18,12 +18,14 @@
  */
 #pragma once
 
+#include <config_options.h>
 #include <tools/toolsdllapi.h>
 #include <tools/lineend.hxx>
 #include <tools/long.hxx>
 #include <tools/ref.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <rtl/string.hxx>
+#include <rtl/strbuf.hxx>
 #include <o3tl/typed_flags_set.hxx>
 #include <memory>
 #include <string_view>
@@ -48,8 +50,9 @@ enum class StreamMode {
 // file i/o
     NOCREATE                 = 0x0004,  ///< 1 == Don't create file
     TRUNC                    = 0x0008,  ///< Truncate _existing_ file to zero length
-    COPY_ON_SYMLINK          = 0x0010,  ///< copy-on-write for symlinks (Unix)
+    COPY_ON_SYMLINK          = 0x0010,  ///< copy-on-write for symlinks (Unix-only)
     TEMPORARY                = 0x0020,  ///< temporary file attribute (Windows-only)
+    DELETE_ON_CLOSE          = 0x0040,  ///< only for temporary files (Windows-only)
 // sharing options
     SHARE_DENYNONE           = 0x0100,
     SHARE_DENYREAD           = 0x0200,  // overrides denynone
@@ -63,7 +66,7 @@ enum class StreamMode {
 };
 namespace o3tl
 {
-    template<> struct typed_flags<StreamMode> : is_typed_flags<StreamMode, 0x0f3f> {};
+    template<> struct typed_flags<StreamMode> : is_typed_flags<StreamMode, 0x0f7f> {};
 }
 
 #define STREAM_SEEK_TO_BEGIN            0L
@@ -96,7 +99,7 @@ struct SvLockBytesStat
     SvLockBytesStat() : nSize(0) {}
 };
 
-class TOOLS_DLLPUBLIC SvLockBytes: public virtual SvRefBase
+class TOOLS_DLLPUBLIC SvLockBytes: public SvRefBase
 {
     SvStream * m_pStream;
     bool m_bOwner;
@@ -159,7 +162,6 @@ private:
     bool            m_isSwap;
     bool            m_isEof;
     ErrCode         m_nError;
-    SvStreamEndian  m_nEndian;
     SvStreamCompressFlags m_nCompressMode;
     LineEnd         m_eLineDelimiter;
     rtl_TextEncoding m_eStreamCharSet;
@@ -185,13 +187,12 @@ protected:
     virtual void    FlushData();
     virtual void    SetSize(sal_uInt64 nSize);
 
-    void            FlushBuffer();
-    void            ClearError();
-    void            ClearBuffer();
+    SAL_DLLPRIVATE void ClearError();
+    SAL_DLLPRIVATE void ClearBuffer();
 
     // encrypt and write in blocks
-    std::size_t     CryptAndWriteBuffer( const void* pStart, std::size_t nLen );
-    void            EncryptBuffer( void* pStart, std::size_t nLen ) const;
+    SAL_DLLPRIVATE std::size_t CryptAndWriteBuffer( const void* pStart, std::size_t nLen );
+    SAL_DLLPRIVATE void EncryptBuffer( void* pStart, std::size_t nLen ) const;
 
 public:
                     SvStream();
@@ -206,7 +207,7 @@ public:
     virtual void    ResetError();
 
     void            SetEndian( SvStreamEndian SvStreamEndian );
-    SvStreamEndian  GetEndian() const { return m_nEndian; }
+    SvStreamEndian  GetEndian() const;
     /// returns status of endian swap flag
     bool            IsEndianSwap() const { return m_isSwap; }
 
@@ -272,6 +273,9 @@ public:
     virtual sal_uInt64 TellEnd();
     // length between current (Tell()) pos and end of stream
     sal_uInt64      remainingSize();
+    /// If we have data in our internal buffers, write them out
+    void            FlushBuffer();
+    /// Call FlushBuffer() and then call flush on the underlying OS stream
     void            Flush();
     // next Tell() <= nSize
     bool            SetStreamSize( sal_uInt64 nSize );
@@ -290,6 +294,7 @@ public:
               @endcode
               causing endless loops ...
     */
+    bool            ReadLine( OStringBuffer& rStr, sal_Int32 nMaxBytesToRead = 0xFFFE );
     bool            ReadLine( OString& rStr, sal_Int32 nMaxBytesToRead = 0xFFFE );
     bool            WriteLine( std::string_view rStr );
 
@@ -331,7 +336,7 @@ public:
                    Maximum of codepoints (UCS-2 or UTF-16 pairs, not bytes) to
                    read, if line is longer it will be truncated.
     */
-    bool            ReadUniStringLine(OUString& rStr, sal_Int32 nMaxCodepointsToRead);
+    SAL_DLLPRIVATE bool ReadUniStringLine(OUString& rStr, sal_Int32 nMaxCodepointsToRead);
     /** Read a 32bit length prefixed sequence of utf-16 if
         eSrcCharSet==RTL_TEXTENCODING_UNICODE, otherwise read a 16bit length
         prefixed sequence of bytes and convert from eSrcCharSet */
@@ -416,13 +421,13 @@ private:
     void readNumberWithoutSwap(T& rDataDest)
     { readNumberWithoutSwap_(&rDataDest, sizeof(rDataDest)); }
 
-    void readNumberWithoutSwap_(void * pDataDest, int nDataSize);
+    SAL_DLLPRIVATE void readNumberWithoutSwap_(void * pDataDest, int nDataSize);
 
     template<typename T>
     void writeNumberWithoutSwap(T const & rDataSrc)
     { writeNumberWithoutSwap_(&rDataSrc, sizeof(rDataSrc)); }
 
-    void writeNumberWithoutSwap_(const void * pDataSrc, int nDataSize);
+    SAL_DLLPRIVATE void writeNumberWithoutSwap_(const void * pDataSrc, int nDataSize);
 };
 
 inline SvStream& operator<<( SvStream& rStr, SvStrPtr f )
@@ -491,7 +496,7 @@ std::size_t write_uInt32_lenPrefixed_uInt16s_FromOUString(SvStream& rStrm,
 /// Attempt to write a pascal-style length (of type prefix) prefixed sequence
 /// of 16bit units from an OUString, returned value is number of bytes written
 /// (including byte-count of prefix)
-TOOLS_DLLPUBLIC std::size_t write_uInt16_lenPrefixed_uInt16s_FromOUString(SvStream& rStrm,
+UNLESS_MERGELIBS(TOOLS_DLLPUBLIC) std::size_t write_uInt16_lenPrefixed_uInt16s_FromOUString(SvStream& rStrm,
                                                 std::u16string_view rStr);
 
 /// Attempt to read 8bit units to an OString until a zero terminator is
@@ -589,7 +594,6 @@ private:
     sal_uInt16      nLockCounter;
 #endif
     bool            bIsOpen;
-    bool            mbDontFlushOnClose; ///< used to avoid flushing when closing temporary files
 
     SvFileStream (const SvFileStream&) = delete;
     SvFileStream & operator= (const SvFileStream&) = delete;
@@ -616,7 +620,6 @@ public:
     bool            IsOpen() const { return bIsOpen; }
 
     const OUString& GetFileName() const { return aFilename; }
-    void            SetDontFlushOnClose(bool b) { mbDontFlushOnClose = b; }
 };
 
 // MemoryStream
@@ -665,7 +668,7 @@ public:
 
     sal_uInt64      GetSize() { return TellEnd(); }
     std::size_t     GetEndOfData() const { return nEndOfData; }
-    const void*     GetData() { Flush(); return pBuf; }
+    const void*     GetData() { FlushBuffer(); return pBuf; }
 
     // return the buffer currently in use, and allocate a new buffer internally
     void*           SwitchBuffer();
@@ -673,6 +676,10 @@ public:
     void            SetBuffer( void* pBuf, std::size_t nSize, std::size_t nEOF );
 
     void            ObjectOwnsMemory( bool bOwn ) { bOwnsData = bOwn; }
+    /// Makes the stream read-only after it was (possibly) initially writable,
+    /// without having to copy the data or change buffers.
+    /// @since LibreOffice 7.5
+    void            MakeReadOnly();
     void            SetResizeOffset( std::size_t nNewResize ) { nResize = nNewResize; }
     virtual sal_uInt64 TellEnd() override { FlushBuffer(); return nEndOfData; }
 };

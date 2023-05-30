@@ -30,14 +30,23 @@
         <entry os="windows" vendor="intel"> <!-- tdf#144923 off-topic comment 14 + tdf#150232 -->
             <device id="0x9a49"/>
         </entry>
-        <entry os="all" vendor="amd" compare="less_equal" version="2.0.49">
+        <entry os="all" vendor="amd" compare="less" version="2.0.198"> <!-- tdf#146402 -->
             <device id="all"/>
         </entry>
         <entry os="windows" vendor="nvidia" compare="less" version="457.36.0">
             <device id="all"/>
         </entry>
+        <entry os="windows" vendor="nvidia"> <!-- tdf#151929 Crash with GTX 670 -->
+            <device id="0x1189"/>
+        </entry>
         <entry os="windows" vendor="nvidia"> <!-- tdf#150232 -->
             <device id="0x1401"/>
+        </entry>
+        <entry os="windows" vendor="nvidia"> <!-- tdf#151627 + tdf#152559 -->
+            <device id="0x1402"/>
+        </entry>
+        <entry os="windows" vendor="nvidia"> <!-- tdf#153538: GeForce GTX 1070 Ti -->
+            <device id="0x1b82"/>
         </entry>
         <entry os="7" vendor="all">
             <device id="all"/>

@@ -24,9 +24,12 @@
 #include <com/sun/star/chart2/data/XDataSequence.hpp>
 #include <com/sun/star/chart2/data/XNumericalDataSequence.hpp>
 #include <com/sun/star/chart2/data/XTextualDataSequence.hpp>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <basegfx/matrix/b3dhommatrix.hxx>
+#include <basegfx/polygon/b2dpolygontools.hxx>
 
+#include <cstddef>
 #include <limits>
 
 namespace chart
@@ -180,6 +183,24 @@ void AddPointToPoly( drawing::PolyPolygonShape3D& rPoly, const drawing::Position
     pInnerSequenceZ[nOldPointCount] = rPos.PositionZ;
 }
 
+void AddPointToPoly( std::vector<std::vector<css::drawing::Position3D>>& rPoly, const drawing::Position3D& rPos, sal_Int32 nPolygonIndex )
+{
+    if(nPolygonIndex<0)
+    {
+        OSL_FAIL( "The polygon index needs to be > 0");
+        nPolygonIndex=0;
+    }
+
+    //make sure that we have enough polygons
+    if(o3tl::make_unsigned(nPolygonIndex) >= rPoly.size() )
+    {
+        rPoly.resize(nPolygonIndex+1);
+    }
+
+    std::vector<css::drawing::Position3D>* pOuterSequence = &rPoly[nPolygonIndex];
+    pOuterSequence->push_back(rPos);
+}
+
 drawing::Position3D getPointFromPoly( const drawing::PolyPolygonShape3D& rPolygon, sal_Int32 nPointIndex, sal_Int32 nPolyIndex )
 {
     drawing::Position3D aRet(0.0,0.0,0.0);
@@ -204,16 +225,34 @@ drawing::Position3D getPointFromPoly( const drawing::PolyPolygonShape3D& rPolygo
     return aRet;
 }
 
-void addPolygon( drawing::PolyPolygonShape3D& rRet, const drawing::PolyPolygonShape3D& rAdd )
+drawing::Position3D getPointFromPoly( const std::vector<std::vector<css::drawing::Position3D>>& rPolygon, sal_Int32 nPointIndex, sal_Int32 nPolyIndex )
 {
-    sal_Int32 nAddOuterCount = rAdd.SequenceX.getLength();
-    sal_Int32 nOuterCount = rRet.SequenceX.getLength() + nAddOuterCount;
-    rRet.SequenceX.realloc( nOuterCount );
-    auto pSequenceX = rRet.SequenceX.getArray();
-    rRet.SequenceY.realloc( nOuterCount );
-    auto pSequenceY = rRet.SequenceY.getArray();
-    rRet.SequenceZ.realloc( nOuterCount );
-    auto pSequenceZ = rRet.SequenceZ.getArray();
+    drawing::Position3D aRet(0.0,0.0,0.0);
+
+    if( nPolyIndex>=0 && o3tl::make_unsigned(nPolyIndex)<rPolygon.size())
+    {
+        if(nPointIndex<static_cast<sal_Int32>(rPolygon[nPolyIndex].size()))
+        {
+            aRet = rPolygon[nPolyIndex][nPointIndex];
+        }
+        else
+        {
+            OSL_FAIL("polygon was accessed with a wrong index");
+        }
+    }
+    else
+    {
+        OSL_FAIL("polygon was accessed with a wrong index");
+    }
+    return aRet;
+}
+
+void addPolygon( std::vector<std::vector<css::drawing::Position3D>>& rRet, const std::vector<std::vector<css::drawing::Position3D>>& rAdd )
+{
+    sal_Int32 nAddOuterCount = rAdd.size();
+    sal_Int32 nOuterCount = rRet.size() + nAddOuterCount;
+    rRet.resize( nOuterCount );
+    auto pSequence = rRet.data();
 
     sal_Int32 nIndex = 0;
     sal_Int32 nOuter = nOuterCount - nAddOuterCount;
@@ -222,49 +261,37 @@ void addPolygon( drawing::PolyPolygonShape3D& rRet, const drawing::PolyPolygonSh
         if( nIndex >= nAddOuterCount )
             break;
 
-        pSequenceX[nOuter] = rAdd.SequenceX[nIndex];
-        pSequenceY[nOuter] = rAdd.SequenceY[nIndex];
-        pSequenceZ[nOuter] = rAdd.SequenceZ[nIndex];
+        pSequence[nOuter] = rAdd[nIndex];
 
         nIndex++;
     }
 }
 
-void appendPoly( drawing::PolyPolygonShape3D& rRet, const drawing::PolyPolygonShape3D& rAdd )
+void appendPoly( std::vector<std::vector<css::drawing::Position3D>>& rRet, const std::vector<std::vector<css::drawing::Position3D>>& rAdd )
 {
-    sal_Int32 nOuterCount = std::max( rRet.SequenceX.getLength(), rAdd.SequenceX.getLength() );
-    rRet.SequenceX.realloc(nOuterCount);
-    auto pSequenceX = rRet.SequenceX.getArray();
-    rRet.SequenceY.realloc(nOuterCount);
-    auto pSequenceY = rRet.SequenceY.getArray();
-    rRet.SequenceZ.realloc(nOuterCount);
-    auto pSequenceZ =rRet.SequenceZ.getArray();
+    std::size_t nOuterCount = std::max( rRet.size(), rAdd.size() );
+    rRet.resize(nOuterCount);
+    auto pSequence = rRet.data();
 
-    for( sal_Int32 nOuter=0;nOuter<nOuterCount;nOuter++ )
+    for( std::size_t nOuter=0;nOuter<nOuterCount;nOuter++ )
     {
-        sal_Int32 nOldPointCount = rRet.SequenceX[nOuter].getLength();
+        sal_Int32 nOldPointCount = rRet[nOuter].size();
         sal_Int32 nAddPointCount = 0;
-        if(nOuter<rAdd.SequenceX.getLength())
-            nAddPointCount = rAdd.SequenceX[nOuter].getLength();
+        if(nOuter<rAdd.size())
+            nAddPointCount = rAdd[nOuter].size();
         if(!nAddPointCount)
             continue;
 
         sal_Int32 nNewPointCount = nOldPointCount + nAddPointCount;
 
-        pSequenceX[nOuter].realloc(nNewPointCount);
-        auto pSequenceX_nOuter = pSequenceX[nOuter].getArray();
-        pSequenceY[nOuter].realloc(nNewPointCount);
-        auto pSequenceY_nOuter = pSequenceY[nOuter].getArray();
-        pSequenceZ[nOuter].realloc(nNewPointCount);
-        auto pSequenceZ_nOuter = pSequenceZ[nOuter].getArray();
+        pSequence[nOuter].resize(nNewPointCount);
+        auto pSequence_nOuter = pSequence[nOuter].data();
 
         sal_Int32 nPointTarget=nOldPointCount;
         sal_Int32 nPointSource=nAddPointCount;
         for( ; nPointSource-- ; nPointTarget++ )
         {
-            pSequenceX_nOuter[nPointTarget] = rAdd.SequenceX[nOuter][nPointSource];
-            pSequenceY_nOuter[nPointTarget] = rAdd.SequenceY[nOuter][nPointSource];
-            pSequenceZ_nOuter[nPointTarget] = rAdd.SequenceZ[nOuter][nPointSource];
+            pSequence_nOuter[nPointTarget] = rAdd[nOuter][nPointSource];
         }
     }
 }
@@ -345,8 +372,56 @@ drawing::PointSequenceSequence PolyToPointSequence(
     return aRet;
 }
 
+drawing::PointSequenceSequence PolyToPointSequence(
+                const std::vector<std::vector<css::drawing::Position3D>>& rPolyPolygon )
+{
+    drawing::PointSequenceSequence aRet;
+    aRet.realloc( rPolyPolygon.size() );
+    auto pRet = aRet.getArray();
+
+    for(std::size_t nN = 0; nN < rPolyPolygon.size(); nN++)
+    {
+        sal_Int32 nInnerLength = rPolyPolygon[nN].size();
+        pRet[nN].realloc( nInnerLength );
+        auto pRet_nN = pRet[nN].getArray();
+        for( sal_Int32 nM = 0; nM < nInnerLength; nM++)
+        {
+            pRet_nN[nM].X = static_cast<sal_Int32>(rPolyPolygon[nN][nM].PositionX);
+            pRet_nN[nM].Y = static_cast<sal_Int32>(rPolyPolygon[nN][nM].PositionY);
+        }
+    }
+    return aRet;
+}
+
+basegfx::B2DPolyPolygon PolyToB2DPolyPolygon(
+                const std::vector<std::vector<css::drawing::Position3D>>& rPolyPolygon )
+{
+    basegfx::B2DPolyPolygon aRetval;
+
+    for(auto const & nN: rPolyPolygon)
+    {
+        basegfx::B2DPolygon aNewPolygon;
+        sal_Int32 nInnerLength = nN.size();
+        if(nInnerLength)
+        {
+            aNewPolygon.reserve(nInnerLength);
+            for( sal_Int32 nM = 0; nM < nInnerLength; nM++)
+            {
+                auto X = static_cast<sal_Int32>(nN[nM].PositionX);
+                auto Y = static_cast<sal_Int32>(nN[nM].PositionY);
+                aNewPolygon.append(basegfx::B2DPoint(X, Y));
+            }
+            // check for closed state flag
+            basegfx::utils::checkClosed(aNewPolygon);
+        }
+        aRetval.append(std::move(aNewPolygon));
+    }
+
+    return aRetval;
+}
+
 void appendPointSequence( drawing::PointSequenceSequence& rTarget
-                        , drawing::PointSequenceSequence& rAdd )
+                        , const drawing::PointSequenceSequence& rAdd )
 {
     sal_Int32 nAddCount = rAdd.getLength();
     if(!nAddCount)
@@ -405,11 +480,6 @@ awt::Size Direction3DToAWTSize( const drawing::Direction3D& rDirection )
     return aRet;
 }
 
-uno::Sequence< double > B3DPointToSequence( const ::basegfx::B3DPoint& rPoint )
-{
-    return { rPoint.getX(), rPoint.getY(), rPoint.getZ() };
-}
-
 drawing::Position3D SequenceToPosition3D( const uno::Sequence< double >& rSeq )
 {
     OSL_ENSURE(rSeq.getLength()==3,"The sequence needs to have length 3 for conversion into vector");
@@ -419,11 +489,6 @@ drawing::Position3D SequenceToPosition3D( const uno::Sequence< double >& rSeq )
     aRet.PositionY = rSeq.getLength()>1?rSeq[1]:0.0;
     aRet.PositionZ = rSeq.getLength()>2?rSeq[2]:0.0;
     return aRet;
-}
-
-uno::Sequence< double > Position3DToSequence( const drawing::Position3D& rPosition )
-{
-    return { rPosition.PositionX, rPosition.PositionY, rPosition.PositionZ };
 }
 
 using namespace ::com::sun::star::chart2;
@@ -518,7 +583,7 @@ sal_Int16 getShortForLongAlso( const uno::Any& rAny )
 }
 
 bool replaceParamterInString( OUString & rInOutResourceString,
-                            const OUString & rParamToReplace,
+                            std::u16string_view rParamToReplace,
                             std::u16string_view rReplaceWith )
 {
     sal_Int32 nPos = rInOutResourceString.indexOf( rParamToReplace );
@@ -526,7 +591,7 @@ bool replaceParamterInString( OUString & rInOutResourceString,
         return false;
 
     rInOutResourceString = rInOutResourceString.replaceAt( nPos
-                        , rParamToReplace.getLength(), rReplaceWith );
+                        , rParamToReplace.size(), rReplaceWith );
     return true;
 }
 

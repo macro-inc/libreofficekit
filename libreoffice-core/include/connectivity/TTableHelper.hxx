@@ -27,6 +27,7 @@
 
 #include <connectivity/dbtoolsdllapi.hxx>
 #include <connectivity/sdbcx/VTable.hxx>
+#include <utility>
 
 namespace com::sun::star::sdbc { class XConnection; }
 namespace com::sun::star::sdb::tools { class XIndexAlteration; }
@@ -51,19 +52,19 @@ namespace connectivity
 
         OrdinalPosition nOrdinalPosition;
 
-        ColumnDesc( const OUString& _rName
+        ColumnDesc( OUString _sName
             , sal_Int32     _nField5
-            , const OUString& _aField6
+            , OUString _aField6
             , sal_Int32     _nField7
             , sal_Int32     _nField9
             , sal_Int32     _nField11
-            , const OUString& _sField12
-            , const OUString& _sField13
+            , OUString _sField12
+            , OUString _sField13
             ,OrdinalPosition _nPosition )
-            :sName( _rName )
-            ,aField6(_aField6)
-            ,sField12(_sField12)
-            ,sField13(_sField13)
+            :sName(std::move( _sName ))
+            ,aField6(std::move(_aField6))
+            ,sField12(std::move(_sField12))
+            ,sField13(std::move(_sField13))
             ,nField5(_nField5)
             ,nField7(_nField7)
             ,nField9(_nField9)
@@ -147,6 +148,9 @@ namespace connectivity
         virtual void SAL_CALL alterColumnByIndex( sal_Int32 index, const css::uno::Reference< css::beans::XPropertySet >& descriptor ) override;
         // XNamed
         virtual OUString SAL_CALL getName() override;
+
+        // To retrieve the table name only without the schema
+        const OUString & getTableName();
 
         // helper method to get key properties
         std::shared_ptr<sdbcx::KeyProperties> getKeyProperties(const OUString& _sName) const;

@@ -21,7 +21,7 @@
 
 #include <drawinglayer/drawinglayerdllapi.h>
 
-#include <drawinglayer/primitive2d/BufferedDecompositionPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/baseprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/color/bcolor.hxx>
 
@@ -46,7 +46,7 @@ private:
 
 public:
     /// constructor
-    PolygonHairlinePrimitive2D(const basegfx::B2DPolygon& rPolygon, const basegfx::BColor& rBColor);
+    PolygonHairlinePrimitive2D(basegfx::B2DPolygon aPolygon, const basegfx::BColor& rBColor);
 
     /// data read access
     const basegfx::B2DPolygon& getB2DPolygon() const { return maPolygon; }

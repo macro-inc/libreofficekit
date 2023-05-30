@@ -29,7 +29,8 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/basemutex.hxx>
-#include <comphelper/multiinterfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
+#include <comphelper/multiinterfacecontainer3.hxx>
 #include <com/sun/star/beans/Property.hpp>
 #include <com/sun/star/container/XChild.hpp>
 #include <com/sun/star/sdbcx/XRename.hpp>
@@ -71,7 +72,7 @@ namespace dbaccess
 
     typedef std::shared_ptr<OContentHelper_Impl> TContentPtr;
 
-    typedef comphelper::OMultiTypeInterfaceContainerHelperVar2<OUString>
+    typedef comphelper::OMultiTypeInterfaceContainerHelperVar3<css::beans::XPropertiesChangeListener, OUString>
         PropertyChangeListenerContainer;
     typedef ::cppu::WeakComponentImplHelper<   css::ucb::XContent
                                            ,   css::ucb::XCommandProcessor
@@ -93,7 +94,7 @@ namespace dbaccess
         void impl_rename_throw(const OUString& _sNewName,bool _bNotify = true);
 
     protected:
-        ::comphelper::OInterfaceContainerHelper2      m_aContentListeners;
+        ::comphelper::OInterfaceContainerHelper3<css::ucb::XContentEventListener> m_aContentListeners;
         PropertyChangeListenerContainer         m_aPropertyChangeListeners;
         css::uno::Reference< css::uno::XInterface >
                                                 m_xParentContainer;
@@ -121,7 +122,7 @@ namespace dbaccess
 
         OContentHelper( const css::uno::Reference< css::uno::XComponentContext >& _xORB
                         ,const css::uno::Reference< css::uno::XInterface >&   _xParentContainer
-                        ,const TContentPtr& _pImpl
+                        ,TContentPtr _pImpl
                     );
 
         // css::lang::XTypeProvider
@@ -156,7 +157,7 @@ namespace dbaccess
 
         // css::lang::XUnoTunnel
         virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-        static css::uno::Sequence< sal_Int8 >  getUnoTunnelId();
+        static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
         // css::container::XChild
         virtual css::uno::Reference< css::uno::XInterface > SAL_CALL getParent(  ) override;

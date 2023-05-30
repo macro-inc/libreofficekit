@@ -18,9 +18,9 @@
  */
 
 #include <TableDeco.hxx>
-#include <apitools.hxx>
 #include <definitioncolumn.hxx>
 #include <stringconstants.hxx>
+#include <strings.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
 #include <osl/diagnose.h>
@@ -477,7 +477,7 @@ sal_Int64 SAL_CALL ODBTableDecorator::getSomething( const Sequence< sal_Int8 >& 
     return nRet;
 }
 
-Sequence< sal_Int8 > ODBTableDecorator::getUnoTunnelId()
+const Sequence< sal_Int8 > & ODBTableDecorator::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit implId;
     return implId.getSeq();

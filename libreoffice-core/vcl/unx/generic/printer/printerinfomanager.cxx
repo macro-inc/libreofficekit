@@ -19,9 +19,8 @@
 
 #include <unx/cpdmgr.hxx>
 #include <unx/cupsmgr.hxx>
+#include <unx/gendata.hxx>
 #include <unx/helper.hxx>
-
-#include <saldatabasic.hxx>
 
 #include <tools/urlobj.hxx>
 #include <tools/config.hxx>
@@ -33,6 +32,7 @@
 #include <osl/file.hxx>
 #include <osl/thread.hxx>
 #include <osl/mutex.hxx>
+#include <o3tl/string_view.hxx>
 
 // filename of configuration files
 constexpr OUStringLiteral PRINT_FILENAME = u"psprint.conf";
@@ -75,31 +75,23 @@ namespace psp
 
 PrinterInfoManager& PrinterInfoManager::get()
 {
-    SalData* pSalData = GetSalData();
+    // can't move to GenericUnixSalData, because of vcl/null/printerinfomanager.cxx
+    GenericUnixSalData* pSalData = GetGenericUnixSalData();
+    PrinterInfoManager* pPIM = pSalData->m_pPrinterInfoManager.get();
+    if (pPIM)
+        return *pPIM;
 
-    if( ! pSalData->m_pPIManager )
-    {
-        pSalData->m_pPIManager = CPDManager::tryLoadCPD();
-        if( ! pSalData->m_pPIManager )
-            pSalData->m_pPIManager = CUPSManager::tryLoadCUPS();
-        if( ! pSalData->m_pPIManager )
-            pSalData->m_pPIManager = new PrinterInfoManager();
-        pSalData->m_pPIManager->initialize();
-#if OSL_DEBUG_LEVEL > 1
-        SAL_INFO("vcl.unx.print", "PrinterInfoManager::get "
-                << "create Manager of type "
-                << ((int) pSalData->m_pPIManager->getType()));
-#endif
-    }
+    pPIM = CPDManager::tryLoadCPD();
+    if (!pPIM)
+        pPIM = CUPSManager::tryLoadCUPS();
+    if (!pPIM)
+        pPIM = new PrinterInfoManager();
+    pSalData->m_pPrinterInfoManager.reset(pPIM);
+    pPIM->initialize();
 
-    return *pSalData->m_pPIManager;
-}
-
-void PrinterInfoManager::release()
-{
-    SalData* pSalData = GetSalData();
-    delete pSalData->m_pPIManager;
-    pSalData->m_pPIManager = nullptr;
+    SAL_INFO("vcl.unx.print", "created PrinterInfoManager of type "
+                               << static_cast<int>(pPIM->getType()));
+    return *pPIM;
 }
 
 PrinterInfoManager::PrinterInfoManager( Type eType ) :
@@ -234,10 +226,10 @@ void PrinterInfoManager::initialize()
             if (!aValue.isEmpty())
             {
                 sal_Int32 nIdx {0};
-                m_aGlobalDefaults.m_nLeftMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
-                m_aGlobalDefaults.m_nRightMarginAdjust  = aValue.getToken(0, ',', nIdx).toInt32();
-                m_aGlobalDefaults.m_nTopMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
-                m_aGlobalDefaults.m_nBottomMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
+                m_aGlobalDefaults.m_nLeftMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                m_aGlobalDefaults.m_nRightMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                m_aGlobalDefaults.m_nTopMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                m_aGlobalDefaults.m_nBottomMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
             }
 
             aValue = aConfig.ReadKey( "ColorDepth", "24" );
@@ -418,10 +410,10 @@ void PrinterInfoManager::initialize()
                 if (!aValue.isEmpty())
                 {
                     sal_Int32 nIdx {0};
-                    aPrinter.m_aInfo.m_nLeftMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
-                    aPrinter.m_aInfo.m_nRightMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
-                    aPrinter.m_aInfo.m_nTopMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
-                    aPrinter.m_aInfo.m_nBottomMarginAdjust = aValue.getToken(0, ',', nIdx).toInt32();
+                    aPrinter.m_aInfo.m_nLeftMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                    aPrinter.m_aInfo.m_nRightMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                    aPrinter.m_aInfo.m_nTopMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
+                    aPrinter.m_aInfo.m_nBottomMarginAdjust = o3tl::toInt32(o3tl::getToken(aValue, 0, ',', nIdx));
                 }
 
                 aValue = aConfig.ReadKey( "ColorDepth" );

@@ -20,7 +20,6 @@
 #ifndef INCLUDED_SW_SOURCE_FILTER_WW8_WRITERHELPER_HXX
 #define INCLUDED_SW_SOURCE_FILTER_WW8_WRITERHELPER_HXX
 
-#include <typeinfo>
 #include <vector>
 #include <map>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
@@ -29,7 +28,6 @@
 #include <svl/itempool.hxx>
 #include <svl/itemset.hxx>
 #include <svx/svdtypes.hxx>
-#include <format.hxx>
 #include <node.hxx>
 #include <pam.hxx>
 #include <tools/poly.hxx>
@@ -102,8 +100,8 @@ namespace ww8
         bool mbForBullet:1;
         Graphic maGrf;
     public:
-        Frame(const SwFrameFormat &rFlyFrame, const SwPosition &rPos);
-        Frame(const Graphic&, const SwPosition &);
+        Frame(const SwFrameFormat &rFlyFrame, SwPosition aPos);
+        Frame(const Graphic&, SwPosition );
 
         /** Get the writer SwFrameFormat that this object describes
 
@@ -126,7 +124,7 @@ namespace ww8
             The SwTextNode this frame is anchored inside
         */
         const SwContentNode *GetContentNode() const
-            { return maPos.nNode.GetNode().GetContentNode(); }
+            { return maPos.GetNode().GetContentNode(); }
 
         /** Get the type of frame that this wraps
 
@@ -248,153 +246,6 @@ namespace sw
             return dynamic_cast<const T *>(pItem);
         }
 
-        /** Extract a SfxPoolItem derived property from a SwContentNode
-
-            Writer's attributes are retrieved by passing a numeric identifier
-            and receiving a SfxPoolItem reference which must then typically be
-            cast back to its original type which is both tedious and verbose.
-
-            ItemGet uses item_cast () on the retrieved reference to test that the
-            retrieved property is of the type that the developer thinks it is.
-
-            @param rNode
-            The SwContentNode to retrieve the property from
-
-            @param eType
-            The numeric identifier of the property to be retrieved
-
-            @tplparam T
-            A SfxPoolItem derived class of the retrieved property
-
-            @exception std::bad_cast Thrown if the property was not a T
-
-            @return The T requested
-        */
-        template<class T> const T & ItemGet(const SwContentNode &rNode,
-            sal_uInt16 eType)
-        {
-            return item_cast<T>(rNode.GetAttr(eType));
-        }
-
-        /** Extract a SfxPoolItem derived property from a SwFormat
-
-            Writer's attributes are retrieved by passing a numeric identifier
-            and receiving a SfxPoolItem reference which must then typically be
-            cast back to its original type which is both tedious and verbose.
-
-            ItemGet uses item_cast () on the retrieved reference to test that the
-            retrieved property is of the type that the developer thinks it is.
-
-            @param rFormat
-            The SwFormat to retrieve the property from
-
-            @param eType
-            The numeric identifier of the property to be retrieved
-
-            @tplparam T
-            A SfxPoolItem derived class of the retrieved property
-
-            @exception std::bad_cast Thrown if the property was not a T
-        */
-        template<class T> const T & ItemGet(const SwFormat &rFormat,
-            sal_uInt16 eType)
-        {
-            return item_cast<T>(rFormat.GetFormatAttr(eType));
-        }
-
-        /** Extract a SfxPoolItem derived property from a SfxItemSet
-
-            Writer's attributes are retrieved by passing a numeric identifier
-            and receiving a SfxPoolItem reference which must then typically be
-            cast back to its original type which is both tedious and verbose.
-
-            ItemGet uses item_cast () on the retrieved reference to test that the
-            retrieved property is of the type that the developer thinks it is.
-
-            @param rSet
-            The SfxItemSet to retrieve the property from
-
-            @param eType
-            The numeric identifier of the property to be retrieved
-
-            @tplparam T
-            A SfxPoolItem derived class of the retrieved property
-
-            @exception std::bad_cast Thrown if the property was not a T
-
-            @return The T requested
-        */
-        template<class T> const T & ItemGet(const SfxItemSet &rSet,
-            sal_uInt16 eType)
-        {
-            return item_cast<T>(rSet.Get(eType));
-        }
-
-        /** Extract a default SfxPoolItem derived property from a SfxItemPool
-
-            Writer's attributes are retrieved by passing a numeric identifier
-            and receiving a SfxPoolItem reference which must then typically be
-            cast back to its original type which is both tedious and verbose.
-
-            DefaultItemGet returns a reference to the default property of a
-            given SfxItemPool for a given property id, e.g. default fontsize
-
-            DefaultItemGet uses item_cast () on the retrieved reference to test
-            that the retrieved property is of the type that the developer thinks
-            it is.
-
-            @param rPool
-            The SfxItemPool whose default property we want
-
-            @param eType
-            The numeric identifier of the default property to be retrieved
-
-            @tplparam T
-            A SfxPoolItem derived class of the retrieved property
-
-            @exception std::bad_cast Thrown if the property was not a T
-
-            @return The T requested
-        */
-        template<class T> const T & DefaultItemGet(const SfxItemPool &rPool,
-            sal_uInt16 eType)
-        {
-            return item_cast<T>(rPool.GetDefaultItem(eType));
-        }
-
-        /** Extract a default SfxPoolItem derived property from a SwDoc
-
-            Writer's attributes are retrieved by passing a numeric identifier
-            and receiving a SfxPoolItem reference which must then typically be
-            cast back to its original type which is both tedious and verbose.
-
-            DefaultItemGet returns a reference to the default property of a
-            given SwDoc (Writer Document) for a given property id, e.g default
-            fontsize
-
-            DefaultItemGet uses item_cast () on the retrieved reference to test
-            that the retrieved property is of the type that the developer thinks
-            it is.
-
-            @param rPool
-            The SfxItemPool whose default property we want
-
-            @param eType
-            The numeric identifier of the default property to be retrieved
-
-            @tplparam T
-            A SfxPoolItem derived class of the retrieved property
-
-            @exception std::bad_cast Thrown if the property was not a T
-
-            @return The T requested
-        */
-        template<class T> const T & DefaultItemGet(const SwDoc &rDoc,
-            sal_uInt16 eType)
-        {
-            return DefaultItemGet<T>(rDoc.GetAttrPool(), eType);
-        }
-
         /** Get the Paragraph Styles of a SwDoc
 
             Writer's styles are in one of those dreaded macro based pre-STL
@@ -465,6 +316,8 @@ namespace sw
             The sw::PoolItems to put the items into
         */
         void GetPoolItems(const SfxItemSet &rSet, ww8::PoolItems &rItems, bool bExportParentItemSet );
+
+        void DeduplicateItems(ww8::PoolItems &rItems);
 
         const SfxPoolItem *SearchPoolItems(const ww8::PoolItems &rItems,
             sal_uInt16 eType);

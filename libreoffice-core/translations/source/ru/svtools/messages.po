@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-06 20:19+0200\n"
-"PO-Revision-Date: 2022-01-20 04:10+0000\n"
-"Last-Translator: bormant <bormant@mail.ru>\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-02-01 09:33+0000\n"
+"Last-Translator: Timon <kaktebyavirubit@gmail.com>\n"
 "Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_ui-master/svtoolsmessages/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1562678205.000000\n"
 
 #. fLdeV
@@ -76,7 +76,7 @@ msgstr "Текст с форматированием (Richtext)"
 #: include/svtools/strings.hrc:36
 msgctxt "STR_FORMAT_ID_DRAWING"
 msgid "%PRODUCTNAME drawing format"
-msgstr "Рисунок %PRODUCTNAME"
+msgstr "%PRODUCTNAME - Рисунок"
 
 #. 84ABF
 #: include/svtools/strings.hrc:37
@@ -94,7 +94,7 @@ msgstr "Информация о состоянии внутренней связ
 #: include/svtools/strings.hrc:39
 msgctxt "STR_FORMAT_ID_SOLK"
 msgid "%PRODUCTNAME Link (SOLK)"
-msgstr "Связь %PRODUCTNAME (SOLK)"
+msgstr "%PRODUCTNAME - Связь (SOLK)"
 
 #. CdJBD
 #: include/svtools/strings.hrc:40
@@ -484,7 +484,7 @@ msgstr "байт"
 #: include/svtools/strings.hrc:106
 msgctxt "STR_SVT_KB"
 msgid "kB"
-msgstr ""
+msgstr "Кб"
 
 #. WpMzR
 #: include/svtools/strings.hrc:107
@@ -801,7 +801,7 @@ msgstr "Этот шрифт не установлен. Будет использ
 #: include/svtools/strings.hrc:178
 msgctxt "STR_TABBAR_PUSHBUTTON_MOVET0HOME"
 msgid "Move To Home"
-msgstr "Переместить в начало"
+msgstr "Перейти в начало"
 
 #. f6NAc
 #: include/svtools/strings.hrc:179
@@ -819,7 +819,7 @@ msgstr "Перейти вправо"
 #: include/svtools/strings.hrc:181
 msgctxt "STR_TABBAR_PUSHBUTTON_MOVETOEND"
 msgid "Move To End"
-msgstr "Переместить в конец"
+msgstr "Перейти в конец"
 
 #. mZ4Ln
 #: include/svtools/strings.hrc:182
@@ -827,512 +827,524 @@ msgctxt "STR_TABBAR_PUSHBUTTON_ADDTAB"
 msgid "Add"
 msgstr "Добавить"
 
-#. 4K4AF
+#. mJtKL
 #: include/svtools/strings.hrc:184
+msgctxt "STR_TABBAR_HINT_MOVETOHOME_SHEETS"
+msgid "Scroll to first sheet"
+msgstr "Прокрутка до первого листа"
+
+#. Vrt2v
+#: include/svtools/strings.hrc:185
+msgctxt "STR_TABBAR_HINT_MOVELEFT_SHEETS"
+msgid "Scroll to previous sheet"
+msgstr "Прокрутка до предыдущего листа"
+
+#. AFDbv
+#: include/svtools/strings.hrc:186
+msgctxt "STR_TABBAR_HINT_MOVERIGHT_SHEETS"
+msgid "Scroll to next sheet"
+msgstr "Прокрутка до следующего листа"
+
+#. eFvNF
+#: include/svtools/strings.hrc:187
+msgctxt "STR_TABBAR_HINT_MOVETOEND_SHEETS"
+msgid "Scroll to last sheet"
+msgstr "Прокрутка до последнего листа"
+
+#. 8E5Gc
+#: include/svtools/strings.hrc:188
+msgctxt "STR_TABBAR_HINT_ADDTAB_SHEETS"
+msgid "Add sheet"
+msgstr "Добавить лист"
+
+#. 4K4AF
+#: include/svtools/strings.hrc:190
 msgctxt "STR_SVT_ACC_RULER_HORZ_NAME"
 msgid "Horizontal Ruler"
 msgstr "Горизонтальная линейка"
 
 #. PG9qt
-#: include/svtools/strings.hrc:185
+#: include/svtools/strings.hrc:191
 msgctxt "STR_SVT_ACC_RULER_VERT_NAME"
 msgid "Vertical Ruler"
 msgstr "Вертикальная линейка"
 
 #. RJDiQ
-#: include/svtools/strings.hrc:187
+#: include/svtools/strings.hrc:193
 msgctxt "STR_SVT_1BIT_THRESHOLD"
 msgid "1-bit threshold"
-msgstr ""
-
-#. oAsoK
-#: include/svtools/strings.hrc:188
-msgctxt "STR_SVT_1BIT_DITHERED"
-msgid "1-bit dithered"
-msgstr ""
-
-#. AdHAD
-#: include/svtools/strings.hrc:189
-msgctxt "STR_SVT_4BIT_GRAYSCALE"
-msgid "4-bit grayscale"
-msgstr ""
-
-#. jGsVu
-#: include/svtools/strings.hrc:190
-msgctxt "STR_SVT_4BIT_COLOR_PALETTE"
-msgid "4-bit color"
-msgstr ""
+msgstr "1-битный порог"
 
 #. D5EAR
-#: include/svtools/strings.hrc:191
+#: include/svtools/strings.hrc:194
 msgctxt "STR_SVT_8BIT_GRAYSCALE"
 msgid "8-bit grayscale"
-msgstr ""
+msgstr "8-битные оттенки серого"
 
 #. HFbrr
-#: include/svtools/strings.hrc:192
+#: include/svtools/strings.hrc:195
 msgctxt "STR_SVT_8BIT_COLOR_PALETTE"
 msgid "8-bit color"
-msgstr ""
+msgstr "8-битный цвет"
 
 #. Rh5LR
-#: include/svtools/strings.hrc:193
+#: include/svtools/strings.hrc:196
 msgctxt "STR_SVT_24BIT_TRUE_COLOR"
 msgid "24-bit true color"
-msgstr ""
+msgstr "24-битный цвет"
 
 #. LHA5t
-#: include/svtools/strings.hrc:194
+#: include/svtools/strings.hrc:197
 msgctxt "STR_SVT_ESTIMATED_SIZE_PIX_1"
 msgid "The image needs about %1 kB of memory."
-msgstr ""
+msgstr "Изображение требует около %1 Кб памяти."
 
 #. bVGRC
-#: include/svtools/strings.hrc:195
+#: include/svtools/strings.hrc:198
 msgctxt "STR_SVT_ESTIMATED_SIZE_PIX_2"
 msgid "The image needs about %1 kB of memory; the file size is %2 kB."
-msgstr ""
+msgstr "Изображение требует около %1 Кб памяти; размер файла %2 Кб."
 
 #. dAVBR
-#: include/svtools/strings.hrc:196
+#: include/svtools/strings.hrc:199
 msgctxt "STR_SVT_ESTIMATED_SIZE_VEC"
 msgid "The file size is %1 kB."
-msgstr ""
+msgstr "Размер файла %1 Кб."
 
 #. TaCaF
-#: include/svtools/strings.hrc:197
+#: include/svtools/strings.hrc:200
 msgctxt "STR_SVT_HOST"
 msgid "host"
 msgstr "Узел"
 
 #. ERaxD
-#: include/svtools/strings.hrc:198
+#: include/svtools/strings.hrc:201
 msgctxt "STR_SVT_PORT"
 msgid "port"
 msgstr "Порт"
 
 #. W88Be
-#: include/svtools/strings.hrc:199
+#: include/svtools/strings.hrc:202
 msgctxt "STR_SVT_OTHER_CMIS"
 msgid "Other CMIS"
 msgstr "Другой CMIS"
 
 #. E9JF5
-#: include/svtools/strings.hrc:200
+#: include/svtools/strings.hrc:203
 msgctxt "STR_SVT_PRNDLG_READY"
 msgid "Ready"
 msgstr "Готов"
 
 #. 6zER8
-#: include/svtools/strings.hrc:201
+#: include/svtools/strings.hrc:204
 msgctxt "STR_SVT_PRNDLG_PAUSED"
 msgid "Paused"
 msgstr "Приостановлен"
 
 #. nqqYs
-#: include/svtools/strings.hrc:202
+#: include/svtools/strings.hrc:205
 msgctxt "STR_SVT_PRNDLG_PENDING"
 msgid "Pending deletion"
 msgstr "Удаление отложено"
 
 #. CGn9R
-#: include/svtools/strings.hrc:203
+#: include/svtools/strings.hrc:206
 msgctxt "STR_SVT_PRNDLG_BUSY"
 msgid "Busy"
 msgstr "Занят"
 
 #. nyGEq
-#: include/svtools/strings.hrc:204
+#: include/svtools/strings.hrc:207
 msgctxt "STR_SVT_PRNDLG_INITIALIZING"
 msgid "Initializing"
 msgstr "Инициализация"
 
 #. hduW4
-#: include/svtools/strings.hrc:205
+#: include/svtools/strings.hrc:208
 msgctxt "STR_SVT_PRNDLG_WAITING"
 msgid "Waiting"
 msgstr "Ожидание"
 
 #. FYGFz
-#: include/svtools/strings.hrc:206
+#: include/svtools/strings.hrc:209
 msgctxt "STR_SVT_PRNDLG_WARMING_UP"
 msgid "Warming up"
 msgstr "Подготовка к старту"
 
 #. qntFR
-#: include/svtools/strings.hrc:207
+#: include/svtools/strings.hrc:210
 msgctxt "STR_SVT_PRNDLG_PROCESSING"
 msgid "Processing"
 msgstr "Обработка"
 
 #. tUmmx
-#: include/svtools/strings.hrc:208
+#: include/svtools/strings.hrc:211
 msgctxt "STR_SVT_PRNDLG_PRINTING"
 msgid "Printing"
 msgstr "Печать"
 
 #. BMWJx
-#: include/svtools/strings.hrc:209
+#: include/svtools/strings.hrc:212
 msgctxt "STR_SVT_PRNDLG_OFFLINE"
 msgid "Offline"
 msgstr "Автономный режим"
 
 #. drDMK
-#: include/svtools/strings.hrc:210
+#: include/svtools/strings.hrc:213
 msgctxt "STR_SVT_PRNDLG_ERROR"
 msgid "Error"
 msgstr "Ошибка"
 
 #. FnMTQ
-#: include/svtools/strings.hrc:211
+#: include/svtools/strings.hrc:214
 msgctxt "STR_SVT_PRNDLG_SERVER_UNKNOWN"
 msgid "Unknown Server"
 msgstr "Неизвестный сервер"
 
 #. vuLYa
-#: include/svtools/strings.hrc:212
+#: include/svtools/strings.hrc:215
 msgctxt "STR_SVT_PRNDLG_PAPER_JAM"
 msgid "Paper jam"
-msgstr "Заедание бумаги"
+msgstr "Замятие бумаги"
 
 #. qG4ZG
-#: include/svtools/strings.hrc:213
+#: include/svtools/strings.hrc:216
 msgctxt "STR_SVT_PRNDLG_PAPER_OUT"
 msgid "Not enough paper"
 msgstr "Нехватка бумаги"
 
 #. bB9PC
-#: include/svtools/strings.hrc:214
+#: include/svtools/strings.hrc:217
 msgctxt "STR_SVT_PRNDLG_MANUAL_FEED"
 msgid "Manual feed"
 msgstr "Ручная подача бумаги"
 
 #. eMZJo
-#: include/svtools/strings.hrc:215
+#: include/svtools/strings.hrc:218
 msgctxt "STR_SVT_PRNDLG_PAPER_PROBLEM"
 msgid "Paper problem"
 msgstr "Проблема с бумагой"
 
 #. RU3Li
-#: include/svtools/strings.hrc:216
+#: include/svtools/strings.hrc:219
 msgctxt "STR_SVT_PRNDLG_IO_ACTIVE"
 msgid "I/O active"
 msgstr "Активный Вход/Выход"
 
 #. VEuAd
-#: include/svtools/strings.hrc:217
+#: include/svtools/strings.hrc:220
 msgctxt "STR_SVT_PRNDLG_OUTPUT_BIN_FULL"
 msgid "Output bin full"
 msgstr "Выходной лоток заполнен"
 
 #. MinDm
-#: include/svtools/strings.hrc:218
+#: include/svtools/strings.hrc:221
 msgctxt "STR_SVT_PRNDLG_TONER_LOW"
 msgid "Toner low"
 msgstr "Тонер на исходе"
 
 #. AjnQj
-#: include/svtools/strings.hrc:219
+#: include/svtools/strings.hrc:222
 msgctxt "STR_SVT_PRNDLG_NO_TONER"
 msgid "No toner"
 msgstr "Нет тонера"
 
 #. CtvCS
-#: include/svtools/strings.hrc:220
+#: include/svtools/strings.hrc:223
 msgctxt "STR_SVT_PRNDLG_PAGE_PUNT"
 msgid "Delete Page"
 msgstr "Удалить страницу"
 
 #. iGWiT
-#: include/svtools/strings.hrc:221
+#: include/svtools/strings.hrc:224
 msgctxt "STR_SVT_PRNDLG_USER_INTERVENTION"
 msgid "User intervention necessary"
 msgstr "Необходимо вмешательство пользователя"
 
 #. 7xg4W
-#: include/svtools/strings.hrc:222
+#: include/svtools/strings.hrc:225
 msgctxt "STR_SVT_PRNDLG_OUT_OF_MEMORY"
 msgid "Insufficient memory"
 msgstr "Недостаточно памяти"
 
 #. DcNFt
-#: include/svtools/strings.hrc:223
+#: include/svtools/strings.hrc:226
 msgctxt "STR_SVT_PRNDLG_DOOR_OPEN"
 msgid "Cover open"
 msgstr "Крышка лотка открыта"
 
 #. CHiEH
-#: include/svtools/strings.hrc:224
+#: include/svtools/strings.hrc:227
 msgctxt "STR_SVT_PRNDLG_POWER_SAVE"
 msgid "Power save mode"
 msgstr "Режим экономии энергии"
 
 #. bYbeA
-#: include/svtools/strings.hrc:225
+#: include/svtools/strings.hrc:228
 msgctxt "STR_SVT_PRNDLG_DEFPRINTER"
 msgid "Default printer"
 msgstr "Принтер по умолчанию"
 
 #. 9QCL5
-#: include/svtools/strings.hrc:226
+#: include/svtools/strings.hrc:229
 msgctxt "STR_SVT_PRNDLG_JOBCOUNT"
 msgid "%d documents"
 msgstr "%d документа(ов)"
 
 #. yobGc
-#: include/svtools/strings.hrc:228
+#: include/svtools/strings.hrc:231
 msgctxt "STR_NO_FIELD_SELECTION"
 msgid "<none>"
 msgstr "<нет>"
 
 #. Fa4nQ
-#: include/svtools/strings.hrc:229
+#: include/svtools/strings.hrc:232
 msgctxt "STR_FIELD_COMPANY"
 msgid "Company"
 msgstr "Организация"
 
 #. DdDzQ
-#: include/svtools/strings.hrc:230
+#: include/svtools/strings.hrc:233
 msgctxt "STR_FIELD_DEPARTMENT"
 msgid "Department"
 msgstr "Отдел"
 
 #. LXmyi
-#: include/svtools/strings.hrc:231
+#: include/svtools/strings.hrc:234
 msgctxt "STR_FIELD_FIRSTNAME"
 msgid "First name"
 msgstr "Имя"
 
 #. 2MkxF
-#: include/svtools/strings.hrc:232
+#: include/svtools/strings.hrc:235
 msgctxt "STR_FIELD_LASTNAME"
 msgid "Last name"
 msgstr "Фамилия"
 
 #. VyyM6
-#: include/svtools/strings.hrc:233
+#: include/svtools/strings.hrc:236
 msgctxt "STR_FIELD_STREET"
 msgid "Street"
 msgstr "Улица"
 
 #. wUdSC
-#: include/svtools/strings.hrc:234
+#: include/svtools/strings.hrc:237
 msgctxt "STR_FIELD_COUNTRY"
 msgid "Country"
 msgstr "Страна"
 
 #. tAg9k
-#: include/svtools/strings.hrc:235
+#: include/svtools/strings.hrc:238
 msgctxt "STR_FIELD_ZIPCODE"
 msgid "ZIP Code"
 msgstr "Почт. индекс"
 
 #. UYGgj
-#: include/svtools/strings.hrc:236
+#: include/svtools/strings.hrc:239
 msgctxt "STR_FIELD_CITY"
 msgid "City"
 msgstr "Город"
 
 #. vTYyD
-#: include/svtools/strings.hrc:237
+#: include/svtools/strings.hrc:240
 msgctxt "STR_FIELD_TITLE"
 msgid "Title"
 msgstr "Звание"
 
 #. E7qqB
-#: include/svtools/strings.hrc:238
+#: include/svtools/strings.hrc:241
 msgctxt "STR_FIELD_POSITION"
 msgid "Position"
 msgstr "Должность"
 
 #. NiFzB
-#: include/svtools/strings.hrc:239
+#: include/svtools/strings.hrc:242
 msgctxt "STR_FIELD_ADDRFORM"
 msgid "Addr. Form"
 msgstr "Обращение"
 
 #. CFDX6
-#: include/svtools/strings.hrc:240
+#: include/svtools/strings.hrc:243
 msgctxt "STR_FIELD_INITIALS"
 msgid "Initials"
 msgstr "Инициалы"
 
 #. 2DADo
-#: include/svtools/strings.hrc:241
+#: include/svtools/strings.hrc:244
 msgctxt "STR_FIELD_SALUTATION"
 msgid "Complimentary close"
 msgstr "Заключительное приветствие"
 
 #. 8MWGd
-#: include/svtools/strings.hrc:242
+#: include/svtools/strings.hrc:245
 msgctxt "STR_FIELD_HOMETEL"
 msgid "Tel: Home"
 msgstr "Телефон (дом.)"
 
 #. fX9J4
-#: include/svtools/strings.hrc:243
+#: include/svtools/strings.hrc:246
 msgctxt "STR_FIELD_WORKTEL"
 msgid "Tel: Work"
 msgstr "Телефон (раб.)"
 
 #. Ss9vd
-#: include/svtools/strings.hrc:244
+#: include/svtools/strings.hrc:247
 msgctxt "STR_FIELD_FAX"
 msgid "Fax"
 msgstr "Факс"
 
 #. MgbsU
-#: include/svtools/strings.hrc:245
+#: include/svtools/strings.hrc:248
 msgctxt "STR_FIELD_EMAIL"
 msgid "Email"
 msgstr "Эл. почта"
 
 #. aHNGY
-#: include/svtools/strings.hrc:246
+#: include/svtools/strings.hrc:249
 msgctxt "STR_FIELD_URL"
 msgid "URL"
 msgstr "URL"
 
 #. CGutA
-#: include/svtools/strings.hrc:247
+#: include/svtools/strings.hrc:250
 msgctxt "STR_FIELD_NOTE"
 msgid "Note"
 msgstr "Примечание"
 
 #. btBDG
-#: include/svtools/strings.hrc:248
+#: include/svtools/strings.hrc:251
 msgctxt "STR_FIELD_USER1"
 msgid "User 1"
 msgstr "Пользователь 1"
 
 #. A4nkT
-#: include/svtools/strings.hrc:249
+#: include/svtools/strings.hrc:252
 msgctxt "STR_FIELD_USER2"
 msgid "User 2"
 msgstr "Пользователь 2"
 
 #. J48Kt
-#: include/svtools/strings.hrc:250
+#: include/svtools/strings.hrc:253
 msgctxt "STR_FIELD_USER3"
 msgid "User 3"
 msgstr "Пользователь 3"
 
 #. 3BxjF
-#: include/svtools/strings.hrc:251
+#: include/svtools/strings.hrc:254
 msgctxt "STR_FIELD_USER4"
 msgid "User 4"
 msgstr "Пользователь 4"
 
 #. tBBKp
-#: include/svtools/strings.hrc:252
+#: include/svtools/strings.hrc:255
 msgctxt "STR_FIELD_ID"
 msgid "ID"
 msgstr "Код"
 
 #. H3ygA
-#: include/svtools/strings.hrc:253
+#: include/svtools/strings.hrc:256
 msgctxt "STR_FIELD_STATE"
 msgid "State"
 msgstr "Область"
 
 #. xP2AC
-#: include/svtools/strings.hrc:254
+#: include/svtools/strings.hrc:257
 msgctxt "STR_FIELD_OFFICETEL"
 msgid "Tel: Office"
 msgstr "Телефон (раб.)"
 
 #. P6Vm5
-#: include/svtools/strings.hrc:255
+#: include/svtools/strings.hrc:258
 msgctxt "STR_FIELD_PAGER"
 msgid "Pager"
 msgstr "Пейджер"
 
 #. ayErk
-#: include/svtools/strings.hrc:256
+#: include/svtools/strings.hrc:259
 msgctxt "STR_FIELD_MOBILE"
 msgid "Mobile"
 msgstr "Мобильный"
 
 #. 26wjz
-#: include/svtools/strings.hrc:257
+#: include/svtools/strings.hrc:260
 msgctxt "STR_FIELD_TELOTHER"
 msgid "Tel: Other"
 msgstr "Телефон (другой)"
 
 #. runZ4
-#: include/svtools/strings.hrc:258
+#: include/svtools/strings.hrc:261
 msgctxt "STR_FIELD_CALENDAR"
 msgid "Calendar"
 msgstr "Календарь"
 
 #. 7niGM
-#: include/svtools/strings.hrc:259
+#: include/svtools/strings.hrc:262
 msgctxt "STR_FIELD_INVITE"
 msgid "Invite"
 msgstr "Пригласить"
 
 #. Fqcgq
-#: include/svtools/strings.hrc:261
+#: include/svtools/strings.hrc:264
 msgctxt "STR_SVT_DEFAULT_SERVICE_LABEL"
 msgid "$user$'s $service$"
 msgstr "$user$ - $service$"
 
 #. CgGG3
-#: include/svtools/strings.hrc:263
+#: include/svtools/strings.hrc:266
 msgctxt "STR_WARNING_JAVANOTFOUND"
 msgid "%PRODUCTNAME requires a Java runtime environment (JRE) to perform this task. Please install a JRE and restart %PRODUCTNAME. %FAQLINK"
 msgstr "Для выполнения данного задания %PRODUCTNAME необходимо установленное окружение Java (JRE). Установите JRE и перезапустите %PRODUCTNAME. %FAQLINK"
 
 #. SBgjA
-#: include/svtools/strings.hrc:264
+#: include/svtools/strings.hrc:267
 msgctxt "STR_WARNING_JAVANOTFOUND_WIN"
 msgid "%PRODUCTNAME requires a %BITNESS-bit Java runtime environment (JRE) to perform this task. Please install a JRE and restart %PRODUCTNAME. %FAQLINK"
 msgstr "Для выполнения данного задания %PRODUCTNAME необходимо установленное %BITNESS-битное окружение Java (JRE). Установите JRE и перезапустите %PRODUCTNAME. %FAQLINK"
 
 #. FY49S
-#: include/svtools/strings.hrc:265
+#: include/svtools/strings.hrc:268
 msgctxt "STR_WARNING_JAVANOTFOUND_MAC"
 msgid "%PRODUCTNAME requires Oracle's Java Development Kit (JDK) on macOS 10.10 or greater to perform this task. Please install them and restart %PRODUCTNAME. %FAQLINK"
 msgstr "Для выполнения данного задания %PRODUCTNAME на macOS 10.10 необходим Java Development Kit (JDK) от Oracle. Установите его и перезапустите %PRODUCTNAME. %FAQLINK"
 
 #. 76BEm
-#: include/svtools/strings.hrc:266
+#: include/svtools/strings.hrc:269
 msgctxt "STR_WARNING_INVALIDJAVASETTINGS_MAC"
 msgid "The %PRODUCTNAME configuration has been changed. Under %PRODUCTNAME - Preferences - %PRODUCTNAME - Advanced, select the Java runtime environment you want to have used by %PRODUCTNAME."
 msgstr "Параметры %PRODUCTNAME были изменены. Выберите в %PRODUCTNAME - Параметры - %PRODUCTNAME - Расширенные возможности виртуальную машину Java для использования в %PRODUCTNAME."
 
 #. BZvFF
-#: include/svtools/strings.hrc:267
+#: include/svtools/strings.hrc:270
 msgctxt "STR_WARNING_INVALIDJAVASETTINGS"
 msgid "The %PRODUCTNAME configuration has been changed. Under Tools - Options - %PRODUCTNAME - Advanced, select the Java runtime environment you want to have used by %PRODUCTNAME."
 msgstr "Параметры %PRODUCTNAME были изменены. Выберите в Сервис - Параметры - %PRODUCTNAME - Расширенные возможности виртуальную машину Java для использования в %PRODUCTNAME."
 
 #. Tunzz
-#: include/svtools/strings.hrc:268
+#: include/svtools/strings.hrc:271
 msgctxt "STR_ERROR_JVMCREATIONFAILED_MAC"
 msgid "%PRODUCTNAME requires a Java runtime environment (JRE) to perform this task. The selected JRE is defective. Please select another version or install a new JRE and select it under %PRODUCTNAME - Preferences - %PRODUCTNAME - Advanced."
 msgstr "Для выполнения данного задания %PRODUCTNAME необходимо установленное окружение Java (JRE). Выбранное JRE неисправно. Пожалуйста, выберите другую версию или установите новую, затем выберите её в %PRODUCTNAME - Параметры - %PRODUCTNAME - Расширенные возможности."
 
 #. rKxCS
-#: include/svtools/strings.hrc:269
+#: include/svtools/strings.hrc:272
 msgctxt "STR_ERROR_JVMCREATIONFAILED"
 msgid "%PRODUCTNAME requires a Java runtime environment (JRE) to perform this task. The selected JRE is defective. Please select another version or install a new JRE and select it under Tools - Options - %PRODUCTNAME - Advanced."
 msgstr "Для выполнения данного задания %PRODUCTNAME необходимо установленное окружение Java (JRE). Выбранное JRE неисправно. Пожалуйста, выберите другую версию или установите новую, затем выберите её в Сервис - Параметры - %PRODUCTNAME - Расширенные возможности."
 
 #. QPEUX
-#: include/svtools/strings.hrc:270
+#: include/svtools/strings.hrc:273
 msgctxt "STR_WARNING_JAVANOTFOUND_TITLE"
 msgid "JRE Required"
 msgstr "Требуется JRE"
 
 #. XD3FG
-#: include/svtools/strings.hrc:271
+#: include/svtools/strings.hrc:274
 msgctxt "STR_WARNING_INVALIDJAVASETTINGS_TITLE"
 msgid "Select JRE"
 msgstr "Выбрать JRE"
 
 #. WETqJ
-#: include/svtools/strings.hrc:272
+#: include/svtools/strings.hrc:275
 msgctxt "STR_ERROR_JVMCREATIONFAILED_TITLE"
 msgid "JRE is Defective"
 msgstr "JRE повреждена"
@@ -1340,412 +1352,412 @@ msgstr "JRE повреждена"
 #. BAnmG
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: include/svtools/strings.hrc:276
+#: include/svtools/strings.hrc:279
 msgctxt "printersetupdialog|extended_tip|options"
 msgid "Opens the Printer Options dialog where you can override the global printer options set on the Tools - Options - %PRODUCTNAME Writer/Web - Print panel for the current document."
-msgstr "Открывает диалог «Параметры печати», где можно изменить глобальные параметры печати, заданные для текущего документа в Сервис ▸ Параметры ▸ %PRODUCTNAME Writer/Web ▸ Печать."
+msgstr "Открывает диалог «Параметры печати», где возможно изменить глобальные параметры печати, заданные для текущего документа в Сервис ▸ Параметры ▸ %PRODUCTNAME Writer/Web ▸ Печать."
 
 #. q7s6f
-#: include/svtools/strings.hrc:278
+#: include/svtools/strings.hrc:281
 msgctxt "STR_DESCRIPTION_SOURCEFILE"
 msgid "Source code"
 msgstr "Исходный код"
 
 #. PZmAB
-#: include/svtools/strings.hrc:279
+#: include/svtools/strings.hrc:282
 msgctxt "STR_DESCRIPTION_BOOKMARKFILE"
 msgid "Bookmark file"
 msgstr "Файл закладок"
 
 #. eNRzD
-#: include/svtools/strings.hrc:280
+#: include/svtools/strings.hrc:283
 msgctxt "STR_DESCRIPTION_GRAPHIC_DOC"
 msgid "Graphics"
 msgstr "Изображения"
 
 #. Enc4X
-#: include/svtools/strings.hrc:281
+#: include/svtools/strings.hrc:284
 msgctxt "STR_DESCRIPTION_CFGFILE"
 msgid "Configuration file"
 msgstr "Файл конфигурации"
 
 #. sP5AK
-#: include/svtools/strings.hrc:282
+#: include/svtools/strings.hrc:285
 msgctxt "STR_DESCRIPTION_APPLICATION"
 msgid "Application"
 msgstr "Приложение"
 
 #. jAA7S
-#: include/svtools/strings.hrc:283
+#: include/svtools/strings.hrc:286
 msgctxt "STR_DESCRIPTION_DATABASE_TABLE"
 msgid "Database table"
 msgstr "Таблица базы данных"
 
 #. CEhUy
-#: include/svtools/strings.hrc:284
+#: include/svtools/strings.hrc:287
 msgctxt "STR_DESCRIPTION_SYSFILE"
 msgid "System file"
 msgstr "Системный файл"
 
 #. E2Kzj
-#: include/svtools/strings.hrc:285
+#: include/svtools/strings.hrc:288
 msgctxt "STR_DESCRIPTION_WORD_DOC"
 msgid "MS Word document"
 msgstr "Документ MS Word"
 
 #. BU7Pw
-#: include/svtools/strings.hrc:286
+#: include/svtools/strings.hrc:289
 msgctxt "STR_DESCRIPTION_HELP_DOC"
 msgid "Help file"
 msgstr "Файл справки"
 
 #. kBbwy
-#: include/svtools/strings.hrc:287
+#: include/svtools/strings.hrc:290
 msgctxt "STR_DESCRIPTION_HTMLFILE"
 msgid "HTML document"
 msgstr "Документ HTML"
 
 #. 6W6tY
-#: include/svtools/strings.hrc:288
+#: include/svtools/strings.hrc:291
 msgctxt "STR_DESCRIPTION_ARCHIVFILE"
 msgid "Archive file"
 msgstr "Файл архива"
 
 #. c9WiE
-#: include/svtools/strings.hrc:289
+#: include/svtools/strings.hrc:292
 msgctxt "STR_DESCRIPTION_LOGFILE"
 msgid "Log file"
 msgstr "Журнал"
 
 #. gBQzN
-#: include/svtools/strings.hrc:290
+#: include/svtools/strings.hrc:293
 msgctxt "STR_DESCRIPTION_SDATABASE_DOC"
 msgid "StarOffice Database"
 msgstr "База данных StarOffice"
 
 #. J4Pki
-#: include/svtools/strings.hrc:291
+#: include/svtools/strings.hrc:294
 msgctxt "STR_DESCRIPTION_GLOBALDOC"
 msgid "StarWriter 4.0 / 5.0 Master Document"
 msgstr "Составной текстовый документ StarWriter 4.0 / 5.0"
 
 #. 33Dez
-#: include/svtools/strings.hrc:292
+#: include/svtools/strings.hrc:295
 msgctxt "STR_DESCRIPTION_SIMAGE_DOC"
 msgid "StarOffice Image"
 msgstr "Изображение StarOffice"
 
 #. pcLE6
-#: include/svtools/strings.hrc:293
+#: include/svtools/strings.hrc:296
 msgctxt "STR_DESCRIPTION_TEXTFILE"
 msgid "Text file"
 msgstr "Текстовый файл"
 
 #. 7bMJT
-#: include/svtools/strings.hrc:294
+#: include/svtools/strings.hrc:297
 msgctxt "STR_DESCRIPTION_LINK"
 msgid "Link"
 msgstr "Связь"
 
 #. hDFtd
-#: include/svtools/strings.hrc:295
+#: include/svtools/strings.hrc:298
 msgctxt "STR_DESCRIPTION_SOFFICE_TEMPLATE_DOC"
 msgid "StarOffice 3.0 - 5.0 Template"
 msgstr "Шаблон StarOffice 3.0 - 5.0"
 
 #. Xcec2
-#: include/svtools/strings.hrc:296
+#: include/svtools/strings.hrc:299
 msgctxt "STR_DESCRIPTION_EXCEL_DOC"
 msgid "MS Excel document"
 msgstr "Документ MS Excel"
 
 #. FWiWT
-#: include/svtools/strings.hrc:297
+#: include/svtools/strings.hrc:300
 msgctxt "STR_DESCRIPTION_EXCEL_TEMPLATE_DOC"
 msgid "MS Excel template"
 msgstr "Шаблон MS Excel"
 
 #. WBsxH
-#: include/svtools/strings.hrc:298
+#: include/svtools/strings.hrc:301
 msgctxt "STR_DESCRIPTION_BATCHFILE"
 msgid "Batch file"
 msgstr "Пакетный файл"
 
 #. SPQtV
-#: include/svtools/strings.hrc:299
+#: include/svtools/strings.hrc:302
 msgctxt "STR_DESCRIPTION_FILE"
 msgid "File"
 msgstr "Файл"
 
 #. Vh78a
-#: include/svtools/strings.hrc:300
+#: include/svtools/strings.hrc:303
 msgctxt "STR_DESCRIPTION_FOLDER"
 msgid "Folder"
 msgstr "Папка"
 
 #. ZK69j
-#: include/svtools/strings.hrc:301
+#: include/svtools/strings.hrc:304
 msgctxt "STR_DESCRIPTION_FACTORY_WRITER"
 msgid "Text Document"
 msgstr "Текстовый документ"
 
 #. p2aL6
-#: include/svtools/strings.hrc:302
+#: include/svtools/strings.hrc:305
 msgctxt "STR_DESCRIPTION_FACTORY_CALC"
 msgid "Spreadsheet"
 msgstr "Электронная таблица"
 
 #. SCtHH
-#: include/svtools/strings.hrc:303
+#: include/svtools/strings.hrc:306
 msgctxt "STR_DESCRIPTION_FACTORY_IMPRESS"
 msgid "Presentation"
 msgstr "Презентация"
 
 #. 5gtdF
-#: include/svtools/strings.hrc:304
+#: include/svtools/strings.hrc:307
 msgctxt "STR_DESCRIPTION_FACTORY_DRAW"
 msgid "Drawing"
 msgstr "Рисунок"
 
 #. suagX
-#: include/svtools/strings.hrc:305
+#: include/svtools/strings.hrc:308
 msgctxt "STR_DESCRIPTION_FACTORY_WRITERWEB"
 msgid "HTML document"
 msgstr "Документ HTML"
 
 #. iLqe2
-#: include/svtools/strings.hrc:306
+#: include/svtools/strings.hrc:309
 msgctxt "STR_DESCRIPTION_FACTORY_GLOBALDOC"
 msgid "Master document"
 msgstr "Составной документ"
 
 #. FF4fa
-#: include/svtools/strings.hrc:307
+#: include/svtools/strings.hrc:310
 msgctxt "STR_DESCRIPTION_FACTORY_MATH"
 msgid "Formula"
 msgstr "Формула"
 
 #. t58zy
-#: include/svtools/strings.hrc:308
+#: include/svtools/strings.hrc:311
 msgctxt "STR_DESCRIPTION_FACTORY_DATABASE"
 msgid "Database"
 msgstr "База данных"
 
 #. DiNGB
-#: include/svtools/strings.hrc:309
+#: include/svtools/strings.hrc:312
 msgctxt "STR_DESCRIPTION_CALC_TEMPLATE"
 msgid "OpenOffice.org 1.0 Spreadsheet Template"
 msgstr "Шаблон электронной таблицы OpenOffice.org 1.0"
 
 #. FYKGV
-#: include/svtools/strings.hrc:310
+#: include/svtools/strings.hrc:313
 msgctxt "STR_DESCRIPTION_DRAW_TEMPLATE"
 msgid "OpenOffice.org 1.0 Drawing Template"
 msgstr "Шаблон рисунка OpenOffice.org 1.0"
 
 #. CTUQg
-#: include/svtools/strings.hrc:311
+#: include/svtools/strings.hrc:314
 msgctxt "STR_DESCRIPTION_IMPRESS_TEMPLATE"
 msgid "OpenOffice.org 1.0 Presentation Template"
 msgstr "Шаблон презентации OpenOffice.org 1.0"
 
 #. Cbvtx
-#: include/svtools/strings.hrc:312
+#: include/svtools/strings.hrc:315
 msgctxt "STR_DESCRIPTION_WRITER_TEMPLATE"
 msgid "OpenOffice.org 1.0 Text Document Template"
 msgstr "Шаблон текстового документа OpenOffice.org 1.0"
 
 #. FBCWx
-#: include/svtools/strings.hrc:313
+#: include/svtools/strings.hrc:316
 msgctxt "STR_DESCRIPTION_LOCALE_VOLUME"
 msgid "Local drive"
-msgstr "Локальный дисковод"
+msgstr "Локальный диск"
 
 #. MEF3h
-#: include/svtools/strings.hrc:314
+#: include/svtools/strings.hrc:317
 msgctxt "STR_DESCRIPTION_FLOPPY_VOLUME"
 msgid "Disk drive"
 msgstr "Дисковод"
 
 #. 55Dof
-#: include/svtools/strings.hrc:315
+#: include/svtools/strings.hrc:318
 msgctxt "STR_DESCRIPTION_CDROM_VOLUME"
 msgid "CD-ROM drive"
 msgstr "Привод для компакт-дисков"
 
 #. 82Acc
-#: include/svtools/strings.hrc:316
+#: include/svtools/strings.hrc:319
 msgctxt "STR_DESCRIPTION_REMOTE_VOLUME"
 msgid "Network connection"
 msgstr "Сетевое подключение"
 
 #. 3CBfJ
-#: include/svtools/strings.hrc:317
+#: include/svtools/strings.hrc:320
 msgctxt "STR_DESCRIPTION_POWERPOINT"
 msgid "MS PowerPoint Document"
 msgstr "Документ MS PowerPoint"
 
 #. DS7CP
-#: include/svtools/strings.hrc:318
+#: include/svtools/strings.hrc:321
 msgctxt "STR_DESCRIPTION_POWERPOINT_TEMPLATE"
 msgid "MS PowerPoint Template"
 msgstr "Шаблон MS PowerPoint"
 
 #. syag8
-#: include/svtools/strings.hrc:319
+#: include/svtools/strings.hrc:322
 msgctxt "STR_DESCRIPTION_POWERPOINT_SHOW"
 msgid "MS PowerPoint Show"
 msgstr "Демонстрация MS PowerPoint"
 
 #. fHGcD
-#: include/svtools/strings.hrc:320
+#: include/svtools/strings.hrc:323
 msgctxt "STR_DESCRIPTION_SXMATH_DOC"
 msgid "OpenOffice.org 1.0 Formula"
 msgstr "Формула OpenOffice.org 1.0"
 
 #. CFw78
-#: include/svtools/strings.hrc:321
+#: include/svtools/strings.hrc:324
 msgctxt "STR_DESCRIPTION_SXCHART_DOC"
 msgid "OpenOffice.org 1.0 Chart"
 msgstr "Диаграмма OpenOffice.org 1.0"
 
 #. tJhDC
-#: include/svtools/strings.hrc:322
+#: include/svtools/strings.hrc:325
 msgctxt "STR_DESCRIPTION_SXDRAW_DOC"
 msgid "OpenOffice.org 1.0 Drawing"
 msgstr "Рисунок OpenOffice.org 1.0"
 
 #. f9ZNL
-#: include/svtools/strings.hrc:323
+#: include/svtools/strings.hrc:326
 msgctxt "STR_DESCRIPTION_SXCALC_DOC"
 msgid "OpenOffice.org 1.0 Spreadsheet"
 msgstr "Электронная таблица OpenOffice.org 1.0"
 
 #. PCBqi
-#: include/svtools/strings.hrc:324
+#: include/svtools/strings.hrc:327
 msgctxt "STR_DESCRIPTION_SXIMPRESS_DOC"
 msgid "OpenOffice.org 1.0 Presentation"
 msgstr "Презентация OpenOffice.org 1.0"
 
 #. Npija
-#: include/svtools/strings.hrc:325
+#: include/svtools/strings.hrc:328
 msgctxt "STR_DESCRIPTION_SXWRITER_DOC"
 msgid "OpenOffice.org 1.0 Text Document"
 msgstr "Текстовый документ OpenOffice.org 1.0"
 
 #. tVnQQ
-#: include/svtools/strings.hrc:326
+#: include/svtools/strings.hrc:329
 msgctxt "STR_DESCRIPTION_SXGLOBAL_DOC"
 msgid "OpenOffice.org 1.0 Master Document"
 msgstr "Составной документ OpenOffice.org 1.0"
 
 #. t6krU
-#: include/svtools/strings.hrc:327
+#: include/svtools/strings.hrc:330
 msgctxt "STR_DESCRIPTION_MATHML_DOC"
 msgid "MathML Document"
 msgstr "Документ MathML"
 
-#. ims8J
-#: include/svtools/strings.hrc:328
-msgctxt "STR_DESCRIPTION_OO_DATABASE_DOC"
-msgid "OpenDocument Database"
-msgstr "База данных OpenDocument"
-
-#. oEsdN
-#: include/svtools/strings.hrc:329
-msgctxt "STR_DESCRIPTION_OO_DRAW_DOC"
-msgid "OpenDocument Drawing"
-msgstr "Рисунок OpenDocument"
-
-#. Bt5dS
-#: include/svtools/strings.hrc:330
-msgctxt "STR_DESCRIPTION_OO_MATH_DOC"
-msgid "OpenDocument Formula"
-msgstr "Формула OpenDocument"
-
-#. sMAZA
+#. gGRGw
 #: include/svtools/strings.hrc:331
-msgctxt "STR_DESCRIPTION_OO_GLOBAL_DOC"
-msgid "OpenDocument Master Document"
-msgstr "Составной документ OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_DATABASE_DOC"
+msgid "%PRODUCTNAME Database"
+msgstr "%PRODUCTNAME - База данных"
 
-#. ufLx7
+#. ZFz7o
 #: include/svtools/strings.hrc:332
-msgctxt "STR_DESCRIPTION_OO_IMPRESS_DOC"
-msgid "OpenDocument Presentation"
-msgstr "Презентация OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_DRAW_DOC"
+msgid "%PRODUCTNAME Drawing"
+msgstr "%PRODUCTNAME - Рисунок"
 
-#. TjbnG
+#. 9JRAR
 #: include/svtools/strings.hrc:333
-msgctxt "STR_DESCRIPTION_OO_CALC_DOC"
-msgid "OpenDocument Spreadsheet"
-msgstr "Электронная таблица OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_MATH_DOC"
+msgid "%PRODUCTNAME Math Formula"
+msgstr "%PRODUCTNAME - Формула Math"
 
-#. FbCGb
+#. 4F4Uo
 #: include/svtools/strings.hrc:334
-msgctxt "STR_DESCRIPTION_OO_WRITER_DOC"
-msgid "OpenDocument Text"
-msgstr "Текстовый документ OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_GLOBAL_DOC"
+msgid "%PRODUCTNAME Master Document"
+msgstr "%PRODUCTNAME - Составной документ"
 
-#. JRP2W
+#. FXCdu
 #: include/svtools/strings.hrc:335
-msgctxt "STR_DESCRIPTION_OO_CALC_TEMPLATE"
-msgid "OpenDocument Spreadsheet Template"
-msgstr "Шаблон электронной таблицы OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_IMPRESS_DOC"
+msgid "%PRODUCTNAME Impress Presentation"
+msgstr "%PRODUCTNAME - Презентация Impress"
 
-#. 3QUto
+#. 3ReMe
 #: include/svtools/strings.hrc:336
-msgctxt "STR_DESCRIPTION_OO_DRAW_TEMPLATE"
-msgid "OpenDocument Drawing Template"
-msgstr "Шаблон рисунка OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_CALC_DOC"
+msgid "%PRODUCTNAME Calc Spreadsheet"
+msgstr "%PRODUCTNAME - Таблица Calc"
 
-#. 5CfAm
+#. pTYGw
 #: include/svtools/strings.hrc:337
-msgctxt "STR_DESCRIPTION_OO_IMPRESS_TEMPLATE"
-msgid "OpenDocument Presentation Template"
-msgstr "Шаблон презентации OpenDocument"
+msgctxt "STR_DESCRIPTION_OO_WRITER_DOC"
+msgid "%PRODUCTNAME Writer Document"
+msgstr "%PRODUCTNAME - Документ Writer"
 
-#. PBGYD
+#. m2AEw
 #: include/svtools/strings.hrc:338
+msgctxt "STR_DESCRIPTION_OO_CALC_TEMPLATE"
+msgid "%PRODUCTNAME Spreadsheet Template"
+msgstr "%PRODUCTNAME - Шаблон эл.таблицы"
+
+#. M65d6
+#: include/svtools/strings.hrc:339
+msgctxt "STR_DESCRIPTION_OO_DRAW_TEMPLATE"
+msgid "%PRODUCTNAME Drawing Template"
+msgstr "%PRODUCTNAME - Шаблон рисунка"
+
+#. MrK7k
+#: include/svtools/strings.hrc:340
+msgctxt "STR_DESCRIPTION_OO_IMPRESS_TEMPLATE"
+msgid "%PRODUCTNAME Presentation Template"
+msgstr "%PRODUCTNAME - Шаблон презентации"
+
+#. F8icA
+#: include/svtools/strings.hrc:341
 msgctxt "STR_DESCRIPTION_OO_WRITER_TEMPLATE"
-msgid "OpenDocument Text Template"
-msgstr "Шаблон текстового документа OpenDocument"
+msgid "%PRODUCTNAME Text Template"
+msgstr "%PRODUCTNAME - Шаблон текстового документа"
 
 #. RgRyf
-#: include/svtools/strings.hrc:339
+#: include/svtools/strings.hrc:342
 msgctxt "STR_DESCRIPTION_EXTENSION"
 msgid "%PRODUCTNAME Extension"
-msgstr "Расширение %PRODUCTNAME"
+msgstr "%PRODUCTNAME - Расширение"
 
 #. b8JK6
-#: include/svtools/strings.hrc:341
+#: include/svtools/strings.hrc:344
 msgctxt "STR_DESCRIPTION_HUNSPELL"
 msgid "Hunspell SpellChecker"
 msgstr "Проверка орфографии Hunspell"
 
 #. do26f
-#: include/svtools/strings.hrc:342
+#: include/svtools/strings.hrc:345
 msgctxt "STR_DESCRIPTION_LIBHYPHEN"
 msgid "Libhyphen Hyphenator"
 msgstr "Переносы Libhyphen"
 
 #. aGFNy
-#: include/svtools/strings.hrc:343
+#: include/svtools/strings.hrc:346
 msgctxt "STR_DESCRIPTION_MYTHES"
 msgid "MyThes Thesaurus"
 msgstr "Словарь синонимов MyThes"
 
 #. RwS4n
-#: include/svtools/strings.hrc:344
+#: include/svtools/strings.hrc:347
 msgctxt "STR_DESCRIPTION_IGNOREALLLIST"
 msgid "List of Ignored Words"
 msgstr "Список игнорируемых слов"
 
 #. eAiiA
-#: include/svtools/strings.hrc:345
+#: include/svtools/strings.hrc:348
 msgctxt "STR_DESCRIPTION_LANGUAGETOOL"
 msgid "LanguageTool Remote Grammar Checker"
-msgstr ""
+msgstr "Удалённая проверка грамматики LanguageTool"
 
 #. wH3TZ
 msgctxt "stock"
@@ -2328,7 +2340,7 @@ msgstr "Ошибка чтения файла."
 #: svtools/inc/errtxt.hrc:107
 msgctxt "RID_ERRHDL"
 msgid "Document opened as read-only cannot be saved over itself."
-msgstr ""
+msgstr "Документ, открытый только для чтения, не может быть сохранён поверх самого себя."
 
 #. kDirB
 #: svtools/inc/errtxt.hrc:108
@@ -2504,7 +2516,7 @@ msgstr "Функция невыполнима: путь содержит тек�
 #: svtools/inc/errtxt.hrc:128
 msgctxt "RID_ERRHDL"
 msgid "Function not possible: device (drive) not identical."
-msgstr "Невозможная функция: другое устройство (диск)."
+msgstr "Невозможно выполнить операцию: другое устройство (диск)."
 
 #. ofvvG
 #: svtools/inc/errtxt.hrc:129
@@ -2532,7 +2544,7 @@ msgid ""
 "Deactivate sharing mode first."
 msgstr ""
 "Пароль совместно используемого табличного документа не может быть установлен или изменён.\n"
-"Сначала отключите режим совместного использования."
+"Сперва отключите режим совместного использования."
 
 #. M4EWG
 #: svtools/inc/errtxt.hrc:133
@@ -2544,7 +2556,7 @@ msgstr "Ошибка формата файла в позиции $(ARG1)(стр�
 #: svtools/inc/errtxt.hrc:134
 msgctxt "RID_ERRHDL"
 msgid "The filter for this file format is disabled in configuration. Please contact your systems administrator."
-msgstr "Фильтр этого формата файла отключен в настройках. Свяжитесь с системным администратором."
+msgstr "Фильтр этого формата файла отключён в настройках. Свяжитесь с системным администратором."
 
 #. WZiDE
 #: svtools/inc/errtxt.hrc:140
@@ -4350,7 +4362,7 @@ msgstr "Гаитянский креольский"
 #: svtools/inc/langtab.hrc:325
 msgctxt "STR_ARR_SVT_LANGUAGE_TABLE"
 msgid "Beembe"
-msgstr "Beembe"
+msgstr "Бембе"
 
 #. 6Pkbr
 #: svtools/inc/langtab.hrc:326
@@ -5046,7 +5058,13 @@ msgstr "Межславянская кириллица"
 #: svtools/inc/langtab.hrc:441
 msgctxt "STR_ARR_SVT_LANGUAGE_TABLE"
 msgid "Pennsylvania Dutch"
-msgstr ""
+msgstr "Пенсильванский голландский"
+
+#. vkGn5
+#: svtools/inc/langtab.hrc:442
+msgctxt "STR_ARR_SVT_LANGUAGE_TABLE"
+msgid "Portuguese (Mozambique)"
+msgstr "Португальский (Мозамбик)"
 
 #. fXSja
 #: svtools/uiconfig/ui/addresstemplatedialog.ui:8
@@ -5178,19 +5196,19 @@ msgstr "Разрешение:"
 #: svtools/uiconfig/ui/graphicexport.ui:222
 msgctxt "graphicexport|extended_tip|widthmf"
 msgid "Specifies the measurement units."
-msgstr "Указывается необходимость печати повторяющихся значений."
+msgstr "Задаёт единицы измерения."
 
 #. BPaB3
 #: svtools/uiconfig/ui/graphicexport.ui:242
 msgctxt "graphicexport|extended_tip|heightmf"
 msgid "Specifies the height."
-msgstr "Указывается необходимость печати повторяющихся значений."
+msgstr "Задаёт высоту."
 
 #. Da3fv
 #: svtools/uiconfig/ui/graphicexport.ui:262
 msgctxt "graphicexport|extended_tip|resolutionmf"
 msgid "Enter the image resolution. Select the measurement units from the list box."
-msgstr "Добавление поздравления. Выберите поздравление из списка."
+msgstr "Введите разрешение изображения. Выберите единицы измерения из списка."
 
 #. S9aHs
 #: svtools/uiconfig/ui/graphicexport.ui:276
@@ -5250,7 +5268,7 @@ msgstr "пикс./метр"
 #: svtools/uiconfig/ui/graphicexport.ui:304
 msgctxt "graphicexport|extended_tip|resolutionlb"
 msgid "Enter the image resolution. Select the measurement units from the list box."
-msgstr "Добавление поздравления. Выберите поздравление из списка."
+msgstr "Введите разрешение изображения. Выберите единицы измерения из списка."
 
 #. ENaqm
 #: svtools/uiconfig/ui/graphicexport.ui:322
@@ -5274,19 +5292,19 @@ msgstr "Глубина цвета"
 #: svtools/uiconfig/ui/graphicexport.ui:385
 msgctxt "graphicexport|losslesscb"
 msgid "Lossless"
-msgstr ""
+msgstr "Без потерь"
 
 #. QKNme
 #: svtools/uiconfig/ui/graphicexport.ui:394
 msgctxt "graphicexport|extended_tip|losslesscb"
 msgid "Lossless images do not lose quality but result in larger files."
-msgstr ""
+msgstr "Изображения без потерь сохраняют качество, но приводят к увеличению размера файлов."
 
 #. 5Gv5x
 #: svtools/uiconfig/ui/graphicexport.ui:413
 msgctxt "graphicexport|extended_tip|compressionjpgwebpnf"
 msgid "Sets the quality for the export. Choose from a low quality with minimal file size, up to a high quality and big file size."
-msgstr ""
+msgstr "Задаёт качество экспорта. Выбор от низкого качества с минимальным размером файла до высокого качества и большого размера файла."
 
 #. Tk5y2
 #: svtools/uiconfig/ui/graphicexport.ui:442
@@ -5316,7 +5334,7 @@ msgstr "Кодирование RLE"
 #: svtools/uiconfig/ui/graphicexport.ui:538
 msgctxt "graphicexport|extended_tip|rlecb"
 msgid "Applies RLE (Run Length Encoding) to the BMP graphics."
-msgstr "Выберите этот значок, чтобы выполнить просмотр графических объектов."
+msgstr "Применяет кодирование RLE к BMP-изображениям."
 
 #. EA7BF
 #: svtools/uiconfig/ui/graphicexport.ui:547
@@ -5352,7 +5370,7 @@ msgstr "Сохранить прозрачность"
 #: svtools/uiconfig/ui/graphicexport.ui:618
 msgctxt "graphicexport|extended_tip|savetransparencycb"
 msgid "Specifies whether to save the background of the picture as transparent. Only objects will be visible in the GIF image. Use the Color Replacer to set the transparent color in the picture."
-msgstr "Указывается, требуется ли сохранить фон изображения в прозрачном виде. В GIF-изображении будут видны только объекты. Для задания прозрачного цвета для рисунка используется инструмент \"Пипетка\"."
+msgstr "Задаёт, сохранить ли фон изображения прозрачным. В изображении GIF будут видны только объекты. Для выбора цвета фона вместо прозрачного используйте инструмент «Замена цвета»."
 
 #. ZPmXf
 #: svtools/uiconfig/ui/graphicexport.ui:627
@@ -5412,7 +5430,7 @@ msgstr "Interchange (EPSI)"
 #: svtools/uiconfig/ui/graphicexport.ui:758
 msgctxt "graphicexport|extended_tip|epsipreviewcb"
 msgid "Specifies whether a monochrome preview graphic in EPSI format is exported together with the PostScript file. This format only contains printable characters from the 7-bit ASCII code."
-msgstr "Указывает, будет ли монохромный предварительный просмотр графического объекта в формате EPSI экспортироваться вместе с файлом PostScript."
+msgstr "Указывает, будет ли монохромный предварительный просмотр графического объекта в формате EPSI экспортироваться вместе с файлом PostScript. Этот формат содержит только печатные символы из 7-битного ASCII-кода."
 
 #. sRbZb
 #: svtools/uiconfig/ui/graphicexport.ui:773
@@ -5430,7 +5448,7 @@ msgstr "Цвет"
 #: svtools/uiconfig/ui/graphicexport.ui:809
 msgctxt "graphicexport|extended_tip|color1rb"
 msgid "Exports the file in color."
-msgstr "Используется для форматирования основания диаграммы."
+msgstr "Экспортирует файл в цвете."
 
 #. VeZFK
 #: svtools/uiconfig/ui/graphicexport.ui:820
@@ -5442,7 +5460,7 @@ msgstr "Оттенки серого"
 #: svtools/uiconfig/ui/graphicexport.ui:829
 msgctxt "graphicexport|extended_tip|color2rb"
 msgid "Exports the file in grayscale tones."
-msgstr "Используется для форматирования линии среднего значения."
+msgstr "Экспортирует файл в оттенках серого."
 
 #. BbSGF
 #: svtools/uiconfig/ui/graphicexport.ui:844
@@ -5460,7 +5478,7 @@ msgstr "Уровень 1"
 #: svtools/uiconfig/ui/graphicexport.ui:880
 msgctxt "graphicexport|extended_tip|level1rb"
 msgid "Compression is not available at this level. Select the Level 1 option if your PostScript printer does not offer the capabilities of Level 2."
-msgstr "На этом уровне сжатие недоступно. Выберите параметр  Уровень 1, если принтер PostScript не предлагает возможности уровня 2."
+msgstr "На этом уровне сжатие недоступно. Выберите параметр Уровень 1, если принтер PostScript не предлагает возможности уровня 2."
 
 #. kuCNX
 #: svtools/uiconfig/ui/graphicexport.ui:891
@@ -5760,91 +5778,91 @@ msgstr "Перезапустить позже"
 #: svtools/uiconfig/ui/restartdialog.ui:70
 msgctxt "restartdialog|reason_java"
 msgid "For the selected Java runtime environment to work properly, %PRODUCTNAME must be restarted."
-msgstr "Для работы выбранного окружения Java %PRODUCTNAME должен быть перезапущен."
+msgstr "Для правильной работы выбранного окружения Java необходимо перезапустить %PRODUCTNAME."
 
 #. rv3cE
 #: svtools/uiconfig/ui/restartdialog.ui:85
 msgctxt "restartdialog|reason_mailmerge_install"
 msgid "For mail merge to work properly, %PRODUCTNAME must be restarted."
-msgstr "Для корректной работы почтовой рассылки перезапустите %PRODUCTNAME."
+msgstr "Для правильной работы почтовой рассылки необходимо перезапустить %PRODUCTNAME."
 
 #. x2ZNk
 #: svtools/uiconfig/ui/restartdialog.ui:100
 msgctxt "restartdialog|reason_pdf"
 msgid "For the modified default print job format to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для вступления в силу изменений формата задания печати %PRODUCTNAME должен быть перезапущен."
+msgstr "Для вступления в силу изменений формата задания печати необходимо перезапустить %PRODUCTNAME."
 
 #. DuVPb
 #: svtools/uiconfig/ui/restartdialog.ui:115
 msgctxt "restartdialog|reason_bibliography_install"
 msgid "For the bibliography to work properly, %PRODUCTNAME must be restarted."
-msgstr "Для корректной работы библиографии %PRODUCTNAME должен быть перезапущен."
+msgstr "Для правильной работы библиографии необходимо перезапустить %PRODUCTNAME."
 
 #. WZXc9
 #: svtools/uiconfig/ui/restartdialog.ui:130
 msgctxt "restartdialog|reason_assigning_folders"
 msgid "For the assigned folders and archives to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения назначенных каталогов и архивов %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения назначенных каталогов и архивов необходимо перезапустить %PRODUCTNAME."
 
 #. hmir5
 #: svtools/uiconfig/ui/restartdialog.ui:145
 msgctxt "restartdialog|reason_assigning_javaparameters"
 msgid "For the assigned Java parameters to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения параметров Java %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения параметров Java необходимо перезапустить %PRODUCTNAME."
 
 #. CQyix
 #: svtools/uiconfig/ui/restartdialog.ui:160
 msgctxt "restartdialog|reason_adding_path"
 msgid "For the added path to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения добавленных путей %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения добавленных путей необходимо перезапустить %PRODUCTNAME."
 
 #. SANFq
 #: svtools/uiconfig/ui/restartdialog.ui:175
 msgctxt "restartdialog|reason_language_change"
 msgid "For the updated language settings to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения настроек языка %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения настроек языка необходимо перезапустить %PRODUCTNAME."
 
 #. MtNwS
 #: svtools/uiconfig/ui/restartdialog.ui:190
 msgctxt "restartdialog|reason_exp_features"
 msgid "For the modified experimental features to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения экспериментальных возможностей %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения экспериментальных возможностей необходимо перезапустить %PRODUCTNAME."
 
 #. T7Cuz
 #: svtools/uiconfig/ui/restartdialog.ui:205
 msgctxt "restartdialog|reason_extension_install"
 msgid "For the extension to work properly, %PRODUCTNAME must be restarted."
-msgstr "Для корректной работы расширения %PRODUCTNAME должен быть перезапущен."
+msgstr "Для корректной работы расширения необходимо перезапустить %PRODUCTNAME."
 
 #. CdJen
 #: svtools/uiconfig/ui/restartdialog.ui:220
 msgctxt "restartdialog|reason_extension_install"
 msgid "To apply changes, %PRODUCTNAME must be restarted."
-msgstr "Для применения изменений %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения изменений необходимо перезапустить %PRODUCTNAME."
 
 #. AGbvD
 #: svtools/uiconfig/ui/restartdialog.ui:235
 msgctxt "restartdialog|reason_opencl"
 msgid "For the OpenCL changes to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения изменений OpenCL %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения изменений OpenCL необходимо перезапустить %PRODUCTNAME."
 
 #. sGe6v
 #: svtools/uiconfig/ui/restartdialog.ui:250
 msgctxt "restartdialog|reason_threading"
 msgid "For the multi-threaded calculation changes to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения изменений мультипоточных вычислений %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения изменений мультипоточных вычислений необходимо перезапустить %PRODUCTNAME."
 
 #. nUonf
 #: svtools/uiconfig/ui/restartdialog.ui:265
 msgctxt "restartdialog|reason_mscompatible_formsmenu"
 msgid "For restructuring the Form menu, %PRODUCTNAME must be restarted."
-msgstr "Для преобразования меню Форма, %PRODUCTNAME должен быть перезапущен."
+msgstr "Для преобразования меню Форма необходимо перезапустить %PRODUCTNAME."
 
 #. yojAQ
 #: svtools/uiconfig/ui/restartdialog.ui:280
 msgctxt "restartdialog|reason_save"
 msgid "For the modified save settings to take effect, %PRODUCTNAME must be restarted."
-msgstr ""
+msgstr "Для применения изменённых настроек необходимо перезапустить %PRODUCTNAME."
 
 #. weAzr
 #: svtools/uiconfig/ui/restartdialog.ui:295
@@ -5856,7 +5874,7 @@ msgstr "Перезапустить %PRODUCTNAME сейчас?"
 #: svtools/uiconfig/ui/restartdialog.ui:309
 msgctxt "restartdialog|reason_skia"
 msgid "For the Skia changes to take effect, %PRODUCTNAME must be restarted."
-msgstr "Для применения изменений Skia %PRODUCTNAME должен быть перезапущен."
+msgstr "Для применения изменений Skia необходимо перезапустить %PRODUCTNAME."
 
 #. v9FjK
 #: svtools/uiconfig/ui/thineditcontrol.ui:72

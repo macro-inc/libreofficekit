@@ -20,9 +20,10 @@
 #define INCLUDED_SW_INC_UNOMAP_HXX
 
 #include <sal/types.h>
+#include <svl/itemprop.hxx>
+#include <o3tl/span.hxx>
 
 class SfxItemPropertySet;
-struct SfxItemPropertyMapEntry;
 
 #define PROPERTY_MAP_TEXT_CURSOR            0
 #define PROPERTY_MAP_CHAR_STYLE             1
@@ -127,7 +128,8 @@ struct SfxItemPropertyMapEntry;
 #define PROPERTY_MAP_FIELDMARK                          102
 #define PROPERTY_MAP_LINEBREAK                          103
 #define PROPERTY_MAP_CONTENTCONTROL                     104
-#define PROPERTY_MAP_END                                105
+#define PROPERTY_MAP_TEXT_PAGE                          105
+#define PROPERTY_MAP_END                                106
 
 //S&E
 #define WID_WORDS                0
@@ -225,6 +227,7 @@ struct SfxItemPropertyMapEntry;
 #define WID_TOC_BOOKMARK                        1061
 #define WID_TOC_NEWLINE                         1062
 #define WID_TOC_PARAGRAPH_OUTLINE_LEVEL         1063
+#define WID_CREATE_FROM_PARAGRAPH_STYLE         1064
 
 // Text document
 #define WID_DOC_CHAR_COUNT                      1000
@@ -305,6 +308,21 @@ struct SfxItemPropertyMapEntry;
 #define WID_IS_OUTLINE                  4
 #define WID_DEFAULT_LIST_ID             5
 
+#define WID_PAGE_BOTTOM 0
+#define WID_PAGE_LEFT   1
+#define WID_PAGE_RIGHT  2
+#define WID_PAGE_TOP    3
+#define WID_PAGE_WIDTH  4
+#define WID_PAGE_HEIGHT 5
+#define WID_PAGE_NUMBER 6
+#define WID_PAGE_ORIENT 7
+#define WID_PAGE_USERATTRIBS 8
+#define WID_PAGE_ISDARK 9
+#define WID_NAVORDER 10
+#define WID_PAGE_BACKFULL 11
+
+#define WID_PAGE_THEME 12
+
 // This define would need the include of <svx/unoshprp.hxx>, but this ends
 // in a mess; there *are* double used symbols which are used in a #define in
 // editengine and as an enum in sw; these will then collide and lead to severe
@@ -315,46 +333,45 @@ struct SfxItemPropertyMapEntry;
 
 class SwUnoPropertyMapProvider
 {
-    SfxItemPropertyMapEntry const * m_aMapEntriesArr[PROPERTY_MAP_END];
+    o3tl::span<SfxItemPropertyMapEntry const> m_aMapEntriesArr[PROPERTY_MAP_END];
     SfxItemPropertySet*             m_aPropertySetArr[PROPERTY_MAP_END];
 
 public:
     SwUnoPropertyMapProvider();
-    ~SwUnoPropertyMapProvider();
 
-    const SfxItemPropertyMapEntry*  GetPropertyMapEntries(sal_uInt16 PropertyId);
+    o3tl::span<const SfxItemPropertyMapEntry> GetPropertyMapEntries(sal_uInt16 PropertyId);
     const SfxItemPropertySet*       GetPropertySet( sal_uInt16 PropertyId );
 
 private:
-    static const SfxItemPropertyMapEntry*  GetTextCursorPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetAccessibilityTextAttrPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetParagraphPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetAutoParaStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetCharStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetAutoCharStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetParaStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetConditionalParaStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetFrameStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetPageStylePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetTablePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetRangePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetSectionPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetFramePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetGraphicPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetEmbeddedPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetIndexMarkPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetContentMarkPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetUserMarkPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetTextTableCursorPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetBookmarkPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetParagraphExtensionsPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetTextPortionExtensionPropertyMap();
-    static const SfxItemPropertyMapEntry*  GetFootnotePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetRedlinePropertyMap();
-    static const SfxItemPropertyMapEntry*  GetRedlinePortionPropertyMap();
-    static       SfxItemPropertyMapEntry*  GetTextDefaultPropertyMap();
-    static const SfxItemPropertyMapEntry* GetLineBreakPropertyMap();
-    static const SfxItemPropertyMapEntry* GetContentControlPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetTextCursorPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetAccessibilityTextAttrPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetParagraphPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetAutoParaStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetCharStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetAutoCharStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetParaStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetConditionalParaStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetFrameStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetPageStylePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetTablePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetRangePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetSectionPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetFramePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetGraphicPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetEmbeddedPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetIndexMarkPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetContentMarkPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetUserMarkPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetTextTableCursorPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetBookmarkPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetParagraphExtensionsPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetTextPortionExtensionPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetFootnotePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetRedlinePropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry>  GetRedlinePortionPropertyMap();
+    static o3tl::span<SfxItemPropertyMapEntry>  GetTextDefaultPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry> GetLineBreakPropertyMap();
+    static o3tl::span<const SfxItemPropertyMapEntry> GetContentControlPropertyMap();
 };
 
 extern SwUnoPropertyMapProvider aSwMapProvider;

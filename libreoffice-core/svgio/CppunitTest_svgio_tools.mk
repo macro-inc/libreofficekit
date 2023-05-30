@@ -29,10 +29,12 @@ $(eval $(call gb_CppunitTest_use_library_objects,svgio_tools,\
 $(eval $(call gb_CppunitTest_use_libraries,svgio_tools,\
     basegfx \
     drawinglayer \
+    drawinglayercore \
     comphelper \
     cppu \
     cppuhelper \
     sal \
+    salhelper \
     sax \
     svt \
     tk \

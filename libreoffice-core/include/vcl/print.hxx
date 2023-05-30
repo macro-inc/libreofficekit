@@ -22,8 +22,6 @@
 
 #include <sal/config.h>
 
-#include <config_options.h>
-
 #include <sal/types.h>
 #include <rtl/ustring.hxx>
 #include <tools/gen.hxx>
@@ -31,8 +29,9 @@
 #include <i18nutil/paper.hxx>
 
 #include <vcl/dllapi.h>
+#include <utility>
 #include <vcl/PrinterSupport.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/prntypes.hxx>
 #include <vcl/region.hxx>
@@ -543,9 +542,9 @@ public:
         bool             mbInternalOnly;
         bool             mbEnabled;
 
-                         UIControlOptions( const OUString& i_rDependsOnName = OUString(),
+                         UIControlOptions( OUString i_DependsOnName = OUString(),
                              sal_Int32 i_nDependsOnEntry = -1, bool i_bAttachToDependency = false)
-                             : maDependsOnName( i_rDependsOnName )
+                             : maDependsOnName(std::move( i_DependsOnName ))
                              , mnDependsOnEntry( i_nDependsOnEntry )
                              , mbAttachToDependency( i_bAttachToDependency )
                              , mbInternalOnly( false )

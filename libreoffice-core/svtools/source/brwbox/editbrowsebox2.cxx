@@ -25,9 +25,8 @@
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/accessiblefactory.hxx>
 #include <vcl/svapp.hxx>
-#include <osl/diagnose.h>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace svt
 {
@@ -86,7 +85,7 @@ void EditBrowseBox::implCreateActiveAccessible( )
          GetColumnPos( GetCurColumnId() )
      );
 
-    commitBrowseBoxEvent( CHILD, makeAny( m_aImpl->m_xActiveCell ), Any() );
+    commitBrowseBoxEvent( CHILD, Any( m_aImpl->m_xActiveCell ), Any() );
 }
 
 

@@ -34,7 +34,6 @@
 using namespace osl;
 using namespace com::sun::star::uno;
 
-/** */ //for docpp
 namespace cppu
 {
 
@@ -206,16 +205,6 @@ void SAL_CALL OWeakConnectionPoint::removeReference(const Reference< XReference 
 
 //-- OWeakObject -------------------------------------------------------
 
-
-#ifdef _MSC_VER
-// Accidentally occurs in msvc mapfile = > had to be outlined.
-OWeakObject::OWeakObject()
-    : m_refCount( 0 ),
-      m_pWeakConnectionPoint( nullptr )
-{
-}
-#endif
-
 // XInterface
 Any SAL_CALL OWeakObject::queryInterface( const Type & rType )
 {
@@ -332,7 +321,6 @@ void OWeakAggObject::setDelegator( const Reference<XInterface > & rDelegator )
 
 }
 
-/** */ //for docpp
 namespace com::sun::star::uno
 {
 
@@ -343,6 +331,7 @@ class OWeakRefListener final : public XReference
 {
 public:
     explicit OWeakRefListener(const Reference< XInterface >& xInt);
+    explicit OWeakRefListener(const Reference< XWeak >& xInt);
     virtual ~OWeakRefListener();
 
     // noncopyable
@@ -381,6 +370,18 @@ OWeakRefListener::OWeakRefListener(const Reference< XInterface >& xInt)
     }
     }
     catch (RuntimeException &) { OSL_ASSERT( false ); } // assert here, but no unexpected()
+    osl_atomic_decrement( &m_aRefCount );
+}
+
+OWeakRefListener::OWeakRefListener(const Reference< XWeak >& xWeak)
+    : m_aRefCount( 1 )
+{
+    m_XWeakConnectionPoint = xWeak->queryAdapter();
+
+    if (m_XWeakConnectionPoint.is())
+    {
+        m_XWeakConnectionPoint->addReference(static_cast<XReference*>(this));
+    }
     osl_atomic_decrement( &m_aRefCount );
 }
 
@@ -446,6 +447,16 @@ WeakReferenceHelper::WeakReferenceHelper(const Reference< XInterface >& xInt)
     }
 }
 
+WeakReferenceHelper::WeakReferenceHelper(const Reference< XWeak >& xWeak)
+    : m_pImpl( nullptr )
+{
+    if (xWeak.is())
+    {
+        m_pImpl = new OWeakRefListener(xWeak);
+        m_pImpl->acquire();
+    }
+}
+
 WeakReferenceHelper::WeakReferenceHelper(const WeakReferenceHelper& rWeakRef)
     : m_pImpl( nullptr )
 {
@@ -502,6 +513,18 @@ WeakReferenceHelper::operator= (const Reference< XInterface > & xInt)
         }
     }
     catch (RuntimeException &) { OSL_ASSERT( false ); } // assert here, but no unexpected()
+    return *this;
+}
+
+WeakReferenceHelper &
+WeakReferenceHelper::operator= (const Reference< XWeak > & xWeak)
+{
+    clear();
+    if (xWeak)
+    {
+        m_pImpl = new OWeakRefListener(xWeak);
+        m_pImpl->acquire();
+    }
     return *this;
 }
 

@@ -20,14 +20,7 @@
 #include <AccObjectManagerAgent.hxx>
 #include <AccObjectWinManager.hxx>
 
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::accessibility;
@@ -102,24 +95,6 @@ void  AccObjectManagerAgent::UpdateAccName( XAccessible* pXAcc, Any newName)
 {
     if( pWinManager )
         pWinManager->SetAccName( pXAcc, newName );
-}
-
-
-/**
-   * Interface of updating MSAA location when UNO location_changed event occurs.
-   * @param pXAcc Uno XAccessible interface of control.
-   * @param pXAcc Uno The top position of new location.
-   * @param pXAcc Uno The left position of new location.
-   * @param pXAcc Uno The width of new location.
-   * @param pXAcc Uno The width of new location.
-   * @return
-   */
-void  AccObjectManagerAgent::UpdateLocation( XAccessible* /* pXAcc */, long /*top*/, long /*left*/, long /*width*/, long /*height*/ )
-{
-#ifdef _IMPL_WIN
-    if( pWinManager )
-        pWinManager->SetLocation( pXAcc, top, left, width, height );
-#endif
 }
 
 /**
@@ -198,7 +173,7 @@ void AccObjectManagerAgent::DeleteChildrenAccObj( XAccessible* pXAcc )
    * @param pState The lost state of control.
    * @return
    */
-void AccObjectManagerAgent::DecreaseState( XAccessible* pXAcc,unsigned short pState )
+void AccObjectManagerAgent::DecreaseState( XAccessible* pXAcc, sal_Int64 pState )
 {
     if(pWinManager)
     {
@@ -212,7 +187,7 @@ void AccObjectManagerAgent::DecreaseState( XAccessible* pXAcc,unsigned short pSt
    * @param pState The new state of control.
    * @return
    */
-void AccObjectManagerAgent::IncreaseState( XAccessible* pXAcc,unsigned short pState )
+void AccObjectManagerAgent::IncreaseState( XAccessible* pXAcc, sal_Int64 pState )
 {
     if(pWinManager)
     {
@@ -229,13 +204,13 @@ void  AccObjectManagerAgent::UpdateState( css::accessibility::XAccessible* pXAcc
 /**
    * Interface of notify MSAA event when some UNO event occurred.
    * @param pXAcc Uno XAccessible interface of control.
-   * @param pEvent UNO event ID.
+   * @param eEvent event type.
    * @return If the method is correctly processed.
    */
-bool AccObjectManagerAgent::NotifyAccEvent(short pEvent, XAccessible* pXAcc)
+bool AccObjectManagerAgent::NotifyAccEvent(UnoMSAAEvent eEvent, XAccessible* pXAcc)
 {
     if(pWinManager)
-        return pWinManager->NotifyAccEvent(pXAcc,pEvent);
+        return pWinManager->NotifyAccEvent(pXAcc, eEvent);
 
     return false;
 }
@@ -298,7 +273,7 @@ bool AccObjectManagerAgent::GetIAccessibleFromXAccessible(
 {
     if(pWinManager)
     {
-        *ppXI = reinterpret_cast<IAccessible*>(pWinManager->GetIMAccByXAcc(pXAcc));
+        *ppXI = pWinManager->GetIMAccByXAcc(pXAcc);
         if(*ppXI)
             return true;
     }
@@ -328,10 +303,10 @@ void AccObjectManagerAgent::UpdateChildState(XAccessible* pXAcc)
 }
 
 
-bool AccObjectManagerAgent::IsSpecialToolboItem(XAccessible* pXAcc)
+bool AccObjectManagerAgent::IsSpecialToolbarItem(XAccessible* pXAcc)
 {
     if(pWinManager)
-        return pWinManager->IsSpecialToolboItem( pXAcc );
+        return pWinManager->IsSpecialToolbarItem(pXAcc);
 
     return false;
 }

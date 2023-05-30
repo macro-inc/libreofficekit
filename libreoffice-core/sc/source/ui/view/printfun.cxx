@@ -443,8 +443,8 @@ static void lcl_HidePrint( const ScTableInfo& rTabInfo, SCCOL nX1, SCCOL nX2 )
         RowInfo* pThisRowInfo = &rTabInfo.mpRowInfo[nArrY];
         for (SCCOL nX=nX1; nX<=nX2; nX++)
         {
-            CellInfo& rCellInfo = pThisRowInfo->cellInfo(nX);
-            BasicCellInfo& rBasicCellInfo = pThisRowInfo->basicCellInfo(nX);
+            ScCellInfo& rCellInfo = pThisRowInfo->cellInfo(nX);
+            ScBasicCellInfo& rBasicCellInfo = pThisRowInfo->basicCellInfo(nX);
             if (!rBasicCellInfo.bEmptyCellText)
                 if (rCellInfo.pPatternAttr->
                             GetItem(ATTR_PROTECTION, rCellInfo.pConditionSet).GetHidePrint())
@@ -897,10 +897,8 @@ void ScPrintFunc::InitParam( const ScPrintOptions* pOptions )
     aHdr.pRight     = &pParamSet->Get(ATTR_PAGE_HEADERRIGHT);
     aHdr.pFirst     = &pParamSet->Get(ATTR_PAGE_HEADERFIRST);
 
-    const SvxSetItem* pHeaderSetItem;
     const SfxItemSet* pHeaderSet = nullptr;
-    if ( pParamSet->GetItemState( ATTR_PAGE_HEADERSET, false,
-                            reinterpret_cast<const SfxPoolItem**>(&pHeaderSetItem) ) == SfxItemState::SET )
+    if ( const SvxSetItem* pHeaderSetItem = pParamSet->GetItemIfSet( ATTR_PAGE_HEADERSET, false ) )
     {
         pHeaderSet = &pHeaderSetItem->GetItemSet();
                                                         // Headline has space below
@@ -914,10 +912,8 @@ void ScPrintFunc::InitParam( const ScPrintOptions* pOptions )
     aFtr.pRight     = &pParamSet->Get(ATTR_PAGE_FOOTERRIGHT);
     aFtr.pFirst     = &pParamSet->Get(ATTR_PAGE_FOOTERFIRST);
 
-    const SvxSetItem* pFooterSetItem;
     const SfxItemSet* pFooterSet = nullptr;
-    if ( pParamSet->GetItemState( ATTR_PAGE_FOOTERSET, false,
-                            reinterpret_cast<const SfxPoolItem**>(&pFooterSetItem) ) == SfxItemState::SET )
+    if ( const SvxSetItem* pFooterSetItem = pParamSet->GetItemIfSet( ATTR_PAGE_FOOTERSET, false ) )
     {
         pFooterSet = &pFooterSetItem->GetItemSet();
                                                         // Footline has space above
@@ -1005,8 +1001,8 @@ void ScPrintFunc::InitParam( const ScPrintOptions* pOptions )
 
     //! walk through all PrintAreas of the table !!!
     const ScRange*  pPrintArea = rDoc.GetPrintRange( nPrintTab, 0 );
-    const ScRange*  pRepeatCol = rDoc.GetRepeatColRange( nPrintTab );
-    const ScRange*  pRepeatRow = rDoc.GetRepeatRowRange( nPrintTab );
+    std::optional<ScRange> oRepeatCol = rDoc.GetRepeatColRange( nPrintTab );
+    std::optional<ScRange> oRepeatRow = rDoc.GetRepeatRowRange( nPrintTab );
 
     //  ignoring ATTR_PAGE_PRINTTABLES
 
@@ -1059,11 +1055,11 @@ void ScPrintFunc::InitParam( const ScPrintOptions* pOptions )
         }
     }
 
-    if ( pRepeatCol )
+    if ( oRepeatCol )
     {
         aAreaParam.bRepeatCol = true;
-        nRepeatStartCol = pRepeatCol->aStart.Col();
-        nRepeatEndCol   = pRepeatCol->aEnd  .Col();
+        nRepeatStartCol = oRepeatCol->aStart.Col();
+        nRepeatEndCol   = oRepeatCol->aEnd  .Col();
     }
     else
     {
@@ -1071,11 +1067,11 @@ void ScPrintFunc::InitParam( const ScPrintOptions* pOptions )
         nRepeatStartCol = nRepeatEndCol = SCCOL_REPEAT_NONE;
     }
 
-    if ( pRepeatRow )
+    if ( oRepeatRow )
     {
         aAreaParam.bRepeatRow = true;
-        nRepeatStartRow = pRepeatRow->aStart.Row();
-        nRepeatEndRow   = pRepeatRow->aEnd  .Row();
+        nRepeatStartRow = oRepeatRow->aStart.Row();
+        nRepeatEndRow   = oRepeatRow->aEnd  .Row();
     }
     else
     {
@@ -3024,7 +3020,7 @@ static void lcl_SetHidden( const ScDocument& rDoc, SCTAB nPrintTab, ScPageRowEnt
     {
         OSL_ENSURE(i < rPageEndX.size(), "vector access error for aPageEndX");
         SCCOL nEndCol = rPageEndX[i];
-        if ( rDoc.IsPrintEmpty( nPrintTab, nStartCol, nStartRow, nEndCol, nEndRow,
+        if ( rDoc.IsPrintEmpty( nStartCol, nStartRow, nEndCol, nEndRow, nPrintTab,
                                     bLeftIsEmpty, &aTempRange, &aTempRect ) )
         {
             rPageRowEntry.SetHidden(i);
@@ -3040,7 +3036,11 @@ static void lcl_SetHidden( const ScDocument& rDoc, SCTAB nPrintTab, ScPageRowEnt
 void ScPrintFunc::CalcPages()               // calculates aPageRect and pages from nZoom
 {
     assert( bPrintAreaValid );
-    m_aRanges.calculate(rDoc, aTableParam.bSkipEmpty, aAreaParam.bPrintArea, nStartRow, nEndRow, nStartCol, nEndCol, nPrintTab, GetDocPageSize());
+
+    sc::PrintPageRangesInput aInput(aTableParam.bSkipEmpty, aAreaParam.bPrintArea,
+                                    ScRange(nStartCol, nStartRow, nPrintTab, nEndCol, nEndRow, nPrintTab),
+                                    GetDocPageSize());
+    m_aRanges.calculate(rDoc, aInput);
 }
 
 namespace sc
@@ -3052,47 +3052,15 @@ PrintPageRanges::PrintPageRanges()
     , m_nTotalY(0)
 {}
 
-bool PrintPageRanges::checkIfAlreadyCalculatedAndSet(
-                                    bool bSkipEmpty, bool bPrintArea,
-                                    SCROW nStartRow, SCROW nEndRow,
-                                    SCCOL nStartCol, SCCOL nEndCol,
-                                    SCTAB nPrintTab, Size const & rDocSize)
-{
-    if (bSkipEmpty == m_aInput.m_bSkipEmpty &&
-        bPrintArea == m_aInput.m_bPrintArea &&
-        nStartRow  == m_aInput.m_nStartRow && nEndRow == m_aInput.m_nEndRow &&
-        nStartCol  == m_aInput.m_nStartCol && nEndCol == m_aInput.m_nEndCol &&
-        nPrintTab  == m_aInput.m_nPrintTab &&
-        rDocSize   == m_aInput.m_aDocSize)
-    {
-        return true;
-    }
-
-    m_aInput.m_bSkipEmpty = bSkipEmpty;
-    m_aInput.m_bPrintArea = bPrintArea;
-    m_aInput.m_nStartRow  = nStartRow;
-    m_aInput.m_nEndRow    = nEndRow;
-    m_aInput.m_nStartCol  = nStartCol;
-    m_aInput.m_nEndCol    = nEndCol;
-    m_aInput.m_nPrintTab  = nPrintTab;
-    m_aInput.m_aDocSize   = rDocSize;
-
-    return false;
-}
-
-void PrintPageRanges::calculate(ScDocument& rDoc,
-                                bool bSkipEmpty, bool bPrintArea,
-                                SCROW nStartRow, SCROW nEndRow,
-                                SCCOL nStartCol, SCCOL nEndCol,
-                                SCTAB nPrintTab, Size const & rDocSize)
+void PrintPageRanges::calculate(ScDocument& rDoc, PrintPageRangesInput const& rInput)
 {
     // Already calculated?
-    if (checkIfAlreadyCalculatedAndSet(bSkipEmpty, bPrintArea,
-                                       nStartRow, nEndRow, nStartCol, nEndCol,
-                                       nPrintTab, rDocSize))
+    if (m_aInput == rInput)
         return;
 
-    rDoc.SetPageSize(nPrintTab, rDocSize);
+    m_aInput = rInput;
+
+    rDoc.SetPageSize(m_aInput.getPrintTab(), m_aInput.m_aDocSize);
 
     // Clear the map to prevent any outdated values to "survive" when
     // we have to recalculate the new values anyway
@@ -3104,17 +3072,17 @@ void PrintPageRanges::calculate(ScDocument& rDoc,
         m_xPageEndX->resize(rDoc.MaxCol()+1, SCCOL());
     }
 
-    if (bPrintArea)
+    if (m_aInput.m_bPrintArea)
     {
-        ScRange aRange(nStartCol, nStartRow, nPrintTab, nEndCol, nEndRow, nPrintTab);
-        rDoc.UpdatePageBreaks(nPrintTab, &aRange);
+        ScRange aRange(m_aInput.getStartColumn(), m_aInput.getStartRow(), m_aInput.getPrintTab(), m_aInput.getEndColumn(), m_aInput.getEndRow(), m_aInput.getPrintTab());
+        rDoc.UpdatePageBreaks(m_aInput.getPrintTab(), &aRange);
     }
     else
     {
-        rDoc.UpdatePageBreaks(nPrintTab); // else, end is marked
+        rDoc.UpdatePageBreaks(m_aInput.getPrintTab()); // else, end is marked
     }
 
-    const size_t nRealCnt = nEndRow - nStartRow + 1;
+    const size_t nRealCnt = m_aInput.getEndRow() - m_aInput.getStartRow() + 1;
 
     // #i123672# use dynamic mem to react on size changes
     if (m_xPageEndY->size() < nRealCnt+1)
@@ -3130,11 +3098,11 @@ void PrintPageRanges::calculate(ScDocument& rDoc,
     m_nTotalY = 0;
 
     bool bVisCol = false;
-    for (SCCOL i = nStartCol; i <= nEndCol; i++)
+    for (SCCOL i = m_aInput.getStartColumn(); i <= m_aInput.getEndColumn(); i++)
     {
-        bool bHidden = rDoc.ColHidden(i, nPrintTab);
-        bool bPageBreak(rDoc.HasColBreak(i, nPrintTab) & ScBreakType::Page);
-        if (i > nStartCol && bVisCol && bPageBreak)
+        bool bHidden = rDoc.ColHidden(i, m_aInput.getPrintTab());
+        bool bPageBreak(rDoc.HasColBreak(i, m_aInput.getPrintTab()) & ScBreakType::Page);
+        if (i > m_aInput.getStartColumn() && bVisCol && bPageBreak)
         {
             OSL_ENSURE(m_nPagesX < m_xPageEndX->size(), "vector access error for aPageEndX");
             (*m_xPageEndX)[m_nPagesX] = i-1;
@@ -3147,40 +3115,40 @@ void PrintPageRanges::calculate(ScDocument& rDoc,
     if (bVisCol) // also at the end, no empty pages
     {
         OSL_ENSURE(m_nPagesX < m_xPageEndX->size(), "vector access error for aPageEndX");
-        (*m_xPageEndX)[m_nPagesX] = nEndCol;
+        (*m_xPageEndX)[m_nPagesX] = m_aInput.getEndColumn();
         ++m_nPagesX;
     }
 
     bool bVisRow = false;
-    SCROW nPageStartRow = nStartRow;
+    SCROW nPageStartRow = m_aInput.getStartRow();
     SCROW nLastVisibleRow = -1;
 
-    std::unique_ptr<ScRowBreakIterator> pRowBreakIter(rDoc.GetRowBreakIterator(nPrintTab));
+    std::unique_ptr<ScRowBreakIterator> pRowBreakIter(rDoc.GetRowBreakIterator(m_aInput.getPrintTab()));
     SCROW nNextPageBreak = pRowBreakIter->first();
-    while (nNextPageBreak != ScRowBreakIterator::NOT_FOUND && nNextPageBreak < nStartRow)
+    while (nNextPageBreak != ScRowBreakIterator::NOT_FOUND && nNextPageBreak < m_aInput.getStartRow())
         // Skip until the page break position is at the start row or greater.
         nNextPageBreak = pRowBreakIter->next();
 
-    for (SCROW nRow = nStartRow; nRow <= nEndRow; ++nRow)
+    for (SCROW nRow = m_aInput.getStartRow(); nRow <= m_aInput.getEndRow(); ++nRow)
     {
         bool bPageBreak = (nNextPageBreak == nRow);
         if (bPageBreak)
             nNextPageBreak = pRowBreakIter->next();
 
-        if (nRow > nStartRow && bVisRow && bPageBreak)
+        if (nRow > m_aInput.getStartRow() && bVisRow && bPageBreak)
         {
             OSL_ENSURE(m_nTotalY < m_xPageEndY->size(), "vector access error for rPageEndY");
             (*m_xPageEndY)[m_nTotalY] = nRow - 1;
             ++m_nTotalY;
 
-            if (!bSkipEmpty || !rDoc.IsPrintEmpty(nPrintTab, nStartCol, nPageStartRow, nEndCol, nRow-1))
+            if (!m_aInput.m_bSkipEmpty || !rDoc.IsPrintEmpty(m_aInput.getStartColumn(), nPageStartRow, m_aInput.getEndColumn(), nRow-1, m_aInput.getPrintTab()))
             {
                 auto& rPageRow = (*m_xPageRows)[m_nPagesY];
                 rPageRow.SetStartRow(nPageStartRow);
                 rPageRow.SetEndRow(nRow - 1);
                 rPageRow.SetPagesX(m_nPagesX);
-                if (bSkipEmpty)
-                    lcl_SetHidden(rDoc, nPrintTab, rPageRow, nStartCol, *m_xPageEndX);
+                if (m_aInput.m_bSkipEmpty)
+                    lcl_SetHidden(rDoc, m_aInput.getPrintTab(), rPageRow, m_aInput.getStartColumn(), *m_xPageEndX);
                 ++m_nPagesY;
             }
 
@@ -3197,7 +3165,7 @@ void PrintPageRanges::calculate(ScDocument& rDoc,
         }
 
         SCROW nLastRow = -1;
-        if (!rDoc.RowHidden(nRow, nPrintTab, nullptr, &nLastRow))
+        if (!rDoc.RowHidden(nRow, m_aInput.getPrintTab(), nullptr, &nLastRow))
         {
             bVisRow = true;
             nLastVisibleRow = nLastRow;
@@ -3214,17 +3182,17 @@ void PrintPageRanges::calculate(ScDocument& rDoc,
         return;
 
     OSL_ENSURE(m_nTotalY < m_xPageEndY->size(), "vector access error for maPageEndY");
-    (*m_xPageEndY)[m_nTotalY] = nEndRow;
+    (*m_xPageEndY)[m_nTotalY] = m_aInput.getEndRow();
     ++m_nTotalY;
 
-    if (!bSkipEmpty || !rDoc.IsPrintEmpty(nPrintTab, nStartCol, nPageStartRow, nEndCol, nEndRow))
+    if (!m_aInput.m_bSkipEmpty || !rDoc.IsPrintEmpty(m_aInput.getStartColumn(), nPageStartRow, m_aInput.getEndColumn(), m_aInput.getEndRow(), m_aInput.getPrintTab()))
     {
         auto& rPageRow = (*m_xPageRows)[m_nPagesY];
         rPageRow.SetStartRow(nPageStartRow);
-        rPageRow.SetEndRow(nEndRow);
+        rPageRow.SetEndRow(m_aInput.getEndRow());
         rPageRow.SetPagesX(m_nPagesX);
-        if (bSkipEmpty)
-            lcl_SetHidden(rDoc, nPrintTab, rPageRow, nStartCol, *m_xPageEndX);
+        if (m_aInput.m_bSkipEmpty)
+            lcl_SetHidden(rDoc, m_aInput.getPrintTab(), rPageRow, m_aInput.getStartColumn(), *m_xPageEndX);
         ++m_nPagesY;
     }
 }

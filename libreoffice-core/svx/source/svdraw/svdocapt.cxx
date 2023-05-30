@@ -28,7 +28,6 @@
 #include <basegfx/tuple/b2dtuple.hxx>
 #include <tools/bigint.hxx>
 #include <tools/helpers.hxx>
-#include <rtl/ustrbuf.hxx>
 
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
@@ -181,7 +180,7 @@ std::unique_ptr<sdr::contact::ViewContact> SdrCaptionObj::CreateObjectSpecificVi
 
 
 SdrCaptionObj::SdrCaptionObj(SdrModel& rSdrModel)
-:   SdrRectObj(rSdrModel, OBJ_TEXT),
+:   SdrRectObj(rSdrModel, SdrObjKind::Text),
     aTailPoly(3),  // default size: 3 points = 2 lines
     mbSpecialTextBoxShadow(false),
     mbFixedTail(false),
@@ -203,7 +202,7 @@ SdrCaptionObj::SdrCaptionObj(
     SdrModel& rSdrModel,
     const tools::Rectangle& rRect,
     const Point& rTail)
-:   SdrRectObj(rSdrModel, OBJ_TEXT,rRect),
+:   SdrRectObj(rSdrModel, SdrObjKind::Text,rRect),
     aTailPoly(3),  // default size: 3 points = 2 lines
     mbSpecialTextBoxShadow(false),
     mbFixedTail(false),
@@ -235,10 +234,10 @@ void SdrCaptionObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrCaptionObj::GetObjIdentifier() const
 {
-    return OBJ_CAPTION;
+    return SdrObjKind::Caption;
 }
 
-SdrCaptionObj* SdrCaptionObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrCaptionObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrCaptionObj(rTargetModel, *this);
 }
@@ -667,11 +666,11 @@ void SdrCaptionObj::RestoreGeoData(const SdrObjGeoData& rGeo)
     aTailPoly=rCGeo.aTailPoly;
 }
 
-SdrObjectUniquePtr SdrCaptionObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrCaptionObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
-    SdrObjectUniquePtr pRect = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText);
-    SdrObjectUniquePtr pTail = ImpConvertMakeObj(basegfx::B2DPolyPolygon(aTailPoly.getB2DPolygon()), false, bBezier);
-    SdrObjectUniquePtr pRet;
+    rtl::Reference<SdrObject> pRect = SdrRectObj::DoConvertToPolyObj(bBezier, bAddText);
+    rtl::Reference<SdrObject> pTail = ImpConvertMakeObj(basegfx::B2DPolyPolygon(aTailPoly.getB2DPolygon()), false, bBezier);
+    rtl::Reference<SdrObject> pRet;
     if (pTail && !pRect)
         pRet = std::move(pTail);
     else if (pRect && !pTail)
@@ -680,20 +679,20 @@ SdrObjectUniquePtr SdrCaptionObj::DoConvertToPolyObj(bool bBezier, bool bAddText
     {
         if (pTail->GetSubList())
         {
-            pTail->GetSubList()->NbcInsertObject(pRect.release());
+            pTail->GetSubList()->NbcInsertObject(pRect.get());
             pRet = std::move(pTail);
         }
         else if (pRect->GetSubList())
         {
-            pRect->GetSubList()->NbcInsertObject(pTail.release(),0);
+            pRect->GetSubList()->NbcInsertObject(pTail.get(),0);
             pRet = std::move(pRect);
         }
         else
         {
-            SdrObjGroup* pGrp = new SdrObjGroup(getSdrModelFromSdrObject());
-            pGrp->GetSubList()->NbcInsertObject(pRect.release());
-            pGrp->GetSubList()->NbcInsertObject(pTail.release(),0);
-            pRet.reset(pGrp);
+            rtl::Reference<SdrObjGroup> pGrp = new SdrObjGroup(getSdrModelFromSdrObject());
+            pGrp->GetSubList()->NbcInsertObject(pRect.get());
+            pGrp->GetSubList()->NbcInsertObject(pTail.get(),0);
+            pRet = pGrp;
         }
     }
     return pRet;

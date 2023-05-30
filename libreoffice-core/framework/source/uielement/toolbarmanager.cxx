@@ -59,9 +59,10 @@
 #include <toolkit/helper/vclunohelper.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <comphelper/propertyvalue.hxx>
-#include <comphelper/sequence.hxx>
+#include <comphelper/propertysequence.hxx>
 #include <svtools/miscopt.hxx>
 #include <svtools/imgdef.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <vcl/graph.hxx>
 #include <vcl/svapp.hxx>
@@ -138,7 +139,7 @@ class VclToolBarManager : public ToolBarManagerImpl
 
 public:
     VclToolBarManager(VclPtr<ToolBox> pToolbar)
-    : m_pToolBar(pToolbar)
+    : m_pToolBar(std::move(pToolbar))
     , m_bAddedToTaskPaneList(true)
     , m_pManager(nullptr)
     {}
@@ -199,19 +200,6 @@ public:
         return VCLUnoHelper::GetInterface(m_pToolBar);
     }
 
-    virtual css::uno::Reference<css::frame::XStatusListener> CreateToolBoxController(
-        const css::uno::Reference<css::frame::XFrame>& rFrame,
-        ToolBoxItemId nId,
-        const OUString& rCommandURL ) override
-    {
-        rtl::Reference<svt::ToolboxController> pController
-            = ::framework::CreateToolBoxController( rFrame, m_pToolBar, nId, rCommandURL );
-        css::uno::Reference<css::frame::XStatusListener> xListener;
-        if (pController)
-            xListener = pController;
-        return xListener;
-    }
-
     virtual void ConnectCallbacks(ToolBarManager* pManager) override
     {
         m_pManager = pManager;
@@ -228,16 +216,13 @@ public:
     }
 
     virtual void InsertItem(ToolBoxItemId nId,
-                            const OUString& rString,
                             const OUString& rCommandURL,
                             const OUString& rTooltip,
                             const OUString& rLabel,
                             ToolBoxItemBits nItemBits) override
     {
-        m_pToolBar->InsertItem( nId, rString, nItemBits );
-        m_pToolBar->SetItemCommand( nId, rCommandURL );
+        m_pToolBar->InsertItem( nId, rLabel, rCommandURL, nItemBits );
         m_pToolBar->SetQuickHelpText(nId, rTooltip);
-        m_pToolBar->SetItemText( nId, rLabel );
         m_pToolBar->EnableItem( nId );
         m_pToolBar->SetItemState( nId, TRISTATE_FALSE );
     }
@@ -332,12 +317,12 @@ public:
         m_pToolBar->SetMenuType( eType );
     }
 
-    virtual void MergeToolbar(ToolBoxItemId & rItemId,
+    virtual void MergeToolbar(ToolBoxItemId & rItemId, sal_uInt16 nFirstItem,
                               const OUString& rModuleIdentifier,
                               CommandToInfoMap& rCommandMap,
                               MergeToolbarInstruction& rInstruction) override
     {
-        ReferenceToolbarPathInfo aRefPoint = ToolBarMerger::FindReferencePoint( m_pToolBar, rInstruction.aMergePoint );
+        ReferenceToolbarPathInfo aRefPoint = ToolBarMerger::FindReferencePoint( m_pToolBar, nFirstItem, rInstruction.aMergePoint );
 
         // convert the sequence< sequence< propertyvalue > > structure to
         // something we can better handle. A vector with item data
@@ -416,20 +401,7 @@ public:
 
     virtual css::uno::Reference<css::awt::XWindow> GetInterface() override
     {
-        return new weld::TransportAsXWindow(m_pWeldedToolBar);
-    }
-
-    virtual css::uno::Reference<css::frame::XStatusListener> CreateToolBoxController(
-        const css::uno::Reference<css::frame::XFrame>& rFrame,
-        ToolBoxItemId /*nId*/,
-        const OUString& rCommandURL ) override
-    {
-        css::uno::Reference<css::frame::XToolbarController> xController
-            = ::framework::CreateWeldToolBoxController(rFrame, m_pWeldedToolBar, m_pBuilder, rCommandURL);
-        css::uno::Reference<css::frame::XStatusListener> xListener;
-        if (xController.is())
-            xListener = css::uno::Reference<css::frame::XStatusListener>( xController, UNO_QUERY );
-        return xListener;
+        return new weld::TransportAsXWindow(m_pWeldedToolBar, m_pBuilder);
     }
 
     virtual void ConnectCallbacks(ToolBarManager* pManager) override
@@ -440,7 +412,6 @@ public:
     }
 
     virtual void InsertItem(ToolBoxItemId nId,
-                            const OUString& /*rString*/,
                             const OUString& rCommandURL,
                             const OUString& rTooltip,
                             const OUString& rLabel,
@@ -521,6 +492,7 @@ public:
     virtual void SetMenuType(ToolBoxMenuType /*eType*/) override {}
 
     virtual void MergeToolbar(ToolBoxItemId & /*rItemId*/,
+                              sal_uInt16 /*nFirstItem*/,
                               const OUString& /*rModuleIdentifier*/,
                               CommandToInfoMap& /*rCommandMap*/,
                               MergeToolbarInstruction& /*rInstruction*/) override {}
@@ -565,17 +537,18 @@ IMPL_LINK(WeldToolBarManager, ToggleMenuHdl, const OString&, rCommand, void)
 
 ToolBarManager::ToolBarManager( const Reference< XComponentContext >& rxContext,
                                 const Reference< XFrame >& rFrame,
-                                const OUString& rResourceName,
+                                OUString aResourceName,
                                 ToolBox* pToolBar ) :
     m_bDisposed( false ),
     m_bFrameActionRegistered( false ),
     m_bUpdateControllers( false ),
     m_eSymbolSize(SvtMiscOptions().GetCurrentSymbolsSize()),
+    m_nContextMinPos(0),
     m_pImpl( new VclToolBarManager( pToolBar ) ),
     m_pToolBar( pToolBar ),
-    m_aResourceName( rResourceName ),
+    m_pWeldedToolBar( nullptr ),
+    m_aResourceName(std::move( aResourceName )),
     m_xFrame( rFrame ),
-    m_aListenerContainer( m_mutex ),
     m_xContext( rxContext ),
     m_aAsyncUpdateControllersTimer( "framework::ToolBarManager m_aAsyncUpdateControllersTimer" ),
     m_sIconTheme( SvtMiscOptions().GetIconTheme() )
@@ -585,18 +558,18 @@ ToolBarManager::ToolBarManager( const Reference< XComponentContext >& rxContext,
 
 ToolBarManager::ToolBarManager( const Reference< XComponentContext >& rxContext,
                                 const Reference< XFrame >& rFrame,
-                                const OUString& rResourceName,
+                                OUString aResourceName,
                                 weld::Toolbar* pToolBar,
                                 weld::Builder* pBuilder ) :
     m_bDisposed( false ),
     m_bFrameActionRegistered( false ),
     m_bUpdateControllers( false ),
     m_eSymbolSize( SvtMiscOptions().GetCurrentSymbolsSize() ),
+    m_nContextMinPos(0),
     m_pImpl( new WeldToolBarManager( pToolBar, pBuilder ) ),
-    m_pToolBar( nullptr ),
-    m_aResourceName( rResourceName ),
+    m_pWeldedToolBar( pToolBar ),
+    m_aResourceName(std::move( aResourceName )),
     m_xFrame( rFrame ),
-    m_aListenerContainer( m_mutex ),
     m_xContext( rxContext ),
     m_aAsyncUpdateControllersTimer( "framework::ToolBarManager m_aAsyncUpdateControllersTimer" ),
     m_sIconTheme( SvtMiscOptions().GetIconTheme() )
@@ -633,9 +606,8 @@ void ToolBarManager::Init()
     // set name for testtool, the useful part is after the last '/'
     sal_Int32 idx = m_aResourceName.lastIndexOf('/');
     idx++; // will become 0 if '/' not found: use full string
-    OString  aHelpIdAsString( ".HelpId:" );
-    OUString  aToolbarName = m_aResourceName.copy( idx );
-    aHelpIdAsString += OUStringToOString( aToolbarName, RTL_TEXTENCODING_UTF8 );
+    std::u16string_view aToolbarName = m_aResourceName.subView( idx );
+    OString aHelpIdAsString = ".HelpId:" + OUStringToOString( aToolbarName, RTL_TEXTENCODING_UTF8 );
     m_pImpl->SetHelpId( aHelpIdAsString );
 
     m_aAsyncUpdateControllersTimer.SetTimeout( 50 );
@@ -794,6 +766,8 @@ void ToolBarManager::frameAction( const FrameActionEvent& Action )
     SolarMutexGuard g;
     if ( Action.Action == FrameAction_CONTEXT_CHANGED && !m_bDisposed )
     {
+        if (m_aImageController)
+            m_aImageController->update();
         m_aAsyncUpdateControllersTimer.Start();
     }
 }
@@ -845,9 +819,11 @@ void SAL_CALL ToolBarManager::dispose()
 {
     Reference< XComponent > xThis(this);
 
-    EventObject aEvent( xThis );
-    m_aListenerContainer.disposeAndClear( aEvent );
-
+    {
+        EventObject aEvent( xThis );
+        std::unique_lock aGuard(m_mutex);
+        m_aListenerContainer.disposeAndClear( aGuard, aEvent );
+    }
     {
         SolarMutexGuard g;
 
@@ -923,12 +899,14 @@ void SAL_CALL ToolBarManager::addEventListener( const Reference< XEventListener 
     if ( m_bDisposed )
         throw DisposedException();
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aListenerContainer.addInterface( aGuard, xListener );
 }
 
 void SAL_CALL ToolBarManager::removeEventListener( const Reference< XEventListener >& xListener )
 {
-    m_aListenerContainer.removeInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aListenerContainer.removeInterface( aGuard, xListener );
 }
 
 // XUIConfigurationListener
@@ -1022,6 +1000,10 @@ void ToolBarManager::RemoveControllers()
 
     m_aSubToolBarControllerMap.clear();
 
+    if (m_aImageController)
+        m_aImageController->dispose();
+    m_aImageController.clear();
+
     // i90033
     // Remove item window pointers from the toolbar. They were
     // destroyed by the dispose() at the XComponent. This is needed
@@ -1067,8 +1049,6 @@ void ToolBarManager::CreateControllers()
         bool                     bCreate( true );
         Reference< XStatusListener > xController;
 
-        rtl::Reference<svt::ToolboxController> pController;
-
         OUString aCommandURL( m_pImpl->GetItemCommand( nId ) );
         // Command can be just an alias to another command.
         auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(aCommandURL, m_aModuleIdentifier);
@@ -1091,27 +1071,14 @@ void ToolBarManager::CreateControllers()
         if ( m_xToolbarControllerFactory.is() &&
              m_xToolbarControllerFactory->hasController( aCommandURL, m_aModuleIdentifier ))
         {
-            PropertyValue aPropValue;
-            std::vector< Any > aPropertyVector;
-
-            aPropValue.Name     = "ModuleIdentifier";
-            aPropValue.Value    <<= m_aModuleIdentifier;
-            aPropertyVector.push_back( makeAny( aPropValue ));
-            aPropValue.Name     = "Frame";
-            aPropValue.Value    <<= m_xFrame;
-            aPropertyVector.push_back( makeAny( aPropValue ));
-            aPropValue.Name     = "ServiceManager";
             Reference<XMultiServiceFactory> xMSF(m_xContext->getServiceManager(), UNO_QUERY_THROW);
-            aPropValue.Value    <<= xMSF;
-            aPropertyVector.push_back( makeAny( aPropValue ));
-            aPropValue.Name     = "ParentWindow";
-            aPropValue.Value    <<= xToolbarWindow;
-            aPropertyVector.push_back( makeAny( aPropValue ));
-            aPropValue.Name     = "Identifier";
-            aPropValue.Value    <<= sal_uInt16(nId);
-            aPropertyVector.push_back( uno::makeAny( aPropValue ) );
-
-            Sequence< Any > aArgs( comphelper::containerToSequence( aPropertyVector ));
+            Sequence< Any > aArgs( comphelper::InitAnyPropertySequence( {
+                { "ModuleIdentifier", Any(m_aModuleIdentifier) },
+                { "Frame", Any(m_xFrame) },
+                { "ServiceManager", Any(xMSF) },
+                { "ParentWindow", Any(xToolbarWindow) },
+                { "Identifier", Any(sal_uInt16(nId)) },
+            } ));
             xController.set( m_xToolbarControllerFactory->createInstanceWithArgumentsAndContext( aCommandURL, aArgs, m_xContext ),
                              UNO_QUERY );
             bInit = false; // Initialization is done through the factory service
@@ -1122,7 +1089,8 @@ void ToolBarManager::CreateControllers()
 
         if ( !xController.is() && bCreate )
         {
-            xController = m_pImpl->CreateToolBoxController( m_xFrame, nId, aCommandURL );
+            if ( m_pToolBar )
+                xController = CreateToolBoxController( m_xFrame, m_pToolBar, nId, aCommandURL );
             if ( !xController )
             {
                 if ( aCommandURL.startsWith( ".uno:StyleApply?" ) )
@@ -1152,10 +1120,12 @@ void ToolBarManager::CreateControllers()
 
                     xController = xStatusListener;
                 }
-                else if (m_pToolBar)
+                else
                 {
-                    xController.set(
-                        new GenericToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aCommandURL ));
+                    if ( m_pToolBar )
+                        xController.set( new GenericToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aCommandURL ));
+                    else
+                        xController.set( new GenericToolbarController( m_xContext, m_xFrame, *m_pWeldedToolBar, aCommandURL ));
 
                     // Accessibility support: Set toggle button role for specific commands
                     sal_Int32 nProps = vcl::CommandInfoProvider::GetPropertiesForCommand(aCommandURL, m_aModuleIdentifier);
@@ -1195,37 +1165,17 @@ void ToolBarManager::CreateControllers()
         {
             if ( bInit )
             {
-                PropertyValue aPropValue;
-                std::vector< Any > aPropertyVector;
-
-                aPropValue.Name = "Frame";
-                aPropValue.Value <<= m_xFrame;
-                aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name = "CommandURL";
-                aPropValue.Value <<= aCommandURL;
-                aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name = "ServiceManager";
                 Reference<XMultiServiceFactory> xMSF(m_xContext->getServiceManager(), UNO_QUERY_THROW);
-                aPropValue.Value <<= xMSF;
-                aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name = "ParentWindow";
-                aPropValue.Value <<= xToolbarWindow;
-                aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name = "ModuleIdentifier";
-                aPropValue.Value <<= m_aModuleIdentifier;
-                aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name     = "Identifier";
-                aPropValue.Value    <<= sal_uInt16(nId);
-                aPropertyVector.push_back( uno::makeAny( aPropValue ) );
+                Sequence< Any > aArgs( comphelper::InitAnyPropertySequence( {
+                    { "Frame", Any(m_xFrame) },
+                    { "CommandURL", Any(aCommandURL) },
+                    { "ServiceManager", Any(xMSF) },
+                    { "ParentWindow", Any(xToolbarWindow) },
+                    { "ModuleIdentifier", Any(m_aModuleIdentifier) },
+                    { "Identifier", Any(sal_uInt16(nId)) },
+                } ));
 
-                Sequence< Any > aArgs( comphelper::containerToSequence( aPropertyVector ));
                 xInit->initialize( aArgs );
-
-                if (pController)
-                {
-                    if (aCommandURL == ".uno:SwitchXFormsDesignMode" || aCommandURL == ".uno:ViewDataSourceBrowser")
-                        pController->setFastPropertyValue_NoBroadcast(1, makeAny(true));
-                }
             }
 
             // Request an item window from the toolbar controller and set it at the VCL toolbar
@@ -1344,7 +1294,9 @@ void ToolBarManager::InitImageManager()
     }
 }
 
-void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContainer )
+void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContainer,
+                                  const Reference< XIndexAccess >& rContextData,
+                                  const OUString& rContextToolbarName )
 {
     OString aTbxName = OUStringToOString( m_aResourceName, RTL_TEXTENCODING_ASCII_US );
     SAL_INFO( "fwk.uielement", "framework (cd100003) ::ToolBarManager::FillToolbar " << aTbxName );
@@ -1363,7 +1315,54 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
     m_aControllerMap.clear();
     m_aCommandMap.clear();
 
-    ToolBoxItemId nId( 1 );
+    ToolBoxItemId nId(1), nAddonId(1000);
+    FillToolbarFromContainer( rItemContainer, m_aResourceName, nId, nAddonId );
+    m_aContextResourceName = rContextToolbarName;
+    if ( rContextData.is() )
+    {
+        m_pImpl->InsertSeparator();
+        FillToolbarFromContainer( rContextData, m_aContextResourceName, nId, nAddonId );
+    }
+
+    // Request images for all toolbar items. Must be done before CreateControllers as
+    // some controllers need access to the image.
+    RequestImages();
+
+    // Create controllers after we set the images. There are controllers which needs
+    // an image at the toolbar at creation time!
+    CreateControllers();
+
+    // Notify controllers that they are now correctly initialized and can start listening
+    // toolbars that will open in popup mode will be updated immediately to avoid flickering
+    if( m_pImpl->WillUsePopupMode() )
+        UpdateControllers();
+    else if ( m_pImpl->IsReallyVisible() )
+    {
+        m_aAsyncUpdateControllersTimer.Start();
+    }
+
+    // Try to retrieve UIName from the container property set and set it as the title
+    // if it is not empty.
+    Reference< XPropertySet > xPropSet( rItemContainer, UNO_QUERY );
+    if ( !xPropSet.is() )
+        return;
+
+    try
+    {
+        OUString aUIName;
+        xPropSet->getPropertyValue("UIName") >>= aUIName;
+        if ( !aUIName.isEmpty() )
+            m_pImpl->SetName( aUIName );
+    }
+    catch (const Exception&)
+    {
+    }
+}
+
+void ToolBarManager::FillToolbarFromContainer( const Reference< XIndexAccess >& rItemContainer,
+                                               const OUString& rResourceName, ToolBoxItemId& nId, ToolBoxItemId& nAddonId )
+{
+    m_nContextMinPos = m_pImpl->GetItemCount();
     CommandInfo aCmdInfo;
     for ( sal_Int32 n = 0; n < rItemContainer->getCount(); n++ )
     {
@@ -1406,7 +1405,6 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
                     auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(aCommandURL, m_aModuleIdentifier);
                     if (!aProperties.hasElements()) // E.g., user-provided macro command?
                         aProperties = aProps; // Use existing info, including user-provided Label
-                    OUString aString(vcl::CommandInfoProvider::GetLabelForCommand(aProperties));
 
                     ToolBoxItemBits nItemBits = ConvertStyleToToolboxItemBits( nStyle );
 
@@ -1414,9 +1412,9 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
                         aTooltip = vcl::CommandInfoProvider::GetTooltipForCommand(aCommandURL, aProperties, m_xFrame);
 
                     if ( aLabel.isEmpty() )
-                        aLabel = aString;
+                        aLabel = vcl::CommandInfoProvider::GetLabelForCommand(aProperties);
 
-                    m_pImpl->InsertItem(nId, aString, aCommandURL, aTooltip, aLabel, nItemBits);
+                    m_pImpl->InsertItem(nId, aCommandURL, aTooltip, aLabel, nItemBits);
 
                     // Fill command map. It stores all our commands and from what
                     // image manager we got our image. So we can decide if we have to use an
@@ -1459,12 +1457,10 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
 
     // Support add-on toolbar merging here. Working directly on the toolbar object is much
     // simpler and faster.
-    constexpr sal_uInt16 TOOLBAR_ITEM_STARTID = 1000;
-
     MergeToolbarInstructionContainer aMergeInstructionContainer;
 
     // Retrieve the toolbar name from the resource name
-    OUString aToolbarName( m_aResourceName );
+    OUString aToolbarName( rResourceName );
     sal_Int32 nIndex = aToolbarName.lastIndexOf( '/' );
     if (( nIndex > 0 ) && ( nIndex < aToolbarName.getLength() ))
         aToolbarName = aToolbarName.copy( nIndex+1 );
@@ -1473,50 +1469,15 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
 
     if ( !aMergeInstructionContainer.empty() )
     {
-        ToolBoxItemId nItemId( TOOLBAR_ITEM_STARTID );
         const sal_uInt32 nCount = aMergeInstructionContainer.size();
         for ( sal_uInt32 i=0; i < nCount; i++ )
         {
             MergeToolbarInstruction& rInstruction = aMergeInstructionContainer[i];
             if ( ToolBarMerger::IsCorrectContext( rInstruction.aMergeContext, m_aModuleIdentifier ))
             {
-                m_pImpl->MergeToolbar(nItemId, m_aModuleIdentifier, m_aCommandMap, rInstruction);
+                m_pImpl->MergeToolbar(nAddonId, m_nContextMinPos, m_aModuleIdentifier, m_aCommandMap, rInstruction);
             }
         }
-    }
-
-    // Request images for all toolbar items. Must be done before CreateControllers as
-    // some controllers need access to the image.
-    RequestImages();
-
-    // Create controllers after we set the images. There are controllers which needs
-    // an image at the toolbar at creation time!
-    CreateControllers();
-
-    // Notify controllers that they are now correctly initialized and can start listening
-    // toolbars that will open in popup mode will be updated immediately to avoid flickering
-    if( m_pImpl->WillUsePopupMode() )
-        UpdateControllers();
-    else if ( m_pImpl->IsReallyVisible() )
-    {
-        m_aAsyncUpdateControllersTimer.Start();
-    }
-
-    // Try to retrieve UIName from the container property set and set it as the title
-    // if it is not empty.
-    Reference< XPropertySet > xPropSet( rItemContainer, UNO_QUERY );
-    if ( !xPropSet.is() )
-        return;
-
-    try
-    {
-        OUString aUIName;
-        xPropSet->getPropertyValue("UIName") >>= aUIName;
-        if ( !aUIName.isEmpty() )
-            m_pImpl->SetName( aUIName );
-    }
-    catch (const Exception&)
-    {
     }
 }
 
@@ -1562,7 +1523,7 @@ void ToolBarManager::FillAddonToolbar( const Sequence< Sequence< PropertyValue >
             }
             else
             {
-                m_pToolBar->InsertItem( nId, aTitle );
+                m_pToolBar->InsertItem( nId, aTitle, aURL );
 
                 OUString aShortcut(vcl::CommandInfoProvider::GetCommandShortcut(aURL, m_xFrame));
                 if (!aShortcut.isEmpty())
@@ -1573,7 +1534,6 @@ void ToolBarManager::FillAddonToolbar( const Sequence< Sequence< PropertyValue >
                 pRuntimeItemData->aControlType = aControlType;
                 pRuntimeItemData->nWidth = nWidth;
                 m_pToolBar->SetItemData( nId, pRuntimeItemData );
-                m_pToolBar->SetItemCommand( nId, aURL );
 
                 // Fill command map. It stores all our commands and from what
                 // image manager we got our image. So we can decide if we have to use an
@@ -1620,8 +1580,7 @@ void ToolBarManager::FillOverflowToolbar( ToolBox const * pParent )
             }
 
             const OUString aCommandURL( pParent->GetItemCommand( nId ) );
-            m_pToolBar->InsertItem( nId, pParent->GetItemText( nId ) );
-            m_pToolBar->SetItemCommand( nId, aCommandURL );
+            m_pToolBar->InsertItem( nId, pParent->GetItemText( nId ), aCommandURL );
             m_pToolBar->SetQuickHelpText( nId, pParent->GetQuickHelpText( nId ) );
 
             // Handle possible add-on controls.
@@ -1709,6 +1668,10 @@ void ToolBarManager::RequestImages()
         ++pIter;
         ++i;
     }
+
+    assert(!m_aImageController); // an existing one isn't disposed here
+    m_aImageController = new ImageOrientationController(m_xContext, m_xFrame, m_pImpl->GetInterface(), m_aModuleIdentifier);
+    m_aImageController->update();
 }
 
 void ToolBarManager::notifyRegisteredControllers( const OUString& aUIElementName, const OUString& aCommand )
@@ -2003,6 +1966,66 @@ void ToolBarManager::AddCustomizeMenuItems(ToolBox const * pToolBar)
         pMenu->RemoveDisabledEntries();
 }
 
+void ToolBarManager::ToggleButton( const OUString& rResourceName, std::u16string_view rCommand )
+{
+    Reference< XLayoutManager > xLayoutManager = getLayoutManagerFromFrame( m_xFrame );
+    if ( !xLayoutManager.is() )
+        return;
+
+    Reference< XUIElementSettings > xUIElementSettings( xLayoutManager->getElement( rResourceName ), UNO_QUERY );
+    if ( !xUIElementSettings.is() )
+        return;
+
+    Reference< XIndexContainer > xItemContainer( xUIElementSettings->getSettings( true ), UNO_QUERY );
+    sal_Int32 nCount = xItemContainer->getCount();
+    for ( sal_Int32 i = 0; i < nCount; i++ )
+    {
+        Sequence< PropertyValue > aProp;
+        sal_Int32 nVisibleIndex( -1 );
+        OUString aCommandURL;
+        bool bVisible( false );
+
+        if ( xItemContainer->getByIndex( i ) >>= aProp )
+        {
+            for ( sal_Int32 j = 0; j < aProp.getLength(); j++ )
+            {
+                if ( aProp[j].Name == ITEM_DESCRIPTOR_COMMANDURL )
+                {
+                    aProp[j].Value >>= aCommandURL;
+                }
+                else if ( aProp[j].Name == ITEM_DESCRIPTOR_VISIBLE )
+                {
+                    aProp[j].Value >>= bVisible;
+                    nVisibleIndex = j;
+                }
+            }
+
+            if (( aCommandURL == rCommand ) && ( nVisibleIndex >= 0 ))
+            {
+                // We have found the requested item, toggle the visible flag
+                // and write back the configuration settings to the toolbar
+                aProp.getArray()[nVisibleIndex].Value <<= !bVisible;
+                try
+                {
+                    xItemContainer->replaceByIndex( i, Any( aProp ));
+                    xUIElementSettings->setSettings( xItemContainer );
+                    Reference< XPropertySet > xPropSet( xUIElementSettings, UNO_QUERY );
+                    if ( xPropSet.is() )
+                    {
+                        Reference< XUIConfigurationPersistence > xUICfgMgr;
+                        if (( xPropSet->getPropertyValue("ConfigurationSource") >>= xUICfgMgr ) && ( xUICfgMgr.is() ))
+                            xUICfgMgr->store();
+                    }
+                }
+                catch (const Exception&)
+                {
+                }
+                break;
+            }
+        }
+    }
+}
+
 IMPL_LINK( ToolBarManager, MenuButton, ToolBox*, pToolBar, void )
 {
     SolarMutexGuard g;
@@ -2170,64 +2193,11 @@ IMPL_LINK( ToolBarManager, MenuSelect, Menu*, pMenu, bool )
                 {
                     // toggle toolbar button visibility
                     OUString aCommand = pMenu->GetItemCommand( nId );
-
-                    Reference< XLayoutManager > xLayoutManager = getLayoutManagerFromFrame( m_xFrame );
-                    if ( xLayoutManager.is() )
-                    {
-                        Reference< XUIElementSettings > xUIElementSettings( xLayoutManager->getElement( m_aResourceName ), UNO_QUERY );
-                        if ( xUIElementSettings.is() )
-                        {
-                            Reference< XIndexContainer > xItemContainer( xUIElementSettings->getSettings( true ), UNO_QUERY );
-                            sal_Int32 nCount = xItemContainer->getCount();
-                            for ( sal_Int32 i = 0; i < nCount; i++ )
-                            {
-                                Sequence< PropertyValue > aProp;
-                                sal_Int32                 nVisibleIndex( -1 );
-                                OUString             aCommandURL;
-                                bool                  bVisible( false );
-
-                                if ( xItemContainer->getByIndex( i ) >>= aProp )
-                                {
-                                    for ( sal_Int32 j = 0; j < aProp.getLength(); j++ )
-                                    {
-                                        if ( aProp[j].Name == ITEM_DESCRIPTOR_COMMANDURL )
-                                        {
-                                            aProp[j].Value >>= aCommandURL;
-                                        }
-                                        else if ( aProp[j].Name == ITEM_DESCRIPTOR_VISIBLE )
-                                        {
-                                            aProp[j].Value >>= bVisible;
-                                            nVisibleIndex = j;
-                                        }
-                                    }
-
-                                    if (( aCommandURL == aCommand ) && ( nVisibleIndex >= 0 ))
-                                    {
-                                        // We have found the requested item, toggle the visible flag
-                                        // and write back the configuration settings to the toolbar
-                                        aProp.getArray()[nVisibleIndex].Value <<= !bVisible;
-                                        try
-                                        {
-                                            xItemContainer->replaceByIndex( i, makeAny( aProp ));
-                                            xUIElementSettings->setSettings( xItemContainer );
-                                            Reference< XPropertySet > xPropSet( xUIElementSettings, UNO_QUERY );
-                                            if ( xPropSet.is() )
-                                            {
-                                                Reference< XUIConfigurationPersistence > xUICfgMgr;
-                                                if (( xPropSet->getPropertyValue("ConfigurationSource") >>= xUICfgMgr ) && ( xUICfgMgr.is() ))
-                                                    xUICfgMgr->store();
-                                            }
-                                        }
-                                        catch (const Exception&)
-                                        {
-                                        }
-
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    if (m_aContextResourceName.isEmpty() ||
+                        nId - STARTID_CUSTOMIZE_POPUPMENU < m_nContextMinPos)
+                        ToggleButton(m_aResourceName, aCommand);
+                    else
+                        ToggleButton(m_aContextResourceName, aCommand);
                 }
                 break;
             }

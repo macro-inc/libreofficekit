@@ -22,6 +22,7 @@
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/text/XTextCursor.hpp>
 #include <com/sun/star/text/XTextAppend.hpp>
+#include <com/sun/star/text/XTextFrame.hpp>
 #include <com/sun/star/style/TabStop.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
@@ -30,8 +31,11 @@
 #include <string_view>
 #include <o3tl/sorted_vector.hxx>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <optional>
+
+#include <ooxml/OOXMLDocument.hxx>
 
 #include <dmapper/CommentProperties.hxx>
 
@@ -43,7 +47,7 @@
 #include "NumberingManager.hxx"
 #include "StyleSheetTable.hxx"
 #include "SettingsTable.hxx"
-#include "ThemeTable.hxx"
+#include "ThemeHandler.hxx"
 #include "GraphicImport.hxx"
 #include "OLEHandler.hxx"
 #include "FFDataHandler.hxx"
@@ -62,6 +66,7 @@ namespace com::sun::star{
         namespace text
         {
                 class XTextField;
+                class XTextFrame;
                 class XFormField;
         }
         namespace beans{ class XPropertySet;}
@@ -196,7 +201,7 @@ class FieldContext : public virtual SvRefBase
     std::vector<FieldParagraph> m_aParagraphsToFinish;
 
 public:
-    explicit FieldContext(css::uno::Reference<css::text::XTextRange> const& xStart);
+    explicit FieldContext(css::uno::Reference<css::text::XTextRange> xStart);
     ~FieldContext() override;
 
     const css::uno::Reference<css::text::XTextRange>& GetStartRange() const { return m_xStartRange; }
@@ -262,7 +267,7 @@ struct TextAppendContext
      */
     std::vector<AnchoredObjectInfo> m_aAnchoredObjects;
 
-    inline TextAppendContext(const css::uno::Reference<css::text::XTextAppend>& xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur);
+    inline TextAppendContext(css::uno::Reference<css::text::XTextAppend> xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur);
 };
 
 struct AnchoredContext
@@ -270,8 +275,8 @@ struct AnchoredContext
     css::uno::Reference<css::text::XTextContent> xTextContent;
     bool bToRemove;
 
-    explicit AnchoredContext(const css::uno::Reference<css::text::XTextContent>& xContent)
-        : xTextContent(xContent), bToRemove(false)
+    explicit AnchoredContext(css::uno::Reference<css::text::XTextContent> xContent)
+        : xTextContent(std::move(xContent)), bToRemove(false)
     {
     }
 };
@@ -287,9 +292,7 @@ struct DeletableTabStop : public css::style::TabStop
     explicit DeletableTabStop()
         : bDeleted(false)
     {
-        // same defaults as SvxXMLTabStopContext_Impl
-        FillChar = ' ';
-        DecimalChar = ',';
+        FillChar = ' ';    // same default as SvxXMLTabStopContext_Impl
     }
     DeletableTabStop(const css::style::TabStop& rTabStop)
         : TabStop(rTabStop),
@@ -303,10 +306,10 @@ struct BookmarkInsertPosition
     bool                                                             m_bIsStartOfText;
     OUString                                                         m_sBookmarkName;
     css::uno::Reference<css::text::XTextRange> m_xTextRange;
-    BookmarkInsertPosition(bool bIsStartOfText, const OUString& rName, css::uno::Reference<css::text::XTextRange> const& xTextRange):
+    BookmarkInsertPosition(bool bIsStartOfText, OUString  rName, css::uno::Reference<css::text::XTextRange> xTextRange):
         m_bIsStartOfText( bIsStartOfText ),
-        m_sBookmarkName( rName ),
-        m_xTextRange( xTextRange )
+        m_sBookmarkName(std::move( rName )),
+        m_xTextRange(std::move( xTextRange ))
      {}
 };
 
@@ -319,12 +322,12 @@ struct PermInsertPosition
 
     css::uno::Reference<css::text::XTextRange> m_xTextRange;
 
-    PermInsertPosition(bool bIsStartOfText, sal_Int32 id, const OUString& ed, const OUString& edGrp, css::uno::Reference<css::text::XTextRange> const& xTextRange)
+    PermInsertPosition(bool bIsStartOfText, sal_Int32 id, OUString  ed, OUString edGrp, css::uno::Reference<css::text::XTextRange> xTextRange)
         : m_bIsStartOfText(bIsStartOfText)
         , m_Id(id)
-        , m_Ed(ed)
-        , m_EdGrp(edGrp)
-        , m_xTextRange(xTextRange)
+        , m_Ed(std::move(ed))
+        , m_EdGrp(std::move(edGrp))
+        , m_xTextRange(std::move(xTextRange))
     {}
 
     OUString createBookmarkName() const
@@ -404,12 +407,12 @@ struct FloatingTableInfo
     /// Tables in footnotes and endnotes are always floating
     bool m_bConvertToFloatingInFootnote = false;
 
-    FloatingTableInfo(css::uno::Reference<css::text::XTextRange> const& xStart,
-            css::uno::Reference<css::text::XTextRange> const& xEnd,
+    FloatingTableInfo(css::uno::Reference<css::text::XTextRange> xStart,
+            css::uno::Reference<css::text::XTextRange> xEnd,
             const css::uno::Sequence<css::beans::PropertyValue>& aFrameProperties,
             sal_Int32 nTableWidth, sal_Int32 nTableWidthType, bool bConvertToFloatingInFootnote)
-        : m_xStart(xStart),
-        m_xEnd(xEnd),
+        : m_xStart(std::move(xStart)),
+        m_xEnd(std::move(xEnd)),
         m_aFrameProperties(aFrameProperties),
         m_nTableWidth(nTableWidth),
         m_nTableWidthType(nTableWidthType),
@@ -454,7 +457,7 @@ public:
 private:
     SourceDocumentType                                                              m_eDocumentType;
     DomainMapper&                                                                   m_rDMapper;
-    void* m_pOOXMLDocument;
+    writerfilter::ooxml::OOXMLDocument* m_pOOXMLDocument;
     OUString m_aBaseUrl;
     css::uno::Reference<css::text::XTextDocument> m_xTextDocument;
     css::uno::Reference<css::beans::XPropertySet> m_xDocumentSettings;
@@ -475,6 +478,8 @@ private:
     std::stack<std::pair<TextAppendContext, bool>>                                  m_aHeaderFooterTextAppendStack;
     std::deque<FieldContextPtr> m_aFieldStack;
     bool m_bForceGenericFields;
+    /// Type of decimal symbol associated to the document language in Writer locale definition
+    bool                                                                            m_bIsDecimalComma;
     bool                                                                            m_bSetUserFieldContent;
     bool                                                                            m_bSetCitation;
     bool                                                                            m_bSetDateValue;
@@ -524,10 +529,10 @@ private:
     ListsManager::Pointer   m_pListTable;
     std::deque< css::uno::Reference<css::drawing::XShape> > m_aPendingShapes;
     StyleSheetTablePtr      m_pStyleSheetTable;
-    ThemeTablePtr           m_pThemeTable;
     SettingsTablePtr        m_pSettingsTable;
     GraphicImportPtr        m_pGraphicImport;
 
+    std::unique_ptr<ThemeHandler> m_pThemeHandler;
 
     PropertyMapPtr                  m_pTopContext;
     PropertyMapPtr           m_pLastSectionContext;
@@ -555,8 +560,11 @@ private:
     /// Skip paragraphs from the <w:separator/> footnote
     SkipFootnoteSeparator           m_eSkipFootnoteState;
     /// preload footnotes and endnotes
-    sal_Int32                       m_nFootnotes;
-    sal_Int32                       m_nEndnotes;
+    sal_Int32                       m_nFootnotes; // footnote count
+    sal_Int32                       m_nEndnotes;  // endnote count
+    // these are the real first notes, use their content in the first notes
+    sal_Int32                       m_nFirstFootnoteIndex;
+    sal_Int32                       m_nFirstEndnoteIndex;
 
     bool                            m_bLineNumberingSet;
     bool                            m_bIsInFootnoteProperties;
@@ -574,8 +582,9 @@ private:
     RedlineParamsPtr                m_previousRedline;
     RedlineParamsPtr                m_pParaMarkerRedline;
     bool                            m_bIsParaMarkerChange;
-    // redline data of the terminating run, if it's a moveFrom deletion
-    RedlineParamsPtr                m_pParaMarkerRedlineMoveFrom;
+    bool                            m_bIsParaMarkerMove;
+    // redline data of the terminating run, if it's a moveFrom deletion or a moveTo insertion
+    RedlineParamsPtr                m_pParaMarkerRedlineMove;
     // This is for removing workaround (double ZWSPs around the anchoring point) for track
     // changed images anchored *to* character, if it's followed by a redline text run immediately.
     // (In that case, the image is part of a tracked text range, no need for the dummy
@@ -610,9 +619,10 @@ private:
     css::uno::Reference< css::beans::XPropertySet > m_xAnnotationField;
     sal_Int32 m_nAnnotationId;
     bool m_bAnnotationResolved = false;
+    OUString m_sAnnotationParent;
+    OUString m_sAnnotationImportedParaId;
     std::unordered_map< sal_Int32, AnnotationPosition > m_aAnnotationPositions;
 
-    void GetCurrentLocale(css::lang::Locale& rLocale);
     void SetNumberFormat(const OUString& rCommand, css::uno::Reference<css::beans::XPropertySet> const& xPropertySet, bool bDetectFormat = false);
     /// @throws css::uno::Exception
     css::uno::Reference<css::beans::XPropertySet> FindOrCreateFieldMaster(const char* pFieldMasterService, const OUString& rFieldMasterName);
@@ -625,9 +635,15 @@ private:
     css::uno::Reference<css::text::XTextRange> m_xSdtEntryStart;
     std::stack<BookmarkInsertPosition> m_xSdtStarts;
 
+    std::queue< css::uno::Reference< css::text::XTextFrame > > m_xPendingTextBoxFrames;
+
 public:
     css::uno::Reference<css::text::XTextRange> m_xInsertTextRange;
     css::uno::Reference<css::text::XTextRange> m_xAltChunkStartingRange;
+    std::deque<sal_Int32> m_aFootnoteIds;
+    std::deque<sal_Int32> m_aEndnoteIds;
+
+    bool m_bIsInTextBox;
 private:
     bool m_bIsNewDoc;
     bool m_bIsAltChunk = false;
@@ -637,13 +653,13 @@ private:
 public:
     DomainMapper_Impl(
             DomainMapper& rDMapper,
-            css::uno::Reference < css::uno::XComponentContext > const& xContext,
+            css::uno::Reference < css::uno::XComponentContext > xContext,
             css::uno::Reference< css::lang::XComponent > const& xModel,
             SourceDocumentType eDocumentType,
             utl::MediaDescriptor const & rMediaDesc);
     ~DomainMapper_Impl();
 
-    void setDocumentReference(void* pDocument) { if (!m_pOOXMLDocument) m_pOOXMLDocument = pDocument; };
+    void setDocumentReference(writerfilter::ooxml::OOXMLDocument* pDocument) { if (!m_pOOXMLDocument) m_pOOXMLDocument = pDocument; };
     writerfilter::ooxml::OOXMLDocument* getDocumentReference() const;
 
     SectionPropertyMap* GetLastSectionContext( )
@@ -674,11 +690,18 @@ public:
 
     void StartParaMarkerChange( );
     void EndParaMarkerChange( );
+    void StartParaMarkerMove( );
+    void EndParaMarkerMove( );
     void ChainTextFrames();
+
+    void PushTextBoxContent();
+    void PopTextBoxContent();
+    void AttachTextBoxContentToShape(css::uno::Reference<css::drawing::XShape> xShape);
 
     void RemoveDummyParaForTableInSection();
     void AddDummyParaForTableInSection();
     void RemoveLastParagraph( );
+    void SetIsDecimalComma() { m_bIsDecimalComma = true; };
     void SetIsLastParagraphInSection( bool bIsLast );
     bool GetIsLastParagraphInSection() const { return m_bIsLastParaInSection;}
     void SetRubySprmId( sal_uInt32 nSprmId) { m_aRubyInfo.nSprmId = nSprmId ; }
@@ -787,11 +810,14 @@ public:
     }
     OUString GetListStyleName(sal_Int32 nListId);
     ListsManager::Pointer const & GetListTable();
-    ThemeTablePtr const & GetThemeTable()
+
+    std::unique_ptr<ThemeHandler> const& getThemeHandler()
     {
-        if(!m_pThemeTable)
-            m_pThemeTable = new ThemeTable;
-        return m_pThemeTable;
+        if (!m_pThemeHandler && m_pOOXMLDocument && m_pOOXMLDocument->getTheme())
+        {
+            m_pThemeHandler = std::make_unique<ThemeHandler>(m_pOOXMLDocument->getTheme(), GetSettingsTable()->GetThemeFontLangProperties());
+        }
+        return m_pThemeHandler;
     }
 
     SettingsTablePtr const & GetSettingsTable()
@@ -801,10 +827,10 @@ public:
         return m_pSettingsTable;
     }
 
-    GraphicImportPtr const & GetGraphicImport( GraphicImportType eGraphicImportType );
+    GraphicImportPtr const & GetGraphicImport();
     void            ResetGraphicImport();
     // this method deletes the current m_pGraphicImport after import
-    void    ImportGraphic(const writerfilter::Reference< Properties>::Pointer_t&, GraphicImportType eGraphicImportType );
+    void    ImportGraphic(const writerfilter::Reference<Properties>::Pointer_t&);
 
     void InitTabStopFromStyle(const css::uno::Sequence<css::style::TabStop>& rInitTabStops);
     void    IncorporateTabStop( const DeletableTabStop &aTabStop );
@@ -870,6 +896,10 @@ public:
     void IncrementFootnoteCount() { ++m_nFootnotes; }
     sal_Int32 GetEndnoteCount() const { return m_nEndnotes; }
     void IncrementEndnoteCount() { ++m_nEndnotes; }
+    bool CopyTemporaryNotes(
+        css::uno::Reference< css::text::XFootnote > xNoteSrc,
+        css::uno::Reference< css::text::XFootnote > xNoteDest );
+    void RemoveTemporaryFootOrEndnotes();
 
     void PushAnnotation();
     void PopAnnotation();
@@ -980,9 +1010,6 @@ public:
 
     DeletableTabStop                m_aCurrentTabStop;
 
-    /// If we're right after the end of a table.
-    bool m_bConvertedTable = false;
-
     bool IsOOXMLImport() const { return m_eDocumentType == SourceDocumentType::OOXML; }
 
     bool IsRTFImport() const { return m_eDocumentType == SourceDocumentType::RTF; }
@@ -1047,8 +1074,6 @@ public:
     }
 
     SectionPropertyMap * GetSectionContext();
-    /// If the current paragraph has a numbering style associated, this method returns its numbering rules
-    css::uno::Reference<css::container::XIndexAccess> GetCurrentNumberingRules(sal_Int32* pListLevel);
 
     sal_Int16 GetListLevel(const StyleSheetEntryPtr& pEntry, const PropertyMapPtr& pParaContext = nullptr);
     void ValidateListLevel(const OUString& sStyleIdentifierD);
@@ -1103,8 +1128,6 @@ public:
     /// If the next tab should be ignored, used for footnotes.
     bool m_bCheckFirstFootnoteTab;
     bool m_bIgnoreNextTab;
-    /// Pending floating tables: they may be converted to text frames at the section end.
-    std::vector<FloatingTableInfo> m_aPendingFloatingTables;
 
     /// Paragraphs with anchored objects in the current section.
     std::vector<AnchoredObjectsInfo> m_aAnchoredObjectAnchors;
@@ -1133,6 +1156,7 @@ public:
     std::pair<OUString, OUString> m_aAligns;
     /// ST_PositivePercentage values we received
     std::queue<OUString> m_aPositivePercentages;
+    enum GraphicImportType m_eGraphicImportType = {};
     bool isInIndexContext() const { return m_bStartIndex;}
     bool isInBibliographyContext() const { return m_bStartBibliography;}
     SmartTagHandler& getSmartTagHandler() { return m_aSmartTagHandler; }
@@ -1181,6 +1205,10 @@ public:
 
     void commentProps(const OUString& sId, const CommentProperties& rProps);
 
+    OUString getFontNameForTheme(const Id id);
+
+    OUString ConvertTOCStyleName(OUString const&);
+
 private:
     void PushPageHeaderFooter(bool bHeader, SectionPropertyMap::PageType eType);
     // Start a new index section; if needed, finish current paragraph
@@ -1203,8 +1231,8 @@ private:
     std::unordered_map<OUString, CommentProperties> m_aCommentProps;
 };
 
-TextAppendContext::TextAppendContext(const css::uno::Reference<css::text::XTextAppend>& xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur)
-    : xTextAppend(xAppend)
+TextAppendContext::TextAppendContext(css::uno::Reference<css::text::XTextAppend> xAppend, const css::uno::Reference<css::text::XTextCursor>& xCur)
+    : xTextAppend(std::move(xAppend))
 {
     xCursor.set(xCur, css::uno::UNO_QUERY);
     xInsertPosition = xCursor;

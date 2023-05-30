@@ -106,9 +106,7 @@ void SwAccessibleChild::Init( const SdrObject* pDrawObj )
 void SwAccessibleChild::Init( const SwFrame* pFrame )
 {
     mpFrame = pFrame;
-    mpDrawObj = mpFrame && mpFrame->IsFlyFrame()
-                ? static_cast < const SwFlyFrame * >( mpFrame )->GetVirtDrawObj()
-                : nullptr;
+    mpDrawObj = nullptr;
     mpWindow = nullptr;
 }
 
@@ -183,13 +181,6 @@ SwAccessibleChild& SwAccessibleChild::operator=( vcl::Window* pWindow )
 {
     Init( pWindow );
     return *this;
-}
-
-bool SwAccessibleChild::operator==( const SwAccessibleChild& r ) const
-{
-    return mpFrame == r.mpFrame &&
-           mpDrawObj == r.mpDrawObj &&
-           mpWindow == r.mpWindow;
 }
 
 bool SwAccessibleChild::IsValid() const

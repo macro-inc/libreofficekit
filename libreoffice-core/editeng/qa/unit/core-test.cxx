@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <config_features.h>
+#include <config_fonts.h>
 
 #include <test/bootstrapfixture.hxx>
 
@@ -97,6 +97,12 @@ public:
 
     void testTransliterate();
 
+    void testTdf147196();
+
+    void testTdf148148();
+
+    void testSingleLine();
+
     DECL_STATIC_LINK( Test, CalcFieldValueHdl, EditFieldInfo*, void );
 
     CPPUNIT_TEST_SUITE(Test);
@@ -119,6 +125,9 @@ public:
     CPPUNIT_TEST(testSectionAttributes);
     CPPUNIT_TEST(testLargeParaCopyPaste);
     CPPUNIT_TEST(testTransliterate);
+    CPPUNIT_TEST(testTdf147196);
+    CPPUNIT_TEST(testTdf148148);
+    CPPUNIT_TEST(testSingleLine);
     CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -1745,15 +1754,241 @@ void Test::testLargeParaCopyPaste()
     CPPUNIT_ASSERT_EQUAL( aTenthPara, rDoc.GetParaAsString(sal_Int32(11)) );
 }
 
+OUString lcl_translitTest(EditEngine& aEditEngine, const OUString& text, const ESelection& esel, const TransliterationFlags nType)
+{
+    aEditEngine.SetText(text);
+    aEditEngine.TransliterateText(esel, nType);
+    return aEditEngine.GetText();
+}
+
+
 void Test::testTransliterate()
 {
     // Create EditEngine's instance
-    EditEngine aEditEngine( mpItemPool.get() );
+    EditEngine editEng( mpItemPool.get() );
 
     OUString sText("one (two) three");
+    editEng.SetText(sText);
+    editEng.TransliterateText(ESelection(0, 0, 0, sText.getLength()), TransliterationFlags::TITLE_CASE);
+    CPPUNIT_ASSERT_EQUAL(OUString("One (Two) Three"), editEng.GetText());
+
+    using TF = TransliterationFlags;
+    const OUString sText2 = "Mary Jones met joe Smith. Time Passed.";
+    int selStart = 12;
+    int selEnd = 12;
+    ESelection esel(0, selStart, 0, selEnd);
+
+    /* DocumentContentOperationsManager checks if the cursor is inside of a word before transliterating,
+     * but Edit Engine has no such check. Therefore, behavior is different between these two when the
+     * cursor is on a word boundary. */
+
+    /* No selection tests. Cursor between the ' ' and 'm' before 'met'. */
+    CPPUNIT_ASSERT_EQUAL(OUString(""), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary jones met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones MET joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* No selection tests. Cursor between the 't' and the ' ' after 'met'. */
+    selStart = 14;
+    selEnd = 14;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString(""), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary jones met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* No selection tests. Cursor between the 'h' and the '.' after 'Smith'. */
+    selStart = 24;
+    selEnd = 24;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString(""), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary jones met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* No selection tests. Cursor between the 'm' and 'e' in 'met'. */
+    selStart = 12;
+    selEnd = 12;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString(""), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary jones met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones MET joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test behavior when there is a selection that does not cross a word boundary: "met" */
+    selStart = 11;
+    selEnd = 14;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString("met"), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones MET joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test behavior when there is a selection that does not begin at a word boundary: "et" */
+    selStart = 12;
+    selEnd = 14;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString("et"), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones mEt joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones mEt joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones mET joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test behavior when there is a selection that ends in the middle of a word */
+    selStart = 11;
+    selEnd = 13;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString("me"), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones Met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones MEt joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+
+    /* Test behavior when there is a selection that crosses a word boundary: "nes met joe Sm" */
+    selStart = 7;
+    selEnd = 21;
+    esel = ESelection(0, selStart, 0, selEnd);
+    CPPUNIT_ASSERT_EQUAL(OUString("nes met joe Sm"), editEng.GetText(esel));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary JoNes met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary JoNes Met Joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary JoNES MET JOE SMith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test behavior when there is a selection that crosses a sentence boundary: "joe Smith. Time Passed." */
+    selStart = 15;
+    selEnd = 38;
+    esel = ESelection(0, selStart, 0, selEnd);
+    editEng.SetText(sText2);
+    CPPUNIT_ASSERT_EQUAL(OUString("joe Smith. Time Passed."), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met Joe smith. Time passed."), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met Joe Smith. Time Passed."), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met JOE SMITH. TIME PASSED."), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Mary Jones met joe smith. time passed."), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test behavior when sentence ends with a capital that is not selected: "CURRENT IS EQUAL TO 10 A" */
+    selStart = 0;
+    selEnd = 19;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText3("CURRENT IS EQUAL TO 10 A");
+    editEng.SetText(sText3);
+    CPPUNIT_ASSERT_EQUAL(OUString("CURRENT IS EQUAL TO"), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("Current is equal to 10 A"), lcl_translitTest(editEng, sText3, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("Current Is Equal To 10 A"), lcl_translitTest(editEng, sText3, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("CURRENT IS EQUAL TO 10 A"), lcl_translitTest(editEng, sText3, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("current is equal to 10 A"), lcl_translitTest(editEng, sText3, esel, TF::UPPERCASE_LOWERCASE));
+
+}
+
+void Test::testTdf147196()
+{
+    EditEngine editEng( mpItemPool.get() );
+    editEng.SetText("2.2 Publication of information - CAA\nSection 4.2 of a CA\'s Certificate Policy and/or Certification Practice Statement SHALL state the CA\'s policy or practice on processing CAA Records for Fully Qualified Domain Names; that policy shall be consistent with these Requirements. \n\nIt shall clearly specify the set of Issuer Domain Names that the CA recognises in CAA \"issue\" or \"issuewild\" records as permitting it to issue. The CA SHALL log all actions taken, if any, consistent with its processing practice.");
+    editEng.TransliterateText(ESelection(0, 0, 3, 232), TransliterationFlags::TITLE_CASE);
+    CPPUNIT_ASSERT_EQUAL(OUString("2.2 Publication Of Information - Caa\nSection 4.2 Of A Ca\'s Certificate Policy And/Or Certification Practice Statement Shall State The Ca\'s Policy Or Practice On Processing Caa Records For Fully Qualified Domain Names; That Policy Shall Be Consistent With These Requirements. \n\nIt Shall Clearly Specify The Set Of Issuer Domain Names That The Ca Recognises In Caa \"Issue\" Or \"Issuewild\" Records As Permitting It To Issue. The Ca Shall Log All Actions Taken, If Any, Consistent With Its Processing Practice."), editEng.GetText());
+}
+
+void Test::testTdf148148()
+{
+    using TF = TransliterationFlags;
+    EditEngine editEng( mpItemPool.get() );
+
+    /* Test what happens when node contains text but selection does not contain any text */
+    int selStart = 0;
+    int selEnd = 3;
+    ESelection esel(0, selStart, 0, selEnd);
+    const OUString sText1("   text");
+    editEng.SetText(sText1);
+    CPPUNIT_ASSERT_EQUAL(OUString("   "), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("   text"), lcl_translitTest(editEng, sText1, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   text"), lcl_translitTest(editEng, sText1, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   text"), lcl_translitTest(editEng, sText1, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   text"), lcl_translitTest(editEng, sText1, esel, TF::UPPERCASE_LOWERCASE));
+
+    selStart = 4;
+    selEnd = 8;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText2("text    ");
+    editEng.SetText(sText2);
+    CPPUNIT_ASSERT_EQUAL(OUString("    "), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("text    "), lcl_translitTest(editEng, sText2, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("text    "), lcl_translitTest(editEng, sText2, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("text    "), lcl_translitTest(editEng, sText2, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("text    "), lcl_translitTest(editEng, sText2, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test what happens when node contains only non-word text but selection does not contain any text */
+    selStart = 0;
+    selEnd = 3;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText3("   -1");
+    editEng.SetText(sText3);
+    CPPUNIT_ASSERT_EQUAL(OUString("   "), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText3, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText3, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText3, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText3, esel, TF::UPPERCASE_LOWERCASE));
+
+    selStart = 2;
+    selEnd = 6;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText4("-1    ");
+    editEng.SetText(sText4);
+    CPPUNIT_ASSERT_EQUAL(OUString("    "), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("-1    "), lcl_translitTest(editEng, sText4, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1    "), lcl_translitTest(editEng, sText4, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1    "), lcl_translitTest(editEng, sText4, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1    "), lcl_translitTest(editEng, sText4, esel, TF::UPPERCASE_LOWERCASE));
+
+    /* Test what happens when node and selection contains only non-word text */
+    selStart = 0;
+    selEnd = 5;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText5("   -1");
+    editEng.SetText(sText3);
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText5, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText5, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText5, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("   -1"), lcl_translitTest(editEng, sText5, esel, TF::UPPERCASE_LOWERCASE));
+
+    selStart = 0;
+    selEnd = 5;
+    esel = ESelection(0, selStart, 0, selEnd);
+    const OUString sText6("-1   ");
+    editEng.SetText(sText4);
+    CPPUNIT_ASSERT_EQUAL(OUString("-1   "), editEng.GetText(esel));
+
+    CPPUNIT_ASSERT_EQUAL(OUString("-1   "), lcl_translitTest(editEng, sText6, esel, TF::SENTENCE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1   "), lcl_translitTest(editEng, sText6, esel, TF::TITLE_CASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1   "), lcl_translitTest(editEng, sText6, esel, TF::LOWERCASE_UPPERCASE));
+    CPPUNIT_ASSERT_EQUAL(OUString("-1   "), lcl_translitTest(editEng, sText6, esel, TF::UPPERCASE_LOWERCASE));
+
+
+}
+
+void Test::testSingleLine()
+{
+    EditEngine aEditEngine( mpItemPool.get() );
+
+    OUString sText("Bolivian\nSanta Cruz de la Sierra");
+    aEditEngine.SetSingleLine(true);
     aEditEngine.SetText(sText);
-    aEditEngine.TransliterateText(ESelection(0, 0, 0, sText.getLength()), TransliterationFlags::TITLE_CASE);
-    CPPUNIT_ASSERT_EQUAL(OUString("One (Two) Three"), aEditEngine.GetText());
+    aEditEngine.QuickFormatDoc(true);
+    CPPUNIT_ASSERT_EQUAL(true, aEditEngine.IsFormatted());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1), aEditEngine.GetParagraphCount());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1), aEditEngine.GetLineCount(0));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(Test);

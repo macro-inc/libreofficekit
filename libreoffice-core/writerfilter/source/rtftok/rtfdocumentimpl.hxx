@@ -73,6 +73,7 @@ enum RTFBufferTypes
     BUFFER_SETSTYLE,
     /// Stores properties, should be created only in bufferProperties().
     BUFFER_PROPS,
+    BUFFER_PROPS_CHAR,
     BUFFER_NESTROW,
     BUFFER_CELLEND,
     BUFFER_STARTRUN,
@@ -523,6 +524,11 @@ public:
     void setInternalState(RTFInternalState nInternalState) { m_nInternalState = nInternalState; }
     RTFInternalState getInternalState() const { return m_nInternalState; }
     RTFDocumentImpl* getDocumentImpl() { return m_pDocumentImpl; }
+    OUString getDocVar() { return m_aDocVar; }
+    void appendDocVar(OUString& aDocVar) { m_aDocVar += aDocVar; };
+    OUString getDocVarName() { return m_aDocVarName; }
+    void setDocVarName(OUString& aDocVarName) { m_aDocVarName = aDocVarName; }
+    void clearDocVarName() { m_aDocVarName = ""; }
 
 private:
     RTFDocumentImpl* m_pDocumentImpl;
@@ -622,6 +628,10 @@ private:
 
     /// Width of invisible cell at the end of the row.
     int m_nTableRowWidthAfter;
+
+    /// For importing document variables which are not referenced in the document
+    OUString m_aDocVar;
+    OUString m_aDocVarName;
 };
 
 /// An RTF stack is similar to std::stack, except that it has an operator[].
@@ -691,6 +701,8 @@ public:
     // RTFListener
     RTFError dispatchDestination(RTFKeyword nKeyword) override;
     RTFError dispatchFlag(RTFKeyword nKeyword) override;
+    /// Dispatches flags related to Positioned Wrapped Tables.
+    bool dispatchFloatingTableFlag(RTFKeyword nKeyword);
     RTFError dispatchSymbol(RTFKeyword nKeyword) override;
     RTFError dispatchToggle(RTFKeyword nKeyword, bool bParam, int nParam) override;
     RTFError dispatchValue(RTFKeyword nKeyword, int nParam) override;
@@ -753,7 +765,7 @@ public:
     void resetFrame();
     /// Buffers properties to be sent later.
     void bufferProperties(RTFBuffer_t& rBuffer, const RTFValue::Pointer_t& pValue,
-                          const tools::SvRef<TableRowBuffer>& pTableProperties);
+                          const tools::SvRef<TableRowBuffer>& pTableProperties, Id nStyleType = 0);
     /// implement non-obvious RTF specific style inheritance
     RTFReferenceTable::Entries_t deduplicateStyleTable();
 
@@ -788,7 +800,7 @@ private:
     void sendProperties(writerfilter::Reference<Properties>::Pointer_t const& pParagraphProperties,
                         writerfilter::Reference<Properties>::Pointer_t const& pFrameProperties,
                         writerfilter::Reference<Properties>::Pointer_t const& pTableRowProperties);
-    void replayRowBuffer(RTFBuffer_t& rBuffer, ::std::deque<RTFSprms>& rCellsSrpms,
+    void replayRowBuffer(RTFBuffer_t& rBuffer, ::std::deque<RTFSprms>& rCellsSprms,
                          ::std::deque<RTFSprms>& rCellsAttributes, int nCells);
     void replayBuffer(RTFBuffer_t& rBuffer, RTFSprms* pSprms, RTFSprms const* pAttributes);
     /// If we have some unicode or hex characters to send.
@@ -979,6 +991,9 @@ private:
 
     /// Are we after a \cell, but before a \row?
     bool m_bAfterCellBeforeRow;
+
+    /// Floating tables are single-page by default.
+    bool m_bBreakWrappedTables = false;
 };
 } // namespace writerfilter::rtftok
 

@@ -31,6 +31,7 @@
 
 #include <basic/sbx.hxx>
 #include <basic/sbxvar.hxx>
+#include <comphelper/string.hxx>
 #include "runtime.hxx"
 #include <osl/thread.h>
 #include <rtl/ref.hxx>
@@ -39,6 +40,7 @@
 #include <sal/log.hxx>
 #include <salhelper/simplereferenceobject.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
+#include <o3tl/string_view.hxx>
 
 #undef max
 
@@ -584,7 +586,7 @@ ErrCode getProcData(HMODULE handle, OUString const & name, ProcData * proc)
 {
     assert(proc != 0);
     if ( !name.isEmpty() && name[0] == '@' ) { //TODO: "@" vs. "#"???
-        sal_Int32 n = name.copy(1).toInt32(); //TODO: handle bad input
+        sal_Int32 n = o3tl::toInt32(name.subView(1)); //TODO: handle bad input
         if (n <= 0 || n > 0xFFFF) {
             return ERRCODE_BASIC_BAD_ARGUMENT; //TODO: more specific errcode?
         }

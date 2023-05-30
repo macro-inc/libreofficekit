@@ -18,6 +18,7 @@
  */
 
 #include <memory>
+#include <utility>
 #include <string_view>
 #include <sal/config.h>
 
@@ -43,7 +44,7 @@
 #include <unotools/transliterationwrapper.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/storagehelper.hxx>
-#include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <editeng/editids.hrc>
 #include <sot/storage.hxx>
 #include <editeng/udlnitem.hxx>
@@ -67,7 +68,7 @@
 #include <com/sun/star/ucb/XCommandEnvironment.hpp>
 #include <com/sun/star/ucb/TransferInfo.hpp>
 #include <com/sun/star/ucb/NameClash.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <xmloff/xmltoken.hxx>
 #include <unordered_map>
 #include <rtl/character.hxx>
@@ -105,7 +106,7 @@ const char
     /* also at these ends - Brackets and all kinds of begin characters */
     sImplEndSkipChars[] = "\"\')]}\x83\x84\x89\x91\x92\x93\x94";
 
-static OUString EncryptBlockName_Imp(const OUString& rName);
+static OUString EncryptBlockName_Imp(std::u16string_view rName);
 
 static bool NonFieldWordDelim( const sal_Unicode c )
 {
@@ -224,7 +225,7 @@ static LocaleDataWrapper& GetLocaleDataWrapper( LanguageType nLang )
     static std::unique_ptr<LocaleDataWrapper> xLclDtWrp;
     LanguageTag aLcl( nLang );
     if (!xLclDtWrp || xLclDtWrp->getLoadedLanguageTag() != aLcl)
-        xLclDtWrp.reset(new LocaleDataWrapper(aLcl));
+        xLclDtWrp.reset(new LocaleDataWrapper(std::move(aLcl)));
     return *xLclDtWrp;
 }
 static TransliterationWrapper& GetIgnoreTranslWrapper()
@@ -324,10 +325,10 @@ const sal_Unicode aStopDoubleAngleQuoteEndRo[] = { cLeftDoubleAngleQuote, cRight
 const sal_Unicode aStopSingleQuoteEnd[] = { 0x201A, 0x2018, 0x201C, 0x201E, 0 };
 const sal_Unicode aStopSingleQuoteEndRuUa[] = { 0x201E, 0x201C, cRightDoubleAngleQuote, cLeftDoubleAngleQuote, 0 };
 
-SvxAutoCorrect::SvxAutoCorrect( const OUString& rShareAutocorrFile,
-                                const OUString& rUserAutocorrFile )
-    : sShareAutoCorrFile( rShareAutocorrFile )
-    , sUserAutoCorrFile( rUserAutocorrFile )
+SvxAutoCorrect::SvxAutoCorrect( OUString aShareAutocorrFile,
+                                OUString aUserAutocorrFile )
+    : sShareAutoCorrFile(std::move( aShareAutocorrFile ))
+    , sUserAutoCorrFile(std::move( aUserAutocorrFile ))
     , eCharClassLang( LANGUAGE_DONTKNOW )
     , nFlags(SvxAutoCorrect::GetDefaultFlags())
     , cStartDQuote( 0 )
@@ -510,7 +511,7 @@ bool SvxAutoCorrect::FnChgOrdinalNumber(
         }
 
         if (bFoundEnd && isValidNumber) {
-            sal_Int32 nNum = rTxt.copy(nSttPos, nNumEnd - nSttPos + 1).toInt32();
+            sal_Int32 nNum = o3tl::toInt32(rTxt.subView(nSttPos, nNumEnd - nSttPos + 1));
 
             // Check if the characters after that number correspond to the ordinal suffix
             uno::Reference< i18n::XOrdinalSuffix > xOrdSuffix
@@ -519,7 +520,7 @@ bool SvxAutoCorrect::FnChgOrdinalNumber(
             const uno::Sequence< OUString > aSuffixes = xOrdSuffix->getOrdinalSuffix(nNum, rCC.getLanguageTag().getLocale());
             for (OUString const & sSuffix : aSuffixes)
             {
-                OUString sEnd = rTxt.copy(nNumEnd + 1, nEndPos - nNumEnd - 1);
+                std::u16string_view sEnd = rTxt.subView(nNumEnd + 1, nEndPos - nNumEnd - 1);
 
                 if (sSuffix == sEnd)
                 {
@@ -543,7 +544,7 @@ bool SvxAutoCorrect::FnChgOrdinalNumber(
 
 // Replace dashes
 bool SvxAutoCorrect::FnChgToEnEmDash(
-                                SvxAutoCorrDoc& rDoc, const OUString& rTxt,
+                                SvxAutoCorrDoc& rDoc, std::u16string_view rTxt,
                                 sal_Int32 nSttPos, sal_Int32 nEndPos,
                                 LanguageType eLang )
 {
@@ -629,7 +630,7 @@ bool SvxAutoCorrect::FnChgToEnEmDash(
     bool bEnDash = (eLang == LANGUAGE_HUNGARIAN || eLang == LANGUAGE_FINNISH);
     if( 4 <= nEndPos - nSttPos )
     {
-        OUString sTmp( rTxt.copy( nSttPos, nEndPos - nSttPos ) );
+        OUString sTmp( rTxt.substr( nSttPos, nEndPos - nSttPos ) );
         sal_Int32 nFndPos = sTmp.indexOf("--");
         if( nFndPos != -1 && nFndPos &&
             nFndPos + 2 < sTmp.getLength() &&
@@ -650,7 +651,7 @@ bool SvxAutoCorrect::FnChgToEnEmDash(
 
 // Add non-breaking space before specific punctuation marks in French text
 bool SvxAutoCorrect::FnAddNonBrkSpace(
-                                SvxAutoCorrDoc& rDoc, const OUString& rTxt,
+                                SvxAutoCorrDoc& rDoc, std::u16string_view rTxt,
                                 sal_Int32 nEndPos,
                                 LanguageType eLang, bool& io_bNbspRunNext )
 {
@@ -683,17 +684,17 @@ bool SvxAutoCorrect::FnAddNonBrkSpace(
 
             //See if the text is the start of a protocol string, e.g. have text of
             //"http" see if it is the start of "http:" and if so leave it alone
-            sal_Int32 nIndex = nSttWdPos + (bWasWordDelim ? 1 : 0);
-            sal_Int32 nProtocolLen = nEndPos - nSttWdPos + 1;
-            if (nIndex + nProtocolLen <= rTxt.getLength())
+            size_t nIndex = nSttWdPos + (bWasWordDelim ? 1 : 0);
+            size_t nProtocolLen = nEndPos - nSttWdPos + 1;
+            if (nIndex + nProtocolLen <= rTxt.size())
             {
-                if (INetURLObject::CompareProtocolScheme(rTxt.copy(nIndex, nProtocolLen)) != INetProtocol::NotValid)
+                if (INetURLObject::CompareProtocolScheme(rTxt.substr(nIndex, nProtocolLen)) != INetProtocol::NotValid)
                     return false;
             }
 
             // Check the presence of "://" in the word
-            sal_Int32 nStrPos = rTxt.indexOf( "://", nSttWdPos + 1 );
-            if ( nStrPos == -1 && nEndPos > 0 )
+            size_t nStrPos = rTxt.find( u"://", nSttWdPos + 1 );
+            if ( nStrPos == std::u16string_view::npos && nEndPos > 0 )
             {
                 // Check the previous char
                 sal_Unicode cPrevChar = rTxt[ nEndPos - 1 ];
@@ -722,7 +723,7 @@ bool SvxAutoCorrect::FnAddNonBrkSpace(
                     io_bNbspRunNext = true;
             }
         }
-        else if ( cChar == '/' && nEndPos > 1 && rTxt.getLength() > (nEndPos - 1) )
+        else if ( cChar == '/' && nEndPos > 1 && static_cast<sal_Int32>(rTxt.size()) > (nEndPos - 1) )
         {
             // Remove the hardspace right before to avoid formatting URLs
             sal_Unicode cPrevChar = rTxt[ nEndPos - 1 ];
@@ -895,7 +896,7 @@ void SvxAutoCorrect::FnCapitalStartSentence( SvxAutoCorrDoc& rDoc,
     sal_Int32 nProtocolLen = pDelim - pWordStt + 1;
     if (nIndex + nProtocolLen <= rTxt.getLength())
     {
-        if (INetURLObject::CompareProtocolScheme(rTxt.copy(nIndex, nProtocolLen)) != INetProtocol::NotValid)
+        if (INetURLObject::CompareProtocolScheme(rTxt.subView(nIndex, nProtocolLen)) != INetProtocol::NotValid)
             return; // already ok
     }
 
@@ -1279,7 +1280,7 @@ OUString SvxAutoCorrect::GetQuote( SvxAutoCorrDoc const & rDoc, sal_Int32 nInsPo
 
 // search preceding opening quote in the paragraph before the insert position
 static bool lcl_HasPrecedingChar( std::u16string_view rTxt, sal_Int32 nPos,
-                const sal_Unicode sPrecedingChar, const sal_Unicode* aStopChars )
+                const sal_Unicode sPrecedingChar, const sal_Unicode sStopChar, const sal_Unicode* aStopChars )
 {
     sal_Unicode cTmpChar;
 
@@ -1287,6 +1288,9 @@ static bool lcl_HasPrecedingChar( std::u16string_view rTxt, sal_Int32 nPos,
         cTmpChar = rTxt[ --nPos ];
         if ( cTmpChar == sPrecedingChar )
             return true;
+
+        if ( cTmpChar == sStopChar )
+            return false;
 
         for ( const sal_Unicode* pCh = aStopChars; *pCh; ++pCh )
             if ( cTmpChar == *pCh )
@@ -1357,13 +1361,15 @@ void SvxAutoCorrect::DoAutoCorrect( SvxAutoCorrDoc& rDoc, const OUString& rTxt,
                         ( ( eLang == LANGUAGE_HUNGARIAN &&
                             lcl_HasPrecedingChar( rTxt, nInsPos,
                                 bSttQuote ? aStopDoubleAngleQuoteStart[0] : aStopDoubleAngleQuoteEnd[0],
-                                bSttQuote ? aStopDoubleAngleQuoteStart + 1 : aStopDoubleAngleQuoteEnd + 1 ) ) ||
+                                bSttQuote ? aStopDoubleAngleQuoteStart[1] : aStopDoubleAngleQuoteEnd[1],
+                                bSttQuote ? aStopDoubleAngleQuoteStart + 1 : aStopDoubleAngleQuoteEnd + 2 ) ) ||
                           ( eLang.anyOf(
                                 LANGUAGE_ROMANIAN,
                                 LANGUAGE_ROMANIAN_MOLDOVA ) &&
                             lcl_HasPrecedingChar( rTxt, nInsPos,
                                 bSttQuote ? aStopDoubleAngleQuoteStart[0] : aStopDoubleAngleQuoteEndRo[0],
-                                bSttQuote ? aStopDoubleAngleQuoteStart + 1 : aStopDoubleAngleQuoteEndRo + 1 ) ) ) )
+                                bSttQuote ? aStopDoubleAngleQuoteStart[1] : aStopDoubleAngleQuoteEndRo[1],
+                                bSttQuote ? aStopDoubleAngleQuoteStart + 1 : aStopDoubleAngleQuoteEndRo + 2 ) ) ) )
                     {
                         LocaleDataWrapper& rLcl = GetLocaleDataWrapper( eLang );
                         // only if the opening double quotation mark is the default one
@@ -1374,7 +1380,7 @@ void SvxAutoCorrect::DoAutoCorrect( SvxAutoCorrDoc& rDoc, const OUString& rTxt,
                         // tdf#128860 use apostrophe outside of second level quotation in Czech, German, Icelandic,
                         // Slovak and Slovenian instead of the – in this case, bad – closing quotation mark U+2018.
                         // tdf#123786 the same for Russian and Ukrainian
-                        ( ( eLang.anyOf (
+                        ( eLang.anyOf (
                                  LANGUAGE_CZECH,
                                  LANGUAGE_GERMAN,
                                  LANGUAGE_GERMAN_SWISS,
@@ -1383,17 +1389,33 @@ void SvxAutoCorrect::DoAutoCorrect( SvxAutoCorrDoc& rDoc, const OUString& rTxt,
                                  LANGUAGE_GERMAN_LIECHTENSTEIN,
                                  LANGUAGE_ICELANDIC,
                                  LANGUAGE_SLOVAK,
-                                 LANGUAGE_SLOVENIAN ) &&
-                            !lcl_HasPrecedingChar( rTxt, nInsPos, aStopSingleQuoteEnd[0],  aStopSingleQuoteEnd + 1 ) ) ||
+                                 LANGUAGE_SLOVENIAN ) ) )
+                    {
+                        sal_Unicode sStartChar = GetStartSingleQuote();
+                        sal_Unicode sEndChar = GetEndSingleQuote();
+                        if ( !sStartChar || !sEndChar ) {
+                            LocaleDataWrapper& rLcl = GetLocaleDataWrapper( eLang );
+                            if ( !sStartChar ) sStartChar = rLcl.getQuotationMarkStart()[0];
+                            if ( !sEndChar ) sEndChar = rLcl.getQuotationMarkStart()[0];
+                        }
+                        if ( !lcl_HasPrecedingChar( rTxt, nInsPos, sStartChar, sEndChar, aStopSingleQuoteEnd + 1 ) )
+                        {
+                            CharClass& rCC = GetCharClass( eLang );
+                            if ( rCC.isLetter(rTxt, nInsPos-1) )
+                            {
+                                eType = ACQuotes::UseApostrophe;
+                            }
+                        }
+                    }
+                    else if ( bSingle && nInsPos && !bSttQuote &&
                           ( eLang.anyOf (
                                  LANGUAGE_RUSSIAN,
                                  LANGUAGE_UKRAINIAN ) &&
-                            !lcl_HasPrecedingChar( rTxt, nInsPos, aStopSingleQuoteEndRuUa[0],  aStopSingleQuoteEndRuUa + 1 ) ) ) )
+                            !lcl_HasPrecedingChar( rTxt, nInsPos, aStopSingleQuoteEndRuUa[0], aStopSingleQuoteEndRuUa[1],  aStopSingleQuoteEndRuUa + 2 ) ) )
                     {
                         LocaleDataWrapper& rLcl = GetLocaleDataWrapper( eLang );
                         CharClass& rCC = GetCharClass( eLang );
-                        if ( ( rLcl.getQuotationMarkStart() == OUStringChar(aStopSingleQuoteEnd[0]) ||
-                             rLcl.getQuotationMarkStart() == OUStringChar(aStopSingleQuoteEndRuUa[0]) ) &&
+                        if ( rLcl.getQuotationMarkStart() == OUStringChar(aStopSingleQuoteEndRuUa[0]) &&
                              // use apostrophe only after letters, not after digits or punctuation
                              rCC.isLetter(rTxt, nInsPos-1) )
                         {
@@ -1632,14 +1654,14 @@ SvxAutoCorrectLanguageLists& SvxAutoCorrect::GetLanguageList_(
     LanguageTag aLanguageTag( eLang);
     if (m_aLangTable.find(aLanguageTag) == m_aLangTable.end())
         (void)CreateLanguageFile(aLanguageTag);
-    return *(m_aLangTable.find(aLanguageTag)->second);
+    return m_aLangTable.find(aLanguageTag)->second;
 }
 
 void SvxAutoCorrect::SaveCplSttExceptList( LanguageType eLang )
 {
     auto const iter = m_aLangTable.find(LanguageTag(eLang));
-    if (iter != m_aLangTable.end() && iter->second)
-        iter->second->SaveCplSttExceptList();
+    if (iter != m_aLangTable.end())
+        iter->second.SaveCplSttExceptList();
     else
     {
         SAL_WARN("editeng", "Save an empty list? ");
@@ -1649,8 +1671,8 @@ void SvxAutoCorrect::SaveCplSttExceptList( LanguageType eLang )
 void SvxAutoCorrect::SaveWordStartExceptList(LanguageType eLang)
 {
     auto const iter = m_aLangTable.find(LanguageTag(eLang));
-    if (iter != m_aLangTable.end() && iter->second)
-        iter->second->SaveWordStartExceptList();
+    if (iter != m_aLangTable.end())
+        iter->second.SaveWordStartExceptList();
     else
     {
         SAL_WARN("editeng", "Save an empty list? ");
@@ -1665,15 +1687,15 @@ bool SvxAutoCorrect::AddCplSttException( const OUString& rNew,
     // either the right language is present or it will be this in the general list
     auto iter = m_aLangTable.find(LanguageTag(eLang));
     if (iter != m_aLangTable.end())
-        pLists = iter->second.get();
+        pLists = &iter->second;
     else
     {
         LanguageTag aLangTagUndetermined( LANGUAGE_UNDETERMINED);
         iter = m_aLangTable.find(aLangTagUndetermined);
         if (iter != m_aLangTable.end())
-            pLists = iter->second.get();
+            pLists = &iter->second;
         else if(CreateLanguageFile(aLangTagUndetermined))
-            pLists = m_aLangTable.find(aLangTagUndetermined)->second.get();
+            pLists = &m_aLangTable.find(aLangTagUndetermined)->second;
     }
     OSL_ENSURE(pLists, "No auto correction data");
     return pLists && pLists->AddToCplSttExceptList(rNew);
@@ -1687,15 +1709,15 @@ bool SvxAutoCorrect::AddWordStartException( const OUString& rNew,
     //either the right language is present or it is set in the general list
     auto iter = m_aLangTable.find(LanguageTag(eLang));
     if (iter != m_aLangTable.end())
-        pLists = iter->second.get();
+        pLists = &iter->second;
     else
     {
         LanguageTag aLangTagUndetermined( LANGUAGE_UNDETERMINED);
         iter = m_aLangTable.find(aLangTagUndetermined);
         if (iter != m_aLangTable.end())
-            pLists = iter->second.get();
+            pLists = &iter->second;
         else if(CreateLanguageFile(aLangTagUndetermined))
-            pLists = m_aLangTable.find(aLangTagUndetermined)->second.get();
+            pLists = &m_aLangTable.find(aLangTagUndetermined)->second;
     }
     OSL_ENSURE(pLists, "No auto correction file!");
     return pLists && pLists->AddToWordStartExceptList(rNew);
@@ -1744,7 +1766,7 @@ OUString SvxAutoCorrect::GetPrevAutoCorrWord(SvxAutoCorrDoc const& rDoc, const O
 }
 
 // static
-std::vector<OUString> SvxAutoCorrect::GetChunkForAutoText(const OUString& rTxt,
+std::vector<OUString> SvxAutoCorrect::GetChunkForAutoText(std::u16string_view rTxt,
                                                           const sal_Int32 nPos)
 {
     constexpr sal_Int32 nMinLen = 3;
@@ -1761,7 +1783,7 @@ std::vector<OUString> SvxAutoCorrect::GetChunkForAutoText(const OUString& rTxt,
         }
         if (nBegin + nMinLen <= nPos)
         {
-            OUString sRes = rTxt.copy(nBegin, nPos - nBegin);
+            OUString sRes( rTxt.substr(nBegin, nPos - nBegin) );
             aRes.push_back(sRes);
             bool bLastStartedWithDelim = IsWordDelim(sRes[0]);
             for (sal_Int32 i = 1; i <= sRes.getLength() - nMinLen; ++i)
@@ -1798,9 +1820,10 @@ bool SvxAutoCorrect::CreateLanguageFile( const LanguageTag& rLanguageTag, bool b
         if( bNewFile )
         {
             sShareDirFile = sUserDirFile;
-            pLists = new SvxAutoCorrectLanguageLists( *this, sShareDirFile, sUserDirFile );
-            LanguageTag aTmp(rLanguageTag);     // this insert() needs a non-const reference
-            m_aLangTable.insert(std::make_pair(aTmp, std::unique_ptr<SvxAutoCorrectLanguageLists>(pLists)));
+            auto itBool = m_aLangTable.emplace(std::piecewise_construct,
+                            std::forward_as_tuple(rLanguageTag),
+                            std::forward_as_tuple(*this, sShareDirFile, sUserDirFile));
+            pLists = &itBool.first->second;
             aLastFileTable.erase(nFndPos);
         }
     }
@@ -1814,9 +1837,10 @@ bool SvxAutoCorrect::CreateLanguageFile( const LanguageTag& rLanguageTag, bool b
         ( sShareDirFile = sUserDirFile, bNewFile )
           )
     {
-        pLists = new SvxAutoCorrectLanguageLists( *this, sShareDirFile, sUserDirFile );
-        LanguageTag aTmp(rLanguageTag);     // this insert() needs a non-const reference
-        m_aLangTable.insert(std::make_pair(aTmp, std::unique_ptr<SvxAutoCorrectLanguageLists>(pLists)));
+        auto itBool = m_aLangTable.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(rLanguageTag),
+                        std::forward_as_tuple(*this, sShareDirFile, sUserDirFile));
+        pLists = &itBool.first->second;
         if (nFndPos != aLastFileTable.end())
             aLastFileTable.erase(nFndPos);
     }
@@ -1833,9 +1857,9 @@ bool SvxAutoCorrect::PutText( const OUString& rShort, const OUString& rLong,
     LanguageTag aLanguageTag( eLang);
     auto const iter = m_aLangTable.find(aLanguageTag);
     if (iter != m_aLangTable.end())
-        return iter->second->PutText(rShort, rLong);
+        return iter->second.PutText(rShort, rLong);
     if(CreateLanguageFile(aLanguageTag))
-        return m_aLangTable.find(aLanguageTag)->second->PutText(rShort, rLong);
+        return m_aLangTable.find(aLanguageTag)->second.PutText(rShort, rLong);
     return false;
 }
 
@@ -1847,11 +1871,11 @@ void SvxAutoCorrect::MakeCombinedChanges( std::vector<SvxAutocorrWord>& aNewEntr
     auto const iter = m_aLangTable.find(aLanguageTag);
     if (iter != m_aLangTable.end())
     {
-        iter->second->MakeCombinedChanges( aNewEntries, aDeleteEntries );
+        iter->second.MakeCombinedChanges( aNewEntries, aDeleteEntries );
     }
     else if(CreateLanguageFile( aLanguageTag ))
     {
-        m_aLangTable.find( aLanguageTag )->second->MakeCombinedChanges( aNewEntries, aDeleteEntries );
+        m_aLangTable.find( aLanguageTag )->second.MakeCombinedChanges( aNewEntries, aDeleteEntries );
     }
 }
 
@@ -1873,11 +1897,11 @@ bool SvxAutoCorrect::PutText( const css::uno::Reference < css::embed::XStorage >
     return false;
 }
 
-OUString EncryptBlockName_Imp(const OUString& rName)
+OUString EncryptBlockName_Imp(std::u16string_view rName)
 {
     OUStringBuffer aName;
     aName.append('#').append(rName);
-    for (sal_Int32 nLen = rName.getLength(), nPos = 1; nPos < nLen; ++nPos)
+    for (size_t nLen = rName.size(), nPos = 1; nPos < nLen; ++nPos)
     {
         if (lcl_IsInAsciiArr( "!/:.\\", aName[nPos]))
             aName[nPos] &= 0x0f;
@@ -1911,7 +1935,7 @@ static void GeneratePackageName ( std::u16string_view rShort, OUString& rPackage
 }
 
 static const SvxAutocorrWord* lcl_SearchWordsInList(
-                SvxAutoCorrectLanguageLists* pList, const OUString& rTxt,
+                SvxAutoCorrectLanguageLists* pList, std::u16string_view rTxt,
                 sal_Int32& rStt, sal_Int32 nEndPos)
 {
     const SvxAutocorrWordList* pAutoCorrWordList = pList->GetAutocorrWordList();
@@ -1920,7 +1944,7 @@ static const SvxAutocorrWord* lcl_SearchWordsInList(
 
 // the search for the words in the substitution table
 const SvxAutocorrWord* SvxAutoCorrect::SearchWordsInList(
-                const OUString& rTxt, sal_Int32& rStt, sal_Int32 nEndPos,
+                std::u16string_view rTxt, sal_Int32& rStt, sal_Int32 nEndPos,
                 SvxAutoCorrDoc&, LanguageTag& rLang )
 {
     const SvxAutocorrWord* pRet = nullptr;
@@ -1936,8 +1960,8 @@ const SvxAutocorrWord* SvxAutoCorrect::SearchWordsInList(
     if (m_aLangTable.find(aLanguageTag) != m_aLangTable.end() || CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        std::unique_ptr<SvxAutoCorrectLanguageLists> const& pList = m_aLangTable.find(aLanguageTag)->second;
-        pRet = lcl_SearchWordsInList( pList.get(), rTxt, rStt, nEndPos );
+        SvxAutoCorrectLanguageLists & rList = m_aLangTable.find(aLanguageTag)->second;
+        pRet = lcl_SearchWordsInList( &rList, rTxt, rStt, nEndPos );
         if( pRet )
         {
             rLang = aLanguageTag;
@@ -1957,8 +1981,8 @@ const SvxAutocorrWord* SvxAutoCorrect::SearchWordsInList(
                  CreateLanguageFile(aLanguageTag, false)))
     {
         //the language is available - so bring it on
-        std::unique_ptr<SvxAutoCorrectLanguageLists> const& pList = m_aLangTable.find(aLanguageTag)->second;
-        pRet = lcl_SearchWordsInList( pList.get(), rTxt, rStt, nEndPos );
+        SvxAutoCorrectLanguageLists& rList = m_aLangTable.find(aLanguageTag)->second;
+        pRet = lcl_SearchWordsInList( &rList, rTxt, rStt, nEndPos );
         if( pRet )
         {
             rLang = aLanguageTag;
@@ -1970,8 +1994,8 @@ const SvxAutocorrWord* SvxAutoCorrect::SearchWordsInList(
             CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        std::unique_ptr<SvxAutoCorrectLanguageLists> const& pList = m_aLangTable.find(aLanguageTag)->second;
-        pRet = lcl_SearchWordsInList( pList.get(), rTxt, rStt, nEndPos );
+        SvxAutoCorrectLanguageLists& rList = m_aLangTable.find(aLanguageTag)->second;
+        pRet = lcl_SearchWordsInList( &rList, rTxt, rStt, nEndPos );
         if( pRet )
         {
             rLang = aLanguageTag;
@@ -1994,8 +2018,8 @@ bool SvxAutoCorrect::FindInWordStartExceptList( LanguageType eLang,
     if (m_aLangTable.find(aLanguageTag) != m_aLangTable.end() || CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        auto const& pList = m_aLangTable.find(aLanguageTag)->second;
-        if(pList->GetWordStartExceptList()->find(sWord) != pList->GetWordStartExceptList()->end() )
+        auto& rList = m_aLangTable.find(aLanguageTag)->second;
+        if(rList.GetWordStartExceptList()->find(sWord) != rList.GetWordStartExceptList()->end() )
             return true;
     }
 
@@ -2008,8 +2032,8 @@ bool SvxAutoCorrect::FindInWordStartExceptList( LanguageType eLang,
                  CreateLanguageFile(aLanguageTag, false)))
     {
         //the language is available - so bring it on
-        auto const& pList = m_aLangTable.find(aLanguageTag)->second;
-        if(pList->GetWordStartExceptList()->find(sWord) != pList->GetWordStartExceptList()->end() )
+        auto& rList = m_aLangTable.find(aLanguageTag)->second;
+        if(rList.GetWordStartExceptList()->find(sWord) != rList.GetWordStartExceptList()->end() )
             return true;
     }
 
@@ -2017,8 +2041,8 @@ bool SvxAutoCorrect::FindInWordStartExceptList( LanguageType eLang,
             CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        auto const& pList = m_aLangTable.find(aLanguageTag)->second;
-        if(pList->GetWordStartExceptList()->find(sWord) != pList->GetWordStartExceptList()->end() )
+        auto& rList = m_aLangTable.find(aLanguageTag)->second;
+        if(rList.GetWordStartExceptList()->find(sWord) != rList.GetWordStartExceptList()->end() )
             return true;
     }
     return false;
@@ -2070,7 +2094,7 @@ bool SvxAutoCorrect::FindInCplSttExceptList(LanguageType eLang,
     if (m_aLangTable.find(aLanguageTag) != m_aLangTable.end() || CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second->GetCplSttExceptList();
+        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second.GetCplSttExceptList();
         if(bAbbreviation ? lcl_FindAbbreviation(pList, sWord) : pList->find(sWord) != pList->end() )
             return true;
     }
@@ -2084,7 +2108,7 @@ bool SvxAutoCorrect::FindInCplSttExceptList(LanguageType eLang,
                  CreateLanguageFile(aLanguageTag, false)))
     {
         //the language is available - so bring it on
-        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second->GetCplSttExceptList();
+        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second.GetCplSttExceptList();
         if(bAbbreviation ? lcl_FindAbbreviation(pList, sWord) : pList->find(sWord) != pList->end() )
             return true;
     }
@@ -2093,7 +2117,7 @@ bool SvxAutoCorrect::FindInCplSttExceptList(LanguageType eLang,
             CreateLanguageFile(aLanguageTag, false))
     {
         //the language is available - so bring it on
-        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second->GetCplSttExceptList();
+        const SvStringsISortDtor* pList = m_aLangTable.find(aLanguageTag)->second.GetCplSttExceptList();
         if(bAbbreviation ? lcl_FindAbbreviation(pList, sWord) : pList->find(sWord) != pList->end() )
             return true;
     }
@@ -2129,10 +2153,10 @@ OUString SvxAutoCorrect::GetAutoCorrFileName( const LanguageTag& rLanguageTag,
 
 SvxAutoCorrectLanguageLists::SvxAutoCorrectLanguageLists(
                 SvxAutoCorrect& rParent,
-                const OUString& rShareAutoCorrectFile,
-                const OUString& rUserAutoCorrectFile)
-:   sShareAutoCorrFile( rShareAutoCorrectFile ),
-    sUserAutoCorrFile( rUserAutoCorrectFile ),
+                OUString aShareAutoCorrectFile,
+                OUString aUserAutoCorrectFile)
+:   sShareAutoCorrFile(std::move( aShareAutoCorrectFile )),
+    sUserAutoCorrFile(std::move( aUserAutoCorrectFile )),
     aModifiedDate( Date::EMPTY ),
     aModifiedTime( tools::Time::EMPTY ),
     aLastCheckTime( tools::Time::EMPTY ),
@@ -2595,7 +2619,7 @@ void SvxAutoCorrectLanguageLists::MakeUserStorage_Impl()
             try
             {
                 ::ucbhelper::Content aContent ( aDest.GetMainURL( INetURLObject::DecodeMechanism::ToIUri ), uno::Reference < XCommandEnvironment >(), comphelper::getProcessComponentContext() );
-                aContent.executeCommand ( "delete", makeAny ( true ) );
+                aContent.executeCommand ( "delete", Any ( true ) );
             }
             catch (...)
             {
@@ -2929,7 +2953,7 @@ const SvxAutocorrWordList::AutocorrWordSetType& SvxAutocorrWordList::getSortedCo
 }
 
 const SvxAutocorrWord* SvxAutocorrWordList::WordMatches(const SvxAutocorrWord *pFnd,
-                                      const OUString &rTxt,
+                                      std::u16string_view rTxt,
                                       sal_Int32 &rStt,
                                       sal_Int32 nEndPos) const
 {
@@ -2937,119 +2961,119 @@ const SvxAutocorrWord* SvxAutocorrWordList::WordMatches(const SvxAutocorrWord *p
 
     sal_Int32 left_wildcard = rChk.startsWith( ".*" ) ? 2 : 0; // ".*word" pattern?
     sal_Int32 right_wildcard = rChk.endsWith( ".*" ) ? 2 : 0; // "word.*" pattern?
-    sal_Int32 nSttWdPos = nEndPos;
+    assert(nEndPos >= 0);
+    size_t nSttWdPos = nEndPos;
 
     // direct replacement of keywords surrounded by colons (for example, ":name:")
-    bool bColonNameColon = rTxt.getLength() > nEndPos &&
+    bool bColonNameColon = static_cast<sal_Int32>(rTxt.size()) > nEndPos &&
         rTxt[nEndPos] == ':' && rChk[0] == ':' && rChk.endsWith(":");
-    if ( nEndPos + (bColonNameColon ? 1 : 0) >= rChk.getLength() - left_wildcard - right_wildcard )
+    if ( nEndPos + (bColonNameColon ? 1 : 0) < rChk.getLength() - left_wildcard - right_wildcard )
+        return nullptr;
+
+    bool bWasWordDelim = false;
+    sal_Int32 nCalcStt = nEndPos - rChk.getLength() + left_wildcard;
+    if (bColonNameColon)
+        nCalcStt++;
+    if( !right_wildcard && ( !nCalcStt || nCalcStt == rStt || left_wildcard || bColonNameColon ||
+          ( nCalcStt < rStt &&
+            IsWordDelim( rTxt[ nCalcStt - 1 ] ))) )
+    {
+        TransliterationWrapper& rCmp = GetIgnoreTranslWrapper();
+        OUString sWord( rTxt.substr(nCalcStt, rChk.getLength() - left_wildcard) );
+        if( (!left_wildcard && rCmp.isEqual( rChk, sWord )) || (left_wildcard && rCmp.isEqual( rChk.copy(left_wildcard), sWord) ))
+        {
+            rStt = nCalcStt;
+            if (!left_wildcard)
+            {
+                // fdo#33899 avoid "1/2", "1/3".. to be replaced by fractions in dates, eg. 1/2/14
+                if (static_cast<sal_Int32>(rTxt.size()) > nEndPos && rTxt[nEndPos] == '/' && rChk.indexOf('/') != -1)
+                    return nullptr;
+                return pFnd;
+            }
+            // get the first word delimiter position before the matching ".*word" pattern
+            while( rStt && !(bWasWordDelim = IsWordDelim( rTxt[ --rStt ])))
+                ;
+            if (bWasWordDelim) rStt++;
+            OUString left_pattern( rTxt.substr(rStt, nEndPos - rStt - rChk.getLength() + left_wildcard) );
+            // avoid double spaces before simple "word" replacement
+            left_pattern += (left_pattern.getLength() == 0 && pFnd->GetLong()[0] == 0x20) ? pFnd->GetLong().subView(1) : pFnd->GetLong();
+            if( const SvxAutocorrWord* pNew = Insert( SvxAutocorrWord(OUString(rTxt.substr(rStt, nEndPos - rStt)), left_pattern) ) )
+                return pNew;
+        }
+    } else
+    // match "word.*" or ".*word.*" patterns, eg. "i18n.*", ".*---.*", TODO: add transliteration support
+    if ( right_wildcard )
     {
 
-        bool bWasWordDelim = false;
-        sal_Int32 nCalcStt = nEndPos - rChk.getLength() + left_wildcard;
-        if (bColonNameColon)
-            nCalcStt++;
-        if( !right_wildcard && ( !nCalcStt || nCalcStt == rStt || left_wildcard || bColonNameColon ||
-              ( nCalcStt < rStt &&
-                IsWordDelim( rTxt[ nCalcStt - 1 ] ))) )
+        OUString sTmp( rChk.copy( left_wildcard, rChk.getLength() - left_wildcard - right_wildcard ) );
+        // Get the last word delimiter position
+        bool not_suffix;
+
+        while( nSttWdPos && !(bWasWordDelim = IsWordDelim( rTxt[ --nSttWdPos ])))
+            ;
+        // search the first occurrence (with a left word delimitation, if needed)
+        size_t nFndPos = std::u16string_view::npos;
+        do {
+            nFndPos = rTxt.find( sTmp, nFndPos + 1);
+            if (nFndPos == std::u16string_view::npos)
+                break;
+            not_suffix = bWasWordDelim && (nSttWdPos >= (nFndPos + sTmp.getLength()));
+        } while ( (!left_wildcard && nFndPos && !IsWordDelim( rTxt[ nFndPos - 1 ])) || not_suffix );
+
+        if ( nFndPos != std::u16string_view::npos )
         {
-            TransliterationWrapper& rCmp = GetIgnoreTranslWrapper();
-            OUString sWord = rTxt.copy(nCalcStt, rChk.getLength() - left_wildcard);
-            if( (!left_wildcard && rCmp.isEqual( rChk, sWord )) || (left_wildcard && rCmp.isEqual( rChk.copy(left_wildcard), sWord) ))
+            sal_Int32 extra_repl = static_cast<sal_Int32>(nFndPos) + sTmp.getLength() > nEndPos ? 1: 0; // for patterns with terminating characters, eg. "a:"
+
+            if ( left_wildcard )
             {
-                rStt = nCalcStt;
-                if (!left_wildcard)
-                {
-                    // fdo#33899 avoid "1/2", "1/3".. to be replaced by fractions in dates, eg. 1/2/14
-                    if (rTxt.getLength() > nEndPos && rTxt[nEndPos] == '/' && rChk.indexOf('/') != -1)
-                        return nullptr;
-                    return pFnd;
-                }
-                // get the first word delimiter position before the matching ".*word" pattern
-                while( rStt && !(bWasWordDelim = IsWordDelim( rTxt[ --rStt ])))
+                // get the first word delimiter position before the matching ".*word.*" pattern
+                while( nFndPos && !(bWasWordDelim = IsWordDelim( rTxt[ --nFndPos ])))
                     ;
-                if (bWasWordDelim) rStt++;
-                OUString left_pattern = rTxt.copy(rStt, nEndPos - rStt - rChk.getLength() + left_wildcard);
-                // avoid double spaces before simple "word" replacement
-                left_pattern += (left_pattern.getLength() == 0 && pFnd->GetLong()[0] == 0x20) ? pFnd->GetLong().copy(1) : pFnd->GetLong();
-                if( const SvxAutocorrWord* pNew = Insert( SvxAutocorrWord(rTxt.copy(rStt, nEndPos - rStt), left_pattern) ) )
-                    return pNew;
+                if (bWasWordDelim) nFndPos++;
             }
-        } else
-        // match "word.*" or ".*word.*" patterns, eg. "i18n.*", ".*---.*", TODO: add transliteration support
-        if ( right_wildcard )
-        {
-
-            OUString sTmp( rChk.copy( left_wildcard, rChk.getLength() - left_wildcard - right_wildcard ) );
-            // Get the last word delimiter position
-            bool not_suffix;
-
-            while( nSttWdPos && !(bWasWordDelim = IsWordDelim( rTxt[ --nSttWdPos ])))
-                ;
-            // search the first occurrence (with a left word delimitation, if needed)
-            sal_Int32 nFndPos = -1;
-            do {
-                nFndPos = rTxt.indexOf( sTmp, nFndPos + 1);
-                if (nFndPos == -1)
-                    break;
-                not_suffix = bWasWordDelim && (nSttWdPos >= (nFndPos + sTmp.getLength()));
-            } while ( (!left_wildcard && nFndPos && !IsWordDelim( rTxt[ nFndPos - 1 ])) || not_suffix );
-
-            if ( nFndPos != -1 )
+            if (nEndPos + extra_repl <= static_cast<sal_Int32>(nFndPos))
             {
-                sal_Int32 extra_repl = nFndPos + sTmp.getLength() > nEndPos ? 1: 0; // for patterns with terminating characters, eg. "a:"
+                return nullptr;
+            }
+            // store matching pattern and its replacement as a new list item, eg. "i18ns" -> "internationalizations"
+            OUString aShort( rTxt.substr(nFndPos, nEndPos - nFndPos + extra_repl) );
 
-                if ( left_wildcard )
-                {
-                    // get the first word delimiter position before the matching ".*word.*" pattern
-                    while( nFndPos && !(bWasWordDelim = IsWordDelim( rTxt[ --nFndPos ])))
-                        ;
-                    if (bWasWordDelim) nFndPos++;
-                }
-                if (nEndPos + extra_repl <= nFndPos)
-                {
-                    return nullptr;
-                }
-                // store matching pattern and its replacement as a new list item, eg. "i18ns" -> "internationalizations"
-                OUString aShort = rTxt.copy(nFndPos, nEndPos - nFndPos + extra_repl);
-
-                OUString aLong;
-                rStt = nFndPos;
-                if ( !left_wildcard )
-                {
-                    sal_Int32 siz = nEndPos - nFndPos - sTmp.getLength();
-                    aLong = pFnd->GetLong() + (siz > 0 ? rTxt.copy(nFndPos + sTmp.getLength(), siz) : "");
-                } else {
-                    OUStringBuffer buf;
-                    do {
-                        nSttWdPos = rTxt.indexOf( sTmp, nFndPos);
-                        if (nSttWdPos != -1)
-                        {
-                            sal_Int32 nTmp(nFndPos);
-                            while (nTmp < nSttWdPos && !IsWordDelim(rTxt[nTmp]))
-                                nTmp++;
-                            if (nTmp < nSttWdPos)
-                                break; // word delimiter found
-                            buf.append(rTxt.subView(nFndPos, nSttWdPos - nFndPos)).append(pFnd->GetLong());
-                            nFndPos = nSttWdPos + sTmp.getLength();
-                        }
-                    } while (nSttWdPos != -1);
-                    if (nEndPos - nFndPos > extra_repl)
-                        buf.append(rTxt.subView(nFndPos, nEndPos - nFndPos));
-                    aLong = buf.makeStringAndClear();
-                }
-                if ( const SvxAutocorrWord* pNew = Insert( SvxAutocorrWord(aShort, aLong) ) )
-                {
-                    if ( (rTxt.getLength() > nEndPos && IsWordDelim(rTxt[nEndPos])) || rTxt.getLength() == nEndPos )
-                        return pNew;
-                }
+            OUString aLong;
+            rStt = nFndPos;
+            if ( !left_wildcard )
+            {
+                sal_Int32 siz = nEndPos - nFndPos - sTmp.getLength();
+                aLong = pFnd->GetLong() + (siz > 0 ? rTxt.substr(nFndPos + sTmp.getLength(), siz) : u"");
+            } else {
+                OUStringBuffer buf;
+                do {
+                    nSttWdPos = rTxt.find( sTmp, nFndPos);
+                    if (nSttWdPos != std::u16string_view::npos)
+                    {
+                        sal_Int32 nTmp(nFndPos);
+                        while (nTmp < static_cast<sal_Int32>(nSttWdPos) && !IsWordDelim(rTxt[nTmp]))
+                            nTmp++;
+                        if (nTmp < static_cast<sal_Int32>(nSttWdPos))
+                            break; // word delimiter found
+                        buf.append(rTxt.substr(nFndPos, nSttWdPos - nFndPos)).append(pFnd->GetLong());
+                        nFndPos = nSttWdPos + sTmp.getLength();
+                    }
+                } while (nSttWdPos != std::u16string_view::npos);
+                if (static_cast<sal_Int32>(nEndPos - nFndPos) > extra_repl)
+                    buf.append(rTxt.substr(nFndPos, nEndPos - nFndPos));
+                aLong = buf.makeStringAndClear();
+            }
+            if ( const SvxAutocorrWord* pNew = Insert( SvxAutocorrWord(aShort, aLong) ) )
+            {
+                if ( (static_cast<sal_Int32>(rTxt.size()) > nEndPos && IsWordDelim(rTxt[nEndPos])) || static_cast<sal_Int32>(rTxt.size()) == nEndPos )
+                    return pNew;
             }
         }
     }
     return nullptr;
 }
 
-const SvxAutocorrWord* SvxAutocorrWordList::SearchWordsInList(const OUString& rTxt, sal_Int32& rStt,
+const SvxAutocorrWord* SvxAutocorrWordList::SearchWordsInList(std::u16string_view rTxt, sal_Int32& rStt,
                                                               sal_Int32 nEndPos) const
 {
     for (auto const& elem : mpImpl->maHash)

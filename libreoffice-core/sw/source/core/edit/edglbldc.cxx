@@ -29,7 +29,6 @@
 #include <section.hxx>
 #include <doctxm.hxx>
 #include <edglbldc.hxx>
-#include <osl/diagnose.h>
 
 bool SwEditShell::IsGlobalDoc() const
 {
@@ -81,7 +80,8 @@ void SwEditShell::GetGlobalDocContent( SwGlblDocContents& rArr ) const
                 pNew.reset(new SwGlblDocContent( pSect ));
                 break;
             }
-            rArr.insert( std::move(pNew) );
+            if (pNew)
+                rArr.insert( std::move(pNew) );
         }
     }
 
@@ -142,18 +142,16 @@ void SwEditShell::InsertGlobalDocContent( const SwGlblDocContent& rInsPos,
         ClearMark();
 
     SwPosition& rPos = *pCursor->GetPoint();
-    rPos.nNode = rInsPos.GetDocPos();
+    rPos.Assign( rInsPos.GetDocPos() );
 
     bool bEndUndo = false;
     SwDoc* pMyDoc = GetDoc();
-    SwTextNode *const pTextNd = rPos.nNode.GetNode().GetTextNode();
-    if( pTextNd )
-        rPos.nContent.Assign( pTextNd, 0 );
-    else
+    SwTextNode *const pTextNd = rPos.GetNode().GetTextNode();
+    if( !pTextNd )
     {
         bEndUndo = true;
         pMyDoc->GetIDocumentUndoRedo().StartUndo( SwUndoId::START, nullptr );
-        --rPos.nNode;
+        rPos.Adjust(SwNodeOffset(-1));
         pMyDoc->getIDocumentContentOperations().AppendTextNode( rPos );
         pCursor->SetMark();
     }
@@ -181,19 +179,17 @@ bool SwEditShell::InsertGlobalDocContent( const SwGlblDocContent& rInsPos,
         ClearMark();
 
     SwPosition& rPos = *pCursor->GetPoint();
-    rPos.nNode = rInsPos.GetDocPos();
+    rPos.Assign(rInsPos.GetDocPos());
 
     bool bEndUndo = false;
     SwDoc* pMyDoc = GetDoc();
-    SwTextNode* pTextNd = rPos.nNode.GetNode().GetTextNode();
-    if (pTextNd && pTextNd->GetText().getLength() && rPos.nNode.GetIndex() + 1 !=
+    SwTextNode* pTextNd = rPos.GetNode().GetTextNode();
+    if (!pTextNd || !pTextNd->GetText().getLength() || rPos.GetNodeIndex() + 1 ==
         pMyDoc->GetNodes().GetEndOfContent().GetIndex() )
-        rPos.nContent.Assign( pTextNd, 0 );
-    else
     {
         bEndUndo = true;
         pMyDoc->GetIDocumentUndoRedo().StartUndo( SwUndoId::START, nullptr );
-        --rPos.nNode;
+        rPos.Adjust(SwNodeOffset(-1));
         pMyDoc->getIDocumentContentOperations().AppendTextNode( rPos );
     }
 
@@ -221,8 +217,7 @@ bool SwEditShell::InsertGlobalDocContent( const SwGlblDocContent& rInsPos )
         ClearMark();
 
     SwPosition& rPos = *pCursor->GetPoint();
-    rPos.nNode = rInsPos.GetDocPos() - 1;
-    rPos.nContent.Assign( nullptr, 0 );
+    rPos.Assign(rInsPos.GetDocPos() - 1);
 
     SwDoc* pMyDoc = GetDoc();
     pMyDoc->getIDocumentContentOperations().AppendTextNode( rPos );
@@ -252,8 +247,7 @@ void SwEditShell::DeleteGlobalDocContent( const SwGlblDocContents& rArr ,
     if( 1 == rArr.size() )
     {
         // we need at least one node!
-        rPos.nNode = nDelIdx - 1;
-        rPos.nContent.Assign( nullptr, 0 );
+        rPos.Assign(nDelIdx - 1);
 
         pMyDoc->getIDocumentContentOperations().AppendTextNode( rPos );
         ++nDelIdx;
@@ -263,13 +257,12 @@ void SwEditShell::DeleteGlobalDocContent( const SwGlblDocContents& rArr ,
     {
     case GLBLDOC_UNKNOWN:
         {
-            rPos.nNode = nDelIdx;
+            rPos.Assign(nDelIdx);
             pCursor->SetMark();
             if( ++nDelPos < rArr.size() )
-                rPos.nNode = rArr[ nDelPos ]->GetDocPos();
+                rPos.Assign(rArr[ nDelPos ]->GetDocPos(), -1);
             else
-                rPos.nNode = pMyDoc->GetNodes().GetEndOfContent();
-            --rPos.nNode;
+                rPos.Assign(pMyDoc->GetNodes().GetEndOfContent(), -1);
             if( !pMyDoc->getIDocumentContentOperations().DelFullPara( *pCursor ) )
                 Delete(false);
         }
@@ -324,7 +317,7 @@ bool SwEditShell::MoveGlobalDocContent( const SwGlblDocContents& rArr ,
     else
         aInsPos  = pMyDoc->GetNodes().GetEndOfContent();
 
-    bool bRet = pMyDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aInsPos,
+    bool bRet = pMyDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aInsPos.GetNode(),
               SwMoveFlags::CREATEUNDOOBJ );
 
     EndAllAction();
@@ -344,14 +337,12 @@ void SwEditShell::GotoGlobalDocContent( const SwGlblDocContent& rPos )
         ClearMark();
 
     SwPosition& rCursorPos = *pCursor->GetPoint();
-    rCursorPos.nNode = rPos.GetDocPos();
+    rCursorPos.Assign(rPos.GetDocPos());
 
     SwDoc* pMyDoc = GetDoc();
-    SwContentNode * pCNd = rCursorPos.nNode.GetNode().GetContentNode();
+    SwContentNode * pCNd = rCursorPos.GetNode().GetContentNode();
     if( !pCNd )
-        pCNd = pMyDoc->GetNodes().GoNext( &rCursorPos.nNode );
-
-    rCursorPos.nContent.Assign( pCNd, 0 );
+        pCNd = pMyDoc->GetNodes().GoNext( &rCursorPos );
 
     EndCursorMove();
 }

@@ -23,10 +23,9 @@
 #include <com/sun/star/awt/Rectangle.hpp>
 #include <com/sun/star/lang/NoSupportException.hpp>
 #include <osl/mutex.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/sysdata.hxx>
 #include <vcl/skia/SkiaHelper.hxx>
-#include <vcl/window.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
 #include "cairo_canvas.hxx"

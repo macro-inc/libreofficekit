@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/settings.hxx>
 #include "PresenterHelpView.hxx"
 #include "PresenterButton.hxx"
@@ -66,7 +67,7 @@ namespace {
     {
     public:
         LineDescriptorList (
-            const OUString& rsText,
+            OUString sText,
             const css::uno::Reference<css::rendering::XCanvasFont>& rxFont,
             const sal_Int32 nMaximalWidth);
 
@@ -87,7 +88,7 @@ namespace {
         const OUString msText;
         std::shared_ptr<vector<LineDescriptor> > mpLineDescriptors;
 
-        static void SplitText (const OUString& rsText, vector<OUString>& rTextParts);
+        static void SplitText (std::u16string_view rsText, vector<OUString>& rTextParts);
         void FormatText (
             const vector<OUString>& rTextParts,
             const css::uno::Reference<css::rendering::XCanvasFont>& rxFont,
@@ -121,11 +122,11 @@ PresenterHelpView::PresenterHelpView (
     const Reference<uno::XComponentContext>& rxContext,
     const Reference<XResourceId>& rxViewId,
     const Reference<frame::XController>& rxController,
-    const ::rtl::Reference<PresenterController>& rpPresenterController)
+    ::rtl::Reference<PresenterController> xPresenterController)
     : PresenterHelpViewInterfaceBase(m_aMutex),
       mxComponentContext(rxContext),
       mxViewId(rxViewId),
-      mpPresenterController(rpPresenterController),
+      mpPresenterController(std::move(xPresenterController)),
       mnSeparatorY(0),
       mnMaximalWidth(0)
 {
@@ -529,10 +530,10 @@ void LineDescriptor::CalculateSize (
 namespace {
 
 LineDescriptorList::LineDescriptorList (
-    const OUString& rsText,
+    OUString sText,
     const css::uno::Reference<css::rendering::XCanvasFont>& rxFont,
     const sal_Int32 nMaximalWidth)
-    : msText(rsText)
+    : msText(std::move(sText))
 {
     Update(rxFont, nMaximalWidth);
 }
@@ -600,21 +601,22 @@ void LineDescriptorList::Update (
 }
 
 void LineDescriptorList::SplitText (
-    const OUString& rsText,
+    std::u16string_view rsText,
     vector<OUString>& rTextParts)
 {
     const char cQuote ('\'');
     const char cSeparator (',');
 
-    sal_Int32 nIndex (0);
-    sal_Int32 nStart (0);
-    sal_Int32 nLength (rsText.getLength());
+    size_t nIndex (0);
+    size_t nStart (0);
+    size_t nLength (rsText.size());
     bool bIsQuoted (false);
     while (nIndex < nLength)
     {
-        const sal_Int32 nQuoteIndex (rsText.indexOf(cQuote, nIndex));
-        const sal_Int32 nSeparatorIndex (rsText.indexOf(cSeparator, nIndex));
-        if (nQuoteIndex>=0 && (nSeparatorIndex==-1 || nQuoteIndex<nSeparatorIndex))
+        const size_t nQuoteIndex (rsText.find(cQuote, nIndex));
+        const size_t nSeparatorIndex (rsText.find(cSeparator, nIndex));
+        if (nQuoteIndex != std::u16string_view::npos &&
+            (nSeparatorIndex == std::u16string_view::npos || nQuoteIndex<nSeparatorIndex))
         {
             bIsQuoted = !bIsQuoted;
             nIndex = nQuoteIndex+1;
@@ -628,13 +630,13 @@ void LineDescriptorList::SplitText (
         }
         else if ( ! bIsQuoted)
         {
-            rTextParts.push_back(rsText.copy(nStart, nNextIndex-nStart));
+            rTextParts.push_back(OUString(rsText.substr(nStart, nNextIndex-nStart)));
             nStart = nNextIndex + 1;
         }
         nIndex = nNextIndex+1;
     }
     if (nStart < nLength)
-        rTextParts.push_back(rsText.copy(nStart, nLength-nStart));
+        rTextParts.push_back(OUString(rsText.substr(nStart, nLength-nStart)));
 }
 
 void LineDescriptorList::FormatText (
@@ -706,7 +708,7 @@ void LineDescriptorList::FormatText (
         }
         else
         {
-            aLineDescriptor.AddPart(OUStringConcatenation(", "+*iPart), rxFont);
+            aLineDescriptor.AddPart(Concat2View(", "+*iPart), rxFont);
         }
         ++iPart;
     }

@@ -31,6 +31,7 @@
 #include <comphelper/lok.hxx>
 #include <comphelper/sequence.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <svl/numformat.hxx>
 #include <svl/zforlist.hxx>
 #include <unotools/resmgr.hxx>
@@ -54,7 +55,7 @@ using namespace com::sun::star;
 namespace {
 
 OUString
-getContentPart( const OUString& _rRawString )
+getContentPart( std::u16string_view _rRawString )
 {
     // search over some parts to find a string
     static char const * aIDs[] = { "CN=", "OU=", "O=", "E=", nullptr };
@@ -63,15 +64,15 @@ getContentPart( const OUString& _rRawString )
     while ( aIDs[i] )
     {
         OUString sPartId = OUString::createFromAscii( aIDs[i++] );
-        sal_Int32 nContStart = _rRawString.indexOf( sPartId );
-        if ( nContStart != -1 )
+        size_t nContStart = _rRawString.find( sPartId );
+        if ( nContStart != std::u16string_view::npos )
         {
             nContStart += sPartId.getLength();
-            sal_Int32 nContEnd = _rRawString.indexOf( ',', nContStart );
-            if ( nContEnd != -1 )
-                sPart = _rRawString.copy( nContStart, nContEnd - nContStart );
+            size_t nContEnd = _rRawString.find( ',', nContStart );
+            if ( nContEnd != std::u16string_view::npos )
+                sPart = _rRawString.substr( nContStart, nContEnd - nContStart );
             else
-                sPart = _rRawString.copy( nContStart );
+                sPart = _rRawString.substr( nContStart );
             break;
         }
     }
@@ -80,21 +81,21 @@ getContentPart( const OUString& _rRawString )
 
 bool
 isDomainMatch(
-              const OUString& hostName, const uno::Sequence< OUString >& certHostNames)
+              std::u16string_view hostName, const uno::Sequence< OUString >& certHostNames)
 {
     for ( const OUString& element : certHostNames){
        if (element.isEmpty())
            continue;
 
-       if (hostName.equalsIgnoreAsciiCase( element ))
+       if (o3tl::equalsIgnoreAsciiCase( hostName, element ))
            return true;
 
        if (element.startsWith("*") &&
-           hostName.getLength() >= element.getLength()  )
+           sal_Int32(hostName.size()) >= element.getLength()  )
        {
            OUString cmpStr = element.copy( 1 );
-           if ( hostName.matchIgnoreAsciiCase(
-                    cmpStr, hostName.getLength() - cmpStr.getLength()) )
+           if ( o3tl::matchIgnoreAsciiCase(hostName,
+                    cmpStr, hostName.size() - cmpStr.getLength()) )
                return true;
        }
     }

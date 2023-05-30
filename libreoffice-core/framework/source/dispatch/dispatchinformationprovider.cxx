@@ -25,12 +25,13 @@
 #include <comphelper/sequence.hxx>
 
 #include <unordered_map>
+#include <utility>
 
 namespace framework{
 
-DispatchInformationProvider::DispatchInformationProvider(const css::uno::Reference< css::uno::XComponentContext >& xContext ,
+DispatchInformationProvider::DispatchInformationProvider(css::uno::Reference< css::uno::XComponentContext >  xContext ,
                                                          const css::uno::Reference< css::frame::XFrame >&          xFrame)
-    : m_xContext    (xContext                     )
+    : m_xContext    (std::move(xContext                     ))
     , m_xFrame      (xFrame                       )
 {
 }
@@ -113,7 +114,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatchInformationProvide
     if (!xFrame.is())
         return css::uno::Sequence< css::uno::Reference< css::frame::XDispatchInformationProvider > >();
 
-    rtl::Reference<CloseDispatcher> xCloser = new CloseDispatcher(m_xContext, xFrame, "_self"); // explicit "_self" ... not "" ... see implementation of close dispatcher itself!
+    rtl::Reference<CloseDispatcher> xCloser = new CloseDispatcher(m_xContext, xFrame, u"_self"); // explicit "_self" ... not "" ... see implementation of close dispatcher itself!
 
     css::uno::Reference< css::frame::XDispatchInformationProvider > xController   (xFrame->getController()                                      , css::uno::UNO_QUERY);
     css::uno::Reference< css::frame::XDispatchInformationProvider > xAppDispatcher = css::frame::AppDispatchProvider::create(m_xContext);

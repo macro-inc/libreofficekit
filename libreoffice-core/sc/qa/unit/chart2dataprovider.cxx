@@ -10,9 +10,7 @@
 #include <sal/config.h>
 
 #include <comphelper/propertyvalue.hxx>
-#include <test/bootstrapfixture.hxx>
 
-#include <docsh.hxx>
 #include <chart2uno.hxx>
 
 #include <com/sun/star/chart/ChartDataRowSource.hpp>
@@ -23,22 +21,16 @@
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 
-class ScChart2DataProviderTest : public ScBootstrapFixture
+class ScChart2DataProviderTest : public ScModelTestBase
 {
 public:
     ScChart2DataProviderTest();
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
 
     void testHeaderExpansion();
 
     CPPUNIT_TEST_SUITE(ScChart2DataProviderTest);
     CPPUNIT_TEST(testHeaderExpansion);
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<uno::XInterface> m_xCalcComponent;
 };
 
 static void lcl_createAndCheckDataProvider(ScDocument& rDoc, const OUString& cellRange,
@@ -77,41 +69,21 @@ static void lcl_createAndCheckDataProvider(ScDocument& rDoc, const OUString& cel
 
 void ScChart2DataProviderTest::testHeaderExpansion()
 {
-    ScDocShellRef xDocSh = loadDoc(u"chart2dataprovider.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load ch.ods.", xDocSh.is());
+    createScDoc("ods/chart2dataprovider.ods");
 
-    ScDocument& rDoc = xDocSh->GetDocument();
+    ScDocument* pDoc = getScDoc();
 
-    lcl_createAndCheckDataProvider(rDoc, "$Sheet1.$A$1:$D$4", false, false, 4, 4);
-    lcl_createAndCheckDataProvider(rDoc, "$Sheet1.$A$1:$D$4", true, true, 4, 3);
+    lcl_createAndCheckDataProvider(*pDoc, "$Sheet1.$A$1:$D$4", false, false, 4, 4);
+    lcl_createAndCheckDataProvider(*pDoc, "$Sheet1.$A$1:$D$4", true, true, 4, 3);
 
-    lcl_createAndCheckDataProvider(rDoc, "$Sheet1.$A$17:$D$20", true, true, 3, 2);
+    lcl_createAndCheckDataProvider(*pDoc, "$Sheet1.$A$17:$D$20", true, true, 3, 2);
 
-    lcl_createAndCheckDataProvider(rDoc, "$Sheet1.$A$25:$D$28", true, true, 4, 2);
-
-    xDocSh->DoClose();
+    lcl_createAndCheckDataProvider(*pDoc, "$Sheet1.$A$25:$D$28", true, true, 4, 2);
 }
 
 ScChart2DataProviderTest::ScChart2DataProviderTest()
-    : ScBootstrapFixture("sc/qa/unit/data")
+    : ScModelTestBase("sc/qa/unit/data")
 {
-}
-
-void ScChart2DataProviderTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    // This is a bit of a fudge, we do this to ensure that ScGlobals::ensure,
-    // which is a private symbol to us, gets called
-    m_xCalcComponent
-        = getMultiServiceFactory()->createInstance("com.sun.star.comp.Calc.SpreadsheetDocument");
-    CPPUNIT_ASSERT_MESSAGE("no calc component!", m_xCalcComponent.is());
-}
-
-void ScChart2DataProviderTest::tearDown()
-{
-    uno::Reference<lang::XComponent>(m_xCalcComponent, UNO_QUERY_THROW)->dispose();
-    test::BootstrapFixture::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScChart2DataProviderTest);

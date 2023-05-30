@@ -38,7 +38,7 @@ public:
                  ModelRef() {}
                  ModelRef( const std::shared_ptr< ModelType >& rxModel ) : std::shared_ptr< ModelType >( rxModel ) {}
 
-    bool         is() const { return this->get() != 0; }
+    bool         is() const { return this->get() != nullptr; }
 
     ModelType&   create() { (*this) = std::make_shared<ModelType>(); return **this; }
     template< typename Param1Type >
@@ -57,8 +57,6 @@ class ModelVector : public RefVector< ModelType >
 public:
     typedef typename RefVector< ModelType >::value_type value_type;
     typedef typename RefVector< ModelType >::size_type  size_type;
-
-                 ModelVector() {}
 
     ModelType&   create() { return append( std::make_shared<ModelType>() ); }
     template< typename Param1Type >
@@ -83,8 +81,6 @@ public:
     typedef typename RefMap< KeyType, ModelType >::key_type     key_type;
     typedef typename RefMap< KeyType, ModelType >::mapped_type  mapped_type;
     typedef typename RefMap< KeyType, ModelType >::value_type   value_type;
-
-                 ModelMap() {}
 
     ModelType&   create( KeyType eKey ) { return insert( eKey, new ModelType ); }
 
@@ -116,7 +112,6 @@ struct LayoutModel
     bool                mbAutoLayout;       /// True = automatic positioning.
 
                         LayoutModel();
-                        ~LayoutModel();
 };
 
 } // namespace oox::drawingml::chart

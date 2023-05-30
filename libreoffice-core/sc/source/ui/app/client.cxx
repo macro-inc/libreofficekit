@@ -20,7 +20,7 @@
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
 
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sfx2/objsh.hxx>
 #include <svx/svditer.hxx>
 #include <svx/svdobj.hxx>
@@ -60,7 +60,7 @@ SdrOle2Obj* ScClient::GetDrawObj()
         SdrObject* pObject = aIter.Next();
         while (pObject && !pOle2Obj)
         {
-            if ( pObject->GetObjIdentifier() == OBJ_OLE2 )
+            if ( pObject->GetObjIdentifier() == SdrObjKind::OLE2 )
             {
                 // name from InfoObject is PersistName
                 if ( static_cast<SdrOle2Obj*>(pObject)->GetPersistName() == aName )
@@ -201,6 +201,12 @@ void ScClient::ViewChanged()
     SdrOle2Obj* pDrawObj = GetDrawObj();
     if (!pDrawObj)
         return;
+
+    if (!IsObjectInPlaceActive())
+    {
+        pDrawObj->ActionChanged();
+        return;
+    }
 
     tools::Rectangle aLogicRect = pDrawObj->GetLogicRect();
     Fraction aFractX = GetScaleWidth() * aVisSize.Width();

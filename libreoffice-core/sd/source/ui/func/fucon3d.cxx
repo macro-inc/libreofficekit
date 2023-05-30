@@ -30,7 +30,6 @@
 #include <svx/cube3d.hxx>
 #include <svx/lathe3d.hxx>
 #include <svx/camera3d.hxx>
-#include <svx/def3d.hxx>
 
 #include <vcl/weld.hxx>
 
@@ -78,9 +77,9 @@ void FuConstruct3dObject::DoExecute( SfxRequest& rReq )
         ToolBarManager::msDrawingObjectToolBar);
 }
 
-E3dCompoundObject* FuConstruct3dObject::ImpCreateBasic3DShape()
+rtl::Reference<E3dCompoundObject> FuConstruct3dObject::ImpCreateBasic3DShape()
 {
-    E3dCompoundObject* p3DObj = nullptr;
+    rtl::Reference<E3dCompoundObject> p3DObj;
 
     switch (nSlotId)
     {
@@ -329,11 +328,11 @@ bool FuConstruct3dObject::MouseButtonDown(const MouseEvent& rMEvt)
 
         weld::WaitObject aWait(mpViewShell->GetFrameWeld());
 
-        E3dCompoundObject* p3DObj = ImpCreateBasic3DShape();
-        E3dScene* pScene = mpView->SetCurrent3DObj(p3DObj);
+        rtl::Reference<E3dCompoundObject> p3DObj = ImpCreateBasic3DShape();
+        rtl::Reference<E3dScene> pScene = mpView->SetCurrent3DObj(p3DObj.get());
 
-        ImpPrepareBasic3DShape(p3DObj, pScene);
-        bReturn = mpView->BegCreatePreparedObject(aPnt, nDrgLog, pScene);
+        ImpPrepareBasic3DShape(p3DObj.get(), pScene.get());
+        bReturn = mpView->BegCreatePreparedObject(aPnt, nDrgLog, pScene.get());
 
         SdrObject* pObj = mpView->GetCreateObj();
 
@@ -358,10 +357,30 @@ bool FuConstruct3dObject::MouseButtonUp(const MouseEvent& rMEvt)
 
     if ( mpView->IsCreateObj() && rMEvt.IsLeft() )
     {
-        mpView->EndCreateObj(SdrCreateCmd::ForceEnd);
-        bReturn = true;
-    }
+        if( mpView->EndCreateObj( SdrCreateCmd::ForceEnd ) )
+        {
+            bReturn = true;
+        }
+        else
+        {
+            //Drag was too small to create object, so insert default object at click pos
+            Point aClickPos(mpWindow->PixelToLogic(rMEvt.GetPosPixel()));
+            sal_uInt32 nDefaultObjectSize(1000);
+            sal_Int32 nCenterOffset(-sal_Int32(nDefaultObjectSize / 2));
+            aClickPos.AdjustX(nCenterOffset);
+            aClickPos.AdjustY(nCenterOffset);
 
+            SdrPageView *pPV = mpView->GetSdrPageView();
+
+            if(mpView->IsSnapEnabled())
+                aClickPos = mpView->GetSnapPos(aClickPos, pPV);
+
+            ::tools::Rectangle aNewObjectRectangle(aClickPos, Size(nDefaultObjectSize, nDefaultObjectSize));
+            rtl::Reference<SdrObject> pObjDefault = CreateDefaultObject(nSlotId, aNewObjectRectangle);
+
+            bReturn = mpView->InsertObjectAtView(pObjDefault.get(), *pPV);
+        }
+    }
     bReturn = FuConstruct::MouseButtonUp(rMEvt) || bReturn;
 
     if (!bPermanent)
@@ -372,15 +391,15 @@ bool FuConstruct3dObject::MouseButtonUp(const MouseEvent& rMEvt)
 
 void FuConstruct3dObject::Activate()
 {
-    mpView->SetCurrentObj(OBJ_NONE);
+    mpView->SetCurrentObj(SdrObjKind::NONE);
 
     FuConstruct::Activate();
 }
 
-SdrObjectUniquePtr FuConstruct3dObject::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstruct3dObject::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
 {
 
-    E3dCompoundObject* p3DObj = ImpCreateBasic3DShape();
+    rtl::Reference<E3dCompoundObject> p3DObj = ImpCreateBasic3DShape();
 
     // E3dView::SetCurrent3DObj part
     // get transformed BoundVolume of the object
@@ -390,7 +409,7 @@ SdrObjectUniquePtr FuConstruct3dObject::CreateDefaultObject(const sal_uInt16 nID
     double fW(aVolume.getWidth());
     double fH(aVolume.getHeight());
     ::tools::Rectangle a3DRect(0, 0, static_cast<::tools::Long>(fW), static_cast<::tools::Long>(fH));
-    std::unique_ptr< E3dScene, SdrObjectFreeOp > pScene(new E3dScene(*mpDoc));
+    rtl::Reference< E3dScene > pScene(new E3dScene(*mpDoc));
 
     // copied code from E3dView::InitScene
     double fCamZ(aVolume.getMaxZ() + ((fW + fH) / 4.0));
@@ -403,11 +422,11 @@ SdrObjectUniquePtr FuConstruct3dObject::CreateDefaultObject(const sal_uInt16 nID
     aCam.SetPosAndLookAt(aCamPos, aLookAt);
     aCam.SetFocalLength(mpView->GetDefaultCamFocal());
     pScene->SetCamera(aCam);
-    pScene->InsertObject(p3DObj);
+    pScene->InsertObject(p3DObj.get());
     pScene->NbcSetSnapRect(a3DRect);
-    ImpPrepareBasic3DShape(p3DObj, pScene.get());
+    ImpPrepareBasic3DShape(p3DObj.get(), pScene.get());
     SfxItemSet aAttr(mpDoc->GetPool());
-    SetStyleSheet(aAttr, p3DObj);
+    SetStyleSheet(aAttr, p3DObj.get());
     aAttr.Put(XLineStyleItem (drawing::LineStyle_NONE));
     p3DObj->SetMergedItemSet(aAttr);
 
@@ -447,7 +466,7 @@ SdrObjectUniquePtr FuConstruct3dObject::CreateDefaultObject(const sal_uInt16 nID
     // use changed rectangle, not original one
     pScene->SetLogicRect(aRect);
 
-    return SdrObjectUniquePtr(pScene.release());
+    return pScene;
 }
 
 } // end of namespace sd

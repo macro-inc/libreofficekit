@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbaview.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include <basic/sberrors.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -44,8 +45,8 @@ using namespace ::com::sun::star;
 const sal_Int32 DEFAULT_BODY_DISTANCE = 500;
 
 SwVbaView::SwVbaView( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext,
-    const uno::Reference< frame::XModel >& rModel ) :
-    SwVbaView_BASE( rParent, rContext ), mxModel( rModel )
+    uno::Reference< frame::XModel > xModel ) :
+    SwVbaView_BASE( rParent, rContext ), mxModel(std::move( xModel ))
 {
     uno::Reference< frame::XController > xController = mxModel->getCurrentController();
 
@@ -58,6 +59,18 @@ SwVbaView::SwVbaView( const uno::Reference< ooo::vba::XHelperInterface >& rParen
 
 SwVbaView::~SwVbaView()
 {
+}
+
+sal_Bool SwVbaView::getShowAll()
+{
+    bool bShowFormattingMarks = false;
+    mxViewSettings->getPropertyValue("ShowNonprintingCharacters") >>= bShowFormattingMarks;
+    return bShowFormattingMarks;
+}
+
+void SwVbaView::setShowAll(sal_Bool bSet)
+{
+    mxViewSettings->setPropertyValue("ShowNonprintingCharacters", uno::Any(bSet));
 }
 
 ::sal_Int32 SAL_CALL
@@ -197,7 +210,7 @@ SwVbaView::getTableGridLines()
 void SAL_CALL
 SwVbaView::setTableGridLines( sal_Bool _tablegridlines )
 {
-    mxViewSettings->setPropertyValue("ShowTableBoundaries", uno::makeAny( _tablegridlines ) );
+    mxViewSettings->setPropertyValue("ShowTableBoundaries", uno::Any( _tablegridlines ) );
 }
 
 ::sal_Int32 SAL_CALL
@@ -218,12 +231,12 @@ SwVbaView::setType( ::sal_Int32 _type )
         case word::WdViewType::wdPrintView:
         case word::WdViewType::wdNormalView:
         {
-            mxViewSettings->setPropertyValue("ShowOnlineLayout", uno::makeAny( false ) );
+            mxViewSettings->setPropertyValue("ShowOnlineLayout", uno::Any( false ) );
             break;
         }
         case word::WdViewType::wdWebView:
         {
-            mxViewSettings->setPropertyValue("ShowOnlineLayout", uno::makeAny( true ) );
+            mxViewSettings->setPropertyValue("ShowOnlineLayout", uno::Any( true ) );
             break;
         }
         case word::WdViewType::wdPrintPreview:
@@ -331,8 +344,8 @@ uno::Reference< text::XTextRange > SwVbaView::getHFTextRange( sal_Int32 nType )
     xPageProps->getPropertyValue( aPropIsShared ) >>= isShared;
     if( !isOn )
     {
-        xPageProps->setPropertyValue( aPropIsOn, uno::makeAny( true ) );
-        xPageProps->setPropertyValue( aPropBodyDistance, uno::makeAny( DEFAULT_BODY_DISTANCE ) );
+        xPageProps->setPropertyValue( aPropIsOn, uno::Any( true ) );
+        xPageProps->setPropertyValue( aPropBodyDistance, uno::Any( DEFAULT_BODY_DISTANCE ) );
     }
     if( !isShared )
     {

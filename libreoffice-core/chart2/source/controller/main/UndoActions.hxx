@@ -20,9 +20,9 @@
 
 #include <com/sun/star/document/XUndoAction.hpp>
 
+#include <rtl/ref.hxx>
 #include <rtl/ustring.hxx>
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <comphelper/compbase.hxx>
 
 #include <memory>
 
@@ -32,16 +32,15 @@ class SdrUndoAction;
 
 namespace chart
 {
+class ChartModel;
 class ChartModelClone;
 
 namespace impl
 {
 
-typedef ::cppu::BaseMutex                                                           UndoElement_MBase;
-typedef ::cppu::WeakComponentImplHelper< css::document::XUndoAction > UndoElement_TBase;
+typedef comphelper::WeakComponentImplHelper< css::document::XUndoAction > UndoElement_TBase;
 
-class UndoElement   :public UndoElement_MBase
-                    ,public UndoElement_TBase
+class UndoElement final : public UndoElement_TBase
 {
 public:
     /** creates a new undo action
@@ -54,10 +53,11 @@ public:
             is the cloned model from before the changes, which the Undo action represents, have been applied.
             Upon <member>invoking</member>, the clone model is applied to the document model.
     */
-    UndoElement( const OUString & i_actionString,
-                 const css::uno::Reference< css::frame::XModel >& i_documentModel,
-                 const std::shared_ptr< ChartModelClone >& i_modelClone
+    UndoElement( OUString  i_actionString,
+                 rtl::Reference<::chart::ChartModel> i_documentModel,
+                 std::shared_ptr< ChartModelClone > i_modelClone
                );
+    virtual ~UndoElement() override;
 
     UndoElement(const UndoElement&) = delete;
     const UndoElement& operator=(const UndoElement&) = delete;
@@ -67,39 +67,29 @@ public:
     virtual void SAL_CALL undo(  ) override;
     virtual void SAL_CALL redo(  ) override;
 
-    // OComponentHelper
-    virtual void SAL_CALL disposing() override;
-
-protected:
-    virtual ~UndoElement() override;
+    // WeakComponentImplHelper
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
 private:
     void    impl_toggleModelState();
 
 private:
     OUString                                      m_sActionString;
-    css::uno::Reference< css::frame::XModel >     m_xDocumentModel;
+    rtl::Reference<::chart::ChartModel>           m_xDocumentModel;
     std::shared_ptr< ChartModelClone >            m_pModelClone;
 };
 
-typedef ::cppu::BaseMutex                                                           ShapeUndoElement_MBase;
-typedef ::cppu::WeakComponentImplHelper< css::document::XUndoAction > ShapeUndoElement_TBase;
-class ShapeUndoElement  :public ShapeUndoElement_MBase
-                        ,public ShapeUndoElement_TBase
+typedef comphelper::WeakComponentImplHelper< css::document::XUndoAction > ShapeUndoElement_TBase;
+class ShapeUndoElement final : public ShapeUndoElement_TBase
 {
 public:
     explicit ShapeUndoElement( std::unique_ptr<SdrUndoAction> xSdrUndoAction );
+    virtual ~ShapeUndoElement() override;
 
     // XUndoAction
     virtual OUString SAL_CALL getTitle() override;
     virtual void SAL_CALL undo(  ) override;
     virtual void SAL_CALL redo(  ) override;
-
-    // OComponentHelper
-    virtual void SAL_CALL disposing() override;
-
-protected:
-    virtual ~ShapeUndoElement() override;
 
 private:
     std::unique_ptr<SdrUndoAction> m_xAction;

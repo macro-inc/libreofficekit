@@ -79,22 +79,20 @@
 #include <wview.hxx>
 
 #include <swabstdlg.hxx>
-#include <memory>
 
 using namespace ::com::sun::star;
 
 namespace
 {
-    void lcl_convertStringArguments(sal_uInt16 nSlot, const std::unique_ptr<SfxItemSet>& pArgs)
+    void lcl_convertStringArguments(sal_uInt16 nSlot, SfxItemSet& rArgs)
     {
         Color aColor;
         OUString sColor;
-        const SfxPoolItem* pItem = nullptr;
-
-        if (SfxItemState::SET != pArgs->GetItemState(SID_ATTR_COLOR_STR, false, &pItem))
+        const SfxStringItem* pItem = rArgs.GetItemIfSet(SID_ATTR_COLOR_STR, false);
+        if (!pItem)
             return;
 
-        sColor = static_cast<const SfxStringItem*>(pItem)->GetValue();
+        sColor = pItem->GetValue();
 
         if (sColor == "transparent")
             aColor = COL_TRANSPARENT;
@@ -106,14 +104,14 @@ namespace
             case SID_ATTR_CHAR_COLOR:
             {
                 SvxColorItem aColorItem(aColor, EE_CHAR_COLOR);
-                pArgs->Put(aColorItem);
+                rArgs.Put(aColorItem);
                 break;
             }
 
             case SID_ATTR_CHAR_BACK_COLOR:
             {
                 SvxColorItem pBackgroundItem(aColor, EE_CHAR_BKGCOLOR);
-                pArgs->Put(pBackgroundItem);
+                rArgs.Put(pBackgroundItem);
                 break;
             }
         }
@@ -153,7 +151,7 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
         case SID_THES:
         {
             OUString aReplaceText;
-            const SfxStringItem* pItem2 = rReq.GetArg<SfxStringItem>(SID_THES);
+            const SfxStringItem* pItem2 = rReq.GetArg(FN_PARAM_THES_WORD_REPLACE);
             if (pItem2)
                 aReplaceText = pItem2->GetValue();
             if (!aReplaceText.isEmpty())
@@ -257,6 +255,7 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
             }
         break;
         case SID_ATTR_PARA_LINESPACE:
+            if (pNewAttrs)
             {
                 SvxLineSpacingItem aLineSpace = static_cast<const SvxLineSpacingItem&>(pNewAttrs->Get(
                                                             GetPool().GetWhich(nSlot)));
@@ -266,6 +265,7 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
             }
             break;
         case SID_ATTR_PARA_ULSPACE:
+            if (pNewAttrs)
             {
                 SvxULSpaceItem aULSpace = static_cast<const SvxULSpaceItem&>(pNewAttrs->Get(
                     GetPool().GetWhich(nSlot)));
@@ -353,6 +353,7 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
         break;
 
         case SID_CHAR_DLG_EFFECT:
+        case SID_CHAR_DLG_POSITION:
         case SID_CHAR_DLG:
         case SID_CHAR_DLG_FOR_PARAGRAPH:
         {
@@ -385,6 +386,10 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
                 if (nSlot == SID_CHAR_DLG_EFFECT)
                 {
                     pDlg->SetCurPageId("fonteffects");
+                }
+                else if (nSlot == SID_CHAR_DLG_POSITION)
+                {
+                    pDlg->SetCurPageId("position");
                 }
                 else if (nSlot == SID_CHAR_DLG_FOR_PARAGRAPH)
                 {
@@ -595,8 +600,8 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
                     EE_PARA_JUST, EE_PARA_JUST>  aAttr( *aNewAttr.GetPool() );
 
             SvxAdjust nAdjust = SvxAdjust::Left;
-            if( SfxItemState::SET == aEditAttr.GetItemState(EE_PARA_JUST, true, &pPoolItem ) )
-                nAdjust = static_cast<const SvxAdjustItem*>(pPoolItem)->GetAdjust();
+            if( const SvxAdjustItem* pAdjustItem = aEditAttr.GetItemIfSet(EE_PARA_JUST) )
+                nAdjust = pAdjustItem->GetAdjust();
 
             if( bLeftToRight )
             {
@@ -619,8 +624,9 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
         case FN_GROW_FONT_SIZE:
         case FN_SHRINK_FONT_SIZE:
         {
+            const SfxObjectShell* pObjSh = SfxObjectShell::Current();
             const SvxFontListItem* pFontListItem = static_cast< const SvxFontListItem* >
-                    ( SfxObjectShell::Current()->GetItem( SID_ATTR_CHAR_FONTLIST ) );
+                    (pObjSh ? pObjSh->GetItem(SID_ATTR_CHAR_FONTLIST) : nullptr);
             const FontList* pFontList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
             pOLV->GetEditView().ChangeFontSize( nSlot == FN_GROW_FONT_SIZE, pFontList );
         }
@@ -632,10 +638,19 @@ void SwDrawTextShell::Execute( SfxRequest &rReq )
     }
     if (nEEWhich && pNewAttrs)
     {
-        lcl_convertStringArguments(nSlot, pNewAttrs);
+        lcl_convertStringArguments(nSlot, *pNewAttrs);
 
         aNewAttr.Put(pNewAttrs->Get(nWhich).CloneSetWhich(nEEWhich));
     }
+    else if (nEEWhich == EE_CHAR_COLOR)
+    {
+        GetView().GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_EFFECT);
+    }
+    else if (nEEWhich == EE_CHAR_KERNING)
+    {
+        GetView().GetViewFrame()->GetDispatcher()->Execute(SID_CHAR_DLG_POSITION);
+    }
+
 
     SetAttrToMarked(aNewAttr);
 
@@ -661,7 +676,9 @@ void SwDrawTextShell::GetState(SfxItemSet& rSet)
     sal_uInt16 nWhich = aIter.FirstWhich();
 
     SfxItemSet aEditAttr(pOLV->GetAttribs());
-    const SfxPoolItem *pAdjust = nullptr, *pLSpace = nullptr, *pEscItem = nullptr;
+    const SvxAdjustItem *pAdjust = nullptr;
+    const SvxLineSpacingItem *pLSpace = nullptr;
+    const SfxPoolItem *pEscItem = nullptr;
     SvxAdjust eAdjust;
     int nLSpace;
     SvxEscapement nEsc;
@@ -713,7 +730,7 @@ void SwDrawTextShell::GetState(SfxItemSet& rSet)
             ASK_ADJUST:
             {
                 if (!pAdjust)
-                    aEditAttr.GetItemState(EE_PARA_JUST, false, &pAdjust);
+                    pAdjust = aEditAttr.GetItemIfSet(EE_PARA_JUST, false);
 
                 if (!pAdjust || IsInvalidItem(pAdjust))
                 {
@@ -721,7 +738,7 @@ void SwDrawTextShell::GetState(SfxItemSet& rSet)
                     nSlotId = 0;
                 }
                 else
-                    bFlag = eAdjust == static_cast<const SvxAdjustItem*>(pAdjust)->GetAdjust();
+                    bFlag = eAdjust == pAdjust->GetAdjust();
             }
             break;
 
@@ -803,7 +820,7 @@ void SwDrawTextShell::GetState(SfxItemSet& rSet)
             ASK_LINESPACE:
             {
                 if (!pLSpace)
-                    aEditAttr.GetItemState(EE_PARA_SBL, false, &pLSpace);
+                    pLSpace = aEditAttr.GetItemIfSet(EE_PARA_SBL, false);
 
                 if (!pLSpace || IsInvalidItem(pLSpace))
                 {
@@ -811,7 +828,7 @@ void SwDrawTextShell::GetState(SfxItemSet& rSet)
                     nSlotId = 0;
                 }
                 else if (nLSpace
-                         == static_cast<const SvxLineSpacingItem*>(pLSpace)->GetPropLineSpace())
+                         == pLSpace->GetPropLineSpace())
                     bFlag = true;
                 else
                 {

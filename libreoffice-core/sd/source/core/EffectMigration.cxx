@@ -25,6 +25,7 @@
 #include <com/sun/star/animations/AnimationFill.hpp>
 #include <com/sun/star/animations/XAnimate.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
+#include <o3tl/string_view.hxx>
 #include <tools/debug.hxx>
 #include <svx/unoshape.hxx>
 #include <svx/svdotext.hxx>
@@ -507,7 +508,7 @@ void EffectMigration::SetAnimationEffect( SvxShape* pShape, AnimationEffect eEff
             if( xNode.is() )
             {
                 CustomAnimationEffectPtr pEffect = std::make_shared<CustomAnimationEffect>( xNode );
-                pEffect->setTarget( makeAny( xShape ) );
+                pEffect->setTarget( Any( xShape ) );
                 SdPage* pPage = dynamic_cast< SdPage* >( pObj->getSdrPageFromSdrObject() );
                 const bool bManual = (pPage == nullptr) || (pPage->GetPresChange() == PresChange::Manual);
                 if( !bManual )
@@ -515,7 +516,7 @@ void EffectMigration::SetAnimationEffect( SvxShape* pShape, AnimationEffect eEff
 
                 pMainSequence->append( pEffect );
 
-                if( ( pObj->GetObjInventor() == SdrInventor::Default ) && ( pObj->GetObjIdentifier() == OBJ_OUTLINETEXT ) )
+                if( ( pObj->GetObjInventor() == SdrInventor::Default ) && ( pObj->GetObjIdentifier() == SdrObjKind::OutlineText ) )
                 {
                     // special case for outline text, effects are always mapped to text group effect
                     pMainSequence->
@@ -606,7 +607,7 @@ void EffectMigration::SetTextAnimationEffect( SvxShape* pShape, AnimationEffect 
         return;
     }
 
-    SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+    SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
 
     // ignore old text effects on shape without text
     if( (pTextObj == nullptr) || (!pTextObj->HasText()) )
@@ -661,7 +662,7 @@ void EffectMigration::SetTextAnimationEffect( SvxShape* pShape, AnimationEffect 
                 if( xNode.is() )
                 {
                     pShapeEffect = std::make_shared<CustomAnimationEffect>( xNode );
-                    pShapeEffect->setTarget( makeAny( xShape ) );
+                    pShapeEffect->setTarget( Any( xShape ) );
                     pShapeEffect->setDuration( 0.1 );
                     pMainSequence->append( pShapeEffect );
 
@@ -751,16 +752,16 @@ AnimationEffect EffectMigration::GetTextAnimationEffect( SvxShape* pShape )
     return eEffect;
 }
 
-bool EffectMigration::ConvertPreset( const OUString& rPresetId, const OUString* pPresetSubType, AnimationEffect& rEffect )
+bool EffectMigration::ConvertPreset( std::u16string_view rPresetId, const OUString* pPresetSubType, AnimationEffect& rEffect )
 {
     rEffect = AnimationEffect_NONE;
-    if( !rPresetId.isEmpty() )
+    if( !rPresetId.empty() )
     {
         // first try a match for preset id and subtype
         deprecated_AnimationEffect_conversion_table_entry const * p = deprecated_AnimationEffect_conversion_table;
         while( p->mpPresetId )
         {
-            if( rPresetId.equalsAscii( p->mpPresetId ) &&
+            if( o3tl::equalsAscii( rPresetId, p->mpPresetId ) &&
                 (( p->mpPresetSubType == nullptr ) ||
                  ( pPresetSubType == nullptr) ||
                  ( pPresetSubType->equalsAscii( p->mpPresetSubType )) ) )
@@ -905,7 +906,7 @@ void EffectMigration::SetDimColor( SvxShape* pShape, sal_Int32 nColor )
         if( pEffect->getTargetShape() == xShape )
         {
             pEffect->setHasAfterEffect( true );
-            pEffect->setDimColor( makeAny( nColor ) );
+            pEffect->setDimColor( Any( nColor ) );
             pEffect->setAfterEffectOnNext( true );
             bNeedRebuild = true;
         }
@@ -1214,7 +1215,7 @@ void EffectMigration::UpdateSoundEffect( SvxShape* pShape, SdAnimationInfo const
         {
             if( !aSoundFile.isEmpty() )
             {
-                pEffect->createAudio( makeAny( aSoundFile ) );
+                pEffect->createAudio( Any( aSoundFile ) );
             }
             else
             {
@@ -1279,7 +1280,7 @@ void EffectMigration::SetAnimationPath( SvxShape* pShape, SdrPathObj const * pPa
         {
             std::shared_ptr< sd::MainSequence > pMainSequence( pPage->getMainSequence() );
             if( pMainSequence )
-                pMainSequence->append( *pPathObj, makeAny( xShape ), -1.0, "" );
+                pMainSequence->append( *pPathObj, Any( xShape ), -1.0, "" );
         }
     }
 }
@@ -1361,10 +1362,10 @@ void EffectMigration::CreateAnimatedGroup(SdrObjGroup const & rGroupObj, SdPage&
     while(aIter.IsMore())
     {
         // do move to page rough with old/current stuff, will be different in aw080 anyways
-        SdrObject* pCandidate = aIter.Next();
+        rtl::Reference<SdrObject> pCandidate = aIter.Next();
         rGroupObj.GetSubList()->NbcRemoveObject(pCandidate->GetOrdNum());
-        rPage.NbcInsertObject(pCandidate);
-        aObjects.push_back(pCandidate);
+        rPage.NbcInsertObject(pCandidate.get());
+        aObjects.push_back(pCandidate.get());
     }
 
     // create main node

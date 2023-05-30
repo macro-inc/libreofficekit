@@ -56,8 +56,9 @@
 
 #include <canvas/canvastools.hxx>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/opengl/OpenGLContext.hxx>
 #include <vcl/opengl/OpenGLHelper.hxx>
@@ -87,8 +88,8 @@ typedef cppu::WeakComponentImplHelper<presentation::XTransition> OGLTransitioner
 class TimerContext
 {
 public:
-    explicit TimerContext(OUString const& rWhat)
-        : m_aWhat(rWhat)
+    explicit TimerContext(OUString aWhat)
+        : m_aWhat(std::move(aWhat))
         , m_StartTime(std::chrono::steady_clock::now())
     {
     }
@@ -176,7 +177,7 @@ protected:
 
     void createTexture( GLuint* texID,
             bool useMipmap,
-            uno::Sequence<sal_Int8>& data,
+            const uno::Sequence<sal_Int8>& data,
             const OGLFormat* pFormat );
     const OGLFormat* chooseFormats();
 
@@ -188,7 +189,7 @@ private:
     void setSlides( const Reference< rendering::XBitmap >& xLeavingSlide , const uno::Reference< rendering::XBitmap >& xEnteringSlide );
     void impl_prepareSlides();
 
-    void impl_createTexture( bool useMipmap, uno::Sequence<sal_Int8>& data, const OGLFormat* pFormat );
+    void impl_createTexture( bool useMipmap, const uno::Sequence<sal_Int8>& data, const OGLFormat* pFormat );
 
     bool initWindowFromSlideShowView( const uno::Reference< presentation::XSlideShowView >& xView );
     /** After the window has been created, and the slides have been set, we'll initialize the slides with OpenGL.
@@ -266,15 +267,15 @@ bool OGLTransitionerImpl::initialize( const Reference< presentation::XSlideShowV
 
     setSlides( xLeavingSlide, xEnteringSlide );
 
-    CHECK_GL_ERROR();
     return mbValidOpenGLContext;
 }
 
 void OGLTransitionerImpl::impl_initializeFlags( bool const bValidContext )
 {
-    CHECK_GL_ERROR();
     mbValidOpenGLContext = bValidContext;
     if ( bValidContext ) {
+        CHECK_GL_ERROR();
+
         mnGLVersion = OpenGLHelper::getGLVersion();
         SAL_INFO("slideshow.opengl", "GL version: " << mnGLVersion << "" );
 
@@ -283,8 +284,9 @@ void OGLTransitionerImpl::impl_initializeFlags( bool const bValidContext )
         /* TODO: check for version once the bug in fglrx driver is fixed */
         mbBrokenTexturesATI = (vendor && strcmp( reinterpret_cast<const char *>(vendor), "ATI Technologies Inc." ) == 0 );
 #endif
+
+        CHECK_GL_ERROR();
     }
-    CHECK_GL_ERROR();
 }
 
 bool OGLTransitionerImpl::initWindowFromSlideShowView( const Reference< presentation::XSlideShowView >& xView )
@@ -443,12 +445,18 @@ bool OGLTransitionerImpl::setTransition( const std::shared_ptr<OGLTransitionImpl
     }
 
     impl_prepareSlides();
+
+    // tdf#91456: When the OpenGL context is initialized but nothing has been rendered on it
+    // it can happen, that an "empty" screen is drawn. Therefore, drawing the content of time 0
+    // onto the context
+    update(0);
+
     return true;
 }
 
 void OGLTransitionerImpl::createTexture( GLuint* texID,
                      bool useMipmap,
-                     uno::Sequence<sal_Int8>& data,
+                     const uno::Sequence<sal_Int8>& data,
                      const OGLFormat* pFormat )
 {
     CHECK_GL_ERROR();
@@ -817,7 +825,7 @@ void buildMipmaps(
 
 void OGLTransitionerImpl::impl_createTexture(
                      bool useMipmap,
-                     uno::Sequence<sal_Int8>& data,
+                     const uno::Sequence<sal_Int8>& data,
                      const OGLFormat* pFormat )
 {
     if( !pFormat )
@@ -1075,6 +1083,9 @@ void SAL_CALL OGLTransitionerImpl::viewChanged( const Reference< presentation::X
 
 void OGLTransitionerImpl::disposeTextures()
 {
+    if (!mbValidOpenGLContext)
+        return;
+
     mpContext->makeCurrent();
     CHECK_GL_ERROR();
 
@@ -1088,8 +1099,11 @@ void OGLTransitionerImpl::disposeTextures()
 
 void OGLTransitionerImpl::impl_dispose()
 {
-    mpContext->makeCurrent();
-    CHECK_GL_ERROR();
+    if (mbValidOpenGLContext)
+    {
+        mpContext->makeCurrent();
+        CHECK_GL_ERROR();
+    }
 
     if( mpTransition && mpTransition->getSettings().mnRequiredGLVersion <= mnGLVersion )
         mpTransition->finish();

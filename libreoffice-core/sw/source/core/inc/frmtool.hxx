@@ -145,8 +145,8 @@ void InsertCnt_( SwLayoutFrame *pLay, SwDoc *pDoc, SwNodeOffset nIndex,
                  SwFrame *pPrv = nullptr, sw::FrameMode eMode = sw::FrameMode::New);
 
 // Creation of frames for a specific section (uses InsertCnt_)
-void MakeFrames( SwDoc *pDoc, const SwNodeIndex &rSttIdx,
-                            const SwNodeIndex &rEndIdx );
+void MakeFrames( SwDoc *pDoc, SwNode &rSttIdx,
+                            SwNode &rEndIdx );
 
 extern bool bObjsDirect;
 
@@ -224,6 +224,9 @@ void CalcContent( SwLayoutFrame *pLay, bool bNoColl = false );
 // the necessary notifications in their destructor if needed
 class SwFrameNotify
 {
+private:
+    void ImplDestroy();
+
 protected:
     SwFrame *mpFrame;
     const SwRect maFrame;
@@ -236,7 +239,7 @@ protected:
 
 public:
     SwFrameNotify( SwFrame *pFrame );
-    ~SwFrameNotify() COVERITY_NOEXCEPT_FALSE;
+    ~SwFrameNotify();
 
     const SwRect &getFrameArea() const { return maFrame; }
     void SetInvaKeep() { mbInvaKeep = true; }
@@ -245,6 +248,8 @@ public:
 class SwLayNotify : public SwFrameNotify
 {
     bool m_bLowersComplete;
+
+    void ImplDestroy();
 
 public:
     SwLayNotify( SwLayoutFrame *pLayFrame );
@@ -256,8 +261,10 @@ public:
 
 class SwFlyNotify : public SwLayNotify
 {
-    SwPageFrame *pOldPage;
-    const SwRect aFrameAndSpace;
+    SwPageFrame *m_pOldPage;
+    const SwRect m_aFrameAndSpace;
+
+    void ImplDestroy();
 
 public:
     SwFlyNotify( SwFlyFrame *pFlyFrame );
@@ -303,7 +310,7 @@ class SwBorderAttrs final : public SwCacheObj
     const SwAttrSet      &m_rAttrSet;
     const SvxULSpaceItem &m_rUL;
     // #i96772#
-    std::shared_ptr<SvxLRSpaceItem> m_rLR;
+    std::shared_ptr<SvxLRSpaceItem> m_xLR;
     const SvxBoxItem     &m_rBox;
     const SvxShadowItem  &m_rShadow;
     const Size            m_aFrameSize;

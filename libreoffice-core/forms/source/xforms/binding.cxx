@@ -31,9 +31,10 @@
 #include <strings.hrc>
 
 #include <rtl/ustrbuf.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <functional>
@@ -79,7 +80,6 @@ using com::sun::star::uno::UNO_QUERY;
 using com::sun::star::uno::UNO_QUERY_THROW;
 using com::sun::star::uno::XInterface;
 using com::sun::star::uno::Exception;
-using com::sun::star::uno::makeAny;
 using com::sun::star::util::XModifyListener;
 using com::sun::star::xforms::XDataTypeRepository;
 using com::sun::star::xml::dom::NodeType_ATTRIBUTE_NODE;
@@ -1043,7 +1043,7 @@ OUString Binding::getListEntry( sal_Int32 nPosition )
 
     // check bounds and return proper item
     PathExpression::NodeVector_t aNodes = maBindingExpression.getNodeList();
-    if( nPosition < 0 || nPosition >= static_cast<sal_Int32>( aNodes.size() ) )
+    if( nPosition < 0 || o3tl::make_unsigned(nPosition) >= aNodes.size() )
         throw IndexOutOfBoundsException("", static_cast<XValueBinding*>(this));
     return lcl_getString( aNodes[ nPosition ] );
 }
@@ -1273,7 +1273,7 @@ void SAL_CALL Binding::setName( const OUString& rName )
 {
     // use the XPropertySet methods, so the change in the name is notified to the
     // property listeners
-    setFastPropertyValue( HANDLE_BindingID, makeAny( rName ) );
+    setFastPropertyValue( HANDLE_BindingID, Any( rName ) );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

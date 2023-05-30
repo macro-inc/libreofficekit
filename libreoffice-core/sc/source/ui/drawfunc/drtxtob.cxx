@@ -20,6 +20,7 @@
 #include <comphelper/string.hxx>
 #include <scitems.hxx>
 
+#include <i18nutil/transliteration.hxx>
 #include <editeng/adjustitem.hxx>
 #include <svx/clipfmtitem.hxx>
 #include <editeng/contouritem.hxx>
@@ -204,7 +205,8 @@ void ScDrawTextObjectBar::Execute( SfxRequest &rReq )
 
         case SID_CHARMAP:
             {
-                const SvxFontItem& rItem = pOutView->GetAttribs().Get(EE_CHAR_FONTINFO);
+                auto const attribs = pOutView->GetAttribs();
+                const SvxFontItem& rItem = attribs.Get(EE_CHAR_FONTINFO);
 
                 OUString aString;
                 std::shared_ptr<SvxFontItem> aNewItem(std::make_shared<SvxFontItem>(EE_CHAR_FONTINFO));
@@ -212,14 +214,12 @@ void ScDrawTextObjectBar::Execute( SfxRequest &rReq )
                 const SfxItemSet *pArgs = rReq.GetArgs();
                 const SfxPoolItem* pItem = nullptr;
                 if( pArgs )
-                    pArgs->GetItemState(GetPool().GetWhich(SID_CHARMAP), false, &pItem);
+                    pArgs->GetItemState(SID_CHARMAP, false, &pItem);
 
                 if ( pItem )
                 {
                     aString = static_cast<const SfxStringItem*>(pItem)->GetValue();
-                    const SfxPoolItem* pFtItem = nullptr;
-                    pArgs->GetItemState( GetPool().GetWhich(SID_ATTR_SPECIALCHAR), false, &pFtItem);
-                    const SfxStringItem* pFontItem = dynamic_cast<const SfxStringItem*>( pFtItem  );
+                    const SfxStringItem* pFontItem = pArgs->GetItemIfSet( SID_ATTR_SPECIALCHAR, false);
                     if ( pFontItem )
                     {
                         const OUString& aFontName(pFontItem->GetValue());
@@ -261,10 +261,8 @@ void ScDrawTextObjectBar::Execute( SfxRequest &rReq )
         case SID_HYPERLINK_SETLINK:
             if( pReqArgs )
             {
-                const SfxPoolItem* pItem;
-                if ( pReqArgs->GetItemState( SID_HYPERLINK_SETLINK, true, &pItem ) == SfxItemState::SET )
+                if ( const SvxHyperlinkItem* pHyper = pReqArgs->GetItemIfSet( SID_HYPERLINK_SETLINK) )
                 {
-                    const SvxHyperlinkItem* pHyper = static_cast<const SvxHyperlinkItem*>(pItem);
                     const OUString& rName = pHyper->GetName();
                     const OUString& rURL      = pHyper->GetURL();
                     const OUString& rTarget   = pHyper->GetTargetFrame();
@@ -341,7 +339,7 @@ void ScDrawTextObjectBar::Execute( SfxRequest &rReq )
         case SID_THES:
             {
                 OUString aReplaceText;
-                const SfxStringItem* pItem2 = rReq.GetArg<SfxStringItem>(SID_THES);
+                const SfxStringItem* pItem2 = rReq.GetArg(FN_PARAM_THES_WORD_REPLACE);
                 if (pItem2)
                     aReplaceText = pItem2->GetValue();
                 if (!aReplaceText.isEmpty())
@@ -822,11 +820,14 @@ void ScDrawTextObjectBar::ExecuteAttr( SfxRequest &rReq )
                     pView->GetTextEditOutlinerView() : nullptr;
                 if ( pOutView )
                 {
-                    const SvxFontListItem* pFontListItem = static_cast< const SvxFontListItem* >
-                            ( SfxObjectShell::Current()->GetItem( SID_ATTR_CHAR_FONTLIST ) );
-                    const FontList* pFontList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
-                    pOutView->GetEditView().ChangeFontSize( nSlot == SID_GROW_FONT_SIZE, pFontList );
-                    mrViewData.GetBindings().Invalidate( SID_ATTR_CHAR_FONTHEIGHT );
+                    if (SfxObjectShell* pObjSh = SfxObjectShell::Current())
+                    {
+                        const SvxFontListItem* pFontListItem = static_cast< const SvxFontListItem* >
+                                ( pObjSh->GetItem( SID_ATTR_CHAR_FONTLIST ) );
+                        const FontList* pFontList = pFontListItem ? pFontListItem->GetFontList() : nullptr;
+                        pOutView->GetEditView().ChangeFontSize( nSlot == SID_GROW_FONT_SIZE, pFontList );
+                        mrViewData.GetBindings().Invalidate( SID_ATTR_CHAR_FONTHEIGHT );
+                    }
                     bDone = false;
                 }
             }

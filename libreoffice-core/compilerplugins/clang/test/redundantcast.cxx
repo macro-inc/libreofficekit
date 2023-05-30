@@ -329,9 +329,21 @@ void testArithmeticTypedefs() {
     (void) static_cast<T1>(c); // expected-error {{redundant}}
 }
 
+void testReinterpretCast() {
+    int * p;
+    (void) reinterpret_cast<int *>(p); // expected-error {{redundant reinterpret_cast from 'int *' to 'int *' [loplugin:redundantcast]}}
+}
+
 void testReinterpretConstCast() {
     int n = 0;
     (void) reinterpret_cast<std::size_t>((const_cast<int const *>(&n))); // expected-error-re {{redundant const_cast from 'int *' to 'const int *' within reinterpret_cast to fundamental type 'std::size_t' (aka 'unsigned {{.+}}') [loplugin:redundantcast]}}
+}
+
+void testSuspiciousReinterpretCast() {
+    D * p;
+    // expected-error@+1 {{suspicious reinterpret_cast from derived 'D *' to base 'S *', maybe this was meant to be a static_cast [loplugin:redundantcast]}}
+    (void) reinterpret_cast<S *>(p);
+    (void) reinterpret_cast<sal_uIntPtr>(p); // expected no error
 }
 
 void testDynamicCast() {
@@ -344,12 +356,37 @@ void testDynamicCast() {
     S2 * s2 = nullptr;
     S3 * s3 = nullptr;
 
+    (void) dynamic_cast<void *>(s1);
+    (void) dynamic_cast<void const *>(s1);
     (void) dynamic_cast<S2 *>(s1);
+    (void) dynamic_cast<S2 &>(*s1);
     (void) dynamic_cast<S1 *>(s2); // expected-error {{redundant dynamic upcast from 'S2 *' to 'S1 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S1 &>(*s2); // expected-error {{redundant dynamic upcast from 'S2' to 'S1 &' [loplugin:redundantcast]}}
     (void) dynamic_cast<S2 *>(s2); // expected-error {{redundant dynamic cast from 'S2 *' to 'S2 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S2 &>(*s2); // expected-error {{redundant dynamic cast from 'S2' to 'S2 &' [loplugin:redundantcast]}}
     (void) dynamic_cast<S3 *>(s2);
+    (void) dynamic_cast<S3 &>(*s2);
     (void) dynamic_cast<const S2 *>(s2); // expected-error {{redundant dynamic cast from 'S2 *' to 'const S2 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<const S2 &>(*s2); // expected-error {{redundant dynamic cast from 'S2' to 'const S2 &' [loplugin:redundantcast]}}
     (void) dynamic_cast<S1 *>(s3); // expected-error {{redundant dynamic upcast from 'S3 *' to 'S1 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S1&>(*s3); // expected-error {{redundant dynamic upcast from 'S3' to 'S1 &' [loplugin:redundantcast]}}
+
+    S1 const * c1 = nullptr;
+    S2 const * c2 = nullptr;
+    S3 const * c3 = nullptr;
+
+    (void) dynamic_cast<void const *>(c1);
+    (void) dynamic_cast<S2 const *>(c1);
+    (void) dynamic_cast<S2 const &>(*c1);
+    (void) dynamic_cast<S1 const *>(c2); // expected-error {{redundant dynamic upcast from 'const S2 *' to 'const S1 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S1 const &>(*c2); // expected-error {{redundant dynamic upcast from 'const S2' to 'const S1 &' [loplugin:redundantcast]}}
+
+    (void) dynamic_cast<S2 const *>(c2); // expected-error {{redundant dynamic cast from 'const S2 *' to 'const S2 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S2 const &>(*c2); // expected-error {{redundant dynamic cast from 'const S2' to 'const S2 &' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S3 const *>(c2);
+    (void) dynamic_cast<S3 const &>(*c2);
+    (void) dynamic_cast<S1 const *>(c3); // expected-error {{redundant dynamic upcast from 'const S3 *' to 'const S1 *' [loplugin:redundantcast]}}
+    (void) dynamic_cast<S1 const&>(*c3); // expected-error {{redundant dynamic upcast from 'const S3' to 'const S1 &' [loplugin:redundantcast]}}
 }
 
 void overload(int);
@@ -442,6 +479,7 @@ int main() {
     testFunctionalCast();
     testCStyleCast();
     testCStyleCastOfTemplateMethodResult(nullptr);
+    testReinterpretCast();
     testReinterpretConstCast();
     testDynamicCast();
     testIntermediaryStaticCast();

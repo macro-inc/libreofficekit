@@ -54,16 +54,25 @@ OReportModel::OReportModel(::reportdesign::OReportDefinition* _pReportDefinition
 
 OReportModel::~OReportModel()
 {
+    // There are some nasty interactions which mean that we have to delete
+    // the pages before we destroy the model - otherwise we will trigger
+    // callbacks which will attempt to recreate SvxShape objects and
+    // fail because the model is being torn down.
+    while (GetPageCount())
+        RemovePage(GetPageCount()-1);
+
     detachController();
 }
 
 void OReportModel::detachController()
 {
-    m_pReportDefinition = nullptr;
+    if (!m_pReportDefinition)
+        return;
     m_pController = nullptr;
     m_xUndoEnv->EndListening( *this );
     ClearUndoBuffer();
     m_xUndoEnv->Clear(OXUndoEnvironment::Accessor());
+    m_pReportDefinition = nullptr;
 }
 
 rtl::Reference<SdrPage> OReportModel::AllocPage(bool /*bMasterPage*/)
@@ -146,7 +155,7 @@ uno::Reference< uno::XInterface > OReportModel::createShape(const OUString& aSer
             xRet = xProp;
             if ( _rShape.is() )
                 throw uno::Exception("no shape", nullptr);
-            xProp->setPropertyValue( PROPERTY_FORMATSSUPPLIER, uno::makeAny(uno::Reference< util::XNumberFormatsSupplier >(*m_pReportDefinition,uno::UNO_QUERY)) );
+            xProp->setPropertyValue( PROPERTY_FORMATSSUPPLIER, uno::Any(uno::Reference< util::XNumberFormatsSupplier >(m_pReportDefinition)) );
         }
         else if ( aServiceSpecifier == SERVICE_FIXEDTEXT)
         {

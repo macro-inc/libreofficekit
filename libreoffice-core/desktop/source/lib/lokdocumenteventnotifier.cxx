@@ -62,7 +62,7 @@ doceventnotifier::LokDocumentEventNotifier::disposing(const css::lang::EventObje
     {
         osl::MutexGuard aLock(m_aMutex);
 
-        m_xOwner = nullptr;
+        m_xOwner.clear();
         m_pCallback = nullptr;
         m_pData = nullptr;
     }

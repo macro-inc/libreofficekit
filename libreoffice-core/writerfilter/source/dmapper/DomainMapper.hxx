@@ -62,7 +62,6 @@ class DomainMapper_Impl;
 class ListsManager;
 class StyleSheetTable;
 class GraphicZOrderHelper;
-class GraphicNamingHelper;
 
 typedef tools::SvRef<StyleSheetTable> StyleSheetTablePtr;
 
@@ -80,7 +79,7 @@ public:
                  utl::MediaDescriptor const & rMediaDesc);
     virtual ~DomainMapper() override;
 
-    virtual void setDocumentReference(void* pDocument) override;
+    virtual void setDocumentReference(writerfilter::ooxml::OOXMLDocument* pDocument) override;
 
     // Stream
     virtual void markLastParagraphInSection() override;
@@ -108,7 +107,6 @@ public:
     StyleSheetTablePtr const & GetStyleSheetTable( );
     SettingsTablePtr const & GetSettingsTable();
     GraphicZOrderHelper* graphicZOrderHelper();
-    GraphicNamingHelper& GetGraphicNamingHelper();
 
     /// Return the first from the pending (not inserted to the document) shapes, if there are any.
     css::uno::Reference<css::drawing::XShape> PopPendingShape();
@@ -149,7 +147,8 @@ private:
     virtual void lcl_endCharacterGroup() override;
     virtual void lcl_startShape(css::uno::Reference<css::drawing::XShape> const& xShape) override;
     virtual void lcl_endShape( ) override;
-
+    virtual void lcl_startTextBoxContent() override;
+    virtual void lcl_endTextBoxContent() override;
     virtual void lcl_text(const sal_uInt8 * data, size_t len) override;
     virtual void lcl_utext(const sal_uInt8 * data, size_t len) override;
     virtual void lcl_positionOffset(const OUString& rText, bool bVertical) override;
@@ -163,6 +162,7 @@ private:
                                ::writerfilter::Reference<Stream>::Pointer_t ref) override;
     virtual void lcl_startGlossaryEntry() override;
     virtual void lcl_endGlossaryEntry() override;
+    virtual void lcl_checkId(const sal_Int32 nId) override;
 
     // Properties
     virtual void lcl_attribute(Id Name, Value & val) override;
@@ -184,7 +184,6 @@ private:
     bool mbHasControls;
     bool mbWasShapeInPara;
     std::unique_ptr< GraphicZOrderHelper > zOrderHelper;
-    std::unique_ptr<GraphicNamingHelper> m_pGraphicNamingHelper;
     OUString m_sGlossaryEntryName;
 };
 

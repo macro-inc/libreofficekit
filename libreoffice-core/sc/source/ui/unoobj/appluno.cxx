@@ -19,6 +19,7 @@
 
 #include <appluno.hxx>
 #include <sal/types.h>
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <formula/funcvarargs.h>
 
@@ -51,29 +52,28 @@ using namespace com::sun::star;
 
 //  everything without Which-ID, map only for PropertySetInfo
 
-static const SfxItemPropertyMapEntry* lcl_GetSettingsPropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetSettingsPropertyMap()
 {
     static const SfxItemPropertyMapEntry aSettingsPropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_DOAUTOCP, 0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_ENTERED,  0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_EXPREF,   0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_EXTFMT,   0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_LINKUPD,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
-        {u"" SC_UNONAME_MARKHDR,  0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_METRIC,   0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
-        {u"" SC_UNONAME_MOVEDIR,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
-        {u"" SC_UNONAME_MOVESEL,  0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_PRALLSH,  0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_PREMPTY,  0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_RANGEFIN, 0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_SCALE,    0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
-        {u"" SC_UNONAME_STBFUNC,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
-        {u"" SC_UNONAME_ULISTS,   0,  cppu::UnoType<uno::Sequence<OUString>>::get(), 0, 0},
-        {u"" SC_UNONAME_PRMETRICS,0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_USETABCOL,0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"" SC_UNONAME_REPLWARN, 0,  cppu::UnoType<bool>::get(),              0, 0},
-        {u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_DOAUTOCP, 0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_ENTERED,  0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_EXPREF,   0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_EXTFMT,   0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_LINKUPD,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
+        { SC_UNONAME_MARKHDR,  0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_METRIC,   0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
+        { SC_UNONAME_MOVEDIR,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
+        { SC_UNONAME_MOVESEL,  0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_PRALLSH,  0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_PREMPTY,  0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_RANGEFIN, 0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_SCALE,    0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
+        { SC_UNONAME_STBFUNC,  0,  cppu::UnoType<sal_Int16>::get(),        0, 0},
+        { SC_UNONAME_ULISTS,   0,  cppu::UnoType<uno::Sequence<OUString>>::get(), 0, 0},
+        { SC_UNONAME_PRMETRICS,0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_USETABCOL,0,  cppu::UnoType<bool>::get(),              0, 0},
+        { SC_UNONAME_REPLWARN, 0,  cppu::UnoType<bool>::get(),              0, 0},
     };
     return aSettingsPropertyMap_Impl;
 }
@@ -291,7 +291,7 @@ uno::Any SAL_CALL ScSpreadsheetSettings::getPropertyValue( const OUString& aProp
 
     ScModule* pScMod = SC_MOD();
     ScAppOptions   aAppOpt = pScMod->GetAppOptions();
-    ScInputOptions aInpOpt = pScMod->GetInputOptions();
+    const ScInputOptions& aInpOpt = pScMod->GetInputOptions();
     // print options aren't loaded until needed
 
     if (aPropertyName == SC_UNONAME_DOAUTOCP) aRet <<= aAppOpt.GetAutoComplete();
@@ -518,7 +518,7 @@ uno::Any SAL_CALL ScFunctionListObj::getByName( const OUString& aName )
         {
             uno::Sequence<beans::PropertyValue> aSeq( SC_FUNCDESC_PROPCOUNT );
             lcl_FillSequence( aSeq, *pDesc );
-            return uno::makeAny(aSeq);
+            return uno::Any(aSeq);
         }
     }
 
@@ -544,14 +544,14 @@ uno::Any SAL_CALL ScFunctionListObj::getByIndex( sal_Int32 nIndex )
     if ( !pFuncList )
         throw uno::RuntimeException();                  // should not happen
 
-    if ( nIndex >= 0 && nIndex < static_cast<sal_Int32>(pFuncList->GetCount()) )
+    if ( nIndex >= 0 && o3tl::make_unsigned(nIndex) < pFuncList->GetCount() )
     {
         const ScFuncDesc* pDesc = pFuncList->GetFunction(nIndex);
         if ( pDesc )
         {
             uno::Sequence<beans::PropertyValue> aSeq( SC_FUNCDESC_PROPCOUNT );
             lcl_FillSequence( aSeq, *pDesc );
-            return uno::makeAny(aSeq);
+            return uno::Any(aSeq);
         }
     }
 
@@ -570,7 +570,6 @@ uno::Reference<container::XEnumeration> SAL_CALL ScFunctionListObj::createEnumer
 
 uno::Type SAL_CALL ScFunctionListObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<uno::Sequence<beans::PropertyValue>>::get();
 }
 

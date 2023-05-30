@@ -20,13 +20,14 @@
 #include <osl/diagnose.h>
 #include <osl/thread.h>
 #include <rtl/strbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "provprox.hxx"
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/ucb/IllegalIdentifierException.hpp>
 #include <cppuhelper/queryinterface.hxx>
 #include <cppuhelper/weak.hxx>
 #include <ucbhelper/macros.hxx>
+#include <utility>
 
 using namespace com::sun::star::lang;
 using namespace com::sun::star::ucb;
@@ -37,7 +38,7 @@ using namespace com::sun::star::uno;
 
 UcbContentProviderProxyFactory::UcbContentProviderProxyFactory(
                         const Reference< XComponentContext >& rxContext )
-: UcbContentProviderProxyFactory_Base(m_aMutex), m_xContext( rxContext )
+: m_xContext( rxContext )
 {
 }
 
@@ -91,8 +92,8 @@ UcbContentProviderProxyFactory::createContentProvider(
 
 UcbContentProviderProxy::UcbContentProviderProxy(
                         const Reference< XComponentContext >& rxContext,
-                        const OUString& Service )
-: m_aService( Service ),
+                        OUString Service )
+: m_aService(std::move( Service )),
   m_bReplace( false ),
   m_bRegister( false ),
   m_xContext( rxContext )

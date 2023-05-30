@@ -31,7 +31,7 @@
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/interaction.hxx>
 #include <connectivity/dbtools.hxx>
 #include <sfx2/docfilt.hxx>
@@ -58,7 +58,6 @@ namespace dbp
         : OControlWizardPage(pPage, pWizard, "modules/sabpilot/ui/tableselectionpage.ui", "TableSelectionPage")
         , m_xTable(m_xBuilder->weld_tree_view("table"))
         , m_xDatasource(m_xBuilder->weld_tree_view("datasource"))
-        , m_xDatasourceLabel(m_xBuilder->weld_label("datasourcelabel"))
         , m_xSearchDatabase(m_xBuilder->weld_button("search"))
         , m_xSourceBox(m_xBuilder->weld_container("sourcebox"))
     {
@@ -162,13 +161,13 @@ namespace dbp
                 xOldConn = getFormConnection();
 
                 OUString sDataSource = m_xDatasource->get_selected_text();
-                rContext.xForm->setPropertyValue("DataSourceName", makeAny( sDataSource ) );
+                rContext.xForm->setPropertyValue("DataSourceName", Any( sDataSource ) );
             }
             OUString sCommand = m_xTable->get_selected_text();
             sal_Int32 nCommandType = m_xTable->get_selected_id().toInt32();
 
-            rContext.xForm->setPropertyValue("Command", makeAny( sCommand ) );
-            rContext.xForm->setPropertyValue("CommandType", makeAny( nCommandType ) );
+            rContext.xForm->setPropertyValue("Command", Any( sCommand ) );
+            rContext.xForm->setPropertyValue("CommandType", Any( nCommandType ) );
 
             if ( !rContext.bEmbedded )
                 setFormConnection( xOldConn, false );

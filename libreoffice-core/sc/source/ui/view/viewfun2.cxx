@@ -256,7 +256,14 @@ enum ScAutoSum
     ScAutoSumAverage,
     ScAutoSumMax,
     ScAutoSumMin,
-    ScAutoSumCount
+    ScAutoSumCount,
+    ScAutoSumCountA,
+    ScAutoSumProduct,
+    ScAutoSumStDev,
+    ScAutoSumStDevP,
+    ScAutoSumVar,
+    ScAutoSumVarP,
+    ScAutoSumEnd
 };
 
 }
@@ -267,10 +274,10 @@ static ScAutoSum lcl_IsAutoSumData( ScDocument& rDoc, SCCOL nCol, SCROW nRow,
     ScRefCellValue aCell(rDoc, ScAddress(nCol, nRow, nTab));
     if (aCell.hasNumeric())
     {
-        if (aCell.meType == CELLTYPE_FORMULA)
+        if (aCell.getType() == CELLTYPE_FORMULA)
         {
             ScAutoSum val = ScAutoSumNone;
-            ScTokenArray* pCode = aCell.mpFormula->GetCode();
+            ScTokenArray* pCode = aCell.getFormula()->GetCode();
             if ( pCode )
             {
                 switch( pCode->GetOuterFuncOpCode() )
@@ -284,6 +291,18 @@ static ScAutoSum lcl_IsAutoSumData( ScDocument& rDoc, SCCOL nCol, SCROW nRow,
                     case ocMin     : val = ScAutoSumMin;
                         break;
                     case ocCount   : val = ScAutoSumCount;
+                        break;
+                    case ocCount2  : val = ScAutoSumCountA;
+                        break;
+                    case ocProduct : val = ScAutoSumProduct;
+                        break;
+                    case ocStDev   : val = ScAutoSumStDev;
+                        break;
+                    case ocStDevP  : val = ScAutoSumStDevP;
+                        break;
+                    case ocVar     : val = ScAutoSumVar;
+                        break;
+                    case ocVarP    : val = ScAutoSumVarP;
                         break;
                     default        :
                         break;
@@ -470,6 +489,18 @@ static sal_Int8 GetSubTotal( const OpCode eCode )
             break;
         case ocCount   : val = 2;
             break;
+        case ocCount2  : val = 3;
+            break;
+        case ocProduct : val = 6;
+            break;
+        case ocStDev   : val = 7;
+            break;
+        case ocStDevP  : val = 8;
+            break;
+        case ocVar     : val = 10;
+            break;
+        case ocVarP    : val = 11;
+            break;
         default        : val = 9;
     }
 
@@ -522,7 +553,7 @@ bool ScViewFunc::GetAutoSumArea( ScRangeList& rRangeList )
         if ( bRow )
         {
             nStartRow = nSeekRow;       // nSeekRow might be adjusted via reference
-            if ( eSum >= ScAutoSumSum  && eSum <= ScAutoSumCount )
+            if ( eSum >= ScAutoSumSum  && eSum < ScAutoSumEnd )
                 nEndRow = nStartRow;        // only sum sums
             else
                 nEndRow = nRow - 1;     // maybe extend data area at bottom
@@ -644,8 +675,8 @@ bool ScViewFunc::AutoSum( const ScRange& rRange, bool bSubTotal, bool bSetCursor
         return false;
     }
 
-    const bool bEndRowEmpty = rDoc.IsBlockEmpty( nTab, nStartCol, nEndRow, nEndCol, nEndRow );
-    const bool bEndColEmpty = rDoc.IsBlockEmpty( nTab, nEndCol, nStartRow, nEndCol, nEndRow );
+    const bool bEndRowEmpty = rDoc.IsBlockEmpty( nStartCol, nEndRow, nEndCol, nEndRow, nTab );
+    const bool bEndColEmpty = rDoc.IsBlockEmpty( nEndCol, nStartRow, nEndCol, nEndRow, nTab );
     bool bRow = ( nStartRow != nEndRow ) && ( bEndRowEmpty || !bEndColEmpty );
     bool bCol = ( nStartCol != nEndCol ) && ( bEndColEmpty || nStartRow == nEndRow );
 
@@ -656,7 +687,7 @@ bool ScViewFunc::AutoSum( const ScRange& rRange, bool bSubTotal, bool bSetCursor
         if ( nInsRow < rDoc.MaxRow() )
         {
             ++nInsRow;
-            while ( !rDoc.IsBlockEmpty( nTab, nStartCol, nInsRow, nEndCol, nInsRow ) )
+            while ( !rDoc.IsBlockEmpty( nStartCol, nInsRow, nEndCol, nInsRow, nTab ) )
             {
                 if ( nInsRow < rDoc.MaxRow() )
                 {
@@ -682,7 +713,7 @@ bool ScViewFunc::AutoSum( const ScRange& rRange, bool bSubTotal, bool bSetCursor
         if ( nInsCol < rDoc.MaxCol() )
         {
             ++nInsCol;
-            while ( !rDoc.IsBlockEmpty( nTab, nInsCol, nStartRow, nInsCol, nEndRow ) )
+            while ( !rDoc.IsBlockEmpty( nInsCol, nStartRow, nInsCol, nEndRow, nTab ) )
             {
                 if ( nInsCol < rDoc.MaxCol() )
                 {
@@ -734,7 +765,7 @@ bool ScViewFunc::AutoSum( const ScRange& rRange, bool bSubTotal, bool bSetCursor
 
         for ( SCCOL nCol = nStartCol; nCol <= nEndCol; ++nCol )
         {
-            if ( !rDoc.IsBlockEmpty( nTab, nCol, nStartRow, nCol, nSumEndRow ) )
+            if ( !rDoc.IsBlockEmpty( nCol, nStartRow, nCol, nSumEndRow, nTab ) )
             {
                 ScRangeList aRangeList;
                 // Include the originally selected start row.
@@ -771,7 +802,7 @@ bool ScViewFunc::AutoSum( const ScRange& rRange, bool bSubTotal, bool bSetCursor
 
         for ( SCROW nRow = nStartRow; nRow <= nEndRow; ++nRow )
         {
-            if ( !rDoc.IsBlockEmpty( nTab, nStartCol, nRow, nSumEndCol, nRow ) )
+            if ( !rDoc.IsBlockEmpty( nStartCol, nRow, nSumEndCol, nRow, nTab ) )
             {
                 ScRangeList aRangeList;
                 // Include the originally selected start column.
@@ -1078,10 +1109,10 @@ void ScViewFunc::SetPrintRanges( bool bEntireSheet, const OUString* pPrint,
         if ( pRepCol )
         {
             if ( pRepCol->isEmpty() )
-                rDoc.SetRepeatColRange( nTab, nullptr );
+                rDoc.SetRepeatColRange( nTab, std::nullopt );
             else
                 if ( aRange.ParseAny( *pRepCol, rDoc, aDetails ) & ScRefFlags::VALID )
-                    rDoc.SetRepeatColRange( nTab, std::unique_ptr<ScRange>(new ScRange(aRange)) );
+                    rDoc.SetRepeatColRange( nTab, std::move(aRange) );
         }
 
         //  repeat rows
@@ -1089,10 +1120,10 @@ void ScViewFunc::SetPrintRanges( bool bEntireSheet, const OUString* pPrint,
         if ( pRepRow )
         {
             if ( pRepRow->isEmpty() )
-                rDoc.SetRepeatRowRange( nTab, nullptr );
+                rDoc.SetRepeatRowRange( nTab, std::nullopt );
             else
                 if ( aRange.ParseAny( *pRepRow, rDoc, aDetails ) & ScRefFlags::VALID )
-                    rDoc.SetRepeatRowRange( nTab, std::unique_ptr<ScRange>(new ScRange(aRange)) );
+                    rDoc.SetRepeatRowRange( nTab, std::move(aRange) );
         }
     }
 
@@ -1745,7 +1776,7 @@ void ScViewFunc::FillCrossDblClick()
         return;
 
     // Make sure the selection is not empty
-    if ( rDoc.IsBlockEmpty( nTab, nStartX, nStartY, nEndX, nEndY ) )
+    if ( rDoc.IsBlockEmpty( nStartX, nStartY, nEndX, nEndY, nTab ) )
         return;
 
     // If there is data in all columns immediately below the selection then
@@ -1806,7 +1837,7 @@ void ScViewFunc::FillCrossDblClick()
         bDataFound = (rDoc.HasData( nMovX, nStartY, nTab) && rDoc.HasData( nMovX, nStartY + 1, nTab));
     }
 
-    if (!(bDataFound && rDoc.IsBlockEmpty( nTab, nStartX, nEndY + 1, nEndX, nEndY + 1, true)))
+    if (!(bDataFound && rDoc.IsEmptyData( nStartX, nEndY + 1, nEndX, nEndY + 1, nTab )))
         return;
 
     // Get end of data left or right.
@@ -1845,6 +1876,8 @@ void ScViewFunc::ConvertFormulaToValue()
 
     ScDocShell* pDocSh = GetViewData().GetDocShell();
     pDocSh->GetDocFunc().ConvertFormulaToValue(aRange, true);
+    // tdf#131326 - invalidate cell slots and update input line with new content
+    CellContentChanged();
     pDocSh->PostPaint(aRange, PaintPartFlags::Grid);
 }
 
@@ -1988,7 +2021,7 @@ bool ScViewFunc::SearchAndReplace( const SvxSearchItem* pSearchItem,
     }
 
     DoneBlockMode(true);                // don't delete mark
-    InitOwnBlockMode();
+    InitOwnBlockMode( ScRange( nCol, nRow, nStartTab, nCol, nRow, nEndTab));
 
     //  If search starts at the beginning don't ask again whether it shall start at the beginning
     bool bFirst = true;
@@ -2000,7 +2033,7 @@ bool ScViewFunc::SearchAndReplace( const SvxSearchItem* pSearchItem,
     {
         GetFrameWin()->EnterWait();
         ScRangeList aMatchedRanges;
-        bool bMatchedRangesWereClamped;
+        bool bMatchedRangesWereClamped = false;
         if (rDoc.SearchAndReplace(*pSearchItem, nCol, nRow, nTab, rMark, aMatchedRanges, aUndoStr, pUndoDoc.get(), bMatchedRangesWereClamped))
         {
             bFound = true;
@@ -2341,7 +2374,7 @@ void ScViewFunc::UseScenario( const OUString& rName )
     SCTAB       nTab    = GetViewData().GetTabNo();
 
     DoneBlockMode();
-    InitOwnBlockMode();
+    InitOwnBlockMode( ScRange( GetViewData().GetCurX(), GetViewData().GetCurY(), nTab));
     pDocSh->UseScenario( nTab, rName );
 }
 
@@ -2829,7 +2862,7 @@ void ScViewFunc::MoveTable(
 
         //  execute without SfxCallMode::RECORD, because already contained in move command
 
-        SfxStringItem aItem( SID_FILE_NAME, "private:factory/" STRING_SCAPP );
+        SfxStringItem aItem( SID_FILE_NAME, "private:factory/" + STRING_SCAPP );
         SfxStringItem aTarget( SID_TARGETNAME, "_blank" );
 
         const SfxPoolItem* pRetItem = GetViewData().GetDispatcher().ExecuteList(
@@ -3428,7 +3461,7 @@ void ScViewFunc::SetSelectionFrameLines( const SvxBorderLine* pLine,
 void ScViewFunc::SetValidation( const ScValidationData& rNew )
 {
     ScDocument& rDoc = GetViewData().GetDocument();
-    sal_uLong nIndex = rDoc.AddValidationEntry(rNew);      // for it there is no Undo
+    sal_uInt32 nIndex = rDoc.AddValidationEntry(rNew);      // for it there is no Undo
     SfxUInt32Item aItem( ATTR_VALIDDATA, nIndex );
 
     ApplyAttr( aItem );         // with Paint and Undo...

@@ -18,6 +18,7 @@
  */
 
 #include <config_extensions.h>
+#include <config_wasm_strip.h>
 
 #include <align.hxx>
 #include "dlgfact.hxx"
@@ -111,7 +112,6 @@ IMPL_ABSTDLG_CLASS(AbstractFmShowColsDialog)
 IMPL_ABSTDLG_CLASS(AbstractGalleryIdDialog)
 IMPL_ABSTDLG_CLASS(AbstractGraphicFilterDialog)
 IMPL_ABSTDLG_CLASS(AbstractHangulHanjaConversionDialog)
-IMPL_ABSTDLG_CLASS(AbstractHyphenWordDialog)
 IMPL_ABSTDLG_CLASS(AbstractInsertObjectDialog)
 IMPL_ABSTDLG_CLASS(AbstractLinksDialog)
 IMPL_ABSTDLG_CLASS(AbstractQrCodeGenDialog)
@@ -145,6 +145,15 @@ IMPL_ABSTDLG_CLASS_ASYNC(CuiAbstractTabController,SfxTabDialogController)
 IMPL_ABSTDLG_CLASS(CuiAbstractController)
 IMPL_ABSTDLG_CLASS(CuiAbstractSingleTabController)
 IMPL_ABSTDLG_CLASS_ASYNC(CuiAbstractWidgetTestControllerAsync,weld::GenericDialogController)
+
+short AbstractHyphenWordDialog_Impl::Execute()
+{
+#if !ENABLE_WASM_STRIP_HUNSPELL
+    return m_xDlg->run();
+#else
+    return 0;
+#endif
+}
 
 const SfxItemSet* AbstractSvxCharacterMapDialog_Impl::GetOutputItemSet() const
 {
@@ -908,7 +917,16 @@ VclPtr<AbstractHyphenWordDialog> AbstractDialogFactory_Impl::CreateHyphenWordDia
                                                 css::uno::Reference< css::linguistic2::XHyphenator >  &xHyphen,
                                                 SvxSpellWrapper* pWrapper)
 {
+#if !ENABLE_WASM_STRIP_EXTRA
     return VclPtr<AbstractHyphenWordDialog_Impl>::Create(std::make_unique<SvxHyphenWordDialog>(rWord, nLang, pParent, xHyphen, pWrapper));
+#else
+    (void) pParent;
+    (void) rWord;
+    (void) nLang;
+    (void) xHyphen;
+    (void) pWrapper;
+    return nullptr;
+#endif
 }
 
 VclPtr<AbstractFmShowColsDialog> AbstractDialogFactory_Impl::CreateFmShowColsDialog(weld::Window* pParent)
@@ -1150,9 +1168,11 @@ VclPtr<AbstractGraphicFilterDialog> AbstractDialogFactory_Impl::CreateGraphicFil
 VclPtr<AbstractSvxAreaTabDialog> AbstractDialogFactory_Impl::CreateSvxAreaTabDialog(weld::Window* pParent,
                                                             const SfxItemSet* pAttr,
                                                             SdrModel* pModel,
-                                                            bool bShadow)
+                                                            bool bShadow,
+                                                            bool bSlideBackground)
 {
-    return VclPtr<AbstractSvxAreaTabDialog_Impl>::Create(std::make_shared<SvxAreaTabDialog>(pParent, pAttr, pModel, bShadow));
+    return VclPtr<AbstractSvxAreaTabDialog_Impl>::Create(
+        std::make_shared<SvxAreaTabDialog>(pParent, pAttr, pModel, bShadow, bSlideBackground));
 }
 
 VclPtr<SfxAbstractTabDialog> AbstractDialogFactory_Impl::CreateSvxLineTabDialog(weld::Window* pParent, const SfxItemSet* pAttr, //add forSvxLineTabDialog
@@ -1420,9 +1440,9 @@ VclPtr<SfxAbstractLinksDialog> AbstractDialogFactory_Impl::CreateLinksDialog(wel
     return VclPtr<AbstractLinksDialog_Impl>::Create(std::move(xLinkDlg));
 }
 
-VclPtr<SfxAbstractTabDialog> AbstractDialogFactory_Impl::CreateSvxFormatCellsDialog(weld::Window* pParent, const SfxItemSet* pAttr, const SdrModel& rModel)
+VclPtr<SfxAbstractTabDialog> AbstractDialogFactory_Impl::CreateSvxFormatCellsDialog(weld::Window* pParent, const SfxItemSet* pAttr, const SdrModel& rModel, bool bStyle)
 {
-    return VclPtr<CuiAbstractTabController_Impl>::Create(std::make_shared<SvxFormatCellsDialog>(pParent, pAttr, rModel));
+    return VclPtr<CuiAbstractTabController_Impl>::Create(std::make_shared<SvxFormatCellsDialog>(pParent, pAttr, rModel, bStyle));
 }
 
 VclPtr<SvxAbstractSplitTableDialog> AbstractDialogFactory_Impl::CreateSvxSplitTableDialog(weld::Window* pParent, bool bIsTableVertical, tools::Long nMaxVertical)
@@ -1487,7 +1507,7 @@ VclPtr<AbstractAdditionsDialog> AbstractDialogFactory_Impl::CreateAdditionsDialo
 #else
     (void) pParent;
     (void) sAdditionsTag;
-    return VclPtr<AbstractAdditionsDialog>(nullptr);
+    return nullptr;
 #endif
 }
 
@@ -1501,8 +1521,13 @@ AbstractDialogFactory_Impl::CreateAboutDialog(weld::Window* pParent)
 VclPtr<VclAbstractDialog>
 AbstractDialogFactory_Impl::CreateTipOfTheDayDialog(weld::Window* pParent)
 {
+#if !ENABLE_WASM_STRIP_PINGUSER
     return VclPtr<CuiAbstractControllerAsync_Impl>::Create(
         std::make_shared<TipOfTheDayDialog>(pParent));
+#else
+    (void) pParent;
+    return nullptr;
+#endif
 }
 
 VclPtr<VclAbstractDialog>
@@ -1520,10 +1545,12 @@ AbstractDialogFactory_Impl::CreateToolbarmodeDialog(weld::Window* pParent)
 }
 
 VclPtr<AbstractDiagramDialog>
-AbstractDialogFactory_Impl::CreateDiagramDialog(weld::Window* pParent, std::shared_ptr<DiagramDataInterface> pDiagramData)
+AbstractDialogFactory_Impl::CreateDiagramDialog(
+    weld::Window* pParent,
+    SdrObjGroup& rDiagram)
 {
     return VclPtr<AbstractDiagramDialog_Impl>::Create(
-        std::make_unique<DiagramDialog>(pParent, pDiagramData));
+        std::make_unique<DiagramDialog>(pParent, rDiagram));
 }
 
 #ifdef _WIN32

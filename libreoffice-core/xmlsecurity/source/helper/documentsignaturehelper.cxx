@@ -29,6 +29,7 @@
 #include <com/sun/star/embed/StorageFormats.hpp>
 #include <com/sun/star/embed/ElementModes.hpp>
 #include <com/sun/star/beans/StringPair.hpp>
+#include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/xml/sax/XDocumentHandler.hpp>
 
 #include <comphelper/documentconstants.hxx>
@@ -39,8 +40,9 @@
 #include <rtl/uri.hxx>
 #include <sal/log.hxx>
 #include <svx/xoutbmp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <xmloff/attrlist.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <xsecctl.hxx>
 
@@ -50,26 +52,26 @@ using namespace css::xml::sax;
 
 namespace
 {
-OUString getElement(OUString const & version, ::sal_Int32 * index)
+std::u16string_view getElement(std::u16string_view version, size_t * index)
 {
-    while (*index < version.getLength() && version[*index] == '0') {
+    while (*index < version.size() && version[*index] == '0') {
         ++*index;
     }
-    return version.getToken(0, '.', *index);
+    return o3tl::getToken(version, u'.', *index);
 }
 
 
 // Return 1 if version1 is greater than version 2, 0 if they are equal
 //and -1 if version1 is less version 2
 int compareVersions(
-    OUString const & version1, OUString const & version2)
+    std::u16string_view version1, std::u16string_view version2)
 {
-    for (::sal_Int32 i1 = 0, i2 = 0; i1 >= 0 || i2 >= 0;) {
-        OUString e1(getElement(version1, &i1));
-        OUString e2(getElement(version2, &i2));
-        if (e1.getLength() < e2.getLength()) {
+    for (size_t i1 = 0, i2 = 0; i1 != std::u16string_view::npos || i2 != std::u16string_view::npos;) {
+        std::u16string_view e1(getElement(version1, &i1));
+        std::u16string_view e2(getElement(version2, &i2));
+        if (e1.size() < e2.size()) {
             return -1;
-        } else if (e1.getLength() > e2.getLength()) {
+        } else if (e1.size() > e2.size()) {
             return 1;
         } else if (e1 < e2) {
             return -1;
@@ -129,7 +131,7 @@ static void ImplFillElementList(
 }
 
 
-bool DocumentSignatureHelper::isODFPre_1_2(const OUString & sVersion)
+bool DocumentSignatureHelper::isODFPre_1_2(std::u16string_view sVersion)
 {
     //The property version exists only if the document is at least version 1.2
     //That is, if the document has version 1.1 and sVersion is empty.
@@ -146,9 +148,9 @@ bool DocumentSignatureHelper::isOOo3_2_Signature(const SignatureInformation & si
 
 DocumentSignatureAlgorithm
 DocumentSignatureHelper::getDocumentAlgorithm(
-    const OUString & sODFVersion, const SignatureInformation & sigInfo)
+    std::u16string_view sODFVersion, const SignatureInformation & sigInfo)
 {
-    OSL_ASSERT(!sODFVersion.isEmpty());
+    OSL_ASSERT(!sODFVersion.empty());
     DocumentSignatureAlgorithm mode = DocumentSignatureAlgorithm::OOo3_2;
     if (!isOOo3_2_Signature(sigInfo))
     {
@@ -199,7 +201,7 @@ DocumentSignatureHelper::CreateElementList(
                 {
                     Reference < css::embed::XStorage > xSubStore = rxStore->openStorageElement( aSubStorageName, css::embed::ElementModes::READ );
                     ImplFillElementList(
-                        aElements, xSubStore, OUStringConcatenation(aSubStorageName+aSep), true, mode);
+                        aElements, xSubStore, Concat2View(aSubStorageName+aSep), true, mode);
                 }
                 catch(css::io::IOException& )
                 {
@@ -211,7 +213,7 @@ DocumentSignatureHelper::CreateElementList(
                 {
                     Reference < css::embed::XStorage > xSubStore = rxStore->openStorageElement( aSubStorageName, css::embed::ElementModes::READ );
                     ImplFillElementList(
-                        aElements, xSubStore, OUStringConcatenation(aSubStorageName+aSep), true, mode);
+                        aElements, xSubStore, Concat2View(aSubStorageName+aSep), true, mode);
                     xSubStore.clear();
 
                     // Object folders...
@@ -222,7 +224,7 @@ DocumentSignatureHelper::CreateElementList(
                         {
                             Reference < css::embed::XStorage > xTmpSubStore = rxStore->openStorageElement( rName, css::embed::ElementModes::READ );
                             ImplFillElementList(
-                                aElements, xTmpSubStore, OUStringConcatenation(rName+aSep), true, mode);
+                                aElements, xTmpSubStore, Concat2View(rName+aSep), true, mode);
                         }
                     }
                 }
@@ -246,7 +248,7 @@ DocumentSignatureHelper::CreateElementList(
             {
                 Reference < css::embed::XStorage > xSubStore = rxStore->openStorageElement( aSubStorageName, css::embed::ElementModes::READ );
                 ImplFillElementList(
-                    aElements, xSubStore, OUStringConcatenation(aSubStorageName+aSep), true, mode);
+                    aElements, xSubStore, Concat2View(aSubStorageName+aSep), true, mode);
             }
             catch( css::io::IOException& )
             {
@@ -259,7 +261,7 @@ DocumentSignatureHelper::CreateElementList(
             {
                 Reference < css::embed::XStorage > xSubStore = rxStore->openStorageElement( aSubStorageName, css::embed::ElementModes::READ );
                 ImplFillElementList(
-                    aElements, xSubStore, OUStringConcatenation(aSubStorageName+aSep), true, mode);
+                    aElements, xSubStore, Concat2View(aSubStorageName+aSep), true, mode);
             }
             catch( css::io::IOException& )
             {
@@ -271,7 +273,7 @@ DocumentSignatureHelper::CreateElementList(
             {
                 Reference < css::embed::XStorage > xSubStore = rxStore->openStorageElement( aSubStorageName, css::embed::ElementModes::READ );
                 ImplFillElementList(
-                    aElements, xSubStore, OUStringConcatenation(aSubStorageName+aSep), true, mode);
+                    aElements, xSubStore, Concat2View(aSubStorageName+aSep), true, mode);
             }
             catch( css::io::IOException& )
             {
@@ -310,7 +312,7 @@ void DocumentSignatureHelper::AppendContentTypes(const uno::Reference<embed::XSt
     {
         auto it = std::find_if(rOverrides.begin(), rOverrides.end(), [&](const beans::StringPair& rPair)
         {
-            return rPair.First == OUStringConcatenation("/" + rElement);
+            return rPair.First == Concat2View("/" + rElement);
         });
 
         if (it != rOverrides.end())
@@ -321,7 +323,7 @@ void DocumentSignatureHelper::AppendContentTypes(const uno::Reference<embed::XSt
 
         it = std::find_if(rDefaults.begin(), rDefaults.end(), [&](const beans::StringPair& rPair)
         {
-            return rElement.endsWith(OUStringConcatenation("." + rPair.First));
+            return rElement.endsWith(Concat2View("." + rPair.First));
         });
 
         if (it != rDefaults.end())
@@ -362,6 +364,33 @@ SignatureStreamHelper DocumentSignatureHelper::OpenSignatureStream(
                 else
                     aSIGStreamName = DocumentSignatureHelper::GetPackageSignatureDefaultStreamName();
 
+#ifdef SAL_LOG_INFO
+                aHelper.xSignatureStream
+                    = aHelper.xSignatureStorage->openStreamElement(aSIGStreamName, nOpenMode);
+                SAL_INFO("xmlsecurity.helper",
+                         "DocumentSignatureHelper::OpenSignatureStream: stream name is '"
+                             << aSIGStreamName << "'");
+                if (aHelper.xSignatureStream.is())
+                {
+                    uno::Reference<io::XInputStream> xInputStream(aHelper.xSignatureStream,
+                                                                  uno::UNO_QUERY);
+                    sal_Int64 nSize = 0;
+                    uno::Reference<beans::XPropertySet> xPropertySet(xInputStream, uno::UNO_QUERY);
+                    xPropertySet->getPropertyValue("Size") >>= nSize;
+                    if (nSize >= 0 || nSize < SAL_MAX_INT32)
+                    {
+                        uno::Sequence<sal_Int8> aData;
+                        xInputStream->readBytes(aData, nSize);
+                        SAL_INFO("xmlsecurity.helper",
+                                 "DocumentSignatureHelper::OpenSignatureStream: stream content is '"
+                                     << OString(reinterpret_cast<const char*>(aData.getArray()),
+                                                aData.getLength())
+                                     << "'");
+                    }
+                }
+                aHelper.xSignatureStream.clear();
+#endif
+
                 aHelper.xSignatureStream = aHelper.xSignatureStorage->openStreamElement( aSIGStreamName, nOpenMode );
             }
         }
@@ -394,7 +423,7 @@ SignatureStreamHelper DocumentSignatureHelper::OpenSignatureStream(
 /** Check whether the current file can be signed with GPG (only ODF >= 1.2 can currently) */
 bool DocumentSignatureHelper::CanSignWithGPG(
     const Reference < css::embed::XStorage >& rxStore,
-    const OUString& sOdfVersion)
+    std::u16string_view sOdfVersion)
 {
     if (!rxStore.is())
         return false;
@@ -450,16 +479,16 @@ bool DocumentSignatureHelper::checkIfAllFilesAreSigned(
   Returns true if both strings are equal.
 */
 bool DocumentSignatureHelper::equalsReferenceUriManifestPath(
-    const OUString & rUri, const OUString & rPath)
+    std::u16string_view rUri, std::u16string_view rPath)
 {
     //split up the uri and path into segments. Both are separated by '/'
     std::vector<OUString> vUriSegments;
     for (sal_Int32 nIndex = 0; nIndex >= 0; )
-        vUriSegments.push_back(rUri.getToken( 0, '/', nIndex ));
+        vUriSegments.push_back(OUString(o3tl::getToken(rUri, 0, '/', nIndex )));
 
     std::vector<OUString> vPathSegments;
     for (sal_Int32 nIndex = 0; nIndex >= 0; )
-        vPathSegments.push_back(rPath.getToken( 0, '/', nIndex ));
+        vPathSegments.push_back(OUString(o3tl::getToken(rPath, 0, '/', nIndex )));
 
     if (vUriSegments.size() != vPathSegments.size())
         return false;

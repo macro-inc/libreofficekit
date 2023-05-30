@@ -29,6 +29,7 @@
 #include <calcconfig.hxx>
 #include <token.hxx>
 #include <math.hxx>
+#include <kahan.hxx>
 #include "parclass.hxx"
 
 #include <map>
@@ -90,7 +91,7 @@ class SharedStringPool;
 /// Arbitrary 256MB result string length limit.
 constexpr sal_Int32 kScInterpreterMaxStrLen = SAL_MAX_INT32 / 8;
 
-#define MAXSTACK      (4096 / sizeof(formula::FormulaToken*))
+constexpr size_t MAXSTACK = 512;
 
 class ScTokenStack
 {
@@ -149,21 +150,10 @@ public:
 
     static void GlobalExit();           // called by ScGlobal::Clear()
 
-    /// Could string be a regular expression?
-    /// if regularExpressions are disabled the function returns false regardless
-    /// of the string content.
-    static bool MayBeRegExp( const OUString& rStr );
-
-    /** Could string be a wildcard (*,?,~) expression?
-        If wildcards are disabled the function returns false regardless of the
-        string content.
-     */
-    static bool MayBeWildcard( const OUString& rStr );
-
     /** Detect if string should be used as regular expression or wildcard
         expression or literal string.
      */
-    static utl::SearchParam::SearchType DetectSearchType( const OUString& rStr, const ScDocument& rDoc );
+    static utl::SearchParam::SearchType DetectSearchType(std::u16string_view rStr, const ScDocument& rDoc );
 
     /// Fail safe division, returning a FormulaError::DivisionByZero coded into a double
     /// if denominator is 0.0
@@ -231,6 +221,7 @@ private:
     inline bool MustHaveParamCount( short nAct, short nMust );
     inline bool MustHaveParamCount( short nAct, short nMust, short nMax );
     inline bool MustHaveParamCountMin( short nAct, short nMin );
+    inline bool MustHaveParamCountMinWithStackCheck( short nAct, short nMin );
     void PushParameterExpected();
     void PushIllegalParameter();
     void PushIllegalArgument();
@@ -331,7 +322,7 @@ private:
     void Pop();
     void PopError();
     double PopDouble();
-    svl::SharedString PopString();
+    const svl::SharedString & PopString();
     void ValidateRef( const ScSingleRefData & rRef );
     void ValidateRef( const ScComplexRefData & rRef );
     void ValidateRef( const ScRefList & rRefList );
@@ -355,6 +346,8 @@ private:
     ScDBRangeBase* PopDBDoubleRef();
     void PopDoubleRef(SCCOL& rCol1, SCROW &rRow1, SCTAB& rTab1,
                               SCCOL& rCol2, SCROW &rRow2, SCTAB& rTab2 );
+    // peek double ref data
+    const ScComplexRefData* GetStackDoubleRef(size_t rRefInList = 0);
 
     void PopExternalSingleRef(sal_uInt16& rFileId, OUString& rTabName, ScSingleRefData& rRef);
 
@@ -481,17 +474,17 @@ private:
 
     // Check for String overflow of rResult+rAdd and set error and erase rResult
     // if so. Return true if ok, false if overflow
-    inline bool CheckStringResultLen( OUString& rResult, const OUString& rAdd );
+    inline bool CheckStringResultLen( OUString& rResult, sal_Int32 nIncrease );
 
     // Check for String overflow of rResult+rAdd and set error and erase rResult
     // if so. Return true if ok, false if overflow
-    inline bool CheckStringResultLen( OUStringBuffer& rResult, const OUString& rAdd );
+    inline bool CheckStringResultLen( OUStringBuffer& rResult, sal_Int32 nIncrease );
 
     // Set error according to rVal, and set rVal to 0.0 if there was an error.
     inline void TreatDoubleError( double& rVal );
     // Lookup using ScLookupCache, @returns true if found and result address
     bool LookupQueryWithCache( ScAddress & o_rResultPos,
-            const ScQueryParam & rParam ) const;
+            const ScQueryParam & rParam, const ScComplexRefData* refData ) const;
 
     void ScIfJump();
     void ScIfError( bool bNAonly );
@@ -1082,6 +1075,17 @@ inline bool ScInterpreter::MustHaveParamCountMin( short nAct, short nMin )
     return false;
 }
 
+inline bool ScInterpreter::MustHaveParamCountMinWithStackCheck( short nAct, short nMin )
+{
+    assert(sp >= nAct);
+    if (sp < nAct)
+    {
+        PushParameterExpected();
+        return false;
+    }
+    return MustHaveParamCountMin( nAct, nMin);
+}
+
 inline bool ScInterpreter::CheckStringPositionArgument( double & fVal )
 {
     if (!std::isfinite( fVal))
@@ -1113,9 +1117,9 @@ inline sal_Int32 ScInterpreter::GetStringPositionArgument()
     return static_cast<sal_Int32>(fVal);
 }
 
-inline bool ScInterpreter::CheckStringResultLen( OUString& rResult, const OUString& rAdd )
+inline bool ScInterpreter::CheckStringResultLen( OUString& rResult, sal_Int32 nIncrease )
 {
-    if (rAdd.getLength() > kScInterpreterMaxStrLen - rResult.getLength())
+    if (nIncrease > kScInterpreterMaxStrLen - rResult.getLength())
     {
         SetError( FormulaError::StringOverflow );
         rResult.clear();
@@ -1124,12 +1128,12 @@ inline bool ScInterpreter::CheckStringResultLen( OUString& rResult, const OUStri
     return true;
 }
 
-inline bool ScInterpreter::CheckStringResultLen( OUStringBuffer& rResult, const OUString& rAdd )
+inline bool ScInterpreter::CheckStringResultLen( OUStringBuffer& rResult, sal_Int32 nIncrease )
 {
-    if (rAdd.getLength() > kScInterpreterMaxStrLen - rResult.getLength())
+    if (nIncrease > kScInterpreterMaxStrLen - rResult.getLength())
     {
         SetError( FormulaError::StringOverflow );
-        rResult = OUStringBuffer();
+        rResult.setLength(0);
         return false;
     }
     return true;

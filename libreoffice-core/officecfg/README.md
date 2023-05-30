@@ -10,3 +10,8 @@ See also: `configmgr`
 entries that use the same accelerator key. The tool goes through the menus using the accessibility
 api and checks the accelerator keys. For information on how to use the tool open the fodt file
 in LibreOffice.
+
+For more details about the file format, see
+<https://www.openoffice.org/projects/util/common/configuration/oor-document-format.html> (also
+mirrored at
+<https://web.archive.org/web/20101103025920/http://util.openoffice.org/common/configuration/oor-document-format.html>).

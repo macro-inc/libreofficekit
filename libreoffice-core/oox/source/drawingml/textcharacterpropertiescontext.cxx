@@ -29,7 +29,6 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
 #include <sax/fastattribs.hxx>
-#include <sax/fastparser.hxx>
 
 #include <sal/log.hxx>
 
@@ -68,7 +67,7 @@ TextCharacterPropertiesContext::TextCharacterPropertiesContext(
         mrTextCharacterProperties.moUnderline = rAttribs.getToken( XML_u );
     if ( rAttribs.hasAttribute( XML_strike ) )
         mrTextCharacterProperties.moStrikeout = rAttribs.getToken( XML_strike );
-    if ( rAttribs.hasAttribute( XML_baseline ) && rAttribs.getInteger( XML_baseline ).get() != 0 )
+    if ( rAttribs.hasAttribute( XML_baseline ) && rAttribs.getInteger( XML_baseline, 0 ) != 0 )
         mrTextCharacterProperties.moBaseline = rAttribs.getInteger( XML_baseline );
 
     if ( rAttribs.hasAttribute( XML_b ) )
@@ -116,13 +115,16 @@ ContextHandlerRef TextCharacterPropertiesContext::onCreateContext( sal_Int32 aEl
     {
         case A_TOKEN(ln): // CT_LineProperties
             // TODO still largely unsupported
-            return new LinePropertiesContext(*this, rAttribs, mrTextCharacterProperties.moTextOutlineProperties.use());
+            if (!mrTextCharacterProperties.moTextOutlineProperties.has_value())
+                mrTextCharacterProperties.moTextOutlineProperties.emplace();
+            return new LinePropertiesContext(*this, rAttribs, *mrTextCharacterProperties.moTextOutlineProperties);
         // EG_FillProperties
         case A_TOKEN( noFill ):
         case A_TOKEN( solidFill ):
         case A_TOKEN( gradFill ):
         case A_TOKEN( pattFill ):
-            return FillPropertiesContext::createFillContext( *this, aElementToken, rAttribs, mrTextCharacterProperties.maFillProperties );
+        case A_TOKEN( blipFill ): // Fontwork uses blibFill.
+            return FillPropertiesContext::createFillContext(*this, aElementToken, rAttribs, mrTextCharacterProperties.maFillProperties, nullptr);
         // EG_EffectProperties
         case A_TOKEN( effectDag ):  // CT_EffectContainer 5.1.10.25
         case A_TOKEN( effectLst ):  // CT_EffectList 5.1.10.26
@@ -167,33 +169,33 @@ ContextHandlerRef TextCharacterPropertiesContext::onCreateContext( sal_Int32 aEl
         case W_TOKEN( rFonts ):
             if( rAttribs.hasAttribute(W_TOKEN(ascii)) )
             {
-                mrTextCharacterProperties.maLatinFont.setAttributes(rAttribs.getString(W_TOKEN(ascii), OUString()));
+                mrTextCharacterProperties.maLatinFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(ascii)));
             }
             if (rAttribs.hasAttribute(W_TOKEN(asciiTheme)))
             {
-                mrTextCharacterProperties.maLatinThemeFont.setAttributes(rAttribs.getString(W_TOKEN(asciiTheme), OUString()));
+                mrTextCharacterProperties.maLatinThemeFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(asciiTheme)));
             }
             if( rAttribs.hasAttribute(W_TOKEN(cs)) )
             {
-                mrTextCharacterProperties.maComplexFont.setAttributes(rAttribs.getString(W_TOKEN(cs), OUString()));
+                mrTextCharacterProperties.maComplexFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(cs)));
             }
             if (rAttribs.hasAttribute(W_TOKEN(cstheme)))
             {
-                mrTextCharacterProperties.maComplexThemeFont.setAttributes(rAttribs.getString(W_TOKEN(cstheme), OUString()));
+                mrTextCharacterProperties.maComplexThemeFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(cstheme)));
             }
             if( rAttribs.hasAttribute(W_TOKEN(eastAsia)) )
             {
-                mrTextCharacterProperties.maAsianFont.setAttributes(rAttribs.getString(W_TOKEN(eastAsia), OUString()));
+                mrTextCharacterProperties.maAsianFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(eastAsia)));
             }
             if (rAttribs.hasAttribute(W_TOKEN(eastAsiaTheme)))
             {
-                mrTextCharacterProperties.maAsianThemeFont.setAttributes(rAttribs.getString(W_TOKEN(eastAsiaTheme), OUString()));
+                mrTextCharacterProperties.maAsianThemeFont.setAttributes(rAttribs.getStringDefaulted(W_TOKEN(eastAsiaTheme)));
             }
             break;
         case W_TOKEN( u ):
         {
             // If you add here, check if it is in drawingmltypes.cxx 113.
-            auto attrib = rAttribs.getString(W_TOKEN(val), OUString());
+            auto attrib = rAttribs.getStringDefaulted(W_TOKEN(val));
             if (attrib == "single" || attrib == "words") // TODO: implement words properly. Now it is a single line.
                 mrTextCharacterProperties.moUnderline = XML_sng;
             else if (attrib == "wavyHeavy")
@@ -229,10 +231,10 @@ ContextHandlerRef TextCharacterPropertiesContext::onCreateContext( sal_Int32 aEl
             else if (attrib == "none")
                 mrTextCharacterProperties.moUnderline = XML_none;
             auto colorAttrib = rAttribs.getIntegerHex(W_TOKEN(color));
-            if (colorAttrib.has())
+            if (colorAttrib.has_value())
             {
                 oox::drawingml::Color theColor;
-                theColor.setSrgbClr(colorAttrib.get());
+                theColor.setSrgbClr(colorAttrib.value());
                 mrTextCharacterProperties.maUnderlineColor = theColor;
             }
             break;
@@ -260,16 +262,16 @@ ContextHandlerRef TextCharacterPropertiesContext::onCreateContext( sal_Int32 aEl
                 mrTextCharacterProperties.moStrikeout = XML_dblStrike;
             break;
         case W_TOKEN( color ):
-            if (rAttribs.getInteger(W_TOKEN(val)).has())
+            if (rAttribs.getInteger(W_TOKEN(val)).has_value())
             {
-                mrTextCharacterProperties.maFillProperties.maFillColor.setSrgbClr(rAttribs.getIntegerHex(W_TOKEN(val)).get());
-                mrTextCharacterProperties.maFillProperties.moFillType.set(XML_solidFill);
+                mrTextCharacterProperties.maFillProperties.maFillColor.setSrgbClr(rAttribs.getIntegerHex(W_TOKEN(val), 0));
+                mrTextCharacterProperties.maFillProperties.moFillType = XML_solidFill;
             }
             break;
         case W_TOKEN(  sz ):
-            if (rAttribs.getInteger(W_TOKEN(val)).has())
+            if (rAttribs.getInteger(W_TOKEN(val)).has_value())
             {
-                sal_Int32 nVal = rAttribs.getInteger(W_TOKEN(val)).get();
+                sal_Int32 nVal = rAttribs.getInteger(W_TOKEN(val), 0);
                 // wml has half points, dml has hundred points
                 mrTextCharacterProperties.moHeight = nVal * 50;
             }
@@ -304,7 +306,7 @@ ContextHandlerRef TextCharacterPropertiesContext::onCreateContext( sal_Int32 aEl
             break;
         }
         case W_TOKEN(lang):
-            mrTextCharacterProperties.moLang = rAttribs.getString(W_TOKEN(val), OUString());
+            mrTextCharacterProperties.moLang = rAttribs.getStringDefaulted(W_TOKEN(val));
             break;
         case OOX_TOKEN(w14, glow):
         case OOX_TOKEN(w14, shadow):

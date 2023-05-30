@@ -22,6 +22,7 @@
 #include <stringconstants.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
+#include <strings.hxx>
 #include "connection.hxx"
 #include "SharedConnection.hxx"
 #include "databasedocument.hxx"
@@ -55,7 +56,7 @@
 #include <connectivity/dbtools.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <officecfg/Office/Common.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <osl/process.h>
 #include <sal/log.hxx>
@@ -607,8 +608,7 @@ Reference< XConnection > ODatabaseSource::buildLowLevelConnection(const OUString
     if ( xModel)
     {
         //See ODbTypeWizDialogSetup::SaveDatabaseDocument
-        ::comphelper::NamedValueCollection aArgs( xModel->getArgs() );
-        aArgs.get("IgnoreFirebirdMigration") >>= bIgnoreMigration;
+        ::comphelper::NamedValueCollection::get(xModel->getArgs(), u"IgnoreFirebirdMigration") >>= bIgnoreMigration;
     }
     else
     {
@@ -770,7 +770,7 @@ Reference< XConnection > ODatabaseSource::buildLowLevelConnection(const OUString
         aContext.Message = DBA_RES(RID_STR_CONNECTION_REQUEST).
             replaceFirst("$name$", m_pImpl->m_sConnectURL);
 
-        throwGenericSQLException( sMessage, static_cast< XDataSource* >( this ), makeAny( aContext ) );
+        throwGenericSQLException( sMessage, static_cast< XDataSource* >( this ), Any( aContext ) );
     }
 
 #if ENABLE_FIREBIRD_SDBC
@@ -796,25 +796,25 @@ Reference< XPropertySetInfo >  ODatabaseSource::getPropertySetInfo()
 // comphelper::OPropertyArrayUsageHelper
 ::cppu::IPropertyArrayHelper* ODatabaseSource::createArrayHelper( ) const
 {
-    css::uno::Sequence< css::beans::Property> aDescriptor(13);
-    css::beans::Property* pDesc = aDescriptor.getArray();
-    sal_Int32 nPos = 0;
-    pDesc[nPos++] = css::beans::Property(PROPERTY_INFO, PROPERTY_ID_INFO, cppu::UnoType<Sequence< PropertyValue >>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_ISPASSWORDREQUIRED, PROPERTY_ID_ISPASSWORDREQUIRED, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_ISREADONLY, PROPERTY_ID_ISREADONLY, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_LAYOUTINFORMATION, PROPERTY_ID_LAYOUTINFORMATION, cppu::UnoType<Sequence< PropertyValue >>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_NAME, PROPERTY_ID_NAME, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_NUMBERFORMATSSUPPLIER, PROPERTY_ID_NUMBERFORMATSSUPPLIER,
-                    cppu::UnoType<XNumberFormatsSupplier>::get(), css::beans::PropertyAttribute::READONLY | css::beans::PropertyAttribute::TRANSIENT);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_PASSWORD, PROPERTY_ID_PASSWORD, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::TRANSIENT);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_SETTINGS, PROPERTY_ID_SETTINGS, cppu::UnoType<XPropertySet>::get(), css::beans::PropertyAttribute::BOUND | css::beans::PropertyAttribute::READONLY);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_SUPPRESSVERSIONCL, PROPERTY_ID_SUPPRESSVERSIONCL, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_TABLEFILTER, PROPERTY_ID_TABLEFILTER, cppu::UnoType<Sequence< OUString >>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_TABLETYPEFILTER, PROPERTY_ID_TABLETYPEFILTER, cppu::UnoType<Sequence< OUString >>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_URL, PROPERTY_ID_URL, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND);
-    pDesc[nPos++] = css::beans::Property(PROPERTY_USER, PROPERTY_ID_USER, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND);
-    OSL_ENSURE(nPos == aDescriptor.getLength(), "forgot to adjust the count ?");
-    return new ::cppu::OPropertyArrayHelper(aDescriptor);
+    return new ::cppu::OPropertyArrayHelper
+    {
+        {
+            { PROPERTY_INFO, PROPERTY_ID_INFO, cppu::UnoType<Sequence< PropertyValue >>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_ISPASSWORDREQUIRED, PROPERTY_ID_ISPASSWORDREQUIRED, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_ISREADONLY, PROPERTY_ID_ISREADONLY, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_LAYOUTINFORMATION, PROPERTY_ID_LAYOUTINFORMATION, cppu::UnoType<Sequence< PropertyValue >>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_NAME, PROPERTY_ID_NAME, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_NUMBERFORMATSSUPPLIER, PROPERTY_ID_NUMBERFORMATSSUPPLIER, cppu::UnoType<XNumberFormatsSupplier>::get(),
+              css::beans::PropertyAttribute::READONLY | css::beans::PropertyAttribute::TRANSIENT },
+            { PROPERTY_PASSWORD, PROPERTY_ID_PASSWORD, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::TRANSIENT },
+            { PROPERTY_SETTINGS, PROPERTY_ID_SETTINGS, cppu::UnoType<XPropertySet>::get(), css::beans::PropertyAttribute::BOUND | css::beans::PropertyAttribute::READONLY },
+            { PROPERTY_SUPPRESSVERSIONCL, PROPERTY_ID_SUPPRESSVERSIONCL, cppu::UnoType<bool>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_TABLEFILTER, PROPERTY_ID_TABLEFILTER, cppu::UnoType<Sequence< OUString >>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_TABLETYPEFILTER, PROPERTY_ID_TABLETYPEFILTER, cppu::UnoType<Sequence< OUString >>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_URL, PROPERTY_ID_URL, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND },
+            { PROPERTY_USER, PROPERTY_ID_USER, cppu::UnoType<OUString>::get(), css::beans::PropertyAttribute::BOUND }
+        }
+    };
 }
 
 // cppu::OPropertySetHelper
@@ -1159,7 +1159,7 @@ Reference< XConnection > ODatabaseSource::connectWithCompletion( const Reference
         aRequest.HasUserName = aRequest.HasPassword = true;
         aRequest.UserName = m_pImpl->m_sUser;
         aRequest.Password = m_pImpl->m_sFailedPassword.isEmpty() ?  m_pImpl->m_aPassword : m_pImpl->m_sFailedPassword;
-        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(makeAny(aRequest));
+        rtl::Reference<OInteractionRequest> pRequest = new OInteractionRequest(Any(aRequest));
         // some knittings
         pRequest->addContinuation(pAbort);
         pRequest->addContinuation(pAuthenticate);
@@ -1278,13 +1278,13 @@ Reference< XNameAccess > SAL_CALL ODatabaseSource::getQueryDefinitions( )
             aValue >>= sSupportService;
             if ( !sSupportService.isEmpty() )
             {
-                Sequence<Any> aArgs{ Any(NamedValue("DataSource",makeAny(xMy))) };
+                Sequence<Any> aArgs{ Any(NamedValue("DataSource",Any(xMy))) };
                 xContainer.set( m_pImpl->m_aContext->getServiceManager()->createInstanceWithArgumentsAndContext(sSupportService, aArgs, m_pImpl->m_aContext), UNO_QUERY);
             }
         }
         if ( !xContainer.is() )
         {
-            TContentPtr& rContainerData( m_pImpl->getObjectContainer( ODatabaseModelImpl::E_QUERY ) );
+            TContentPtr& rContainerData( m_pImpl->getObjectContainer( ODatabaseModelImpl::ObjectType::Query ) );
             xContainer = new OCommandContainer( m_pImpl->m_aContext, *this, rContainerData, false );
         }
         m_pImpl->m_xCommandDefinitions = xContainer;
@@ -1300,7 +1300,7 @@ Reference< XNameAccess >  ODatabaseSource::getTables()
     Reference< XNameAccess > xContainer = m_pImpl->m_xTableDefinitions;
     if ( !xContainer.is() )
     {
-        TContentPtr& rContainerData( m_pImpl->getObjectContainer( ODatabaseModelImpl::E_TABLE ) );
+        TContentPtr& rContainerData( m_pImpl->getObjectContainer( ODatabaseModelImpl::ObjectType::Table ) );
         xContainer = new OCommandContainer( m_pImpl->m_aContext, *this, rContainerData, true );
         m_pImpl->m_xTableDefinitions = xContainer;
     }

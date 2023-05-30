@@ -25,7 +25,7 @@
 #include <com/sun/star/embed/StorageFormats.hpp>
 #include <com/sun/star/embed/ElementModes.hpp>
 #include <com/sun/star/embed/XStorage.hpp>
-#include <com/sun/star/io/TempFile.hpp>
+#include <com/sun/star/io/XTempFile.hpp>
 #include <com/sun/star/io/XTruncate.hpp>
 #include <com/sun/star/embed/XTransactedObject.hpp>
 #include <com/sun/star/xml/crypto/SEInitializer.hpp>
@@ -41,6 +41,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <tools/datetime.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <certificate.hxx>
 #include <biginteger.hxx>
@@ -166,7 +167,7 @@ bool DocumentSignatureManager::readManifest()
     The parameter is an encoded uri. However, the manifest contains paths. Therefore
     the path is encoded as uri, so they can be compared.
 */
-bool DocumentSignatureManager::isXML(const OUString& rURI)
+bool DocumentSignatureManager::isXML(std::u16string_view rURI)
 {
     SAL_WARN_IF(!mxStore.is(), "xmlsecurity.helper", "empty storage reference");
 
@@ -207,11 +208,11 @@ bool DocumentSignatureManager::isXML(const OUString& rURI)
         //Files can only be encrypted if they are in the manifest.xml.
         //That is, the current file cannot be encrypted, otherwise bPropsAvailable
         //would be true.
-        sal_Int32 nSep = rURI.lastIndexOf('.');
-        if (nSep != -1)
+        size_t nSep = rURI.rfind('.');
+        if (nSep != std::u16string_view::npos)
         {
-            OUString aExt = rURI.copy(nSep + 1);
-            if (aExt.equalsIgnoreAsciiCase("XML"))
+            std::u16string_view aExt = rURI.substr(nSep + 1);
+            if (o3tl::equalsIgnoreAsciiCase(aExt, u"XML"))
                 bIsXML = true;
         }
     }
@@ -236,7 +237,7 @@ SignatureStreamHelper DocumentSignatureManager::ImplOpenSignatureStream(sal_Int3
         if (nStreamOpenMode & embed::ElementModes::TRUNCATE)
         {
             //We write always into a new temporary stream.
-            mxTempSignatureStream.set(io::TempFile::create(mxContext), uno::UNO_QUERY_THROW);
+            mxTempSignatureStream = new utl::TempFileFastService;
             if (aHelper.nStorageFormat != embed::StorageFormats::OFOPXML)
                 aHelper.xSignatureStream = mxTempSignatureStream;
             else

@@ -41,9 +41,7 @@ SdCustomShowDlg::SdCustomShowDlg(weld::Window* pWindow, SdDrawDocument& rDrawDoc
     , m_xBtnEdit(m_xBuilder->weld_button("edit"))
     , m_xBtnRemove(m_xBuilder->weld_button("delete"))
     , m_xBtnCopy(m_xBuilder->weld_button("copy"))
-    , m_xBtnHelp(m_xBuilder->weld_button("help"))
     , m_xBtnStartShow(m_xBuilder->weld_button("startshow"))
-    , m_xBtnOK(m_xBuilder->weld_button("ok"))
 {
     m_xLbCustomShows->set_size_request(m_xLbCustomShows->get_approximate_digit_width() * 32,
                                        m_xLbCustomShows->get_height_rows(8));
@@ -252,8 +250,6 @@ SdDefineCustomShowDlg::SdDefineCustomShowDlg(weld::Window* pWindow, SdDrawDocume
     , m_xLbCustomPages(m_xBuilder->weld_tree_view("custompages"))
     , m_xDropTargetHelper(new weld::ReorderingDropTarget(*m_xLbCustomPages))
     , m_xBtnOK(m_xBuilder->weld_button("ok"))
-    , m_xBtnCancel(m_xBuilder->weld_button("cancel"))
-    , m_xBtnHelp(m_xBuilder->weld_button("help"))
 {
     Link<weld::Button&,void> aLink = LINK( this, SdDefineCustomShowDlg, ClickButtonHdl );
     m_xBtnAdd->connect_clicked( aLink );
@@ -288,7 +284,7 @@ SdDefineCustomShowDlg::SdDefineCustomShowDlg(weld::Window* pWindow, SdDrawDocume
         // fill ListBox with CustomShow pages
         for( const auto& rpPage : rpCustomShow->PagesVector() )
         {
-            m_xLbCustomPages->append(OUString::number(reinterpret_cast<sal_uInt64>(rpPage)), rpPage->GetName(), "");
+            m_xLbCustomPages->append(weld::toId(rpPage), rpPage->GetName(), "");
         }
     }
     else
@@ -355,7 +351,7 @@ void SdDefineCustomShowDlg::ClickButtonHdl2(void const * p)
             {
                 OUString aStr = m_xLbPages->get_text(i);
                 SdPage* pPage = rDoc.GetSdPage(i, PageKind::Standard);
-                OUString sId(OUString::number(reinterpret_cast<sal_uInt64>(pPage)));
+                OUString sId(weld::toId(pPage));
                 m_xLbCustomPages->insert(nPosCP, aStr, &sId, nullptr, nullptr);
                 m_xLbCustomPages->select(nPosCP != -1 ? nPosCP : m_xLbCustomPages->n_children() - 1);
 
@@ -405,7 +401,7 @@ void SdDefineCustomShowDlg::CheckCustomShow()
         size_t i = 0;
         for (const auto& rpPage : rpCustomShow->PagesVector())
         {
-            SdPage* pPage = reinterpret_cast<SdPage*>(m_xLbCustomPages->get_id(i).toUInt64());
+            SdPage* pPage = weld::fromId<SdPage*>(m_xLbCustomPages->get_id(i));
             if (rpPage != pPage)
             {
                 rpCustomShow->PagesVector().clear();
@@ -422,7 +418,7 @@ void SdDefineCustomShowDlg::CheckCustomShow()
     {
         for (size_t i = 0; i < nCount; ++i)
         {
-            SdPage* pPage = reinterpret_cast<SdPage*>(m_xLbCustomPages->get_id(i).toUInt64());
+            SdPage* pPage = weld::fromId<SdPage*>(m_xLbCustomPages->get_id(i));
             rpCustomShow->PagesVector().push_back(pPage);
         }
         bModified = true;

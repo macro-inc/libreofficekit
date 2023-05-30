@@ -14,7 +14,9 @@
 #include <o3tl/runtimetooustring.hxx>
 #include <osl/file.hxx>
 #include <osl/thread.h>
+#include <o3tl/string_view.hxx>
 #include <memory>
+#include <utility>
 
 #include "LuceneHelper.hxx"
 #include <CLucene.h>
@@ -28,11 +30,11 @@
 
 using namespace lucene::document;
 
-HelpIndexer::HelpIndexer(OUString const &lang, OUString const &module,
+HelpIndexer::HelpIndexer(OUString lang, OUString module,
     std::u16string_view srcDir, std::u16string_view outDir)
-    : d_lang(lang), d_module(module)
+    : d_lang(std::move(lang)), d_module(std::move(module))
 {
-    d_indexDir = outDir + OUStringChar('/') + module + ".idxl";
+    d_indexDir = outDir + OUStringChar('/') + d_module + ".idxl";
     d_captionDir = OUString::Concat(srcDir) + "/caption";
     d_contentDir = OUString::Concat(srcDir) + "/content";
 }
@@ -76,8 +78,8 @@ bool HelpIndexer::indexDocuments()
 
     try
     {
-        OUString sLang = d_lang.getToken(0, '-');
-        bool bUseCJK = sLang == "ja" || sLang == "ko" || sLang == "zh";
+        std::u16string_view sLang = o3tl::getToken(d_lang, 0, '-');
+        bool bUseCJK = sLang == u"ja" || sLang == u"ko" || sLang == u"zh";
 
         // Construct the analyzer appropriate for the given language
         std::unique_ptr<lucene::analysis::Analyzer> analyzer;

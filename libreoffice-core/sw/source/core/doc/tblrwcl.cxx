@@ -506,7 +506,8 @@ bool SwTable::InsertCol( SwDoc& rDoc, const SwSelBoxes& rBoxes, sal_uInt16 nCnt,
         pPCD->AddRowCols( *this, rBoxes, nCnt, bBehind );
     rDoc.UpdateCharts( GetFrameFormat()->GetName() );
 
-    rDoc.GetDocShell()->GetFEShell()->UpdateTableStyleFormatting();
+    if (SwFEShell* pFEShell = rDoc.GetDocShell()->GetFEShell())
+        pFEShell->UpdateTableStyleFormatting();
 
     return bRes;
 }
@@ -595,11 +596,10 @@ bool SwTable::InsertRow_( SwDoc* pDoc, const SwSelBoxes& rBoxes,
                 SvxPrintItem aSetTracking(RES_PRINT, false);
                 SwPosition aPos(*pNewTableLine->GetTabBoxes()[0]->GetSttNd());
                 SwCursor aCursor( aPos, nullptr );
-                SwNodeIndex aInsPos(*pNewTableLine->GetTabBoxes()[0]->GetSttNd(), 1 );
-                SwPaM aPaM(aInsPos);
+                SwPaM aPaM(*pNewTableLine->GetTabBoxes()[0]->GetSttNd(), SwNodeOffset(1));
                 pDoc->getIDocumentContentOperations().InsertString( aPaM,
                         OUStringChar(CH_TXT_TRACKED_DUMMY_CHAR) );
-                pDoc->SetRowNotTracked( aCursor, aSetTracking );
+                pDoc->SetRowNotTracked( aCursor, aSetTracking, /*bAll=*/false, /*bIns=*/true );
             }
         }
     }
@@ -625,7 +625,8 @@ bool SwTable::InsertRow_( SwDoc* pDoc, const SwSelBoxes& rBoxes,
         pPCD->AddRowCols( *this, rBoxes, nCnt, bBehind );
     pDoc->UpdateCharts( GetFrameFormat()->GetName() );
 
-    pDoc->GetDocShell()->GetFEShell()->UpdateTableStyleFormatting(pTableNd);
+    if (SwFEShell* pFEShell = pDoc->GetDocShell()->GetFEShell())
+        pFEShell->UpdateTableStyleFormatting(pTableNd);
 
     return true;
 }
@@ -1141,7 +1142,7 @@ bool SwTable::OldSplitRow( SwDoc& rDoc, const SwSelBoxes& rBoxes, sal_uInt16 nCn
                         SwNodeRange aRg( *pLastBox->GetSttNd(), SwNodeOffset(+2), *pEndNd );
                         pLastBox = pNewLine->GetTabBoxes()[0];  // reset
                         SwNodeIndex aInsPos( *pLastBox->GetSttNd(), 1 );
-                        rDoc.GetNodes().MoveNodes(aRg, rDoc.GetNodes(), aInsPos, false);
+                        rDoc.GetNodes().MoveNodes(aRg, rDoc.GetNodes(), aInsPos.GetNode(), false);
                         rDoc.GetNodes().Delete( aInsPos ); // delete the empty one
                     }
                 }
@@ -1908,12 +1909,12 @@ static void lcl_CopyBoxToDoc(FndBox_ const& rFndBox, CpyPara *const pCpyPara)
                     aBoxAttrSet.Put(rFndBox.GetBox()->GetFrameFormat()->GetAttrSet());
                     if( aBoxAttrSet.Count() )
                     {
-                        const SfxPoolItem* pItem;
+                        const SwTableBoxNumFormat* pItem;
                         SvNumberFormatter* pN = pCpyPara->rDoc.GetNumberFormatter( false );
-                        if( pN && pN->HasMergeFormatTable() && SfxItemState::SET == aBoxAttrSet.
-                            GetItemState( RES_BOXATR_FORMAT, false, &pItem ) )
+                        if( pN && pN->HasMergeFormatTable() && (pItem = aBoxAttrSet.
+                            GetItemIfSet( RES_BOXATR_FORMAT, false )) )
                         {
-                            sal_uLong nOldIdx = static_cast<const SwTableBoxNumFormat*>(pItem)->GetValue();
+                            sal_uLong nOldIdx = pItem->GetValue();
                             sal_uLong nNewIdx = pN->GetMergeFormatIndex( nOldIdx );
                             if( nNewIdx != nOldIdx )
                                 aBoxAttrSet.Put( SwTableBoxNumFormat( nNewIdx ));
@@ -1926,7 +1927,7 @@ static void lcl_CopyBoxToDoc(FndBox_ const& rFndBox, CpyPara *const pCpyPara)
                         *rFndBox.GetBox()->GetSttNd()->EndOfSectionNode() );
                 SwNodeIndex aInsIdx( *pBox->GetSttNd(), 1 );
 
-                pFromDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(aCpyRg, aInsIdx, nullptr, false);
+                pFromDoc->GetDocumentContentOperationsManager().CopyWithFlyInFly(aCpyRg, aInsIdx.GetNode(), nullptr, false);
                 // Delete the initial TextNode
                 pCpyPara->rDoc.GetNodes().Delete( aInsIdx );
             }
@@ -2086,7 +2087,7 @@ bool SwTable::MakeCopy( SwDoc& rInsDoc, const SwPosition& rPos,
     if( !pNewTable )
         return false;
 
-    SwNodeIndex aIdx( rPos.nNode, -1 );
+    SwNodeIndex aIdx( rPos.GetNode(), -1 );
     SwTableNode* pTableNd = aIdx.GetNode().FindTableNode();
     ++aIdx;
     OSL_ENSURE( pTableNd, "Where is the TableNode now?" );
@@ -2127,7 +2128,7 @@ bool SwTable::MakeCopy( SwDoc& rInsDoc, const SwPosition& rPos,
 
     // Also copy Names or enforce a new unique one
     if( bCpyName )
-        pNewTable->GetFrameFormat()->SetName( GetFrameFormat()->GetName() );
+        pNewTable->GetFrameFormat()->SetFormatName( GetFrameFormat()->GetName() );
 
     CpyTabFrames aCpyFormat;
     CpyPara aPara( pTableNd, 1, aCpyFormat );
@@ -2199,7 +2200,7 @@ bool SwTable::MakeCopy( SwDoc& rInsDoc, const SwPosition& rPos,
     // Clean up
     pNewTable->GCLines();
 
-    pTableNd->MakeOwnFrames( &aIdx );  // re-generate the Frames
+    pTableNd->MakeOwnFrames();  // re-generate the Frames
 
     CHECKTABLELAYOUT
 
@@ -2613,7 +2614,6 @@ bool SwTable::SetColWidth( SwTableBox& rCurrentBox, TableChgWidthHeightType eTyp
     const SwFormatFrameSize& rSz = GetFrameFormat()->GetFrameSize();
     const SvxLRSpaceItem& rLR = GetFrameFormat()->GetLRSpace();
 
-    std::unique_ptr<FndBox_> xFndBox;                // for insertion/deletion
     bool bBigger,
         bRet = false,
         bLeft = TableChgWidthHeightType::ColLeft == extractPosition( eType ) ||
@@ -2912,22 +2912,6 @@ bool SwTable::SetColWidth( SwTableBox& rCurrentBox, TableChgWidthHeightType eTyp
         default: break;
     }
 
-    if( xFndBox )
-    {
-        // Clean up the structure of all Lines
-        GCLines();
-
-        // Update Layout
-        if( !bBigger || xFndBox->AreLinesToRestore( *this ) )
-            xFndBox->MakeFrames( *this );
-
-        // TL_CHART2: it is currently unclear if sth has to be done here.
-        // The function name hints that nothing needs to be done, on the other
-        // hand there is a case where sth gets deleted.  :-(
-
-        xFndBox.reset();
-    }
-
 #if defined DBG_UTIL
     if( bRet )
     {
@@ -3055,7 +3039,6 @@ bool SwTable::SetRowHeight( SwTableBox& rCurrentBox, TableChgWidthHeightType eTy
     while( pBaseLine->GetUpper() )
         pBaseLine = pBaseLine->GetUpper()->GetUpper();
 
-    std::unique_ptr<FndBox_> xFndBox;                // for insertion/deletion
     bool bBigger,
         bRet = false,
         bTop = TableChgWidthHeightType::CellTop == extractPosition( eType );
@@ -3196,26 +3179,11 @@ bool SwTable::SetRowHeight( SwTableBox& rCurrentBox, TableChgWidthHeightType eTy
                                         nRelDiff, ppUndo );
 
                     m_eTableChgMode = eOld;
-                    xFndBox.reset();
                 }
             }
         }
         break;
         default: break;
-    }
-
-    if( xFndBox )
-    {
-        // then clean up the structure of all Lines
-        GCLines();
-
-        // Update Layout
-        if( bBigger || xFndBox->AreLinesToRestore( *this ) )
-            xFndBox->MakeFrames( *this );
-
-        // TL_CHART2: it is currently unclear if sth has to be done here.
-
-        xFndBox.reset();
     }
 
     CHECKTABLELAYOUT

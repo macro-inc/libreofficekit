@@ -21,10 +21,14 @@
 #include <algorithm>
 #include <string_view>
 
+#include <o3tl/string_view.hxx>
 #include <sal/types.h>
 #include <rtl/ustring.hxx>
 #include <svtools/htmltokn.h>
 #include <svtools/htmlkywd.hxx>
+
+// If this is odd, then getOnToken() breaks.
+static_assert(static_cast<sal_Int16>(HtmlTokenId::ABBREVIATION_ON) % 2 == 0);
 
 namespace {
 
@@ -43,12 +47,12 @@ static bool sortCompare(const TokenEntry<T> & lhs, const TokenEntry<T> & rhs)
     return lhs.sToken < rhs.sToken;
 }
 template<typename T>
-static bool findCompare(const TokenEntry<T> & lhs, const OUString & rhs)
+static bool findCompare(const TokenEntry<T> & lhs, std::u16string_view rhs)
 {
     return lhs.sToken < rhs;
 }
 template<typename T, size_t LEN>
-static T search(TokenEntry<T> const (&dataTable)[LEN], const OUString & key, T notFoundValue)
+static T search(TokenEntry<T> const (&dataTable)[LEN], std::u16string_view key, T notFoundValue)
 {
     auto findIt = std::lower_bound( std::begin(dataTable), std::end(dataTable),
                                      key, findCompare<T> );
@@ -63,6 +67,7 @@ using HTML_TokenEntry = TokenEntry<HtmlTokenId>;
 HTML_TokenEntry const aHTMLTokenTab[] = {
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_comment),         HtmlTokenId::COMMENT},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_doctype),         HtmlTokenId::DOCTYPE},
+    {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_cdata),           HtmlTokenId::CDATA},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_anchor),          HtmlTokenId::ANCHOR_ON},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_abbreviation),    HtmlTokenId::ABBREVIATION_ON},  // HTML 3.0
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_acronym),         HtmlTokenId::ACRONYM_ON},   // HTML 3.0
@@ -174,7 +179,7 @@ HTML_TokenEntry const aHTMLTokenTab[] = {
 };
 
 
-HtmlTokenId GetHTMLToken( const OUString& rName )
+HtmlTokenId GetHTMLToken( std::u16string_view rName )
 {
     static bool bSortKeyWords = false;
     if( !bSortKeyWords )
@@ -183,7 +188,7 @@ HtmlTokenId GetHTMLToken( const OUString& rName )
         bSortKeyWords = true;
     }
 
-    if( rName.startsWith( OOO_STRING_SVTOOLS_HTML_comment ))
+    if( o3tl::starts_with( rName, u"" OOO_STRING_SVTOOLS_HTML_comment ))
         return HtmlTokenId::COMMENT;
 
     return search( aHTMLTokenTab, rName, HtmlTokenId::NONE);
@@ -198,6 +203,7 @@ static HTML_CharEntry aHTMLCharNameTab[] = {
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_lt),             60},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_gt),             62},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_amp),        38},
+    {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_apos),        39},
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_quot),       34},
 
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_C_Agrave),        192},
@@ -459,7 +465,7 @@ static HTML_CharEntry aHTMLCharNameTab[] = {
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_S_diams),     9830}
 };
 
-sal_Unicode GetHTMLCharName( const OUString& rName )
+sal_Unicode GetHTMLCharName( std::u16string_view rName )
 {
     if( !bSortCharKeyWords )
     {
@@ -631,7 +637,7 @@ static HTML_OptionEntry aHTMLOptionTab[] = {
     {std::u16string_view(u"" OOO_STRING_SVTOOLS_HTML_O_start),     HtmlOptionId::START}, // Netscape 2.0 vs IExplorer 2.0
 };
 
-HtmlOptionId GetHTMLOption( const OUString& rName )
+HtmlOptionId GetHTMLOption( std::u16string_view rName )
 {
     if( !bSortOptionKeyWords )
     {

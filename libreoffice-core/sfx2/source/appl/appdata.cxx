@@ -20,15 +20,11 @@
 #include <config_features.h>
 
 #include <appdata.hxx>
-#include <sfxpicklist.hxx>
 #include <sfx2/tbxctrl.hxx>
 #include <sfx2/stbitem.hxx>
 #include <sfx2/childwin.hxx>
-#include <sfx2/dispatch.hxx>
 #include <sfx2/doctempl.hxx>
-#include <sfx2/fcontnr.hxx>
 #include <sfx2/module.hxx>
-#include <sfx2/msgpool.hxx>
 #include <sfx2/sidebar/Theme.hxx>
 #include <sfx2/objsh.hxx>
 #include <appbaslib.hxx>
@@ -47,6 +43,7 @@ using ::com::sun::star::uno::XInterface;
 
 static BasicDLL* pBasic = nullptr;
 
+#if HAVE_FEATURE_SCRIPTING
 class SfxBasicManagerCreationListener : public ::basic::BasicManagerCreationListener
 {
 private:
@@ -72,6 +69,7 @@ void SfxBasicManagerCreationListener::onBasicManagerCreated( const Reference< XM
     if ( _rxForDocument == nullptr )
         m_rAppData.OnApplicationBasicManagerCreated( _rBasicManager );
 }
+#endif
 
 SfxAppData_Impl::SfxAppData_Impl()
     : pPool(nullptr)
@@ -79,7 +77,9 @@ SfxAppData_Impl::SfxAppData_Impl()
     , nDocModalMode(0)
     , nRescheduleLocks(0)
     , pBasicManager( new SfxBasicManagerHolder )
+#if HAVE_FEATURE_SCRIPTING
     , pBasMgrListener( new SfxBasicManagerCreationListener( *this ) )
+#endif
     , pViewFrame( nullptr )
     , bDowning( true )
     , bInQuit( false )
@@ -124,7 +124,7 @@ void SfxAppData_Impl::OnApplicationBasicManagerCreated( BasicManager& _rBasicMan
     // global constants, additionally to the ones already added by createApplicationBasicManager:
     // ThisComponent
     Reference< XInterface > xCurrentComponent = SfxObjectShell::GetCurrentComponent();
-    _rBasicManager.SetGlobalUNOConstant( "ThisComponent", makeAny( xCurrentComponent ) );
+    _rBasicManager.SetGlobalUNOConstant( "ThisComponent", css::uno::Any( xCurrentComponent ) );
 #endif
 }
 

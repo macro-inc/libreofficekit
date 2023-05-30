@@ -26,6 +26,7 @@
 
 #include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <com/sun/star/util/SortField.hpp>
 
@@ -162,22 +163,22 @@ void SAL_CALL ScXMLSortContext::endFastElement( sal_Int32 /*nElement*/ )
     pDatabaseRangeContext->SetSortSequence(aSortDescriptor);
 }
 
-void ScXMLSortContext::AddSortField(const OUString& sFieldNumber, const OUString& sDataType, std::u16string_view sOrder)
+void ScXMLSortContext::AddSortField(std::u16string_view sFieldNumber, std::u16string_view sDataType, std::u16string_view sOrder)
 {
     util::SortField aSortField;
-    aSortField.Field = sFieldNumber.toInt32();
+    aSortField.Field = o3tl::toInt32(sFieldNumber);
     if (IsXMLToken(sOrder, XML_ASCENDING))
         aSortField.SortAscending = true;
     else
         aSortField.SortAscending = false;
-    if (sDataType.getLength() > 8)
+    if (sDataType.size() > 8)
     {
-        OUString sTemp = sDataType.copy(0, 8);
-        if (sTemp == "UserList")
+        std::u16string_view sTemp = sDataType.substr(0, 8);
+        if (sTemp == u"UserList")
         {
             bEnabledUserList = true;
-            sTemp = sDataType.copy(8);
-            nUserListIndex = static_cast<sal_Int16>(sTemp.toInt32());
+            sTemp = sDataType.substr(8);
+            nUserListIndex = static_cast<sal_Int16>(o3tl::toInt32(sTemp));
         }
         else
         {

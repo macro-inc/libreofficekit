@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <hints.hxx>
 #include <osl/diagnose.h>
 #include <o3tl/safeint.hxx>
@@ -61,7 +63,6 @@
 #include <layact.hxx>
 #include <ndtxt.hxx>
 #include <swtable.hxx>
-#include <tblsel.hxx>
 
 // RotateFlyFrame3
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
@@ -374,6 +375,12 @@ void SwFrame::CheckDir( SvxFrameDirection nDir, bool bVert, bool bOnlyBiDi, bool
                 mbVertLR = true;
                 mbVertLRBT = true;
             }
+            else if (nDir == SvxFrameDirection::Vertical_RL_TB90)
+            {
+                // not yet implemented, render as RL_TB
+                mbVertLR = false;
+                mbVertLRBT = false;
+            }
         }
     }
     else
@@ -448,13 +455,12 @@ void SwTabFrame::CheckDirection( bool bVert )
 void SwCellFrame::CheckDirection( bool bVert )
 {
     const SwFrameFormat* pFormat = GetFormat();
-    const SfxPoolItem* pItem;
+    const SvxFrameDirectionItem* pFrameDirItem;
     // Check if the item is set, before actually
     // using it. Otherwise the dynamic pool default is used, which may be set
     // to LTR in case of OOo 1.0 documents.
-    if( pFormat && SfxItemState::SET == pFormat->GetItemState( RES_FRAMEDIR, true, &pItem ) )
+    if( pFormat && (pFrameDirItem = pFormat->GetItemIfSet( RES_FRAMEDIR ) ) )
     {
-        const SvxFrameDirectionItem* pFrameDirItem = static_cast<const SvxFrameDirectionItem*>(pItem);
         const SwViewShell *pSh = getRootFrame()->GetCurrShell();
         const bool bBrowseMode = pSh && pSh->GetViewOptions()->getBrowseMode();
         CheckDir( pFrameDirItem->GetValue(), bVert, false, bBrowseMode );
@@ -1727,7 +1733,7 @@ SwTwips SwFrame::AdjustNeighbourhood( SwTwips nDiff, bool bTst )
 
             //Trigger a repaint if necessary.
             std::unique_ptr<SvxBrushItem> aBack(pUp->GetFormat()->makeBackgroundBrushItem());
-            const SvxGraphicPosition ePos = aBack ? aBack->GetGraphicPos() : GPOS_NONE;
+            const SvxGraphicPosition ePos = aBack->GetGraphicPos();
             if ( ePos != GPOS_NONE && ePos != GPOS_TILED )
                 pViewShell->InvalidateWindows( pUp->getFrameArea() );
 
@@ -2784,12 +2790,13 @@ SwTwips SwLayoutFrame::GrowFrame( SwTwips nDist, bool bTst, bool bInfo )
                 InvaPercentLowers( nReal );
 
             std::unique_ptr<SvxBrushItem> aBack(GetFormat()->makeBackgroundBrushItem());
-            const SvxGraphicPosition ePos = aBack ? aBack->GetGraphicPos() : GPOS_NONE;
+            const SvxGraphicPosition ePos = aBack->GetGraphicPos();
             if ( GPOS_NONE != ePos && GPOS_TILED != ePos )
                 SetCompletePaint();
         }
     }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( bMoveAccFrame && IsAccessibleFrame() )
     {
         SwRootFrame *pRootFrame = getRootFrame();
@@ -2799,6 +2806,11 @@ SwTwips SwLayoutFrame::GrowFrame( SwTwips nDist, bool bTst, bool bInfo )
             pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( this, aOldFrame );
         }
     }
+#else
+    (void)bMoveAccFrame;
+    (void)aOldFrame;
+#endif
+
     return nReal;
 }
 
@@ -2934,6 +2946,7 @@ SwTwips SwLayoutFrame::ShrinkFrame( SwTwips nDist, bool bTst, bool bInfo )
             AdjustNeighbourhood( nReal - nShrink );
     }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if( bMoveAccFrame && IsAccessibleFrame() )
     {
         SwRootFrame *pRootFrame = getRootFrame();
@@ -2943,6 +2956,11 @@ SwTwips SwLayoutFrame::ShrinkFrame( SwTwips nDist, bool bTst, bool bInfo )
             pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( this, aOldFrame );
         }
     }
+#else
+    (void)aOldFrame;
+    (void)bMoveAccFrame;
+#endif
+
     if ( !bTst && (IsCellFrame() || IsColumnFrame() ? nReal : nRealDist) )
     {
         SwPageFrame *pPage = FindPageFrame();
@@ -2973,7 +2991,7 @@ SwTwips SwLayoutFrame::ShrinkFrame( SwTwips nDist, bool bTst, bool bInfo )
             if (pFormat)
             {
                 std::unique_ptr<SvxBrushItem> aBack(pFormat->makeBackgroundBrushItem());
-                const SvxGraphicPosition ePos = aBack ? aBack->GetGraphicPos() : GPOS_NONE;
+                const SvxGraphicPosition ePos = aBack->GetGraphicPos();
                 if ( GPOS_NONE == ePos || GPOS_TILED == ePos )
                     bCompletePaint = false;
             }
@@ -4472,7 +4490,7 @@ static void UnHideRedlines(SwRootFrame & rLayout,
             // be created in UI but by import filters...
             if (pRedline
                 && pRedline->GetType() == RedlineType::Delete
-                && &pRedline->Start()->nNode.GetNode() == &rNode)
+                && &pRedline->Start()->GetNode() == &rNode)
             {
                 for (SwNodeOffset j = rNode.GetIndex(); j <= rNode.EndOfSectionIndex(); ++j)
                 {
@@ -4485,8 +4503,7 @@ static void UnHideRedlines(SwRootFrame & rLayout,
                 pTableNd->DelFrames(&rLayout);
                 if ( !pTableNd->GetTable().IsDeleted() )
                 {
-                    SwNodeIndex aIdx( *pTableNd->EndOfSectionNode(), 1 );
-                    pTableNd->MakeOwnFrames(&aIdx);
+                    pTableNd->MakeOwnFrames();
                 }
             }
         }
@@ -4495,8 +4512,7 @@ static void UnHideRedlines(SwRootFrame & rLayout,
         {
             SwTableNode * pTableNd = rNode.GetTableNode();
             pTableNd->DelFrames(&rLayout);
-            SwNodeIndex aIdx( *pTableNd->EndOfSectionNode(), 1 );
-            pTableNd->MakeOwnFrames(&aIdx);
+            pTableNd->MakeOwnFrames();
         }
 
         if (!rNode.IsCreateFrameWhenHidingRedlines())
@@ -4527,11 +4543,9 @@ static void UnHideRedlines(SwRootFrame & rLayout,
                 }
                 // call MakeFrames once, because sections/tables
                 // InsertCnt_ also checks for hidden sections
-                SwNodeIndex const start(rNodes, i);
-                SwNodeIndex const end(rNodes, j);
                 {
                     sw::FlyCreationSuppressor aSuppressor(false);
-                    ::MakeFrames(rLayout.GetFormat()->GetDoc(), start, end);
+                    ::MakeFrames(rLayout.GetFormat()->GetDoc(), *rNodes[i], *rNodes[j]);
                 }
                 i = j - 1; // will be incremented again
             }
@@ -4692,23 +4706,26 @@ void SwRootFrame::SetHideRedlines(bool const bHideRedlines)
     }
     // TODO: remove temporary ShowBoth
     sw::FieldmarkMode const eMode(m_FieldmarkMode);
+    sw::ParagraphBreakMode const ePBMode(m_ParagraphBreakMode);
     if (HasMergedParas())
     {
         m_FieldmarkMode = sw::FieldmarkMode::ShowBoth;
+        m_ParagraphBreakMode = sw::ParagraphBreakMode::Shown;
         mbHideRedlines = false;
         UnHide(*this);
     }
-    if (bHideRedlines || eMode != m_FieldmarkMode)
+    if (bHideRedlines || eMode != m_FieldmarkMode || ePBMode != m_ParagraphBreakMode)
     {
         m_FieldmarkMode = eMode;
+        m_ParagraphBreakMode = ePBMode;
         mbHideRedlines = bHideRedlines;
         UnHide(*this);
     }
 }
 
-void SwRootFrame::SetFieldmarkMode(sw::FieldmarkMode const eMode)
+void SwRootFrame::SetFieldmarkMode(sw::FieldmarkMode const eFMMode, sw::ParagraphBreakMode const ePBMode)
 {
-    if (eMode == m_FieldmarkMode)
+    if (eFMMode == m_FieldmarkMode && ePBMode == m_ParagraphBreakMode)
     {
         return;
     }
@@ -4718,14 +4735,23 @@ void SwRootFrame::SetFieldmarkMode(sw::FieldmarkMode const eMode)
     {
         mbHideRedlines = false;
         m_FieldmarkMode = sw::FieldmarkMode::ShowBoth;
+        m_ParagraphBreakMode = sw::ParagraphBreakMode::Shown;
         UnHide(*this);
     }
-    if (eMode != sw::FieldmarkMode::ShowBoth || isHideRedlines)
+    if (isHideRedlines || eFMMode != sw::FieldmarkMode::ShowBoth || ePBMode == sw::ParagraphBreakMode::Hidden)
     {
         mbHideRedlines = isHideRedlines;
-        m_FieldmarkMode = eMode;
+        m_FieldmarkMode = eFMMode;
+        m_ParagraphBreakMode = ePBMode;
         UnHide(*this);
     }
+}
+
+bool SwRootFrame::HasMergedParas() const
+{
+    return IsHideRedlines()
+        || GetFieldmarkMode() != sw::FieldmarkMode::ShowBoth
+        || GetParagraphBreakMode() == sw::ParagraphBreakMode::Hidden;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

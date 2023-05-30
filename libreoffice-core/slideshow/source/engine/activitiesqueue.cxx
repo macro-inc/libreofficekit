@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <sal/log.hxx>
 
@@ -28,6 +28,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 
 
 using namespace ::com::sun::star;
@@ -35,8 +36,8 @@ using namespace ::com::sun::star;
 namespace slideshow::internal
 {
         ActivitiesQueue::ActivitiesQueue(
-          const std::shared_ptr< ::canvas::tools::ElapsedTime >& pPresTimer ) :
-            mpTimer( pPresTimer ),
+          std::shared_ptr< ::canvas::tools::ElapsedTime > pPresTimer ) :
+            mpTimer(std::move( pPresTimer )),
             maCurrentActivitiesWaiting(),
             maCurrentActivitiesReinsert(),
             maDequeuedActivities()

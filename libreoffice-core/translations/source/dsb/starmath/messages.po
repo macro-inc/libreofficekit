@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:51+0200\n"
-"PO-Revision-Date: 2022-07-04 16:15+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-02-19 19:03+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian <https://translations.documentfoundation.org/projects/libo_ui-master/starmathmessages/dsb/>\n"
 "Language: dsb\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n % 100 == 1) ? 0 : ((n % 100 == 2) ? 1 : ((n % 100 == 3 || n % 100 == 4) ? 2 : 3));\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1562269165.000000\n"
 
 #. GrDhX
@@ -998,7 +998,7 @@ msgstr "Powšykny operator indeks dołojce"
 #: starmath/inc/strings.hrc:116
 msgctxt "RID_OPER_TOX_HELP"
 msgid "General operator Superscript Top"
-msgstr "Powšykny operator indeks górjojce"
+msgstr "Powšykny operator z górneju granicu"
 
 #. Pch4L
 #: starmath/inc/strings.hrc:117
@@ -1766,7 +1766,7 @@ msgstr "Indeks dołojce wugódnośiś"
 #: starmath/inc/strings.hrc:244
 msgctxt "RID_EVALUATE_TOX_HELP"
 msgid "Evaluate Superscript Top"
-msgstr "Indeks górjejce wugódnośiś"
+msgstr "Z górneju granicu wugódnośiś"
 
 #. 6NGAj
 #: starmath/inc/strings.hrc:245
@@ -1778,7 +1778,7 @@ msgstr "Indeks wugódnośiś"
 #: starmath/inc/strings.hrc:246
 msgctxt "RID_RSUBX_HELP"
 msgid "Subscript Right"
-msgstr "Dołoj stajony napšawo"
+msgstr "Nižej stajony napšawo"
 
 #. tAk6B
 #: starmath/inc/strings.hrc:247
@@ -1790,25 +1790,25 @@ msgstr "Eksponent"
 #: starmath/inc/strings.hrc:248
 msgctxt "RID_LSUBX_HELP"
 msgid "Subscript Left"
-msgstr "dołoj stajiś nalěwo"
+msgstr "nižej stajiś nalěwo"
 
 #. diRUE
 #: starmath/inc/strings.hrc:249
 msgctxt "RID_LSUPX_HELP"
 msgid "Superscript Left"
-msgstr "górjej stajiś nalěwo"
+msgstr "wušej stajiś nalěwo"
 
 #. cA8up
 #: starmath/inc/strings.hrc:250
 msgctxt "RID_CSUBX_HELP"
 msgid "Subscript Bottom"
-msgstr "dołoj stajiś dołojce"
+msgstr "nižej stajiś dołojce"
 
 #. BmFm5
 #: starmath/inc/strings.hrc:251
 msgctxt "RID_CSUPX_HELP"
 msgid "Superscript Top"
-msgstr "górjej stajiś górjejce"
+msgstr "wušej stajiś górjejce"
 
 #. WTF6i
 #: starmath/inc/strings.hrc:252
@@ -1928,7 +1928,7 @@ msgstr "Epsilon nawopak"
 #: starmath/inc/strings.hrc:271
 msgctxt "RID_WP_HELP"
 msgid "Weierstrass p"
-msgstr "Weierstrass p"
+msgstr "Weierstraß p"
 
 #. f9sfv
 #: starmath/inc/strings.hrc:272
@@ -2612,7 +2612,7 @@ msgstr "Dwójne wusměrjenje njejo dowólone"
 #: starmath/inc/strings.hrc:387
 msgctxt "RID_ERR_DOUBLESUBSUPSCRIPT"
 msgid "Double sub/superscripts is not allowed"
-msgstr "Dwójne górjejstajenje/dołojstajenje njejo dowólone"
+msgstr "Dwójne wušejstajenje/nižejstajenje njejo dowólone"
 
 #. U6U5Z
 #: starmath/inc/strings.hrc:388
@@ -2807,22 +2807,16 @@ msgid "Unknown"
 msgstr "Njeznaty"
 
 #. znrh2
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:205
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:208
 msgctxt "catalogdialog|extended_tip|preview"
 msgid "Displays a preview of the current selection."
 msgstr "Pokazujo pśeglěd aktualnego wuběrka."
 
 #. DSYgZ
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:246
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:249
 msgctxt "catalogdialog|extended_tip|CatalogDialog"
 msgid "Opens the Symbols dialog, in which you can select a symbol to insert in the formula."
 msgstr "Wócynja dialog Symbole, w kótaremž móžośo symbol wubraś, aby jen do formule zasajźił."
-
-#. P3rFo
-#: starmath/uiconfig/smath/ui/dockingelements.ui:24
-msgctxt "dockingelements|ElementCategories|tooltip_text"
-msgid "Element categories"
-msgstr "Elementowe kategorije"
 
 #. 4SGdP
 #: starmath/uiconfig/smath/ui/fontdialog.ui:16
@@ -3262,6 +3256,12 @@ msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "These changes will apply for all new formulas."
 msgstr "Toś te změny se na wšykne nowe formule nałožyju."
 
+#. XBBFa
+#: starmath/uiconfig/smath/ui/sidebarelements_math.ui:24
+msgctxt "mathelementspanel|ElementCategories|tooltip_text"
+msgid "Element categories"
+msgstr "Elementowe kategorije"
+
 #. 6EqHz
 #: starmath/uiconfig/smath/ui/smathsettings.ui:41
 msgctxt "smathsettings|title"
@@ -3519,7 +3519,7 @@ msgstr "Wótkłon"
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:867
 msgctxt "spacingdialog|2label1"
 msgid "_Superscript:"
-msgstr "_Górjej stajony:"
+msgstr "W_ušej stajony:"
 
 #. 3uzYA
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:880

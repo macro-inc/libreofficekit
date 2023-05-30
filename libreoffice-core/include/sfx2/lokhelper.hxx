@@ -23,6 +23,7 @@
 #include <rtl/string.hxx>
 #include <optional>
 #include <string_view>
+#include <sfx2/app.hxx>
 
 struct SFX2_DLLPUBLIC LokMouseEventData
 {
@@ -46,9 +47,13 @@ struct SFX2_DLLPUBLIC LokMouseEventData
 
 #include <boost/property_tree/ptree_fwd.hpp>
 
+namespace com::sun::star::ui { struct ContextChangeEventObject; };
+
 class SFX2_DLLPUBLIC SfxLokHelper
 {
 public:
+    /// Gets the short cut accelerators.
+    static std::unordered_map<OUString, css::uno::Reference<com::sun::star::ui::XAcceleratorConfiguration>>& getAcceleratorConfs();
     /// Create a new view shell from the current view frame.
     /// This assumes a single document is ever loaded.
     static int createView();
@@ -78,6 +83,8 @@ public:
     static void setViewLanguage(int nId, const OUString& rBcp47LanguageTag);
     /// Set the default language for views.
     static void setDefaultLanguage(const OUString& rBcp47LanguageTag);
+    /// Enable/Disable AT support for the given view.
+    static void setAccessibilityState(int nId, bool nEnabled);
     /// Get the language used by the loading view (used for all save operations).
     static const LanguageTag & getLoadLanguage();
     /// Set the language used by the loading view (used for all save operations).
@@ -88,6 +95,17 @@ public:
     static LOKDeviceFormFactor getDeviceFormFactor();
     /// Set the device form factor that should be used for a new view.
     static void setDeviceFormFactor(std::u16string_view rDeviceFormFactor);
+
+    /// Set timezone of the given view.
+    /// @isSet true to use @rTimezone, even if it's empty. Otherwise, no timezone.
+    /// @rTimezone the value to set (which could be empty).
+    static void setDefaultTimezone(bool isSet, const OUString& rTimezone);
+    /// Get timezone of the given view. See @setDefaultTimezone.
+    static std::pair<bool, OUString> getDefaultTimezone();
+    /// Set the timezone of the given view.
+    static void setViewTimezone(int nId, bool isSet, const OUString& rTimezone);
+    /// Get the timezone of the given view.
+    static std::pair<bool, OUString> getViewTimezone(int nId);
 
     /// Iterate over any view shell, except pThisViewShell, passing it to the f function.
     template<typename ViewShellType, typename FunctionType>
@@ -125,7 +143,10 @@ public:
     static void notifyAllViews(int nType, const OString& rPayload);
 
     /// Notify about the editing context change.
-    static void notifyContextChange(SfxViewShell const* pViewShell, const OUString& aApplication, const OUString& aContext);
+    static void notifyContextChange(const css::ui::ContextChangeEventObject& rEvent);
+
+    /// Emits an LOK_CALLBACK_VIEW_RENDER_STATE
+    static void notifyViewRenderState(SfxViewShell const* pViewShell, vcl::ITiledRenderable* pDoc);
 
     // Notify about the given type needing an update.
     static void notifyUpdate(SfxViewShell const* pViewShell, int nType);

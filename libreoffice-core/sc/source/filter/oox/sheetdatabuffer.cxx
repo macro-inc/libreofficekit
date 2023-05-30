@@ -120,6 +120,8 @@ void SheetDataBuffer::setStringCell( const CellModel& rModel, const RichStringRe
 {
     OSL_ENSURE( rxString, "SheetDataBuffer::setStringCell - missing rich string object" );
     const oox::xls::Font* pFirstPortionFont = getStyles().getFontFromCellXf( rModel.mnXfId ).get();
+    const Xf* pXf = getStyles().getCellXf( rModel.mnXfId ).get();
+    bool bSingleLine = pXf ? !rxString->isPreserveSpace() && !pXf->getAlignment().getModel().mbWrapText : false;
     OUString aText;
     if( rxString->extractPlainString( aText, pFirstPortionFont ) )
     {
@@ -127,7 +129,7 @@ void SheetDataBuffer::setStringCell( const CellModel& rModel, const RichStringRe
     }
     else
     {
-        putRichString( rModel.maCellAddr, *rxString, pFirstPortionFont );
+        putRichString( rModel.maCellAddr, *rxString, pFirstPortionFont, bSingleLine );
         setCellFormat( rModel );
     }
 }
@@ -792,7 +794,7 @@ void SheetDataBuffer::applyCellMerging( const ScRange& rRange )
         lcl_SetBorderLine( rDoc, rRange, getSheetIndex(), SvxBoxItemLine::BOTTOM );
     // do merge
     if( bMultiCol || bMultiRow )
-        rDoc.DoMerge( getSheetIndex(), rStart.Col(), rStart.Row(), rEnd.Col(), rEnd.Row() );
+        rDoc.DoMerge( rStart.Col(), rStart.Row(), rEnd.Col(), rEnd.Row(), getSheetIndex() );
 }
 
 } // namespace oox

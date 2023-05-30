@@ -21,6 +21,7 @@
 
 #include "swatrset.hxx"
 #include "swtypes.hxx"
+#include <utility>
 #include <vcl/vclptr.hxx>
 
 class SwFormat;
@@ -75,33 +76,7 @@ public:
     SwFormatChg( SwFormat *pFormat );
 };
 
-class SwInsText final : public SwMsgPoolItem
-{
-public:
-    sal_Int32 nPos;
-    sal_Int32 nLen;
-    bool isInsideFieldmarkCommand;
-    bool isInsideFieldmarkResult;
 
-    SwInsText(sal_Int32 nP, sal_Int32 nL, bool isInFMCommand, bool isInFMResult);
-};
-
-class SwDelChr final : public SwMsgPoolItem
-{
-public:
-    sal_Int32 nPos;
-
-    SwDelChr( sal_Int32 nP );
-};
-
-class SwDelText final : public SwMsgPoolItem
-{
-public:
-    sal_Int32 nStart;
-    sal_Int32 nLen;
-
-    SwDelText( sal_Int32 nS, sal_Int32 nL );
-};
 
 namespace sw {
 
@@ -115,6 +90,34 @@ public:
     sal_Int32 nLen;
 
     MoveText(SwTextNode *pD, sal_Int32 nD, sal_Int32 nS, sal_Int32 nL);
+};
+
+class InsertText final : public SfxHint
+{
+public:
+    const sal_Int32 nPos;
+    const sal_Int32 nLen;
+    const bool isInsideFieldmarkCommand;
+    const bool isInsideFieldmarkResult;
+
+    InsertText(sal_Int32 nP, sal_Int32 nL, bool isInFMCommand, bool isInFMResult);
+};
+
+class DeleteText final : public SfxHint
+{
+public:
+    const sal_Int32 nStart;
+    const sal_Int32 nLen;
+
+    DeleteText( sal_Int32 nS, sal_Int32 nL );
+};
+
+class DeleteChar final : public SfxHint
+{
+public:
+    const sal_Int32 m_nPos;
+
+    DeleteChar( const sal_Int32 nPos );
 };
 
 /// new delete redline is created
@@ -189,6 +192,19 @@ public:
     const SwTableBoxFormat& m_rNewFormat;
     const SwTableBox& m_rTableBox;
     TableBoxFormatChanged(const SwTableBoxFormat& rNewFormat, const SwTableBox& rTableBox) : m_rNewFormat(rNewFormat), m_rTableBox(rTableBox) {};
+};
+class NameChanged final : public SfxHint
+{
+public:
+    const OUString m_sOld;
+    const OUString m_sNew;
+    NameChanged(const OUString& rOld, const OUString& rNew) : SfxHint(SfxHintId::NameChanged), m_sOld(rOld), m_sNew(rNew) {};
+};
+class SectionHidden final: public SfxHint
+{
+public:
+    const bool m_isHidden;
+    SectionHidden(const bool isHidden = true) : SfxHint(SfxHintId::SwSectionHidden), m_isHidden(isHidden) {};
 };
 }
 
@@ -347,8 +363,8 @@ public:
 
     const OUString& GetString() const { return m_sStr; }
 
-    SwStringMsgPoolItem( sal_uInt16 nId, const OUString& rStr )
-        : SwMsgPoolItem( nId ), m_sStr( rStr )
+    SwStringMsgPoolItem( sal_uInt16 nId, OUString aStr )
+        : SwMsgPoolItem( nId ), m_sStr(std::move( aStr ))
     {}
 };
 #endif

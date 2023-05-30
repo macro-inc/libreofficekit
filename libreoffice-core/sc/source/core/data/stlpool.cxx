@@ -141,21 +141,19 @@ void ScStyleSheetPool::CopyStyleFrom( ScStyleSheetPool* pSrcPool,
     SfxItemSet& rDestSet = pDestSheet->GetItemSet();
     rDestSet.PutExtended( rSourceSet, SfxItemState::DONTCARE, SfxItemState::DEFAULT );
 
-    const SfxPoolItem* pItem;
     if ( eFamily == SfxStyleFamily::Page )
     {
         //  Set-Items
 
-        if ( rSourceSet.GetItemState( ATTR_PAGE_HEADERSET, false, &pItem ) == SfxItemState::SET )
+        if ( const SvxSetItem* pSetItem = rSourceSet.GetItemIfSet( ATTR_PAGE_HEADERSET, false ) )
         {
-            const SfxItemSet& rSrcSub = static_cast<const SvxSetItem*>(pItem)->GetItemSet();
+            const SfxItemSet& rSrcSub = pSetItem->GetItemSet();
             SfxItemSet aDestSub( *rDestSet.GetPool(), rSrcSub.GetRanges() );
             aDestSub.PutExtended( rSrcSub, SfxItemState::DONTCARE, SfxItemState::DEFAULT );
-            rDestSet.Put( SvxSetItem( ATTR_PAGE_HEADERSET, aDestSub ) );
         }
-        if ( rSourceSet.GetItemState( ATTR_PAGE_FOOTERSET, false, &pItem ) == SfxItemState::SET )
+        if ( const SvxSetItem* pSetItem = rSourceSet.GetItemIfSet( ATTR_PAGE_FOOTERSET, false ) )
         {
-            const SfxItemSet& rSrcSub = static_cast<const SvxSetItem*>(pItem)->GetItemSet();
+            const SfxItemSet& rSrcSub = pSetItem->GetItemSet();
             SfxItemSet aDestSub( *rDestSet.GetPool(), rSrcSub.GetRanges() );
             aDestSub.PutExtended( rSrcSub, SfxItemState::DONTCARE, SfxItemState::DEFAULT );
             rDestSet.Put( SvxSetItem( ATTR_PAGE_FOOTERSET, aDestSub ) );
@@ -165,10 +163,11 @@ void ScStyleSheetPool::CopyStyleFrom( ScStyleSheetPool* pSrcPool,
     {
         // number format exchange list has to be handled here, too
 
+        const SfxUInt32Item* pItem;
         if ( pDoc && pDoc->GetFormatExchangeList() &&
-             rSourceSet.GetItemState( ATTR_VALUE_FORMAT, false, &pItem ) == SfxItemState::SET )
+             (pItem = rSourceSet.GetItemIfSet( ATTR_VALUE_FORMAT, false )) )
         {
-            sal_uLong nOldFormat = static_cast<const SfxUInt32Item*>(pItem)->GetValue();
+            sal_uLong nOldFormat = pItem->GetValue();
             SvNumberFormatterIndexTable::const_iterator it = pDoc->GetFormatExchangeList()->find(nOldFormat);
             if (it != pDoc->GetFormatExchangeList()->end())
             {
@@ -409,14 +408,30 @@ ScStyleSheet* ScStyleSheetPool::FindCaseIns( const OUString& rName, SfxStyleFami
     CaseInsensitiveNamePredicate aPredicate(rName, eFam);
     std::vector<sal_Int32> aFoundPositions = GetIndexedStyleSheets().FindPositionsByPredicate(aPredicate);
 
+    ScStyleSheet* first = nullptr; // first case insensitive match found
     for (const auto& rPos : aFoundPositions)
     {
         SfxStyleSheetBase *pFound = GetStyleSheetByPositionInIndex(rPos);
         // we do not know what kind of sheets we have.
         if (pFound->isScStyleSheet())
-            return static_cast<ScStyleSheet*>(pFound);
+        {
+            if (pFound->GetName() == rName) // exact case sensitive match
+                return static_cast<ScStyleSheet*>(pFound);
+            if (!first)
+                first = static_cast<ScStyleSheet*>(pFound);
+        }
     }
-    return nullptr;
+    return first;
+}
+
+ScStyleSheet* ScStyleSheetPool::FindAutoStyle(const OUString& rName)
+{
+    ScStyleSheet* pStyleSheet = FindCaseIns(rName, SfxStyleFamily::Para);
+    if (!pStyleSheet)
+        if (auto pFound = Find(ScResId(STR_STYLENAME_STANDARD), SfxStyleFamily::Para))
+            if (pFound->isScStyleSheet()) // we do not know what kind of sheets we have
+                pStyleSheet = static_cast<ScStyleSheet*>(pFound);
+    return pStyleSheet;
 }
 
 void ScStyleSheetPool::setAllParaStandard()

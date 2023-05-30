@@ -94,6 +94,7 @@ void VBATest::testMiscVBAFunctions()
         "hex.vb",
         "hour.vb",
         "formatnumber.vb",
+        "formatpercent.vb",
         "iif.vb",
         "instr.vb",
         "instrrev.vb",
@@ -135,6 +136,8 @@ void VBATest::testMiscVBAFunctions()
         "strreverse.vb",
         "switch.vb",
         "tdf147089_idiv.vb",
+        "tdf147529_optional_parameters_msgbox.vb",
+        "tdf148358_non_ascii_names.vb",
         "timeserial.vb",
         "timevalue.vb",
         "trim.vb",
@@ -158,7 +161,7 @@ void VBATest::testMiscVBAFunctions()
     SvtSysLocaleOptions aLocalOptions;
     aLocalOptions.SetLocaleConfigString( aLocale.getBcp47() );
 
-    for ( size_t  i=0; i<SAL_N_ELEMENTS( macroSource ); ++i )
+    for ( size_t  i=0; i<std::size( macroSource ); ++i )
     {
         OUString sMacroURL = sMacroPathURL
                            + OUString::createFromAscii( macroSource[ i ] );
@@ -235,11 +238,11 @@ void VBATest::testMiscOLEStuff()
 
     uno::Sequence< uno::Any > aArgs
     {
-        uno::makeAny(sPath),
-        uno::makeAny(OUString(o3tl::toU(pODBCDriverName)))
+        uno::Any(sPath),
+        uno::Any(OUString(o3tl::toU(pODBCDriverName)))
     };
 
-    for ( sal_uInt32  i=0; i<SAL_N_ELEMENTS( macroSource ); ++i )
+    for ( sal_uInt32  i=0; i<std::size( macroSource ); ++i )
     {
         OUString sMacroURL = sMacroPathURL
                            + OUString::createFromAscii( macroSource[ i ] );

@@ -29,7 +29,7 @@
 #include <vcl/svapp.hxx>
 #include <unotools/securityoptions.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <dialmgr.hxx>
 #include "optinet2.hxx"
@@ -88,7 +88,7 @@ IMPL_LINK(SvxProxyTabPage, PortChangedHdl, weld::Entry&, rEdit, void)
     {
         std::unique_ptr<weld::MessageDialog> xErrorBox(Application::CreateMessageDialog(GetFrameWeld(),
                                                        VclMessageType::Warning, VclButtonsType::Ok,
-                                                       CuiResId( RID_SVXSTR_OPT_PROXYPORTS)));
+                                                       CuiResId(RID_CUISTR_OPT_PROXYPORTS)));
         xErrorBox->run();
     }
 }
@@ -204,6 +204,8 @@ void SvxProxyTabPage::ReadConfigData_Impl()
         nIntValue = *x;
         m_xHttpPortED->set_text( OUString::number( nIntValue ));
     }
+    else
+        m_xHttpPortED->set_text( "" );
 
     m_xHttpsProxyED->set_text( officecfg::Inet::Settings::ooInetHTTPSProxyName::get() );
     x = officecfg::Inet::Settings::ooInetHTTPSProxyPort::get();
@@ -212,6 +214,8 @@ void SvxProxyTabPage::ReadConfigData_Impl()
         nIntValue = *x;
         m_xHttpsPortED->set_text( OUString::number( nIntValue ));
     }
+    else
+        m_xHttpsPortED->set_text( "" );
 
     m_xFtpProxyED->set_text( officecfg::Inet::Settings::ooInetFTPProxyName::get() );
     x = officecfg::Inet::Settings::ooInetFTPProxyPort::get();
@@ -220,6 +224,8 @@ void SvxProxyTabPage::ReadConfigData_Impl()
         nIntValue = *x;
         m_xFtpPortED->set_text( OUString::number( nIntValue ));
     }
+    else
+        m_xFtpPortED->set_text( "" );
 
     m_xNoProxyForED->set_text( officecfg::Inet::Settings::ooInetNoProxy::get() );
 }

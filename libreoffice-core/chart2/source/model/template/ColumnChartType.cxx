@@ -139,6 +139,11 @@ uno::Reference< util::XCloneable > SAL_CALL ColumnChartType::createClone()
     return uno::Reference< util::XCloneable >( new ColumnChartType( *this ));
 }
 
+rtl::Reference< ChartType > ColumnChartType::cloneChartType() const
+{
+    return new ColumnChartType( *this );
+}
+
 // ____ XChartType ____
 OUString SAL_CALL ColumnChartType::getChartType()
 {
@@ -151,13 +156,14 @@ uno::Sequence< OUString > ColumnChartType::getSupportedPropertyRoles()
 }
 
 // ____ OPropertySet ____
-uno::Any ColumnChartType::GetDefaultValue( sal_Int32 nHandle ) const
+void ColumnChartType::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticColumnChartTypeDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL ColumnChartType::getInfoHelper()

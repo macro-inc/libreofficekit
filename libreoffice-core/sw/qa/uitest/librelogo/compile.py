@@ -1,8 +1,11 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
 
 from uitest.framework import UITestCase
 
@@ -108,6 +111,9 @@ class LibreLogoCompileTest(UITestCase):
                 ("a=RANDOM 40 + 120", "a=Random(40 + 120)"),
                 ("a=RANDOM(40) + 120", "a=Random(40) + 120"),
                 ("a=RANDOM [1, 2, 3]", "a=Random([1, 2, 3])"),
+                ("PRINT RANDOM 40", "Print(Random(40))"),
+                ("FORWARD RANDOM 40", "forward(Random(40))"),
+                ("FORWARD 10 + RANDOM 40 + RANDOM 100", "forward(10 + Random(40 + Random(100)))"),
                 ("a=[sin 90 + cos 15, cos 100 * x, sqrt 25 * 25]", "a=[sin(90 + cos(15)), cos(100 * x), sqrt(25 * 25)]"),
                 ("a=[sin 90 + cos 15, cos 100 * x, sqrt 25 * 25]", "a=[sin(90 + cos(15)), cos(100 * x), sqrt(25 * 25)]"),
                 ("a=[sin(90) + cos 15, cos(100) * x, sqrt(25) * 25]", "a=[sin(90) + cos(15), cos(100) * x, sqrt(25) * 25]"),

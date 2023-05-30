@@ -30,10 +30,6 @@ View3DModel::View3DModel(bool bMSO2007Doc) :
 {
 }
 
-View3DModel::~View3DModel()
-{
-}
-
 WallFloorModel::WallFloorModel()
 {
 }

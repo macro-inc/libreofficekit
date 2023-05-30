@@ -23,7 +23,6 @@
 #include <config_options.h>
 #include <vcl/dllapi.h>
 #include <vcl/ctrl.hxx>
-#include <vcl/toolbox.hxx>
 #include <vcl/EnumContext.hxx>
 #include <vcl/NotebookbarContextControl.hxx>
 
@@ -33,6 +32,7 @@ class TabPage;
 class Button;
 class PushButton;
 class ListBox;
+class ToolBox;
 
 #ifndef TAB_APPEND
 #define TAB_APPEND          (sal_uInt16(0xFFFF))
@@ -57,6 +57,7 @@ protected:
     sal_uInt16          mnActPageId;
     sal_uInt16          mnCurPageId;
     bool                mbFormat;
+    bool                mbShowTabs;
     bool                mbRestoreHelpId;
     bool                mbSmallInvalidate;
     bool                mbLayoutDirty;
@@ -187,6 +188,8 @@ public:
     virtual FactoryFunction GetUITestFactory() const override;
 
     virtual void queue_resize(StateChangedType eReason = StateChangedType::Layout) override;
+
+    virtual bool set_property(const OString &rKey, const OUString &rValue) override;
 
     virtual void DumpAsPropertyTree(tools::JsonWriter&) override;
 };

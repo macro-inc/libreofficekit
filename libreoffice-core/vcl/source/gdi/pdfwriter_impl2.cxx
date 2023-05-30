@@ -60,8 +60,9 @@ void PDFWriterImpl::implWriteGradient( const tools::PolyPolygon& i_rPolyPoly, co
                                        VirtualDevice* i_pDummyVDev, const vcl::PDFWriter::PlayMetafileContext& i_rContext )
 {
     GDIMetaFile        aTmpMtf;
+    Gradient aGradient(i_rGradient);
 
-    i_pDummyVDev->AddGradientActions( i_rPolyPoly.GetBoundRect(), i_rGradient, aTmpMtf );
+    aGradient.AddGradientActions( i_rPolyPoly.GetBoundRect(), aTmpMtf );
 
     m_rOuterFace.Push();
     m_rOuterFace.IntersectClipRegion( i_rPolyPoly.getB2DPolyPolygon() );
@@ -812,7 +813,7 @@ void PDFWriterImpl::playMetafile( const GDIMetaFile& i_rMtf, vcl::PDFExtOutDevDa
                 case MetaActionType::TEXTARRAY:
                 {
                     const MetaTextArrayAction* pA = static_cast<const MetaTextArrayAction*>(pAction);
-                    m_rOuterFace.DrawTextArray( pA->GetPoint(), pA->GetText(), pA->GetDXArray(), pA->GetIndex(), pA->GetLen() );
+                    m_rOuterFace.DrawTextArray( pA->GetPoint(), pA->GetText(), pA->GetDXArray(), pA->GetKashidaArray(), pA->GetIndex(), pA->GetLen() );
                 }
                 break;
 
@@ -1062,7 +1063,7 @@ public:
     // XMaterialHolder
     virtual uno::Any SAL_CALL getMaterial() override
     {
-        return uno::makeAny( sal_Int64(maID) );
+        return uno::Any( sal_Int64(maID) );
     }
 
     static EncHashTransporter* getEncHashTransporter( const uno::Reference< beans::XMaterialHolder >& );
@@ -1950,8 +1951,8 @@ void PDFWriterImpl::DrawHatchLine_DrawLine(const Point& rStartPoint, const Point
 static bool lcl_canUsePDFAxialShading(const Gradient& rGradient) {
     switch (rGradient.GetStyle())
     {
-        case GradientStyle::Linear:
-        case GradientStyle::Axial:
+        case css::awt::GradientStyle_LINEAR:
+        case css::awt::GradientStyle_AXIAL:
             break;
         default:
             return false;

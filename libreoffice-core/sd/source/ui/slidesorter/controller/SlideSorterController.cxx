@@ -43,7 +43,7 @@
 #include <view/SlsToolTip.hxx>
 #include <cache/SlsPageCache.hxx>
 #include <cache/SlsPageCacheManager.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <drawdoc.hxx>
 #include <ViewShellBase.hxx>
@@ -829,8 +829,8 @@ void SlideSorterController::PageNameHasChanged (int nPageIndex, const OUString& 
     OUString sNewName (pChild->GetPage()->GetName());
     pChild->FireAccessibleEvent(
         css::accessibility::AccessibleEventId::NAME_CHANGED,
-        makeAny(rsOldName),
-        makeAny(sNewName));
+        Any(rsOldName),
+        Any(sNewName));
 }
 
 void SlideSorterController::SetDocumentSlides (const Reference<container::XIndexAccess>& rxSlides)

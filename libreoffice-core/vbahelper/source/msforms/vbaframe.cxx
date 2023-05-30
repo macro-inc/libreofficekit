@@ -22,6 +22,7 @@
 #include "vbacontrols.hxx"
 #include <ooo/vba/msforms/fmBorderStyle.hpp>
 #include <ooo/vba/msforms/fmSpecialEffect.hpp>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace ooo::vba;
@@ -32,9 +33,9 @@ ScVbaFrame::ScVbaFrame(
         const uno::Reference< uno::XInterface >& xControl,
         const uno::Reference< frame::XModel >& xModel,
         std::unique_ptr<ov::AbstractGeometryAttributes> pGeomHelper,
-        const css::uno::Reference< css::awt::XControl >& xDialog ) :
+        css::uno::Reference< css::awt::XControl > xDialog ) :
     FrameImpl_BASE( xParent, xContext, xControl, xModel, std::move(pGeomHelper) ),
-    mxDialog( xDialog )
+    mxDialog(std::move( xDialog ))
 {
 }
 
@@ -49,7 +50,7 @@ OUString SAL_CALL ScVbaFrame::getCaption()
 
 void SAL_CALL ScVbaFrame::setCaption( const OUString& _caption )
 {
-    m_xProps->setPropertyValue( "Label", uno::makeAny( _caption ) );
+    m_xProps->setPropertyValue( "Label", uno::Any( _caption ) );
 }
 
 sal_Int32 SAL_CALL ScVbaFrame::getSpecialEffect()

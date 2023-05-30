@@ -19,17 +19,19 @@
 
 #pragma once
 
-#include <dp_misc.h>
 #include <dp_shared.hxx>
 #include <dp_interact.h>
 #include <rtl/ref.hxx>
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <com/sun/star/lang/XEventListener.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/deployment/XPackageRegistry.hpp>
+#include <com/sun/star/uno/XComponentContext.hpp>
 #include <unordered_map>
 #include <strings.hrc>
+#include <utility>
 
 namespace dp_registry::backend
 {
@@ -42,7 +44,7 @@ typedef ::cppu::WeakComponentImplHelper<
     css::deployment::XPackage > t_PackageBase;
 
 
-class Package : protected ::dp_misc::MutexHolder, public t_PackageBase
+class Package : protected cppu::BaseMutex, public t_PackageBase
 {
     PackageRegistryBackend * getMyBackend() const;
     void processPackage_impl(
@@ -84,14 +86,13 @@ protected:
         = 0;
 
     virtual ~Package() override;
-    Package( ::rtl::Reference<PackageRegistryBackend> const & myBackend,
-             OUString const & url,
-             OUString const & name,
-             OUString const & displayName,
-             css::uno::Reference<css::deployment::XPackageTypeInfo> const &
-             xPackageType,
+    Package( ::rtl::Reference<PackageRegistryBackend> myBackend,
+             OUString url,
+             OUString name,
+             OUString displayName,
+             css::uno::Reference<css::deployment::XPackageTypeInfo> const & xPackageType,
              bool bRemoved,
-             OUString const & identifier);
+             OUString identifier);
 
 public:
 
@@ -103,11 +104,11 @@ public:
         const OUString m_shortDescr;
     public:
         virtual ~TypeInfo() override;
-        TypeInfo( OUString const & mediaType,
-                  OUString const & fileFilter,
-                  OUString const & shortDescr )
-            : m_mediaType(mediaType), m_fileFilter(fileFilter),
-              m_shortDescr(shortDescr)
+        TypeInfo( OUString mediaType,
+                  OUString fileFilter,
+                  OUString shortDescr )
+            : m_mediaType(std::move(mediaType)), m_fileFilter(std::move(fileFilter)),
+              m_shortDescr(std::move(shortDescr))
             {}
         // XPackageTypeInfo
         virtual OUString SAL_CALL getMediaType() override;
@@ -192,7 +193,7 @@ typedef ::cppu::WeakComponentImplHelper<
 
 
 class PackageRegistryBackend
-    : protected ::dp_misc::MutexHolder, public t_BackendBase
+    : protected cppu::BaseMutex, public t_BackendBase
 {
     //The map held originally WeakReferences. The map entries are removed in the disposing
     //function, which is called when the XPackages are destructed or they are

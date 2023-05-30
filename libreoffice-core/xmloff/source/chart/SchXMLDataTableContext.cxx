@@ -42,7 +42,7 @@ SchXMLDataTableContext::SchXMLDataTableContext(SchXMLImportHelper& rImpHelper, S
 void SchXMLDataTableContext::startFastElement(
     sal_Int32 /*nElement*/, const uno::Reference<xml::sax::XFastAttributeList>& xAttrList)
 {
-    printf("SchXMLDataTableContext::startFastElement\n");
+    // Check if we have all that is needed to create the data table instance
     auto xChartDocument = mrImportHelper.GetChartDocument();
     if (!xChartDocument.is())
         return;
@@ -55,6 +55,7 @@ void SchXMLDataTableContext::startFastElement(
     if (!xDiagram.is())
         return;
 
+    // Create a new DataTable instance
     uno::Reference<lang::XMultiServiceFactory> xFactory = comphelper::getProcessServiceFactory();
     uno::Reference<chart2::XDataTable> xDataTable(
         xFactory->createInstance("com.sun.star.chart2.DataTable"), uno::UNO_QUERY);
@@ -73,7 +74,7 @@ void SchXMLDataTableContext::startFastElement(
             XMLOFF_WARN_UNKNOWN("xmloff", aIter);
     }
 
-    // set properties
+    // Set the data table properties
     uno::Reference<beans::XPropertySet> xPropertySet(xDataTable, uno::UNO_QUERY);
 
     if (!sAutoStyleName.isEmpty() && xPropertySet.is())

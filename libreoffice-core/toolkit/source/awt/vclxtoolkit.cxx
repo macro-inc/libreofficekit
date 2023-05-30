@@ -48,9 +48,11 @@
 #include <com/sun/star/awt/XToolkitExperimental.hpp>
 #include <com/sun/star/awt/XToolkitRobot.hpp>
 
+#include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/bootstrap.hxx>
 #include <cppuhelper/compbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <o3tl/safeint.hxx>
 #include <osl/conditn.hxx>
 #include <osl/module.h>
 #include <osl/thread.hxx>
@@ -59,7 +61,7 @@
 #include <rtl/process.h>
 #include <sal/log.hxx>
 #include <tools/link.hxx>
-#include <tools/wintypes.hxx>
+#include <vcl/wintypes.hxx>
 
 #ifdef MACOSX
 #include <premac.h>
@@ -67,6 +69,7 @@
 #include <postmac.h>
 #endif
 
+#include <utility>
 #include <vcl/sysdata.hxx>
 #include <vcl/textrectinfo.hxx>
 #include <vcl/toolkit/vclmedit.hxx>
@@ -86,6 +89,7 @@
 #include <toolkit/helper/convert.hxx>
 #include <controls/filectrl.hxx>
 #include <controls/svmedit.hxx>
+#include <controls/table/tablecontrol.hxx>
 #include <controls/treecontrolpeer.hxx>
 #include <vcl/toolkit/button.hxx>
 #include <vcl/toolkit/calendar.hxx>
@@ -107,7 +111,7 @@
 #include <vcl/toolkit/longcurr.hxx>
 #include <vcl/toolkit/menubtn.hxx>
 #include <vcl/stdtext.hxx>
-#include <vcl/scrbar.hxx>
+#include <vcl/toolkit/scrbar.hxx>
 #include <vcl/split.hxx>
 #include <vcl/splitwin.hxx>
 #include <vcl/status.hxx>
@@ -131,7 +135,8 @@
 #endif
 #include <awt/vclxspinbutton.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/profilezone.hxx>
 
@@ -224,11 +229,11 @@ void MessBox::ImplInitButtons()
 }
 
 MessBox::MessBox(vcl::Window* pParent, MessBoxStyle nMessBoxStyle, WinBits nWinBits,
-                 const OUString& rTitle, const OUString& rMessage) :
+                 const OUString& rTitle, OUString aMessage) :
     ButtonDialog( WindowType::MESSBOX ),
     mbHelpBtn( false ),
     mnMessBoxStyle( nMessBoxStyle ),
-    maMessText( rMessage )
+    maMessText(std::move( aMessage ))
 {
     ImplLOKNotifier(pParent);
     ImplInitDialog(pParent, nWinBits | WB_MOVEABLE | WB_HORZ | WB_CENTER);
@@ -398,12 +403,6 @@ Size MessBox::GetOptimalSize() const
 
 namespace {
 
-extern "C" typedef vcl::Window* (*FN_SvtCreateWindow)(
-        rtl::Reference<VCLXWindow>* ppNewComp,
-        const css::awt::WindowDescriptor* pDescriptor,
-        vcl::Window* pParent,
-        WinBits nWinBits );
-
 class Pause : public Idle
 {
 public:
@@ -426,13 +425,7 @@ public:
     sal_Int32 m_nPauseMilliseconds;
 };
 
-class VCLXToolkitMutexHelper
-{
-protected:
-    ::osl::Mutex    maMutex;
-};
-
-class VCLXToolkit : public VCLXToolkitMutexHelper,
+class VCLXToolkit : public cppu::BaseMutex,
                     public cppu::WeakComponentImplHelper<
                     css::awt::XToolkitExperimental,
                     css::awt::XToolkitRobot,
@@ -441,12 +434,9 @@ class VCLXToolkit : public VCLXToolkitMutexHelper,
     css::uno::Reference< css::datatransfer::clipboard::XClipboard > mxClipboard;
     css::uno::Reference< css::datatransfer::clipboard::XClipboard > mxSelection;
 
-    oslModule           hSvToolsLib;
-    FN_SvtCreateWindow  fnSvtCreateWindow;
-
-    ::comphelper::OInterfaceContainerHelper2 m_aTopWindowListeners;
-    ::comphelper::OInterfaceContainerHelper2 m_aKeyHandlers;
-    ::comphelper::OInterfaceContainerHelper2 m_aFocusListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XTopWindowListener> m_aTopWindowListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XKeyHandler> m_aKeyHandlers;
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XFocusListener> m_aFocusListeners;
     ::Link<VclSimpleEvent&,void> m_aEventListenerLink;
     ::Link<VclWindowEvent&,bool> m_aKeyListenerLink;
     bool m_bEventListener;
@@ -466,7 +456,7 @@ class VCLXToolkit : public VCLXToolkitMutexHelper,
     void callFocusListeners(::VclSimpleEvent const * pEvent, bool bGained);
 
 protected:
-    ::osl::Mutex&   GetMutex() { return maMutex; }
+    ::osl::Mutex&   GetMutex() { return m_aMutex; }
 
     virtual void SAL_CALL disposing() override;
 
@@ -731,6 +721,7 @@ ComponentInfo const aComponentInfos [] =
     { std::u16string_view(u"formattedfield"),     WindowType::CONTROL },
     { std::u16string_view(u"frame"),              WindowType::GROUPBOX },
     { std::u16string_view(u"framewindow"),        WindowType::TOOLKIT_FRAMEWINDOW },
+    { std::u16string_view(u"grid"),               WindowType::CONTROL },
     { std::u16string_view(u"groupbox"),           WindowType::GROUPBOX },
     { std::u16string_view(u"helpbutton"),         WindowType::HELPBUTTON },
     { std::u16string_view(u"imagebutton"),        WindowType::IMAGEBUTTON },
@@ -941,9 +932,6 @@ VCLXToolkit::VCLXToolkit():
     m_bEventListener(false),
     m_bKeyListener(false)
 {
-    hSvToolsLib = nullptr;
-    fnSvtCreateWindow = nullptr;
-
 #ifndef IOS
     osl::Guard< osl::Mutex > aGuard( getInitMutex() );
     nVCLToolkitInstanceCount++;
@@ -958,15 +946,6 @@ VCLXToolkit::VCLXToolkit():
 
 void SAL_CALL VCLXToolkit::disposing()
 {
-#ifndef DISABLE_DYNLOADING
-    if ( hSvToolsLib )
-    {
-        osl_unloadModule( hSvToolsLib );
-        hSvToolsLib = nullptr;
-        fnSvtCreateWindow = nullptr;
-    }
-#endif
-
 #ifndef IOS
     {
         osl::Guard< osl::Mutex > aGuard( getInitMutex() );
@@ -1013,8 +992,8 @@ css::awt::Rectangle VCLXToolkit::getWorkArea(  )
     css::awt::Rectangle aNotherRect;
     aNotherRect.X = aWorkRect.Left();
     aNotherRect.Y = aWorkRect.Top();
-    aNotherRect.Width = aWorkRect.getWidth();
-    aNotherRect.Height = aWorkRect.getHeight();
+    aNotherRect.Width = aWorkRect.getOpenWidth();
+    aNotherRect.Height = aWorkRect.getOpenHeight();
     return aNotherRect;
 }
 
@@ -1837,6 +1816,11 @@ vcl::Window* VCLXToolkit::ImplCreateWindow( rtl::Reference<VCLXWindow>* ppNewCom
                     *ppNewComp = newComp;
                     newComp->SetFormatter( static_cast<FormatterBase*>(static_cast<DateField*>(pNewWindow.get())) );
                 }
+                else if (aServiceName == "grid")
+                {
+                    pNewWindow = VclPtr<::svt::table::TableControl>::Create(pParent, nWinBits);
+                    *ppNewComp = new SVTXGridControl;
+                }
             break;
             default:
                 OSL_ENSURE( false, "VCLXToolkit::ImplCreateWindow: unknown window type!" );
@@ -1849,16 +1833,6 @@ vcl::Window* VCLXToolkit::ImplCreateWindow( rtl::Reference<VCLXWindow>* ppNewCom
         pControl->SetShowAccelerator(true);
     return pNewWindow;
 }
-
-#ifndef DISABLE_DYNLOADING
-
-extern "C" { static void thisModule() {} }
-
-#else
-
-extern "C" vcl::Window* SAL_CALL CreateWindow( rtl::Reference<VCLXWindow>* ppNewComp, const css::awt::WindowDescriptor* pDescriptor, vcl::Window* pParent, WinBits nWinBits );
-
-#endif
 
 css::uno::Reference< css::awt::XWindowPeer > VCLXToolkit::ImplCreateWindow(
     const css::awt::WindowDescriptor& rDescriptor,
@@ -1888,37 +1862,7 @@ css::uno::Reference< css::awt::XWindowPeer > VCLXToolkit::ImplCreateWindow(
 
     rtl::Reference<VCLXWindow> pNewComp;
 
-    vcl::Window* pNewWindow = nullptr;
-    // Try to create the window with SvTools
-    // (do this _before_ creating it on our own: The old mechanism (extended toolkit in SvTools) did it this way,
-    // and we need to stay compatible)
-    // try to load the lib
-    if ( !fnSvtCreateWindow
-#ifndef DISABLE_DYNLOADING
-         && !hSvToolsLib
-#endif
-         )
-    {
-#ifndef DISABLE_DYNLOADING
-        OUString aLibName(SVT_DLL_NAME);
-        hSvToolsLib = osl_loadModuleRelative(
-            &thisModule, aLibName.pData, SAL_LOADMODULE_DEFAULT );
-        if ( hSvToolsLib )
-        {
-            OUString aFunctionName( "CreateWindow" );
-            fnSvtCreateWindow = reinterpret_cast<FN_SvtCreateWindow>(osl_getFunctionSymbol( hSvToolsLib, aFunctionName.pData ));
-        }
-#else
-        fnSvtCreateWindow = CreateWindow;
-#endif
-    }
-    // ask the SvTool creation function
-    if ( fnSvtCreateWindow )
-        pNewWindow = fnSvtCreateWindow( &pNewComp, &rDescriptor, pParent, nWinBits );
-
-    // if SvTools could not provide a window, create it ourself
-    if ( !pNewWindow )
-        pNewWindow = ImplCreateWindow( &pNewComp, rDescriptor, pParent, nWinBits, aPair.second );
+    vcl::Window* pNewWindow = ImplCreateWindow( &pNewComp, rDescriptor, pParent, nWinBits, aPair.second );
 
     DBG_ASSERT( pNewWindow, "createWindow: Unknown Component!" );
     SAL_INFO_IF( !pNewComp, "toolkit", "createWindow: No special Interface!" );
@@ -1975,7 +1919,7 @@ css::uno::Sequence< css::uno::Reference< css::awt::XWindowPeer > > VCLXToolkit::
 
         if ( aDescr.ParentIndex == -1 )
             aDescr.Parent = nullptr;
-        else if ( ( aDescr.ParentIndex >= 0 ) && ( aDescr.ParentIndex < static_cast<short>(n) ) )
+        else if ( ( aDescr.ParentIndex >= 0 ) && ( o3tl::make_unsigned(aDescr.ParentIndex) < n ) )
             aDescr.Parent = aSeq.getConstArray()[aDescr.ParentIndex];
         aSeq.getArray()[n] = createWindow( aDescr );
     }
@@ -2416,17 +2360,15 @@ void VCLXToolkit::callTopWindowListeners(
     if (!pWindow->IsTopWindow())
         return;
 
-    std::vector< css::uno::Reference< css::uno::XInterface > >
+    std::vector< css::uno::Reference< css::awt::XTopWindowListener > >
           aListeners(m_aTopWindowListeners.getElements());
     if (aListeners.empty())
         return;
 
     css::lang::EventObject aAwtEvent(
         static_cast< css::awt::XWindow * >(pWindow->GetWindowPeer()));
-    for (const css::uno::Reference<XInterface> & i : aListeners)
+    for (const css::uno::Reference<css::awt::XTopWindowListener> & xListener : aListeners)
     {
-        css::uno::Reference< css::awt::XTopWindowListener >
-              xListener(i, css::uno::UNO_QUERY);
         try
         {
             (xListener.get()->*pFn)(aAwtEvent);
@@ -2441,7 +2383,7 @@ void VCLXToolkit::callTopWindowListeners(
 bool VCLXToolkit::callKeyHandlers(::VclSimpleEvent const * pEvent,
                                   bool bPressed)
 {
-    std::vector< css::uno::Reference< css::uno::XInterface > >
+    std::vector< css::uno::Reference< css::awt::XKeyHandler > >
           aHandlers(m_aKeyHandlers.getElements());
 
     if (!aHandlers.empty())
@@ -2464,10 +2406,8 @@ bool VCLXToolkit::callKeyHandlers(::VclSimpleEvent const * pEvent,
             pKeyEvent->GetKeyCode().GetCode(), pKeyEvent->GetCharCode(),
             sal::static_int_cast< sal_Int16 >(
                 pKeyEvent->GetKeyCode().GetFunction()));
-        for (const css::uno::Reference<XInterface> & i : aHandlers)
+        for (const css::uno::Reference<css::awt::XKeyHandler> & xHandler : aHandlers)
         {
-            css::uno::Reference< css::awt::XKeyHandler > xHandler(
-                i, css::uno::UNO_QUERY);
             try
             {
                 if (bPressed ? xHandler->keyPressed(aAwtEvent)
@@ -2491,7 +2431,7 @@ void VCLXToolkit::callFocusListeners(::VclSimpleEvent const * pEvent,
     if (!pWindow->IsTopWindow())
         return;
 
-    std::vector< css::uno::Reference< css::uno::XInterface > >
+    std::vector< css::uno::Reference< css::awt::XFocusListener > >
           aListeners(m_aFocusListeners.getElements());
     if (aListeners.empty())
         return;
@@ -2513,10 +2453,8 @@ void VCLXToolkit::callFocusListeners(::VclSimpleEvent const * pEvent,
         static_cast< css::awt::XWindow * >(pWindow->GetWindowPeer()),
         static_cast<sal_Int16>(pWindow->GetGetFocusFlags()),
         xNext, false);
-    for (const css::uno::Reference<XInterface> & i : aListeners)
+    for (const css::uno::Reference<css::awt::XFocusListener> & xListener : aListeners)
     {
-        css::uno::Reference< css::awt::XFocusListener > xListener(
-            i, css::uno::UNO_QUERY);
         try
         {
             bGained ? xListener->focusGained(aAwtEvent)

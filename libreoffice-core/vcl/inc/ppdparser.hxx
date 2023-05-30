@@ -36,6 +36,8 @@
 
 namespace psp {
 
+enum class orientation;
+
 class PPDCache;
 class PPDTranslator;
 
@@ -48,6 +50,7 @@ struct VCL_DLLPUBLIC PPDValue
     //see http://www.cups.org/documentation.php/spec-ppd.html#OPTIONS
     //for full specs, only the basics are implemented here
     bool             m_bCustomOption;
+    mutable bool     m_bCustomOptionSetViaApp;
     mutable OUString m_aCustomOption;
     OUString         m_aOption;
     OUString         m_aValue;
@@ -83,7 +86,7 @@ private:
 
     void eraseValue( const OUString& rOption );
 public:
-    PPDKey( const OUString& rKey );
+    PPDKey( OUString aKey );
     ~PPDKey();
 
     PPDValue*           insertValue(const OUString& rOption, PPDValueType eType, bool bCustomOption = false);
@@ -108,7 +111,6 @@ struct PPDKeyhash
     size_t operator()( const PPDKey * pKey) const
         { return reinterpret_cast<size_t>(pKey); }
 };
-
 
 /*
  * PPDParser - parses a PPD file and contains all available keys from it
@@ -163,8 +165,8 @@ private:
     // translations
     std::unique_ptr<PPDTranslator>              m_pTranslator;
 
-    PPDParser( const OUString& rFile );
-    PPDParser(const OUString& rFile, const std::vector<PPDKey*>& keys);
+    PPDParser( OUString aFile );
+    PPDParser(OUString aFile, const std::vector<PPDKey*>& keys);
 
     void parseOrderDependency(const OString& rLine);
     void parseOpenUI(const OString& rLine, std::string_view rPPDGroup);
@@ -176,6 +178,9 @@ private:
     static void scanPPDDir( const OUString& rDir );
     static void initPPDFiles(PPDCache &rPPDCache);
     static OUString getPPDFile( const OUString& rFile );
+
+    OUString        matchPaperImpl(int nWidth, int nHeight, bool bDontSwap = false, psp::orientation* pOrientation = nullptr) const;
+
 public:
     ~PPDParser();
     static const PPDParser* getParser( const OUString& rFile );
@@ -200,7 +205,7 @@ public:
     // returns false if paper not found
 
     // match the best paper for width and height
-    OUString        matchPaper( int nWidth, int nHeight ) const;
+    OUString        matchPaper( int nWidth, int nHeight, psp::orientation* pOrientation = nullptr ) const;
 
     bool getMargins( std::u16string_view rPaperName,
                      int &rLeft, int& rRight,
@@ -214,11 +219,11 @@ public:
 
     void            getDefaultResolution( int& rXRes, int& rYRes ) const;
     // values in dpi
-    static void     getResolutionFromString( const OUString&, int&, int& );
+    static void     getResolutionFromString( std::u16string_view, int&, int& );
     // helper function
 
     OUString   translateKey( const OUString& i_rKey ) const;
-    OUString   translateOption( const OUString& i_rKey,
+    OUString   translateOption( std::u16string_view i_rKey,
                                 const OUString& i_rOption ) const;
 };
 

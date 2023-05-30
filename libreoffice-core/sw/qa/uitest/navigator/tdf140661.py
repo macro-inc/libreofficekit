@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,6 +11,12 @@ from libreoffice.uno.propertyvalue import mkPropertyValues
 from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
 
 class tdf140661(UITestCase):
+
+    def get_item(self, xTree, name):
+        for i in xTree.getChildren():
+            xItem = xTree.getChild(i)
+            if name == get_state_as_dict(xItem)['Text']:
+                return xItem
 
     def launch_navigator(self, bIsBeforeUngroup):
         xMainWindow = self.xUITest.getTopFocusWindow()
@@ -22,7 +30,7 @@ class tdf140661(UITestCase):
         xNavigatorPanel = self.ui_test.wait_until_child_is_available('NavigatorPanel')
 
         xContentTree = xNavigatorPanel.getChild("contenttree")
-        xDrawings = xContentTree.getChild('11')
+        xDrawings = self.get_item(xContentTree, 'Drawing objects')
         self.assertEqual('Drawing objects', get_state_as_dict(xDrawings)['Text'])
 
         xDrawings.executeAction("EXPAND", tuple())
@@ -44,7 +52,7 @@ class tdf140661(UITestCase):
 
     def test_tdf140661(self):
 
-        with self.ui_test.load_file(get_url_for_data_file("tdf140661.odt")) as writer_doc:
+        with self.ui_test.load_file(get_url_for_data_file("tdf140661.odt")):
 
             self.launch_navigator(True)
 

@@ -21,16 +21,16 @@
 
 #include <sfx2/tabdlg.hxx>
 #include <global.hxx>
-#include <sheetlimits.hxx>
 
 class ScViewData;
 class ScDocument;
 struct ScSubTotalParam;
+class ScSubTotalItem;
 
 class ScTpSubTotalGroup : public SfxTabPage
 {
 protected:
-    ScTpSubTotalGroup(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rArgSet);
+    ScTpSubTotalGroup(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rArgSet, const sal_uInt16& nTabNumber);
 
 public:
     virtual ~ScTpSubTotalGroup() override;
@@ -39,23 +39,6 @@ public:
                                       const SfxItemSet& rArgSet  );
     bool            DoFillItemSet   ( sal_uInt16        nGroupNo,
                                       SfxItemSet&   rArgSet  );
-protected:
-    const OUString    aStrNone;
-    const OUString    aStrColumn;
-
-    ScViewData*             pViewData;
-    ScDocument*             pDoc;
-
-    const sal_uInt16            nWhichSubTotals;
-    const ScSubTotalParam&  rSubTotalData;
-    std::vector<SCCOL>      mnFieldArr;
-    sal_uInt16              nFieldCount;
-
-    std::unique_ptr<weld::ComboBox> mxLbGroup;
-    std::unique_ptr<weld::TreeView> mxLbColumns;
-    std::unique_ptr<weld::TreeView> mxLbFunctions;
-    std::unique_ptr<weld::CheckButton> mxLbSelectAllColumns;
-
 private:
     void            Init            ();
     void            FillListBoxes   ();
@@ -69,6 +52,22 @@ private:
     DECL_LINK(CheckHdl, const weld::TreeView::iter_col&, void);
     DECL_LINK(CheckBoxHdl, weld::Toggleable&, void);
     void SelectHdl(const weld::Widget*);
+
+    const OUString    aStrNone;
+    const OUString    aStrColumn;
+
+    ScViewData*             pViewData;
+    ScDocument*             pDoc;
+
+    const TypedWhichId<ScSubTotalItem> nWhichSubTotals;
+    const ScSubTotalParam&  rSubTotalData;
+    std::vector<SCCOL>      mnFieldArr;
+    sal_uInt16              nFieldCount;
+
+    std::unique_ptr<weld::ComboBox> mxLbGroup;
+    std::unique_ptr<weld::TreeView> mxLbColumns;
+    std::unique_ptr<weld::TreeView> mxLbFunctions;
+    std::unique_ptr<weld::CheckButton> mxLbSelectAllColumns;
 };
 
 class ScTpSubTotalGroup1 final : public ScTpSubTotalGroup
@@ -130,7 +129,7 @@ private:
 
     ScViewData*             pViewData;
     ScDocument*             pDoc;
-    const sal_uInt16        nWhichSubTotals;
+    const TypedWhichId<ScSubTotalItem> nWhichSubTotals;
     const ScSubTotalParam&  rSubTotalData;
 
     std::unique_ptr<weld::CheckButton> m_xBtnPagebreak;

@@ -24,6 +24,7 @@
 #include <cstring>
 #include <exception>
 #include <limits>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/connection/XConnection.hpp>
@@ -31,7 +32,6 @@
 #include <com/sun/star/lang/WrappedTargetRuntimeException.hpp>
 #include <com/sun/star/uno/XCurrentContext.hpp>
 #include <cppuhelper/exc_hlp.hxx>
-#include <osl/mutex.hxx>
 #include <sal/log.hxx>
 #include <uno/dispatcher.hxx>
 
@@ -51,24 +51,24 @@ Writer::Item::Item()
 {}
 
 Writer::Item::Item(
-    rtl::ByteSequence const & theTid, OUString const & theOid,
-    css::uno::TypeDescription const & theType,
-    css::uno::TypeDescription const & theMember,
+    rtl::ByteSequence theTid, OUString theOid,
+    css::uno::TypeDescription theType,
+    css::uno::TypeDescription theMember,
     std::vector< BinaryAny >&& inArguments,
-    css::uno::UnoInterfaceReference const & theCurrentContext):
-    tid(theTid), oid(theOid), type(theType), member(theMember),
-    currentContext(theCurrentContext), arguments(std::move(inArguments)),
+    css::uno::UnoInterfaceReference theCurrentContext):
+    tid(std::move(theTid)), oid(std::move(theOid)), type(std::move(theType)), member(std::move(theMember)),
+    currentContext(std::move(theCurrentContext)), arguments(std::move(inArguments)),
     request(true), setter(false), exception(false), setCurrentContextMode(false)
 {}
 
 Writer::Item::Item(
-    rtl::ByteSequence const & theTid,
-    css::uno::TypeDescription const & theMember, bool theSetter,
-    bool theException, BinaryAny const & theReturnValue,
+    rtl::ByteSequence theTid,
+    css::uno::TypeDescription theMember, bool theSetter,
+    bool theException, BinaryAny theReturnValue,
     std::vector< BinaryAny >&& outArguments,
     bool theSetCurrentContextMode):
-    tid(theTid), member(theMember),
-    returnValue(theReturnValue), arguments(std::move(outArguments)),
+    tid(std::move(theTid)), member(std::move(theMember)),
+    returnValue(std::move(theReturnValue)), arguments(std::move(outArguments)),
     request(false), setter(theSetter),
     exception(theException), setCurrentContextMode(theSetCurrentContextMode)
 {}
@@ -108,7 +108,7 @@ void Writer::queueRequest(
     std::vector< BinaryAny >&& inArguments)
 {
     css::uno::UnoInterfaceReference cc(current_context::get());
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     queue_.emplace_back(tid, oid, type, member, std::move(inArguments), cc);
     items_.set();
 }
@@ -119,7 +119,7 @@ void Writer::queueReply(
     bool exception, BinaryAny const & returnValue,
     std::vector< BinaryAny >&& outArguments, bool setCurrentContextMode)
 {
-    osl::MutexGuard g(mutex_);
+    std::lock_guard g(mutex_);
     queue_.emplace_back(
             tid, member, setter, exception, returnValue, std::move(outArguments),
             setCurrentContextMode);
@@ -135,7 +135,7 @@ void Writer::unblock() {
 
 void Writer::stop() {
     {
-        osl::MutexGuard g(mutex_);
+        std::lock_guard g(mutex_);
         stop_ = true;
     }
     unblocked_.set();
@@ -151,7 +151,7 @@ void Writer::execute() {
             items_.wait();
             Item item;
             {
-                osl::MutexGuard g(mutex_);
+                std::lock_guard g(mutex_);
                 if (stop_) {
                     return;
                 }

@@ -17,7 +17,6 @@
 #include <com/sun/star/drawing/FillStyle.hpp>
 
 #include <editeng/unoprnms.hxx>
-#include <test/xmltesttools.hxx>
 #include <rtl/ustring.hxx>
 #include <rtl/ustrbuf.hxx>
 
@@ -89,6 +88,7 @@ class Chart2DumpTest : public ChartTest
 {
 protected:
     Chart2DumpTest(bool bDumpMode)
+        : ChartTest("/chart2/qa/extras/chart2dump/data/")
     {
         m_bDumpMode = bDumpMode;
     }
@@ -108,7 +108,6 @@ protected:
 
     virtual OUString getTestName() { return OUString(); }
     OUString const & getTestFileName() const { return m_sTestFileName; }
-    OUString getTestFileDirName() const { return "/chart2/qa/extras/chart2dump/data/"; }
     OUString getReferenceDirName()
     {
         return "/chart2/qa/extras/chart2dump/reference/" + getTestName().toAsciiLowerCase() + "/";
@@ -125,7 +124,7 @@ protected:
         {
             if (m_aReferenceFile.is_open())
                 m_aReferenceFile.close();
-            OString sReferenceFile = OUStringToOString(OUStringConcatenation(m_directories.getPathFromSrc(getReferenceDirName()) + sFileName), RTL_TEXTENCODING_UTF8);
+            OString sReferenceFile = OUStringToOString(Concat2View(m_directories.getPathFromSrc(getReferenceDirName()) + sFileName), RTL_TEXTENCODING_UTF8);
             m_aReferenceFile.open(sReferenceFile.getStr(), std::ios_base::in);
             CPPUNIT_ASSERT_MESSAGE(OString("Can't open reference file: " + sReferenceFile).getStr(), m_aReferenceFile.is_open());
         }
@@ -133,7 +132,7 @@ protected:
         {
             if (m_aDumpFile.is_open())
                 m_aDumpFile.close();
-            OString sDumpFile = OUStringToOString(OUStringConcatenation(m_directories.getPathFromSrc(getReferenceDirName()) + sFileName), RTL_TEXTENCODING_UTF8);
+            OString sDumpFile = OUStringToOString(Concat2View(m_directories.getPathFromSrc(getReferenceDirName()) + sFileName), RTL_TEXTENCODING_UTF8);
             m_aDumpFile.open(sDumpFile.getStr(), std::ios_base::out | std::ofstream::binary | std::ofstream::trunc);
             CPPUNIT_ASSERT_MESSAGE(OString("Can't open dump file: " + sDumpFile).getStr(), m_aDumpFile.is_open());
         }
@@ -158,12 +157,12 @@ protected:
         return OUString(sTemp.data(), sTemp.length(), RTL_TEXTENCODING_UTF8);
     }
 
-    void writeActual(const OUString& sActualValue, const OUString& sCheck)
+    void writeActual(std::u16string_view sActualValue, const OUString& sCheck)
     {
         assert(m_bDumpMode);
         assert(m_aDumpFile.is_open());
         m_aDumpFile << "// " << sCheck << "\n";   // Add check string to make dump file readable
-        m_aDumpFile << sActualValue.trim() << "\n";      // Write out the checked value, will be used as reference later
+        m_aDumpFile << OUString(sActualValue) << "\n";      // Write out the checked value, will be used as reference later
     }
 
     void readNote(std::u16string_view sNote)
@@ -203,15 +202,15 @@ protected:
         // Convert string back to a transformation;
         drawing::HomogenMatrix3 aExpectedTransform;
         sal_Int32 nIdx {0};
-        aExpectedTransform.Line1.Column1 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line1.Column2 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line1.Column3 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line2.Column1 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line2.Column2 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line2.Column3 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line3.Column1 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line3.Column2 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
-        aExpectedTransform.Line3.Column3 = rExpectedTransform.getToken(0, ';', nIdx).toDouble();
+        aExpectedTransform.Line1.Column1 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line1.Column2 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line1.Column3 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line2.Column1 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line2.Column2 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line2.Column3 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line3.Column1 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line3.Column2 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
+        aExpectedTransform.Line3.Column3 = o3tl::toDouble(o3tl::getToken(rExpectedTransform, 0, ';', nIdx));
 
         // Check the equality of the two transformation
         return (std::abs(aExpectedTransform.Line1.Column1 - rTransform.Line1.Column1) < fEPS &&
@@ -270,7 +269,7 @@ DECLARE_DUMP_TEST(ChartDataTest, Chart2DumpTest, false)
     for (const OUString& aTestFile : aTestFiles)
     {
         setTestFileName(aTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc (getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
 
         // Check title
@@ -383,7 +382,7 @@ DECLARE_DUMP_TEST(LegendTest, Chart2DumpTest, false)
     for (const OUString& aTestFile : aTestFiles)
     {
         setTestFileName(aTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromDrawImpress(0, 0), UNO_SET_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -477,7 +476,7 @@ DECLARE_DUMP_TEST(GridTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -549,7 +548,7 @@ DECLARE_DUMP_TEST(AxisGeometryTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromDrawImpress(0, 0), UNO_SET_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -622,7 +621,7 @@ DECLARE_DUMP_TEST(AxisLabelTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromDrawImpress(0, 0), UNO_SET_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -705,7 +704,7 @@ DECLARE_DUMP_TEST(ColumnBarChartTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -775,7 +774,7 @@ DECLARE_DUMP_TEST(ChartWallTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromDrawImpress(0, 0), UNO_SET_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -823,7 +822,6 @@ DECLARE_DUMP_TEST(ChartWallTest, Chart2DumpTest, false)
         sal_Int32 nChartWallLineWidth = 0;
         xPropSet->getPropertyValue("LineWidth") >>= nChartWallLineWidth;
         CPPUNIT_DUMP_ASSERT_NUMBERS_EQUAL(nChartWallLineWidth);
-
     }
 }
 
@@ -841,7 +839,7 @@ DECLARE_DUMP_TEST(PieChartTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -914,7 +912,7 @@ DECLARE_DUMP_TEST(AreaChartTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -987,7 +985,7 @@ DECLARE_DUMP_TEST(PointLineChartTest, Chart2DumpTest, false)
     for (const OUString& sTestFile : aTestFiles)
     {
         setTestFileName(sTestFile);
-        load(getTestFileDirName(), getTestFileName());
+        loadFromURL(getTestFileName());
         uno::Reference< chart::XChartDocument > xChartDoc(getChartDocFromSheet(0, mxComponent), UNO_QUERY_THROW);
         uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(xChartDoc, uno::UNO_QUERY);
         uno::Reference<drawing::XDrawPage> xDrawPage = xDrawPageSupplier->getDrawPage();
@@ -1079,7 +1077,7 @@ DECLARE_DUMP_TEST(PointLineChartTest, Chart2DumpTest, false)
 DECLARE_DUMP_TEST( PivotChartDataButtonTest, Chart2DumpTest, false )
 {
     setTestFileName( "pivotchart_data_button.ods" );
-    load( getTestFileDirName(), getTestFileName() );
+    loadFromURL(getTestFileName());
 
     // Check that we have pivot chart in the document
     uno::Reference<table::XTablePivotCharts> xTablePivotCharts = getTablePivotChartsFromSheet( 1, mxComponent );

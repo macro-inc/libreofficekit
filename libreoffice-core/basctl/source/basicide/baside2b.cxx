@@ -40,11 +40,14 @@
 #include <com/sun/star/container/XHierarchicalNameAccess.hpp>
 #include <com/sun/star/script/XLibraryContainer2.hpp>
 #include <comphelper/string.hxx>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/progress.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <tools/debug.hxx>
+#include <utility>
 #include <vcl/image.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/weldutils.hxx>
@@ -60,12 +63,15 @@
 #include <vcl/svapp.hxx>
 #include <vcl/taskpanelist.hxx>
 #include <vcl/help.hxx>
+#include <o3tl/string_view.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <vector>
 #include <com/sun/star/reflection/theCoreReflection.hpp>
 #include <unotools/charclass.hxx>
+#include <o3tl/string_view.hxx>
 #include "textwindowpeer.hxx"
 #include "uiobject.hxx"
+#include <basegfx/utils/zoomtools.hxx>
 
 namespace basctl
 {
@@ -202,7 +208,7 @@ private:
 
     virtual void SAL_CALL disposing(lang::EventObject const &) override
     {
-        osl::MutexGuard g(editor_.mutex_);
+        std::unique_lock g(editor_.mutex_);
         editor_.notifier_.clear();
     }
 
@@ -230,7 +236,7 @@ public:
     }
 
 private:
-    sal_uLong nCurState;
+    sal_uInt32 nCurState;
 };
 
 EditorWindow::EditorWindow (vcl::Window* pParent, ModulWindow* pModulWindow) :
@@ -246,7 +252,9 @@ EditorWindow::EditorWindow (vcl::Window* pParent, ModulWindow* pModulWindow) :
     pCodeCompleteWnd(VclPtr<CodeCompleteWindow>::Create(this))
 {
     set_id("EditorWindow");
-    SetBackground(Wallpaper(rModulWindow.GetLayout().GetSyntaxBackgroundColor()));
+    const Wallpaper aBackground(rModulWindow.GetLayout().GetSyntaxBackgroundColor());
+    SetBackground(aBackground);
+    GetWindow(GetWindowType::Border)->SetBackground(aBackground);
     SetPointer( PointerStyle::Text );
     SetHelpId( HID_BASICIDE_EDITORWINDOW );
 
@@ -255,9 +263,13 @@ EditorWindow::EditorWindow (vcl::Window* pParent, ModulWindow* pModulWindow) :
         officecfg::Office::Common::Font::SourceViewFont::get(),
         UNO_QUERY_THROW);
     {
-        osl::MutexGuard g(mutex_);
+        std::unique_lock g(mutex_);
         notifier_ = n;
     }
+
+    // The zoom level applied to the editor window is the zoom slider value in the shell
+    nCurrentZoomLevel = GetShell()->GetCurrentZoomSliderValue();
+
     const Sequence<OUString> aPropertyNames{"FontHeight", "FontName"};
     n->addPropertiesChangeListener(aPropertyNames, listener_);
 }
@@ -278,7 +290,7 @@ void EditorWindow::dispose()
 
     Reference< beans::XMultiPropertySet > n;
     {
-        osl::MutexGuard g(mutex_);
+        std::unique_lock g(mutex_);
         n = notifier_;
     }
     if (n.is()) {
@@ -467,8 +479,9 @@ void EditorWindow::MouseButtonUp( const MouseEvent &rEvt )
 void EditorWindow::MouseButtonDown( const MouseEvent &rEvt )
 {
     GrabFocus();
-    if ( pEditView )
-        pEditView->MouseButtonDown( rEvt );
+    if (!pEditView)
+        return;
+    pEditView->MouseButtonDown(rEvt);
     if( pCodeCompleteWnd->IsVisible() )
     {
         if (pEditView->GetSelection() != pCodeCompleteWnd->GetTextSelection())
@@ -489,8 +502,25 @@ void EditorWindow::Command( const CommandEvent& rCEvt )
          ( rCEvt.GetCommand() == CommandEventId::StartAutoScroll ) ||
          ( rCEvt.GetCommand() == CommandEventId::AutoScroll ) )
     {
-        HandleScrollCommand( rCEvt, rModulWindow.GetHScrollBar(), &rModulWindow.GetEditVScrollBar() );
-    } else if ( rCEvt.GetCommand() == CommandEventId::ContextMenu ) {
+        const CommandWheelData* pData = rCEvt.GetWheelData();
+
+        // Check if it is a Ctrl+Wheel zoom command
+        if (pData && pData->IsMod1())
+        {
+            const sal_uInt16 nOldZoom = GetCurrentZoom();
+            sal_uInt16 nNewZoom;
+            if( pData->GetDelta() < 0 )
+                nNewZoom = std::max<sal_uInt16>(basctl::Shell::GetMinZoom(),
+                                                basegfx::zoomtools::zoomOut(nOldZoom));
+            else
+                nNewZoom = std::min<sal_uInt16>(basctl::Shell::GetMaxZoom(),
+                                                basegfx::zoomtools::zoomIn(nOldZoom));
+            GetShell()->SetGlobalEditorZoomLevel(nNewZoom);
+        }
+        else
+            HandleScrollCommand(rCEvt, &rModulWindow.GetEditHScrollBar(), &rModulWindow.GetEditVScrollBar());
+    }
+    else if ( rCEvt.GetCommand() == CommandEventId::ContextMenu ) {
         SfxDispatcher* pDispatcher = GetDispatcher();
         if ( pDispatcher )
         {
@@ -714,9 +744,9 @@ TextSelection EditorWindow::GetLastHighlightPortionTextSelection() const
     if( aPortions.empty() )
         return TextSelection();
 
-    OUString sStr = aLine.copy( r.nBegin, r.nEnd - r.nBegin );
+    std::u16string_view sStr = aLine.subView( r.nBegin, r.nEnd - r.nBegin );
     TextPaM aStart( nLine, r.nBegin );
-    TextPaM aEnd( nLine, r.nBegin + sStr.getLength() );
+    TextPaM aEnd( nLine, r.nBegin + sStr.size() );
     return TextSelection( aStart, aEnd );
 }
 
@@ -792,17 +822,17 @@ void EditorWindow::HandleProcedureCompletion()
             if( aCurrPortions.size() >= 3 )
             {//at least 3 tokens: (sub|function) whitespace identifier...
                 HighlightPortion& r = aCurrPortions.front();
-                OUString sStr = aCurrLine.copy(r.nBegin, r.nEnd - r.nBegin);
+                std::u16string_view sStr = aCurrLine.subView(r.nBegin, r.nEnd - r.nBegin);
 
                 if( r.tokenType == TokenType::Keywords )
                 {
-                    if( sStr.equalsIgnoreAsciiCase("sub") || sStr.equalsIgnoreAsciiCase("function") )
+                    if( o3tl::equalsIgnoreAsciiCase(sStr, u"sub") || o3tl::equalsIgnoreAsciiCase(sStr, u"function") )
                     {
                         pEditView->InsertText( sText );//append to the end
                         GetEditView()->SetSelection(aSel);
                         break;
                     }
-                    if( sStr.equalsIgnoreAsciiCase("end") )
+                    if( o3tl::equalsIgnoreAsciiCase(sStr, u"end") )
                         break;
                 }
             }
@@ -810,7 +840,7 @@ void EditorWindow::HandleProcedureCompletion()
     }
 }
 
-bool EditorWindow::GetProcedureName(OUString const & rLine, OUString& rProcType, OUString& rProcName) const
+bool EditorWindow::GetProcedureName(std::u16string_view rLine, OUString& rProcType, OUString& rProcName) const
 {
     std::vector<HighlightPortion> aPortions;
     aHighlighter.getHighlightPortions(rLine, aPortions);
@@ -823,10 +853,10 @@ bool EditorWindow::GetProcedureName(OUString const & rLine, OUString& rProcType,
 
     for (auto const& portion : aPortions)
     {
-        OUString sTokStr = rLine.copy(portion.nBegin, portion.nEnd - portion.nBegin);
+        std::u16string_view sTokStr = rLine.substr(portion.nBegin, portion.nEnd - portion.nBegin);
 
-        if( portion.tokenType == TokenType::Keywords && ( sTokStr.equalsIgnoreAsciiCase("sub")
-            || sTokStr.equalsIgnoreAsciiCase("function")) )
+        if( portion.tokenType == TokenType::Keywords && ( o3tl::equalsIgnoreAsciiCase(sTokStr, u"sub")
+            || o3tl::equalsIgnoreAsciiCase(sTokStr, u"function")) )
         {
             rProcType = sTokStr;
             bFoundType = true;
@@ -970,20 +1000,14 @@ void EditorWindow::SetSourceInBasic()
 
 // Returns the position of the last character of any of the following
 // EOL char combinations: CR, CR/LF, LF, return -1 if no EOL is found
-sal_Int32 searchEOL( const OUString& rStr, sal_Int32 fromIndex )
+sal_Int32 searchEOL( std::u16string_view rStr, sal_Int32 fromIndex )
 {
-    sal_Int32 iRetPos = -1;
+    size_t iLF = rStr.find( LINE_SEP, fromIndex );
+    if( iLF != std::u16string_view::npos )
+        return iLF;
 
-    sal_Int32 iLF = rStr.indexOf( LINE_SEP, fromIndex );
-    if( iLF != -1 )
-    {
-        iRetPos = iLF;
-    }
-    else
-    {
-        iRetPos = rStr.indexOf( LINE_SEP_CR, fromIndex );
-    }
-    return iRetPos;
+    size_t iCR = rStr.find( LINE_SEP_CR, fromIndex );
+    return iCR == std::u16string_view::npos ? -1 : iCR;
 }
 
 void EditorWindow::CreateEditEngine()
@@ -1078,9 +1102,8 @@ void EditorWindow::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint )
     TextHint const& rTextHint = *pTextHint;
     if( rTextHint.GetId() == SfxHintId::TextViewScrolled )
     {
-        if ( rModulWindow.GetHScrollBar() )
-            rModulWindow.GetHScrollBar()->SetThumbPos( pEditView->GetStartDocPos().X() );
         rModulWindow.GetEditVScrollBar().SetThumbPos( pEditView->GetStartDocPos().Y() );
+        rModulWindow.GetEditHScrollBar().SetThumbPos( pEditView->GetStartDocPos().X() );
         rModulWindow.GetBreakPointWindow().DoScroll
             ( rModulWindow.GetBreakPointWindow().GetCurYOffset() - pEditView->GetStartDocPos().Y() );
         rModulWindow.GetLineNumberWindow().DoScroll
@@ -1102,15 +1125,13 @@ void EditorWindow::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint )
     }
     else if( rTextHint.GetId() == SfxHintId::TextFormatted )
     {
-        if ( rModulWindow.GetHScrollBar() )
+
+        const tools::Long nWidth = pEditEngine->CalcTextWidth();
+        if ( nWidth != nCurTextWidth )
         {
-            const tools::Long nWidth = pEditEngine->CalcTextWidth();
-            if ( nWidth != nCurTextWidth )
-            {
-                nCurTextWidth = nWidth;
-                rModulWindow.GetHScrollBar()->SetRange( Range( 0, nCurTextWidth-1) );
-                rModulWindow.GetHScrollBar()->SetThumbPos( pEditView->GetStartDocPos().X() );
-            }
+            nCurTextWidth = nWidth;
+            rModulWindow.GetEditHScrollBar().SetRange( Range( 0, nCurTextWidth-1) );
+            rModulWindow.GetEditHScrollBar().SetThumbPos( pEditView->GetStartDocPos().X() );
         }
         tools::Long nPrevTextWidth = nCurTextWidth;
         nCurTextWidth = pEditEngine->CalcTextWidth();
@@ -1140,7 +1161,7 @@ void EditorWindow::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint )
     }
 }
 
-OUString EditorWindow::GetActualSubName( sal_uLong nLine )
+OUString EditorWindow::GetActualSubName( sal_uInt32 nLine )
 {
     SbxArrayRef pMethods = rModulWindow.GetSbModule()->GetMethods();
     for (sal_uInt32 i = 0; i < pMethods->Count(); i++)
@@ -1165,10 +1186,8 @@ void EditorWindow::SetScrollBarRanges()
     if ( !pEditEngine )
         return;
 
-    if ( rModulWindow.GetHScrollBar() )
-        rModulWindow.GetHScrollBar()->SetRange( Range( 0, nCurTextWidth-1 ) );
-
     rModulWindow.GetEditVScrollBar().SetRange( Range( 0, pEditEngine->GetTextHeight()-1 ) );
+    rModulWindow.GetEditHScrollBar().SetRange( Range( 0, nCurTextWidth-1 ) );
 }
 
 void EditorWindow::InitScrollBars()
@@ -1184,17 +1203,14 @@ void EditorWindow::InitScrollBars()
     rModulWindow.GetEditVScrollBar().SetThumbPos(pEditView->GetStartDocPos().Y());
     rModulWindow.GetEditVScrollBar().Show();
 
-    if (rModulWindow.GetHScrollBar())
-    {
-        rModulWindow.GetHScrollBar()->SetVisibleSize(aOutSz.Width());
-        rModulWindow.GetHScrollBar()->SetPageSize(aOutSz.Width() * 8 / 10);
-        rModulWindow.GetHScrollBar()->SetLineSize(GetTextWidth( "x" ) );
-        rModulWindow.GetHScrollBar()->SetThumbPos(pEditView->GetStartDocPos().X());
-        rModulWindow.GetHScrollBar()->Show();
-    }
+    rModulWindow.GetEditHScrollBar().SetVisibleSize(aOutSz.Width());
+    rModulWindow.GetEditHScrollBar().SetPageSize(aOutSz.Width() * 8 / 10);
+    rModulWindow.GetEditHScrollBar().SetLineSize(GetTextWidth( "x" ));
+    rModulWindow.GetEditHScrollBar().SetThumbPos(pEditView->GetStartDocPos().X());
+    rModulWindow.GetEditHScrollBar().Show();
 }
 
-void EditorWindow::ImpDoHighlight( sal_uLong nLine )
+void EditorWindow::ImpDoHighlight( sal_uInt32 nLine )
 {
     if ( !bDoSyntaxHighlight )
         return;
@@ -1233,6 +1249,7 @@ void EditorWindow::UpdateSyntaxHighlighting ()
 
 void EditorWindow::ImplSetFont()
 {
+    // Get default font name and height defined in the Options dialog
     OUString sFontName(officecfg::Office::Common::Font::SourceViewFont::FontName::get().value_or(OUString()));
     if (sFontName.isEmpty())
     {
@@ -1241,7 +1258,12 @@ void EditorWindow::ImplSetFont()
                                                         GetDefaultFontFlags::NONE, GetOutDev()));
         sFontName = aTmpFont.GetFamilyName();
     }
-    Size aFontSize(0, officecfg::Office::Common::Font::SourceViewFont::FontHeight::get());
+    sal_uInt16 nDefaultFontHeight = officecfg::Office::Common::Font::SourceViewFont::FontHeight::get();
+
+    // Calculate font size considering zoom level
+    sal_uInt16 nNewFontHeight = nDefaultFontHeight * (static_cast<float>(nCurrentZoomLevel) / 100);
+    Size aFontSize(0, nNewFontHeight);
+
     vcl::Font aFont(sFontName, aFontSize);
     aFont.SetColor(rModulWindow.GetLayout().GetFontColor());
     SetPointFont(*GetOutDev(), aFont); // FIXME RenderContext
@@ -1249,6 +1271,7 @@ void EditorWindow::ImplSetFont()
 
     rModulWindow.GetBreakPointWindow().SetFont(aFont);
     rModulWindow.GetLineNumberWindow().SetFont(aFont);
+    rModulWindow.Invalidate();
 
     if (pEditEngine)
     {
@@ -1256,9 +1279,28 @@ void EditorWindow::ImplSetFont()
         pEditEngine->SetFont(aFont);
         pEditEngine->SetModified(bModified);
     }
+
+    // Update controls
+    if (SfxBindings* pBindings = GetBindingsPtr())
+    {
+        pBindings->Invalidate( SID_BASICIDE_CURRENT_ZOOM );
+        pBindings->Invalidate( SID_ATTR_ZOOMSLIDER );
+    }
 }
 
-void EditorWindow::DoSyntaxHighlight( sal_uLong nPara )
+void EditorWindow::SetEditorZoomLevel(sal_uInt16 nNewZoomLevel)
+{
+    if (nCurrentZoomLevel == nNewZoomLevel)
+        return;
+
+    if (nNewZoomLevel < MIN_ZOOM_LEVEL || nNewZoomLevel > MAX_ZOOM_LEVEL)
+        return;
+
+    nCurrentZoomLevel = nNewZoomLevel;
+    ImplSetFont();
+}
+
+void EditorWindow::DoSyntaxHighlight( sal_uInt32 nPara )
 {
     // because of the DelayedSyntaxHighlight it's possible
     // that this line does not exist anymore!
@@ -1271,7 +1313,7 @@ void EditorWindow::DoSyntaxHighlight( sal_uLong nPara )
     }
 }
 
-void EditorWindow::DoDelayedSyntaxHighlight( sal_uLong nPara )
+void EditorWindow::DoDelayedSyntaxHighlight( sal_uInt32 nPara )
 {
     // line is only added to list, processed in TimerHdl
     // => don't manipulate breaks while EditEngine is formatting
@@ -1313,7 +1355,7 @@ IMPL_LINK_NOARG(EditorWindow, SyntaxTimerHdl, Timer *, void)
     bHighlighting = false;
 }
 
-void EditorWindow::ParagraphInsertedDeleted( sal_uLong nPara, bool bInserted )
+void EditorWindow::ParagraphInsertedDeleted( sal_uInt32 nPara, bool bInserted )
 {
     if ( pProgress )
         pProgress->StepProgress();
@@ -1588,8 +1630,8 @@ struct WatchItem
 
     WatchItem*      mpArrayParentItem;
 
-    explicit WatchItem (OUString const& rName):
-        maName(rName),
+    explicit WatchItem (OUString aName):
+        maName(std::move(aName)),
         nDimLevel(0),
         nDimCount(0),
         mpArrayParentItem(nullptr)
@@ -1668,7 +1710,7 @@ void WatchWindow::dispose()
 
     // Destroy user data
     m_xTreeListBox->all_foreach([this](weld::TreeIter& rEntry){
-        WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(rEntry).toInt64());
+        WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(rEntry));
         delete pItem;
         return false;
     });
@@ -1729,7 +1771,7 @@ void WatchWindow::AddWatch( const OUString& rVName )
     lcl_SeparateNameAndIndex( rVName, aVar, aIndex );
     WatchItem* pWatchItem = new WatchItem(aVar);
 
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pWatchItem)));
+    OUString sId(weld::toId(pWatchItem));
     std::unique_ptr<weld::TreeIter> xRet = m_xTreeListBox->make_iterator();
     m_xTreeListBox->insert(nullptr, -1, &aVar, &sId, nullptr, nullptr, false, xRet.get());
     m_xTreeListBox->set_text(*xRet, "", 1);
@@ -1752,7 +1794,7 @@ void WatchWindow::RemoveSelectedWatch()
         m_xTreeListBox->remove(*xEntry);
         bEntry = m_xTreeListBox->get_cursor(xEntry.get());
         if (bEntry)
-            m_xEdit->set_text(reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(*xEntry).toInt64())->maName);
+            m_xEdit->set_text(weld::fromId<WatchItem*>(m_xTreeListBox->get_id(*xEntry))->maName);
         else
             m_xEdit->set_text(OUString());
         if ( !m_xTreeListBox->n_children() )
@@ -1772,7 +1814,7 @@ IMPL_LINK_NOARG(WatchWindow, TreeListHdl, weld::TreeView&, void)
     bool bCurEntry = m_xTreeListBox->get_cursor(xCurEntry.get());
     if (!bCurEntry)
         return;
-    WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(*xCurEntry).toInt64());
+    WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(*xCurEntry));
     if (!pItem)
         return;
     m_xEdit->set_text(pItem->maName);
@@ -1941,7 +1983,8 @@ ComplexEditorWindow::ComplexEditorWindow( ModulWindow* pParent ) :
     aBrkWindow(VclPtr<BreakPointWindow>::Create(this, pParent)),
     aLineNumberWindow(VclPtr<LineNumberWindow>::Create(this, pParent)),
     aEdtWindow(VclPtr<EditorWindow>::Create(this, pParent)),
-    aEWVScrollBar( VclPtr<ScrollBar>::Create(this, WB_VSCROLL | WB_DRAG) )
+    aEWVScrollBar(VclPtr<ScrollAdaptor>::Create(this, false)),
+    aEWHScrollBar(VclPtr<ScrollAdaptor>::Create(this, true))
 {
     aEdtWindow->Show();
     aBrkWindow->Show();
@@ -1950,6 +1993,11 @@ ComplexEditorWindow::ComplexEditorWindow( ModulWindow* pParent ) :
     aEWVScrollBar->SetPageSize(nScrollPage);
     aEWVScrollBar->SetScrollHdl( LINK( this, ComplexEditorWindow, ScrollHdl ) );
     aEWVScrollBar->Show();
+
+    aEWHScrollBar->SetLineSize(nScrollLine);
+    aEWHScrollBar->SetPageSize(nScrollPage);
+    aEWHScrollBar->SetScrollHdl( LINK( this, ComplexEditorWindow, ScrollHdl ) );
+    aEWHScrollBar->Show();
 }
 
 ComplexEditorWindow::~ComplexEditorWindow()
@@ -1963,6 +2011,7 @@ void ComplexEditorWindow::dispose()
     aLineNumberWindow.disposeAndClear();
     aEdtWindow.disposeAndClear();
     aEWVScrollBar.disposeAndClear();
+    aEWHScrollBar.disposeAndClear();
     vcl::Window::dispose();
 }
 
@@ -1974,39 +2023,42 @@ void ComplexEditorWindow::Resize()
     aSz.AdjustHeight( -(2*DWBORDER) );
     tools::Long nBrkWidth = 20;
     tools::Long nSBWidth = aEWVScrollBar->GetSizePixel().Width();
+    tools::Long nSBHeight = aEWHScrollBar->GetSizePixel().Height();
 
-    Size aBrkSz(nBrkWidth, aSz.Height());
-
-    Size aLnSz(aLineNumberWindow->GetWidth(), aSz.Height());
+    Size aBrkSz(nBrkWidth, aSz.Height() - nSBHeight);
 
     if (aLineNumberWindow->IsVisible())
     {
-        aBrkWindow->SetPosSizePixel( Point( DWBORDER, DWBORDER ), aBrkSz );
-        aLineNumberWindow->SetPosSizePixel(Point(DWBORDER + aBrkSz.Width() - 1, DWBORDER), aLnSz);
-        Size aEWSz(aSz.Width() - nBrkWidth - aLineNumberWindow->GetWidth() - nSBWidth + 2, aSz.Height());
-        aEdtWindow->SetPosSizePixel( Point( DWBORDER + aBrkSz.Width() + aLnSz.Width() - 1, DWBORDER ), aEWSz );
+        Size aLnSz(aLineNumberWindow->GetWidth(), aSz.Height() - nSBHeight);
+        Size aEWSz(aSz.Width() - nBrkWidth - aLineNumberWindow->GetWidth() - nSBWidth, aSz.Height() - nSBHeight);
+        aBrkWindow->SetPosSizePixel(Point(DWBORDER, DWBORDER), aBrkSz);
+        aLineNumberWindow->SetPosSizePixel(Point(DWBORDER + nBrkWidth, DWBORDER), aLnSz);
+        aEdtWindow->SetPosSizePixel(Point(DWBORDER + nBrkWidth + aLnSz.Width(), DWBORDER), aEWSz);
     }
     else
     {
+        Size aEWSz(aSz.Width() - nBrkWidth - nSBWidth, aSz.Height() - nSBHeight);
         aBrkWindow->SetPosSizePixel( Point( DWBORDER, DWBORDER ), aBrkSz );
-        Size aEWSz(aSz.Width() - nBrkWidth - nSBWidth + 2, aSz.Height());
-        aEdtWindow->SetPosSizePixel(Point(DWBORDER + aBrkSz.Width() - 1, DWBORDER), aEWSz);
+        aEdtWindow->SetPosSizePixel(Point(DWBORDER + nBrkWidth, DWBORDER), aEWSz);
     }
 
-    aEWVScrollBar->SetPosSizePixel( Point( aOutSz.Width() - DWBORDER - nSBWidth, DWBORDER ), Size( nSBWidth, aSz.Height() ) );
+    aEWVScrollBar->SetPosSizePixel(Point(aOutSz.Width() - DWBORDER - nSBWidth, DWBORDER),
+                                   Size(nSBWidth, aSz.Height() - nSBHeight));
+    aEWHScrollBar->SetPosSizePixel(Point(DWBORDER, aOutSz.Height() - DWBORDER - nSBHeight),
+                                   Size(aSz.Width() - nSBWidth, nSBHeight));
 }
 
-IMPL_LINK(ComplexEditorWindow, ScrollHdl, ScrollBar *, pCurScrollBar, void )
+IMPL_LINK_NOARG(ComplexEditorWindow, ScrollHdl, weld::Scrollbar&, void)
 {
     if (aEdtWindow->GetEditView())
     {
-        DBG_ASSERT( pCurScrollBar == aEWVScrollBar.get(), "Who is scrolling?" );
-        tools::Long nDiff = aEdtWindow->GetEditView()->GetStartDocPos().Y() - pCurScrollBar->GetThumbPos();
-        aEdtWindow->GetEditView()->Scroll( 0, nDiff );
-        aBrkWindow->DoScroll( nDiff );
-        aLineNumberWindow->DoScroll( nDiff );
+        tools::Long nXDiff = aEdtWindow->GetEditView()->GetStartDocPos().X() - aEWHScrollBar->GetThumbPos();
+        tools::Long nYDiff = aEdtWindow->GetEditView()->GetStartDocPos().Y() - aEWVScrollBar->GetThumbPos();
+        aEdtWindow->GetEditView()->Scroll(nXDiff, nYDiff);
+        aBrkWindow->DoScroll( nYDiff );
+        aLineNumberWindow->DoScroll( nYDiff );
         aEdtWindow->GetEditView()->ShowCursor(false);
-        pCurScrollBar->SetThumbPos( aEdtWindow->GetEditView()->GetStartDocPos().Y() );
+        aEWVScrollBar->SetThumbPos( aEdtWindow->GetEditView()->GetStartDocPos().Y() );
     }
 }
 
@@ -2069,7 +2121,7 @@ IMPL_LINK(WatchWindow, RequestingChildrenHdl, const weld::TreeIter&, rParent, bo
     if (m_xTreeListBox->iter_has_child(rParent))
         return true;
 
-    WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(rParent).toInt64());
+    WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(rParent));
     std::unique_ptr<weld::TreeIter> xRet = m_xTreeListBox->make_iterator();
 
     SbxDimArray* pArray = pItem->mpArray.get();
@@ -2097,7 +2149,7 @@ IMPL_LINK(WatchWindow, RequestingChildrenHdl, const weld::TreeIter&, rParent, bo
             OUString const& rName = pItem->maMemberList.back();
 
             WatchItem* pWatchItem = new WatchItem(rName);
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pWatchItem)));
+            OUString sId(weld::toId(pWatchItem));
 
             m_xTreeListBox->insert(&rParent, -1, &rName, &sId, nullptr, nullptr, false, xRet.get());
             m_xTreeListBox->set_text(*xRet, "", 1);
@@ -2148,7 +2200,7 @@ IMPL_LINK(WatchWindow, RequestingChildrenHdl, const weld::TreeIter&, rParent, bo
                 aDisplayName += aIndexStr;
                 pChildItem->maDisplayName = aDisplayName;
 
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pChildItem)));
+                OUString sId(weld::toId(pChildItem));
 
                 m_xTreeListBox->insert(&rParent, -1, &aDisplayName, &sId, nullptr, nullptr, false,
                                        xRet.get());
@@ -2178,12 +2230,12 @@ SbxBase* WatchWindow::ImplGetSBXForEntry(const weld::TreeIter& rEntry, bool& rbA
     SbxBase* pSBX = nullptr;
     rbArrayElement = false;
 
-    WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(rEntry).toInt64());
+    WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(rEntry));
     OUString aVName( pItem->maName );
 
     std::unique_ptr<weld::TreeIter> xParentEntry = m_xTreeListBox->make_iterator(&rEntry);
     bool bParentEntry = m_xTreeListBox->iter_parent(*xParentEntry);
-    WatchItem* pParentItem = bParentEntry ? reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(*xParentEntry).toInt64()) : nullptr;
+    WatchItem* pParentItem = bParentEntry ? weld::fromId<WatchItem*>(m_xTreeListBox->get_id(*xParentEntry)) : nullptr;
     if( pParentItem )
     {
         SbxObject* pObj = pParentItem->mpObject.get();
@@ -2216,7 +2268,7 @@ SbxBase* WatchWindow::ImplGetSBXForEntry(const weld::TreeIter& rEntry, bool& rbA
 
 IMPL_LINK(WatchWindow, EditingEntryHdl, const weld::TreeIter&, rIter, bool)
 {
-    WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(rIter).toInt64());
+    WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(rIter));
 
     bool bEdit = false;
     if (StarBASIC::IsRunning() && StarBASIC::GetActiveMethod() && !SbxBase::IsError())
@@ -2293,7 +2345,7 @@ void implCollapseModifiedObjectEntry(const weld::TreeIter& rParent, weld::TreeVi
     {
         implCollapseModifiedObjectEntry(*xDeleteEntry, rTree);
 
-        WatchItem* pItem = reinterpret_cast<WatchItem*>(rTree.get_id(*xDeleteEntry).toInt64());
+        WatchItem* pItem = weld::fromId<WatchItem*>(rTree.get_id(*xDeleteEntry));
         delete pItem;
         rTree.remove(*xDeleteEntry);
         rTree.copy_iterator(rParent, *xDeleteEntry);
@@ -2352,7 +2404,7 @@ void WatchWindow::UpdateWatches(bool bBasicStopped)
     setBasicWatchMode( true );
 
     m_xTreeListBox->all_foreach([this, pCurMethod, bBasicStopped](weld::TreeIter& rEntry){
-        WatchItem* pItem = reinterpret_cast<WatchItem*>(m_xTreeListBox->get_id(rEntry).toInt64());
+        WatchItem* pItem = weld::fromId<WatchItem*>(m_xTreeListBox->get_id(rEntry));
         DBG_ASSERT( !pItem->maName.isEmpty(), "Var? - Must not be empty!" );
         OUString aWatchStr;
         OUString aTypeStr;
@@ -2591,7 +2643,7 @@ void CodeCompleteWindow::SetMatchingEntries()
     for (sal_Int32 i = 0, nEntryCount = m_xListBox->n_children(); i< nEntryCount; ++i)
     {
         OUString sEntry = m_xListBox->get_text(i);
-        if (sEntry.startsWithIgnoreAsciiCase(aFuncBuffer.toString()))
+        if (sEntry.startsWithIgnoreAsciiCase(aFuncBuffer))
         {
             m_xListBox->select(i);
             break;
@@ -2657,8 +2709,8 @@ bool CodeCompleteWindow::HandleKeyInput( const KeyEvent& rKeyEvt )
                         for (sal_Int32 i = nInd; i != nEntryCount; ++i)
                         {
                             OUString sEntry = m_xListBox->get_text(i);
-                            if( sEntry.startsWithIgnoreAsciiCase( aFuncBuffer.toString() )
-                                && (aFuncBuffer.toString() != sTypedText) && (i != nInd) )
+                            if( sEntry.startsWithIgnoreAsciiCase( aFuncBuffer )
+                                && (std::u16string_view(aFuncBuffer) != sTypedText) && (i != nInd) )
                             {
                                 m_xListBox->select(i);
                                 bFound = true;
@@ -2688,7 +2740,7 @@ bool CodeCompleteWindow::HandleKeyInput( const KeyEvent& rKeyEvt )
                     OUString aTabInsertedStr( GetParentEditView()->GetSelected() );
                     GetParentEditView()->SetSelection( aSel );
 
-                    if( !aTabInsertedStr.isEmpty() && aTabInsertedStr != aFuncBuffer.toString() )
+                    if( !aTabInsertedStr.isEmpty() && aTabInsertedStr != std::u16string_view(aFuncBuffer) )
                     {
                         aFuncBuffer = aTabInsertedStr;
                     }

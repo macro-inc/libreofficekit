@@ -123,7 +123,6 @@ struct SVXCORE_DLLPUBLIC SdrViewEvent
 
 public:
     SdrViewEvent();
-    ~SdrViewEvent();
 };
 
 // helper class for all D&D overlays
@@ -160,6 +159,8 @@ public:
         OutputDevice* pOut = nullptr);
 
     virtual ~SdrView() override;
+
+    virtual bool IsSdrView() const final { return true; }
 
     // The default value for all dispatchers is activated. If the app for example
     // wants to intervene in MouseDispatcher for special treatment, you have to

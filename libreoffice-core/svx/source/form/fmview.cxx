@@ -41,6 +41,7 @@
 #include <fmundo.hxx>
 #include <svx/dataaccessdescriptor.hxx>
 #include <comphelper/namedvaluecollection.hxx>
+#include <o3tl/deleter.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/awt/XControl.hpp>
@@ -50,6 +51,7 @@
 #include <svx/svxids.hrc>
 #include <vcl/i18nhelp.hxx>
 #include <vcl/window.hxx>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -101,10 +103,9 @@ void FmFormView::Init()
     SfxObjectShell* pObjShell = pFormModel->GetObjectShell();
     if ( pObjShell && pObjShell->GetMedium() )
     {
-        const SfxPoolItem *pItem=nullptr;
-        if ( pObjShell->GetMedium()->GetItemSet()->GetItemState( SID_COMPONENTDATA, false, &pItem ) == SfxItemState::SET )
+        if ( const SfxUnoAnyItem *pItem = pObjShell->GetMedium()->GetItemSet()->GetItemIfSet( SID_COMPONENTDATA, false ) )
         {
-            ::comphelper::NamedValueCollection aComponentData( static_cast<const SfxUnoAnyItem*>(pItem)->GetValue() );
+            ::comphelper::NamedValueCollection aComponentData( pItem->GetValue() );
             bInitDesignMode = aComponentData.getOrDefault( "ApplyFormDesignMode", bInitDesignMode );
         }
     }
@@ -114,15 +115,13 @@ void FmFormView::Init()
     SetDesignMode( bInitDesignMode );
 }
 
-
 FmFormView::~FmFormView()
 {
-    if( pFormShell )
-        pFormShell->SetView( nullptr );
+    if (pFormShell)
+        suppress_fun_call_w_exception(pFormShell->SetView(nullptr));
 
     pImpl->notifyViewDying();
 }
-
 
 FmFormPage* FmFormView::GetCurPage()
 {
@@ -130,7 +129,6 @@ FmFormPage* FmFormView::GetCurPage()
     FmFormPage*  pCurPage = pPageView ? dynamic_cast<FmFormPage*>( pPageView->GetPage()  ) : nullptr;
     return pCurPage;
 }
-
 
 void FmFormView::MarkListHasChanged()
 {
@@ -176,28 +174,25 @@ namespace
 }
 
 
-void FmFormView::AddWindowToPaintView(OutputDevice* pNewWin, vcl::Window* pWindow)
+void FmFormView::AddDeviceToPaintView(OutputDevice& rNewDev, vcl::Window* pWindow)
 {
-    E3dView::AddWindowToPaintView(pNewWin, pWindow);
-
-    if ( !pNewWin )
-        return;
+    E3dView::AddDeviceToPaintView(rNewDev, pWindow);
 
     // look up the PageViewWindow for the newly inserted window, and care for it
     // #i39269# / 2004-12-20 / frank.schoenheit@sun.com
-    const SdrPageWindow* pPageWindow = findPageWindow( this, pNewWin );
+    const SdrPageWindow* pPageWindow = findPageWindow( this, &rNewDev );
     if ( pPageWindow )
         pImpl->addWindow( *pPageWindow );
 }
 
 
-void FmFormView::DeleteWindowFromPaintView(OutputDevice* pNewWin)
+void FmFormView::DeleteDeviceFromPaintView(OutputDevice& rNewDev)
 {
-    const SdrPageWindow* pPageWindow = findPageWindow( this, pNewWin );
+    const SdrPageWindow* pPageWindow = findPageWindow( this, &rNewDev );
     if ( pPageWindow )
         pImpl->removeWindow( pPageWindow->GetControlContainer() );
 
-    E3dView::DeleteWindowFromPaintView(pNewWin);
+    E3dView::DeleteDeviceFromPaintView(rNewDev);
 }
 
 
@@ -373,25 +368,25 @@ void FmFormView::DeactivateControls(SdrPageView const * pPageView)
 }
 
 
-SdrObjectUniquePtr FmFormView::CreateFieldControl( const ODataAccessDescriptor& _rColumnDescriptor )
+rtl::Reference<SdrObject> FmFormView::CreateFieldControl( const ODataAccessDescriptor& _rColumnDescriptor )
 {
     return pImpl->implCreateFieldControl( _rColumnDescriptor );
 }
 
 
-SdrObjectUniquePtr FmFormView::CreateXFormsControl( const OXFormsDescriptor &_rDesc )
+rtl::Reference<SdrObject> FmFormView::CreateXFormsControl( const OXFormsDescriptor &_rDesc )
 {
     return pImpl->implCreateXFormsControl(_rDesc);
 }
 
 
-SdrObjectUniquePtr FmFormView::CreateFieldControl(const OUString& rFieldDesc) const
+rtl::Reference<SdrObject> FmFormView::CreateFieldControl(std::u16string_view rFieldDesc) const
 {
     sal_Int32 nIdx{ 0 };
-    OUString sDataSource     = rFieldDesc.getToken(0, u'\x000B', nIdx);
-    OUString sObjectName     = rFieldDesc.getToken(0, u'\x000B', nIdx);
-    sal_uInt16 nObjectType   = static_cast<sal_uInt16>(rFieldDesc.getToken(0, u'\x000B', nIdx).toInt32());
-    OUString sFieldName      = rFieldDesc.getToken(0, u'\x000B', nIdx);
+    OUString sDataSource(    o3tl::getToken(rFieldDesc, 0, u'\x000B', nIdx));
+    OUString sObjectName(    o3tl::getToken(rFieldDesc, 0, u'\x000B', nIdx));
+    sal_uInt16 nObjectType   = static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rFieldDesc, 0, u'\x000B', nIdx)));
+    OUString sFieldName(      o3tl::getToken(rFieldDesc, 0, u'\x000B', nIdx));
 
     if (sFieldName.isEmpty() || sObjectName.isEmpty() || sDataSource.isEmpty())
         return nullptr;
@@ -581,8 +576,8 @@ void FmFormView::createControlLabelPair( OutputDevice const * _pOutDev, sal_Int3
     const Reference< XPropertySet >& _rxField, const Reference< XNumberFormats >& _rxNumberFormats,
     SdrObjKind _nControlObjectID, SdrInventor _nInventor, SdrObjKind _nLabelObjectID,
     SdrModel& _rModel,
-    std::unique_ptr<SdrUnoObj, SdrObjectFreeOp>& _rpLabel,
-    std::unique_ptr<SdrUnoObj, SdrObjectFreeOp>& _rpControl )
+    rtl::Reference<SdrUnoObj>& _rpLabel,
+    rtl::Reference<SdrUnoObj>& _rpControl )
 {
     FmXFormView::createControlLabelPair(
         *_pOutDev, _nXOffsetMM, _nYOffsetMM,

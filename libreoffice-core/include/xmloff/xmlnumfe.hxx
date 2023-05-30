@@ -32,7 +32,7 @@ namespace com::sun::star::lang { struct Locale; }
 namespace com::sun::star::uno { template <typename > class Reference; }
 namespace com::sun::star::util { class XNumberFormatsSupplier; }
 
-#define XML_WRITTENNUMBERSTYLES "WrittenNumberStyles"
+inline constexpr OUStringLiteral XML_WRITTENNUMBERSTYLES = u"WrittenNumberStyles";
 
 class Color;
 class LocaleDataWrapper;
@@ -72,7 +72,7 @@ private:
     SAL_DLLPRIVATE void WriteFractionElement_Impl( sal_Int32 nInteger, bool bGrouping,
                                                    const SvNumberformat& rFormat, sal_uInt16 nPart );
     SAL_DLLPRIVATE void WriteCurrencyElement_Impl( const OUString& rString,
-                                        const OUString& rExt );
+                                        std::u16string_view rExt );
     SAL_DLLPRIVATE void WriteBooleanElement_Impl();
     SAL_DLLPRIVATE void WriteTextContentElement_Impl();
     SAL_DLLPRIVATE void WriteDayElement_Impl( const OUString& rCalendar, bool bLong );
@@ -102,7 +102,7 @@ public:
                        const css::uno::Reference< css::util::XNumberFormatsSupplier >& rSupp );
     SvXMLNumFmtExport( SvXMLExport& rExport,
                        const css::uno::Reference< css::util::XNumberFormatsSupplier >& rSupp,
-                       const OUString& rPrefix );
+                       OUString sPrefix );
 
     ~SvXMLNumFmtExport();
 

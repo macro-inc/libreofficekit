@@ -21,23 +21,17 @@
 
 #include <sal/config.h>
 
-#include <array>
 #include <memory>
-#include <optional>
 
 #include <vcl/transfer.hxx>
 #include <vcl/weld.hxx>
-#include <svl/lstner.hxx>
 #include <svl/eitem.hxx>
 
 #include <svl/style.hxx>
 
-#include <sfx2/childwin.hxx>
 #include <sfx2/objsh.hxx>
 #include <sfx2/styfitem.hxx>
 #include <sfx2/templdlg.hxx>
-
-#include <vcl/idle.hxx>
 
 #include "StyleList.hxx"
 
@@ -69,8 +63,6 @@ protected:
     friend class SfxTemplateControllerItem;
 
     SfxBindings* pBindings;
-
-    weld::Container* mpContainer;
 
     css::uno::Reference<css::frame::XModuleManager2> xModuleManager;
     DeletionWatcher* m_pDeletionWatcher;
@@ -178,7 +170,7 @@ public:
     void SelectStyle(const OUString& rStyle, bool bIsCallback, StyleList& rStyleList);
 
     //When a new document is created, it comes into action
-    void IsUpdate(bool bDoUpdate, StyleList&);
+    void IsUpdate(StyleList&);
 
     // This function return the value of bUpdate in Stylelist
     // This value is used in StyleList's Notify

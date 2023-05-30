@@ -30,7 +30,6 @@
 #include "officeipcthread.hxx"
 #include <rtl/ustring.hxx>
 #include <comphelper/processfactory.hxx>
-#include <comphelper/string.hxx>
 #include <comphelper/synchronousdispatch.hxx>
 #include <com/sun/star/io/IOException.hpp>
 #include <com/sun/star/util/XCloseable.hpp>
@@ -55,7 +54,7 @@
 
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/mediadescriptor.hxx>
 #include <unotools/tempfile.hxx>
@@ -64,6 +63,7 @@
 #include <osl/file.hxx>
 #include <iostream>
 #include <string_view>
+#include <utility>
 
 using namespace ::osl;
 using namespace ::com::sun::star::uno;
@@ -85,8 +85,8 @@ namespace {
 
 struct DispatchHolder
 {
-    DispatchHolder( const URL& rURL, Reference< XDispatch > const & rDispatch ) :
-        aURL( rURL ), xDispatch( rDispatch ) {}
+    DispatchHolder( URL _aURL, Reference< XDispatch > const & rDispatch ) :
+        aURL(std::move( _aURL )), xDispatch( rDispatch ) {}
 
     URL aURL;
     Reference< XDispatch > xDispatch;
@@ -244,16 +244,16 @@ void scriptCat(const Reference< XModel >& xDoc )
 }
 
 // Perform batch print
-void batchPrint( const OUString &rPrinterName, const Reference< XPrintable > &xDoc,
+void batchPrint( std::u16string_view rPrinterName, const Reference< XPrintable > &xDoc,
                  const INetURLObject &aObj, const OUString &aName )
 {
     OUString aFilterOut;
     OUString aPrinterName;
-    sal_Int32 nPathIndex =  rPrinterName.lastIndexOf( ';' );
-    if( nPathIndex != -1 )
-        aFilterOut=rPrinterName.copy( nPathIndex+1 );
+    size_t nPathIndex =  rPrinterName.rfind( ';' );
+    if( nPathIndex != std::u16string_view::npos )
+        aFilterOut=rPrinterName.substr( nPathIndex+1 );
     if( nPathIndex != 0 )
-        aPrinterName=rPrinterName.copy( 0, nPathIndex );
+        aPrinterName=rPrinterName.substr( 0, nPathIndex );
 
     INetURLObject aOutFilename( aObj );
     aOutFilename.SetExtension( u"pdf" );
@@ -572,10 +572,10 @@ bool DispatchWatcher::executeDispatchRequests( const std::vector<DispatchRequest
                             OUString aOutFile
                                 = aOutFilename.GetMainURL(INetURLObject::DecodeMechanism::NONE);
 
-                            std::unique_ptr<utl::TempFile> fileForCat;
+                            std::unique_ptr<utl::TempFileNamed> fileForCat;
                             if( aDispatchRequest.aRequestType == REQUEST_CAT )
                             {
-                                fileForCat = std::make_unique<utl::TempFile>();
+                                fileForCat = std::make_unique<utl::TempFileNamed>();
                                 if (fileForCat->IsValid())
                                     fileForCat->EnableKillingFile();
                                 else

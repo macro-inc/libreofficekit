@@ -12,20 +12,27 @@
 #include <docsh.hxx>
 #include <swdtflvr.hxx>
 #include <swmodule.hxx>
+#include <frmmgr.hxx>
+#include <frameformats.hxx>
+#include <formatflysplit.hxx>
 
 namespace
 {
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/attr/data/";
-
 /// Covers sw/source/core/attr/ fixes.
 class Test : public SwModelTestBase
 {
+public:
+    Test()
+        : SwModelTestBase("/sw/qa/core/attr/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(Test, testSwAttrSet)
 {
     // Given a document with track changes and the whole document is selected:
-    SwDoc* pDoc = createSwDoc(DATA_DIRECTORY, "attr-set.docx");
+    createSwDoc("attr-set.docx");
+    SwDoc* pDoc = getSwDoc();
     SwDocShell* pDocShell = pDoc->GetDocShell();
     SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
     dispatchCommand(mxComponent, ".uno:SelectAll", {});
@@ -45,6 +52,26 @@ CPPUNIT_TEST_FIXTURE(Test, testSwAttrSet)
     // Then make sure we get data without crashing:
     CPPUNIT_ASSERT(aData.hasValue());
     pMod->m_pXSelection = pOldTransferable;
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testFormatFlySplit)
+{
+    createSwDoc();
+    SwWrtShell* pWrtShell = getSwDocShell()->GetWrtShell();
+    SwFlyFrameAttrMgr aMgr(true, pWrtShell, Frmmgr_Type::TEXT, nullptr);
+    RndStdIds eAnchor = RndStdIds::FLY_AT_PARA;
+    aMgr.InsertFlyFrame(eAnchor, aMgr.GetPos(), aMgr.GetSize());
+    SwDoc* pDoc = getSwDoc();
+    SwFrameFormats& rFlys = *pDoc->GetSpzFrameFormats();
+    SwFrameFormat* pFly = rFlys[0];
+    CPPUNIT_ASSERT(!pFly->GetAttrSet().GetFlySplit().GetValue());
+
+    SfxItemSet aSet(pFly->GetAttrSet());
+    SwFormatFlySplit aItem(true);
+    aSet.Put(aItem);
+    pDoc->SetFlyFrameAttr(*pFly, aSet);
+
+    CPPUNIT_ASSERT(pFly->GetAttrSet().GetFlySplit().GetValue());
 }
 }
 

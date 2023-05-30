@@ -23,10 +23,9 @@
 
 #include <unx/glyphcache.hxx>
 #include <font/PhysicalFontFace.hxx>
-#include <fontinstance.hxx>
-#include <vcl/glyphitem.hxx>
+#include <font/LogicalFontInstance.hxx>
 
-class CmapResult;
+#include <glyphid.hxx>
 
 // FreetypeFontFile has the responsibility that a font file is only mapped once.
 // (#86621#) the old directly ft-managed solution caused it to be mapped
@@ -44,7 +43,7 @@ public:
 
 private:
     friend class FreetypeManager;
-    explicit                FreetypeFontFile( const OString& rNativeFileName );
+    explicit                FreetypeFontFile( OString aNativeFileName );
 
     const OString    maNativeFileName;
     unsigned char*   mpFileMap;
@@ -59,8 +58,6 @@ class FreetypeFontInfo final
 public:
     ~FreetypeFontInfo();
 
-    const unsigned char*  GetTable( const char*, sal_uLong* pLength) const;
-
     FT_FaceRec_*          GetFaceFT();
     void                  ReleaseFaceFT();
 
@@ -68,17 +65,13 @@ public:
     int                   GetFontFaceIndex() const  { return mnFaceNum; }
     int                   GetFontFaceVariation() const  { return mnFaceVariation; }
     sal_IntPtr            GetFontId() const         { return mnFontId; }
-    bool                  IsSymbolFont() const      { return maDevFontAttributes.IsSymbolFont(); }
     const FontAttributes& GetFontAttributes() const { return maDevFontAttributes; }
 
     void                  AnnounceFont( vcl::font::PhysicalFontCollection* );
 
-    const FontCharMapRef & GetFontCharMap() const;
-    bool GetFontCapabilities(vcl::FontCapabilities&) const;
-
 private:
     friend class FreetypeManager;
-    explicit FreetypeFontInfo(const FontAttributes&, FreetypeFontFile* const pFontFile,
+    explicit FreetypeFontInfo(FontAttributes , FreetypeFontFile* const pFontFile,
                               int nFaceNum, int nFaceVariation, sal_IntPtr nFontId);
 
     FT_FaceRec_*    maFaceFT;
@@ -89,7 +82,6 @@ private:
     sal_IntPtr      mnFontId;
     FontAttributes  maDevFontAttributes;
 
-    mutable FontCharMapRef mxFontCharMap;
 };
 
 class FreetypeFontFace : public vcl::font::PhysicalFontFace
@@ -103,14 +95,11 @@ public:
     virtual rtl::Reference<LogicalFontInstance> CreateFontInstance(const vcl::font::FontSelectPattern&) const override;
     virtual sal_IntPtr      GetFontId() const override { return mpFreetypeFontInfo->GetFontId(); }
 
-    FontCharMapRef GetFontCharMap() const override { return mpFreetypeFontInfo->GetFontCharMap(); }
-    inline bool GetFontCapabilities(vcl::FontCapabilities&) const override;
-};
+    virtual hb_face_t* GetHbFace() const override;
+    virtual hb_blob_t* GetHbTable(hb_tag_t nTag) const override;
 
-bool FreetypeFontFace::GetFontCapabilities(vcl::FontCapabilities& rFontCapabilities) const
-{
-    return mpFreetypeFontInfo->GetFontCapabilities(rFontCapabilities);
-}
+    const std::vector<hb_variation_t>& GetVariations(const LogicalFontInstance&) const override;
+};
 
 class SAL_DLLPUBLIC_RTTI FreetypeFontInstance final : public LogicalFontInstance
 {
@@ -118,7 +107,6 @@ class SAL_DLLPUBLIC_RTTI FreetypeFontInstance final : public LogicalFontInstance
 
     std::unique_ptr<FreetypeFont> mxFreetypeFont;
 
-    virtual hb_font_t* ImplInitHbFont() override;
     virtual bool ImplGetGlyphBoundRect(sal_GlyphId, tools::Rectangle&, bool) const override;
 
     explicit FreetypeFontInstance(const vcl::font::PhysicalFontFace& rPFF, const vcl::font::FontSelectPattern& rFSP);

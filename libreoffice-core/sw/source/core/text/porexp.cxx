@@ -38,6 +38,16 @@ void SwExpandPortion::HandlePortion( SwPortionHandler& rPH ) const
     rPH.Special( GetLen(), OUString(), GetWhichPor() );
 }
 
+void SwExpandPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                                TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwExpandPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterEndElement(pWriter);
+}
+
 SwPosSize SwExpandPortion::GetTextSize( const SwTextSizeInfo &rInf ) const
 {
     SwTextSlot aDiffText( &rInf, this, false, false );
@@ -208,6 +218,21 @@ bool SwBlankPortion::GetExpText( const SwTextSizeInfo&, OUString &rText ) const
 void SwBlankPortion::HandlePortion( SwPortionHandler& rPH ) const
 {
     rPH.Special( GetLen(), OUString( m_cChar ), GetWhichPor() );
+}
+
+void SwBlankPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                               TextFrameIndex& nOffset) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwBlankPortion"));
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
+
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("char"),
+                                      BAD_CAST(OUString(m_cChar).toUtf8().getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("multi"),
+                                      BAD_CAST(OString::boolean(m_bMulti).getStr()));
+
+    (void)xmlTextWriterEndElement(pWriter);
 }
 
 SwPostItsPortion::SwPostItsPortion( bool bScrpt )

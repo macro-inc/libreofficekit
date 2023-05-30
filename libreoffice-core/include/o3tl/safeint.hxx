@@ -27,7 +27,7 @@
 namespace o3tl
 {
 
-template <typename T> inline T saturating_add(T a, T b)
+template <typename T> inline constexpr T saturating_add(T a, T b)
 {
     if (b >= 0) {
         if (a <= std::numeric_limits<T>::max() - b) {
@@ -44,7 +44,7 @@ template <typename T> inline T saturating_add(T a, T b)
     }
 }
 
-template <typename T> inline T saturating_sub(T a, T b)
+template <typename T> inline constexpr T saturating_sub(T a, T b)
 {
     if (b >= 0) {
         if (a >= std::numeric_limits<T>::min() + b) {
@@ -206,6 +206,17 @@ make_unsigned(T value)
 {
     assert(value >= 0);
     return value;
+}
+
+template<typename T1, typename T2> constexpr std::enable_if_t<std::is_unsigned_v<T1>, T1>
+clamp_to_unsigned(T2 value) {
+    if constexpr (std::is_unsigned_v<T2>) {
+        // coverity[result_independent_of_operands] - suppress warning for template
+        return value <= std::numeric_limits<T1>::max() ? value : std::numeric_limits<T1>::max();
+    } else {
+        static_assert(std::is_signed_v<T2>);
+        return value < 0 ? 0 : clamp_to_unsigned<T1>(make_unsigned(value));
+    }
 }
 
 // An implicit conversion from T2 to T1, useful in places where an explicit conversion from T2 to

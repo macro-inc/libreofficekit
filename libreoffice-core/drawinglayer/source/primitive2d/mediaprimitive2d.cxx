@@ -21,6 +21,7 @@
 #include <basegfx/polygon/b2dpolygon.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
+#include <utility>
 #include <vcl/GraphicObject.hxx>
 #include <drawinglayer/primitive2d/graphicprimitive2d.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
@@ -87,20 +88,20 @@ namespace drawinglayer::primitive2d
                 }
             }
 
-            rContainer.insert(rContainer.end(), xRetval.begin(), xRetval.end());
+            rContainer.append(std::move(xRetval));
         }
 
         MediaPrimitive2D::MediaPrimitive2D(
-            const basegfx::B2DHomMatrix& rTransform,
-            const OUString& rURL,
+            basegfx::B2DHomMatrix aTransform,
+            OUString aURL,
             const basegfx::BColor& rBackgroundColor,
             sal_uInt32 nDiscreteBorder,
-            const Graphic &rSnapshot)
-        :   maTransform(rTransform),
-            maURL(rURL),
+            Graphic aSnapshot)
+        :   maTransform(std::move(aTransform)),
+            maURL(std::move(aURL)),
             maBackgroundColor(rBackgroundColor),
             mnDiscreteBorder(nDiscreteBorder),
-            maSnapshot(rSnapshot)
+            maSnapshot(std::move(aSnapshot))
         {
         }
 
@@ -113,7 +114,8 @@ namespace drawinglayer::primitive2d
                 return (getTransform() == rCompare.getTransform()
                     && maURL == rCompare.maURL
                     && getBackgroundColor() == rCompare.getBackgroundColor()
-                    && getDiscreteBorder() == rCompare.getDiscreteBorder());
+                    && getDiscreteBorder() == rCompare.getDiscreteBorder()
+                    && maSnapshot.IsNone() == rCompare.maSnapshot.IsNone());
             }
 
             return false;

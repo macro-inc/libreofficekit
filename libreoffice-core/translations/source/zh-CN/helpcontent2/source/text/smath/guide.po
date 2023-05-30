@@ -3,11 +3,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2019-07-10 01:38+0000\n"
-"Last-Translator: Dian LI <xslidian@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: zh_CN\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-10-23 10:10+0000\n"
+"Last-Translator: serval2412 <serval2412@yahoo.fr>\n"
+"Language-Team: Chinese (Simplified) <https://translations.documentfoundation.org/projects/libo_help-master/textsmathguide/zh_Hans/>\n"
+"Language: zh-CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>aligning; characters in %PRODUCTNAME Math</bookmark_value><bookmark_value>formula parts; manually aligning</bookmark_value>"
 msgstr "<bookmark_value>对齐; %PRODUCTNAME Math 中的字符</bookmark_value><bookmark_value>公式部分; 手动对齐</bookmark_value>"
 
-#. 5ENLq
+#. Yt2Lw
 #: align.xhp
 msgctxt ""
 "align.xhp\n"
 "hd_id3156384\n"
 "help.text"
-msgid "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\" name=\"Manually Aligning Formula Parts\">Manually Aligning Formula Parts</link></variable>"
-msgstr "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\" name=\"手动对齐公式部分\">手动对齐公式部分</link> </variable>"
+msgid "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\">Manually Aligning Formula Parts</link></variable>"
+msgstr "<variable id=\"align\"><link href=\"text/smath/guide/align.xhp\">手动对齐公式部分</link> </variable>"
 
 #. eUZmq
 #: align.xhp
@@ -106,14 +106,14 @@ msgctxt ""
 msgid "<bookmark_value>attributes; changing in $[officename] Math</bookmark_value><bookmark_value>font attributes;changing defaults</bookmark_value><bookmark_value>formatting;changing default attributes</bookmark_value><bookmark_value>defaults;changing default formatting</bookmark_value><bookmark_value>changing;default formatting</bookmark_value>"
 msgstr "<bookmark_value>属性; 在 $[officename] Math 中修改</bookmark_value><bookmark_value>字体属性;修改默认值</bookmark_value><bookmark_value>格式;修改默认属性</bookmark_value><bookmark_value>默认值;修改默认格式</bookmark_value><bookmark_value>修改;默认格式</bookmark_value>"
 
-#. WndEQ
+#. tFymM
 #: attributes.xhp
 msgctxt ""
 "attributes.xhp\n"
 "hd_id3145792\n"
 "help.text"
-msgid "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\" name=\"Changing Default Attributes\">Changing Default Attributes</link></variable>"
-msgstr "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\" name=\"修改默认属性\">修改默认属性</link></variable>"
+msgid "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\">Changing Default Attributes</link></variable>"
+msgstr "<variable id=\"attributes\"><link href=\"text/smath/guide/attributes.xhp\">修改默认属性</link></variable>"
 
 #. gAHnh
 #: attributes.xhp
@@ -169,14 +169,14 @@ msgctxt ""
 msgid "<bookmark_value>brackets; merging formula parts</bookmark_value><bookmark_value>formula parts; merging</bookmark_value><bookmark_value>fractions in formulas</bookmark_value><bookmark_value>merging;formula parts</bookmark_value>"
 msgstr "<bookmark_value>括号; 合并公式部分</bookmark_value><bookmark_value>公式部分; 合并</bookmark_value><bookmark_value>公式中的分数</bookmark_value><bookmark_value>合并;公式部分</bookmark_value>"
 
-#. J7BeM
+#. vAkzZ
 #: brackets.xhp
 msgctxt ""
 "brackets.xhp\n"
 "hd_id3152596\n"
 "help.text"
-msgid "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\" name=\"Merging Formula Parts in Brackets\">Merging Formula Parts in Brackets</link></variable>"
-msgstr "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\" name=\"合并括号中的公式部分\">合并括号中的公式部分</link></variable>"
+msgid "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\">Merging Formula Parts in Brackets</link></variable>"
+msgstr "<variable id=\"brackets\"><link href=\"text/smath/guide/brackets.xhp\">合并括号中的公式部分</link></variable>"
 
 #. z6zop
 #: brackets.xhp
@@ -221,7 +221,7 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Applying Color to Formula Parts"
-msgstr ""
+msgstr "将颜色应用于公式的各个部分"
 
 #. F9aE8
 #: color.xhp
@@ -230,16 +230,16 @@ msgctxt ""
 "bm_id3156384\n"
 "help.text"
 msgid "<bookmark_value>Color in formulas</bookmark_value>"
-msgstr ""
+msgstr "<bookmark_value>公式中的颜色</bookmark_value>"
 
-#. UXL5W
+#. dBGoG
 #: color.xhp
 msgctxt ""
 "color.xhp\n"
 "hd_id601641846107898\n"
 "help.text"
-msgid "<variable id=\"color\"><link href=\"text/smath/guide/color.xhp\" name=\"Color_link\">Applying Color to Formula Parts</link></variable>"
-msgstr ""
+msgid "<variable id=\"color\"><link href=\"text/smath/guide/color.xhp\">Applying Color to Formula Parts</link></variable>"
+msgstr "<variable id=\"color\"><link href=\"text/smath/guide/color.xhp\">将颜色应用于公式中的各个部分</link></variable>"
 
 #. ckGgG
 #: color.xhp
@@ -248,7 +248,7 @@ msgctxt ""
 "par_id481641846189425\n"
 "help.text"
 msgid "Use the command <literal>color</literal> to apply color to the subsequent formula part."
-msgstr ""
+msgstr "使用<literal>color</literal>命令将颜色应用于其后接的公式部分。"
 
 #. BnqGh
 #: color.xhp
@@ -257,15 +257,15 @@ msgctxt ""
 "par_id141641846432331\n"
 "help.text"
 msgid "The example below creates a formula where <emph>a</emph> is shown using the default color (black) and <emph>b</emph> is shown in red."
-msgstr ""
+msgstr "下面的示例创建了一个公式，其中使用默认颜色（黑色）显示<emph>a</emph>，以红色显示<emph>b</emph>。"
 
-#. jV7H8
+#. QBxDL
 #: color.xhp
 msgctxt ""
 "color.xhp\n"
 "par_id211641848286949\n"
 "help.text"
-msgid "Beware that the <literal>color</literal> command only changes the color of the formula part that comes immediately after it. For example, in the formula below only <emph>b</emph> will be shown in red, whereas <emph>c</emph> will be shown in black."
+msgid "Be aware that the <literal>color</literal> command only changes the color of the formula part that comes immediately after it. For example, in the formula below only <emph>b</emph> will be shown in red, whereas <emph>c</emph> will be shown in black."
 msgstr ""
 
 #. hLeFX
@@ -275,16 +275,16 @@ msgctxt ""
 "par_id841641848475043\n"
 "help.text"
 msgid "Use braces to apply color to more parts of the formula. In the following example, <emph>b</emph> and <emph>c</emph> are shown in red."
-msgstr ""
+msgstr "使用大括号将颜色应用于公式的更多部分。在以下示例中，<emph>b</emph>和<emph>c</emph>显示为红色。"
 
-#. JAK8L
+#. gLttS
 #: color.xhp
 msgctxt ""
 "color.xhp\n"
 "par_id651641851485699\n"
 "help.text"
-msgid "A list with predefined color names is available <link href=\"text/smath/guide/color.xhp#PredefinedColors\" name=\"Colors_list\">here</link>."
-msgstr ""
+msgid "A list with predefined color names is available <link href=\"text/smath/guide/color.xhp#PredefinedColors\">here</link>."
+msgstr "<link href=\"text/smath/guide/color.xhp#PredefinedColors\">此处</link>提供了带有预定义颜色名称的列表。"
 
 #. gQn7y
 #: color.xhp
@@ -293,7 +293,7 @@ msgctxt ""
 "bm_id521641858375937\n"
 "help.text"
 msgid "<bookmark_value>RGB colors</bookmark_value>"
-msgstr ""
+msgstr "<bookmark_value>RGB颜色</bookmark_value>"
 
 #. beAyt
 #: color.xhp
@@ -302,7 +302,7 @@ msgctxt ""
 "hd_id831641851472401\n"
 "help.text"
 msgid "Using RGB colors"
-msgstr ""
+msgstr "使用RGB颜色"
 
 #. tj2xF
 #: color.xhp
@@ -311,7 +311,7 @@ msgctxt ""
 "par_id701641851641673\n"
 "help.text"
 msgid "Use the command <literal>color rgb</literal> to apply colors using RGB (Red, Green, Blue) values."
-msgstr ""
+msgstr "使用<literal>“color rgb”</literal>命令可以使用RGB（红色、绿色、蓝色）值应用颜色。"
 
 #. eYWCg
 #: color.xhp
@@ -320,7 +320,7 @@ msgctxt ""
 "par_id941641851779414\n"
 "help.text"
 msgid "RGB values range between 0 and 255."
-msgstr ""
+msgstr "RGB值范围在0到255之间。"
 
 #. EFXpV
 #: color.xhp
@@ -329,7 +329,7 @@ msgctxt ""
 "bm_id521641858372217\n"
 "help.text"
 msgid "<bookmark_value>Hex colors</bookmark_value>"
-msgstr ""
+msgstr "<bookmark_value>十六进制颜色</bookmark_value>"
 
 #. mdvQM
 #: color.xhp
@@ -338,7 +338,7 @@ msgctxt ""
 "hd_id901641851813499\n"
 "help.text"
 msgid "Using hex notation"
-msgstr ""
+msgstr "使用十六进制表示法"
 
 #. zLQWy
 #: color.xhp
@@ -347,7 +347,7 @@ msgctxt ""
 "par_id271641851832464\n"
 "help.text"
 msgid "Use the command <literal>color hex</literal> to apply colors using the hexadecimal notation."
-msgstr ""
+msgstr "使用命令<literal>color hex</literal>以十六进制表示法应用颜色。"
 
 #. rPHnc
 #: color.xhp
@@ -356,7 +356,7 @@ msgctxt ""
 "hd_id121641851982125\n"
 "help.text"
 msgid "Combining color with other commands"
-msgstr ""
+msgstr "将颜色与其他命令相结合"
 
 #. WiZz8
 #: color.xhp
@@ -718,14 +718,14 @@ msgctxt ""
 msgid "<bookmark_value>comments; entering in $[officename] Math</bookmark_value><bookmark_value>inserting;comments in $[officename] Math</bookmark_value>"
 msgstr "<bookmark_value>注释; 在 $[officename] Math 中输入</bookmark_value><bookmark_value>插入; $[officename] Math 中的注释</bookmark_value>"
 
-#. RB5xU
+#. A9Yfc
 #: comment.xhp
 msgctxt ""
 "comment.xhp\n"
 "hd_id3155961\n"
 "help.text"
-msgid "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\" name=\"Entering Comments\">Entering Comments</link></variable>"
-msgstr "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\" name=\"输入注释\">输入注释</link></variable>"
+msgid "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\">Entering Comments</link></variable>"
+msgstr "<variable id=\"comment\"><link href=\"text/smath/guide/comment.xhp\">输入注释</link></variable>"
 
 #. CA8hE
 #: comment.xhp
@@ -781,14 +781,14 @@ msgctxt ""
 msgid "<bookmark_value>accessibility; $[officename] Math shortcuts</bookmark_value>"
 msgstr "<bookmark_value>辅助功能； $[officename] Math 快捷方式</bookmark_value>"
 
-#. 4zHFd
+#. pq9cU
 #: keyboard.xhp
 msgctxt ""
 "keyboard.xhp\n"
 "hd_id3149018\n"
 "help.text"
-msgid "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\" name=\"Shortcuts ($[officename] Math Accessibility)\">Shortcuts ($[officename] Math Accessibility)</link></variable>"
-msgstr "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\" name=\"快捷键 ($[officename] Math 辅助功能) \">快捷键 ($[officename] Math 辅助功能) </link></variable>"
+msgid "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\">Shortcuts ($[officename] Math Accessibility)</link></variable>"
+msgstr "<variable id=\"keyboard\"><link href=\"text/smath/guide/keyboard.xhp\">快捷键 ($[officename] Math 辅助功能) </link></variable>"
 
 #. ZkpGA
 #: keyboard.xhp
@@ -1087,14 +1087,14 @@ msgctxt ""
 msgid "<bookmark_value>$[officename] Math;general instructions</bookmark_value><bookmark_value>instructions; $[officename] Math</bookmark_value><bookmark_value>Equation Editor, see $[officename] Math</bookmark_value>"
 msgstr "<bookmark_value>$[officename] Math; 常规说明</bookmark_value><bookmark_value>说明; $[officename] Math</bookmark_value><bookmark_value>方程式编辑器，参阅 $[officename] Math</bookmark_value>"
 
-#. DyNdG
+#. 4VuXB
 #: main.xhp
 msgctxt ""
 "main.xhp\n"
 "hd_id3147341\n"
 "help.text"
-msgid "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\" name=\"Instructions for Using $[officename] Math\">Instructions for Using $[officename] Math</link></variable>"
-msgstr "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\" name=\"Instructions for Using $[officename] Math\">$[officename] Math 使用说明</link></variable>"
+msgid "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\">Instructions for Using $[officename] Math</link></variable>"
+msgstr "<variable id=\"main\"><link href=\"text/smath/guide/main.xhp\">$[officename] Math 使用说明</link></variable>"
 
 #. ArDuV
 #: main.xhp
@@ -1123,14 +1123,14 @@ msgctxt ""
 msgid "<bookmark_value>line breaks; in formulas</bookmark_value><bookmark_value>formulas;line breaks</bookmark_value><bookmark_value>wrapping text;in formulas</bookmark_value>"
 msgstr "<bookmark_value>换行符; 在公式中</bookmark_value><bookmark_value>公式;换行符</bookmark_value><bookmark_value>环绕文字;在公式中</bookmark_value>"
 
-#. Uaq5F
+#. HD6CM
 #: newline.xhp
 msgctxt ""
 "newline.xhp\n"
 "hd_id3146970\n"
 "help.text"
-msgid "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\" name=\"Entering Line Breaks\">Entering Line Breaks</link></variable>"
-msgstr "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\" name=\"输入换行符\">输入换行符</link></variable>"
+msgid "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\">Entering Line Breaks</link></variable>"
+msgstr "<variable id=\"newline\"><link href=\"text/smath/guide/newline.xhp\">输入换行符</link></variable>"
 
 #. gLLUF
 #: newline.xhp
@@ -1168,14 +1168,14 @@ msgctxt ""
 msgid "<bookmark_value>brackets; inserting in %PRODUCTNAME Math</bookmark_value><bookmark_value>inserting;brackets</bookmark_value><bookmark_value>distances between brackets</bookmark_value>"
 msgstr "<bookmark_value>括号; 在 %PRODUCTNAME Math 中插入</bookmark_value><bookmark_value>插入;括号</bookmark_value><bookmark_value>括号之间的距离</bookmark_value>"
 
-#. XkEUk
+#. AsaCy
 #: parentheses.xhp
 msgctxt ""
 "parentheses.xhp\n"
 "hd_id3153415\n"
 "help.text"
-msgid "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\" name=\"Inserting Brackets\">Inserting Brackets</link></variable>"
-msgstr "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\" name=\"插入括号\">插入括号</link></variable>"
+msgid "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\">Inserting Brackets</link></variable>"
+msgstr "<variable id=\"parentheses\"><link href=\"text/smath/guide/parentheses.xhp\">插入括号</link></variable>"
 
 #. cAGdF
 #: parentheses.xhp
@@ -1213,14 +1213,14 @@ msgctxt ""
 msgid "<bookmark_value>text strings; entering in $[officename] Math</bookmark_value><bookmark_value>direct text; entering in $[officename] Math</bookmark_value><bookmark_value>inserting;text in $[officename] Math</bookmark_value>"
 msgstr "<bookmark_value>文本字符串; 在 $[officename] Math 中输入</bookmark_value><bookmark_value>直接文本; 在 $[officename] Math 中输入</bookmark_value><bookmark_value>插入; $[officename] Math 中的文本</bookmark_value>"
 
-#. XRDUC
+#. 5ZHGm
 #: text.xhp
 msgctxt ""
 "text.xhp\n"
 "hd_id5676442\n"
 "help.text"
-msgid "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\" name=\"Entering Text\">Entering Text</link></variable>"
-msgstr "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\" name=\"Entering Text\">输入文本</link></variable>"
+msgid "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\">Entering Text</link></variable>"
+msgstr "<variable id=\"text\"><link href=\"text/smath/guide/text.xhp\">输入文本</link></variable>"
 
 #. FGjG4
 #: text.xhp

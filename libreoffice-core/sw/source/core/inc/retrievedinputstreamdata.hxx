@@ -21,11 +21,12 @@
 
 #include <tools/link.hxx>
 #include <sal/types.h>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <com/sun/star/uno/Reference.hxx>
 
 #include <map>
 #include <memory>
+#include <utility>
 
 namespace com::sun::star::io { class XInputStream; }
 
@@ -58,7 +59,7 @@ class SwRetrievedInputStreamDataManager
             {};
 
             tData( std::weak_ptr< SwAsyncRetrieveInputStreamThreadConsumer > pThreadConsumer )
-                : mpThreadConsumer( pThreadConsumer ),
+                : mpThreadConsumer(std::move( pThreadConsumer )),
                   mbIsStreamReadOnly( false )
             {};
         };
@@ -74,13 +75,13 @@ class SwRetrievedInputStreamDataManager
         bool PopData( const tDataKey nDataKey,
                       tData& rData );
 
-        DECL_LINK( LinkedInputStreamReady, void*, void );
+        DECL_STATIC_LINK( SwRetrievedInputStreamDataManager, LinkedInputStreamReady, void*, void );
 
     private:
 
         static tDataKey snNextKeyValue;
 
-        osl::Mutex maMutex;
+        std::mutex maMutex;
 
         std::map< tDataKey, tData > maInputStreamData;
 };

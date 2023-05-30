@@ -42,13 +42,14 @@
 #include <com/sun/star/script/XEventAttacherManager.hpp>
 #include <com/sun/star/script/XScriptListener.hpp>
 #include <cppuhelper/weak.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <rtl/ref.hxx>
 
 #include <deque>
 #include <algorithm>
+#include <utility>
 
 using namespace com::sun::star::uno;
 using namespace com::sun::star::io;
@@ -86,7 +87,7 @@ class ImplEventAttacherManager
     std::deque< AttacherIndex_Impl >  aIndex;
     Mutex aLock;
     // Container for the ScriptListener
-    OInterfaceContainerHelper2          aScriptListeners;
+    OInterfaceContainerHelper3<XScriptListener> aScriptListeners;
     // Instance of EventAttacher
     Reference< XEventAttacher2 >        xAttacher;
     Reference< XComponentContext >      mxContext;
@@ -140,8 +141,8 @@ class AttacherAllListener_Impl : public WeakImplHelper< XAllListener >
     /// @throws CannotConvertException
     void convertToEventReturn( Any & rRet, const Type & rRetType );
 public:
-    AttacherAllListener_Impl( ImplEventAttacherManager* pManager_, const OUString &rScriptType_,
-                                const OUString & rScriptCode_ );
+    AttacherAllListener_Impl( ImplEventAttacherManager* pManager_, OUString aScriptType_,
+                                OUString aScriptCode_ );
 
     // Methods of XAllListener
     virtual void SAL_CALL firing(const AllEventObject& Event) override;
@@ -156,12 +157,12 @@ public:
 AttacherAllListener_Impl::AttacherAllListener_Impl
 (
     ImplEventAttacherManager*   pManager_,
-    const OUString &             rScriptType_,
-    const OUString &             rScriptCode_
+    OUString              aScriptType_,
+    OUString              aScriptCode_
 )
     : mxManager( pManager_ )
-    , aScriptType( rScriptType_ )
-    , aScriptCode( rScriptCode_ )
+    , aScriptType(std::move( aScriptType_ ))
+    , aScriptCode(std::move( aScriptCode_ ))
 {
 }
 
@@ -179,9 +180,7 @@ void SAL_CALL AttacherAllListener_Impl::firing(const AllEventObject& Event)
     aScriptEvent.ScriptCode     = aScriptCode;
 
     // Iterate over all listeners and pass events.
-    OInterfaceIteratorHelper2 aIt( mxManager->aScriptListeners );
-    while( aIt.hasMoreElements() )
-        static_cast<XScriptListener *>(aIt.next())->firing( aScriptEvent );
+    mxManager->aScriptListeners.notifyEach( &XScriptListener::firing, aScriptEvent );
 }
 
 
@@ -242,10 +241,10 @@ Any SAL_CALL AttacherAllListener_Impl::approveFiring( const AllEventObject& Even
 
     Any aRet;
     // Iterate over all listeners and pass events.
-    OInterfaceIteratorHelper2 aIt( mxManager->aScriptListeners );
+    OInterfaceIteratorHelper3 aIt( mxManager->aScriptListeners );
     while( aIt.hasMoreElements() )
     {
-        aRet = static_cast<XScriptListener *>(aIt.next())->approveFiring( aScriptEvent );
+        aRet = aIt.next()->approveFiring( aScriptEvent );
         try
         {
             Reference< XIdlClass > xListenerType = mxManager->getReflection()->
@@ -458,10 +457,10 @@ void SAL_CALL ImplEventAttacherManager::revokeScriptEvent
     for( const auto& rObj : aList )
         detach( nIndex, rObj.xTarget );
 
-    OUString aLstType = ListenerType;
-    sal_Int32 nLastDot = aLstType.lastIndexOf('.');
-    if (nLastDot != -1)
-        aLstType = aLstType.copy(nLastDot+1);
+    std::u16string_view aLstType = ListenerType;
+    size_t nLastDot = aLstType.rfind('.');
+    if (nLastDot != std::u16string_view::npos)
+        aLstType = aLstType.substr(nLastDot+1);
 
     auto aEvtIt = std::find_if(aIt->aEventList.begin(), aIt->aEventList.end(),
         [&aLstType, &EventMethod, &ToRemoveListenerParam](const ScriptEventDescriptor& rEvent) {

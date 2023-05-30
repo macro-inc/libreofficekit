@@ -44,7 +44,7 @@ using namespace ::comphelper;
 
 #define CHECK_RETURN(x)                                                 \
     if(!SUCCEEDED(x))                                                               \
-        ADOS::ThrowException(*m_pStmt->m_pConnection->getConnection(),*this);
+        ADOS::ThrowException(m_pStmt->m_pConnection->getConnection(),*this);
 
 using namespace connectivity::ado;
 using namespace com::sun::star::uno;
@@ -596,7 +596,7 @@ sal_Bool SAL_CALL OResultSet::next(  )
             ++m_nRowPos;
         }
         else
-            ADOS::ThrowException(*m_pStmt->m_pConnection->getConnection(),*this);
+            ADOS::ThrowException(m_pStmt->m_pConnection->getConnection(),*this);
     }
 
     return bRet;
@@ -818,12 +818,12 @@ Any SAL_CALL OResultSet::getBookmark(  )
     checkDisposed(OResultSet_BASE::rBHelper.bDisposed);
 
     if(m_nRowPos < static_cast<sal_Int32>(m_aBookmarks.size())) // this bookmark was already fetched
-        return makeAny(sal_Int32(m_nRowPos-1));
+        return Any(sal_Int32(m_nRowPos-1));
 
     OLEVariant aVar;
     m_pRecordSet->get_Bookmark(&aVar);
     m_aBookmarks.push_back(aVar);
-    return makeAny(static_cast<sal_Int32>(m_aBookmarks.size()-1));
+    return Any(static_cast<sal_Int32>(m_aBookmarks.size()-1));
 
 }
 
@@ -882,11 +882,9 @@ sal_Bool SAL_CALL OResultSet::hasOrderedBookmarks(  )
     checkDisposed(OResultSet_BASE::rBHelper.bDisposed);
 
 
-    ADOProperties* pProps = nullptr;
-    m_pRecordSet->get_Properties(&pProps);
     WpADOProperties aProps;
-    aProps.setWithOutAddRef(pProps);
-    ADOS::ThrowException(*static_cast<OConnection*>(m_pStmt->getConnection().get())->getConnection(),*this);
+    m_pRecordSet->get_Properties(&aProps);
+    ADOS::ThrowException(static_cast<OConnection*>(m_pStmt->getConnection().get())->getConnection(),*this);
     OSL_ENSURE(aProps.IsValid(),"There are no properties at the connection");
 
     WpADOProperty aProp(aProps.GetItem(OUString("Bookmarks Ordered")));
@@ -894,7 +892,7 @@ sal_Bool SAL_CALL OResultSet::hasOrderedBookmarks(  )
     if(aProp.IsValid())
         aVar = aProp.GetValue();
     else
-        ADOS::ThrowException(*static_cast<OConnection*>(m_pStmt->getConnection().get())->getConnection(),*this);
+        ADOS::ThrowException(static_cast<OConnection*>(m_pStmt->getConnection().get())->getConnection(),*this);
 
     bool bValue(false);
     if(!aVar.isNull() && !aVar.isEmpty())
@@ -1035,26 +1033,31 @@ void OResultSet::setFetchSize(sal_Int32 _par0)
 
 ::cppu::IPropertyArrayHelper* OResultSet::createArrayHelper( ) const
 {
-    Sequence< css::beans::Property > aProps(5);
-    css::beans::Property* pProperties = aProps.getArray();
-    sal_Int32 nPos = 0;
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHDIRECTION),
-        PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHSIZE),
-        PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_ISBOOKMARKABLE),
-        PROPERTY_ID_ISBOOKMARKABLE, cppu::UnoType<bool>::get(), PropertyAttribute::READONLY);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETCONCURRENCY),
-        PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-
-    pProperties[nPos++] = css::beans::Property(::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETTYPE),
-        PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY);
-
-    return new ::cppu::OPropertyArrayHelper(aProps);
+    return new ::cppu::OPropertyArrayHelper
+    {
+        {
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHDIRECTION),
+                PROPERTY_ID_FETCHDIRECTION, cppu::UnoType<sal_Int32>::get(), 0
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_FETCHSIZE),
+                PROPERTY_ID_FETCHSIZE, cppu::UnoType<sal_Int32>::get(), 0
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_ISBOOKMARKABLE),
+                PROPERTY_ID_ISBOOKMARKABLE, cppu::UnoType<bool>::get(), PropertyAttribute::READONLY
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETCONCURRENCY),
+                PROPERTY_ID_RESULTSETCONCURRENCY, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY
+            },
+            {
+                ::connectivity::OMetaConnection::getPropMap().getNameByIndex(PROPERTY_ID_RESULTSETTYPE),
+                PROPERTY_ID_RESULTSETTYPE, cppu::UnoType<sal_Int32>::get(), PropertyAttribute::READONLY
+            }
+        }
+    };
 }
 
 ::cppu::IPropertyArrayHelper & OResultSet::getInfoHelper()

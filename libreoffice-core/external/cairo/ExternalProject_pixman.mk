@@ -34,10 +34,10 @@ $(call gb_ExternalProject_get_state_target,pixman,build) :
 		$(gb_RUN_CONFIGURE) ./configure \
 		--disable-shared \
 		--with-pic \
-		$(if $(filter ANDROID,$(OS)),--disable-arm-simd --disable-arm-neon --disable-arm-iwmmxt) \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM) \
-		$(if $(filter INTEL ARM X86_64 AARCH64,$(CPUNAME)),ac_cv_c_bigendian=no)) \
-		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS="-pthread") \
+		$(if $(filter ANDROID,$(OS)),--disable-arm-simd --disable-arm-neon --disable-arm-a64-neon --disable-arm-iwmmxt) \
+		$(gb_CONFIGURE_PLATFORMS) \
+		$(if $(CROSS_COMPILING),$(if $(filter INTEL ARM,$(CPUNAME)),ac_cv_c_bigendian=no)) \
+		$(if $(filter EMSCRIPTEN,$(OS)),CFLAGS="-O3 -pthread -msimd128") \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,pixman,EXTERNAL)

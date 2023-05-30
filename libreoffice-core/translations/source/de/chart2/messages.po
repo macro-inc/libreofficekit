@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:18+0100\n"
-"PO-Revision-Date: 2022-07-26 09:17+0000\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
+"PO-Revision-Date: 2023-02-19 19:03+0000\n"
 "Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_ui-master/chart2messages/de/>\n"
 "Language: de\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1547564210.000000\n"
 
 #. NCRDD
@@ -68,7 +68,7 @@ msgstr "_Löschen"
 #. YspCj
 msgctxt "stock"
 msgid "_Edit"
-msgstr "_Bearbeiten"
+msgstr "_Bearbeiten…"
 
 #. imQxr
 msgctxt "stock"
@@ -78,7 +78,7 @@ msgstr "_Hilfe"
 #. RbjyB
 msgctxt "stock"
 msgid "_New"
-msgstr "Ne_u"
+msgstr "Ne_u…"
 
 #. dx2yy
 msgctxt "stock"
@@ -319,49 +319,49 @@ msgstr "Achsen"
 #: chart2/inc/strings.hrc:59
 msgctxt "STR_OBJECT_GRIDS"
 msgid "Grids"
-msgstr "Gitter"
+msgstr "Gitterlinien"
 
 #. zyanU
 #: chart2/inc/strings.hrc:60
 msgctxt "STR_OBJECT_GRID"
 msgid "Grid"
-msgstr "Gitter"
+msgstr "Gitterlinie"
 
 #. pEwe5
 #: chart2/inc/strings.hrc:61
 msgctxt "STR_OBJECT_GRID_MAJOR_X"
 msgid "X Axis Major Grid"
-msgstr "X-Achsenhauptgitter"
+msgstr "X-Achse Hauptgitterlinien"
 
 #. ETsPn
 #: chart2/inc/strings.hrc:62
 msgctxt "STR_OBJECT_GRID_MAJOR_Y"
 msgid "Y Axis Major Grid"
-msgstr "Y-Achsenhauptgitter"
+msgstr "Y-Achse Hauptgitterlinien"
 
 #. SonFW
 #: chart2/inc/strings.hrc:63
 msgctxt "STR_OBJECT_GRID_MAJOR_Z"
 msgid "Z Axis Major Grid"
-msgstr "Z-Achsenhauptgitter"
+msgstr "Z-Achse Hauptgitterlinien"
 
 #. sBgvb
 #: chart2/inc/strings.hrc:64
 msgctxt "STR_OBJECT_GRID_MINOR_X"
 msgid "X Axis Minor Grid"
-msgstr "X-Achsenhilfsgitter"
+msgstr "X-Achse Hilfsgitterlinien"
 
 #. 3YcEK
 #: chart2/inc/strings.hrc:65
 msgctxt "STR_OBJECT_GRID_MINOR_Y"
 msgid "Y Axis Minor Grid"
-msgstr "Y-Achsenhilfsgitter"
+msgstr "Y-Achse Hilfsgitterlinien"
 
 #. hkZQA
 #: chart2/inc/strings.hrc:66
 msgctxt "STR_OBJECT_GRID_MINOR_Z"
 msgid "Z Axis Minor Grid"
-msgstr "Z-Achsenhilfsgitter"
+msgstr "Z-Achse Hilfsgitterlinien"
 
 #. HRr84
 #: chart2/inc/strings.hrc:67
@@ -559,7 +559,7 @@ msgstr "Diagrammboden"
 #: chart2/inc/strings.hrc:99
 msgctxt "STR_OBJECT_SHAPE"
 msgid "Drawing Object"
-msgstr "Zeichenobjekt"
+msgstr "Zeichnungsobjekt"
 
 #. dNCXG
 #: chart2/inc/strings.hrc:100
@@ -649,13 +649,13 @@ msgstr "Legende ein/aus"
 #: chart2/inc/strings.hrc:114
 msgctxt "STR_ACTION_TOGGLE_GRID_HORZ"
 msgid "Horizontal grid major/major&minor/off"
-msgstr "Horizontales Gitter (Hauptgitter/beide/keines)"
+msgstr "Horizontale Gitterlinien (Hauptgitterlinien/beide/keine)"
 
 #. jZDDr
 #: chart2/inc/strings.hrc:115
 msgctxt "STR_ACTION_TOGGLE_GRID_VERTICAL"
 msgid "Vertical grid major/major&minor/off"
-msgstr "Vertikales Gitter (Hauptgitter/beide/keines)"
+msgstr "Vertikale Gitterlinien (Hauptgitterlinien/beide/keine)"
 
 #. bZzzZ
 #: chart2/inc/strings.hrc:116
@@ -853,260 +853,266 @@ msgctxt "STR_PROPERTY_ROLE_BORDERCOLOR"
 msgid "Border Color"
 msgstr "Rahmenfarbe"
 
+#. KSB4c
+#: chart2/inc/strings.hrc:148
+msgctxt "STR_DATA_TABLE"
+msgid "Data Table"
+msgstr "Datentabelle"
+
 #. TuRxr
-#: chart2/inc/strings.hrc:149
+#: chart2/inc/strings.hrc:150
 msgctxt "STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
 msgid "From Data Table"
 msgstr "Aus Datentabelle"
 
 #. aPEDY
-#: chart2/inc/strings.hrc:150
+#: chart2/inc/strings.hrc:151
 msgctxt "STR_REGRESSION_LINEAR"
 msgid "Linear"
 msgstr "Linear"
 
 #. nD8ay
-#: chart2/inc/strings.hrc:151
+#: chart2/inc/strings.hrc:152
 msgctxt "STR_REGRESSION_LOG"
 msgid "Logarithmic"
 msgstr "Logarithmisch"
 
 #. CotSJ
-#: chart2/inc/strings.hrc:152
+#: chart2/inc/strings.hrc:153
 msgctxt "STR_REGRESSION_EXP"
 msgid "Exponential"
 msgstr "Exponentiell"
 
 #. HqBJV
-#: chart2/inc/strings.hrc:153
+#: chart2/inc/strings.hrc:154
 msgctxt "STR_REGRESSION_POWER"
 msgid "Power"
 msgstr "Potenziell"
 
 #. dBiUj
-#: chart2/inc/strings.hrc:154
+#: chart2/inc/strings.hrc:155
 msgctxt "STR_REGRESSION_POLYNOMIAL"
 msgid "Polynomial"
 msgstr "Polynomisch"
 
 #. FWi4g
-#: chart2/inc/strings.hrc:155
+#: chart2/inc/strings.hrc:156
 msgctxt "STR_REGRESSION_MOVING_AVERAGE"
 msgid "Moving average"
 msgstr "Gleitender Mittelwert"
 
 #. psj3B
-#: chart2/inc/strings.hrc:156
+#: chart2/inc/strings.hrc:157
 msgctxt "STR_REGRESSION_MEAN"
 msgid "Mean"
 msgstr "Mittelwert"
 
 #. C8FVd
-#: chart2/inc/strings.hrc:158
+#: chart2/inc/strings.hrc:159
 msgctxt "STR_TYPE_COLUMN"
 msgid "Column"
 msgstr "Säulendiagramm"
 
 #. SWPnA
-#: chart2/inc/strings.hrc:159
+#: chart2/inc/strings.hrc:160
 msgctxt "STR_TYPE_BAR"
 msgid "Bar"
 msgstr "Balkendiagramm"
 
 #. xUnpz
-#: chart2/inc/strings.hrc:160
+#: chart2/inc/strings.hrc:161
 msgctxt "STR_TYPE_AREA"
 msgid "Area"
 msgstr "Flächendiagramm"
 
 #. bqxBm
-#: chart2/inc/strings.hrc:161
+#: chart2/inc/strings.hrc:162
 msgctxt "STR_TYPE_PIE"
 msgid "Pie"
 msgstr "Kreisdiagramm"
 
 #. GGwEH
-#: chart2/inc/strings.hrc:162
+#: chart2/inc/strings.hrc:163
 msgctxt "STR_PIE_EXPLODED"
 msgid "Exploded Pie Chart"
 msgstr "Explodiertes Kreisdiagramm"
 
 #. gxFtf
-#: chart2/inc/strings.hrc:163
+#: chart2/inc/strings.hrc:164
 msgctxt "STR_DONUT_EXPLODED"
 msgid "Exploded Donut Chart"
 msgstr "Explodiertes Ringdiagramm"
 
 #. nsoQ2
-#: chart2/inc/strings.hrc:164
+#: chart2/inc/strings.hrc:165
 msgctxt "STR_DONUT"
 msgid "Donut"
 msgstr "Ringdiagramm"
 
 #. 7HjEG
-#: chart2/inc/strings.hrc:165
+#: chart2/inc/strings.hrc:166
 msgctxt "STR_TYPE_LINE"
 msgid "Line"
 msgstr "Liniendiagramm"
 
 #. Miu8E
-#: chart2/inc/strings.hrc:166
+#: chart2/inc/strings.hrc:167
 msgctxt "STR_TYPE_XY"
 msgid "XY (Scatter)"
 msgstr "XY (Streudiagramm)"
 
 #. LBFRX
-#: chart2/inc/strings.hrc:167
+#: chart2/inc/strings.hrc:168
 msgctxt "STR_POINTS_AND_LINES"
 msgid "Points and Lines"
 msgstr "Punkte und Linien"
 
 #. fjka7
-#: chart2/inc/strings.hrc:168
+#: chart2/inc/strings.hrc:169
 msgctxt "STR_POINTS_ONLY"
 msgid "Points Only"
 msgstr "Nur Punkte"
 
 #. Sz53v
-#: chart2/inc/strings.hrc:169
+#: chart2/inc/strings.hrc:170
 msgctxt "STR_LINES_ONLY"
 msgid "Lines Only"
 msgstr "Nur Linien"
 
 #. AAEA2
-#: chart2/inc/strings.hrc:170
+#: chart2/inc/strings.hrc:171
 msgctxt "STR_LINES_3D"
 msgid "3D Lines"
 msgstr "3D-Linien"
 
 #. ABjEg
-#: chart2/inc/strings.hrc:171
+#: chart2/inc/strings.hrc:172
 msgctxt "STR_TYPE_COMBI_COLUMN_LINE"
 msgid "Column and Line"
 msgstr "Säulen und Linien"
 
 #. nVKfC
-#: chart2/inc/strings.hrc:172
+#: chart2/inc/strings.hrc:173
 msgctxt "STR_LINE_COLUMN"
 msgid "Columns and Lines"
 msgstr "Säulen und Linien"
 
 #. QkQSa
-#: chart2/inc/strings.hrc:173
+#: chart2/inc/strings.hrc:174
 msgctxt "STR_LINE_STACKEDCOLUMN"
 msgid "Stacked Columns and Lines"
 msgstr "Gestapelte Säulen und Linien"
 
 #. HGKEx
-#: chart2/inc/strings.hrc:174
+#: chart2/inc/strings.hrc:175
 msgctxt "STR_TYPE_NET"
 msgid "Net"
 msgstr "Netzdiagramm"
 
 #. BKUc4
-#: chart2/inc/strings.hrc:175
+#: chart2/inc/strings.hrc:176
 msgctxt "STR_TYPE_STOCK"
 msgid "Stock"
 msgstr "Kursdiagramm"
 
 #. oG4gw
-#: chart2/inc/strings.hrc:176
+#: chart2/inc/strings.hrc:177
 msgctxt "STR_STOCK_1"
 msgid "Stock Chart 1"
 msgstr "Kursdiagramm 1"
 
 #. pSzDo
-#: chart2/inc/strings.hrc:177
+#: chart2/inc/strings.hrc:178
 msgctxt "STR_STOCK_2"
 msgid "Stock Chart 2"
 msgstr "Kursdiagramm 2"
 
 #. aEFDu
-#: chart2/inc/strings.hrc:178
+#: chart2/inc/strings.hrc:179
 msgctxt "STR_STOCK_3"
 msgid "Stock Chart 3"
 msgstr "Kursdiagramm 3"
 
 #. jZqox
-#: chart2/inc/strings.hrc:179
+#: chart2/inc/strings.hrc:180
 msgctxt "STR_STOCK_4"
 msgid "Stock Chart 4"
 msgstr "Kursdiagramm 4"
 
 #. DNBgg
-#: chart2/inc/strings.hrc:180
+#: chart2/inc/strings.hrc:181
 msgctxt "STR_NORMAL"
 msgid "Normal"
 msgstr "Normal"
 
 #. EfGVL
-#: chart2/inc/strings.hrc:181
+#: chart2/inc/strings.hrc:182
 msgctxt "STR_STACKED"
 msgid "Stacked"
 msgstr "Gestapelt"
 
 #. wqtzw
-#: chart2/inc/strings.hrc:182
+#: chart2/inc/strings.hrc:183
 msgctxt "STR_PERCENT"
 msgid "Percent Stacked"
 msgstr "Prozentual gestapelt"
 
 #. 52UGB
-#: chart2/inc/strings.hrc:183
+#: chart2/inc/strings.hrc:184
 msgctxt "STR_DEEP"
 msgid "Deep"
 msgstr "Hintereinander"
 
 #. dxfuQ
-#: chart2/inc/strings.hrc:184
+#: chart2/inc/strings.hrc:185
 msgctxt "STR_FILLED"
 msgid "Filled"
 msgstr "Ausgefüllt"
 
 #. rC5nu
-#: chart2/inc/strings.hrc:185
+#: chart2/inc/strings.hrc:186
 msgctxt "STR_TYPE_BUBBLE"
 msgid "Bubble"
 msgstr "Blasendiagramm"
 
 #. N9tXx
-#: chart2/inc/strings.hrc:186
+#: chart2/inc/strings.hrc:187
 msgctxt "STR_BUBBLE_1"
 msgid "Bubble Chart"
 msgstr "Blasendiagramm"
 
 #. AjPsf
-#: chart2/inc/strings.hrc:188
+#: chart2/inc/strings.hrc:189
 msgctxt "STR_INVALID_NUMBER"
 msgid "Numbers are required. Check your input."
 msgstr "Es werden Zahlenwerte benötigt. Bitte überprüfen Sie die Eingabe."
 
 #. ofh4V
-#: chart2/inc/strings.hrc:189
+#: chart2/inc/strings.hrc:190
 msgctxt "STR_STEP_GT_ZERO"
 msgid "The major interval requires a positive number. Check your input."
 msgstr "Das Hauptintervall benötigt einen positiven Zahlenwert. Bitte überprüfen Sie die Eingabe."
 
 #. EBJjR
-#: chart2/inc/strings.hrc:190
+#: chart2/inc/strings.hrc:191
 msgctxt "STR_BAD_LOGARITHM"
 msgid "The logarithmic scale requires positive numbers. Check your input."
 msgstr "Für die logarithmische Darstellung werden positive Zahlenwerte benötigt. Bitte überprüfen Sie die Eingabe."
 
 #. K8BCB
-#: chart2/inc/strings.hrc:191
+#: chart2/inc/strings.hrc:192
 msgctxt "STR_MIN_GREATER_MAX"
 msgid "The minimum must be lower than the maximum. Check your input."
 msgstr "Der Mindestwert muss unter dem Höchstwert liegen. Prüfen Sie die eingegebenen Werte."
 
 #. oBR4x
-#: chart2/inc/strings.hrc:192
+#: chart2/inc/strings.hrc:193
 msgctxt "STR_INVALID_INTERVALS"
 msgid "The major interval needs to be greater than the minor interval. Check your input."
 msgstr "Das Hauptintervall benötigt einen größeren Zahlenwert als das Hilfsintervall. Bitte überprüfen Sie die Eingabe."
 
 #. ZvDEh
-#: chart2/inc/strings.hrc:193
+#: chart2/inc/strings.hrc:194
 msgctxt "STR_INVALID_TIME_UNIT"
 msgid "The major and minor interval need to be greater or equal to the resolution. Check your input."
 msgstr "Das Haupt- und Hilfsintervall benötigen einen mindestens genauso großen Zahlenwert wie die Auflösung. Bitte überprüfen Sie die Eingabe."
@@ -1403,7 +1409,7 @@ msgstr "Textattribute"
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:322
 msgctxt "dlg_DataLabel|FT_LABEL_PLACEMENT"
 msgid "Place_ment"
-msgstr "Platz_ierung"
+msgstr "Platz_ierung:"
 
 #. RBvRC
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:338
@@ -1493,7 +1499,7 @@ msgstr "Wählt die Platzierung der Datenbeschriftung relativ zu den Objekten."
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:367
 msgctxt "dlg_DataLabel|FT_TEXT_SEPARATOR"
 msgid "_Separator"
-msgstr "_Trenner"
+msgstr "_Trennzeichen:"
 
 #. m8qsr
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:383
@@ -1529,7 +1535,7 @@ msgstr "Punkt"
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:391
 msgctxt "dlg_DataLabel|extended_tip|LB_TEXT_SEPARATOR"
 msgid "Selects the separator between multiple text strings for the same object."
-msgstr "Wählt das Trennzeichen zwischen mehreren Textzeichenketten für das gleiche Objekt."
+msgstr "Wählt das Trennzeichen zwischen mehreren Textzeichenfolgen für das gleiche Objekt."
 
 #. oEFpN
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:406
@@ -1559,7 +1565,7 @@ msgstr "_Grad"
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:518
 msgctxt "dlg_DataLabel|FT_LABEL_TEXTDIR"
 msgid "Te_xt direction"
-msgstr "Te_xtrichtung"
+msgstr "Te_xtrichtung:"
 
 #. tjcHp
 #: chart2/uiconfig/ui/dlg_DataLabel.ui:535
@@ -1602,6 +1608,48 @@ msgstr "Öffnet den Dialog Datenbeschriftung, in dem Sie das Aussehen der Datenb
 msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabels"
 msgid "Opens the Data Labels dialog, which enables you to set the data labels."
 msgstr "Öffnet den Dialog Datenbeschriftung, in dem Sie das Aussehen der Datenbeschriftung festlegen."
+
+#. XbRRD
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:8
+msgctxt "dlg_InsertDataTable|dlg_InsertDataTable"
+msgid "Data Table"
+msgstr "Datentabelle"
+
+#. SBrCL
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:85
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show data table"
+msgstr "Datentabelle anzeigen"
+
+#. y4rFB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:119
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Horizontalen Rahmen anzeigen"
+
+#. GstZR
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:135
+msgctxt "dlg_InsertDataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Vertikalen Rahmen anzeigen"
+
+#. KAzDB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:151
+msgctxt "dlg_InsertDataTable|outlineCB"
+msgid "Show outline"
+msgstr "Umrandung zeigen"
+
+#. bm6hN
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:167
+msgctxt "dlg_InsertDataTable|keysCB"
+msgid "Show keys"
+msgstr "Schlüssel zeigen"
+
+#. JpXPi
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:187
+msgctxt "dlg_InsertDataTable|dataTablePropertiesLabel"
+msgid "Data Table Properties"
+msgstr "Datentabellen-Eigenschaften"
 
 #. 3GUtp
 #: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:28
@@ -1985,7 +2033,7 @@ msgstr "_X-Achse"
 #: chart2/uiconfig/ui/insertgriddlg.ui:110
 msgctxt "insertgriddlg|extended_tip|primaryX"
 msgid "Adds gridlines to the X axis of the chart."
-msgstr "Fügt Gitternetzlinien für die X-Achse des Diagramms ein."
+msgstr "Fügt Gitterlinien für die X-Achse des Diagramms ein."
 
 #. FEBZW
 #: chart2/uiconfig/ui/insertgriddlg.ui:122
@@ -1997,7 +2045,7 @@ msgstr "_Y-Achse"
 #: chart2/uiconfig/ui/insertgriddlg.ui:130
 msgctxt "insertgriddlg|extended_tip|primaryY"
 msgid "Adds gridlines to the Y axis of the chart."
-msgstr "Fügt Gitternetzlinien für die Y-Achse des Diagramms ein."
+msgstr "Fügt Gitterlinien für die Y-Achse des Diagramms ein."
 
 #. XEXTu
 #: chart2/uiconfig/ui/insertgriddlg.ui:142
@@ -2009,13 +2057,13 @@ msgstr "_Z-Achse"
 #: chart2/uiconfig/ui/insertgriddlg.ui:150
 msgctxt "insertgriddlg|extended_tip|primaryZ"
 msgid "Adds gridlines to the Z axis of the chart."
-msgstr "Fügt Gitternetzlinien für die Z-Achse des Diagramms ein."
+msgstr "Fügt Gitterlinien für die Z-Achse des Diagramms ein."
 
 #. 9QbAA
 #: chart2/uiconfig/ui/insertgriddlg.ui:167
 msgctxt "insertgriddlg|label1"
 msgid "Major Grids"
-msgstr "Hauptgitter"
+msgstr "Hauptgitterlinien"
 
 #. wqXds
 #: chart2/uiconfig/ui/insertgriddlg.ui:198
@@ -2027,7 +2075,7 @@ msgstr "X-_Achse"
 #: chart2/uiconfig/ui/insertgriddlg.ui:206
 msgctxt "insertgriddlg|extended_tip|secondaryX"
 msgid "Adds gridlines that subdivide the X axis into smaller sections."
-msgstr "Fügt Gitternetzlinien zur Unterteilung der X-Achse in kleinere Abschnitte ein."
+msgstr "Fügt Gitterlinien zur Unterteilung der X-Achse in kleinere Abschnitte ein."
 
 #. PkzaY
 #: chart2/uiconfig/ui/insertgriddlg.ui:218
@@ -2039,7 +2087,7 @@ msgstr "Y-A_chse"
 #: chart2/uiconfig/ui/insertgriddlg.ui:226
 msgctxt "insertgriddlg|extended_tip|secondaryY"
 msgid "Adds gridlines that subdivide the Y axis into smaller sections."
-msgstr "Fügt Gitternetzlinien zur Unterteilung der Y-Achse in kleinere Abschnitte ein."
+msgstr "Fügt Gitterlinien zur Unterteilung der Y-Achse in kleinere Abschnitte ein."
 
 #. CcCG8
 #: chart2/uiconfig/ui/insertgriddlg.ui:238
@@ -2051,19 +2099,19 @@ msgstr "Z-Ach_se"
 #: chart2/uiconfig/ui/insertgriddlg.ui:246
 msgctxt "insertgriddlg|extended_tip|secondaryZ"
 msgid "Adds gridlines that subdivide the Z axis into smaller sections."
-msgstr "Fügt Gitternetzlinien zur Unterteilung der Z-Achse in kleinere Abschnitte ein."
+msgstr "Fügt Gitterlinien zur Unterteilung der Z-Achse in kleinere Abschnitte ein."
 
 #. QBQD4
 #: chart2/uiconfig/ui/insertgriddlg.ui:263
 msgctxt "insertgriddlg|label2"
 msgid "Minor Grids"
-msgstr "Hilfsgitter"
+msgstr "Hilfsgitterlinien"
 
 #. URB9E
 #: chart2/uiconfig/ui/insertgriddlg.ui:295
 msgctxt "insertgriddlg|extended_tip|InsertGridDialog"
 msgid "You can divide the axes into sections by assigning gridlines to them. This allows you to get a better overview of the chart, especially if you are working with large charts."
-msgstr "Mit Gitternetzlinien lassen sich die Achsen in verschiedene Abschnitte unterteilen. Besonders bei der Arbeit mit großen Diagrammen erhalten Sie dadurch einen besseren Überblick über das Diagramm."
+msgstr "Mit Gitterlinien lassen sich die Achsen in verschiedene Abschnitte unterteilen. Besonders bei der Arbeit mit großen Diagrammen erhalten Sie dadurch eine bessere Übersicht über das Diagramm."
 
 #. rqADt
 #: chart2/uiconfig/ui/inserttitledlg.ui:8
@@ -2210,508 +2258,508 @@ msgid "Show labels"
 msgstr "_Beschriftung anzeigen"
 
 #. 52BFU
-#: chart2/uiconfig/ui/sidebaraxis.ui:38
+#: chart2/uiconfig/ui/sidebaraxis.ui:40
 msgctxt "sidebaraxis|checkbutton_reverse"
 msgid "Reverse direction"
 msgstr "Richtun_g umkehren"
 
 #. hABaw
-#: chart2/uiconfig/ui/sidebaraxis.ui:63
+#: chart2/uiconfig/ui/sidebaraxis.ui:58
 msgctxt "sidebaraxis|label1"
 msgid "_Label position:"
 msgstr "Beschriftungs_position:"
 
 #. JpV6N
-#: chart2/uiconfig/ui/sidebaraxis.ui:77
+#: chart2/uiconfig/ui/sidebaraxis.ui:73
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis"
 msgstr "An der Achse"
 
 #. HEMNB
-#: chart2/uiconfig/ui/sidebaraxis.ui:78
+#: chart2/uiconfig/ui/sidebaraxis.ui:74
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis (other side)"
 msgstr "An der Achse (andere Seite)"
 
 #. BE2dT
-#: chart2/uiconfig/ui/sidebaraxis.ui:79
+#: chart2/uiconfig/ui/sidebaraxis.ui:75
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside start"
 msgstr "Außerhalb des Anfangs"
 
 #. rH94z
-#: chart2/uiconfig/ui/sidebaraxis.ui:80
+#: chart2/uiconfig/ui/sidebaraxis.ui:76
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside end"
 msgstr "Außerhalb des Endes"
 
 #. 69LSe
-#: chart2/uiconfig/ui/sidebaraxis.ui:94
+#: chart2/uiconfig/ui/sidebaraxis.ui:90
 msgctxt "sidebaraxis|label2"
 msgid "_Text orientation:"
 msgstr "_Textausrichtung:"
 
+#. vkhjB
+#: chart2/uiconfig/ui/sidebarelements.ui:25
+msgctxt "sidebarelements|l"
+msgid "Titles"
+msgstr "Titel"
+
 #. Bqqg6
-#: chart2/uiconfig/ui/sidebarelements.ui:34
+#: chart2/uiconfig/ui/sidebarelements.ui:38
 msgctxt "sidebarelements|checkbutton_title"
 msgid "Title"
 msgstr "Titel"
 
 #. HttnZ
-#: chart2/uiconfig/ui/sidebarelements.ui:51
+#: chart2/uiconfig/ui/sidebarelements.ui:71
 msgctxt "sidebarelements|checkbutton_subtitle"
 msgid "Subtitle"
 msgstr "_Untertitel"
 
-#. vkhjB
-#: chart2/uiconfig/ui/sidebarelements.ui:102
-msgctxt "sidebarelements|l"
-msgid "Titles"
-msgstr "Titel"
+#. UVbZR
+#: chart2/uiconfig/ui/sidebarelements.ui:108
+msgctxt "sidebarelements|label_legen"
+msgid "Legend"
+msgstr "Legende"
 
 #. dB6pP
-#: chart2/uiconfig/ui/sidebarelements.ui:131
+#: chart2/uiconfig/ui/sidebarelements.ui:121
 msgctxt "sidebarelements|checkbutton_legend"
 msgid "Show legend"
 msgstr "Legende anzeigen"
 
 #. XxG3r
-#: chart2/uiconfig/ui/sidebarelements.ui:135
+#: chart2/uiconfig/ui/sidebarelements.ui:125
 msgctxt "sidebarelements|checkbutton_legend|tooltip_text"
 msgid "Show Legend"
 msgstr "Legende anzeigen"
 
-#. zszn2
-#: chart2/uiconfig/ui/sidebarelements.ui:156
-msgctxt "sidebarelements|placement_label"
-msgid "_Placement:"
-msgstr "Platz_ierung:"
-
 #. N9Vw3
-#: chart2/uiconfig/ui/sidebarelements.ui:172
+#: chart2/uiconfig/ui/sidebarelements.ui:141
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Right"
 msgstr "Rechts"
 
 #. XWGfH
-#: chart2/uiconfig/ui/sidebarelements.ui:173
+#: chart2/uiconfig/ui/sidebarelements.ui:142
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Top"
 msgstr "Oben"
 
 #. AYbfc
-#: chart2/uiconfig/ui/sidebarelements.ui:174
+#: chart2/uiconfig/ui/sidebarelements.ui:143
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Bottom"
 msgstr "Unten"
 
 #. Hdrnv
-#: chart2/uiconfig/ui/sidebarelements.ui:175
+#: chart2/uiconfig/ui/sidebarelements.ui:144
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Left"
 msgstr "Links"
 
 #. WxtCZ
-#: chart2/uiconfig/ui/sidebarelements.ui:193
+#: chart2/uiconfig/ui/sidebarelements.ui:154
 msgctxt "sidebarelements|checkbutton_no_overlay"
 msgid "Show the legend without overlapping the chart"
 msgstr "Legende anzeigen, ohne das Diagramm zu überlappen"
 
-#. UVbZR
-#: chart2/uiconfig/ui/sidebarelements.ui:212
-msgctxt "sidebarelements|label_legen"
-msgid "Legend"
-msgstr "Legende"
-
-#. Am6Gz
-#: chart2/uiconfig/ui/sidebarelements.ui:242
-msgctxt "sidebarelements|checkbutton_x_axis"
-msgid "X axis"
-msgstr "_X-Achse"
-
-#. P5gxx
-#: chart2/uiconfig/ui/sidebarelements.ui:256
-msgctxt "sidebarelements|checkbutton_x_axis_title"
-msgid "X axis title"
-msgstr "Titel X-Achse"
-
-#. iMXPp
-#: chart2/uiconfig/ui/sidebarelements.ui:270
-msgctxt "sidebarelements|checkbutton_y_axis"
-msgid "Y axis"
-msgstr "_Y-Achse"
-
-#. vF4oS
-#: chart2/uiconfig/ui/sidebarelements.ui:284
-msgctxt "sidebarelements|checkbutton_y_axis_title"
-msgid "Y axis title"
-msgstr "Titel Y-Achse"
-
-#. A35cf
-#: chart2/uiconfig/ui/sidebarelements.ui:298
-msgctxt "sidebarelements|checkbutton_z_axis"
-msgid "Z axis"
-msgstr "_Z-Achse"
-
-#. RZFAU
-#: chart2/uiconfig/ui/sidebarelements.ui:312
-msgctxt "sidebarelements|checkbutton_z_axis_title"
-msgid "Z axis title"
-msgstr "Titel Z-Achse"
-
-#. GoJDH
-#: chart2/uiconfig/ui/sidebarelements.ui:326
-msgctxt "sidebarelements|checkbutton_2nd_x_axis"
-msgid "2nd X axis"
-msgstr "2. X-Achse"
-
-#. nsoDZ
-#: chart2/uiconfig/ui/sidebarelements.ui:339
-msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
-msgid "2nd X axis title"
-msgstr "Titel 2. X-Achse"
-
-#. bGsCM
-#: chart2/uiconfig/ui/sidebarelements.ui:352
-msgctxt "sidebarelements|checkbutton_2nd_y_axis"
-msgid "2nd Y axis"
-msgstr "2. Y-Achse"
-
-#. yDNuy
-#: chart2/uiconfig/ui/sidebarelements.ui:365
-msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
-msgid "2nd Y axis title"
-msgstr "Titel 2. Y-Achse"
-
 #. ScLEM
-#: chart2/uiconfig/ui/sidebarelements.ui:382
+#: chart2/uiconfig/ui/sidebarelements.ui:175
 msgctxt "sidebarelements|label_axes"
 msgid "Axes"
 msgstr "Achsen"
 
-#. RL8AA
-#: chart2/uiconfig/ui/sidebarelements.ui:412
-msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
-msgid "Horizontal major"
-msgstr "Hauptgitter horizontal"
+#. Am6Gz
+#: chart2/uiconfig/ui/sidebarelements.ui:188
+msgctxt "sidebarelements|checkbutton_x_axis"
+msgid "X axis"
+msgstr "_X-Achse"
 
-#. FYBSZ
-#: chart2/uiconfig/ui/sidebarelements.ui:426
-msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
-msgid "Vertical major"
-msgstr "Hauptgitter vertikal"
+#. iMXPp
+#: chart2/uiconfig/ui/sidebarelements.ui:203
+msgctxt "sidebarelements|checkbutton_y_axis"
+msgid "Y axis"
+msgstr "_Y-Achse"
 
-#. VCTTS
-#: chart2/uiconfig/ui/sidebarelements.ui:440
-msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
-msgid "Horizontal minor"
-msgstr "Hilfsgitter horizontal"
+#. A35cf
+#: chart2/uiconfig/ui/sidebarelements.ui:218
+msgctxt "sidebarelements|checkbutton_z_axis"
+msgid "Z axis"
+msgstr "_Z-Achse"
 
-#. QDFEZ
-#: chart2/uiconfig/ui/sidebarelements.ui:454
-msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
-msgid "Vertical minor"
-msgstr "Hilfsgitter vertikal"
+#. GoJDH
+#: chart2/uiconfig/ui/sidebarelements.ui:233
+msgctxt "sidebarelements|checkbutton_2nd_x_axis"
+msgid "2nd X axis"
+msgstr "2. X-Achse"
+
+#. bGsCM
+#: chart2/uiconfig/ui/sidebarelements.ui:247
+msgctxt "sidebarelements|checkbutton_2nd_y_axis"
+msgid "2nd Y axis"
+msgstr "2. Y-Achse"
+
+#. P5gxx
+#: chart2/uiconfig/ui/sidebarelements.ui:261
+msgctxt "sidebarelements|checkbutton_x_axis_title"
+msgid "X axis title"
+msgstr "Titel X-Achse"
+
+#. vF4oS
+#: chart2/uiconfig/ui/sidebarelements.ui:276
+msgctxt "sidebarelements|checkbutton_y_axis_title"
+msgid "Y axis title"
+msgstr "Titel Y-Achse"
+
+#. RZFAU
+#: chart2/uiconfig/ui/sidebarelements.ui:291
+msgctxt "sidebarelements|checkbutton_z_axis_title"
+msgid "Z axis title"
+msgstr "Titel Z-Achse"
+
+#. nsoDZ
+#: chart2/uiconfig/ui/sidebarelements.ui:306
+msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
+msgid "2nd X axis title"
+msgstr "Titel 2. X-Achse"
+
+#. yDNuy
+#: chart2/uiconfig/ui/sidebarelements.ui:320
+msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
+msgid "2nd Y axis title"
+msgstr "Titel 2. Y-Achse"
 
 #. yeE2v
-#: chart2/uiconfig/ui/sidebarelements.ui:472
+#: chart2/uiconfig/ui/sidebarelements.ui:339
 msgctxt "sidebarelements|label_gri"
 msgid "Gridlines"
 msgstr "Gitterlinien"
 
+#. RL8AA
+#: chart2/uiconfig/ui/sidebarelements.ui:352
+msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
+msgid "Horizontal major"
+msgstr "Hauptgitterlinien horizontal"
+
+#. FYBSZ
+#: chart2/uiconfig/ui/sidebarelements.ui:367
+msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
+msgid "Vertical major"
+msgstr "Hauptgitterlinien vertikal"
+
+#. VCTTS
+#: chart2/uiconfig/ui/sidebarelements.ui:382
+msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
+msgid "Horizontal minor"
+msgstr "Hilfsgitterlinien horizontal"
+
+#. QDFEZ
+#: chart2/uiconfig/ui/sidebarelements.ui:397
+msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
+msgid "Vertical minor"
+msgstr "Hilfsgitterlinien vertikal"
+
 #. uacDo
-#: chart2/uiconfig/ui/sidebarelements.ui:493
+#: chart2/uiconfig/ui/sidebarelements.ui:419
 msgctxt "sidebarelements|text_title"
 msgid "Title"
 msgstr "Titel"
 
 #. jXGDE
-#: chart2/uiconfig/ui/sidebarelements.ui:504
+#: chart2/uiconfig/ui/sidebarelements.ui:432
 msgctxt "sidebarelements|text_subtitle"
 msgid "Subtitle"
 msgstr "Untertitel"
 
+#. zszn2
+#: chart2/uiconfig/ui/sidebarelements.ui:445
+msgctxt "sidebarelements|placement_label"
+msgid "_Placement:"
+msgstr "Platz_ierung:"
+
 #. SCPM4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:60
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:48
 msgctxt "sidebarerrorbar|label2"
 msgid "Category:"
 msgstr "Kategorie:"
 
 #. 8Pb84
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:74
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:63
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Constant"
 msgstr "Konstant"
 
 #. Lz8Lo
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:75
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:64
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Percentage"
 msgstr "_Prozentual"
 
 #. Ap367
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:76
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:65
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Cell Range or Data Table"
 msgstr "Zellbereich oder Datentabelle"
 
 #. Lqw6L
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:77
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:66
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard deviation"
 msgstr "Standardabweichung"
 
 #. qUL78
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:78
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:67
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard error"
 msgstr "Standardfehler"
 
 #. KUCgB
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:79
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:68
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Variance"
 msgstr "Varianz"
 
 #. QDwJu
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:80
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:69
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Error margin"
 msgstr "Fehlerbereich"
 
 #. US82z
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:93
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:82
 msgctxt "sidebarerrorbar|label3"
 msgid "Positive (+):"
 msgstr "Po_sitiv (+):"
 
 #. NJdbG
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:94
 msgctxt "sidebarerrorbar|label4"
 msgid "Negative (-):"
 msgstr "_Negativ (-):"
 
 #. GBewc
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:117
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
 msgctxt "sidebarerrorbar|spinbutton_pos"
 msgid "0.00"
 msgstr "0,00"
 
 #. e3GvR
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:132
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:119
 msgctxt "sidebarerrorbar|spinbutton_neg"
 msgid "0.00"
 msgstr "0,00"
 
 #. 34Vax
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:152
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:139
 msgctxt "sidebarerrorbar|radiobutton_positive_negative|tooltip_text"
 msgid "Positive and Negative"
 msgstr "Positiv _und negativ"
 
 #. gETvJ
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:169
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:156
 msgctxt "sidebarerrorbar|radiobutton_positive|tooltip_text"
 msgid "Positive"
 msgstr "Pos_itiv"
 
 #. 3Ur2d
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:186
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:173
 msgctxt "sidebarerrorbar|radiobutton_negative|tooltip_text"
 msgid "Negative"
 msgstr "Ne_gativ"
 
 #. iCPU4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:209
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:196
 msgctxt "sidebarerrorbar|label5"
 msgid "Indicator"
 msgstr "Indikator"
 
 #. qJBsd
-#: chart2/uiconfig/ui/sidebarseries.ui:41
+#: chart2/uiconfig/ui/sidebarseries.ui:38
 msgctxt "sidebarseries|checkbutton_label"
 msgid "Show data labels"
 msgstr "Datenbeschriftung anzeigen"
 
-#. BsC9D
-#: chart2/uiconfig/ui/sidebarseries.ui:64
-msgctxt "sidebarseries|label_box"
-msgid "P_lacement:"
-msgstr "Platz_ierung:"
-
 #. Dk3GN
-#: chart2/uiconfig/ui/sidebarseries.ui:79
+#: chart2/uiconfig/ui/sidebarseries.ui:56
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Above"
 msgstr "Oberhalb"
 
 #. e4znD
-#: chart2/uiconfig/ui/sidebarseries.ui:80
+#: chart2/uiconfig/ui/sidebarseries.ui:57
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Below"
 msgstr "Unterhalb"
 
 #. CWwzt
-#: chart2/uiconfig/ui/sidebarseries.ui:81
+#: chart2/uiconfig/ui/sidebarseries.ui:58
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Center"
 msgstr "Zentriert"
 
 #. osWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:82
+#: chart2/uiconfig/ui/sidebarseries.ui:59
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Outside"
 msgstr "Außen"
 
 #. U3N4S
-#: chart2/uiconfig/ui/sidebarseries.ui:83
+#: chart2/uiconfig/ui/sidebarseries.ui:60
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Inside"
 msgstr "Innen"
 
 #. pAmg7
-#: chart2/uiconfig/ui/sidebarseries.ui:84
+#: chart2/uiconfig/ui/sidebarseries.ui:61
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Near origin"
 msgstr "Nahe Ursprung"
 
 #. erC9C
-#: chart2/uiconfig/ui/sidebarseries.ui:109
+#: chart2/uiconfig/ui/sidebarseries.ui:71
 msgctxt "sidebarseries|checkbutton_trendline"
 msgid "Show trendline"
 msgstr "Trendlinie anzeigen"
 
+#. FFPa2
+#: chart2/uiconfig/ui/sidebarseries.ui:92
+msgctxt "sidebarseries|label1"
+msgid "Error Bars"
+msgstr "Fehlerbalken"
+
 #. bXUND
-#: chart2/uiconfig/ui/sidebarseries.ui:140
+#: chart2/uiconfig/ui/sidebarseries.ui:105
 msgctxt "sidebarseries|checkbutton_y_error"
 msgid "Y error bars"
 msgstr "Y-Fehlerbalken"
 
 #. zK6DE
-#: chart2/uiconfig/ui/sidebarseries.ui:155
+#: chart2/uiconfig/ui/sidebarseries.ui:121
 msgctxt "sidebarseries|checkbutton_x_error"
 msgid "X error bars"
 msgstr "X-Fehlerbalken"
 
-#. FFPa2
-#: chart2/uiconfig/ui/sidebarseries.ui:174
-msgctxt "sidebarseries|label1"
-msgid "Error Bars"
-msgstr "Fehlerbalken"
-
-#. vhdnt
-#: chart2/uiconfig/ui/sidebarseries.ui:203
-msgctxt "sidebarseries|radiobutton_primary_axis"
-msgid "Primary Y axis"
-msgstr "Primäre Y-Achse"
-
-#. VPWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:219
-msgctxt "sidebarseries|radiobutton_secondary_axis"
-msgid "Secondary Y axis"
-msgstr "Sekundäre Y-Achse"
-
 #. qE5HF
-#: chart2/uiconfig/ui/sidebarseries.ui:239
+#: chart2/uiconfig/ui/sidebarseries.ui:142
 msgctxt "sidebarseries|axis_label"
 msgid "Align Series to Axis"
 msgstr "Reihen an Achsen ausrichten"
 
 #. fvnkG
-#: chart2/uiconfig/ui/sidebarseries.ui:255
+#: chart2/uiconfig/ui/sidebarseries.ui:157
 msgctxt "sidebarseries|label_series_tmpl"
 msgid "Data series '%1'"
 msgstr "Datenreihe '%1'"
 
+#. vhdnt
+#: chart2/uiconfig/ui/sidebarseries.ui:173
+msgctxt "sidebarseries|radiobutton_primary_axis"
+msgid "Primary Y axis"
+msgstr "Primäre Y-Achse"
+
+#. VPWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:189
+msgctxt "sidebarseries|radiobutton_secondary_axis"
+msgid "Secondary Y axis"
+msgstr "Sekundäre Y-Achse"
+
+#. BsC9D
+#: chart2/uiconfig/ui/sidebarseries.ui:218
+msgctxt "sidebarseries|label_box"
+msgid "P_lacement:"
+msgstr "Platz_ierung:"
+
 #. mZfrk
-#: chart2/uiconfig/ui/sidebartype.ui:85
+#: chart2/uiconfig/ui/sidebartype.ui:74
 msgctxt "sidebartype|3dlook"
 msgid "_3D Look"
-msgstr "_3D-Darstellung"
+msgstr "_3D-Darstellung:"
 
 #. mjrkY
-#: chart2/uiconfig/ui/sidebartype.ui:104
+#: chart2/uiconfig/ui/sidebartype.ui:90
 msgctxt "sidebartype|3dscheme"
 msgid "Simple"
 msgstr "Einfach"
 
 #. urfc7
-#: chart2/uiconfig/ui/sidebartype.ui:105
+#: chart2/uiconfig/ui/sidebartype.ui:91
 msgctxt "sidebartype|3dscheme"
 msgid "Realistic"
 msgstr "Realistisch"
 
 #. gYXXE
-#: chart2/uiconfig/ui/sidebartype.ui:126
+#: chart2/uiconfig/ui/sidebartype.ui:105
 msgctxt "sidebartype|shapeft"
 msgid "Sh_ape"
 msgstr "_Form"
 
 #. B6KS5
-#: chart2/uiconfig/ui/sidebartype.ui:187
+#: chart2/uiconfig/ui/sidebartype.ui:153
 msgctxt "sidebartype|stack"
 msgid "_Stack series"
 msgstr "_Datenreihen stapeln"
 
-#. Yau6n
-#: chart2/uiconfig/ui/sidebartype.ui:207
-msgctxt "sidebartype|ontop"
-msgid "On top"
-msgstr "Übereinander"
-
-#. f2J43
-#: chart2/uiconfig/ui/sidebartype.ui:221
-msgctxt "sidebartype|percent"
-msgid "Percent"
-msgstr "Prozentual"
-
-#. iDSaa
-#: chart2/uiconfig/ui/sidebartype.ui:235
-msgctxt "sidebartype|deep"
-msgid "Deep"
-msgstr "Hintereinander"
-
 #. KaS7Z
-#: chart2/uiconfig/ui/sidebartype.ui:263
+#: chart2/uiconfig/ui/sidebartype.ui:170
 msgctxt "sidebartype|linetypeft"
 msgid "_Line type"
-msgstr "Linien_typ"
+msgstr "Linien_typ:"
 
 #. Hqc3N
-#: chart2/uiconfig/ui/sidebartype.ui:278
+#: chart2/uiconfig/ui/sidebartype.ui:183
 msgctxt "sidebartype|linetype"
 msgid "Straight"
 msgstr "Gerade"
 
 #. EB58Z
-#: chart2/uiconfig/ui/sidebartype.ui:279
+#: chart2/uiconfig/ui/sidebartype.ui:184
 msgctxt "sidebartype|linetype"
 msgid "Smooth"
 msgstr "Kurve"
 
 #. qLn3k
-#: chart2/uiconfig/ui/sidebartype.ui:280
+#: chart2/uiconfig/ui/sidebartype.ui:185
 msgctxt "sidebartype|linetype"
 msgid "Stepped"
 msgstr "Stufen"
 
 #. jKDXh
-#: chart2/uiconfig/ui/sidebartype.ui:290
+#: chart2/uiconfig/ui/sidebartype.ui:195
 msgctxt "sidebartype|properties"
 msgid "Properties..."
 msgstr "_Eigenschaften…"
 
 #. xW9CQ
-#: chart2/uiconfig/ui/sidebartype.ui:308
+#: chart2/uiconfig/ui/sidebartype.ui:207
 msgctxt "sidebartype|sort"
 msgid "_Sort by X values"
 msgstr "_Nach X-Werten sortiert"
 
 #. thu3G
-#: chart2/uiconfig/ui/sidebartype.ui:330
+#: chart2/uiconfig/ui/sidebartype.ui:223
 msgctxt "sidebartype|nolinesft"
 msgid "_Number of lines"
 msgstr "Anzahl der _Linien"
+
+#. Yau6n
+#: chart2/uiconfig/ui/sidebartype.ui:282
+msgctxt "sidebartype|ontop"
+msgid "On top"
+msgstr "Übereinander"
+
+#. f2J43
+#: chart2/uiconfig/ui/sidebartype.ui:298
+msgctxt "sidebartype|percent"
+msgid "Percent"
+msgstr "Prozentual"
+
+#. iDSaa
+#: chart2/uiconfig/ui/sidebartype.ui:314
+msgctxt "sidebartype|deep"
+msgid "Deep"
+msgstr "Hintereinander"
 
 #. Ledzw
 #: chart2/uiconfig/ui/smoothlinesdlg.ui:22
@@ -3179,7 +3227,7 @@ msgstr "Legen Sie die Lichtquellen für die 3D-Ansicht fest."
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:44
 msgctxt "tp_AxisPositions|FT_CROSSES_OTHER_AXIS_AT"
 msgid "_Cross other axis at"
-msgstr "Andere Achse schneiden _bei"
+msgstr "Andere Achse schneiden _bei:"
 
 #. Z734o
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:60
@@ -3269,7 +3317,7 @@ msgstr "Position der Achsen"
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:258
 msgctxt "tp_AxisPositions|FT_PLACE_LABELS"
 msgid "_Place labels"
-msgstr "_Position"
+msgstr "_Position:"
 
 #. GDk2L
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:274
@@ -3413,13 +3461,13 @@ msgstr "Intervallmarkierungen"
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:589
 msgctxt "tp_AxisPositions|CB_MAJOR_GRID"
 msgid "Show major _grid"
-msgstr "_Hauptgitter anzeigen"
+msgstr "_Hauptgitterlinien anzeigen"
 
 #. 7c2Hs
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:603
 msgctxt "tp_AxisPositions|CB_MINOR_GRID"
 msgid "_Show minor grid"
-msgstr "_Hilfsgitter anzeigen"
+msgstr "_Hilfsgitterlinien anzeigen"
 
 #. Dp5Ar
 #: chart2/uiconfig/ui/tp_AxisPositions.ui:617
@@ -3443,7 +3491,7 @@ msgstr "Gitterlinien"
 #: chart2/uiconfig/ui/tp_ChartType.ui:48
 msgctxt "tp_ChartType|FT_CAPTION_FOR_WIZARD"
 msgid "Choose a Chart Type"
-msgstr "Diagrammtyp wählen"
+msgstr "Wählen Sie einen Diagrammtyp"
 
 #. wBFXQ
 #: chart2/uiconfig/ui/tp_ChartType.ui:94
@@ -3455,7 +3503,7 @@ msgstr "Wählen Sie einen Untertyp des grundlegenden Diagrammtyps."
 #: chart2/uiconfig/ui/tp_ChartType.ui:123
 msgctxt "tp_ChartType|3dlook"
 msgid "_3D Look"
-msgstr "_3D-Darstellung"
+msgstr "_3D-Darstellung:"
 
 #. EB95g
 #: chart2/uiconfig/ui/tp_ChartType.ui:133
@@ -3719,7 +3767,7 @@ msgstr "Textattribute"
 #: chart2/uiconfig/ui/tp_DataLabel.ui:254
 msgctxt "tp_DataLabel|FT_LABEL_PLACEMENT"
 msgid "Place_ment"
-msgstr "Platz_ierung"
+msgstr "Platz_ierung:"
 
 #. L2MYb
 #: chart2/uiconfig/ui/tp_DataLabel.ui:270
@@ -3809,7 +3857,7 @@ msgstr "Wählt die Platzierung der Datenbeschriftung relativ zu den Objekten."
 #: chart2/uiconfig/ui/tp_DataLabel.ui:299
 msgctxt "tp_DataLabel|FT_TEXT_SEPARATOR"
 msgid "_Separator"
-msgstr "_Trenner"
+msgstr "_Trenner:"
 
 #. oPhGH
 #: chart2/uiconfig/ui/tp_DataLabel.ui:315
@@ -3845,7 +3893,7 @@ msgstr "Punkt"
 #: chart2/uiconfig/ui/tp_DataLabel.ui:323
 msgctxt "tp_DataLabel|extended_tip|LB_TEXT_SEPARATOR"
 msgid "Selects the separator between multiple text strings for the same object."
-msgstr "Wählt das Trennzeichen zwischen mehreren Textzeichenketten für das gleiche Objekt."
+msgstr "Wählt das Trennzeichen zwischen mehreren Textzeichenfolgen für das gleiche Objekt."
 
 #. mFEKm
 #: chart2/uiconfig/ui/tp_DataLabel.ui:338
@@ -3875,7 +3923,7 @@ msgstr "_Grad"
 #: chart2/uiconfig/ui/tp_DataLabel.ui:450
 msgctxt "tp_DataLabel|FT_LABEL_TEXTDIR"
 msgid "Te_xt direction"
-msgstr "Te_xtrichtung"
+msgstr "Te_xtrichtung:"
 
 #. MYXZo
 #: chart2/uiconfig/ui/tp_DataLabel.ui:467
@@ -4062,6 +4110,36 @@ msgstr "Zeigt die Quellbereichsadresse der Kategorien an (der für die X-Achse e
 msgctxt "tp_DataSource|FT_CAPTION_FOR_WIZARD"
 msgid "Customize Data Ranges for Individual Data Series"
 msgstr "Wählen Sie spezielle Datenbereiche für die Datenreihen"
+
+#. JGgFh
+#: chart2/uiconfig/ui/tp_DataTable.ui:33
+msgctxt "tp_DataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Horizontalen Rahmen anzeigen"
+
+#. EzGM5
+#: chart2/uiconfig/ui/tp_DataTable.ui:49
+msgctxt "tp_DataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Vertikalen Rahmen anzeigen"
+
+#. ZTAZY
+#: chart2/uiconfig/ui/tp_DataTable.ui:65
+msgctxt "tp_DataTable|outlineCB"
+msgid "Show outline"
+msgstr "Umrandung anzeigen"
+
+#. kPDNa
+#: chart2/uiconfig/ui/tp_DataTable.ui:81
+msgctxt "tp_DataTable|keysCB"
+msgid "Show keys"
+msgstr "Schlüssel anzeigen"
+
+#. fybMv
+#: chart2/uiconfig/ui/tp_DataTable.ui:101
+msgctxt "tp_axisLabel|textflowL"
+msgid "Data Table Properties"
+msgstr "Datentabelle-Eigenschaften"
 
 #. tGqhN
 #: chart2/uiconfig/ui/tp_ErrorBars.ui:53
@@ -4349,7 +4427,7 @@ msgstr "Position"
 #: chart2/uiconfig/ui/tp_LegendPosition.ui:142
 msgctxt "tp_LegendPosition|FT_LEGEND_TEXTDIR"
 msgid "Te_xt direction"
-msgstr "Te_xtrichtung"
+msgstr "Te_xtrichtung:"
 
 #. PSPoQ
 #: chart2/uiconfig/ui/tp_LegendPosition.ui:158
@@ -4391,7 +4469,7 @@ msgstr "Im _Uhrzeigersinn"
 #: chart2/uiconfig/ui/tp_PolarOptions.ui:34
 msgctxt "tp_PolarOptions|extended_tip|CB_CLOCKWISE"
 msgid "The default direction in which the pieces of a pie chart are ordered is counterclockwise. Enable the Clockwise direction checkbox to draw the pieces in opposite direction."
-msgstr "Die Standardrichtung, in der die Stücke eines Kreisdiagramms angeordnet sind, ist entgegen dem Uhrzeigersinn. Aktivieren Sie das Markierfeld Ausrichtung im Uhrzeigersinn, um die Stücke in die entgegengesetzte Richtung zu ziehen."
+msgstr "Die voreingestellte Richtung, in der die Stücke eines Kreisdiagramms angeordnet sind, ist entgegen dem Uhrzeigersinn. Aktivieren Sie das Markierfeld Ausrichtung im Uhrzeigersinn, um die Stücke in die entgegengesetzte Richtung zu ziehen."
 
 #. ATHCu
 #: chart2/uiconfig/ui/tp_PolarOptions.ui:43
@@ -4571,7 +4649,7 @@ msgstr "Legt fest, dass die Achse logarithmisch unterteilt wird."
 #: chart2/uiconfig/ui/tp_Scale.ui:102
 msgctxt "tp_Scale|TXT_AXIS_TYPE"
 msgid "T_ype"
-msgstr "A_rt"
+msgstr "A_rt:"
 
 #. D6Bre
 #: chart2/uiconfig/ui/tp_Scale.ui:118
@@ -4601,13 +4679,13 @@ msgstr "Für einige Achsenarten können Sie festlegen, ob Sie eine Achse als Tex
 #: chart2/uiconfig/ui/tp_Scale.ui:159
 msgctxt "tp_Scale|TXT_MIN"
 msgid "_Minimum"
-msgstr "_Minimum"
+msgstr "_Minimum:"
 
 #. XUKzj
 #: chart2/uiconfig/ui/tp_Scale.ui:173
 msgctxt "tp_Scale|TXT_MAX"
 msgid "Ma_ximum"
-msgstr "Ma_ximum"
+msgstr "Ma_ximum:"
 
 #. 4jRuB
 #: chart2/uiconfig/ui/tp_Scale.ui:185
@@ -4673,7 +4751,7 @@ msgstr "Automat_isch"
 #: chart2/uiconfig/ui/tp_Scale.ui:328
 msgctxt "tp_Scale|TXT_STEP_MAIN"
 msgid "Ma_jor interval"
-msgstr "Hau_ptintervall"
+msgstr "Hau_ptintervall:"
 
 #. AtZ6D
 #: chart2/uiconfig/ui/tp_Scale.ui:358
@@ -4727,7 +4805,7 @@ msgstr "Hilfsinter_vall"
 #: chart2/uiconfig/ui/tp_Scale.ui:473
 msgctxt "tp_Scale|TXT_STEP_HELP_COUNT"
 msgid "Minor inter_val count"
-msgstr "Hil_fsintervall Schritte"
+msgstr "Hil_fsintervall Schritte:"
 
 #. c9m8j
 #: chart2/uiconfig/ui/tp_Scale.ui:500
@@ -4811,13 +4889,13 @@ msgstr "Datenreihe ausrichten an"
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:123
 msgctxt "tp_SeriesToAxis|FT_GAP"
 msgid "_Spacing"
-msgstr "Ab_stand"
+msgstr "Ab_stand:"
 
 #. 27wWb
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:136
 msgctxt "tp_SeriesToAxis|FT_OVERLAP"
 msgid "_Overlap"
-msgstr "Ü_berlappung"
+msgstr "Ü_berlappung:"
 
 #. NKaBT
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:153
@@ -5251,10 +5329,10 @@ msgctxt "tp_axisLabel|even"
 msgid "Stagger _even"
 msgstr "_Tief-hoch versetzt"
 
-#. 9EMGj
+#. a6qBM
 #: chart2/uiconfig/ui/tp_axisLabel.ui:113
 msgctxt "tp_axisLabel|extended_tip|even"
-msgid "Stagger numbers on the axes, odd numbers lower than even numbers."
+msgid "Stagger numbers on the axis, odd numbers lower than even numbers."
 msgstr "Ordnet Zahlen versetzt an den Achsen an, ungerade Zahlen tiefer als gerade Zahlen."
 
 #. 2JwY3
@@ -5501,7 +5579,7 @@ msgstr "Wenn Sie diese Option wählen, ist die Legende unterhalb des Diagramms z
 #: chart2/uiconfig/ui/wizelementspage.ui:391
 msgctxt "wizelementspage|Axe"
 msgid "Choose Titles, Legend, and Grid Settings"
-msgstr "Wählen Sie Titel-, Legenden- und Gitter-Einstellungen"
+msgstr "Wählen Sie die Titel-, Legenden- und Gitterlinien-Einstellungen"
 
 #. wp2DC
 #: chart2/uiconfig/ui/wizelementspage.ui:421
@@ -5543,4 +5621,4 @@ msgstr "Blendet senkrecht zur Z-Achse verlaufende Gitterlinien ein. Diese Option
 #: chart2/uiconfig/ui/wizelementspage.ui:482
 msgctxt "wizelementspage|label2"
 msgid "Display Grids"
-msgstr "Gitter anzeigen"
+msgstr "Gitterlinien anzeigen"

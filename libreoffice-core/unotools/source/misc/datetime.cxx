@@ -27,14 +27,16 @@
 #include <rtl/math.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
+#include <cstddef>
 #include <sstream>
 
 namespace
 {
-    bool checkAllNumber(const OUString& rString)
+    bool checkAllNumber(std::u16string_view rString)
     {
         sal_Int32 nPos = 0;
-        sal_Int32 nLen = rString.getLength();
+        sal_Int32 nLen = rString.size();
 
         // skip white space
         while( nPos < nLen && ' ' == rString[nPos] )
@@ -56,7 +58,7 @@ namespace
 
     /** convert string to number with optional min and max values */
     bool convertNumber32(sal_Int32& rValue,
-                         const OUString& rString,
+                         std::u16string_view rString,
                          sal_Int32 /*nMin*/ = -1, sal_Int32 /*nMax*/ = -1)
     {
         if (!checkAllNumber(rString))
@@ -65,12 +67,12 @@ namespace
             return false;
         }
 
-        rValue = rString.toInt32();
+        rValue = o3tl::toInt32(rString);
         return true;
     }
 
     bool convertNumber64(sal_Int64& rValue,
-                         const OUString& rString,
+                         std::u16string_view rString,
                          sal_Int64 /*nMin*/ = -1, sal_Int64 /*nMax*/ = -1)
     {
         if (!checkAllNumber(rString))
@@ -79,7 +81,7 @@ namespace
             return false;
         }
 
-        rValue = rString.toInt64();
+        rValue = o3tl::toInt64(rString);
         return true;
     }
 
@@ -99,15 +101,15 @@ namespace
     //   o_strInt:    output; integer part of token
     //   o_bFraction: output; was there a fractional part?
     //   o_strFrac:   output; fractional part of token
-    bool impl_getISO8601TimeToken(const OUString &i_str, sal_Int32 &nPos, OUString &resInt, bool &bFraction, OUString &resFrac)
+    bool impl_getISO8601TimeToken(std::u16string_view i_str, std::size_t &nPos, OUString &resInt, bool &bFraction, OUString &resFrac)
     {
         bFraction = false;
         // all tokens are of length 2
-        const sal_Int32 nEndPos = nPos + 2;
+        const std::size_t nEndPos = nPos + 2;
         const sal_Unicode c0 = '0';
         const sal_Unicode c9 = '9';
         const sal_Unicode sep = ':';
-        for (;nPos < nEndPos && nPos < i_str.getLength(); ++nPos)
+        for (;nPos < nEndPos && nPos < i_str.size(); ++nPos)
         {
             const sal_Unicode c = i_str[nPos];
             if (c == sep)
@@ -116,13 +118,15 @@ namespace
                 return false;
             resInt += OUStringChar(c);
         }
-        if (nPos == i_str.getLength() || i_str[nPos] == sep)
+        if (nPos == 0)
+            return false;
+        if (nPos == i_str.size() || i_str[nPos] == sep)
             return true;
         if (i_str[nPos] == ',' || i_str[nPos] == '.')
         {
             bFraction = true;
             ++nPos;
-            for (; nPos < i_str.getLength(); ++nPos)
+            for (; nPos < i_str.size(); ++nPos)
             {
                 const sal_Unicode c = i_str[nPos];
                 if (c == 'Z' || c == '+' || c == '-')
@@ -137,7 +141,7 @@ namespace
                     return false;
                 resFrac += OUStringChar(c);
             }
-            OSL_ENSURE(nPos == i_str.getLength(), "impl_getISO8601TimeToken internal error; expected to be at end of string");
+            OSL_ENSURE(nPos == i_str.size(), "impl_getISO8601TimeToken internal error; expected to be at end of string");
             return true;
         }
         if (i_str[nPos] == 'Z' || i_str[nPos] == '+' || i_str[nPos] == '-')
@@ -148,12 +152,12 @@ namespace
         else
             return false;
     }
-    bool getISO8601TimeToken(const OUString &i_str, sal_Int32 &io_index, OUString &o_strInt, bool &o_bFraction, OUString &o_strFrac)
+    bool getISO8601TimeToken(std::u16string_view i_str, std::size_t &io_index, OUString &o_strInt, bool &o_bFraction, OUString &o_strFrac)
     {
         OUString resInt;
         OUString resFrac;
         bool bFraction = false;
-        sal_Int32 index = io_index;
+        std::size_t index = io_index;
         if(!impl_getISO8601TimeToken(i_str, index, resInt, bFraction, resFrac))
             return false;
         else
@@ -165,7 +169,7 @@ namespace
             return true;
         }
     }
-    bool getISO8601TimeZoneToken(const OUString &i_str, sal_Int32 &io_index, OUString &o_strInt)
+    bool getISO8601TimeZoneToken(std::u16string_view i_str, std::size_t &io_index, OUString &o_strInt)
     {
         const sal_Unicode c0 = '0';
         const sal_Unicode c9 = '9';
@@ -180,7 +184,7 @@ namespace
         {
             ++io_index;
             o_strInt.clear();
-            for (; io_index < i_str.getLength(); ++io_index)
+            for (; io_index < i_str.size(); ++io_index)
             {
                 const sal_Unicode c = i_str[io_index];
                 if ((c < c0 || c > c9) && c != sep)
@@ -302,25 +306,25 @@ OUString toISO8601(const css::util::DateTime& rDateTime)
 }
 
 /** convert ISO8601 DateTime String to util::DateTime */
-bool ISO8601parseDateTime(const OUString &rString, css::util::DateTime& rDateTime)
+bool ISO8601parseDateTime(std::u16string_view rString, css::util::DateTime& rDateTime)
 {
     bool bSuccess = true;
 
-    OUString aDateStr, aTimeStr;
+    std::u16string_view aDateStr, aTimeStr;
     css::util::Date aDate;
     css::util::Time aTime;
-    sal_Int32 nPos = rString.indexOf( 'T' );
-    if ( nPos >= 0 )
+    size_t nPos = rString.find( 'T' );
+    if ( nPos != std::u16string_view::npos )
     {
-        aDateStr = rString.copy( 0, nPos );
-        aTimeStr = rString.copy( nPos + 1 );
+        aDateStr = rString.substr( 0, nPos );
+        aTimeStr = rString.substr( nPos + 1 );
     }
     else
         aDateStr = rString;         // no separator: only date part
 
     bSuccess = ISO8601parseDate(aDateStr, aDate);
 
-    if ( bSuccess && !aTimeStr.isEmpty() )           // time is optional
+    if ( bSuccess && !aTimeStr.empty() )           // time is optional
     {
         bSuccess = ISO8601parseTime(aTimeStr, aTime);
     }
@@ -338,7 +342,7 @@ bool ISO8601parseDateTime(const OUString &rString, css::util::DateTime& rDateTim
 // TODO: supports only calendar dates YYYY-MM-DD
 // MISSING: calendar dates YYYYMMDD YYYY-MM
 //          year, week date, ordinal date
-bool ISO8601parseDate(const OUString &aDateStr, css::util::Date& rDate)
+bool ISO8601parseDate(std::u16string_view aDateStr, css::util::Date& rDate)
 {
     const sal_Int32 nDateTokens {comphelper::string::getTokenCount(aDateStr, '-')};
 
@@ -350,13 +354,13 @@ bool ISO8601parseDate(const OUString &aDateStr, css::util::Date& rDate)
     sal_Int32 nDay     = 30;
 
     sal_Int32 nIdx {0};
-    if ( !convertNumber32( nYear, aDateStr.getToken( 0, '-', nIdx ), 0, 9999 ) )
+    if ( !convertNumber32( nYear, o3tl::getToken(aDateStr, 0, '-', nIdx ), 0, 9999 ) )
         return false;
     if ( nDateTokens >= 2 )
-        if ( !convertNumber32( nMonth, aDateStr.getToken( 0, '-', nIdx ), 0, 12 ) )
+        if ( !convertNumber32( nMonth, o3tl::getToken(aDateStr, 0, '-', nIdx ), 0, 12 ) )
             return false;
     if ( nDateTokens >= 3 )
-        if ( !convertNumber32( nDay, aDateStr.getToken( 0, '-', nIdx ), 0, 31 ) )
+        if ( !convertNumber32( nDay, o3tl::getToken(aDateStr, 0, '-', nIdx ), 0, 31 ) )
             return false;
 
     rDate.Year = static_cast<sal_uInt16>(nYear);
@@ -367,14 +371,14 @@ bool ISO8601parseDate(const OUString &aDateStr, css::util::Date& rDate)
 }
 
 /** convert ISO8601 Time String to util::Time */
-bool ISO8601parseTime(const OUString &aTimeStr, css::util::Time& rTime)
+bool ISO8601parseTime(std::u16string_view aTimeStr, css::util::Time& rTime)
 {
     sal_Int32 nHour    = 0;
     sal_Int32 nMin     = 0;
     sal_Int32 nSec     = 0;
     sal_Int32 nNanoSec = 0;
 
-    sal_Int32 n = 0;
+    std::size_t n = 0;
     OUString tokInt;
     OUString tokFrac;
     OUString tokTz;
@@ -384,7 +388,7 @@ bool ISO8601parseTime(const OUString &aTimeStr, css::util::Time& rTime)
     if (!bSuccess)
         return false;
 
-    if ( bFrac && n < aTimeStr.getLength())
+    if ( bFrac && n < aTimeStr.size())
     {
         // is it junk or the timezone?
         bSuccess = getISO8601TimeZoneToken(aTimeStr, n, tokTz);
@@ -419,14 +423,14 @@ bool ISO8601parseTime(const OUString &aTimeStr, css::util::Time& rTime)
         }
         goto end;
     }
-    if(n >= aTimeStr.getLength())
+    if(n >= aTimeStr.size())
         goto end;
 
     // minutes
     bSuccess = getISO8601TimeToken(aTimeStr, n, tokInt, bFrac, tokFrac);
     if (!bSuccess)
         return false;
-    if ( bFrac && n < aTimeStr.getLength())
+    if ( bFrac && n < aTimeStr.size())
     {
         // is it junk or the timezone?
         bSuccess = getISO8601TimeZoneToken(aTimeStr, n, tokTz);
@@ -455,14 +459,14 @@ bool ISO8601parseTime(const OUString &aTimeStr, css::util::Time& rTime)
         }
         goto end;
     }
-    if(n >= aTimeStr.getLength())
+    if(n >= aTimeStr.size())
         goto end;
 
     // seconds
     bSuccess = getISO8601TimeToken(aTimeStr, n, tokInt, bFrac, tokFrac);
     if (!bSuccess)
         return false;
-    if (n < aTimeStr.getLength())
+    if (n < aTimeStr.size())
     {
         // is it junk or the timezone?
         bSuccess = getISO8601TimeZoneToken(aTimeStr, n, tokTz);

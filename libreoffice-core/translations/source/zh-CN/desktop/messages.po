@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-12 03:33+0000\n"
-"Last-Translator: Ming Hua <plateauwolf@qq.com>\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-10-21 14:17+0000\n"
+"Last-Translator: 锁琨珑 <suokunlong@126.com>\n"
 "Language-Team: Chinese (Simplified) <https://translations.documentfoundation.org/projects/libo_ui-master/desktopmessages/zh_Hans/>\n"
 "Language: zh-CN\n"
 "MIME-Version: 1.0\n"
@@ -919,10 +919,10 @@ msgctxt "extensionmanager|label1"
 msgid "Display Extensions"
 msgstr "显示扩展"
 
-#. yTB9y
+#. WREKY
 #: desktop/uiconfig/ui/extensionmanager.ui:162
 msgctxt "extensionmanager|search"
-msgid "Search ..."
+msgid "Search..."
 msgstr "搜索..."
 
 #. BAVdg

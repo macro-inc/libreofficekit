@@ -23,10 +23,9 @@
 #include <com/sun/star/ui/dialogs/TemplateDescription.hpp>
 #include <comphelper/processfactory.hxx>
 #include <osl/file.h>
-#include <osl/diagnose.h>
 #include <svl/svlresid.hxx>
 #include <svl/svl.hrc>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <vcl/toolkit/edit.hxx>
 

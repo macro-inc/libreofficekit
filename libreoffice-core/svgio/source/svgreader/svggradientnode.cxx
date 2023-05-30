@@ -20,6 +20,8 @@
 #include <svggradientnode.hxx>
 #include <svgdocument.hxx>
 #include <svggradientstopnode.hxx>
+#include <o3tl/string_view.hxx>
+#include <osl/diagnose.h>
 
 namespace svgio::svgreader
 {
@@ -63,7 +65,7 @@ namespace svgio::svgreader
             SvgNode::parseAttribute(rTokenName, aSVGToken, aContent);
 
             // read style attributes
-            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent, false);
+            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent);
 
             // parse own
             switch(aSVGToken)
@@ -170,11 +172,11 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.match(commonStrings::aStrUserSpaceOnUse))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrUserSpaceOnUse))
                         {
                             setGradientUnits(SvgUnits::userSpaceOnUse);
                         }
-                        else if(aContent.match(commonStrings::aStrObjectBoundingBox))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrObjectBoundingBox))
                         {
                             setGradientUnits(SvgUnits::objectBoundingBox);
                         }
@@ -185,15 +187,15 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.startsWith("pad"))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"pad"))
                         {
                             setSpreadMethod(drawinglayer::primitive2d::SpreadMethod::Pad);
                         }
-                        else if(aContent.startsWith("reflect"))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"reflect"))
                         {
                             setSpreadMethod(drawinglayer::primitive2d::SpreadMethod::Reflect);
                         }
-                        else if(aContent.startsWith("repeat"))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"repeat"))
                         {
                             setSpreadMethod(drawinglayer::primitive2d::SpreadMethod::Repeat);
                         }
@@ -213,13 +215,8 @@ namespace svgio::svgreader
                 case SVGToken::Href:
                 case SVGToken::XlinkHref:
                 {
-                    const sal_Int32 nLen(aContent.getLength());
-
-                    if(nLen && '#' == aContent[0])
-                    {
-                        maXLink = aContent.copy(1);
-                        tryToFindLink();
-                    }
+                    readLocalLink(aContent, maXLink);
+                    tryToFindLink();
                     break;
                 }
                 default:

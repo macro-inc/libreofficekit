@@ -40,18 +40,16 @@
 #include <officecfg/Office/Common.hxx>
 #include <svl/stritem.hxx>
 #include <svl/urihelper.hxx>
-#include <unotools/saveopt.hxx>
 #include <basic/sbstar.hxx>
 
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <sfx2/infobar.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/app.hxx>
 #include <sfx2/viewfrm.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdoole2.hxx>
 #include <svx/f3dchild.hxx>
 #include <svx/imapdlg.hxx>
@@ -70,18 +68,19 @@
 #include <bitmaps.hlst>
 #include <strings.hrc>
 #include <sdresid.hxx>
+#include <utility>
 #include <vcl/canvastools.hxx>
 #include <vcl/commandevent.hxx>
-#include <vcl/commandinfoprovider.hxx>
 #include <vcl/weldutils.hxx>
 
 #include <vcl/settings.hxx>
-#include <vcl/scheduler.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/help.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <rtl/ref.hxx>
+#include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <avmedia/mediawindow.hxx>
 #include <svtools/colrdlg.hxx>
 #include <DrawDocShell.hxx>
@@ -169,7 +168,7 @@ private:
     bool getSlideAPI( sal_Int32 nSlideNumber, Reference< XDrawPage >& xSlide, Reference< XAnimationNode >& xAnimNode );
     sal_Int32 findSlideIndex( sal_Int32 nSlideNumber ) const;
 
-    bool isValidIndex( sal_Int32 nIndex ) const { return (nIndex >= 0) && (nIndex < static_cast<sal_Int32>(maSlideNumbers.size())); }
+    bool isValidIndex( sal_Int32 nIndex ) const { return (nIndex >= 0) && (o3tl::make_unsigned(nIndex) < maSlideNumbers.size()); }
     bool isValidSlideNumber( sal_Int32 nSlideNumber ) const { return (nSlideNumber >= 0) && (nSlideNumber < mnSlideCount); }
 
 private:
@@ -487,8 +486,7 @@ constexpr OUStringLiteral gsBookmark( u"Bookmark" );
 constexpr OUStringLiteral gsVerb( u"Verb" );
 
 SlideshowImpl::SlideshowImpl( const Reference< XPresentation2 >& xPresentation, ViewShell* pViewSh, ::sd::View* pView, SdDrawDocument* pDoc, vcl::Window* pParentWindow )
-: SlideshowImplBase( m_aMutex )
-, mxModel(pDoc->getUnoModel(),UNO_QUERY_THROW)
+: mxModel(pDoc->getUnoModel(),UNO_QUERY_THROW)
 , maUpdateTimer("SlideShowImpl maUpdateTimer")
 , maInputFreezeTimer("SlideShowImpl maInputFreezeTimer")
 , maDeactivateTimer("SlideShowImpl maDeactivateTimer")
@@ -566,11 +564,12 @@ SlideshowImpl::~SlideshowImpl()
     if( !mbDisposed )
     {
         OSL_FAIL("SlideshowImpl::~SlideshowImpl(), component was not disposed!");
-        disposing();
+        std::unique_lock g(m_aMutex);
+        disposing(g);
     }
 }
 
-void SAL_CALL SlideshowImpl::disposing()
+void SlideshowImpl::disposing(std::unique_lock<std::mutex>&)
 {
 #ifdef ENABLE_SDREMOTE
     RemoteServer::presentationStopped();
@@ -629,7 +628,7 @@ void SAL_CALL SlideshowImpl::disposing()
 
     // take DrawView from presentation window, but give the old window back
     if( mpShowWindow && mpView )
-        mpView->DeleteWindowFromPaintView( mpShowWindow->GetOutDev() );
+        mpView->DeleteDeviceFromPaintView( *mpShowWindow->GetOutDev() );
 
     if( mpView )
         mpView->SetAnimationPause( false );
@@ -782,7 +781,7 @@ bool SlideshowImpl::startPreview(
 
         if( mpView )
         {
-            mpView->AddWindowToPaintView( mpShowWindow->GetOutDev(), nullptr );
+            mpView->AddDeviceToPaintView( *mpShowWindow->GetOutDev(), nullptr );
             mpView->SetAnimationPause( true );
         }
 
@@ -968,7 +967,7 @@ bool SlideshowImpl::startShow( PresentationSettingsEx const * pPresSettings )
 
             if( mpView )
             {
-                mpView->AddWindowToPaintView( mpShowWindow->GetOutDev(), nullptr );
+                mpView->AddDeviceToPaintView( *mpShowWindow->GetOutDev(), nullptr );
                 mpView->SetAnimationPause( true );
             }
 
@@ -1063,7 +1062,7 @@ bool SlideshowImpl::startShowImpl( const Sequence< beans::PropertyValue >& aProp
                 mxShow->setProperty(
                     beans::PropertyValue( "WaitSymbolBitmap" ,
                         -1,
-                        makeAny( xBitmap ),
+                        Any( xBitmap ),
                         beans::PropertyState_DIRECT_VALUE ) );
             }
 
@@ -1075,7 +1074,7 @@ bool SlideshowImpl::startShowImpl( const Sequence< beans::PropertyValue >& aProp
                 mxShow->setProperty(
                     beans::PropertyValue( "PointerSymbolBitmap" ,
                         -1,
-                        makeAny( xPointerBitmap ),
+                        Any( xPointerBitmap ),
                         beans::PropertyState_DIRECT_VALUE ) );
             }
         }
@@ -1154,7 +1153,7 @@ void SlideshowImpl::slideEnded(const bool bReverse)
         gotoNextSlide();
 }
 
-bool SlideshowImpl::swipe(const CommandSwipeData &rSwipeData)
+bool SlideshowImpl::swipe(const CommandGestureSwipeData &rSwipeData)
 {
     if (mbUsePen || mnContextMenuEvent)
         return false;
@@ -1176,7 +1175,7 @@ bool SlideshowImpl::swipe(const CommandSwipeData &rSwipeData)
     return true;
 }
 
-bool SlideshowImpl::longpress(const CommandLongPressData &rLongPressData)
+bool SlideshowImpl::longpress(const CommandGestureLongPressData &rLongPressData)
 {
     if (mnContextMenuEvent)
         return false;
@@ -1386,7 +1385,7 @@ void SAL_CALL SlideshowImpl::resume()
 
     if( mbIsPaused ) try
     {
-        if( mpShowWindow->GetShowWindowMode() == SHOWWINDOWMODE_BLANK )
+        if( mpShowWindow->GetShowWindowMode() == SHOWWINDOWMODE_BLANK || mpShowWindow->GetShowWindowMode() == SHOWWINDOWMODE_END )
         {
             mpShowWindow->RestartShow();
         }
@@ -1531,12 +1530,12 @@ void SlideshowImpl::click( const Reference< XShape >& xShape )
             // "Macroname.Modulname.Libname.Documentname" or
             // "Macroname.Modulname.Libname.Applicationname"
             sal_Int32 nIdx{ 0 };
-            const OUString aMacroName = aMacro.getToken(0, '.', nIdx);
-            const OUString aModulName = aMacro.getToken(0, '.', nIdx);
+            const std::u16string_view aMacroName = o3tl::getToken(aMacro, 0, '.', nIdx);
+            const std::u16string_view aModulName = o3tl::getToken(aMacro, 0, '.', nIdx);
 
             // todo: is the limitation still given that only
             // Modulname+Macroname can be used here?
-            OUString aExecMacro = aModulName + "." + aMacroName;
+            OUString aExecMacro = OUString::Concat(aModulName) + "." + aMacroName;
             mpDocSh->GetBasic()->Call(aExecMacro);
         }
     }
@@ -1818,6 +1817,15 @@ bool SlideshowImpl::keyInput(const KeyEvent& rKEvt)
                 setUsePen( !mbUsePen );
                 break;
 
+            // tdf#149351 Ctrl+A disables pointer as pen mode
+            case KEY_A:
+                if(rKEvt.GetKeyCode().IsMod1())
+                {
+                    setUsePen( false );
+                    break;
+                }
+            break;
+
             case KEY_E:
                 setEraseAllInk( true );
                 updateSlideShow();
@@ -2055,7 +2063,7 @@ IMPL_LINK_NOARG(SlideshowImpl, ContextMenuHdl, void*, void)
         resume();
 }
 
-void SlideshowImpl::ContextMenuSelectHdl(const OString& rMenuId)
+void SlideshowImpl::ContextMenuSelectHdl(std::string_view rMenuId)
 {
     if (rMenuId == "prev")
     {
@@ -2175,9 +2183,9 @@ void SlideshowImpl::ContextMenuSelectHdl(const OString& rMenuId)
         }
         endPresentation();
     }
-    else if (!rMenuId.isEmpty())
+    else if (!rMenuId.empty())
     {
-        sal_Int32 nPageNumber = rMenuId.toInt32() - CM_SLIDES;
+        sal_Int32 nPageNumber = o3tl::toInt32(rMenuId) - CM_SLIDES;
         const ShowWindowMode eMode = mpShowWindow->GetShowWindowMode();
         if( (eMode == SHOWWINDOWMODE_END) || (eMode == SHOWWINDOWMODE_PAUSE) || (eMode == SHOWWINDOWMODE_BLANK) )
         {
@@ -3124,10 +3132,10 @@ void PresentationSettingsEx::SetPropertyValue( std::u16string_view rProperty, co
 
 // XAnimationListener
 
-SlideShowListenerProxy::SlideShowListenerProxy( const rtl::Reference< SlideshowImpl >& xController, const css::uno::Reference< css::presentation::XSlideShow >& xSlideShow )
+SlideShowListenerProxy::SlideShowListenerProxy( rtl::Reference< SlideshowImpl > xController, css::uno::Reference< css::presentation::XSlideShow > xSlideShow )
 : maListeners( m_aMutex )
-, mxController( xController )
-, mxSlideShow( xSlideShow )
+, mxController(std::move( xController ))
+, mxSlideShow(std::move( xSlideShow ))
 {
 }
 
@@ -3187,7 +3195,7 @@ void SAL_CALL SlideShowListenerProxy::beginEvent( const Reference< XAnimationNod
 
     if( maListeners.getLength() >= 0 )
     {
-        maListeners.forEach<XSlideShowListener>(
+        maListeners.forEach(
             [&] (Reference<XAnimationListener> const& xListener) {
                 return xListener->beginEvent(xNode);
             } );
@@ -3200,7 +3208,7 @@ void SAL_CALL SlideShowListenerProxy::endEvent( const Reference< XAnimationNode 
 
     if( maListeners.getLength() >= 0 )
     {
-        maListeners.forEach<XSlideShowListener>(
+        maListeners.forEach(
             [&] (Reference<XAnimationListener> const& xListener) {
                 return xListener->endEvent(xNode);
             } );
@@ -3213,7 +3221,7 @@ void SAL_CALL SlideShowListenerProxy::repeat( const Reference< XAnimationNode >&
 
     if( maListeners.getLength() >= 0 )
     {
-        maListeners.forEach<XSlideShowListener>(
+        maListeners.forEach(
             [&] (Reference<XAnimationListener> const& xListener) {
                 return xListener->repeat(xNode, nRepeat);
             } );
@@ -3226,7 +3234,7 @@ void SAL_CALL SlideShowListenerProxy::paused(  )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    maListeners.forEach<XSlideShowListener>(
+    maListeners.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->paused();
@@ -3237,7 +3245,7 @@ void SAL_CALL SlideShowListenerProxy::resumed(  )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    maListeners.forEach<XSlideShowListener>(
+    maListeners.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->resumed();
@@ -3248,7 +3256,7 @@ void SAL_CALL SlideShowListenerProxy::slideTransitionStarted( )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    maListeners.forEach<XSlideShowListener>(
+    maListeners.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideTransitionStarted();
@@ -3259,7 +3267,7 @@ void SAL_CALL SlideShowListenerProxy::slideTransitionEnded( )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    maListeners.forEach<XSlideShowListener>(
+    maListeners.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideTransitionEnded ();
@@ -3270,7 +3278,7 @@ void SAL_CALL SlideShowListenerProxy::slideAnimationsEnded(  )
 {
     ::osl::MutexGuard aGuard( m_aMutex );
 
-    maListeners.forEach<XSlideShowListener>(
+    maListeners.forEach(
         [](uno::Reference<presentation::XSlideShowListener> const& xListener)
         {
             xListener->slideAnimationsEnded ();
@@ -3284,7 +3292,7 @@ void SlideShowListenerProxy::slideEnded(sal_Bool bReverse)
 
         if( maListeners.getLength() >= 0 )
         {
-            maListeners.forEach<XSlideShowListener>(
+            maListeners.forEach(
                 [&] (Reference<XSlideShowListener> const& xListener) {
                     return xListener->slideEnded(bReverse);
                 } );
@@ -3305,7 +3313,7 @@ void SlideShowListenerProxy::hyperLinkClicked( OUString const& aHyperLink )
 
         if( maListeners.getLength() >= 0 )
         {
-            maListeners.forEach<XSlideShowListener>(
+            maListeners.forEach(
                 [&] (Reference<XSlideShowListener> const& xListener) {
                     return xListener->hyperLinkClicked(aHyperLink);
                 } );

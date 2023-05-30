@@ -25,9 +25,7 @@
 #include <QtFont.hxx>
 #include <QtTools.hxx>
 
-#include <sft.hxx>
-#include <impfontcharmap.hxx>
-#include <fontinstance.hxx>
+#include <font/LogicalFontInstance.hxx>
 #include <font/FontSelectPattern.hxx>
 #include <font/PhysicalFontCollection.hxx>
 
@@ -35,6 +33,7 @@
 #include <QtGui/QFontDatabase>
 #include <QtGui/QFontInfo>
 #include <QtGui/QRawFont>
+#include <utility>
 
 using namespace vcl;
 
@@ -43,8 +42,6 @@ QtFontFace::QtFontFace(const QtFontFace& rSrc)
     , m_aFontId(rSrc.m_aFontId)
     , m_eFontIdType(rSrc.m_eFontIdType)
 {
-    if (rSrc.m_xCharMap.is())
-        m_xCharMap = rSrc.m_xCharMap;
 }
 
 FontWeight QtFontFace::toFontWeight(const int nWeight)
@@ -111,8 +108,6 @@ void QtFontFace::fillAttributesFromQFont(const QFont& rFont, FontAttributes& rFA
     QFontInfo aFontInfo(rFont);
 
     rFA.SetFamilyName(toOUString(aFontInfo.family()));
-    if (IsStarSymbol(toOUString(aFontInfo.family())))
-        rFA.SetSymbolFlag(true);
     rFA.SetStyleName(toOUString(aFontInfo.styleName()));
     rFA.SetPitch(aFontInfo.fixedPitch() ? PITCH_FIXED : PITCH_VARIABLE);
     rFA.SetWeight(QtFontFace::toFontWeight(aFontInfo.weight()));
@@ -129,19 +124,28 @@ QtFontFace* QtFontFace::fromQFont(const QFont& rFont)
 
 QtFontFace* QtFontFace::fromQFontDatabase(const QString& aFamily, const QString& aStyle)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto const isFixedPitch = QFontDatabase::isFixedPitch(aFamily, aStyle);
+    auto const weigh = QFontDatabase::weight(aFamily, aStyle);
+    auto const italic = QFontDatabase::italic(aFamily, aStyle);
+    auto const aPointList = QFontDatabase::pointSizes(aFamily, aStyle);
+#else
     QFontDatabase aFDB;
+    auto const isFixedPitch = aFDB.isFixedPitch(aFamily, aStyle);
+    auto const weigh = aFDB.weight(aFamily, aStyle);
+    auto const italic = aFDB.italic(aFamily, aStyle);
+    auto const aPointList = aFDB.pointSizes(aFamily, aStyle);
+#endif
+
     FontAttributes aFA;
 
     aFA.SetFamilyName(toOUString(aFamily));
-    if (IsStarSymbol(aFA.GetFamilyName()))
-        aFA.SetSymbolFlag(true);
     aFA.SetStyleName(toOUString(aStyle));
-    aFA.SetPitch(aFDB.isFixedPitch(aFamily, aStyle) ? PITCH_FIXED : PITCH_VARIABLE);
-    aFA.SetWeight(QtFontFace::toFontWeight(aFDB.weight(aFamily, aStyle)));
-    aFA.SetItalic(aFDB.italic(aFamily, aStyle) ? ITALIC_NORMAL : ITALIC_NONE);
+    aFA.SetPitch(isFixedPitch ? PITCH_FIXED : PITCH_VARIABLE);
+    aFA.SetWeight(QtFontFace::toFontWeight(weigh));
+    aFA.SetItalic(italic ? ITALIC_NORMAL : ITALIC_NONE);
 
     int nPointSize = 0;
-    QList<int> aPointList = aFDB.pointSizes(aFamily, aStyle);
     if (!aPointList.empty())
         nPointSize = aPointList[0];
 
@@ -149,12 +153,10 @@ QtFontFace* QtFontFace::fromQFontDatabase(const QString& aFamily, const QString&
                           FontIdType::FontDB);
 }
 
-QtFontFace::QtFontFace(const FontAttributes& rFA, const QString& rFontID,
-                       const FontIdType eFontIdType)
+QtFontFace::QtFontFace(const FontAttributes& rFA, QString aFontID, const FontIdType eFontIdType)
     : PhysicalFontFace(rFA)
-    , m_aFontId(rFontID)
+    , m_aFontId(std::move(aFontID))
     , m_eFontIdType(eFontIdType)
-    , m_bFontCapabilitiesRead(false)
 {
 }
 
@@ -167,10 +169,16 @@ QFont QtFontFace::CreateFont() const
     {
         case FontDB:
         {
-            QFontDatabase aFDB;
             QStringList aStrList = m_aFontId.split(",");
             if (3 == aStrList.size())
+            {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+                aFont = QFontDatabase::font(aStrList[0], aStrList[1], aStrList[2].toInt());
+#else
+                QFontDatabase aFDB;
                 aFont = aFDB.font(aStrList[0], aStrList[1], aStrList[2].toInt());
+#endif
+            }
             else
                 SAL_WARN("vcl.qt", "Invalid QFontDatabase font ID " << m_aFontId);
             break;
@@ -190,50 +198,20 @@ QtFontFace::CreateFontInstance(const vcl::font::FontSelectPattern& rFSD) const
     return new QtFont(*this, rFSD);
 }
 
-FontCharMapRef QtFontFace::GetFontCharMap() const
+hb_blob_t* QtFontFace::GetHbTable(hb_tag_t nTag) const
 {
-    if (m_xCharMap.is())
-        return m_xCharMap;
+    char pTagName[5] = { '\0' };
+    hb_tag_to_string(nTag, pTagName);
 
     QFont aFont = CreateFont();
     QRawFont aRawFont(QRawFont::fromFont(aFont));
-    QByteArray aCMapTable = aRawFont.fontTable("cmap");
-    if (aCMapTable.isEmpty())
-    {
-        m_xCharMap = new FontCharMap();
-        return m_xCharMap;
-    }
+    QByteArray aTable = aRawFont.fontTable(pTagName);
+    const sal_uInt32 nLength = aTable.size();
 
-    CmapResult aCmapResult;
-    if (ParseCMAP(reinterpret_cast<const unsigned char*>(aCMapTable.data()), aCMapTable.size(),
-                  aCmapResult))
-        m_xCharMap = new FontCharMap(aCmapResult);
-
-    return m_xCharMap;
-}
-
-bool QtFontFace::GetFontCapabilities(vcl::FontCapabilities& rFontCapabilities) const
-{
-    // read this only once per font
-    if (m_bFontCapabilitiesRead)
-    {
-        rFontCapabilities = m_aFontCapabilities;
-        return rFontCapabilities.oUnicodeRange || rFontCapabilities.oCodePageRange;
-    }
-    m_bFontCapabilitiesRead = true;
-
-    QFont aFont = CreateFont();
-    QRawFont aRawFont(QRawFont::fromFont(aFont));
-    QByteArray aOS2Table = aRawFont.fontTable("OS/2");
-    if (!aOS2Table.isEmpty())
-    {
-        vcl::getTTCoverage(m_aFontCapabilities.oUnicodeRange, m_aFontCapabilities.oCodePageRange,
-                           reinterpret_cast<const unsigned char*>(aOS2Table.data()),
-                           aOS2Table.size());
-    }
-
-    rFontCapabilities = m_aFontCapabilities;
-    return rFontCapabilities.oUnicodeRange || rFontCapabilities.oCodePageRange;
+    hb_blob_t* pBlob = nullptr;
+    if (nLength > 0)
+        pBlob = hb_blob_create(aTable.data(), nLength, HB_MEMORY_MODE_DUPLICATE, nullptr, nullptr);
+    return pBlob;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

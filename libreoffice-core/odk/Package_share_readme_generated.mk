@@ -12,7 +12,6 @@ $(eval $(call gb_Package_Package,odk_share_readme_generated,$(WORKDIR)/CustomTar
 $(eval $(call gb_Package_set_outdir,odk_share_readme_generated,$(INSTDIR)))
 
 $(eval $(call gb_Package_add_files,odk_share_readme_generated,$(SDKDIRNAME)/readme,\
-	$(if $(filter WNT,$(OS)),license/license.txt) \
 	readme/$(call gb_README,en-US) \
 ))
 

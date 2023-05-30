@@ -24,6 +24,7 @@
 #include <memory>
 
 #include <com/sun/star/xml/sax/XFastAttributeList.hpp>
+#include <utility>
 
 #include "diagram.hxx"
 
@@ -276,11 +277,11 @@ class ConditionAtom
 public:
     explicit ConditionAtom(LayoutNode& rLayoutNode, bool isElse, const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttributes);
     virtual void accept( LayoutAtomVisitor& ) override;
-    bool getDecision(const dgm::Point* pPresPoint) const;
+    bool getDecision(const svx::diagram::Point* pPresPoint) const;
 
 private:
     static bool compareResult(sal_Int32 nOperator, sal_Int32 nFirst, sal_Int32 nSecond);
-    sal_Int32 getNodeCount(const dgm::Point* pPresPoint) const;
+    sal_Int32 getNodeCount(const svx::diagram::Point* pPresPoint) const;
 
     bool          mIsElse;
     IteratorAttr  maIter;
@@ -333,7 +334,7 @@ public:
         { mpNodeShapes.push_back(pShape); }
 
     bool setupShape( const ShapePtr& rShape,
-                     const dgm::Point* pPresNode,
+                     const svx::diagram::Point* pPresNode,
                      sal_Int32 nCurrIdx ) const;
 
     const LayoutNode* getParentLayoutNode() const;
@@ -354,7 +355,7 @@ class ShapeAtom
     : public LayoutAtom
 {
 public:
-    ShapeAtom(LayoutNode& rLayoutNode, const ShapePtr& pShape) : LayoutAtom(rLayoutNode), mpShapeTemplate(pShape) {}
+    ShapeAtom(LayoutNode& rLayoutNode, ShapePtr pShape) : LayoutAtom(rLayoutNode), mpShapeTemplate(std::move(pShape)) {}
     virtual void accept( LayoutAtomVisitor& ) override;
     const ShapePtr& getShapeTemplate() const
         { return mpShapeTemplate; }

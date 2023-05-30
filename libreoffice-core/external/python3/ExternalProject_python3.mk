@@ -44,6 +44,8 @@ $(call gb_ExternalProject_get_state_target,python3,build) :
 			/maxcpucount \
 			/p:PlatformToolset=$(VCTOOLSET) /p:VisualStudioVersion=$(VCVER) /ToolsVersion:Current \
 			$(if $(filter 10,$(WINDOWS_SDK_VERSION)),/p:WindowsTargetPlatformVersion=$(UCRTVERSION)) \
+		$(foreach i,$(python3_EXTENSION_MODULES), \
+			&& { test -e ../$i || { printf 'Error: missing %s\n' $i; false; } }) \
 	,PCBuild)
 	$(call gb_Trace_EndRange,python3,EXTERNAL)
 
@@ -85,7 +87,7 @@ $(call gb_ExternalProject_get_state_target,python3,build) :
 			) \
 		) \
 		$(gb_RUN_CONFIGURE) ./configure \
-		$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+		$(gb_CONFIGURE_PLATFORMS) \
 		$(if $(ENABLE_VALGRIND),--with-valgrind) \
 		$(if $(ENABLE_DBGUTIL),--with-pydebug) \
 		--prefix=/python-inst \
@@ -98,7 +100,6 @@ $(call gb_ExternalProject_get_state_target,python3,build) :
             ) \
 			--enable-framework=/@__________________________________________________OOO --with-framework-name=LibreOfficePython, \
 			--enable-shared \
-			$(if $(filter 1090 101000 101100 101200,$(MAC_OS_X_VERSION_MIN_REQUIRED)),ac_cv_func_utimensat=no) \
 		) \
 		$(if $(ENABLE_OPENSSL),$(if $(SYSTEM_OPENSSL),,\
 			--with-openssl=$(call gb_UnpackedTarball_get_dir,openssl) \
@@ -123,6 +124,8 @@ $(call gb_ExternalProject_get_state_target,python3,build) :
 			$(if $(filter MACOSX,$(OS)),DESTDIR=$(EXTERNAL_WORKDIR)/python-inst install) \
 			$(if $(SYSTEM_ZLIB),,ZLIB_INCDIR=$(WORKDIR)/UnpackedTarball/zlib) \
 		&& ln -s build/lib.* LO_lib \
+		$(foreach i,$(python3_EXTENSION_MODULES), \
+			&& { test -e $i || { printf 'Error: missing %s\n' $i; false; } }) \
 	)
 	$(call gb_Trace_EndRange,python3,EXTERNAL)
 

@@ -25,13 +25,14 @@
 
 #include <rtl/ustrbuf.hxx>
 
+#include <utility>
 #include <vcl/i18nhelp.hxx>
 
 using namespace ::com::sun::star;
 
-vcl::I18nHelper::I18nHelper(  const css::uno::Reference< css::uno::XComponentContext >& rxContext, const LanguageTag& rLanguageTag )
+vcl::I18nHelper::I18nHelper(  const css::uno::Reference< css::uno::XComponentContext >& rxContext, LanguageTag aLanguageTag )
     :
-        maLanguageTag( rLanguageTag)
+        maLanguageTag(std::move( aLanguageTag))
 {
     m_xContext = rxContext;
     mpLocaleDataWrapper = nullptr;
@@ -106,7 +107,7 @@ OUString vcl::I18nHelper::filterFormattingChars( const OUString& rStr )
 
 sal_Int32 vcl::I18nHelper::CompareString( const OUString& rStr1, const OUString& rStr2 ) const
 {
-    ::osl::Guard< ::osl::Mutex > aGuard( const_cast<vcl::I18nHelper*>(this)->maMutex );
+    std::unique_lock aGuard( maMutex );
 
     if ( mbTransliterateIgnoreCase )
     {
@@ -123,7 +124,7 @@ sal_Int32 vcl::I18nHelper::CompareString( const OUString& rStr1, const OUString&
 
 bool vcl::I18nHelper::MatchString( const OUString& rStr1, const OUString& rStr2 ) const
 {
-    ::osl::Guard< ::osl::Mutex > aGuard( const_cast<vcl::I18nHelper*>(this)->maMutex );
+    std::unique_lock aGuard( maMutex );
 
     if ( !mbTransliterateIgnoreCase )
     {
@@ -138,18 +139,13 @@ bool vcl::I18nHelper::MatchString( const OUString& rStr1, const OUString& rStr2 
     return ImplGetTransliterationWrapper().isMatch( aStr1, aStr2 );
 }
 
-bool vcl::I18nHelper::MatchMnemonic( const OUString& rString, sal_Unicode cMnemonicChar ) const
+bool vcl::I18nHelper::MatchMnemonic( std::u16string_view rString, sal_Unicode cMnemonicChar ) const
 {
-    ::osl::Guard< ::osl::Mutex > aGuard( const_cast<vcl::I18nHelper*>(this)->maMutex );
-
-    bool bEqual = false;
-    sal_Int32 n = rString.indexOf( '~' );
-    if ( n != -1 )
-    {
-        OUString aMatchStr = rString.copy( n+1 );   // not only one char, because of transliteration...
-        bEqual = MatchString( OUString(cMnemonicChar), aMatchStr );
-    }
-    return bEqual;
+    size_t n = rString.find( '~' );
+    if ( n == std::u16string_view::npos )
+        return false;
+    OUString aMatchStr( rString.substr( n+1 ) );   // not only one char, because of transliteration...
+    return MatchString( OUString(cMnemonicChar), aMatchStr );
 }
 
 OUString vcl::I18nHelper::GetNum( tools::Long nNumber, sal_uInt16 nDecimals, bool bUseThousandSep, bool bTrailingZeros ) const

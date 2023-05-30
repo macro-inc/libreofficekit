@@ -27,6 +27,7 @@
 #include <sw_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/primitivetools2d.hxx>
 #include <drawinglayer/primitive2d/fillgradientprimitive2d.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 
 namespace sw::sidebarwindows {
 
@@ -82,55 +83,59 @@ void ShadowPrimitive::create2DDecomposition(
         case SS_NORMAL:
         {
             aRange.expand(basegfx::B2DTuple(getSecondPosition().getX(), getSecondPosition().getY() + (2.0 * getDiscreteUnit())));
-            const ::drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
-                drawinglayer::attribute::GradientStyle::Linear,
+
+            ::drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
+                css::awt::GradientStyle_LINEAR,
                 0.0,
                 0.5,
                 0.5,
                 M_PI,
-                basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
-                basegfx::BColor(180.0/255.0,180.0/255.0,180.0/255.0));
+                basegfx::utils::createColorStopsFromStartEndColor(
+                    basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
+                    basegfx::BColor(180.0/255.0,180.0/255.0,180.0/255.0)));
 
             rContainer.push_back(
                 new drawinglayer::primitive2d::FillGradientPrimitive2D(
                     aRange,
-                    aFillGradientAttribute));
+                    std::move(aFillGradientAttribute)));
             break;
         }
         case SS_VIEW:
         {
             aRange.expand(basegfx::B2DTuple(getSecondPosition().getX(), getSecondPosition().getY() + (4.0 * getDiscreteUnit())));
-            const drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
-                drawinglayer::attribute::GradientStyle::Linear,
+            drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
+                css::awt::GradientStyle_LINEAR,
                 0.0,
                 0.5,
                 0.5,
                 M_PI,
-                basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
-                basegfx::BColor(180.0/255.0,180.0/255.0,180.0/255.0));
+                basegfx::utils::createColorStopsFromStartEndColor(
+                    basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
+                    basegfx::BColor(180.0/255.0,180.0/255.0,180.0/255.0)));
 
             rContainer.push_back(
                 new drawinglayer::primitive2d::FillGradientPrimitive2D(
                     aRange,
-                    aFillGradientAttribute));
+                    std::move(aFillGradientAttribute)));
             break;
         }
         case SS_EDIT:
         {
             aRange.expand(basegfx::B2DTuple(getSecondPosition().getX(), getSecondPosition().getY() + (4.0 * getDiscreteUnit())));
-            const drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
-                drawinglayer::attribute::GradientStyle::Linear,
+            drawinglayer::attribute::FillGradientAttribute aFillGradientAttribute(
+                css::awt::GradientStyle_LINEAR,
                 0.0,
                 0.5,
                 0.5,
                 M_PI,
-                basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
-                basegfx::BColor(83.0/255.0,83.0/255.0,83.0/255.0));
+                basegfx::utils::createColorStopsFromStartEndColor(
+                    basegfx::BColor(230.0/255.0,230.0/255.0,230.0/255.0),
+                    basegfx::BColor(83.0/255.0,83.0/255.0,83.0/255.0)));
 
             rContainer.push_back(
                 new drawinglayer::primitive2d::FillGradientPrimitive2D(
                     aRange,
-                    aFillGradientAttribute));
+                    std::move(aFillGradientAttribute)));
             break;
         }
         default:

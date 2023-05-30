@@ -35,9 +35,20 @@
 #include <pagedesc.hxx>
 #include <cellatr.hxx>
 #include <com/sun/star/drawing/XDrawPageSupplier.hpp>
+#include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/util/Color.hpp>
 #include "xmlexp.hxx"
 #include <SwStyleNameMapper.hxx>
 #include <osl/diagnose.h>
+#include <comphelper/sequenceashashmap.hxx>
+#include <sax/tools/converter.hxx>
+
+#include <o3tl/enumrange.hxx>
+#include <svx/unoapi.hxx>
+#include <svx/svdpage.hxx>
+#include <docmodel/theme/ThemeColor.hxx>
+#include <docmodel/theme/Theme.hxx>
+
 
 using namespace ::com::sun::star::beans;
 using namespace ::com::sun::star::uno;
@@ -85,13 +96,11 @@ void SwXMLExport::ExportFormat(const SwFormat& rFormat, enum XMLTokenEnum eFamil
     // style:master-page-name
     if( RES_FRMFMT == rFormat.Which() && XML_TABLE == eFamily )
     {
-        const SfxPoolItem *pItem;
-        if( SfxItemState::SET == rFormat.GetAttrSet().GetItemState( RES_PAGEDESC,
-                                                            false, &pItem ) )
+        if( const SwFormatPageDesc* pItem = rFormat.GetAttrSet().GetItemIfSet( RES_PAGEDESC,
+                                                            false ) )
         {
             OUString sName;
-            const SwPageDesc *pPageDesc =
-                static_cast<const SwFormatPageDesc *>(pItem)->GetPageDesc();
+            const SwPageDesc *pPageDesc = pItem->GetPageDesc();
             if( pPageDesc )
                 SwStyleNameMapper::FillProgName(
                                     pPageDesc->GetName(),
@@ -106,12 +115,10 @@ void SwXMLExport::ExportFormat(const SwFormat& rFormat, enum XMLTokenEnum eFamil
     {
         OSL_ENSURE(RES_FRMFMT == rFormat.Which(), "only frame format");
 
-        const SfxPoolItem *pItem;
-        if( SfxItemState::SET ==
-            rFormat.GetAttrSet().GetItemState( RES_BOXATR_FORMAT,
-                                            false, &pItem ) )
+        if( const SwTableBoxNumFormat *pItem =
+                rFormat.GetAttrSet().GetItemIfSet( RES_BOXATR_FORMAT, false ) )
         {
-            sal_Int32 nFormat = static_cast<sal_Int32>(static_cast<const SwTableBoxNumFormat *>(pItem)->GetValue());
+            sal_Int32 nFormat = static_cast<sal_Int32>(pItem->GetValue());
 
             if ( (nFormat != -1) && (nFormat != static_cast<sal_Int32>(getSwDefaultTextFormat())) )
             {
@@ -174,6 +181,72 @@ void SwXMLExport::ExportStyles_( bool bUsed )
     GetShapeExport()->GetShapeTableExport()->exportTableStyles();
     //page defaults
     GetPageExport()->exportDefaultStyle();
+
+    // Theme
+    uno::Reference<drawing::XDrawPageSupplier> xDrawPageSupplier(GetModel(), UNO_QUERY);
+    if (xDrawPageSupplier.is())
+    {
+        uno::Reference<drawing::XDrawPage> xPage = xDrawPageSupplier->getDrawPage();
+        if (xPage.is())
+            ExportThemeElement(xPage);
+    }
+}
+
+void SwXMLExport::ExportThemeElement(const uno::Reference<drawing::XDrawPage>& xDrawPage)
+{
+    if ((getSaneDefaultVersion() & SvtSaveOptions::ODFSVER_EXTENDED) == 0)
+    {
+        // Do not export in standard ODF 1.3 or older.
+        return;
+    }
+
+    SdrPage* pPage = GetSdrPageFromXDrawPage(xDrawPage);
+    SAL_WARN_IF(!pPage, "oox", "Can't get SdrPage from XDrawPage");
+
+    if (!pPage)
+        return;
+
+    auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+    if (!pTheme)
+        return;
+
+    if (!pTheme->GetName().isEmpty())
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, pTheme->GetName());
+    SvXMLElementExport aTheme(*this, XML_NAMESPACE_LO_EXT, XML_THEME, true, true);
+
+    auto* pColorSet = pTheme->GetColorSet();
+    if (!pColorSet->getName().isEmpty())
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, pColorSet->getName());
+    SvXMLElementExport aColorTable(*this, XML_NAMESPACE_LO_EXT, XML_COLOR_TABLE, true, true);
+
+    static const XMLTokenEnum aColorTokens[] =
+    {
+        XML_DK1, // Text 1
+        XML_LT1, // Background 1
+        XML_DK2, // Text 2
+        XML_LT2, // Background 2
+        XML_ACCENT1,
+        XML_ACCENT2,
+        XML_ACCENT3,
+        XML_ACCENT4,
+        XML_ACCENT5,
+        XML_ACCENT6,
+        XML_HLINK, // Hyperlink
+        XML_FOLHLINK, // Followed hyperlink
+    };
+
+    for (auto eThemeColorType : o3tl::enumrange<model::ThemeColorType>())
+    {
+        if (eThemeColorType == model::ThemeColorType::Unknown)
+            continue;
+
+        auto nColor = size_t(eThemeColorType);
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_NAME, GetXMLToken(aColorTokens[nColor]));
+        OUStringBuffer sValue;
+        sax::Converter::convertColor(sValue, pColorSet->getColor(eThemeColorType));
+        AddAttribute(XML_NAMESPACE_LO_EXT, XML_COLOR, sValue.makeStringAndClear());
+        SvXMLElementExport aColor(*this, XML_NAMESPACE_LO_EXT, XML_COLOR, true, true);
+    }
 }
 
 void SwXMLExport::collectAutoStyles()

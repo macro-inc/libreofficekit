@@ -23,6 +23,7 @@
 #include <sal/config.h>
 #include <osl/file.hxx>
 #include <cppuhelper/exc_hlp.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <cppuhelper/implbase.hxx>
 
@@ -102,8 +103,8 @@ class UpdateCommandEnv
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
 public:
-    UpdateCommandEnv( css::uno::Reference< css::uno::XComponentContext > const & xCtx,
-        ::rtl::Reference<UpdateInstallDialog::Thread>const & thread);
+    UpdateCommandEnv( css::uno::Reference< css::uno::XComponentContext > xCtx,
+        ::rtl::Reference<UpdateInstallDialog::Thread> thread);
 
     // XCommandEnvironment
     virtual css::uno::Reference<css::task::XInteractionHandler > SAL_CALL
@@ -379,7 +380,7 @@ void UpdateInstallDialog::Thread::downloadExtensions()
                         ++nPos;
                     }
                     m_dialog.setError(UpdateInstallDialog::ERROR_DOWNLOAD, updateData.aInstalledPackage->getDisplayName(),
-                        buf.makeStringAndClear());
+                        buf);
                 }
             }
 
@@ -441,7 +442,7 @@ void UpdateInstallDialog::Thread::installExtensions()
             }
             if (!updateData.aUpdateSource.is() && !updateData.sLocalURL.isEmpty())
             {
-                css::beans::NamedValue prop("EXTENSION_UPDATE", css::uno::makeAny(OUString("1")));
+                css::beans::NamedValue prop("EXTENSION_UPDATE", css::uno::Any(OUString("1")));
                 if (!updateData.bIsShared)
                     xExtension = m_dialog.getExtensionManager()->addExtension(
                         updateData.sLocalURL, css::uno::Sequence<css::beans::NamedValue>(&prop, 1),
@@ -458,7 +459,7 @@ void UpdateInstallDialog::Thread::installExtensions()
                 //add extension. Currently it contains only "SUPPRESS_LICENSE". So it could happen
                 //that a license is displayed when updating from the shared repository, although the
                 //shared extension was installed using "SUPPRESS_LICENSE".
-                css::beans::NamedValue prop("EXTENSION_UPDATE", css::uno::makeAny(OUString("1")));
+                css::beans::NamedValue prop("EXTENSION_UPDATE", css::uno::Any(OUString("1")));
                 if (!updateData.bIsShared)
                     xExtension = m_dialog.getExtensionManager()->addExtension(
                         updateData.aUpdateSource->getURL(), css::uno::Sequence<css::beans::NamedValue>(&prop, 1),
@@ -578,10 +579,10 @@ bool UpdateInstallDialog::Thread::download(OUString const & sDownloadURL, Update
     return m_stop;
 }
 
-UpdateCommandEnv::UpdateCommandEnv( css::uno::Reference< css::uno::XComponentContext > const & xCtx,
-    ::rtl::Reference<UpdateInstallDialog::Thread>const & thread)
-    : m_installThread(thread),
-    m_xContext(xCtx)
+UpdateCommandEnv::UpdateCommandEnv( css::uno::Reference< css::uno::XComponentContext > xCtx,
+    ::rtl::Reference<UpdateInstallDialog::Thread> thread)
+    : m_installThread(std::move(thread)),
+    m_xContext(std::move(xCtx))
 {
 }
 

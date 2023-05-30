@@ -20,8 +20,8 @@
 #include <RptModel.hxx>
 #include <Section.hxx>
 #include <RptObject.hxx>
-#include <svx/unoshape.hxx>
 #include <ReportDrawPage.hxx>
+#include <utility>
 
 namespace rptui
 {
@@ -29,10 +29,10 @@ using namespace ::com::sun::star;
 
 OReportPage::OReportPage(
     OReportModel& _rModel,
-    const uno::Reference< report::XSection >& _xSection)
+    uno::Reference< report::XSection > _xSection)
 :   SdrPage(_rModel, false/*bMasterPage*/)
     ,rModel(_rModel)
-    ,m_xSection(_xSection)
+    ,m_xSection(std::move(_xSection))
     ,m_bSpecialInsertMode(false)
 {
 }
@@ -82,9 +82,9 @@ void OReportPage::removeSdrObject(const uno::Reference< report::XReportComponent
     }
 }
 
-SdrObject* OReportPage::RemoveObject(size_t nObjNum)
+rtl::Reference<SdrObject> OReportPage::RemoveObject(size_t nObjNum)
 {
-    SdrObject* pObj = SdrPage::RemoveObject(nObjNum);
+    rtl::Reference<SdrObject> pObj = SdrPage::RemoveObject(nObjNum);
     if (getSpecialMode())
     {
         return pObj;
@@ -94,7 +94,7 @@ SdrObject* OReportPage::RemoveObject(size_t nObjNum)
     reportdesign::OSection* pSection = comphelper::getFromUnoTunnel<reportdesign::OSection>(m_xSection);
     uno::Reference< drawing::XShape> xShape(pObj->getUnoShape(),uno::UNO_QUERY);
     pSection->notifyElementRemoved(xShape);
-    if (dynamic_cast< const OUnoObject *>( pObj ) !=  nullptr)
+    if (dynamic_cast< const OUnoObject *>( pObj.get() ) !=  nullptr)
     {
         OUnoObject& rUnoObj = dynamic_cast<OUnoObject&>(*pObj);
         uno::Reference< container::XChild> xChild(rUnoObj.GetUnoControlModel(),uno::UNO_QUERY);

@@ -53,9 +53,10 @@
 #include <o3tl/safeint.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
+#include <utility>
 
 using namespace ::dbaui;
 using namespace ::com::sun::star::uno;
@@ -167,7 +168,7 @@ void ObjectCopySource::copyFilterAndSortingTo( const Reference< XConnection >& _
                 {
                     sStatement.append(aProperty.second);
                     sFilter = sFilter.replaceFirst(sSourceName,sTargetNameTemp);
-                    _rxObject->setPropertyValue( aProperty.first, makeAny(sFilter) );
+                    _rxObject->setPropertyValue( aProperty.first, Any(sFilter) );
                     sStatement.append(sFilter);
                 }
             }
@@ -250,10 +251,10 @@ OUString ObjectCopySource::getSelectStatement() const
 }
 
 // NamedTableCopySource
-NamedTableCopySource::NamedTableCopySource( const Reference< XConnection >& _rxConnection, const OUString& _rTableName )
+NamedTableCopySource::NamedTableCopySource( const Reference< XConnection >& _rxConnection, OUString _sTableName )
     :m_xConnection( _rxConnection, UNO_SET_THROW )
     ,m_xMetaData( _rxConnection->getMetaData(), UNO_SET_THROW )
-    ,m_sTableName( _rTableName )
+    ,m_sTableName(std::move( _sTableName ))
 {
     ::dbtools::qualifiedNameComponents( m_xMetaData, m_sTableName, m_sTableCatalog, m_sTableSchema, m_sTableBareName, ::dbtools::EComposeRule::Complete );
     impl_ensureColumnInfo_throw();
@@ -269,7 +270,7 @@ bool NamedTableCopySource::isView() const
     OUString sTableType;
     try
     {
-        Reference< XResultSet > xTableDesc( m_xMetaData->getTables( makeAny( m_sTableCatalog ), m_sTableSchema, m_sTableBareName,
+        Reference< XResultSet > xTableDesc( m_xMetaData->getTables( Any( m_sTableCatalog ), m_sTableSchema, m_sTableBareName,
             Sequence< OUString >() ) );
         Reference< XRow > xTableDescRow( xTableDesc, UNO_QUERY_THROW );
         OSL_VERIFY( xTableDesc->next() );
@@ -341,7 +342,7 @@ Sequence< OUString > NamedTableCopySource::getPrimaryKeyColumnNames() const
 
     try
     {
-        Reference< XResultSet > xPKDesc( m_xMetaData->getPrimaryKeys( makeAny( m_sTableCatalog ), m_sTableSchema, m_sTableBareName ) );
+        Reference< XResultSet > xPKDesc( m_xMetaData->getPrimaryKeys( Any( m_sTableCatalog ), m_sTableSchema, m_sTableBareName ) );
         Reference< XRow > xPKDescRow( xPKDesc, UNO_QUERY_THROW );
         while ( xPKDesc->next() )
         {
@@ -583,7 +584,7 @@ weld::Container* OCopyTableWizard::CreatePageContainer()
     return pPageContainer;
 }
 
-OCopyTableWizard::OCopyTableWizard( weld::Window* pParent, const OUString& _rDefaultName, sal_Int16 _nOperation,
+OCopyTableWizard::OCopyTableWizard( weld::Window* pParent, OUString _sDefaultName, sal_Int16 _nOperation,
         ODatabaseExport::TColumns&& _rSourceColumns, const ODatabaseExport::TColumnVector& _rSourceColVec,
         const Reference< XConnection >& _xConnection, const Reference< XNumberFormatter >&  _xFormatter,
         TypeSelectionPageFactory _pTypeSelectionPageFactory, SvStream& _rTypeSelectionPageArg, const Reference< XComponentContext >& _rxContext )
@@ -598,7 +599,7 @@ OCopyTableWizard::OCopyTableWizard( weld::Window* pParent, const OUString& _rDef
     , m_nPageCount(0)
     , m_bDeleteSourceColumns(false)
     , m_bInterConnectionCopy( false )
-    , m_sName(_rDefaultName)
+    , m_sName(std::move(_sDefaultName))
     , m_nOperation( _nOperation )
     , m_ePressed( WIZARD_NONE )
     , m_bCreatePrimaryKeyColumn(false)
@@ -651,9 +652,9 @@ void OCopyTableWizard::construct()
 
     if (!m_vDestColumns.empty())
         // source is a html or rtf table
-        m_xNextPage->set_has_default(true);
+        m_xAssistant->change_default_widget(nullptr, m_xNextPage.get());
     else
-        m_xFinish->set_has_default(true);
+        m_xAssistant->change_default_widget(nullptr, m_xFinish.get());
 
     m_pTypeInfo = std::make_shared<OTypeInfo>();
     m_pTypeInfo->aUIName = m_sTypeNames.getToken(TYPE_OTHER, ';');
@@ -844,7 +845,7 @@ IMPL_LINK_NOARG(OCopyTableWizard, ImplOKHdl, weld::Button&, void)
                         OUString sMsg(DBA_RES(STR_TABLEDESIGN_NO_PRIM_KEY));
                         SQLContext aError;
                         aError.Message = sMsg;
-                        ::rtl::Reference xRequest( new ::comphelper::OInteractionRequest( makeAny( aError ) ) );
+                        ::rtl::Reference xRequest( new ::comphelper::OInteractionRequest( Any( aError ) ) );
                         ::rtl::Reference xYes = new ::comphelper::OInteractionApprove;
                         xRequest->addContinuation( xYes );
                         xRequest->addContinuation( new ::comphelper::OInteractionDisapprove );
@@ -1075,7 +1076,7 @@ void OCopyTableWizard::appendColumns( Reference<XColumnsSupplier> const & _rxCol
             if(!_bKeyColumns)
                 dbaui::setColumnProperties(xColumn,pField);
             else
-                xColumn->setPropertyValue(PROPERTY_NAME,makeAny(pField->GetName()));
+                xColumn->setPropertyValue(PROPERTY_NAME,Any(pField->GetName()));
 
             xAppend->appendByDescriptor(xColumn);
             xColumn = nullptr;
@@ -1110,7 +1111,7 @@ void OCopyTableWizard::appendKey( Reference<XKeysSupplier> const & _rxSup, const
 
     Reference<XPropertySet> xKey = xKeyFactory->createDataDescriptor();
     OSL_ENSURE(xKey.is(),"Key is null!");
-    xKey->setPropertyValue(PROPERTY_TYPE,makeAny(KeyType::PRIMARY));
+    xKey->setPropertyValue(PROPERTY_TYPE,Any(KeyType::PRIMARY));
 
     Reference<XColumnsSupplier> xColSup(xKey,UNO_QUERY);
     if(xColSup.is())
@@ -1202,9 +1203,9 @@ Reference< XPropertySet > OCopyTableWizard::createTable()
         }
     }
 
-    xTable->setPropertyValue(PROPERTY_CATALOGNAME,makeAny(sCatalog));
-    xTable->setPropertyValue(PROPERTY_SCHEMANAME,makeAny(sSchema));
-    xTable->setPropertyValue(PROPERTY_NAME,makeAny(sTable));
+    xTable->setPropertyValue(PROPERTY_CATALOGNAME,Any(sCatalog));
+    xTable->setPropertyValue(PROPERTY_SCHEMANAME,Any(sSchema));
+    xTable->setPropertyValue(PROPERTY_NAME,Any(sTable));
 
     Reference< XColumnsSupplier > xSuppDestinationColumns( xTable, UNO_QUERY );
     // now append the columns
@@ -1359,7 +1360,7 @@ void OCopyTableWizard::setOperation( const sal_Int16 _nOperation )
 
 OUString OCopyTableWizard::convertColumnName(const TColumnFindFunctor&   _rCmpFunctor,
                                                     const OUString&  _sColumnName,
-                                                    const OUString&  _sExtraChars,
+                                                    std::u16string_view  _sExtraChars,
                                                     sal_Int32               _nMaxNameLen)
 {
     OUString sAlias = _sColumnName;

@@ -88,7 +88,7 @@ ScColumn::ScColumn(ScSheetLimits const & rSheetLimits) :
     mnBlkCountFormula(0),
     nCol( 0 ),
     nTab( 0 ),
-    mbFiltering( false )
+    mbEmptyBroadcastersPending( false )
 {
     maCells.resize(rSheetLimits.GetMaxRowCount());
 }
@@ -624,6 +624,8 @@ void ScColumn::ApplyAttr( SCROW nRow, const SfxPoolItem& rAttr )
 
     ScDocumentPool* pDocPool = GetDoc().GetPool();
 
+    std::unique_lock aGuard(pDocPool->maPoolMutex);
+
     const ScPatternAttr* pOldPattern = pAttrArray->GetPattern( nRow );
     ScPatternAttr aTemp(*pOldPattern);
     aTemp.GetItemSet().Put(rAttr);
@@ -666,34 +668,27 @@ ScRefCellValue ScColumn::GetCellValue( sc::ColumnBlockConstPosition& rBlockPos, 
 
 ScRefCellValue ScColumn::GetCellValue( const sc::CellStoreType::const_iterator& itPos, size_t nOffset )
 {
-    ScRefCellValue aVal; // Defaults to empty cell.
     switch (itPos->type)
     {
         case sc::element_type_numeric:
             // Numeric cell
-            aVal.mfValue = sc::numeric_block::at(*itPos->data, nOffset);
-            aVal.meType = CELLTYPE_VALUE;
+            return ScRefCellValue(sc::numeric_block::at(*itPos->data, nOffset));
         break;
         case sc::element_type_string:
             // String cell
-            aVal.mpString = &sc::string_block::at(*itPos->data, nOffset);
-            aVal.meType = CELLTYPE_STRING;
+            return ScRefCellValue(&sc::string_block::at(*itPos->data, nOffset));
         break;
         case sc::element_type_edittext:
             // Edit cell
-            aVal.mpEditText = sc::edittext_block::at(*itPos->data, nOffset);
-            aVal.meType = CELLTYPE_EDIT;
+            return ScRefCellValue(sc::edittext_block::at(*itPos->data, nOffset));
         break;
         case sc::element_type_formula:
             // Formula cell
-            aVal.mpFormula = sc::formula_block::at(*itPos->data, nOffset);
-            aVal.meType = CELLTYPE_FORMULA;
+            return ScRefCellValue(sc::formula_block::at(*itPos->data, nOffset));
         break;
         default:
-            ;
+            return ScRefCellValue(); // empty cell
     }
-
-    return aVal;
 }
 
 const sc::CellTextAttr* ScColumn::GetCellTextAttr( SCROW nRow ) const
@@ -2078,7 +2073,7 @@ class UpdateRefOnNonCopy
         ScFormulaCell** ppEnd = pp + rGroup.mnLength;
         ScFormulaCell* pTop = *pp;
         ScTokenArray* pCode = pTop->GetCode();
-        std::unique_ptr<ScTokenArray> pOldCode(pCode->Clone());
+        ScTokenArray aOldCode(pCode->CloneValue());
         ScAddress aOldPos = pTop->aPos;
 
         // Run this before the position gets updated.
@@ -2123,7 +2118,7 @@ class UpdateRefOnNonCopy
 
         if (aRes.mbReferenceModified || aRes.mbNameModified || bGroupShifted)
         {
-            sc::EndListeningContext aEndCxt(mpCxt->mrDoc, pOldCode.get());
+            sc::EndListeningContext aEndCxt(mpCxt->mrDoc, &aOldCode);
             aEndCxt.setPositionDelta(
                 ScAddress(-mpCxt->mnColDelta, -mpCxt->mnRowDelta, -mpCxt->mnTabDelta));
 
@@ -2136,7 +2131,7 @@ class UpdateRefOnNonCopy
 
             mbUpdated = true;
 
-            fillUndoDoc(aOldPos, rGroup.mnLength, *pOldCode);
+            fillUndoDoc(aOldPos, rGroup.mnLength, aOldCode);
         }
 
         if (aRes.mbValueChanged)
@@ -2163,13 +2158,13 @@ class UpdateRefOnNonCopy
         ScFormulaCell** ppEnd = pp + rGroup.mnLength;
         ScFormulaCell* pTop = *pp;
         ScTokenArray* pCode = pTop->GetCode();
-        std::unique_ptr<ScTokenArray> pOldCode(pCode->Clone());
+        ScTokenArray aOldCode(pCode->CloneValue());
 
         ScAddress aPos = pTop->aPos;
         ScAddress aOldPos = aPos;
 
         bool bCellMoved;
-        if (mpCxt->maRange.In(aPos))
+        if (mpCxt->maRange.Contains(aPos))
         {
             bCellMoved = true;
 
@@ -2210,7 +2205,7 @@ class UpdateRefOnNonCopy
         auto pPosSet = std::make_shared<sc::ColumnBlockPositionSet>(mpCxt->mrDoc);
 
         sc::StartListeningContext aStartCxt(mpCxt->mrDoc, pPosSet);
-        sc::EndListeningContext aEndCxt(mpCxt->mrDoc, pPosSet, pOldCode.get());
+        sc::EndListeningContext aEndCxt(mpCxt->mrDoc, pPosSet, &aOldCode);
 
         aEndCxt.setPositionDelta(
             ScAddress(-mpCxt->mnColDelta, -mpCxt->mnRowDelta, -mpCxt->mnTabDelta));
@@ -2228,7 +2223,7 @@ class UpdateRefOnNonCopy
         // Move from clipboard is Cut&Paste, then do not copy the original
         // positions' formula cells to the Undo document.
         if (!mbClipboardSource || !bCellMoved)
-            fillUndoDoc(aOldPos, rGroup.mnLength, *pOldCode);
+            fillUndoDoc(aOldPos, rGroup.mnLength, aOldCode);
     }
 
     void fillUndoDoc( const ScAddress& rOldPos, SCROW nLength, const ScTokenArray& rOldCode )

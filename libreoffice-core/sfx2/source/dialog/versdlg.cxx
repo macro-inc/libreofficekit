@@ -126,7 +126,7 @@ namespace
 
         for (int i = 0; i < rVersionBox.n_children(); ++i)
         {
-            aAuthors.insert(reinterpret_cast<SfxVersionInfo*>(rVersionBox.get_id(i).toInt64())->aAuthor);
+            aAuthors.insert(weld::fromId<SfxVersionInfo*>(rVersionBox.get_id(i))->aAuthor);
         }
 
         int nMaxAuthorWidth = nRest/4;
@@ -218,7 +218,7 @@ void SfxVersionDialog::Init_Impl()
     {
         SfxVersionInfo *pInfo = m_pTable->at( n );
         OUString aEntry = formatDateTime(pInfo->aCreationDate, Application::GetSettings().GetLocaleDataWrapper(), false);
-        m_xVersionBox->append(OUString::number(reinterpret_cast<sal_Int64>(pInfo)), aEntry);
+        m_xVersionBox->append(weld::toId(pInfo), aEntry);
         auto nLastRow = m_xVersionBox->n_children() - 1;
         m_xVersionBox->set_text(nLastRow, pInfo->aAuthor, 1);
         m_xVersionBox->set_text(nLastRow, ConvertWhiteSpaces_Impl(pInfo->aComment), 2);
@@ -268,7 +268,7 @@ void SfxVersionDialog::Open_Impl()
     if ( GetEncryptionData_Impl( pObjShell->GetMedium()->GetItemSet(), aEncryptionData ) )
     {
         // there is a password, it should be used during the opening
-        SfxUnoAnyItem aEncryptionDataItem( SID_ENCRYPTIONDATA, uno::makeAny( aEncryptionData ) );
+        SfxUnoAnyItem aEncryptionDataItem( SID_ENCRYPTIONDATA, uno::Any( aEncryptionData ) );
         m_pViewFrame->GetDispatcher()->ExecuteList(
             SID_OPENDOC, SfxCallMode::ASYNCHRON,
             { &aFile, &aItem, &aTarget, &aReferer, &aEncryptionDataItem });
@@ -331,7 +331,7 @@ IMPL_LINK(SfxVersionDialog, ButtonHdl_Impl, weld::Button&, rButton, void)
     }
     else if (&rButton == m_xDeleteButton.get() && nEntry != -1)
     {
-        SfxVersionInfo* pInfo = reinterpret_cast<SfxVersionInfo*>(m_xVersionBox->get_id(nEntry).toInt64());
+        SfxVersionInfo* pInfo = weld::fromId<SfxVersionInfo*>(m_xVersionBox->get_id(nEntry));
         pObjShell->GetMedium()->RemoveVersion_Impl(pInfo->aName);
         pObjShell->SetModified();
         m_xVersionBox->freeze();
@@ -345,7 +345,7 @@ IMPL_LINK(SfxVersionDialog, ButtonHdl_Impl, weld::Button&, rButton, void)
     }
     else if (&rButton == m_xViewButton.get() && nEntry != -1)
     {
-        SfxVersionInfo* pInfo = reinterpret_cast<SfxVersionInfo*>(m_xVersionBox->get_id(nEntry).toInt64());
+        SfxVersionInfo* pInfo = weld::fromId<SfxVersionInfo*>(m_xVersionBox->get_id(nEntry));
         SfxViewVersionDialog_Impl aDlg(m_xDialog.get(), *pInfo, false);
         aDlg.run();
     }
@@ -428,10 +428,6 @@ IMPL_LINK(SfxViewVersionDialog_Impl, ButtonHdl, weld::Button&, rButton, void)
 SfxCmisVersionsDialog::SfxCmisVersionsDialog(weld::Window* pParent, SfxViewFrame* pVwFrame)
     : SfxDialogController(pParent, "sfx/ui/versionscmis.ui", "VersionsCmisDialog")
     , m_pViewFrame(pVwFrame)
-    , m_xOpenButton(m_xBuilder->weld_button("open"))
-    , m_xViewButton(m_xBuilder->weld_button("show"))
-    , m_xDeleteButton(m_xBuilder->weld_button("delete"))
-    , m_xCompareButton(m_xBuilder->weld_button("compare"))
     , m_xVersionBox(m_xBuilder->weld_tree_view("versions"))
 {
     m_xVersionBox->set_size_request(m_xVersionBox->get_approximate_digit_width() * 90,
@@ -460,7 +456,7 @@ void SfxCmisVersionsDialog::LoadVersions()
     {
         SfxVersionInfo *pInfo = m_pTable->at( n );
         OUString aEntry = formatDateTime(pInfo->aCreationDate, Application::GetSettings().GetLocaleDataWrapper(), false);
-        m_xVersionBox->append(OUString::number(reinterpret_cast<sal_Int64>(pInfo)), aEntry);
+        m_xVersionBox->append(weld::toId(pInfo), aEntry);
         auto nLastRow = m_xVersionBox->n_children() - 1;
         m_xVersionBox->set_text(nLastRow, pInfo->aAuthor, 1);
         m_xVersionBox->set_text(nLastRow, ConvertWhiteSpaces_Impl(pInfo->aComment), 2);

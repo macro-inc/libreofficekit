@@ -68,7 +68,7 @@
 #include <sal/log.hxx>
 #include <svx/fmsearch.hxx>
 #include <svx/svxdlg.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -125,7 +125,7 @@ class SbaXDataBrowserController::FormControllerImpl
                                          css::frame::XFrameActionListener >
 {
     friend class SbaXDataBrowserController;
-    ::comphelper::OInterfaceContainerHelper2   m_aActivateListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XFormControllerListener>   m_aActivateListeners;
     SbaXDataBrowserController*          m_pOwner;
 
 public:
@@ -712,14 +712,14 @@ bool SbaXDataBrowserController::Construct(vcl::Window* pParent)
     // we want to have a grid with a "flat" border
     Reference< XPropertySet >  xGridSet(m_xGridModel, UNO_QUERY);
     if ( xGridSet.is() )
-        xGridSet->setPropertyValue(PROPERTY_BORDER, makeAny(sal_Int16(2)));
+        xGridSet->setPropertyValue(PROPERTY_BORDER, Any(sal_Int16(2)));
 
 
     // marry them
     Reference< css::container::XNameContainer >  xNameCont(m_xRowSet, UNO_QUERY);
     {
         OUString sText(DBA_RES(STR_DATASOURCE_GRIDCONTROL_NAME));
-        xNameCont->insertByName(sText, makeAny(m_xGridModel));
+        xNameCont->insertByName(sText, Any(m_xGridModel));
     }
 
     // create the view
@@ -902,9 +902,7 @@ void SAL_CALL SbaXDataBrowserController::focusGained(const FocusEvent& /*e*/)
 {
     // notify our activate listeners (registered on the form controller aggregate)
     EventObject aEvt(*this);
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_xFormControllerImpl->m_aActivateListeners);
-    while (aIter.hasMoreElements())
-        static_cast<XFormControllerListener*>(aIter.next())->formActivated(aEvt);
+    m_xFormControllerImpl->m_aActivateListeners.notifyEach( &css::form::XFormControllerListener::formActivated, aEvt );
 }
 
 void SAL_CALL SbaXDataBrowserController::focusLost(const FocusEvent& e)
@@ -928,9 +926,7 @@ void SAL_CALL SbaXDataBrowserController::focusLost(const FocusEvent& e)
 
     // notify the listeners that the "form" we represent has been deactivated
     EventObject aEvt(*this);
-    ::comphelper::OInterfaceIteratorHelper2 aIter(m_xFormControllerImpl->m_aActivateListeners);
-    while (aIter.hasMoreElements())
-        static_cast<XFormControllerListener*>(aIter.next())->formDeactivated(aEvt);
+    m_xFormControllerImpl->m_aActivateListeners.notifyEach( &css::form::XFormControllerListener::formDeactivated, aEvt );
 
     // commit the changes of the grid control (as we're deactivated)
     Reference< XBoundComponent >  xCommitable(getBrowserView()->getGridControl(), UNO_QUERY);
@@ -1274,7 +1270,7 @@ sal_Bool SbaXDataBrowserController::approveParameter(const css::form::DatabasePa
         ParametersRequest aRequest;
         aRequest.Parameters = xParameters;
         aRequest.Connection = getConnection(Reference< XRowSet >(aEvent.Source, UNO_QUERY));
-        rtl::Reference<OInteractionRequest> pParamRequest = new OInteractionRequest(makeAny(aRequest));
+        rtl::Reference<OInteractionRequest> pParamRequest = new OInteractionRequest(Any(aRequest));
         // some knittings
         pParamRequest->addContinuation(pParamValues);
         pParamRequest->addContinuation(pAbort);
@@ -1585,7 +1581,7 @@ void SbaXDataBrowserController::applyParserOrder(const OUString& _rOldOrder,cons
     bool bSuccess = false;
     try
     {
-        xFormSet->setPropertyValue(PROPERTY_ORDER, makeAny(_xParser->getOrder()));
+        xFormSet->setPropertyValue(PROPERTY_ORDER, Any(_xParser->getOrder()));
         bSuccess = reloadForm(m_xLoadable);
     }
     catch(Exception&)
@@ -1594,7 +1590,7 @@ void SbaXDataBrowserController::applyParserOrder(const OUString& _rOldOrder,cons
 
     if (!bSuccess)
     {
-        xFormSet->setPropertyValue(PROPERTY_ORDER, makeAny(_rOldOrder));
+        xFormSet->setPropertyValue(PROPERTY_ORDER, Any(_rOldOrder));
 
         try
         {
@@ -1627,8 +1623,8 @@ void SbaXDataBrowserController::applyParserFilter(const OUString& _rOldFilter, b
     try
     {
         FormErrorHelper aError(this);
-        xFormSet->setPropertyValue(PROPERTY_FILTER, makeAny(_xParser->getFilter()));
-        xFormSet->setPropertyValue(PROPERTY_HAVING_CLAUSE, makeAny(_xParser->getHavingClause()));
+        xFormSet->setPropertyValue(PROPERTY_FILTER, Any(_xParser->getFilter()));
+        xFormSet->setPropertyValue(PROPERTY_HAVING_CLAUSE, Any(_xParser->getHavingClause()));
         xFormSet->setPropertyValue(PROPERTY_APPLYFILTER, css::uno::Any(true));
 
         bSuccess = reloadForm(m_xLoadable);
@@ -1639,8 +1635,8 @@ void SbaXDataBrowserController::applyParserFilter(const OUString& _rOldFilter, b
 
     if (!bSuccess)
     {
-        xFormSet->setPropertyValue(PROPERTY_FILTER, makeAny(_rOldFilter));
-        xFormSet->setPropertyValue(PROPERTY_HAVING_CLAUSE, makeAny(_sOldHaving));
+        xFormSet->setPropertyValue(PROPERTY_FILTER, Any(_rOldFilter));
+        xFormSet->setPropertyValue(PROPERTY_HAVING_CLAUSE, Any(_sOldHaving));
         xFormSet->setPropertyValue(PROPERTY_APPLYFILTER, css::uno::Any(_bOldFilterApplied));
 
         try
@@ -1793,7 +1789,7 @@ void SbaXDataBrowserController::ExecuteSearch()
     OSL_ENSURE(xModelSet.is(), "SbaXDataBrowserController::ExecuteSearch : no model set ?!");
     xModelSet->setPropertyValue("DisplayIsSynchron", css::uno::Any(false));
     xModelSet->setPropertyValue("AlwaysShowCursor", css::uno::Any(true));
-    xModelSet->setPropertyValue("CursorColor", makeAny(COL_LIGHTRED));
+    xModelSet->setPropertyValue("CursorColor", Any(COL_LIGHTRED));
 
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
     VclPtr<AbstractFmSearchDialog> pDialog;
@@ -2083,9 +2079,9 @@ void SbaXDataBrowserController::Execute(sal_uInt16 nId, const Sequence< Property
             Reference< XPropertySet >  xSet(getRowSet(), UNO_QUERY);
             if ( xSet.is() )
             {
-                xSet->setPropertyValue(PROPERTY_FILTER,makeAny(OUString()));
-                xSet->setPropertyValue(PROPERTY_HAVING_CLAUSE,makeAny(OUString()));
-                xSet->setPropertyValue(PROPERTY_ORDER,makeAny(OUString()));
+                xSet->setPropertyValue(PROPERTY_FILTER,Any(OUString()));
+                xSet->setPropertyValue(PROPERTY_HAVING_CLAUSE,Any(OUString()));
+                xSet->setPropertyValue(PROPERTY_ORDER,Any(OUString()));
             }
             try
             {

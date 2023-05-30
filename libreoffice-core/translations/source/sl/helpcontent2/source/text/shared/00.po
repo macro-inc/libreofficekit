@@ -1,16 +1,16 @@
 #. extracted from helpcontent2/source/text/shared/00
 msgid ""
 msgstr ""
-"Project-Id-Version: LibreOffice 7.4\n"
+"Project-Id-Version: LibreOffice 7.5\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-13 09:51+0200\n"
-"PO-Revision-Date: 2022-06-13 11:52+0200\n"
+"POT-Creation-Date: 2022-12-07 21:45+0100\n"
+"PO-Revision-Date: 2022-12-04 12:31+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: sl.libreoffice.org\n"
-"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 "X-Generator: Virtaal 0.7.1\n"
 "X-Accelerator-Marker: ~\n"
@@ -32,6 +32,22 @@ msgctxt ""
 "help.text"
 msgid "Frequently-Used Buttons"
 msgstr "Pogosto uporabljeni gumbi"
+
+#: 00000001.xhp
+msgctxt ""
+"00000001.xhp\n"
+"hd_id211668777619062\n"
+"help.text"
+msgid "Help"
+msgstr "Pomoč"
+
+#: 00000001.xhp
+msgctxt ""
+"00000001.xhp\n"
+"par_id761668777629023\n"
+"help.text"
+msgid "Click the <menuitem>Help</menuitem> button to open the help page associated with the currently open dialog."
+msgstr "Kliknite gumb <menuitem>Pomoč</menuitem>, da odprete stran pomoči, povezano s trenutno odprtim pogovornim oknom."
 
 #: 00000001.xhp
 msgctxt ""
@@ -118,8 +134,8 @@ msgctxt ""
 "00000001.xhp\n"
 "par_id3150264\n"
 "help.text"
-msgid "If the field next to the spin button defines numerical values, you can also define a <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"measurement unit\">measurement unit</link>, for example, <emph>1 cm or 5 mm, 12 pt or 2\"</emph>."
-msgstr "Če polje ob pomikalniku vsebuje številske vrednosti, lahko določite tudi <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"Merska enota\">mersko enoto</link>, npr. <emph>1 cm ali 5 mm, 12 tč ali 2\"</emph>."
+msgid "If the field next to the spin button defines numerical values, you can also define a <link href=\"text/shared/00/00000003.xhp#measurement_units\">measurement unit</link>, for example, <emph>1 cm or 5 mm, 12 pt or 2\"</emph>."
+msgstr "Če polje ob pomikalniku vsebuje številske vrednosti, lahko določite tudi <link href=\"text/shared/00/00000003.xhp#measurement_units\">mersko enoto</link>, npr. <emph>1 cm ali 5 mm, 12 tč ali 2\"</emph>."
 
 #: 00000001.xhp
 msgctxt ""
@@ -198,8 +214,8 @@ msgctxt ""
 "00000001.xhp\n"
 "par_id3145345\n"
 "help.text"
-msgid "You can enter values in the input fields in different <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"units of measurement\">units of measurement</link>. The default unit is inches. However, if you want a space of exactly 1 cm, then type \"1cm\". Additional units are available according to the context, for example, 12 pt for a 12 point spacing. If the value of the new unit is unrealistic, the program uses a predefined maximum or minimum value."
-msgstr "V vhodna polja lahko vnesete vrednote v različnih <link href=\"text/shared/00/00000003.xhp#measurement_units\" name=\"Merske enote\">merskih enotah</link>. Privzeta enota ameriške različice so palci, slovenske različice pa (centi)metri. A če želite presledek, širok natanko 1 cm, vtipkajte »1cm«. Dodatne enote so na razpolago glede na kontekst, npr. 12 pt za 12 točkovni razmik. Če je vrednost nove enote nerealna, program uporabi vnaprej določeno največjo ali najmanjšo vrednost."
+msgid "You can enter values in the input fields in different <link href=\"text/shared/00/00000003.xhp#measurement_units\">units of measurement</link>. The default unit is inches. However, if you want a space of exactly 1 cm, then type \"1cm\". Additional units are available according to the context, for example, 12 pt for a 12 point spacing. If the value of the new unit is unrealistic, the program uses a predefined maximum or minimum value."
+msgstr "V vhodna polja lahko vnesete vrednote v različnih <link href=\"text/shared/00/00000003.xhp#measurement_units\">merskih enotah</link>. Privzeta enota ameriške različice so palci, slovenske različice pa (centi)metri. A če želite presledek, širok natanko 1 cm, vtipkajte »1cm«. Dodatne enote so na razpolago glede na kontekst, npr. 12 pt za 12 točkovni razmik. Če je vrednost nove enote nerealna, program uporabi vnaprej določeno največjo ali najmanjšo vrednost."
 
 #: 00000001.xhp
 msgctxt ""
@@ -590,8 +606,8 @@ msgctxt ""
 "00000001.xhp\n"
 "par_id3147418\n"
 "help.text"
-msgid "The search supports wildcards or <link href=\"text/shared/01/02100001.xhp\" name=\"regular expressions\">regular expressions</link>. With regular expressions enabled, you can enter \"all.*\", for example to find the first location of \"all\" followed by any characters. If you want to search for a text that is also a regular expression, you must either precede every character with a \"\\\" character, or enclose the text into \\Q...\\E. You can switch the automatic evaluation of wildcards or regular expression on and off in <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME Calc - Calculate</menuitem></link>."
-msgstr "Iskanje podpira <link href=\"text/shared/01/02100001.xhp\" name=\"Regularni izrazi\">regularne izraze</link>. Če so ti omogočeni, lahko vnesete npr. »vse.*«, da najdete prvo mesto, kjer se nahaja »vse«, in kateremu sledi karkoli. Če želite iskati besedilo, ki je tudi regularen izraz, morate pred vsak znak vnesi znak »\\« ali pa besedilo zaobjeti v \\Q...\\E. Samodejno vrednotenje nadomestnih znakov ali regularnega izraza lahko vklopite in izklopite v <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – %PRODUCTNAME Calc – Izračuni</menuitem></link>."
+msgid "The search supports wildcards or <link href=\"text/shared/01/02100001.xhp\">regular expressions</link>. With regular expressions enabled, you can enter \"all.*\", for example to find the first location of \"all\" followed by any characters. If you want to search for a text that is also a regular expression, you must either precede every regular expression metacharacter or operator with a \"\\\" character, or enclose the text into \\Q...\\E. You can switch the automatic evaluation of wildcards or regular expression on and off in <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME Calc - Calculate</menuitem></link>."
+msgstr "Iskanje podpira <link href=\"text/shared/01/02100001.xhp\" name=\"Regularni izrazi\">regularne izraze</link>. Če so ti omogočeni, lahko vnesete npr. »vse.*«, da najdete prvo mesto, kjer se nahaja »vse«, in kateremu sledi karkoli. Če želite iskati besedilo, ki je tudi regularen izraz, morate pred vsak meta-znak regularnega izraza ali operator vnesi znak »\\« ali pa besedilo zaobjeti v \\Q...\\E. Samodejno vrednotenje nadomestnih znakov ali regularnega izraza lahko vklopite in izklopite v <link href=\"text/shared/optionen/01060500.xhp\"><switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – %PRODUCTNAME Calc – Izračuni</menuitem></link>."
 
 #: 00000001.xhp
 msgctxt ""
@@ -614,8 +630,8 @@ msgctxt ""
 "00000001.xhp\n"
 "par_id3154145\n"
 "help.text"
-msgid "<variable id=\"kontext\">(This command is only accessible through the <link href=\"text/shared/00/00000005.xhp#contextmenu\" name=\"context menu\">context menu</link>).</variable>"
-msgstr "<variable id=\"kontext\">(Ta ukaz je dostopen le prek <link href=\"text/shared/00/00000005.xhp#contextmenu\" name=\"Kontekstni meni\">kontekstnega menija</link>).</variable>"
+msgid "<variable id=\"kontext\">(This command is only accessible through the <link href=\"text/shared/00/00000005.xhp#contextmenu\">context menu</link>).</variable>"
+msgstr "<variable id=\"kontext\">(Ta ukaz je dostopen le prek <link href=\"text/shared/00/00000005.xhp#contextmenu\">kontekstnega menija</link>).</variable>"
 
 #: 00000001.xhp
 msgctxt ""
@@ -718,8 +734,8 @@ msgctxt ""
 "00000002.xhp\n"
 "hd_id3150702\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp\" name=\"Glossary of Internet Terms\">Glossary of Internet Terms</link>"
-msgstr "<link href=\"text/shared/00/00000002.xhp\" name=\"Slovarček spletnih izrazov\">Slovarček spletnih izrazov</link>"
+msgid "<link href=\"text/shared/00/00000002.xhp\">Glossary of Internet Terms</link>"
+msgstr "<link href=\"text/shared/00/00000002.xhp\">Slovarček spletnih izrazov</link>"
 
 #: 00000002.xhp
 msgctxt ""
@@ -766,8 +782,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id981525003378764\n"
 "help.text"
-msgid "EPUB is a technical standard published now by the <link href=\"https://www.w3.org/publishing/\" name=\"IDPF\">Publishing group of W3C</link>. EPUB is a popular format because it is open and is based on HTML."
-msgstr "EPUB je tehnični standard, ki ga je objavila <link href=\"https://www.w3.org/publishing/\" name=\"IDPF\">skupina Publishing group v okviru W3C</link>. EPUB je priljubljen zapis, saj je odprt in temelji na HTML."
+msgid "EPUB is a technical standard published now by the <link href=\"https://www.w3.org/publishing/\">Publishing group of W3C</link>. EPUB is a popular format because it is open and is based on HTML."
+msgstr "EPUB je tehnični standard, ki ga je objavila <link href=\"https://www.w3.org/publishing/\">skupina Publishing group v okviru W3C</link>. EPUB je priljubljen zapis, saj je odprt in temelji na HTML."
 
 #: 00000002.xhp
 msgctxt ""
@@ -806,8 +822,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3157909\n"
 "help.text"
-msgid "Frames are useful for designing the layout of <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> pages. $[officename] uses floating frames into which you can place objects such as graphics, movie files and sound. The context menu of a frame shows the options for restoring or editing frame contents. Some of these commands are also listed in <emph>Edit - Object</emph> when the frame is selected."
-msgstr "Okviri so uporabni za oblikovanje postavitve strani <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link>. $[officename] uporablja plavajoče okvire, v katere lahko vstavite predmete, kot so slike, filmske datoteke in zvok. Kontekstni meni okvira prikaže možnosti za obnovitev ali urejanje vsebine okvira. Nekateri od teh ukazov so našteti tudi v <emph>Uredi – Predmet</emph>, ko je okvir izbran."
+msgid "Frames are useful for designing the layout of <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> pages. $[officename] uses floating frames into which you can place objects such as graphics, movie files and sound. The context menu of a frame shows the options for restoring or editing frame contents. Some of these commands are also listed in <emph>Edit - Object</emph> when the frame is selected."
+msgstr "Okviri so uporabni za oblikovanje postavitve strani <link href=\"text/shared/00/00000002.xhp#html\">HTML</link>. $[officename] uporablja plavajoče okvire, v katere lahko vstavite predmete, kot so slike, filmske datoteke in zvok. Kontekstni meni okvira prikaže možnosti za obnovitev ali urejanje vsebine okvira. Nekateri od teh ukazov so našteti tudi v <emph>Uredi – Predmet</emph>, ko je okvir izbran."
 
 #: 00000002.xhp
 msgctxt ""
@@ -822,8 +838,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3147335\n"
 "help.text"
-msgid "FTP stands for File Transfer Protocol and is the standard transfer protocol for files in the Internet. An FTP server is a program on a computer connected to the Internet which stores files to be transmitted with the aid of FTP. While FTP is responsible for transmitting and downloading Internet files, <link href=\"text/shared/00/00000002.xhp#http\" name=\"HTTP\">HTTP</link> (Hypertext Transfer Protocol) provides the connection setup and data transfer between WWW servers and clients."
-msgstr "FTP pomeni protokol za prenos datotek in je standardni protokol za prenos datotek v spletu. FTP-strežnik je program na računalniku, povezanim z internetom, ki shranjuje datoteke, ki se prenašajo s pomočjo FTP-ja. FTP je odgovoren za prenos in namestitev spletnih datotek, <link href=\"text/shared/00/00000002.xhp#http\" name=\"HTTP\">HTTP</link> (Hypertext Transfer Protocol) pa zagotavlja povezavo in prenos podatkov med spletnimi strežniki in odjemalci."
+msgid "FTP stands for File Transfer Protocol and is the standard transfer protocol for files in the Internet. An FTP server is a program on a computer connected to the Internet which stores files to be transmitted with the aid of FTP. While FTP is responsible for transmitting and downloading Internet files, <link href=\"text/shared/00/00000002.xhp#http\">HTTP</link> (Hypertext Transfer Protocol) provides the connection setup and data transfer between WWW servers and clients."
+msgstr "FTP pomeni protokol za prenos datotek in je standardni protokol za prenos datotek v spletu. FTP-strežnik je program na računalniku, povezanim z internetom, ki shranjuje datoteke, ki se prenašajo s pomočjo FTP-ja. FTP je odgovoren za prenos in namestitev spletnih datotek, <link href=\"text/shared/00/00000002.xhp#http\">HTTP</link> (Hypertext Transfer Protocol) pa zagotavlja povezavo in prenos podatkov med spletnimi strežniki in odjemalci."
 
 #: 00000002.xhp
 msgctxt ""
@@ -846,8 +862,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3161459\n"
 "help.text"
-msgid "HTML (Hypertext Markup Language) is a document code language, which is used as the file format for WWW documents. It is derived from <link href=\"text/shared/00/00000002.xhp#sgml\" name=\"SGML\">SGML</link> and integrates text, graphics, videos and sound."
-msgstr "HTML (Hypertext Markup Language) je kodni jezik dokumenta, ki se uporablja kot vrsta datotek za dokumente WWW. Izhaja iz jezika <link href=\"text/shared/00/00000002.xhp#sgml\" name=\"SGML\">SGML</link> in vključuje besedilo, slike, video in zvok."
+msgid "HTML (Hypertext Markup Language) is a document code language, which is used as the file format for WWW documents. It is derived from <link href=\"text/shared/00/00000002.xhp#sgml\">SGML</link> and integrates text, graphics, videos and sound."
+msgstr "HTML (Hypertext Markup Language) je kodni jezik dokumenta, ki se uporablja kot vrsta datotek za dokumente WWW. Izhaja iz jezika <link href=\"text/shared/00/00000002.xhp#sgml\">SGML</link> in vključuje besedilo, slike, video in zvok."
 
 #: 00000002.xhp
 msgctxt ""
@@ -934,16 +950,16 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3154685\n"
 "help.text"
-msgid "An ImageMap is a reference-sensitive graphic or frame. You can click on defined areas of the graphic or frame to go to a target (<link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link>), which is linked with the area. The reference areas, along with the linked URLs and corresponding text displayed when resting the mouse pointer on these areas, are defined in the <link href=\"text/shared/01/02220000.xhp\" name=\"ImageMap Editor\">ImageMap Editor</link>."
-msgstr "Slika s povezavami (ImageMap) je sklicno občutljiva slika ali okvir. S klikom na določena področja slike ali okvira lahko pridete do ciljnega naslova (<link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link>), ki je povezan s področjem. Sklicna področja so skupaj s povezanimi URL-ji in temu primernemu besedilu, prikazanem ob mirovanju miškinega kazalca na teh področjih, določena v <link href=\"text/shared/01/02220000.xhp\" name=\"Urejevalnik slik s povezavami\">Urejevalniku slik s povezavami</link>."
+msgid "An ImageMap is a reference-sensitive graphic or frame. You can click on defined areas of the graphic or frame to go to a target (<link href=\"text/shared/00/00000002.xhp#url\">URL</link>), which is linked with the area. The reference areas, along with the linked URLs and corresponding text displayed when resting the mouse pointer on these areas, are defined in the <link href=\"text/shared/01/02220000.xhp\">ImageMap Editor</link>."
+msgstr "Slika s povezavami (ImageMap) je sklicno občutljiva slika ali okvir. S klikom na določena področja slike ali okvira lahko pridete do ciljnega naslova (<link href=\"text/shared/00/00000002.xhp#url\">URL</link>), ki je povezan s področjem. Sklicna področja so skupaj s povezanimi URL-ji in temu primernemu besedilu, prikazanem ob mirovanju miškinega kazalca na teh področjih, določena v <link href=\"text/shared/01/02220000.xhp\">Urejevalniku slik s povezavami</link>."
 
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3153178\n"
 "help.text"
-msgid "There are two different types of ImageMaps. A Client Side ImageMap is evaluated on the client computer, which loaded the graphic from the Internet, while a Server Side ImageMap is evaluated on the server computer which provides the <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> page on the Internet. In server evaluation, clicking an ImageMap sends the relative coordinates of the cursor within the image to the server, and a dedicated program on the server responds. In the client evaluation, clicking a defined hotspot of the ImageMap activates the URL, as if it were a normal text link. The URL appears below the mouse pointer when passing across the ImageMap."
-msgstr "Obstajata dve različni vrsti slik s povezavami. Slika s povezavami na strani odjemalca je ovrednotena na računalniku odjemalca, ki je prenesel sliko s spleta, medtem ko je slika s povezavami na strani strežnika ovrednotena na računalniku strežnika, ki ponuja stran <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> na spletu. Pri vrednotenju na strežniku pošljemo s klikom slike s povezavami strežniku relativne koordinate kazalca znotraj slike in odzove se namenski program na strežniku. S klikom določene točke povezave slike s povezavami se pri vrednotenju na strani odjemalca aktivira URL, kot da gre za običajno besedilno povezavo. Pri prečkanju slike s povezavami se URL pojavlja pod miškinim kazalcem."
+msgid "There are two different types of ImageMaps. A Client Side ImageMap is evaluated on the client computer, which loaded the graphic from the Internet, while a Server Side ImageMap is evaluated on the server computer which provides the <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> page on the Internet. In server evaluation, clicking an ImageMap sends the relative coordinates of the cursor within the image to the server, and a dedicated program on the server responds. In the client evaluation, clicking a defined hotspot of the ImageMap activates the URL, as if it were a normal text link. The URL appears below the mouse pointer when passing across the ImageMap."
+msgstr "Obstajata dve različni vrsti slik s povezavami. Slika s povezavami na strani odjemalca je ovrednotena na računalniku odjemalca, ki je prenesel sliko s spleta, medtem ko je slika s povezavami na strani strežnika ovrednotena na računalniku strežnika, ki ponuja stran <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> na spletu. Pri vrednotenju na strežniku pošljemo s klikom slike s povezavami strežniku relativne koordinate kazalca znotraj slike in odzove se namenski program na strežniku. S klikom določene točke povezave slike s povezavami se pri vrednotenju na strani odjemalca aktivira URL, kot da gre za običajno besedilno povezavo. Pri prečkanju slike s povezavami se URL pojavlja pod miškinim kazalcem."
 
 #: 00000002.xhp
 msgctxt ""
@@ -1038,16 +1054,16 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3151290\n"
 "help.text"
-msgid "The area of the picture or frame where the reader can click is indicated by the appearance of the linked <link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link> when the mouse passes over the area. The ImageMap is stored in a layer below the picture and contains information about the referenced regions. The only disadvantage of Client Side ImageMaps is that older Web browsers cannot read them; a disadvantage that will, however, resolve itself in time."
-msgstr "Območje slike ali okvira, kamor lahko bralec klikne, je označeno s pojavitvijo povezave <link href=\"text/shared/00/00000002.xhp#url\" name=\"URL\">URL</link>, ko miškin kazalec prečka to področje. Zemljevid povezav je shranjen v plasti pod sliko in vsebuje podatke o območjih sklicevanja. Edina pomanjkljivost slike s povezavami na strani odjemalca je, da jih starejši spletni brskalniki ne znajo prebrati; pomanjkljivost, ki bo sčasoma izginila."
+msgid "The area of the picture or frame where the reader can click is indicated by the appearance of the linked <link href=\"text/shared/00/00000002.xhp#url\">URL</link> when the mouse passes over the area. The ImageMap is stored in a layer below the picture and contains information about the referenced regions. The only disadvantage of Client Side ImageMaps is that older Web browsers cannot read them; a disadvantage that will, however, resolve itself in time."
+msgstr "Območje slike ali okvira, kamor lahko bralec klikne, je označeno s pojavitvijo povezave <link href=\"text/shared/00/00000002.xhp#url\">URL</link>, ko miškin kazalec prečka to področje. Zemljevid povezav je shranjen v plasti pod sliko in vsebuje podatke o območjih sklicevanja. Edina pomanjkljivost slike s povezavami na strani odjemalca je, da jih starejši spletni brskalniki ne znajo prebrati; pomanjkljivost, ki bo sčasoma izginila."
 
 #: 00000002.xhp
 msgctxt ""
 "00000002.xhp\n"
 "par_id3149664\n"
 "help.text"
-msgid "When saving the ImageMap, select the file type <emph>SIP - StarView ImageMap</emph>. This saves the ImageMap directly in a format which can be applied to every active picture or frame in your document. However, if you just want to use the ImageMap on the current picture or frame, you do not have to save it in any special format. After defining the regions, simply click <emph>Apply</emph>. Nothing more is necessary. Client Side ImageMaps saved in <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> format are inserted directly into the page in HTML code."
-msgstr "Pri shranjevanju slike s povezavami izberite vrsto datoteke <emph>SIP – StarView ImageMap</emph>. Tako shranite sliko s povezavami neposredno v obliki, ki jo lahko uporabite v vsaki aktivni sliki ali okviru vašega dokumenta. Če pa želite sliko s povezavami uporabiti le v trenutni sliki ali okviru, je ni potrebno shranjevati v posebni obliki. Po določitvi območij preprosto kliknite <emph>Uporabi</emph>. Nobene dodatne nastavitve niso potrebne. Slike s povezavami pri odjemalcu, shranjene v obliki zapisa <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link>, se vstavijo neposredno v stran v kodi HTML."
+msgid "When saving the ImageMap, select the file type <emph>SIP - StarView ImageMap</emph>. This saves the ImageMap directly in a format which can be applied to every active picture or frame in your document. However, if you just want to use the ImageMap on the current picture or frame, you do not have to save it in any special format. After defining the regions, simply click <emph>Apply</emph>. Nothing more is necessary. Client Side ImageMaps saved in <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> format are inserted directly into the page in HTML code."
+msgstr "Pri shranjevanju slike s povezavami izberite vrsto datoteke <emph>SIP – StarView ImageMap</emph>. Tako shranite sliko s povezavami neposredno v obliki, ki jo lahko uporabite v vsaki aktivni sliki ali okviru vašega dokumenta. Če pa želite sliko s povezavami uporabiti le v trenutni sliki ali okviru, je ni potrebno shranjevati v posebni obliki. Po določitvi območij preprosto kliknite <emph>Uporabi</emph>. Nobene dodatne nastavitve niso potrebne. Slike s povezavami pri odjemalcu, shranjene v obliki zapisa <link href=\"text/shared/00/00000002.xhp#html\">HTML</link>, se vstavijo neposredno v stran v kodi HTML."
 
 #: 00000002.xhp
 msgctxt ""
@@ -1118,8 +1134,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3148747\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> is a specialized application of SGML. This means that most Web browsers support only a limited range of SGML standards and that almost all SGML-enabled systems can produce attractive HTML pages."
-msgstr "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> je posebna zvrst SGML. To pomeni, da večina spletnih brskalnikov podpira le omejen obseg standardov SGML in da skoraj vsi sistemi s podporo SGML lahko proizvedejo privlačne strani HTML."
+msgid "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> is a specialized application of SGML. This means that most Web browsers support only a limited range of SGML standards and that almost all SGML-enabled systems can produce attractive HTML pages."
+msgstr "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> je posebna zvrst SGML. To pomeni, da večina spletnih brskalnikov podpira le omejen obseg standardov SGML in da skoraj vsi sistemi s podporo SGML lahko proizvedejo privlačne strani HTML."
 
 #: 00000002.xhp
 msgctxt ""
@@ -1166,8 +1182,8 @@ msgctxt ""
 "00000002.xhp\n"
 "par_id3156360\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> pages contain certain structural and formatting instructions called tags. Tags are code words enclosed by brackets in the document description language HTML. Many tags contain text or hyperlink references between the opening and closing brackets. For example, titles are marked by the tags <h1> at the beginning and </h1> at the end of the title. Some tags only appear on their own such as <br> for a line break or <img ...> to link a graphic."
-msgstr "Strani <link href=\"text/shared/00/00000002.xhp#html\" name=\"HTML\">HTML</link> vsebujejo določena strukturalna in oblikovna navodila, ki se imenujejo značke HTML. Značke HTML so kodne besede, obdane z oklepaji in zapisane v jeziku HTML. Mnoge značke vsebujejo sklice na besedilo ali hiperpovezavo med začetnimi in končnimi oklepaji. Naslovi so npr. označeni z značkama HTML <h1> na začetku in </h1> na koncu naslova. Nekatere značke se pojavijo samostojno, npr. <br> za prelom vrstice ali <img ...> za povezavo slike."
+msgid "<link href=\"text/shared/00/00000002.xhp#html\">HTML</link> pages contain certain structural and formatting instructions called tags. Tags are code words enclosed by brackets in the document description language HTML. Many tags contain text or hyperlink references between the opening and closing brackets. For example, titles are marked by the tags <h1> at the beginning and </h1> at the end of the title. Some tags only appear on their own such as <br> for a line break or <img ...> to link a graphic."
+msgstr "Strani <link href=\"text/shared/00/00000002.xhp#html\">HTML</link> vsebujejo določena strukturalna in oblikovna navodila, ki se imenujejo značke HTML. Značke HTML so kodne besede, obdane z oklepaji in zapisane v jeziku HTML. Mnoge značke vsebujejo sklice na besedilo ali hiperpovezavo med začetnimi in končnimi oklepaji. Naslovi so npr. označeni z značkama HTML <h1> na začetku in </h1> na koncu naslova. Nekatere značke se pojavijo samostojno, npr. <br> za prelom vrstice ali <img ...> za povezavo slike."
 
 #: 00000002.xhp
 msgctxt ""
@@ -1822,8 +1838,8 @@ msgctxt ""
 "00000005.xhp\n"
 "hd_id3154896\n"
 "help.text"
-msgid "<link href=\"text/shared/00/00000005.xhp\" name=\"General Glossary\">General Glossary</link>"
-msgstr "<link href=\"text/shared/00/00000005.xhp\" name=\"Splošni slovarček\">Splošni slovarček</link>"
+msgid "<link href=\"text/shared/00/00000005.xhp\">General Glossary</link>"
+msgstr "<link href=\"text/shared/00/00000005.xhp\">Splošni slovarček</link>"
 
 #: 00000005.xhp
 msgctxt ""
@@ -2238,8 +2254,8 @@ msgctxt ""
 "00000005.xhp\n"
 "par_id3150092\n"
 "help.text"
-msgid "The <menuitem>Links to External Files</menuitem> command is found in the <menuitem>Edit</menuitem> menu. The command can only be activated when at least one link is contained in the current document. When you insert a picture, for example, you can either insert the picture directly into the document or insert the picture as a link."
-msgstr "???Ukaz <menuitem>Povezave z zunanjimi datotekami</menuitem> najdete v meniju <menuitem>Uredi</menuitem>. Ukaz je aktiven samo, ko je v trenutnem dokumentu vsaj ena povezava. Ko npr. vstavite sliko, jo lahko vstavite neposredno v dokument ali zgolj kot povezavo do slike."
+msgid "The <menuitem>External Links</menuitem> command is found in the <menuitem>Edit</menuitem> menu. The command can only be activated when at least one link is contained in the current document. When you insert a picture, for example, you can either insert the picture directly into the document or insert the picture as a link."
+msgstr "Ukaz <menuitem>Zunanje povezave</menuitem> najdete v meniju <menuitem>Uredi</menuitem>. Ukaz je aktiven samo, ko je v trenutnem dokumentu vsaj ena povezava. Ko npr. vstavite sliko, jo lahko vstavite neposredno v dokument ali zgolj kot povezavo do slike."
 
 #: 00000005.xhp
 msgctxt ""
@@ -2262,15 +2278,15 @@ msgctxt ""
 "00000005.xhp\n"
 "par_id3153334\n"
 "help.text"
-msgid "Use <menuitem>Edit - Links to External Files</menuitem> to see which files are inserted as links. The links can be removed if required. This will break the link and insert the object directly."
-msgstr "Uporabite <menuitem>Uredi – Povezave z zunanjimi datotekami</menuitem> za ogled datotek, ki so vstavljene kot povezave. Povezave lahko po želji odstranite. S tem prekinete povezavo in neposredno vstavite predmet."
+msgid "Use <menuitem>Edit - External Links</menuitem> to see which files are inserted as links. The links can be removed if required. This will break the link and insert the object directly."
+msgstr "Uporabite <menuitem>Uredi – Zunanje povezave</menuitem> za ogled datotek, ki so vstavljene kot povezave. Povezave lahko po želji odstranite. S tem prekinete povezavo in neposredno vstavite predmet."
 
 #: 00000005.xhp
 msgctxt ""
 "00000005.xhp\n"
 "hd_id3154512\n"
 "help.text"
-msgid "Number System"
+msgid "Numeral System"
 msgstr "Številski sistem"
 
 #: 00000005.xhp
@@ -2278,8 +2294,8 @@ msgctxt ""
 "00000005.xhp\n"
 "par_id3157846\n"
 "help.text"
-msgid "A number system is determined by the number of characters available for representing numbers. The decimal system, for instance is based on the ten numbers (0..9), the binary system is based on the two numbers 0 and 1, the hexadecimal system is based on 16 characters (0...9 and A...F)."
-msgstr "Številski sistem je določen s številom znakov, ki so na voljo za predstavitev številk. Decimalni sistem tako temelji na desetih števkah (0..9), dvojiški sistem na dveh števkah (0 in 1), šestnajstiški pa na 16 znakih (0..9 ter A..F)."
+msgid "A numeral system is determined by the number of digits available for representing numbers. The decimal system, for instance is based on the ten digits (0..9), the binary system is based on the two digits 0 and 1, the hexadecimal system is based on 16 digits (0...9 and A...F)."
+msgstr "Številski sistem je določen s številom znakov oz. števk, ki so na voljo za predstavitev številk. Decimalni sistem tako temelji na desetih števkah (0..9), dvojiški sistem na dveh števkah (0 in 1), šestnajstiški pa na 16 znakih (števkah 0..9 ter znakih A..F)."
 
 #: 00000005.xhp
 msgctxt ""
@@ -2374,8 +2390,8 @@ msgctxt ""
 "00000005.xhp\n"
 "par_id781653403974567\n"
 "help.text"
-msgid "If an OLE object is linked to a target document, then the target document must be available in the location specified in the link. Deleting or moving the target document will make it impossible to open the linked OLE object. You can use the <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\" name=\"relative\"><menuitem>Save URLs relative to file system</menuitem></link> option in the <link href=\"text/shared/optionen/01010200.xhp\" name=\"General Load/Save Options\"><menuitem>General</menuitem></link> section of Load/Save Options to configure your system to save links <link href=\"text/shared/00/00000005.xhp#saving\" name=\"relative saving\"><menuitem>relative</menuitem></link> to your filesystem."
-msgstr "Če je predmet OLE povezan s ciljnim dokumentom, mora biti ciljni dokument na voljo na s povezavo določenem mestu. Brisanje ali premik ciljnega dokumenta onemogoči odpiranje povezanega predmeta OLE. Uporabite lahko možnost <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\" name=\"relative\"><menuitem>Shrani URL-je glede na datotečni sistem</menuitem></link> v razdelku <link href=\"text/shared/optionen/01010200.xhp\" name=\"Splošne možnosti Nalaganje/Shranjevanje\"><menuitem>Splošno</menuitem></link> med nastavitvami Nalaganje/shranjevanje, da prilagodite svoj sistem, da shranjuje povezave <link href=\"text/shared/00/00000005.xhp#saving\" name=\"Relativno shranjevanje\"><menuitem>glede na datotečni sistem</menuitem></link>."
+msgid "If an OLE object is linked to a target document, then the target document must be available in the location specified in the link. Deleting or moving the target document will make it impossible to open the linked OLE object. You can use the <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\"><menuitem>Save URLs relative to file system</menuitem></link> option in the <link href=\"text/shared/optionen/01010200.xhp\"><menuitem>General</menuitem></link> section of Load/Save Options to configure your system to save links <link href=\"text/shared/00/00000005.xhp#saving\"><menuitem>relative</menuitem></link> to your filesystem."
+msgstr "Če je predmet OLE povezan s ciljnim dokumentom, mora biti ciljni dokument na voljo na s povezavo določenem mestu. Brisanje ali premik ciljnega dokumenta onemogoči odpiranje povezanega predmeta OLE. Uporabite lahko možnost <link href=\"text/shared/optionen/01010200.xhp#relative_saving_option\"><menuitem>Shrani URL-je glede na datotečni sistem</menuitem></link> v razdelku <link href=\"text/shared/optionen/01010200.xhp\"><menuitem>Splošno</menuitem></link> med nastavitvami Nalaganje/shranjevanje, da prilagodite svoj sistem, da shranjuje povezave <link href=\"text/shared/00/00000005.xhp#saving\"><menuitem>glede na datotečni sistem</menuitem></link>."
 
 #: 00000005.xhp
 msgctxt ""
@@ -3030,8 +3046,8 @@ msgctxt ""
 "00000020.xhp\n"
 "par_id3143272\n"
 "help.text"
-msgid "In $[officename], apart from its own <link href=\"text/shared/00/00000021.xhp\" name=\"XML formats\">XML formats</link> you can also open and save many foreign XML formats."
-msgstr "V $[officename] lahko poleg lastnih <link href=\"text/shared/00/00000021.xhp\" name=\"Zapisi XML\">zapisov XML</link> odpirate in shranjujete številne tuje zapise XML."
+msgid "In $[officename], apart from its own <link href=\"text/shared/00/00000021.xhp\">XML formats</link> you can also open and save many foreign XML formats."
+msgstr "V $[officename] lahko poleg lastnih <link href=\"text/shared/00/00000021.xhp\">zapisov XML</link> odpirate in shranjujete številne tuje zapise XML."
 
 #: 00000020.xhp
 msgctxt ""
@@ -3054,8 +3070,8 @@ msgctxt ""
 "00000020.xhp\n"
 "par_id3156211\n"
 "help.text"
-msgid "In <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\" name=\"Load/Save - VBA Properties\">Load/Save - VBA Properties</link> you can specify the settings for the VBA macro codes in MS Office documents. VBA macros are unable to run in $[officename]; they must first be converted and adapted. Often you only want to use $[officename] to change the visible content of a Word, Excel or PowerPoint file and then save the file again in Microsoft Office format without changing the macros they contain. You can set the behavior of $[officename] as desired: Either the VBA macros are saved in commented form as a subroutine of $[officename] and when the document is saved in MS Office format are written back correctly again, or you can select the Microsoft Office macros to be removed when loading. The last option is an effective protection against viruses within the Microsoft Office documents."
-msgstr "V <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME – Nastavitve</caseinline><defaultinline>Orodja – Možnosti</defaultinline></switchinline> – <link href=\"text/shared/optionen/01130100.xhp\" name=\"Nalaganje/shranjevanje – Lastnosti VBA\">Nalaganje/shranjevanje – Lastnosti VBA</link> lahko določite nastavitve za kodo makrov VBA v dokumentih programa MS Office. Makri VBA ne morejo teči v $[officename]; najprej jih je potrebno pretvoriti in prilagoditi. Ponavadi ne želite z $[officename] spreminjati vidno vsebino datotek programov Word, Excel ali PowerPoint in nato znova shraniti datoteko v obliki zapisa Microsoft Office brez spreminjanja makrov, ki jih vsebujejo. V $[officename] lahko vedenje nastavite po meri: makri VBA se lahko shranijo v komentirani obliki kot procedure $[officename] in dokument se shrani nazaj v obliki zapisa MS Office ali pa lahko izberete, da bodo makri Microsoft Office pri nalaganju odstranjeni. Zadnja možnost je učinkovita zaščita pred virusi v dokumentih Microsoft Office."
+msgid "In <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME - Preferences</caseinline><defaultinline>Tools - Options</defaultinline></switchinline> - <link href=\"text/shared/optionen/01130100.xhp\">Load/Save - VBA Properties</link> you can specify the settings for the VBA macro codes in MS Office documents. VBA macros are unable to run in $[officename]; they must first be converted and adapted. Often you only want to use $[officename] to change the visible content of a Word, Excel or PowerPoint file and then save the file again in Microsoft Office format without changing the macros they contain. You can set the behavior of $[officename] as desired: Either the VBA macros are saved in commented form as a subroutine of $[officename] and when the document is saved in MS Office format are written back correctly again, or you can select the Microsoft Office macros to be removed when loading. The last option is an effective protection against viruses within the Microsoft Office documents."
+msgstr "V <switchinline select=\"sys\"><caseinline select=\"MAC\">%PRODUCTNAME – Nastavitve</caseinline><defaultinline>Orodja – Možnosti</defaultinline></switchinline> – <link href=\"text/shared/optionen/01130100.xhp\">Nalaganje/shranjevanje – Lastnosti VBA</link> lahko določite nastavitve za kodo makrov VBA v dokumentih programa MS Office. Makri VBA ne morejo teči v $[officename]; najprej jih je potrebno pretvoriti in prilagoditi. Ponavadi ne želite z $[officename] spreminjati vidno vsebino datotek programov Word, Excel ali PowerPoint in nato znova shraniti datoteko v obliki zapisa Microsoft Office brez spreminjanja makrov, ki jih vsebujejo. V $[officename] lahko vedenje nastavite po meri: makri VBA se lahko shranijo v komentirani obliki kot procedure $[officename] in dokument se shrani nazaj v obliki zapisa MS Office ali pa lahko izberete, da bodo makri Microsoft Office pri nalaganju odstranjeni. Zadnja možnost je učinkovita zaščita pred virusi v dokumentih Microsoft Office."
 
 #: 00000020.xhp
 msgctxt ""
@@ -3110,8 +3126,8 @@ msgctxt ""
 "00000020.xhp\n"
 "par_id3149095\n"
 "help.text"
-msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>It is also possible to import and export <link href=\"text/shared/00/00000005.xhp#rtf\" name=\"RTF\">RTF</link> files. This file format can be used to exchange formatted texts across various applications and platforms. In this way, many formats read by most programs will be transferred without a problem. The clipboard uses RTF format when you insert part of a spreadsheet from $[officename] Calc through <link href=\"text/shared/00/00000005.xhp\" name=\"DDE\">DDE</link> into $[officename] Writer.</defaultinline></switchinline>"
-msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Uvažati in izvažati je mogoče tudi datoteke <link href=\"text/shared/00/00000005.xhp#rtf\" name=\"RTF\">RTF</link>. To vrsto datotek lahko uporabite za prenos oblikovanega besedila med različnimi programi in platformami. Na ta način bodo dokumenti večine programov preneseni brez težav. Odložišče uporablja zapis RTF, ko vstavite del preglednice iz $[officename] Calc prek <link href=\"text/shared/00/00000005.xhp\" name=\"DDE\">DDE</link> v modul $[officename] Writer.</defaultinline></switchinline>"
+msgid "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>It is also possible to import and export <link href=\"text/shared/00/00000005.xhp#rtf\">RTF</link> files. This file format can be used to exchange formatted texts across various applications and platforms. In this way, many formats read by most programs will be transferred without a problem. The clipboard uses RTF format when you insert part of a spreadsheet from $[officename] Calc through <link href=\"text/shared/00/00000005.xhp\">DDE</link> into $[officename] Writer.</defaultinline></switchinline>"
+msgstr "<switchinline select=\"appl\"><caseinline select=\"CALC\"></caseinline><caseinline select=\"DRAW\"></caseinline><caseinline select=\"IMPRESS\"></caseinline><defaultinline>Uvažati in izvažati je mogoče tudi datoteke <link href=\"text/shared/00/00000005.xhp#rtf\">RTF</link>. To vrsto datotek lahko uporabite za prenos oblikovanega besedila med različnimi programi in platformami. Na ta način bodo dokumenti večine programov preneseni brez težav. Odložišče uporablja zapis RTF, ko vstavite del preglednice iz $[officename] Calc prek <link href=\"text/shared/00/00000005.xhp\">DDE</link> v modul $[officename] Writer.</defaultinline></switchinline>"
 
 #: 00000020.xhp
 msgctxt ""
@@ -3166,8 +3182,8 @@ msgctxt ""
 "00000020.xhp\n"
 "par_id3153146\n"
 "help.text"
-msgid "If, in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Load/Save - HTML Compatibility</emph>, you select Mozilla Firefox or $[officename] Writer as the export option, upon export all important font attributes are exported as direct attributes (for example, text color, font size, bold, italic, and so on) in CSS1 styles. (<link href=\"text/shared/00/00000002.xhp\" name=\"CSS\">CSS</link> stands for Cascading Style Sheets.) Importing is also carried out according to this standard."
-msgstr "Če v <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME – Nastavitve</emph></caseinline><defaultinline><emph>Orodja – Možnosti</emph></defaultinline></switchinline><emph> – Nalaganje/shranjevanje – Združljivost s HTML</emph> izberete Mozilla Firefox ali $[officename] Writer kot možnosti izvoza, bodo ob izvozu vsi pomembni atributi pisav izvoženi kot neposredni atributi (npr. barva besedila, velikost pisave, krepko, ležeče itn.) v slogih CSS1. (<link href=\"text/shared/00/00000002.xhp\" name=\"CSS\">CSS</link> pomeni Cascading Style Sheets.) Uvoz se prav tako izvede v skladu s tem standardom."
+msgid "If, in <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME - Preferences</emph></caseinline><defaultinline><emph>Tools - Options</emph></defaultinline></switchinline><emph> - Load/Save - HTML Compatibility</emph>, you select Mozilla Firefox or $[officename] Writer as the export option, upon export all important font attributes are exported as direct attributes (for example, text color, font size, bold, italic, and so on) in CSS1 styles. (<link href=\"text/shared/00/00000002.xhp\">CSS</link> stands for Cascading Style Sheets.) Importing is also carried out according to this standard."
+msgstr "Če v <switchinline select=\"sys\"><caseinline select=\"MAC\"><emph>%PRODUCTNAME – Nastavitve</emph></caseinline><defaultinline><emph>Orodja – Možnosti</emph></defaultinline></switchinline><emph> – Nalaganje/shranjevanje – Združljivost s HTML</emph> izberete Mozilla Firefox ali $[officename] Writer kot možnosti izvoza, bodo ob izvozu vsi pomembni atributi pisav izvoženi kot neposredni atributi (npr. barva besedila, velikost pisave, krepko, ležeče itn.) v slogih CSS1. (<link href=\"text/shared/00/00000002.xhp\">CSS</link> pomeni Cascading Style Sheets.) Uvoz se prav tako izvede v skladu s tem standardom."
 
 #: 00000020.xhp
 msgctxt ""
@@ -3462,8 +3478,8 @@ msgctxt ""
 "00000020.xhp\n"
 "par_id3159153\n"
 "help.text"
-msgid "Some $[officename] Draw and $[officename] Impress options can be accessed through <emph>File - Export</emph>. See <link href=\"text/shared/00/00000200.xhp\" name=\"Graphics Export Options\">Graphics Export Options</link> for more information."
-msgstr "Do nekaterih možnosti $[officename] Draw in $[officename] Impress lahko dostopate prek <emph>Datoteka – Izvozi</emph>. Oglejte si <link href=\"text/shared/00/00000200.xhp\" name=\"Možnosti izvoza grafike\">Možnosti izvoza grafike</link>, če vas zanimajo podrobnosti."
+msgid "Some $[officename] Draw and $[officename] Impress options can be accessed through <emph>File - Export</emph>. See <link href=\"text/shared/00/00000200.xhp\">Graphics Export Options</link> for more information."
+msgstr "Do nekaterih možnosti $[officename] Draw in $[officename] Impress lahko dostopate prek <emph>Datoteka – Izvozi</emph>. Oglejte si <link href=\"text/shared/00/00000200.xhp\">Možnosti izvoza grafike</link>, če vas zanimajo podrobnosti."
 
 #: 00000020.xhp
 msgctxt ""
@@ -3526,8 +3542,8 @@ msgctxt ""
 "00000021.xhp\n"
 "hd_id3154408\n"
 "help.text"
-msgid "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\" name=\"XML File Formats\">XML File Formats</link></variable>"
-msgstr "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\" name=\"Vrste datotek XML\">Vrste datotek XML</link></variable>"
+msgid "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\">XML File Formats</link></variable>"
+msgstr "<variable id=\"xmlformat\"><link href=\"text/shared/00/00000021.xhp\">Vrste datotek XML</link></variable>"
 
 #: 00000021.xhp
 msgctxt ""
@@ -3542,8 +3558,8 @@ msgctxt ""
 "00000021.xhp\n"
 "par_idN10725\n"
 "help.text"
-msgid "The OpenDocument file format (ODF) is a standardized file format used by many software applications. You can find more information at the Wikipedia site: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\" name=\"English Wikipedia: OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
-msgstr "Vrsta datotek OpenDocument (ODF) je standardiziran zapis datotek, ki ga uporablja veliko programov. Več informacij lahko najdete na strani Wikipedije: <link href=\"https://sl.wikipedia.org/wiki/OpenDocument\" name=\"Slovenska Wikipedija: OpenDocument\">sl.wikipedia.org/wiki/OpenDocument</link>."
+msgid "The OpenDocument file format (ODF) is a standardized file format used by many software applications. You can find more information at the Wikipedia site: <link href=\"https://en.wikipedia.org/wiki/OpenDocument\">wikipedia.org/wiki/OpenDocument</link>."
+msgstr "Vrsta datotek OpenDocument (ODF) je standardiziran zapis datotek, ki ga uporablja veliko programov. Več informacij lahko najdete na strani Wikipedije: <link href=\"https://sl.wikipedia.org/wiki/OpenDocument\">sl.wikipedia.org/wiki/OpenDocument</link>."
 
 #: 00000021.xhp
 msgctxt ""
@@ -4030,8 +4046,8 @@ msgctxt ""
 "00000021.xhp\n"
 "par_id3146907\n"
 "help.text"
-msgid "If you want to define another file format as the default, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\" name=\"Load/Save - General\"><menuitem>Load/Save - General</menuitem></link> to find alternative file formats for each $[officename] document type."
-msgstr "Če želite za privzeto določiti kakšno drugo vrsto datotek, izberite <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – </menuitem><link href=\"text/shared/optionen/01010200.xhp\" name=\"Nalaganje/Shranjevanje – Splošno\"><menuitem>Nalaganje/Shranjevanje – Splošno</menuitem></link>, kjer najdete alternativne možnosti za vsako vrsto datotek $[officename] posebej."
+msgid "If you want to define another file format as the default, choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - </menuitem><link href=\"text/shared/optionen/01010200.xhp\"><menuitem>Load/Save - General</menuitem></link> to find alternative file formats for each $[officename] document type."
+msgstr "Če želite za privzeto določiti kakšno drugo vrsto datotek, izberite <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – </menuitem><link href=\"text/shared/optionen/01010200.xhp\"><menuitem>Nalaganje/Shranjevanje – Splošno</menuitem></link>, kjer najdete alternativne možnosti za vsako vrsto datotek $[officename] posebej."
 
 #: 00000021.xhp
 msgctxt ""
@@ -4158,16 +4174,16 @@ msgctxt ""
 "00000099.xhp\n"
 "par_id3143206\n"
 "help.text"
-msgid "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\" name=\"Tools Menu - Scenarios\">Tools Menu - Scenarios</link></variable>"
-msgstr "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\" name=\"Meni Orodja – Scenariji\">Meni Orodja – Scenariji</link></variable>"
+msgid "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\">Tools Menu - Scenarios</link></variable>"
+msgstr "<variable id=\"userszenarien\"><link href=\"text/scalc/01/06050000.xhp\">Meni Orodja – Scenariji</link></variable>"
 
 #: 00000099.xhp
 msgctxt ""
 "00000099.xhp\n"
 "par_id3156069\n"
 "help.text"
-msgid "On the help page for <link href=\"text/shared/guide/main.xhp\" name=\"$[officename] general\">$[officename] general</link> you can find instructions that are applicable to all modules, such as working with windows and menus, customizing $[officename], data sources, Gallery, and drag and drop."
-msgstr "Na strani <link href=\"text/shared/guide/main.xhp\" name=\"Splošna pomoč za $[officename]\">splošne pomoči za $[officename]</link> najdete napotke za delo, ki so uporabni v vseh modulih, kot npr. za delo z okni in meniji, prilagajanje $[officename], vire podatkov, galerijo itn."
+msgid "On the help page for <link href=\"text/shared/guide/main.xhp\">$[officename] general</link> you can find instructions that are applicable to all modules, such as working with windows and menus, customizing $[officename], data sources, Gallery, and drag and drop."
+msgstr "Na strani <link href=\"text/shared/guide/main.xhp\">splošne pomoči za $[officename]</link> najdete napotke za delo, ki so uporabni v vseh modulih, kot npr. za delo z okni in meniji, prilagajanje $[officename], vire podatkov, galerijo itn."
 
 #: 00000099.xhp
 msgctxt ""
@@ -4518,8 +4534,8 @@ msgctxt ""
 "00000200.xhp\n"
 "par_id3147250\n"
 "help.text"
-msgid "See <link href=\"text/shared/00/00000020.xhp\" name=\"Import and Export Filter Information\">Import and Export Filter Information</link> for more information about filters."
-msgstr "Za več informacij o filtrih si oglejte temo <link href=\"text/shared/00/00000020.xhp\" name=\"Informacije o uvoznih in izvoznih filtrih\">Informacije o uvoznih in izvoznih filtrih</link>."
+msgid "See <link href=\"text/shared/00/00000020.xhp\">Import and Export Filter Information</link> for more information about filters."
+msgstr "Za več informacij o filtrih si oglejte temo <link href=\"text/shared/00/00000020.xhp\">Informacije o uvoznih in izvoznih filtrih</link>."
 
 #: 00000206.xhp
 msgctxt ""
@@ -4566,8 +4582,8 @@ msgctxt ""
 "00000206.xhp\n"
 "par_id3152942\n"
 "help.text"
-msgid "For further information regarding filters, refer to the topic: <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Information about Import and Export Filters</link>."
-msgstr "Za več informacij o filtrih si oglejte temo: <link href=\"text/shared/00/00000020.xhp\" name=\"Informacije o uvoznih in izvoznih filtrih\">Informacije o uvoznih in izvoznih filtrih</link>."
+msgid "For further information regarding filters, refer to the topic: <link href=\"text/shared/00/00000020.xhp\">Information about Import and Export Filters</link>."
+msgstr "Za več informacij o filtrih si oglejte temo: <link href=\"text/shared/00/00000020.xhp\">Informacije o uvoznih in izvoznih filtrih</link>."
 
 #: 00000207.xhp
 msgctxt ""
@@ -4766,8 +4782,8 @@ msgctxt ""
 "00000208.xhp\n"
 "hd_id3150960\n"
 "help.text"
-msgid "Text Import"
-msgstr "Uvoz besedila"
+msgid "<variable id=\"TextImporth1\"><link href=\"text/shared/00/00000208.xhp\">Text Import</link></variable>"
+msgstr "<variable id=\"TextImporth1\"><link href=\"text/shared/00/00000208.xhp\">Uvoz besedila</link></variable>"
 
 #: 00000208.xhp
 msgctxt ""
@@ -4830,8 +4846,8 @@ msgctxt ""
 "00000208.xhp\n"
 "par_id314949586\n"
 "help.text"
-msgid "When importing an HTML document, the Language selection can conflict with the global HTML option <link href=\"text/shared/optionen/01030500.xhp\" name=\"Use\">Use 'English (USA)' locale for numbers</link>. The global HTML option is effective only when the Automatic language option is selected. If you select a specific language in the HTML Import Options dialog, the global HTML option is ignored."
-msgstr "Pri uvažanju dokumenta HTML je izbor jezika lahko v navzkrižju s splošno nastavitvijo za HTML <link href=\"text/shared/optionen/01030500.xhp\" name=\"Use\">Za številke uporabi področno nastavitev »angleški (ZDA)«</link>. Splošna nastavitev za HTML je v veljavi le, če je izbran samodejni jezik. Če v pogovornem oknu Možnosti uvoza HTML izberete natanko določen jezik, bo splošna nastavitev za HTML prezrta."
+msgid "When importing an HTML document, the Language selection can conflict with the global HTML option <link href=\"text/shared/optionen/01030500.xhp\">Use 'English (USA)' locale for numbers</link>. The global HTML option is effective only when the Automatic language option is selected. If you select a specific language in the HTML Import Options dialog, the global HTML option is ignored."
+msgstr "Pri uvažanju dokumenta HTML je izbor jezika lahko v navzkrižju s splošno nastavitvijo za HTML <link href=\"text/shared/optionen/01030500.xhp\">Za številke uporabi področno nastavitev »angleški (ZDA)«</link>. Splošna nastavitev za HTML je v veljavi le, če je izbran samodejni jezik. Če v pogovornem oknu Možnosti uvoza HTML izberete natanko določen jezik, bo splošna nastavitev za HTML prezrta."
 
 #: 00000208.xhp
 msgctxt ""
@@ -5102,8 +5118,8 @@ msgctxt ""
 "00000208.xhp\n"
 "par_id171220172144419125\n"
 "help.text"
-msgid "<ahelp hid=\".\">When this option is enabled, Calc preserves previous content of cells when pasting empty ones. Otherwise, Calc deletes content of previous cells.</ahelp>"
-msgstr "<ahelp hid=\".\">Ko je ta možnost omogočena, program Calc pri lepljenju praznih celic ohrani prejšnjo vsebino celic. Sicer program Calc izbriše prejšnjo vsebino celic.</ahelp>"
+msgid "<ahelp hid=\".\">Available when using <menuitem>Paste Special</menuitem>: when this option is enabled, Calc preserves previous content of cells when pasting empty ones. Otherwise, Calc deletes content of previous cells.</ahelp>"
+msgstr "<ahelp hid=\".\">Na voljo, ko uporabljate <menuitem>Posebno lepljenje</menuitem>: ko je ta možnost omogočena, program Calc pri lepljenju praznih celic ohrani prejšnjo vsebino celic. Sicer program Calc izbriše prejšnjo vsebino celic.</ahelp>"
 
 #: 00000208.xhp
 msgctxt ""
@@ -5112,6 +5128,22 @@ msgctxt ""
 "help.text"
 msgid "In <emph>Text to Columns</emph> conversion, if cell content begins with a separator and this option is disabled, then first column will be emptied."
 msgstr "Pri pretvorbi <emph>Besedilo v stolpce</emph> se, če se vsebina celice začne z ločilom in ta možnost ni potrjena, prvi stolpec izprazni."
+
+#: 00000208.xhp
+msgctxt ""
+"00000208.xhp\n"
+"hd_id151656941561432\n"
+"help.text"
+msgid "Evaluate formulas"
+msgstr "Ovrednoti formule"
+
+#: 00000208.xhp
+msgctxt ""
+"00000208.xhp\n"
+"par_id601656941717698\n"
+"help.text"
+msgid "Determines whether formula expressions starting with a = equal sign character are to be evaluated as formulas or imported as textual data. If checked evaluate formulas on input. Otherwise formulas are input as text."
+msgstr "Določa, ali naj se izrazi formul, ki se začenjajo z znakom enačaja (=), ovrednotijo kot formule ali pa uvozijo kot besedilni podatki. Če je možnost potrjena, bodo formule ob vnosu ovrednotene. Sicer se formule vnesejo kot besedilo."
 
 #: 00000208.xhp
 msgctxt ""
@@ -5300,26 +5332,10 @@ msgstr "Oblika zapisa datuma"
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
-"par_id3156212\n"
-"help.text"
-msgid "6"
-msgstr "6"
-
-#: 00000208.xhp
-msgctxt ""
-"00000208.xhp\n"
 "par_id3153056\n"
 "help.text"
 msgid "Two characters each are taken for day, month, and year in the selected order."
 msgstr "Po dva znaka bosta predstavljala dan, mesec in leto v izbranem vrstnem redu."
-
-#: 00000208.xhp
-msgctxt ""
-"00000208.xhp\n"
-"par_id3147352\n"
-"help.text"
-msgid "8"
-msgstr "8"
 
 #: 00000208.xhp
 msgctxt ""
@@ -5382,16 +5398,16 @@ msgctxt ""
 "00000208.xhp\n"
 "par_id3155746\n"
 "help.text"
-msgid "<link href=\"text/shared/guide/keyboard.xhp\" name=\"Navigating Without the Mouse\">Navigating Without the Mouse</link>"
-msgstr "<link href=\"text/shared/guide/keyboard.xhp\" name=\"Krmarjenje brez miške\">Krmarjenje brez miške</link>"
+msgid "<link href=\"text/shared/guide/keyboard.xhp\">Navigating Without the Mouse</link>"
+msgstr "<link href=\"text/shared/guide/keyboard.xhp\">Krmarjenje brez miške</link>"
 
 #: 00000208.xhp
 msgctxt ""
 "00000208.xhp\n"
 "par_id3146120\n"
 "help.text"
-msgid "For more information, see <link href=\"text/shared/00/00000020.xhp\" name=\"Information about Import and Export Filters\">Information about Import and Export Filters</link>."
-msgstr "Za več podatkov o tem si oglejte <link href=\"text/shared/00/00000020.xhp\" name=\"Informacije o uvoznih in izvoznih filtrih\">Informacije o uvoznih in izvoznih filtrih</link>."
+msgid "<link href=\"text/shared/00/00000020.xhp\">Information about Import and Export Filters</link>."
+msgstr "<link href=\"text/shared/00/00000020.xhp\">Informacije o uvoznih in izvoznih filtrih</link>."
 
 #: 00000215.xhp
 msgctxt ""
@@ -6270,8 +6286,8 @@ msgctxt ""
 "00000401.xhp\n"
 "par_id971594767600402\n"
 "help.text"
-msgid "Choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - LibreOffice - Security</menuitem> and in <emph>Certificate Path</emph> area click <menuitem>Certificate</menuitem>."
-msgstr "Izberite <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – LibreOffice – Varnost</menuitem>. V področju <emph>Pot digitalnega potrdila</emph> kliknite <menuitem>Potrdilo</menuitem>."
+msgid "Choose <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME - Preferences</menuitem></caseinline><defaultinline><menuitem>Tools - Options</menuitem></defaultinline></switchinline><menuitem> - %PRODUCTNAME - Security</menuitem> and, in the <emph>Certificate Path</emph> area, click <menuitem>Certificate</menuitem>."
+msgstr "Izberite <switchinline select=\"sys\"><caseinline select=\"MAC\"><menuitem>%PRODUCTNAME – Nastavitve</menuitem></caseinline><defaultinline><menuitem>Orodja – Možnosti</menuitem></defaultinline></switchinline><menuitem> – %PRODUCTNAME – Varnost</menuitem>. V področju <emph>Pot digitalnega potrdila</emph> kliknite <menuitem>Potrdilo</menuitem>."
 
 #: 00000401.xhp
 msgctxt ""
@@ -6648,6 +6664,14 @@ msgctxt ""
 "help.text"
 msgid "Choose <menuitem>Data - Text to Columns</menuitem> (Calc)."
 msgstr "Izberite <menuitem>Podatki – Besedilo v stolpce</menuitem> (Calc)."
+
+#: 00000401.xhp
+msgctxt ""
+"00000401.xhp\n"
+"par_id161656944575459\n"
+"help.text"
+msgid "Copy data to clipboard, then choose <menuitem>Edit - Paste Special - Paste Special</menuitem> (Calc)."
+msgstr "Kopirajte podatke na odložišče ,nato izberite <menuitem>Uredi – Posebno lepljenje – Posebno lepljenje</menuitem> (Calc)."
 
 #: 00000401.xhp
 msgctxt ""
@@ -7084,10 +7108,18 @@ msgstr "Predmet OLE"
 #: 00000404.xhp
 msgctxt ""
 "00000404.xhp\n"
+"par_id761566316165430\n"
+"help.text"
+msgid "Choose <menuitem>Insert - OLE Object - QR and Barcode</menuitem>."
+msgstr "Izberite <menuitem>Vstavi – Predmet OLE – Koda QR in črtna koda</menuitem>."
+
+#: 00000404.xhp
+msgctxt ""
+"00000404.xhp\n"
 "par_id3150393\n"
 "help.text"
-msgid "Choose <menuitem>Insert - OLE Object - Formula Object</menuitem>."
-msgstr "Izberite <menuitem>Vstavi – Predmet OLE – Predmet formule</menuitem>."
+msgid "<variable id=\"insert_formula\">Choose <menuitem>Insert - OLE Object - Formula Object</menuitem>.</variable>"
+msgstr "<variable id=\"insert_formula\">Izberite <menuitem>Vstavi – Predmet OLE – Predmet formule</menuitem>.</variable>"
 
 #: 00000404.xhp
 msgctxt ""
@@ -7550,8 +7582,32 @@ msgctxt ""
 "00000406.xhp\n"
 "par_id3149884\n"
 "help.text"
-msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F7"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Tipka Cmd</caseinline><defaultinline>Krmilka</defaultinline></switchinline>+F7"
+msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Command</keycode></caseinline><defaultinline><keycode>Ctrl</keycode></defaultinline></switchinline>+<keycode>F7</keycode>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\"><keycode>Tipka Cmd</keycode></caseinline><defaultinline><keycode>Krmilka</keycode></defaultinline></switchinline>+<keycode>F7</keycode>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id641655489196783\n"
+"help.text"
+msgid "On the <emph>Tools</emph> bar, click"
+msgstr "V vrstici <emph>Orodja</emph> kliknite"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id751655488651997\n"
+"help.text"
+msgid "<image src=\"cmd/lc_thesaurus.svg\" id=\"img_id111655488651999\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111655488652000\">Icon Thesaurus</alt></image>"
+msgstr "<image src=\"cmd/lc_thesaurus.svg\" id=\"img_id111655488651999\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111655488652000\">Ikona Slovar sopomenk</alt></image>"
+
+#: 00000406.xhp
+msgctxt ""
+"00000406.xhp\n"
+"par_id11655488652002\n"
+"help.text"
+msgid "Thesaurus"
+msgstr "Slovar sopomenk"
 
 #: 00000406.xhp
 msgctxt ""
@@ -7574,8 +7630,8 @@ msgctxt ""
 "00000406.xhp\n"
 "par_id3151385\n"
 "help.text"
-msgid "<variable id=\"makro\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>, or press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+F11 (if not assigned by your system).</variable>"
-msgstr "<variable id=\"makro\">Izberite <emph>Orodja – Makri – Organiziraj makre – %PRODUCTNAME Basic</emph> ali pritisnite tipki <switchinline select=\"sys\"><caseinline select=\"MAC\">izmenjalka</caseinline><defaultinline>izmenjalka</defaultinline></switchinline>+F11 (če ta kombinacija ni dodeljena sistemu).</variable>"
+msgid "<variable id=\"makro\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>, or press <switchinline select=\"sys\"><caseinline select=\"MAC\">Option</caseinline><defaultinline>Alt</defaultinline></switchinline>+F11 (if not assigned by your system).</variable>"
+msgstr "<variable id=\"makro\">Izberite <emph>Orodja – Makri – Organiziraj makre – Basic</emph> ali pritisnite tipki <switchinline select=\"sys\"><caseinline select=\"MAC\">izmenjalka</caseinline><defaultinline>izmenjalka</defaultinline></switchinline>+F11 (če ta kombinacija ni dodeljena sistemu).</variable>"
 
 #: 00000406.xhp
 msgctxt ""
@@ -7622,16 +7678,16 @@ msgctxt ""
 "00000406.xhp\n"
 "par_id3150398\n"
 "help.text"
-msgid "<variable id=\"passwort\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>,<br/>click the <emph>Organizer</emph> button,<br/>click the <emph>Libraries</emph> tab,<br/>and then click the <emph>Password</emph> button.</variable>"
-msgstr "<variable id=\"passwort\">Izberite <emph>Orodja – Makri – Organiziraj makre – %PRODUCTNAME Basic</emph>, kliknite gumb <emph>Organizator</emph>, kliknite zavihek <emph>Knjižnice</emph>, nato kliknite gumb <emph>Geslo</emph>.</variable>"
+msgid "<variable id=\"passwort\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>,<br/>click the <emph>Organizer</emph> button,<br/>click the <emph>Libraries</emph> tab,<br/>and then click the <emph>Password</emph> button.</variable>"
+msgstr "<variable id=\"passwort\">Izberite <emph>Orodja – Makri – Organiziraj makre – Basic</emph>, kliknite gumb <emph>Organizator</emph>, kliknite zavihek <emph>Knjižnice</emph>, nato kliknite gumb <emph>Geslo</emph>.</variable>"
 
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_id3150498\n"
 "help.text"
-msgid "<variable id=\"liborganizer\">Choose <emph>Tools - Macros - Organize Macros - %PRODUCTNAME Basic</emph>,<br/>click the <widget>Organizer</widget> button.</variable>"
-msgstr "<variable id=\"liborganizer\">Izberite <emph>Orodja – Makri – Organiziraj makre – %PRODUCTNAME Basic</emph>,<br/>kliknite gumb <widget>Organizator</widget>.</variable>"
+msgid "<variable id=\"liborganizer\">Choose <emph>Tools - Macros - Organize Macros - Basic</emph>,<br/>click the <widget>Organizer</widget> button.</variable>"
+msgstr "<variable id=\"liborganizer\">Izberite <emph>Orodja – Makri – Organiziraj makre – Basic</emph>,<br/>kliknite gumb <widget>Organizator</widget>.</variable>"
 
 #: 00000406.xhp
 msgctxt ""
@@ -7694,16 +7750,16 @@ msgctxt ""
 "00000406.xhp\n"
 "par_idN108E9\n"
 "help.text"
-msgid "<variable id=\"menuenew\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the gear  <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon gear menu</alt></image> dropdown menu and choose <menuitem>Add</menuitem>.</variable>"
-msgstr "<variable id=\"menuenew\">Izberite <menuitem>Orodja – Prilagodi – zavihek Meniji</menuitem>, kliknite spustni meni Zobnik <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Ikona menija Zobnik</alt></image> in izberite <menuitem>Dodaj</menuitem>.</variable>"
+msgid "<variable id=\"menuenew\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the hamburger <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon Hamburger menu</alt></image> dropdown menu and choose <menuitem>Add</menuitem>.</variable>"
+msgstr "<variable id=\"menuenew\">Izberite <menuitem>Orodja – Prilagodi – zavihek Meniji</menuitem>, kliknite spustni meni hamburgerja <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Ikona menija hamburgerja</alt></image> in izberite <menuitem>Dodaj</menuitem>.</variable>"
 
 #: 00000406.xhp
 msgctxt ""
 "00000406.xhp\n"
 "par_idN10919\n"
 "help.text"
-msgid "<variable id=\"menuemove\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the gear   <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon gear menu</alt></image>  dropdown menu and choose <menuitem>Move</menuitem>.</variable>"
-msgstr "<variable id=\"menuemove\">Izberite <menuitem>Orodja – Prilagodi – zavihek Meniji</menuitem>, kliknite spustni meni Zobnik <image id=\"img_id3148386\" src=\"cmd/lc_config.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Ikona menija Zobnik</alt></image> in izberite <menuitem>Premakni</menuitem>.</variable>"
+msgid "<variable id=\"menuemove\">Choose <menuitem>Tools - Customize - Menus</menuitem> tab, click the hamburger <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Icon Hamburger menu</alt></image>  dropdown menu and choose <menuitem>Move</menuitem>.</variable>"
+msgstr "<variable id=\"menuemove\">Izberite <menuitem>Orodja – Prilagodi – zavihek Meniji</menuitem>, kliknite spustni meni hamburgerja <image id=\"img_id3148386\" src=\"sfx2/res/menu.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148386\">Ikona menija hamburgerja</alt></image> in izberite <menuitem>Premakni</menuitem>.</variable>"
 
 #: 00000406.xhp
 msgctxt ""
@@ -8892,6 +8948,262 @@ msgstr "Meni Oblika"
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
+"par_id3156426\n"
+"help.text"
+msgid "Open <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimize Size</menuitem></link> dropdown menu from <link href=\"text/swriter/main0204.xhp\"><menuitem>Table</menuitem></link> bar, click"
+msgstr "Odprite spustni meni <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimiziraj velikost</menuitem></link> v orodni vrstici <link href=\"text/swriter/main0204.xhp\"><menuitem>Tabela</menuitem></link>, nato kliknite"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id481655731478873\n"
+"help.text"
+msgid "Open <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimize Size</menuitem></link> dropdown menu from <menuitem>Table</menuitem> bar, click"
+msgstr "Odprite spustni meni <link href=\"text/shared/02/04210000.xhp\"><menuitem>Optimiziraj velikost</menuitem></link> v vrstici <menuitem>Tabela</menuitem>, nato kliknite"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id271654223353638\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Minimal Row Height</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Najmanjša višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id151655731003155\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Minimal Row Height</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Najmanjša višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id451655738489793\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Minimal Row Height</menuitem>."
+msgstr "Izberite vrstice v tabeli in izberite <menuitem>Velikost – Najmanjša višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id751654222949632\n"
+"help.text"
+msgid "<image src=\"cmd/lc_setminimalrowheight.svg\" id=\"img_id731654222949632\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id541654222949632\">Minimal Row Height Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_setminimalrowheight.svg\" id=\"img_id731654222949632\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id541654222949632\">Ikona Najmanjša višina vrstice</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id961654222949632\n"
+"help.text"
+msgid "Minimal Row Height"
+msgstr "Najmanjša višina vrstice"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3155536\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Optimal Row Height</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Optimalna višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id621655731074115\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Optimal Row Height</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Optimalna višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id741655738425233\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Optimal Row Height</menuitem>."
+msgstr "Izberite vrstice v tabeli in izberite <menuitem>Velikost – Optimalna višina vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145222\n"
+"help.text"
+msgid "<image id=\"img_id3145228\" src=\"cmd/lc_setoptimalrowheight.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145228\">Icon Optimal Row Height</alt></image>"
+msgstr "<image id=\"img_id3145228\" src=\"cmd/lc_setoptimalrowheight.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145228\">Ikona Optimalna višina vrstice</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153545\n"
+"help.text"
+msgid "Optimal Row Height"
+msgstr "Optimalna višina vrstice"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153569\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Distribute Rows Evenly</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Enakomerno razporedi vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id701655731168178\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Distribute Rows Evenly</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Enakomerno razporedi vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id801655738379330\n"
+"help.text"
+msgid "Select rows in table, right-click, choose <menuitem>Size - Distribute Rows Evenly</menuitem>."
+msgstr "Izberite vrstice v tabeli in izberite <menuitem>Velikost – Enakomerno razporedi vrstice</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145297\n"
+"help.text"
+msgid "<image id=\"img_id3155994\" src=\"cmd/lc_distributerows.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155994\">Icon Distribute Rows Evenly</alt></image>"
+msgstr "<image id=\"img_id3155994\" src=\"cmd/lc_distributerows.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3155994\">Ikona Enakomerno razporedi vrstice</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3153206\n"
+"help.text"
+msgid "Distribute Rows Evenly"
+msgstr "Enakomerno razporedi vrstice"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id51654220677297\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Minimal Column Width</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Najmanjša širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id691655731247050\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Minimal Column Width</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Najmanjša širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id941655738180090\n"
+"help.text"
+msgid "Select columns in table, right-click, choose <menuitem>Size - Minimal Column Width</menuitem>."
+msgstr "Izberite stolpce v tabeli, desno kliknite in izberite <menuitem>Velikost – Najmanjša širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id11654222599271\n"
+"help.text"
+msgid "<image src=\"cmd/lc_setminimalcolumnwidth.svg\" id=\"img_id541654222599271\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451654222599271\">Minimal Column Width Icon</alt></image>"
+msgstr "<image src=\"cmd/lc_setminimalcolumnwidth.svg\" id=\"img_id541654222599271\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id451654222599271\">Ikona Najmanjša širina stolpca</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id161654222599272\n"
+"help.text"
+msgid "Minimal Column Width"
+msgstr "Najmanjša širina stolpca"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3154752\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Optimal Column Width</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Optimalna širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id471655731343905\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Optimal Column Width</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Optimalna širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id701655738103242\n"
+"help.text"
+msgid "Select columns in table, right-click, choose <menuitem>Size - Optimal Column Width</menuitem>."
+msgstr "Izberite stolpce v tabeli, desno kliknite in izberite <menuitem>Velikost – Optimalna širina stolpca</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3157881\n"
+"help.text"
+msgid "<image id=\"img_id3157888\" src=\"cmd/lc_setoptimalcolumnwidth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157888\">Icon Optimal Column Width</alt></image>"
+msgstr "<image id=\"img_id3157888\" src=\"cmd/lc_setoptimalcolumnwidth.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157888\">Ikona Optimalna širina stolpca</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3150524\n"
+"help.text"
+msgid "Optimal Column Width"
+msgstr "Optimalna širina stolpca"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3159219\n"
+"help.text"
+msgid "Choose <menuitem>Table - Size - Distribute Columns Evenly</menuitem>."
+msgstr "Izberite <menuitem>Tabela – Velikost – Enakomerno razporedi stolpce</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id991655731434331\n"
+"help.text"
+msgid "Choose <menuitem>Format - Table - Distribute Columns Evenly</menuitem>."
+msgstr "Izberite <menuitem>Oblika – Tabela – Enakomerno razporedi stolpce</menuitem>."
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id151654212978990\n"
+"help.text"
+msgid "<variable id=\"RightClickSize\">Select columns in table, right-click, choose <menuitem>Size - Distribute Columns Evenly</menuitem>.</variable>"
+msgstr "<variable id=\"RightClickSize\">Izberite stolpce v tabeli, desno kliknite kamor koli v poudarjenem izboru, nato iz kontekstnega menija izberite <menuitem>Velikost – Enakomerno razporedi stolpce</menuitem>.</variable>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3145179\n"
+"help.text"
+msgid "<image id=\"img_id3145186\" src=\"cmd/lc_distributecolumns.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145186\">Icon Distribute Columns Evenly</alt></image>"
+msgstr "<image id=\"img_id3145186\" src=\"cmd/lc_distributecolumns.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3145186\">Ikona Enakomerno razmakni stolpce</alt></image>"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
+"par_id3151364\n"
+"help.text"
+msgid "Distribute Columns Evenly"
+msgstr "Enakomerno razporedi stolpce"
+
+#: 00040500.xhp
+msgctxt ""
+"00040500.xhp\n"
 "par_id3145356\n"
 "help.text"
 msgid "<variable id=\"standard\">Choose <emph>Format - Clear Direct Formatting</emph>.</variable>"
@@ -8990,8 +9302,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3156306\n"
 "help.text"
-msgid "Menu <menuitem>Format - Page - Header/Footer</menuitem> - <emph>Edit</emph> button (spreadsheets)."
-msgstr "Meni <menuitem>Oblika – Stran – Glava/Noga</menuitem> – gumb <emph>Uredi</emph> (preglednice)."
+msgid "Menu <menuitem>Format - Page Style - Header/Footer</menuitem> - <emph>Edit</emph> button (spreadsheets)."
+msgstr "Meni <menuitem>Oblika – Slog strani – Glava/Noga</menuitem> – gumb <emph>Uredi</emph> (preglednice)."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9014,8 +9326,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3159176\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
-msgstr "Meni <emph>Oblika – Stran – Glava/Noga</emph> – gumb <emph>Uredi</emph> (preglednice)."
+msgid "Menu <emph>Format - Page Style - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
+msgstr "Meni <emph>Oblika – Slog strani – Glava/Noga</emph> – gumb <emph>Uredi</emph> (preglednice)."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9038,8 +9350,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3151385\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
-msgstr "Meni <emph>Oblika – Stran – Glava/Noga</emph> – gumb <emph>Uredi</emph> (preglednice)."
+msgid "Menu <emph>Format - Page Style - Header/Footer</emph> - <emph>Edit</emph> button (spreadsheets)."
+msgstr "Meni <emph>Oblika – Slog strani – Glava/Noga</emph> – gumb <emph>Uredi</emph> (preglednice)."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9270,8 +9582,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3159130\n"
 "help.text"
-msgid "Menu <emph>Format - Page - Border - Padding</emph>."
-msgstr "Izberite <emph>Oblika – Stran – Obrobe – Odmik vsebine</emph>."
+msgid "Menu <emph>Format - Page Style - Border - Padding</emph>."
+msgstr "Izberite <emph>Oblika – Slog strani – Obrobe – Odmik vsebine</emph>."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9310,24 +9622,24 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3151321\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Background</emph> tab."
-msgstr "Izberite <emph>Oblika – Stran – zavihek Ozadje</emph>."
+msgid "Choose <emph>Format - Page Style - Background</emph> tab."
+msgstr "Izberite <emph>Oblika – Slog strani – zavihek Ozadje</emph>."
 
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3154510\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Header - More</emph> button."
-msgstr "Izberite <emph>Oblika – Stran – Glava – gumb Dodatno</emph>."
+msgid "Choose <emph>Format - Page Style - Header - More</emph> button."
+msgstr "Izberite <emph>Oblika – Slog strani – Glava – gumb Dodatno</emph>."
 
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3159110\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Footer - More</emph> button."
-msgstr "Izberite <emph>Oblika – Stran – Noga – gumb Dodatno</emph>."
+msgid "Choose <emph>Format - Page Style - Footer - More</emph> button."
+msgstr "Izberite <emph>Oblika – Slog strani – Noga – gumb Dodatno</emph>."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9382,8 +9694,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3146788\n"
 "help.text"
-msgid "<variable id=\"Calcseiteverwaltenh1\">Choose <menuitem>Format - Page - Organizer</menuitem> tab.</variable>"
-msgstr "<variable id=\"Calcseiteverwaltenh1\">Izberite <menuitem>Oblika – Stran – zavihek Organizator</menuitem>.</variable>"
+msgid "<variable id=\"Calcseiteverwaltenh1\">Choose <menuitem>Format - Page Style - Organizer</menuitem> tab.</variable>"
+msgstr "<variable id=\"Calcseiteverwaltenh1\">Izberite <menuitem>Oblika – Slog strani – zavihek Organizator</menuitem>.</variable>"
 
 #: 00040500.xhp
 msgctxt ""
@@ -9446,8 +9758,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id731601602622257\n"
 "help.text"
-msgid "Choose <menuitem>Format - Page - Page</menuitem> tab."
-msgstr "Izberite <menuitem>Oblika – Stran – zavihek Stran</menuitem>."
+msgid "Choose <menuitem>Format - Page Style - Page</menuitem> tab."
+msgstr "Izberite <menuitem>Oblika – Slog strani –</menuitem> zavihek <menuitem>Stran</menuitem>."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9479,15 +9791,15 @@ msgctxt ""
 "par_id3133357\n"
 "help.text"
 msgid "Choose <menuitem>Format - Page Style - Page</menuitem> tab (Writer)."
-msgstr "Izberite <menuitem>Oblika – Slog strani –</menuitem> zavihek <menuitem>Stran</menuitem> (Writer)."
+msgstr "Izberite <menuitem>Oblika – Slog strani,</menuitem> nato zavihek <menuitem>Stran</menuitem> (Writer)."
 
 #: 00040500.xhp
 msgctxt ""
 "00040500.xhp\n"
 "par_id3155515\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Header</emph> tab."
-msgstr "Izberite <emph>Oblika – Stran – zavihek Glava</emph>."
+msgid "Choose <emph>Format - Page Style - Header</emph> tab."
+msgstr "Izberite <emph>Oblika – Slog strani</emph>, nato zavihek <emph>Glava</emph>."
 
 #: 00040500.xhp
 msgctxt ""
@@ -9502,8 +9814,8 @@ msgctxt ""
 "00040500.xhp\n"
 "par_id3145618\n"
 "help.text"
-msgid "Choose <emph>Format - Page - Footer</emph> tab."
-msgstr "Izberite <emph>Oblika – Stran – zavihek Noga</emph>."
+msgid "Choose <emph>Format - Page Style - Footer</emph> tab."
+msgstr "Izberite <emph>Oblika – Slog strani</emph>, nato zavihek <emph>Noga</emph>."
 
 #: 00040500.xhp
 msgctxt ""
@@ -11135,7 +11447,7 @@ msgctxt ""
 "par_id641654762186921\n"
 "help.text"
 msgid "On the <menuitem>Drawing Object Properties</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking"
-msgstr "Po kliku v orodni vrstici <menuitem>Lastnosti risanega predmeta</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>."
+msgstr "V orodni vrstici <menuitem>Lastnosti risanega predmeta</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>, potem ko ste kliknili"
 
 #: 00040502.xhp
 msgctxt ""
@@ -11143,7 +11455,7 @@ msgctxt ""
 "par_id331654762248984\n"
 "help.text"
 msgid "On the <menuitem>Drawing Object Properties</menuitem> bar or <menuitem>Image</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking"
-msgstr "Po kliku v orodni vrstici <menuitem>Lastnosti risanega predmeta</menuitem> ali <menuitem>Slika</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>."
+msgstr "V orodni vrstici <menuitem>Lastnosti risanega predmeta</menuitem> ali <menuitem>Slika</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>, potem ko ste kliknili"
 
 #: 00040502.xhp
 msgctxt ""
@@ -11151,7 +11463,7 @@ msgctxt ""
 "par_id411654762306808\n"
 "help.text"
 msgid "On the <menuitem>Image</menuitem> bar or <menuitem>Line and Filling</menuitem> bar, choose <menuitem>Arrow Styles</menuitem> tab, after clicking"
-msgstr "Po kliku v orodni vrstici <menuitem>Slika</menuitem> ali <menuitem>Črta in polnilo</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>."
+msgstr "V orodni vrstici <menuitem>Slika</menuitem> ali <menuitem>Črta in polnilo</menuitem> izberite zavihek <menuitem>Slogi puščic</menuitem>, potem ko ste kliknili"
 
 #: 00040502.xhp
 msgctxt ""
@@ -11230,8 +11542,8 @@ msgctxt ""
 "00040502.xhp\n"
 "par_id771592156369992\n"
 "help.text"
-msgid "Choose <menuitem>Format - Page - Background</menuitem> tab"
-msgstr "Izberite <menuitem>Oblika – Stran – zavihek Ozadje</menuitem>."
+msgid "Choose <menuitem>Format - Page Style - Background</menuitem> tab"
+msgstr "Izberite <menuitem>Oblika – Slog strani – zavihek Ozadje</menuitem>."
 
 #: 00040502.xhp
 msgctxt ""
@@ -12494,8 +12806,8 @@ msgctxt ""
 "01000000.xhp\n"
 "par_id3149948\n"
 "help.text"
-msgid "Every <link href=\"text/shared/00/00000005.xhp#docking\" name=\"docked\">docked</link> window has an icon to control the display properties of the window."
-msgstr "Vsako <link href=\"text/shared/00/00000005.xhp#docking\" name=\"Sidrano\">sidrano</link> okno ima ikono za določanje lastnosti prikaza okna."
+msgid "Every <link href=\"text/shared/00/00000005.xhp#docking\">docked</link> window has an icon to control the display properties of the window."
+msgstr "Vsako <link href=\"text/shared/00/00000005.xhp#docking\">sidrano</link> okno ima ikono za določanje lastnosti prikaza okna."
 
 #: 01000000.xhp
 msgctxt ""
@@ -12694,8 +13006,8 @@ msgctxt ""
 "01050000.xhp\n"
 "hd_id3158397\n"
 "help.text"
-msgid "<link href=\"text/shared/00/01050000.xhp\" name=\"General\">General</link>"
-msgstr "<link href=\"text/shared/00/01050000.xhp\" name=\"Splošno\">Splošno</link>"
+msgid "<link href=\"text/shared/00/01050000.xhp\">General</link>"
+msgstr "<link href=\"text/shared/00/01050000.xhp\">Splošno</link>"
 
 #: 01050000.xhp
 msgctxt ""
@@ -13342,24 +13654,24 @@ msgctxt ""
 "edit_menu.xhp\n"
 "par_id3149281\n"
 "help.text"
-msgid "<variable id=\"link\">Choose <menuitem>Edit - Links to External Files</menuitem>.</variable>"
-msgstr "<variable id=\"link\">Izberite <menuitem>Uredi – Povezave z zunanjimi datotekami</menuitem>.</variable>"
+msgid "<variable id=\"link\">Choose <menuitem>Edit - External Links</menuitem>.</variable>"
+msgstr "<variable id=\"link\">Izberite <menuitem>Uredi – Zunanje povezave</menuitem>.</variable>"
 
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3159339\n"
 "help.text"
-msgid "<variable id=\"linkae\">Choose <menuitem>Edit - Links to External Files - Modify...</menuitem> (DDE links only).</variable>"
-msgstr "<variable id=\"linkae\">Izberite <menuitem>Uredi – Povezave z zunanjimi datotekami – Spremeni</menuitem> (samo za povezave DDE).</variable>"
+msgid "<variable id=\"linkae\">Choose <menuitem>Edit - External Links - Modify</menuitem> (DDE links only).</variable>"
+msgstr "<variable id=\"linkae\">Izberite <menuitem>Uredi – Zunanje povezave – Spremeni</menuitem> (samo za povezave DDE).</variable>"
 
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3148927\n"
 "help.text"
-msgid "Select a frame, then choose <menuitem>Edit - Object - Properties</menuitem>."
-msgstr "Izberite okvir, nato izberite <menuitem>Uredi – Predmet – Lastnosti</menuitem>."
+msgid "Select a frame, then choose <menuitem>Edit - OLE Object - Properties</menuitem>."
+msgstr "Izberite okvir, nato izberite <menuitem>Uredi – Predmet OLE – Lastnosti</menuitem>."
 
 #: edit_menu.xhp
 msgctxt ""
@@ -13374,24 +13686,24 @@ msgctxt ""
 "edit_menu.xhp\n"
 "par_id3149259\n"
 "help.text"
-msgid "<variable id=\"edit1\">Choose <menuitem>Edit - Object</menuitem>.</variable>"
-msgstr "<variable id=\"edit1\">Izberite <menuitem>Uredi – Predmet</menuitem>.</variable>"
+msgid "<variable id=\"edit1\">Choose <menuitem>Edit - OLE Object</menuitem>.</variable>"
+msgstr "<variable id=\"edit1\">Izberite <menuitem>Uredi – Predmet OLE</menuitem>.</variable>"
 
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3154966\n"
 "help.text"
-msgid "<variable id=\"edit2\">Choose <menuitem>Edit - Object - Edit</menuitem>, also in the context menu of selected object.</variable>"
-msgstr "<variable id=\"edit2\">Izberite <menuitem>Uredi – Predmet – Uredi</menuitem>, lahko tudi v kontekstnem meniju izbranega predmeta.</variable>"
+msgid "<variable id=\"edit2\">Choose <menuitem>Edit - OLE Object - Edit</menuitem>, also in the context menu of selected object.</variable>"
+msgstr "<variable id=\"edit2\">Izberite <menuitem>Uredi – Predmet OLE – Uredi</menuitem>, lahko tudi v kontekstnem meniju izbranega predmeta.</variable>"
 
 #: edit_menu.xhp
 msgctxt ""
 "edit_menu.xhp\n"
 "par_id3149565\n"
 "help.text"
-msgid "<variable id=\"edit3\">Choose <menuitem>Edit - Object - Open</menuitem>.</variable>"
-msgstr "<variable id=\"edit3\">Izberite <menuitem>Uredi – Predmet – Odpri</menuitem>.</variable>"
+msgid "<variable id=\"edit3\">Choose <menuitem>Edit - OLE Object - Open</menuitem>.</variable>"
+msgstr "<variable id=\"edit3\">Izberite <menuitem>Uredi – Predmet OLE – Odpri</menuitem>.</variable>"
 
 #: edit_menu.xhp
 msgctxt ""

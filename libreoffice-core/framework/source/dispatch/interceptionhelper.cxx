@@ -22,17 +22,18 @@
 #include <com/sun/star/frame/XInterceptorInfo.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/svapp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace com::sun::star;
 
 namespace framework{
 
 InterceptionHelper::InterceptionHelper(const css::uno::Reference< css::frame::XFrame >&            xOwner,
-                                       const css::uno::Reference< css::frame::XDispatchProvider >& xSlave)
+                                       css::uno::Reference< css::frame::XDispatchProvider >  xSlave)
     : m_xOwnerWeak  (xOwner                       )
-    , m_xSlave      (xSlave                       )
+    , m_xSlave      (std::move(xSlave                       ))
 {
 }
 
@@ -234,7 +235,7 @@ void SAL_CALL InterceptionHelper::disposing(const css::lang::EventObject& aEvent
 
     // We need a full copy of all currently registered interceptor objects.
     // Otherwise we can't iterate over this vector without the risk, that our iterator will be invalid.
-    // Because this vetor will be influenced by every deregistered interceptor.
+    // Because this vector will be influenced by every deregistered interceptor.
     InterceptionHelper::InterceptorList aCopy = m_lInterceptionRegs;
 
     aReadLock.clear();

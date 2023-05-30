@@ -27,20 +27,22 @@
 #include <svl/poolitem.hxx>
 #include <svl/typedwhich.hxx>
 #include <tools/degree.hxx>
-#include <svx/DiagramDataInterface.hxx>
 #include <svx/svdtypes.hxx>
 #include <svx/svdobjkind.hxx>
 #include <svx/svxdllapi.h>
-#include <svx/shapeproperty.hxx>
 #include <tools/link.hxx>
-#include <tools/weakbase.h>
 #include <tools/gen.hxx>
 #include <unotools/resmgr.hxx>
+#include <unotools/weakref.hxx>
+#include <osl/diagnose.h>
+#include <typeinfo>
 
 #include <unordered_set>
 
 class SfxBroadcaster;
 class AutoTimer;
+class E3dObject;
+class E3dScene;
 class OutlinerParaObject;
 class Outliner;
 class SdrOutliner;
@@ -53,6 +55,7 @@ class SdrObjList;
 class SdrObject;
 class SdrPage;
 class SdrPageView;
+class SdrTextObj;
 class SdrView;
 class SfxItemSet;
 class SfxGrabBagItem;
@@ -75,6 +78,7 @@ class Fraction;
 enum class PointerStyle;
 class Graphic;
 class SvxShape;
+namespace svx { enum class ShapePropertyProviderId; }
 
 namespace basegfx
 {
@@ -89,13 +93,8 @@ namespace sdr::contact { class ViewContact; }
 
 namespace svx { class PropertyChangeNotifier; }
 namespace com::sun::star::drawing { class XShape; }
+namespace svx::diagram { class IDiagramHelper; }
 
-
-struct SVXCORE_DLLPUBLIC SdrObjectFreeOp;
-
-// helper for constructing std::unique_ptr for SdrObjects where a
-// deleter is needed - here, SdrObject::Free needs to be used.
-typedef std::unique_ptr< SdrObject, SdrObjectFreeOp > SdrObjectUniquePtr;
 
 enum class SdrInventor : sal_uInt32 {
     Unknown          = 0,
@@ -131,6 +130,7 @@ class SVXCORE_DLLPUBLIC SdrObjUserCall
 public:
     virtual ~SdrObjUserCall();
     virtual void Changed(const SdrObject& rObj, SdrUserCallType eType, const tools::Rectangle& rOldBoundRect);
+    virtual sal_Int32 GetPDFAnchorStructureElementId(SdrObject const& rObj, OutputDevice const&);
 };
 
 class SVXCORE_DLLPUBLIC SdrObjMacroHitRec
@@ -257,8 +257,13 @@ public:
 //      SwFlyDrawObj
 
 /// Abstract DrawObject
-class SVXCORE_DLLPUBLIC SdrObject : public SfxListener, public tools::WeakBase
+class SVXCORE_DLLPUBLIC SdrObject : public SfxListener, public cppu::OWeakObject
 {
+public:
+    // Basic DiagramHelper support
+    virtual const std::shared_ptr< svx::diagram::IDiagramHelper >& getDiagramHelper() const;
+    bool isDiagram() const { return bool(getDiagramHelper()); }
+
 private:
     friend class                SdrObjListIter;
     friend class                SdrObjList;
@@ -294,6 +299,9 @@ public:
     SdrObject(SdrModel& rSdrModel);
     // Copy constructor
     SdrObject(SdrModel& rSdrModel, SdrObject const & rSource);
+
+    virtual void SAL_CALL acquire() noexcept override final;
+    virtual void SAL_CALL release() noexcept override final;
 
     // SdrModel/SdrPage access on SdrObject level
     SdrPage* getSdrPageFromSdrObject() const;
@@ -333,19 +341,11 @@ public:
     const double* GetRelativeHeight() const;
     sal_Int16 GetRelativeHeightRelation() const;
 
-    void SetDiagramData(std::shared_ptr<DiagramDataInterface> pDiagramData);
-    const std::shared_ptr<DiagramDataInterface> & GetDiagramData() const;
-
     /// @param bNotMyself = true: set only ObjList to dirty, don't mark this object as dirty.
     ///
     /// This is needed for instance for NbcMove, because usually one moves SnapRect and aOutRect
     /// at the same time to avoid recomputation.
     virtual void SetBoundAndSnapRectsDirty(bool bNotMyself = false, bool bRecursive = true);
-
-    // frees the SdrObject pointed to by the argument
-    // In case the object has an SvxShape, which has the ownership of the object, it
-    // is actually *not* deleted.
-    static  void    Free( SdrObject*& _rpObject );
 
     // this method is only for access from Property objects
     virtual void SetBoundRectDirty();
@@ -374,14 +374,14 @@ public:
     // An object may have a user-set Name (Get/SetName()), e.g SdrGrafObj, SdrObjGroup
     // or SdrOle2Obj.
     // It may also have a Title and a Description for accessibility purposes.
-    void SetName(const OUString& rStr, const bool bSetChanged = true);
-    OUString GetName() const;
+    virtual void SetName(const OUString& rStr, const bool bSetChanged = true);
+    virtual const OUString & GetName() const;
     void MakeNameUnique();
     void MakeNameUnique(std::unordered_set<OUString>& rNameSet);
-    void SetTitle(const OUString& rStr);
-    OUString GetTitle() const;
-    void SetDescription(const OUString& rStr);
-    OUString GetDescription() const;
+    virtual void SetTitle(const OUString& rStr);
+    virtual OUString GetTitle() const;
+    virtual void SetDescription(const OUString& rStr);
+    virtual OUString GetDescription() const;
 
     // for group objects
     bool IsGroupObject() const;
@@ -401,7 +401,7 @@ public:
     // GrabBagItem for interim interop purposes
     void GetGrabBagItem(css::uno::Any& rVal) const;
 
-    void SetGrabBagItem(const css::uno::Any& rVal);
+    virtual void SetGrabBagItem(const css::uno::Any& rVal);
 
     // Return the position in the navigation order for the called object.
     // Note that this method may update the navigation position of the
@@ -443,7 +443,14 @@ public:
     virtual bool HasLimitedRotation() const;
 
     // Returns a copy of the object. Every inherited class must reimplement this.
-    virtual SdrObject* CloneSdrObject(SdrModel& rTargetModel) const;
+    virtual rtl::Reference<SdrObject> CloneSdrObject(SdrModel& rTargetModel) const;
+    // helper, since Clone always return the type of the current subclass
+    template<class T>
+    static rtl::Reference<T> Clone(T const & rObj, SdrModel& rTargetModel)
+    {
+        rtl::Reference<SdrObject> newObj = rObj.CloneSdrObject(rTargetModel);
+        return static_cast<T*>(newObj.get());
+    }
 
     // Overwriting this object makes no sense, it is too complicated for that
     SdrObject& operator=(const SdrObject& rObj) = delete;
@@ -501,7 +508,7 @@ public:
     // part of the model, thus not changing anything since it's only a temporary
     // helper object for interaction
     virtual bool supportsFullDrag() const;
-    virtual SdrObjectUniquePtr getFullDragClone() const;
+    virtual rtl::Reference<SdrObject> getFullDragClone() const;
 
     /// Every object must be able to create itself interactively.
     /// On MouseDown first an object is created, and its BegCreate() method
@@ -625,7 +632,7 @@ public:
     // if bDontRemoveHardAttr is false, set all attributes, which were set in the style sheet, to their default value
     // if true, all hard attributes keep their values
     void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr);
-    virtual void NbcSetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr);
+    void NbcSetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr);
     SfxStyleSheet* GetStyleSheet() const;
 
     virtual bool HasTextEdit() const;
@@ -718,15 +725,15 @@ public:
     // In the case of the conversion from TextObj to PathObj,
     // both modi (bLineToArea=true/false) would be identical.
     // The methods' default implementations report "I'm unable to do this" (false/null).
-    virtual SdrObjectUniquePtr DoConvertToPolyObj(bool bBezier, bool bAddText) const;
-    SdrObjectUniquePtr ConvertToPolyObj(bool bBezier, bool bLineToArea) const;
+    virtual rtl::Reference<SdrObject> DoConvertToPolyObj(bool bBezier, bool bAddText) const;
+    rtl::Reference<SdrObject> ConvertToPolyObj(bool bBezier, bool bLineToArea) const;
 
     // convert this path object to contour object; bForceLineDash converts even
     // when there is no filled new polygon created from line-to-polygon conversion,
     // specially used for XLINE_DASH and 3D conversion
-    SdrObject* ConvertToContourObj(SdrObject* pRet, bool bForceLineDash = false) const;
+    rtl::Reference<SdrObject> ConvertToContourObj(SdrObject* pRet, bool bForceLineDash = false) const;
 private:
-    SdrObject* ImpConvertToContourObj(bool bForceLineDash);
+    rtl::Reference<SdrObject> ImpConvertToContourObj(bool bForceLineDash);
 public:
 
     // if true, reference onto an object
@@ -755,6 +762,7 @@ public:
     bool IsVisible() const { return mbVisible;}
     void SetMarkProtect(bool bProt);
     bool IsMarkProtect() const { return m_bMarkProt;}
+    virtual bool IsSdrTextObj() const { return false; }
 
     /// Whether the aspect ratio should be kept by default when resizing.
     virtual bool shouldKeepAspectRatio() const { return false; }
@@ -787,7 +795,7 @@ public:
     // This method is equivalent to calling getShapePropertyChangeNotifier().notifyPropertyChange( _eProperty ),
     // exception that it is allowed to be called when there does not yet exist an associated SvxShape - in which
     // case the method will silently return without doing anything.
-    void notifyShapePropertyChange( const svx::ShapeProperty _eProperty ) const;
+    void notifyShapePropertyChange( const svx::ShapePropertyProviderId _eProperty ) const;
 
     // transformation interface for StarOfficeAPI. This implements support for
     // homogen 3x3 matrices containing the transformation of the SdrObject. At the
@@ -857,24 +865,40 @@ public:
     // Use SdrObjList::SetObjectNavigationPosition() instead.
     void SetNavigationPosition (const sal_uInt32 nPosition);
 
-    // sets a new UNO representation of the shape
-    // This is only a public interface function. The actual work is
-    // done by impl_setUnoShape().
-    // Calling this function is only allowed for the UNO representation
-    // itself!
-    void setUnoShape( const css::uno::Reference<css::drawing::XShape>& _rxUnoShape);
+    /// Sets a new UNO representation of the shape
+    ///
+    /// Calling this function is only allowed for the UNO representation
+    /// itself!
+    ///
+    /// The default implementation of this function sets the new UNO
+    /// shape. Derived classes should override the function to handle
+    /// any other actions that are needed when the shape is being
+    /// changed.
+    ///
+    /// The implementation _must_ call the same method of its parent
+    /// class (preferably as the first step)!
+    virtual void setUnoShape( const css::uno::Reference< css::drawing::XShape >& _rxUnoShape );
 
     const css::uno::WeakReference< css::drawing::XShape >& getWeakUnoShape() const { return maWeakUnoShape; }
 
-    void setSuitableOutlinerBg(Outliner& rOutliner) const;
+    // return true if a bg was set, false otherwise
+    bool setSuitableOutlinerBg(Outliner& rOutliner) const;
     // If fillstyle is drawing::FillStyle_BITMAP, returns the graphic.
     const Graphic* getFillGraphic() const;
 
     const OUString& getHyperlink() const { return msHyperlink; }
     void setHyperlink(const OUString& sHyperlink) { msHyperlink = sHyperlink; }
 
+    void ForceMetricToItemPoolMetric(basegfx::B2DPolyPolygon& rPolyPolygon) const noexcept;
+
 protected:
-    mutable tools::Rectangle    m_aOutRect;     // surrounding rectangle for Paint (incl. LineWidth, ...)
+    const tools::Rectangle& getOutRectangle() const;
+    void setOutRectangleConst(tools::Rectangle const& rRectangle) const; // need to do something about this
+    void setOutRectangle(tools::Rectangle const& rRectangle);
+    void resetOutRectangle();
+    void moveOutRectangle(sal_Int32 nXDelta, sal_Int32 nYDelta);
+
+    mutable tools::Rectangle m_aOutRect;     // surrounding rectangle for Paint (incl. LineWidth, ...)
     Point                       m_aAnchor;      // anchor position (Writer)
     SdrObjUserCall*             m_pUserCall;
     std::unique_ptr<SdrObjPlusData>
@@ -936,18 +960,9 @@ protected:
         return static_cast<const T&>(GetObjectItem(sal_uInt16(nWhich)));
     }
 
-    /// Sets a new UNO shape
-    ///
-    /// The default implementation of this function sets the new UNO
-    /// shape. Derived classes should override the function to handle
-    /// any other actions that are needed when the shape is being
-    /// changed.
-    ///
-    /// The implementation _must_ call the same method of its parent
-    /// class (preferably as the first step)!
-    virtual void impl_setUnoShape( const css::uno::Reference< css::drawing::XShape >& _rxUnoShape );
-
     const SfxItemSet* getBackgroundFillSet() const;
+
+    virtual void InternalSetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr, bool bBroadcast);
 
 private:
     struct Impl;
@@ -969,10 +984,12 @@ private:
     std::unique_ptr<sdr::contact::ViewContact>
                                       mpViewContact;
 
-    // do not use directly, always use getSvxShape() if you have to!
+    // do not use directly, always use getSvxShape() if you have to, because not all
+    // SdrObjects have an associated SvxShape subclass (e.g. reportdesign)
     SvxShape*                   mpSvxShape;
     css::uno::WeakReference< css::drawing::XShape >
                                 maWeakUnoShape;
+
     // HACK: Do not automatically insert newly created object into a page.
     // The user needs to do it manually later.
     bool                        mbDoNotInsertIntoPageAutomatically;
@@ -985,13 +1002,13 @@ private:
     SdrObject( const SdrObject& ) = delete;
 };
 
-struct SVXCORE_DLLPUBLIC SdrObjectFreeOp
-{
-    void operator()(SdrObject* obj)
-    {
-        SdrObject::Free(obj);
-    }
-};
+SVXCORE_DLLPUBLIC E3dScene* DynCastE3dScene(SdrObject*);
+inline const E3dScene* DynCastE3dScene(const SdrObject* p) { return DynCastE3dScene(const_cast<SdrObject*>(p)); }
+SVXCORE_DLLPUBLIC E3dObject* DynCastE3dObject(SdrObject*);
+inline const E3dObject* DynCastE3dObject(const SdrObject* p) { return DynCastE3dObject(const_cast<SdrObject*>(p)); }
+SVXCORE_DLLPUBLIC SdrTextObj* DynCastSdrTextObj(SdrObject*);
+inline const SdrTextObj* DynCastSdrTextObj(const SdrObject* p) { return DynCastSdrTextObj(const_cast<SdrObject*>(p)); }
+
 
 struct SdrObjCreatorParams
 {
@@ -1011,17 +1028,17 @@ struct SdrObjCreatorParams
 class SVXCORE_DLLPUBLIC SdrObjFactory
 {
 public:
-    static SdrObject* MakeNewObject(
+    static rtl::Reference<SdrObject> MakeNewObject(
         SdrModel& rSdrModel,
         SdrInventor nInventor,
         SdrObjKind nObjIdentifier,
         const tools::Rectangle* pSnapRect = nullptr);
 
-    static void InsertMakeObjectHdl(Link<SdrObjCreatorParams, SdrObject*> const & rLink);
-    static void RemoveMakeObjectHdl(Link<SdrObjCreatorParams, SdrObject*> const & rLink);
+    static void InsertMakeObjectHdl(Link<SdrObjCreatorParams, rtl::Reference<SdrObject>> const & rLink);
+    static void RemoveMakeObjectHdl(Link<SdrObjCreatorParams, rtl::Reference<SdrObject>> const & rLink);
 
 private:
-    static SVX_DLLPRIVATE SdrObject* CreateObjectFromFactory(
+    static SVX_DLLPRIVATE rtl::Reference<SdrObject> CreateObjectFromFactory(
         SdrModel& rSdrModel,
         SdrInventor nInventor,
         SdrObjKind nIdentifier);

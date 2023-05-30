@@ -22,11 +22,14 @@
 #include <com/sun/star/chart2/data/XDataSource.hpp>
 #include <com/sun/star/chart2/data/XDataSink.hpp>
 #include <cppuhelper/implbase.hxx>
+#include <vector>
+#include "charttoolsdllapi.hxx"
 
 namespace chart
 {
+class LabeledDataSequence;
 
-class DataSource : public
+class OOO_DLLPUBLIC_CHARTTOOLS DataSource final : public
     ::cppu::WeakImplHelper<
         css::lang::XServiceInfo,
         css::chart2::data::XDataSource,
@@ -36,6 +39,8 @@ public:
     explicit DataSource();
     explicit DataSource(
         const css::uno::Sequence< css::uno::Reference< css::chart2::data::XLabeledDataSequence > > & rSequences );
+    explicit DataSource(
+        const std::vector< css::uno::Reference< css::chart2::data::XLabeledDataSequence >  > & rSequences );
 
     virtual ~DataSource() override;
 
@@ -44,7 +49,6 @@ public:
     virtual sal_Bool SAL_CALL supportsService( const OUString& ServiceName ) override;
     virtual css::uno::Sequence< OUString > SAL_CALL getSupportedServiceNames() override;
 
-protected:
     // ____ XDataSource ____
     virtual css::uno::Sequence< css::uno::Reference< css::chart2::data::XLabeledDataSequence > > SAL_CALL
         getDataSequences() override;

@@ -41,7 +41,7 @@
 #include <oox/ppt/pptfilterhelpers.hxx>
 #include <oox/token/tokens.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::beans;
@@ -152,7 +152,7 @@ namespace oox::ppt {
                 Event aEvent;
                 aEvent.Trigger = EventTrigger::ON_NEXT;
                 aEvent.Repeat = 0;
-                xClickNode->setBegin( makeAny( aEvent ) );
+                xClickNode->setBegin( Any( aEvent ) );
 
                 if( bFirst )
                 {
@@ -182,7 +182,7 @@ namespace oox::ppt {
                                     {
                                         // first effect does not start on click, so correct
                                         // first click nodes begin to 0s
-                                        xClickNode->setBegin( makeAny( 0.0 ) );
+                                        xClickNode->setBegin( Any( 0.0 ) );
                                         break;
                                     }
                                 }

@@ -144,13 +144,13 @@ void FuConstructRectangle::DoExecute( SfxRequest& rReq )
                                            pCenterY->GetValue () - pAxisY->GetValue () / 2,
                                            pCenterX->GetValue () + pAxisX->GetValue () / 2,
                                            pCenterY->GetValue () + pAxisY->GetValue () / 2);
-                SdrCircObj  *pNewCircle = new SdrCircObj(
+                rtl::Reference<SdrCircObj> pNewCircle = new SdrCircObj(
                     mpView->getSdrModelFromSdrView(),
                     SdrCircKind::Full,
                     aNewRectangle);
                 SdrPageView *pPV = mpView->GetSdrPageView();
 
-                mpView->InsertObjectAtView(pNewCircle, *pPV, SdrInsertFlags::SETDEFLAYER | SdrInsertFlags::SETDEFATTR);
+                mpView->InsertObjectAtView(pNewCircle.get(), *pPV, SdrInsertFlags::SETDEFLAYER | SdrInsertFlags::SETDEFATTR);
             }
             break;
 
@@ -189,12 +189,12 @@ void FuConstructRectangle::DoExecute( SfxRequest& rReq )
                                            pMouseStartY->GetValue (),
                                            pMouseEndX->GetValue (),
                                            pMouseEndY->GetValue ());
-                SdrRectObj  *pNewRect = new SdrRectObj(
+                rtl::Reference<SdrRectObj> pNewRect = new SdrRectObj(
                     mpView->getSdrModelFromSdrView(),
                     aNewRectangle);
                 SdrPageView *pPV = mpView->GetSdrPageView();
 
-                mpView->InsertObjectAtView(pNewRect, *pPV, SdrInsertFlags::SETDEFLAYER | SdrInsertFlags::SETDEFATTR);
+                mpView->InsertObjectAtView(pNewRect.get(), *pPV, SdrInsertFlags::SETDEFLAYER | SdrInsertFlags::SETDEFATTR);
             }
             break;
         }
@@ -251,7 +251,7 @@ bool FuConstructRectangle::MouseButtonDown(const MouseEvent& rMEvt)
         mpWindow->CaptureMouse();
         sal_uInt16 nDrgLog = sal_uInt16 ( mpWindow->PixelToLogic(Size(DRGPIX,0)).Width() );
 
-        if (mpView->GetCurrentObjIdentifier() == OBJ_CAPTION)
+        if (mpView->GetCurrentObjIdentifier() == SdrObjKind::Caption)
         {
             Size aCaptionSize(846, 846);    // (4x2)cm
             bReturn = mpView->BegCreateCaptionObj(aPnt, aCaptionSize,
@@ -314,6 +314,24 @@ bool FuConstructRectangle::MouseButtonUp(const MouseEvent& rMEvt)
 
             bReturn = true;
         }
+        else
+        {
+            //Drag was too small to create object, so insert default object at click pos
+            Point aClickPos(mpWindow->PixelToLogic(rMEvt.GetPosPixel()));
+            sal_uInt32 nDefaultObjectSize(1500);
+            sal_Int32 nCenterOffset(-sal_Int32(nDefaultObjectSize / 2));
+            aClickPos.AdjustX(nCenterOffset);
+            aClickPos.AdjustY(nCenterOffset);
+
+            SdrPageView *pPV = mpView->GetSdrPageView();
+            if(mpView->IsSnapEnabled())
+                aClickPos = mpView->GetSnapPos(aClickPos, pPV);
+
+            ::tools::Rectangle aNewObjectRectangle(aClickPos, Size(nDefaultObjectSize, nDefaultObjectSize));
+            rtl::Reference<SdrObject> pObjDefault = CreateDefaultObject(nSlotId, aNewObjectRectangle);
+
+            bReturn = mpView->InsertObjectAtView(pObjDefault.get(), *pPV);
+        }
     }
 
     bReturn = FuConstruct::MouseButtonUp (rMEvt) || bReturn;
@@ -341,12 +359,12 @@ void FuConstructRectangle::Activate()
             [[fallthrough]];
         case SID_DRAW_LINE :
         case SID_DRAW_XLINE:
-            aObjKind = OBJ_LINE;
+            aObjKind = SdrObjKind::Line;
             break;
 
         case SID_DRAW_MEASURELINE:
         {
-            aObjKind = OBJ_MEASURE;
+            aObjKind = SdrObjKind::Measure;
         }
         break;
 
@@ -359,7 +377,7 @@ void FuConstructRectangle::Activate()
         case SID_DRAW_SQUARE_ROUND     :
         case SID_DRAW_SQUARE_ROUND_NOFILL:
         {
-            aObjKind = OBJ_RECT;
+            aObjKind = SdrObjKind::Rectangle;
         }
         break;
 
@@ -368,14 +386,14 @@ void FuConstructRectangle::Activate()
         case SID_DRAW_CIRCLE        :
         case SID_DRAW_CIRCLE_NOFILL :
         {
-            aObjKind = OBJ_CIRC;
+            aObjKind = SdrObjKind::CircleOrEllipse;
         }
         break;
 
         case SID_DRAW_CAPTION:
         case SID_DRAW_CAPTION_VERTICAL:
         {
-            aObjKind = OBJ_CAPTION;
+            aObjKind = SdrObjKind::Caption;
         }
         break;
 
@@ -408,19 +426,19 @@ void FuConstructRectangle::Activate()
         case SID_CONNECTOR_LINES_CIRCLE_END:
         case SID_CONNECTOR_LINES_CIRCLES:
         {
-            aObjKind = OBJ_EDGE;
+            aObjKind = SdrObjKind::Edge;
             mpView->SetGlueVisible();
         }
         break;
         case SID_INSERT_SIGNATURELINE:
         {
-            aObjKind = OBJ_GRAF;
+            aObjKind = SdrObjKind::Graphic;
         }
         break;
 
         default:
         {
-            aObjKind = OBJ_RECT;
+            aObjKind = SdrObjKind::Rectangle;
         }
         break;
     }
@@ -674,7 +692,7 @@ static ::basegfx::B2DPolyPolygon getPolygon(TranslateId pResId, const SdrModel& 
 
 void FuConstructRectangle::SetLineEnds(SfxItemSet& rAttr, SdrObject const & rObj)
 {
-    if ( !((rObj.GetObjIdentifier() == OBJ_EDGE &&
+    if ( !((rObj.GetObjIdentifier() == SdrObjKind::Edge &&
           nSlotId != SID_TOOL_CONNECTOR        &&
           nSlotId != SID_CONNECTOR_LINE        &&
           nSlotId != SID_CONNECTOR_LINES       &&
@@ -858,7 +876,7 @@ void FuConstructRectangle::SetLineEnds(SfxItemSet& rAttr, SdrObject const & rObj
     }
 }
 
-SdrObjectUniquePtr FuConstructRectangle::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
+rtl::Reference<SdrObject> FuConstructRectangle::CreateDefaultObject(const sal_uInt16 nID, const ::tools::Rectangle& rRectangle)
 {
     DBG_ASSERT( (nID != SID_DRAW_FONTWORK) && (nID != SID_DRAW_FONTWORK_VERTICAL ), "FuConstRectangle::CreateDefaultObject can not create Fontwork shapes!" );
 
@@ -915,7 +933,7 @@ SdrObjectUniquePtr FuConstructRectangle::CreateDefaultObject(const sal_uInt16 nI
     // case SID_CONNECTOR_LINES_CIRCLE_END:
     // case SID_CONNECTOR_LINES_CIRCLES:
 
-    SdrObjectUniquePtr pObj(SdrObjFactory::MakeNewObject(
+    rtl::Reference<SdrObject> pObj(SdrObjFactory::MakeNewObject(
         mpView->getSdrModelFromSdrView(),
         mpView->GetCurrentObjInventor(),
         mpView->GetCurrentObjIdentifier()));

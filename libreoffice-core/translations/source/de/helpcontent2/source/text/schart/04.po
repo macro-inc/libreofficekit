@@ -3,15 +3,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2019-07-11 18:38+0200\n"
-"PO-Revision-Date: 2018-06-15 05:23+0000\n"
-"Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-10-24 10:35+0000\n"
+"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textschart04/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
 "X-Generator: LibreOffice\n"
 "X-POOTLE-MTIME: 1529040217.000000\n"
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; charts</bookmark_value><bookmark_value>charts; shortcuts</bookmark_value>"
 msgstr "<bookmark_value>Tastenkombinationen; Diagramme</bookmark_value><bookmark_value>Diagramme; Tastenkombinationen</bookmark_value>"
 
-#. pm6fm
+#. BKqdE
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3150767\n"
 "help.text"
-msgid "<variable id=\"Chart_keys\"><link href=\"text/schart/04/01020000.xhp\" name=\"Shortcuts for Charts\">Shortcuts for Charts</link></variable>"
-msgstr "<variable id=\"Chart_keys\"><link href=\"text/schart/04/01020000.xhp\" name=\"Tastenkombinationen für Diagramme\">Tastenkombinationen für Diagramme</link></variable>"
+msgid "<variable id=\"Chart_keys\"><link href=\"text/schart/04/01020000.xhp\">Shortcuts for Charts</link></variable>"
+msgstr "<variable id=\"Chart_keys\"><link href=\"text/schart/04/01020000.xhp\">Tastenkombinationen für Diagramme</link></variable>"
 
 #. btcmU
 #: 01020000.xhp
@@ -52,14 +52,14 @@ msgctxt ""
 msgid "You can use the following shortcut keys in charts."
 msgstr "Für die Arbeit mit Diagrammen stehen Ihnen die folgenden Tastenkombinationen zur Verfügung."
 
-#. eMdUn
+#. EQR2d
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3159154\n"
 "help.text"
-msgid "You can also use the general <link href=\"text/shared/04/01010000.xhp\" name=\"shortcut keys\">shortcut keys</link> for $[officename]."
-msgstr "Darüber hinaus können Sie die allgemeinen <link href=\"text/shared/04/01010000.xhp\" name=\"Tastenkombinationen\">Tastenkombinationen</link> für $[officename] verwenden."
+msgid "You can also use the general <link href=\"text/shared/04/01010000.xhp\">shortcut keys</link> for $[officename]."
+msgstr "Darüber hinaus können Sie die allgemeinen <link href=\"text/shared/04/01010000.xhp\">Tastenkombinationen</link> für $[officename] verwenden."
 
 #. CEzNG
 #: 01020000.xhp
@@ -203,7 +203,7 @@ msgctxt ""
 "hd_id3150364\n"
 "help.text"
 msgid "up/down/left/right arrow in pie charts"
-msgstr "Pfeil nach oben/unten/links/rechts) bei Kreisdiagrammen"
+msgstr "Pfeil nach oben/unten/links/rechts bei Kreisdiagrammen"
 
 #. d2pzL
 #: 01020000.xhp
@@ -303,4 +303,3 @@ msgctxt ""
 "help.text"
 msgid "Moves the selected pie segment off or into the pie chart."
 msgstr "Schiebt das ausgewählte Kreissegment in das Tortendiagramm oder nimmt es heraus."
-

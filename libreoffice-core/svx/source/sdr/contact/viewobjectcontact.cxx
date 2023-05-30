@@ -29,6 +29,13 @@
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
+#include <drawinglayer/primitive2d/structuretagprimitive2d.hxx>
+#include <svx/svdobj.hxx>
+#include <svx/svdmodel.hxx>
+#include <svx/svdpage.hxx>
+#include <svx/svdotext.hxx>
+#include <vcl/pdfwriter.hxx>
+#include <vcl/pdfextoutdevdata.hxx>
 
 using namespace com::sun::star;
 
@@ -67,7 +74,7 @@ public:
 
     // data access
     const drawinglayer::primitive2d::Primitive2DContainer& getPrimitive2DSequence() const { return maPrimitive2DSequence; }
-    drawinglayer::primitive2d::Primitive2DContainer extractPrimitive2DSequence() const { return std::move(maPrimitive2DSequence); }
+    drawinglayer::primitive2d::Primitive2DContainer extractPrimitive2DSequence() { return std::move(maPrimitive2DSequence); }
 };
 
 AnimatedExtractingProcessor2D::AnimatedExtractingProcessor2D(
@@ -147,6 +154,7 @@ ViewObjectContact::ViewObjectContact(ObjectContact& rObjectContact, ViewContact&
 :   mrObjectContact(rObjectContact),
     mrViewContact(rViewContact),
     maGridOffset(0.0, 0.0),
+    mnActionChangedCount(0),
     mbLazyInvalidate(false)
 {
     // make the ViewContact remember me
@@ -193,7 +201,7 @@ const basegfx::B2DRange& ViewObjectContact::getObjectRange() const
         {
             // if range is not computed (new or LazyInvalidate objects), force it
             const DisplayInfo aDisplayInfo;
-            const drawinglayer::primitive2d::Primitive2DContainer xSequence(getPrimitive2DSequence(aDisplayInfo));
+            const drawinglayer::primitive2d::Primitive2DContainer& xSequence(getPrimitive2DSequence(aDisplayInfo));
 
             if(!xSequence.empty())
             {
@@ -208,6 +216,10 @@ const basegfx::B2DRange& ViewObjectContact::getObjectRange() const
 
 void ViewObjectContact::ActionChanged()
 {
+    // clear cached primitives
+    mxPrimitive2DSequence.clear();
+    ++mnActionChangedCount;
+
     if(mbLazyInvalidate)
         return;
 
@@ -289,10 +301,11 @@ void ViewObjectContact::checkForPrimitive2DAnimations()
     }
 }
 
-drawinglayer::primitive2d::Primitive2DContainer ViewObjectContact::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const
+void ViewObjectContact::createPrimitive2DSequence(const DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
     // get the view-independent Primitive from the viewContact
-    drawinglayer::primitive2d::Primitive2DContainer xRetval(GetViewContact().getViewIndependentPrimitive2DContainer());
+    drawinglayer::primitive2d::Primitive2DContainer xRetval;
+    GetViewContact().getViewIndependentPrimitive2DContainer(xRetval);
 
     if(!xRetval.empty())
     {
@@ -324,11 +337,21 @@ drawinglayer::primitive2d::Primitive2DContainer ViewObjectContact::createPrimiti
         }
     }
 
-    return xRetval;
+    rVisitor.visit(xRetval);
 }
 
 drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const
 {
+    // only some of the top-level apps are any good at reliably invalidating us (e.g. writer is not)
+    SdrObject* pSdrObj(mrViewContact.TryToGetSdrObject());
+
+    if (nullptr != pSdrObj && pSdrObj->getSdrModelFromSdrObject().IsVOCInvalidationIsReliable())
+    {
+        if (!mxPrimitive2DSequence.empty())
+            return mxPrimitive2DSequence;
+    }
+
+    // prepare new representation
     drawinglayer::primitive2d::Primitive2DContainer xNewPrimitiveSequence;
 
     // take care of redirectors and create new list
@@ -336,29 +359,15 @@ drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPr
 
     if(pRedirector)
     {
-        xNewPrimitiveSequence = pRedirector->createRedirectedPrimitive2DSequence(*this, rDisplayInfo);
+        pRedirector->createRedirectedPrimitive2DSequence(*this, rDisplayInfo, xNewPrimitiveSequence);
     }
     else
     {
-        xNewPrimitiveSequence = createPrimitive2DSequence(rDisplayInfo);
+        createPrimitive2DSequence(rDisplayInfo, xNewPrimitiveSequence);
     }
 
-    // local up-to-date checks. New list different from local one?
-    if(mxPrimitive2DSequence == xNewPrimitiveSequence)
-        return mxPrimitive2DSequence;
-
-    // has changed, copy content
-    const_cast< ViewObjectContact* >(this)->mxPrimitive2DSequence = std::move(xNewPrimitiveSequence);
-
-    // check for animated stuff
-    const_cast< ViewObjectContact* >(this)->checkForPrimitive2DAnimations();
-
-    // always update object range when PrimitiveSequence changes
-    const drawinglayer::geometry::ViewInformation2D& rViewInformation2D(GetObjectContact().getViewInformation2D());
-    const_cast< ViewObjectContact* >(this)->maObjectRange = mxPrimitive2DSequence.getB2DRange(rViewInformation2D);
-
-    // check and eventually embed to GridOffset transform primitive
-    if(GetObjectContact().supportsGridOffsets())
+    // check and eventually embed to GridOffset transform primitive (calc only)
+    if(!xNewPrimitiveSequence.empty() && GetObjectContact().supportsGridOffsets())
     {
         const basegfx::B2DVector& rGridOffset(getGridOffset());
 
@@ -367,23 +376,120 @@ drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPr
             const basegfx::B2DHomMatrix aTranslateGridOffset(
                 basegfx::utils::createTranslateB2DHomMatrix(
                     rGridOffset));
-            const drawinglayer::primitive2d::Primitive2DReference aEmbed(
-                 new drawinglayer::primitive2d::TransformPrimitive2D(
+            drawinglayer::primitive2d::Primitive2DReference aEmbed(
+                new drawinglayer::primitive2d::TransformPrimitive2D(
                     aTranslateGridOffset,
-                    drawinglayer::primitive2d::Primitive2DContainer(mxPrimitive2DSequence)));
-
-            // Set values at local data. So for now, the mechanism is to reset some of the
-            // defining things (mxPrimitive2DSequence, maGridOffset) and re-create the
-            // buffered data (including maObjectRange). It *could* be changed to keep
-            // the unmodified PrimitiveSequence and only update the GridOffset, but this
-            // would require a 2nd instance of maObjectRange and mxPrimitive2DSequence. I
-            // started doing so, but it just makes the code more complicated. For now,
-            // just allow re-creation of the PrimitiveSequence (and removing buffered
-            // decomposed content of it). May be optimized, though. OTOH it only happens
-            // in calc which traditionally does not have a huge amount of DrawObjects anyways.
-            const_cast< ViewObjectContact* >(this)->mxPrimitive2DSequence = drawinglayer::primitive2d::Primitive2DContainer { aEmbed };
-            const_cast< ViewObjectContact* >(this)->maObjectRange.transform(aTranslateGridOffset);
+                    std::move(xNewPrimitiveSequence)));
+            xNewPrimitiveSequence = drawinglayer::primitive2d::Primitive2DContainer { aEmbed };
         }
+    }
+
+    // Check if we need to embed to a StructureTagPrimitive2D, too. This
+    // was done at ImplRenderPaintProc::createRedirectedPrimitive2DSequence before
+    if (!xNewPrimitiveSequence.empty() && GetObjectContact().isExportTaggedPDF())
+    {
+        if (nullptr != pSdrObj)
+        {
+            vcl::PDFWriter::StructElement eElement(vcl::PDFWriter::NonStructElement);
+            const SdrInventor nInventor(pSdrObj->GetObjInventor());
+            const SdrObjKind nIdentifier(pSdrObj->GetObjIdentifier());
+            const bool bIsTextObj(nullptr != DynCastSdrTextObj(pSdrObj));
+
+            // Note: SwFlyDrawObj/SwVirtFlyDrawObj have SdrInventor::Swg - these
+            // are *not* handled here because not all of them are painted
+            // completely with primitives, so a tag here does not encapsulate them.
+            // The tag must be created by SwTaggedPDFHelper until this is fixed.
+            if ( nInventor == SdrInventor::Default )
+            {
+                if ( nIdentifier == SdrObjKind::Group )
+                    eElement = vcl::PDFWriter::Section;
+                else if (nIdentifier == SdrObjKind::Table)
+                    eElement = vcl::PDFWriter::Table;
+                else if (nIdentifier == SdrObjKind::Media)
+                    eElement = vcl::PDFWriter::Annot;
+                else if ( nIdentifier == SdrObjKind::TitleText )
+                    eElement = vcl::PDFWriter::Heading;
+                else if ( nIdentifier == SdrObjKind::OutlineText )
+                    eElement = vcl::PDFWriter::Division;
+                else if ( !bIsTextObj || !static_cast<const SdrTextObj&>(*pSdrObj).HasText() )
+                    eElement = vcl::PDFWriter::Figure;
+                else
+                    eElement = vcl::PDFWriter::Division;
+            }
+
+            if(vcl::PDFWriter::NonStructElement != eElement)
+            {
+                SdrPage* pSdrPage(pSdrObj->getSdrPageFromSdrObject());
+
+                if(pSdrPage)
+                {
+                    const bool bBackground(pSdrPage->IsMasterPage());
+                    const bool bImage(SdrObjKind::Graphic == pSdrObj->GetObjIdentifier());
+                    // note: there must be output device here, in PDF export
+                    sal_Int32 nAnchorId(-1);
+                    if (auto const pUserCall = pSdrObj->GetUserCall())
+                    {
+                        nAnchorId = pUserCall->GetPDFAnchorStructureElementId(
+                            *pSdrObj, *GetObjectContact().TryToGetOutputDevice());
+                    }
+
+                    ::std::vector<sal_Int32> annotIds;
+                    if (eElement == vcl::PDFWriter::Annot)
+                    {
+                        auto const pPDFExtOutDevData(GetObjectContact().GetPDFExtOutDevData());
+                        assert(pPDFExtOutDevData);
+                        annotIds = pPDFExtOutDevData->GetScreenAnnotIds(pSdrObj);
+                    }
+
+                    drawinglayer::primitive2d::Primitive2DReference xReference(
+                        new drawinglayer::primitive2d::StructureTagPrimitive2D(
+                            eElement,
+                            bBackground,
+                            bImage,
+                            std::move(xNewPrimitiveSequence),
+                            nAnchorId,
+                            &annotIds));
+                    xNewPrimitiveSequence = drawinglayer::primitive2d::Primitive2DContainer { xReference };
+                }
+            }
+        }
+        else
+        {
+            // page backgrounds etc should be tagged as artifacts:
+            xNewPrimitiveSequence = drawinglayer::primitive2d::Primitive2DContainer {
+                    new drawinglayer::primitive2d::StructureTagPrimitive2D(
+                        // lies to force silly VclMetafileProcessor2D to emit NonStructElement
+                        vcl::PDFWriter::Division,
+                        true,
+                        true,
+                        std::move(xNewPrimitiveSequence))
+                };
+        }
+    }
+
+    // Local up-to-date checks. New list different from local one?
+    // This is the important point where it gets decided if the current or the new
+    // representation gets used. This is important for performance, since the
+    // current representation contains possible precious decompositions. That
+    // comparisons triggers exactly if something in the object visualization
+    // has changed.
+    // Note: That is the main reason for BasePrimitive2D::operator== at all. I
+    // have alternatively tried to invalidate the local representation on object
+    // change, but that is simply not reliable.
+    // Note2: I did that once in aw080, the lost CWS, and it worked well enough
+    // so that I could remove *all* operator== from all derivations of
+    // BasePrimitive2D, so it can be done again (with the needed resources)
+    if(mxPrimitive2DSequence != xNewPrimitiveSequence)
+    {
+        // has changed, copy content
+        const_cast< ViewObjectContact* >(this)->mxPrimitive2DSequence = std::move(xNewPrimitiveSequence);
+
+        // check for animated stuff
+        const_cast< ViewObjectContact* >(this)->checkForPrimitive2DAnimations();
+
+        // always update object range when PrimitiveSequence changes
+        const drawinglayer::geometry::ViewInformation2D& rViewInformation2D(GetObjectContact().getViewInformation2D());
+        const_cast< ViewObjectContact* >(this)->maObjectRange = mxPrimitive2DSequence.getB2DRange(rViewInformation2D);
     }
 
     // return current Primitive2DContainer
@@ -408,13 +514,14 @@ void ViewObjectContact::getPrimitive2DSequenceHierarchy(DisplayInfo& rDisplayInf
     if(!isPrimitiveVisible(rDisplayInfo))
         return;
 
-    drawinglayer::primitive2d::Primitive2DContainer xRetval = getPrimitive2DSequence(rDisplayInfo);
-    if(xRetval.empty())
+    getPrimitive2DSequence(rDisplayInfo);
+    if(mxPrimitive2DSequence.empty())
         return;
 
     // get ranges
     const drawinglayer::geometry::ViewInformation2D& rViewInformation2D(GetObjectContact().getViewInformation2D());
-    const basegfx::B2DRange aObjectRange(xRetval.getB2DRange(rViewInformation2D));
+    // tdf#147164 cannot use maObjectRange here, it is unreliable
+    const basegfx::B2DRange aObjectRange(mxPrimitive2DSequence.getB2DRange(rViewInformation2D));
     const basegfx::B2DRange& aViewRange(rViewInformation2D.getViewport());
 
     // check geometrical visibility
@@ -422,22 +529,27 @@ void ViewObjectContact::getPrimitive2DSequenceHierarchy(DisplayInfo& rDisplayInf
     if(!bVisible)
         return;
 
-    rVisitor.append(xRetval);
+    // temporarily take over the mxPrimitive2DSequence, in case it gets invalidated while we want to iterate over it
+    auto tmp = std::move(const_cast<ViewObjectContact*>(this)->mxPrimitive2DSequence);
+    int nPrevCount = mnActionChangedCount;
+
+    rVisitor.visit(tmp);
+
+    // if we received ActionChanged() calls while walking the primitives, then leave it empty, otherwise move it back
+    if (mnActionChangedCount == nPrevCount)
+        const_cast<ViewObjectContact*>(this)->mxPrimitive2DSequence = std::move(tmp);
 }
 
-drawinglayer::primitive2d::Primitive2DContainer ViewObjectContact::getPrimitive2DSequenceSubHierarchy(DisplayInfo& rDisplayInfo) const
+void ViewObjectContact::getPrimitive2DSequenceSubHierarchy(DisplayInfo& rDisplayInfo, drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
 {
     const sal_uInt32 nSubHierarchyCount(GetViewContact().GetObjectCount());
-    drawinglayer::primitive2d::Primitive2DContainer xSeqRetval;
 
     for(sal_uInt32 a(0); a < nSubHierarchyCount; a++)
     {
         const ViewObjectContact& rCandidate(GetViewContact().GetViewContact(a).GetViewObjectContact(GetObjectContact()));
 
-        rCandidate.getPrimitive2DSequenceHierarchy(rDisplayInfo, xSeqRetval);
+        rCandidate.getPrimitive2DSequenceHierarchy(rDisplayInfo, rVisitor);
     }
-
-    return xSeqRetval;
 }
 
 // Support getting a GridOffset per object and view for non-linear ViewToDevice

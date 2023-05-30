@@ -97,23 +97,19 @@ class InterceptionHelper final : public  ::cppu::WeakImplHelper<
 
             /** @short search for an interceptor inside this list using it's reference.
 
-                @param xInterceptor
-                        points to the interceptor object, which should be located inside this list.
+                @param sURL
+                        URL which should match with a registered pattern.
 
                 @return An iterator object, which points directly to the located item inside this list.
                         In case no interceptor could be found, it points to the end of this list!
               */
             iterator findByPattern(std::u16string_view sURL)
             {
-                iterator pIt;
-                for (pIt=begin(); pIt!=end(); ++pIt)
+                for (iterator pIt=begin(); pIt!=end(); ++pIt)
                 {
-                    sal_Int32              c        = pIt->lURLPattern.getLength();
-                    const OUString* pPattern = pIt->lURLPattern.getConstArray();
-
-                    for (sal_Int32 i=0; i<c; ++i)
+                    for (const OUString& pattern : pIt->lURLPattern)
                     {
-                        WildCard aPattern(pPattern[i]);
+                        WildCard aPattern(pattern);
                         if (aPattern.Matches(sURL))
                             return pIt;
                     }
@@ -151,7 +147,7 @@ class InterceptionHelper final : public  ::cppu::WeakImplHelper<
                     an outside creates dispatch provider, which has to be used here as lowest slave "interceptor".
          */
         InterceptionHelper(const css::uno::Reference< css::frame::XFrame >&            xOwner,
-                           const css::uno::Reference< css::frame::XDispatchProvider >& xSlave);
+                           css::uno::Reference< css::frame::XDispatchProvider >  xSlave);
 
     private:
 
@@ -247,6 +243,8 @@ class InterceptionHelper final : public  ::cppu::WeakImplHelper<
                         Normally we will die by ref count too...
          */
         virtual void SAL_CALL disposing(const css::lang::EventObject& aEvent) override;
+
+        css::uno::Reference<css::frame::XDispatchProvider> GetSlave() const { return m_xSlave; }
 
 }; // class InterceptionHelper
 

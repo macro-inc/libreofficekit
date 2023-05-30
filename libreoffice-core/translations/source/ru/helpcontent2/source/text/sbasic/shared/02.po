@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-10-04 19:51+0200\n"
-"PO-Revision-Date: 2020-03-04 14:16+0000\n"
-"Last-Translator: kompilainenn <79045_79045@mail.ru>\n"
-"Language-Team: Russian <https://weblate.documentfoundation.org/projects/libo_help-master/textsbasicshared02/ru/>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-02 12:20+0000\n"
+"Last-Translator: Timon <kaktebyavirubit@gmail.com>\n"
+"Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicshared02/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1494866790.000000\n"
 
 #. 6Kkin
@@ -25,14 +25,14 @@ msgctxt ""
 msgid "Library"
 msgstr "Библиотека"
 
-#. uR2gG
+#. SUqwz
 #: 11010000.xhp
 msgctxt ""
 "11010000.xhp\n"
 "hd_id3151100\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11010000.xhp\" name=\"Library\">Library</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11010000.xhp\" name=\"Библиотека\">Библиотека</link>"
+msgid "<link href=\"text/sbasic/shared/02/11010000.xhp\">Library</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11010000.xhp\">Библиотека</link>"
 
 #. MCJF5
 #: 11010000.xhp
@@ -70,14 +70,14 @@ msgctxt ""
 msgid "Compile"
 msgstr "Компилировать"
 
-#. sG7ET
+#. zTzxA
 #: 11020000.xhp
 msgctxt ""
 "11020000.xhp\n"
 "hd_id3148983\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11020000.xhp\" name=\"Compile\">Compile</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11020000.xhp\" name=\"Компилировать\">Компилировать</link>"
+msgid "<link href=\"text/sbasic/shared/02/11020000.xhp\">Compile</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11020000.xhp\">Компилировать</link>"
 
 #. FkJqv
 #: 11020000.xhp
@@ -115,14 +115,14 @@ msgctxt ""
 msgid "Run"
 msgstr "Выполнить"
 
-#. n3bkD
+#. eTVMQ
 #: 11030000.xhp
 msgctxt ""
 "11030000.xhp\n"
 "hd_id3153255\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11030000.xhp\" name=\"Run\">Run</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11030000.xhp\" name=\"Выполнить\">Выполнить</link>"
+msgid "<link href=\"text/sbasic/shared/02/11030000.xhp\">Run</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11030000.xhp\">Выполнить</link>"
 
 #. Vi9DY
 #: 11030000.xhp
@@ -169,14 +169,14 @@ msgctxt ""
 msgid "<bookmark_value>macros; stopping</bookmark_value><bookmark_value>program stops</bookmark_value><bookmark_value>stopping macros</bookmark_value>"
 msgstr "<bookmark_value>макросы; остановка</bookmark_value><bookmark_value>остановка программы</bookmark_value><bookmark_value>остановка макросов</bookmark_value>"
 
-#. ZV5Z3
+#. EUFsx
 #: 11040000.xhp
 msgctxt ""
 "11040000.xhp\n"
 "hd_id3154863\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11040000.xhp\" name=\"Stop\">Stop</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11040000.xhp\" name=\"Стоп\">Стоп</link>"
+msgid "<link href=\"text/sbasic/shared/02/11040000.xhp\">Stop</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11040000.xhp\">Стоп</link>"
 
 #. XevvQ
 #: 11040000.xhp
@@ -214,14 +214,14 @@ msgctxt ""
 msgid "Single Step"
 msgstr "Шаг"
 
-#. HrJ7h
+#. BfoCA
 #: 11050000.xhp
 msgctxt ""
 "11050000.xhp\n"
 "hd_id3155934\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Single Step\">Single Step</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Шаг\">Шаг</link>"
+msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\">Шаг</link>"
 
 #. 5NkKq
 #: 11050000.xhp
@@ -232,14 +232,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BasicStepInto\">Runs the macro and stops it after the next command.</ahelp>"
 msgstr "<ahelp hid=\".uno:BasicStepInto\">Выполняет макрос и останавливается после выполнения следующей команды.</ahelp>"
 
-#. nCFSZ
+#. v6MCD
 #: 11050000.xhp
 msgctxt ""
 "11050000.xhp\n"
 "par_id3152801\n"
 "help.text"
-msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Watch\">Watch</link> command to troubleshoot errors."
-msgstr "Эту команду можно использовать в сочетании с командой <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Контрольное значение\">Контрольное значение</link> для устранения ошибок."
+msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> command to troubleshoot errors."
+msgstr "Эту команду можно использовать в сочетании с командой <link href=\"text/sbasic/shared/02/11080000.xhp\">Контрольное значение</link> для устранения ошибок."
 
 #. SD8E7
 #: 11050000.xhp
@@ -259,14 +259,14 @@ msgctxt ""
 msgid "Single Step"
 msgstr "Шаг"
 
-#. NZffL
+#. fmm7T
 #: 11050000.xhp
 msgctxt ""
 "11050000.xhp\n"
 "par_id3149235\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\" name=\"Procedure Step function\">Procedure Step function</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\" name=\"Функция ''Шаг с обходом''\">Функция ''Шаг с обходом''</link>"
+msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\">Procedure Step function</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\">Функция ''Шаг с обходом''</link>"
 
 #. JceSB
 #: 11060000.xhp
@@ -277,14 +277,14 @@ msgctxt ""
 msgid "Procedure Step"
 msgstr "Шаг с обходом"
 
-#. GCdz2
+#. BGWAS
 #: 11060000.xhp
 msgctxt ""
 "11060000.xhp\n"
 "hd_id3148520\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\" name=\"Procedure Step\">Procedure Step</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\" name=\"Шаг с обходом\">Шаг с обходом</link>"
+msgid "<link href=\"text/sbasic/shared/02/11060000.xhp\">Procedure Step</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11060000.xhp\">Шаг с обходом</link>"
 
 #. narAD
 #: 11060000.xhp
@@ -295,14 +295,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:BasicStepOver\">Runs the macro and stops it after the next procedure.</ahelp>"
 msgstr "<ahelp hid=\".uno:BasicStepOver\">Выполняет макрос и останавливается после выполнения следующей процедуры.</ahelp>"
 
-#. Re5BC
+#. cnCf7
 #: 11060000.xhp
 msgctxt ""
 "11060000.xhp\n"
 "par_id3153394\n"
 "help.text"
-msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Watch\">Watch</link> command to troubleshoot errors."
-msgstr "Эту команду можно использовать в сочетании с командой <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Контрольное значение\">Контрольное значение</link> для устранения ошибок."
+msgid "You can use this command in conjunction with the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> command to troubleshoot errors."
+msgstr "Эту команду можно использовать в сочетании с командой <link href=\"text/sbasic/shared/02/11080000.xhp\">Контрольное значение</link> для устранения ошибок."
 
 #. 8z956
 #: 11060000.xhp
@@ -322,14 +322,14 @@ msgctxt ""
 msgid "Procedure Step"
 msgstr "Шаг с обходом"
 
-#. dy7AF
+#. tLjsB
 #: 11060000.xhp
 msgctxt ""
 "11060000.xhp\n"
 "par_id3153562\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Single Step function\">Single Step function</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Функция ''Шаг''\">Функция ''Шаг''</link>"
+msgid "<link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step function</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11050000.xhp\">Функция ''Шаг''</link>"
 
 #. mK2Ph
 #: 11070000.xhp
@@ -340,14 +340,14 @@ msgctxt ""
 msgid "Breakpoint"
 msgstr "Точка останова"
 
-#. dSrmB
+#. hVDHU
 #: 11070000.xhp
 msgctxt ""
 "11070000.xhp\n"
 "hd_id3154863\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11070000.xhp\" name=\"Breakpoint\">Breakpoint</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11070000.xhp\" name=\"Точка останова\">Точка останова</link>"
+msgid "<link href=\"text/sbasic/shared/02/11070000.xhp\">Breakpoint</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11070000.xhp\">Точка останова</link>"
 
 #. iTCUE
 #: 11070000.xhp
@@ -358,14 +358,14 @@ msgctxt ""
 msgid "<ahelp hid=\".uno:ToggleBreakPoint\">Inserts a breakpoint in the program line.</ahelp>"
 msgstr "<ahelp hid=\".uno:ToggleBreakPoint\">Служит для вставки точки останова в строку программы.</ahelp>"
 
-#. 2S8i7
+#. KET2A
 #: 11070000.xhp
 msgctxt ""
 "11070000.xhp\n"
 "par_id3149346\n"
 "help.text"
-msgid "The breakpoint is inserted at the cursor position. Use a breakpoint to interrupt a program just before an error occurs. You can then troubleshoot the program by running it in <link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Single Step\">Single Step</link> mode until the error occurs. You can also use the <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Watch\">Watch</link> icon to check the content of the relevant variables."
-msgstr "Точка останова вставляется там, где находится курсор. Используя точку останова, выполнение программы можно останавливать перед появлением ошибки. Затем для устранения ошибок можно запускать программу на выполнение в режиме <link href=\"text/sbasic/shared/02/11050000.xhp\" name=\"Шаг\">Шаг</link>. С помощью значка <link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Контрольное значение\">Контрольное значение</link> можно также проверять значения релевантных переменных."
+msgid "The breakpoint is inserted at the cursor position. Use a breakpoint to interrupt a program just before an error occurs. You can then troubleshoot the program by running it in <link href=\"text/sbasic/shared/02/11050000.xhp\">Single Step</link> mode until the error occurs. You can also use the <link href=\"text/sbasic/shared/02/11080000.xhp\">Watch</link> icon to check the content of the relevant variables."
+msgstr "Точка останова вставляется там, где находится курсор. Используя точку останова, выполнение программы можно останавливать перед появлением ошибки. Затем для устранения ошибок можно запускать программу на выполнение в режиме <link href=\"text/sbasic/shared/02/11050000.xhp\">Шаг</link>. С помощью значка <link href=\"text/sbasic/shared/02/11080000.xhp\">Контрольное значение</link> можно также проверять значения релевантных переменных."
 
 #. srCR5
 #: 11070000.xhp
@@ -394,14 +394,14 @@ msgctxt ""
 msgid "Enable Watch"
 msgstr "Включить область контрольных значений"
 
-#. 4X56s
+#. MLDaG
 #: 11080000.xhp
 msgctxt ""
 "11080000.xhp\n"
 "hd_id3154863\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Enable Watch\">Enable Watch</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11080000.xhp\" name=\"Включить область контрольных значений\">Включить область контрольных значений</link>"
+msgid "<link href=\"text/sbasic/shared/02/11080000.xhp\">Enable Watch</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11080000.xhp\">Включить область контрольных значений</link>"
 
 #. TRivb
 #: 11080000.xhp
@@ -457,14 +457,14 @@ msgctxt ""
 msgid "Object Catalog"
 msgstr "Каталог объектов"
 
-#. EKx2C
+#. ThBAt
 #: 11090000.xhp
 msgctxt ""
 "11090000.xhp\n"
 "hd_id3153255\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11090000.xhp\" name=\"Object Catalog\">Object Catalog</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11090000.xhp\" name=\"Каталог объектов\">Каталог объектов</link>"
+msgid "<link href=\"text/sbasic/shared/02/11090000.xhp\">Object Catalog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11090000.xhp\">Каталог объектов</link>"
 
 #. bHCXS
 #: 11090000.xhp
@@ -482,7 +482,7 @@ msgctxt ""
 "par_id3147576\n"
 "help.text"
 msgid "Double click the name of a function or sub to load the module that contains that function or sub, and to position the cursor. Double click the name of a module or dialog to load and display that module or dialog."
-msgstr "Дважды щелкните имя функции или подпрограммы, чтобы загрузить модуль, который содержит эту функцию или подпрограмму, и поместить курсор в её текст. Дважды щелкните имя модуля или диалогового окна, чтобы загрузить и отобразить этот модуль или диалоговое окно."
+msgstr "Дважды щёлкните имя функции или подпрограммы, чтобы загрузить модуль, который содержит эту функцию или подпрограмму, и поместить курсор в её текст. Дважды щёлкните имя модуля или диалогового окна, чтобы загрузить и отобразить этот модуль или диалоговое окно."
 
 #. yNVBJ
 #: 11090000.xhp
@@ -529,14 +529,14 @@ msgctxt ""
 msgid "Macros"
 msgstr "Макросы"
 
-#. FLE8S
+#. 7FmMu
 #: 11100000.xhp
 msgctxt ""
 "11100000.xhp\n"
 "hd_id3156183\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11100000.xhp\" name=\"Macros\">Macros</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11100000.xhp\" name=\"Макросы\">Макросы</link>"
+msgid "<link href=\"text/sbasic/shared/02/11100000.xhp\">Macros</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11100000.xhp\">Макросы</link>"
 
 #. 5C9pN
 #: 11100000.xhp
@@ -574,23 +574,23 @@ msgctxt ""
 msgid "Modules"
 msgstr "Модули"
 
-#. z4nD8
+#. 99Edc
 #: 11110000.xhp
 msgctxt ""
 "11110000.xhp\n"
 "hd_id3148520\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11110000.xhp\" name=\"Modules\">Modules</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11110000.xhp\" name=\"Модули\">Модули</link>"
+msgid "<link href=\"text/sbasic/shared/02/11110000.xhp\">Modules</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11110000.xhp\">Модули</link>"
 
-#. dGdth
+#. knaPi
 #: 11110000.xhp
 msgctxt ""
 "11110000.xhp\n"
 "par_id3156414\n"
 "help.text"
-msgid "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Click here to open the <link href=\"text/sbasic/shared/01/06130000.xhp\" name=\"Macro Organizer\"><emph>Macro Organizer</emph></link> dialog.</ahelp>"
-msgstr "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Позволяет открыть диалоговое окно <link href=\"text/sbasic/shared/01/06130000.xhp\" name=\"Управление макросами\"><emph>Управление макросами</emph></link>.</ahelp>"
+msgid "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Click here to open the <link href=\"text/sbasic/shared/01/06130000.xhp\"><emph>Macro Organizer</emph></link> dialog.</ahelp>"
+msgstr "<ahelp visibility=\"visible\" hid=\".uno:ModuleDialog\">Позволяет открыть диалоговое окно <link href=\"text/sbasic/shared/01/06130000.xhp\"><emph>Управление макросами</emph></link>.</ahelp>"
 
 #. 2pTWM
 #: 11110000.xhp
@@ -619,14 +619,14 @@ msgctxt ""
 msgid "Find Parentheses"
 msgstr "Найти скобку"
 
-#. awTDX
+#. fQkDR
 #: 11120000.xhp
 msgctxt ""
 "11120000.xhp\n"
 "hd_id3149497\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11120000.xhp\" name=\"Find Parentheses\">Find Parentheses</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11120000.xhp\" name=\"Найти скобку\">Найти скобку</link>"
+msgid "<link href=\"text/sbasic/shared/02/11120000.xhp\">Find Parentheses</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11120000.xhp\">Найти скобку</link>"
 
 #. Kkd6M
 #: 11120000.xhp
@@ -664,14 +664,14 @@ msgctxt ""
 msgid "Insert Source Text"
 msgstr "Вставить исходный текст"
 
-#. FBDRn
+#. kKdim
 #: 11140000.xhp
 msgctxt ""
 "11140000.xhp\n"
 "hd_id3154044\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11140000.xhp\" name=\"Insert Source Text\">Insert Source Text</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11140000.xhp\" name=\"Вставить исходный текст\">Вставить исходный текст</link>"
+msgid "<link href=\"text/sbasic/shared/02/11140000.xhp\">Insert Source Text</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11140000.xhp\">Вставить исходный текст</link>"
 
 #. JscV7
 #: 11140000.xhp
@@ -718,14 +718,14 @@ msgctxt ""
 msgid "Save Source As"
 msgstr "Сохранить исходный текст как"
 
-#. QL8Bk
+#. UCFMa
 #: 11150000.xhp
 msgctxt ""
 "11150000.xhp\n"
 "hd_id3149497\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11150000.xhp\" name=\"Save Source As\">Save Source As</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11150000.xhp\" name=\"Сохранить исходный текст как\">Сохранить исходный текст как</link>"
+msgid "<link href=\"text/sbasic/shared/02/11150000.xhp\">Save Source As</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11150000.xhp\">Сохранить исходный текст как</link>"
 
 #. C4hju
 #: 11150000.xhp
@@ -763,14 +763,14 @@ msgctxt ""
 msgid "Step Out"
 msgstr "Выход на верхний уровень"
 
-#. KeqCM
+#. EQK5E
 #: 11160000.xhp
 msgctxt ""
 "11160000.xhp\n"
 "hd_id3148983\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11160000.xhp\" name=\"Step Out\">Step Out</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11160000.xhp\" name=\"Выход на верхний уровень\">Выход на верхний уровень</link>"
+msgid "<link href=\"text/sbasic/shared/02/11160000.xhp\">Step Out</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11160000.xhp\">Выход на верхний уровень</link>"
 
 #. 4rNBj
 #: 11160000.xhp
@@ -808,14 +808,14 @@ msgctxt ""
 msgid "Manage Breakpoints"
 msgstr "Управление точками останова"
 
-#. 9xPeD
+#. 58Sgj
 #: 11170000.xhp
 msgctxt ""
 "11170000.xhp\n"
 "hd_id3156183\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11170000.xhp\" name=\"Manage Breakpoints\">Manage Breakpoints</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11170000.xhp\" name=\"Управление точками останова\">Управление точками останова</link>"
+msgid "<link href=\"text/sbasic/shared/02/11170000.xhp\">Manage Breakpoints</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11170000.xhp\">Управление точками останова</link>"
 
 #. XqJ6C
 #: 11170000.xhp
@@ -844,14 +844,14 @@ msgctxt ""
 msgid "Manage Breakpoints"
 msgstr "Управление точками останова"
 
-#. VEXGo
+#. k7KJF
 #: 11170000.xhp
 msgctxt ""
 "11170000.xhp\n"
 "par_id3154897\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/01050300.xhp\" name=\"Manage Breakpoints dialog\"><emph>Manage Breakpoints</emph> dialog</link>"
-msgstr "<link href=\"text/sbasic/shared/01050300.xhp\" name=\"Диалоговое окно ''Управление точками останова''\"><emph>Диалоговое окно ''Управление точками останова''</emph></link>"
+msgid "<link href=\"text/sbasic/shared/01050300.xhp\"><emph>Manage Breakpoints</emph> dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/01050300.xhp\"><emph>Диалоговое окно ''Управление точками останова''</emph></link>"
 
 #. sBFuo
 #: 11180000.xhp
@@ -862,14 +862,14 @@ msgctxt ""
 msgid "Import Dialog"
 msgstr "Диалоговое окно импорта"
 
-#. DpFcB
+#. uKC9G
 #: 11180000.xhp
 msgctxt ""
 "11180000.xhp\n"
 "hd_id3156183\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11180000.xhp\" name=\"Import Dialog\">Import Dialog</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11180000.xhp\" name=\"Диалоговое окно импорта\">Диалоговое окно импорта</link>"
+msgid "<link href=\"text/sbasic/shared/02/11180000.xhp\">Import Dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11180000.xhp\">Диалоговое окно импорта</link>"
 
 #. XBChu
 #: 11180000.xhp
@@ -961,14 +961,14 @@ msgctxt ""
 msgid "Export Dialog"
 msgstr "Диалоговое окно экспорта"
 
-#. ZwGyC
+#. 9y6Pg
 #: 11190000.xhp
 msgctxt ""
 "11190000.xhp\n"
 "hd_id3156183\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/11190000.xhp\" name=\"Export Dialog\">Export Dialog</link>"
-msgstr "<link href=\"text/sbasic/shared/02/11190000.xhp\" name=\"Диалоговое окно экспорта\">Диалоговое окно экспорта</link>"
+msgid "<link href=\"text/sbasic/shared/02/11190000.xhp\">Export Dialog</link>"
+msgstr "<link href=\"text/sbasic/shared/02/11190000.xhp\">Диалоговое окно экспорта</link>"
 
 #. aVo7E
 #: 11190000.xhp
@@ -1015,14 +1015,14 @@ msgctxt ""
 msgid "<bookmark_value>controls; in dialog editor</bookmark_value><bookmark_value>push button control in dialog editor</bookmark_value><bookmark_value>icon control</bookmark_value><bookmark_value>buttons; controls</bookmark_value><bookmark_value>image control</bookmark_value><bookmark_value>check box control</bookmark_value><bookmark_value>radio button control</bookmark_value><bookmark_value>option button control</bookmark_value><bookmark_value>fixed text control</bookmark_value><bookmark_value>label field control</bookmark_value><bookmark_value>editing; controls</bookmark_value><bookmark_value>text boxes; controls</bookmark_value><bookmark_value>list boxes; controls</bookmark_value><bookmark_value>combo box control</bookmark_value><bookmark_value>scroll bar control</bookmark_value><bookmark_value>horizontal scrollbar control</bookmark_value><bookmark_value>vertical scrollbar control</bookmark_value><bookmark_value>group box control</bookmark_value><bookmark_value>progress bar control</bookmark_value><bookmark_value>fixed line control</bookmark_value><bookmark_value>horizontal line control</bookmark_value><bookmark_value>line control</bookmark_value><bookmark_value>vertical line control</bookmark_value><bookmark_value>date field control</bookmark_value><bookmark_value>time field control</bookmark_value><bookmark_value>numerical field control</bookmark_value><bookmark_value>currency field control</bookmark_value><bookmark_value>formatted field control</bookmark_value><bookmark_value>pattern field control</bookmark_value><bookmark_value>masked field control</bookmark_value><bookmark_value>file selection control</bookmark_value><bookmark_value>selection options for controls</bookmark_value><bookmark_value>test mode control</bookmark_value>"
 msgstr "<bookmark_value>элементы управления; в редакторе диалоговых окон</bookmark_value><bookmark_value>элемент управления \"кнопка\" в редакторе диалоговых окон</bookmark_value><bookmark_value>элемент управления \"значок\"</bookmark_value><bookmark_value>кнопки; элементы управления</bookmark_value><bookmark_value>элемент управления \"изображение\"</bookmark_value><bookmark_value>элемент управления \"флажок\"</bookmark_value><bookmark_value>элемент управления \"переключатель\"</bookmark_value><bookmark_value>элемент управления \"переключатель\"</bookmark_value><bookmark_value>элемент управления \"фиксированный текст\"</bookmark_value><bookmark_value>элемент управления \"поле подписи\"</bookmark_value><bookmark_value>изменение; элементы управления</bookmark_value><bookmark_value>текстовые поля; элементы управления</bookmark_value><bookmark_value>списки; элементы управления</bookmark_value><bookmark_value>элемент управления \"поле со списком\"</bookmark_value><bookmark_value>элемент управления \"полоса прокрутки\"</bookmark_value><bookmark_value>элемент управления \"горизонтальная полоса прокрутки\"</bookmark_value><bookmark_value>элемент управления \"вертикальная полоса прокрутки\"</bookmark_value><bookmark_value>элемент управления \"группа\"</bookmark_value><bookmark_value>элемент управления \"индикатор выполнения\"</bookmark_value><bookmark_value>элемент управления \"фиксированная строка\"</bookmark_value><bookmark_value>элемент управления \"горизонтальная линия\"</bookmark_value><bookmark_value>элемент управления \"линия\"</bookmark_value><bookmark_value>элемент управления \"вертикальная линия\"</bookmark_value><bookmark_value>элемент управления \"поле даты\"</bookmark_value><bookmark_value>элемент управления \"поле времени\"</bookmark_value><bookmark_value>элемент управления \"числовое поле\"</bookmark_value><bookmark_value>элемент управления \"поле денежных значений\"</bookmark_value><bookmark_value>элемент управления \"поле с форматированием\"</bookmark_value><bookmark_value>элемент управления \"поле с маской ввода\"</bookmark_value><bookmark_value>элемент управления \"поле с маской ввода\"</bookmark_value><bookmark_value>элемент управления \"выбор файла\"</bookmark_value><bookmark_value>варианты выбора для элементов управления</bookmark_value><bookmark_value>элемент управления \"тестовый режим\"</bookmark_value>"
 
-#. YL3Za
+#. dVPiE
 #: 20000000.xhp
 msgctxt ""
 "20000000.xhp\n"
 "hd_id3150402\n"
 "help.text"
-msgid "<link href=\"text/sbasic/shared/02/20000000.xhp\" name=\"Insert Controls\">Insert Controls</link>"
-msgstr "<link href=\"text/sbasic/shared/02/20000000.xhp\" name=\"Вставить элементы управления\">Вставить элементы управления</link>"
+msgid "<link href=\"text/sbasic/shared/02/20000000.xhp\">Insert Controls</link>"
+msgstr "<link href=\"text/sbasic/shared/02/20000000.xhp\">Вставить элементы управления</link>"
 
 #. jnfj9
 #: 20000000.xhp
@@ -1040,7 +1040,7 @@ msgctxt ""
 "par_id3147226\n"
 "help.text"
 msgid "<image id=\"img_id3147571\" src=\"cmd/lc_choosecontrols.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147571\">Icon Choose Controls</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3147571\" src=\"cmd/lc_choosecontrols.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147571\">Значок Выбор элементов управления</alt></image>"
 
 #. DCFsK
 #: 20000000.xhp
@@ -1051,14 +1051,14 @@ msgctxt ""
 msgid "Insert Controls"
 msgstr "Вставить элементы управления"
 
-#. BjneK
+#. 5qZGJ
 #: 20000000.xhp
 msgctxt ""
 "20000000.xhp\n"
 "par_id3157958\n"
 "help.text"
-msgid "In edit mode, double-click a control to open the <link href=\"text/sbasic/shared/01170100.xhp\" name=\"properties dialog\">properties dialog</link>."
-msgstr "В режиме редактирования дважды щёлкните элемент управления, чтобы открыть <link href=\"text/sbasic/shared/01170100.xhp\" name=\"диалоговое окно свойств\">диалоговое окно свойств</link>."
+msgid "In edit mode, double-click a control to open the <link href=\"text/sbasic/shared/01170100.xhp\">properties dialog</link>."
+msgstr "В режиме редактирования дважды щёлкните элемент управления, чтобы открыть <link href=\"text/sbasic/shared/01170100.xhp\">диалоговое окно свойств</link>."
 
 #. eo4TR
 #: 20000000.xhp
@@ -1085,7 +1085,7 @@ msgctxt ""
 "par_id3153824\n"
 "help.text"
 msgid "<image id=\"img_id3157909\" src=\"cmd/sc_insertpushbutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157909\">Icon Button</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3157909\" src=\"cmd/sc_insertpushbutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3157909\">Значок Кнопка</alt></image>"
 
 #. pGofA
 #: 20000000.xhp
@@ -1094,7 +1094,7 @@ msgctxt ""
 "par_id3147530\n"
 "help.text"
 msgid "<ahelp hid=\".uno:InsertPushbutton\">Adds a command button.</ahelp> You can use a command button to execute a command for a defined event, such as a mouse click."
-msgstr "<ahelp hid=\".uno:InsertPushbutton\">Служит для добавления кнопки управления.</ahelp> Кнопку управления можно использовать для выполнения команды для определенного события, например, для щелчка кнопкой мыши."
+msgstr "<ahelp hid=\".uno:InsertPushbutton\">Служит для добавления кнопки управления.</ahelp> Кнопку управления можно использовать для выполнения команды для определённого события, например, для щелчка кнопкой мыши."
 
 #. GZHQC
 #: 20000000.xhp
@@ -1121,7 +1121,7 @@ msgctxt ""
 "par_id3154138\n"
 "help.text"
 msgid "<image id=\"img_id3144760\" src=\"cmd/sc_objectcatalog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3144760\">Icon Image Control</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3144760\" src=\"cmd/sc_objectcatalog.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3144760\">Значок Графический элемент управления</alt></image>"
 
 #. VFc83
 #: 20000000.xhp
@@ -1148,7 +1148,7 @@ msgctxt ""
 "par_id3155131\n"
 "help.text"
 msgid "<image id=\"img_id3150439\" src=\"cmd/sc_checkbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150439\">Icon Check Box</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150439\" src=\"cmd/sc_checkbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150439\">Значок Флажок</alt></image>"
 
 #. QWB7B
 #: 20000000.xhp
@@ -1175,7 +1175,7 @@ msgctxt ""
 "par_id3155856\n"
 "help.text"
 msgid "<image id=\"img_id3146921\" src=\"cmd/sc_radiobutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146921\">Icon Option Button</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3146921\" src=\"cmd/sc_radiobutton.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146921\">Значок Переключатель</alt></image>"
 
 #. FNGHF
 #: 20000000.xhp
@@ -1202,7 +1202,7 @@ msgctxt ""
 "par_id3149300\n"
 "help.text"
 msgid "<image id=\"img_id3153415\" src=\"cmd/sc_insertfixedtext.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153415\">Icon Label Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3153415\" src=\"cmd/sc_insertfixedtext.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153415\">Значок Метка</alt></image>"
 
 #. XA4Aw
 #: 20000000.xhp
@@ -1229,7 +1229,7 @@ msgctxt ""
 "par_id3153766\n"
 "help.text"
 msgid "<image id=\"img_id3148996\" src=\"cmd/sc_edit.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148996\">Icon Text Box</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3148996\" src=\"cmd/sc_edit.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148996\">Значок Текстовое поле</alt></image>"
 
 #. ruGZ2
 #: 20000000.xhp
@@ -1256,7 +1256,7 @@ msgctxt ""
 "par_id3155959\n"
 "help.text"
 msgid "<image id=\"img_id3163808\" src=\"cmd/sc_listbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Icon List Box</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3163808\" src=\"cmd/sc_listbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3163808\">Значок Список</alt></image>"
 
 #. CZ7M5
 #: 20000000.xhp
@@ -1283,7 +1283,7 @@ msgctxt ""
 "par_id3148418\n"
 "help.text"
 msgid "<image id=\"img_id3153200\" src=\"cmd/sc_combobox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153200\">Icon Combo Box</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3153200\" src=\"cmd/sc_combobox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153200\">Значок Поле со списком</alt></image>"
 
 #. Vdn74
 #: 20000000.xhp
@@ -1310,7 +1310,7 @@ msgctxt ""
 "par_id3153781\n"
 "help.text"
 msgid "<image id=\"img_id3149530\" src=\"cmd/sc_hscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149530\">Icon Horizontal Scrollbar</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3149530\" src=\"cmd/sc_hscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149530\">Значок Горизонтальная полоса прокрутки</alt></image>"
 
 #. Vbp2o
 #: 20000000.xhp
@@ -1337,7 +1337,7 @@ msgctxt ""
 "par_id3150515\n"
 "help.text"
 msgid "<image id=\"img_id3150203\" src=\"cmd/sc_vscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150203\">Icon Vertical Scrollbar</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150203\" src=\"cmd/sc_vscrollbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150203\">Значок Вертикальная полоса прокрутки</alt></image>"
 
 #. NmKDo
 #: 20000000.xhp
@@ -1364,7 +1364,7 @@ msgctxt ""
 "par_id3151184\n"
 "help.text"
 msgid "<image id=\"img_id3151335\" src=\"cmd/sc_groupbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151335\">Icon Group Box</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3151335\" src=\"cmd/sc_groupbox.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151335\">Значок Группа</alt></image>"
 
 #. aMgsB
 #: 20000000.xhp
@@ -1400,7 +1400,7 @@ msgctxt ""
 "par_id3159093\n"
 "help.text"
 msgid "<image id=\"img_id3150318\" src=\"cmd/sc_progressbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150318\">Icon Progress Bar</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150318\" src=\"cmd/sc_progressbar.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150318\">Значок Индикатор выполнения</alt></image>"
 
 #. AUUic
 #: 20000000.xhp
@@ -1427,7 +1427,7 @@ msgctxt ""
 "par_id3150888\n"
 "help.text"
 msgid "<image id=\"img_id3152872\" src=\"cmd/sc_hfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152872\">Icon Horizontal Line</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3152872\" src=\"cmd/sc_hfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152872\">Значок Горизонтальная линия</alt></image>"
 
 #. rVrjy
 #: 20000000.xhp
@@ -1454,7 +1454,7 @@ msgctxt ""
 "par_id3154913\n"
 "help.text"
 msgid "<image id=\"img_id3153249\" src=\"cmd/sc_vfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153249\">Icon Vertical Line</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3153249\" src=\"cmd/sc_vfixedline.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3153249\">Значок Вертикальная линия</alt></image>"
 
 #. aQQuM
 #: 20000000.xhp
@@ -1481,7 +1481,7 @@ msgctxt ""
 "par_id3148901\n"
 "help.text"
 msgid "<image id=\"img_id3151010\" src=\"cmd/sc_adddatefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151010\">Icon Date Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3151010\" src=\"cmd/sc_adddatefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3151010\">Значок Поле даты</alt></image>"
 
 #. VU2nc
 #: 20000000.xhp
@@ -1517,7 +1517,7 @@ msgctxt ""
 "par_id3154338\n"
 "help.text"
 msgid "<image id=\"img_id3147077\" src=\"cmd/sc_timefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147077\">Icon Time Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3147077\" src=\"cmd/sc_timefield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147077\">Значок Поле времени</alt></image>"
 
 #. 6fSyF
 #: 20000000.xhp
@@ -1544,7 +1544,7 @@ msgctxt ""
 "par_id3146107\n"
 "help.text"
 msgid "<image id=\"img_id3147499\" src=\"cmd/sc_insertnumericfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147499\">Icon Numeric Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3147499\" src=\"cmd/sc_insertnumericfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147499\">Значок Числовое поле</alt></image>"
 
 #. hMT5t
 #: 20000000.xhp
@@ -1571,7 +1571,7 @@ msgctxt ""
 "par_id3153958\n"
 "help.text"
 msgid "<image id=\"img_id3150435\" src=\"cmd/sc_currencyfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150435\">Icon Currency Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150435\" src=\"cmd/sc_currencyfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150435\">Значок Поле валюты</alt></image>"
 
 #. BeFRH
 #: 20000000.xhp
@@ -1598,7 +1598,7 @@ msgctxt ""
 "par_id3153162\n"
 "help.text"
 msgid "<image id=\"img_id3152807\" src=\"cmd/sc_formattedfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152807\">Icon Formatted Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3152807\" src=\"cmd/sc_formattedfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3152807\">Значок Форматированное поле</alt></image>"
 
 #. QAd5c
 #: 20000000.xhp
@@ -1625,7 +1625,7 @@ msgctxt ""
 "par_id3150379\n"
 "help.text"
 msgid "<image id=\"img_id3150032\" src=\"cmd/sc_insertpatternfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150032\">Icon Pattern Field</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150032\" src=\"cmd/sc_insertpatternfield.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150032\">Значок Поле с маской ввода</alt></image>"
 
 #. AJhaK
 #: 20000000.xhp
@@ -1652,7 +1652,7 @@ msgctxt ""
 "par_id3149194\n"
 "help.text"
 msgid "<image id=\"img_id3149101\" src=\"cmd/sc_filecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149101\">Icon File Selection</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3149101\" src=\"cmd/sc_filecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3149101\">Значок Выбор файла</alt></image>"
 
 #. 9GHDa
 #: 20000000.xhp
@@ -1679,7 +1679,7 @@ msgctxt ""
 "par_id3154903\n"
 "help.text"
 msgid "<image id=\"img_id3150653\" src=\"cmd/sc_drawselect.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150653\">Icon Select</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3150653\" src=\"cmd/sc_drawselect.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3150653\">Значок Выбрать</alt></image>"
 
 #. hAcNy
 #: 20000000.xhp
@@ -1706,16 +1706,16 @@ msgctxt ""
 "par_id3148725\n"
 "help.text"
 msgid "<image id=\"img_id3146874\" src=\"cmd/sc_controlproperties.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146874\">Icon Properties</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3146874\" src=\"cmd/sc_controlproperties.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3146874\">Значок Свойства</alt></image>"
 
-#. pjygv
+#. DToMk
 #: 20000000.xhp
 msgctxt ""
 "20000000.xhp\n"
 "par_id3151105\n"
 "help.text"
-msgid "<ahelp hid=\".uno:ShowPropBrowser\">Opens a dialog where you can edit the <link href=\"text/sbasic/shared/01170100.xhp\" name=\"properties\">properties</link> of the selected control.</ahelp>"
-msgstr "<ahelp hid=\".uno:ShowPropBrowser\">Позволяет открыть диалоговое окно для редактирования <link href=\"text/sbasic/shared/01170100.xhp\" name=\"свойств\">свойств</link> выбранного элемента управления.</ahelp>"
+msgid "<ahelp hid=\".uno:ShowPropBrowser\">Opens a dialog where you can edit the <link href=\"text/sbasic/shared/01170100.xhp\">properties</link> of the selected control.</ahelp>"
+msgstr "<ahelp hid=\".uno:ShowPropBrowser\">Позволяет открыть диалоговое окно для редактирования <link href=\"text/sbasic/shared/01170100.xhp\">свойств</link> выбранного элемента управления.</ahelp>"
 
 #. GqGSX
 #: 20000000.xhp
@@ -1733,7 +1733,7 @@ msgctxt ""
 "par_id3147417\n"
 "help.text"
 msgid "<image id=\"img_id3148883\" src=\"cmd/sc_testmode.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148883\">Icon Activate Test Mode</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3148883\" src=\"cmd/sc_testmode.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3148883\">Значок Активировать тестовый режим</alt></image>"
 
 #. 9gCL9
 #: 20000000.xhp
@@ -1760,7 +1760,7 @@ msgctxt ""
 "par_id2320017\n"
 "help.text"
 msgid "<image id=\"img_id2856837\" src=\"cmd/sc_managelanguage.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2856837\">Manage Language icon</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id2856837\" src=\"cmd/sc_managelanguage.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2856837\">Значок Управление языками</alt></image>"
 
 #. adqA5
 #: 20000000.xhp
@@ -1778,7 +1778,7 @@ msgctxt ""
 "hd_id11902\n"
 "help.text"
 msgid "Tree Control"
-msgstr "Элемент управления \"дерево\""
+msgstr "Дерево (ЭУ)"
 
 #. tiKw8
 #: 20000000.xhp
@@ -1787,7 +1787,7 @@ msgctxt ""
 "par_id7511520\n"
 "help.text"
 msgid "<image id=\"Graphic2\" src=\"cmd/sc_inserttreecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id285634\">Icon Tree Control</alt></image>"
-msgstr ""
+msgstr "<image id=\"Graphic2\" src=\"cmd/sc_inserttreecontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id285634\">Значок Дерево (ЭУ)</alt></image>"
 
 #. xFjgC
 #: 20000000.xhp
@@ -1805,7 +1805,7 @@ msgctxt ""
 "hd_id11904\n"
 "help.text"
 msgid "Table Control"
-msgstr "Таблица"
+msgstr "Таблица (ЭУ)"
 
 #. 4bdNw
 #: 20000000.xhp
@@ -1814,7 +1814,7 @@ msgctxt ""
 "par_id7511524\n"
 "help.text"
 msgid "<image id=\"Graphic3\" src=\"cmd/sc_insertgridcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2867837\">Table control icon</alt></image>"
-msgstr ""
+msgstr "<image id=\"Graphic3\" src=\"cmd/sc_insertgridcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2867837\">Значок Таблица (ЭУ)</alt></image>"
 
 #. XzXwf
 #: 20000000.xhp
@@ -1832,7 +1832,7 @@ msgctxt ""
 "hd_id11905\n"
 "help.text"
 msgid "Hyperlink Control"
-msgstr "Гиперссылка"
+msgstr "Гиперссылка (ЭУ)"
 
 #. CY98t
 #: 20000000.xhp
@@ -1841,7 +1841,7 @@ msgctxt ""
 "par_id7511525\n"
 "help.text"
 msgid "<image id=\"Graphic3\" src=\"cmd/sc_inserthyperlinkcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2896837\">Insert hyperlink control icon</alt></image>"
-msgstr ""
+msgstr "<image id=\"Graphic3\" src=\"cmd/sc_inserthyperlinkcontrol.png\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id2896837\">Значок Вставить гиперссылку (ЭУ)</alt></image>"
 
 #. C2Gjm
 #: 20000000.xhp

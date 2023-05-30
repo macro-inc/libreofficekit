@@ -43,7 +43,6 @@
 #include <cppuhelper/implbase.hxx>
 #include <com/sun/star/frame/TerminationVetoException.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/sdb/DatabaseContext.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/FrameSearchFlag.hpp>
@@ -61,9 +60,10 @@
 
 #include <comphelper/interaction.hxx>
 #include <comphelper/namedvaluecollection.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <connectivity/DriversConfig.hxx>
+#include <utility>
 
 namespace dbaui
 {
@@ -115,15 +115,14 @@ ODbTypeWizDialogSetup::ODbTypeWizDialogSetup(weld::Window* _pParent
     , m_pGeneralPage( nullptr )
     , m_pMySQLIntroPage( nullptr )
     , m_pFinalPage( nullptr )
-    , m_pCollection( nullptr )
 {
     // no local resources needed anymore
     // extract the datasource type collection from the item set
-    const DbuTypeCollectionItem* pCollectionItem = dynamic_cast<const DbuTypeCollectionItem*>( _pItems->GetItem(DSID_TYPECOLLECTION) );
-    if (pCollectionItem)
-        m_pCollection = pCollectionItem->getCollection();
+    const DbuTypeCollectionItem* pCollectionItem = dynamic_cast<const DbuTypeCollectionItem*>(_pItems->GetItem(DSID_TYPECOLLECTION));
+    assert(pCollectionItem && "must exist");
+    m_pCollection = pCollectionItem->getCollection();
 
-    OSL_ENSURE(m_pCollection, "ODbTypeWizDialogSetup::ODbTypeWizDialogSetup : really need a DSN type collection !");
+    assert(m_pCollection && "ODbTypeWizDialogSetup::ODbTypeWizDialogSetup : really need a DSN type collection !");
 
     m_pImpl.reset(new ODbDataSourceAdministrationHelper(_rxORB, m_xAssistant.get(), _pParent, this));
     m_pImpl->setDataSourceOrName(_aDataSourceName);
@@ -154,10 +153,14 @@ ODbTypeWizDialogSetup::ODbTypeWizDialogSetup(weld::Window* _pParent
     aPath.push_back(PAGE_DBSETUPWIZARD_INTRO);
     declarePath( static_cast<PathId>(m_pCollection->size()+1), aPath);
 
+    // Set general help ID for the roadmap
+    SetRoadmapHelpId(HID_DBWIZ_ROADMAP);
+
     m_xPrevPage->set_help_id(HID_DBWIZ_PREVIOUS);
     m_xNextPage->set_help_id(HID_DBWIZ_NEXT);
     m_xCancel->set_help_id(HID_DBWIZ_CANCEL);
     m_xFinish->set_help_id(HID_DBWIZ_FINISH);
+    m_xHelp->set_help_id(HID_DBWIZ_HELP);
     ActivatePage();
     setTitleBase(DBA_RES(STR_DBWIZARDTITLE));
     m_xAssistant->set_current_page(0);
@@ -267,7 +270,7 @@ static void lcl_removeUnused(const ::comphelper::NamedValueCollection& _aOld,con
     }
 }
 
-void DataSourceInfoConverter::convert(const Reference<XComponentContext> & xContext, const ::dbaccess::ODsnTypeCollection* _pCollection,const OUString& _sOldURLPrefix,const OUString& _sNewURLPrefix,const css::uno::Reference< css::beans::XPropertySet >& _xDatasource)
+void DataSourceInfoConverter::convert(const Reference<XComponentContext> & xContext, const ::dbaccess::ODsnTypeCollection* _pCollection, std::u16string_view _sOldURLPrefix, std::u16string_view _sNewURLPrefix,const css::uno::Reference< css::beans::XPropertySet >& _xDatasource)
 {
     if ( _pCollection->getPrefix(_sOldURLPrefix) == _pCollection->getPrefix(_sNewURLPrefix) )
         return ;
@@ -282,7 +285,7 @@ void DataSourceInfoConverter::convert(const Reference<XComponentContext> & xCont
     lcl_removeUnused(aOldProperties,aNewProperties,aDS);
 
     aDS >>= aInfo;
-    _xDatasource->setPropertyValue(PROPERTY_INFO,uno::makeAny(aInfo));
+    _xDatasource->setPropertyValue(PROPERTY_INFO,uno::Any(aInfo));
 }
 
 void ODbTypeWizDialogSetup::activateDatabasePath()
@@ -487,16 +490,16 @@ std::unique_ptr<BuilderPage> ODbTypeWizDialogSetup::createPage(WizardState _nSta
             break;
 
         case PAGE_DBSETUPWIZARD_MYSQL_ODBC:
-            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix("sdbc:mysql:odbc:")));
+            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix(u"sdbc:mysql:odbc:")));
             xPage = OConnectionTabPageSetup::CreateODBCTabPage(pPageContainer, this, *m_pOutSet);
             break;
 
         case PAGE_DBSETUPWIZARD_MYSQL_JDBC:
-            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix("sdbc:mysql:jdbc:")));
+            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix(u"sdbc:mysql:jdbc:")));
             xPage = OGeneralSpecialJDBCConnectionPageSetup::CreateMySQLJDBCTabPage(pPageContainer, this, *m_pOutSet);
             break;
         case PAGE_DBSETUPWIZARD_MYSQL_NATIVE:
-            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix("sdbc:mysql:mysqlc:")));
+            m_pOutSet->Put(SfxStringItem(DSID_CONNECTURL, m_pCollection->getPrefix(u"sdbc:mysql:mysqlc:")));
             xPage = MySQLNativeSetupPage::Create(pPageContainer, this, *m_pOutSet);
             break;
 
@@ -700,7 +703,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
                     aRequest.Code = IOErrorCode_GENERAL;
                 aRequest.Message = e.Message;
                 aRequest.Context = e.Context;
-                lcl_handle( xHandler, makeAny( aRequest ) );
+                lcl_handle( xHandler, Any( aRequest ) );
             }
         }
     }
@@ -739,7 +742,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
             Reference< XPropertySet > xDatasource = m_pImpl->getCurrentDataSource();
             OSL_ENSURE(xDatasource.is(),"DataSource is null!");
             if ( xDatasource.is() )
-                xDatasource->setPropertyValue( PROPERTY_INFO, makeAny( m_pCollection->getDefaultDBSettings( eType ) ) );
+                xDatasource->setPropertyValue( PROPERTY_INFO, Any( m_pCollection->getDefaultDBSettings( eType ) ) );
             m_pImpl->translateProperties(xDatasource,*m_pOutSet);
         }
         else if ( m_pCollection->isFileSystemBased(eType) )
@@ -756,7 +759,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
         m_pImpl->saveChanges(*m_pOutSet);
     }
 
-    void ODbTypeWizDialogSetup::RegisterDataSourceByLocation(const OUString& _sPath)
+    void ODbTypeWizDialogSetup::RegisterDataSourceByLocation(std::u16string_view _sPath)
     {
         Reference< XPropertySet > xDatasource = m_pImpl->getCurrentDataSource();
         Reference< XDatabaseContext > xDatabaseContext( DatabaseContext::create(getORB()) );
@@ -815,7 +818,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
             if (bFolderExists)
             {
                 i++;
-                pURL->setName(OUStringConcatenation(sLastSegmentName + OUString::number(i)));
+                pURL->setName(Concat2View(sLastSegmentName + OUString::number(i)));
             }
         }
     }
@@ -833,7 +836,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
             bElementExists = xSimpleFileAccess->exists( aExistenceCheck.GetMainURL( INetURLObject::DecodeMechanism::NONE ) );
             if ( bElementExists )
             {
-                aExistenceCheck.setBase( OUStringConcatenation(BaseName + OUString::number( i ) ));
+                aExistenceCheck.setBase( Concat2View(BaseName + OUString::number( i ) ));
                 ++i;
             }
         }
@@ -860,7 +863,7 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
             OAsynchronousLink                    m_aAsyncCaller;
 
         public:
-            AsyncLoader( const Reference< XComponentContext >& _rxORB, const OUString& _rURL );
+            AsyncLoader( const Reference< XComponentContext >& _xORB, OUString _aURL );
 
             void doLoadAsync();
 
@@ -874,8 +877,8 @@ bool ODbTypeWizDialogSetup::SaveDatabaseDocument()
             DECL_LINK( OnOpenDocument, void*, void );
         };
 
-        AsyncLoader::AsyncLoader( const Reference< XComponentContext >& _rxORB, const OUString& _rURL )
-            :m_sURL( _rURL )
+        AsyncLoader::AsyncLoader( const Reference< XComponentContext >& _rxORB, OUString _aURL )
+            :m_sURL(std::move( _aURL ))
             ,m_aAsyncCaller( LINK( this, AsyncLoader, OnOpenDocument ) )
         {
             try

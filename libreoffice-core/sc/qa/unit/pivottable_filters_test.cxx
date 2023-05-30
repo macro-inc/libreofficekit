@@ -11,7 +11,6 @@
 
 #include "helper/qahelper.hxx"
 #include "helper/debughelper.hxx"
-#include "helper/xpath.hxx"
 
 #include <patattr.hxx>
 #include <scitems.hxx>
@@ -25,6 +24,9 @@
 #include <dpshttab.hxx>
 #include <globstr.hrc>
 #include <scresid.hxx>
+#include <queryentry.hxx>
+#include <queryparam.hxx>
+#include <rtl/string.hxx>
 
 #include <test/xmltesttools.hxx>
 #include <com/sun/star/sheet/DataPilotFieldOrientation.hpp>
@@ -33,16 +35,13 @@
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
 
-class ScPivotTableFiltersTest : public ScBootstrapFixture, public XmlTestTools
+class ScPivotTableFiltersTest : public ScModelTestBase
 {
 protected:
     virtual void registerNamespaces(xmlXPathContextPtr& pXmlXPathCtx) override;
 
 public:
     ScPivotTableFiltersTest();
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
 
     // Import
     void testPivotTableBasicODS();
@@ -85,6 +84,7 @@ public:
     void testPivotTableDuplicatedMemberFilterXLSX();
     void testPivotTableTabularModeXLSX();
     void testPivotTableDuplicateFields();
+    void testPivotTableCompactLayoutXLSX();
     void testTdf112106();
     void testTdf123923();
     void testTdf123939();
@@ -96,6 +96,7 @@ public:
     void testTdf125046();
     void testTdf125055();
     void testTdf125086();
+    void testTdf73845();
 
     CPPUNIT_TEST_SUITE(ScPivotTableFiltersTest);
 
@@ -138,6 +139,7 @@ public:
     CPPUNIT_TEST(testPivotTableDuplicatedMemberFilterXLSX);
     CPPUNIT_TEST(testPivotTableTabularModeXLSX);
     CPPUNIT_TEST(testPivotTableDuplicateFields);
+    CPPUNIT_TEST(testPivotTableCompactLayoutXLSX);
     CPPUNIT_TEST(testTdf112106);
     CPPUNIT_TEST(testTdf123923);
     CPPUNIT_TEST(testTdf123939);
@@ -149,33 +151,14 @@ public:
     CPPUNIT_TEST(testTdf125046);
     CPPUNIT_TEST(testTdf125055);
     CPPUNIT_TEST(testTdf125086);
+    CPPUNIT_TEST(testTdf73845);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<uno::XInterface> m_xCalcComponent;
 };
 
 ScPivotTableFiltersTest::ScPivotTableFiltersTest()
-    : ScBootstrapFixture("sc/qa/unit/data")
+    : ScModelTestBase("sc/qa/unit/data")
 {
-}
-
-void ScPivotTableFiltersTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    // This is a bit of a fudge, we do this to ensure that ScGlobals::ensure,
-    // which is a private symbol to us, gets called
-    m_xCalcComponent
-        = getMultiServiceFactory()->createInstance("com.sun.star.comp.Calc.SpreadsheetDocument");
-    CPPUNIT_ASSERT_MESSAGE("no calc component!", m_xCalcComponent.is());
-}
-
-void ScPivotTableFiltersTest::tearDown()
-{
-    uno::Reference<lang::XComponent>(m_xCalcComponent, UNO_QUERY_THROW)->dispose();
-    test::BootstrapFixture::tearDown();
 }
 
 void ScPivotTableFiltersTest::registerNamespaces(xmlXPathContextPtr& pXmlXPathCtx)
@@ -206,14 +189,13 @@ bool hasDimension(const std::vector<const ScDPSaveDimension*>& rDims, const OUSt
 
 void ScPivotTableFiltersTest::testPivotTableBasicODS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table-basic.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load pivot-table-basic.ods", xDocSh.is());
+    createScDoc("ods/pivot-table-basic.ods");
 
-    ScDocument& rDoc = xDocSh->GetDocument();
+    ScDocument* pDoc = getScDoc();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be exactly two sheets.", sal_Int16(2),
-                                 rDoc.GetTableCount());
+                                 pDoc->GetTableCount());
 
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_MESSAGE("Failed to get a live ScDPCollection instance.", pDPs);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be exactly one pivot table instance.", size_t(1),
                                  pDPs->GetCount());
@@ -259,18 +241,15 @@ void ScPivotTableFiltersTest::testPivotTableBasicODS()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Function for the data field should be COUNT.",
                                  sal_uInt16(ScGeneralFunction::COUNT),
                                  sal_uInt16(pDim->GetFunction()));
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableNamedRangeSourceODS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table-named-range-source.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load pivot-table-named-range-source.ods", xDocSh.is());
+    createScDoc("ods/pivot-table-named-range-source.ods");
 
-    ScDocument& rDoc = xDocSh->GetDocument();
+    ScDocument* pDoc = getScDoc();
 
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(size_t(1), pDPs->GetCount());
 
     ScDPObject* pDP = &(*pDPs)[0];
@@ -286,8 +265,6 @@ void ScPivotTableFiltersTest::testPivotTableNamedRangeSourceODS()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Failed to detect header dimension.", tools::Long(0), nDim);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("This dimension should be a page dimension.",
                                  sheet::DataPilotFieldOrientation_PAGE, nOrient);
-
-    xDocSh->DoClose();
 }
 
 namespace
@@ -319,13 +296,12 @@ bool checkVisiblePageFieldMember(const ScDPSaveDimension::MemberList& rMembers,
 
 void ScPivotTableFiltersTest::testPivotTableSharedCacheGroupODS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table-shared-cache-with-group.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("ods/pivot-table-shared-cache-with-group.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Make sure that page field's visibility settings are loaded correctly.
 
-    ScDPObject* pDPObj = rDoc.GetDPAtCursor(0, 0, 1); // A1 on 2nd sheet
+    ScDPObject* pDPObj = pDoc->GetDPAtCursor(0, 0, 1); // A1 on 2nd sheet
     CPPUNIT_ASSERT_MESSAGE("There should be a pivot table here.", pDPObj);
     ScDPSaveData* pSaveData = pDPObj->GetSaveData();
     CPPUNIT_ASSERT_MESSAGE("Save data is expected.", pSaveData);
@@ -336,7 +312,7 @@ void ScPivotTableFiltersTest::testPivotTableSharedCacheGroupODS()
     CPPUNIT_ASSERT_MESSAGE("Incorrect member visibility.",
                            checkVisiblePageFieldMember(*pMembers, u"APL-01-1"));
 
-    pDPObj = rDoc.GetDPAtCursor(0, 1, 2); // A2 on 3rd sheet
+    pDPObj = pDoc->GetDPAtCursor(0, 1, 2); // A2 on 3rd sheet
     CPPUNIT_ASSERT_MESSAGE("There should be a pivot table here.", pDPObj);
     pSaveData = pDPObj->GetSaveData();
     CPPUNIT_ASSERT_MESSAGE("Save data is expected.", pSaveData);
@@ -349,7 +325,7 @@ void ScPivotTableFiltersTest::testPivotTableSharedCacheGroupODS()
 
     // These two pivot tables share the same data range. We should only have
     // one pivot cache.
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     ScDPCollection::SheetCaches& rSheetCaches = pDPs->GetSheetCaches();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rSheetCaches.size());
 
@@ -448,54 +424,48 @@ void ScPivotTableFiltersTest::testPivotTableSharedCacheGroupODS()
 
     CPPUNIT_ASSERT_MESSAGE("Pivot cache doesn't have an additional year group.", bHasYears);
     CPPUNIT_ASSERT_MESSAGE("Pivot cache doesn't have an additional month group.", bHasMonths);
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testGetPivotDataXLS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-getpivotdata.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    rDoc.CalcAll();
+    createScDoc("xls/pivot-getpivotdata.xls");
+    ScDocument* pDoc = getScDoc();
+    pDoc->CalcAll();
 
     // Check GETPIVOTDATA results in E3:E20. Expected results are given in
     // F3:F20.
 
     for (SCROW nRow = 2; nRow <= 19; ++nRow)
-        CPPUNIT_ASSERT_EQUAL(rDoc.GetValue(ScAddress(4, nRow, 1)),
-                             rDoc.GetValue(ScAddress(5, nRow, 1)));
-
-    xDocSh->DoClose();
+        CPPUNIT_ASSERT_EQUAL(pDoc->GetValue(ScAddress(4, nRow, 1)),
+                             pDoc->GetValue(ScAddress(5, nRow, 1)));
 }
 
 void ScPivotTableFiltersTest::testPivotTableSharedGroupXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/shared-group-field.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("xlsx/pivot-table/shared-group-field.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     // Check whether right group names are imported for both tables
     // First table
-    CPPUNIT_ASSERT_EQUAL(OUString("a2"), rDoc.GetString(ScAddress(0, 1, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport1"), rDoc.GetString(ScAddress(0, 2, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport2"), rDoc.GetString(ScAddress(0, 3, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport3"), rDoc.GetString(ScAddress(0, 4, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("16"), rDoc.GetString(ScAddress(0, 5, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("17"), rDoc.GetString(ScAddress(0, 6, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("18"), rDoc.GetString(ScAddress(0, 7, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a2"), pDoc->GetString(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport1"), pDoc->GetString(ScAddress(0, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport2"), pDoc->GetString(ScAddress(0, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport3"), pDoc->GetString(ScAddress(0, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("16"), pDoc->GetString(ScAddress(0, 5, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("17"), pDoc->GetString(ScAddress(0, 6, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("18"), pDoc->GetString(ScAddress(0, 7, 0)));
 
     // Second table
-    CPPUNIT_ASSERT_EQUAL(OUString("a2"), rDoc.GetString(ScAddress(0, 11, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport1"), rDoc.GetString(ScAddress(0, 12, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport2"), rDoc.GetString(ScAddress(0, 13, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("Csoport3"), rDoc.GetString(ScAddress(0, 14, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("16"), rDoc.GetString(ScAddress(0, 15, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("17"), rDoc.GetString(ScAddress(0, 16, 0)));
-    CPPUNIT_ASSERT_EQUAL(OUString("18"), rDoc.GetString(ScAddress(0, 17, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a2"), pDoc->GetString(ScAddress(0, 11, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport1"), pDoc->GetString(ScAddress(0, 12, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport2"), pDoc->GetString(ScAddress(0, 13, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("Csoport3"), pDoc->GetString(ScAddress(0, 14, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("16"), pDoc->GetString(ScAddress(0, 15, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("17"), pDoc->GetString(ScAddress(0, 16, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("18"), pDoc->GetString(ScAddress(0, 17, 0)));
 
     // There should be exactly 2 pivot tables and 1 cache.
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     ScDPCollection::SheetCaches& rSheetCaches = pDPs->GetSheetCaches();
@@ -505,16 +475,11 @@ void ScPivotTableFiltersTest::testPivotTableSharedGroupXLSX()
     CPPUNIT_ASSERT_MESSAGE("Pivot cache is expected for A1:N19 on the second sheet.", pCache);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(14), pCache->GetFieldCount());
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pCache->GetGroupFieldCount());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableSharedDateGroupXLSX()
 {
-    auto testThis = [](ScDocShellRef& xDocSh) {
-        CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-        ScDocument& rDoc = xDocSh->GetDocument();
-
+    auto testThis = [](ScDocument& rDoc) {
         // Check whether right date labels are imported for both tables
         // First table
         CPPUNIT_ASSERT_EQUAL(OUString("a"), rDoc.GetString(ScAddress(0, 3, 1)));
@@ -545,43 +510,34 @@ void ScPivotTableFiltersTest::testPivotTableSharedDateGroupXLSX()
         CPPUNIT_ASSERT_MESSAGE("Pivot cache is expected for A1:J25 on the first sheet.", pCache);
         CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(10), pCache->GetFieldCount());
     };
-    ScDocShellRef xDocSh1 = loadDoc(u"pivot-table/shared-dategroup.", FORMAT_XLSX);
-    testThis(xDocSh1);
+    createScDoc("xlsx/pivot-table/shared-dategroup.xlsx");
+    testThis(*getScDoc());
     // Now test round-trip of group fields
-    ScDocShellRef xDocSh2 = saveAndReload(*xDocSh1, FORMAT_XLSX);
-    testThis(xDocSh2);
-    xDocSh2->DoClose();
-    xDocSh1->DoClose();
+    saveAndReload("Calc Office Open XML");
+    testThis(*getScDoc());
 }
 
 void ScPivotTableFiltersTest::testPivotTableSharedNestedDateGroupXLSX()
 {
-    auto testThis = [](ScDocShellRef& xDocSh) {
-        CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-        ScDocument& rDoc = xDocSh->GetDocument();
-
+    auto testThis = [](ScDocument& rDoc) {
         // Check whether right date groups are imported for both tables
         // First table
-        CPPUNIT_ASSERT_EQUAL(OUString("Years"), rDoc.GetString(ScAddress(0, 3, 1)));
+        // Years, Quarters, 'a' have compact layout so the only header contains a multi-field filter.
         CPPUNIT_ASSERT_EQUAL(OUString("1965"), rDoc.GetString(ScAddress(0, 4, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("1989"), rDoc.GetString(ScAddress(0, 11, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("2000"), rDoc.GetString(ScAddress(0, 18, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("2004"), rDoc.GetString(ScAddress(0, 21, 1)));
         // TODO: check why this fails with the empty string
         //CPPUNIT_ASSERT_EQUAL(OUString("2007"), rDoc.GetString(ScAddress(0,32,1)));
-        CPPUNIT_ASSERT_EQUAL(OUString("Quarters"), rDoc.GetString(ScAddress(1, 3, 1)));
-        CPPUNIT_ASSERT_EQUAL(OUString("a"), rDoc.GetString(ScAddress(2, 3, 1)));
 
         // Second table
-        CPPUNIT_ASSERT_EQUAL(OUString("Years"), rDoc.GetString(ScAddress(6, 3, 1)));
+        // Years, Quarters, 'a' have compact layout so the only row header contains a multi-field filter.
         CPPUNIT_ASSERT_EQUAL(OUString("1965"), rDoc.GetString(ScAddress(6, 4, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("1989"), rDoc.GetString(ScAddress(6, 11, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("2000"), rDoc.GetString(ScAddress(6, 18, 1)));
         CPPUNIT_ASSERT_EQUAL(OUString("2004"), rDoc.GetString(ScAddress(6, 21, 1)));
         // TODO: check why this fails with the empty string
         //CPPUNIT_ASSERT_EQUAL(OUString("2007"), rDoc.GetString(ScAddress(6,31,1)));
-        CPPUNIT_ASSERT_EQUAL(OUString("Quarters"), rDoc.GetString(ScAddress(7, 3, 1)));
-        CPPUNIT_ASSERT_EQUAL(OUString("a"), rDoc.GetString(ScAddress(8, 3, 1)));
 
         // There should be exactly 2 pivot tables and 1 cache.
         ScDPCollection* pDPs = rDoc.GetDPCollection();
@@ -597,40 +553,37 @@ void ScPivotTableFiltersTest::testPivotTableSharedNestedDateGroupXLSX()
         CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pCache->GetGroupFieldCount());
     };
 
-    ScDocShellRef xDocSh1 = loadDoc(u"pivot-table/shared-nested-dategroup.", FORMAT_XLSX);
-    testThis(xDocSh1);
+    createScDoc("xlsx/pivot-table/shared-nested-dategroup.xlsx");
+    testThis(*getScDoc());
     // Now test round-trip of group fields
-    ScDocShellRef xDocSh2 = saveAndReload(*xDocSh1, FORMAT_XLSX);
-    testThis(xDocSh2);
-    xDocSh2->DoClose();
-    xDocSh1->DoClose();
+    saveAndReload("Calc Office Open XML");
+    testThis(*getScDoc());
 }
 
 void ScPivotTableFiltersTest::testPivotTableSharedNumGroupXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/shared-numgroup.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("xlsx/pivot-table/shared-numgroup.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     // Check whether right number groups are imported for both tables
     // First table
-    CPPUNIT_ASSERT_EQUAL(OUString("f"), rDoc.GetString(ScAddress(0, 3, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("32674-47673"), rDoc.GetString(ScAddress(0, 4, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("47674-62673"), rDoc.GetString(ScAddress(0, 5, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("62674-77673"), rDoc.GetString(ScAddress(0, 6, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("77674-92673"), rDoc.GetString(ScAddress(0, 7, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("92674-107673"), rDoc.GetString(ScAddress(0, 8, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("f"), pDoc->GetString(ScAddress(0, 3, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("32674-47673"), pDoc->GetString(ScAddress(0, 4, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("47674-62673"), pDoc->GetString(ScAddress(0, 5, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("62674-77673"), pDoc->GetString(ScAddress(0, 6, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("77674-92673"), pDoc->GetString(ScAddress(0, 7, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("92674-107673"), pDoc->GetString(ScAddress(0, 8, 1)));
 
     // Second table
-    CPPUNIT_ASSERT_EQUAL(OUString("f"), rDoc.GetString(ScAddress(5, 3, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("32674-47673"), rDoc.GetString(ScAddress(5, 4, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("47674-62673"), rDoc.GetString(ScAddress(5, 5, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("62674-77673"), rDoc.GetString(ScAddress(5, 6, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("77674-92673"), rDoc.GetString(ScAddress(5, 7, 1)));
-    CPPUNIT_ASSERT_EQUAL(OUString("92674-107673"), rDoc.GetString(ScAddress(5, 8, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("f"), pDoc->GetString(ScAddress(5, 3, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("32674-47673"), pDoc->GetString(ScAddress(5, 4, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("47674-62673"), pDoc->GetString(ScAddress(5, 5, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("62674-77673"), pDoc->GetString(ScAddress(5, 6, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("77674-92673"), pDoc->GetString(ScAddress(5, 7, 1)));
+    CPPUNIT_ASSERT_EQUAL(OUString("92674-107673"), pDoc->GetString(ScAddress(5, 8, 1)));
 
     // There should be exactly 2 pivot tables and 1 cache.
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     ScDPCollection::SheetCaches& rSheetCaches = pDPs->GetSheetCaches();
@@ -639,24 +592,21 @@ void ScPivotTableFiltersTest::testPivotTableSharedNumGroupXLSX()
     const ScDPCache* pCache = rSheetCaches.getExistingCache(ScRange(0, 0, 0, 9, 24, 0));
     CPPUNIT_ASSERT_MESSAGE("Pivot cache is expected for A1:J25 on the first sheet.", pCache);
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(10), pCache->GetFieldCount());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableNoColumnsLayout()
 {
     // tdf#113268 - Pivot table: Missing popup button after opening a pivot table from ODS
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_no_columns_layout.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("ods/pivottable_no_columns_layout.ods");
+    ScDocument* pDoc = getScDoc();
 
     // There should be exactly 2 pivot tables
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     // Check first pivot table's popup button (headerlayout flag)
     {
-        const ScPatternAttr* pPattern = rDoc.GetPattern(0, 1, 1);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(0, 1, 1);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
@@ -664,23 +614,20 @@ void ScPivotTableFiltersTest::testPivotTableNoColumnsLayout()
 
     // Check second pivot table's popup button
     {
-        const ScPatternAttr* pPattern = rDoc.GetPattern(3, 0, 1);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(3, 0, 1);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testTdf112501()
 {
-    ScDocShellRef xDocSh = loadDoc(u"tdf112501.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("xls/tdf112501.xls");
+    ScDocument* pDoc = getScDoc();
 
     // There should be exactly 2 pivot tables
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     // Check first pivot table popup buttons (compact)
@@ -690,21 +637,21 @@ void ScPivotTableFiltersTest::testTdf112501()
         // Check whether we have the buttons at the right buttons
         // Row button
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(0, 3, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(0, 3, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
         }
         // Column button
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(1, 2, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(1, 2, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
         }
         // Check also C3 to make sure column button is not placed there
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(2, 2, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(2, 2, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(!(rMergeFlag.GetValue() & ScMF::ButtonPopup));
@@ -718,39 +665,35 @@ void ScPivotTableFiltersTest::testTdf112501()
         // Check whether we have the buttons at the right buttons
         // Two row buttons
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(7, 3, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(7, 3, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
         }
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(8, 3, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(8, 3, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
         }
         // Column button
         {
-            const ScPatternAttr* pPattern = rDoc.GetPattern(9, 2, 0);
+            const ScPatternAttr* pPattern = pDoc->GetPattern(9, 2, 0);
             const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
             const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
             CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
         }
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableExportXLSX()
 {
     // tdf#89139: pivot table definition needs to list items, including hidden
 
-    ScDocShellRef xShell = loadDoc(u"tdf89139_pivot_table.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/tdf89139_pivot_table.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[3]/x:items", "count",
@@ -758,18 +701,14 @@ void ScPivotTableFiltersTest::testPivotTableExportXLSX()
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[3]/x:items/x:item", 4);
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[3]/x:items/x:item[3]",
                 "h", "1");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableExportXLSXSingleDataField()
 {
-    ScDocShellRef xShell = loadDoc(u"tdf123421_1datafield.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("ods/tdf123421_1datafield.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable, "/x:pivotTableDefinition/x:location", "ref", "A3:B6");
@@ -781,18 +720,14 @@ void ScPivotTableFiltersTest::testPivotTableExportXLSXSingleDataField()
     // There should not be any colFields tag, before the fix there used to be a singleton with
     // <field x="-2"/> as child node.
     assertXPath(pTable, "/x:pivotTableDefinition/x:colFields", 0);
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableExportXLSXMultipleDataFields()
 {
-    ScDocShellRef xShell = loadDoc(u"tdf123421_2datafields.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("ods/tdf123421_2datafields.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable, "/x:pivotTableDefinition/x:location", "ref", "A1:C6");
@@ -808,8 +743,6 @@ void ScPivotTableFiltersTest::testPivotTableExportXLSXMultipleDataFields()
     assertXPath(pTable, "/x:pivotTableDefinition/x:colFields", "count", "1");
     assertXPath(pTable, "/x:pivotTableDefinition/x:colFields/x:field", 1);
     assertXPath(pTable, "/x:pivotTableDefinition/x:colFields/x:field", "x", "-2");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotCacheExportXLSX()
@@ -821,12 +754,10 @@ void ScPivotTableFiltersTest::testPivotCacheExportXLSX()
     // This test case ensures, that such values are properly set according to documentation:
     // https://technet.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.shareditems.aspx
 
-    ScDocShellRef xShell = loadDoc(u"pivot-table/with-strings-integers-and-dates.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/pivot-table/with-strings-integers-and-dates.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pCacheDef = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                                         "xl/pivotCache/pivotCacheDefinition1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pCacheDef = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pCacheDef);
 
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField", 6);
@@ -1001,11 +932,10 @@ void ScPivotTableFiltersTest::testPivotCacheExportXLSX()
                 "containsDate", "1");
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[5]/x:sharedItems",
                 "containsString", "0");
-    //TODO: date generator in tests are one day higher, than during standard xlsx export. It should be: minDate="1899-12-31T00:00:00" maxDate="2009-07-06T10:53:02"
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[5]/x:sharedItems",
-                "minDate", "1900-01-01T00:00:00");
+                "minDate", "1899-12-31T00:00:00");
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[5]/x:sharedItems",
-                "maxDate", "2009-07-07T10:53:02");
+                "maxDate", "2009-07-06T10:53:02");
     assertXPathNoAttribute(pCacheDef,
                            "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[5]/x:sharedItems",
                            "containsNumber");
@@ -1059,8 +989,6 @@ void ScPivotTableFiltersTest::testPivotCacheExportXLSX()
                            "maxValue");
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[6]/x:sharedItems",
                 "count", "1");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableXLSX()
@@ -1183,24 +1111,19 @@ void ScPivotTableFiltersTest::testPivotTableXLSX()
 
     } aTest;
 
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/many-fields-in-cache.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
-    ScDocument* pDoc = &xDocSh->GetDocument();
+    createScDoc("xlsx/pivot-table/many-fields-in-cache.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     // Initial check.
     bool bCheck = aTest.check(*pDoc);
     CPPUNIT_ASSERT_MESSAGE("Initial check failed.", bCheck);
 
-    ScDocShellRef xDocSh2 = saveAndReload(*xDocSh, FORMAT_XLSX);
-    xDocSh->DoClose();
-    CPPUNIT_ASSERT(xDocSh2.is());
-    pDoc = &xDocSh2->GetDocument();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
 
     // Reload check.
     bCheck = aTest.check(*pDoc);
     CPPUNIT_ASSERT_MESSAGE("Reload check failed.", bCheck);
-
-    xDocSh2->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableTwoDataFieldsXLSX()
@@ -1307,42 +1230,35 @@ void ScPivotTableFiltersTest::testPivotTableTwoDataFieldsXLSX()
 
     } aTest;
 
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/two-data-fields.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
-    ScDocument* pDoc = &xDocSh->GetDocument();
+    createScDoc("xlsx/pivot-table/two-data-fields.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     // Initial check.
     bool bCheck = aTest.check(*pDoc);
     CPPUNIT_ASSERT_MESSAGE("Initial check failed.", bCheck);
 
-    ScDocShellRef xDocSh2 = saveAndReload(*xDocSh, FORMAT_XLSX);
-    xDocSh->DoClose();
-    CPPUNIT_ASSERT(xDocSh2.is());
-    pDoc = &xDocSh2->GetDocument();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
 
     // Reload check.
     bCheck = aTest.check(*pDoc);
     CPPUNIT_ASSERT_MESSAGE("Reload check failed.", bCheck);
-
-    xDocSh2->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableMedianODS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table-median.", FORMAT_ODS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load test document.", xDocSh.is());
+    createScDoc("ods/pivot-table-median.ods");
 
     // Export the document and import again for a check
-    ScDocShellRef xDocSh2 = saveAndReload(*xDocSh, FORMAT_ODS);
-    xDocSh->DoClose();
+    saveAndReload("calc8");
 
     // Check sheet
-    ScDocument& rDoc = xDocSh2->GetDocument();
+    ScDocument* pDoc = getScDoc();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be exactly one sheet.", sal_Int16(1),
-                                 rDoc.GetTableCount());
+                                 pDoc->GetTableCount());
 
     // Check pivot table
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_MESSAGE("Failed to get a live ScDPCollection instance.", pDPs);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be one pivot table instance.", size_t(1),
                                  pDPs->GetCount());
@@ -1361,18 +1277,15 @@ void ScPivotTableFiltersTest::testPivotTableMedianODS()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Function for the data field should be MEDIAN.",
                                  sal_uInt16(ScGeneralFunction::MEDIAN),
                                  sal_uInt16(pDim->GetFunction()));
-
-    xDocSh2->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableRowHeaderXLS()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot_row_header.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
+    createScDoc("xls/pivot_row_header.xls");
+    ScDocument* pDoc = getScDoc();
 
     // There should be exactly 2 pivot tables
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     // First table has extra row header
@@ -1381,7 +1294,7 @@ void ScPivotTableFiltersTest::testPivotTableRowHeaderXLS()
         CPPUNIT_ASSERT_MESSAGE("Failed to get a pivot table object.", pDPObj);
         CPPUNIT_ASSERT(pDPObj->GetHeaderLayout());
         // Check whether the row header has the right popupbutton flag
-        const ScPatternAttr* pPattern = rDoc.GetPattern(3, 3, 0);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(3, 3, 0);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
@@ -1393,19 +1306,18 @@ void ScPivotTableFiltersTest::testPivotTableRowHeaderXLS()
         CPPUNIT_ASSERT_MESSAGE("Failed to get a pivot table object.", pDPObj);
         CPPUNIT_ASSERT(!pDPObj->GetHeaderLayout());
         // Check whether the row header has the right popupbutton flag
-        const ScPatternAttr* pPattern = rDoc.GetPattern(0, 2, 0);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(0, 2, 0);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
     }
 
     // Check also after a reload
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
 
     // There should be exactly 2 pivot tables
-    pDPs = rLoadedDoc.GetDPCollection();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), pDPs->GetCount());
 
     // First table has extra row header
@@ -1414,7 +1326,7 @@ void ScPivotTableFiltersTest::testPivotTableRowHeaderXLS()
         CPPUNIT_ASSERT_MESSAGE("Failed to get a pivot table object.", pDPObj);
         CPPUNIT_ASSERT(pDPObj->GetHeaderLayout());
         // Check whether the row header has the right popupbutton flag
-        const ScPatternAttr* pPattern = rLoadedDoc.GetPattern(3, 3, 0);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(3, 3, 0);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
@@ -1426,28 +1338,24 @@ void ScPivotTableFiltersTest::testPivotTableRowHeaderXLS()
         CPPUNIT_ASSERT_MESSAGE("Failed to get a pivot table object.", pDPObj);
         CPPUNIT_ASSERT(!pDPObj->GetHeaderLayout());
         // Check whether the row header has the right popupbutton flag
-        const ScPatternAttr* pPattern = rLoadedDoc.GetPattern(0, 2, 0);
+        const ScPatternAttr* pPattern = pDoc->GetPattern(0, 2, 0);
         const SfxPoolItem& rPoolItem = pPattern->GetItem(ATTR_MERGE_FLAG);
         const ScMergeFlagAttr& rMergeFlag = static_cast<const ScMergeFlagAttr&>(rPoolItem);
         CPPUNIT_ASSERT(rMergeFlag.GetValue() & ScMF::ButtonPopup);
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDoubleFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_double_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_double_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), pDPs->GetCount());
 
     // Field with general formatting
@@ -1533,23 +1441,19 @@ void ScPivotTableFiltersTest::testPivotTableDoubleFieldFilter()
         CPPUNIT_ASSERT(pMember->HasIsVisible());
         CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableStringFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_string_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_string_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     const ScDPObject* pDPObj = &(*pDPs)[0];
@@ -1569,23 +1473,19 @@ void ScPivotTableFiltersTest::testPivotTableStringFieldFilter()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDateFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_date_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_date_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -1660,23 +1560,19 @@ void ScPivotTableFiltersTest::testPivotTableDateFieldFilter()
         CPPUNIT_ASSERT(pMember->HasIsVisible());
         CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableBoolFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_bool_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_bool_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -1696,23 +1592,19 @@ void ScPivotTableFiltersTest::testPivotTableBoolFieldFilter()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableRowColPageFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_rowcolpage_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_rowcolpage_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -1806,23 +1698,19 @@ void ScPivotTableFiltersTest::testPivotTableRowColPageFieldFilter()
         CPPUNIT_ASSERT(pMember->HasIsVisible());
         CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableEmptyItem()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_empty_item.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_empty_item.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -1846,23 +1734,19 @@ void ScPivotTableFiltersTest::testPivotTableEmptyItem()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(!pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTablePageFieldFilter()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_page_field_filter.", FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xls/pivottable_page_field_filter.xls");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -1951,47 +1835,39 @@ void ScPivotTableFiltersTest::testPivotTablePageFieldFilter()
         CPPUNIT_ASSERT(pMember->HasIsVisible());
         CPPUNIT_ASSERT(!pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableFirstHeaderRowXLSX()
 {
     // tdf#112733: We have different tables here, but have the same value as firstHeaderRow
     // The documentation is not clear about what firstHeaderRow actually means, but MS Excel works on this way
-    ScDocShellRef xShell = loadDoc(u"pivot_table_first_header_row.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/pivot_table_first_header_row.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
     assertXPath(pTable, "/x:pivotTableDefinition/x:location", "firstHeaderRow", "1");
 
-    pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable2.xml");
+    pTable = parseExport("xl/pivotTables/pivotTable2.xml");
     CPPUNIT_ASSERT(pTable);
     assertXPath(pTable, "/x:pivotTableDefinition/x:location", "firstHeaderRow", "1");
 
-    pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable3.xml");
+    pTable = parseExport("xl/pivotTables/pivotTable3.xml");
     CPPUNIT_ASSERT(pTable);
     assertXPath(pTable, "/x:pivotTableDefinition/x:location", "firstHeaderRow", "1");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDoubleFieldFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_double_field_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_double_field_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(3), pDPs->GetCount());
 
     // Field with general formatting
@@ -2077,23 +1953,19 @@ void ScPivotTableFiltersTest::testPivotTableDoubleFieldFilterXLSX()
         CPPUNIT_ASSERT(pMember->HasIsVisible());
         CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableStringFieldFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_string_field_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_string_field_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     const ScDPObject* pDPObj = &(*pDPs)[0];
@@ -2113,23 +1985,19 @@ void ScPivotTableFiltersTest::testPivotTableStringFieldFilterXLSX()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDateFieldFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_date_field_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_date_field_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2151,7 +2019,7 @@ void ScPivotTableFiltersTest::testPivotTableDateFieldFilterXLSX()
         pMember = *aIter; // "2016. január 8."
         CPPUNIT_ASSERT(pMember);
         CPPUNIT_ASSERT(pMember->HasIsVisible());
-        CPPUNIT_ASSERT(!pMember->GetIsVisible());
+        CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
 
     {
@@ -2169,7 +2037,7 @@ void ScPivotTableFiltersTest::testPivotTableDateFieldFilterXLSX()
         pMember = *aIter; // "2016-01-08"
         CPPUNIT_ASSERT(pMember);
         CPPUNIT_ASSERT(pMember->HasIsVisible());
-        CPPUNIT_ASSERT(!pMember->GetIsVisible());
+        CPPUNIT_ASSERT(pMember->GetIsVisible());
     }
 
     {
@@ -2182,31 +2050,27 @@ void ScPivotTableFiltersTest::testPivotTableDateFieldFilterXLSX()
         ScDPSaveMember* pMember = *aIter; // "2016. 1. 7. 0:00"
         CPPUNIT_ASSERT(pMember);
         CPPUNIT_ASSERT(pMember->HasIsVisible());
-        CPPUNIT_ASSERT(!pMember->GetIsVisible());
+        CPPUNIT_ASSERT(pMember->GetIsVisible());
         ++aIter;
         pMember = *aIter; // "2016. 1. 8. 0:00"
         CPPUNIT_ASSERT(pMember);
         CPPUNIT_ASSERT(pMember->HasIsVisible());
-        CPPUNIT_ASSERT(pMember->GetIsVisible());
+        CPPUNIT_ASSERT(!pMember->GetIsVisible());
     }
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableBoolFieldFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_bool_field_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_bool_field_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
-    CPPUNIT_ASSERT_EQUAL(OUString("TRUE"), rDoc.GetString(ScAddress(0, 1, 0))); //A2
+    CPPUNIT_ASSERT_EQUAL(OUString("TRUE"), pDoc->GetString(ScAddress(0, 1, 0))); //A2
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2226,23 +2090,19 @@ void ScPivotTableFiltersTest::testPivotTableBoolFieldFilterXLSX()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableRowColPageFieldFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_rowcolpage_field_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_rowcolpage_field_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check filtering of row dimensions
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2334,23 +2194,19 @@ void ScPivotTableFiltersTest::testPivotTableRowColPageFieldFilterXLSX()
         CPPUNIT_ASSERT(pMember);
         CPPUNIT_ASSERT(pMember->HasIsVisible() && pMember->GetIsVisible());
     }*/
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableErrorItemFilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_error_item_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/pivottable_error_item_filter.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check whether filtering is preserved
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2365,16 +2221,13 @@ void ScPivotTableFiltersTest::testPivotTableErrorItemFilterXLSX()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(!pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableErrorItemFilterXLSB()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_error_item_filter.", FORMAT_XLSB);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsb/pivottable_error_item_filter.xlsb");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2389,23 +2242,19 @@ void ScPivotTableFiltersTest::testPivotTableErrorItemFilterXLSB()
     CPPUNIT_ASSERT(pMember);
     CPPUNIT_ASSERT(pMember->HasIsVisible());
     CPPUNIT_ASSERT(!pMember->GetIsVisible());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableErrorItem2FilterXLSX()
 {
-    ScDocShellRef xDocSh = loadDoc(u"tdf122471.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/tdf122471.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check whether filtering is preserved
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2417,18 +2266,14 @@ void ScPivotTableFiltersTest::testPivotTableErrorItem2FilterXLSX()
     const ScDPSaveDimension::MemberList& rMembers = pSaveDim->GetMembers();
     // prior to the patch, columns were missing due to an exception dropping the column data
     CPPUNIT_ASSERT_EQUAL(size_t(21), rMembers.size());
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableOutlineModeXLSX()
 {
-    ScDocShellRef xShell = loadDoc(u"pivottable_outline_mode.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/pivottable_outline_mode.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     // Next to the outline flags, compact flags also should be set (true is the default)
@@ -2437,18 +2282,14 @@ void ScPivotTableFiltersTest::testPivotTableOutlineModeXLSX()
     assertXPath(pTable, "/x:pivotTableDefinition", "compact", "0");
     assertXPath(pTable, "/x:pivotTableDefinition", "compactData", "0");
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[1]", "compact", "0");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDuplicatedMemberFilterXLSX()
 {
-    ScDocShellRef xShell = loadDoc(u"pivottable_duplicated_member_filter.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/pivottable_duplicated_member_filter.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     // Check whether page field has the right number of items
@@ -2456,18 +2297,14 @@ void ScPivotTableFiltersTest::testPivotTableDuplicatedMemberFilterXLSX()
                 "axisPage");
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[5]/x:items", "count",
                 "21");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableTabularModeXLSX()
 {
-    ScDocShellRef xShell = loadDoc(u"pivottable_tabular_mode.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("xlsx/pivottable_tabular_mode.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     // In tabular mode both outline and compact flag should be false
@@ -2477,18 +2314,14 @@ void ScPivotTableFiltersTest::testPivotTableTabularModeXLSX()
     assertXPath(pTable, "/x:pivotTableDefinition", "compactData", "0");
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[1]", "compact", "0");
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[1]", "outline", "0");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testPivotTableDuplicateFields()
 {
-    ScDocShellRef xShell = loadDoc(u"caseinsensitive-duplicate-fields.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("ods/caseinsensitive-duplicate-fields.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pCacheDef = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                                         "xl/pivotCache/pivotCacheDefinition1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pCacheDef = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pCacheDef);
 
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields", "count", "6");
@@ -2502,23 +2335,19 @@ void ScPivotTableFiltersTest::testPivotTableDuplicateFields()
                 "method2");
     assertXPath(pCacheDef, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[6]", "name",
                 "Method3");
-
-    xShell->DoClose();
 }
 
 void ScPivotTableFiltersTest::testTdf112106()
 {
-    ScDocShellRef xDocSh = loadDoc(u"tdf112106.", FORMAT_XLSX);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rDoc = xDocSh->GetDocument();
-    ScDPCollection* pDPs = rDoc.GetDPCollection();
+    createScDoc("xlsx/tdf112106.xlsx");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
 
     // Reload and check data layout dim
-    xDocSh = saveAndReload(*xDocSh, FORMAT_XLS);
-    CPPUNIT_ASSERT_MESSAGE("Failed to load file", xDocSh.is());
-    ScDocument& rLoadedDoc = xDocSh->GetDocument();
-    pDPs = rLoadedDoc.GetDPCollection();
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
+    pDPs = pDoc->GetDPCollection();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDPs->GetCount());
     const ScDPObject* pDPObj = &(*pDPs)[0];
     CPPUNIT_ASSERT(pDPObj);
@@ -2531,20 +2360,16 @@ void ScPivotTableFiltersTest::testTdf112106()
     const std::optional<OUString>& pLayoutName = pDim->GetLayoutName();
     CPPUNIT_ASSERT(pLayoutName);
     CPPUNIT_ASSERT_EQUAL(ScResId(STR_PIVOT_DATA), (*pLayoutName));
-
-    xDocSh->DoClose();
 }
 
 void ScPivotTableFiltersTest::testTdf123923()
 {
     // tdf#123923: Excel fails when it finds "Err:504" instead of "#REF!" in pivot table cache
 
-    ScDocShellRef xShell = loadDoc(u"pivot-table-err-in-cache.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("ods/pivot-table-err-in-cache.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                                      "xl/pivotCache/pivotCacheDefinition1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[1]/x:sharedItems/x:e",
@@ -2555,12 +2380,10 @@ void ScPivotTableFiltersTest::testTdf123939()
 {
     // tdf#123939: Excel warns on containsMixedTypes="1" if sharedItems has only strings and errors
 
-    ScDocShellRef xShell = loadDoc(u"pivot-table-str-and-err-in-data.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xShell.is());
+    createScDoc("ods/pivot-table-str-and-err-in-data.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xShell, FORMAT_XLSX);
-    xmlDocUniquePtr pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                                      "xl/pivotCache/pivotCacheDefinition1.xml");
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPathNoAttribute(pTable,
@@ -2569,8 +2392,7 @@ void ScPivotTableFiltersTest::testTdf123939()
 
     // But we must emit containsMixedTypes="1" for a mix of errors and non-string types!
 
-    pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                      "xl/pivotCache/pivotCacheDefinition2.xml");
+    pTable = parseExport("xl/pivotCache/pivotCacheDefinition2.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[1]/x:sharedItems",
@@ -2579,11 +2401,10 @@ void ScPivotTableFiltersTest::testTdf123939()
 
 void ScPivotTableFiltersTest::testTdf124651()
 {
-    ScDocShellRef xDocSh = loadDoc(u"tdf124651_simplePivotTable.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("ods/tdf124651_simplePivotTable.ods");
 
-    xmlDocUniquePtr pDoc = XPathHelper::parseExport2(*this, *xDocSh, m_xSFactory,
-                                                     "xl/pivotTables/pivotTable1.xml", FORMAT_XLSX);
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pDoc = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pDoc);
     // We have to export name attribute, even though it's optional according to ECMA-376 standard,
     // because Excel (at least 2016) seems to require it.
@@ -2593,14 +2414,11 @@ void ScPivotTableFiltersTest::testTdf124651()
 
 void ScPivotTableFiltersTest::testTdf124736()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/shared-dategroup.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("xlsx/pivot-table/shared-dategroup.xlsx");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xDocSh, FORMAT_XLSX);
-    xDocSh->DoClose();
+    save("Calc Office Open XML");
 
-    xmlDocUniquePtr pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory,
-                                                      "xl/pivotCache/pivotCacheDefinition1.xml");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pTable);
 
     assertXPath(pTable,
@@ -2626,7 +2444,7 @@ void ScPivotTableFiltersTest::testTdf124736()
 
     // Now check that table references these in correct order (document-dependent, so this is how
     // it should be in this specific testdoc which shows "<" and ">" values in the end)
-    pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
     assertXPath(pTable, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[1]/x:items", "count",
                 "46");
@@ -2646,21 +2464,18 @@ void ScPivotTableFiltersTest::testTdf124736()
 
 void ScPivotTableFiltersTest::tesTtdf124772NumFmt()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table-num-fmt.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("ods/pivot-table-num-fmt.ods");
 
-    std::shared_ptr<utl::TempFile> pXPathFile = ScBootstrapFixture::exportTo(*xDocSh, FORMAT_XLSX);
-    xDocSh->DoClose();
+    save("Calc Office Open XML");
 
-    xmlDocUniquePtr pTable
-        = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/pivotTables/pivotTable1.xml");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     // This asserts that numFmtId attribute is present
     const OUString sXclNumFmt
         = getXPath(pTable, "/x:pivotTableDefinition/x:dataFields/x:dataField", "numFmtId");
 
-    pTable = XPathHelper::parseExport(pXPathFile, m_xSFactory, "xl/styles.xml");
+    pTable = parseExport("xl/styles.xml");
     CPPUNIT_ASSERT(pTable);
 
     // Check that we refer to correct format
@@ -2672,12 +2487,10 @@ void ScPivotTableFiltersTest::testTdf124810()
 {
     {
         // First, test that we roundtrip existing pivot table style information from XLSX.
-        ScDocShellRef xDocSh = loadDoc(u"pivot_dark1.", FORMAT_XLSX);
-        CPPUNIT_ASSERT(xDocSh.is());
+        createScDoc("xlsx/pivot_dark1.xlsx");
 
-        xmlDocUniquePtr pTable = XPathHelper::parseExport2(
-            *this, *xDocSh, m_xSFactory, "xl/pivotTables/pivotTable1.xml", FORMAT_XLSX);
-        xDocSh->DoClose();
+        save("Calc Office Open XML");
+        xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
         CPPUNIT_ASSERT(pTable);
 
         // All attributes must have been roundtripped correctly (testdoc uses some non-default values)
@@ -2694,12 +2507,10 @@ void ScPivotTableFiltersTest::testTdf124810()
         // Now check that we export default style information when there's no such information in
         // original document. Just use some ODS as source. This might be changed when we start
         // exporting better pivot table style information.
-        ScDocShellRef xDocSh = loadDoc(u"tdf124651_simplePivotTable.", FORMAT_ODS);
-        CPPUNIT_ASSERT(xDocSh.is());
+        createScDoc("ods/tdf124651_simplePivotTable.ods");
 
-        xmlDocUniquePtr pTable = XPathHelper::parseExport2(
-            *this, *xDocSh, m_xSFactory, "xl/pivotTables/pivotTable1.xml", FORMAT_XLSX);
-        xDocSh->DoClose();
+        save("Calc Office Open XML");
+        xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
         CPPUNIT_ASSERT(pTable);
 
         // The default style for pivot tables in Excel 2007 through 2016 is PivotStyleLight16
@@ -2715,12 +2526,10 @@ void ScPivotTableFiltersTest::testTdf124810()
 
 void ScPivotTableFiltersTest::testTdf124883()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivot-table/two-data-fields.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("xlsx/pivot-table/two-data-fields.xlsx");
 
-    xmlDocUniquePtr pTable = XPathHelper::parseExport2(
-        *this, *xDocSh, m_xSFactory, "xl/pivotTables/pivotTable1.xml", FORMAT_XLSX);
-    xDocSh->DoClose();
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pTable = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pTable);
 
     // The field names must be kept just as they appear in original XLSX
@@ -2732,11 +2541,10 @@ void ScPivotTableFiltersTest::testTdf124883()
 
 void ScPivotTableFiltersTest::testTdf125046()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_long_text.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("xlsx/pivottable_long_text.xlsx");
 
-    xmlDocUniquePtr pDoc = XPathHelper::parseExport2(
-        *this, *xDocSh, m_xSFactory, "xl/pivotCache/pivotCacheDefinition1.xml", FORMAT_XLSX);
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pDoc = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pDoc);
     assertXPath(pDoc, "/x:pivotCacheDefinition/x:cacheFields/x:cacheField[2]/x:sharedItems",
                 "longText", "1");
@@ -2744,11 +2552,10 @@ void ScPivotTableFiltersTest::testTdf125046()
 
 void ScPivotTableFiltersTest::testTdf125055()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_1s_difference.", FORMAT_XLSX);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("xlsx/pivottable_1s_difference.xlsx");
 
-    xmlDocUniquePtr pDoc = XPathHelper::parseExport2(
-        *this, *xDocSh, m_xSFactory, "xl/pivotCache/pivotCacheDefinition1.xml", FORMAT_XLSX);
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pDoc = parseExport("xl/pivotCache/pivotCacheDefinition1.xml");
     CPPUNIT_ASSERT(pDoc);
 
     // 1-second precision should not result in duplicated entries for values different by ~1 s.
@@ -2780,15 +2587,115 @@ void ScPivotTableFiltersTest::testTdf125055()
 
 void ScPivotTableFiltersTest::testTdf125086()
 {
-    ScDocShellRef xDocSh = loadDoc(u"pivottable_fieldInRowsAndData.", FORMAT_ODS);
-    CPPUNIT_ASSERT(xDocSh.is());
+    createScDoc("ods/pivottable_fieldInRowsAndData.ods");
 
-    xmlDocUniquePtr pDoc = XPathHelper::parseExport2(*this, *xDocSh, m_xSFactory,
-                                                     "xl/pivotTables/pivotTable1.xml", FORMAT_XLSX);
+    save("Calc Office Open XML");
+    xmlDocUniquePtr pDoc = parseExport("xl/pivotTables/pivotTable1.xml");
     CPPUNIT_ASSERT(pDoc);
     assertXPath(pDoc, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[2]", "axis", "axisRow");
     // "dataField" attribute was not written for this "axisRow" field
     assertXPath(pDoc, "/x:pivotTableDefinition/x:pivotFields/x:pivotField[2]", "dataField", "1");
+}
+
+void ScPivotTableFiltersTest::testTdf73845()
+{
+    // Query filter is set for individual pivot table in this ODS document.
+    // This test checks the query filter is restored for ByEmpty and ByNonEmpty query.
+    createScDoc("ods/pivottable_restore_query_filter.ods");
+    ScDocument* pDoc = getScDoc();
+    ScDPCollection* pDPs = pDoc->GetDPCollection();
+    CPPUNIT_ASSERT_MESSAGE("Failed to get a live ScDPCollection instance.", pDPs);
+
+    // Three pivot tables are created in the spreadsheet. Query filters are set as follow:
+    // pivot table 0: Confirmed Date = Not Empty
+    // pivot table 1: Confirmed Date = Empty
+    // pivot table 2: Category > C1 AND Confirmed Date = Not Empty
+    //
+    // Following assertions check the Confirmed Date is restored properly
+    // after file is opened again.
+    const SCCOLROW nConfirmedDateCol = SCCOLROW(2);
+    size_t nDPCount = pDPs->GetCount();
+    for (size_t i = 0; i < nDPCount; i++)
+    {
+        ScDPObject& pDPObj = (*pDPs)[i];
+        ScQueryParam aQueryParam(pDPObj.GetSheetDesc()->GetQueryParam());
+        size_t nEntriesCount = aQueryParam.GetEntryCount();
+        for (size_t j = 0; j < nEntriesCount; j++)
+        {
+            ScQueryEntry rEntry = aQueryParam.GetEntry(j);
+            if (rEntry.IsQueryByEmpty() || rEntry.IsQueryByNonEmpty())
+            {
+                const OString msg = "Query entry " + OString::number(j) + " on pivot table "
+                                    + OString::number(i) + " is not restored.";
+                CPPUNIT_ASSERT_EQUAL_MESSAGE(msg.getStr(), nConfirmedDateCol, rEntry.nField);
+            }
+        }
+    }
+}
+
+void ScPivotTableFiltersTest::testPivotTableCompactLayoutXLSX()
+{
+    auto testThis = [](ScDocument& rDoc) {
+        ScDPCollection* pDPs = rDoc.GetDPCollection();
+        CPPUNIT_ASSERT_MESSAGE("Failed to get a live ScDPCollection instance.", pDPs);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE("There should be exactly one pivot table instance.", size_t(1),
+                                     pDPs->GetCount());
+
+        const ScDPObject* pDPObj = &(*pDPs)[0];
+        CPPUNIT_ASSERT_MESSAGE("Failed to get a pivot table object.", pDPObj);
+        const ScDPSaveData* pSaveData = pDPObj->GetSaveData();
+        CPPUNIT_ASSERT_MESSAGE("The show expand/collapse buttons option must be true",
+                               pSaveData->GetExpandCollapse());
+
+        CPPUNIT_ASSERT_EQUAL(OUString("Row Labels"), rDoc.GetString(ScAddress(10, 1, 0)));
+
+        // Check some row fields
+        struct RowFieldLabel
+        {
+            OUString aContent;
+            ScAddress aAddr;
+            bool bIndented;
+        };
+
+        constexpr int nCases = 6;
+        const RowFieldLabel aCases[nCases] = {
+            { "aaa", ScAddress(10, 2, 0), true },
+
+            { "bbb", ScAddress(10, 3, 0), true },
+
+            { "ccc", ScAddress(10, 4, 0), true },
+
+            { "aax", ScAddress(10, 10, 0), true },
+
+            { "bbx", ScAddress(10, 14, 0), true },
+
+            { "ccc", ScAddress(10, 15, 0), true },
+        };
+
+        for (int nCaseNum = 0; nCaseNum < nCases; ++nCaseNum)
+        {
+            auto& rCase = aCases[nCaseNum];
+            CPPUNIT_ASSERT_EQUAL(rCase.aContent, rDoc.GetString(rCase.aAddr));
+            const ScIndentItem* pIndent = rDoc.GetAttr(rCase.aAddr, ATTR_INDENT);
+            if (rCase.bIndented)
+                CPPUNIT_ASSERT(pIndent && pIndent->GetValue() > 0);
+            else
+                CPPUNIT_ASSERT(!pIndent || pIndent->GetValue() == 0);
+        }
+
+        // check col fields
+        CPPUNIT_ASSERT_EQUAL(OUString("ddd"), rDoc.GetString(ScAddress(11, 1, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString("ddx"), rDoc.GetString(ScAddress(12, 1, 0)));
+    };
+
+    createScDoc("xlsx/pivot-table/pivotcompact.xlsx");
+    testThis(*getScDoc());
+
+    saveAndReload("calc8");
+    testThis(*getScDoc());
+
+    saveAndReload("Calc Office Open XML");
+    testThis(*getScDoc());
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScPivotTableFiltersTest);

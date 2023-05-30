@@ -16,8 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_text_WritingMode2_idl__
-#define __com_sun_star_text_WritingMode2_idl__
 
 
 
@@ -83,11 +81,19 @@ published constants WritingMode2
         @since LibreOffice 6.3
      */
     const short BT_LR = 5;
+
+    /** text within a line is written top-to-bottom so as if a horizontal
+        left-to-right line is clockwise rotated by 90deg. Lines and blocks
+        are placed right-to-left. This corresponds to OOXML attribute
+        vert="vert" for shapes and ECMA w:val="tbRl" attribute in
+        <w:textDirection> element.
+
+        @since LibreOffice 7.5
+    */
+    const short TB_RL90 = 6;
 };
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

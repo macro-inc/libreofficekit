@@ -28,7 +28,6 @@
 #include <sfx2/docfile.hxx>
 #include <svx/svxids.hrc>
 #include <svl/numformat.hxx>
-#include <svl/zforlist.hxx>
 #include <unotools/configmgr.hxx>
 #include <sal/log.hxx>
 
@@ -96,7 +95,8 @@ ImportExcel::ImportExcel( XclImpRootData& rImpData, SvStream& rStrm ):
     mnIxfeIndex( 0 ),
     mnLastRecId(0),
     mbBiff2HasXfs(false),
-    mbBiff2HasXfsValid(false)
+    mbBiff2HasXfsValid(false),
+    mbFuzzing(utl::ConfigManager::IsFuzzing())
 {
     nBdshtTab = 0;
 
@@ -980,7 +980,11 @@ void ImportExcel::Cellmerging()
         maStrm >> aXclRange;    // 16-bit rows and columns
         ScRange aScRange( ScAddress::UNINITIALIZED );
         if( rAddrConv.ConvertRange( aScRange, aXclRange, nScTab, nScTab, true ) )
-            GetXFRangeBuffer().SetMerge( aScRange.aStart.Col(), aScRange.aStart.Row(), aScRange.aEnd.Col(), aScRange.aEnd.Row() );
+        {
+            const bool bTooSlowForFuzzing = mbFuzzing && (aScRange.aEnd.Col() > 512 || aScRange.aEnd.Row() > 512);
+            if (!bTooSlowForFuzzing)
+                GetXFRangeBuffer().SetMerge( aScRange.aStart.Col(), aScRange.aStart.Row(), aScRange.aEnd.Col(), aScRange.aEnd.Row() );
+        }
         ++nIdx;
     }
 }
@@ -1103,7 +1107,7 @@ void ImportExcel::TableOp()
     sal_uInt16 nInpRow2 = aIn.ReaduInt16();
     sal_uInt16 nInpCol2 = aIn.ReaduInt16();
 
-    if (utl::ConfigManager::IsFuzzing())
+    if (mbFuzzing)
     {
         //shrink to smallish arbitrary value to not timeout
         nLastRow = std::min<sal_uInt16>(nLastRow, MAXROW_30 / 2);
@@ -1372,13 +1376,13 @@ void ImportExcel::PostDocLoad()
             {
                 if( p->aStart.Col() == 0 && p->aEnd.Col() == rD.MaxCol() && bRowVirgin )
                 {
-                    rD.SetRepeatRowRange( n, std::unique_ptr<ScRange>(new ScRange(*p)) );
+                    rD.SetRepeatRowRange( n, *p );
                     bRowVirgin = false;
                 }
 
                 if( p->aStart.Row() == 0 && p->aEnd.Row() == rD.MaxRow() && bColVirgin )
                 {
-                    rD.SetRepeatColRange( n, std::unique_ptr<ScRange>(new ScRange(*p)) );
+                    rD.SetRepeatColRange( n, *p );
                     bColVirgin = false;
                 }
 

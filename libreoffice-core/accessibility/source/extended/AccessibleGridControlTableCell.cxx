@@ -33,14 +33,13 @@ namespace accessibility
         // FIXME this is a copy'n'paste from
         // source/extended/AccessibleBrowseBoxTableCell.cxx, get rid of that...
         /// @throws css::lang::IndexOutOfBoundsException
-        void checkIndex_Impl( sal_Int32 _nIndex, const OUString& _sText )
+        void checkIndex_Impl( sal_Int32 _nIndex, std::u16string_view _sText )
         {
-            if ( _nIndex >= _sText.getLength() )
+            if ( _nIndex >= static_cast<sal_Int32>(_sText.size()) )
                 throw css::lang::IndexOutOfBoundsException();
         }
     }
     using namespace ::com::sun::star::lang;
-    using namespace utl;
     using namespace comphelper;
     using namespace ::com::sun::star::uno;
     using ::com::sun::star::accessibility::XAccessible;
@@ -59,16 +58,6 @@ namespace accessibility
         ,m_nRowPos( _nRowPos )
         ,m_nColPos( _nColPos )
     {
-        // set accessible name here, because for that we need the position of the cell
-        // and so the base class isn't capable of doing this
-        OUString aAccName;
-        if(_eType == TCTYPE_TABLECELL)
-            aAccName = _rTable.GetAccessibleObjectName( TCTYPE_TABLECELL, _nRowPos, _nColPos );
-        else if(_eType == TCTYPE_ROWHEADERCELL)
-            aAccName = _rTable.GetAccessibleObjectName( TCTYPE_ROWHEADERCELL, _nRowPos, 0 );
-        else if(_eType == TCTYPE_COLUMNHEADERCELL)
-            aAccName = _rTable.GetAccessibleObjectName( TCTYPE_COLUMNHEADERCELL, 0, _nRowPos );
-        implSetName( aAccName );
     }
 
     void SAL_CALL AccessibleGridControlCell::grabFocus()
@@ -76,6 +65,24 @@ namespace accessibility
         SolarMutexGuard aSolarGuard;
 
         m_aTable.GoToCell( m_nColPos, m_nRowPos );
+    }
+
+    OUString SAL_CALL AccessibleGridControlCell::getAccessibleName()
+    {
+        SolarMutexGuard g;
+
+        ensureIsAlive();
+
+        OUString sAccName;
+        if (m_eObjType == TCTYPE_TABLECELL)
+            sAccName = m_aTable.GetAccessibleObjectName(TCTYPE_TABLECELL, m_nRowPos, m_nColPos);
+        else if (m_eObjType == TCTYPE_ROWHEADERCELL)
+            sAccName = m_aTable.GetAccessibleObjectName(TCTYPE_ROWHEADERCELL, m_nRowPos, 0);
+        else if (m_eObjType == TCTYPE_COLUMNHEADERCELL)
+            sAccName = m_aTable.GetAccessibleObjectName(TCTYPE_COLUMNHEADERCELL, 0, m_nRowPos);
+        else
+            assert(false && "Unhandled table cell type");
+        return sAccName;
     }
 
     // implementation of a table cell
@@ -158,38 +165,35 @@ namespace accessibility
     }
 
     /** @return  The count of visible children. */
-    sal_Int32 SAL_CALL AccessibleGridControlTableCell::getAccessibleChildCount()
+    sal_Int64 SAL_CALL AccessibleGridControlTableCell::getAccessibleChildCount()
     {
         return 0;
     }
 
     /** @return  The css::accessibility::XAccessible interface of the specified child. */
-    css::uno::Reference< css::accessibility::XAccessible > SAL_CALL AccessibleGridControlTableCell::getAccessibleChild( sal_Int32 )
+    css::uno::Reference< css::accessibility::XAccessible > SAL_CALL AccessibleGridControlTableCell::getAccessibleChild( sal_Int64 )
     {
         throw css::lang::IndexOutOfBoundsException();
     }
 
-    /** Creates a new AccessibleStateSetHelper and fills it with states of the
-        current object.
-        @return
-            A filled AccessibleStateSetHelper.
+    /** Return a bitset of states of the current object.
     */
-    rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleGridControlTableCell::implCreateStateSetHelper()
+    sal_Int64 AccessibleGridControlTableCell::implCreateStateSet()
     {
-        rtl::Reference<::utl::AccessibleStateSetHelper> pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+        sal_Int64 nStateSet = 0;
 
         if( isAlive() )
         {
             // SHOWING done with mxParent
             if( implIsShowing() )
-                pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+                nStateSet |= AccessibleStateType::SHOWING;
 
-            m_aTable.FillAccessibleStateSetForCell( *pStateSetHelper, getRowPos(), static_cast< sal_uInt16 >( getColumnPos() ) );
+            m_aTable.FillAccessibleStateSetForCell( nStateSet, getRowPos(), static_cast< sal_uInt16 >( getColumnPos() ) );
         }
         else
-            pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+            nStateSet |= AccessibleStateType::DEFUNC;
 
-        return pStateSetHelper;
+        return nStateSet;
     }
 
 
@@ -206,13 +210,13 @@ namespace accessibility
 
     // css::accessibility::XAccessibleContext
 
-    sal_Int32 SAL_CALL AccessibleGridControlTableCell::getAccessibleIndexInParent()
+    sal_Int64 SAL_CALL AccessibleGridControlTableCell::getAccessibleIndexInParent()
     {
         SolarMutexGuard aSolarGuard;
 
         ensureIsAlive();
 
-        return ( getRowPos() * m_aTable.GetColumnCount() ) + getColumnPos();
+        return (static_cast<sal_Int64>(getRowPos()) * static_cast<sal_Int64>(m_aTable.GetColumnCount())) + getColumnPos();
     }
 
     sal_Int32 SAL_CALL AccessibleGridControlTableCell::getCaretPosition(  )
@@ -254,20 +258,14 @@ namespace accessibility
 
     OUString SAL_CALL AccessibleGridControlTableCell::getSelectedText(  )
     {
-        SolarMutexGuard aSolarGuard;
-
         return OUString();
     }
     sal_Int32 SAL_CALL AccessibleGridControlTableCell::getSelectionStart(  )
     {
-        SolarMutexGuard aSolarGuard;
-
         return 0;
     }
     sal_Int32 SAL_CALL AccessibleGridControlTableCell::getSelectionEnd(  )
     {
-        SolarMutexGuard aSolarGuard;
-
         return 0;
     }
     sal_Bool SAL_CALL AccessibleGridControlTableCell::setSelection( sal_Int32 nStartIndex, sal_Int32 nEndIndex )
@@ -330,7 +328,7 @@ namespace accessibility
         vcl::Window* pParent = m_aTable.GetAccessibleParentWindow();
         DBG_ASSERT( pParent, "implGetBoundingBox - missing parent window" );
         tools::Rectangle aGridRect = m_aTable.GetWindowExtentsRelative( pParent );
-        sal_Int32 nIndex = getAccessibleIndexInParent();
+        sal_Int64 nIndex = getAccessibleIndexInParent();
         tools::Rectangle aCellRect = m_aTable.calcCellRect(nIndex%m_aTable.GetColumnCount(), nIndex/m_aTable.GetColumnCount());
         tools::Long nX = aGridRect.Left() + aCellRect.Left();
         tools::Long nY = aGridRect.Top() + aCellRect.Top();
@@ -341,7 +339,7 @@ namespace accessibility
     tools::Rectangle AccessibleGridControlTableCell::implGetBoundingBoxOnScreen()
     {
         tools::Rectangle aGridRect = m_aTable.GetWindowExtentsRelative( nullptr );
-        sal_Int32 nIndex = getAccessibleIndexInParent();
+        sal_Int64 nIndex = getAccessibleIndexInParent();
         tools::Rectangle aCellRect = m_aTable.calcCellRect(nIndex%m_aTable.GetColumnCount(), nIndex/m_aTable.GetColumnCount());
         tools::Long nX = aGridRect.Left() + aCellRect.Left();
         tools::Long nY = aGridRect.Top() + aCellRect.Top();

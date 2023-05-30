@@ -19,21 +19,21 @@
 
 #include <ShapeFactory.hxx>
 #include <VDiagram.hxx>
+#include <Diagram.hxx>
 #include <PropertyMapper.hxx>
 #include <ViewDefines.hxx>
 #include <Stripe.hxx>
 #include <ObjectIdentifier.hxx>
 #include <DiagramHelper.hxx>
+#include <ChartType.hxx>
 #include <BaseGFXHelper.hxx>
 #include <ChartTypeHelper.hxx>
 #include <ThreeDHelper.hxx>
 #include <defines.hxx>
 #include <editeng/unoprnms.hxx>
-#include <com/sun/star/lang/XTypeProvider.hpp>
-#include <svx/unoshape.hxx>
 #include <svx/scene3d.hxx>
 #include <svx/e3dsceneupdater.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace chart
 {
@@ -41,10 +41,9 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
 VDiagram::VDiagram(
-    const uno::Reference<XDiagram> & xDiagram, const drawing::Direction3D& rPreferredAspectRatio,
+    const rtl::Reference<Diagram> & xDiagram, const drawing::Direction3D& rPreferredAspectRatio,
     sal_Int32 nDimension )
-    : m_pShapeFactory(nullptr)
-    , m_nDimensionCount(nDimension)
+    : m_nDimensionCount(nDimension)
     , m_xDiagram(xDiagram)
     , m_aPreferredAspectRatio(rPreferredAspectRatio)
     , m_fXAnglePi(0)
@@ -55,13 +54,12 @@ VDiagram::VDiagram(
     if( m_nDimensionCount != 3)
         return;
 
-    uno::Reference< beans::XPropertySet > xSourceProp( m_xDiagram, uno::UNO_QUERY );
-    ThreeDHelper::getRotationAngleFromDiagram( xSourceProp, m_fXAnglePi, m_fYAnglePi, m_fZAnglePi );
+    ThreeDHelper::getRotationAngleFromDiagram( xDiagram, m_fXAnglePi, m_fYAnglePi, m_fZAnglePi );
     if( ChartTypeHelper::isSupportingRightAngledAxes(
             DiagramHelper::getChartTypeByIndex( m_xDiagram, 0 ) ) )
     {
-        if(xSourceProp.is())
-            xSourceProp->getPropertyValue("RightAngledAxes") >>= m_bRightAngledAxes;
+        if(xDiagram.is())
+            xDiagram->getPropertyValue("RightAngledAxes") >>= m_bRightAngledAxes;
         if( m_bRightAngledAxes )
         {
             ThreeDHelper::adaptRadAnglesForRightAngledAxes( m_fXAnglePi, m_fYAnglePi );
@@ -74,14 +72,9 @@ VDiagram::~VDiagram()
 {
 }
 
-void VDiagram::init(
-    const uno::Reference< drawing::XShapes >& xTarget, const uno::Reference< lang::XMultiServiceFactory >& xFactory )
+void VDiagram::init( const rtl::Reference<SvxShapeGroupAnyD>& xTarget )
 {
-    OSL_PRECOND(xFactory.is(), "no proper initialization parameters");
-
     m_xTarget  = xTarget;
-    m_xShapeFactory = xFactory;
-    m_pShapeFactory = ShapeFactory::getOrCreateShapeFactory(xFactory);
 }
 
 void VDiagram::createShapes( const awt::Point& rPos, const awt::Size& rSize )
@@ -137,76 +130,60 @@ void VDiagram::createShapes( const awt::Point& rPos, const awt::Size& rSize )
 
 void VDiagram::createShapes_2d()
 {
-    OSL_PRECOND(m_pShapeFactory && m_xTarget.is() && m_xShapeFactory.is(), "is not proper initialized");
-    if (!m_pShapeFactory || !m_xTarget.is() || !m_xShapeFactory.is())
+    OSL_PRECOND(m_xTarget.is(), "is not proper initialized");
+    if (!m_xTarget.is())
         return;
 
     //create group shape
-    uno::Reference< drawing::XShapes > xOuterGroup_Shapes = m_pShapeFactory->createGroup2D(m_xTarget);
-    m_xOuterGroupShape.set( xOuterGroup_Shapes, uno::UNO_QUERY );
+    rtl::Reference<SvxShapeGroupAnyD> xOuterGroup_Shapes = ShapeFactory::createGroup2D(m_xTarget);
+    m_xOuterGroupShape = xOuterGroup_Shapes;
 
-    uno::Reference< drawing::XShapes > xGroupForWall( m_pShapeFactory->createGroup2D(xOuterGroup_Shapes,"PlotAreaExcludingAxes") );
+    rtl::Reference<SvxShapeGroupAnyD> xGroupForWall( ShapeFactory::createGroup2D(xOuterGroup_Shapes,"PlotAreaExcludingAxes") );
 
     //create independent group shape as container for datapoints and such things
-    {
-        uno::Reference< drawing::XShapes > xShapes = m_pShapeFactory->createGroup2D(xOuterGroup_Shapes,"testonly;CooContainer=XXX_CID");
-        m_xCoordinateRegionShape.set( xShapes, uno::UNO_QUERY );
-    }
+    m_xCoordinateRegionShape = ShapeFactory::createGroup2D(xOuterGroup_Shapes,"testonly;CooContainer=XXX_CID");
 
     bool bAddFloorAndWall = DiagramHelper::isSupportingFloorAndWall( m_xDiagram );
 
     //add back wall
     {
-        ShapeFactory* pShapeFactory = ShapeFactory::getOrCreateShapeFactory(m_xShapeFactory);
-        m_xWall2D = pShapeFactory->createRectangle(
-                xGroupForWall );
+        m_xWall2D = ShapeFactory::createRectangle( xGroupForWall );
 
-        uno::Reference< beans::XPropertySet > xProp( m_xWall2D, uno::UNO_QUERY );
-        if( xProp.is())
+        try
         {
-            try
+            OSL_ENSURE( m_xDiagram.is(), "Invalid Diagram model" );
+            if( m_xDiagram.is() )
             {
-                OSL_ENSURE( m_xDiagram.is(), "Invalid Diagram model" );
-                if( m_xDiagram.is() )
-                {
-                    uno::Reference< beans::XPropertySet > xWallProp( m_xDiagram->getWall());
-                    if( xWallProp.is())
-                        PropertyMapper::setMappedProperties( xProp, xWallProp, PropertyMapper::getPropertyNameMapForFillAndLineProperties() );
-                }
-                if( !bAddFloorAndWall )
-                {
-                    //we always need this object as dummy object for correct scene dimensions
-                    //but it should not be visible in this case:
-                    ShapeFactory::makeShapeInvisible( m_xWall2D );
-                }
-                else
-                {
-                    //CID for selection handling
-                    OUString aWallCID( ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_DIAGRAM_WALL, u"" ) );//@todo read CID from model
-                    xProp->setPropertyValue( UNO_NAME_MISC_OBJ_NAME, uno::Any( aWallCID ) );
-                }
+                uno::Reference< beans::XPropertySet > xWallProp( m_xDiagram->getWall());
+                if( xWallProp.is())
+                    PropertyMapper::setMappedProperties( *m_xWall2D, xWallProp, PropertyMapper::getPropertyNameMapForFillAndLineProperties() );
             }
-            catch( const uno::Exception& )
+            if( !bAddFloorAndWall )
             {
-                TOOLS_WARN_EXCEPTION("chart2", "" );
+                //we always need this object as dummy object for correct scene dimensions
+                //but it should not be visible in this case:
+                ShapeFactory::makeShapeInvisible( m_xWall2D );
+            }
+            else
+            {
+                //CID for selection handling
+                OUString aWallCID( ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_DIAGRAM_WALL, u"" ) );//@todo read CID from model
+                m_xWall2D->SvxShape::setPropertyValue( UNO_NAME_MISC_OBJ_NAME, uno::Any( aWallCID ) );
             }
         }
-
+        catch( const uno::Exception& )
+        {
+            TOOLS_WARN_EXCEPTION("chart2", "" );
+        }
     }
 
     //position and size for diagram
     adjustPosAndSize_2d( m_aAvailablePosIncludingAxes, m_aAvailableSizeIncludingAxes );
 }
 
-static E3dScene* lcl_getE3dScene( const uno::Reference< drawing::XShape >& xShape )
+static E3dScene* lcl_getE3dScene( const rtl::Reference<SvxShapeGroupAnyD>& xShape )
 {
-    E3dScene* pRet=nullptr;
-    uno::Reference< lang::XTypeProvider > xTypeProvider( xShape, uno::UNO_QUERY );
-    if(xTypeProvider.is())
-    {
-        pRet = dynamic_cast< E3dScene* >(SdrObject::getSdrObjectFromXShape(xShape));
-    }
-    return pRet;
+    return DynCastE3dScene(xShape->GetSdrObject());
 }
 
 static void lcl_setLightSources(
@@ -450,19 +427,20 @@ void VDiagram::adjustAspectRatio3d( const awt::Size& rAvailableSize )
 
 void VDiagram::createShapes_3d()
 {
-    OSL_PRECOND(m_pShapeFactory && m_xTarget.is() && m_xShapeFactory.is(), "is not proper initialized");
-    if (!m_pShapeFactory || !m_xTarget.is() || !m_xShapeFactory.is())
+    OSL_PRECOND(m_xTarget.is(), "is not proper initialized");
+    if (!m_xTarget.is())
         return;
 
     //create shape
-    m_xOuterGroupShape.set( m_pShapeFactory->createGroup3D( m_xTarget, "PlotAreaExcludingAxes" ), uno::UNO_QUERY);
+    rtl::Reference<Svx3DSceneObject> xShapes = ShapeFactory::createGroup3D( m_xTarget, "PlotAreaExcludingAxes" );
+    m_xOuterGroupShape = xShapes;
 
-    uno::Reference< drawing::XShapes > xOuterGroup_Shapes( m_xOuterGroupShape, uno::UNO_QUERY );
+    rtl::Reference<SvxShapeGroupAnyD> xOuterGroup_Shapes = m_xOuterGroupShape;
 
     //create additional group to manipulate the aspect ratio of the whole diagram:
-    xOuterGroup_Shapes = m_pShapeFactory->createGroup3D( xOuterGroup_Shapes );
+    xOuterGroup_Shapes = ShapeFactory::createGroup3D( xOuterGroup_Shapes );
 
-    m_xAspectRatio3D.set( xOuterGroup_Shapes, uno::UNO_QUERY );
+    m_xAspectRatio3D = xOuterGroup_Shapes;
 
     bool bAddFloorAndWall = DiagramHelper::isSupportingFloorAndWall( m_xDiagram );
 
@@ -477,10 +455,10 @@ void VDiagram::createShapes_3d()
         OUString aWallCID( ObjectIdentifier::createClassifiedIdentifier( OBJECTTYPE_DIAGRAM_WALL, u"" ) );//@todo read CID from model
         if( !bAddFloorAndWall )
             aWallCID.clear();
-        uno::Reference< drawing::XShapes > xWallGroup_Shapes( m_pShapeFactory->createGroup3D( xOuterGroup_Shapes, aWallCID ) );
+        rtl::Reference<Svx3DSceneObject> xWallGroup_Shapes = ShapeFactory::createGroup3D( xOuterGroup_Shapes, aWallCID );
 
-        CuboidPlanePosition eLeftWallPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardLeftWall( uno::Reference< beans::XPropertySet >( m_xDiagram, uno::UNO_QUERY ) ) );
-        CuboidPlanePosition eBackWallPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardBackWall( uno::Reference< beans::XPropertySet >( m_xDiagram, uno::UNO_QUERY ) ) );
+        CuboidPlanePosition eLeftWallPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardLeftWall( m_xDiagram ) );
+        CuboidPlanePosition eBackWallPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardBackWall( m_xDiagram ) );
 
         //add left wall
         {
@@ -500,8 +478,8 @@ void VDiagram::createShapes_3d()
             }
             aStripe.InvertNormal(true);
 
-            uno::Reference< drawing::XShape > xShape =
-                m_pShapeFactory->createStripe( xWallGroup_Shapes, aStripe
+            rtl::Reference<Svx3DPolygonObject> xShape =
+                ShapeFactory::createStripe( xWallGroup_Shapes, aStripe
                     , xWallProp, PropertyMapper::getPropertyNameMapForFillAndLineProperties(), bDoubleSided, nRotatedTexture );
             if( !bAddFloorAndWall )
             {
@@ -528,8 +506,8 @@ void VDiagram::createShapes_3d()
             }
             aStripe.InvertNormal(true);
 
-            uno::Reference< drawing::XShape > xShape =
-                m_pShapeFactory->createStripe(xWallGroup_Shapes, aStripe
+            rtl::Reference<Svx3DPolygonObject> xShape =
+                ShapeFactory::createStripe(xWallGroup_Shapes, aStripe
                     , xWallProp, PropertyMapper::getPropertyNameMapForFillAndLineProperties(), bDoubleSided, nRotatedTexture );
             if( !bAddFloorAndWall )
             {
@@ -542,28 +520,25 @@ void VDiagram::createShapes_3d()
 
     try
     {
-        uno::Reference< beans::XPropertySet > xSourceProp( m_xDiagram, uno::UNO_QUERY_THROW );
-        uno::Reference< beans::XPropertySet > xDestProp( m_xOuterGroupShape, uno::UNO_QUERY_THROW );
-
         //perspective
         {
             //ignore distance and focal length from file format and model completely
             //use vrp only to indicate the distance of the camera and thus influence the perspective
-            xDestProp->setPropertyValue( UNO_NAME_3D_SCENE_DISTANCE, uno::Any(
-                                        static_cast<sal_Int32>(ThreeDHelper::getCameraDistance( xSourceProp ))));
-            xDestProp->setPropertyValue( UNO_NAME_3D_SCENE_PERSPECTIVE,
-                                        xSourceProp->getPropertyValue( UNO_NAME_3D_SCENE_PERSPECTIVE));
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_SCENE_DISTANCE, uno::Any(
+                                        static_cast<sal_Int32>(ThreeDHelper::getCameraDistance( m_xDiagram ))));
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_SCENE_PERSPECTIVE,
+                                        m_xDiagram->getPropertyValue( UNO_NAME_3D_SCENE_PERSPECTIVE));
         }
 
         //light
         {
-            xDestProp->setPropertyValue( UNO_NAME_3D_SCENE_SHADE_MODE,
-                                        xSourceProp->getPropertyValue( UNO_NAME_3D_SCENE_SHADE_MODE));
-            xDestProp->setPropertyValue( UNO_NAME_3D_SCENE_AMBIENTCOLOR,
-                                        xSourceProp->getPropertyValue( UNO_NAME_3D_SCENE_AMBIENTCOLOR));
-            xDestProp->setPropertyValue( UNO_NAME_3D_SCENE_TWO_SIDED_LIGHTING,
-                                        xSourceProp->getPropertyValue( UNO_NAME_3D_SCENE_TWO_SIDED_LIGHTING));
-            lcl_setLightSources( xSourceProp, xDestProp );
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_SCENE_SHADE_MODE,
+                                        m_xDiagram->getPropertyValue( UNO_NAME_3D_SCENE_SHADE_MODE));
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_SCENE_AMBIENTCOLOR,
+                                        m_xDiagram->getPropertyValue( UNO_NAME_3D_SCENE_AMBIENTCOLOR));
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_SCENE_TWO_SIDED_LIGHTING,
+                                        m_xDiagram->getPropertyValue( UNO_NAME_3D_SCENE_TWO_SIDED_LIGHTING));
+            lcl_setLightSources( m_xDiagram, m_xOuterGroupShape );
         }
 
         //rotation
@@ -583,7 +558,7 @@ void VDiagram::createShapes_3d()
             //#i98497# 3D charts are rendered with wrong size
             E3DModifySceneSnapRectUpdater aUpdater(lcl_getE3dScene(m_xOuterGroupShape));
 
-            xDestProp->setPropertyValue( UNO_NAME_3D_TRANSFORM_MATRIX,
+            m_xOuterGroupShape->setPropertyValue( UNO_NAME_3D_TRANSFORM_MATRIX,
                     uno::Any( BaseGFXHelper::B3DHomMatrixToHomogenMatrix( aEffectiveTransformation ) ) );
         }
     }
@@ -603,11 +578,11 @@ void VDiagram::createShapes_3d()
             , drawing::Direction3D(FIXED_SIZE_FOR_3D_CHART_VOLUME,0,0) );
         aStripe.InvertNormal(true);
 
-        uno::Reference< drawing::XShape > xShape =
-            m_pShapeFactory->createStripe(xOuterGroup_Shapes, aStripe
+        rtl::Reference<Svx3DPolygonObject> xShape =
+            ShapeFactory::createStripe(xOuterGroup_Shapes, aStripe
                 , xFloorProp, PropertyMapper::getPropertyNameMapForFillAndLineProperties(), bDoubleSided );
 
-        CuboidPlanePosition eBottomPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardBottom( uno::Reference< beans::XPropertySet >( m_xDiagram, uno::UNO_QUERY ) ) );
+        CuboidPlanePosition eBottomPos( ThreeDHelper::getAutomaticCuboidPlanePositionForStandardBottom( m_xDiagram ) );
         if( !bAddFloorAndWall || (eBottomPos!=CuboidPlanePosition_Bottom) )
         {
             //we always need this object as dummy object for correct scene dimensions
@@ -623,31 +598,26 @@ void VDiagram::createShapes_3d()
 
     //create an additional scene for the smaller inner coordinate region:
     {
-        uno::Reference< drawing::XShapes > xShapes = m_pShapeFactory->createGroup3D( xOuterGroup_Shapes,"testonly;CooContainer=XXX_CID" );
-        m_xCoordinateRegionShape.set( xShapes, uno::UNO_QUERY );
+        rtl::Reference<Svx3DSceneObject> xShapes2 = ShapeFactory::createGroup3D( xOuterGroup_Shapes,"testonly;CooContainer=XXX_CID" );
+        m_xCoordinateRegionShape = xShapes2;
 
-        uno::Reference< beans::XPropertySet > xShapeProp( m_xCoordinateRegionShape, uno::UNO_QUERY );
-        OSL_ENSURE(xShapeProp.is(), "created shape offers no XPropertySet");
-        if( xShapeProp.is())
+        try
         {
-            try
-            {
-                double fXScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
-                double fYScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
-                double fZScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
+            double fXScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
+            double fYScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
+            double fZScale = (FIXED_SIZE_FOR_3D_CHART_VOLUME -GRID_TO_WALL_DISTANCE) /FIXED_SIZE_FOR_3D_CHART_VOLUME;
 
-                ::basegfx::B3DHomMatrix aM;
-                aM.translate(GRID_TO_WALL_DISTANCE/fXScale, GRID_TO_WALL_DISTANCE/fYScale, GRID_TO_WALL_DISTANCE/fZScale);
-                aM.scale( fXScale, fYScale, fZScale );
-                E3DModifySceneSnapRectUpdater aUpdater(lcl_getE3dScene(m_xOuterGroupShape));
+            ::basegfx::B3DHomMatrix aM;
+            aM.translate(GRID_TO_WALL_DISTANCE/fXScale, GRID_TO_WALL_DISTANCE/fYScale, GRID_TO_WALL_DISTANCE/fZScale);
+            aM.scale( fXScale, fYScale, fZScale );
+            E3DModifySceneSnapRectUpdater aUpdater(lcl_getE3dScene(m_xOuterGroupShape));
 
-                xShapeProp->setPropertyValue( UNO_NAME_3D_TRANSFORM_MATRIX
-                    , uno::Any(BaseGFXHelper::B3DHomMatrixToHomogenMatrix(aM)) );
-            }
-            catch( const uno::Exception& )
-            {
-                TOOLS_WARN_EXCEPTION("chart2", "" );
-            }
+            xShapes2->SvxShape::setPropertyValue( UNO_NAME_3D_TRANSFORM_MATRIX
+                , uno::Any(BaseGFXHelper::B3DHomMatrixToHomogenMatrix(aM)) );
+        }
+        catch( const uno::Exception& )
+        {
+            TOOLS_WARN_EXCEPTION("chart2", "" );
         }
     }
 

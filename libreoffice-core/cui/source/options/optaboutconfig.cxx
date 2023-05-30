@@ -8,6 +8,7 @@
  */
 
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include "optaboutconfig.hxx"
 
 #include <comphelper/processfactory.hxx>
@@ -15,17 +16,24 @@
 #include <com/sun/star/configuration/theDefaultProvider.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/beans/NamedValue.hpp>
+#include <com/sun/star/beans/UnknownPropertyException.hpp>
+#include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/container/XNameReplace.hpp>
 #include <com/sun/star/container/XHierarchicalName.hpp>
+#include <com/sun/star/uno/Reference.hxx>
+#include <com/sun/star/uno/Type.hxx>
+#include <com/sun/star/uno/TypeClass.hpp>
 #include <com/sun/star/util/XChangesBatch.hpp>
 #include <com/sun/star/util/SearchFlags.hpp>
 #include <com/sun/star/util/SearchAlgorithms2.hpp>
+#include <cppu/unotype.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <unotools/textsearch.hxx>
+#include <utility>
 #include <vcl/event.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <memory>
@@ -45,10 +53,10 @@ struct Prop_Impl
     OUString    Property;
     Any         Value;
 
-    Prop_Impl( const OUString& sName, const OUString& sProperty, const Any& aValue )
-        : Name( sName )
-        , Property( sProperty )
-        , Value( aValue )
+    Prop_Impl( OUString sName, OUString sProperty, Any aValue )
+        : Name(std::move( sName ))
+        , Property(std::move( sProperty ))
+        , Value(std::move( aValue ))
     {}
 };
 
@@ -59,9 +67,9 @@ struct UserData
     int aLineage;
     Reference<XNameAccess> aXNameAccess;
 
-    explicit UserData( OUString const & rPropertyPath )
+    explicit UserData( OUString aPropertyPath )
         : bIsPropertyPath( true )
-        , sPropertyPath(rPropertyPath)
+        , sPropertyPath(std::move(aPropertyPath))
         , aLineage(0)
     {}
 
@@ -207,7 +215,7 @@ void CuiAboutConfigTabPage::InsertEntry(const OUString& rPropertyPath, const OUS
     m_vectorUserData.push_back(std::make_unique<UserData>(rPropertyPath));
     if (bInsertToPrefBox)
     {
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_vectorUserData.back().get())));
+        OUString sId(weld::toId(m_vectorUserData.back().get()));
         m_xPrefBox->insert(pParentEntry, -1, &rProp, &sId, nullptr, nullptr, false, m_xScratchIter.get());
         m_xPrefBox->set_text(*m_xScratchIter, rStatus, 1);
         m_xPrefBox->set_text(*m_xScratchIter, rType, 2);
@@ -289,7 +297,7 @@ void CuiAboutConfigTabPage::FillItems(const Reference< XNameAccess >& xNameAcces
             {
                 // not leaf node
                 m_vectorUserData.push_back(std::make_unique<UserData>(xNextNameAccess, lineage + 1));
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(m_vectorUserData.back().get())));
+                OUString sId(weld::toId(m_vectorUserData.back().get()));
 
                 m_xPrefBox->insert(pParentEntry, -1, &item, &sId, nullptr, nullptr, true, m_xScratchIter.get());
                 // Necessary, without this the selection line will be truncated.
@@ -525,14 +533,14 @@ void CuiAboutConfigTabPage::AddToModifiedVector( const std::shared_ptr< Prop_Imp
     //property is not modified before
 }
 
-std::vector< OUString > CuiAboutConfigTabPage::commaStringToSequence( const OUString& rCommaSepString )
+std::vector< OUString > CuiAboutConfigTabPage::commaStringToSequence( std::u16string_view rCommaSepString )
 {
     std::vector<OUString> tempVector;
 
     sal_Int32 index = 0;
     do
     {
-        OUString word = rCommaSepString.getToken(0, u',', index);
+        OUString word( o3tl::getToken(rCommaSepString, 0, u',', index) );
         word = word.trim();
         if( !word.isEmpty())
             tempVector.push_back(word);
@@ -573,7 +581,7 @@ IMPL_LINK_NOARG( CuiAboutConfigTabPage, StandardHdl_Impl, weld::Button&, void )
     if (!m_xPrefBox->get_selected(m_xScratchIter.get()))
         return;
 
-    UserData *pUserData = reinterpret_cast<UserData*>(m_xPrefBox->get_id(*m_xScratchIter).toInt64());
+    UserData *pUserData = weld::fromId<UserData*>(m_xPrefBox->get_id(*m_xScratchIter));
     if (!(pUserData && pUserData->bIsPropertyPath))
         return;
 
@@ -581,6 +589,39 @@ IMPL_LINK_NOARG( CuiAboutConfigTabPage, StandardHdl_Impl, weld::Button&, void )
     OUString sPropertyName = m_xPrefBox->get_text(*m_xScratchIter, 1);
     OUString sPropertyType = m_xPrefBox->get_text(*m_xScratchIter, 2);
     OUString sPropertyValue = m_xPrefBox->get_text(*m_xScratchIter, 3);
+
+    // If the configuration property has a nil value, determine its static type:
+    if (sPropertyType == "void")
+    {
+        css::uno::Reference<css::beans::XPropertySetInfo> info(
+            CuiAboutConfigTabPage::getConfigAccess(pUserData->sPropertyPath, false),
+            css::uno::UNO_QUERY_THROW);
+        css::uno::Type t;
+        try {
+            t = info->getPropertyByName(sPropertyName).Type;
+        } catch (css::beans::UnknownPropertyException &) {
+            TOOLS_WARN_EXCEPTION("cui.options", pUserData->sPropertyPath << " " << sPropertyName);
+        }
+        // If the configuration property is of type any (or an UnknownPropertyException was caught
+        // above), stick to "void" for now (ideally, properties of type any would allow setting
+        // values of arbitrary type, regardless of their current value, in this dialog anyway):
+        if (t != cppu::UnoType<void>::get()) {
+            sPropertyType = t.getTypeName();
+            switch (t.getTypeClass()) {
+            case css::uno::TypeClass_BOOLEAN:
+                sPropertyValue = "false";
+                break;
+            case css::uno::TypeClass_SHORT:
+            case css::uno::TypeClass_LONG:
+            case css::uno::TypeClass_HYPER:
+            case css::uno::TypeClass_DOUBLE:
+                sPropertyValue = "0";
+                break;
+            default:
+                break;
+            }
+        }
+    }
 
     auto pProperty  = std::make_shared<Prop_Impl>( pUserData->sPropertyPath, sPropertyName, Any( sPropertyValue ) );
     bool bSaveChanges = false;
@@ -741,6 +782,7 @@ IMPL_LINK_NOARG( CuiAboutConfigTabPage, StandardHdl_Impl, weld::Button&, void )
             AddToModifiedVector( pProperty );
 
             //update listbox value.
+            m_xPrefBox->set_text(*m_xScratchIter, sPropertyType, 2);
             m_xPrefBox->set_text(*m_xScratchIter, sDialogValue, 3);
             //update m_prefBoxEntries
             auto it = std::find_if(m_prefBoxEntries.begin(), m_prefBoxEntries.end(),
@@ -856,7 +898,7 @@ void CuiAboutConfigTabPage::InsertEntry(const prefBoxEntry& rEntry)
         // deal with no parent case (tdf#107811)
         if (index < 0)
         {
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(rEntry.pUserData)));
+            OUString sId(weld::toId(rEntry.pUserData));
             m_xPrefBox->insert(nullptr, -1, &rEntry.sProp, &sId, nullptr, nullptr, false, m_xScratchIter.get());
             m_xPrefBox->set_text(*m_xScratchIter, rEntry.sStatus, 1);
             m_xPrefBox->set_text(*m_xScratchIter, rEntry.sType, 2);
@@ -900,7 +942,7 @@ void CuiAboutConfigTabPage::InsertEntry(const prefBoxEntry& rEntry)
         xGrandParentEntry = m_xPrefBox->make_iterator(xParentEntry.get());
     } while(index < sPath.getLength() - 1);
 
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(rEntry.pUserData)));
+    OUString sId(weld::toId(rEntry.pUserData));
     m_xPrefBox->insert(xParentEntry.get(), -1, &rEntry.sProp, &sId, nullptr, nullptr, false, m_xScratchIter.get());
     m_xPrefBox->set_text(*m_xScratchIter, rEntry.sStatus, 1);
     m_xPrefBox->set_text(*m_xScratchIter, rEntry.sType, 2);
@@ -911,7 +953,7 @@ IMPL_LINK(CuiAboutConfigTabPage, ExpandingHdl_Impl, const weld::TreeIter&, rEntr
 {
     if (m_xPrefBox->iter_has_child(rEntry))
         return true;
-    UserData *pUserData = reinterpret_cast<UserData*>(m_xPrefBox->get_id(rEntry).toInt64());
+    UserData *pUserData = weld::fromId<UserData*>(m_xPrefBox->get_id(rEntry));
     if (pUserData && !pUserData->bIsPropertyPath)
     {
         assert(pUserData->aXNameAccess.is());

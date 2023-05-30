@@ -23,6 +23,7 @@
 
 #include <ndarr.hxx>
 #include <tools/long.hxx>
+#include <utility>
 
 class SwWrtShell;
 class SwContentArr;
@@ -37,28 +38,28 @@ class SwTextFootnote;
 
 class SwOutlineContent final : public SwContent
 {
-    SwOutlineNodes::size_type nOutlinePos;
-    sal_uInt8   nOutlineLevel;
-    bool    bIsMoveable;
+    SwOutlineNodes::size_type m_nOutlinePos;
+    sal_uInt8   m_nOutlineLevel;
+    bool    m_bIsMoveable;
     public:
         SwOutlineContent(   const SwContentType* pCnt,
                             const OUString& rName,
                             SwOutlineNodes::size_type nArrPos,
                             sal_uInt8 nLevel,
                             bool bMove,
-                            tools::Long nYPos) :
+                            double nYPos) :
             SwContent(pCnt, rName, nYPos),
-            nOutlinePos(nArrPos), nOutlineLevel(nLevel), bIsMoveable(bMove) {}
+            m_nOutlinePos(nArrPos), m_nOutlineLevel(nLevel), m_bIsMoveable(bMove) {}
 
-    SwOutlineNodes::size_type GetOutlinePos() const {return nOutlinePos;}
-    sal_uInt8   GetOutlineLevel() const {return nOutlineLevel;}
-    bool        IsMoveable() const {return bIsMoveable;};
+    SwOutlineNodes::size_type GetOutlinePos() const {return m_nOutlinePos;}
+    sal_uInt8   GetOutlineLevel() const {return m_nOutlineLevel;}
+    bool        IsMoveable() const {return m_bIsMoveable;};
 };
 
 class SwRegionContent final : public SwContent
 {
 
-    sal_uInt8   nRegionLevel;
+    sal_uInt8   m_nRegionLevel;
 
     public:
         SwRegionContent(    const SwContentType* pCnt,
@@ -66,27 +67,27 @@ class SwRegionContent final : public SwContent
                             sal_uInt8 nLevel,
                             tools::Long nYPos) :
             SwContent(pCnt, rName, nYPos),
-                        nRegionLevel(nLevel){}
-    sal_uInt8   GetRegionLevel() const {return nRegionLevel;}
+                        m_nRegionLevel(nLevel){}
+    sal_uInt8   GetRegionLevel() const {return m_nRegionLevel;}
 };
 
 class SwURLFieldContent final : public SwContent
 {
-    OUString sURL;
-    const SwTextINetFormat* pINetAttr;
+    OUString m_sURL;
+    const SwTextINetFormat* m_pINetAttr;
 
 public:
     SwURLFieldContent(  const SwContentType* pCnt,
                             const OUString& rName,
-                            const OUString& rURL,
+                            OUString aURL,
                             const SwTextINetFormat* pAttr,
                             tools::Long nYPos )
-        : SwContent( pCnt, rName, nYPos ), sURL( rURL ), pINetAttr( pAttr )
+        : SwContent( pCnt, rName, nYPos ), m_sURL(std::move( aURL )), m_pINetAttr( pAttr )
     {}
 
     virtual bool        IsProtect() const override;
-    const OUString&     GetURL()    const   { return sURL; }
-    const SwTextINetFormat* GetINetAttr() const { return pINetAttr; }
+    const OUString&     GetURL()    const   { return m_sURL; }
+    const SwTextINetFormat* GetINetAttr() const { return m_pINetAttr; }
 };
 
 class SwTextFieldContent final : public SwContent
@@ -122,42 +123,42 @@ public:
 
 class SwPostItContent final : public SwContent
 {
-    const SwFormatField*     pField;
+    const SwFormatField*     m_pField;
 public:
     SwPostItContent( const SwContentType* pCnt,
                             const OUString& rName,
                             const SwFormatField* pFormatField,
                             tools::Long nYPos )
         : SwContent(pCnt, rName, nYPos)
-        , pField(pFormatField)
+        , m_pField(pFormatField)
     {}
 
-    const SwFormatField* GetPostIt() const  { return pField; }
+    const SwFormatField* GetPostIt() const  { return m_pField; }
     virtual bool    IsProtect()     const override;
 };
 
 class SwGraphicContent final : public SwContent
 {
-    OUString      sLink;
+    OUString      m_sLink;
 public:
-    SwGraphicContent(const SwContentType* pCnt, const OUString& rName, const OUString& rLink, tools::Long nYPos)
-        : SwContent( pCnt, rName, nYPos ), sLink( rLink )
+    SwGraphicContent(const SwContentType* pCnt, const OUString& rName, OUString aLink, tools::Long nYPos)
+        : SwContent( pCnt, rName, nYPos ), m_sLink(std::move( aLink ))
         {}
     virtual ~SwGraphicContent() override;
 
-    const OUString&   GetLink() const {return sLink;}
+    const OUString&   GetLink() const {return m_sLink;}
 };
 
 class SwTOXBaseContent final : public SwContent
 {
-    const SwTOXBase* pBase;
+    const SwTOXBase* m_pBase;
 public:
     SwTOXBaseContent(const SwContentType* pCnt, const OUString& rName, tools::Long nYPos, const SwTOXBase& rBase)
-        : SwContent( pCnt, rName, nYPos ), pBase(&rBase)
+        : SwContent( pCnt, rName, nYPos ), m_pBase(&rBase)
         {}
     virtual ~SwTOXBaseContent() override;
 
-    const SwTOXBase* GetTOXBase() const {return pBase;}
+    const SwTOXBase* GetTOXBase() const {return m_pBase;}
 };
 
 /**
@@ -183,15 +184,15 @@ class SwContentType final : public SwTypeNumber
     bool                m_bEdit:          1;  // can this type be edited?
     bool                m_bDelete:        1;  // can this type be deleted?
 
+    bool m_bAlphabeticSort = false;
+
         static OUString     RemoveNewline(const OUString&);
 public:
         SwContentType(SwWrtShell* pParent, ContentTypeId nType, sal_uInt8 nLevel );
         virtual ~SwContentType() override;
 
-        void                Init(bool* pbInvalidateWindow = nullptr);
-
         /** Fill the List of contents */
-        void                FillMemberList(bool* pbLevelChanged = nullptr);
+        void                FillMemberList(bool* pbContentChanged = nullptr);
         size_t              GetMemberCount() const
                                 {return m_nMemberCount;};
         ContentTypeId       GetType() const {return m_nContentType;}
@@ -207,6 +208,9 @@ public:
                                 m_nOutlineLevel = nNew;
                                 Invalidate();
                             }
+
+        bool GetSortType() const {return m_bAlphabeticSort;}
+        void SetSortType(bool bAlphabetic) {m_bAlphabeticSort = bAlphabetic;}
 
         void                Invalidate(); // only nMemberCount is read again
 

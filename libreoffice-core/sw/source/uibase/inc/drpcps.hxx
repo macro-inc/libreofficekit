@@ -28,6 +28,8 @@
 
 class SwWrtShell;
 
+/// Dedicated drop caps dialog, opened by the .uno:FormatDropcap UNO command, which is not in the
+/// default menus.
 class SwDropCapsDlg final : public SfxSingleTabDialogController
 {
 public:
@@ -65,14 +67,14 @@ class SwDropCapsPict final : public weld::CustomWidgetController
     SvxFont         maCJKFont;
     SvxFont         maCTLFont;
     Size            maTextSize;
-    css::uno::Reference< css::i18n::XBreakIterator >   xBreak;
+    css::uno::Reference< css::i18n::XBreakIterator >   m_xBreak;
 
     virtual void    Paint(vcl::RenderContext& /*rRenderContext*/, const tools::Rectangle &rRect) override;
     void            CheckScript();
     Size            CalcTextSize();
     inline void     InitPrinter();
     void            InitPrinter_();
-    static void     GetFontSettings( const SwDropCapsPage& _rPage, vcl::Font& _rFont, sal_uInt16 _nWhich );
+    static void     GetFontSettings( vcl::Font& _rFont, sal_uInt16 _nWhich );
     void            GetFirstScriptSegment(sal_Int32 &start, sal_Int32 &end, sal_uInt16 &scriptType);
     bool            GetNextScriptSegment(size_t &nIdx, sal_Int32 &start, sal_Int32 &end, sal_uInt16 &scriptType);
 
@@ -112,11 +114,9 @@ class SwDropCapsPage final : public SfxTabPage
 friend class SwDropCapsPict;
     SwDropCapsPict  m_aPict;
 
-    bool          bModified;
-    bool          bFormat;
-    bool          bHtmlMode;
-
-    SwWrtShell &rSh;
+    bool          m_bModified;
+    bool          m_bFormat;
+    bool          m_bHtmlMode;
 
     std::unique_ptr<weld::CheckButton> m_xDropCapsBox;
     std::unique_ptr<weld::CheckButton> m_xWholeWordCB;
@@ -144,20 +144,20 @@ friend class SwDropCapsPict;
     DECL_LINK(SelectHdl, weld::ComboBox&, void);
     DECL_LINK(WholeWordHdl, weld::Toggleable&, void);
 
-    static const WhichRangesContainer aPageRg;
+    static const WhichRangesContainer s_aPageRg;
 
 public:
     SwDropCapsPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet &rSet);
     virtual ~SwDropCapsPage() override;
 
     static std::unique_ptr<SfxTabPage> Create(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet *rSet);
-    static WhichRangesContainer GetRanges() { return aPageRg; }
+    static WhichRangesContainer GetRanges() { return s_aPageRg; }
 
 
     virtual bool FillItemSet(      SfxItemSet *rSet) override;
     virtual void Reset      (const SfxItemSet *rSet) override;
 
-    void    SetFormat(bool bSet){bFormat = bSet;}
+    void    SetFormat(bool bSet){m_bFormat = bSet;}
 };
 
 #endif

@@ -40,6 +40,7 @@
 #include <com/sun/star/ucb/InteractiveAugmentedIOException.hpp>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <osl/diagnose.h>
 #include <rtl/uri.hxx>
 #include <rtl/ustring.hxx>
@@ -123,25 +124,25 @@ namespace {
         pArguments[i++]
             <<= PropertyValue("Uri",
                               -1,
-                              makeAny(rPhysicalUrl),
+                              Any(rPhysicalUrl),
                               PropertyState_DIRECT_VALUE);
         if (bResourceName)
             pArguments[i++]
                 <<= PropertyValue("ResourceName",
                                   -1,
-                                  makeAny(aResourceName),
+                                  Any(aResourceName),
                                   PropertyState_DIRECT_VALUE);
         if (bResourceType)
             pArguments[i++]
                 <<= PropertyValue("ResourceType",
                                   -1,
-                                  makeAny(aResourceType),
+                                  Any(aResourceType),
                                   PropertyState_DIRECT_VALUE);
         if (bRemoveProperty)
             pArguments[i++]
                 <<= PropertyValue("Removable",
                                   -1,
-                                  makeAny(bRemovable),
+                                  Any(bRemovable),
                                   PropertyState_DIRECT_VALUE);
 
         return aArguments;
@@ -152,20 +153,20 @@ namespace {
 namespace fileaccess {
 
 
-    bool isChild( const OUString& srcUnqPath,
-                      const OUString& dstUnqPath )
+    bool isChild( std::u16string_view srcUnqPath,
+                      std::u16string_view dstUnqPath )
     {
         static const sal_Unicode slash = '/';
         // Simple lexical comparison
-        sal_Int32 srcL = srcUnqPath.getLength();
-        sal_Int32 dstL = dstUnqPath.getLength();
+        size_t srcL = srcUnqPath.size();
+        size_t dstL = dstUnqPath.size();
 
         return (
             ( srcUnqPath == dstUnqPath )
             ||
             ( ( dstL > srcL )
               &&
-              dstUnqPath.startsWith(srcUnqPath)
+              o3tl::starts_with(dstUnqPath, srcUnqPath)
               &&
               ( dstUnqPath[ srcL ] == slash ) )
         );
@@ -174,26 +175,26 @@ namespace fileaccess {
 
     OUString newName(
         std::u16string_view aNewPrefix,
-        const OUString& aOldPrefix,
+        std::u16string_view aOldPrefix,
         std::u16string_view old_Name )
     {
-        sal_Int32 srcL = aOldPrefix.getLength();
+        size_t srcL = aOldPrefix.size();
 
         return OUString::Concat(aNewPrefix) + old_Name.substr( srcL );
     }
 
 
-    OUString getTitle( const OUString& aPath )
+    std::u16string_view getTitle( std::u16string_view aPath )
     {
-        sal_Int32 lastIndex = aPath.lastIndexOf( '/' );
-        return aPath.copy( lastIndex + 1 );
+        size_t lastIndex = aPath.rfind( '/' );
+        return aPath.substr( lastIndex + 1 );
     }
 
 
-    OUString getParentName( const OUString& aFileName )
+    OUString getParentName( std::u16string_view aFileName )
     {
-        sal_Int32 lastIndex = aFileName.lastIndexOf( '/' );
-        OUString aParent = aFileName.copy( 0,lastIndex );
+        size_t lastIndex = aFileName.rfind( '/' );
+        OUString aParent( aFileName.substr( 0,lastIndex ) );
 
         if( aParent.endsWith(":") && aParent.getLength() == 6 )
             aParent += "/";
@@ -561,7 +562,7 @@ namespace fileaccess {
             prop.Handle = -1;
             OUString aClashingName(
                 rtl::Uri::decode(
-                    getTitle(aUncPath),
+                    OUString(getTitle(aUncPath)),
                     rtl_UriDecodeWithCharset,
                     RTL_TEXTENCODING_UTF8));
             prop.Value <<= aClashingName;

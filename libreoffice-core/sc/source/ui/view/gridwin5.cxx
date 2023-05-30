@@ -40,7 +40,6 @@
 #include <chgtrack.hxx>
 #include <chgviset.hxx>
 #include <dbfunc.hxx>
-#include <userdat.hxx>
 #include <postit.hxx>
 #include <global.hxx>
 
@@ -81,7 +80,7 @@ bool ScGridWindow::ShowNoteMarker( SCCOL nPosX, SCROW nPosY, bool bKeyboard )
                     else if ( eType == SC_CAT_DELETE_COLS )
                         aRange.aEnd.SetCol( aRange.aStart.Col() );
 
-                    if ( aRange.In( aCellPos ) )
+                    if ( aRange.Contains( aCellPos ) )
                     {
                         pFound = pAction;       // the last one wins
                         switch ( eType )
@@ -104,7 +103,7 @@ bool ScGridWindow::ShowNoteMarker( SCCOL nPosX, SCROW nPosY, bool bKeyboard )
                     ScRange aRange =
                         static_cast<const ScChangeActionMove*>(pAction)->
                         GetFromRange().MakeRange( rDoc );
-                    if ( aRange.In( aCellPos ) )
+                    if ( aRange.Contains( aCellPos ) )
                     {
                         pFound = pAction;
                     }

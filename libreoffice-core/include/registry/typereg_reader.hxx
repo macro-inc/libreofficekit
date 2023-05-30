@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_REGISTRY_READER_H
-#define INCLUDED_REGISTRY_READER_H
+#pragma once
 
 #include <registry/regdllapi.h>
 #include <registry/types.hxx>
@@ -139,7 +138,7 @@ REG_DLLPUBLIC RTTypeClass typereg_reader_getTypeClass(void * handle);
    @param handle a handle on a type reader; may be null
 
    @return whether the type reader is published; if <code>handle</code> is null,
-   <code>sal_False</code> is returned
+   false is returned
 
    @since UDK 3.2.0
  */
@@ -559,7 +558,5 @@ REG_DLLPUBLIC RTReferenceType typereg_reader_getReferenceSort(
  */
 REG_DLLPUBLIC void typereg_reader_getReferenceTypeName(
     void * handle, rtl_uString ** result, sal_uInt16 index);
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

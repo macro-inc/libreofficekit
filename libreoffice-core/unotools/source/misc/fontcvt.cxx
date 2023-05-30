@@ -23,8 +23,8 @@
 #include <sal/log.hxx>
 #include <unotools/fontcvt.hxx>
 #include <unotools/fontdefs.hxx>
-#include <sal/macros.h>
 
+#include <cstddef>
 #include <map>
 #include <vector>
 
@@ -33,9 +33,6 @@
 //then gained some extra code points, but there are still potentially
 //various holes in OpenSymbol which were filled by StarSymbol, i.e.
 //destination mapping points which are empty in OpenSymbol
-
-// note: the character mappings that are only approximations
-//       are marked (with an empty comment)
 
 const sal_Unicode aStarBatsTab[224] =
 {
@@ -1165,11 +1162,8 @@ StarSymbolToMSMultiFontImpl::StarSymbolToMSMultiFontImpl()
 
     //Reverse map from a given starsymbol char to exact matches in ms symbol
     //fonts.
-    int nEntries = SAL_N_ELEMENTS(aConservativeTable);
-    int i;
-    for (i = 0; i < nEntries; ++i)
+    for (auto const & r: aConservativeTable)
     {
-        const ConvertTable& r = aConservativeTable[i];
         SymbolEntry aEntry;
         aEntry.eFont = r.meFont;
         for (aEntry.cIndex = 0xFF; aEntry.cIndex >= 0x20; --aEntry.cIndex)
@@ -1192,12 +1186,9 @@ StarSymbolToMSMultiFontImpl::StarSymbolToMSMultiFontImpl()
             sizeof(aTNRExtraTab))
     };
 
-     //Allow extra conversions that are not perfect, but "good enough"
-    nEntries = SAL_N_ELEMENTS(aAggressiveTable);
-
-    for (i = 0; i < nEntries; ++i)
+    //Allow extra conversions that are not perfect, but "good enough"
+    for (auto const & r: aAggressiveTable)
     {
-        const ExtendedConvertTable& r = aAggressiveTable[i];
         SymbolEntry aEntry;
         aEntry.eFont = r.meFont;
         for (int j = r.mnSize / sizeof(r.mpTable[0]) - 1; j >=0; --j)
@@ -1268,7 +1259,7 @@ sal_Unicode ConvertChar::RecodeChar( sal_Unicode cChar ) const
 
             if (!cRetVal && mpSubsFontName)
             {
-                if ( IsStarSymbol( OUString::createFromAscii(mpSubsFontName) ) )
+                if ( IsOpenSymbol( OUString::createFromAscii(mpSubsFontName) ) )
                 {
                     cRetVal = 0xE12C;
                     SAL_WARN( "unotools.misc", "Forcing a bullet substitution from 0x" <<
@@ -1355,9 +1346,8 @@ const ConvertChar* ConvertChar::GetRecodeData( std::u16string_view rOrgFontName,
     if( aMapName == "starsymbol"
      || aMapName == "opensymbol" )
     {
-        for( int i = 0; i < int(SAL_N_ELEMENTS(aStarSymbolRecodeTable)); ++i)
+        for (auto const & r: aStarSymbolRecodeTable)
         {
-            const RecodeTable& r = aStarSymbolRecodeTable[i];
             if( aOrgName.equalsAscii( r.pOrgName ) )
             {
                 pCvt = &r.aCvt;
@@ -1370,9 +1360,8 @@ const ConvertChar* ConvertChar::GetRecodeData( std::u16string_view rOrgFontName,
     //adobe-symbol to unicode conversion in rtl instead
     else if( aMapName == "applesymbol" )
     {
-        for( int i = 0; i < int(SAL_N_ELEMENTS(aAppleSymbolRecodeTable)); ++i)
+        for (auto const & r: aAppleSymbolRecodeTable)
         {
-            const RecodeTable& r = aAppleSymbolRecodeTable[i];
             if( aOrgName.equalsAscii( r.pOrgName ) )
             {
                 pCvt = &r.aCvt;
@@ -1399,8 +1388,8 @@ FontToSubsFontConverter CreateFontToSubsFontConverter( std::u16string_view rOrgN
 
     if ( nFlags == FontToSubsFontFlags::IMPORT )
     {
-        const int nEntries = 2; // only StarMath+StarBats
-        for( int i = 0; i < nEntries; ++i )
+        const std::size_t nEntries = 2; // only StarMath+StarBats
+        for( std::size_t i = 0; i < nEntries; ++i )
         {
             const RecodeTable& r = aStarSymbolRecodeTable[i];
             if( aName.equalsAscii( r.pOrgName ) )

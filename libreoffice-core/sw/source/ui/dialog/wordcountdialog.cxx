@@ -87,7 +87,7 @@ void SwWordCountFloatDlg::showCJK(bool bShowCJK)
 {
     m_xCurrentCjkcharsFT->set_visible(bShowCJK);
     m_xDocCjkcharsFT->set_visible(bShowCJK);
-    if (m_xCjkcharsLabelFT2)
+    if (IS_MOBILE_PHONE && m_xCjkcharsLabelFT2)
         m_xCjkcharsLabelFT2->set_visible(bShowCJK);
     m_xCjkcharsLabelFT->set_visible(bShowCJK);
 }
@@ -96,7 +96,7 @@ void SwWordCountFloatDlg::showStandardizedPages(bool bShowStandardizedPages)
 {
     m_xCurrentStandardizedPagesFT->set_visible(bShowStandardizedPages);
     m_xDocStandardizedPagesFT->set_visible(bShowStandardizedPages);
-    if (m_xStandardizedPagesLabelFT2)
+    if (IS_MOBILE_PHONE && m_xStandardizedPagesLabelFT2)
         m_xStandardizedPagesLabelFT2->set_visible(bShowStandardizedPages);
     m_xStandardizedPagesLabelFT->set_visible(bShowStandardizedPages);
 }
@@ -129,19 +129,22 @@ SwWordCountFloatDlg::SwWordCountFloatDlg(SfxBindings* _pBindings,
 
 void SwWordCountFloatDlg::UpdateCounts()
 {
-    SwWrtShell &rSh = ::GetActiveView()->GetWrtShell();
-    SwDocStat aCurrCnt;
-    SwDocStat aDocStat;
+    if (SwView* pView = GetActiveView())
     {
-        auto& rDocShell(*GetActiveView()->GetDocShell());
-        SwWait aWait(rDocShell, true);
-        auto aLock = rDocShell.LockAllViews();
-        rSh.StartAction();
-        rSh.CountWords( aCurrCnt );
-        aDocStat = rSh.GetUpdatedDocStat();
-        rSh.EndAction();
+        SwWrtShell &rSh = pView->GetWrtShell();
+        SwDocStat aCurrCnt;
+        SwDocStat aDocStat;
+        {
+            auto& rDocShell(*pView->GetDocShell());
+            SwWait aWait(rDocShell, true);
+            auto aLock = rDocShell.LockAllViews();
+            rSh.StartAction();
+            rSh.CountWords( aCurrCnt );
+            aDocStat = rSh.GetUpdatedDocStat();
+            rSh.EndAction();
+        }
+        SetValues(aCurrCnt, aDocStat);
     }
-    SetValues(aCurrCnt, aDocStat);
 }
 
 void SwWordCountFloatDlg::SetCounts(const SwDocStat &rCurrCnt, const SwDocStat &rDocStat)

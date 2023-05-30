@@ -62,7 +62,6 @@
 #include <svx/xlnstwit.hxx>
 #include <svx/xlnwtit.hxx>
 #include <svx/xpoly.hxx>
-#include <rtl/ustrbuf.hxx>
 #include <unotools/syslocale.hxx>
 #include <unotools/localedatawrapper.hxx>
 #include <vcl/ptrstyle.hxx>
@@ -257,7 +256,7 @@ void SdrMeasureObj::TakeObjInfo(SdrObjTransformInfoRec& rInfo) const
 
 SdrObjKind SdrMeasureObj::GetObjIdentifier() const
 {
-    return OBJ_MEASURE;
+    return SdrObjKind::Measure;
 }
 
 struct ImpMeasureRec : public SdrDragStatUserData
@@ -698,7 +697,7 @@ void SdrMeasureObj::TakeUnrotatedSnapRect(tools::Rectangle& rRect) const
     RotatePoint(aTextPos,aPt1b,aMPol.nLineSin,aMPol.nLineCos);
     aTextSize2.AdjustWidth( 1 ); aTextSize2.AdjustHeight( 1 ); // because of the Rect-Ctor's odd behavior
     rRect=tools::Rectangle(aTextPos,aTextSize2);
-    rRect.Justify();
+    rRect.Normalize();
     const_cast<SdrMeasureObj*>(this)->maRect=rRect;
 
     if (aMPol.nTextAngle != maGeo.nRotationAngle) {
@@ -707,7 +706,7 @@ void SdrMeasureObj::TakeUnrotatedSnapRect(tools::Rectangle& rRect) const
     }
 }
 
-SdrMeasureObj* SdrMeasureObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> SdrMeasureObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new SdrMeasureObj(rTargetModel, *this);
 }
@@ -1125,7 +1124,7 @@ void SdrMeasureObj::RestoreGeoData(const SdrObjGeoData& rGeo)
     SetTextDirty();
 }
 
-SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
+rtl::Reference<SdrObject> SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText) const
 {
     // get XOR Poly as base
     XPolyPolygon aTmpPolyPolygon(TakeXorPoly());
@@ -1135,11 +1134,11 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
     SfxStyleSheet* pStyleSheet = GetStyleSheet();
 
     // prepare group
-    std::unique_ptr<SdrObjGroup,SdrObjectFreeOp> pGroup(new SdrObjGroup(getSdrModelFromSdrObject()));
+    rtl::Reference<SdrObjGroup> pGroup(new SdrObjGroup(getSdrModelFromSdrObject()));
 
     // prepare parameters
     basegfx::B2DPolyPolygon aPolyPoly;
-    SdrPathObj* pPath;
+    rtl::Reference<SdrPathObj> pPath;
     sal_uInt16 nCount(aTmpPolyPolygon.Count());
     sal_uInt16 nLoopStart(0);
 
@@ -1151,12 +1150,12 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
 
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
         aSet.Put(XLineStartWidthItem(0));
         aSet.Put(XLineEndWidthItem(0));
         nLoopStart = 1;
@@ -1172,13 +1171,13 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
         aPolyPoly.append(aTmpPolyPolygon[0].getB2DPolygon());
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
 
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
 
         aSet.Put(XLineEndWidthItem(nEndWidth));
         aSet.Put(XLineStartWidthItem(0));
@@ -1187,13 +1186,13 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
         aPolyPoly.append(aTmpPolyPolygon[1].getB2DPolygon());
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
 
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
 
         aSet.Put(XLineEndWidthItem(0));
         nLoopStart = 2;
@@ -1209,13 +1208,13 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
         aPolyPoly.append(aTmpPolyPolygon[0].getB2DPolygon());
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
 
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
 
         aSet.Put(XLineEndWidthItem(nEndWidth));
         aSet.Put(XLineStartWidthItem(0));
@@ -1224,13 +1223,13 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
         aPolyPoly.append(aTmpPolyPolygon[1].getB2DPolygon());
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
 
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
 
         aSet.Put(XLineEndWidthItem(0));
         nLoopStart = 2;
@@ -1242,13 +1241,13 @@ SdrObjectUniquePtr SdrMeasureObj::DoConvertToPolyObj(bool bBezier, bool bAddText
         aPolyPoly.append(aTmpPolyPolygon[nLoopStart].getB2DPolygon());
         pPath = new SdrPathObj(
             getSdrModelFromSdrObject(),
-            OBJ_PATHLINE,
+            SdrObjKind::PathLine,
             aPolyPoly);
 
         pPath->SetMergedItemSet(aSet);
         pPath->SetStyleSheet(pStyleSheet, true);
 
-        pGroup->GetSubList()->NbcInsertObject(pPath);
+        pGroup->GetSubList()->NbcInsertObject(pPath.get());
     }
 
     if(bAddText)

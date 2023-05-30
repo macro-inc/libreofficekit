@@ -29,13 +29,13 @@
 #include <com/sun/star/io/XTruncate.hpp>
 #include <com/sun/star/io/TempFile.hpp>
 
-#include <comphelper/interfacecontainer2.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <sot/stg.hxx>
 #include <sot/storinfo.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -43,11 +43,11 @@ const sal_Int32 nBytesCount = 32000;
 
 
 OLESimpleStorage::OLESimpleStorage(
-        css::uno::Reference<css::uno::XComponentContext> const & xContext,
+        css::uno::Reference<css::uno::XComponentContext> xContext,
         css::uno::Sequence<css::uno::Any> const &aArguments)
 : m_bDisposed( false )
 , m_pListenersContainer( nullptr )
-, m_xContext( xContext )
+, m_xContext(std::move( xContext ))
 , m_bNoTemporaryCopy( false )
 {
     sal_Int32 nArgNum = aArguments.getLength();
@@ -580,7 +580,7 @@ void SAL_CALL OLESimpleStorage::addEventListener(
         throw lang::DisposedException();
 
     if ( !m_pListenersContainer )
-        m_pListenersContainer = new ::comphelper::OInterfaceContainerHelper2( m_aMutex );
+        m_pListenersContainer = new ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>( m_aMutex );
 
     m_pListenersContainer->addInterface( xListener );
 }

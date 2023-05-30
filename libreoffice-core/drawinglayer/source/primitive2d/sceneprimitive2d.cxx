@@ -23,14 +23,15 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/attribute/sdrlightattribute3d.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <processor3d/zbufferprocessor3d.hxx>
 #include <processor3d/shadow3dextractor.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
 #include <processor3d/geometry2dextractor.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/raster/bzpixelraster.hxx>
+#include <utility>
 #include <vcl/BitmapTools.hxx>
 #include <comphelper/threadpool.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
@@ -223,7 +224,7 @@ namespace drawinglayer::primitive2d
                 if(aViewRange.isEmpty() || aShadow2DRange.overlaps(aViewRange))
                 {
                     // add extracted 2d shadows (before 3d scene creations itself)
-                    rContainer.insert(rContainer.end(), maShadowPrimitives.begin(), maShadowPrimitives.end());
+                    rContainer.append(maShadowPrimitives);
                 }
             }
 
@@ -471,7 +472,7 @@ namespace drawinglayer::primitive2d
             // create bitmap primitive and add
             rContainer.push_back(
                 new BitmapPrimitive2D(
-                    VCLUnoHelper::CreateVCLXBitmap(maOldRenderedBitmap),
+                    maOldRenderedBitmap,
                     aNew2DTransform));
 
             // test: Allow to add an outline in the debugger when tests are needed
@@ -481,7 +482,7 @@ namespace drawinglayer::primitive2d
             {
                 basegfx::B2DPolygon aOutline(basegfx::utils::createUnitPolygon());
                 aOutline.transform(aNew2DTransform);
-                rContainer.push_back(new PolygonHairlinePrimitive2D(aOutline, basegfx::BColor(1.0, 0.0, 0.0)));
+                rContainer.push_back(new PolygonHairlinePrimitive2D(std::move(aOutline), basegfx::BColor(1.0, 0.0, 0.0)));
             }
         }
 
@@ -509,8 +510,6 @@ namespace drawinglayer::primitive2d
 
         Primitive2DContainer ScenePrimitive2D::getShadow2D() const
         {
-            std::unique_lock aGuard( m_aMutex );
-
             Primitive2DContainer aRetval;
 
             // create 2D shadows from contained 3D primitives
@@ -525,56 +524,54 @@ namespace drawinglayer::primitive2d
 
         bool ScenePrimitive2D::tryToCheckLastVisualisationDirectHit(const basegfx::B2DPoint& rLogicHitPoint, bool& o_rResult) const
         {
-            if(!maOldRenderedBitmap.IsEmpty() && !maOldUnitVisiblePart.isEmpty())
+            if(maOldRenderedBitmap.IsEmpty() || maOldUnitVisiblePart.isEmpty())
+                return false;
+
+            basegfx::B2DHomMatrix aInverseSceneTransform(getObjectTransformation());
+            aInverseSceneTransform.invert();
+            const basegfx::B2DPoint aRelativePoint(aInverseSceneTransform * rLogicHitPoint);
+
+            if(!maOldUnitVisiblePart.isInside(aRelativePoint))
+                return false;
+
+            // calculate coordinates relative to visualized part
+            double fDivisorX(maOldUnitVisiblePart.getWidth());
+            double fDivisorY(maOldUnitVisiblePart.getHeight());
+
+            if(basegfx::fTools::equalZero(fDivisorX))
             {
-                basegfx::B2DHomMatrix aInverseSceneTransform(getObjectTransformation());
-                aInverseSceneTransform.invert();
-                const basegfx::B2DPoint aRelativePoint(aInverseSceneTransform * rLogicHitPoint);
-
-                if(maOldUnitVisiblePart.isInside(aRelativePoint))
-                {
-                    // calculate coordinates relative to visualized part
-                    double fDivisorX(maOldUnitVisiblePart.getWidth());
-                    double fDivisorY(maOldUnitVisiblePart.getHeight());
-
-                    if(basegfx::fTools::equalZero(fDivisorX))
-                    {
-                        fDivisorX = 1.0;
-                    }
-
-                    if(basegfx::fTools::equalZero(fDivisorY))
-                    {
-                        fDivisorY = 1.0;
-                    }
-
-                    const double fRelativeX((aRelativePoint.getX() - maOldUnitVisiblePart.getMinX()) / fDivisorX);
-                    const double fRelativeY((aRelativePoint.getY() - maOldUnitVisiblePart.getMinY()) / fDivisorY);
-
-                    // combine with real BitmapSizePixel to get bitmap coordinates
-                    const Size aBitmapSizePixel(maOldRenderedBitmap.GetSizePixel());
-                    const sal_Int32 nX(basegfx::fround(fRelativeX * aBitmapSizePixel.Width()));
-                    const sal_Int32 nY(basegfx::fround(fRelativeY * aBitmapSizePixel.Height()));
-
-                    // try to get a statement about transparency in that pixel
-                    o_rResult = (0 != maOldRenderedBitmap.GetAlpha(nX, nY));
-                    return true;
-                }
+                fDivisorX = 1.0;
             }
 
-            return false;
+            if(basegfx::fTools::equalZero(fDivisorY))
+            {
+                fDivisorY = 1.0;
+            }
+
+            const double fRelativeX((aRelativePoint.getX() - maOldUnitVisiblePart.getMinX()) / fDivisorX);
+            const double fRelativeY((aRelativePoint.getY() - maOldUnitVisiblePart.getMinY()) / fDivisorY);
+
+            // combine with real BitmapSizePixel to get bitmap coordinates
+            const Size aBitmapSizePixel(maOldRenderedBitmap.GetSizePixel());
+            const sal_Int32 nX(basegfx::fround(fRelativeX * aBitmapSizePixel.Width()));
+            const sal_Int32 nY(basegfx::fround(fRelativeY * aBitmapSizePixel.Height()));
+
+            // try to get a statement about transparency in that pixel
+            o_rResult = (0 != maOldRenderedBitmap.GetAlpha(nX, nY));
+            return true;
         }
 
         ScenePrimitive2D::ScenePrimitive2D(
-            const primitive3d::Primitive3DContainer& rxChildren3D,
-            const attribute::SdrSceneAttribute& rSdrSceneAttribute,
-            const attribute::SdrLightingAttribute& rSdrLightingAttribute,
-            const basegfx::B2DHomMatrix& rObjectTransformation,
-            const geometry::ViewInformation3D& rViewInformation3D)
-        :   mxChildren3D(rxChildren3D),
-            maSdrSceneAttribute(rSdrSceneAttribute),
-            maSdrLightingAttribute(rSdrLightingAttribute),
-            maObjectTransformation(rObjectTransformation),
-            maViewInformation3D(rViewInformation3D),
+            primitive3d::Primitive3DContainer aChildren3D,
+            attribute::SdrSceneAttribute  aSdrSceneAttribute,
+            attribute::SdrLightingAttribute aSdrLightingAttribute,
+            basegfx::B2DHomMatrix aObjectTransformation,
+            geometry::ViewInformation3D aViewInformation3D)
+        :   mxChildren3D(std::move(aChildren3D)),
+            maSdrSceneAttribute(std::move(aSdrSceneAttribute)),
+            maSdrLightingAttribute(std::move(aSdrLightingAttribute)),
+            maObjectTransformation(std::move(aObjectTransformation)),
+            maViewInformation3D(std::move(aViewInformation3D)),
             mbShadow3DChecked(false),
             mfOldDiscreteSizeX(0.0),
             mfOldDiscreteSizeY(0.0)
@@ -626,8 +623,6 @@ namespace drawinglayer::primitive2d
 
         void ScenePrimitive2D::get2DDecomposition(Primitive2DDecompositionVisitor& rVisitor, const geometry::ViewInformation2D& rViewInformation) const
         {
-            std::unique_lock aGuard( m_aMutex );
-
             // get the involved ranges (see helper method calculateDiscreteSizes for details)
             basegfx::B2DRange aDiscreteRange;
             basegfx::B2DRange aUnitVisibleRange;
@@ -681,7 +676,6 @@ namespace drawinglayer::primitive2d
             }
 
             // use parent implementation
-            aGuard.unlock();
             BufferedDecompositionPrimitive2D::get2DDecomposition(rVisitor, rViewInformation);
         }
 

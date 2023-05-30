@@ -54,10 +54,12 @@ public:
 
     bool GetGlyphOutline(sal_GlyphId, basegfx::B2DPolyPolygon&, bool) const override;
 
+    IDWriteFontFace* GetDWFontFace() const;
+
 private:
     explicit WinFontInstance(const WinFontFace&, const vcl::font::FontSelectPattern&);
 
-    hb_font_t* ImplInitHbFont() override;
+    virtual void ImplInitHbFont(hb_font_t*) override;
     bool ImplGetGlyphBoundRect(sal_GlyphId, tools::Rectangle&, bool) const override;
 
     WinSalGraphics *m_pGraphics;
@@ -65,6 +67,7 @@ private:
     float m_fScale;
     bool  m_bIsCJKVerticalFont;
     sal_Int32 m_nTmDescent;
+    mutable sal::systools::COMReference<IDWriteFontFace> mxDWFontFace;
 };
 
 class TextOutRenderer

@@ -18,9 +18,10 @@
  */
 
 
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <tools/stream.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svl/SfxBroadcaster.hxx>
 #include <basic/codecompletecache.hxx>
 #include <basic/sbx.hxx>
@@ -198,7 +199,7 @@ DocObjectWrapper::invoke( const OUString& aFunctionName, const Sequence< Any >& 
             return m_xAggInv->invoke( aFunctionName, aParams, aOutParamIndex, aOutParam );
     SbMethodRef pMethod = getMethod( aFunctionName );
     if ( !pMethod.is() )
-        throw RuntimeException();
+        throw RuntimeException("DocObjectWrapper::invoke - Could not get the method reference!");
     // check number of parameters
     sal_Int32 nParamsCount = aParams.getLength();
     SbxInfo* pInfo = pMethod->GetInfo();
@@ -415,9 +416,9 @@ static bool getDefaultVBAMode( StarBASIC* pb )
 // A Basic module has set EXTSEARCH, so that the elements, that the module contains,
 // could be found from other module.
 
-SbModule::SbModule( const OUString& rName, bool bVBACompat )
+SbModule::SbModule( const OUString& rName, bool bVBASupport )
          : SbxObject( "StarBASICModule" ),
-           pBreaks(nullptr), mbVBACompat( bVBACompat ), bIsProxyModule( false )
+           pBreaks(nullptr), mbVBASupport(bVBASupport), mbCompat(bVBASupport), bIsProxyModule(false)
 {
     SetName( rName );
     SetFlag( SbxFlagBits::ExtSearch | SbxFlagBits::GlobalSearch );
@@ -801,11 +802,11 @@ void SbModule::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
 void SbModule::SetSource32( const OUString& r )
 {
     // Default basic mode to library container mode, but... allow Option VBASupport 0/1 override
-    SetVBACompat( getDefaultVBAMode( static_cast< StarBASIC*>( GetParent() ) ) );
+    SetVBASupport( getDefaultVBAMode( static_cast< StarBASIC*>( GetParent() ) ) );
     aOUSource = r;
     StartDefinitions();
     SbiTokenizer aTok( r );
-    aTok.SetCompatible( IsVBACompat() );
+    aTok.SetCompatible( IsVBASupport() );
 
     while( !aTok.IsEof() )
     {
@@ -836,12 +837,13 @@ void SbModule::SetSource32( const OUString& r )
                     eCurTok = aTok.Next();
                     if( eCurTok == COMPATIBLE )
                     {
+                        mbCompat = true;
                         aTok.SetCompatible( true );
                     }
                     else if ( ( eCurTok == VBASUPPORT ) && ( aTok.Next() == NUMBER ) )
                     {
                         bool bIsVBA = ( aTok.GetDbl()== 1 );
-                        SetVBACompat( bIsVBA );
+                        SetVBASupport( bIsVBA );
                         aTok.SetCompatible( bIsVBA );
                     }
                 }
@@ -915,8 +917,8 @@ static void SendHint( SbxObject* pObj, SfxHintId nId, SbMethod* p )
     SendHint_( pObj, nId, p );
 }
 
-// #57841 Clear Uno-Objects, which were helt in RTL functions,
-// at the end of the program, so that nothing were helt.
+// #57841 Clear Uno-Objects, which were held in RTL functions,
+// at the end of the program, so that nothing is held
 static void ClearUnoObjectsInRTL_Impl_Rek( StarBASIC* pBasic )
 {
     // delete the return value of CreateUnoService
@@ -973,15 +975,16 @@ static void ClearUnoObjectsInRTL_Impl( StarBASIC* pBasic )
 }
 
 
-void SbModule::SetVBACompat( bool bCompat )
+void SbModule::SetVBASupport( bool bSupport )
 {
-    if( mbVBACompat == bCompat )
+    if( mbVBASupport == bSupport )
         return;
 
-    mbVBACompat = bCompat;
+    mbVBASupport = bSupport;
     // initialize VBA document API
-    if( mbVBACompat ) try
+    if( mbVBASupport ) try
     {
+        mbCompat = true;
         StarBASIC* pBasic = static_cast< StarBASIC* >( GetParent() );
         uno::Reference< lang::XMultiServiceFactory > xFactory( getDocumentModel( pBasic ), uno::UNO_QUERY_THROW );
         xFactory->createInstance( "ooo.vba.VBAGlobals" );
@@ -1066,7 +1069,7 @@ namespace
 // Run a Basic-subprogram
 void SbModule::Run( SbMethod* pMeth )
 {
-    SAL_INFO("basic","About to run " << pMeth->GetName() << ", vba compatmode is " << mbVBACompat );
+    SAL_INFO("basic","About to run " << pMeth->GetName() << ", vba compatmode is " << mbVBASupport );
 
     static sal_uInt16 nMaxCallLevel = 0;
 
@@ -1087,7 +1090,7 @@ void SbModule::Run( SbMethod* pMeth )
         /*  If a VBA script in a document is started, get the VBA compatibility
             interface from the document Basic library container, and notify all
             VBA script listeners about the started script. */
-        if( mbVBACompat )
+        if( mbVBASupport )
         {
             StarBASIC* pBasic = static_cast< StarBASIC* >( GetParent() );
             if( pBasic && pBasic->IsDocBasic() ) try
@@ -1165,21 +1168,19 @@ void SbModule::Run( SbMethod* pMeth )
                 pSbData->pInst->CalcBreakCallLevel( pMeth->GetDebugFlags() );
             }
 
-            auto xRuntimeGuard(std::make_unique<RunGuard>(this, pMeth, pMeth->nStart, pSbData, bDelInst));
-
-            if ( mbVBACompat )
             {
-                pSbData->pInst->EnableCompatibility( true );
+                RunGuard xRuntimeGuard(this, pMeth, pMeth->nStart, pSbData, bDelInst);
+
+                if (mbVBASupport)
+                    pSbData->pInst->EnableCompatibility(true);
+
+                xRuntimeGuard.run();
             }
-
-            xRuntimeGuard->run();
-
-            xRuntimeGuard.reset();
 
             if( bDelInst )
             {
-                // #57841 Clear Uno-Objects, which were helt in RTL functions,
-                // at the end of the program, so that nothing were helt.
+                // #57841 Clear Uno-Objects, which were held in RTL functions,
+                // at the end of the program, so that nothing is held.
                 ClearUnoObjectsInRTL_Impl( xBasic.get() );
 
                 clearNativeObjectWrapperVector();
@@ -1223,8 +1224,8 @@ void SbModule::Run( SbMethod* pMeth )
     StarBASIC* pBasic = dynamic_cast<StarBASIC*>( GetParent() );
     if( bDelInst )
     {
-       // #57841 Clear Uno-Objects, which were helt in RTL functions,
-       // the end of the program, so that nothing were helt.
+        // #57841 Clear Uno-Objects, which were held in RTL functions,
+        // the end of the program, so that nothing is held.
         ClearUnoObjectsInRTL_Impl( xBasic.get() );
 
         delete pSbData->pInst;
@@ -1253,9 +1254,7 @@ void SbModule::RunInit()
     pSbData->bRunInit = true;
 
     // The init code starts always here
-    auto xRuntimeGuard(std::make_unique<RunInitGuard>(this, nullptr, 0, pSbData));
-    xRuntimeGuard->run();
-    xRuntimeGuard.reset();
+    RunInitGuard(this, nullptr, 0, pSbData).run();
 
     pImage->bInit = true;
     pImage->bFirstInit = false;
@@ -1450,7 +1449,7 @@ const sal_uInt8* SbModule::FindNextStmnt( const sal_uInt8* p, sal_uInt16& nLine,
 const sal_uInt8* SbModule::FindNextStmnt( const sal_uInt8* p, sal_uInt16& nLine, sal_uInt16& nCol,
     bool bFollowJumps, const SbiImage* pImg ) const
 {
-    sal_uInt32 nPC = static_cast<sal_uInt32>( p - reinterpret_cast<const sal_uInt8*>(pImage->GetCode()) );
+    sal_uInt32 nPC = static_cast<sal_uInt32>( p - pImage->GetCode() );
     while( nPC < pImage->GetCodeSize() )
     {
         SbiOpcode eOp = static_cast<SbiOpcode>( *p++ );
@@ -1460,7 +1459,7 @@ const sal_uInt8* SbModule::FindNextStmnt( const sal_uInt8* p, sal_uInt16& nLine,
             SAL_WARN_IF( !pImg, "basic", "FindNextStmnt: pImg==NULL with FollowJumps option" );
             sal_uInt32 nOp1 = *p++; nOp1 |= *p++ << 8;
             nOp1 |= *p++ << 16; nOp1 |= *p++ << 24;
-            p = reinterpret_cast<const sal_uInt8*>(pImg->GetCode()) + nOp1;
+            p = pImg->GetCode() + nOp1;
         }
         else if( eOp >= SbiOpcode::SbOP1_START && eOp <= SbiOpcode::SbOP1_END )
         {
@@ -1497,7 +1496,7 @@ bool SbModule::IsBreakable( sal_uInt16 nLine ) const
 {
     if( !pImage )
         return false;
-    const sal_uInt8* p = reinterpret_cast<const sal_uInt8*>(pImage->GetCode());
+    const sal_uInt8* p = pImage->GetCode();
     sal_uInt16 nl, nc;
     while( ( p = FindNextStmnt( p, nl, nc ) ) != nullptr )
         if( nl == nLine )
@@ -1596,38 +1595,38 @@ bool SbModule::LoadData( SvStream& rStrm, sal_uInt16 nVer )
     SetFlag( SbxFlagBits::ExtSearch | SbxFlagBits::GlobalSearch );
     sal_uInt8 bImage;
     rStrm.ReadUChar( bImage );
-    if( bImage )
-    {
-        std::unique_ptr<SbiImage> p(new SbiImage);
-        sal_uInt32 nImgVer = 0;
+    if( !bImage )
+        return true;
 
-        if( !p->Load( rStrm, nImgVer ) )
-        {
-            return false;
-        }
-        // If the image is in old format, we fix up the method start offsets
-        if ( nImgVer < B_EXT_IMG_VERSION )
-        {
-            fixUpMethodStart( false, p.get() );
-            p->ReleaseLegacyBuffer();
-        }
-        aComment = p->aComment;
-        SetName( p->aName );
-        if( p->GetCodeSize() )
-        {
-            aOUSource = p->aOUSource;
-            // Old version: image away
-            if( nVer == 1 )
-            {
-                SetSource32( p->aOUSource );
-            }
-            else
-                pImage = std::move(p);
-        }
-        else
+    std::unique_ptr<SbiImage> p(new SbiImage);
+    sal_uInt32 nImgVer = 0;
+
+    if( !p->Load( rStrm, nImgVer ) )
+    {
+        return false;
+    }
+    // If the image is in old format, we fix up the method start offsets
+    if ( nImgVer < B_EXT_IMG_VERSION )
+    {
+        fixUpMethodStart( false, p.get() );
+        p->ReleaseLegacyBuffer();
+    }
+    aComment = p->aComment;
+    SetName( p->aName );
+    if( p->GetCodeSize() )
+    {
+        aOUSource = p->aOUSource;
+        // Old version: image away
+        if( nVer == 1 )
         {
             SetSource32( p->aOUSource );
         }
+        else
+            pImage = std::move(p);
+    }
+    else
+    {
+        SetSource32( p->aOUSource );
     }
     return true;
 }
@@ -2063,10 +2062,7 @@ ErrCode SbMethod::Call( SbxValue* pRet, SbxVariable* pCaller )
         StarBASIC::Error( ERRCODE_BASIC_BAD_PROP_VALUE );
 
     // tdf#143582 - clear return value of the method before calling it
-    const SbxFlagBits nSavFlags = GetFlags();
-    SetFlag(SbxFlagBits::ReadWrite | SbxFlagBits::NoBroadcast);
     Clear();
-    SetFlags(nSavFlags);
 
     Get( aVals );
     if ( pRet )
@@ -2212,8 +2208,8 @@ class FormObjEventListenerImpl:
 public:
     FormObjEventListenerImpl(const FormObjEventListenerImpl&) = delete;
     const FormObjEventListenerImpl& operator=(const FormObjEventListenerImpl&) = delete;
-    FormObjEventListenerImpl( SbUserFormModule* pUserForm, const uno::Reference< lang::XComponent >& xComponent, const uno::Reference< frame::XModel >& xModel ) :
-        mpUserForm( pUserForm ), mxComponent( xComponent), mxModel( xModel ),
+    FormObjEventListenerImpl( SbUserFormModule* pUserForm, uno::Reference< lang::XComponent > xComponent, uno::Reference< frame::XModel > xModel ) :
+        mpUserForm( pUserForm ), mxComponent(std::move( xComponent)), mxModel(std::move( xModel )),
         mbDisposed( false ), mbOpened( false ), mbActivated( false ), mbShowing( false )
     {
         if ( mxComponent.is() )
@@ -2506,7 +2502,7 @@ void SbUserFormModule::triggerResizeEvent()
 
 SbUserFormModuleInstance* SbUserFormModule::CreateInstance()
 {
-    SbUserFormModuleInstance* pInstance = new SbUserFormModuleInstance( this, GetName(), m_mInfo, IsVBACompat() );
+    SbUserFormModuleInstance* pInstance = new SbUserFormModuleInstance( this, GetName(), m_mInfo, IsVBASupport() );
     return pInstance;
 }
 
@@ -2616,9 +2612,9 @@ void SbUserFormModule::InitObject()
             uno::Sequence< uno::Any > aArgs
             {
                 uno::Any(),
-                makeAny(m_xDialog),
-                makeAny(m_xModel),
-                makeAny(GetParent()->GetName())
+                Any(m_xDialog),
+                Any(m_xModel),
+                Any(GetParent()->GetName())
             };
             pDocObject = new SbUnoObject( GetName(), uno::Any( xVBAFactory->createInstanceWithArguments( "ooo.vba.msforms.UserForm", aArgs  ) ) );
 

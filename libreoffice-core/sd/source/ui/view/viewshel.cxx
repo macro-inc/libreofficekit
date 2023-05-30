@@ -32,7 +32,6 @@
 #include <sfx2/bindings.hxx>
 #include <sfx2/dispatch.hxx>
 #include <vcl/commandevent.hxx>
-#include <vcl/scrbar.hxx>
 #include <svl/eitem.hxx>
 #include <svx/ruler.hxx>
 #include <svx/svxids.hrc>
@@ -163,7 +162,6 @@ ViewShell::~ViewShell()
         mpContentWindow.disposeAndClear();
     }
 
-    mpScrollBarBox.disposeAndClear();
     mpVerticalRuler.disposeAndClear();
     mpHorizontalRuler.disposeAndClear();
     mpVerticalScrollBar.disposeAndClear();
@@ -180,6 +178,7 @@ void ViewShell::construct()
     mpView = nullptr;
     mpFrameView = nullptr;
     mpZoomList = nullptr;
+    mfLastZoomScale = 0;
     mbStartShowWithDialog = false;
     mnPrintedHandoutPageNum = 1;
     mnPrintedHandoutPageCount = 0;
@@ -197,7 +196,7 @@ void ViewShell::construct()
     mpContentWindow.reset(VclPtr< ::sd::Window >::Create(GetParentWindow()));
     SetActiveWindow (mpContentWindow.get());
 
-    GetParentWindow()->SetBackground (Wallpaper());
+    GetParentWindow()->SetBackground(Application::GetSettings().GetStyleSettings().GetFaceColor());
     mpContentWindow->SetBackground (Wallpaper());
     mpContentWindow->SetCenterAllowed(true);
     mpContentWindow->SetViewShell(this);
@@ -207,16 +206,14 @@ void ViewShell::construct()
     if ( ! GetDocSh()->IsPreview())
     {
         // Create scroll bars and the filler between the scroll bars.
-        mpHorizontalScrollBar.reset (VclPtr<ScrollBar>::Create(GetParentWindow(), WinBits(WB_HSCROLL | WB_DRAG)));
+        mpHorizontalScrollBar.reset (VclPtr<ScrollAdaptor>::Create(GetParentWindow(), true));
         mpHorizontalScrollBar->EnableRTL (false);
         mpHorizontalScrollBar->SetRange(Range(0, 32000));
         mpHorizontalScrollBar->SetScrollHdl(LINK(this, ViewShell, HScrollHdl));
 
-        mpVerticalScrollBar.reset (VclPtr<ScrollBar>::Create(GetParentWindow(), WinBits(WB_VSCROLL | WB_DRAG)));
+        mpVerticalScrollBar.reset (VclPtr<ScrollAdaptor>::Create(GetParentWindow(), false));
         mpVerticalScrollBar->SetRange(Range(0, 32000));
         mpVerticalScrollBar->SetScrollHdl(LINK(this, ViewShell, VScrollHdl));
-
-        mpScrollBarBox.reset(VclPtr<ScrollBarBox>::Create(GetParentWindow(), WB_SIZEABLE));
     }
 
     SetName ("ViewShell");
@@ -256,8 +253,6 @@ void ViewShell::doShow()
         maScrBarWH = Size(
             mpVerticalScrollBar->GetSizePixel().Width(),
             mpHorizontalScrollBar->GetSizePixel().Height());
-
-        mpScrollBarBox->Show();
     }
 
     GetParentWindow()->Show();
@@ -522,7 +517,7 @@ void ViewShell::SetCursorMm100Position(const Point& rPosition, bool bPoint, bool
     }
 }
 
-uno::Reference<datatransfer::XTransferable> ViewShell::GetSelectionTransferrable() const
+uno::Reference<datatransfer::XTransferable> ViewShell::GetSelectionTransferable() const
 {
     SdrView* pSdrView = GetView();
     if (!pSdrView)
@@ -651,7 +646,7 @@ bool ViewShell::Notify(NotifyEvent const & rNEvt, ::sd::Window* pWin)
 {
     // handle scroll commands when they arrived at child windows
     bool bRet = false;
-    if( rNEvt.GetType() == MouseNotifyEvent::COMMAND )
+    if( rNEvt.GetType() == NotifyEventType::COMMAND )
     {
         // note: dynamic_cast is not possible as GetData() returns a void*
         CommandEvent* pCmdEvent = static_cast< CommandEvent* >(rNEvt.GetData());
@@ -666,22 +661,22 @@ bool ViewShell::HandleScrollCommand(const CommandEvent& rCEvt, ::sd::Window* pWi
 
     switch( rCEvt.GetCommand() )
     {
-        case CommandEventId::Swipe:
+        case CommandEventId::GestureSwipe:
             {
                 rtl::Reference< SlideShow > xSlideShow( SlideShow::GetSlideShow( GetViewShellBase() ) );
                 if (xSlideShow.is())
                 {
-                    const CommandSwipeData* pSwipeData = rCEvt.GetSwipeData();
+                    const CommandGestureSwipeData* pSwipeData = rCEvt.GetGestureSwipeData();
                     bDone = xSlideShow->swipe(*pSwipeData);
                 }
             }
             break;
-        case CommandEventId::LongPress:
+        case CommandEventId::GestureLongPress:
             {
                 rtl::Reference< SlideShow > xSlideShow( SlideShow::GetSlideShow( GetViewShellBase() ) );
                 if (xSlideShow.is())
                 {
-                    const CommandLongPressData* pLongPressData = rCEvt.GetLongPressData();
+                    const CommandGestureLongPressData* pLongPressData = rCEvt.GetLongPressData();
                     bDone = xSlideShow->longpress(*pLongPressData);
                 }
             }
@@ -717,14 +712,14 @@ bool ViewShell::HandleScrollCommand(const CommandEvent& rCEvt, ::sd::Window* pWi
                 {
                     if( !GetDocSh()->IsUIActive() )
                     {
-                        const ::tools::Long  nOldZoom = GetActiveWindow()->GetZoom();
-                        ::tools::Long        nNewZoom;
+                        const sal_uInt16  nOldZoom = GetActiveWindow()->GetZoom();
+                        sal_uInt16        nNewZoom;
                         Point aOldMousePos = GetActiveWindow()->PixelToLogic(rCEvt.GetMousePosPixel());
 
                         if( pData->GetDelta() < 0 )
-                            nNewZoom = std::max<::tools::Long>( pWin->GetMinZoom(), basegfx::zoomtools::zoomOut( nOldZoom ));
+                            nNewZoom = std::max<sal_uInt16>( pWin->GetMinZoom(), basegfx::zoomtools::zoomOut( nOldZoom ));
                         else
-                            nNewZoom = std::min<::tools::Long>( pWin->GetMaxZoom(), basegfx::zoomtools::zoomIn( nOldZoom ));
+                            nNewZoom = std::min<sal_uInt16>( pWin->GetMaxZoom(), basegfx::zoomtools::zoomIn( nOldZoom ));
 
                         SetZoom( nNewZoom );
                         // Keep mouse at same doc point before zoom
@@ -754,6 +749,54 @@ bool ViewShell::HandleScrollCommand(const CommandEvent& rCEvt, ::sd::Window* pWi
                     }
                 }
             }
+        }
+        break;
+
+        case CommandEventId::GestureZoom:
+        {
+            const CommandGestureZoomData* pData = rCEvt.GetGestureZoomData();
+
+            Reference<XSlideShowController> xSlideShowController(SlideShow::GetSlideShowController(GetViewShellBase()));
+
+            if (pData->meEventType == GestureEventZoomType::Begin)
+            {
+                mfLastZoomScale = pData->mfScaleDelta;
+                bDone = true;
+                break;
+            }
+
+            if (pData->meEventType == GestureEventZoomType::Update)
+            {
+                double deltaBetweenEvents = (pData->mfScaleDelta - mfLastZoomScale) / mfLastZoomScale;
+                mfLastZoomScale = pData->mfScaleDelta;
+
+                if (!GetDocSh()->IsUIActive() && !xSlideShowController.is())
+                {
+                    const ::tools::Long nOldZoom = GetActiveWindow()->GetZoom();
+                    ::tools::Long nNewZoom;
+                    Point aOldMousePos = GetActiveWindow()->PixelToLogic(rCEvt.GetMousePosPixel());
+
+                    // Accumulate fractional zoom to avoid small zoom changes from being ignored
+                    mfAccumulatedZoom += deltaBetweenEvents;
+                    int nZoomChangePercent = mfAccumulatedZoom * 100;
+                    mfAccumulatedZoom -= nZoomChangePercent / 100.0;
+
+                    nNewZoom = nOldZoom + nZoomChangePercent;
+                    nNewZoom = std::max<::tools::Long>(pWin->GetMinZoom(), nNewZoom);
+                    nNewZoom = std::min<::tools::Long>(pWin->GetMaxZoom(), nNewZoom);
+
+                    SetZoom(nNewZoom);
+
+                    // Keep mouse at same doc point before zoom
+                    Point aNewMousePos = GetActiveWindow()->PixelToLogic(rCEvt.GetMousePosPixel());
+                    SetWinViewPos(GetWinViewPos() - (aNewMousePos - aOldMousePos));
+
+                    Invalidate(SID_ATTR_ZOOM);
+                    Invalidate(SID_ATTR_ZOOMSLIDER);
+                }
+            }
+
+            bDone = true;
         }
         break;
 
@@ -793,81 +836,72 @@ void ViewShell::SetupRulers()
     }
 }
 
-const SfxPoolItem* ViewShell::GetNumBulletItem(SfxItemSet& aNewAttr, sal_uInt16& nNumItemId)
+const SvxNumBulletItem* ViewShell::GetNumBulletItem(SfxItemSet& aNewAttr, TypedWhichId<SvxNumBulletItem>& nNumItemId)
 {
-    const SfxPoolItem* pTmpItem = nullptr;
-
-    if(aNewAttr.GetItemState(nNumItemId, false, &pTmpItem) == SfxItemState::SET)
-    {
+    const SvxNumBulletItem* pTmpItem = aNewAttr.GetItemIfSet(nNumItemId, false);
+    if(pTmpItem)
         return pTmpItem;
-    }
-    else
+
+    nNumItemId = aNewAttr.GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
+    pTmpItem = aNewAttr.GetItemIfSet(nNumItemId, false);
+    if(pTmpItem)
+        return pTmpItem;
+
+    bool bOutliner = false;
+    bool bTitle = false;
+
+    if( mpView )
     {
-        nNumItemId = aNewAttr.GetPool()->GetWhich(SID_ATTR_NUMBERING_RULE);
-        SfxItemState eState = aNewAttr.GetItemState(nNumItemId, false, &pTmpItem);
-        if (eState == SfxItemState::SET)
-            return pTmpItem;
-        else
+        const SdrMarkList& rMarkList = mpView->GetMarkedObjectList();
+        const size_t nCount = rMarkList.GetMarkCount();
+
+        for(size_t nNum = 0; nNum < nCount; ++nNum)
         {
-            bool bOutliner = false;
-            bool bTitle = false;
-
-            if( mpView )
+            SdrObject* pObj = rMarkList.GetMark(nNum)->GetMarkedSdrObj();
+            if( pObj->GetObjInventor() == SdrInventor::Default )
             {
-                const SdrMarkList& rMarkList = mpView->GetMarkedObjectList();
-                const size_t nCount = rMarkList.GetMarkCount();
-
-                for(size_t nNum = 0; nNum < nCount; ++nNum)
+                switch(pObj->GetObjIdentifier())
                 {
-                    SdrObject* pObj = rMarkList.GetMark(nNum)->GetMarkedSdrObj();
-                    if( pObj->GetObjInventor() == SdrInventor::Default )
-                    {
-                        switch(pObj->GetObjIdentifier())
-                        {
-                        case OBJ_TITLETEXT:
-                            bTitle = true;
-                            break;
-                        case OBJ_OUTLINETEXT:
-                            bOutliner = true;
-                            break;
-                        default:
-                            break;
-                        }
-                    }
+                case SdrObjKind::TitleText:
+                    bTitle = true;
+                    break;
+                case SdrObjKind::OutlineText:
+                    bOutliner = true;
+                    break;
+                default:
+                    break;
                 }
             }
-
-            const SvxNumBulletItem *pItem = nullptr;
-            if(bOutliner)
-            {
-                SfxStyleSheetBasePool* pSSPool = mpView->GetDocSh()->GetStyleSheetPool();
-                SfxStyleSheetBase* pFirstStyleSheet = pSSPool->Find( STR_LAYOUT_OUTLINE " 1", SfxStyleFamily::Pseudo);
-                if( pFirstStyleSheet )
-                    pFirstStyleSheet->GetItemSet().GetItemState(EE_PARA_NUMBULLET, false, reinterpret_cast<const SfxPoolItem**>(&pItem));
-            }
-
-            if( pItem == nullptr )
-                pItem = aNewAttr.GetPool()->GetSecondaryPool()->GetPoolDefaultItem(EE_PARA_NUMBULLET);
-
-            aNewAttr.Put(pItem->CloneSetWhich(EE_PARA_NUMBULLET));
-
-            if(bTitle && aNewAttr.GetItemState(EE_PARA_NUMBULLET) == SfxItemState::SET )
-            {
-                const SvxNumBulletItem* pBulletItem = aNewAttr.GetItem(EE_PARA_NUMBULLET);
-                const SvxNumRule& rRule = pBulletItem->GetNumRule();
-                SvxNumRule aNewRule( rRule );
-                aNewRule.SetFeatureFlag( SvxNumRuleFlags::NO_NUMBERS );
-
-                SvxNumBulletItem aNewItem( std::move(aNewRule), EE_PARA_NUMBULLET );
-                aNewAttr.Put(aNewItem);
-            }
-
-            SfxItemState eNumState = aNewAttr.GetItemState(nNumItemId, false, &pTmpItem);
-            if (eNumState == SfxItemState::SET)
-                return pTmpItem;
-
         }
     }
+
+    const SvxNumBulletItem *pItem = nullptr;
+    if(bOutliner)
+    {
+        SfxStyleSheetBasePool* pSSPool = mpView->GetDocSh()->GetStyleSheetPool();
+        SfxStyleSheetBase* pFirstStyleSheet = pSSPool->Find( STR_LAYOUT_OUTLINE + " 1", SfxStyleFamily::Pseudo);
+        if( pFirstStyleSheet )
+            pItem = pFirstStyleSheet->GetItemSet().GetItemIfSet(EE_PARA_NUMBULLET, false);
+    }
+
+    if( pItem == nullptr )
+        pItem = aNewAttr.GetPool()->GetSecondaryPool()->GetPoolDefaultItem(EE_PARA_NUMBULLET);
+
+    aNewAttr.Put(pItem->CloneSetWhich(EE_PARA_NUMBULLET));
+
+    if(bTitle && aNewAttr.GetItemState(EE_PARA_NUMBULLET) == SfxItemState::SET )
+    {
+        const SvxNumBulletItem* pBulletItem = aNewAttr.GetItem(EE_PARA_NUMBULLET);
+        const SvxNumRule& rRule = pBulletItem->GetNumRule();
+        SvxNumRule aNewRule( rRule );
+        aNewRule.SetFeatureFlag( SvxNumRuleFlags::NO_NUMBERS );
+
+        SvxNumBulletItem aNewItem( std::move(aNewRule), EE_PARA_NUMBULLET );
+        aNewAttr.Put(aNewItem);
+    }
+
+    pTmpItem = aNewAttr.GetItemIfSet(nNumItemId, false);
+
     return pTmpItem;
 }
 
@@ -962,21 +996,6 @@ void ViewShell::ArrangeGUIElements()
         mpVerticalScrollBar->SetPosSizePixel (
             Point(nRight,nTop),
             Size (maScrBarWH.Width(), nBottom-nTop));
-    }
-
-    // Filler in the lower right corner.
-    if (mpScrollBarBox)
-    {
-        if (mpHorizontalScrollBar
-            && mpHorizontalScrollBar->IsVisible()
-            && mpVerticalScrollBar
-            && mpVerticalScrollBar->IsVisible())
-        {
-            mpScrollBarBox->Show();
-            mpScrollBarBox->SetPosSizePixel(Point(nRight, nBottom), maScrBarWH);
-        }
-        else
-            mpScrollBarBox->Hide();
     }
 
     // Place horizontal ruler below tab bar.
@@ -1202,9 +1221,8 @@ void ViewShell::ImpSidUndo(SfxRequest& rReq)
 
         // Repair mode: allow undo/redo of all undo actions, even if access would
         // be limited based on the view shell ID.
-        const SfxPoolItem* pRepairItem;
-        if (pReqArgs->GetItemState(SID_REPAIRPACKAGE, false, &pRepairItem) == SfxItemState::SET)
-            bRepair = static_cast<const SfxBoolItem*>(pRepairItem)->GetValue();
+        if (const SfxBoolItem* pRepairItem = pReqArgs->GetItemIfSet(SID_REPAIRPACKAGE, false))
+            bRepair = pRepairItem->GetValue();
     }
 
     if(nNumber && pUndoManager)
@@ -1270,9 +1288,8 @@ void ViewShell::ImpSidRedo(SfxRequest& rReq)
         nNumber = pUIntItem->GetValue();
         // Repair mode: allow undo/redo of all undo actions, even if access would
         // be limited based on the view shell ID.
-        const SfxPoolItem* pRepairItem;
-        if (pReqArgs->GetItemState(SID_REPAIRPACKAGE, false, &pRepairItem) == SfxItemState::SET)
-            bRepair = static_cast<const SfxBoolItem*>(pRepairItem)->GetValue();
+        if (const SfxBoolItem* pRepairItem = pReqArgs->GetItemIfSet(SID_REPAIRPACKAGE, false))
+            bRepair = pRepairItem->GetValue();
     }
 
     if(nNumber && pUndoManager)
@@ -1515,9 +1532,6 @@ void ViewShell::ShowUIControls (bool bVisible)
     if (mpHorizontalScrollBar)
         mpHorizontalScrollBar->Show( bVisible );
 
-    if (mpScrollBarBox)
-        mpScrollBarBox->Show(bVisible);
-
     if (mpContentWindow)
         mpContentWindow->Show( bVisible );
 }
@@ -1535,8 +1549,6 @@ bool ViewShell::RelocateToParentWindow (vcl::Window* pParentWindow)
         mpHorizontalScrollBar->SetParent(mpParentWindow);
     if (mpVerticalScrollBar)
         mpVerticalScrollBar->SetParent(mpParentWindow);
-    if (mpScrollBarBox)
-        mpScrollBarBox->SetParent(mpParentWindow);
 
     return true;
 }

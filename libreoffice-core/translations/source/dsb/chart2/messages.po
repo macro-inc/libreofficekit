@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:18+0100\n"
-"PO-Revision-Date: 2022-04-25 17:34+0000\n"
+"POT-Creation-Date: 2022-11-22 14:43+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian <https://translations.documentfoundation.org/projects/libo_ui-master/chart2messages/dsb/>\n"
 "Language: dsb\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n % 100 == 1) ? 0 : ((n % 100 == 2) ? 1 : ((n % 100 == 3 || n % 100 == 4) ? 2 : 3));\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1547385228.000000\n"
 
 #. NCRDD
@@ -853,260 +853,266 @@ msgctxt "STR_PROPERTY_ROLE_BORDERCOLOR"
 msgid "Border Color"
 msgstr "Ramikowa barwa"
 
+#. KSB4c
+#: chart2/inc/strings.hrc:148
+msgctxt "STR_DATA_TABLE"
+msgid "Data Table"
+msgstr "Datowa tabela"
+
 #. TuRxr
-#: chart2/inc/strings.hrc:149
+#: chart2/inc/strings.hrc:150
 msgctxt "STR_CONTROLTEXT_ERROR_BARS_FROM_DATA"
 msgid "From Data Table"
 msgstr "Z datoweje tabele"
 
 #. aPEDY
-#: chart2/inc/strings.hrc:150
+#: chart2/inc/strings.hrc:151
 msgctxt "STR_REGRESSION_LINEAR"
 msgid "Linear"
 msgstr "Linearny"
 
 #. nD8ay
-#: chart2/inc/strings.hrc:151
+#: chart2/inc/strings.hrc:152
 msgctxt "STR_REGRESSION_LOG"
 msgid "Logarithmic"
 msgstr "Logaritmiski"
 
 #. CotSJ
-#: chart2/inc/strings.hrc:152
+#: chart2/inc/strings.hrc:153
 msgctxt "STR_REGRESSION_EXP"
 msgid "Exponential"
 msgstr "Eksponencialny"
 
 #. HqBJV
-#: chart2/inc/strings.hrc:153
+#: chart2/inc/strings.hrc:154
 msgctxt "STR_REGRESSION_POWER"
 msgid "Power"
 msgstr "Potencielny"
 
 #. dBiUj
-#: chart2/inc/strings.hrc:154
+#: chart2/inc/strings.hrc:155
 msgctxt "STR_REGRESSION_POLYNOMIAL"
 msgid "Polynomial"
 msgstr "Polynomiski"
 
 #. FWi4g
-#: chart2/inc/strings.hrc:155
+#: chart2/inc/strings.hrc:156
 msgctxt "STR_REGRESSION_MOVING_AVERAGE"
 msgid "Moving average"
 msgstr "Suwaty pśerězk"
 
 #. psj3B
-#: chart2/inc/strings.hrc:156
+#: chart2/inc/strings.hrc:157
 msgctxt "STR_REGRESSION_MEAN"
 msgid "Mean"
 msgstr "Pśerězk"
 
 #. C8FVd
-#: chart2/inc/strings.hrc:158
+#: chart2/inc/strings.hrc:159
 msgctxt "STR_TYPE_COLUMN"
 msgid "Column"
 msgstr "Słupikowy diagram"
 
 #. SWPnA
-#: chart2/inc/strings.hrc:159
+#: chart2/inc/strings.hrc:160
 msgctxt "STR_TYPE_BAR"
 msgid "Bar"
 msgstr "Grědowy diagram"
 
 #. xUnpz
-#: chart2/inc/strings.hrc:160
+#: chart2/inc/strings.hrc:161
 msgctxt "STR_TYPE_AREA"
 msgid "Area"
 msgstr "Płoninowy diagram"
 
 #. bqxBm
-#: chart2/inc/strings.hrc:161
+#: chart2/inc/strings.hrc:162
 msgctxt "STR_TYPE_PIE"
 msgid "Pie"
 msgstr "Krejzowy diagram"
 
 #. GGwEH
-#: chart2/inc/strings.hrc:162
+#: chart2/inc/strings.hrc:163
 msgctxt "STR_PIE_EXPLODED"
 msgid "Exploded Pie Chart"
 msgstr "Wuśěgnjony krejzowy diagram"
 
 #. gxFtf
-#: chart2/inc/strings.hrc:163
+#: chart2/inc/strings.hrc:164
 msgctxt "STR_DONUT_EXPLODED"
 msgid "Exploded Donut Chart"
 msgstr "Wuśěgnjony kołowy diagram"
 
 #. nsoQ2
-#: chart2/inc/strings.hrc:164
+#: chart2/inc/strings.hrc:165
 msgctxt "STR_DONUT"
 msgid "Donut"
 msgstr "Kołowy diagram"
 
 #. 7HjEG
-#: chart2/inc/strings.hrc:165
+#: chart2/inc/strings.hrc:166
 msgctxt "STR_TYPE_LINE"
 msgid "Line"
 msgstr "Linijowy diagram"
 
 #. Miu8E
-#: chart2/inc/strings.hrc:166
+#: chart2/inc/strings.hrc:167
 msgctxt "STR_TYPE_XY"
 msgid "XY (Scatter)"
 msgstr "XY (rozdrosćeński diagram)"
 
 #. LBFRX
-#: chart2/inc/strings.hrc:167
+#: chart2/inc/strings.hrc:168
 msgctxt "STR_POINTS_AND_LINES"
 msgid "Points and Lines"
 msgstr "Dypki a linije"
 
 #. fjka7
-#: chart2/inc/strings.hrc:168
+#: chart2/inc/strings.hrc:169
 msgctxt "STR_POINTS_ONLY"
 msgid "Points Only"
 msgstr "Jano dypki"
 
 #. Sz53v
-#: chart2/inc/strings.hrc:169
+#: chart2/inc/strings.hrc:170
 msgctxt "STR_LINES_ONLY"
 msgid "Lines Only"
 msgstr "Jano linije"
 
 #. AAEA2
-#: chart2/inc/strings.hrc:170
+#: chart2/inc/strings.hrc:171
 msgctxt "STR_LINES_3D"
 msgid "3D Lines"
 msgstr "3D-linije"
 
 #. ABjEg
-#: chart2/inc/strings.hrc:171
+#: chart2/inc/strings.hrc:172
 msgctxt "STR_TYPE_COMBI_COLUMN_LINE"
 msgid "Column and Line"
-msgstr "Słup a linija"
+msgstr "Słupik a linija"
 
 #. nVKfC
-#: chart2/inc/strings.hrc:172
+#: chart2/inc/strings.hrc:173
 msgctxt "STR_LINE_COLUMN"
 msgid "Columns and Lines"
-msgstr "Słupy a linije"
+msgstr "Słupiki a linije"
 
 #. QkQSa
-#: chart2/inc/strings.hrc:173
+#: chart2/inc/strings.hrc:174
 msgctxt "STR_LINE_STACKEDCOLUMN"
 msgid "Stacked Columns and Lines"
-msgstr "Zeštaplowane słupy a linije"
+msgstr "Zeštaplowane słupiki a linije"
 
 #. HGKEx
-#: chart2/inc/strings.hrc:174
+#: chart2/inc/strings.hrc:175
 msgctxt "STR_TYPE_NET"
 msgid "Net"
 msgstr "Seśowy diagram"
 
 #. BKUc4
-#: chart2/inc/strings.hrc:175
+#: chart2/inc/strings.hrc:176
 msgctxt "STR_TYPE_STOCK"
 msgid "Stock"
 msgstr "Kursowy diagram"
 
 #. oG4gw
-#: chart2/inc/strings.hrc:176
+#: chart2/inc/strings.hrc:177
 msgctxt "STR_STOCK_1"
 msgid "Stock Chart 1"
 msgstr "Kursowy diagram 1"
 
 #. pSzDo
-#: chart2/inc/strings.hrc:177
+#: chart2/inc/strings.hrc:178
 msgctxt "STR_STOCK_2"
 msgid "Stock Chart 2"
 msgstr "Kursowy diagram 2"
 
 #. aEFDu
-#: chart2/inc/strings.hrc:178
+#: chart2/inc/strings.hrc:179
 msgctxt "STR_STOCK_3"
 msgid "Stock Chart 3"
 msgstr "Kursowy diagram 3"
 
 #. jZqox
-#: chart2/inc/strings.hrc:179
+#: chart2/inc/strings.hrc:180
 msgctxt "STR_STOCK_4"
 msgid "Stock Chart 4"
 msgstr "Kursowy diagram 4"
 
 #. DNBgg
-#: chart2/inc/strings.hrc:180
+#: chart2/inc/strings.hrc:181
 msgctxt "STR_NORMAL"
 msgid "Normal"
 msgstr "Normalny"
 
 #. EfGVL
-#: chart2/inc/strings.hrc:181
+#: chart2/inc/strings.hrc:182
 msgctxt "STR_STACKED"
 msgid "Stacked"
 msgstr "Zeštaplowany"
 
 #. wqtzw
-#: chart2/inc/strings.hrc:182
+#: chart2/inc/strings.hrc:183
 msgctxt "STR_PERCENT"
 msgid "Percent Stacked"
 msgstr "Procentualnje zeštaplowany"
 
 #. 52UGB
-#: chart2/inc/strings.hrc:183
+#: chart2/inc/strings.hrc:184
 msgctxt "STR_DEEP"
 msgid "Deep"
 msgstr "Jaden za drugim"
 
 #. dxfuQ
-#: chart2/inc/strings.hrc:184
+#: chart2/inc/strings.hrc:185
 msgctxt "STR_FILLED"
 msgid "Filled"
 msgstr "Wupołnjony"
 
 #. rC5nu
-#: chart2/inc/strings.hrc:185
+#: chart2/inc/strings.hrc:186
 msgctxt "STR_TYPE_BUBBLE"
 msgid "Bubble"
 msgstr "Puchorjowy diagram"
 
 #. N9tXx
-#: chart2/inc/strings.hrc:186
+#: chart2/inc/strings.hrc:187
 msgctxt "STR_BUBBLE_1"
 msgid "Bubble Chart"
 msgstr "Puchorjowy diagram"
 
 #. AjPsf
-#: chart2/inc/strings.hrc:188
+#: chart2/inc/strings.hrc:189
 msgctxt "STR_INVALID_NUMBER"
 msgid "Numbers are required. Check your input."
 msgstr "Licby su trěbne. Pśeglědajśo swójo zapódaśe."
 
 #. ofh4V
-#: chart2/inc/strings.hrc:189
+#: chart2/inc/strings.hrc:190
 msgctxt "STR_STEP_GT_ZERO"
 msgid "The major interval requires a positive number. Check your input."
 msgstr "Głowny interwal trjeba pozitiwnu licbowu gódnotu. Pśeglědajśo swójo zapódaśe."
 
 #. EBJjR
-#: chart2/inc/strings.hrc:190
+#: chart2/inc/strings.hrc:191
 msgctxt "STR_BAD_LOGARITHM"
 msgid "The logarithmic scale requires positive numbers. Check your input."
 msgstr "Logaritmiske zwobraznjenje trjeba pozitiwne licbowe gódnoty. Pśeglědajśo swójo zapódaśe."
 
 #. K8BCB
-#: chart2/inc/strings.hrc:191
+#: chart2/inc/strings.hrc:192
 msgctxt "STR_MIN_GREATER_MAX"
 msgid "The minimum must be lower than the maximum. Check your input."
 msgstr "Minimalna gódnota musy mjeńša ako maksimalna gódnota byś. Pśeglědajśo swójo zapódaśe."
 
 #. oBR4x
-#: chart2/inc/strings.hrc:192
+#: chart2/inc/strings.hrc:193
 msgctxt "STR_INVALID_INTERVALS"
 msgid "The major interval needs to be greater than the minor interval. Check your input."
 msgstr "Głowny interwal musy wětšy ako pomocny interwal byś. Pśeglědajśo swójo zapódaśe."
 
 #. ZvDEh
-#: chart2/inc/strings.hrc:193
+#: chart2/inc/strings.hrc:194
 msgctxt "STR_INVALID_TIME_UNIT"
 msgid "The major and minor interval need to be greater or equal to the resolution. Check your input."
 msgstr "Głowny a pomocny interwal musytej wětšej abo rowno tak wjelikej ako rozeznaśe byś. Pśeglědajśo swójo zapódaśe."
@@ -1602,6 +1608,48 @@ msgstr "Wócynja dialog Datowe pópisanja, kótaryž wam zmóžnja, datowe pópi
 msgctxt "dlg_DataLabel|extended_tip|dlg_DataLabels"
 msgid "Opens the Data Labels dialog, which enables you to set the data labels."
 msgstr "Wócynja dialog Datowe pópisanja, kótaryž wam zmóžnja, datowe pópisanja póstajiś."
+
+#. XbRRD
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:8
+msgctxt "dlg_InsertDataTable|dlg_InsertDataTable"
+msgid "Data Table"
+msgstr "Datowa tabela"
+
+#. SBrCL
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:85
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show data table"
+msgstr "Datowu tabelu pokazaś"
+
+#. y4rFB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:119
+msgctxt "dlg_InsertDataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Horicontalny ramik pokazaś"
+
+#. GstZR
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:135
+msgctxt "dlg_InsertDataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Wertikalny ramik pokazaś"
+
+#. KAzDB
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:151
+msgctxt "dlg_InsertDataTable|outlineCB"
+msgid "Show outline"
+msgstr "Wobceŕ pokazaś"
+
+#. bm6hN
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:167
+msgctxt "dlg_InsertDataTable|keysCB"
+msgid "Show keys"
+msgstr "Kluce pokazaś"
+
+#. JpXPi
+#: chart2/uiconfig/ui/dlg_InsertDataTable.ui:187
+msgctxt "dlg_InsertDataTable|dataTablePropertiesLabel"
+msgid "Data Table Properties"
+msgstr "Kakosći datoweje tabele"
 
 #. 3GUtp
 #: chart2/uiconfig/ui/dlg_InsertErrorBars.ui:28
@@ -2210,508 +2258,508 @@ msgid "Show labels"
 msgstr "Pópisanja pokazaś"
 
 #. 52BFU
-#: chart2/uiconfig/ui/sidebaraxis.ui:38
+#: chart2/uiconfig/ui/sidebaraxis.ui:40
 msgctxt "sidebaraxis|checkbutton_reverse"
 msgid "Reverse direction"
 msgstr "Směr wobrośiś"
 
 #. hABaw
-#: chart2/uiconfig/ui/sidebaraxis.ui:63
+#: chart2/uiconfig/ui/sidebaraxis.ui:58
 msgctxt "sidebaraxis|label1"
 msgid "_Label position:"
 msgstr "_Pozicija pópisanja:"
 
 #. JpV6N
-#: chart2/uiconfig/ui/sidebaraxis.ui:77
+#: chart2/uiconfig/ui/sidebaraxis.ui:73
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis"
 msgstr "Blisko wóski"
 
 #. HEMNB
-#: chart2/uiconfig/ui/sidebaraxis.ui:78
+#: chart2/uiconfig/ui/sidebaraxis.ui:74
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Near Axis (other side)"
 msgstr "Blisko wóski (drugi bok)"
 
 #. BE2dT
-#: chart2/uiconfig/ui/sidebaraxis.ui:79
+#: chart2/uiconfig/ui/sidebaraxis.ui:75
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside start"
 msgstr "Wenka zachopjeńka"
 
 #. rH94z
-#: chart2/uiconfig/ui/sidebaraxis.ui:80
+#: chart2/uiconfig/ui/sidebaraxis.ui:76
 msgctxt "sidebaraxis|comboboxtext_label_position"
 msgid "Outside end"
 msgstr "Wenka kóńca"
 
 #. 69LSe
-#: chart2/uiconfig/ui/sidebaraxis.ui:94
+#: chart2/uiconfig/ui/sidebaraxis.ui:90
 msgctxt "sidebaraxis|label2"
 msgid "_Text orientation:"
 msgstr "_Tekstowe wusměrjenje:"
 
+#. vkhjB
+#: chart2/uiconfig/ui/sidebarelements.ui:25
+msgctxt "sidebarelements|l"
+msgid "Titles"
+msgstr "Titele"
+
 #. Bqqg6
-#: chart2/uiconfig/ui/sidebarelements.ui:34
+#: chart2/uiconfig/ui/sidebarelements.ui:38
 msgctxt "sidebarelements|checkbutton_title"
 msgid "Title"
 msgstr "Titel"
 
 #. HttnZ
-#: chart2/uiconfig/ui/sidebarelements.ui:51
+#: chart2/uiconfig/ui/sidebarelements.ui:71
 msgctxt "sidebarelements|checkbutton_subtitle"
 msgid "Subtitle"
 msgstr "Pódtitel"
 
-#. vkhjB
-#: chart2/uiconfig/ui/sidebarelements.ui:102
-msgctxt "sidebarelements|l"
-msgid "Titles"
-msgstr "Titele"
+#. UVbZR
+#: chart2/uiconfig/ui/sidebarelements.ui:108
+msgctxt "sidebarelements|label_legen"
+msgid "Legend"
+msgstr "Legenda"
 
 #. dB6pP
-#: chart2/uiconfig/ui/sidebarelements.ui:131
+#: chart2/uiconfig/ui/sidebarelements.ui:121
 msgctxt "sidebarelements|checkbutton_legend"
 msgid "Show legend"
 msgstr "Legendu pokazaś"
 
 #. XxG3r
-#: chart2/uiconfig/ui/sidebarelements.ui:135
+#: chart2/uiconfig/ui/sidebarelements.ui:125
 msgctxt "sidebarelements|checkbutton_legend|tooltip_text"
 msgid "Show Legend"
 msgstr "Legendu pokazaś"
 
-#. zszn2
-#: chart2/uiconfig/ui/sidebarelements.ui:156
-msgctxt "sidebarelements|placement_label"
-msgid "_Placement:"
-msgstr "_Placěrowanje:"
-
 #. N9Vw3
-#: chart2/uiconfig/ui/sidebarelements.ui:172
+#: chart2/uiconfig/ui/sidebarelements.ui:141
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Right"
 msgstr "Napšawo"
 
 #. XWGfH
-#: chart2/uiconfig/ui/sidebarelements.ui:173
+#: chart2/uiconfig/ui/sidebarelements.ui:142
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Top"
 msgstr "Górjejce"
 
 #. AYbfc
-#: chart2/uiconfig/ui/sidebarelements.ui:174
+#: chart2/uiconfig/ui/sidebarelements.ui:143
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Bottom"
 msgstr "Dołojce"
 
 #. Hdrnv
-#: chart2/uiconfig/ui/sidebarelements.ui:175
+#: chart2/uiconfig/ui/sidebarelements.ui:144
 msgctxt "sidebarelements|comboboxtext_legend"
 msgid "Left"
 msgstr "Nalěwo"
 
 #. WxtCZ
-#: chart2/uiconfig/ui/sidebarelements.ui:193
+#: chart2/uiconfig/ui/sidebarelements.ui:154
 msgctxt "sidebarelements|checkbutton_no_overlay"
 msgid "Show the legend without overlapping the chart"
 msgstr "Legendu pokazaś, mimo aby se diagram pózakšył"
 
-#. UVbZR
-#: chart2/uiconfig/ui/sidebarelements.ui:212
-msgctxt "sidebarelements|label_legen"
-msgid "Legend"
-msgstr "Legenda"
-
-#. Am6Gz
-#: chart2/uiconfig/ui/sidebarelements.ui:242
-msgctxt "sidebarelements|checkbutton_x_axis"
-msgid "X axis"
-msgstr "X-wóska"
-
-#. P5gxx
-#: chart2/uiconfig/ui/sidebarelements.ui:256
-msgctxt "sidebarelements|checkbutton_x_axis_title"
-msgid "X axis title"
-msgstr "Titel X-wóski"
-
-#. iMXPp
-#: chart2/uiconfig/ui/sidebarelements.ui:270
-msgctxt "sidebarelements|checkbutton_y_axis"
-msgid "Y axis"
-msgstr "Y-wóska"
-
-#. vF4oS
-#: chart2/uiconfig/ui/sidebarelements.ui:284
-msgctxt "sidebarelements|checkbutton_y_axis_title"
-msgid "Y axis title"
-msgstr "Titel Y-wóski"
-
-#. A35cf
-#: chart2/uiconfig/ui/sidebarelements.ui:298
-msgctxt "sidebarelements|checkbutton_z_axis"
-msgid "Z axis"
-msgstr "Z-wóska"
-
-#. RZFAU
-#: chart2/uiconfig/ui/sidebarelements.ui:312
-msgctxt "sidebarelements|checkbutton_z_axis_title"
-msgid "Z axis title"
-msgstr "Titel Z-wóski"
-
-#. GoJDH
-#: chart2/uiconfig/ui/sidebarelements.ui:326
-msgctxt "sidebarelements|checkbutton_2nd_x_axis"
-msgid "2nd X axis"
-msgstr "2. X-wóska"
-
-#. nsoDZ
-#: chart2/uiconfig/ui/sidebarelements.ui:339
-msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
-msgid "2nd X axis title"
-msgstr "Titel 2. X-wóski"
-
-#. bGsCM
-#: chart2/uiconfig/ui/sidebarelements.ui:352
-msgctxt "sidebarelements|checkbutton_2nd_y_axis"
-msgid "2nd Y axis"
-msgstr "2. Y-wóska"
-
-#. yDNuy
-#: chart2/uiconfig/ui/sidebarelements.ui:365
-msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
-msgid "2nd Y axis title"
-msgstr "Titel 2. Y-wóski"
-
 #. ScLEM
-#: chart2/uiconfig/ui/sidebarelements.ui:382
+#: chart2/uiconfig/ui/sidebarelements.ui:175
 msgctxt "sidebarelements|label_axes"
 msgid "Axes"
 msgstr "Wóski"
 
+#. Am6Gz
+#: chart2/uiconfig/ui/sidebarelements.ui:188
+msgctxt "sidebarelements|checkbutton_x_axis"
+msgid "X axis"
+msgstr "X-wóska"
+
+#. iMXPp
+#: chart2/uiconfig/ui/sidebarelements.ui:203
+msgctxt "sidebarelements|checkbutton_y_axis"
+msgid "Y axis"
+msgstr "Y-wóska"
+
+#. A35cf
+#: chart2/uiconfig/ui/sidebarelements.ui:218
+msgctxt "sidebarelements|checkbutton_z_axis"
+msgid "Z axis"
+msgstr "Z-wóska"
+
+#. GoJDH
+#: chart2/uiconfig/ui/sidebarelements.ui:233
+msgctxt "sidebarelements|checkbutton_2nd_x_axis"
+msgid "2nd X axis"
+msgstr "2. X-wóska"
+
+#. bGsCM
+#: chart2/uiconfig/ui/sidebarelements.ui:247
+msgctxt "sidebarelements|checkbutton_2nd_y_axis"
+msgid "2nd Y axis"
+msgstr "2. Y-wóska"
+
+#. P5gxx
+#: chart2/uiconfig/ui/sidebarelements.ui:261
+msgctxt "sidebarelements|checkbutton_x_axis_title"
+msgid "X axis title"
+msgstr "Titel X-wóski"
+
+#. vF4oS
+#: chart2/uiconfig/ui/sidebarelements.ui:276
+msgctxt "sidebarelements|checkbutton_y_axis_title"
+msgid "Y axis title"
+msgstr "Titel Y-wóski"
+
+#. RZFAU
+#: chart2/uiconfig/ui/sidebarelements.ui:291
+msgctxt "sidebarelements|checkbutton_z_axis_title"
+msgid "Z axis title"
+msgstr "Titel Z-wóski"
+
+#. nsoDZ
+#: chart2/uiconfig/ui/sidebarelements.ui:306
+msgctxt "sidebarelements|checkbutton_2nd_x_axis_title"
+msgid "2nd X axis title"
+msgstr "Titel 2. X-wóski"
+
+#. yDNuy
+#: chart2/uiconfig/ui/sidebarelements.ui:320
+msgctxt "sidebarelements|checkbutton_2nd_y_axis_title"
+msgid "2nd Y axis title"
+msgstr "Titel 2. Y-wóski"
+
+#. yeE2v
+#: chart2/uiconfig/ui/sidebarelements.ui:339
+msgctxt "sidebarelements|label_gri"
+msgid "Gridlines"
+msgstr "Kśidnowe linije"
+
 #. RL8AA
-#: chart2/uiconfig/ui/sidebarelements.ui:412
+#: chart2/uiconfig/ui/sidebarelements.ui:352
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_major"
 msgid "Horizontal major"
 msgstr "Horicontalne głowne kśidno"
 
 #. FYBSZ
-#: chart2/uiconfig/ui/sidebarelements.ui:426
+#: chart2/uiconfig/ui/sidebarelements.ui:367
 msgctxt "sidebarelements|checkbutton_gridline_vertical_major"
 msgid "Vertical major"
 msgstr "Wertikalne głowne kśidno"
 
 #. VCTTS
-#: chart2/uiconfig/ui/sidebarelements.ui:440
+#: chart2/uiconfig/ui/sidebarelements.ui:382
 msgctxt "sidebarelements|checkbutton_gridline_horizontal_minor"
 msgid "Horizontal minor"
 msgstr "Horicontalne pomocne kśidno"
 
 #. QDFEZ
-#: chart2/uiconfig/ui/sidebarelements.ui:454
+#: chart2/uiconfig/ui/sidebarelements.ui:397
 msgctxt "sidebarelements|checkbutton_gridline_vertical_minor"
 msgid "Vertical minor"
 msgstr "Wertikalne pomocne kśidno"
 
-#. yeE2v
-#: chart2/uiconfig/ui/sidebarelements.ui:472
-msgctxt "sidebarelements|label_gri"
-msgid "Gridlines"
-msgstr "Kśidnowe linije"
-
 #. uacDo
-#: chart2/uiconfig/ui/sidebarelements.ui:493
+#: chart2/uiconfig/ui/sidebarelements.ui:419
 msgctxt "sidebarelements|text_title"
 msgid "Title"
 msgstr "Titel"
 
 #. jXGDE
-#: chart2/uiconfig/ui/sidebarelements.ui:504
+#: chart2/uiconfig/ui/sidebarelements.ui:432
 msgctxt "sidebarelements|text_subtitle"
 msgid "Subtitle"
 msgstr "Pódtitel"
 
+#. zszn2
+#: chart2/uiconfig/ui/sidebarelements.ui:445
+msgctxt "sidebarelements|placement_label"
+msgid "_Placement:"
+msgstr "_Placěrowanje:"
+
 #. SCPM4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:60
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:48
 msgctxt "sidebarerrorbar|label2"
 msgid "Category:"
 msgstr "Kategorija:"
 
 #. 8Pb84
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:74
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:63
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Constant"
 msgstr "Konstantny"
 
 #. Lz8Lo
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:75
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:64
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Percentage"
 msgstr "Procentualny"
 
 #. Ap367
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:76
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:65
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Cell Range or Data Table"
 msgstr "Celowy wobceŕk abo datowa tabela"
 
 #. Lqw6L
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:77
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:66
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard deviation"
 msgstr "Standardne wótchylenje"
 
 #. qUL78
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:78
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:67
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Standard error"
 msgstr "Standardna zmólka"
 
 #. KUCgB
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:79
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:68
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Variance"
 msgstr "Warianca"
 
 #. QDwJu
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:80
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:69
 msgctxt "sidebarerrorbar|comboboxtext_type"
 msgid "Error margin"
 msgstr "Zmólkowy wobceŕk"
 
 #. US82z
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:93
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:82
 msgctxt "sidebarerrorbar|label3"
 msgid "Positive (+):"
 msgstr "Pozitiwny (+):"
 
 #. NJdbG
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:94
 msgctxt "sidebarerrorbar|label4"
 msgid "Negative (-):"
 msgstr "Negatiwny (-):"
 
 #. GBewc
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:117
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:105
 msgctxt "sidebarerrorbar|spinbutton_pos"
 msgid "0.00"
 msgstr "0,00"
 
 #. e3GvR
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:132
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:119
 msgctxt "sidebarerrorbar|spinbutton_neg"
 msgid "0.00"
 msgstr "0,00"
 
 #. 34Vax
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:152
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:139
 msgctxt "sidebarerrorbar|radiobutton_positive_negative|tooltip_text"
 msgid "Positive and Negative"
 msgstr "Pozitiwny a negatiwny"
 
 #. gETvJ
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:169
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:156
 msgctxt "sidebarerrorbar|radiobutton_positive|tooltip_text"
 msgid "Positive"
 msgstr "Pozitiwny"
 
 #. 3Ur2d
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:186
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:173
 msgctxt "sidebarerrorbar|radiobutton_negative|tooltip_text"
 msgid "Negative"
 msgstr "Negatiwny"
 
 #. iCPU4
-#: chart2/uiconfig/ui/sidebarerrorbar.ui:209
+#: chart2/uiconfig/ui/sidebarerrorbar.ui:196
 msgctxt "sidebarerrorbar|label5"
 msgid "Indicator"
 msgstr "Indikator"
 
 #. qJBsd
-#: chart2/uiconfig/ui/sidebarseries.ui:41
+#: chart2/uiconfig/ui/sidebarseries.ui:38
 msgctxt "sidebarseries|checkbutton_label"
 msgid "Show data labels"
 msgstr "Datowe pópisanja pokazaś"
 
-#. BsC9D
-#: chart2/uiconfig/ui/sidebarseries.ui:64
-msgctxt "sidebarseries|label_box"
-msgid "P_lacement:"
-msgstr "P_lacěrowanje:"
-
 #. Dk3GN
-#: chart2/uiconfig/ui/sidebarseries.ui:79
+#: chart2/uiconfig/ui/sidebarseries.ui:56
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Above"
 msgstr "Wušej"
 
 #. e4znD
-#: chart2/uiconfig/ui/sidebarseries.ui:80
+#: chart2/uiconfig/ui/sidebarseries.ui:57
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Below"
 msgstr "Nižej"
 
 #. CWwzt
-#: chart2/uiconfig/ui/sidebarseries.ui:81
+#: chart2/uiconfig/ui/sidebarseries.ui:58
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Center"
 msgstr "Centrěrowaś"
 
 #. osWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:82
+#: chart2/uiconfig/ui/sidebarseries.ui:59
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Outside"
 msgstr "Wenka"
 
 #. U3N4S
-#: chart2/uiconfig/ui/sidebarseries.ui:83
+#: chart2/uiconfig/ui/sidebarseries.ui:60
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Inside"
 msgstr "Nutśi"
 
 #. pAmg7
-#: chart2/uiconfig/ui/sidebarseries.ui:84
+#: chart2/uiconfig/ui/sidebarseries.ui:61
 msgctxt "sidebarseries|comboboxtext_label"
 msgid "Near origin"
 msgstr "Blisko póchada"
 
 #. erC9C
-#: chart2/uiconfig/ui/sidebarseries.ui:109
+#: chart2/uiconfig/ui/sidebarseries.ui:71
 msgctxt "sidebarseries|checkbutton_trendline"
 msgid "Show trendline"
 msgstr "Trendowu liniju pokazaś"
 
+#. FFPa2
+#: chart2/uiconfig/ui/sidebarseries.ui:92
+msgctxt "sidebarseries|label1"
+msgid "Error Bars"
+msgstr "Zmólkowe grědy"
+
 #. bXUND
-#: chart2/uiconfig/ui/sidebarseries.ui:140
+#: chart2/uiconfig/ui/sidebarseries.ui:105
 msgctxt "sidebarseries|checkbutton_y_error"
 msgid "Y error bars"
 msgstr "Zmólkowe grědy Y"
 
 #. zK6DE
-#: chart2/uiconfig/ui/sidebarseries.ui:155
+#: chart2/uiconfig/ui/sidebarseries.ui:121
 msgctxt "sidebarseries|checkbutton_x_error"
 msgid "X error bars"
 msgstr "Zmólkowe grědy X"
 
-#. FFPa2
-#: chart2/uiconfig/ui/sidebarseries.ui:174
-msgctxt "sidebarseries|label1"
-msgid "Error Bars"
-msgstr "Zmólkowe grědy"
-
-#. vhdnt
-#: chart2/uiconfig/ui/sidebarseries.ui:203
-msgctxt "sidebarseries|radiobutton_primary_axis"
-msgid "Primary Y axis"
-msgstr "Primarna Y-wóska"
-
-#. VPWVq
-#: chart2/uiconfig/ui/sidebarseries.ui:219
-msgctxt "sidebarseries|radiobutton_secondary_axis"
-msgid "Secondary Y axis"
-msgstr "Sekundarna Y-wóska"
-
 #. qE5HF
-#: chart2/uiconfig/ui/sidebarseries.ui:239
+#: chart2/uiconfig/ui/sidebarseries.ui:142
 msgctxt "sidebarseries|axis_label"
 msgid "Align Series to Axis"
 msgstr "Datowe rědy 0na wósce wusměrś"
 
 #. fvnkG
-#: chart2/uiconfig/ui/sidebarseries.ui:255
+#: chart2/uiconfig/ui/sidebarseries.ui:157
 msgctxt "sidebarseries|label_series_tmpl"
 msgid "Data series '%1'"
 msgstr "Datowy rěd '%1'"
 
+#. vhdnt
+#: chart2/uiconfig/ui/sidebarseries.ui:173
+msgctxt "sidebarseries|radiobutton_primary_axis"
+msgid "Primary Y axis"
+msgstr "Primarna Y-wóska"
+
+#. VPWVq
+#: chart2/uiconfig/ui/sidebarseries.ui:189
+msgctxt "sidebarseries|radiobutton_secondary_axis"
+msgid "Secondary Y axis"
+msgstr "Sekundarna Y-wóska"
+
+#. BsC9D
+#: chart2/uiconfig/ui/sidebarseries.ui:218
+msgctxt "sidebarseries|label_box"
+msgid "P_lacement:"
+msgstr "P_lacěrowanje:"
+
 #. mZfrk
-#: chart2/uiconfig/ui/sidebartype.ui:85
+#: chart2/uiconfig/ui/sidebartype.ui:74
 msgctxt "sidebartype|3dlook"
 msgid "_3D Look"
 msgstr "_3D-naglěd"
 
 #. mjrkY
-#: chart2/uiconfig/ui/sidebartype.ui:104
+#: chart2/uiconfig/ui/sidebartype.ui:90
 msgctxt "sidebartype|3dscheme"
 msgid "Simple"
 msgstr "Jadnory"
 
 #. urfc7
-#: chart2/uiconfig/ui/sidebartype.ui:105
+#: chart2/uiconfig/ui/sidebartype.ui:91
 msgctxt "sidebartype|3dscheme"
 msgid "Realistic"
 msgstr "Realistiski"
 
 #. gYXXE
-#: chart2/uiconfig/ui/sidebartype.ui:126
+#: chart2/uiconfig/ui/sidebartype.ui:105
 msgctxt "sidebartype|shapeft"
 msgid "Sh_ape"
 msgstr "_Forma"
 
 #. B6KS5
-#: chart2/uiconfig/ui/sidebartype.ui:187
+#: chart2/uiconfig/ui/sidebartype.ui:153
 msgctxt "sidebartype|stack"
 msgid "_Stack series"
 msgstr "_Rědy štaplowaś"
 
-#. Yau6n
-#: chart2/uiconfig/ui/sidebartype.ui:207
-msgctxt "sidebartype|ontop"
-msgid "On top"
-msgstr "Jaden nad drugim"
-
-#. f2J43
-#: chart2/uiconfig/ui/sidebartype.ui:221
-msgctxt "sidebartype|percent"
-msgid "Percent"
-msgstr "Procent"
-
-#. iDSaa
-#: chart2/uiconfig/ui/sidebartype.ui:235
-msgctxt "sidebartype|deep"
-msgid "Deep"
-msgstr "Jaden za drugim"
-
 #. KaS7Z
-#: chart2/uiconfig/ui/sidebartype.ui:263
+#: chart2/uiconfig/ui/sidebartype.ui:170
 msgctxt "sidebartype|linetypeft"
 msgid "_Line type"
 msgstr "_Linijowy typ"
 
 #. Hqc3N
-#: chart2/uiconfig/ui/sidebartype.ui:278
+#: chart2/uiconfig/ui/sidebartype.ui:183
 msgctxt "sidebartype|linetype"
 msgid "Straight"
 msgstr "Rowna cera"
 
 #. EB58Z
-#: chart2/uiconfig/ui/sidebartype.ui:279
+#: chart2/uiconfig/ui/sidebartype.ui:184
 msgctxt "sidebartype|linetype"
 msgid "Smooth"
 msgstr "Głaźiś"
 
 #. qLn3k
-#: chart2/uiconfig/ui/sidebartype.ui:280
+#: chart2/uiconfig/ui/sidebartype.ui:185
 msgctxt "sidebartype|linetype"
 msgid "Stepped"
 msgstr "Schójźeńki"
 
 #. jKDXh
-#: chart2/uiconfig/ui/sidebartype.ui:290
+#: chart2/uiconfig/ui/sidebartype.ui:195
 msgctxt "sidebartype|properties"
 msgid "Properties..."
 msgstr "Kakosći..."
 
 #. xW9CQ
-#: chart2/uiconfig/ui/sidebartype.ui:308
+#: chart2/uiconfig/ui/sidebartype.ui:207
 msgctxt "sidebartype|sort"
 msgid "_Sort by X values"
 msgstr "Pó _X-gódnotach sortěrowaś"
 
 #. thu3G
-#: chart2/uiconfig/ui/sidebartype.ui:330
+#: chart2/uiconfig/ui/sidebartype.ui:223
 msgctxt "sidebartype|nolinesft"
 msgid "_Number of lines"
 msgstr "_Licba linijow"
+
+#. Yau6n
+#: chart2/uiconfig/ui/sidebartype.ui:282
+msgctxt "sidebartype|ontop"
+msgid "On top"
+msgstr "Jaden nad drugim"
+
+#. f2J43
+#: chart2/uiconfig/ui/sidebartype.ui:298
+msgctxt "sidebartype|percent"
+msgid "Percent"
+msgstr "Procent"
+
+#. iDSaa
+#: chart2/uiconfig/ui/sidebartype.ui:314
+msgctxt "sidebartype|deep"
+msgid "Deep"
+msgstr "Jaden za drugim"
 
 #. Ledzw
 #: chart2/uiconfig/ui/smoothlinesdlg.ui:22
@@ -4063,6 +4111,36 @@ msgctxt "tp_DataSource|FT_CAPTION_FOR_WIZARD"
 msgid "Customize Data Ranges for Individual Data Series"
 msgstr "Pśiměrśo datowe wobceŕki za jadnotliwe datowe rědy"
 
+#. JGgFh
+#: chart2/uiconfig/ui/tp_DataTable.ui:33
+msgctxt "tp_DataTable|horizontalBorderCB"
+msgid "Show horizontal border"
+msgstr "Horicontalny ramik pokazaś"
+
+#. EzGM5
+#: chart2/uiconfig/ui/tp_DataTable.ui:49
+msgctxt "tp_DataTable|verticalBorderCB"
+msgid "Show vertical border"
+msgstr "Wertikalny ramik pokazaś"
+
+#. ZTAZY
+#: chart2/uiconfig/ui/tp_DataTable.ui:65
+msgctxt "tp_DataTable|outlineCB"
+msgid "Show outline"
+msgstr "Wobceŕ pokazaś"
+
+#. kPDNa
+#: chart2/uiconfig/ui/tp_DataTable.ui:81
+msgctxt "tp_DataTable|keysCB"
+msgid "Show keys"
+msgstr "Kluce pokazaś"
+
+#. fybMv
+#: chart2/uiconfig/ui/tp_DataTable.ui:101
+msgctxt "tp_axisLabel|textflowL"
+msgid "Data Table Properties"
+msgstr "Kakosći datoweje tabele"
+
 #. tGqhN
 #: chart2/uiconfig/ui/tp_ErrorBars.ui:53
 msgctxt "tp_ErrorBars|RB_NONE"
@@ -4379,7 +4457,7 @@ msgstr "Pódawa, lěc legenda ma diagram pózakšyś."
 #: chart2/uiconfig/ui/tp_LegendPosition.ui:227
 msgctxt "tp_LegendPosition|TXT_OVERLAY"
 msgid "Overlay"
-msgstr "Waršta"
+msgstr "Pózakšyśe"
 
 #. 8783D
 #: chart2/uiconfig/ui/tp_PolarOptions.ui:24
@@ -4403,7 +4481,7 @@ msgstr "Wumsěrjenje"
 #: chart2/uiconfig/ui/tp_PolarOptions.ui:79
 msgctxt "tp_PolarOptions|extended_tip|CT_ANGLE_DIAL"
 msgid "Drag the small dot along the circle or click any position on the circle to set the starting angle of a pie or donut chart. The starting angle is the mathematical angle position where the first piece is drawn. The value of 90 degrees draws the first piece at the 12 o'clock position. A value of 0 degrees starts at the 3 o'clock position."
-msgstr "Śěgniśo mały dypk pó krejzu abo klikniśo na někaku poziciju na krejzu, aby startowy kut krejzowego abo wokolicnego diagrama nastajił. Startowy kut jo matematiska kutowa pozicija, źož se prědny segment kresli. Gódnota 90 stopnjow prědny segment na poziciji zeger 12. Gódnota 0 stopnjow se na poziciji zeger 3 zachopina."
+msgstr "Śěgniśo mały dypk pó krejzu abo klikniśo na někaku poziciju na krejzu, aby startowy kut krejzowego abo kołowego diagrama nastajił. Startowy kut jo matematiska kutowa pozicija, źož se prědny segment kresli. Gódnota 90 stopnjow prědny segment na poziciji zeger 12 kresli. Gódnota 0 stopnjow se na poziciji zeger 3 zachopina."
 
 #. EEVTg
 #: chart2/uiconfig/ui/tp_PolarOptions.ui:99
@@ -4853,7 +4931,7 @@ msgstr "Zwězujuce linije"
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:218
 msgctxt "tp_SeriesToAxis|extended_tip|CB_CONNECTOR"
 msgid "For \"stacked\" and \"percent\" column (vertical bar) charts, mark this check box to connect the column layers that belong together with lines."
-msgstr "Markěrujśo za štaplowane a procentowe słupowe diagramy toś ten kontrolny kašćik, aby gromadu słušajuce słupowe rowniny z linijami zwězał."
+msgstr "Markěrujśo za štaplowane a procentowe słupikowe diagramy toś ten kontrolny kašćik, aby gromadu słušajuce słupikowe rowniny z linijami zwězał."
 
 #. VHcU3
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:234
@@ -4877,7 +4955,7 @@ msgstr "_Prozny flak wóstajiś"
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:291
 msgctxt "tp_SeriesToAxis|extended_tip|RB_DONT_PAINT"
 msgid "For a missing value, no data will be shown. This is the default for chart types Column, Bar, Line, Net."
-msgstr "Gaž gódnota felujo, daty se njepokazuju. To jo standard za słupowe, grědowe, linijowe a seśowe diagramy."
+msgstr "Gaž gódnota felujo, daty se njepokazuju. To jo standard za słupikowe, grědowe, linijowe a seśowe diagramy."
 
 #. ZvtoD
 #: chart2/uiconfig/ui/tp_SeriesToAxis.ui:302
@@ -5251,10 +5329,10 @@ msgctxt "tp_axisLabel|even"
 msgid "Stagger _even"
 msgstr "_Dłymoko-wusoko pśestajony"
 
-#. 9EMGj
+#. a6qBM
 #: chart2/uiconfig/ui/tp_axisLabel.ui:113
 msgctxt "tp_axisLabel|extended_tip|even"
-msgid "Stagger numbers on the axes, odd numbers lower than even numbers."
+msgid "Stagger numbers on the axis, odd numbers lower than even numbers."
 msgstr "Štaflujo licby na wósce, njerowne licby su dłymše ako rowne licby."
 
 #. 2JwY3

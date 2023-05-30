@@ -225,7 +225,8 @@ ScMyStylesMap::iterator ScMyStylesImportHelper::GetIterator(const OUString & rSt
 {
     auto it = aCellStyles.find(rStyleName);
     if (it == aCellStyles.end())
-        it = aCellStyles.emplace_hint(it, rStyleName, std::make_unique<ScMyStyleRanges>());
+        it = aCellStyles.emplace_hint(it, std::piecewise_construct,
+                            std::forward_as_tuple(rStyleName), std::forward_as_tuple());
     return it;
 }
 
@@ -281,9 +282,9 @@ void ScMyStylesImportHelper::AddSingleRange(const ScRange& rRange)
 {
     ScMyStylesMap::iterator aItr(GetIterator(*pPrevStyleName));
     if (nPrevCellType != util::NumberFormat::CURRENCY)
-        aItr->second->AddRange(rRange, nPrevCellType);
+        aItr->second.AddRange(rRange, nPrevCellType);
     else
-        aItr->second->AddCurrencyRange(rRange, pPrevCurrency);
+        aItr->second.AddCurrencyRange(rRange, pPrevCurrency);
 }
 
 void ScMyStylesImportHelper::AddRange()
@@ -299,7 +300,7 @@ void ScMyStylesImportHelper::AddColumnStyle(const OUString& sStyleName, const sa
 {
     OSL_ENSURE(static_cast<sal_uInt32>(nColumn) == aColDefaultStyles.size(), "some columns are absent");
     ScMyStylesMap::iterator aItr(GetIterator(sStyleName));
-    aColDefaultStyles.reserve(aColDefaultStyles.size() + nRepeat);
+    aColDefaultStyles.reserve(std::max<size_t>(aColDefaultStyles.size() + nRepeat, aColDefaultStyles.size() * 2));
     for (sal_Int32 i = 0; i < nRepeat; ++i)
         aColDefaultStyles.push_back(aItr);
 }
@@ -375,7 +376,7 @@ void ScMyStylesImportHelper::InsertCol(const sal_Int32 nCol, const sal_Int32 nTa
     ScXMLImport::MutexGuard aGuard(rImport);
     for (auto& rCellStyle : aCellStyles)
     {
-        rCellStyle.second->InsertCol(nCol, nTab);
+        rCellStyle.second.InsertCol(nCol, nTab);
     }
 }
 
@@ -392,7 +393,7 @@ void ScMyStylesImportHelper::SetStylesToRanges()
 {
     for (auto& rCellStyle : aCellStyles)
     {
-        rCellStyle.second->SetStylesToRanges(&rCellStyle.first, rImport);
+        rCellStyle.second.SetStylesToRanges(&rCellStyle.first, rImport);
     }
     aColDefaultStyles.clear();
     aCellStyles.clear();

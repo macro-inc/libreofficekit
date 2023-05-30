@@ -1,1 +1,77 @@
-<svg height="48" width="48" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="a" gradientTransform="matrix(2.9999 0 0 2.9991699 -327.98767 -2928.2901)" gradientUnits="userSpaceOnUse" x1="123.66695" x2="111.66655" y1="991.70453" y2="977.03375"><stop offset="0" stop-color="#535353"/><stop offset="1" stop-color="#7e7e7e"/></linearGradient><path d="m6.4379114.01363646c-1.37515.262398-2.46216 1.59863804-2.4375 2.99804704v41.9882845c.00015 1.57031 1.42931 2.99985 3 3h33.9999996c1.57069-.00015 2.99985-1.42969 3-3v-26.18165c.018-.79196-.29252-1.587065-.84375-2.156245l-15.8125-15.80468654c-.56932-.550947-1.3641-.862103-2.15625-.84375h-18.1874996c-.18689-.01799-.37555-.01799-.5625 0zm26.5507796.0098c-.99843.319797-1.33417 1.83991404-.56445 2.55468804l9.03515 9.0820305c.83473.795587 2.49704.114553 2.54102-1.04105v-9.0820315c-.00009-.79262304-.71736-1.51358204-1.50586-1.51367204h-9.03516c-.15569-.02399-.31509-.02399-.4707 0z" fill="url(#a)"/><path d="m7.0004114 2.9999985v41.9999995h33.9999996v-26l-16-15.9999995z" fill="#fff"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="134.19557mm"
+   height="134.19557mm"
+   viewBox="0 0 134.19557 134.19557"
+   version="1.1"
+   id="svg4519"
+   sodipodi:docname="collabora-online-logo.svg"
+   inkscape:version="0.92.0 unknown">
+  <defs
+     id="defs4513" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="256.04006"
+     inkscape:cy="260.75029"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1301"
+     inkscape:window-height="744"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata4516">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(164.06501,-114.9656)">
+    <polygon
+       id="polygon14"
+       points="17.772,20.172 30.958,32.599 17.914,44.893 17.358,44.386 17.258,20.718 "
+       style="fill:#ffffff"
+       transform="matrix(2.8998956,0,0,2.8998956,-195.59046,87.816779)" />
+    <polygon
+       style="fill:#5c2983;fill-opacity:1"
+       id="polygon16"
+       points="30.379,33.145 17.914,44.893 28.654,55.638 51.742,32.55 28.561,9.362 17.763,20.162 17.772,20.172 30.379,32.053 30.958,32.599 "
+       transform="matrix(2.8998956,0,0,2.8998956,-195.59046,87.816779)" />
+    <polygon
+       id="polygon18"
+       points="17.358,44.386 17.258,20.718 29.864,32.599 "
+       style="fill:#c8c8c8"
+       transform="matrix(2.8998956,0,0,2.8998956,-195.59046,87.816779)" />
+    <polygon
+       style="fill:#2d0b47;fill-opacity:1"
+       id="polygon20"
+       points="27.743,35.628 18.807,44.052 31.847,41.483 "
+       transform="matrix(2.8998956,0,0,2.8998956,-195.59046,87.816779)" />
+  </g>
+</svg>

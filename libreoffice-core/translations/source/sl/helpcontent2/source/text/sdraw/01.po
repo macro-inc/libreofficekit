@@ -1,10 +1,10 @@
 #. extracted from helpcontent2/source/text/sdraw/01
 msgid ""
 msgstr ""
-"Project-Id-Version: LibreOffice 7.2\n"
+"Project-Id-Version: LibreOffice 7.5\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-19 22:36+0100\n"
-"PO-Revision-Date: 2022-01-19 19:03+0200\n"
+"POT-Creation-Date: 2022-12-07 21:45+0100\n"
+"PO-Revision-Date: 2022-11-03 22:31+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: sl.libreoffice.org\n"
 "MIME-Version: 1.0\n"
@@ -438,8 +438,8 @@ msgctxt ""
 "consolidatetext.xhp\n"
 "hd_id861623510996086\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/consolidatetext.xhp\" name=\"consolidate text\">Text Box Consolidation</link>"
-msgstr "<link href=\"text/sdraw/01/consolidatetext.xhp\" name=\"Zberi besedilo\">Zbiranje polj z besedilom</link>"
+msgid "<link href=\"text/sdraw/01/consolidatetext.xhp\">Text Box Consolidation</link>"
+msgstr "<link href=\"text/sdraw/01/consolidatetext.xhp\">Zbiranje polj z besedilom</link>"
 
 #: consolidatetext.xhp
 msgctxt ""
@@ -566,8 +566,8 @@ msgctxt ""
 "delete_page.xhp\n"
 "hd_id3150202\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/delete_page.xhp\" name=\"Delete Page\">Delete Page</link>"
-msgstr "<link href=\"text/sdraw/01/delete_page.xhp\" name=\"Izbriši stran\">Izbriši stran</link>"
+msgid "<link href=\"text/sdraw/01/delete_page.xhp\">Delete Page</link>"
+msgstr "<link href=\"text/sdraw/01/delete_page.xhp\">Izbriši stran</link>"
 
 #: delete_page.xhp
 msgctxt ""
@@ -590,8 +590,8 @@ msgctxt ""
 "duplicate_page.xhp\n"
 "hd_id3148576\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/duplicate_page.xhp\" name=\"Duplicate Page\">Duplicate Page</link>"
-msgstr "<link href=\"text/sdraw/01/duplicate_page.xhp\" name=\"Podvoji stran\">Podvoji stran</link>"
+msgid "<link href=\"text/sdraw/01/duplicate_page.xhp\">Duplicate Page</link>"
+msgstr "<link href=\"text/sdraw/01/duplicate_page.xhp\">Podvoji stran</link>"
 
 #: duplicate_page.xhp
 msgctxt ""
@@ -612,18 +612,26 @@ msgstr "Vstavi plast"
 #: insert_layer.xhp
 msgctxt ""
 "insert_layer.xhp\n"
+"bm_id3156329\n"
+"help.text"
+msgid "<bookmark_value>renaming layers</bookmark_value><bookmark_value>layers; renaming</bookmark_value><bookmark_value>layers; insert</bookmark_value><bookmark_value>layers; modify</bookmark_value><bookmark_value>modify layer</bookmark_value><bookmark_value>insert layer</bookmark_value>"
+msgstr "<bookmark_value>preimenovanje plasti</bookmark_value><bookmark_value>plasti;preimenovanje</bookmark_value><bookmark_value>plasti;vstavljanje</bookmark_value><bookmark_value>plasti;spreminjanje</bookmark_value><bookmark_value>spreminjanje;plasti</bookmark_value><bookmark_value>vstavljanje;plasti</bookmark_value>"
+
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
 "hd_id3151074\n"
 "help.text"
-msgid "Insert Layer"
-msgstr "Vstavi plast"
+msgid "Insert or Modify Layer"
+msgstr "Vstavljanje ali urejanje plasti"
 
 #: insert_layer.xhp
 msgctxt ""
 "insert_layer.xhp\n"
 "par_id3153415\n"
 "help.text"
-msgid "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">Inserts a new layer in the document. Layers are only available in Draw, not in Impress. </ahelp></variable>"
-msgstr "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">V dokument vstavi novo plast. Plasti so na voljo le v programu Draw, ne pa tudi v Impress. </ahelp></variable>"
+msgid "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">Inserts a new layer or modify a layer in the document. Layers are only available in Draw, not in Impress. </ahelp></variable>"
+msgstr "<variable id=\"ebenetext\"><ahelp hid=\".uno:InsertLayer\">V dokument vstavi novo plast ali spremeni obstoječo plast. Plasti so na voljo le v programu Draw, ne pa tudi v Impress. </ahelp></variable>"
 
 #: insert_layer.xhp
 msgctxt ""
@@ -646,8 +654,16 @@ msgctxt ""
 "insert_layer.xhp\n"
 "par_id3149404\n"
 "help.text"
-msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Enter a name for the new layer.</ahelp>"
-msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Vnesite ime nove plasti.</ahelp>"
+msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Enter a name for the new layer. To rename the layer, enter the new name.</ahelp>"
+msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/name\">Vnesite ime nove plasti. Če želite preimenovati plast, vnesite novo ime.</ahelp>"
+
+#: insert_layer.xhp
+msgctxt ""
+"insert_layer.xhp\n"
+"par_id761667238910931\n"
+"help.text"
+msgid "To rename the layer directly, right-click the layer tab at the bottom, select <menuitem>Rename Layer</menuitem> in the context menu and enter the new name in the tab."
+msgstr "Če želite preimenovati plast neposredno, desno kliknite zavihek plasti na dnu, v kontekstnem meniju izberite <menuitem>Preimenuj plast</menuitem> in vnesite novo ime v zavihek."
 
 #: insert_layer.xhp
 msgctxt ""
@@ -686,16 +702,16 @@ msgctxt ""
 "insert_layer.xhp\n"
 "hd_id3153820\n"
 "help.text"
-msgid "Properties"
-msgstr "Lastnosti"
+msgid "Layer Properties"
+msgstr "Lastnosti plasti"
 
 #: insert_layer.xhp
 msgctxt ""
 "insert_layer.xhp\n"
 "par_id3151240\n"
 "help.text"
-msgid "Set the properties for the new layer."
-msgstr "Nastavite lastnosti nove plasti."
+msgid "Set the properties for the layer."
+msgstr "Nastavite lastnosti plasti."
 
 #: insert_layer.xhp
 msgctxt ""
@@ -745,142 +761,6 @@ msgctxt ""
 msgid "<ahelp hid=\"modules/sdraw/ui/insertlayer/locked\">Prevent elements on the layer from being edited.</ahelp>"
 msgstr "<ahelp hid=\"modules/sdraw/ui/insertlayer/locked\">Prepreči, da bi se elementi na plasti urejali.</ahelp>"
 
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"tit\n"
-"help.text"
-msgid "Modify Layer"
-msgstr "Spremeni plast"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"bm_id3156329\n"
-"help.text"
-msgid "<bookmark_value>renaming layers</bookmark_value><bookmark_value>layers; renaming</bookmark_value>"
-msgstr "<bookmark_value>preimenovanje plasti</bookmark_value><bookmark_value>plasti; preimenovanje</bookmark_value>"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3156329\n"
-"help.text"
-msgid "Modify Layer"
-msgstr "Spremeni plast"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3147265\n"
-"help.text"
-msgid "<variable id=\"ebene\"><ahelp hid=\".uno:ModifyLayer\">Changes the properties of the selected layer.</ahelp></variable>"
-msgstr "<variable id=\"ebene\"><ahelp hid=\".uno:ModifyLayer\">Spremeni lastnosti izbrane plasti.</ahelp></variable>"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3155603\n"
-"help.text"
-msgid "Name"
-msgstr "Ime"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3155738\n"
-"help.text"
-msgid "Enter a name for the selected layer."
-msgstr "Vnesite ime izbrane plasti."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3149126\n"
-"help.text"
-msgid "You can only change the name of a layer you created."
-msgstr "Spremenite lahko le ime plasti, ki ste jo ustvarili sami."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3147345\n"
-"help.text"
-msgid "Properties"
-msgstr "Lastnosti"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3148488\n"
-"help.text"
-msgid "Sets the properties of the selected layer."
-msgstr "Nastavi lastnosti izbrane plasti."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3166423\n"
-"help.text"
-msgid "Visible"
-msgstr "Vidno"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3159239\n"
-"help.text"
-msgid "Shows or hides the contents of the selected layer."
-msgstr "Pokaže ali skrije vsebino izbrane plasti."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3150208\n"
-"help.text"
-msgid "Printable"
-msgstr "Natisljivo"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3152993\n"
-"help.text"
-msgid "Prints the contents of the selected layer."
-msgstr "Natisne vsebino izbrane plasti."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3145585\n"
-"help.text"
-msgid "Protected"
-msgstr "Zaščiteno"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3159488\n"
-"help.text"
-msgid "Locks the contents of the selected layer, so that they cannot be edited."
-msgstr "Zaklene vsebino izbrane plasti, tako da je ni mogoče urejati."
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"hd_id3156448\n"
-"help.text"
-msgid "Rename Layer"
-msgstr "Preimenuj plast"
-
-#: modify_layer.xhp
-msgctxt ""
-"modify_layer.xhp\n"
-"par_id3163801\n"
-"help.text"
-msgid "<ahelp hid=\".uno:RenameLayer\">Renames the active layer.</ahelp> You can only change the name of a layer you created."
-msgstr "<ahelp hid=\".uno:RenameLayer\">Preimenuje aktivno plast.</ahelp> Spremenite lahko le ime plasti, ki ste jo ustvarili."
-
 #: navigate_page.xhp
 msgctxt ""
 "navigate_page.xhp\n"
@@ -894,8 +774,8 @@ msgctxt ""
 "navigate_page.xhp\n"
 "hd_id341566156032976\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/navigate_page.xhp\" name=\"navigate\">Page Navigation</link>"
-msgstr "<link href=\"text/sdraw/01/navigate_page.xhp\" name=\"Krmarjenje po strani\">Krmarjenje po strani</link>"
+msgid "<link href=\"text/sdraw/01/navigate_page.xhp\">Page Navigation</link>"
+msgstr "<link href=\"text/sdraw/01/navigate_page.xhp\">Krmarjenje po strani</link>"
 
 #: navigate_page.xhp
 msgctxt ""
@@ -918,8 +798,8 @@ msgctxt ""
 "new_page.xhp\n"
 "hd_id3150202\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/new_page.xhp\" name=\"New Page\">New Page</link>"
-msgstr "<link href=\"text/sdraw/01/new_page.xhp\" name=\"Nova stran\">Nova stran</link>"
+msgid "<link href=\"text/sdraw/01/new_page.xhp\">New Page</link>"
+msgstr "<link href=\"text/sdraw/01/new_page.xhp\">Nova stran</link>"
 
 #: new_page.xhp
 msgctxt ""
@@ -974,8 +854,8 @@ msgctxt ""
 "rename_page.xhp\n"
 "hd_id301566092814709\n"
 "help.text"
-msgid "<link href=\"text/sdraw/01/rename_page.xhp\" name=\"rename page\">Rename Page</link>"
-msgstr "<link href=\"text/sdraw/01/rename_page.xhp\" name=\"Preimenuj stran\">Preimenuj stran</link>"
+msgid "<link href=\"text/sdraw/01/rename_page.xhp\">Rename Page</link>"
+msgstr "<link href=\"text/sdraw/01/rename_page.xhp\">Preimenuj stran</link>"
 
 #: rename_page.xhp
 msgctxt ""

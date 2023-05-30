@@ -17,10 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <apitools.hxx>
 #include <table.hxx>
 #include <definitioncolumn.hxx>
 #include <stringconstants.hxx>
+#include <strings.hxx>
 #include <core_resource.hxx>
 #include <strings.hrc>
 #include "CIndexes.hxx"
@@ -29,7 +29,6 @@
 #include <comphelper/servicehelper.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/sdbc/SQLException.hpp>
-#include <com/sun/star/sdbc/XConnection.hpp>
 #include <com/sun/star/sdb/tools/XTableRename.hpp>
 #include <com/sun/star/sdb/tools/XTableAlteration.hpp>
 
@@ -316,7 +315,7 @@ sal_Int64 SAL_CALL ODBTable::getSomething( const Sequence< sal_Int8 >& rId )
                                         comphelper::FallbackToGetSomethingOf<OTable_Base>{});
 }
 
-Sequence< sal_Int8 > ODBTable::getUnoTunnelId()
+const Sequence< sal_Int8 > & ODBTable::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit s_Id;
     return s_Id.getSeq();

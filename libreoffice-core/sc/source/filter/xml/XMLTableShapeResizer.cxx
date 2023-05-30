@@ -54,9 +54,9 @@ bool ScMyOLEFixer::IsOLE(const uno::Reference< drawing::XShape >& rShape)
 
 void ScMyOLEFixer::CreateChartListener(ScDocument& rDoc,
     const OUString& rName,
-    const OUString& rRangeList)
+    std::u16string_view rRangeList)
 {
-    if (rRangeList.isEmpty())
+    if (rRangeList.empty())
     {
         rDoc.AddOLEObjectToCollection(rName);
         return;
@@ -76,15 +76,15 @@ void ScMyOLEFixer::CreateChartListener(ScDocument& rDoc,
     if (!pCollection)
         return;
 
-    unique_ptr< vector<ScTokenRef> > pRefTokens(new vector<ScTokenRef>);
+    vector<ScTokenRef> aRefTokens;
     const sal_Unicode cSep = ScCompiler::GetNativeSymbolChar(ocSep);
     ScRefTokenHelper::compileRangeRepresentation(
-        *pRefTokens, aRangeStr, rDoc, cSep, rDoc.GetGrammar());
-    if (pRefTokens->empty())
+        aRefTokens, aRangeStr, rDoc, cSep, rDoc.GetGrammar());
+    if (aRefTokens.empty())
         return;
 
     OUString sName = !rName.isEmpty() ? rName : pCollection->getUniqueName(u"OLEFixer ");
-    ScChartListener* pCL(new ScChartListener(sName, rDoc, std::move(pRefTokens)));
+    ScChartListener* pCL(new ScChartListener(sName, rDoc, std::move(aRefTokens)));
 
     //for loading binary files e.g.
     //if we have the flat filter we need to set the dirty flag thus the visible charts get repainted

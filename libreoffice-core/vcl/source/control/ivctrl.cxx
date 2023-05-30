@@ -18,6 +18,7 @@
  */
 
 
+#include <utility>
 #include <vcl/toolkit/ivctrl.hxx>
 #include "imivctl.hxx"
 #include <vcl/accessiblefactory.hxx>
@@ -36,13 +37,12 @@ using namespace ::com::sun::star::accessibility;
 
 namespace
 {
-void collectUIInformation( const OUString& aID, const OUString& aPos , const OUString& aParent )
+void collectUIInformation( const OUString& aID, const OUString& aPos)
 {
     EventDescription aDescription;
     aDescription.aID = aID;
     aDescription.aParameters = {{ "POS" ,  aPos}};
     aDescription.aAction = "SELECT";
-    aDescription.aParent = aParent;
     aDescription.aKeyWord = "VerticalTab";
     UITestLogger::getInstance().logEvent(aDescription);
 }
@@ -54,10 +54,10 @@ void collectUIInformation( const OUString& aID, const OUString& aPos , const OUS
 |
 \*****************************************************************************/
 
-SvxIconChoiceCtrlEntry::SvxIconChoiceCtrlEntry( const OUString& rText,
-                                                const Image& rImage )
-    : aImage(rImage)
-    , aText(rText)
+SvxIconChoiceCtrlEntry::SvxIconChoiceCtrlEntry( OUString _aText,
+                                                Image _aImage )
+    : aImage(std::move(_aImage))
+    , aText(std::move(_aText))
     , nPos(0)
     , pblink(nullptr)
     , pflink(nullptr)
@@ -544,7 +544,7 @@ void VerticalTabControl::SetCurPageId(const OString& rId)
         ActivatePage();
         pNewData->xPage->Show();
     }
-    collectUIInformation(get_id(),OStringToOUString(m_sCurrentPageId,RTL_TEXTENCODING_UTF8), GetPageParent()->get_id());
+    collectUIInformation(get_id(),OStringToOUString(m_sCurrentPageId,RTL_TEXTENCODING_UTF8));
 }
 
 const OString & VerticalTabControl::GetPageId(sal_uInt16 nIndex) const

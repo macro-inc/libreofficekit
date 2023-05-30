@@ -22,6 +22,7 @@
 #include <expfld.hxx>
 #include <swmodule.hxx>
 #include "fldref.hxx"
+#include <frmatr.hxx>
 #include <reffld.hxx>
 #include <wrtsh.hxx>
 
@@ -34,7 +35,10 @@
 #include <osl/diagnose.h>
 
 #include <comphelper/string.hxx>
+#include <editeng/frmdiritem.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
+#include <vcl/settings.hxx>
 
 #define REFFLDFLAG          0x4000
 #define REFFLDFLAG_BOOKMARK 0x4800
@@ -72,12 +76,12 @@ SwFieldRefPage::SwFieldRefPage(weld::Container* pPage, weld::DialogController* p
         m_xFormatLB->append_text(SwResId(FLD_REF_PAGE_TYPES[i]));
     }
 
-    sBookmarkText = m_xTypeLB->get_text(0);
-    sFootnoteText = m_xTypeLB->get_text(1);
-    sEndnoteText = m_xTypeLB->get_text(2);
+    m_sBookmarkText = m_xTypeLB->get_text(0);
+    m_sFootnoteText = m_xTypeLB->get_text(1);
+    m_sEndnoteText = m_xTypeLB->get_text(2);
     // #i83479#
-    sHeadingText = m_xTypeLB->get_text(3);
-    sNumItemText = m_xTypeLB->get_text(4);
+    m_sHeadingText = m_xTypeLB->get_text(3);
+    m_sNumItemText = m_xTypeLB->get_text(4);
 
     auto nHeight = m_xTypeLB->get_height_rows(8);
     auto nWidth = m_xTypeLB->get_approximate_digit_width() * FIELD_COLUMN_WIDTH;
@@ -102,6 +106,13 @@ SwFieldRefPage::SwFieldRefPage(weld::Container* pPage, weld::DialogController* p
     m_xSelectionToolTipLB->connect_changed( LINK(this, SwFieldRefPage, SubTypeTreeListBoxHdl) );
     m_xSelectionToolTipLB->connect_row_activated( LINK(this, SwFieldRefPage, TreeViewInsertHdl) );
     m_xFilterED->grab_focus();
+
+    // uitests
+    m_xTypeLB->set_buildable_name(m_xTypeLB->get_buildable_name() + "-ref");
+    m_xNameED->set_buildable_name(m_xNameED->get_buildable_name() + "-ref");
+    m_xValueED->set_buildable_name(m_xValueED->get_buildable_name() + "-ref");
+    m_xSelectionLB->set_buildable_name(m_xSelectionLB->get_buildable_name() + "-ref");
+    m_xFormatLB->set_buildable_name(m_xFormatLB->get_buildable_name() + "-ref");
 }
 
 SwFieldRefPage::~SwFieldRefPage()
@@ -111,6 +122,8 @@ SwFieldRefPage::~SwFieldRefPage()
 IMPL_LINK_NOARG(SwFieldRefPage, ModifyHdl_Impl, weld::Entry&, void)
 {
     UpdateSubType(comphelper::string::strip(m_xFilterED->get_text(), ' '));
+    // tdf#135938 - refresh cross-reference name after filter selection has changed
+    SubTypeHdl();
 }
 
 // #i83479#
@@ -178,16 +191,24 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
 
     // #i83479#
     // entries for headings and numbered items
-    m_xTypeLB->append(OUString::number(REFFLDFLAG_HEADING), sHeadingText);
-    m_xTypeLB->append(OUString::number(REFFLDFLAG_NUMITEM), sNumItemText);
+    m_xTypeLB->append(OUString::number(REFFLDFLAG_HEADING), m_sHeadingText);
+    m_xTypeLB->append(OUString::number(REFFLDFLAG_NUMITEM), m_sNumItemText);
 
     // fill up with the sequence types
     SwWrtShell *pSh = GetWrtShell();
     if (!pSh)
         pSh = ::GetActiveWrtShell();
-
     if (!pSh)
         return;
+
+    // tdf#148432 in LTR UI override the navigator treeview direction based on
+    // the first page directionality
+    if (!AllSettings::GetLayoutRTL())
+    {
+        const SwPageDesc& rDesc = pSh->GetPageDesc(0);
+        const SvxFrameDirectionItem& rFrameDir = rDesc.GetMaster().GetFrameDir();
+        m_xSelectionToolTipLB->set_direction(rFrameDir.GetValue() == SvxFrameDirection::Horizontal_RL_TB);
+    }
 
     const size_t nFieldTypeCnt = pSh->GetFieldTypeCount(SwFieldIds::SetExp);
 
@@ -204,18 +225,18 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
     }
 
     // text marks - now always (because of globaldocuments)
-    m_xTypeLB->append(OUString::number(REFFLDFLAG_BOOKMARK), sBookmarkText);
+    m_xTypeLB->append(OUString::number(REFFLDFLAG_BOOKMARK), m_sBookmarkText);
 
     // footnotes:
     if( pSh->HasFootnotes() )
     {
-        m_xTypeLB->append(OUString::number(REFFLDFLAG_FOOTNOTE), sFootnoteText);
+        m_xTypeLB->append(OUString::number(REFFLDFLAG_FOOTNOTE), m_sFootnoteText);
     }
 
     // endnotes:
     if ( pSh->HasFootnotes(true) )
     {
-        m_xTypeLB->append(OUString::number(REFFLDFLAG_ENDNOTE), sEndnoteText);
+        m_xTypeLB->append(OUString::number(REFFLDFLAG_ENDNOTE), m_sEndnoteText);
     }
 
     m_xTypeLB->thaw();
@@ -231,10 +252,10 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
     {
         sal_Int32 nIdx{ 0 };
         const OUString sUserData = GetUserData();
-        if(!IsRefresh() && sUserData.getToken(0, ';', nIdx).
-                                equalsIgnoreAsciiCase(USER_DATA_VERSION_1))
+        if(!IsRefresh() && o3tl::equalsIgnoreAsciiCase(o3tl::getToken(sUserData, 0, ';', nIdx),
+                                u"" USER_DATA_VERSION_1))
         {
-            const sal_uInt16 nVal = static_cast< sal_uInt16 >(sUserData.getToken(0, ';', nIdx).toInt32());
+            const sal_uInt16 nVal = static_cast< sal_uInt16 >(o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx)));
             if(nVal != USHRT_MAX)
             {
                 for(sal_Int32 i = 0, nEntryCount = m_xTypeLB->n_children(); i < nEntryCount; ++i)
@@ -247,7 +268,7 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
                 }
                 if (nIdx>=0 && nIdx<sUserData.getLength())
                 {
-                    nFormatBoxPosition = static_cast< sal_uInt16 >(sUserData.getToken(0, ';', nIdx).toInt32());
+                    nFormatBoxPosition = static_cast< sal_uInt16 >(o3tl::toInt32(o3tl::getToken(sUserData, 0, ';', nIdx)));
                 }
             }
         }
@@ -293,30 +314,30 @@ IMPL_LINK_NOARG(SwFieldRefPage, TypeHdl, weld::TreeView&, void)
                     if ( pRefField &&
                          pRefField->IsRefToHeadingCrossRefBookmark() )
                     {
-                        sName = sHeadingText;
+                        sName = m_sHeadingText;
                         nFlag = REFFLDFLAG_HEADING;
                     }
                     else if ( pRefField &&
                               pRefField->IsRefToNumItemCrossRefBookmark() )
                     {
-                        sName = sNumItemText;
+                        sName = m_sNumItemText;
                         nFlag = REFFLDFLAG_NUMITEM;
                     }
                     else
                     {
-                        sName = sBookmarkText;
+                        sName = m_sBookmarkText;
                         nFlag = REFFLDFLAG_BOOKMARK;
                     }
                 }
                 break;
 
                 case REF_FOOTNOTE:
-                    sName = sFootnoteText;
+                    sName = m_sFootnoteText;
                     nFlag = REFFLDFLAG_FOOTNOTE;
                     break;
 
                 case REF_ENDNOTE:
-                    sName = sEndnoteText;
+                    sName = m_sEndnoteText;
                     nFlag = REFFLDFLAG_ENDNOTE;
                     break;
 
@@ -326,9 +347,15 @@ IMPL_LINK_NOARG(SwFieldRefPage, TypeHdl, weld::TreeView&, void)
                     break;
 
                 case REF_SEQUENCEFLD:
-                    sName = static_cast<SwGetRefField*>(GetCurField())->GetSetRefName();
+                {
+                    SwGetRefField const*const pRefField(dynamic_cast<SwGetRefField*>(GetCurField()));
+                    if (pRefField)
+                    {
+                        sName = pRefField->GetSetRefName();
+                    }
                     nFlag = REFFLDFLAG;
                     break;
+                }
             }
 
             if (m_xTypeLB->find_text(sName) == -1)   // reference to deleted mark
@@ -351,9 +378,6 @@ IMPL_LINK_NOARG(SwFieldRefPage, TypeHdl, weld::TreeView&, void)
 
     sal_uInt16 nTypeId = m_xTypeLB->get_id(GetTypeSel()).toUInt32();
 
-    // fill selection-ListBox
-    UpdateSubType(comphelper::string::strip(m_xFilterED->get_text(), ' '));
-
     bool bName = false;
     nFieldDlgFormatSel = 0;
 
@@ -364,6 +388,9 @@ IMPL_LINK_NOARG(SwFieldRefPage, TypeHdl, weld::TreeView&, void)
         m_xValueED->set_text(OUString());
         m_xFilterED->set_text(OUString());
     }
+
+    // fill selection-ListBox
+    UpdateSubType(comphelper::string::strip(m_xFilterED->get_text(), ' '));
 
     switch (nTypeId)
     {
@@ -462,9 +489,12 @@ void SwFieldRefPage::SubTypeHdl()
 void SwFieldRefPage::UpdateSubType(const OUString& filterString)
 {
     SwWrtShell *pSh = GetWrtShell();
-    if(!pSh)
+    if (!pSh)
         pSh = ::GetActiveWrtShell();
-    SwGetRefField* pRefField = static_cast<SwGetRefField*>(GetCurField());
+    if (!pSh)
+        return;
+
+    SwGetRefField const*const pRefField(dynamic_cast<SwGetRefField*>(GetCurField()));
     const sal_uInt16 nTypeId = m_xTypeLB->get_id(GetTypeSel()).toUInt32();
 
     OUString sOldSel;
@@ -475,7 +505,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
         if (nSelectionSel != -1)
             sOldSel = m_xSelectionLB->get_text(nSelectionSel);
     }
-    if (IsFieldEdit() && sOldSel.isEmpty())
+    if (IsFieldEdit() && pRefField && sOldSel.isEmpty())
         sOldSel = OUString::number( pRefField->GetSeqNo() + 1 );
 
     m_xSelectionLB->freeze();
@@ -524,7 +554,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     }
                 }
             }
-            if (IsFieldEdit())
+            if (IsFieldEdit() && pRefField)
                 sOldSel = pRefField->GetSetRefName();
         }
         else if (nTypeId == REFFLDFLAG_FOOTNOTE)
@@ -539,7 +569,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                 {
                     m_xSelectionLB->append_text( aArr[ n ].sDlgEntry );
                 }
-                if (IsFieldEdit() && pRefField->GetSeqNo() == aArr[ n ].nSeqNo)
+                if (IsFieldEdit() && pRefField && pRefField->GetSeqNo() == aArr[ n ].nSeqNo)
                     sOldSel = aArr[n].sDlgEntry;
             }
         }
@@ -555,7 +585,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                 {
                     m_xSelectionLB->append_text( aArr[ n ].sDlgEntry );
                 }
-                if (IsFieldEdit() && pRefField->GetSeqNo() == aArr[ n ].nSeqNo)
+                if (IsFieldEdit() && pRefField && pRefField->GetSeqNo() == aArr[ n ].nSeqNo)
                     sOldSel = aArr[n].sDlgEntry;
             }
         }
@@ -579,9 +609,9 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     OUString sId(OUString::number(nOutlIdx));
                     m_xSelectionToolTipLB->append(sId,
                         pIDoc->getOutlineText(nOutlIdx, pSh->GetLayout(), true, true, false));
-                    if ( ( IsFieldEdit() &&
-                       pRefField->GetReferencedTextNode() == maOutlineNodes[nOutlIdx] ) ||
-                        mpSavedSelectedTextNode == maOutlineNodes[nOutlIdx] )
+                    if ((IsFieldEdit() && pRefField
+                            && pRefField->GetReferencedTextNode() == maOutlineNodes[nOutlIdx])
+                        || mpSavedSelectedTextNode == maOutlineNodes[nOutlIdx])
                     {
                         m_sSelectionToolTipLBId = sId;
                         sOldSel.clear();
@@ -614,9 +644,9 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     OUString sId(OUString::number(nNumItemIdx));
                     m_xSelectionToolTipLB->append(sId,
                         pIDoc->getListItemText(*maNumItems[nNumItemIdx], *pSh->GetLayout()));
-                    if ( ( IsFieldEdit() &&
-                           pRefField->GetReferencedTextNode() == maNumItems[nNumItemIdx]->GetTextNode() ) ||
-                        mpSavedSelectedTextNode == maNumItems[nNumItemIdx]->GetTextNode() )
+                    if ((IsFieldEdit() && pRefField
+                            && pRefField->GetReferencedTextNode() == maNumItems[nNumItemIdx]->GetTextNode())
+                        || mpSavedSelectedTextNode == maNumItems[nNumItemIdx]->GetTextNode())
                     {
                         m_sSelectionToolTipLBId = sId;
                         sOldSel.clear();
@@ -651,12 +681,12 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     {
                         m_xSelectionLB->append_text( aArr[ n ].sDlgEntry );
                     }
-                    if (IsFieldEdit() && sOldSel.isEmpty() &&
+                    if (IsFieldEdit() && pRefField && sOldSel.isEmpty() &&
                         aArr[ n ].nSeqNo == pRefField->GetSeqNo())
                         sOldSel = aArr[ n ].sDlgEntry;
                 }
 
-                if (IsFieldEdit() && sOldSel.isEmpty())
+                if (IsFieldEdit() && pRefField && sOldSel.isEmpty())
                     sOldSel = OUString::number( pRefField->GetSeqNo() + 1);
             }
         }
@@ -674,7 +704,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
             }
         }
 
-        if (IsFieldEdit())
+        if (IsFieldEdit() && pRefField)
             sOldSel = pRefField->GetSetRefName();
     }
 
@@ -950,15 +980,14 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
         }
     }
 
-    SwGetRefField* pRefField = static_cast<SwGetRefField*>(GetCurField());
+    SwGetRefField const*const pRefField(dynamic_cast<SwGetRefField*>(GetCurField()));
 
-    if (REFFLDFLAG & nTypeId)
+    SwWrtShell *pSh = GetWrtShell();
+    if(!pSh)
+        pSh = ::GetActiveWrtShell();
+
+    if (pSh && REFFLDFLAG & nTypeId)
     {
-        SwWrtShell *pSh = GetWrtShell();
-        if(!pSh)
-        {
-            pSh = ::GetActiveWrtShell();
-        }
         if (nTypeId == REFFLDFLAG_BOOKMARK)     // text marks!
         {
             aName = m_xNameED->get_text();
@@ -980,10 +1009,10 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
             {
                 aVal = OUString::number( aArr[nPos].nSeqNo );
 
-                if (IsFieldEdit() && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
+                if (IsFieldEdit() && pRefField && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
                     bModified = true; // can happen with fields of which the references were deleted
             }
-            else if (IsFieldEdit())
+            else if (IsFieldEdit() && pRefField)
                 aVal = OUString::number( pRefField->GetSeqNo() );
         }
         else if (REFFLDFLAG_ENDNOTE == nTypeId)         // endnotes
@@ -1001,10 +1030,10 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
             {
                 aVal = OUString::number( aArr[nPos].nSeqNo );
 
-                if (IsFieldEdit() && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
+                if (IsFieldEdit() && pRefField && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
                     bModified = true; // can happen with fields of which the reference was deleted
             }
-            else if (IsFieldEdit())
+            else if (IsFieldEdit() && pRefField)
                 aVal = OUString::number( pRefField->GetSeqNo() );
         }
         // #i83479#
@@ -1069,10 +1098,10 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
                 {
                     aVal = OUString::number( aArr[nPos].nSeqNo );
 
-                    if (IsFieldEdit() && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
+                    if (IsFieldEdit() && pRefField && aArr[nPos].nSeqNo == pRefField->GetSeqNo())
                         bModified = true; // can happen with fields of which the reference was deleted
                 }
-                else if (IsFieldEdit())
+                else if (IsFieldEdit() && pRefField)
                     aVal = OUString::number( pRefField->GetSeqNo() );
             }
         }

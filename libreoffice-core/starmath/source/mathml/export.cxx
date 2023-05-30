@@ -22,6 +22,7 @@
 #include <mathml/iterator.hxx>
 
 // LO tools to use
+#include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/embed/ElementModes.hpp>
 #include <com/sun/star/task/XStatusIndicator.hpp>
 #include <com/sun/star/uno/Any.h>
@@ -29,27 +30,22 @@
 #include <com/sun/star/xml/sax/Writer.hpp>
 
 // Extra LO tools
-#include <comphelper/fileformat.h>
 #include <comphelper/genericpropertyset.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertysetinfo.hxx>
-#include <sax/tools/converter.hxx>
 #include <sfx2/frame.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/sfxsids.hrc>
-#include <sot/storage.hxx>
 #include <svl/itemset.hxx>
 #include <svl/stritem.hxx>
 #include <unotools/streamwrap.hxx>
 #include <xmloff/namespacemap.hxx>
 
 // Our starmath tools
-#include <cfgitem.hxx>
 #include <document.hxx>
 #include <smmod.hxx>
 #include <strings.hrc>
 #include <unomodel.hxx>
-#include <utility.hxx>
 #include <xparsmlbase.hxx>
 #include <starmathdatabase.hxx>
 
@@ -120,27 +116,27 @@ bool SmMLExportWrapper::Export(SfxMedium& rMedium)
         }
 
         // Fetch progress bar
-        auto pItem = pMediumItemSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
+        const SfxUnoAnyItem* pItem = pMediumItemSet->GetItem(SID_PROGRESS_STATUSBAR_CONTROL);
         if (pItem)
         {
             // set progress range and start status indicator
-            static_cast<const SfxUnoAnyItem*>(pItem)->GetValue() >>= xStatusIndicator;
+            pItem->GetValue() >>= xStatusIndicator;
             xStatusIndicator->start(SmResId(STR_STATSTR_WRITING), 3);
             xStatusIndicator->setValue(0);
         }
     }
 
     // create XPropertySet with three properties for status indicator
-    comphelper::PropertyMapEntry aInfoMap[]
-        = { { OUString("UsePrettyPrinting"), 0, cppu::UnoType<bool>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 } };
+    static const comphelper::PropertyMapEntry aInfoMap[]{
+        { OUString("UsePrettyPrinting"), 0, cppu::UnoType<bool>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 }
+    };
     uno::Reference<beans::XPropertySet> xInfoSet(
         comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(aInfoMap)));
 
@@ -148,7 +144,7 @@ bool SmMLExportWrapper::Export(SfxMedium& rMedium)
     xInfoSet->setPropertyValue("UsePrettyPrinting", Any(true));
 
     // Set base URI
-    xInfoSet->setPropertyValue(u"BaseURI", makeAny(rMedium.GetBaseURL(true)));
+    xInfoSet->setPropertyValue(u"BaseURI", Any(rMedium.GetBaseURL(true)));
 
     if (!m_bFlat) //Storage (Package) of Stream
     {
@@ -163,12 +159,13 @@ bool SmMLExportWrapper::Export(SfxMedium& rMedium)
         // TODO/LATER: handle the case of embedded links gracefully
         if (bEmbedded) //&& !pStg->IsRoot() )
         {
-            auto pDocHierarchItem = pMediumItemSet->GetItem(SID_DOC_HIERARCHICALNAME);
+            const SfxStringItem* pDocHierarchItem
+                = pMediumItemSet->GetItem(SID_DOC_HIERARCHICALNAME);
             if (pDocHierarchItem != nullptr)
             {
-                OUString aName = static_cast<const SfxStringItem*>(pDocHierarchItem)->GetValue();
+                OUString aName = pDocHierarchItem->GetValue();
                 if (!aName.isEmpty())
-                    xInfoSet->setPropertyValue("StreamRelPath", makeAny(aName));
+                    xInfoSet->setPropertyValue("StreamRelPath", Any(aName));
             }
         }
         else
@@ -265,16 +262,16 @@ OUString SmMLExportWrapper::Export(SmMlElement* pElementTree)
     }
 
     // create XPropertySet with three properties for status indicator
-    comphelper::PropertyMapEntry aInfoMap[]
-        = { { OUString("UsePrettyPrinting"), 0, cppu::UnoType<bool>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(),
-              beans::PropertyAttribute::MAYBEVOID, 0 },
-            { OUString(), 0, css::uno::Type(), 0, 0 } };
+    static const comphelper::PropertyMapEntry aInfoMap[]{
+        { OUString("UsePrettyPrinting"), 0, cppu::UnoType<bool>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("StreamRelPath"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 },
+        { OUString("StreamName"), 0, ::cppu::UnoType<OUString>::get(),
+          beans::PropertyAttribute::MAYBEVOID, 0 }
+    };
     uno::Reference<beans::XPropertySet> xInfoSet(
         comphelper::GenericPropertySet_CreateInstance(new comphelper::PropertySetInfo(aInfoMap)));
 
@@ -398,7 +395,7 @@ bool SmMLExportWrapper::WriteThroughComponentS(const Reference<embed::XStorage>&
     xSet->setPropertyValue("UseCommonStoragePasswordEncryption", Any(true));
 
     // set Base URL
-    rPropSet->setPropertyValue("StreamName", makeAny(OUString(pStreamName)));
+    rPropSet->setPropertyValue("StreamName", Any(OUString(pStreamName)));
 
     // write the stuff
     // Note: export through an XML exporter component (output stream version)
@@ -626,8 +623,8 @@ void SmMLExport::declareMlError()
     m_bSuccess = false;
 }
 
-void SmMLExport::exportMlAttributteLength(xmloff::token::XMLTokenEnum pAttribute,
-                                          const SmLengthValue& aLengthValue)
+void SmMLExport::exportMlAttributeLength(xmloff::token::XMLTokenEnum pAttribute,
+                                         const SmLengthValue& aLengthValue)
 {
     if (!aLengthValue.m_aOriginalText->isEmpty())
     {
@@ -676,7 +673,7 @@ void SmMLExport::exportMlAttributteLength(xmloff::token::XMLTokenEnum pAttribute
     }
 }
 
-void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
+void SmMLExport::exportMlAttributes(const SmMlElement* pMlElement)
 {
     size_t nAttributeCount = pMlElement->getAttributeCount();
     for (size_t i = 0; i < nAttributeCount; ++i)
@@ -775,7 +772,7 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
             {
                 auto aSizeData = aAttribute.getMlLspace();
                 auto aLengthData = aSizeData->m_aLengthValue;
-                exportMlAttributteLength(XML_LSPACE, aLengthData);
+                exportMlAttributeLength(XML_LSPACE, aLengthData);
                 break;
             }
             case SmMlAttributeValueType::MlMathbackground:
@@ -788,11 +785,10 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
                         break;
                     case SmMlAttributeValueMathbackground::MlRgb:
                     {
-                        OUString aTextColor
-                            = OUString::createFromAscii(starmathdatabase::Identify_Color_MATHML(
-                                                            sal_uInt32(aAttributeValue->m_aCol))
-                                                            .pIdent);
-                        addAttribute(XML_MATHBACKGROUND, aTextColor);
+                        const OUString& rTextColor = starmathdatabase::Identify_Color_MATHML(
+                                                         sal_uInt32(aAttributeValue->m_aCol))
+                                                         .aIdent;
+                        addAttribute(XML_MATHBACKGROUND, rTextColor);
                         break;
                     }
                     default:
@@ -810,11 +806,10 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
                         break;
                     case SmMlAttributeValueMathcolor::MlRgb:
                     {
-                        OUString aTextColor
-                            = OUString::createFromAscii(starmathdatabase::Identify_Color_MATHML(
-                                                            sal_uInt32(aAttributeValue->m_aCol))
-                                                            .pIdent);
-                        addAttribute(XML_MATHCOLOR, aTextColor);
+                        const OUString& rTextColor = starmathdatabase::Identify_Color_MATHML(
+                                                         sal_uInt32(aAttributeValue->m_aCol))
+                                                         .aIdent;
+                        addAttribute(XML_MATHCOLOR, rTextColor);
                         break;
                     }
                     default:
@@ -827,7 +822,7 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
             {
                 auto aSizeData = aAttribute.getMlMathsize();
                 auto aLengthData = aSizeData->m_aLengthValue;
-                exportMlAttributteLength(XML_MATHSIZE, aLengthData);
+                exportMlAttributeLength(XML_MATHSIZE, aLengthData);
                 break;
             }
             case SmMlAttributeValueType::MlMathvariant:
@@ -908,7 +903,7 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
                     }
                     case SmMlAttributeValueMaxsize::MlFinite:
                     {
-                        exportMlAttributteLength(XML_MAXSIZE, aLengthData);
+                        exportMlAttributeLength(XML_MAXSIZE, aLengthData);
                         break;
                     }
                 }
@@ -918,7 +913,7 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
             {
                 auto aSizeData = aAttribute.getMlMinsize();
                 auto aLengthData = aSizeData->m_aLengthValue;
-                exportMlAttributteLength(XML_MINSIZE, aLengthData);
+                exportMlAttributeLength(XML_MINSIZE, aLengthData);
                 break;
             }
             case SmMlAttributeValueType::MlMovablelimits:
@@ -942,7 +937,7 @@ void SmMLExport::exportMlAttributtes(const SmMlElement* pMlElement)
             {
                 auto aSizeData = aAttribute.getMlRspace();
                 auto aLengthData = aSizeData->m_aLengthValue;
-                exportMlAttributteLength(XML_RSPACE, aLengthData);
+                exportMlAttributeLength(XML_RSPACE, aLengthData);
                 break;
             }
             case SmMlAttributeValueType::MlSeparator:
@@ -1036,7 +1031,7 @@ SvXMLElementExport* SmMLExport::exportMlElement(const SmMlElement* pMlElement)
             pElementExport = nullptr;
     }
     const OUString& aElementText = pMlElement->getText();
-    exportMlAttributtes(pMlElement);
+    exportMlAttributes(pMlElement);
     if (aElementText.isEmpty())
         GetDocHandler()->characters(aElementText);
     return pElementExport;
@@ -1068,7 +1063,7 @@ public:
     inline void setDepthData(SvXMLElementExport* aSvXMLElementExportList)
     {
         if (m_nDepth == m_aSvXMLElementExportList.size())
-            m_aSvXMLElementExportList.reserve(m_aSvXMLElementExportList.size() + 1024);
+            m_aSvXMLElementExportList.resize(m_aSvXMLElementExportList.size() + 1024);
         m_aSvXMLElementExportList[m_nDepth] = aSvXMLElementExportList;
     }
 

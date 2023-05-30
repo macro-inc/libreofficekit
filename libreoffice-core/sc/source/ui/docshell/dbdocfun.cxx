@@ -1205,7 +1205,7 @@ bool lcl_EmptyExcept( ScDocument& rDoc, const ScRange& rRange, const ScRange& rE
     {
         if (!aIter.isEmpty())      // real content?
         {
-            if (!rExcept.In(aIter.GetPos()))
+            if (!rExcept.Contains(aIter.GetPos()))
                 return false;       // cell found
         }
     }
@@ -1553,8 +1553,8 @@ bool ScDBDocFunc::CreatePivotTable(const ScDPObject& rDPObj, bool bRecord, bool 
     if (!bApi)
     {
         bool bEmpty = rDoc.IsBlockEmpty(
-            aNewOut.aStart.Tab(), aNewOut.aStart.Col(), aNewOut.aStart.Row(),
-            aNewOut.aEnd.Col(), aNewOut.aEnd.Row());
+            aNewOut.aStart.Col(), aNewOut.aStart.Row(),
+            aNewOut.aEnd.Col(), aNewOut.aEnd.Row(), aNewOut.aStart.Tab() );
 
         if (!bEmpty)
         {

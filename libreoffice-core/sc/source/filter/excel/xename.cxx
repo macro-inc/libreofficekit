@@ -635,13 +635,13 @@ sal_uInt16 XclExpNameManagerImpl::CreateName( SCTAB nTab, const ScRangeData& rRa
         if ( rRangeData.HasType( ScRangeData::Type::AbsPos ) || rRangeData.HasType( ScRangeData::Type::AbsArea ) )
         {
             // Don't modify the actual document; use a temporary copy to create the export formulas.
-            std::unique_ptr<ScTokenArray> pTokenCopy( pScTokArr->Clone() );
-            lcl_EnsureAbs3DToken(nTab, pTokenCopy->FirstToken());
+            ScTokenArray aTokenCopy( pScTokArr->CloneValue() );
+            lcl_EnsureAbs3DToken(nTab, aTokenCopy.FirstToken());
 
-            xTokArr = GetFormulaCompiler().CreateFormula(EXC_FMLATYPE_NAME, *pTokenCopy);
+            xTokArr = GetFormulaCompiler().CreateFormula(EXC_FMLATYPE_NAME, aTokenCopy);
             if ( GetOutput() != EXC_OUTPUT_BINARY )
             {
-                ScCompiler aComp(GetDoc(), rRangeData.GetPos(), *pTokenCopy,
+                ScCompiler aComp(GetDoc(), rRangeData.GetPos(), aTokenCopy,
                                  formula::FormulaGrammar::GRAM_OOXML);
                 aComp.CreateStringFromTokenArray( sSymbol );
             }
@@ -719,15 +719,15 @@ void XclExpNameManagerImpl::CreateBuiltInNames()
 
             ScRangeList aTitleList;
             // repeated columns
-            if( const ScRange* pColRange = rDoc.GetRepeatColRange( nScTab ) )
+            if( std::optional<ScRange> oColRange = rDoc.GetRepeatColRange( nScTab ) )
                 aTitleList.push_back( ScRange(
-                    pColRange->aStart.Col(), 0, nScTab,
-                    pColRange->aEnd.Col(), GetXclMaxPos().Row(), nScTab ) );
+                    oColRange->aStart.Col(), 0, nScTab,
+                    oColRange->aEnd.Col(), GetXclMaxPos().Row(), nScTab ) );
             // repeated rows
-            if( const ScRange* pRowRange = rDoc.GetRepeatRowRange( nScTab ) )
+            if( std::optional<ScRange> oRowRange = rDoc.GetRepeatRowRange( nScTab ) )
                 aTitleList.push_back( ScRange(
-                    0, pRowRange->aStart.Row(), nScTab,
-                    GetXclMaxPos().Col(), pRowRange->aEnd.Row(), nScTab ) );
+                    0, oRowRange->aStart.Row(), nScTab,
+                    GetXclMaxPos().Col(), oRowRange->aEnd.Row(), nScTab ) );
             // create the NAME record
             GetAddressConverter().ValidateRangeList( aTitleList, false );
             if( !aTitleList.empty() )

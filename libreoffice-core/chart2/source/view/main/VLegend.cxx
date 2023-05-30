@@ -19,6 +19,7 @@
 
 #include "VLegend.hxx"
 #include "VButton.hxx"
+#include <Legend.hxx>
 #include <PropertyMapper.hxx>
 #include <ChartModel.hxx>
 #include <ObjectIdentifier.hxx>
@@ -31,7 +32,6 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/TextHorizontalAdjust.hpp>
 #include <com/sun/star/drawing/LineJoint.hpp>
-#include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/chart/ChartLegendExpansion.hpp>
 #include <com/sun/star/chart2/LegendPosition.hpp>
 #include <com/sun/star/chart2/RelativePosition.hpp>
@@ -40,11 +40,11 @@
 #include <com/sun/star/chart2/data/XPivotTableDataProvider.hpp>
 #include <com/sun/star/chart2/data/PivotTableFieldEntry.hpp>
 #include <rtl/math.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/ctloptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -149,13 +149,11 @@ void lcl_getProperties(
 
 awt::Size lcl_createTextShapes(
     const std::vector<ViewLegendEntry> & rEntries,
-    const Reference< lang::XMultiServiceFactory > & xShapeFactory,
-    const Reference< drawing::XShapes > & xTarget,
-    std::vector< Reference< drawing::XShape > > & rOutTextShapes,
+    const rtl::Reference<SvxShapeGroupAnyD> & xTarget,
+    std::vector< rtl::Reference<SvxShapeText> > & rOutTextShapes,
     const tPropertyValues & rTextProperties )
 {
     awt::Size aResult;
-    ShapeFactory* pShapeFactory = ShapeFactory::getOrCreateShapeFactory(xShapeFactory);
 
     for (ViewLegendEntry const & rEntry : rEntries)
     {
@@ -169,14 +167,22 @@ awt::Size lcl_createTextShapes(
                 if( i == 1 )
                     break;
 
+                // tdf#150034 limit legend label text
+                if (aLabelSeq[i]->getString().getLength() > 520)
+                {
+                    sal_Int32 nIndex = aLabelSeq[i]->getString().indexOf(' ', 500);
+                    aLabelSeq[i]->setString(
+                        aLabelSeq[i]->getString().copy(0, nIndex > 500 ? nIndex : 500));
+                }
+
                 aLabelString += aLabelSeq[i]->getString();
                 // workaround for Issue #i67540#
                 if( aLabelString.isEmpty())
                     aLabelString = " ";
             }
 
-            Reference< drawing::XShape > xEntry =
-                pShapeFactory->createText( xTarget, aLabelString,
+            rtl::Reference<SvxShapeText> xEntry =
+                ShapeFactory::createText( xTarget, aLabelString,
                         rTextProperties.first, rTextProperties.second, uno::Any() );
 
             // adapt max-extent
@@ -196,7 +202,7 @@ awt::Size lcl_createTextShapes(
 }
 
 void lcl_collectColumnWidths( std::vector< sal_Int32 >& rColumnWidths, const sal_Int32 nNumberOfRows, const sal_Int32 nNumberOfColumns,
-                              const std::vector< Reference< drawing::XShape > >& rTextShapes, sal_Int32 nSymbolPlusDistanceWidth )
+                              const std::vector< rtl::Reference<SvxShapeText> >& rTextShapes, sal_Int32 nSymbolPlusDistanceWidth )
 {
     rColumnWidths.clear();
     sal_Int32 nNumberOfEntries = rTextShapes.size();
@@ -219,7 +225,7 @@ void lcl_collectColumnWidths( std::vector< sal_Int32 >& rColumnWidths, const sal
 }
 
 void lcl_collectRowHeighs( std::vector< sal_Int32 >& rRowHeights, const sal_Int32 nNumberOfRows, const sal_Int32 nNumberOfColumns,
-                           const std::vector< Reference< drawing::XShape > >& rTextShapes )
+                           const std::vector< rtl::Reference<SvxShapeText> >& rTextShapes )
 {
     // calculate maximum height for each row
     // and collect column widths
@@ -267,8 +273,7 @@ awt::Size lcl_placeLegendEntries(
     double fViewFontSize,
     const awt::Size& rMaxSymbolExtent,
     tPropertyValues & rTextProperties,
-    const Reference< drawing::XShapes > & xTarget,
-    const Reference< lang::XMultiServiceFactory > & xShapeFactory,
+    const rtl::Reference<SvxShapeGroupAnyD> & xTarget,
     const awt::Size& rRemainingSpace,
     sal_Int32 nYStartPosition,
     const awt::Size& rPageSize,
@@ -304,8 +309,8 @@ awt::Size lcl_placeLegendEntries(
         *pFrameWidthAny <<= nMaxTextWidth;
     }
 
-    std::vector< Reference< drawing::XShape > > aTextShapes;
-    awt::Size aMaxEntryExtent = lcl_createTextShapes( rEntries, xShapeFactory, xTarget, aTextShapes, rTextProperties );
+    std::vector< rtl::Reference<SvxShapeText> > aTextShapes;
+    awt::Size aMaxEntryExtent = lcl_createTextShapes( rEntries, xTarget, aTextShapes, rTextProperties );
     OSL_ASSERT( aTextShapes.size() == rEntries.size());
 
     sal_Int32 nMaxEntryWidth = nXOffset + nSymbolPlusDistanceWidth + aMaxEntryExtent.Width;
@@ -329,7 +334,7 @@ awt::Size lcl_placeLegendEntries(
         sal_Int32 nMaxColumnCount=-1;
         for( sal_Int32 nN=0; nN<static_cast<sal_Int32>(aTextShapes.size()); nN++ )
         {
-            Reference< drawing::XShape > xShape( aTextShapes[nN] );
+            rtl::Reference<SvxShapeText> xShape( aTextShapes[nN] );
             if( !xShape.is() )
                 continue;
             awt::Size aSize( xShape->getSize() );
@@ -410,7 +415,7 @@ awt::Size lcl_placeLegendEntries(
                     }
                     if( nEntry < nNumberOfEntries && ( nEntry != 0 || nNumberOfColumns != 1 ) )
                     {
-                        DrawModelWrapper::removeShape( rEntries[ nEntry ].aSymbol );
+                        DrawModelWrapper::removeShape( rEntries[ nEntry ].xSymbol );
                         rEntries.pop_back();
                         nNumberOfEntries--;
                     }
@@ -421,11 +426,10 @@ awt::Size lcl_placeLegendEntries(
                     {
                         OUString aLabelString = rEntries[0].aLabel[0]->getString();
                         static const OUStringLiteral sDots = u"...";
-                        ShapeFactory* pShapeFactory = ShapeFactory::getOrCreateShapeFactory(xShapeFactory);
-                        for (sal_Int32 nNewLen = aLabelString.getLength() - sDots.getLength(); nNewLen > 0; nNewLen--)
+                        for (sal_Int32 nNewLen = aLabelString.getLength() - sDots.getLength(); nNewLen > 0; )
                         {
                             OUString aNewLabel = aLabelString.subView(0, nNewLen) + sDots;
-                            Reference<drawing::XShape> xEntry = pShapeFactory->createText(
+                            rtl::Reference<SvxShapeText> xEntry = ShapeFactory::createText(
                                 xTarget, aNewLabel, rTextProperties.first, rTextProperties.second, uno::Any());
                             nSumHeight = xEntry->getSize().Height;
                             nRemainingSpace = rRemainingSpace.Height - nSumHeight;
@@ -442,10 +446,16 @@ awt::Size lcl_placeLegendEntries(
                                 }
                             }
                             DrawModelWrapper::removeShape(xEntry);
+                            // The intention here is to make pathological cases with extremely large labels
+                            // converge a little faster
+                            if (nNewLen > 10 && std::abs(nRemainingSpace) > nSumHeight / 10)
+                                nNewLen -= nNewLen / 10;
+                            else
+                                --nNewLen;
                         }
                         if (aTextShapes.size() == 0)
                         {
-                            DrawModelWrapper::removeShape(rEntries[0].aSymbol);
+                            DrawModelWrapper::removeShape(rEntries[0].xSymbol);
                             rEntries.pop_back();
                             nNumberOfEntries--;
                             aRowHeights.pop_back();
@@ -580,7 +590,7 @@ awt::Size lcl_placeLegendEntries(
                 break;
 
             // text shape
-            Reference< drawing::XShape > xTextShape( aTextShapes[nEntry] );
+            rtl::Reference<SvxShapeText> xTextShape( aTextShapes[nEntry] );
             if( xTextShape.is() )
             {
                 awt::Size aTextSize( xTextShape->getSize() );
@@ -591,7 +601,7 @@ awt::Size lcl_placeLegendEntries(
             }
 
             // symbol
-            Reference< drawing::XShape > xSymbol( rEntries[ nEntry ].aSymbol );
+            rtl::Reference<SvxShapeGroup> & xSymbol( rEntries[ nEntry ].xSymbol );
             if( xSymbol.is() )
             {
                 awt::Size aSymbolSize( rMaxSymbolExtent );
@@ -639,11 +649,11 @@ awt::Size lcl_placeLegendEntries(
         awt::Point aPos(0,0);
         for( sal_Int32 nEntry=0; nEntry<nNumberOfEntries; nEntry++ )
         {
-            Reference< drawing::XShape > xSymbol( rEntries[ nEntry ].aSymbol );
+            rtl::Reference<SvxShapeGroup> & xSymbol( rEntries[ nEntry ].xSymbol );
             aPos = xSymbol->getPosition();
             aPos.X += nLegendWidth;
             xSymbol->setPosition( aPos );
-            Reference< drawing::XShape > xText( aTextShapes[ nEntry ] );
+            rtl::Reference<SvxShapeText> & xText( aTextShapes[ nEntry ] );
             aPos = xText->getPosition();
             aPos.X += nLegendWidth;
             xText->setPosition( aPos );
@@ -824,8 +834,7 @@ bool lcl_shouldSymbolsBePlacedOnTheLeftSide( const Reference< beans::XPropertySe
 }
 
 std::vector<std::shared_ptr<VButton>> lcl_createButtons(
-                       uno::Reference<drawing::XShapes> const & xLegendContainer,
-                       uno::Reference<lang::XMultiServiceFactory> const & xShapeFactory,
+                       rtl::Reference<SvxShapeGroupAnyD> const & xLegendContainer,
                        ChartModel& rModel, bool bPlaceButtonsVertically, tools::Long & nUsedHeight)
 {
     std::vector<std::shared_ptr<VButton>> aButtons;
@@ -846,7 +855,7 @@ std::vector<std::shared_ptr<VButton>> lcl_createButtons(
     {
         auto pButton = std::make_shared<VButton>();
         aButtons.push_back(pButton);
-        pButton->init(xLegendContainer, xShapeFactory);
+        pButton->init(xLegendContainer);
         awt::Point aNewPosition(x, y);
         pButton->setLabel(sColumnFieldEntry.Name);
         pButton->setCID("FieldButton.Column." + OUString::number(sColumnFieldEntry.DimensionIndex));
@@ -876,15 +885,13 @@ std::vector<std::shared_ptr<VButton>> lcl_createButtons(
 } // anonymous namespace
 
 VLegend::VLegend(
-    const Reference< XLegend > & xLegend,
+    rtl::Reference< Legend > xLegend,
     const Reference< uno::XComponentContext > & xContext,
     std::vector< LegendEntryProvider* >&& rLegendEntryProviderList,
-    const Reference< drawing::XShapes >& xTargetPage,
-    const Reference< lang::XMultiServiceFactory >& xFactory,
+    rtl::Reference<SvxShapeGroupAnyD> xTargetPage,
     ChartModel& rModel )
-        : m_xTarget(xTargetPage)
-        , m_xShapeFactory(xFactory)
-        , m_xLegend(xLegend)
+        : m_xTarget(std::move(xTargetPage))
+        , m_xLegend(std::move(xLegend))
         , mrModel(rModel)
         , m_xContext(xContext)
         , m_aLegendEntryProviderList(std::move(rLegendEntryProviderList))
@@ -897,7 +904,7 @@ void VLegend::setDefaultWritingMode( sal_Int16 nDefaultWritingMode )
     m_nDefaultWritingMode = nDefaultWritingMode;
 }
 
-bool VLegend::isVisible( const Reference< XLegend > & xLegend )
+bool VLegend::isVisible( const rtl::Reference< Legend > & xLegend )
 {
     if( ! xLegend.is())
         return false;
@@ -905,8 +912,7 @@ bool VLegend::isVisible( const Reference< XLegend > & xLegend )
     bool bShow = false;
     try
     {
-        Reference< beans::XPropertySet > xLegendProp( xLegend, uno::UNO_QUERY_THROW );
-        xLegendProp->getPropertyValue( "Show") >>= bShow;
+        xLegend->getPropertyValue( "Show") >>= bShow;
     }
     catch( const uno::Exception & )
     {
@@ -921,58 +927,50 @@ void VLegend::createShapes(
     const awt::Size & rPageSize,
     awt::Size & rDefaultLegendSize )
 {
-    if(! (m_xLegend.is() &&
-          m_xShapeFactory.is() &&
-          m_xTarget.is()))
+    if(! (m_xLegend.is() && m_xTarget.is()))
         return;
 
     try
     {
         //create shape and add to page
-        ShapeFactory* pShapeFactory = ShapeFactory::getOrCreateShapeFactory(m_xShapeFactory);
-        OUString aLegendParticle( ObjectIdentifier::createParticleForLegend( mrModel ) );
-        m_xShape.set( pShapeFactory->createGroup2D( m_xTarget,
-                    ObjectIdentifier::createClassifiedIdentifierForParticle( aLegendParticle )),
-                uno::UNO_QUERY);
+        OUString aLegendParticle( ObjectIdentifier::createParticleForLegend( &mrModel ) );
+        m_xShape = ShapeFactory::createGroup2D( m_xTarget,
+                    ObjectIdentifier::createClassifiedIdentifierForParticle( aLegendParticle ) );
 
         // create and insert sub-shapes
-        Reference< drawing::XShapes > xLegendContainer( m_xShape, uno::UNO_QUERY );
-        if( xLegendContainer.is())
+        rtl::Reference<SvxShapeGroupAnyD> xLegendContainer = m_xShape;
+        if( xLegendContainer.is() )
         {
             // for quickly setting properties
             tPropertyValues aLineFillProperties;
             tPropertyValues aTextProperties;
 
-            Reference< beans::XPropertySet > xLegendProp( m_xLegend, uno::UNO_QUERY );
             css::chart::ChartLegendExpansion eExpansion = css::chart::ChartLegendExpansion_HIGH;
             awt::Size aLegendSize( rAvailableSpace );
 
             bool bCustom = false;
             LegendPosition eLegendPosition = LegendPosition_LINE_END;
-            if (xLegendProp.is())
+            // get Expansion property
+            m_xLegend->getPropertyValue("Expansion") >>= eExpansion;
+            if( eExpansion == css::chart::ChartLegendExpansion_CUSTOM )
             {
-                // get Expansion property
-                xLegendProp->getPropertyValue("Expansion") >>= eExpansion;
-                if( eExpansion == css::chart::ChartLegendExpansion_CUSTOM )
+                RelativeSize aRelativeSize;
+                if (m_xLegend->getPropertyValue("RelativeSize") >>= aRelativeSize)
                 {
-                    RelativeSize aRelativeSize;
-                    if (xLegendProp->getPropertyValue("RelativeSize") >>= aRelativeSize)
-                    {
-                        aLegendSize.Width = static_cast<sal_Int32>(::rtl::math::approxCeil( aRelativeSize.Primary * rPageSize.Width ));
-                        aLegendSize.Height = static_cast<sal_Int32>(::rtl::math::approxCeil( aRelativeSize.Secondary * rPageSize.Height ));
-                        bCustom = true;
-                    }
-                    else
-                    {
-                        eExpansion = css::chart::ChartLegendExpansion_HIGH;
-                    }
+                    aLegendSize.Width = static_cast<sal_Int32>(::rtl::math::approxCeil( aRelativeSize.Primary * rPageSize.Width ));
+                    aLegendSize.Height = static_cast<sal_Int32>(::rtl::math::approxCeil( aRelativeSize.Secondary * rPageSize.Height ));
+                    bCustom = true;
                 }
-                xLegendProp->getPropertyValue("AnchorPosition") >>= eLegendPosition;
-                lcl_getProperties( xLegendProp, aLineFillProperties, aTextProperties, rPageSize );
+                else
+                {
+                    eExpansion = css::chart::ChartLegendExpansion_HIGH;
+                }
             }
+            m_xLegend->getPropertyValue("AnchorPosition") >>= eLegendPosition;
+            lcl_getProperties( m_xLegend, aLineFillProperties, aTextProperties, rPageSize );
 
             // create entries
-            double fViewFontSize = lcl_CalcViewFontSize( xLegendProp, rPageSize );//todo
+            double fViewFontSize = lcl_CalcViewFontSize( m_xLegend, rPageSize );//todo
             // #i109336# Improve auto positioning in chart
             sal_Int32 nSymbolHeight = static_cast< sal_Int32 >( fViewFontSize * 0.6  );
             sal_Int32 nSymbolWidth = nSymbolHeight;
@@ -998,13 +996,13 @@ void VLegend::createShapes(
                 if (pLegendEntryProvider)
                 {
                     std::vector<ViewLegendEntry> aNewEntries = pLegendEntryProvider->createLegendEntries(
-                                                                    aMaxSymbolExtent, eLegendPosition, xLegendProp,
-                                                                    xLegendContainer, m_xShapeFactory, m_xContext, mrModel);
+                                                                    aMaxSymbolExtent, eLegendPosition, m_xLegend,
+                                                                    xLegendContainer, m_xContext, mrModel);
                     aViewEntries.insert( aViewEntries.end(), aNewEntries.begin(), aNewEntries.end() );
                 }
             }
 
-            bool bSymbolsLeftSide = lcl_shouldSymbolsBePlacedOnTheLeftSide( xLegendProp, m_nDefaultWritingMode );
+            bool bSymbolsLeftSide = lcl_shouldSymbolsBePlacedOnTheLeftSide( m_xLegend, m_nDefaultWritingMode );
 
             uno::Reference<chart2::data::XPivotTableDataProvider> xPivotTableDataProvider( mrModel.getDataProvider(), uno::UNO_QUERY );
             bool bIsPivotChart = xPivotTableDataProvider.is();
@@ -1017,7 +1015,7 @@ void VLegend::createShapes(
                                                 eLegendPosition != LegendPosition_PAGE_END &&
                                                 eExpansion != css::chart::ChartLegendExpansion_WIDE);
 
-                std::vector<std::shared_ptr<VButton>> aButtons = lcl_createButtons(xLegendContainer, m_xShapeFactory, mrModel, bPlaceButtonsVertically, nUsedButtonHeight);
+                std::vector<std::shared_ptr<VButton>> aButtons = lcl_createButtons(xLegendContainer, mrModel, bPlaceButtonsVertically, nUsedButtonHeight);
 
                 // A custom size includes the size we used for buttons already, so we need to
                 // subtract that from the size that is available for the legend
@@ -1027,7 +1025,7 @@ void VLegend::createShapes(
                 // place the legend entries
                 aLegendSize = lcl_placeLegendEntries(aViewEntries, eExpansion, bSymbolsLeftSide, fViewFontSize,
                                                      aMaxSymbolExtent, aTextProperties, xLegendContainer,
-                                                     m_xShapeFactory, aLegendSize, nUsedButtonHeight, rPageSize, bIsPivotChart, rDefaultLegendSize);
+                                                     aLegendSize, nUsedButtonHeight, rPageSize, bIsPivotChart, rDefaultLegendSize);
 
                 uno::Reference<beans::XPropertySet> xModelPage(mrModel.getPageBackground());
 
@@ -1041,7 +1039,7 @@ void VLegend::createShapes(
                     pButton->createShapes(xModelPage);
                 }
 
-                Reference<drawing::XShape> xBorder = pShapeFactory->createRectangle(
+                rtl::Reference<SvxShapeRect> xBorder = ShapeFactory::createRectangle(
                     xLegendContainer, aLegendSize, awt::Point(0, 0), aLineFillProperties.first,
                     aLineFillProperties.second, ShapeFactory::StackPosition::Bottom);
 
@@ -1068,18 +1066,17 @@ void VLegend::changePosition(
     {
         // determine position and alignment depending on default position
         awt::Size aLegendSize = m_xShape->getSize();
-        Reference< beans::XPropertySet > xLegendProp( m_xLegend, uno::UNO_QUERY_THROW );
         chart2::RelativePosition aRelativePosition;
 
         bool bDefaultLegendSize = rDefaultLegendSize.Width != 0 || rDefaultLegendSize.Height != 0;
         bool bAutoPosition =
-            ! (xLegendProp->getPropertyValue( "RelativePosition") >>= aRelativePosition);
+            ! (m_xLegend->getPropertyValue( "RelativePosition") >>= aRelativePosition);
 
         LegendPosition ePos = LegendPosition_LINE_END;
-        xLegendProp->getPropertyValue( "AnchorPosition") >>= ePos;
+        m_xLegend->getPropertyValue( "AnchorPosition") >>= ePos;
 
         bool bOverlay = false;
-        xLegendProp->getPropertyValue("Overlay") >>= bOverlay;
+        m_xLegend->getPropertyValue("Overlay") >>= bOverlay;
         //calculate position
         if( bAutoPosition )
         {

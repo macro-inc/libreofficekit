@@ -35,6 +35,8 @@ class GraphicDescriptorTest : public test::BootstrapFixtureBase
     void testDetectTIF();
     void testDetectBMP();
     void testDetectWEBP();
+    void testDetectEMF();
+    void testDetectWMF();
 
     CPPUNIT_TEST_SUITE(GraphicDescriptorTest);
     CPPUNIT_TEST(testDetectPNG);
@@ -43,6 +45,8 @@ class GraphicDescriptorTest : public test::BootstrapFixtureBase
     CPPUNIT_TEST(testDetectTIF);
     CPPUNIT_TEST(testDetectBMP);
     CPPUNIT_TEST(testDetectWEBP);
+    CPPUNIT_TEST(testDetectEMF);
+    CPPUNIT_TEST(testDetectWMF);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -61,7 +65,7 @@ void createBitmapAndExportForType(SvStream& rStream, std::u16string_view sType)
     uno::Sequence<beans::PropertyValue> aFilterData;
     GraphicFilter& rGraphicFilter = GraphicFilter::GetGraphicFilter();
     sal_uInt16 nFilterFormat = rGraphicFilter.GetExportFormatNumberForShortName(sType);
-    rGraphicFilter.ExportGraphic(aBitmapEx, "none", rStream, nFilterFormat, &aFilterData);
+    rGraphicFilter.ExportGraphic(aBitmapEx, u"none", rStream, nFilterFormat, &aFilterData);
 
     rStream.Seek(STREAM_SEEK_TO_BEGIN);
 }
@@ -152,6 +156,41 @@ void GraphicDescriptorTest::testDetectWEBP()
 
     CPPUNIT_ASSERT_EQUAL(tools::Long(100), aDescriptor.GetSizePixel().Width());
     CPPUNIT_ASSERT_EQUAL(tools::Long(100), aDescriptor.GetSizePixel().Height());
+}
+
+void GraphicDescriptorTest::testDetectEMF()
+{
+    SvFileStream aFileStream(getFullUrl(u"TypeDetectionExample.emf"), StreamMode::READ);
+    GraphicDescriptor aDescriptor(aFileStream, nullptr);
+    aDescriptor.Detect(true);
+    CPPUNIT_ASSERT_EQUAL(GraphicFileFormat::EMF, aDescriptor.GetFileFormat());
+    // Test that Bounds/Frame values are fetched from header
+    CPPUNIT_ASSERT_EQUAL(tools::Long(142), aDescriptor.GetSizePixel().Width());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(142), aDescriptor.GetSizePixel().Height());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(300), aDescriptor.GetSize_100TH_MM().Width());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(300), aDescriptor.GetSize_100TH_MM().Height());
+}
+
+void GraphicDescriptorTest::testDetectWMF()
+{
+    // Test placeable wmf
+    {
+        SvFileStream aFileStream(m_directories.getURLFromSrc(u"/emfio/qa/cppunit/wmf/data/")
+                                     + "tdf88163-wrong-font-size.wmf",
+                                 StreamMode::READ);
+        GraphicDescriptor aDescriptor(aFileStream, nullptr);
+        aDescriptor.Detect(true);
+        CPPUNIT_ASSERT_EQUAL(GraphicFileFormat::WMF, aDescriptor.GetFileFormat());
+    }
+    // Test non-placeable wmf
+    {
+        SvFileStream aFileStream(m_directories.getURLFromSrc(u"/emfio/qa/cppunit/wmf/data/")
+                                     + "tdf88163-non-placeable.wmf",
+                                 StreamMode::READ);
+        GraphicDescriptor aDescriptor(aFileStream, nullptr);
+        aDescriptor.Detect(true);
+        CPPUNIT_ASSERT_EQUAL(GraphicFileFormat::WMF, aDescriptor.GetFileFormat());
+    }
 }
 
 } // namespace

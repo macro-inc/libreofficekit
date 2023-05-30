@@ -28,6 +28,7 @@
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/implbase1.hxx>
+#include <utility>
 #include <vcl/font.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/graph.hxx>
@@ -41,7 +42,6 @@
 #include <editeng/unofdesc.hxx>
 #include <editeng/unonrule.hxx>
 #include <editeng/editids.hrc>
-#include <editeng/numdef.hxx>
 #include <o3tl/enumarray.hxx>
 #include <o3tl/temporary.hxx>
 #include <memory>
@@ -67,7 +67,7 @@ const SvxAdjust aUnoToSvxAdjust[] =
     SvxAdjust::Block
 };
 
-const o3tl::enumarray<SvxAdjust, unsigned short> aSvxToUnoAdjust
+const o3tl::enumarray<SvxAdjust, sal_Int16> aSvxToUnoAdjust
 {
     text::HoriOrientation::LEFT,
     text::HoriOrientation::RIGHT,
@@ -91,8 +91,8 @@ static unsigned short ConvertUnoAdjust( SvxAdjust eAdjust )
 
 UNO3_GETIMPLEMENTATION_IMPL( SvxUnoNumberingRules );
 
-SvxUnoNumberingRules::SvxUnoNumberingRules(const SvxNumRule& rRule)
-: maRule( rRule )
+SvxUnoNumberingRules::SvxUnoNumberingRules(SvxNumRule aRule)
+: maRule(std::move( aRule ))
 {
 }
 
@@ -504,37 +504,34 @@ sal_Int16 SAL_CALL SvxUnoNumberingRulesCompare::compare( const Any& Any1, const 
 sal_Int16 SvxUnoNumberingRules::Compare( const Any& Any1, const Any& Any2 )
 {
     Reference< XIndexReplace > x1( Any1, UNO_QUERY ), x2( Any2, UNO_QUERY );
-    if( x1.is() && x2.is() )
+    if( !x1 || !x2 )
+        return -1;
+
+    if( x1.get() == x2.get() )
+        return 0;
+
+    SvxUnoNumberingRules* pRule1 = comphelper::getFromUnoTunnel<SvxUnoNumberingRules>( x1 );
+    if( !pRule1 )
+        return -1;
+    SvxUnoNumberingRules* pRule2 = comphelper::getFromUnoTunnel<SvxUnoNumberingRules>( x2 );
+    if( !pRule2 )
+        return -1;
+
+    const SvxNumRule& rRule1 = pRule1->getNumRule();
+    const SvxNumRule& rRule2 = pRule2->getNumRule();
+
+    const sal_uInt16 nLevelCount1 = rRule1.GetLevelCount();
+    const sal_uInt16 nLevelCount2 = rRule2.GetLevelCount();
+
+    if( nLevelCount1 == 0 || nLevelCount2 == 0 )
+        return -1;
+
+    for( sal_uInt16 i = 0; (i < nLevelCount1) && (i < nLevelCount2); i++ )
     {
-        if( x1.get() == x2.get() )
-            return 0;
-
-        SvxUnoNumberingRules* pRule1 = comphelper::getFromUnoTunnel<SvxUnoNumberingRules>( x1 );
-        if( pRule1 )
-        {
-            SvxUnoNumberingRules* pRule2 = comphelper::getFromUnoTunnel<SvxUnoNumberingRules>( x2 );
-            if( pRule2 )
-            {
-                const SvxNumRule& rRule1 = pRule1->getNumRule();
-                const SvxNumRule& rRule2 = pRule2->getNumRule();
-
-                const sal_uInt16 nLevelCount1 = rRule1.GetLevelCount();
-                const sal_uInt16 nLevelCount2 = rRule2.GetLevelCount();
-
-                if( nLevelCount1 == 0 || nLevelCount2 == 0 )
-                    return -1;
-
-                for( sal_uInt16 i = 0; (i < nLevelCount1) && (i < nLevelCount2); i++ )
-                {
-                    if( rRule1.GetLevel(i) != rRule2.GetLevel(i) )
-                        return -1;
-                }
-                return  0;
-            }
-        }
+        if( rRule1.GetLevel(i) != rRule2.GetLevel(i) )
+            return -1;
     }
-
-    return -1;
+    return  0;
 }
 
 Reference< XAnyCompare > SvxCreateNumRuleCompare() noexcept

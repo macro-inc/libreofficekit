@@ -18,7 +18,6 @@
  */
 
 #include <controls/accessiblecontrolcontext.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/awt/XControl.hpp>
 #include <com/sun/star/awt/XWindow.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -27,7 +26,7 @@
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <toolkit/helper/vclunohelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/window.hxx>
 
 
@@ -58,9 +57,17 @@ namespace toolkit
     }
 
 
+    // (order matters: the first is the class name, the second is the class doing the ref counting)
     IMPLEMENT_FORWARD_XINTERFACE3( OAccessibleControlContext, OAccessibleControlContext_Base, OAccessibleImplementationAccess, OAccessibleControlContext_IBase )
-    IMPLEMENT_FORWARD_XTYPEPROVIDER3( OAccessibleControlContext, OAccessibleControlContext_Base, OAccessibleImplementationAccess, OAccessibleControlContext_IBase )
-        // (order matters: the first is the class name, the second is the class doing the ref counting)
+    css::uno::Sequence< css::uno::Type > SAL_CALL OAccessibleControlContext::getTypes()
+    {
+        return ::comphelper::concatSequences(
+            OAccessibleControlContext_Base::getTypes(),
+            OAccessibleImplementationAccess::getTypes(),
+            OAccessibleControlContext_IBase::getTypes()
+        );
+    }
+    IMPLEMENT_GET_IMPLEMENTATION_ID( OAccessibleControlContext )
 
 
     void OAccessibleControlContext::Init( const Reference< XAccessible >& _rxCreator )
@@ -119,14 +126,14 @@ namespace toolkit
     }
 
 
-    sal_Int32 SAL_CALL OAccessibleControlContext::getAccessibleChildCount(  )
+    sal_Int64 SAL_CALL OAccessibleControlContext::getAccessibleChildCount(  )
     {
         // we do not have children
         return 0;
     }
 
 
-    Reference< XAccessible > SAL_CALL OAccessibleControlContext::getAccessibleChild( sal_Int32 )
+    Reference< XAccessible > SAL_CALL OAccessibleControlContext::getAccessibleChild( sal_Int64 )
     {
         // we do not have children
         throw IndexOutOfBoundsException();
@@ -165,23 +172,21 @@ namespace toolkit
     }
 
 
-    Reference< XAccessibleStateSet > SAL_CALL OAccessibleControlContext::getAccessibleStateSet(  )
+    sal_Int64 SAL_CALL OAccessibleControlContext::getAccessibleStateSet(  )
     {
         ::osl::MutexGuard aGuard( GetMutex() );
             // no OContextEntryGuard here, as we do not want to throw an exception in case we're not alive anymore
 
-        rtl::Reference<::utl::AccessibleStateSetHelper> pStateSet;
+        sal_Int64 nStateSet = 0;
         if ( isAlive() )
         {
             // no own states, only the ones which are foreign controlled
-            pStateSet = new ::utl::AccessibleStateSetHelper( 0 );
         }
         else
         {   // only the DEFUNC state if we're already disposed
-            pStateSet = new ::utl::AccessibleStateSetHelper;
-            pStateSet->AddState( AccessibleStateType::DEFUNC );
+            nStateSet |= AccessibleStateType::DEFUNC;
         }
-        return pStateSet;
+        return nStateSet;
     }
 
 

@@ -25,7 +25,6 @@
 #include <com/sun/star/lang/XUnoTunnel.hpp>
 
 #include <rtl/ref.hxx>
-#include <comphelper/weak.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <svl/svldllapi.h>
 #include <svl/hint.hxx>
@@ -113,7 +112,7 @@ SfxStyleSheetHint( SfxHintId::StyleSheetErased, *p ) from:
    SfxStyleSheetBasePool::Clear()
 */
 
-class SVL_DLLPUBLIC SfxStyleSheetBase : public comphelper::OWeakTypeObject
+class SVL_DLLPUBLIC SfxStyleSheetBase : public cppu::WeakImplHelper<>
 {
 private:
     friend class SfxStyleSheetBasePool;
@@ -192,7 +191,7 @@ public:
     /** Constructor.
      * The iterator will only iterate over style sheets which have the family \p eFam
      */
-    SfxStyleSheetIterator(SfxStyleSheetBasePool *pBase,
+    SfxStyleSheetIterator(const SfxStyleSheetBasePool *pBase,
                           SfxStyleFamily eFam, SfxStyleSearchBits n=SfxStyleSearchBits::All );
     SfxStyleSearchBits GetSearchMask() const;
     SfxStyleFamily GetSearchFamily() const;
@@ -207,7 +206,7 @@ public:
 
 protected:
 
-    SfxStyleSheetBasePool*  pBasePool;
+    const SfxStyleSheetBasePool*  pBasePool;
     SfxStyleFamily          nSearchFamily;
     SfxStyleSearchBits      nMask;
 
@@ -224,7 +223,7 @@ friend class SfxStyleSheetBasePool;
 
 class SfxStyleSheetBasePool_Impl;
 
-class SVL_DLLPUBLIC SfxStyleSheetBasePool: public SfxBroadcaster, public comphelper::OWeakTypeObject
+class SVL_DLLPUBLIC SfxStyleSheetBasePool: public SfxBroadcaster, public cppu::WeakImplHelper<>
 {
 friend class SfxStyleSheetIterator;
 friend class SfxStyleSheetBase;
@@ -274,7 +273,7 @@ public:
 
     SfxStyleSheetBase*  First(SfxStyleFamily eFamily, SfxStyleSearchBits eMask = SfxStyleSearchBits::All);
     SfxStyleSheetBase*  Next();
-    virtual SfxStyleSheetBase*  Find( const OUString&, SfxStyleFamily eFam, SfxStyleSearchBits n=SfxStyleSearchBits::All );
+    virtual SfxStyleSheetBase*  Find( const OUString&, SfxStyleFamily eFam, SfxStyleSearchBits n=SfxStyleSearchBits::All ) const;
 
     virtual bool                SetParent(SfxStyleFamily eFam,
                                           const OUString &rStyle,
@@ -337,7 +336,7 @@ class UNLESS_MERGELIBS(SVL_DLLPUBLIC) SfxStyleSheetModifiedHint final : public S
     OUString            aName;
 
 public:
-                        SfxStyleSheetModifiedHint( const OUString& rOld,
+                        SfxStyleSheetModifiedHint( OUString aOld,
                                                    SfxStyleSheetBase& );
     const OUString&     GetOldName() const { return aName; }
 };

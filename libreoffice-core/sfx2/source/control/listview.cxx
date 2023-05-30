@@ -23,7 +23,7 @@
 #include <unotools/collatorwrapper.hxx>
 #include <unotools/syslocale.hxx>
 #include <unotools/intlwrapper.hxx>
-#include <tools/wintypes.hxx>
+#include <vcl/wintypes.hxx>
 
 #include <bitmaps.hlst>
 #include <rtl/math.hxx>
@@ -42,7 +42,7 @@ static sal_uInt64 getFileSize(const OUString& rURL);
 static sal_uInt32 getFileModifyTime(const OUString& rURL);
 static OUString getDisplayFileSize(const OUString& rURL);
 static OUString getDisplayFileModifyTime(const OUString& rURL);
-static OUString getApplication(const OUString& rURL);
+static OUString getApplication(std::u16string_view rURL);
 
 ListView::ListView(std::unique_ptr<weld::TreeView> xTreeView)
     : mxTreeView(std::move(xTreeView))
@@ -56,6 +56,9 @@ ListView::ListView(std::unique_ptr<weld::TreeView> xTreeView)
         static_cast<int>(nDigitWidth * 15), /* Application Column */
         static_cast<int>(nDigitWidth * 18) /* Modify Column */
     };
+
+    // tdf#151143 Make the size of ListView and ThumbnailView the same
+    mxTreeView->set_size_request(TEMPLATE_ITEM_MAX_WIDTH * 5, TEMPLATE_ITEM_MAX_HEIGHT_SUB * 3);
 
     mxTreeView->set_column_fixed_widths(aWidths);
     mxTreeView->set_selection_mode(SelectionMode::Multiple);
@@ -416,7 +419,7 @@ static sal_uInt64 getFileSize(const OUString& rURL)
     return nSize;
 }
 
-static OUString getApplication(const OUString& rURL)
+static OUString getApplication(std::u16string_view rURL)
 {
     INetURLObject aUrl(rURL);
     OUString aExt = aUrl.getExtension();

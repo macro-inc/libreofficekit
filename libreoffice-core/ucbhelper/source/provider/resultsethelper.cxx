@@ -18,24 +18,20 @@
  */
 
 
-/**************************************************************************
-                                TODO
- **************************************************************************
-
+/* TODO
  - This implementation is far away from completion. It has no interface
    for changes notifications etc.
+ */
 
- *************************************************************************/
 #include <com/sun/star/ucb/ListActionType.hpp>
 #include <com/sun/star/ucb/ListenerAlreadySetException.hpp>
 #include <com/sun/star/ucb/ServiceNotFoundException.hpp>
 #include <com/sun/star/ucb/WelcomeDynamicResultSetStruct.hpp>
 #include <com/sun/star/ucb/CachedDynamicResultSetStubFactory.hpp>
 #include <com/sun/star/ucb/XSourceInitialization.hpp>
-#include <cppuhelper/interfacecontainer.h>
-#include <cppuhelper/queryinterface.hxx>
+#include <cppuhelper/supportsservice.hxx>
 #include <ucbhelper/resultsethelper.hxx>
-#include <ucbhelper/macros.hxx>
+#include <utility>
 
 #include <osl/diagnose.h>
 
@@ -49,12 +45,12 @@ namespace ucbhelper {
 
 
 ResultSetImplHelper::ResultSetImplHelper(
-    const uno::Reference< uno::XComponentContext >& rxContext,
-    const css::ucb::OpenCommandArgument2& rCommand )
+    uno::Reference< uno::XComponentContext > xContext,
+    css::ucb::OpenCommandArgument2 aCommand )
 : m_bStatic( false ),
   m_bInitDone( false ),
-  m_aCommand( rCommand ),
-  m_xContext( rxContext )
+  m_aCommand(std::move( aCommand )),
+  m_xContext(std::move( xContext ))
 {
 }
 
@@ -88,13 +84,13 @@ css::uno::Sequence< OUString > SAL_CALL ResultSetImplHelper::getSupportedService
 // virtual
 void SAL_CALL ResultSetImplHelper::dispose()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pDisposeEventListeners && m_pDisposeEventListeners->getLength() )
+    if ( m_aDisposeEventListeners.getLength(aGuard) )
     {
         lang::EventObject aEvt;
         aEvt.Source = static_cast< lang::XComponent * >( this );
-        m_pDisposeEventListeners->disposeAndClear( aEvt );
+        m_aDisposeEventListeners.disposeAndClear( aGuard, aEvt );
     }
 }
 
@@ -103,12 +99,9 @@ void SAL_CALL ResultSetImplHelper::dispose()
 void SAL_CALL ResultSetImplHelper::addEventListener(
         const uno::Reference< lang::XEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( !m_pDisposeEventListeners )
-        m_pDisposeEventListeners.reset(new cppu::OInterfaceContainerHelper( m_aMutex ));
-
-    m_pDisposeEventListeners->addInterface( Listener );
+    m_aDisposeEventListeners.addInterface( aGuard, Listener );
 }
 
 
@@ -116,10 +109,9 @@ void SAL_CALL ResultSetImplHelper::addEventListener(
 void SAL_CALL ResultSetImplHelper::removeEventListener(
         const uno::Reference< lang::XEventListener >& Listener )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
-    if ( m_pDisposeEventListeners )
-        m_pDisposeEventListeners->removeInterface( Listener );
+    m_aDisposeEventListeners.removeInterface( aGuard, Listener );
 }
 
 
@@ -130,7 +122,7 @@ void SAL_CALL ResultSetImplHelper::removeEventListener(
 uno::Reference< sdbc::XResultSet > SAL_CALL
 ResultSetImplHelper::getStaticResultSet()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( m_xListener.is() )
         throw css::ucb::ListenerAlreadySetException();
@@ -144,7 +136,7 @@ ResultSetImplHelper::getStaticResultSet()
 void SAL_CALL ResultSetImplHelper::setListener(
         const uno::Reference< css::ucb::XDynamicResultSetListener >& Listener )
 {
-    osl::ClearableMutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( m_bStatic || m_xListener.is() )
         throw css::ucb::ListenerAlreadySetException();
@@ -173,7 +165,7 @@ void SAL_CALL ResultSetImplHelper::setListener(
             0, // Count; not used
             css::ucb::ListActionType::WELCOME,
             aInfo ) };
-    aGuard.clear();
+    aGuard.unlock();
 
     Listener->notify(
         css::ucb::ListEvent(
@@ -229,8 +221,6 @@ void SAL_CALL ResultSetImplHelper::connectToCache(
 
 void ResultSetImplHelper::init( bool bStatic )
 {
-    osl::MutexGuard aGuard( m_aMutex );
-
     if ( m_bInitDone )
         return;
 

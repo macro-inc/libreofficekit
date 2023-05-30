@@ -102,7 +102,7 @@
 #include <vcl/bitmapex.hxx>
 #include <vcl/checksum.hxx>
 #include <vcl/dllapi.h>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <vcl/fntstyle.hxx>
 #include <vcl/font.hxx>
 #include <vcl/mapmod.hxx>
@@ -172,7 +172,7 @@
 #include <svtools/svtdllapi.h>
 #include <tools/color.hxx>
 #include <tools/degree.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/fontenum.hxx>
 #include <tools/gen.hxx>
 #include <tools/link.hxx>

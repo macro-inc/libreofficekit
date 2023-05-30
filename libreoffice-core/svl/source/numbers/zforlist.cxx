@@ -25,6 +25,7 @@
 #include <svl/currencytable.hxx>
 
 #include <comphelper/string.hxx>
+#include <o3tl/string_view.hxx>
 #include <tools/debug.hxx>
 #include <unotools/charclass.hxx>
 #include <unotools/configmgr.hxx>
@@ -1120,7 +1121,7 @@ sal_uInt32 SvNumberFormatter::ImpGenerateCL( LanguageType eLnge )
                                       + "("
                                       + xSeq[j].formatKey
                                       + ") "
-                                      + aDupes.makeStringAndClear();
+                                      + aDupes;
                         LocaleDataWrapper::outputCheckMessage( xLocaleData->appendLocaleInfo( aMsg ));
                     }
                 }
@@ -1594,10 +1595,14 @@ sal_uInt32 SvNumberFormatter::GuessDateTimeFormat( SvNumFormatType& rType, doubl
 }
 
 sal_uInt32 SvNumberFormatter::GetEditFormat( double fNumber, sal_uInt32 nFIndex,
-                                             SvNumFormatType eType, LanguageType eLang,
-                                             SvNumberformat const * pFormat )
+                                             SvNumFormatType eType,
+                                             SvNumberformat const * pFormat,
+                                             LanguageType eForLocale )
 {
     ::osl::MutexGuard aGuard( GetInstanceMutex() );
+    const LanguageType eLang = (pFormat ? pFormat->GetLanguage() : LANGUAGE_SYSTEM);
+    if (eForLocale == LANGUAGE_DONTKNOW)
+        eForLocale = eLang;
     sal_uInt32 nKey = nFIndex;
     switch ( eType )
     {
@@ -1615,16 +1620,16 @@ sal_uInt32 SvNumberFormatter::GetEditFormat( double fNumber, sal_uInt32 nFIndex,
                 // fdo#34977 preserve time when editing even if only date was
                 // displayed.
                 if (bIsoDate)
-                    nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS, eLang);
+                    nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS, eForLocale);
                 else
-                    nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eLang );
+                    nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eForLocale );
             }
             else
             {
                 if (bIsoDate)
-                    nKey = GetFormatIndex( NF_DATE_ISO_YYYYMMDD, eLang);
+                    nKey = GetFormatIndex( NF_DATE_ISO_YYYYMMDD, eForLocale);
                 else
-                    nKey = GetFormatIndex( NF_DATE_SYS_DDMMYYYY, eLang );
+                    nKey = GetFormatIndex( NF_DATE_SYS_DDMMYYYY, eForLocale );
             }
         }
         break;
@@ -1635,36 +1640,36 @@ sal_uInt32 SvNumberFormatter::GetEditFormat( double fNumber, sal_uInt32 nFIndex,
              * of a signed 16-bit. 32k hours are 3.7 years ... or
              * 1903-09-26 if date. */
             if (fabs( fNumber) * 24 < 0x7fff)
-                nKey = GetTimeFormat( fNumber, eLang, true);
+                nKey = GetTimeFormat( fNumber, eForLocale, true);
             // Preserve duration, use [HH]:MM:SS instead of time.
             else
-                nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eLang );
+                nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eForLocale );
             // Assume that a large value is a datetime with only time
             // displayed.
         }
         else
-            nKey = GetStandardFormat( fNumber, nFIndex, eType, eLang );
+            nKey = GetStandardFormat( fNumber, nFIndex, eType, eForLocale );
         break;
     case SvNumFormatType::DURATION :
-        nKey = GetTimeFormat( fNumber, eLang, true);
+        nKey = GetTimeFormat( fNumber, eForLocale, true);
         break;
     case SvNumFormatType::DATETIME :
         if (nFIndex == GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS, eLang))
-            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS, eLang );
+            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS, eForLocale );
         else if (nFIndex == GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS000, eLang))
-            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS000, eLang );
+            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDDTHHMMSS000, eForLocale );
         else if (nFIndex == GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS000, eLang))
-            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS000, eLang );
+            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS000, eForLocale );
         else if (nFIndex == GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS, eLang) || (pFormat && pFormat->IsIso8601( 0 )))
-            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS, eLang );
+            nKey = GetFormatIndex( NF_DATETIME_ISO_YYYYMMDD_HHMMSS, eForLocale );
         else
-            nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eLang );
+            nKey = GetFormatIndex( NF_DATETIME_SYS_DDMMYYYY_HHMMSS, eForLocale );
         break;
     case SvNumFormatType::NUMBER:
-        nKey = GetStandardFormat( eType, eLang );
+        nKey = GetStandardFormat( eType, eForLocale );
         break;
     default:
-        nKey = GetStandardFormat( fNumber, nFIndex, eType, eLang );
+        nKey = GetStandardFormat( fNumber, nFIndex, eType, eForLocale );
     }
     return nKey;
 }
@@ -1672,7 +1677,7 @@ sal_uInt32 SvNumberFormatter::GetEditFormat( double fNumber, sal_uInt32 nFIndex,
 void SvNumberFormatter::GetInputLineString(const double& fOutNumber,
                                            sal_uInt32 nFIndex,
                                            OUString& sOutString,
-                                           bool bFiltering)
+                                           bool bFiltering, bool bForceSystemLocale)
 {
     ::osl::MutexGuard aGuard( GetInstanceMutex() );
     const Color* pColor;
@@ -1695,6 +1700,7 @@ void SvNumberFormatter::GetInputLineString(const double& fOutNumber,
          * numbers so wouldn't be a safe bet. */
         eType = pFormat->GetNumForInfoScannedType(0);
     }
+    const SvNumFormatType eTypeOrig = eType;
 
     sal_uInt16 nOldPrec = pFormatScanner->GetStandardPrec();
     bool bPrecChanged = false;
@@ -1712,11 +1718,15 @@ void SvNumberFormatter::GetInputLineString(const double& fOutNumber,
         bPrecChanged = true;
     }
 
-    sal_uInt32 nKey = GetEditFormat( fOutNumber, nRealKey, eType, eLang, pFormat);
     // if bFiltering true keep the nRealKey format
-    if ( nKey != nRealKey && !bFiltering )
+    if (!bFiltering)
     {
-        pFormat = GetFormatEntry( nKey );
+        sal_uInt32 nKey = GetEditFormat( fOutNumber, nRealKey, eType, pFormat,
+                                         bForceSystemLocale ? LANGUAGE_SYSTEM : LANGUAGE_DONTKNOW);
+        if (nKey != nRealKey)
+        {
+            pFormat = GetFormatEntry( nKey );
+        }
     }
     assert(pFormat);
     if (pFormat)
@@ -1726,13 +1736,13 @@ void SvNumberFormatter::GetInputLineString(const double& fOutNumber,
             ChangeStandardPrec(INPUTSTRING_PRECISION);
             bPrecChanged = true;
         }
-        const bool bOk = pFormat->GetOutputString(fOutNumber, sOutString, &pColor);
+        pFormat->GetOutputString(fOutNumber, sOutString, &pColor);
 
         // The #FMT error string must not be used for input as it would lead to
         // data loss. This can happen for at least date(+time). Fall back to a
         // last resort of plain number in the locale the formatter was
         // constructed with.
-        if (!bOk && eType != SvNumFormatType::NUMBER && sOutString == ImpSvNumberformatScan::sErrStr)
+        if (eTypeOrig != SvNumFormatType::NUMBER && sOutString == ImpSvNumberformatScan::sErrStr)
         {
             pFormat = GetFormatEntry(ZF_STANDARD);
             assert(pFormat);
@@ -2455,8 +2465,9 @@ void SvNumberFormatter::ImpAdjustFormatCodeDefault(
                 aMsg.insert(0, "SvNumberFormatter::ImpAdjustFormatCodeDefault: ");
                 aMsg.append("\nXML locale data FormatElement formatindex: ");
                 aMsg.append(static_cast<sal_Int32>(pFormatArr[nElem].Index));
-                OUString aUMsg(OStringToOUString(aMsg.makeStringAndClear(),
+                OUString aUMsg(OStringToOUString(aMsg,
                     RTL_TEXTENCODING_ASCII_US));
+                aMsg.setLength(0);
                 LocaleDataWrapper::outputCheckMessage(xLocaleData->appendLocaleInfo(aUMsg));
             }
         }
@@ -2470,9 +2481,10 @@ void SvNumberFormatter::ImpAdjustFormatCodeDefault(
         {
             aMsg.insert(0, "SvNumberFormatter::ImpAdjustFormatCodeDefault: ");
             aMsg.append("\nXML locale data FormatElement group of: ");
-            OUString aUMsg(OStringToOUString(aMsg.makeStringAndClear(), RTL_TEXTENCODING_ASCII_US));
+            OUString aUMsg(OStringToOUString(aMsg, RTL_TEXTENCODING_ASCII_US));
+            aMsg.setLength(0);
             LocaleDataWrapper::outputCheckMessage(
-                xLocaleData->appendLocaleInfo(OUStringConcatenation(aUMsg + pFormatArr[0].NameID)));
+                xLocaleData->appendLocaleInfo(Concat2View(aUMsg + pFormatArr[0].NameID)));
         }
     }
     // find the default (medium preferred, then long) and reset all other defaults
@@ -3219,6 +3231,15 @@ OUString SvNumberFormatter::GenerateFormat(sal_uInt32 nIndex,
         sString.append(GetNumDecimalSep());
         padToLength(sString, sString.getLength() + nPrecision, '0');
     }
+
+    // Native Number
+    const OUString sPosNatNumModifier = pFormat ? pFormat->GetNatNumModifierString( 0 ) : "";
+    const OUString sNegNatNumModifier = pFormat ?
+            // if a negative format already exists, use its NatNum modifier
+            // else use NatNum modifier of positive format
+            ( pFormat->GetNumForString( 1, 0 )  ? pFormat->GetNatNumModifierString( 1 ) : sPosNatNumModifier )
+            : "";
+
     if (eType == SvNumFormatType::PERCENT)
     {
         sString.append( pFormat->GetPercentString() );
@@ -3231,9 +3252,9 @@ OUString SvNumberFormatter::GenerateFormat(sal_uInt32 nIndex,
       {
         sal_Int32 nIndexSep = ImpPosToken( sOldFormatString, ';', nIndexE );
         if (nIndexSep > nIndexE)
-            sString.append( sOldFormatString.copy(nIndexE, nIndexSep - nIndexE) );
+            sString.append( sOldFormatString.subView(nIndexE, nIndexSep - nIndexE) );
         else
-            sString.append( sOldFormatString.copy(nIndexE) );
+            sString.append( sOldFormatString.subView(nIndexE) );
       }
     }
     else if (eType == SvNumFormatType::CURRENCY)
@@ -3242,50 +3263,62 @@ OUString SvNumberFormatter::GenerateFormat(sal_uInt32 nIndex,
         OUString aCurr;
         const NfCurrencyEntry* pEntry;
         bool bBank;
-        if ( GetNewCurrencySymbolString( nIndex, aCurr, &pEntry, &bBank ) )
+        bool isPosNatNum12 = sPosNatNumModifier.startsWith( "[NatNum12" );
+        bool isNegNatNum12 = sNegNatNumModifier.startsWith( "[NatNum12" );
+        if ( !isPosNatNum12 || !isNegNatNum12 )
         {
-            if ( pEntry )
+            if ( GetNewCurrencySymbolString( nIndex, aCurr, &pEntry, &bBank ) )
             {
-                sal_uInt16 nPosiForm = NfCurrencyEntry::GetEffectivePositiveFormat(
-                    xLocaleData->getCurrPositiveFormat(),
-                    pEntry->GetPositiveFormat(), bBank );
-                sal_uInt16 nNegaForm = NfCurrencyEntry::GetEffectiveNegativeFormat(
-                    xLocaleData->getCurrNegativeFormat(),
-                    pEntry->GetNegativeFormat(), bBank );
-                pEntry->CompletePositiveFormatString( sString, bBank, nPosiForm );
-                pEntry->CompleteNegativeFormatString( sNegStr, bBank, nNegaForm );
+                if ( pEntry )
+                {
+                    sal_uInt16 nPosiForm = NfCurrencyEntry::GetEffectivePositiveFormat(
+                        xLocaleData->getCurrPositiveFormat(),
+                        pEntry->GetPositiveFormat(), bBank );
+                    sal_uInt16 nNegaForm = NfCurrencyEntry::GetEffectiveNegativeFormat(
+                        xLocaleData->getCurrNegativeFormat(),
+                        pEntry->GetNegativeFormat(), bBank );
+                    if ( !isPosNatNum12 )
+                        pEntry->CompletePositiveFormatString( sString, bBank, nPosiForm );
+                    if ( !isNegNatNum12 )
+                        pEntry->CompleteNegativeFormatString( sNegStr, bBank, nNegaForm );
+                }
+                else
+                {   // assume currency abbreviation (AKA banking symbol), not symbol
+                    sal_uInt16 nPosiForm = NfCurrencyEntry::GetEffectivePositiveFormat(
+                        xLocaleData->getCurrPositiveFormat(),
+                        xLocaleData->getCurrPositiveFormat(), true );
+                    sal_uInt16 nNegaForm = NfCurrencyEntry::GetEffectiveNegativeFormat(
+                        xLocaleData->getCurrNegativeFormat(),
+                        xLocaleData->getCurrNegativeFormat(), true );
+                    if ( !isPosNatNum12 )
+                        NfCurrencyEntry::CompletePositiveFormatString( sString, aCurr, nPosiForm );
+                    if ( !isNegNatNum12 )
+                        NfCurrencyEntry::CompleteNegativeFormatString( sNegStr, aCurr, nNegaForm );
+                }
             }
             else
-            {   // assume currency abbreviation (AKA banking symbol), not symbol
-                sal_uInt16 nPosiForm = NfCurrencyEntry::GetEffectivePositiveFormat(
-                    xLocaleData->getCurrPositiveFormat(),
-                    xLocaleData->getCurrPositiveFormat(), true );
-                sal_uInt16 nNegaForm = NfCurrencyEntry::GetEffectiveNegativeFormat(
-                    xLocaleData->getCurrNegativeFormat(),
-                    xLocaleData->getCurrNegativeFormat(), true );
-                NfCurrencyEntry::CompletePositiveFormatString( sString, aCurr, nPosiForm );
-                NfCurrencyEntry::CompleteNegativeFormatString( sNegStr, aCurr, nNegaForm );
+            {   // "automatic" old style
+                OUString aSymbol, aAbbrev;
+                GetCompatibilityCurrency( aSymbol, aAbbrev );
+                if ( !isPosNatNum12 )
+                    NfCurrencyEntry::CompletePositiveFormatString( sString,
+                                        aSymbol, xLocaleData->getCurrPositiveFormat() );
+                if ( !isNegNatNum12 )
+                    NfCurrencyEntry::CompleteNegativeFormatString( sNegStr,
+                                        aSymbol, xLocaleData->getCurrNegativeFormat() );
             }
         }
-        else
-        {   // "automatic" old style
-            OUString aSymbol, aAbbrev;
-            GetCompatibilityCurrency( aSymbol, aAbbrev );
-            NfCurrencyEntry::CompletePositiveFormatString( sString,
-                                aSymbol, xLocaleData->getCurrPositiveFormat() );
-            NfCurrencyEntry::CompleteNegativeFormatString( sNegStr,
-                                aSymbol, xLocaleData->getCurrNegativeFormat() );
-        }
+        sString.append( ';' );
         if (IsRed)
         {
-            sString.append(';');
             sString.append('[');
             sString.append(pFormatScanner->GetRedString());
             sString.append(']');
         }
-        else
+        sString.append( sNegNatNumModifier );
+        if ( isNegNatNum12 )
         {
-            sString.append(';');
+            sString.append( '-' );
         }
         sString.append(sNegStr);
     }
@@ -3331,6 +3364,7 @@ OUString SvNumberFormatter::GenerateFormat(sal_uInt32 nIndex,
                 sTmpStr.append(pFormatScanner->GetRedString());
                 sTmpStr.append(']');
             }
+            sTmpStr.append( sNegNatNumModifier );
 
             if (insertBrackets)
             {
@@ -3346,6 +3380,7 @@ OUString SvNumberFormatter::GenerateFormat(sal_uInt32 nIndex,
             sString = sTmpStr;
         }
     }
+    sString.insert( 0, sPosNatNumModifier );
     return sString.makeStringAndClear();
 }
 
@@ -3910,10 +3945,10 @@ bool SvNumberFormatter::GetNewCurrencySymbolString( sal_uInt32 nFormat, OUString
     const SvNumberformat* pFormat = GetFormatEntry(nFormat);
     if ( pFormat )
     {
-        OUStringBuffer sBuff(128); // guess-estimate of a value that will pretty much guarantee no re-alloc
         OUString aSymbol, aExtension;
         if ( pFormat->GetNewCurrencySymbol( aSymbol, aExtension ) )
         {
+            OUStringBuffer sBuff(128); // guess-estimate of a value that will pretty much guarantee no re-alloc
             if ( ppEntry )
             {
                 bool bFoundBank = false;
@@ -3949,7 +3984,7 @@ bool SvNumberFormatter::GetNewCurrencySymbolString( sal_uInt32 nFormat, OUString
                 }
                 sBuff.append(']');
             }
-            rStr = sBuff.toString();
+            rStr = sBuff.makeStringAndClear();
             return true;
         }
     }
@@ -3961,25 +3996,28 @@ bool SvNumberFormatter::GetNewCurrencySymbolString( sal_uInt32 nFormat, OUString
 // static
 const NfCurrencyEntry* SvNumberFormatter::GetCurrencyEntry( bool & bFoundBank,
                                                             std::u16string_view rSymbol,
-                                                            const OUString& rExtension,
+                                                            std::u16string_view rExtension,
                                                             LanguageType eFormatLanguage,
                                                             bool bOnlyStringLanguage )
 {
-    sal_Int32 nExtLen = rExtension.getLength();
+    sal_Int32 nExtLen = rExtension.size();
     LanguageType eExtLang;
     if ( nExtLen )
     {
         // rExtension should be a 16-bit hex value max FFFF which may contain a
         // leading "-" separator (that is not a minus sign, but toInt32 can be
         // used to parse it, with post-processing as necessary):
-        sal_Int32 nExtLang = rExtension.toInt32( 16 );
+        sal_Int32 nExtLang = o3tl::toInt32(rExtension, 16);
         if ( !nExtLang )
         {
             eExtLang = LANGUAGE_DONTKNOW;
         }
         else
         {
-            eExtLang = LanguageType((nExtLang < 0) ? -nExtLang : nExtLang);
+            if (nExtLang < 0)
+                nExtLang = -nExtLang;
+            SAL_WARN_IF(nExtLang > 0xFFFF, "svl.numbers", "Out of range Lang Id: " << nExtLang << " from input string: " << OUString(rExtension));
+            eExtLang = LanguageType(nExtLang & 0xFFFF);
         }
     }
     else

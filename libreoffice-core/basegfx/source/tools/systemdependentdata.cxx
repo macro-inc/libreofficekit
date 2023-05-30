@@ -8,6 +8,7 @@
  */
 
 #include <basegfx/utils/systemdependentdata.hxx>
+#include <config_fuzzers.h>
 #include <math.h>
 
 namespace basegfx
@@ -36,6 +37,10 @@ namespace basegfx
 
     sal_uInt32 SystemDependentData::calculateCombinedHoldCyclesInSeconds() const
     {
+#if ENABLE_FUZZERS
+        return 0;
+#endif
+
         if(0 == mnCalculatedCycles)
         {
             const sal_Int64 nBytes(estimateUsageInBytes());
@@ -47,7 +52,8 @@ namespace basegfx
             // For the future, a more sophisticated differentiation may be added
             if(nBytes > 450)
             {
-                const sal_uInt32 nSeconds = 60; // HoldCyclesInSeconds
+                // HoldCyclesInSeconds
+                const sal_uInt32 nSeconds = 60;
 
                 // default is Seconds (minimal is one)
                 sal_uInt32 nResult(0 == nSeconds ? 1 : nSeconds);

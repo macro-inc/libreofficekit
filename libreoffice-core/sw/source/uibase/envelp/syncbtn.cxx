@@ -44,8 +44,7 @@ SwSyncChildWin::SwSyncChildWin(vcl::Window* _pParent,
         weld::Dialog* pDlg = pBtnDlg->getDialog();
         Point aPos;
 
-        SwView* pActiveView = ::GetActiveView();
-        if (pActiveView)
+        if (SwView* pActiveView = GetActiveView())
         {
             const SwEditWin &rEditWin = pActiveView->GetEditWin();
             aPos = rEditWin.OutputToScreenPixel(Point(0, 0));
@@ -53,11 +52,10 @@ SwSyncChildWin::SwSyncChildWin(vcl::Window* _pParent,
         else
             aPos = _pParent->OutputToScreenPixel(Point(0, 0));
 
-        WindowStateData aState;
-        aState.SetMask(WindowStateMask::Pos);
-        aState.SetX(aPos.X());
-        aState.SetY(aPos.Y());
-        pDlg->set_window_state(aState.ToStr());
+        vcl::WindowData aState;
+        aState.setMask(vcl::WindowDataMask::Pos);
+        aState.setPos(aPos);
+        pDlg->set_window_state(aState.toStr());
 
         pInfo->aPos = pDlg->get_position();
         pInfo->aSize = pDlg->get_size();
@@ -81,7 +79,8 @@ SwSyncBtnDlg::~SwSyncBtnDlg()
 
 IMPL_STATIC_LINK_NOARG(SwSyncBtnDlg, BtnHdl, weld::Button&, void)
 {
-    SfxViewFrame::Current()->GetDispatcher()->Execute(FN_UPDATE_ALL_LINKS, SfxCallMode::ASYNCHRON);
+    if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+        pViewFrm->GetDispatcher()->Execute(FN_UPDATE_ALL_LINKS, SfxCallMode::ASYNCHRON);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

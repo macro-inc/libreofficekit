@@ -33,16 +33,16 @@ Size get_surface_size(cairo_surface_t* surface)
 
 namespace cairo
 {
-QtSvpSurface::QtSvpSurface(const CairoSurfaceSharedPtr& pSurface)
+QtSvpSurface::QtSvpSurface(CairoSurfaceSharedPtr pSurface)
     : m_pGraphics(nullptr)
     , m_pCairoContext(nullptr)
-    , m_pSurface(pSurface)
+    , m_pSurface(std::move(pSurface))
 {
 }
 
 QtSvpSurface::QtSvpSurface(const QtSvpGraphics* pGraphics, int x, int y, int width, int height)
     : m_pGraphics(pGraphics)
-    , m_pCairoContext(pGraphics->getCairoContext(false))
+    , m_pCairoContext(pGraphics->getCairoContext())
 {
     cairo_surface_t* surface = cairo_get_target(m_pCairoContext);
     m_pSurface.reset(cairo_surface_create_for_rectangle(surface, x, y, width, height),

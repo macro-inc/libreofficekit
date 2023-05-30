@@ -1007,7 +1007,7 @@ SfxVoidItem DesignerDialog SID_STYLE_DESIGNER
     AccelConfig = TRUE,
     MenuConfig = TRUE,
     ToolBoxConfig = TRUE,
-    GroupId = SfxGroupId::Format;
+    GroupId = SfxGroupId::View;
 ]
 
 SfxVoidItem DragHierarchy SID_STYLE_DRAGHIERARCHIE
@@ -1921,21 +1921,23 @@ SfxVoidItem TipOfTheDay SID_TIPOFTHEDAY
     GroupId = SfxGroupId::Application;
 ]
 
-SfxVoidItem EmojiControl SID_EMOJI_CONTROL
 
+SfxVoidItem BasicIDEZoom SID_BASICIDE_CURRENT_ZOOM
+()
 [
     AutoUpdate = FALSE,
-    FastCall = TRUE,
-    ReadOnlyDoc = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
     Toggle = FALSE,
     Container = FALSE,
     RecordAbsolute = FALSE,
     RecordPerSet;
+    Asynchron;
 
     AccelConfig = FALSE,
     MenuConfig = FALSE,
-    ToolBoxConfig = TRUE,
-    GroupId = SfxGroupId::Special;
+    ToolBoxConfig = FALSE,
+    GroupId = SfxGroupId::View;
 ]
 
 
@@ -2339,7 +2341,7 @@ SfxScriptOrganizerItem ScriptOrganizer SID_SCRIPTORGANIZER
 
 
 SfxScriptOrganizerItem MacroOrganizer SID_MACROORGANIZER
-(SfxUInt16Item TabId SID_MACROORGANIZER)
+(SfxUInt16Item TabId SID_MACROORGANIZER, SfxBoolItem CurrentDocument FN_PARAM_2)
 [
     AutoUpdate = FALSE,
     FastCall = TRUE,
@@ -5340,7 +5342,7 @@ SfxVoidItem ToolbarModeUI SID_TOOLBAR_MODE_UI
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
-    ReadOnlyDoc = FALSE,
+    ReadOnlyDoc = TRUE,
     Toggle = FALSE,
     Container = FALSE,
     RecordAbsolute = FALSE,
@@ -5387,7 +5389,11 @@ SfxVoidItem AVMediaPlayer SID_AVMEDIA_PLAYER
 ]
 
 SfxVoidItem InsertAVMedia SID_INSERT_AVMEDIA
-()
+(
+    SfxStringItem URL SID_INSERT_AVMEDIA,
+    SvxSizeItem Size FN_PARAM_1,
+    SfxBoolItem IsLink FN_PARAM_2
+)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -5650,7 +5656,7 @@ SfxVoidItem PasteUnformatted SID_PASTE_UNFORMATTED
 
 // call thesaurus dialog from context menu
 SfxVoidItem ThesaurusFromContext SID_THES
-(SfxStringItem WordReplace SID_THES)
+(SfxStringItem WordReplace FN_PARAM_THES_WORD_REPLACE)
 [
     AutoUpdate = FALSE,
     FastCall = TRUE,
@@ -5753,7 +5759,7 @@ SfxVoidItem UnicodeNotationToggle SID_UNICODE_NOTATION_TOGGLE
 ]
 
 SfxVoidItem AdditionsDialog SID_ADDITIONS_DIALOG
-(SfxStringItem AdditionsTag SID_ADDITIONS_TAG)
+(SfxStringItem AdditionsTag FN_PARAM_ADDITIONS_TAG)
 [
     AutoUpdate = FALSE,
     FastCall = FALSE,
@@ -5799,5 +5805,19 @@ SfxVoidItem WidgetTestDialog SID_WIDGET_TEST_DIALOG
     AccelConfig = TRUE,
     MenuConfig = TRUE,
     ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::Application;
+]
+
+SfxVoidItem ChangeTheme FN_CHANGE_THEME
+(SfxStringItem NewTheme FN_PARAM_NEW_THEME)
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = FALSE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
     GroupId = SfxGroupId::Application;
 ]

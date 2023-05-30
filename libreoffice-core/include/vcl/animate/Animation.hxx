@@ -20,13 +20,15 @@
 #ifndef INCLUDED_VCL_ANIMATE_ANIMATION_HXX
 #define INCLUDED_VCL_ANIMATE_ANIMATION_HXX
 
+#include <tools/solar.h>
 #include <vcl/dllapi.h>
 #include <vcl/timer.hxx>
-#include <vcl/animate/AnimationBitmap.hxx>
+#include <vcl/animate/AnimationFrame.hxx>
 
 #define ANIMATION_TIMEOUT_ON_CLICK 2147483647L
 
-class ImplAnimView;
+class AnimationRenderer;
+struct AnimationData;
 
 class VCL_DLLPUBLIC Animation
 {
@@ -42,9 +44,9 @@ public:
     void Clear();
 
     bool Start(OutputDevice& rOutDev, const Point& rDestPt, const Size& rDestSz,
-               tools::Long nExtraData, OutputDevice* pFirstFrameOutDev);
+               tools::Long nRendererId, OutputDevice* pFirstFrameOutDev);
 
-    void Stop(const OutputDevice* pOutDev = nullptr, tools::Long nExtraData = 0);
+    void Stop(const OutputDevice* pOutDev = nullptr, tools::Long nRendererId = 0);
 
     void Draw(OutputDevice& rOutDev, const Point& rDestPt) const;
     void Draw(OutputDevice& rOutDev, const Point& rDestPt, const Size& rDestSz) const;
@@ -65,11 +67,11 @@ public:
     void SetNotifyHdl(const Link<Animation*, void>& rLink) { maNotifyLink = rLink; }
     const Link<Animation*, void>& GetNotifyHdl() const { return maNotifyLink; }
 
-    std::vector<std::unique_ptr<AnimationBitmap>>& GetAnimationFrames() { return maList; }
-    size_t Count() const { return maList.size(); }
-    bool Insert(const AnimationBitmap& rAnimationBitmap);
-    const AnimationBitmap& Get(sal_uInt16 nAnimation) const;
-    void Replace(const AnimationBitmap& rNewAnimationBmp, sal_uInt16 nAnimation);
+    std::vector<std::unique_ptr<AnimationFrame>>& GetAnimationFrames() { return maFrames; }
+    size_t Count() const { return maFrames.size(); }
+    bool Insert(const AnimationFrame& rAnimationFrame);
+    const AnimationFrame& Get(sal_uInt16 nAnimation) const;
+    void Replace(const AnimationFrame& rNewAnimationBmp, sal_uInt16 nAnimation);
 
     sal_uLong GetSizeBytes() const;
     BitmapChecksum GetChecksum() const;
@@ -90,13 +92,13 @@ public:
 public:
     SAL_DLLPRIVATE static void ImplIncAnimCount() { mnAnimCount++; }
     SAL_DLLPRIVATE static void ImplDecAnimCount() { mnAnimCount--; }
-    SAL_DLLPRIVATE sal_uLong ImplGetCurPos() const { return mnPos; }
+    SAL_DLLPRIVATE sal_uLong ImplGetCurPos() const { return mnFrameIndex; }
 
 private:
     SAL_DLLPRIVATE static sal_uLong mnAnimCount;
 
-    std::vector<std::unique_ptr<AnimationBitmap>> maList;
-    std::vector<std::unique_ptr<ImplAnimView>> maViewList;
+    std::vector<std::unique_ptr<AnimationFrame>> maFrames;
+    std::vector<std::unique_ptr<AnimationRenderer>> maRenderers;
 
     Link<Animation*, void> maNotifyLink;
     BitmapEx maBitmapEx;
@@ -104,9 +106,15 @@ private:
     Size maGlobalSize;
     sal_uInt32 mnLoopCount;
     sal_uInt32 mnLoops;
-    size_t mnPos;
+    size_t mnFrameIndex;
     bool mbIsInAnimation;
     bool mbLoopTerminated;
+
+    SAL_DLLPRIVATE std::vector<std::unique_ptr<AnimationData>> CreateAnimationDataItems();
+    SAL_DLLPRIVATE void PopulateRenderers();
+    SAL_DLLPRIVATE void RenderNextFrameInAllRenderers();
+    SAL_DLLPRIVATE void PruneMarkedRenderers();
+    SAL_DLLPRIVATE bool IsAnyRendererActive();
 
     SAL_DLLPRIVATE void ImplRestartTimer(sal_uLong nTimeout);
     DECL_DLLPRIVATE_LINK(ImplTimeoutHdl, Timer*, void);

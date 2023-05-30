@@ -19,7 +19,7 @@
 #include <tools/stream.hxx>
 #include <config_folders.h>
 #include <memory>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/svapp.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <com/sun/star/util/XFlushable.hpp>
@@ -37,13 +37,10 @@
 #include <bitmap/BitmapWriteAccess.hxx>
 #include <watchdog.hxx>
 #include <vcl/skia/SkiaHelper.hxx>
-#include <vcl/glxtestprocess.hxx>
 #include <salinst.hxx>
 #include <svdata.hxx>
 
-#if USING_X11
-#include <opengl/x11/X11DeviceInfo.hxx>
-#elif defined (_WIN32)
+#if defined (_WIN32)
 #include <opengl/win/WinDeviceInfo.hxx>
 #endif
 
@@ -171,6 +168,7 @@ namespace
 {
     const sal_uInt32 GLenumSize = sizeof(GLenum);
 
+#if defined _WIN32
     OString getHexString(const sal_uInt8* pData, sal_uInt32 nLength)
     {
         static const char* const pHexData = "0123456789ABCDEF";
@@ -203,24 +201,11 @@ namespace
 
     OString getDeviceInfoString()
     {
-#if USING_X11
-        const X11OpenGLDeviceInfo aInfo;
-        return aInfo.GetOS() +
-            aInfo.GetOSRelease() +
-            aInfo.GetRenderer() +
-            aInfo.GetVendor() +
-            aInfo.GetVersion();
-#elif defined( _WIN32 )
         const WinOpenGLDeviceInfo aInfo;
         return OUStringToOString(aInfo.GetAdapterVendorID(), RTL_TEXTENCODING_UTF8) +
             OUStringToOString(aInfo.GetAdapterDeviceID(), RTL_TEXTENCODING_UTF8) +
             OUStringToOString(aInfo.GetDriverVersion(), RTL_TEXTENCODING_UTF8) +
             OString::number(DriverBlocklist::GetWindowsVersion());
-#else
-        return OString::Concat(reinterpret_cast<const char*>(glGetString(GL_VENDOR))) +
-            reinterpret_cast<const char*>(glGetString(GL_RENDERER)) +
-            reinterpret_cast<const char*>(glGetString(GL_VERSION));
-#endif
     }
 
     OString getStringDigest( const OUString& rVertexShaderName,
@@ -241,6 +226,7 @@ namespace
 
         return generateMD5(aMessage.getStr(), aMessage.getLength());
     }
+#endif
 
     OString getCacheFolder()
     {
@@ -374,12 +360,14 @@ namespace
     }
 }
 
+#if defined _WIN32
 OString OpenGLHelper::GetDigest( const OUString& rVertexShaderName,
                                       const OUString& rFragmentShaderName,
                                       std::string_view rPreamble )
 {
     return getStringDigest(rVertexShaderName, rFragmentShaderName, rPreamble);
 }
+#endif
 
 GLint OpenGLHelper::LoadShaders(const OUString& rVertexShaderName,
                                 const OUString& rFragmentShaderName,
@@ -543,9 +531,9 @@ void OpenGLHelper::renderToFile(tools::Long nWidth, tools::Long nHeight, const O
     glReadPixels(0, 0, nWidth, nHeight, OptimalBufferFormat(), GL_UNSIGNED_BYTE, pBuffer.get());
     BitmapEx aBitmap = ConvertBufferToBitmapEx(pBuffer.get(), nWidth, nHeight);
     try {
-        vcl::PNGWriter aWriter( aBitmap );
         SvFileStream sOutput( rFileName, StreamMode::WRITE );
-        aWriter.Write( sOutput );
+        vcl::PngImageWriter aWriter( sOutput );
+        aWriter.write( aBitmap );
         sOutput.Close();
     } catch (...) {
         SAL_WARN("vcl.opengl", "Error writing png to " << rFileName);
@@ -765,11 +753,7 @@ bool OpenGLHelper::isDeviceDenylisted()
     {
         OpenGLZone aZone;
 
-#if USING_X11
-        X11OpenGLDeviceInfo aInfo;
-        bDenylisted = aInfo.isDeviceBlocked();
-        SAL_INFO("vcl.opengl", "denylisted: " << bDenylisted);
-#elif defined( _WIN32 )
+#if defined( _WIN32 )
         WinOpenGLDeviceInfo aInfo;
         bDenylisted = aInfo.isDeviceBlocked();
 

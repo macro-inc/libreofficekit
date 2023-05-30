@@ -77,6 +77,7 @@ class SdrUndoFactory;
 class ImageMap;
 class TextChain;
 enum class CharCompressType;
+enum class SdrCompatibilityFlag;
 namespace comphelper
 {
     class IEmbeddedHelper;
@@ -90,7 +91,7 @@ namespace com::sun::star::beans {
     struct PropertyValue;
 }
 
-namespace svx
+namespace model
 {
 class Theme;
 }
@@ -146,7 +147,6 @@ struct SdrModelImpl;
 
 class SVXCORE_DLLPUBLIC SdrModel : public SfxBroadcaster, public tools::WeakBase
 {
-private:
 #ifdef DBG_UTIL
     // SdrObjectLifetimeWatchDog:
     // Use maAllIncarnatedObjects to keep track of all SdrObjects incarnated using this SdrModel
@@ -165,9 +165,9 @@ private:
     // be expensive. Nonetheless, only use with debug code. It may be seductive to use this in
     // product code, too, especially if it will indeed trigger - but its intention is clearly
     // to find/identify MemoryLeaks caused by SdrObjects
-    friend void impAddIncarnatedSdrObjectToSdrModel(const SdrObject& rSdrObject, SdrModel& rSdrModel);
-    friend void impRemoveIncarnatedSdrObjectToSdrModel(const SdrObject& rSdrObject, SdrModel& rSdrModel);
-    std::unordered_set< const SdrObject* >  maAllIncarnatedObjects;
+    friend void impAddIncarnatedSdrObjectToSdrModel(SdrObject& rSdrObject, SdrModel& rSdrModel);
+    friend void impRemoveIncarnatedSdrObjectToSdrModel(SdrObject& rSdrObject, SdrModel& rSdrModel);
+    std::unordered_set< SdrObject* >  maAllIncarnatedObjects;
 #endif
 protected:
     std::vector<rtl::Reference<SdrPage>> maMasterPages;
@@ -199,6 +199,7 @@ protected:
     std::unique_ptr<SdrUndoGroup> m_pCurrentUndoGroup;  // For multi-level
     sal_uInt16          m_nUndoLevel;                   // undo nesting
     bool                m_bIsWriter:1;        // to clean up pMyPool from 303a
+    bool                m_bThemedControls:1;  // If false UnoControls should not use theme colors
     bool                mbUndoEnabled:1;  // If false no undo is recorded or we are during the execution of an undo action
     bool                mbChanged:1;
     bool                m_bPagNumsDirty:1;
@@ -210,6 +211,7 @@ protected:
     bool                m_bPasteResize:1; // Objects are being resized due to Paste with different MapMode
     bool                m_bStarDrawPreviewMode:1;
     bool                mbDisableTextEditUsesCommonUndoManager:1;
+    bool                mbVOCInvalidationIsReliable:1; // does the app reliably invalidate the VOC, or do we need to rebuild the primitives on every render?
     sal_uInt16          m_nDefaultTabulator;
     sal_uInt32          m_nMaxUndoCount;
 
@@ -268,6 +270,7 @@ private:
 public:
     SVX_DLLPRIVATE virtual bool IsCreatingDataObj() const { return false; }
     bool     IsTransportContainer() const { return m_bTransportContainer; }
+    bool     AreControlsThemed() { return m_bThemedControls; }
     bool     IsPasteResize() const        { return m_bPasteResize; }
     void     SetPasteResize(bool bOn) { m_bPasteResize=bOn; }
     // If a custom Pool is put here, the class will call methods
@@ -278,7 +281,7 @@ public:
     // If you do use a custom Pool, make sure you inherit from SdrItemPool,
     // if you want to use symbol objects inherited from SdrAttrObj.
     // If, however, you use objects inheriting from SdrObject you are free
-    // to chose a pool of your liking.
+    // to choose a pool of your liking.
     //
     // tdf#118731 a bDisablePropertyFiles of true will disable ability to load
     // XPropertyFiles describing defaults. Useful for UI preview widgets
@@ -540,8 +543,8 @@ public:
     SfxStyleSheetBasePool* GetStyleSheetPool() const         { return mxStyleSheetPool.get(); }
     void SetStyleSheetPool(SfxStyleSheetBasePool* pPool)     { mxStyleSheetPool=pPool; }
 
-    void SetTheme(std::unique_ptr<svx::Theme> pTheme);
-    svx::Theme* GetTheme();
+    void setTheme(std::shared_ptr<model::Theme> const& pTheme);
+    std::shared_ptr<model::Theme> const& getTheme() const;
 
     void    SetStarDrawPreviewMode(bool bPreview);
     bool    IsStarDrawPreviewMode() const { return m_bStarDrawPreviewMode; }
@@ -569,9 +572,9 @@ public:
     void SetAddExtLeading( bool bEnabled );
     bool IsAddExtLeading() const { return mbAddExtLeading; }
 
-    // tdf#99729 compatibility flag
-    void SetAnchoredTextOverflowLegacy(bool bEnabled);
-    bool IsAnchoredTextOverflowLegacy() const;
+    void SetCompatibilityFlag(SdrCompatibilityFlag eFlag, bool bEnabled);
+    /// @returns state of the SdrCompatibilityFlag
+    bool GetCompatibilityFlag(SdrCompatibilityFlag eFlag) const;
 
     void ReformatAllTextObjects();
 
@@ -612,6 +615,9 @@ public:
     virtual sal_Int32 getImagePreferredDPI() const { return 0; }
 
     virtual void dumpAsXml(xmlTextWriterPtr pWriter) const;
+
+    bool IsVOCInvalidationIsReliable() const { return mbVOCInvalidationIsReliable; }
+    void SetVOCInvalidationIsReliable(bool b) { mbVOCInvalidationIsReliable = b; }
 };
 
 /*

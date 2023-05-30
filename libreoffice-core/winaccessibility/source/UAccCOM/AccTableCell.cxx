@@ -18,6 +18,7 @@
  */
 
 #include "AccTableCell.h"
+#include "MAccessible.h"
 
 #include <vcl/svapp.hxx>
 #include <com/sun/star/accessibility/XAccessible.hpp>
@@ -34,135 +35,280 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::put_XInterface(hyper pXInterfac
 {
     // internal IUNOXWrapper - no mutex meeded
 
-    ENTER_PROTECTED_BLOCK
-
-    CUNOXWrapper::put_XInterface(pXInterface);
-    if (pUNOInterface == nullptr)
-        return E_INVALIDARG;
-
-    Reference<XAccessibleContext> xContext = pUNOInterface->getAccessibleContext();
-    if (!xContext.is())
-        return E_FAIL;
-
-    // retrieve reference to table (parent of the cell)
-    Reference<XAccessibleContext> xParentContext
-        = xContext->getAccessibleParent()->getAccessibleContext();
-    Reference<XAccessibleTable> xTable(xParentContext, UNO_QUERY);
-
-    if (!xTable.is())
+    try
     {
-        m_xTable.clear();
+        CUNOXWrapper::put_XInterface(pXInterface);
+        if (pUNOInterface == nullptr)
+            return E_INVALIDARG;
+
+        Reference<XAccessibleContext> xContext = pUNOInterface->getAccessibleContext();
+        if (!xContext.is())
+            return E_FAIL;
+
+        // retrieve reference to table (parent of the cell)
+        Reference<XAccessibleContext> xParentContext
+            = xContext->getAccessibleParent()->getAccessibleContext();
+        Reference<XAccessibleTable> xTable(xParentContext, UNO_QUERY);
+
+        if (!xTable.is())
+        {
+            m_xTable.clear();
+            return E_FAIL;
+        }
+
+        m_xTable = xTable;
+        m_nIndexInParent = xContext->getAccessibleIndexInParent();
+        return S_OK;
+    }
+    catch (...)
+    {
         return E_FAIL;
     }
-
-    m_xTable = xTable;
-    m_nIndexInParent = xContext->getAccessibleIndexInParent();
-    return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_columnExtent(long* pColumnsSpanned)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try
+    {
+        if (pColumnsSpanned == nullptr)
+            return E_INVALIDARG;
 
-    if (pColumnsSpanned == nullptr)
+        if (!m_xTable.is())
+            return E_FAIL;
+
+        long nRow = 0, nColumn = 0;
+        get_rowIndex(&nRow);
+        get_columnIndex(&nColumn);
+
+        *pColumnsSpanned = m_xTable->getAccessibleColumnExtentAt(nRow, nColumn);
+        return S_OK;
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
+}
+
+COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_columnHeaderCells(IUnknown*** cellAccessibles,
+                                                                       long* pColumnHeaderCellCount)
+{
+    SolarMutexGuard g;
+
+    if (!cellAccessibles || !pColumnHeaderCellCount)
         return E_INVALIDARG;
 
     if (!m_xTable.is())
         return E_FAIL;
 
-    long nRow = 0, nColumn = 0;
-    get_rowIndex(&nRow);
-    get_columnIndex(&nColumn);
+    Reference<XAccessibleTable> xHeaders = m_xTable->getAccessibleColumnHeaders();
+    if (!xHeaders.is())
+        return E_FAIL;
 
-    *pColumnsSpanned = m_xTable->getAccessibleColumnExtentAt(nRow, nColumn);
+    const sal_Int32 nCount = xHeaders->getAccessibleRowCount();
+    *pColumnHeaderCellCount = nCount;
+    *cellAccessibles = static_cast<IUnknown**>(CoTaskMemAlloc(nCount * sizeof(IUnknown*)));
+    sal_Int32 nCol = 0;
+    get_columnIndex(&nCol);
+    for (sal_Int32 nRow = 0; nRow < nCount; nRow++)
+    {
+        Reference<XAccessible> xCell = xHeaders->getAccessibleCellAt(nRow, nCol);
+        assert(xCell.is());
+
+        IAccessible* pIAccessible;
+        bool bOK = CMAccessible::get_IAccessibleFromXAccessible(xCell.get(), &pIAccessible);
+        if (!bOK)
+        {
+            Reference<XAccessible> xTableAcc(m_xTable, UNO_QUERY);
+            CMAccessible::g_pAgent->InsertAccObj(xCell.get(), xTableAcc.get());
+            bOK = CMAccessible::get_IAccessibleFromXAccessible(xCell.get(), &pIAccessible);
+        }
+        assert(bOK && "Couldn't retrieve IAccessible object for cell.");
+
+        pIAccessible->AddRef();
+        (*cellAccessibles)[nRow] = pIAccessible;
+    }
     return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_columnIndex(long* pColumnIndex)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try
+    {
+        if (pColumnIndex == nullptr)
+            return E_INVALIDARG;
 
-    if (pColumnIndex == nullptr)
-        return E_INVALIDARG;
+        if (!m_xTable.is())
+            return E_FAIL;
 
-    if (!m_xTable.is())
+        *pColumnIndex = m_xTable->getAccessibleColumn(m_nIndexInParent);
+        return S_OK;
+    }
+    catch (...)
+    {
         return E_FAIL;
-
-    *pColumnIndex = m_xTable->getAccessibleColumn(m_nIndexInParent);
-    return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
+    }
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_rowExtent(long* pRowsSpanned)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try
+    {
+        if (pRowsSpanned == nullptr)
+            return E_INVALIDARG;
 
-    if (pRowsSpanned == nullptr)
+        if (!m_xTable.is())
+            return E_FAIL;
+
+        long nRow = 0, nColumn = 0;
+        get_rowIndex(&nRow);
+        get_columnIndex(&nColumn);
+
+        *pRowsSpanned = m_xTable->getAccessibleRowExtentAt(nRow, nColumn);
+
+        return S_OK;
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
+}
+
+COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_rowHeaderCells(IUnknown*** cellAccessibles,
+                                                                    long* pRowHeaderCellCount)
+{
+    SolarMutexGuard g;
+
+    if (!cellAccessibles || !pRowHeaderCellCount)
         return E_INVALIDARG;
 
     if (!m_xTable.is())
         return E_FAIL;
 
-    long nRow = 0, nColumn = 0;
+    Reference<XAccessibleTable> xHeaders = m_xTable->getAccessibleRowHeaders();
+    if (!xHeaders.is())
+        return E_FAIL;
+
+    const sal_Int32 nCount = xHeaders->getAccessibleColumnCount();
+    *pRowHeaderCellCount = nCount;
+    *cellAccessibles = static_cast<IUnknown**>(CoTaskMemAlloc(nCount * sizeof(IUnknown*)));
+    sal_Int32 nRow = 0;
     get_rowIndex(&nRow);
-    get_columnIndex(&nColumn);
+    for (sal_Int32 nCol = 0; nCol < nCount; nCol++)
+    {
+        Reference<XAccessible> xCell = xHeaders->getAccessibleCellAt(nRow, nCol);
+        assert(xCell.is());
 
-    *pRowsSpanned = m_xTable->getAccessibleRowExtentAt(nRow, nColumn);
+        IAccessible* pIAccessible;
+        bool bOK = CMAccessible::get_IAccessibleFromXAccessible(xCell.get(), &pIAccessible);
+        if (!bOK)
+        {
+            Reference<XAccessible> xTableAcc(m_xTable, UNO_QUERY);
+            CMAccessible::g_pAgent->InsertAccObj(xCell.get(), xTableAcc.get());
+            bOK = CMAccessible::get_IAccessibleFromXAccessible(xCell.get(), &pIAccessible);
+        }
+        assert(bOK && "Couldn't retrieve IAccessible object for cell.");
 
+        pIAccessible->AddRef();
+        (*cellAccessibles)[nRow] = pIAccessible;
+    }
     return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_rowIndex(long* pRowIndex)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try
+    {
+        if (pRowIndex == nullptr)
+            return E_INVALIDARG;
 
-    if (pRowIndex == nullptr)
-        return E_INVALIDARG;
+        if (!m_xTable.is())
+            return E_FAIL;
 
-    if (!m_xTable.is())
+        *pRowIndex = m_xTable->getAccessibleRow(m_nIndexInParent);
+        return S_OK;
+    }
+    catch (...)
+    {
         return E_FAIL;
-
-    *pRowIndex = m_xTable->getAccessibleRow(m_nIndexInParent);
-    return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
+    }
 }
 
 COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_isSelected(boolean* pIsSelected)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try
+    {
+        if (pIsSelected == nullptr)
+            return E_INVALIDARG;
 
-    if (pIsSelected == nullptr)
+        if (!m_xTable.is())
+            return E_FAIL;
+
+        long nRow = 0, nColumn = 0;
+        get_rowIndex(&nRow);
+        get_columnIndex(&nColumn);
+
+        *pIsSelected = m_xTable->isAccessibleSelected(nRow, nColumn);
+        return S_OK;
+    }
+    catch (...)
+    {
+        return E_FAIL;
+    }
+}
+
+COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_rowColumnExtents(long* pRow, long* pColumn,
+                                                                      long* pRowExtents,
+                                                                      long* pColumnExtents,
+                                                                      boolean* pIsSelected)
+{
+    SolarMutexGuard g;
+
+    if (!pRow || !pColumn || !pRowExtents || !pColumnExtents || !pIsSelected)
+        return E_INVALIDARG;
+
+    if (get_rowIndex(pRow) != S_OK)
+        return E_FAIL;
+    if (get_columnIndex(pColumn) != S_OK)
+        return E_FAIL;
+    if (get_rowExtent(pRowExtents) != S_OK)
+        return E_FAIL;
+    if (get_columnExtent(pColumnExtents) != S_OK)
+        return E_FAIL;
+    if (get_isSelected(pIsSelected) != S_OK)
+        return E_FAIL;
+    return S_OK;
+}
+
+COM_DECLSPEC_NOTHROW STDMETHODIMP CAccTableCell::get_table(IUnknown** ppTable)
+{
+    if (!ppTable)
         return E_INVALIDARG;
 
     if (!m_xTable.is())
         return E_FAIL;
 
-    long nRow = 0, nColumn = 0;
-    get_rowIndex(&nRow);
-    get_columnIndex(&nColumn);
+    Reference<XAccessible> xAcc(m_xTable, UNO_QUERY);
+    if (!xAcc.is())
+        return E_FAIL;
 
-    *pIsSelected = m_xTable->isAccessibleSelected(nRow, nColumn);
+    IAccessible* pRet = nullptr;
+    bool bOK = CMAccessible::get_IAccessibleFromXAccessible(xAcc.get(), &pRet);
+    if (!bOK)
+        return E_FAIL;
+
+    *ppTable = pRet;
+    pRet->AddRef();
     return S_OK;
-
-    LEAVE_PROTECTED_BLOCK
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

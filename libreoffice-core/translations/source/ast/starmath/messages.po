@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:51+0200\n"
-"PO-Revision-Date: 2022-07-06 16:25+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-02-28 22:08+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
-"Language-Team: Asturian <https://translations.documentfoundation.org/projects/libo_ui-master/starmathmessages/ast/>\n"
+"Language-Team: Asturian <https://translations.documentfoundation.org/projects/libo_ui-7-5/starmathmessages/ast/>\n"
 "Language: ast\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1525785908.000000\n"
 
 #. GrDhX
@@ -1442,7 +1442,7 @@ msgstr "Cambear la fonte"
 #: starmath/inc/strings.hrc:190
 msgctxt "RID_COLORX_BLACK_HELP"
 msgid "Color Black"
-msgstr "Color prietu"
+msgstr "Color prieto"
 
 #. GrXZS
 #: starmath/inc/strings.hrc:191
@@ -1478,7 +1478,7 @@ msgstr ""
 #: starmath/inc/strings.hrc:196
 msgctxt "RID_COLORX_GRAY_HELP"
 msgid "Color Gray"
-msgstr "Color buxu"
+msgstr "Color buxo"
 
 #. 8Pn5t
 #: starmath/inc/strings.hrc:197
@@ -1496,7 +1496,7 @@ msgstr ""
 #: starmath/inc/strings.hrc:199
 msgctxt "RID_COLORX_NAVY_HELP"
 msgid "Color Navy"
-msgstr ""
+msgstr "Color azul marín"
 
 #. XL3XB
 #: starmath/inc/strings.hrc:200
@@ -1582,7 +1582,7 @@ msgstr ""
 #: starmath/inc/strings.hrc:213
 msgctxt "RID_COLORX_ORANGERED_HELP"
 msgid "Color Orangered"
-msgstr ""
+msgstr "Color roxo"
 
 #. LbfRK
 #: starmath/inc/strings.hrc:214
@@ -1930,7 +1930,7 @@ msgstr ""
 #: starmath/inc/strings.hrc:271
 msgctxt "RID_WP_HELP"
 msgid "Weierstrass p"
-msgstr "p de Weierstrass"
+msgstr "p de Weierstraß"
 
 #. f9sfv
 #: starmath/inc/strings.hrc:272
@@ -2326,7 +2326,7 @@ msgstr "verde"
 #: starmath/inc/strings.hrc:339
 msgctxt "STR_RED"
 msgid "red"
-msgstr "bermeyo"
+msgstr "bermeyu"
 
 #. b5qhM
 #: starmath/inc/strings.hrc:340
@@ -2392,7 +2392,7 @@ msgstr "xade"
 #: starmath/inc/strings.hrc:350
 msgctxt "STR_YELLOW"
 msgid "yellow"
-msgstr "mariello"
+msgstr "mariellu"
 
 #. AZyLo
 #: starmath/inc/strings.hrc:351
@@ -2428,7 +2428,7 @@ msgstr ""
 #: starmath/inc/strings.hrc:356
 msgctxt "STR_ORANGERED"
 msgid "orangered"
-msgstr ""
+msgstr "roxu"
 
 #. Ak3yd
 #: starmath/inc/strings.hrc:357
@@ -2813,22 +2813,16 @@ msgid "Unknown"
 msgstr "Desconocíu"
 
 #. znrh2
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:205
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:208
 msgctxt "catalogdialog|extended_tip|preview"
 msgid "Displays a preview of the current selection."
 msgstr ""
 
 #. DSYgZ
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:246
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:249
 msgctxt "catalogdialog|extended_tip|CatalogDialog"
 msgid "Opens the Symbols dialog, in which you can select a symbol to insert in the formula."
 msgstr ""
-
-#. P3rFo
-#: starmath/uiconfig/smath/ui/dockingelements.ui:24
-msgctxt "dockingelements|ElementCategories|tooltip_text"
-msgid "Element categories"
-msgstr "Categoríes d'elementos"
 
 #. 4SGdP
 #: starmath/uiconfig/smath/ui/fontdialog.ui:16
@@ -3284,6 +3278,12 @@ msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "These changes will apply for all new formulas."
 msgstr "Estos cambios aplicaránse pa toles fórmules nueves."
 
+#. XBBFa
+#: starmath/uiconfig/smath/ui/sidebarelements_math.ui:24
+msgctxt "mathelementspanel|ElementCategories|tooltip_text"
+msgid "Element categories"
+msgstr "Categoríes d'elementos"
+
 #. 6EqHz
 #: starmath/uiconfig/smath/ui/smathsettings.ui:41
 msgctxt "smathsettings|title"
@@ -3322,10 +3322,9 @@ msgstr "Aplica un borde finu al área de la fórmula na salida impresa."
 
 #. Fs5q2
 #: starmath/uiconfig/smath/ui/smathsettings.ui:105
-#, fuzzy
 msgctxt "smathsettings|label4"
 msgid "Print Options"
-msgstr "Opciones d'impresión"
+msgstr "Opciones d'imprentación"
 
 #. QCh6f
 #: starmath/uiconfig/smath/ui/smathsettings.ui:135
@@ -3366,10 +3365,9 @@ msgstr ""
 
 #. kMZqq
 #: starmath/uiconfig/smath/ui/smathsettings.ui:228
-#, fuzzy
 msgctxt "smathsettings|label5"
 msgid "Print Format"
-msgstr "Formatu d'impresión"
+msgstr "Formatu d'imprentación"
 
 #. s7A4r
 #: starmath/uiconfig/smath/ui/smathsettings.ui:257
@@ -3382,7 +3380,7 @@ msgstr "I_norar ~ y ` al final de la llinia"
 #: starmath/uiconfig/smath/ui/smathsettings.ui:265
 msgctxt "extended_tip|norightspaces"
 msgid "Specifies that these space wildcards will be removed if they are at the end of a line."
-msgstr ""
+msgstr "Especifica que los comodinos d'espaciu se borren si s'atopen a la fin d'una ringlera."
 
 #. RCEH8
 #: starmath/uiconfig/smath/ui/smathsettings.ui:277

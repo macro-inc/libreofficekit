@@ -8,13 +8,11 @@
  */
 
 #include <iostream>
-#include <fstream>
 #include <cassert>
 #include <cstring>
 
 #include <libxml/tree.h>
 #include <libxml/parser.h>
-#include <libxml/xmlmemory.h>
 #include <libxml/xmlstring.h>
 
 #include <export.hxx>
@@ -22,6 +20,7 @@
 #include <common.hxx>
 #include <po.hxx>
 #include <treemerge.hxx>
+#include <utility>
 
 
 namespace
@@ -60,7 +59,7 @@ namespace
 
     // Update id and content of the topic
     xmlNodePtr lcl_UpdateTopic(
-        const xmlNodePtr pCurrent, const OString& rXhpRoot )
+        const xmlNodePtr pCurrent, std::string_view rXhpRoot )
     {
         xmlNodePtr pReturn = pCurrent;
         xmlChar* pID = xmlGetProp(pReturn, reinterpret_cast<const xmlChar*>("id"));
@@ -73,7 +72,7 @@ namespace
         {
             OString sNewID =
                 OString::Concat(sID.subView( 0, nFirstSlash + 1 )) +
-                rXhpRoot.subView( rXhpRoot.lastIndexOf('/') + 1 ) +
+                rXhpRoot.substr( rXhpRoot.rfind('/') + 1 ) +
                 sID.subView( sID.indexOf( '/', nFirstSlash + 1 ) );
             xmlSetProp(
                 pReturn, reinterpret_cast<const xmlChar*>("id"),
@@ -81,7 +80,7 @@ namespace
         }
 
         const OString sXhpPath =
-            rXhpRoot +
+            OString::Concat(rXhpRoot) +
             sID.subView(sID.indexOf('/', nFirstSlash + 1));
         xmlDocPtr pXhpFile = xmlParseFile( sXhpPath.getStr() );
         // if xhpfile is missing than put this topic into comment
@@ -117,11 +116,10 @@ namespace
                         helper::xmlStrToOString( sTitle ).
                             replaceAll("$[officename]","%PRODUCTNAME").
                                 replaceAll("$[officeversion]","%PRODUCTVERSION");
-                    xmlNodeSetContent(
-                        pReturn,
-                        xmlEncodeSpecialChars( nullptr,
-                            reinterpret_cast<const xmlChar*>(
-                                sNewTitle.getStr() )));
+                    xmlChar *xmlString = xmlEncodeSpecialChars(nullptr,
+                        reinterpret_cast<const xmlChar*>( sNewTitle.getStr() ));
+                    xmlNodeSetContent( pReturn, xmlString);
+                    xmlFree( xmlString );
                     xmlFree( sTitle );
                     break;
                 }
@@ -199,9 +197,9 @@ namespace
 }
 
 TreeParser::TreeParser(
-    const OString& rInputFile, const OString& rLang )
+    const OString& rInputFile, OString _sLang )
     : m_pSource( nullptr )
-    , m_sLang( rLang )
+    , m_sLang(std::move( _sLang ))
     , m_bIsInitialized( false )
 {
     m_pSource = xmlParseFile( rInputFile.getStr() );

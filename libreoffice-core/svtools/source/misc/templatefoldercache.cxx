@@ -36,12 +36,13 @@
 #include <tools/time.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/pathoptions.hxx>
 
 #include <comphelper/processfactory.hxx>
 
 #include <mutex>
+#include <utility>
 #include <vector>
 #include <algorithm>
 
@@ -128,7 +129,7 @@ namespace svt
         virtual ~TemplateContent() override;
 
     public:
-        explicit TemplateContent( const INetURLObject& _rURL );
+        explicit TemplateContent( INetURLObject _aURL );
 
         // attribute access
         OUString                 getURL( ) const                             { return m_aURL.GetMainURL( INetURLObject::DecodeMechanism::ToIUri ); }
@@ -148,8 +149,8 @@ namespace svt
 
     }
 
-    TemplateContent::TemplateContent( const INetURLObject& _rURL )
-        :m_aURL( _rURL )
+    TemplateContent::TemplateContent( INetURLObject _aURL )
+        :m_aURL(std::move( _aURL ))
     {
         DBG_ASSERT( INetProtocol::NotValid != m_aURL.GetProtocol(), "TemplateContent::TemplateContent: invalid URL!" );
         implResetDate();
@@ -259,10 +260,9 @@ namespace svt
         uno::Reference< util::XOfficeInstallationDirectories > m_xOfficeInstDirs;
 
         StoreContentURL( SvStream& _rStorage,
-                         const uno::Reference<
-                            util::XOfficeInstallationDirectories > &
-                                xOfficeInstDirs )
-        : StorageHelper( _rStorage ), m_xOfficeInstDirs( xOfficeInstDirs ) { }
+                         uno::Reference<
+                            util::XOfficeInstallationDirectories > xOfficeInstDirs )
+        : StorageHelper( _rStorage ), m_xOfficeInstDirs(std::move( xOfficeInstDirs )) { }
 
         void operator() ( const ::rtl::Reference< TemplateContent >& _rxContent ) const
         {
@@ -283,10 +283,9 @@ namespace svt
 
     public:
         StoreFolderContent( SvStream& _rStorage,
-                         const uno::Reference<
-                            util::XOfficeInstallationDirectories > &
-                                xOfficeInstDirs )
-        : StorageHelper( _rStorage ), m_xOfficeInstDirs( xOfficeInstDirs ) { }
+                         uno::Reference<
+                            util::XOfficeInstallationDirectories > xOfficeInstDirs )
+        : StorageHelper( _rStorage ), m_xOfficeInstDirs(std::move( xOfficeInstDirs )) { }
 
 
         void operator() ( const TemplateContent& _rContent ) const
@@ -328,10 +327,9 @@ namespace svt
         uno::Reference< util::XOfficeInstallationDirectories > m_xOfficeInstDirs;
 
         ReadFolderContent( SvStream& _rStorage,
-                         const uno::Reference<
-                            util::XOfficeInstallationDirectories > &
-                                xOfficeInstDirs )
-        : StorageHelper( _rStorage ), m_xOfficeInstDirs( xOfficeInstDirs ) { }
+                         uno::Reference<
+                            util::XOfficeInstallationDirectories > xOfficeInstDirs )
+        : StorageHelper( _rStorage ), m_xOfficeInstDirs(std::move( xOfficeInstDirs )) { }
 
 
         void operator() ( TemplateContent& _rContent ) const
@@ -353,8 +351,7 @@ namespace svt
             {
                 OUString sURL = m_rStorage.ReadUniOrByteString(m_rStorage.GetStreamCharSet());
                 sURL = m_xOfficeInstDirs->makeAbsoluteURL( sURL );
-                INetURLObject aChildURL( sURL );
-                rChildren.push_back( new TemplateContent( aChildURL ) );
+                rChildren.push_back( new TemplateContent( INetURLObject( sURL ) ) );
             }
 
             // their content
@@ -568,7 +565,7 @@ namespace svt
                     INetURLObject aSubContentURL( xContentAccess->queryContentIdentifierString() );
 
                     // a new content instance
-                    ::rtl::Reference< TemplateContent > xChild = new TemplateContent( aSubContentURL );
+                    ::rtl::Reference< TemplateContent > xChild = new TemplateContent( std::move(aSubContentURL) );
 
                     // the modified date
                     xChild->setModDate( xRow->getTimestamp( 2 ) );  // date modified

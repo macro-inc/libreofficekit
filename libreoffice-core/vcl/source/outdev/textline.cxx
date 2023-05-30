@@ -17,26 +17,23 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <cassert>
-
 #include <sal/types.h>
-#include <vcl/gdimtf.hxx>
+#include <basegfx/matrix/b2dhommatrixtools.hxx>
+#include <basegfx/polygon/WaveLine.hxx>
+#include <tools/helpers.hxx>
+#include <o3tl/hash_combine.hxx>
+#include <o3tl/lru_map.hxx>
+
+#include <vcl/lazydelete.hxx>
 #include <vcl/metaact.hxx>
-#include <vcl/outdev.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/virdev.hxx>
-#include <vcl/lazydelete.hxx>
-
-#include <tools/helpers.hxx>
 
 #include <drawmode.hxx>
 #include <salgdi.hxx>
 #include <impglyphitem.hxx>
 
-#include <basegfx/matrix/b2dhommatrixtools.hxx>
-#include <basegfx/polygon/WaveLine.hxx>
-#include <o3tl/hash_combine.hxx>
-#include <o3tl/lru_map.hxx>
+#include <cassert>
 
 #define UNDERLINE_LAST      LINESTYLE_BOLDWAVE
 #define STRIKEOUT_LAST      STRIKEOUT_X
@@ -108,7 +105,7 @@ void OutputDevice::ImplInitTextLineSize()
 
 void OutputDevice::ImplInitAboveTextLineSize()
 {
-    mpFontInstance->mxFontMetric->ImplInitAboveTextLineSize();
+    mpFontInstance->mxFontMetric->ImplInitAboveTextLineSize( this );
 }
 
 void OutputDevice::ImplDrawWavePixel( tools::Long nOriginX, tools::Long nOriginY,
@@ -672,7 +669,7 @@ void OutputDevice::ImplDrawStrikeoutChar( tools::Long nBaseX, tools::Long nBaseY
     std::unique_ptr<SalLayout> pLayout = ImplLayout( aStrikeoutTest, 0, nTestStrLen );
     if( pLayout )
     {
-        nStrikeoutWidth = pLayout->GetTextWidth() / (nTestStrLen * pLayout->GetUnitsPerPixel());
+        nStrikeoutWidth = pLayout->GetTextWidth() / nTestStrLen;
     }
     if( nStrikeoutWidth <= 0 ) // sanity check
         return;
@@ -839,7 +836,7 @@ void OutputDevice::ImplDrawTextLines( SalLayout& rSalLayout, FontStrikeout eStri
                 }
 
                 // update the length of the textline
-                nWidth += pGlyph->m_nNewWidth;
+                nWidth += pGlyph->newWidth();
             }
             else if( nWidth > 0 )
             {
@@ -861,7 +858,7 @@ void OutputDevice::ImplDrawTextLines( SalLayout& rSalLayout, FontStrikeout eStri
     {
         DevicePoint aStartPt = rSalLayout.GetDrawPosition();
         ImplDrawTextLine( aStartPt.getX(), aStartPt.getY(), 0,
-                          rSalLayout.GetTextWidth() / rSalLayout.GetUnitsPerPixel(),
+                          rSalLayout.GetTextWidth(),
                           eStrikeout, eUnderline, eOverline, bUnderlineAbove );
     }
 }
@@ -999,14 +996,13 @@ void OutputDevice::DrawWaveLine(const Point& rStartPos, const Point& rEndPos, to
     tools::Long nStartY = aStartPt.Y();
     tools::Long nEndX = aEndPt.X();
     tools::Long nEndY = aEndPt.Y();
-    double fOrientation = 0.0;
+    auto nOrientation = mpFontInstance->mnOrientation;
 
     // handle rotation
-    if (nStartY != nEndY || nStartX > nEndX)
+    if (nOrientation)
     {
-        fOrientation = basegfx::rad2deg(std::atan2(nStartY - nEndY, nEndX - nStartX));
         // un-rotate the end point
-        aStartPt.RotateAround(nEndX, nEndY, Degree10(static_cast<sal_Int16>(-fOrientation * 10.0)));
+        aStartPt.RotateAround(nEndX, nEndY, nOrientation);
     }
 
     // Handle HiDPI
@@ -1033,7 +1029,9 @@ void OutputDevice::DrawWaveLine(const Point& rStartPos, const Point& rEndPos, to
         nLineWidth = 0;
     }
 
-    if ( fOrientation == 0.0 )
+    // The code below does not work for RTL text, that is what nEndX > nStartX
+    // check is for.
+    if ( nOrientation == 0_deg10 && nEndX > nStartX )
     {
         static vcl::DeleteOnDeinit< WavyLineCache > snLineCache {};
         if ( !snLineCache.get() )
@@ -1052,7 +1050,7 @@ void OutputDevice::DrawWaveLine(const Point& rStartPos, const Point& rEndPos, to
             pVirtDev->SetBackground( Wallpaper( COL_TRANSPARENT ) );
             pVirtDev->Erase();
             pVirtDev->SetAntialiasing( AntialiasingFlags::Enable );
-            pVirtDev->ImplDrawWaveLineBezier( 0, 0, nWordLength, 0, nWaveHeight, fOrientation, nLineWidth );
+            pVirtDev->ImplDrawWaveLineBezier( 0, 0, nWordLength, 0, nWaveHeight, nOrientation, nLineWidth );
             BitmapEx aBitmapEx(pVirtDev->GetBitmapEx(Point(0, 0), pVirtDev->GetOutputSize()));
 
             // Ideally we don't need this block, but in the split rgb surface + separate alpha surface
@@ -1073,10 +1071,10 @@ void OutputDevice::DrawWaveLine(const Point& rStartPos, const Point& rEndPos, to
         return;
     }
 
-    ImplDrawWaveLineBezier( nStartX, nStartY, nEndX, nEndY, nWaveHeight, fOrientation, nLineWidth );
+    ImplDrawWaveLineBezier( nStartX, nStartY, nEndX, nEndY, nWaveHeight, nOrientation, nLineWidth );
 }
 
-void OutputDevice::ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStartY, tools::Long nEndX, tools::Long nEndY, tools::Long nWaveHeight, double fOrientation, tools::Long nLineWidth)
+void OutputDevice::ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStartY, tools::Long nEndX, tools::Long nEndY, tools::Long nWaveHeight, Degree10 nOrientation, tools::Long nLineWidth)
 {
     // we need a graphics
     if( !mpGraphics && !AcquireGraphics() )
@@ -1094,7 +1092,7 @@ void OutputDevice::ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStar
 
     const basegfx::B2DRectangle aWaveLineRectangle(nStartX, nStartY, nEndX, nEndY + nWaveHeight);
     const basegfx::B2DPolygon aWaveLinePolygon = basegfx::createWaveLinePolygon(aWaveLineRectangle);
-    const basegfx::B2DHomMatrix aRotationMatrix = basegfx::utils::createRotateAroundPoint(nStartX, nStartY, basegfx::deg2rad(-fOrientation));
+    const basegfx::B2DHomMatrix aRotationMatrix = basegfx::utils::createRotateAroundPoint(nStartX, nStartY, toRadians(nOrientation));
     const bool bPixelSnapHairline(mnAntialiasing & AntialiasingFlags::PixelSnapHairline);
 
     mpGraphics->SetLineColor(GetLineColor());
@@ -1111,7 +1109,7 @@ void OutputDevice::ImplDrawWaveLineBezier(tools::Long nStartX, tools::Long nStar
             *this);
 
     if( mpAlphaVDev )
-        mpAlphaVDev->ImplDrawWaveLineBezier(nStartX, nStartY, nEndX, nEndY, nWaveHeight, fOrientation, nLineWidth);
+        mpAlphaVDev->ImplDrawWaveLineBezier(nStartX, nStartY, nEndX, nEndY, nWaveHeight, nOrientation, nLineWidth);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

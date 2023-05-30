@@ -180,6 +180,18 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
           <value xml:lang="en-US">.uno:Print</value>
         </prop>
       </node>
+      <node oor:name="P_MOD2" oor:op="replace">
+        <prop oor:name="Command">
+          <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
+          <value xml:lang="en-US">.uno:EditStyle</value>
+        </prop>
+      </node>
+      <node oor:name="P_SHIFT_MOD2" oor:op="replace">
+        <prop oor:name="Command">
+          <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
+          <value xml:lang="en-US">.uno:PageDialog</value>
+        </prop>
+      </node>
       <node oor:name="R_MOD1" oor:op="replace">
         <prop oor:name="Command">
           <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
@@ -265,6 +277,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
       <node oor:name="C_MOD2" oor:op="replace">
         <prop oor:name="Command">
           <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
+          <value xml:lang="en-US">.uno:FontDialog</value>
           <value xml:lang="de"    install:module="unxwnt">.uno:UnicodeNotationToggle</value>
           <value xml:lang="eu"    install:module="unxwnt">.uno:UnicodeNotationToggle</value>
           <value xml:lang="gl"    install:module="unxwnt">.uno:UnicodeNotationToggle</value>
@@ -801,19 +814,10 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="en-US">.uno:FillDown</value>
           </prop>
         </node>
-        <node oor:name="EQUAL_MOD1_MOD2" oor:op="replace">
+        <node oor:name="E_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:InsertObjectStarMath</value>
-              <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-              <value xml:lang="fr"></value>
-          </prop>
-        </node>
-        <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-        <node oor:name="RIGHTCURLYBRACKET_MOD1_MOD2" oor:op="replace">
-          <prop oor:name="Command">
-            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="fr">.uno:InsertObjectStarMath</value>
           </prop>
         </node>
         <node oor:name="END" oor:op="replace">
@@ -940,8 +944,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
         <node oor:name="SEMICOLON_SHIFT_MOD1" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="en-US" install:module="macosx">.uno:SpellDialog</value>
-            <value xml:lang="en-US" install:module="unxwnt">.uno:InsertCurrentTime</value>
+            <value xml:lang="en-US">.uno:InsertCurrentTime</value>
           </prop>
         </node>
         <node oor:name="F7_MOD1" oor:op="replace">
@@ -1739,19 +1742,10 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="es">.uno:SelectAll</value>
           </prop>
         </node>
-        <node oor:name="EQUAL_MOD1_MOD2" oor:op="replace">
+        <node oor:name="E_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:InsertMath</value>
-              <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-              <value xml:lang="fr"></value>
-          </prop>
-        </node>
-        <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-        <node oor:name="RIGHTCURLYBRACKET_MOD1_MOD2" oor:op="replace">
-          <prop oor:name="Command">
-            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="fr">.uno:InsertMath</value>
           </prop>
         </node>
         <node oor:name="F11" oor:op="replace">
@@ -2968,21 +2962,6 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="en-US">.uno:PreviousAnnotation</value>
           </prop>
         </node>
-        <node oor:name="EQUAL_MOD1_MOD2" oor:op="replace">
-          <prop oor:name="Command">
-            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="en-US">.uno:InsertMath</value>
-              <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-              <value xml:lang="fr"></value>
-          </prop>
-        </node>
-        <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-        <node oor:name="RIGHTCURLYBRACKET_MOD1_MOD2" oor:op="replace">
-          <prop oor:name="Command">
-            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="fr">.uno:InsertMath</value>
-          </prop>
-        </node>
         <node oor:name="1_MOD1" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
@@ -3083,7 +3062,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="en-US">.uno:InsertZWSP</value>
           </prop>
         </node>
-        <node oor:name="DOWN_SHIFT_MOD1" oor:op="replace">
+        <node oor:name="PAGEDOWN_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:MovePageDown</value>
@@ -3102,7 +3081,13 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="es">.uno:SelectAll</value>
           </prop>
         </node>
-        <node oor:name="END_SHIFT_MOD1" oor:op="replace">
+        <node oor:name="E_SHIFT_MOD2" oor:op="replace">
+          <prop oor:name="Command">
+            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
+            <value xml:lang="en-US">.uno:InsertMath</value>
+          </prop>
+        </node>
+        <node oor:name="END_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:MovePageLast</value>
@@ -3242,7 +3227,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="de" install:module="unxwnt">.uno:SuperScript</value>
           </prop>
         </node>
-        <node oor:name="HOME_SHIFT_MOD1" oor:op="replace">
+        <node oor:name="HOME_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:MovePageFirst</value>
@@ -3432,7 +3417,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="en-US" install:module="macosx">.uno:DesignerDialog</value>
           </prop>
         </node>
-        <node oor:name="UP_SHIFT_MOD1" oor:op="replace">
+        <node oor:name="PAGEUP_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:MovePageUp</value>
@@ -3533,6 +3518,7 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:Select</value>
+            <value xml:lang="es">.uno:Open</value>
           </prop>
         </node>
         <node oor:name="F3" oor:op="replace">
@@ -6241,19 +6227,10 @@ Ctrl+Shift+e aka E_SHIFT_MOD1 under GTK/IBUS is for some emoji thing
             <value xml:lang="es">.uno:SelectAll</value>
           </prop>
         </node>
-        <node oor:name="EQUAL_MOD1_MOD2" oor:op="replace">
+        <node oor:name="E_SHIFT_MOD2" oor:op="replace">
           <prop oor:name="Command">
             <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
             <value xml:lang="en-US">.uno:InsertObjectStarMath</value>
-              <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-              <value xml:lang="fr"></value>
-          </prop>
-        </node>
-        <!-- tdf#150862 Replace Ctrl-Alt-EQUAL with Ctrl-Ctrl-} for French keyboard layout -->
-        <node oor:name="RIGHTCURLYBRACKET_MOD1_MOD2" oor:op="replace">
-          <prop oor:name="Command">
-            <value xml:lang="x-no-translate">I10N SHORTCUTS - NO TRANSLATE</value>
-            <value xml:lang="fr">.uno:InsertObjectStarMath</value>
           </prop>
         </node>
         <node oor:name="F10_MOD1" oor:op="replace">

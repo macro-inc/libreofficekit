@@ -20,7 +20,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/drawing/XDrawPage.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <oox/helper/attributelist.hxx>
 #include <oox/helper/propertyset.hxx>
@@ -82,8 +82,8 @@ SlideFragmentHandler::~SlideFragmentHandler()
         PropertyMap aPropMap;
         PropertySet aSlideProp( xSlide );
 
-        OptValue<bool> aShowMasterShapes = rAttribs.getBool(XML_showMasterSp);
-        if (aShowMasterShapes.has() && !aShowMasterShapes.get())
+        std::optional<bool> aShowMasterShapes = rAttribs.getBool(XML_showMasterSp);
+        if (aShowMasterShapes.has_value() && !aShowMasterShapes.value())
             xSet->setPropertyValue("IsBackgroundObjectsVisible", Any(false));
 
         aPropMap.setProperty( PROP_Visible, rAttribs.getBool( XML_show, true ));
@@ -124,7 +124,7 @@ SlideFragmentHandler::~SlideFragmentHandler()
     case PPT_TOKEN( notesMaster ):      // CT_NotesMaster
         return this;
     case PPT_TOKEN( cSld ):             // CT_CommonSlideData
-        maSlideName = rAttribs.getString(XML_name, OUString());
+        maSlideName = rAttribs.getStringDefaulted(XML_name);
         return this;
 
     case PPT_TOKEN( spTree ):           // CT_GroupShape
@@ -141,7 +141,7 @@ SlideFragmentHandler::~SlideFragmentHandler()
         {
             ::oox::vml::ControlInfo aInfo;
             aInfo.setShapeId( rAttribs.getInteger( XML_spid, 0 ) );
-            aInfo.maFragmentPath = getFragmentPathFromRelId( rAttribs.getString( R_TOKEN( id ), OUString() ) );
+            aInfo.maFragmentPath = getFragmentPathFromRelId( rAttribs.getStringDefaulted( R_TOKEN( id )) );
             aInfo.maName = rAttribs.getXString( XML_name, OUString() );
             mpSlidePersistPtr->getDrawing()->registerControl( aInfo );
         }
@@ -212,24 +212,24 @@ SlideFragmentHandler::~SlideFragmentHandler()
         }
         // insert a new comment in vector commentsList
         mpSlidePersistPtr->getCommentsList().cmLst.emplace_back();
-        mpSlidePersistPtr->getCommentsList().cmLst.back().setAuthorId(rAttribs.getString(XML_authorId, OUString()));
-        mpSlidePersistPtr->getCommentsList().cmLst.back().setdt(rAttribs.getString(XML_dt, OUString()));
-        mpSlidePersistPtr->getCommentsList().cmLst.back().setidx(rAttribs.getString(XML_idx, OUString()));
+        mpSlidePersistPtr->getCommentsList().cmLst.back().setAuthorId(rAttribs.getStringDefaulted(XML_authorId));
+        mpSlidePersistPtr->getCommentsList().cmLst.back().setdt(rAttribs.getStringDefaulted(XML_dt));
+        mpSlidePersistPtr->getCommentsList().cmLst.back().setidx(rAttribs.getStringDefaulted(XML_idx));
         break;
 
     case PPT_TOKEN( pos ):
         mpSlidePersistPtr->getCommentsList().cmLst.back().setPoint(
-            rAttribs.getString(XML_x, OUString()),
-            rAttribs.getString(XML_y, OUString()));
+            rAttribs.getStringDefaulted(XML_x),
+            rAttribs.getStringDefaulted(XML_y));
         break;
 
     case PPT_TOKEN( cmAuthor ):
         CommentAuthor _author;
-        _author.clrIdx = rAttribs.getString(XML_clrIdx, OUString());
-        _author.id = rAttribs.getString(XML_id, OUString());
-        _author.initials = rAttribs.getString(XML_initials, OUString());
-        _author.lastIdx = rAttribs.getString(XML_lastIdx, OUString());
-        _author.name = rAttribs.getString(XML_name, OUString());
+        _author.clrIdx = rAttribs.getStringDefaulted(XML_clrIdx);
+        _author.id = rAttribs.getStringDefaulted(XML_id);
+        _author.initials = rAttribs.getStringDefaulted(XML_initials);
+        _author.lastIdx = rAttribs.getStringDefaulted(XML_lastIdx);
+        _author.name = rAttribs.getStringDefaulted(XML_name);
         mpSlidePersistPtr->getCommentAuthors().addAuthor(_author);
         break;
     }

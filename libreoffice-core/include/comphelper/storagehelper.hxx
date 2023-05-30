@@ -177,19 +177,19 @@ public:
     static css::uno::Sequence< css::beans::NamedValue >
         CreateGpgPackageEncryptionData();
 
-    static bool IsValidZipEntryFileName( const OUString& aName, bool bSlashAllowed );
+    static bool IsValidZipEntryFileName( std::u16string_view aName, bool bSlashAllowed );
     static bool IsValidZipEntryFileName( const sal_Unicode *pChar, sal_Int32 nLength, bool bSlashAllowed );
 
-    static bool PathHasSegment( const OUString& aPath, const OUString& aSegment );
+    static bool PathHasSegment( std::u16string_view aPath, std::u16string_view aSegment );
 
     // Methods to allow easy use of hierarchical names inside storages
 
     static css::uno::Reference< css::embed::XStorage > GetStorageAtPath(
         const css::uno::Reference< css::embed::XStorage > &xStorage,
-        const OUString& aPath, sal_uInt32 nOpenMode, LifecycleProxy const &rNastiness );
+        std::u16string_view aPath, sal_uInt32 nOpenMode, LifecycleProxy const &rNastiness );
     static css::uno::Reference< css::io::XStream > GetStreamAtPath(
         const css::uno::Reference< css::embed::XStorage > &xStorage,
-        const OUString& aPath, sal_uInt32 nOpenMode, LifecycleProxy const &rNastiness );
+        std::u16string_view aPath, sal_uInt32 nOpenMode, LifecycleProxy const &rNastiness );
     static css::uno::Reference< css::io::XStream > GetStreamAtPackageURL(
         const css::uno::Reference< css::embed::XStorage > &xStorage,
         const OUString& rURL, sal_uInt32 const nOpenMode,

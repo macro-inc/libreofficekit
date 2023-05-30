@@ -12,7 +12,6 @@
 #include <edtwin.hxx>
 #include <view.hxx>
 #include <wrtsh.hxx>
-#include <navipi.hxx>
 #include <ndtxt.hxx>
 #include <viewopt.hxx>
 #include <sfx2/sidebar/Sidebar.hxx>
@@ -104,7 +103,7 @@ void SwEditWinUIObject::execute(const OUString& rAction,
             TextFrameIndex const nEndPos(aEndPos.toInt32());
 
             auto & shell = getWrtShell(mxEditWin);
-            if (shell.GetCursor_()->GetPoint()->nNode.GetNode().GetTextNode())
+            if (shell.GetCursor_()->GetPoint()->GetNode().GetTextNode())
             {
                 shell.Push();
                 shell.MovePara(GoCurrPara, fnParaEnd);

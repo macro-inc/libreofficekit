@@ -39,6 +39,7 @@
 #include <sfx2/docstoragemodifylistener.hxx>
 #include <unotools/sharedunocomponent.hxx>
 #include <rtl/ref.hxx>
+#include <o3tl/enumarray.hxx>
 
 namespace comphelper
 {
@@ -93,26 +94,29 @@ typedef ::utl::SharedUNOComponent< css::embed::XStorage >  SharedStorage;
 class ODatabaseContext;
 class DocumentStorageAccess;
 class OSharedConnectionManager;
+
 class ODatabaseModelImpl    :public ::sfx2::IMacroDocumentAccess
                             ,public ::sfx2::IModifiableDocument
 {
 public:
-    enum ObjectType
+
+    enum class ObjectType
     {
-        E_FORM   = 0,
-        E_REPORT = 1,
-        E_QUERY  = 2,
-        E_TABLE  = 3
+        Form   = 0,
+        Report = 1,
+        Query  = 2,
+        Table = 3,
+        LAST = Table
     };
 
-    enum EmbeddedMacros
+    enum class EmbeddedMacros
     {
         // the database document (storage) itself contains macros
-        eDocumentWideMacros,
+        DocumentWide,
         // there are sub document( storage)s containing macros
-        eSubDocumentMacros,
+        SubDocument,
         // there are no known macro( storage)s
-        eNoMacros
+        NONE
     };
 
 private:
@@ -120,7 +124,7 @@ private:
     css::uno::WeakReference< css::sdbc::XDataSource >                 m_xDataSource;
 
     rtl::Reference<DocumentStorageAccess>                             m_pStorageAccess;
-    std::vector< TContentPtr >                                      m_aContainer;   // one for each ObjectType
+    o3tl::enumarray< ObjectType, TContentPtr >                        m_aContainer;   // one for each ObjectType
     ::sfx2::DocumentMacroMode                                         m_aMacroMode;
     sal_Int16                                                         m_nImposedMacroExecMode;
 
@@ -221,7 +225,7 @@ public:
     virtual ~ODatabaseModelImpl();
 
     ODatabaseModelImpl(
-        const OUString& _rRegistrationName,
+        OUString _sRegistrationName,
         const css::uno::Reference< css::uno::XComponentContext >& _rxContext,
         ODatabaseContext& _rDBContext
         );
@@ -451,7 +455,7 @@ protected:
     ::osl::Mutex m_aMutex; // only use this to init WeakComponentImplHelper
 
 protected:
-    explicit ModelDependentComponent( const ::rtl::Reference< ODatabaseModelImpl >& _model );
+    explicit ModelDependentComponent( ::rtl::Reference< ODatabaseModelImpl > _model );
     virtual ~ModelDependentComponent();
 
     /** returns the component itself

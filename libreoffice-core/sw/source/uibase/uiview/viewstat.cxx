@@ -25,7 +25,6 @@
 #include <svl/cjkoptions.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <svl/imageitm.hxx>
-#include <svl/languageoptions.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <editeng/langitem.hxx>
 #include <editeng/brushitem.hxx>
@@ -104,7 +103,7 @@ void SwView::GetState(SfxItemSet &rSet)
             case FN_SCROLL_PREV:
             case FN_SCROLL_NEXT:
             {
-                if (m_nMoveType == NID_RECENCY)
+                if (s_nMoveType == NID_RECENCY)
                 {
                     if (!m_pWrtShell->GetNavigationMgr().forwardEnabled())
                         rSet.DisableItem(FN_SCROLL_NEXT);
@@ -394,23 +393,22 @@ void SwView::GetState(SfxItemSet &rSet)
                         // TODO: adjust this for column selections, where the selected columns
                         // don't contain any redlines and any tracked row changes, but the
                         // adjacent not selected columns do to avoid false Enable
-                        std::unique_ptr<SwPosition> pSelectionEnd;
+                        std::optional<SwPosition> oSelectionEnd;
                         if ( m_pWrtShell->IsTableMode() &&
                                             m_pWrtShell->GetTableCursor()->GetSelectedBoxesCount() )
                         {
                             const SwSelBoxes& rBoxes = m_pWrtShell->GetTableCursor()->GetSelectedBoxes();
                             const SwStartNode *pSttNd = rBoxes.back()->GetSttNd();
                             const SwNode* pEndNode = pSttNd->GetNodes()[pSttNd->EndOfSectionIndex()];
-                            pSelectionEnd.reset(new SwPosition(*pEndNode));
+                            oSelectionEnd.emplace(*pEndNode);
                         }
                         else
-                            pSelectionEnd.reset(
-                                new SwPosition(pCursor->End()->nNode, pCursor->End()->nContent));
+                            oSelectionEnd.emplace(*pCursor->End());
 
                         for(; index < table.size(); ++index )
                         {
                             const SwRangeRedline* tmp = table[ index ];
-                            if( *tmp->Start() >= *pSelectionEnd )
+                            if( *tmp->Start() >= *oSelectionEnd )
                                 break;
                             if( tmp->HasMark() && tmp->IsVisible())
                             {
@@ -430,7 +428,7 @@ void SwView::GetState(SfxItemSet &rSet)
                     if (nullptr == pDoc->getIDocumentRedlineAccess().GetRedline(*pCursor->Start(), nullptr) &&
                        // except in the case of an inserted or deleted table row
                        ( !m_pWrtShell->IsCursorInTable() ||
-                           (pTableBox = pCursor->Start()->nNode.GetNode().GetTableBox() ) == nullptr ||
+                           (pTableBox = pCursor->Start()->GetNode().GetTableBox() ) == nullptr ||
                            RedlineType::None == pTableBox->GetUpper()->GetRedlineType() ) )
                     {
                         bDisable = true;

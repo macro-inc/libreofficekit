@@ -42,7 +42,7 @@ class CommandEvent;
 class SvtAccessibilityOptions;
 class SwPagePreviewLayout;
 
-// Delete member <mnVirtPage> and its accessor
+/// Provides the VCL widget that is used for the main area of the File -> Print Preview window.
 class SAL_DLLPUBLIC_RTTI SwPagePreviewWin final : public vcl::Window
 {
     SwViewShell* mpViewShell;
@@ -179,8 +179,6 @@ class SW_DLLPUBLIC SwPagePreview final : public SfxViewShell
     VclPtr<SwScrollbar> m_pVScrollbar;
     bool mbHScrollbarEnabled : 1;
     bool mbVScrollbarEnabled : 1;
-    // dummy window for filling the lower right edge when both scrollbars are active
-    VclPtr<vcl::Window> m_pScrollFill;
 
     sal_uInt16 mnPageCount;
     bool m_bNormalPrint;
@@ -194,8 +192,10 @@ class SW_DLLPUBLIC SwPagePreview final : public SfxViewShell
     SAL_DLLPRIVATE Point AlignToPixel(const Point& rPt) const;
 
     SAL_DLLPRIVATE void CreateScrollbar( bool bHori);
-    DECL_DLLPRIVATE_LINK(ScrollHdl, ScrollBar*, void);
-    DECL_DLLPRIVATE_LINK(EndScrollHdl, ScrollBar*, void);
+    DECL_DLLPRIVATE_LINK(HoriScrollHdl, weld::Scrollbar&, void);
+    DECL_DLLPRIVATE_LINK(VertScrollHdl, weld::Scrollbar&, void);
+    SAL_DLLPRIVATE void ScrollHdl(weld::Scrollbar&, bool bHorizontal);
+    SAL_DLLPRIVATE void EndScrollHdl(weld::Scrollbar&, bool bHorizontal);
     SAL_DLLPRIVATE bool ChgPage( int eMvMode, bool bUpdateScrollbar = true );
 
     SAL_DLLPRIVATE virtual SfxPrinter*     GetPrinter( bool bCreate = false ) override;
@@ -219,6 +219,8 @@ class SW_DLLPUBLIC SwPagePreview final : public SfxViewShell
 
     virtual void    InnerResizePixel( const Point &rOfs, const Size &rSize, bool inplaceEditModeChange ) override;
     virtual void    OuterResizePixel( const Point &rOfs, const Size &rSize ) override;
+
+    void Activate(bool bMDI) override;
 
     void         SetZoom(SvxZoomType eSet, sal_uInt16 nFactor);
 

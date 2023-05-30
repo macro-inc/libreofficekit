@@ -19,7 +19,7 @@
 
 #include "Splines.hxx"
 #include <osl/diagnose.h>
-#include <com/sun/star/drawing/PolyPolygonShape3D.hpp>
+#include <com/sun/star/drawing/Position3D.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -410,26 +410,19 @@ bool createParameterT(const tPointVecType& rUniquePoints, double* t)
     bool bIsSuccessful = true;
     const lcl_tSizeType n = rUniquePoints.size() - 1;
     t[0]=0.0;
-    double dx = 0.0;
-    double dy = 0.0;
-    double fDiffMax = 1.0; //dummy values
     double fDenominator = 0.0; // initialized for summing up
     for (lcl_tSizeType i=1; i<=n ; ++i)
     {   // 4th root(dx^2+dy^2)
-        dx = rUniquePoints[i].first - rUniquePoints[i-1].first;
-        dy = rUniquePoints[i].second - rUniquePoints[i-1].second;
-        // scaling to avoid underflow or overflow
-        fDiffMax = std::max(fabs(dx), fabs(dy));
-        if (fDiffMax == 0.0)
+        double dx = rUniquePoints[i].first - rUniquePoints[i-1].first;
+        double dy = rUniquePoints[i].second - rUniquePoints[i-1].second;
+        if (dx == 0 && dy == 0)
         {
             bIsSuccessful = false;
             break;
         }
         else
         {
-            dx /= fDiffMax;
-            dy /= fDiffMax;
-            fDenominator += sqrt(sqrt(dx * dx + dy * dy)) * sqrt(fDiffMax);
+            fDenominator += sqrt(std::hypot(dx, dy));
         }
     }
     if (fDenominator == 0.0)
@@ -443,13 +436,9 @@ bool createParameterT(const tPointVecType& rUniquePoints, double* t)
             double fNumerator = 0.0;
             for (lcl_tSizeType i=1; i<=j ; ++i)
             {
-                dx = rUniquePoints[i].first - rUniquePoints[i-1].first;
-                dy = rUniquePoints[i].second - rUniquePoints[i-1].second;
-                fDiffMax = std::max(fabs(dx), fabs(dy));
-                // same as above, so should not be zero
-                dx /= fDiffMax;
-                dy /= fDiffMax;
-                fNumerator += sqrt(sqrt(dx * dx + dy * dy)) * sqrt(fDiffMax);
+                double dx = rUniquePoints[i].first - rUniquePoints[i-1].first;
+                double dy = rUniquePoints[i].second - rUniquePoints[i-1].second;
+                fNumerator += sqrt(std::hypot(dx, dy));
             }
             t[j] = fNumerator / fDenominator;
 
@@ -531,34 +520,28 @@ void applyNtoParameterT(const lcl_tSizeType i,const double tk,const sal_uInt32 p
 // Calculates uniform parametric splines with subinterval length 1,
 // according ODF1.2 part 1, chapter 'chart interpolation'.
 void SplineCalculater::CalculateCubicSplines(
-    const drawing::PolyPolygonShape3D& rInput
-    , drawing::PolyPolygonShape3D& rResult
+    const std::vector<std::vector<css::drawing::Position3D>>& rInput
+    , std::vector<std::vector<css::drawing::Position3D>>& rResult
     , sal_uInt32 nGranularity )
 {
     OSL_PRECOND( nGranularity > 0, "Granularity is invalid" );
 
-    sal_uInt32 nOuterCount = rInput.SequenceX.getLength();
+    sal_uInt32 nOuterCount = rInput.size();
 
-    rResult.SequenceX.realloc(nOuterCount);
-    rResult.SequenceY.realloc(nOuterCount);
-    rResult.SequenceZ.realloc(nOuterCount);
+    rResult.resize(nOuterCount);
 
-    auto pSequenceX = rResult.SequenceX.getArray();
-    auto pSequenceY = rResult.SequenceY.getArray();
-    auto pSequenceZ = rResult.SequenceZ.getArray();
+    auto pSequence = rResult.data();
 
     if( !nOuterCount )
         return;
 
     for( sal_uInt32 nOuter = 0; nOuter < nOuterCount; ++nOuter )
     {
-        if( rInput.SequenceX[nOuter].getLength() <= 1 )
+        if( rInput[nOuter].size() <= 1 )
             continue; //we need at least two points
 
-        sal_uInt32 nMaxIndexPoints = rInput.SequenceX[nOuter].getLength()-1; // is >=1
-        const double* pOldX = rInput.SequenceX[nOuter].getConstArray();
-        const double* pOldY = rInput.SequenceY[nOuter].getConstArray();
-        const double* pOldZ = rInput.SequenceZ[nOuter].getConstArray();
+        sal_uInt32 nMaxIndexPoints = rInput[nOuter].size()-1; // is >=1
+        const css::drawing::Position3D* pOld = rInput[nOuter].data();
 
         std::vector < double > aParameter(nMaxIndexPoints+1);
         aParameter[0]=0.0;
@@ -577,11 +560,11 @@ void SplineCalculater::CalculateCubicSplines(
         for (sal_uInt32 nN=0;nN<=nMaxIndexPoints; nN++ )
         {
           aInputX[ nN ].first=aParameter[nN];
-          aInputX[ nN ].second=pOldX[ nN ];
+          aInputX[ nN ].second=pOld[ nN ].PositionX;
           aInputY[ nN ].first=aParameter[nN];
-          aInputY[ nN ].second=pOldY[ nN ];
+          aInputY[ nN ].second=pOld[ nN ].PositionY;
           aInputZ[ nN ].first=aParameter[nN];
-          aInputZ[ nN ].second=pOldZ[ nN ];
+          aInputZ[ nN ].second=pOld[ nN ].PositionZ;
         }
 
         // generate a spline for each coordinate. It holds the complete
@@ -592,40 +575,35 @@ void SplineCalculater::CalculateCubicSplines(
         // a data series are equal. No spline calculation needed, but copy
         // coordinate to output
 
-        if( pOldX[ 0 ] == pOldX[nMaxIndexPoints] &&
-            pOldY[ 0 ] == pOldY[nMaxIndexPoints] &&
-            pOldZ[ 0 ] == pOldZ[nMaxIndexPoints] &&
+        if( pOld[ 0 ].PositionX == pOld[nMaxIndexPoints].PositionX &&
+            pOld[ 0 ].PositionY == pOld[nMaxIndexPoints].PositionY &&
+            pOld[ 0 ].PositionZ == pOld[nMaxIndexPoints].PositionZ &&
             nMaxIndexPoints >=2 )
         {   // periodic spline
-            aSplineX.reset(new lcl_SplineCalculation( std::move(aInputX)));
-            aSplineY.reset(new lcl_SplineCalculation( std::move(aInputY)));
-            // aSplineZ = new lcl_SplineCalculation( aInputZ) ;
+            aSplineX = std::make_unique<lcl_SplineCalculation>(std::move(aInputX));
+            aSplineY = std::make_unique<lcl_SplineCalculation>(std::move(aInputY));
         }
         else // generate the kind "natural spline"
         {
             double fXDerivation = std::numeric_limits<double>::infinity();
             double fYDerivation = std::numeric_limits<double>::infinity();
-            aSplineX.reset(new lcl_SplineCalculation( std::move(aInputX), fXDerivation, fXDerivation ));
-            aSplineY.reset(new lcl_SplineCalculation( std::move(aInputY), fYDerivation, fYDerivation ));
+            aSplineX = std::make_unique<lcl_SplineCalculation>(std::move(aInputX), fXDerivation, fXDerivation);
+            aSplineY = std::make_unique<lcl_SplineCalculation>(std::move(aInputY), fYDerivation, fYDerivation);
         }
 
         // fill result polygon with calculated values
-        pSequenceX[nOuter].realloc( nMaxIndexPoints*nGranularity + 1);
-        pSequenceY[nOuter].realloc( nMaxIndexPoints*nGranularity + 1);
-        pSequenceZ[nOuter].realloc( nMaxIndexPoints*nGranularity + 1);
+        pSequence[nOuter].resize( nMaxIndexPoints*nGranularity + 1);
 
-        double* pNewX = pSequenceX[nOuter].getArray();
-        double* pNewY = pSequenceY[nOuter].getArray();
-        double* pNewZ = pSequenceZ[nOuter].getArray();
+        css::drawing::Position3D* pNew = pSequence[nOuter].data();
 
         sal_uInt32 nNewPointIndex = 0; // Index in result points
 
         for( sal_uInt32 ni = 0; ni < nMaxIndexPoints; ni++ )
         {
             // given point is surely a curve point
-            pNewX[nNewPointIndex] = pOldX[ni];
-            pNewY[nNewPointIndex] = pOldY[ni];
-            pNewZ[nNewPointIndex] = pOldZ[ni];
+            pNew[nNewPointIndex].PositionX = pOld[ni].PositionX;
+            pNew[nNewPointIndex].PositionY = pOld[ni].PositionY;
+            pNew[nNewPointIndex].PositionZ = pOld[ni].PositionZ;
             nNewPointIndex++;
 
             // calculate intermediate points
@@ -634,31 +612,21 @@ void SplineCalculater::CalculateCubicSplines(
             {
                 double fParam = aParameter[ni] + ( fInc * static_cast< double >( nj ) );
 
-                pNewX[nNewPointIndex]=aSplineX->GetInterpolatedValue( fParam );
-                pNewY[nNewPointIndex]=aSplineY->GetInterpolatedValue( fParam );
+                pNew[nNewPointIndex].PositionX = aSplineX->GetInterpolatedValue( fParam );
+                pNew[nNewPointIndex].PositionY = aSplineY->GetInterpolatedValue( fParam );
                 // pNewZ[nNewPointIndex]=aSplineZ->GetInterpolatedValue( fParam );
-                pNewZ[nNewPointIndex] = pOldZ[ni];
+                pNew[nNewPointIndex].PositionZ = pOld[ni].PositionZ;
                 nNewPointIndex++;
             }
         }
         // add last point
-        pNewX[nNewPointIndex] = pOldX[nMaxIndexPoints];
-        pNewY[nNewPointIndex] = pOldY[nMaxIndexPoints];
-        pNewZ[nNewPointIndex] = pOldZ[nMaxIndexPoints];
+        pNew[nNewPointIndex] = pOld[nMaxIndexPoints];
     }
 }
 
-// The implementation follows closely ODF1.2 spec, chapter chart:interpolation
-// using the same names as in spec as far as possible, without prefix.
-// More details can be found on
-// Dr. C.-K. Shene: CS3621 Introduction to Computing with Geometry Notes
-// Unit 9: Interpolation and Approximation/Curve Global Interpolation
-// Department of Computer Science, Michigan Technological University
-// http://www.cs.mtu.edu/~shene/COURSES/cs3621/NOTES/
-// [last called 2011-05-20]
 void SplineCalculater::CalculateBSplines(
-            const css::drawing::PolyPolygonShape3D& rInput
-            , css::drawing::PolyPolygonShape3D& rResult
+            const std::vector<std::vector<css::drawing::Position3D>>& rInput
+            , std::vector<std::vector<css::drawing::Position3D>>& rResult
             , sal_uInt32 nResolution
             , sal_uInt32 nDegree )
 {
@@ -672,38 +640,32 @@ void SplineCalculater::CalculateBSplines(
     // limit the b-spline degree at 15 to prevent insanely large sets of points
     sal_uInt32 p = std::min<sal_uInt32>(nDegree, 15);
 
-    sal_Int32 nOuterCount = rInput.SequenceX.getLength();
+    sal_Int32 nOuterCount = rInput.size();
 
-    rResult.SequenceX.realloc(nOuterCount);
-    rResult.SequenceY.realloc(nOuterCount);
-    rResult.SequenceZ.realloc(nOuterCount);
+    rResult.resize(nOuterCount);
 
-    auto pSequenceX = rResult.SequenceX.getArray();
-    auto pSequenceY = rResult.SequenceY.getArray();
-    auto pSequenceZ = rResult.SequenceZ.getArray();
+    auto pSequence = rResult.data();
 
     if( !nOuterCount )
         return; // no input
 
     for( sal_Int32 nOuter = 0; nOuter < nOuterCount; ++nOuter )
     {
-        if( rInput.SequenceX[nOuter].getLength() <= 1 )
+        if( rInput[nOuter].size() <= 1 )
             continue; // need at least 2 points, next piece of the series
 
         // Copy input to vector of points and remove adjacent double points. The
         // Z-coordinate is equal for all points in a series and holds the depth
         // in 3D mode, simple copying is enough.
-        lcl_tSizeType nMaxIndexPoints = rInput.SequenceX[nOuter].getLength()-1; // is >=1
-        const double* pOldX = rInput.SequenceX[nOuter].getConstArray();
-        const double* pOldY = rInput.SequenceY[nOuter].getConstArray();
-        const double* pOldZ = rInput.SequenceZ[nOuter].getConstArray();
-        double fZCoordinate = pOldZ[0];
+        lcl_tSizeType nMaxIndexPoints = rInput[nOuter].size()-1; // is >=1
+        const css::drawing::Position3D* pOld = rInput[nOuter].data();
+        double fZCoordinate = pOld[0].PositionZ;
         tPointVecType aPointsIn;
         aPointsIn.resize(nMaxIndexPoints+1);
         for (lcl_tSizeType i = 0; i <= nMaxIndexPoints; ++i )
         {
-          aPointsIn[ i ].first = pOldX[i];
-          aPointsIn[ i ].second = pOldY[i];
+          aPointsIn[ i ].first = pOld[i].PositionX;
+          aPointsIn[ i ].second = pOld[i].PositionY;
         }
         aPointsIn.erase( std::unique( aPointsIn.begin(), aPointsIn.end()),
                      aPointsIn.end() );
@@ -715,29 +677,23 @@ void SplineCalculater::CalculateBSplines(
             continue; // need at least 2 points, degree p needs at least n+1 points
                       // next piece of series
 
-        std::unique_ptr<double[]> t(new double [n+1]);
-        if (!createParameterT(aPointsIn, t.get()))
+        std::vector<double> t(n + 1);
+        if (!createParameterT(aPointsIn, t.data()))
         {
             continue; // next piece of series
         }
 
         lcl_tSizeType m = n + p + 1;
-        std::unique_ptr<double[]> u(new double [m+1]);
-        createKnotVector(n, p, t.get(), u.get());
+        std::vector<double> u(m + 1);
+        createKnotVector(n, p, t.data(), u.data());
 
         // The matrix N contains the B-spline basis functions applied to parameters.
         // In each row only p+1 adjacent elements are non-zero. The starting
         // column in a higher row is equal or greater than in the lower row.
         // To store this matrix the non-zero elements are shifted to column 0
         // and the amount of shifting is remembered in an array.
-        std::unique_ptr<double*[]> aMatN(new double*[n+1]);
-        for (lcl_tSizeType row = 0; row <=n; ++row)
-        {
-            aMatN[row] = new double[p+1];
-            for (sal_uInt32 col = 0; col <= p; ++col)
-            aMatN[row][col] = 0.0;
-        }
-        std::unique_ptr<lcl_tSizeType[]> aShift(new lcl_tSizeType[n+1]);
+        std::vector<std::vector<double>> aMatN(n + 1, std::vector<double>(p + 1));
+        std::vector<lcl_tSizeType> aShift(n + 1);
         aMatN[0][0] = 1.0; //all others are zero
         aShift[0] = 0;
         aMatN[n][0] = 1.0;
@@ -757,7 +713,7 @@ void SplineCalculater::CalculateBSplines(
             // index in reduced matrix aMatN = (index in full matrix N) - (i-p)
             aShift[k] = i - p;
 
-            applyNtoParameterT(i, t[k], p, u.get(), aMatN[k]);
+            applyNtoParameterT(i, t[k], p, u.data(), aMatN[k].data());
         } // next row k
 
         // Get matrix C of control points from the matrix equation aMatN * C = aPointsIn
@@ -767,9 +723,6 @@ void SplineCalculater::CalculateBSplines(
         lcl_tSizeType c = 0; // true column index
         double fDivisor = 1.0; // used for diagonal element
         double fEliminate = 1.0; // used for the element, that will become zero
-        double fHelp;
-        tPointType aHelp;
-        lcl_tSizeType nHelp; // used in triangle change
         bool bIsSuccessful = true;
         for (c = 0 ; c <= n && bIsSuccessful; ++c)
         {
@@ -789,18 +742,9 @@ void SplineCalculater::CalculateBSplines(
                 // exchange total row r with total row c if necessary
                 if (r != c)
                 {
-                    for ( sal_uInt32 i = 0; i <= p ; ++i)
-                    {
-                        fHelp = aMatN[r][i];
-                        aMatN[r][i] = aMatN[c][i];
-                        aMatN[c][i] = fHelp;
-                    }
-                    aHelp = aPointsIn[r];
-                    aPointsIn[r] = aPointsIn[c];
-                    aPointsIn[c] = aHelp;
-                    nHelp = aShift[r];
-                    aShift[r] = aShift[c];
-                    aShift[c] = nHelp;
+                    std::swap( aMatN[r], aMatN[c] );
+                    std::swap( aPointsIn[r], aPointsIn[c] );
+                    std::swap( aShift[r], aShift[c] );
                 }
 
                 // divide row c, so that element(c,c) becomes 1
@@ -860,19 +804,15 @@ void SplineCalculater::CalculateBSplines(
             // calculate the intermediate points according given resolution
             // using deBoor-Cox algorithm
             lcl_tSizeType nNewSize = nResolution * n + 1;
-            pSequenceX[nOuter].realloc(nNewSize);
-            pSequenceY[nOuter].realloc(nNewSize);
-            pSequenceZ[nOuter].realloc(nNewSize);
-            double* pNewX = pSequenceX[nOuter].getArray();
-            double* pNewY = pSequenceY[nOuter].getArray();
-            double* pNewZ = pSequenceZ[nOuter].getArray();
-            pNewX[0] = aPointsIn[0].first;
-            pNewY[0] = aPointsIn[0].second;
-            pNewZ[0] = fZCoordinate; // Precondition: z-coordinates of all points of a series are equal
-            pNewX[nNewSize -1 ] = aPointsIn[n].first;
-            pNewY[nNewSize -1 ] = aPointsIn[n].second;
-            pNewZ[nNewSize -1 ] = fZCoordinate;
-            std::unique_ptr<double[]> aP(new double[m+1]);
+            pSequence[nOuter].resize(nNewSize);
+            css::drawing::Position3D* pNew = pSequence[nOuter].data();
+            pNew[0].PositionX = aPointsIn[0].first;
+            pNew[0].PositionY = aPointsIn[0].second;
+            pNew[0].PositionZ = fZCoordinate; // Precondition: z-coordinates of all points of a series are equal
+            pNew[nNewSize -1 ].PositionX = aPointsIn[n].first;
+            pNew[nNewSize -1 ].PositionY = aPointsIn[n].second;
+            pNew[nNewSize -1 ].PositionZ = fZCoordinate;
+            std::vector<double> aP(m + 1);
             lcl_tSizeType nLow = 0;
             for ( lcl_tSizeType nTIndex = 0; nTIndex <= n-1; ++nTIndex)
             {
@@ -904,7 +844,7 @@ void SplineCalculater::CalculateBSplines(
                             aP[i] = (1 - fFactor)* aP[i-1] + fFactor * aP[i];
                         }
                     }
-                    pNewX[nNewIndex] = aP[nLow];
+                    pNew[nNewIndex].PositionX = aP[nLow];
 
                     // y-coordinate
                     for (lcl_tSizeType i = nLow - p; i <= nLow; ++i)
@@ -919,14 +859,10 @@ void SplineCalculater::CalculateBSplines(
                             aP[i] = (1 - fFactor)* aP[i-1] + fFactor * aP[i];
                         }
                     }
-                    pNewY[nNewIndex] = aP[nLow];
-                    pNewZ[nNewIndex] = fZCoordinate;
+                    pNew[nNewIndex].PositionY = aP[nLow];
+                    pNew[nNewIndex].PositionZ = fZCoordinate;
                 }
             }
-        }
-        for (lcl_tSizeType row = 0; row <=n; ++row)
-        {
-            delete[] aMatN[row];
         }
     } // next piece of the series
 }

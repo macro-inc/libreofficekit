@@ -39,7 +39,7 @@ class CxnListContext
 {
 public:
     CxnListContext( ContextHandler2Helper const & rParent,
-                    dgm::Connections & aConnections )
+                    svx::diagram::Connections & aConnections )
         : ContextHandler2( rParent )
         , mrConnection( aConnections )
         {
@@ -54,15 +54,15 @@ public:
                 case DGM_TOKEN( cxn ):
                 {
                     mrConnection.emplace_back( );
-                    dgm::Connection& rConnection=mrConnection.back();
+                    svx::diagram::Connection& rConnection=mrConnection.back();
 
-                    rConnection.mnType = rAttribs.getToken( XML_type, XML_parOf );
-                    rConnection.msModelId = rAttribs.getString( XML_modelId ).get();
-                    rConnection.msSourceId = rAttribs.getString( XML_srcId ).get();
-                    rConnection.msDestId  = rAttribs.getString( XML_destId ).get();
-                    rConnection.msPresId  = rAttribs.getString( XML_presId ).get();
-                    rConnection.msSibTransId  = rAttribs.getString( XML_sibTransId ).get();
-                    rConnection.msParTransId  = rAttribs.getString( XML_parTransId ).get();
+                    rConnection.mnXMLType = static_cast<svx::diagram::TypeConstant>(rAttribs.getToken( XML_type, XML_parOf ));
+                    rConnection.msModelId = rAttribs.getStringDefaulted( XML_modelId );
+                    rConnection.msSourceId = rAttribs.getStringDefaulted( XML_srcId );
+                    rConnection.msDestId  = rAttribs.getStringDefaulted( XML_destId );
+                    rConnection.msPresId  = rAttribs.getStringDefaulted( XML_presId );
+                    rConnection.msSibTransId  = rAttribs.getStringDefaulted( XML_sibTransId );
+                    rConnection.msParTransId  = rAttribs.getStringDefaulted( XML_parTransId );
                     rConnection.mnSourceOrder = rAttribs.getInteger( XML_srcOrd, 0 );
                     rConnection.mnDestOrder = rAttribs.getInteger( XML_destOrd, 0 );
 
@@ -76,7 +76,7 @@ public:
             return this;
         }
 private:
-    dgm::Connections& mrConnection;
+    svx::diagram::Connections& mrConnection;
 };
 
 // CT_presLayoutVars
@@ -85,7 +85,7 @@ class PresLayoutVarsContext
 {
 public:
     PresLayoutVarsContext( ContextHandler2Helper const & rParent,
-                           dgm::Point & rPoint ) :
+                           svx::diagram::Point & rPoint ) :
         ContextHandler2( rParent ),
         mrPoint( rPoint )
     {
@@ -113,8 +113,13 @@ public:
                 mrPoint.mnDirection = rAttribs.getToken( XML_val, XML_norm );
                 break;
             case DGM_TOKEN( hierBranch ):
-                mrPoint.moHierarchyBranch = rAttribs.getToken( XML_val );
+            {
+                // need to convert from oox::OptValue to std::optional since 1st is not available in svx
+                const std::optional< sal_Int32 > aOptVal(rAttribs.getToken( XML_val ));
+                if(aOptVal.has_value())
+                    mrPoint.moHierarchyBranch = aOptVal.value();
                 break;
+            }
             case DGM_TOKEN( orgChart ):
                 mrPoint.mbOrgChartEnabled = rAttribs.getBool( XML_val, false );
                 break;
@@ -129,7 +134,7 @@ public:
     }
 
 private:
-    dgm::Point& mrPoint;
+    svx::diagram::Point& mrPoint;
 };
 
 // CT_prSet
@@ -138,21 +143,21 @@ class PropertiesContext
 {
 public:
     PropertiesContext( ContextHandler2Helper const & rParent,
-                       dgm::Point & rPoint,
+                       svx::diagram::Point & rPoint,
                        const AttributeList& rAttribs ) :
         ContextHandler2( rParent ),
         mrPoint( rPoint )
     {
-        mrPoint.msColorTransformCategoryId = rAttribs.getString( XML_csCatId, "" );
-        mrPoint.msColorTransformTypeId = rAttribs.getString( XML_csTypeId, "" );
-        mrPoint.msLayoutCategoryId = rAttribs.getString( XML_loCatId, "" );
-        mrPoint.msLayoutTypeId = rAttribs.getString( XML_loTypeId, "" );
-        mrPoint.msPlaceholderText = rAttribs.getString( XML_phldrT, "" );
-        mrPoint.msPresentationAssociationId = rAttribs.getString( XML_presAssocID, "" );
-        mrPoint.msPresentationLayoutName = rAttribs.getString( XML_presName, "" );
-        mrPoint.msPresentationLayoutStyleLabel = rAttribs.getString( XML_presStyleLbl, "" );
-        mrPoint.msQuickStyleCategoryId = rAttribs.getString( XML_qsCatId, "" );
-        mrPoint.msQuickStyleTypeId = rAttribs.getString( XML_qsTypeId, "" );
+        mrPoint.msColorTransformCategoryId = rAttribs.getStringDefaulted( XML_csCatId);
+        mrPoint.msColorTransformTypeId = rAttribs.getStringDefaulted( XML_csTypeId);
+        mrPoint.msLayoutCategoryId = rAttribs.getStringDefaulted( XML_loCatId);
+        mrPoint.msLayoutTypeId = rAttribs.getStringDefaulted( XML_loTypeId);
+        mrPoint.msPlaceholderText = rAttribs.getStringDefaulted( XML_phldrT);
+        mrPoint.msPresentationAssociationId = rAttribs.getStringDefaulted( XML_presAssocID);
+        mrPoint.msPresentationLayoutName = rAttribs.getStringDefaulted( XML_presName);
+        mrPoint.msPresentationLayoutStyleLabel = rAttribs.getStringDefaulted( XML_presStyleLbl);
+        mrPoint.msQuickStyleCategoryId = rAttribs.getStringDefaulted( XML_qsCatId);
+        mrPoint.msQuickStyleTypeId = rAttribs.getStringDefaulted( XML_qsTypeId);
 
         mrPoint.mnCustomAngle = rAttribs.getInteger( XML_custAng, -1 );
         mrPoint.mnPercentageNeighbourWidth = rAttribs.getInteger( XML_custLinFactNeighborX, -1 );
@@ -193,7 +198,7 @@ public:
         }
 
 private:
-    dgm::Point& mrPoint;
+    svx::diagram::Point& mrPoint;
 };
 
 // CL_Pt
@@ -201,21 +206,23 @@ class PtContext
     : public ContextHandler2
 {
 public:
-    PtContext( ContextHandler2Helper const & rParent,
+    PtContext( ContextHandler2Helper const& rParent,
                const AttributeList& rAttribs,
-               dgm::Point & rPoint):
+               svx::diagram::Point& rPoint,
+               DiagramData& rDiagramData):
         ContextHandler2( rParent ),
-        mrPoint( rPoint )
+        mrPoint( rPoint ),
+        mrDiagramData( rDiagramData )
     {
-        mrPoint.msModelId = rAttribs.getString( XML_modelId ).get();
+        mrPoint.msModelId = rAttribs.getStringDefaulted( XML_modelId );
 
         // the default type is XML_node
         const sal_Int32 nType  = rAttribs.getToken( XML_type, XML_node );
-        mrPoint.mnType = nType;
+        mrPoint.mnXMLType = static_cast<svx::diagram::TypeConstant>(nType);
 
         // ignore the cxnId unless it is this type. See 5.15.3.1.3 in Primer
         if( ( nType == XML_parTrans ) || ( nType == XML_sibTrans ) )
-            mrPoint.msCnxId = rAttribs.getString( XML_cxnId ).get();
+            mrPoint.msCnxId = rAttribs.getStringDefaulted( XML_cxnId );
     }
 
     virtual ContextHandlerRef
@@ -229,15 +236,15 @@ public:
             case DGM_TOKEN( prSet ):
                 return new PropertiesContext( *this, mrPoint, rAttribs );
             case DGM_TOKEN( spPr ):
-                if( !mrPoint.mpShape )
-                    mrPoint.mpShape = std::make_shared<Shape>();
-                return new ShapePropertiesContext( *this, *(mrPoint.mpShape) );
+            {
+                Shape* pShape(mrDiagramData.getOrCreateAssociatedShape(mrPoint, true));
+                return new ShapePropertiesContext( *this, *pShape );
+            }
             case DGM_TOKEN( t ):
             {
+                Shape* pShape(mrDiagramData.getOrCreateAssociatedShape(mrPoint, true));
                 TextBodyPtr xTextBody = std::make_shared<TextBody>();
-                if( !mrPoint.mpShape )
-                    mrPoint.mpShape = std::make_shared<Shape>();
-                mrPoint.mpShape->setTextBody( xTextBody );
+                pShape->setTextBody( xTextBody );
                 return new TextBodyContext( *this, *xTextBody );
             }
             default:
@@ -247,7 +254,8 @@ public:
         }
 
 private:
-    dgm::Point& mrPoint;
+    svx::diagram::Point& mrPoint;
+    DiagramData& mrDiagramData;
 };
 
 // CT_PtList
@@ -255,9 +263,10 @@ class PtListContext
     : public ContextHandler2
 {
 public:
-    PtListContext( ContextHandler2Helper const & rParent,  dgm::Points& rPoints) :
+    PtListContext( ContextHandler2Helper const & rParent,  svx::diagram::Points& rPoints, DiagramData& rDiagramData) :
         ContextHandler2( rParent ),
-        mrPoints( rPoints )
+        mrPoints( rPoints ),
+        mrDiagramData( rDiagramData )
     {}
     virtual ContextHandlerRef
     onCreateContext( sal_Int32 aElementToken,
@@ -269,7 +278,7 @@ public:
             {
                 // CT_Pt
                 mrPoints.emplace_back( );
-                return new PtContext( *this, rAttribs, mrPoints.back() );
+                return new PtContext( *this, rAttribs, mrPoints.back(), mrDiagramData );
             }
             default:
                 break;
@@ -278,7 +287,8 @@ public:
         }
 
 private:
-    dgm::Points& mrPoints;
+    svx::diagram::Points& mrPoints;
+    DiagramData& mrDiagramData;
 };
 
 // CT_BackgroundFormatting
@@ -286,7 +296,7 @@ class BackgroundFormattingContext
     : public ContextHandler2
 {
 public:
-    BackgroundFormattingContext( ContextHandler2Helper const & rParent, DiagramDataPtr const & pModel )
+    BackgroundFormattingContext( ContextHandler2Helper const & rParent, OoxDiagramDataPtr const& pModel )
         : ContextHandler2( rParent )
         , mpDataModel( pModel )
         {
@@ -306,8 +316,7 @@ public:
             case A_TOKEN( pattFill ):
             case A_TOKEN( solidFill ):
                 // EG_FillProperties
-                return FillPropertiesContext::createFillContext(
-                    *this, aElementToken, rAttribs, *mpDataModel->getFillProperties() );
+                return FillPropertiesContext::createFillContext(*this, aElementToken, rAttribs, *mpDataModel->getBackgroundShapeFillProperties(), nullptr);
             case A_TOKEN( effectDag ):
             case A_TOKEN( effectLst ):
                 // TODO
@@ -319,13 +328,13 @@ public:
             return this;
         }
 private:
-    DiagramDataPtr mpDataModel;
+    OoxDiagramDataPtr mpDataModel;
 };
 
 }
 
-DataModelContext::DataModelContext( ContextHandler2Helper const & rParent,
-                                    const DiagramDataPtr & pDataModel )
+DataModelContext::DataModelContext( ContextHandler2Helper const& rParent,
+                                    const OoxDiagramDataPtr& pDataModel )
     : ContextHandler2( rParent )
     , mpDataModel( pDataModel )
 {
@@ -349,7 +358,7 @@ DataModelContext::onCreateContext( ::sal_Int32 aElement,
         return new CxnListContext( *this, mpDataModel->getConnections() );
     case DGM_TOKEN( ptLst ):
         // CT_PtList
-        return new PtListContext( *this, mpDataModel->getPoints() );
+        return new PtListContext( *this, mpDataModel->getPoints(), *mpDataModel );
     case DGM_TOKEN( bg ):
         // CT_BackgroundFormatting
         return new BackgroundFormattingContext( *this, mpDataModel );
@@ -361,7 +370,7 @@ DataModelContext::onCreateContext( ::sal_Int32 aElement,
     case A_TOKEN( ext ):
         break;
     case DSP_TOKEN( dataModelExt ):
-        mpDataModel->getExtDrawings().push_back( rAttribs.getString( XML_relId ).get() );
+        mpDataModel->getExtDrawings().push_back( rAttribs.getStringDefaulted( XML_relId ) );
         break;
     default:
         break;

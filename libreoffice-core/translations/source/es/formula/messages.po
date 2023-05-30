@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:19+0100\n"
-"PO-Revision-Date: 2022-06-15 20:37+0000\n"
+"POT-Creation-Date: 2022-12-21 17:45+0100\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-master/formulamessages/es/>\n"
 "Language: es\n"
@@ -1438,7 +1438,7 @@ msgstr "HALLAR"
 #: formula/inc/core_resource.hrc:2518
 msgctxt "RID_STRLIST_FUNCTION_NAMES"
 msgid "MID"
-msgstr "MID"
+msgstr "EXTRAE"
 
 #. CcD9A
 #: formula/inc/core_resource.hrc:2519
@@ -2692,11 +2692,11 @@ msgctxt "functionpage|label_search"
 msgid "_Search"
 msgstr "_Buscar"
 
-#. Pc52A
+#. kBsGA
 #: formula/uiconfig/ui/functionpage.ui:45
 msgctxt "functionpage|extended_tip|search"
-msgid "Search for a part of the function name."
-msgstr "Permite buscar mediante parte del nombre de una función."
+msgid "Search for a function name. Also matches function descriptions."
+msgstr "Busque el nombre de una función. También encuentra descripciones."
 
 #. MbTAL
 #: formula/uiconfig/ui/functionpage.ui:60

@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <memory>
 
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
@@ -37,7 +39,6 @@
 #include <sfx2/printer.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <svl/stritem.hxx>
-#include <svl/languageoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <sfx2/htmlmode.hxx>
 #include <swmodule.hxx>
@@ -49,6 +50,7 @@
 #include <numrule.hxx>
 #include <swundo.hxx>
 #include <svx/drawitem.hxx>
+#include <utility>
 #include <view.hxx>
 #include <wrtsh.hxx>
 #include <docsh.hxx>
@@ -73,13 +75,14 @@
 #include <edtwin.hxx>
 #include <unochart.hxx>
 #include <swabstdlg.hxx>
-#include <paratr.hxx>
 #include <tblafmt.hxx>
 #include <sfx2/watermarkitem.hxx>
 #include <svl/grabbagitem.hxx>
 #include <SwUndoFmt.hxx>
 #include <strings.hrc>
 #include <AccessibilityCheck.hxx>
+#include <docmodel/theme/Theme.hxx>
+#include <svx/svdpage.hxx>
 
 using namespace ::com::sun::star;
 
@@ -102,9 +105,8 @@ void  SwDocShell::StateStyleSheet(SfxItemSet& rSet, SwWrtShell* pSh)
     else
     {
         SfxViewFrame* pFrame = pShell->GetView().GetViewFrame();
-        std::unique_ptr<SfxPoolItem> pItem;
-        pFrame->GetBindings().QueryState(SID_STYLE_FAMILY, pItem);
-        SfxUInt16Item* pFamilyItem = dynamic_cast<SfxUInt16Item*>(pItem.get());
+        std::unique_ptr<SfxUInt16Item> pFamilyItem;
+        pFrame->GetBindings().QueryState(SID_STYLE_FAMILY, pFamilyItem);
         if (pFamilyItem)
         {
             nActualFamily = static_cast<SfxStyleFamily>(pFamilyItem->GetValue());
@@ -437,9 +439,8 @@ void SwDocShell::ExecStyleSheet( SfxRequest& rReq )
                 if( SfxItemState::SET == pArgs->GetItemState(SID_STYLE_MASK,
                     false, &pItem ))
                     nMask = static_cast<SfxStyleSearchBits>(static_cast<const SfxUInt16Item*>(pItem)->GetValue());
-                if( SfxItemState::SET == pArgs->GetItemState(FN_PARAM_WRTSHELL,
-                    false, &pItem ))
-                    pActShell = pShell = static_cast<SwWrtShell*>(static_cast<const SwPtrItem*>(pItem)->GetValue());
+                if( const SwPtrItem* pShellItem = pArgs->GetItemIfSet(FN_PARAM_WRTSHELL, false ))
+                    pActShell = pShell = static_cast<SwWrtShell*>(pShellItem->GetValue());
 
                 if( nSlot == SID_STYLE_UPDATE_BY_EXAMPLE && aParam.isEmpty() )
                 {
@@ -467,15 +468,15 @@ void SwDocShell::ExecStyleSheet( SfxRequest& rReq )
                         }
                         break;
                         case SfxStyleFamily::Pseudo:
-                        if(SfxItemState::SET == pArgs->GetItemState(SID_STYLE_UPD_BY_EX_NAME, false, &pItem))
+                        if(const SfxStringItem* pExName = pArgs->GetItemIfSet(SID_STYLE_UPD_BY_EX_NAME, false))
                         {
-                            aParam = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                            aParam = pExName->GetValue();
                         }
                         break;
                         case SfxStyleFamily::Table:
-                        if(SfxItemState::SET == pArgs->GetItemState(SID_STYLE_UPD_BY_EX_NAME, false, &pItem))
+                        if(const SfxStringItem* pExName = pArgs->GetItemIfSet(SID_STYLE_UPD_BY_EX_NAME, false))
                         {
-                            aParam = static_cast<const SfxStringItem*>(pItem)->GetValue();
+                            aParam = pExName->GetValue();
                         }
                         break;
                         default: break;
@@ -542,16 +543,16 @@ class ApplyStyle
 {
 public:
     ApplyStyle(SwDocShell &rDocSh, bool bNew,
-        rtl::Reference< SwDocStyleSheet > const & xTmp,
+        rtl::Reference< SwDocStyleSheet > xTmp,
         SfxStyleFamily nFamily, SfxAbstractApplyTabDialog *pDlg,
-        rtl::Reference< SfxStyleSheetBasePool > const & xBasePool,
+        rtl::Reference< SfxStyleSheetBasePool > xBasePool,
         bool bModified)
         : m_pDlg(pDlg)
         , m_rDocSh(rDocSh)
         , m_bNew(bNew)
-        , m_xTmp(xTmp)
+        , m_xTmp(std::move(xTmp))
         , m_nFamily(nFamily)
-        , m_xBasePool(xBasePool)
+        , m_xBasePool(std::move(xBasePool))
         , m_bModified(bModified)
     {
     }
@@ -597,12 +598,14 @@ IMPL_LINK_NOARG(ApplyStyle, ApplyHdl, LinkParamNone*, void)
     }
     else
     {
-        if(SfxStyleFamily::Page == m_nFamily)
+        if(SfxStyleFamily::Page == m_nFamily || SfxStyleFamily::Frame == m_nFamily)
         {
             static const sal_uInt16 aInval[] = {
                 SID_IMAGE_ORIENTATION,
                 SID_ATTR_CHAR_FONT,
-                FN_INSERT_CTRL, FN_INSERT_OBJ_CTRL, 0};
+                FN_INSERT_CTRL, FN_INSERT_OBJ_CTRL,
+                FN_TABLE_INSERT_COL_BEFORE,
+                FN_TABLE_INSERT_COL_AFTER, 0};
             pView->GetViewFrame()->GetBindings().Invalidate(aInval);
         }
         SfxItemSet aTmpSet( *m_pDlg->GetOutputItemSet() );
@@ -622,13 +625,11 @@ IMPL_LINK_NOARG(ApplyStyle, ApplyHdl, LinkParamNone*, void)
 
         if (m_nFamily == SfxStyleFamily::Page)
         {
-            const SfxPoolItem* pItem = nullptr;
-            if (aTmpSet.HasItem(SID_ATTR_CHAR_GRABBAG, &pItem))
+            if (const SfxGrabBagItem* pGrabBagItem = aTmpSet.GetItemIfSet(SID_ATTR_CHAR_GRABBAG))
             {
-                const auto& rGrabBagItem = static_cast<const SfxGrabBagItem&>(*pItem);
                 bool bGutterAtTop{};
-                auto it = rGrabBagItem.GetGrabBag().find("GutterAtTop");
-                if (it != rGrabBagItem.GetGrabBag().end())
+                auto it = pGrabBagItem->GetGrabBag().find("GutterAtTop");
+                if (it != pGrabBagItem->GetGrabBag().end())
                 {
                     it->second >>= bGutterAtTop;
                 }
@@ -645,14 +646,12 @@ IMPL_LINK_NOARG(ApplyStyle, ApplyHdl, LinkParamNone*, void)
 
         if (m_nFamily == SfxStyleFamily::Frame)
         {
-            const SfxPoolItem* pItem = nullptr;
-            if (aTmpSet.HasItem(FN_KEEP_ASPECT_RATIO, &pItem))
+            if (const SfxBoolItem* pBoolItem = aTmpSet.GetItemIfSet(FN_KEEP_ASPECT_RATIO))
             {
-                const auto& rBoolItem = static_cast<const SfxBoolItem&>(*pItem);
                 const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
                 SwViewOption aUsrPref(*pVOpt);
-                aUsrPref.SetKeepRatio(rBoolItem.GetValue());
-                if (rBoolItem.GetValue() != pVOpt->IsKeepRatio())
+                aUsrPref.SetKeepRatio(pBoolItem->GetValue());
+                if (pBoolItem->GetValue() != pVOpt->IsKeepRatio())
                 {
                     SW_MOD()->ApplyUsrPref(aUsrPref, &pWrtShell->GetView());
                 }
@@ -915,10 +914,9 @@ void SwDocShell::Edit(
         rSet.Put(SvxPatternListItem(pDrawModel->GetPatternList(), SID_PATTERN_LIST));
 
         std::optional<SfxGrabBagItem> oGrabBag;
-        SfxPoolItem const* pItem(nullptr);
-        if (SfxItemState::SET == rSet.GetItemState(SID_ATTR_CHAR_GRABBAG, true, &pItem))
+        if (SfxGrabBagItem const* pItem = rSet.GetItemIfSet(SID_ATTR_CHAR_GRABBAG))
         {
-            oGrabBag.emplace(*static_cast<SfxGrabBagItem const*>(pItem));
+            oGrabBag.emplace(*pItem);
         }
         else
         {
@@ -1137,8 +1135,6 @@ void SwDocShell::Hide(const OUString &rName, SfxStyleFamily nFamily, bool bHidde
 SfxStyleFamily SwDocShell::ApplyStyles(const OUString &rName, SfxStyleFamily nFamily,
                                SwWrtShell* pShell, const sal_uInt16 nMode )
 {
-    MakeAllOutlineContentTemporarilyVisible a(GetDoc());
-
     SwDocStyleSheet* pStyle = static_cast<SwDocStyleSheet*>( m_xBasePool->Find( rName, nFamily ) );
 
     SAL_WARN_IF( !pStyle, "sw.ui", "Style not found" );
@@ -1163,6 +1159,11 @@ SfxStyleFamily SwDocShell::ApplyStyles(const OUString &rName, SfxStyleFamily nFa
         }
         case SfxStyleFamily::Para:
         {
+            // When outline-folding is enabled, MakeAllOutlineContentTemporarilyVisible makes
+            // application of a paragraph style that has an outline-level greater than the previous
+            // outline node become folded content of the previous outline node if the previous
+            // outline node's content is folded.
+            MakeAllOutlineContentTemporarilyVisible a(GetDoc());
             // #i62675#
             // clear also list attributes at affected text nodes, if paragraph
             // style has the list style attribute set.
@@ -1187,7 +1188,8 @@ SfxStyleFamily SwDocShell::ApplyStyles(const OUString &rName, SfxStyleFamily nFa
             const SwNumRule* pNumRule = pStyle->GetNumRule();
             if (pNumRule->GetName() == SwResId(STR_POOLNUMRULE_NOLIST))
             {
-                SfxViewFrame::Current()->GetDispatcher()->Execute(FN_NUM_BULLET_OFF);
+                if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+                    pViewFrm->GetDispatcher()->Execute(FN_NUM_BULLET_OFF);
                 break;
             }
             const OUString sListIdForStyle =pNumRule->GetDefaultListId();
@@ -1344,9 +1346,12 @@ void SwDocShell::UpdateStyle(const OUString &rName, SfxStyleFamily nFamily, SwWr
         break;
         case SfxStyleFamily::Table:
         {
-            if(GetFEShell()->IsTableMode())
+            if (SwFEShell* pFEShell = GetFEShell())
             {
-                GetFEShell()->TableCursorToCursor();
+                if(pFEShell->IsTableMode())
+                {
+                    pFEShell->TableCursorToCursor();
+                }
             }
             SwTableAutoFormat aFormat(rName);
             if (pCurrWrtShell->GetTableAutoFormat(aFormat))
@@ -1561,14 +1566,29 @@ void SwDocShell::MakeByExample( const OUString &rName, SfxStyleFamily nFamily,
 
 sfx::AccessibilityIssueCollection SwDocShell::runAccessibilityCheck()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     sw::AccessibilityCheck aCheck(m_xDoc.get());
     aCheck.check();
     return aCheck.getIssueCollection();
+#else
+    return sfx::AccessibilityIssueCollection();
+#endif
 }
 
 std::set<Color> SwDocShell::GetDocColors()
 {
     return m_xDoc->GetDocColors();
+}
+
+std::vector<Color> SwDocShell::GetThemeColors()
+{
+    SdrPage* pPage = m_xDoc->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+    if (!pPage)
+        return {};
+    auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+    if (!pTheme)
+        return {};
+    return pTheme->GetColors();
 }
 
 void  SwDocShell::LoadStyles( SfxObjectShell& rSource )

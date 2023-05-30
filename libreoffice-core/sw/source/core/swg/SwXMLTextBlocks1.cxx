@@ -23,7 +23,7 @@
 #include <svl/macitem.hxx>
 #include <svtools/unoevent.hxx>
 #include <sfx2/docfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/fileformat.h>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -320,7 +320,7 @@ ErrCode SwXMLTextBlocks::GetBlockText( std::u16string_view rShort, OUString& rTe
 }
 
 ErrCode SwXMLTextBlocks::PutBlockText( const OUString& rShort,
-                                         const OUString& rText,  const OUString& rPackageName )
+                                         std::u16string_view rText,  const OUString& rPackageName )
 {
     GetIndex ( rShort );
     /*

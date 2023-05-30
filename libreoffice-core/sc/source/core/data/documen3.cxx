@@ -83,17 +83,25 @@ void sortAndRemoveDuplicates(std::vector<ScTypedStrData>& rStrings, bool bCaseSe
 {
     if (bCaseSens)
     {
-        std::sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessCaseSensitive());
+        std::stable_sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessCaseSensitive());
         std::vector<ScTypedStrData>::iterator it =
             std::unique(rStrings.begin(), rStrings.end(), ScTypedStrData::EqualCaseSensitive());
         rStrings.erase(it, rStrings.end());
+        if (std::find_if(rStrings.begin(), rStrings.end(),
+            [](ScTypedStrData& rString) { return rString.IsHiddenByFilter(); }) != rStrings.end()) {
+            std::stable_sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessHiddenRows());
+        }
     }
     else
     {
-        std::sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessCaseInsensitive());
+        std::stable_sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessCaseInsensitive());
         std::vector<ScTypedStrData>::iterator it =
             std::unique(rStrings.begin(), rStrings.end(), ScTypedStrData::EqualCaseInsensitive());
         rStrings.erase(it, rStrings.end());
+        if (std::find_if(rStrings.begin(), rStrings.end(),
+            [](ScTypedStrData& rString) { return rString.IsHiddenByFilter(); }) != rStrings.end()) {
+            std::stable_sort(rStrings.begin(), rStrings.end(), ScTypedStrData::LessHiddenRows());
+        }
     }
 }
 
@@ -118,27 +126,25 @@ void ScDocument::GetAllTabRangeNames(ScRangeName::TabNameCopyMap& rNames) const
     rNames.swap(aNames);
 }
 
-void ScDocument::SetAllRangeNames(const std::map<OUString, std::unique_ptr<ScRangeName>>& rRangeMap)
+void ScDocument::SetAllRangeNames(const std::map<OUString, ScRangeName>& rRangeMap)
 {
-    for (const auto& [rName, rxRangeName] : rRangeMap)
+    for (const auto& [rName, rRangeName] : rRangeMap)
     {
         if (rName == STR_GLOBAL_RANGE_NAME)
         {
             pRangeName.reset();
-            const ScRangeName *const pName = rxRangeName.get();
-            if (!pName->empty())
-                pRangeName.reset( new ScRangeName( *pName ) );
+            if (!rRangeName.empty())
+                pRangeName.reset( new ScRangeName( rRangeName ) );
         }
         else
         {
-            const ScRangeName *const pName = rxRangeName.get();
             SCTAB nTab;
             bool bFound = GetTable(rName, nTab);
             assert(bFound); (void)bFound;   // fouled up?
-            if (pName->empty())
+            if (rRangeName.empty())
                 SetRangeName( nTab, nullptr );
             else
-                SetRangeName( nTab, std::unique_ptr<ScRangeName>(new ScRangeName( *pName )) );
+                SetRangeName( nTab, std::unique_ptr<ScRangeName>(new ScRangeName( rRangeName )) );
         }
     }
 }
@@ -207,7 +213,7 @@ bool ScDocument::IsAddressInRangeName( RangeNameScope eScope, const ScAddress& r
     {
         if (rEntry.second->IsValidReference(aNameRange))
         {
-            if (aNameRange.In(rAddress))
+            if (aNameRange.Contains(rAddress))
                 return true;
         }
     }
@@ -382,7 +388,7 @@ ScDPObject* ScDocument::GetDPAtCursor(SCCOL nCol, SCROW nRow, SCTAB nTab) const
     sal_uInt16 nCount = pDPCollection->GetCount();
     ScAddress aPos( nCol, nRow, nTab );
     for (sal_uInt16 i=0; i<nCount; i++)
-        if ( (*pDPCollection)[i].GetOutRange().In( aPos ) )
+        if ( (*pDPCollection)[i].GetOutRange().Contains( aPos ) )
             return &(*pDPCollection)[i];
 
     return nullptr;
@@ -397,7 +403,7 @@ ScDPObject* ScDocument::GetDPAtBlock( const ScRange & rBlock ) const
      * approximation of MS Excels 'most recent' effect. */
     sal_uInt16 i = pDPCollection->GetCount();
     while ( i-- > 0 )
-        if ( (*pDPCollection)[i].GetOutRange().In( rBlock ) )
+        if ( (*pDPCollection)[i].GetOutRange().Contains( rBlock ) )
             return &(*pDPCollection)[i];
 
     return nullptr;
@@ -575,8 +581,11 @@ bool ScDocument::LinkExternalTab( SCTAB& rTab, const OUString& aDocTab,
     }
     rTab = 0;
 #if ENABLE_FUZZERS
+    (void)aDocTab;
+    (void)aFileName;
+    (void)aTabName;
     return false;
-#endif
+#else
     OUString  aFilterName; // Is filled by the Loader
     OUString  aOptions; // Filter options
     sal_uInt32 nLinkCnt = pExtDocOptions ? pExtDocOptions->GetDocSettings().mnLinkCnt : 0;
@@ -618,6 +627,7 @@ bool ScDocument::LinkExternalTab( SCTAB& rTab, const OUString& aDocTab,
             pBindings->Invalidate( SID_LINKS );
     }
     return true;
+#endif
 }
 
 ScExternalRefManager* ScDocument::GetExternalRefManager() const
@@ -1950,7 +1960,8 @@ void ScDocument::SetDocOptions( const ScDocOptions& rOpt )
     assert(pDocOptions && "No DocOptions! :-(");
 
     *pDocOptions = rOpt;
-    mxPoolHelper->SetFormTableOpt(rOpt);
+    if (mxPoolHelper)
+        mxPoolHelper->SetFormTableOpt(rOpt);
 }
 
 const ScViewOptions& ScDocument::GetViewOptions() const
@@ -2028,8 +2039,8 @@ void ScDocument::SetClipOptions(std::unique_ptr<ScClipOptions> pClipOptions)
     mpClipOptions = std::move(pClipOptions);
 }
 
-void ScDocument::DoMergeContents( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
-                                    SCCOL nEndCol, SCROW nEndRow )
+void ScDocument::DoMergeContents( SCCOL nStartCol, SCROW nStartRow,
+                                    SCCOL nEndCol, SCROW nEndRow, SCTAB nTab )
 {
     OUStringBuffer aTotal;
     OUString aCellStr;
@@ -2052,8 +2063,8 @@ void ScDocument::DoMergeContents( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
     SetString(nStartCol,nStartRow,nTab,aTotal.makeStringAndClear());
 }
 
-void ScDocument::DoEmptyBlock( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
-                               SCCOL nEndCol, SCROW nEndRow )
+void ScDocument::DoEmptyBlock( SCCOL nStartCol, SCROW nStartRow,
+                               SCCOL nEndCol, SCROW nEndRow, SCTAB nTab )
 {
     SCCOL nCol;
     SCROW nRow;
@@ -2065,8 +2076,8 @@ void ScDocument::DoEmptyBlock( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
         }
 }
 
-void ScDocument::DoMerge( SCTAB nTab, SCCOL nStartCol, SCROW nStartRow,
-                                    SCCOL nEndCol, SCROW nEndRow, bool bDeleteCaptions )
+void ScDocument::DoMerge( SCCOL nStartCol, SCROW nStartRow,
+                          SCCOL nEndCol, SCROW nEndRow, SCTAB nTab, bool bDeleteCaptions )
 {
     ScTable* pTab = FetchTable(nTab);
     if (!pTab)

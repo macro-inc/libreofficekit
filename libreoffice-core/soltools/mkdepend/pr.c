@@ -29,6 +29,9 @@ in this Software without prior written authorization from the X Consortium.
 
 #include "def.h"
 #include <string.h>
+
+#include <sal/types.h>
+
 static size_t pr( struct inclist *ip, char *file,char *base);
 
 extern int  width;
@@ -67,6 +70,7 @@ void add_include(struct filepointer *filep, struct inclist *file, struct inclist
     if (!newfile->i_searched) {
         newfile->i_searched = TRUE;
         content = getfile(newfile->i_file);
+        // coverity[tainted_data] - this is a build time tool
         find_includes(content, newfile, file_red, 0, failOK, incCollection, symbols);
         freefile(content);
     }
@@ -116,8 +120,10 @@ size_t pr(struct inclist *ip, char *file, char *base)
     len = (int)strlen(ip->i_file)+4;
     if (file != lastfile) {
         lastfile = file;
+        SAL_WNODEPRECATED_DECLARATIONS_PUSH /* sprintf (macOS 13 SDK) */
         sprintf(buf, "\n%s%s%s: \\\n %s", objprefix, base, objsuffix,
             ip->i_file);
+        SAL_WNODEPRECATED_DECLARATIONS_POP
         len = (int)strlen(buf);
     }
     else {

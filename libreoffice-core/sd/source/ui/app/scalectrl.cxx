@@ -22,7 +22,7 @@
 #include <vcl/commandevent.hxx>
 #include <vcl/status.hxx>
 #include <vcl/weldutils.hxx>
-#include <sfx2/dispatch.hxx>
+#include <sfx2/bindings.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <svl/stritem.hxx>
 #include <sfx2/sfxsids.hrc>
@@ -50,6 +50,11 @@ void SdScaleControl::StateChangedAtStatusBarControl(sal_uInt16 /*nSID*/, SfxItem
     if (eState != SfxItemState::DEFAULT || pState->IsVoidItem())
         return;
     auto pStringItem = dynamic_cast<const SfxStringItem*>(pState);
+    if (!pStringItem)
+    {
+        SAL_WARN("sd", "Item wasn't a SfxStringItem");
+        return;
+    }
     GetStatusBar().SetItemText(GetId(), pStringItem->GetValue());
 }
 

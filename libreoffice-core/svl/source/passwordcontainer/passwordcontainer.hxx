@@ -19,6 +19,7 @@
 #ifndef INCLUDED_SVL_SOURCE_PASSWORDCONTAINER_PASSWORDCONTAINER_HXX
 #define INCLUDED_SVL_SOURCE_PASSWORDCONTAINER_PASSWORDCONTAINER_HXX
 
+#include <utility>
 #include <vector>
 #include <map>
 #include <optional>
@@ -73,19 +74,19 @@ class NamePasswordRecord
 
 public:
 
-    NamePasswordRecord( const OUString& aName )
-        : m_aName( aName )
+    NamePasswordRecord( OUString aName )
+        : m_aName(std::move( aName ))
         , m_bHasMemoryPasswords( false )
         , m_bHasPersistentPassword( false )
     {
     }
 
-    NamePasswordRecord( const OUString& aName, const OUString& aPersistentList, const OUString& aPersistentIV )
-        : m_aName( aName )
+    NamePasswordRecord( OUString aName, OUString aPersistentList, OUString aPersistentIV )
+        : m_aName(std::move( aName ))
         , m_bHasMemoryPasswords( false )
         , m_bHasPersistentPassword( true )
-        , m_aPersistentPassword( aPersistentList )
-        , m_aPersistentIV( aPersistentIV )
+        , m_aPersistentPassword(std::move( aPersistentList ))
+        , m_aPersistentIV(std::move( aPersistentIV ))
     {
     }
 
@@ -316,10 +317,10 @@ private:
                               const css::uno::Reference< css::task::XInteractionHandler >& Handler );
 
     /// @throws css::uno::RuntimeException
-    static ::std::vector< OUString > DecodePasswords( const OUString& aLine, const OUString& aIV, const OUString& aMasterPassword, css::task::PasswordRequestMode mode );
+    static ::std::vector< OUString > DecodePasswords( std::u16string_view aLine, std::u16string_view aIV, std::u16string_view aMasterPassword, css::task::PasswordRequestMode mode );
 
     /// @throws css::uno::RuntimeException
-    static OUString EncodePasswords(const std::vector< OUString >& lines, const OUString& aIV, const OUString& aMasterPassword );
+    static OUString EncodePasswords(const std::vector< OUString >& lines, std::u16string_view aIV, std::u16string_view aMasterPassword );
 
 public:
     PasswordContainer( const css::uno::Reference< css::uno::XComponentContext >& );

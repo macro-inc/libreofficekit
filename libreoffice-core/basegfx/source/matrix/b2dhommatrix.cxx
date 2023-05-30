@@ -82,7 +82,7 @@ namespace basegfx
 
     bool B2DHomMatrix::isIdentity() const
     {
-        return mpImpl->isIdentity();
+        return mpImpl.same_object(DEFAULT) || mpImpl->isIdentity();
     }
 
     void B2DHomMatrix::identity()
@@ -103,12 +103,12 @@ namespace basegfx
         }
 
         Impl2DHomMatrix aWork(*mpImpl);
-        std::unique_ptr<sal_uInt16[]> pIndex( new sal_uInt16[Impl2DHomMatrix_Base::getEdgeLength()] );
+        sal_uInt16* pIndex = static_cast<sal_uInt16*>(alloca( sizeof(sal_uInt16) * Impl2DHomMatrix_Base::getEdgeLength() ));
         sal_Int16 nParity;
 
-        if(aWork.ludcmp(pIndex.get(), nParity))
+        if(aWork.ludcmp(pIndex, nParity))
         {
-            mpImpl->doInvert(aWork, pIndex.get());
+            mpImpl->doInvert(aWork, pIndex);
             return true;
         }
 

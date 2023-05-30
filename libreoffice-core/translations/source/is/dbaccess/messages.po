@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-02-01 10:35+0000\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
+"PO-Revision-Date: 2023-02-02 12:18+0000\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>\n"
 "Language-Team: Icelandic <https://translations.documentfoundation.org/projects/libo_ui-master/dbaccessmessages/is/>\n"
 "Language: is\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1563517570.000000\n"
 
 #. BiN6g
@@ -1895,11 +1895,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "Slóð á töflureikniskjalið"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "Heiti ODBC gagnagjafans á kerfinu þínu"
+msgid "Name of the ODBC data source"
+msgstr "Heiti ODBC-gagnagjafans"
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -1911,7 +1911,7 @@ msgstr "Slóð á Writer-skjalið"
 #: dbaccess/inc/strings.hrc:335
 msgctxt "STR_MYSQL_DATABASE_NAME"
 msgid "Name of the MySQL/MariaDB database"
-msgstr ""
+msgstr "Nafn MySQL/MariaDB gagnagrunns"
 
 #. uhRMQ
 #: dbaccess/inc/strings.hrc:336
@@ -2101,7 +2101,7 @@ msgstr "Setja upp Oracle gagnagrunnstengingu"
 #: dbaccess/inc/strings.hrc:368
 msgctxt "STR_PAGETITLE_MYSQL"
 msgid "Set up MySQL/MariaDB connection"
-msgstr ""
+msgstr "Setja upp MySQL/MariaDB tengingu"
 
 #. uJuNs
 #: dbaccess/inc/strings.hrc:369
@@ -2125,7 +2125,7 @@ msgstr "Setja upp auðkenningu notanda"
 #: dbaccess/inc/strings.hrc:372
 msgctxt "STR_PAGETITLE_MYSQL_NATIVE"
 msgid "Set up MySQL/MariaDB server data"
-msgstr ""
+msgstr "Setja upp MySQL/MariaDB netþjónstengingu"
 
 #. 6Fy7C
 #: dbaccess/inc/strings.hrc:373
@@ -2143,7 +2143,7 @@ msgstr "Nýr gagnagrunnur"
 #: dbaccess/inc/strings.hrc:375
 msgctxt "STR_MYSQLJDBC_HEADERTEXT"
 msgid "Set up connection to a MySQL/MariaDB database using JDBC"
-msgstr ""
+msgstr "Setja upp tengingu við MySQL/MariaDB gagnagrunn með JDBC"
 
 #. tqpeM
 #: dbaccess/inc/strings.hrc:376
@@ -2152,12 +2152,14 @@ msgid ""
 "Please enter the required information to connect to a MySQL/MariaDB database using JDBC. Note that a JDBC driver class must be installed on your system and registered with %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
+"Sláðu inn nauðsynlegar upplýsingar til að tengjast við MySQL/MariaDB gagnagrunn með JDBC. Athugaðu að JDBC rekill þarf að vera uppsettur í kerfinu og skráður í %PRODUCTNAME.\n"
+"Hafðu samband við kerfisstjóra ef þú ert ekki viss um eftirfarandi stillingar."
 
 #. Lrd3G
 #: dbaccess/inc/strings.hrc:377
 msgctxt "STR_MYSQL_DRIVERCLASSTEXT"
 msgid "MySQL/MariaDB JDBC d~river class:"
-msgstr ""
+msgstr "MySQL/MariaDB JDBC ~reklaflokkur:"
 
 #. cBiSe
 #: dbaccess/inc/strings.hrc:378
@@ -2225,22 +2227,22 @@ msgstr ""
 "Smelltu á 'Velja' til að stilla sérsniðnar stillingar.\n"
 "Hafðu samband við kerfisstjóra ef þú ert ekki viss um eftirfarandi stillingar."
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "Setja upp tengingu við ODBC gagnagrunn"
+msgid "Set up a connection to an ODBC data source"
+msgstr "Setja upp tengingu við ODBC gagnagjafa"
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"Sláðu inn nafnið á ODBC gagnagrunninum sem þú vilt tengjast við.\n"
-"Smelltu á 'Velja...' til að velja ODBC gagnagrunn sem er þegar skráður í %PRODUCTNAME.\n"
+"Settu inn nafnið á ODBC gagnagjafann sem þú vilt nota.\n"
+"Smelltu á 'Velja...' til að velja ODBC-gagnagjafa sem er þegar skráður í %PRODUCTNAME.\n"
 "Hafðu samband við kerfisstjóra ef þú ert ekki viss um eftirfarandi stillingar."
 
 #. dmi7n
@@ -2423,158 +2425,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "Upplýsingar"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr "Bæta við notanda"
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr "Eyða notanda"
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr "Breyta lykilorði"
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "Viltu örugglega eyða notandanum?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "Gagnagrunnurinn styður ekki notendastjórnun."
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "Lykilorðin stemma ekki. Settu þau aftur inn."
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "Athugaðu að sumir gagnagrunnar styðja ekki þessa tegund töflutengingar."
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "Inniheldur aðeins færslur þar sem gildi í tengdum sviðum fyrir báðar töflur eru eins."
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "Inniheldur ALLAR færslur frá töflu '%1' en aðeins færslur frá töflu '%2' þar sem gildi í tengdum sviðum passa."
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "Inniheldur ALLAR færslur frá '%1' og með '%2'."
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr "Inniheldur mengjamargfeldi ALLRA færslna frá '%1' og með '%2'."
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr "Viðtökugrunnur styður ekki sýnir."
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr "Viðtökugrunnur styður ekki aðallykla."
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr "fann ekki upplýsingar fyrir gögn, eða það fundust ekki nægjanlegar upplýsingar fyrir gögn"
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr "Aðeins töflur og fyrirspurnir eru studdar eins og er."
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr "Viðtökustaður afrits verður að styðja við bókamerki."
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr "Ekki er stutt við dálka tegund ($type$) í dálki $pos$."
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr "Óleyfilegur fjöldi af frumstillingarbreytum."
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr "Villa kom upp við frumstillingu."
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr "Óstuddur eiginleiki í lýsingu viðtökustaðar: $name$."
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr "Til að geta afritað fyrirspurn, verður tengingin að styðja við fyrirspurnir."
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr "Uppgefið handfang víxlverkunar er ógilt."
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr "Töfluvenslin eru þegar til staðar. Viltu breyta þeim eða búa til ný?"
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "Breyta..."
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "Búa til..."
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " - %PRODUCTNAME Base: Gerð töfluvensla"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "Gagnagrunnurinn styður ekki töfluvensl."
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "Þegar þý eyðir þessari töflu, verður öllum tengdum töfluvenslum eytt í leiðinni. Halda áfram?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2803,7 +2823,7 @@ msgstr "_Breidd:"
 #: dbaccess/uiconfig/ui/colwidthdialog.ui:118
 msgctxt "colwidthdialog|extended_tip|value"
 msgid "Enter the column width that you want to use."
-msgstr ""
+msgstr "Settu inn dálkbreiddina sem þú vilt nota."
 
 #. LtAmr
 #: dbaccess/uiconfig/ui/colwidthdialog.ui:129
@@ -2824,67 +2844,67 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr ""
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Slóð á dBASE skrárnar:"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr "_Búa til nýtt"
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "_Velja…"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "Almennt"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "_Notandanafn:"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "Lykilorð nauðsynlegt"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "Sannvottun notanda"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "_JDBC reklaklassi:"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "Prufuklassi"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "JDBC eiginleikar"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
 msgstr "Prófa tengingu"
@@ -3022,19 +3042,19 @@ msgid "label"
 msgstr "skýring"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Slóð á dBASE skrárnar:"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr "_Búa til nýtt"
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Velja…"
@@ -3077,19 +3097,19 @@ msgstr "Hvernig viltu tengjast við MySQL gagnagrunninn?"
 #: dbaccess/uiconfig/ui/dbwizmysqlintropage.ui:128
 msgctxt "dbwizmysqlintropage|header"
 msgid "Set Up a Connection to a MySQL/MariaDB Database"
-msgstr ""
+msgstr "Setja upp tengingu við MySQL/MariaDB gagnagrunn"
 
 #. 3cSEi
 #: dbaccess/uiconfig/ui/dbwizmysqlnativepage.ui:35
 msgctxt "dbwizmysqlnativepage|helptext"
 msgid "Please enter the required information to connect to a MySQL/MariaDB database."
-msgstr ""
+msgstr "Settu inn nauðsynlegar upplýsingar til að tengjast MySQL/MariaDB gagnagrunni."
 
 #. 4uetU
 #: dbaccess/uiconfig/ui/dbwizmysqlnativepage.ui:70
 msgctxt "dbwizmysqlnativepage|header"
 msgid "Set Up a Connection to a MySQL/MariaDB Database"
-msgstr ""
+msgstr "Setja upp tengingu við MySQL/MariaDB gagnagrunn"
 
 #. AEty7
 #: dbaccess/uiconfig/ui/dbwizspreadsheetpage.ui:55
@@ -3161,7 +3181,7 @@ msgstr "S_kipun sem á að keyra:"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:134
 msgctxt "directsqldialog|directsql"
 msgid "Run SQL command _directly"
-msgstr ""
+msgstr "Keyra SQL-fyrirspurn beint"
 
 #. dAffv
 #: dbaccess/uiconfig/ui/directsqldialog.ui:142
@@ -3221,7 +3241,7 @@ msgstr "Staða"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:304
 msgctxt "directsqldialog|extended_tip|output"
 msgid "Displays the results of the SQL command that you ran."
-msgstr ""
+msgstr "Birtir niðurstöður SQL-skipunarinnar sem þú keyrðir."
 
 #. DYZA5
 #: dbaccess/uiconfig/ui/directsqldialog.ui:315
@@ -3659,25 +3679,25 @@ msgid "Path to the dBASE files:"
 msgstr "Slóð á dBASE skrárnar:"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr "_Búa til nýtt"
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Velja…"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "JDBC _reklaklassi:"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
 msgstr "_Prufuklassi"
@@ -4640,13 +4660,13 @@ msgstr ""
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:24
 msgctxt "specialjdbcconnectionpage|header"
 msgid "Set up connection to a MySQL/MariaDB database using JDBC"
-msgstr ""
+msgstr "Setja upp tengingu við MySQL/MariaDB gagnagrunn með JDBC"
 
 #. EVDCG
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:39
 msgctxt "specialjdbcconnectionpage|helpLabel"
 msgid "Please enter the required information to connect to a MySQL/MariaDB database using JDBC. Note that a JDBC driver class must be installed on your system and registered with %PRODUCTNAME. Please contact your system administrator if you are unsure about the following settings. "
-msgstr ""
+msgstr "Settu inn nauðsynlegar upplýsingar til að tengjast við MySQL/MariaDB gagnagrunn með JDBC. Athugaðu að JDBC-rekill þarf að vera uppsettur í kerfinu og skráður í %PRODUCTNAME. Hafðu samband við kerfisstjóra ef þú ert ekki viss um eftirfarandi stillingar. "
 
 #. GchzZ
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:64
@@ -4676,7 +4696,7 @@ msgstr "Sjálfgefið: 3306"
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:188
 msgctxt "specialjdbcconnectionpage|jdbcDriverLabel"
 msgid "MySQL/MariaDB JDBC d_river class:"
-msgstr ""
+msgstr "MySQL/MariaDB JDBC reklaklassi:"
 
 #. 8oG6P
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:212
@@ -5195,37 +5215,25 @@ msgid "User Settings"
 msgstr "Notandastillingar"
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "N_otandi:"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "_Bæta við notanda..."
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "Breyta _lykilorði..."
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "_Eyða notanda..."
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr ""
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "Val notanda"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"
 msgstr "Aðgangsheimildir fyrir valinn notanda"

@@ -38,7 +38,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <defnamesbuffer.hxx>
 #include <pivotcachefragment.hxx>
 #include <sheetdatabuffer.hxx>
@@ -245,7 +245,16 @@ OUString PivotCacheItem::getFormattedName(const ScDPSaveDimension& rSaveDim, ScD
         case XML_n: return pObj->GetFormattedString(rSaveDim.GetName(), maValue.get<double>());
         case XML_i: return pObj->GetFormattedString(rSaveDim.GetName(), static_cast<double>(maValue.get< sal_Int32 >()));
         case XML_b: return pObj->GetFormattedString(rSaveDim.GetName(), static_cast<double>(maValue.get< bool >()));
-        case XML_d: return pObj->GetFormattedString(rSaveDim.GetName(), maValue.get< css::util::DateTime >() - rNullDate);
+        case XML_d:
+        {
+            css::util::DateTime aDateTime(maValue.get< css::util::DateTime >());
+            if (aDateTime.Year == 0)
+            {
+                SAL_WARN("sc", "PivotCacheField::getFormattedName - invalid date");
+                return OUString();
+            }
+            return pObj->GetFormattedString(rSaveDim.GetName(), aDateTime - rNullDate);
+        }
         case XML_e: return maValue.get< OUString >();
     }
     OSL_FAIL( "PivotCacheItem::getFormattedName - invalid data type" );

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: UI\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-07-08 10:43+0000\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-02-13 07:33+0000\n"
 "Last-Translator: bormant <bormant@mail.ru>\n"
 "Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/ru/>\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1564293093.000000\n"
 
 #. W5ukN
@@ -474,7 +474,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Flip Vertically"
-msgstr "Отразить по вертикали"
+msgstr "Отразить вертикально"
 
 #. wZRbB
 #: CalcCommands.xcu
@@ -494,7 +494,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Flip Horizontally"
-msgstr "Отразить по горизонтали"
+msgstr "Отразить горизонтально"
 
 #. wFQNy
 #: CalcCommands.xcu
@@ -984,7 +984,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Status Expanded Selection"
-msgstr "Состояние добавляемого выделения"
+msgstr "Состояние добавляемого выбора"
 
 #. dQf2r
 #: CalcCommands.xcu
@@ -994,7 +994,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Status Extended Selection"
-msgstr "Состояние расширяемого выделения"
+msgstr "Состояние расширяемого выбора"
 
 #. z5DTT
 #: CalcCommands.xcu
@@ -1254,7 +1254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Go to Sheet..."
-msgstr ""
+msgstr "Перейти к листу..."
 
 #. 79aNB
 #: CalcCommands.xcu
@@ -1394,7 +1394,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Conditional Formatting: Color Scale"
-msgstr "Условное форматирование: Цветотвая шкала"
+msgstr "Условное форматирование: Цветовая шкала"
 
 #. bkSZz
 #: CalcCommands.xcu
@@ -1494,7 +1494,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Undo Selection"
-msgstr "Отменить выделение"
+msgstr "Отменить выбор"
 
 #. mwULt
 #: CalcCommands.xcu
@@ -2074,7 +2074,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Z-test..."
-msgstr "Z-тест..."
+msgstr "Z-критерий..."
 
 #. EXRQ8
 #: CalcCommands.xcu
@@ -2104,17 +2104,17 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Sparklines"
-msgstr ""
+msgstr "Спарклайны"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr ""
+msgid "Sparkline..."
+msgstr "Спарклайн..."
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -2124,7 +2124,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Удалить спарклайн"
 
 #. fFsYi
 #: CalcCommands.xcu
@@ -2134,7 +2134,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Удалить группу спарклайнов"
 
 #. w6VdZ
 #: CalcCommands.xcu
@@ -2144,7 +2144,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Сгруппировать спарклайны"
 
 #. 9pmpG
 #: CalcCommands.xcu
@@ -2154,7 +2154,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Разгруппировать спарклайны"
 
 #. MRK2s
 #: CalcCommands.xcu
@@ -2164,7 +2164,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline..."
-msgstr ""
+msgstr "Править спарклайн..."
 
 #. cA9mm
 #: CalcCommands.xcu
@@ -2174,7 +2174,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Sparkline Group..."
-msgstr ""
+msgstr "Править группу спарклайнов..."
 
 #. dTXDB
 #: CalcCommands.xcu
@@ -2244,7 +2244,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Record Track Changes"
-msgstr "Отслеживать изменения"
+msgstr "Записывать исправления"
 
 #. MAuGe
 #: CalcCommands.xcu
@@ -2264,7 +2264,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show Track Changes"
-msgstr "Показать изменения"
+msgstr "Показать исправления"
 
 #. Cs6vq
 #: CalcCommands.xcu
@@ -2394,7 +2394,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Value ~Highlighting"
-msgstr "Выделение значений цветом"
+msgstr "Подсветка значений"
 
 #. XMuyF
 #: CalcCommands.xcu
@@ -2404,7 +2404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show Hidden Row/Column Indicator"
-msgstr ""
+msgstr "Показ индикатора скрытых строк/столбцов"
 
 #. nZGvm
 #: CalcCommands.xcu
@@ -2414,7 +2414,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Hidden Row/Column Indicator"
-msgstr ""
+msgstr "Индикатор скрытых строк/столбцов"
 
 #. PMfQA
 #: CalcCommands.xcu
@@ -2424,7 +2424,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show the indicator for hidden rows and columns"
-msgstr ""
+msgstr "Отображение индикатора скрытых строк и столбцов"
 
 #. 2TbE2
 #: CalcCommands.xcu
@@ -2454,7 +2454,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Page Break"
-msgstr "Разметка страниц"
+msgstr "Разрыв страницы"
 
 #. 5cx7F
 #: CalcCommands.xcu
@@ -2534,7 +2534,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert Track Change Comment"
-msgstr "Комментировать изменение"
+msgstr "Комментировать исправление"
 
 #. zVBGm
 #: CalcCommands.xcu
@@ -3444,7 +3444,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Recalculate Hard"
-msgstr "Безусловное новое вычисление"
+msgstr "Пересчитать безусловно"
 
 #. zPLSW
 #: CalcCommands.xcu
@@ -3724,7 +3724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select All Sheets"
-msgstr "Выделить все листы"
+msgstr "Выбрать все листы"
 
 #. B8gwQ
 #: CalcCommands.xcu
@@ -3734,7 +3734,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Deselect All Sheets"
-msgstr "Снять выделение"
+msgstr "Снять выбор всех листов"
 
 #. 4JjmY
 #: CalcCommands.xcu
@@ -3814,7 +3814,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Center Vertically"
-msgstr "Центрировать по вертикали"
+msgstr "Центрировать вертикально"
 
 #. SsaBA
 #: CalcCommands.xcu
@@ -4644,7 +4644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste Transposed"
-msgstr "Вставить транспонировано"
+msgstr "Вставить с транспонированием"
 
 #. EbDtX
 #: CalcCommands.xcu
@@ -5254,7 +5254,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. uoFEw
 #: CalcWindowState.xcu
@@ -5434,7 +5434,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. dbAAf
 #: CalcWindowState.xcu
@@ -5464,7 +5464,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Insert Cell"
-msgstr "Вставка ячеек"
+msgstr "Вставка ячейки"
 
 #. wg8x7
 #: CalcWindowState.xcu
@@ -5734,7 +5734,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Data Labels..."
-msgstr "Подпись данных..."
+msgstr "Подписи данных..."
 
 #. 3K7RZ
 #: ChartCommands.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "Полосы погрешностей Y..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Таблица данных..."
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -5784,7 +5794,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Format Selection..."
-msgstr "Формат выделения..."
+msgstr "Формат выбранного..."
 
 #. 2Mrjz
 #: ChartCommands.xcu
@@ -5904,7 +5914,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Main Title..."
-msgstr "Главное заглавие..."
+msgstr "Основное заглавие..."
 
 #. d6BoL
 #: ChartCommands.xcu
@@ -6536,6 +6546,26 @@ msgctxt ""
 msgid "Format Single Data Label..."
 msgstr "Формат отдельной подписи к данным..."
 
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Вставить таблицу данных"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Удалить таблицу данных"
+
 #. 3wU84
 #: ChartCommands.xcu
 msgctxt ""
@@ -6624,7 +6654,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Scale Text"
-msgstr "Масштаб текстов"
+msgstr "Масштаб текста"
 
 #. XYByv
 #: ChartCommands.xcu
@@ -6654,7 +6684,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Legend On/Off"
-msgstr "Показать/спрятать легенду"
+msgstr "Легенда вкл./выкл."
 
 #. 2SGzu
 #: ChartCommands.xcu
@@ -7004,7 +7034,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Query Design"
-msgstr "Конструктор запросов"
+msgstr "Дизайн запроса"
 
 #. wCjhb
 #: DbRelationWindowState.xcu
@@ -7164,7 +7194,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Index Design..."
-msgstr "Проектирование индекса..."
+msgstr "Дизайн индекса..."
 
 #. 77E5a
 #: DbuCommands.xcu
@@ -7174,7 +7204,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Switch Design View On/Off"
-msgstr "Вкл./выкл. вид дизайна"
+msgstr "Режим дизайна вкл./выкл."
 
 #. Bs2Ez
 #: DbuCommands.xcu
@@ -7214,7 +7244,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distinct Values"
-msgstr "Однозначные значения"
+msgstr "Уникальные значения"
 
 #. GTG6x
 #: DbuCommands.xcu
@@ -7284,7 +7314,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit in SQL View..."
-msgstr "Редактировать в режиме SQL..."
+msgstr "Правка в режиме SQL..."
 
 #. un9aP
 #: DbuCommands.xcu
@@ -7554,7 +7584,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select All"
-msgstr "Выделить всё"
+msgstr "Выбрать всё"
 
 #. M32AD
 #: DbuCommands.xcu
@@ -7694,7 +7724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Query (Design View)..."
-msgstr "Запрос (дизайн)..."
+msgstr "Запрос (режим дизайна)..."
 
 #. AenSc
 #: DbuCommands.xcu
@@ -7714,7 +7744,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Query (SQL View)..."
-msgstr "Запрос (SQL)..."
+msgstr "Запрос (режим SQL)..."
 
 #. mBDrN
 #: DbuCommands.xcu
@@ -7804,7 +7834,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "User Administration..."
-msgstr "Управление пользователями..."
+msgstr "Администрирование пользователей..."
 
 #. ErGeE
 #: DbuCommands.xcu
@@ -8324,7 +8354,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Gluepoint Relative"
-msgstr "Относительная"
+msgstr "Относительная точка"
 
 #. XbDqq
 #: DrawImpressCommands.xcu
@@ -8664,7 +8694,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "M~aster Notes"
-msgstr "Мастер-примечание"
+msgstr "Мастер-примечаний"
 
 #. 5jAWW
 #: DrawImpressCommands.xcu
@@ -9024,7 +9054,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "In 3D Rotation Object"
-msgstr "В 3D-тело вращения"
+msgstr "В тело вращения"
 
 #. CEphF
 #: DrawImpressCommands.xcu
@@ -9184,7 +9214,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Connectors"
-msgstr "Соединители"
+msgstr "Соединительные линии"
 
 #. GFbAp
 #: DrawImpressCommands.xcu
@@ -9214,7 +9244,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Vertically"
-msgstr "По вертикали"
+msgstr "Вертикально"
 
 #. VSNvw
 #: DrawImpressCommands.xcu
@@ -9224,7 +9254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Horizontally"
-msgstr "По горизонтали"
+msgstr "Горизонтально"
 
 #. WbFWT
 #: DrawImpressCommands.xcu
@@ -9424,7 +9454,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Allow Interaction"
-msgstr "Разрешить действие по щелчку мыши"
+msgstr "Разрешить взаимодействие"
 
 #. QFLsR
 #: DrawImpressCommands.xcu
@@ -9444,7 +9474,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Interaction..."
-msgstr "Де~йствие по щелчку мыши..."
+msgstr "Взаимоде~йствие..."
 
 #. eYLQW
 #: DrawImpressCommands.xcu
@@ -9454,7 +9484,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "E~xecute Interaction..."
-msgstr "Выполнить действие..."
+msgstr "Выполнить взаимодействие..."
 
 #. TNj5u
 #: DrawImpressCommands.xcu
@@ -9474,7 +9504,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Master Page..."
-msgstr "Шаблон страницы..."
+msgstr "Мастер-страница..."
 
 #. RxHFo
 #: DrawImpressCommands.xcu
@@ -9674,7 +9704,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Transformations"
-msgstr "Преобразования"
+msgstr "Трансформации"
 
 #. KLDYE
 #: DrawImpressCommands.xcu
@@ -10114,7 +10144,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Snap to Snap Guides"
-msgstr "Прилипать к направляющим"
+msgstr "Привязка к направляющим"
 
 #. Fkqc6
 #: DrawImpressCommands.xcu
@@ -10694,7 +10724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Rows Evenly"
-msgstr ""
+msgstr "Выровнять высоту строк"
 
 #. tjGQ2
 #: DrawImpressCommands.xcu
@@ -11414,7 +11444,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Title, 2 Vertical Text, Clipart"
-msgstr "Заглавие, вертикальный текст, картинка коллекции"
+msgstr "Заглавие, 2 вертикальных текста, картинка коллекции"
 
 #. 3EaGa
 #: DrawImpressCommands.xcu
@@ -11504,7 +11534,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export Redacted PDF (Black)"
-msgstr ""
+msgstr "Экспорт редактуры PDF (чёрный)"
 
 #. r924M
 #: DrawImpressCommands.xcu
@@ -11514,7 +11544,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export Redacted PDF (White)"
-msgstr ""
+msgstr "Экспорт редактуры PDF (белый)"
 
 #. NErRC
 #: DrawImpressCommands.xcu
@@ -11524,7 +11554,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export Preview PDF"
-msgstr ""
+msgstr "Экспорт просмотра PDF"
 
 #. sBp7W
 #: DrawImpressCommands.xcu
@@ -11534,7 +11564,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Shapes Deck"
-msgstr ""
+msgstr "Открыть панель «Фигуры»"
 
 #. SziV6
 #: DrawImpressCommands.xcu
@@ -11544,7 +11574,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Slide Transition Deck"
-msgstr ""
+msgstr "Открыть панель «Смена слайда»"
 
 #. DmUFe
 #: DrawImpressCommands.xcu
@@ -11554,7 +11584,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Custom Animation Deck"
-msgstr ""
+msgstr "Открыть панель «Настройки анимации»"
 
 #. H8jxa
 #: DrawImpressCommands.xcu
@@ -11564,7 +11594,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Master Slides Deck"
-msgstr ""
+msgstr "Открыть панель «Мастер-слайды»"
 
 #. ESt3w
 #: DrawWindowState.xcu
@@ -11734,7 +11764,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Multiple Selection"
-msgstr "Мультивыделение"
+msgstr "Мультивыбор"
 
 #. PAtdR
 #: DrawWindowState.xcu
@@ -11934,7 +11964,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Transformations"
-msgstr "Преобразования"
+msgstr "Трансформации"
 
 #. HtRmf
 #: DrawWindowState.xcu
@@ -11944,7 +11974,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Connectors"
-msgstr "Соединительная линия"
+msgstr "Соединительные линии"
 
 #. HW8ac
 #: DrawWindowState.xcu
@@ -12034,7 +12064,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. TaytU
 #: DrawWindowState.xcu
@@ -12044,7 +12074,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Gluepoints"
-msgstr "Точки соединений"
+msgstr "Точки соединения"
 
 #. 5SA3p
 #: DrawWindowState.xcu
@@ -12284,7 +12314,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Distribute Selection"
-msgstr "Распределить выделение"
+msgstr "Распределить выбранное"
 
 #. qQQAi
 #: Effects.xcu
@@ -13104,7 +13134,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Style Emphasis"
-msgstr "Выделение начертания"
+msgstr "Стилевой акцент"
 
 #. 87RH2
 #: Effects.xcu
@@ -14054,7 +14084,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Down"
-msgstr "вниз"
+msgstr "Вниз"
 
 #. xBFFG
 #: Effects.xcu
@@ -14134,7 +14164,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Up"
-msgstr "вверх"
+msgstr "Вверх"
 
 #. SUuzn
 #: Effects.xcu
@@ -14494,7 +14524,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Down"
-msgstr "вниз"
+msgstr "Вниз"
 
 #. DBt3p
 #: Effects.xcu
@@ -14504,7 +14534,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Up"
-msgstr "вверх"
+msgstr "Вверх"
 
 #. zxg2d
 #: Effects.xcu
@@ -16294,7 +16324,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Fontwork Alignment"
-msgstr "Выравнивание текстовых эффектов"
+msgstr "Выравнивание текстового эффекта"
 
 #. yZJce
 #: GenericCommands.xcu
@@ -18374,7 +18404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Find Values"
-msgstr ""
+msgstr "Найти в значениях"
 
 #. 9rvmc
 #: GenericCommands.xcu
@@ -18384,7 +18414,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Find text in values, to search in formulas use the dialog"
-msgstr ""
+msgstr "Поиск текста в значениях, для поиска в формулах используйте диалоговое окно"
 
 #. NCRsb
 #: GenericCommands.xcu
@@ -18474,7 +18504,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~What's This?"
-msgstr "Что это такое?"
+msgstr "Что это?"
 
 #. TBFsT
 #: GenericCommands.xcu
@@ -18554,7 +18584,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Align Left"
-msgstr "Выровнять влево"
+msgstr "По левому краю"
 
 #. JiDPE
 #: GenericCommands.xcu
@@ -18574,7 +18604,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Align Right"
-msgstr "Выровнять вправо"
+msgstr "По правому краю"
 
 #. yanFA
 #: GenericCommands.xcu
@@ -19606,7 +19636,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Points"
-msgstr "Изменить узлы"
+msgstr "Изменение геометрии"
 
 #. aEwRC
 #: GenericCommands.xcu
@@ -20096,7 +20126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Convert to Curve"
-msgstr "Конвертировать в кривую"
+msgstr "Преобразовать в кривую"
 
 #. KcWDe
 #: GenericCommands.xcu
@@ -20166,7 +20196,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Propert~ies..."
-msgstr "Свойства..."
+msgstr "Сво~йства..."
 
 #. jKBdE
 #: GenericCommands.xcu
@@ -20186,7 +20216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Up"
-msgstr ""
+msgstr "Поднять"
 
 #. J83AS
 #: GenericCommands.xcu
@@ -20196,7 +20226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs up one paragraph"
-msgstr ""
+msgstr "Переместить выбранные абзацы на один выше"
 
 #. GvBYt
 #: GenericCommands.xcu
@@ -20216,7 +20246,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Down"
-msgstr ""
+msgstr "Опустить"
 
 #. ZEVXU
 #: GenericCommands.xcu
@@ -20226,7 +20256,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Move selected paragraphs down one paragraph"
-msgstr ""
+msgstr "Переместить выбранные абзацы на один ниже"
 
 #. KQLPA
 #: GenericCommands.xcu
@@ -20256,7 +20286,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Promote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Повысить уровень структуры выбранных абзацев списка"
 
 #. 3WakF
 #: GenericCommands.xcu
@@ -20316,7 +20346,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Demote outline level of selected list paragraphs"
-msgstr ""
+msgstr "Понизить уровень структуры выбранных абзацев списка"
 
 #. BoAR5
 #: GenericCommands.xcu
@@ -20396,7 +20426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Image Control"
-msgstr "Графический элемент управления"
+msgstr "Изображение (ЭУ)"
 
 #. EDfVz
 #: GenericCommands.xcu
@@ -20556,7 +20586,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~New Style from Selection"
-msgstr "Создать стиль по выделению"
+msgstr "Создать стиль по выбранному"
 
 #. kk8gA
 #: GenericCommands.xcu
@@ -20706,7 +20736,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Tree Control"
-msgstr "Древовидный элемент управления"
+msgstr "Дерево (ЭУ)"
 
 #. ncarC
 #: GenericCommands.xcu
@@ -20716,7 +20746,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Hyperlink Control"
-msgstr "Вставить гиперссылку"
+msgstr "Гиперссылка (ЭУ)"
 
 #. 2rDGb
 #: GenericCommands.xcu
@@ -20736,7 +20766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Вставить объект OLE"
 
 #. gB86r
 #: GenericCommands.xcu
@@ -20746,7 +20776,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~OLE Object..."
-msgstr ""
+msgstr "Объект OLE..."
 
 #. zKjoT
 #: GenericCommands.xcu
@@ -20756,7 +20786,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Open dialog to insert OLE object"
-msgstr ""
+msgstr "Открыть диалоговое окно для вставки объекта OLE"
 
 #. 6B9a2
 #: GenericCommands.xcu
@@ -20796,7 +20826,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Hide Details"
-msgstr "Скрыть детали"
+msgstr "Скрыть подробности"
 
 #. gQ7DC
 #: GenericCommands.xcu
@@ -20816,7 +20846,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Show Details"
-msgstr "Показать детали"
+msgstr "Показать подробности"
 
 #. fe5CC
 #: GenericCommands.xcu
@@ -20896,7 +20926,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Character Highlighting Color (in Text Box and Shapes)"
-msgstr "Цвет подсветки символов (в текстовых объектах)"
+msgstr "Цвет подсветки символов (в «Текстовое поле и форма»)"
 
 #. SPsxZ
 #: GenericCommands.xcu
@@ -21006,7 +21036,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Ob~ject"
-msgstr ""
+msgstr "Объект OLE"
 
 #. o5DE2
 #: GenericCommands.xcu
@@ -21016,7 +21046,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Menu for editing or saving OLE objects"
-msgstr ""
+msgstr "Меню для редактирования или сохранения объектов OLE"
 
 #. WQPXj
 #: GenericCommands.xcu
@@ -21396,7 +21426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Text B~ox and Shape"
-msgstr ""
+msgstr "Текстовое поле и фигура"
 
 #. zFyfF
 #: GenericCommands.xcu
@@ -21736,7 +21766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "F~ontwork"
-msgstr "Эффекты"
+msgstr "Текстовые эффекты"
 
 #. AiLcR
 #: GenericCommands.xcu
@@ -21786,7 +21816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split Frame Horizontally"
-msgstr "Разделить фрейм по горизонтали"
+msgstr "Разделить фрейм горизонтально"
 
 #. kkTHb
 #: GenericCommands.xcu
@@ -21796,7 +21826,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split Frame Vertically"
-msgstr "Разделить фрейм по вертикали"
+msgstr "Разделить фрейм вертикально"
 
 #. 63whQ
 #: GenericCommands.xcu
@@ -21806,7 +21836,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split FrameSet Horizontally"
-msgstr "Разделить набор кадров по горизонтали"
+msgstr "Разделить набор кадров горизонтально"
 
 #. rnjzF
 #: GenericCommands.xcu
@@ -21816,7 +21846,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split FrameSet Vertically"
-msgstr "Разделить набор кадров по вертикали"
+msgstr "Разделить набор кадров вертикально"
 
 #. yFCL7
 #: GenericCommands.xcu
@@ -21946,7 +21976,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Merge Cells"
-msgstr ""
+msgstr "Объединить ячейки"
 
 #. ktF7K
 #: GenericCommands.xcu
@@ -21956,7 +21986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Split Cells..."
-msgstr ""
+msgstr "Разбить ячейки..."
 
 #. 2gYcx
 #: GenericCommands.xcu
@@ -22066,7 +22096,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select start and end arrowheads for lines."
-msgstr ""
+msgstr "Выберите стили стрелок начала и конца линий."
 
 #. FDhkx
 #: GenericCommands.xcu
@@ -22116,7 +22146,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Clone Formatting (double click for multi-selection)"
-msgstr "Копировать формат (двойной щелчок для мультивыделения)"
+msgstr "Копировать формат (двойной щелчок для мультивыбора)"
 
 #. Kx4N5
 #: GenericCommands.xcu
@@ -22198,26 +22228,6 @@ msgctxt ""
 msgid "Delete C~ontents..."
 msgstr "Удалить содержимое..."
 
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Эмодзи"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Вставить эмодзи"
-
 #. tEjpF
 #: GenericCommands.xcu
 msgctxt ""
@@ -22266,7 +22276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select ~All"
-msgstr "Выделить всё"
+msgstr "Выбрать всё"
 
 #. hZnKV
 #: GenericCommands.xcu
@@ -22286,7 +22296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select ~All"
-msgstr "Выделить всё"
+msgstr "Выбрать всё"
 
 #. qxfRr
 #: GenericCommands.xcu
@@ -22956,7 +22966,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Protect Track Changes"
-msgstr "Защитить изменения"
+msgstr "Защитить исправления"
 
 #. XGBrs
 #: GenericCommands.xcu
@@ -22966,7 +22976,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Protect Track Changes"
-msgstr "Защитить изменения"
+msgstr "Защитить исправления"
 
 #. 7u9EW
 #: GenericCommands.xcu
@@ -23036,7 +23046,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Flip Horizontally"
-msgstr "Отразить по горизонтали"
+msgstr "Отразить горизонтально"
 
 #. fvKEC
 #: GenericCommands.xcu
@@ -23046,7 +23056,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Flip Vertically"
-msgstr "Отразить по вертикали"
+msgstr "Отразить вертикально"
 
 #. LfGBn
 #: GenericCommands.xcu
@@ -23478,6 +23488,36 @@ msgctxt ""
 msgid "Toggle Automatic Spell Checking"
 msgstr "Переключить автопроверку орфографии"
 
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Автоматическая проверка доступности"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "Автоматическая проверка доступности"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Переключить автоматическую проверку доступности"
+
 #. 4DCmg
 #: GenericCommands.xcu
 msgctxt ""
@@ -23896,7 +23936,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Customi~ze..."
-msgstr "Модификация..."
+msgstr "Настройка..."
 
 #. 9W7qD
 #: GenericCommands.xcu
@@ -24056,7 +24096,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Import BASIC..."
-msgstr ""
+msgstr "Импорт BASIC..."
 
 #. zCkAf
 #: GenericCommands.xcu
@@ -24066,7 +24106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export BASIC..."
-msgstr ""
+msgstr "Экспорт BASIC..."
 
 #. jA2bd
 #: GenericCommands.xcu
@@ -24076,7 +24116,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export Dialog..."
-msgstr ""
+msgstr "Экспорт диалога..."
 
 #. wcyCu
 #: GenericCommands.xcu
@@ -24086,7 +24126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Import Dialog..."
-msgstr ""
+msgstr "Импорт диалога..."
 
 #. mkYcT
 #: GenericCommands.xcu
@@ -24246,7 +24286,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. Vzi7P
 #: GenericCommands.xcu
@@ -24336,7 +24376,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Table Control"
-msgstr "Таблица"
+msgstr "Таблица (ЭУ)"
 
 #. uxkbv
 #: GenericCommands.xcu
@@ -24436,7 +24476,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "New Record"
-msgstr "Добавить запись"
+msgstr "Создать запись"
 
 #. FEFre
 #: GenericCommands.xcu
@@ -24516,7 +24556,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Toggle Design Mode"
-msgstr "Переключить режим разработки"
+msgstr "Переключить режим дизайна"
 
 #. RmQXs
 #: GenericCommands.xcu
@@ -24526,7 +24566,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Design Mode"
-msgstr "Режим разработки"
+msgstr "Режим дизайна"
 
 #. QESE8
 #: GenericCommands.xcu
@@ -24536,7 +24576,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Design Mode On/Off"
-msgstr "Режим разработки"
+msgstr "Режим дизайна"
 
 #. HDwoF
 #: GenericCommands.xcu
@@ -24766,7 +24806,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open in Design Mode"
-msgstr "Открывать в режиме разработки"
+msgstr "Открыть в режиме дизайна"
 
 #. NQ2cX
 #: GenericCommands.xcu
@@ -24776,7 +24816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Image Control"
-msgstr "Графический элемент управления"
+msgstr "Изображение (ЭУ)"
 
 #. yx6TJ
 #: GenericCommands.xcu
@@ -25076,7 +25116,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Replace with Label Field"
-msgstr "Заменить Меткой"
+msgstr "Заменить меткой"
 
 #. zi9Vz
 #: GenericCommands.xcu
@@ -25186,7 +25226,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Replace with Currency Field"
-msgstr "Поле валюты"
+msgstr "Заменить полем валюты"
 
 #. eqjJi
 #: GenericCommands.xcu
@@ -25206,7 +25246,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Replace with Image Control"
-msgstr "Заменить графическим элементом управления"
+msgstr "Заменить изображением (ЭУ)"
 
 #. wdUiA
 #: GenericCommands.xcu
@@ -25606,7 +25646,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete All Comments by This Author"
-msgstr "Удалить все коментарии автора"
+msgstr "Удалить все комментарии автора"
 
 #. RJXW9
 #: GenericCommands.xcu
@@ -25696,7 +25736,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Center Vertically"
-msgstr "Центрировать по вертикали"
+msgstr "Центрировать вертикально"
 
 #. WEKEP
 #: GenericCommands.xcu
@@ -25776,7 +25816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Date Picker Content Control"
-msgstr "Элемент управления Календарь"
+msgstr "Календарь (ЭУС)"
 
 #. Pm6tv
 #: GenericCommands.xcu
@@ -25956,7 +25996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Character Font Position..."
-msgstr ""
+msgstr "Положение шрифта..."
 
 #. fZufx
 #: GenericCommands.xcu
@@ -25976,7 +26016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. SQ76T
 #: GenericCommands.xcu
@@ -26186,7 +26226,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Formatting Mark"
-msgstr "Символ форматирования"
+msgstr "Непечатаемый символ"
 
 #. FbCCL
 #: GenericCommands.xcu
@@ -26256,7 +26296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Anchor Menu"
-msgstr ""
+msgstr "Привязка"
 
 #. oNBG8
 #: GenericCommands.xcu
@@ -26276,7 +26316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Выбор привязки для объекта"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -26326,7 +26366,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Audio or ~Video..."
-msgstr "Видео и звук..."
+msgstr "Звук или видео..."
 
 #. jB3GF
 #: GenericCommands.xcu
@@ -26336,7 +26376,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert Audio or Video"
-msgstr "Вставить видео или звук"
+msgstr "Вставить звук или видео"
 
 #. PXy4s
 #: GenericCommands.xcu
@@ -26346,7 +26386,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Table Control"
-msgstr "Таблица"
+msgstr "Таблица (ЭУ)"
 
 #. 7wECp
 #: GenericCommands.xcu
@@ -26376,7 +26416,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert non-br~eaking hyphen"
-msgstr "Вставить неразрывный дефис"
+msgstr "Неразрывный дефис"
 
 #. FsR94
 #: GenericCommands.xcu
@@ -26386,7 +26426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert s~oft Hyphen"
-msgstr "Вставить мягкий перенос"
+msgstr "Мягкий перенос"
 
 #. B9WX3
 #: GenericCommands.xcu
@@ -26396,7 +26436,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert ~non-breaking space"
-msgstr "Вставить неразрывный пробел"
+msgstr "Неразрывный пробел"
 
 #. KZXXb
 #: GenericCommands.xcu
@@ -26406,7 +26446,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert N~arrow No-break Space"
-msgstr "Вставить узкий неразрывный пробел"
+msgstr "Неразрывный узкий пробел"
 
 #. txaEk
 #: GenericCommands.xcu
@@ -26476,7 +26516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Columns"
-msgstr ""
+msgstr "Удалить столбцы"
 
 #. AG4Qy
 #: GenericCommands.xcu
@@ -26486,7 +26526,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Columns"
-msgstr ""
+msgstr "Удалить столбцы"
 
 #. KxsdA
 #: GenericCommands.xcu
@@ -26496,7 +26536,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected columns"
-msgstr ""
+msgstr "Удалить выбранные столбцы"
 
 #. VL8Wa
 #: GenericCommands.xcu
@@ -26506,7 +26546,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Rows"
-msgstr ""
+msgstr "Удалить строки"
 
 #. uAPr9
 #: GenericCommands.xcu
@@ -26516,7 +26556,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Delete ~Rows"
-msgstr ""
+msgstr "Удалить строки"
 
 #. wjm8K
 #: GenericCommands.xcu
@@ -26526,7 +26566,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected rows"
-msgstr ""
+msgstr "Удалить выбранные строки"
 
 #. poXFa
 #: GenericCommands.xcu
@@ -26556,7 +26596,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "For Selection"
-msgstr "Для выделения"
+msgstr "Для выбранного"
 
 #. yhJF9
 #: GenericCommands.xcu
@@ -26566,7 +26606,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Language for Selection"
-msgstr "Язык для выделения"
+msgstr "Язык для выбранного"
 
 #. TbazQ
 #: GenericCommands.xcu
@@ -26766,7 +26806,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Give a label to identify an object"
-msgstr ""
+msgstr "Задайте метку для идентификации объекта"
 
 #. k5bGq
 #: GenericCommands.xcu
@@ -26786,7 +26826,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Add descriptions of non-text content (for accessibility)"
-msgstr ""
+msgstr "Добавление описаний нетекстового содержимого (для специальных возможностей)"
 
 #. YwMhY
 #: GenericCommands.xcu
@@ -26946,7 +26986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Open Local Copy"
-msgstr ""
+msgstr "Открыть локальную копию"
 
 #. 2YneU
 #: GenericCommands.xcu
@@ -26976,7 +27016,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Distribute Selection"
-msgstr "Распределить выделение"
+msgstr "Распределить выбранное"
 
 #. vDkBA
 #: GenericCommands.xcu
@@ -27156,7 +27196,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Graphic Size Check..."
-msgstr ""
+msgstr "Проверка размера графики..."
 
 #. ACwaJ
 #: GenericCommands.xcu
@@ -27166,7 +27206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Properties Deck"
-msgstr ""
+msgstr "Открыть панель «Свойства»"
 
 #. kHuni
 #: GenericCommands.xcu
@@ -27176,7 +27216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Styles Deck"
-msgstr ""
+msgstr "Открыть панель «Стили»"
 
 #. X4FoZ
 #: GenericCommands.xcu
@@ -27186,7 +27226,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Gallery Deck"
-msgstr ""
+msgstr "Открыть панель «Галерея»"
 
 #. e4JiP
 #: GenericCommands.xcu
@@ -27196,7 +27236,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Navigator Deck"
-msgstr ""
+msgstr "Открыть панель «Навигатор»"
 
 #. uaVMn
 #: ImpressWindowState.xcu
@@ -27356,7 +27396,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Multiple Selection"
-msgstr "Мультивыделение"
+msgstr "Мультивыбор"
 
 #. NAj9S
 #: ImpressWindowState.xcu
@@ -27516,7 +27556,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Transformations"
-msgstr "Преобразования"
+msgstr "Трансформации"
 
 #. U6A4Z
 #: ImpressWindowState.xcu
@@ -27536,7 +27576,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Connectors"
-msgstr "Соединительная линия"
+msgstr "Соединительные линии"
 
 #. bq2Yq
 #: ImpressWindowState.xcu
@@ -27606,7 +27646,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. 5sW2T
 #: ImpressWindowState.xcu
@@ -27866,7 +27906,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Gluepoints"
-msgstr "Точки соединений"
+msgstr "Точки соединения"
 
 #. HNeiC
 #: ImpressWindowState.xcu
@@ -27976,7 +28016,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Distribute Selection"
-msgstr "Распределить выделение"
+msgstr "Распределить выбранное"
 
 #. tpAhh
 #: MathCommands.xcu
@@ -28337,6 +28377,16 @@ msgctxt ""
 "value.text"
 msgid "~Others"
 msgstr "Прочее"
+
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Открыть панель Элементы"
 
 #. uXvss
 #: MathWindowState.xcu
@@ -28736,7 +28786,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select all Labels"
-msgstr "Выделить все подписи"
+msgstr "Выбрать все подписи"
 
 #. Hyu2G
 #: ReportCommands.xcu
@@ -29016,7 +29066,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Manage Changes"
-msgstr "Управление изменениями"
+msgstr "Управление исправлениями"
 
 #. rtuWS
 #: Sidebar.xcu
@@ -29036,7 +29086,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Elements"
-msgstr ""
+msgstr "Элементы"
 
 #. B4iFE
 #: Sidebar.xcu
@@ -29076,7 +29126,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Media Playback"
-msgstr "Воспроизведение"
+msgstr "Мультимедиа"
 
 #. VAX5E
 #: Sidebar.xcu
@@ -29176,7 +29226,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Properties"
-msgstr ""
+msgstr "Свойства"
 
 #. VwByE
 #: Sidebar.xcu
@@ -29186,7 +29236,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Elements"
-msgstr ""
+msgstr "Элементы"
 
 #. hKwDG
 #: Sidebar.xcu
@@ -29246,7 +29296,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Page"
-msgstr ""
+msgstr "Страница"
 
 #. E9FJB
 #: Sidebar.xcu
@@ -29426,7 +29476,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Manage Changes"
-msgstr "Управление изменениями"
+msgstr "Управление исправлениями"
 
 #. DC8Ky
 #: Sidebar.xcu
@@ -30136,7 +30186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Bibliography Entry..."
-msgstr "Элемент списка литературы..."
+msgstr "Библиографическая ссылка..."
 
 #. jxZGG
 #: WriterCommands.xcu
@@ -30266,7 +30316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Reject Track Change"
-msgstr "Отклонить изменение"
+msgstr "Отклонить исправление"
 
 #. ABbj4
 #: WriterCommands.xcu
@@ -30296,7 +30346,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Reject Track Change and select the next one"
-msgstr "Отклонить изменение и выбрать следующее"
+msgstr "Отклонить исправление и выбрать следующее"
 
 #. 4EvCQ
 #: WriterCommands.xcu
@@ -30346,7 +30396,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accept Track Change"
-msgstr "Принять изменение"
+msgstr "Принять исправление"
 
 #. E4nSp
 #: WriterCommands.xcu
@@ -30376,7 +30426,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accept Track Change and select the next one"
-msgstr "Принять изменение и выбрать следующее"
+msgstr "Принять исправление и выбрать следующее"
 
 #. TFCgf
 #: WriterCommands.xcu
@@ -30426,7 +30476,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Next Track Change"
-msgstr "Следующее изменение"
+msgstr "Следующее исправление"
 
 #. B7bo8
 #: WriterCommands.xcu
@@ -30446,7 +30496,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Previous Track Change"
-msgstr "Предыдущее изменение"
+msgstr "Предыдущее исправление"
 
 #. WWoqU
 #: WriterCommands.xcu
@@ -30486,7 +30536,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Record Track Changes"
-msgstr "Отслеживать изменения"
+msgstr "Записывать исправления"
 
 #. uTnAC
 #: WriterCommands.xcu
@@ -30496,7 +30546,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Track Changes Functions"
-msgstr "Показать панель изменений"
+msgstr "Показать панель исправлений"
 
 #. EuyGQ
 #: WriterCommands.xcu
@@ -30506,7 +30556,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show Track Changes Functions"
-msgstr "Показать панель изменений"
+msgstr "Показать панель исправлений"
 
 #. Qvz6V
 #: WriterCommands.xcu
@@ -30526,16 +30576,16 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show Track Changes"
-msgstr "Показать изменения"
+msgstr "Показать исправления"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
+msgid "Show Tracked ~Changes"
 msgstr "Показать изменения"
 
 #. sMgCx
@@ -30586,7 +30636,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show outline-folding buttons"
-msgstr ""
+msgstr "Кнопки сворачивания структуры"
 
 #. 4hvcy
 #: WriterCommands.xcu
@@ -30596,7 +30646,17 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
-msgstr ""
+msgstr "Показывает кнопку для управления сворачиванием и разворачиванием структуры рядом с заголовками и подзаголовками. Без кнопки выполнять сворачивание и разворачивание структуры можно с помощью навигатора."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Показать содержимое структуры до уровня..."
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30646,7 +30706,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert Track Change Comment"
-msgstr "Комментировать изменение"
+msgstr "Комментировать исправление"
 
 #. uoAny
 #: WriterCommands.xcu
@@ -30706,7 +30766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Bibliography Entry..."
-msgstr "Элемент списка литературы..."
+msgstr "Библиографическая ссылка..."
 
 #. SyBgc
 #: WriterCommands.xcu
@@ -30726,7 +30786,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Update ~Charts"
-msgstr ""
+msgstr "Обновить диаграммы"
 
 #. 46XYv
 #: WriterCommands.xcu
@@ -30756,7 +30816,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Control Properties"
-msgstr ""
+msgstr "Свойства ЭУС"
 
 #. npNpZ
 #: WriterCommands.xcu
@@ -30836,7 +30896,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Exchange Data~base..."
-msgstr "Активная база данных..."
+msgstr "Источник данных..."
 
 #. iuDxN
 #: WriterCommands.xcu
@@ -30926,7 +30986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Content Controls"
-msgstr ""
+msgstr "Элементы управления содержимым"
 
 #. isyh9
 #: WriterCommands.xcu
@@ -30936,7 +30996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Rich Text Content Control"
-msgstr ""
+msgstr "Вставить текст с форматированием (ЭУС)"
 
 #. GH8DZ
 #: WriterCommands.xcu
@@ -30946,7 +31006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Check Box Content Control"
-msgstr ""
+msgstr "Вставить флажок (ЭУС)"
 
 #. h2RBS
 #: WriterCommands.xcu
@@ -30956,7 +31016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Drop-Down List Content Control"
-msgstr ""
+msgstr "Вставить выпадающий список (ЭУС)"
 
 #. Avn9E
 #: WriterCommands.xcu
@@ -30966,7 +31026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Picture Content Control"
-msgstr ""
+msgstr "Вставить изображение (ЭУС)"
 
 #. oxa64
 #: WriterCommands.xcu
@@ -30976,7 +31036,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
-msgstr ""
+msgstr "Вставить дату (ЭУС)"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Вставить простой текст (ЭУС)"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Вставить поле со списком (ЭУС)"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -31436,7 +31516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "OLE Object Insert Menu"
-msgstr ""
+msgstr "Меню вставки объекта OLE"
 
 #. DE4Ca
 #: WriterCommands.xcu
@@ -31446,7 +31526,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Insert OLE Object"
-msgstr ""
+msgstr "Вставить объект OLE"
 
 #. ESBXG
 #: WriterCommands.xcu
@@ -31546,7 +31626,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "T~itle"
-msgstr "Заголовок"
+msgstr "Заглавие"
 
 #. Vf5oi
 #: WriterCommands.xcu
@@ -31596,7 +31676,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~While Typing"
-msgstr "При вводе"
+msgstr "При наборе"
 
 #. FA8kc
 #: WriterCommands.xcu
@@ -31626,7 +31706,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Apply and Edit ~Changes"
-msgstr "Принять или отклонить изменения..."
+msgstr "Принять или отклонить исправления..."
 
 #. BZfML
 #: WriterCommands.xcu
@@ -31906,7 +31986,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select to End of Word"
-msgstr ""
+msgstr "Выделить до конца слова"
 
 #. bpBoC
 #: WriterCommands.xcu
@@ -32077,6 +32157,16 @@ msgctxt ""
 "value.text"
 msgid "Title Page..."
 msgstr "Титульная страница..."
+
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Перевести..."
 
 #. JrZD4
 #: WriterCommands.xcu
@@ -32478,6 +32568,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Строки выше"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Вставить строки выше"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32497,6 +32597,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Строки ниже"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Вставить строки ниже"
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32518,15 +32628,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Вставить столбцы перед"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
+msgid "Columns B~efore"
 msgstr "Столбцы перед"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Вставить столбцы перед"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32538,15 +32658,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Вставить столбцы после"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
+msgid "Columns A~fter"
 msgstr "Столбцы после"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Вставить столбцы после"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -32826,7 +32956,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Update ~Fields"
-msgstr ""
+msgstr "Обновить поля"
 
 #. tpc5P
 #: WriterCommands.xcu
@@ -32896,7 +33026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Protect Cells"
-msgstr "Защита ячейки"
+msgstr "Защитить ячейки"
 
 #. Mgs5r
 #: WriterCommands.xcu
@@ -32976,7 +33106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level"
-msgstr ""
+msgstr "Понизить уровень структуры"
 
 #. jzcmc
 #: WriterCommands.xcu
@@ -32996,7 +33126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level"
-msgstr ""
+msgstr "Повысить уровень структуры"
 
 #. MdLME
 #: WriterCommands.xcu
@@ -33056,7 +33186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up"
-msgstr ""
+msgstr "Переместить выше элемент"
 
 #. F6Rc7
 #: WriterCommands.xcu
@@ -33076,7 +33206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down"
-msgstr ""
+msgstr "Переместить ниже элемент"
 
 #. 2GyQ4
 #: WriterCommands.xcu
@@ -33146,7 +33276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr ""
+msgstr "Понизить уровень структуры с подпунктами"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33166,7 +33296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr ""
+msgstr "Повысить уровень структуры с подпунктами"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33176,7 +33306,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr ""
+msgstr "Переместить выше элемент с подпунктами"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33196,7 +33326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr ""
+msgstr "Переместить ниже элемент с подпунктами"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -33436,7 +33566,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Previous Page"
-msgstr ""
+msgstr "К предыдущей странице"
 
 #. w4B39
 #: WriterCommands.xcu
@@ -33446,7 +33576,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "To Previous Page"
-msgstr ""
+msgstr "К предыдущей странице"
 
 #. qEpQx
 #: WriterCommands.xcu
@@ -33456,7 +33586,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Page"
-msgstr ""
+msgstr "К следующей странице"
 
 #. Nx5Ux
 #: WriterCommands.xcu
@@ -33466,7 +33596,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "To Next Page"
-msgstr ""
+msgstr "К следующей странице"
 
 #. adnz3
 #: WriterCommands.xcu
@@ -33476,7 +33606,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "MultiSelection On"
-msgstr "Вкл. групповое выделение"
+msgstr "Групповой выбор вкл."
 
 #. qSdqD
 #: WriterCommands.xcu
@@ -33496,7 +33626,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Update Page Formatting"
-msgstr ""
+msgstr "Обновить форматирование страницы"
 
 #. yyVam
 #: WriterCommands.xcu
@@ -33506,7 +33636,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Extended Selection On"
-msgstr "Вкл. расширенное выделение"
+msgstr "Расширенный выбор вкл."
 
 #. MqMFd
 #: WriterCommands.xcu
@@ -33966,7 +34096,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Toggle Restart Numbering"
-msgstr ""
+msgstr "Переключить Начать нумерацию заново"
 
 #. ofjeC
 #: WriterCommands.xcu
@@ -34096,7 +34226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Column Width: Adjust width of selected columns to fit content"
-msgstr ""
+msgstr "Минимальная ширина столбца: Настройка ширины выделенных столбцов по их содержимому"
 
 #. vGAT7
 #: WriterCommands.xcu
@@ -34136,7 +34266,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Row Height: Adjust height of selected rows to fit content"
-msgstr ""
+msgstr "Минимальная высота строки: Подстроить высоту выбранных строк по содержимому"
 
 #. 9RUey
 #: WriterCommands.xcu
@@ -34226,7 +34356,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Cycle"
-msgstr ""
+msgstr "Выбрать цикл"
 
 #. GzD2B
 #: WriterCommands.xcu
@@ -34396,7 +34526,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Text"
-msgstr "Выделить текст"
+msgstr "Выбрать текст"
 
 #. YCSWp
 #: WriterCommands.xcu
@@ -34787,6 +34917,166 @@ msgctxt ""
 "value.text"
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Копировать формат (двойной щелчок с Ctrl или Cmd для смены поведения)"
+
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Масштаб"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Управление исправлениями"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Символы"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Абзац"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Свойства таблицы"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Положение и размер"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Свойства изображения"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Свойства фрейма"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "Свойства объекта OLE"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Обтекание текстом"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Обрамление"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Обрамление"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Область"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Область"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Линия"
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Линия"
 
 #. 7PCFf
 #: WriterCommands.xcu
@@ -35426,7 +35716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr ""
+msgstr "Без стиля символов"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -35436,7 +35726,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Remove applied character style"
-msgstr ""
+msgstr "Удалить применённый стиль символов"
 
 #. idpKA
 #: WriterCommands.xcu
@@ -35466,7 +35756,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Emphasis Character Style"
-msgstr "Стиль символов с выделением"
+msgstr "Стиль символов с акцентом"
 
 #. JNbe4
 #: WriterCommands.xcu
@@ -35476,7 +35766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Strong Emphasis"
-msgstr "Сильное выделение"
+msgstr "Сильный акцент"
 
 #. zdF7o
 #: WriterCommands.xcu
@@ -35486,7 +35776,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Strong Emphasis Character Style"
-msgstr ""
+msgstr "Стиль символов с сильным акцентом"
 
 #. PZ7tA
 #: WriterCommands.xcu
@@ -35496,7 +35786,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Strong Emphasis"
-msgstr "Сильное выделение"
+msgstr "Сильный акцент"
 
 #. 7Xm9y
 #: WriterCommands.xcu
@@ -35506,7 +35796,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Strong Emphasis Character Style"
-msgstr "Стиль символов с сильным выделением"
+msgstr "Стиль символов с сильным акцентом"
 
 #. gVtiB
 #: WriterCommands.xcu
@@ -35526,7 +35816,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Quotation Character Style"
-msgstr ""
+msgstr "Стиль символов цитаты"
 
 #. 9LD4r
 #: WriterCommands.xcu
@@ -35556,7 +35846,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Sou~rce Text"
-msgstr "Исходный текст"
+msgstr "Исходный код"
 
 #. 6Wb9s
 #: WriterCommands.xcu
@@ -35766,7 +36056,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Default Table Style"
-msgstr "Базовый"
+msgstr "Базовый стиль таблицы"
 
 #. 4AbSB
 #: WriterCommands.xcu
@@ -36006,7 +36296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Toggle Outline Folding"
-msgstr ""
+msgstr "Переключить сворачивание структуры"
 
 #. mByUW
 #: WriterCommands.xcu
@@ -36016,7 +36306,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Fold or unfold outline content in document"
-msgstr ""
+msgstr "Свернуть или развернуть содержимое структуры в документе"
 
 #. nFACE
 #: WriterCommands.xcu
@@ -36026,7 +36316,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Page Deck"
-msgstr ""
+msgstr "Открыть панель «Страница»"
 
 #. foho3
 #: WriterCommands.xcu
@@ -36036,7 +36326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Style Inspector Deck"
-msgstr ""
+msgstr "Открыть панель «Инспектор стилей»"
 
 #. joS9f
 #: WriterFormWindowState.xcu
@@ -36126,7 +36416,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. GrvFm
 #: WriterFormWindowState.xcu
@@ -36306,7 +36596,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. 9ZALG
 #: WriterFormWindowState.xcu
@@ -36376,7 +36666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. nCSvk
 #: WriterFormWindowState.xcu
@@ -36616,7 +36906,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. JbpFk
 #: WriterGlobalWindowState.xcu
@@ -36796,7 +37086,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. VxShF
 #: WriterGlobalWindowState.xcu
@@ -36856,7 +37146,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. v45LV
 #: WriterGlobalWindowState.xcu
@@ -37026,7 +37316,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Track Changes"
-msgstr "Отслеживать изменения"
+msgstr "Отслеживать исправления"
 
 #. BQHZF
 #: WriterGlobalWindowState.xcu
@@ -37036,7 +37326,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Formatting (Styles)"
-msgstr "Формат (стили)"
+msgstr "Форматирование (стили)"
 
 #. ogQzM
 #: WriterReportWindowState.xcu
@@ -37126,7 +37416,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. ztD3A
 #: WriterReportWindowState.xcu
@@ -37306,7 +37596,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. DvgCs
 #: WriterReportWindowState.xcu
@@ -37376,7 +37666,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. 5GFnw
 #: WriterReportWindowState.xcu
@@ -37586,7 +37876,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. WVqNh
 #: WriterWebWindowState.xcu
@@ -37676,7 +37966,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. gaswH
 #: WriterWebWindowState.xcu
@@ -37806,7 +38096,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. 7v96P
 #: WriterWebWindowState.xcu
@@ -38046,7 +38336,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. s4qQE
 #: WriterWindowState.xcu
@@ -38276,7 +38566,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. u7kSX
 #: WriterWindowState.xcu
@@ -38336,7 +38626,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. Tgtuj
 #: WriterWindowState.xcu
@@ -38516,7 +38806,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Track Changes"
-msgstr "Отслеживать изменения"
+msgstr "Отслеживать исправления"
 
 #. VzFYU
 #: WriterWindowState.xcu
@@ -38527,6 +38817,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Стандартная (однострочная)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Стандартная (однострочная) - Комментарий"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Стандартная (однострочная) - Фигура"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Стандартная (однострочная) - Текст фигуры"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Стандартная (однострочная) - Элемент управления"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Стандартная (однострочная) - Фрейм"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Стандартная (однострочная) - Изображение"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Стандартная (однострочная) - Медиа"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Стандартная (однострочная) - Объект OLE"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Стандартная (однострочная) - Предварительный просмотр"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Стандартная (однострочная) - Таблица"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Стандартная (однострочная) - Текст"
 
 #. h6gRt
 #: WriterWindowState.xcu
@@ -38626,7 +39026,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr "OLE-объект"
+msgstr "Объект OLE"
 
 #. LRwDA
 #: XFormsWindowState.xcu
@@ -38806,7 +39206,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Design"
-msgstr "Конструктор форм"
+msgstr "Дизайн формы"
 
 #. pXT2f
 #: XFormsWindowState.xcu
@@ -38876,7 +39276,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "OLE Object"
-msgstr ""
+msgstr "Объект OLE"
 
 #. URXoj
 #: XFormsWindowState.xcu

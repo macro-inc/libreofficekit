@@ -114,7 +114,7 @@ SvxHpLinkDlg::SvxHpLinkDlg(SfxBindings* pBindings, SfxChildWindow* pChild, weld:
     mbGrabFocus = true;
 
     // set OK/Cancel - button
-    m_xCancelBtn->set_label(CuiResId(RID_SVXSTR_HYPDLG_CLOSEBUT));
+    m_xCancelBtn->set_label(CuiResId(RID_CUISTR_HYPDLG_CLOSEBUT));
 
     // create itemset for tabpages
     mpItemSet = std::make_unique<SfxItemSetFixed<SID_HYPERLINK_GETLINK,
@@ -189,17 +189,14 @@ void SvxHpLinkDlg::Apply()
     SvxHyperlinkTabPageBase* pCurrentPage = static_cast<SvxHyperlinkTabPageBase*>(
                                                 GetTabPage( GetCurPageId() ) );
 
-    if ( pCurrentPage->AskApply() )
-    {
-        pCurrentPage->FillItemSet( &aItemSet );
+    pCurrentPage->FillItemSet( &aItemSet );
 
-        const SvxHyperlinkItem *aItem = aItemSet.GetItem(SID_HYPERLINK_SETLINK);
-        if ( !aItem->GetURL().isEmpty() )
-            GetDispatcher()->ExecuteList(SID_HYPERLINK_SETLINK,
-                    SfxCallMode::ASYNCHRON | SfxCallMode::RECORD, { aItem });
+    const SvxHyperlinkItem *aItem = aItemSet.GetItem(SID_HYPERLINK_SETLINK);
+    if ( !aItem->GetURL().isEmpty() )
+        GetDispatcher()->ExecuteList(SID_HYPERLINK_SETLINK,
+                SfxCallMode::ASYNCHRON | SfxCallMode::RECORD, { aItem });
 
-        static_cast<SvxHyperlinkTabPageBase*>( GetTabPage( GetCurPageId() ) )->DoApply();
-    }
+    static_cast<SvxHyperlinkTabPageBase*>( GetTabPage( GetCurPageId() ) )->DoApply();
 }
 
 /// Click on OK button

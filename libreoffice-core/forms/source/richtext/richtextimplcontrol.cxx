@@ -46,7 +46,6 @@ namespace frm
         ,m_pViewport            ( nullptr                )
         ,m_pHScroll             ( nullptr                )
         ,m_pVScroll             ( nullptr                )
-        ,m_pScrollCorner        ( nullptr                )
         ,m_pEngine              ( _pEngine            )
         ,m_pTextAttrListener    ( _pTextAttrListener  )
         ,m_pSelectionListener   ( _pSelectionListener )
@@ -84,7 +83,6 @@ namespace frm
         m_pAntiImpl->SetBackground( Wallpaper( m_pAntiImpl->GetSettings().GetStyleSettings().GetFieldColor() ) );
     }
 
-
     RichTextControlImpl::~RichTextControlImpl( )
     {
         m_pEngine->RemoveView( m_pView.get() );
@@ -93,16 +91,14 @@ namespace frm
         m_pViewport.disposeAndClear();
         m_pHScroll.disposeAndClear();
         m_pVScroll.disposeAndClear();
-        m_pScrollCorner.disposeAndClear();
     }
-
 
     void RichTextControlImpl::implUpdateAttribute( const AttributeHandlerPool::const_iterator& _pHandler )
     {
-        if  (  ( _pHandler->first == SID_ATTR_CHAR_WEIGHT )
-            || ( _pHandler->first == SID_ATTR_CHAR_POSTURE )
-            || ( _pHandler->first == SID_ATTR_CHAR_FONT )
-            || ( _pHandler->first == SID_ATTR_CHAR_FONTHEIGHT )
+        if  (  ( _pHandler->first == sal_uInt16(SID_ATTR_CHAR_WEIGHT) )
+            || ( _pHandler->first == sal_uInt16(SID_ATTR_CHAR_POSTURE) )
+            || ( _pHandler->first == sal_uInt16(SID_ATTR_CHAR_FONT) )
+            || ( _pHandler->first == sal_uInt16(SID_ATTR_CHAR_FONTHEIGHT) )
             )
         {
             // these are attributes whose value depends on the current script type.
@@ -306,24 +302,22 @@ namespace frm
             m_pVScroll->SetThumbPos( m_pView->GetVisArea().Top() );
     }
 
-
     IMPL_LINK_NOARG( RichTextControlImpl, OnInvalidateAllAttributes, LinkParamNone*, void )
     {
         updateAllAttributes();
     }
 
-
-    IMPL_LINK( RichTextControlImpl, OnHScroll, ScrollBar*, _pScrollbar, void )
+    IMPL_LINK( RichTextControlImpl, OnHScroll, weld::Scrollbar&, rScrollbar, void )
     {
-        m_pView->Scroll( -_pScrollbar->GetDelta(), 0, ScrollRangeCheck::PaperWidthTextSize );
+        auto nDiff = m_pView->GetVisArea().Left() - rScrollbar.adjustment_get_value();
+        m_pView->Scroll(nDiff, 0, ScrollRangeCheck::PaperWidthTextSize);
     }
 
-
-    IMPL_LINK( RichTextControlImpl, OnVScroll, ScrollBar*, _pScrollbar, void )
+    IMPL_LINK(RichTextControlImpl, OnVScroll, weld::Scrollbar&, rScrollbar, void)
     {
-        m_pView->Scroll( 0, -_pScrollbar->GetDelta(), ScrollRangeCheck::PaperWidthTextSize );
+        auto nDiff = m_pView->GetVisArea().Top() - rScrollbar.adjustment_get_value();
+        m_pView->Scroll(0, nDiff, ScrollRangeCheck::PaperWidthTextSize);
     }
-
 
     void RichTextControlImpl::ensureScrollbars()
     {
@@ -341,7 +335,7 @@ namespace frm
         }
         else
         {
-            m_pVScroll = VclPtr<ScrollBar>::Create( m_pAntiImpl, WB_VSCROLL | WB_DRAG | WB_REPEAT );
+            m_pVScroll = VclPtr<ScrollAdaptor>::Create( m_pAntiImpl, false );
             m_pVScroll->SetScrollHdl ( LINK( this, RichTextControlImpl, OnVScroll ) );
             m_pVScroll->Show();
         }
@@ -352,25 +346,13 @@ namespace frm
         }
         else
         {
-            m_pHScroll = VclPtr<ScrollBar>::Create( m_pAntiImpl, WB_HSCROLL | WB_DRAG | WB_REPEAT );
+            m_pHScroll = VclPtr<ScrollAdaptor>::Create( m_pAntiImpl, true );
             m_pHScroll->SetScrollHdl ( LINK( this, RichTextControlImpl, OnHScroll ) );
             m_pHScroll->Show();
         }
 
-        if ( m_pHScroll && m_pVScroll )
-        {
-            m_pScrollCorner.disposeAndClear();
-            m_pScrollCorner = VclPtr<ScrollBarBox>::Create( m_pAntiImpl );
-            m_pScrollCorner->Show();
-        }
-        else
-        {
-            m_pScrollCorner.disposeAndClear();
-        }
-
         layoutWindow();
     }
-
 
     void RichTextControlImpl::ensureLineBreakSetting()
     {
@@ -379,7 +361,6 @@ namespace frm
 
         layoutWindow();
     }
-
 
     void RichTextControlImpl::layoutWindow()
     {
@@ -417,11 +398,15 @@ namespace frm
         m_pViewport->SetPosSizePixel( Point( nOffset, nOffset ), aViewportSizePixel );
         // position the scrollbars
         if ( m_pVScroll )
+        {
+            m_pVScroll->SetThickness(nScrollBarWidth);
             m_pVScroll->SetPosSizePixel( Point( aViewportPlaygroundPixel.Width(), 0 ), Size( nScrollBarWidth, aViewportPlaygroundPixel.Height() ) );
+        }
         if ( m_pHScroll )
+        {
+            m_pHScroll->SetThickness(nScrollBarHeight);
             m_pHScroll->SetPosSizePixel( Point( 0, aViewportPlaygroundPixel.Height() ), Size( aViewportPlaygroundPixel.Width(), nScrollBarHeight ) );
-        if ( m_pScrollCorner )
-            m_pScrollCorner->SetPosSizePixel( Point( aViewportPlaygroundPixel.Width(), aViewportPlaygroundPixel.Height() ), Size( nScrollBarWidth, nScrollBarHeight ) );
+        }
 
         // paper size
         if ( windowHasAutomaticLineBreak() )

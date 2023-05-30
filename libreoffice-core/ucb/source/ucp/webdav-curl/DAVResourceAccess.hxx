@@ -52,13 +52,12 @@ class DAVResourceAccess
     rtl::Reference< DAVSessionFactory > m_xSessionFactory;
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
     std::vector<CurlUri> m_aRedirectURIs;
-    sal_uInt32   m_nRedirectLimit;
 
 public:
     DAVResourceAccess() = default;
-    DAVResourceAccess( const css::uno::Reference< css::uno::XComponentContext > & rContext,
-                       rtl::Reference< DAVSessionFactory > const & rSessionFactory,
-                       const OUString & rURL );
+    DAVResourceAccess( css::uno::Reference< css::uno::XComponentContext > xContext,
+                       rtl::Reference< DAVSessionFactory > xSessionFactory,
+                       OUString aURL );
     DAVResourceAccess( const DAVResourceAccess & rOther );
 
     DAVResourceAccess & operator=( const DAVResourceAccess & rOther );
@@ -73,7 +72,7 @@ public:
 
     const OUString & getURL() const { return m_aURL; }
 
-    rtl::Reference< DAVSessionFactory > getSessionFactory() const
+    const rtl::Reference< DAVSessionFactory > & getSessionFactory() const
     { return m_xSessionFactory; }
 
     // DAV methods

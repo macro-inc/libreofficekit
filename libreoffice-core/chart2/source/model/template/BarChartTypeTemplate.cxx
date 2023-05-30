@@ -18,17 +18,17 @@
  */
 
 #include "BarChartTypeTemplate.hxx"
+#include "ColumnChartType.hxx"
+#include <Diagram.hxx>
 #include <DiagramHelper.hxx>
-#include <servicenames_charttypes.hxx>
+#include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <PropertyHelper.hxx>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <com/sun/star/chart2/DataPointGeometry3D.hpp>
-#include <com/sun/star/chart2/XCoordinateSystemContainer.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 
@@ -135,7 +135,6 @@ BarChartTypeTemplate::BarChartTypeTemplate(
     BarDirection eDirection,
     sal_Int32 nDim         /* = 2 */ ) :
         ChartTypeTemplate( xContext, rServiceName ),
-        ::property::OPropertySet( m_aMutex ),
         m_eStackMode( eStackMode ),
         m_eBarDirection( eDirection ),
         m_nDim( nDim )
@@ -159,12 +158,12 @@ bool BarChartTypeTemplate::isSwapXAndY() const
     return (m_eBarDirection == HORIZONTAL);
 }
 
-// ____ XChartTypeTemplate ____
-sal_Bool SAL_CALL BarChartTypeTemplate::matchesTemplate(
-    const Reference< chart2::XDiagram >& xDiagram,
-    sal_Bool bAdaptProperties )
+// ____ ChartTypeTemplate ____
+bool  BarChartTypeTemplate::matchesTemplate2(
+    const rtl::Reference< ::chart::Diagram >& xDiagram,
+    bool bAdaptProperties )
 {
-    bool bResult = ChartTypeTemplate::matchesTemplate( xDiagram, bAdaptProperties );
+    bool bResult = ChartTypeTemplate::matchesTemplate2( xDiagram, bAdaptProperties );
 
     //check BarDirection
     if( bResult )
@@ -196,41 +195,29 @@ sal_Bool SAL_CALL BarChartTypeTemplate::matchesTemplate(
 
     return bResult;
 }
-Reference< chart2::XChartType > BarChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
+
+rtl::Reference< ChartType > BarChartTypeTemplate::getChartTypeForIndex( sal_Int32 /*nChartTypeIndex*/ )
 {
-    Reference< chart2::XChartType > xResult;
-
-    try
-    {
-        Reference< lang::XMultiServiceFactory > xFact(
-            GetComponentContext()->getServiceManager(), uno::UNO_QUERY_THROW );
-        xResult.set( xFact->createInstance(
-                         CHART2_SERVICE_NAME_CHARTTYPE_COLUMN ), uno::UNO_QUERY_THROW );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
-
-    return xResult;
+    return new ColumnChartType();
 }
 
-Reference< chart2::XChartType > SAL_CALL BarChartTypeTemplate::getChartTypeForNewSeries(
-        const uno::Sequence< Reference< chart2::XChartType > >& aFormerlyUsedChartTypes )
+rtl::Reference< ChartType > BarChartTypeTemplate::getChartTypeForNewSeries2(
+        const std::vector< rtl::Reference< ChartType > >& aFormerlyUsedChartTypes )
 {
-    Reference< chart2::XChartType > xResult( getChartTypeForIndex( 0 ) );
+    rtl::Reference< ChartType > xResult( getChartTypeForIndex( 0 ) );
     ChartTypeTemplate::copyPropertiesFromOldToNewCoordinateSystem( aFormerlyUsedChartTypes, xResult );
     return xResult;
 }
 
 // ____ OPropertySet ____
-uno::Any BarChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle ) const
+void BarChartTypeTemplate::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticBarChartTypeTemplateDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL BarChartTypeTemplate::getInfoHelper()
@@ -244,13 +231,13 @@ Reference< beans::XPropertySetInfo > SAL_CALL BarChartTypeTemplate::getPropertyS
     return *StaticBarChartTypeTemplateInfo::get();
 }
 
-void SAL_CALL BarChartTypeTemplate::applyStyle(
-    const Reference< chart2::XDataSeries >& xSeries,
+void BarChartTypeTemplate::applyStyle2(
+    const rtl::Reference< DataSeries >& xSeries,
     ::sal_Int32 nChartTypeIndex,
     ::sal_Int32 nSeriesIndex,
     ::sal_Int32 nSeriesCount )
 {
-    ChartTypeTemplate::applyStyle( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
+    ChartTypeTemplate::applyStyle2( xSeries, nChartTypeIndex, nSeriesIndex, nSeriesCount );
     DataSeriesHelper::setPropertyAlsoToAllAttributedDataPoints( xSeries, "BorderStyle", uno::Any( drawing::LineStyle_NONE ) );
     if( getDimension() != 3 )
         return;
@@ -268,26 +255,20 @@ void SAL_CALL BarChartTypeTemplate::applyStyle(
     }
 }
 
-void SAL_CALL BarChartTypeTemplate::resetStyles(
-    const Reference< chart2::XDiagram >& xDiagram )
+void BarChartTypeTemplate::resetStyles2(
+    const rtl::Reference< ::chart::Diagram >& xDiagram )
 {
-    ChartTypeTemplate::resetStyles( xDiagram );
-    std::vector< Reference< chart2::XDataSeries > > aSeriesVec(
+    ChartTypeTemplate::resetStyles2( xDiagram );
+    std::vector< rtl::Reference< DataSeries > > aSeriesVec(
         DiagramHelper::getDataSeriesFromDiagram( xDiagram ));
     uno::Any aLineStyleAny( drawing::LineStyle_NONE );
     for (auto const& series : aSeriesVec)
     {
-        Reference< beans::XPropertyState > xState(series, uno::UNO_QUERY);
-        if( xState.is())
+        if( getDimension() == 3 )
+            series->setPropertyToDefault( "Geometry3D");
+        if( series->getPropertyValue( "BorderStyle") == aLineStyleAny )
         {
-            if( getDimension() == 3 )
-                xState->setPropertyToDefault( "Geometry3D");
-            Reference< beans::XPropertySet > xProp( xState, uno::UNO_QUERY );
-            if( xProp.is() &&
-                xProp->getPropertyValue( "BorderStyle") == aLineStyleAny )
-            {
-                xState->setPropertyToDefault( "BorderStyle");
-            }
+            series->setPropertyToDefault( "BorderStyle");
         }
     }
 
@@ -295,11 +276,10 @@ void SAL_CALL BarChartTypeTemplate::resetStyles(
 }
 
 void BarChartTypeTemplate::createCoordinateSystems(
-    const Reference< chart2::XCoordinateSystemContainer > & xCooSysCnt )
+    const rtl::Reference< ::chart::Diagram > & xDiagram )
 {
-    ChartTypeTemplate::createCoordinateSystems( xCooSysCnt );
+    ChartTypeTemplate::createCoordinateSystems( xDiagram );
 
-    Reference< chart2::XDiagram > xDiagram( xCooSysCnt, uno::UNO_QUERY );
     DiagramHelper::setVertical( xDiagram, m_eBarDirection == HORIZONTAL );
 }
 

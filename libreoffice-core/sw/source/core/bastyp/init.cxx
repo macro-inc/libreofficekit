@@ -77,6 +77,7 @@
 #include <editeng/widwitem.hxx>
 #include <editeng/wrlmitem.hxx>
 #include <editeng/xmlcnitm.hxx>
+#include <i18nutil/transliteration.hxx>
 #include <editsh.hxx>
 #include <fchrfmt.hxx>
 #include <fmtanchr.hxx>
@@ -104,6 +105,7 @@
 #include <fmtpdsc.hxx>
 #include <fmtrfmrk.hxx>
 #include <fmtrowsplt.hxx>
+#include <formatflysplit.hxx>
 #include <fmtruby.hxx>
 #include <fmtsrnd.hxx>
 #include <fmturl.hxx>
@@ -390,6 +392,7 @@ SfxItemInfo aSlotTab[] =
 
     { SID_ATTR_HDFT_DYNAMIC_SPACING, true },// RES_HEADER_FOOTER_EAT_SPACING
     { FN_TABLE_ROW_SPLIT, true },          // RES_ROW_SPLIT
+    { 0, true }                 ,          // RES_FLY_SPLIT
     // #i18732# - use slot-id define in svx
     { SID_SW_FOLLOW_TEXT_FLOW, true },     // RES_FOLLOW_TEXT_FLOW
     // #i29550#
@@ -403,6 +406,7 @@ SfxItemInfo aSlotTab[] =
     { 0, true },                           // RES_TEXT_VERT_ADJUST
     { 0, true },                           // RES_BACKGROUND_FULL_SIZE
     { 0, true },                           // RES_RTL_GUTTER
+    { 0, true },                           // RES_DECORATIVE
 
     { 0, true },                           // RES_GRFATR_MIRRORGRF
     { SID_ATTR_GRAF_CROP, true },          // RES_GRFATR_CROPGRF
@@ -415,8 +419,6 @@ SfxItemInfo aSlotTab[] =
     { 0, true },                           // RES_GRFATR_GAMMA,
     { 0, true },                           // RES_GRFATR_INVERT,
     { 0, true },                           // RES_GRFATR_TRANSPARENCY,
-    { 0, true },                           // RES_GRFATR_DUMMY1,
-    { 0, true },                           // RES_GRFATR_DUMMY2,
     { 0, true },                           // RES_GRFATR_DUMMY3,
     { 0, true },                           // RES_GRFATR_DUMMY4,
     { 0, true },                           // RES_GRFATR_DUMMY5,
@@ -592,6 +594,7 @@ void InitCore()
     aAttrTab[ RES_COLUMNBALANCE - POOLATTR_BEGIN ] =        new SwFormatNoBalancedColumns;
     aAttrTab[ RES_FRAMEDIR - POOLATTR_BEGIN ] =             new SvxFrameDirectionItem( SvxFrameDirection::Environment, RES_FRAMEDIR );
     aAttrTab[ RES_ROW_SPLIT - POOLATTR_BEGIN ] =            new SwFormatRowSplit;
+    aAttrTab[ RES_FLY_SPLIT - POOLATTR_BEGIN ] =            new SwFormatFlySplit;
 
     // #i18732#
     aAttrTab[ RES_FOLLOW_TEXT_FLOW - POOLATTR_BEGIN ] =     new SwFormatFollowTextFlow(false);
@@ -608,6 +611,7 @@ void InitCore()
     aAttrTab[ RES_TEXT_VERT_ADJUST - POOLATTR_BEGIN ] = new SdrTextVertAdjustItem(SDRTEXTVERTADJUST_TOP,RES_TEXT_VERT_ADJUST);
     aAttrTab[ RES_BACKGROUND_FULL_SIZE - POOLATTR_BEGIN ] = new SfxBoolItem(RES_BACKGROUND_FULL_SIZE, true);
     aAttrTab[ RES_RTL_GUTTER - POOLATTR_BEGIN ] = new SfxBoolItem(RES_RTL_GUTTER, false);
+    aAttrTab[ RES_DECORATIVE - POOLATTR_BEGIN ] = new SfxBoolItem(RES_DECORATIVE, false);
 
     aAttrTab[ RES_GRFATR_MIRRORGRF- POOLATTR_BEGIN ] =      new SwMirrorGrf;
     aAttrTab[ RES_GRFATR_CROPGRF- POOLATTR_BEGIN ] =        new SwCropGrf;
@@ -623,8 +627,6 @@ void InitCore()
     aAttrTab[ RES_GRFATR_DRAWMODE - POOLATTR_BEGIN ] =      new SwDrawModeGrf;
 
 // GraphicAttr - Dummies
-    aAttrTab[ RES_GRFATR_DUMMY1 - POOLATTR_BEGIN ] =        new SfxBoolItem( RES_GRFATR_DUMMY1 );
-    aAttrTab[ RES_GRFATR_DUMMY2 - POOLATTR_BEGIN ] =        new SfxBoolItem( RES_GRFATR_DUMMY2 );
     aAttrTab[ RES_GRFATR_DUMMY3 - POOLATTR_BEGIN ] =        new SfxBoolItem( RES_GRFATR_DUMMY3 );
     aAttrTab[ RES_GRFATR_DUMMY4 - POOLATTR_BEGIN ] =        new SfxBoolItem( RES_GRFATR_DUMMY4 );
     aAttrTab[ RES_GRFATR_DUMMY5 - POOLATTR_BEGIN ] =        new SfxBoolItem( RES_GRFATR_DUMMY5 );

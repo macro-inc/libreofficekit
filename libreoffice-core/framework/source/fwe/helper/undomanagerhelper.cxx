@@ -29,17 +29,20 @@
 #include <com/sun/star/util/NotLockedException.hpp>
 #include <com/sun/star/util/XModifyListener.hpp>
 
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <cppuhelper/exc_hlp.hxx>
 #include <comphelper/flagguard.hxx>
 #include <comphelper/asyncnotification.hxx>
 #include <svl/undo.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/conditn.hxx>
+#include <vcl/svapp.hxx>
 
 #include <functional>
+#include <mutex>
 #include <stack>
 #include <queue>
+#include <utility>
 
 namespace framework
 {
@@ -144,8 +147,8 @@ namespace framework
     class UndoManagerRequest : public ::comphelper::AnyEvent
     {
     public:
-        explicit UndoManagerRequest( ::std::function<void ()> const& i_request )
-            :m_request( i_request )
+        explicit UndoManagerRequest( ::std::function<void ()>  i_request )
+            :m_request(std::move( i_request ))
         {
             m_finishCondition.reset();
         }
@@ -198,12 +201,14 @@ namespace framework
     {
     private:
         ::osl::Mutex                        m_aMutex;
-        ::osl::Mutex                        m_aQueueMutex;
+        /// Use different mutex for listeners to prevent ABBA deadlocks
+        ::osl::Mutex                        m_aListenerMutex;
+        std::mutex                          m_aQueueMutex;
         bool                                m_bAPIActionRunning;
         bool                                m_bProcessingEvents;
         sal_Int32                           m_nLockCount;
-        ::comphelper::OInterfaceContainerHelper2   m_aUndoListeners;
-        ::comphelper::OInterfaceContainerHelper2   m_aModifyListeners;
+        ::comphelper::OInterfaceContainerHelper3<XUndoManagerListener>   m_aUndoListeners;
+        ::comphelper::OInterfaceContainerHelper3<XModifyListener>   m_aModifyListeners;
         IUndoManagerImplementation&         m_rUndoManagerImplementation;
         ::std::stack< bool >                m_aContextVisibilities;
 #if OSL_DEBUG_LEVEL > 0
@@ -221,8 +226,8 @@ namespace framework
             :m_bAPIActionRunning( false )
             ,m_bProcessingEvents( false )
             ,m_nLockCount( 0 )
-            ,m_aUndoListeners( m_aMutex )
-            ,m_aModifyListeners( m_aMutex )
+            ,m_aUndoListeners( m_aListenerMutex )
+            ,m_aModifyListeners( m_aListenerMutex )
             ,m_rUndoManagerImplementation( i_undoManagerImpl )
         {
             getUndoManager().AddUndoListener( *this );
@@ -452,7 +457,7 @@ namespace framework
         // create the request, and add it to our queue
         ::rtl::Reference< UndoManagerRequest > pRequest( new UndoManagerRequest( i_request ) );
         {
-            ::osl::MutexGuard aQueueGuard( m_aQueueMutex );
+            std::unique_lock aQueueGuard( m_aQueueMutex );
             m_aEventQueue.push( pRequest );
         }
 
@@ -470,7 +475,7 @@ namespace framework
         {
             pRequest.clear();
             {
-                ::osl::MutexGuard aQueueGuard( m_aQueueMutex );
+                std::unique_lock aQueueGuard( m_aQueueMutex );
                 if ( m_aEventQueue.empty() )
                 {
                     // reset the flag before releasing the queue mutex, otherwise it's possible that another thread
@@ -492,7 +497,7 @@ namespace framework
                 {
                     // no chance to process further requests, if the current one failed
                     // => discard them
-                    ::osl::MutexGuard aQueueGuard( m_aQueueMutex );
+                    std::unique_lock aQueueGuard( m_aQueueMutex );
                     while ( !m_aEventQueue.empty() )
                     {
                         pRequest = m_aEventQueue.front();
@@ -685,6 +690,7 @@ namespace framework
 
         {
             ::comphelper::FlagGuard aNotificationGuard( m_bAPIActionRunning );
+            SolarMutexGuard aGuard2;
             rUndoManager.Clear();
         }
 

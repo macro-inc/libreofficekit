@@ -82,12 +82,12 @@ public:
     void AppendPath(::std::u16string_view rPath);
     /// @param matches: relative-ref = path-absolute [ "?" query ] [ "#" fragment ]
     /// @throws DAVException
-    CurlUri CloneWithRelativeRefPathAbsolute(OUString const& rRelativeRef) const;
+    CurlUri CloneWithRelativeRefPathAbsolute(std::u16string_view rRelativeRef) const;
 };
 
 OUString EncodeSegment(OUString const& rSegment);
 OUString DecodeURI(OUString const& rURI);
-OUString ConnectionEndPointString(OUString const& rHost, sal_uInt16 nPort);
+OUString ConnectionEndPointString(std::u16string_view rHost, sal_uInt16 nPort);
 
 } // namespace http_dav_ucp
 

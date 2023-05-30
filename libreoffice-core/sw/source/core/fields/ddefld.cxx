@@ -36,6 +36,7 @@
 #include <swbaslnk.hxx>
 #include <unofldmid.h>
 #include <hints.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -69,9 +70,13 @@ public:
     case SotClipboardFormatId::STRING:
         if( !IsNoDataFlag() )
         {
-            uno::Sequence< sal_Int8 > aSeq;
-            rValue >>= aSeq;
-            OUString sStr( reinterpret_cast<char const *>(aSeq.getConstArray()), aSeq.getLength(), osl_getThreadTextEncoding() );
+            OUString sStr;
+            if (!(rValue >>= sStr))
+            {
+                uno::Sequence< sal_Int8 > aSeq;
+                rValue >>= aSeq;
+                sStr = OUString(reinterpret_cast<char const*>(aSeq.getConstArray()), aSeq.getLength(), osl_getThreadTextEncoding());
+            }
 
             // remove not needed CR-LF at the end
             sal_Int32 n = sStr.getLength();
@@ -109,8 +114,7 @@ void SwIntrnlRefLink::Closed()
     {
         // advise goes, convert all fields into text?
         SwViewShell* pSh = m_rFieldType.GetDoc()->getIDocumentLayoutAccess().GetCurrentViewShell();
-        SwEditShell* pESh = m_rFieldType.GetDoc()->GetEditShell();
-        if( pESh )
+        if (SwEditShell* pESh = m_rFieldType.GetDoc()->GetEditShell())
         {
             pESh->StartAllAction();
             pESh->FieldToText(&m_rFieldType);
@@ -144,10 +148,10 @@ bool SwIntrnlRefLink::IsInRange( SwNodeOffset nSttNd, SwNodeOffset nEndNd ) cons
     return bInRange;
 }
 
-SwDDEFieldType::SwDDEFieldType(const OUString& rName,
+SwDDEFieldType::SwDDEFieldType( OUString aName,
                                const OUString& rCmd, SfxLinkUpdateMode nUpdateType )
     : SwFieldType( SwFieldIds::Dde ),
-    m_aName( rName ), m_pDoc( nullptr ), m_nRefCount( 0 )
+    m_aName( std::move(aName) ), m_pDoc( nullptr ), m_nRefCount( 0 )
 {
     m_bCRLFFlag = m_bDeleted = false;
     m_RefLink = new SwIntrnlRefLink( *this, nUpdateType );

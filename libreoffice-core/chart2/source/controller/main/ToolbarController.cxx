@@ -19,21 +19,18 @@ namespace com::sun::star::uno { class XComponentContext; }
 
 namespace chart {
 
-ChartToolbarController::ChartToolbarController(const css::uno::Sequence<css::uno::Any>& rProperties):
-    ChartToolbarControllerBase(m_aMutex)
+ChartToolbarController::ChartToolbarController(const css::uno::Sequence<css::uno::Any>& rProperties)
 {
-    css::uno::Reference<css::frame::XFrame> xFrame;
-    sal_Int32 nLength = rProperties.getLength();
-    for (sal_Int32 i = 0; i < nLength; ++i)
+    for (const auto& rProperty : rProperties)
     {
         css::beans::PropertyValue aPropValue;
-        rProperties[i] >>= aPropValue;
+        rProperty >>= aPropValue;
         if (aPropValue.Name == "Frame")
-            aPropValue.Value >>= xFrame;
+        {
+            mxFramesSupplier.set(aPropValue.Value, css::uno::UNO_QUERY);
+            break;
+        }
     }
-
-    css::uno::Reference<css::frame::XFramesSupplier> xFramesSupplier(xFrame, css::uno::UNO_QUERY);
-    mxFramesSupplier = xFramesSupplier;
 }
 
 ChartToolbarController::~ChartToolbarController()

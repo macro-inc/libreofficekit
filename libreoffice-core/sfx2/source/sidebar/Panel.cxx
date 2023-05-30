@@ -20,7 +20,6 @@
 #include <sfx2/sidebar/Panel.hxx>
 #include <sidebar/PanelTitleBar.hxx>
 #include <sidebar/PanelDescriptor.hxx>
-#include <sfx2/sidebar/Theme.hxx>
 #include <sfx2/sidebar/ResourceManager.hxx>
 #include <sfx2/sidebar/SidebarController.hxx>
 #include <sfx2/sidebar/SidebarPanelBase.hxx>
@@ -33,11 +32,11 @@
 #include <sfx2/sidebar/Deck.hxx>
 #endif
 
-#include <com/sun/star/awt/PosSize.hpp>
 #include <com/sun/star/ui/XToolPanel.hpp>
 #include <com/sun/star/ui/XSidebarPanel.hpp>
 #include <com/sun/star/ui/XUIElement.hpp>
 
+#include <utility>
 #include <vcl/weldutils.hxx>
 
 using namespace css;
@@ -49,7 +48,7 @@ Panel::Panel(const PanelDescriptor& rPanelDescriptor,
              weld::Widget* pParentWindow,
              const bool bIsInitiallyExpanded,
              Deck* pDeck,
-             const std::function<Context()>& rContextAccess,
+             std::function<Context()> aContextAccess,
              const css::uno::Reference<css::frame::XFrame>& rxFrame)
     : mxBuilder(Application::CreateBuilder(pParentWindow, "sfx/ui/panel.ui", false, reinterpret_cast<sal_uInt64>(SfxViewShell::Current())))
     , msPanelId(rPanelDescriptor.msId)
@@ -58,7 +57,7 @@ Panel::Panel(const PanelDescriptor& rPanelDescriptor,
     , mbWantsAWT(rPanelDescriptor.mbWantsAWT)
     , mbIsExpanded(bIsInitiallyExpanded)
     , mbLurking(false)
-    , maContextAccess(rContextAccess)
+    , maContextAccess(std::move(aContextAccess))
     , mxFrame(rxFrame)
     , mpParentWindow(pParentWindow)
     , mxDeck(pDeck)

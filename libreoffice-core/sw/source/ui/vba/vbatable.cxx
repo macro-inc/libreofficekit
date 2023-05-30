@@ -25,15 +25,23 @@
 #include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/table/XTableRows.hpp>
 #include <com/sun/star/container/XNamed.hpp>
+#include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/table/TableBorderDistances.hpp>
+#include <utility>
 #include "vbaborders.hxx"
 #include "vbapalette.hxx"
 #include "vbarows.hxx"
 #include "vbacolumns.hxx"
+#include "vbaapplication.hxx"
+
+#include <tools/UnitConversion.hxx>
+
+#include <sal/log.hxx>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaTable::SwVbaTable(  const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextDocument >& rDocument, const  uno::Reference< text::XTextTable >& xTextTable) : SwVbaTable_BASE( rParent, rContext ), mxTextDocument( rDocument )
+SwVbaTable::SwVbaTable(  const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextDocument > xDocument, const  uno::Reference< text::XTextTable >& xTextTable) : SwVbaTable_BASE( rParent, rContext ), mxTextDocument(std::move( xDocument ))
 {
     mxTextTable.set( xTextTable, uno::UNO_SET_THROW );
 }
@@ -54,7 +62,7 @@ SwVbaTable::Select(  )
     uno::Reference< view::XSelectionSupplier > xSelectionSupplier( xController, uno::UNO_QUERY_THROW );
 
     // set the view cursor to the start of the table.
-    xSelectionSupplier->select( uno::makeAny( mxTextTable ) );
+    xSelectionSupplier->select( uno::Any( mxTextTable ) );
 
     // go to the end of the table and span the view
     uno::Reference< text::XTextViewCursor > xCursor = xViewCursorSupplier->getViewCursor();
@@ -70,7 +78,7 @@ SwVbaTable::Delete(  )
 }
 
 OUString SAL_CALL
-SwVbaTable::getName()
+SwVbaTable::getName(  )
 {
     uno::Reference< container::XNamed > xNamed( mxTextTable, uno::UNO_QUERY_THROW );
     return xNamed->getName();
@@ -84,7 +92,83 @@ SwVbaTable::Borders( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaBorders( this, mxContext, aCellRange, aPalette ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
+}
+
+double SAL_CALL
+SwVbaTable::getBottomPadding()
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    xPropertySet->getPropertyValue("TableBorderDistances") >>= aTableBorderDistances;
+    return convertMm100ToPoint(aTableBorderDistances.BottomDistance);
+}
+
+void SAL_CALL
+SwVbaTable::setBottomPadding( double fValue )
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    aTableBorderDistances.IsBottomDistanceValid = true;
+    aTableBorderDistances.BottomDistance = convertPointToMm100(fValue);
+    xPropertySet->setPropertyValue( "TableBorderDistances", uno::Any( aTableBorderDistances ) );
+}
+
+double SAL_CALL
+SwVbaTable::getLeftPadding()
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    xPropertySet->getPropertyValue("TableBorderDistances") >>= aTableBorderDistances;
+    return convertMm100ToPoint(aTableBorderDistances.LeftDistance);
+}
+
+void SAL_CALL
+SwVbaTable::setLeftPadding( double fValue )
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    aTableBorderDistances.IsLeftDistanceValid = true;
+    aTableBorderDistances.LeftDistance = convertPointToMm100(fValue);
+    xPropertySet->setPropertyValue( "TableBorderDistances", uno::Any( aTableBorderDistances ) );
+}
+
+double SAL_CALL
+SwVbaTable::getRightPadding()
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    xPropertySet->getPropertyValue("TableBorderDistances") >>= aTableBorderDistances;
+    return convertMm100ToPoint(aTableBorderDistances.RightDistance);
+}
+
+void SAL_CALL
+SwVbaTable::setRightPadding( double fValue )
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    aTableBorderDistances.IsRightDistanceValid = true;
+    aTableBorderDistances.RightDistance = convertPointToMm100(fValue);
+    xPropertySet->setPropertyValue( "TableBorderDistances", uno::Any( aTableBorderDistances ) );
+}
+
+double SAL_CALL
+SwVbaTable::getTopPadding()
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    xPropertySet->getPropertyValue("TableBorderDistances") >>= aTableBorderDistances;
+    return convertMm100ToPoint(aTableBorderDistances.TopDistance);
+}
+
+void SAL_CALL
+SwVbaTable::setTopPadding( double fValue )
+{
+    uno::Reference< beans::XPropertySet > xPropertySet( mxTextTable, uno::UNO_QUERY_THROW);
+    table::TableBorderDistances aTableBorderDistances;
+    aTableBorderDistances.IsTopDistanceValid = true;
+    aTableBorderDistances.TopDistance = convertPointToMm100(fValue);
+    xPropertySet->setPropertyValue( "TableBorderDistances", uno::Any( aTableBorderDistances ) );
 }
 
 uno::Any SAL_CALL
@@ -94,7 +178,7 @@ SwVbaTable::Rows( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaRows( this, mxContext, mxTextTable, xTableRows ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL
@@ -104,7 +188,7 @@ SwVbaTable::Columns( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaColumns( this, mxContext, mxTextTable, xTableColumns ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 // XHelperInterface

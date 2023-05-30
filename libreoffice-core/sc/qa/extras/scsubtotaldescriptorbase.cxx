@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
@@ -35,7 +35,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScSubTotalDescriptorBase : public CalcUnoApiTest,
+class ScSubTotalDescriptorBase : public UnoApiTest,
                                  public apitest::SubTotalDescriptor,
                                  public apitest::XElementAccess,
                                  public apitest::XEnumerationAccess,
@@ -49,7 +49,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScSubTotalDescriptorBase);
 
@@ -84,13 +83,10 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScSubTotalDescriptorBase::ScSubTotalDescriptorBase()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<sheet::XSubTotalField>::get())
     , XIndexAccess(1)
     , XServiceInfo("ScSubTotalDescriptorBase", "com.sun.star.sheet.SubTotalDescriptor")
@@ -116,15 +112,9 @@ uno::Reference<uno::XInterface> ScSubTotalDescriptorBase::init()
 
 void ScSubTotalDescriptorBase::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScSubTotalDescriptorBase::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScSubTotalDescriptorBase);

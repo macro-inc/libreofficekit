@@ -18,7 +18,7 @@
  */
 
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 #include <comphelper/attributelist.hxx>
 
@@ -419,7 +419,7 @@ SvXMLShapeContext* XMLShapeImportHelper::CreateFrameChildContext(
         }
         // add other shapes here...
         default:
-            XMLOFF_WARN_UNKNOWN_ELEMENT("xmloff", nElement);
+            SAL_INFO("xmloff", "unknown element " << SvXMLImport::getPrefixAndNameFromToken(nElement));
             break;
     }
 
@@ -429,7 +429,7 @@ SvXMLShapeContext* XMLShapeImportHelper::CreateFrameChildContext(
         for(auto& aIter : *xCombinedAttrList)
         {
             if (!pContext->processAttribute( aIter ))
-                XMLOFF_WARN_UNKNOWN("xmloff", aIter);
+                SAL_INFO("xmloff", "unknown attribute " << SvXMLImport::getPrefixAndNameFromToken(aIter.getToken()) << " value=" << aIter.toString());
         }
     }
 
@@ -466,7 +466,8 @@ void XMLShapeImportHelper::addShape( uno::Reference< drawing::XShape >& rShape,
         uno::Reference<beans::XPropertySet> xPropertySet(rShape, uno::UNO_QUERY);
         if (xPropertySet.is())
         {
-            xPropertySet->setPropertyValue("HandlePathObjScale", uno::makeAny(true));
+            static constexpr OUStringLiteral sHandlePathObjScale = u"HandlePathObjScale";
+            xPropertySet->setPropertyValue(sHandlePathObjScale, uno::Any(true));
         }
     }
 }
@@ -514,8 +515,9 @@ struct ZOrderHint
 {
     sal_Int32 nIs;
     sal_Int32 nShould;
-    /// The hint is for this shape.
-    uno::Reference<drawing::XShape> xShape;
+    /// The hint is for this shape. We don't use uno::Reference here to speed up
+    /// some operations, and because this shape is always held by mxShapes
+    drawing::XShape* pShape;
 
     bool operator<(const ZOrderHint& rComp) const { return nShould < rComp.nShould; }
 };
@@ -533,7 +535,7 @@ public:
     sal_Int32                       mnCurrentZ;
     std::shared_ptr<ShapeGroupContext> mpParentContext;
 
-    ShapeGroupContext( uno::Reference< drawing::XShapes > const & rShapes, std::shared_ptr<ShapeGroupContext> pParentContext );
+    ShapeGroupContext( uno::Reference< drawing::XShapes > xShapes, std::shared_ptr<ShapeGroupContext> pParentContext );
 
     void popGroupAndPostProcess();
 private:
@@ -542,8 +544,8 @@ private:
 
 }
 
-ShapeGroupContext::ShapeGroupContext( uno::Reference< drawing::XShapes > const & rShapes, std::shared_ptr<ShapeGroupContext> pParentContext )
-:   mxShapes( rShapes ), mnCurrentZ( 0 ), mpParentContext( std::move(pParentContext) )
+ShapeGroupContext::ShapeGroupContext( uno::Reference< drawing::XShapes > xShapes, std::shared_ptr<ShapeGroupContext> pParentContext )
+:   mxShapes(std::move( xShapes )), mnCurrentZ( 0 ), mpParentContext( std::move(pParentContext) )
 {
 }
 
@@ -613,6 +615,7 @@ void ShapeGroupContext::popGroupAndPostProcess()
 
         // second add the already existing shapes in the unsorted list
         ZOrderHint aNewHint;
+        aNewHint.pShape = nullptr;
         do
         {
             nCount--;
@@ -730,7 +733,7 @@ void XMLShapeImportHelper::shapeWithZIndexAdded( css::uno::Reference< css::drawi
     ZOrderHint aNewHint;
     aNewHint.nIs = mpImpl->mpGroupContext->mnCurrentZ++;
     aNewHint.nShould = nZIndex;
-    aNewHint.xShape = xShape;
+    aNewHint.pShape = xShape.get();
 
     if( nZIndex == -1 )
     {
@@ -748,7 +751,7 @@ void XMLShapeImportHelper::shapeRemoved(const uno::Reference<drawing::XShape>& x
 {
     auto it = std::find_if(mpImpl->mpGroupContext->maZOrderList.begin(), mpImpl->mpGroupContext->maZOrderList.end(), [&xShape](const ZOrderHint& rHint)
     {
-        return rHint.xShape == xShape;
+        return rHint.pShape == xShape.get();
     });
     if (it == mpImpl->mpGroupContext->maZOrderList.end())
         // Part of the unsorted list, nothing to do.

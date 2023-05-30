@@ -19,20 +19,20 @@
 
 #include "AccessibleChartElement.hxx"
 #include <CharacterProperties.hxx>
+#include <ChartModel.hxx>
 #include <ObjectIdentifier.hxx>
 #include <ObjectNameProvider.hxx>
 #include <servicenames.hxx>
 
 #include <com/sun/star/awt/XDevice.hpp>
 #include <com/sun/star/chart2/XTitle.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::accessibility;
@@ -65,7 +65,7 @@ bool AccessibleChartElement::ImplUpdateChildren()
     bool bResult = false;
     Reference< chart2::XTitle > xTitle(
         ObjectIdentifier::getObjectPropertySet(
-            GetInfo().m_aOID.getObjectCID(), Reference< chart2::XChartDocument >( GetInfo().m_xChartDocument )),
+            GetInfo().m_aOID.getObjectCID(), GetInfo().m_xChartDocument ),
         uno::UNO_QUERY );
     m_bHasText = xTitle.is();
 
@@ -115,7 +115,7 @@ void AccessibleChartElement::InitTextEdit()
 //             Interfaces
 
 // ________ AccessibleBase::XAccessibleContext ________
-Reference< XAccessible > AccessibleChartElement::ImplGetAccessibleChildById( sal_Int32 i ) const
+Reference< XAccessible > AccessibleChartElement::ImplGetAccessibleChildById( sal_Int64 i ) const
 {
     Reference< XAccessible > xResult;
 
@@ -127,7 +127,7 @@ Reference< XAccessible > AccessibleChartElement::ImplGetAccessibleChildById( sal
     return xResult;
 }
 
-sal_Int32 AccessibleChartElement::ImplGetAccessibleChildCount() const
+sal_Int64 AccessibleChartElement::ImplGetAccessibleChildCount() const
 {
     if( m_bHasText )
     {
@@ -170,7 +170,7 @@ Reference< awt::XFont > SAL_CALL AccessibleChartElement::getFont()
     {
         Reference< beans::XMultiPropertySet > xObjProp(
             ObjectIdentifier::getObjectPropertySet(
-                GetInfo().m_aOID.getObjectCID(), Reference< chart2::XChartDocument >( GetInfo().m_xChartDocument )), uno::UNO_QUERY );
+                GetInfo().m_aOID.getObjectCID(), GetInfo().m_xChartDocument ), uno::UNO_QUERY );
         awt::FontDescriptor aDescr(
             CharacterProperties::createFontDescriptorFromPropertySet( xObjProp ));
         xFont = xDevice->getFont( aDescr );
@@ -189,7 +189,7 @@ OUString SAL_CALL AccessibleChartElement::getToolTipText()
     CheckDisposeState();
 
     return ObjectNameProvider::getHelpText(
-        GetInfo().m_aOID.getObjectCID(), Reference< chart2::XChartDocument >( GetInfo().m_xChartDocument ));
+        GetInfo().m_aOID.getObjectCID(), GetInfo().m_xChartDocument );
 }
 
 // ________ XAccessibleComponent ________

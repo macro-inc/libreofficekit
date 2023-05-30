@@ -23,7 +23,9 @@
 #include <com/sun/star/drawing/Hatch.hpp>
 #include <com/sun/star/style/CaseMap.hpp>
 #include <com/sun/star/xml/sax/XFastAttributeList.hpp>
-#include <o3tl/safeint.hxx>
+
+#include <o3tl/string_view.hxx>
+#include <optional>
 #include <osl/diagnose.h>
 #include <sax/tools/converter.hxx>
 #include <oox/token/tokens.hxx>
@@ -375,17 +377,49 @@ const char* GetHatchPattern( const drawing::Hatch& rHatch )
     return sPattern;
 }
 
+std::optional<OString> GetTextVerticalType(sal_Int32 nRotateAngle)
+{
+    switch (nRotateAngle)
+    {
+      case 9000:
+          return "vert270";
+      case 27000:
+          return "vert";
+      default:
+          return {};
+    }
+}
+
+namespace
+{
+// ISO/IEC-29500 Part 1 ST_Percentage, and [MS-OI29500] 2.1.1324
+sal_Int32 GetST_Percentage(std::u16string_view s)
+{
+    if (o3tl::ends_with(s, u"%"))
+        return std::round(o3tl::toDouble(s) * 1000);
+    return o3tl::toInt32(s);
+}
+}
+
 /** converts the attributes from a CT_RelativeRect to an IntegerRectangle2D */
 IntegerRectangle2D GetRelativeRect( const Reference< XFastAttributeList >& xAttribs )
 {
     IntegerRectangle2D r;
 
-    r.X1 = xAttribs->getOptionalValue( XML_l ).toInt32();
-    r.Y1 = xAttribs->getOptionalValue( XML_t ).toInt32();
-    r.X2 = xAttribs->getOptionalValue( XML_r ).toInt32();
-    r.Y2 = xAttribs->getOptionalValue( XML_b ).toInt32();
+    r.X1 = GetST_Percentage(xAttribs->getOptionalValue( XML_l ));
+    r.Y1 = GetST_Percentage(xAttribs->getOptionalValue( XML_t ));
+    r.X2 = GetST_Percentage(xAttribs->getOptionalValue( XML_r ));
+    r.Y2 = GetST_Percentage(xAttribs->getOptionalValue( XML_b ));
 
     return r;
+}
+
+void fillRelativeRectangle(model::RelativeRectangle& rRelativeRectangle, const Reference<XFastAttributeList>& xAttribs)
+{
+    rRelativeRectangle.mnLeft = GetST_Percentage(xAttribs->getOptionalValue(XML_l));
+    rRelativeRectangle.mnTop = GetST_Percentage(xAttribs->getOptionalValue(XML_t));
+    rRelativeRectangle.mnRight = GetST_Percentage(xAttribs->getOptionalValue(XML_r));
+    rRelativeRectangle.mnBottom = GetST_Percentage(xAttribs->getOptionalValue(XML_b));
 }
 
 /** converts the attributes from a CT_Size2D into an awt Size with 1/100thmm */
@@ -400,6 +434,26 @@ IndexRange GetIndexRange( const Reference< XFastAttributeList >& xAttributes )
     range.start = xAttributes->getOptionalValue( XML_st ).toInt32();
     range.end = xAttributes->getOptionalValue( XML_end ).toInt32();
     return range;
+}
+
+
+model::RectangleAlignment convertToRectangleAlignment(sal_Int32 nToken)
+{
+    switch (nToken)
+    {
+        case XML_tl: return model::RectangleAlignment::TopLeft;
+        case XML_t: return model::RectangleAlignment::Top;
+        case XML_tr: return model::RectangleAlignment::TopRight;
+        case XML_l: return model::RectangleAlignment::Left;
+        case XML_ctr: return model::RectangleAlignment::Center;
+        case XML_r: return model::RectangleAlignment::Right;
+        case XML_bl: return model::RectangleAlignment::BottomLeft;
+        case XML_b: return model::RectangleAlignment::Bottom;
+        case XML_br: return model::RectangleAlignment::BottomRight;
+        default:
+            break;
+    }
+    return model::RectangleAlignment::Unset;
 }
 
 } // namespace oox::drawingml

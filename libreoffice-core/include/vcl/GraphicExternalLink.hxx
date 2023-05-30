@@ -12,6 +12,7 @@
 
 #include <vcl/dllapi.h>
 #include <rtl/ustring.hxx>
+#include <utility>
 
 class VCL_DLLPUBLIC GraphicExternalLink
 {
@@ -20,8 +21,8 @@ public:
 
     GraphicExternalLink() {}
 
-    GraphicExternalLink(OUString const& rURL)
-        : msURL(rURL)
+    GraphicExternalLink(OUString aURL)
+        : msURL(std::move(aURL))
     {
     }
 };

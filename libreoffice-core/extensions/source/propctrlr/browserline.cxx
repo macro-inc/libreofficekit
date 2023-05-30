@@ -28,7 +28,8 @@
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/string.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <utility>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -52,9 +53,9 @@ namespace pcr
 
     namespace PropertyLineElement = ::com::sun::star::inspection::PropertyLineElement;
 
-    OBrowserLine::OBrowserLine(const OUString& rEntryName, weld::Container* pParent, weld::SizeGroup* pLabelGroup,
+    OBrowserLine::OBrowserLine(OUString aEntryName, weld::Container* pParent, weld::SizeGroup* pLabelGroup,
                                weld::Container* pInitialControlParent)
-        : m_sEntryName(rEntryName)
+        : m_sEntryName(std::move(aEntryName))
         , m_xBuilder(Application::CreateBuilder(pParent, "modules/spropctrlr/ui/browserline.ui"))
         , m_xContainer(m_xBuilder->weld_container("BrowserLine"))
         , m_xFtTitle(m_xBuilder->weld_label("label"))
@@ -179,7 +180,7 @@ namespace pcr
         OUStringBuffer aText(m_xFtTitle->get_label());
 
         int n10DotsWidth = m_xFtTitle->get_pixel_size("..........").Width();
-        int nTextWidth = m_xFtTitle->get_pixel_size(aText.toString()).Width();
+        int nTextWidth = m_xFtTitle->get_pixel_size(OUString::unacquired(aText)).Width();
         int nDiff = m_nNameWidth - nTextWidth;
         int nExtraChars = (nDiff * 10) / n10DotsWidth;
         for (int i = 0; i < nExtraChars; ++i)

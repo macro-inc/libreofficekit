@@ -26,10 +26,10 @@ ifneq ($(strip $(CPPUNITTRACE)),)
 ifneq ($(filter gdb,$(CPPUNITTRACE)),)
 # sneak (a) setting the LD_LIBRARY_PATH, and (b) setting malloc debug flags, into the "gdb --args" command line
 gb_CppunitTest_GDBTRACE := $(subst gdb,\
-	PYTHONWARNINGS=default gdb -return-child-result -ex "add-auto-load-safe-path $(INSTDIR)" -ex "set environment $(subst =, ,$(gb_CppunitTest_CPPTESTPRECOMMAND))" $(if $(PYTHONWARNINGS),-ex 'set environment PYTHONWARNINGS $(PYTHONWARNINGS)') $(gb_CppunitTest_malloc_check) $(gb_CppunitTest_DEBUGCPPUNIT),\
+	gdb -return-child-result -ex "add-auto-load-safe-path $(INSTDIR)" -ex "set environment $(subst =, ,$(gb_CppunitTest_CPPTESTPRECOMMAND))" $(if $(PYTHONWARNINGS),-ex 'set environment PYTHONWARNINGS $(PYTHONWARNINGS)') $(gb_CppunitTest_malloc_check) $(gb_CppunitTest_DEBUGCPPUNIT),\
 	$(CPPUNITTRACE))
 gb_PythonTest_GDBTRACE := $(subst gdb,\
-	PYTHONWARNINGS=default gdb -return-child-result -ex "add-auto-load-safe-path $(INSTDIR)" -ex "set environment $(subst =, ,$(gb_PythonTest_PRECOMMAND))" $(if $(PYTHONWARNINGS),-ex 'set environment PYTHONWARNINGS $(PYTHONWARNINGS)') $(gb_CppunitTest_malloc_check) $(gb_CppunitTest_DEBUGCPPUNIT),\
+	gdb -return-child-result -ex "add-auto-load-safe-path $(INSTDIR)" -ex "set environment $(subst =, ,$(gb_PythonTest_PRECOMMAND))" $(if $(PYTHONWARNINGS),-ex 'set environment PYTHONWARNINGS $(PYTHONWARNINGS)') $(gb_CppunitTest_malloc_check) $(gb_CppunitTest_DEBUGCPPUNIT),\
 	$(CPPUNITTRACE))
 else ifneq ($(filter lldb,$(CPPUNITTRACE)),)
 gb_CppunitTest_GDBTRACE := $(subst lldb,\
@@ -93,7 +93,7 @@ $(if $(URE),\
     $(if $(strip $(UNO_TYPES)),\
 	    "-env:UNO_TYPES=$(foreach item,$(UNO_TYPES),$(call gb_Helper_make_url,$(item)))") \
     $(if $(strip $(UNO_SERVICES)),\
-	"-env:UNO_SERVICES=$(foreach item,$(UNO_SERVICES),$(call gb_Helper_make_url,$(item)))") \
+	"-env:UNO_SERVICES=$(foreach item,$(UNO_SERVICES),$(call gb_Helper_make_url,$(item)))" -env:URE_BIN_DIR=$(call gb_Helper_make_url,$(INSTROOT)/$(LIBO_URE_BIN_FOLDER))) \
 	-env:URE_INTERNAL_LIB_DIR=$(call gb_Helper_make_url,$(INSTROOT)/$(LIBO_URE_LIB_FOLDER)) \
 	-env:LO_LIB_DIR=$(call gb_Helper_make_url,$(INSTROOT)/$(LIBO_LIB_FOLDER)) \
 	-env:LO_JAVA_DIR=$(call gb_Helper_make_url,$(INSTROOT)/$(LIBO_SHARE_JAVA_FOLDER)) \
@@ -132,14 +132,19 @@ else
 		$(if $(gb_CppunitTest__vcl_no_svp), \
 			$(filter-out SAL_USE_VCLPLUGIN=svp,$(gb_TEST_ENV_VARS)),$(gb_TEST_ENV_VARS)) \
 		$(EXTRA_ENV_VARS) \
+		$(if $(filter allow,$(NON_APPLICATION_FONT_USE)),, \
+			$(if $(filter abort,$(NON_APPLICATION_FONT_USE)),SAL_NON_APPLICATION_FONT_USE=abort, \
+			$(if $(filter deny,$(NON_APPLICATION_FONT_USE)),SAL_NON_APPLICATION_FONT_USE=deny))) \
 		$(if $(filter gdb,$(gb_CppunitTest_GDBTRACE)),,$(gb_CppunitTest_CPPTESTPRECOMMAND)) \
 		$(if $(G_SLICE),G_SLICE=$(G_SLICE)) \
 		$(if $(GLIBCXX_FORCE_NEW),GLIBCXX_FORCE_NEW=$(GLIBCXX_FORCE_NEW)) \
 		$(if $(strip $(PYTHON_URE)),\
 			PYTHONDONTWRITEBYTECODE=1) \
+		$(if $(filter gdb,$(CPPUNITTRACE)),\
+			PYTHONWARNINGS=default) \
 		$(ICECREAM_RUN) $(gb_CppunitTest_GDBTRACE) $(gb_CppunitTest_VALGRINDTOOL) $(gb_CppunitTest_RR) \
 			$(gb_CppunitTest_CPPTESTCOMMAND) \
-		$(call gb_LinkTarget_get_target,$(call gb_CppunitTest_get_linktarget,$*)) \
+		$(call gb_CppunitTest_get_linktarget_target,$*) \
 		$(call gb_CppunitTest__make_args) "-env:CPPUNITTESTTARGET=$@" \
 		$(if $(gb_CppunitTest_localized),|| exit $$?; done) \
 		) \
@@ -196,6 +201,7 @@ $(call gb_CppunitTest_get_target,$(1)) : UNO_SERVICES :=
 $(call gb_CppunitTest_get_target,$(1)) : UNO_TYPES :=
 $(call gb_CppunitTest_get_target,$(1)) : HEADLESS := --headless
 $(call gb_CppunitTest_get_target,$(1)) : EXTRA_ENV_VARS :=
+$(call gb_CppunitTest_get_target,$(1)) : NON_APPLICATION_FONT_USE :=
 $$(eval $$(call gb_Module_register_target,$(call gb_CppunitTest_get_target,$(1)),$(call gb_CppunitTest_get_clean_target,$(1))))
 $(call gb_Helper_make_userfriendly_targets,$(1),CppunitTest)
 
@@ -354,17 +360,25 @@ $(call gb_CppunitTest__use_configuration,$(1),xcsxcu,$(INSTROOT)/$(LIBO_SHARE_FO
 
 endef
 
-# Use configuration in $(WORKDIR)/unittest/registry.
-define gb_CppunitTest_use_unittest_configuration
+# Use configuration in $(WORKDIR)/unittest/registry-common.
+define gb_CppunitTest_use_common_configuration
 $(call gb_CppunitTest_get_target,$(1)) : $(call gb_Package_get_target,test_unittest)
-$(call gb_CppunitTest__use_configuration,$(1),xcsxcu,$(WORKDIR)/unittest/registry)
+$(call gb_CppunitTest__use_configuration,$(1),xcsxcu,$(WORKDIR)/unittest/registry-common)
 
 endef
 
-# Use standard configuration: instdir config + unittest config (in this order!)
+# Use configuration in $(WORKDIR)/unittest/registry-user-ui
+define gb_CppunitTest_use_user_ui_configuration
+$(call gb_CppunitTest_get_target,$(1)) : $(call gb_Package_get_target,test_unittest)
+$(call gb_CppunitTest__use_configuration,$(1),xcsxcu,$(WORKDIR)/unittest/registry-user-ui)
+
+endef
+
+# Use standard configuration: instdir config + common + user-ui config (in this order!)
 define gb_CppunitTest_use_configuration
 $(call gb_CppunitTest_use_instdir_configuration,$(1))
-$(call gb_CppunitTest_use_unittest_configuration,$(1))
+$(call gb_CppunitTest_use_common_configuration,$(1))
+$(call gb_CppunitTest_use_user_ui_configuration,$(1))
 
 endef
 
@@ -373,10 +387,17 @@ $(call gb_CppunitTest_get_target,$(1)) : $(call gb_Executable_get_target,$(2))
 
 endef
 
+# One of allow, deny, abort:
+define gb_CppunitTest_set_non_application_font_use
+$(call gb_CppunitTest_get_target,$(1)) : NON_APPLICATION_FONT_USE += $(2)
+
+endef
+
 define gb_CppunitTest_use_more_fonts
 ifneq ($(filter MORE_FONTS,$(BUILD_TYPE)),)
 $(call gb_CppunitTest_get_target,$(1)) : \
     $(foreach font,$(gb_Package_MODULE_ooo_fonts),$(call gb_Package_get_target,$(font)))
+$(call gb_CppunitTest_set_non_application_font_use,$(1),deny)
 endif
 
 endef
@@ -489,7 +510,7 @@ gb_CppunitTest_set_external_code = $(call gb_CppunitTest__forward_to_Linktarget,
 gb_CppunitTest_set_generated_cxx_suffix = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_CppunitTest_use_clang = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_CppunitTest_set_clang_precompiled_header = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
-gb_CppunitTest_use_glxtest = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_CppunitTest_use_vclmain = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
+gb_CppunitTest_add_prejs = $(call gb_CppunitTest__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 
 # vim: set noet sw=4:

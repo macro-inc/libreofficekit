@@ -135,8 +135,11 @@ void GraphicDescriptor::implCreate( SvStream& rIStm, const OUString* pURL )
         case GraphicFileFormat::PCT: pMimeType = MIMETYPE_PCT; cType = graphic::GraphicType::VECTOR; break;
         case GraphicFileFormat::SVM: pMimeType = MIMETYPE_SVM; cType = graphic::GraphicType::VECTOR; break;
         case GraphicFileFormat::WMF: pMimeType = MIMETYPE_WMF; cType = graphic::GraphicType::VECTOR; break;
+        case GraphicFileFormat::WMZ: pMimeType = MIMETYPE_WMF; cType = graphic::GraphicType::VECTOR; break;
         case GraphicFileFormat::EMF: pMimeType = MIMETYPE_EMF; cType = graphic::GraphicType::VECTOR; break;
+        case GraphicFileFormat::EMZ: pMimeType = MIMETYPE_EMF; cType = graphic::GraphicType::VECTOR; break;
         case GraphicFileFormat::SVG: pMimeType = MIMETYPE_SVG; cType = graphic::GraphicType::VECTOR; break;
+        case GraphicFileFormat::SVGZ: pMimeType = MIMETYPE_SVG; cType = graphic::GraphicType::VECTOR; break;
 
         default:
         break;
@@ -244,8 +247,6 @@ rtl::Reference<::comphelper::PropertySetInfo> GraphicDescriptor::createPropertyS
         { OUString( "Animated" ), static_cast< sal_Int32 >( UnoGraphicProperty::Animated ), cppu::UnoType< sal_Bool >::get(), beans::PropertyAttribute::READONLY, 0 },
         { OUString("Linked"), sal_Int32(UnoGraphicProperty::Linked), cppu::UnoType<sal_Bool>::get(), beans::PropertyAttribute::READONLY, 0 },
         { OUString("OriginURL"), sal_Int32(UnoGraphicProperty::OriginURL), cppu::UnoType<OUString>::get(), beans::PropertyAttribute::READONLY, 0 },
-
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
 
     return rtl::Reference<::comphelper::PropertySetInfo>( new ::comphelper::PropertySetInfo(aEntries) );

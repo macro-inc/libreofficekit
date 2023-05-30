@@ -19,6 +19,7 @@
 
 #include <svgpatternnode.hxx>
 #include <svgdocument.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace svgio::svgreader
 {
@@ -55,7 +56,7 @@ namespace svgio::svgreader
             SvgNode::parseAttribute(rTokenName, aSVGToken, aContent);
 
             // read style attributes
-            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent, false);
+            maSvgStyleAttributes.parseStyleAttribute(aSVGToken, aContent);
 
             // parse own
             switch(aSVGToken)
@@ -130,11 +131,11 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.match(commonStrings::aStrUserSpaceOnUse))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrUserSpaceOnUse))
                         {
                             setPatternUnits(SvgUnits::userSpaceOnUse);
                         }
-                        else if(aContent.match(commonStrings::aStrObjectBoundingBox))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrObjectBoundingBox))
                         {
                             setPatternUnits(SvgUnits::objectBoundingBox);
                         }
@@ -145,11 +146,11 @@ namespace svgio::svgreader
                 {
                     if(!aContent.isEmpty())
                     {
-                        if(aContent.match(commonStrings::aStrUserSpaceOnUse))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrUserSpaceOnUse))
                         {
                             setPatternContentUnits(SvgUnits::userSpaceOnUse);
                         }
-                        else if(aContent.match(commonStrings::aStrObjectBoundingBox))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), commonStrings::aStrObjectBoundingBox))
                         {
                             setPatternContentUnits(SvgUnits::objectBoundingBox);
                         }
@@ -169,13 +170,8 @@ namespace svgio::svgreader
                 case SVGToken::Href:
                 case SVGToken::XlinkHref:
                 {
-                    const sal_Int32 nLen(aContent.getLength());
-
-                    if(nLen && '#' == aContent[0])
-                    {
-                        maXLink = aContent.copy(1);
-                        tryToFindLink();
-                    }
+                    readLocalLink(aContent, maXLink);
+                    tryToFindLink();
                     break;
                 }
                 default:

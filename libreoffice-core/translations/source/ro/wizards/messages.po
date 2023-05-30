@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-01-19 13:14+0100\n"
-"PO-Revision-Date: 2022-05-03 12:41+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2023-02-28 22:07+0000\n"
 "Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
-"Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/wizardsmessages/ro/>\n"
+"Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-7-5/wizardsmessages/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1516048481.000000\n"
 
 #. gbiMx
@@ -22,35 +22,35 @@ msgctxt "RID_COMMON_START_0"
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Directorul '%1' nu a putut fi creat.<BR> Este posibil să nu fie suficient spațiu liber disponibil pe disc."
 
-#. BPmbE
+#. zrtRZ
 #: wizards/com/sun/star/wizards/common/strings.hrc:33
 msgctxt "RID_COMMON_START_1"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Documentul text nu a putut fi creat.<BR>Verificați dacă modulul 'PRODUCTNAME Writer' este instalat."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr ""
 
-#. R9k3A
+#. m9CbQ
 #: wizards/com/sun/star/wizards/common/strings.hrc:34
 msgctxt "RID_COMMON_START_2"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Foaia de calcul nu a putut fi creată.<BR>Verificați dacă modulul 'PRODUCTNAME Calc' este instalat."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr ""
 
-#. XfFf9
+#. ZCzrE
 #: wizards/com/sun/star/wizards/common/strings.hrc:35
 msgctxt "RID_COMMON_START_3"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Prezentarea nu a putut fi creată.<BR>Verificați dacă modulul 'PRODUCTNAME Impress' este instalat."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr ""
 
-#. QEUL9
+#. s45vT
 #: wizards/com/sun/star/wizards/common/strings.hrc:36
 msgctxt "RID_COMMON_START_4"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Desenul nu a putut fi creat.<BR>Verificați dacă modulul 'PRODUCTNAME Draw' este instalat."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr ""
 
-#. GA9Kx
+#. YzHou
 #: wizards/com/sun/star/wizards/common/strings.hrc:37
 msgctxt "RID_COMMON_START_5"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Formula nu a putut fi creată.<BR>Verificați dacă modulul 'PRODUCTNAME Math' este instalat."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr ""
 
 #. EcX4n
 #: wizards/com/sun/star/wizards/common/strings.hrc:38
@@ -278,7 +278,7 @@ msgstr "Adresă ~nouă a expeditorului:"
 #: wizards/com/sun/star/wizards/common/strings.hrc:76
 msgctxt "RID_LETTERWIZARDDIALOG_START_21"
 msgid "Use placeholders for ~recipient's address"
-msgstr "Folosește simbolu~ri de substituire pentru adresa destinatarului"
+msgstr "Folosește substituenți pentru ad~resa destinatarului"
 
 #. AkZCA
 #: wizards/com/sun/star/wizards/common/strings.hrc:77
@@ -434,7 +434,7 @@ msgstr "Subsol"
 #: wizards/com/sun/star/wizards/common/strings.hrc:102
 msgctxt "RID_LETTERWIZARDDIALOG_START_48"
 msgid "This wizard creates a letter template which enables you to create multiple letters with the same layout and settings."
-msgstr "Acest asistent creează un șablon de scrisoare care vă permite să creați mai multe scrisori cu același aspect și aceleași setări."
+msgstr "Acest asistent creează un șablon de scrisoare care vă permite să creați mai multe scrisori cu aceeași dispunere și aceleași setări."
 
 #. C9EDv
 #: wizards/com/sun/star/wizards/common/strings.hrc:103
@@ -590,7 +590,7 @@ msgstr "Design de pagină"
 #: wizards/com/sun/star/wizards/common/strings.hrc:134
 msgctxt "RID_LETTERWIZARDROADMAP_START_2"
 msgid "Letterhead Layout"
-msgstr "Aranjamentul antetului"
+msgstr "Dispunerea antetului scrisorii"
 
 #. pbqyP
 #: wizards/com/sun/star/wizards/common/strings.hrc:135
@@ -752,7 +752,7 @@ msgstr "Subsol"
 #: wizards/com/sun/star/wizards/common/strings.hrc:163
 msgctxt "RID_FAXWIZARDDIALOG_START_23"
 msgid "This wizard creates a fax template which enables you to create multiple faxes with the same layout and settings."
-msgstr "Acest asistent creează un șablon de fax care vă permite să generați mai multe faxuri cu același aspect și aceleași setări."
+msgstr "Acest asistent creează un șablon de fax care vă permite să generați mai multe faxuri cu aceeași dispunere și aceleași setări."
 
 #. 58yuF
 #: wizards/com/sun/star/wizards/common/strings.hrc:164
@@ -842,7 +842,7 @@ msgstr "Număr de fax:"
 #: wizards/com/sun/star/wizards/common/strings.hrc:178
 msgctxt "RID_FAXWIZARDDIALOG_START_38"
 msgid "Use placeholders for ~recipient's address"
-msgstr "Folosește simbolu~ri de substituire pentru adresa destinatarului"
+msgstr "Folosește substituenți pentru ad~resa destinatarului"
 
 #. gqzFF
 #: wizards/com/sun/star/wizards/common/strings.hrc:179
@@ -1148,7 +1148,7 @@ msgstr "Locație:"
 #: wizards/com/sun/star/wizards/common/strings.hrc:239
 msgctxt "RID_AGENDAWIZARDDIALOG_START_17"
 msgid "Placeholders will be used in empty fields. You can replace placeholders with text later."
-msgstr "În câmpurile goale se vor plasa simboluri de substituire. Le veți putea înlocui ulterior cu text."
+msgstr "Substituenții vor fi folosiți în câmpurile goale. Puteți înlocui substituenții cu text mai târziu."
 
 #. raUGn
 #: wizards/com/sun/star/wizards/common/strings.hrc:240
@@ -1232,7 +1232,7 @@ msgstr "Angajați ai companiei"
 #: wizards/com/sun/star/wizards/common/strings.hrc:253
 msgctxt "RID_AGENDAWIZARDDIALOG_START_31"
 msgid "The agenda template will include placeholders for the names of the selected people. When creating an agenda from the template, you can replace these placeholder with the appropriate names."
-msgstr "Șablonul de agendă va include spații rezervate pentru numele persoanelor selectate. Atunci când creați o agendă folosind șablonul, puteți înlocui aceste spații cu numele corespunzătoare."
+msgstr "Șablonul de agendă va include substituenți pentru numele persoanelor selectate. Atunci când creați o agendă din șablon, puteți înlocui acest substituent cu numele corespunzătoare."
 
 #. F4f4a
 #: wizards/com/sun/star/wizards/common/strings.hrc:254
@@ -1262,7 +1262,7 @@ msgstr "Notițe"
 #: wizards/com/sun/star/wizards/common/strings.hrc:258
 msgctxt "RID_AGENDAWIZARDDIALOG_START_36"
 msgid "The agenda template will include placeholders for the selected items."
-msgstr "Șablonul agendei va include spații rezervate pentru elementele selectate."
+msgstr "Șablonul de agendă va include substituenți pentru elementele selectate."
 
 #. bCFEm
 #: wizards/com/sun/star/wizards/common/strings.hrc:259
@@ -1274,7 +1274,7 @@ msgstr "Dată:"
 #: wizards/com/sun/star/wizards/common/strings.hrc:260
 msgctxt "RID_AGENDAWIZARDDIALOG_START_39"
 msgid "This wizard creates an agenda template which enables you to create multiple agendas with the same layout and settings."
-msgstr "Acest asistent creează un șablon de agendă care vă permite să creați agende multiple cu același aspect și aceleași setări."
+msgstr "Acest asistent creează un șablon de agendă care vă permite să creați agende multiple cu aceeași dispunere și aceleași setări."
 
 #. CS6WP
 #: wizards/com/sun/star/wizards/common/strings.hrc:261
@@ -1310,7 +1310,7 @@ msgstr "Nume"
 #: wizards/com/sun/star/wizards/common/strings.hrc:266
 msgctxt "RID_AGENDAWIZARDDIALOG_START_45"
 msgid "Date"
-msgstr "Dată:"
+msgstr "Dată"
 
 #. tatFa
 #: wizards/com/sun/star/wizards/common/strings.hrc:267

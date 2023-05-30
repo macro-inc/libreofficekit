@@ -31,8 +31,7 @@
 #include <com/sun/star/text/XTextDocument.hpp>
 
 #include <osl/mutex.hxx>
-#include <cppuhelper/interfacecontainer.h>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/multicontainer2.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <tools/UnitConversion.hxx>
@@ -63,6 +62,7 @@
 #include <cppuhelper/implbase.hxx>
 #include <svl/itemprop.hxx>
 #include <svl/listener.hxx>
+#include <mutex>
 
 using namespace ::com::sun::star;
 
@@ -295,7 +295,7 @@ private:
     SwSectionFormat* m_pFormat;
 
 public:
-    uno::WeakReference<uno::XInterface> m_wThis;
+    unotools::WeakReference<SwXDocumentIndex> m_wThis;
     ::comphelper::OMultiTypeInterfaceContainerHelper2 m_Listeners;
     SfxItemPropertySet const& m_rPropSet;
     const TOXTypes m_eTOXType;
@@ -371,12 +371,12 @@ void SwXDocumentIndex::Impl::Notify(const SfxHint& rHint)
     if(!m_pFormat)
     {
         EndListeningAll();
-        uno::Reference<uno::XInterface> const xThis(m_wThis);
+        rtl::Reference<SwXDocumentIndex> const xThis(m_wThis);
         if (!xThis.is())
         {   // fdo#72695: if UNO object is already dead, don't revive it with event
             return;
         }
-        lang::EventObject const ev(xThis);
+        lang::EventObject const ev(static_cast<cppu::OWeakObject*>(xThis.get()));
         m_Listeners.disposeAndClear(ev);
     }
 }
@@ -397,30 +397,29 @@ SwXDocumentIndex::~SwXDocumentIndex()
 {
 }
 
-uno::Reference<text::XDocumentIndex>
+rtl::Reference<SwXDocumentIndex>
 SwXDocumentIndex::CreateXDocumentIndex(
         SwDoc & rDoc, SwTOXBaseSection * pSection, TOXTypes const eTypes)
 {
     // re-use existing SwXDocumentIndex
     // #i105557#: do not iterate over the registered clients: race condition
-    uno::Reference<text::XDocumentIndex> xIndex;
+    rtl::Reference<SwXDocumentIndex> xIndex;
     if (pSection)
     {
         SwSectionFormat const *const pFormat = pSection->GetFormat();
-        xIndex.set(pFormat->GetXObject(), uno::UNO_QUERY);
+        xIndex = dynamic_cast<SwXDocumentIndex*>(pFormat->GetXObject().get().get());
     }
     if (!xIndex.is())
     {
-        SwXDocumentIndex *const pIndex(pSection
+        xIndex = pSection
                 ? new SwXDocumentIndex(*pSection, rDoc)
-                : new SwXDocumentIndex(eTypes, rDoc));
-        xIndex.set(pIndex);
+                : new SwXDocumentIndex(eTypes, rDoc);
         if (pSection)
         {
-            pSection->GetFormat()->SetXObject(xIndex);
+            pSection->GetFormat()->SetXObject(static_cast<cppu::OWeakObject*>(xIndex.get()));
         }
         // need a permanent Reference to initialize m_wThis
-        pIndex->m_pImpl->m_wThis = xIndex;
+        xIndex->m_pImpl->m_wThis = xIndex.get();
     }
     return xIndex;
 }
@@ -793,6 +792,30 @@ SwXDocumentIndex::setPropertyValue(
         case WID_CREATE_FROM_PARAGRAPH_STYLES:
             lcl_AnyToBitMask(rValue, nCreate, SwTOXElement::Template);
         break;
+        case WID_CREATE_FROM_PARAGRAPH_STYLE:
+        {
+            OUString style;
+            if (rValue >>= style)
+            {
+                if (style.indexOf(TOX_STYLE_DELIMITER) != -1)
+                {
+                    throw lang::IllegalArgumentException();
+                }
+                lcl_AnyToBitMask(uno::Any(true), nCreate, SwTOXElement::Template);
+                OUString uiStyle;
+                SwStyleNameMapper::FillUIName(style, uiStyle, SwGetPoolIdFromName::TxtColl);
+                rTOXBase.SetStyleNames(uiStyle, 0);
+            }
+            else if (!rValue.hasValue())
+            {
+                lcl_AnyToBitMask(uno::Any(false), nCreate, SwTOXElement::Template);
+            }
+            else
+            {
+                throw lang::IllegalArgumentException();
+            }
+        }
+        break;
 
         case WID_PARA_LEV1:
         case WID_PARA_LEV2:
@@ -1102,6 +1125,23 @@ SwXDocumentIndex::getPropertyValue(const OUString& rPropertyName)
             case WID_CREATE_FROM_PARAGRAPH_STYLES:
                 lcl_BitMaskToAny(aRet, nCreate, SwTOXElement::Template);
             break;
+            case WID_CREATE_FROM_PARAGRAPH_STYLE:
+            {
+                if (nCreate & SwTOXElement::Template)
+                {   // there is only one style, at top level
+                    OUString const& rStyle(pTOXBase->GetStyleNames(0));
+                    if (!rStyle.isEmpty())
+                    {
+                        assert(rStyle.indexOf(TOX_STYLE_DELIMITER) == -1);
+                        OUString ret;
+                        SwStyleNameMapper::FillProgName(rStyle, ret,
+                            SwGetPoolIdFromName::TxtColl);
+                        aRet <<= ret;
+                    }
+                }
+            }
+            break;
+
             case WID_PARA_HEAD:
             {
                 //Header is at position 0
@@ -1349,14 +1389,14 @@ SwXDocumentIndex::getAnchor()
         throw uno::RuntimeException();
     }
 
-    uno::Reference< text::XTextRange > xRet;
+    rtl::Reference<SwXTextRange> xRet;
     SwNodeIndex const*const pIdx( pSectionFormat->GetContent().GetContentIdx() );
     if (pIdx && pIdx->GetNode().GetNodes().IsDocNodes())
     {
         SwPaM aPaM(*pIdx);
         aPaM.Move( fnMoveForward, GoInContent );
         aPaM.SetMark();
-        aPaM.GetPoint()->nNode = *pIdx->GetNode().EndOfSectionNode();
+        aPaM.GetPoint()->Assign( *pIdx->GetNode().EndOfSectionNode() );
         aPaM.Move( fnMoveBackward, GoInContent );
         xRet = SwXTextRange::CreateXTextRange(*pSectionFormat->GetDoc(),
             *aPaM.GetMark(), aPaM.GetPoint());
@@ -1478,16 +1518,16 @@ lcl_TypeToPropertyMap_Mark(const TOXTypes eType)
 class SwXDocumentIndexMark::Impl final: public SvtListener
 {
 private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
     SwXDocumentIndexMark & m_rThis;
     bool m_bInReplaceMark;
 
 public:
 
-    uno::WeakReference<uno::XInterface> m_wThis;
+    unotools::WeakReference<SwXDocumentIndexMark> m_wThis;
     SfxItemPropertySet const& m_rPropSet;
     const TOXTypes m_eTOXType;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
     bool m_bIsDescriptor;
     const SwTOXType* m_pTOXType;
     const SwTOXMark* m_pTOXMark;
@@ -1514,7 +1554,6 @@ public:
         , m_rPropSet(
             *aSwMapProvider.GetPropertySet(lcl_TypeToPropertyMap_Mark(eType)))
         , m_eTOXType(eType)
-        , m_EventListeners(m_Mutex)
         , m_bIsDescriptor(nullptr == pMark)
         , m_pTOXType(pType)
         , m_pTOXMark(pMark)
@@ -1555,7 +1594,8 @@ public:
             OSL_FAIL("ReplaceTOXMark() failed!");
             lang::EventObject const ev(
                     static_cast< ::cppu::OWeakObject&>(m_rThis));
-            m_EventListeners.disposeAndClear(ev);
+            std::unique_lock aGuard(m_Mutex);
+            m_EventListeners.disposeAndClear(aGuard, ev);
             throw;
         }
     }
@@ -1568,12 +1608,13 @@ void SwXDocumentIndexMark::Impl::Invalidate()
 {
     if (!m_bInReplaceMark) // #i109983# only dispose on delete, not on replace!
     {
-        uno::Reference<uno::XInterface> const xThis(m_wThis);
+        rtl::Reference<SwXDocumentIndexMark> const xThis(m_wThis);
         // fdo#72695: if UNO object is already dead, don't revive it with event
         if (xThis.is())
         {
-            lang::EventObject const ev(xThis);
-            m_EventListeners.disposeAndClear(ev);
+            lang::EventObject const ev(static_cast<cppu::OWeakObject*>(xThis.get()));
+            std::unique_lock aGuard(m_Mutex);
+            m_EventListeners.disposeAndClear(aGuard, ev);
         }
     }
     EndListeningAll();
@@ -1610,31 +1651,30 @@ SwXDocumentIndexMark::~SwXDocumentIndexMark()
 {
 }
 
-uno::Reference<text::XDocumentIndexMark>
+rtl::Reference<SwXDocumentIndexMark>
 SwXDocumentIndexMark::CreateXDocumentIndexMark(
         SwDoc & rDoc, SwTOXMark *const pMark, TOXTypes const eType)
 {
     // re-use existing SwXDocumentIndexMark
     // NB: xmloff depends on this caching to generate ID from the address!
     // #i105557#: do not iterate over the registered clients: race condition
-    uno::Reference<text::XDocumentIndexMark> xTOXMark;
+    rtl::Reference<SwXDocumentIndexMark> xTOXMark;
     if (pMark)
     {
         xTOXMark = pMark->GetXTOXMark();
     }
     if (!xTOXMark.is())
     {
-        SwXDocumentIndexMark *const pNew(pMark
+        xTOXMark = pMark
             ? new SwXDocumentIndexMark(rDoc,
                     *const_cast<SwTOXType*>(pMark->GetTOXType()), *pMark)
-            : new SwXDocumentIndexMark(eType));
-        xTOXMark.set(pNew);
+            : new SwXDocumentIndexMark(eType);
         if (pMark)
         {
             pMark->SetXTOXMark(xTOXMark);
         }
         // need a permanent Reference to initialize m_wThis
-        pNew->m_pImpl->m_wThis = xTOXMark;
+        xTOXMark->m_pImpl->m_wThis = xTOXMark.get();
     }
     return xTOXMark;
 }
@@ -1730,10 +1770,10 @@ SwXDocumentIndexMark::setMarkEntry(const OUString& rIndexEntry)
         aPam.SetMark();
         if(pTextMark->End())
         {
-            aPam.GetPoint()->nContent = *pTextMark->End();
+            aPam.GetPoint()->SetContent( *pTextMark->End() );
         }
         else
-            ++aPam.GetPoint()->nContent;
+            aPam.GetPoint()->AdjustContent(1);
 
         m_pImpl->ReplaceTOXMark(*pType, aMark, aPam);
     }
@@ -1955,11 +1995,11 @@ SwXDocumentIndexMark::getAnchor()
     aPam.SetMark();
     if(pTextMark->End())
     {
-        aPam.GetPoint()->nContent = *pTextMark->End();
+        aPam.GetPoint()->SetContent( *pTextMark->End() );
     }
     else
     {
-        ++aPam.GetPoint()->nContent;
+        aPam.GetPoint()->AdjustContent(1);
     }
     const uno::Reference< frame::XModel > xModel =
         m_pImpl->m_pDoc->GetDocShell()->GetBaseModel();
@@ -1987,7 +2027,8 @@ SwXDocumentIndexMark::addEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL
@@ -1995,7 +2036,8 @@ SwXDocumentIndexMark::removeEventListener(
         const uno::Reference< lang::XEventListener > & xListener)
 {
     // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 uno::Reference< beans::XPropertySetInfo > SAL_CALL
@@ -2089,11 +2131,11 @@ SwXDocumentIndexMark::setPropertyValue(
         aPam.SetMark();
         if(pTextMark->End())
         {
-            aPam.GetPoint()->nContent = *pTextMark->End();
+            aPam.GetPoint()->SetContent(*pTextMark->End());
         }
         else
         {
-            ++aPam.GetPoint()->nContent;
+            aPam.GetPoint()->AdjustContent(1);
         }
 
         m_pImpl->ReplaceTOXMark(*pType, aMark, aPam);

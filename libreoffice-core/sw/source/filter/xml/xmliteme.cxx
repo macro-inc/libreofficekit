@@ -34,7 +34,6 @@
 #include "xmlexp.hxx"
 #include <editeng/memberids.h>
 #include <editeng/prntitem.hxx>
-#include <xmloff/xmlnamespace.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -110,13 +109,11 @@ void SwXMLTableItemMapper_Impl::handleSpecialItem(
 
     case RES_PRINT:
         {
-            const SfxPoolItem *pItem;
+            const SvxPrintItem *pItem;
             if( pSet &&
-                SfxItemState::SET == pSet->GetItemState( RES_PRINT, true,
-                                                    &pItem ) )
+                (pItem = pSet->GetItemIfSet( RES_PRINT )) )
             {
-                bool bHasTextChangesOnly =
-                    static_cast<const SvxPrintItem *>(pItem)->GetValue();
+                bool bHasTextChangesOnly = pItem->GetValue();
                 if ( !bHasTextChangesOnly )
                 {
                     OUString sValue;
@@ -136,13 +133,11 @@ void SwXMLTableItemMapper_Impl::handleSpecialItem(
 
     case RES_LR_SPACE:
         {
-            const SfxPoolItem *pItem;
+            const SwFormatHoriOrient *pItem;
             if( pSet &&
-                SfxItemState::SET == pSet->GetItemState( RES_HORI_ORIENT, true,
-                                                    &pItem ) )
+                (pItem = pSet->GetItemIfSet( RES_HORI_ORIENT )) )
             {
-                sal_Int16 eHoriOrient =
-                    static_cast<const SwFormatHoriOrient *>(pItem)->GetHoriOrient();
+                sal_Int16 eHoriOrient = pItem->GetHoriOrient();
                 bool bExport = false;
                 sal_uInt16 nMemberId =
                     o3tl::narrowing<sal_uInt16>( rEntry.nMemberId & MID_SW_FLAG_MASK );

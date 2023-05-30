@@ -22,11 +22,11 @@
 #include <RangeSelectionHelper.hxx>
 #include <helpids.h>
 #include <chartview/ChartSfxItemIds.hxx>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <vcl/weld.hxx>
+#include <ChartModel.hxx>
 
 #include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <svl/stritem.hxx>
 
@@ -165,12 +165,12 @@ void ErrorBarResources::SetErrorBarType( tErrorBarType eNewType )
 }
 
 void ErrorBarResources::SetChartDocumentForRangeChoosing(
-    const uno::Reference< chart2::XChartDocument > & xChartDocument )
+    const rtl::Reference<::chart::ChartModel> & xChartDocument )
 {
     if( xChartDocument.is())
     {
         m_bHasInternalDataProvider = xChartDocument->hasInternalDataProvider();
-        uno::Reference< beans::XPropertySet > xProps( xChartDocument, uno::UNO_QUERY );
+        uno::Reference< beans::XPropertySet > xProps( static_cast<cppu::OWeakObject*>(xChartDocument.get()), uno::UNO_QUERY );
         if ( xProps.is() )
         {
             try
@@ -515,16 +515,14 @@ void ErrorBarResources::Reset(const SfxItemSet& rInAttrs)
     }
 
     // parameters
-    aState = rInAttrs.GetItemState( SCHATTR_STAT_CONSTPLUS, true, &pPoolItem );
-    if( aState == SfxItemState::SET )
+    if( const SvxDoubleItem* pDoubleItem = rInAttrs.GetItemIfSet( SCHATTR_STAT_CONSTPLUS ) )
     {
-        m_fPlusValue = static_cast<const SvxDoubleItem*>(pPoolItem)->GetValue();
+        m_fPlusValue = pDoubleItem->GetValue();
     }
 
-    aState = rInAttrs.GetItemState( SCHATTR_STAT_CONSTMINUS, true, &pPoolItem );
-    if( aState == SfxItemState::SET )
+    if( const SvxDoubleItem* pStatItem = rInAttrs.GetItemIfSet( SCHATTR_STAT_CONSTMINUS ) )
     {
-        m_fMinusValue = static_cast<const SvxDoubleItem*>(pPoolItem)->GetValue();
+        m_fMinusValue = pStatItem->GetValue();
 
         if( m_eErrorKind != SvxChartKindError::Range &&
             m_fPlusValue == m_fMinusValue )

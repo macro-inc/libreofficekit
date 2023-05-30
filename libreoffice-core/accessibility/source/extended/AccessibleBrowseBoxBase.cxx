@@ -19,6 +19,7 @@
 
 #include <extended/AccessibleBrowseBoxBase.hxx>
 #include <toolkit/helper/convert.hxx>
+#include <utility>
 #include <vcl/accessibletableprovider.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -49,14 +50,14 @@ using namespace com::sun::star::accessibility::AccessibleStateType;
 // Ctor/Dtor/disposing
 
 AccessibleBrowseBoxBase::AccessibleBrowseBoxBase(
-        const css::uno::Reference< css::accessibility::XAccessible >& rxParent,
+        css::uno::Reference< css::accessibility::XAccessible > xParent,
         ::vcl::IAccessibleTableProvider&                      rBrowseBox,
-        const css::uno::Reference< css::awt::XWindow >& _xFocusWindow,
+        css::uno::Reference< css::awt::XWindow > _xFocusWindow,
         AccessibleBrowseBoxObjType      eObjType ) :
     AccessibleBrowseBoxImplHelper( m_aMutex ),
-    mxParent( rxParent ),
+    mxParent(std::move( xParent )),
     mpBrowseBox( &rBrowseBox ),
-    m_xFocusWindow(_xFocusWindow),
+    m_xFocusWindow(std::move(_xFocusWindow)),
     maName( rBrowseBox.GetAccessibleObjectName( eObjType ) ),
     maDescription( rBrowseBox.GetAccessibleObjectDescription( eObjType ) ),
     meObjType( eObjType ),
@@ -67,18 +68,18 @@ AccessibleBrowseBoxBase::AccessibleBrowseBoxBase(
 }
 
 AccessibleBrowseBoxBase::AccessibleBrowseBoxBase(
-        const css::uno::Reference< css::accessibility::XAccessible >& rxParent,
+        css::uno::Reference< css::accessibility::XAccessible >  rxParent,
         ::vcl::IAccessibleTableProvider&                      rBrowseBox,
-        const css::uno::Reference< css::awt::XWindow >& _xFocusWindow,
+        css::uno::Reference< css::awt::XWindow >  _xFocusWindow,
         AccessibleBrowseBoxObjType      eObjType,
-        const OUString&          rName,
-        const OUString&          rDescription ) :
+        OUString           rName,
+        OUString           rDescription ) :
     AccessibleBrowseBoxImplHelper( m_aMutex ),
-    mxParent( rxParent ),
+    mxParent(std::move( rxParent )),
     mpBrowseBox( &rBrowseBox ),
-    m_xFocusWindow(_xFocusWindow),
-    maName( rName ),
-    maDescription( rDescription ),
+    m_xFocusWindow(std::move(_xFocusWindow)),
+    maName(std::move( rName )),
+    maDescription(std::move( rDescription )),
     meObjType( eObjType ),
     m_aClientId(0)
 {
@@ -125,13 +126,13 @@ Reference< css::accessibility::XAccessible > SAL_CALL AccessibleBrowseBoxBase::g
     return mxParent;
 }
 
-sal_Int32 SAL_CALL AccessibleBrowseBoxBase::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleBrowseBoxBase::getAccessibleIndexInParent()
 {
     ::osl::MutexGuard aGuard( getMutex() );
     ensureIsAlive();
 
     // -1 for child not found/no parent (according to specification)
-    sal_Int32 nRet = -1;
+    sal_Int64 nRet = -1;
 
     css::uno::Reference< uno::XInterface > xMeMyselfAndI( static_cast< css::accessibility::XAccessibleContext* >( this ), uno::UNO_QUERY );
 
@@ -144,8 +145,8 @@ sal_Int32 SAL_CALL AccessibleBrowseBoxBase::getAccessibleIndexInParent()
         {
             css::uno::Reference< uno::XInterface > xChild;
 
-            sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-            for( sal_Int32 nChild = 0; nChild < nChildCount; ++nChild )
+            sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+            for( sal_Int64 nChild = 0; nChild < nChildCount; ++nChild )
             {
                 xChild.set(xParentContext->getAccessibleChild( nChild ), css::uno::UNO_QUERY);
 
@@ -183,12 +184,12 @@ AccessibleBrowseBoxBase::getAccessibleRelationSet()
     return new utl::AccessibleRelationSetHelper;
 }
 
-Reference< css::accessibility::XAccessibleStateSet > SAL_CALL
+sal_Int64 SAL_CALL
 AccessibleBrowseBoxBase::getAccessibleStateSet()
 {
     SolarMethodGuard aGuard( getMutex() );
     // don't check whether alive -> StateSet may contain DEFUNC
-    return implCreateStateSetHelper();
+    return implCreateStateSet();
 }
 
 lang::Locale SAL_CALL AccessibleBrowseBoxBase::getLocale()
@@ -354,23 +355,22 @@ bool AccessibleBrowseBoxBase::implIsShowing()
     return bShowing;
 }
 
-rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleBrowseBoxBase::implCreateStateSetHelper()
+sal_Int64 AccessibleBrowseBoxBase::implCreateStateSet()
 {
-    rtl::Reference<::utl::AccessibleStateSetHelper>
-        pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( isAlive() )
     {
         // SHOWING done with mxParent
         if( implIsShowing() )
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
         // BrowseBox fills StateSet with states depending on object type
-        mpBrowseBox->FillAccessibleStateSet( *pStateSetHelper, getType() );
+        mpBrowseBox->FillAccessibleStateSet( nStateSet, getType() );
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 // internal helper methods

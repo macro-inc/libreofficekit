@@ -22,6 +22,7 @@
 #include <tools/date.hxx>
 #include <tools/time.hxx>
 #include <svl/fstathelper.hxx>
+#include <unotools/configmgr.hxx>
 #include <unotools/moduleoptions.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/docfilt.hxx>
@@ -30,6 +31,7 @@
 #include <editeng/boxitem.hxx>
 #include <editeng/paperinf.hxx>
 #include <o3tl/deleter.hxx>
+#include <officecfg/Office/Writer.hxx>
 #include <node.hxx>
 #include <docary.hxx>
 #include <fmtanchr.hxx>
@@ -63,6 +65,7 @@
 #include <swerror.h>
 #include <pausethreadstarting.hxx>
 #include <frameformats.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -73,6 +76,16 @@ static bool sw_MergePortions(SwNode* pNode, void *)
         pNode->GetTextNode()->FileLoadedInitHints();
     }
     return true;
+}
+
+void SwAsciiOptions::Reset()
+{
+    m_sFont.clear();
+    m_eCRLF_Flag = GetSystemLineEnd();
+    m_eCharSet = ::osl_getThreadTextEncoding();
+    m_nLanguage = LANGUAGE_SYSTEM;
+    m_bIncludeBOM = true;
+    m_bIncludeHidden = !utl::ConfigManager::IsFuzzing() && officecfg::Office::Writer::FilterFlags::ASCII::IncludeHiddenText::get();
 }
 
 ErrCode SwReader::Read( const Reader& rOptions )
@@ -117,8 +130,7 @@ ErrCode SwReader::Read( const Reader& rOptions )
     else
     {
         // if the Reader was not called by a Shell, create a PaM ourselves
-        SwNodeIndex nNode( mxDoc->GetNodes().GetEndOfContent(), -1 );
-        pPam = new SwPaM( nNode );
+        pPam = new SwPaM( mxDoc->GetNodes().GetEndOfContent(), SwNodeOffset(-1) );
         // For Web documents the default template was set already by InitNew,
         // unless the filter is not HTML,
         // or a SetTemplateName was called in ConvertFrom.
@@ -169,7 +181,7 @@ ErrCode SwReader::Read( const Reader& rOptions )
         if( bDocUndo || mpCursor )
         {
             // set Pam to the previous node, so that it is not also moved
-            const SwNodeIndex& rTmp = pPam->GetPoint()->nNode;
+            const SwNode& rTmp = pPam->GetPoint()->GetNode();
             pUndoPam.emplace( rTmp, rTmp, SwNodeOffset(0), SwNodeOffset(-1) );
         }
 
@@ -180,12 +192,12 @@ ErrCode SwReader::Read( const Reader& rOptions )
                 mxDoc->GetSpzFrameFormats()->end() );
         }
 
-        const sal_Int32 nSttContent = pPam->GetPoint()->nContent.GetIndex();
+        const sal_Int32 nSttContent = pPam->GetPoint()->GetContentIndex();
 
         // make sure the End position is correct for all Readers
-        SwContentNode* pCNd = pPam->GetContentNode();
+        SwContentNode* pCNd = pPam->GetPointContentNode();
         sal_Int32 nEndContent = pCNd ? pCNd->Len() - nSttContent : 0;
-        SwNodeIndex aEndPos( pPam->GetPoint()->nNode, 1 );
+        SwNodeIndex aEndPos( pPam->GetPoint()->GetNode(), 1 );
 
         mxDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
 
@@ -203,13 +215,12 @@ ErrCode SwReader::Read( const Reader& rOptions )
             if( !pCNd && nullptr == ( pCNd = SwNodes::GoPrevious( &aEndPos ) ))
                 pCNd = mxDoc->GetNodes().GoNext( &aEndPos );
 
-            pPam->GetPoint()->nNode = aEndPos;
             const sal_Int32 nLen = pCNd->Len();
             if( nLen < nEndContent )
                 nEndContent = 0;
             else
                 nEndContent = nLen - nEndContent;
-            pPam->GetPoint()->nContent.Assign( pCNd, nEndContent );
+            pPam->GetPoint()->Assign( *pCNd, nEndContent );
 
             const SwStartNode* pTableBoxStart = pCNd->FindTableBoxStartNode();
             if ( pTableBoxStart )
@@ -225,13 +236,10 @@ ErrCode SwReader::Read( const Reader& rOptions )
         if( mpCursor )
         {
             *pUndoPam->GetMark() = *pPam->GetPoint();
-            ++pUndoPam->GetPoint()->nNode;
-            SwNode& rNd = pUndoPam->GetNode();
+            pUndoPam->GetPoint()->Adjust(SwNodeOffset(1));
+            SwNode& rNd = pUndoPam->GetPointNode();
             if( rNd.IsContentNode() )
-                pUndoPam->GetPoint()->nContent.Assign(
-                                    static_cast<SwContentNode*>(&rNd), nSttContent );
-            else
-                pUndoPam->GetPoint()->nContent.Assign( nullptr, 0 );
+                pUndoPam->GetPoint()->SetContent( nSttContent );
 
             bool bChkHeaderFooter = rNd.FindHeaderStartNode() ||
                                    rNd.FindFooterStartNode();
@@ -247,8 +255,8 @@ ErrCode SwReader::Read( const Reader& rOptions )
                     if  (   (RndStdIds::FLY_AT_PAGE == rAnchor.GetAnchorId())
                         // TODO: why is this not handled via SetInsertRange?
                         ||  SwUndoInserts::IsCreateUndoForNewFly(rAnchor,
-                                pUndoPam->GetPoint()->nNode.GetIndex(),
-                                pUndoPam->GetMark()->nNode.GetIndex()))
+                                pUndoPam->GetPoint()->GetNodeIndex(),
+                                pUndoPam->GetMark()->GetNodeIndex()))
                     {
                         if( bChkHeaderFooter &&
                             (RndStdIds::FLY_AT_PARA == rAnchor.GetAnchorId()) &&
@@ -279,7 +287,7 @@ ErrCode SwReader::Read( const Reader& rOptions )
 
                             if (RndStdIds::FLY_AT_PAGE == rAnchor.GetAnchorId())
                             {
-                                if( !rAnchor.GetContentAnchor() )
+                                if( !rAnchor.GetAnchorNode() )
                                 {
                                     pFrameFormat->MakeFrames();
                                 }
@@ -375,7 +383,7 @@ ErrCode SwReader::Read( const Reader& rOptions )
         // not insert: set the redline mode read from settings.xml
         eOld = ePostReadRedlineFlags & ~RedlineFlags::Ignore;
 
-        mxDoc->getIDocumentFieldsAccess().SetFieldsDirty(false, nullptr, SwNodeOffset(0));
+        mxDoc->getIDocumentFieldsAccess().SetFieldsDirty(true, nullptr, SwNodeOffset(0));
     }
 
     mxDoc->getIDocumentRedlineAccess().SetRedlineFlags_intern( eOld );
@@ -401,9 +409,9 @@ ErrCode SwReader::Read( const Reader& rOptions )
 }
 
 
-SwReader::SwReader(SfxMedium& rMedium, const OUString& rFileName, SwDoc *pDocument)
+SwReader::SwReader(SfxMedium& rMedium, OUString aFileName, SwDoc *pDocument)
     : SwDocFac(pDocument), mpStrm(nullptr), mpMedium(&rMedium), mpCursor(nullptr),
-    maFileName(rFileName), mbSkipImages(false)
+    maFileName(std::move(aFileName)), mbSkipImages(false)
 {
     SetBaseURL( rMedium.GetBaseURL() );
     SetSkipImages( rMedium.IsSkipImages() );
@@ -411,22 +419,22 @@ SwReader::SwReader(SfxMedium& rMedium, const OUString& rFileName, SwDoc *pDocume
 
 
 // Read into an existing document
-SwReader::SwReader(SvStream& rStrm, const OUString& rFileName, const OUString& rBaseURL, SwPaM& rPam)
+SwReader::SwReader(SvStream& rStrm, OUString aFileName, const OUString& rBaseURL, SwPaM& rPam)
     : SwDocFac(&rPam.GetDoc()), mpStrm(&rStrm), mpMedium(nullptr), mpCursor(&rPam),
-    maFileName(rFileName), mbSkipImages(false)
+    maFileName(std::move(aFileName)), mbSkipImages(false)
 {
     SetBaseURL( rBaseURL );
 }
 
-SwReader::SwReader(SfxMedium& rMedium, const OUString& rFileName, SwPaM& rPam)
+SwReader::SwReader(SfxMedium& rMedium, OUString aFileName, SwPaM& rPam)
     : SwDocFac(&rPam.GetDoc()), mpStrm(nullptr), mpMedium(&rMedium),
-    mpCursor(&rPam), maFileName(rFileName), mbSkipImages(false)
+    mpCursor(&rPam), maFileName(std::move(aFileName)), mbSkipImages(false)
 {
     SetBaseURL( rMedium.GetBaseURL() );
 }
 
-SwReader::SwReader( const uno::Reference < embed::XStorage > &rStg, const OUString& rFilename, SwPaM &rPam )
-    : SwDocFac(&rPam.GetDoc()), mpStrm(nullptr), mxStg( rStg ), mpMedium(nullptr), mpCursor(&rPam), maFileName(rFilename), mbSkipImages(false)
+SwReader::SwReader( uno::Reference < embed::XStorage > xStg, OUString aFilename, SwPaM &rPam )
+    : SwDocFac(&rPam.GetDoc()), mpStrm(nullptr), mxStg( std::move(xStg) ), mpMedium(nullptr), mpCursor(&rPam), maFileName(std::move(aFilename)), mbSkipImages(false)
 {
 }
 
@@ -711,8 +719,8 @@ SwWriter::SwWriter(SvStream& rStrm, SwPaM& rPam, bool bInWriteAll)
 {
 }
 
-SwWriter::SwWriter( const uno::Reference < embed::XStorage >& rStg, SwDoc &rDocument)
-    : m_pStrm(nullptr), m_xStg( rStg ), m_pMedium(nullptr), m_pOutPam(nullptr), m_pShell(nullptr), m_rDoc(rDocument), m_bWriteAll(true)
+SwWriter::SwWriter( uno::Reference < embed::XStorage > xStg, SwDoc &rDocument)
+    : m_pStrm(nullptr), m_xStg( std::move(xStg) ), m_pMedium(nullptr), m_pOutPam(nullptr), m_pShell(nullptr), m_rDoc(rDocument), m_bWriteAll(true)
 {
 }
 
@@ -755,7 +763,7 @@ ErrCode SwWriter::Write( WriterRef const & rxWriter, const OUString* pRealFileNa
         SwNodeIndex aIdx( xDoc->GetNodes().GetEndOfExtras(), 2 );
         SwContentNode *pNd = aIdx.GetNode().GetContentNode();
         OSL_ENSURE( pNd, "Node not found" );
-        SwPosition aPos( aIdx, SwIndex( pNd ) );
+        SwPosition aPos( aIdx, pNd, 0 );
         pTableNd->GetTable().MakeCopy( *xDoc, aPos, aBoxes );
     }
 

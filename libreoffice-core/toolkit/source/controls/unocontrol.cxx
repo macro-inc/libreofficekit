@@ -33,7 +33,7 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <osl/mutex.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
 #include <toolkit/helper/property.hxx>
@@ -152,7 +152,7 @@ UnoControl::~UnoControl()
 {
 }
 
-OUString UnoControl::GetComponentServiceName()
+OUString UnoControl::GetComponentServiceName() const
 {
     return OUString();
 }
@@ -660,7 +660,7 @@ void UnoControl::disposing( const EventObject& rEvt )
     if ( maAccessibleContext.get() == rEvt.Source )
     {
         // just in case the context is disposed, but not released - ensure that we do not re-use it in the future
-        maAccessibleContext = nullptr;
+        maAccessibleContext.clear();
     }
     else if( mxModel.get() == Reference< XControlModel >(rEvt.Source,UNO_QUERY).get() )
     {
@@ -1297,6 +1297,25 @@ void UnoControl::createPeer( const Reference< XToolkit >& rxToolkit, const Refer
     Reference< XWindow >    xWindow  ( getPeer(), UNO_QUERY_THROW );
 
     aGuard.clear();
+
+    // tdf#150886 if false use the same settings for widgets regardless of theme
+    // for consistency of document across platforms and in pdf/print output
+    // note: tdf#155029 do this before updateFromModel
+    if (xInfo->hasPropertyByName("StandardTheme"))
+    {
+        aVal = xPSet->getPropertyValue("StandardTheme");
+        bool bUseStandardTheme = false;
+        aVal >>= bUseStandardTheme;
+        if (bUseStandardTheme)
+        {
+            VclPtr<vcl::Window> pVclPeer = VCLUnoHelper::GetWindow(getPeer());
+            AllSettings aAllSettings = pVclPeer->GetSettings();
+            StyleSettings aStyleSettings = aAllSettings.GetStyleSettings();
+            aStyleSettings.SetStandardStyles();
+            aAllSettings.SetStyleSettings(aStyleSettings);
+            pVclPeer->SetSettings(aAllSettings);
+        }
+    }
 
     // the updateFromModel is done without a locked mutex, too.
     // The reason is that the only thing this method does  is firing property changes, and this in general has

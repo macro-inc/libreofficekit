@@ -58,7 +58,7 @@ void TypeSerializer::readGradient(Gradient& rGradient)
     mrStream.ReadUInt16(nIntensityEnd);
     mrStream.ReadUInt16(nStepCount);
 
-    rGradient.SetStyle(static_cast<GradientStyle>(nStyle));
+    rGradient.SetStyle(static_cast<css::awt::GradientStyle>(nStyle));
     rGradient.SetStartColor(aStartColor);
     rGradient.SetEndColor(aEndColor);
     if (nAngle > 3600)
@@ -124,10 +124,7 @@ void TypeSerializer::readGfxLink(GfxLink& rGfxLink)
         nDataSize = nRemainingData;
     }
 
-    std::unique_ptr<sal_uInt8[]> pBuffer(new sal_uInt8[nDataSize]);
-    mrStream.ReadBytes(pBuffer.get(), nDataSize);
-
-    rGfxLink = GfxLink(std::move(pBuffer), nDataSize, static_cast<GfxLinkType>(nType));
+    rGfxLink = GfxLink(BinaryDataContainer(mrStream, nDataSize), static_cast<GfxLinkType>(nType));
     rGfxLink.SetUserId(nUserId);
 
     if (bMapAndSizeValid)
@@ -170,7 +167,7 @@ void TypeSerializer::readGraphic(Graphic& rGraphic)
     if (mrStream.GetError())
         return;
 
-    const sal_uLong nInitialStreamPosition = mrStream.Tell();
+    const sal_uInt64 nInitialStreamPosition = mrStream.Tell();
     sal_uInt32 nType;
 
     // if there is no more data, avoid further expensive
@@ -282,9 +279,7 @@ void TypeSerializer::readGraphic(Graphic& rGraphic)
 
                     if (nLength)
                     {
-                        auto rData = std::make_unique<std::vector<sal_uInt8>>(nLength);
-                        mrStream.ReadBytes(rData->data(), rData->size());
-                        BinaryDataContainer aDataContainer(std::move(rData));
+                        BinaryDataContainer aDataContainer(mrStream, nLength);
 
                         if (!mrStream.GetError())
                         {
@@ -392,8 +387,8 @@ void TypeSerializer::writeGraphic(const Graphic& rGraphic)
 
                     sal_uInt32 nSize = pVectorGraphicData->getBinaryDataContainer().getSize();
                     mrStream.WriteUInt32(nSize);
-                    mrStream.WriteBytes(pVectorGraphicData->getBinaryDataContainer().getData(),
-                                        nSize);
+                    pVectorGraphicData->getBinaryDataContainer().writeToStream(mrStream);
+
                     // For backwards compatibility, used to serialize path
                     mrStream.WriteUniOrByteString(u"", mrStream.GetStreamCharSet());
                 }
@@ -425,6 +420,26 @@ void TypeSerializer::writeGraphic(const Graphic& rGraphic)
     }
 }
 
+bool TooLargeScaleForMapMode(const Fraction& rScale, int nDPI)
+{
+    // ImplLogicToPixel will multiply its values by this numerator * dpi and then double that
+    // result before dividing
+    if (rScale.GetNumerator() > std::numeric_limits<sal_Int32>::max() / nDPI / 2)
+        return true;
+    if (rScale.GetNumerator() < std::numeric_limits<sal_Int32>::min() / nDPI / 2)
+        return true;
+    return false;
+}
+
+static bool UselessScaleForMapMode(const Fraction& rScale)
+{
+    if (!rScale.IsValid())
+        return true;
+    if (static_cast<double>(rScale) < 0.0)
+        return true;
+    return false;
+}
+
 void TypeSerializer::readMapMode(MapMode& rMapMode)
 {
     VersionCompatRead aCompat(mrStream);
@@ -441,7 +456,10 @@ void TypeSerializer::readMapMode(MapMode& rMapMode)
     readFraction(aScaleY);
     mrStream.ReadCharAsBool(bSimple);
 
-    if (bSimple)
+    const bool bBogus = UselessScaleForMapMode(aScaleX) || UselessScaleForMapMode(aScaleY);
+    SAL_WARN_IF(bBogus, "vcl", "invalid scale");
+
+    if (bSimple || bBogus)
         rMapMode = MapMode(eUnit);
     else
         rMapMode = MapMode(eUnit, aOrigin, aScaleX, aScaleY);

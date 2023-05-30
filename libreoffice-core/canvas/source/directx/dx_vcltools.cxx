@@ -22,7 +22,7 @@
 #include <basegfx/numeric/ftools.hxx>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/rendering/XIntegerBitmap.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/bitmap.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/BitmapReadAccess.hxx>
@@ -66,7 +66,6 @@ namespace dxcanvas::tools
                              const void*                                     hDIB )
             {
                 bool            bRet( false );
-                BitmapSharedPtr pBitmap;
 
                 const BITMAPINFO* pBI = static_cast<BITMAPINFO*>(GlobalLock( const_cast<void *>(hDIB) ));
 

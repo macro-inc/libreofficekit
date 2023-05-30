@@ -177,13 +177,13 @@ namespace {
 
 class SwTransferDdeLink : public ::sfx2::SvBaseLink
 {
-    OUString sName;
-    ::sfx2::SvLinkSourceRef refObj;
-    SwTransferable& rTrnsfr;
-    SwDocShell* pDocShell;
-    sal_uLong nOldTimeOut;
-    bool bDelBookmark : 1;
-    bool bInDisconnect : 1;
+    OUString m_sName;
+    ::sfx2::SvLinkSourceRef m_xRefObj;
+    SwTransferable& m_rTransfer;
+    SwDocShell* m_pDocShell;
+    sal_uLong m_nOldTimeOut;
+    bool m_bDelBookmark : 1;
+    bool m_bInDisconnect : 1;
 
     bool FindDocShell();
 
@@ -218,7 +218,7 @@ public:
 
 private:
     SwWrtShell& m_rWrtShell;
-    std::unique_ptr<SwPaM> m_pPaM;
+    std::optional<SwPaM> m_oPaM;
     sal_Int32 m_nStartContent = 0;
 };
 
@@ -437,8 +437,8 @@ sal_Bool SAL_CALL SwTransferable::isComplex()
     SwNodes& aNodes = m_pWrtShell->GetDoc()->GetNodes();
     for (SwPaM& rPaM : m_pWrtShell->GetCursor()->GetRingContainer())
     {
-        for (SwNodeOffset nIndex = rPaM.GetMark()->nNode.GetIndex();
-             nIndex <= rPaM.GetPoint()->nNode.GetIndex(); ++nIndex)
+        for (SwNodeOffset nIndex = rPaM.GetMark()->GetNodeIndex();
+             nIndex <= rPaM.GetPoint()->GetNodeIndex(); ++nIndex)
         {
             SwNode& rNd = *aNodes[nIndex];
 
@@ -494,12 +494,12 @@ bool SwTransferable::GetData( const DataFlavor& rFlavor, const OUString& rDestDo
         // SEL_GRF is from ContentType of editsh
         if(bPending || ((SelectionType::Graphic | SelectionType::DrawObject | SelectionType::DbForm) & nSelectionType))
         {
-            m_pClpGraphic.reset(new Graphic);
-            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_pClpGraphic ))
-                m_pOrigGraphic = m_pClpGraphic.get();
-            m_pClpBitmap.reset(new Graphic);
-            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_pClpBitmap ))
-                m_pOrigGraphic = m_pClpBitmap.get();
+            m_oClpGraphic.emplace();
+            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_oClpGraphic ))
+                m_pOrigGraphic = &*m_oClpGraphic;
+            m_oClpBitmap.emplace();
+            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_oClpBitmap ))
+                m_pOrigGraphic = &*m_oClpBitmap;
 
             // is it a URL-Button ?
             OUString sURL;
@@ -636,13 +636,13 @@ bool SwTransferable::GetData( const DataFlavor& rFlavor, const OUString& rDestDo
 
         case SotClipboardFormatId::GDIMETAFILE:
             if( m_eBufferType & TransferBufferType::Graphic )
-                bOK = SetGDIMetaFile( m_pClpGraphic->GetGDIMetaFile() );
+                bOK = SetGDIMetaFile( m_oClpGraphic->GetGDIMetaFile() );
             break;
         case SotClipboardFormatId::BITMAP:
         case SotClipboardFormatId::PNG:
             // Neither pClpBitmap nor pClpGraphic are necessarily set
-            if( (m_eBufferType & TransferBufferType::Graphic) && (m_pClpBitmap != nullptr || m_pClpGraphic != nullptr))
-                bOK = SetBitmapEx( (m_pClpBitmap ? m_pClpBitmap : m_pClpGraphic)->GetBitmapEx(), rFlavor );
+            if( (m_eBufferType & TransferBufferType::Graphic) && (m_oClpBitmap || m_oClpGraphic))
+                bOK = SetBitmapEx( (m_oClpBitmap ? m_oClpBitmap : m_oClpGraphic)->GetBitmapEx(), rFlavor );
             break;
 
         case SotClipboardFormatId::SVIM:
@@ -738,10 +738,10 @@ bool SwTransferable::WriteObject( tools::SvRef<SotTempStream>& xStream,
             SfxObjectShell*   pEmbObj = static_cast<SfxObjectShell*>(pObject);
             try
             {
-                ::utl::TempFile     aTempFile;
-                aTempFile.EnableKillingFile();
+                ::utl::TempFileFast aTempFile;
+                SvStream* pTempStream = aTempFile.GetStream(StreamMode::READWRITE);
                 uno::Reference< embed::XStorage > xWorkStore =
-                    ::comphelper::OStorageHelper::GetStorageFromURL( aTempFile.GetURL(), embed::ElementModes::READWRITE );
+                    ::comphelper::OStorageHelper::GetStorageFromStream( new utl::OStreamWrapper(*pTempStream), embed::ElementModes::READWRITE );
 
                 // write document storage
                 pEmbObj->SetupStorage( xWorkStore, SOFFICE_FILEFORMAT_CURRENT, false );
@@ -754,13 +754,8 @@ bool SwTransferable::WriteObject( tools::SvRef<SotTempStream>& xStream,
                 if ( xTransact.is() )
                     xTransact->commit();
 
-                std::unique_ptr<SvStream> pSrcStm(::utl::UcbStreamHelper::CreateStream( aTempFile.GetURL(), StreamMode::READ ));
-                if( pSrcStm )
-                {
-                    xStream->SetBufferSize( 0xff00 );
-                    xStream->WriteStream( *pSrcStm );
-                    pSrcStm.reset();
-                }
+                xStream->SetBufferSize( 0xff00 );
+                xStream->WriteStream( *pTempStream );
 
                 xWorkStore->dispose();
                 xWorkStore.clear();
@@ -793,11 +788,11 @@ bool SwTransferable::WriteObject( tools::SvRef<SotTempStream>& xStream,
 
     case SWTRANSFER_OBJECTTYPE_RTF:
     case SWTRANSFER_OBJECTTYPE_RICHTEXT:
-        GetRTFWriter(OUString(), OUString(), xWrt);
+        GetRTFWriter(std::u16string_view(), OUString(), xWrt);
         break;
 
     case SWTRANSFER_OBJECTTYPE_STRING:
-        GetASCWriter(OUString(), OUString(), xWrt);
+        GetASCWriter(std::u16string_view(), OUString(), xWrt);
         if( xWrt.is() )
         {
             SwAsciiOptions aAOpt;
@@ -898,10 +893,10 @@ static void DeleteDDEMarks(SwDoc & rDest)
 
 void SwTransferable::PrepareForCopyTextRange(SwPaM & rPaM)
 {
-    std::unique_ptr<SwWait> pWait;
+    std::optional<SwWait> oWait;
     if (m_pWrtShell->ShouldWait())
     {
-        pWait.reset(new SwWait( *m_pWrtShell->GetView().GetDocShell(), true ));
+        oWait.emplace( *m_pWrtShell->GetView().GetDocShell(), true );
     }
 
     m_pClpDocFac.reset(new SwDocFac);
@@ -925,8 +920,7 @@ void SwTransferable::PrepareForCopyTextRange(SwPaM & rPaM)
 
         SwNodeIndex const aIdx(rDest.GetNodes().GetEndOfContent(), -1);
         SwContentNode *const pContentNode(aIdx.GetNode().GetContentNode());
-        SwPosition aPos(aIdx,
-            SwIndex(pContentNode, pContentNode ? pContentNode->Len() : 0));
+        SwPosition aPos(aIdx, pContentNode, pContentNode ? pContentNode->Len() : 0);
 
         rSrc.getIDocumentContentOperations().CopyRange(rPaM, aPos, SwCopyFlags::CheckPosInFly);
 
@@ -969,12 +963,12 @@ int SwTransferable::PrepareForCopy( bool bIsCut )
     const SelectionType nSelection = m_pWrtShell->GetSelectionType();
     if( nSelection == SelectionType::Graphic )
     {
-        m_pClpGraphic.reset(new Graphic);
-        if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_pClpGraphic ))
-            m_pOrigGraphic = m_pClpGraphic.get();
-        m_pClpBitmap.reset(new Graphic);
-        if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_pClpBitmap ))
-            m_pOrigGraphic = m_pClpBitmap.get();
+        m_oClpGraphic.emplace();
+        if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_oClpGraphic ))
+            m_pOrigGraphic = &*m_oClpGraphic;
+        m_oClpBitmap.emplace();
+        if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_oClpBitmap ))
+            m_pOrigGraphic = &*m_oClpBitmap;
 
         m_pClpDocFac.reset(new SwDocFac);
         SwDoc& rDoc = lcl_GetDoc(*m_pClpDocFac);
@@ -1043,9 +1037,9 @@ int SwTransferable::PrepareForCopy( bool bIsCut )
     else if ( m_pWrtShell->IsSelection() || m_pWrtShell->IsFrameSelected() ||
               m_pWrtShell->IsObjSelected() )
     {
-        std::unique_ptr<SwWait> pWait;
+        std::optional<SwWait> oWait;
         if( m_pWrtShell->ShouldWait() )
-            pWait.reset(new SwWait( *m_pWrtShell->GetView().GetDocShell(), true ));
+            oWait.emplace( *m_pWrtShell->GetView().GetDocShell(), true );
 
         m_pClpDocFac.reset(new SwDocFac);
 
@@ -1120,12 +1114,12 @@ int SwTransferable::PrepareForCopy( bool bIsCut )
             }
             m_eBufferType = static_cast<TransferBufferType>( TransferBufferType::Graphic | m_eBufferType );
 
-            m_pClpGraphic.reset(new Graphic);
-            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_pClpGraphic ))
-                m_pOrigGraphic = m_pClpGraphic.get();
-            m_pClpBitmap.reset(new Graphic);
-            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_pClpBitmap ))
-                m_pOrigGraphic = m_pClpBitmap.get();
+            m_oClpGraphic.emplace();
+            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::GDIMETAFILE, *m_oClpGraphic ))
+                m_pOrigGraphic = &*m_oClpGraphic;
+            m_oClpBitmap.emplace();
+            if( !m_pWrtShell->GetDrawObjGraphic( SotClipboardFormatId::BITMAP, *m_oClpBitmap ))
+                m_pOrigGraphic = &*m_oClpBitmap;
 
             // is it a URL-Button ?
             OUString sURL;
@@ -1293,12 +1287,12 @@ void SwPasteContext::remember()
         return;
 
     // Set point to the previous node, so it is not moved.
-    const SwNodeIndex& rNodeIndex = pCursor->GetPoint()->nNode;
-    m_pPaM.reset(new SwPaM(rNodeIndex, rNodeIndex, SwNodeOffset(0), SwNodeOffset(-1)));
-    m_nStartContent = pCursor->GetPoint()->nContent.GetIndex();
+    const SwNode& rNode = pCursor->GetPoint()->GetNode();
+    m_oPaM.emplace(rNode, rNode, SwNodeOffset(0), SwNodeOffset(-1));
+    m_nStartContent = pCursor->GetPoint()->GetContentIndex();
 }
 
-void SwPasteContext::forget() { m_pPaM.reset(); }
+void SwPasteContext::forget() { m_oPaM.reset(); }
 
 SwPasteContext::~SwPasteContext()
 {
@@ -1319,40 +1313,39 @@ SwPasteContext::~SwPasteContext()
 
                 aPropertyValue.Name = "TextGraphicObject";
                 aPropertyValue.Value
-                    <<= SwXTextGraphicObject::CreateXTextGraphicObject(*pFormat->GetDoc(), pFormat);
+                    <<= uno::Reference<text::XTextContent>(SwXTextGraphicObject::CreateXTextGraphicObject(*pFormat->GetDoc(), pFormat));
                 break;
             }
 
             default:
             {
-                if (!m_pPaM)
+                if (!m_oPaM)
                     return;
 
                 SwPaM* pCursor = m_rWrtShell.GetCursor();
                 if (!pCursor)
                     return;
 
-                if (!pCursor->GetPoint()->nNode.GetNode().IsTextNode())
+                if (!pCursor->GetPoint()->GetNode().IsTextNode())
                     // Non-text was pasted.
                     return;
 
                 // Update mark after paste.
-                *m_pPaM->GetMark() = *pCursor->GetPoint();
+                *m_oPaM->GetMark() = *pCursor->GetPoint();
 
                 // Restore point.
-                ++m_pPaM->GetPoint()->nNode;
-                SwNode& rNode = m_pPaM->GetNode();
+                m_oPaM->GetPoint()->Adjust(SwNodeOffset(1));
+                SwNode& rNode = m_oPaM->GetPointNode();
                 if (!rNode.IsTextNode())
                     // Starting point is no longer text.
                     return;
 
-                m_pPaM->GetPoint()->nContent.Assign(static_cast<SwContentNode*>(&rNode),
-                                                    m_nStartContent);
+                m_oPaM->GetPoint()->SetContent(m_nStartContent);
 
                 aPropertyValue.Name = "TextRange";
-                const uno::Reference<text::XTextRange> xTextRange = SwXTextRange::CreateXTextRange(
-                    m_pPaM->GetDoc(), *m_pPaM->GetPoint(), m_pPaM->GetMark());
-                aPropertyValue.Value <<= xTextRange;
+                const rtl::Reference<SwXTextRange> xTextRange = SwXTextRange::CreateXTextRange(
+                    m_oPaM->GetDoc(), *m_oPaM->GetPoint(), m_oPaM->GetMark());
+                aPropertyValue.Value <<= uno::Reference<text::XTextRange>(xTextRange);
                 break;
             }
         }
@@ -1362,14 +1355,7 @@ SwPasteContext::~SwPasteContext()
 
         // Invoke the listeners.
         uno::Sequence<beans::PropertyValue> aEvent{ aPropertyValue };
-
-        comphelper::OInterfaceIteratorHelper2 it(m_rWrtShell.GetPasteListeners());
-        while (it.hasMoreElements())
-        {
-            uno::Reference<text::XPasteListener> xListener(it.next(), UNO_QUERY);
-            if (xListener.is())
-                xListener->notifyPasteEvent(aEvent);
-        }
+        m_rWrtShell.GetPasteListeners().notifyEach( &css::text::XPasteListener::notifyPasteEvent, aEvent );
     }
     catch (const uno::Exception& rException)
     {
@@ -1521,7 +1507,7 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
             const sal_Int32 nRows = nNewlines ? nNewlines-1 : 0;
             if ( nRows == 1 )
             {
-                const sal_Int32 nCols = comphelper::string::getTokenCount(aExpand.getToken(0, '\n'), '\t');
+                const sal_Int32 nCols = comphelper::string::getTokenCount(o3tl::getToken(aExpand, 0, '\n'), '\t');
                 if (nCols == 1)
                     bSingleCellTable = true;
             }
@@ -1529,26 +1515,45 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
 
         // convert the worksheet to a temporary native table using HTML format, and copy that into the original native table
         if (!bSingleCellTable && rData.HasFormat( SotClipboardFormatId::HTML ) &&
-                        rSh.GetDoc()->IsIdxInTable(rSh.GetCursor()->GetNode()) != nullptr && rSh.DoesUndo())
+                        SwDoc::IsInTable(rSh.GetCursor()->GetPointNode()) != nullptr && rSh.DoesUndo())
         {
             SfxDispatcher* pDispatch = rSh.GetView().GetViewFrame()->GetDispatcher();
             sal_uInt32 nLevel = 0;
+
             // within Writer table cells, inserting worksheets using HTML format results only plain text, not a native table,
             // so remove all outer nested tables temporary to get a working insertion point
             // (RTF format has no such problem, but that inserts the hidden rows of the original Calc worksheet, too)
+
+            // For this, switch off change tracking temporarily, if needed
+            RedlineFlags eOld = rSh.GetDoc()->getIDocumentRedlineAccess().GetRedlineFlags();
+            if ( eOld & RedlineFlags::On )
+                rSh.GetDoc()->getIDocumentRedlineAccess().SetRedlineFlags( eOld & ~RedlineFlags::On );
+
+            OUString sPreviousTableName;
             do
             {
+                // tdf#152245 add a limit to the loop, if it's not possible to delete the table
+                const SwTableNode* pNode = rSh.GetCursor()->GetPointNode().FindTableNode();
+                const OUString sTableName = pNode->GetTable().GetFrameFormat()->GetName();
+                if ( sTableName == sPreviousTableName )
+                    break;
+                sPreviousTableName = sTableName;
                 // insert a random character to redo the place of the insertion at the end
                 pDispatch->Execute(FN_INSERT_NNBSP, SfxCallMode::SYNCHRON);
                 pDispatch->Execute(FN_TABLE_DELETE_TABLE, SfxCallMode::SYNCHRON);
                 nLevel++;
-            } while (rSh.GetDoc()->IsIdxInTable(rSh.GetCursor()->GetNode()) != nullptr);
+            } while (SwDoc::IsInTable(rSh.GetCursor()->GetPointNode()) != nullptr);
+
+            // restore change tracking settings
+            if ( eOld & RedlineFlags::On )
+                rSh.GetDoc()->getIDocumentRedlineAccess().SetRedlineFlags( eOld );
+
             if ( SwTransferable::PasteData( rData, rSh, EXCHG_OUT_ACTION_INSERT_STRING, nActionFlags, SotClipboardFormatId::HTML,
                                         nDestination, false, false, nullptr, 0, false, nAnchorType, bIgnoreComments, &aPasteContext, ePasteTable) )
             {
                 bool bFoundTemporaryTable = false;
                 pDispatch->Execute(FN_LINE_UP, SfxCallMode::SYNCHRON);
-                if (rSh.GetDoc()->IsIdxInTable(rSh.GetCursor()->GetNode()) != nullptr)
+                if (SwDoc::IsInTable(rSh.GetCursor()->GetPointNode()) != nullptr)
                 {
                     bFoundTemporaryTable = true;
                     pDispatch->Execute(FN_TABLE_SELECT_ALL, SfxCallMode::SYNCHRON);
@@ -1578,7 +1583,7 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
     // insert clipboard content as new table rows/columns before the actual row/column instead of overwriting it
     else if ( (rSh.GetTableInsertMode() != SwTable::SEARCH_NONE || ePasteTable == PasteTableType::PASTE_ROW || ePasteTable == PasteTableType::PASTE_COLUMN) &&
         rData.HasFormat( SotClipboardFormatId::HTML ) &&
-        rSh.GetDoc()->IsIdxInTable(rSh.GetCursor()->GetNode()) != nullptr )
+        SwDoc::IsInTable(rSh.GetCursor()->GetPointNode()) != nullptr )
     {
         OUString aExpand;
         sal_Int32 nIdx;
@@ -1592,7 +1597,7 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
             sal_Int32 nTableLevel = lcl_getLevel(aExpand, nIdx);
             // table rows repeated heading use extra indentation, too:
             // <thead> is always used here, and the first table with <thead> is not nested,
-            // if its indentation level is greater only by 1, than intentation level of the table
+            // if its indentation level is greater only by 1, than indentation level of the table
             bool bShifted = lcl_getLevel(aExpand, aExpand.indexOf("<thead")) == nTableLevel + 1;
             // calculate count of selected rows or columns
             sal_Int32 nSelectedRowsOrCols = 0;
@@ -1611,9 +1616,9 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
             // are we at the beginning of the cell?
             bool bStartTableBoxNode =
                 // first paragraph of the cell?
-                rSh.GetCursor()->GetNode().GetIndex() == rSh.GetCursor()->GetNode().FindTableBoxStartNode()->GetIndex()+1 &&
+                rSh.GetCursor()->GetPointNode().GetIndex() == rSh.GetCursor()->GetPointNode().FindTableBoxStartNode()->GetIndex()+1 &&
                 // beginning of the paragraph?
-                !rSh.GetCursor()->GetPoint()->nContent.GetIndex();
+                !rSh.GetCursor()->GetPoint()->GetContentIndex();
             SfxDispatcher* pDispatch = rSh.GetView().GetViewFrame()->GetDispatcher();
 
             // go start of the cell
@@ -1640,7 +1645,7 @@ bool SwTransferable::Paste(SwWrtShell& rSh, TransferableDataHelper& rData, RndSt
             // add the other new empty rows/columns after the actual table row/column
             if ( nSelectedRowsOrCols > 1 )
             {
-                SfxUInt16Item aCountItem( nDispatchSlot, nSelectedRowsOrCols-1 );
+                SfxInt16Item aCountItem( nDispatchSlot, nSelectedRowsOrCols-1 );
                 SfxBoolItem aAfter( FN_PARAM_INSERT_AFTER, true );
                 pDispatch->ExecuteList(nDispatchSlot,
                     SfxCallMode::SYNCHRON|SfxCallMode::RECORD,
@@ -2695,8 +2700,10 @@ bool SwTransferable::PasteDDE( const TransferableDataHelper& rData,
                 ( rData.HasFormat( SotClipboardFormatId::SYLK ) ||
                   rData.HasFormat( SotClipboardFormatId::SYLK_BIGCAPS ) ) )
             {
-                const sal_Int32 nRows = nNewlines ? nNewlines-1 : 0;
-                const sal_Int32 nCols = comphelper::string::getTokenCount(aExpand.getToken(0, '\n'), '\t');
+                sal_Int32 nRows = nNewlines ? nNewlines-1 : 0;
+                if (!aExpand.endsWith("\n"))
+                    ++nRows;    // last row has no newline, e.g. one single cell
+                const sal_Int32 nCols = comphelper::string::getTokenCount(o3tl::getToken(aExpand, 0, '\n'), '\t');
 
                 // don't try to insert tables that are too large for writer
                 if (nRows > SAL_MAX_UINT16 || nCols > SAL_MAX_UINT16)
@@ -3229,11 +3236,11 @@ bool SwTransferable::PasteDBData( const TransferableDataHelper& rData,
             FmFormView* pFmView = dynamic_cast<FmFormView*>( rSh.GetDrawView()  );
             if (pFmView && pDragPt)
             {
-                const OXFormsDescriptor &rDesc = OXFormsTransferable::extractDescriptor(rData);
-                SdrObjectUniquePtr pObj = pFmView->CreateXFormsControl(rDesc);
+                OXFormsDescriptor aDesc = OXFormsTransferable::extractDescriptor(rData);
+                rtl::Reference<SdrObject> pObj = pFmView->CreateXFormsControl(aDesc);
                 if(pObj)
                 {
-                    rSh.SwFEShell::InsertDrawObj( *(pObj.release()), *pDragPt );
+                    rSh.SwFEShell::InsertDrawObj( *pObj, *pDragPt );
                 }
             }
         }
@@ -3261,7 +3268,7 @@ bool SwTransferable::PasteDBData( const TransferableDataHelper& rData,
             {
                 pConnectionItem.reset(new SfxUnoAnyItem(FN_DB_CONNECTION_ANY, aDesc[DataAccessDescriptorProperty::Connection]));
                 pColumnItem.reset(new SfxUnoAnyItem(FN_DB_COLUMN_ANY, aDesc[DataAccessDescriptorProperty::ColumnObject]));
-                pSourceItem.reset(new SfxUnoAnyItem(FN_DB_DATA_SOURCE_ANY, makeAny(aDesc.getDataSource())));
+                pSourceItem.reset(new SfxUnoAnyItem(FN_DB_DATA_SOURCE_ANY, Any(aDesc.getDataSource())));
                 pCommandItem.reset(new SfxUnoAnyItem(FN_DB_DATA_COMMAND_ANY, aDesc[DataAccessDescriptorProperty::Command]));
                 pCommandTypeItem.reset(new SfxUnoAnyItem(FN_DB_DATA_COMMAND_TYPE_ANY, aDesc[DataAccessDescriptorProperty::CommandType]));
                 pColumnNameItem.reset(new SfxUnoAnyItem(FN_DB_DATA_COLUMN_NAME_ANY, aDesc[DataAccessDescriptorProperty::ColumnName]));
@@ -3287,9 +3294,9 @@ bool SwTransferable::PasteDBData( const TransferableDataHelper& rData,
             FmFormView* pFmView = dynamic_cast<FmFormView*>( rSh.GetDrawView()  );
             if (pFmView && bHaveColumnDescriptor && pDragPt)
             {
-                SdrObjectUniquePtr pObj = pFmView->CreateFieldControl( OColumnTransferable::extractColumnDescriptor(rData) );
+                rtl::Reference<SdrObject> pObj = pFmView->CreateFieldControl( OColumnTransferable::extractColumnDescriptor(rData) );
                 if (pObj)
-                    rSh.SwFEShell::InsertDrawObj( *(pObj.release()), *pDragPt );
+                    rSh.SwFEShell::InsertDrawObj( *pObj, *pDragPt );
             }
         }
         bRet = true;
@@ -3372,7 +3379,7 @@ bool SwTransferable::IsPasteSpecial( const SwWrtShell& rWrtShell,
                                      const TransferableDataHelper& rData )
 {
     // we can paste-special if there's an entry in the paste-special-format list
-    SvxClipboardFormatItem aClipboardFormatItem(0);
+    SvxClipboardFormatItem aClipboardFormatItem(TypedWhichId<SvxClipboardFormatItem>(0));
     FillClipFormatItem( rWrtShell, rData, aClipboardFormatItem);
     return aClipboardFormatItem.Count() > 0;
 }
@@ -3971,12 +3978,39 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
             // up to down, if the cursor is there in its last table row
             const SwSelBoxes& rBoxes = rSrcSh.GetTableCursor()->GetSelectedBoxes();
             const SwTableNode* pTableNd = rSh.IsCursorInTable();
-            sal_Int32 nSelRows = !rBoxes.back()
-                ? 0
-                : pTableNd->GetTable().GetTabLines().GetPos( rBoxes.back()->GetUpper() ) -
-                  pTableNd->GetTable().GetTabLines().GetPos( rBoxes.front()->GetUpper() ) + 1;
+            const SwTableLines& rLines = pTableNd->GetTable().GetTabLines();
+            const SwStartNode& rDelPos = rBoxes.back()
+                    ? *rBoxes.front()->GetSttNd()
+                    : *pTableNd->GetStartNode();
+
+            // count selected rows or columns
+            sal_Int32 nSelRowOrCols = 0;
+            if ( rBoxes.back() )
+            {
+                if ( bTableCol )
+                {
+                    // selected column count is the count of the cells
+                    // in the first row of the selection
+                    auto nLine = rLines.GetPos( rBoxes.front()->GetUpper() );
+                    for (auto pBox : rBoxes)
+                    {
+                        // cell is in the next row
+                        if ( nLine != rLines.GetPos( pBox->GetUpper() ) )
+                            break;
+                        ++nSelRowOrCols;
+                    }
+                }
+                else
+                {
+                   // selected row count is the difference of the row number of the
+                   // first and the last cell of the selection
+                   nSelRowOrCols = rLines.GetPos( rBoxes.back()->GetUpper() ) -
+                                   rLines.GetPos( rBoxes.front()->GetUpper() ) + 1;
+                }
+            }
+
             bool bSelUpToDown = rBoxes.back() && rBoxes.back()->GetUpper() ==
-                           rSh.GetCursor()->GetNode().GetTableBox()->GetUpper();
+                           rSh.GetCursor()->GetPointNode().GetTableBox()->GetUpper();
 
             SwUndoId eUndoId = bMove ? SwUndoId::UI_DRAG_AND_MOVE : SwUndoId::UI_DRAG_AND_COPY;
 
@@ -3998,7 +4032,7 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
             rSh.EnterStdMode();
             rSh.SwCursorShell::SetCursor(rDragPt, false);
 
-            bool bPasteIntoTable = rSh.GetCursor()->GetNode().GetTableBox() != nullptr;
+            bool bPasteIntoTable = rSh.GetCursor()->GetPointNode().GetTableBox() != nullptr;
 
             // store cursor
             ::sw::mark::IMark* pMark = rSh.SetBookmark(
@@ -4028,16 +4062,16 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
             }
             else
             {
-                const SwTableBox* pBoxStt = rSh.GetCursor()->GetNode().GetTableBox();
+                const SwTableBox* pBoxStt = rSh.GetCursor()->GetPointNode().GetTableBox();
                 SwTableLine* pLine = pBoxStt ? const_cast<SwTableLine*>( pBoxStt->GetUpper()): nullptr;
 
-                for (sal_Int32 nDeleted = 0; bNeedTrack && nDeleted < nSelRows;)
+                for (sal_Int32 nDeleted = 0; bNeedTrack && nDeleted < nSelRowOrCols;)
                 {
                     // move up text cursor (note: "true" is important for the layout level)
                     if ( !rSh.Up(false) )
                         break;
 
-                    const SwTableBox* pBox = rSh.GetCursor()->GetNode().GetTableBox();
+                    const SwTableBox* pBox = rSh.GetCursor()->GetPointNode().GetTableBox();
 
                     if ( !pBox )
                         break;
@@ -4065,14 +4099,16 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
                         rSh.getIDocumentMarkAccess()->deleteMark( pMarkMoveFrom );
                     }
 
-                    // set all row as tracked deletion, otherwise go to the first moved row
-                    if ( bNeedTrack || ( bSelUpToDown && nSelRows > 1 ) )
+                    // tracked table row moving: set original rows as tracked deletion,
+                    // otherwise delete original rows/columns (tracking column deletion
+                    // and insertion is not supported yet)
+                    if ( !bTableCol && bNeedTrack )
                     {
                         pLine = nullptr;
 
-                        for (sal_Int32 nDeleted = 0; nDeleted < nSelRows - int(!bNeedTrack);)
+                        for (sal_Int32 nDeleted = 0; nDeleted < nSelRowOrCols;)
                         {
-                            const SwTableBox* pBox = rSh.GetCursor()->GetNode().GetTableBox();
+                            const SwTableBox* pBox = rSh.GetCursor()->GetPointNode().GetTableBox();
 
                             if ( !pBox )
                                 break;
@@ -4080,10 +4116,7 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
                             if ( pBox->GetUpper() != pLine )
                             {
                                 pLine = const_cast<SwTableLine*>(pBox->GetUpper());
-                                if (bNeedTrack)
-                                    pDispatch->Execute(bTableCol
-                                        ? FN_TABLE_DELETE_COL
-                                        : FN_TABLE_DELETE_ROW, SfxCallMode::SYNCHRON);
+                                pDispatch->Execute(FN_TABLE_DELETE_ROW, SfxCallMode::SYNCHRON);
                                 ++nDeleted;
                             }
 
@@ -4096,14 +4129,18 @@ bool SwTransferable::PrivateDrop( SwWrtShell& rSh, const Point& rDragPt,
                                 break;
                         }
                     }
-
-                    // delete rows without track changes
-                    if ( !bNeedTrack )
+                    else
                     {
-                        for (sal_Int32 nDeleted = 0; nDeleted < nSelRows; ++nDeleted)
+                        // set cursor in the first cell of the original selection
+                        rSh.GetCursor()->DeleteMark();
+                        rSh.GetCursor()->GetPoint()->Assign( rDelPos.GetIndex() + 1);
+
+                        for (sal_Int32 nDeleted = 0; nDeleted < nSelRowOrCols; ++nDeleted)
+                        {
                             pDispatch->Execute(bTableCol
                                 ? FN_TABLE_DELETE_COL
                                 : FN_TABLE_DELETE_ROW, SfxCallMode::SYNCHRON);
+                        }
                     }
                 }
             }
@@ -4362,18 +4399,18 @@ SwTransferable* SwTransferable::GetSwTransferable( const TransferableDataHelper&
 }
 
 SwTransferDdeLink::SwTransferDdeLink( SwTransferable& rTrans, SwWrtShell& rSh )
-    : rTrnsfr(rTrans)
-    , pDocShell(nullptr)
-    , nOldTimeOut(0)
-    , bDelBookmark(false)
-    , bInDisconnect(false)
+    : m_rTransfer(rTrans)
+    , m_pDocShell(nullptr)
+    , m_nOldTimeOut(0)
+    , m_bDelBookmark(false)
+    , m_bInDisconnect(false)
 {
     // we only end up here with table- or text selection
     if( SelectionType::TableCell & rSh.GetSelectionType() )
     {
         SwFrameFormat* pFormat = rSh.GetTableFormat();
         if( pFormat )
-            sName = pFormat->GetName();
+            m_sName = pFormat->GetName();
     }
     else
     {
@@ -4388,36 +4425,36 @@ SwTransferDdeLink::SwTransferDdeLink( SwTransferable& rTrans, SwWrtShell& rSh )
             IDocumentMarkAccess::MarkType::DDE_BOOKMARK);
         if(pMark)
         {
-            sName = pMark->GetName();
-            bDelBookmark = true;
+            m_sName = pMark->GetName();
+            m_bDelBookmark = true;
             if( !bIsModified )
                 rSh.ResetModified();
         }
         else
-            sName.clear();
+            m_sName.clear();
         rSh.DoUndo( bUndo );
     }
 
-    if( sName.isEmpty() ||
-        nullptr == ( pDocShell = rSh.GetDoc()->GetDocShell() ))
+    if( m_sName.isEmpty() ||
+        nullptr == ( m_pDocShell = rSh.GetDoc()->GetDocShell() ))
         return;
 
     // then we create our "server" and connect to it
-    refObj = pDocShell->DdeCreateLinkSource( sName );
-    if( refObj.is() )
+    m_xRefObj = m_pDocShell->DdeCreateLinkSource( m_sName );
+    if( m_xRefObj.is() )
     {
-        refObj->AddConnectAdvise( this );
-        refObj->AddDataAdvise( this,
+        m_xRefObj->AddConnectAdvise( this );
+        m_xRefObj->AddDataAdvise( this,
                         OUString(),
                         ADVISEMODE_NODATA | ADVISEMODE_ONLYONCE );
-        nOldTimeOut = refObj->GetUpdateTimeout();
-        refObj->SetUpdateTimeout( 0 );
+        m_nOldTimeOut = m_xRefObj->GetUpdateTimeout();
+        m_xRefObj->SetUpdateTimeout( 0 );
     }
 }
 
 SwTransferDdeLink::~SwTransferDdeLink()
 {
-    if( refObj.is() )
+    if( m_xRefObj.is() )
         Disconnect( true );
 }
 
@@ -4425,10 +4462,10 @@ SwTransferDdeLink::~SwTransferDdeLink()
                                     const uno::Any& )
 {
     // well, that's it with the link
-    if( !bInDisconnect )
+    if( !m_bInDisconnect )
     {
-        if( FindDocShell() && pDocShell->GetView() )
-            rTrnsfr.RemoveDDELinkFormat( pDocShell->GetView()->GetEditWin() );
+        if( FindDocShell() && m_pDocShell->GetView() )
+            m_rTransfer.RemoveDDELinkFormat( m_pDocShell->GetView()->GetEditWin() );
         Disconnect( false );
     }
     return SUCCESS;
@@ -4436,15 +4473,15 @@ SwTransferDdeLink::~SwTransferDdeLink()
 
 bool SwTransferDdeLink::WriteData( SvStream& rStrm )
 {
-    if( !refObj.is() || !FindDocShell() )
+    if( !m_xRefObj.is() || !FindDocShell() )
         return false;
 
     rtl_TextEncoding eEncoding = osl_getThreadTextEncoding();
     const OString aAppNm(OUStringToOString(
         Application::GetAppName(), eEncoding));
     const OString aTopic(OUStringToOString(
-        pDocShell->GetTitle(SFX_TITLE_FULLNAME), eEncoding));
-    const OString aName(OUStringToOString(sName, eEncoding));
+        m_pDocShell->GetTitle(SFX_TITLE_FULLNAME), eEncoding));
+    const OString aName(OUStringToOString(m_sName, eEncoding));
 
     std::unique_ptr<char[]> pMem(new char[ aAppNm.getLength() + aTopic.getLength() + aName.getLength() + 4 ]);
 
@@ -4462,15 +4499,15 @@ bool SwTransferDdeLink::WriteData( SvStream& rStrm )
     rStrm.WriteBytes( pMem.get(), nLen );
     pMem.reset();
 
-    IDocumentMarkAccess* const pMarkAccess = pDocShell->GetDoc()->getIDocumentMarkAccess();
-    IDocumentMarkAccess::const_iterator_t ppMark = pMarkAccess->findMark(sName);
+    IDocumentMarkAccess* const pMarkAccess = m_pDocShell->GetDoc()->getIDocumentMarkAccess();
+    IDocumentMarkAccess::const_iterator_t ppMark = pMarkAccess->findMark(m_sName);
     if(ppMark != pMarkAccess->getAllMarksEnd()
         && IDocumentMarkAccess::GetType(**ppMark) != IDocumentMarkAccess::MarkType::BOOKMARK)
     {
         // the mark is still a DdeBookmark
         // we replace it with a Bookmark, so it will get saved etc.
         ::sw::mark::IMark* const pMark = *ppMark;
-        ::sfx2::SvLinkSource* p = refObj.get();
+        ::sfx2::SvLinkSource* p = m_xRefObj.get();
         SwServerObject& rServerObject = dynamic_cast<SwServerObject&>(*p);
 
         // collecting state of old mark
@@ -4497,7 +4534,7 @@ bool SwTransferDdeLink::WriteData( SvStream& rStrm )
         rServerObject.SetDdeBookmark(*pNewMark);
     }
 
-    bDelBookmark = false;
+    m_bDelBookmark = false;
     return true;
 }
 
@@ -4505,13 +4542,13 @@ void SwTransferDdeLink::Disconnect( bool bRemoveDataAdvise )
 {
     //  don't accept DataChanged anymore, when already in Disconnect!
     //  (DTOR from Bookmark sends a DataChanged!)
-    bool bOldDisconnect = bInDisconnect;
-    bInDisconnect = true;
+    bool bOldDisconnect = m_bInDisconnect;
+    m_bInDisconnect = true;
 
     // destroy the unused bookmark again (without Undo!)?
-    if( bDelBookmark && refObj.is() && FindDocShell() )
+    if( m_bDelBookmark && m_xRefObj.is() && FindDocShell() )
     {
-        SwDoc* pDoc = pDocShell->GetDoc();
+        SwDoc* pDoc = m_pDocShell->GetDoc();
         ::sw::UndoGuard const undoGuard(pDoc->GetIDocumentUndoRedo());
 
         // #i58448#
@@ -4521,29 +4558,29 @@ void SwTransferDdeLink::Disconnect( bool bRemoveDataAdvise )
         bool bIsModified = pDoc->getIDocumentState().IsModified();
 
         IDocumentMarkAccess* const pMarkAccess = pDoc->getIDocumentMarkAccess();
-        pMarkAccess->deleteMark(pMarkAccess->findMark(sName), false);
+        pMarkAccess->deleteMark(pMarkAccess->findMark(m_sName), false);
 
         if( !bIsModified )
             pDoc->getIDocumentState().ResetModified();
         // #i58448#
         pDoc->SetOle2Link( aSavedOle2Link );
 
-        bDelBookmark = false;
+        m_bDelBookmark = false;
     }
 
-    if( refObj.is() )
+    if( m_xRefObj.is() )
     {
-        refObj->SetUpdateTimeout( nOldTimeOut );
-        refObj->RemoveConnectAdvise( this );
+        m_xRefObj->SetUpdateTimeout( m_nOldTimeOut );
+        m_xRefObj->RemoveConnectAdvise( this );
         if( bRemoveDataAdvise )
             // in a DataChanged the SelectionObject must NEVER be deleted
             // is already handled by the base class
             // (ADVISEMODE_ONLYONCE!!!!)
             // but always in normal Disconnect!
-            refObj->RemoveAllDataAdvise( this );
-        refObj.clear();
+            m_xRefObj->RemoveAllDataAdvise( this );
+        m_xRefObj.clear();
     }
-    bInDisconnect = bOldDisconnect;
+    m_bInDisconnect = bOldDisconnect;
 }
 
 bool SwTransferDdeLink::FindDocShell()
@@ -4551,26 +4588,26 @@ bool SwTransferDdeLink::FindDocShell()
     SfxObjectShell* pTmpSh = SfxObjectShell::GetFirst( checkSfxObjectShell<SwDocShell> );
     while( pTmpSh )
     {
-        if( pTmpSh == pDocShell )       // that's what we want to have
+        if( pTmpSh == m_pDocShell )       // that's what we want to have
         {
-            if( pDocShell->GetDoc() )
+            if( m_pDocShell->GetDoc() )
                 return true;
             break;      // the Doc is not there anymore, so leave!
         }
         pTmpSh = SfxObjectShell::GetNext( *pTmpSh, checkSfxObjectShell<SwDocShell> );
     }
 
-    pDocShell = nullptr;
+    m_pDocShell = nullptr;
     return false;
 }
 
 void SwTransferDdeLink::Closed()
 {
-    if( !bInDisconnect && refObj.is() )
+    if( !m_bInDisconnect && m_xRefObj.is() )
     {
-        refObj->RemoveAllDataAdvise( this );
-        refObj->RemoveConnectAdvise( this );
-        refObj.clear();
+        m_xRefObj->RemoveAllDataAdvise( this );
+        m_xRefObj->RemoveConnectAdvise( this );
+        m_xRefObj.clear();
     }
 }
 

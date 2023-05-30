@@ -44,7 +44,7 @@ namespace
     class SampleItem : public NameOrIndex
     {
     public:
-        SampleItem(sal_uInt16 nWhich, const OUString& rName) : NameOrIndex(nWhich, rName) {}
+        SampleItem(sal_uInt16 nWhich, const OUString& rName) : NameOrIndex(TypedWhichId<NameOrIndex>(nWhich), rName) {}
 
         bool operator==(const SfxPoolItem& rCmp) const
         {
@@ -107,7 +107,7 @@ void SvxUnoNameItemTable::ImplInsertByName( const OUString& aName, const uno::An
     xNewItem->SetName(aName);
     xNewItem->PutValue(aElement, mnMemberId);
     xNewItem->SetWhich(mnWhich);
-    maItemSetVector.back()->Put(*xNewItem);
+    maItemSetVector.back()->Put(std::move(xNewItem));
 }
 
 // XNameContainer
@@ -172,7 +172,7 @@ void SAL_CALL SvxUnoNameItemTable::replaceByName( const OUString& aApiName, cons
         xNewItem->SetName(aName);
         if (!xNewItem->PutValue(aElement, mnMemberId) || !isValid(xNewItem.get()))
             throw lang::IllegalArgumentException();
-        (*aIter)->Put(*xNewItem);
+        (*aIter)->Put(std::move(xNewItem));
         return;
     }
 

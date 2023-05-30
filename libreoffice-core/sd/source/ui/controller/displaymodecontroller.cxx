@@ -70,17 +70,17 @@ private:
     DECL_LINK(SelectValueSetHdl, ValueSet*, void);
 };
 
-struct snewfoil_value_info
+struct snew_slide_value_info
 {
     sal_uInt16 mnId;
-    const char* msBmpResId;
+    OUString msBmpResId;
     TranslateId mpStrResId;
     const char* msUnoCommand;
 };
 
 }
 
-const snewfoil_value_info editmodes[] =
+const snew_slide_value_info editmodes[] =
 {
     {1,
         BMP_DISPLAYMODE_SLIDE,
@@ -101,7 +101,7 @@ const snewfoil_value_info editmodes[] =
     {0, "", {}, "" }
 };
 
-const snewfoil_value_info mastermodes[] =
+const snew_slide_value_info mastermodes[] =
 {
     {5,
         BMP_DISPLAYMODE_SLIDE_MASTER,
@@ -119,13 +119,13 @@ const snewfoil_value_info mastermodes[] =
 };
 
 
-static void fillLayoutValueSet(ValueSet* pValue, const snewfoil_value_info* pInfo)
+static void fillLayoutValueSet(ValueSet* pValue, const snew_slide_value_info* pInfo)
 {
     Size aLayoutItemSize;
     for( ; pInfo->mnId; pInfo++ )
     {
         OUString aText(SdResId(pInfo->mpStrResId));
-        BitmapEx aBmp(OUString::createFromAscii(pInfo->msBmpResId));
+        BitmapEx aBmp(pInfo->msBmpResId);
 
         pValue->InsertItem(pInfo->mnId, Image(aBmp), aText);
 
@@ -176,11 +176,11 @@ IMPL_LINK( DisplayModeToolbarMenu, SelectValueSetHdl, ValueSet*, pControl, void 
 
     if( pControl == mxDisplayModeSet1.get() ) {
         sCommandURL = OUString::createFromAscii(editmodes[mxDisplayModeSet1->GetSelectedItemId() - 1 ].msUnoCommand);
-        sImage = OUString::createFromAscii(editmodes[mxDisplayModeSet1->GetSelectedItemId() - 1 ].msBmpResId);
+        sImage = editmodes[mxDisplayModeSet1->GetSelectedItemId() - 1 ].msBmpResId;
     }
     else if( pControl == mxDisplayModeSet2.get() ) {
         sCommandURL = OUString::createFromAscii(mastermodes[mxDisplayModeSet2->GetSelectedItemId() - 5 ].msUnoCommand);
-        sImage = OUString::createFromAscii(mastermodes[mxDisplayModeSet2->GetSelectedItemId() - 5 ].msBmpResId);
+        sImage = mastermodes[mxDisplayModeSet2->GetSelectedItemId() - 5 ].msBmpResId;
     }
 
     if (!sCommandURL.isEmpty())

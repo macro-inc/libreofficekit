@@ -48,6 +48,7 @@
 #include <unotools/ucbhelper.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <unotools/streamwrap.hxx>
+#include <unotools/tempfile.hxx>
 #include <ucbhelper/content.hxx>
 
 #include "fsstorage.hxx"
@@ -83,7 +84,7 @@ FSStorage::~FSStorage()
     {}
 }
 
-bool FSStorage::MakeFolderNoUI( const OUString& rFolder )
+bool FSStorage::MakeFolderNoUI( std::u16string_view rFolder )
 {
     INetURLObject aURL( rFolder );
     OUString aTitle = aURL.getName( INetURLObject::LAST_SEGMENT, true, INetURLObject::DecodeMechanism::WithCharset );
@@ -472,12 +473,9 @@ uno::Reference< io::XStream > SAL_CALL FSStorage::cloneStreamElement( const OUSt
         ::ucbhelper::Content aResultContent( aFileURL.GetMainURL( INetURLObject::DecodeMechanism::NONE ), xDummyEnv, comphelper::getProcessComponentContext() );
         uno::Reference< io::XInputStream > xInStream = aResultContent.openStream();
 
-        xTempResult = io::TempFile::create(m_xContext);
+        xTempResult = new utl::TempFileFastService;
         uno::Reference < io::XOutputStream > xTempOut = xTempResult->getOutputStream();
         uno::Reference < io::XInputStream > xTempIn = xTempResult->getInputStream();
-
-        if ( !xTempOut.is() || !xTempIn.is() )
-            throw io::IOException();
 
         ::comphelper::OStorageHelper::CopyInputToOutput( xInStream, xTempOut );
         xTempOut->closeOutput();
@@ -887,7 +885,7 @@ void SAL_CALL FSStorage::addEventListener(
     ::osl::MutexGuard aGuard( m_aMutex );
 
     if ( !m_pListenersContainer )
-        m_pListenersContainer.reset(new ::comphelper::OInterfaceContainerHelper2( m_aMutex ));
+        m_pListenersContainer.reset(new ::comphelper::OInterfaceContainerHelper3<css::lang::XEventListener>( m_aMutex ));
 
     m_pListenersContainer->addInterface( xListener );
 }
@@ -924,9 +922,9 @@ uno::Any SAL_CALL FSStorage::getPropertyValue( const OUString& aPropertyName )
     ::osl::MutexGuard aGuard( m_aMutex );
 
     if ( aPropertyName == "URL" )
-        return uno::makeAny( m_aURL );
+        return uno::Any( m_aURL );
     else if ( aPropertyName == "OpenMode" )
-        return uno::makeAny( m_nMode );
+        return uno::Any( m_nMode );
 
     throw beans::UnknownPropertyException(aPropertyName); // TODO
 }

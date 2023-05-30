@@ -10,7 +10,6 @@
 #include <sal/config.h>
 
 #include <algorithm>
-#include <string_view>
 
 #include <svl/cryptosign.hxx>
 #include <svl/sigstruct.hxx>
@@ -905,10 +904,10 @@ static int AsHex(char ch)
     return nRet;
 }
 
-std::vector<unsigned char> DecodeHexString(const OString& rHex)
+std::vector<unsigned char> DecodeHexString(std::string_view rHex)
 {
     std::vector<unsigned char> aRet;
-    size_t nHexLen = rHex.getLength();
+    size_t nHexLen = rHex.size();
     {
         int nByte = 0;
         int nCount = 2;
@@ -972,8 +971,8 @@ bool Signing::Sign(OStringBuffer& rCMSHexBuffer)
     digest.len = aHashResult.size();
 
     PRTime now = PR_Now();
-    NSSCMSSignedData *cms_sd;
-    NSSCMSSignerInfo *cms_signer;
+    NSSCMSSignedData *cms_sd(nullptr);
+    NSSCMSSignerInfo *cms_signer(nullptr);
     NSSCMSMessage *cms_msg = CreateCMSMessage(nullptr, &cms_sd, &cms_signer, cert, &digest);
     if (!cms_msg)
         return false;

@@ -34,7 +34,7 @@
 #include <unotools/streamwrap.hxx>
 #include <unotextrange.hxx>
 #include <sfx2/docfile.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 constexpr OUStringLiteral AUTOTEXT_GALLERY = u"autoTxt";
 
@@ -63,7 +63,7 @@ ErrCode SwDOCXReader::Read(SwDoc& rDoc, const OUString& /* rBaseURL */, SwPaM& r
     uno::Reference<document::XImporter> xImporter(xInterface, uno::UNO_QUERY_THROW);
     xImporter->setTargetDocument(xDstDoc);
 
-    const uno::Reference<text::XTextRange> xInsertTextRange = SwXTextRange::CreateXTextRange(rDoc, *rPam.GetPoint(), nullptr);
+    const rtl::Reference<SwXTextRange> xInsertTextRange = SwXTextRange::CreateXTextRange(rDoc, *rPam.GetPoint(), nullptr);
     uno::Reference<io::XStream> xStream(new utl::OStreamWrapper(*m_pMedium->GetInStream()));
 
     //SetLoading hack because the document properties will be re-initted
@@ -76,7 +76,7 @@ ErrCode SwDOCXReader::Read(SwDoc& rDoc, const OUString& /* rBaseURL */, SwPaM& r
     {
         { "InputStream", uno::Any(xStream) },
         { "InsertMode", uno::Any(true) },
-        { "TextInsertModeRange", uno::Any(xInsertTextRange) }
+        { "TextInsertModeRange", uno::Any(uno::Reference<text::XTextRange>(xInsertTextRange)) }
     }));
 
     ErrCode ret = ERRCODE_NONE;
@@ -167,9 +167,8 @@ bool SwDOCXReader::MakeEntries( SwDoc *pD, SwTextBlocks &rBlocks )
             OUString aLNm;
             {
                 SwPaM aPam( aStart );
-                SwNodeIndex& rIdx = aPam.GetPoint()->nNode;
-                ++rIdx;
-                aLNm = aPam.GetNode().GetTextNode()->GetText();
+                aPam.GetPoint()->Adjust(SwNodeOffset(1));
+                aLNm = aPam.GetPointNode().GetTextNode()->GetText();
 
                 // is AutoText?
                 bIsAutoText = aLNm.startsWith(AUTOTEXT_GALLERY);
@@ -182,34 +181,30 @@ bool SwDOCXReader::MakeEntries( SwDoc *pD, SwTextBlocks &rBlocks )
             // Get content
             SwPaM aPam( aStart );
             {
-                SwNodeIndex& rIdx = aPam.GetPoint()->nNode;
-                ++rIdx;
-                pCNd = rIdx.GetNode().GetTextNode();
+                SwNodeIndex aIdx( aPam.GetPoint()->GetNode(), SwNodeOffset(1) );
+                pCNd = aIdx.GetNode().GetTextNode();
                 if( nullptr == pCNd )
                 {
-                    pCNd = pD->GetNodes().MakeTextNode( rIdx, pColl );
-                    rIdx = *pCNd;
+                    pCNd = pD->GetNodes().MakeTextNode( aIdx.GetNode(), pColl );
                 }
             }
 
-            aPam.GetPoint()->nContent.Assign( pCNd, 0 );
+            aPam.GetPoint()->Assign( *pCNd );
             aPam.SetMark();
             {
-                SwNodeIndex& rIdx = aPam.GetPoint()->nNode;
-                rIdx = aStart.GetNode().EndOfSectionIndex() - 1;
+                SwNodeIndex aIdx( *aStart.GetNode().EndOfSectionNode(), SwNodeOffset(-1) );
                 // don't add extra empty text node if exist (.dotx but not .dotm)
-                if( rIdx.GetNode().GetTextNode() &&
-                    rIdx.GetNode().GetTextNode()->GetText().isEmpty() )
-                    rIdx = aStart.GetNode().EndOfSectionIndex() - 2;
-                pCNd = rIdx.GetNode().GetContentNode();
+                if( aIdx.GetNode().GetTextNode() &&
+                    aIdx.GetNode().GetTextNode()->GetText().isEmpty() )
+                    aIdx = aStart.GetNode().EndOfSectionIndex() - 2;
+                pCNd = aIdx.GetNode().GetContentNode();
                 if( nullptr == pCNd )
                 {
-                    ++rIdx;
-                    pCNd = pD->GetNodes().MakeTextNode( rIdx, pColl );
-                    rIdx = *pCNd;
+                    ++aIdx;
+                    pCNd = pD->GetNodes().MakeTextNode( aIdx.GetNode(), pColl );
                 }
             }
-            aPam.GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+            aPam.GetPoint()->Assign( *pCNd, pCNd->Len() );
 
             if( bIsAutoText )
             {
@@ -234,7 +229,7 @@ bool SwDOCXReader::MakeEntries( SwDoc *pD, SwTextBlocks &rBlocks )
                     SwDoc* pGlDoc = rBlocks.GetDoc();
                     SwNodeIndex aIdx( pGlDoc->GetNodes().GetEndOfContent(), -1 );
                     pCNd = aIdx.GetNode().GetContentNode();
-                    SwPosition aPos( aIdx, SwIndex( pCNd, pCNd ? pCNd->Len() : 0 ) );
+                    SwPosition aPos( aIdx, pCNd, pCNd ? pCNd->Len() : 0 );
                     pD->getIDocumentContentOperations().CopyRange(aPam, aPos, SwCopyFlags::CheckPosInFly);
                     rBlocks.PutDoc();
                 }

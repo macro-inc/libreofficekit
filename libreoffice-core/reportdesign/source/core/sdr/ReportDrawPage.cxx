@@ -19,16 +19,14 @@
 #include <ReportDrawPage.hxx>
 #include <RptObject.hxx>
 #include <RptModel.hxx>
-#include <RptDef.hxx>
 #include <strings.hxx>
 #include <comphelper/mimeconfighelper.hxx>
 #include <comphelper/embeddedobjectcontainer.hxx>
-#include <editeng/outlobj.hxx>
 
 #include <svx/svdmodel.hxx>
 #include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svx/unoshape.hxx>
 #include <svx/svdpage.hxx>
 
@@ -44,7 +42,7 @@ OReportDrawPage::OReportDrawPage(SdrPage* _pPage
 {
 }
 
-SdrObject* OReportDrawPage::CreateSdrObject_(const uno::Reference< drawing::XShape > & xDescr)
+rtl::Reference<SdrObject> OReportDrawPage::CreateSdrObject_(const uno::Reference< drawing::XShape > & xDescr)
 {
     uno::Reference< report::XReportComponent> xReportComponent(xDescr,uno::UNO_QUERY);
     if ( xReportComponent.is() )
@@ -78,14 +76,14 @@ uno::Reference< drawing::XShape >  OReportDrawPage::CreateShape( SdrObject *pObj
         if (dynamic_cast< const OUnoObject* >(pObj) != nullptr)
         {
             OUnoObject& rUnoObj = dynamic_cast<OUnoObject&>(*pObj);
-            if (rUnoObj.GetObjIdentifier() == OBJ_RD_FIXEDTEXT)
+            if (rUnoObj.GetObjIdentifier() == SdrObjKind::ReportDesignFixedText)
             {
                 uno::Reference<beans::XPropertySet> xControlModel(rUnoObj.GetUnoControlModel(),uno::UNO_QUERY);
                 if ( xControlModel.is() )
-                    xControlModel->setPropertyValue( PROPERTY_MULTILINE,uno::makeAny(true));
+                    xControlModel->setPropertyValue( PROPERTY_MULTILINE,uno::Any(true));
             }
             else
-                bChangeOrientation = rUnoObj.GetObjIdentifier() == OBJ_RD_HFIXEDLINE;
+                bChangeOrientation = rUnoObj.GetObjIdentifier() == SdrObjKind::ReportDesignHorizontalFixedLine;
             rtl::Reference<SvxShapeControl> pShape = new SvxShapeControl( pObj );
             xShape = static_cast<SvxShape_UnoImplHelper *>(pShape.get());
             pShape->setShapeKind(pObj->GetObjIdentifier());
@@ -106,7 +104,7 @@ uno::Reference< drawing::XShape >  OReportDrawPage::CreateShape( SdrObject *pObj
                 OUString sName;
                 xObj = pObj->getSdrModelFromSdrObject().GetPersist()->getEmbeddedObjectContainer().CreateEmbeddedObject(
                     ::comphelper::MimeConfigurationHelper::GetSequenceClassIDRepresentation(
-                    "80243D39-6741-46C5-926E-069164FF87BB"), sName );
+                    u"80243D39-6741-46C5-926E-069164FF87BB"), sName );
                 OSL_ENSURE(xObj.is(),"Embedded Object could not be created!");
 
                 /**************************************************

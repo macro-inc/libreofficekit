@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/sheet/cellarealink.hxx>
 #include <test/sheet/xarealink.hxx>
@@ -27,7 +27,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScAreaLinkObj : public CalcUnoApiTest,
+class ScAreaLinkObj : public UnoApiTest,
                       public apitest::CellAreaLink,
                       public apitest::XAreaLink,
                       public apitest::XPropertySet,
@@ -38,7 +38,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScAreaLinkObj);
 
@@ -66,20 +65,17 @@ public:
     CPPUNIT_TEST(testRefreshListener);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 ScAreaLinkObj::ScAreaLinkObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , CellAreaLink(m_directories.getURLFromSrc(u"/sc/qa/extras/testdocuments/scarealinkobj.ods"))
 {
 }
 
 uno::Reference<uno::XInterface> ScAreaLinkObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<beans::XPropertySet> xPropSet(xDoc, uno::UNO_QUERY_THROW);
     uno::Reference<sheet::XAreaLinks> xLinks(xPropSet->getPropertyValue("AreaLinks"),
@@ -96,14 +92,8 @@ uno::Reference<uno::XInterface> ScAreaLinkObj::init()
 
 void ScAreaLinkObj::setUp()
 {
-    CalcUnoApiTest::setUp();
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScAreaLinkObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    UnoApiTest::setUp();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScAreaLinkObj);

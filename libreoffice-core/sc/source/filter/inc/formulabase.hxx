@@ -553,7 +553,7 @@ public:
 
     /** Returns the library type associated with the passed URL of a function
         library (function add-in). */
-    static FunctionLibraryType getFuncLibTypeFromLibraryName( const OUString& rLibraryName );
+    static FunctionLibraryType getFuncLibTypeFromLibraryName( std::u16string_view rLibraryName );
 
 protected:
     /** Returns the list of all function infos. */
@@ -650,15 +650,6 @@ public:
     static OUString generateAddress2dString(
                             const BinAddress& rAddress,
                             bool bAbsolute );
-
-    /** Generates a string in Calc formula notation from the passed string.
-
-        @param rString  The string value.
-
-        @return  The string enclosed in double quotes, where all contained
-            quote characters are doubled.
-     */
-    static OUString generateApiString( const OUString& rString );
 
     /** Generates an array string in Calc formula notation from the passed
         matrix with Any's containing double values or strings.

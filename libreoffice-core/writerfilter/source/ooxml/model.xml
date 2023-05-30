@@ -18,6 +18,7 @@
 -->
 <model
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:adec="http://schemas.microsoft.com/office/drawing/2017/decorative"
   xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart"
   xmlns:dgm="http://schemas.openxmlformats.org/drawingml/2006/diagram"
   xmlns:lc="http://schemas.openxmlformats.org/drawingml/2006/lockedCanvas"
@@ -207,7 +208,7 @@
         </element>
       </define>
     </grammar>
-    <resource name="CT_OfficeStyleSheet" resource="Table" tokenid="ooxml:THEMETABLE"/>
+    <resource name="CT_OfficeStyleSheet" resource="Theme" tokenid="ooxml:THEMETABLE"/>
     <resource name="CT_Hyperlink" resource="Properties">
       <attribute name="r:id" tokenid="ooxml:CT_Hyperlink_r_id"/>
     </resource>
@@ -2622,10 +2623,24 @@
   <namespace name="dml-baseTypes">
     <grammar xmlns="http://relaxng.org/ns/structure/1.0" ns="http://schemas.openxmlformats.org/drawingml/2006/main">
       <include href="shared-relationshipReference"/>
-      <define name="CT_OfficeArtExtension">
-        <element>
-          <ref name="BUILT_IN_ANY_TYPE"/>
+      <define name="adec_decorative_val">
+        <attribute name="val">
+          <data type="boolean"/>
+        </attribute>
+      </define>
+      <define name="adec_decorative">
+        <element name="adec:decorative">
+          <ref name="adec_decorative_val"/>
         </element>
+      </define>
+      <define name="CT_OfficeArtExtension">
+        <choice>
+          <!-- add implemented extensions here so they can be processed -->
+          <ref name="adec_decorative"/>
+          <element>
+            <ref name="BUILT_IN_ANY_TYPE"/>
+          </element>
+        </choice>
         <attribute name="uri">
           <data type="token"/>
         </attribute>
@@ -3474,6 +3489,14 @@
         <data type="unsignedInt"/>
       </define>
     </grammar>
+    <resource name="CT_OfficeArtExtension" resource="Stream">
+      <element name="adec:decorative" tokenid="ooxml:CT_OfficeArtExtension_Decorative"/>
+    </resource>
+    <!-- this is not ideal, but unlike more obivous variants it appears to work -->
+    <resource name="adec_decorative" resource="Stream"/>
+    <resource name="adec_decorative_val" resource="Properties">
+      <attribute name="val" tokenid="ooxml:OfficeArtExtension_Decorative_val"/>
+    </resource>
     <resource name="ST_Coordinate" resource="Integer"/>
     <resource name="ST_PositiveCoordinate" resource="Integer"/>
     <resource name="ST_Angle" resource="Integer"/>
@@ -3977,6 +4000,9 @@
       <attribute name="noChangeAspect" tokenid="ooxml:CT_GraphicalObjectFrameLocking_noChangeAspect"/>
       <attribute name="noMove" tokenid="ooxml:CT_GraphicalObjectFrameLocking_noMove"/>
       <attribute name="noResize" tokenid="ooxml:CT_GraphicalObjectFrameLocking_noResize"/>
+    </resource>
+    <resource name="CT_OfficeArtExtensionList" resource="Properties">
+      <element name="ext" tokenid="ooxml:CT_OfficeArtExtension"/>
     </resource>
     <resource name="CT_NonVisualDrawingProps" resource="Properties">
       <element name="a:hlinkClick" tokenid="ooxml:CT_NonVisualDrawingProps_a_hlinkClick"/>
@@ -5378,11 +5404,9 @@
         <attribute name="paraId">
           <ref name="ST_LongHexNumber"/>
         </attribute>
-        <!-- Not yet used
         <attribute name="paraIdParent">
           <ref name="ST_LongHexNumber"/>
         </attribute>
-        -->
         <attribute name="done">
           <ref name="ST_OnOff"/>
         </attribute>
@@ -5404,6 +5428,7 @@
     </resource>
     <resource name="CT_CommentEx" resource="CommentEx">
       <attribute name="paraId" tokenid="ooxml:CT_CommentEx_paraId" action="att_paraId"/>
+      <attribute name="paraIdParent" tokenid="ooxml:CT_CommentEx_paraIdParent" action="att_paraIdParent"/>
       <attribute name="done" tokenid="ooxml:CT_CommentEx_done" action="att_done"/>
     </resource>
     <resource name="ST_LongHexNumber" resource="String"/>
@@ -13946,6 +13971,11 @@
           <data type="string"/>
         </attribute>
       </define>
+      <define name="CT_SdtAppearance">
+        <attribute name="w15:val">
+          <data type="string"/>
+        </attribute>
+      </define>
       <define name="CT_SdtPr">
         <choice>
           <element name="rPr">
@@ -13970,6 +14000,9 @@
             <ref name="CT_OnOff"/>
           </element>
           <element name="id">
+            <ref name="CT_DecimalNumber"/>
+          </element>
+          <element name="tabIndex">
             <ref name="CT_DecimalNumber"/>
           </element>
           <element name="tag">
@@ -14016,6 +14049,9 @@
           </element>
           <element name="w15:color">
             <ref name="CT_SdtColor"/>
+          </element>
+          <element name="w15:appearance">
+            <ref name="CT_SdtAppearance"/>
           </element>
         </choice>
       </define>
@@ -17677,6 +17713,7 @@
       <action name="start" action="startCharacterGroup"/>
       <action name="start" action="printproperty" sendtokenid="ooxml:CT_SimpleField_instr"/>
       <action name="start" action="endCharacterGroup"/>
+      <action name="start" action="fieldlock_simple"/>
       <action name="start" action="fieldsep"/>
       <action name="end" action="fieldend"/>
     </resource>
@@ -18190,6 +18227,8 @@
     <resource name="CT_ParaRPr" resource="Properties">
       <element name="ins" tokenid="ooxml:CT_ParaRPr_ins"/>
       <element name="del" tokenid="ooxml:CT_ParaRPr_del"/>
+      <element name="moveFrom" tokenid="ooxml:CT_ParaRPr_moveFrom"/>
+      <element name="moveTo" tokenid="ooxml:CT_ParaRPr_moveTo"/>
       <element name="rPrChange" tokenid="ooxml:CT_ParaRPr_rPrChange"/>
     </resource>
     <resource name="CT_ParaTrackChange" resource="Properties">
@@ -18260,6 +18299,9 @@
     <resource name="CT_SdtColor" resource="Properties">
       <attribute name="val" tokenid="ooxml:CT_SdtColor_val"/>
     </resource>
+    <resource name="CT_SdtAppearance" resource="Properties">
+      <attribute name="w15:val" tokenid="ooxml:CT_SdtAppearance_val"/>
+    </resource>
     <resource name="CT_SdtPr" resource="Properties">
       <element name="rPr" tokenid="ooxml:CT_SdtPr_rPr"/>
       <element name="alias" tokenid="ooxml:CT_SdtPr_alias"/>
@@ -18269,6 +18311,7 @@
       <element name="dataBinding" tokenid="ooxml:CT_SdtPr_dataBinding"/>
       <element name="temporary" tokenid="ooxml:CT_SdtPr_temporary"/>
       <element name="id" tokenid="ooxml:CT_SdtPr_id"/>
+      <element name="tabIndex" tokenid="ooxml:CT_SdtPr_tabIndex"/>
       <element name="tag" tokenid="ooxml:CT_SdtPr_tag"/>
       <element name="equation" tokenid="ooxml:CT_SdtPr_equation"/>
       <element name="comboBox" tokenid="ooxml:CT_SdtPr_comboBox"/>
@@ -18284,6 +18327,7 @@
       <element name="group" tokenid="ooxml:CT_SdtPr_group"/>
       <element name="bibliography" tokenid="ooxml:CT_SdtPr_bibliography"/>
       <element name="w15:color" tokenid="ooxml:CT_SdtPr_color"/>
+      <element name="w15:appearance" tokenid="ooxml:CT_SdtPr_appearance"/>
     </resource>
     <resource name="CT_SdtEndPr" resource="Properties">
       <element name="rPr" tokenid="ooxml:CT_SdtEndPr_rPr"/>
@@ -18778,6 +18822,9 @@
       <attribute name="name" tokenid="ooxml:CT_CompatSetting_name"/>
       <attribute name="uri" tokenid="ooxml:CT_CompatSetting_uri"/>
       <attribute name="val" tokenid="ooxml:CT_CompatSetting_val"/>
+    </resource>
+    <resource name="CT_DocVars" resource="Properties">
+      <element name="docVar" tokenid="ooxml:CT_DocVar"/>
     </resource>
     <resource name="CT_DocVar" resource="Properties">
       <attribute name="name" tokenid="ooxml:CT_DocVar_name"/>

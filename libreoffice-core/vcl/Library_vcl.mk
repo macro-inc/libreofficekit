@@ -19,20 +19,20 @@
 
 $(eval $(call gb_Library_Library,vcl))
 
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.common))
+$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.common,services))
 
 ifeq ($(DISABLE_GUI),TRUE)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.headless))
+$(eval $(call gb_Library_add_componentimpl,vcl,headless))
 else ifeq ($(OS),MACOSX)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.macosx))
+$(eval $(call gb_Library_add_componentimpl,vcl,macosx))
 else ifeq ($(OS),WNT)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.windows))
+$(eval $(call gb_Library_add_componentimpl,vcl,windows))
 else ifeq ($(OS),ANDROID)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.android))
+$(eval $(call gb_Library_add_componentimpl,vcl,android))
 else ifeq ($(OS),iOS)
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.ios))
+$(eval $(call gb_Library_set_componentfile,vcl,ios))
 else
-$(eval $(call gb_Library_set_componentfile,vcl,vcl/vcl.unx))
+$(eval $(call gb_Library_add_componentimpl,vcl,unx))
 endif
 
 $(eval $(call gb_Library_set_precompiled_header,vcl,vcl/inc/pch/precompiled_vcl))
@@ -49,6 +49,7 @@ $(eval $(call gb_Library_add_defs,vcl,\
     -DDESKTOP_DETECTOR_DLL_NAME=\"$(call gb_Library_get_runtime_filename,$(call gb_Library__get_name,desktop_detector))\" \
     -DTK_DLL_NAME=\"$(call gb_Library_get_runtime_filename,$(call gb_Library__get_name,tk))\" \
     $(if $(SYSTEM_GLM),-DGLM_ENABLE_EXPERIMENTAL) \
+    $(if $(SYSTEM_LIBFIXMATH),-DSYSTEM_LIBFIXMATH) \
 ))
 
 $(eval $(call gb_Library_use_sdk_api,vcl))
@@ -63,6 +64,7 @@ $(eval $(call gb_Library_use_libraries,vcl,\
     cppu \
     cppuhelper \
     $(call gb_Helper_optional,BREAKPAD,crashreport) \
+    drawinglayercore \
     i18nlangtag \
     i18nutil \
     $(if $(ENABLE_JAVA),jvmaccess) \
@@ -93,14 +95,14 @@ $(eval $(call gb_Library_use_externals,vcl,\
     libtiff \
     libwebp \
     mdds_headers \
-    $(if $(filter PDFIUM,$(BUILD_TYPE)),pdfium) \
 ))
 
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/rendercontext/drawmode \
     vcl/skia/SkiaHelper \
     vcl/source/animate/Animation \
-    vcl/source/animate/AnimationBitmap \
+    vcl/source/animate/AnimationFrame \
+    vcl/source/animate/AnimationRenderer \
     vcl/source/cnttype/mcnttfactory \
     vcl/source/cnttype/mcnttype \
     vcl/source/printer/Options \
@@ -132,9 +134,10 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/window/dockingarea \
     vcl/source/window/dockmgr \
     vcl/source/window/dockwin \
+    vcl/source/window/DocWindow \
     vcl/source/window/event \
     vcl/source/window/floatwin \
-    vcl/source/window/introwin \
+    $(if $(ENABLE_WASM_STRIP_SPLASH),,vcl/source/window/introwin) \
     vcl/source/window/keycod \
     vcl/source/window/keyevent \
     vcl/source/window/layout \
@@ -216,6 +219,7 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/toolkit/group \
     vcl/source/toolkit/morebtn \
     vcl/source/outdev/background \
+    vcl/source/outdev/eps \
     vcl/source/outdev/outdev \
     vcl/source/outdev/stack \
     vcl/source/outdev/clipping \
@@ -259,6 +263,7 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/treelist/svlbitm \
     vcl/source/treelist/uiobject \
     vcl/source/text/ImplLayoutRuns \
+    vcl/source/text/mnemonic \
     vcl/source/gdi/configsettings \
     vcl/source/gdi/cvtgrf \
     vcl/source/gdi/embeddedfontshelper \
@@ -274,7 +279,6 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/gdi/graph \
     vcl/source/gdi/graphictools \
     vcl/source/gdi/hatch \
-    vcl/source/gdi/impanmvw \
     vcl/source/gdi/impglyphitem \
     vcl/source/gdi/impgraph \
     vcl/source/gdi/jobset \
@@ -284,7 +288,6 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/gdi/oldprintadaptor \
     vcl/source/gdi/pdfbuildin_fonts \
     vcl/source/gdi/pdfextoutdevdata \
-    vcl/source/gdi/pdffontcache \
     vcl/source/gdi/pdfwriter \
     vcl/source/gdi/pdfwriter_impl2 \
     vcl/source/gdi/pdfwriter_impl \
@@ -381,7 +384,6 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/helper/commandinfoprovider \
     vcl/source/helper/displayconnectiondispatch \
     vcl/source/helper/driverblocklist \
-    vcl/source/helper/errcode \
     vcl/source/helper/evntpost \
     vcl/source/helper/lazydelete \
     vcl/source/helper/strhelper \
@@ -394,6 +396,9 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/app/help \
     vcl/source/app/i18nhelp \
     vcl/source/app/idle \
+    $(if $(filter-out WNT,$(OS)), \
+    vcl/source/app/salplug \
+    ) \
     vcl/source/app/salusereventlist \
     vcl/source/app/salvtables \
     vcl/source/app/scheduler \
@@ -472,32 +477,31 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/filter/wmf/wmfexternal \
     vcl/source/filter/wmf/wmfwr \
     vcl/source/filter/png/PngImageReader \
-    vcl/source/filter/png/pngwrite \
+    vcl/source/filter/png/PngImageWriter \
     vcl/source/filter/webp/reader \
     vcl/source/filter/webp/writer \
     vcl/source/font/DirectFontSubstitution \
+    vcl/source/font/EmphasisMark \
     vcl/source/font/Feature \
     vcl/source/font/FeatureCollector \
     vcl/source/font/FeatureParser \
     vcl/source/font/FontSelectPattern \
+    vcl/source/font/LogicalFontInstance \
     vcl/source/font/OpenTypeFeatureDefinitionList \
     vcl/source/font/PhysicalFontCollection \
     vcl/source/font/PhysicalFontFace \
     vcl/source/font/PhysicalFontFamily \
     vcl/source/font/fontattributes \
-    vcl/source/font/fontinstance \
     vcl/source/font/fontcache \
     vcl/source/font/fontcharmap \
     vcl/source/font/fontmetric \
     vcl/source/font/font \
     vcl/source/fontsubset/cff \
     vcl/source/fontsubset/fontsubset \
-    vcl/source/fontsubset/list \
     vcl/source/fontsubset/sft \
     vcl/source/fontsubset/ttcr \
     vcl/source/fontsubset/xlat \
     vcl/source/pdf/PDFiumTools \
-    vcl/source/pdf/$(if $(filter PDFIUM,$(BUILD_TYPE)),,Dummy)PDFiumLibrary \
     vcl/source/uitest/logger \
     vcl/source/uitest/uiobject \
     vcl/source/uitest/uitest \
@@ -532,7 +536,9 @@ vcl_headless_code= \
     $(if $(filter-out iOS,$(OS)), \
         vcl/headless/svpbmp \
         vcl/headless/svpgdi \
-        $(if $(ENABLE_HEADLESS),vcl/headless/svpdata) \
+        vcl/headless/SvpGraphicsBackend \
+        vcl/headless/CairoCommon \
+        vcl/headless/BitmapHelper \
     ) \
     vcl/headless/svpdummies \
     vcl/headless/svpinst \
@@ -569,10 +575,11 @@ $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/print/text_gfx \
 )
 
-vcl_headless_freetype_libs = \
-    cairo \
-    fontconfig \
-    freetype \
+ifeq ($(SYSTEM_LIBFIXMATH),TRUE)
+$(eval $(call gb_Library_add_libs,vcl,\
+        -llibfixmath \
+))
+endif
 
 ifeq ($(USING_X11),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
@@ -583,58 +590,26 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/unx/generic/printer/ppdparser \
     vcl/unx/generic/window/screensaverinhibitor \
     vcl/unx/generic/printer/cpdmgr \
-    $(if $(ENABLE_CUPS),\
-        vcl/unx/generic/printer/cupsmgr \
-        vcl/unx/generic/printer/printerinfomanager \
-    , \
-        vcl/null/printerinfomanager \
-    ) \
-    $(vcl_headless_code) \
-    $(vcl_headless_freetype_code) \
 ))
 
 $(eval $(call gb_Library_use_externals,vcl,\
-    $(if $(ENABLE_CUPS),cups) \
     dbus \
     valgrind \
-    $(vcl_headless_freetype_libs) \
 ))
 
 $(eval $(call gb_Library_add_libs,vcl,\
     -lX11 \
     -lXext \
 ))
-
-ifneq (,$(filter LINUX %BSD SOLARIS,$(OS)))
-$(eval $(call gb_Library_use_static_libraries,vcl,\
-    glxtest \
-))
-$(eval $(call gb_Library_add_exception_objects,vcl,\
-    vcl/source/opengl/x11/X11DeviceInfo \
-))
-endif
 endif # USING_X11
-
-ifneq (,$(filter LINUX %BSD SOLARIS,$(OS)))
-$(eval $(call gb_Library_add_libs,vcl,\
-    -lm $(DLOPEN_LIBS) \
-))
-endif
 
 ifeq ($(DISABLE_GUI),TRUE)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-$(if $(filter WNT,$(OS)), \
-    vcl/source/opengl/DeviceInfo \
-    vcl/win/dummies \
-) \
-    vcl/null/printerinfomanager \
 $(if $(filter-out WNT,$(OS)), \
     vcl/unx/generic/printer/jobdata \
     vcl/unx/generic/printer/ppdparser \
 ) \
     vcl/headless/headlessinst \
-    $(vcl_headless_code) \
-    $(vcl_headless_freetype_code) \
 ))
 
 $(eval $(call gb_Library_use_externals,vcl,\
@@ -646,7 +621,6 @@ $(eval $(call gb_Library_use_externals,vcl,\
 else # !DISABLE_GUI
 
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-    vcl/source/opengl/DeviceInfo \
     vcl/source/opengl/OpenGLContext \
     vcl/source/opengl/OpenGLHelper \
     $(if $(filter SKIA,$(BUILD_TYPE)), \
@@ -662,28 +636,50 @@ $(eval $(call gb_Library_use_externals,vcl,\
 ))
 endif # !DISABLE_GUI
 
-
-ifeq ($(OS),HAIKU)
+#
+# * plugin loader: used on all platforms except iOS and Android
+# * select headless code and corresponding libraries
+#
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-    vcl/unx/generic/printer/jobdata \
-    vcl/unx/generic/printer/ppdparser \
-    vcl/null/printerinfomanager \
-    $(vcl_headless_code) \
-    $(vcl_headless_freetype_code) \
+    $(if $(USE_HEADLESS_CODE), \
+        $(if $(ENABLE_CUPS), \
+            vcl/unx/generic/printer/cupsmgr \
+            vcl/unx/generic/printer/printerinfomanager \
+        , \
+            vcl/null/printerinfomanager \
+        ) \
+        $(vcl_headless_code) \
+        $(vcl_headless_freetype_code) \
+    ) \
+    vcl/source/pdf/$(if $(filter PDFIUM,$(BUILD_TYPE)),,Dummy)PDFiumLibrary \
+))
+
+# fontconfig depends on expat for static builds
+$(eval $(call gb_Library_use_externals,vcl,\
+    $(if $(USE_HEADLESS_CODE), \
+        cairo \
+        $(if $(ENABLE_CUPS),cups) \
+        fontconfig \
+        freetype \
+    ) \
+    $(if $(filter PDFIUM,$(BUILD_TYPE)),pdfium) \
 ))
 
 $(eval $(call gb_Library_add_libs,vcl,\
+    $(if $(filter LINUX %BSD SOLARIS,$(OS)), \
+        -lm \
+        $(if $(DISABLE_DYNLOADING),,$(UNIX_DLAPI_LIBS)) \
+    ) \
+))
+
+
+#
+# OS specific stuff not handled yet
+#
+
+ifeq ($(OS),HAIKU)
+$(eval $(call gb_Library_add_libs,vcl,\
     -lbe \
-))
-
-$(eval $(call gb_Library_add_exception_objects,vcl, \
-    $(if $(or $(ENABLE_QT5),$(ENABLE_KF5)),vcl/source/app/salplug) \
-    $(if $(ENABLE_QT6),vcl/source/app/salplug) \
-))
-
-$(eval $(call gb_Library_use_externals,vcl,\
-    expat \
-    $(vcl_headless_freetype_libs) \
 ))
 endif
 
@@ -695,18 +691,7 @@ $(eval $(call gb_Library_add_libs,vcl,\
     -llo-bootstrap \
 ))
 $(eval $(call gb_Library_add_exception_objects,vcl,\
-    vcl/unx/generic/printer/jobdata \
-    vcl/unx/generic/printer/ppdparser \
-    vcl/null/printerinfomanager \
     vcl/android/androidinst \
-    vcl/source/app/salplug \
-    $(vcl_headless_code) \
-    $(vcl_headless_freetype_code) \
-))
-
-$(eval $(call gb_Library_use_externals,vcl,\
-    expat \
-    $(vcl_headless_freetype_libs) \
 ))
 endif
 
@@ -714,6 +699,9 @@ endif
 ifeq ($(OS),iOS)
 $(eval $(call gb_Library_add_cxxflags,vcl,\
     $(gb_OBJCXXFLAGS) \
+))
+$(eval $(call gb_Library_add_objcxxobjects,vcl,\
+    vcl/quartz/cgutils \
 ))
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/ios/iosinst \
@@ -731,6 +719,7 @@ $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/quartz/utils \
     vcl/quartz/AquaGraphicsBackend \
     $(vcl_headless_code) \
+    vcl/unx/generic/app/gendata \
 ))
 $(eval $(call gb_Library_use_system_darwin_frameworks,vcl,\
     UIKit \
@@ -740,6 +729,12 @@ endif
 
 
 ifeq ($(OS),MACOSX)
+$(eval $(call gb_Library_add_objcxxobjects,vcl,\
+    vcl/quartz/cgutils \
+    $(if $(filter SKIA,$(BUILD_TYPE)), \
+        vcl/skia/quartz/salbmp \
+    ) \
+))
 $(eval $(call gb_Library_use_system_darwin_frameworks,vcl,\
     Cocoa \
     CoreFoundation \
@@ -756,9 +751,8 @@ endif
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_exception_objects,vcl,\
     vcl/source/opengl/win/WinDeviceInfo \
-    $(if $(filter-out TRUE,$(DISABLE_GUI)), \
-      vcl/source/app/salplug \
-    ) \
+    vcl/win/dummies \
+    vcl/source/app/salplug \
     vcl/win/app/fileregistration \
 ))
 

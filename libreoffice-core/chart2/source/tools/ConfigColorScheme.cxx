@@ -124,9 +124,7 @@ void ConfigColorScheme::retrieveConfigColors()
             new impl::ChartConfigItem( *this ));
         m_apChartConfigItem->addPropertyNotification( aSeriesPropName );
     }
-    OSL_ASSERT(m_apChartConfigItem);
-    if (!m_apChartConfigItem)
-        return;
+    assert(m_apChartConfigItem && "this can only be set at this point");
 
     // retrieve colors
     uno::Any aValue(
@@ -153,7 +151,7 @@ void ConfigColorScheme::retrieveConfigColors()
         0xff00ff, 0x00ffff, 0xffff00
     };
 
-    static const sal_Int32 nMaxDefaultColors = SAL_N_ELEMENTS( nDefaultColors );
+    static const sal_Int32 nMaxDefaultColors = std::size( nDefaultColors );
     return nDefaultColors[ nIndex % nMaxDefaultColors ];
 }
 

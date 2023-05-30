@@ -19,11 +19,11 @@
 #pragma once
 
 #include <com/sun/star/uno/Sequence.hxx>
-#include <com/sun/star/uno/XInterface.hpp>
 #include <com/sun/star/beans/PropertyChangeEvent.hpp>
+#include <com/sun/star/beans/XPropertySetInfoChangeListener.hpp>
+#include <com/sun/star/beans/XPropertiesChangeListener.hpp>
 #include <com/sun/star/ucb/XContentIdentifier.hpp>
 #include <com/sun/star/ucb/XContent.hpp>
-#include <memory>
 #include <optional>
 #include <unordered_map>
 #include <vector>
@@ -39,21 +39,21 @@ namespace fileaccess {
         css::uno::Reference< css::ucb::XContent > m_xCreatorContent;
         css::uno::Reference< css::ucb::XContentIdentifier > m_xCreatorId;
         css::uno::Reference< css::ucb::XContentIdentifier > m_xOldId;
-        std::vector< css::uno::Reference< css::uno::XInterface > > m_sListeners;
+        std::vector< css::uno::Reference< css::ucb::XContentEventListener > > m_sListeners;
     public:
 
         ContentEventNotifier(
             TaskManager* pMyShell,
             const css::uno::Reference< css::ucb::XContent >& xCreatorContent,
             const css::uno::Reference< css::ucb::XContentIdentifier >& xCreatorId,
-            std::vector< css::uno::Reference< css::uno::XInterface > >&& sListeners );
+            std::vector< css::uno::Reference< css::ucb::XContentEventListener > >&& sListeners );
 
         ContentEventNotifier(
             TaskManager* pMyShell,
             const css::uno::Reference< css::ucb::XContent >& xCreatorContent,
             const css::uno::Reference< css::ucb::XContentIdentifier >& xCreatorId,
             const css::uno::Reference< css::ucb::XContentIdentifier >& xOldId,
-            std::vector< css::uno::Reference< css::uno::XInterface > >&& sListeners );
+            std::vector< css::uno::Reference< css::ucb::XContentEventListener > >&& sListeners );
 
         void notifyChildInserted( const OUString& aChildName ) const;
         void notifyDeleted() const;
@@ -66,11 +66,11 @@ namespace fileaccess {
     {
     private:
         css::uno::Reference< css::ucb::XContent > m_xCreatorContent;
-        std::vector< css::uno::Reference< css::uno::XInterface > > m_sListeners;
+        std::vector< css::uno::Reference< css::beans::XPropertySetInfoChangeListener > > m_sListeners;
     public:
         PropertySetInfoChangeNotifier(
             const css::uno::Reference< css::ucb::XContent >& xCreatorContent,
-            std::vector< css::uno::Reference< css::uno::XInterface > >&& sListeners );
+            std::vector< css::uno::Reference< css::beans::XPropertySetInfoChangeListener > >&& sListeners );
 
         void notifyPropertyAdded( const OUString & aPropertyName ) const;
         void notifyPropertyRemoved( const OUString & aPropertyName ) const;
@@ -78,7 +78,7 @@ namespace fileaccess {
 
 
     typedef std::unordered_map< OUString,
-                           std::vector< css::uno::Reference< css::uno::XInterface > > >  ListenerMap;
+                           std::vector< css::uno::Reference< css::beans::XPropertiesChangeListener > > >  ListenerMap;
 
     class PropertyChangeNotifier
     {

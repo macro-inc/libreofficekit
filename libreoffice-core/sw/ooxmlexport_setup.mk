@@ -13,9 +13,11 @@ define sw_ooxmlexport_libraries
 	comphelper \
 	cppu \
 	cppuhelper \
+	docmodel \
 	editeng \
 	sal \
 	sfx \
+	subsequenttest \
 	svl \
 	sw \
 	swqahelper \
@@ -24,7 +26,8 @@ define sw_ooxmlexport_libraries
 	unotest \
 	utl \
 	vcl \
-	svxcore
+	svxcore \
+	basegfx
 endef
 
 # template for ooxmlexport tests (there are several so that they can be run in parallel)
@@ -50,6 +53,7 @@ $(eval $(call gb_CppunitTest_use_externals,sw_ooxmlexport$(1),\
 $(eval $(call gb_CppunitTest_set_include,sw_ooxmlexport$(1),\
     -I$(SRCDIR)/sw/inc \
     -I$(SRCDIR)/sw/source/core/inc \
+	-I$(SRCDIR)/sw/source/uibase/inc \
 	-I$(SRCDIR)/sw/qa/inc \
     $$(INCLUDE) \
 ))

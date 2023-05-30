@@ -23,7 +23,6 @@
 #include <PropertyHelper.hxx>
 #include <ModifyListenerHelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
 
 namespace com::sun::star::uno { class XComponentContext; }
 
@@ -96,20 +95,19 @@ namespace chart
 {
 
 FormattedString::FormattedString() :
-        ::property::OPropertySet( m_aMutex ),
     m_aType(chart2::DataPointCustomLabelFieldType::DataPointCustomLabelFieldType_TEXT),
     m_bDataLabelsRange(false),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 FormattedString::FormattedString( const FormattedString & rOther ) :
         impl::FormattedString_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
+        ::property::OPropertySet( rOther ),
     m_aString( rOther.m_aString ),
     m_aType(rOther.m_aType),
     m_aGuid(rOther.m_aGuid),
     m_bDataLabelsRange(rOther.m_bDataLabelsRange),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 FormattedString::~FormattedString()
@@ -209,28 +207,12 @@ void SAL_CALL FormattedString::setCellRange( const OUString& cellRange )
 // ____ XModifyBroadcaster ____
 void SAL_CALL FormattedString::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL FormattedString::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____
@@ -257,13 +239,14 @@ void FormattedString::fireModifyEvent()
 }
 
 // ____ OPropertySet ____
-uno::Any FormattedString::GetDefaultValue( sal_Int32 nHandle ) const
+void FormattedString::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticFormattedStringDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 // ____ OPropertySet ____

@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 #include <com/sun/star/beans/Property.hpp>
@@ -57,7 +58,6 @@
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/lang/XTypeProvider.hpp>
-#include <com/sun/star/lang/XUnoTunnel.hpp>
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/uno/RuntimeException.hpp>
@@ -68,6 +68,7 @@
 #include <com/sun/star/util/ElementChange.hpp>
 #include <comphelper/sequence.hxx>
 #include <comphelper/servicehelper.hxx>
+#include <comphelper/string.hxx>
 #include <comphelper/lok.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <cppu/unotype.hxx>
@@ -410,13 +411,13 @@ css::uno::Sequence< OUString > Access::getElementNames()
     osl::MutexGuard g(*lock_);
     checkLocalizedPropertyAccess();
     std::vector< rtl::Reference< ChildAccess > > children(getAllChildren());
-    std::vector<OUString> names;
-    names.reserve(children.size());
+    css::uno::Sequence<OUString> names(children.size());
+    OUString* pArray = names.getArray();
     for (auto const& child : children)
     {
-        names.push_back(child->getNameInternal());
+        *pArray++ = child->getNameInternal();
     }
-    return comphelper::containerToSequence(names);
+    return names;
 }
 
 sal_Bool Access::hasByName(OUString const & aName)
@@ -1407,17 +1408,16 @@ rtl::Reference< ChildAccess > Access::getChild(OUString const & name) {
             // xml:lang attributes, look for the first entry with the same first
             // segment as the requested language tag before falling back to
             // defaults (see fdo#33638):
-            if (aFallbacks.size() > 0)
-                locale = aFallbacks[aFallbacks.size() - 1];
-            assert(
-                !locale.isEmpty() && locale.indexOf('-') == -1 &&
-                locale.indexOf('_') == -1);
-
+            auto const i = comphelper::string::indexOfAny(locale, u"-_", 1);
+            if (i != -1) {
+                locale = locale.copy(0, i);
+            }
+            assert(!locale.isEmpty());
             std::vector< rtl::Reference< ChildAccess > > children(
                 getAllChildren());
             for (auto const& child : children)
             {
-                OUString name2(child->getNameInternal());
+                const OUString & name2(child->getNameInternal());
                 if (name2.startsWith(locale) &&
                     (name2.getLength() == locale.getLength() ||
                      name2[locale.getLength()] == '-' ||
@@ -1925,8 +1925,8 @@ Access::ModifiedChild::ModifiedChild():
 {}
 
 Access::ModifiedChild::ModifiedChild(
-    rtl::Reference< ChildAccess > const & theChild, bool theDirectlyModified):
-    child(theChild), directlyModified(theDirectlyModified)
+    rtl::Reference< ChildAccess > theChild, bool theDirectlyModified):
+    child(std::move(theChild)), directlyModified(theDirectlyModified)
 {}
 
 rtl::Reference< ChildAccess > Access::getModifiedChild(

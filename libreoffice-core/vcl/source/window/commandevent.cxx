@@ -19,12 +19,13 @@
 
 #include <string.h>
 
+#include <utility>
 #include <vcl/commandevent.hxx>
 
-CommandExtTextInputData::CommandExtTextInputData( const OUString& rText,
+CommandExtTextInputData::CommandExtTextInputData( OUString aText,
     const ExtTextInputAttr* pTextAttr, sal_Int32 nCursorPos, sal_uInt16 nCursorFlags,
     bool bOnlyCursor)
-    : maText(rText)
+    : maText(std::move(aText))
 {
     if ( pTextAttr && !maText.isEmpty() )
     {
@@ -170,29 +171,44 @@ const CommandSelectionChangeData* CommandEvent::GetSelectionChangeData() const
         return nullptr;
 }
 
-const CommandSwipeData* CommandEvent::GetSwipeData() const
+const CommandGestureSwipeData* CommandEvent::GetGestureSwipeData() const
 {
-    if( mnCommand == CommandEventId::Swipe )
-        return static_cast<const CommandSwipeData*>(mpData);
+    if( mnCommand == CommandEventId::GestureSwipe )
+        return static_cast<const CommandGestureSwipeData*>(mpData);
     else
         return nullptr;
 }
 
-const CommandLongPressData* CommandEvent::GetLongPressData() const
+const CommandGestureLongPressData* CommandEvent::GetLongPressData() const
 {
-    if( mnCommand == CommandEventId::LongPress )
-        return static_cast<const CommandLongPressData*>(mpData);
+    if( mnCommand == CommandEventId::GestureLongPress )
+        return static_cast<const CommandGestureLongPressData*>(mpData);
     else
         return nullptr;
 }
 
-const CommandGestureData* CommandEvent::GetGestureData() const
+const CommandGesturePanData* CommandEvent::GetGesturePanData() const
 {
-    if (mnCommand == CommandEventId::Gesture)
-        return static_cast<const CommandGestureData*>(mpData);
+    if (mnCommand == CommandEventId::GesturePan)
+        return static_cast<const CommandGesturePanData*>(mpData);
     else
         return nullptr;
 }
 
+const CommandGestureZoomData* CommandEvent::GetGestureZoomData() const
+{
+    if (mnCommand == CommandEventId::GestureZoom)
+        return static_cast<const CommandGestureZoomData*>(mpData);
+    else
+        return nullptr;
+}
+
+const CommandGestureRotateData* CommandEvent::GetGestureRotateData() const
+{
+    if (mnCommand == CommandEventId::GestureRotate)
+        return static_cast<const CommandGestureRotateData*>(mpData);
+    else
+        return nullptr;
+}
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

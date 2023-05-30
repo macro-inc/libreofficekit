@@ -21,15 +21,10 @@
 
 #include <sal/config.h>
 
-#include <osl/diagnose.h>
 #include <osl/mutex.hxx>
 #include <com/sun/star/lang/EventObject.hpp>
-#include <com/sun/star/lang/DisposedException.hpp>
-#include <com/sun/star/uno/Sequence.hxx>
 #include <comphelper/comphelperdllapi.h>
 #include <comphelper/interfacecontainer2.hxx>
-#include <cstddef>
-#include <functional>
 #include <memory>
 #include <vector>
 #include <utility>
@@ -39,7 +34,6 @@ namespace com::sun::star::uno
 class XInterface;
 }
 
-/** */ //for docpp
 namespace comphelper
 {
 /** This is a copy of cppu::OMultiTypeInterfaceContainerHelper2 in include/cppuhelper/interfacecontainer.h,

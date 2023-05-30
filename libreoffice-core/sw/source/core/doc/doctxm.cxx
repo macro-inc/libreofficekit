@@ -21,6 +21,7 @@
 #include <hintids.hxx>
 #include <editeng/formatbreakitem.hxx>
 #include <comphelper/classids.hxx>
+#include <o3tl/string_view.hxx>
 #include <docsh.hxx>
 #include <ndole.hxx>
 #include <txttxmrk.hxx>
@@ -117,7 +118,7 @@ sal_uInt16 SwDoc::GetCurTOXMark( const SwPosition& rPos,
                                 SwTOXMarks& rArr )
 {
     // search on Position rPos for all SwTOXMarks
-    SwTextNode *const pTextNd = rPos.nNode.GetNode().GetTextNode();
+    SwTextNode *const pTextNd = rPos.GetNode().GetTextNode();
     if( !pTextNd || !pTextNd->GetpSwpHints() )
         return 0;
 
@@ -125,7 +126,7 @@ sal_uInt16 SwDoc::GetCurTOXMark( const SwPosition& rPos,
     sal_Int32 nSttIdx;
     const sal_Int32 *pEndIdx;
 
-    const sal_Int32 nCurrentPos = rPos.nContent.GetIndex();
+    const sal_Int32 nCurrentPos = rPos.GetContentIndex();
 
     for( size_t n = 0; n < rHts.Count(); ++n )
     {
@@ -174,7 +175,7 @@ void SwDoc::DeleteTOXMark( const SwTOXMark* pTOXMark )
         {
             // save attributes for Undo
             SwUndoResetAttr* pUndo = new SwUndoResetAttr(
-                SwPosition( rTextNd, SwIndex( &rTextNd, pTextTOXMark->GetStart() ) ),
+                SwPosition( rTextNd, pTextTOXMark->GetStart() ),
                 RES_TXTATR_TOXMARK );
             GetIDocumentUndoRedo().AppendUndo( std::unique_ptr<SwUndo>(pUndo) );
 
@@ -362,12 +363,13 @@ SwTOXBaseSection* SwDoc::InsertTableOf( const SwPaM& aPam,
     OUString sSectNm = GetUniqueTOXBaseName( *rTOX.GetTOXType(), rTOX.GetTOXName() );
     SwSectionData aSectionData( SectionType::ToxContent, sSectNm );
 
-    std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode> const tmp(
+    std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode, sw::ParagraphBreakMode> const tmp(
         &rTOX,
         pLayout && pLayout->IsHideRedlines()
             ? sw::RedlineMode::Hidden
             : sw::RedlineMode::Shown,
-        pLayout ? pLayout->GetFieldmarkMode() : sw::FieldmarkMode::ShowBoth);
+        pLayout ? pLayout->GetFieldmarkMode() : sw::FieldmarkMode::ShowBoth,
+        pLayout ? pLayout->GetParagraphBreakMode() : sw::ParagraphBreakMode::Shown);
     SwTOXBaseSection *const pNewSection = dynamic_cast<SwTOXBaseSection *>(
         InsertSwSection(aPam, aSectionData, & tmp, pSet, false));
     if (pNewSection)
@@ -388,15 +390,15 @@ SwTOXBaseSection* SwDoc::InsertTableOf( const SwPaM& aPam,
             // then insert the headline section
             SwNodeIndex aIdx( *pSectNd, +1 );
 
-            SwTextNode* pHeadNd = GetNodes().MakeTextNode( aIdx,
+            SwTextNode* pHeadNd = GetNodes().MakeTextNode( aIdx.GetNode(),
                             getIDocumentStylePoolAccess().GetTextCollFromPool( RES_POOLCOLL_STANDARD ) );
 
             SwSectionData headerData( SectionType::ToxHeader, pNewSection->GetTOXName()+"_Head" );
 
-            SwNodeIndex aStt( *pHeadNd ); --aIdx;
+            --aIdx;
             SwSectionFormat* pSectFormat = MakeSectionFormat();
             GetNodes().InsertTextSection(
-                    aStt, *pSectFormat, headerData, nullptr, &aIdx, true, false);
+                    *pHeadNd, *pSectFormat, headerData, nullptr, &aIdx.GetNode(), true, false);
         }
     }
 
@@ -430,7 +432,7 @@ void SwDoc::InsertTableOf( SwNodeOffset nSttNd, SwNodeOffset nEndNd,
         pFormat->SetFormatAttr(*pSet);
 
     SwSectionNode *const pNewSectionNode =
-        GetNodes().InsertTextSection(aStt, *pFormat, aSectionData, &rTOX, &aEnd);
+        GetNodes().InsertTextSection(aStt.GetNode(), *pFormat, aSectionData, &rTOX, &aEnd.GetNode());
     if (!pNewSectionNode)
     {
         DelSectionFormat( pFormat );
@@ -446,7 +448,7 @@ void SwDoc::InsertTableOf( SwNodeOffset nSttNd, SwNodeOffset nEndNd,
 /// Get current table of contents
 SwTOXBase* SwDoc::GetCurTOX( const SwPosition& rPos )
 {
-    SwNode& rNd = rPos.nNode.GetNode();
+    SwNode& rNd = rPos.GetNode();
     SwSectionNode* pSectNd = rNd.FindSectionNode();
     while( pSectNd )
     {
@@ -667,7 +669,7 @@ OUString SwDoc::GetUniqueTOXBaseName( const SwTOXType& rType,
             if ( rNm.startsWith(aName) )
             {
                 // Calculate number and set the Flag
-                nNum = rNm.copy( nNmLen ).toInt32();
+                nNum = o3tl::toInt32(rNm.subView( nNmLen ));
                 if( nNum-- && nNum < mpSectionFormatTable->size() )
                     pSetFlags[ nNum / 8 ] |= (0x01 << ( nNum & 0x07 ));
             }
@@ -732,9 +734,93 @@ static const SwTextNode* lcl_FindChapterNode( const SwNode& rNd,
             SwPosition aPos( *pNd );
             pNd = GetBodyTextNode( pNd->GetDoc(), aPos, *pFrame );
             OSL_ENSURE( pNd, "Where's the paragraph?" );
+            // tdf#151462 - search for outline node containing the current node
+            return pNd ? pNd->FindOutlineNodeOfLevel(pNd->GetSectionLevel() - 1, pLayout) : nullptr;
         }
     }
-    return pNd ? pNd->FindOutlineNodeOfLevel(nLvl, pLayout) : nullptr;
+    return pNd->FindOutlineNodeOfLevel(nLvl, pLayout);
+}
+
+static bool IsHeadingContained(const SwTextNode* pChptrNd, const SwNode& rNd)
+{
+    const SwNode* pNd = &rNd;
+    const SwOutlineNodes& rONds = pNd->GetNodes().GetOutLineNds();
+    bool bIsHeadingContained = false;
+    if (!rONds.empty())
+    {
+        bool bCheckFirst = false;
+        SwOutlineNodes::size_type nPos;
+
+        if (!rONds.Seek_Entry(const_cast<SwNode*>(pNd), &nPos))
+        {
+            if (nPos == 0)
+                bCheckFirst = true;
+            else
+                nPos--;
+        }
+
+        if (bCheckFirst)
+        {
+            const SwContentNode* pCNd = pNd->GetContentNode();
+
+            Point aPt(0, 0);
+            std::pair<Point, bool> const tmp(aPt, false);
+
+            const SwFrame* pChptrFrame = pChptrNd ? pChptrNd->getLayoutFrame(
+                pChptrNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(), nullptr, &tmp) : nullptr;
+            const SwPageFrame* pChptrPgFrame = pChptrFrame ? pChptrFrame->FindPageFrame() : nullptr;
+            const SwFrame* pNdFrame
+                = pCNd ? pCNd->getLayoutFrame(
+                      pCNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(), nullptr, &tmp)
+                       : nullptr;
+
+            // Check if the one asking doesn't precede the page of the specified chapter note
+            bIsHeadingContained
+                = pNdFrame && pChptrPgFrame
+                  && pChptrPgFrame->getFrameArea().Top() <= pNdFrame->getFrameArea().Top();
+            // Check if the one asking doesn't succeed the specified chapter note
+            if (bIsHeadingContained)
+            {
+                const SwNode* aChptrNd = pChptrNd;
+                if (!rONds.Seek_Entry(const_cast<SwNode*>(aChptrNd), &nPos) && nPos)
+                    nPos--;
+                // Search for the next outline node with a larger level than the specified chapter node
+                while (nPos < rONds.size() - 1
+                       && pChptrNd->GetAttrOutlineLevel()
+                              < rONds[nPos + 1]->GetTextNode()->GetAttrOutlineLevel())
+                    nPos++;
+                // If there exists such an outline node, check if the one asking doesn't succeed
+                // the specified chapter node
+                if (nPos < rONds.size() - 1) {
+                    nPos++;
+                    const auto aONdsTxtNd = rONds[nPos]->GetTextNode();
+                    pChptrFrame = aONdsTxtNd->getLayoutFrame(
+                        aONdsTxtNd->GetDoc().getIDocumentLayoutAccess().GetCurrentLayout(), nullptr,
+                        &tmp);
+                    pChptrPgFrame = pChptrFrame ? pChptrFrame->FindPageFrame() : nullptr;
+                    bIsHeadingContained
+                        = pNdFrame && pChptrPgFrame
+                          && pChptrPgFrame->getFrameArea().Top() >= pNdFrame->getFrameArea().Top();
+                }
+            }
+        }
+        else
+        {
+            // Search for the next outline node which lies not within the current chapter node
+            while (nPos > 0
+                   && pChptrNd->GetAttrOutlineLevel()
+                          < rONds[nPos]->GetTextNode()->GetAttrOutlineLevel())
+                nPos--;
+            bIsHeadingContained = pChptrNd == rONds[nPos]->GetTextNode();
+        }
+    }
+    else
+    {
+        // If there are no outline nodes, consider the heading contained,
+        // otherwise the _XDocumentIndex._update() test fails
+        bIsHeadingContained = true;
+    }
+    return bIsHeadingContained;
 }
 
 // Table of contents class
@@ -756,9 +842,8 @@ bool SwTOXBaseSection::SetPosAtStartEnd( SwPosition& rPos ) const
     const SwSectionNode* pSectNd = GetFormat()->GetSectionNode();
     if( pSectNd )
     {
-        rPos.nNode = *pSectNd;
-        SwContentNode* pCNd = pSectNd->GetDoc().GetNodes().GoNext( &rPos.nNode );
-        rPos.nContent.Assign( pCNd, 0 );
+        rPos.Assign(*pSectNd);
+        pSectNd->GetDoc().GetNodes().GoNext( &rPos );
         bRet = true;
     }
     return bRet;
@@ -831,8 +916,9 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
         {
             // determine page description of content before table-of-content
             SwNodeIndex aIdx( *pSectNd );
-            pDefaultPageDesc =
-                SwNodes::GoPrevious( &aIdx )->FindPageDesc();
+            SwContentNode* pTmp = SwNodes::GoPrevious( &aIdx );
+            assert(pTmp); // make coverity happy
+            pDefaultPageDesc = pTmp->FindPageDesc();
 
         }
         if ( !pDefaultPageDesc )
@@ -854,9 +940,10 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
 
     // find the first layout node for this TOX, if it only find the content
     // in his own chapter
-    const SwTextNode* pOwnChapterNode = IsFromChapter()
-            ? ::lcl_FindChapterNode( *pSectNd, pLayout )
-            : nullptr;
+    const SwSectionNode* pChapterSectNd = IsFromChapter() ? pSectNd->FindSectionNode() : nullptr;
+    const SwTextNode* pOwnChapterNode = pChapterSectNd
+        ? ::lcl_FindChapterNode( *pSectNd, pLayout, pChapterSectNd->GetSectionLevel() + 1 )
+        : nullptr;
 
     SwNode2LayoutSaveUpperFrames aN2L(*pSectNd);
     const_cast<SwSectionNode*>(pSectNd)->DelFrames();
@@ -910,7 +997,7 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
 
         SwNodeIndex aSttIdx( *pSectNd, +1 );
         SwNodeIndex aEndIdx( *pSectNd->EndOfSectionNode() );
-        pFirstEmptyNd = rDoc.GetNodes().MakeTextNode( aEndIdx,
+        pFirstEmptyNd = rDoc.GetNodes().MakeTextNode( aEndIdx.GetNode(),
                         rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool( RES_POOLCOLL_TEXT ) );
 
         {
@@ -941,13 +1028,13 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
         else
         {
             --aEndIdx;
-            SwPosition aPos( aEndIdx, SwIndex( pFirstEmptyNd, 0 ));
+            SwPosition aPos( aEndIdx, pFirstEmptyNd, 0 );
             SwDoc::CorrAbs( aSttIdx, aEndIdx, aPos, true );
 
             // delete flys in whole range including start node which requires
             // giving the node before start node as Mark parameter, hence -1.
             // (flys must be deleted because the anchor nodes are removed)
-            DelFlyInRange( SwNodeIndex(aSttIdx, -1), aEndIdx );
+            DelFlyInRange( SwNodeIndex(aSttIdx, -1).GetNode(), aEndIdx.GetNode() );
 
             rDoc.GetNodes().Delete( aSttIdx, aEndIdx.GetIndex() - aSttIdx.GetIndex() );
         }
@@ -959,16 +1046,16 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
         // then insert the headline section
         SwNodeIndex aIdx( *pSectNd, +1 );
 
-        SwTextNode* pHeadNd = rDoc.GetNodes().MakeTextNode( aIdx,
+        SwTextNode* pHeadNd = rDoc.GetNodes().MakeTextNode( aIdx.GetNode(),
                                 GetTextFormatColl( FORM_TITLE ) );
-        pHeadNd->InsertText( GetTitle(), SwIndex( pHeadNd ) );
+        pHeadNd->InsertText( GetTitle(), SwContentIndex( pHeadNd ) );
 
         SwSectionData headerData( SectionType::ToxHeader, GetTOXName()+"_Head" );
 
-        SwNodeIndex aStt( *pHeadNd ); --aIdx;
+        --aIdx;
         SwSectionFormat* pSectFormat = rDoc.MakeSectionFormat();
         rDoc.GetNodes().InsertTextSection(
-                aStt, *pSectFormat, headerData, nullptr, &aIdx, true, false);
+                *pHeadNd, *pSectFormat, headerData, nullptr, &aIdx.GetNode(), true, false);
 
         if (pUndo)
         {
@@ -994,7 +1081,7 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
         }
 
         // Generate: Set dynamic TabStops
-        SwTextNode* pTOXNd = rDoc.GetNodes().MakeTextNode( aInsPos , pColl );
+        SwTextNode* pTOXNd = rDoc.GetNodes().MakeTextNode( aInsPos.GetNode() , pColl );
         m_aSortArr[ nCnt ]->pTOXNd = pTOXNd;
 
         // Generate: Evaluate Form and insert the place holder for the
@@ -1039,7 +1126,6 @@ void SwTOXBaseSection::Update(const SfxItemSet* pAttr,
     aInsPos = *pFirstEmptyNd;
     {
         SwPaM aCorPam( *pFirstEmptyNd );
-        aCorPam.GetPoint()->nContent.Assign( pFirstEmptyNd, 0 );
         if( !aCorPam.Move( fnMoveForward ) )
             aCorPam.Move( fnMoveBackward );
         SwNodeIndex aEndIdx( aInsPos, 1 );
@@ -1205,7 +1291,7 @@ void SwTOXBaseSection::UpdateMarks(const SwTOXInternational& rIntl,
     {
         ::SetProgressState(0, pShell);
         auto& rNode = rMark.get().GetTextNode();
-        if(IsFromChapter() && ::lcl_FindChapterNode(rNode, pLayout) != pOwnChapterNode)
+        if(IsFromChapter() && !IsHeadingContained(pOwnChapterNode, rNode))
             continue;
         auto rTOXMark = rMark.get().GetTOXMark();
         if(TOX_INDEX == eTOXTyp)
@@ -1249,8 +1335,7 @@ void SwTOXBaseSection::UpdateOutline( const SwTextNode* pOwnChapterNode,
            !pTextNd->HasHiddenCharAttribute( true ) &&
            (!pLayout || !pLayout->HasMergedParas()
                 || static_cast<SwTextFrame*>(pTextNd->getLayoutFrame(pLayout))->GetTextNodeForParaProps() == pTextNd) &&
-            ( !IsFromChapter() ||
-               ::lcl_FindChapterNode(*pTextNd, pLayout) == pOwnChapterNode ))
+            ( !IsFromChapter() || IsHeadingContained(pOwnChapterNode, *pTextNd) ))
         {
             InsertSorted(MakeSwTOXSortTabBase<SwTOXPara>(pLayout, *pTextNd, SwTOXElement::OutlineLevel));
         }
@@ -1290,8 +1375,7 @@ void SwTOXBaseSection::UpdateTemplate(const SwTextNode* pOwnChapterNode,
                     pTextNd->GetNodes().IsDocNodes() &&
                     (!pLayout || !pLayout->HasMergedParas()
                         || static_cast<SwTextFrame*>(pTextNd->getLayoutFrame(pLayout))->GetTextNodeForParaProps() == pTextNd) &&
-                    (!IsFromChapter() || pOwnChapterNode ==
-                        ::lcl_FindChapterNode(*pTextNd, pLayout)))
+                    (!IsFromChapter() || IsHeadingContained(pOwnChapterNode, *pTextNd)))
                 {
                     InsertSorted(MakeSwTOXSortTabBase<SwTOXPara>(pLayout, *pTextNd, SwTOXElement::Template, i + 1));
                 }
@@ -1319,8 +1403,7 @@ void SwTOXBaseSection::UpdateSequence(const SwTextNode* pOwnChapterNode,
 
         if (rTextNode.GetText().getLength() &&
             rTextNode.getLayoutFrame(pLayout) &&
-            ( !IsFromChapter() ||
-                ::lcl_FindChapterNode(rTextNode, pLayout) == pOwnChapterNode)
+            ( !IsFromChapter() || IsHeadingContained(pOwnChapterNode, rTextNode))
             && (!pLayout || !pLayout->IsHideRedlines()
                 || !sw::IsFieldDeletedInModel(pDoc->getIDocumentRedlineAccess(), *pTextField)))
         {
@@ -1513,8 +1596,7 @@ void SwTOXBaseSection::UpdateContent( SwTOXElement eMyType,
             if (pCNd->getLayoutFrame(pLayout)
                 && (!pLayout || !pLayout->HasMergedParas()
                     || pCNd->GetRedlineMergeFlag() != SwNode::Merge::Hidden)
-                && ( !IsFromChapter() ||
-                    ::lcl_FindChapterNode(*pCNd, pLayout) == pOwnChapterNode ))
+                && ( !IsFromChapter() || IsHeadingContained(pOwnChapterNode, *pCNd)))
             {
                 std::unique_ptr<SwTOXPara> pNew( MakeSwTOXSortTabBase<SwTOXPara>(
                         pLayout, *pCNd, eMyType,
@@ -1556,8 +1638,7 @@ void SwTOXBaseSection::UpdateTable(const SwTextNode* pOwnChapterNode,
                 if (pCNd->getLayoutFrame(pLayout)
                     && (!pLayout || !pLayout->HasMergedParas()
                         || pCNd->GetRedlineMergeFlag() != SwNode::Merge::Hidden)
-                    && (!IsFromChapter()
-                        || ::lcl_FindChapterNode(*pCNd, pLayout) == pOwnChapterNode))
+                    && (!IsFromChapter() || IsHeadingContained(pOwnChapterNode, *pCNd)))
                 {
                     std::unique_ptr<SwTOXTable> pNew(new SwTOXTable( *pCNd ));
                     if( IsLevelFromChapter() && TOX_TABLES != SwTOXBase::GetType())
@@ -1742,7 +1823,7 @@ void SwTOXBaseSection::UpdatePageNum_( SwTextNode* pNd,
     }
 
     // Delete place holder
-    SwIndex aPos(pNd, nStartPos);
+    SwContentIndex aPos(pNd, nStartPos);
     SwCharFormat* pPageNoCharFormat = nullptr;
     SwpHints* pHints = pNd->GetpSwpHints();
     if(pHints)

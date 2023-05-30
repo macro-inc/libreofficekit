@@ -8,6 +8,7 @@
  *
  */
 
+#include <tools/solar.h>
 #include <vcl/bitmap.hxx>
 #include <vcl/bitmapex.hxx>
 #include <vcl/BitmapPopArtFilter.hxx>
@@ -31,14 +32,14 @@ BitmapEx BitmapPopArtFilter::execute(BitmapEx const& rBitmapEx) const
         {
             const sal_Int32 nWidth = pWriteAcc->Width();
             const sal_Int32 nHeight = pWriteAcc->Height();
-            const int nEntryCount = 1 << pWriteAcc->GetBitCount();
-            int n = 0;
+            const sal_uInt16 nEntryCount = 1 << pWriteAcc->GetBitCount();
+            sal_uInt16 n = 0;
             std::vector<PopArtEntry> aPopArtTable(nEntryCount);
 
             for (n = 0; n < nEntryCount; n++)
             {
                 PopArtEntry& rEntry = aPopArtTable[n];
-                rEntry.mnIndex = static_cast<sal_uInt16>(n);
+                rEntry.mnIndex = n;
                 rEntry.mnCount = 0;
             }
 
@@ -49,6 +50,7 @@ BitmapEx BitmapPopArtFilter::execute(BitmapEx const& rBitmapEx) const
                 for (sal_Int32 nX = 0; nX < nWidth; nX++)
                 {
                     aPopArtTable[pWriteAcc->GetIndexFromData(pScanline, nX)].mnCount++;
+                    assert(aPopArtTable[pWriteAcc->GetIndexFromData(pScanline, nX)].mnCount != 0);
                 }
             }
 
@@ -59,8 +61,8 @@ BitmapEx BitmapPopArtFilter::execute(BitmapEx const& rBitmapEx) const
                       });
 
             // get last used entry
-            sal_uLong nFirstEntry;
-            sal_uLong nLastEntry = 0;
+            sal_uInt16 nFirstEntry;
+            sal_uInt16 nLastEntry = 0;
 
             for (n = 0; n < nEntryCount; n++)
             {
@@ -69,19 +71,16 @@ BitmapEx BitmapPopArtFilter::execute(BitmapEx const& rBitmapEx) const
             }
 
             // rotate palette (one entry)
-            const BitmapColor aFirstCol(pWriteAcc->GetPaletteColor(
-                sal::static_int_cast<sal_uInt16>(aPopArtTable[0].mnIndex)));
+            const BitmapColor aFirstCol(pWriteAcc->GetPaletteColor(aPopArtTable[0].mnIndex));
 
             for (nFirstEntry = 0; nFirstEntry < nLastEntry; nFirstEntry++)
             {
                 pWriteAcc->SetPaletteColor(
-                    sal::static_int_cast<sal_uInt16>(aPopArtTable[nFirstEntry].mnIndex),
-                    pWriteAcc->GetPaletteColor(
-                        sal::static_int_cast<sal_uInt16>(aPopArtTable[nFirstEntry + 1].mnIndex)));
+                    aPopArtTable[nFirstEntry].mnIndex,
+                    pWriteAcc->GetPaletteColor(aPopArtTable[nFirstEntry + 1].mnIndex));
             }
 
-            pWriteAcc->SetPaletteColor(
-                sal::static_int_cast<sal_uInt16>(aPopArtTable[nLastEntry].mnIndex), aFirstCol);
+            pWriteAcc->SetPaletteColor(aPopArtTable[nLastEntry].mnIndex, aFirstCol);
 
             // cleanup
             pWriteAcc.reset();

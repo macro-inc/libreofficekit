@@ -280,7 +280,7 @@ ErrCode SfxMacroLoader::loadMacro( const OUString& rURL, css::uno::Any& rRetval,
                 if ( bSetGlobalThisComponent )
                 {
                     // document is executed via AppBASIC, adjust ThisComponent variable
-                    aOldThisComponent = pAppMgr->SetGlobalUNOConstant( "ThisComponent", makeAny( pDoc->GetModel() ) );
+                    pAppMgr->SetGlobalUNOConstant( "ThisComponent", Any( pDoc->GetModel() ), &aOldThisComponent );
                 }
 
                 // just to let the shell be alive
@@ -288,9 +288,9 @@ ErrCode SfxMacroLoader::loadMacro( const OUString& rURL, css::uno::Any& rRetval,
 
                 {
                     // attempt to protect the document against the script tampering with its Undo Context
-                    std::unique_ptr< ::framework::DocumentUndoGuard > pUndoGuard;
+                    std::optional< ::framework::DocumentUndoGuard > pUndoGuard;
                     if ( bIsDocBasic )
-                        pUndoGuard.reset( new ::framework::DocumentUndoGuard( pDoc->GetModel() ) );
+                        pUndoGuard.emplace( pDoc->GetModel() );
 
                     // execute the method
                     SbxVariableRef retValRef = new SbxVariable;

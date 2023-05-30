@@ -20,6 +20,7 @@
 #include <memory>
 #include <autoform.hxx>
 
+#include <sal/log.hxx>
 #include <sfx2/docfile.hxx>
 #include <unotools/pathoptions.hxx>
 #include <svl/intitem.hxx>
@@ -377,7 +378,7 @@ const ScNumFormatAbbrev& ScAutoFormatData::GetNumFormat( sal_uInt16 nIndex ) con
     return GetField( nIndex ).GetNumFormat();
 }
 
-bool ScAutoFormatData::IsEqualData( sal_uInt16 nIndex1, sal_uInt16 nIndex2 ) const
+bool ScAutoFormatData::HasSameData( sal_uInt16 nIndex1, sal_uInt16 nIndex2 ) const
 {
     bool bEqual = true;
     const ScAutoFormatDataField& rField1 = GetField( nIndex1 );
@@ -844,7 +845,7 @@ void ScAutoFormat::Load()
                     (AUTOFORMAT_ID_504 <= nVal && nVal <= AUTOFORMAT_ID) )
             {
                 sal_uInt8 nChrSet, nCnt;
-                tools::Long nPos = rStream.Tell();
+                sal_uInt64 nPos = rStream.Tell();
                 rStream.ReadUChar( nCnt ).ReadUChar( nChrSet );
                 if( rStream.Tell() != sal_uLong(nPos + nCnt) )
                 {
@@ -922,7 +923,7 @@ bool ScAutoFormat::Save()
             }
         }
 
-        rStream.Flush();
+        rStream.FlushBuffer();
 
         aMedium.Commit();
     }

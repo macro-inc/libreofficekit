@@ -28,12 +28,11 @@
 #include <com/sun/star/util/TextSearch2.hpp>
 #include <com/sun/star/util/SearchAlgorithms2.hpp>
 #include <com/sun/star/util/SearchFlags.hpp>
-#include <sal/log.hxx>
 #include <unotools/charclass.hxx>
 #include <comphelper/processfactory.hxx>
 #include <unotools/textsearch.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <mutex>
 
 using namespace ::com::sun::star::util;

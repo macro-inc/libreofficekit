@@ -224,6 +224,22 @@ const OUString& PropertyMap::getPropertyName( sal_Int32 nPropId )
     return GetPropertyNameVector()[ nPropId ];
 }
 
+sal_Int32 PropertyMap::getPropertyId( std::u16string_view sPropName )
+{
+    // This may use a std::map to get faster from String to ID in the
+    // future, inside the [0..PROP_COUNT[ entries. Since it is currently
+    // only used for Diagram re-creation I opted for less memory usage here
+    if(sPropName.empty())
+        return -1;
+
+    const std::vector<OUString>& rVec(GetPropertyNameVector());
+    for(size_t a(0); a < rVec.size(); a++)
+        if(rVec[a] == sPropName)
+            return a;
+
+    return -1;
+}
+
 void PropertyMap::assignAll( const PropertyMap& rPropMap )
 {
     for (auto const& prop : rPropMap.maProperties)
@@ -321,7 +337,7 @@ static void lclDumpAnyValue( const Any& value)
             fprintf (stderr,"%s\n", USS(value.getValueTypeName()));
             for( int i=0; i<propArrayArray.getLength(); i++ ) {
                 fprintf (stderr,"\t\t\t[%3d] ", i);
-                lclDumpAnyValue( makeAny (propArrayArray[i]) );
+                lclDumpAnyValue( Any (propArrayArray[i]) );
             }
     } else if( value >>= anyArray ) {
             fprintf (stderr,"%s\n", USS(value.getValueTypeName()));
@@ -339,21 +355,21 @@ static void lclDumpAnyValue( const Any& value)
             fprintf (stderr,"%s\n", USS(value.getValueTypeName()));
             for( int i=0; i<segArray.getLength(); i++ ) {
                 fprintf (stderr,"\t\t\t[%3d] ", i );
-                lclDumpAnyValue( makeAny( segArray[i] ) );
+                lclDumpAnyValue( Any( segArray[i] ) );
             }
     } else if( value >>= ppArray ) {
             fprintf (stderr,"%s\n", USS(value.getValueTypeName()));
             for( int i=0; i<ppArray.getLength(); i++ ) {
                 fprintf (stderr,"\t\t\t[%3d] ", i );
-                lclDumpAnyValue( makeAny( ppArray[i] ) );
+                lclDumpAnyValue( Any( ppArray[i] ) );
             }
     } else if( value >>= segment ) {
             fprintf (stderr,"Command: %d Count: %d\n", segment.Command, segment.Count);
     } else if( value >>= pp ) {
             fprintf (stderr,"First: ");
-            lclDumpAnyValue( makeAny (pp.First) );
+            lclDumpAnyValue( Any (pp.First) );
             fprintf (stderr,"\t\t\t      Second: ");
-            lclDumpAnyValue( makeAny (pp.Second) );
+            lclDumpAnyValue( Any (pp.Second) );
     } else if( value >>= par ) {
             fprintf (stderr,"Parameter (%s): ", USS(par.Value.getValueTypeName()));
             lclDumpAnyValue( par.Value );
@@ -622,7 +638,7 @@ static const char* lclDumpAnyValueCode( const Any& value, int level)
         for( int i=0; i<sizeArray.getLength(); i++ ) {
             printLevel (level);
             fprintf (stderr, "{\n");
-            const char *var = lclDumpAnyValueCode (makeAny (sizeArray[i]), level + 1);
+            const char *var = lclDumpAnyValueCode (Any (sizeArray[i]), level + 1);
             printLevel (level + 1);
             fprintf (stderr, "aSizeSequence [%d] = %s;\n", i, var);
             printLevel (level);
@@ -637,7 +653,7 @@ static const char* lclDumpAnyValueCode( const Any& value, int level)
         for( int i=0; i<propArrayArray.getLength(); i++ ) {
             printLevel (level);
             fprintf (stderr, "{\n");
-            const char *var = lclDumpAnyValueCode( makeAny (propArrayArray[i]), level + 1 );
+            const char *var = lclDumpAnyValueCode( Any (propArrayArray[i]), level + 1 );
             printLevel (level + 1);
             fprintf (stderr, "aPropSequenceSequence [%d] = %s;\n", i, var);
             printLevel (level);
@@ -697,7 +713,7 @@ static const char* lclDumpAnyValueCode( const Any& value, int level)
         for( int i=0; i<segTextFrame.getLength(); i++ ) {
             printLevel (level);
             fprintf (stderr, "{\n");
-            const char *var = lclDumpAnyValueCode (makeAny (segTextFrame[i]), level + 1);
+            const char *var = lclDumpAnyValueCode (Any (segTextFrame[i]), level + 1);
             printLevel (level + 1);
             fprintf (stderr, "aTextFrameSeq [%d] = %s;\n", i, var);
             printLevel (level);
@@ -739,7 +755,7 @@ static const char* lclDumpAnyValueCode( const Any& value, int level)
         printLevel (level);
         fprintf (stderr, "{\n");
         {
-            const char* var = lclDumpAnyValueCode( makeAny (textFrame.TopLeft), level + 1 );
+            const char* var = lclDumpAnyValueCode( Any (textFrame.TopLeft), level + 1 );
             printLevel (level + 1);
             fprintf (stderr, "aTextFrame.TopLeft = %s;\n", var);
         }
@@ -749,7 +765,7 @@ static const char* lclDumpAnyValueCode( const Any& value, int level)
         printLevel (level);
         fprintf (stderr, "{\n");
         {
-            const char* var = lclDumpAnyValueCode( makeAny (textFrame.BottomRight), level + 1 );
+            const char* var = lclDumpAnyValueCode( Any (textFrame.BottomRight), level + 1 );
             printLevel (level + 1);
             fprintf (stderr, "aTextFrame.BottomRight = %s;\n", var);
         }

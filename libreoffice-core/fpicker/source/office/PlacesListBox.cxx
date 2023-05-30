@@ -29,6 +29,7 @@ PlacesListBox::PlacesListBox(std::unique_ptr<weld::TreeView> xControl,
 
     mxImpl->connect_changed( LINK( this, PlacesListBox, Selection ) );
     mxImpl->connect_row_activated( LINK( this, PlacesListBox, DoubleClick ) ) ;
+    mxImpl->connect_query_tooltip(LINK(this, PlacesListBox, QueryTooltipHdl));
 }
 
 PlacesListBox::~PlacesListBox( )
@@ -112,29 +113,39 @@ IMPL_LINK_NOARG( PlacesListBox, DoubleClick, weld::TreeView&, bool )
 {
     sal_uInt16 nSelected = mxImpl->get_cursor_index();
     PlacePtr pPlace = maPlaces[nSelected];
-    if ( pPlace->IsEditable() && !pPlace->IsLocal( ) )
+    if ( !pPlace->IsEditable() || pPlace->IsLocal( ) )
+        return true;
+    PlaceEditDialog aDlg(mpDlg->getDialog(), pPlace);
+    short aRetCode = aDlg.run();
+    switch (aRetCode)
     {
-        PlaceEditDialog aDlg(mpDlg->getDialog(), pPlace);
-        short aRetCode = aDlg.run();
-        switch (aRetCode)
+        case RET_OK :
         {
-            case RET_OK :
-            {
-                pPlace->SetName ( aDlg.GetServerName() );
-                pPlace->SetUrl( aDlg.GetServerUrl() );
-                mbUpdated = true;
-                break;
-            }
-            case RET_NO :
-            {
-                RemovePlace(nSelected);
-                break;
-            }
-            default:
-                break;
+            pPlace->SetName ( aDlg.GetServerName() );
+            pPlace->SetUrl( aDlg.GetServerUrl() );
+            mbUpdated = true;
+            break;
         }
+        case RET_NO :
+        {
+            RemovePlace(nSelected);
+            break;
+        }
+        default:
+            break;
     }
     return true;
+}
+
+IMPL_LINK(PlacesListBox, QueryTooltipHdl, const weld::TreeIter&, rIter, OUString)
+{
+    const OUString sText = mxImpl->get_text(rIter);
+    for (const auto& pPlace : maPlaces)
+    {
+        if (pPlace->GetName() == sText)
+            return pPlace->GetUrlObject().GetMainURL(INetURLObject::DecodeMechanism::Unambiguous);
+    }
+    return OUString();
 }
 
 void PlacesListBox::updateView( )

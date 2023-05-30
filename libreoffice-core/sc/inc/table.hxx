@@ -125,7 +125,7 @@ class ScColumnsRange final
     {
         SCCOL mCol;
     public:
-        typedef std::input_iterator_tag iterator_category;
+        typedef std::bidirectional_iterator_tag iterator_category;
         typedef SCCOL value_type;
         typedef SCCOL difference_type;
         typedef const SCCOL* pointer;
@@ -222,8 +222,8 @@ private:
 
     ScRangeVec      aPrintRanges;
 
-    std::unique_ptr<ScRange> pRepeatColRange;
-    std::unique_ptr<ScRange> pRepeatRowRange;
+    std::optional<ScRange> moRepeatColRange;
+    std::optional<ScRange> moRepeatRowRange;
 
     sal_uInt16          nLockCount;
 
@@ -266,8 +266,10 @@ friend class ScHorizontalValueIterator;
 friend class ScDBQueryDataIterator;
 friend class ScFormulaGroupIterator;
 friend class ScCellIterator;
-friend class ScQueryCellIterator;
-friend class ScCountIfCellIterator;
+template< ScQueryCellIteratorAccess accessType, ScQueryCellIteratorType queryType >
+friend class ScQueryCellIteratorBase;
+template< ScQueryCellIteratorAccess accessType >
+friend class ScQueryCellIteratorAccessSpecific;
 friend class ScHorizontalCellIterator;
 friend class ScColumnTextWidthIterator;
 friend class ScDocumentImport;
@@ -298,6 +300,14 @@ public:
     }
     // out-of-line the cold part of the function
     void CreateColumnIfNotExistsImpl( const SCCOL nScCol );
+
+    ScColumnData& GetColumnData( SCCOL nCol )
+    {
+        if( nCol >= aCol.size())
+            return aDefaultColData;
+        return aCol[nCol];
+    }
+
     sal_uInt64      GetCellCount() const;
     sal_uInt64      GetWeightedCount() const;
     sal_uInt64      GetWeightedCount(SCROW nStartRow, SCROW nEndRow) const;
@@ -415,7 +425,8 @@ public:
                                         bool bNoMatrixAtAll = false ) const;
     bool        HasSelectionMatrixFragment( const ScMarkData& rMark ) const;
 
-    bool        IsBlockEmpty( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2, bool bIgnoreNotes ) const;
+    // This also includes e.g. notes. Use IsEmptyData() for cell data only.
+    bool        IsBlockEmpty( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 ) const;
 
     bool        SetString( SCCOL nCol, SCROW nRow, SCTAB nTab, const OUString& rString,
                            const ScSetStringParam * pParam = nullptr );
@@ -455,7 +466,7 @@ public:
     OUString    GetString( SCCOL nCol, SCROW nRow, const ScInterpreterContext* pContext = nullptr ) const;
     double*     GetValueCell( SCCOL nCol, SCROW nRow );
     // Note that if pShared is set and a value is returned that way, the returned OUString is empty.
-    OUString    GetInputString( SCCOL nCol, SCROW nRow, const svl::SharedString** pShared = nullptr ) const;
+    OUString    GetInputString( SCCOL nCol, SCROW nRow, bool bForceSystemLocale = false ) const;
     double      GetValue( SCCOL nCol, SCROW nRow ) const;
     const EditTextObject* GetEditText( SCCOL nCol, SCROW nRow ) const;
     void RemoveEditTextCharAttribs( SCCOL nCol, SCROW nRow, const ScPatternAttr& rAttr );
@@ -626,7 +637,7 @@ public:
     SCROW       GetLastDataRow( SCCOL nCol1, SCCOL nCol2, SCROW nLastRow,
                                 ScDataAreaExtras* pDataAreaExtras = nullptr ) const;
 
-    bool        IsEmptyBlock(SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW nEndRow) const;
+    bool        IsEmptyData(SCCOL nStartCol, SCROW nStartRow, SCCOL nEndCol, SCROW nEndRow) const;
     SCSIZE      GetEmptyLinesInBlock( SCCOL nStartCol, SCROW nStartRow,
                                         SCCOL nEndCol, SCROW nEndRow, ScDirection eDir ) const;
 
@@ -797,10 +808,10 @@ public:
     void        ClearSelectionItems( const sal_uInt16* pWhich, const ScMarkData& rMark );
     void        ChangeSelectionIndent( bool bIncrement, const ScMarkData& rMark );
 
-    const ScRange*  GetRepeatColRange() const   { return pRepeatColRange.get(); }
-    const ScRange*  GetRepeatRowRange() const   { return pRepeatRowRange.get(); }
-    void            SetRepeatColRange( std::unique_ptr<ScRange> pNew );
-    void            SetRepeatRowRange( std::unique_ptr<ScRange> pNew );
+    const std::optional<ScRange>& GetRepeatColRange() const { return moRepeatColRange; }
+    const std::optional<ScRange>& GetRepeatRowRange() const { return moRepeatRowRange; }
+    void            SetRepeatColRange( std::optional<ScRange> oNew );
+    void            SetRepeatRowRange( std::optional<ScRange> oNew );
 
     sal_uInt16          GetPrintRangeCount() const          { return static_cast< sal_uInt16 >( aPrintRanges.size() ); }
     const ScRange*  GetPrintRange(sal_uInt16 nPos) const;
@@ -858,7 +869,7 @@ public:
     tools::Long     GetColWidth( SCCOL nStartCol, SCCOL nEndCol ) const;
     sal_uInt16 GetRowHeight( SCROW nRow, SCROW* pStartRow, SCROW* pEndRow, bool bHiddenAsZero = true ) const;
     tools::Long     GetRowHeight( SCROW nStartRow, SCROW nEndRow, bool bHiddenAsZero = true ) const;
-    tools::Long     GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double fScale, const tools::Long* pnMaxHeight = nullptr ) const;
+    tools::Long     GetScaledRowHeight( SCROW nStartRow, SCROW nEndRow, double fScale ) const;
     tools::Long     GetColOffset( SCCOL nCol, bool bHiddenAsZero = true ) const;
     tools::Long     GetRowOffset( SCROW nRow, bool bHiddenAsZero = true ) const;
 
@@ -953,7 +964,11 @@ public:
     SCROW       FirstVisibleRow(SCROW nStartRow, SCROW nEndRow) const;
     SCROW       LastVisibleRow(SCROW nStartRow, SCROW nEndRow) const;
     SCROW       CountVisibleRows(SCROW nStartRow, SCROW nEndRow) const;
+    SCROW       CountHiddenRows(SCROW nStartRow, SCROW nEndRow) const;
     tools::Long GetTotalRowHeight(SCROW nStartRow, SCROW nEndRow, bool bHiddenAsZero = true) const;
+
+    SCCOL       CountVisibleCols(SCCOL nStartCol, SCCOL nEndCol) const;
+    SCCOL       CountHiddenCols(SCCOL nStartCol, SCCOL nEndCol) const;
 
     SCCOLROW    LastHiddenColRow(SCCOLROW nPos, bool bCol) const;
 
@@ -1054,11 +1069,12 @@ public:
     SvtBroadcaster* GetBroadcaster( SCCOL nCol, SCROW nRow );
     const SvtBroadcaster* GetBroadcaster( SCCOL nCol, SCROW nRow ) const;
     void DeleteBroadcasters( sc::ColumnBlockPosition& rBlockPos, SCCOL nCol, SCROW nRow1, SCROW nRow2 );
+    void DeleteEmptyBroadcasters();
 
     void FillMatrix( ScMatrix& rMat, SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2, svl::SharedStringPool* pPool ) const;
 
     void InterpretDirtyCells( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 );
-    void InterpretCellsIfNeeded( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 );
+    bool InterpretCellsIfNeeded( SCCOL nCol1, SCROW nRow1, SCCOL nCol2, SCROW nRow2 );
 
     void SetFormulaResults( SCCOL nCol, SCROW nRow, const double* pResults, size_t nLen );
 
@@ -1189,7 +1205,8 @@ private:
                        const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc);
     bool        Search(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
                        SCCOL nLastCol, SCROW nLastRow,
-                       const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc);
+                       const ScMarkData& rMark, OUString& rUndoStr, ScDocument* pUndoDoc,
+                       std::vector< sc::ColumnBlockConstPosition >& blockPos);
     bool        SearchAll(const SvxSearchItem& rSearchItem, const ScMarkData& rMark,
                           ScRangeList& rMatchedRanges, OUString& rUndoStr, ScDocument* pUndoDoc);
     bool        Replace(const SvxSearchItem& rSearchItem, SCCOL& rCol, SCROW& rRow,
@@ -1353,7 +1370,6 @@ private:
 
     public:
         explicit VisibleDataCellIterator(const ScDocument& rDoc, ScFlatBoolRowSegments& rRowSegs, ScColumn& rColumn);
-        ~VisibleDataCellIterator();
 
         /**
          * Set the start row position.  In case there is not visible data cell

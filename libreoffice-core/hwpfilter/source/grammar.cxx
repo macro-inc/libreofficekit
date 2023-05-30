@@ -21,9 +21,6 @@
 /*  A Bison parser, made from grammar.y
     by GNU Bison version 1.28  */
 
-#ifndef YYDEBUG
-#define YYDEBUG 0
-#endif
 #ifndef YYMAXDEPTH
 #define YYMAXDEPTH 0
 #endif
@@ -94,70 +91,6 @@ const char yytranslate[] = {     0,
     27,    28,    29,    30,    31
 };
 
-#if YYDEBUG != 0
-static const short yyprhs[] = {     0,
-     0,     2,     4,     6,     8,    10,    12,    14,    16,    18,
-    20,    22,    24,    26,    28,    30,    32,    34,    36,    39,
-    42,    45,    48,    51,    54,    58,    60,    63,    66,    69,
-    72,    75,    79,    81,    85,    89,    92,    96,    99,   103,
-   106,   110,   114,   120,   124,   130,   132,   135,   137,   140,
-   143,   147,   150,   154,   157,   159,   161,   165,   167,   169,
-   172,   174,   176,   178,   180,   182,   184,   186,   188,   190,
-   192,   194
-};
-
-static const short yyrhs[] = {     4,
-     0,     9,     0,    10,     0,     5,     0,    11,     0,    12,
-     0,    20,     0,    21,     0,     7,     0,     6,     0,    23,
-     0,    17,     0,    18,     0,     8,     0,    32,     0,    31,
-     0,    22,     0,    43,     0,    44,    43,     0,    26,    33,
-     0,    26,    34,     0,    26,    35,     0,    26,    36,     0,
-    26,    32,     0,    26,    32,    32,     0,    29,     0,    27,
-    37,     0,    27,    38,     0,    27,    39,     0,    27,    40,
-     0,    27,    32,     0,    27,    32,    32,     0,    30,     0,
-    45,    64,    46,     0,    33,    64,    37,     0,    33,    37,
-     0,    35,    64,    39,     0,    35,    39,     0,    34,    64,
-    38,     0,    34,    38,     0,    65,    41,    65,     0,    65,
-    42,    65,     0,    65,    41,    49,    42,    49,     0,    14,
-    49,    49,     0,    35,    64,    16,    64,    39,     0,     3,
-     0,    54,    49,     0,    19,     0,    56,    49,     0,    13,
-    49,     0,    13,    50,    49,     0,    24,    49,     0,    24,
-    49,    49,     0,    25,    49,     0,    62,     0,    63,     0,
-    62,    28,    63,     0,    64,     0,    65,     0,    64,    65,
-     0,    49,     0,    48,     0,    47,     0,    51,     0,    52,
-     0,    53,     0,    57,     0,    58,     0,    55,     0,    44,
-     0,    59,     0,    60,     0
-};
-
-#endif
-
-#if YYDEBUG != 0
-static const short yyrline[] = { 0,
-    59,    61,    62,    63,    64,    65,    66,    67,    68,    69,
-    70,    71,    72,    73,    74,    75,    76,    79,    81,    84,
-    86,    87,    88,    89,    90,    91,    94,    96,    97,    98,
-    99,   100,   101,   104,   108,   110,   113,   115,   118,   120,
-   123,   125,   126,   129,   133,   138,   142,   145,   149,   153,
-   155,   158,   160,   163,   168,   172,   174,   177,   181,   183,
-   186,   188,   189,   190,   191,   192,   193,   194,   195,   196,
-   197,   198
-};
-#endif
-
-
-#if YYDEBUG != 0 || defined (YYERROR_VERBOSE)
-
-static const char * const yytname[] = {   "$","error","$undefined.","ACCENT",
-"SMALL_GREEK","CAPITAL_GREEK","BINARY_OPERATOR","RELATION_OPERATOR","ARROW",
-"GENERAL_IDEN","GENERAL_OPER","BIG_SYMBOL","FUNCTION","ROOT","FRACTION","SUBSUP",
-"EQOVER","DELIMETER","LARGE_DELIM","DECORATION","SPACE_SYMBOL","CHARACTER","STRING",
-"OPERATOR","EQBEGIN","EQEND","EQLEFT","EQRIGHT","NEWLINE","LEFT_DELIM","RIGHT_DELIM",
-"DIGIT","'|'","'('","'['","'{'","'<'","')'","']'","'}'","'>'","'_'","'^'","Identifier",
-"PrimaryExpr","EQLeft","EQRight","Fence","Parenth","Block","Bracket","SubSupExpr",
-"FractionExpr","OverExpr","Accent","AccentExpr","Decoration","DecorationExpr",
-"RootExpr","BeginExpr","EndExpr","MathML","Lines","Line","ExprList","Expr", NULL
-};
-#endif
 
 const short yyr1[] = {     0,
     43,    43,    43,    43,    43,    43,    43,    43,    43,    43,
@@ -363,47 +296,15 @@ const short yycheck[] = {    11,
 
 #define YYTERROR    1
 
-#ifndef YYPURE
 #define YYLEX       yylex()
-#endif
-
-#ifdef YYPURE
-#ifdef YYLSP_NEEDED
-#ifdef YYLEX_PARAM
-#define YYLEX       yylex(&yylval, &yylloc, YYLEX_PARAM)
-#else
-#define YYLEX       yylex(&yylval, &yylloc)
-#endif
-#else /* not YYLSP_NEEDED */
-#ifdef YYLEX_PARAM
-#define YYLEX       yylex(&yylval, YYLEX_PARAM)
-#else
-#define YYLEX       yylex(&yylval)
-#endif
-#endif /* not YYLSP_NEEDED */
-#endif
 
 /* If nonreentrant, generate the variables here */
-
-#ifndef YYPURE
 
 static int yychar;  /*  the lookahead symbol        */
 YYSTYPE yylval;         /*  the semantic value of the       */
                 /*  lookahead symbol            */
 
-#ifdef YYLSP_NEEDED
-YYLTYPE yylloc;         /*  location data for the lookahead */
-                /*  symbol              */
-#endif
-
 static int yynerrs;     /*  number of parse errors so far       */
-#endif  /* not YYPURE */
-
-#if YYDEBUG != 0
-int yydebug;            /*  nonzero means print parse trace */
-/* Since this is uninitialized, it does not stop multiple parsers
-   from coexisting.  */
-#endif
 
 /*  YYINITDEPTH indicates the initial size of the parser's stacks   */
 
@@ -422,27 +323,12 @@ int yydebug;            /*  nonzero means print parse trace */
 #define YYMAXDEPTH 10000
 #endif
 
-/* The user can define YYPARSE_PARAM as the name of an argument to be passed
-   into yyparse.  The argument should have type void *.
-   It should actually point to an object.
-   Grammar actions can access the variable by casting it
-   to the proper pointer type.  */
-
-#ifdef YYPARSE_PARAM
-#define YYPARSE_PARAM_ARG void *YYPARSE_PARAM
-#define YYPARSE_PARAM_DECL
-#else /* not YYPARSE_PARAM */
 #define YYPARSE_PARAM_ARG
 #define YYPARSE_PARAM_DECL
-#endif /* not YYPARSE_PARAM */
 
 /* Prevent warning if -Wstrict-prototypes.  */
 #ifdef __GNUC__
-#ifdef YYPARSE_PARAM
-int yyparse (void *);
-#else
 static int yyparse();
-#endif
 #endif
 
 static int
@@ -462,25 +348,8 @@ yyparse(YYPARSE_PARAM_ARG)
   short *yyss = yyssa;      /*  refer to the stacks through separate pointers */
   YYSTYPE *yyvs = yyvsa;    /*  to allow yyoverflow to reallocate them elsewhere */
 
-#ifdef YYLSP_NEEDED
-  YYLTYPE yylsa[YYINITDEPTH];   /*  the location stack          */
-  YYLTYPE *yyls = yylsa;
-  YYLTYPE *yylsp;
-
-#define YYPOPSTACK   (yyvsp--, yyssp--, yylsp--)
-#endif
-
   int yystacksize = YYINITDEPTH;
   int yyfree_stacks = 0;
-
-#ifdef YYPURE
-  int yychar;
-  YYSTYPE yylval;
-  int yynerrs;
-#ifdef YYLSP_NEEDED
-  YYLTYPE yylloc;
-#endif
-#endif
 
   YYSTYPE yyval;        /*  the variable used to return     */
   yyval.dval = nullptr;
@@ -488,11 +357,6 @@ yyparse(YYPARSE_PARAM_ARG)
                 /*  routines                */
 
   int yylen;
-
-#if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Starting parse\n");
-#endif
 
   yystate = 0;
   yyerrstatus = 0;
@@ -506,9 +370,6 @@ yyparse(YYPARSE_PARAM_ARG)
 
   yyssp = yyss - 1;
   yyvsp = yyvs;
-#ifdef YYLSP_NEEDED
-  yylsp = yyls;
-#endif
 
 /* Push a new state, which is found in  yystate  .  */
 /* In all cases, when you get here, the value and location stacks
@@ -523,36 +384,10 @@ yynewstate:
       /* Use copies of these so that the &'s don't force the real ones into memory. */
       YYSTYPE *yyvs1 = yyvs;
       short *yyss1 = yyss;
-#ifdef YYLSP_NEEDED
-      YYLTYPE *yyls1 = yyls;
-#endif
 
       /* Get the current used size of the three stacks, in elements.  */
       int size = yyssp - yyss + 1;
 
-#ifdef yyoverflow
-      /* Each stack pointer address is followed by the size of
-     the data in use in that stack, in bytes.  */
-#ifdef YYLSP_NEEDED
-      /* This used to be a conditional around just the two extra args,
-     but that might be undefined if yyoverflow is a macro.  */
-      yyoverflow("parser stack overflow",
-         &yyss1, size * sizeof (*yyssp),
-         &yyvs1, size * sizeof (*yyvsp),
-         &yyls1, size * sizeof (*yylsp),
-         &yystacksize);
-#else
-      yyoverflow("parser stack overflow",
-         &yyss1, size * sizeof (*yyssp),
-         &yyvs1, size * sizeof (*yyvsp),
-         &yystacksize);
-#endif
-
-      yyss = yyss1; yyvs = yyvs1;
-#ifdef YYLSP_NEEDED
-      yyls = yyls1;
-#endif
-#else /* no yyoverflow */
       /* Extend the stack our own way.  */
       if (yystacksize >= YYMAXDEPTH)
     {
@@ -561,9 +396,6 @@ yynewstate:
         {
           free (yyss);
           free (yyvs);
-#ifdef YYLSP_NEEDED
-          free (yyls);
-#endif
         }
       return 2;
     }
@@ -575,31 +407,19 @@ yynewstate:
       memcpy (yyss, yyss1, size * sizeof (*yyssp));
       yyvs = static_cast<YYSTYPE *>(malloc (yystacksize * sizeof (*yyvsp)));
       memcpy (yyvs, yyvs1, size * sizeof (*yyvsp));
-#ifdef YYLSP_NEEDED
-      yyls = (YYLTYPE *) malloc (yystacksize * sizeof (*yylsp));
-      memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
-#endif
-#endif /* no yyoverflow */
+
+      // https://lists.gnu.org/archive/html/bug-bison/2001-11/msg00021.html
+      if (yyss1 != yyssa)
+          free (yyss1);
+      if (yyvs1 != yyvsa)
+          free (yyvs1);
 
       yyssp = yyss + size - 1;
       yyvsp = yyvs + size - 1;
-#ifdef YYLSP_NEEDED
-      yylsp = yyls + size - 1;
-#endif
-
-#if YYDEBUG != 0
-      if (yydebug)
-    fprintf(stderr, "Stack size increased to %d\n", yystacksize);
-#endif
 
       if (yyssp >= yyss + yystacksize - 1)
     YYABORT;
     }
-
-#if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Entering state %d\n", yystate);
-#endif
 
   goto yybackup;
  yybackup:
@@ -621,10 +441,6 @@ yynewstate:
 
   if (yychar == YYEMPTY)
     {
-#if YYDEBUG != 0
-      if (yydebug)
-    fprintf(stderr, "Reading a token: ");
-#endif
       yychar = YYLEX;
     }
 
@@ -635,27 +451,11 @@ yynewstate:
       yychar1 = 0;
       yychar = YYEOF;       /* Don't call YYLEX any more */
 
-#if YYDEBUG != 0
-      if (yydebug)
-    fprintf(stderr, "Now at end of input.\n");
-#endif
     }
   else
     {
       yychar1 = YYTRANSLATE(yychar);
 
-#if YYDEBUG != 0
-      if (yydebug)
-    {
-      fprintf (stderr, "Next token is %d (%s", yychar, yytname[yychar1]);
-      /* Give the individual parser a way to print the precise meaning
-         of a token, for further debugging info.  */
-#ifdef YYPRINT
-      YYPRINT (stderr, yychar, yylval);
-#endif
-      fprintf (stderr, ")\n");
-    }
-#endif
     }
 
   yyn += yychar1;
@@ -686,19 +486,11 @@ yynewstate:
 
   /* Shift the lookahead token.  */
 
-#if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Shifting token %d (%s), ", yychar, yytname[yychar1]);
-#endif
-
   /* Discard the token being shifted unless it is eof.  */
   if (yychar != YYEOF)
     yychar = YYEMPTY;
 
   *++yyvsp = yylval;
-#ifdef YYLSP_NEEDED
-  *++yylsp = yylloc;
-#endif
 
   /* count tokens shifted since error; after three, turn off error status.  */
   if (yyerrstatus) yyerrstatus--;
@@ -719,74 +511,58 @@ yyreduce:
   if (yylen > 0)
     yyval = yyvsp[1-yylen]; /* implement default value of the action */
 
-#if YYDEBUG != 0
-  if (yydebug)
-    {
-      int i;
-
-      fprintf (stderr, "Reducing via rule %d (line %d), ",
-           yyn, yyrline[yyn]);
-
-      /* Print the symbols being reduced, and their result.  */
-      for (i = yyprhs[yyn]; yyrhs[i] > 0; i++)
-    fprintf (stderr, "%s ", yytname[yyrhs[i]]);
-      fprintf (stderr, " -> %s\n", yytname[yyr1[yyn]]);
-    }
-#endif
-
-
   switch (yyn) {
 
 case 1:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 2:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 3:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 4:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 5:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 6:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 7:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 8:
-{ yyval.ptr = new Node(ID_CHARACTER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_CHARACTER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 9:
-{ yyval.ptr = new Node(ID_OPERATOR); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_OPERATOR); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 10:
-{ yyval.ptr = new Node(ID_OPERATOR); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_OPERATOR); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 11:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 12:
-{ yyval.ptr = new Node(ID_DELIMITER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_DELIMITER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 13:
-{ yyval.ptr = new Node(ID_DELIMITER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_DELIMITER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 14:
-{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value = strdup(yyvsp[0].str); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_IDENTIFIER); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Identifier : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 15:
-{ yyval.ptr = new Node(ID_CHARACTER); yyval.ptr->value = strdup("|"); debug("Identifier : '|'\n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_CHARACTER); yyval.ptr->value.reset(strdup("|")); debug("Identifier : '|'\n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 16:
-{ yyval.ptr = new Node(ID_NUMBER); yyval.ptr->value = strdup(yyvsp[0].dval); debug("Number : %s\n",yyvsp[0].dval); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_NUMBER); yyval.ptr->value.reset(strdup(yyvsp[0].dval)); debug("Number : %s\n",yyvsp[0].dval); nodelist.emplace_back(yyval.ptr);
     break;}
 case 17:
-{ yyval.ptr = new Node(ID_STRING); yyval.ptr->value = strdup(yyvsp[0].str); debug("String : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_STRING); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("String : %s\n",yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 18:
 { yyval.ptr = new Node(ID_PRIMARYEXPR); yyval.ptr->child = yyvsp[0].ptr; debug("PrimaryExpr\n"); nodelist.emplace_back(yyval.ptr);
@@ -795,46 +571,46 @@ case 19:
 { yyval.ptr = new Node(ID_PRIMARYEXPR); yyval.ptr->child = yyvsp[-1].ptr; yyval.ptr->next = yyvsp[0].ptr; debug("PrimaryExpr : PrimaryExpr Identifier\n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 20:
-{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup("("); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("(")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 21:
-{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup("["); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("[")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 22:
-{   yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup("{"); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{   yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("{")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 23:
-{   yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup("<"); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{   yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("<")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 24:
-{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup("|"); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("|")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 25:
-{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value =strdup("||"); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup("||")); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 26:
-{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value = strdup(yyvsp[0].str); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_LEFT); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("EQLeft \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 27:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup(")"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup(")")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 28:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup("]"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup("]")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 29:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup("}"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup("}")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 30:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup(">"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup(">")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 31:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup("|"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup("|")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 32:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup("||"); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup("||")); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 33:
-{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value = strdup(yyvsp[0].str); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_RIGHT); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("EQRight \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 34:
 { yyval.ptr = new Node(ID_FENCE); yyval.ptr->child=yyvsp[-2].ptr; yyvsp[-2].ptr->next=yyvsp[-1].ptr; yyvsp[-1].ptr->next=yyvsp[0].ptr; debug("Fence \n"); nodelist.emplace_back(yyval.ptr);
@@ -873,13 +649,13 @@ case 45:
 { yyval.ptr = new Node(ID_OVER); yyval.ptr->child = yyvsp[-3].ptr; yyvsp[-3].ptr->next = yyvsp[-1].ptr; debug("OverExpr\n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 46:
-{ yyval.ptr = new Node(ID_ACCENTEXPR); yyval.ptr->value = strdup(yyvsp[0].str); debug("Accent : %s\n", yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_ACCENTEXPR); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Accent : %s\n", yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 47:
 { yyval.ptr = new Node(ID_ACCENTEXPR); yyval.ptr->child=yyvsp[-1].ptr; yyvsp[-1].ptr->next = yyvsp[0].ptr; debug("AccentExpr \n"); nodelist.emplace_back(yyval.ptr);
     break;}
 case 48:
-{ yyval.ptr = new Node(ID_DECORATIONEXPR); yyval.ptr->value = strdup(yyvsp[0].str); debug("Decoration : %s\n", yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
+{ yyval.ptr = new Node(ID_DECORATIONEXPR); yyval.ptr->value.reset(strdup(yyvsp[0].str)); debug("Decoration : %s\n", yyvsp[0].str); nodelist.emplace_back(yyval.ptr);
     break;}
 case 49:
 { yyval.ptr = new Node(ID_DECORATIONEXPR); yyval.ptr->child = yyvsp[-1].ptr; yyvsp[-1].ptr->next = yyvsp[0].ptr; debug("DecorationExpr \n"); nodelist.emplace_back(yyval.ptr);
@@ -958,39 +734,8 @@ case 72:
 
   yyvsp -= yylen;
   yyssp -= yylen;
-#ifdef YYLSP_NEEDED
-  yylsp -= yylen;
-#endif
-
-#if YYDEBUG != 0
-  if (yydebug)
-    {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "state stack now");
-      while (ssp1 != yyssp)
-    fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
-    }
-#endif
 
   *++yyvsp = yyval;
-
-#ifdef YYLSP_NEEDED
-  yylsp++;
-  if (yylen == 0)
-    {
-      yylsp->first_line = yylloc.first_line;
-      yylsp->first_column = yylloc.first_column;
-      yylsp->last_line = (yylsp-1)->last_line;
-      yylsp->last_column = (yylsp-1)->last_column;
-      yylsp->text = 0;
-    }
-  else
-    {
-      yylsp->last_line = (yylsp+yylen-1)->last_line;
-      yylsp->last_column = (yylsp+yylen-1)->last_column;
-    }
-#endif
 
   /* Now "shift" the result of the reduction.
      Determine what state that goes to,
@@ -1069,11 +814,6 @@ yyerrlab1:   /* here on error raised explicitly by an action */
       if (yychar == YYEOF)
     YYABORT;
 
-#if YYDEBUG != 0
-      if (yydebug)
-    fprintf(stderr, "Discarding token %d (%s).\n", yychar, yytname[yychar1]);
-#endif
-
       yychar = YYEMPTY;
     }
 
@@ -1098,20 +838,6 @@ yyerrpop:   /* pop the current state because it cannot handle the error token */
   if (yyssp == yyss) YYABORT;
   yyvsp--;
   yystate = *--yyssp;
-#ifdef YYLSP_NEEDED
-  yylsp--;
-#endif
-
-#if YYDEBUG != 0
-  if (yydebug)
-    {
-      short *ssp1 = yyss - 1;
-      fprintf (stderr, "Error: state stack now");
-      while (ssp1 != yyssp)
-    fprintf (stderr, " %d", *++ssp1);
-      fprintf (stderr, "\n");
-    }
-#endif
 
 yyerrhandle:
 
@@ -1137,15 +863,7 @@ yyerrhandle:
   if (yyn == YYFINAL)
     YYACCEPT;
 
-#if YYDEBUG != 0
-  if (yydebug)
-    fprintf(stderr, "Shifting error token, ");
-#endif
-
   *++yyvsp = yylval;
-#ifdef YYLSP_NEEDED
-  *++yylsp = yylloc;
-#endif
 
   yystate = yyn;
   goto yynewstate;
@@ -1156,9 +874,6 @@ yyerrhandle:
     {
       free (yyss);
       free (yyvs);
-#ifdef YYLSP_NEEDED
-      free (yyls);
-#endif
     }
   return 0;
 
@@ -1168,19 +883,17 @@ yyerrhandle:
     {
       free (yyss);
       free (yyvs);
-#ifdef YYLSP_NEEDED
-      free (yyls);
-#endif
     }
   return 1;
 }
-
 
 Node *mainParse(const char *_code)
 {
     initFlex( _code );
     top = nullptr;
     yyparse();
+    deinitFlex();
+
     if( top )
         return top;
     else

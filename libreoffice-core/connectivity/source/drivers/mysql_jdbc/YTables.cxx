@@ -153,7 +153,7 @@ OUString OTables::adjustSQL(const OUString& _sSql)
         sal_Int32 nPos = nIndex + strlen(s_sUNSIGNED);
         OUString sNewUnsigned(sSQL.copy(nPos, nParen - nPos + 1));
         sSQL = sSQL.replaceAt(nIndex, strlen(s_sUNSIGNED) + sNewUnsigned.getLength(),
-                              rtl::OUStringConcatenation(sNewUnsigned + s_sUNSIGNED));
+                              rtl::Concat2View(sNewUnsigned + s_sUNSIGNED));
         nIndex = sSQL.indexOf(s_sUNSIGNED, nIndex + strlen(s_sUNSIGNED) + sNewUnsigned.getLength());
     }
     return sSQL;
@@ -178,10 +178,10 @@ void OTables::appendNew(const OUString& _rsNewTable)
     insertElement(_rsNewTable, nullptr);
 
     // notify our container listeners
-    ContainerEvent aEvent(static_cast<XContainer*>(this), makeAny(_rsNewTable), Any(), Any());
-    OInterfaceIteratorHelper2 aListenerLoop(m_aContainerListeners);
+    ContainerEvent aEvent(static_cast<XContainer*>(this), Any(_rsNewTable), Any(), Any());
+    OInterfaceIteratorHelper3 aListenerLoop(m_aContainerListeners);
     while (aListenerLoop.hasMoreElements())
-        static_cast<XContainerListener*>(aListenerLoop.next())->elementInserted(aEvent);
+        aListenerLoop.next()->elementInserted(aEvent);
 }
 
 OUString OTables::getNameForObject(const sdbcx::ObjectType& _xObject)

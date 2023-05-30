@@ -33,6 +33,7 @@
 #include <com/sun/star/util/PathSubstitution.hpp>
 #include <com/sun/star/util/XStringSubstitution.hpp>
 #include <cppuhelper/supportsservice.hxx>
+#include <utility>
 
 namespace framework{
 
@@ -55,8 +56,8 @@ css::uno::Sequence< OUString > SAL_CALL ShellJob::getSupportedServiceNames()
 }
 
 
-ShellJob::ShellJob(const css::uno::Reference< css::uno::XComponentContext >& xContext)
-    : m_xContext    (xContext)
+ShellJob::ShellJob(css::uno::Reference< css::uno::XComponentContext >  xContext)
+    : m_xContext    (std::move(xContext))
 {
 }
 
@@ -101,8 +102,8 @@ css::uno::Any SAL_CALL ShellJob::execute(const css::uno::Sequence< css::beans::N
 
 css::uno::Any ShellJob::impl_generateAnswer4Deactivation()
 {
-    css::uno::Sequence< css::beans::NamedValue > aAnswer { { JobConst::ANSWER_DEACTIVATE_JOB, css::uno::makeAny(true) } };
-    return css::uno::makeAny(aAnswer);
+    css::uno::Sequence< css::beans::NamedValue > aAnswer { { JobConst::ANSWER_DEACTIVATE_JOB, css::uno::Any(true) } };
+    return css::uno::Any(aAnswer);
 }
 
 OUString ShellJob::impl_substituteCommandVariables(const OUString& sCommand)

@@ -46,6 +46,7 @@
 
 #include <cassert>
 #include <memory>
+#include <utility>
 
 namespace {
 
@@ -60,6 +61,9 @@ bool sortTabHasNoToxSourcesOrFirstToxSourceHasNoNode(const SwTOXSortTabBase& sor
     return false;
 }
 
+// Similar to rtl::isAsciiWhiteSpace, but applicable to ToC entry number
+bool isWhiteSpace(sal_Unicode ch) { return ch == ' ' || ch == '\t'; }
+
 } // end anonymous namespace
 
 namespace sw {
@@ -67,7 +71,7 @@ namespace sw {
 OUString
 ToxTextGenerator::GetNumStringOfFirstNode(const SwTOXSortTabBase& rBase,
         bool bUsePrefix, sal_uInt8 nLevel,
-        SwRootFrame const*const pLayout)
+        SwRootFrame const*const pLayout, bool bAddSpace)
 {
     if (sortTabHasNoToxSourcesOrFirstToxSourceHasNoNode(rBase)) {
         return OUString();
@@ -84,7 +88,7 @@ ToxTextGenerator::GetNumStringOfFirstNode(const SwTOXSortTabBase& rBase,
     }
     if (pLayout && pLayout->HasMergedParas())
     {   // note: pNd could be any node, since it could be Sequence etc.
-        pNd = sw::GetParaPropsNode(*pLayout, SwNodeIndex(*pNd));
+        pNd = sw::GetParaPropsNode(*pLayout, *pNd);
     }
 
     const SwNumRule* pRule = pNd->GetNumRule();
@@ -96,7 +100,7 @@ ToxTextGenerator::GetNumStringOfFirstNode(const SwTOXSortTabBase& rBase,
         sRet = pNd->GetNumString(bUsePrefix, nLevel, pLayout);
     }
 
-    if (!sRet.isEmpty()) {
+    if (bAddSpace && !sRet.isEmpty() && !isWhiteSpace(sRet[sRet.getLength() - 1])) {
         sRet += " ";// Makes sure spacing is done only when there is outline numbering
     }
 
@@ -105,10 +109,10 @@ ToxTextGenerator::GetNumStringOfFirstNode(const SwTOXSortTabBase& rBase,
 
 
 ToxTextGenerator::ToxTextGenerator(const SwForm& toxForm,
-        std::shared_ptr<ToxTabStopTokenHandler> const & tabStopHandler)
+        std::shared_ptr<ToxTabStopTokenHandler> tabStopHandler)
 : mToxForm(toxForm),
   mLinkProcessor(std::make_shared<ToxLinkProcessor>()),
-  mTabStopTokenHandler(tabStopHandler)
+  mTabStopTokenHandler(std::move(tabStopHandler))
 {}
 
 ToxTextGenerator::~ToxTextGenerator()
@@ -189,17 +193,22 @@ ToxTextGenerator::GenerateText(SwDoc* pDoc,
         // #i21237#
         SwFormTokens aPattern = mToxForm.GetPattern(nLvl);
         // remove text from node
-        for(const auto& aToken : aPattern) // #i21237#
+        for (size_t i = 0; i < aPattern.size(); ++i) // #i21237#
         {
+            const auto& aToken = aPattern[i];
             sal_Int32 nStartCharStyle = rText.getLength();
             OUString aCharStyleName = aToken.sCharStyleName;
             switch( aToken.eTokenType )
             {
             case TOKEN_ENTRY_NO:
                 // for TOC numbering
+                // Only add space when there is outline numbering, and also when the next token
+                // is the entry text: it can also be e.g. a tab, or the entry number can be used
+                // in page number area like "2-15" for chapter 2, page 15.
                 rText += GetNumStringOfFirstNode(rBase,
                     aToken.nChapterFormat == CF_NUMBER,
-                    static_cast<sal_uInt8>(aToken.nOutlineLevel - 1), pLayout);
+                    static_cast<sal_uInt8>(aToken.nOutlineLevel - 1), pLayout,
+                    i < aPattern.size() - 1 && aPattern[i + 1].eTokenType == TOKEN_ENTRY_TEXT);
                 break;
 
             case TOKEN_ENTRY_TEXT: {
@@ -258,7 +267,7 @@ ToxTextGenerator::GenerateText(SwDoc* pDoc,
             case TOKEN_AUTHORITY:
                 {
                     ToxAuthorityField eField = static_cast<ToxAuthorityField>(aToken.nAuthorityField);
-                    SwIndex aIdx( pTOXNd, rText.getLength() );
+                    SwContentIndex aIdx( pTOXNd, rText.getLength() );
                     if (eField == ToxAuthorityField::AUTH_FIELD_URL)
                     {
                         aCharStyleName = SwResId(STR_POOLCHR_INET_NORMAL);
@@ -335,7 +344,7 @@ void ToxTextGenerator::GetAttributesForNode(
 {
     // note: this *must* use the same flags as SwTextNode::GetExpandText()
     // or indexes will be off!
-    ExpandMode eMode = ExpandMode::ExpandFields;
+    ExpandMode eMode = ExpandMode::ExpandFields | ExpandMode::HideFieldmarkCommands;
     if (pLayout && pLayout->IsHideRedlines())
     {
         eMode |= ExpandMode::HideDeletions;
@@ -423,7 +432,7 @@ ToxTextGenerator::HandleTextToken(const SwTOXSortTabBase& source,
 ToxTextGenerator::ApplyHandledTextToken(const HandledTextToken& htt, SwTextNode& targetNode)
 {
     sal_Int32 offset = targetNode.GetText().getLength();
-    SwIndex aIdx(&targetNode, offset);
+    SwContentIndex aIdx(&targetNode, offset);
     targetNode.InsertText(htt.text, aIdx);
     for (size_t i=0; i < htt.autoFormats.size(); ++i) {
         targetNode.InsertItem(*htt.autoFormats.at(i),

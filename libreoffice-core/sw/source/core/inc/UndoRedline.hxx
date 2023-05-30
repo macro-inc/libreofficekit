@@ -22,7 +22,6 @@
 
 #include <memory>
 #include <undobj.hxx>
-#include <tools/long.hxx>
 #include <IDocumentContentOperations.hxx>
 
 struct SwSortOptions;
@@ -100,6 +99,7 @@ public:
     void SetSaveRange( const SwPaM& rRange );
 };
 
+/// Undo for Edit -> track changes -> accept.
 class SwUndoAcceptRedline final : public SwUndoRedline
 {
 private:

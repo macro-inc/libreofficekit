@@ -24,10 +24,13 @@
 
 #include <tools/fontenum.hxx>
 #include <vcl/dllapi.h>
-#include <vcl/glyphitem.hxx>
 #include <vcl/timer.hxx>
 #include <com/sun/star/lang/Locale.hpp>
 #include <unx/fc_fontoptions.hxx>
+
+#include <font/PhysicalFontFace.hxx>
+
+#include <glyphid.hxx>
 
 #include <map>
 #include <set>
@@ -42,28 +45,18 @@
  */
 
 class FontAttributes;
-class FontSubsetInfo;
 class FontConfigFontOptions;
 namespace vcl::font
 {
 class FontSelectPattern;
 }
+namespace vcl { struct NameRecord; }
 class GenericUnixSalData;
 
 namespace psp {
 class PPDParser;
 
 typedef int fontID;
-
-/*
- *  the difference between FastPrintFontInfo and PrintFontInfo
- *  is that the information in FastPrintFontInfo can usually
- *  be gathered without opening either the font file, they are
- *  gathered from fonts.dir alone.
- *  if only FastPrintFontInfo is gathered and PrintFontInfo
- *  on demand and for less fonts, then performance in startup
- *  increases considerably
- */
 
 struct FastPrintFontInfo
 {
@@ -91,18 +84,6 @@ struct FastPrintFontInfo
     {}
 };
 
-struct PrintFontInfo : public FastPrintFontInfo
-{
-    int                                     m_nAscend;
-    int                                     m_nDescend;
-
-    PrintFontInfo() :
-            FastPrintFontInfo(),
-            m_nAscend( 0 ),
-            m_nDescend( 0 )
-    {}
-};
-
 // a class to manage printable fonts
 
 class VCL_PLUGIN_PUBLIC PrintFontManager
@@ -126,10 +107,6 @@ class VCL_PLUGIN_PUBLIC PrintFontManager
         int               m_nAscend;
         int               m_nDescend;
         int               m_nLeading;
-        int               m_nXMin; // font bounding box
-        int               m_nYMin;
-        int               m_nXMax;
-        int               m_nYMax;
 
         int               m_nDirectory;       // atom containing system dependent path
         OString           m_aFontFile;        // relative to directory
@@ -153,7 +130,7 @@ class VCL_PLUGIN_PUBLIC PrintFontManager
     OString getFontFile(const PrintFont& rFont) const;
 
     std::vector<PrintFont> analyzeFontFile(int nDirID, const OString& rFileName, const char *pFormat=nullptr) const;
-    static OUString convertSfntName( void* pNameRecord ); // actually a NameRecord* format font subsetting code
+    static OUString convertSfntName( const vcl::NameRecord& rNameRecord ); // format font subsetting code
     static void analyzeSfntFamilyName( void const * pTTFont, std::vector< OUString >& rnames ); // actually a TrueTypeFont* from font subsetting code
     bool analyzeSfntFile(PrintFont& rFont) const;
     // finds the font id for the nFaceIndex face in this font file
@@ -176,7 +153,6 @@ class VCL_PLUGIN_PUBLIC PrintFontManager
         return it == m_aFonts.end() ? nullptr : &it->second;
     }
     static void fillPrintFontInfo(const PrintFont& rFont, FastPrintFontInfo& rInfo);
-    void fillPrintFontInfo( PrintFont& rFont, PrintFontInfo& rInfo ) const;
 
     OString getDirectory( int nAtom ) const;
     int getDirectoryAtom( const OString& rDirectory );
@@ -186,7 +162,7 @@ class VCL_PLUGIN_PUBLIC PrintFontManager
     called from <code>initialize()</code>
     */
     static void initFontconfig();
-    void countFontconfigFonts( std::unordered_map<OString, int>& o_rVisitedPaths );
+    void countFontconfigFonts();
     /* deinitialize fontconfig
      */
     static void deinitFontconfig();
@@ -211,15 +187,13 @@ public:
     static PrintFontManager& get(); // one instance only
 
     // There may be multiple font ids for font collections
-    std::vector<fontID> addFontFile( const OUString& rFileUrl );
+    std::vector<fontID> addFontFile( std::u16string_view rFileUrl );
 
     void initialize();
 
     // returns the ids of all managed fonts.
     void getFontList( std::vector< fontID >& rFontIDs );
 
-    // get font info for a specific font
-    bool getFontInfo( fontID nFontID, PrintFontInfo& rInfo ) const;
     // get fast font info for a specific font
     bool getFontFastInfo( fontID nFontID, FastPrintFontInfo& rInfo ) const;
 
@@ -227,20 +201,6 @@ public:
 
     // get a specific fonts PSName name
     OUString getPSName( fontID nFontID );
-
-    // get a specific fonts italic type
-    FontItalic getFontItalic( fontID nFontID ) const
-    {
-        const PrintFont* pFont = getFont( nFontID );
-        return pFont ? pFont->m_eItalic : ITALIC_DONTKNOW;
-    }
-
-    // get a specific fonts weight type
-    FontWeight getFontWeight( fontID nFontID ) const
-    {
-        const PrintFont* pFont = getFont( nFontID );
-        return pFont ? pFont->m_eWeight : WEIGHT_DONTKNOW;
-    }
 
     // get a specific fonts system dependent filename
     OString getFontFileSysPath( fontID nFontID ) const
@@ -259,34 +219,6 @@ public:
 
     // get a specific fonts descent
     int getFontDescend( fontID nFontID );
-
-    // get a fonts glyph bounding box
-    void getFontBoundingBox( fontID nFont, int& xMin, int& yMin, int& xMax, int& yMax );
-
-    // creates a new font subset of an existing SFNT font
-    // returns true in case of success, else false
-    // nFont: the font to be subsetted
-    // rOutFile: the file to put the new subset into;
-    //           must be a valid osl file URL
-    // pGlyphIDs: input array of glyph ids for new font
-    // pNewEncoding: the corresponding encoding in the new font
-    // pWidths: output array of widths of requested glyphs
-    // nGlyphs: number of glyphs in arrays
-    // pCapHeight:: capital height of the produced font
-    // pXMin, pYMin, pXMax, pYMax: outgoing font bounding box
-    // TODO: callers of this method should use its FontSubsetInfo counterpart directly
-    bool createFontSubset( FontSubsetInfo&,
-                           fontID nFont,
-                           const OUString& rOutFile,
-                           const sal_GlyphId* pGlyphIDs,
-                           const sal_uInt8* pNewEncoding,
-                           sal_Int32* pWidths,
-                           int nGlyphs
-                           );
-    void getGlyphWidths( fontID nFont,
-                         bool bVertical,
-                         std::vector< sal_Int32 >& rWidths,
-                         std::map< sal_Unicode, sal_uInt32 >& rUnicodeEnc );
 
     // font administration functions
 

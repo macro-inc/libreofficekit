@@ -22,6 +22,7 @@
 #include <svx/svdoedge.hxx>
 #include <sdr/primitive2d/sdrattributecreator.hxx>
 #include <sdr/primitive2d/sdrconnectorprimitive2d.hxx>
+#include <osl/diagnose.h>
 
 
 namespace sdr::contact
@@ -35,9 +36,9 @@ namespace sdr::contact
         {
         }
 
-        drawinglayer::primitive2d::Primitive2DContainer ViewContactOfSdrEdgeObj::createViewIndependentPrimitive2DSequence() const
+        void ViewContactOfSdrEdgeObj::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
         {
-            const basegfx::B2DPolygon aEdgeTrack(GetEdgeObj().getEdgeTrack());
+            basegfx::B2DPolygon aEdgeTrack(GetEdgeObj().getEdgeTrack());
 
             // what to do when no EdgeTrack is provided (HitTest and selectability) ?
             OSL_ENSURE(0 != aEdgeTrack.count(), "Connectors with no geometry are not allowed (!)");
@@ -55,9 +56,9 @@ namespace sdr::contact
             const drawinglayer::primitive2d::Primitive2DReference xReference(
                 new drawinglayer::primitive2d::SdrConnectorPrimitive2D(
                     aAttribute,
-                    aEdgeTrack));
+                    std::move(aEdgeTrack)));
 
-            return drawinglayer::primitive2d::Primitive2DContainer { xReference };
+            rVisitor.visit(xReference);
         }
 
 } // end of namespace

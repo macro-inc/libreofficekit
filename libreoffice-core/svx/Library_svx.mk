@@ -19,7 +19,12 @@
 
 $(eval $(call gb_Library_Library,svx))
 
-$(eval $(call gb_Library_set_componentfile,svx,svx/util/svx))
+$(eval $(call gb_Library_set_componentfile,svx,svx/util/svx,services))
+
+$(eval $(call gb_Library_add_componentimpls,svx, \
+    $(call gb_Helper_optional,BREAKPAD,crashreport) \
+    $(if $(ENABLE_WASM_STRIP_RECOVERYUI),,recoveryui) \
+))
 
 $(eval $(call gb_Library_set_include,svx,\
     -I$(SRCDIR)/svx/inc \
@@ -48,8 +53,9 @@ $(eval $(call gb_Library_use_libraries,svx,\
     cppu \
     $(call gb_Helper_optional,BREAKPAD, \
 		crashreport) \
-    $(call gb_Helper_optional,DBCONNECTIVITY, \
-        dbtools) \
+        dbtools \
+    docmodel \
+    drawinglayercore \
     drawinglayer \
     editeng \
     fwk \
@@ -79,10 +85,17 @@ $(eval $(call gb_Library_use_externals,svx,\
 	icu_headers \
 ))
 
+ifneq ($(ENABLE_WASM_STRIP_RECOVERYUI),TRUE)
+$(eval $(call gb_Library_add_exception_objects,svx,\
+    svx/source/dialog/docrecovery \
+    svx/source/unodraw/recoveryui \
+))
+endif
+
+ifneq ($(ENABLE_WASM_STRIP_ACCESSIBILITY),TRUE)
 $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/accessibility/AccessibleControlShape \
     svx/source/accessibility/AccessibleEmptyEditSource \
-    svx/source/accessibility/AccessibleFrameSelector \
     svx/source/accessibility/AccessibleGraphicShape \
     svx/source/accessibility/AccessibleOLEShape \
     svx/source/accessibility/AccessibleShape \
@@ -96,9 +109,16 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/accessibility/GraphCtlAccessibleContext \
     svx/source/accessibility/ShapeTypeHandler \
     svx/source/accessibility/SvxShapeTypes \
-    svx/source/accessibility/charmapacc \
     svx/source/accessibility/lookupcolorname \
-	svx/source/accessibility/svxpixelctlaccessiblecontext \
+    svx/source/table/accessiblecell \
+    svx/source/table/accessibletableshape \
+))
+endif
+
+$(eval $(call gb_Library_add_exception_objects,svx,\
+    svx/source/accessibility/AccessibleFrameSelector \
+    svx/source/accessibility/charmapacc \
+    svx/source/accessibility/svxpixelctlaccessiblecontext \
     svx/source/accessibility/svxrectctaccessiblecontext \
     svx/source/customshapes/EnhancedCustomShape3d \
     svx/source/customshapes/EnhancedCustomShapeEngine \
@@ -124,7 +144,6 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/dialog/dialcontrol \
     svx/source/dialog/dlgctl3d \
     svx/source/dialog/dlgctrl \
-    svx/source/dialog/docrecovery \
     svx/source/dialog/fntctrl \
     svx/source/dialog/fontwork \
     svx/source/dialog/frmdirlbox \
@@ -157,6 +176,9 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/dialog/svxruler \
     svx/source/dialog/swframeexample \
     svx/source/dialog/swframeposstrings \
+    svx/source/dialog/ThemeColorValueSet \
+    svx/source/dialog/ThemeDialog \
+    svx/source/dialog/ThemeColorEditDialog \
     svx/source/dialog/txencbox \
     svx/source/dialog/txenctab \
     svx/source/dialog/weldeditview \
@@ -183,6 +205,7 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/items/postattr \
     svx/source/items/rotmodit \
     svx/source/items/SmartTagItem \
+    svx/source/items/statusitem \
     svx/source/items/svxerr \
     svx/source/items/viewlayoutitem \
     svx/source/items/zoomslideritem \
@@ -235,8 +258,6 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/svdraw/ActionDescriptionProvider \
     svx/source/svdraw/MediaShellHelpers \
     svx/source/smarttags/SmartTagMgr \
-    svx/source/table/accessiblecell \
-    svx/source/table/accessibletableshape \
     svx/source/table/tabledesign \
     svx/source/table/tablertfexporter \
     svx/source/table/tablertfimporter \
@@ -256,7 +277,6 @@ $(eval $(call gb_Library_add_exception_objects,svx,\
     svx/source/tbxctrls/tbxdrctl \
     svx/source/tbxctrls/verttexttbxctrl \
     svx/source/uitest/uiobject \
-    svx/source/unodraw/recoveryui \
     svx/source/unodraw/unoctabl \
     svx/source/unodraw/UnoNamespaceMap \
     svx/source/unodraw/unopool \

@@ -208,7 +208,7 @@ void TypeScriptWriter::writePolymorphicStruct(
 }
 
 void TypeScriptWriter::writeException(OUString const& name,
-                                      rtl::Reference<unoidl::ExceptionTypeEntity> entity) {
+                                      rtl::Reference<unoidl::ExceptionTypeEntity> /* entity */) {
     out("// exception " + name);
 }
 

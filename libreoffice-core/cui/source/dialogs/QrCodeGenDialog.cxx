@@ -27,7 +27,6 @@
 #endif
 
 #include <BarcodeFormat.h>
-#include <BitArray.h>
 #include <BitMatrix.h>
 #include <MultiFormatWriter.h>
 #include <TextUtfEncoding.h>
@@ -79,7 +78,6 @@ OString ConvertToSVGFormat(const ZXing::BitMatrix& bitmatrix)
     OStringBuffer sb;
     const int width = bitmatrix.width();
     const int height = bitmatrix.height();
-    ZXing::BitArray row(width);
     sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
               "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 "
               + OString::number(width) + " " + OString::number(height)
@@ -87,10 +85,9 @@ OString ConvertToSVGFormat(const ZXing::BitMatrix& bitmatrix)
                 "<path d=\"");
     for (int i = 0; i < height; ++i)
     {
-        bitmatrix.getRow(i, row);
         for (int j = 0; j < width; ++j)
         {
-            if (row.get(j))
+            if (bitmatrix.get(j, i))
             {
                 sb.append("M" + OString::number(j) + "," + OString::number(i) + "h1v1h-1z");
             }
@@ -100,7 +97,7 @@ OString ConvertToSVGFormat(const ZXing::BitMatrix& bitmatrix)
     return sb.toString();
 }
 
-std::string GetBarCodeType(const int& type)
+std::string GetBarCodeType(int type)
 {
     switch (type)
     {
@@ -156,7 +153,7 @@ QrCodeGenDialog::QrCodeGenDialog(weld::Widget* pParent, Reference<XModel> xModel
                                  bool bEditExisting)
     : GenericDialogController(pParent, "cui/ui/qrcodegen.ui", "QrCodeGenDialog")
     , m_xModel(std::move(xModel))
-    , m_xEdittext(m_xBuilder->weld_entry("edit_text"))
+    , m_xEdittext(m_xBuilder->weld_text_view("edit_text"))
     , m_xECC{ m_xBuilder->weld_radio_button("button_low"),
               m_xBuilder->weld_radio_button("button_medium"),
               m_xBuilder->weld_radio_button("button_quartile"),
@@ -167,6 +164,8 @@ QrCodeGenDialog::QrCodeGenDialog(weld::Widget* pParent, Reference<XModel> xModel
     , mpParent(pParent)
 #endif
 {
+    m_xEdittext->set_size_request(m_xEdittext->get_approximate_digit_width() * 28,
+                                  m_xEdittext->get_height_rows(6));
     if (!bEditExisting)
     {
         // TODO: This only works in Writer doc. Should also work in shapes
@@ -219,7 +218,7 @@ short QrCodeGenDialog::run()
             {
                 std::unique_ptr<weld::MessageDialog> xBox(Application::CreateMessageDialog(
                     mpParent, VclMessageType::Warning, VclButtonsType::Ok,
-                    CuiResId(RID_SVXSTR_QRCODEDATALONG)));
+                    CuiResId(RID_CUISTR_QRCODEDATALONG)));
                 xBox->run();
             }
         }

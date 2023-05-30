@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <string_view>
 
 #include <config_folders.h>
 
@@ -30,7 +29,7 @@
 #include <rtl/bootstrap.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/stream.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/svapp.hxx>
@@ -230,7 +229,7 @@ bool getPreviewFile(const AdditionInfo& aAdditionInfo, OUString& sPreviewFile)
     return true;
 }
 
-void LoadImage(const OUString& rPreviewFile, std::shared_ptr<AdditionsItem> pCurrentItem)
+void LoadImage(std::u16string_view rPreviewFile, std::shared_ptr<AdditionsItem> pCurrentItem)
 {
     const sal_Int8 Margin = 6;
 
@@ -382,7 +381,7 @@ void SearchAndParseThread::CheckInstalledExtensions()
                         SolarMutexGuard aGuard;
                         rInfo->m_xButtonInstall->set_sensitive(false);
                         rInfo->m_xButtonInstall->set_label(
-                            CuiResId(RID_SVXSTR_ADDITIONS_INSTALLEDBUTTON));
+                            CuiResId(RID_CUISTR_ADDITIONS_INSTALLEDBUTTON));
                     }
                 }
             }
@@ -394,9 +393,9 @@ void SearchAndParseThread::execute()
 {
     OUString sProgress;
     if (m_bIsFirstLoading)
-        sProgress = CuiResId(RID_SVXSTR_ADDITIONS_LOADING);
+        sProgress = CuiResId(RID_CUISTR_ADDITIONS_LOADING);
     else
-        sProgress = CuiResId(RID_SVXSTR_ADDITIONS_SEARCHING);
+        sProgress = CuiResId(RID_CUISTR_ADDITIONS_SEARCHING);
 
     m_pAdditionsDialog->SetProgress(
         sProgress); // Loading or searching according to being first call or not
@@ -428,7 +427,6 @@ AdditionsDialog::AdditionsDialog(weld::Window* pParent, const OUString& sAdditio
     , m_aSearchDataTimer("AdditionsDialog SearchDataTimer")
     , m_xEntrySearch(m_xBuilder->weld_entry("entrySearch"))
     , m_xButtonClose(m_xBuilder->weld_button("buttonClose"))
-    , m_xMenuButtonSettings(m_xBuilder->weld_menu_button("buttonGear"))
     , m_xContentWindow(m_xBuilder->weld_scrolled_window("contentWindow"))
     , m_xContentGrid(m_xBuilder->weld_container("contentGrid"))
     , m_xLabelProgress(m_xBuilder->weld_label("labelProgress"))
@@ -448,10 +446,31 @@ AdditionsDialog::AdditionsDialog(weld::Window* pParent, const OUString& sAdditio
     m_nMaxItemCount = PAGE_SIZE; // Dialog initialization item count
     m_nCurrentListItemCount = 0; // First, there is no item on the list.
 
-    OUString titlePrefix = CuiResId(RID_SVXSTR_ADDITIONS_DIALOG_TITLE_PREFIX);
+    OUString titlePrefix = CuiResId(RID_CUISTR_ADDITIONS_DIALOG_TITLE_PREFIX);
     if (!m_sTag.isEmpty())
-    {
-        this->set_title(titlePrefix + ": " + sAdditionsTag);
+    { // tdf#142564 localize extension category names
+        OUString sDialogTitle = "";
+        if (sAdditionsTag == "Templates")
+        {
+            sDialogTitle = CuiResId(RID_CUISTR_ADDITIONS_TEMPLATES);
+        }
+        else if (sAdditionsTag == "Dictionary")
+        {
+            sDialogTitle = CuiResId(RID_CUISTR_ADDITIONS_DICTIONARY);
+        }
+        else if (sAdditionsTag == "Gallery")
+        {
+            sDialogTitle = CuiResId(RID_CUISTR_ADDITIONS_GALLERY);
+        }
+        else if (sAdditionsTag == "Icons")
+        {
+            sDialogTitle = CuiResId(RID_CUISTR_ADDITIONS_ICONS);
+        }
+        else if (sAdditionsTag == "Color Palette")
+        {
+            sDialogTitle = CuiResId(RID_CUISTR_ADDITIONS_PALETTES);
+        }
+        this->set_title(sDialogTitle);
     }
     else
     {
@@ -584,19 +603,15 @@ AdditionsItem::AdditionsItem(weld::Widget* pParent, AdditionsDialog* pParentDial
     , m_xLinkButtonWebsite(m_xBuilder->weld_link_button("btnWebsite"))
     , m_xLabelName(m_xBuilder->weld_label("lbName"))
     , m_xLabelAuthor(m_xBuilder->weld_label("labelAuthor"))
-    , m_xLabelDesc(m_xBuilder->weld_label("labelDesc")) // no change (print description)
     , m_xLabelDescription(m_xBuilder->weld_label("labelDescription"))
     , m_xLabelLicense(m_xBuilder->weld_label("lbLicenseText"))
     , m_xLabelVersion(m_xBuilder->weld_label("lbVersionText"))
-    , m_xLabelComments(m_xBuilder->weld_label("labelComments")) // no change
     , m_xLinkButtonComments(m_xBuilder->weld_link_button("linkButtonComments"))
     , m_xImageVoting1(m_xBuilder->weld_image("imageVoting1"))
     , m_xImageVoting2(m_xBuilder->weld_image("imageVoting2"))
     , m_xImageVoting3(m_xBuilder->weld_image("imageVoting3"))
     , m_xImageVoting4(m_xBuilder->weld_image("imageVoting4"))
     , m_xImageVoting5(m_xBuilder->weld_image("imageVoting5"))
-    , m_xLabelNoVoting(m_xBuilder->weld_label("votingLabel"))
-    , m_xImageDownloadNumber(m_xBuilder->weld_image("imageDownloadNumber"))
     , m_xLabelDownloadNumber(m_xBuilder->weld_label("labelDownloadNumber"))
     , m_xButtonShowMore(m_xBuilder->weld_button("buttonShowMore"))
     , m_pParentDialog(pParentDialog)
@@ -615,8 +630,8 @@ AdditionsItem::AdditionsItem(weld::Widget* pParent, AdditionsDialog* pParentDial
 
     if (additionInfo.sName.getLength() > maxExtensionNameLength)
     {
-        OUString sShortName = additionInfo.sName.copy(0, maxExtensionNameLength - 3);
-        sExtensionName = sShortName + "...";
+        std::u16string_view sShortName = additionInfo.sName.subView(0, maxExtensionNameLength - 3);
+        sExtensionName = OUString::Concat(sShortName) + "...";
     }
     else
     {
@@ -651,7 +666,7 @@ AdditionsItem::AdditionsItem(weld::Widget* pParent, AdditionsDialog* pParentDial
     if (!additionInfo.sAuthorName.equalsIgnoreAsciiCase("null"))
         m_xLabelAuthor->set_label(additionInfo.sAuthorName);
 
-    m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+    m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
     m_xLabelLicense->set_label(additionInfo.sLicense);
     m_xLabelVersion->set_label(">=" + additionInfo.sCompatibleVersion);
     m_xLinkButtonComments->set_label(additionInfo.sCommentNumber);
@@ -729,14 +744,14 @@ IMPL_LINK_NOARG(AdditionsItem, ShowMoreHdl, weld::Button&, void)
 
 IMPL_LINK_NOARG(AdditionsItem, InstallHdl, weld::Button&, void)
 {
-    m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLING));
+    m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLING));
     m_xButtonInstall->set_sensitive(false);
     OUString aExtensionFile;
     bool bResult = getExtensionFile(aExtensionFile); // info vector json data
 
     if (!bResult)
     {
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
 
         SAL_INFO("cui.dialogs", "Couldn't get the extension file.");
@@ -749,36 +764,36 @@ IMPL_LINK_NOARG(AdditionsItem, InstallHdl, weld::Button&, void)
     {
         m_pParentDialog->m_xExtensionManager->addExtension(
             aExtensionFile, uno::Sequence<beans::NamedValue>(), "user", xAbortChannel, pCmdEnv);
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLEDBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLEDBUTTON));
     }
     catch (const ucb::CommandFailedException)
     {
         TOOLS_WARN_EXCEPTION("cui.dialogs", "");
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
     }
     catch (const ucb::CommandAbortedException)
     {
         TOOLS_WARN_EXCEPTION("cui.dialogs", "");
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
     }
     catch (const deployment::DeploymentException)
     {
         TOOLS_WARN_EXCEPTION("cui.dialogs", "");
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
     }
     catch (const lang::IllegalArgumentException)
     {
         TOOLS_WARN_EXCEPTION("cui.dialogs", "");
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
     }
     catch (const css::uno::Exception)
     {
         TOOLS_WARN_EXCEPTION("cui.dialogs", "");
-        m_xButtonInstall->set_label(CuiResId(RID_SVXSTR_ADDITIONS_INSTALLBUTTON));
+        m_xButtonInstall->set_label(CuiResId(RID_CUISTR_ADDITIONS_INSTALLBUTTON));
         m_xButtonInstall->set_sensitive(true);
     }
 }

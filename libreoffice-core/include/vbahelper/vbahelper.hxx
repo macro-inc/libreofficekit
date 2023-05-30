@@ -32,7 +32,7 @@
 #include <tools/color.hxx>
 #include <vbahelper/vbadllapi.h>
 #include <vcl/ptrstyle.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 
 namespace com::sun::star {
     namespace awt { class XControl; }
@@ -122,11 +122,8 @@ namespace ooo::vba
         /// @throws css::uno::RuntimeException
         VBAHELPER_DLLPUBLIC OUString getAnyAsString( const css::uno::Any& pvargItem );
         VBAHELPER_DLLPUBLIC OUString VBAToRegexp(const OUString &rIn); // needs to be in a uno service ( already this code is duplicated in basic )
-        VBAHELPER_DLLPUBLIC double getPixelTo100thMillimeterConversionFactor( const css::uno::Reference< css::awt::XDevice >& xDevice, bool bVertical);
         VBAHELPER_DLLPUBLIC double PointsToPixels( const css::uno::Reference< css::awt::XDevice >& xDevice, double fPoints, bool bVertical);
         VBAHELPER_DLLPUBLIC double PixelsToPoints( const css::uno::Reference< css::awt::XDevice >& xDevice, double fPixels, bool bVertical);
-        VBAHELPER_DLLPUBLIC sal_Int32 PointsToHmm( double fPoints );
-        VBAHELPER_DLLPUBLIC double HmmToPoints( sal_Int32 nHmm );
         VBAHELPER_DLLPUBLIC PointerStyle getPointerStyle( const css::uno::Reference< css::frame::XModel >& );
         VBAHELPER_DLLPUBLIC void setCursorHelper( const css::uno::Reference< css::frame::XModel >& xModel, PointerStyle nPointer, bool bOverWrite );
         /// @throws css::uno::RuntimeException
@@ -182,7 +179,7 @@ class VBAHELPER_DLLPUBLIC ShapeHelper
 public:
     /// @throws css::script::BasicErrorException
     /// @throws css::uno::RuntimeException
-    ShapeHelper( const css::uno::Reference< css::drawing::XShape >& _xShape);
+    ShapeHelper( css::uno::Reference< css::drawing::XShape > _xShape);
 
     double getHeight() const;
     void setHeight(double _fheight);

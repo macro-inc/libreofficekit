@@ -24,6 +24,7 @@
 #include <ooxml/resourceids.hxx>
 #include <oox/mathml/import.hxx>
 #include <oox/token/namespaces.hxx>
+#include <oox/shape/ShapeFilterBase.hxx>
 #include <sal/log.hxx>
 #include <comphelper/embeddedobjectcontainer.hxx>
 #include <comphelper/propertyvalue.hxx>
@@ -38,6 +39,8 @@
 #include <dmapper/PropertyIds.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/sequenceashashmap.hxx>
+#include "OOXMLPropertySet.hxx"
+#include <dmapper/GraphicHelpers.hxx>
 
 const sal_Unicode uCR = 0xd;
 const sal_Unicode uFtnEdnRef = 0x2;
@@ -230,7 +233,6 @@ void OOXMLFastContextHandler::lcl_startFastElement
         inPositionV = true;
     else if( Element == (NMSP_dmlWordDr|XML_positionH) )
         inPositionV = false;
-
 }
 
 void OOXMLFastContextHandler::lcl_endFastElement
@@ -1408,6 +1410,7 @@ void OOXMLFastContextHandlerXNote::lcl_endFastElement
 void OOXMLFastContextHandlerXNote::checkId(const OOXMLValue::Pointer_t& pValue)
 {
     mnMyXNoteId = sal_Int32(pValue->getInt());
+    mpStream->checkId(mnMyXNoteId);
 }
 
 void OOXMLFastContextHandlerXNote::checkType(const OOXMLValue::Pointer_t& pValue)
@@ -1683,6 +1686,41 @@ void OOXMLFastContextHandlerShape::lcl_startFastElement
 
     if (mrShapeContext.is())
     {
+        if (Element == DGM_TOKEN(relIds))
+        {
+            // It is a SmartArt. Make size available for generated group.
+            // Search for PropertySet in parents
+            OOXMLFastContextHandler* pHandler = getParent();
+            while (pHandler && pHandler->getId() != NS_ooxml::LN_anchor_anchor
+                   && pHandler->getId() != NS_ooxml::LN_inline_inline)
+            {
+                pHandler = pHandler->getParent();
+            }
+            // Search for extent
+            if (pHandler)
+            {
+                if (const OOXMLPropertySet::Pointer_t pPropSet = pHandler->getPropertySet())
+                {
+                    auto aIt = pPropSet->begin();
+                    auto aItEnd = pPropSet->end();
+                    while (aIt != aItEnd && (*aIt)->getId() != NS_ooxml::LN_CT_Inline_extent
+                           && (*aIt)->getId() != NS_ooxml::LN_CT_Anchor_extent)
+                    {
+                        ++aIt;
+                    }
+                    if (aIt != aItEnd)
+                    {
+                        writerfilter::Reference<Properties>::Pointer_t pProperties = (*aIt)->getProps();
+                        if (pProperties)
+                        {
+                            writerfilter::dmapper::ExtentHandler::Pointer_t pExtentHandler(new writerfilter::dmapper::ExtentHandler());
+                            pProperties->resolve(*pExtentHandler);
+                            mrShapeContext->setSize(pExtentHandler->getExtent());
+                        }
+                    }
+                }
+            }
+        }
         mrShapeContext->startFastElement(Element, Attribs);
     }
 }
@@ -1725,6 +1763,10 @@ void OOXMLFastContextHandlerShape::setToken(Token_t nToken)
 
     mrShapeContext->setRelationFragmentPath(mpParserState->getTarget());
 
+    // Floating tables (table inside a textframe) have issues with fullWPG,
+    // so disable the fullWPGsupport in tables until that issue is not fixed.
+    mrShapeContext->setFullWPGSupport(!mnTableDepth);
+
     auto xGraphicMapper = getDocument()->getGraphicMapper();
 
     if (xGraphicMapper.is())
@@ -1733,7 +1775,7 @@ void OOXMLFastContextHandlerShape::setToken(Token_t nToken)
     OOXMLFastContextHandler::setToken(nToken);
 
     if (mrShapeContext.is())
-        mrShapeContext->setStartToken(nToken);
+        mrShapeContext->pushStartToken(nToken);
 }
 
 void OOXMLFastContextHandlerShape::sendShape( Token_t Element )
@@ -1761,7 +1803,7 @@ void OOXMLFastContextHandlerShape::sendShape( Token_t Element )
     if (mnTableDepth > 0 && xShapePropSet.is() && mbIsVMLfound) //if we had a table
     {
         xShapePropSet->setPropertyValue(dmapper::getPropertyName(dmapper::PROP_FOLLOW_TEXT_FLOW),
-                                        uno::makeAny(mbAllowInCell));
+                                        uno::Any(mbAllowInCell));
     }
     // Notify the dmapper that the shape is ready to use
     if ( !bIsPicture )
@@ -1770,6 +1812,11 @@ void OOXMLFastContextHandlerShape::sendShape( Token_t Element )
         m_bShapeStarted = true;
     }
 }
+
+bool OOXMLFastContextHandlerShape::isDMLGroupShape() const
+{
+    return (mrShapeContext->getFullWPGSupport() && mrShapeContext->isWordProcessingGroupShape());
+};
 
 void OOXMLFastContextHandlerShape::lcl_endFastElement
 (Token_t Element)
@@ -1817,7 +1864,8 @@ OOXMLFastContextHandlerShape::lcl_createFastChildContext
 
     bool bGroupShape = Element == Token_t(NMSP_vml | XML_group);
     // drawingML version also counts as a group shape.
-    bGroupShape |= mrShapeContext->getStartToken() == Token_t(NMSP_wpg | XML_wgp);
+    if (!mrShapeContext->getFullWPGSupport())
+        bGroupShape |= mrShapeContext->getStartToken() == Token_t(NMSP_wpg | XML_wgp);
     mbIsVMLfound = (getNamespace(Element) == NMSP_vmlOffice) || (getNamespace(Element) == NMSP_vml);
     switch (oox::getNamespace(Element))
     {
@@ -1981,6 +2029,13 @@ void OOXMLFastContextHandlerWrapper::lcl_startFastElement
 {
     if (mxWrappedContext.is())
         mxWrappedContext->startFastElement(Element, Attribs);
+
+    if (mxShapeHandler->isDMLGroupShape()
+        && (Element == Token_t(NMSP_wps | XML_txbx)
+            || Element == Token_t(NMSP_wps | XML_linkedTxbx)))
+    {
+        mpStream->startTextBoxContent();
+    }
 }
 
 void OOXMLFastContextHandlerWrapper::lcl_endFastElement
@@ -1988,6 +2043,13 @@ void OOXMLFastContextHandlerWrapper::lcl_endFastElement
 {
     if (mxWrappedContext.is())
         mxWrappedContext->endFastElement(Element);
+
+    if (mxShapeHandler->isDMLGroupShape()
+        && (Element == Token_t(NMSP_wps | XML_txbx)
+            || Element == Token_t(NMSP_wps | XML_linkedTxbx)))
+    {
+        mpStream->endTextBoxContent();
+    }
 }
 
 uno::Reference< xml::sax::XFastContextHandler >
@@ -2263,7 +2325,7 @@ OOXMLFastContextHandlerCommentEx::OOXMLFastContextHandlerCommentEx(
 
 void OOXMLFastContextHandlerCommentEx::lcl_endFastElement(Token_t /*Element*/)
 {
-    mpStream->commentProps(m_sParaId, { m_bDone });
+    mpStream->commentProps(m_sParaId, { m_bDone, m_sParentId });
 }
 
 void OOXMLFastContextHandlerCommentEx::att_paraId(const OOXMLValue::Pointer_t& pValue)
@@ -2275,6 +2337,11 @@ void OOXMLFastContextHandlerCommentEx::att_done(const OOXMLValue::Pointer_t& pVa
 {
     if (pValue->getInt())
         m_bDone = true;
+}
+
+void OOXMLFastContextHandlerCommentEx::att_paraIdParent(const OOXMLValue::Pointer_t& pValue)
+{
+    m_sParentId = pValue->getString();
 }
 
 }

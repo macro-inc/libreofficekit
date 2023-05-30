@@ -18,19 +18,18 @@
  */
 #include <sal/config.h>
 
-#include <iterator> /* std::iterator*/
-
 #include <cassert>
 #include <stdio.h>
 #include <string_view>
 
 #include <helper.hxx>
-#include <common.hxx>
+#include <utility>
 #include <xmlparse.hxx>
 #include <fstream>
 #include <iostream>
-#include <osl/thread.hxx>
+#include <osl/file.hxx>
 #include <osl/process.h>
+#include <rtl/ustring.hxx>
 #include <rtl/strbuf.hxx>
 #include <unicode/regex.h>
 
@@ -251,7 +250,7 @@ void XMLFile::Print( XMLNode *pCur, sal_uInt16 nLevel )
                     for (size_t j = 0; j < pElement->GetAttributeList()->size(); ++j)
                     {
                         const OString aAttrName((*pElement->GetAttributeList())[j]->GetName());
-                        if (!aAttrName.equalsIgnoreAsciiCase(XML_LANG))
+                        if (aAttrName != XML_LANG)
                         {
                             fprintf( stdout, " %s=\"%s\"",
                                 aAttrName.getStr(),
@@ -302,9 +301,9 @@ XMLFile::~XMLFile()
     }
 }
 
-XMLFile::XMLFile( const OString &rFileName ) // the file name, empty if created from memory stream
+XMLFile::XMLFile( OString _sFileName ) // the file name, empty if created from memory stream
     : XMLParentNode( nullptr )
-    , m_sFileName( rFileName )
+    , m_sFileName(std::move( _sFileName ))
 {
     m_aNodes_localize.emplace( OString("bookmark") , true );
     m_aNodes_localize.emplace( OString("variable") , true );
@@ -394,28 +393,28 @@ XMLFile::XMLFile( const XMLFile& rObj )
 
 XMLFile& XMLFile::operator=(const XMLFile& rObj)
 {
-    if( this != &rObj )
+    if( this == &rObj )
+        return *this;
+
+    XMLParentNode::operator=(rObj);
+
+    m_aNodes_localize = rObj.m_aNodes_localize;
+    m_vOrder = rObj.m_vOrder;
+
+    m_pXMLStrings.reset();
+
+    if( rObj.m_pXMLStrings )
     {
-        XMLParentNode::operator=(rObj);
-
-        m_aNodes_localize = rObj.m_aNodes_localize;
-        m_vOrder = rObj.m_vOrder;
-
-        m_pXMLStrings.reset();
-
-        if( rObj.m_pXMLStrings )
+        m_pXMLStrings.reset( new XMLHashMap );
+        for (auto const& pos : *rObj.m_pXMLStrings)
         {
-            m_pXMLStrings.reset( new XMLHashMap );
-            for (auto const& pos : *rObj.m_pXMLStrings)
+            LangHashMap* pElem=pos.second;
+            LangHashMap* pNewelem = new LangHashMap;
+            for (auto const& pos2 : *pElem)
             {
-                LangHashMap* pElem=pos.second;
-                LangHashMap* pNewelem = new LangHashMap;
-                for (auto const& pos2 : *pElem)
-                {
-                    (*pNewelem)[ pos2.first ] = new XMLElement( *pos2.second );
-                }
-                (*m_pXMLStrings)[ pos.first ] = pNewelem;
+                (*pNewelem)[ pos2.first ] = new XMLElement( *pos2.second );
             }
+            (*m_pXMLStrings)[ pos.first ] = pNewelem;
         }
     }
     return *this;
@@ -474,7 +473,7 @@ void XMLFile::SearchL10NElements( XMLChildNode *pCur )
     }
 }
 
-bool XMLFile::CheckExportStatus( XMLParentNode *pCur )
+bool XMLFile::CheckExportStatus( XMLChildNode *pCur )
 {
     static bool bStatusExport = true;
 
@@ -489,7 +488,7 @@ bool XMLFile::CheckExportStatus( XMLParentNode *pCur )
                 {
                     for ( size_t i = 0; i < GetChildList()->size(); i++ )
                     {
-                        XMLParentNode* pElement = static_cast<XMLParentNode*>((*GetChildList())[ i ]);
+                        XMLChildNode* pElement = (*GetChildList())[ i ];
                         if( pElement->GetNodeType() ==  XMLNodeType::ELEMENT ) CheckExportStatus( pElement );//, i);
                     }
                 }
@@ -521,7 +520,7 @@ bool XMLFile::CheckExportStatus( XMLParentNode *pCur )
                 else if ( pElement->GetChildList() )
                 {
                     for (size_t k = 0; k < pElement->GetChildList()->size(); ++k)
-                        CheckExportStatus( static_cast<XMLParentNode*>((*pElement->GetChildList())[k]) );
+                        CheckExportStatus( (*pElement->GetChildList())[k] );
                 }
             }
             break;
@@ -533,11 +532,11 @@ bool XMLFile::CheckExportStatus( XMLParentNode *pCur )
 }
 
 XMLElement::XMLElement(
-    const OString &rName,    // the element name
+    OString _sName,    // the element name
     XMLParentNode *pParent   // parent node of this element
 )
     : XMLParentNode( pParent )
-    , m_sElementName( rName )
+    , m_sElementName(std::move( _sName ))
 {
 }
 
@@ -671,7 +670,7 @@ void XMLElement::Print(XMLNode *pCur, OStringBuffer& rBuffer, bool bRootelement 
                             for ( size_t j = 0; j < pElement->GetAttributeList()->size(); j++ )
                             {
                                 const OString aAttrName( (*pElement->GetAttributeList())[ j ]->GetName() );
-                                if (!aAttrName.equalsIgnoreAsciiCase(XML_LANG))
+                                if (aAttrName != XML_LANG)
                                 {
                                     rBuffer.append(
                                         " " + aAttrName + "=\"" +

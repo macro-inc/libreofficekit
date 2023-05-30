@@ -18,6 +18,7 @@
  */
 
 #include <scitems.hxx>
+#include <utility>
 #include <vcl/virdev.hxx>
 #include <editeng/boxitem.hxx>
 #include <sfx2/app.hxx>
@@ -1673,11 +1674,11 @@ ScUndoUseScenario::ScUndoUseScenario( ScDocShell* pNewDocShell,
                         const ScMarkData& rMark,
 /*C*/                   const ScArea& rDestArea,
                               ScDocumentUniquePtr pNewUndoDoc,
-                        const OUString& rNewName ) :
+                        OUString aNewName ) :
     ScSimpleUndo( pNewDocShell ),
     pUndoDoc( std::move(pNewUndoDoc) ),
     aMarkData( rMark ),
-    aName( rNewName )
+    aName(std::move( aNewName ))
 {
     aRange.aStart.SetCol(rDestArea.nColStart);
     aRange.aStart.SetRow(rDestArea.nRowStart);
@@ -1704,7 +1705,7 @@ void ScUndoUseScenario::Undo()
     if (pViewShell)
     {
         pViewShell->DoneBlockMode();
-        pViewShell->InitOwnBlockMode();
+        pViewShell->InitOwnBlockMode( aRange );
     }
 
     ScDocument& rDoc = pDocShell->GetDocument();
@@ -1761,7 +1762,7 @@ void ScUndoUseScenario::Redo()
     {
         pViewShell->SetTabNo( nTab );
         pViewShell->DoneBlockMode();
-        pViewShell->InitOwnBlockMode();
+        pViewShell->InitOwnBlockMode( aRange );
     }
 
     pDocShell->UseScenario( nTab, aName, false );
@@ -1791,12 +1792,12 @@ bool ScUndoUseScenario::CanRepeat(SfxRepeatTarget& rTarget) const
 ScUndoSelectionStyle::ScUndoSelectionStyle( ScDocShell* pNewDocShell,
                                       const ScMarkData& rMark,
                                       const ScRange& rRange,
-                                      const OUString& rName,
+                                      OUString aName,
                                             ScDocumentUniquePtr pNewUndoDoc ) :
     ScSimpleUndo( pNewDocShell ),
     aMarkData( rMark ),
     pUndoDoc( std::move(pNewUndoDoc) ),
-    aStyleName( rName ),
+    aStyleName(std::move( aName )),
     aRange( rRange )
 {
     aMarkData.MarkToMulti();
@@ -1893,10 +1894,10 @@ bool ScUndoSelectionStyle::CanRepeat(SfxRepeatTarget& rTarget) const
 }
 
 ScUndoEnterMatrix::ScUndoEnterMatrix( ScDocShell* pNewDocShell, const ScRange& rArea,
-                                      ScDocumentUniquePtr pNewUndoDoc, const OUString& rForm ) :
+                                      ScDocumentUniquePtr pNewUndoDoc, OUString aForm ) :
     ScBlockUndo( pNewDocShell, rArea, SC_UNDO_SIMPLE ),
     pUndoDoc( std::move(pNewUndoDoc) ),
-    aFormula( rForm )
+    aFormula(std::move( aForm ))
 {
     SetChangeTrack();
 }

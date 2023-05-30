@@ -20,13 +20,13 @@
 #include <UncachedDataSequence.hxx>
 #include <CommonFunctors.hxx>
 #include <ModifyListenerHelper.hxx>
+#include <InternalDataProvider.hxx>
 
 #include <cppuhelper/supportsservice.hxx>
 #include <algorithm>
 #include <strings.hrc>
 #include <ResId.hxx>
-#include <com/sun/star/chart2/XInternalDataProvider.hpp>
-#include <tools/diagnose_ex.h>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -55,28 +55,28 @@ namespace chart
 {
 
 UncachedDataSequence::UncachedDataSequence(
-    const Reference< chart2::XInternalDataProvider > & xIntDataProv,
-    const OUString & rRangeRepresentation )
+    rtl::Reference< InternalDataProvider > xIntDataProv,
+    OUString aRangeRepresentation )
         : OPropertyContainer( GetBroadcastHelper()),
           UncachedDataSequence_Base( GetMutex()),
           m_nNumberFormatKey(0),
-          m_xDataProvider( xIntDataProv ),
-          m_aSourceRepresentation( rRangeRepresentation ),
-          m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+          m_xDataProvider(std::move( xIntDataProv )),
+          m_aSourceRepresentation(std::move( aRangeRepresentation )),
+          m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     registerProperties();
 }
 
 UncachedDataSequence::UncachedDataSequence(
-    const Reference< chart2::XInternalDataProvider > & xIntDataProv,
-    const OUString & rRangeRepresentation,
+    rtl::Reference< InternalDataProvider > xIntDataProv,
+    OUString aRangeRepresentation,
     const OUString & rRole )
         : OPropertyContainer( GetBroadcastHelper()),
           UncachedDataSequence_Base( GetMutex()),
           m_nNumberFormatKey(0),
-          m_xDataProvider( xIntDataProv ),
-          m_aSourceRepresentation( rRangeRepresentation ),
-          m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+          m_xDataProvider(std::move( xIntDataProv )),
+          m_aSourceRepresentation(std::move( aRangeRepresentation )),
+          m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     registerProperties();
     setFastPropertyValue_NoBroadcast( PROP_PROPOSED_ROLE, uno::Any( rRole ));
@@ -89,7 +89,7 @@ UncachedDataSequence::UncachedDataSequence( const UncachedDataSequence & rSource
           m_sRole( rSource.m_sRole ),
           m_xDataProvider( rSource.m_xDataProvider ),
           m_aSourceRepresentation( rSource.m_aSourceRepresentation ),
-          m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+          m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     registerProperties();
 }
@@ -297,28 +297,12 @@ void SAL_CALL UncachedDataSequence::setModified( sal_Bool bModified )
 // ____ XModifyBroadcaster (base of XModifiable) ____
 void SAL_CALL UncachedDataSequence::addModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL UncachedDataSequence::removeModifyListener( const Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 void UncachedDataSequence::fireModifyEvent()

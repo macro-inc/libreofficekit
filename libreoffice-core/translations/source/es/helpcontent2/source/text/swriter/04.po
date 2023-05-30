@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-05-25 10:44+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-03-08 09:32+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
-"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_help-master/textswriter04/es/>\n"
+"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_help-7-5/textswriter04/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1529889107.000000\n"
 
 #. brcGC
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; in text documents</bookmark_value>         <bookmark_value>text documents; shortcut keys in</bookmark_value>"
 msgstr "<bookmark_value>atajos de teclado; en documentos de texto</bookmark_value>         <bookmark_value>documentos de texto; atajos de teclado en</bookmark_value>"
 
-#. 35yyT
+#. C9cjF
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3145763\n"
 "help.text"
-msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Shortcut Keys for %PRODUCTNAME Writer\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
-msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Atajos de teclado de %PRODUCTNAME Writer\">Atajos de teclado de <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Atajos de teclado de <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
 
 #. qbPEo
 #: 01020000.xhp
@@ -52,14 +52,14 @@ msgctxt ""
 msgid "You can use shortcut keys to quickly perform common tasks in <item type=\"productname\">%PRODUCTNAME</item>. This section lists the default shortcut keys for <item type=\"productname\">%PRODUCTNAME</item> Writer."
 msgstr "Puede usar atajos de teclado para realizar rápidamente tareas comunes en <item type=\"productname\">%PRODUCTNAME</item>. Esta sección enumera las combinaciones de teclas predeterminadas de <item type=\"productname\">%PRODUCTNAME</item> Writer."
 
-#. NuaiP
+#. WkpSD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3145081\n"
 "help.text"
-msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\" name=\"general shortcut keys in %PRODUCTNAME\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
-msgstr "También se pueden usar las <link href=\"text/shared/04/01010000.xhp\" name=\"combinaciones de teclas generales en %PRODUCTNAME\">combinaciones de teclas generales en <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgstr "También se pueden usar las <link href=\"text/shared/04/01010000.xhp\">combinaciones de teclas generales en <item type=\"productname\">%PRODUCTNAME</item></link>."
 
 #. dQtdg
 #: 01020000.xhp
@@ -113,7 +113,7 @@ msgctxt ""
 "hd_id3149821\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+F2"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + F2"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘F2</caseinline><defaultinline>Ctrl + F2</defaultinline></switchinline>"
 
 #. zp2mH
 #: 01020000.xhp
@@ -1004,7 +1004,7 @@ msgctxt ""
 "hd_id3150281\n"
 "help.text"
 msgid "Shift+Enter"
-msgstr "Mayús + Intro"
+msgstr "Mayús + Intro"
 
 #. Swrx8
 #: 01020000.xhp
@@ -1085,7 +1085,7 @@ msgctxt ""
 "par_id3153798\n"
 "help.text"
 msgid "Insert a new paragraph directly before or after a section or table."
-msgstr ""
+msgstr "Inserte un nuevo párrafo directamente antes o después de una sección o tabla."
 
 #. D2Ddu
 #: 01020000.xhp
@@ -1094,7 +1094,7 @@ msgctxt ""
 "par_id9535524\n"
 "help.text"
 msgid "For sections, the cursor must be placed at the first or last character. For tables, the cursor must be placed at the first character of the first cell or the last character of the last cell."
-msgstr ""
+msgstr "Para las secciones, el cursor debe situarse en el primer o último carácter. Para las tablas, el cursor debe situarse en el primer carácter de la primera celda o en el último carácter de la última celda."
 
 #. SAcMa
 #: 01020000.xhp
@@ -1744,14 +1744,14 @@ msgctxt ""
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
 msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘</caseinline><defaultinline>Ctrl</defaultinline></switchinline> + Tab"
 
-#. SDvt2
+#. AFUgU
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3153577\n"
 "help.text"
-msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Sugerencia siguiente de la <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">compleción automática de palabras</link>"
+msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Sugerencia siguiente de la <link href=\"text/shared/01/06040600.xhp\">compleción automática de palabras</link>"
 
 #. qDiED
 #: 01020000.xhp
@@ -1762,14 +1762,14 @@ msgctxt ""
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
 msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘⇧↹</caseinline><defaultinline>Ctrl + Mayús + Tab</defaultinline></switchinline>"
 
-#. aounX
+#. bVg3F
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3147386\n"
 "help.text"
-msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Utilizar la sugerencia anterior con la <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">compleción automática de palabras</link>"
+msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Utilizar la sugerencia anterior con la <link href=\"text/shared/01/06040600.xhp\">compleción automática de palabras</link>"
 
 #. BqeEo
 #: 01020000.xhp
@@ -1823,7 +1823,7 @@ msgctxt ""
 "hd_id3150396\n"
 "help.text"
 msgid "Shortcut Keys for Paragraphs, List Paragraphs and Heading Levels"
-msgstr ""
+msgstr "Teclas de acceso directo a los párrafos, a los párrafos de la lista y a los niveles de los títulos"
 
 #. AGgt5
 #: 01020000.xhp
@@ -1895,7 +1895,7 @@ msgctxt ""
 "par_id3154672\n"
 "help.text"
 msgid "<variable id=\"beginning\">With the cursor positioned in front of a heading or list paragraph:</variable> The heading in format \"Heading X\" (X = 1-9) is moved down one level in the outline. For list paragraphs, the list level is moved down one level."
-msgstr ""
+msgstr "<variable id=\"beginning\">Con el cursor situado delante de un título o párrafo de lista:</variable> El título en formato \"Encabezamiento X\" (X = 1-9) se desplaza un nivel hacia abajo en el esquema. Para los párrafos de la lista, el nivel de la lista se desplaza un nivel hacia abajo."
 
 #. AuZkE
 #: 01020000.xhp
@@ -1913,7 +1913,7 @@ msgctxt ""
 "par_id3155346\n"
 "help.text"
 msgid "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> The heading in format \"Heading X\" (X = 2-10) is moved up one level in the outline. For list paragraphs, the list level is moved up one level."
-msgstr ""
+msgstr "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> El título con formato \"Título X\" (X = 2-10) se mueve un nivel hacia arriba en el esquema. En el caso de los párrafos de la lista, el nivel de la lista sube un nivel."
 
 #. TL5GS
 #: 01020000.xhp
@@ -1940,7 +1940,7 @@ msgctxt ""
 "par_id3155395\n"
 "help.text"
 msgid "With the cursor placed anywhere in a heading or list paragraph: Increases the alignment for all headings. For list paragraphs, increases the alignment for all paragraphs in the same list."
-msgstr ""
+msgstr "Con el cursor colocado en cualquier lugar de un título o párrafo de la lista: Aumenta la alineación para todos los títulos. Para los párrafos de la lista, aumenta la alineación para todos los párrafos de la misma lista."
 
 #. HKCQQ
 #: 01020000.xhp
@@ -1949,7 +1949,7 @@ msgctxt ""
 "par_id491655382453027\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
-msgstr ""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">⌘⇧↹</caseinline><defaultinline>Ctrl + Mayús + Tab</defaultinline></switchinline>"
 
 #. pARCd
 #: 01020000.xhp
@@ -1958,16 +1958,16 @@ msgctxt ""
 "par_id71655381890029\n"
 "help.text"
 msgid "With the cursor placed anywhere in a heading or list paragraph: Decreases the alignment for all headings. For list paragraphs, decreases the alignment for all paragraphs in the same list."
-msgstr ""
+msgstr "Con el cursor colocado en cualquier lugar de un título o párrafo de la lista: Disminuye la alineación de todos los encabezados. Para los párrafos de lista, disminuye la alineación para todos los párrafos de la misma lista."
 
-#. U2tpK
+#. wrjFD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id491655382900210\n"
 "help.text"
-msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\" name=\"Position\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
-msgstr ""
+msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
+msgstr "Para insertar un tabulador al principio de un título o de un párrafo de la lista, utilice la opción <menuitem>Numeración seguida de</menuitem> en la pestaña <link href=\"text/shared/01/06050600.xhp\"><menuitem>Posición</menuitem></link> del cuadro de diálogo <menuitem>Numeración de capítulos</menuitem> o <menuitem>Balas y numeración</menuitem>. Cuadro de diálogo. También se puede copiar una pestaña y pegarla al principio."
 
 #. Vp3wR
 #: 01020000.xhp

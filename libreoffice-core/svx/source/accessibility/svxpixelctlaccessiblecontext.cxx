@@ -19,10 +19,10 @@
 
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <toolkit/helper/convert.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <osl/mutex.hxx>
@@ -57,12 +57,12 @@ uno::Reference< XAccessibleContext > SvxPixelCtlAccessible::getAccessibleContext
     return this;
 }
 
-sal_Int32 SvxPixelCtlAccessible::getAccessibleChildCount(  )
+sal_Int64 SvxPixelCtlAccessible::getAccessibleChildCount(  )
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
     return SvxPixelCtl::GetSquares();
 }
-uno::Reference< XAccessible > SvxPixelCtlAccessible::getAccessibleChild( sal_Int32 i )
+uno::Reference< XAccessible > SvxPixelCtlAccessible::getAccessibleChild( sal_Int64 i )
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
     if ( i < 0 || i >= getAccessibleChildCount())
@@ -106,36 +106,27 @@ Reference< XAccessibleRelationSet > SAL_CALL SvxPixelCtlAccessible::getAccessibl
     return uno::Reference<css::accessibility::XAccessibleRelationSet>();
 }
 
-uno::Reference< XAccessibleStateSet > SvxPixelCtlAccessible::getAccessibleStateSet(  )
+sal_Int64 SvxPixelCtlAccessible::getAccessibleStateSet(  )
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if (mpPixelCtl)
     {
-        const sal_Int16 aStandardStates[] =
-        {
-            AccessibleStateType::FOCUSABLE,
-            AccessibleStateType::SELECTABLE,
-            AccessibleStateType::SHOWING,
-            AccessibleStateType::VISIBLE,
-            AccessibleStateType::OPAQUE,
-            0
-        };
-
-        sal_Int16 nState = 0;
-        while (aStandardStates[nState])
-        {
-            pStateSetHelper->AddState(aStandardStates[nState++]);
-        }
+        nStateSet |=
+            AccessibleStateType::FOCUSABLE |
+            AccessibleStateType::SELECTABLE |
+            AccessibleStateType::SHOWING |
+            AccessibleStateType::VISIBLE |
+            AccessibleStateType::OPAQUE;
         if (mpPixelCtl->IsEnabled())
-            pStateSetHelper->AddState(AccessibleStateType::ENABLED);
+            nStateSet |= AccessibleStateType::ENABLED;
         if (mpPixelCtl->HasFocus())
-            pStateSetHelper->AddState(AccessibleStateType::FOCUSED);
-        pStateSetHelper->AddState(AccessibleStateType::MANAGES_DESCENDANTS);
+            nStateSet |= AccessibleStateType::FOCUSED;
+        nStateSet |= AccessibleStateType::MANAGES_DESCENDANTS;
     }
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 uno::Reference<XAccessible > SAL_CALL SvxPixelCtlAccessible::getAccessibleAtPoint (
@@ -199,7 +190,7 @@ sal_Int32 SvxPixelCtlAccessible::getBackground(  )
     return sal_Int32(rStyles.GetDialogColor());
 }
 
-void SvxPixelCtlAccessible::implSelect(sal_Int32 nChildIndex, bool bSelect)
+void SvxPixelCtlAccessible::implSelect(sal_Int64 nChildIndex, bool bSelect)
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
 
@@ -213,7 +204,7 @@ void SvxPixelCtlAccessible::implSelect(sal_Int32 nChildIndex, bool bSelect)
     NotifyChild(nIndex, bSelect, false);
 }
 
-bool SvxPixelCtlAccessible::implIsSelected(sal_Int32 nChildIndex)
+bool SvxPixelCtlAccessible::implIsSelected(sal_Int64 nChildIndex)
 {
     ::osl::MutexGuard   aGuard( m_aMutex );
 
@@ -322,10 +313,10 @@ void SvxPixelCtlAccessibleChild::SelectChild( bool bSelect)
 }
 
 SvxPixelCtlAccessibleChild::SvxPixelCtlAccessibleChild( SvxPixelCtl& rWindow, bool bPixelColorOrBG,
-    const tools::Rectangle& rBoundingBox, const rtl::Reference<SvxPixelCtlAccessible>& rxParent,
+    const tools::Rectangle& rBoundingBox, rtl::Reference<SvxPixelCtlAccessible> xParent,
     tools::Long nIndexInParent)
     : mrParentWindow( rWindow )
-    , mxParent(rxParent)
+    , mxParent(std::move(xParent))
     , m_bPixelColorOrBG(bPixelColorOrBG)
     , maBoundingBox( rBoundingBox )
     , mnIndexInParent( nIndexInParent )
@@ -368,12 +359,12 @@ sal_Int32 SvxPixelCtlAccessibleChild::getBackground()
 }
 
 // XAccessibleContext
-sal_Int32 SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleChildCount()
+sal_Int64 SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleChildCount()
 {
     return 0;
 }
 
-uno::Reference< XAccessible > SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleChild( sal_Int32 )
+uno::Reference< XAccessible > SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleChild( sal_Int64 )
 {
     throw lang::IndexOutOfBoundsException();
 }
@@ -409,35 +400,34 @@ uno::Reference<XAccessibleRelationSet> SAL_CALL SvxPixelCtlAccessibleChild::getA
     return uno::Reference< XAccessibleRelationSet >();
 }
 
-uno::Reference< XAccessibleStateSet > SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleStateSet()
+sal_Int64 SAL_CALL SvxPixelCtlAccessibleChild::getAccessibleStateSet()
 {
     ::osl::MutexGuard                       aGuard( m_aMutex );
-    rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if (!rBHelper.bDisposed)
     {
-
-        pStateSetHelper->AddState( AccessibleStateType::TRANSIENT );
-        pStateSetHelper->AddState( AccessibleStateType::ENABLED );
-        pStateSetHelper->AddState( AccessibleStateType::OPAQUE );
-        pStateSetHelper->AddState( AccessibleStateType::SELECTABLE );
-        pStateSetHelper->AddState( AccessibleStateType::SHOWING );
-        pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
+        nStateSet |= AccessibleStateType::TRANSIENT;
+        nStateSet |= AccessibleStateType::ENABLED;
+        nStateSet |= AccessibleStateType::OPAQUE;
+        nStateSet |= AccessibleStateType::SELECTABLE;
+        nStateSet |= AccessibleStateType::SHOWING;
+        nStateSet |= AccessibleStateType::VISIBLE;
 
         tools::Long nIndex = mrParentWindow.GetFocusPosIndex();
         if ( nIndex == mnIndexInParent)
         {
-            pStateSetHelper->AddState( AccessibleStateType::SELECTED );
+            nStateSet |= AccessibleStateType::SELECTED;
         }
         if (mrParentWindow.GetBitmapPixel(sal_uInt16(mnIndexInParent)))
         {
-            pStateSetHelper->AddState( AccessibleStateType::CHECKED );
+            nStateSet |= AccessibleStateType::CHECKED;
         }
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 void SAL_CALL SvxPixelCtlAccessibleChild::disposing()

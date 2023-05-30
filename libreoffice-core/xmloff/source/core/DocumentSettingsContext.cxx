@@ -19,11 +19,13 @@
 
 #include <sal/config.h>
 
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <sax/tools/converter.hxx>
 
 #include <com/sun/star/util/PathSubstitution.hpp>
 #include <com/sun/star/util/XStringSubstitution.hpp>
+#include <utility>
 #include <xmloff/DocumentSettingsContext.hxx>
 #include <xmloff/xmlimp.hxx>
 #include <xmloff/xmltoken.hxx>
@@ -40,12 +42,12 @@
 #include <com/sun/star/util/DateTime.hpp>
 #include <com/sun/star/document/XViewDataSupplier.hpp>
 #include <com/sun/star/document/PrinterIndependentLayout.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/document/NamedPropertyValues.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <comphelper/indexedpropertyvalues.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/configmgr.hxx>
 #include "xmlenums.hxx"
 
@@ -62,7 +64,7 @@ class XMLMyList
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
 public:
-    explicit XMLMyList(const uno::Reference<uno::XComponentContext>& rxContext);
+    explicit XMLMyList(uno::Reference<uno::XComponentContext> xContext);
 
     void push_back(beans::PropertyValue const & aProp) { aProps.push_back(aProp); nCount++; }
     uno::Sequence<beans::PropertyValue> GetSequence();
@@ -72,9 +74,9 @@ public:
 
 }
 
-XMLMyList::XMLMyList(const uno::Reference<uno::XComponentContext>& rxContext)
+XMLMyList::XMLMyList(uno::Reference<uno::XComponentContext> xContext)
 :   nCount(0),
-    m_xContext(rxContext)
+    m_xContext(std::move(xContext))
 {
     assert(m_xContext.is());
 }
@@ -109,7 +111,7 @@ uno::Reference<container::XNameContainer> XMLMyList::GetNameContainer()
 
 uno::Reference<container::XIndexContainer> XMLMyList::GetIndexContainer()
 {
-    uno::Reference<container::XIndexContainer> xIndexContainer = document::IndexedPropertyValues::create(m_xContext);
+    rtl::Reference< comphelper::IndexedPropertyValuesContainer > xIndexContainer = new comphelper::IndexedPropertyValuesContainer();
     sal_uInt32 i(0);
     for (auto const& prop : aProps)
     {
@@ -149,7 +151,7 @@ public:
     XMLConfigItemContext(SvXMLImport& rImport,
                                     const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
                                     css::uno::Any& rAny,
-                                    const OUString& rItemName,
+                                    OUString aItemName,
                                     XMLConfigBaseContext* pBaseContext);
 
     virtual void SAL_CALL characters( const OUString& rChars ) override;
@@ -193,7 +195,7 @@ private:
 public:
     XMLConfigItemMapIndexedContext(SvXMLImport& rImport,
                                     css::uno::Any& rAny,
-                                    const OUString& rConfigItemName,
+                                    OUString aConfigItemName,
                                     XMLConfigBaseContext* pBaseContext);
 
     virtual css::uno::Reference< css::xml::sax::XFastContextHandler > SAL_CALL createFastChildContext(
@@ -383,11 +385,11 @@ void XMLConfigItemSetContext::endFastElement(sal_Int32 )
 XMLConfigItemContext::XMLConfigItemContext(SvXMLImport& rImport,
                                     const css::uno::Reference< css::xml::sax::XFastAttributeList>& xAttrList,
                                     css::uno::Any& rTempAny,
-                                    const OUString& rTempItemName,
+                                    OUString aTempItemName,
                                     XMLConfigBaseContext* pTempBaseContext)
     : SvXMLImportContext(rImport),
     mrAny(rTempAny),
-    mrItemName(rTempItemName),
+    mrItemName(std::move(aTempItemName)),
     mpBaseContext(pTempBaseContext)
 {
     for (auto &aIter : sax_fastparser::castToFastAttributeList( xAttrList ))
@@ -408,9 +410,10 @@ void XMLConfigItemContext::endFastElement(sal_Int32 )
     uno::Sequence<sal_Int8> aDecoded;
     if (IsXMLToken(msType, XML_BASE64BINARY))
     {
-        OUString sChars = maCharBuffer.makeStringAndClear().trim();
-        if( !sChars.isEmpty() )
+        std::u16string_view sChars = o3tl::trim(maCharBuffer);
+        if( !sChars.empty() )
             ::comphelper::Base64::decodeSomeChars( aDecoded, sChars );
+        maCharBuffer.setLength(0);
     }
     else
         sValue = maCharBuffer.makeStringAndClear();
@@ -460,8 +463,10 @@ void XMLConfigItemContext::endFastElement(sal_Int32 )
         else if (IsXMLToken(msType, XML_DATETIME))
         {
             util::DateTime aDateTime;
-            ::sax::Converter::parseDateTime(aDateTime, sValue);
-            mrAny <<= aDateTime;
+            if (::sax::Converter::parseDateTime(aDateTime, sValue))
+                mrAny <<= aDateTime;
+            else
+                SAL_WARN("xmloff.core", "XMLConfigItemContext: broken DateTime '" << sValue << "'");
         }
         else if (IsXMLToken(msType, XML_BASE64BINARY))
         {
@@ -552,10 +557,10 @@ void XMLConfigItemMapNamedContext::endFastElement(sal_Int32 )
 
 XMLConfigItemMapIndexedContext::XMLConfigItemMapIndexedContext(SvXMLImport& rImport,
                                     css::uno::Any& rAny,
-                                    const OUString& rConfigItemName,
+                                    OUString aConfigItemName,
                                     XMLConfigBaseContext* pBaseContext)
     : XMLConfigBaseContext(rImport, rAny, pBaseContext),
-      maConfigItemName( rConfigItemName )
+      maConfigItemName(std::move( aConfigItemName ))
 {
 }
 

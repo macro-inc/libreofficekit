@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-08 14:37+0200\n"
-"PO-Revision-Date: 2022-02-01 10:35+0000\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-02-02 12:18+0000\n"
 "Last-Translator: Sveinn í Felli <sv1@fellsnet.is>\n"
 "Language-Team: Icelandic <https://translations.documentfoundation.org/projects/libo_ui-master/scmessages/is/>\n"
 "Language: is\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1550485051.000000\n"
 
 #. kBovX
@@ -100,52 +100,52 @@ msgstr "_Hætta við"
 #. MRCkv
 msgctxt "stock"
 msgid "_Close"
-msgstr ""
+msgstr "_Loka"
 
 #. nvx5t
 msgctxt "stock"
 msgid "_Delete"
-msgstr ""
+msgstr "E_yða"
 
 #. YspCj
 msgctxt "stock"
 msgid "_Edit"
-msgstr ""
+msgstr "Br_eyta"
 
 #. imQxr
 msgctxt "stock"
 msgid "_Help"
-msgstr ""
+msgstr "_Hjálp"
 
 #. RbjyB
 msgctxt "stock"
 msgid "_New"
-msgstr ""
+msgstr "_Nýtt"
 
 #. dx2yy
 msgctxt "stock"
 msgid "_No"
-msgstr ""
+msgstr "_Nei"
 
 #. M9DsL
 msgctxt "stock"
 msgid "_OK"
-msgstr ""
+msgstr "Í _lagi"
 
 #. VtJS9
 msgctxt "stock"
 msgid "_Remove"
-msgstr ""
+msgstr "Fja_rlægja"
 
 #. C69Fy
 msgctxt "stock"
 msgid "_Reset"
-msgstr ""
+msgstr "F_rumstilla"
 
 #. mgpxh
 msgctxt "stock"
 msgid "_Yes"
-msgstr ""
+msgstr "_Já"
 
 #. BDDVk
 #. * This file is reserved for string IDs of permanently loaded resident string
@@ -1061,6 +1061,13 @@ msgid ""
 "• contain [ ] * ? : / \\ \n"
 "• use ' (apostrophe) as first or last character."
 msgstr ""
+"Ógilt heiti á blaði.\n"
+"\n"
+"Nafn á blaði má ekki:\n"
+"• vera tómt\n"
+"• þegar til staðar\n"
+"• innifela stafina [ ] * ? : / \\ \n"
+"• nota stafinn ' (úrfellingamerki) sem fyrsta eða síðasta staf."
 
 #. CGAdE
 #: sc/inc/globstr.hrc:185
@@ -1239,7 +1246,7 @@ msgstr "Villa: Deilt með núlli"
 #: sc/inc/globstr.hrc:219
 msgctxt "STR_LONG_ERR_NO_VALUE"
 msgid "Error: No value"
-msgstr ""
+msgstr "Villa: Ekkert gildi"
 
 #. kHwc6
 #. ERROR.TYPE( #REF! ) == 4
@@ -1459,6 +1466,9 @@ msgid ""
 "a table range of at least\n"
 "3 × 3 cells must be selected."
 msgstr ""
+"Til að beita sjálfvirku sniði,\n"
+"þarf að velja minnsta kosti\n"
+"töflu af stærðinni 3 × 3."
 
 #. iySox
 #: sc/inc/globstr.hrc:261
@@ -1506,13 +1516,13 @@ msgstr "Flytja inn Lotus skrár"
 #: sc/inc/globstr.hrc:268
 msgctxt "STR_IMPORT_DBF"
 msgid "Import dBASE files"
-msgstr ""
+msgstr "Flytja inn dBASE-skrár"
 
 #. uyTFS
 #: sc/inc/globstr.hrc:269
 msgctxt "STR_EXPORT_DBF"
 msgid "dBASE export"
-msgstr ""
+msgstr "dBASE útflutningur"
 
 #. CtHUj
 #: sc/inc/globstr.hrc:270
@@ -1530,109 +1540,109 @@ msgstr "Dif innflutningur"
 #: sc/inc/globstr.hrc:272
 msgctxt "STR_STYLENAME_STANDARD"
 msgid "Default"
-msgstr ""
+msgstr "Sjálfgefið"
 
 #. TG9pD
 #: sc/inc/globstr.hrc:273
 msgctxt "STR_STYLENAME_HEADING"
 msgid "Heading"
-msgstr ""
+msgstr "Fyrirsögn"
 
 #. NM7R3
 #: sc/inc/globstr.hrc:274
 msgctxt "STR_STYLENAME_HEADING_1"
 msgid "Heading 1"
-msgstr ""
+msgstr "Fyrirsögn 1"
 
 #. 8XF63
 #: sc/inc/globstr.hrc:275
 msgctxt "STR_STYLENAME_HEADING_2"
 msgid "Heading 2"
-msgstr ""
+msgstr "Fyrirsögn 2"
 
 #. WBuWS
 #: sc/inc/globstr.hrc:276
 msgctxt "STR_STYLENAME_TEXT"
 msgid "Text"
-msgstr ""
+msgstr "Texti"
 
 #. tMJaD
 #: sc/inc/globstr.hrc:277
 msgctxt "STR_STYLENAME_NOTE"
 msgid "Note"
-msgstr ""
+msgstr "Minnispunktur"
 
 #. Df8xB
 #: sc/inc/globstr.hrc:278
 msgctxt "STR_STYLENAME_FOOTNOTE"
 msgid "Footnote"
-msgstr ""
+msgstr "Neðanmálsgrein"
 
 #. 2hk6H
 #: sc/inc/globstr.hrc:279
 msgctxt "STR_STYLENAME_HYPERLINK"
 msgid "Hyperlink"
-msgstr ""
+msgstr "Veftengill"
 
 #. aeksB
 #: sc/inc/globstr.hrc:280
 msgctxt "STR_STYLENAME_STATUS"
 msgid "Status"
-msgstr ""
+msgstr "Staða"
 
 #. pxAhk
 #: sc/inc/globstr.hrc:281
 msgctxt "STR_STYLENAME_GOOD"
 msgid "Good"
-msgstr ""
+msgstr "Gott"
 
 #. Ebk8F
 #: sc/inc/globstr.hrc:282
 msgctxt "STR_STYLENAME_NEUTRAL"
 msgid "Neutral"
-msgstr ""
+msgstr "Hlutlaust"
 
 #. FdWhD
 #: sc/inc/globstr.hrc:283
 msgctxt "STR_STYLENAME_BAD"
 msgid "Bad"
-msgstr ""
+msgstr "Slæmt"
 
 #. t6f8W
 #: sc/inc/globstr.hrc:284
 msgctxt "STR_STYLENAME_WARNING"
 msgid "Warning"
-msgstr ""
+msgstr "Aðvörun"
 
 #. 99BgJ
 #: sc/inc/globstr.hrc:285
 msgctxt "STR_STYLENAME_ERROR"
 msgid "Error"
-msgstr ""
+msgstr "Villa"
 
 #. yGAVF
 #: sc/inc/globstr.hrc:286
 msgctxt "STR_STYLENAME_ACCENT"
 msgid "Accent"
-msgstr ""
+msgstr "Áhersla"
 
 #. fw24e
 #: sc/inc/globstr.hrc:287
 msgctxt "STR_STYLENAME_ACCENT_1"
 msgid "Accent 1"
-msgstr ""
+msgstr "Áhersla 1"
 
 #. nHhDx
 #: sc/inc/globstr.hrc:288
 msgctxt "STR_STYLENAME_ACCENT_2"
 msgid "Accent 2"
-msgstr ""
+msgstr "Áhersla 2"
 
 #. NsLP7
 #: sc/inc/globstr.hrc:289
 msgctxt "STR_STYLENAME_ACCENT_3"
 msgid "Accent 3"
-msgstr ""
+msgstr "Áhersla 3"
 
 #. GATGM
 #: sc/inc/globstr.hrc:290
@@ -1898,17 +1908,17 @@ msgctxt "STR_SCATTR_PAGE_SCALE"
 msgid "Reduce/enlarge printout"
 msgstr "Minnka/stækka útprentun"
 
-#. CXqDX
+#. jYSCo
 #: sc/inc/globstr.hrc:333
 msgctxt "STR_SCATTR_PAGE_SCALETOPAGES"
-msgid "Fit print range(s) on number of pages"
-msgstr "Aðlaga prentsvið að síðufjölda"
+msgid "Shrink print range(s) on number of pages"
+msgstr "Minnka prentsvið að síðufjölda"
 
-#. kDAZk
+#. P4CCx
 #: sc/inc/globstr.hrc:334
 msgctxt "STR_SCATTR_PAGE_SCALETO"
-msgid "Fit print range(s) to width/height"
-msgstr "Aðlaga prentsvið að breidd/hæð"
+msgid "Shrink print range(s) to width/height"
+msgstr "Minnka prentsvið að breidd/hæð"
 
 #. fnrU6
 #: sc/inc/globstr.hrc:335
@@ -1990,11 +2000,11 @@ msgctxt "STR_ON"
 msgid "on"
 msgstr "virkt"
 
-#. NqkbD
+#. RryEg
 #: sc/inc/globstr.hrc:348
 msgctxt "STR_RELOAD_TABLES"
-msgid "Security Warning: Automatic update of external links has been disabled."
-msgstr ""
+msgid "Automatic update of external links has been disabled."
+msgstr "Sjálfvirk uppfærsla ytri tengla hefur verið gerð óvirk."
 
 #. qkto7
 #: sc/inc/globstr.hrc:349
@@ -2124,7 +2134,7 @@ msgstr "Eyða innihaldi"
 #: sc/inc/globstr.hrc:367
 msgctxt "STR_QUICKHELP_REF"
 msgid "%1 R  × %2 C"
-msgstr ""
+msgstr "%1 R  × %2 C"
 
 #. NJpDi
 #: sc/inc/globstr.hrc:368
@@ -2297,7 +2307,7 @@ msgstr "Aðlaga svæði fylkis"
 #: sc/inc/globstr.hrc:395
 msgctxt "STR_TIP_RESIZEMATRIX"
 msgid "Array formula  %1 R × %2 C"
-msgstr ""
+msgstr "Fylkisformúla  %1 R x  C"
 
 #. nkxuG
 #: sc/inc/globstr.hrc:396
@@ -2645,7 +2655,7 @@ msgstr "Ógildt heiti. Þegar í notkun í viðkomandi efni."
 #: sc/inc/globstr.hrc:447
 msgctxt "STR_ERR_NAME_INVALID"
 msgid "Invalid name. Start with a letter, use only letters, numbers and underscore."
-msgstr ""
+msgstr "Ógilt heiti. Byrjaðu á staf, notaðu einungis stafi, tölur og undirstrik."
 
 #. owW4Y
 #: sc/inc/globstr.hrc:448
@@ -2723,19 +2733,19 @@ msgstr "Formúla er"
 #: sc/inc/globstr.hrc:459
 msgctxt "STR_COND_TOP10"
 msgid "is in top elements"
-msgstr ""
+msgstr "er meðal efstu staka"
 
 #. tR5xA
 #: sc/inc/globstr.hrc:460
 msgctxt "STR_COND_BOTTOM10"
 msgid "is in bottom elements"
-msgstr ""
+msgstr "er meðal neðstu staka"
 
 #. EWAhr
 #: sc/inc/globstr.hrc:461
 msgctxt "STR_COND_TOP_PERCENT"
 msgid "is in top percent"
-msgstr ""
+msgstr "er meðal efstu prósenta"
 
 #. vRk5n
 #: sc/inc/globstr.hrc:462
@@ -2747,7 +2757,7 @@ msgstr "Dagsetning er"
 #: sc/inc/globstr.hrc:463
 msgctxt "STR_COND_BOTTOM_PERCENT"
 msgid "is in bottom percent"
-msgstr ""
+msgstr "er meðal neðstu prósenta"
 
 #. w5vq3
 #: sc/inc/globstr.hrc:464
@@ -2907,6 +2917,9 @@ msgid ""
 "\n"
 " Do you want to edit the existing conditional format?"
 msgstr ""
+"Valdi reiturinn inniheldur skilyrt snið. Þú getur annað hvort breytt fyrirliggjandi skilyrtu sniði eða skilgreint nýtt skilyrt snið sem skarast.\n"
+"\n"
+" Viltu breyta fyrirliggjandi skilyrtu sniði?"
 
 #. cisuZ
 #: sc/inc/globstr.hrc:490
@@ -2936,7 +2949,7 @@ msgstr ""
 #: sc/inc/globstr.hrc:492
 msgctxt "STR_NO_INSERT_DELETE_OVER_PIVOT_TABLE"
 msgid "You cannot insert or delete cells when the affected range intersects with pivot table."
-msgstr ""
+msgstr "Þú getur ekki sett inn eða eytt reitum þegar umrætt svið skarast við veltitöflu."
 
 #. FVE5v
 #: sc/inc/globstr.hrc:493
@@ -3076,11 +3089,11 @@ msgctxt "STR_UNDO_FORMULA_TO_VALUE"
 msgid "Convert Formula To Value"
 msgstr "Umbreyta formúlu í gildi"
 
-#. dsjqi
+#. BywKj
 #: sc/inc/globstr.hrc:515
 msgctxt "STR_UNQUOTED_STRING"
-msgid "Strings without quotes are interpreted as column/row labels."
-msgstr "Strengir án gæsalappa eru túlkaðir sem fyrirsagnir dálka/raða."
+msgid "Strings without quotes are interpreted as defined names or references or column/row labels."
+msgstr "Strengir án gæsalappa eru túlkaðir sem heiti, tilvísanir eða fyrirsagnir dálka/raða."
 
 #. rHjns
 #: sc/inc/globstr.hrc:516
@@ -3164,7 +3177,7 @@ msgstr "Texti"
 #: sc/inc/globstr.hrc:529
 msgctxt "STR_QUERY_PIVOTTABLE_DELTAB"
 msgid "The selected sheet(s) contain source data of related pivot tables that will be lost. Are you sure you want to delete the selected sheet(s)?"
-msgstr ""
+msgstr "Valda blaðið/blöðin innihalda gagnagjafa tengdrar veltitöflu sem mun þá tapast. Ertu viss um að þú viljir eyða völdum blöðum?"
 
 #. 5uVFF
 #: sc/inc/globstr.hrc:530
@@ -3182,7 +3195,7 @@ msgstr "Utanaðkomandi efni er óvirkt."
 #: sc/inc/globstr.hrc:532
 msgctxt "STR_TEXTORIENTANGLE"
 msgid "Text orientation angle"
-msgstr ""
+msgstr "Stefnuhorn texta"
 
 #. EwD3A
 #: sc/inc/globstr.hrc:533
@@ -3242,43 +3255,43 @@ msgstr "Inndráttur: "
 #: sc/inc/globstr.hrc:542
 msgctxt "STR_UNDO_INSERT_SPARKLINE"
 msgid "Insert Sparkline Group"
-msgstr ""
+msgstr "Setja inn hóp smágrafa"
 
 #. LiBMo
 #: sc/inc/globstr.hrc:543
 msgctxt "STR_UNDO_DELETE_SPARKLINE"
 msgid "Delete Sparkline"
-msgstr ""
+msgstr "Eyða smágrafi"
 
 #. f2V6A
 #: sc/inc/globstr.hrc:544
 msgctxt "STR_UNDO_DELETE_SPARKLINE_GROUP"
 msgid "Delete Sparkline Group"
-msgstr ""
+msgstr "Eyða hópi smágrafa"
 
 #. 6sxnX
 #: sc/inc/globstr.hrc:545
 msgctxt "STR_UNDO_EDIT_SPARKLINE_GROUP"
 msgid "Edit Sparkline Group"
-msgstr ""
+msgstr "Breyta hópi smágrafa"
 
 #. CBBMB
 #: sc/inc/globstr.hrc:546
 msgctxt "STR_UNDO_GROUP_SPARKLINES"
 msgid "Group Sparklines"
-msgstr ""
+msgstr "Hópa smágröf"
 
 #. vv2eo
 #: sc/inc/globstr.hrc:547
 msgctxt "STR_UNDO_UNGROUP_SPARKLINES"
 msgid "Ungroup Sparklines"
-msgstr ""
+msgstr "Taka smágröf úr hópi"
 
 #. ux3mX
 #: sc/inc/globstr.hrc:548
 msgctxt "STR_UNDO_EDIT_SPARKLINE"
 msgid "Edit Sparkline"
-msgstr ""
+msgstr "Breyta smágrafi"
 
 #. dB8cp
 #: sc/inc/pvfundlg.hrc:28
@@ -6857,11 +6870,11 @@ msgctxt "SC_OPCODE_RANDOM"
 msgid "Returns a random number between 0 and 1."
 msgstr "Skilar tölu af handahófi á milli 0 og 1."
 
-#. QugqG
+#. Le6a5
 #: sc/inc/scfuncs.hrc:1064
 msgctxt "SC_OPCODE_IS_EVEN"
-msgid "Returns TRUE if value is an even integer."
-msgstr "Skilar SATT ef talan er slétt."
+msgid "Returns TRUE if the value truncated to integer is even."
+msgstr ""
 
 #. aEG3g
 #: sc/inc/scfuncs.hrc:1065
@@ -6875,11 +6888,11 @@ msgctxt "SC_OPCODE_IS_EVEN"
 msgid "The value to be tested."
 msgstr "Gildið sem á að prófa."
 
-#. M8AAF
+#. FXDi6
 #: sc/inc/scfuncs.hrc:1072
 msgctxt "SC_OPCODE_IS_ODD"
-msgid "Returns TRUE if value is an odd integer."
-msgstr "Skilar SATT ef talan er oddatala."
+msgid "Returns TRUE if the value truncated to integer is odd."
+msgstr ""
 
 #. 4scb6
 #: sc/inc/scfuncs.hrc:1073
@@ -7321,10 +7334,9 @@ msgstr "Horn"
 
 #. cu47J
 #: sc/inc/scfuncs.hrc:1256
-#, fuzzy
 msgctxt "SC_OPCODE_COSECANT_HYP"
 msgid "The hyperbolic angle in radians for which the hyperbolic cosecant is to be calculated."
-msgstr "Hornið í bogamálseiningum sem skila á sínus fyrir."
+msgstr "Hornið í bogamálseiningum sem skila á breiðbogakósekans fyrir."
 
 #. P8KDD
 #: sc/inc/scfuncs.hrc:1262
@@ -7814,7 +7826,7 @@ msgstr "Talan sem á að slétta upp."
 #: sc/inc/scfuncs.hrc:1437
 msgctxt "SC_OPCODE_CEIL_MS"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. 9KDXm
 #: sc/inc/scfuncs.hrc:1438
@@ -7844,7 +7856,7 @@ msgstr "Talan sem á að slétta upp."
 #: sc/inc/scfuncs.hrc:1447
 msgctxt "SC_OPCODE_CEIL_PRECISE"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. MaoHR
 #: sc/inc/scfuncs.hrc:1448
@@ -7874,7 +7886,7 @@ msgstr "Talan sem á að slétta upp."
 #: sc/inc/scfuncs.hrc:1457
 msgctxt "SC_OPCODE_CEIL_ISO"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. uZqnP
 #: sc/inc/scfuncs.hrc:1458
@@ -7904,7 +7916,7 @@ msgstr "Talan sem á að slétta upp."
 #: sc/inc/scfuncs.hrc:1467
 msgctxt "SC_OPCODE_CEIL"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. tp6SD
 #: sc/inc/scfuncs.hrc:1468
@@ -7946,7 +7958,7 @@ msgstr "Talan sem á að slétta upp."
 #: sc/inc/scfuncs.hrc:1479
 msgctxt "SC_OPCODE_CEIL_MATH"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. 3RoYe
 #: sc/inc/scfuncs.hrc:1480
@@ -7988,7 +8000,7 @@ msgstr "Talan sem slétta á niður."
 #: sc/inc/scfuncs.hrc:1491
 msgctxt "SC_OPCODE_FLOOR"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. gV64T
 #: sc/inc/scfuncs.hrc:1492
@@ -8004,10 +8016,9 @@ msgstr "Hamur"
 
 #. QQWo6
 #: sc/inc/scfuncs.hrc:1494
-#, fuzzy
 msgctxt "SC_OPCODE_FLOOR"
 msgid "If given and not equal to zero then rounded towards zero with negative number and significance."
-msgstr "Ef skilgreint og er ekki jafnt og núll þá er talan sléttuð í samræmi við töluna ef neikvæð tala og margfeldi."
+msgstr "Ef skilgreint og er ekki jafnt og núll þá er talan sléttuð í átt að núlli með neikvæðri tölu og margfeldi."
 
 #. 2oGdX
 #: sc/inc/scfuncs.hrc:1500
@@ -8033,7 +8044,7 @@ msgstr "Talan sem slétta á niður."
 #: sc/inc/scfuncs.hrc:1503
 msgctxt "SC_OPCODE_FLOOR_MS"
 msgid "Significance"
-msgstr "Marktækir"
+msgstr "Marktækni"
 
 #. ougtr
 #: sc/inc/scfuncs.hrc:1504
@@ -8063,7 +8074,7 @@ msgstr "Talan sem slétta á niður."
 #: sc/inc/scfuncs.hrc:1513
 msgctxt "SC_OPCODE_FLOOR_MATH"
 msgid "Significance"
-msgstr "Marktækni"
+msgstr "Marktækir"
 
 #. FYVCb
 #: sc/inc/scfuncs.hrc:1514
@@ -9167,7 +9178,7 @@ msgstr "Tala 1, tala 2, ... eru tölugildi sem lýsa úrtaki."
 #: sc/inc/scfuncs.hrc:1942
 msgctxt "SC_OPCODE_PERCENTILE"
 msgid "Returns the alpha percentile of a sample."
-msgstr ""
+msgstr "Skilar alfa-prósentumarki fyrir úrtak."
 
 #. KruQH
 #: sc/inc/scfuncs.hrc:1943
@@ -9443,7 +9454,7 @@ msgstr "Marktækni"
 #: sc/inc/scfuncs.hrc:2028
 msgctxt "SC_OPCODE_PERCENT_RANK"
 msgid "The number of significant digits for the returned percentage: if omitted, a value of 3 is used."
-msgstr ""
+msgstr "Fjöldi marktækra tölustafa uppgefins prósentugildis: ef þessu er sleppt er notað gildið 3."
 
 #. DyyD5
 #: sc/inc/scfuncs.hrc:2034
@@ -9485,7 +9496,7 @@ msgstr "Marktækni"
 #: sc/inc/scfuncs.hrc:2040
 msgctxt "SC_OPCODE_PERCENT_RANK_EXC"
 msgid "The number of significant digits for the returned percentage: if omitted, a value of 3 is used."
-msgstr ""
+msgstr "Fjöldi marktækra tölustafa uppgefins prósentugildis: ef þessu er sleppt er notað gildið 3."
 
 #. 8F33F
 #: sc/inc/scfuncs.hrc:2046
@@ -9527,7 +9538,7 @@ msgstr "Marktækni"
 #: sc/inc/scfuncs.hrc:2052
 msgctxt "SC_OPCODE_PERCENT_RANK_INC"
 msgid "The number of significant digits for the returned percentage: if omitted, a value of 3 is used."
-msgstr ""
+msgstr "Fjöldi marktækra tölustafa uppgefins prósentugildis: ef þessu er sleppt er notað gildið 3."
 
 #. whrMs
 #: sc/inc/scfuncs.hrc:2058
@@ -13253,13 +13264,13 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3147
 msgctxt "SC_OPCODE_FORECAST_ETS_ADD"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. ZE4ec
 #: sc/inc/scfuncs.hrc:3153
 msgctxt "SC_OPCODE_FORECAST_ETS_MUL"
 msgid "Calculates future value(s) using multiplicative Exponential Smoothing algorithm."
-msgstr ""
+msgstr "Reiknar framtíðargildi með því að nota margfeldi með Veldisjöfnun-reikniritinu."
 
 #. HsmXq
 #: sc/inc/scfuncs.hrc:3154
@@ -13331,7 +13342,7 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3165
 msgctxt "SC_OPCODE_FORECAST_ETS_MUL"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. JNrxu
 #: sc/inc/scfuncs.hrc:3171
@@ -13421,7 +13432,7 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3185
 msgctxt "SC_OPCODE_FORECAST_ETS_PIA"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. bFPyC
 #: sc/inc/scfuncs.hrc:3191
@@ -13511,7 +13522,7 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3205
 msgctxt "SC_OPCODE_FORECAST_ETS_PIM"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. SN7GC
 #: sc/inc/scfuncs.hrc:3211
@@ -13565,7 +13576,7 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3219
 msgctxt "SC_OPCODE_FORECAST_ETS_SEA"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. c2bd2
 #: sc/inc/scfuncs.hrc:3225
@@ -13643,13 +13654,13 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3237
 msgctxt "SC_OPCODE_FORECAST_ETS_STA"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. deJuC
 #: sc/inc/scfuncs.hrc:3243
 msgctxt "SC_OPCODE_FORECAST_ETS_STM"
 msgid "Returns statistical value(s) using multiplicative Exponential Smoothing algorithm."
-msgstr ""
+msgstr "Reiknar tölfræðigildi með því að nota margfeldi með Veldisjöfnun-reikniritinu."
 
 #. d4RLA
 #: sc/inc/scfuncs.hrc:3244
@@ -13721,7 +13732,7 @@ msgstr "Samsöfnun"
 #: sc/inc/scfuncs.hrc:3255
 msgctxt "SC_OPCODE_FORECAST_ETS_STM"
 msgid "Aggregation (default 1 = AVERAGE); method to be used to aggregate identical (time) values."
-msgstr ""
+msgstr "Samsöfnun (sjálfgefið 1 = AVERAGE); aðferð sem á að nota til að safna saman eins (tíma)gildum."
 
 #. KdhBr
 #: sc/inc/scfuncs.hrc:3261
@@ -14039,7 +14050,7 @@ msgstr "Raðað uppflettisvið"
 #: sc/inc/scfuncs.hrc:3363
 msgctxt "SC_OPCODE_H_LOOKUP"
 msgid "If the value is TRUE or not given, the search row of the array represents a series of ranges, and must be sorted in ascending order."
-msgstr ""
+msgstr "Ef gildið er SATT eða sleppt, verður leitarröðin í fylkinu að standa fyrir runu gagnasviða og að vera raðað í hækkandi röð."
 
 #. Qid6E
 #: sc/inc/scfuncs.hrc:3369
@@ -14093,7 +14104,7 @@ msgstr "Raðað uppflettisvið"
 #: sc/inc/scfuncs.hrc:3377
 msgctxt "SC_OPCODE_V_LOOKUP"
 msgid "If the value is TRUE or not given, the search column of the array represents a series of ranges, and must be sorted in ascending order."
-msgstr ""
+msgstr "Ef gildið er SATT eða sleppt, verður leitardálkurinn í fylkinu að standa fyrir runu gagnasviða og að vera raðaður í hækkandi röð."
 
 #. KZapz
 #: sc/inc/scfuncs.hrc:3383
@@ -14825,7 +14836,7 @@ msgstr ""
 #: sc/inc/scfuncs.hrc:3618
 msgctxt "SC_OPCODE_MINIFS_MS"
 msgid "Returns the minimum value in a range that meet multiple criteria in multiple ranges."
-msgstr ""
+msgstr "Skilar lágmarksgildi í gagnasviði sem passar við mörg skilyrði í mörgum gagnasvæðum."
 
 #. huc4D
 #: sc/inc/scfuncs.hrc:3619
@@ -14867,7 +14878,7 @@ msgstr "Skilyrði 1, skilyrði 2,... eru þau skilyrði sem beita skal á uppgef
 #: sc/inc/scfuncs.hrc:3629
 msgctxt "SC_OPCODE_MAXIFS_MS"
 msgid "Returns the maximum value in a range that meet multiple criteria in multiple ranges."
-msgstr ""
+msgstr "Skilar hámarksgildi í gagnasviði sem passar við mörg skilyrði í mörgum gagnasvæðum."
 
 #. qmsEN
 #: sc/inc/scfuncs.hrc:3630
@@ -15235,11 +15246,11 @@ msgctxt "SC_OPCODE_FIXED"
 msgid "Decimals"
 msgstr "Tugabrot"
 
-#. ACFqC
+#. CTmcM
 #: sc/inc/scfuncs.hrc:3751
 msgctxt "SC_OPCODE_FIXED"
-msgid "Decimal places. The number of fixed decimal places that are to be displayed."
-msgstr "Fjöldi aukastafa. Fjöldi fastra aukastafa sem á að sýna."
+msgid "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."
+msgstr "Fjöldi aukastafa. Fjöldi fastra aukastafa sem á að sýna. Sjálfgefið 2."
 
 #. fdn6N
 #: sc/inc/scfuncs.hrc:3752
@@ -16356,7 +16367,7 @@ msgstr "Textinn sem á að setja inn."
 #: sc/inc/scfuncs.hrc:4101
 msgctxt "SC_OPCODE_FINDB"
 msgid "Looks for a string of text within another (case sensitive), using byte positions."
-msgstr ""
+msgstr "Leitar að textastreng innan annars textastrengs (greinarmunur er á há- og lágstöfum), notar bætastöðu."
 
 #. pARfz
 #: sc/inc/scfuncs.hrc:4102
@@ -16398,7 +16409,7 @@ msgstr "Tilgreinir stöðu stafsins sem á að byrja leitina frá."
 #: sc/inc/scfuncs.hrc:4113
 msgctxt "SC_OPCODE_SEARCHB"
 msgid "Looks for a string of text within another (not case sensitive), using byte positions."
-msgstr ""
+msgstr "Leitar að textastreng innan annars textastrengs (ekki munur á há- og lágstöfum), notar bætastöðu."
 
 #. ZDK7h
 #: sc/inc/scfuncs.hrc:4114
@@ -16508,10 +16519,10 @@ msgctxt "SC_OPCODE_RANDOM_NV"
 msgid "Returns a random number between 0 and 1, non-volatile."
 msgstr ""
 
-#. op2W5
+#. fDQYY
 #: sc/inc/scfuncs.hrc:4147
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "Returns a random integer between the numbers you specify, non-volatile."
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."
 msgstr ""
 
 #. o3i8h
@@ -16520,11 +16531,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Bottom"
 msgstr "Neðst"
 
-#. HdKGo
+#. 7kUdh
 #: sc/inc/scfuncs.hrc:4149
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The smallest integer returned."
-msgstr "Er lægsta heiltalan sem er skilað."
+msgid "The smallest integer that can be returned."
+msgstr ""
 
 #. 8s6nU
 #: sc/inc/scfuncs.hrc:4150
@@ -16532,11 +16543,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Top"
 msgstr "Efst"
 
-#. x9uuF
+#. AmoKE
 #: sc/inc/scfuncs.hrc:4151
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The largest integer returned."
-msgstr "Er hæsta heiltalan sem er skilað."
+msgid "The largest integer that can be returned."
+msgstr ""
 
 #. pDDme
 #: sc/inc/scstyles.hrc:29
@@ -16627,7 +16638,7 @@ msgstr "Stöðluð sía..."
 #: sc/inc/strings.hrc:34
 msgctxt "SCSTR_CLEAR_FILTER"
 msgid "Clear Filter"
-msgstr ""
+msgstr "Hreinsa síu"
 
 #. 7QCjE
 #: sc/inc/strings.hrc:35
@@ -16639,7 +16650,7 @@ msgstr "Topp 10"
 #: sc/inc/strings.hrc:36
 msgctxt "SCSTR_BOTTOM10FILTER"
 msgid "Bottom 10"
-msgstr ""
+msgstr "Neðstu 10"
 
 #. FNDLK
 #: sc/inc/strings.hrc:37
@@ -16657,132 +16668,120 @@ msgstr "Ekki tómt"
 #: sc/inc/strings.hrc:39
 msgctxt "SCSTR_FILTER_COLOR"
 msgid "Filter by Color"
-msgstr ""
+msgstr "Sía eftir lit"
 
 #. EYFT8
 #: sc/inc/strings.hrc:40
 msgctxt "SCSTR_FILTER_CONDITION"
 msgid "Filter by Condition"
-msgstr ""
+msgstr "Sía eftir skilyrði"
 
-#. 5LENV
-#: sc/inc/strings.hrc:41
-msgctxt "SCSTR_FILTER_TEXT_COLOR"
-msgid "Text Color"
-msgstr ""
-
-#. BtGE4
-#: sc/inc/strings.hrc:42
-msgctxt "SCSTR_FILTER_BACKGROUND_COLOR"
-msgid "Background Color"
-msgstr ""
-
-#. td5Gr
+#. PWtxn
 #. This must match the translation of the same strings of standardfilterdialog|cond
-#: sc/inc/strings.hrc:44
+#: sc/inc/strings.hrc:42
 msgctxt "STANDARDFILTERDIALOG_COND"
-msgid "Text color"
-msgstr ""
+msgid "Font color"
+msgstr "Litur á letri"
 
 #. sGJCz
-#: sc/inc/strings.hrc:45
+#: sc/inc/strings.hrc:43
 msgctxt "STANDARDFILTERDIALOG_COND"
 msgid "Background color"
-msgstr ""
+msgstr "Bakgrunnslitur"
 
 #. teYGB
-#: sc/inc/strings.hrc:46
+#: sc/inc/strings.hrc:44
 msgctxt "SCSTR_FILTER_NO_FILL"
 msgid "No Fill"
-msgstr ""
+msgstr "Engin fylling"
 
 #. 8DPvA
-#: sc/inc/strings.hrc:47
+#: sc/inc/strings.hrc:45
 msgctxt "SCSTR_FILTER_AUTOMATIC_COLOR"
 msgid "Automatic"
-msgstr ""
+msgstr "Sjálfvirkt"
 
 #. Wgy7r
-#: sc/inc/strings.hrc:48
+#: sc/inc/strings.hrc:46
 msgctxt "SCSTR_NONAME"
 msgid "unnamed"
 msgstr "nafnlaust"
 
 #. JAf3n
-#: sc/inc/strings.hrc:49
+#: sc/inc/strings.hrc:47
 msgctxt "SCSTR_INSERT_RTL"
 msgid "Shift cells left"
-msgstr ""
+msgstr "Færa reiti til vinstri"
 
 #. CW4Wh
 #. "%1 is replaced to column letter, such as 'Column A'"
-#: sc/inc/strings.hrc:51
+#: sc/inc/strings.hrc:49
 msgctxt "SCSTR_COLUMN_LETTER"
 msgid "Column %1"
-msgstr ""
+msgstr "Dálkur %1"
 
 #. CJrpZ
-#: sc/inc/strings.hrc:52
+#: sc/inc/strings.hrc:50
 msgctxt "SCSTR_COLUMN"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. Bjnch
-#: sc/inc/strings.hrc:53
+#: sc/inc/strings.hrc:51
 msgctxt "SCSTR_ROW"
 msgid "Row"
-msgstr ""
+msgstr "Röð"
 
 #. 7p8BN
-#: sc/inc/strings.hrc:54
+#: sc/inc/strings.hrc:52
 msgctxt "SCSTR_TABLE"
 msgid "Sheet"
 msgstr "Blað"
 
 #. ArnTD
-#: sc/inc/strings.hrc:55
+#: sc/inc/strings.hrc:53
 msgctxt "SCSTR_NAME"
 msgid "Name"
 msgstr "Heiti"
 
 #. BxrBH
-#: sc/inc/strings.hrc:56
+#: sc/inc/strings.hrc:54
 msgctxt "SCSTR_APDTABLE"
 msgid "Append Sheet"
 msgstr "Bæta við blaði"
 
 #. sba4F
-#: sc/inc/strings.hrc:57
+#: sc/inc/strings.hrc:55
 msgctxt "SCSTR_RENAMETAB"
 msgid "Rename Sheet"
 msgstr "Endurnefna blað"
 
 #. EEcgV
-#: sc/inc/strings.hrc:58
+#: sc/inc/strings.hrc:56
 msgctxt "SCSTR_SET_TAB_BG_COLOR"
 msgid "Tab Color"
 msgstr "Flipalitur"
 
 #. sTank
-#: sc/inc/strings.hrc:59
+#: sc/inc/strings.hrc:57
 msgctxt "SCSTR_NO_TAB_BG_COLOR"
 msgid "Default"
 msgstr "Sjálfgefið"
 
 #. yEEuF
-#: sc/inc/strings.hrc:60
+#: sc/inc/strings.hrc:58
 msgctxt "SCSTR_RENAMEOBJECT"
 msgid "Name Object"
 msgstr "Nefna hlut"
 
 #. 3FHKw
-#: sc/inc/strings.hrc:61
+#: sc/inc/strings.hrc:59
 msgctxt "STR_INSERTGRAPHIC"
 msgid "Insert Image"
 msgstr "Setja inn mynd"
 
 #. bKv77
-#: sc/inc/strings.hrc:62
+#: sc/inc/strings.hrc:60
 msgctxt "SCSTR_TOTAL"
 msgid "One result found"
 msgid_plural "%1 results found"
@@ -16790,1802 +16789,1808 @@ msgstr[0] "Ein niðurstaða fannst"
 msgstr[1] "%1 niðurstöður fundust"
 
 #. 7GkKi
-#: sc/inc/strings.hrc:63
+#: sc/inc/strings.hrc:61
 msgctxt "SCSTR_SKIPPED"
 msgid "(only %1 are listed)"
 msgstr "(aðeins %1 er talið með)"
 
+#. khhRt
+#: sc/inc/strings.hrc:62
+msgctxt "SCSTR_RESULTS_CLAMPED"
+msgid "More than %1 results found (stopped counting)"
+msgstr "Fleiri en %1 niðurstöður fundust (hætti að telja)"
+
 #. YxFpr
 #. Attribute
-#: sc/inc/strings.hrc:65
+#: sc/inc/strings.hrc:64
 msgctxt "SCSTR_PROTECTDOC"
 msgid "Protect Spreadsheet Structure"
 msgstr "Vernda uppbyggingu töflureiknisskjals"
 
 #. SQCpD
-#: sc/inc/strings.hrc:66
+#: sc/inc/strings.hrc:65
 msgctxt "SCSTR_UNPROTECTDOC"
 msgid "Unprotect Spreadsheet Structure"
 msgstr "Afvernda uppbyggingu töflureiknisskjals"
 
 #. rAV3G
-#: sc/inc/strings.hrc:67
+#: sc/inc/strings.hrc:66
 msgctxt "SCSTR_UNPROTECTTAB"
 msgid "Unprotect Sheet"
 msgstr "Afvernda blað"
 
 #. K7w3B
-#: sc/inc/strings.hrc:68
+#: sc/inc/strings.hrc:67
 msgctxt "SCSTR_CHG_PROTECT"
 msgid "Protect Records"
 msgstr "Vernda færslur"
 
 #. DLDBg
-#: sc/inc/strings.hrc:69
+#: sc/inc/strings.hrc:68
 msgctxt "SCSTR_CHG_UNPROTECT"
 msgid "Unprotect Records"
 msgstr "Afvernda færslur"
 
 #. rFdAS
-#: sc/inc/strings.hrc:70
+#: sc/inc/strings.hrc:69
 msgctxt "SCSTR_PASSWORD"
 msgid "Password:"
 msgstr "Lykilorð:"
 
 #. dd2wC
-#: sc/inc/strings.hrc:71
+#: sc/inc/strings.hrc:70
 msgctxt "SCSTR_PASSWORDOPT"
 msgid "Password (optional):"
 msgstr "Lykilorð (má sleppa):"
 
 #. dTBug
-#: sc/inc/strings.hrc:72
+#: sc/inc/strings.hrc:71
 msgctxt "SCSTR_WRONGPASSWORD"
 msgid "Incorrect Password"
 msgstr "Rangt lykilorð"
 
 #. bkGuJ
-#: sc/inc/strings.hrc:73
+#: sc/inc/strings.hrc:72
 msgctxt "SCSTR_END"
 msgid "~End"
 msgstr "~Endir"
 
 #. XNnTf
-#: sc/inc/strings.hrc:74
+#: sc/inc/strings.hrc:73
 msgctxt "SCSTR_UNKNOWN"
 msgid "Unknown"
 msgstr "Óþekkt"
 
 #. NoEfk
-#: sc/inc/strings.hrc:75
+#: sc/inc/strings.hrc:74
 msgctxt "SCSTR_VALID_MINIMUM"
 msgid "~Minimum"
 msgstr "~Lágmark"
 
 #. gKahz
-#: sc/inc/strings.hrc:76
+#: sc/inc/strings.hrc:75
 msgctxt "SCSTR_VALID_MAXIMUM"
 msgid "~Maximum"
 msgstr "~Hámark"
 
 #. nmeHF
-#: sc/inc/strings.hrc:77
+#: sc/inc/strings.hrc:76
 msgctxt "SCSTR_VALID_VALUE"
 msgid "~Value"
 msgstr "~Gildi"
 
 #. g8Cow
-#: sc/inc/strings.hrc:78
+#: sc/inc/strings.hrc:77
 msgctxt "SCSTR_VALID_FORMULA"
 msgid "~Formula"
 msgstr "~Formúla"
 
 #. 6YEEk
-#: sc/inc/strings.hrc:79
+#: sc/inc/strings.hrc:78
 msgctxt "SCSTR_VALID_RANGE"
 msgid "~Source"
 msgstr "~Uppruni"
 
 #. FA84s
-#: sc/inc/strings.hrc:80
+#: sc/inc/strings.hrc:79
 msgctxt "SCSTR_VALID_LIST"
 msgid "~Entries"
 msgstr "~Færslur"
 
 #. vhcaA
 #. for dialogues:
-#: sc/inc/strings.hrc:82
+#: sc/inc/strings.hrc:81
 msgctxt "SCSTR_CHARSET_USER"
 msgid "System"
 msgstr "Kerfi"
 
 #. 2tobg
-#: sc/inc/strings.hrc:83
+#: sc/inc/strings.hrc:82
 msgctxt "SCSTR_COLUMN_USER"
 msgid "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide"
 msgstr "Venjulegt;Texti;Dagsetning (DMY);Dagsetning (MDY);Dagsetning (YMD);US Enska;Fela"
 
 #. px75F
-#: sc/inc/strings.hrc:84
+#: sc/inc/strings.hrc:83
 msgctxt "SCSTR_FIELDSEP_TAB"
 msgid "Tab"
 msgstr "Innskotsmerki"
 
 #. ZGpGp
-#: sc/inc/strings.hrc:85
+#: sc/inc/strings.hrc:84
 msgctxt "SCSTR_FIELDSEP_SPACE"
 msgid "space"
 msgstr "bil"
 
 #. C8dAj
-#: sc/inc/strings.hrc:86
+#: sc/inc/strings.hrc:85
 msgctxt "SCSTR_UNDO_GRAFFILTER"
 msgid "Image Filter"
 msgstr "Myndsía"
 
 #. CfBRk
-#: sc/inc/strings.hrc:87
+#: sc/inc/strings.hrc:86
 msgctxt "STR_CAPTION_DEFAULT_TEXT"
 msgid "Text"
 msgstr "Texti"
 
 #. X6bVC
 #. Select tables dialog title
-#: sc/inc/strings.hrc:89
+#: sc/inc/strings.hrc:88
 msgctxt "STR_DLG_SELECTTABLES_TITLE"
 msgid "Select Sheets"
 msgstr "Veldu blöð"
 
 #. GYoSL
-#: sc/inc/strings.hrc:90
+#: sc/inc/strings.hrc:89
 msgctxt "STR_DLG_SELECTTABLE_TITLE"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Fara á blað"
 
 #. iHTDF
-#: sc/inc/strings.hrc:91
+#: sc/inc/strings.hrc:90
 msgctxt "STR_DLG_SELECTTABLE_MASK"
 msgid "~Type a Sheet Name"
-msgstr ""
+msgstr "Skrifaðu ~heiti á blaði"
 
 #. SEDS2
 #. Select tables dialog listbox
-#: sc/inc/strings.hrc:93
+#: sc/inc/strings.hrc:92
 msgctxt "STR_DLG_SELECTTABLES_LBNAME"
 msgid "~Selected sheets"
 msgstr "~Valin blöð"
 
 #. szfzF
-#: sc/inc/strings.hrc:94
+#: sc/inc/strings.hrc:93
 msgctxt "STR_DLG_SELECTTABLE_LBNAME"
 msgid "~Sheets"
-msgstr ""
+msgstr "~Blöð"
 
 #. SfEhE
-#: sc/inc/strings.hrc:95
+#: sc/inc/strings.hrc:94
 msgctxt "STR_ACC_CSVRULER_NAME"
 msgid "Ruler"
 msgstr "Reglustika"
 
 #. 3VwsT
-#: sc/inc/strings.hrc:96
+#: sc/inc/strings.hrc:95
 msgctxt "STR_ACC_CSVRULER_DESCR"
 msgid "This ruler manages objects at fixed positions."
 msgstr "Þessi reglustika meðhöndlar hluti á föstum staðsetningum."
 
 #. 7Ream
-#: sc/inc/strings.hrc:97
+#: sc/inc/strings.hrc:96
 msgctxt "STR_ACC_CSVGRID_NAME"
 msgid "Preview"
 msgstr "Forskoða"
 
 #. uSKyF
-#: sc/inc/strings.hrc:98
+#: sc/inc/strings.hrc:97
 msgctxt "STR_ACC_CSVGRID_DESCR"
 msgid "This sheet shows how the data will be arranged in the document."
 msgstr "Þetta blað sýnir hvernig gögnunum verður raðað í skjalinu."
 
 #. MwTAm
-#: sc/inc/strings.hrc:99
+#: sc/inc/strings.hrc:98
 msgctxt "STR_ACC_DOC_NAME"
 msgid "Document view"
 msgstr "Yfirlit skjals"
 
 #. NFaas
-#: sc/inc/strings.hrc:100
+#: sc/inc/strings.hrc:99
 msgctxt "STR_ACC_TABLE_NAME"
 msgid "Sheet %1"
 msgstr "Skjal %1"
 
 #. 2qRJG
-#: sc/inc/strings.hrc:101
+#: sc/inc/strings.hrc:100
 msgctxt "STR_ACC_CELL_NAME"
 msgid "Cell %1"
 msgstr "Reitur %1"
 
 #. KD4PA
-#: sc/inc/strings.hrc:102
+#: sc/inc/strings.hrc:101
 msgctxt "STR_ACC_LEFTAREA_NAME"
 msgid "Left area"
 msgstr "Vinstra svæði"
 
 #. 56AkM
-#: sc/inc/strings.hrc:103
+#: sc/inc/strings.hrc:102
 msgctxt "STR_ACC_PREVIEWDOC_NAME"
 msgid "Page preview"
 msgstr "Prentskoðun"
 
 #. RA4AS
-#: sc/inc/strings.hrc:104
+#: sc/inc/strings.hrc:103
 msgctxt "STR_ACC_CENTERAREA_NAME"
 msgid "Center area"
 msgstr "Miðsvæði"
 
 #. 2hpwq
-#: sc/inc/strings.hrc:105
+#: sc/inc/strings.hrc:104
 msgctxt "STR_ACC_RIGHTAREA_NAME"
 msgid "Right area"
 msgstr "Hægra svæði"
 
 #. FrXgq
-#: sc/inc/strings.hrc:106
+#: sc/inc/strings.hrc:105
 msgctxt "STR_ACC_HEADER_NAME"
 msgid "Header of page %1"
 msgstr "Haus síðu %1"
 
 #. BwF8D
-#: sc/inc/strings.hrc:107
+#: sc/inc/strings.hrc:106
 msgctxt "STR_ACC_FOOTER_NAME"
 msgid "Footer of page %1"
 msgstr "Fótur síðu %1"
 
 #. 9T4c8
-#: sc/inc/strings.hrc:108
+#: sc/inc/strings.hrc:107
 msgctxt "STR_ACC_EDITLINE_NAME"
 msgid "Input line"
 msgstr "Inntakslína"
 
 #. ejFak
-#: sc/inc/strings.hrc:109
+#: sc/inc/strings.hrc:108
 msgctxt "STR_ACC_EDITLINE_DESCR"
 msgid "This is where you enter or edit text, numbers and formulas."
 msgstr "Þetta er þar sem þú setur inn tölur, texta og formúlur."
 
 #. XX585
-#: sc/inc/strings.hrc:110
+#: sc/inc/strings.hrc:109
 msgctxt "SCSTR_MEDIASHELL"
 msgid "Media Playback"
 msgstr "Afspilun"
 
 #. SuAaA
-#: sc/inc/strings.hrc:111
+#: sc/inc/strings.hrc:110
 msgctxt "RID_SCSTR_ONCLICK"
 msgid "Mouse button pressed"
 msgstr "Ýtt á músahnapp"
 
 #. 4prfv
-#: sc/inc/strings.hrc:112
+#: sc/inc/strings.hrc:111
 msgctxt "STR_ACC_TOOLBAR_FORMULA"
 msgid "Formula Tool Bar"
 msgstr "Formúluslá"
 
 #. nAcNZ
-#: sc/inc/strings.hrc:113
+#: sc/inc/strings.hrc:112
 msgctxt "STR_ACC_DOC_SPREADSHEET"
 msgid "%PRODUCTNAME Spreadsheets"
 msgstr "%PRODUCTNAME töflureikniskjöl"
 
 #. 8UMap
-#: sc/inc/strings.hrc:114
+#: sc/inc/strings.hrc:113
 msgctxt "STR_ACC_DOC_SPREADSHEET_READONLY"
 msgid "(read-only)"
 msgstr "(skrifvarið)"
 
 #. fDxgL
-#: sc/inc/strings.hrc:115
+#: sc/inc/strings.hrc:114
 msgctxt "STR_ACC_DOC_PREVIEW_SUFFIX"
 msgid "(Preview mode)"
 msgstr "(Forskoðunarhamur)"
 
 #. ZwiH6
-#: sc/inc/strings.hrc:116
+#: sc/inc/strings.hrc:115
 msgctxt "SCSTR_PRINTOPT_PAGES"
 msgid "Pages:"
 msgstr "Síður:"
 
 #. FYjDY
-#: sc/inc/strings.hrc:117
+#: sc/inc/strings.hrc:116
 msgctxt "SCSTR_PRINTOPT_SUPPRESSEMPTY"
 msgid "~Suppress output of empty pages"
 msgstr "Ekki prenta auðar ~síður"
 
 #. GQNVf
-#: sc/inc/strings.hrc:118
+#: sc/inc/strings.hrc:117
 msgctxt "SCSTR_PRINTOPT_ALLSHEETS"
 msgid "Print All Sheets"
 msgstr "Prenta öll blöð"
 
 #. xcKcm
-#: sc/inc/strings.hrc:119
+#: sc/inc/strings.hrc:118
 msgctxt "SCSTR_PRINTOPT_SELECTEDSHEETS"
 msgid "Print Selected Sheets"
 msgstr "Prenta valin blöð"
 
 #. e7kTj
-#: sc/inc/strings.hrc:120
+#: sc/inc/strings.hrc:119
 msgctxt "SCSTR_PRINTOPT_SELECTEDCELLS"
 msgid "Print Selected Cells"
 msgstr "Prenta valda reiti"
 
 #. z4DB6
-#: sc/inc/strings.hrc:121
+#: sc/inc/strings.hrc:120
 msgctxt "SCSTR_PRINTOPT_FROMWHICH"
 msgid "From which:"
 msgstr "Hvað á að prenta:"
 
 #. v5EK2
-#: sc/inc/strings.hrc:122
+#: sc/inc/strings.hrc:121
 msgctxt "SCSTR_PRINTOPT_PRINTALLPAGES"
 msgid "All ~Pages"
 msgstr "A~llar síður"
 
 #. cvNuW
-#: sc/inc/strings.hrc:123
+#: sc/inc/strings.hrc:122
 msgctxt "SCSTR_PRINTOPT_PRINTPAGES"
 msgid "Pa~ges:"
 msgstr "Síð~ur:"
 
 #. Pw9Pu
-#: sc/inc/strings.hrc:124
+#: sc/inc/strings.hrc:123
 msgctxt "SCSTR_PRINTOPT_PRODNAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 4BEKq
-#: sc/inc/strings.hrc:125
+#: sc/inc/strings.hrc:124
 msgctxt "SCSTR_DDEDOC_NOT_LOADED"
 msgid "The following DDE source could not be updated possibly because the source document was not open. Please launch the source document and try again."
 msgstr ""
 
 #. kGmko
-#: sc/inc/strings.hrc:126
+#: sc/inc/strings.hrc:125
 msgctxt "SCSTR_EXTDOC_NOT_LOADED"
 msgid "The following external file could not be loaded. Data linked from this file did not get updated."
 msgstr "Ekki var hægt að hlaða inn eftirfarandi ytri skrá. Tengd gögn úr þessari skrá voru ekki uppfærð."
 
 #. BvtFc
-#: sc/inc/strings.hrc:127
+#: sc/inc/strings.hrc:126
 msgctxt "SCSTR_UPDATE_EXTDOCS"
 msgid "Updating external links."
 msgstr "Uppfæri utanaðkomandi tengla."
 
 #. MACSv
-#: sc/inc/strings.hrc:128
+#: sc/inc/strings.hrc:127
 msgctxt "SCSTR_FORMULA_SYNTAX_CALC_A1"
 msgid "Calc A1"
 msgstr "Calc A1"
 
 #. xEQCB
-#: sc/inc/strings.hrc:129
+#: sc/inc/strings.hrc:128
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_A1"
 msgid "Excel A1"
 msgstr "Excel A1"
 
 #. KLkBH
-#: sc/inc/strings.hrc:130
+#: sc/inc/strings.hrc:129
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_R1C1"
 msgid "Excel R1C1"
 msgstr "Excel R1C1"
 
 #. pr4wW
-#: sc/inc/strings.hrc:131
+#: sc/inc/strings.hrc:130
 msgctxt "SCSTR_COL_LABEL"
 msgid "Range contains column la~bels"
 msgstr "Svið inniheldur ~dálkaheiti"
 
 #. mJyFP
-#: sc/inc/strings.hrc:132
+#: sc/inc/strings.hrc:131
 msgctxt "SCSTR_ROW_LABEL"
 msgid "Range contains ~row labels"
 msgstr "Svið inniheldur ~raðaheiti"
 
 #. ujjcx
-#: sc/inc/strings.hrc:133
+#: sc/inc/strings.hrc:132
 msgctxt "SCSTR_VALERR"
 msgid "Invalid value"
 msgstr "Ógilt gildi"
 
 #. SoLXN
-#: sc/inc/strings.hrc:134
+#: sc/inc/strings.hrc:133
 msgctxt "STR_NOFORMULASPECIFIED"
 msgid "No formula specified."
 msgstr "Engin formúla er tilgreind."
 
 #. YFnCS
-#: sc/inc/strings.hrc:135
+#: sc/inc/strings.hrc:134
 msgctxt "STR_NOCOLROW"
 msgid "Neither row or column specified."
 msgstr "Hvorki röð né dálkur eru tilgreind."
 
 #. 6YQh2
-#: sc/inc/strings.hrc:136
+#: sc/inc/strings.hrc:135
 msgctxt "STR_WRONGFORMULA"
 msgid "Undefined name or range."
 msgstr "Óskilgreint heiti eða svæði."
 
 #. 4aHCG
-#: sc/inc/strings.hrc:137
+#: sc/inc/strings.hrc:136
 msgctxt "STR_WRONGROWCOL"
 msgid "Undefined name or wrong cell reference."
 msgstr "Óskilgreint heiti eða röng vísun í reit."
 
 #. G8KPr
-#: sc/inc/strings.hrc:138
+#: sc/inc/strings.hrc:137
 msgctxt "STR_NOCOLFORMULA"
 msgid "Formulas don't form a column."
 msgstr "Formúlur mynda ekki dálk."
 
 #. uSxCb
-#: sc/inc/strings.hrc:139
+#: sc/inc/strings.hrc:138
 msgctxt "STR_NOROWFORMULA"
 msgid "Formulas don't form a row."
 msgstr "Formúlur mynda ekki röð."
 
 #. PknB5
-#: sc/inc/strings.hrc:140
+#: sc/inc/strings.hrc:139
 msgctxt "STR_ADD_AUTOFORMAT_TITLE"
 msgid "Add AutoFormat"
 msgstr "Bæta við sjálfvirku sniði"
 
 #. 7KuSQ
-#: sc/inc/strings.hrc:141
+#: sc/inc/strings.hrc:140
 msgctxt "STR_RENAME_AUTOFORMAT_TITLE"
 msgid "Rename AutoFormat"
 msgstr "Endurnefna sjálfvirkt snið"
 
 #. hqtgD
-#: sc/inc/strings.hrc:142
+#: sc/inc/strings.hrc:141
 msgctxt "STR_ADD_AUTOFORMAT_LABEL"
 msgid "Name"
 msgstr "Heiti"
 
 #. L9jQU
-#: sc/inc/strings.hrc:143
+#: sc/inc/strings.hrc:142
 msgctxt "STR_DEL_AUTOFORMAT_TITLE"
 msgid "Delete AutoFormat"
 msgstr "Eyða sjálfvirku sniði"
 
 #. KCDoJ
-#: sc/inc/strings.hrc:144
+#: sc/inc/strings.hrc:143
 msgctxt "STR_DEL_AUTOFORMAT_MSG"
 msgid "Do you really want to delete the # AutoFormat?"
 msgstr "Viltu í alvörunni eyða sjálfvirku sniði #?"
 
 #. GDdL3
-#: sc/inc/strings.hrc:145
+#: sc/inc/strings.hrc:144
 msgctxt "STR_BTN_AUTOFORMAT_CLOSE"
 msgid "~Close"
 msgstr "~Loka"
 
 #. DAuNm
-#: sc/inc/strings.hrc:146
+#: sc/inc/strings.hrc:145
 msgctxt "STR_JAN"
 msgid "Jan"
 msgstr "Jan"
 
 #. WWzNg
-#: sc/inc/strings.hrc:147
+#: sc/inc/strings.hrc:146
 msgctxt "STR_FEB"
 msgid "Feb"
 msgstr "Feb"
 
 #. CCC3U
-#: sc/inc/strings.hrc:148
+#: sc/inc/strings.hrc:147
 msgctxt "STR_MAR"
 msgid "Mar"
 msgstr "Mar"
 
 #. cr7Jq
-#: sc/inc/strings.hrc:149
+#: sc/inc/strings.hrc:148
 msgctxt "STR_NORTH"
 msgid "North"
 msgstr "Norður"
 
 #. wHYPw
-#: sc/inc/strings.hrc:150
+#: sc/inc/strings.hrc:149
 msgctxt "STR_MID"
 msgid "Mid"
 msgstr "Mið"
 
 #. sxDHC
-#: sc/inc/strings.hrc:151
+#: sc/inc/strings.hrc:150
 msgctxt "STR_SOUTH"
 msgid "South"
 msgstr "Suður"
 
 #. CWcdp
-#: sc/inc/strings.hrc:152
+#: sc/inc/strings.hrc:151
 msgctxt "STR_SUM"
 msgid "Total"
 msgstr "Samtals"
 
 #. MMCxb
-#: sc/inc/strings.hrc:153
+#: sc/inc/strings.hrc:152
 msgctxt "SCSTR_UNDO_PAGE_ANCHOR"
 msgid "Page Anchor"
 msgstr "Festipunktur síðu"
 
 #. fFFQ8
-#: sc/inc/strings.hrc:154
+#: sc/inc/strings.hrc:153
 msgctxt "SCSTR_UNDO_CELL_ANCHOR"
 msgid "Cell Anchor"
 msgstr "Festipunktur reits"
 
 #. rTGKc
-#: sc/inc/strings.hrc:155
+#: sc/inc/strings.hrc:154
 msgctxt "SCSTR_CONDITION"
 msgid "Condition "
 msgstr "Skilyrði "
 
 #. 56Wmj
 #. content description strings are also use        d in ScLinkTargetsObj
-#: sc/inc/strings.hrc:158
+#: sc/inc/strings.hrc:157
 msgctxt "SCSTR_CONTENT_ROOT"
 msgid "Contents"
 msgstr "Innihald"
 
 #. wLN3J
-#: sc/inc/strings.hrc:159
+#: sc/inc/strings.hrc:158
 msgctxt "SCSTR_CONTENT_TABLE"
 msgid "Sheets"
 msgstr "Blöð"
 
 #. 3ZhJn
-#: sc/inc/strings.hrc:160
+#: sc/inc/strings.hrc:159
 msgctxt "SCSTR_CONTENT_RANGENAME"
 msgid "Range names"
 msgstr "Heiti sviða"
 
 #. jjQeD
-#: sc/inc/strings.hrc:161
+#: sc/inc/strings.hrc:160
 msgctxt "SCSTR_CONTENT_DBAREA"
 msgid "Database ranges"
 msgstr "Gagnagrunnssvið"
 
 #. kbHfD
-#: sc/inc/strings.hrc:162
+#: sc/inc/strings.hrc:161
 msgctxt "SCSTR_CONTENT_GRAPHIC"
 msgid "Images"
 msgstr "Myndir"
 
 #. 3imVs
-#: sc/inc/strings.hrc:163
+#: sc/inc/strings.hrc:162
 msgctxt "SCSTR_CONTENT_OLEOBJECT"
 msgid "OLE objects"
 msgstr "OLE hlutir"
 
 #. T28Cj
-#: sc/inc/strings.hrc:164
+#: sc/inc/strings.hrc:163
 msgctxt "SCSTR_CONTENT_NOTE"
 msgid "Comments"
 msgstr "Athugasemdir"
 
 #. 5UcFo
-#: sc/inc/strings.hrc:165
+#: sc/inc/strings.hrc:164
 msgctxt "SCSTR_CONTENT_AREALINK"
 msgid "Linked areas"
 msgstr "Tengd svæði"
 
 #. HzVgF
-#: sc/inc/strings.hrc:166
+#: sc/inc/strings.hrc:165
 msgctxt "SCSTR_CONTENT_DRAWING"
 msgid "Drawing objects"
 msgstr "Teikna hluti"
 
 #. sCafb
-#: sc/inc/strings.hrc:167
+#: sc/inc/strings.hrc:166
 msgctxt "SCSTR_ACTIVE"
 msgid "active"
 msgstr "virkt"
 
 #. q6EmB
-#: sc/inc/strings.hrc:168
+#: sc/inc/strings.hrc:167
 msgctxt "SCSTR_NOTACTIVE"
 msgid "inactive"
 msgstr "óvirkt"
 
 #. Gr6xn
-#: sc/inc/strings.hrc:169
+#: sc/inc/strings.hrc:168
 msgctxt "SCSTR_HIDDEN"
 msgid "hidden"
 msgstr "falið"
 
 #. vnwQr
-#: sc/inc/strings.hrc:170
+#: sc/inc/strings.hrc:169
 msgctxt "SCSTR_ACTIVEWIN"
 msgid "Active Window"
 msgstr "Virkur gluggi"
 
 #. yo3cD
-#: sc/inc/strings.hrc:171
+#: sc/inc/strings.hrc:170
 msgctxt "SCSTR_QHLP_SCEN_LISTBOX"
 msgid "Scenario Name"
 msgstr "Heiti atburðarásar"
 
 #. oWz3B
-#: sc/inc/strings.hrc:172
+#: sc/inc/strings.hrc:171
 msgctxt "SCSTR_QHLP_SCEN_COMMENT"
 msgid "Comment"
 msgstr "Athugasemd"
 
 #. tNLKD
-#: sc/inc/strings.hrc:174
+#: sc/inc/strings.hrc:173
 msgctxt "STR_MENU_SORT_ASC"
 msgid "Sort Ascending"
 msgstr "Raða vaxandi"
 
 #. S6kbN
-#: sc/inc/strings.hrc:175
+#: sc/inc/strings.hrc:174
 msgctxt "STR_MENU_SORT_DESC"
 msgid "Sort Descending"
 msgstr "Raða minnkandi"
 
 #. BDYHo
-#: sc/inc/strings.hrc:176
+#: sc/inc/strings.hrc:175
 msgctxt "STR_MENU_SORT_CUSTOM"
 msgid "Custom Sort"
 msgstr "Sérsniðin röðun"
 
 #. bpBbA
-#: sc/inc/strings.hrc:178
+#: sc/inc/strings.hrc:177
 msgctxt "SCSTR_QHELP_POSWND"
 msgid "Name Box"
 msgstr "Reitur fyrir heiti"
 
 #. GeNTF
-#: sc/inc/strings.hrc:179
+#: sc/inc/strings.hrc:178
 msgctxt "SCSTR_QHELP_INPUTWND"
 msgid "Input line"
 msgstr "Inntakslína"
 
 #. E6mnF
-#: sc/inc/strings.hrc:180
+#: sc/inc/strings.hrc:179
 msgctxt "SCSTR_QHELP_BTNCALC"
 msgid "Function Wizard"
 msgstr "Fallagerðarpúki"
 
 #. rU6xA
-#: sc/inc/strings.hrc:181
+#: sc/inc/strings.hrc:180
 msgctxt "SCSTR_QHELP_BTNOK"
 msgid "Accept"
 msgstr "Samþykkja"
 
 #. NC6DB
-#: sc/inc/strings.hrc:182
+#: sc/inc/strings.hrc:181
 msgctxt "SCSTR_QHELP_BTNCANCEL"
 msgid "Cancel"
 msgstr "Hætta við"
 
 #. 9JUCF
-#: sc/inc/strings.hrc:183
+#: sc/inc/strings.hrc:182
 msgctxt "SCSTR_QHELP_BTNSUM"
 msgid "Select Function"
 msgstr "Veldu fall"
 
 #. kFqE4
-#: sc/inc/strings.hrc:184
+#: sc/inc/strings.hrc:183
 msgctxt "SCSTR_QHELP_BTNEQUAL"
 msgid "Formula"
 msgstr "Formúla"
 
 #. dPqKq
-#: sc/inc/strings.hrc:185
+#: sc/inc/strings.hrc:184
 msgctxt "SCSTR_QHELP_EXPAND_FORMULA"
 msgid "Expand Formula Bar"
 msgstr "Þenja út formúluslá"
 
 #. ENx2Q
-#: sc/inc/strings.hrc:186
+#: sc/inc/strings.hrc:185
 msgctxt "SCSTR_QHELP_COLLAPSE_FORMULA"
 msgid "Collapse Formula Bar"
 msgstr "Fella saman formúluslá"
 
 #. nSD8r
-#: sc/inc/strings.hrc:188
+#: sc/inc/strings.hrc:187
 msgctxt "STR_UNKNOWN_USER_CONFLICT"
 msgid "Unknown User"
 msgstr "Óþekktur notandi"
 
 #. HDiei
-#: sc/inc/strings.hrc:190
+#: sc/inc/strings.hrc:189
 msgctxt "STR_CHG_INSERT_COLS"
 msgid "Column inserted"
 msgstr "Dálkur settur inn"
 
 #. brecA
-#: sc/inc/strings.hrc:191
+#: sc/inc/strings.hrc:190
 msgctxt "STR_CHG_INSERT_ROWS"
 msgid "Row inserted "
 msgstr "Röð sett inn "
 
 #. nBf8B
-#: sc/inc/strings.hrc:192
+#: sc/inc/strings.hrc:191
 msgctxt "STR_CHG_INSERT_TABS"
 msgid "Sheet inserted "
 msgstr "Blað sett inn "
 
 #. Td8iF
-#: sc/inc/strings.hrc:193
+#: sc/inc/strings.hrc:192
 msgctxt "STR_CHG_DELETE_COLS"
 msgid "Column deleted"
 msgstr "Dálki eytt"
 
 #. 8Kopo
-#: sc/inc/strings.hrc:194
+#: sc/inc/strings.hrc:193
 msgctxt "STR_CHG_DELETE_ROWS"
 msgid "Row deleted"
 msgstr "Röð eytt"
 
 #. DynWz
-#: sc/inc/strings.hrc:195
+#: sc/inc/strings.hrc:194
 msgctxt "STR_CHG_DELETE_TABS"
 msgid "Sheet deleted"
 msgstr "Blaði eytt"
 
 #. 6f9S9
-#: sc/inc/strings.hrc:196
+#: sc/inc/strings.hrc:195
 msgctxt "STR_CHG_MOVE"
 msgid "Range moved"
 msgstr "Svið fært"
 
 #. UpHkf
-#: sc/inc/strings.hrc:197
+#: sc/inc/strings.hrc:196
 msgctxt "STR_CHG_CONTENT"
 msgid "Changed contents"
 msgstr "Breytt innihald"
 
 #. cefNw
-#: sc/inc/strings.hrc:198
+#: sc/inc/strings.hrc:197
 msgctxt "STR_CHG_CONTENT_WITH_CHILD"
 msgid "Changed contents"
 msgstr "Breytt innihald"
 
 #. DcsSq
-#: sc/inc/strings.hrc:199
+#: sc/inc/strings.hrc:198
 msgctxt "STR_CHG_CHILD_CONTENT"
 msgid "Changed to "
 msgstr "Breyta í "
 
 #. naPuN
-#: sc/inc/strings.hrc:200
+#: sc/inc/strings.hrc:199
 msgctxt "STR_CHG_CHILD_ORGCONTENT"
 msgid "Original"
 msgstr "Upprunalegt"
 
 #. cbtSw
-#: sc/inc/strings.hrc:201
+#: sc/inc/strings.hrc:200
 msgctxt "STR_CHG_REJECT"
 msgid "Changes rejected"
 msgstr "Breytingum hafnað"
 
 #. rGkvk
-#: sc/inc/strings.hrc:202
+#: sc/inc/strings.hrc:201
 msgctxt "STR_CHG_ACCEPTED"
 msgid "Accepted"
 msgstr "Samþykkt"
 
 #. FRREF
-#: sc/inc/strings.hrc:203
+#: sc/inc/strings.hrc:202
 msgctxt "STR_CHG_REJECTED"
 msgid "Rejected"
 msgstr "Hafnað"
 
 #. bG7Pb
-#: sc/inc/strings.hrc:204
+#: sc/inc/strings.hrc:203
 msgctxt "STR_CHG_NO_ENTRY"
 msgid "No Entry"
 msgstr "Engin færsla"
 
 #. i2doZ
-#: sc/inc/strings.hrc:205
+#: sc/inc/strings.hrc:204
 msgctxt "STR_CHG_EMPTY"
 msgid "<empty>"
 msgstr "<tómt>"
 
 #. dAt5Q
-#: sc/inc/strings.hrc:207
+#: sc/inc/strings.hrc:206
 msgctxt "STR_NOT_PROTECTED"
 msgid "Not protected"
 msgstr "Ekki varið"
 
 #. 3TDDs
-#: sc/inc/strings.hrc:208
+#: sc/inc/strings.hrc:207
 msgctxt "STR_NOT_PASS_PROTECTED"
 msgid "Not password-protected"
 msgstr "Ekki varið af lykilorði"
 
 #. qBe6G
-#: sc/inc/strings.hrc:209
+#: sc/inc/strings.hrc:208
 msgctxt "STR_HASH_BAD"
 msgid "Hash incompatible"
 msgstr "Dulritunargildi (hash) er ekki samsvarandi"
 
 #. XoAEE
-#: sc/inc/strings.hrc:210
+#: sc/inc/strings.hrc:209
 msgctxt "STR_HASH_GOOD"
 msgid "Hash compatible"
 msgstr "Dulritunargildi (hash) er samsvarandi"
 
 #. MHDYB
-#: sc/inc/strings.hrc:211
+#: sc/inc/strings.hrc:210
 msgctxt "STR_RETYPE"
 msgid "Re-type"
 msgstr "Slá inn aftur"
 
 #. bFjd9
 #. MovingAverageDialog
-#: sc/inc/strings.hrc:214
+#: sc/inc/strings.hrc:213
 msgctxt "STR_MOVING_AVERAGE_UNDO_NAME"
 msgid "Moving Average"
 msgstr "Hlaupandi meðaltal"
 
 #. ZUkPQ
 #. ExponentialSmoothingDialog
-#: sc/inc/strings.hrc:216
+#: sc/inc/strings.hrc:215
 msgctxt "STR_EXPONENTIAL_SMOOTHING_UNDO_NAME"
 msgid "Exponential Smoothing"
 msgstr "Veldisjöfnun"
 
 #. LAfqT
 #. AnalysisOfVarianceDialog
-#: sc/inc/strings.hrc:218
+#: sc/inc/strings.hrc:217
 msgctxt "STR_ANALYSIS_OF_VARIANCE_UNDO_NAME"
 msgid "Analysis of Variance"
 msgstr "Greining breytileika (ANOVA"
 
 #. 8v4W5
-#: sc/inc/strings.hrc:219
+#: sc/inc/strings.hrc:218
 msgctxt "STR_LABEL_ANOVA"
 msgid "Analysis of Variance (ANOVA)"
 msgstr "Greining breytileika (ANOVA)"
 
 #. NY8WD
-#: sc/inc/strings.hrc:220
+#: sc/inc/strings.hrc:219
 msgctxt "STR_ANOVA_SINGLE_FACTOR_LABEL"
 msgid "ANOVA - Single Factor"
 msgstr "ANOVA - Einn stuðull"
 
 #. AFnEZ
-#: sc/inc/strings.hrc:221
+#: sc/inc/strings.hrc:220
 msgctxt "STR_ANOVA_TWO_FACTOR_LABEL"
 msgid "ANOVA - Two Factor"
 msgstr "ANOVA - Tveir stuðlar"
 
 #. hBPGD
-#: sc/inc/strings.hrc:222
+#: sc/inc/strings.hrc:221
 msgctxt "STR_ANOVA_LABEL_GROUPS"
 msgid "Groups"
 msgstr "Hópar"
 
 #. DiUWy
-#: sc/inc/strings.hrc:223
+#: sc/inc/strings.hrc:222
 msgctxt "STR_ANOVA_LABEL_BETWEEN_GROUPS"
 msgid "Between Groups"
 msgstr "Milli hópa"
 
 #. fBh3S
-#: sc/inc/strings.hrc:224
+#: sc/inc/strings.hrc:223
 msgctxt "STR_ANOVA_LABEL_WITHIN_GROUPS"
 msgid "Within Groups"
 msgstr "Innan hópa"
 
 #. DFcw4
-#: sc/inc/strings.hrc:225
+#: sc/inc/strings.hrc:224
 msgctxt "STR_ANOVA_LABEL_SOURCE_OF_VARIATION"
 msgid "Source of Variation"
 msgstr "Uppruni breytileika"
 
 #. KYbb8
-#: sc/inc/strings.hrc:226
+#: sc/inc/strings.hrc:225
 msgctxt "STR_ANOVA_LABEL_SS"
 msgid "SS"
 msgstr "SS"
 
 #. j7j6E
-#: sc/inc/strings.hrc:227
+#: sc/inc/strings.hrc:226
 msgctxt "STR_ANOVA_LABEL_DF"
 msgid "df"
 msgstr "df"
 
 #. 6QJED
-#: sc/inc/strings.hrc:228
+#: sc/inc/strings.hrc:227
 msgctxt "STR_ANOVA_LABEL_MS"
 msgid "MS"
 msgstr "MS"
 
 #. JcWo9
-#: sc/inc/strings.hrc:229
+#: sc/inc/strings.hrc:228
 msgctxt "STR_ANOVA_LABEL_F"
 msgid "F"
 msgstr "F"
 
 #. a43mP
-#: sc/inc/strings.hrc:230
+#: sc/inc/strings.hrc:229
 msgctxt "STR_ANOVA_LABEL_SIGNIFICANCE_F"
 msgid "Significance F"
 msgstr "Marktækni F"
 
 #. MMmsS
-#: sc/inc/strings.hrc:231
+#: sc/inc/strings.hrc:230
 msgctxt "STR_ANOVA_LABEL_P_VALUE"
 msgid "P-value"
 msgstr "P-gildi"
 
 #. UoaCS
-#: sc/inc/strings.hrc:232
+#: sc/inc/strings.hrc:231
 msgctxt "STR_ANOVA_LABEL_F_CRITICAL"
 msgid "F critical"
 msgstr "F krítískt"
 
 #. oJD9H
-#: sc/inc/strings.hrc:233
+#: sc/inc/strings.hrc:232
 msgctxt "STR_ANOVA_LABEL_TOTAL"
 msgid "Total"
 msgstr "Samtals"
 
 #. kvSFC
 #. CorrelationDialog
-#: sc/inc/strings.hrc:235
+#: sc/inc/strings.hrc:234
 msgctxt "STR_CORRELATION_UNDO_NAME"
 msgid "Correlation"
 msgstr "Fylgni"
 
 #. WC4SJ
-#: sc/inc/strings.hrc:236
+#: sc/inc/strings.hrc:235
 msgctxt "STR_CORRELATION_LABEL"
 msgid "Correlations"
 msgstr "Fylgnir"
 
 #. AAb7T
 #. CovarianceDialog
-#: sc/inc/strings.hrc:238
+#: sc/inc/strings.hrc:237
 msgctxt "STR_COVARIANCE_UNDO_NAME"
 msgid "Covariance"
 msgstr "Samfylgni"
 
 #. VyxUL
-#: sc/inc/strings.hrc:239
+#: sc/inc/strings.hrc:238
 msgctxt "STR_COVARIANCE_LABEL"
 msgid "Covariances"
 msgstr "Samfylgnir"
 
 #. 8gmqu
 #. DescriptiveStatisticsDialog
-#: sc/inc/strings.hrc:241
+#: sc/inc/strings.hrc:240
 msgctxt "STR_DESCRIPTIVE_STATISTICS_UNDO_NAME"
 msgid "Descriptive Statistics"
 msgstr "Lýsandi tölfræði"
 
 #. FGXC5
-#: sc/inc/strings.hrc:242
+#: sc/inc/strings.hrc:241
 msgctxt "STRID_CALC_MEAN"
 msgid "Mean"
 msgstr "Meðaltal"
 
 #. 2sHVR
-#: sc/inc/strings.hrc:243
+#: sc/inc/strings.hrc:242
 msgctxt "STRID_CALC_STD_ERROR"
 msgid "Standard Error"
 msgstr "Staðalvilla"
 
 #. KrDBB
-#: sc/inc/strings.hrc:244
+#: sc/inc/strings.hrc:243
 msgctxt "STRID_CALC_MODE"
 msgid "Mode"
 msgstr "Hamur"
 
 #. AAbEo
-#: sc/inc/strings.hrc:245
+#: sc/inc/strings.hrc:244
 msgctxt "STRID_CALC_MEDIAN"
 msgid "Median"
 msgstr "Miðgildi"
 
 #. h2HaP
-#: sc/inc/strings.hrc:246
+#: sc/inc/strings.hrc:245
 msgctxt "STRID_CALC_VARIANCE"
 msgid "Variance"
 msgstr "Breytileiki"
 
 #. 3uYMC
-#: sc/inc/strings.hrc:247
+#: sc/inc/strings.hrc:246
 msgctxt "STRID_CALC_STD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Staðalfrávik"
 
 #. JTx7f
-#: sc/inc/strings.hrc:248
+#: sc/inc/strings.hrc:247
 msgctxt "STRID_CALC_KURTOSIS"
 msgid "Kurtosis"
 msgstr "Ferilris"
 
 #. EXJJt
-#: sc/inc/strings.hrc:249
+#: sc/inc/strings.hrc:248
 msgctxt "STRID_CALC_SKEWNESS"
 msgid "Skewness"
 msgstr "Skeifni"
 
 #. HkRYo
-#: sc/inc/strings.hrc:250
+#: sc/inc/strings.hrc:249
 msgctxt "STRID_CALC_RANGE"
 msgid "Range"
 msgstr "Svið"
 
 #. LHk8p
-#: sc/inc/strings.hrc:251
+#: sc/inc/strings.hrc:250
 msgctxt "STRID_CALC_MIN"
 msgid "Minimum"
 msgstr "Lágmark"
 
 #. LtMJs
-#: sc/inc/strings.hrc:252
+#: sc/inc/strings.hrc:251
 msgctxt "STRID_CALC_MAX"
 msgid "Maximum"
 msgstr "Hámark"
 
 #. Q5r5c
-#: sc/inc/strings.hrc:253
+#: sc/inc/strings.hrc:252
 msgctxt "STRID_CALC_SUM"
 msgid "Sum"
 msgstr "Summa"
 
 #. s8K23
-#: sc/inc/strings.hrc:254
+#: sc/inc/strings.hrc:253
 msgctxt "STRID_CALC_COUNT"
 msgid "Count"
 msgstr "Fjöldi"
 
 #. pU8QG
-#: sc/inc/strings.hrc:255
+#: sc/inc/strings.hrc:254
 msgctxt "STRID_CALC_FIRST_QUARTILE"
 msgid "First Quartile"
 msgstr "Fyrsta fjórðungsmark"
 
 #. PGXzY
-#: sc/inc/strings.hrc:256
+#: sc/inc/strings.hrc:255
 msgctxt "STRID_CALC_THIRD_QUARTILE"
 msgid "Third Quartile"
 msgstr "Þriðja fjórðungsmark"
 
 #. gABRP
 #. RandomNumberGeneratorDialog
-#: sc/inc/strings.hrc:258
+#: sc/inc/strings.hrc:257
 msgctxt "STR_UNDO_DISTRIBUTION_TEMPLATE"
 msgid "Random ($(DISTRIBUTION))"
 msgstr "Slembið ($(DISTRIBUTION))"
 
 #. A8Rc9
-#: sc/inc/strings.hrc:259
+#: sc/inc/strings.hrc:258
 msgctxt "STR_DISTRIBUTION_UNIFORM_REAL"
 msgid "Uniform"
 msgstr "Einsleitt"
 
 #. 9ke8L
-#: sc/inc/strings.hrc:260
+#: sc/inc/strings.hrc:259
 msgctxt "STR_DISTRIBUTION_UNIFORM_INTEGER"
 msgid "Uniform Integer"
 msgstr "Einsleit heiltala"
 
 #. GC2LH
-#: sc/inc/strings.hrc:261
+#: sc/inc/strings.hrc:260
 msgctxt "STR_DISTRIBUTION_NORMAL"
 msgid "Normal"
 msgstr "Venjulegt"
 
 #. XjQ2x
-#: sc/inc/strings.hrc:262
+#: sc/inc/strings.hrc:261
 msgctxt "STR_DISTRIBUTION_CAUCHY"
 msgid "Cauchy"
 msgstr "Cauchy"
 
 #. G5CqB
-#: sc/inc/strings.hrc:263
+#: sc/inc/strings.hrc:262
 msgctxt "STR_DISTRIBUTION_BERNOULLI"
 msgid "Bernoulli"
 msgstr "Bernoulli"
 
 #. GpJUB
-#: sc/inc/strings.hrc:264
+#: sc/inc/strings.hrc:263
 msgctxt "STR_DISTRIBUTION_BINOMIAL"
 msgid "Binomial"
 msgstr "Tvíliða"
 
 #. 6yJKm
-#: sc/inc/strings.hrc:265
+#: sc/inc/strings.hrc:264
 msgctxt "STR_DISTRIBUTION_NEGATIVE_BINOMIAL"
 msgid "Negative Binomial"
 msgstr "Neikvæð tvíliða"
 
 #. zzpmN
-#: sc/inc/strings.hrc:266
+#: sc/inc/strings.hrc:265
 msgctxt "STR_DISTRIBUTION_CHI_SQUARED"
 msgid "Chi Squared"
 msgstr "Chi í öðru veldi"
 
 #. NGBzX
-#: sc/inc/strings.hrc:267
+#: sc/inc/strings.hrc:266
 msgctxt "STR_DISTRIBUTION_GEOMETRIC"
 msgid "Geometric"
 msgstr "Rúmfræðilegt"
 
 #. BNZPE
-#: sc/inc/strings.hrc:268
+#: sc/inc/strings.hrc:267
 msgctxt "STR_RNG_PARAMETER_MINIMUM"
 msgid "Minimum"
 msgstr "Lágmark"
 
 #. EThhi
-#: sc/inc/strings.hrc:269
+#: sc/inc/strings.hrc:268
 msgctxt "STR_RNG_PARAMETER_MAXIMUM"
 msgid "Maximum"
 msgstr "Hámark"
 
 #. RPYEG
-#: sc/inc/strings.hrc:270
+#: sc/inc/strings.hrc:269
 msgctxt "STR_RNG_PARAMETER_MEAN"
 msgid "Mean"
 msgstr "Meðaltal"
 
 #. VeqrX
-#: sc/inc/strings.hrc:271
+#: sc/inc/strings.hrc:270
 msgctxt "STR_RNG_PARAMETER_STANDARD_DEVIATION"
 msgid "Standard Deviation"
 msgstr "Staðalfrávik"
 
 #. ChwWE
-#: sc/inc/strings.hrc:272
+#: sc/inc/strings.hrc:271
 msgctxt "STR_RNG_PARAMETER_STANDARD_MEDIAN"
 msgid "Median"
 msgstr "Miðgildi"
 
 #. SzgEb
-#: sc/inc/strings.hrc:273
+#: sc/inc/strings.hrc:272
 msgctxt "STR_RNG_PARAMETER_STANDARD_SIGMA"
 msgid "Sigma"
 msgstr "Sigma"
 
 #. 94TBK
-#: sc/inc/strings.hrc:274
+#: sc/inc/strings.hrc:273
 msgctxt "STR_RNG_PARAMETER_STANDARD_PROBABILITY"
 msgid "p Value"
 msgstr "p-gildi"
 
 #. AfUsB
-#: sc/inc/strings.hrc:275
+#: sc/inc/strings.hrc:274
 msgctxt "STR_RNG_PARAMETER_STANDARD_NUMBER_OF_TRIALS"
 msgid "Number of Trials"
 msgstr "Fjöldi tilrauna"
 
 #. DdfR6
-#: sc/inc/strings.hrc:276
+#: sc/inc/strings.hrc:275
 msgctxt "STR_RNG_PARAMETER_STANDARD_NU_VALUE"
 msgid "nu Value"
 msgstr "nu-gildi"
 
 #. gygpC
 #. SamplingDialog
-#: sc/inc/strings.hrc:278
+#: sc/inc/strings.hrc:277
 msgctxt "STR_SAMPLING_UNDO_NAME"
 msgid "Sampling"
 msgstr "Söfnun"
 
 #. zLuBp
 #. Names of dialogs
-#: sc/inc/strings.hrc:280
+#: sc/inc/strings.hrc:279
 msgctxt "STR_FTEST"
 msgid "F-test"
 msgstr "F-próf"
 
 #. bQEfv
-#: sc/inc/strings.hrc:281
+#: sc/inc/strings.hrc:280
 msgctxt "STR_FTEST_UNDO_NAME"
 msgid "F-test"
 msgstr "F-próf"
 
 #. UdsVZ
-#: sc/inc/strings.hrc:282
+#: sc/inc/strings.hrc:281
 msgctxt "STR_TTEST"
 msgid "Paired t-test"
 msgstr "Parað t-próf"
 
 #. A7xTa
-#: sc/inc/strings.hrc:283
+#: sc/inc/strings.hrc:282
 msgctxt "STR_TTEST_UNDO_NAME"
 msgid "Paired t-test"
 msgstr "Parað t-próf"
 
 #. dWPSe
-#: sc/inc/strings.hrc:284
+#: sc/inc/strings.hrc:283
 msgctxt "STR_ZTEST"
 msgid "z-test"
 msgstr "z-próf"
 
 #. QvZ7V
-#: sc/inc/strings.hrc:285
+#: sc/inc/strings.hrc:284
 msgctxt "STR_ZTEST_UNDO_NAME"
 msgid "z-test"
 msgstr "z-próf"
 
 #. D6AqL
-#: sc/inc/strings.hrc:286
+#: sc/inc/strings.hrc:285
 msgctxt "STR_CHI_SQUARE_TEST"
 msgid "Test of Independence (Chi-Square)"
 msgstr "Kí-kvaðratdreifingarpróf (Chi-Square)"
 
 #. PvFSb
-#: sc/inc/strings.hrc:287
+#: sc/inc/strings.hrc:286
 msgctxt "STR_REGRESSION_UNDO_NAME"
 msgid "Regression"
 msgstr "Aðfallsgreining"
 
 #. NXrYh
-#: sc/inc/strings.hrc:288
+#: sc/inc/strings.hrc:287
 msgctxt "STR_REGRESSION"
 msgid "Regression"
 msgstr "Aðfallsgreining"
 
 #. AM5WV
-#: sc/inc/strings.hrc:289
+#: sc/inc/strings.hrc:288
 msgctxt "STR_FOURIER_ANALYSIS_UNDO_NAME"
 msgid "Fourier Analysis"
 msgstr "Fourier-greining"
 
 #. hd6yJ
-#: sc/inc/strings.hrc:290
+#: sc/inc/strings.hrc:289
 msgctxt "STR_FOURIER_ANALYSIS"
 msgid "Fourier Analysis"
 msgstr "Fourier-greining"
 
 #. KNJ5s
 #. Common
-#: sc/inc/strings.hrc:292
+#: sc/inc/strings.hrc:291
 msgctxt "STR_COLUMN_LABEL_TEMPLATE"
 msgid "Column %NUMBER%"
 msgstr "Dálkur %NUMBER%"
 
 #. aTAGd
-#: sc/inc/strings.hrc:293
+#: sc/inc/strings.hrc:292
 msgctxt "STR_ROW_LABEL_TEMPLATE"
 msgid "Row %NUMBER%"
 msgstr "Röð %NUMBER%"
 
 #. nAbaC
-#: sc/inc/strings.hrc:294
+#: sc/inc/strings.hrc:293
 msgctxt "STR_LABEL_ALPHA"
 msgid "Alpha"
 msgstr "Alfa"
 
 #. FZZCu
-#: sc/inc/strings.hrc:295
+#: sc/inc/strings.hrc:294
 msgctxt "STR_VARIABLE_1_LABEL"
 msgid "Variable 1"
 msgstr "Breyta 1"
 
 #. pnyaa
-#: sc/inc/strings.hrc:296
+#: sc/inc/strings.hrc:295
 msgctxt "STR_VARIABLE_2_LABEL"
 msgid "Variable 2"
 msgstr "Breyta 2"
 
 #. LU4CC
-#: sc/inc/strings.hrc:297
+#: sc/inc/strings.hrc:296
 msgctxt "STR_HYPOTHESIZED_MEAN_DIFFERENCE_LABEL"
 msgid "Hypothesized Mean Difference"
 msgstr "Tilgáta meðalmismunar (Hypothesized Mean Difference)"
 
 #. sCNt9
-#: sc/inc/strings.hrc:298
+#: sc/inc/strings.hrc:297
 msgctxt "STR_OBSERVATIONS_LABEL"
 msgid "Observations"
 msgstr "Athuganir"
 
 #. arX5v
-#: sc/inc/strings.hrc:299
+#: sc/inc/strings.hrc:298
 msgctxt "STR_OBSERVED_MEAN_DIFFERENCE_LABEL"
 msgid "Observed Mean Difference"
 msgstr "Sjáanlegur meðalmismunur"
 
 #. dr3Gt
-#: sc/inc/strings.hrc:300
+#: sc/inc/strings.hrc:299
 msgctxt "STR_LABEL_RSQUARED"
 msgid "R^2"
 msgstr "R^2"
 
 #. pnhCA
-#: sc/inc/strings.hrc:301
+#: sc/inc/strings.hrc:300
 msgctxt "STR_LABEL_ADJUSTED_RSQUARED"
 msgid "Adjusted R^2"
 msgstr "Aðlagað R^2"
 
 #. ACsNA
-#: sc/inc/strings.hrc:302
+#: sc/inc/strings.hrc:301
 msgctxt "STR_LABEL_XVARIABLES_COUNT"
 msgid "Count of X variables"
 msgstr "Fjöldi X-breyta"
 
 #. kEPsb
-#: sc/inc/strings.hrc:303
+#: sc/inc/strings.hrc:302
 msgctxt "STR_DEGREES_OF_FREEDOM_LABEL"
 msgid "df"
 msgstr "df"
 
 #. FYUYT
-#: sc/inc/strings.hrc:304
+#: sc/inc/strings.hrc:303
 msgctxt "STR_P_VALUE_LABEL"
 msgid "P-value"
 msgstr "P-gildi"
 
 #. S3BHc
-#: sc/inc/strings.hrc:305
+#: sc/inc/strings.hrc:304
 msgctxt "STR_CRITICAL_VALUE_LABEL"
 msgid "Critical Value"
 msgstr "Krítískt gildi"
 
 #. wgpT3
-#: sc/inc/strings.hrc:306
+#: sc/inc/strings.hrc:305
 msgctxt "STR_TEST_STATISTIC_LABEL"
 msgid "Test Statistic"
 msgstr "Tölfræði prófunar"
 
 #. kTwBX
-#: sc/inc/strings.hrc:307
+#: sc/inc/strings.hrc:306
 msgctxt "STR_LABEL_LOWER"
 msgid "Lower"
 msgstr "Neðri"
 
 #. GgFPs
-#: sc/inc/strings.hrc:308
+#: sc/inc/strings.hrc:307
 msgctxt "STR_LABEL_Upper"
 msgid "Upper"
 msgstr "Efri"
 
 #. hkXzo
-#: sc/inc/strings.hrc:309
+#: sc/inc/strings.hrc:308
 msgctxt "STR_MESSAGE_INVALID_INPUT_RANGE"
 msgid "Input range is invalid."
 msgstr "Inntakssvið er ógilt."
 
 #. rTFFF
-#: sc/inc/strings.hrc:310
+#: sc/inc/strings.hrc:309
 msgctxt "STR_MESSAGE_INVALID_OUTPUT_ADDR"
 msgid "Output address is not valid."
 msgstr "Úttaksvistfang er ekki gilt."
 
 #. rtSox
 #. RegressionDialog
-#: sc/inc/strings.hrc:312
+#: sc/inc/strings.hrc:311
 msgctxt "STR_LABEL_LINEAR"
 msgid "Linear"
 msgstr "Línulegt"
 
 #. kVG6g
-#: sc/inc/strings.hrc:313
+#: sc/inc/strings.hrc:312
 msgctxt "STR_LABEL_LOGARITHMIC"
 msgid "Logarithmic"
 msgstr "Lógaritmískt"
 
 #. wmyFW
-#: sc/inc/strings.hrc:314
+#: sc/inc/strings.hrc:313
 msgctxt "STR_LABEL_POWER"
 msgid "Power"
 msgstr "Veldi"
 
 #. GabFM
-#: sc/inc/strings.hrc:315
+#: sc/inc/strings.hrc:314
 msgctxt "STR_MESSAGE_XINVALID_RANGE"
 msgid "Independent variable(s) range is not valid."
 msgstr ""
 
 #. 8x8DM
-#: sc/inc/strings.hrc:316
+#: sc/inc/strings.hrc:315
 msgctxt "STR_MESSAGE_YINVALID_RANGE"
 msgid "Dependent variable(s) range is not valid."
 msgstr ""
 
 #. E7BD2
-#: sc/inc/strings.hrc:317
+#: sc/inc/strings.hrc:316
 msgctxt "STR_MESSAGE_INVALID_CONFIDENCE_LEVEL"
 msgid "Confidence level must be in the interval (0, 1)."
 msgstr "Stig áreiðanleika verður að vera á bilinu (0, 1)."
 
 #. ZdyQs
-#: sc/inc/strings.hrc:318
+#: sc/inc/strings.hrc:317
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_COLUMN"
 msgid "Y variable range cannot have more than 1 column."
 msgstr "Svið Y-breyta geta ekki verið með fleiri en 1 dálk."
 
 #. UpZqC
-#: sc/inc/strings.hrc:319
+#: sc/inc/strings.hrc:318
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_ROW"
 msgid "Y variable range cannot have more than 1 row."
 msgstr "Svið Y-breyta geta ekki verið með fleiri en 1 röð."
 
 #. DrsBe
-#: sc/inc/strings.hrc:320
+#: sc/inc/strings.hrc:319
 msgctxt "STR_MESSAGE_UNIVARIATE_NUMOBS_MISMATCH"
 msgid "Univariate regression : The observation count in X and Y must match."
 msgstr ""
 
 #. KuttF
-#: sc/inc/strings.hrc:321
+#: sc/inc/strings.hrc:320
 msgctxt "STR_MESSAGE_MULTIVARIATE_NUMOBS_MISMATCH"
 msgid "Multivariate regression : The observation count in X and Y must match."
 msgstr ""
 
 #. 6Cghz
-#: sc/inc/strings.hrc:322
+#: sc/inc/strings.hrc:321
 msgctxt "STR_LABEL_REGRESSION_MODEL"
 msgid "Regression Model"
 msgstr "Aðfallsgreiningarlíkan"
 
 #. bmR5w
-#: sc/inc/strings.hrc:323
+#: sc/inc/strings.hrc:322
 msgctxt "STR_LABEL_REGRESSION_STATISTICS"
 msgid "Regression Statistics"
 msgstr "Tölfræði aðfallsgreiningar"
 
 #. RNHCx
-#: sc/inc/strings.hrc:324
+#: sc/inc/strings.hrc:323
 msgctxt "STR_LABEL_RESIDUAL"
 msgid "Residual"
 msgstr "Afgangs"
 
 #. 4DANj
-#: sc/inc/strings.hrc:325
+#: sc/inc/strings.hrc:324
 msgctxt "STR_LABEL_CONFIDENCE_LEVEL"
 msgid "Confidence level"
 msgstr "Stig áreiðanleika"
 
 #. 9LhbX
-#: sc/inc/strings.hrc:326
+#: sc/inc/strings.hrc:325
 msgctxt "STR_LABEL_COEFFICIENTS"
 msgid "Coefficients"
 msgstr "Stuðlar"
 
 #. nyH7s
-#: sc/inc/strings.hrc:327
+#: sc/inc/strings.hrc:326
 msgctxt "STR_LABEL_TSTATISTIC"
 msgid "t-Statistic"
 msgstr "t-tölfræði"
 
 #. PGno2
-#: sc/inc/strings.hrc:328
+#: sc/inc/strings.hrc:327
 msgctxt "STR_LABEL_INTERCEPT"
 msgid "Intercept"
 msgstr "Skurðpunktur"
 
 #. oa4Cm
-#: sc/inc/strings.hrc:329
+#: sc/inc/strings.hrc:328
 msgctxt "STR_LABEL_PREDICTEDY"
 msgid "Predicted Y"
 msgstr "Spáð Y"
 
 #. QFEjs
-#: sc/inc/strings.hrc:330
+#: sc/inc/strings.hrc:329
 msgctxt "STR_LINEST_RAW_OUTPUT_TITLE"
 msgid "LINEST raw output"
 msgstr "LINEST hrátt úttak"
 
 #. bk7FH
 #. F Test
-#: sc/inc/strings.hrc:332
+#: sc/inc/strings.hrc:331
 msgctxt "STR_FTEST_P_RIGHT_TAIL"
 msgid "P (F<=f) right-tail"
 msgstr "P (F<=f) hægrihliðar"
 
 #. CkHJw
-#: sc/inc/strings.hrc:333
+#: sc/inc/strings.hrc:332
 msgctxt "STR_FTEST_F_CRITICAL_RIGHT_TAIL"
 msgid "F Critical right-tail"
 msgstr "F-krítískt hægrihliðar"
 
 #. J7yMZ
-#: sc/inc/strings.hrc:334
+#: sc/inc/strings.hrc:333
 msgctxt "STR_FTEST_P_LEFT_TAIL"
 msgid "P (F<=f) left-tail"
 msgstr "P (F<=f) vinstrihliðar"
 
 #. R3BNC
-#: sc/inc/strings.hrc:335
+#: sc/inc/strings.hrc:334
 msgctxt "STR_FTEST_F_CRITICAL_LEFT_TAIL"
 msgid "F Critical left-tail"
 msgstr "F-krítískt vinstrihliðar"
 
 #. Bve5D
-#: sc/inc/strings.hrc:336
+#: sc/inc/strings.hrc:335
 msgctxt "STR_FTEST_P_TWO_TAIL"
 msgid "P two-tail"
 msgstr "P tvíhliða"
 
 #. 4YZrT
-#: sc/inc/strings.hrc:337
+#: sc/inc/strings.hrc:336
 msgctxt "STR_FTEST_F_CRITICAL_TWO_TAIL"
 msgid "F Critical two-tail"
 msgstr "F-krítískt tvíhliða"
 
 #. qaf4N
 #. t Test
-#: sc/inc/strings.hrc:339
+#: sc/inc/strings.hrc:338
 msgctxt "STR_TTEST_PEARSON_CORRELATION"
 msgid "Pearson Correlation"
 msgstr "Pearson fylgni"
 
 #. C6BU8
-#: sc/inc/strings.hrc:340
+#: sc/inc/strings.hrc:339
 msgctxt "STR_TTEST_VARIANCE_OF_THE_DIFFERENCES"
 msgid "Variance of the Differences"
 msgstr "Breytileiki mismuna (Variance of the Differences)"
 
 #. j8NuP
-#: sc/inc/strings.hrc:341
+#: sc/inc/strings.hrc:340
 msgctxt "STR_TTEST_T_STAT"
 msgid "t Stat"
 msgstr "t Stat"
 
 #. bKoeX
-#: sc/inc/strings.hrc:342
+#: sc/inc/strings.hrc:341
 msgctxt "STR_TTEST_P_ONE_TAIL"
 msgid "P (T<=t) one-tail"
 msgstr "P (T<=t) einhliða"
 
 #. dub8R
-#: sc/inc/strings.hrc:343
+#: sc/inc/strings.hrc:342
 msgctxt "STR_TTEST_T_CRITICAL_ONE_TAIL"
 msgid "t Critical one-tail"
 msgstr "F-krítískt einhliða"
 
 #. FrDDz
-#: sc/inc/strings.hrc:344
+#: sc/inc/strings.hrc:343
 msgctxt "STR_TTEST_P_TWO_TAIL"
 msgid "P (T<=t) two-tail"
 msgstr "P (T<=t) tvíhliða"
 
 #. RQqAd
-#: sc/inc/strings.hrc:345
+#: sc/inc/strings.hrc:344
 msgctxt "STR_TTEST_T_CRITICAL_TWO_TAIL"
 msgid "t Critical two-tail"
 msgstr "t-krítískt tvíhliða"
 
 #. kDCsZ
 #. Z Test
-#: sc/inc/strings.hrc:347
+#: sc/inc/strings.hrc:346
 msgctxt "STR_ZTEST_Z_VALUE"
 msgid "z"
 msgstr "z"
 
 #. CF8D5
-#: sc/inc/strings.hrc:348
+#: sc/inc/strings.hrc:347
 msgctxt "STR_ZTEST_KNOWN_VARIANCE"
 msgid "Known Variance"
 msgstr "Þekktur breytileiki"
 
 #. cYWDr
-#: sc/inc/strings.hrc:349
+#: sc/inc/strings.hrc:348
 msgctxt "STR_ZTEST_P_ONE_TAIL"
 msgid "P (Z<=z) one-tail"
 msgstr "P (Z<=z) einhliða"
 
 #. DmEVf
-#: sc/inc/strings.hrc:350
+#: sc/inc/strings.hrc:349
 msgctxt "STR_ZTEST_Z_CRITICAL_ONE_TAIL"
 msgid "z Critical one-tail"
 msgstr "z-krítískt einhliða"
 
 #. G8PeP
-#: sc/inc/strings.hrc:351
+#: sc/inc/strings.hrc:350
 msgctxt "STR_ZTEST_P_TWO_TAIL"
 msgid "P (Z<=z) two-tail"
 msgstr "P (Z<=z) tvíhliða"
 
 #. rGBfK
-#: sc/inc/strings.hrc:352
+#: sc/inc/strings.hrc:351
 msgctxt "STR_ZTEST_Z_CRITICAL_TWO_TAIL"
 msgid "z Critical two-tail"
 msgstr "z-krítískt tvíhliða"
 
 #. mCsCB
 #. Fourier Analysis
-#: sc/inc/strings.hrc:354
+#: sc/inc/strings.hrc:353
 msgctxt "STR_FOURIER_TRANSFORM"
 msgid "Fourier Transform"
 msgstr "Fourier ummyndun"
 
 #. sc3hp
-#: sc/inc/strings.hrc:355
+#: sc/inc/strings.hrc:354
 msgctxt "STR_INVERSE_FOURIER_TRANSFORM"
 msgid "Inverse Fourier Transform"
 msgstr "Viðsnúin Fourier ummyndun"
 
 #. AtC94
-#: sc/inc/strings.hrc:356
+#: sc/inc/strings.hrc:355
 msgctxt "STR_REAL_PART"
 msgid "Real"
 msgstr "Raunveruleg"
 
 #. SoyPr
-#: sc/inc/strings.hrc:357
+#: sc/inc/strings.hrc:356
 msgctxt "STR_IMAGINARY_PART"
 msgid "Imaginary"
 msgstr "Ímynduð"
 
 #. ymnyT
-#: sc/inc/strings.hrc:358
+#: sc/inc/strings.hrc:357
 msgctxt "STR_MAGNITUDE_PART"
 msgid "Magnitude"
 msgstr "Styrkur"
 
 #. NGmmD
-#: sc/inc/strings.hrc:359
+#: sc/inc/strings.hrc:358
 msgctxt "STR_PHASE_PART"
 msgid "Phase"
 msgstr "Fasi"
 
 #. E7Eez
-#: sc/inc/strings.hrc:360
+#: sc/inc/strings.hrc:359
 msgctxt "STR_MESSAGE_INVALID_NUMCOLS"
 msgid "More than two columns selected in grouped by column mode."
 msgstr ""
 
 #. wF2RV
-#: sc/inc/strings.hrc:361
+#: sc/inc/strings.hrc:360
 msgctxt "STR_MESSAGE_INVALID_NUMROWS"
 msgid "More than two rows selected in grouped by row mode."
 msgstr ""
 
 #. DRbrH
-#: sc/inc/strings.hrc:362
+#: sc/inc/strings.hrc:361
 msgctxt "STR_MESSAGE_NODATA_IN_RANGE"
 msgid "No data in input range."
 msgstr "Engin gögn í inntakssviði."
 
 #. gjC2w
-#: sc/inc/strings.hrc:363
+#: sc/inc/strings.hrc:362
 msgctxt "STR_MESSAGE_OUTPUT_TOO_LONG"
 msgid "Output is too long to write into the sheet."
 msgstr "Úttakið er of langt til að skrifa það inn í blaðið"
 
 #. SnGyL
-#: sc/inc/strings.hrc:364
+#: sc/inc/strings.hrc:363
 msgctxt "STR_INPUT_DATA_RANGE"
 msgid "Input data range"
 msgstr "Inntakssvið gagna"
 
 #. EaQGL
 #. infobar for allowing links to update or not
-#: sc/inc/strings.hrc:366
+#: sc/inc/strings.hrc:365
 msgctxt "STR_ENABLE_CONTENT"
 msgid "Allow updating"
 msgstr "Leyfa uppfærslu"
 
 #. aJDFG
 #. tooltip for the "Allow updating" infobar button
-#: sc/inc/strings.hrc:368
+#: sc/inc/strings.hrc:367
 msgctxt "STR_ENABLE_CONTENT_TOOLTIP"
 msgid "Only allow updating if you trust this document."
 msgstr ""
 
 #. w5Gd7
 #. Insert image dialog
-#: sc/inc/strings.hrc:370
+#: sc/inc/strings.hrc:369
 msgctxt "STR_ANCHOR_TO_CELL"
 msgid "To cell"
 msgstr "Að reit"
 
 #. itvXY
-#: sc/inc/strings.hrc:371
+#: sc/inc/strings.hrc:370
 msgctxt "STR_ANCHOR_TO_CELL_RESIZE"
 msgid "To cell (resize with cell)"
 msgstr "Að reit (breyta stærð með reit)"
 
 #. P8vG7
-#: sc/inc/strings.hrc:372
+#: sc/inc/strings.hrc:371
 msgctxt "STR_ANCHOR_TO_PAGE"
 msgid "To page"
 msgstr "Að síðu"
 
 #. SSc6B
-#: sc/inc/strings.hrc:374
+#: sc/inc/strings.hrc:373
 msgctxt "sharedocumentdlg|nouserdata"
 msgid "No user data available."
 msgstr "Engin gögn um notanda eru tiltæk."
 
 #. FFnfu
-#: sc/inc/strings.hrc:375
+#: sc/inc/strings.hrc:374
 msgctxt "sharedocumentdlg|exclusive"
 msgid "(exclusive access)"
 msgstr "(einkaaðgangur)"
 
 #. hitQA
-#: sc/inc/strings.hrc:376
+#: sc/inc/strings.hrc:375
 msgctxt "STR_NO_NAMED_RANGES_AVAILABLE"
 msgid "No named ranges available in the selected document"
 msgstr ""
 
 #. hnAZx
-#: sc/inc/strings.hrc:377
+#: sc/inc/strings.hrc:376
 msgctxt "STR_BORDER_HAIRLINE"
 msgid "Hairline (%s pt)"
-msgstr ""
+msgstr "Hárlína (% pt)"
 
 #. E9Dhi
-#: sc/inc/strings.hrc:378
+#: sc/inc/strings.hrc:377
 msgctxt "STR_BORDER_VERY_THIN"
 msgid "Very thin (%s pt)"
-msgstr ""
+msgstr "Mjög mjó (% pt)"
 
 #. KGVAw
-#: sc/inc/strings.hrc:379
+#: sc/inc/strings.hrc:378
 msgctxt "STR_BORDER_THIN"
 msgid "Thin (%s pt)"
-msgstr ""
+msgstr "Mjó (% pt)"
 
 #. V6PRY
-#: sc/inc/strings.hrc:380
+#: sc/inc/strings.hrc:379
 msgctxt "STR_BORDER_MEDIUM"
 msgid "Medium (%s pt)"
-msgstr ""
+msgstr "Miðlungs (% pt)"
 
 #. GyeKi
-#: sc/inc/strings.hrc:381
+#: sc/inc/strings.hrc:380
 msgctxt "STR_BORDER_THICK"
 msgid "Thick (%s pt)"
-msgstr ""
+msgstr "Þykk (% pt)"
 
 #. QvEAB
-#: sc/inc/strings.hrc:382
+#: sc/inc/strings.hrc:381
 msgctxt "STR_BORDER_EXTRA_THICK"
 msgid "Extra thick (%s pt)"
-msgstr ""
+msgstr "Mjög þykk (% pt)"
 
 #. v9kkb
-#: sc/inc/strings.hrc:383
+#: sc/inc/strings.hrc:382
 msgctxt "STR_BORDER_DOUBLE_1"
 msgid "Double Hairline (%s pt)"
-msgstr ""
+msgstr "Tvöföld hárlína (% pt)"
 
 #. KzKEy
-#: sc/inc/strings.hrc:384
+#: sc/inc/strings.hrc:383
 msgctxt "STR_BORDER_DOUBLE_2"
 msgid "Thin/Medium (%s pt)"
-msgstr ""
+msgstr "Mjó/Miðlungs (% pt)"
 
 #. HD8tG
-#: sc/inc/strings.hrc:385
+#: sc/inc/strings.hrc:384
 msgctxt "STR_BORDER_DOUBLE_3"
 msgid "Medium/Hairline (%s pt)"
-msgstr ""
+msgstr "Miðlungs/Hárlína (% pt)"
 
 #. ygGcU
-#: sc/inc/strings.hrc:386
+#: sc/inc/strings.hrc:385
 msgctxt "STR_BORDER_DOUBLE_4"
 msgid "Medium/Medium (%s pt)"
-msgstr ""
+msgstr "Miðlungs/Miðlungs (% pt)"
 
 #. z9YGZ
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: sc/inc/strings.hrc:390
+#: sc/inc/strings.hrc:389
 msgctxt "sortoptionspage|extended_tip|sortuserlb"
 msgid "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists."
 msgstr ""
 
 #. T5A7R
-#: sc/inc/strings.hrc:391
+#: sc/inc/strings.hrc:390
 msgctxt "subtotaloptionspage|extended_tip|lbuserdef"
 msgid "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists."
 msgstr ""
 
 #. gbz6Y
-#: sc/inc/strings.hrc:392
+#: sc/inc/strings.hrc:391
 msgctxt "extended_tip|annot"
 msgid "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box."
 msgstr ""
@@ -18720,13 +18725,13 @@ msgstr "Nákvæm sía"
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:38
 msgctxt "advancedfilterdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. gzGAU
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:58
 msgctxt "advancedfilterdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. v3B8V
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:119
@@ -18876,13 +18881,13 @@ msgstr "Val_kostir"
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:462
 msgctxt "advancedfilterdialog|extended_tip|more"
 msgid "Shows additional filter options."
-msgstr ""
+msgstr "Birtir viðbótarvalkosti við síun."
 
 #. 3CXjk
 #: sc/uiconfig/scalc/ui/advancedfilterdialog.ui:484
 msgctxt "advancedfilterdialog|extended_tip|AdvancedFilterDialog"
 msgid "Defines an advanced filter."
-msgstr ""
+msgstr "Skilgreinir nákvæma síu."
 
 #. JyzjZ
 #: sc/uiconfig/scalc/ui/aggregatefunctionentry.ui:29
@@ -18918,13 +18923,13 @@ msgstr "Hámarksgildi"
 #: sc/uiconfig/scalc/ui/aggregatefunctionentry.ui:66
 msgctxt "aggregatefunctionentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. BDhZj
 #: sc/uiconfig/scalc/ui/aggregatefunctionentry.ui:75
 msgctxt "aggregatefunctionentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. NCX7N
 #: sc/uiconfig/scalc/ui/allheaderfooterdialog.ui:8
@@ -19056,19 +19061,19 @@ msgstr "Sníða sjálfvirkt"
 #: sc/uiconfig/scalc/ui/autoformattable.ui:39
 msgctxt "autoformattable|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. V6Tpf
 #: sc/uiconfig/scalc/ui/autoformattable.ui:60
 msgctxt "autoformattable|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. NTY8D
 #: sc/uiconfig/scalc/ui/autoformattable.ui:131
 msgctxt "autoformattable|extended_tip|preview"
 msgid "Displays a preview of the current selection."
-msgstr ""
+msgstr "Birtit forskoðun á fyrirliggjandi vali."
 
 #. qcCWk
 #: sc/uiconfig/scalc/ui/autoformattable.ui:173
@@ -19086,7 +19091,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/autoformattable.ui:225
 msgctxt "autoformattable|extended_tip|remove"
 msgid "Deletes the selected element or elements after confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum eftir staðfestingu."
 
 #. YNp3m
 #: sc/uiconfig/scalc/ui/autoformattable.ui:237
@@ -19305,37 +19310,37 @@ msgstr ""
 "Veldu 'Verja blað' úr valmyndinni 'Verkfæri'."
 
 #. bVREg
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:118
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:121
 msgctxt "cellprotectionpage|LabelProtection"
 msgid "Protection"
 msgstr "Vörn"
 
 #. A5DFp
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:148
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:151
 msgctxt "cellprotectionpage|checkHidePrinting"
 msgid "Hide _when printing"
 msgstr "Fela _við prentun"
 
 #. ZosAc
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:157
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:160
 msgctxt "cellprotectionpage|extended_tip|checkHidePrinting"
 msgid "Keeps the selected cells from being printed."
-msgstr ""
+msgstr "Kemur í veg fyrir að valdir reitir séu prentaðir."
 
 #. QqUqE
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:172
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:175
 msgctxt "cellprotectionpage|label4"
 msgid "The cells selected will be omitted when printing."
 msgstr "Völdum reitum verður sleppt í prentun."
 
 #. 8RuyP
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:188
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:194
 msgctxt "cellprotectionpage|label3"
 msgid "Print"
 msgstr "Prenta"
 
 #. DPWp6
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:202
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:208
 msgctxt "cellprotectionpage|extended_tip|CellProtectionPage"
 msgid "Defines protection options for selected cells."
 msgstr ""
@@ -19518,7 +19523,7 @@ msgstr "Breidd"
 #: sc/uiconfig/scalc/ui/colwidthdialog.ui:110
 msgctxt "colwidthdialog|extended_tip|value"
 msgid "Enter the column width that you want to use."
-msgstr ""
+msgstr "Settu inn dálkbreiddina sem þú vilt nota."
 
 #. qUvgX
 #: sc/uiconfig/scalc/ui/colwidthdialog.ui:121
@@ -19572,7 +19577,7 @@ msgstr "Bæta við"
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:179
 msgctxt "condformatmanager|extended_tip|add"
 msgid "Here you can add, edit or remove one or several conditional formattings."
-msgstr ""
+msgstr "Hérna geturðu bætt við, breytt, og fjarlægt eitt eða fleiri skilyrt snið."
 
 #. 8XXd8
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:191
@@ -19584,7 +19589,7 @@ msgstr "Breyta..."
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:197
 msgctxt "condformatmanager|extended_tip|edit"
 msgid "Here you can add, edit or remove one or several conditional formattings."
-msgstr ""
+msgstr "Hérna geturðu bætt við, breytt, og fjarlægt eitt eða fleiri skilyrt snið."
 
 #. oLc2f
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:209
@@ -19596,7 +19601,7 @@ msgstr "Fjarlægja"
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:215
 msgctxt "condformatmanager|extended_tip|remove"
 msgid "Here you can add, edit or remove one or several conditional formattings."
-msgstr ""
+msgstr "Hérna geturðu bætt við, breytt, og fjarlægt eitt eða fleiri skilyrt snið."
 
 #. dV9US
 #: sc/uiconfig/scalc/ui/condformatmanager.ui:238
@@ -19842,25 +19847,25 @@ msgstr "er ekki tvítak"
 #: sc/uiconfig/scalc/ui/conditionalentry.ui:392
 msgctxt "conditionalentry|typeis"
 msgid "is in top N elements"
-msgstr ""
+msgstr "er meðal efstu N staka"
 
 #. FGAML
 #: sc/uiconfig/scalc/ui/conditionalentry.ui:393
 msgctxt "conditionalentry|typeis"
 msgid "is in bottom N elements"
-msgstr ""
+msgstr "er meðal neðstu N staka"
 
 #. BCnE4
 #: sc/uiconfig/scalc/ui/conditionalentry.ui:394
 msgctxt "conditionalentry|typeis"
 msgid "is in top N percent"
-msgstr ""
+msgstr "er meðal efstu N prósenta"
 
 #. 2EFQe
 #: sc/uiconfig/scalc/ui/conditionalentry.ui:395
 msgctxt "conditionalentry|typeis"
 msgid "is in bottom N percent"
-msgstr ""
+msgstr "er meðal neðstu N prósenta"
 
 #. mgJrq
 #: sc/uiconfig/scalc/ui/conditionalentry.ui:396
@@ -20190,13 +20195,13 @@ msgstr "Skilyrt snið fyrir"
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:34
 msgctxt "conditionalformatdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. zqDuf
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:54
 msgctxt "conditionalformatdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. VP7Xe
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:156
@@ -20208,37 +20213,37 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:185
 msgctxt "conditionalformatdialog|extended_tip|add"
 msgid "Here you can add, edit or remove one or several conditional formattings."
-msgstr ""
+msgstr "Hérna geturðu bætt við, breytt, og fjarlægt eitt eða fleiri skilyrt snið."
 
 #. ejKTF
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:204
 msgctxt "conditionalformatdialog|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. upqJA
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:216
 msgctxt "conditionalformatdialog|up"
 msgid "_Up"
-msgstr ""
+msgstr "_Upp"
 
 #. fGKvB
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:223
 msgctxt "conditionalformatdialog|extended_tip|up"
 msgid "Increase priority of the selected condition."
-msgstr ""
+msgstr "Eykur forgang valins skilyrðis."
 
 #. yaQBX
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:235
 msgctxt "conditionalformatdialog|down"
 msgid "Do_wn"
-msgstr ""
+msgstr "_Niður"
 
 #. ykMES
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:242
 msgctxt "conditionalformatdialog|extended_tip|down"
 msgid "Decrease priority of the selected condition."
-msgstr ""
+msgstr "Minnkar forgang valins skilyrðis."
 
 #. Q6Ag7
 #: sc/uiconfig/scalc/ui/conditionalformatdialog.ui:265
@@ -20328,7 +20333,7 @@ msgstr "Það eru árekstrar á milli breytinga í þessu sameiginlega skjali. S
 #: sc/uiconfig/scalc/ui/conflictsdialog.ui:147
 msgctxt "conflictsdialog|conflict"
 msgid "Conflict"
-msgstr ""
+msgstr "Árekstur"
 
 #. kQCmz
 #: sc/uiconfig/scalc/ui/conflictsdialog.ui:161
@@ -20340,7 +20345,7 @@ msgstr "Höfundur"
 #: sc/uiconfig/scalc/ui/conflictsdialog.ui:175
 msgctxt "conflictsdialog|date"
 msgid "Date"
-msgstr ""
+msgstr "Dagsetning"
 
 #. tgZHu
 #: sc/uiconfig/scalc/ui/conflictsdialog.ui:189
@@ -20370,13 +20375,13 @@ msgstr "Sameina"
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:43
 msgctxt "consolidatedialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. EHBqo
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:63
 msgctxt "consolidatedialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. kkPF3
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:110
@@ -20514,7 +20519,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:396
 msgctxt "consolidatedialog|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. DLuPQ
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:416
@@ -20586,7 +20591,7 @@ msgstr "Valkostir"
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:596
 msgctxt "consolidatedialog|extended_tip|more"
 msgid "Shows additional options."
-msgstr ""
+msgstr "Birtir viðbótarvalkosti."
 
 #. HEHFf
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:618
@@ -20862,7 +20867,7 @@ msgstr "Formúla"
 #: sc/uiconfig/scalc/ui/databaroptions.ui:145
 msgctxt "databaroptions|extended_tip|min"
 msgid "Select the way the minimum is set"
-msgstr ""
+msgstr "Veldu hvernig lágmarkið er sett"
 
 #. DiBWL
 #: sc/uiconfig/scalc/ui/databaroptions.ui:160
@@ -20910,19 +20915,19 @@ msgstr "Formúla"
 #: sc/uiconfig/scalc/ui/databaroptions.ui:170
 msgctxt "databaroptions|extended_tip|max"
 msgid "Select the way the maximum is set"
-msgstr ""
+msgstr "Veldu hvernig hámarkið er sett"
 
 #. 5P3sd
 #: sc/uiconfig/scalc/ui/databaroptions.ui:187
 msgctxt "datbaroptions|extended_tip|min_value"
 msgid "Enter the value for the minimum"
-msgstr ""
+msgstr "Settu inn gildi fyrir lágmarkið"
 
 #. oKw6w
 #: sc/uiconfig/scalc/ui/databaroptions.ui:204
 msgctxt "datbaroptions|extended_tip|max_value"
 msgid "Enter the value for the maximum"
-msgstr ""
+msgstr "Settu inn gildi fyrir hámarkið"
 
 #. TKfBV
 #: sc/uiconfig/scalc/ui/databaroptions.ui:219
@@ -20946,13 +20951,13 @@ msgstr "Neikvætt:"
 #: sc/uiconfig/scalc/ui/databaroptions.ui:287
 msgctxt "databaroptions|extended_tip|positive_colour"
 msgid "Select the color for the positive values"
-msgstr ""
+msgstr "Veldu lit fyrir jákvæðu gildin"
 
 #. fHCLy
 #: sc/uiconfig/scalc/ui/databaroptions.ui:306
 msgctxt "datbaroptions|extended_tip|negative_colour"
 msgid "Select the color for the negative values"
-msgstr ""
+msgstr "Veldu lit fyrir neikvæðu gildin"
 
 #. zbBGo
 #: sc/uiconfig/scalc/ui/databaroptions.ui:320
@@ -20976,7 +20981,7 @@ msgstr "Litstigull"
 #: sc/uiconfig/scalc/ui/databaroptions.ui:339
 msgctxt "databaroptions|extended_tip|fill_type"
 msgid "Select if the fill in color is solid or gradient."
-msgstr ""
+msgstr "Veldu hvort lituð fylling sé heillitur eða litstigull."
 
 #. cA4CB
 #: sc/uiconfig/scalc/ui/databaroptions.ui:354
@@ -21024,7 +21029,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/databaroptions.ui:443
 msgctxt "datbaroptions|extended_tip|axis_colour"
 msgid "Set the color of the vertical axis"
-msgstr ""
+msgstr "Veldu hér lit á lóðréttan ás"
 
 #. DjBHB
 #: sc/uiconfig/scalc/ui/databaroptions.ui:458
@@ -21222,7 +21227,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/datafielddialog.ui:354
 msgctxt "datafielddialog|label3"
 msgid "Displayed Value"
-msgstr ""
+msgstr "Birt gildi"
 
 #. mk9vJ
 #: sc/uiconfig/scalc/ui/datafielddialog.ui:359
@@ -21270,7 +21275,7 @@ msgstr "Ha_ndvirkt"
 #: sc/uiconfig/scalc/ui/datafieldoptionsdialog.ui:173
 msgctxt "datafieldoptionsdialog|extended_tip|manual"
 msgid "Sorts values alphabetically."
-msgstr ""
+msgstr "Raðar gildum í stafrófsröð."
 
 #. cdBMn
 #: sc/uiconfig/scalc/ui/datafieldoptionsdialog.ui:190
@@ -21483,88 +21488,88 @@ msgid "Data Entry Form is a tool to make table data entry easy in spreadsheets."
 msgstr ""
 
 #. 6DQYr
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:25
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:22
 msgctxt "dataproviderdlg/okaybtn"
 msgid "Okay"
-msgstr ""
+msgstr "Í lagi"
 
 #. Ah2h8
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:38
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:35
 msgctxt "dataproviderdlg/cancelbtn"
 msgid "Cancel"
-msgstr ""
+msgstr "Hætta við"
 
 #. a7EFA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:88
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:86
 msgctxt "dataproviderdlg|db_name"
 msgid "Database Range:"
-msgstr ""
+msgstr "Gagnagrunnssvið:"
 
 #. pSQ4F
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:113
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:111
 msgctxt "dataproviderdlg/provider"
 msgid "Data Provider:"
-msgstr ""
+msgstr "Gagnamiðlari:"
 
 #. RGiXi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:138
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:136
 msgctxt "dataproviderdlg/url"
 msgid "URL:"
-msgstr ""
+msgstr "Slóð:"
 
 #. GKDQA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:161
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:159
 msgctxt "dataproviderdlg/browse_btn"
 msgid "Browse"
-msgstr ""
+msgstr "Flakka"
 
 #. GABzG
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:175
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:173
 msgctxt "dataproviderdlg/id"
 msgid "Id / Xpath:"
 msgstr ""
 
 #. pwS4k
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:203
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:201
 msgctxt "dataproviderdlg/lbSource"
 msgid "Source"
-msgstr ""
+msgstr "Uppruni"
 
 #. fHfGq
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:237
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:236
 msgctxt "dataproviderdlg/transformation_add"
 msgid "Add"
-msgstr ""
+msgstr "Bæta við"
 
 #. Smoiv
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:241
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:240
 msgctxt "dataproviderdlg/AddTransformation_tooltip"
 msgid "Add Transformations"
-msgstr ""
+msgstr "Bæta við umbreytingum"
 
 #. cSgeU
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:297
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:296
 msgctxt "dataproviderdlg/transformation"
 msgid "Transformations"
-msgstr ""
+msgstr "Umbreytingar"
 
 #. gpeXB
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:353
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:352
 msgctxt "dataproviderdlg/apply"
 msgid "Apply"
-msgstr ""
+msgstr "Virkja"
 
 #. bDVwi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:357
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:356
 msgctxt "dataproviderdlg/apply_tooltiptext"
 msgid "Apply Changes"
-msgstr ""
+msgstr "Virkja breytingar"
 
 #. 6pCFs
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:376
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:375
 msgctxt "dataproviderdlg/preview"
 msgid "Preview"
-msgstr ""
+msgstr "Forskoðun"
 
 #. 4jLF7
 #: sc/uiconfig/scalc/ui/datastreams.ui:8
@@ -21666,7 +21671,7 @@ msgstr "Hámarksfjöldi raða"
 #: sc/uiconfig/scalc/ui/datastreams.ui:466
 msgctxt "datastreams|extended_tip|DataStreamDialog"
 msgid "Live data stream for spreadsheets"
-msgstr ""
+msgstr "Gagnastreymi í beinni fyrir töflureikna"
 
 #. 7s8rq
 #: sc/uiconfig/scalc/ui/datetimetransformationentry.ui:29
@@ -21786,13 +21791,13 @@ msgstr "Tími"
 #: sc/uiconfig/scalc/ui/datetimetransformationentry.ui:80
 msgctxt "datetimetransformationentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. sM9XW
 #: sc/uiconfig/scalc/ui/datetimetransformationentry.ui:89
 msgctxt "datetimetransformationentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. nHoB2
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:18
@@ -21804,13 +21809,13 @@ msgstr "Skilgreina gagnagrunnssvið"
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:44
 msgctxt "definedatabaserangedialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. djkZd
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:63
 msgctxt "definedatabaserangedialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. RMghE
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:171
@@ -21858,7 +21863,7 @@ msgstr "_Laga"
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:317
 msgctxt "definedatabaserangedialog|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. TniCB
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:350
@@ -21870,7 +21875,7 @@ msgstr "Inniheldur fyrirsagnir _dálka"
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:358
 msgctxt "definedatabaserangedialog|extended_tip|ContainsColumnLabels"
 msgid "Selected cell ranges contain labels."
-msgstr ""
+msgstr "Valið svið reita inniheldur fyrirsagnir raða."
 
 #. QBs5X
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:370
@@ -21942,7 +21947,7 @@ msgstr "Valkostir"
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:493
 msgctxt "definedatabaserangedialog|extended_tip|more"
 msgid "Shows additional options."
-msgstr ""
+msgstr "Birtir viðbótarvalkosti."
 
 #. swLE2
 #: sc/uiconfig/scalc/ui/definedatabaserangedialog.ui:519
@@ -21960,7 +21965,7 @@ msgstr "Skilgreina nafn"
 #: sc/uiconfig/scalc/ui/definename.ui:48
 msgctxt "definename|extended_tip|add"
 msgid "Click the Add button to add a new defined name."
-msgstr ""
+msgstr "Smelltu á 'Bæta við'-hnappinn  til að bæta við nýju skilgreindu heiti."
 
 #. 6EGaz
 #: sc/uiconfig/scalc/ui/definename.ui:96
@@ -22014,7 +22019,7 @@ msgstr "_Prentsvið"
 #: sc/uiconfig/scalc/ui/definename.ui:253
 msgctxt "definename|extended_tip|printarea"
 msgid "Defines the area as a print range."
-msgstr ""
+msgstr "Skilgreinir svæðið sem prentbil."
 
 #. L5Ebf
 #: sc/uiconfig/scalc/ui/definename.ui:264
@@ -22038,7 +22043,7 @@ msgstr "_Endurtaka dálk"
 #: sc/uiconfig/scalc/ui/definename.ui:291
 msgctxt "definename|extended_tip|colheader"
 msgid "Defines the area as a repeating column."
-msgstr ""
+msgstr "Skilgreinir svæðið sem endurtekinn dálk."
 
 #. jfJFq
 #: sc/uiconfig/scalc/ui/definename.ui:302
@@ -22050,7 +22055,7 @@ msgstr "Endurtaka _röð"
 #: sc/uiconfig/scalc/ui/definename.ui:310
 msgctxt "definename|extended_tip|rowheader"
 msgid "Defines the area as a repeating row."
-msgstr ""
+msgstr "Skilgreinir svæðið sem endurtekna röð."
 
 #. 47nrA
 #: sc/uiconfig/scalc/ui/definename.ui:325
@@ -22140,19 +22145,19 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/deletecolumnentry.ui:29
 msgctxt "deletecolumnentry|name"
 msgid "Delete Columns"
-msgstr ""
+msgstr "Eyða dálkum"
 
 #. QFtCG
 #: sc/uiconfig/scalc/ui/deletecolumnentry.ui:46
 msgctxt "deletecolumnentry/cols"
 msgid "Cols(; Separated)"
-msgstr ""
+msgstr "Dálk(aðgreint með ;)"
 
 #. tGfwG
 #: sc/uiconfig/scalc/ui/deletecolumnentry.ui:55
 msgctxt "deletecolumnentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. VWjSF
 #: sc/uiconfig/scalc/ui/deletecontents.ui:8
@@ -22278,19 +22283,19 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/deleterowentry.ui:45
 msgctxt "deleterow|value"
 msgid "Enter Value"
-msgstr ""
+msgstr "Settu inn gildi"
 
 #. whbyR
 #: sc/uiconfig/scalc/ui/deleterowentry.ui:59
 msgctxt "deleterow|column"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. yhzDR
 #: sc/uiconfig/scalc/ui/deleterowentry.ui:68
 msgctxt "deleterow|delete_btn"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. gB36A
 #: sc/uiconfig/scalc/ui/descriptivestatisticsdialog.ui:8
@@ -22398,55 +22403,55 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/dropmenu.ui:71
 msgctxt "dropmenu|SCSTR_DISPLAY"
 msgid "Display"
-msgstr ""
+msgstr "Birting"
 
 #. kzFT9
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:15
 msgctxt "erroralerttabpage-mobile|tsbshow"
 msgid "Show error _message when invalid values are entered"
-msgstr ""
+msgstr "Sýna villu_meldingar þegar ógild gildi eru slegin inn"
 
 #. yMbrW
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:43
 msgctxt "erroralerttabpage-mobile|action_label"
 msgid "_Action:"
-msgstr ""
+msgstr "_Aðgerð:"
 
 #. 2sruM
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:57
 msgctxt "erroralerttabpage-mobile|title_label"
 msgid "_Title:"
-msgstr ""
+msgstr "_Titill:"
 
 #. DALxA
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:105
 msgctxt "erroralerttabpage-mobile|errormsg_label"
 msgid "_Error message:"
-msgstr ""
+msgstr "_Villuskilaboð:"
 
 #. ZzEdw
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:118
 msgctxt "erroralerttabpage-mobile|browseBtn"
 msgid "_Browse..."
-msgstr ""
+msgstr "_Velja..."
 
 #. hsbzw
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:134
 msgctxt "erroralerttabpage-mobile|actionCB"
 msgid "Stop"
-msgstr ""
+msgstr "Stöðva"
 
 #. fcLJh
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:135
 msgctxt "erroralerttabpage-mobile|actionCB"
 msgid "Warning"
-msgstr ""
+msgstr "Aðvörun"
 
 #. trGJe
 #: sc/uiconfig/scalc/ui/erroralerttabpage-mobile.ui:136
 msgctxt "erroralerttabpage-mobile|actionCB"
 msgid "Information"
-msgstr ""
+msgstr "Upplýsingar"
 
 #. PL8Bz
 #: sc/uiconfig/scalc/ui/erroralerttabpage.ui:15
@@ -22536,7 +22541,7 @@ msgstr "Innihald"
 #: sc/uiconfig/scalc/ui/erroralerttabpage.ui:197
 msgctxt "erroralerttabpage|extended_tip|ErrorAlertTabPage"
 msgid "Define the error message that is displayed when invalid data is entered in a cell."
-msgstr ""
+msgstr "Skilgreindu villuskilaboðin sem birtast þegar ógild gögn eru sett inn í reit."
 
 #. nWmSN
 #: sc/uiconfig/scalc/ui/exponentialsmoothingdialog.ui:14
@@ -22866,13 +22871,13 @@ msgstr "Þre_pun:"
 #: sc/uiconfig/scalc/ui/filldlg.ui:496
 msgctxt "filldlg|extended_tip|startValue"
 msgid "Determines the start value for the series."
-msgstr ""
+msgstr "Ákvarðar upphafsgildi raðarinnar."
 
 #. Ubfua
 #: sc/uiconfig/scalc/ui/filldlg.ui:513
 msgctxt "filldlg|extended_tip|endValue"
 msgid "Determines the end value for the series."
-msgstr ""
+msgstr "Ákvarðar lokagildi raðarinnar."
 
 #. LMokQ
 #: sc/uiconfig/scalc/ui/filldlg.ui:530
@@ -22890,79 +22895,79 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:12
 msgctxt "filterdropdown|more"
 msgid "Add row"
-msgstr ""
+msgstr "Bæta við röð"
 
 #. WCqFM
 #: sc/uiconfig/scalc/ui/filterdropdown.ui:20
 msgctxt "filterdropdown|less"
 msgid "Remove row"
-msgstr ""
+msgstr "Fjarlægja röð"
 
 #. cd5X5
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:150
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:158
 msgctxt "filterdropdown|STR_EDIT_SEARCH_ITEMS"
 msgid "Search items..."
-msgstr ""
+msgstr "Leita að atriðum..."
 
 #. zKwWE
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:184
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:192
 msgctxt "filterdropdown|STR_BTN_TOGGLE_ALL"
 msgid "All"
-msgstr ""
+msgstr "Allt"
 
 #. JsSz6
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:203
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:211
 msgctxt "filterdropdown|STR_BTN_SELECT_CURRENT"
 msgid "Show only the current item."
-msgstr ""
+msgstr "Sýna aðeins núverandi atriði."
 
 #. vBQYB
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:218
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:226
 msgctxt "filterdropdown|STR_BTN_UNSELECT_CURRENT"
 msgid "Hide only the current item."
-msgstr ""
+msgstr "Fela aðeins núverandi atriði."
 
 #. bXw6N
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:148
 msgctxt "filtersubdropdown|background"
 msgid "Background Color"
-msgstr ""
+msgstr "Bakgrunnslitur"
 
-#. EZpYM
+#. ca9FH
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:205
 msgctxt "filtersubdropdown|textcolor"
-msgid "Text Color"
-msgstr ""
+msgid "Font Color"
+msgstr "Litur á letri"
 
 #. XYJHx
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:28
 msgctxt "findreplace|label_action"
 msgid "Find Replace Action"
-msgstr ""
+msgstr "Finna og skipta út aðgerð"
 
 #. T9kUg
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
 msgctxt "findreplace|find"
 msgid "Find"
-msgstr ""
+msgstr "Finna"
 
 #. mBfPJ
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:59
 msgctxt "findreplace|replace"
 msgid "Replace With"
-msgstr ""
+msgstr "Skipta út með"
 
 #. RF57t
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:73
 msgctxt "findreplace|columns"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. WWQzs
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:82
 msgctxt "findreplace|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. AfnFz
 #: sc/uiconfig/scalc/ui/floatingborderstyle.ui:34
@@ -23076,7 +23081,7 @@ msgstr "Síðufætur"
 #: sc/uiconfig/scalc/ui/footerdialog.ui:139
 msgctxt "footerdialog|footerfirst"
 msgid "Footer (first)"
-msgstr ""
+msgstr "Síðufótur (fyrsti)"
 
 #. 9nDTt
 #: sc/uiconfig/scalc/ui/footerdialog.ui:183
@@ -23295,106 +23300,100 @@ msgid "Produces the Fourier analysis of a data set by computing the Discrete Fou
 msgstr ""
 
 #. FEwZR
-#: sc/uiconfig/scalc/ui/functionpanel.ui:63
+#: sc/uiconfig/scalc/ui/functionpanel.ui:54
 msgctxt "functionpanel|insert|tooltip_text"
 msgid "Insert Function into calculation sheet"
 msgstr "Setja fallið inn í reikniblað"
 
 #. L79E6
-#: sc/uiconfig/scalc/ui/functionpanel.ui:78
+#: sc/uiconfig/scalc/ui/functionpanel.ui:69
 msgctxt "functionpanel|category"
 msgid "Last Used"
 msgstr "Síðast notað"
 
 #. uRXDm
-#: sc/uiconfig/scalc/ui/functionpanel.ui:79
+#: sc/uiconfig/scalc/ui/functionpanel.ui:70
 msgctxt "functionpanel|category"
 msgid "All"
 msgstr "Allt"
 
 #. Fk97C
-#: sc/uiconfig/scalc/ui/functionpanel.ui:80
+#: sc/uiconfig/scalc/ui/functionpanel.ui:71
 msgctxt "functionpanel|category"
 msgid "Database"
 msgstr "Gagnagrunnur"
 
 #. hCefc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:81
+#: sc/uiconfig/scalc/ui/functionpanel.ui:72
 msgctxt "functionpanel|category"
 msgid "Date&Time"
 msgstr "Dagsetning&Tími"
 
 #. Cj6Vy
-#: sc/uiconfig/scalc/ui/functionpanel.ui:82
+#: sc/uiconfig/scalc/ui/functionpanel.ui:73
 msgctxt "functionpanel|category"
 msgid "Financial"
 msgstr "Fjármál"
 
 #. gS2PB
-#: sc/uiconfig/scalc/ui/functionpanel.ui:83
+#: sc/uiconfig/scalc/ui/functionpanel.ui:74
 msgctxt "functionpanel|category"
 msgid "Information"
 msgstr "Upplýsingar"
 
 #. rMqtg
-#: sc/uiconfig/scalc/ui/functionpanel.ui:84
+#: sc/uiconfig/scalc/ui/functionpanel.ui:75
 msgctxt "functionpanel|category"
 msgid "Logical"
 msgstr "Röklegt"
 
 #. 6cFkD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:85
+#: sc/uiconfig/scalc/ui/functionpanel.ui:76
 msgctxt "functionpanel|category"
 msgid "Mathematical"
 msgstr "Stærðfræðilegt"
 
 #. RdQeE
-#: sc/uiconfig/scalc/ui/functionpanel.ui:86
+#: sc/uiconfig/scalc/ui/functionpanel.ui:77
 msgctxt "functionpanel|category"
 msgid "Array"
 msgstr "Fylki"
 
 #. h4kRr
-#: sc/uiconfig/scalc/ui/functionpanel.ui:87
+#: sc/uiconfig/scalc/ui/functionpanel.ui:78
 msgctxt "functionpanel|category"
 msgid "Statistical"
 msgstr "Tölfræðilegt"
 
 #. 6XCsS
-#: sc/uiconfig/scalc/ui/functionpanel.ui:88
+#: sc/uiconfig/scalc/ui/functionpanel.ui:79
 msgctxt "functionpanel|category"
 msgid "Spreadsheet"
 msgstr "Töflureiknir"
 
 #. DwfB5
-#: sc/uiconfig/scalc/ui/functionpanel.ui:89
+#: sc/uiconfig/scalc/ui/functionpanel.ui:80
 msgctxt "functionpanel|category"
 msgid "Text"
 msgstr "Texti"
 
 #. BCiyc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:90
+#: sc/uiconfig/scalc/ui/functionpanel.ui:81
 msgctxt "functionpanel|category"
 msgid "Add-in"
 msgstr "Viðbætur"
 
 #. tDNFD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:94
+#: sc/uiconfig/scalc/ui/functionpanel.ui:85
 msgctxt "functionpanel|extended_tip|category"
 msgid "Displays the available functions."
-msgstr ""
+msgstr "Birtir tiltæk föll."
 
 #. V9ATp
-#: sc/uiconfig/scalc/ui/functionpanel.ui:141
+#: sc/uiconfig/scalc/ui/functionpanel.ui:133
 msgctxt "functionpanel|extended_tip|funclist"
 msgid "Displays the available functions."
-msgstr ""
-
-#. rmQie
-#: sc/uiconfig/scalc/ui/functionpanel.ui:175
-msgctxt "functionpanel|funcdesc"
-msgid "label"
-msgstr "skýring"
+msgstr "Birtir tiltæk föll."
 
 #. dmA3u
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:8
@@ -23406,13 +23405,13 @@ msgstr "Markmiðaleit"
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:30
 msgctxt "goalseekdlg|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. fKq27
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:51
 msgctxt "goalseekdlg|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. qJ3YX
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:105
@@ -23478,7 +23477,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:16
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Go to Sheet"
-msgstr ""
+msgstr "Fara á blað"
 
 #. ybsRg
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:103
@@ -23490,13 +23489,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:112
 msgctxt "gotosheetdialog|label-mask"
 msgid "_Type a sheet name"
-msgstr ""
+msgstr "S_krifaðu heiti á blaði"
 
 #. DpWr7
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:174
 msgctxt "gotosheetdialog|label-sheets"
 msgid "_Sheets"
-msgstr ""
+msgstr "_Blöð"
 
 #. F6iSH
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:197
@@ -23646,7 +23645,7 @@ msgstr "Hausar"
 #: sc/uiconfig/scalc/ui/headerdialog.ui:139
 msgctxt "headerdialog|headerfirst"
 msgid "Header (first)"
-msgstr ""
+msgstr "Haus (fyrsti)"
 
 #. DCKK3
 #: sc/uiconfig/scalc/ui/headerdialog.ui:183
@@ -23835,55 +23834,55 @@ msgid "Use the buttons to change the font or insert field commands such as date,
 msgstr "Notaðu hnappana til að breyta letrinu eða til að setja inn gagnasviðskipanir eins og dagsetningu, tíma, o.s.frv."
 
 #. WBsTf
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:503
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:506
 msgctxt "headerfootercontent|label1"
 msgid "Note"
 msgstr "Athugasemd"
 
 #. X2HEK
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:525
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:528
 msgctxt "headerfootercontent|labelSTR_HF_NONE_IN_BRACKETS"
 msgid "(none)"
 msgstr "(ekkert)"
 
 #. RSazM
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:537
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:540
 msgctxt "headerfootercontent|labelSTR_PAGE"
 msgid "Page"
 msgstr "Síða"
 
 #. CMDYZ
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:549
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:552
 msgctxt "headerfootercontent|labelSTR_HF_OF_QUESTION"
 msgid "of ?"
 msgstr "af ?"
 
 #. jQyGW
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:561
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:564
 msgctxt "headerfootercontent|labelSTR_HF_CONFIDENTIAL"
 msgid "Confidential"
 msgstr "Trúnaðarmál"
 
 #. EeAAh
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:573
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:576
 msgctxt "headerfootercontent|labelSTR_HF_CREATED_BY"
 msgid "Created by"
 msgstr "Búið til af"
 
 #. CASF2
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:585
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:588
 msgctxt "headerfootercontent|labelSTR_HF_CUSTOMIZED"
 msgid "Customized"
 msgstr "Sérsniðið"
 
 #. wZN6q
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:597
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:600
 msgctxt "headerfootercontent|labelSTR_HF_OF"
 msgid "of"
 msgstr "af"
 
 #. SDx4X
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:614
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:617
 msgctxt "headerfootercontent|extended_tip|HeaderFooterContent"
 msgid "Defines or formats a header or footer for a Page Style."
 msgstr ""
@@ -24006,7 +24005,7 @@ msgstr "Valkostir gagnasviða"
 #: sc/uiconfig/scalc/ui/inputstringdialog.ui:108
 msgctxt "inputstringdialog|extended_tip|name_entry"
 msgid "Enter a new name for the sheet here."
-msgstr ""
+msgstr "Settu hér inn nýtt heiti á blaðið."
 
 #. MwM2i
 #: sc/uiconfig/scalc/ui/inputstringdialog.ui:137
@@ -24102,7 +24101,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/insertname.ui:70
 msgctxt "insertname|paste"
 msgid "_Paste"
-msgstr ""
+msgstr "_Líma"
 
 #. TNPzH
 #: sc/uiconfig/scalc/ui/insertname.ui:79
@@ -24114,7 +24113,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/insertname.ui:137
 msgctxt "insertname|STR_HEADER_NAME"
 msgid "Name"
-msgstr ""
+msgstr "Heiti"
 
 #. 28fLF
 #: sc/uiconfig/scalc/ui/insertname.ui:150
@@ -24324,19 +24323,19 @@ msgstr "Sýsla með heiti"
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:44
 msgctxt "managenamesdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. ftVCr
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:63
 msgctxt "managenamesdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. RCtXS
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:133
 msgctxt "managenamesdialog|name"
 msgid "Name"
-msgstr ""
+msgstr "Heiti"
 
 #. qwCzn
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:146
@@ -24414,7 +24413,7 @@ msgstr "_Prentsvið"
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:369
 msgctxt "managenamesdialog|extended_tip|printrange"
 msgid "Defines the area as a print range."
-msgstr ""
+msgstr "Skilgreinir svæðið sem prentbil."
 
 #. EjtHY
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:380
@@ -24438,7 +24437,7 @@ msgstr "_Endurtaka dálk"
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:407
 msgctxt "managenamesdialog|extended_tip|colheader"
 msgid "Defines the area as a repeating column."
-msgstr ""
+msgstr "Skilgreinir svæðið sem endurtekinn dálk."
 
 #. c3b8v
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:418
@@ -24450,7 +24449,7 @@ msgstr "Endurtaka _röð"
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:426
 msgctxt "managenamesdialog|extended_tip|rowheader"
 msgid "Defines the area as a repeating row."
-msgstr ""
+msgstr "Skilgreinir svæðið sem endurtekna röð."
 
 #. Rujwh
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:441
@@ -24468,13 +24467,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:472
 msgctxt "managenamesdialog|extended_tip|add"
 msgid "Click the Add button to add a new defined name."
-msgstr ""
+msgstr "Smelltu á 'Bæta við'-hnappinn  til að bæta við nýju skilgreindu heiti."
 
 #. MBAnE
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:491
 msgctxt "managenamesdialog|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. j3EMw
 #: sc/uiconfig/scalc/ui/managenamesdialog.ui:527
@@ -24534,19 +24533,19 @@ msgstr "Aðgerð við sameiningu dálka"
 #: sc/uiconfig/scalc/ui/mergecolumnentry.ui:46
 msgctxt "mergecolumnentry/separator"
 msgid "Separator"
-msgstr ""
+msgstr "Aðgreinir"
 
 #. BKHND
 #: sc/uiconfig/scalc/ui/mergecolumnentry.ui:60
 msgctxt "mergecolumnentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. cMGtd
 #: sc/uiconfig/scalc/ui/mergecolumnentry.ui:69
 msgctxt "mergecolumnentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. 4kTrD
 #: sc/uiconfig/scalc/ui/movecopysheet.ui:16
@@ -24726,13 +24725,13 @@ msgstr "Margar aðgerðir"
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:33
 msgctxt "multipleoperationsdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. EEze8
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:52
 msgctxt "multipleoperationsdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. aQNVa
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:106
@@ -24810,13 +24809,13 @@ msgstr "Skilgreina fyrirsagnasvið"
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:43
 msgctxt "namerangesdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. jkh7A
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:63
 msgctxt "namerangesdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. 9GqGh
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:131
@@ -24882,7 +24881,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:319
 msgctxt "namerangesdialog|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. E2Wk2
 #: sc/uiconfig/scalc/ui/namerangesdialog.ui:370
@@ -25140,7 +25139,7 @@ msgstr "_Heim"
 #: sc/uiconfig/scalc/ui/notebookbar.ui:4833
 msgctxt "CalcNotebookbar|HomeLabel"
 msgid "~Home"
-msgstr ""
+msgstr "~Heim"
 
 #. bBEGh
 #: sc/uiconfig/scalc/ui/notebookbar.ui:5380
@@ -25149,177 +25148,177 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. VCk9a
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5882
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5859
 msgctxt "CalcNotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. HnjBi
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5987
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5964
 msgctxt "CalcNotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. xmARL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6388
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6413
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6841
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6365
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6390
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6818
 msgctxt "CalcNotebookbar|objectalign|tooltip_text"
 msgid "Object Align"
 msgstr "Jöfnun hlutar"
 
 #. vruXQ
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7062
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7039
 msgctxt "CalcNotebookbar|LayoutMenuButton"
 msgid "_Layout"
 msgstr "_Framsetning"
 
 #. eWinY
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7146
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7123
 msgctxt "CalcNotebookbar|PageLayoutLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. pnWd5
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8423
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8400
 msgctxt "CalcNotebookbar|StatisticsMenuButton"
 msgid "_Statistics"
 msgstr "_Tölfræði"
 
 #. BiHBE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8474
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8451
 msgctxt "CalcNotebookbar|DataMenuButton"
 msgid "_Data"
 msgstr "_Gögn"
 
 #. xzx9j
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8580
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8557
 msgctxt "CalcNotebookbar|DataLabel"
 msgid "~Data"
 msgstr "~Gögn"
 
 #. CBEHA
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9383
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9360
 msgctxt "CalcNotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. 7FXbr
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9468
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9445
 msgctxt "CalcNotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "Yfirfa~ra"
 
 #. NT37F
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10354
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10331
 msgctxt "CalcNotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. rPdAq
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10439
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10416
 msgctxt "CalcNotebookbar|ViewLabel"
 msgid "~View"
 msgstr "S~koða"
 
 #. SAv6Z
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11548
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11525
 msgctxt "CalcNotebookbar|ImageMenuButton"
 msgid "Ima_ge"
 msgstr "M_ynd"
 
 #. rwprK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11669
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11646
 msgctxt "CalcNotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "M~ynd"
 
 #. EjbzV
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12850
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12827
 msgctxt "CalcNotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "Tei_kna"
 
 #. iagRv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12957
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12934
 msgctxt "CalcNotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "Tei~kna"
 
 #. EgeGL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13415
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13392
 msgctxt "CalcNotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Umbreyta"
 
 #. PRmbH
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13705
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13682
 msgctxt "CalcNotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Hlutur"
 
 #. xTKVv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13812
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13789
 msgctxt "CalcNotebookbar|FrameLabel"
 msgid "~Object"
 msgstr "~Hlutur"
 
 #. cHyKz
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14371
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14348
 msgctxt "CalcNotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Margmiðlun"
 
 #. CJ2qx
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14476
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14453
 msgctxt "CalcNotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Margmiðlun"
 
 #. eQK6A
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14858
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14835
 msgctxt "CalcNotebookbar|PrintMenuButton"
 msgid "_Print"
 msgstr "_Prenta"
 
 #. sCGyG
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14941
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14918
 msgctxt "CalcNotebookbar|PrintLabel"
 msgid "~Print"
 msgstr "~Prenta"
 
 #. 5JVAt
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15749
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15726
 msgctxt "CalcNotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. CCEAK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15833
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15810
 msgctxt "CalcNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. DHeyE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15890
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15867
 msgctxt "CalcNotebookbar|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. 4ZDL7
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15964
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15941
 msgctxt "CalcNotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. 3Ec6T
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17153
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17130
 msgctxt "CalcNotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. 8HTEk
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17237
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17214
 msgctxt "CalcNotebookbar|ToolsLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -25338,7 +25337,7 @@ msgstr "~Skrá"
 
 #. UWfVg
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:3545
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6152
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6113
 msgctxt "notebookbar_compact|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Tilgreindu jaðra fyrir valda reiti."
@@ -25353,7 +25352,7 @@ msgstr "Val_mynd"
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:4639
 msgctxt "notebookbar_compact|CalcLabel"
 msgid "~Home"
-msgstr ""
+msgstr "~Heim"
 
 #. ecBqZ
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5135
@@ -25362,163 +25361,163 @@ msgid "Fiel_d"
 msgstr "_Gagnasvið"
 
 #. zveKA
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5637
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5598
 msgctxt "notebookbar_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "Setja _inn"
 
 #. CDXv3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5692
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5653
 msgctxt "notebookbar_compact|InsertLabel"
 msgid "~Insert"
 msgstr "Setja ~inn"
 
 #. EvytN
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6273
 msgctxt "notebookbar_compact|PageMenuButton"
 msgid "_Layout"
 msgstr "_Framsetning"
 
 #. TbQMa
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6364
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6325
 msgctxt "notebookbar_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "Fra~msetning"
 
 #. QqjZP
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7199
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7160
 msgctxt "notebookbar_compact|Statistics"
 msgid "_Statistics"
 msgstr "_Tölfræði"
 
 #. GFZNz
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7264
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7225
 msgctxt "notebookbar_compact|DataMenuButton"
 msgid "_Data"
 msgstr "_Gögn"
 
 #. TCt7E
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7315
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7276
 msgctxt "notebookbar_compact|DataLabel"
 msgid "~Data"
-msgstr ""
+msgstr "~Gögn"
 
 #. jYD7j
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7997
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7958
 msgctxt "notebookbar_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "Yfi_rfara"
 
 #. Lbj5B
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8049
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8010
 msgctxt "notebookbar_compact|ReviewLabel"
 msgid "~Review"
-msgstr ""
+msgstr "Yfirfa~ra"
 
 #. 35kA2
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8716
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8677
 msgctxt "notebookbar_compact|ViewMenuButton"
 msgid "_View"
 msgstr "S_koða"
 
 #. ZGh8C
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8768
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8729
 msgctxt "notebookbar_compact|ViewLabel"
 msgid "~View"
-msgstr ""
+msgstr "S~koða"
 
 #. dV94w
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10082
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10043
 msgctxt "notebookbar_compact|GraphicMenuButton"
 msgid "Im_age"
-msgstr ""
+msgstr "M_ynd"
 
 #. ekWoX
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10134
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10095
 msgctxt "notebookbar_compact|ImageLabel"
 msgid "Ima~ge"
-msgstr ""
+msgstr "M~ynd"
 
 #. 8eQN8
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11504
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11465
 msgctxt "notebookbar_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "_Teikna"
 
 #. FBf68
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11556
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11517
 msgctxt "notebookbar_compact|ShapeLabel"
 msgid "~Draw"
 msgstr ""
 
 #. DoVwy
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12507
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12468
 msgctxt "notebookbar_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Hlutur"
 
 #. JXKiY
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12559
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12520
 msgctxt "notebookbar_compact|FrameLabel"
 msgid "~Object"
-msgstr ""
+msgstr "~Hlutur"
 
 #. q8wnS
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13259
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13220
 msgctxt "notebookbar_compact|MediaButton"
 msgid "_Media"
 msgstr ""
 
 #. 7HDt3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13273
 msgctxt "notebookbar_compact|MediaLabel"
 msgid "~Media"
 msgstr ""
 
 #. vSDok
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13871
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13832
 msgctxt "notebookbar_compact|PrintPreviewButton"
 msgid "Print"
 msgstr "Prenta"
 
 #. goiqQ
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13923
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13884
 msgctxt "notebookbar_compact|FormLabel"
 msgid "~Print"
-msgstr ""
+msgstr "~Prenta"
 
 #. EBGs5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15237
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15198
 msgctxt "notebookbar_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Innfyllinga_rform"
 
 #. EKA8X
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15289
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15250
 msgctxt "notebookbar_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Innfyllingarfo~rm"
 
 #. 8SvE5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15368
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15329
 msgctxt "notebookbar_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "Við_bót"
 
 #. WH5NR
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15426
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15387
 msgctxt "notebookbar_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "Við~bót"
 
 #. 8fhwb
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16427
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16388
 msgctxt "notebookbar_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Verkfæri"
 
 #. kpc43
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16479
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16440
 msgctxt "notebookbar_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Verkfæri"
@@ -25654,7 +25653,7 @@ msgstr "Þríví_dd"
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_compact.ui:7127
 msgctxt "notebookbar_groupedbar_compact|GridButton"
 msgid "_Fontwork"
-msgstr ""
+msgstr "Leturs_miðja"
 
 #. PLqyG
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_compact.ui:7238
@@ -25670,7 +25669,7 @@ msgstr "_Hnitanet"
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_compact.ui:7368
 msgctxt "notebookbar_groupedbar_compact|ImageButton"
 msgid "Im_age"
-msgstr ""
+msgstr "M_ynd"
 
 #. SEFWn
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_compact.ui:8020
@@ -25736,13 +25735,13 @@ msgstr "Áhersla 3"
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_full.ui:2652
 msgctxt "notebookbar_groupedbar_full|Header1"
 msgid "Heading 1"
-msgstr ""
+msgstr "Fyrirsögn 1"
 
 #. 6Ej4G
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_full.ui:2660
 msgctxt "notebookbar_groupedbar_full|Header2"
 msgid "Heading 2"
-msgstr ""
+msgstr "Fyrirsögn 2"
 
 #. sqE94
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_full.ui:2674
@@ -25874,7 +25873,7 @@ msgstr "S_koða"
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_full.ui:5687
 msgctxt "notebookbar_groupedbar_full|graphicB"
 msgid "Im_age"
-msgstr ""
+msgstr "M_ynd"
 
 #. punQr
 #: sc/uiconfig/scalc/ui/notebookbar_groupedbar_full.ui:6002
@@ -26438,13 +26437,13 @@ msgstr "Er oddatala"
 #: sc/uiconfig/scalc/ui/numbertransformationentry.ui:75
 msgctxt "numbertransformationentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. FFa8s
 #: sc/uiconfig/scalc/ui/numbertransformationentry.ui:84
 msgctxt "numbertransformationentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. T2p5k
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:42
@@ -26702,7 +26701,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:556
 msgctxt "optcalculatepage|label5"
 msgid "Formulas Wildcards"
-msgstr ""
+msgstr "Algildisstafir í formúlum"
 
 #. Umdv5
 #: sc/uiconfig/scalc/ui/optchangespage.ui:32
@@ -27170,7 +27169,7 @@ msgstr "_Eyða"
 #: sc/uiconfig/scalc/ui/optsortlists.ui:286
 msgctxt "optsortlists|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
-msgstr ""
+msgstr "Eyðir völdu atriði eða atriðum án þess að krefjast staðfestingar."
 
 #. L7EBD
 #: sc/uiconfig/scalc/ui/optsortlists.ui:311
@@ -27326,7 +27325,7 @@ msgstr "Sérstök líming"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:130
 msgctxt "pastespecial|paste_values_only|label"
 msgid "Values Only"
-msgstr ""
+msgstr "Eingöngu gildi"
 
 #. XyU8o
 #: sc/uiconfig/scalc/ui/pastespecial.ui:134
@@ -27344,7 +27343,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:153
 msgctxt "pastespecial|paste_values_formats|label"
 msgid "Values & Formats"
-msgstr ""
+msgstr "Gildi og snið"
 
 #. 7GuDi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:157
@@ -27362,13 +27361,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:176
 msgctxt "pastespecial|paste_format|label"
 msgid "Formats Only"
-msgstr ""
+msgstr "Eingöngu snið"
 
 #. Cvyjn
 #: sc/uiconfig/scalc/ui/pastespecial.ui:180
 msgctxt "pastespecial|paste_format|tooltip_text"
 msgid "Formats Only"
-msgstr ""
+msgstr "Eingöngu snið"
 
 #. Jhc4o
 #: sc/uiconfig/scalc/ui/pastespecial.ui:187
@@ -27380,13 +27379,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:199
 msgctxt "pastespecial|paste_transpose|label"
 msgid "Transpose All"
-msgstr ""
+msgstr "Umbylta öllu"
 
 #. sbLGi
 #: sc/uiconfig/scalc/ui/pastespecial.ui:203
 msgctxt "pastespecial|paste_transpose|tooltip_text"
 msgid "Transpose All"
-msgstr ""
+msgstr "Umbylta öllu"
 
 #. 3BC6U
 #: sc/uiconfig/scalc/ui/pastespecial.ui:210
@@ -27398,7 +27397,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:229
 msgctxt "pastespecial|cbImmediately"
 msgid "Run immediately"
-msgstr ""
+msgstr "Keyra strax"
 
 #. 7a9JE
 #: sc/uiconfig/scalc/ui/pastespecial.ui:238
@@ -27410,13 +27409,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:254
 msgctxt "pastespecial|frPresets"
 msgid "Presets"
-msgstr ""
+msgstr "Forstillingar"
 
 #. huhPQ
 #: sc/uiconfig/scalc/ui/pastespecial.ui:290
 msgctxt "pastespecial|paste_all"
 msgid "All"
-msgstr ""
+msgstr "Allt"
 
 #. Labin
 #: sc/uiconfig/scalc/ui/pastespecial.ui:298
@@ -27428,7 +27427,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:309
 msgctxt "pastespecial|numbers"
 msgid "Numbers"
-msgstr ""
+msgstr "Tölur"
 
 #. SCVEu
 #: sc/uiconfig/scalc/ui/pastespecial.ui:317
@@ -27440,7 +27439,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:328
 msgctxt "pastespecial|text"
 msgid "Text"
-msgstr ""
+msgstr "Texti"
 
 #. JWDk5
 #: sc/uiconfig/scalc/ui/pastespecial.ui:336
@@ -27452,7 +27451,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:347
 msgctxt "pastespecial|datetime"
 msgid "Date & time"
-msgstr ""
+msgstr "Dagsetning og tími"
 
 #. jq6Md
 #: sc/uiconfig/scalc/ui/pastespecial.ui:355
@@ -27464,7 +27463,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:366
 msgctxt "pastespecial|formats"
 msgid "Formats"
-msgstr ""
+msgstr "Snið"
 
 #. ehyEf
 #: sc/uiconfig/scalc/ui/pastespecial.ui:374
@@ -27476,7 +27475,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:385
 msgctxt "pastespecial|comments"
 msgid "Comments"
-msgstr ""
+msgstr "Athugasemdir"
 
 #. 3uP7i
 #: sc/uiconfig/scalc/ui/pastespecial.ui:393
@@ -27488,7 +27487,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:404
 msgctxt "pastespecial|objects"
 msgid "Objects"
-msgstr ""
+msgstr "Hlutir"
 
 #. DZsnr
 #: sc/uiconfig/scalc/ui/pastespecial.ui:412
@@ -27500,7 +27499,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:423
 msgctxt "pastespecial|formulas"
 msgid "Formulas"
-msgstr ""
+msgstr "Formúlur"
 
 #. Na5Ba
 #: sc/uiconfig/scalc/ui/pastespecial.ui:431
@@ -27512,13 +27511,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:446
 msgctxt "pastespecial|label1"
 msgid "Paste"
-msgstr ""
+msgstr "Líma"
 
 #. SKs5y
 #: sc/uiconfig/scalc/ui/pastespecial.ui:477
 msgctxt "pastespecial|no_shift"
 msgid "Don't shift"
-msgstr ""
+msgstr "Ekki færa"
 
 #. q3Xv3
 #: sc/uiconfig/scalc/ui/pastespecial.ui:486
@@ -27530,7 +27529,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:498
 msgctxt "pastespecial|move_down"
 msgid "Down"
-msgstr ""
+msgstr "Niður"
 
 #. BNALN
 #: sc/uiconfig/scalc/ui/pastespecial.ui:507
@@ -27542,7 +27541,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:519
 msgctxt "pastespecial|move_right"
 msgid "Right"
-msgstr ""
+msgstr "Hægri"
 
 #. GEFe7
 #: sc/uiconfig/scalc/ui/pastespecial.ui:528
@@ -27560,7 +27559,7 @@ msgstr "Hliðra reitum"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:588
 msgctxt "pastespecial|link"
 msgid "As Link"
-msgstr ""
+msgstr "Sem tengil"
 
 #. Bg9dc
 #: sc/uiconfig/scalc/ui/pastespecial.ui:596
@@ -27572,7 +27571,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:607
 msgctxt "pastespecial|transpose"
 msgid "Transpose"
-msgstr ""
+msgstr "Umbylta"
 
 #. P3eE4
 #: sc/uiconfig/scalc/ui/pastespecial.ui:615
@@ -27584,7 +27583,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:626
 msgctxt "pastespecial|skip_empty"
 msgid "Skip empty cells"
-msgstr ""
+msgstr "Sleppa auðum reitum"
 
 #. BodqB
 #: sc/uiconfig/scalc/ui/pastespecial.ui:630
@@ -27602,13 +27601,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:650
 msgctxt "pastespecial|OptionsFrame"
 msgid "Options"
-msgstr ""
+msgstr "Valkostir"
 
 #. ekYg5
 #: sc/uiconfig/scalc/ui/pastespecial.ui:681
 msgctxt "pastespecial|none"
 msgid "None"
-msgstr ""
+msgstr "Ekkert"
 
 #. 7GKDG
 #: sc/uiconfig/scalc/ui/pastespecial.ui:690
@@ -27620,7 +27619,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:702
 msgctxt "pastespecial|add"
 msgid "Add"
-msgstr ""
+msgstr "Bæta við"
 
 #. bNyh2
 #: sc/uiconfig/scalc/ui/pastespecial.ui:711
@@ -27632,7 +27631,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:723
 msgctxt "pastespecial|subtract"
 msgid "Subtract"
-msgstr ""
+msgstr "Draga frá"
 
 #. 2SKbT
 #: sc/uiconfig/scalc/ui/pastespecial.ui:732
@@ -27644,7 +27643,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:744
 msgctxt "pastespecial|multiply"
 msgid "Multiply"
-msgstr ""
+msgstr "Margfalda"
 
 #. jkRDm
 #: sc/uiconfig/scalc/ui/pastespecial.ui:753
@@ -27656,7 +27655,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:765
 msgctxt "pastespecial|divide"
 msgid "Divide"
-msgstr ""
+msgstr "Deila"
 
 #. 9VKdS
 #: sc/uiconfig/scalc/ui/pastespecial.ui:774
@@ -27670,10 +27669,10 @@ msgctxt "pastespecial|label2"
 msgid "Operations"
 msgstr "Aðgerðir"
 
-#. ypkML
-#: sc/uiconfig/scalc/ui/pastespecial.ui:825
+#. cBodz
+#: sc/uiconfig/scalc/ui/pastespecial.ui:824
 msgctxt "pastespecial|extended_tip|PasteSpecial"
-msgid "Inserts the contents of the clipboard into the current file in a format that you can specify."
+msgid "Inserts the contents of the clipboard into the current document in a format that you can specify."
 msgstr ""
 
 #. AqzPf
@@ -27938,13 +27937,13 @@ msgstr "Framsetning veltitöflu"
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:75
 msgctxt "pivottablelayoutdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. ieEKA
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:94
 msgctxt "pivottablelayoutdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. dhgK2
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:163
@@ -28190,13 +28189,13 @@ msgstr "Breyta prentsviðum"
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:33
 msgctxt "printareasdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. BftEK
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:52
 msgctxt "printareasdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. DrnyM
 #: sc/uiconfig/scalc/ui/printareasdialog.ui:119
@@ -28558,10 +28557,10 @@ msgctxt "randomnumbergenerator|enable-rounding-check"
 msgid "Enable rounding"
 msgstr "Virkja rúnnun"
 
-#. 8n4v9
+#. 6cz4t
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:418
 msgctxt "randomnumbergenerator|extended_tip|enable-rounding-check"
-msgid "Truncate the number to a given number of Decimal Places."
+msgid "Round the number to a given number of Decimal Places."
 msgstr ""
 
 #. nRvWV
@@ -28766,19 +28765,19 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/replacenulltransformationentry.ui:46
 msgctxt "replacenulltransformationentry/replace"
 msgid "Replace with"
-msgstr ""
+msgstr "Skipta út með"
 
 #. AN53W
 #: sc/uiconfig/scalc/ui/replacenulltransformationentry.ui:60
 msgctxt "replacenulltransformationentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. KHAnu
 #: sc/uiconfig/scalc/ui/replacenulltransformationentry.ui:69
 msgctxt "replacenulltransformationentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. vAFwf
 #: sc/uiconfig/scalc/ui/retypepassdialog.ui:10
@@ -28808,13 +28807,13 @@ msgstr "Slá inn _aftur"
 #: sc/uiconfig/scalc/ui/retypepassdialog.ui:152
 msgctxt "retypepassdialog|label2"
 msgid "Document Protection"
-msgstr ""
+msgstr "Verndun skjals"
 
 #. TriyK
 #: sc/uiconfig/scalc/ui/retypepassdialog.ui:207
 msgctxt "retypepassdialog|label3"
 msgid "Sheet Protection"
-msgstr ""
+msgstr "Verndun blaðs"
 
 #. eGMrC
 #: sc/uiconfig/scalc/ui/retypepassworddialog.ui:8
@@ -29278,38 +29277,26 @@ msgctxt "scgeneralpage|enter_paste_mode_cb"
 msgid "Press Enter to paste and clear clipboard"
 msgstr ""
 
-#. LFenu
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
-msgctxt "scgeneralpage|textfmtcb"
-msgid "Use printer metrics for text formatting"
-msgstr "Nota stillingar prentara til að sníða texta"
-
-#. ECUd7
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:385
-msgctxt "extended_tip|textfmtcb"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen."
-msgstr ""
-
 #. zW9SZ
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:397
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
 msgctxt "scgeneralpage|markhdrcb"
 msgid "Highlight sele_ction in column/row headers"
 msgstr "Ljóma _val í fyrirsögnum raða/dálka"
 
 #. payBv
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:405
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:386
 msgctxt "extended_tip|markhdrcb"
 msgid "Specifies whether to highlight column and row headers in the selected columns or rows."
 msgstr ""
 
 #. KGWyE
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:417
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:398
 msgctxt "scgeneralpage|sortrefupdatecb"
 msgid "Update references when sorting range of cells"
 msgstr "Uppfæra tilvísanir þegar reitum er endurraðað"
 
 #. M9G8o
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:439
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:420
 msgctxt "scgeneralpage|label3"
 msgid "Input Settings"
 msgstr "Inntaksstillingar"
@@ -29342,13 +29329,13 @@ msgstr "Blað"
 #: sc/uiconfig/scalc/ui/searchresults.ui:115
 msgctxt "searchresults|cell"
 msgid "Cell"
-msgstr ""
+msgstr "Reitur"
 
 #. Knp9A
 #: sc/uiconfig/scalc/ui/searchresults.ui:129
 msgctxt "searchresults|content"
 msgid "Content"
-msgstr ""
+msgstr "Innihald"
 
 #. GtwuD
 #: sc/uiconfig/scalc/ui/selectdatasource.ui:8
@@ -29510,37 +29497,37 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/sharedfirstfooterdialog.ui:8
 msgctxt "sharedfirstfooterdialog|SharedFirstFooterDialog"
 msgid "Footers"
-msgstr ""
+msgstr "Síðufætur"
 
 #. hHAJt
 #: sc/uiconfig/scalc/ui/sharedfirstfooterdialog.ui:139
 msgctxt "sharedfirstfooterdialog|footerright"
 msgid "Footer (right)"
-msgstr ""
+msgstr "Síðufótur (hægri)"
 
 #. p3eiA
 #: sc/uiconfig/scalc/ui/sharedfirstfooterdialog.ui:186
 msgctxt "sharedfirstfooterdialog|footerleft"
 msgid "Footer (left)"
-msgstr ""
+msgstr "Síðufótur (vinstri)"
 
 #. zzfLu
 #: sc/uiconfig/scalc/ui/sharedfirstheaderdialog.ui:8
 msgctxt "sharedfirstheaderdialog|SharedFirstHeaderDialog"
 msgid "Headers"
-msgstr ""
+msgstr "Hausar"
 
 #. na6S3
 #: sc/uiconfig/scalc/ui/sharedfirstheaderdialog.ui:139
 msgctxt "sharedfirstheaderdialog|headerright"
 msgid "Header (right)"
-msgstr ""
+msgstr "Haus (hægri)"
 
 #. B8Tvi
 #: sc/uiconfig/scalc/ui/sharedfirstheaderdialog.ui:186
 msgctxt "sharedfirstheaderdialog|headerleft"
 msgid "Header (left)"
-msgstr ""
+msgstr "Haus (vinstri)"
 
 #. DEDQP
 #: sc/uiconfig/scalc/ui/sharedfooterdialog.ui:8
@@ -29594,37 +29581,37 @@ msgstr "Síðufótur (vinstri)"
 #: sc/uiconfig/scalc/ui/sharedleftfooterdialog.ui:8
 msgctxt "sharedleftfooterdialog|SharedLeftFooterDialog"
 msgid "Footers"
-msgstr ""
+msgstr "Síðufætur"
 
 #. CHQPX
 #: sc/uiconfig/scalc/ui/sharedleftfooterdialog.ui:139
 msgctxt "sharedleftfooterdialog|footerfirst"
 msgid "Footer (first)"
-msgstr ""
+msgstr "Síðufótur (fyrsti)"
 
 #. FCzBo
 #: sc/uiconfig/scalc/ui/sharedleftfooterdialog.ui:183
 msgctxt "sharedleftfooterdialog|footerright"
 msgid "Footer (rest)"
-msgstr ""
+msgstr "Síðufótur (afgangur)"
 
 #. yw8Bd
 #: sc/uiconfig/scalc/ui/sharedleftheaderdialog.ui:8
 msgctxt "sharedleftheaderdialog|SharedLeftHeaderDialog"
 msgid "Headers"
-msgstr ""
+msgstr "Hausar"
 
 #. AaCXP
 #: sc/uiconfig/scalc/ui/sharedleftheaderdialog.ui:139
 msgctxt "sharedleftheaderdialog|headerfirst"
 msgid "Header (first)"
-msgstr ""
+msgstr "Haus (fyrsti)"
 
 #. DhEeW
 #: sc/uiconfig/scalc/ui/sharedleftheaderdialog.ui:183
 msgctxt "sharedleftheaderdialog|headerright"
 msgid "Header (rest)"
-msgstr ""
+msgstr "Haus (afgangur)"
 
 #. D5VTo
 #: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:18
@@ -29645,19 +29632,19 @@ msgid "Note: Changes to formatting attributes like fonts, colors, and number for
 msgstr "Athugið: Breytingar á ýmsum sniðeiginleikum eins og fyrir letur, liti og tölur verða ekki vistaðar og sumar aðgerðir á borð við breytingar á línuritum og teikningum eru ekki í boði þegar unnið er í sameiginlegum skjölum. Slökktu á sameignarhamnum til að fá einkarétt til slíkra breytinga og aðgerða."
 
 #. dQz77
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:187
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:190
 msgctxt "sharedocumentdlg|name"
 msgid "Name"
 msgstr "Heiti"
 
 #. EC8AA
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:200
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:203
 msgctxt "sharedocumentdlg|accessed"
 msgid "Accessed"
 msgstr "Opnað"
 
 #. hHHJG
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:224
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:227
 msgctxt "sharedocumentdlg|label1"
 msgid "Users Currently Accessing This Spreadsheet"
 msgstr "Notendur sem eru núna með aðgang að skjalinu"
@@ -29890,17 +29877,17 @@ msgctxt "sheetprintpage|comboLB_SCALEMODE"
 msgid "Reduce/enlarge printout"
 msgstr "Minnka/stækka útprentun"
 
-#. GxZyi
+#. i7BEB
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:645
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) to width/height"
-msgstr "Aðlaga prentsvið að breidd/hæð"
+msgid "Shrink print range(s) to width/height"
+msgstr ""
 
-#. Y2GhT
+#. KzA6v
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:646
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) on number of pages"
-msgstr "Aðlaga prentsvið að síðufjölda"
+msgid "Shrink print range(s) on number of pages"
+msgstr ""
 
 #. AzkrF
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:650
@@ -30011,97 +29998,97 @@ msgid "Displays a list of all hidden sheets in your spreadsheet document."
 msgstr ""
 
 #. ktHTz
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:52
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:53
 msgctxt "sidebaralignment|horizontalalignment|tooltip_text"
 msgid "Horizontal Alignment"
 msgstr "Lárétt jöfnun"
 
 #. U8BWH
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:109
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:114
 msgctxt "sidebaralignment|verticalalignment|tooltip_text"
 msgid "Vertical Alignment"
 msgstr "Lóðrétt jöfnun"
 
-#. etrVi
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:237
-msgctxt "sidebaralignment|leftindent|tooltip_text"
-msgid "Indents from the left edge."
-msgstr "Inndráttur frá vinstri jaðri."
-
 #. qtoY5
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:266
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:243
 msgctxt "sidebaralignment|orientationlabel"
 msgid "Text _orientation:"
 msgstr "Stefna te_xta:"
 
 #. Ume2A
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:281
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:257
 msgctxt "sidebaralignment|orientationdegrees|tooltip_text"
 msgid "Select the angle for rotation."
 msgstr "Veldu snúningshornið."
 
 #. KEG9k
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:308
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:270
 msgctxt "sidebaralignment|stacked"
 msgid "Vertically stacked"
 msgstr "Staflað lóðrétt"
 
 #. ZE4wU
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:336
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:295
 msgctxt "sidebaralignment|bottom|tooltip_text"
 msgid "Text Extension From Lower Cell Border"
 msgstr "Texti teygist frá neðri brún reits"
 
 #. CgVBh
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:312
 msgctxt "sidebaralignment|top|tooltip_text"
 msgid "Text Extension From Upper Cell Border"
 msgstr "Texti teygist frá efri brún reits"
 
 #. TSALx
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:329
 msgctxt "sidebaralignment|standard|tooltip_text"
 msgid "Text Extension Inside Cell"
 msgstr "Texti teygist innan í reit"
 
 #. xruhe
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:349
 msgctxt "sidebaralignment|wraptext"
 msgid "Wrap text"
 msgstr "Línuskipta texta"
 
 #. uTKvq
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:402
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
 msgctxt "sidebaralignment|wraptext|tooltip_text"
 msgid "Wrap texts automatically."
 msgstr "Sjálfvirkt umbrot texta."
 
 #. Ae65n
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:415
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:366
 msgctxt "sidebaralignment|mergecells"
 msgid "Merge cells"
 msgstr "Sameina reiti"
 
 #. NK2BS
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:419
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
 msgctxt "sidebaralignment|mergecells|tooltip_text"
 msgid "Joins the selected cells into one."
 msgstr "Sameinar valda reiti í einn."
 
+#. etrVi
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:385
+msgctxt "sidebaralignment|leftindent|tooltip_text"
+msgid "Indents from the left edge."
+msgstr "Inndráttur frá vinstri jaðri."
+
 #. FdKBk
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:433
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
 msgctxt "sidebaralignment|leftindentlabel"
 msgid "_Indent:"
 msgstr "_Inndráttur:"
 
 #. BBGFK
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:23
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:22
 msgctxt "sidebarcellappearance|cellbackgroundlabel"
 msgid "_Background:"
 msgstr "_Bakgrunnur:"
 
 #. bjHWc
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:37
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:36
 msgctxt "sidebarcellappearance|cellbackgroundcolor|tooltip_text"
 msgid "Select the background color of the selected cells."
 msgstr "Smelltu hér til að velja bakgrunnslit á valda reiti."
@@ -30113,199 +30100,199 @@ msgid "Select the background color of the selected cells."
 msgstr "Smelltu hér til að velja bakgrunnslit á valda reiti."
 
 #. DKEkN
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:71
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:72
 msgctxt "sidebarcellappearance|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Tilgreindu jaðra fyrir valda reiti."
 
 #. D2TVi
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:92
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:93
 msgctxt "sidebarcellappearance|borderlinecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Veldu hér línulit jaðra."
 
 #. GqfZD
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:101
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:103
 msgctxt "sidebarcellappearance|linecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Veldu hér línulit jaðra."
 
 #. 8AUBs
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:111
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:113
 msgctxt "sidebarcellappearance|borderlinecolor-atkobject"
 msgid "Border Line Color"
 msgstr "Litur jaðarlínu"
 
 #. VgXDF
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:132
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:135
 msgctxt "sidebarcellappearance|linestyle|tooltip_text"
 msgid "Select the line style of the borders."
 msgstr "Veldu hér línustíl jaðra."
 
 #. jaxhA
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:142
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:145
 msgctxt "sidebarcellappearance|borderlinestyle-atkobject"
 msgid "Border Line Style"
 msgstr "Línustíll jaðars"
 
 #. CNqCC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:71
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
 msgctxt "sidebarnumberformat|numberformatcombobox|tooltip_text"
 msgid "Select a category of contents."
 msgstr "Veldu flokk innihalds."
 
 #. EeECn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:75
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:85
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "General"
 msgstr "Almennt"
 
 #. SmpsG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:76
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:86
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Number"
-msgstr ""
+msgstr "Tala"
 
 #. 8FGeM
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:77
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:87
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Percent"
-msgstr ""
+msgstr "Prósenta"
 
 #. bHC79
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:78
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Currency"
 msgstr "Gjaldmiðill"
 
 #. Lh2G6
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:79
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:89
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Date "
-msgstr ""
+msgstr "Dagsetning "
 
 #. EUCxB
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:80
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:90
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Time"
-msgstr ""
+msgstr "Tími"
 
 #. EukSF
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:91
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Scientific"
 msgstr "Vísindalegt"
 
 #. AQV5y
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:82
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:92
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Fraction"
 msgstr "Tugabrot"
 
 #. kQGBu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:83
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:93
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Boolean Value"
-msgstr ""
+msgstr "Boole-gildi"
 
 #. Gv2sX
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:84
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:94
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Text"
 msgstr "Texti"
 
 #. ypKG8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:98
 msgctxt "sidebarnumberformat|numberformatcombobox-atkobject"
 msgid "Category"
 msgstr "Flokkur"
 
 #. FqFzG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:120
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:117
 msgctxt "sidebarnumberformat|decimalplaceslabel"
 msgid "_Decimal places:"
 msgstr "Tu_gabrotasæti:"
 
 #. xen2B
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:134
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:131
 msgctxt "sidebarnumberformat|denominatorplaceslabel"
 msgid "Den_ominator places:"
 msgstr "Sæt_i í nefnara:"
 
 #. cdFDC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:162
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:158
 msgctxt "sidebarnumberformat|denominatorplaces|tooltip_text"
 msgid "Enter the number of places for the denominator that you want to display."
 msgstr "Settu inn fjölda aukastafa fyrir nefnara sem á að birta."
 
 #. ySDGH
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:167
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:163
 msgctxt "sidebarnumberformat|denominatorplaces-atkobject"
 msgid "Denominator Places"
 msgstr "Tugabrotasæti nefnara"
 
 #. EaLbU
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:181
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:177
 msgctxt "sidebarnumberformat|decimalplaces|tooltip_text"
 msgid "Enter the number of decimal places that you want to display."
 msgstr "Settu inn fjölda aukastafa sem á að birta."
 
 #. 5tvJA
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:186
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:182
 msgctxt "sidebarnumberformat|decimalplaces-atkobject"
 msgid "Decimal Places"
 msgstr "Tugabrotasæti"
 
 #. 4h3mG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:219
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:202
 msgctxt "sidebarnumberformat|leadingzeroeslabel"
 msgid "Leading _zeroes:"
 msgstr "Núll á _undan:"
 
 #. 35pSE
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:234
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:215
 msgctxt "sidebarnumberformat|leadingzeroes|tooltip_text"
 msgid "Enter the maximum number of zeroes to display before the decimal point."
 msgstr "Settu inn hámarksfjölda núlla sem birta má á á undan tugabrotskommu."
 
 #. UFTBa
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:240
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:221
 msgctxt "sidebarnumberformat|leadingzeroes-atkobject"
 msgid "Leading Zeroes"
 msgstr "Núll á undan"
 
 #. jkDKD
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:259
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:232
 msgctxt "sidebarnumberformat|negativenumbersred"
 msgid "_Negative numbers in red"
 msgstr "_Neikvæðar tölur rauðar"
 
 #. apRL8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:263
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:236
 msgctxt "sidebarnumberformat|negativenumbersred|tooltip_text"
 msgid "Changes the font color of negative numbers to red."
 msgstr "Gerir neikvæðar tölur rauðar."
 
 #. BJ9Gy
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:275
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:249
 msgctxt "sidebarnumberformat|thousandseparator"
 msgid "_Thousands separator"
 msgstr "Þúsunda_tákn"
 
 #. ykEWn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:279
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:253
 msgctxt "sidebarnumberformat|thousandseparator|tooltip_text"
 msgid "Inserts a separator between thousands."
 msgstr "Bætir við aðgreini eða bili á milli þúsunda."
 
 #. pGpRu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:291
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:266
 msgctxt "sidebarnumberformat|engineeringnotation"
 msgid "_Engineering notation"
 msgstr "V_erkfræðilegur ritháttur (staðalform)"
 
 #. 9CEjC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:294
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:269
 msgctxt "sidebarnumberformat|engineeringnotation|tooltip_text"
 msgid "Ensures that exponent is a multiple of 3."
 msgstr "Tryggir að veldi sé margfeldi af 3."
@@ -30338,7 +30325,7 @@ msgstr "Leysari"
 #: sc/uiconfig/scalc/ui/solverdlg.ui:39
 msgctxt "solverdlg|resetall"
 msgid "_Reset All"
-msgstr ""
+msgstr "F_rumstilla allt"
 
 #. bz78K
 #: sc/uiconfig/scalc/ui/solverdlg.ui:53
@@ -30346,10 +30333,10 @@ msgctxt "solverdlg|options"
 msgid "O_ptions..."
 msgstr "_Valkostir..."
 
-#. UABF3
+#. 8BGxk
 #: sc/uiconfig/scalc/ui/solverdlg.ui:60
 msgctxt "solverdlg|extended_tip|options"
-msgid "Opens the Solver Options dialog."
+msgid "Opens the solver’s Options dialog."
 msgstr ""
 
 #. 8hMNV
@@ -30776,37 +30763,37 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:79
 msgctxt "sortcriteriapage|topdown"
 msgid "Top to bottom (sort rows)"
-msgstr ""
+msgstr "Efstu til neðstu (raða röðum)"
 
 #. eNaAT
 #: sc/uiconfig/scalc/ui/sortcriteriapage.ui:94
 msgctxt "sortcriteriapage|leftright"
 msgid "Left to right (sort columns)"
-msgstr ""
+msgstr "Vinstri til hægri (raða dálkum)"
 
 #. vTci8
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:112
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:111
 msgctxt "sortcriteriapage|lbDirection"
 msgid "Direction:"
-msgstr ""
+msgstr "Stefna:"
 
 #. 6YQSB
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:122
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:121
 msgctxt "sortcriteriapage|header"
 msgid "Range contains..."
-msgstr ""
+msgstr "Sviðið inniheldur..."
 
 #. E9DMu
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:138
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:137
 msgctxt "sortcriteriapage|lbHeader"
 msgid "Headers:"
-msgstr ""
+msgstr "Hausar:"
 
 #. 5oaCb
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:155
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:154
 msgctxt "sortcriteriapage|lbOptions"
 msgid "Sort Options"
-msgstr ""
+msgstr "Valkostir röðunar"
 
 #. PqGRt
 #: sc/uiconfig/scalc/ui/sortdialog.ui:8
@@ -31004,7 +30991,7 @@ msgstr "Valkostir röðunar"
 #: sc/uiconfig/scalc/ui/sortoptionspage.ui:326
 msgctxt "sortoptionspage|extended_tip|SortOptionsPage"
 msgid "Sets additional sorting options."
-msgstr ""
+msgstr "Stillir viðbótarvalkosti röðunar."
 
 #. qAEt6
 #: sc/uiconfig/scalc/ui/sorttransformationentry.ui:28
@@ -31016,25 +31003,25 @@ msgstr "Raða umbreytingum"
 #: sc/uiconfig/scalc/ui/sorttransformationentry.ui:45
 msgctxt "sorttransformationentry/cols"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. 2nUfs
 #: sc/uiconfig/scalc/ui/sorttransformationentry.ui:54
 msgctxt "sorttransformationentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. JyYHP
 #: sc/uiconfig/scalc/ui/sorttransformationentry.ui:74
 msgctxt "sorttransformationentry|order_descending"
 msgid "Descending Order"
-msgstr ""
+msgstr "Lækkandi röð"
 
 #. CHFMb
 #: sc/uiconfig/scalc/ui/sorttransformationentry.ui:75
 msgctxt "sorttransformationentry|order_ascending"
 msgid "Ascending Order"
-msgstr ""
+msgstr "Hækkandi röð"
 
 #. EhGCw
 #: sc/uiconfig/scalc/ui/sortwarning.ui:8
@@ -31070,247 +31057,247 @@ msgstr "Ábending: Hægt er að ákvarða röðunarsvæði sjálfvirkt. Setti be
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:8
 msgctxt "SparklineDialog"
 msgid "Sparkline Data Range"
-msgstr ""
+msgstr "Gagnabil smágrafs"
 
 #. mdCMa
 #: sc/uiconfig/scalc/ui/sparklinedatarangedialog.ui:120
 msgctxt "SparklineDataRangeDialog|cell-range-label"
 msgid "Data range:"
-msgstr ""
+msgstr "Gagnabil:"
 
 #. 59Wvr
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:24
 msgctxt "SparklineDialog"
 msgid "Sparkline Properties"
-msgstr ""
+msgstr "Eiginleikar smágrafs"
 
 #. ZGEum
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:182
 msgctxt "SparklineDialog|label_InputRange"
 msgid "Input range:"
-msgstr ""
+msgstr "Inntakssvið:"
 
 #. X2vrF
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:199
 msgctxt "SparklineDialog|label_OutputRange"
 msgid "Output range:"
-msgstr ""
+msgstr "Frálagssvið:"
 
 #. faM2q
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:218
 msgctxt "SparklineDialog|label-data"
 msgid "Data"
-msgstr ""
+msgstr "Gögn"
 
 #. GXiV2
 #: sc/uiconfig/scalc/ui/sparklinedialog.ui:250
 msgctxt "SparklineDialog|label_Series"
 msgid "Series:"
-msgstr ""
+msgstr "Runa:"
 
 #. wBmc6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:283
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:285
 msgctxt "SparklineDialog|checkButton_Negative"
 msgid "Negative points:"
-msgstr ""
+msgstr "Neikvæðir punktar:"
 
 #. ySwZA
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:319
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:323
 msgctxt "SparklineDialog|checkButton_High"
 msgid "High points:"
-msgstr ""
+msgstr "Hápunktar:"
 
 #. DJKw7
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:355
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:361
 msgctxt "SparklineDialog|checkButton_Low"
 msgid "Low points:"
-msgstr ""
+msgstr "Lágpunktar:"
 
 #. q5qaV
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:391
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:399
 msgctxt "SparklineDialog|checkButton_Marker"
 msgid "Marker:"
-msgstr ""
+msgstr "Merki:"
 
 #. 4yLTi
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:427
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:437
 msgctxt "SparklineDialog|checkButton_First"
 msgid "First point:"
-msgstr ""
+msgstr "Fyrsti punktur:"
 
 #. EYEEJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:463
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:475
 msgctxt "SparklineDialog|checkButton_Last"
 msgid "Last point:"
-msgstr ""
+msgstr "Síðasti punktur:"
 
 #. mP9Uy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:503
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:517
 msgctxt "SparklineDialog|label_Colors"
 msgid "Colors"
-msgstr ""
+msgstr "Litir"
 
 #. a9F7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:537
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:551
 msgctxt "SparklineDialog|label_LineWidth"
 msgid "Line width:"
-msgstr ""
+msgstr "Línubreidd:"
 
 #. ofAyv
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:552
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:566
 msgctxt "SparklineDialog|spinButton_LineWidth"
 msgid "1,00"
-msgstr ""
+msgstr "1,00"
 
 #. 4ciyB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:570
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:584
 msgctxt "SparklineDialog|label_DisplayEmptyCellsAs"
 msgid "Display empty cells as:"
-msgstr ""
+msgstr "Birta auða reiti sem:"
 
 #. K3oCB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:585
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:599
 msgctxt "SparklineDialog|optionEmpty_Gap"
 msgid "Gap"
-msgstr ""
+msgstr "Bil"
 
 #. fzBds
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:586
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:600
 msgctxt "SparklineDialog|optionEmpty_Zero"
 msgid "Zero"
-msgstr ""
+msgstr "Núll"
 
 #. tGCDf
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:587
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:601
 msgctxt "SparklineDialog|optionEmpty_Span"
 msgid "Span"
-msgstr ""
+msgstr "Spönnun"
 
 #. fkB5s
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:597
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:611
 msgctxt "SparklineDialog|checkButton_Hidden"
 msgid "Display hidden"
-msgstr ""
+msgstr "Birta falið"
 
 #. gxx8E
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:612
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:626
 msgctxt "SparklineDialog|checkButton_RTL"
 msgid "Right-to-left"
-msgstr ""
+msgstr "Hægri-til-vinstri"
 
 #. GJfmJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:631
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
 msgctxt "SparklineDialog|optionType_Line"
 msgid "Line"
-msgstr ""
+msgstr "Lína"
 
 #. 2ZDbw
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:632
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:646
 msgctxt "SparklineDialog|optionType_Column"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. UirXW
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:633
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:647
 msgctxt "SparklineDialog|optionType_Stacked"
 msgid "Stacked"
-msgstr ""
+msgstr "Staflað"
 
 #. zmCsJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:659
 msgctxt "SparklineDialog|label_Type"
 msgid "Type:"
-msgstr ""
+msgstr "Tegund:"
 
 #. o8rnM
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:661
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:675
 msgctxt "SparklineDialog|label_Properties"
 msgid "Properties"
-msgstr ""
+msgstr "Eiginleikar"
 
 #. uQaJH
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:694
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:708
 msgctxt "SparklineDialog|option_MinAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "Stakt"
 
 #. BCX7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:695
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:709
 msgctxt "SparklineDialog|option_MinAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Hópur"
 
 #. SubB5
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:696
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:710
 msgctxt "SparklineDialog|option_MinAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Sérsniðið"
 
 #. T8Arr
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:724
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:738
 msgctxt "SparklineDialog|option_MaxAxis_Individual"
 msgid "Individual"
-msgstr ""
+msgstr "Stakt"
 
 #. DDfCP
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:725
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:739
 msgctxt "SparklineDialog|option_MaxAxis_Group"
 msgid "Group"
-msgstr ""
+msgstr "Hópur"
 
 #. C2Huq
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:726
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:740
 msgctxt "SparklineDialog|option_MaxAxis_Custom"
 msgid "Custom"
-msgstr ""
+msgstr "Sérsniðið"
 
-#. JFSoc
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:753
+#. kiBE8
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:767
 msgctxt "SparklineDialog|label_AxisMaximum"
-msgid "Vertical maximum"
-msgstr ""
+msgid "Vertical maximum:"
+msgstr "Lóðrétt hámark:"
 
 #. MEvJy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:768
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:782
 msgctxt "SparklineDialog|label_AxisMinimum"
 msgid "Vertical minimum:"
-msgstr ""
+msgstr "Lóðrétt lágmark:"
 
 #. EMPn4
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:780
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:794
 msgctxt "SparklineDialog|checkBox_DisplayX"
 msgid "Display X axis"
-msgstr ""
+msgstr "Birta X-ás"
 
 #. uAAF6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:800
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:814
 msgctxt "SparklineDialog|label_Axes"
 msgid "Axes"
-msgstr ""
+msgstr "Ásar"
 
 #. p9BBw
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:29
 msgctxt "splitcolumnentry|name"
 msgid "Split Column"
-msgstr ""
+msgstr "Kljúfa dálk"
 
 #. CVAGZ
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:46
 msgctxt "splitcolumnentry/separator"
 msgid "Separator"
-msgstr ""
+msgstr "Aðgreinir"
 
 #. CGTQa
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:60
 msgctxt "splitcolumnentry/cols"
 msgid "Column"
-msgstr ""
+msgstr "Dálkur"
 
 #. P8ZCJ
 #: sc/uiconfig/scalc/ui/splitcolumnentry.ui:69
 msgctxt "splitcolumnentry|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. GJ7zg
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:76
@@ -31322,19 +31309,19 @@ msgstr "Stöðluð sía"
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:94
 msgctxt "standardfilterdialog|clear"
 msgid "_Clear"
-msgstr ""
+msgstr "_Hreinsa"
 
 #. kFyDu
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:118
 msgctxt "standardfilterdialog|extended_tip|ok"
 msgid "Saves all changes and closes dialog."
-msgstr ""
+msgstr "Vistar allar breytingar og lokar glugga."
 
 #. JEsDB
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:138
 msgctxt "standardfilterdialog|extended_tip|cancel"
 msgid "Closes dialog and discards all changes."
-msgstr ""
+msgstr "Lokar glugga og hendir öllum breytingum."
 
 #. 3c3SD
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:217
@@ -31493,7 +31480,7 @@ msgstr "Nafn gagnasviðs 4"
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:540
 msgctxt "standardfilterdialog|cond"
 msgid "Largest"
-msgstr ""
+msgstr "Stærsta"
 
 #. QSesc
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:424
@@ -31502,7 +31489,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:541
 msgctxt "standardfilterdialog|cond"
 msgid "Smallest"
-msgstr ""
+msgstr "Minnsta"
 
 #. TpdQF
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:425
@@ -31511,7 +31498,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:542
 msgctxt "standardfilterdialog|cond"
 msgid "Largest %"
-msgstr ""
+msgstr "Stærsta %"
 
 #. aQA5f
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:426
@@ -31520,7 +31507,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:543
 msgctxt "standardfilterdialog|cond"
 msgid "Smallest %"
-msgstr ""
+msgstr "Minnsta %"
 
 #. eL6RL
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:427
@@ -31529,7 +31516,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:544
 msgctxt "standardfilterdialog|cond"
 msgid "Contains"
-msgstr ""
+msgstr "Inniheldur"
 
 #. K4RKQ
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:428
@@ -31538,7 +31525,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:545
 msgctxt "standardfilterdialog|cond"
 msgid "Does not contain"
-msgstr ""
+msgstr "Inniheldur ekki"
 
 #. VJwkd
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:429
@@ -31547,7 +31534,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:546
 msgctxt "standardfilterdialog|cond"
 msgid "Begins with"
-msgstr ""
+msgstr "Byrjar á"
 
 #. A3zBA
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:430
@@ -31556,7 +31543,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:547
 msgctxt "standardfilterdialog|cond"
 msgid "Does not begin with"
-msgstr ""
+msgstr "Byrjar ekki á"
 
 #. yEk22
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:431
@@ -31565,7 +31552,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:548
 msgctxt "standardfilterdialog|cond"
 msgid "Ends with"
-msgstr ""
+msgstr "Endar á"
 
 #. KMx5B
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:432
@@ -31574,16 +31561,16 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:549
 msgctxt "standardfilterdialog|cond"
 msgid "Does not end with"
-msgstr ""
+msgstr "Endar ekki á"
 
-#. XCG8Q
+#. 3PahC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:433
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:472
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:511
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:550
 msgctxt "standardfilterdialog|cond"
-msgid "Text color"
-msgstr ""
+msgid "Font color"
+msgstr "Litur á letri"
 
 #. 5Wa7m
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:434
@@ -31592,7 +31579,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:551
 msgctxt "standardfilterdialog|cond"
 msgid "Background color"
-msgstr ""
+msgstr "Bakgrunnslitur"
 
 #. rmPTC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:441
@@ -31640,25 +31627,25 @@ msgstr "Skilyrði 4"
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:569
 msgctxt "standardfilterdialog|remove1|tooltip_text"
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #. snJCB
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:584
 msgctxt "standardfilterdialog|remove2|tooltip_text"
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #. 8ti5o
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:599
 msgctxt "standardfilterdialog|remove3|tooltip_text"
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #. y4aPN
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:614
 msgctxt "standardfilterdialog|remove4|tooltip_text"
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #. FRhsT
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:647
@@ -31808,7 +31795,7 @@ msgstr "_Valkostir"
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1206
 msgctxt "standardfilterdialog|extended_tip|more"
 msgid "Shows additional filter options."
-msgstr ""
+msgstr "Birtir viðbótarvalkosti við síun."
 
 #. NNCfP
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:1226
@@ -31892,7 +31879,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/subtotalgrppage.ui:73
 msgctxt "subtotalgrppage|select_all_columns_button"
 msgid "Select all columns"
-msgstr ""
+msgstr "Velja alla dálka"
 
 #. 42zT3
 #: sc/uiconfig/scalc/ui/subtotalgrppage.ui:106
@@ -32024,25 +32011,25 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/swaprowsentry.ui:28
 msgctxt "swaprows|action"
 msgid "Swap Rows Action"
-msgstr ""
+msgstr "Víxla aðgerðum raða"
 
 #. sig3h
 #: sc/uiconfig/scalc/ui/swaprowsentry.ui:45
 msgctxt "swaprows|row1"
 msgid "First Row"
-msgstr ""
+msgstr "Fyrsta röð"
 
 #. rDLdF
 #: sc/uiconfig/scalc/ui/swaprowsentry.ui:59
 msgctxt "swaprows|row2"
 msgid "Second Row"
-msgstr ""
+msgstr "Önnur röð"
 
 #. E7ATE
 #: sc/uiconfig/scalc/ui/swaprowsentry.ui:68
 msgctxt "swaprows|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. 8AoGN
 #: sc/uiconfig/scalc/ui/tabcolordialog.ui:72
@@ -32066,7 +32053,7 @@ msgstr "_Stafatafla:"
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:133
 msgctxt "textimportcsv|textlanguage"
 msgid "_Locale:"
-msgstr ""
+msgstr "Staðfærs_la:"
 
 #. GAQTV
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:147
@@ -32078,7 +32065,7 @@ msgstr "_Frá röð"
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:163
 msgctxt "textimportcsv|extended_tip|charset"
 msgid "Specifies the character set to be used in the imported file."
-msgstr ""
+msgstr "Tilgreinir stafatöflu til að nota fyrir innfluttu skrána."
 
 #. FM2uG
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:178
@@ -32264,7 +32251,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:628
 msgctxt "textimportcsv|evaluateformulas"
 msgid "E_valuate formulas"
-msgstr ""
+msgstr "_Meta formúlur"
 
 #. vqmGs
 #: sc/uiconfig/scalc/ui/textimportcsv.ui:632
@@ -32342,7 +32329,7 @@ msgstr "Innflutningsvalkostir"
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:57
 msgctxt "textimportoptions|keepasking"
 msgid "Keep asking during this session"
-msgstr ""
+msgstr "Halda áfram að spyrja á meðan þessari setu stendur"
 
 #. Ug4iB
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:102
@@ -32360,7 +32347,7 @@ msgstr "Sjálfvirkt"
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:148
 msgctxt "textimportoptions|label2"
 msgid "Select the Locale to Use for Import"
-msgstr ""
+msgstr "Veldu þá staðfærslu sem nota á við innflutning"
 
 #. iRYr7
 #: sc/uiconfig/scalc/ui/textimportoptions.ui:169
@@ -32384,13 +32371,13 @@ msgstr "Umbreyting texta"
 #: sc/uiconfig/scalc/ui/texttransformationentry.ui:47
 msgctxt "texttransformation_type|tolower"
 msgid "To Lower"
-msgstr ""
+msgstr "Að neðri"
 
 #. DkKCf
 #: sc/uiconfig/scalc/ui/texttransformationentry.ui:48
 msgctxt "texttransformation_type|toupper"
 msgid "To Upper"
-msgstr ""
+msgstr "Að efri"
 
 #. ZsHz4
 #: sc/uiconfig/scalc/ui/texttransformationentry.ui:49
@@ -32408,13 +32395,13 @@ msgstr "Skera af"
 #: sc/uiconfig/scalc/ui/texttransformationentry.ui:65
 msgctxt "texttransformationentry/cols"
 msgid "Columns"
-msgstr ""
+msgstr "Dálkar"
 
 #. aoBA3
 #: sc/uiconfig/scalc/ui/texttransformationentry.ui:74
 msgctxt "texttransformation_type|delete"
 msgid "Delete"
-msgstr ""
+msgstr "Eyða"
 
 #. D7zk3
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:31
@@ -32564,7 +32551,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:285
 msgctxt "tpviewpage|summary"
 msgid "Summary o_n search"
-msgstr ""
+msgstr "Sama_ntekt við leit"
 
 #. Ws4Ev
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:304
@@ -32651,127 +32638,127 @@ msgid "Specifies when grid lines will be displayed. Default is to display grid l
 msgstr ""
 
 #. yajBD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:468
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:469
 msgctxt "extended_tip|color"
 msgid "Specifies a color for the grid lines in the current document."
 msgstr ""
 
 #. BpEmt
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:482
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:483
 msgctxt "tpviewpage|labelCursor"
 msgid "Pointe_r:"
-msgstr ""
+msgstr "_Bendill:"
 
 #. AmbjZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:494
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:495
 msgctxt "tpviewpage|radiobuttonThemed"
 msgid "T_hemed"
-msgstr ""
+msgstr "Frá þe_ma"
 
 #. xQTDE
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:498
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:499
 msgctxt "tpviewpage|radiobuttonThemedTip"
 msgid "Show the pointer as defined in the icon theme, typically as fat cross."
-msgstr ""
+msgstr "Birta músarbendil eins og skilgreint er í táknmyndaþema, venjulega sem feitan kross."
 
 #. 3HxpG
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:510
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:511
 msgctxt "tpviewpage|radiobuttonSystem"
 msgid "S_ystem"
-msgstr ""
+msgstr "_Kerfis"
 
 #. weVdC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:514
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:515
 msgctxt "tpviewpage|radiobuttonSystemTip"
 msgid "Show the pointer as system default, typically an arrow pointer."
-msgstr ""
+msgstr "Birta músarbendil eins og skilgreint er í stýrikerfinu, venjulega sem ör."
 
 #. Cb4AM
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:530
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:531
 msgctxt "tpviewpage|label1"
 msgid "Visual Aids"
 msgstr "Sjónræn hjálp"
 
 #. Qd5Rp
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:561
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:562
 msgctxt "tpviewpage|objgrf_label"
 msgid "Ob_jects/Images:"
 msgstr "Hlutir/m_yndir:"
 
 #. vLBFR
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:575
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:576
 msgctxt "tpviewpage|diagram_label"
 msgid "Char_ts:"
-msgstr ""
+msgstr "_Gröf:"
 
 #. q544D
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:589
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:590
 msgctxt "tpviewpage|draw_label"
 msgid "_Drawing objects:"
 msgstr "_Teiknaðir hlutir:"
 
 #. mpELg
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:604
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
 msgctxt "tpviewpage|objgrf"
 msgid "Show"
 msgstr "Birta"
 
 #. Kx6yJ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:606
 msgctxt "tpviewpage|objgrf"
 msgid "Hide"
 msgstr "Fela"
 
 #. oKpbX
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:609
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:610
 msgctxt "extended_tip|objgrf"
 msgid "Defines if objects and graphics are shown or hidden."
-msgstr ""
+msgstr "Skilgreinir hvort hlutir og myndefni sé birt eða falið."
 
 #. wFBeZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:623
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
 msgctxt "tpviewpage|diagram"
 msgid "Show"
 msgstr "Birta"
 
 #. H7MAB
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:625
 msgctxt "tpviewpage|diagram"
 msgid "Hide"
 msgstr "Fela"
 
 #. oVE9C
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:628
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:629
 msgctxt "extended_tip|diagram"
 msgid "Defines if charts in your document are shown or hidden."
-msgstr ""
+msgstr "Skilgreinir hvort gröf í skjalinu séu birt eða falin."
 
 #. YaiTQ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:642
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
 msgctxt "tpviewpage|draw"
 msgid "Show"
 msgstr "Birta"
 
 #. DST5a
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:644
 msgctxt "tpviewpage|draw"
 msgid "Hide"
 msgstr "Fela"
 
 #. FDGKD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:647
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:648
 msgctxt "extended_tip|draw"
 msgid "Defines if drawing objects in your document are shown or hidden."
-msgstr ""
+msgstr "Skilgreinir hvort teiknihlutar í skjalinu séu birtir eða faldir."
 
 #. E6GxC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:662
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:663
 msgctxt "tpviewpage|label2"
 msgid "Objects"
 msgstr "Hlutir"
 
 #. AnHPF
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:686
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:687
 msgctxt "extended_tip|TpViewPage"
 msgid "Defines which elements of the Calc main window are displayed. You can also show or hide highlighting of values in tables."
 msgstr ""
@@ -32968,10 +32955,10 @@ msgctxt "validationcriteriapage|liststore2"
 msgid "invalid range"
 msgstr "ógilt svið"
 
-#. 89CdB
+#. 8udun
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:84
 msgctxt "validationcriteriapage|extended_tip|data"
-msgid "Select the comparative operator that you want to use."
+msgid "Select the comparison operator that you want to use."
 msgstr ""
 
 #. RCFrD
@@ -33041,13 +33028,13 @@ msgid "A valid source can only consist of a contiguous selection of rows and col
 msgstr "Til að teljast gildur þarf uppruni gagna að vera frá samhangandi svæði dálka og raða, eða formúlu sem gefur útkomu í samhangandi svæði eða fylki."
 
 #. 9v4Ah
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:286
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:289
 msgctxt "validationcriteriapage|extended_tip|max"
 msgid "Enter the maximum value for the data validation option that you selected in the Allow box."
 msgstr ""
 
 #. 3HjmP
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:309
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:312
 msgctxt "validationcriteriapage|extended_tip|ValidationCriteriaPage"
 msgid "Specify the validation rules for the selected cell(s)."
 msgstr ""
@@ -33080,19 +33067,19 @@ msgstr "Villuáminning"
 #: sc/uiconfig/scalc/ui/validationhelptabpage-mobile.ui:15
 msgctxt "validationhelptabpage-mobile|tsbhelp"
 msgid "_Show input help when cell is selected"
-msgstr ""
+msgstr "_Sýna innsláttarhjálp þegar reitur er valinn"
 
 #. ZJEXj
 #: sc/uiconfig/scalc/ui/validationhelptabpage-mobile.ui:56
 msgctxt "validationhelptabpage-mobile|title_label"
 msgid "_Title:"
-msgstr ""
+msgstr "_Titill:"
 
 #. yDRCK
 #: sc/uiconfig/scalc/ui/validationhelptabpage-mobile.ui:70
 msgctxt "validationhelptabpage-mobile|inputhelp_label"
 msgid "_Input help:"
-msgstr ""
+msgstr "_Innsláttarhjálp:"
 
 #. 4etq8
 #: sc/uiconfig/scalc/ui/validationhelptabpage.ui:15
@@ -33146,13 +33133,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:13
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "%PRODUCTNAME Calc found an error in the formula entered."
-msgstr ""
+msgstr "%PRODUCTNAME Calc fann villu í formúlunni sem var sett inn."
 
 #. 7BDGp
 #: sc/uiconfig/scalc/ui/warnautocorrect.ui:14
 msgctxt "warnautocorrect|WarnAutoCorrect"
 msgid "Do you want to accept the correction proposed below?"
-msgstr ""
+msgstr "Samþykkir þú leiðréttinguna sem stungið er upp á hér að neðan?"
 
 #. pSFWN
 #: sc/uiconfig/scalc/ui/xmlsourcedialog.ui:23
@@ -33200,7 +33187,7 @@ msgstr "Varpa í skjal"
 #: sc/uiconfig/scalc/ui/xmlsourcedialog.ui:301
 msgctxt "xmlsourcedialog|extended_tip|XMLSourceDialog"
 msgid "Import XML data in a spreadsheet."
-msgstr ""
+msgstr "Flytja XML-gögn inn í töflureikni."
 
 #. 5ozTx
 #: sc/uiconfig/scalc/ui/ztestdialog.ui:95

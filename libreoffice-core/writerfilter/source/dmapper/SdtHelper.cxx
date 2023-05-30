@@ -13,6 +13,7 @@
 #include <com/sun/star/text/VertOrientation.hpp>
 #include <editeng/unoprnms.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <vcl/outdev.hxx>
 #include <comphelper/string.hxx>
@@ -25,11 +26,10 @@
 #include <com/sun/star/util/XRefreshable.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/document/XOOXMLDocumentPropertiesImporter.hpp>
-#include <com/sun/star/embed/ElementModes.hpp>
 #include <ooxml/OOXMLDocument.hxx>
 #include <com/sun/star/xml/xpath/XPathAPI.hpp>
+#include <com/sun/star/xml/xpath/XPathException.hpp>
 #include <com/sun/star/xml/dom/DocumentBuilder.hpp>
-#include <com/sun/star/xml/dom/XNode.hpp>
 
 namespace writerfilter::dmapper
 {
@@ -78,9 +78,9 @@ static awt::Size lcl_getOptimalWidth(const StyleSheetTablePtr& pStyleSheet,
 }
 
 SdtHelper::SdtHelper(DomainMapper_Impl& rDM_Impl,
-                     css::uno::Reference<css::uno::XComponentContext> const& xContext)
+                     css::uno::Reference<css::uno::XComponentContext> xContext)
     : m_rDM_Impl(rDM_Impl)
-    , m_xComponentContext(xContext)
+    , m_xComponentContext(std::move(xContext))
     , m_aControlType(SdtControlType::unknown)
     , m_bHasElements(false)
     , m_bOutsideAParagraph(false)
@@ -105,13 +105,13 @@ void SdtHelper::loadPropertiesXMLs()
     if (!xDomBuilder.is())
         return;
 
-    std::vector<uno::Reference<xml::dom::XDocument>> aPropDocs;
-
     // Load core properties
     try
     {
         auto xCorePropsStream = xImporter->getCorePropertiesStream(m_rDM_Impl.m_xDocumentStorage);
-        aPropDocs.push_back(xDomBuilder->parse(xCorePropsStream));
+        m_xPropertiesXMLs.insert(
+            { OUString("{6C3C8BC8-F283-45AE-878A-BAB7291924A1}"), // hardcoded id for core props
+              xDomBuilder->parse(xCorePropsStream) });
     }
     catch (const uno::Exception&)
     {
@@ -124,7 +124,9 @@ void SdtHelper::loadPropertiesXMLs()
     {
         auto xExtPropsStream
             = xImporter->getExtendedPropertiesStream(m_rDM_Impl.m_xDocumentStorage);
-        aPropDocs.push_back(xDomBuilder->parse(xExtPropsStream));
+        m_xPropertiesXMLs.insert(
+            { OUString("{6668398D-A668-4E3E-A5EB-62B293D839F1}"), // hardcoded id for extended props
+              xDomBuilder->parse(xExtPropsStream) });
     }
     catch (const uno::Exception&)
     {
@@ -137,16 +139,44 @@ void SdtHelper::loadPropertiesXMLs()
     // Add custom XMLs
     uno::Sequence<uno::Reference<xml::dom::XDocument>> aCustomXmls
         = m_rDM_Impl.getDocumentReference()->getCustomXmlDomList();
-    for (const auto& xDoc : aCustomXmls)
+    uno::Sequence<uno::Reference<xml::dom::XDocument>> aCustomXmlProps
+        = m_rDM_Impl.getDocumentReference()->getCustomXmlDomPropsList();
+    if (aCustomXmls.getLength())
     {
-        aPropDocs.push_back(xDoc);
+        uno::Reference<XXPathAPI> xXpathAPI = XPathAPI::create(m_xComponentContext);
+        xXpathAPI->registerNS("ds",
+                              "http://schemas.openxmlformats.org/officeDocument/2006/customXml");
+        sal_Int32 nItem = 0;
+        // Hereby we assume that items from getCustomXmlDomList() and getCustomXmlDomPropsList()
+        // are matching each other:
+        // item1.xml -> itemProps1.xml, item2.xml -> itemProps2.xml
+        // This does works practically, but is it true in general?
+        for (const auto& xDoc : aCustomXmls)
+        {
+            // Retrieve storeid from properties xml
+            OUString aStoreId;
+            uno::Reference<XXPathObject> xResult
+                = xXpathAPI->eval(aCustomXmlProps[nItem], "string(/ds:datastoreItem/@ds:itemID)");
+
+            if (xResult.is() && xResult->getString().getLength())
+            {
+                aStoreId = xResult->getString();
+            }
+            else
+            {
+                SAL_WARN("writerfilter",
+                         "SdtHelper::loadPropertiesXMLs: can't fetch storeid for custom doc!");
+            }
+
+            m_xPropertiesXMLs.insert({ aStoreId, xDoc });
+            nItem++;
+        }
     }
 
-    m_xPropertiesXMLs = comphelper::containerToSequence(aPropDocs);
     m_bPropertiesXMLsLoaded = true;
 }
 
-static void lcl_registerNamespaces(const OUString& sNamespaceString,
+static void lcl_registerNamespaces(std::u16string_view sNamespaceString,
                                    const uno::Reference<XXPathAPI>& xXPathAPI)
 {
     // Split namespaces and register it in XPathAPI
@@ -192,15 +222,46 @@ std::optional<OUString> SdtHelper::getValueFromDataBinding()
 
     lcl_registerNamespaces(m_sDataBindingPrefixMapping, xXpathAPI);
 
-    // Iterate all properties xml documents and try to fetch data
-    for (const auto& xDocument : m_xPropertiesXMLs)
+    // Find storage by store id and eval xpath there
+    const auto& aSourceIt = m_xPropertiesXMLs.find(m_sDataBindingStoreItemID);
+    if (aSourceIt != m_xPropertiesXMLs.end())
     {
-        uno::Reference<XXPathObject> xResult = xXpathAPI->eval(xDocument, m_sDataBindingXPath);
-
-        if (xResult.is() && xResult->getNodeList() && xResult->getNodeList()->getLength()
-            && xResult->getString().getLength())
+        try
         {
-            return xResult->getString();
+            uno::Reference<XXPathObject> xResult
+                = xXpathAPI->eval(aSourceIt->second, m_sDataBindingXPath);
+
+            if (xResult.is() && xResult->getNodeList() && xResult->getNodeList()->getLength()
+                && xResult->getString().getLength())
+            {
+                return xResult->getString();
+            }
+        }
+        catch (const XPathException& e)
+        {
+            // XPath failed? Log and continue with next data document
+            SAL_WARN("writerfilter", "SdtHelper::failed running XPath: " << e.Message);
+        }
+    }
+
+    // Nothing found? Try to iterate storages and eval xpath
+    for (const auto& aSource : m_xPropertiesXMLs)
+    {
+        try
+        {
+            uno::Reference<XXPathObject> xResult
+                = xXpathAPI->eval(aSource.second, m_sDataBindingXPath);
+
+            if (xResult.is() && xResult->getNodeList() && xResult->getNodeList()->getLength()
+                && xResult->getString().getLength())
+            {
+                return xResult->getString();
+            }
+        }
+        catch (const XPathException& e)
+        {
+            // XPath failed? Log and continue with next data document
+            SAL_WARN("writerfilter", "SdtHelper::failed running XPath: " << e.Message);
         }
     }
 
@@ -235,9 +296,9 @@ void SdtHelper::createDropDownControl()
 
         // set properties
         uno::Reference<beans::XPropertySet> xPropertySet(xControlModel, uno::UNO_QUERY);
-        xPropertySet->setPropertyValue("SelectedItem", uno::makeAny(aDefaultText));
-        xPropertySet->setPropertyValue(
-            "Items", uno::makeAny(comphelper::containerToSequence(m_aDropDownItems)));
+        xPropertySet->setPropertyValue("SelectedItem", uno::Any(aDefaultText));
+        xPropertySet->setPropertyValue("Items",
+                                       uno::Any(comphelper::containerToSequence(m_aDropDownItems)));
 
         // add it into document
         m_rDM_Impl.appendTextContent(xControlModel, uno::Sequence<beans::PropertyValue>());
@@ -253,10 +314,10 @@ void SdtHelper::createDropDownControl()
 
         // set properties
         uno::Reference<beans::XPropertySet> xPropertySet(xControlModel, uno::UNO_QUERY);
-        xPropertySet->setPropertyValue("DefaultText", uno::makeAny(aDefaultText));
-        xPropertySet->setPropertyValue("Dropdown", uno::makeAny(true));
-        xPropertySet->setPropertyValue(
-            "StringItemList", uno::makeAny(comphelper::containerToSequence(m_aDropDownItems)));
+        xPropertySet->setPropertyValue("DefaultText", uno::Any(aDefaultText));
+        xPropertySet->setPropertyValue("Dropdown", uno::Any(true));
+        xPropertySet->setPropertyValue("StringItemList",
+                                       uno::Any(comphelper::containerToSequence(m_aDropDownItems)));
 
         // add it into document
         createControlShape(
@@ -286,14 +347,14 @@ void SdtHelper::createPlainTextControl()
     if (oData.has_value())
         aDefaultText = *oData;
 
-    xPropertySet->setPropertyValue("Content", uno::makeAny(aDefaultText));
+    xPropertySet->setPropertyValue("Content", uno::Any(aDefaultText));
 
     // add it into document
     m_rDM_Impl.appendTextContent(xControlModel, uno::Sequence<beans::PropertyValue>());
 
     // Store all unused sdt parameters from grabbag
     xPropertySet->setPropertyValue(UNO_NAME_MISC_OBJ_INTEROPGRABBAG,
-                                   uno::makeAny(getInteropGrabBagAndClear()));
+                                   uno::Any(getInteropGrabBagAndClear()));
 
     // clean up
     clear();
@@ -319,8 +380,11 @@ void SdtHelper::createDateContentControl()
     try
     {
         xCrsr->gotoRange(m_xDateFieldStartRange, false);
+        // tdf#138093: Date selector reset, if placed inside table
+        // Modified to XOR relationship and adding dummy paragraph conditions
         bool bIsInTable = (m_rDM_Impl.hasTableManager() && m_rDM_Impl.getTableManager().isInTable())
-                          || (m_rDM_Impl.m_nTableDepth > 0);
+                              != (m_rDM_Impl.m_nTableDepth > 0)
+                          && m_rDM_Impl.GetIsDummyParaAddedForTableInSection();
         if (bIsInTable)
             xCrsr->goRight(1, false);
         xCrsr->gotoEnd(true);
@@ -347,9 +411,9 @@ void SdtHelper::createDateContentControl()
 
         // Replace quotation mark used for marking static strings in date format
         sDateFormat = sDateFormat.replaceAll("'", "\"");
-        xNameCont->insertByName(ODF_FORMDATE_DATEFORMAT, uno::makeAny(sDateFormat));
+        xNameCont->insertByName(ODF_FORMDATE_DATEFORMAT, uno::Any(sDateFormat));
         xNameCont->insertByName(ODF_FORMDATE_DATEFORMAT_LANGUAGE,
-                                uno::makeAny(m_sLocale.makeStringAndClear()));
+                                uno::Any(m_sLocale.makeStringAndClear()));
     }
     OUString sFullDate = m_sDate.makeStringAndClear();
 
@@ -362,7 +426,7 @@ void SdtHelper::createDateContentControl()
         sal_Int32 nTimeSep = sFullDate.indexOf("T");
         if (nTimeSep != -1)
             sFullDate = sFullDate.copy(0, nTimeSep);
-        xNameCont->insertByName(ODF_FORMDATE_CURRENTDATE, uno::makeAny(sFullDate));
+        xNameCont->insertByName(ODF_FORMDATE_CURRENTDATE, uno::Any(sFullDate));
     }
 
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(m_rDM_Impl.GetTextDocument(),
@@ -373,7 +437,7 @@ void SdtHelper::createDateContentControl()
 
     // Store all unused sdt parameters from grabbag
     xNameCont->insertByName(UNO_NAME_MISC_OBJ_INTEROPGRABBAG,
-                            uno::makeAny(getInteropGrabBagAndClear()));
+                            uno::Any(getInteropGrabBagAndClear()));
 
     clear();
 }
@@ -389,10 +453,10 @@ void SdtHelper::createControlShape(awt::Size aSize,
     xControlShape->setControl(xControlModel);
 
     uno::Reference<beans::XPropertySet> xPropertySet(xControlShape, uno::UNO_QUERY);
-    xPropertySet->setPropertyValue("VertOrient", uno::makeAny(text::VertOrientation::CENTER));
+    xPropertySet->setPropertyValue("VertOrient", uno::Any(text::VertOrientation::CENTER));
 
     if (rGrabBag.hasElements())
-        xPropertySet->setPropertyValue(UNO_NAME_MISC_OBJ_INTEROPGRABBAG, uno::makeAny(rGrabBag));
+        xPropertySet->setPropertyValue(UNO_NAME_MISC_OBJ_INTEROPGRABBAG, uno::Any(rGrabBag));
 
     uno::Reference<text::XTextContent> xTextContent(xControlShape, uno::UNO_QUERY);
     m_rDM_Impl.appendTextContent(xTextContent, uno::Sequence<beans::PropertyValue>());
@@ -432,14 +496,14 @@ bool SdtHelper::GetChecked() const { return m_bChecked; }
 
 void SdtHelper::SetCheckedState(const OUString& rCheckedState) { m_aCheckedState = rCheckedState; }
 
-OUString SdtHelper::GetCheckedState() const { return m_aCheckedState; }
+const OUString& SdtHelper::GetCheckedState() const { return m_aCheckedState; }
 
 void SdtHelper::SetUncheckedState(const OUString& rUncheckedState)
 {
     m_aUncheckedState = rUncheckedState;
 }
 
-OUString SdtHelper::GetUncheckedState() const { return m_aUncheckedState; }
+const OUString& SdtHelper::GetUncheckedState() const { return m_aUncheckedState; }
 
 void SdtHelper::clear()
 {
@@ -460,6 +524,8 @@ void SdtHelper::clear()
     m_aAlias.clear();
     m_aTag.clear();
     m_nId = 0;
+    m_nTabIndex = 0;
+    m_aLock.clear();
 }
 
 void SdtHelper::SetPlaceholderDocPart(const OUString& rPlaceholderDocPart)
@@ -467,11 +533,15 @@ void SdtHelper::SetPlaceholderDocPart(const OUString& rPlaceholderDocPart)
     m_aPlaceholderDocPart = rPlaceholderDocPart;
 }
 
-OUString SdtHelper::GetPlaceholderDocPart() const { return m_aPlaceholderDocPart; }
+const OUString& SdtHelper::GetPlaceholderDocPart() const { return m_aPlaceholderDocPart; }
 
 void SdtHelper::SetColor(const OUString& rColor) { m_aColor = rColor; }
 
-OUString SdtHelper::GetColor() const { return m_aColor; }
+const OUString& SdtHelper::GetColor() const { return m_aColor; }
+
+void SdtHelper::SetAppearance(const OUString& rAppearance) { m_aAppearance = rAppearance; }
+
+const OUString& SdtHelper::GetAppearance() const { return m_aAppearance; }
 
 void SdtHelper::SetAlias(const OUString& rAlias) { m_aAlias = rAlias; }
 
@@ -484,6 +554,14 @@ const OUString& SdtHelper::GetTag() const { return m_aTag; }
 void SdtHelper::SetId(sal_Int32 nId) { m_nId = nId; }
 
 sal_Int32 SdtHelper::GetId() const { return m_nId; }
+
+void SdtHelper::SetTabIndex(sal_uInt32 nTabIndex) { m_nTabIndex = nTabIndex; }
+
+sal_uInt32 SdtHelper::GetTabIndex() const { return m_nTabIndex; }
+
+void SdtHelper::SetLock(const OUString& rLock) { m_aLock = rLock; }
+
+const OUString& SdtHelper::GetLock() const { return m_aLock; }
 
 } // namespace writerfilter::dmapper
 

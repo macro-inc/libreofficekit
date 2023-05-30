@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:04+0200\n"
-"PO-Revision-Date: 2022-08-22 14:04+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-11-14 13:33+0000\n"
 "Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textsbasicguide/de/>\n"
 "Language: de\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: LibreOffice\n"
 "X-POOTLE-MTIME: 1561087588.000000\n"
 
 #. WcTKB
@@ -59,7 +59,7 @@ msgctxt ""
 "par_idA2B004\n"
 "help.text"
 msgid "Access2Base is a %PRODUCTNAME BASIC library of macros for (business or personal) application developers and advanced users. It is one of the libraries stored in \"Application macros and dialogs\"."
-msgstr ""
+msgstr "Access2Base ist eine %PRODUCTNAME-Basic-Bibliothek mit Makros für (geschäftliche oder private) Anwendungsentwickler und fortgeschrittene Benutzer. Sie ist eine der Bibliotheken, die in \"Anwendungsmakros und -dialoge\" gespeichert sind."
 
 #. CE5QB
 #: access2base.xhp
@@ -68,7 +68,7 @@ msgctxt ""
 "par_idA2B005\n"
 "help.text"
 msgid "The functionalities provided by the implemented macros are all directly inspired by Microsoft Access. The macros are callable mainly from a %PRODUCTNAME <emph>Base</emph> application, but also from <emph>any</emph> %PRODUCTNAME document (Writer, Calc, ...) where access to data stored in a database makes sense."
-msgstr ""
+msgstr "Die Funktionen der implementierten Makros sind alle direkt von Microsoft Access inspiriert. Die Makros können überwiegend direkt aus %PRODUCTNAME-<emph>Base</emph> heraus aufgerufen werden, aber auch von <emph>jedem</emph> %PRODUCTNAME-Dokument (Writer, Calc, …), aus dem heraus ein Zugriff auf eine Datenbank Sinn macht."
 
 #. tmNkV
 #: access2base.xhp
@@ -79,14 +79,14 @@ msgctxt ""
 msgid "The API provided by Access2Base is intended to be more concise, intuitive and easy to learn than the standard UNO API (API = Application Programming Interface)."
 msgstr "Die API, die durch Access2Base bereitgestellt wird, ist dafür gedacht, kompakter, intuitiver und einfacher erlernbar zu sein als die Standard UNO-API (API = Application Programming Interface; zu deutsch Anwendungsprogrammierschnittstelle)."
 
-#. DHfDb
+#. 88c4V
 #: access2base.xhp
 msgctxt ""
 "access2base.xhp\n"
 "par_idA2B007\n"
 "help.text"
-msgid "<emph>The library is documented online on </emph><link href=\"http://www.access2base.com\" name=\"http://www.access2base.com\"><emph>http://www.access2base.com</emph></link>."
-msgstr "<emph>Die Bibliothek ist Online dokumentiert auf </emph><link href=\"http://www.access2base.com\" name=\"http://www.access2base.com\"><emph>http://www.access2base.com (englisch)</emph></link>."
+msgid "<emph>The library is documented online on </emph><link href=\"http://www.access2base.com\"><emph>http://www.access2base.com</emph></link>."
+msgstr "<emph>Die Bibliothek ist Online dokumentiert auf </emph><link href=\"http://www.access2base.com\"><emph>http://www.access2base.com (englisch)</emph></link>."
 
 #. fGJgF
 #: access2base.xhp
@@ -205,14 +205,14 @@ msgctxt ""
 msgid "<bookmark_value>Basic;Calling Python</bookmark_value>         <bookmark_value>API;SimpleFileAccess</bookmark_value>         <bookmark_value>API;PathSettings</bookmark_value>         <bookmark_value>API;XScript</bookmark_value>"
 msgstr "<bookmark_value>Basic; Python aufrufen</bookmark_value><bookmark_value>API; SimpleFileAccess</bookmark_value><bookmark_value>API; PathSettings</bookmark_value><bookmark_value>API; XScript</bookmark_value>"
 
-#. 8tB4f
+#. GD9hZ
 #: basic_2_python.xhp
 msgctxt ""
 "basic_2_python.xhp\n"
 "hd_id811571848401485\n"
 "help.text"
-msgid "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\" name=\"Basic Programming Examples\">Calling Python Scripts from Basic</link></variable>"
-msgstr "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\" name=\"Basic Programming Examples\">Python-Skripte aus Basic aufrufen</link></variable>"
+msgid "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\">Calling Python Scripts from Basic</link></variable>"
+msgstr "<variable id=\"basic2python\"><link href=\"text/sbasic/guide/basic_2_python.xhp\">Python-Skripte aus Basic aufrufen</link></variable>"
 
 #. P7E4G
 #: basic_2_python.xhp
@@ -232,23 +232,23 @@ msgctxt ""
 msgid "<literal>ComputerName</literal> identification or <literal>OSName</literal> detection are possible,"
 msgstr "Die Identifikation von <literal>ComputerName</literal> oder <literal>OSName</literal> ist möglich,"
 
-#. AW7Lr
+#. RW3Yq
 #: basic_2_python.xhp
 msgctxt ""
 "basic_2_python.xhp\n"
 "N0434\n"
 "help.text"
-msgid "Basic <literal>FileLen()</literal> function and <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\" name=\"ucb.SimpleFileAccess\">com.sun.star.ucb.SimpleFileAccess.</link><literal>getSize()</literal> API function exhibit a 2 Gigabytes file size upper limit that Python helps to overcome,"
-msgstr "Die Basic-Funktionen <literal>FileLen()</literal> und <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\" name=\"ucb.SimpleFileAccess\">com.sun.star.ucb.SimpleFileAccess</link>. Die API-Funktion <literal>getSize()</literal> hat eine Obergrenze von 2 Gigabyte Dateigröße, die mit Python verarbeitet werden kann."
+msgid "Basic <literal>FileLen()</literal> function and <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\">com.sun.star.ucb.SimpleFileAccess.</link><literal>getSize()</literal> API function exhibit a 2 Gigabytes file size upper limit that Python helps to overcome,"
+msgstr "Die Basic-Funktionen <literal>FileLen()</literal> und <link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1ucb_1_1SimpleFileAccess.html\">com.sun.star.ucb.SimpleFileAccess</link>. Die API-Funktion <literal>getSize()</literal> hat eine Obergrenze von 2 Gigabyte Dateigröße, die mit Python verarbeitet werden kann."
 
-#. At8D2
+#. UuEjr
 #: basic_2_python.xhp
 msgctxt ""
 "basic_2_python.xhp\n"
 "N0435\n"
 "help.text"
-msgid "<link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\" name=\"util.PathSettings\">com.sun.star.util.PathSettings</link> can be normalized,"
-msgstr "<link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\" name=\"util.PathSettings\">com.sun.star.util.PathSettings</link> kann normalisiert werden"
+msgid "<link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\">com.sun.star.util.PathSettings</link> can be normalized,"
+msgstr "<link href=\"https://api.libreoffice.org/docs/idl/ref/servicecom_1_1sun_1_1star_1_1util_1_1PathSettings.html\">com.sun.star.util.PathSettings</link> kann normalisiert werden"
 
 #. CPd9K
 #: basic_2_python.xhp
@@ -259,14 +259,14 @@ msgctxt ""
 msgid "and many more."
 msgstr "und vieles mehr."
 
-#. JvzSR
+#. FdkpF
 #: basic_2_python.xhp
 msgctxt ""
 "basic_2_python.xhp\n"
 "N0437\n"
 "help.text"
-msgid "A reasonable exposure to %PRODUCTNAME Basic and to <link href=\"https://api.libreoffice.org/\" name=\"Application Programming Interface\">Application Programming Interface (API)</link> features is recommended prior to perform inter-language calls from Basic to Python, to JavaScript or any other script engine."
-msgstr "Ein angemessener Umgang mit %PRODUCTNAME Basic und der <link href=\"https://api.libreoffice.org/\" name=\"Application Programming Interface\">Anwendungs-Programmierschnittstelle (API)</link> ist vor der Ausführung von Sprachaufrufen von Basic zu Python, zu JavaScript oder einer anderen Skript-Engine empfehlenswert."
+msgid "A reasonable exposure to %PRODUCTNAME Basic and to <link href=\"https://api.libreoffice.org/\">Application Programming Interface (API)</link> features is recommended prior to perform inter-language calls from Basic to Python, to JavaScript or any other script engine."
+msgstr "Ein angemessener Umgang mit %PRODUCTNAME Basic und der <link href=\"https://api.libreoffice.org/\">Anwendungs-Programmierschnittstelle (API)</link> ist vor der Ausführung von Sprachaufrufen von Basic zu Python, zu JavaScript oder einer anderen Skript-Engine empfehlenswert."
 
 #. 4jY8s
 #: basic_2_python.xhp
@@ -277,14 +277,14 @@ msgctxt ""
 msgid "Retrieving Python Scripts"
 msgstr "Python-Skripte abrufen"
 
-#. bBTqb
+#. rPSP7
 #: basic_2_python.xhp
 msgctxt ""
 "basic_2_python.xhp\n"
 "N0439\n"
 "help.text"
-msgid "Python scripts can be personal, shared, or embedded in documents. In order to execute them, %PRODUCTNAME Basic needs to be provided with Python script locations. Locating <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"script.provider.XScript\">com.sun.star.script.provider.XScript</link> interface compliant UNO objects allows the execution of Python scripts:"
-msgstr "Python-Skripte können privat, freigegeben oder in Dokumente eingebettet sein. Um sie auszuführen, muss %PRODUCTNAME Basic mit Python-Skriptpfaden versehen werden. Das Auffinden von <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\" name=\"script.provider.XScript\">com.sun.star.script.provider.XScript</link>-Interface-kompatiblen UNO-Objekten ermöglicht die Ausführung von Python-Skripten:"
+msgid "Python scripts can be personal, shared, or embedded in documents. In order to execute them, %PRODUCTNAME Basic needs to be provided with Python script locations. Locating <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScript</link> interface compliant UNO objects allows the execution of Python scripts:"
+msgstr "Python-Skripte können privat, freigegeben oder in Dokumente eingebettet sein. Um sie auszuführen, muss %PRODUCTNAME Basic mit Python-Skriptpfaden versehen werden. Das Auffinden von <link href=\"https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1script_1_1provider_1_1XScript.html\">com.sun.star.script.provider.XScript</link>-Interface-kompatiblen UNO-Objekten ermöglicht die Ausführung von Python-Skripten:"
 
 #. AZwVA
 #: basic_2_python.xhp
@@ -673,14 +673,14 @@ msgctxt ""
 msgid "<bookmark_value>Basic;programming examples</bookmark_value>"
 msgstr "<bookmark_value>Basic; Programmierbeispiele</bookmark_value>"
 
-#. DdPKY
+#. 9kPoD
 #: basic_examples.xhp
 msgctxt ""
 "basic_examples.xhp\n"
 "hd_id471559139063621\n"
 "help.text"
-msgid "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\" name=\"Basic Programming Examples\">Basic Programming Examples</link></variable>"
-msgstr "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\" name=\"Basic Programming Examples\">Basic-Programmierbeispiele</link></variable>"
+msgid "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\">Basic Programming Examples</link></variable>"
+msgstr "<variable id=\"basicexamplestit\"><link href=\"text/sbasic/guide/basic_examples.xhp\">Basic-Programmierbeispiele</link></variable>"
 
 #. GKzpN
 #: calc_borders.xhp
@@ -691,14 +691,14 @@ msgctxt ""
 msgid "Formatting Borders in Calc with Macros"
 msgstr "Formatierung von Rändern in Calc mit Makros"
 
-#. gDaEd
+#. RKGKF
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "hd_id461623364876507\n"
 "help.text"
-msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\" name=\"Calc_Borders_h1\">Formatting Borders in Calc with Macros</link></variable>"
-msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\" name=\"Calc_Borders_h1\">Formatierung von Rändern in Calc mit Makros</link></variable>"
+msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\">Formatting Borders in Calc with Macros</link></variable>"
+msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/calc_borders.xhp\">Formatierung von Rändern in Calc mit Makros</link></variable>"
 
 #. JyRxe
 #: calc_borders.xhp
@@ -772,14 +772,14 @@ msgctxt ""
 msgid "<emph>cellAddress</emph> is a string denoting the range to be formatted in the format \"A1\"."
 msgstr "<emph>cellAddress</emph> ist eine Zeichenfolge, die den Bereich angibt, der im Format \"A1\" formatiert werden soll."
 
-#. dfuE6
+#. xpGBx
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "par_id821630538210271\n"
 "help.text"
-msgid "<emph>newStyle</emph> is an integer value that corresponds to the border line style (see <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\" name=\"LineStyles_link\">Line Styles</link> below)."
-msgstr "<emph>newStyle</emph> ist ein ganzzahliger Wert, der dem Rahmenlinienstil entspricht (siehe <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\" name=\"LineStyles_link\">Linienstile</link> weiter unten)."
+msgid "<emph>newStyle</emph> is an integer value that corresponds to the border line style (see <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\">Line Styles</link> below)."
+msgstr "<emph>newStyle</emph> ist ein ganzzahliger Wert, der dem Rahmenlinienstil entspricht (siehe <link href=\"text/sbasic/guide/calc_borders.xhp#LineStyles_h2\">Linienstile</link> weiter unten)."
 
 #. gKaYD
 #: calc_borders.xhp
@@ -790,14 +790,14 @@ msgctxt ""
 msgid "<emph>newWidth</emph> is an integer value that defines the line width."
 msgstr "<emph>newWidth</emph> ist ein ganzzahliger Wert, der die Linienbreite festlegt."
 
-#. wVnmn
+#. 6Tv9V
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "par_id71630538211142\n"
 "help.text"
-msgid "<emph>newColor</emph> is an integer value corresponding to a color defined using the <link href=\"text/sbasic/shared/03010305.xhp\" name=\"RGB_link\">RGB</link> function."
-msgstr "<emph>newColor</emph> ist ein ganzzahliger Wert, der einer Farbe entspricht, die mit der Funktion <link href=\"text/sbasic/shared/03010305.xhp\" name=\"RGB_link\">RGB</link> festgelegt wurde."
+msgid "<emph>newColor</emph> is an integer value corresponding to a color defined using the <link href=\"text/sbasic/shared/03010305.xhp\">RGB</link> function."
+msgstr "<emph>newColor</emph> ist ein ganzzahliger Wert, der einer Farbe entspricht, die mit der Funktion <link href=\"text/sbasic/shared/03010305.xhp\">RGB</link> festgelegt wurde."
 
 #. 3gYJs
 #: calc_borders.xhp
@@ -871,14 +871,14 @@ msgctxt ""
 msgid "The code snippet below implements a macro named <literal>myMacro</literal> that calls <literal>formatCellBorder</literal>:"
 msgstr "Der folgende Codeausschnitt implementiert ein Makro mit dem Namen <literal>myMacro</literal>, das <literal>formatCellBorder</literal> aufruft:"
 
-#. zmvzf
+#. 3zyiA
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "par_id261630541889040\n"
 "help.text"
-msgid "The Python code presented above uses the <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\" name=\"SF_link\">ScriptForge library</link> that is available since %PRODUCTNAME 7.2."
-msgstr "Der oben vorgestellte Python-Code verwendet die <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\" name=\"SF_link\">Bibliothek ScriptForge</link>, welche seit %PRODUCTNAME 7.2 verfügbar ist."
+msgid "The Python code presented above uses the <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">ScriptForge library</link> that is available since %PRODUCTNAME 7.2."
+msgstr "Der oben vorgestellte Python-Code verwendet die <link href=\"text/sbasic/shared/03/lib_ScriptForge.xhp\">Bibliothek ScriptForge</link>, die seit %PRODUCTNAME 7.2 verfügbar ist."
 
 #. FfECT
 #: calc_borders.xhp
@@ -988,14 +988,14 @@ msgctxt ""
 msgid "Dash dot dot"
 msgstr "Strich-Punkt-Punkt"
 
-#. A9PVK
+#. jTEcr
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "par_id751630539680866\n"
 "help.text"
-msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\" name=\"BorderLineStyle_link\">BorderLineStyle Constant Reference</link> in the LibreOffice API documentation to learn more about line style constants."
-msgstr "Lesen Sie für weitere Details über die Konstanten der Linienstile die englische Seite <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\" name=\"BorderLineStyle_link\">BorderLineStyle Constant Reference</link> in der Dokumentation zur LibreOffice-API."
+msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\">BorderLineStyle Constant Reference</link> in the LibreOffice API documentation to learn more about line style constants."
+msgstr "Lesen Sie für weitere Details über die Konstanten der Linienstile die englische Seite <link href=\"https://api.libreoffice.org/docs/idl/ref/namespacecom_1_1sun_1_1star_1_1table_1_1BorderLineStyle.html\">BorderLineStyle Constant Reference</link> in der Dokumentation zur LibreOffice-API."
 
 #. aJTNw
 #: calc_borders.xhp
@@ -1013,7 +1013,7 @@ msgctxt ""
 "par_id11630542436346\n"
 "help.text"
 msgid "Range objects have a property named <literal>TableBorder2</literal> that can be used to format range borders as it is done in the <menuitem>Format - Cells - Borders</menuitem> dialog in the <emph>Line Arrangement</emph> section."
-msgstr "Bereichsobjekte haben eine Eigenschaft namens <literal>TableBorder2</literal>, welche zum Formatieren der Bereichsumrandungen verwendet werden kann, genauso wie Sie sie im Dialog <menuitem>Format – Zellen… – Register: Umrandungen</menuitem> im Bereich <emph>Linienanordnung</emph> formatieren können."
+msgstr "Bereichsobjekte haben eine Eigenschaft namens <literal>TableBorder2</literal>, die zum Formatieren der Bereichsumrandungen verwendet werden kann, genauso wie Sie sie im Dialog <menuitem>Format – Zellen… – Register: Umrandungen</menuitem> im Bereich <emph>Linienanordnung</emph> formatieren können."
 
 #. A25aA
 #: calc_borders.xhp
@@ -1060,14 +1060,14 @@ msgctxt ""
 msgid "The macro can be implemented in Python as follows:"
 msgstr "Das Makro kann in Python wie folgt implementiert werden:"
 
-#. aipfb
+#. cYZYt
 #: calc_borders.xhp
 msgctxt ""
 "calc_borders.xhp\n"
 "par_id751630539680102\n"
 "help.text"
-msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\" name=\"BorderLineStyle_link\">TableBorder2 Struct Reference</link> in the LibreOffice API documentation to learn more about its attributes."
-msgstr "Lesen Sie für weitere Details über die Eigenschaften die englische Seite <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\" name=\"BorderLineStyle_link\">TableBorder2 Struct Reference</link> in der Dokumentation zur LibreOffice-API."
+msgid "Refer to the <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\">TableBorder2 Struct Reference</link> in the LibreOffice API documentation to learn more about its attributes."
+msgstr "Lesen Sie für weitere Details über die Eigenschaften die englische Seite <link href=\"https://api.libreoffice.org/docs/idl/ref/structcom_1_1sun_1_1star_1_1table_1_1TableBorder2.html\">TableBorder2 Struct Reference</link> in der Dokumentation zur LibreOffice-API."
 
 #. YLjtF
 #: control_properties.xhp
@@ -1087,14 +1087,14 @@ msgctxt ""
 msgid "<bookmark_value>properties; controls in dialog editor</bookmark_value><bookmark_value>changing;control properties</bookmark_value><bookmark_value>controls;changing properties</bookmark_value><bookmark_value>dialog editor;changing control properties</bookmark_value>"
 msgstr "<bookmark_value>Eigenschaften; Steuerelemente im Dialog-Editor</bookmark_value><bookmark_value>Ändern; Eigenschaften von Steuerelementen</bookmark_value><bookmark_value>Steuerelemente; Eigenschaften ändern</bookmark_value><bookmark_value>Dialog-Editor; Eigenschaften von Steuerelementen ändern</bookmark_value>"
 
-#. NFh5G
+#. tLFhk
 #: control_properties.xhp
 msgctxt ""
 "control_properties.xhp\n"
 "hd_id3145786\n"
 "help.text"
-msgid "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\" name=\"Changing the Properties of Controls in the Dialog Editor\">Changing the Properties of Controls in the Dialog Editor</link></variable>"
-msgstr "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\" name=\"Changing the Properties of Controls in the Dialog Editor\">Eigenschaften für Steuerelemente im Dialog-Editor</link></variable>"
+msgid "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\">Changing the Properties of Controls in the Dialog Editor</link></variable>"
+msgstr "<variable id=\"control_properties\"><link href=\"text/sbasic/guide/control_properties.xhp\">Eigenschaften für Steuerelemente im Dialog-Editor</link></variable>"
 
 #. Es8Xy
 #: control_properties.xhp
@@ -1132,14 +1132,14 @@ msgctxt ""
 msgid "<bookmark_value>dialogs;creating Basic dialogs</bookmark_value>"
 msgstr "<bookmark_value>Dialoge; Basic-Dialoge erstellen</bookmark_value>"
 
-#. TKtFE
+#. CGEVb
 #: create_dialog.xhp
 msgctxt ""
 "create_dialog.xhp\n"
 "hd_id3149346\n"
 "help.text"
-msgid "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Creating a Basic Dialog\">Creating a Basic Dialog</link></variable>"
-msgstr "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"Creating a Basic Dialog\">Erstellen eines Basic-Dialogs</link></variable>"
+msgid "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\">Creating a Basic Dialog</link></variable>"
+msgstr "<variable id=\"create_dialog\"><link href=\"text/sbasic/guide/create_dialog.xhp\">Erstellen eines Basic-Dialogs</link></variable>"
 
 #. xBcR4
 #: create_dialog.xhp
@@ -1204,14 +1204,14 @@ msgctxt ""
 msgid "<bookmark_value>controls; creating in the dialog editor</bookmark_value><bookmark_value>dialog editor;creating controls</bookmark_value>"
 msgstr "<bookmark_value>Steuerelemente; im Dialog-Editor erstellen</bookmark_value><bookmark_value>Dialog-Editor; Steuerelemente erstellen</bookmark_value>"
 
-#. UAc5k
+#. fy7KC
 #: insert_control.xhp
 msgctxt ""
 "insert_control.xhp\n"
 "hd_id3149182\n"
 "help.text"
-msgid "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\" name=\"Creating Controls in the Dialog Editor\">Creating Controls in the Dialog Editor</link></variable>"
-msgstr "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\" name=\"Creating Controls in the Dialog Editor\">Erstellen von Steuerelementen im Dialog-Editor</link></variable>"
+msgid "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\">Creating Controls in the Dialog Editor</link></variable>"
+msgstr "<variable id=\"insert_control\"><link href=\"text/sbasic/guide/insert_control.xhp\">Erstellen von Steuerelementen im Dialog-Editor</link></variable>"
 
 #. rCdw2
 #: insert_control.xhp
@@ -1258,14 +1258,14 @@ msgctxt ""
 msgid "Reading and Writing values to Ranges"
 msgstr "Lesen und Schreiben von Werten in Bereiche"
 
-#. 3hH3s
+#. 4icyW
 #: read_write_values.xhp
 msgctxt ""
 "read_write_values.xhp\n"
 "hd_id461623364876507\n"
 "help.text"
-msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\" name=\"ReadWriteValues_h1\">Reading and Writing values to Ranges</link></variable>"
-msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\" name=\"ReadWriteValues_h1\">Lesen und Schreiben von Werten in Bereiche</link></variable>"
+msgid "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\">Reading and Writing values to Ranges</link></variable>"
+msgstr "<variable id=\"title\"><link href=\"text/sbasic/guide/read_write_values.xhp\">Lesen und Schreiben von Werten in Bereiche</link></variable>"
 
 #. ZKUBE
 #: read_write_values.xhp
@@ -1355,7 +1355,7 @@ msgctxt ""
 "hd_id411633215666257\n"
 "help.text"
 msgid "Values, Strings and Formulas"
-msgstr "Werte, Zeichenfolgen und Formulare"
+msgstr "Werte, Zeichenfolgen und Formeln"
 
 #. MBHDg
 #: read_write_values.xhp
@@ -1364,7 +1364,7 @@ msgctxt ""
 "par_id861633215682610\n"
 "help.text"
 msgid "Calc cells can have three types of values: numeric, strings and formulas. Each type has its own set and get methods:"
-msgstr ""
+msgstr "Calc-Zellen können drei Arten von Werten haben: numerisch, Zeichenfolgen und Formeln. Jeder Typ hat seine eigenen Set- und Get-Methoden:"
 
 #. RXE76
 #: read_write_values.xhp
@@ -1373,7 +1373,7 @@ msgctxt ""
 "par_id191633215791905\n"
 "help.text"
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #. rYCuZ
 #: read_write_values.xhp
@@ -1391,7 +1391,7 @@ msgctxt ""
 "par_id961633215932180\n"
 "help.text"
 msgid "Text"
-msgstr ""
+msgstr "Text"
 
 #. KH9Ya
 #: read_write_values.xhp
@@ -1400,7 +1400,7 @@ msgctxt ""
 "par_id651633215984116\n"
 "help.text"
 msgid "Formula"
-msgstr ""
+msgstr "Formel"
 
 #. nGhov
 #: read_write_values.xhp
@@ -1409,7 +1409,7 @@ msgctxt ""
 "par_id21633215845395\n"
 "help.text"
 msgid "Dates and currency values are considered as numeric values in Calc."
-msgstr ""
+msgstr "Datums- und Währungswerte werden in Calc als numerische Werte behandelt."
 
 #. t87Qx
 #: read_write_values.xhp
@@ -1418,7 +1418,7 @@ msgctxt ""
 "par_id221633216111353\n"
 "help.text"
 msgid "The following example enters numeric values into cells \"A1\" and \"A2\" and inserts a formula in cell \"A3\" that returns the multiplication of these values."
-msgstr ""
+msgstr "Das folgende Beispiel fügt numerische Werte in die Zellen \"A1\" und \"A2\" ein und fügt eine Formel in die Zelle \"A3\" ein, welche die Multiplikation dieser Werte zurückgibt."
 
 #. r6BG6
 #: read_write_values.xhp
@@ -1427,7 +1427,7 @@ msgctxt ""
 "hd_id321633216630043\n"
 "help.text"
 msgid "Accessing Ranges in Different Sheets"
-msgstr ""
+msgstr "Zugriff auf Bereiche in verschiedenen Tabellen"
 
 #. TFU8U
 #: read_write_values.xhp
@@ -1436,7 +1436,7 @@ msgctxt ""
 "par_id371633216672570\n"
 "help.text"
 msgid "The previous examples used only the active sheet to perform operations. It is possible to access cell ranges in different sheets by their indices or names."
-msgstr ""
+msgstr "In den vorherigen Beispielen wurde nur die aktive Tabelle zum Ausführen von Operationen verwendet. Es ist möglich, auf Zellbereiche in verschiedenen Tabellen über ihre Indizes oder Namen zuzugreifen."
 
 #. c3yhF
 #: read_write_values.xhp
@@ -1445,7 +1445,7 @@ msgctxt ""
 "par_id861633216843382\n"
 "help.text"
 msgid "The example below enters a numeric value into cell \"A1\" of the sheet named \"Sheet2\"."
-msgstr ""
+msgstr "Im folgenden Beispiel wird ein numerischer Wert in die Zelle \"A1\" der Tabelle mit dem Namen \"Sheet2\" eingegeben."
 
 #. GpnNS
 #: read_write_values.xhp
@@ -1454,7 +1454,7 @@ msgctxt ""
 "par_id611633217090743\n"
 "help.text"
 msgid "This example can also be implemented in Python as follows:"
-msgstr ""
+msgstr "Dieses Beispiel kann auch wie folgt in Python implementiert werden:"
 
 #. xGQ3k
 #: read_write_values.xhp
@@ -1463,7 +1463,7 @@ msgctxt ""
 "par_id631633217279518\n"
 "help.text"
 msgid "Sheets can also be accessed using zero-based indices indicating which sheet considering the order they appear in the Calc file."
-msgstr ""
+msgstr "Auf Tabellen kann auch mit nullbasierten Indizes zugegriffen werden, die angeben, welche Tabelle unter Berücksichtigung der Reihenfolge, in der sie in der Calc-Datei erscheinen, angezeigt wird."
 
 #. tSo3e
 #: read_write_values.xhp
@@ -1472,7 +1472,7 @@ msgctxt ""
 "par_id291633264880172\n"
 "help.text"
 msgid "In Basic, instead of using the <literal>getByName</literal> method, use <literal>Sheets(sheetIndex)</literal> as shown next:"
-msgstr ""
+msgstr "In Basic verwenden Sie anstelle der Methode <literal>getByName</literal> die Methode <literal>Sheets(sheetIndex)</literal>, wie unten gezeigt:"
 
 #. svDuj
 #: read_write_values.xhp
@@ -1481,7 +1481,7 @@ msgctxt ""
 "par_id891633265000047\n"
 "help.text"
 msgid "This can be done in a similar fashion in Python:"
-msgstr ""
+msgstr "Dies kann auf ähnliche Weise in Python erfolgen:"
 
 #. 6qHAn
 #: read_write_values.xhp
@@ -1490,7 +1490,7 @@ msgctxt ""
 "hd_id451633265241066\n"
 "help.text"
 msgid "Using the ScriptForge Library"
-msgstr ""
+msgstr "Verwenden der Bibliothek ScriptForge"
 
 #. 8CkSe
 #: read_write_values.xhp
@@ -1499,7 +1499,7 @@ msgctxt ""
 "par_id731633265268585\n"
 "help.text"
 msgid "The Calc service of the ScriptForge library can be used to get and set cell values as follows:"
-msgstr ""
+msgstr "Der Calc-Dienst der Bibliothek ScriptForge kann verwendet werden, um Zellenwerte wie folgt zu erhalten und zu setzen:"
 
 #. DCJ2E
 #: read_write_values.xhp
@@ -1508,7 +1508,7 @@ msgctxt ""
 "par_id551633265526538\n"
 "help.text"
 msgid "' Loads the ScriptForge library"
-msgstr ""
+msgstr "' Lädt die Bibliothek ScriptForge"
 
 #. hgDyM
 #: read_write_values.xhp
@@ -1517,7 +1517,7 @@ msgctxt ""
 "par_id581633265527001\n"
 "help.text"
 msgid "' Gets access to the current Calc document"
-msgstr ""
+msgstr "' Erhält Zugriff auf das aktuelle Calc-Dokument"
 
 #. Gw4KG
 #: read_write_values.xhp
@@ -1526,7 +1526,7 @@ msgctxt ""
 "par_id751633265527427\n"
 "help.text"
 msgid "' Sets the value of cells A1 and A2"
-msgstr ""
+msgstr "' Legt den Wert der Zellen A1 und A2 fest"
 
 #. VUWVE
 #: read_write_values.xhp
@@ -1535,7 +1535,7 @@ msgctxt ""
 "par_id781633267324929\n"
 "help.text"
 msgid "The <literal>setValue</literal> method can be used to set both numeric and text values. To set a cell formula, use the <literal>setFormula</literal> method."
-msgstr ""
+msgstr "Die Methode <literal>setValue</literal> kann verwendet werden, um sowohl numerische als auch Textwerte festzulegen. Verwenden Sie zum Festlegen einer Zellformel die Methode <literal>setFormula</literal>."
 
 #. jPRii
 #: read_write_values.xhp
@@ -1544,7 +1544,7 @@ msgctxt ""
 "par_id251633265634883\n"
 "help.text"
 msgid "With the Calc service, getting and setting cell values can be done with a single line of code. The example below gets the value from cell \"A1\" and shows it on a message box."
-msgstr ""
+msgstr "Mit dem Calc-Dienst kann das Abrufen und Festlegen von Zellenwerten mit einer einzigen Codezeile erfolgen. Das folgende Beispiel ruft den Wert aus Zelle \"A1\" ab und zeigt ihn in einem Meldungsfeld an."
 
 #. NzUg4
 #: read_write_values.xhp
@@ -1553,7 +1553,7 @@ msgctxt ""
 "par_id521633608223310\n"
 "help.text"
 msgid "The ScriptForge library also makes it simpler to access ranges in different sheets, as demonstrated in the example below:"
-msgstr ""
+msgstr "Die Bibliothek ScriptForge vereinfacht auch den Zugriff auf Bereiche in verschiedenen Tabellen, wie im folgenden Beispiel gezeigt:"
 
 #. CCeEh
 #: read_write_values.xhp
@@ -1562,7 +1562,7 @@ msgctxt ""
 "bas_id521633608366292\n"
 "help.text"
 msgid "' Gets cell \"A1\" from the sheet named \"Sheet1\""
-msgstr ""
+msgstr "' Ruft Zelle \"A1\" aus der Tabelle mit dem Namen \"Sheet1\" ab"
 
 #. qUTqA
 #: read_write_values.xhp
@@ -1571,7 +1571,7 @@ msgctxt ""
 "bas_id661633608366484\n"
 "help.text"
 msgid "' Gets cell \"B3\" from the sheet named \"Sheet2\""
-msgstr ""
+msgstr "' Ruft Zelle \"B3\" aus der Tabelle mit dem Namen \"Sheet2\" ab"
 
 #. mCX5W
 #: read_write_values.xhp
@@ -1580,7 +1580,7 @@ msgctxt ""
 "bas_id501633608516381\n"
 "help.text"
 msgid "' Places the result into cell \"A1\" of sheet \"Report\""
-msgstr ""
+msgstr "' Platziert das Ergebnis in Zelle \"A1\" der Tabelle \"Report\""
 
 #. ZdkEz
 #: read_write_values.xhp
@@ -1589,7 +1589,7 @@ msgctxt ""
 "par_id431633266057163\n"
 "help.text"
 msgid "The examples above can also be implemented in Python as follows:"
-msgstr ""
+msgstr "Die obigen Beispiele können auch wie folgt in Python implementiert werden:"
 
 #. ayg6P
 #: sample_code.xhp
@@ -1609,23 +1609,23 @@ msgctxt ""
 msgid "<bookmark_value>programming examples for controls</bookmark_value>  <bookmark_value>dialogs;loading (example)</bookmark_value>  <bookmark_value>dialogs;displaying (example)</bookmark_value>  <bookmark_value>controls;reading or editing properties (example)</bookmark_value>  <bookmark_value>list boxes;removing entries from (example)</bookmark_value>  <bookmark_value>list boxes;adding entries to (example)</bookmark_value>  <bookmark_value>examples; programming controls</bookmark_value>  <bookmark_value>dialog editor;programming examples for controls</bookmark_value>  <bookmark_value>Tools;LoadDialog</bookmark_value>"
 msgstr "<bookmark_value>Programmierbeispiele für Steuerelemente</bookmark_value><bookmark_value>Dialoge; laden (Beispiel)</bookmark_value><bookmark_value>Dialoge; anzeigen (Beispiel)</bookmark_value><bookmark_value>Steuerelemente; Eigenschaften lesen oder ändern (Beispiel)</bookmark_value><bookmark_value>Listenfelder; Einträge löschen (Beispiel)</bookmark_value><bookmark_value>Listenfelder; Einträge einfügen (Beispiel)</bookmark_value><bookmark_value>Beispiele; Programmierung von Steuerelementen</bookmark_value><bookmark_value>Dialog-Editor; Programmierbeispiele für Steuerelemente</bookmark_value><bookmark_value>Werkzeuge; LoadDialog</bookmark_value>"
 
-#. XFqTD
+#. 8rpap
 #: sample_code.xhp
 msgctxt ""
 "sample_code.xhp\n"
 "hd_id3155338\n"
 "help.text"
-msgid "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\" name=\"Programming Examples for Controls in the Dialog Editor\">Programming Examples for Controls in the Dialog Editor</link>   </variable>"
-msgstr "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\" name=\"Programming Examples for Controls in the Dialog Editor\">Programmbeispiele für Steuerelemente im Dialog-Editor</link></variable>"
+msgid "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\">Programming Examples for Controls in the Dialog Editor</link>   </variable>"
+msgstr "<variable id=\"sample_code\"><link href=\"text/sbasic/guide/sample_code.xhp\">Programmbeispiele für Steuerelemente im Dialog-Editor</link></variable>"
 
-#. uFxhk
+#. GwPP9
 #: sample_code.xhp
 msgctxt ""
 "sample_code.xhp\n"
 "par_id3153031\n"
 "help.text"
-msgid "The following examples are for a new <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog\">dialog</link> called \"Dialog1\". Use the tools on the <emph>Toolbox</emph> bar in the dialog editor to create the dialog and add the following controls: a <emph>Check Box</emph> called \"CheckBox1\", a <emph>Label Field</emph> called \"Label1\", a <emph>Button</emph> called \"CommandButton1\", and a <emph>List Box</emph> called \"ListBox1\"."
-msgstr "Um diese Beispiele ausprobieren zu können, brauchen Sie einen neuen <link href=\"text/sbasic/guide/create_dialog.xhp\" name=\"dialog\">Dialog</link> mit dem Namen \"Dialog1\" anlegen. Im Dialog-Editor legen Sie mithilfe der Schaltflächen in der <emph>Werkzeugleiste</emph> folgende Steuerelemente an: ein <emph>Markierfeld</emph> mit dem Namen \"Markierfeld1\", ein <emph>Beschriftungsfeld</emph> mit dem Namen \"Beschriftung1\", eine <emph>Schaltfläche</emph> mit dem Namen \"Schaltfläche1\" und ein <emph>Listenfeld</emph> mit dem Namen \"Listenfeld1\"."
+msgid "The following examples are for a new <link href=\"text/sbasic/guide/create_dialog.xhp\">dialog</link> called \"Dialog1\". Use the tools on the <emph>Toolbox</emph> bar in the dialog editor to create the dialog and add the following controls: a <emph>Check Box</emph> called \"CheckBox1\", a <emph>Label Field</emph> called \"Label1\", a <emph>Button</emph> called \"CommandButton1\", and a <emph>List Box</emph> called \"ListBox1\"."
+msgstr "Um diese Beispiele ausprobieren zu können, brauchen Sie einen neuen <link href=\"text/sbasic/guide/create_dialog.xhp\">Dialog</link> mit dem Namen \"Dialog1\" anlegen. Im Dialog-Editor legen Sie mithilfe der Schaltflächen in der <emph>Werkzeugleiste</emph> folgende Steuerelemente an: ein <emph>Markierfeld</emph> mit dem Namen \"Markierfeld1\", ein <emph>Beschriftungsfeld</emph> mit dem Namen \"Beschriftung1\", eine <emph>Schaltfläche</emph> mit dem Namen \"Schaltfläche1\" und ein <emph>Listenfeld</emph> mit dem Namen \"Listenfeld1\"."
 
 #. bfDTG
 #: sample_code.xhp
@@ -1652,7 +1652,7 @@ msgctxt ""
 "par_id3153032\n"
 "help.text"
 msgid "<literal>LoadDialog</literal> function is stored in <literal>Tools.ModuleControls</literal> available from Application Macros and Dialogs."
-msgstr ""
+msgstr "Die Funktion <literal>LoadDialog</literal> ist in <literal>Tools.ModuleControls</literal> gespeichert, die unter Anwendungsmakros und -dialoge verfügbar ist."
 
 #. kBLFU
 #: sample_code.xhp
@@ -1825,14 +1825,14 @@ msgctxt ""
 msgid "<bookmark_value>module/dialog toggle</bookmark_value>   <bookmark_value>dialogs;using Basic to show (example)</bookmark_value>   <bookmark_value>examples; showing a dialog with Basic</bookmark_value>   <bookmark_value>Tools;LoadDialog</bookmark_value>"
 msgstr "<bookmark_value>Module/Dialoge umschalten</bookmark_value><bookmark_value>Dialoge; Programmcode zum Anzeigen verwenden (Beispiel)</bookmark_value><bookmark_value>Beispiele; einen Dialog mithilfe von Programmcode anzeigen</bookmark_value><bookmark_value>Werkzeuge; Dialoge laden</bookmark_value>"
 
-#. 7KfDE
+#. TArAY
 #: show_dialog.xhp
 msgctxt ""
 "show_dialog.xhp\n"
 "hd_id3154140\n"
 "help.text"
-msgid "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\" name=\"Opening a Dialog With Basic\">Opening a Dialog With Basic</link></variable>"
-msgstr "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\" name=\"Öffnen eines Dialogs mit Basic\">Öffnen eines Dialogs mit Basic</link></variable>"
+msgid "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\">Opening a Dialog With Basic</link></variable>"
+msgstr "<variable id=\"show_dialog\"><link href=\"text/sbasic/guide/show_dialog.xhp\">Öffnen eines Dialogs mit Basic</link></variable>"
 
 #. PXLvB
 #: show_dialog.xhp
@@ -2075,7 +2075,7 @@ msgctxt ""
 "par_id4585100\n"
 "help.text"
 msgid "This adds string resources to contain the translated versions of all strings to the dialog properties. The set of dialog strings of the default language is copied to the new set of strings. Later, you can switch to the new language and then translate the strings."
-msgstr "Hiermit fügen Sie Sprachressourcen, welche die übersetzten Versionen aller Texte enthalten, zu den Dialog-Eigenschaften hinzu. Alle Texte der Standardsprache werden in die neue Sprachressourcen kopiert. Später können Sie zu der neuen Sprache umschalten und dann die Zeichenketten übersetzen."
+msgstr "Hiermit fügen Sie Sprachressourcen, welche die übersetzten Versionen aller Texte enthalten, zu den Dialogeigenschaften hinzu. Alle Texte der Standardsprache werden in die neue Sprachressourcen kopiert. Später können Sie zu der neuen Sprache umschalten und dann die Zeichenfolgen übersetzen."
 
 #. cfjJ8
 #: translation.xhp

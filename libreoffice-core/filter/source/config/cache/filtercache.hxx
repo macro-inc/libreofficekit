@@ -361,9 +361,9 @@ class FilterCache : public cppu::BaseMutex
                         if some input parameter are wrong or the cache itself is not valid
                         any longer, because any operation before damage it.
          */
-        std::vector<OUString> getMatchingItemsByProps(      EItemType  eType                ,
-                                                     const CacheItem& lIProps              ,
-                                                     const CacheItem& lEProps = CacheItem()) const;
+        std::vector<OUString> getMatchingItemsByProps( EItemType  eType,
+                                                     o3tl::span< const css::beans::NamedValue > lIProps,
+                                                     o3tl::span< const css::beans::NamedValue > lEProps = {}) const;
 
 
         /** @short      indicates if the requested sub container
@@ -524,10 +524,8 @@ class FilterCache : public cppu::BaseMutex
                         was not migrated to the new one. So we can't provide write access
                         to such items...
          */
-        void addStatePropsToItem(      EItemType        eType,
-                                         const OUString& sItem,
-                                               CacheItem&       rItem);
-
+        css::uno::Any getItemWithStateProps( EItemType        eType,
+                                             const OUString& sItem);
 
         /** TODO document me
 
@@ -600,6 +598,7 @@ class FilterCache : public cppu::BaseMutex
 
         CacheItemList& impl_getItemList(EItemType eType);
 
+        CacheItem& impl_getItem( EItemType eType, const OUString& sItem);
 
         /** @short      return a valid configuration update access
                         to the underlying configuration package, which
@@ -665,7 +664,7 @@ class FilterCache : public cppu::BaseMutex
                         Can be empty if an internal error occurred or if the requested
                         key does not exists!
          */
-        css::uno::Any impl_getDirectCFGValue(const OUString& sDirectKey);
+        css::uno::Any impl_getDirectCFGValue(std::u16string_view sDirectKey);
 
 
         /** @short      load the underlying configuration into this cache.
@@ -891,7 +890,7 @@ class FilterCache : public cppu::BaseMutex
 
 
         /** TODO */
-        static std::vector<OUString> impl_tokenizeString(const OUString& sData     ,
+        static std::vector<OUString> impl_tokenizeString(std::u16string_view sData     ,
                                                sal_Unicode      cSeparator);
 
 

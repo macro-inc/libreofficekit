@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-08 12:15+0200\n"
-"PO-Revision-Date: 2022-07-06 16:25+0000\n"
-"Last-Translator: SteenRønnow <steen.roennow@mail.dk>\n"
+"POT-Creation-Date: 2023-02-15 14:12+0100\n"
+"PO-Revision-Date: 2023-01-12 12:04+0000\n"
+"Last-Translator: David Lamhauge <davidlamhauge@gmail.com>\n"
 "Language-Team: Danish <https://translations.documentfoundation.org/projects/libo_ui-master/cuimessages/da/>\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -633,663 +633,657 @@ msgctxt "RID_SVXSTR_HANJA"
 msgid "Hanja"
 msgstr "Hanja"
 
-#. 88dts
-#: cui/inc/strings.hrc:113
-msgctxt "RID_SVXSTR_BASICMACROS"
-msgid "BASIC Macros"
-msgstr "BASIC-makroer"
-
 #. XKYHn
-#: cui/inc/strings.hrc:114
+#: cui/inc/strings.hrc:113
 msgctxt "RID_SVXSTR_GROUP_STYLES"
 msgid "Styles"
 msgstr "Typografier"
 
 #. 3Qq2E
-#: cui/inc/strings.hrc:115
+#: cui/inc/strings.hrc:114
 msgctxt "RID_SVXSTR_GROUP_SIDEBARDECKS"
 msgid "Sidebar Decks"
 msgstr "Sidepaneldæk"
 
 #. hFEBv
-#: cui/inc/strings.hrc:117
+#: cui/inc/strings.hrc:116
 msgctxt "RID_SVXSTR_EVENT_STARTAPP"
 msgid "Start Application"
 msgstr "Start programmet"
 
 #. 6tUvx
-#: cui/inc/strings.hrc:118
+#: cui/inc/strings.hrc:117
 msgctxt "RID_SVXSTR_EVENT_CLOSEAPP"
 msgid "Close Application"
 msgstr "Luk programmet"
 
 #. 6NsQz
-#: cui/inc/strings.hrc:119
+#: cui/inc/strings.hrc:118
 msgctxt "RID_SVXSTR_EVENT_NEWDOC"
 msgid "New Document"
 msgstr "Nyt dokument"
 
 #. G6b2e
-#: cui/inc/strings.hrc:120
+#: cui/inc/strings.hrc:119
 msgctxt "RID_SVXSTR_EVENT_CLOSEDOC"
 msgid "Document closed"
 msgstr "Dokument lukket"
 
 #. yvsTa
-#: cui/inc/strings.hrc:121
+#: cui/inc/strings.hrc:120
 msgctxt "RID_SVXSTR_EVENT_PREPARECLOSEDOC"
 msgid "Document is going to be closed"
 msgstr "Dokumentet bliver lukket"
 
 #. DKpfj
-#: cui/inc/strings.hrc:122
+#: cui/inc/strings.hrc:121
 msgctxt "RID_SVXSTR_EVENT_OPENDOC"
 msgid "Open Document"
 msgstr "Åbn dokument"
 
 #. DTDDm
-#: cui/inc/strings.hrc:123
+#: cui/inc/strings.hrc:122
 msgctxt "RID_SVXSTR_EVENT_SAVEDOC"
 msgid "Save Document"
 msgstr "Gem dokument"
 
 #. Trc82
-#: cui/inc/strings.hrc:124
+#: cui/inc/strings.hrc:123
 msgctxt "RID_SVXSTR_EVENT_SAVEASDOC"
 msgid "Save Document As"
 msgstr "Gem dokument som"
 
 #. GCbZt
-#: cui/inc/strings.hrc:125
+#: cui/inc/strings.hrc:124
 msgctxt "RID_SVXSTR_EVENT_SAVEDOCDONE"
 msgid "Document has been saved"
 msgstr "Dokumentet er blevet gemt"
 
 #. mYtMa
-#: cui/inc/strings.hrc:126
+#: cui/inc/strings.hrc:125
 msgctxt "RID_SVXSTR_EVENT_SAVEASDOCDONE"
 msgid "Document has been saved as"
 msgstr "Dokumentet er blevet gemt som"
 
 #. t8F8W
-#: cui/inc/strings.hrc:127
+#: cui/inc/strings.hrc:126
 msgctxt "RID_SVXSTR_EVENT_ACTIVATEDOC"
 msgid "Activate Document"
 msgstr "Aktiver dokument"
 
 #. T7QE3
-#: cui/inc/strings.hrc:128
+#: cui/inc/strings.hrc:127
 msgctxt "RID_SVXSTR_EVENT_DEACTIVATEDOC"
 msgid "Deactivate Document"
 msgstr "Deaktiver dokument"
 
 #. AQXyC
-#: cui/inc/strings.hrc:129
+#: cui/inc/strings.hrc:128
 msgctxt "RID_SVXSTR_EVENT_PRINTDOC"
 msgid "Print Document"
 msgstr "Udskriv dokument"
 
 #. 8uXuz
-#: cui/inc/strings.hrc:130
+#: cui/inc/strings.hrc:129
 msgctxt "RID_SVXSTR_EVENT_MODIFYCHANGED"
 msgid "'Modified' status was changed"
 msgstr "'Ændret'-status blev ændret"
 
 #. 5CKDG
-#: cui/inc/strings.hrc:131
+#: cui/inc/strings.hrc:130
 msgctxt "RID_SVXSTR_EVENT_MAILMERGE"
 msgid "Printing of form letters started"
 msgstr "Udskrivning af formularbreve påbegyndt"
 
 #. AZ2io
-#: cui/inc/strings.hrc:132
+#: cui/inc/strings.hrc:131
 msgctxt "RID_SVXSTR_EVENT_MAILMERGE_END"
 msgid "Printing of form letters finished"
 msgstr "Udskrivning af formularbreve færdig"
 
 #. dHtbz
-#: cui/inc/strings.hrc:133
+#: cui/inc/strings.hrc:132
 msgctxt "RID_SVXSTR_EVENT_FIELDMERGE"
 msgid "Merging of form fields started"
 msgstr "Fletning af formularfelter startet"
 
 #. uGCdD
-#: cui/inc/strings.hrc:134
+#: cui/inc/strings.hrc:133
 msgctxt "RID_SVXSTR_EVENT_FIELDMERGE_FINISHED"
 msgid "Merging of form fields finished"
 msgstr "Fletning af formularfelter færdig"
 
 #. srLLa
-#: cui/inc/strings.hrc:135
+#: cui/inc/strings.hrc:134
 msgctxt "RID_SVXSTR_EVENT_PAGECOUNTCHANGE"
 msgid "Changing the page count"
 msgstr "Ændring af sideantallet"
 
 #. AsuQF
-#: cui/inc/strings.hrc:136
+#: cui/inc/strings.hrc:135
 msgctxt "RID_SVXSTR_EVENT_SUBCOMPONENT_OPENED"
 msgid "Loaded a sub component"
 msgstr "Hentede en underkomponent"
 
 #. Gf22f
-#: cui/inc/strings.hrc:137
+#: cui/inc/strings.hrc:136
 msgctxt "RID_SVXSTR_EVENT_SUBCOMPONENT_CLOSED"
 msgid "Closed a sub component"
 msgstr "Lukkede en underkomponent"
 
 #. QayEb
-#: cui/inc/strings.hrc:138
+#: cui/inc/strings.hrc:137
 msgctxt "RID_SVXSTR_EVENT_APPROVEPARAMETER"
 msgid "Fill parameters"
 msgstr "Udfyld parametre"
 
 #. mL59X
-#: cui/inc/strings.hrc:139
+#: cui/inc/strings.hrc:138
 msgctxt "RID_SVXSTR_EVENT_ACTIONPERFORMED"
 msgid "Execute action"
 msgstr "Udfør handling"
 
 #. KtHBE
-#: cui/inc/strings.hrc:140
+#: cui/inc/strings.hrc:139
 msgctxt "RID_SVXSTR_EVENT_AFTERUPDATE"
 msgid "After updating"
 msgstr "Efter opdatering"
 
 #. b6CCj
-#: cui/inc/strings.hrc:141
+#: cui/inc/strings.hrc:140
 msgctxt "RID_SVXSTR_EVENT_BEFOREUPDATE"
 msgid "Before updating"
 msgstr "Før opdatering"
 
 #. KTBcp
-#: cui/inc/strings.hrc:142
+#: cui/inc/strings.hrc:141
 msgctxt "RID_SVXSTR_EVENT_APPROVEROWCHANGE"
 msgid "Before record action"
 msgstr "Før dataposthandling"
 
 #. Fhyio
-#: cui/inc/strings.hrc:143
+#: cui/inc/strings.hrc:142
 msgctxt "RID_SVXSTR_EVENT_ROWCHANGE"
 msgid "After record action"
 msgstr "Efter dataposthandling"
 
 #. PmJgM
-#: cui/inc/strings.hrc:144
+#: cui/inc/strings.hrc:143
 msgctxt "RID_SVXSTR_EVENT_CONFIRMDELETE"
 msgid "Confirm deletion"
 msgstr "Bekræft sletning"
 
 #. gcREA
-#: cui/inc/strings.hrc:145
+#: cui/inc/strings.hrc:144
 msgctxt "RID_SVXSTR_EVENT_ERROROCCURRED"
 msgid "Error occurred"
 msgstr "Fejl opstod"
 
 #. oAwDt
-#: cui/inc/strings.hrc:146
+#: cui/inc/strings.hrc:145
 msgctxt "RID_SVXSTR_EVENT_ADJUSTMENTVALUECHANGED"
 msgid "While adjusting"
 msgstr "Ved justering"
 
 #. AyfwP
-#: cui/inc/strings.hrc:147
+#: cui/inc/strings.hrc:146
 msgctxt "RID_SVXSTR_EVENT_FOCUSGAINED"
 msgid "When receiving focus"
 msgstr "Ved modtaget fokus"
 
 #. BD96B
-#: cui/inc/strings.hrc:148
+#: cui/inc/strings.hrc:147
 msgctxt "RID_SVXSTR_EVENT_FOCUSLOST"
 msgid "When losing focus"
 msgstr "Ved mistet fokus"
 
 #. wEhfE
-#: cui/inc/strings.hrc:149
+#: cui/inc/strings.hrc:148
 msgctxt "RID_SVXSTR_EVENT_ITEMSTATECHANGED"
 msgid "Item status changed"
 msgstr "Elementstatus ændret"
 
 #. FRW7b
-#: cui/inc/strings.hrc:150
+#: cui/inc/strings.hrc:149
 msgctxt "RID_SVXSTR_EVENT_KEYTYPED"
 msgid "Key pressed"
 msgstr "Tast trykket"
 
 #. 4kZCD
-#: cui/inc/strings.hrc:151
+#: cui/inc/strings.hrc:150
 msgctxt "RID_SVXSTR_EVENT_KEYUP"
 msgid "Key released"
 msgstr "Tast sluppet"
 
 #. ZiS2D
-#: cui/inc/strings.hrc:152
+#: cui/inc/strings.hrc:151
 msgctxt "RID_SVXSTR_EVENT_LOADED"
 msgid "When loading"
 msgstr "Ved indlæsning"
 
 #. vEjAG
-#: cui/inc/strings.hrc:153
+#: cui/inc/strings.hrc:152
 msgctxt "RID_SVXSTR_EVENT_RELOADING"
 msgid "Before reloading"
 msgstr "Før genindlæsning"
 
 #. 5FvrE
-#: cui/inc/strings.hrc:154
+#: cui/inc/strings.hrc:153
 msgctxt "RID_SVXSTR_EVENT_RELOADED"
 msgid "When reloading"
 msgstr "Ved genindlæsning"
 
 #. CDcYt
-#: cui/inc/strings.hrc:155
+#: cui/inc/strings.hrc:154
 msgctxt "RID_SVXSTR_EVENT_MOUSEDRAGGED"
 msgid "Mouse moved while key pressed"
 msgstr "Musebevægelse med tastetryk"
 
 #. CPpyk
-#: cui/inc/strings.hrc:156
+#: cui/inc/strings.hrc:155
 msgctxt "RID_SVXSTR_EVENT_MOUSEENTERED"
 msgid "Mouse inside"
 msgstr "Mus indenfor"
 
 #. 4hGfp
-#: cui/inc/strings.hrc:157
+#: cui/inc/strings.hrc:156
 msgctxt "RID_SVXSTR_EVENT_MOUSEEXITED"
 msgid "Mouse outside"
 msgstr "Mus udenfor"
 
 #. QEuWr
-#: cui/inc/strings.hrc:158
+#: cui/inc/strings.hrc:157
 msgctxt "RID_SVXSTR_EVENT_MOUSEMOVED"
 msgid "Mouse moved"
 msgstr "Mus flyttet"
 
 #. 8YA3S
-#: cui/inc/strings.hrc:159
+#: cui/inc/strings.hrc:158
 msgctxt "RID_SVXSTR_EVENT_MOUSEPRESSED"
 msgid "Mouse button pressed"
 msgstr "Museknap trykket"
 
 #. RMuJe
-#: cui/inc/strings.hrc:160
+#: cui/inc/strings.hrc:159
 msgctxt "RID_SVXSTR_EVENT_MOUSERELEASED"
 msgid "Mouse button released"
 msgstr "Museknap sluppet"
 
 #. 5iPHQ
-#: cui/inc/strings.hrc:161
+#: cui/inc/strings.hrc:160
 msgctxt "RID_SVXSTR_EVENT_POSITIONING"
 msgid "Before record change"
 msgstr "Før ændring af datapost"
 
 #. yrBiz
-#: cui/inc/strings.hrc:162
+#: cui/inc/strings.hrc:161
 msgctxt "RID_SVXSTR_EVENT_POSITIONED"
 msgid "After record change"
 msgstr "Efter ændring af datapost"
 
 #. bdBH4
-#: cui/inc/strings.hrc:163
+#: cui/inc/strings.hrc:162
 msgctxt "RID_SVXSTR_EVENT_RESETTED"
 msgid "After resetting"
 msgstr "Efter nulstilling"
 
 #. eVsFk
-#: cui/inc/strings.hrc:164
+#: cui/inc/strings.hrc:163
 msgctxt "RID_SVXSTR_EVENT_APPROVERESETTED"
 msgid "Prior to reset"
 msgstr "Før nulstilling"
 
 #. 2oAoV
-#: cui/inc/strings.hrc:165
+#: cui/inc/strings.hrc:164
 msgctxt "RID_SVXSTR_EVENT_APPROVEACTIONPERFORMED"
 msgid "Approve action"
 msgstr "Godkend handling"
 
 #. hQAzK
-#: cui/inc/strings.hrc:166
+#: cui/inc/strings.hrc:165
 msgctxt "RID_SVXSTR_EVENT_SUBMITTED"
 msgid "Before submitting"
 msgstr "Før afsendelse"
 
 #. CFPSo
-#: cui/inc/strings.hrc:167
+#: cui/inc/strings.hrc:166
 msgctxt "RID_SVXSTR_EVENT_TEXTCHANGED"
 msgid "Text modified"
 msgstr "Tekst ændret"
 
 #. 2ADMH
-#: cui/inc/strings.hrc:168
+#: cui/inc/strings.hrc:167
 msgctxt "RID_SVXSTR_EVENT_UNLOADING"
 msgid "Before unloading"
 msgstr "Før fjernelse"
 
 #. F8BL3
-#: cui/inc/strings.hrc:169
+#: cui/inc/strings.hrc:168
 msgctxt "RID_SVXSTR_EVENT_UNLOADED"
 msgid "When unloading"
 msgstr "Ved fjernelse"
 
 #. M6fPe
-#: cui/inc/strings.hrc:170
+#: cui/inc/strings.hrc:169
 msgctxt "RID_SVXSTR_EVENT_CHANGED"
 msgid "Changed"
 msgstr "Ændret"
 
 #. gZyVB
-#: cui/inc/strings.hrc:171
+#: cui/inc/strings.hrc:170
 msgctxt "RID_SVXSTR_EVENT_CREATEDOC"
 msgid "Document created"
 msgstr "Dokument oprettet"
 
 #. BcPDW
-#: cui/inc/strings.hrc:172
+#: cui/inc/strings.hrc:171
 msgctxt "RID_SVXSTR_EVENT_LOADDOCFINISHED"
 msgid "Document loading finished"
 msgstr "Dokumentindlæsning færdig"
 
 #. ir7AQ
-#: cui/inc/strings.hrc:173
+#: cui/inc/strings.hrc:172
 msgctxt "RID_SVXSTR_EVENT_SAVEDOCFAILED"
 msgid "Saving of document failed"
 msgstr "Gem dokument fejlet"
 
 #. BFtTF
-#: cui/inc/strings.hrc:174
+#: cui/inc/strings.hrc:173
 msgctxt "RID_SVXSTR_EVENT_SAVEASDOCFAILED"
 msgid "'Save as' has failed"
 msgstr "'Gem som' har fejlet"
 
 #. N9e6u
-#: cui/inc/strings.hrc:175
+#: cui/inc/strings.hrc:174
 msgctxt "RID_SVXSTR_EVENT_COPYTODOC"
 msgid "Storing or exporting copy of document"
 msgstr "Gemme eller eksportere kopi af dokument"
 
 #. okb9H
-#: cui/inc/strings.hrc:176
+#: cui/inc/strings.hrc:175
 msgctxt "RID_SVXSTR_EVENT_COPYTODOCDONE"
 msgid "Document copy has been created"
 msgstr "Dokumentkopi er oprettet"
 
 #. DrYTY
-#: cui/inc/strings.hrc:177
+#: cui/inc/strings.hrc:176
 msgctxt "RID_SVXSTR_EVENT_COPYTODOCFAILED"
 msgid "Creating of document copy failed"
 msgstr "Oprettelse af dokumentkopi fejlet"
 
 #. BBJJQ
-#: cui/inc/strings.hrc:178
+#: cui/inc/strings.hrc:177
 msgctxt "RID_SVXSTR_EVENT_VIEWCREATED"
 msgid "View created"
 msgstr "Visning oprettet"
 
 #. XN9Az
-#: cui/inc/strings.hrc:179
+#: cui/inc/strings.hrc:178
 msgctxt "RID_SVXSTR_EVENT_PREPARECLOSEVIEW"
 msgid "View is going to be closed"
 msgstr "Visning vil blive lukket"
 
 #. a9qty
-#: cui/inc/strings.hrc:180
+#: cui/inc/strings.hrc:179
 msgctxt "RID_SVXSTR_EVENT_CLOSEVIEW"
 msgid "View closed"
 msgstr "Visning lukket"
 
 #. dDunN
-#: cui/inc/strings.hrc:181
+#: cui/inc/strings.hrc:180
 msgctxt "RID_SVXSTR_EVENT_TITLECHANGED"
 msgid "Document title changed"
 msgstr "Dokument titel ændret"
 
 #. 6D6BS
-#: cui/inc/strings.hrc:182
+#: cui/inc/strings.hrc:181
 msgctxt "RID_SVXSTR_EVENT_SELECTIONCHANGED"
 msgid "Selection changed"
 msgstr "Markering ændret"
 
 #. XArW3
-#: cui/inc/strings.hrc:183
+#: cui/inc/strings.hrc:182
 msgctxt "RID_SVXSTR_EVENT_DOUBLECLICK"
 msgid "Double click"
 msgstr "Dobbeltklik"
 
 #. oDkyz
-#: cui/inc/strings.hrc:184
+#: cui/inc/strings.hrc:183
 msgctxt "RID_SVXSTR_EVENT_RIGHTCLICK"
 msgid "Right click"
 msgstr "Højreklik"
 
 #. tVSz9
-#: cui/inc/strings.hrc:185
+#: cui/inc/strings.hrc:184
 msgctxt "RID_SVXSTR_EVENT_CALCULATE"
 msgid "Formulas calculated"
 msgstr "Formler beregnet"
 
 #. ESxTQ
-#: cui/inc/strings.hrc:186
+#: cui/inc/strings.hrc:185
 msgctxt "RID_SVXSTR_EVENT_CONTENTCHANGED"
 msgid "Content changed"
 msgstr "Indhold ændret"
 
 #. Zimeo
-#: cui/inc/strings.hrc:188
+#: cui/inc/strings.hrc:187
 msgctxt "RID_STR_SEARCH_ANYWHERE"
 msgid "anywhere in the field"
 msgstr "hvor som helst i feltet"
 
 #. qCKMY
-#: cui/inc/strings.hrc:189
+#: cui/inc/strings.hrc:188
 msgctxt "RID_STR_SEARCH_BEGINNING"
 msgid "beginning of field"
 msgstr "begyndelsen af feltet"
 
 #. CKVTF
-#: cui/inc/strings.hrc:190
+#: cui/inc/strings.hrc:189
 msgctxt "RID_STR_SEARCH_END"
 msgid "end of field"
 msgstr "slutningen af feltet"
 
 #. FZwxu
-#: cui/inc/strings.hrc:191
+#: cui/inc/strings.hrc:190
 msgctxt "RID_STR_SEARCH_WHOLE"
 msgid "entire field"
 msgstr "helt felt"
 
 #. AFUFs
-#: cui/inc/strings.hrc:192
+#: cui/inc/strings.hrc:191
 msgctxt "RID_STR_FROM_TOP"
 msgid "From top"
 msgstr "Fra toppen"
 
 #. FBDbX
-#: cui/inc/strings.hrc:193
+#: cui/inc/strings.hrc:192
 msgctxt "RID_STR_FROM_BOTTOM"
 msgid "From bottom"
 msgstr "Fra bunden"
 
 #. brdgV
-#: cui/inc/strings.hrc:194
+#: cui/inc/strings.hrc:193
 msgctxt "RID_STR_SEARCH_NORECORD"
 msgid "No records corresponding to your data found."
 msgstr "Der blev ikke fundet nogen dataposter, som svarer til dine data."
 
 #. VkTjA
-#: cui/inc/strings.hrc:195
+#: cui/inc/strings.hrc:194
 msgctxt "RID_STR_SEARCH_GENERAL_ERROR"
 msgid "An unknown error occurred. The search could not be finished."
 msgstr "Der opstod en ukendt fejl. Det var ikke muligt at afslutte søgningen."
 
 #. jiQdw
-#: cui/inc/strings.hrc:196
+#: cui/inc/strings.hrc:195
 msgctxt "RID_STR_OVERFLOW_FORWARD"
 msgid "Overflow, search continued at the beginning"
 msgstr "Overløb, søgning fortsat fra begyndelsen"
 
 #. EzK3y
-#: cui/inc/strings.hrc:197
+#: cui/inc/strings.hrc:196
 msgctxt "RID_STR_OVERFLOW_BACKWARD"
 msgid "Overflow, search continued at the end"
 msgstr "Overløb, søgning fortsat fra slutningen"
 
 #. zwiat
-#: cui/inc/strings.hrc:198
+#: cui/inc/strings.hrc:197
 msgctxt "RID_STR_SEARCH_COUNTING"
 msgid "counting records"
 msgstr "tæller dataposter"
 
 #. 7cVWa
-#: cui/inc/strings.hrc:200
+#: cui/inc/strings.hrc:199
 msgctxt "RID_SVXSTR_GALLERY_NOFILES"
 msgid "<No Files>"
 msgstr "<Ingen filer>"
 
 #. AnJUu
-#: cui/inc/strings.hrc:201
+#: cui/inc/strings.hrc:200
 msgctxt "RID_SVXSTR_GALLERYPROPS_OBJECT"
 msgid "Object;Objects"
 msgstr "Objekt;Objekter"
 
 #. GQXSM
-#: cui/inc/strings.hrc:202
+#: cui/inc/strings.hrc:201
 msgctxt "RID_SVXSTR_GALLERY_READONLY"
 msgid "(read-only)"
 msgstr "(skrivebeskyttet)"
 
 #. sAwgA
-#: cui/inc/strings.hrc:203
+#: cui/inc/strings.hrc:202
 msgctxt "RID_SVXSTR_GALLERY_ALLFILES"
 msgid "<All Files>"
 msgstr "<Alle filer>"
 
 #. YkCky
-#: cui/inc/strings.hrc:204
+#: cui/inc/strings.hrc:203
 msgctxt "RID_SVXSTR_GALLERY_ID_EXISTS"
 msgid "This ID already exists..."
 msgstr "Dette ID findes allerede..."
 
 #. w3AUk
-#: cui/inc/strings.hrc:206
+#: cui/inc/strings.hrc:205
 msgctxt "RID_MULTIPATH_DBL_ERR"
 msgid "The path %1 already exists."
 msgstr "Stien %1 findes allerede."
 
 #. 54BsS
-#: cui/inc/strings.hrc:207
+#: cui/inc/strings.hrc:206
 msgctxt "RID_SVXSTR_ARCHIVE_TITLE"
 msgid "Select Archives"
 msgstr "Vælg arkiver"
 
 #. NDB5V
-#: cui/inc/strings.hrc:208
+#: cui/inc/strings.hrc:207
 msgctxt "RID_SVXSTR_ARCHIVE_HEADLINE"
 msgid "Archives"
 msgstr "Arkiver"
 
 #. ffPAq
-#: cui/inc/strings.hrc:209
+#: cui/inc/strings.hrc:208
 msgctxt "RID_SVXSTR_MULTIFILE_DBL_ERR"
 msgid "The file %1 already exists."
 msgstr "Filen %1 findes allerede."
 
 #. 5FyxP
-#: cui/inc/strings.hrc:210
+#: cui/inc/strings.hrc:209
 msgctxt "RID_SVXSTR_ADD_IMAGE"
 msgid "Add Image"
 msgstr "Tilføj billede"
 
 #. eUzGk
-#: cui/inc/strings.hrc:212
+#: cui/inc/strings.hrc:211
 msgctxt "RID_SVXSTR_ONE_PASSWORD_MISMATCH"
 msgid "The confirmation password did not match the password. Set the password again by entering the same password in both boxes."
 msgstr "Bekræftelseskodeordet passede ikke med kodeordet. Angiv kodeordet igen ved at indtaste samme kodeord i begge felter."
 
 #. mN9jE
-#: cui/inc/strings.hrc:213
+#: cui/inc/strings.hrc:212
 msgctxt "RID_SVXSTR_TWO_PASSWORDS_MISMATCH"
 msgid "The confirmation passwords did not match the original passwords. Set the passwords again."
 msgstr "Bekræftelseskodeordet passede ikke med det oprindelige kodeord. Angiv kodeordet igen."
 
 #. 48ez3
-#: cui/inc/strings.hrc:214
+#: cui/inc/strings.hrc:213
 msgctxt "RID_SVXSTR_INVALID_STATE_FOR_OK_BUTTON"
 msgid "Please enter a password to open or to modify, or check the open read-only option to continue."
 msgstr "Angiv venligst et kodeord for at åbne eller ændre, eller marker feltet åbn skrivebeskyttet for at fortsætte."
 
 #. aAbAN
-#: cui/inc/strings.hrc:215
+#: cui/inc/strings.hrc:214
 msgctxt "RID_SVXSTR_INVALID_STATE_FOR_OK_BUTTON_V2"
 msgid "Set the password by entering the same password in both boxes."
 msgstr "Angiv adgangskoden ved at skrive den samme adgangskode i begge felter."
 
 #. ZXcFw
-#: cui/inc/strings.hrc:216
+#: cui/inc/strings.hrc:215
 msgctxt "RID_SVXSTR_PASSWORD_LEN_INDICATOR"
 msgid "Password length limit of %1 reached"
 msgstr "Kodeords maks. længde på %1 nået"
 
 #. Fko49
-#: cui/inc/strings.hrc:218
+#: cui/inc/strings.hrc:217
 msgctxt "STR_AUTOLINK"
 msgid "Automatic"
 msgstr "Automatisk"
 
 #. WYHFb
-#: cui/inc/strings.hrc:219
+#: cui/inc/strings.hrc:218
 msgctxt "STR_MANUALLINK"
 msgid "Manual"
 msgstr "Manuelt"
 
 #. PFN4j
-#: cui/inc/strings.hrc:220
+#: cui/inc/strings.hrc:219
 msgctxt "STR_BROKENLINK"
 msgid "Not available"
 msgstr "Ikke tilgængelig"
 
 #. 5ymS3
-#: cui/inc/strings.hrc:221
+#: cui/inc/strings.hrc:220
 msgctxt "STR_CLOSELINKMSG"
 msgid "Are you sure you want to remove the selected link?"
 msgstr "Er du sikker på, at du vil fjerne den markerede kæde?"
 
 #. wyMwT
-#: cui/inc/strings.hrc:222
+#: cui/inc/strings.hrc:221
 msgctxt "STR_CLOSELINKMSG_MULTI"
 msgid "Are you sure you want to remove the selected link?"
 msgstr "Er du sikker på, at du vil fjerne den markerede kæde?"
 
 #. CN74h
-#: cui/inc/strings.hrc:223
+#: cui/inc/strings.hrc:222
 msgctxt "STR_WAITINGLINK"
 msgid "Waiting"
 msgstr "Venter"
 
 #. QJKgF
-#: cui/inc/strings.hrc:225
+#: cui/inc/strings.hrc:224
 msgctxt "RID_SVXSTR_SAVE_SCREENSHOT_AS"
 msgid "Save Screenshot As..."
 msgstr "Gem skærmbillede som..."
 
 #. CAaFf
 #. $(ROW) can be a number or the caption of the row in quotes
-#: cui/inc/strings.hrc:228
+#: cui/inc/strings.hrc:227
 msgctxt "RID_SVXSTR_DIAGRAM_ROW"
 msgid "Data Series $(ROW)"
 msgstr "Dataserie $(ROW)"
 
 #. HzhXp
-#: cui/inc/strings.hrc:230
+#: cui/inc/strings.hrc:229
 msgctxt "RID_SVXSTR_YES"
 msgid "Yes"
 msgstr "Ja"
 
 #. RuQiB
-#: cui/inc/strings.hrc:231
+#: cui/inc/strings.hrc:230
 msgctxt "RID_SVXSTR_NO"
 msgid "No"
 msgstr "Nej"
 
 #. irLeD
-#: cui/inc/strings.hrc:233
+#: cui/inc/strings.hrc:232
 msgctxt "STR_LINKEDDOC_DOESNOTEXIST"
 msgid ""
 "The file\n"
@@ -1301,7 +1295,7 @@ msgstr ""
 "findes ikke."
 
 #. iQYnX
-#: cui/inc/strings.hrc:234
+#: cui/inc/strings.hrc:233
 msgctxt "STR_LINKEDDOC_NO_SYSTEM_FILE"
 msgid ""
 "The file\n"
@@ -1313,7 +1307,7 @@ msgstr ""
 "findes ikke i det lokale filsystem."
 
 #. 4PaJ2
-#: cui/inc/strings.hrc:235
+#: cui/inc/strings.hrc:234
 msgctxt "STR_NAME_CONFLICT"
 msgid ""
 "The name '$file$' is already used for another database.\n"
@@ -1323,163 +1317,163 @@ msgstr ""
 "Vælg et andet navn."
 
 #. KFB7q
-#: cui/inc/strings.hrc:236
+#: cui/inc/strings.hrc:235
 msgctxt "RID_SVXSTR_QUERY_DELETE_CONFIRM"
 msgid "Do you want to delete the entry?"
 msgstr "Vil du slette elementet?"
 
 #. gg9gD
-#: cui/inc/strings.hrc:238
+#: cui/inc/strings.hrc:237
 msgctxt "RID_SVXSTR_DELQUERY"
 msgid "Do you want to delete the following object?"
 msgstr "Vil du slette det følgende objekt?"
 
 #. 42ivC
-#: cui/inc/strings.hrc:239
+#: cui/inc/strings.hrc:238
 msgctxt "RID_SVXSTR_DELQUERY_TITLE"
 msgid "Confirm Deletion"
 msgstr "Bekræft sletning"
 
 #. kn5KE
-#: cui/inc/strings.hrc:240
+#: cui/inc/strings.hrc:239
 msgctxt "RID_SVXSTR_DELFAILED"
 msgid "The selected object could not be deleted."
 msgstr "Det markerede objekt kunne ikke slettes."
 
 #. T7T8x
-#: cui/inc/strings.hrc:241
+#: cui/inc/strings.hrc:240
 msgctxt "RID_SVXSTR_DELFAILED_TITLE"
 msgid "Error Deleting Object"
 msgstr "Fejl ved sletning af objekt"
 
 #. SCgXy
-#: cui/inc/strings.hrc:242
+#: cui/inc/strings.hrc:241
 msgctxt "RID_SVXSTR_CREATEFAILED"
 msgid "The object could not be created."
 msgstr "Objektet kunne ikke oprettes."
 
 #. TmiCU
-#: cui/inc/strings.hrc:243
+#: cui/inc/strings.hrc:242
 msgctxt "RID_SVXSTR_CREATEFAILEDDUP"
 msgid " Object with the same name already exists."
 msgstr "Et objekt med samme navn findes allerede."
 
 #. ffc5M
-#: cui/inc/strings.hrc:244
+#: cui/inc/strings.hrc:243
 msgctxt "RID_SVXSTR_CREATEFAILED_TITLE"
 msgid "Error Creating Object"
 msgstr "Fejl under oprettelse af objekt"
 
 #. hpB8B
-#: cui/inc/strings.hrc:245
+#: cui/inc/strings.hrc:244
 msgctxt "RID_SVXSTR_RENAMEFAILED"
 msgid "The object could not be renamed."
 msgstr "Objektet kunne ikke omdøbes."
 
 #. eevjm
-#: cui/inc/strings.hrc:246
+#: cui/inc/strings.hrc:245
 msgctxt "RID_SVXSTR_RENAMEFAILED_TITLE"
 msgid "Error Renaming Object"
 msgstr "Fejl ved omdøbning af objekt"
 
 #. fTHFY
-#: cui/inc/strings.hrc:247
+#: cui/inc/strings.hrc:246
 msgctxt "RID_SVXSTR_ERROR_TITLE"
 msgid "%PRODUCTNAME Error"
 msgstr "%PRODUCTNAME-fejl"
 
 #. e6BgS
-#: cui/inc/strings.hrc:248
+#: cui/inc/strings.hrc:247
 msgctxt "RID_SVXSTR_ERROR_LANG_NOT_SUPPORTED"
 msgid "The scripting language %LANGUAGENAME is not supported."
 msgstr "Scriptsproget %LANGUAGENAME understøttes ikke."
 
 #. EUek9
-#: cui/inc/strings.hrc:249
+#: cui/inc/strings.hrc:248
 msgctxt "RID_SVXSTR_ERROR_RUNNING"
 msgid "An error occurred while running the %LANGUAGENAME script %SCRIPTNAME."
 msgstr "Der opstod en fej under udførelse af %LANGUAGENAME-scriptet %SCRIPTNAME."
 
 #. KVQAh
-#: cui/inc/strings.hrc:250
+#: cui/inc/strings.hrc:249
 msgctxt "RID_SVXSTR_EXCEPTION_RUNNING"
 msgid "An exception occurred while running the %LANGUAGENAME script %SCRIPTNAME."
 msgstr "Der er opstået en undtagelse under udførelse af %LANGUAGENAME-scriptet %SCRIPTNAME."
 
 #. 5bFCQ
-#: cui/inc/strings.hrc:251
+#: cui/inc/strings.hrc:250
 msgctxt "RID_SVXSTR_ERROR_AT_LINE"
 msgid "An error occurred while running the %LANGUAGENAME script %SCRIPTNAME at line: %LINENUMBER."
 msgstr "Der opstod en fej under udførelse af %LANGUAGENAME-scriptet %SCRIPTNAME ved linje: %LINENUMBER."
 
 #. KTptU
-#: cui/inc/strings.hrc:252
+#: cui/inc/strings.hrc:251
 msgctxt "RID_SVXSTR_EXCEPTION_AT_LINE"
 msgid "An exception occurred while running the %LANGUAGENAME script %SCRIPTNAME at line: %LINENUMBER."
 msgstr "Der er opstået en undtagelse under udførelse af %LANGUAGENAME-scriptet %SCRIPTNAME ved linje: %LINENUMBER."
 
 #. BZDbp
-#: cui/inc/strings.hrc:253
+#: cui/inc/strings.hrc:252
 msgctxt "RID_SVXSTR_FRAMEWORK_ERROR_RUNNING"
 msgid "A Scripting Framework error occurred while running the %LANGUAGENAME script %SCRIPTNAME."
 msgstr "Der opstod en fejl i scriptframeworket under udførelse af %LANGUAGENAME-scriptet %SCRIPTNAME."
 
 #. AAghx
-#: cui/inc/strings.hrc:254
+#: cui/inc/strings.hrc:253
 msgctxt "RID_SVXSTR_ERROR_TYPE_LABEL"
 msgid "Type:"
 msgstr "Type:"
 
 #. GAsca
-#: cui/inc/strings.hrc:255
+#: cui/inc/strings.hrc:254
 msgctxt "RID_SVXSTR_ERROR_MESSAGE_LABEL"
 msgid "Message:"
 msgstr "Meddelelse:"
 
 #. ZcxRY
-#: cui/inc/strings.hrc:257
+#: cui/inc/strings.hrc:256
 msgctxt "RID_SVXSTR_CHG_MATH"
 msgid "MathType to %PRODUCTNAME Math or reverse"
 msgstr "MathType til %PRODUCTNAME Math eller omvendt"
 
 #. Ttggs
-#: cui/inc/strings.hrc:258
+#: cui/inc/strings.hrc:257
 msgctxt "RID_SVXSTR_CHG_WRITER"
 msgid "WinWord to %PRODUCTNAME Writer or reverse"
 msgstr "WinWord til %PRODUCTNAME Writer eller omvendt"
 
 #. ZJRKY
-#: cui/inc/strings.hrc:259
+#: cui/inc/strings.hrc:258
 msgctxt "RID_SVXSTR_CHG_CALC"
 msgid "Excel to %PRODUCTNAME Calc or reverse"
 msgstr "Excel til %PRODUCTNAME Calc eller omvendt"
 
 #. VmuND
-#: cui/inc/strings.hrc:260
+#: cui/inc/strings.hrc:259
 msgctxt "RID_SVXSTR_CHG_IMPRESS"
 msgid "PowerPoint to %PRODUCTNAME Impress or reverse"
 msgstr "PowerPoint til %PRODUCTNAME Impress eller omvendt"
 
 #. sE8as
-#: cui/inc/strings.hrc:261
+#: cui/inc/strings.hrc:260
 msgctxt "RID_SVXSTR_CHG_SMARTART"
 msgid "SmartArt to %PRODUCTNAME shapes or reverse"
 msgstr "SmartArt til %PRODUCTNAME figurer eller omvendt"
 
 #. AEgXY
-#: cui/inc/strings.hrc:262
+#: cui/inc/strings.hrc:261
 msgctxt "RID_SVXSTR_CHG_VISIO"
 msgid "Visio to %PRODUCTNAME Draw or reverse"
 msgstr "Visio til %PRODUCTNAME Draw eller omvendt"
 
 #. Zarkq
-#: cui/inc/strings.hrc:263
+#: cui/inc/strings.hrc:262
 msgctxt "RID_SVXSTR_CHG_PDF"
 msgid "PDF to %PRODUCTNAME Draw or reverse"
 msgstr "PDF til %PRODUCTNAME Draw eller omvendt"
 
 #. dDtDU
-#: cui/inc/strings.hrc:265
+#: cui/inc/strings.hrc:264
 msgctxt "RID_SVXSTR_OPT_DOUBLE_DICTS"
 msgid ""
 "The specified name already exists.\n"
@@ -1489,7 +1483,7 @@ msgstr ""
 "Indtast et nyt navn."
 
 #. kzhkA
-#: cui/inc/strings.hrc:266
+#: cui/inc/strings.hrc:265
 msgctxt "RID_SVXSTR_OPT_INVALID_DICT_NAME"
 msgid ""
 "The specified name is invalid.\n"
@@ -1511,133 +1505,133 @@ msgstr ""
 #. For example, adding "Grammar By" word "fund" to the new user
 #. word "crowdfund", the spell checker will recognize "crowdfund"
 #. with suffixes of "fund": "crowdfunding", "crowdfund's" etc.
-#: cui/inc/strings.hrc:281
+#: cui/inc/strings.hrc:280
 msgctxt "RID_SVXSTR_OPT_GRAMMAR_BY"
 msgid "~Grammar By"
 msgstr "~Grammatik af"
 
 #. LPb5d
-#: cui/inc/strings.hrc:282
+#: cui/inc/strings.hrc:281
 msgctxt "STR_MODIFY"
 msgid "~Replace"
 msgstr "~Erstat"
 
 #. anivV
-#: cui/inc/strings.hrc:283
+#: cui/inc/strings.hrc:282
 msgctxt "RID_SVXSTR_CONFIRM_SET_LANGUAGE"
 msgid "Do you want to change the '%1' dictionary language?"
 msgstr "Vil du ændre sproget i ordbogen '%1'?"
 
 #. XEFrB
-#: cui/inc/strings.hrc:285
+#: cui/inc/strings.hrc:284
 msgctxt "RID_SVXSTR_COLOR_CONFIG_DELETE"
 msgid "Do you really want to delete the color scheme?"
 msgstr "Er du sikker på, at du vil slette farveskemaet?"
 
 #. ybdED
-#: cui/inc/strings.hrc:286
+#: cui/inc/strings.hrc:285
 msgctxt "RID_SVXSTR_COLOR_CONFIG_DELETE_TITLE"
 msgid "Color Scheme Deletion"
 msgstr "Sletning af farveskema"
 
 #. DoNBE
-#: cui/inc/strings.hrc:287
+#: cui/inc/strings.hrc:286
 msgctxt "RID_SVXSTR_COLOR_CONFIG_SAVE1"
 msgid "Save scheme"
 msgstr "Gem farveskema"
 
 #. tFrki
-#: cui/inc/strings.hrc:288
+#: cui/inc/strings.hrc:287
 msgctxt "RID_SVXSTR_COLOR_CONFIG_SAVE2"
 msgid "Name of color scheme"
 msgstr "Navn på farveskema"
 
 #. BAGbe
-#: cui/inc/strings.hrc:290
+#: cui/inc/strings.hrc:289
 msgctxt "RID_SVXSTR_SPELL"
 msgid "Spelling"
 msgstr "Stavning"
 
 #. uBohu
-#: cui/inc/strings.hrc:291
+#: cui/inc/strings.hrc:290
 msgctxt "RID_SVXSTR_HYPH"
 msgid "Hyphenation"
 msgstr "Orddeling"
 
 #. XGkt6
-#: cui/inc/strings.hrc:292
+#: cui/inc/strings.hrc:291
 msgctxt "RID_SVXSTR_THES"
 msgid "Thesaurus"
 msgstr "Synonymer"
 
 #. EFrDA
-#: cui/inc/strings.hrc:293
+#: cui/inc/strings.hrc:292
 msgctxt "RID_SVXSTR_GRAMMAR"
 msgid "Grammar"
 msgstr "Grammatik"
 
 #. zbEv9
-#: cui/inc/strings.hrc:294
+#: cui/inc/strings.hrc:293
 msgctxt "RID_SVXSTR_CAPITAL_WORDS"
 msgid "Check uppercase words"
 msgstr "Kontroller ord med STORE bogstaver"
 
 #. BbDNe
-#: cui/inc/strings.hrc:295
+#: cui/inc/strings.hrc:294
 msgctxt "RID_SVXSTR_WORDS_WITH_DIGITS"
 msgid "Check words with numbers "
 msgstr "Kontroller ord med tal "
 
 #. bPDyB
-#: cui/inc/strings.hrc:296
+#: cui/inc/strings.hrc:295
 msgctxt "RID_SVXSTR_SPELL_SPECIAL"
 msgid "Check special regions"
 msgstr "Kontroller i specialområder"
 
 #. XjifG
-#: cui/inc/strings.hrc:297
+#: cui/inc/strings.hrc:296
 msgctxt "RID_SVXSTR_SPELL_AUTO"
 msgid "Check spelling as you type"
 msgstr "Kontroller stavning mens du taster"
 
 #. J3ENq
-#: cui/inc/strings.hrc:298
+#: cui/inc/strings.hrc:297
 msgctxt "RID_SVXSTR_GRAMMAR_AUTO"
 msgid "Check grammar as you type"
 msgstr "Kontroller grammatik mens du taster"
 
 #. f6v3L
-#: cui/inc/strings.hrc:299
+#: cui/inc/strings.hrc:298
 msgctxt "RID_SVXSTR_NUM_MIN_WORDLEN"
 msgid "Minimal number of characters for hyphenation: "
 msgstr "Minimal ordlængde for orddeling: "
 
 #. BCrEf
-#: cui/inc/strings.hrc:300
+#: cui/inc/strings.hrc:299
 msgctxt "RID_SVXSTR_NUM_PRE_BREAK"
 msgid "Characters before line break: "
 msgstr "Tegn før linjeskift: "
 
 #. Kgioh
-#: cui/inc/strings.hrc:301
+#: cui/inc/strings.hrc:300
 msgctxt "RID_SVXSTR_NUM_POST_BREAK"
 msgid "Characters after line break: "
 msgstr "Tegn efter linjeskift: "
 
 #. AewrH
-#: cui/inc/strings.hrc:302
+#: cui/inc/strings.hrc:301
 msgctxt "RID_SVXSTR_HYPH_AUTO"
 msgid "Hyphenate without inquiry"
 msgstr "Del ord uden forespørgsel"
 
 #. qCKn9
-#: cui/inc/strings.hrc:303
+#: cui/inc/strings.hrc:302
 msgctxt "RID_SVXSTR_HYPH_SPECIAL"
 msgid "Hyphenate special regions"
 msgstr "Del ord i specialområder"
 
 #. weKUF
-#: cui/inc/strings.hrc:305
+#: cui/inc/strings.hrc:304
 msgctxt "RID_SVXSTR_JRE_NOT_RECOGNIZED"
 msgid ""
 "The folder you selected does not contain a Java runtime environment.\n"
@@ -1647,7 +1641,7 @@ msgstr ""
 "Vælg en anden mappe."
 
 #. jFLdB
-#: cui/inc/strings.hrc:306
+#: cui/inc/strings.hrc:305
 msgctxt "RID_SVXSTR_JRE_FAILED_VERSION"
 msgid ""
 "The Java runtime environment you selected is not the required version.\n"
@@ -1657,13 +1651,13 @@ msgstr ""
 "Vælg en anden mappe."
 
 #. 79uiz
-#: cui/inc/strings.hrc:307
+#: cui/inc/strings.hrc:306
 msgctxt "RID_SVXSTR_JAVA_START_PARAM"
 msgid "Edit Parameter"
 msgstr "Rediger Parameter"
 
 #. fsbAN
-#: cui/inc/strings.hrc:309
+#: cui/inc/strings.hrc:308
 msgctxt "RID_SVXSTR_OPT_PROXYPORTS"
 msgid ""
 "Invalid value!\n"
@@ -1675,37 +1669,37 @@ msgstr ""
 "Et portnummer kan højst være 65535."
 
 #. UCFD6
-#: cui/inc/strings.hrc:311
+#: cui/inc/strings.hrc:310
 msgctxt "RID_SVXSTR_DESC_GRADIENT"
 msgid "Please enter a name for the gradient:"
 msgstr "Indtast et navn for farvegradueringen:"
 
 #. UDvKR
-#: cui/inc/strings.hrc:312
+#: cui/inc/strings.hrc:311
 msgctxt "RID_SVXSTR_DESC_NEW_BITMAP"
 msgid "Please enter a name for the bitmap:"
 msgstr "Indtast et navn til denne bitmap:"
 
 #. QXqJD
-#: cui/inc/strings.hrc:313
+#: cui/inc/strings.hrc:312
 msgctxt "RID_SVXSTR_DESC_EXT_BITMAP"
 msgid "Please enter a name for the external bitmap:"
 msgstr "Indtast et navn til den eksterne bitmap:"
 
 #. SrS6X
-#: cui/inc/strings.hrc:314
+#: cui/inc/strings.hrc:313
 msgctxt "RID_SVXSTR_DESC_NEW_PATTERN"
 msgid "Please enter a name for the pattern:"
 msgstr "Indtast et navn for mønstret:"
 
 #. yD7AW
-#: cui/inc/strings.hrc:315
+#: cui/inc/strings.hrc:314
 msgctxt "RID_SVXSTR_DESC_LINESTYLE"
 msgid "Please enter a name for the line style:"
 msgstr "Indtast et navn til stregtypen:"
 
 #. FQDrh
-#: cui/inc/strings.hrc:316
+#: cui/inc/strings.hrc:315
 msgctxt "RID_SVXSTR_ASK_CHANGE_LINESTYLE"
 msgid ""
 "The line style was modified without saving. \n"
@@ -1715,455 +1709,461 @@ msgstr ""
 "Du kan ændre den markerede stregtype eller tilføje en ny."
 
 #. Z5Dkg
-#: cui/inc/strings.hrc:317
+#: cui/inc/strings.hrc:316
 msgctxt "RID_SVXSTR_DESC_HATCH"
 msgid "Please enter a name for the hatching:"
 msgstr "Indtast et navn til skraveringen:"
 
 #. rvyBi
-#: cui/inc/strings.hrc:318
+#: cui/inc/strings.hrc:317
 msgctxt "RID_SVXSTR_CHANGE"
 msgid "Modify"
 msgstr "Redigér"
 
 #. ZDhBm
-#: cui/inc/strings.hrc:319
+#: cui/inc/strings.hrc:318
 msgctxt "RID_SVXSTR_ADD"
 msgid "Add"
 msgstr "Adder"
 
 #. QgAFH
-#: cui/inc/strings.hrc:320
+#: cui/inc/strings.hrc:319
 msgctxt "RID_SVXSTR_DESC_COLOR"
 msgid "Please enter a name for the new color:"
 msgstr "Indtast et navn til den nye farve:"
 
 #. GKnJR
-#: cui/inc/strings.hrc:321
+#: cui/inc/strings.hrc:320
 msgctxt "RID_SVXSTR_TABLE"
 msgid "Table"
 msgstr "Tabel"
 
 #. s9ED3
-#: cui/inc/strings.hrc:322
+#: cui/inc/strings.hrc:321
 msgctxt "RID_SVXSTR_DESC_LINEEND"
 msgid "Please enter a name for the new arrow style:"
-msgstr ""
+msgstr "Indtast et navn til denne pil-type:"
 
 #. xD9BU
-#: cui/inc/strings.hrc:323
+#: cui/inc/strings.hrc:322
 msgctxt "RID_SVXSTR_CHARNAME_NOSTYLE"
 msgid "No %1"
 msgstr "Ikke %1"
 
 #. GVkFG
-#: cui/inc/strings.hrc:324
+#: cui/inc/strings.hrc:323
 msgctxt "RID_SVXSTR_CHARNAME_FAMILY"
 msgid "Family:"
 msgstr "Familie:"
 
 #. 6uDkp
-#: cui/inc/strings.hrc:325
+#: cui/inc/strings.hrc:324
 msgctxt "RID_SVXSTR_CHARNAME_FONT"
 msgid "Font:"
 msgstr "Skrifttype:"
 
 #. KFXAV
-#: cui/inc/strings.hrc:326
+#: cui/inc/strings.hrc:325
 msgctxt "RID_SVXSTR_CHARNAME_STYLE"
 msgid "Style:"
 msgstr "Typografi:"
 
 #. gDu75
-#: cui/inc/strings.hrc:327
+#: cui/inc/strings.hrc:326
 msgctxt "RID_SVXSTR_CHARNAME_TYPEFACE"
 msgid "Typeface:"
 msgstr "Skrifttype:"
 
 #. BcWHA
-#: cui/inc/strings.hrc:328
+#: cui/inc/strings.hrc:327
 msgctxt "RID_SVXSTR_USE_REPLACE"
 msgid "Use replacement table"
 msgstr "Anvend erstatningstabel"
 
 #. L8BEE
-#: cui/inc/strings.hrc:329
+#: cui/inc/strings.hrc:328
 msgctxt "RID_SVXSTR_CPTL_STT_WORD"
 msgid "Correct TWo INitial CApitals"
 msgstr "REt andet BOgstav i ORd til lille"
 
 #. p5h3s
-#: cui/inc/strings.hrc:330
+#: cui/inc/strings.hrc:329
 msgctxt "RID_SVXSTR_CPTL_STT_SENT"
 msgid "Capitalize first letter of every sentence"
 msgstr "Første bogstav i sætninger med stort"
 
 #. prrWd
-#: cui/inc/strings.hrc:331
+#: cui/inc/strings.hrc:330
 msgctxt "RID_SVXSTR_BOLD_UNDER"
 msgid "Automatic *bold*, /italic/, -strikeout- and _underline_"
 msgstr "Automatisk *fed*, /kursiv/, -gennemstreget- og _understreget_"
 
 #. a89xT
-#: cui/inc/strings.hrc:332
+#: cui/inc/strings.hrc:331
 msgctxt "RID_SVXSTR_NO_DBL_SPACES"
 msgid "Ignore double spaces"
 msgstr "Ignorer dobbelte mellemrum"
 
 #. qEA6h
-#: cui/inc/strings.hrc:333
+#: cui/inc/strings.hrc:332
 msgctxt "RID_SVXSTR_DETECT_URL"
 msgid "URL Recognition"
 msgstr "URL-genkendelse"
 
 #. JfySE
-#: cui/inc/strings.hrc:334
+#: cui/inc/strings.hrc:333
 msgctxt "RID_SVXSTR_DASH"
 msgid "Replace dashes"
 msgstr "Erstat tankestreger"
 
 #. u2BuA
-#: cui/inc/strings.hrc:335
+#: cui/inc/strings.hrc:334
 msgctxt "RID_SVXSTR_CORRECT_ACCIDENTAL_CAPS_LOCK"
 msgid "Correct accidental use of cAPS LOCK key"
 msgstr "Ret utilsigtet brug af cAPS LOCK-tasten"
 
 #. GZqG9
-#: cui/inc/strings.hrc:336
+#: cui/inc/strings.hrc:335
 msgctxt "RID_SVXSTR_NON_BREAK_SPACE"
 msgid "Add non-breaking space before specific punctuation marks in French text"
 msgstr "Tilføj hårdt mellemrum før specifikke skilletegn i fransk tekst"
 
 #. NDmW9
-#: cui/inc/strings.hrc:337
+#: cui/inc/strings.hrc:336
 msgctxt "RID_SVXSTR_ORDINAL"
 msgid "Format ordinal numbers suffixes (1st -> 1^st)"
 msgstr "Formater ordinaltalsuffikser (1st -> 1^st)"
 
 #. 6oHuF
-#: cui/inc/strings.hrc:338
+#: cui/inc/strings.hrc:337
 msgctxt "RID_SVXSTR_OLD_HUNGARIAN"
 msgid "Transliterate to Old Hungarian if the text direction is from right to left"
 msgstr "Oversætter til gammel ungarsk, hvis tekstretningen er fra højre til venstre"
 
 #. CNtDd
-#: cui/inc/strings.hrc:339
+#: cui/inc/strings.hrc:338
 msgctxt "RID_SVXSTR_ANGLE_QUOTES"
 msgid "Replace << and >> with angle quotes"
 msgstr "Erstat << og >> med Guillemet-form"
 
 #. Rc6Zg
-#: cui/inc/strings.hrc:340
+#: cui/inc/strings.hrc:339
 msgctxt "RID_SVXSTR_DEL_EMPTY_PARA"
 msgid "Remove blank paragraphs"
 msgstr "Fjern tomme afsnit"
 
 #. F6HCc
-#: cui/inc/strings.hrc:341
+#: cui/inc/strings.hrc:340
 msgctxt "RID_SVXSTR_USER_STYLE"
 msgid "Replace Custom Styles"
 msgstr "Erstat brugerdefinerede typografier"
 
 #. itDJG
-#: cui/inc/strings.hrc:342
+#: cui/inc/strings.hrc:341
 msgctxt "RID_SVXSTR_BULLET"
 msgid "Replace bullets with: %1"
 msgstr "Erstat punkttegn med: %1"
 
 #. BvroE
 #. To translators: %1 will be replaced with a percentage, e.g. "10%"
-#: cui/inc/strings.hrc:344
+#: cui/inc/strings.hrc:343
 msgctxt "RID_SVXSTR_RIGHT_MARGIN"
 msgid "Combine single line paragraphs if length greater than %1"
 msgstr "Kombiner enkeltlinjeafsnit hvis længde er større end %1"
 
 #. M9kNQ
-#: cui/inc/strings.hrc:345
+#: cui/inc/strings.hrc:344
 msgctxt "RID_SVXSTR_NUM"
 msgid "Bulleted and numbered lists. Bullet symbol: %1"
 msgstr "Punkter og nummererede lister. Punktsymbol: %1"
 
 #. BJVGT
-#: cui/inc/strings.hrc:346
+#: cui/inc/strings.hrc:345
 msgctxt "RID_SVXSTR_BORDER"
 msgid "Apply border"
 msgstr "Anvend kant"
 
 #. bXpcq
-#: cui/inc/strings.hrc:347
+#: cui/inc/strings.hrc:346
 msgctxt "RID_SVXSTR_CREATE_TABLE"
 msgid "Create table"
 msgstr "Opret tabel"
 
 #. RvEBo
-#: cui/inc/strings.hrc:348
+#: cui/inc/strings.hrc:347
 msgctxt "RID_SVXSTR_REPLACE_TEMPLATES"
 msgid "Apply Styles"
 msgstr "Anvend typografier"
 
 #. 6MGUe
-#: cui/inc/strings.hrc:349
+#: cui/inc/strings.hrc:348
 msgctxt "RID_SVXSTR_DEL_SPACES_AT_STT_END"
 msgid "Delete spaces and tabs at beginning and end of paragraph"
 msgstr "Slet mellemrum og tabulatorer ved afsnitsstart og -afslutning"
 
 #. R9Kke
-#: cui/inc/strings.hrc:350
+#: cui/inc/strings.hrc:349
 msgctxt "RID_SVXSTR_DEL_SPACES_BETWEEN_LINES"
 msgid "Delete spaces and tabs at end and start of line"
 msgstr "Slet mellemrum og tabulatorer ved begyndelse og slutning af linje"
 
 #. GFpkR
-#: cui/inc/strings.hrc:351
+#: cui/inc/strings.hrc:350
 msgctxt "RID_SVXSTR_CONNECTOR"
 msgid "Connector"
 msgstr "Forbindelse"
 
 #. XDp8d
-#: cui/inc/strings.hrc:352
+#: cui/inc/strings.hrc:351
 msgctxt "RID_SVXSTR_DIMENSION_LINE"
 msgid "Dimension line"
 msgstr "Dimensioneringslinje"
 
 #. Mxt3D
-#: cui/inc/strings.hrc:353
+#: cui/inc/strings.hrc:352
 msgctxt "RID_SVXSTR_STARTQUOTE"
 msgid "Start Quote"
 msgstr "Start-citationstegn"
 
 #. o8nY6
-#: cui/inc/strings.hrc:354
+#: cui/inc/strings.hrc:353
 msgctxt "RID_SVXSTR_ENDQUOTE"
 msgid "End Quote"
 msgstr "Slut-citationstegn"
 
 #. cZX7G
-#: cui/inc/strings.hrc:356
+#: cui/inc/strings.hrc:355
 msgctxt "RID_SVXSTR_SHADOW_STYLE_NONE"
 msgid "No Shadow"
 msgstr "Ingen skygge"
 
 #. bzAHG
-#: cui/inc/strings.hrc:357
+#: cui/inc/strings.hrc:356
 msgctxt "RID_SVXSTR_SHADOW_STYLE_BOTTOMRIGHT"
 msgid "Cast Shadow to Bottom Right"
 msgstr "Kast skygge nederst til højre"
 
 #. FjBGC
-#: cui/inc/strings.hrc:358
+#: cui/inc/strings.hrc:357
 msgctxt "RID_SVXSTR_SHADOW_STYLE_TOPRIGHT"
 msgid "Cast Shadow to Top Right"
 msgstr "Kast skygge øverst til højre"
 
 #. 5BkoC
-#: cui/inc/strings.hrc:359
+#: cui/inc/strings.hrc:358
 msgctxt "RID_SVXSTR_SHADOW_STYLE_BOTTOMLEFT"
 msgid "Cast Shadow to Bottom Left"
 msgstr "Kast skygge nederst til venstre"
 
 #. GYB8M
-#: cui/inc/strings.hrc:360
+#: cui/inc/strings.hrc:359
 msgctxt "RID_SVXSTR_SHADOW_STYLE_TOPLEFT"
 msgid "Cast Shadow to Top Left"
 msgstr "Kast skygge øverst til venstre"
 
 #. xTvak
-#: cui/inc/strings.hrc:361
+#: cui/inc/strings.hrc:360
 msgctxt "RID_SVXSTR_SIGNATURELINE_SIGNED_BY"
 msgid "Signed by: %1"
 msgstr "Underskrevet af: %1"
 
 #. Uc7wm
-#: cui/inc/strings.hrc:363
+#: cui/inc/strings.hrc:362
 msgctxt "RID_SVXSTR_FILTER_ALL"
 msgid "All files"
 msgstr "Alle filer"
 
 #. 8bnrf
-#: cui/inc/strings.hrc:365
+#: cui/inc/strings.hrc:364
 msgctxt "RID_SVXSTR_REGISTERED_DATABASES"
 msgid "Registered Databases"
 msgstr "Registrerede databaser"
 
 #. xySty
-#: cui/inc/strings.hrc:367
+#: cui/inc/strings.hrc:366
 msgctxt "RID_SVXSTR_CANNOTCONVERTURL_ERR"
 msgid "The URL <%1> cannot be converted to a filesystem path."
 msgstr "URL'en <%1> kan ikke konverteres til en sti i filsystemet."
 
-#. ZzTBf
-#: cui/inc/strings.hrc:369
+#. YfSb4
+#: cui/inc/strings.hrc:368
 msgctxt "aboutdialog|copyright"
-msgid "Copyright © 2000–2022 LibreOffice contributors."
-msgstr "Copyright © 2000–2022 LibreOffice-bidragsydere."
+msgid "Copyright © 2000–2023 LibreOffice contributors."
+msgstr "Copyright © 2000–2023 LibreOffice-bidragsydere."
 
 #. WCnhx
-#: cui/inc/strings.hrc:370
+#: cui/inc/strings.hrc:369
 msgctxt "aboutdialog|vendor"
 msgid "This release was supplied by %OOOVENDOR."
 msgstr "Denne udgivelse blev leveret af %OOOVENDOR."
 
 #. Lz9nx
-#: cui/inc/strings.hrc:371
+#: cui/inc/strings.hrc:370
 msgctxt "aboutdialog|libreoffice"
 msgid "LibreOffice was based on OpenOffice.org."
 msgstr "LibreOffice var baseret på OpenOffice.org."
 
 #. 9aeNR
-#: cui/inc/strings.hrc:372
+#: cui/inc/strings.hrc:371
 msgctxt "aboutdialog|derived"
 msgid "%PRODUCTNAME is derived from LibreOffice which was based on OpenOffice.org"
 msgstr "%PRODUCTNAME er afledt af LibreOffice, som er baseret på OpenOffice.org"
 
 #. q5Myk
-#: cui/inc/strings.hrc:373
+#: cui/inc/strings.hrc:372
 msgctxt "aboutdialog|uilocale"
 msgid "UI: $LOCALE"
 msgstr "UI: $LOCALE"
 
 #. 3vXzF
-#: cui/inc/strings.hrc:375
+#: cui/inc/strings.hrc:374
 msgctxt "optpathspage|editpaths"
 msgid "Edit Paths: %1"
 msgstr "Rediger stier: %1"
 
 #. 8ZaCL
-#: cui/inc/strings.hrc:377
+#: cui/inc/strings.hrc:376
 msgctxt "RID_SVXSTR_COMMANDLABEL"
 msgid "Label"
 msgstr "Etiket"
 
 #. GceL6
-#: cui/inc/strings.hrc:378
+#: cui/inc/strings.hrc:377
 msgctxt "RID_SVXSTR_COMMANDLABEL"
 msgid "Command"
 msgstr "Kommando"
 
 #. dRqYc
-#: cui/inc/strings.hrc:379
+#: cui/inc/strings.hrc:378
 msgctxt "RID_SVXSTR_COMMANDLABEL"
 msgid "Tooltip"
 msgstr "Værktøjstip"
 
 #. NBDBv
-#: cui/inc/strings.hrc:380
+#: cui/inc/strings.hrc:379
 msgctxt "RID_SVXSTR_COMMANDEXPERIMENTAL"
 msgid "Experimental"
 msgstr "Eksperimentel"
 
 #. 3FZFt
-#: cui/inc/strings.hrc:382
+#: cui/inc/strings.hrc:381
 msgctxt "RID_SVXSTR_QRCODEDATALONG"
 msgid "The URL or text is too long for the current error correction level. Either shorten the text or decrease the correction level."
 msgstr "Webadressen eller teksten er for lang til det aktuelle niveau for fejlkorrektion. Enten forkortes teksten eller sænk korrektionen."
 
 #. AD8QJ
-#: cui/inc/strings.hrc:383
+#: cui/inc/strings.hrc:382
 msgctxt "RID_SVXSTR_DELETEUSERCOLOR1"
 msgid "You can only delete user-defined colors"
 msgstr "Du kan kun slette brugerdefinerede farver"
 
 #. 4LWGV
-#: cui/inc/strings.hrc:384
+#: cui/inc/strings.hrc:383
 msgctxt "RID_SVXSTR_DELETEUSERCOLOR2"
 msgid "Please select the color to delete"
 msgstr "Vælg den farve, der skal slettes"
 
 #. FjQQ5
-#: cui/inc/strings.hrc:386
+#: cui/inc/strings.hrc:385
 msgctxt "RID_SVXSTR_ADDITIONS_INSTALLBUTTON"
 msgid "Install"
 msgstr "Installere"
 
 #. 2GUFq
-#: cui/inc/strings.hrc:387
+#: cui/inc/strings.hrc:386
 msgctxt "RID_SVXSTR_ADDITIONS_INSTALLEDBUTTON"
 msgid "Installed"
 msgstr "Installeret"
 
 #. TmK5f
-#: cui/inc/strings.hrc:388
+#: cui/inc/strings.hrc:387
 msgctxt "RID_SVXSTR_ADDITIONS_INSTALLING"
 msgid "Installing"
 msgstr "Installerer"
 
 #. izdAK
-#: cui/inc/strings.hrc:389
+#: cui/inc/strings.hrc:388
 msgctxt "RID_SVXSTR_ADDITIONS_SEARCHING"
 msgid "Searching..."
 msgstr "Søger..."
 
 #. HYT6K
-#: cui/inc/strings.hrc:390
+#: cui/inc/strings.hrc:389
 msgctxt "RID_SVXSTR_ADDITIONS_LOADING"
 msgid "Loading..."
 msgstr "Indlæser..."
 
 #. 88Ect
-#: cui/inc/strings.hrc:391
+#: cui/inc/strings.hrc:390
 msgctxt "RID_SVXSTR_ADDITIONS_DIALOG_TITLE_PREFIX"
 msgid "Extensions"
 msgstr "Udvidelser"
 
 #. LWw9B
-#: cui/inc/strings.hrc:392
+#: cui/inc/strings.hrc:391
 msgctxt "RID_SVXSTR_ADDITIONS_DICTIONARY"
 msgid "Extensions: Dictionary"
 msgstr "Udvidelser: Ordbog"
 
 #. MEZpu
-#: cui/inc/strings.hrc:393
+#: cui/inc/strings.hrc:392
 msgctxt "RID_SVXSTR_ADDITIONS_GALLERY"
 msgid "Extensions: Gallery"
 msgstr "Udvidelser: Galleri"
 
 #. R8obE
-#: cui/inc/strings.hrc:394
+#: cui/inc/strings.hrc:393
 msgctxt "RID_SVXSTR_ADDITIONS_ICONS"
 msgid "Extensions: Icons"
 msgstr "Udvidelser: Ikoner"
 
 #. AqGWn
-#: cui/inc/strings.hrc:395
+#: cui/inc/strings.hrc:394
 msgctxt "RID_SVXSTR_ADDITIONS_PALETTES"
 msgid "Extensions: Color Palette"
 msgstr "Udvidelser: Farvepalette"
 
 #. mncuJ
-#: cui/inc/strings.hrc:396
+#: cui/inc/strings.hrc:395
 msgctxt "RID_SVXSTR_ADDITIONS_TEMPLATES"
 msgid "Extensions: Templates"
 msgstr "Udvidelser: Skabeloner"
 
 #. KTtQE
-#: cui/inc/strings.hrc:398
+#: cui/inc/strings.hrc:397
 msgctxt "RID_SVXSTR_UI_APPLYALL"
 msgid "Apply to %MODULE"
 msgstr "Anvend på %MODULE"
 
 #. Xr3W9
-#: cui/inc/strings.hrc:400
+#: cui/inc/strings.hrc:399
 msgctxt "RID_SVXSTR_OLE_INSERT"
 msgid "Inserting OLE object..."
 msgstr "Indsætter OLE-objekt…"
 
 #. QMiCF
-#: cui/inc/strings.hrc:402
+#: cui/inc/strings.hrc:401
 msgctxt "RID_CUISTR_CLICK_RESULT"
 msgid "(Click on any test to view its resultant bitmap image)"
 msgstr "(Klik på en vilkårlig test for at se dens resulterende bitmapbillede)"
 
 #. BT9KG
-#: cui/inc/strings.hrc:403
+#: cui/inc/strings.hrc:402
 msgctxt "RID_CUISTR_ZIPFAIL"
 msgid "Creation of ZIP file failed."
 msgstr "Oprettelse af ZIP-fil mislykkedes."
 
 #. 9QSQr
-#: cui/inc/strings.hrc:404
+#: cui/inc/strings.hrc:403
 msgctxt "RID_CUISTR_SAVED"
 msgid "The results have been successfully saved in the file 'GraphicTestResults.zip'!"
 msgstr "Det er lykkedes at gemme resultaterne i filen 'GraphicTestResults.zip'!"
+
+#. RAA72
+#: cui/inc/strings.hrc:405
+msgctxt "RID_LANGUAGETOOL_LEAVE_EMPTY"
+msgid "Leave this field empty to use the free version"
+msgstr ""
 
 #. mpS3V
 #: cui/inc/tipoftheday.hrc:50
@@ -2244,13 +2244,13 @@ msgstr "Find alle udtryk i parentes i Rediger ▸ Søg og Erstat ▸ Søg ▸ \\
 #: cui/inc/tipoftheday.hrc:62
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Select a different icon set from Tools ▸ Options ▸ %PRODUCTNAME ▸ View ▸ Icon Theme."
-msgstr ""
+msgstr "Vælg et andet ikonsæt fra Funktioner ▸ Indstillinger ▸ %PRODUCTNAME ▸ Vis ▸ Ikontema."
 
 #. Udk4L
 #: cui/inc/tipoftheday.hrc:63
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can display a number as a fraction (0.125 = 1/8): Format ▸ Cells, under Numbers tab in the Category select Fraction."
-msgstr ""
+msgstr "Du kan få vist et tal som en brøk (0,125 = 1/8): Formater ▸ Celler fanebladet Tal i Kategorien Vælg Brøk."
 
 #. VxuFm
 #: cui/inc/tipoftheday.hrc:64
@@ -2280,7 +2280,7 @@ msgstr "Klik på et kolonnefelt (række) i Pivottabel og tryk F12 for at grupper
 #: cui/inc/tipoftheday.hrc:68
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can restart the slide show after a pause specified at Slide Show ▸ Slide Show Settings ▸ Loop and repeat after."
-msgstr ""
+msgstr "Du kan genstarte diasshowet efter en pause, der angives i Diasshow ▸ Diasshow-indstillinger ▸ Sløjfe og gentag efter."
 
 #. 5SoBD
 #: cui/inc/tipoftheday.hrc:69
@@ -2404,7 +2404,7 @@ msgstr "Gentag en tabeloverskrift, når en tabel spænder over flere sider, ved 
 #: cui/inc/tipoftheday.hrc:88
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to quickly insert or delete rows? Select the desired number of rows (or columns) and press %MOD1+Plus sign (+) to add or %MOD1+Minus sign (-) to delete."
-msgstr ""
+msgstr "Vil du indsætte eller slette rækker hurtigt? Vælg det ønskede antal rækker (eller kolonner) og tryk på %MOD1+plustegn (+) for at tilføje eller %MOD1+minustegn (-) for at slette."
 
 #. gEysu
 #: cui/inc/tipoftheday.hrc:89
@@ -2416,7 +2416,7 @@ msgstr "Gentag rækker/kolonner på alle sider ved at bruger Formater ▸ Udskri
 #: cui/inc/tipoftheday.hrc:90
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Insert images and photos into shapes in Draw and Impress. Right-click on a shape, choose Area ▸ Image ▸ Add / Import, and use Options to adjust appearance."
-msgstr ""
+msgstr "Indsæt billeder og fotos i figurer i Draw og Impress. Højreklik på en figur, vælg Flade ▸ Billede ▸ Tilføj/Importer og brug Indstillinger til at justere udseendet."
 
 #. W6E2A
 #: cui/inc/tipoftheday.hrc:91
@@ -2559,11 +2559,11 @@ msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Open a CSV file as a new sheet in the current spreadsheet via Sheet ▸ Sheet from file."
 msgstr "Åbn en CSV-fil som et nyt ark i det aktuelle regneark gennem Ark ▸ Indsæt ark fra fil."
 
-#. aJtLS
+#. CRH5u
 #: cui/inc/tipoftheday.hrc:116
 msgctxt "RID_CUI_TIPOFTHEDAY"
-msgid "Typing in bold, italics, or underlined in Writer you can continue with the default attributes using just the shortcut %MOD1+Shift+X (remove direct character formats)."
-msgstr "Når du skriver med fed, kursiv eller understreget i Writer kan du fortsætte med standard-attributterne ved blot at bruge genvejen %MOD1+Skift+X  (fjern direkte tegnformater)."
+msgid "You can continue writing with the default formatting attributes after manually applying bold, italic or underline by pressing %MOD1+Shift+X."
+msgstr ""
 
 #. iXjDF
 #: cui/inc/tipoftheday.hrc:117
@@ -2647,7 +2647,7 @@ msgstr "Du kan kopiere fra et ark til et andet uden udklipsholderen. Marker omr�
 #: cui/inc/tipoftheday.hrc:130
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can change the look of %PRODUCTNAME via View ▸ User Interface."
-msgstr ""
+msgstr "Du kan ændre %PRODUCTNAMEs udseende via Vis ▸ Brugerflade."
 
 #. J853i
 #: cui/inc/tipoftheday.hrc:131
@@ -2737,7 +2737,7 @@ msgstr "Du kan bruge typografier til at gøre tabellerne i det dokument mere kon
 #: cui/inc/tipoftheday.hrc:145
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to open hyperlinks without pressing the %MOD1 key? Uncheck “%MOD1+click required to open hyperlinks” in Tools ▸ Options ▸ %PRODUCTNAME ▸ Security ▸ Options ▸ Security Options."
-msgstr ""
+msgstr "Vil du åbne links uden at trykke på %MOD1-tasten? Ryd “%MOD1+klik er nødvendig for at åbne links” under Funktioner ▸ Indstillinger ▸ %PRODUCTNAME ▸ Sikkerhed ▸ Indstillinger ▸ Sikkerhedsindstillinger."
 
 #. cCnpG
 #: cui/inc/tipoftheday.hrc:146
@@ -2751,12 +2751,12 @@ msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can protect cells with Format ▸ Cells ▸ Protection. To prevent insert, delete, rename, move/copy of sheets use Tools ▸ Protect Sheet."
 msgstr "Du kan beskytte celler med formater ▸ Celler ▸ Cellebeskyttelse. For at forhindre indsættelse, sletning, omdøbning. flytning/sletning af ark bruger du Funktioner ▸ Beskyt ark."
 
-#. L6brZ
+#. H2oxt
 #. local help missing
 #: cui/inc/tipoftheday.hrc:148
 msgctxt "RID_CUI_TIPOFTHEDAY"
-msgid "Write along a curve? Draw the line, double click, type the text, Format ▸ Text Box and Shape ▸ Fontwork."
-msgstr "Skrive langs med en kurve? Træk linjen, dobbeltklik, indtast tekseten og Formater ▸ Tekstboks og figur ▸ FontWork."
+msgid "Write along a curve? Draw the curve, double click, type the text, Format ▸ Text Box and Shape ▸ Fontwork. Select one of the alignment options: Rotate, Upright, Slant Horizontal or Slant Vertical."
+msgstr ""
 
 #. ZE6D5
 #: cui/inc/tipoftheday.hrc:149
@@ -2780,7 +2780,7 @@ msgstr "Med Navigator kan du markere og flytte overskrifter og teksten under ove
 #: cui/inc/tipoftheday.hrc:152
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to get a math object into Writer quickly? Type your formula, select it, and use Insert ▸ OLE Object ▸ Formula to convert the text."
-msgstr "Vil su hurtigt have et math-objekt ind i Writer? Skriv din formel,  vælg den og brug Indsæt ▸ OLE-objekt ▸ Formel for at konvertere teksten."
+msgstr "Vil su hurtigt have et Math-objekt ind i Writer? Skriv din formel, vælg den og brug Indsæt ▸ OLE-objekt ▸ Formel for at konvertere teksten."
 
 #. Zj7NA
 #: cui/inc/tipoftheday.hrc:153
@@ -2804,13 +2804,13 @@ msgstr "Writer lader nummerere dine fodnoter efter side, kapitel eller dokument:
 #: cui/inc/tipoftheday.hrc:156
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Your Writer document does not reopen with the text cursor at the same editing position it was when you saved it? Add First or Last name in Tools ▸ Options ▸ %PRODUCTNAME ▸ User Data ▸ First/last name."
-msgstr "Dit Writer-dokument genåbnes ikke igen med tekstmarkøren på den samme redigeringsposition, som den var på, da du gemte det? Tilføj for- eller efternavn i Funktioner ▸ Indstillinger ▸ % PRODUCTNAME ▸ Brugerdata ▸ Fornavn/efternavn."
+msgstr "Dit Writer-dokument genåbnes ikke igen med tekstmarkøren på den samme redigeringsposition, som den var på, da du gemte det? Tilføj for- eller efternavn i Funktioner ▸ Indstillinger ▸ %PRODUCTNAME ▸ Brugerdata ▸ Fornavn/efternavn."
 
-#. udDRb
+#. jEYXp
 #: cui/inc/tipoftheday.hrc:157
 msgctxt "RID_CUI_TIPOFTHEDAY"
-msgid "Citation management? Use a 3rd party extension."
-msgstr "Håndtering af citater? Brug en tredjepartsudvidelse."
+msgid "Need to do citation? You can use third-party citation managers such as Zotero."
+msgstr ""
 
 #. ALczh
 #: cui/inc/tipoftheday.hrc:158
@@ -2949,7 +2949,7 @@ msgstr "Bliver dine tal vist som ### i dit regneark? Kolonnen er for smal til at
 #: cui/inc/tipoftheday.hrc:179
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Enable massive parallel calculations of formula cells via Tools ▸ Options ▸ %PRODUCTNAME ▸ OpenCL."
-msgstr ""
+msgstr "Aktiver massive parallelle beregninger af formelceller via Funktioner ▸ Indstillinger ▸ %PRODUCTNAME ▸ OpenCL."
 
 #. zAqfX
 #. https://help.libreoffice.org/%PRODUCTVERSION/%LANGUAGENAME/text/shared/optionen/opencl.html
@@ -2981,7 +2981,7 @@ msgstr "Marker et sammenhængende område af celler med data og afgrænset af to
 #: cui/inc/tipoftheday.hrc:184
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Your date acceptance pattern is inappropriate? Use Tools ▸ Options ▸ Language Settings ▸ Languages ▸ Date acceptance patterns to tweak the pattern."
-msgstr ""
+msgstr "Passer dit datoacceptmønster ikke? Brug Funktioner ▸ Indstillinger ▸ Sprogindstillinger ▸ Sprog ▸ Datoacceptmønstre for at finjustere mønstret."
 
 #. MZyXB
 #: cui/inc/tipoftheday.hrc:185
@@ -3226,378 +3226,372 @@ msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can reformat all comments in a document by clicking the down arrow in a comment and choose “Format all Comments”."
 msgstr "Du kan omformatere alle kommentarer i et dokument ved at klikke på pilen nedad i en kommentar og vælge “Formater alle kommentarer”."
 
-#. 3masz
-#: cui/inc/tipoftheday.hrc:224
-msgctxt "RID_CUI_TIPOFTHEDAY"
-msgid "Want the same layout for the screen display and printing? Check Tools ▸ Options ▸ %PRODUCTNAME Calc ▸ General ▸ Use printer metrics for text formatting."
-msgstr "Vi du have den samme layout i skærmvisning og udskrift? Marker Funktioner ▸ Indstillinger ▸ %PRODUCTNAME Calc ▸ Generelt ▸ Benyt printerens måleenheder ved teksformatering."
-
 #. zD57W
-#: cui/inc/tipoftheday.hrc:225
+#: cui/inc/tipoftheday.hrc:224
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Writer helps you to make backups: with File ▸ Save a Copy you create a new document continuing to work on the original."
 msgstr "Writer hjælper dig med at lave backups: med Filer ▸ Gem en kopi… opretter du et nyt dokument, mens du bliver ved med at arbejde på originalen."
 
 #. fkvVZ
-#: cui/inc/tipoftheday.hrc:226
+#: cui/inc/tipoftheday.hrc:225
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "When you have created a Style based on another, you can enter a percentage value or a point value (e.g. 110% or −2pt or +5pt)."
 msgstr "Når du har oprettet en Typografi, der er baseret på en anden, kan du indstast en procentværdi eller en punktværdi (fx. 110%, -2 pkt. eller +5 pkt.)."
 
 #. PBjFr
-#: cui/inc/tipoftheday.hrc:227
+#: cui/inc/tipoftheday.hrc:226
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "To copy a comment without losing the content of the target cell you should use Paste Special and uncheck everything except “Comments” in dialog. Use Operations “Add” to not override existing content."
 msgstr "Kopier en kommentar uden at miste indholdet i målcellen ved at bruge Indsæt speciel og deaktivere alt i dialogen undtagen “Kommentarer”. Brug operationen “Tilføj” for ikke at overskrive det eksisterende indhold."
 
 #. rexFB
-#: cui/inc/tipoftheday.hrc:228
+#: cui/inc/tipoftheday.hrc:227
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Batch-convert your Microsoft Office documents to the OpenDocument format by using the Document Converter wizard in menu File ▸ Wizards ▸ Document Converter."
-msgstr ""
+msgstr "Bundtkonverter dine Microsoft Office-dokumenter til OpenDocument-formatet ved at bruge guiden Dokumentkonvertering i menuen Filer ▸ Guider ▸ Dokumentkonvertering."
 
 #. WMueE
-#: cui/inc/tipoftheday.hrc:229
+#: cui/inc/tipoftheday.hrc:228
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "When editing a cell in place, you can right click and Insert fields: Date, Sheet name, Document title, etc."
 msgstr "Når du redigerer en celle på dens placering, kan du højreklikke på den og Indsæt(te) felter: Daro, Arknavn, Dokumenttitel osv."
 
 #. qAVmk
-#: cui/inc/tipoftheday.hrc:230
+#: cui/inc/tipoftheday.hrc:229
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Need to move a Writer table? Table ▸ Select ▸ Table and Insert ▸ Frame ▸ Frame and move where you want."
 msgstr "Brug for at flytte en Writer-tabel? Tabel ▸ Marker ▸ Tabel og så Indsæt ▸ Ramme ▸ Ramme og flyt derhen, hvor du vil."
 
 #. TmaSP
-#: cui/inc/tipoftheday.hrc:231
+#: cui/inc/tipoftheday.hrc:230
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "With Tools ▸ AutoText ▸ AutoText ▸ Import you can select a Word document or a template containing the AutoText entries that you want to import."
 msgstr "Med Funktioner ▸ Autotekst ▸ Autotekst ▸ Importer kan du vælge et Word-dokument eller en skabelon,  er indeholder de Autotekst-elementer. du vil importere."
 
 #. kwxqQ
-#: cui/inc/tipoftheday.hrc:232
+#: cui/inc/tipoftheday.hrc:231
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Do not insert manual breaks to separate two paragraphs. Rather change Indents & Spacing ▸ Spacing ▸ Below paragraph at the style/paragraph properties."
 msgstr "Indsæt ikke manuelle linjeskift mellem to afsnit. Det er bedre at ændre typografi-/afsnit-egenskaberne på fanebladet Indrykning og afstand ▸ Under afsnit."
 
 #. rxTGc
-#: cui/inc/tipoftheday.hrc:233
+#: cui/inc/tipoftheday.hrc:232
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Keep the zeros before a number by using the “leading zeroes” cell format option or format the cell as text before entering the number."
 msgstr "Behold nullerne foran et tal ved at bruge celleformat-indstillingen “Foranstillede nuller” eller formater cellen som tekst, før du indtaster tallet."
 
 #. jkXFE
-#: cui/inc/tipoftheday.hrc:234
+#: cui/inc/tipoftheday.hrc:233
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to return to default after applying a list style? Click Bullets or Numbering On/Off tool on the Formatting toolbar."
 msgstr "Vil du tilbage til standarden efter at have anvendt en listetypografi? Klik på Punktopstilling til/fra på værktøjslinjen Formatering."
 
 #. wAFRP
-#: cui/inc/tipoftheday.hrc:235
+#: cui/inc/tipoftheday.hrc:234
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Delete all of your printing areas in one step: select all sheets, then Format ▸ Print Ranges ▸ Clear."
 msgstr "Slet alle dine udskriftsområder i et trin: marker alle ark og vælg så Formater ▸ Udskriftsområder ▸ Slet."
 
 #. Cqtjg
-#: cui/inc/tipoftheday.hrc:236
+#: cui/inc/tipoftheday.hrc:235
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Add background images to spreadsheets via Insert ▸ Image or drag a background from the Gallery, then Format ▸ Arrange ▸ To Background."
 msgstr "Sæt baggrundsbilleder på regneark ved hjælp af Indsæt ▸ Billede eller træk en baggrund fra Galleriet og så Formater ▸ Arranger ▸ I baggrunden."
 
 #. khFDu
-#: cui/inc/tipoftheday.hrc:237
+#: cui/inc/tipoftheday.hrc:236
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Having trouble pasting text from PDF files or webpages into documents? Try to paste as unformatted text (%MOD1+%MOD2+Shift+V)."
 msgstr "Har du svært ved at indsætte tekst fra PDF-filer eller netsider i dokumenter? Prøv at indsætte som uformateret tekstt (%MOD1+%MOD2+Shift+V)."
 
 #. BtaBD
-#: cui/inc/tipoftheday.hrc:238
+#: cui/inc/tipoftheday.hrc:237
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "In Calc use TRIMMEAN() to return the mean of a data set excluding the highest and lowest values."
 msgstr "I Calc kan du bruge TRIMMIDDELVÆRDI() til at returnere middelværdien af et datasæt uden de(n) højeste og laveste værdi(er)."
 
 #. U2cxc
 #. local help missing
-#: cui/inc/tipoftheday.hrc:239
+#: cui/inc/tipoftheday.hrc:238
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "The 4th optional parameter of VLOOKUP Calc function indicates whether the first column of data is sorted. If not, enter FALSE or zero."
 msgstr "Den fjerde vilkårlige parameter i Calc-funktionen LOPSLAG viser, om den første data-kolonne er blevet sorteret. Hvis ikke, indtast FALSK eller 0(nul)."
 
 #. LThNS
-#: cui/inc/tipoftheday.hrc:240
+#: cui/inc/tipoftheday.hrc:239
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Toolbars are contextual—they open depending on the context. If you do not want that, uncheck them from View ▸ Toolbars."
 msgstr "Værktøjslister afhænger af sammenhængen – de åbnes afhængigt af sammenhængen. Hvis du ikke ønsker det, deaktiver dem i Vis ▸ Værktøjslinjer."
 
 #. WjXyE
-#: cui/inc/tipoftheday.hrc:241
+#: cui/inc/tipoftheday.hrc:240
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can create a master document from the current Writer document by using File ▸ Send ▸ Create Master Document."
 msgstr "Du kan oprette et hoveddokument fra det aktuelle Writer-dokument ved at bruge Filer ▸ Send ▸ Opret Hoveddokument."
 
 #. cPNVv
-#: cui/inc/tipoftheday.hrc:242
+#: cui/inc/tipoftheday.hrc:241
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to center cells on a printed page in Calc? Format ▸ Page, Page ▸ Layout settings ▸ Table alignment."
 msgstr "Vil du centrere celler på en udskrift fra Calc?  Formater ▸ Side, fanebladet Side ▸ Layoutindstillinger ▸ Tabeljustering."
 
 #. dpyeU
-#: cui/inc/tipoftheday.hrc:243
+#: cui/inc/tipoftheday.hrc:242
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Frames can be linked so that the text can flow from one to the other as in desktop publishing."
 msgstr "Rammer kan sammenkædes, så teksten kan flyde fra den ene til den anden ligesom i dtp-programmer."
 
 #. AjBA3
 #. local help missing
-#: cui/inc/tipoftheday.hrc:244
+#: cui/inc/tipoftheday.hrc:243
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can create a chart based on a Writer table by clicking in the table and choosing Insert ▸ Chart."
 msgstr "Du kan oprette et diagram baserret på en Writer-tabel ved at klikke på tabellen og vælge Indsæt ▸ Diagram."
 
 #. cU6JB
-#: cui/inc/tipoftheday.hrc:245
+#: cui/inc/tipoftheday.hrc:244
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Select options in Tools ▸ Options ▸ %PRODUCTNAME Writer ▸ Formatting Aids ▸ Display Formatting to specify which non-printing characters are displayed."
 msgstr ""
 
 #. 9cyVB
-#: cui/inc/tipoftheday.hrc:246
+#: cui/inc/tipoftheday.hrc:245
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to jump to a particular page by its number? Click the left-most statusbar entry or use Edit ▸ Go To Page… or press %MOD1+G."
 msgstr "Vil du hoppe til en bestemt side med dens sidetal? Klik på det yderste venstre element på statuslinje eller brug Rediger ▸ Gå til side… eller tryk på %MOD1+G."
 
 #. ULATG
-#: cui/inc/tipoftheday.hrc:247
+#: cui/inc/tipoftheday.hrc:246
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "%PRODUCTNAME supports over 150 languages."
 msgstr "%PRODUCTNAME understøtter over 150 sprog."
 
 #. SLU8G
-#: cui/inc/tipoftheday.hrc:248
+#: cui/inc/tipoftheday.hrc:247
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Uncheck Slide Show ▸ Settings ▸ Presentation always on top if you need another program displays its window to the front of your presentation."
 msgstr "Deaktiver Præsentation ▸ Indstillinger ▸ Præsentation altid øverst, hvis du har for, at et andet program vises foran din præsentation."
 
 #. sogyj
-#: cui/inc/tipoftheday.hrc:249
+#: cui/inc/tipoftheday.hrc:248
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to find the words in bold in a Writer document? Edit ▸ Find and Replace ▸ Other options ▸ Attributes ▸ Font weight."
 msgstr "Vil du finde ord med fed skrift i et Writer-dokument? Rediger ▸ Søg og erstat ▸ Andre indstillinger ▸ Attributter ▸ Skrifttypevægt."
 
 #. ppAeT
 #. local help missing
-#: cui/inc/tipoftheday.hrc:250
+#: cui/inc/tipoftheday.hrc:249
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You can sort paragraphs or table rows alphabetically or numerically per Tools ▸ Sort."
 msgstr "Du kan sortere afsnit eller tabelrækker alfabetisk eller nummerering gennem Funktioner ▸ Sorter."
 
 #. 26HAu
 #. https://help.libreoffice.org/%PRODUCTVERSION/%LANGUAGENAME/text/swriter/01/06100000.html
-#: cui/inc/tipoftheday.hrc:251
+#: cui/inc/tipoftheday.hrc:250
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "To insert a paragraph before (after) a section, press %MOD2+Enter at the beginning (end) of the section."
 msgstr "Indsæt et afsnit før (efter) en sektion ved at trykke på %MOD2+Enter i begyndelsen (slutningen) af sektionen."
 
 #. 7dGQR
-#: cui/inc/tipoftheday.hrc:252
+#: cui/inc/tipoftheday.hrc:251
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "%PRODUCTNAME has a template center to create good looking documents—check it out."
 msgstr "%PRODUCTNAME har et skabeloncenter til at oprette dokumenter, der ser godt ud – prøv det."
 
 #. tvpFN
-#: cui/inc/tipoftheday.hrc:253
+#: cui/inc/tipoftheday.hrc:252
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Calculate loan repayments with Calc: eg. PMT(2%/12;36;2500) interest rate per payment period 2%/12, 36 months, loan amount 2500."
 msgstr "Beregn tilbagebetalingsrater med Calc: for eksempel R.YDELSE(2%/12;36;2500) rentesats pr. afdragspriode 2%/12, 36 måneder, lånebeløb 2500."
 
 #. QZAFw
 #. local help missing
-#: cui/inc/tipoftheday.hrc:254
+#: cui/inc/tipoftheday.hrc:253
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Cannot find what you want with the VLOOKUP function in Calc? With INDEX and MATCH you can do anything!"
 msgstr "Kan du ikke finde det, du vil, med funktionen VLOOKUP i Calc? Med INDEX og MATCH kan du gøre hvad som helst!"
 
 #. ARJgA
 #. local help missing
-#: cui/inc/tipoftheday.hrc:255
+#: cui/inc/tipoftheday.hrc:254
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to show hidden column A? Click a cell in column B, press the left mouse button, move the mouse to the left, release. Then switch it on via Format ▸ Columns ▸ Show."
 msgstr "Vil du vise en skjult kolonne? Klik på en celle i kolonne  B, tryk på den venstre museknap, flyt musen til venstre og slip. Derefter aktiverer du den med Formater ▸ Kolonner ▸ Vis."
 
 #. Wzpbw
-#: cui/inc/tipoftheday.hrc:256
+#: cui/inc/tipoftheday.hrc:255
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "To change the number of a page in Writer, go to the properties of the first paragraph and at the Text Flow tab check Break ▸ Insert and enter the number."
 msgstr "For at ændre sidetallet på en side i Writer går du til det første afsnits egenskaber og på fanebladet Tekstforløb markerer du Skift ▸ Indsæt og indtaster sidetallet."
 
 #. AgQyA
-#: cui/inc/tipoftheday.hrc:257
+#: cui/inc/tipoftheday.hrc:256
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Run %PRODUCTNAME in any browser via rollApp."
 msgstr "Kør %PRODUCTNAME i enhver browser ved hjælp af RollApp."
 
 #. mPz5B
-#: cui/inc/tipoftheday.hrc:258
+#: cui/inc/tipoftheday.hrc:257
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Strange error code in Calc, Err: followed by a number? This page gives the explanation:"
 msgstr "Mærkelige fejlkoder i Calc: Err: fulgt af et tal? Denne side giver forklaringen:"
 
 #. BJ5aN
 #. local help missing
-#: cui/inc/tipoftheday.hrc:259
+#: cui/inc/tipoftheday.hrc:258
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Include a paragraph that is not a title in the table of contents by changing Outline & Numbering in the paragraph settings to an outline level."
 msgstr "Medtag et afsnit, som ikke er en overskrift, i indholdsfortegnelsen ved at ændre Disposition og nummerering i afsnitsindstillingerne til et dispositionsniveau."
 
 #. Jx7Fr
-#: cui/inc/tipoftheday.hrc:260
+#: cui/inc/tipoftheday.hrc:259
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Apart from table of contents, %PRODUCTNAME can create Alphabetical, Illustrations, Tables, Objects, Bibliography, User-Defined indexes."
 msgstr "Udover indholdsfotegnelse kan %PRODUCTNAME oprette stikordsregister, billed-, tabel- og objekt-fortegnelser, Litteraturliste og brugerdefinerede indekser."
 
 #. 2DrYx
 #. https://help.libreoffice.org/%PRODUCTVERSION/%LANGUAGENAME/text/swriter/guide/indices_toc.html
-#: cui/inc/tipoftheday.hrc:261
+#: cui/inc/tipoftheday.hrc:260
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Unable to modify or delete a custom cell style? Check all sheets, none should be protected."
 msgstr "Kan du ikke ændre eller slette en tilpasset celletypografi? Tjek alle ark, ingen af dem skulle være beskyttet."
 
 #. 55Nfb
-#: cui/inc/tipoftheday.hrc:262
+#: cui/inc/tipoftheday.hrc:261
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "You need to fill a series? Select the cell range and Sheet ▸ Fill Cells ▸ Fill Series and choose between Linear, Growth, Date and AutoFill."
 msgstr "Har du brug for at udfylde en serie? Marker celleområdet og vælg Ark ▸ Udfyld celler ▸ Fyld serie og vælg mellem  Lineær, Vækst, Dato og Autofyld."
 
 #. BiSJM
 #. local help missing
-#: cui/inc/tipoftheday.hrc:263
+#: cui/inc/tipoftheday.hrc:262
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to know if a cell is referred in formulas of other cells? Tools ▸ Detective ▸ Trace Dependents (Shift+F5)."
 msgstr "Vil du vide, om der er henvist til en celle i andre cellers formler ? Funktioner ▸ Detektiv ▸ Spor underordnede (skift+F5)."
 
 #. QeBjt
-#: cui/inc/tipoftheday.hrc:264
+#: cui/inc/tipoftheday.hrc:263
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "In the replace input field of auto correct options you can use the wildcards .*"
 msgstr "I indtastningsfeltet Erstat i Autokorrekturs indstillinger kan du bruge jokere *"
 
 #. G7J8m
-#: cui/inc/tipoftheday.hrc:265
+#: cui/inc/tipoftheday.hrc:264
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want to duplicate the above line? Press %MOD1+D or use Sheet ▸ Fill Cells ▸ Fill Down."
 msgstr "Vil du duplikere linjen ovenfor? Tryk på %MOD1+D eller brug Ark ▸ Udfyld celler ▸ Nedad."
 
 #. MG7Pu
-#: cui/inc/tipoftheday.hrc:266
+#: cui/inc/tipoftheday.hrc:265
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "To search in several spreadsheets, select them before you start the search."
 msgstr "Søg i flere regneark ved at markere dem, før du starter søgningen."
 
 #. Jd6KJ
-#: cui/inc/tipoftheday.hrc:267
+#: cui/inc/tipoftheday.hrc:266
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Drag & drop cells from Calc into the normal view of a slide creates a table; into the outline view, each cell creates a line in the outline."
 msgstr "Træk-og-slip celler fra Calc til et dias' Normal-visning opretter en tabel, trukket ind i Dispositions-visningen opretter hver celle en linje i dispositionen,"
 
 #. DgSwJ
-#: cui/inc/tipoftheday.hrc:268
+#: cui/inc/tipoftheday.hrc:267
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "%PRODUCTNAME helps you not to enter two or more spaces in Writer. Check Tools ▸ AutoCorrect ▸ AutoCorrect Options ▸ Options ▸ Ignore double spaces."
 msgstr "%PRODUCTNAME hjælper dig med ikke at indtaste to eller flere mellemrum i Writer. Aktiver Funktioner▸ Autokorrekturindstillinger ▸ fanebladet Indstillinger ▸ Ignorer dobbelte mellemrum."
 
 #. 3Fjtd
-#: cui/inc/tipoftheday.hrc:269
+#: cui/inc/tipoftheday.hrc:268
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Want the cursor to go into the cell to the right, after entering a value in Calc? Use the Tab key instead of Enter."
 msgstr "Vil du have markøren til at gå ind i den næste celle til højre, når du har indtastet en værdi i Calc? Brug Tabulatortasten i stedet for Enter."
 
 #. 5Cvhv
-#: cui/inc/tipoftheday.hrc:270
+#: cui/inc/tipoftheday.hrc:269
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "To display the scrollbar to the left, enable Tools ▸ Options ▸ Language Settings ▸ Languages ▸ Complex text and right click a sheet in Sheet tabs above Status bar ▸ Right-To-Left."
 msgstr ""
 
 #. gqs9W
-#: cui/inc/tipoftheday.hrc:271
+#: cui/inc/tipoftheday.hrc:270
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Drag a formatted object to the Styles and Formatting window. A dialog box opens, just enter the name of the new style."
 msgstr "Træk et formateret objekt ind i vinduet Typografier og formatering. Der åbnes et dialogfelt og du indtaster bare navnet på den nye typografi."
 
 #. EabEN
-#: cui/inc/tipoftheday.hrc:272
+#: cui/inc/tipoftheday.hrc:271
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "New versions of %PRODUCTNAME provide new features, bug fixes, and security patches. Keep your software updated!"
 msgstr "Nye versioner af %PRODUCTNAME giver nye funktioner, fejlretninger, og større sikkerhed. Hold din software opdateret!"
 
 #. cmz6r
-#: cui/inc/tipoftheday.hrc:273
+#: cui/inc/tipoftheday.hrc:272
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Developing new XSLT and XML filters?"
 msgstr "Udvikler du nye XSLT- og XML-filtre?"
 
 #. C7Ya2
-#: cui/inc/tipoftheday.hrc:274
+#: cui/inc/tipoftheday.hrc:273
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Press Shift+F1 to see any available extended tooltips in dialog boxes, when \"Extended tips\" is not enabled in Tools ▸ Options ▸ %PRODUCTNAME ▸ General."
 msgstr "Tryk på Skift+F1 for at se et tilgængeligt, udvidet værktøjstip i dialogfelter, når \"Udvidede tips\" ikke er aktiveret under Funktioner ▸ Indstillinger ▸ %PRODUCTNAME ▸ Generelt."
 
 #. CqfWV
-#: cui/inc/tipoftheday.hrc:275
+#: cui/inc/tipoftheday.hrc:274
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Never use certain arrow styles? Remove them by using the Delete button on the Format ▸ Text Box and Shape ▸ Line ▸ Arrow Styles tab."
-msgstr ""
+msgstr "Bruger du aldrig bestemte piletypografier? Fjern dem ved at bruge Slet-knappen på Formater ▸ Tekstfelt og figur ▸ Linje ▸ fanebladet Piletypografier."
 
 #. q5M6P
-#: cui/inc/tipoftheday.hrc:276
+#: cui/inc/tipoftheday.hrc:275
 msgctxt "RID_CUI_TIPOFTHEDAY"
 msgid "Don’t like the position of some icons on your toolbar? Change it with Tools ▸ Customize ▸ Toolbars tab ▸ Target."
 msgstr ""
 
 #. hsZPg
-#: cui/inc/tipoftheday.hrc:279
+#: cui/inc/tipoftheday.hrc:278
 msgctxt "STR_HELP_LINK"
 msgid "%PRODUCTNAME Help"
 msgstr "%PRODUCTNAME Hjælp"
 
 #. NG4jW
-#: cui/inc/tipoftheday.hrc:280
+#: cui/inc/tipoftheday.hrc:279
 msgctxt "STR_MORE_LINK"
 msgid "More info"
 msgstr "Flere oplysninger"
 
 #. sCREc
-#: cui/inc/tipoftheday.hrc:281
+#: cui/inc/tipoftheday.hrc:280
 msgctxt "STR_UNO_LINK"
 msgid "Run this action now..."
 msgstr "Udfør denne handling nu..."
 
 #. P6JME
-#: cui/inc/tipoftheday.hrc:282
+#: cui/inc/tipoftheday.hrc:281
 msgctxt "STR_TITLE"
 msgid "Tip of the Day: %CURRENT/%TOTAL"
 msgstr "Dagens tip:  %CURRENT/%TOTAL"
 
 #. C6Dsn
-#: cui/inc/tipoftheday.hrc:283
+#: cui/inc/tipoftheday.hrc:282
 msgctxt "STR_CMD"
 msgid "⌘ Cmd"
 msgstr "⌘  Kommando"
 
 #. RpVWs
 #. use narrow no-break space U+202F here
-#: cui/inc/tipoftheday.hrc:284
+#: cui/inc/tipoftheday.hrc:283
 msgctxt "STR_CTRL"
 msgid "Ctrl"
 msgstr "Ctrl"
 
 #. mZWSR
-#: cui/inc/tipoftheday.hrc:285
+#: cui/inc/tipoftheday.hrc:284
 msgctxt "STR_CMD"
 msgid "Alt"
 msgstr "Alt"
 
 #. QtEGa
-#: cui/inc/tipoftheday.hrc:286
+#: cui/inc/tipoftheday.hrc:285
 msgctxt "STR_CTRL"
 msgid "⌥ Opt"
 msgstr "⌥  Alt"
@@ -3782,356 +3776,362 @@ msgctxt "SID_LANGUAGE_OPTIONS_RES"
 msgid "Complex Text Layout"
 msgstr "Complex Text Layout (CTL)"
 
-#. ix6bE
+#. 539Cz
 #: cui/inc/treeopt.hrc:59
 msgctxt "SID_LANGUAGE_OPTIONS_RES"
-msgid "LanguageTool Server Settings"
+msgid "LanguageTool Server"
+msgstr ""
+
+#. A3j2S
+#: cui/inc/treeopt.hrc:60
+msgctxt "SID_LANGUAGE_OPTIONS_RES"
+msgid "DeepL Server"
 msgstr ""
 
 #. TGnig
-#: cui/inc/treeopt.hrc:64
+#: cui/inc/treeopt.hrc:65
 msgctxt "SID_INET_DLG_RES"
 msgid "Internet"
 msgstr "Internet"
 
 #. QJNEE
-#: cui/inc/treeopt.hrc:65
+#: cui/inc/treeopt.hrc:66
 msgctxt "SID_INET_DLG_RES"
 msgid "Proxy"
 msgstr "Proxy"
 
 #. EhHFs
-#: cui/inc/treeopt.hrc:66
+#: cui/inc/treeopt.hrc:67
 msgctxt "SID_INET_DLG_RES"
 msgid "Email"
 msgstr "E-mail"
 
 #. 4Cajf
-#: cui/inc/treeopt.hrc:71
+#: cui/inc/treeopt.hrc:72
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "%PRODUCTNAME Writer"
 msgstr "%PRODUCTNAME Writer"
 
 #. CtZCN
-#: cui/inc/treeopt.hrc:72
+#: cui/inc/treeopt.hrc:73
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "General"
 msgstr "Generelt"
 
 #. t9DgE
-#: cui/inc/treeopt.hrc:73
+#: cui/inc/treeopt.hrc:74
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "View"
 msgstr "Vis"
 
 #. MxbiL
-#: cui/inc/treeopt.hrc:74
+#: cui/inc/treeopt.hrc:75
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Formatting Aids"
 msgstr "Formateringshjælp"
 
 #. V3usW
-#: cui/inc/treeopt.hrc:75
+#: cui/inc/treeopt.hrc:76
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Grid"
 msgstr "Gitter"
 
 #. Cc2Ka
-#: cui/inc/treeopt.hrc:76
+#: cui/inc/treeopt.hrc:77
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Basic Fonts (Western)"
 msgstr "Grundlæggende skrifttyper (vestlige)"
 
 #. TDUti
-#: cui/inc/treeopt.hrc:77
+#: cui/inc/treeopt.hrc:78
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Basic Fonts (Asian)"
 msgstr "Grundlæggende skrifttyper (asiatiske)"
 
 #. nfHR8
-#: cui/inc/treeopt.hrc:78
+#: cui/inc/treeopt.hrc:79
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Basic Fonts (CTL)"
 msgstr "Grundlæggende skrifttyper (CTL)"
 
 #. 38A6E
-#: cui/inc/treeopt.hrc:79
+#: cui/inc/treeopt.hrc:80
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Print"
 msgstr "Udskriv"
 
 #. UCGLq
-#: cui/inc/treeopt.hrc:80
+#: cui/inc/treeopt.hrc:81
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Table"
 msgstr "Tabel"
 
 #. NVRAk
-#: cui/inc/treeopt.hrc:81
+#: cui/inc/treeopt.hrc:82
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Changes"
 msgstr "Ændringer"
 
 #. 3DyC7
-#: cui/inc/treeopt.hrc:82
+#: cui/inc/treeopt.hrc:83
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Comparison"
 msgstr "Sammenligning"
 
 #. AtMGC
-#: cui/inc/treeopt.hrc:83
+#: cui/inc/treeopt.hrc:84
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Compatibility"
 msgstr "Kompatibilitet"
 
 #. byMJP
-#: cui/inc/treeopt.hrc:84
+#: cui/inc/treeopt.hrc:85
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "AutoCaption"
 msgstr "Autobilledtekst"
 
 #. aGnq6
-#: cui/inc/treeopt.hrc:85
+#: cui/inc/treeopt.hrc:86
 msgctxt "SID_SW_EDITOPTIONS_RES"
 msgid "Mail Merge Email"
 msgstr "Brevflet e-mail"
 
 #. trEVm
-#: cui/inc/treeopt.hrc:90
+#: cui/inc/treeopt.hrc:91
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "%PRODUCTNAME Writer/Web"
 msgstr "%PRODUCTNAME Writer/Web"
 
 #. BZ7BG
-#: cui/inc/treeopt.hrc:91
+#: cui/inc/treeopt.hrc:92
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "View"
 msgstr "Vis"
 
 #. 3q8qM
-#: cui/inc/treeopt.hrc:92
+#: cui/inc/treeopt.hrc:93
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "Formatting Aids"
 msgstr "Formateringshjælp"
 
 #. 9fj7Y
-#: cui/inc/treeopt.hrc:93
+#: cui/inc/treeopt.hrc:94
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "Grid"
 msgstr "Gitter"
 
 #. stfD4
-#: cui/inc/treeopt.hrc:94
+#: cui/inc/treeopt.hrc:95
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "Print"
 msgstr "Udskriv"
 
 #. KpkDS
-#: cui/inc/treeopt.hrc:95
+#: cui/inc/treeopt.hrc:96
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "Table"
 msgstr "Tabel"
 
 #. 9NS67
-#: cui/inc/treeopt.hrc:96
+#: cui/inc/treeopt.hrc:97
 msgctxt "SID_SW_ONLINEOPTIONS_RES"
 msgid "Background"
 msgstr "Baggrund"
 
 #. 9WCAp
-#: cui/inc/treeopt.hrc:101
+#: cui/inc/treeopt.hrc:102
 msgctxt "SID_SM_EDITOPTIONS_RES"
 msgid "%PRODUCTNAME Math"
 msgstr "%PRODUCTNAME Math"
 
 #. rFHDF
-#: cui/inc/treeopt.hrc:102
+#: cui/inc/treeopt.hrc:103
 msgctxt "SID_SM_EDITOPTIONS_RES"
 msgid "Settings"
 msgstr "Indstillinger"
 
 #. vk6jX
-#: cui/inc/treeopt.hrc:107
+#: cui/inc/treeopt.hrc:108
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "%PRODUCTNAME Calc"
 msgstr "%PRODUCTNAME Calc"
 
 #. xe2ry
-#: cui/inc/treeopt.hrc:108
+#: cui/inc/treeopt.hrc:109
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "General"
 msgstr "Generelt"
 
 #. xE8RH
-#: cui/inc/treeopt.hrc:109
+#: cui/inc/treeopt.hrc:110
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Defaults"
 msgstr "Standarder"
 
 #. ufTM2
-#: cui/inc/treeopt.hrc:110
+#: cui/inc/treeopt.hrc:111
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "View"
 msgstr "Vis"
 
 #. QMCfy
-#: cui/inc/treeopt.hrc:111
+#: cui/inc/treeopt.hrc:112
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Calculate"
 msgstr "Beregn"
 
 #. oq8xG
-#: cui/inc/treeopt.hrc:112
+#: cui/inc/treeopt.hrc:113
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Formula"
 msgstr "Formel"
 
 #. HUUQP
-#: cui/inc/treeopt.hrc:113
+#: cui/inc/treeopt.hrc:114
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Sort Lists"
 msgstr "Sorteringslister"
 
 #. bostB
-#: cui/inc/treeopt.hrc:114
+#: cui/inc/treeopt.hrc:115
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Changes"
 msgstr "Ændringer"
 
 #. WVbFZ
-#: cui/inc/treeopt.hrc:115
+#: cui/inc/treeopt.hrc:116
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Compatibility"
 msgstr "Kompatibilitet"
 
 #. UZGDj
-#: cui/inc/treeopt.hrc:116
+#: cui/inc/treeopt.hrc:117
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Grid"
 msgstr "Gitter"
 
 #. wrdFF
-#: cui/inc/treeopt.hrc:117
+#: cui/inc/treeopt.hrc:118
 msgctxt "SID_SC_EDITOPTIONS_RES"
 msgid "Print"
 msgstr "Udskriv"
 
 #. EeKzo
-#: cui/inc/treeopt.hrc:122
+#: cui/inc/treeopt.hrc:123
 msgctxt "SID_SD_EDITOPTIONS_RES"
 msgid "%PRODUCTNAME Impress"
 msgstr "%PRODUCTNAME Impress"
 
 #. GxFDj
-#: cui/inc/treeopt.hrc:123
+#: cui/inc/treeopt.hrc:124
 msgctxt "SID_SD_EDITOPTIONS_RES"
 msgid "General"
 msgstr "Generelt"
 
 #. unCEW
-#: cui/inc/treeopt.hrc:124
+#: cui/inc/treeopt.hrc:125
 msgctxt "SID_SD_EDITOPTIONS_RES"
 msgid "View"
 msgstr "Vis"
 
 #. UxXLE
-#: cui/inc/treeopt.hrc:125
+#: cui/inc/treeopt.hrc:126
 msgctxt "SID_SD_EDITOPTIONS_RES"
 msgid "Grid"
 msgstr "Gitter"
 
 #. DLCS4
-#: cui/inc/treeopt.hrc:126
+#: cui/inc/treeopt.hrc:127
 msgctxt "SID_SD_EDITOPTIONS_RES"
 msgid "Print"
 msgstr "Udskriv"
 
 #. wZWAL
-#: cui/inc/treeopt.hrc:131
+#: cui/inc/treeopt.hrc:132
 msgctxt "SID_SD_GRAPHIC_OPTIONS_RES"
 msgid "%PRODUCTNAME Draw"
 msgstr "%PRODUCTNAME Draw"
 
 #. B9gGf
-#: cui/inc/treeopt.hrc:132
+#: cui/inc/treeopt.hrc:133
 msgctxt "SID_SD_GRAPHIC_OPTIONS_RES"
 msgid "General"
 msgstr "Generelt"
 
 #. oiiBb
-#: cui/inc/treeopt.hrc:133
+#: cui/inc/treeopt.hrc:134
 msgctxt "SID_SD_GRAPHIC_OPTIONS_RES"
 msgid "View"
 msgstr "Vis"
 
 #. et8PK
-#: cui/inc/treeopt.hrc:134
+#: cui/inc/treeopt.hrc:135
 msgctxt "SID_SD_GRAPHIC_OPTIONS_RES"
 msgid "Grid"
 msgstr "Gitter"
 
 #. oGTEW
-#: cui/inc/treeopt.hrc:135
+#: cui/inc/treeopt.hrc:136
 msgctxt "SID_SD_GRAPHIC_OPTIONS_RES"
 msgid "Print"
 msgstr "Udskriv"
 
 #. BECZi
-#: cui/inc/treeopt.hrc:140
+#: cui/inc/treeopt.hrc:141
 msgctxt "SID_SCH_EDITOPTIONS_RES"
 msgid "Charts"
 msgstr "Diagrammer"
 
 #. XAhzo
-#: cui/inc/treeopt.hrc:141
+#: cui/inc/treeopt.hrc:142
 msgctxt "SID_SCH_EDITOPTIONS_RES"
 msgid "Default Colors"
 msgstr "Standardfarver"
 
 #. oUBac
-#: cui/inc/treeopt.hrc:146
+#: cui/inc/treeopt.hrc:147
 msgctxt "SID_FILTER_DLG_RES"
 msgid "Load/Save"
 msgstr "Hent/gem"
 
 #. 3go3N
-#: cui/inc/treeopt.hrc:147
+#: cui/inc/treeopt.hrc:148
 msgctxt "SID_FILTER_DLG_RES"
 msgid "General"
 msgstr "Generelt"
 
 #. 9aX4K
-#: cui/inc/treeopt.hrc:148
+#: cui/inc/treeopt.hrc:149
 msgctxt "SID_FILTER_DLG_RES"
 msgid "VBA Properties"
 msgstr "VBA-egenskaber"
 
 #. oAGDd
-#: cui/inc/treeopt.hrc:149
+#: cui/inc/treeopt.hrc:150
 msgctxt "SID_FILTER_DLG_RES"
 msgid "Microsoft Office"
 msgstr "Microsoft Office"
 
 #. UtTyJ
-#: cui/inc/treeopt.hrc:150
+#: cui/inc/treeopt.hrc:151
 msgctxt "SID_FILTER_DLG_RES"
 msgid "HTML Compatibility"
 msgstr "HTML-kompatibilitet"
 
 #. Qysp7
-#: cui/inc/treeopt.hrc:155
+#: cui/inc/treeopt.hrc:156
 msgctxt "SID_SB_STARBASEOPTIONS_RES"
 msgid "%PRODUCTNAME Base"
 msgstr "%PRODUCTNAME Base"
 
 #. 78XBF
-#: cui/inc/treeopt.hrc:156
+#: cui/inc/treeopt.hrc:157
 msgctxt "SID_SB_STARBASEOPTIONS_RES"
 msgid "Connections"
 msgstr "Forbindelser"
 
 #. 54yat
-#: cui/inc/treeopt.hrc:157
+#: cui/inc/treeopt.hrc:158
 msgctxt "SID_SB_STARBASEOPTIONS_RES"
 msgid "Databases"
 msgstr "Databaser"
@@ -4305,85 +4305,85 @@ msgid "About %PRODUCTNAME"
 msgstr "Om %PRODUCTNAME"
 
 #. rdEwV
-#: cui/uiconfig/ui/aboutdialog.ui:106
+#: cui/uiconfig/ui/aboutdialog.ui:105
 msgctxt "aboutdialog|lbVersion"
 msgid "Version:"
 msgstr "Version:"
 
 #. W6gkc
-#: cui/uiconfig/ui/aboutdialog.ui:123
+#: cui/uiconfig/ui/aboutdialog.ui:125
 msgctxt "aboutdialog|lbBuild"
 msgid "Build:"
 msgstr "Build:"
 
 #. J78bj
-#: cui/uiconfig/ui/aboutdialog.ui:139
+#: cui/uiconfig/ui/aboutdialog.ui:144
 msgctxt "aboutdialog|lbEnvironment"
 msgid "Environment:"
 msgstr "Miljø:"
 
 #. c2sEB
-#: cui/uiconfig/ui/aboutdialog.ui:209
+#: cui/uiconfig/ui/aboutdialog.ui:223
 msgctxt "aboutdialog|lbExtra"
 msgid "Misc:"
 msgstr "Diverse:"
 
 #. FwVyQ
-#: cui/uiconfig/ui/aboutdialog.ui:243
+#: cui/uiconfig/ui/aboutdialog.ui:263
 msgctxt "aboutdialog|lbLocale"
 msgid "Locale:"
 msgstr "Landestandard:"
 
 #. SFbP2
-#: cui/uiconfig/ui/aboutdialog.ui:275
+#: cui/uiconfig/ui/aboutdialog.ui:301
 msgctxt "aboutdialog|lbUI"
 msgid "User Interface:"
 msgstr "Brugerflade:"
 
 #. KFo3i
-#: cui/uiconfig/ui/aboutdialog.ui:316
+#: cui/uiconfig/ui/aboutdialog.ui:348
 msgctxt "aboutdialog|description"
 msgid "%PRODUCTNAME is a modern, easy-to-use, open source productivity suite for word processing, spreadsheets, presentations and more."
 msgstr "%PRODUCTNAME er en moderne og letanvendelig open source kontorpakke til tekstbehandling, regneark, præsentationer m.m."
 
 #. cFC6E
-#: cui/uiconfig/ui/aboutdialog.ui:350
+#: cui/uiconfig/ui/aboutdialog.ui:389
 msgctxt "aboutdialog|credits"
 msgid "Credits"
 msgstr "Bidrag"
 
 #. VkRAv
-#: cui/uiconfig/ui/aboutdialog.ui:366
+#: cui/uiconfig/ui/aboutdialog.ui:405
 msgctxt "aboutdialog|website"
 msgid "Website"
 msgstr "Websted"
 
 #. i4Jo2
-#: cui/uiconfig/ui/aboutdialog.ui:382
+#: cui/uiconfig/ui/aboutdialog.ui:421
 msgctxt "aboutdialog|releasenotes"
 msgid "Release Notes"
 msgstr "Udgivelsesnoter"
 
 #. 5TUrF
-#: cui/uiconfig/ui/aboutdialog.ui:410
+#: cui/uiconfig/ui/aboutdialog.ui:449
 msgctxt "aboutdialog|lbVersionInfo"
 msgid "Version Information"
 msgstr "Versionsinformation"
 
 #. jZvGC
-#: cui/uiconfig/ui/aboutdialog.ui:429
+#: cui/uiconfig/ui/aboutdialog.ui:468
 msgctxt "aboutdialog|btnCopyVersionTooltip"
 msgid "Copy all version information in English"
 msgstr "Kopier alle versionoplysninger på engelsk"
 
 #. Ujmto
-#: cui/uiconfig/ui/accelconfigpage.ui:80
+#: cui/uiconfig/ui/accelconfigpage.ui:84
 msgctxt "accelconfigpage|tooltip|shortcuts"
 msgid "To quickly find a shortcut in this list, simply press the key combination."
 msgstr "For hurtigt at finde en genvej på denne liste trykker du simpelthen på tastekobinationen."
 
 #. s4GiG
-#: cui/uiconfig/ui/accelconfigpage.ui:117
+#: cui/uiconfig/ui/accelconfigpage.ui:121
 msgctxt "accelconfigpage|extended_tip|shortcuts"
 msgid ""
 "Lists the shortcut keys and the associated commands. To assign or modify the shortcut key for the command selected in the Function list, click a shortcut in this list, and then click Modify.\n"
@@ -4393,145 +4393,145 @@ msgstr ""
 "For hurtigt at finde en genvej på denne liste trykker du simpelthen på tastekombinationen."
 
 #. MP3WF
-#: cui/uiconfig/ui/accelconfigpage.ui:129
+#: cui/uiconfig/ui/accelconfigpage.ui:133
 msgctxt "accelconfigpage|label21"
 msgid "Shortcu_t Keys"
 msgstr "Genvejs_taster"
 
 #. rEN3b
-#: cui/uiconfig/ui/accelconfigpage.ui:155
+#: cui/uiconfig/ui/accelconfigpage.ui:159
 msgctxt "accelconfigpage|office"
 msgid "%PRODUCTNAME"
 msgstr "%PRODUCTNAME"
 
 #. oakFo
-#: cui/uiconfig/ui/accelconfigpage.ui:164
+#: cui/uiconfig/ui/accelconfigpage.ui:168
 msgctxt "accelconfigpage|extended_tip|office"
 msgid "Displays shortcut keys that are common to all the office suite applications."
 msgstr "Viser genvejstaster, der er fælles for alle kontorprogrammer."
 
 #. jjhUE
-#: cui/uiconfig/ui/accelconfigpage.ui:176
+#: cui/uiconfig/ui/accelconfigpage.ui:180
 msgctxt "accelconfigpage|module"
 msgid "$(MODULE)"
 msgstr "$(MODULE)"
 
 #. 6UUdW
-#: cui/uiconfig/ui/accelconfigpage.ui:185
+#: cui/uiconfig/ui/accelconfigpage.ui:189
 msgctxt "accelconfigpage|extended_tip|module"
 msgid "Displays shortcut keys for the current office suite application."
 msgstr "Viser genvejstaster i det aktuelle kontorpakke-program."
 
 #. R2nhJ
-#: cui/uiconfig/ui/accelconfigpage.ui:212
+#: cui/uiconfig/ui/accelconfigpage.ui:216
 msgctxt "accelconfigpage|change"
 msgid "_Modify"
 msgstr "Ændr"
 
 #. F2oLa
-#: cui/uiconfig/ui/accelconfigpage.ui:219
+#: cui/uiconfig/ui/accelconfigpage.ui:223
 msgctxt "accelconfigpage|extended_tip|change"
 msgid "Assigns the key combination selected in the Shortcut keys list to the command selected in the Function list."
 msgstr "Tildeler tastekombinationen, der er valgt i listen Genvejstaster til kommandoen valgt i listen Funktion."
 
 #. eFsw9
-#: cui/uiconfig/ui/accelconfigpage.ui:238
+#: cui/uiconfig/ui/accelconfigpage.ui:242
 msgctxt "accelconfigpage|extended_tip|delete"
 msgid "Deletes the selected element or elements without requiring confirmation."
 msgstr "Sletter det markerede element eller elementer uden at kræve bekræftelse."
 
 #. 6MwWq
-#: cui/uiconfig/ui/accelconfigpage.ui:250
+#: cui/uiconfig/ui/accelconfigpage.ui:254
 msgctxt "accelconfigpage|load"
 msgid "_Load..."
 msgstr "Hent..."
 
 #. yANEF
-#: cui/uiconfig/ui/accelconfigpage.ui:257
+#: cui/uiconfig/ui/accelconfigpage.ui:261
 msgctxt "accelconfigpage|extended_tip|load"
 msgid "Replaces the shortcut key configuration with one that was previously saved."
 msgstr "Erstatter genvejstasttilpasningen med en, der er gemt tidligere."
 
 #. Uq7F5
-#: cui/uiconfig/ui/accelconfigpage.ui:270
+#: cui/uiconfig/ui/accelconfigpage.ui:274
 msgctxt "accelconfigpage|save"
 msgid "_Save..."
 msgstr "Gem..."
 
 #. e9TFA
-#: cui/uiconfig/ui/accelconfigpage.ui:277
+#: cui/uiconfig/ui/accelconfigpage.ui:281
 msgctxt "accelconfigpage|extended_tip|save"
 msgid "Saves the current shortcut key configuration, so that you can load it later."
 msgstr "Gemmer den aktuelle genvejstasttilpasning, så du kan indlæse den senere."
 
 #. oSRQ7
-#: cui/uiconfig/ui/accelconfigpage.ui:295
+#: cui/uiconfig/ui/accelconfigpage.ui:298
 msgctxt "accelconfigpage|tooltip|reset"
 msgid "Unsaved modifications to shortcut keys are reverted."
 msgstr "Ikke-gemte ændringer af genvejstaster nulstilles."
 
 #. stv4J
-#: cui/uiconfig/ui/accelconfigpage.ui:298
+#: cui/uiconfig/ui/accelconfigpage.ui:302
 msgctxt "accelconfigpage|extended_tip|reset"
 msgid "Revert any changes made to keyboard shortcuts to the assignments that were present when this dialog was opened."
 msgstr "Nulstil alle ændringer af genvejstasterne til de tildelinger, der fandtes, da denne dialog blev åbnet."
 
 #. BKAsD
-#: cui/uiconfig/ui/accelconfigpage.ui:349
+#: cui/uiconfig/ui/accelconfigpage.ui:354
 msgctxt "accelconfigpage|searchEntry"
 msgid "Type to search"
 msgstr "Skriv for at søge"
 
 #. nGtvW
-#: cui/uiconfig/ui/accelconfigpage.ui:353
+#: cui/uiconfig/ui/accelconfigpage.ui:357
 msgctxt "accelconfigpage|extended_tip|searchEntry"
 msgid "Type here to search in the list of functions."
 msgstr "Tast her for at søge på funktionslisten."
 
 #. T5FGo
-#: cui/uiconfig/ui/accelconfigpage.ui:375
+#: cui/uiconfig/ui/accelconfigpage.ui:380
 msgctxt "accelconfigpage|label23"
 msgid "_Category"
 msgstr "Kategori"
 
 #. xfWzA
-#: cui/uiconfig/ui/accelconfigpage.ui:389
+#: cui/uiconfig/ui/accelconfigpage.ui:394
 msgctxt "accelconfigpage|label24"
 msgid "_Function"
 msgstr "Funktion"
 
 #. 7PCeb
-#: cui/uiconfig/ui/accelconfigpage.ui:403
+#: cui/uiconfig/ui/accelconfigpage.ui:408
 msgctxt "accelconfigpage|label25"
 msgid "_Keys"
 msgstr "Taster"
 
 #. 8DnFJ
-#: cui/uiconfig/ui/accelconfigpage.ui:447
+#: cui/uiconfig/ui/accelconfigpage.ui:452
 msgctxt "accelconfigpage|extended_tip|category"
 msgid "Lists the available function categories. To assign shortcuts to Styles, open the \"Styles\" category."
 msgstr "Lister de tilgængelige funktionskategorier. For at tildele genveje til Typografier, åbn kategorien \"Typografier\"."
 
 #. wGm8q
-#: cui/uiconfig/ui/accelconfigpage.ui:494
+#: cui/uiconfig/ui/accelconfigpage.ui:499
 msgctxt "accelconfigpage|extended_tip|function"
 msgid "Select a function that you want to assign a shortcut key to, click a key combination in the Shortcut keys list, and then click Modify. If the selected function already has a shortcut key, it is displayed in the Keys list."
 msgstr "Vælg en funktion, som du vil tildele en genvejstast til, klik en tastekombination i listen Genvejstaster, og klik så på Modificer. Hvis den valgte funktion allerede har en genvejstast, vises det i listen Taster."
 
 #. PzCaG
-#: cui/uiconfig/ui/accelconfigpage.ui:540
+#: cui/uiconfig/ui/accelconfigpage.ui:545
 msgctxt "accelconfigpage|extended_tip|keys"
 msgid "Displays the shortcut keys that are assigned to the selected function."
 msgstr "Viser de genvejstaster, der er tildelt til den valgte funktion."
 
 #. CqdJF
-#: cui/uiconfig/ui/accelconfigpage.ui:564
+#: cui/uiconfig/ui/accelconfigpage.ui:569
 msgctxt "accelconfigpage|label22"
 msgid "F_unctions"
 msgstr "F_unktioner"
 
 #. kVeWd
-#: cui/uiconfig/ui/accelconfigpage.ui:577
+#: cui/uiconfig/ui/accelconfigpage.ui:582
 msgctxt "accelconfigpage|extended_tip|AccelConfigPage"
 msgid "Assigns or edits the shortcut keys for the office suite commands, or Basic macros."
 msgstr "Tildeler eller redigerer genvejstasterne til kontorpakke-programmets kommandoer eller Basic-makroer."
@@ -4782,11 +4782,11 @@ msgctxt "additionsdialog|ProgressLabel"
 msgid "Progress Label"
 msgstr "Fremdriftsetiket"
 
-#. PjJ55
+#. sdUSh
 #: cui/uiconfig/ui/additionsdialog.ui:126
 msgctxt "additionsdialog|ProgressLabel"
-msgid "ProgressLabel"
-msgstr "Fremdriftsetiket"
+msgid "Progress label"
+msgstr ""
 
 #. SYKGE
 #: cui/uiconfig/ui/additionsdialog.ui:127
@@ -4794,8 +4794,13 @@ msgctxt "additionsdialog|ProgressLabel"
 msgid "This label shows that the progress of the operations such as loading extensions, not found, etc."
 msgstr "Denne etiket viser fremdriften for handlingerne såsom indlæsning af udvidelser, ikke fundet osv."
 
-#. NrZT8
+#. Gq5Hf
 #: cui/uiconfig/ui/additionsdialog.ui:188
+msgctxt "additionsdialog|searchEntry"
+msgid "Search entry"
+msgstr ""
+
+#. NrZT8
 #: cui/uiconfig/ui/additionsdialog.ui:189
 msgctxt "additionsdialog|searchEntry"
 msgid "searchEntry"
@@ -4819,11 +4824,11 @@ msgctxt "additionsDialog|buttonShowMore"
 msgid "Show More Extensions"
 msgstr "Vis flere udvidelser"
 
-#. 2pPGn
+#. ZFA5D
 #: cui/uiconfig/ui/additionsfragment.ui:21
 msgctxt "additionsDialog|buttonShowMore"
-msgid "ButtonShowMore"
-msgstr "Knappen Vis mere"
+msgid "Button \"Show more\""
+msgstr ""
 
 #. i9AoG
 #: cui/uiconfig/ui/additionsfragment.ui:22
@@ -6638,145 +6643,145 @@ msgid "Language:"
 msgstr "Sprog:"
 
 #. zCCrx
-#: cui/uiconfig/ui/charnamepage.ui:150
+#: cui/uiconfig/ui/charnamepage.ui:151
 msgctxt "charnamepage|extended_tip|westlanglb-cjk"
 msgid "Sets the language that the spellchecker uses for the selected text or the text that you type. Available language modules have a check mark in front of them."
 msgstr "Sætter det sprog, som stavekontrollen bruger til den valgte tekst eller til den tekst, som du skriver. Tilgængelige sprogmoduler er markeret med flueben."
 
 #. PEg2a
-#: cui/uiconfig/ui/charnamepage.ui:185
+#: cui/uiconfig/ui/charnamepage.ui:187
 msgctxt "charnamepage|extended_tip|weststylelb-cjk"
 msgid "Select the formatting that you want to apply."
 msgstr "Vælg den formatering, du vil bruge."
 
 #. nKfjE
-#: cui/uiconfig/ui/charnamepage.ui:199
+#: cui/uiconfig/ui/charnamepage.ui:201
 msgctxt "charnamepage|westsizeft-cjk"
 msgid "Size:"
 msgstr "Størrelse:"
 
 #. 8quPQ
-#: cui/uiconfig/ui/charnamepage.ui:221
+#: cui/uiconfig/ui/charnamepage.ui:224
 msgctxt "charnamepage|extended_tip|westsizelb-cjk"
 msgid "Enter or select the font size that you want to apply. For scalable fonts, you can also enter decimal values."
 msgstr "Indtast eller marker den skriftstørrelse, du vil bruge. Ved skalerbare skrifter kan du også vælge decimaltal."
 
 #. qpSnT
-#: cui/uiconfig/ui/charnamepage.ui:233
+#: cui/uiconfig/ui/charnamepage.ui:236
 msgctxt "charnamepage|west_features_button-cjk"
 msgid "Features..."
 msgstr "Funktioner..."
 
 #. 67pMm
-#: cui/uiconfig/ui/charnamepage.ui:277
+#: cui/uiconfig/ui/charnamepage.ui:280
 msgctxt "charnamepage|extended_tip|westfontnamelb-nocjk"
 msgid "Select the font that you want to apply."
 msgstr ""
 
 #. a6gqN
-#: cui/uiconfig/ui/charnamepage.ui:334
+#: cui/uiconfig/ui/charnamepage.ui:337
 msgctxt "charnamepage|Tab_Western"
 msgid "Western"
 msgstr ""
 
 #. q4WZB
-#: cui/uiconfig/ui/charnamepage.ui:380
+#: cui/uiconfig/ui/charnamepage.ui:383
 msgctxt "charnamepage|eastsizeft"
 msgid "Size:"
 msgstr "Størrelse:"
 
 #. 6MVEP
-#: cui/uiconfig/ui/charnamepage.ui:394
+#: cui/uiconfig/ui/charnamepage.ui:397
 msgctxt "charnamepage|eastlangft"
 msgid "Language:"
 msgstr "Sprog:"
 
 #. BhQZB
-#: cui/uiconfig/ui/charnamepage.ui:416
+#: cui/uiconfig/ui/charnamepage.ui:420
 msgctxt "charnamepage|extended_tip|eaststylelb"
 msgid "Select the formatting that you want to apply."
 msgstr "Vælg den formatering, du vil bruge."
 
 #. JSR99
-#: cui/uiconfig/ui/charnamepage.ui:438
+#: cui/uiconfig/ui/charnamepage.ui:443
 msgctxt "charnamepage|extended_tip|eastsizelb"
 msgid "Enter or select the font size that you want to apply. For scalable fonts, you can also enter decimal values."
 msgstr "Indtast eller marker den skriftstørrelse, du vil bruge. Ved skalerbare skrifter kan du også vælge decimaltal."
 
 #. 5uQYn
-#: cui/uiconfig/ui/charnamepage.ui:464
+#: cui/uiconfig/ui/charnamepage.ui:469
 msgctxt "charnamepage|east_features_button"
 msgid "Features..."
 msgstr "Funktioner..."
 
 #. 53eGE
-#: cui/uiconfig/ui/charnamepage.ui:522
+#: cui/uiconfig/ui/charnamepage.ui:527
 msgctxt "charnamepage|extended_tip|trCJKFontName"
 msgid "Select the font that you want to apply."
 msgstr ""
 
 #. KLJQT
-#: cui/uiconfig/ui/charnamepage.ui:570
+#: cui/uiconfig/ui/charnamepage.ui:576
 msgctxt "charnamepage|extended_tip|eastlanglb"
 msgid "Sets the language that the spellchecker uses for the selected text or the text that you type. Available language modules have a check mark in front of them."
 msgstr "Sætter det sprog, som stavekontrollen bruger til den valgte tekst eller til den tekst, som du skriver. Tilgængelige sprogmoduler er markeret med flueben."
 
 #. 2A2Jj
-#: cui/uiconfig/ui/charnamepage.ui:610
+#: cui/uiconfig/ui/charnamepage.ui:616
 msgctxt "charnamepage|Tab_Asian"
 msgid "Asian"
 msgstr ""
 
 #. FSm5y
-#: cui/uiconfig/ui/charnamepage.ui:660
+#: cui/uiconfig/ui/charnamepage.ui:666
 msgctxt "charnamepage|ctlsizeft"
 msgid "Size:"
 msgstr "Størrelse:"
 
 #. 64NvC
-#: cui/uiconfig/ui/charnamepage.ui:682
+#: cui/uiconfig/ui/charnamepage.ui:689
 msgctxt "charnamepage|extended_tip|ctlstylelb"
 msgid "Select the formatting that you want to apply."
 msgstr "Vælg den formatering, du vil bruge."
 
 #. CeMCG
-#: cui/uiconfig/ui/charnamepage.ui:704
+#: cui/uiconfig/ui/charnamepage.ui:712
 msgctxt "charnamepage|extended_tip|ctlsizelb"
 msgid "Enter or select the font size that you want to apply. For scalable fonts, you can also enter decimal values."
 msgstr "Indtast eller marker den skriftstørrelse, du vil bruge. Ved skalerbare skrifter kan du også vælge decimaltal."
 
 #. j6bmf
-#: cui/uiconfig/ui/charnamepage.ui:718
+#: cui/uiconfig/ui/charnamepage.ui:726
 msgctxt "charnamepage|ctllangft"
 msgid "Language:"
 msgstr "Sprog:"
 
 #. Nobqa
-#: cui/uiconfig/ui/charnamepage.ui:730
+#: cui/uiconfig/ui/charnamepage.ui:738
 msgctxt "charnamepage|ctl_features_button"
 msgid "Features..."
 msgstr "Funktioner..."
 
 #. zCKxL
-#: cui/uiconfig/ui/charnamepage.ui:763
+#: cui/uiconfig/ui/charnamepage.ui:772
 msgctxt "charnamepage|extended_tip|ctllanglb"
 msgid "Sets the language that the spellchecker uses for the selected text or the text that you type. Available language modules have a check mark in front of them."
 msgstr "Sætter det sprog, som stavekontrollen bruger til den valgte tekst eller til den tekst, som du skriver. Tilgængelige sprogmoduler er markeret med flueben."
 
 #. 97Vwf
-#: cui/uiconfig/ui/charnamepage.ui:805
+#: cui/uiconfig/ui/charnamepage.ui:814
 msgctxt "charnamepage|extended_tip|trCTLFontName"
 msgid "Select the font that you want to apply."
 msgstr ""
 
 #. U2Qki
-#: cui/uiconfig/ui/charnamepage.ui:864
+#: cui/uiconfig/ui/charnamepage.ui:873
 msgctxt "charnamepage|Tab_Complex"
 msgid "Complex"
 msgstr ""
 
 #. RyyME
-#: cui/uiconfig/ui/charnamepage.ui:905
+#: cui/uiconfig/ui/charnamepage.ui:914
 msgctxt "charnamepage|preview-atkobject"
 msgid "Preview"
 msgstr "Forhåndsvisning"
@@ -6788,403 +6793,409 @@ msgid "Document background"
 msgstr "Dokumentbaggrund"
 
 #. LE7Wp
-#: cui/uiconfig/ui/colorconfigwin.ui:64
+#: cui/uiconfig/ui/colorconfigwin.ui:65
 msgctxt "colorconfigwin|docboundaries"
 msgid "Text boundaries"
 msgstr "Tekstgrænser"
 
 #. Df2ut
-#: cui/uiconfig/ui/colorconfigwin.ui:96
+#: cui/uiconfig/ui/colorconfigwin.ui:98
 msgctxt "colorconfigwin|docboundaries_lb"
 msgid "Text boundaries color"
 msgstr "Farve på tekstens kanter"
 
 #. dWQqH
-#: cui/uiconfig/ui/colorconfigwin.ui:111
+#: cui/uiconfig/ui/colorconfigwin.ui:113
 msgctxt "colorconfigwin|appback"
 msgid "Application background"
 msgstr "Programbaggrund"
 
 #. XAMAa
-#: cui/uiconfig/ui/colorconfigwin.ui:139
+#: cui/uiconfig/ui/colorconfigwin.ui:142
 msgctxt "colorconfigwin|objboundaries"
 msgid "Object boundaries"
 msgstr "Objektgrænser"
 
 #. ubeED
-#: cui/uiconfig/ui/colorconfigwin.ui:171
+#: cui/uiconfig/ui/colorconfigwin.ui:175
 msgctxt "colorconfigwin|objboundaries_lb"
 msgid "Object boundaries color"
 msgstr "Farve på objektets kanter"
 
 #. KsUa5
-#: cui/uiconfig/ui/colorconfigwin.ui:182
+#: cui/uiconfig/ui/colorconfigwin.ui:186
 msgctxt "colorconfigwin|tblboundaries"
 msgid "Table boundaries"
 msgstr "Tabelgrænser"
 
 #. uJLG6
-#: cui/uiconfig/ui/colorconfigwin.ui:214
+#: cui/uiconfig/ui/colorconfigwin.ui:219
 msgctxt "colorconfigwin|tblboundaries_lb"
 msgid "Table boundaries color"
 msgstr "Farve på tabellens kanter"
 
 #. TkNp4
-#: cui/uiconfig/ui/colorconfigwin.ui:229
+#: cui/uiconfig/ui/colorconfigwin.ui:234
 msgctxt "colorconfigwin|font"
 msgid "Font color"
 msgstr "Skriftfarve"
 
 #. EhDTB
-#: cui/uiconfig/ui/colorconfigwin.ui:257
+#: cui/uiconfig/ui/colorconfigwin.ui:263
 msgctxt "colorconfigwin|unvisitedlinks"
 msgid "Unvisited links"
 msgstr "Ubesøgte hyperlinks"
 
 #. DySTC
-#: cui/uiconfig/ui/colorconfigwin.ui:289
+#: cui/uiconfig/ui/colorconfigwin.ui:296
 msgctxt "colorconfigwin|unvisitedlinks_lb"
 msgid "Unvisited links color"
 msgstr "Farve på ikke-besøgte links"
 
 #. UTPiE
-#: cui/uiconfig/ui/colorconfigwin.ui:300
+#: cui/uiconfig/ui/colorconfigwin.ui:307
 msgctxt "colorconfigwin|visitedlinks"
 msgid "Visited links"
 msgstr "Besøgte hyperlinks"
 
 #. NmbCZ
-#: cui/uiconfig/ui/colorconfigwin.ui:332
+#: cui/uiconfig/ui/colorconfigwin.ui:340
 msgctxt "colorconfigwin|visitedlinks_lb"
 msgid "Visited links color"
 msgstr "Farve på besøgte links"
 
-#. RP2Vp
-#: cui/uiconfig/ui/colorconfigwin.ui:347
+#. QA2Eq
+#: cui/uiconfig/ui/colorconfigwin.ui:355
 msgctxt "colorconfigwin|autospellcheck"
-msgid "AutoSpellcheck"
-msgstr "Automatisk stavekontrol"
+msgid "Spelling mistakes"
+msgstr ""
 
 #. CpXy5
-#: cui/uiconfig/ui/colorconfigwin.ui:379
+#: cui/uiconfig/ui/colorconfigwin.ui:388
 msgctxt "colorconfigwin|smarttags"
 msgid "Smart Tags"
 msgstr "Smartmærker"
 
 #. HshHE
-#: cui/uiconfig/ui/colorconfigwin.ui:407
+#: cui/uiconfig/ui/colorconfigwin.ui:417
 msgctxt "colorconfigwin|shadows"
 msgid "Shadows"
 msgstr "Skygger"
 
 #. EGNdC
-#: cui/uiconfig/ui/colorconfigwin.ui:439
+#: cui/uiconfig/ui/colorconfigwin.ui:450
 msgctxt "colorconfigwin|shadows_lb"
 msgid "Shadows color"
 msgstr "Skyggefarve"
 
 #. hDvCW
-#: cui/uiconfig/ui/colorconfigwin.ui:454
+#: cui/uiconfig/ui/colorconfigwin.ui:465
 msgctxt "colorconfigwin|general"
 msgid "General"
 msgstr "Generelt"
 
 #. 3bVoq
-#: cui/uiconfig/ui/colorconfigwin.ui:488
+#: cui/uiconfig/ui/colorconfigwin.ui:499
 msgctxt "colorconfigwin|writergrid"
 msgid "Grid"
 msgstr "Gitter"
 
 #. RydzU
-#: cui/uiconfig/ui/colorconfigwin.ui:517
+#: cui/uiconfig/ui/colorconfigwin.ui:529
 msgctxt "colorconfigwin|field"
 msgid "Field shadings"
 msgstr "Feltskygger"
 
 #. DEpAZ
-#: cui/uiconfig/ui/colorconfigwin.ui:549
+#: cui/uiconfig/ui/colorconfigwin.ui:562
 msgctxt "colorconfigwin|field_lb"
 msgid "Field shadings color"
 msgstr "Farve på feltskygger"
 
 #. DqZGn
-#: cui/uiconfig/ui/colorconfigwin.ui:560
+#: cui/uiconfig/ui/colorconfigwin.ui:573
 msgctxt "colorconfigwin|index"
 msgid "Index and table shadings"
 msgstr "Indeks- og tabelskygger"
 
 #. sGffP
-#: cui/uiconfig/ui/colorconfigwin.ui:592
+#: cui/uiconfig/ui/colorconfigwin.ui:606
 msgctxt "colorconfigwin|index_lb"
 msgid "Index and table shadings color"
 msgstr "Farve på fortegnelses- og tabel-skygger"
 
 #. wBw2w
-#: cui/uiconfig/ui/colorconfigwin.ui:607
+#: cui/uiconfig/ui/colorconfigwin.ui:621
 msgctxt "colorconfigwin|script"
 msgid "Script Indicator"
 msgstr "Skriptindikator"
 
 #. fitqS
-#: cui/uiconfig/ui/colorconfigwin.ui:635
+#: cui/uiconfig/ui/colorconfigwin.ui:650
 msgctxt "colorconfigwin|section"
 msgid "Section boundaries"
 msgstr "Sektionsgrænser"
 
 #. ztqX5
-#: cui/uiconfig/ui/colorconfigwin.ui:667
+#: cui/uiconfig/ui/colorconfigwin.ui:683
 msgctxt "colorconfigwin|section_lb"
 msgid "Section boundaries color"
 msgstr "Farve på sektionskanter"
 
 #. wHL6h
-#: cui/uiconfig/ui/colorconfigwin.ui:682
+#: cui/uiconfig/ui/colorconfigwin.ui:698
 msgctxt "colorconfigwin|hdft"
 msgid "Headers and Footer delimiter"
 msgstr "Sidehoved- og sidefodsafgrænser"
 
 #. dCEBJ
-#: cui/uiconfig/ui/colorconfigwin.ui:714
+#: cui/uiconfig/ui/colorconfigwin.ui:731
 msgctxt "colorconfigwin|pagebreak"
 msgid "Page and column breaks"
 msgstr "Side- og spalteskift"
 
 #. yrTZF
-#: cui/uiconfig/ui/colorconfigwin.ui:746
+#: cui/uiconfig/ui/colorconfigwin.ui:764
 msgctxt "colorconfigwin|direct"
 msgid "Direct Cursor"
 msgstr "Direkte markør"
 
+#. Yh6Lz
+#: cui/uiconfig/ui/colorconfigwin.ui:797
+msgctxt "colorconfigwin|autospellcheck"
+msgid "Grammar mistakes"
+msgstr ""
+
 #. ZZcPY
-#: cui/uiconfig/ui/colorconfigwin.ui:778
+#: cui/uiconfig/ui/colorconfigwin.ui:830
 msgctxt "colorconfigwin|writer"
 msgid "Text Document"
 msgstr "Tekstdokument"
 
 #. GFFes
-#: cui/uiconfig/ui/colorconfigwin.ui:812
+#: cui/uiconfig/ui/colorconfigwin.ui:864
 msgctxt "colorconfigwin|calcgrid"
 msgid "Grid lines"
 msgstr "Gitterlinjer"
 
 #. MGvyJ
-#: cui/uiconfig/ui/colorconfigwin.ui:845
+#: cui/uiconfig/ui/colorconfigwin.ui:898
 msgctxt "colorconfigwin|brk"
 msgid "Page breaks"
 msgstr "Sideskift"
 
 #. aNnBE
-#: cui/uiconfig/ui/colorconfigwin.ui:877
+#: cui/uiconfig/ui/colorconfigwin.ui:931
 msgctxt "colorconfigwin|brkmanual"
 msgid "Manual page breaks"
 msgstr "Manuelle sideskift"
 
 #. PVzmm
-#: cui/uiconfig/ui/colorconfigwin.ui:909
+#: cui/uiconfig/ui/colorconfigwin.ui:964
 msgctxt "colorconfigwin|brkauto"
 msgid "Automatic page breaks"
 msgstr "Automatiske sideskift"
 
 #. NgGUC
-#: cui/uiconfig/ui/colorconfigwin.ui:941
+#: cui/uiconfig/ui/colorconfigwin.ui:997
 msgctxt "colorconfigwin|det"
 msgid "Detective"
 msgstr "Detektiv"
 
 #. 5Mp8g
-#: cui/uiconfig/ui/colorconfigwin.ui:990
+#: cui/uiconfig/ui/colorconfigwin.ui:1048
 msgctxt "colorconfigwin|deterror"
 msgid "Detective error"
 msgstr "Detektivfejl"
 
 #. K5CDH
-#: cui/uiconfig/ui/colorconfigwin.ui:1022
+#: cui/uiconfig/ui/colorconfigwin.ui:1081
 msgctxt "colorconfigwin|ref"
 msgid "References"
 msgstr "Henvisninger"
 
 #. ebAgi
-#: cui/uiconfig/ui/colorconfigwin.ui:1054
+#: cui/uiconfig/ui/colorconfigwin.ui:1114
 msgctxt "colorconfigwin|notes"
 msgid "Notes background"
 msgstr "Kommentarbaggrund"
 
 #. KdFAN
-#: cui/uiconfig/ui/colorconfigwin.ui:1086
+#: cui/uiconfig/ui/colorconfigwin.ui:1147
 msgctxt "colorconfigwin|values"
 msgid "Values"
 msgstr "Værdier"
 
 #. UfL75
-#: cui/uiconfig/ui/colorconfigwin.ui:1118
+#: cui/uiconfig/ui/colorconfigwin.ui:1180
 msgctxt "colorconfigwin|formulas"
 msgid "Formulas"
 msgstr "Formler"
 
 #. 9kx8m
-#: cui/uiconfig/ui/colorconfigwin.ui:1150
+#: cui/uiconfig/ui/colorconfigwin.ui:1213
 msgctxt "colorconfigwin|text"
 msgid "Text"
 msgstr "Tekst"
 
 #. ZCYmf
-#: cui/uiconfig/ui/colorconfigwin.ui:1182
+#: cui/uiconfig/ui/colorconfigwin.ui:1246
 msgctxt "colorconfigwin|protectedcells"
 msgid "Protected cells background"
 msgstr "Beskyttede cellers baggrund"
 
 #. pqHBt
-#: cui/uiconfig/ui/colorconfigwin.ui:1193
+#: cui/uiconfig/ui/colorconfigwin.ui:1257
 msgctxt "colorconfigwin|hiddencolrow"
 msgid "Hidden columns/rows"
 msgstr "Skjulte kolonner/rækker"
 
 #. gTFFH
-#: cui/uiconfig/ui/colorconfigwin.ui:1225
+#: cui/uiconfig/ui/colorconfigwin.ui:1290
 msgctxt "colorconfigwin|hiddencolrow_lb"
 msgid "Hidden row/column color"
 msgstr "Skjult række/kolonne-farve"
 
 #. mA6HV
-#: cui/uiconfig/ui/colorconfigwin.ui:1240
+#: cui/uiconfig/ui/colorconfigwin.ui:1305
 msgctxt "colorconfigwin|calc"
 msgid "Spreadsheet"
 msgstr "Regneark"
 
 #. C8q88
-#: cui/uiconfig/ui/colorconfigwin.ui:1292
+#: cui/uiconfig/ui/colorconfigwin.ui:1358
 msgctxt "colorconfigwin|drawgrid"
 msgid "Grid"
 msgstr "Gitter"
 
 #. oKFnR
-#: cui/uiconfig/ui/colorconfigwin.ui:1307
+#: cui/uiconfig/ui/colorconfigwin.ui:1373
 msgctxt "colorconfigwin|draw"
 msgid "Drawing / Presentation"
 msgstr "Tegning / præsentation"
 
 #. yELpi
-#: cui/uiconfig/ui/colorconfigwin.ui:1359
+#: cui/uiconfig/ui/colorconfigwin.ui:1426
 msgctxt "colorconfigwin|basicid"
 msgid "Identifier"
 msgstr "Identifikator"
 
 #. 5uQto
-#: cui/uiconfig/ui/colorconfigwin.ui:1391
+#: cui/uiconfig/ui/colorconfigwin.ui:1459
 msgctxt "colorconfigwin|basiccomment"
 msgid "Comment"
 msgstr "Kommentar"
 
 #. 73qea
-#: cui/uiconfig/ui/colorconfigwin.ui:1423
+#: cui/uiconfig/ui/colorconfigwin.ui:1492
 msgctxt "colorconfigwin|basicnumber"
 msgid "Number"
 msgstr "Antal"
 
 #. rHmNM
-#: cui/uiconfig/ui/colorconfigwin.ui:1455
+#: cui/uiconfig/ui/colorconfigwin.ui:1525
 msgctxt "colorconfigwin|basicstring"
 msgid "String"
 msgstr "Streng"
 
 #. Kf9eR
-#: cui/uiconfig/ui/colorconfigwin.ui:1487
+#: cui/uiconfig/ui/colorconfigwin.ui:1558
 msgctxt "colorconfigwin|basicop"
 msgid "Operator"
 msgstr "Operator"
 
 #. EFQpW
-#: cui/uiconfig/ui/colorconfigwin.ui:1519
+#: cui/uiconfig/ui/colorconfigwin.ui:1591
 msgctxt "colorconfigwin|basickeyword"
 msgid "Reserved expression"
 msgstr "Reserveret udtryk"
 
 #. QEuyS
-#: cui/uiconfig/ui/colorconfigwin.ui:1551
+#: cui/uiconfig/ui/colorconfigwin.ui:1624
 msgctxt "colorconfigwin|error"
 msgid "Error"
 msgstr "Fejl"
 
 #. 4JokA
-#: cui/uiconfig/ui/colorconfigwin.ui:1566
+#: cui/uiconfig/ui/colorconfigwin.ui:1639
 msgctxt "colorconfigwin|basic"
 msgid "Basic Syntax Highlighting"
 msgstr "Fremhævelse af Basic-syntaks"
 
 #. ERVJA
-#: cui/uiconfig/ui/colorconfigwin.ui:1618
+#: cui/uiconfig/ui/colorconfigwin.ui:1692
 msgctxt "colorconfigwin|sqlid"
 msgid "Identifier"
 msgstr "Identifikator"
 
 #. nAF39
-#: cui/uiconfig/ui/colorconfigwin.ui:1650
+#: cui/uiconfig/ui/colorconfigwin.ui:1725
 msgctxt "colorconfigwin|sqlnumber"
 msgid "Number"
 msgstr "Antal"
 
 #. B6Bku
-#: cui/uiconfig/ui/colorconfigwin.ui:1682
+#: cui/uiconfig/ui/colorconfigwin.ui:1758
 msgctxt "colorconfigwin|sqlstring"
 msgid "String"
 msgstr "Streng"
 
 #. FPDgu
-#: cui/uiconfig/ui/colorconfigwin.ui:1714
+#: cui/uiconfig/ui/colorconfigwin.ui:1791
 msgctxt "colorconfigwin|sqlop"
 msgid "Operator"
 msgstr "Operator"
 
 #. 4t4Ww
-#: cui/uiconfig/ui/colorconfigwin.ui:1746
+#: cui/uiconfig/ui/colorconfigwin.ui:1824
 msgctxt "colorconfigwin|sqlkeyword"
 msgid "Keyword"
 msgstr "Nøgleord"
 
 #. qbVhS
-#: cui/uiconfig/ui/colorconfigwin.ui:1778
+#: cui/uiconfig/ui/colorconfigwin.ui:1857
 msgctxt "colorconfigwin|sqlparam"
 msgid "Parameter"
 msgstr "Parameter"
 
 #. B7ubh
-#: cui/uiconfig/ui/colorconfigwin.ui:1810
+#: cui/uiconfig/ui/colorconfigwin.ui:1890
 msgctxt "colorconfigwin|sqlcomment"
 msgid "Comment"
 msgstr "Kommentar"
 
 #. PLRFA
-#: cui/uiconfig/ui/colorconfigwin.ui:1825
+#: cui/uiconfig/ui/colorconfigwin.ui:1905
 msgctxt "colorconfigwin|sql"
 msgid "SQL Syntax Highlighting"
 msgstr "SQL-syntaksfremhævelse"
 
 #. NcJi8
-#: cui/uiconfig/ui/colorconfigwin.ui:1877
+#: cui/uiconfig/ui/colorconfigwin.ui:1958
 msgctxt "colorconfigwin|sgml"
 msgid "SGML syntax highlighting"
 msgstr "Fremhævelse af SGML-syntaks"
 
 #. uYB5C
-#: cui/uiconfig/ui/colorconfigwin.ui:1892
+#: cui/uiconfig/ui/colorconfigwin.ui:1973
 msgctxt "colorconfigwin|htmlcomment"
 msgid "Comment highlighting"
 msgstr "Fremhævelse af kommentarer"
 
 #. 82UJf
-#: cui/uiconfig/ui/colorconfigwin.ui:1924
+#: cui/uiconfig/ui/colorconfigwin.ui:2006
 msgctxt "colorconfigwin|htmlkeyword"
 msgid "Keyword highlighting"
 msgstr "Fremhævelse af nøgleord"
 
 #. otYwD
-#: cui/uiconfig/ui/colorconfigwin.ui:1956
+#: cui/uiconfig/ui/colorconfigwin.ui:2039
 msgctxt "colorconfigwin|unknown"
 msgid "Text"
 msgstr "Tekst"
 
 #. XxGeg
-#: cui/uiconfig/ui/colorconfigwin.ui:1988
+#: cui/uiconfig/ui/colorconfigwin.ui:2072
 msgctxt "colorconfigwin|html"
 msgid "HTML Document"
 msgstr "HTML-dokument"
@@ -9101,38 +9112,44 @@ msgctxt "eventsconfigpage|extended_tip|delete"
 msgid "Deletes the macro or component assignment for the selected event."
 msgstr "Sletter makroen eller komponenttildeloingen for den markerede hændelse."
 
+#. 7j6pm
+#: cui/uiconfig/ui/eventsconfigpage.ui:100
+msgctxt "eventsconfigpage|deleteall"
+msgid "Remove _All"
+msgstr ""
+
 #. Ebcvv
-#: cui/uiconfig/ui/eventsconfigpage.ui:130
+#: cui/uiconfig/ui/eventsconfigpage.ui:144
 msgctxt "eventsconfigpage|label2"
 msgid "Save in:"
 msgstr "Gem i:"
 
 #. AXbbm
-#: cui/uiconfig/ui/eventsconfigpage.ui:147
+#: cui/uiconfig/ui/eventsconfigpage.ui:161
 msgctxt "eventsconfigpage|extended_tip|savein"
 msgid "Select first where to save the event binding, in the current document or in the office suite."
 msgstr "Vælg først, hvor hændelsesbindingen skal gemmes: i det aktuelle dokument eller i kontorpakken."
 
 #. C6KwW
-#: cui/uiconfig/ui/eventsconfigpage.ui:186
+#: cui/uiconfig/ui/eventsconfigpage.ui:200
 msgctxt "eventsconfigpage|eventft"
 msgid "Event"
 msgstr "Hændelse"
 
 #. daKJA
-#: cui/uiconfig/ui/eventsconfigpage.ui:210
+#: cui/uiconfig/ui/eventsconfigpage.ui:224
 msgctxt "eventsconfigpage|actionft"
 msgid "Assigned Action"
 msgstr "Tildelt handling"
 
 #. Gp5MK
-#: cui/uiconfig/ui/eventsconfigpage.ui:221
+#: cui/uiconfig/ui/eventsconfigpage.ui:235
 msgctxt "eventsconfigpage|extended_tip|events"
 msgid "The big list box lists the events and the assigned macros. After you selected the location in the Save In list box, select an event in the big list box. Then click Assign Macro."
 msgstr "Den store rulleliste lister hændelserne og de tildelte makroer. Når du har valgt placeringen i rullelisten Gem i, skal du vælge en hændelse i den store rulleliste. Derefter skal du klikke på Tildel makro."
 
 #. aCb4v
-#: cui/uiconfig/ui/eventsconfigpage.ui:246
+#: cui/uiconfig/ui/eventsconfigpage.ui:260
 msgctxt "eventsconfigpage|extended_tip|EventsConfigPage"
 msgid "Assigns macros to program events. The assigned macro runs automatically every time the selected event occurs."
 msgstr "Tilknytter makroer til programbegivenheder. De tilknyttede makroer afvikles automatisk, hver gang de valgte begivenheder optræder."
@@ -9455,14 +9472,26 @@ msgctxt "fontfeaturesdialog|FontFeaturesDialog"
 msgid "Font Features"
 msgstr "Skrifttype-funktioner"
 
+#. wDK93
+#: cui/uiconfig/ui/fontfeaturesdialog.ui:141
+msgctxt "fontfeaturesdialog"
+msgid "Stylistic Sets"
+msgstr ""
+
+#. PJ2PF
+#: cui/uiconfig/ui/fontfeaturesdialog.ui:193
+msgctxt "fontfeaturesdialog"
+msgid "Character Variants"
+msgstr ""
+
 #. 696Sw
-#: cui/uiconfig/ui/fontfeaturesdialog.ui:161
+#: cui/uiconfig/ui/fontfeaturesdialog.ui:266
 msgctxt "fontfeaturesdialog|preview-atkobject"
 msgid "Preview"
 msgstr "Forhåndsvisning"
 
 #. hib9i
-#: cui/uiconfig/ui/fontfeaturesdialog.ui:195
+#: cui/uiconfig/ui/fontfeaturesdialog.ui:297
 msgctxt "fontfeaturesdialog|extended_tip|FontFeaturesDialog"
 msgid "Select and apply font typographical features to characters."
 msgstr "Marker og anvend skrifttypografiske funktioner på tegn."
@@ -9473,32 +9502,68 @@ msgctxt "formatcellsdialog|FormatCellsDialog"
 msgid "Table Properties"
 msgstr "Tabelegenskaber"
 
+#. w4N7S
+#: cui/uiconfig/ui/formatcellsdialog.ui:38
+msgctxt "formatcellsdialog|standard"
+msgid "_Standard"
+msgstr ""
+
 #. aCkau
-#: cui/uiconfig/ui/formatcellsdialog.ui:138
+#: cui/uiconfig/ui/formatcellsdialog.ui:125
 msgctxt "formatcellsdialog|name"
 msgid "Font"
 msgstr "Skrifttype"
 
 #. zJZxA
-#: cui/uiconfig/ui/formatcellsdialog.ui:185
+#: cui/uiconfig/ui/formatcellsdialog.ui:148
 msgctxt "formatcellsdialog|effects"
 msgid "Font Effects"
 msgstr "Skrifteffekter"
 
+#. R2G6r
+#: cui/uiconfig/ui/formatcellsdialog.ui:172
+msgctxt "formatcellsdialog|position"
+msgid "Position"
+msgstr ""
+
+#. CxV6A
+#: cui/uiconfig/ui/formatcellsdialog.ui:196
+msgctxt "formatcellsdialog|highlight"
+msgid "Highlighting"
+msgstr ""
+
+#. TM6fA
+#: cui/uiconfig/ui/formatcellsdialog.ui:220
+msgctxt "formatcellsdialog|indentspacing"
+msgid "Indents & Spacing"
+msgstr ""
+
+#. gfAJa
+#: cui/uiconfig/ui/formatcellsdialog.ui:244
+msgctxt "formatcellsdialog|asian"
+msgid "Asian Typography"
+msgstr ""
+
+#. iuvXW
+#: cui/uiconfig/ui/formatcellsdialog.ui:268
+msgctxt "formatcellsdialog|alignment"
+msgid "Alignment"
+msgstr ""
+
 #. Pz8yJ
-#: cui/uiconfig/ui/formatcellsdialog.ui:233
+#: cui/uiconfig/ui/formatcellsdialog.ui:292
 msgctxt "formatcellsdialog|border"
 msgid "Borders"
 msgstr "Kanter"
 
 #. wk9fG
-#: cui/uiconfig/ui/formatcellsdialog.ui:281
+#: cui/uiconfig/ui/formatcellsdialog.ui:316
 msgctxt "formatcellsdialog|area"
 msgid "Background"
 msgstr "Baggrund"
 
 #. 8JNHE
-#: cui/uiconfig/ui/formatcellsdialog.ui:329
+#: cui/uiconfig/ui/formatcellsdialog.ui:340
 msgctxt "formatcellsdialog|shadow"
 msgid "Shadow"
 msgstr "Skygge"
@@ -9808,7 +9873,7 @@ msgstr "Indsæt det lodrette begyndelsespunkt i overgangen, hvor 0% svarer til d
 #: cui/uiconfig/ui/gradientpage.ui:393
 msgctxt "gradientpage|borderft"
 msgid "_Border:"
-msgstr "Kant:"
+msgstr ""
 
 #. iZbnF
 #: cui/uiconfig/ui/gradientpage.ui:427
@@ -11915,69 +11980,69 @@ msgid "Deletes the selected JRE start parameter."
 msgstr "Sletter den valgte startparameter Java-afviklingsmiljøet (Java Runtime Environment - JRE)."
 
 #. ucDEJ
-#: cui/uiconfig/ui/langtoolconfigpage.ui:29
+#: cui/uiconfig/ui/langtoolconfigpage.ui:33
 msgctxt "langtoolconfigpage|disclaimer"
 msgid "If you enable this, the data will be sent to an external server."
 msgstr ""
 
 #. kF4mt
-#: cui/uiconfig/ui/langtoolconfigpage.ui:39
+#: cui/uiconfig/ui/langtoolconfigpage.ui:48
 msgctxt "langtoolconfigpage|policy"
 msgid "Please read the privacy policy"
 msgstr ""
 
 #. ZRJcn
-#: cui/uiconfig/ui/langtoolconfigpage.ui:55
+#: cui/uiconfig/ui/langtoolconfigpage.ui:63
 msgctxt "langtoolconfigpage|activate"
 msgid "Enable LanguageTool"
 msgstr ""
 
+#. Ntss5
+#: cui/uiconfig/ui/langtoolconfigpage.ui:81
+msgctxt "langtoolconfigpage|langtoolsettings"
+msgid "LanguageTool API Options"
+msgstr ""
+
 #. tUmXv
-#: cui/uiconfig/ui/langtoolconfigpage.ui:86
+#: cui/uiconfig/ui/langtoolconfigpage.ui:115
 msgctxt "langtoolconfigpage|base"
 msgid "Base URL:"
 msgstr ""
 
 #. z58D6
-#: cui/uiconfig/ui/langtoolconfigpage.ui:111
+#: cui/uiconfig/ui/langtoolconfigpage.ui:141
 msgctxt "langtoolconfigpage|usernamelbl"
 msgid "Username:"
 msgstr ""
 
 #. B8kMr
-#: cui/uiconfig/ui/langtoolconfigpage.ui:125
+#: cui/uiconfig/ui/langtoolconfigpage.ui:155
 msgctxt "langtoolconfigpage|apikeylbl"
 msgid "API key:"
 msgstr ""
 
-#. LBMkb
-#: cui/uiconfig/ui/langtoolconfigpage.ui:159
+#. UDGnD
+#: cui/uiconfig/ui/langtoolconfigpage.ui:191
 msgctxt "langtoolconfigpage|urldesc"
-msgid "Please use the base URL, i.e., without “/check”, at the end."
+msgid "Please use the base URL, i.e., without “/check” at the end."
 msgstr ""
 
 #. 77oav
-#: cui/uiconfig/ui/langtoolconfigpage.ui:174
+#: cui/uiconfig/ui/langtoolconfigpage.ui:211
 msgctxt "langtoolconfigpage|usernamedesc"
 msgid "Your LanguageTool account’s username for premium usage."
 msgstr ""
 
 #. tGuAh
-#: cui/uiconfig/ui/langtoolconfigpage.ui:189
+#: cui/uiconfig/ui/langtoolconfigpage.ui:231
 msgctxt "langtoolconfigpage|apikeydesc"
 msgid "Your LanguageTool account’s API key for premium usage."
 msgstr ""
 
 #. Dn8bb
-#: cui/uiconfig/ui/langtoolconfigpage.ui:215
+#: cui/uiconfig/ui/langtoolconfigpage.ui:261
 msgctxt "langtoolconfigpage|apisettingsheader"
 msgid "API Settings"
-msgstr ""
-
-#. Ntss5
-#: cui/uiconfig/ui/langtoolconfigpage.ui:234
-msgctxt "langtoolconfigpage|langtoolsettings"
-msgid "LanguageTool API Options"
 msgstr ""
 
 #. RdoKs
@@ -12014,7 +12079,7 @@ msgstr "Piletyper"
 #: cui/uiconfig/ui/lineendstabpage.ui:66
 msgctxt "lineendstabpage|FT_TITLE"
 msgid "Style _name:"
-msgstr ""
+msgstr "Typografinavn:"
 
 #. iGG25
 #: cui/uiconfig/ui/lineendstabpage.ui:80
@@ -12026,25 +12091,25 @@ msgstr "Piletyper:"
 #: cui/uiconfig/ui/lineendstabpage.ui:148
 msgctxt "lineendstabpage|BTN_ADD|tooltip_text"
 msgid "Adds selected shape as Arrow Style."
-msgstr ""
+msgstr "Tilføjer den valgte figur som Piletypografi."
 
 #. 3vvkz
 #: cui/uiconfig/ui/lineendstabpage.ui:152
 msgctxt "lineendstabpage|extended_tip|BTN_ADD"
 msgid "To add a new Arrow Style, first select the shape in the document to be added, then open this dialog and press Add. If the selected shape is not permitted as an Arrow Style, then the Add button is not active."
-msgstr ""
+msgstr "For at tilføje en ny Piletypografi vælger du først den figur i dokumentet, der skal tilføjes, og åbner derefter denne dialog og trykker på Tilføj. Hvis den valgte figur ikke er tilladt som Piletypografi, er knappen Tilføj ikke aktiv."
 
 #. hvDgC
 #: cui/uiconfig/ui/lineendstabpage.ui:164
 msgctxt "lineendstabpage|BTN_MODIFY"
 msgid "_Rename"
-msgstr ""
+msgstr "Omdøb"
 
 #. cQTAi
 #: cui/uiconfig/ui/lineendstabpage.ui:168
 msgctxt "lineendstabpage|BTN_MODIFY|tooltip_text"
 msgid "Applies changes to the Style name."
-msgstr ""
+msgstr "Anvender ændringerne på Typografinavnet"
 
 #. iQUys
 #: cui/uiconfig/ui/lineendstabpage.ui:186
@@ -12068,7 +12133,7 @@ msgstr "Gem piletyper"
 #: cui/uiconfig/ui/lineendstabpage.ui:302
 msgctxt "lineendstabpage|label1"
 msgid "Manage Arrow Styles"
-msgstr ""
+msgstr "Håndter piletypografier"
 
 #. F3Hkn
 #: cui/uiconfig/ui/linestyletabpage.ui:99
@@ -12420,14 +12485,20 @@ msgctxt "macroassignpage|extended_tip|delete"
 msgid "Deletes the macro or component assignment for the selected event."
 msgstr "Sletter makroen eller komponenttildeloingen for den markerede hændelse."
 
+#. DASAB
+#: cui/uiconfig/ui/macroassignpage.ui:186
+msgctxt "macroassignpage|deleteall"
+msgid "Remove _All"
+msgstr ""
+
 #. CqT9E
-#: cui/uiconfig/ui/macroassignpage.ui:190
+#: cui/uiconfig/ui/macroassignpage.ui:204
 msgctxt "macroassignpage|label1"
 msgid "Assign"
 msgstr "Tildel"
 
 #. v49A4
-#: cui/uiconfig/ui/macroassignpage.ui:204
+#: cui/uiconfig/ui/macroassignpage.ui:218
 msgctxt "macroassignpage|extended_tip|MacroAssignPage"
 msgid "Assigns macros to program events. The assigned macro runs automatically every time the selected event occurs."
 msgstr "Tilknytter makroer til programbegivenheder. De tilknyttede makroer afvikles automatisk, hver gang de valgte begivenheder optræder."
@@ -12643,103 +12714,103 @@ msgid "Contains commands to modify or delete the selected toolbar, and the comma
 msgstr "Indeholder kommandoer til at ændre eller slette den valgte værktøjslinje og kommandoen til at tilføje nye værktøjslinjer."
 
 #. w7EFX
-#: cui/uiconfig/ui/menuassignpage.ui:686
+#: cui/uiconfig/ui/menuassignpage.ui:688
 msgctxt "menuassignpage|insert"
 msgid "_Insert"
 msgstr "_Indsæt"
 
 #. Q69cQ
-#: cui/uiconfig/ui/menuassignpage.ui:710
+#: cui/uiconfig/ui/menuassignpage.ui:712
 msgctxt "menuassignpage|modify"
 msgid "_Modify"
 msgstr "_Ændr"
 
 #. Cwu32
-#: cui/uiconfig/ui/menuassignpage.ui:734
+#: cui/uiconfig/ui/menuassignpage.ui:736
 msgctxt "menuassignpage|defaultsbtn"
 msgid "_Defaults"
 msgstr "_Standarder"
 
 #. taFyJ
-#: cui/uiconfig/ui/menuassignpage.ui:745
+#: cui/uiconfig/ui/menuassignpage.ui:747
 msgctxt "menuassignpage|defaultsbtn"
 msgid "Resets the selected toolbar, menu, or context menu to its default state."
 msgstr "Nulstiller den valgte værktøjslinje, menu eller kontekstmenu til sin standardtilstand."
 
 #. B32nz
-#: cui/uiconfig/ui/menuassignpage.ui:781
+#: cui/uiconfig/ui/menuassignpage.ui:783
 msgctxt "menuassignpage|add"
 msgid "Add item"
 msgstr "Tilføj element"
 
 #. JrYMp
-#: cui/uiconfig/ui/menuassignpage.ui:789
+#: cui/uiconfig/ui/menuassignpage.ui:791
 msgctxt "menuassignpage|extended_tip|add"
 msgid "Click on the right arrow button to select a function on the left display box and copy to the right display box. This will add the function to the selected menu."
 msgstr "Klik på højrepil-knappen for at markere en funktion i den venstre boks og kopiere den til den højre boks. Dette vil føje funktionen til den markerede menu."
 
 #. iree8
-#: cui/uiconfig/ui/menuassignpage.ui:815
+#: cui/uiconfig/ui/menuassignpage.ui:817
 msgctxt "menuassignpage|remove"
 msgid "Remove item"
 msgstr "Fjern element"
 
 #. AsenA
-#: cui/uiconfig/ui/menuassignpage.ui:823
+#: cui/uiconfig/ui/menuassignpage.ui:825
 msgctxt "menuassignpage|extended_tip|remove"
 msgid "Click on the left arrow button to remove the selected command from the current menu."
 msgstr "Klik på venstrepil-knappen for at fjerne den markerede kommando fra den aktuelle menu."
 
 #. t7BYP
-#: cui/uiconfig/ui/menuassignpage.ui:856
+#: cui/uiconfig/ui/menuassignpage.ui:858
 msgctxt "menuassignpage|moveupbtn"
 msgid "Move up"
 msgstr "Flyt op"
 
 #. BH9fq
-#: cui/uiconfig/ui/menuassignpage.ui:861
+#: cui/uiconfig/ui/menuassignpage.ui:863
 msgctxt "menuassignpage|extended_tip|up"
 msgid "Click on the Up or Down arrows on the right to move the selected command upward or downward in the list of displayed menu commands."
 msgstr "Klik på Oppil eller Nedpil til højre for at flytte den markerede kommande opad eller ned på listen over de viste kommandoer."
 
 #. S6K2N
-#: cui/uiconfig/ui/menuassignpage.ui:875
+#: cui/uiconfig/ui/menuassignpage.ui:877
 msgctxt "menuassignpage|movedownbtn"
 msgid "Move down"
 msgstr "Flyt ned"
 
 #. RCKEK
-#: cui/uiconfig/ui/menuassignpage.ui:880
+#: cui/uiconfig/ui/menuassignpage.ui:882
 msgctxt "menuassignpage|extended_tip|down"
 msgid "Click on the Up or Down arrows on the right to move the selected command upward or downward in the list of displayed menu commands."
 msgstr "Klik på Oppil eller Nedpil til højre for at flytte den markerede kommande opad eller ned på listen over de viste kommandoer."
 
 #. fto8m
-#: cui/uiconfig/ui/menuassignpage.ui:900
+#: cui/uiconfig/ui/menuassignpage.ui:902
 msgctxt "menuassignpage|scopelabel"
 msgid "S_cope"
 msgstr "Omfang"
 
 #. SLinm
-#: cui/uiconfig/ui/menuassignpage.ui:913
+#: cui/uiconfig/ui/menuassignpage.ui:915
 msgctxt "menuassignpage|targetlabel"
 msgid "_Target"
 msgstr "_Mål"
 
 #. cZEBZ
-#: cui/uiconfig/ui/menuassignpage.ui:926
+#: cui/uiconfig/ui/menuassignpage.ui:928
 msgctxt "menuassignpage|functionlabel"
 msgid "Assi_gned Commands"
 msgstr "Til_delte kommandoer"
 
 #. AZQ8V
-#: cui/uiconfig/ui/menuassignpage.ui:939
+#: cui/uiconfig/ui/menuassignpage.ui:941
 msgctxt "menuassignpage|customizelabel"
 msgid "_Customize"
 msgstr "_Tilpas"
 
 #. w3brP
-#: cui/uiconfig/ui/menuassignpage.ui:998
+#: cui/uiconfig/ui/menuassignpage.ui:1000
 msgctxt "menuassignpage|extended_tip|MenuAssignPage"
 msgid "Lets you customize the office suite menus for all modules."
 msgstr "Lader dig tilpasse kontorpakkens menuer i alle moduler."
@@ -13696,35 +13767,35 @@ msgctxt "objecttitledescdialog|ObjectTitleDescDialog"
 msgid "Description"
 msgstr "Beskrivelse"
 
-#. E4YpG
-#: cui/uiconfig/ui/objecttitledescdialog.ui:92
-msgctxt "objecttitledescdialog|object_title_label"
-msgid "_Text Alternative:"
-msgstr ""
-
 #. Ge74Q
-#: cui/uiconfig/ui/objecttitledescdialog.ui:94
+#: cui/uiconfig/ui/objecttitledescdialog.ui:92
 msgctxt "objecttitledescdialog|object_title_label|tooltip_text"
 msgid "Give a short description of non-text content for users who do not see this object."
-msgstr ""
+msgstr "Giv en kort beskrivelse af ikke-tekst-indholdet til brugere, som ikke ser dette objekt."
 
-#. mMZoM
+#. E4YpG
+#: cui/uiconfig/ui/objecttitledescdialog.ui:93
+msgctxt "objecttitledescdialog|object_title_label"
+msgid "_Text Alternative:"
+msgstr "_Tekst-alternativ:"
+
+#. Gqfxb
 #: cui/uiconfig/ui/objecttitledescdialog.ui:113
 msgctxt "objecttitledescdialog|extended_tip|object_title_entry"
-msgid "Enter a title text. This short name is visible as an alternative tag in HTML format. Accessibility tools can read this text."
-msgstr "Indtast en titel. Dette korte navn er synligt som et alternativt mærke i HTML-format. Tilgængelighedsværktøjer kan læse denne tekst."
+msgid "Enter a title text. This short name is visible as an \"alt\" tag in HTML format. Accessibility tools can read this text."
+msgstr ""
+
+#. EFUyD
+#: cui/uiconfig/ui/objecttitledescdialog.ui:127
+msgctxt "objecttitledescdialog|desc_label|tooltip_text"
+msgid "Give longer explanation of non-text content that is too complex to be described briefly in “Text Alternative”"
+msgstr "Giv en længere forklaring om ikke-tekst-indhold, der er for kompliceret til at beskrives kort i \"Tekst-alternativ\""
 
 #. kDbQ9
-#: cui/uiconfig/ui/objecttitledescdialog.ui:127
+#: cui/uiconfig/ui/objecttitledescdialog.ui:128
 msgctxt "objecttitledescdialog|desc_label"
 msgid "_Description:"
 msgstr "Beskrivelse:"
-
-#. EFUyD
-#: cui/uiconfig/ui/objecttitledescdialog.ui:129
-msgctxt "objecttitledescdialog|desc_label|tooltip_text"
-msgid "Give longer explanation of non-text content that is too complex to be described briefly in “Text Alternative”"
-msgstr ""
 
 #. vT3u9
 #: cui/uiconfig/ui/objecttitledescdialog.ui:151
@@ -13733,7 +13804,7 @@ msgid "Enter a description text. The long description text can be entered to des
 msgstr "Indtast en beskrivende tekst. Den lange beskrivelsestekst kan indtastes for at beskrive et komplekst objekt eller en kompleks gruppe af objekter til brugere med skærmlæsersoftware. Beskrivelsen er synlig som et alternativt mærke for tilgængelighedsværktøjer."
 
 #. 8BCe3
-#: cui/uiconfig/ui/objecttitledescdialog.ui:182
+#: cui/uiconfig/ui/objecttitledescdialog.ui:179
 msgctxt "objecttitledescdialog|extended_tip|ObjectTitleDescDialog"
 msgid "Assigns a title and a description to the selected object. These are accessible for accessibility tools and as alternative tags when you export the document."
 msgstr "Tildeler en titel og en beskrivelse til det valgte objekt. Disse er tilgængelige for tilgængelighedsværktøjer og som alternative mærker (tags), når du eksporterer dokumentet."
@@ -13792,50 +13863,68 @@ msgctxt "optaccessibilitypage|label1"
 msgid "Miscellaneous Options"
 msgstr "Andre indstillinger"
 
-#. pLAWF
-#: cui/uiconfig/ui/optaccessibilitypage.ui:140
-msgctxt "optaccessibilitypage|autodetecthc"
-msgid "Automatically _detect high contrast mode of operating system"
-msgstr " Detekter automatisk operativsystemets høj kontrast-tilstand."
+#. fRGUu
+#: cui/uiconfig/ui/optaccessibilitypage.ui:149
+msgctxt "optaccessibilitypage|label13"
+msgid "High contrast:"
+msgstr ""
 
-#. oF9CC
-#: cui/uiconfig/ui/optaccessibilitypage.ui:148
-msgctxt "extended_tip|autodetecthc"
-msgid "Switches the office suite into high contrast mode when the system background color is very dark."
-msgstr "Sætter kontorpakken i højkontrast-tilstand, når systemets baggrundsfarve er meget mørk."
+#. KHEv8
+#: cui/uiconfig/ui/optaccessibilitypage.ui:166
+msgctxt "optaccessibilitypage|highcontrast"
+msgid "Automatic"
+msgstr ""
+
+#. EwVi9
+#: cui/uiconfig/ui/optaccessibilitypage.ui:167
+msgctxt "optaccessibilitypage|highcontrast"
+msgid "Disable"
+msgstr ""
+
+#. NbxkL
+#: cui/uiconfig/ui/optaccessibilitypage.ui:168
+msgctxt "optaccessibilitypage|highcontrast"
+msgid "Enable"
+msgstr ""
+
+#. YA7wn
+#: cui/uiconfig/ui/optaccessibilitypage.ui:172
+msgctxt "extended_tip|highcontrast"
+msgid "Controls if high contrast mode is used. Select from “Automatic”, “Disable” and “Enable”. “Automatic” uses high contrast according to system settings."
+msgstr ""
 
 #. Sc8Cq
-#: cui/uiconfig/ui/optaccessibilitypage.ui:160
+#: cui/uiconfig/ui/optaccessibilitypage.ui:190
 msgctxt "optaccessibilitypage|autofontcolor"
 msgid "Use automatic font _color for screen display"
 msgstr "Brug automatisk skrift_farve på skærmen"
 
 #. BAnK4
-#: cui/uiconfig/ui/optaccessibilitypage.ui:168
+#: cui/uiconfig/ui/optaccessibilitypage.ui:198
 msgctxt "extended_tip|autofontcolor"
 msgid "Displays fonts in the office suite using the system color settings. This option only affects the screen display."
 msgstr "Viser skrifttyper i kontorpakken med systemets farveindstillinger. Denne indstilling påvirker kun skærmvisningen."
 
 #. n24Cd
-#: cui/uiconfig/ui/optaccessibilitypage.ui:180
+#: cui/uiconfig/ui/optaccessibilitypage.ui:210
 msgctxt "optaccessibilitypage|systempagepreviewcolor"
 msgid "_Use system colors for page previews"
 msgstr "_Brug systemets farver til vis udskrift"
 
 #. DRkNv
-#: cui/uiconfig/ui/optaccessibilitypage.ui:188
+#: cui/uiconfig/ui/optaccessibilitypage.ui:218
 msgctxt "extended_tip|systempagepreviewcolor"
 msgid "Applies the high contrast settings of the operating system to page previews."
 msgstr "Anvender operativsystemets indstillinger for høj kontrast i udskriftsvisningen."
 
 #. hGpaw
-#: cui/uiconfig/ui/optaccessibilitypage.ui:204
+#: cui/uiconfig/ui/optaccessibilitypage.ui:234
 msgctxt "optaccessibilitypage|label2"
 msgid "Options for High Contrast Appearance"
 msgstr "Indstillinger for høj kontrast"
 
 #. cocVg
-#: cui/uiconfig/ui/optaccessibilitypage.ui:219
+#: cui/uiconfig/ui/optaccessibilitypage.ui:249
 msgctxt "extended_tip|OptAccessibilityPage"
 msgid "Sets options that make the office suite programs more accessible for users with reduced sight, limited dexterity or other disabilities."
 msgstr "Sæt indstillinger, der gør kontorpakkens programmer mere tilgængelige for brugere med nedsat syn, begrænset bevægelighed eller andre handicaps."
@@ -14416,6 +14505,30 @@ msgctxt "extended_tip|OptCTLPage"
 msgid "Defines the options for documents with complex text layouts."
 msgstr "Definerer indstillingerne for dokumenter med Complex Text Layout (CTL)."
 
+#. xE3dG
+#: cui/uiconfig/ui/optdeeplpage.ui:29
+msgctxt "optdeeplpage|privacy"
+msgid "Please read the privacy policy"
+msgstr ""
+
+#. F4GTM
+#: cui/uiconfig/ui/optdeeplpage.ui:54
+msgctxt "optdeeplpage|privacy"
+msgid "API URL:"
+msgstr ""
+
+#. HHJta
+#: cui/uiconfig/ui/optdeeplpage.ui:68
+msgctxt "optdeeplpage|label3"
+msgid "Authentication key:"
+msgstr ""
+
+#. tcBQE
+#: cui/uiconfig/ui/optdeeplpage.ui:113
+msgctxt "optdeeplpage|label1"
+msgid "DeepL API Options"
+msgstr ""
+
 #. G5EDD
 #: cui/uiconfig/ui/optemailpage.ui:31
 msgctxt "optemailpage|label2"
@@ -14913,49 +15026,49 @@ msgid "Sen_d crash reports to The Document Foundation"
 msgstr "Send nedbrudsrapporter til  The Document Foundation"
 
 #. rS3dG
-#: cui/uiconfig/ui/optgeneralpage.ui:304
+#: cui/uiconfig/ui/optgeneralpage.ui:307
 msgctxt "optgeneralpage|label7"
 msgid "Help Improve %PRODUCTNAME"
 msgstr "Hjælp med at forbedre %PRODUCTNAME"
 
 #. 2MFwd
-#: cui/uiconfig/ui/optgeneralpage.ui:332
+#: cui/uiconfig/ui/optgeneralpage.ui:335
 msgctxt "optgeneralpage|quicklaunch"
 msgid "Load %PRODUCTNAME during system start-up"
 msgstr "Indlæs %PRODUCTNAME ved systemstart"
 
 #. MKruH
-#: cui/uiconfig/ui/optgeneralpage.ui:346
+#: cui/uiconfig/ui/optgeneralpage.ui:349
 msgctxt "optgeneralpage|systray"
 msgid "Enable systray Quickstarter"
 msgstr "Aktiver Hurtigstart i systembakken"
 
 #. 8vGvu
-#: cui/uiconfig/ui/optgeneralpage.ui:364
+#: cui/uiconfig/ui/optgeneralpage.ui:367
 msgctxt "optgeneralpage|label8"
 msgid "%PRODUCTNAME Quickstarter"
 msgstr "%PRODUCTNAME Hurtigstart"
 
 #. FvigS
-#: cui/uiconfig/ui/optgeneralpage.ui:391
+#: cui/uiconfig/ui/optgeneralpage.ui:394
 msgctxt "optgeneralpage|fileassoc"
 msgid "Windows Default apps"
 msgstr "Windows standardapper"
 
 #. 2EWmE
-#: cui/uiconfig/ui/optgeneralpage.ui:405
+#: cui/uiconfig/ui/optgeneralpage.ui:408
 msgctxt "optgeneralpage|FileExtCheckCheckbox"
 msgid "Perform check for default file associations on start-up"
 msgstr "Udfør tjek for standard fil-tilknytninger ved opstart"
 
 #. fXjVB
-#: cui/uiconfig/ui/optgeneralpage.ui:423
+#: cui/uiconfig/ui/optgeneralpage.ui:426
 msgctxt "optgeneralpage|fileassoc"
 msgid "%PRODUCTNAME File Associations"
 msgstr "%PRODUCTNAME Filtilknytninger"
 
 #. KyK5F
-#: cui/uiconfig/ui/optgeneralpage.ui:437
+#: cui/uiconfig/ui/optgeneralpage.ui:443
 msgctxt "extended_tip | OptGeneralPage"
 msgid "Specifies the general settings for the office suite."
 msgstr "Angiver kontorpakkens generelle indstillinger."
@@ -15855,97 +15968,97 @@ msgid "Last checked: %DATE%, %TIME%"
 msgstr "Seneste kontrol: %DATE%, %TIME%"
 
 #. rw57A
-#: cui/uiconfig/ui/optonlineupdatepage.ui:169
+#: cui/uiconfig/ui/optonlineupdatepage.ui:172
 msgctxt "optonlineupdatepage|neverchecked"
 msgid "Last checked: Not yet"
 msgstr "Senest kontrolleret: Endnu ikke"
 
 #. DWDdu
-#: cui/uiconfig/ui/optonlineupdatepage.ui:209
+#: cui/uiconfig/ui/optonlineupdatepage.ui:215
 msgctxt "optonlineupdatepage|autodownload"
 msgid "_Download updates automatically"
 msgstr "_Hent opdateringer automatisk"
 
 #. 5TCn4
-#: cui/uiconfig/ui/optonlineupdatepage.ui:218
+#: cui/uiconfig/ui/optonlineupdatepage.ui:224
 msgctxt "extended_tip|autodownload"
 msgid "Enable the automatic download of updates to the specified folder."
 msgstr "Aktivér automatisk download af opdateringer til den angivne mappe."
 
 #. AmVMh
-#: cui/uiconfig/ui/optonlineupdatepage.ui:238
+#: cui/uiconfig/ui/optonlineupdatepage.ui:244
 msgctxt "optonlineupdatepage|changepath"
 msgid "Ch_ange..."
 msgstr "_Skift..."
 
 #. mCu2A
-#: cui/uiconfig/ui/optonlineupdatepage.ui:246
+#: cui/uiconfig/ui/optonlineupdatepage.ui:252
 msgctxt "extended_tip|changepath"
 msgid "Click to select the destination folder for downloaded files."
 msgstr "Klik for at vælge målfolderen for downloadede filer."
 
 #. iCVFj
-#: cui/uiconfig/ui/optonlineupdatepage.ui:264
+#: cui/uiconfig/ui/optonlineupdatepage.ui:270
 msgctxt "optonlineupdatepage|destpathlabel"
 msgid "Download destination:"
 msgstr "Hent til:"
 
 #. j2D7W
-#: cui/uiconfig/ui/optonlineupdatepage.ui:268
+#: cui/uiconfig/ui/optonlineupdatepage.ui:274
 msgctxt "extended_tip|destpathlabel"
 msgid "Click to select the destination folder for downloaded files."
 msgstr "Klik for at vælge målfolderen for downloadede filer."
 
 #. vDRC5
-#: cui/uiconfig/ui/optonlineupdatepage.ui:310
+#: cui/uiconfig/ui/optonlineupdatepage.ui:316
 msgctxt "optonlineupdatepage|labeldest"
 msgid "Download Destination"
 msgstr "Download-mål"
 
 #. JqAh4
-#: cui/uiconfig/ui/optonlineupdatepage.ui:341
+#: cui/uiconfig/ui/optonlineupdatepage.ui:347
 msgctxt "optonlineupdatepage|extrabits"
 msgid "_Send OS version and basic hardware information"
 msgstr "_Send operativsystemversion og grundlæggende hardwareoplysninger"
 
 #. b95Sc
-#: cui/uiconfig/ui/optonlineupdatepage.ui:345
+#: cui/uiconfig/ui/optonlineupdatepage.ui:351
 msgctxt "optonlineupdatepage|extrabits|tooltip_text"
 msgid "This information lets us make optimizations for your hardware and operating system."
 msgstr "Disse oplysninger gør at vi kan lave optimeringer til din hardware og dit operativsystem."
 
 #. f2Wtr
-#: cui/uiconfig/ui/optonlineupdatepage.ui:366
+#: cui/uiconfig/ui/optonlineupdatepage.ui:372
 msgctxt "optonlineupdatepage|useragent_label"
 msgid "User Agent:"
 msgstr "Brugerprogram:"
 
 #. agWbu
-#: cui/uiconfig/ui/optonlineupdatepage.ui:378
+#: cui/uiconfig/ui/optonlineupdatepage.ui:387
 msgctxt "optonlineupdatepage|useragent_changed"
 msgid "Hit apply to update"
 msgstr "Klik anvend for at opdatere"
 
 #. ZC9EF
-#: cui/uiconfig/ui/optonlineupdatepage.ui:412
+#: cui/uiconfig/ui/optonlineupdatepage.ui:427
 msgctxt "optonlineupdatepage|labelagent"
 msgid "User Agent"
 msgstr "Bruger-agent"
 
 #. kEnsC
-#: cui/uiconfig/ui/optonlineupdatepage.ui:427
+#: cui/uiconfig/ui/optonlineupdatepage.ui:442
 msgctxt "optonlineupdatepage|privacy"
 msgid "Privacy Policy"
 msgstr "Privatlivspolitik"
 
 #. 3J5As
-#: cui/uiconfig/ui/optonlineupdatepage.ui:445
+#: cui/uiconfig/ui/optonlineupdatepage.ui:460
 msgctxt "optonlineupdatepage|label1"
 msgid "Online Update Options"
 msgstr "Indstillinger for onlineopdatering"
 
 #. MdSsA
-#: cui/uiconfig/ui/optonlineupdatepage.ui:453
+#: cui/uiconfig/ui/optonlineupdatepage.ui:468
 msgctxt "extended_tip|OptOnlineUpdatePage"
 msgid "Specifies some options for the automatic notification and downloading of online updates to the office suite."
 msgstr "Angiver nogle indstillinger for automatisk notifikation og download af online-opdateringer til kontorpakken."
@@ -17313,116 +17426,152 @@ msgctxt "optviewpage|label1"
 msgid "Icon Theme"
 msgstr "Ikontema"
 
-#. stYtM
+#. zXaFc
 #: cui/uiconfig/ui/optviewpage.ui:503
+msgctxt "optviewpage|appearance"
+msgid "System"
+msgstr ""
+
+#. S3ogK
+#: cui/uiconfig/ui/optviewpage.ui:504
+msgctxt "optviewpage|appearance"
+msgid "Light"
+msgstr ""
+
+#. qYSap
+#: cui/uiconfig/ui/optviewpage.ui:505
+msgctxt "optviewpage|appearance"
+msgid "Dark"
+msgstr ""
+
+#. qfbPT
+#: cui/uiconfig/ui/optviewpage.ui:509
+msgctxt "extended_tip | appearance"
+msgid "Specifies whether to follow the system appearance mode or override Dark or Light."
+msgstr ""
+
+#. nzLbn
+#: cui/uiconfig/ui/optviewpage.ui:522
+msgctxt "optviewpage|label7"
+msgid "Mode:"
+msgstr ""
+
+#. Nrc4k
+#: cui/uiconfig/ui/optviewpage.ui:538
+msgctxt "optviewpage|label16"
+msgid "Appearance"
+msgstr ""
+
+#. stYtM
+#: cui/uiconfig/ui/optviewpage.ui:573
 msgctxt "optviewpage|grid3|tooltip_text"
 msgid "Requires restart"
 msgstr "Kræver genstart"
 
 #. R2ZAF
-#: cui/uiconfig/ui/optviewpage.ui:509
+#: cui/uiconfig/ui/optviewpage.ui:579
 msgctxt "optviewpage|useaccel"
 msgid "Use hard_ware acceleration"
 msgstr "Brug hardwareacceleration"
 
 #. qw73y
-#: cui/uiconfig/ui/optviewpage.ui:518
+#: cui/uiconfig/ui/optviewpage.ui:588
 msgctxt "extended_tip | useaccel"
 msgid "Directly accesses hardware features of the graphical display adapter to improve the screen display."
 msgstr "Du kan tilgå hardwarefunktionerne for dit grafikkort for at forbedre skærmfremvisningen."
 
 #. 2MWvd
-#: cui/uiconfig/ui/optviewpage.ui:529
+#: cui/uiconfig/ui/optviewpage.ui:599
 msgctxt "optviewpage|useaa"
 msgid "Use anti-a_liasing"
 msgstr "Brug anti-aliasing"
 
 #. fUKV9
-#: cui/uiconfig/ui/optviewpage.ui:538
+#: cui/uiconfig/ui/optviewpage.ui:608
 msgctxt "extended_tip | useaa"
 msgid "When supported, you can enable and disable anti-aliasing of graphics. With anti-aliasing enabled, the display of most graphical objects looks smoother and with less artifacts."
 msgstr "Når det er understøttet, kan du aktivere og deaktivere anti-aliasing af grafik. Når anti-aliasing er aktiveret, vil de fleste grafiske objekter fremstå glattere."
 
 #. ppJKg
-#: cui/uiconfig/ui/optviewpage.ui:549
+#: cui/uiconfig/ui/optviewpage.ui:619
 msgctxt "optviewpage|useskia"
 msgid "Use Skia for all rendering"
 msgstr "Brug Skia til al tegning"
 
 #. RFqrA
-#: cui/uiconfig/ui/optviewpage.ui:563
+#: cui/uiconfig/ui/optviewpage.ui:633
 msgctxt "optviewpage|forceskiaraster"
 msgid "Force Skia software rendering"
 msgstr "Gennemtving Skia software gengivelse"
 
 #. DTMxy
-#: cui/uiconfig/ui/optviewpage.ui:567
+#: cui/uiconfig/ui/optviewpage.ui:637
 msgctxt "optviewpage|forceskia|tooltip_text"
 msgid "Requires restart. Enabling this will prevent the use of graphics drivers."
 msgstr "Genstart nødvendig, Aktivering af dette vil forhindre brug af grafikdrivere."
 
 #. 5pA7K
-#: cui/uiconfig/ui/optviewpage.ui:581
+#: cui/uiconfig/ui/optviewpage.ui:651
 msgctxt "optviewpage|skiaenabled"
 msgid "Skia is currently enabled."
 msgstr "Skia er aktiveret i øjeblikket."
 
 #. yDGEV
-#: cui/uiconfig/ui/optviewpage.ui:593
+#: cui/uiconfig/ui/optviewpage.ui:663
 msgctxt "optviewpage|skiadisabled"
 msgid "Skia is currently disabled."
 msgstr "Skia er deaktiveret i øjeblikket."
 
 #. sy9iz
-#: cui/uiconfig/ui/optviewpage.ui:607
+#: cui/uiconfig/ui/optviewpage.ui:677
 msgctxt "optviewpage|label2"
 msgid "Graphics Output"
 msgstr "Grafikoutput"
 
 #. B6DLD
-#: cui/uiconfig/ui/optviewpage.ui:635
+#: cui/uiconfig/ui/optviewpage.ui:705
 msgctxt "optviewpage|showfontpreview"
 msgid "Show p_review of fonts"
 msgstr "_Forhåndsvisning af skrifttyper"
 
 #. 7Qidy
-#: cui/uiconfig/ui/optviewpage.ui:644
+#: cui/uiconfig/ui/optviewpage.ui:714
 msgctxt "extended_tip | showfontpreview"
 msgid "Displays the names of selectable fonts in the corresponding font, for example, fonts in the Font box on the Formatting bar."
 msgstr "Viser navnene på tilgængelige skrifttyper i den tilsvarende skrifttype, for eksempel skrifttyper i feltet Skrifttype på værktøjslinjen Formatering."
 
 #. 2FKuk
-#: cui/uiconfig/ui/optviewpage.ui:655
+#: cui/uiconfig/ui/optviewpage.ui:725
 msgctxt "optviewpage|aafont"
 msgid "Screen font antialiasin_g"
 msgstr "Trim skærmskrifttyper"
 
 #. 5QEjG
-#: cui/uiconfig/ui/optviewpage.ui:664
+#: cui/uiconfig/ui/optviewpage.ui:734
 msgctxt "extended_tip | aafont"
 msgid "Select to smooth the screen appearance of text."
 msgstr "Marker for at udjævne tekstens udseende på skærmen."
 
 #. 7dYGb
-#: cui/uiconfig/ui/optviewpage.ui:685
+#: cui/uiconfig/ui/optviewpage.ui:755
 msgctxt "optviewpage|aafrom"
 msgid "fro_m:"
 msgstr "_fra:"
 
 #. nLvZy
-#: cui/uiconfig/ui/optviewpage.ui:703
+#: cui/uiconfig/ui/optviewpage.ui:773
 msgctxt "extended_tip | aanf"
 msgid "Enter the smallest font size to apply antialiasing to."
 msgstr "Skriv den mindste skriftstørrelse, du vil bruge antialiasing  på."
 
 #. uZALs
-#: cui/uiconfig/ui/optviewpage.ui:724
+#: cui/uiconfig/ui/optviewpage.ui:794
 msgctxt "optviewpage|label5"
 msgid "Font Lists"
 msgstr "Skrifttypelister"
 
 #. BgCZE
-#: cui/uiconfig/ui/optviewpage.ui:738
+#: cui/uiconfig/ui/optviewpage.ui:808
 msgctxt "optviewpage|btn_rungptest"
 msgid "Run Graphics Tests"
 msgstr "Kør grafik-tests."
@@ -17561,110 +17710,110 @@ msgid "If enabled, then all paragraph styles with the option page line-spacing a
 msgstr "Hvis aktiveret, bliver alle afsnitstypografier med indstillingen side -linjeafstand aktiveret påvirket og antager Referencetypogtrafien s linjeafstand. Det får dem til at rette ind efter et usynligt lodret sidegitter uden hensyn til deres typestørrelse, sådan at alle linjer har den samme højde."
 
 #. 46djR
-#: cui/uiconfig/ui/pageformatpage.ui:570
+#: cui/uiconfig/ui/pageformatpage.ui:571
 msgctxt "pageformatpage|liststorePageLayout"
 msgid "Right and left"
 msgstr "Højre og venstre"
 
 #. xetCH
-#: cui/uiconfig/ui/pageformatpage.ui:571
+#: cui/uiconfig/ui/pageformatpage.ui:572
 msgctxt "pageformatpage|liststorePageLayout"
 msgid "Mirrored"
 msgstr "Spejlvendt"
 
 #. 47EHF
-#: cui/uiconfig/ui/pageformatpage.ui:572
+#: cui/uiconfig/ui/pageformatpage.ui:573
 msgctxt "pageformatpage|liststorePageLayout"
 msgid "Only right"
 msgstr "Kun højre"
 
 #. ALSy9
-#: cui/uiconfig/ui/pageformatpage.ui:573
+#: cui/uiconfig/ui/pageformatpage.ui:574
 msgctxt "pageformatpage|liststorePageLayout"
 msgid "Only left"
 msgstr "Kun venstre"
 
 #. Fhvzk
-#: cui/uiconfig/ui/pageformatpage.ui:595
+#: cui/uiconfig/ui/pageformatpage.ui:596
 msgctxt "pageformatpage|labelTblAlign"
 msgid "Table alignment:"
 msgstr "Tabeljustering:"
 
 #. 79BH9
-#: cui/uiconfig/ui/pageformatpage.ui:607
+#: cui/uiconfig/ui/pageformatpage.ui:608
 msgctxt "pageformatpage|checkbuttonHorz"
 msgid "Hori_zontal"
 msgstr "_Vandret"
 
 #. krxQZ
-#: cui/uiconfig/ui/pageformatpage.ui:621
+#: cui/uiconfig/ui/pageformatpage.ui:622
 msgctxt "pageformatpage|checkbuttonVert"
 msgid "_Vertical"
 msgstr "_Lodret"
 
 #. FPLFK
-#: cui/uiconfig/ui/pageformatpage.ui:635
+#: cui/uiconfig/ui/pageformatpage.ui:636
 msgctxt "pageformatpage|checkAdaptBox"
 msgid "_Fit object to paper format"
 msgstr "Tilpas objekt til p_apirformat"
 
 #. bqcXW
-#: cui/uiconfig/ui/pageformatpage.ui:651
+#: cui/uiconfig/ui/pageformatpage.ui:653
 msgctxt "pageformatpage|labelRegisterStyle"
 msgid "Reference _Style:"
 msgstr "Reference_typografi"
 
 #. FnoPF
-#: cui/uiconfig/ui/pageformatpage.ui:675
+#: cui/uiconfig/ui/pageformatpage.ui:677
 msgctxt "pageformatpage|labelGutterPosition"
 msgid "Gutter position:"
 msgstr "Placering af midterrende:"
 
 #. LF4Ex
-#: cui/uiconfig/ui/pageformatpage.ui:690
+#: cui/uiconfig/ui/pageformatpage.ui:692
 msgctxt "pageformatpage|liststoreGutterPosition"
 msgid "Left"
 msgstr "Venstre"
 
 #. DSBY5
-#: cui/uiconfig/ui/pageformatpage.ui:691
+#: cui/uiconfig/ui/pageformatpage.ui:693
 msgctxt "pageformatpage|liststoreGutterPosition"
 msgid "Top"
 msgstr "Øverst"
 
 #. AosV5
-#: cui/uiconfig/ui/pageformatpage.ui:701
+#: cui/uiconfig/ui/pageformatpage.ui:703
 msgctxt "pageformatpage|checkRtlGutter"
 msgid "Gutter on right side of page"
 msgstr "Indbindingsmargin til højre på disen"
 
 #. cuazP
-#: cui/uiconfig/ui/pageformatpage.ui:715
+#: cui/uiconfig/ui/pageformatpage.ui:717
 msgctxt "pageformatpage|checkBackgroundFullSize"
 msgid "Background covers margins"
 msgstr "Baggrunden dækker marginer"
 
 #. ApZcb
 #. xdds
-#: cui/uiconfig/ui/pageformatpage.ui:719
+#: cui/uiconfig/ui/pageformatpage.ui:721
 msgctxt "pageformatpage|checkBackgroundFullSize"
 msgid "Any background will cover margins of the page as well"
 msgstr "Enhver baggrund dækker også sidens marginer"
 
 #. XtMGD
-#: cui/uiconfig/ui/pageformatpage.ui:724
+#: cui/uiconfig/ui/pageformatpage.ui:726
 msgctxt "extended_tip|checkBackgroundFullSize"
 msgid "If enabled, then any background will cover the entire page, including margins. If disabled, any background will cover the page only inside the margins."
 msgstr "Når aktiveret, dækker enhver baggrund hele siden inklusive marginer. Hvis deaktiveret, dækker enhver baggrund kun siden inden for marginerne."
 
 #. xdECe
-#: cui/uiconfig/ui/pageformatpage.ui:754
+#: cui/uiconfig/ui/pageformatpage.ui:753
 msgctxt "pageformatpage|label5"
 msgid "Layout Settings"
 msgstr "Layoutindstillinger"
 
 #. eBMbb
-#: cui/uiconfig/ui/pageformatpage.ui:775
+#: cui/uiconfig/ui/pageformatpage.ui:774
 msgctxt "pageformatpage|labelMsg"
 msgid ""
 "The margin settings are out of print range.\n"
@@ -17729,86 +17878,92 @@ msgctxt "paragalignpage|labelST_LEFTALIGN_ASIAN"
 msgid "_Left/Top"
 msgstr "Venstre/Top"
 
+#. RaDiT
+#: cui/uiconfig/ui/paragalignpage.ui:196
+msgctxt "paragalignpage|labelST_VERTALIGN_SDR"
+msgid "Vertical"
+msgstr ""
+
 #. tRWTe
-#: cui/uiconfig/ui/paragalignpage.ui:209
+#: cui/uiconfig/ui/paragalignpage.ui:220
 msgctxt "paragalignpage|labelLB_LASTLINE"
 msgid "_Last line:"
 msgstr "Sidste linje:"
 
 #. AgkBK
-#: cui/uiconfig/ui/paragalignpage.ui:226 cui/uiconfig/ui/paragalignpage.ui:227
+#: cui/uiconfig/ui/paragalignpage.ui:237 cui/uiconfig/ui/paragalignpage.ui:238
 msgctxt "paragalignpage|liststoreLB_LASTLINE"
 msgid "Start"
 msgstr "Start"
 
 #. d23Ct
-#: cui/uiconfig/ui/paragalignpage.ui:228
+#: cui/uiconfig/ui/paragalignpage.ui:239
 msgctxt "paragalignpage|liststoreLB_LASTLINE"
 msgid "Centered"
 msgstr "Centreret"
 
 #. QJdX9
-#: cui/uiconfig/ui/paragalignpage.ui:229
+#: cui/uiconfig/ui/paragalignpage.ui:240
 msgctxt "paragalignpage|liststoreLB_LASTLINE"
 msgid "Justified"
 msgstr "Lige margener"
 
 #. nFwD6
-#: cui/uiconfig/ui/paragalignpage.ui:250
+#: cui/uiconfig/ui/paragalignpage.ui:261
 msgctxt "paragalignpage|label1"
 msgid "Options"
 msgstr "Indstillinger"
 
 #. 4gLpc
-#: cui/uiconfig/ui/paragalignpage.ui:279
+#: cui/uiconfig/ui/paragalignpage.ui:290
 msgctxt "paragalignpage|labelFT_VERTALIGN"
 msgid "_Alignment:"
 msgstr "Justering:"
 
 #. XsDLG
-#: cui/uiconfig/ui/paragalignpage.ui:296
+#: cui/uiconfig/ui/paragalignpage.ui:307
 msgctxt "paragalignpage|liststoreLB_VERTALIGN"
 msgid "Automatic"
 msgstr "Automatisk"
 
 #. fPsyD
-#: cui/uiconfig/ui/paragalignpage.ui:297
+#: cui/uiconfig/ui/paragalignpage.ui:308
 msgctxt "paragalignpage|liststoreLB_VERTALIGN"
 msgid "Base line"
 msgstr "Grundlinje"
 
 #. 34jBi
-#: cui/uiconfig/ui/paragalignpage.ui:298
+#: cui/uiconfig/ui/paragalignpage.ui:309
 msgctxt "paragalignpage|liststoreLB_VERTALIGN"
 msgid "Top"
 msgstr "Top"
 
 #. hKVxK
-#: cui/uiconfig/ui/paragalignpage.ui:299
+#: cui/uiconfig/ui/paragalignpage.ui:310
 msgctxt "paragalignpage|liststoreLB_VERTALIGN"
 msgid "Middle"
 msgstr "Midte"
 
 #. 5robg
-#: cui/uiconfig/ui/paragalignpage.ui:300
+#: cui/uiconfig/ui/paragalignpage.ui:311
 msgctxt "paragalignpage|liststoreLB_VERTALIGN"
 msgid "Bottom"
 msgstr "Bund"
 
 #. JPEFz
-#: cui/uiconfig/ui/paragalignpage.ui:315
+#: cui/uiconfig/ui/paragalignpage.ui:326
 msgctxt "paragalignpage|labelFL_VERTALIGN"
 msgid "Text-to-text"
 msgstr "Tekst-til-tekst"
 
 #. wcho5
-#: cui/uiconfig/ui/paragalignpage.ui:344
+#: cui/uiconfig/ui/paragalignpage.ui:355
 msgctxt "paragalignpage|label2"
 msgid "_Text direction:"
 msgstr "Tekst_retning:"
 
 #. pfaYp
-#: cui/uiconfig/ui/paragalignpage.ui:372
+#: cui/uiconfig/ui/paragalignpage.ui:383
 msgctxt "paragalignpage|labelFL_PROPERTIES"
 msgid "Properties"
 msgstr "Egenskaber"
@@ -18720,126 +18875,120 @@ msgctxt "qrcodegen|QrCodeGenDialog"
 msgid "QR and Barcode"
 msgstr "QR og stregkode"
 
-#. CCQhf
-#: cui/uiconfig/ui/qrcodegen.ui:115
-msgctxt "qrcodegen|edit_name"
-msgid "www.libreoffice.org"
-msgstr "https://da.libreoffice.org/"
-
-#. DnXM6
-#: cui/uiconfig/ui/qrcodegen.ui:118
-msgctxt "qr text"
-msgid "The text from which to generate the code."
-msgstr "Den tekst, som koden skal genereres fra."
-
 #. 4FXDa
 #. Text to be stored in the QR
-#: cui/uiconfig/ui/qrcodegen.ui:132
+#: cui/uiconfig/ui/qrcodegen.ui:117
 msgctxt "qrcodegen|label_text"
 msgid "URL/Text:"
 msgstr "URL/Tekst:"
 
 #. FoKEY
 #. Set Margin around QR
-#: cui/uiconfig/ui/qrcodegen.ui:147
+#: cui/uiconfig/ui/qrcodegen.ui:132
 msgctxt "qrcodegen|label_margin"
 msgid "Margin:"
 msgstr "Margin:"
 
 #. cBGCb
 #. Select type
-#: cui/uiconfig/ui/qrcodegen.ui:162
+#: cui/uiconfig/ui/qrcodegen.ui:147
 msgctxt "qrcodegen|label_type"
 msgid "Type:"
 msgstr "Type:"
 
 #. QaD48
-#: cui/uiconfig/ui/qrcodegen.ui:179
+#: cui/uiconfig/ui/qrcodegen.ui:164
 msgctxt "qrcodegen|QrCode"
 msgid "QR Code"
 msgstr "QR-kode"
 
 #. HGShQ
-#: cui/uiconfig/ui/qrcodegen.ui:180
+#: cui/uiconfig/ui/qrcodegen.ui:165
 msgctxt "qrcodegen|BarCode"
 msgid "Barcode"
 msgstr "Stregkode"
 
 #. C3VYY
-#: cui/uiconfig/ui/qrcodegen.ui:184
+#: cui/uiconfig/ui/qrcodegen.ui:169
 msgctxt "type"
 msgid "The type of code to generate."
 msgstr "Den type kode, der skal genereres."
 
 #. 8QtFq
 #. Error Correction Level of QR code
-#: cui/uiconfig/ui/qrcodegen.ui:205
+#: cui/uiconfig/ui/qrcodegen.ui:189
 msgctxt "qrcodegen|label_ecc"
 msgid "Error correction:"
 msgstr "Fejlretning:"
 
 #. SPWn3
-#: cui/uiconfig/ui/qrcodegen.ui:237
+#: cui/uiconfig/ui/qrcodegen.ui:221
 msgctxt "edit margin"
 msgid "The margin surrounding the code."
 msgstr "Margin omkring koden."
 
 #. vUJPT
-#: cui/uiconfig/ui/qrcodegen.ui:254
+#: cui/uiconfig/ui/qrcodegen.ui:238
 msgctxt "qrcodegen|ErrorCorrection"
 msgid "Low"
 msgstr "Lav"
 
 #. GeYR9
-#: cui/uiconfig/ui/qrcodegen.ui:266
+#: cui/uiconfig/ui/qrcodegen.ui:250
 msgctxt "button_low"
 msgid "7% of codewords can be restored."
 msgstr "7% af kodeordene kan gendannes."
 
 #. 2gaf5
-#: cui/uiconfig/ui/qrcodegen.ui:277
+#: cui/uiconfig/ui/qrcodegen.ui:261
 msgctxt "qrcodegen|ErrorCorrection"
 msgid "Medium"
 msgstr "Medium"
 
 #. 3A5XB
-#: cui/uiconfig/ui/qrcodegen.ui:289
+#: cui/uiconfig/ui/qrcodegen.ui:273
 msgctxt "button_medium"
 msgid "15% of codewords can be restored."
 msgstr "15% af kodeordene kan gendannes."
 
 #. GBf3R
-#: cui/uiconfig/ui/qrcodegen.ui:300
+#: cui/uiconfig/ui/qrcodegen.ui:284
 msgctxt "qrcodegen|ErrorCorrection"
 msgid "Quartile"
 msgstr "Kvartil"
 
 #. x4g64
-#: cui/uiconfig/ui/qrcodegen.ui:312
+#: cui/uiconfig/ui/qrcodegen.ui:296
 msgctxt "button_quartile"
 msgid "25% of codewords can be restored."
 msgstr "25% af kodeordene kan gendannes."
 
 #. WS3ER
-#: cui/uiconfig/ui/qrcodegen.ui:323
+#: cui/uiconfig/ui/qrcodegen.ui:307
 msgctxt "qrcodegen|ErrorCorrection"
 msgid "High"
 msgstr "Høj"
 
 #. A2TRN
-#: cui/uiconfig/ui/qrcodegen.ui:335
+#: cui/uiconfig/ui/qrcodegen.ui:319
 msgctxt "button_high"
 msgid "30% of codewords can be restored."
 msgstr "30% af kodeordene kan gendannes."
 
+#. DnXM6
+#: cui/uiconfig/ui/qrcodegen.ui:350
+msgctxt "qr text"
+msgid "The text from which to generate the code."
+msgstr "Den tekst, som koden skal genereres fra."
+
 #. VCCGD
-#: cui/uiconfig/ui/qrcodegen.ui:356
+#: cui/uiconfig/ui/qrcodegen.ui:367
 msgctxt "qrcodegen|QR Code Properties"
 msgid "Options"
 msgstr "Indstillinger"
 
 #. bAZcM
-#: cui/uiconfig/ui/qrcodegen.ui:384
+#: cui/uiconfig/ui/qrcodegen.ui:395
 msgctxt "qr code dialog title"
 msgid "Generate linear and matrix codes for any text or URL."
 msgstr "Generer lineære og matrix-koder til enhver tekst eller URL."
@@ -21695,7 +21844,7 @@ msgid "UI variants"
 msgstr "Brugerflade-varianter"
 
 #. H7m7J
-#: cui/uiconfig/ui/toolbarmodedialog.ui:363
+#: cui/uiconfig/ui/toolbarmodedialog.ui:366
 msgctxt "ToolbarmodeDialog|rightframe"
 msgid "Preview"
 msgstr "Forhåndsvisning"
@@ -21951,6 +22100,12 @@ msgstr "Omgivende tegn"
 msgctxt "twolinespage|preview-atkobject"
 msgid "Preview"
 msgstr "Forhåndsvisning"
+
+#. swBdf
+#: cui/uiconfig/ui/widgettestdialog.ui:7
+msgctxt "widgettestdialog|WidgetTestDialog"
+msgid "Test Widgets"
+msgstr ""
 
 #. 9zxtA
 #: cui/uiconfig/ui/wordcompletionpage.ui:60

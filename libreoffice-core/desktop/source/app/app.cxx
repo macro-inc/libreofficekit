@@ -24,9 +24,11 @@
 #include <config_java.h>
 #include <config_folders.h>
 #include <config_extensions.h>
+#include <config_wasm_strip.h>
 
 #include <sal/config.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <string_view>
 
@@ -46,8 +48,6 @@
 #include <framework/desktop.hxx>
 #include <i18nlangtag/languagetag.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
-#include <svl/languageoptions.hxx>
-#include <svl/cjkoptions.hxx>
 #include <svl/ctloptions.hxx>
 #include <svtools/javacontext.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -82,6 +82,7 @@
 #include <desktop/exithelper.h>
 #include <sal/log.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
+#include <comphelper/lok.hxx>
 #include <comphelper/configuration.hxx>
 #include <comphelper/fileurl.hxx>
 #include <comphelper/threadpool.hxx>
@@ -101,10 +102,11 @@
 #include <osl/process.h>
 #include <rtl/byteseq.hxx>
 #include <unotools/pathoptions.hxx>
+#if !ENABLE_WASM_STRIP_PINGUSER
 #include <unotools/VersionConfig.hxx>
+#endif
 #include <rtl/bootstrap.hxx>
 #include <vcl/test/GraphicsRenderTests.hxx>
-#include <vcl/glxtestprocess.hxx>
 #include <vcl/help.hxx>
 #include <vcl/weld.hxx>
 #include <vcl/settings.hxx>
@@ -117,7 +119,7 @@
 #include <basic/sbstar.hxx>
 #include <desktop/crashreport.hxx>
 #include <tools/urlobj.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <svtools/fontsubstconfig.hxx>
 #include <svtools/accessibilityoptions.hxx>
 #include <svtools/apearcfg.hxx>
@@ -285,12 +287,11 @@ bool shouldLaunchQuickstart()
     bool bQuickstart = Desktop::GetCommandLineArgs().IsQuickstart();
     if (!bQuickstart)
     {
-        const SfxPoolItem* pItem=nullptr;
         SfxItemSetFixed<SID_ATTR_QUICKLAUNCHER, SID_ATTR_QUICKLAUNCHER> aQLSet(SfxGetpApp()->GetPool());
-        SfxGetpApp()->GetOptions(aQLSet);
-        SfxItemState eState = aQLSet.GetItemState(SID_ATTR_QUICKLAUNCHER, false, &pItem);
-        if (SfxItemState::SET == eState)
-            bQuickstart = static_cast<const SfxBoolItem*>(pItem)->GetValue();
+        SfxApplication::GetOptions(aQLSet);
+        const SfxBoolItem* pLauncherItem = aQLSet.GetItemIfSet(SID_ATTR_QUICKLAUNCHER, false);
+        if (pLauncherItem)
+            bQuickstart = pLauncherItem->GetValue();
     }
     return bQuickstart;
 }
@@ -341,10 +342,14 @@ namespace {
 
 void runGraphicsRenderTests()
 {
+    if (comphelper::LibreOfficeKit::isActive())
+        return;
+#if !ENABLE_WASM_STRIP_PINGUSER
     if (!utl::isProductVersionUpgraded(false))
     {
         return;
     }
+#endif
     GraphicsRenderTests TestObject;
     TestObject.run();
 }
@@ -454,7 +459,8 @@ void Desktop::Init()
     }
     catch (css::uno::Exception & e)
     {
-        SetBootstrapError( BE_UNO_SERVICEMANAGER, e.Message );
+        HandleBootstrapErrors( BE_UNO_SERVICEMANAGER, e.Message );
+        std::abort();
     }
 
     // Check whether safe mode is enabled
@@ -501,7 +507,7 @@ void Desktop::Init()
     RequestHandler::Status aStatus = RequestHandler::Enable(true);
     if ( aStatus == RequestHandler::IPC_STATUS_PIPE_ERROR )
     {
-#if defined ANDROID
+#if defined(ANDROID) || defined(EMSCRIPTEN)
         // Ignore crack pipe errors on Android
 #else
         // Keep using this oddly named BE_PATHINFO_MISSING value
@@ -969,6 +975,7 @@ struct RefClearGuard
     @param  bEmergencySave
             differs between EMERGENCY_SAVE and RECOVERY
 */
+#if !ENABLE_WASM_STRIP_RECOVERYUI
 bool impl_callRecoveryUI(bool bEmergencySave     ,
                          bool bExistsRecoveryData)
 {
@@ -1000,6 +1007,7 @@ bool impl_callRecoveryUI(bool bEmergencySave     ,
     aRet >>= bRet;
     return bRet;
 }
+#endif
 
 bool impl_bringToFrontRecoveryUI()
 {
@@ -1148,9 +1156,11 @@ void Desktop::Exception(ExceptionCategory nCategory)
         // Save all open documents so they will be reopened
         // the next time the application is started
         // returns true if at least one document could be saved...
+#if !ENABLE_WASM_STRIP_RECOVERYUI
         bRestart = impl_callRecoveryUI(
                         true , // force emergency save
                         false);
+#endif
     }
 
     FlushConfiguration();
@@ -1164,8 +1174,10 @@ void Desktop::Exception(ExceptionCategory nCategory)
             osl_removeSignalHandler( pSignalHandler );
 
         restartOnMac(false);
+#if !ENABLE_WASM_STRIP_SPLASH
         if ( m_rSplashScreen.is() )
             m_rSplashScreen->reset();
+#endif
 
         _exit( EXITHELPER_CRASH_WITH_RESTART );
     }
@@ -1268,14 +1280,16 @@ int Desktop::Main()
     Translate::SetReadStringHook(ReplaceStringHookProc);
 
     // Startup screen
+#if !ENABLE_WASM_STRIP_SPLASH
     OpenSplashScreen();
+#endif
 
     SetSplashScreenProgress(10);
 
     userinstall::Status inst_fin = userinstall::finalize();
     if (inst_fin != userinstall::EXISTED && inst_fin != userinstall::CREATED)
     {
-        SAL_WARN( "desktop.app", "userinstall failed");
+        SAL_WARN( "desktop.app", "userinstall failed: " << inst_fin);
         if ( inst_fin == userinstall::ERROR_NO_SPACE )
             HandleBootstrapErrors(
                 BE_USERINSTALL_NOTENOUGHDISKSPACE, OUString() );
@@ -1295,11 +1309,11 @@ int Desktop::Main()
 
     Reference< XDesktop2 > xDesktop;
 
-    RegisterServices(xContext);
+    RegisterServices();
 
     SetSplashScreenProgress(25);
 
-#if HAVE_FEATURE_DESKTOP
+#if HAVE_FEATURE_DESKTOP && !defined(EMSCRIPTEN)
     // check user installation directory for lockfile so we can be sure
     // there is no other instance using our data files from a remote host
 
@@ -1568,23 +1582,13 @@ int Desktop::Main()
             runGraphicsRenderTests();
         }
 
-        // Reap the process started by fire_glxtest_process().
-        reap_glxtest_process();
+        // Post user event to startup first application component window
+        // We have to send this OpenClients message short before execute() to
+        // minimize the risk that this message overtakes type detection construction!!
+        Application::PostUserEvent( LINK( this, Desktop, OpenClients_Impl ) );
 
-        // Release solar mutex just before we wait for our client to connect
-        {
-            SolarMutexReleaser aReleaser;
-
-            // Post user event to startup first application component window
-            // We have to send this OpenClients message short before execute() to
-            // minimize the risk that this message overtakes type detection construction!!
-            Application::PostUserEvent( LINK( this, Desktop, OpenClients_Impl ) );
-
-            // Post event to enable acceptors
-            Application::PostUserEvent( LINK( this, Desktop, EnableAcceptors_Impl) );
-
-            // Acquire solar mutex just before we enter our message loop
-        }
+        // Post event to enable acceptors
+        Application::PostUserEvent( LINK( this, Desktop, EnableAcceptors_Impl) );
 
         // call Application::Execute to process messages in vcl message loop
 #if HAVE_FEATURE_JAVA
@@ -1715,8 +1719,10 @@ int Desktop::doShutdown()
     if ( bRR )
     {
         restartOnMac(true);
+#if !ENABLE_WASM_STRIP_SPLASH
         if ( m_rSplashScreen.is() )
             m_rSplashScreen->reset();
+#endif
 
         return EXITHELPER_NORMAL_RESTART;
     }
@@ -2012,11 +2018,13 @@ void Desktop::OpenClients()
     }
     else
     {
-        bool bCrashed            = false;
         bool bExistsRecoveryData = false;
+#if !ENABLE_WASM_STRIP_RECOVERYUI
+        bool bCrashed            = false;
         bool bExistsSessionData  = false;
         bool const bDisableRecovery
             = getenv("OOO_DISABLE_RECOVERY") != nullptr
+              || IsOnSystemEventLoop()
               || !officecfg::Office::Recovery::RecoveryInfo::Enabled::get();
 
         impl_checkRecoveryState(bCrashed, bExistsRecoveryData, bExistsSessionData);
@@ -2039,6 +2047,7 @@ void Desktop::OpenClients()
                 TOOLS_WARN_EXCEPTION( "desktop.app", "Error during recovery");
             }
         }
+#endif
 
         Reference< XSessionManagerListener2 > xSessionListener;
         try
@@ -2397,6 +2406,7 @@ void Desktop::HandleAppEvent( const ApplicationEvent& rAppEvent )
     }
 }
 
+#if !ENABLE_WASM_STRIP_SPLASH
 void Desktop::OpenSplashScreen()
 {
     const CommandLineArgs &rCmdLine = GetCommandLineArgs();
@@ -2446,31 +2456,42 @@ void Desktop::OpenSplashScreen()
             m_rSplashScreen->start("SplashScreen", 100);
 
 }
+#endif
 
 void Desktop::SetSplashScreenProgress(sal_Int32 iProgress)
 {
+#if ENABLE_WASM_STRIP_SPLASH
+    (void) iProgress;
+#else
     if(m_rSplashScreen.is())
     {
         m_rSplashScreen->setValue(iProgress);
     }
+#endif
 }
 
 void Desktop::SetSplashScreenText( const OUString& rText )
 {
+#if ENABLE_WASM_STRIP_SPLASH
+    (void) rText;
+#else
     if( m_rSplashScreen.is() )
     {
         m_rSplashScreen->setText( rText );
     }
+#endif
 }
 
 void Desktop::CloseSplashScreen()
 {
+#if !ENABLE_WASM_STRIP_SPLASH
     if(m_rSplashScreen.is())
     {
         SolarMutexGuard ensureSolarMutex;
         m_rSplashScreen->end();
         m_rSplashScreen = nullptr;
     }
+#endif
 }
 
 

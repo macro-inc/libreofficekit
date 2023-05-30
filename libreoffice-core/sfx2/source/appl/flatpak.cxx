@@ -43,6 +43,7 @@ bool flatpak::createTemporaryHtmlDirectory(OUString ** url) {
     assert(url != nullptr);
     DBG_TESTSOLARMUTEX();
     if (!temporaryHtmlDirectoryStatus.created) {
+        // coverity[tainted_return_value] - we trust the contents of this variable
         auto const env = std::getenv("XDG_CACHE_HOME");
         if (env == nullptr) {
             SAL_WARN("sfx.appl", "LIBO_FLATPAK mode but unset XDG_CACHE_HOME");
@@ -71,13 +72,12 @@ bool flatpak::createTemporaryHtmlDirectory(OUString ** url) {
         if (!parent.endsWith("/")) {
             parent += "/";
         }
-        auto const tmp = utl::TempFile(&parent, true);
-        if (!tmp.IsValid()) {
+        temporaryHtmlDirectoryStatus.url = utl::CreateTempURL(&parent, true);
+        if (temporaryHtmlDirectoryStatus.url.isEmpty()) {
             SAL_WARN(
                 "sfx.appl", "LIBO_FLATPAK mode failure creating temp dir at <" << parent << ">");
             return false;
         }
-        temporaryHtmlDirectoryStatus.url = tmp.GetURL();
         temporaryHtmlDirectoryStatus.created = true;
     }
     *url = &temporaryHtmlDirectoryStatus.url;

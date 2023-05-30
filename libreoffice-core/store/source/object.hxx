@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_STORE_SOURCE_OBJECT_HXX
-#define INCLUDED_STORE_SOURCE_OBJECT_HXX
+#pragma once
 
 #include <sal/types.h>
 #include <salhelper/simplereferenceobject.hxx>
@@ -28,8 +27,6 @@ namespace store
 class OStoreObject : public virtual salhelper::SimpleReferenceObject
 {
 public:
-    /** Construction.
-     */
     OStoreObject() {}
 
     /** Replaces dynamic_cast type checking.
@@ -37,8 +34,6 @@ public:
     virtual bool isKindOf(sal_uInt32 nTypeId);
 
 protected:
-    /** Destruction.
-     */
     virtual ~OStoreObject() override {}
 
 private:
@@ -55,7 +50,5 @@ template <class store_handle_type>
 store_handle_type* SAL_CALL query(OStoreObject* pHandle, store_handle_type*);
 
 } // namespace store
-
-#endif // INCLUDED_STORE_SOURCE_OBJECT_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

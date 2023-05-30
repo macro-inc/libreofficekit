@@ -19,16 +19,16 @@
 
 #include <sal/config.h>
 
+#include <sal/log.hxx>
+#include <osl/diagnose.h>
 #include <tools/bigint.hxx>
 #include <tools/debug.hxx>
+
 #include <vcl/cursor.hxx>
-#include <vcl/gdimtf.hxx>
 #include <vcl/lineinfo.hxx>
 #include <vcl/metaact.hxx>
 #include <vcl/virdev.hxx>
 #include <vcl/wrkwin.hxx>
-#include <sal/log.hxx>
-#include <osl/diagnose.h>
 
 #include <ImplOutDevData.hxx>
 #include <svdata.hxx>
@@ -36,46 +36,6 @@
 
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <tools/UnitConversion.hxx>
-
-/*
-Reduces accuracy until it is a fraction (should become
-ctor fraction once); we could also do this with BigInts
-*/
-
-static Fraction ImplMakeFraction( tools::Long nN1, tools::Long nN2, tools::Long nD1, tools::Long nD2 )
-{
-    if( nD1 == 0 || nD2 == 0 ) //under these bad circumstances the following while loop will be endless
-    {
-        SAL_WARN("vcl.gdi", "Invalid parameter for ImplMakeFraction");
-        return Fraction( 1, 1 );
-    }
-
-    tools::Long i = 1;
-
-    if ( nN1 < 0 ) { i = -i; nN1 = -nN1; }
-    if ( nN2 < 0 ) { i = -i; nN2 = -nN2; }
-    if ( nD1 < 0 ) { i = -i; nD1 = -nD1; }
-    if ( nD2 < 0 ) { i = -i; nD2 = -nD2; }
-    // all positive; i sign
-
-    Fraction aF = Fraction( i*nN1, nD1 ) * Fraction( nN2, nD2 );
-
-    while ( !aF.IsValid() ) {
-        if ( nN1 > nN2 )
-            nN1 = (nN1 + 1) / 2;
-        else
-            nN2 = (nN2 + 1) / 2;
-        if ( nD1 > nD2 )
-            nD1 = (nD1 + 1) / 2;
-        else
-            nD2 = (nD2 + 1) / 2;
-
-        aF = Fraction( i*nN1, nD1 ) * Fraction( nN2, nD2 );
-    }
-
-    aF.ReduceInaccurate(32);
-    return aF;
-}
 
 static auto setMapRes(ImplMapRes& rMapRes, const o3tl::Length eUnit)
 {
@@ -208,11 +168,11 @@ static void ImplCalcMapResolution( const MapMode& rMapMode,
 
     // calculate scaling factor according to MapMode
     // aTemp? = rMapRes.mnMapSc? * aScale?
-    Fraction aTempX = ImplMakeFraction( rMapRes.mnMapScNumX,
+    Fraction aTempX = Fraction::MakeFraction( rMapRes.mnMapScNumX,
                                         aScaleX.GetNumerator(),
                                         rMapRes.mnMapScDenomX,
                                         aScaleX.GetDenominator() );
-    Fraction aTempY = ImplMakeFraction( rMapRes.mnMapScNumY,
+    Fraction aTempY = Fraction::MakeFraction( rMapRes.mnMapScNumY,
                                         aScaleY.GetNumerator(),
                                         rMapRes.mnMapScDenomY,
                                         aScaleY.GetDenominator() );
@@ -270,12 +230,21 @@ static tools::Long ImplLogicToPixel(tools::Long n, tools::Long nDPI, tools::Long
     return n;
 }
 
-static double ImplLogicToPixel(double n, tools::Long nDPI, tools::Long nMapNum,
+static double ImplLogicToSubPixel(tools::Long n, tools::Long nDPI, tools::Long nMapNum,
                                          tools::Long nMapDenom)
 {
     assert(nDPI > 0);
     assert(nMapDenom != 0);
-    return n * nMapNum * nDPI / nMapDenom;
+    return static_cast<double>(n) * nMapNum * nDPI / nMapDenom;
+}
+
+static tools::Long ImplSubPixelToLogic(double n, tools::Long nDPI, tools::Long nMapNum,
+                                       tools::Long nMapDenom)
+{
+    assert(nDPI > 0);
+    assert(nMapNum != 0);
+
+    return std::round(n * nMapDenom / nMapNum / nDPI);
 }
 
 static tools::Long ImplPixelToLogic(tools::Long n, tools::Long nDPI, tools::Long nMapNum,
@@ -335,14 +304,6 @@ tools::Long OutputDevice::ImplLogicHeightToDevicePixel( tools::Long nHeight ) co
         return nHeight;
 
     return ImplLogicToPixel(nHeight, mnDPIY, maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY);
-}
-
-float OutputDevice::ImplFloatLogicHeightToDevicePixel( float fLogicHeight) const
-{
-    if( !mbMap)
-        return fLogicHeight;
-    float fPixelHeight = (fLogicHeight * mnDPIY * maMapRes.mnMapScNumY) / maMapRes.mnMapScDenomY;
-    return fPixelHeight;
 }
 
 tools::Long OutputDevice::ImplDevicePixelToLogicWidth( tools::Long nWidth ) const
@@ -728,24 +689,22 @@ void OutputDevice::SetMapMode( const MapMode& rNewMapMode )
     }
 
     // set new MapMode
-    if ( bRelMap )
+    if (bRelMap)
     {
-        Point aOrigin( maMapRes.mnMapOfsX, maMapRes.mnMapOfsY );
-        // aScale? = maMapMode.GetScale?() * rNewMapMode.GetScale?()
-        Fraction aScaleX = ImplMakeFraction( maMapMode.GetScaleX().GetNumerator(),
-                                             rNewMapMode.GetScaleX().GetNumerator(),
-                                             maMapMode.GetScaleX().GetDenominator(),
-                                             rNewMapMode.GetScaleX().GetDenominator() );
-        Fraction aScaleY = ImplMakeFraction( maMapMode.GetScaleY().GetNumerator(),
-                                             rNewMapMode.GetScaleY().GetNumerator(),
-                                             maMapMode.GetScaleY().GetDenominator(),
-                                             rNewMapMode.GetScaleY().GetDenominator() );
-        maMapMode.SetOrigin( aOrigin );
-        maMapMode.SetScaleX( aScaleX );
-        maMapMode.SetScaleY( aScaleY );
+        maMapMode.SetScaleX(Fraction::MakeFraction(
+            maMapMode.GetScaleX().GetNumerator(), rNewMapMode.GetScaleX().GetNumerator(),
+            maMapMode.GetScaleX().GetDenominator(), rNewMapMode.GetScaleX().GetDenominator()));
+
+        maMapMode.SetScaleY(Fraction::MakeFraction(
+            maMapMode.GetScaleY().GetNumerator(), rNewMapMode.GetScaleY().GetNumerator(),
+            maMapMode.GetScaleY().GetDenominator(), rNewMapMode.GetScaleY().GetDenominator()));
+
+        maMapMode.SetOrigin(Point(maMapRes.mnMapOfsX, maMapRes.mnMapOfsY));
     }
     else
+    {
         maMapMode = rNewMapMode;
+    }
 
     // create new objects (clip region are not re-scaled)
     mbNewFont   = true;
@@ -782,11 +741,11 @@ void OutputDevice::SetRelativeMapMode( const MapMode& rNewMapMode )
     MapUnit eNew = rNewMapMode.GetMapUnit();
 
     // a?F = rNewMapMode.GetScale?() / maMapMode.GetScale?()
-    Fraction aXF = ImplMakeFraction( rNewMapMode.GetScaleX().GetNumerator(),
+    Fraction aXF = Fraction::MakeFraction( rNewMapMode.GetScaleX().GetNumerator(),
                                      maMapMode.GetScaleX().GetDenominator(),
                                      rNewMapMode.GetScaleX().GetDenominator(),
                                      maMapMode.GetScaleX().GetNumerator() );
-    Fraction aYF = ImplMakeFraction( rNewMapMode.GetScaleY().GetNumerator(),
+    Fraction aYF = Fraction::MakeFraction( rNewMapMode.GetScaleY().GetNumerator(),
                                      maMapMode.GetScaleY().GetDenominator(),
                                      rNewMapMode.GetScaleY().GetDenominator(),
                                      maMapMode.GetScaleY().GetNumerator() );
@@ -810,9 +769,9 @@ void OutputDevice::SetRelativeMapMode( const MapMode& rNewMapMode )
             Fraction aF(div, mul);
 
             // a?F =  a?F * aF
-            aXF = ImplMakeFraction( aXF.GetNumerator(),   aF.GetNumerator(),
+            aXF = Fraction::MakeFraction( aXF.GetNumerator(),   aF.GetNumerator(),
                                     aXF.GetDenominator(), aF.GetDenominator() );
-            aYF = ImplMakeFraction( aYF.GetNumerator(),   aF.GetNumerator(),
+            aYF = Fraction::MakeFraction( aYF.GetNumerator(),   aF.GetNumerator(),
                                     aYF.GetDenominator(), aF.GetDenominator() );
             if ( eOld == MapUnit::MapPixel )
             {
@@ -1173,6 +1132,20 @@ Point OutputDevice::PixelToLogic( const Point& rDevicePt ) const
                                     maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY ) - maMapRes.mnMapOfsY - mnOutOffLogicY );
 }
 
+Point OutputDevice::SubPixelToLogic(const DevicePoint& rDevicePt) const
+{
+    if (!mbMap)
+    {
+        assert(floor(rDevicePt.getX() == rDevicePt.getX()) && floor(rDevicePt.getY() == rDevicePt.getY()));
+        return Point(rDevicePt.getX(), rDevicePt.getY());
+    }
+
+    return Point(ImplSubPixelToLogic(rDevicePt.getX(), mnDPIX,
+                                     maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX) - maMapRes.mnMapOfsX - mnOutOffLogicX,
+                 ImplSubPixelToLogic(rDevicePt.getY(), mnDPIY,
+                                     maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY) - maMapRes.mnMapOfsY - mnOutOffLogicY);
+}
+
 Size OutputDevice::PixelToLogic( const Size& rDeviceSize ) const
 {
 
@@ -1465,14 +1438,15 @@ auto getCorrectedUnit(MapUnit eMapSrc, MapUnit eMapDst)
     }
     return std::make_pair(eSrc, eDst);
 }
-}
 
-#define ENTER4( rMapModeSource, rMapModeDest )                          \
-    ImplMapRes aMapResSource;                                           \
-    ImplMapRes aMapResDest;                                             \
-                                                                        \
-    ImplCalcMapResolution( rMapModeSource, 72, 72, aMapResSource );     \
-    ImplCalcMapResolution( rMapModeDest, 72, 72, aMapResDest )
+std::pair<ImplMapRes, ImplMapRes> ENTER4(const MapMode& rMMSource, const MapMode& rMMDest)
+{
+    std::pair<ImplMapRes, ImplMapRes> result;
+    ImplCalcMapResolution(rMMSource, 72, 72, result.first);
+    ImplCalcMapResolution(rMMDest, 72, 72, result.second);
+    return result;
+}
+}
 
 // return (n1 * n2 * n3) / (n4 * n5)
 static tools::Long fn5( const tools::Long n1,
@@ -1688,7 +1662,7 @@ Point OutputDevice::LogicToLogic( const Point& rPtSource,
     }
     else
     {
-        ENTER4( rMapModeSource, rMapModeDest );
+        const auto& [aMapResSource, aMapResDest] = ENTER4( rMapModeSource, rMapModeDest );
 
         return Point( fn5( rPtSource.X() + aMapResSource.mnMapOfsX,
                            aMapResSource.mnMapScNumX, aMapResDest.mnMapScDenomX,
@@ -1719,7 +1693,7 @@ Size OutputDevice::LogicToLogic( const Size& rSzSource,
     }
     else
     {
-        ENTER4( rMapModeSource, rMapModeDest );
+        const auto& [aMapResSource, aMapResDest] = ENTER4( rMapModeSource, rMapModeDest );
 
         return Size( fn5( rSzSource.Width(),
                           aMapResSource.mnMapScNumX, aMapResDest.mnMapScDenomX,
@@ -1770,7 +1744,7 @@ basegfx::B2DHomMatrix OutputDevice::LogicToLogic(const MapMode& rMapModeSource, 
     }
     else
     {
-        ENTER4(rMapModeSource, rMapModeDest);
+        const auto& [aMapResSource, aMapResDest] = ENTER4(rMapModeSource, rMapModeDest);
 
         const double fScaleFactorX((double(aMapResSource.mnMapScNumX) * double(aMapResDest.mnMapScDenomX)) / (double(aMapResSource.mnMapScDenomX) * double(aMapResDest.mnMapScNumX)));
         const double fScaleFactorY((double(aMapResSource.mnMapScNumY) * double(aMapResDest.mnMapScDenomY)) / (double(aMapResSource.mnMapScDenomY) * double(aMapResDest.mnMapScNumY)));
@@ -1814,7 +1788,7 @@ tools::Rectangle OutputDevice::LogicToLogic( const tools::Rectangle& rRectSource
     }
     else
     {
-        ENTER4( rMapModeSource, rMapModeDest );
+        const auto& [aMapResSource, aMapResDest] = ENTER4( rMapModeSource, rMapModeDest );
 
         auto left = fn5( rRectSource.Left() + aMapResSource.mnMapOfsX,
                                aMapResSource.mnMapScNumX, aMapResDest.mnMapScDenomX,
@@ -1879,32 +1853,41 @@ DeviceCoordinate OutputDevice::LogicWidthToDeviceCoordinate( tools::Long nWidth 
         return static_cast<DeviceCoordinate>(nWidth);
 
 #if VCL_FLOAT_DEVICE_PIXEL
-    return ImplLogicToPixel(static_cast<double>(nWidth), mnDPIX, maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX);
+    return ImplLogicToSubPixel(nWidth, mnDPIX, maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX);
 #else
     return ImplLogicToPixel(nWidth, mnDPIX, maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX);
 #endif
 }
 
-double OutputDevice::ImplLogicWidthToDeviceFontWidth(tools::Long nWidth) const
+double OutputDevice::ImplLogicWidthToDeviceSubPixel(tools::Long nWidth) const
 {
     if (!mbMap)
         return nWidth;
 
-    return ImplLogicToPixel(static_cast<double>(nWidth), mnDPIX,
-                            maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX);
+    return ImplLogicToSubPixel(nWidth, mnDPIX,
+                               maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX);
 }
 
-DevicePoint OutputDevice::ImplLogicToDeviceFontCoordinate(const Point& rPoint) const
+double OutputDevice::ImplLogicHeightToDeviceSubPixel(tools::Long nHeight) const
+{
+    if (!mbMap)
+        return nHeight;
+
+    return ImplLogicToSubPixel(nHeight, mnDPIY,
+                               maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY);
+}
+
+DevicePoint OutputDevice::ImplLogicToDeviceSubPixel(const Point& rPoint) const
 {
     if (!mbMap)
         return DevicePoint(rPoint.X() + mnOutOffX, rPoint.Y() + mnOutOffY);
 
-    return DevicePoint(ImplLogicToPixel(static_cast<double>(rPoint.X() + maMapRes.mnMapOfsX), mnDPIX,
-                                        maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX)
-                                        + mnOutOffX + mnOutOffOrigX,
-                       ImplLogicToPixel(static_cast<double>(rPoint.Y() + maMapRes.mnMapOfsY), mnDPIY,
-                                        maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY)
-                                        + mnOutOffY + mnOutOffOrigY);
+    return DevicePoint(ImplLogicToSubPixel(rPoint.X() + maMapRes.mnMapOfsX, mnDPIX,
+                                           maMapRes.mnMapScNumX, maMapRes.mnMapScDenomX)
+                                           + mnOutOffX + mnOutOffOrigX,
+                       ImplLogicToSubPixel(rPoint.Y() + maMapRes.mnMapOfsY, mnDPIY,
+                                           maMapRes.mnMapScNumY, maMapRes.mnMapScDenomY)
+                                           + mnOutOffY + mnOutOffOrigY);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

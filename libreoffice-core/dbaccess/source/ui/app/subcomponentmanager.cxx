@@ -31,8 +31,9 @@
 #include <com/sun/star/document/XDocumentEventBroadcaster.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <dbaccess/dataview.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <osl/mutex.hxx>
 
@@ -47,7 +48,7 @@ namespace dbaui
     using ::com::sun::star::uno::UNO_SET_THROW;
     using ::com::sun::star::uno::Exception;
     using ::com::sun::star::uno::RuntimeException;
-    using ::com::sun::star::uno::makeAny;
+    using ::com::sun::star::uno::Any;
     using ::com::sun::star::uno::Sequence;
     using ::com::sun::star::frame::XFrame;
     using ::com::sun::star::frame::XController;
@@ -89,13 +90,13 @@ namespace dbaui
 
             SubComponentDescriptor()
                 :nComponentType( -1 )
-                ,eOpenMode( E_OPEN_NORMAL )
+                ,eOpenMode( ElementOpenMode::Normal )
             {
             }
 
-            SubComponentDescriptor( const OUString& i_rName, const sal_Int32 i_nComponentType,
+            SubComponentDescriptor( OUString i_sName, const sal_Int32 i_nComponentType,
                     const ElementOpenMode i_eOpenMode, const Reference< XComponent >& i_rComponent )
-                :sName( i_rName )
+                :sName(std::move( i_sName ))
                 ,nComponentType( i_nComponentType )
                 ,eOpenMode( i_eOpenMode )
             {
@@ -168,9 +169,9 @@ namespace dbaui
         struct SubComponentMatch
         {
         public:
-            SubComponentMatch( const OUString& i_rName, const sal_Int32 i_nComponentType,
+            SubComponentMatch( OUString i_sName, const sal_Int32 i_nComponentType,
                     const ElementOpenMode i_eOpenMode )
-                :m_sName( i_rName )
+                :m_sName(std::move( i_sName ))
                 ,m_nComponentType( i_nComponentType )
                 ,m_eOpenMode( i_eOpenMode )
             {
@@ -192,9 +193,9 @@ namespace dbaui
     // SubComponentManager_Data
     struct SubComponentManager_Data
     {
-        SubComponentManager_Data( OApplicationController& _rController, const ::comphelper::SharedMutex& _rMutex )
+        SubComponentManager_Data( OApplicationController& _rController, ::comphelper::SharedMutex  _aMutex )
             :m_rController( _rController )
-            ,m_aMutex( _rMutex )
+            ,m_aMutex(std::move( _aMutex ))
         {
         }
 
@@ -315,7 +316,7 @@ namespace dbaui
                 xBroadcaster->notifyDocumentEvent(
                     OUString::createFromAscii( _pAsciiEventName ),
                     &_rData.m_rController,
-                    makeAny( _rComponent.xFrame )
+                    Any( _rComponent.xFrame )
                 );
             }
             catch( const Exception& )

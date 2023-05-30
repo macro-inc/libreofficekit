@@ -1,5 +1,7 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -10,15 +12,28 @@ from libreoffice.uno.propertyvalue import mkPropertyValues
 from uitest.uihelper.common import get_state_as_dict
 from uitest.uihelper.common import select_pos
 
-
 # specialcharacters.ui
 class specialCharacter(UITestCase):
 
-    def test_special_character(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
-
+    def test_tdf56363(self):
+        with self.ui_test.create_doc_in_start_center("writer"):
             xWriterDoc = self.xUITest.getTopFocusWindow()
 
+            # Insert a font including a font feature into the font name combobox
+            xFontName = xWriterDoc.getChild("fontnamecombobox")
+            fontName = get_state_as_dict(xFontName)["Text"]
+            xFontName.executeAction("TYPE", mkPropertyValues({"KEYCODE": "CTRL+A"}))
+            xFontName.executeAction("TYPE", mkPropertyValues({"TEXT": fontName + ":smcp"}))
+            xFontName.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RETURN"}))
+
+            # Open special character dialog and check selected font name
+            with self.ui_test.execute_dialog_through_command(".uno:InsertSymbol", close_button="cancel") as xDialog:
+                xComboFont = xDialog.getChild("fontlb")
+                # Without the fix in place, no font would be selected
+                self.assertEqual(get_state_as_dict(xComboFont)["Text"], fontName)
+
+    def test_special_character(self):
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             with self.ui_test.execute_dialog_through_command(".uno:InsertSymbol", close_button="cancel") as xDialog:
                 xCharSet = xDialog.getChild("showcharset")  # default charset

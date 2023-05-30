@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -80,9 +83,9 @@ class WriterPageDialog(UITestCase):
             self.assertEqual(
                 document.StyleFamilies.PageStyles.Standard.FillBitmapLogicalSize, True)
             self.assertEqual(
-                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeX, 0)
+                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeX, 1000)
             self.assertEqual(
-                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeY, 0)
+                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeY, 1000)
             self.assertEqual(
                 document.StyleFamilies.PageStyles.Standard.FillBitmapName, 'Painted White')
         elif btn == 'btnpattern':
@@ -105,9 +108,9 @@ class WriterPageDialog(UITestCase):
             self.assertEqual(
                 document.StyleFamilies.PageStyles.Standard.FillBitmapLogicalSize, True)
             self.assertEqual(
-                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeX, 0)
+                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeX, 1000)
             self.assertEqual(
-                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeY, 0)
+                document.StyleFamilies.PageStyles.Standard.FillBitmapSizeY, 1000)
             self.assertEqual(
                 document.StyleFamilies.PageStyles.Standard.FillBitmapName, '5 Percent')
 
@@ -206,7 +209,7 @@ class WriterPageDialog(UITestCase):
     def test_cancel_button_page_dialog(self):
         with self.ui_test.create_doc_in_start_center("writer"):
 
-            with self.ui_test.execute_dialog_through_command(".uno:PageDialog", close_button="cancel") as xDialog:
+            with self.ui_test.execute_dialog_through_command(".uno:PageDialog", close_button="cancel"):
                 pass
 
 

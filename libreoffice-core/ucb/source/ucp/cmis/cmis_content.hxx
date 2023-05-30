@@ -55,8 +55,8 @@ namespace ucbhelper
 namespace cmis
 {
 
-#define CMIS_FILE_TYPE   "application/vnd.libreoffice.cmis-file"
-#define CMIS_FOLDER_TYPE "application/vnd.libreoffice.cmis-folder"
+inline constexpr OUStringLiteral CMIS_FILE_TYPE = u"application/vnd.libreoffice.cmis-file";
+inline constexpr OUStringLiteral CMIS_FOLDER_TYPE = u"application/vnd.libreoffice.cmis-folder";
 
 class ContentProvider;
 class Content : public ::ucbhelper::ContentImplHelper,
@@ -139,7 +139,7 @@ public:
     Content( const css::uno::Reference< css::uno::XComponentContext >& rxContext,
         ContentProvider *pProvider,
         const css::uno::Reference< css::ucb::XContentIdentifier >& Identifier,
-        libcmis::ObjectPtr const & pObject = libcmis::ObjectPtr( ) );
+        libcmis::ObjectPtr pObject = libcmis::ObjectPtr( ) );
 
     /// @throws css::ucb::ContentCreationException
     Content( const css::uno::Reference< css::uno::XComponentContext >& rxContext,

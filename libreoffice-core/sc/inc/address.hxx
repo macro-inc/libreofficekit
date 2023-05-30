@@ -147,6 +147,12 @@ const SCROW MAXROW_30         = 8191;
     return nTab < 0 ? 0 : (nTab > MAXTAB ? MAXTAB : nTab);
 }
 
+template <typename T> inline void PutInOrder(T& nStart, T& nEnd)
+{
+    if (nEnd < nStart)
+        std::swap(nStart, nEnd);
+}
+
 // The result of ConvertRef() is a bit group of the following:
 enum class ScRefFlags : sal_uInt16
 {
@@ -389,24 +395,9 @@ inline std::basic_ostream<charT, traits> & operator <<(std::basic_ostream<charT,
 
 inline void ScAddress::PutInOrder( ScAddress& rAddress )
 {
-    if ( rAddress.Col() < Col() )
-    {
-        SCCOL nTmp = rAddress.Col();
-        rAddress.SetCol( Col() );
-        SetCol( nTmp );
-    }
-    if ( rAddress.Row() < Row() )
-    {
-        SCROW nTmp = rAddress.Row();
-        rAddress.SetRow( Row() );
-        SetRow( nTmp );
-    }
-    if ( rAddress.Tab() < Tab() )
-    {
-        SCTAB nTmp = rAddress.Tab();
-        rAddress.SetTab( Tab() );
-        SetTab( nTmp );
-    }
+    ::PutInOrder(nCol, rAddress.nCol);
+    ::PutInOrder(nRow, rAddress.nRow);
+    ::PutInOrder(nTab, rAddress.nTab);
 }
 
 inline void ScAddress::Set( SCCOL nColP, SCROW nRowP, SCTAB nTabP )
@@ -519,7 +510,7 @@ public:
     ScRange( const ScAddress& aInputStart, const ScAddress& aInputEnd ) :
         aStart( aInputStart ), aEnd( aInputEnd )
     {
-        aStart.PutInOrder( aEnd );
+        PutInOrder();
     }
     ScRange( const ScRange& rRange ) :
         aStart( rRange.aStart ), aEnd( rRange.aEnd )
@@ -554,8 +545,9 @@ public:
     {
         return aStart.IsValid() && aEnd.IsValid();
     }
-    inline bool In( const ScAddress& ) const;   ///< is Address& in Range?
-    inline bool In( const ScRange& ) const;     ///< is Range& in Range?
+    inline bool Contains( const ScAddress& ) const;   ///< is Address& fully in Range?
+    inline bool Contains( const ScRange& ) const;     ///< is Range& fully in Range?
+    inline bool Intersects( const ScRange& rRange ) const;    // do two ranges intersect?
 
     ScRefFlags Parse( const OUString&, const ScDocument&,
                                    const ScAddress::Details& rDetails = ScAddress::detailsOOOa1,
@@ -627,7 +619,7 @@ public:
 
     inline void GetVars( SCCOL& nCol1, SCROW& nRow1, SCTAB& nTab1,
                          SCCOL& nCol2, SCROW& nRow2, SCTAB& nTab2 ) const;
-    void PutInOrder();
+    void PutInOrder() { aStart.PutInOrder(aEnd); }
 
     /**
         @param  rErrorRange
@@ -647,7 +639,6 @@ public:
     void IncRowIfNotLessThan(const ScDocument& rDoc, SCROW nStartRow, SCROW nOffset);
 
     void ExtendTo( const ScRange& rRange );
-    bool Intersects( const ScRange& rRange ) const;    // do two ranges intersect?
 
     ScRange Intersection( const ScRange& rOther ) const;
 
@@ -724,7 +715,7 @@ inline bool ScRange::operator<=( const ScRange& rRange ) const
     return operator<( rRange ) || operator==( rRange );
 }
 
-inline bool ScRange::In( const ScAddress& rAddress ) const
+inline bool ScRange::Contains( const ScAddress& rAddress ) const
 {
     return
         aStart.Col() <= rAddress.Col() && rAddress.Col() <= aEnd.Col() &&
@@ -732,12 +723,20 @@ inline bool ScRange::In( const ScAddress& rAddress ) const
         aStart.Tab() <= rAddress.Tab() && rAddress.Tab() <= aEnd.Tab();
 }
 
-inline bool ScRange::In( const ScRange& rRange ) const
+inline bool ScRange::Contains( const ScRange& rRange ) const
 {
     return
         aStart.Col() <= rRange.aStart.Col() && rRange.aEnd.Col() <= aEnd.Col() &&
         aStart.Row() <= rRange.aStart.Row() && rRange.aEnd.Row() <= aEnd.Row() &&
         aStart.Tab() <= rRange.aStart.Tab() && rRange.aEnd.Tab() <= aEnd.Tab();
+}
+
+inline bool ScRange::Intersects( const ScRange& rRange ) const
+{
+    return
+        aStart.Col() <= rRange.aEnd.Col() && rRange.aStart.Col() <= aEnd.Col() &&
+        aStart.Row() <= rRange.aEnd.Row() && rRange.aStart.Row() <= aEnd.Row() &&
+        aStart.Tab() <= rRange.aEnd.Tab() && rRange.aStart.Tab() <= aEnd.Tab();
 }
 
 inline size_t ScRange::hashArea() const
@@ -945,14 +944,6 @@ inline bool ScRefAddress::operator==( const ScRefAddress& rRefAddress ) const
 #define BCA_BRDCST_ALWAYS ScAddress( 0, SCROW_MAX, 0 )
 #define BCA_LISTEN_ALWAYS ScRange( BCA_BRDCST_ALWAYS, BCA_BRDCST_ALWAYS )
 
-template< typename T > inline void PutInOrder( T& nStart, T& nEnd )
-{
-    if (nEnd < nStart)
-    {
-        std::swap(nStart, nEnd);
-    }
-}
-
 bool ConvertSingleRef( const ScDocument& pDocument, const OUString& rRefString,
                        SCTAB nDefTab, ScRefAddress& rRefAddress,
                        const ScAddress::Details& rDetails,
@@ -982,6 +973,6 @@ inline OUString ScColToAlpha( SCCOL nCol )
 }
 
 /// get column number of A..IV... string
-bool AlphaToCol(const ScDocument& rDoc, SCCOL& rCol, const OUString& rStr);
+bool AlphaToCol(const ScDocument& rDoc, SCCOL& rCol, std::u16string_view rStr);
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

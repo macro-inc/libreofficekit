@@ -18,6 +18,7 @@
  */
 
 #include "imagemanagerimpl.hxx"
+#include <utility>
 #include <xml/imagesconfiguration.hxx>
 #include <uiconfiguration/imagetype.hxx>
 #include <uiconfiguration/graphicnameaccess.hxx>
@@ -39,11 +40,10 @@
 #include <vcl/graph.hxx>
 #include <vcl/svapp.hxx>
 #include <o3tl/enumrange.hxx>
-#include <osl/mutex.hxx>
 #include <comphelper/sequence.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <vcl/filter/PngImageReader.hxx>
-#include <vcl/pngwrite.hxx>
+#include <vcl/filter/PngImageWriter.hxx>
 #include <memory>
 
 using ::com::sun::star::uno::Sequence;
@@ -85,15 +85,15 @@ namespace framework
 
 static GlobalImageList*     pGlobalImageList = nullptr;
 
-static osl::Mutex& getGlobalImageListMutex()
+static std::mutex& getGlobalImageListMutex()
 {
-    static osl::Mutex mutex;
+    static std::mutex mutex;
     return mutex;
 }
 
 static GlobalImageList* getGlobalImageList( const uno::Reference< uno::XComponentContext >& rxContext )
 {
-    osl::MutexGuard guard( getGlobalImageListMutex() );
+    std::unique_lock guard( getGlobalImageListMutex() );
 
     if ( pGlobalImageList == nullptr )
         pGlobalImageList = new GlobalImageList( rxContext );
@@ -101,10 +101,10 @@ static GlobalImageList* getGlobalImageList( const uno::Reference< uno::XComponen
     return pGlobalImageList;
 }
 
-CmdImageList::CmdImageList( const uno::Reference< uno::XComponentContext >& rxContext, const OUString& aModuleIdentifier ) :
+CmdImageList::CmdImageList( uno::Reference< uno::XComponentContext >  rxContext, OUString aModuleIdentifier ) :
     m_bInitialized(false),
-    m_aModuleIdentifier( aModuleIdentifier ),
-    m_xContext( rxContext )
+    m_aModuleIdentifier(std::move( aModuleIdentifier )),
+    m_xContext(std::move( rxContext ))
 {
 }
 
@@ -183,26 +183,26 @@ GlobalImageList::GlobalImageList( const uno::Reference< uno::XComponentContext >
 
 GlobalImageList::~GlobalImageList()
 {
-    osl::MutexGuard guard( getGlobalImageListMutex() );
+    std::unique_lock guard( getGlobalImageListMutex() );
     // remove global pointer as we destroy the object now
     pGlobalImageList = nullptr;
 }
 
 Image GlobalImageList::getImageFromCommandURL( vcl::ImageType nImageType, const OUString& rCommandURL )
 {
-    osl::MutexGuard guard( getGlobalImageListMutex() );
+    std::unique_lock guard( getGlobalImageListMutex() );
     return CmdImageList::getImageFromCommandURL( nImageType, rCommandURL );
 }
 
 bool GlobalImageList::hasImage( vcl::ImageType nImageType, const OUString& rCommandURL )
 {
-    osl::MutexGuard guard( getGlobalImageListMutex() );
+    std::unique_lock guard( getGlobalImageListMutex() );
     return CmdImageList::hasImage( nImageType, rCommandURL );
 }
 
 ::std::vector< OUString >& GlobalImageList::getImageCommandNames()
 {
-    osl::MutexGuard guard( getGlobalImageListMutex() );
+    std::unique_lock guard( getGlobalImageListMutex() );
     return CmdImageList::getImageCommandNames();
 }
 
@@ -367,89 +367,90 @@ bool ImageManagerImpl::implts_storeUserImages(
 {
     SolarMutexGuard g;
 
-    if ( m_bModified )
+    if ( !m_bModified )
+        return false;
+
+    ImageList* pImageList = implts_getUserImageList( nImageType );
+    if ( pImageList->GetImageCount() > 0 )
     {
-        ImageList* pImageList = implts_getUserImageList( nImageType );
-        if ( pImageList->GetImageCount() > 0 )
+        ImageItemDescriptorList aUserImageListInfo;
+
+        for ( sal_uInt16 i=0; i < pImageList->GetImageCount(); i++ )
         {
-            ImageItemDescriptorList aUserImageListInfo;
+            ImageItemDescriptor aItem;
+            aItem.aCommandURL = pImageList->GetImageName( i );
+            aUserImageListInfo.push_back( aItem );
+        }
 
-            for ( sal_uInt16 i=0; i < pImageList->GetImageCount(); i++ )
+        uno::Reference< XTransactedObject > xTransaction;
+        uno::Reference< XOutputStream >     xOutputStream;
+        uno::Reference< XStream > xStream = xUserImageStorage->openStreamElement( OUString::createFromAscii( IMAGELIST_XML_FILE[nImageType] ),
+                                                                                  ElementModes::WRITE|ElementModes::TRUNCATE );
+        if ( xStream.is() )
+        {
+            uno::Reference< XStream > xBitmapStream =
+                xUserBitmapsStorage->openStreamElement( OUString::createFromAscii( BITMAP_FILE_NAMES[nImageType] ),
+                                                        ElementModes::WRITE|ElementModes::TRUNCATE );
+            if ( xBitmapStream.is() )
             {
-                ImageItemDescriptor aItem;
-                aItem.aCommandURL = pImageList->GetImageName( i );
-                aUserImageListInfo.push_back( aItem );
-            }
-
-            uno::Reference< XTransactedObject > xTransaction;
-            uno::Reference< XOutputStream >     xOutputStream;
-            uno::Reference< XStream > xStream = xUserImageStorage->openStreamElement( OUString::createFromAscii( IMAGELIST_XML_FILE[nImageType] ),
-                                                                                      ElementModes::WRITE|ElementModes::TRUNCATE );
-            if ( xStream.is() )
-            {
-                uno::Reference< XStream > xBitmapStream =
-                    xUserBitmapsStorage->openStreamElement( OUString::createFromAscii( BITMAP_FILE_NAMES[nImageType] ),
-                                                            ElementModes::WRITE|ElementModes::TRUNCATE );
-                if ( xBitmapStream.is() )
                 {
-                    {
-                        std::unique_ptr<SvStream> pSvStream(utl::UcbStreamHelper::CreateStream( xBitmapStream ));
-                        vcl::PNGWriter aPngWriter( pImageList->GetAsHorizontalStrip() );
-                        aPngWriter.Write( *pSvStream );
-                    }
-
-                    // Commit user bitmaps storage
-                    xTransaction.set( xUserBitmapsStorage, UNO_QUERY );
-                    if ( xTransaction.is() )
-                        xTransaction->commit();
+                    std::unique_ptr<SvStream> pSvStream(utl::UcbStreamHelper::CreateStream( xBitmapStream ));
+                    vcl::PngImageWriter aPngWriter( *pSvStream );
+                    auto rBitmap = pImageList->GetAsHorizontalStrip();
+                    aPngWriter.write( rBitmap );
                 }
 
-                xOutputStream = xStream->getOutputStream();
-                if ( xOutputStream.is() )
-                    ImagesConfiguration::StoreImages( m_xContext, xOutputStream, aUserImageListInfo );
-
-                // Commit user image storage
-                xTransaction.set( xUserImageStorage, UNO_QUERY );
+                // Commit user bitmaps storage
+                xTransaction.set( xUserBitmapsStorage, UNO_QUERY );
                 if ( xTransaction.is() )
                     xTransaction->commit();
             }
 
-            return true;
-        }
-        else
-        {
-            // Remove the streams from the storage, if we have no data. We have to catch
-            // the NoSuchElementException as it can be possible that there is no stream at all!
-            try
-            {
-                xUserImageStorage->removeElement( OUString::createFromAscii( IMAGELIST_XML_FILE[nImageType] ));
-            }
-            catch ( const css::container::NoSuchElementException& )
-            {
-            }
-
-            try
-            {
-                xUserBitmapsStorage->removeElement( OUString::createFromAscii( BITMAP_FILE_NAMES[nImageType] ));
-            }
-            catch ( const css::container::NoSuchElementException& )
-            {
-            }
-
-            uno::Reference< XTransactedObject > xTransaction;
+            xOutputStream = xStream->getOutputStream();
+            if ( xOutputStream.is() )
+                ImagesConfiguration::StoreImages( m_xContext, xOutputStream, aUserImageListInfo );
 
             // Commit user image storage
             xTransaction.set( xUserImageStorage, UNO_QUERY );
             if ( xTransaction.is() )
                 xTransaction->commit();
-
-            // Commit user bitmaps storage
-            xTransaction.set( xUserBitmapsStorage, UNO_QUERY );
-            if ( xTransaction.is() )
-                xTransaction->commit();
-
-            return true;
         }
+
+        return true;
+    }
+    else
+    {
+        // Remove the streams from the storage, if we have no data. We have to catch
+        // the NoSuchElementException as it can be possible that there is no stream at all!
+        try
+        {
+            xUserImageStorage->removeElement( OUString::createFromAscii( IMAGELIST_XML_FILE[nImageType] ));
+        }
+        catch ( const css::container::NoSuchElementException& )
+        {
+        }
+
+        try
+        {
+            xUserBitmapsStorage->removeElement( OUString::createFromAscii( BITMAP_FILE_NAMES[nImageType] ));
+        }
+        catch ( const css::container::NoSuchElementException& )
+        {
+        }
+
+        uno::Reference< XTransactedObject > xTransaction;
+
+        // Commit user image storage
+        xTransaction.set( xUserImageStorage, UNO_QUERY );
+        if ( xTransaction.is() )
+            xTransaction->commit();
+
+        // Commit user bitmaps storage
+        xTransaction.set( xUserBitmapsStorage, UNO_QUERY );
+        if ( xTransaction.is() )
+            xTransaction->commit();
+
+        return true;
     }
 
     return false;
@@ -474,11 +475,10 @@ CmdImageList* ImageManagerImpl::implts_getDefaultImageList()
     return m_pDefaultImageList.get();
 }
 
-ImageManagerImpl::ImageManagerImpl( const uno::Reference< uno::XComponentContext >& rxContext,::cppu::OWeakObject* pOwner,bool _bUseGlobal ) :
-    m_xContext( rxContext )
+ImageManagerImpl::ImageManagerImpl( uno::Reference< uno::XComponentContext > xContext, ::cppu::OWeakObject* pOwner, bool _bUseGlobal ) :
+    m_xContext(std::move( xContext ))
     , m_pOwner(pOwner)
     , m_aResourceString( "private:resource/images/moduleimages" )
-    , m_aListenerContainer( m_mutex )
     , m_bUseGlobal(_bUseGlobal)
     , m_bReadOnly( true )
     , m_bInitialized( false )
@@ -501,7 +501,14 @@ void ImageManagerImpl::dispose()
 {
     uno::Reference< uno::XInterface > xOwner(m_pOwner);
     css::lang::EventObject aEvent( xOwner );
-    m_aListenerContainer.disposeAndClear( aEvent );
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aEventListeners.disposeAndClear( aGuard, aEvent );
+    }
+    {
+        std::unique_lock aGuard(m_mutex);
+        m_aConfigListeners.disposeAndClear( aGuard, aEvent );
+    }
 
     {
         SolarMutexGuard g;
@@ -530,13 +537,15 @@ void ImageManagerImpl::addEventListener( const uno::Reference< XEventListener >&
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.addInterface( aGuard, xListener );
 }
 
 void ImageManagerImpl::removeEventListener( const uno::Reference< XEventListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<XEventListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aEventListeners.removeInterface( aGuard, xListener );
 }
 
 // XInitialization
@@ -1145,23 +1154,21 @@ void ImageManagerImpl::addConfigurationListener( const uno::Reference< css::ui::
             throw DisposedException();
     }
 
-    m_aListenerContainer.addInterface( cppu::UnoType<XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.addInterface( aGuard, xListener );
 }
 
 void ImageManagerImpl::removeConfigurationListener( const uno::Reference< css::ui::XUIConfigurationListener >& xListener )
 {
     /* SAFE AREA ----------------------------------------------------------------------------------------------- */
-    m_aListenerContainer.removeInterface( cppu::UnoType<XUIConfigurationListener>::get(), xListener );
+    std::unique_lock aGuard(m_mutex);
+    m_aConfigListeners.removeInterface( aGuard, xListener );
 }
 
 void ImageManagerImpl::implts_notifyContainerListener( const ConfigurationEvent& aEvent, NotifyOp eOp )
 {
-    comphelper::OInterfaceContainerHelper2* pContainer = m_aListenerContainer.getContainer(
-                                        cppu::UnoType<css::ui::XUIConfigurationListener>::get());
-    if ( pContainer == nullptr )
-        return;
-
-    comphelper::OInterfaceIteratorHelper2 pIterator( *pContainer );
+    std::unique_lock aGuard(m_mutex);
+    comphelper::OInterfaceIteratorHelper4 pIterator( aGuard, m_aConfigListeners );
     while ( pIterator.hasMoreElements() )
     {
         try
@@ -1169,19 +1176,19 @@ void ImageManagerImpl::implts_notifyContainerListener( const ConfigurationEvent&
             switch ( eOp )
             {
                 case NotifyOp_Replace:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementReplaced( aEvent );
+                    pIterator.next()->elementReplaced( aEvent );
                     break;
                 case NotifyOp_Insert:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementInserted( aEvent );
+                    pIterator.next()->elementInserted( aEvent );
                     break;
                 case NotifyOp_Remove:
-                    static_cast< css::ui::XUIConfigurationListener*>(pIterator.next())->elementRemoved( aEvent );
+                    pIterator.next()->elementRemoved( aEvent );
                     break;
             }
         }
         catch( const css::uno::RuntimeException& )
         {
-            pIterator.remove();
+            pIterator.remove(aGuard);
         }
     }
 }

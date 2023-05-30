@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:19+0100\n"
-"PO-Revision-Date: 2022-01-09 04:12+0000\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2023-02-21 03:08+0000\n"
 "Last-Translator: A S Alam <amanpreet.alam@gmail.com>\n"
 "Language-Team: Punjabi <https://translations.documentfoundation.org/projects/libo_ui-master/filtersourceconfigfragmentsfilters/pa/>\n"
 "Language: pa-IN\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1548642184.000000\n"
 
 #. FR4Ff
@@ -94,7 +94,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "CGM - Computer Graphics Metafile"
-msgstr ""
+msgstr "CGM - ਕੰਪਿਊਟਰ ਗਰਾਫ਼ਿਕਸ ਮੇਟਾਫ਼ਾਇਲ"
 
 #. PEXwM
 #: ClarisWorks.xcu
@@ -104,7 +104,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "ClarisWorks/AppleWorks Text Document"
-msgstr ""
+msgstr "ClarisWorks/AppleWorks ਲਿਖਤ ਦਸਤਾਵੇਜ਼"
 
 #. enPoE
 #: ClarisWorks_Calc.xcu
@@ -114,7 +114,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "ClarisWorks/AppleWorks Spreadsheet"
-msgstr ""
+msgstr "ClarisWorks/AppleWorks ਸਪਰੈਡਸ਼ੀਟ"
 
 #. renzu
 #: ClarisWorks_Draw.xcu
@@ -124,7 +124,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "ClarisWorks/AppleWorks Drawing"
-msgstr ""
+msgstr "ClarisWorks/AppleWorks ਡਰਾਇੰਗ"
 
 #. gz2o6
 #: ClarisWorks_Impress.xcu
@@ -134,7 +134,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "ClarisWorks/AppleWorks Presentation"
-msgstr ""
+msgstr "ClarisWorks/AppleWorks ਪੇਸ਼ਕਾਰੀ"
 
 #. JTAGb
 #: Claris_Resolve_Calc.xcu
@@ -144,7 +144,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "ClarisResolve Document"
-msgstr ""
+msgstr "ClarisResolve ਦਸਤਾਵੇਜ਼"
 
 #. AHyWG
 #: CorelDrawDocument.xcu
@@ -154,7 +154,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Corel Draw"
-msgstr ""
+msgstr "ਕੋਰਲ ਡਰਾਅ"
 
 #. ZBGoe
 #: CorelPresentationExchange.xcu
@@ -174,7 +174,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Data Interchange Format"
-msgstr ""
+msgstr "ਡਾਟਾ ਇੰਟਰਚੇਜ਼ ਫ਼ਾਰਮੈਟ"
 
 #. NEKcH
 #: DXF___AutoCAD_Interchange.xcu
@@ -194,7 +194,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "DocBook"
-msgstr ""
+msgstr "ਡੌਕ-ਬੁੱਕ"
 
 #. yXBiX
 #: DosWord.xcu
@@ -216,6 +216,16 @@ msgctxt ""
 msgid "EMF - Enhanced Metafile"
 msgstr "EMF - ਇੰਹਾਂਸਡ ਮੇਟਾਫਾਇਲ"
 
+#. xqsZy
+#: EMZ___Compressed_MS_Windows_Metafile.xcu
+msgctxt ""
+"EMZ___Compressed_MS_Windows_Metafile.xcu\n"
+"EMZ - Compressed MS Windows Metafile\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr ""
+
 #. eFNDy
 #: EPS___Encapsulated_PostScript.xcu
 msgctxt ""
@@ -234,7 +244,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "EPUB Document"
-msgstr ""
+msgstr "EPUB ਦਸਤਾਵੇਜ਼"
 
 #. MPCRM
 #: FictionBook_2.xcu
@@ -986,6 +996,16 @@ msgctxt ""
 msgid "Rich Text Format (Calc)"
 msgstr ""
 
+#. gSCsm
+#: SVGZ___Compressed_Scalable_Vector_Graphics.xcu
+msgctxt ""
+"SVGZ___Compressed_Scalable_Vector_Graphics.xcu\n"
+"SVGZ - Compressed Scalable Vector Graphics\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr ""
+
 #. KbNXG
 #: SVG___Scalable_Vector_Graphics.xcu
 msgctxt ""
@@ -1305,6 +1325,16 @@ msgctxt ""
 "value.text"
 msgid "WMF - Windows Metafile"
 msgstr "WMF - ਵਿੰਡੋਜ਼ ਮੇਟਾਫਾਇਲ"
+
+#. JFdh9
+#: WMZ___Compressed_MS_Windows_Metafile.xcu
+msgctxt ""
+"WMZ___Compressed_MS_Windows_Metafile.xcu\n"
+"WMZ - Compressed MS Windows Metafile\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr ""
 
 #. G6mAM
 #: WPS_Lotus_Calc.xcu
@@ -1646,6 +1676,16 @@ msgctxt ""
 msgid "EMF - Enhanced Metafile"
 msgstr "EMF - ਇੰਹਾਂਸਡ ਮੇਟਾਫਾਇਲ"
 
+#. FfGTC
+#: draw_emz_Export.xcu
+msgctxt ""
+"draw_emz_Export.xcu\n"
+"draw_emz_Export\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr ""
+
 #. Vx93E
 #: draw_eps_Export.xcu
 msgctxt ""
@@ -1716,6 +1756,16 @@ msgctxt ""
 msgid "SVG - Scalable Vector Graphics"
 msgstr "SVG - ਸਕੇਲੇਬਲ ਵੈਕਟਰ ਗਰਾਫਿਕਸ"
 
+#. 752Tv
+#: draw_svgz_Export.xcu
+msgctxt ""
+"draw_svgz_Export.xcu\n"
+"draw_svgz_Export\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr ""
+
 #. GsbKe
 #: draw_tif_Export.xcu
 msgctxt ""
@@ -1745,6 +1795,16 @@ msgctxt ""
 "value.text"
 msgid "WMF - Windows Metafile"
 msgstr "WMF - ਵਿੰਡੋਜ਼ ਮੇਟਾਫਾਇਲ"
+
+#. BPxLS
+#: draw_wmz_Export.xcu
+msgctxt ""
+"draw_wmz_Export.xcu\n"
+"draw_wmz_Export\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr ""
 
 #. 3fXiG
 #: impress8.xcu

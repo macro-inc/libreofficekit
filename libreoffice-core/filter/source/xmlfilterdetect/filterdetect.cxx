@@ -23,11 +23,12 @@
 #include <com/sun/star/container/XNameAccess.hpp>
 #include <com/sun/star/beans/PropertyState.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <ucbhelper/content.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <svl/inettype.hxx>
 #include <memory>
+#include <o3tl/string_view.hxx>
 
 using namespace com::sun::star::container;
 using namespace com::sun::star::uno;
@@ -35,13 +36,13 @@ using namespace com::sun::star::beans;
 
 namespace {
 
-OUString supportedByType( const OUString& clipBoardFormat,  const OUString& resultString, const OUString& checkType)
+OUString supportedByType( std::u16string_view clipBoardFormat, std::u16string_view resultString, const OUString& checkType)
 {
     OUString sTypeName;
-    if ( clipBoardFormat.match("doctype:") )
+    if ( o3tl::starts_with(clipBoardFormat, u"doctype:") )
     {
-        OUString tryStr = clipBoardFormat.copy(8);
-        if (resultString.indexOf(tryStr) >= 0)
+        std::u16string_view tryStr = clipBoardFormat.substr(8);
+        if (resultString.find(tryStr) != std::u16string_view::npos)
         {
             sTypeName = checkType;
         }

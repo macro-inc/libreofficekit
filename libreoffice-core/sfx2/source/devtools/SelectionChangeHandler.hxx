@@ -10,17 +10,15 @@
 
 #pragma once
 
-#include <memory>
-
 #include <sfx2/devtools/DevelopmentToolDockingWindow.hxx>
 
 #include <com/sun/star/frame/XController.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
 
-#include <cppuhelper/compbase.hxx>
-#include <cppuhelper/basemutex.hxx>
+#include <comphelper/compbase.hxx>
+#include <utility>
 
-typedef cppu::WeakComponentImplHelper<css::view::XSelectionChangeListener>
+typedef comphelper::WeakComponentImplHelper<css::view::XSelectionChangeListener>
     SelectionChangeHandlerInterfaceBase;
 
 /** Selection change handler to listen to document selection changes.
@@ -28,18 +26,16 @@ typedef cppu::WeakComponentImplHelper<css::view::XSelectionChangeListener>
  * Listens to the changes and notifies the docking window with a new
  * selected object, when a change happens.
  */
-class SelectionChangeHandler final : private ::cppu::BaseMutex,
-                                     public SelectionChangeHandlerInterfaceBase
+class SelectionChangeHandler final : public SelectionChangeHandlerInterfaceBase
 {
 private:
     css::uno::Reference<css::frame::XController> mxController;
     VclPtr<DevelopmentToolDockingWindow> mpDockingWindow;
 
 public:
-    SelectionChangeHandler(const css::uno::Reference<css::frame::XController>& rxController,
+    SelectionChangeHandler(css::uno::Reference<css::frame::XController> xController,
                            DevelopmentToolDockingWindow* pDockingWindow)
-        : SelectionChangeHandlerInterfaceBase(m_aMutex)
-        , mxController(rxController)
+        : mxController(std::move(xController))
         , mpDockingWindow(pDockingWindow)
     {
         css::uno::Reference<css::view::XSelectionSupplier> xSupplier(mxController,
@@ -69,7 +65,7 @@ public:
     }
 
     virtual void SAL_CALL disposing(const css::lang::EventObject& /*rEvent*/) override {}
-    virtual void SAL_CALL disposing() override {}
+    using comphelper::WeakComponentImplHelperBase::disposing;
 
 private:
     SelectionChangeHandler(const SelectionChangeHandler&) = delete;

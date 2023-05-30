@@ -10,8 +10,8 @@
 #include <swmodeltestbase.hxx>
 #include <unotools/tempfile.hxx>
 #include <tools/urlobj.hxx>
-#include <unotools/saveopt.hxx>
 #include <officecfg/Office/Common.hxx>
+#include <o3tl/string_view.hxx>
 
 // This file contains tests to check relative/absolute hyperlinks handling
 
@@ -45,13 +45,12 @@
             CPPUNIT_ASSERT(!sFileName.isEmpty());                                                  \
                                                                                                    \
             /* Get temp path */                                                                    \
-            OUString sTempDir = utl::TempFile::GetTempNameBaseDirectory();                         \
+            OUString sTempDir = utl::GetTempNameBaseDirectory();                                   \
                                                                                                    \
             /* Create & apply new URL */                                                           \
             OUString sOriginalFileInTempDir = sTempDir + sFileName;                                \
             uno::Reference<beans::XPropertySet> xPropertySet(xText, css::uno::UNO_QUERY);          \
-            xPropertySet->setPropertyValue("HyperLinkURL",                                         \
-                                           css::uno::makeAny(sOriginalFileInTempDir));             \
+            xPropertySet->setPropertyValue("HyperLinkURL", css::uno::Any(sOriginalFileInTempDir)); \
         }                                                                                          \
                                                                                                    \
     public:                                                                                        \
@@ -99,16 +98,6 @@ public:
     Test()
         : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text")
     {
-    }
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override
-    {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
     }
 };
 

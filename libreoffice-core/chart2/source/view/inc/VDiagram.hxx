@@ -18,11 +18,12 @@
  */
 #pragma once
 
-#include <com/sun/star/drawing/XShapes.hpp>
 #include <basegfx/range/b2irectangle.hxx>
 #include <com/sun/star/drawing/Direction3D.hpp>
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/awt/Point.hpp>
+#include <svx/unoshape.hxx>
+#include <rtl/ref.hxx>
 
 namespace com::sun::star::beans { class XPropertySet; }
 namespace com::sun::star::chart2 { class XDiagram; }
@@ -32,7 +33,7 @@ namespace com::sun::star::drawing { class XShape; }
 
 namespace chart
 {
-
+class Diagram;
 class ShapeFactory;
 
 /** The VDiagram is responsible to generate the visible parts of the Diagram
@@ -44,20 +45,19 @@ diagram.
 class VDiagram final
 {
 public: //methods
-    VDiagram( const css::uno::Reference<css::chart2::XDiagram>& xDiagram,
+    VDiagram( const rtl::Reference<::chart::Diagram>& xDiagram,
               const css::drawing::Direction3D& rPreferredAspectRatio,
               sal_Int32 nDimension );
     ~VDiagram();
 
     void init(
-        const css::uno::Reference<css::drawing::XShapes>& xTarget,
-        const css::uno::Reference<css::lang::XMultiServiceFactory>& xFactory );
+        const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
     void    createShapes( const css::awt::Point& rPos
                         , const css::awt::Size& rSize );
 
-    css::uno::Reference< css::drawing::XShapes >
-            getCoordinateRegion() const { return css::uno::Reference<css::drawing::XShapes>( m_xCoordinateRegionShape, css::uno::UNO_QUERY );}
+    const rtl::Reference<SvxShapeGroupAnyD> &
+            getCoordinateRegion() const { return m_xCoordinateRegionShape; }
 
     /**
      * Get current bounding rectangle for the diagram without axes.
@@ -85,18 +85,16 @@ private: //methods
 private: //members
     VDiagram(const VDiagram& rD) = delete;
 
-    css::uno::Reference< css::drawing::XShapes >                    m_xTarget;
-    css::uno::Reference< css::lang::XMultiServiceFactory>           m_xShapeFactory;
-    ShapeFactory* m_pShapeFactory;
+    rtl::Reference<SvxShapeGroupAnyD>                    m_xTarget;
 
     // this is the surrounding shape which contains floor, wall and coordinate
-    css::uno::Reference< css::drawing::XShape >   m_xOuterGroupShape;
+    rtl::Reference<SvxShapeGroupAnyD>   m_xOuterGroupShape;
     // this is an additional inner shape that represents the coordinate region -  that is - where to place data points
-    css::uno::Reference< css::drawing::XShape >   m_xCoordinateRegionShape;
-    css::uno::Reference< css::drawing::XShape >   m_xWall2D;
+    rtl::Reference<SvxShapeGroupAnyD>   m_xCoordinateRegionShape;
+    rtl::Reference<SvxShapeRect> m_xWall2D;
 
-    sal_Int32                                                               m_nDimensionCount;
-    css::uno::Reference< css::chart2::XDiagram >                                m_xDiagram;
+    sal_Int32                          m_nDimensionCount;
+    rtl::Reference< ::chart::Diagram > m_xDiagram;
 
     css::drawing::Direction3D                                  m_aPreferredAspectRatio;
     css::uno::Reference< css::beans::XPropertySet > m_xAspectRatio3D;

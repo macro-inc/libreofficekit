@@ -38,7 +38,7 @@ public: //methods
     const ObjectIdentifier& getSelectedOID() const { return m_aSelectedOID;}
 
     bool isResizeableObjectSelected() const;
-    bool isRotateableObjectSelected( const css::uno::Reference< css::frame::XModel >& xChartModel ) const;
+    bool isRotateableObjectSelected( const rtl::Reference<::chart::ChartModel>& xChartModel ) const;
     bool isDragableObjectSelected() const;
 
     bool isAdditionalShapeSelected() const;
@@ -72,7 +72,7 @@ private: //member
     ObjectIdentifier    m_aSelectedOID_selectOnlyIfNoDoubleClickIsFollowing;
 };
 
-class SelectionHelper : public MarkHandleProvider
+class SelectionHelper final : public MarkHandleProvider
 {
 public:
     static bool             findNamedParent( SdrObject*& pInOutObject
@@ -92,8 +92,8 @@ public:
         DrawViewWrapper const & rDrawViewWrapper,
         bool bGetDiagramInsteadOf_Wall=false );
 
-    static bool isRotateableObject( const OUString& rCID
-                    , const css::uno::Reference< css::frame::XModel >& xChartModel );
+    static bool isRotateableObject( std::u16string_view rCID
+                    , const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     explicit SelectionHelper( SdrObject* pSelectedObj );
     virtual ~SelectionHelper();

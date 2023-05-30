@@ -39,6 +39,8 @@
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
 
+#include <unotools/mediadescriptor.hxx>
+
 namespace oox::drawingml::chart {
 
 using namespace ::com::sun::star::chart2;
@@ -450,7 +452,8 @@ const ShapePropertyIds spnCommonPropIds =
     PROP_FillStyle, PROP_FillColor, PROP_FillTransparence, PROP_FillTransparenceGradientName, PROP_FillGradientName,
     PROP_FillBitmapName, PROP_FillBitmapMode, PROP_FillBitmapSizeX, PROP_FillBitmapSizeY,
     PROP_FillBitmapPositionOffsetX, PROP_FillBitmapPositionOffsetY, PROP_FillBitmapRectanglePoint,
-    PROP_FillHatchName, PROP_FillBackground
+    PROP_FillHatchName, PROP_FillBackground,
+    PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID
 };
 
 const ShapePropertyIds spnLinearPropIds =
@@ -460,7 +463,8 @@ const ShapePropertyIds spnLinearPropIds =
     PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID,
     PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID,
     PROP_INVALID, PROP_INVALID, PROP_INVALID,
-    PROP_INVALID, PROP_INVALID
+    PROP_INVALID, PROP_INVALID,
+    PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID
 };
 
 const ShapePropertyIds spnFilledPropIds =
@@ -491,7 +495,8 @@ const ShapePropertyIds spnFilledPropIds =
     PROP_FillBitmapPositionOffsetY,
     PROP_FillBitmapRectanglePoint,
     PROP_HatchName,
-    PROP_FillBackground
+    PROP_FillBackground,
+    PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID, PROP_INVALID
 };
 
 /** Property info for common chart objects, to be used in ShapePropertyMap. */
@@ -826,17 +831,22 @@ LineFormatter::LineFormatter( ObjectFormatterData& rData, const AutoFormatEntry*
     if( const Theme* pTheme = mrData.mrFilter.getCurrentTheme() )
         if( const LineProperties* pLineProps = pTheme->getLineStyle( pAutoFormatEntry->mnThemedIdx ) )
             *mxAutoLine = *pLineProps;
-    // set automatic border property for chartarea, because of tdf#81437 and tdf#82217
+    // set automatic border property for chartarea, because of tdf#81437 and tdf#82217, except for Impress (tdf#150176)
     if ( eObjType == OBJECTTYPE_CHARTSPACE )
     {
-        mxAutoLine->maLineFill.moFillType = oox::GraphicHelper::getDefaultChartAreaLineStyle();
-        mxAutoLine->moLineWidth = oox::GraphicHelper::getDefaultChartAreaLineWidth();
-        // this value is what MSO 2016 use as a default color for chartspace border
-        mxAutoLine->maLineFill.maFillColor.setSrgbClr( 0xD9D9D9 );
+        OUString aFilterName;
+        rData.mrFilter.getMediaDescriptor()[utl::MediaDescriptor::PROP_FILTERNAME] >>= aFilterName;
+        if (!aFilterName.startsWithIgnoreAsciiCase("Impress"))
+        {
+            mxAutoLine->maLineFill.moFillType = oox::GraphicHelper::getDefaultChartAreaLineStyle();
+            mxAutoLine->moLineWidth = oox::GraphicHelper::getDefaultChartAreaLineWidth();
+            // this value is what MSO 2016 use as a default color for chartspace border
+            mxAutoLine->maLineFill.maFillColor.setSrgbClr(0xD9D9D9);
+        }
     }
     // change line width according to chart auto style
-    if( mxAutoLine->moLineWidth.has() )
-        mxAutoLine->moLineWidth = mxAutoLine->moLineWidth.get() * pAutoFormatEntry->mnRelLineWidth / 100;
+    if( mxAutoLine->moLineWidth.has_value() )
+        mxAutoLine->moLineWidth = mxAutoLine->moLineWidth.value() * pAutoFormatEntry->mnRelLineWidth / 100;
 }
 
 void LineFormatter::convertFormatting( ShapePropertyMap& rPropMap, const ModelRef< Shape >& rxShapeProp, sal_Int32 nSeriesIdx )
@@ -873,7 +883,7 @@ void FillFormatter::convertFormatting( ShapePropertyMap& rPropMap, const ModelRe
     FillProperties aFillProps;
     if( mxAutoFill )
         aFillProps.assignUsed( *mxAutoFill );
-    if( rxShapeProp.is() )
+    if (rxShapeProp)
         aFillProps.assignUsed( rxShapeProp->getFillProperties() );
     if( pPicOptions )
         lclConvertPictureOptions( aFillProps, *pPicOptions );
@@ -903,7 +913,7 @@ TextFormatter::TextFormatter( ObjectFormatterData& rData, const AutoTextEntry* p
     ::Color nTextColor = getPhColor( -1 );
     if( sal_Int32(nTextColor) >= 0 ) {
         mxAutoText->maFillProperties.maFillColor.setSrgbClr( nTextColor );
-        mxAutoText->maFillProperties.moFillType.set(XML_solidFill);
+        mxAutoText->maFillProperties.moFillType = XML_solidFill;
     }
     mxAutoText->moHeight = pAutoTextEntry->mnDefFontSize;
     mxAutoText->moBold = pAutoTextEntry->mbBold;
@@ -911,8 +921,8 @@ TextFormatter::TextFormatter( ObjectFormatterData& rData, const AutoTextEntry* p
     if( const TextCharacterProperties* pTextProps = lclGetTextProperties( rxGlobalTextProp ) )
     {
         mxAutoText->assignUsed( *pTextProps );
-        if( pTextProps->moHeight.has() )
-            mxAutoText->moHeight = pTextProps->moHeight.get() * pAutoTextEntry->mnRelFontSize / 100;
+        if( pTextProps->moHeight.has_value() )
+            mxAutoText->moHeight = pTextProps->moHeight.value() * pAutoTextEntry->mnRelFontSize / 100;
     }
 }
 
@@ -1057,14 +1067,14 @@ void ObjectFormatter::convertTextRotation( PropertySet& rPropSet, const ModelRef
     bool bStacked = false;
     if( bSupportsStacked )
     {
-        sal_Int32 nVert = rxTextProp->getTextProperties().moVert.get( XML_horz );
+        sal_Int32 nVert = rxTextProp->getTextProperties().moVert.value_or( XML_horz );
         bStacked = (nVert == XML_wordArtVert) || (nVert == XML_wordArtVertRtl);
         rPropSet.setProperty( PROP_StackCharacters, bStacked );
     }
 
     /*  Chart2 expects rotation angle as double value in range of [0,360).
         OOXML counts clockwise, Chart2 counts counterclockwise. */
-    double fAngle = static_cast< double >( bStacked ? 0 : rxTextProp->getTextProperties().moRotation.get( nDefaultRotation ) );
+    double fAngle = static_cast< double >( bStacked ? 0 : rxTextProp->getTextProperties().moTextAreaRotation.value_or( nDefaultRotation ) );
     // MS Office UI allows values only in range of [-90,90].
     if ( fAngle < -5400000.0 || fAngle > 5400000.0 )
     {
@@ -1123,9 +1133,9 @@ void ObjectFormatter::convertNumberFormat( PropertySet& rPropSet, const NumberFo
 
     // Setting "LinkNumberFormatToSource" does not really work, at least not for axis :-/
     if (!bAxis)
-        rPropSet.setProperty(PROP_LinkNumberFormatToSource, makeAny(rNumberFormat.mbSourceLinked));
+        rPropSet.setProperty(PROP_LinkNumberFormatToSource, Any(rNumberFormat.mbSourceLinked));
     else
-        rPropSet.setProperty(PROP_LinkNumberFormatToSource, makeAny(rNumberFormat.maFormatCode.isEmpty()));
+        rPropSet.setProperty(PROP_LinkNumberFormatToSource, Any(rNumberFormat.maFormatCode.isEmpty()));
 }
 
 void ObjectFormatter::convertAutomaticFill( PropertySet& rPropSet, ObjectType eObjType, sal_Int32 nSeriesIdx )
@@ -1136,7 +1146,7 @@ void ObjectFormatter::convertAutomaticFill( PropertySet& rPropSet, ObjectType eO
 
 bool ObjectFormatter::isAutomaticFill( const ModelRef< Shape >& rxShapeProp )
 {
-    return !rxShapeProp || !rxShapeProp->getFillProperties().moFillType.has();
+    return !rxShapeProp || !rxShapeProp->getFillProperties().moFillType.has_value();
 }
 
 } // namespace oox

@@ -30,6 +30,7 @@
 #include "tox.hxx"
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <o3tl/sorted_vector.hxx>
 
@@ -84,7 +85,7 @@ struct SwConversionArgs;
 struct SvxSwAutoFormatFlags;
 struct SwInsertTableOptions;
 struct SwDBData;
-enum class SvtScriptType;
+enum class SvtScriptType : sal_uInt8;
 enum class SfxClassificationPolicyType;
 enum class RedlineFlags;
 enum class TransliterationFlags;
@@ -119,8 +120,8 @@ struct SwGetINetAttr
     OUString sText;
     const SwTextINetFormat& rINetAttr;
 
-    SwGetINetAttr( const OUString& rText, const SwTextINetFormat& rAttr )
-        : sText( rText ), rINetAttr( rAttr )
+    SwGetINetAttr( OUString aText, const SwTextINetFormat& rAttr )
+        : sText(std::move( aText )), rINetAttr( rAttr )
     {}
 };
 typedef std::vector<SwGetINetAttr> SwGetINetAttrs;
@@ -710,6 +711,11 @@ public:
     /// For Inserting SoftHyphen. Position is offset within the syllabificated word.
     static void InsertSoftHyph( const sal_Int32 nHyphPos );
 
+    /**
+     * Inserts an nRows x nCols table to the document at the current position. Unlike the UI, this
+     * function does not move the user's cursor to the first cell of the just inserted table, use
+     * `MoveTable(GotoPrevTable, fnTableStart)` to do that.
+     */
     const SwTable& InsertTable( const SwInsertTableOptions& rInsTableOpts,  ///< All
                                 sal_uInt16 nRows, sal_uInt16 nCols,
                                 const SwTableAutoFormat* pTAFormat = nullptr );
@@ -826,7 +832,7 @@ public:
 
     bool InsertURL( const SwFormatINetFormat& rFormat, const OUString& rStr,
                     bool bKeepSelection = false );
-    void GetINetAttrs( SwGetINetAttrs& rArr );
+    void GetINetAttrs(SwGetINetAttrs& rArr , bool bIncludeInToxContent = true);
 
     OUString GetDropText( const sal_Int32 nChars ) const;
     void   ReplaceDropText( const OUString &rStr, SwPaM* pPaM = nullptr );

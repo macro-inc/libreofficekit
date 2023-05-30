@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:51+0200\n"
-"PO-Revision-Date: 2022-08-19 12:58+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2022-12-27 11:23+0000\n"
 "Last-Translator: Quentin PAGÈS <quentinantonin@free.fr>\n"
 "Language-Team: Occitan <https://translations.documentfoundation.org/projects/libo_ui-master/starmathmessages/oc/>\n"
 "Language: oc\n"
@@ -2807,22 +2807,16 @@ msgid "Unknown"
 msgstr "Desconegut"
 
 #. znrh2
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:205
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:208
 msgctxt "catalogdialog|extended_tip|preview"
 msgid "Displays a preview of the current selection."
 msgstr "Mostrar un apercebut de la seleccion activa"
 
 #. DSYgZ
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:246
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:249
 msgctxt "catalogdialog|extended_tip|CatalogDialog"
 msgid "Opens the Symbols dialog, in which you can select a symbol to insert in the formula."
 msgstr ""
-
-#. P3rFo
-#: starmath/uiconfig/smath/ui/dockingelements.ui:24
-msgctxt "dockingelements|ElementCategories|tooltip_text"
-msgid "Element categories"
-msgstr "Categorias d’elements"
 
 #. 4SGdP
 #: starmath/uiconfig/smath/ui/fontdialog.ui:16
@@ -3262,6 +3256,12 @@ msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "These changes will apply for all new formulas."
 msgstr "Aquelas modificacions seràn aplicadas a totas las novèlas formulas."
 
+#. XBBFa
+#: starmath/uiconfig/smath/ui/sidebarelements_math.ui:24
+msgctxt "mathelementspanel|ElementCategories|tooltip_text"
+msgid "Element categories"
+msgstr ""
+
 #. 6EqHz
 #: starmath/uiconfig/smath/ui/smathsettings.ui:41
 msgctxt "smathsettings|title"
@@ -3669,7 +3669,7 @@ msgstr "Operadors"
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:1608
 msgctxt "spacingdialog|10label1"
 msgid "_Left:"
-msgstr "_Esquèrra :"
+msgstr "_Esquèrra :"
 
 #. PBu3t
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:1621

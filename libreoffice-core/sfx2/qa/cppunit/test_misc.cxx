@@ -25,13 +25,9 @@
 #include <com/sun/star/packages/zip/ZipFileAccess.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/ucb/NameClashException.hpp>
 
-#include <test/bootstrapfixture.hxx>
-#include <test/xmltesttools.hxx>
-#include <unotest/macros_test.hxx>
+#include <test/unoapixml_test.hxx>
 
-#include <unotools/mediadescriptor.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/processfactory.hxx>
@@ -45,12 +41,13 @@ using namespace ::com::sun::star;
 namespace {
 
 class MiscTest
-    : public test::BootstrapFixture
-    , public unotest::MacrosTest
-    , public XmlTestTools
+    : public UnoApiXmlTest
 {
 public:
-    virtual void setUp() override;
+    MiscTest()
+        : UnoApiXmlTest("/sfx2/qa/cppunit/misc/")
+    {
+    }
 
     virtual void registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx) override
     {
@@ -64,13 +61,6 @@ public:
     }
 };
 
-void MiscTest::setUp()
-{
-    m_xContext = comphelper::getProcessComponentContext();
-    mxDesktop.set(frame::Desktop::create(m_xContext));
-    SfxApplication::GetOrCreate();
-}
-
 CPPUNIT_TEST_FIXTURE(MiscTest, testODFCustomMetadata)
 {
     uno::Reference<document::XDocumentProperties> const xProps(
@@ -82,52 +72,41 @@ CPPUNIT_TEST_FIXTURE(MiscTest, testODFCustomMetadata)
     uno::Sequence<beans::PropertyValue> mimeArgs({
         beans::PropertyValue("MediaType", -1, uno::Any(OUString("application/vnd.oasis.opendocument.text")), beans::PropertyState_DIRECT_VALUE)
         });
-    utl::TempFile aTempFile;
-    xProps->storeToMedium(aTempFile.GetURL(), mimeArgs);
+    xProps->storeToMedium(maTempFile.GetURL(), mimeArgs);
 
     // check that custom metadata is preserved
-    uno::Reference<packages::zip::XZipFileAccess2> const xZip(
-        packages::zip::ZipFileAccess::createWithURL(m_xContext, aTempFile.GetURL()));
-    uno::Reference<io::XInputStream> const xInputStream(xZip->getByName("meta.xml"), uno::UNO_QUERY);
-    std::unique_ptr<SvStream> const pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("meta.xml");
     assertXPathContent(pXmlDoc, "/office:document-meta/office:meta/bork", "bork");
     assertXPath(pXmlDoc, "/office:document-meta/office:meta/foo:bar", 1);
     assertXPath(pXmlDoc, "/office:document-meta/office:meta/foo:bar/baz:foo", 1);
     assertXPath(pXmlDoc, "/office:document-meta/office:meta/foo:bar/baz:foo[@baz:bar='foo']");
     assertXPathContent(pXmlDoc, "/office:document-meta/office:meta/foo:bar/foo:baz", "bar");
-
-    aTempFile.EnableKillingFile();
 }
 
 CPPUNIT_TEST_FIXTURE(MiscTest, testNoThumbnail)
 {
     // Load a document.
-    const OUString aURL(m_directories.getURLFromSrc(u"/sfx2/qa/cppunit/misc/hello.odt"));
-    uno::Reference<lang::XComponent> xComponent
-        = loadFromDesktop(aURL, "com.sun.star.text.TextDocument");
+    loadFromURL(u"hello.odt");
 
     // Save it with the NoThumbnail option and assert that it has no thumbnail.
 #ifndef _WIN32
     mode_t nMask = umask(022);
 #endif
-    uno::Reference<frame::XStorable> xStorable(xComponent, uno::UNO_QUERY);
+    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
     CPPUNIT_ASSERT(xStorable.is());
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
     uno::Sequence<beans::PropertyValue> aProperties(
-        comphelper::InitPropertySequence({ { "NoThumbnail", uno::makeAny(true) } }));
-    osl::File::remove(aTempFile.GetURL());
-    xStorable->storeToURL(aTempFile.GetURL(), aProperties);
+        comphelper::InitPropertySequence({ { "NoThumbnail", uno::Any(true) } }));
+    osl::File::remove(maTempFile.GetURL());
+    xStorable->storeToURL(maTempFile.GetURL(), aProperties);
     uno::Reference<packages::zip::XZipFileAccess2> xZipFile
-        = packages::zip::ZipFileAccess::createWithURL(m_xContext, aTempFile.GetURL());
+        = packages::zip::ZipFileAccess::createWithURL(m_xContext, maTempFile.GetURL());
     CPPUNIT_ASSERT(!xZipFile->hasByName("Thumbnails/thumbnail.png"));
 
 #ifndef _WIN32
     // Check permissions of the URL after store.
     osl::DirectoryItem aItem;
     CPPUNIT_ASSERT_EQUAL(osl::DirectoryItem::E_None,
-                         osl::DirectoryItem::get(aTempFile.GetURL(), aItem));
+                         osl::DirectoryItem::get(maTempFile.GetURL(), aItem));
 
     osl::FileStatus aStatus(osl_FileStatus_Mask_Attributes);
     CPPUNIT_ASSERT_EQUAL(osl::DirectoryItem::E_None, aItem.getFileStatus(aStatus));
@@ -138,7 +117,7 @@ CPPUNIT_TEST_FIXTURE(MiscTest, testNoThumbnail)
     CPPUNIT_ASSERT(aStatus.getAttributes() & osl_File_Attribute_OthRead);
 
     // Now "save as" again to trigger the "overwrite" case.
-    xStorable->storeToURL(aTempFile.GetURL(), {});
+    xStorable->storeToURL(maTempFile.GetURL(), {});
     CPPUNIT_ASSERT_EQUAL(osl::DirectoryItem::E_None, aItem.getFileStatus(aStatus));
     // The following check used to fail in the past, result had temp file
     // permissions.
@@ -146,17 +125,14 @@ CPPUNIT_TEST_FIXTURE(MiscTest, testNoThumbnail)
 
     umask(nMask);
 #endif
-
-    xComponent->dispose();
 }
 
 CPPUNIT_TEST_FIXTURE(MiscTest, testHardLinks)
 {
 #ifndef _WIN32
-    OUString aSourceDir = m_directories.getURLFromSrc(u"/sfx2/qa/cppunit/misc/");
     OUString aTargetDir = m_directories.getURLFromWorkdir(u"/CppunitTest/sfx2_misc.test.user/");
     const OUString aURL(aTargetDir + "hello.odt");
-    osl::File::copy(aSourceDir + "hello.odt", aURL);
+    osl::File::copy(createFileURL(u"hello.odt"), aURL);
     OUString aTargetPath;
     osl::FileBase::getSystemPathFromFileURL(aURL, aTargetPath);
     OString aOld = aTargetPath.toUtf8();
@@ -165,9 +141,9 @@ CPPUNIT_TEST_FIXTURE(MiscTest, testHardLinks)
     int nRet = link(aOld.getStr(), aNew.getStr());
     CPPUNIT_ASSERT_EQUAL(0, nRet);
 
-    uno::Reference<lang::XComponent> xComponent = loadFromDesktop(aURL, "com.sun.star.text.TextDocument");
+    mxComponent = loadFromDesktop(aURL, "com.sun.star.text.TextDocument");
 
-    uno::Reference<frame::XStorable> xStorable(xComponent, uno::UNO_QUERY);
+    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
     xStorable->store();
 
     struct stat buf;
@@ -187,34 +163,30 @@ CPPUNIT_TEST_FIXTURE(MiscTest, testHardLinks)
     CPPUNIT_ASSERT_EQUAL(0, nRet);
     // This failed, the hello.odt.2 symlink was replaced with a real file.
     CPPUNIT_ASSERT(bool(S_ISLNK(buf.st_mode)));
-
-    xComponent->dispose();
 #endif
 }
 
 CPPUNIT_TEST_FIXTURE(MiscTest, testOverwrite)
 {
     // tdf#60237 - try to overwrite an existing file using the different settings of the Overwrite option
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    uno::Reference<lang::XComponent> xComponent
-        = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
-    uno::Reference<frame::XStorable> xStorable(xComponent, uno::UNO_QUERY);
+    mxComponent
+        = loadFromDesktop(maTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
     CPPUNIT_ASSERT(xStorable.is());
 
     // overwrite the file using the default case of the Overwrite option (true)
-    CPPUNIT_ASSERT_NO_THROW(xStorable->storeToURL(aTempFile.GetURL(), {}));
+    CPPUNIT_ASSERT_NO_THROW(xStorable->storeToURL(maTempFile.GetURL(), {}));
 
     // explicitly overwrite the file using the Overwrite option
     CPPUNIT_ASSERT_NO_THROW(xStorable->storeToURL(
-        aTempFile.GetURL(),
-        comphelper::InitPropertySequence({ { "Overwrite", uno::makeAny(true) } })));
+        maTempFile.GetURL(),
+        comphelper::InitPropertySequence({ { "Overwrite", uno::Any(true) } })));
 
     try
     {
         // overwrite an existing file with the Overwrite flag set to false
-        xStorable->storeToURL(aTempFile.GetURL(), comphelper::InitPropertySequence(
-                                                      { { "Overwrite", uno::makeAny(false) } }));
+        xStorable->storeToURL(maTempFile.GetURL(), comphelper::InitPropertySequence(
+                                                      { { "Overwrite", uno::Any(false) } }));
         CPPUNIT_ASSERT_MESSAGE("We expect an exception on overwriting an existing file", false);
     }
     catch (const css::uno::Exception&)

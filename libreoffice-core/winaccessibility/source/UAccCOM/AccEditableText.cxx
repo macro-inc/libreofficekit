@@ -21,16 +21,8 @@
  * AccEditableText.cpp : Implementation of CUAccCOMApp and DLL registration.
  */
 #include "stdafx.h"
-#include "AccEditableText.h"
-
-#if defined __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
-#endif
 #include  <UAccCOM.h>
-#if defined __clang__
-#pragma clang diagnostic pop
-#endif
+#include "AccEditableText.h"
 
 #include <vcl/svapp.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
@@ -60,7 +52,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::copyText(long startOffset, l
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK XInterface#
     if(!pRXEdtTxt.is())
@@ -73,7 +65,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::copyText(long startOffset, l
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -87,7 +79,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::deleteText(long startOffset,
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if( !pRXEdtTxt.is() )
         return E_FAIL;
@@ -97,7 +89,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::deleteText(long startOffset,
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -111,7 +103,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::insertText(long offset, BSTR
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if (text == nullptr)
         return E_INVALIDARG;
@@ -126,7 +118,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::insertText(long offset, BSTR
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -140,7 +132,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::cutText(long startOffset, lo
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if( !pRXEdtTxt.is() )
         return E_FAIL;
@@ -150,7 +142,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::cutText(long startOffset, lo
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -163,7 +155,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::pasteText(long offset)
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     if( !pRXEdtTxt.is() )
         return E_FAIL;
@@ -173,7 +165,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::pasteText(long offset)
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -188,7 +180,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::replaceText(long startOffset
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if (text == nullptr)
@@ -202,7 +194,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::replaceText(long startOffset
         return S_OK;
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -217,7 +209,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::setAttributes(long startOffs
 {
     SolarMutexGuard g;
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     // #CHECK#
     if (attributes == nullptr)
@@ -251,7 +243,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::setAttributes(long startOffs
 
     return E_FAIL;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /**
@@ -397,11 +389,11 @@ void CAccEditableText::get_AnyFromOLECHAR(std::u16string_view ouName, const OUSt
 
 
         // Dump into Sequence.
-        int iSeqLen = (vecTabStop.size() == 0) ? 1 : vecTabStop.size();
+        int iSeqLen = vecTabStop.empty() ? 1 : vecTabStop.size();
         Sequence< css::style::TabStop > seqTabStop(iSeqLen);
         auto pseqTabStop = seqTabStop.getArray();
 
-        if(vecTabStop.size() != 0)
+        if (!vecTabStop.empty())
         {
             // Dump every element.
             for(int i = 0; i < iSeqLen; i ++)
@@ -481,7 +473,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::put_XInterface(hyper pXInter
 {
     // internal IUNOXWrapper - no mutex meeded
 
-    ENTER_PROTECTED_BLOCK
+    try {
 
     CUNOXWrapper::put_XInterface(pXInterface);
     //special query.
@@ -499,7 +491,7 @@ COM_DECLSPEC_NOTHROW STDMETHODIMP CAccEditableText::put_XInterface(hyper pXInter
         pRXEdtTxt = pRXI.get();
     return S_OK;
 
-    LEAVE_PROTECTED_BLOCK
+    } catch(...) { return E_FAIL; }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

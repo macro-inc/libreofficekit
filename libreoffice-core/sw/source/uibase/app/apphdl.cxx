@@ -19,6 +19,7 @@
 
 #include <config_features.h>
 #include <config_fuzzers.h>
+#include <config_wasm_strip.h>
 
 #include <comphelper/propertysequence.hxx>
 #include <sfx2/dispatch.hxx>
@@ -35,13 +36,14 @@
 #include <svl/ctloptions.hxx>
 #include <svtools/colorcfg.hxx>
 #include <svtools/accessibilityoptions.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/useroptions.hxx>
 #include <com/sun/star/document/UpdateDocMode.hpp>
 #include <sfx2/docfile.hxx>
 #include <sfx2/objface.hxx>
 #include <vcl/settings.hxx>
 #include <vcl/svapp.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <view.hxx>
 #include <pview.hxx>
@@ -77,6 +79,8 @@
 #include <swabstdlg.hxx>
 #include <comphelper/dispatchcommand.hxx>
 #include <comphelper/processfactory.hxx>
+#include <comphelper/lok.hxx>
+#include <LibreOfficeKit/LibreOfficeKitEnums.h>
 
 #include <salhelper/simplereferenceobject.hxx>
 #include <rtl/ref.hxx>
@@ -169,9 +173,8 @@ void SwModule::StateOther(SfxItemSet &rSet)
             case FN_MAILMERGE_NEXT_ENTRY:
             case FN_MAILMERGE_LAST_ENTRY:
             {
-                SwView* pView = ::GetActiveView();
                 std::shared_ptr<SwMailMergeConfigItem> xConfigItem;
-                if (pView)
+                if (SwView* pView = GetActiveView())
                     xConfigItem = pView->GetMailMergeConfigItem();
                 if (!xConfigItem)
                     rSet.DisableItem(nWhich);
@@ -203,9 +206,8 @@ void SwModule::StateOther(SfxItemSet &rSet)
             case FN_MAILMERGE_PRINT_DOCUMENTS:
             case FN_MAILMERGE_EMAIL_DOCUMENTS:
             {
-                SwView* pView = ::GetActiveView();
                 std::shared_ptr<SwMailMergeConfigItem> xConfigItem;
-                if (pView)
+                if (SwView* pView = GetActiveView())
                     xConfigItem = pView->EnsureMailMergeConfigItem();
 
                 // #i51949# hide e-Mail option if e-Mail is not supported
@@ -243,13 +245,13 @@ std::shared_ptr<SwMailMergeConfigItem> SwView::EnsureMailMergeConfigItem(const S
         xMMConfig->SetSourceView(this);
 
         //set the first used database as default source on the config item
-        const SfxPoolItem* pItem = nullptr;
-        if (pArgs && SfxItemState::SET == pArgs->GetItemState(
-               FN_PARAM_DATABASE_PROPERTIES, false, &pItem))
+        const SfxUnoAnyItem* pItem = nullptr;
+        if (pArgs && (pItem = pArgs->GetItemIfSet(
+               FN_PARAM_DATABASE_PROPERTIES, false)))
         {
             //mailmerge has been called from the database beamer
             uno::Sequence< beans::PropertyValue> aDBValues;
-            if (static_cast<const SfxUnoAnyItem*>(pItem)->GetValue() >>= aDBValues)
+            if (pItem->GetValue() >>= aDBValues)
             {
                 SwDBData aDBData;
                 svx::ODataAccessDescriptor aDescriptor(aDBValues);
@@ -282,7 +284,7 @@ std::shared_ptr<SwMailMergeConfigItem> SwView::EnsureMailMergeConfigItem(const S
                 sal_Int32 nIdx{ 0 };
                 aDBData.sDataSource = sDBName.getToken(0, DB_DELIM, nIdx);
                 aDBData.sCommand = sDBName.getToken(0, DB_DELIM, nIdx);
-                aDBData.nCommandType = sDBName.getToken(0, DB_DELIM, nIdx).toInt32();
+                aDBData.nCommandType = o3tl::toInt32(o3tl::getToken(sDBName, 0, DB_DELIM, nIdx));
                 //set the currently used database for the wizard
                 xMMConfig->SetCurrentDBData(aDBData);
             }
@@ -749,6 +751,9 @@ void SwModule::ExecOther(SfxRequest& rReq)
         case FN_MAILMERGE_CURRENT_ENTRY:
         {
             SwView* pView = ::GetActiveView();
+            if (!pView)
+                return;
+
             const std::shared_ptr<SwMailMergeConfigItem>& xConfigItem = pView->GetMailMergeConfigItem();
             if (!xConfigItem)
                 return;
@@ -770,15 +775,15 @@ void SwModule::ExecOther(SfxRequest& rReq)
             // now the record has to be merged into the source document
             // TODO can we re-use PerformMailMerge() here somehow?
             const SwDBData& rDBData = xConfigItem->GetCurrentDBData();
-            uno::Sequence<uno::Any> vSelection({ uno::makeAny(xConfigItem->GetResultSetPosition()) });
+            uno::Sequence<uno::Any> vSelection({ uno::Any(xConfigItem->GetResultSetPosition()) });
             svx::ODataAccessDescriptor aDescriptor(::comphelper::InitPropertySequence({
-                        {"Selection",        uno::makeAny(vSelection)},
-                        {"DataSourceName",   uno::makeAny(rDBData.sDataSource)},
-                        {"Command",          uno::makeAny(rDBData.sCommand)},
-                        {"CommandType",      uno::makeAny(rDBData.nCommandType)},
-                        {"ActiveConnection", uno::makeAny(xConfigItem->GetConnection().getTyped())},
-                        {"Filter",           uno::makeAny(xConfigItem->GetFilter())},
-                        {"Cursor",           uno::makeAny(xConfigItem->GetResultSet())}
+                        {"Selection",        uno::Any(vSelection)},
+                        {"DataSourceName",   uno::Any(rDBData.sDataSource)},
+                        {"Command",          uno::Any(rDBData.sCommand)},
+                        {"CommandType",      uno::Any(rDBData.nCommandType)},
+                        {"ActiveConnection", uno::Any(xConfigItem->GetConnection().getTyped())},
+                        {"Filter",           uno::Any(xConfigItem->GetFilter())},
+                        {"Cursor",           uno::Any(xConfigItem->GetResultSet())}
                         }));
 
             SwWrtShell& rSh = pView->GetWrtShell();
@@ -810,14 +815,18 @@ void SwModule::ExecOther(SfxRequest& rReq)
         case FN_MAILMERGE_PRINT_DOCUMENTS:
         case FN_MAILMERGE_EMAIL_DOCUMENTS:
         {
-            std::shared_ptr<SwMailMergeConfigItem> xConfigItem = GetActiveView()->GetMailMergeConfigItem();
+            SwView* pView = ::GetActiveView();
+            if (!pView)
+                return;
+
+            std::shared_ptr<SwMailMergeConfigItem> xConfigItem = pView->GetMailMergeConfigItem();
             assert(xConfigItem);
-            if (!xConfigItem || !xConfigItem->GetResultSet().is())
+            if (!xConfigItem->GetResultSet().is())
             {
                 // The connection has been attempted, but failed or no results found,
                 // so invalidate the toolbar buttons in case they need to be disabled.
                 SfxBindings& rBindings
-                    = GetActiveView()->GetWrtShell().GetView().GetViewFrame()->GetBindings();
+                    = pView->GetWrtShell().GetView().GetViewFrame()->GetBindings();
                 rBindings.Invalidate(FN_MAILMERGE_CREATE_DOCUMENTS);
                 rBindings.Invalidate(FN_MAILMERGE_SAVE_DOCUMENTS);
                 rBindings.Invalidate(FN_MAILMERGE_PRINT_DOCUMENTS);
@@ -832,7 +841,7 @@ void SwModule::ExecOther(SfxRequest& rReq)
 
             if (nWhich == FN_MAILMERGE_CREATE_DOCUMENTS)
             {
-                xConfigItem = SwDBManager::PerformMailMerge(GetActiveView());
+                xConfigItem = SwDBManager::PerformMailMerge(pView);
 
                 if (xConfigItem && xConfigItem->GetTargetView())
                     xConfigItem->GetTargetView()->GetViewFrame()->GetFrame().Appear();
@@ -877,7 +886,7 @@ void SwModule::Notify( SfxBroadcaster& /*rBC*/, const SfxHint& rHint )
                     {
                         // assume that not calling via SwEditShell::SetFixFields
                         // is allowed, because the shell hasn't been created yet
-                        assert(!pWrtSh);
+                        assert(!pWrtSh || pWrtSh->GetView().GetViewFrame()->GetFrame().IsClosing_Impl());
                         pDocSh->GetDoc()->getIDocumentFieldsAccess().SetFixFields(nullptr);
                     }
                 }
@@ -965,37 +974,64 @@ void SwModule::ConfigurationChanged( utl::ConfigurationBroadcaster* pBrdCst, Con
     {
         m_bAuthorInitialised = false;
     }
-    else if ( pBrdCst == m_pColorConfig.get() || pBrdCst == m_pAccessibilityOptions.get() )
+    else if ( pBrdCst == m_pColorConfig.get() )
     {
-        bool bAccessibility = false;
-        if( pBrdCst == m_pColorConfig.get() )
-            SwViewOption::ApplyColorConfigValues(*m_pColorConfig);
-        else
-            bAccessibility = true;
-
-        //invalidate all edit windows
+        //invalidate only the current view in tiled rendering mode, or all views otherwise
+        bool bOnlyInvalidateCurrentView = comphelper::LibreOfficeKit::isActive();
+        SfxViewShell* pViewShell = bOnlyInvalidateCurrentView ? SfxViewShell::Current() : SfxViewShell::GetFirst();
+        while(pViewShell)
+        {
+            if(pViewShell->GetWindow())
+            {
+                auto pSwView = dynamic_cast<SwView *>( pViewShell );
+                if(pSwView !=  nullptr ||
+                   dynamic_cast< const SwPagePreview *>( pViewShell ) !=  nullptr ||
+                   dynamic_cast< const SwSrcView *>( pViewShell ) !=  nullptr)
+                {
+                    SwViewOption aNewOptions = *pSwView->GetWrtShell().GetViewOptions();
+                    aNewOptions.SetThemeName(m_pColorConfig->GetCurrentSchemeName());
+                    SwViewColors aViewColors(*m_pColorConfig);
+                    aNewOptions.SetColorConfig(aViewColors);
+                    pSwView->GetWrtShell().ApplyViewOptions(aNewOptions);
+                    pViewShell->GetWindow()->Invalidate();
+                    if (bOnlyInvalidateCurrentView)
+                    {
+                        pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_APPLICATION_BACKGROUND_COLOR,
+                            aViewColors.m_aAppBackgroundColor.AsRGBHexString().toUtf8().getStr());
+                    }
+                }
+            }
+            if (bOnlyInvalidateCurrentView)
+                break;
+            pViewShell = SfxViewShell::GetNext( *pViewShell );
+        }
+    }
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
+    else if ( pBrdCst == m_pAccessibilityOptions.get() )
+    {
+        //set Accessibility options
         SfxViewShell* pViewShell = SfxViewShell::GetFirst();
         while(pViewShell)
         {
             if(pViewShell->GetWindow())
             {
-                if(dynamic_cast< const SwView *>( pViewShell ) !=  nullptr ||
-                   dynamic_cast< const SwPagePreview *>( pViewShell ) !=  nullptr ||
-                   dynamic_cast< const SwSrcView *>( pViewShell ) !=  nullptr)
+                auto pSwView = dynamic_cast<SwView *>( pViewShell );
+                auto pPagePreview = dynamic_cast<SwPagePreview *>( pViewShell );
+
+                if(pSwView)
+                    pSwView->ApplyAccessibilityOptions(*m_pAccessibilityOptions);
+                else if(pPagePreview)
+                    pPagePreview->ApplyAccessibilityOptions(*m_pAccessibilityOptions);
+
+                if(pSwView || pPagePreview || dynamic_cast< const SwSrcView *>( pViewShell ) !=  nullptr)
                 {
-                    if(bAccessibility)
-                    {
-                        if(auto pSwView = dynamic_cast<SwView *>( pViewShell ))
-                            pSwView->ApplyAccessibilityOptions(*m_pAccessibilityOptions);
-                        else if(auto pPagePreview = dynamic_cast<SwPagePreview *>( pViewShell ))
-                            pPagePreview->ApplyAccessibilityOptions(*m_pAccessibilityOptions);
-                    }
                     pViewShell->GetWindow()->Invalidate();
                 }
             }
             pViewShell = SfxViewShell::GetNext( *pViewShell );
         }
     }
+#endif
     else if( pBrdCst == m_pCTLOptions.get() )
     {
         const SfxObjectShell* pObjSh = SfxObjectShell::GetFirst();
@@ -1026,7 +1062,7 @@ svtools::ColorConfig& SwModule::GetColorConfig()
     if(!m_pColorConfig)
     {
         m_pColorConfig.reset(new svtools::ColorConfig);
-        SwViewOption::ApplyColorConfigValues(*m_pColorConfig);
+        SwViewOption::SetInitialColorConfig(*m_pColorConfig);
         m_pColorConfig->AddListener(this);
     }
     return *m_pColorConfig;

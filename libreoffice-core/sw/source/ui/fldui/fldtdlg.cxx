@@ -102,10 +102,10 @@ SwFieldDlg::~SwFieldDlg()
 {
 }
 
-void SwFieldDlg::EndDialog()
+void SwFieldDlg::EndDialog(int nResponse)
 {
     m_bClosing = true;
-    SfxTabDialogController::EndDialog();
+    SfxTabDialogController::EndDialog(nResponse);
     m_bClosing = false;
 }
 
@@ -121,7 +121,7 @@ void SwFieldDlg::Close()
         // If Execute action did fail for whatever reason, this means that request
         // to close did fail or wasn't delivered to SwTextShell::ExecField().
         // Just explicitly close dialog in this case.
-        SfxTabDialogController::EndDialog();
+        SfxTabDialogController::EndDialog(RET_CLOSE);
     }
 }
 
@@ -138,7 +138,7 @@ SfxItemSet* SwFieldDlg::CreateInputItemSet(const OString& rID)
     SwDocShell *const pDocSh(static_cast<SwDocShell*>(SfxObjectShell::Current()));
     if (rID == "docinfo" && pDocSh) // might not have a shell if the dialog is restored on startup
     {
-        mxInputItemSet = std::make_unique<SfxItemSetFixed<SID_DOCINFO, SID_DOCINFO>>( pDocSh->GetPool() );
+        mxInputItemSet = std::make_unique<SfxItemSetFixed<FN_FIELD_DIALOG_DOC_PROPS, FN_FIELD_DIALOG_DOC_PROPS>>( pDocSh->GetPool() );
         using namespace ::com::sun::star;
         uno::Reference<document::XDocumentPropertiesSupplier> xDPS(
             pDocSh->GetModel(), uno::UNO_QUERY_THROW);
@@ -147,7 +147,7 @@ SfxItemSet* SwFieldDlg::CreateInputItemSet(const OString& rID)
         uno::Reference< beans::XPropertySet > xUDProps(
             xDocProps->getUserDefinedProperties(),
             uno::UNO_QUERY_THROW);
-        mxInputItemSet->Put( SfxUnoAnyItem( SID_DOCINFO, uno::makeAny(xUDProps) ) );
+        mxInputItemSet->Put( SfxUnoAnyItem( FN_FIELD_DIALOG_DOC_PROPS, uno::Any(xUDProps) ) );
         return mxInputItemSet.get();
     }
     else
@@ -180,8 +180,11 @@ void SwFieldDlg::ReInitDlg()
 
     if (bNewMode != m_bHtmlMode)
     {
-        SfxViewFrame::Current()->GetDispatcher()->
-            Execute(FN_INSERT_FIELD, SfxCallMode::ASYNCHRON|SfxCallMode::RECORD);
+        if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+        {
+            pViewFrm->GetDispatcher()->
+                Execute(FN_INSERT_FIELD, SfxCallMode::ASYNCHRON|SfxCallMode::RECORD);
+        }
         Close();
     }
 
@@ -189,8 +192,9 @@ void SwFieldDlg::ReInitDlg()
     if(!pActiveView)
         return;
     const SwWrtShell& rSh = pActiveView->GetWrtShell();
-    GetOKButton().set_sensitive(!rSh.IsReadOnlyAvailable() ||
-                                !rSh.HasReadonlySel());
+    GetOKButton().set_sensitive((  !rSh.IsReadOnlyAvailable()
+                                || !rSh.HasReadonlySel())
+                            &&  !SwCursorShell::PosInsideInputField(*rSh.GetCursor()->GetPoint()));
 
     ReInitTabPage("document");
     ReInitTabPage("variables");
@@ -217,14 +221,16 @@ void SwFieldDlg::ReInitTabPage(std::string_view rPageId, bool bOnlyActivate)
 // newly initialise after activation of a few TabPages
 void SwFieldDlg::Activate()
 {
-    SwView* pView = ::GetActiveView();
+    SwView* pView = GetActiveView();
     if( !pView )
         return;
 
     bool bHtmlMode = (::GetHtmlMode(static_cast<SwDocShell*>(SfxObjectShell::Current())) & HTMLMODE_ON) != 0;
     const SwWrtShell& rSh = pView->GetWrtShell();
-    GetOKButton().set_sensitive(!rSh.IsReadOnlyAvailable() ||
-                                !rSh.HasReadonlySel());
+    GetOKButton().set_sensitive((  !rSh.IsReadOnlyAvailable()
+                                || !rSh.HasReadonlySel())
+                            &&  !SwCursorShell::PosInsideInputField(*rSh.GetCursor()->GetPoint()));
+
 
     ReInitTabPage("variables", true);
 
@@ -240,11 +246,13 @@ void SwFieldDlg::EnableInsert(bool bEnable)
     if( bEnable )
     {
         SwView* pView = ::GetActiveView();
-        OSL_ENSURE(pView, "no view found");
         if( !pView ||
                 (pView->GetWrtShell().IsReadOnlyAvailable() &&
-                    pView->GetWrtShell().HasReadonlySel()) )
+                    pView->GetWrtShell().HasReadonlySel())
+            || SwCursorShell::PosInsideInputField(*pView->GetWrtShell().GetCursor()->GetPoint()))
+        {
             bEnable = false;
+        }
     }
     GetOKButton().set_sensitive(bEnable);
 }

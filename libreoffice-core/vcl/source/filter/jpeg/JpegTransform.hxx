@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_VCL_SOURCE_FILTER_JPEG_JPEGTRANSFORM_HXX
-#define INCLUDED_VCL_SOURCE_FILTER_JPEG_JPEGTRANSFORM_HXX
+#pragma once
 
 #include <tools/stream.hxx>
 
@@ -30,12 +29,9 @@ class JpegTransform final
 
 public:
     JpegTransform(SvStream& rInputStream, SvStream& rOutputStream);
-    ~JpegTransform();
 
     void setRotate(Degree10 aRotate);
     void perform();
 };
-
-#endif // INCLUDED_VCL_SOURCE_FILTER_JPEG_JPEGTRANSFORM_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -20,12 +20,13 @@
 #include <sdr/primitive2d/sdrolecontentprimitive2d.hxx>
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <svx/svdoole2.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <drawinglayer/primitive2d/graphicprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <svtools/colorcfg.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <basegfx/polygon/b2dpolygon.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 
 
@@ -33,7 +34,7 @@ namespace drawinglayer::primitive2d
 {
         void SdrOleContentPrimitive2D::create2DDecomposition(Primitive2DContainer& rContainer, const geometry::ViewInformation2D& /*aViewInformation*/) const
         {
-            const SdrOle2Obj* pSource = mpSdrOle2Obj.get();
+            rtl::Reference<SdrOle2Obj> pSource = mpSdrOle2Obj.get();
             bool bScaleContent(false);
             Graphic aGraphic;
 
@@ -123,18 +124,18 @@ namespace drawinglayer::primitive2d
                 const Color aVclColor(aColor.nColor);
                 aOutline.transform(getObjectTransform());
                 const drawinglayer::primitive2d::Primitive2DReference xOutline(
-                    new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(aOutline, aVclColor.getBColor()));
+                    new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(std::move(aOutline), aVclColor.getBColor()));
                 rContainer.push_back(xOutline);
             }
         }
 
         SdrOleContentPrimitive2D::SdrOleContentPrimitive2D(
             const SdrOle2Obj& rSdrOle2Obj,
-            const basegfx::B2DHomMatrix& rObjectTransform,
+            basegfx::B2DHomMatrix aObjectTransform,
             sal_uInt32 nGraphicVersion
         )
         :   mpSdrOle2Obj(const_cast< SdrOle2Obj* >(&rSdrOle2Obj)),
-            maObjectTransform(rObjectTransform),
+            maObjectTransform(std::move(aObjectTransform)),
             mnGraphicVersion(nGraphicVersion)
         {
         }
@@ -144,9 +145,11 @@ namespace drawinglayer::primitive2d
             if( BufferedDecompositionPrimitive2D::operator==(rPrimitive) )
             {
                 const SdrOleContentPrimitive2D& rCompare = static_cast<const SdrOleContentPrimitive2D&>(rPrimitive);
-                const bool bBothNot(!mpSdrOle2Obj.is() && !rCompare.mpSdrOle2Obj.is());
-                const bool bBothAndEqual(mpSdrOle2Obj.is() && rCompare.mpSdrOle2Obj.is()
-                    && mpSdrOle2Obj.get() == rCompare.mpSdrOle2Obj.get());
+                auto xSdrThis = mpSdrOle2Obj.get();
+                auto xSdrThat = rCompare.mpSdrOle2Obj.get();
+                const bool bBothNot(!xSdrThis && !xSdrThat);
+                const bool bBothAndEqual(xSdrThis && xSdrThat
+                    && xSdrThis.get() == xSdrThat.get());
 
                 return ((bBothNot || bBothAndEqual)
                     && getObjectTransform() == rCompare.getObjectTransform()

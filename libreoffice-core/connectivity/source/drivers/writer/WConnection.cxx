@@ -32,7 +32,7 @@
 #include <unotools/pathoptions.hxx>
 #include <connectivity/dbexception.hxx>
 #include <cppuhelper/exc_hlp.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -42,7 +42,6 @@ namespace connectivity::writer
 {
 OWriterConnection::OWriterConnection(ODriver* _pDriver)
     : OConnection(_pDriver)
-    , m_nDocCount(0)
 {
 }
 

@@ -11,8 +11,7 @@
 
 #include <string_view>
 
-#include <unotest/macros_test.hxx>
-#include <test/bootstrapfixture.hxx>
+#include <test/unoapi_test.hxx>
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XIndexContainer.hpp>
@@ -27,7 +26,6 @@
 #include <com/sun/star/form/XFormsSupplier.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
 #include <com/sun/star/script/XLibraryContainer.hpp>
 #include <com/sun/star/script/XLibraryContainerPassword.hpp>
@@ -59,17 +57,13 @@ using namespace ::com::sun::star::uno;
 
 /* Implementation of Macros test */
 
-class SwMacrosTest : public test::BootstrapFixture, public unotest::MacrosTest
+class SwMacrosTest : public UnoApiTest
 {
 public:
     SwMacrosTest();
 
-    void createFileURL(std::u16string_view aFile, OUString& rFilePath);
-
-    virtual void setUp() override;
-    virtual void tearDown() override;
-
     void testVba();
+    void testModernVBADelete();
     void testBookmarkDeleteAndJoin();
     void testBookmarkDeleteTdf90816();
     void testControlShapeGrouping();
@@ -80,6 +74,7 @@ public:
 
     CPPUNIT_TEST_SUITE(SwMacrosTest);
     CPPUNIT_TEST(testVba);
+    CPPUNIT_TEST(testModernVBADelete);
     CPPUNIT_TEST(testBookmarkDeleteAndJoin);
     CPPUNIT_TEST(testBookmarkDeleteTdf90816);
     CPPUNIT_TEST(testControlShapeGrouping);
@@ -88,28 +83,11 @@ public:
     CPPUNIT_TEST(testFdo87530);
     CPPUNIT_TEST(testFindReplace);
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<uno::XInterface> m_xWriterComponent;
-    OUString m_aBaseString;
 };
-
-void SwMacrosTest::createFileURL(std::u16string_view aFile, OUString& rFilePath)
-{
-    auto i = aFile.find_last_of('.');
-    CPPUNIT_ASSERT_MESSAGE("Missing Extension", i != std::string_view::npos);
-    std::u16string_view aFileExtension = aFile.substr(i+1);
-
-    rFilePath = m_directories.getSrcRootURL() + m_aBaseString + "/" + aFileExtension + "/" + aFile;
-}
 
 void SwMacrosTest::testVba()
 {
     TestMacroInfo testInfo[] = {
-        {
-            OUString("testVba.doc"),
-            OUString("vnd.sun.Star.script:Project.NewMacros.Macro1?language=Basic&location=document")
-        },
         {
             OUString("testVBA.docm"),
             OUString("vnd.sun.Star.script:Project.ThisDocument.testAll?language=Basic&location=document")
@@ -117,28 +95,78 @@ void SwMacrosTest::testVba()
         {
             OUString("testModernVBA.docm"),
             OUString("vnd.sun.Star.script:Project.ThisDocument.testAll?language=Basic&location=document")
+        },
+        {
+            OUString("testFind.docm"),
+            OUString("vnd.sun.Star.script:Project.Module1.testAll?language=Basic&location=document")
+        },
+        {
+            OUString("testDocumentRange.docm"),
+            OUString("vnd.sun.Star.script:Project.Module1.testAll?language=Basic&location=document")
+        },
+        /*{
+            OUString("testSelectionFind.docm"),
+            OUString("vnd.sun.Star.script:Project.Module1.testAll?language=Basic&location=document")
+        },
+        {
+            //current working tests here!
+
+            OUString("testFontColor.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.testAll?language=Basic&location=document")
         }
+        // TODO - make these pass in Writer
+        {
+            OUString("testSentences.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.TestAll?language=Basic&location=document")
+        },
+        {
+            OUString("testWords.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.TestAll?language=Basic&location=document")
+        },
+        {
+            OUString("testParagraphFormat.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.TestAll?language=Basic&location=document")
+        },*/
+        {
+            OUString("testTables.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.TestAll?language=Basic&location=document")
+        }
+
     };
     for ( size_t  i=0; i<SAL_N_ELEMENTS( testInfo ); ++i )
     {
-        OUString aFileName;
-        createFileURL(testInfo[i].sFileBaseName, aFileName);
-        uno::Reference< css::lang::XComponent > xComponent = loadFromDesktop(aFileName, "com.sun.star.text.TextDocument");
-        OUString sUrl = testInfo[i].sMacroUrl;
-        Any aRet;
-        Sequence< sal_Int16 > aOutParamIndex;
-        Sequence< Any > aOutParam;
-        Sequence< uno::Any > aParams;
+        OUString sFileName("docm/" + testInfo[i].sFileBaseName);
+        loadFromURL(sFileName);
 
-        SfxObjectShell* pFoundShell = SfxObjectShell::GetShellFromComponent(xComponent);
-
-        CPPUNIT_ASSERT_MESSAGE("Failed to access document shell", pFoundShell);
-        SfxObjectShell::CallXScript(xComponent, sUrl, aParams, aRet, aOutParamIndex,aOutParam);
+        uno::Any aRet = executeMacro(testInfo[i].sMacroUrl);
         OUString aStringRes;
-        aRet >>= aStringRes;
-        // CPPUNIT_ASSERT_EQUAL(OUString("OK"), aStringRes);
-        pFoundShell->DoClose();
+        CPPUNIT_ASSERT(aRet >>= aStringRes);
+        CPPUNIT_ASSERT_EQUAL(OUString("OK"), aStringRes);
     }
+}
+
+void SwMacrosTest::testModernVBADelete()
+{
+    TestMacroInfo testInfo =
+        {
+            OUString("testModernVBADelete.docm"),
+            OUString("vnd.sun.Star.script:Project.ThisDocument.testAll?language=Basic&location=document")
+        };
+
+    OUString sFileName("docm/" + testInfo.sFileBaseName);
+    loadFromURL(sFileName);
+
+    SwXTextDocument *const pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
+    SwDoc *const pDoc = pTextDoc->GetDocShell()->GetDoc();
+    pDoc->GetIDocumentUndoRedo().DoUndo(true);
+    CPPUNIT_ASSERT(!pDoc->GetIDocumentUndoRedo().GetUndoActionCount());
+
+    uno::Any aRet = executeMacro(testInfo.sMacroUrl);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pDoc->GetIDocumentUndoRedo().GetUndoActionCount());
+
+    OUString aStringRes;
+    CPPUNIT_ASSERT(aRet >>= aStringRes);
+    CPPUNIT_ASSERT_EQUAL(OUString("OK"), aStringRes);
 }
 
 void SwMacrosTest::testBookmarkDeleteAndJoin()
@@ -176,8 +204,8 @@ void SwMacrosTest::testBookmarkDeleteAndJoin()
     for (IDocumentMarkAccess::const_iterator_t i = rIDMA.getAllMarksBegin(); i != rIDMA.getAllMarksEnd(); ++i)
     {
         // problem was that the nContent was pointing at deleted node
-        CPPUNIT_ASSERT_EQUAL(static_cast<const SwContentNode*>((*i)->GetMarkStart().nContent.GetIdxReg()),
-            static_cast<const SwContentNode*>((*i)->GetMarkStart().nNode.GetNode().GetContentNode()));
+        CPPUNIT_ASSERT_EQUAL((*i)->GetMarkStart().GetContentNode(),
+            static_cast<const SwContentNode*>((*i)->GetMarkStart().GetNode().GetContentNode()));
     }
 }
 
@@ -213,12 +241,9 @@ void SwMacrosTest::testBookmarkDeleteTdf90816()
 
 void SwMacrosTest::testControlShapeGrouping()
 {
-    OUString aFileName;
-    createFileURL(u"testControlShapeGrouping.odt", aFileName);
-    Reference< css::lang::XComponent > xComponent(
-        loadFromDesktop(aFileName, "com.sun.star.text.TextDocument"));
+    loadFromURL(u"odt/testControlShapeGrouping.odt");
 
-    uno::Reference<frame::XModel> const xModel(xComponent, UNO_QUERY);
+    uno::Reference<frame::XModel> const xModel(mxComponent, UNO_QUERY);
     CPPUNIT_ASSERT(xModel.is());
     uno::Reference<lang::XMultiServiceFactory> xFactory(xModel, UNO_QUERY);
     uno::Reference<drawing::XDrawPageSupplier> const xDPS(xModel, UNO_QUERY);
@@ -250,7 +275,7 @@ void SwMacrosTest::testControlShapeGrouping()
         UNO_QUERY);
     xDateShape->setControl(xDateControlModel);
     uno::Reference<beans::XPropertySet> xDateShapeProps(xDateShape, UNO_QUERY);
-    xDateShapeProps->setPropertyValue("AnchorType", makeAny(text::TextContentAnchorType_AT_PARAGRAPH));
+    xDateShapeProps->setPropertyValue("AnchorType", Any(text::TextContentAnchorType_AT_PARAGRAPH));
 
     uno::Reference<drawing::XControlShape> const xTimeShape(
         xFactory->createInstance("com.sun.star.drawing.ControlShape"),
@@ -260,11 +285,11 @@ void SwMacrosTest::testControlShapeGrouping()
         UNO_QUERY);
     xTimeShape->setControl(xTimeControlModel);
     uno::Reference<beans::XPropertySet> xTimeShapeProps(xTimeShape, UNO_QUERY);
-    xTimeShapeProps->setPropertyValue("AnchorType", makeAny(text::TextContentAnchorType_AT_PARAGRAPH));
+    xTimeShapeProps->setPropertyValue("AnchorType", Any(text::TextContentAnchorType_AT_PARAGRAPH));
 
-    xFormNC->insertByName("aDateCntrl", makeAny(xDateControlModel));
+    xFormNC->insertByName("aDateCntrl", Any(xDateControlModel));
     xDPShapes->add(xDateShape);
-    xFormNC->insertByName("aTimeCntrl", makeAny(xTimeControlModel));
+    xFormNC->insertByName("aTimeCntrl", Any(xTimeControlModel));
     xDPShapes->add(xTimeShape);
 
     xShapes->add(xDateShape);
@@ -312,10 +337,6 @@ void SwMacrosTest::testControlShapeGrouping()
         CPPUNIT_ASSERT_EQUAL(xTS->getControl(), xTimeControlModel);
     }
 #endif
-
-    // close
-    Reference<util::XCloseable> xDocCloseable(xComponent, UNO_QUERY_THROW);
-    xDocCloseable->close(false);
 }
 
 void SwMacrosTest::testFdo55289()
@@ -334,16 +355,16 @@ void SwMacrosTest::testFdo55289()
             createInstance("com.sun.star.drawing.GraphicObjectShape"),
         UNO_QUERY);
     xShape->setPropertyValue("AnchorType",
-            makeAny(text::TextContentAnchorType_AT_PAGE));
+            Any(text::TextContentAnchorType_AT_PAGE));
     xShapes->add(uno::Reference<drawing::XShape>(xShape, UNO_QUERY));
     xShape->setPropertyValue("AnchorType",
-            makeAny(text::TextContentAnchorType_AT_CHARACTER));
+            Any(text::TextContentAnchorType_AT_CHARACTER));
     xShape->setPropertyValue("AnchorType",
-            makeAny(text::TextContentAnchorType_AS_CHARACTER));
+            Any(text::TextContentAnchorType_AS_CHARACTER));
     xShape->setPropertyValue("AnchorType",
-            makeAny(text::TextContentAnchorType_AT_CHARACTER));
+            Any(text::TextContentAnchorType_AT_CHARACTER));
     xShape->setPropertyValue("AnchorType",
-            makeAny(text::TextContentAnchorType_AS_CHARACTER));
+            Any(text::TextContentAnchorType_AS_CHARACTER));
     uno::Reference<text::XTextRange> const xEnd =
         uno::Reference<text::XTextDocument>(xModel, UNO_QUERY_THROW)->getText()->getEnd();
     uno::Reference<text::XTextContent> const xShapeContent(xShape, UNO_QUERY);
@@ -353,26 +374,13 @@ void SwMacrosTest::testFdo55289()
 
 void SwMacrosTest::testFdo68983()
 {
-    OUString aFileName;
-    createFileURL(u"fdo68983.odt", aFileName);
-    Reference< css::lang::XComponent > xComponent =
-        loadFromDesktop(aFileName, "com.sun.star.text.TextDocument");
-    Reference< frame::XStorable > xDocStorable(xComponent, UNO_QUERY_THROW);
+    loadFromURL(u"odt/fdo68983.odt");
+    Reference< frame::XStorable > xDocStorable(mxComponent, UNO_QUERY_THROW);
 
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    Sequence<beans::PropertyValue> desc( comphelper::InitPropertySequence({
-            { "FilterName", Any(OUString("writer8")) }
-        }));
-    xDocStorable->storeAsURL(aTempFile.GetURL(), desc);
-
-    Reference<util::XCloseable>(xComponent, UNO_QUERY_THROW)->close(false);
-
-    // re-load
-    xComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    saveAndReload("writer8");
 
     // check that password-protected library survived store and re-load
-    Reference<document::XEmbeddedScripts> xDocScr(xComponent, UNO_QUERY_THROW);
+    Reference<document::XEmbeddedScripts> xDocScr(mxComponent, UNO_QUERY_THROW);
     Reference<script::XStorageBasedLibraryContainer> xStorBasLib(xDocScr->getBasicLibraries());
     Reference<script::XLibraryContainer> xBasLib(xStorBasLib, UNO_QUERY_THROW);
     Reference<script::XLibraryContainerPassword> xBasLibPwd(xStorBasLib, UNO_QUERY_THROW);
@@ -380,47 +388,29 @@ void SwMacrosTest::testFdo68983()
     CPPUNIT_ASSERT(xBasLibPwd->verifyLibraryPassword("Library1", "foo"));
     xBasLib->loadLibrary("Library1");
     CPPUNIT_ASSERT(xBasLib->isLibraryLoaded("Library1"));
-
-    // close
-    Reference<util::XCloseable> xDocCloseable(xComponent, UNO_QUERY_THROW);
-    xDocCloseable->close(false);
 }
 
 void SwMacrosTest::testFdo87530()
 {
-    Reference<css::lang::XComponent> xComponent =
-        loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
-
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-
-    Sequence<beans::PropertyValue> desc( comphelper::InitPropertySequence({
-            { "FilterName", Any(OUString("writer8")) }
-        }));
+    mxComponent = loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
 
     {
         // insert initial password protected library
-        Reference<document::XEmbeddedScripts> xDocScr(xComponent, UNO_QUERY_THROW);
+        Reference<document::XEmbeddedScripts> xDocScr(mxComponent, UNO_QUERY_THROW);
         Reference<script::XStorageBasedLibraryContainer> xStorBasLib(xDocScr->getBasicLibraries());
         Reference<script::XLibraryContainer> xBasLib(xStorBasLib, UNO_QUERY_THROW);
         Reference<script::XLibraryContainerPassword> xBasLibPwd(xStorBasLib, UNO_QUERY_THROW);
         Reference<container::XNameContainer> xLibrary(xBasLib->createLibrary("BarLibrary"));
         xLibrary->insertByName("BarModule",
-                uno::makeAny(OUString("Sub Main\nEnd Sub\n")));
+                uno::Any(OUString("Sub Main\nEnd Sub\n")));
         xBasLibPwd->changeLibraryPassword("BarLibrary", "", "foo");
-
-        Reference<frame::XStorable> xDocStorable(xComponent, UNO_QUERY_THROW);
-        xDocStorable->storeAsURL(aTempFile.GetURL(), desc);
     }
 
-    Reference<util::XCloseable>(xComponent, UNO_QUERY_THROW)->close(false);
-
-    // re-load
-    xComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    saveAndReload("writer8");
 
     {
         // check that password-protected library survived store and re-load
-        Reference<document::XEmbeddedScripts> xDocScr(xComponent, UNO_QUERY_THROW);
+        Reference<document::XEmbeddedScripts> xDocScr(mxComponent, UNO_QUERY_THROW);
         Reference<script::XStorageBasedLibraryContainer> xStorBasLib(xDocScr->getBasicLibraries());
         Reference<script::XLibraryContainer> xBasLib(xStorBasLib, UNO_QUERY_THROW);
         Reference<script::XLibraryContainerPassword> xBasLibPwd(xStorBasLib, UNO_QUERY_THROW);
@@ -435,21 +425,14 @@ void SwMacrosTest::testFdo87530()
         // add a second module now - tdf#87530 happened here
         Reference<container::XNameContainer> xFooLib(xBasLib->createLibrary("FooLibrary"));
         xFooLib->insertByName("FooModule",
-                uno::makeAny(OUString("Sub Main\nEnd Sub\n")));
+                uno::Any(OUString("Sub Main\nEnd Sub\n")));
         xBasLibPwd->changeLibraryPassword("FooLibrary", "", "foo");
-
-        // store again
-        Reference<frame::XStorable> xDocStorable(xComponent, UNO_QUERY_THROW);
-        xDocStorable->store();
     }
 
-    Reference<util::XCloseable>(xComponent, UNO_QUERY_THROW)->close(false);
-
-    // re-load
-    xComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    saveAndReload("writer8");
 
     // check that password-protected library survived store and re-load
-    Reference<document::XEmbeddedScripts> xDocScr(xComponent, UNO_QUERY_THROW);
+    Reference<document::XEmbeddedScripts> xDocScr(mxComponent, UNO_QUERY_THROW);
     Reference<script::XStorageBasedLibraryContainer> xStorBasLib(xDocScr->getBasicLibraries());
     Reference<script::XLibraryContainer> xBasLib(xStorBasLib, UNO_QUERY_THROW);
     Reference<script::XLibraryContainerPassword> xBasLibPwd(xStorBasLib, UNO_QUERY_THROW);
@@ -460,22 +443,16 @@ void SwMacrosTest::testFdo87530()
     Reference<container::XNameContainer> xLibrary(xBasLib->getByName("FooLibrary"), UNO_QUERY);
     Any module(xLibrary->getByName("FooModule"));
     CPPUNIT_ASSERT_EQUAL(OUString("Sub Main\nEnd Sub\n"), module.get<OUString>());
-
-    // close
-    Reference<util::XCloseable>(xComponent, UNO_QUERY_THROW)->close(false);
 }
 
 
 void SwMacrosTest::testFindReplace()
 {
     // we need a full document with view and layout etc. because ::GetNode()
-    Reference<lang::XComponent> const xComponent =
+    mxComponent =
         loadFromDesktop("private:factory/swriter", "com.sun.star.text.TextDocument");
 
-    const ::comphelper::ScopeGuard aComponentScopeGuard(
-        [&xComponent]() { xComponent->dispose(); } );
-
-    SwXTextDocument *const pTextDoc = dynamic_cast<SwXTextDocument *>(xComponent.get());
+    SwXTextDocument *const pTextDoc = dynamic_cast<SwXTextDocument *>(mxComponent.get());
     CPPUNIT_ASSERT(pTextDoc);
     SwDoc *const pDoc = pTextDoc->GetDocShell()->GetDoc();
     SwNodeIndex aIdx(pDoc->GetNodes().GetEndOfContent(), -1);
@@ -510,7 +487,7 @@ void SwMacrosTest::testFindReplace()
             opts, false, SwDocPositions::Curr, SwDocPositions::End, bCancel, FindRanges::InBody);
     CPPUNIT_ASSERT(bFound);
     CPPUNIT_ASSERT(pPaM->HasMark());
-    CPPUNIT_ASSERT(pPaM->GetPoint()->nNode != pPaM->GetMark()->nNode);
+    CPPUNIT_ASSERT(pPaM->GetPoint()->GetNode() != pPaM->GetMark()->GetNode());
     CPPUNIT_ASSERT_EQUAL(OUString(OUStringChar(CH_TXTATR_NEWLINE)), pPaM->GetText());
 
     // now do another Find, inside the selection from the first Find
@@ -519,7 +496,7 @@ void SwMacrosTest::testFindReplace()
             opts, false, SwDocPositions::Curr, SwDocPositions::End, bCancel, FindRanges::InSel);
     CPPUNIT_ASSERT(bFound);
     CPPUNIT_ASSERT(pPaM->HasMark());
-    CPPUNIT_ASSERT(pPaM->GetPoint()->nNode != pPaM->GetMark()->nNode);
+    CPPUNIT_ASSERT(pPaM->GetPoint()->GetNode() != pPaM->GetMark()->GetNode());
     CPPUNIT_ASSERT_EQUAL(OUString(OUStringChar(CH_TXTATR_NEWLINE)), pPaM->GetText());
 
     rIDCO.ReplaceRange(*pPaM, " ", true);
@@ -529,33 +506,15 @@ void SwMacrosTest::testFindReplace()
 
     // problem was that after the 2nd Find, the wrong newline was selected
     CPPUNIT_ASSERT_EQUAL(OUString("foo bar"),
-            pPaM->Start()->nNode.GetNode().GetTextNode()->GetText());
+            pPaM->Start()->GetNode().GetTextNode()->GetText());
     pPaM->Move(fnMoveForward, GoInNode);
     CPPUNIT_ASSERT_EQUAL(OUString("baz"),
-            pPaM->End()->nNode.GetNode().GetTextNode()->GetText());
+            pPaM->End()->GetNode().GetTextNode()->GetText());
 }
 
 SwMacrosTest::SwMacrosTest()
-      : m_aBaseString("/sw/qa/core/data")
+      : UnoApiTest("/sw/qa/core/data/")
 {
-}
-
-void SwMacrosTest::setUp()
-{
-    test::BootstrapFixture::setUp();
-
-    // This is a bit of a fudge, we do this to ensure that SwGlobals::ensure,
-    // which is a private symbol to us, gets called
-    m_xWriterComponent =
-        getMultiServiceFactory()->createInstance("com.sun.star.comp.Writer.TextDocument");
-    CPPUNIT_ASSERT_MESSAGE("no writer component!", m_xWriterComponent.is());
-    mxDesktop = css::frame::Desktop::create( comphelper::getComponentContext(getMultiServiceFactory()) );
-}
-
-void SwMacrosTest::tearDown()
-{
-    uno::Reference< lang::XComponent >( m_xWriterComponent, UNO_QUERY_THROW )->dispose();
-    test::BootstrapFixture::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SwMacrosTest);

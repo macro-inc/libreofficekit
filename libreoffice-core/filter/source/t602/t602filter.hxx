@@ -25,16 +25,13 @@
 #include <com/sun/star/io/XInputStream.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
-#include <com/sun/star/lang/XLocalizable.hpp>
 #include <com/sun/star/beans/XPropertyAccess.hpp>
 #include <com/sun/star/ui/dialogs/XExecutableDialog.hpp>
 #include <com/sun/star/xml/sax/XDocumentHandler.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/implbase.hxx>
 #include <xmloff/attrlist.hxx>
-#include <i18nlangtag/languagetag.hxx>
 #include <rtl/ref.hxx>
-#include <unotools/resmgr.hxx>
 
 namespace T602ImportFilter {
 
@@ -78,25 +75,17 @@ struct inistruct
 
 class T602ImportFilterDialog : public cppu::WeakImplHelper <
         css::ui::dialogs::XExecutableDialog,
-        css::lang::XLocalizable,
         css::lang::XServiceInfo,
         css::beans::XPropertyAccess
 >
 {
-    LanguageTag maLocale;
-    std::locale maResLocale;
-    bool OptionsDlg();
-    OUString getResStr(TranslateId resid);
+    static bool OptionsDlg();
 
     virtual ~T602ImportFilterDialog() override;
 
     // XExecutableDialog
        virtual void SAL_CALL setTitle( const OUString& aTitle ) override;
        virtual sal_Int16 SAL_CALL execute() override;
-
-    // XLocalizable
-        virtual void SAL_CALL setLocale( const css::lang::Locale& eLocale ) override;
-        virtual css::lang::Locale SAL_CALL getLocale() override;
 
     // XServiceInfo
         virtual OUString SAL_CALL getImplementationName(  ) override;
@@ -224,8 +213,8 @@ private:
     bool importImpl( const css::uno::Sequence< css::beans::PropertyValue >& aDescriptor );
 
     public:
-        explicit T602ImportFilter(const css::uno::Reference<css::uno::XComponentContext > &r );
-        explicit T602ImportFilter(css::uno::Reference<css::io::XInputStream> const & xInputStream);
+        explicit T602ImportFilter(css::uno::Reference<css::uno::XComponentContext > x );
+        explicit T602ImportFilter(css::uno::Reference<css::io::XInputStream> xInputStream);
         virtual ~T602ImportFilter() override;
 
     // XFilter

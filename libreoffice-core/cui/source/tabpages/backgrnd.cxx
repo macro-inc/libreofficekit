@@ -118,10 +118,9 @@ void SvxBkgTabPage::Reset( const SfxItemSet* )
     if ( m_xTblLBox && m_xTblLBox->get_visible() )
     {
         m_nActPos = -1;
-        const SfxPoolItem* pItem;
-        if ( SfxItemState::SET == m_pResetSet->GetItemState( SID_BACKGRND_DESTINATION, false, &pItem ) )
+        if ( const SfxUInt16Item* pDestItem = m_pResetSet->GetItemIfSet( SID_BACKGRND_DESTINATION, false ) )
         {
-            sal_uInt16 nDestValue = static_cast<const SfxUInt16Item*>(pItem)->GetValue();
+            sal_uInt16 nDestValue = pDestItem->GetValue();
             m_xTblLBox->set_active( nDestValue );
             TblDestinationHdl_Impl( *m_xTblLBox );
         }
@@ -181,47 +180,45 @@ bool SvxBkgTabPage::FillItemSet( SfxItemSet* rCoreSet )
         {
             std::unique_ptr<SvxBrushItem> aBrushItem( getSvxBrushItemFromSourceSet( maSet, nWhich ) );
             if ( GraphicType::NONE != aBrushItem->GetGraphicObject()->GetType() )
-                rCoreSet->Put( *aBrushItem );
+                rCoreSet->Put( std::move(aBrushItem) );
             break;
         }
         default:
             break;
     }
 
-    if (m_xTblLBox && m_xTblLBox->get_visible())
-    {
-        if (nSlot != SID_ATTR_BRUSH)
-        {
-            nWhich = maSet.GetPool()->GetWhich(SID_ATTR_BRUSH);
-            if (SfxItemState::SET == maSet.GetItemState(nWhich))
-            {
-                SvxBrushItem aBrushItem(static_cast<const SvxBrushItem&>(maSet.Get(nWhich)));
-                rCoreSet->Put(aBrushItem);
-            }
-        }
-        if (nSlot != SID_ATTR_BRUSH_ROW)
-        {
-            nWhich = maSet.GetPool()->GetWhich(SID_ATTR_BRUSH_ROW);
-            if (SfxItemState::SET == maSet.GetItemState(nWhich))
-            {
-                SvxBrushItem aBrushItem(static_cast<const SvxBrushItem&>(maSet.Get(nWhich)));
-                rCoreSet->Put(aBrushItem);
-            }
-        }
-        if (nSlot != SID_ATTR_BRUSH_TABLE)
-        {
-            nWhich = maSet.GetPool()->GetWhich(SID_ATTR_BRUSH_TABLE);
-            if (SfxItemState::SET == maSet.GetItemState(nWhich))
-            {
-                SvxBrushItem aBrushItem(static_cast<const SvxBrushItem&>(maSet.Get(nWhich)));
-                rCoreSet->Put(aBrushItem);
-            }
-        }
+    if (!m_xTblLBox || !m_xTblLBox->get_visible())
+        return true;
 
-        if (m_xTblLBox->get_value_changed_from_saved())
+    if (nSlot != SID_ATTR_BRUSH)
+    {
+        nWhich = maSet.GetPool()->GetWhich(SID_ATTR_BRUSH);
+        if (SfxItemState::SET == maSet.GetItemState(nWhich))
         {
-            rCoreSet->Put(SfxUInt16Item(SID_BACKGRND_DESTINATION, m_xTblLBox->get_active()));
+            SvxBrushItem aBrushItem(static_cast<const SvxBrushItem&>(maSet.Get(nWhich)));
+            rCoreSet->Put(aBrushItem);
         }
+    }
+    if (nSlot != SID_ATTR_BRUSH_ROW)
+    {
+        if (SfxItemState::SET == maSet.GetItemState(SID_ATTR_BRUSH_ROW))
+        {
+            SvxBrushItem aBrushItem(maSet.Get(SID_ATTR_BRUSH_ROW));
+            rCoreSet->Put(aBrushItem);
+        }
+    }
+    if (nSlot != SID_ATTR_BRUSH_TABLE)
+    {
+        if (SfxItemState::SET == maSet.GetItemState(SID_ATTR_BRUSH_TABLE))
+        {
+            SvxBrushItem aBrushItem(maSet.Get(SID_ATTR_BRUSH_TABLE));
+            rCoreSet->Put(aBrushItem);
+        }
+    }
+
+    if (m_xTblLBox->get_value_changed_from_saved())
+    {
+        rCoreSet->Put(SfxUInt16Item(SID_BACKGRND_DESTINATION, m_xTblLBox->get_active()));
     }
 
     return true;
@@ -284,7 +281,7 @@ IMPL_LINK(SvxBkgTabPage, TblDestinationHdl_Impl, weld::ComboBox&, rBox, void)
         // fill local item set with XATTR_FILL settings gathered from tab page
         // and convert to SvxBrushItem and store in table destination slot Which
         SvxAreaTabPage::FillItemSet(&maSet);
-        maSet.Put(*getSvxBrushItemFromSourceSet(maSet, maSet.GetPool()->GetWhich(lcl_GetTableDestSlot(m_nActPos))));
+        maSet.Put(getSvxBrushItemFromSourceSet(maSet, maSet.GetPool()->GetWhich(lcl_GetTableDestSlot(m_nActPos))));
     }
 
     sal_Int32 nSelPos = rBox.get_active();
@@ -310,7 +307,7 @@ IMPL_LINK(SvxBkgTabPage, TblDestinationHdl_Impl, weld::ComboBox&, rBox, void)
     drawing::FillStyle eXFS = drawing::FillStyle_NONE;
     if (maSet.GetItemState(XATTR_FILLSTYLE) != SfxItemState::DONTCARE)
     {
-        XFillStyleItem aFillStyleItem(static_cast<const XFillStyleItem&>(maSet.Get(GetWhich( XATTR_FILLSTYLE))));
+        XFillStyleItem aFillStyleItem(maSet.Get(GetWhich( XATTR_FILLSTYLE)));
         eXFS = aFillStyleItem.GetValue();
     }
     switch(eXFS)

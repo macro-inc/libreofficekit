@@ -19,18 +19,22 @@
 
 #include <ExplicitCategoriesProvider.hxx>
 #include <DiagramHelper.hxx>
+#include <ChartType.hxx>
 #include <ChartTypeHelper.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <DataSourceHelper.hxx>
 #include <ChartModel.hxx>
 #include <ChartModelHelper.hxx>
 #include <NumberFormatterWrapper.hxx>
 #include <unonames.hxx>
+#include <BaseCoordinateSystem.hxx>
+#include <DataSeries.hxx>
 
 #include <com/sun/star/chart2/AxisType.hpp>
 #include <o3tl/safeint.hxx>
 #include <rtl/ustrbuf.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <limits>
 
@@ -43,10 +47,10 @@ using ::com::sun::star::uno::Reference;
 using ::com::sun::star::uno::Sequence;
 using std::vector;
 
-ExplicitCategoriesProvider::ExplicitCategoriesProvider( const Reference< chart2::XCoordinateSystem >& xCooSysModel
+ExplicitCategoriesProvider::ExplicitCategoriesProvider( const rtl::Reference< BaseCoordinateSystem >& xCooSysModel
                                                        , ChartModel& rModel )
     : m_bDirty(true)
-    , m_xCooSysModel( xCooSysModel )
+    , m_xCooSysModel( xCooSysModel.get() )
     , mrModel(rModel)
     , m_bIsExplicitCategoriesInited(false)
     , m_bIsDateAxis(false)
@@ -57,7 +61,7 @@ ExplicitCategoriesProvider::ExplicitCategoriesProvider( const Reference< chart2:
         if( xCooSysModel.is() )
         {
             // TODO: handle different category names on the primary and secondary category axis.
-            uno::Reference< XAxis > xAxis( xCooSysModel->getAxisByDimension(0,0) );
+            rtl::Reference< Axis > xAxis = xCooSysModel->getAxisByDimension2(0,0);
             if( xAxis.is() )
             {
                 ScaleData aScale( xAxis->getScaleData() );
@@ -99,10 +103,10 @@ ExplicitCategoriesProvider::ExplicitCategoriesProvider( const Reference< chart2:
                         //->split them in the direction of the first series
                         //detect whether the first series is a row or a column
                         bool bSeriesUsesColumns = true;
-                        std::vector< Reference< XDataSeries > > aSeries( ChartModelHelper::getDataSeries( mrModel ) );
+                        std::vector< rtl::Reference< DataSeries > > aSeries = ChartModelHelper::getDataSeries( &mrModel );
                         if( !aSeries.empty() )
                         {
-                            uno::Reference< data::XDataSource > xSeriesSource( aSeries.front(), uno::UNO_QUERY );
+                            rtl::Reference< DataSeries > xSeriesSource = aSeries.front();
                             OUString aStringDummy;
                             bool bDummy;
                             uno::Sequence< sal_Int32 > aSeqDummy;
@@ -110,13 +114,13 @@ ExplicitCategoriesProvider::ExplicitCategoriesProvider( const Reference< chart2:
                                     aStringDummy, aSeqDummy, bSeriesUsesColumns, bDummy, bDummy );
                         }
                         if( bSeriesUsesColumns )
-                            m_aSplitCategoriesList=aColumns;
+                            m_aSplitCategoriesList = comphelper::sequenceToContainer<std::vector<Reference<data::XLabeledDataSequence>>>(aColumns);
                         else
-                            m_aSplitCategoriesList=aRows;
+                            m_aSplitCategoriesList = comphelper::sequenceToContainer<std::vector<Reference<data::XLabeledDataSequence>>>(aRows);
                     }
                 }
             }
-            if( !m_aSplitCategoriesList.hasElements() )
+            if( m_aSplitCategoriesList.empty() )
             {
                 m_aSplitCategoriesList = { m_xOriginalCategories };
             }
@@ -141,12 +145,12 @@ Reference< chart2::data::XDataSequence > ExplicitCategoriesProvider::getOriginal
 
 bool ExplicitCategoriesProvider::hasComplexCategories() const
 {
-    return m_aSplitCategoriesList.getLength() > 1;
+    return m_aSplitCategoriesList.size() > 1;
 }
 
 sal_Int32 ExplicitCategoriesProvider::getCategoryLevelCount() const
 {
-    sal_Int32 nCount = m_aSplitCategoriesList.getLength();
+    sal_Int32 nCount = m_aSplitCategoriesList.size();
     if(!nCount)
         nCount = 1;
     return nCount;
@@ -173,12 +177,12 @@ void ExplicitCategoriesProvider::convertCategoryAnysToText( uno::Sequence< OUStr
     auto pOutTexts = rOutTexts.getArray();
 
     sal_Int32 nAxisNumberFormat = 0;
-    Reference< XCoordinateSystem > xCooSysModel( ChartModelHelper::getFirstCoordinateSystem( rModel ) );
+    rtl::Reference< BaseCoordinateSystem > xCooSysModel( ChartModelHelper::getFirstCoordinateSystem( &rModel ) );
     if( xCooSysModel.is() )
     {
-        Reference< chart2::XAxis > xAxis( xCooSysModel->getAxisByDimension(0,0) );
+        rtl::Reference< Axis > xAxis = xCooSysModel->getAxisByDimension2(0,0);
         nAxisNumberFormat = AxisHelper::getExplicitNumberFormatKeyForAxis(
-            xAxis, xCooSysModel, uno::Reference<chart2::XChartDocument>(&rModel), false );
+            xAxis, xCooSysModel, &rModel, false );
     }
 
     Color nLabelColor;
@@ -219,8 +223,7 @@ class SplitCategoriesProvider_ForLabeledDataSequences : public SplitCategoriesPr
 public:
 
     explicit SplitCategoriesProvider_ForLabeledDataSequences(
-        const css::uno::Sequence<
-            css::uno::Reference< css::chart2::data::XLabeledDataSequence> >& rSplitCategoriesList
+        const std::vector< Reference< data::XLabeledDataSequence> >& rSplitCategoriesList
         , ChartModel& rModel )
         : m_rSplitCategoriesList( rSplitCategoriesList )
         , mrModel( rModel )
@@ -230,8 +233,7 @@ public:
     virtual uno::Sequence< OUString > getStringsForLevel( sal_Int32 nIndex ) const override;
 
 private:
-    const css::uno::Sequence< css::uno::Reference<
-        css::chart2::data::XLabeledDataSequence> >& m_rSplitCategoriesList;
+    const std::vector< Reference< data::XLabeledDataSequence> >& m_rSplitCategoriesList;
 
     ChartModel& mrModel;
 };
@@ -240,7 +242,7 @@ private:
 
 sal_Int32 SplitCategoriesProvider_ForLabeledDataSequences::getLevelCount() const
 {
-    return m_rSplitCategoriesList.getLength();
+    return m_rSplitCategoriesList.size();
 }
 uno::Sequence< OUString > SplitCategoriesProvider_ForLabeledDataSequences::getStringsForLevel( sal_Int32 nLevel ) const
 {
@@ -404,13 +406,13 @@ static bool lcl_fillDateCategories( const uno::Reference< data::XDataSequence >&
         bool bOwnData = false;
         bool bOwnDataAnddAxisHasAnyFormat = false;
         bool bOwnDataAnddAxisHasDateFormat = false;
-        Reference< XCoordinateSystem > xCooSysModel( ChartModelHelper::getFirstCoordinateSystem( rModel ) );
+        rtl::Reference< BaseCoordinateSystem > xCooSysModel( ChartModelHelper::getFirstCoordinateSystem( &rModel ) );
         if( xCooSysModel.is() )
         {
             if( rModel.hasInternalDataProvider() )
             {
                 bOwnData = true;
-                Reference< beans::XPropertySet > xAxisProps( xCooSysModel->getAxisByDimension(0,0), uno::UNO_QUERY );
+                rtl::Reference< Axis > xAxisProps = xCooSysModel->getAxisByDimension2(0,0);
                 sal_Int32 nAxisNumberFormat = 0;
                 if (xAxisProps.is() && (xAxisProps->getPropertyValue(CHART_UNONAME_NUMFMT) >>= nAxisNumberFormat))
                 {
@@ -478,7 +480,7 @@ void ExplicitCategoriesProvider::init()
         {
             if(m_bIsDateAxis)
             {
-                if( ChartTypeHelper::isSupportingDateAxis( AxisHelper::getChartTypeByIndex( m_xCooSysModel, 0 ), 0 ) )
+                if( ChartTypeHelper::isSupportingDateAxis( AxisHelper::getChartTypeByIndex( m_xCooSysModel.get(), 0 ), 0 ) )
                     m_bIsDateAxis = lcl_fillDateCategories( m_xOriginalCategories->getValues(), m_aDateCategories, m_bIsAutoDate, mrModel );
                 else
                     m_bIsDateAxis = false;
@@ -515,7 +517,7 @@ Sequence< OUString > const & ExplicitCategoriesProvider::getSimpleCategories()
             }
         }
         if(!m_aExplicitCategories.hasElements())
-            m_aExplicitCategories = DiagramHelper::generateAutomaticCategoriesFromCooSys( m_xCooSysModel );
+            m_aExplicitCategories = DiagramHelper::generateAutomaticCategoriesFromCooSys( m_xCooSysModel.get() );
         m_bIsExplicitCategoriesInited = true;
     }
     return m_aExplicitCategories;
@@ -531,7 +533,7 @@ const std::vector<ComplexCategory>* ExplicitCategoriesProvider::getCategoriesByL
 }
 
 OUString ExplicitCategoriesProvider::getCategoryByIndex(
-          const Reference< XCoordinateSystem >& xCooSysModel
+          const rtl::Reference< BaseCoordinateSystem >& xCooSysModel
         , ChartModel& rModel
         , sal_Int32 nIndex )
 {

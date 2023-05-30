@@ -14,12 +14,9 @@ $(eval $(call gb_Module_add_targets,extras,\
 	CustomTarget_autotextuser \
 	CustomTarget_glade \
 	CustomTarget_gallsystem \
-	CustomTarget_tplofficorr \
-	CustomTarget_tploffimisc \
-	CustomTarget_tplpersonal \
+	CustomTarget_templates \
 	CustomTarget_tplpresnt \
-	CustomTarget_tpl_styles \
-	CustomTarget_tpldraw \
+	CustomTarget_tplwizard \
 	Package_autocorr \
 	Package_autotextuser \
 	Package_cfgsrvnolang \
@@ -37,19 +34,11 @@ $(eval $(call gb_Module_add_targets,extras,\
 	Package_labels \
 	$(if $(filter WNT,$(OS)),Package_newfiles) \
 	Package_palettes \
-	Package_tplofficorr \
-	Package_tploffimisc \
-	Package_tplpersonal \
+	Package_templates \
 	Package_tplpresnt \
-	Package_tpl_styles \
-	Package_tpldraw \
-	Package_tplwizagenda \
+	Package_tplwizard \
 	Package_tplwizbitmap \
 	Package_tplwizdesktop \
-	Package_tplwizfax \
-	Package_tplwizletter \
-	Package_tplwizreport \
-	Package_tplwizstyles \
 	Package_wordbook \
 ))
 
@@ -61,7 +50,7 @@ $(eval $(call gb_Module_add_l10n_targets,extras,\
 ifneq ($(WITH_GALLERY_BUILD),)
 $(eval $(call gb_Module_add_targets,extras,\
 	Gallery_backgrounds \
-	Gallery_sound \
+    $(call gb_Helper_optional,AVMEDIA,Gallery_sound) \
 ))
 endif
 

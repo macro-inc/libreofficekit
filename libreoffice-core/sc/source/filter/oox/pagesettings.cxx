@@ -46,10 +46,10 @@
 #include <oox/core/filterbase.hxx>
 #include <oox/core/relations.hxx>
 #include <stylesbuffer.hxx>
-#include <unitconverter.hxx>
 #include <document.hxx>
 #include <biffhelper.hxx>
 #include <filter/msfilter/util.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::xls {
 
@@ -423,9 +423,9 @@ private:
     /** Sets the passed font name if it is valid. */
     void                convertFontName( const OUString& rStyle );
     /** Converts a font style given as string. */
-    void                convertFontStyle( const OUString& rStyle );
+    void                convertFontStyle( std::u16string_view aStyle );
     /** Converts a font color given as string. */
-    void                convertFontColor( const OUString& rColor );
+    void                convertFontColor( std::u16string_view aColor );
 
     /** Finalizes current portion: sets font attributes and updates text height data. */
     void                finalizePortion();
@@ -641,7 +641,7 @@ double HeaderFooterParser::parse( const Reference<sheet::XHeaderFooterContent>& 
                         {
                             setAttributes();
                             // eat the following 6 characters
-                            convertFontColor( OUString( pcChar + 1, 6 ) );
+                            convertFontColor( std::u16string_view( pcChar + 1, 6 ) );
                             pcChar += 6;
                         }
                     break;
@@ -686,7 +686,8 @@ double HeaderFooterParser::parse( const Reference<sheet::XHeaderFooterContent>& 
                     case '\"':
                         setAttributes();
                         convertFontName( aFontName.makeStringAndClear() );
-                        convertFontStyle( aFontStyle.makeStringAndClear() );
+                        convertFontStyle( aFontStyle );
+                        aFontStyle.setLength(0);
                         eState = STATE_TEXT;
                     break;
                     default:
@@ -827,14 +828,14 @@ void HeaderFooterParser::convertFontName( const OUString& rName )
     }
 }
 
-void HeaderFooterParser::convertFontStyle( const OUString& rStyle )
+void HeaderFooterParser::convertFontStyle( std::u16string_view rStyle )
 {
     maFontModel.mbBold = maFontModel.mbItalic = false;
-    if (rStyle.isEmpty())
+    if (rStyle.empty())
         return;
     for( sal_Int32 nPos{ 0 }; nPos>=0; )
     {
-        OString aToken = OUStringToOString( rStyle.getToken( 0, ' ', nPos ), RTL_TEXTENCODING_UTF8 ).toAsciiLowerCase();
+        OString aToken = OUStringToOString( o3tl::getToken(rStyle, 0, ' ', nPos ), RTL_TEXTENCODING_UTF8 ).toAsciiLowerCase();
         if( !aToken.isEmpty() )
         {
             if( maBoldNames.count( aToken ) > 0 )
@@ -845,17 +846,17 @@ void HeaderFooterParser::convertFontStyle( const OUString& rStyle )
     }
 }
 
-void HeaderFooterParser::convertFontColor( const OUString& rColor )
+void HeaderFooterParser::convertFontColor( std::u16string_view aColor )
 {
-    OSL_ENSURE( rColor.getLength() == 6, "HeaderFooterParser::convertFontColor - invalid font color code" );
-    if( (rColor[ 2 ] == '+') || (rColor[ 2 ] == '-') )
+    OSL_ENSURE( aColor.size() == 6, "HeaderFooterParser::convertFontColor - invalid font color code" );
+    if( (aColor[ 2 ] == '+') || (aColor[ 2 ] == '-') )
         // theme color: TTSNNN (TT = decimal theme index, S = +/-, NNN = decimal tint/shade in percent)
         maFontModel.maColor.setTheme(
-            rColor.copy( 0, 2 ).toInt32(),
-            static_cast< double >( rColor.copy( 2 ).toInt32() ) / 100.0 );
+            o3tl::toInt32(aColor.substr( 0, 2 )),
+            static_cast< double >( o3tl::toInt32(aColor.substr( 2 )) ) / 100.0 );
     else
         // RGB color: RRGGBB
-        maFontModel.maColor.setRgb( ::Color(ColorTransparency, rColor.toUInt32( 16 )) );
+        maFontModel.maColor.setRgb( ::Color(ColorTransparency, o3tl::toUInt32( aColor, 16 )) );
 }
 
 void HeaderFooterParser::finalizePortion()
@@ -961,7 +962,6 @@ void PageSettingsConverter::writePageSettingsProperties(
     convertHeaderFooterData( rPropSet, maFooterData, rModel.maOddFooter, rModel.maEvenFooter, rModel.maFirstFooter, rModel.mbUseEvenHF, rModel.mbUseFirstHF, rModel.mfBottomMargin, rModel.mfFooterMargin );
 
     // write all properties to property set
-    const UnitConverter& rUnitConv = getUnitConverter();
     PropertyMap aPropMap;
     aPropMap.setProperty( PROP_IsLandscape, bLandscape);
     aPropMap.setProperty( PROP_FirstPageNumber, getLimitedValue< sal_Int16, sal_Int32 >( rModel.mbUseFirstPage ? rModel.mnFirstPage : 0, 0, 9999 ));
@@ -971,12 +971,12 @@ void PageSettingsConverter::writePageSettingsProperties(
     aPropMap.setProperty( PROP_CenterVertically, rModel.mbVerCenter);
     aPropMap.setProperty( PROP_PrintGrid, (!bChartSheet && rModel.mbPrintGrid));     // no gridlines in chart sheets
     aPropMap.setProperty( PROP_PrintHeaders, (!bChartSheet && rModel.mbPrintHeadings)); // no column/row headings in chart sheets
-    aPropMap.setProperty( PROP_LeftMargin, rUnitConv.scaleToMm100( rModel.mfLeftMargin, Unit::Inch ));
-    aPropMap.setProperty( PROP_RightMargin, rUnitConv.scaleToMm100( rModel.mfRightMargin, Unit::Inch ));
+    aPropMap.setProperty<sal_Int32>( PROP_LeftMargin, std::round(o3tl::convert( rModel.mfLeftMargin, o3tl::Length::in, o3tl::Length::mm100 )));
+    aPropMap.setProperty<sal_Int32>( PROP_RightMargin, std::round(o3tl::convert( rModel.mfRightMargin, o3tl::Length::in, o3tl::Length::mm100 )));
     // #i23296# In Calc, "TopMargin" property is distance to top of header if enabled
-    aPropMap.setProperty( PROP_TopMargin, rUnitConv.scaleToMm100( maHeaderData.mbHasContent ? rModel.mfHeaderMargin : rModel.mfTopMargin, Unit::Inch ));
+    aPropMap.setProperty<sal_Int32>( PROP_TopMargin, std::round(o3tl::convert( maHeaderData.mbHasContent ? rModel.mfHeaderMargin : rModel.mfTopMargin, o3tl::Length::in, o3tl::Length::mm100 )));
     // #i23296# In Calc, "BottomMargin" property is distance to bottom of footer if enabled
-    aPropMap.setProperty( PROP_BottomMargin, rUnitConv.scaleToMm100( maFooterData.mbHasContent ? rModel.mfFooterMargin : rModel.mfBottomMargin, Unit::Inch ));
+    aPropMap.setProperty<sal_Int32>( PROP_BottomMargin, std::round(o3tl::convert( maFooterData.mbHasContent ? rModel.mfFooterMargin : rModel.mfBottomMargin, o3tl::Length::in, o3tl::Length::mm100 )));
     aPropMap.setProperty( PROP_HeaderIsOn, maHeaderData.mbHasContent);
     aPropMap.setProperty( PROP_HeaderIsShared, maHeaderData.mbShareOddEven);
     aPropMap.setProperty( PROP_FirstPageHeaderIsShared, maHeaderData.mbShareFirst);
@@ -1028,7 +1028,7 @@ void PageSettingsConverter::convertHeaderFooterData(
     /*  Calc contains distance between bottom of header and top of page
         body in "HeaderBodyDistance" property, and distance between bottom
         of page body and top of footer in "FooterBodyDistance" property */
-    orHFData.mnBodyDist = getUnitConverter().scaleToMm100( fPageMargin - fContentMargin, Unit::Inch ) - orHFData.mnHeight;
+    orHFData.mnBodyDist = std::round(o3tl::convert( fPageMargin - fContentMargin, o3tl::Length::in, o3tl::Length::mm100 )) - orHFData.mnHeight;
     /*  #i23296# Distance less than 0 means, header or footer overlays page
         body. As this is not possible in Calc, set fixed header or footer
         height (crop header/footer) to get correct top position of page body. */
@@ -1054,7 +1054,7 @@ sal_Int32 PageSettingsConverter::writeHeaderFooter(
         {
             double fTotalHeight = mxHFParser->parse( xHFContent, rContent );
             rPropSet.setProperty( nPropId, xHFContent );
-            nHeight = getUnitConverter().scaleToMm100( fTotalHeight, Unit::Point );
+            nHeight = std::round(o3tl::convert(fTotalHeight, o3tl::Length::pt, o3tl::Length::mm100));
         }
     }
     return nHeight;

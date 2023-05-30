@@ -21,7 +21,8 @@
 
 #include "formstrings.hxx"
 #include <comphelper/sequence.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 namespace pcr
 {
@@ -29,10 +30,10 @@ namespace pcr
     using namespace ::com::sun::star::beans;
 
     ListSelectionDialog::ListSelectionDialog(weld::Window* pParent, const Reference< XPropertySet >& _rxListBox,
-            const OUString& _rPropertyName, const OUString& _rPropertyUIName)
+            OUString _sPropertyName, const OUString& _rPropertyUIName)
         : GenericDialogController(pParent, "modules/spropctrlr/ui/listselectdialog.ui", "ListSelectDialog")
         , m_xListBox     ( _rxListBox     )
-        , m_sPropertyName( _rPropertyName )
+        , m_sPropertyName(std::move( _sPropertyName ))
         , m_xFrame(m_xBuilder->weld_frame("frame"))
         , m_xEntries(m_xBuilder->weld_tree_view("treeview"))
     {
@@ -99,7 +100,7 @@ namespace pcr
 
         try
         {
-            m_xListBox->setPropertyValue( m_sPropertyName, makeAny( comphelper::containerToSequence(aSelection) ) );
+            m_xListBox->setPropertyValue( m_sPropertyName, Any( comphelper::containerToSequence(aSelection) ) );
         }
         catch( const Exception& )
         {

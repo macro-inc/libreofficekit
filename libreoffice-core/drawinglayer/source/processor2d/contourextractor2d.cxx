@@ -19,7 +19,7 @@
 
 #include <drawinglayer/processor2d/contourextractor2d.hxx>
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/bitmapprimitive2d.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
@@ -123,12 +123,8 @@ namespace drawinglayer::processor2d
                     const geometry::ViewInformation2D aLastViewInformation2D(getViewInformation2D());
 
                     // create new local ViewInformation2D
-                    const geometry::ViewInformation2D aViewInformation2D(
-                        getViewInformation2D().getObjectTransformation() * rTransformCandidate.getTransformation(),
-                        getViewInformation2D().getViewTransformation(),
-                        getViewInformation2D().getViewport(),
-                        getViewInformation2D().getVisualizedPage(),
-                        getViewInformation2D().getViewTime());
+                    geometry::ViewInformation2D aViewInformation2D(getViewInformation2D());
+                    aViewInformation2D.setObjectTransformation(getViewInformation2D().getObjectTransformation() * rTransformCandidate.getTransformation());
                     updateViewInformation(aViewInformation2D);
 
                     // process content

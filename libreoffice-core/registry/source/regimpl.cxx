@@ -32,10 +32,6 @@
 #include <unistd.h>
 #endif
 
-#include "reflread.hxx"
-
-#include "reflwrit.hxx"
-
 #include <registry/reader.hxx>
 #include <registry/refltype.hxx>
 #include <registry/types.hxx>
@@ -697,6 +693,7 @@ RegError ORegistry::openKey(RegKeyHandle hKey, std::u16string_view keyName,
 
         std::unique_ptr< ORegKey > p(new ORegKey(path, this));
         i = m_openKeyTable.insert(std::make_pair(path, p.get())).first;
+        // coverity[leaked_storage : FALSE] - ownership transferred to m_openKeyTable
         p.release();
     } else {
         i->second->acquire();
@@ -750,11 +747,11 @@ RegError ORegistry::deleteKey(RegKeyHandle hKey, std::u16string_view keyName)
     return eraseKey(m_openKeyTable[ROOT], sFullKeyName);
 }
 
-RegError ORegistry::eraseKey(ORegKey* pKey, const OUString& keyName)
+RegError ORegistry::eraseKey(ORegKey* pKey, std::u16string_view keyName)
 {
     RegError _ret = RegError::NO_ERROR;
 
-    if (keyName.isEmpty())
+    if (keyName.empty())
     {
         return RegError::INVALID_KEYNAME;
     }
@@ -762,18 +759,18 @@ RegError ORegistry::eraseKey(ORegKey* pKey, const OUString& keyName)
     OUString     sFullKeyName(pKey->getName());
     OUString     sFullPath(sFullKeyName);
     OUString     sRelativKey;
-    sal_Int32    lastIndex = keyName.lastIndexOf('/');
+    size_t    lastIndex = keyName.rfind('/');
 
-    if (lastIndex >= 0)
+    if (lastIndex != std::u16string_view::npos)
     {
-        sRelativKey += keyName.subView(lastIndex + 1);
+        sRelativKey += keyName.substr(lastIndex + 1);
 
         if (sFullKeyName.getLength() > 1)
             sFullKeyName += keyName;
         else
-            sFullKeyName += keyName.subView(1);
+            sFullKeyName += keyName.substr(1);
 
-        sFullPath = sFullKeyName.copy(0, keyName.lastIndexOf('/') + 1);
+        sFullPath = sFullKeyName.copy(0, keyName.rfind('/') + 1);
     } else
     {
         if (sFullKeyName.getLength() > 1)
@@ -848,402 +845,6 @@ RegError ORegistry::deleteSubkeysAndValues(ORegKey* pKey)
     }
 
     return RegError::NO_ERROR;
-}
-
-RegError ORegistry::loadKey(RegKeyHandle hKey, const OUString& regFileName,
-                            bool bWarnings, bool bReport)
-{
-    ORegKey* pKey = static_cast< ORegKey* >(hKey);
-
-    ORegistry aReg;
-    RegError _ret = aReg.initRegistry(regFileName, RegAccessMode::READONLY);
-    if (_ret != RegError::NO_ERROR)
-        return _ret;
-    ORegKey* pRootKey = aReg.getRootKey();
-
-    REG_GUARD(m_mutex);
-
-    OStoreDirectory::iterator   iter;
-    OStoreDirectory             rStoreDir(pRootKey->getStoreDir());
-    storeError                  _err = rStoreDir.first(iter);
-
-    while (_err == store_E_None)
-    {
-        OUString const keyName(iter.m_pszName, iter.m_nLength);
-
-        if (iter.m_nAttrib & STORE_ATTRIB_ISDIR)
-        {
-            _ret = loadAndSaveKeys(pKey, pRootKey, keyName, 0, bWarnings, bReport);
-        }
-        else
-        {
-            _ret = loadAndSaveValue(pKey, pRootKey, keyName, 0, bWarnings, bReport);
-        }
-
-        if (_ret == RegError::MERGE_ERROR)
-            break;
-        if (_ret == RegError::MERGE_CONFLICT && bWarnings)
-            break;
-
-        _err = rStoreDir.next(iter);
-    }
-
-    rStoreDir = OStoreDirectory();
-    (void) aReg.releaseKey(pRootKey);
-    return _ret;
-}
-
-RegError ORegistry::loadAndSaveValue(ORegKey* pTargetKey,
-                                     ORegKey const * pSourceKey,
-                                     const OUString& valueName,
-                                     sal_uInt32 nCut,
-                                     bool bWarnings,
-                                     bool bReport)
-{
-    OStoreStream    rValue;
-    RegValueType    valueType;
-    sal_uInt32      valueSize;
-    sal_uInt32      nSize;
-    storeAccessMode sourceAccess = storeAccessMode::ReadWrite;
-    OUString        sTargetPath(pTargetKey->getName());
-    OUString        sSourcePath(pSourceKey->getName());
-
-    if (pSourceKey->isReadOnly())
-    {
-        sourceAccess = storeAccessMode::ReadOnly;
-    }
-
-    if (nCut)
-    {
-        sTargetPath = sSourcePath.copy(nCut);
-    } else
-    {
-        if (sTargetPath.getLength() > 1)
-        {
-            if (sSourcePath.getLength() > 1)
-                sTargetPath += sSourcePath;
-        } else
-            sTargetPath = sSourcePath;
-    }
-
-    if (sTargetPath.getLength() > 1) sTargetPath += ROOT;
-    if (sSourcePath.getLength() > 1) sSourcePath += ROOT;
-
-    if (rValue.create(pSourceKey->getStoreFile(), sSourcePath, valueName, sourceAccess))
-    {
-        return RegError::VALUE_NOT_EXISTS;
-    }
-
-    std::vector<sal_uInt8> aBuffer(VALUE_HEADERSIZE);
-
-    sal_uInt32  rwBytes;
-    if (rValue.readAt(0, aBuffer.data(), VALUE_HEADERSIZE, rwBytes))
-    {
-        return RegError::INVALID_VALUE;
-    }
-    if (rwBytes != VALUE_HEADERSIZE)
-    {
-        return RegError::INVALID_VALUE;
-    }
-
-    RegError _ret = RegError::NO_ERROR;
-    sal_uInt8   type = aBuffer[0];
-    valueType = static_cast<RegValueType>(type);
-    readUINT32(aBuffer.data() + VALUE_TYPEOFFSET, valueSize);
-
-    nSize = VALUE_HEADERSIZE + valueSize;
-    aBuffer.resize(nSize);
-
-    if (rValue.readAt(0, aBuffer.data(), nSize, rwBytes))
-    {
-        return RegError::INVALID_VALUE;
-    }
-    if (rwBytes != nSize)
-    {
-        return RegError::INVALID_VALUE;
-    }
-
-    OStoreFile  rTargetFile(pTargetKey->getStoreFile());
-
-    if (!rValue.create(rTargetFile, sTargetPath, valueName, storeAccessMode::ReadWrite))
-    {
-        if (valueType == RegValueType::BINARY)
-        {
-            _ret = checkBlop(
-                rValue, sTargetPath, valueSize, aBuffer.data() + VALUE_HEADEROFFSET,
-                bReport);
-            if (_ret != RegError::NO_ERROR)
-            {
-                if (_ret == RegError::MERGE_ERROR ||
-                    (_ret == RegError::MERGE_CONFLICT && bWarnings))
-                {
-                    return _ret;
-                }
-            } else
-            {
-                return _ret;
-            }
-        }
-    }
-
-    if (rValue.create(rTargetFile, sTargetPath, valueName, storeAccessMode::Create))
-    {
-        return RegError::INVALID_VALUE;
-    }
-    if (rValue.writeAt(0, aBuffer.data(), nSize, rwBytes))
-    {
-        return RegError::INVALID_VALUE;
-    }
-
-    if (rwBytes != nSize)
-    {
-        return RegError::INVALID_VALUE;
-    }
-    pTargetKey->setModified();
-
-    return _ret;
-}
-
-RegError ORegistry::checkBlop(OStoreStream& rValue,
-                              std::u16string_view sTargetPath,
-                              sal_uInt32 srcValueSize,
-                              sal_uInt8 const * pSrcBuffer,
-                              bool bReport)
-{
-    RegistryTypeReader reader(pSrcBuffer, srcValueSize);
-
-    if (reader.getTypeClass() == RT_TYPE_INVALID)
-    {
-        return RegError::INVALID_VALUE;
-    }
-
-    std::vector<sal_uInt8> aBuffer(VALUE_HEADERSIZE);
-    sal_uInt32      rwBytes;
-    OString         targetPath(OUStringToOString(sTargetPath, RTL_TEXTENCODING_UTF8));
-
-    if (!rValue.readAt(0, aBuffer.data(), VALUE_HEADERSIZE, rwBytes) &&
-        (rwBytes == VALUE_HEADERSIZE))
-    {
-        sal_uInt8 type = aBuffer[0];
-        RegValueType valueType = static_cast<RegValueType>(type);
-        sal_uInt32      valueSize;
-        readUINT32(aBuffer.data() + VALUE_TYPEOFFSET, valueSize);
-
-        if (valueType == RegValueType::BINARY)
-        {
-            aBuffer.resize(valueSize);
-            if (!rValue.readAt(VALUE_HEADEROFFSET, aBuffer.data(), valueSize, rwBytes) &&
-                (rwBytes == valueSize))
-            {
-                RegistryTypeReader reader2(aBuffer.data(), valueSize);
-
-                if ((reader.getTypeClass() != reader2.getTypeClass())
-                    || reader2.getTypeClass() == RT_TYPE_INVALID)
-                {
-                    if (bReport)
-                    {
-                        fprintf(stdout, "ERROR: values of blop from key \"%s\" has different types.\n",
-                                targetPath.getStr());
-                    }
-                    return RegError::MERGE_ERROR;
-                }
-
-                if (reader.getTypeClass() == RT_TYPE_MODULE)
-                {
-                    if (reader.getFieldCount() > 0 &&
-                        reader2.getFieldCount() > 0)
-                    {
-                        mergeModuleValue(rValue, reader, reader2);
-
-                        return RegError::NO_ERROR;
-                    } else
-                    if (reader2.getFieldCount() > 0)
-                    {
-                        return RegError::NO_ERROR;
-                    } else
-                    {
-                        return RegError::MERGE_CONFLICT;
-                    }
-                } else
-                {
-                    if (bReport)
-                    {
-                        fprintf(stderr, "WARNING: value of key \"%s\" already exists.\n",
-                                targetPath.getStr());
-                    }
-                    return RegError::MERGE_CONFLICT;
-                }
-            } else
-            {
-                if (bReport)
-                {
-                    fprintf(stderr, "ERROR: values of key \"%s\" contains bad data.\n",
-                            targetPath.getStr());
-                }
-                return RegError::MERGE_ERROR;
-            }
-        } else
-        {
-            if (bReport)
-            {
-                fprintf(stderr, "ERROR: values of key \"%s\" has different types.\n",
-                        targetPath.getStr());
-            }
-            return RegError::MERGE_ERROR;
-        }
-    } else
-    {
-        return RegError::INVALID_VALUE;
-    }
-}
-
-static sal_uInt32 checkTypeReaders(RegistryTypeReader const & reader1,
-                                   RegistryTypeReader const & reader2,
-                                   std::set< OUString >& nameSet)
-{
-    sal_uInt32 count=0;
-    for (sal_uInt32 i=0 ; i < reader1.getFieldCount(); i++)
-    {
-        nameSet.insert(reader1.getFieldName(i));
-        count++;
-    }
-    for (sal_uInt32 i=0 ; i < reader2.getFieldCount(); i++)
-    {
-        if (nameSet.insert(reader2.getFieldName(i)).second)
-            count++;
-    }
-    return count;
-}
-
-RegError ORegistry::mergeModuleValue(OStoreStream& rTargetValue,
-                                     RegistryTypeReader const & reader,
-                                     RegistryTypeReader const & reader2)
-{
-    std::set< OUString > nameSet;
-    sal_uInt32 count = checkTypeReaders(reader, reader2, nameSet);
-
-    if (count != reader.getFieldCount())
-    {
-        sal_uInt16 index = 0;
-
-        RegistryTypeWriter writer(reader.getTypeClass(),
-                                  reader.getTypeName(),
-                                  reader.getSuperTypeName(),
-                                  static_cast<sal_uInt16>(count));
-
-        for (sal_uInt32 i=0 ; i < reader.getFieldCount(); i++)
-        {
-            writer.setFieldData(index,
-                               reader.getFieldName(i),
-                               reader.getFieldType(i),
-                               reader.getFieldDoku(i),
-                               reader.getFieldFileName(i),
-                               reader.getFieldAccess(i),
-                               reader.getFieldConstValue(i));
-            index++;
-        }
-        for (sal_uInt32 i=0 ; i < reader2.getFieldCount(); i++)
-        {
-            if (nameSet.find(reader2.getFieldName(i)) == nameSet.end())
-            {
-                writer.setFieldData(index,
-                                   reader2.getFieldName(i),
-                                   reader2.getFieldType(i),
-                                   reader2.getFieldDoku(i),
-                                   reader2.getFieldFileName(i),
-                                   reader2.getFieldAccess(i),
-                                   reader2.getFieldConstValue(i));
-                index++;
-            }
-        }
-
-        const sal_uInt8*    pBlop = writer.getBlop();
-        sal_uInt32          aBlopSize = writer.getBlopSize();
-
-        sal_uInt8   type = sal_uInt8(RegValueType::BINARY);
-        std::vector<sal_uInt8> aBuffer(VALUE_HEADERSIZE + aBlopSize);
-
-        memcpy(aBuffer.data(), &type, 1);
-        writeUINT32(aBuffer.data() + VALUE_TYPEOFFSET, aBlopSize);
-        memcpy(aBuffer.data() + VALUE_HEADEROFFSET, pBlop, aBlopSize);
-
-        sal_uInt32  rwBytes;
-        if (rTargetValue.writeAt(0, aBuffer.data(), VALUE_HEADERSIZE+aBlopSize, rwBytes))
-        {
-            return RegError::INVALID_VALUE;
-        }
-
-        if (rwBytes != VALUE_HEADERSIZE+aBlopSize)
-        {
-            return RegError::INVALID_VALUE;
-        }
-    }
-    return RegError::NO_ERROR;
-}
-
-RegError ORegistry::loadAndSaveKeys(ORegKey* pTargetKey,
-                                    ORegKey* pSourceKey,
-                                    const OUString& keyName,
-                                    sal_uInt32 nCut,
-                                    bool bWarnings,
-                                    bool bReport)
-{
-    RegError    _ret = RegError::NO_ERROR;
-    OUString    sRelPath(pSourceKey->getName().copy(nCut));
-    OUString    sFullPath;
-
-    if(pTargetKey->getName().getLength() > 1)
-        sFullPath += pTargetKey->getName();
-    sFullPath += sRelPath;
-    if (sRelPath.getLength() > 1 || sFullPath.isEmpty())
-        sFullPath += ROOT;
-
-    OUString sFullKeyName = sFullPath + keyName;
-
-    OStoreDirectory rStoreDir;
-    if (rStoreDir.create(pTargetKey->getStoreFile(), sFullPath, keyName, storeAccessMode::Create))
-    {
-        return RegError::CREATE_KEY_FAILED;
-    }
-
-    if (m_openKeyTable.count(sFullKeyName) > 0)
-    {
-        m_openKeyTable[sFullKeyName]->setDeleted(false);
-    }
-
-    ORegKey* pTmpKey = nullptr;
-    _ret = pSourceKey->openKey(keyName, reinterpret_cast<RegKeyHandle*>(&pTmpKey));
-    if (_ret != RegError::NO_ERROR)
-        return _ret;
-
-    OStoreDirectory::iterator   iter;
-    OStoreDirectory             rTmpStoreDir(pTmpKey->getStoreDir());
-    storeError                  _err = rTmpStoreDir.first(iter);
-
-    while (_err == store_E_None)
-    {
-        OUString const sName(iter.m_pszName, iter.m_nLength);
-
-        if (iter.m_nAttrib & STORE_ATTRIB_ISDIR)
-        {
-            _ret = loadAndSaveKeys(pTargetKey, pTmpKey,
-                                   sName, nCut, bWarnings, bReport);
-        } else
-        {
-            _ret = loadAndSaveValue(pTargetKey, pTmpKey,
-                                    sName, nCut, bWarnings, bReport);
-        }
-
-        if (_ret == RegError::MERGE_ERROR)
-            break;
-        if (_ret == RegError::MERGE_CONFLICT && bWarnings)
-            break;
-
-        _err = rTmpStoreDir.next(iter);
-    }
-
-    pSourceKey->releaseKey(pTmpKey);
-    return _ret;
 }
 
 ORegKey* ORegistry::getRootKey()

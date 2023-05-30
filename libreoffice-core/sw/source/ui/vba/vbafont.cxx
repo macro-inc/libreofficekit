@@ -73,10 +73,10 @@ class UnderLineMapper
 private:
     UnderLineMapper()
     {
-        for ( sal_Int32 index=0; index<sal_Int32(SAL_N_ELEMENTS( UnderLineTable )); ++index )
+        for ( auto const & index: UnderLineTable )
         {
-            MSO2OOO[ UnderLineTable[ index ].nMSOConst ] = UnderLineTable[ index ].nOOOConst;
-            OOO2MSO[ UnderLineTable[ index ].nOOOConst ] = UnderLineTable[ index ].nMSOConst;
+            MSO2OOO[ index.nMSOConst ] = index.nOOOConst;
+            OOO2MSO[ index.nOOOConst ] = index.nMSOConst;
         }
     }
 public:
@@ -120,7 +120,7 @@ SwVbaFont::getUnderline()
 {
     sal_Int32 nOOVal = 0;
     mxFont->getPropertyValue(  UnderLineMapper::propName() ) >>= nOOVal;
-    return uno::makeAny( UnderLineMapper::instance().getMSOFromOOO( nOOVal ) );
+    return uno::Any( UnderLineMapper::instance().getMSOFromOOO( nOOVal ) );
 }
 
 void SAL_CALL
@@ -131,7 +131,7 @@ SwVbaFont::setUnderline( const uno::Any& _underline )
     if ( _underline >>= nMSOVal )
     {
         sal_Int32 nOOVal =  UnderLineMapper::instance().getOOOFromMSO( nMSOVal );
-        mxFont->setPropertyValue(  UnderLineMapper::propName(), uno::makeAny( nOOVal ) );
+        mxFont->setPropertyValue(  UnderLineMapper::propName(), uno::Any( nOOVal ) );
     }
 }
 
@@ -146,7 +146,7 @@ SwVbaFont::setColorIndex( const uno::Any& _colorindex )
 {
         sal_Int32 nIndex = 0;
         _colorindex >>= nIndex;
-        return setColor( OORGBToXLRGB(mxPalette->getByIndex( nIndex )) );
+        return setColor( mxPalette->getByIndex( nIndex ) );
 }
 
 uno::Any SAL_CALL
@@ -154,7 +154,7 @@ SwVbaFont::getColorIndex()
 {
     sal_Int32 nColor = 0;
 
-    XLRGBToOORGB( getColor() ) >>= nColor;
+    getColor() >>= nColor;
     sal_Int32 nElems = mxPalette->getCount();
     sal_Int32 nIndex = 0;
     for ( sal_Int32 count=0; count<nElems; ++count )
@@ -167,7 +167,7 @@ SwVbaFont::getColorIndex()
             break;
         }
     }
-    return uno::makeAny( nIndex );
+    return uno::Any( nIndex );
 }
 uno::Any SAL_CALL
 SwVbaFont::getSubscript()

@@ -180,7 +180,7 @@ bool SwTextFrame::GetCharRect( SwRect& rOrig, const SwPosition &rPos,
 {
     OSL_ENSURE( ! IsVertical() || ! IsSwapped(),"SwTextFrame::GetCharRect with swapped frame" );
 
-    if( IsLocked() || IsHiddenNow() )
+    if (IsLocked())
         return false;
 
     // Find the right frame first. We need to keep in mind that:
@@ -671,7 +671,7 @@ bool SwTextFrame::GetModelPositionForViewPoint(SwPosition* pPos, Point& rPoint,
 
 bool SwTextFrame::LeftMargin(SwPaM *pPam) const
 {
-    assert(GetMergedPara() || &pPam->GetNode() == static_cast<SwContentNode const*>(GetDep()));
+    assert(GetMergedPara() || &pPam->GetPointNode() == static_cast<SwContentNode const*>(GetDep()));
 
     SwTextFrame *pFrame = GetAdjFrameAtPos( const_cast<SwTextFrame*>(this), *pPam->GetPoint(),
                                      SwTextCursor::IsRightMargin() );
@@ -705,7 +705,7 @@ bool SwTextFrame::LeftMargin(SwPaM *pPam) const
 
 bool SwTextFrame::RightMargin(SwPaM *pPam, bool bAPI) const
 {
-    assert(GetMergedPara() || &pPam->GetNode() == static_cast<SwContentNode const*>(GetDep()));
+    assert(GetMergedPara() || &pPam->GetPointNode() == static_cast<SwContentNode const*>(GetDep()));
 
     SwTextFrame *pFrame = GetAdjFrameAtPos( const_cast<SwTextFrame*>(this), *pPam->GetPoint(),
                                      SwTextCursor::IsRightMargin() );
@@ -764,8 +764,8 @@ bool SwTextFrame::UnitUp_( SwPaM *pPam, const SwTwips nOffset,
     SwSetToRightMargin aSet;
 
     if( IsInTab() &&
-        pPam->GetNode().StartOfSectionNode() !=
-        pPam->GetNode( false ).StartOfSectionNode() )
+        pPam->GetPointNode().StartOfSectionNode() !=
+        pPam->GetMarkNode().StartOfSectionNode() )
     {
         // If the PaM is located within different boxes, we have a table selection,
         // which is handled by the base class.
@@ -831,13 +831,13 @@ bool SwTextFrame::UnitUp_( SwPaM *pPam, const SwTwips nOffset,
 
                 // See comment in SwTextFrame::GetModelPositionForViewPoint()
 #if OSL_DEBUG_LEVEL > 0
-                const SwNodeOffset nOldNode = pPam->GetPoint()->nNode.GetIndex();
+                const SwNodeOffset nOldNode = pPam->GetPoint()->GetNodeIndex();
 #endif
                 // The node should not be changed
                 TextFrameIndex nTmpOfst = aLine.GetModelPositionForViewPoint(pPam->GetPoint(),
                                                          aCharBox.Pos(), false );
 #if OSL_DEBUG_LEVEL > 0
-                OSL_ENSURE( nOldNode == pPam->GetPoint()->nNode.GetIndex(),
+                OSL_ENSURE( nOldNode == pPam->GetPoint()->GetNodeIndex(),
                         "SwTextFrame::UnitUp: illegal node change" );
 #endif
 
@@ -1151,8 +1151,8 @@ bool SwTextFrame::UnitDown_(SwPaM *pPam, const SwTwips nOffset,
 {
 
     if ( IsInTab() &&
-        pPam->GetNode().StartOfSectionNode() !=
-        pPam->GetNode( false ).StartOfSectionNode() )
+        pPam->GetPointNode().StartOfSectionNode() !=
+        pPam->GetMarkNode().StartOfSectionNode() )
     {
         // If the PaM is located within different boxes, we have a table selection,
         // which is handled by the base class.
@@ -1192,7 +1192,7 @@ bool SwTextFrame::UnitDown_(SwPaM *pPam, const SwTwips nOffset,
                 aCharBox.Width( aCharBox.SSize().Width() / 2 );
 #if OSL_DEBUG_LEVEL > 0
                 // See comment in SwTextFrame::GetModelPositionForViewPoint()
-                const SwNodeOffset nOldNode = pPam->GetPoint()->nNode.GetIndex();
+                const SwNodeOffset nOldNode = pPam->GetPoint()->GetNodeIndex();
 #endif
                 if ( pNextLine && ! bFirstOfDouble )
                     aLine.NextLine();
@@ -1200,7 +1200,7 @@ bool SwTextFrame::UnitDown_(SwPaM *pPam, const SwTwips nOffset,
                 TextFrameIndex nTmpOfst = aLine.GetModelPositionForViewPoint( pPam->GetPoint(),
                                  aCharBox.Pos(), false );
 #if OSL_DEBUG_LEVEL > 0
-                OSL_ENSURE( nOldNode == pPam->GetPoint()->nNode.GetIndex(),
+                OSL_ENSURE( nOldNode == pPam->GetPoint()->GetNodeIndex(),
                     "SwTextFrame::UnitDown: illegal node change" );
 #endif
 

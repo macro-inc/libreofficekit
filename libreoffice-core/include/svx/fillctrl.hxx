@@ -25,7 +25,6 @@
 #include <sfx2/tbxctrl.hxx>
 #include <sfx2/weldutils.hxx>
 #include <svx/svxdllapi.h>
-#include <com/sun/star/drawing/FillStyle.hpp>
 
 class XFillStyleItem;
 class XFillColorItem;
@@ -96,6 +95,7 @@ private:
     void SetOptimalSize();
 
     virtual void DataChanged(const DataChangedEvent& rDCEvt) override;
+    virtual void GetFocus() override;
 
     static void ReleaseFocus_Impl();
 

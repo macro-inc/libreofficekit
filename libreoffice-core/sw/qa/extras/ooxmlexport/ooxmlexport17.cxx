@@ -7,45 +7,44 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <sal/config.h>
+#include <swmodeltestbase.hxx>
 
-#include <string_view>
+#include <queue>
 
 #include <com/sun/star/beans/NamedValue.hpp>
+#include <com/sun/star/style/ParagraphAdjust.hpp>
+#include <com/sun/star/text/WritingMode2.hpp>
 #include <com/sun/star/text/XBookmarksSupplier.hpp>
+#include <com/sun/star/text/XDocumentIndex.hpp>
+#include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XTextFieldsSupplier.hpp>
 #include <com/sun/star/text/XTextField.hpp>
+#include <com/sun/star/text/TextGridMode.hpp>
+#include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/util/XRefreshable.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
+#include <com/sun/star/text/XTextTable.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/awt/FontSlant.hpp>
 #include <com/sun/star/awt/FontWeight.hpp>
 
-
-#include <comphelper/configuration.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <officecfg/Office/Common.hxx>
+#include <o3tl/string_view.hxx>
 #include <comphelper/propertyvalue.hxx>
 
-#include <swmodeltestbase.hxx>
 #include <unotxdoc.hxx>
-
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/extras/ooxmlexport/data/";
+#include <docsh.hxx>
+#include <wrtsh.hxx>
+#include <IDocumentLayoutAccess.hxx>
+#include <rootfrm.hxx>
+#include <xmloff/odffields.hxx>
 
 class Test : public SwModelTestBase
 {
 public:
-    Test() : SwModelTestBase(DATA_DIRECTORY, "Office Open XML Text") {}
-
-protected:
-    /**
-     * Denylist handling
-     */
-    bool mustTestImportOf(const char* filename) const override {
-        // If the testcase is stored in some other format, it's pointless to test.
-        return OString(filename).endsWith(".docx");
-    }
+    Test() : SwModelTestBase("/sw/qa/extras/ooxmlexport/data/", "Office Open XML Text") {}
 };
 
 DECLARE_OOXMLEXPORT_TEST(testTdf135164_cancelledNumbering, "tdf135164_cancelledNumbering.docx")
@@ -64,7 +63,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf147861_customField, "tdf147861_customField.docx"
 {
     // These should each be specific values, not a shared DocProperty
     getParagraph(1, "CustomEditedTitle"); // edited
-    // A couple of nulls at the end of the string thwarted all attemps at an "equals" comparison.
+    // A couple of nulls at the end of the string thwarted all attempts at an "equals" comparison.
     CPPUNIT_ASSERT(getParagraph(2)->getString().startsWith(" INSERT Custom Title here"));
     getParagraph(3, "My Title"); // edited
 
@@ -78,9 +77,206 @@ DECLARE_OOXMLEXPORT_TEST(testTdf147861_customField, "tdf147861_customField.docx"
     CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Title (fixed)"), xField->getPresentation(true));
 }
 
-DECLARE_OOXMLEXPORT_EXPORTONLY_TEST(testTdf135906, "tdf135906.docx")
+DECLARE_OOXMLEXPORT_TEST(testTdf148380_createField, "tdf148380_createField.docx")
 {
+    // Verify that these are fields, and not just plain text
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    // This should NOT be "Lorenzo Chavez", or a real date since the user hand-modified the result.
+    CPPUNIT_ASSERT_EQUAL(OUString("Myself - that's who"), xField->getPresentation(false));
+    xField.set(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("yesterday at noon"), xField->getPresentation(false));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf138093, "tdf138093.docx")
+{
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+        assertXPath(pXmlDoc, "//w:sdt", 3);
+        uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
+        uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(),
+                                                        uno::UNO_QUERY);
+        uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
+        uno::Reference<table::XCell> xCell = xTable->getCellByName("B1");
+        uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xCell, uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xParagraphs
+            = xParagraphsAccess->createEnumeration();
+        uno::Reference<container::XEnumerationAccess> xParagraph(xParagraphs->nextElement(),
+                                                                 uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xPortions = xParagraph->createEnumeration();
+        uno::Reference<beans::XPropertySet> xTextPortion(xPortions->nextElement(), uno::UNO_QUERY);
+
+        OUString aPortionType;
+        xTextPortion->getPropertyValue("TextPortionType") >>= aPortionType;
+        CPPUNIT_ASSERT_EQUAL(OUString("ContentControl"), aPortionType);
+
+        uno::Reference<text::XTextContent> xContentControl;
+        xTextPortion->getPropertyValue("ContentControl") >>= xContentControl;
+        uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+        bool bDate{};
+        xContentControlProps->getPropertyValue("Date") >>= bDate;
+        CPPUNIT_ASSERT(bDate);
+        uno::Reference<container::XEnumerationAccess> xContentControlEnumAccess(xContentControl,
+                                                                                uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xContentControlEnum
+            = xContentControlEnumAccess->createEnumeration();
+        uno::Reference<text::XTextRange> xTextPortionRange(xContentControlEnum->nextElement(),
+                                                           uno::UNO_QUERY);
+        CPPUNIT_ASSERT_EQUAL(OUString("2017"), xTextPortionRange->getString());
+    }
+    else
+    {
+        SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+        CPPUNIT_ASSERT(pTextDoc);
+        SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
+        IDocumentMarkAccess* pMarkAccess = pDoc->getIDocumentMarkAccess();
+        CPPUNIT_ASSERT_EQUAL(sal_Int32(2), pMarkAccess->getAllMarksCount());
+
+        ::sw::mark::IDateFieldmark* pFieldmark
+            = dynamic_cast<::sw::mark::IDateFieldmark*>(*pMarkAccess->getAllMarksBegin());
+        CPPUNIT_ASSERT(pFieldmark);
+        CPPUNIT_ASSERT_EQUAL(OUString(ODF_FORMDATE), pFieldmark->GetFieldname());
+        CPPUNIT_ASSERT_EQUAL(OUString("2017"), pFieldmark->GetContent());
+    }
+}
+
+
+DECLARE_OOXMLEXPORT_TEST(testTdf148380_fldLocked, "tdf148380_fldLocked.docx")
+{
+    getParagraph(2, "4/5/2022 4:29:00 PM");
+    getParagraph(4, "1/23/4567 8:9:10 PM");
+
+    // Verify that these are fields, and not just plain text
+    // (import only, since export thankfully just dumps these fixed fields as plain text
+    if (isExported())
+        return;
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    // This should NOT be updated at FILEOPEN to match the last modified time - it is locked.
+    CPPUNIT_ASSERT_EQUAL(OUString("4/5/2022 4:29:00 PM"), xField->getPresentation(false));
+    CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Modified (fixed)"), xField->getPresentation(true));
+    xField.set(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("1/23/4567 8:9:10 PM"), xField->getPresentation(false));
+    CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Last printed (fixed)"), xField->getPresentation(true));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf148380_usernameField, "tdf148380_usernameField.docx")
+{
+    // Verify that these are fields, and not just plain text
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    // These should match the as-last-seen-in-the-text name, and not the application's user name
+    CPPUNIT_ASSERT_EQUAL(OUString("Charlie Brown"), xField->getPresentation(false));
+    xField.set(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("CB"), xField->getPresentation(false));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf148380_modifiedField, "tdf148380_modifiedField.docx")
+{
+    getParagraph(2, "4/5/2022 3:29:00 PM"); // default (unspecified) date format
+
+    // Verify that these are fields, and not just plain text
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    // unspecified SAVEDATE gets default US formatting because style.xml has w:lang w:val="en-US"
+    CPPUNIT_ASSERT_EQUAL(OUString("4/5/2022 3:29:00 PM"), xField->getPresentation(false));
+    xField.set(xFields->nextElement(), uno::UNO_QUERY);
+    // This was hand-modified and really should be Charlie Brown, not Charles ...
+    CPPUNIT_ASSERT_EQUAL(OUString("Charlie Brown"), xField->getPresentation(false));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf148380_printField, "tdf148380_printField.docx")
+{
+    // Verify that these are fields, and not just plain text
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    // unspecified SAVEDATE gets default GB formatting because style.xml has w:lang w:val="en-GB"
+    CPPUNIT_ASSERT_EQUAL(OUString("08/04/2022 07:10:00 AM"), xField->getPresentation(false));
+    CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Modified"), xField->getPresentation(true));
+    xField.set(xFields->nextElement(), uno::UNO_QUERY);
+    // MS Word actually shows "8 o'clock-ish" until the document is reprinted,
+    // but it seems best to actually show the real last-printed date since it can't be FIXEDFLD
+    CPPUNIT_ASSERT_EQUAL(OUString("08/04/2022 06:47:00 AM"), xField->getPresentation(false));
+    CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Last printed"), xField->getPresentation(true));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf132475_printField, "tdf132475_printField.docx")
+{
+    // The last printed date field: formatted two different ways
+    getParagraph(2, "Thursday, March 17, 2022");
+    getParagraph(3, "17-Mar-22");
+    // Time zone affects the displayed time in MS Word. LO shows GMT time. Word only updated by F9
+    getParagraph(5, "12:49");
+    getParagraph(6, "12:49:00 PM");
+
+    // Verify that these are fields, and not just plain text
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(OUString("Thursday, March 17, 2022"), xField->getPresentation(false));
+    CPPUNIT_ASSERT_EQUAL(OUString("DocInformation:Last printed"), xField->getPresentation(true));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf114734_commentFormating, "tdf114734_commentFormating.docx")
+{
+    // Get the PostIt/Comment/Annotation
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+
+    uno::Reference<text::XText> xText = getProperty<uno::Reference<text::XText>>(xField, "TextRange");
+    uno::Reference<text::XTextRange> xParagraph = getParagraphOfText(1, xText);
+    // Paragraph formatting was lost: should be right to left, and thus right-justified
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Right to Left comment",
+                                 text::WritingMode2::RL_TB,
+                                 getProperty<sal_Int16>(xParagraph, "WritingMode"));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("literal right justified",
+                                 sal_Int16(style::ParagraphAdjust_RIGHT),
+                                 getProperty<sal_Int16>(xParagraph, "ParaAdjust"));
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf139759_commentHighlightBackground, "tdf139759_commentHighlightBackground.docx")
+{
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    auto xFieldsAccess(xTextFieldsSupplier->getTextFields());
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    uno::Reference<text::XTextField> xField(xFields->nextElement(), uno::UNO_QUERY);
+
+    uno::Reference<text::XText> xText = getProperty<uno::Reference<text::XText>>(xField, "TextRange");
+    uno::Reference<text::XTextRange> xParagraph = getParagraphOfText(1, xText);
+    CPPUNIT_ASSERT_EQUAL(COL_YELLOW, getProperty<Color>(getRun(xParagraph, 2), "CharBackColor"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf135906)
+{
+    loadAndReload("tdf135906.docx");
     // just test round-tripping. The document was exported as corrupt and didn't re-load.
+}
+
+CPPUNIT_TEST_FIXTURE(Test, TestTdf146802)
+{
+    createSwDoc("tdf146802.docx");
+
+    // First check if the load failed, as before the fix.
+    CPPUNIT_ASSERT(mxComponent);
+
+    // There is a group shape with text box inside having an embedded VML formula,
+    // check if something missing.
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Where is the formula?", 2, getShapes());
+    // Before the fix the bugdoc failed to load or the formula was missing.
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testParaStyleNumLevel)
@@ -107,22 +303,10 @@ CPPUNIT_TEST_FIXTURE(Test, testClearingBreak)
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/w:br", "clear", "all");
 }
 
-CPPUNIT_TEST_FIXTURE(Test, testTdf148494)
-{
-    loadAndSave("tdf148494.docx");
-
-    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-
-    // Without the fix in place, this test would have failed with
-    // - Expected:  MACROBUTTON AllCaps Hello World
-    // - Actual  :  MACROBUTTONAllCaps Hello World
-    assertXPathContent(pXmlDoc, "/w:document/w:body/w:p/w:r[3]/w:instrText", " MACROBUTTON AllCaps Hello World ");
-}
-
 CPPUNIT_TEST_FIXTURE(Test, testContentControlExport)
 {
     // Given a document with a content control around one or more text portions:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -133,12 +317,11 @@ CPPUNIT_TEST_FIXTURE(Test, testContentControlExport)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::makeAny(true));
+    xContentControlProps->setPropertyValue("ShowingPlaceHolder", uno::Any(true));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -154,7 +337,7 @@ CPPUNIT_TEST_FIXTURE(Test, testContentControlExport)
 CPPUNIT_TEST_FIXTURE(Test, testCheckboxContentControlExport)
 {
     // Given a document with a checkbox content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -165,15 +348,14 @@ CPPUNIT_TEST_FIXTURE(Test, testCheckboxContentControlExport)
     uno::Reference<text::XTextContent> xContentControl(
         xMSF->createInstance("com.sun.star.text.ContentControl"), uno::UNO_QUERY);
     uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
-    xContentControlProps->setPropertyValue("Checkbox", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("Checked", uno::makeAny(true));
-    xContentControlProps->setPropertyValue("CheckedState", uno::makeAny(OUString(u"☒")));
-    xContentControlProps->setPropertyValue("UncheckedState", uno::makeAny(OUString(u"☐")));
+    xContentControlProps->setPropertyValue("Checkbox", uno::Any(true));
+    xContentControlProps->setPropertyValue("Checked", uno::Any(true));
+    xContentControlProps->setPropertyValue("CheckedState", uno::Any(OUString(u"☒")));
+    xContentControlProps->setPropertyValue("UncheckedState", uno::Any(OUString(u"☐")));
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -190,7 +372,7 @@ CPPUNIT_TEST_FIXTURE(Test, testCheckboxContentControlExport)
 CPPUNIT_TEST_FIXTURE(Test, testDropdownContentControlExport)
 {
     // Given a document with a dropdown content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -222,8 +404,7 @@ CPPUNIT_TEST_FIXTURE(Test, testDropdownContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -243,7 +424,7 @@ CPPUNIT_TEST_FIXTURE(Test, testDropdownContentControlExport)
 CPPUNIT_TEST_FIXTURE(Test, testPictureContentControlExport)
 {
     // Given a document with a picture content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -263,8 +444,7 @@ CPPUNIT_TEST_FIXTURE(Test, testPictureContentControlExport)
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -278,7 +458,7 @@ CPPUNIT_TEST_FIXTURE(Test, testPictureContentControlExport)
 CPPUNIT_TEST_FIXTURE(Test, testDateContentControlExport)
 {
     // Given a document with a date content control around a text portion:
-    mxComponent = loadFromDesktop("private:factory/swriter");
+    createSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -298,13 +478,17 @@ CPPUNIT_TEST_FIXTURE(Test, testDateContentControlExport)
     xContentControlProps->setPropertyValue("DataBindingXpath", uno::Any(OUString("/ns0:employees[1]/ns0:employee[1]/ns0:hireDate[1]")));
     xContentControlProps->setPropertyValue("DataBindingStoreItemID", uno::Any(OUString("{241A8A02-7FFD-488D-8827-63FBE74E8BC9}")));
     xContentControlProps->setPropertyValue("Color", uno::Any(OUString("008000")));
+    xContentControlProps->setPropertyValue("Appearance", uno::Any(OUString("hidden")));
     xContentControlProps->setPropertyValue("Alias", uno::Any(OUString("myalias")));
     xContentControlProps->setPropertyValue("Tag", uno::Any(OUString("mytag")));
+    xContentControlProps->setPropertyValue("Id", uno::Any(static_cast<sal_Int32>(123)));
+    xContentControlProps->setPropertyValue("TabIndex", uno::Any(sal_uInt32(4294967295))); // -1
+    xContentControlProps->setPropertyValue("Lock", uno::Any(OUString("sdtLocked")));
+
     xText->insertTextContent(xCursor, xContentControl, /*bAbsorb=*/true);
 
     // When exporting to DOCX:
-    save("Office Open XML Text", maTempFile);
-    mbExported = true;
+    save("Office Open XML Text");
 
     // Then make sure the expected markup is used:
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
@@ -321,15 +505,63 @@ CPPUNIT_TEST_FIXTURE(Test, testDateContentControlExport)
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:dataBinding", "xpath", "/ns0:employees[1]/ns0:employee[1]/ns0:hireDate[1]");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:dataBinding", "storeItemID", "{241A8A02-7FFD-488D-8827-63FBE74E8BC9}");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w15:color", "val", "008000");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w15:appearance", "val", "hidden");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:alias", "val", "myalias");
     assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:tag", "val", "mytag");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:id", "val", "123");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:tabIndex", "val", "-1");
+    assertXPath(pXmlDoc, "//w:sdt/w:sdtPr/w:lock", "val", "sdtLocked");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testNegativePageBorder)
+{
+    // Given a document with a negative border distance:
+    createSwDoc();
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    SwDocShell* pDocShell = pTextDoc->GetDocShell();
+    SwWrtShell* pWrtShell = pDocShell->GetWrtShell();
+    pWrtShell->Insert("test");
+    uno::Reference<beans::XPropertySet> xPageStyle(getStyles("PageStyles")->getByName("Standard"),
+                                                   uno::UNO_QUERY);
+    xPageStyle->setPropertyValue("TopMargin", uno::Any(static_cast<sal_Int32>(501)));
+    table::BorderLine2 aBorder;
+    aBorder.LineWidth = 159;
+    aBorder.OuterLineWidth = 159;
+    xPageStyle->setPropertyValue("TopBorder", uno::Any(aBorder));
+    sal_Int32 nTopBorderDistance = -646;
+    xPageStyle->setPropertyValue("TopBorderDistance", uno::Any(nTopBorderDistance));
+
+    // When exporting to DOCX:
+    save("Office Open XML Text");
+
+    // Then make sure that the page edge -> border space is correct:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    assertXPath(pXmlDoc, "//w:pgMar", "top", "284");
+    assertXPath(pXmlDoc, "//w:pgBorders/w:top", "sz", "36");
+    // Without the fix in place, this test would have failed with:
+    // - Expected: 28
+    // - Actual  : 0
+    // i.e. editeng::BorderDistancesToWord() mis-handled negative border distances.
+    assertXPath(pXmlDoc, "//w:pgBorders/w:top", "space", "28");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf148494)
+{
+    loadAndSave("tdf148494.docx");
+
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected:  MACROBUTTON AllCaps Hello World
+    // - Actual  :  MACROBUTTONAllCaps Hello World
+    assertXPathContent(pXmlDoc, "/w:document/w:body/w:p/w:r[3]/w:instrText", " MACROBUTTON AllCaps Hello World ");
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf137466, "tdf137466.docx")
 {
+    if (!isExported())
+       return; // initial import, no further checks
     xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-    if (!pXmlDoc)
-       return; // initial import, no futher checks
 
     // Ensure that we have <w:placeholder><w:docPart v:val="xxxx"/></w:placeholder>
     OUString sDocPart = getXPath(pXmlDoc, "/w:document/w:body/w:p/w:sdt/w:sdtPr/w:placeholder/w:docPart", "val");
@@ -376,6 +608,113 @@ CPPUNIT_TEST_FIXTURE(Test, testDontAddNewStyles)
     assertXPath(pXmlDoc, "/w:styles/w:style[@w:styleId='Caption']", 0);
 }
 
+DECLARE_OOXMLEXPORT_TEST(TestWPGZOrder, "testWPGZOrder.docx")
+{
+    // Check if the load failed.
+    CPPUNIT_ASSERT(mxComponent);
+
+    // Get the WPG
+    uno::Reference<drawing::XShapes> xGroup(getShape(1), uno::UNO_QUERY_THROW);
+    uno::Reference<beans::XPropertySet> xGroupProperties(xGroup, uno::UNO_QUERY_THROW);
+
+    // Initialize a queue for subgroups
+    std::queue<uno::Reference<drawing::XShapes>> xGroupList;
+    xGroupList.push(xGroup);
+
+    // Every textbox shall be visible.
+    while (xGroupList.size())
+    {
+        // Get the first group
+        xGroup = xGroupList.front();
+        xGroupList.pop();
+        for (sal_Int32 i = 0; i < xGroup->getCount(); ++i)
+        {
+            // Get the child shape
+            uno::Reference<beans::XPropertySet> xChildShapeProperties(xGroup->getByIndex(i),
+                uno::UNO_QUERY_THROW);
+            // Check for textbox
+            if (!xChildShapeProperties->getPropertyValue("TextBox").get<bool>())
+            {
+                // Is this a Group Shape? Put it into the queue.
+                uno::Reference<drawing::XShapes> xInnerGroup(xGroup->getByIndex(i), uno::UNO_QUERY);
+                if (xInnerGroup)
+                    xGroupList.push(xInnerGroup);
+                continue;
+            }
+
+            // Get the textbox properties
+            uno::Reference<beans::XPropertySet> xTextBoxFrameProperties(
+                xChildShapeProperties->getPropertyValue("TextBoxContent"), uno::UNO_QUERY_THROW);
+
+            // Assert that the textbox ZOrder greater than the groupshape
+            CPPUNIT_ASSERT_GREATER(xGroupProperties->getPropertyValue("ZOrder").get<long>(),
+                xTextBoxFrameProperties->getPropertyValue("ZOrder").get<long>());
+            // Before the fix, this failed because that was less, and the textboxes were covered.
+        }
+
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf148720)
+{
+    loadAndReload("tdf148720.odt");
+    const auto& pLayout = parseLayoutDump();
+
+    const OString sShapeXPaths[] =
+    {
+        OString("/root/page/body/txt/anchored/SwAnchoredDrawObject/SdrObjGroup/SdrObjList/SdrObject[1]"),
+        OString("/root/page/body/txt/anchored/SwAnchoredDrawObject/SdrObjGroup/SdrObjList/SdrObjGroup/SdrObjList/SdrObjGroup/SdrObjList/SdrObject[1]"),
+        OString("/root/page/body/txt/anchored/SwAnchoredDrawObject/SdrObjGroup/SdrObjList/SdrObjGroup/SdrObjList/SdrObjGroup/SdrObjList/SdrObject[2]"),
+        OString("/root/page/body/txt/anchored/SwAnchoredDrawObject/SdrObjGroup/SdrObjList/SdrObject[2]")
+    };
+
+    const OString sTextXPaths[] =
+    {
+        OString("/root/page/body/txt/anchored/fly[1]/infos/bounds"),
+        OString("/root/page/body/txt/anchored/fly[2]/infos/bounds"),
+        OString("/root/page/body/txt/anchored/fly[3]/infos/bounds"),
+        OString("/root/page/body/txt/anchored/fly[4]/infos/bounds")
+    };
+
+    const OString sAttribs[] =
+    {
+        OString("left"),
+        OString("top"),
+        OString("width"),
+        OString("height")
+    };
+
+    for (sal_Int32 i = 0; i < 4; ++i)
+    {
+        OUString aShapeVals[4];
+        int aTextVals[4] = {0, 0, 0, 0};
+
+        const auto aOutRect = getXPath(pLayout, sShapeXPaths[i], "aOutRect");
+
+        sal_uInt16 nCommaPos[4] = {0, 0, 0, 0};
+        nCommaPos[1] = aOutRect.indexOf(",");
+        nCommaPos[2] = aOutRect.indexOf(",", nCommaPos[1] + 1);
+        nCommaPos[3] = aOutRect.indexOf(",", nCommaPos[2] + 1);
+
+
+        aShapeVals[0] = aOutRect.copy(nCommaPos[0], nCommaPos[1] - nCommaPos[0]);
+        aShapeVals[1] = aOutRect.copy(nCommaPos[1] + 2, nCommaPos[2] - nCommaPos[1] - 2);
+        aShapeVals[2] = aOutRect.copy(nCommaPos[2] + 2, nCommaPos[3] - nCommaPos[2] - 2);
+        aShapeVals[3] = aOutRect.copy(nCommaPos[3] + 2, aOutRect.getLength() - nCommaPos[3] - 2);
+
+        for (int ii = 0; ii < 4; ++ii)
+        {
+            aTextVals[ii] = getXPath(pLayout, sTextXPaths[i], sAttribs[ii]).toInt32();
+        }
+
+        tools::Rectangle ShapeArea(Point(aShapeVals[0].toInt32(), aShapeVals[1].toInt32()), Size(aShapeVals[2].toInt32() + 5, aShapeVals[3].toInt32() + 5));
+
+        tools::Rectangle TextArea(Point(aTextVals[0], aTextVals[1]), Size(aTextVals[2], aTextVals[3]));
+
+        CPPUNIT_ASSERT(ShapeArea.Contains(TextArea));
+    }
+}
+
 DECLARE_OOXMLEXPORT_TEST(testTdf126287, "tdf126287.docx")
 {
     CPPUNIT_ASSERT_EQUAL(2, getPages());
@@ -393,16 +732,16 @@ DECLARE_OOXMLEXPORT_TEST(testTdf123642_BookmarkAtDocEnd, "tdf123642.docx")
     CPPUNIT_ASSERT(xBookmarksByName->hasByName("Bookmark1"));
 
     // and it is really in exported DOCX (let's ensure)
-    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-    if (!pXmlDoc)
+    if (!isExported())
        return; // initial import, no further checks
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     CPPUNIT_ASSERT_EQUAL(OUString("Bookmark1"), getXPath(pXmlDoc, "/w:document/w:body/w:p[2]/w:bookmarkStart[1]", "name"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf148361, "tdf148361.docx")
 {
-    if (mbExported)
+    if (isExported())
     {
         // Block SDT is turned into run SDT on export, so the next import will have this as content
         // control, not as a field.
@@ -428,6 +767,54 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148361, "tdf148361.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("[Type text]"), aActual);
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf153082_semicolon, "custom-styles-TOC-semicolon.docx")
+{
+    uno::Reference<text::XDocumentIndexesSupplier> xIndexSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xIndexes = xIndexSupplier->getDocumentIndexes();
+    uno::Reference<text::XDocumentIndex> xTOC(xIndexes->getByIndex(0), uno::UNO_QUERY);
+    // check styles
+    uno::Reference<container::XIndexAccess> xParaStyles =
+        getProperty<uno::Reference<container::XIndexAccess>>(xTOC, "LevelParagraphStyles");
+    uno::Sequence<OUString> styles;
+    xParaStyles->getByIndex(0) >>= styles;
+    CPPUNIT_ASSERT_EQUAL(uno::Sequence<OUString>{}, styles);
+    xParaStyles->getByIndex(1) >>= styles;
+    CPPUNIT_ASSERT_EQUAL(uno::Sequence<OUString>{}, styles);
+    xParaStyles->getByIndex(2) >>= styles;
+    // the first one is built-in Word style "Intense Quote" that was localised DE "Intensives Zitat" in the file
+    CPPUNIT_ASSERT_EQUAL((uno::Sequence<OUString>{"Intensives Zitat", "Custom1", "_MyStyle0"}), styles);
+    xTOC->update();
+    OUString const tocContent(xTOC->getAnchor()->getString());
+    CPPUNIT_ASSERT(tocContent.startsWith("Table of Contents"));
+    CPPUNIT_ASSERT(tocContent.indexOf("Lorem ipsum dolor sit amet, consectetuer adipiscing elit.") != -1);
+    CPPUNIT_ASSERT(tocContent.indexOf("Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.") != -1);
+    CPPUNIT_ASSERT(tocContent.indexOf("Proin pharetra nonummy pede. Mauris et orci.") != -1);
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf153082_comma, "custom-styles-TOC-comma.docx")
+{
+    uno::Reference<text::XDocumentIndexesSupplier> xIndexSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xIndexes = xIndexSupplier->getDocumentIndexes();
+    uno::Reference<text::XDocumentIndex> xTOC(xIndexes->getByIndex(0), uno::UNO_QUERY);
+    // check styles
+    uno::Reference<container::XIndexAccess> xParaStyles =
+        getProperty<uno::Reference<container::XIndexAccess>>(xTOC, "LevelParagraphStyles");
+    uno::Sequence<OUString> styles;
+    xParaStyles->getByIndex(0) >>= styles;
+    CPPUNIT_ASSERT_EQUAL(uno::Sequence<OUString>{"_MyStyle0"}, styles);
+    xParaStyles->getByIndex(1) >>= styles;
+    CPPUNIT_ASSERT_EQUAL(uno::Sequence<OUString>{"Custom1"}, styles);
+    xParaStyles->getByIndex(2) >>= styles;
+    // the first one is built-in Word style "Intense Quote" that was localised DE "Intensives Zitat" in the file
+    CPPUNIT_ASSERT_EQUAL(uno::Sequence<OUString>{"Intensives Zitat"}, styles);
+    xTOC->update();
+    OUString const tocContent(xTOC->getAnchor()->getString());
+    CPPUNIT_ASSERT(tocContent.startsWith("Table of Contents"));
+    CPPUNIT_ASSERT(tocContent.indexOf("Lorem ipsum dolor sit amet, consectetuer adipiscing elit.") != -1);
+    CPPUNIT_ASSERT(tocContent.indexOf("Fusce posuere, magna sed pulvinar ultricies, purus lectus malesuada libero, sit amet commodo magna eros quis urna.") != -1);
+    CPPUNIT_ASSERT(tocContent.indexOf("Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.") != -1);
+}
+
 DECLARE_OOXMLEXPORT_TEST(testTdf142407, "tdf142407.docx")
 {
     uno::Reference<container::XNameAccess> xPageStyles = getStyles("PageStyles");
@@ -435,6 +822,54 @@ DECLARE_OOXMLEXPORT_TEST(testTdf142407, "tdf142407.docx")
     sal_Int16 nGridLines;
     xPageStyle->getPropertyValue("GridLines") >>= nGridLines;
     CPPUNIT_ASSERT_EQUAL( sal_Int16(36), nGridLines);   // was 23, left large space before text.
+}
+
+DECLARE_OOXMLEXPORT_TEST(testWPGBodyPr, "WPGbodyPr.docx")
+{
+    // Is load successful?
+    CPPUNIT_ASSERT(mxComponent);
+
+    // There are a WPG shape and a picture
+    CPPUNIT_ASSERT_EQUAL(2, getShapes());
+
+    // Get the WPG shape
+    uno::Reference<drawing::XShapes> xGroup(getShape(1), uno::UNO_QUERY);
+    // And the embed WPG
+    uno::Reference<drawing::XShapes> xEmbedGroup(xGroup->getByIndex(1), uno::UNO_QUERY);
+
+    // Get the properties of the shapes
+    uno::Reference<beans::XPropertySet> xOuterShape(xGroup->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xMiddleShape(xEmbedGroup->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xInnerShape(xEmbedGroup->getByIndex(1), uno::UNO_QUERY);
+
+    // Get the properties of the textboxes too
+    uno::Reference<beans::XPropertySet> xOuterTextBox(
+        xOuterShape->getPropertyValue("TextBoxContent"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xMiddleTextBox(
+        xMiddleShape->getPropertyValue("TextBoxContent"), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xInnerTextBox(
+        xInnerShape->getPropertyValue("TextBoxContent"), uno::UNO_QUERY);
+
+    // Check the alignments
+    CPPUNIT_ASSERT_EQUAL(css::drawing::TextVerticalAdjust::TextVerticalAdjust_TOP,
+                         xOuterTextBox->getPropertyValue("TextVerticalAdjust")
+                             .get<css::drawing::TextVerticalAdjust>());
+    CPPUNIT_ASSERT_EQUAL(css::drawing::TextVerticalAdjust::TextVerticalAdjust_TOP,
+                         xMiddleTextBox->getPropertyValue("TextVerticalAdjust")
+                             .get<css::drawing::TextVerticalAdjust>());
+    CPPUNIT_ASSERT_EQUAL(css::drawing::TextVerticalAdjust::TextVerticalAdjust_CENTER,
+                         xInnerTextBox->getPropertyValue("TextVerticalAdjust")
+                             .get<css::drawing::TextVerticalAdjust>());
+
+    // Check the inset margins, all were 0 before the fix
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(499),
+                         xInnerShape->getPropertyValue("TextLowerDistance").get<sal_Int32>());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(499),
+                         xInnerShape->getPropertyValue("TextUpperDistance").get<sal_Int32>());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(1000),
+                         xInnerShape->getPropertyValue("TextLeftDistance").get<sal_Int32>());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(254),
+                         xInnerShape->getPropertyValue("TextRightDistance").get<sal_Int32>());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf146851_1, "tdf146851_1.docx")
@@ -467,6 +902,22 @@ DECLARE_OOXMLEXPORT_TEST(testTdf146851_2, "tdf146851_2.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("Schedule"), xTextField->getPresentation(false));
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf148052, "tdf148052.docx")
+{
+    uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XEnumerationAccess> xFieldsAccess(xTextFieldsSupplier->getTextFields());
+
+    uno::Reference<container::XEnumeration> xFields(xFieldsAccess->createEnumeration());
+    CPPUNIT_ASSERT(xFields->hasMoreElements());
+
+    uno::Reference<text::XTextField> xTextField(xFields->nextElement(), uno::UNO_QUERY);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 14. Aug 18
+    // - Actual  : 11. Apr 22
+    CPPUNIT_ASSERT_EQUAL(OUString("14. Aug 18"), xTextField->getPresentation(false));
+}
+
 DECLARE_OOXMLEXPORT_TEST(testTdf148111, "tdf148111.docx")
 {
     uno::Reference<text::XTextFieldsSupplier> xTextFieldsSupplier(mxComponent, uno::UNO_QUERY);
@@ -493,13 +944,47 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148111, "tdf148111.docx")
 
     // No more fields
     CPPUNIT_ASSERT(!xFields->hasMoreElements());
+
+    if (!isExported())
+        return;
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // ShowingPlaceholder should be off for 0, false and "on". (This was 21 before the fix)
+    assertXPath(pXmlDoc,"//w:p/w:sdt/w:sdtPr/w:showingPlcHdr", 12);
+}
+
+DECLARE_OOXMLEXPORT_TEST(TestTdf73499, "tdf73499.docx")
+{
+    // Ensure, the bugdoc is opened
+    CPPUNIT_ASSERT(mxComponent);
+    // Get the groupshape
+    uno::Reference<drawing::XShapes> xGroup(getShape(1), uno::UNO_QUERY_THROW);
+
+    // Get the textboxes of the groupshape
+    uno::Reference<text::XText> xTextBox1(xGroup->getByIndex(0), uno::UNO_QUERY_THROW);
+    uno::Reference<text::XText> xTextBox2(xGroup->getByIndex(1), uno::UNO_QUERY_THROW);
+
+    // Get the properties of the textboxes
+    uno::Reference<beans::XPropertySet> xTextBox1Properties(xTextBox1, uno::UNO_QUERY_THROW);
+    uno::Reference<beans::XPropertySet> xTextBox2Properties(xTextBox2, uno::UNO_QUERY_THROW);
+
+    // Get the name of the textboxes
+    uno::Reference<container::XNamed> xTextBox1Name(xTextBox1, uno::UNO_QUERY_THROW);
+    uno::Reference<container::XNamed> xTextBox2Name(xTextBox2, uno::UNO_QUERY_THROW);
+
+    // Check for the links, before the fix that were missing
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "Link name missing!", xTextBox2Name->getName(),
+        xTextBox1Properties->getPropertyValue("ChainNextName").get<OUString>());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        "Link name missing!", xTextBox1Name->getName(),
+        xTextBox2Properties->getPropertyValue("ChainPrevName").get<OUString>());
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf81507, "tdf81507.docx")
 {
-    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-    if (!pXmlDoc)
+    if (!isExported())
        return; // initial import, no further checks
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Ensure that we have <w:text w:multiLine="1"/>
     CPPUNIT_ASSERT_EQUAL(OUString("1"), getXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:sdt/w:sdtPr/w:text", "multiLine"));
@@ -508,7 +993,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf81507, "tdf81507.docx")
     CPPUNIT_ASSERT_EQUAL(OUString("0"), getXPath(pXmlDoc, "/w:document/w:body/w:p[2]/w:sdt/w:sdtPr/w:text", "multiLine"));
 
     // Ensure that we have <w:text/>
-    getXPath(pXmlDoc, "/w:document/w:body/w:p[3]/w:sdt/w:sdtPr/w:text", "");
+    assertXPath(pXmlDoc, "/w:document/w:body/w:p[3]/w:sdt/w:sdtPr/w:text");
 
     // Ensure that we have no <w:text/> (not quite correct case, but to ensure import/export are okay)
     xmlXPathObjectPtr pXmlObj = getXPathNode(pXmlDoc, "/w:document/w:body/w:p[4]/w:sdt/w:sdtPr/w:text");
@@ -569,8 +1054,21 @@ DECLARE_OOXMLEXPORT_TEST(testTdf144563, "tdf144563.docx")
     }
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf144668, "tdf144668.odt")
+// broken test document?
+#if !defined(_WIN32)
+CPPUNIT_TEST_FIXTURE(Test, testTdf146955)
 {
+    loadAndReload("tdf146955.odt");
+    // import of a (broken?) DOCX export with dozens of frames raised a SAX exception,
+    // when the code tried to access to a non-existent footnote
+    uno::Reference<text::XFootnotesSupplier> xNotes(mxComponent, uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), xNotes->getFootnotes()->getCount());
+}
+#endif
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf144668)
+{
+    loadAndReload("tdf144668.odt");
     uno::Reference<beans::XPropertySet> xPara1(getParagraph(1, u"level1"), uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(OUString("[0001]"), getProperty<OUString>(xPara1, "ListLabelString"));
 
@@ -586,9 +1084,9 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148455_1, "tdf148455_1.docx")
 
 DECLARE_OOXMLEXPORT_TEST(testTdf148455_2, "tdf148455_2.docx")
 {
-    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
-    if (!pXmlDoc)
+    if (!isExported())
        return; // initial import, no further checks
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
 
     // Find list id for restarted list
     sal_Int32 nListId = getXPath(pXmlDoc, "/w:document/w:body/w:p[3]/w:pPr/w:numPr/w:numId", "val").toInt32();
@@ -596,19 +1094,16 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148455_2, "tdf148455_2.docx")
     xmlDocUniquePtr pNumberingDoc = parseExport("word/numbering.xml");
 
     // Ensure we have empty lvlOverride for levels 0 - 1
-    getXPath(pNumberingDoc, "/w:numbering/w:num[@w:numId='" + OString::number(nListId) +"']/w:lvlOverride[@w:ilvl='0']", "");
-    getXPath(pNumberingDoc, "/w:numbering/w:num[@w:numId='" + OString::number(nListId) +"']/w:lvlOverride[@w:ilvl='1']", "");
-    // And normal overrride for level 2
+    assertXPath(pNumberingDoc, "/w:numbering/w:num[@w:numId='" + OString::number(nListId) +"']/w:lvlOverride[@w:ilvl='0']");
+    assertXPath(pNumberingDoc, "/w:numbering/w:num[@w:numId='" + OString::number(nListId) +"']/w:lvlOverride[@w:ilvl='1']");
+    // And normal override for level 2
     getXPath(pNumberingDoc, "/w:numbering/w:num[@w:numId='" + OString::number(nListId) +"']/w:lvlOverride[@w:ilvl='2']/w:startOverride", "val");
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf147978enhancedPathABVW)
 {
-    load(DATA_DIRECTORY, "tdf147978_enhancedPath_commandABVW.odt");
-    CPPUNIT_ASSERT(mxComponent);
-    save("Office Open XML Text", maTempFile);
-    mxComponent->dispose();
-    mxComponent = loadFromDesktop(maTempFile.GetURL(), "com.sun.star.text.TextDocument");
+    createSwDoc("tdf147978_enhancedPath_commandABVW.odt");
+    reload("Office Open XML Text", nullptr);
     // Make sure the new implemented export for commands A,B,V and W use the correct arc between
     // the given two points, here the short one.
     for (sal_Int16 i = 1 ; i <= 4; ++i)
@@ -627,7 +1122,7 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148132, "tdf148132.docx")
         comphelper::SequenceAsHashMap levelProps(xLevels->getByIndex(1));
         OUString aCharStyleName = levelProps["CharStyleName"].get<OUString>();
         // Ensure that numbering in this paragraph is 24pt bold italic
-        // Previously it got overriden by paragraph properties and became 6pt, no bold, no italic
+        // Previously it got overridden by paragraph properties and became 6pt, no bold, no italic
         uno::Reference<beans::XPropertySet> xStyle(getStyles("CharacterStyles")->getByName(aCharStyleName), uno::UNO_QUERY);
         CPPUNIT_ASSERT_EQUAL(24.f, getProperty<float>(xStyle, "CharHeight"));
         CPPUNIT_ASSERT_EQUAL(awt::FontWeight::BOLD, getProperty<float>(xStyle, "CharWeight"));
@@ -662,6 +1157,38 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf149200)
     CPPUNIT_ASSERT_EQUAL(OUString("dark1"), getXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[1]/w:rPr/w:color", "themeColor"));
 }
 
+DECLARE_OOXMLEXPORT_TEST(testTdf149313, "tdf149313.docx")
+{
+    // only 2, but not 3 pages in document
+    CPPUNIT_ASSERT_EQUAL(2, getPages());
+
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+    // And ensure that pages are with correct sections (have correct dimensions)
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(4989), getXPath(pXmlDoc, "/root/page[1]/infos/bounds", "height").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(4989), getXPath(pXmlDoc, "/root/page[1]/infos/bounds", "width").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(4989), getXPath(pXmlDoc, "/root/page[2]/infos/bounds", "height").toInt32());
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(8000), getXPath(pXmlDoc, "/root/page[2]/infos/bounds", "width").toInt32());
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf148360, "tdf148360.docx")
+{
+    const auto& pLayout = parseLayoutDump();
+
+    // Ensure first element is a tab
+    assertXPath(pLayout, "/root/page[1]/body/txt[1]/SwParaPortion/SwLineLayout/child::*[1]", "type", "PortionType::TabLeft");
+    // and only then goes content
+    assertXPath(pLayout, "/root/page[1]/body/txt[1]/SwParaPortion/SwLineLayout/child::*[2]", "type", "PortionType::Text");
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf135923, "tdf135923-min.docx")
+{
+    uno::Reference<text::XText> xShape(getShape(1), uno::UNO_QUERY);
+    uno::Reference<text::XTextRange> xParagraph = getParagraphOfText(1, xShape);
+
+    CPPUNIT_ASSERT_EQUAL(COL_WHITE, getProperty<Color>(getRun(xParagraph, 1), "CharColor"));
+    CPPUNIT_ASSERT_EQUAL(COL_BLACK, getProperty<Color>(getRun(xParagraph, 2), "CharColor"));
+}
+
 DECLARE_OOXMLEXPORT_TEST(testTdf148273_sectionBulletFormatLeak, "tdf148273_sectionBulletFormatLeak.docx")
 {
     // get a paragraph with bullet point after section break
@@ -676,6 +1203,83 @@ DECLARE_OOXMLEXPORT_TEST(testTdf148273_sectionBulletFormatLeak, "tdf148273_secti
     // i.e. empty paragraph formats from the first section leaked to the bullet's formatting
     uno::Any aValue = xProps->getPropertyValue("ListAutoFormat");
     CPPUNIT_ASSERT_EQUAL(false, aValue.hasValue());
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf131722, "tdf131722.docx")
+{
+    if (isExported())
+    {
+        xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+        assertXPath(pXmlDoc, "//w:sdt", 4);
+        uno::Reference<text::XTextTablesSupplier> xTablesSupplier(mxComponent, uno::UNO_QUERY);
+        uno::Reference<container::XIndexAccess> xTables(xTablesSupplier->getTextTables(),
+                                                        uno::UNO_QUERY);
+        uno::Reference<text::XTextTable> xTable(xTables->getByIndex(0), uno::UNO_QUERY);
+        uno::Reference<table::XCell> xCell = xTable->getCellByName("A1");
+        uno::Reference<container::XEnumerationAccess> xParagraphsAccess(xCell, uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xParagraphs
+            = xParagraphsAccess->createEnumeration();
+        uno::Reference<container::XEnumerationAccess> xParagraph(xParagraphs->nextElement(),
+                                                                 uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xPortions = xParagraph->createEnumeration();
+        uno::Reference<beans::XPropertySet> xTextPortion(xPortions->nextElement(), uno::UNO_QUERY);
+
+        OUString aPortionType;
+        xTextPortion->getPropertyValue("TextPortionType") >>= aPortionType;
+        CPPUNIT_ASSERT_EQUAL(OUString("ContentControl"), aPortionType);
+
+        uno::Reference<text::XTextContent> xContentControl;
+        xTextPortion->getPropertyValue("ContentControl") >>= xContentControl;
+        uno::Reference<beans::XPropertySet> xContentControlProps(xContentControl, uno::UNO_QUERY);
+        bool bDate{};
+        xContentControlProps->getPropertyValue("Date") >>= bDate;
+        CPPUNIT_ASSERT(bDate);
+        uno::Reference<container::XEnumerationAccess> xContentControlEnumAccess(xContentControl,
+                                                                                uno::UNO_QUERY);
+        uno::Reference<container::XEnumeration> xContentControlEnum
+            = xContentControlEnumAccess->createEnumeration();
+        uno::Reference<text::XTextRange> xTextPortionRange(xContentControlEnum->nextElement(),
+                                                           uno::UNO_QUERY);
+        CPPUNIT_ASSERT_EQUAL(OUString("Enter a date here!"), xTextPortionRange->getString());
+    }
+    else
+    {
+        SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+        CPPUNIT_ASSERT(pTextDoc);
+        SwDoc* pDoc = pTextDoc->GetDocShell()->GetDoc();
+        IDocumentMarkAccess* pMarkAccess = pDoc->getIDocumentMarkAccess();
+
+        for (auto aIter = pMarkAccess->getFieldmarksBegin();
+             aIter != pMarkAccess->getFieldmarksEnd(); ++aIter)
+        {
+            ::sw::mark::IDateFieldmark* pFieldmark
+                = dynamic_cast<::sw::mark::IDateFieldmark*>(*aIter);
+            CPPUNIT_ASSERT(pFieldmark);
+            CPPUNIT_ASSERT_EQUAL(OUString(ODF_FORMDATE), pFieldmark->GetFieldname());
+            CPPUNIT_ASSERT_EQUAL(OUString("Enter a date here!"), pFieldmark->GetContent());
+        }
+    }
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf149089, "tdf149089.docx")
+{
+    uno::Reference<container::XNameAccess> xPageStyles = getStyles("PageStyles");
+    uno::Reference<beans::XPropertySet> xPageStyle(xPageStyles->getByName("Standard"), uno::UNO_QUERY);
+    sal_Int16 nGridMode;
+    xPageStyle->getPropertyValue("GridMode") >>= nGridMode;
+    CPPUNIT_ASSERT_EQUAL( sal_Int16(text::TextGridMode::LINES), nGridMode);   // was LINES_AND_CHARS
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf139128)
+{
+    loadAndReload("tdf139128.odt");
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    CPPUNIT_ASSERT(pXmlDoc);
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 2
+    // - Actual  : 0
+    // i.e. the line break was lost on export.
+    assertXPath(pXmlDoc, "//w:br", 2);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

@@ -22,10 +22,12 @@
 #include "swdllapi.h"
 #include "hintids.hxx"
 #include "format.hxx"
+#include "pam.hxx"
 #include <svl/poolitem.hxx>
 #include <svx/swframetypes.hxx>
 
 #include <memory>
+#include <optional>
 
 struct SwPosition;
 class IntlWrapper;
@@ -33,7 +35,7 @@ class IntlWrapper;
 /// FlyAnchors
 class SW_DLLPUBLIC SwFormatAnchor final : public SfxPoolItem
 {
-    std::unique_ptr<SwPosition> m_pContentAnchor; /**< 0 for page-bound frames.
+    std::optional<SwPosition> m_oContentAnchor; /**< 0 for page-bound frames.
                                                      Index for paragraph-bound frames.
                                                      Position for character-bound frames. */
     RndStdIds  m_eAnchorId;
@@ -63,14 +65,19 @@ public:
     virtual bool PutValue( const css::uno::Any& rVal, sal_uInt8 nMemberId ) override;
 
     RndStdIds GetAnchorId() const { return m_eAnchorId; }
+    void SetType( RndStdIds nRndId ) { m_eAnchorId = nRndId; }
+
     sal_uInt16 GetPageNum() const { return m_nPageNumber; }
-    const SwPosition *GetContentAnchor() const { return m_pContentAnchor.get(); }
+    void SetPageNum( sal_uInt16 nNew ) { m_nPageNumber = nNew; }
+
+    SwNode* GetAnchorNode() const;
+    const SwPosition* GetContentAnchor() const { return m_oContentAnchor ? &*m_oContentAnchor : nullptr; }
+    SwContentNode* GetAnchorContentNode() const;
+    sal_Int32 GetAnchorContentOffset() const;
+    void SetAnchor( const SwPosition *pPos );
+
     // #i28701#
     sal_uInt32 GetOrder() const { return m_nOrder;}
-
-    void SetType( RndStdIds nRndId ) { m_eAnchorId = nRndId; }
-    void SetPageNum( sal_uInt16 nNew ) { m_nPageNumber = nNew; }
-    void SetAnchor( const SwPosition *pPos );
 
     void dumpAsXml(xmlTextWriterPtr pWriter) const override;
 };

@@ -19,11 +19,8 @@
 
 #include <sal/config.h>
 
-#include <osl/thread.h>
 #include <svtools/htmlcfg.hxx>
-#include <svtools/parhtml.hxx>
 #include <unotools/syslocale.hxx>
-#include <tools/debug.hxx>
 #include <officecfg/Office/Common.hxx>
 
 namespace SvxHtmlOptions
@@ -85,30 +82,6 @@ bool IsPrintLayoutExtension()
             bRet = false;
     }
     return bRet;
-}
-
-bool IsDefaultTextEncoding()
-{
-    std::optional<sal_Int32> x = officecfg::Office::Common::Filter::HTML::Export::Encoding::get();
-    // if we have a value, then the text encoding is not default
-    return !bool(x);
-}
-rtl_TextEncoding GetTextEncoding()
-{
-    std::optional<sal_Int32> x = officecfg::Office::Common::Filter::HTML::Export::Encoding::get();
-    rtl_TextEncoding eRet;
-    if (!x)
-        eRet = SvtSysLocale::GetBestMimeEncoding();
-    else
-        eRet = static_cast<rtl_TextEncoding>(*x);
-    return eRet;
-}
-
-void SetTextEncoding( rtl_TextEncoding eEnc )
-{
-    std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
-    officecfg::Office::Common::Filter::HTML::Export::Encoding::set(eEnc, batch);
-    batch->commit();
 }
 
 } // namespace SvxHtmlOptions

@@ -46,6 +46,7 @@
 #include <IDocumentDrawModelAccess.hxx>
 #include <IDocumentLayoutAccess.hxx>
 #include <IDocumentStylePoolAccess.hxx>
+#include <UndoAttribute.hxx>
 #include <docsh.hxx>
 #include <editsh.hxx>
 #include <ndindex.hxx>
@@ -97,7 +98,7 @@
 #include <frmatr.hxx>
 #include <ndtxt.hxx>
 #include <ndgrf.hxx>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <vcl/svapp.hxx>
 #include <vcl/GraphicLoader.hxx>
 #include <SwStyleNameMapper.hxx>
@@ -109,6 +110,7 @@
 #include <fmtfollowtextflow.hxx>
 #include <fmtwrapinfluenceonobjpos.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
+#include <comphelper/interfacecontainer4.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <sal/log.hxx>
@@ -132,6 +134,7 @@
 #include <svx/xfltrit.hxx>
 #include <swunohelper.hxx>
 #include <fefly.hxx>
+#include <formatflysplit.hxx>
 
 using namespace ::com::sun::star;
 
@@ -374,7 +377,8 @@ bool BaseFrameProperties_Impl::FillBaseProperties(SfxItemSet& rToSet, const SfxI
         {
             if(pXFillGradientItem)
             {
-                const XGradient aNullGrad(COL_BLACK, COL_WHITE);
+                // XGradient() default already creates [COL_BLACK, COL_WHITE] as defaults
+                const XGradient aNullGrad;
                 XFillGradientItem aXFillGradientItem(aNullGrad);
 
                 aXFillGradientItem.PutValue(*pXFillGradientItem, MID_FILLGRADIENT);
@@ -433,8 +437,8 @@ bool BaseFrameProperties_Impl::FillBaseProperties(SfxItemSet& rToSet, const SfxI
         {
             if(pXFillBitmapItem)
             {
-                const Graphic aNullGraphic;
-                XFillBitmapItem aXFillBitmapItem(aNullGraphic);
+                Graphic aNullGraphic;
+                XFillBitmapItem aXFillBitmapItem(std::move(aNullGraphic));
 
                 aXFillBitmapItem.PutValue(*pXFillBitmapItem, MID_BITMAP);
                 rToSet.Put(aXFillBitmapItem);
@@ -516,7 +520,8 @@ bool BaseFrameProperties_Impl::FillBaseProperties(SfxItemSet& rToSet, const SfxI
         {
             if(pXFillFloatTransparenceItem)
             {
-                const XGradient aNullGrad(COL_BLACK, COL_WHITE);
+                // XGradient() default already creates [COL_BLACK, COL_WHITE] as defaults
+                const XGradient aNullGrad;
                 XFillFloatTransparenceItem aXFillFloatTransparenceItem(aNullGrad, false);
 
                 aXFillFloatTransparenceItem.PutValue(*pXFillFloatTransparenceItem, MID_FILLGRADIENT);
@@ -948,6 +953,24 @@ bool BaseFrameProperties_Impl::FillBaseProperties(SfxItemSet& rToSet, const SfxI
         }
     }
 
+    const ::uno::Any* pDecorative = nullptr;
+    GetProperty(RES_DECORATIVE, 0, pDecorative);
+    if (pDecorative)
+    {
+        SfxBoolItem item(RES_DECORATIVE);
+        bRet &= item.PutValue(*pDecorative, 0);
+        rToSet.Put(item);
+    }
+
+    const ::uno::Any* pFlySplit = nullptr;
+    GetProperty(RES_FLY_SPLIT, 0, pFlySplit);
+    if (pFlySplit)
+    {
+        SwFormatFlySplit aSplit(true);
+        bRet &= aSplit.PutValue(*pFlySplit, 0);
+        rToSet.Put(aSplit);
+    }
+
     return bRet;
 }
 
@@ -1150,14 +1173,10 @@ bool SwOLEProperties_Impl::AnyToItemSet(
 
 class SwXFrame::Impl
 {
-private:
-    ::osl::Mutex m_Mutex; // just for OInterfaceContainerHelper2
-
 public:
     uno::WeakReference<uno::XInterface> m_wThis;
-    ::comphelper::OInterfaceContainerHelper2 m_EventListeners;
-
-    Impl() : m_EventListeners(m_Mutex) { }
+    std::mutex m_Mutex; // just for OInterfaceContainerHelper4
+    ::comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_EventListeners;
 };
 
 const ::uno::Sequence< sal_Int8 > & SwXFrame::getUnoTunnelId()
@@ -1263,28 +1282,27 @@ SwXFrame::~SwXFrame()
     EndListeningAll();
 }
 
-template<class Interface, class NameLookupIsHard>
-uno::Reference<Interface>
+template<class NameLookupIsHard>
+rtl::Reference<NameLookupIsHard>
 SwXFrame::CreateXFrame(SwDoc & rDoc, SwFrameFormat *const pFrameFormat)
 {
     assert(!pFrameFormat || &rDoc == pFrameFormat->GetDoc());
-    uno::Reference<Interface> xFrame;
+    rtl::Reference<NameLookupIsHard> xFrame;
     if (pFrameFormat)
     {
-        xFrame.set(pFrameFormat->GetXObject(), uno::UNO_QUERY); // cached?
+        xFrame = dynamic_cast<NameLookupIsHard*>(pFrameFormat->GetXObject().get().get()); // cached?
     }
     if (!xFrame.is())
     {
-        NameLookupIsHard *const pNew(pFrameFormat
+        xFrame = pFrameFormat
                 ? new NameLookupIsHard(*pFrameFormat)
-                : new NameLookupIsHard(&rDoc));
-        xFrame.set(pNew);
+                : new NameLookupIsHard(&rDoc);
         if (pFrameFormat)
         {
-            pFrameFormat->SetXObject(xFrame);
+            pFrameFormat->SetXObject(static_cast<cppu::OWeakObject*>(xFrame.get()));
         }
         // need a permanent Reference to initialize m_wThis
-        pNew->SwXFrame::m_pImpl->m_wThis = xFrame;
+        xFrame->SwXFrame::m_pImpl->m_wThis = uno::Reference<XWeak>(xFrame.get());
     }
     return xFrame;
 }
@@ -1394,17 +1412,20 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
 {
     SolarMutexGuard aGuard;
     SwFrameFormat* pFormat = GetFrameFormat();
+    if (!pFormat && !IsDescriptor())
+        throw uno::RuntimeException();
 
     // Hack to support hidden property to transfer textDirection
     if(rPropertyName == "FRMDirection")
     {
         if (pFormat)
         {
+            SwDocModifyAndUndoGuard guard(*pFormat);
             SvxFrameDirectionItem aItem(SvxFrameDirection::Environment, RES_FRAMEDIR);
             aItem.PutValue(_rValue, 0);
-            GetFrameFormat()->SetFormatAttr(aItem);
+            pFormat->SetFormatAttr(aItem);
         }
-        else if(IsDescriptor())
+        else // if(IsDescriptor())
         {
             m_pProps->SetProperty(o3tl::narrowing<sal_uInt16>(RES_FRAMEDIR), 0, _rValue);
         }
@@ -1443,7 +1464,7 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
 
         if(bDoIt)
         {
-            const SwDoc* pDoc = (IsDescriptor() ? m_pDoc : GetFrameFormat()->GetDoc());
+            const SwDoc* pDoc = (IsDescriptor() ? m_pDoc : pFormat->GetDoc());
             const SfxItemPool& rPool = pDoc->GetAttrPool();
             const MapUnit eMapUnit(rPool.GetMetric(pEntry->nWID));
 
@@ -1532,6 +1553,13 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
             GetOrCreateSdrObject(rFlyFormat);
             rFlyFormat.GetDoc()->SetFlyFrameTitle(rFlyFormat, sTitle);
         }
+        else if (pEntry->nWID == FN_UNO_TOOLTIP)
+        {
+            SwFlyFrameFormat& rFlyFormat = dynamic_cast<SwFlyFrameFormat&>(*pFormat);
+            OUString sTooltip;
+            aValue >>= sTooltip;
+            rFlyFormat.SetObjTooltip(sTooltip);
+        }
         // New attribute Description
         else if( FN_UNO_DESCRIPTION == pEntry->nWID )
         {
@@ -1562,8 +1590,7 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
                     pFly = pFlyFrameFormat->GetFrame();
                 if ( pFly )
                 {
-                    const ::SfxPoolItem* pItem;
-                    if( SfxItemState::SET == pFrameFormat->GetItemState( RES_ANCHOR, false, &pItem ))
+                    if( const SwFormatAnchor* pItem = pFrameFormat->GetItemIfSet( RES_ANCHOR, false ))
                     {
                         pSet.emplace( pDoc->GetAttrPool(), aFrameFormatSetRange );
                         pSet->Put( *pItem );
@@ -1836,8 +1863,8 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
                     {
                         case XATTR_FILLBITMAP:
                         {
-                            const Graphic aNullGraphic;
-                            XFillBitmapItem aXFillBitmapItem(aNullGraphic);
+                            Graphic aNullGraphic;
+                            XFillBitmapItem aXFillBitmapItem(std::move(aNullGraphic));
 
                             aXFillBitmapItem.PutValue(aValue, nMemberId);
                             aSet.Put(aXFillBitmapItem);
@@ -1867,8 +1894,8 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
                 SwFormatAnchor aAnchor = static_cast<const SwFormatAnchor&>(aSet.Get(pEntry->nWID));
                 if(aAnchor.GetAnchorId() == RndStdIds::FLY_AT_FLY)
                 {
-                    const ::SwPosition* pPosition = aAnchor.GetContentAnchor();
-                    SwFrameFormat* pFlyFormat = pPosition ? pPosition->nNode.GetNode().GetFlyFormat() : nullptr;
+                    const ::SwNode* pAnchorNode = aAnchor.GetAnchorNode();
+                    SwFrameFormat* pFlyFormat = pAnchorNode ? pAnchorNode->GetFlyFormat() : nullptr;
                     if(!pFlyFormat || pFlyFormat->Which() == RES_DRAWFRMFMT)
                     {
                         lang::IllegalArgumentException aExcept;
@@ -1877,14 +1904,14 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
                     }
                     else
                     {
-                        SwPosition aPos = *pPosition;
-                        aPos.nNode = *pFlyFormat->GetContent().GetContentIdx();
+                        SwPosition aPos = *aAnchor.GetContentAnchor();
+                        aPos.Assign( *pFlyFormat->GetContent().GetContentIdx() );
                         aAnchor.SetAnchor(&aPos);
                         aSet.Put(aAnchor);
                     }
                 }
                 else if ((aAnchor.GetAnchorId() != RndStdIds::FLY_AT_PAGE) &&
-                         !aAnchor.GetContentAnchor())
+                         !aAnchor.GetAnchorNode())
                 {
                     SwNode& rNode = pDoc->GetNodes().GetEndOfContent();
                     SwPaM aPam(rNode);
@@ -1904,8 +1931,7 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
                         pFly = pFrameFormat->GetFrame();
                     if (pFly)
                     {
-                        const ::SfxPoolItem* pItem;
-                        if( SfxItemState::SET == aSet.GetItemState( RES_ANCHOR, false, &pItem ))
+                        if( const SwFormatAnchor* pItem = aSet.GetItemIfSet( RES_ANCHOR, false ))
                         {
                             aSet.Put( *pItem );
                             if ( pFormat->GetDoc()->GetEditShell() != nullptr )
@@ -1924,11 +1950,12 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
             }
             else
             {
+                SwDocModifyAndUndoGuard guard(*pFormat);
                 pFormat->SetFormatAttr(aSet);
             }
         }
     }
-    else if(IsDescriptor())
+    else // if(IsDescriptor())
     {
         m_pProps->SetProperty(pEntry->nWID, nMemberId, aValue);
         if( FN_UNO_FRAME_STYLE_NAME == pEntry->nWID )
@@ -1973,8 +2000,6 @@ void SwXFrame::setPropertyValue(const OUString& rPropertyName, const ::uno::Any&
             m_nVisibleAreaHeight = sAspect.toInt64();
         }
     }
-    else
-        throw uno::RuntimeException();
 }
 
 namespace
@@ -2126,8 +2151,7 @@ uno::Any SwXFrame::getPropertyValue(const OUString& rPropertyName)
                 SwDoc* pDoc = pFormat->GetDoc();
                 if (pDoc)
                 {
-                    const SwEditShell* pEditShell = pDoc->GetEditShell();
-                    if (pEditShell)
+                    if (const SwEditShell* pEditShell = pDoc->GetEditShell())
                     {
                         SwFrame* pCurrFrame = pEditShell->GetCurrFrame(false);
                         GraphicAttr aGraphicAttr;
@@ -2167,6 +2191,11 @@ uno::Any SwXFrame::getPropertyValue(const OUString& rPropertyName)
             // assure that <SdrObject> instance exists.
             GetOrCreateSdrObject(rFlyFormat);
             aAny <<= rFlyFormat.GetObjTitle();
+        }
+        else if (pEntry->nWID == FN_UNO_TOOLTIP)
+        {
+            SwFlyFrameFormat& rFlyFormat = dynamic_cast<SwFlyFrameFormat&>(*pFormat);
+            aAny <<= rFlyFormat.GetObjTooltip();
         }
         // New attribute Description
         else if( FN_UNO_DESCRIPTION == pEntry->nWID )
@@ -2256,17 +2285,18 @@ uno::Any SwXFrame::getPropertyValue(const OUString& rPropertyName)
         }
         else if(WID_LAYOUT_SIZE == pEntry->nWID)
         {
-            // format document completely in order to get correct value
-            pFormat->GetDoc()->GetEditShell()->CalcLayout();
+            // format document completely in order to get correct value (no EditShell for ole embedded case)
+            if (SwEditShell* pEditShell = pFormat->GetDoc()->GetEditShell())
+                pEditShell->CalcLayout();
 
             SwFrame* pTmpFrame = SwIterator<SwFrame,SwFormat>( *pFormat ).First();
             if ( pTmpFrame )
             {
                 OSL_ENSURE( pTmpFrame->isFrameAreaDefinitionValid(), "frame not valid" );
                 const SwRect &rRect = pTmpFrame->getFrameArea();
-                Size aMM100Size = OutputDevice::LogicToLogic(
+                Size aMM100Size = o3tl::convert(
                         Size( rRect.Width(), rRect.Height() ),
-                        MapMode( MapUnit::MapTwip ), MapMode( MapUnit::Map100thMM ));
+                        o3tl::Length::twip, o3tl::Length::mm100 );
                 aAny <<= awt::Size( aMM100Size.Width(), aMM100Size.Height() );
             }
         }
@@ -2274,10 +2304,10 @@ uno::Any SwXFrame::getPropertyValue(const OUString& rPropertyName)
         {
             if (!m_xParentText.is())
             {
-                const SwPosition* pContentAnchor = pFormat->GetAnchor().GetContentAnchor();
-                if (pContentAnchor)
+                const SwFormatAnchor& rFormatAnchor = pFormat->GetAnchor();
+                if (rFormatAnchor.GetAnchorNode())
                 {
-                    m_xParentText = sw::CreateParentXText(*pFormat->GetDoc(), *pContentAnchor);
+                    m_xParentText = sw::CreateParentXText(*pFormat->GetDoc(), *rFormatAnchor.GetContentAnchor());
                 }
             }
             aAny <<= m_xParentText;
@@ -2519,6 +2549,7 @@ void SwXFrame::setPropertyToDefault( const OUString& rPropertyName )
             aSet.ClearItem(XATTR_FILLBMP_STRETCH);
             aSet.ClearItem(XATTR_FILLBMP_TILE);
 
+            SwDocModifyAndUndoGuard guard(*pFormat);
             pFormat->SetFormatAttr(aSet);
         }
         else if( pEntry->nWID &&
@@ -2555,14 +2586,14 @@ void SwXFrame::setPropertyToDefault( const OUString& rPropertyName )
                 GetOrCreateSdrObject(rFlyFormat);
                 rFlyFormat.GetDoc()->SetFlyFrameDescription(rFlyFormat, OUString());
             }
-            else
+            else if (rPropertyName != UNO_NAME_ANCHOR_TYPE)
             {
                 SwDoc* pDoc = pFormat->GetDoc();
                 SfxItemSetFixed<RES_FRMATR_BEGIN, RES_FRMATR_END - 1> aSet( pDoc->GetAttrPool() );
                 aSet.SetParent(&pFormat->GetAttrSet());
                 aSet.ClearItem(pEntry->nWID);
-                if(rPropertyName != UNO_NAME_ANCHOR_TYPE)
-                    pFormat->SetFormatAttr(aSet);
+                SwDocModifyAndUndoGuard guard(*pFormat);
+                pFormat->SetFormatAttr(aSet);
             }
         }
         else
@@ -2615,15 +2646,15 @@ uno::Any SwXFrame::getPropertyDefault( const OUString& rPropertyName )
 void SAL_CALL SwXFrame::addEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.addInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.addInterface(aGuard, xListener);
 }
 
 void SAL_CALL SwXFrame::removeEventListener(
         const uno::Reference<lang::XEventListener> & xListener)
 {
-    // no need to lock here as m_pImpl is const and container threadsafe
-    m_pImpl->m_EventListeners.removeInterface(xListener);
+    std::unique_lock aGuard(m_pImpl->m_Mutex);
+    m_pImpl->m_EventListeners.removeInterface(aGuard, xListener);
 }
 
 void SwXFrame::DisposeInternal()
@@ -2636,8 +2667,11 @@ void SwXFrame::DisposeInternal()
     {   // fdo#72695: if UNO object is already dead, don't revive it with event
         return;
     }
-    lang::EventObject const ev(xThis);
-    m_pImpl->m_EventListeners.disposeAndClear(ev);
+    {
+        lang::EventObject const ev(xThis);
+        std::unique_lock aGuard(m_pImpl->m_Mutex);
+        m_pImpl->m_EventListeners.disposeAndClear(aGuard, ev);
+    }
     m_pFrameFormat = nullptr;
     EndListeningAll();
 }
@@ -2664,11 +2698,11 @@ void SwXFrame::dispose()
            ( pObj->GetUserCall() &&
              !static_cast<SwContact*>(pObj->GetUserCall())->IsInDTOR() ) ) )
     {
-        if (pFormat->GetAnchor().GetAnchorId() == RndStdIds::FLY_AS_CHAR)
+        const SwFormatAnchor& rFormatAnchor = pFormat->GetAnchor();
+        if (rFormatAnchor.GetAnchorId() == RndStdIds::FLY_AS_CHAR)
         {
-            const SwPosition &rPos = *(pFormat->GetAnchor().GetContentAnchor());
-            SwTextNode *pTextNode = rPos.nNode.GetNode().GetTextNode();
-            const sal_Int32 nIdx = rPos.nContent.GetIndex();
+            SwTextNode *pTextNode = rFormatAnchor.GetAnchorNode()->GetTextNode();
+            const sal_Int32 nIdx = rFormatAnchor.GetAnchorContentOffset();
             pTextNode->DeleteAttributes( RES_TXTATR_FLYCNT, nIdx, nIdx );
         }
         else
@@ -2680,7 +2714,7 @@ void SwXFrame::dispose()
 uno::Reference< text::XTextRange >  SwXFrame::getAnchor()
 {
     SolarMutexGuard aGuard;
-    uno::Reference< text::XTextRange >  aRef;
+    rtl::Reference<SwXTextRange> aRef;
     SwFrameFormat* pFormat = GetFrameFormat();
     if(!pFormat)
         throw uno::RuntimeException();
@@ -2689,16 +2723,15 @@ uno::Reference< text::XTextRange >  SwXFrame::getAnchor()
     // return an anchor for non-page bound frames
     // and for page bound frames that have a page no == NULL and a content position
     if ((rAnchor.GetAnchorId() != RndStdIds::FLY_AT_PAGE) ||
-        (rAnchor.GetContentAnchor() && !rAnchor.GetPageNum()))
+        (rAnchor.GetAnchorNode() && !rAnchor.GetPageNum()))
     {
-        const SwPosition &rPos = *(rAnchor.GetContentAnchor());
         if (rAnchor.GetAnchorId() == RndStdIds::FLY_AT_PARA)
-        {   // ensure that SwXTextRange has SwIndex
-            aRef = SwXTextRange::CreateXTextRange(*pFormat->GetDoc(), SwPosition(rPos.nNode), nullptr);
+        {   // ensure that SwXTextRange has SwContentIndex
+            aRef = SwXTextRange::CreateXTextRange(*pFormat->GetDoc(), SwPosition(*rAnchor.GetAnchorNode()), nullptr);
         }
         else
         {
-            aRef = SwXTextRange::CreateXTextRange(*pFormat->GetDoc(), rPos, nullptr);
+            aRef = SwXTextRange::CreateXTextRange(*pFormat->GetDoc(), *rAnchor.GetContentAnchor(), nullptr);
         }
     }
 
@@ -2762,22 +2795,21 @@ void SwXFrame::attachToRange(uno::Reference<text::XTextRange> const& xTextRange,
         *aPam.GetMark() = *aIntPam.GetMark();
     }
 
-    const SfxPoolItem* pItem;
     RndStdIds eAnchorId = RndStdIds::FLY_AT_PARA;
-    if(SfxItemState::SET == aFrameSet.GetItemState(RES_ANCHOR, false, &pItem) )
+    if(const SwFormatAnchor* pItem = aFrameSet.GetItemIfSet(RES_ANCHOR, false) )
     {
-        eAnchorId = static_cast<const SwFormatAnchor*>(pItem)->GetAnchorId();
+        eAnchorId = pItem->GetAnchorId();
         if( RndStdIds::FLY_AT_FLY == eAnchorId &&
-            !aPam.GetNode().FindFlyStartNode())
+            !aPam.GetPointNode().FindFlyStartNode())
         {
             // framebound only where a frame exists
             SwFormatAnchor aAnchor(RndStdIds::FLY_AT_PARA);
             aFrameSet.Put(aAnchor);
         }
         else if ((RndStdIds::FLY_AT_PAGE == eAnchorId) &&
-                 0 == static_cast<const SwFormatAnchor*>(pItem)->GetPageNum() )
+                 0 == pItem->GetPageNum() )
         {
-            SwFormatAnchor aAnchor( *static_cast<const SwFormatAnchor*>(pItem) );
+            SwFormatAnchor aAnchor( *pItem );
             aAnchor.SetType(RndStdIds::FLY_AT_CHAR); // convert invalid at-page
             aAnchor.SetAnchor( aPam.GetPoint() );
             aFrameSet.Put(aAnchor);
@@ -2817,8 +2849,14 @@ void SwXFrame::attachToRange(uno::Reference<text::XTextRange> const& xTextRange,
                 aFrameSet.Put( SwFormatAnchor( RndStdIds::FLY_AT_PAGE, 1 ));
             }
 
-            aPam.DeleteMark(); // mark position node will be deleted!
-            aIntPam.DeleteMark(); // mark position node will be deleted!
+            // park these no longer needed PaMs somewhere safe so MakeFlyAndMove
+            // can delete what it likes without any assert these are pointing to
+            // that content
+            aPam.DeleteMark();
+            aIntPam.DeleteMark();
+            aIntPam.GetPoint()->Assign(*pDoc->GetNodes()[SwNodeOffset(0)]);
+            *aPam.GetPoint() = *aIntPam.GetPoint();
+
             pFormat = pDoc->MakeFlyAndMove( *pCopySource, aFrameSet,
                            nullptr,
                            pParentFrameFormat );
@@ -2827,7 +2865,7 @@ void SwXFrame::attachToRange(uno::Reference<text::XTextRange> const& xTextRange,
                 pFormat->DelFrames();
                 pAnchorItem->SetAnchor( pCopySource->Start() );
                 SfxItemSetFixed<RES_ANCHOR, RES_ANCHOR> aAnchorSet( pDoc->GetAttrPool() );
-                aAnchorSet.Put( *pAnchorItem );
+                aAnchorSet.Put( std::move(pAnchorItem) );
                 pDoc->SetFlyFrameAttr( *pFormat, aAnchorSet );
             }
         }
@@ -3158,7 +3196,6 @@ void SwXFrame::attach(const uno::Reference< text::XTextRange > & xTextRange)
 
 awt::Point SwXFrame::getPosition()
 {
-    SolarMutexGuard aGuard;
     uno::RuntimeException aRuntime;
     aRuntime.Message = "position cannot be determined with this method";
     throw aRuntime;
@@ -3166,7 +3203,6 @@ awt::Point SwXFrame::getPosition()
 
 void SwXFrame::setPosition(const awt::Point& /*aPosition*/)
 {
-    SolarMutexGuard aGuard;
     uno::RuntimeException aRuntime;
     aRuntime.Message = "position cannot be changed with this method";
     throw aRuntime;
@@ -3207,10 +3243,10 @@ SwXTextFrame::~SwXTextFrame()
 {
 }
 
-uno::Reference<text::XTextFrame>
+rtl::Reference<SwXTextFrame>
 SwXTextFrame::CreateXTextFrame(SwDoc & rDoc, SwFrameFormat *const pFrameFormat)
 {
-    return CreateXFrame<text::XTextFrame, SwXTextFrame>(rDoc, pFrameFormat);
+    return CreateXFrame<SwXTextFrame>(rDoc, pFrameFormat);
 }
 
 void SAL_CALL SwXTextFrame::acquire(  )noexcept
@@ -3276,7 +3312,6 @@ SwXTextFrame::CreateCursor()
 uno::Reference< text::XTextCursor >  SwXTextFrame::createTextCursor()
 {
     SolarMutexGuard aGuard;
-    uno::Reference< text::XTextCursor >  aRef;
     SwFrameFormat* pFormat = GetFrameFormat();
     if(!pFormat)
         throw uno::RuntimeException();
@@ -3288,19 +3323,16 @@ uno::Reference< text::XTextCursor >  SwXTextFrame::createTextCursor()
 
     SwPaM aPam(rNode);
     aPam.Move(fnMoveForward, GoInNode);
-    SwTableNode* pTableNode = aPam.GetNode().FindTableNode();
-    SwContentNode* pCont = nullptr;
+    SwTableNode* pTableNode = aPam.GetPointNode().FindTableNode();
     while( pTableNode )
     {
-        aPam.GetPoint()->nNode = *pTableNode->EndOfSectionNode();
-        pCont = GetDoc()->GetNodes().GoNext(&aPam.GetPoint()->nNode);
+        aPam.GetPoint()->Assign( *pTableNode->EndOfSectionNode() );
+        SwContentNode* pCont = GetDoc()->GetNodes().GoNext(aPam.GetPoint());
         pTableNode = pCont->FindTableNode();
     }
-    if(pCont)
-        aPam.GetPoint()->nContent.Assign(pCont, 0);
 
     const SwStartNode* pNewStartNode =
-        aPam.GetNode().FindSttNodeByType(SwFlyStartNode);
+        aPam.GetPointNode().FindSttNodeByType(SwFlyStartNode);
     if(!pNewStartNode || pNewStartNode != pOwnStartNode)
     {
         uno::RuntimeException aExcept;
@@ -3324,7 +3356,7 @@ uno::Reference< text::XTextCursor >  SwXTextFrame::createTextCursorByRange(const
 
     uno::Reference<text::XTextCursor>  aRef;
     SwNode& rNode = pFormat->GetContent().GetContentIdx()->GetNode();
-    if(aPam.GetNode().FindFlyStartNode() == rNode.FindFlyStartNode())
+    if(aPam.GetPointNode().FindFlyStartNode() == rNode.FindFlyStartNode())
     {
         aRef = static_cast<text::XWordCursor*>(
                 new SwXTextCursor(*pFormat->GetDoc(), this, CursorType::Frame,
@@ -3449,10 +3481,10 @@ SwXTextGraphicObject::~SwXTextGraphicObject()
 {
 }
 
-uno::Reference<text::XTextContent>
+rtl::Reference<SwXTextGraphicObject>
 SwXTextGraphicObject::CreateXTextGraphicObject(SwDoc & rDoc, SwFrameFormat *const pFrameFormat)
 {
-    return CreateXFrame<text::XTextContent, SwXTextGraphicObject>(rDoc, pFrameFormat);
+    return CreateXFrame<SwXTextGraphicObject>(rDoc, pFrameFormat);
 }
 
 OUString SwXTextGraphicObject::getImplementationName()
@@ -3496,10 +3528,10 @@ SwXTextEmbeddedObject::~SwXTextEmbeddedObject()
 {
 }
 
-uno::Reference<text::XTextContent>
+rtl::Reference<SwXTextEmbeddedObject>
 SwXTextEmbeddedObject::CreateXTextEmbeddedObject(SwDoc & rDoc, SwFrameFormat *const pFrameFormat)
 {
-    return CreateXFrame<text::XTextContent, SwXTextEmbeddedObject>(rDoc, pFrameFormat);
+    return CreateXFrame<SwXTextEmbeddedObject>(rDoc, pFrameFormat);
 }
 
 uno::Reference< lang::XComponent >  SwXTextEmbeddedObject::getEmbeddedObject()
@@ -3632,9 +3664,9 @@ namespace
     }
 }
 
-SwXOLEListener::SwXOLEListener( SwFormat& rOLEFormat, uno::Reference< XModel > const & xOLE)
+SwXOLEListener::SwXOLEListener( SwFormat& rOLEFormat, uno::Reference< XModel > xOLE)
     : m_pOLEFormat(&rOLEFormat)
-    , m_xOLEModel(xOLE)
+    , m_xOLEModel(std::move(xOLE))
 {
     StartListening(m_pOLEFormat->GetNotifier());
 }

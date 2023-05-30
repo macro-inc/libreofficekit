@@ -10,13 +10,14 @@
 #include <sal/log.hxx>
 #include <o3tl/safeint.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/document/IndexedPropertyValues.hpp>
 #include <com/sun/star/ui/XUIConfigurationPersistence.hpp>
 #include <com/sun/star/ui/theModuleUIConfigurationManagerSupplier.hpp>
 #include <com/sun/star/ui/ItemType.hpp>
+#include <comphelper/indexedpropertyvalues.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/sequence.hxx>
+#include <rtl/ref.hxx>
 #include <map>
 
 using namespace com::sun::star;
@@ -181,7 +182,7 @@ bool ScCTB::ImportCustomToolBar( ScCTBWrapper& rWrapper, CustomToolBarImportHelp
         uno::Reference< beans::XPropertySet > xProps( xIndexContainer, uno::UNO_QUERY_THROW );
         WString& name = tb.getName();
         // set UI name for toolbar
-        xProps->setPropertyValue("UIName", uno::makeAny( name.getString() ) );
+        xProps->setPropertyValue("UIName", uno::Any( name.getString() ) );
 
         OUString sToolBarName = "private:resource/toolbar/custom_" + name.getString();
         for ( auto& rItem : rTBC )
@@ -295,7 +296,7 @@ bool ScTBC::ImportToolBarControl( ScCTBWrapper& rWrapper, const css::uno::Refere
             ScCTB* pCustTB = rWrapper.GetCustomizationData( pMenu->Name() );
             if ( pCustTB )
             {
-                 uno::Reference< container::XIndexContainer > xMenuDesc = document::IndexedPropertyValues::create( comphelper::getProcessComponentContext() );
+                 rtl::Reference< comphelper::IndexedPropertyValuesContainer > xMenuDesc = new comphelper::IndexedPropertyValuesContainer();
                  if ( !pCustTB->ImportMenuTB( rWrapper, xMenuDesc, helper ) )
                      return false;
                  if ( !bIsMenuToolbar )
@@ -307,7 +308,7 @@ bool ScTBC::ImportToolBarControl( ScCTBWrapper& rWrapper, const css::uno::Refere
                  {
                      beans::PropertyValue aProp;
                      aProp.Name = "ItemDescriptorContainer";
-                     aProp.Value <<= xMenuDesc;
+                     aProp.Value <<= uno::Reference< container::XIndexContainer >(xMenuDesc);
                      props.push_back( aProp );
                  }
             }
@@ -318,9 +319,9 @@ bool ScTBC::ImportToolBarControl( ScCTBWrapper& rWrapper, const css::uno::Refere
             // insert spacer
             uno::Sequence sProps{ comphelper::makePropertyValue("Type",
                                                                 ui::ItemType::SEPARATOR_LINE) };
-            toolbarcontainer->insertByIndex( toolbarcontainer->getCount(), uno::makeAny( sProps ) );
+            toolbarcontainer->insertByIndex( toolbarcontainer->getCount(), uno::Any( sProps ) );
         }
-        toolbarcontainer->insertByIndex( toolbarcontainer->getCount(), uno::makeAny( comphelper::containerToSequence(props) ) );
+        toolbarcontainer->insertByIndex( toolbarcontainer->getCount(), uno::Any( comphelper::containerToSequence(props) ) );
     }
     return true;
 }

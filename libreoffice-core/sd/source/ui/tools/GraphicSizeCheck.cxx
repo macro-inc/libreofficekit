@@ -17,13 +17,17 @@
 #include <sfx2/dispatch.hxx>
 
 #include <sdresid.hxx>
-#include <DrawViewShell.hxx>
 #include <DrawDocShell.hxx>
+#include <ViewShell.hxx>
 
 namespace sd
 {
 namespace
 {
+/**
+ * Interface for the visitor class, which handles each visited SdrObject
+ * in the DOM.
+ */
 class ModelTraverseHandler
 {
 public:
@@ -32,6 +36,10 @@ public:
     virtual void handleSdrObject(SdrObject* pObject) = 0;
 };
 
+/**
+ * Traverses the DOM and calls a handler for each object (SdrObject) it
+ * encounters.
+ */
 class ModelTraverser
 {
 private:
@@ -103,7 +111,7 @@ bool GraphicSizeViolation::check()
     return isDPITooLow() || isDPITooHigh();
 }
 
-OUString GraphicSizeViolation::getGraphicName() { return m_pGraphicObject->GetName(); }
+const OUString& GraphicSizeViolation::getGraphicName() { return m_pGraphicObject->GetName(); }
 
 namespace
 {

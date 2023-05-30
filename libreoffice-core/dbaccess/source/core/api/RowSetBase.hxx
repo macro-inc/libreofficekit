@@ -143,16 +143,16 @@ namespace dbaccess
         virtual void getPropertyDefaultByHandle( sal_Int32 _nHandle, css::uno::Any& _rDefault ) const override;
         virtual void SAL_CALL getFastPropertyValue(css::uno::Any& rValue,sal_Int32 nHandle) const override;
 
-        enum CursorMoveDirection
+        enum class CursorMoveDirection
         {
             /// denotes a cursor move forward
-            MOVE_FORWARD,
+            Forward,
             /// denotes a cursor  move backwards
-            MOVE_BACKWARD,
+            Backward,
             /// denotes no cursor move at all, but move cache to current row (if it is not there already)
-            MOVE_NONE,
+            Current,
             /// denotes no cursor move at all, but force the cache to move to current row (and refresh the row)
-            MOVE_NONE_REFRESH
+            CurrentRefresh
         };
         /** positions the cache in preparation of a cursor move
 
@@ -347,11 +347,11 @@ namespace dbaccess
 
         <p>The class can only be used on the stack, within a method of ORowSetBase (or derivees)</p>
     */
-    struct ORowSetNotifierImpl;
     class ORowSetNotifier
     {
     private:
-        std::unique_ptr<ORowSetNotifierImpl> m_pImpl;
+        std::vector<sal_Int32>    aChangedColumns;
+        ORowSetValueVector::Vector  aRow;
         ORowSetBase*    m_pRowSet;
             // not acquired! This is not necessary because this class here is to be used on the stack within
             // a method of ORowSetBase (or derivees)
@@ -391,9 +391,9 @@ namespace dbaccess
         */
         void    firePropertyChange();
 
-        /** use this one to store the inde of the changed column values
+        /** use this one to store the index of the changed column values
         */
-        std::vector<sal_Int32>& getChangedColumns() const;
+        std::vector<sal_Int32>& getChangedColumns();
 
     };
 

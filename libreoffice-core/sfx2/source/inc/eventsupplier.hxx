@@ -29,6 +29,7 @@
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/uno/Type.hxx>
 #include <cppuhelper/implbase.hxx>
+#include <mutex>
 #include <vector>
 
 namespace comphelper
@@ -43,9 +44,9 @@ class SvxMacro;
 class SfxEvents_Impl final : public ::cppu::WeakImplHelper< css::container::XNameReplace, css::document::XDocumentEventListener >
 {
     css::uno::Sequence< OUString >     maEventNames;
-    std::vector< css::uno::Any >       maEventData;
+    std::vector< css::uno::Sequence < css::beans::PropertyValue > >  maEventData;
     css::uno::Reference< css::document::XDocumentEventBroadcaster >  mxBroadcaster;
-    ::osl::Mutex                    maMutex;
+    std::mutex                     maMutex;
     SfxObjectShell                 *mpObjShell;
 
 public:
@@ -78,7 +79,7 @@ public:
                                     const ::comphelper::NamedValueCollection& i_eventDescriptor,
                                     ::comphelper::NamedValueCollection& o_normalizedDescriptor,
                                     SfxObjectShell* i_document );
-    static void Execute( css::uno::Any const & aEventData, const css::document::DocumentEvent& aTrigger, SfxObjectShell* pDoc );
+    static void Execute( css::uno::Sequence < css::beans::PropertyValue > const & aEventData, const css::document::DocumentEvent& aTrigger, SfxObjectShell* pDoc );
 
 private:
     /// Check if script URL whitelist exists, and if so, if current script url is part of it

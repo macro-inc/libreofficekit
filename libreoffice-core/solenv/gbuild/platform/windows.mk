@@ -10,7 +10,7 @@
 # to block heavy exception handling that try to acquire the solarmutex
 export LO_LEAN_EXCEPTION=1
 
-gb_LICENSE := license.txt
+gb_LICENSE := LICENSE
 gb_README = readme_$(1).txt
 
 gb_Helper_get_rcfile = $(1).ini
@@ -52,5 +52,9 @@ gb_MSBUILD_PLATFORM := $(strip \
 gb_MSBUILD_CONFIG_AND_PLATFORM := \
 	/p:Configuration=$(gb_MSBUILD_CONFIG) \
 	/p:Platform=$(gb_MSBUILD_PLATFORM)
+
+gb_CONFIGURE_PLATFORMS := \
+	$(if $(and $(filter i686-pc-cygwin,$(HOST_PLATFORM)),$(filter x86_64-pc-cygwin,$(BUILD_PLATFORM))), \
+		--build=$(HOST_PLATFORM),--build=$(BUILD_PLATFORM)) --host=$(HOST_PLATFORM)
 
 # vim:set noexpandtab:

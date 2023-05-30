@@ -82,7 +82,7 @@ void AccDialogEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
             pAgent->InsertAccObj(pAcc, m_xAccessible.get());
             //add all oldValue's existing children
             pAgent->InsertChildrenAccObj(pAcc);
-            pAgent->NotifyAccEvent(UM_EVENT_CHILD_ADDED, pAcc);
+            pAgent->NotifyAccEvent(UnoMSAAEvent::CHILD_ADDED, pAcc);
         }
     }
     else if (oldValue >>= xChild)
@@ -91,7 +91,7 @@ void AccDialogEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
         if(xChild.is())
         {
             XAccessible* pAcc = xChild.get();
-            pAgent->NotifyAccEvent(UM_EVENT_CHILD_REMOVED, pAcc);
+            pAgent->NotifyAccEvent(UnoMSAAEvent::CHILD_REMOVED, pAcc);
             //delete all oldValue's existing children
             pAgent->DeleteChildrenAccObj( pAcc );
             //delete this child
@@ -106,7 +106,7 @@ void AccDialogEventListener::HandleChildChangedEvent(Any oldValue, Any newValue)
  *  @param state    new state id
  *  @param enable   true if state is set, false if state is unset
  */
-void AccDialogEventListener::SetComponentState(short state, bool enable)
+void AccDialogEventListener::SetComponentState(sal_Int64 state, bool enable)
 {
     // only the following state can be fired state event.
     switch (state)

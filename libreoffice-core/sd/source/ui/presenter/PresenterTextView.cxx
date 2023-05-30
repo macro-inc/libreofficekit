@@ -36,8 +36,8 @@
 #include <com/sun/star/awt/Size.hpp>
 #include <com/sun/star/rendering/XCanvas.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
-#include <com/sun/star/util/Color.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
+#include <o3tl/string_view.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -70,7 +70,7 @@ public:
     sal_Int32 GetTop() const { return mnTop;}
     void SetTop (const sal_Int32 nTop);
     void SetText (const OUString& Text);
-    sal_Int32 ParseDistance (const OUString& rsDistance) const;
+    sal_Int32 ParseDistance (std::u16string_view sDistance) const;
     Reference<rendering::XBitmap> const & GetBitmap();
     sal_Int32 GetTotalHeight();
 
@@ -364,17 +364,17 @@ void PresenterTextView::Implementation::SetText (const OUString& rText)
     mxBitmap = nullptr;
 }
 
-sal_Int32 PresenterTextView::Implementation::ParseDistance (const OUString& rsDistance) const
+sal_Int32 PresenterTextView::Implementation::ParseDistance (std::u16string_view sDistance) const
 {
     DBG_ASSERT(mpEditEngine!=nullptr, "EditEngine missing");
     sal_Int32 nDistance (0);
-    if (rsDistance.endsWith("px"))
+    if (o3tl::ends_with(sDistance, u"px"))
     {
-        nDistance = rsDistance.copy(0,rsDistance.getLength()-2).toInt32();
+        nDistance = o3tl::toInt32(sDistance.substr(0,sDistance.size()-2));
     }
-    else if (rsDistance.endsWith("l"))
+    else if (o3tl::ends_with(sDistance, u"l"))
     {
-        const sal_Int32 nLines (rsDistance.copy(0,rsDistance.getLength()-1).toInt32());
+        const sal_Int32 nLines (o3tl::toInt32(sDistance.substr(0,sDistance.size()-1)));
         // Take the height of the first line as the height of every line.
         const sal_uInt32 nFirstLineHeight (mpEditEngine->GetLineHeight(0));
         nDistance = nFirstLineHeight * nLines;

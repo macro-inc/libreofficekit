@@ -21,6 +21,7 @@
 
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <typeinfo>
 #include <unordered_map>
 #include <utility>
@@ -28,11 +29,11 @@
 
 #include <dlfcn.h>
 
-#include <osl/mutex.hxx>
 #include <rtl/strbuf.hxx>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
 #include <typelib/typedescription.h>
+#include <o3tl/string_view.hxx>
 
 #include "rtti.hxx"
 #include "share.hxx"
@@ -58,7 +59,6 @@ private:
 
 class GeneratedPad: public Generated {
 public:
-public:
     GeneratedPad(std::unique_ptr<char[]> && pad): pad_(std::move(pad)) {};
 
     ~GeneratedPad() override { get()->~type_info(); }
@@ -74,7 +74,6 @@ class RTTI
 {
     typedef std::unordered_map< OUString, std::type_info * > t_rtti_map;
 
-    osl::Mutex m_mutex;
     t_rtti_map m_rttis;
     std::vector<OString> m_rttiNames;
     std::unordered_map<OUString, std::unique_ptr<Generated>> m_generatedRttis;
@@ -108,7 +107,6 @@ std::type_info * RTTI::getRTTI(typelib_TypeDescription const & pTypeDescr)
 {
     OUString const & unoName = OUString::unacquired(&pTypeDescr.pTypeName);
 
-    osl::MutexGuard guard( m_mutex );
     t_rtti_map::const_iterator iFind( m_rttis.find( unoName ) );
     if (iFind != m_rttis.end())
         return iFind->second;
@@ -121,8 +119,8 @@ std::type_info * RTTI::getRTTI(typelib_TypeDescription const & pTypeDescr)
     sal_Int32 index = 0;
     do
     {
-        OUString token( unoName.getToken( 0, '.', index ) );
-        buf.append( token.getLength() );
+        std::u16string_view token( o3tl::getToken(unoName, 0, '.', index ) );
+        buf.append( static_cast<sal_Int32>(token.size()) );
         OString c_token( OUStringToOString( token, RTL_TEXTENCODING_ASCII_US ) );
         buf.append( c_token );
     }
@@ -255,11 +253,9 @@ std::type_info * RTTI::getRTTI(typelib_TypeDescription const & pTypeDescr)
         assert(false); // cannot happen
     }
     rtti = newRtti->get();
-    if (newRtti) {
-        auto insertion (
-            m_generatedRttis.emplace(unoName, std::move(newRtti)));
-        SAL_WARN_IF( !insertion.second, "bridges", "key " << unoName << " already in generated rtti map" );
-    }
+
+    auto insertion(m_generatedRttis.emplace(unoName, std::move(newRtti)));
+    SAL_WARN_IF( !insertion.second, "bridges", "key " << unoName << " already in generated rtti map" );
 
     return rtti;
 }
@@ -268,6 +264,8 @@ std::type_info * RTTI::getRTTI(typelib_TypeDescription const & pTypeDescr)
 
 std::type_info * x86_64::getRtti(typelib_TypeDescription const & type) {
     static RTTI theRttiFactory;
+    static std::mutex theMutex;
+    std::lock_guard aGuard(theMutex);
     return theRttiFactory.getRTTI(type);
 }
 

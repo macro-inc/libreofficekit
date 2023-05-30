@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/sheet/spreadsheetdocumentsettings.hxx>
 
@@ -21,7 +21,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScSpreadsheetSettingsObj : public CalcUnoApiTest,
+class ScSpreadsheetSettingsObj : public UnoApiTest,
                                  public apitest::SpreadsheetDocumentSettings,
                                  public apitest::XPropertySet
 {
@@ -30,7 +30,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScSpreadsheetSettingsObj);
 
@@ -45,13 +44,10 @@ public:
     CPPUNIT_TEST(testVetoableChangeListener);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScSpreadsheetSettingsObj::ScSpreadsheetSettingsObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XPropertySet({
           "AreaLinks",
           "CharLocale",
@@ -78,15 +74,9 @@ uno::Reference<uno::XInterface> ScSpreadsheetSettingsObj::init()
 
 void ScSpreadsheetSettingsObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScSpreadsheetSettingsObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScSpreadsheetSettingsObj);

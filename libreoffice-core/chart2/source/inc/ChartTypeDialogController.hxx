@@ -37,10 +37,6 @@ namespace com::sun::star::chart2
 {
 class XChartDocument;
 }
-namespace com::sun::star::chart2
-{
-class XChartTypeTemplate;
-}
 namespace com::sun::star::lang
 {
 class XMultiServiceFactory;
@@ -50,6 +46,10 @@ class ValueSet;
 
 namespace chart
 {
+class ChartModel;
+class ChartTypeTemplate;
+class ChartTypeManager;
+
 enum GlobalStackMode
 {
     GlobalStackMode_NONE,
@@ -114,7 +114,7 @@ public:
     virtual void showExtraControls(weld::Builder* pBuilder);
     virtual void hideExtraControls() const;
     virtual void
-    fillExtraControls(const css::uno::Reference<css::chart2::XChartDocument>& xChartModel,
+    fillExtraControls(const rtl::Reference<::chart::ChartModel>& xChartModel,
                       const css::uno::Reference<css::beans::XPropertySet>& xTemplateProps) const;
     /// @throws css::uno::RuntimeException
     virtual void setTemplateProperties(
@@ -131,10 +131,10 @@ public:
     virtual void adjustParameterToMainType(ChartTypeParameter& rParameter);
     OUString getServiceNameForParameter(const ChartTypeParameter& rParameter) const;
     void commitToModel(const ChartTypeParameter& rParameter,
-                       const css::uno::Reference<css::chart2::XChartDocument>& xChartModel);
-    css::uno::Reference<css::chart2::XChartTypeTemplate> getCurrentTemplate(
-        const ChartTypeParameter& rParameter,
-        const css::uno::Reference<css::lang::XMultiServiceFactory>& xTemplateManager) const;
+                       const rtl::Reference<::chart::ChartModel>& xChartModel);
+    rtl::Reference<::chart::ChartTypeTemplate>
+    getCurrentTemplate(const ChartTypeParameter& rParameter,
+                       const rtl::Reference<::chart::ChartTypeManager>& xTemplateManager) const;
 
 protected:
     bool bSupportsXAxisWithValues;
@@ -153,7 +153,7 @@ public:
     virtual void adjustSubTypeAndEnableControls(ChartTypeParameter& rParameter) override;
 };
 
-class ColumnChartDialogController : public ColumnOrBarChartDialogController_Base
+class ColumnChartDialogController final : public ColumnOrBarChartDialogController_Base
 {
 public:
     ColumnChartDialogController();
@@ -166,7 +166,7 @@ public:
                                  const ChartTypeParameter& rParameter) override;
 };
 
-class BarChartDialogController : public ColumnOrBarChartDialogController_Base
+class BarChartDialogController final : public ColumnOrBarChartDialogController_Base
 {
 public:
     BarChartDialogController();
@@ -179,7 +179,7 @@ public:
                                  const ChartTypeParameter& rParameter) override;
 };
 
-class PieChartDialogController : public ChartTypeDialogController
+class PieChartDialogController final : public ChartTypeDialogController
 {
 public:
     PieChartDialogController();
@@ -195,7 +195,7 @@ public:
     virtual bool shouldShow_3DLookControl() const override;
 };
 
-class LineChartDialogController : public ChartTypeDialogController
+class LineChartDialogController final : public ChartTypeDialogController
 {
 public:
     LineChartDialogController();
@@ -213,7 +213,7 @@ public:
     virtual bool shouldShow_SplineControl() const override;
 };
 
-class XYChartDialogController : public ChartTypeDialogController
+class XYChartDialogController final : public ChartTypeDialogController
 {
 public:
     XYChartDialogController();
@@ -230,7 +230,7 @@ public:
     virtual bool shouldShow_SortByXValuesResourceGroup() const override;
 };
 
-class AreaChartDialogController : public ChartTypeDialogController
+class AreaChartDialogController final : public ChartTypeDialogController
 {
 public:
     AreaChartDialogController();
@@ -247,7 +247,7 @@ public:
     virtual bool shouldShow_3DLookControl() const override;
 };
 
-class NetChartDialogController : public ChartTypeDialogController
+class NetChartDialogController final : public ChartTypeDialogController
 {
 public:
     NetChartDialogController();
@@ -263,7 +263,7 @@ public:
     virtual bool shouldShow_StackingControl() const override;
 };
 
-class StockChartDialogController : public ChartTypeDialogController
+class StockChartDialogController final : public ChartTypeDialogController
 {
 public:
     StockChartDialogController();
@@ -277,7 +277,7 @@ public:
     virtual void adjustParameterToSubType(ChartTypeParameter& rParameter) override;
 };
 
-class CombiColumnLineChartDialogController : public ChartTypeDialogController
+class CombiColumnLineChartDialogController final : public ChartTypeDialogController
 {
 public:
     CombiColumnLineChartDialogController();
@@ -292,7 +292,7 @@ public:
     virtual void showExtraControls(weld::Builder* pBuilder) override;
     virtual void hideExtraControls() const override;
     virtual void fillExtraControls(
-        const css::uno::Reference<css::chart2::XChartDocument>& xChartModel,
+        const rtl::Reference<::chart::ChartModel>& xChartModel,
         const css::uno::Reference<css::beans::XPropertySet>& xTemplateProps) const override;
 
     virtual void setTemplateProperties(
@@ -306,7 +306,7 @@ private:
     std::unique_ptr<weld::SpinButton> m_xMF_NumberOfLines;
 };
 
-class BubbleChartDialogController : public ChartTypeDialogController
+class BubbleChartDialogController final : public ChartTypeDialogController
 {
 public:
     BubbleChartDialogController();

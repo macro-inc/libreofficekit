@@ -19,20 +19,19 @@
 
 #pragma once
 
-#include <MutexOwner.hxx>
-
 #include <com/sun/star/drawing/framework/XModuleController.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
+#include <cppuhelper/weakref.hxx>
 
-#include <memory>
+#include <unordered_map>
 
 namespace com::sun::star::frame { class XController; }
 namespace com::sun::star::uno { class XComponentContext; }
 
 namespace sd::framework {
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XModuleController,
     css::lang::XInitialization
     > ModuleControllerInterfaceBase;
@@ -55,9 +54,8 @@ typedef ::cppu::WeakComponentImplHelper <
     can then register as listeners at the ConfigurationController or do
     whatever they like.
 */
-class ModuleController
-    : private sd::MutexOwner,
-      public ModuleControllerInterfaceBase
+class ModuleController final
+    : public ModuleControllerInterfaceBase
 {
 public:
     static css::uno::Reference<
@@ -66,7 +64,7 @@ public:
             const css::uno::Reference<css::uno::XComponentContext>&
             rxContext);
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     // XModuleController
 
@@ -81,10 +79,8 @@ private:
     css::uno::Reference<
         css::frame::XController> mxController;
 
-    class ResourceToFactoryMap;
-    std::unique_ptr<ResourceToFactoryMap> mpResourceToFactoryMap;
-    class LoadedFactoryContainer;
-    std::unique_ptr<LoadedFactoryContainer> mpLoadedFactories;
+    std::unordered_map<OUString, OUString> maResourceToFactoryMap;
+    std::unordered_map<OUString, css::uno::WeakReference<css::uno::XInterface>> maLoadedFactories;
 
     /// @throws std::exception
     ModuleController (

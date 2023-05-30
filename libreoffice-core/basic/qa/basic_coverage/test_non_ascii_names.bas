@@ -17,10 +17,19 @@ Function [Функция]([😁])
   [Функция] = [😁] & " and some text"
 End Function
 
+Function TestNonAsciiNative as Integer
+    Dim [Абв] as Integer
+    [Абв] = 5
+    TestNonAsciiNative = [абв]
+End Function
+
 Sub [Prüfung]
   On Error GoTo errorHandler
 
   TestUtil.AssertEqual([Функция]("Smiley"), "Smiley and some text", "[Функция](""Smiley"")")
+
+  ' tdf#148358 - compare Non-ASCII variable names case-insensitive
+  TestUtil.AssertEqual(TestNonAsciiNative(), 5, "TestNonAsciiNative()")
 
   Exit Sub
 errorHandler:

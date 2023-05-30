@@ -23,17 +23,25 @@
 
 SwSplitTableDlg::SwSplitTableDlg(weld::Window* pParent, SwWrtShell& rSh)
     : GenericDialogController(pParent, "modules/swriter/ui/splittable.ui", "SplitTableDialog")
-    , m_xContentCopyRB(m_xBuilder->weld_radio_button("copyheading"))
     , m_xBoxAttrCopyWithParaRB(m_xBuilder->weld_radio_button("customheadingapplystyle"))
     , m_xBoxAttrCopyNoParaRB(m_xBuilder->weld_radio_button("customheading"))
     , m_xBorderCopyRB(m_xBuilder->weld_radio_button("noheading"))
-    , rShell(rSh)
+    , m_rShell(rSh)
+    , m_nSplit(SplitTable_HeadlineOption::ContentCopy)
 {
 }
 
 void SwSplitTableDlg::Apply()
 {
-    rShell.SplitTable(GetSplitMode());
+    m_nSplit = SplitTable_HeadlineOption::ContentCopy;
+    if (m_xBoxAttrCopyWithParaRB->get_active())
+        m_nSplit = SplitTable_HeadlineOption::BoxAttrAllCopy;
+    else if (m_xBoxAttrCopyNoParaRB->get_active())
+        m_nSplit = SplitTable_HeadlineOption::BoxAttrCopy;
+    else if (m_xBorderCopyRB->get_active())
+        m_nSplit = SplitTable_HeadlineOption::BorderCopy;
+
+    m_rShell.SplitTable(m_nSplit);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -44,6 +44,7 @@
 #include <rtl/ustring.hxx>
 #include <sal/types.h>
 #include <unoidl/unoidl.hxx>
+#include <o3tl/string_view.hxx>
 
 #include "classfile.hxx"
 #include "javaoptions.hxx"
@@ -108,14 +109,18 @@ bool isSpecialType(SpecialType special) {
 }
 
 OString translateUnoidlEntityNameToJavaFullyQualifiedName(
-    OUString const & name, std::string_view prefix)
+    std::u16string_view name, std::string_view prefix)
 {
-    assert(!name.startsWith("[]"));
-    assert(name.indexOf('<') == -1);
-    sal_Int32 i = name.lastIndexOf('.') + 1;
-    return codemaker::convertString(name.copy(0, i)).replace('.', '/')
+    assert(!o3tl::starts_with(name, u"[]"));
+    assert(name.find('<') == std::string_view::npos);
+    size_t i = name.rfind('.');
+    if (i == std::string_view::npos)
+        i = 0;
+    else
+        ++i;
+    return codemaker::convertString(OUString(name.substr(0, i))).replace('.', '/')
         + codemaker::java::translateUnoToJavaIdentifier(
-            codemaker::convertString(name.copy(i)), prefix);
+            codemaker::convertString(OUString(name.substr(i))), prefix);
 }
 
 struct PolymorphicUnoType {
@@ -315,7 +320,7 @@ SpecialType getFieldDescriptor(
 class MethodDescriptor {
 public:
     MethodDescriptor(
-        rtl::Reference< TypeManager > const & manager,
+        rtl::Reference< TypeManager > manager,
         std::set<OUString> * dependencies, std::u16string_view returnType,
         SpecialType * specialReturnType,
         PolymorphicUnoType * polymorphicUnoType);
@@ -328,7 +333,7 @@ public:
 
     OString getDescriptor() const;
 
-    OString getSignature() const { return m_needsSignature ? m_signatureStart.toString() + m_signatureEnd : OString();}
+    OString getSignature() const { return m_needsSignature ? m_signatureStart + m_signatureEnd : OString();}
 
 private:
     rtl::Reference< TypeManager > m_manager;
@@ -341,10 +346,10 @@ private:
 };
 
 MethodDescriptor::MethodDescriptor(
-    rtl::Reference< TypeManager > const & manager, std::set<OUString> * dependencies,
+    rtl::Reference< TypeManager > manager, std::set<OUString> * dependencies,
     std::u16string_view returnType, SpecialType * specialReturnType,
     PolymorphicUnoType * polymorphicUnoType):
-    m_manager(manager), m_dependencies(dependencies), m_needsSignature(false)
+    m_manager(std::move(manager)), m_dependencies(dependencies), m_needsSignature(false)
 {
     assert(dependencies != nullptr);
     m_descriptorStart.append('(');
@@ -395,20 +400,20 @@ public:
 
     // KIND_MEMBER:
     TypeInfo(
-        OString const & name, SpecialType specialType, sal_Int32 index,
+        OString name, SpecialType specialType, sal_Int32 index,
         PolymorphicUnoType const & polymorphicUnoType,
         sal_Int32 typeParameterIndex);
 
     // KIND_ATTRIBUTE/METHOD:
     TypeInfo(
-        Kind kind, OString const & name, SpecialType specialType, Flags flags,
-        sal_Int32 index, PolymorphicUnoType const & polymorphicUnoType);
+        Kind kind, OString name, SpecialType specialType, Flags flags,
+        sal_Int32 index, PolymorphicUnoType  polymorphicUnoType);
 
     // KIND_PARAMETER:
     TypeInfo(
-        OString const & parameterName, SpecialType specialType,
-        bool inParameter, bool outParameter, OString const & methodName,
-        sal_Int32 index, PolymorphicUnoType const & polymorphicUnoType);
+        OString parameterName, SpecialType specialType,
+        bool inParameter, bool outParameter, OString  methodName,
+        sal_Int32 index, PolymorphicUnoType  polymorphicUnoType);
 
     sal_uInt16 generateCode(ClassFile::Code & code, std::set<OUString> * dependencies)
         const;
@@ -442,10 +447,10 @@ sal_Int32 translateSpecialTypeFlags(
 }
 
 TypeInfo::TypeInfo(
-    OString const & name, SpecialType specialType, sal_Int32 index,
+    OString name, SpecialType specialType, sal_Int32 index,
     PolymorphicUnoType const & polymorphicUnoType,
     sal_Int32 typeParameterIndex):
-    m_kind(KIND_MEMBER), m_name(name),
+    m_kind(KIND_MEMBER), m_name(std::move(name)),
     m_flags(translateSpecialTypeFlags(specialType, false, false)),
     m_index(index), m_polymorphicUnoType(polymorphicUnoType),
     m_typeParameterIndex(typeParameterIndex)
@@ -456,24 +461,24 @@ TypeInfo::TypeInfo(
 }
 
 TypeInfo::TypeInfo(
-    Kind kind, OString const & name, SpecialType specialType, Flags flags,
-    sal_Int32 index, PolymorphicUnoType const & polymorphicUnoType):
-    m_kind(kind), m_name(name),
+    Kind kind, OString name, SpecialType specialType, Flags flags,
+    sal_Int32 index, PolymorphicUnoType polymorphicUnoType):
+    m_kind(kind), m_name(std::move(name)),
     m_flags(flags | translateSpecialTypeFlags(specialType, false, false)),
-    m_index(index), m_polymorphicUnoType(polymorphicUnoType),
+    m_index(index), m_polymorphicUnoType(std::move(polymorphicUnoType)),
     m_typeParameterIndex(0)
 {
     assert(kind == KIND_ATTRIBUTE || kind == KIND_METHOD);
 }
 
 TypeInfo::TypeInfo(
-    OString const & parameterName, SpecialType specialType, bool inParameter,
-    bool outParameter, OString const & methodName, sal_Int32 index,
-    PolymorphicUnoType const & polymorphicUnoType):
-    m_kind(KIND_PARAMETER), m_name(parameterName),
+    OString parameterName, SpecialType specialType, bool inParameter,
+    bool outParameter, OString methodName, sal_Int32 index,
+    PolymorphicUnoType polymorphicUnoType):
+    m_kind(KIND_PARAMETER), m_name(std::move(parameterName)),
     m_flags(translateSpecialTypeFlags(specialType, inParameter, outParameter)),
-    m_index(index), m_methodName(methodName),
-    m_polymorphicUnoType(polymorphicUnoType),
+    m_index(index), m_methodName(std::move(methodName)),
+    m_polymorphicUnoType(std::move(polymorphicUnoType)),
     m_typeParameterIndex(0)
 {}
 
@@ -779,8 +784,7 @@ void handleEnumType(
             std::unique_ptr< ClassFile::Code > blockCode(cf->newCode());
             blockCode->instrGetstatic(className, pair.second, classDescriptor);
             blockCode->instrAreturn();
-            blocks.emplace_back(pair.first, blockCode.get());
-            blockCode.release();
+            blocks.emplace_back(pair.first, blockCode.release());
         }
         code->instrLookupswitch(defCode.get(), blocks);
         for (const std::pair< sal_Int32, ClassFile::Code * >& pair : blocks)

@@ -31,20 +31,18 @@
 #include <com/sun/star/drawing/FillStyle.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/view/XSelectionSupplier.hpp>
-#include <com/sun/star/chart2/XChartDocument.hpp>
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <i18nlangtag/languagetag.hxx>
-#include <vcl/unohelp.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/window.hxx>
 #include <vcl/settings.hxx>
 #include <o3tl/functional.hxx>
 #include <o3tl/safeint.hxx>
-#include <tools/diagnose_ex.h>
-#include <unotools/accessiblestatesethelper.hxx>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <iterator>
@@ -66,7 +64,7 @@ namespace chart
 /** @param bMayHaveChildren is false per default
  */
 AccessibleBase::AccessibleBase(
-    const AccessibleElementInfo & rAccInfo,
+    AccessibleElementInfo aAccInfo,
     bool bMayHaveChildren,
     bool bAlwaysTransparent /* default: false */ ) :
         impl::AccessibleBase_Base( m_aMutex ),
@@ -74,18 +72,17 @@ AccessibleBase::AccessibleBase(
         m_bMayHaveChildren( bMayHaveChildren ),
         m_bChildrenInitialized( false ),
         m_nEventNotifierId(0),
-        m_xStateSetHelper( new ::utl::AccessibleStateSetHelper() ),
-        m_aAccInfo( rAccInfo ),
+        m_nStateSet( 0 ),
+        m_aAccInfo(std::move( aAccInfo )),
         m_bAlwaysTransparent( bAlwaysTransparent ),
         m_bStateSetInitialized( false )
 {
     // initialize some states
-    OSL_ASSERT( m_xStateSetHelper.is() );
-    m_xStateSetHelper->AddState( AccessibleStateType::ENABLED );
-    m_xStateSetHelper->AddState( AccessibleStateType::SHOWING );
-    m_xStateSetHelper->AddState( AccessibleStateType::VISIBLE );
-    m_xStateSetHelper->AddState( AccessibleStateType::SELECTABLE );
-    m_xStateSetHelper->AddState( AccessibleStateType::FOCUSABLE );
+    m_nStateSet |= AccessibleStateType::ENABLED;
+    m_nStateSet |= AccessibleStateType::SHOWING;
+    m_nStateSet |= AccessibleStateType::VISIBLE;
+    m_nStateSet |= AccessibleStateType::SELECTABLE;
+    m_nStateSet |= AccessibleStateType::FOCUSABLE;
 }
 
 AccessibleBase::~AccessibleBase()
@@ -122,7 +119,7 @@ bool AccessibleBase::NotifyEvent( EventType eEventType, const AccessibleUniqueId
 
                     AddState( AccessibleStateType::FOCUSED );
                     aSelected <<= AccessibleStateType::FOCUSED;
-                    BroadcastAccEvent( AccessibleEventId::STATE_CHANGED, aSelected, aEmpty, true );
+                    BroadcastAccEvent( AccessibleEventId::STATE_CHANGED, aSelected, aEmpty );
 
                     SAL_INFO("chart2.accessibility", "Selection acquired by: " << getAccessibleName());
                 }
@@ -135,7 +132,7 @@ bool AccessibleBase::NotifyEvent( EventType eEventType, const AccessibleUniqueId
 
                     AddState( AccessibleStateType::FOCUSED );
                     aSelected <<= AccessibleStateType::FOCUSED;
-                    BroadcastAccEvent( AccessibleEventId::STATE_CHANGED, aEmpty, aSelected, true );
+                    BroadcastAccEvent( AccessibleEventId::STATE_CHANGED, aEmpty, aSelected );
                     SAL_INFO("chart2.accessibility", "Selection lost by: " << getAccessibleName());
                 }
                 break;
@@ -166,18 +163,16 @@ bool AccessibleBase::NotifyEvent( EventType eEventType, const AccessibleUniqueId
     return false;
 }
 
-void AccessibleBase::AddState( sal_Int16 aState )
+void AccessibleBase::AddState( sal_Int64 aState )
 {
     CheckDisposeState();
-    OSL_ASSERT( m_xStateSetHelper.is() );
-    m_xStateSetHelper->AddState( aState );
+    m_nStateSet |= aState;
 }
 
-void AccessibleBase::RemoveState( sal_Int16 aState )
+void AccessibleBase::RemoveState( sal_Int64 aState )
 {
     CheckDisposeState();
-    OSL_ASSERT( m_xStateSetHelper.is() );
-    m_xStateSetHelper->RemoveState( aState );
+    m_nStateSet &= ~aState;
 }
 
 bool AccessibleBase::UpdateChildren()
@@ -342,32 +337,24 @@ awt::Point AccessibleBase::GetUpperLeftOnScreen() const
 void AccessibleBase::BroadcastAccEvent(
     sal_Int16 nId,
     const Any & rNew,
-    const Any & rOld,
-    bool bSendGlobally ) const
+    const Any & rOld ) const
 {
     ClearableMutexGuard aGuard( m_aMutex );
 
-    if ( !m_nEventNotifierId && !bSendGlobally )
+    if ( !m_nEventNotifierId )
         return;
         // if we don't have a client id for the notifier, then we don't have listeners, then
         // we don't need to notify anything
-        //except SendGlobally for focus handling?
 
     // the const cast is needed, because UNO parameters are never const
     const AccessibleEventObject aEvent(
         const_cast< uno::XWeak * >( static_cast< const uno::XWeak * >( this )),
         nId, rNew, rOld );
 
-    if ( m_nEventNotifierId ) // let the notifier handle this event
-        ::comphelper::AccessibleEventNotifier::addEvent( m_nEventNotifierId, aEvent );
+    // let the notifier handle this event
+    ::comphelper::AccessibleEventNotifier::addEvent( m_nEventNotifierId, aEvent );
 
     aGuard.clear();
-
-    // send event to global message queue
-    if( bSendGlobally )
-    {
-        vcl::unohelper::NotifyAccessibleStateEventGlobally( aEvent );
-    }
 }
 
 void AccessibleBase::KillAllChildren()
@@ -404,8 +391,7 @@ void AccessibleBase::SetInfo( const AccessibleElementInfo & rNewInfo )
     {
         KillAllChildren();
     }
-    BroadcastAccEvent( AccessibleEventId::INVALIDATE_ALL_CHILDREN, uno::Any(), uno::Any(),
-                       true /* global notification */ );
+    BroadcastAccEvent( AccessibleEventId::INVALIDATE_ALL_CHILDREN, uno::Any(), uno::Any());
 }
 
 // ________ (XComponent::dispose) ________
@@ -426,11 +412,7 @@ void SAL_CALL AccessibleBase::disposing()
         // reset pointers
         m_aAccInfo.m_pParent = nullptr;
 
-        // attach new empty state set helper to member reference
-        rtl::Reference<::utl::AccessibleStateSetHelper> pHelper = new ::utl::AccessibleStateSetHelper();
-        pHelper->AddState(AccessibleStateType::DEFUNC);
-        // release old helper and attach new one
-        m_xStateSetHelper = pHelper;
+        m_nStateSet = AccessibleStateType::DEFUNC;
 
         m_bIsDisposed = true;
 
@@ -452,7 +434,7 @@ Reference< XAccessibleContext > SAL_CALL AccessibleBase::getAccessibleContext()
 }
 
 // ________ AccessibleBase::XAccessibleContext ________
-sal_Int32 SAL_CALL AccessibleBase::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleBase::getAccessibleChildCount()
 {
     ClearableMutexGuard aGuard( m_aMutex );
     if( ! m_bMayHaveChildren ||
@@ -471,12 +453,12 @@ sal_Int32 SAL_CALL AccessibleBase::getAccessibleChildCount()
     return ImplGetAccessibleChildCount();
 }
 
-sal_Int32 AccessibleBase::ImplGetAccessibleChildCount() const
+sal_Int64 AccessibleBase::ImplGetAccessibleChildCount() const
 {
     return m_aChildList.size();
 }
 
-Reference< XAccessible > SAL_CALL AccessibleBase::getAccessibleChild( sal_Int32 i )
+Reference< XAccessible > SAL_CALL AccessibleBase::getAccessibleChild( sal_Int64 i )
 {
     CheckDisposeState();
     Reference< XAccessible > xResult;
@@ -495,7 +477,7 @@ Reference< XAccessible > SAL_CALL AccessibleBase::getAccessibleChild( sal_Int32 
     return xResult;
 }
 
-Reference< XAccessible > AccessibleBase::ImplGetAccessibleChildById( sal_Int32 i ) const
+Reference< XAccessible > AccessibleBase::ImplGetAccessibleChildById( sal_Int64 i ) const
 {
     Reference< XAccessible > xResult;
 
@@ -528,7 +510,7 @@ Reference< XAccessible > SAL_CALL AccessibleBase::getAccessibleParent()
     return aResult;
 }
 
-sal_Int32 SAL_CALL AccessibleBase::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleBase::getAccessibleIndexInParent()
 {
     CheckDisposeState();
 
@@ -548,7 +530,7 @@ Reference< XAccessibleRelationSet > SAL_CALL AccessibleBase::getAccessibleRelati
     return aResult;
 }
 
-Reference< XAccessibleStateSet > SAL_CALL AccessibleBase::getAccessibleStateSet()
+sal_Int64 SAL_CALL AccessibleBase::getAccessibleStateSet()
 {
     if( ! m_bStateSetInitialized )
     {
@@ -565,7 +547,7 @@ Reference< XAccessibleStateSet > SAL_CALL AccessibleBase::getAccessibleStateSet(
         m_bStateSetInitialized = true;
     }
 
-    return m_xStateSetHelper;
+    return m_nStateSet;
 }
 
 lang::Locale SAL_CALL AccessibleBase::getLocale()
@@ -656,7 +638,7 @@ awt::Rectangle SAL_CALL AccessibleBase::getBounds()
                                 aParentLocOnScreen.Y - aULOnScreen.Y );
 
             return awt::Rectangle( aRect.Left() - aOffset.X, aRect.Top() - aOffset.Y,
-                                   aRect.getWidth(), aRect.getHeight());
+                                   aRect.getOpenWidth(), aRect.getOpenHeight());
         }
     }
 
@@ -727,13 +709,13 @@ Color AccessibleBase::getColor( eColorType eColType )
     if( eType == OBJECTTYPE_LEGEND_ENTRY )
     {
         // for colors get the data series/point properties
-        OUString aParentParticle( ObjectIdentifier::getFullParentParticle( aObjectCID ));
+        std::u16string_view aParentParticle( ObjectIdentifier::getFullParentParticle( aObjectCID ));
         aObjectCID = ObjectIdentifier::createClassifiedIdentifierForParticle( aParentParticle );
     }
 
     xObjProp =
         ObjectIdentifier::getObjectPropertySet(
-            aObjectCID, Reference< chart2::XChartDocument >( m_aAccInfo.m_xChartDocument ));
+            aObjectCID, m_aAccInfo.m_xChartDocument );
     if( xObjProp.is())
     {
         try

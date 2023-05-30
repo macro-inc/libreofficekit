@@ -251,9 +251,8 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
                 // take color from character format 'unvisited link'
                 rINetAttr.SetVisited(false);
                 const SwCharFormat* pTmpFormat = rINetAttr.GetCharFormat();
-                const SfxPoolItem* pItem;
-                if (SfxItemState::SET == pTmpFormat->GetItemState(RES_CHRATR_COLOR, true, &pItem))
-                    *pColor = pItem->StaticWhichCast(RES_CHRATR_COLOR).GetValue();
+                if (const SvxColorItem* pItem = pTmpFormat->GetItemIfSet(RES_CHRATR_COLOR))
+                    *pColor = pItem->GetValue();
                 rINetAttr.SetVisited(true);
             }
             return true;
@@ -268,8 +267,8 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
 
     if ( pShell->GetWin() &&
         (
-          (rINetAttr.IsVisited() && SwViewOption::IsVisitedLinks()) ||
-          (!rINetAttr.IsVisited() && SwViewOption::IsLinks())
+          (rINetAttr.IsVisited() && pShell->GetViewOptions()->IsVisitedLinks()) ||
+          (!rINetAttr.IsVisited() && pShell->GetViewOptions()->IsLinks())
         )
        )
     {
@@ -278,12 +277,12 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
             if (rINetAttr.IsVisited())
             {
                 // take color from view option 'visited link color'
-                *pColor = SwViewOption::GetVisitedLinksColor();
+                *pColor = pShell->GetViewOptions()->GetVisitedLinksColor();
             }
             else
             {
                 // take color from view option 'unvisited link color'
-                *pColor = SwViewOption::GetLinksColor();
+                *pColor = pShell->GetViewOptions()->GetLinksColor();
             }
         }
         return true;
@@ -562,7 +561,7 @@ void SwAttrHandler::ActivateTop( SwFont& rFnt, const sal_uInt16 nAttr )
 
         if ( pTwoLineAttr )
         {
-             const auto& rTwoLineItem = CharFormat::GetItem( *pTwoLineAttr, RES_CHRATR_TWO_LINES )->StaticWhichCast(RES_CHRATR_TWO_LINES);
+             const auto& rTwoLineItem = *CharFormat::GetItem( *pTwoLineAttr, RES_CHRATR_TWO_LINES );
              bTwoLineAct = rTwoLineItem.GetValue();
         }
         else
@@ -577,7 +576,7 @@ void SwAttrHandler::ActivateTop( SwFont& rFnt, const sal_uInt16 nAttr )
 
         if ( pRotateAttr )
         {
-            const auto& rRotateItem = CharFormat::GetItem( *pRotateAttr, RES_CHRATR_ROTATE )->StaticWhichCast(RES_CHRATR_ROTATE);
+            const auto& rRotateItem = *CharFormat::GetItem( *pRotateAttr, RES_CHRATR_ROTATE );
             rFnt.SetVertical( rRotateItem.GetValue(), m_bVertLayout );
         }
         else
@@ -782,7 +781,7 @@ void SwAttrHandler::FontChg(const SfxPoolItem& rItem, SwFont& rFnt, bool bPush )
 
             if ( pTwoLineAttr )
             {
-                const auto& rTwoLineItem = CharFormat::GetItem( *pTwoLineAttr, RES_CHRATR_TWO_LINES )->StaticWhichCast(RES_CHRATR_TWO_LINES);
+                const auto& rTwoLineItem = *CharFormat::GetItem( *pTwoLineAttr, RES_CHRATR_TWO_LINES );
                 bTwoLineAct = rTwoLineItem.GetValue();
             }
             else
@@ -817,7 +816,7 @@ void SwAttrHandler::FontChg(const SfxPoolItem& rItem, SwFont& rFnt, bool bPush )
 
             if ( pRotateAttr )
             {
-                const auto& rRotateItem = CharFormat::GetItem( *pRotateAttr, RES_CHRATR_ROTATE )->StaticWhichCast(RES_CHRATR_ROTATE);
+                const auto& rRotateItem = *CharFormat::GetItem( *pRotateAttr, RES_CHRATR_ROTATE );
                 rFnt.SetVertical( rRotateItem.GetValue(), m_bVertLayout );
             }
             else

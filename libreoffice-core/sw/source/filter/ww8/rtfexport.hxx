@@ -114,7 +114,7 @@ public:
 
     void DoFormText(const SwInputField* pField) override;
 
-    sal_uLong ReplaceCr(sal_uInt8 nChar) override;
+    sal_uInt64 ReplaceCr(sal_uInt8 nChar) override;
 
     ExportFormat GetExportFormat() const override { return ExportFormat::RTF; }
 
@@ -216,6 +216,8 @@ private:
     void WriteUserPropValue(const OUString& rValue);
     /// Writes the userprops group: user defined document properties.
     void WriteUserProps();
+    /// Writes document variables
+    void WriteDocVars();
     /// Writes the writer-specific \pgdsctbl group.
     void WritePageDescTable();
     /// This is necessary to have the numbering table ready before the main text is being processed.

@@ -140,7 +140,24 @@ interface BaseText
         StateMethod = GetState ;
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
+    FN_EDIT_BOOKMARK
+    [
+        ExecMethod = Execute ;
+        StateMethod = GetState ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
     FN_UPDATE_BOOKMARKS
+    [
+        ExecMethod = Execute ;
+        StateMethod = GetState ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
+    FN_UPDATE_BOOKMARK
+    [
+        ExecMethod = Execute ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
+    FN_UPDATE_SECTIONS
     [
         ExecMethod = Execute ;
         StateMethod = GetState ;
@@ -179,11 +196,6 @@ interface BaseText
     SID_CHARMAP // status(final|play|rec)
     [
         ExecMethod = Execute ;
-        StateMethod = GetState ;
-        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
-    ]
-    SID_EMOJI_CONTROL
-    [
         StateMethod = GetState ;
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
@@ -924,6 +936,13 @@ interface BaseText
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
 
+    FN_PGNUMBER_WIZARD
+    [
+        ExecMethod = ExecField ;
+        StateMethod = StateField ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+        ReadOnlyDoc = FALSE ;
+    ]
     FN_INSERT_FLD_PGNUMBER
     [
         ExecMethod = ExecField ;
@@ -972,6 +991,11 @@ interface BaseText
         StateMethod = NoState ;
     ]
     FN_GOTO_PREV_INPUTFLD // status(final|play)
+    [
+        ExecMethod = ExecField ;
+        StateMethod = NoState ;
+    ]
+    FN_GOTO_MARK // status(final|play)
     [
         ExecMethod = ExecField ;
         StateMethod = NoState ;
@@ -1584,6 +1608,11 @@ interface BaseText
         ExecMethod = Execute ;
         DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
+    SID_CHAR_DLG_POSITION
+    [
+        ExecMethod = Execute ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
     SID_CHAR_DLG_FOR_PARAGRAPH
     [
         ExecMethod = Execute ;
@@ -1784,6 +1813,18 @@ interface BaseText
         StateMethod = StateField ;
     ]
 
+    FN_UPDATE_TEXT_FORMFIELD
+    [
+        ExecMethod = ExecField ;
+        StateMethod = StateField ;
+    ]
+
+    FN_DELETE_TEXT_FORMFIELDS
+    [
+        ExecMethod = ExecField ;
+        StateMethod = StateField ;
+    ]
+
     FN_PROTECT_FIELDS
     [
         ExecMethod = Execute ;
@@ -1794,6 +1835,24 @@ interface BaseText
     [
         ExecMethod = Execute ;
         StateMethod = GetState ;
+    ]
+
+    FN_DELETE_BOOKMARKS
+    [
+        ExecMethod = Execute ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
+
+    FN_DELETE_SECTIONS
+    [
+        ExecMethod = Execute ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
+    ]
+
+    FN_DELETE_FIELDS
+    [
+        ExecMethod = Execute ;
+        DisableFlags="SfxDisableFlags::SwOnProtectedCursor";
     ]
 
     SID_FM_CTL_PROPERTIES

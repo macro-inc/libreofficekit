@@ -86,10 +86,10 @@ namespace SwUnoCursorHelper
     void                    GetCurPageStyle(SwPaM const & rPaM, OUString &rString);
 
     inline bool             IsStartOfPara(SwPaM& rUnoCursor)
-                                        { return rUnoCursor.GetPoint()->nContent == 0;}
+                                        { return rUnoCursor.GetPoint()->GetContentIndex() == 0;}
     inline bool             IsEndOfPara(SwPaM& rUnoCursor)
-                                        { return rUnoCursor.GetContentNode() &&
-                                            rUnoCursor.GetPoint()->nContent == rUnoCursor.GetContentNode()->Len();}
+                                        { return rUnoCursor.GetPointContentNode() &&
+                                            rUnoCursor.GetPoint()->GetContentIndex() == rUnoCursor.GetPointContentNode()->Len();}
 
     void                        resetCursorPropertyValue(const SfxItemPropertyMapEntry& rEntry, SwPaM& rPam);
     /// @throws css::lang::IllegalArgumentException
@@ -113,7 +113,7 @@ namespace SwUnoCursorHelper
                                     css::beans::PropertyState& eState);
 
     bool    DocInsertStringSplitCR(  SwDoc &rDoc,
-                    const SwPaM &rNewCursor, const OUString &rText,
+                    const SwPaM &rNewCursor, std::u16string_view aText,
                     const bool bForceExpandHints );
     /// @throws css::lang::IllegalArgumentException
     /// @throws css::uno::RuntimeException
@@ -141,7 +141,7 @@ namespace SwUnoCursorHelper
     SwFormatColl * GetCurTextFormatColl(SwPaM & rPam, const bool bConditional);
 
     void SelectPam(SwPaM & rPam, const bool bExpand);
-    void SetString(SwCursor & rCursor, const OUString & rString);
+    void SetString(SwCursor & rCursor, std::u16string_view aString);
 
     css::uno::Sequence< css::beans::PropertyValue >
            CreateSortDescriptor(const bool bFromTable);
@@ -170,6 +170,11 @@ namespace SwUnoCursorHelper
             const SfxItemPropertySet & rPropSet,
             const css::uno::Sequence< css::beans::PropertyValue > &
             rPropertyValues,
+            const SetAttrMode nAttrMode = SetAttrMode::DEFAULT);
+    void SetPropertyValues(
+            SwPaM& rPaM,
+            const SfxItemPropertySet & rPropSet,
+            o3tl::span< const css::beans::PropertyValue > aPropertyValues,
             const SetAttrMode nAttrMode = SetAttrMode::DEFAULT);
     /// @throws css::beans::UnknownPropertyException
     /// @throws css::lang::WrappedTargetException

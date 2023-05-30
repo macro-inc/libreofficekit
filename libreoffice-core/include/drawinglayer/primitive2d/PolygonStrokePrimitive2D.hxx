@@ -46,6 +46,9 @@ private:
     /// the line stroking (if used)
     attribute::StrokeAttribute maStrokeAttribute;
 
+    /// the buffered result of PolygonStrokePrimitive2D::getB2DRange
+    mutable basegfx::B2DRange maBufferedRange;
+
 protected:
     /// local decomposition.
     virtual void
@@ -54,12 +57,12 @@ protected:
 
 public:
     /// constructor
-    PolygonStrokePrimitive2D(const basegfx::B2DPolygon& rPolygon,
+    PolygonStrokePrimitive2D(basegfx::B2DPolygon aPolygon,
                              const attribute::LineAttribute& rLineAttribute,
-                             const attribute::StrokeAttribute& rStrokeAttribute);
+                             attribute::StrokeAttribute aStrokeAttribute);
 
     /// constructor without stroking
-    PolygonStrokePrimitive2D(const basegfx::B2DPolygon& rPolygon,
+    PolygonStrokePrimitive2D(basegfx::B2DPolygon aPolygon,
                              const attribute::LineAttribute& rLineAttribute);
 
     /// data read access

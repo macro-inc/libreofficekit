@@ -19,7 +19,6 @@
 
 #include <svl/hint.hxx>
 #include <comphelper/lok.hxx>
-#include <svl/zforlist.hxx>
 #include <svx/numfmtsh.hxx>
 #include <svx/numinf.hxx>
 #include <svx/svxids.hrc>
@@ -322,27 +321,27 @@ std::unique_ptr<SvxNumberInfoItem> ScTabViewShell::MakeNumberInfoItem( ScDocumen
 
     ScRefCellValue aCell(rDoc, rViewData.GetCurPos());
 
-    switch (aCell.meType)
+    switch (aCell.getType())
     {
         case CELLTYPE_VALUE:
         {
-            nCellValue = aCell.mfValue;
+            nCellValue = aCell.getDouble();
             eValType = SvxNumberValueType::Number;
         }
         break;
 
         case CELLTYPE_STRING:
         {
-            aCellString = aCell.mpString->getString();
+            aCellString = aCell.getSharedString()->getString();
             eValType = SvxNumberValueType::String;
         }
         break;
 
         case CELLTYPE_FORMULA:
         {
-            if (aCell.mpFormula->IsValue())
+            if (aCell.getFormula()->IsValue())
             {
-                nCellValue = aCell.mpFormula->GetValue();
+                nCellValue = aCell.getFormula()->GetValue();
                 eValType = SvxNumberValueType::Number;
             }
             else
@@ -378,7 +377,7 @@ std::unique_ptr<SvxNumberInfoItem> ScTabViewShell::MakeNumberInfoItem( ScDocumen
     }
 
     return std::make_unique<SvxNumberInfoItem>(
-        rDoc.GetFormatTable(), static_cast<sal_uInt16>(SID_ATTR_NUMBERFORMAT_INFO));
+        rDoc.GetFormatTable(), SID_ATTR_NUMBERFORMAT_INFO);
 }
 
 void ScTabViewShell::UpdateNumberFormatter(

@@ -32,6 +32,8 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/tokens.hxx>
 #include <sal/log.hxx>
+#include <drawingml/transform2dcontext.hxx>
+#include <utility>
 
 using namespace oox::core;
 using namespace ::com::sun::star;
@@ -44,10 +46,10 @@ using namespace ::com::sun::star::xml::sax;
 namespace oox::drawingml {
 
 // CT_Shape
-ShapeContext::ShapeContext( ContextHandler2Helper const & rParent, ShapePtr const & pMasterShapePtr, ShapePtr const & pShapePtr )
+ShapeContext::ShapeContext( ContextHandler2Helper const & rParent, ShapePtr pMasterShapePtr, ShapePtr pShapePtr )
 : ContextHandler2( rParent )
-, mpMasterShapePtr( pMasterShapePtr )
-, mpShapePtr( pShapePtr )
+, mpMasterShapePtr(std::move( pMasterShapePtr ))
+, mpShapePtr(std::move( pShapePtr ))
 {
     if( mpMasterShapePtr && mpShapePtr )
         mpMasterShapePtr->addChild( mpShapePtr );
@@ -67,9 +69,9 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 aElementToken, const 
     case XML_cNvPr:
     {
         mpShapePtr->setHidden( rAttribs.getBool( XML_hidden, false ) );
-        mpShapePtr->setId( rAttribs.getString( XML_id ).get() );
-        mpShapePtr->setName( rAttribs.getString( XML_name ).get() );
-        mpShapePtr->setDescription( rAttribs.getString( XML_descr ).get() );
+        mpShapePtr->setId( rAttribs.getStringDefaulted( XML_id ) );
+        mpShapePtr->setName( rAttribs.getStringDefaulted( XML_name ) );
+        mpShapePtr->setDescription( rAttribs.getStringDefaulted( XML_descr ) );
         break;
     }
     case XML_hlinkMouseOver:
@@ -78,7 +80,7 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 aElementToken, const 
     case XML_ph:
         mpShapePtr->setSubType( rAttribs.getToken( XML_type, XML_obj ) );
         if( rAttribs.hasAttribute( XML_idx ) )
-            mpShapePtr->setSubTypeIndex( rAttribs.getString( XML_idx ).get().toInt32() );
+            mpShapePtr->setSubTypeIndex( rAttribs.getInteger( XML_idx, 0 ) );
         break;
     // nvSpPr CT_ShapeNonVisual end
 
@@ -95,13 +97,13 @@ ContextHandlerRef ShapeContext::onCreateContext( sal_Int32 aElementToken, const 
             mpShapePtr->setTextBody( std::make_shared<TextBody>() );
         return new TextBodyContext( *this, mpShapePtr );
     }
-    case XML_txXfrm:
+    case XML_txXfrm: // diagram shape. [MS-ODRAWXML]
     {
         const TextBodyPtr& rShapePtr = mpShapePtr->getTextBody();
         if (rShapePtr)
-            rShapePtr->getTextProperties().moRotation = rAttribs.getInteger( XML_rot );
-        return nullptr;
+            return new oox::drawingml::Transform2DContext( *this, rAttribs, *mpShapePtr, true );
     }
+        break;
     case XML_cNvSpPr:
         break;
     case XML_spLocks:

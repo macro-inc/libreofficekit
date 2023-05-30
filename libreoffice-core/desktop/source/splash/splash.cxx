@@ -26,6 +26,7 @@
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/task/XStatusIndicator.hpp>
+#include <comphelper/string.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <rtl/bootstrap.hxx>
@@ -33,6 +34,9 @@
 #include <rtl/math.hxx>
 #include <vcl/introwin.hxx>
 #include <vcl/virdev.hxx>
+#include <o3tl/string_view.hxx>
+
+#include <mutex>
 
 #define NOT_LOADED  (tools::Long(-1))
 #define NOT_LOADED_COLOR  (Color(ColorTransparency, 0xffffffff))
@@ -72,8 +76,6 @@ private:
     void updateStatus();
     void SetScreenBitmap(BitmapEx &rBitmap);
     static void determineProgressRatioValues( double& rXRelPos, double& rYRelPos, double& rRelWidth, double& rRelHeight );
-
-    static osl::Mutex _aMutex;
 
     BitmapEx        _aIntroBmp;
     Color           _cProgressFrameColor;
@@ -243,7 +245,8 @@ void SAL_CALL SplashScreen::setValue(sal_Int32 nValue)
 void SAL_CALL
 SplashScreen::initialize( const css::uno::Sequence< css::uno::Any>& aArguments )
 {
-    osl::MutexGuard  aGuard( _aMutex );
+    static std::mutex aMutex;
+    std::lock_guard  aGuard( aMutex );
     if (!aArguments.hasElements())
         return;
 
@@ -367,16 +370,16 @@ void SplashScreen::loadConfig()
     {
         sal_uInt8 nRed = 0;
         sal_Int32 idx = 0;
-        sal_Int32 temp = sProgressFrameColor.getToken( 0, ',', idx ).toInt32();
+        sal_Int32 temp = o3tl::toInt32(o3tl::getToken(sProgressFrameColor, 0, ',', idx ));
         if ( idx != -1 )
         {
             nRed = static_cast< sal_uInt8 >( temp );
-            temp = sProgressFrameColor.getToken( 0, ',', idx ).toInt32();
+            temp = o3tl::toInt32(o3tl::getToken(sProgressFrameColor, 0, ',', idx ));
         }
         if ( idx != -1 )
         {
             sal_uInt8 nGreen = static_cast< sal_uInt8 >( temp );
-            sal_uInt8 nBlue = static_cast< sal_uInt8 >( sProgressFrameColor.getToken( 0, ',', idx ).toInt32() );
+            sal_uInt8 nBlue = static_cast< sal_uInt8 >( o3tl::toInt32(o3tl::getToken(sProgressFrameColor, 0, ',', idx )) );
             _cProgressFrameColor = Color( nRed, nGreen, nBlue );
         }
     }
@@ -385,16 +388,16 @@ void SplashScreen::loadConfig()
     {
         sal_uInt8 nRed = 0;
         sal_Int32 idx = 0;
-        sal_Int32 temp = sProgressBarColor.getToken( 0, ',', idx ).toInt32();
+        sal_Int32 temp = o3tl::toInt32(o3tl::getToken(sProgressBarColor, 0, ',', idx ));
         if ( idx != -1 )
         {
             nRed = static_cast< sal_uInt8 >( temp );
-            temp = sProgressBarColor.getToken( 0, ',', idx ).toInt32();
+            temp = o3tl::toInt32(o3tl::getToken(sProgressBarColor, 0, ',', idx ));
         }
         if ( idx != -1 )
         {
             sal_uInt8 nGreen = static_cast< sal_uInt8 >( temp );
-            sal_uInt8 nBlue = static_cast< sal_uInt8 >( sProgressBarColor.getToken( 0, ',', idx ).toInt32() );
+            sal_uInt8 nBlue = static_cast< sal_uInt8 >( o3tl::toInt32(o3tl::getToken(sProgressBarColor, 0, ',', idx )) );
             _cProgressBarColor = Color( nRed, nGreen, nBlue );
         }
     }
@@ -403,16 +406,16 @@ void SplashScreen::loadConfig()
     {
         sal_uInt8 nRed = 0;
         sal_Int32 idx = 0;
-        sal_Int32 temp = sProgressTextColor.getToken( 0, ',', idx ).toInt32();
+        sal_Int32 temp = o3tl::toInt32(o3tl::getToken(sProgressTextColor, 0, ',', idx ));
         if ( idx != -1 )
         {
             nRed = static_cast< sal_uInt8 >( temp );
-            temp = sProgressTextColor.getToken( 0, ',', idx ).toInt32();
+            temp = o3tl::toInt32(o3tl::getToken(sProgressTextColor, 0, ',', idx ));
         }
         if ( idx != -1 )
         {
             sal_uInt8 nGreen = static_cast< sal_uInt8 >( temp );
-            sal_uInt8 nBlue = static_cast< sal_uInt8 >( sProgressTextColor.getToken( 0, ',', idx ).toInt32() );
+            sal_uInt8 nBlue = static_cast< sal_uInt8 >( o3tl::toInt32(o3tl::getToken(sProgressTextColor, 0, ',', idx )) );
             _cProgressTextColor = Color( nRed, nGreen, nBlue );
         }
     }
@@ -430,11 +433,11 @@ void SplashScreen::loadConfig()
     if ( !sSize.isEmpty() )
     {
         sal_Int32 idx = 0;
-        sal_Int32 temp = sSize.getToken( 0, ',', idx ).toInt32();
+        sal_Int32 temp = o3tl::toInt32(o3tl::getToken(sSize, 0, ',', idx ));
         if ( idx != -1 )
         {
             _barwidth = temp;
-            _barheight = sSize.getToken( 0, ',', idx ).toInt32();
+            _barheight = o3tl::toInt32(o3tl::getToken(sSize, 0, ',', idx ));
         }
     }
 
@@ -444,11 +447,11 @@ void SplashScreen::loadConfig()
     if ( !sPosition.isEmpty() )
     {
         sal_Int32 idx = 0;
-        sal_Int32 temp = sPosition.getToken( 0, ',', idx ).toInt32();
+        sal_Int32 temp = o3tl::toInt32(o3tl::getToken(sPosition, 0, ',', idx ));
         if ( idx != -1 )
         {
             _tlx = temp;
-            _tly = sPosition.getToken( 0, ',', idx ).toInt32();
+            _tly = o3tl::toInt32(o3tl::getToken(sPosition, 0, ',', idx ));
         }
     }
 }
@@ -469,25 +472,15 @@ void SplashScreen::SetScreenBitmap(BitmapEx &rBitmap)
     }
 
     // create file name from screen resolution information
-    OStringBuffer aStrBuf( 128 );
-    aStrBuf.append( "intro_" );
+    OUString aResBuf = "_" + OUString::number(nWidth) + "x" + OUString::number(nHeight);
     if ( !_sAppName.isEmpty() )
-    {
-        aStrBuf.append( OUStringToOString(_sAppName, RTL_TEXTENCODING_UTF8) );
-        aStrBuf.append( "_" );
-    }
-    OString aResBuf = OString::number( nWidth ) + "x" + OString::number( nHeight );
+        if (Application::LoadBrandBitmap(Concat2View("intro_" + _sAppName + aResBuf), rBitmap))
+            return;
 
-    aStrBuf.append( aResBuf.getStr() );
-    if (Application::LoadBrandBitmap (aStrBuf.makeStringAndClear().getStr(), rBitmap))
+    if (Application::LoadBrandBitmap(Concat2View("intro" + aResBuf), rBitmap))
         return;
 
-    aStrBuf.append( "intro_" );
-    aStrBuf.append( aResBuf.getStr() );
-    if (Application::LoadBrandBitmap (aResBuf.getStr(), rBitmap))
-        return;
-
-    (void)Application::LoadBrandBitmap ("intro", rBitmap);
+    (void)Application::LoadBrandBitmap (u"intro", rBitmap);
 }
 
 void SplashScreen::determineProgressRatioValues(
@@ -534,22 +527,22 @@ void SplashScreen::determineProgressRatioValues(
                 if ( !sFullScreenProgressPos.isEmpty() )
                 {
                     sal_Int32 idx = 0;
-                    double temp = sFullScreenProgressPos.getToken( 0, ',', idx ).toDouble();
+                    double temp = o3tl::toDouble(o3tl::getToken(sFullScreenProgressPos, 0, ',', idx ));
                     if ( idx != -1 )
                     {
                         rXRelPos = temp;
-                        rYRelPos = sFullScreenProgressPos.getToken( 0, ',', idx ).toDouble();
+                        rYRelPos = o3tl::toDouble(o3tl::getToken(sFullScreenProgressPos, 0, ',', idx ));
                     }
                 }
 
                 if ( !sFullScreenProgressSize.isEmpty() )
                 {
                     sal_Int32 idx = 0;
-                    double temp = sFullScreenProgressSize.getToken( 0, ',', idx ).toDouble();
+                    double temp = o3tl::toDouble(o3tl::getToken(sFullScreenProgressSize, 0, ',', idx ));
                     if ( idx != -1 )
                     {
                         rRelWidth  = temp;
-                        rRelHeight = sFullScreenProgressSize.getToken( 0, ',', idx ).toDouble();
+                        rRelHeight = o3tl::toDouble(o3tl::getToken(sFullScreenProgressSize, 0, ',', idx ));
                     }
                 }
             }
@@ -615,10 +608,6 @@ void SplashScreenWindow::Paint(vcl::RenderContext& rRenderContext, const tools::
     }
     rRenderContext.DrawOutDev(Point(), GetOutputSizePixel(), Point(), _vdev->GetOutputSizePixel(), *_vdev);
 }
-
-
-// get service instance...
-osl::Mutex SplashScreen::_aMutex;
 
 }
 

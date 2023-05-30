@@ -18,10 +18,10 @@
  */
 #pragma once
 
+#include <svtools/scrolladaptor.hxx>
 #include <vcl/window.hxx>
 #include <vcl/timer.hxx>
 #include <vcl/idle.hxx>
-#include <vcl/scrbar.hxx>
 #include <vcl/vclptr.hxx>
 #include <vcl/transfer.hxx>
 
@@ -50,9 +50,8 @@ namespace dbaui
     class OJoinTableView;
     class OScrollWindowHelper : public vcl::Window
     {
-        VclPtr<ScrollBar>          m_aHScrollBar;
-        VclPtr<ScrollBar>          m_aVScrollBar;
-        VclPtr<vcl::Window>        m_pCornerWindow;
+        VclPtr<ScrollAdaptor>      m_aHScrollBar;
+        VclPtr<ScrollAdaptor>      m_aVScrollBar;
         VclPtr<OJoinTableView>     m_pTableView;
 
     protected:
@@ -68,8 +67,8 @@ namespace dbaui
         void resetRange(const Point& _aSize);
 
         // own methods
-        ScrollBar& GetHScrollBar() { return *m_aHScrollBar; }
-        ScrollBar& GetVScrollBar() { return *m_aVScrollBar; }
+        ScrollAdaptor& GetHScrollBar() { return *m_aHScrollBar; }
+        ScrollAdaptor& GetVScrollBar() { return *m_aVScrollBar; }
     };
 
 
@@ -121,9 +120,10 @@ namespace dbaui
         virtual css::uno::Reference< css::accessibility::XAccessible > CreateAccessible() override;
 
         // own methods
-        ScrollBar& GetHScrollBar() { return static_cast<OScrollWindowHelper*>(GetParent())->GetHScrollBar(); }
-        ScrollBar& GetVScrollBar() { return static_cast<OScrollWindowHelper*>(GetParent())->GetVScrollBar(); }
-        DECL_LINK( ScrollHdl, ScrollBar*, void );
+        ScrollAdaptor& GetHScrollBar() { return static_cast<OScrollWindowHelper*>(GetParent())->GetHScrollBar(); }
+        ScrollAdaptor& GetVScrollBar() { return static_cast<OScrollWindowHelper*>(GetParent())->GetVScrollBar(); }
+        DECL_LINK(VertScrollHdl, weld::Scrollbar&, void);
+        DECL_LINK(HorzScrollHdl, weld::Scrollbar&, void);
 
         void DrawConnections(vcl::RenderContext& rRenderContext, const tools::Rectangle& rRect);
         void InvalidateConnections();
@@ -163,7 +163,7 @@ namespace dbaui
         void addConnection(OTableConnection* _pConnection,bool _bAddData = true);
 
         bool ScrollPane( tools::Long nDelta, bool bHoriz, bool bPaintScrollBars );
-        sal_uLong GetTabWinCount() const;
+        sal_Int64 GetTabWinCount() const;
         const Point& GetScrollOffset() const { return m_aScrollOffset; }
 
         OJoinDesignView* getDesignView() const { return m_pView; }

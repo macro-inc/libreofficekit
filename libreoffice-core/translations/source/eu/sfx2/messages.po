@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-08-02 21:51+0000\n"
+"POT-Creation-Date: 2023-01-09 11:30+0100\n"
+"PO-Revision-Date: 2023-01-09 03:14+0000\n"
 "Last-Translator: Asier Sarasua Garmendia <asiersar@yahoo.com>\n"
 "Language-Team: Basque <https://translations.documentfoundation.org/projects/libo_ui-master/sfx2messages/eu/>\n"
 "Language: eu\n"
@@ -1175,11 +1175,11 @@ msgctxt "STR_PB_SAVEACOPY"
 msgid "Save a Copy"
 msgstr "Gorde kopia bat"
 
-#. T9mMd
+#. CrEzt
 #: include/sfx2/strings.hrc:215
 msgctxt "STR_PB_COMPAREDOC"
-msgid "Compare to"
-msgstr "Konparatu honekin:"
+msgid "Compare to Original Document"
+msgstr "Konparatu jatorrizko dokumentuarekin"
 
 #. 4qMCh
 #: include/sfx2/strings.hrc:216
@@ -1506,7 +1506,7 @@ msgstr "Zure dohaintzek mundu osoan dugun komunitateari laguntzen diote."
 #: include/sfx2/strings.hrc:268
 msgctxt "STR_DONATE_BUTTON"
 msgid "Donate"
-msgstr "Egin dohaintza"
+msgstr "Lagundu diruz"
 
 #. G8bbK
 #: include/sfx2/strings.hrc:269
@@ -1664,337 +1664,367 @@ msgctxt "STR_REFRESH_PASSWORD"
 msgid "Refresh Password"
 msgstr "Berritu pasahitza"
 
+#. JBvAE
+#: include/sfx2/strings.hrc:295
+msgctxt "STR_CONTAINS_MACROS"
+msgid "The document contains macros."
+msgstr "Dokumentuak makroak ditu."
+
+#. W7BEM
+#: include/sfx2/strings.hrc:296
+msgctxt "STR_MACROS"
+msgid "Macros"
+msgstr "Makroak"
+
+#. xtAP6
+#: include/sfx2/strings.hrc:297
+msgctxt "STR_EVENTS"
+msgid "Events"
+msgstr "Gertaerak"
+
 #. kej8D
 #. Translators: default Impress template names
-#: include/sfx2/strings.hrc:297
+#: include/sfx2/strings.hrc:300
 msgctxt "STR_TEMPLATE_NAME1"
 msgid "Grey Elegant"
 msgstr "Gris dotorea"
 
 #. FkuLG
-#: include/sfx2/strings.hrc:298
+#: include/sfx2/strings.hrc:301
 msgctxt "STR_TEMPLATE_NAME2"
 msgid "Beehive"
 msgstr "Erlauntza"
 
 #. uwaPH
-#: include/sfx2/strings.hrc:299
+#: include/sfx2/strings.hrc:302
 msgctxt "STR_TEMPLATE_NAME3"
 msgid "Blue Curve"
 msgstr "Kurba urdina"
 
 #. hHRDz
-#: include/sfx2/strings.hrc:300
+#: include/sfx2/strings.hrc:303
 msgctxt "STR_TEMPLATE_NAME4"
 msgid "Blueprint Plans"
 msgstr "Zianotipoa"
 
 #. MAnPU
-#: include/sfx2/strings.hrc:301
+#: include/sfx2/strings.hrc:304
 msgctxt "STR_TEMPLATE_NAME5"
 msgid "Candy"
 msgstr "Gozokia"
 
 #. jEiAn
-#: include/sfx2/strings.hrc:302
+#: include/sfx2/strings.hrc:305
 msgctxt "STR_TEMPLATE_NAME6"
 msgid "Yellow Idea"
 msgstr "Ideia horia"
 
 #. QDNuB
-#: include/sfx2/strings.hrc:303
+#: include/sfx2/strings.hrc:306
 msgctxt "STR_TEMPLATE_NAME7"
 msgid "DNA"
 msgstr "DNA"
 
 #. XBrCi
-#: include/sfx2/strings.hrc:304
+#: include/sfx2/strings.hrc:307
 msgctxt "STR_TEMPLATE_NAME8"
 msgid "Focus"
 msgstr "Fokua"
 
 #. GADdA
-#: include/sfx2/strings.hrc:305
+#: include/sfx2/strings.hrc:308
 msgctxt "STR_TEMPLATE_NAME9"
 msgid "Forestbird"
 msgstr "Basoko txoria"
 
 #. TT8G5
-#: include/sfx2/strings.hrc:306
+#: include/sfx2/strings.hrc:309
 msgctxt "STR_TEMPLATE_NAME10"
 msgid "Freshes"
 msgstr "Freskotasuna"
 
 #. C5N9D
-#: include/sfx2/strings.hrc:307
+#: include/sfx2/strings.hrc:310
 msgctxt "STR_TEMPLATE_NAME11"
 msgid "Inspiration"
 msgstr "Inspirazioa"
 
 #. fCKG9
-#: include/sfx2/strings.hrc:308
+#: include/sfx2/strings.hrc:311
 msgctxt "STR_TEMPLATE_NAME12"
 msgid "Lights"
 msgstr "Argiak"
 
 #. pcLWs
-#: include/sfx2/strings.hrc:309
+#: include/sfx2/strings.hrc:312
 msgctxt "STR_TEMPLATE_NAME13"
 msgid "Growing Liberty"
 msgstr "Askatasun hazkorra"
 
 #. xo2gC
-#: include/sfx2/strings.hrc:310
+#: include/sfx2/strings.hrc:313
 msgctxt "STR_TEMPLATE_NAME14"
 msgid "Metropolis"
 msgstr "Metropolia"
 
 #. FFDBk
-#: include/sfx2/strings.hrc:311
+#: include/sfx2/strings.hrc:314
 msgctxt "STR_TEMPLATE_NAME15"
 msgid "Midnightblue"
 msgstr "Gaueko urdina"
 
 #. yiCzk
-#: include/sfx2/strings.hrc:312
+#: include/sfx2/strings.hrc:315
 msgctxt "STR_TEMPLATE_NAME16"
 msgid "Nature Illustration"
 msgstr "Naturako ilustrazioa"
 
 #. cCZzC
-#: include/sfx2/strings.hrc:313
+#: include/sfx2/strings.hrc:316
 msgctxt "STR_TEMPLATE_NAME17"
 msgid "Pencil"
 msgstr "Arkatza"
 
 #. Ji4Cw
-#: include/sfx2/strings.hrc:314
+#: include/sfx2/strings.hrc:317
 msgctxt "STR_TEMPLATE_NAME18"
 msgid "Piano"
 msgstr "Pianoa"
 
 #. mrbiq
-#: include/sfx2/strings.hrc:315
+#: include/sfx2/strings.hrc:318
 msgctxt "STR_TEMPLATE_NAME19"
 msgid "Portfolio"
 msgstr "Paper-zorroa"
 
 #. ysBGy
-#: include/sfx2/strings.hrc:316
+#: include/sfx2/strings.hrc:319
 msgctxt "STR_TEMPLATE_NAME20"
 msgid "Progress"
 msgstr "Progresioa"
 
 #. gtPt9
-#: include/sfx2/strings.hrc:317
+#: include/sfx2/strings.hrc:320
 msgctxt "STR_TEMPLATE_NAME21"
 msgid "Sunset"
 msgstr "Ilunabarra"
 
 #. 73Y2e
-#: include/sfx2/strings.hrc:318
+#: include/sfx2/strings.hrc:321
 msgctxt "STR_TEMPLATE_NAME22"
 msgid "Vintage"
 msgstr "Antzinakoa"
 
 #. MSY8y
-#: include/sfx2/strings.hrc:319
+#: include/sfx2/strings.hrc:322
 msgctxt "STR_TEMPLATE_NAME23"
 msgid "Vivid"
 msgstr "Bizia"
 
 #. QDZBz
 #. Translators: default Writer template names
-#: include/sfx2/strings.hrc:321
+#: include/sfx2/strings.hrc:324
 msgctxt "STR_TEMPLATE_NAME24"
 msgid "CV"
 msgstr "CV"
 
 #. Koe3V
-#: include/sfx2/strings.hrc:322
+#: include/sfx2/strings.hrc:325
 msgctxt "STR_TEMPLATE_NAME25"
 msgid "Resume"
 msgstr "Laburpena"
 
 #. hCpfD
-#: include/sfx2/strings.hrc:323
+#: include/sfx2/strings.hrc:326
 msgctxt "STR_TEMPLATE_NAME26"
 msgid "Default"
 msgstr "Lehenetsia"
 
 #. d7Hyk
-#: include/sfx2/strings.hrc:324
+#: include/sfx2/strings.hrc:327
 msgctxt "STR_TEMPLATE_NAME27"
 msgid "Modern"
 msgstr "Modernoa"
 
 #. CVJEC
-#: include/sfx2/strings.hrc:325
+#: include/sfx2/strings.hrc:328
 msgctxt "STR_TEMPLATE_NAME28"
 msgid "Modern business letter sans-serif"
 msgstr "Enpresa-gutun modernoa, sans serif"
 
 #. 95GeB
-#: include/sfx2/strings.hrc:326
+#: include/sfx2/strings.hrc:329
 msgctxt "STR_TEMPLATE_NAME29"
 msgid "Modern business letter serif"
 msgstr "Enpresa-gutun modernoa, serif"
 
 #. XdU49
-#: include/sfx2/strings.hrc:327
+#: include/sfx2/strings.hrc:330
 msgctxt "STR_TEMPLATE_NAME30"
 msgid "Businesscard with logo"
-msgstr "Aurkezpen-txartel logoduna"
+msgstr "Bisita-txartel logoduna"
 
 #. UAmSj
-#: include/sfx2/strings.hrc:328
+#: include/sfx2/strings.hrc:331
 msgctxt "STR_TEMPLATE_NAME31"
 msgid "Simple"
 msgstr "Sinplea"
 
 #. W7NVH
-#: include/sfx2/strings.hrc:329
+#: include/sfx2/strings.hrc:332
 msgctxt "STR_TEMPLATE_NAME32"
 msgid "BPMN"
 msgstr "BPMN"
 
+#. PUBoR
+#: include/sfx2/strings.hrc:333
+msgctxt "STR_TEMPLATE_NAME33"
+msgid "Simplified Chinese Normal"
+msgstr "Txinera soildu normala"
+
 #. ZaGGB
-#: include/sfx2/strings.hrc:331
+#: include/sfx2/strings.hrc:335
 msgctxt "STR_CLEAR_CHAR"
 msgid "Remove"
 msgstr "Kendu"
 
 #. JReRY
-#: include/sfx2/strings.hrc:332
+#: include/sfx2/strings.hrc:336
 msgctxt "STR_CLEAR_ALL_CHAR"
 msgid "Clear All"
 msgstr "Garbitu dena"
 
 #. yC8Gs
-#: include/sfx2/strings.hrc:334
+#: include/sfx2/strings.hrc:338
 msgctxt "STR_PASSWORD_LEN"
 msgid "Password length"
 msgstr "Pasahitzaren luzera"
 
 #. FKFmJ
-#: include/sfx2/strings.hrc:335
+#: include/sfx2/strings.hrc:339
 msgctxt "STR_PASSWORD_WARNING"
 msgid "The password you have entered causes interoperability issues. Please enter a password that is shorter than 52 bytes, or longer than 55 bytes."
 msgstr "Sartutako pasahitzak bateragarritasun-arazoak sortzen ditu. Sartu 52 byte baino gutxiago edo 55 byte baino gehiago dituen pasahitz bat."
 
 #. jBQFN
-#: include/sfx2/strings.hrc:337
+#: include/sfx2/strings.hrc:341
 msgctxt "STR_CTRLCLICKHYPERLINK"
 msgid "%{key}-click to open hyperlink: %{link}"
 msgstr "%{key}-klik hiperesteka irekitzeko: %{link}"
 
 #. jC3AK
-#: include/sfx2/strings.hrc:338
+#: include/sfx2/strings.hrc:342
 msgctxt "STR_CLICKHYPERLINK"
 msgid "Click to open hyperlink: %{link}"
 msgstr "Egin klik hiperesteka irekitzeko: %{link}"
 
 #. eFJMp
-#: include/sfx2/strings.hrc:340
+#: include/sfx2/strings.hrc:344
 msgctxt "STR_STYLEUSEDBY"
 msgid "(used by: %STYLELIST)"
 msgstr "(honek erabilia: %STYLELIST)"
 
 #. 6UgqW
-#: include/sfx2/strings.hrc:342
+#: include/sfx2/strings.hrc:346
 msgctxt "STR_DOCUMENT"
 msgid "Document"
 msgstr "Dokumentua"
 
 #. XDGTb
-#: include/sfx2/strings.hrc:343
+#: include/sfx2/strings.hrc:347
 msgctxt "STR_SPREADSHEET"
 msgid "Spreadsheet"
 msgstr "Kalkulu-orria"
 
 #. 3UZXB
-#: include/sfx2/strings.hrc:344
+#: include/sfx2/strings.hrc:348
 msgctxt "STR_PRESENTATION"
 msgid "Presentation"
 msgstr "Aurkezpena"
 
 #. noN5s
-#: include/sfx2/strings.hrc:345
+#: include/sfx2/strings.hrc:349
 msgctxt "STR_DRAWING"
 msgid "Drawing"
 msgstr "Marrazkia"
 
 #. QpuFo
-#: include/sfx2/strings.hrc:346
+#: include/sfx2/strings.hrc:350
 msgctxt "STR_RECENT"
 msgid "Recently used"
 msgstr "Azken aldian erabilia"
 
 #. EcAjb
-#: include/sfx2/strings.hrc:347
+#: include/sfx2/strings.hrc:351
 msgctxt "STR_NORECENT"
 msgid "No recent characters"
 msgstr "Azken karaktererik ez"
 
 #. tfjbD
-#: include/sfx2/strings.hrc:349
+#: include/sfx2/strings.hrc:353
 msgctxt "STR_ACTION_RESET_ALL_DEFAULT_TEMPLATES"
 msgid "Reset All De~fault Templates"
 msgstr "Berrezarri txantiloi le~henetsi guztiak"
 
 #. GWuDE
-#: include/sfx2/strings.hrc:350
+#: include/sfx2/strings.hrc:354
 msgctxt "STR_ACTION_RESET_WRITER_TEMPLATE"
 msgid "Reset De~fault Text Document"
 msgstr "Berrezarri testu-dokumentu le~henetsia"
 
 #. j5eV8
-#: include/sfx2/strings.hrc:351
+#: include/sfx2/strings.hrc:355
 msgctxt "STR_ACTION_RESET_CALC_TEMPLATE"
 msgid "Reset De~fault Spreadsheet"
 msgstr "Berrezarri kalkulu-orri le~henetsia"
 
 #. mWp3t
-#: include/sfx2/strings.hrc:352
+#: include/sfx2/strings.hrc:356
 msgctxt "STR_ACTION_RESET_IMPRESS_TEMPLATE"
 msgid "Reset De~fault Presentation"
 msgstr "Berrezarri aurkezpen le~henetsia"
 
 #. wfExB
-#: include/sfx2/strings.hrc:353
+#: include/sfx2/strings.hrc:357
 msgctxt "STR_ACTION_RESET_DRAW_TEMPLATE"
 msgid "Reset De~fault Drawing"
 msgstr "Berrezarri marrazki le~henetsia"
 
 #. BFaGA
-#: include/sfx2/strings.hrc:354
+#: include/sfx2/strings.hrc:358
 msgctxt "STR_ACTION_IMPORT"
 msgid "~Import"
 msgstr "~Inportatu"
 
 #. 8Cwfk
-#: include/sfx2/strings.hrc:355
+#: include/sfx2/strings.hrc:359
 msgctxt "STR_ACTION_EXTENSIONS"
 msgid "E~xtensions"
 msgstr "He~dapenak"
 
 #. idGvM
-#: include/sfx2/strings.hrc:356
+#: include/sfx2/strings.hrc:360
 msgctxt "STR_WINDOW_TITLE_RENAME_TEMPLATE"
 msgid "Rename"
 msgstr "Aldatu izena"
 
 #. EyjE3
-#: include/sfx2/strings.hrc:357
+#: include/sfx2/strings.hrc:361
 msgctxt "STR_WINDOW_TITLE_RENAME_CATEGORY"
 msgid "Rename Category"
 msgstr "Aldatu izena kategoriari"
 
 #. T79Eb
-#: include/sfx2/strings.hrc:358
+#: include/sfx2/strings.hrc:362
 msgctxt "STR_WINDOW_TITLE_RENAME_NEW_CATEGORY"
 msgid "New Category"
 msgstr "Kategoria berria"
+
+#. fCRA7
+#: include/sfx2/strings.hrc:364
+msgctxt "STR_OBJECT_INSPECTOR"
+msgid "UNO Object Inspector"
+msgstr "UNO objektuen ikuskatzailea"
 
 #. wH3TZ
 msgctxt "stock"
@@ -2315,47 +2345,23 @@ msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Personal Correspondence and Documents"
 msgstr "Posta eta dokumentu pertsonalak"
 
-#. 6Dgiz
-#: sfx2/inc/doctempl.hrc:34
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Forms and Contracts"
-msgstr "Inprimakiak eta kontratuak"
-
-#. VCKTG
-#: sfx2/inc/doctempl.hrc:35
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Finances"
-msgstr "Finantzak"
-
-#. HmqGP
-#: sfx2/inc/doctempl.hrc:36
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Education"
-msgstr "Hezkuntza"
-
-#. xopM8
-#: sfx2/inc/doctempl.hrc:37
-msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Presentation Backgrounds"
-msgstr "Aurkezpenaren atzeko planoak"
-
 #. tSQLA
-#: sfx2/inc/doctempl.hrc:38
+#: sfx2/inc/doctempl.hrc:34
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
 msgid "Presentations"
 msgstr "Aurkezpenak"
 
-#. KuNzz
-#: sfx2/inc/doctempl.hrc:39
+#. Fi5fa
+#: sfx2/inc/doctempl.hrc:35
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Miscellaneous"
-msgstr "Hainbat"
+msgid "Drawings"
+msgstr "Marrazkiak"
 
-#. SC4E5
-#: sfx2/inc/doctempl.hrc:40
+#. uw5RC
+#: sfx2/inc/doctempl.hrc:36
 msgctxt "TEMPLATE_LONG_NAMES_ARY"
-msgid "Labels"
-msgstr "Etiketak"
+msgid "Localization"
+msgstr "Kokagunea"
 
 #. Wg9Je
 #: sfx2/source/devtools/DevToolsStrings.hrc:15
@@ -2964,7 +2970,7 @@ msgid "No"
 msgstr "Ez"
 
 #. kDKBB
-#: sfx2/uiconfig/ui/commandpopup.ui:36
+#: sfx2/uiconfig/ui/commandpopup.ui:35
 msgctxt "commandpopup|entry"
 msgid "Search command"
 msgstr "Bilatu komandoa"
@@ -3391,14 +3397,20 @@ msgctxt "documentinfopage|thumbnailsavecb"
 msgid "Save preview image with this document"
 msgstr "Gorde aurrebista dokumentu honekin"
 
-#. 2GKBr
-#: sfx2/uiconfig/ui/documentinfopage.ui:415
+#. 6bF5w
+#: sfx2/uiconfig/ui/documentinfopage.ui:416
 msgctxt "documentinfopage|image-preferred-dpi-checkbutton"
-msgid "Image preferred DPI"
-msgstr "Irudirako hobetsitako DPIa"
+msgid "Preferred resolution for images:"
+msgstr "Irudietarako hobetsitako bereizmena:"
+
+#. pukYD
+#: sfx2/uiconfig/ui/documentinfopage.ui:466
+msgctxt "documentinfopage|image-preferred-ppi-unit"
+msgid "ppi"
+msgstr "ppi"
 
 #. VWjRu
-#: sfx2/uiconfig/ui/documentinfopage.ui:479
+#: sfx2/uiconfig/ui/documentinfopage.ui:500
 msgctxt "documentinfopage|extended_tip|DocumentInfoPage"
 msgid "Contains basic information about the current file."
 msgstr "Uneko fitxategiari buruzko oinarrizko informazioa dago."
@@ -3721,7 +3733,7 @@ msgctxt "licensedialog|show"
 msgid "_Show License"
 msgstr "_Erakutsi lizentzia"
 
-#. 3unZa
+#. uCvKD
 #: sfx2/uiconfig/ui/licensedialog.ui:68
 msgctxt "licensedialog|label"
 msgid ""
@@ -3731,7 +3743,7 @@ msgid ""
 "\n"
 "All trademarks and registered trademarks mentioned herein are the property of their respective owners.\n"
 "\n"
-"Copyright © 2000–2022 LibreOffice contributors. All rights reserved.\n"
+"Copyright © 2000–2023 LibreOffice contributors. All rights reserved.\n"
 "\n"
 "This product was created by %OOOVENDOR, based on OpenOffice.org, which is Copyright 2000, 2011 Oracle and/or its affiliates. %OOOVENDOR acknowledges all community members, please see http://www.libreoffice.org/ for more details."
 msgstr ""
@@ -3741,7 +3753,7 @@ msgstr ""
 "\n"
 "Hemen erregistratutako marka guztiak bakoitza bere jabearenak dira.\n"
 "\n"
-"Copyright © 2000–2022 LibreOffice garatzaileak. Eskubide guztiak erreserbatuta.\n"
+"Copyright © 2000–2023 LibreOffice garatzaileak. Eskubide guztiak erreserbatuta.\n"
 "\n"
 "Produktu hau %OOOVENDOR erakundeak sortu du, OpenOffice.org softwarean oinarrituta. Azken horrek Oracleren eta bere bazkideen copyright-a dauka (2000, 2011). %OOOVENDOR erakundeak komunitateko kide guztien aitortza egiten du, ikusi http://www.libreoffice.org/ xehetasun gehiagorako."
 
@@ -4034,7 +4046,7 @@ msgid "Style"
 msgstr "Estiloa"
 
 #. NXG9o
-#: sfx2/uiconfig/ui/managestylepage.ui:227
+#: sfx2/uiconfig/ui/managestylepage.ui:230
 msgctxt "managestylepage|label2"
 msgid "Contains"
 msgstr "Edukia:"
@@ -4169,13 +4181,13 @@ msgstr "G_radiente-bandak:"
 #: sfx2/uiconfig/ui/optprintpage.ui:239
 msgctxt "extended_tip|reducegradstripes"
 msgid "Specifies the maximum number of gradient stripes for printing."
-msgstr "Inprimatzeko erabiliko den gradienteen zerrenda kopuru maximoa zehazten du."
+msgstr "Inprimatzeko erabiliko den gradienteen zerrenda gehieneko kopurua zehazten du."
 
 #. 5HCxT
 #: sfx2/uiconfig/ui/optprintpage.ui:257
 msgctxt "extended_tip|reducegradstep"
 msgid "Specifies the maximum number of gradient stripes for printing."
-msgstr "Inprimatzeko erabiliko den gradienteen zerrenda kopuru maximoa zehazten du."
+msgstr "Inprimatzeko erabiliko den gradienteen zerrenda gehieneko kopurua zehazten du."
 
 #. W8LE7
 #: sfx2/uiconfig/ui/optprintpage.ui:274
@@ -4235,7 +4247,7 @@ msgstr "_Bereizmena:"
 #: sfx2/uiconfig/ui/optprintpage.ui:398
 msgctxt "extended_tip|reducebitmapresol"
 msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
-msgstr "Inprimatze-kalitate maximoa zehazten du, dpi unitateetan (puntuak hazbeteko). Bereizmena txikitu egin daiteke, baina handitu ez."
+msgstr "Gehieneko inprimatze-kalitatea zehazten du, dpi unitateetan (puntuak hazbeteko). Bereizmena txikitu egin daiteke, baina handitu ez."
 
 #. 6ALtE
 #: sfx2/uiconfig/ui/optprintpage.ui:412
@@ -4277,7 +4289,7 @@ msgstr "600 DPI"
 #: sfx2/uiconfig/ui/optprintpage.ui:421
 msgctxt "extended_tip|reducebitmapdpi"
 msgid "Specifies the maximum print quality in dpi. The resolution can only be reduced and not increased."
-msgstr "Inprimatze-kalitate maximoa zehazten du, dpi unitateetan (puntuak hazbeteko). Bereizmena txikitu egin daiteke, baina handitu ez."
+msgstr "Gehieneko inprimatze-kalitatea zehazten du, dpi unitateetan (puntuak hazbeteko). Bereizmena txikitu egin daiteke, baina handitu ez."
 
 #. YXTXc
 #: sfx2/uiconfig/ui/optprintpage.ui:438
@@ -4693,131 +4705,149 @@ msgctxt "startcenter|clear_all"
 msgid "Clear Recent Documents"
 msgstr "Garbitu azken dokumentuak"
 
-#. gCfQ9
-#: sfx2/uiconfig/ui/startcenter.ui:38
-msgctxt "startcenter|filter_writer"
-msgid "Writer Templates"
-msgstr "Writer txantiloiak"
-
-#. kj5ts
-#: sfx2/uiconfig/ui/startcenter.ui:45
-msgctxt "startcenter|filter_calc"
-msgid "Calc Templates"
-msgstr "Calc txantiloiak"
-
-#. HEYvU
-#: sfx2/uiconfig/ui/startcenter.ui:52
-msgctxt "startcenter|filter_impress"
-msgid "Impress Templates"
-msgstr "Impress txantiloiak"
-
-#. uWEpu
-#: sfx2/uiconfig/ui/startcenter.ui:59
-msgctxt "startcenter|filter_draw"
-msgid "Draw Templates"
-msgstr "Draw txantiloiak"
-
-#. e3TH8
-#: sfx2/uiconfig/ui/startcenter.ui:72
-msgctxt "startcenter|manage"
-msgid "Manage Templates"
-msgstr "Kudeatu txantiloiak"
+#. zmWnH
+#: sfx2/uiconfig/ui/startcenter.ui:24
+msgctxt "startcenter|clear_unavailable"
+msgid "Clear Unavailable Files"
+msgstr "Garbitu eskuragarri ez dauden fitxategiak"
 
 #. isnw8
-#: sfx2/uiconfig/ui/startcenter.ui:151
+#: sfx2/uiconfig/ui/startcenter.ui:119
 msgctxt "startcenter|open_all"
 msgid "_Open File"
 msgstr "_Ireki fitxategia"
 
 #. 6zjop
-#: sfx2/uiconfig/ui/startcenter.ui:172
+#: sfx2/uiconfig/ui/startcenter.ui:140
 msgctxt "startcenter|open_remote"
 msgid "Remote File_s"
 msgstr "Urruneko fitxategia_k"
 
 #. ZUnZ9
-#: sfx2/uiconfig/ui/startcenter.ui:205
+#: sfx2/uiconfig/ui/startcenter.ui:173
 msgctxt "startcenter|open_recent"
 msgid "_Recent Documents"
 msgstr "A_zken dokumentuak"
 
 #. BnkvG
-#: sfx2/uiconfig/ui/startcenter.ui:229
+#: sfx2/uiconfig/ui/startcenter.ui:193
 msgctxt "startcenter|templates_all"
 msgid "T_emplates"
 msgstr "T_xantiloiak"
 
 #. JEkqY
-#: sfx2/uiconfig/ui/startcenter.ui:270
+#: sfx2/uiconfig/ui/startcenter.ui:230
 msgctxt "startcenter|create_label"
 msgid "Create:"
 msgstr "Sortu:"
 
 #. SY4iY
-#: sfx2/uiconfig/ui/startcenter.ui:281
+#: sfx2/uiconfig/ui/startcenter.ui:241
 msgctxt "startcenter|writer_all"
 msgid "_Writer Document"
 msgstr "_Writer dokumentua"
 
 #. Bvz5c
-#: sfx2/uiconfig/ui/startcenter.ui:301
+#: sfx2/uiconfig/ui/startcenter.ui:261
 msgctxt "startcenter|calc_all"
 msgid "_Calc Spreadsheet"
 msgstr "_Calc kalkulu-orria"
 
 #. RxGP6
-#: sfx2/uiconfig/ui/startcenter.ui:321
+#: sfx2/uiconfig/ui/startcenter.ui:281
 msgctxt "startcenter|impress_all"
 msgid "_Impress Presentation"
 msgstr "_Impress aurkezpena"
 
 #. 7fE2M
-#: sfx2/uiconfig/ui/startcenter.ui:341
+#: sfx2/uiconfig/ui/startcenter.ui:301
 msgctxt "startcenter|draw_all"
 msgid "_Draw Drawing"
 msgstr "_Draw marrazkia"
 
 #. 7wn8r
-#: sfx2/uiconfig/ui/startcenter.ui:361
+#: sfx2/uiconfig/ui/startcenter.ui:321
 msgctxt "startcenter|math_all"
 msgid "_Math Formula"
 msgstr "_Math formula"
 
 #. nnwDC
-#: sfx2/uiconfig/ui/startcenter.ui:381
+#: sfx2/uiconfig/ui/startcenter.ui:341
 msgctxt "startcenter|database_all"
 msgid "_Base Database"
 msgstr "_Base datu-basea"
 
 #. ZEDmn
-#: sfx2/uiconfig/ui/startcenter.ui:403
+#: sfx2/uiconfig/ui/startcenter.ui:363
 msgctxt "startcenter|althelplabel"
 msgid "He_lp"
 msgstr "_Laguntza"
 
 #. oqVes
-#: sfx2/uiconfig/ui/startcenter.ui:473
+#: sfx2/uiconfig/ui/startcenter.ui:433
 msgctxt "startcenter|extensions"
 msgid "E_xtensions"
 msgstr "_Hedapenak"
 
 #. rDw4E
-#: sfx2/uiconfig/ui/startcenter.ui:498
+#: sfx2/uiconfig/ui/startcenter.ui:458
 msgctxt "startcenter|label1"
 msgid "Application"
 msgstr "Aplikazioa"
 
 #. UiDMp
-#: sfx2/uiconfig/ui/startcenter.ui:518
+#: sfx2/uiconfig/ui/startcenter.ui:478
 msgctxt "startcenter|all_recent_label"
 msgid "Recent Files List"
 msgstr "Azken fitxategien zerrenda"
 
 #. kho2B
-#: sfx2/uiconfig/ui/startcenter.ui:531
+#: sfx2/uiconfig/ui/startcenter.ui:491
 msgctxt "startcenter|local_view_label"
 msgid "Templates List"
 msgstr "Txantiloien zerrenda"
+
+#. FcFBB
+#: sfx2/uiconfig/ui/startcenter.ui:516
+msgctxt "startcenter|filter_label"
+msgid "Filter:"
+msgstr "Iragazkia:"
+
+#. xYGf6
+#: sfx2/uiconfig/ui/startcenter.ui:533
+msgctxt "startcenter|filter_none"
+msgid "All Applications"
+msgstr "Aplikazio guztiak"
+
+#. fAxHB
+#: sfx2/uiconfig/ui/startcenter.ui:534
+msgctxt "startcenter|filter_writer"
+msgid "Text Documents"
+msgstr "Testu-dokumentuak"
+
+#. zdYmN
+#: sfx2/uiconfig/ui/startcenter.ui:535
+msgctxt "startcenter|filter_calc"
+msgid "Spreadsheets"
+msgstr "Kalkulu-orriak"
+
+#. DZVJB
+#: sfx2/uiconfig/ui/startcenter.ui:536
+msgctxt "startcenter|filter_impress"
+msgid "Presentations"
+msgstr "Aurkezpenak"
+
+#. 67F9T
+#: sfx2/uiconfig/ui/startcenter.ui:537
+msgctxt "startcenter|filter_draw"
+msgid "Drawings"
+msgstr "Marrazkiak"
+
+#. ZCQZB
+#: sfx2/uiconfig/ui/startcenter.ui:554
+msgctxt "startcenter|mbActions|tool_tip"
+msgid "Actions"
+msgstr "Ekintzak"
 
 #. UHrAZ
 #: sfx2/uiconfig/ui/stylecontextmenu.ui:12
@@ -4904,139 +4934,139 @@ msgid "or Create a New Category"
 msgstr "edo sortu kategoria berria"
 
 #. eUWTy
-#: sfx2/uiconfig/ui/templatedlg.ui:46
+#: sfx2/uiconfig/ui/templatedlg.ui:44
 msgctxt "templatedlg|TemplateDialog"
 msgid "Templates"
 msgstr "Txantiloiak"
 
 #. rhuYP
-#: sfx2/uiconfig/ui/templatedlg.ui:77
+#: sfx2/uiconfig/ui/templatedlg.ui:76
 msgctxt "templatedlg|hidedialogcb"
 msgid "Show this dialog at startup"
 msgstr "Erakutsi elkarrizketa-koadro hau abioan"
 
 #. 32zsB
-#: sfx2/uiconfig/ui/templatedlg.ui:144
+#: sfx2/uiconfig/ui/templatedlg.ui:143
 msgctxt "templatedlg|search_filter|tooltip_text"
 msgid "Search"
 msgstr "Bilatu"
 
 #. sGZMC
-#: sfx2/uiconfig/ui/templatedlg.ui:148
+#: sfx2/uiconfig/ui/templatedlg.ui:147
 msgctxt "templatedlg|search_filter"
 msgid "Search..."
 msgstr "Bilatu..."
 
 #. DF5YC
-#: sfx2/uiconfig/ui/templatedlg.ui:167
+#: sfx2/uiconfig/ui/templatedlg.ui:166
 msgctxt "templatedlg|action_menu|label"
 msgid "_Manage"
 msgstr "_Kudeatu"
 
 #. LUs2m
-#: sfx2/uiconfig/ui/templatedlg.ui:181
+#: sfx2/uiconfig/ui/templatedlg.ui:180
 msgctxt "templatedlg|extended_tip|action_menu"
 msgid "Provides commands to create, rename and delete categories, reset default templates, and refresh the template manager."
 msgstr "Kategoriak sortu, izenaz aldatu eta ezabatzeko, txantiloi lehenetsiak berrezartzeko eta txantiloi-kudeatzailea freskatzeko komandoak eskaintzen ditu."
 
 #. fXVNY
-#: sfx2/uiconfig/ui/templatedlg.ui:208
+#: sfx2/uiconfig/ui/templatedlg.ui:207
 msgctxt "templatedlg|filter_application|tooltip_text"
 msgid "Filter by Application"
 msgstr "Iragazi aplikazioaren arabera"
 
 #. tqVhJ
-#: sfx2/uiconfig/ui/templatedlg.ui:210
+#: sfx2/uiconfig/ui/templatedlg.ui:209
 msgctxt "templatedlg|applist"
 msgid "All Applications"
 msgstr "Aplikazio guztiak"
 
 #. pD6pU
-#: sfx2/uiconfig/ui/templatedlg.ui:211
+#: sfx2/uiconfig/ui/templatedlg.ui:210
 msgctxt "templatedlg|applist"
 msgid "Text Documents"
 msgstr "Testu-dokumentuak"
 
 #. eECt7
-#: sfx2/uiconfig/ui/templatedlg.ui:212
+#: sfx2/uiconfig/ui/templatedlg.ui:211
 msgctxt "templatedlg|applist"
 msgid "Spreadsheets"
 msgstr "Kalkulu-orriak"
 
 #. ajLbV
-#: sfx2/uiconfig/ui/templatedlg.ui:213
+#: sfx2/uiconfig/ui/templatedlg.ui:212
 msgctxt "templatedlg|applist"
 msgid "Presentations"
 msgstr "Aurkezpenak"
 
 #. LfUzB
-#: sfx2/uiconfig/ui/templatedlg.ui:214
+#: sfx2/uiconfig/ui/templatedlg.ui:213
 msgctxt "templatedlg|applist"
 msgid "Drawings"
 msgstr "Marrazkiak"
 
 #. t7zE7
-#: sfx2/uiconfig/ui/templatedlg.ui:228
+#: sfx2/uiconfig/ui/templatedlg.ui:227
 msgctxt "templatedlg|filter_folder|tooltip_text"
 msgid "Filter by Category"
 msgstr "Iragazi kategoriaren arabera"
 
 #. 93CGw
-#: sfx2/uiconfig/ui/templatedlg.ui:230
+#: sfx2/uiconfig/ui/templatedlg.ui:229
 msgctxt "templatedlg|folderlist"
 msgid "All Categories"
 msgstr "Kategoria guztiak"
 
 #. NF9wE
-#: sfx2/uiconfig/ui/templatedlg.ui:251
+#: sfx2/uiconfig/ui/templatedlg.ui:250
 msgctxt "templatedlg|label1"
 msgid "Filter"
 msgstr "Iragazkia"
 
 #. ewTL3
-#: sfx2/uiconfig/ui/templatedlg.ui:357
+#: sfx2/uiconfig/ui/templatedlg.ui:356
 msgctxt "templatedlg|treeviewcolumn1"
 msgid "Name"
 msgstr "Izena"
 
 #. 7EJRA
-#: sfx2/uiconfig/ui/templatedlg.ui:374
+#: sfx2/uiconfig/ui/templatedlg.ui:373
 msgctxt "templatedlg|treeviewcolumn2"
 msgid "Category"
 msgstr "Kategoria"
 
 #. AC27i
-#: sfx2/uiconfig/ui/templatedlg.ui:389
+#: sfx2/uiconfig/ui/templatedlg.ui:388
 msgctxt "templatedlg|treeviewcolumn3"
 msgid "Application"
 msgstr "Aplikazioa"
 
 #. eSaBw
-#: sfx2/uiconfig/ui/templatedlg.ui:404
+#: sfx2/uiconfig/ui/templatedlg.ui:403
 msgctxt "templatedlg|treeviewcolumn4"
 msgid "Modified"
 msgstr "Aldatze-data"
 
 #. pNzYA
-#: sfx2/uiconfig/ui/templatedlg.ui:419
+#: sfx2/uiconfig/ui/templatedlg.ui:418
 msgctxt "templatedlg|treeviewcolumn5"
 msgid "Size"
 msgstr "Tamaina"
 
 #. j39jM
-#: sfx2/uiconfig/ui/templatedlg.ui:445
+#: sfx2/uiconfig/ui/templatedlg.ui:444
 msgctxt "templatedlg|thumbnailviewlabel"
 msgid "Template List"
 msgstr "Txantiloi zerrenda"
 
 #. yEhgP
-#: sfx2/uiconfig/ui/templatedlg.ui:464
+#: sfx2/uiconfig/ui/templatedlg.ui:463
 msgctxt "templatedlg|thumbnail_view_btn|tooltip_text"
 msgid "Thumbnail View"
-msgstr "Miniatura-ikuspegia"
+msgstr "Koadro txikien ikuspegia"
 
 #. j76ke
-#: sfx2/uiconfig/ui/templatedlg.ui:481
+#: sfx2/uiconfig/ui/templatedlg.ui:480
 msgctxt "templatedlg|list_view_btn|tooltip_text"
 msgid "List View"
 msgstr "Zerrenda-ikuspegia"

@@ -204,6 +204,7 @@ author-initials
 author-name
 auto
 auto-complete
+auto-create-new-frame
 auto-grow-height
 auto-grow-width
 auto-reload
@@ -965,6 +966,9 @@ hyphenation-ladder-count
 hyphenation-push-char-count
 hyphenation-remain-char-count
 hyphenation-no-caps
+hyphenation-no-last-word
+hyphenation-word-char-count
+hyphenation-zone
 i
 icon
 icon-set
@@ -1118,6 +1122,7 @@ lines-used
 linked-cell
 link-to-source-data
 list
+marker-style-name
 list-block
 list-header
 list-info
@@ -1131,6 +1136,7 @@ list-name
 list-style
 list-style-name
 ln
+lock
 locked
 log
 logarithmic
@@ -1364,6 +1370,7 @@ outline-level-style
 outline-style
 outset
 outside
+overflow-behavior
 overlap
 overlay
 p
@@ -2180,6 +2187,7 @@ bt-lr
 lr
 rl
 tb
+tb-rl90
 layout-grid-color
 layout-grid-lines
 layout-grid-base-height
@@ -2352,11 +2360,13 @@ extrusion-second-light-level
 extrusion-first-light-direction
 extrusion-second-light-direction
 extrusion-metal
+extrusion-metal-type
 extrusion-rotation-angle
 extrusion-rotation-center
 extrusion-shininess
 extrusion-skew
 extrusion-specularity
+extrusion-specularity-loext
 extrusion-projection-mode
 extrusion-viewpoint
 extrusion-origin
@@ -2426,6 +2436,7 @@ add-empty-lines
 tabular-layout
 outline-subtotals-top
 outline-subtotals-bottom
+compact-layout
 layout-mode
 data-pilot-layout-info
 symbol-color
@@ -2587,6 +2598,7 @@ GNM_STEP_CENTER_Y_DUMMY
 N_DB_OASIS_DUMMY
 show-filter-button
 drill-down-on-double-click
+show-drill-down-buttons
 header-grid-layout
 grouped-by
 days
@@ -3093,6 +3105,7 @@ use-zero
 ignore
 fieldmark
 fieldmark-start
+fieldmark-separator
 fieldmark-end
 image-scale
 isotropic
@@ -3220,8 +3233,8 @@ rtl
 symmetric
 linked-style-name
 theme
-theme-color
-fill-theme-color
+char-color-theme-reference
+fill-color-theme-reference
 dk1
 lt1
 dk2
@@ -3234,10 +3247,6 @@ accent5
 accent6
 hlink
 folHlink
-color-lum-mod
-color-lum-off
-fill-color-lum-mod
-fill-color-lum-off
 content-control
 showing-place-holder
 checked-state
@@ -3249,4 +3258,10 @@ date-rfc-language-tag
 plain-text
 alias
 tag
+fill-use-slide-background
+may-break-between-pages
+gradient-stop
+opacity-stop
+color-value
+color-type
 TOKEN_END_DUMMY

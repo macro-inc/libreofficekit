@@ -21,7 +21,7 @@
 #define INCLUDED_SVX_XOUTBMP_HXX
 
 #include <vcl/graph.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <com/sun/star/uno/Sequence.h>
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <svx/svxdllapi.h>
@@ -59,7 +59,8 @@ public:
     static ErrCode      WriteGraphic( const Graphic& rGraphic, OUString& rFileName,
                                       const OUString& rFilterName, const XOutFlags nFlags,
                                       const Size* pMtfSize_100TH_MM = nullptr,
-                                      const css::uno::Sequence< css::beans::PropertyValue >* pFilterData = nullptr);
+                                      const css::uno::Sequence< css::beans::PropertyValue >* pFilterData = nullptr,
+                                      OUString* pMediaType = nullptr );
     static bool GraphicToBase64(const Graphic& rGraphic, OUString& rOUString,
                                 bool bAddPrefix = true,
                                 ConvertDataFormat aTargetFormat = ConvertDataFormat::Unknown);

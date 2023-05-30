@@ -38,7 +38,7 @@ const sal_uInt16 XML_NAMESPACE_NONE          = USHRT_MAX-1;
 const sal_uInt16 XML_NAMESPACE_UNKNOWN       = USHRT_MAX;
 const sal_uInt16 XML_NAMESPACE_UNKNOWN_FLAG  = 0x8000;
 
-class NameSpaceEntry final : public salhelper::SimpleReferenceObject
+class NameSpaceEntry final
 {
 public:
     // sName refers to the full namespace name
@@ -47,6 +47,20 @@ public:
     OUString     sPrefix;
     // nKey is the unique identifier of a namespace
     sal_uInt16   nKey;
+
+    bool operator==(NameSpaceEntry const & rhs) const
+    {
+        return sName == rhs.sName && sPrefix == rhs.sPrefix && nKey == rhs.nKey;
+    }
+};
+
+class KeyToNameSpaceMapEntry final
+{
+public:
+    // sName refers to the full namespace name
+    OUString     sName;
+    // sPrefix is the prefix used to declare a given item to be from a given namespace
+    OUString     sPrefix;
 };
 
 typedef ::std::pair < sal_uInt16, OUString > QNamePair;
@@ -63,8 +77,8 @@ struct QNamePairHash
 };
 
 typedef std::unordered_map < QNamePair, OUString, QNamePairHash > QNameCache;
-typedef std::unordered_map < OUString, ::rtl::Reference <NameSpaceEntry > > NameSpaceHash;
-typedef std::unordered_map < sal_uInt16, ::rtl::Reference < NameSpaceEntry > > NameSpaceMap;
+typedef std::unordered_map < OUString, NameSpaceEntry > NameSpaceHash;
+typedef std::unordered_map < sal_uInt16, KeyToNameSpaceMapEntry > KeyToNameSpaceMap;
 
 class XMLOFF_DLLPUBLIC SvXMLNamespaceMap
 {
@@ -72,7 +86,7 @@ class XMLOFF_DLLPUBLIC SvXMLNamespaceMap
 
     NameSpaceHash               aNameHash;
     mutable NameSpaceHash       aNameCache;
-    NameSpaceMap                aNameMap;
+    KeyToNameSpaceMap           maKeyToNamespaceMap;
     mutable QNameCache          aQNameCache;
     SAL_DLLPRIVATE sal_uInt16 Add_( const OUString& rPrefix, const OUString &rName, sal_uInt16 nKey );
 
@@ -121,6 +135,8 @@ public:
        for the same key (needed for saving sheets separately in Calc).
        This might be replaced by a better interface later. */
     const NameSpaceHash& GetAllEntries() const { return aNameHash; }
+
+    void Clear();
 
     static bool NormalizeOasisURN( OUString& rName );
     static bool NormalizeW3URI( OUString& rName );

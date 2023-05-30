@@ -35,12 +35,13 @@
 #include <editeng/outlobj.hxx>
 #include <sot/storage.hxx>
 #include <editeng/editobj.hxx>
+#include <o3tl/safeint.hxx>
 #include <svx/svdobjkind.hxx>
 #include <svx/svdouno.hxx>
 #include <svx/ImageMapInfo.hxx>
 #include <sot/formats.hxx>
 #include <svl/urlbmk.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <com/sun/star/form/FormButtonType.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
@@ -128,7 +129,7 @@ SdTransferable::~SdTransferable()
     if( mbOwnDocument )
         delete mpSdDrawDocumentIntern;
 
-    mpGraphic.reset();
+    moGraphic.reset();
     mpBookmark.reset();
     mpImageMap.reset();
 
@@ -145,7 +146,7 @@ void SdTransferable::CreateObjectReplacement( SdrObject* pObj )
         return;
 
     mpOLEDataHelper.reset();
-    mpGraphic.reset();
+    moGraphic.reset();
     mpBookmark.reset();
     mpImageMap.reset();
 
@@ -163,7 +164,7 @@ void SdTransferable::CreateObjectReplacement( SdrObject* pObj )
                 // The EmbedDataHelper should bring the graphic in future
                 const Graphic* pObjGr = pOleObj->GetGraphic();
                 if ( pObjGr )
-                    mpGraphic.reset( new Graphic( *pObjGr ) );
+                    moGraphic.emplace(*pObjGr);
             }
         }
         catch( uno::Exception& )
@@ -171,9 +172,9 @@ void SdTransferable::CreateObjectReplacement( SdrObject* pObj )
     }
     else if( dynamic_cast< const SdrGrafObj *>( pObj ) !=  nullptr && (mpSourceDoc && !SdDrawDocument::GetAnimationInfo( pObj )) )
     {
-        mpGraphic.reset( new Graphic( static_cast< SdrGrafObj* >( pObj )->GetTransformedGraphic() ) );
+        moGraphic.emplace( static_cast< SdrGrafObj* >( pObj )->GetTransformedGraphic() );
     }
-    else if( pObj->IsUnoObj() && SdrInventor::FmForm == pObj->GetObjInventor() && ( pObj->GetObjIdentifier() == sal_uInt16(OBJ_FM_BUTTON) ) )
+    else if( pObj->IsUnoObj() && SdrInventor::FmForm == pObj->GetObjInventor() && ( pObj->GetObjIdentifier() == SdrObjKind::FormButton ) )
     {
         SdrUnoObj* pUnoCtrl = static_cast< SdrUnoObj* >( pObj );
 
@@ -203,7 +204,7 @@ void SdTransferable::CreateObjectReplacement( SdrObject* pObj )
             }
         }
     }
-    else if( auto pTextObj = dynamic_cast< SdrTextObj *>( pObj ) )
+    else if( auto pTextObj = DynCastSdrTextObj( pObj ) )
     {
         const OutlinerParaObject* pPara;
 
@@ -393,14 +394,14 @@ void SdTransferable::AddSupportedFormats()
         for( const auto& rItem : aVector )
             AddFormat( rItem );
     }
-    else if( mpGraphic )
+    else if( moGraphic )
     {
         // #i25616#
         AddFormat( SotClipboardFormatId::DRAWING );
 
         AddFormat( SotClipboardFormatId::SVXB );
 
-        if( mpGraphic->GetType() == GraphicType::Bitmap )
+        if( moGraphic->GetType() == GraphicType::Bitmap )
         {
             AddFormat( SotClipboardFormatId::PNG );
             AddFormat( SotClipboardFormatId::BITMAP );
@@ -456,8 +457,8 @@ bool SdTransferable::GetData( const DataFlavor& rFlavor, const OUString& rDestDo
     else if( mpOLEDataHelper && mpOLEDataHelper->HasFormat( rFlavor ) )
     {
         // TODO/LATER: support all the graphical formats, the embedded object scenario should not have separated handling
-        if( nFormat == SotClipboardFormatId::GDIMETAFILE && mpGraphic )
-            bOK = SetGDIMetaFile( mpGraphic->GetGDIMetaFile() );
+        if( nFormat == SotClipboardFormatId::GDIMETAFILE && moGraphic )
+            bOK = SetGDIMetaFile( moGraphic->GetGDIMetaFile() );
         else
             bOK = SetAny( mpOLEDataHelper->GetAny(rFlavor, rDestDoc) );
     }
@@ -522,9 +523,9 @@ bool SdTransferable::GetData( const DataFlavor& rFlavor, const OUString& rDestDo
         {
             bOK = SetString( mpBookmark->GetURL() );
         }
-        else if( ( nFormat == SotClipboardFormatId::SVXB ) && mpGraphic )
+        else if( ( nFormat == SotClipboardFormatId::SVXB ) && moGraphic )
         {
-            bOK = SetGraphic( *mpGraphic );
+            bOK = SetGraphic( *moGraphic );
         }
         else if( ( nFormat == SotClipboardFormatId::SVIM ) && mpImageMap )
         {
@@ -596,13 +597,13 @@ bool SdTransferable::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* pOb
         case SDTRANSFER_OBJECTTYPE_DRAWOLE:
         {
             SfxObjectShell*   pEmbObj = static_cast<SfxObjectShell*>(pObject);
-            ::utl::TempFile     aTempFile;
-            aTempFile.EnableKillingFile();
+            ::utl::TempFileFast aTempFile;
+            SvStream* pTempStream = aTempFile.GetStream(StreamMode::READWRITE);
 
             try
             {
                 uno::Reference< embed::XStorage > xWorkStore =
-                    ::comphelper::OStorageHelper::GetStorageFromURL( aTempFile.GetURL(), embed::ElementModes::READWRITE );
+                    ::comphelper::OStorageHelper::GetStorageFromStream( new utl::OStreamWrapper(*pTempStream), embed::ElementModes::READWRITE );
 
                 // write document storage
                 pEmbObj->SetupStorage( xWorkStore, SOFFICE_FILEFORMAT_CURRENT, false );
@@ -615,13 +616,8 @@ bool SdTransferable::WriteObject( tools::SvRef<SotTempStream>& rxOStm, void* pOb
                 if ( xTransact.is() )
                     xTransact->commit();
 
-                std::unique_ptr<SvStream> pSrcStm = ::utl::UcbStreamHelper::CreateStream( aTempFile.GetURL(), StreamMode::READ );
-                if( pSrcStm )
-                {
-                    rxOStm->SetBufferSize( 0xff00 );
-                    rxOStm->WriteStream( *pSrcStm );
-                    pSrcStm.reset();
-                }
+                rxOStm->SetBufferSize( 0xff00 );
+                rxOStm->WriteStream( *pTempStream );
 
                 bRet = true;
             }
@@ -725,7 +721,7 @@ sal_Int32 SdTransferable::GetUserDataCount() const
 
 std::shared_ptr<SdTransferable::UserData> SdTransferable::GetUserData (const sal_Int32 nIndex) const
 {
-    if (nIndex>=0 && nIndex<sal_Int32(maUserData.size()))
+    if (nIndex>=0 && o3tl::make_unsigned(nIndex)<maUserData.size())
         return maUserData[nIndex];
     else
         return std::shared_ptr<UserData>();

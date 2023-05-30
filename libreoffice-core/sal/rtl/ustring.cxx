@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <string>
 
+#include <config_options.h>
 #include <osl/diagnose.h>
 #include <osl/interlck.h>
 #include <osl/mutex.h>
@@ -56,47 +57,13 @@ static_assert(sizeof (rtl_uString) == 12);
 
 #include "strtmpl.hxx"
 
-/* static data to be referenced by all empty strings
- * the refCount is predefined to 1 and must never become 0 !
- */
-template<>
-rtl_uString rtl::str::EmptyStringImpl<rtl_uString>::data =
-{
-    sal_Int32(SAL_STRING_INTERN_FLAG|SAL_STRING_STATIC_FLAG|1), /*sal_Int32    refCount; */
-    0,                                               /*sal_Int32    length;   */
-    { 0 }                                            /*sal_Unicode  buffer[1];*/
-};
-
 /* ======================================================================= */
 
 sal_Int32 rtl_ustr_indexOfAscii_WithLength(
     sal_Unicode const * str, sal_Int32 len,
     char const * subStr, sal_Int32 subLen) SAL_THROW_EXTERN_C()
 {
-    assert(len >= 0);
-    assert(subLen >= 0);
-    if (subLen > 0 && subLen <= len)
-    {
-        sal_Unicode const* end = str + len;
-        sal_Unicode const* cursor = str;
-
-        while(cursor < end)
-        {
-            cursor = std::char_traits<sal_Unicode>::find(cursor, end - cursor, *subStr);
-            if(!cursor || (end - cursor < subLen))
-            {
-                /* no enough left to actually have a match */
-                break;
-            }
-            /* now it is worth trying a full match */
-            if (rtl_ustr_asciil_reverseEquals_WithLength(cursor, subStr, subLen))
-            {
-                return cursor - str;
-            }
-            cursor += 1;
-        }
-    }
-    return -1;
+    return rtl::str::indexOfStr_WithLength(str, len, subStr, subLen);
 }
 
 sal_Int32 rtl_ustr_lastIndexOfAscii_WithLength(
@@ -121,48 +88,34 @@ sal_Int32 rtl_ustr_lastIndexOfAscii_WithLength(
 sal_Int32 SAL_CALL rtl_ustr_valueOfFloat(sal_Unicode * pStr, float f)
     SAL_THROW_EXTERN_C()
 {
-    assert(pStr);
-    rtl_uString * pResult = nullptr;
-    sal_Int32 nLen;
-    rtl_math_doubleToUString(
-        &pResult, nullptr, 0, f, rtl_math_StringFormat_G,
-        RTL_USTR_MAX_VALUEOFFLOAT - RTL_CONSTASCII_LENGTH("-x.E-xxx"), '.', nullptr,
-        0, true);
-    nLen = pResult->length;
-    OSL_ASSERT(nLen < RTL_USTR_MAX_VALUEOFFLOAT);
-    memcpy(pStr, pResult->buffer, (nLen + 1) * sizeof(sal_Unicode));
-    rtl_uString_release(pResult);
-    return nLen;
+    return rtl::str::valueOfFP<RTL_USTR_MAX_VALUEOFFLOAT>(pStr, f);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_valueOfDouble(sal_Unicode * pStr, double d)
     SAL_THROW_EXTERN_C()
 {
-    assert(pStr);
-    rtl_uString * pResult = nullptr;
-    sal_Int32 nLen;
-    rtl_math_doubleToUString(
-        &pResult, nullptr, 0, d, rtl_math_StringFormat_G,
-        RTL_USTR_MAX_VALUEOFDOUBLE - RTL_CONSTASCII_LENGTH("-x.E-xxx"), '.', nullptr,
-        0, true);
-    nLen = pResult->length;
-    OSL_ASSERT(nLen < RTL_USTR_MAX_VALUEOFDOUBLE);
-    memcpy(pStr, pResult->buffer, (nLen + 1) * sizeof(sal_Unicode));
-    rtl_uString_release(pResult);
-    return nLen;
+    return rtl::str::valueOfFP<RTL_USTR_MAX_VALUEOFDOUBLE>(pStr, d);
 }
 
 namespace {
 
 // Avoid -fsanitize=undefined warning e.g. "runtime error: value 1e+99 is
-// outside the range of representable values of type 'float'":
+// outside the range of representable values of type 'float'" with Clang prior to
+// <https://github.com/llvm/llvm-project/commit/9e52c43090f8cd980167bbd2719878ae36bcf6b5> "Treat the
+// range of representable values of floating-point types as [-inf, +inf] not as [-max, +max]"
+// (ENABLE_RUNTIME_OPTIMIZATIONS is an approximation for checking whether building is done without
+// -fsanitize=undefined):
 float doubleToFloat(double x) {
+#if !defined __clang__ || __clang_major__ >= 9 || ENABLE_RUNTIME_OPTIMIZATIONS
+    return static_cast<float>(x);
+#else
     return
         x < -std::numeric_limits<float>::max()
         ? -std::numeric_limits<float>::infinity()
         : x > std::numeric_limits<float>::max()
         ? std::numeric_limits<float>::infinity()
         : static_cast<float>(x);
+#endif
 }
 
 }
@@ -188,23 +141,8 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_compare( const sal_Unicode* pStr1,
                                            const char* pStr2 )
     SAL_THROW_EXTERN_C()
 {
-    assert(pStr1);
-    assert(pStr2);
-    sal_Int32 nRet;
-    for (;;)
-    {
-        nRet = static_cast<sal_Int32>(*pStr1)-
-                     static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if (!(nRet == 0 && *pStr2 ))
-            break;
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_compare - Found char > 127" );
-        pStr1++;
-        pStr2++;
-    }
-
-    return nRet;
+    return rtl::str::compare(rtl::str::null_terminated(pStr1), rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareNormal(), rtl::str::noShortening);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -214,25 +152,9 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_compare_WithLength( const sal_Unicode* pStr1,
                                                       const char* pStr2 )
     SAL_THROW_EXTERN_C()
 {
-    assert(pStr1);
-    assert(nStr1Len >= 0);
-    assert(pStr2);
-    sal_Int32 nRet = 0;
-    for (;;)
-    {
-        nRet = (nStr1Len ? static_cast<sal_Int32>(*pStr1) : 0) -
-               static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if (!(nRet == 0 && nStr1Len && *pStr2 ))
-            break;
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_compare_WithLength - Found char > 127" );
-        pStr1++;
-        pStr2++;
-        nStr1Len--;
-    }
-
-    return nRet;
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareNormal(), rtl::str::noShortening);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -243,43 +165,9 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_shortenedCompare_WithLength( const sal_Unicode
                                                                sal_Int32 nShortenedLength )
     SAL_THROW_EXTERN_C()
 {
-    assert(nStr1Len >= 0);
-    assert(nShortenedLength >= 0);
-    const sal_Unicode*  pStr1End = pStr1 + nStr1Len;
-    sal_Int32           nRet;
-    while ( (nShortenedLength > 0) &&
-            (pStr1 < pStr1End) && *pStr2 )
-    {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_shortenedCompare_WithLength - Found char > 127" );
-
-        nRet = static_cast<sal_Int32>(*pStr1)-
-               static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if ( nRet != 0 )
-            return nRet;
-
-        nShortenedLength--;
-        pStr1++;
-        pStr2++;
-    }
-
-    if ( nShortenedLength <= 0 )
-        return 0;
-
-    if ( *pStr2 )
-    {
-        OSL_ENSURE( pStr1 == pStr1End, "pStr1 == pStr1End failed" );
-        // first is a substring of the second string => less (negative value)
-        nRet = -1;
-    }
-    else
-    {
-        // greater or equal
-        nRet = pStr1End - pStr1;
-    }
-
-    return nRet;
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareNormal(), nShortenedLength);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -290,23 +178,8 @@ sal_Int32 SAL_CALL rtl_ustr_asciil_reverseCompare_WithLength( const sal_Unicode*
                                                               sal_Int32 nStr2Len )
     SAL_THROW_EXTERN_C()
 {
-    assert(nStr1Len >= 0 && nStr2Len >= 0);
-    const sal_Unicode*  pStr1Run = pStr1+nStr1Len;
-    const char*     pStr2Run = pStr2+nStr2Len;
-    sal_Int32           nRet;
-    while ( (pStr1 < pStr1Run) && (pStr2 < pStr2Run) )
-    {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_asciil_reverseCompare_WithLength - Found char > 127" );
-        pStr1Run--;
-        pStr2Run--;
-        nRet = static_cast<sal_Int32>(*pStr1Run)- static_cast<sal_Int32>(*pStr2Run);
-        if ( nRet )
-            return nRet;
-    }
-
-    return nStr1Len - nStr2Len;
+    return rtl::str::reverseCompare_WithLengths(pStr1, nStr1Len, pStr2, nStr2Len,
+                                                rtl::str::CompareNormal());
 }
 
 /* ----------------------------------------------------------------------- */
@@ -321,11 +194,10 @@ sal_Bool SAL_CALL rtl_ustr_asciil_reverseEquals_WithLength( const sal_Unicode* p
     const char*     pStr2Run = pStr2+nStrLen;
     while ( pStr1 < pStr1Run )
     {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_asciil_reverseEquals_WithLength - Found char > 127" );
         pStr1Run--;
         pStr2Run--;
+        SAL_WARN_IF( !rtl::isAscii(static_cast<unsigned char>(*pStr2Run)), "rtl.string",
+                    "rtl_ustr_asciil_reverseEquals_WithLength - Found char > 127" );
         if( *pStr1Run != static_cast<sal_Unicode>(*pStr2Run) )
             return false;
     }
@@ -339,33 +211,8 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_compareIgnoreAsciiCase( const sal_Unicode* pSt
                                                           const char* pStr2 )
     SAL_THROW_EXTERN_C()
 {
-    assert(pStr1);
-    assert(pStr2);
-    sal_Int32   nRet;
-    sal_Int32   c1;
-    sal_Int32   c2;
-    do
-    {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_compareIgnoreAsciiCase - Found char > 127" );
-        /* If character between 'A' and 'Z', then convert it to lowercase */
-        c1 = static_cast<sal_Int32>(*pStr1);
-        c2 = static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if ( (c1 >= 65) && (c1 <= 90) )
-            c1 += 32;
-        if ( (c2 >= 65) && (c2 <= 90) )
-            c2 += 32;
-        nRet = c1-c2;
-        if ( nRet != 0 )
-            return nRet;
-
-        pStr1++;
-        pStr2++;
-    }
-    while ( c2 );
-
-    return 0;
+    return rtl::str::compare(rtl::str::null_terminated(pStr1), rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareIgnoreAsciiCase(), rtl::str::noShortening);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -375,65 +222,18 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_compareIgnoreAsciiCase_WithLength( const sal_U
                                                                      const char* pStr2 )
     SAL_THROW_EXTERN_C()
 {
-    assert(nStr1Len >= 0);
-    assert(pStr2);
-    sal_Int32   nRet;
-    sal_Int32   c1;
-    sal_Int32   c2;
-    do
-    {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_compareIgnoreAsciiCase_WithLength - Found char > 127" );
-        if ( !nStr1Len )
-            return *pStr2 == '\0' ? 0 : -1;
-
-        /* If character between 'A' and 'Z', then convert it to lowercase */
-        c1 = static_cast<sal_Int32>(*pStr1);
-        c2 = static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if ( (c1 >= 65) && (c1 <= 90) )
-            c1 += 32;
-        if ( (c2 >= 65) && (c2 <= 90) )
-            c2 += 32;
-        nRet = c1-c2;
-        if ( nRet != 0 )
-            return nRet;
-
-        pStr1++;
-        pStr2++;
-        nStr1Len--;
-    }
-    while( c2 );
-
-    return 0;
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareIgnoreAsciiCase(), rtl::str::noShortening);
 }
 
 sal_Int32 rtl_ustr_ascii_compareIgnoreAsciiCase_WithLengths(
     sal_Unicode const * first, sal_Int32 firstLen,
     char const * second, sal_Int32 secondLen) SAL_THROW_EXTERN_C()
 {
-    assert(firstLen >= 0 && secondLen >= 0);
-    sal_Int32 i;
-    sal_Int32 len = std::min(firstLen, secondLen);
-    for (i = 0; i < len; ++i) {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*second)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_compareIgnoreAsciiCase_WithLengths - Found char > 127" );
-        sal_Int32 c1 = *first++;
-        sal_Int32 c2 = static_cast<unsigned char>(*second++);
-        sal_Int32 d;
-        if (c1 >= 65 && c1 <= 90) {
-            c1 += 32;
-        }
-        if (c2 >= 65 && c2 <= 90) {
-            c2 += 32;
-        }
-        d = c1 - c2;
-        if (d != 0) {
-            return d;
-        }
-    }
-    return firstLen - secondLen;
+    return rtl::str::compare(rtl::str::with_length(first, firstLen),
+                             rtl::str::with_length(second, secondLen),
+                             rtl::str::CompareIgnoreAsciiCase(), rtl::str::noShortening);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -444,51 +244,9 @@ sal_Int32 SAL_CALL rtl_ustr_ascii_shortenedCompareIgnoreAsciiCase_WithLength( co
                                                                               sal_Int32 nShortenedLength )
     SAL_THROW_EXTERN_C()
 {
-    assert(nStr1Len >= 0);
-    assert(nShortenedLength >= 0);
-    const sal_Unicode*  pStr1End = pStr1 + nStr1Len;
-    sal_Int32           nRet;
-    sal_Int32           c1;
-    sal_Int32           c2;
-    while ( (nShortenedLength > 0) &&
-            (pStr1 < pStr1End) && *pStr2 )
-    {
-        /* Check ASCII range */
-        SAL_WARN_IF( (static_cast<unsigned char>(*pStr2)) > 127, "rtl.string",
-                    "rtl_ustr_ascii_shortenedCompareIgnoreAsciiCase_WithLength - Found char > 127" );
-
-        /* If character between 'A' and 'Z', then convert it to lowercase */
-        c1 = static_cast<sal_Int32>(*pStr1);
-        c2 = static_cast<sal_Int32>(static_cast<unsigned char>(*pStr2));
-        if ( (c1 >= 65) && (c1 <= 90) )
-            c1 += 32;
-        if ( (c2 >= 65) && (c2 <= 90) )
-            c2 += 32;
-        nRet = c1-c2;
-        if ( nRet != 0 )
-            return nRet;
-
-        nShortenedLength--;
-        pStr1++;
-        pStr2++;
-    }
-
-    if ( nShortenedLength <= 0 )
-        return 0;
-
-    if ( *pStr2 )
-    {
-        OSL_ENSURE( pStr1 == pStr1End, "pStr1 == pStr1End failed" );
-        // first is a substring of the second string => less (negative value)
-        nRet = -1;
-    }
-    else
-    {
-        // greater or equal
-        nRet = pStr1End - pStr1;
-    }
-
-    return nRet;
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareIgnoreAsciiCase(), nShortenedLength);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -498,17 +256,7 @@ void SAL_CALL rtl_uString_newFromAscii( rtl_uString** ppThis,
     SAL_THROW_EXTERN_C()
 {
     assert(ppThis);
-    sal_Int32 nLen;
-
-    if ( pCharStr )
-    {
-        const char* pTempStr = pCharStr;
-        while( *pTempStr )
-            pTempStr++;
-        nLen = pTempStr-pCharStr;
-    }
-    else
-        nLen = 0;
+    sal_Int32 nLen = pCharStr ? rtl::str::getLength(pCharStr) : 0;
 
     if ( !nLen )
     {
@@ -584,57 +332,14 @@ void rtl_uString_newConcatAsciiL(
     rtl_uString ** newString, rtl_uString * left, char const * right,
     sal_Int32 rightLength)
 {
-    assert(newString != nullptr);
-    assert(left != nullptr);
-    assert(right != nullptr);
-    assert(rightLength >= 0);
-    if (left->length > std::numeric_limits<sal_Int32>::max() - rightLength) {
-#if !defined(__COVERITY__)
-        throw std::length_error("rtl_uString_newConcatAsciiL");
-#else
-        //coverity doesn't report std::bad_alloc as an unhandled exception when
-        //potentially thrown from destructors but does report std::length_error
-        throw std::bad_alloc();
-#endif
-    }
-    sal_Int32 n = left->length + rightLength;
-    rtl_uString_assign(newString, left);
-    rtl_uString_ensureCapacity(newString, n);
-    sal_Unicode * p = (*newString)->buffer + (*newString)->length;
-    for (sal_Int32 i = 0; i != rightLength; ++i) {
-        p[i] = static_cast<unsigned char>(right[i]);
-    }
-    (*newString)->buffer[n] = 0;
-    (*newString)->length = n;
+    rtl::str::newConcat(newString, left, right, rightLength);
 }
 
 void rtl_uString_newConcatUtf16L(
     rtl_uString ** newString, rtl_uString * left, sal_Unicode const * right,
     sal_Int32 rightLength)
 {
-    assert(newString != nullptr);
-    assert(left != nullptr);
-    assert(right != nullptr || rightLength == 0);
-    assert(rightLength >= 0);
-    if (left->length > std::numeric_limits<sal_Int32>::max() - rightLength) {
-#if !defined(__COVERITY__)
-        throw std::length_error("rtl_uString_newConcatUtf16L");
-#else
-        //coverity doesn't report std::bad_alloc as an unhandled exception when
-        //potentially thrown from destructors but does report std::length_error
-        throw std::bad_alloc();
-#endif
-    }
-    sal_Int32 n = left->length + rightLength;
-    rtl_uString_assign(newString, left);
-    rtl_uString_ensureCapacity(newString, n);
-    if (rightLength != 0) {
-        memcpy(
-            (*newString)->buffer + (*newString)->length, right,
-            rightLength * sizeof (sal_Unicode));
-    }
-    (*newString)->buffer[n] = 0;
-    (*newString)->length = n;
+    rtl::str::newConcat(newString, left, right, rightLength);
 }
 
 /* ======================================================================= */
@@ -986,7 +691,7 @@ void SAL_CALL rtl_uString_internConvert( rtl_uString   ** newStr,
             for (i = 0; i < len; i++)
             {
                 /* Check ASCII range */
-                SAL_WARN_IF( (static_cast<unsigned char>(str[i])) > 127, "rtl.string",
+                SAL_WARN_IF( !rtl::isAscii(static_cast<unsigned char>(str[i])), "rtl.string",
                             "rtl_ustring_internConvert() - Found char > 127 and RTL_TEXTENCODING_ASCII_US is specified" );
                 pScratch->buffer[i] = str[i];
             }
@@ -1030,8 +735,7 @@ void SAL_CALL rtl_uString_internConvert( rtl_uString   ** newStr,
     rtl_ustring_intern_internal( newStr, scratch, CAN_RETURN );
 }
 
-static void
-internRelease (rtl_uString *pThis)
+void internRelease (rtl_uString *pThis)
 {
     rtl_uString *pFree = nullptr;
     if ( SAL_STRING_REFCOUNT(
@@ -1120,41 +824,10 @@ void rtl_uString_newReplaceFirst(
     rtl_uString ** newStr, rtl_uString * str, rtl_uString const * from,
     rtl_uString const * to, sal_Int32 * index) SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
-    assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
     assert(from != nullptr);
     assert(to != nullptr);
-    sal_Int32 i = rtl_ustr_indexOfStr_WithLength(
-        str->buffer + *index, str->length - *index, from->buffer, from->length);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(from->length <= str->length);
-        if (str->length - from->length > SAL_MAX_INT32 - to->length) {
-            std::abort();
-        }
-        sal_Int32 n = str->length - from->length + to->length;
-        rtl_uString_acquire(str); // in case *newStr == str
-        rtl_uString_new_WithLength(newStr, n);
-        if (n != 0) {
-            (*newStr)->length = n;
-            assert(i >= 0 && i < str->length);
-            memcpy(
-                (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-            memcpy(
-                (*newStr)->buffer + i, to->buffer,
-                to->length * sizeof (sal_Unicode));
-            memcpy(
-                (*newStr)->buffer + i + to->length,
-                str->buffer + i + from->length,
-                (str->length - i - from->length) * sizeof (sal_Unicode));
-        }
-        rtl_uString_release(str);
-    }
-    *index = i;
+    rtl_uString_newReplaceFirstUtf16LUtf16L(newStr, str, from->buffer, from->length, to->buffer,
+                                            to->length, index);
 }
 
 void rtl_uString_newReplaceFirstAsciiL(
@@ -1162,41 +835,9 @@ void rtl_uString_newReplaceFirstAsciiL(
     sal_Int32 fromLength, rtl_uString const * to, sal_Int32 * index)
     SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
-    assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
-    assert(fromLength >= 0);
     assert(to != nullptr);
-    sal_Int32 i = rtl_ustr_indexOfAscii_WithLength(
-        str->buffer + *index, str->length - *index, from, fromLength);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(fromLength <= str->length);
-        if (str->length - fromLength > SAL_MAX_INT32 - to->length) {
-            std::abort();
-        }
-        sal_Int32 n = str->length - fromLength + to->length;
-        rtl_uString_acquire(str); // in case *newStr == str
-        rtl_uString_new_WithLength(newStr, n);
-        if (n != 0) {
-            (*newStr)->length = n;
-            assert(i >= 0 && i < str->length);
-            memcpy(
-                (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-            memcpy(
-                (*newStr)->buffer + i, to->buffer,
-                to->length * sizeof (sal_Unicode));
-            memcpy(
-                (*newStr)->buffer + i + to->length,
-                str->buffer + i + fromLength,
-                (str->length - i - fromLength) * sizeof (sal_Unicode));
-        }
-        rtl_uString_release(str);
-    }
-    *index = i;
+    rtl_uString_newReplaceFirstAsciiLUtf16L(newStr, str, from, fromLength, to->buffer, to->length,
+                                            index);
 }
 
 void rtl_uString_newReplaceFirstToAsciiL(
@@ -1204,42 +845,9 @@ void rtl_uString_newReplaceFirstToAsciiL(
     char const * to, sal_Int32 toLength, sal_Int32 * index)
     SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
-    assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
     assert(from != nullptr);
-    assert(toLength >= 0);
-    sal_Int32 i = rtl_ustr_indexOfStr_WithLength(
-        str->buffer + *index, str->length - *index, from->buffer, from->length);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(from->length <= str->length);
-        if (str->length - from->length > SAL_MAX_INT32 - toLength) {
-            std::abort();
-        }
-        sal_Int32 n = str->length - from->length + toLength;
-        rtl_uString_acquire(str); // in case *newStr == str
-        rtl_uString_new_WithLength(newStr, n);
-        if (n != 0) {
-            (*newStr)->length = n;
-            assert(i >= 0 && i < str->length);
-            memcpy(
-                (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-            for (sal_Int32 j = 0; j != toLength; ++j) {
-                assert(static_cast< unsigned char >(to[j]) <= 0x7F);
-                (*newStr)->buffer[i + j] = to[j];
-            }
-            memcpy(
-                (*newStr)->buffer + i + toLength,
-                str->buffer + i + from->length,
-                (str->length - i - from->length) * sizeof (sal_Unicode));
-        }
-        rtl_uString_release(str);
-    }
-    *index = i;
+    rtl_uString_newReplaceFirstUtf16LAsciiL(newStr, str, from->buffer, from->length, to, toLength,
+                                            index);
 }
 
 void rtl_uString_newReplaceFirstAsciiLAsciiL(
@@ -1247,43 +855,8 @@ void rtl_uString_newReplaceFirstAsciiLAsciiL(
     sal_Int32 fromLength, char const * to, sal_Int32 toLength,
     sal_Int32 * index) SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
     assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
-    assert(fromLength >= 0);
-    assert(to != nullptr);
-    assert(toLength >= 0);
-    sal_Int32 i = rtl_ustr_indexOfAscii_WithLength(
-        str->buffer + *index, str->length - *index, from, fromLength);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(fromLength <= str->length);
-        if (str->length - fromLength > SAL_MAX_INT32 - toLength) {
-            std::abort();
-        }
-        sal_Int32 n = str->length - fromLength + toLength;
-        rtl_uString_acquire(str); // in case *newStr == str
-        rtl_uString_new_WithLength(newStr, n);
-        if (n != 0) {
-            (*newStr)->length = n;
-            assert(i >= 0 && i < str->length);
-            memcpy(
-                (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-            for (sal_Int32 j = 0; j != toLength; ++j) {
-                assert(static_cast< unsigned char >(to[j]) <= 0x7F);
-                (*newStr)->buffer[i + j] = to[j];
-            }
-            memcpy(
-                (*newStr)->buffer + i + toLength,
-                str->buffer + i + fromLength,
-                (str->length - i - fromLength) * sizeof (sal_Unicode));
-        }
-        rtl_uString_release(str);
-    }
-    *index = i;
+    rtl::str::newReplaceFirst(newStr, str, from, fromLength, to, toLength, *index);
 }
 
 void rtl_uString_newReplaceFirstAsciiLUtf16L(
@@ -1291,45 +864,8 @@ void rtl_uString_newReplaceFirstAsciiLUtf16L(
     sal_Int32 fromLength, sal_Unicode const * to, sal_Int32 toLength,
     sal_Int32 * index) SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
     assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
-    assert(fromLength >= 0);
-    assert(to != nullptr || toLength == 0);
-    assert(toLength >= 0);
-    sal_Int32 i = rtl_ustr_indexOfAscii_WithLength(
-        str->buffer + *index, str->length - *index, from, fromLength);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(fromLength <= str->length);
-        if (str->length - fromLength > SAL_MAX_INT32 - toLength) {
-            rtl_uString_release(*newStr);
-            *newStr = nullptr;
-        } else {
-            sal_Int32 n = str->length - fromLength + toLength;
-            rtl_uString_acquire(str); // in case *newStr == str
-            rtl_uString_new_WithLength(newStr, n);
-            if (n != 0 && /*TODO:*/ *newStr != nullptr) {
-                (*newStr)->length = n;
-                assert(i >= 0 && i < str->length);
-                memcpy(
-                    (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-                if (toLength != 0) {
-                    memcpy(
-                        (*newStr)->buffer + i, to, toLength * sizeof (sal_Unicode));
-                }
-                memcpy(
-                    (*newStr)->buffer + i + toLength,
-                    str->buffer + i + fromLength,
-                    (str->length - i - fromLength) * sizeof (sal_Unicode));
-            }
-            rtl_uString_release(str);
-        }
-    }
-    *index = i;
+    rtl::str::newReplaceFirst(newStr, str, from, fromLength, to, toLength, *index);
 }
 
 void rtl_uString_newReplaceFirstUtf16LAsciiL(
@@ -1337,45 +873,8 @@ void rtl_uString_newReplaceFirstUtf16LAsciiL(
     sal_Int32 fromLength, char const * to, sal_Int32 toLength,
     sal_Int32 * index) SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
     assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
-    assert(fromLength >= 0);
-    assert(to != nullptr);
-    assert(toLength >= 0);
-    sal_Int32 i = rtl_ustr_indexOfStr_WithLength(
-        str->buffer + *index, str->length - *index, from, fromLength);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(fromLength <= str->length);
-        if (str->length - fromLength > SAL_MAX_INT32 - toLength) {
-            rtl_uString_release(*newStr);
-            *newStr = nullptr;
-        } else {
-            sal_Int32 n = str->length - fromLength + toLength;
-            rtl_uString_acquire(str); // in case *newStr == str
-            rtl_uString_new_WithLength(newStr, n);
-            if (n != 0 && /*TODO:*/ *newStr != nullptr) {
-                (*newStr)->length = n;
-                assert(i >= 0 && i < str->length);
-                memcpy(
-                    (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-                for (sal_Int32 j = 0; j != toLength; ++j) {
-                    assert(static_cast< unsigned char >(to[j]) <= 0x7F);
-                    (*newStr)->buffer[i + j] = to[j];
-                }
-                memcpy(
-                    (*newStr)->buffer + i + toLength,
-                    str->buffer + i + fromLength,
-                    (str->length - i - fromLength) * sizeof (sal_Unicode));
-            }
-            rtl_uString_release(str);
-        }
-    }
-    *index = i;
+    rtl::str::newReplaceFirst(newStr, str, from, fromLength, to, toLength, *index);
 }
 
 void rtl_uString_newReplaceFirstUtf16LUtf16L(
@@ -1383,46 +882,8 @@ void rtl_uString_newReplaceFirstUtf16LUtf16L(
     sal_Int32 fromLength, sal_Unicode const * to, sal_Int32 toLength,
     sal_Int32 * index) SAL_THROW_EXTERN_C()
 {
-    assert(str != nullptr);
     assert(index != nullptr);
-    assert(*index >= 0 && *index <= str->length);
-    assert(from != nullptr || fromLength == 0);
-    assert(fromLength >= 0);
-    assert(to != nullptr || toLength == 0);
-    assert(toLength >= 0);
-    sal_Int32 i = rtl_ustr_indexOfStr_WithLength(
-        str->buffer + *index, str->length - *index, from, fromLength);
-    if (i == -1) {
-        rtl_uString_assign(newStr, str);
-    } else {
-        assert(i <= str->length - *index);
-        i += *index;
-        assert(fromLength <= str->length);
-        if (str->length - fromLength > SAL_MAX_INT32 - toLength) {
-            rtl_uString_release(*newStr);
-            *newStr = nullptr;
-        } else {
-            sal_Int32 n = str->length - fromLength + toLength;
-            rtl_uString_acquire(str); // in case *newStr == str
-            rtl_uString_new_WithLength(newStr, n);
-            if (n != 0 && /*TODO:*/ *newStr != nullptr) {
-                (*newStr)->length = n;
-                assert(i >= 0 && i < str->length);
-                memcpy(
-                    (*newStr)->buffer, str->buffer, i * sizeof (sal_Unicode));
-                if (toLength != 0) {
-                    memcpy(
-                        (*newStr)->buffer + i, to, toLength * sizeof (sal_Unicode));
-                }
-                memcpy(
-                    (*newStr)->buffer + i + toLength,
-                    str->buffer + i + fromLength,
-                    (str->length - i - fromLength) * sizeof (sal_Unicode));
-            }
-            rtl_uString_release(str);
-        }
-    }
-    *index = i;
+    rtl::str::newReplaceFirst(newStr, str, from, fromLength, to, toLength, *index);
 }
 
 void rtl_uString_newReplaceAll(
@@ -1438,13 +899,8 @@ void rtl_uString_newReplaceAllFromIndex(
 {
     assert(to != nullptr);
     assert(fromIndex >= 0 && fromIndex <= str->length);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = fromIndex;; i += to->length) {
-        rtl_uString_newReplaceFirst(newStr, *newStr, from, to, &i);
-        if (i == -1) {
-            break;
-        }
-    }
+    rtl_uString_newReplaceAllFromIndexUtf16LUtf16L(newStr, str, from->buffer, from->length,
+                                                   to->buffer, to->length, fromIndex);
 }
 
 void rtl_uString_newReplaceAllAsciiL(
@@ -1452,14 +908,7 @@ void rtl_uString_newReplaceAllAsciiL(
     sal_Int32 fromLength, rtl_uString const * to) SAL_THROW_EXTERN_C()
 {
     assert(to != nullptr);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = 0;; i += to->length) {
-        rtl_uString_newReplaceFirstAsciiL(
-            newStr, *newStr, from, fromLength, to, &i);
-        if (i == -1) {
-            break;
-        }
-    }
+    rtl_uString_newReplaceAllAsciiLUtf16L(newStr, str, from, fromLength, to->buffer, to->length);
 }
 
 void rtl_uString_newReplaceAllToAsciiL(
@@ -1467,14 +916,7 @@ void rtl_uString_newReplaceAllToAsciiL(
     char const * to, sal_Int32 toLength) SAL_THROW_EXTERN_C()
 {
     assert(from != nullptr);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = 0;; i += toLength) {
-        rtl_uString_newReplaceFirstToAsciiL(
-            newStr, *newStr, from, to, toLength, &i);
-        if (i == -1) {
-            break;
-        }
-    }
+    rtl_uString_newReplaceAllUtf16LAsciiL(newStr, str, from->buffer, from->length, to, toLength);
 }
 
 void rtl_uString_newReplaceAllAsciiLAsciiL(
@@ -1482,15 +924,7 @@ void rtl_uString_newReplaceAllAsciiLAsciiL(
     sal_Int32 fromLength, char const * to, sal_Int32 toLength)
     SAL_THROW_EXTERN_C()
 {
-    assert(toLength >= 0);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = 0;; i += toLength) {
-        rtl_uString_newReplaceFirstAsciiLAsciiL(
-            newStr, *newStr, from, fromLength, to, toLength, &i);
-        if (i == -1) {
-            break;
-        }
-    }
+    rtl::str::newReplaceAllFromIndex(newStr, str, from, fromLength, to, toLength, 0);
 }
 
 void rtl_uString_newReplaceAllAsciiLUtf16L(
@@ -1498,15 +932,7 @@ void rtl_uString_newReplaceAllAsciiLUtf16L(
     sal_Int32 fromLength, sal_Unicode const * to, sal_Int32 toLength)
     SAL_THROW_EXTERN_C()
 {
-    assert(toLength >= 0);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = 0;; i += toLength) {
-        rtl_uString_newReplaceFirstAsciiLUtf16L(
-            newStr, *newStr, from, fromLength, to, toLength, &i);
-        if (i == -1 || *newStr == nullptr) {
-            break;
-        }
-    }
+    rtl::str::newReplaceAllFromIndex(newStr, str, from, fromLength, to, toLength, 0);
 }
 
 void rtl_uString_newReplaceAllUtf16LAsciiL(
@@ -1514,15 +940,7 @@ void rtl_uString_newReplaceAllUtf16LAsciiL(
     sal_Int32 fromLength, char const * to, sal_Int32 toLength)
     SAL_THROW_EXTERN_C()
 {
-    assert(toLength >= 0);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = 0;; i += toLength) {
-        rtl_uString_newReplaceFirstUtf16LAsciiL(
-            newStr, *newStr, from, fromLength, to, toLength, &i);
-        if (i == -1 || *newStr == nullptr) {
-            break;
-        }
-    }
+    rtl::str::newReplaceAllFromIndex(newStr, str, from, fromLength, to, toLength, 0);
 }
 
 void rtl_uString_newReplaceAllUtf16LUtf16L(
@@ -1538,16 +956,7 @@ void rtl_uString_newReplaceAllFromIndexUtf16LUtf16L(
     sal_Int32 fromLength, sal_Unicode const * to, sal_Int32 toLength, sal_Int32 fromIndex)
     SAL_THROW_EXTERN_C()
 {
-    assert(toLength >= 0);
-    assert(fromIndex >= 0 && fromIndex <= str->length);
-    rtl_uString_assign(newStr, str);
-    for (sal_Int32 i = fromIndex;; i += toLength) {
-        rtl_uString_newReplaceFirstUtf16LUtf16L(
-            newStr, *newStr, from, fromLength, to, toLength, &i);
-        if (i == -1 || *newStr == nullptr) {
-            break;
-        }
-    }
+    rtl::str::newReplaceAllFromIndex(newStr, str, from, fromLength, to, toLength, fromIndex);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_getLength(const sal_Unicode* pStr) SAL_THROW_EXTERN_C()
@@ -1558,34 +967,41 @@ sal_Int32 SAL_CALL rtl_ustr_getLength(const sal_Unicode* pStr) SAL_THROW_EXTERN_
 sal_Int32 SAL_CALL rtl_ustr_compare(const sal_Unicode* pStr1, const sal_Unicode* pStr2)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::compare(pStr1, pStr2);
+    return rtl::str::compare(rtl::str::null_terminated(pStr1), rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareNormal(), rtl::str::noShortening);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_compare_WithLength(const sal_Unicode* pStr1, sal_Int32 nStr1Len,
                                                const sal_Unicode* pStr2, sal_Int32 nStr2Len)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::compare_WithLength(pStr1, nStr1Len, pStr2, nStr2Len);
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::with_length(pStr2, nStr2Len), rtl::str::CompareNormal(),
+                             rtl::str::noShortening);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_shortenedCompare_WithLength(
     const sal_Unicode* pStr1, sal_Int32 nStr1Len, const sal_Unicode* pStr2, sal_Int32 nStr2Len,
     sal_Int32 nShortenedLength) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::shortenedCompare_WithLength(pStr1, nStr1Len, pStr2, nStr2Len, nShortenedLength);
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::with_length(pStr2, nStr2Len), rtl::str::CompareNormal(),
+                             nShortenedLength);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_reverseCompare_WithLength(const sal_Unicode* pStr1, sal_Int32 nStr1Len,
                                                       const sal_Unicode* pStr2, sal_Int32 nStr2Len)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::reverseCompare_WithLength(pStr1, nStr1Len, pStr2, nStr2Len);
+    return rtl::str::reverseCompare_WithLengths(pStr1, nStr1Len, pStr2, nStr2Len,
+                                                rtl::str::CompareNormal());
 }
 
 sal_Int32 SAL_CALL rtl_ustr_compareIgnoreAsciiCase(const sal_Unicode* pStr1,
                                                    const sal_Unicode* pStr2) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::compareIgnoreAsciiCase(pStr1, pStr2);
+    return rtl::str::compare(rtl::str::null_terminated(pStr1), rtl::str::null_terminated(pStr2),
+                             rtl::str::CompareIgnoreAsciiCase(), rtl::str::noShortening);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_compareIgnoreAsciiCase_WithLength(const sal_Unicode* pStr1,
@@ -1594,15 +1010,18 @@ sal_Int32 SAL_CALL rtl_ustr_compareIgnoreAsciiCase_WithLength(const sal_Unicode*
                                                               sal_Int32 nStr2Len)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::compareIgnoreAsciiCase_WithLength(pStr1, nStr1Len, pStr2, nStr2Len);
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::with_length(pStr2, nStr2Len),
+                             rtl::str::CompareIgnoreAsciiCase(), rtl::str::noShortening);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_shortenedCompareIgnoreAsciiCase_WithLength(
     const sal_Unicode* pStr1, sal_Int32 nStr1Len, const sal_Unicode* pStr2, sal_Int32 nStr2Len,
     sal_Int32 nShortenedLength) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::shortenedCompareIgnoreAsciiCase_WithLength(pStr1, nStr1Len, pStr2, nStr2Len,
-                                                              nShortenedLength);
+    return rtl::str::compare(rtl::str::with_length(pStr1, nStr1Len),
+                             rtl::str::with_length(pStr2, nStr2Len),
+                             rtl::str::CompareIgnoreAsciiCase(), nShortenedLength);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_hashCode(const sal_Unicode* pStr) SAL_THROW_EXTERN_C()
@@ -1668,35 +1087,35 @@ sal_Int32 SAL_CALL rtl_ustr_lastIndexOfStr_WithLength(const sal_Unicode* pStr, s
 void SAL_CALL rtl_ustr_replaceChar(sal_Unicode* pStr, sal_Unicode cOld, sal_Unicode cNew)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::replaceChar(pStr, cOld, cNew);
+    return rtl::str::replaceChars(rtl::str::null_terminated(pStr), rtl::str::FromTo(cOld, cNew));
 }
 
 void SAL_CALL rtl_ustr_replaceChar_WithLength(sal_Unicode* pStr, sal_Int32 nLen, sal_Unicode cOld,
                                               sal_Unicode cNew) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::replaceChar_WithLength(pStr, nLen, cOld, cNew);
+    return rtl::str::replaceChars(rtl::str::with_length(pStr, nLen), rtl::str::FromTo(cOld, cNew));
 }
 
 void SAL_CALL rtl_ustr_toAsciiLowerCase(sal_Unicode* pStr) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toAsciiLowerCase(pStr);
+    return rtl::str::replaceChars(rtl::str::null_terminated(pStr), rtl::str::toAsciiLower);
 }
 
 void SAL_CALL rtl_ustr_toAsciiLowerCase_WithLength(sal_Unicode* pStr, sal_Int32 nLen)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toAsciiLowerCase_WithLength(pStr, nLen);
+    return rtl::str::replaceChars(rtl::str::with_length(pStr, nLen), rtl::str::toAsciiLower);
 }
 
 void SAL_CALL rtl_ustr_toAsciiUpperCase(sal_Unicode* pStr) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toAsciiUpperCase(pStr);
+    return rtl::str::replaceChars(rtl::str::null_terminated(pStr), rtl::str::toAsciiUpper);
 }
 
 void SAL_CALL rtl_ustr_toAsciiUpperCase_WithLength(sal_Unicode* pStr, sal_Int32 nLen)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toAsciiUpperCase_WithLength(pStr, nLen);
+    return rtl::str::replaceChars(rtl::str::with_length(pStr, nLen), rtl::str::toAsciiUpper);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_trim(sal_Unicode* pStr) SAL_THROW_EXTERN_C()
@@ -1722,19 +1141,19 @@ sal_Int32 SAL_CALL rtl_ustr_valueOfChar(sal_Unicode* pStr, sal_Unicode c) SAL_TH
 sal_Int32 SAL_CALL rtl_ustr_valueOfInt32(sal_Unicode* pStr, sal_Int32 n, sal_Int16 nRadix)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::valueOfInt32(pStr, n, nRadix);
+    return rtl::str::valueOfInt<RTL_USTR_MAX_VALUEOFINT32>(pStr, n, nRadix);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_valueOfInt64(sal_Unicode* pStr, sal_Int64 n, sal_Int16 nRadix)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::valueOfInt64(pStr, n, nRadix);
+    return rtl::str::valueOfInt<RTL_USTR_MAX_VALUEOFINT64>(pStr, n, nRadix);
 }
 
 sal_Int32 SAL_CALL rtl_ustr_valueOfUInt64(sal_Unicode* pStr, sal_uInt64 n, sal_Int16 nRadix)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::valueOfUInt64(pStr, n, nRadix);
+    return rtl::str::valueOfInt<RTL_USTR_MAX_VALUEOFUINT64>(pStr, n, nRadix);
 }
 
 sal_Bool SAL_CALL rtl_ustr_toBoolean(const sal_Unicode* pStr) SAL_THROW_EXTERN_C()
@@ -1744,30 +1163,30 @@ sal_Bool SAL_CALL rtl_ustr_toBoolean(const sal_Unicode* pStr) SAL_THROW_EXTERN_C
 
 sal_Int32 SAL_CALL rtl_ustr_toInt32(const sal_Unicode* pStr, sal_Int16 nRadix) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toInt32(pStr, nRadix);
+    return rtl::str::toInt<sal_Int32>(rtl::str::null_terminated(pStr), nRadix);
 }
 
 sal_Int64 SAL_CALL rtl_ustr_toInt64(const sal_Unicode* pStr, sal_Int16 nRadix) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toInt64(pStr, nRadix);
+    return rtl::str::toInt<sal_Int64>(rtl::str::null_terminated(pStr), nRadix);
 }
 
 sal_Int64 SAL_CALL rtl_ustr_toInt64_WithLength(const sal_Unicode* pStr, sal_Int16 nRadix,
                                                sal_Int32 nStrLength) SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toInt64_WithLength(pStr, nRadix, nStrLength);
+    return rtl::str::toInt<sal_Int64>(rtl::str::with_length(pStr, nStrLength), nRadix);
 }
 
 sal_uInt32 SAL_CALL rtl_ustr_toUInt32(const sal_Unicode* pStr, sal_Int16 nRadix)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toUInt32(pStr, nRadix);
+    return rtl::str::toInt<sal_uInt32>(rtl::str::null_terminated(pStr), nRadix);
 }
 
 sal_uInt64 SAL_CALL rtl_ustr_toUInt64(const sal_Unicode* pStr, sal_Int16 nRadix)
     SAL_THROW_EXTERN_C()
 {
-    return rtl::str::toUInt64(pStr, nRadix);
+    return rtl::str::toInt<sal_uInt64>(rtl::str::null_terminated(pStr), nRadix);
 }
 
 rtl_uString* rtl_uString_ImplAlloc(sal_Int32 nLen)
@@ -1830,7 +1249,7 @@ void SAL_CALL rtl_uString_newFromSubString(rtl_uString** ppThis, const rtl_uStri
 void SAL_CALL rtl_uString_newFromLiteral(rtl_uString** ppThis, const char* pCharStr, sal_Int32 nLen,
                                          sal_Int32 allocExtra) SAL_THROW_EXTERN_C()
 {
-    rtl::str::newFromLiteral(ppThis, pCharStr, nLen, allocExtra);
+    rtl::str::newFromStr_WithLength(ppThis, pCharStr, nLen, allocExtra);
 }
 
 void SAL_CALL rtl_uString_assign(rtl_uString** ppThis, rtl_uString* pStr) SAL_THROW_EXTERN_C()
@@ -1882,13 +1301,13 @@ void SAL_CALL rtl_uString_newReplace(rtl_uString** ppThis, rtl_uString* pStr, sa
 void SAL_CALL rtl_uString_newToAsciiLowerCase(rtl_uString** ppThis, rtl_uString* pStr)
     SAL_THROW_EXTERN_C()
 {
-    rtl::str::newToAsciiLowerCase(ppThis, pStr);
+    rtl::str::newReplaceChars<rtl::str::ToAsciiLower>(ppThis, pStr);
 }
 
 void SAL_CALL rtl_uString_newToAsciiUpperCase(rtl_uString** ppThis, rtl_uString* pStr)
     SAL_THROW_EXTERN_C()
 {
-    rtl::str::newToAsciiUpperCase(ppThis, pStr);
+    rtl::str::newReplaceChars<rtl::str::ToAsciiUpper>(ppThis, pStr);
 }
 
 void SAL_CALL rtl_uString_newTrim(rtl_uString** ppThis, rtl_uString* pStr) SAL_THROW_EXTERN_C()

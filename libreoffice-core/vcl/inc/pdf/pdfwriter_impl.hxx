@@ -24,6 +24,7 @@
 #include <map>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <string_view>
 #include <vector>
@@ -55,11 +56,11 @@
 #include <vcl/BinaryDataContainer.hxx>
 
 #include <vcl/filter/pdfobjectcontainer.hxx>
+#include <vcl/settings.hxx>
 #include <pdf/ExternalPDFStreams.hxx>
 #include <pdf/pdfbuildin_fonts.hxx>
-#include <pdf/pdffontcache.hxx>
+#include <salgdi.hxx>
 
-class StyleSettings;
 class FontSubsetInfo;
 class ZCodec;
 class EncHashTransporter;
@@ -282,19 +283,52 @@ struct TransparencyEmit
 };
 
 // font subsets
+
+struct ColorLayer
+{
+    sal_Int32 m_nFontID;
+    sal_uInt8 m_nSubsetGlyphID;
+    uint32_t m_nColorIndex;
+};
+
 class GlyphEmit
 {
     // performance: actually this should probably a vector;
     std::vector<sal_Ucs>            m_CodeUnits;
     sal_uInt8                       m_nSubsetGlyphID;
+    sal_Int32                       m_nGlyphWidth;
+    std::vector<ColorLayer>         m_aColorLayers;
+    font::RawFontData               m_aColorBitmap;
+    tools::Rectangle                m_aRect;
+    basegfx::B2DPolyPolygon         m_aOutline;
 
 public:
-    GlyphEmit() : m_nSubsetGlyphID(0)
+    GlyphEmit() : m_nSubsetGlyphID(0), m_nGlyphWidth(0)
     {
     }
 
     void setGlyphId( sal_uInt8 i_nId ) { m_nSubsetGlyphID = i_nId; }
     sal_uInt8 getGlyphId() const { return m_nSubsetGlyphID; }
+
+    void setGlyphWidth( sal_Int32 nWidth ) { m_nGlyphWidth = nWidth; }
+    sal_Int32 getGlyphWidth() const { return m_nGlyphWidth; }
+
+    void addColorLayer(ColorLayer aLayer) { m_aColorLayers.push_back(aLayer); }
+    const std::vector<ColorLayer>& getColorLayers() const { return m_aColorLayers; }
+
+    void setColorBitmap(font::RawFontData aData, tools::Rectangle aRect)
+    {
+        m_aColorBitmap = aData;
+        m_aRect = aRect;
+    }
+    const font::RawFontData& getColorBitmap(tools::Rectangle& rRect) const
+    {
+        rRect = m_aRect;
+        return m_aColorBitmap;
+    }
+
+    void setOutline(basegfx::B2DPolyPolygon aOutline) { m_aOutline = aOutline; }
+    const basegfx::B2DPolyPolygon& getOutline() const { return m_aOutline; }
 
     void addCode( sal_Ucs i_cCode )
     {
@@ -334,8 +368,11 @@ struct FontSubset
 struct EmbedFont
 {
     sal_Int32                       m_nNormalFontID;
+    LogicalFontInstance*            m_pFontInstance;
 
-    EmbedFont() : m_nNormalFontID( 0 ) {}
+    EmbedFont()
+        : m_nNormalFontID(0)
+        , m_pFontInstance(nullptr) {}
 };
 
 struct PDFDest
@@ -390,10 +427,12 @@ struct PDFLink : public PDFAnnotation
     sal_Int32                   m_nDest; // set to -1 for URL, to a dest else
     OUString               m_aURL;
     sal_Int32                   m_nStructParent; // struct parent entry
+    OUString m_AltText;
 
-    PDFLink()
+    PDFLink(OUString const& rAltText)
             : m_nDest( -1 ),
               m_nStructParent( -1 )
+            , m_AltText(rAltText)
     {}
 };
 
@@ -436,9 +475,14 @@ struct PDFScreen : public PDFAnnotation
     OUString m_aTempFileURL;
     /// ID of the EmbeddedFile object.
     sal_Int32 m_nTempFileObject;
+    /// alternative text description
+    OUString m_AltText;
+    sal_Int32 m_nStructParent;
 
-    PDFScreen()
+    PDFScreen(OUString const& rAltText)
         : m_nTempFileObject(0)
+        , m_AltText(rAltText)
+        , m_nStructParent(-1)
     {
     }
 };
@@ -481,6 +525,8 @@ struct PDFWidget : public PDFAnnotation
     std::vector<sal_Int32>      m_aSelectedEntries;
     typedef std::unordered_map<OString, SvMemoryStream*> PDFAppearanceStreams;
     std::unordered_map<OString, PDFAppearanceStreams> m_aAppearances;
+    sal_Int32 m_nStructParent = -1;
+
     PDFWidget()
             : m_eType( PDFWriter::PushButton ),
               m_nTextStyle( DrawTextFlags::NONE ),
@@ -489,6 +535,9 @@ struct PDFWidget : public PDFAnnotation
               m_nTabOrder( 0 ),
               m_nRadioGroup( -1 ),
               m_nMaxLen( 0 ),
+              m_nFormat( PDFWriter::FormatType::Text ),
+              m_nDecimalAccuracy ( 0 ),
+              m_bPrependCurrencySymbol( false ),
               m_bSubmit( false ),
               m_bSubmitGet( false ),
               m_nDest( -1 )
@@ -539,6 +588,7 @@ struct PDFStructureElement
     std::list< PDFStructureElementKid >                 m_aKids;
     std::map<PDFWriter::StructAttribute, PDFStructureAttribute >
                                                         m_aAttributes;
+    ::std::vector<sal_Int32>                            m_AnnotIds;
     tools::Rectangle                                    m_aBBox;
     OUString                                            m_aActualText;
     OUString                                            m_aAltText;
@@ -572,20 +622,22 @@ struct PDFAddStream
 // helper structure for drawLayout and friends
 struct PDFGlyph
 {
-    Point const       m_aPos;
+    DevicePoint const m_aPos;
     const GlyphItem* m_pGlyph;
+    const LogicalFontInstance* m_pFont;
     sal_Int32 const   m_nNativeWidth;
     sal_Int32 const   m_nMappedFontId;
     sal_uInt8 const   m_nMappedGlyphId;
     int const         m_nCharPos;
 
-    PDFGlyph( const Point& rPos,
+    PDFGlyph( const DevicePoint& rPos,
               const GlyphItem* pGlyph,
+              const LogicalFontInstance* pFont,
               sal_Int32 nNativeWidth,
               sal_Int32 nFontId,
               sal_uInt8 nMappedGlyphId,
               int nCharPos )
-    : m_aPos( rPos ), m_pGlyph(pGlyph), m_nNativeWidth( nNativeWidth ),
+    : m_aPos( rPos ), m_pGlyph(pGlyph), m_pFont(pFont), m_nNativeWidth( nNativeWidth ),
       m_nMappedFontId( nFontId ), m_nMappedGlyphId( nMappedGlyphId ),
       m_nCharPos(nCharPos)
     {}
@@ -639,7 +691,7 @@ class PDFWriterImpl final : public VirtualDevice, public PDFObjectContainer
 public:
     friend struct vcl::pdf::PDFPage;
 
-    static const char* getStructureTag( PDFWriter::StructElement );
+    const char* getStructureTag( PDFWriter::StructElement );
     static const char* getAttributeTag( PDFWriter::StructAttribute eAtr );
     static const char* getAttributeValueTag( PDFWriter::StructAttributeValue eVal );
 
@@ -657,6 +709,7 @@ private:
     void DrawHatchLine_DrawLine(const Point& rStartPoint, const Point& rEndPoint) override;
 
     MapMode                             m_aMapMode; // PDFWriterImpl scaled units
+    StyleSettings                       m_aWidgetStyleSettings;
     std::vector< PDFPage >              m_aPages;
     /* maps object numbers to file offsets (needed for xref) */
     std::vector< sal_uInt64 >           m_aObjects;
@@ -712,6 +765,8 @@ private:
     /* role map of struct tree root */
     std::unordered_map< OString, OString >
                                         m_aRoleMap;
+    /* structure elements (object ids) that should have ID */
+    std::unordered_set<sal_Int32> m_StructElemObjsWithID;
 
     /* contains all widgets used in the PDF
      */
@@ -730,8 +785,8 @@ private:
     /*  contains all font subsets in use */
     std::map<const vcl::font::PhysicalFontFace*, FontSubset> m_aSubsets;
     std::map<const vcl::font::PhysicalFontFace*, EmbedFont> m_aSystemFonts;
+    std::map<const vcl::font::PhysicalFontFace*, FontSubset> m_aType3Fonts;
     sal_Int32                           m_nNextFID;
-    PDFFontCache                        m_aFontCache;
 
     /// Cache some most recent bitmaps we've exported, in case we encounter them again..
     o3tl::lru_map<BitmapChecksum,
@@ -814,12 +869,13 @@ i12626
     void appendLiteralStringEncrypt( std::string_view rInString, const sal_Int32 nInObjectNumber, OStringBuffer& rOutBuffer );
 
     /* creates fonts and subsets that will be emitted later */
-    void registerGlyph(const GlyphItem* pGlyph, const vcl::font::PhysicalFontFace* pFont, const std::vector<sal_Ucs>& rCodeUnits, sal_uInt8& nMappedGlyph, sal_Int32& nMappedFontObject);
+    void registerGlyph(const sal_GlyphId, const vcl::font::PhysicalFontFace*, const LogicalFontInstance* pFont, const std::vector<sal_Ucs>&, sal_Int32, sal_uInt8&, sal_Int32&);
+    void registerSimpleGlyph(const sal_GlyphId, const vcl::font::PhysicalFontFace*, const std::vector<sal_Ucs>&, sal_Int32, sal_uInt8&, sal_Int32&);
 
     /*  emits a text object according to the passed layout */
     /* TODO: remove rText as soon as SalLayout will change so that rText is not necessary anymore */
-    void drawVerticalGlyphs( const std::vector<PDFGlyph>& rGlyphs, OStringBuffer& rLine, const Point& rAlignOffset, const Matrix3& rRotScale, double fAngle, double fXScale, double fSkew, sal_Int32 nFontHeight );
-    void drawHorizontalGlyphs( const std::vector<PDFGlyph>& rGlyphs, OStringBuffer& rLine, const Point& rAlignOffset, bool bFirst, double fAngle, double fXScale, double fSkew, sal_Int32 nFontHeight, sal_Int32 nPixelFontHeight );
+    void drawVerticalGlyphs( const std::vector<PDFGlyph>& rGlyphs, OStringBuffer& rLine, const Point& rAlignOffset, const Matrix3& rRotScale, double fAngle, double fXScale, sal_Int32 nFontHeight );
+    void drawHorizontalGlyphs( const std::vector<PDFGlyph>& rGlyphs, OStringBuffer& rLine, const Point& rAlignOffset, bool bFirst, double fAngle, double fXScale, sal_Int32 nFontHeight, sal_Int32 nPixelFontHeight );
     void drawLayout( SalLayout& rLayout, const OUString& rText, bool bTextLines );
     void drawRelief( SalLayout& rLayout, const OUString& rText, bool bTextLines );
     void drawShadow( SalLayout& rLayout, const OUString& rText, bool bTextLines );
@@ -843,6 +899,7 @@ i12626
 
     /* tries to find the bitmap by its id and returns its emit data if exists,
        else creates a new emit data block */
+    const BitmapEmit& createBitmapEmit( const BitmapEx& rBitmapEx, const Graphic& rGraphic, std::list<BitmapEmit>& rBitmaps, ResourceDict& rResourceDict, std::list<StreamRedirect>& rOutputStreams );
     const BitmapEmit& createBitmapEmit( const BitmapEx& rBitmapEx, const Graphic& rGraphic );
 
     /* writes the Do operation inside the content stream */
@@ -860,11 +917,13 @@ i12626
     sal_Int32 emitBuildinFont( const pdf::BuildinFontFace*, sal_Int32 nObject );
     /* writes a type1 system font object and returns its mapping from font ids to object ids (or 0 in case of failure ) */
     std::map< sal_Int32, sal_Int32 > emitSystemFont(const vcl::font::PhysicalFontFace*, EmbedFont const &);
+    /* writes a type3 font object and appends it to the font id mapping, or returns false in case of failure */
+    bool emitType3Font(const vcl::font::PhysicalFontFace*, const FontSubset&, std::map<sal_Int32, sal_Int32>&);
     /* writes a font descriptor and returns its object id (or 0) */
     sal_Int32 emitFontDescriptor(const vcl::font::PhysicalFontFace*, FontSubsetInfo const &, sal_Int32 nSubsetID, sal_Int32 nStream);
     /* writes a ToUnicode cmap, returns the corresponding stream object */
     sal_Int32 createToUnicodeCMap( sal_uInt8 const * pEncoding, const sal_Ucs* pCodeUnits, const sal_Int32* pCodeUnitsPerGlyph,
-                                   const sal_Int32* pEncToUnicodeIndex, int nGlyphs );
+                                   const sal_Int32* pEncToUnicodeIndex, uint32_t nGlyphs );
 
     /* get resource dict object number */
     sal_Int32 getResourceDictObj()
@@ -881,6 +940,7 @@ i12626
         return m_nFontDictObject;
     }
     /* push resource into current (redirected) resource dict */
+    static void pushResource( ResourceKind eKind, const OString& rResource, sal_Int32 nObject, ResourceDict& rResourceDict, std::list<StreamRedirect>& rOutputStreams );
     void pushResource( ResourceKind eKind, const OString& rResource, sal_Int32 nObject );
 
     void appendBuildinFontsToDict( OStringBuffer& rDict ) const;
@@ -918,6 +978,7 @@ i12626
     sal_Int32 emitNamedDestinations();//i56629
     // writes outline dict and tree
     sal_Int32 emitOutline();
+    template<typename T> void AppendAnnotKid(PDFStructureElement& i_rEle, T & rAnnot);
     // puts the attribute objects of a structure element into the returned string,
     // helper for emitStructure
     OString emitStructureAttributes( PDFStructureElement& rEle );
@@ -931,6 +992,8 @@ i12626
     sal_Int32 emitStructure( PDFStructureElement& rEle );
     // writes structure parent tree
     sal_Int32 emitStructParentTree( sal_Int32 nTreeObject );
+    // writes structure IDTree
+    sal_Int32 emitStructIDTree(sal_Int32 nTreeObject);
     // writes page tree and catalog
     bool emitCatalog();
     // writes signature dictionary object
@@ -1078,12 +1141,10 @@ public:
     Size getCurPageSize() const
     {
         Size aSize;
-        if( m_nCurrentPage >= 0 && m_nCurrentPage < static_cast<sal_Int32>(m_aPages.size()) )
+        if( m_nCurrentPage >= 0 && o3tl::make_unsigned(m_nCurrentPage) < m_aPages.size() )
             aSize = Size( m_aPages[ m_nCurrentPage ].m_nPageWidth, m_aPages[ m_nCurrentPage ].m_nPageHeight );
         return aSize;
     }
-
-    PDFWriter::PDFVersion getVersion() const { return m_aContext.Version; }
 
     void setDocumentLocale( const css::lang::Locale& rLoc )
     { m_aContext.DocumentLocale = rLoc; }
@@ -1183,7 +1244,7 @@ public:
 
     /* actual drawing functions */
     void drawText( const Point& rPos, const OUString& rText, sal_Int32 nIndex, sal_Int32 nLen, bool bTextLines = true );
-    void drawTextArray( const Point& rPos, const OUString& rText, o3tl::span<const sal_Int32> pDXArray, sal_Int32 nIndex, sal_Int32 nLen );
+    void drawTextArray( const Point& rPos, const OUString& rText, KernArraySpan pDXArray, o3tl::span<const sal_Bool> pKashidaArray, sal_Int32 nIndex, sal_Int32 nLen );
     void drawStretchText( const Point& rPos, sal_uLong nWidth, const OUString& rText,
                           sal_Int32 nIndex, sal_Int32 nLen  );
     void drawText( const tools::Rectangle& rRect, const OUString& rOrigStr, DrawTextFlags nStyle );
@@ -1234,7 +1295,7 @@ public:
     sal_Int32   emitDocumentMetadata();
 
     // links
-    sal_Int32 createLink( const tools::Rectangle& rRect, sal_Int32 nPageNr );
+    sal_Int32 createLink(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText);
     sal_Int32 createDest( const tools::Rectangle& rRect, sal_Int32 nPageNr, PDFWriter::DestAreaType eType );
     sal_Int32 registerDestReference( sal_Int32 nDestId, const tools::Rectangle& rRect, sal_Int32 nPageNr, PDFWriter::DestAreaType eType );
     void      setLinkDest( sal_Int32 nLinkId, sal_Int32 nDestId );
@@ -1242,25 +1303,26 @@ public:
     void      setLinkPropertyId( sal_Int32 nLinkId, sal_Int32 nPropertyId );
 
     // screens
-    sal_Int32 createScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr);
+    sal_Int32 createScreen(const tools::Rectangle& rRect, sal_Int32 nPageNr, OUString const& rAltText);
     void setScreenURL(sal_Int32 nScreenId, const OUString& rURL);
     void setScreenStream(sal_Int32 nScreenId, const OUString& rURL);
 
     // outline
-    sal_Int32 createOutlineItem( sal_Int32 nParent, const OUString& rText, sal_Int32 nDestID );
+    sal_Int32 createOutlineItem( sal_Int32 nParent, std::u16string_view rText, sal_Int32 nDestID );
     void      setOutlineItemParent( sal_Int32 nItem, sal_Int32 nNewParent );
-    void      setOutlineItemText( sal_Int32 nItem, const OUString& rText );
+    void      setOutlineItemText( sal_Int32 nItem, std::u16string_view rText );
     void      setOutlineItemDest( sal_Int32 nItem, sal_Int32 nDestID );
 
     // notes
     void createNote( const tools::Rectangle& rRect, const PDFNote& rNote, sal_Int32 nPageNr );
     // structure elements
-    sal_Int32 beginStructureElement( PDFWriter::StructElement eType, const OUString& rAlias );
+    sal_Int32 beginStructureElement( PDFWriter::StructElement eType, std::u16string_view rAlias );
     void endStructureElement();
     bool setCurrentStructureElement( sal_Int32 nElement );
     bool setStructureAttribute( enum PDFWriter::StructAttribute eAttr, enum PDFWriter::StructAttributeValue eVal );
     bool setStructureAttributeNumerical( enum PDFWriter::StructAttribute eAttr, sal_Int32 nValue );
     void setStructureBoundingBox( const tools::Rectangle& rRect );
+    void setStructureAnnotIds(::std::vector<sal_Int32> const& rAnnotIds);
     void setActualText( const OUString& rText );
     void setAlternateText( const OUString& rText );
 

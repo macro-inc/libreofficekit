@@ -50,19 +50,15 @@ class COMPHELPER_DLLPUBLIC MimeConfigurationHelper
 
 public:
 
-    MimeConfigurationHelper( const css::uno::Reference< css::uno::XComponentContext >& rxContext );
+    MimeConfigurationHelper( css::uno::Reference< css::uno::XComponentContext > xContext );
 
 
     static OUString GetStringClassIDRepresentation( const css::uno::Sequence< sal_Int8 >& aClassID );
 
-    static css::uno::Sequence< sal_Int8 > GetSequenceClassIDRepresentation( const OUString& aClassID );
+    static css::uno::Sequence< sal_Int8 > GetSequenceClassIDRepresentation( std::u16string_view aClassID );
 
-
-    css::uno::Reference< css::container::XNameAccess >
-                                            GetConfigurationByPath( const OUString& aPath );
 
     css::uno::Reference< css::container::XNameAccess > GetObjConfiguration();
-
     css::uno::Reference< css::container::XNameAccess > GetVerbsConfiguration();
     css::uno::Reference< css::container::XNameAccess > GetMediaTypeConfiguration();
 

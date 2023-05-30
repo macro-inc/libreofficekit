@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-08-19 12:58+0000\n"
-"Last-Translator: Joan Montané <joan@montane.cat>\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2022-12-21 15:34+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Catalan <https://translations.documentfoundation.org/projects/libo_ui-master/vclmessages/ca/>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1562301320.000000\n"
 
 #. k5jTM
@@ -1057,7 +1057,7 @@ msgstr "Separador"
 #: vcl/inc/strings.hrc:115
 msgctxt "STR_FILEEXT_NONDEFAULT_ASK_TITLE"
 msgid "Default file formats not registered"
-msgstr "Els formats de fitxer predeterminats no estan enregistrats"
+msgstr "Els formats de fitxer per defecte no estan registrats"
 
 #. TDctx
 #: vcl/inc/strings.hrc:116
@@ -1380,11 +1380,11 @@ msgctxt "STR_FONT_FEATURE_ID_FALT"
 msgid "Final Glyph on Line Alternates"
 msgstr "Glifs alternatius a final de línia"
 
-#. rKM4e
+#. q3jvz
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:43
 msgctxt "STR_FONT_FEATURE_ID_FRAC"
-msgid "Fraction style:"
-msgstr "Estil de fraccions:"
+msgid "Fraction style"
+msgstr "Estil de fraccions"
 
 #. FA4Qr
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:44
@@ -1722,6 +1722,12 @@ msgctxt "STR_FONT_FEATURE_ID_ZERO"
 msgid "Slashed Zero"
 msgstr "Zero barrat"
 
+#. 8jmFo
+#: vcl/inc/font/OpenTypeFeatureStrings.hrc:100
+msgctxt "STR_FONT_FEATURE_PARAM_NONE"
+msgid "None"
+msgstr "Cap"
+
 #. TxdMF
 #: vcl/uiconfig/ui/aboutbox.ui:74
 msgctxt "aboutdialog|buildIdLink"
@@ -1835,6 +1841,62 @@ msgstr "No s'ha trobat cap impressora per defecte."
 msgctxt "errornoprinterdialog|ErrorNoPrinterDialog"
 msgid "Please choose a printer and try again."
 msgstr "Seleccioneu una impressora i torneu-ho a intentar."
+
+#. puBNZ
+#: vcl/uiconfig/ui/openlockedquerybox.ui:8
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Document in Use"
+msgstr "Document en ús"
+
+#. 4ZftN
+#: vcl/uiconfig/ui/openlockedquerybox.ui:76
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark image"
+msgstr "Imatge de signe d'interrogació"
+
+#. LCYux
+#: vcl/uiconfig/ui/openlockedquerybox.ui:77
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark icon for dialog box."
+msgstr "Icona de signe d'interrogació per a quadre de diàleg"
+
+#. j4NGP
+#: vcl/uiconfig/ui/openlockedquerybox.ui:100
+msgctxt "openlockedquerybox|messagetext"
+msgid "This file has been locked by another user."
+msgstr "Un altre usuari ha blocat aquest fitxer."
+
+#. sq7go
+#: vcl/uiconfig/ui/openlockedquerybox.ui:124
+msgctxt "openlockedquerybox|ReadOnlyMessage"
+msgid ""
+"You can open it read only  and\n"
+"receive a notification if ready."
+msgstr ""
+"Podeu obrir-lo en mode lectura i \n"
+"rebreu una notificació quan estigui disponible."
+
+#. nFBTF
+#: vcl/uiconfig/ui/openlockedquerybox.ui:142
+msgctxt "openlockedquerybox|OpenCopyMessage"
+msgid ""
+"You can open a copy on your\n"
+"local system."
+msgstr ""
+"Podeu obrir-ne una còpia en el vostre\n"
+"sistema local."
+
+#. W3Sbv
+#: vcl/uiconfig/ui/openlockedquerybox.ui:178
+msgctxt "openlockedquerybox|expandertext"
+msgid "_More Details"
+msgstr "_Més detalls"
+
+#. jEGxc
+#: vcl/uiconfig/ui/openlockedquerybox.ui:264
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Displays information about locked files and further steps to take when opening a locked file."
+msgstr "Mostra informació sobre els fitxers blocats i les passes addicionals que cal fer en obrir un fitxer blocat."
 
 #. DUavz
 #: vcl/uiconfig/ui/printdialog.ui:64

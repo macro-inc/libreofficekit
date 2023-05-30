@@ -19,6 +19,8 @@
 
 $(eval $(call gb_Library_Library,swui))
 
+$(eval $(call gb_Library_set_plugin_for,swui,sw))
+
 $(eval $(call gb_Library_set_include,swui,\
     -I$(SRCDIR)/sw/inc \
     -I$(SRCDIR)/sw/source/uibase/inc \
@@ -55,8 +57,7 @@ $(eval $(call gb_Library_use_libraries,swui,\
     cppu \
     cppuhelper \
     cui \
-    $(call gb_Helper_optional,DBCONNECTIVITY, \
-        dbtools) \
+	dbtools \
     editeng \
     i18nlangtag \
     i18nutil \
@@ -70,12 +71,12 @@ $(eval $(call gb_Library_use_libraries,swui,\
     svx \
     svx \
     svxcore \
-    sw \
     tk \
     tl \
     ucbhelper \
     utl \
     vcl \
+    drawinglayercore \
     drawinglayer \
     lng \
 ))
@@ -141,6 +142,7 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/misc/bookmark \
     sw/source/ui/misc/contentcontroldlg \
     sw/source/ui/misc/contentcontrollistitemdlg \
+    sw/source/ui/misc/pagenumberdlg \
     sw/source/ui/misc/docfnote \
     sw/source/ui/misc/glosbib \
     sw/source/ui/misc/glossary \
@@ -151,7 +153,7 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/misc/pgfnote \
     sw/source/ui/misc/pggrid \
     sw/source/ui/misc/srtdlg \
-    sw/source/ui/misc/translatelangselect \
+    $(if $(ENABLE_CURL),sw/source/ui/misc/translatelangselect) \
     sw/source/ui/misc/swmodalredlineacceptdlg \
     sw/source/ui/misc/titlepage \
     sw/source/ui/table/colwd \
@@ -166,7 +168,6 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/utlui/swrenamexnameddlg \
 ))
 
-ifneq (,$(filter DBCONNECTIVITY,$(BUILD_TYPE)))
 $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/dbui/addresslistdialog \
     sw/source/ui/dbui/createaddresslistdialog \
@@ -182,6 +183,5 @@ $(eval $(call gb_Library_add_exception_objects,swui,\
     sw/source/ui/dbui/mmresultdialogs \
     sw/source/ui/dbui/selectdbtabledialog \
 ))
-endif
 
 # vim: set noet sw=4 ts=4:

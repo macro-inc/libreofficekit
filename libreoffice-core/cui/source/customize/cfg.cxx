@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <typeinfo>
 
+#include <utility>
 #include <vcl/stdtext.hxx>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/event.hxx>
@@ -35,6 +36,7 @@
 #include <vcl/decoview.hxx>
 #include <vcl/virdev.hxx>
 
+#include <sfx2/minfitem.hxx>
 #include <sfx2/sfxhelp.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/filedlghelper.hxx>
@@ -42,7 +44,7 @@
 #include <svl/stritem.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
 #include <algorithm>
@@ -90,7 +92,7 @@
 #include <comphelper/propertysequence.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/processfactory.hxx>
-#include <officecfg/Office/Common.hxx>
+#include <config_features.h>
 
 namespace uno = com::sun::star::uno;
 namespace frame = com::sun::star::frame;
@@ -215,18 +217,29 @@ SvxConfigDialog::SvxConfigDialog(weld::Window * pParent, const SfxItemSet* pInSe
     AddTabPage("keyboard", CreateKeyboardConfigPage, nullptr);
     AddTabPage("events", CreateSvxEventConfigPage, nullptr);
 
-    const SfxPoolItem* pItem =
-        pInSet->GetItem( pInSet->GetPool()->GetWhich( SID_CONFIG ) );
-
-    if ( pItem )
+    if (const SfxPoolItem* pItem = pInSet->GetItem(SID_CONFIG))
     {
         OUString text = static_cast<const SfxStringItem*>(pItem)->GetValue();
-
         if (text.startsWith( ITEM_TOOLBAR_URL ) )
-        {
             SetCurPageId("toolbars");
-        }
+        else if (text.startsWith( ITEM_EVENT_URL) )
+            SetCurPageId("events");
     }
+#if HAVE_FEATURE_SCRIPTING
+    else if (pInSet->GetItemIfSet(SID_MACROINFO))
+    {
+        // for the "assign" button in the Basic Macros chooser automatically switch
+        // to the keyboard tab in which this macro will be pre-selected for assigning
+        // to a keystroke
+        SetCurPageId("keyboard");
+    }
+#endif
+}
+
+void SvxConfigDialog::ActivatePage(const OString& rPage)
+{
+    SfxTabDialogController::ActivatePage(rPage);
+    GetResetButton()->set_visible(rPage != "keyboard");
 }
 
 void SvxConfigDialog::SetFrame(const css::uno::Reference<css::frame::XFrame>& xFrame)
@@ -268,16 +281,16 @@ void SvxConfigDialog::PageCreated(const OString &rId, SfxTabPage& rPage)
 uno::Reference< css::ui::XImageManager>* SaveInData::xDefaultImgMgr = nullptr;
 
 SaveInData::SaveInData(
-    const uno::Reference< css::ui::XUIConfigurationManager >& xCfgMgr,
-    const uno::Reference< css::ui::XUIConfigurationManager >& xParentCfgMgr,
+    uno::Reference< css::ui::XUIConfigurationManager > xCfgMgr,
+    uno::Reference< css::ui::XUIConfigurationManager > xParentCfgMgr,
     const OUString& aModuleId,
     bool isDocConfig )
         :
             bModified( false ),
             bDocConfig( isDocConfig ),
             bReadOnly( false ),
-            m_xCfgMgr( xCfgMgr ),
-            m_xParentCfgMgr( xParentCfgMgr ),
+            m_xCfgMgr(std::move( xCfgMgr )),
+            m_xParentCfgMgr(std::move( xParentCfgMgr )),
             m_aSeparatorSeq{ comphelper::makePropertyValue(ITEM_DESCRIPTOR_TYPE,
                                                            css::ui::ItemType::SEPARATOR_LINE) }
 {
@@ -932,6 +945,7 @@ SvxMenuEntriesListBox::SvxMenuEntriesListBox(std::unique_ptr<weld::TreeView> xCo
     m_xControl->enable_toggle_buttons(weld::ColumnToggleType::Check);
     CreateDropDown();
     m_xControl->connect_key_press(LINK(this, SvxMenuEntriesListBox, KeyInputHdl));
+    m_xControl->connect_query_tooltip(LINK(this, SvxMenuEntriesListBox, QueryTooltip));
 }
 
 SvxMenuEntriesListBox::~SvxMenuEntriesListBox()
@@ -961,6 +975,21 @@ IMPL_LINK(SvxMenuEntriesListBox, KeyInputHdl, const KeyEvent&, rKeyEvent, bool)
         return false; // pass on to default handler
     }
     return true;
+}
+
+IMPL_LINK(SvxMenuEntriesListBox, QueryTooltip, const weld::TreeIter&, rIter, OUString)
+{
+    SvxConfigEntry *pEntry = weld::fromId<SvxConfigEntry*>(m_xControl->get_id(rIter));
+    if (!pEntry || pEntry->GetCommand().isEmpty())
+        return OUString();
+    const OUString sCommand(pEntry->GetCommand());
+    OUString aModuleName(vcl::CommandInfoProvider::GetModuleIdentifier(m_pPage->GetFrame()));
+    auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(sCommand, aModuleName);
+    OUString sTooltipLabel = vcl::CommandInfoProvider::GetTooltipForCommand(sCommand, aProperties,
+                                                                            m_pPage->GetFrame());
+    return CuiResId(RID_CUISTR_COMMANDLABEL) + ": " + pEntry->GetName().replaceFirst("~", "") + "\n" +
+            CuiResId(RID_CUISTR_COMMANDNAME) + ": " + sCommand + "\n" +
+            CuiResId(RID_CUISTR_COMMANDTIP) + ": " + sTooltipLabel.replaceFirst("~", "");
 }
 
 /******************************************************************************
@@ -1023,7 +1052,7 @@ SvxConfigPage::~SvxConfigPage()
     int cnt = m_xSaveInListBox->get_count();
     for(int i=0; i < cnt; ++i)
     {
-        SaveInData *pData = reinterpret_cast<SaveInData*>(m_xSaveInListBox->get_id(i).toInt64());
+        SaveInData *pData = weld::fromId<SaveInData*>(m_xSaveInListBox->get_id(i));
         delete pData;
     }
 }
@@ -1075,7 +1104,7 @@ void SvxConfigPage::Reset( const SfxItemSet* )
 
         if ( pModuleData != nullptr )
         {
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pModuleData)));
+            OUString sId(weld::toId(pModuleData));
             m_xSaveInListBox->append(sId, utl::ConfigManager::getProductName() + " " + aModuleName);
         }
 
@@ -1106,7 +1135,7 @@ void SvxConfigPage::Reset( const SfxItemSet* )
 
             if ( !pDocData->IsReadOnly() )
             {
-                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pDocData)));
+                OUString sId(weld::toId(pDocData));
                 m_xSaveInListBox->append(sId, aTitle);
             }
         }
@@ -1215,7 +1244,7 @@ void SvxConfigPage::Reset( const SfxItemSet* )
 
                             if ( pData && !pData->IsReadOnly() )
                             {
-                                OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pData)));
+                                OUString sId(weld::toId(pData));
                                 m_xSaveInListBox->append(sId, aTitle2);
                             }
                         }
@@ -1285,7 +1314,7 @@ OUString SvxConfigPage::GetScriptURL() const
 {
     OUString result;
 
-    SfxGroupInfo_Impl *pData = reinterpret_cast<SfxGroupInfo_Impl*>(m_xFunctions->get_selected_id().toInt64());
+    SfxGroupInfo_Impl *pData = weld::fromId<SfxGroupInfo_Impl*>(m_xFunctions->get_selected_id());
     if (pData)
     {
         if  (   ( pData->nKind == SfxCfgKind::FUNCTION_SLOT ) ||
@@ -1313,7 +1342,7 @@ bool SvxConfigPage::FillItemSet( SfxItemSet* )
         OUString sId = m_xSaveInListBox->get_id(i);
         if (sId != notebookbarTabScope)
         {
-            SaveInData* pData = reinterpret_cast<SaveInData*>(sId.toInt64());
+            SaveInData* pData = weld::fromId<SaveInData*>(sId);
             result = pData->Apply();
         }
     }
@@ -1324,7 +1353,7 @@ IMPL_LINK_NOARG(SvxConfigPage, SelectSaveInLocation, weld::ComboBox&, void)
 {
     OUString sId = m_xSaveInListBox->get_active_id();
     if (sId != notebookbarTabScope)
-        pCurrentSaveInData = reinterpret_cast<SaveInData*>(sId.toInt64());
+        pCurrentSaveInData = weld::fromId<SaveInData*>(sId);
     Init();
 }
 
@@ -1337,7 +1366,7 @@ void SvxConfigPage::ReloadTopLevelListBox( SvxConfigEntry const * pToSelect )
     {
         for (auto const& entryData : *GetSaveInData()->GetEntries())
         {
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(entryData)));
+            OUString sId(weld::toId(entryData));
             m_xTopLevelListBox->append(sId, SvxConfigPageHelper::stripHotKey(entryData->GetName()));
 
             if (entryData == pToSelect)
@@ -1371,7 +1400,7 @@ void SvxConfigPage::AddSubMenusToUI(
         {
             OUString subMenuTitle = OUString::Concat(rBaseTitle) + aMenuSeparatorStr + SvxConfigPageHelper::stripHotKey(entryData->GetName());
 
-            OUString sId(OUString::number(reinterpret_cast<sal_Int64>(entryData)));
+            OUString sId(weld::toId(entryData));
             m_xTopLevelListBox->append(sId, subMenuTitle);
 
             AddSubMenusToUI( subMenuTitle, entryData );
@@ -1496,7 +1525,7 @@ int SvxConfigPage::AppendEntry(
     int nCurEntry =
         nTarget != -1 ? nTarget : m_xContentsListBox->get_selected_index();
 
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pNewEntryData)));
+    OUString sId(weld::toId(pNewEntryData));
 
     if (nCurEntry == -1 || nCurEntry == m_xContentsListBox->n_children() - 1)
     {
@@ -1507,7 +1536,7 @@ int SvxConfigPage::AppendEntry(
     else
     {
         SvxConfigEntry* pEntryData =
-            reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nCurEntry).toInt64());
+            weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nCurEntry));
 
         SvxEntries::iterator iter = pEntries->begin();
         SvxEntries::const_iterator end = pEntries->end();
@@ -1549,7 +1578,7 @@ namespace
     template<typename itertype> void TmplInsertEntryIntoUI(SvxConfigEntry* pNewEntryData, weld::TreeView& rTreeView, itertype& rIter, SaveInData* pSaveInData,
                                                            VirtualDevice& rDropDown, bool bMenu)
     {
-        OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pNewEntryData)));
+        OUString sId(weld::toId(pNewEntryData));
 
         rTreeView.set_id(rIter, sId);
 
@@ -1619,16 +1648,16 @@ IMPL_LINK_NOARG(SvxConfigPage, SelectFunctionHdl, weld::TreeView&, void)
         }
         else
         {
-            SfxGroupInfo_Impl *pData = reinterpret_cast<SfxGroupInfo_Impl*>(m_xFunctions->get_selected_id().toInt64());
+            SfxGroupInfo_Impl *pData = weld::fromId<SfxGroupInfo_Impl*>(m_xFunctions->get_selected_id());
             if (pData)
             {
                 bool bIsExperimental
                     = vcl::CommandInfoProvider::IsExperimental(pData->sCommand, m_aModuleId);
 
-                OUString aExperimental = "\n" + CuiResId(RID_SVXSTR_COMMANDEXPERIMENTAL);
-                OUString aLabel = CuiResId(RID_SVXSTR_COMMANDLABEL) + ": " + pData->sLabel + "\n";
-                OUString aName = CuiResId(RID_SVXSTR_COMMANDNAME) + ": " + pData->sCommand + "\n";
-                OUString aTip = CuiResId(RID_SVXSTR_COMMANDTIP) + ": " + pData->sTooltip;
+                OUString aExperimental = "\n" + CuiResId(RID_CUISTR_COMMANDEXPERIMENTAL);
+                OUString aLabel = CuiResId(RID_CUISTR_COMMANDLABEL) + ": " + pData->sLabel + "\n";
+                OUString aName = CuiResId(RID_CUISTR_COMMANDNAME) + ": " + pData->sCommand + "\n";
+                OUString aTip = CuiResId(RID_CUISTR_COMMANDTIP) + ": " + pData->sTooltip;
                 if (bIsExperimental)
                     m_xDescriptionField->set_text(aLabel + aName + aTip + aExperimental);
                 else
@@ -1717,32 +1746,30 @@ bool SvxConfigPage::MoveEntryData(int nSourceEntry, int nTargetEntry)
     SvxEntries* pEntries = GetTopLevelSelection()->GetEntries();
 
     SvxConfigEntry* pSourceData =
-        reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nSourceEntry).toInt64());
+        weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nSourceEntry));
 
     SvxConfigEntry* pTargetData =
-        reinterpret_cast<SvxConfigEntry*>(m_xContentsListBox->get_id(nTargetEntry).toInt64());
+        weld::fromId<SvxConfigEntry*>(m_xContentsListBox->get_id(nTargetEntry));
 
-    if ( pSourceData != nullptr && pTargetData != nullptr )
-    {
-        // remove the source entry from our list
-        SvxConfigPageHelper::RemoveEntry( pEntries, pSourceData );
+    if ( pSourceData == nullptr || pTargetData == nullptr )
+        return false;
 
-        SvxEntries::iterator iter = pEntries->begin();
-        SvxEntries::const_iterator end = pEntries->end();
+    // remove the source entry from our list
+    SvxConfigPageHelper::RemoveEntry( pEntries, pSourceData );
 
-        // advance the iterator to the position of the target entry
-        while (*iter != pTargetData && ++iter != end) ;
+    SvxEntries::iterator iter = pEntries->begin();
+    SvxEntries::const_iterator end = pEntries->end();
 
-        // insert the source entry at the position after the target
-        pEntries->insert( ++iter, pSourceData );
+    // advance the iterator to the position of the target entry
+    while (*iter != pTargetData && ++iter != end) ;
 
-        GetSaveInData()->SetModified();
-        GetTopLevelSelection()->SetModified();
+    // insert the source entry at the position after the target
+    pEntries->insert( ++iter, pSourceData );
 
-        return true;
-    }
+    GetSaveInData()->SetModified();
+    GetTopLevelSelection()->SetModified();
 
-    return false;
+    return true;
 }
 
 SvxMainMenuOrganizerDialog::SvxMainMenuOrganizerDialog(
@@ -1763,7 +1790,7 @@ SvxMainMenuOrganizerDialog::SvxMainMenuOrganizerDialog(
         mpEntries.reset( new SvxEntries );
         for (auto const& entry : *entries)
         {
-            m_xMenuListBox->append(OUString::number(reinterpret_cast<sal_uInt64>(entry)),
+            m_xMenuListBox->append(weld::toId(entry),
                                    SvxConfigPageHelper::stripHotKey(entry->GetName()));
             mpEntries->push_back(entry);
             if (entry == selection)
@@ -1776,7 +1803,7 @@ SvxMainMenuOrganizerDialog::SvxMainMenuOrganizerDialog(
     if ( bCreateMenu )
     {
         // Generate custom name for new menu
-        OUString prefix = CuiResId( RID_SVXSTR_NEW_MENU );
+        OUString prefix = CuiResId( RID_CUISTR_NEW_MENU );
 
         OUString newname = SvxConfigPageHelper::generateCustomName( prefix, entries );
         OUString newurl = SvxConfigPageHelper::generateCustomMenuURL( mpEntries.get() );
@@ -1787,7 +1814,7 @@ SvxMainMenuOrganizerDialog::SvxMainMenuOrganizerDialog(
         pNewEntryData->SetUserDefined();
         pNewEntryData->SetMain();
 
-        m_sNewMenuEntryId = OUString::number(reinterpret_cast<sal_uInt64>(pNewEntryData));
+        m_sNewMenuEntryId = weld::toId(pNewEntryData);
         m_xMenuListBox->append(m_sNewMenuEntryId,
                                SvxConfigPageHelper::stripHotKey(pNewEntryData->GetName()));
         m_xMenuListBox->select(m_xMenuListBox->n_children() - 1);
@@ -1803,7 +1830,7 @@ SvxMainMenuOrganizerDialog::SvxMainMenuOrganizerDialog(
         // hide name label and textfield
         m_xMenuBox->hide();
         // change the title
-        m_xDialog->set_title(CuiResId(RID_SVXSTR_MOVE_MENU));
+        m_xDialog->set_title(CuiResId(RID_CUISTR_MOVE_MENU));
     }
 
     m_xMenuListBox->connect_changed(LINK(this, SvxMainMenuOrganizerDialog, SelectHdl));
@@ -1826,7 +1853,7 @@ IMPL_LINK_NOARG(SvxMainMenuOrganizerDialog, ModifyHdl, weld::Entry&, void)
         return;
     }
 
-    SvxConfigEntry* pNewEntryData = reinterpret_cast<SvxConfigEntry*>(m_sNewMenuEntryId.toUInt64());
+    SvxConfigEntry* pNewEntryData = weld::fromId<SvxConfigEntry*>(m_sNewMenuEntryId);
     pNewEntryData->SetName(m_xMenuNameEdit->get_text());
 
     const int nNewMenuPos = m_xMenuListBox->find_id(m_sNewMenuEntryId);
@@ -1883,14 +1910,14 @@ SvxConfigEntry* SvxMainMenuOrganizerDialog::GetSelectedEntry()
     const int nSelected(m_xMenuListBox->get_selected_index());
     if (nSelected == -1)
         return nullptr;
-    return reinterpret_cast<SvxConfigEntry*>(m_xMenuListBox->get_id(nSelected).toUInt64());
+    return weld::fromId<SvxConfigEntry*>(m_xMenuListBox->get_id(nSelected));
 }
 
-SvxConfigEntry::SvxConfigEntry( const OUString& rDisplayName,
-                                const OUString& rCommandURL, bool bPopup, bool bParentData )
+SvxConfigEntry::SvxConfigEntry( OUString aDisplayName,
+                                OUString aCommandURL, bool bPopup, bool bParentData )
     : nId( 1 )
-    , aLabel(rDisplayName)
-    , aCommand(rCommandURL)
+    , aLabel(std::move(aDisplayName))
+    , aCommand(std::move(aCommandURL))
     , bPopUp(bPopup)
     , bStrEdited( false )
     , bIsUserDefined( false )
@@ -2661,7 +2688,6 @@ void ToolbarSaveInData::LoadToolbar(
 SvxNewToolbarDialog::SvxNewToolbarDialog(weld::Window* pWindow, const OUString& rName)
     : GenericDialogController(pWindow, "cui/ui/newtoolbardialog.ui", "NewToolbarDialog")
     , m_xEdtName(m_xBuilder->weld_entry("edit"))
-    , m_xBtnOK(m_xBuilder->weld_button("ok"))
     , m_xSaveInListBox(m_xBuilder->weld_combo_box("savein"))
 {
     m_xEdtName->set_text(rName);
@@ -2678,11 +2704,11 @@ SvxNewToolbarDialog::~SvxNewToolbarDialog()
 *
 *******************************************************************************/
 SvxIconSelectorDialog::SvxIconSelectorDialog(weld::Window *pWindow,
-    const uno::Reference< css::ui::XImageManager >& rXImageManager,
-    const uno::Reference< css::ui::XImageManager >& rXParentImageManager)
+    uno::Reference< css::ui::XImageManager > xImageManager,
+    uno::Reference< css::ui::XImageManager > xParentImageManager)
     : GenericDialogController(pWindow, "cui/ui/iconselectordialog.ui", "IconSelector")
-    , m_xImageManager(rXImageManager)
-    , m_xParentImageManager(rXParentImageManager)
+    , m_xImageManager(std::move(xImageManager))
+    , m_xParentImageManager(std::move(xParentImageManager))
     , m_xTbSymbol(new ValueSet(m_xBuilder->weld_scrolled_window("symbolswin", true)))
     , m_xTbSymbolWin(new weld::CustomWeld(*m_xBuilder, "symbolsToolbar", *m_xTbSymbol))
     , m_xFtNote(m_xBuilder->weld_label("noteLabel"))
@@ -2902,7 +2928,7 @@ IMPL_LINK_NOARG(SvxIconSelectorDialog, ImportHdl, weld::Button&, void)
 
 IMPL_LINK_NOARG(SvxIconSelectorDialog, DeleteHdl, weld::Button&, void)
 {
-    OUString message = CuiResId( RID_SVXSTR_DELETE_ICON_CONFIRM );
+    OUString message = CuiResId( RID_CUISTR_DELETE_ICON_CONFIRM );
 
     std::unique_ptr<weld::MessageDialog> xWarn(Application::CreateMessageDialog(m_xDialog.get(),
                                                VclMessageType::Warning, VclButtonsType::OkCancel,
@@ -2995,7 +3021,7 @@ namespace
     OUString ReplaceIconName(std::u16string_view rMessage)
     {
         OUString name;
-        OUString message = CuiResId( RID_SVXSTR_REPLACE_ICON_WARNING );
+        OUString message = CuiResId( RID_CUISTR_REPLACE_ICON_WARNING );
         OUString placeholder("%ICONNAME" );
         sal_Int32 pos = message.indexOf( placeholder );
         if ( pos != -1 )
@@ -3014,10 +3040,10 @@ namespace
         SvxIconReplacementDialog(weld::Window *pParent, std::u16string_view rMessage, bool bYestoAll)
             : m_xQueryBox(Application::CreateMessageDialog(pParent, VclMessageType::Warning, VclButtonsType::NONE, ReplaceIconName(rMessage)))
         {
-            m_xQueryBox->set_title(CuiResId(RID_SVXSTR_REPLACE_ICON_CONFIRM));
+            m_xQueryBox->set_title(CuiResId(RID_CUISTR_REPLACE_ICON_CONFIRM));
             m_xQueryBox->add_button(GetStandardText(StandardButtonType::Yes), 2);
             if (bYestoAll)
-                m_xQueryBox->add_button(CuiResId(RID_SVXSTR_YESTOALL), 5);
+                m_xQueryBox->add_button(CuiResId(RID_CUISTR_YESTOALL), 5);
             m_xQueryBox->add_button(GetStandardText(StandardButtonType::No), 4);
             m_xQueryBox->add_button(GetStandardText(StandardButtonType::Cancel), 6);
             m_xQueryBox->set_default_response(2);

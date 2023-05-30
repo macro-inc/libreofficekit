@@ -21,11 +21,13 @@
 
 #include <comphelper/lok.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <sfx2/app.hxx>
 #include <editeng/editobj.hxx>
 #include <editeng/justifyitem.hxx>
 #include <sfx2/linkmgr.hxx>
 #include <sfx2/bindings.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/svapp.hxx>
@@ -107,7 +109,6 @@
 #include <config_features.h>
 
 #include <memory>
-#include <utility>
 #include <basic/basmgr.hxx>
 #include <set>
 #include <vector>
@@ -819,13 +820,12 @@ bool ScDocFunc::SetNormalString( bool& o_rbNumFmtSet, const ScAddress& rPos, con
         aOldValue.mnTab = rPos.Tab();
         aOldValue.maCell.assign(rDoc, rPos);
 
-        const SfxPoolItem* pItem;
         const ScPatternAttr* pPattern = rDoc.GetPattern( rPos.Col(),rPos.Row(),rPos.Tab() );
-        if ( SfxItemState::SET == pPattern->GetItemSet().GetItemState(
-                                ATTR_VALUE_FORMAT,false,&pItem) )
+        if ( const SfxUInt32Item* pItem = pPattern->GetItemSet().GetItemIfSet(
+                                ATTR_VALUE_FORMAT,false) )
         {
             aOldValue.mbHasFormat = true;
-            aOldValue.mnFormat = static_cast<const SfxUInt32Item*>(pItem)->GetValue();
+            aOldValue.mnFormat = pItem->GetValue();
         }
         else
             aOldValue.mbHasFormat = false;
@@ -1151,8 +1151,8 @@ namespace {
         sal_Int32   nIndex;
         SfxItemSet  aItemSet;
 
-        ScMyRememberItem(const SfxItemSet& rItemSet, sal_Int32 nTempIndex) :
-            nIndex(nTempIndex), aItemSet(rItemSet) {}
+        ScMyRememberItem(SfxItemSet _aItemSet, sal_Int32 nTempIndex) :
+            nIndex(nTempIndex), aItemSet(std::move(_aItemSet)) {}
     };
 
 }
@@ -1248,9 +1248,9 @@ bool ScDocFunc::SetCellText(
         {
             ScDocument& rDoc = rDocShell.GetDocument();
 
-            ::std::unique_ptr<ScExternalRefManager::ApiGuard> pExtRefGuard;
+            ::std::optional<ScExternalRefManager::ApiGuard> pExtRefGuard;
             if (bApi)
-                pExtRefGuard.reset(new ScExternalRefManager::ApiGuard(rDoc));
+                pExtRefGuard.emplace(rDoc);
 
             ScInputStringType aRes =
                 ScStringUtil::parseInputString(*rDoc.GetFormatTable(), rText, LANGUAGE_ENGLISH_US);
@@ -1997,7 +1997,7 @@ bool ScDocFunc::InsertCells( const ScRange& rRange, const ScMarkData* pTabMark, 
                             rDoc.ExtendOverlapped( aTestRange );
                             rDoc.ExtendMerge( aTestRange, true);
                             ScRange aMergeRange( aTestRange.aStart.Col(),aTestRange.aStart.Row(), i );
-                            if( !aExtendRange.In( aMergeRange ) )
+                            if( !aExtendRange.Contains( aMergeRange ) )
                             {
                                 qIncreaseRange.push_back( aTestRange );
                                 bInsertMerge = true;
@@ -2007,7 +2007,7 @@ bool ScDocFunc::InsertCells( const ScRange& rRange, const ScMarkData* pTabMark, 
                     else
                     {
                         ScRange aMergeRange( aRange.aStart.Col(),aRange.aStart.Row(), i );
-                        if( !aExtendRange.In( aMergeRange ) )
+                        if( !aExtendRange.Contains( aMergeRange ) )
                         {
                             qIncreaseRange.push_back( aRange );
                         }
@@ -2479,7 +2479,7 @@ bool ScDocFunc::DeleteCells( const ScRange& rRange, const ScMarkData* pTabMark, 
                             rDoc.ExtendOverlapped( aTestRange );
                             rDoc.ExtendMerge( aTestRange, true );
                             ScRange aMergeRange( aTestRange.aStart.Col(),aTestRange.aStart.Row(), i );
-                            if( !aExtendRange.In( aMergeRange ) )
+                            if( !aExtendRange.Contains( aMergeRange ) )
                             {
                                 qDecreaseRange.push_back( aTestRange );
                                 bDeletingMerge = true;
@@ -2489,7 +2489,7 @@ bool ScDocFunc::DeleteCells( const ScRange& rRange, const ScMarkData* pTabMark, 
                     else
                     {
                         ScRange aMergeRange( aRange.aStart.Col(),aRange.aStart.Row(), i );
-                        if( !aExtendRange.In( aMergeRange ) )
+                        if( !aExtendRange.Contains( aMergeRange ) )
                         {
                             qDecreaseRange.push_back( aRange );
                         }
@@ -4977,9 +4977,9 @@ bool ScDocFunc::MergeCells( const ScCellMergeOption& rOption, bool bContents, bo
     for (const SCTAB nTab : rOption.maTabs)
     {
         bool bIsBlockEmpty = ( nStartRow == nEndRow )
-                             ? rDoc.IsBlockEmpty( nTab, nStartCol+1,nStartRow, nEndCol,nEndRow, true )
-                             : rDoc.IsBlockEmpty( nTab, nStartCol,nStartRow+1, nStartCol,nEndRow, true ) &&
-                               rDoc.IsBlockEmpty( nTab, nStartCol+1,nStartRow, nEndCol,nEndRow, true );
+                             ? rDoc.IsEmptyData( nStartCol+1,nStartRow, nEndCol,nEndRow, nTab )
+                             : rDoc.IsEmptyData( nStartCol,nStartRow+1, nStartCol,nEndRow, nTab ) &&
+                               rDoc.IsEmptyData( nStartCol+1,nStartRow, nEndCol,nEndRow, nTab );
         bool bNeedContents = bContents && !bIsBlockEmpty;
         bool bNeedEmpty = bEmptyMergedCells && !bIsBlockEmpty && !bNeedContents; // if DoMergeContents then cells are emptied
 
@@ -5000,10 +5000,10 @@ bool ScDocFunc::MergeCells( const ScCellMergeOption& rOption, bool bContents, bo
         }
 
         if (bNeedContents)
-            rDoc.DoMergeContents( nTab, nStartCol,nStartRow, nEndCol,nEndRow );
+            rDoc.DoMergeContents( nStartCol,nStartRow, nEndCol,nEndRow,  nTab );
         else if ( bNeedEmpty )
-            rDoc.DoEmptyBlock( nTab, nStartCol,nStartRow, nEndCol,nEndRow );
-        rDoc.DoMerge( nTab, nStartCol,nStartRow, nEndCol,nEndRow );
+            rDoc.DoEmptyBlock( nStartCol,nStartRow, nEndCol,nEndRow, nTab );
+        rDoc.DoMerge( nStartCol,nStartRow, nEndCol,nEndRow, nTab );
 
         if (rOption.mbCenter)
         {
@@ -5185,7 +5185,7 @@ void ScDocFunc::SetNewRangeNames( std::unique_ptr<ScRangeName> pNewRanges, bool 
     }
 }
 
-void ScDocFunc::ModifyAllRangeNames(const std::map<OUString, std::unique_ptr<ScRangeName>>& rRangeMap)
+void ScDocFunc::ModifyAllRangeNames(const std::map<OUString, ScRangeName>& rRangeMap)
 {
     ScDocShellModificator aModificator(rDocShell);
     ScDocument& rDoc = rDocShell.GetDocument();
@@ -5238,7 +5238,7 @@ void ScDocFunc::CreateOneName( ScRangeName& rList,
             else
             {
                 OUString aTemplate = ScResId( STR_CREATENAME_REPLACE );
-                OUString aMessage = aTemplate.getToken( 0, '#' ) + aName + aTemplate.getToken( 1, '#' );
+                OUString aMessage = o3tl::getToken(aTemplate, 0, '#' ) + aName + o3tl::getToken(aTemplate, 1, '#' );
 
                 std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(ScDocShell::GetActiveDialogParent(),
                                                                VclMessageType::Question, VclButtonsType::YesNo,
@@ -5434,7 +5434,7 @@ bool ScDocFunc::InsertNameList( const ScAddress& rStartPos, bool bApi )
                 pData->GetName(aName);
                 // adjust relative references to the left column in Excel-compliant way:
                 pData->UpdateSymbol(aContent, ScAddress( nStartCol, nOutRow, nTab ));
-                aFormula = "=" + aContent.toString();
+                aFormula = "=" + aContent;
                 ScSetStringParam aParam;
                 aParam.setTextInput();
                 rDoc.SetString(ScAddress(nStartCol,nOutRow,nTab), aName, &aParam);
@@ -5513,7 +5513,7 @@ void ScDocFunc::ResizeMatrix( const ScRange& rOldRange, const ScAddress& rNewEnd
 
 void ScDocFunc::InsertAreaLink( const OUString& rFile, const OUString& rFilter,
                                 const OUString& rOptions, const OUString& rSource,
-                                const ScRange& rDestRange, sal_uLong nRefresh,
+                                const ScRange& rDestRange, sal_Int32 nRefreshDelaySeconds,
                                 bool bFitBlock, bool bApi )
 {
     ScDocument& rDoc = rDocShell.GetDocument();
@@ -5550,7 +5550,7 @@ void ScDocFunc::InsertAreaLink( const OUString& rFile, const OUString& rFilter,
                 rDocShell.GetUndoManager()->AddUndoAction(
                     std::make_unique<ScUndoRemoveAreaLink>( &rDocShell,
                         pOldArea->GetFile(), pOldArea->GetFilter(), pOldArea->GetOptions(),
-                        pOldArea->GetSource(), pOldArea->GetDestArea(), pOldArea->GetRefreshDelay() ) );
+                        pOldArea->GetSource(), pOldArea->GetDestArea(), pOldArea->GetRefreshDelaySeconds() ) );
             }
             pLinkManager->Remove( pBase );
             nLinkCount = pLinkManager->GetLinks().size();
@@ -5570,7 +5570,7 @@ void ScDocFunc::InsertAreaLink( const OUString& rFile, const OUString& rFilter,
     ScDocumentLoader::RemoveAppPrefix( aFilterName );
 
     ScAreaLink* pLink = new ScAreaLink( &rDocShell, rFile, aFilterName,
-                                        aNewOptions, rSource, rDestRange, nRefresh );
+                                        aNewOptions, rSource, rDestRange, nRefreshDelaySeconds );
     OUString aTmp = aFilterName;
     pLinkManager->InsertFileLink( *pLink, sfx2::SvBaseLinkObjectType::ClientFile, rFile, &aTmp, &rSource );
 
@@ -5580,7 +5580,7 @@ void ScDocFunc::InsertAreaLink( const OUString& rFile, const OUString& rFilter,
     {
         rDocShell.GetUndoManager()->AddUndoAction( std::make_unique<ScUndoInsertAreaLink>( &rDocShell,
                                                     rFile, aFilterName, aNewOptions,
-                                                    rSource, rDestRange, nRefresh ) );
+                                                    rSource, rDestRange, nRefreshDelaySeconds ) );
         if ( nRemoved )
             rDocShell.GetUndoManager()->LeaveListAction();  // undo for link update is still separate
     }

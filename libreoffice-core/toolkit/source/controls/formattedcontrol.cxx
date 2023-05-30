@@ -19,14 +19,13 @@
 
 #include <controls/formattedcontrol.hxx>
 #include <toolkit/helper/property.hxx>
-#include <helper/servicenames.hxx>
 
 #include <com/sun/star/awt/XVclWindowPeer.hpp>
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <com/sun/star/util/NumberFormatter.hpp>
 #include <com/sun/star/util/NumberFormatsSupplier.hpp>
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <osl/diagnose.h>
 
@@ -133,6 +132,8 @@ namespace toolkit
         ImplRegisterProperty( BASEPROPERTY_WRITING_MODE );
         ImplRegisterProperty( BASEPROPERTY_CONTEXT_WRITING_MODE );
         ImplRegisterProperty( BASEPROPERTY_MOUSE_WHEEL_BEHAVIOUR );
+        ImplRegisterProperty( BASEPROPERTY_HIGHLIGHT_COLOR );
+        ImplRegisterProperty( BASEPROPERTY_HIGHLIGHT_TEXT_COLOR );
 
         Any aTreatAsNumber;
         aTreatAsNumber <<= true;
@@ -200,8 +201,7 @@ namespace toolkit
                 }
             }
 
-            Reference< XPropertySet > xThis( *this, UNO_QUERY );
-            xThis->setPropertyValue( GetPropertyName( BASEPROPERTY_TEXT ), makeAny( sStringValue ) );
+            setPropertyValue( GetPropertyName( BASEPROPERTY_TEXT ), Any( sStringValue ) );
         }
         catch( const Exception& )
         {
@@ -417,7 +417,7 @@ namespace toolkit
     }
 
 
-    OUString UnoFormattedFieldControl::GetComponentServiceName()
+    OUString UnoFormattedFieldControl::GetComponentServiceName() const
     {
         return "FormattedField";
     }

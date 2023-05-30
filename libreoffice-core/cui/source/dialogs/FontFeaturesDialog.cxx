@@ -10,20 +10,25 @@
 
 #include <FontFeaturesDialog.hxx>
 #include <rtl/ustrbuf.hxx>
+#include <utility>
 #include <vcl/font/FeatureParser.hxx>
 #include <FontFeatures.hxx>
-#include <svtools/colorcfg.hxx>
 #include <unordered_set>
 
 using namespace css;
 
 namespace cui
 {
-FontFeaturesDialog::FontFeaturesDialog(weld::Window* pParent, OUString const& rFontName)
+FontFeaturesDialog::FontFeaturesDialog(weld::Window* pParent, OUString aFontName)
     : GenericDialogController(pParent, "cui/ui/fontfeaturesdialog.ui", "FontFeaturesDialog")
-    , m_sFontName(rFontName)
+    , m_sFontName(std::move(aFontName))
     , m_xContentWindow(m_xBuilder->weld_scrolled_window("contentWindow"))
+    , m_xContentBox(m_xBuilder->weld_container("contentBox"))
     , m_xContentGrid(m_xBuilder->weld_container("contentGrid"))
+    , m_xStylisticSetsBox(m_xBuilder->weld_container("stylisticSetsBox"))
+    , m_xStylisticSetsGrid(m_xBuilder->weld_container("stylisticSetsGrid"))
+    , m_xCharacterVariantsBox(m_xBuilder->weld_container("characterVariantsBox"))
+    , m_xCharacterVariantsGrid(m_xBuilder->weld_container("characterVariantsGrid"))
     , m_xPreviewWindow(new weld::CustomWeld(*m_xBuilder, "preview", m_aPreviewWindow))
 {
     initialize();
@@ -58,7 +63,7 @@ void FontFeaturesDialog::initialize()
 
     for (vcl::font::Feature const& rFontFeature : rFontFeatures)
     {
-        sal_uInt32 nFontFeatureCode = rFontFeature.m_aID.m_aFeatureCode;
+        sal_uInt32 nFontFeatureCode = rFontFeature.m_nCode;
         if (!aDoneFeatures.insert(nFontFeatureCode).second)
             continue;
         rFilteredFontFeatures.push_back(rFontFeature);
@@ -66,9 +71,11 @@ void FontFeaturesDialog::initialize()
 
     int nRowHeight = fillGrid(rFilteredFontFeatures);
 
+    auto nFeaturesHeight = m_xContentBox->get_preferred_size().Height()
+                           + m_xStylisticSetsBox->get_preferred_size().Height()
+                           + m_xCharacterVariantsBox->get_preferred_size().Height();
     m_xContentWindow->set_size_request(
-        -1, std::min(std::max(m_xContentWindow->get_preferred_size().Height(),
-                              m_xContentGrid->get_preferred_size().Height()),
+        -1, std::min(std::max(m_xContentWindow->get_preferred_size().Height(), nFeaturesHeight),
                      static_cast<tools::Long>(300L)));
 
     if (nRowHeight)
@@ -87,10 +94,10 @@ int FontFeaturesDialog::fillGrid(std::vector<vcl::font::Feature> const& rFontFea
     vcl::font::FeatureParser aParser(m_sFontName);
     auto aExistingFeatures = aParser.getFeaturesMap();
 
-    sal_Int32 i = 0;
+    sal_Int32 nIdx, nStylisticSets(0), nCharacterVariants(0), nOtherFeatures(0);
     for (vcl::font::Feature const& rFontFeature : rFontFeatures)
     {
-        sal_uInt32 nFontFeatureCode = rFontFeature.m_aID.m_aFeatureCode;
+        sal_uInt32 nFontFeatureCode = rFontFeature.m_nCode;
 
         vcl::font::FeatureDefinition aDefinition;
         if (rFontFeature.m_aDefinition)
@@ -98,20 +105,39 @@ int FontFeaturesDialog::fillGrid(std::vector<vcl::font::Feature> const& rFontFea
         if (!aDefinition)
             aDefinition = { nFontFeatureCode, "" };
 
-        m_aFeatureItems.emplace_back(m_xContentGrid.get());
+        if (rFontFeature.isStylisticSet())
+        {
+            nIdx = nStylisticSets++;
+            m_xStylisticSetsBox->set_visible(true);
+            m_aFeatureItems.emplace_back(
+                std::make_unique<FontFeatureItem>(m_xStylisticSetsGrid.get()));
+        }
+        else if (rFontFeature.isCharacterVariant())
+        {
+            nIdx = nCharacterVariants++;
+            m_xCharacterVariantsBox->set_visible(true);
+            m_aFeatureItems.emplace_back(
+                std::make_unique<FontFeatureItem>(m_xCharacterVariantsGrid.get()));
+        }
+        else
+        {
+            nIdx = nOtherFeatures++;
+            m_xContentBox->set_visible(true);
+            m_aFeatureItems.emplace_back(std::make_unique<FontFeatureItem>(m_xContentGrid.get()));
+        }
 
-        uint32_t nValue = 0;
+        int32_t nValue = 0;
         if (aExistingFeatures.find(nFontFeatureCode) != aExistingFeatures.end())
             nValue = aExistingFeatures.at(nFontFeatureCode);
         else
             nValue = aDefinition.getDefault();
 
-        FontFeatureItem& aCurrentItem = m_aFeatureItems.back();
+        FontFeatureItem& aCurrentItem = *m_aFeatureItems.back();
         aCurrentItem.m_aFeatureCode = nFontFeatureCode;
         aCurrentItem.m_nDefault = aDefinition.getDefault();
 
-        sal_Int32 nGridPositionX = (i % 2) * 2;
-        sal_Int32 nGridPositionY = i / 2;
+        sal_Int32 nGridPositionX = (nIdx % 2) * 2;
+        sal_Int32 nGridPositionY = nIdx / 2;
         aCurrentItem.m_xContainer->set_grid_left_attach(nGridPositionX);
         aCurrentItem.m_xContainer->set_grid_top_attach(nGridPositionY);
 
@@ -133,16 +159,25 @@ int FontFeaturesDialog::fillGrid(std::vector<vcl::font::Feature> const& rFontFea
         }
         else
         {
-            aCurrentItem.m_xCheck->set_active(nValue > 0);
+            if (nValue < 0)
+            {
+                aCurrentItem.m_xCheck->set_state(TRISTATE_INDET);
+                aCurrentItem.m_aTriStateEnabled.bTriStateEnabled = true;
+                aCurrentItem.m_aTriStateEnabled.eState = TRISTATE_INDET;
+            }
+            else
+            {
+                aCurrentItem.m_xCheck->set_state(nValue > 0 ? TRISTATE_TRUE : TRISTATE_FALSE);
+                aCurrentItem.m_aTriStateEnabled.bTriStateEnabled = false;
+                aCurrentItem.m_aTriStateEnabled.eState = aCurrentItem.m_xCheck->get_state();
+            }
             aCurrentItem.m_xCheck->set_label(aDefinition.getDescription());
-            aCurrentItem.m_xCheck->connect_toggled(aCheckBoxToggleHandler);
+            aCurrentItem.m_aToggleHdl = aCheckBoxToggleHandler;
             aCurrentItem.m_xCheck->show();
         }
 
         nRowHeight
             = std::max<int>(nRowHeight, aCurrentItem.m_xContainer->get_preferred_size().Height());
-
-        i++;
     }
 
     return nRowHeight;
@@ -163,6 +198,13 @@ void FontFeaturesDialog::updateFontPreview()
     m_aPreviewWindow.SetFont(rPreviewFont, rPreviewFontCJK, rPreviewFontCTL);
 }
 
+IMPL_LINK(FontFeatureItem, CheckBoxToggledHdl, weld::Toggleable&, rToggle, void)
+{
+    m_aTriStateEnabled.ButtonToggled(rToggle);
+    m_aTriStateEnabled.bTriStateEnabled = false;
+    m_aToggleHdl.Call(rToggle);
+}
+
 IMPL_LINK_NOARG(FontFeaturesDialog, CheckBoxToggledHdl, weld::Toggleable&, void)
 {
     updateFontPreview();
@@ -179,11 +221,12 @@ OUString FontFeaturesDialog::createFontNameWithFeatures()
     OUStringBuffer sNameSuffix;
     bool bFirst = true;
 
-    for (const FontFeatureItem& rItem : m_aFeatureItems)
+    for (const auto& rEntry : m_aFeatureItems)
     {
+        const FontFeatureItem& rItem(*rEntry);
         if (rItem.m_xCheck->get_visible())
         {
-            if (sal_uInt32(rItem.m_xCheck->get_active()) != rItem.m_nDefault)
+            if (rItem.m_xCheck->get_state() != TRISTATE_INDET)
             {
                 if (!bFirst)
                     sNameSuffix.append(vcl::font::FeatureSeparator);
@@ -191,7 +234,7 @@ OUString FontFeaturesDialog::createFontNameWithFeatures()
                     bFirst = false;
 
                 sNameSuffix.append(vcl::font::featureCodeAsString(rItem.m_aFeatureCode));
-                if (!rItem.m_xCheck->get_active())
+                if (rItem.m_xCheck->get_state() == TRISTATE_FALSE)
                     sNameSuffix.append("=0");
             }
         }
@@ -213,8 +256,7 @@ OUString FontFeaturesDialog::createFontNameWithFeatures()
     }
     sResultFontName = vcl::font::trimFontNameFeatures(m_sFontName);
     if (!sNameSuffix.isEmpty())
-        sResultFontName
-            += OUStringChar(vcl::font::FeaturePrefix) + sNameSuffix.makeStringAndClear();
+        sResultFontName += OUStringChar(vcl::font::FeaturePrefix) + sNameSuffix;
     return sResultFontName;
 }
 

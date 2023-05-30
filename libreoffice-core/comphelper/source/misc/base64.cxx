@@ -17,10 +17,15 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include <comphelper/base64.hxx>
 
 #include <com/sun/star/uno/Sequence.hxx>
 
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 
 using namespace com::sun::star;
@@ -128,28 +133,28 @@ void Base64::encode(OUStringBuffer& aStrBuffer, const uno::Sequence<sal_Int8>& a
     base64encode(aStrBuffer, aPass);
 }
 
-void Base64::decode(uno::Sequence<sal_Int8>& aBuffer, const OUString& sBuffer)
+void Base64::decode(uno::Sequence<sal_Int8>& aBuffer, std::u16string_view sBuffer)
 {
-    sal_Int32 nCharsDecoded = decodeSomeChars( aBuffer, sBuffer );
-    OSL_ENSURE( nCharsDecoded == sBuffer.getLength(), "some bytes left in base64 decoding!" );
+    std::size_t nCharsDecoded = decodeSomeChars( aBuffer, sBuffer );
+    OSL_ENSURE( nCharsDecoded == sBuffer.size(), "some bytes left in base64 decoding!" );
 }
 
-sal_Int32 Base64::decodeSomeChars(uno::Sequence<sal_Int8>& rOutBuffer, const OUString& rInBuffer)
+std::size_t Base64::decodeSomeChars(uno::Sequence<sal_Int8>& rOutBuffer, std::u16string_view rInBuffer)
 {
-    sal_Int32 nInBufferLen = rInBuffer.getLength();
-    sal_Int32 nMinOutBufferLen = (nInBufferLen / 4) * 3;
-    if( rOutBuffer.getLength() < nMinOutBufferLen )
+    std::size_t nInBufferLen = rInBuffer.size();
+    std::size_t nMinOutBufferLen = (nInBufferLen / 4) * 3;
+    if( o3tl::make_unsigned(rOutBuffer.getLength()) < nMinOutBufferLen )
         rOutBuffer.realloc( nMinOutBufferLen );
 
-    const sal_Unicode *pInBuffer = rInBuffer.getStr();
+    const sal_Unicode *pInBuffer = rInBuffer.data();
     sal_Int8 *pOutBuffer = rOutBuffer.getArray();
     sal_Int8 *pOutBufferStart = pOutBuffer;
-    sal_Int32 nCharsDecoded = 0;
+    std::size_t nCharsDecoded = 0;
 
     sal_uInt8 aDecodeBuffer[4];
     sal_Int32 nBytesToDecode = 0;
     sal_Int32 nBytesGotFromDecoding = 3;
-    sal_Int32 nInBufferPos= 0;
+    std::size_t nInBufferPos= 0;
     while( nInBufferPos < nInBufferLen )
     {
         sal_Unicode cChar = *pInBuffer;

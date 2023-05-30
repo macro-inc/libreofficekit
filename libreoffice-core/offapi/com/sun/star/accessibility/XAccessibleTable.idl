@@ -17,12 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_XAccessibleTable_idl__
-#define __com_sun_star_accessibility_XAccessibleTable_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-#include <com/sun/star/lang/IndexOutOfBoundsException.idl>
-
 module com { module sun { module star { module accessibility {
 
  interface XAccessible;
@@ -44,13 +38,13 @@ module com { module sun { module star { module accessibility {
    XAccessibleTable::getAccessibleColumn().</p>
 
    <p>The range of valid coordinates for this interface are implementation
-   dependent.  However, that range includes at least the intervals from the
+   dependent. However, that range includes at least the intervals
    from the first row or column with the index 0 up to the last (but not
    including) used row or column as returned by
    XAccessibleTable::getAccessibleRowCount() and
    XAccessibleTable::getAccessibleColumnCount().  In case of
-   the Calc the current range of valid indices for retrieving data include
-   the maximal table size--256 columns and 32000 rows--minus one.</p>
+   Calc the current range of valid indices for retrieving data include
+   the maximum table size minus one.</p>
 
     @since OOo 1.1.2
 */
@@ -331,7 +325,7 @@ interface XAccessibleTable : ::com::sun::star::uno::XInterface
             Child index of the specified accessible object or -1 if one or
             both of the given indices is/are invalid.
     */
-    long getAccessibleIndex ([in] long nRow, [in] long nColumn)
+    hyper getAccessibleIndex ([in] long nRow, [in] long nColumn)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Translate the given child index into the corresponding row
@@ -348,7 +342,7 @@ interface XAccessibleTable : ::com::sun::star::uno::XInterface
         @throws ::com::sun::star::lang::IndexOutOfBoundsException
             if nChildIndex addresses an invalid row.
     */
-    long getAccessibleRow ([in] long nChildIndex)
+    long getAccessibleRow ([in] hyper nChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 
     /** Translate the given child index into the corresponding column
@@ -366,12 +360,10 @@ interface XAccessibleTable : ::com::sun::star::uno::XInterface
         @throws ::com::sun::star::lang::IndexOutOfBoundsException
             if nChildIndex addresses an invalid column.
     */
-    long getAccessibleColumn ([in] long nChildIndex)
+    long getAccessibleColumn ([in] hyper nChildIndex)
         raises (::com::sun::star::lang::IndexOutOfBoundsException);
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

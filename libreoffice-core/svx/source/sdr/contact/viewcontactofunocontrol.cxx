@@ -31,6 +31,7 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/primitive2d/controlprimitive2d.hxx>
 #include <drawinglayer/primitive2d/sdrdecompositiontools2d.hxx>
+#include <osl/diagnose.h>
 
 
 namespace sdr::contact {
@@ -86,7 +87,7 @@ namespace sdr::contact {
     }
 
 
-    drawinglayer::primitive2d::Primitive2DContainer ViewContactOfUnoControl::createViewIndependentPrimitive2DSequence() const
+    void ViewContactOfUnoControl::createViewIndependentPrimitive2DSequence(drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) const
     {
         // create range. Use model data directly, not getBoundRect()/getSnapRect; these will use
         // the primitive data themselves in the long run. Use SdrUnoObj's (which is a SdrRectObj)
@@ -110,9 +111,12 @@ namespace sdr::contact {
             const drawinglayer::primitive2d::Primitive2DReference xRetval(
                 new drawinglayer::primitive2d::ControlPrimitive2D(
                     aTransform,
-                    xControlModel));
+                    xControlModel,
+                    nullptr,
+                    GetSdrObject().GetTitle(),
+                    GetSdrObject().GetDescription()));
 
-            return drawinglayer::primitive2d::Primitive2DContainer { xRetval };
+            rVisitor.visit(xRetval);
         }
         else
         {
@@ -121,7 +125,7 @@ namespace sdr::contact {
                 drawinglayer::primitive2d::createHiddenGeometryPrimitives2D(
                     aTransform));
 
-            return drawinglayer::primitive2d::Primitive2DContainer { xRetval };
+            rVisitor.visit(xRetval);
         }
     }
 

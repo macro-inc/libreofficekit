@@ -35,6 +35,7 @@
 #include <svl/itemprop.hxx>
 #include <svl/itempool.hxx>
 #include <memory>
+#include <unordered_map>
 
 using namespace ::com::sun::star;
 
@@ -139,7 +140,13 @@ void SwSearchProperties_Impl::FillItemSet(SfxItemSet& rSet, bool bIsValueSearch)
     pCTLLangItem,
     pCTLPostureItem,
     pCTLWeightItem,
-    pShadowItem ;
+    pShadowItem,
+    pCharReliefItem,
+    pCharRotate,
+    pCharScaleWidth,
+    pParaVertAlign,
+    pParaOrphans,
+    pParaWidows;
 
     auto funcClone = [&rSet](sal_uInt16 nWID, std::unique_ptr<SfxPoolItem> & rpPoolItem)
     {
@@ -151,7 +158,7 @@ void SwSearchProperties_Impl::FillItemSet(SfxItemSet& rSet, bool bIsValueSearch)
     {
         SfxPoolItem* pTempItem = nullptr;
         const SfxItemPropertyMapEntry* pPropEntry = mrMap.getByName(rPair.first);
-        assert(pPropEntry && "SetProperties only enters values into maValues if mrMap.hasPropertyByName() wass true");
+        assert(pPropEntry && "SetProperties only enters values into maValues if mrMap.hasPropertyByName() was true");
         const SfxItemPropertyMapEntry & rPropEntry = *pPropEntry;
         sal_uInt16 nWID = rPropEntry.nWID;
         switch(nWID)
@@ -296,6 +303,24 @@ void SwSearchProperties_Impl::FillItemSet(SfxItemSet& rSet, bool bIsValueSearch)
             break;
             case RES_CHRATR_SHADOW:
                 pTempItem = funcClone(nWID, pShadowItem);
+            break;
+            case RES_CHRATR_RELIEF:
+                pTempItem = funcClone(nWID, pCharReliefItem);
+            break;
+            case RES_CHRATR_ROTATE:
+                pTempItem = funcClone(nWID, pCharRotate);
+            break;
+            case RES_CHRATR_SCALEW:
+                pTempItem = funcClone(nWID, pCharScaleWidth);
+            break;
+            case RES_PARATR_VERTALIGN:
+                pTempItem = funcClone(nWID, pParaVertAlign);
+            break;
+            case RES_PARATR_ORPHANS:
+                pTempItem = funcClone(nWID, pParaOrphans);
+            break;
+            case RES_PARATR_WIDOWS:
+                pTempItem = funcClone(nWID, pParaWidows);
             break;
         }
         if(pTempItem)

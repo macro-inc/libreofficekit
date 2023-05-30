@@ -24,7 +24,6 @@
 #include <doc.hxx>
 #include <IDocumentTimerAccess.hxx>
 #include <o3tl/typed_flags_set.hxx>
-#include <tools/UnitConversion.hxx>
 #include <set>
 #include <vector>
 
@@ -48,6 +47,7 @@ namespace sw {
     };
 
     enum class FieldmarkMode { ShowCommand = 1, ShowResult = 2, ShowBoth = 3 };
+    enum class ParagraphBreakMode { Shown, Hidden };
 };
 
 enum class SwInvalidateFlags
@@ -76,6 +76,8 @@ using SwCurrShells = std::set<CurrShell*>;
 
 class SwSectionFrame;
 using SwDestroyList = o3tl::sorted_vector<SwSectionFrame*>;
+class SwFlyFrame;
+using SwFlyDestroyList = o3tl::sorted_vector<SwFlyFrame*>;
 
 /// The root element of a Writer document layout. Lower frames are expected to
 /// be SwPageFrame instances.
@@ -122,6 +124,7 @@ class SW_DLLPUBLIC SwRootFrame final : public SwLayoutFrame
     bool    mbLayoutFreezed;
     bool    mbHideRedlines;
     sw::FieldmarkMode m_FieldmarkMode;
+    sw::ParagraphBreakMode m_ParagraphBreakMode;
 
     /**
      * For BrowseMode
@@ -169,6 +172,7 @@ class SW_DLLPUBLIC SwRootFrame final : public SwLayoutFrame
     SdrPage *mpDrawPage;
 
     std::unique_ptr<SwDestroyList> mpDestroy;
+    std::unique_ptr<SwFlyDestroyList> mpFlyDestroy;
 
     sal_uInt16  mnPhyPageNums; /// Page count
     sal_uInt16 mnAccessibleShells; // Number of accessible shells
@@ -177,6 +181,8 @@ class SW_DLLPUBLIC SwRootFrame final : public SwLayoutFrame
     void ImplInvalidateBrowseWidth();
 
     void DeleteEmptySct_(); // Destroys the registered SectionFrames
+    /// Destroys the registered FlyFrames.
+    void DeleteEmptyFlys_();
     void RemoveFromList_( SwSectionFrame* pSct ); // Removes SectionFrames from the Delete List
 
     virtual void DestroyImpl() override;
@@ -378,7 +384,11 @@ public:
      * destroyed later on or deregistered.
      */
     void InsertEmptySct( SwSectionFrame* pDel );
+    /// Empty SwFlyFrames are registered here for deletion and destroyed later if they are not
+    /// de-registered in the meantime.
+    void InsertEmptyFly(SwFlyFrame* pDel);
     void DeleteEmptySct() { if( mpDestroy ) DeleteEmptySct_(); }
+    void DeleteEmptyFlys() { if( mpFlyDestroy ) DeleteEmptyFlys_(); }
     void RemoveFromList( SwSectionFrame* pSct ) { if( mpDestroy ) RemoveFromList_( pSct ); }
 #ifdef DBG_UTIL
     bool IsInDelList( SwSectionFrame* pSct ) const;
@@ -422,10 +432,9 @@ public:
     bool IsHideRedlines() const { return mbHideRedlines; }
     void SetHideRedlines(bool);
     sw::FieldmarkMode GetFieldmarkMode() const { return m_FieldmarkMode; }
-    void SetFieldmarkMode(sw::FieldmarkMode);
-    bool HasMergedParas() const {
-        return IsHideRedlines() || GetFieldmarkMode() != sw::FieldmarkMode::ShowBoth;
-    }
+    void SetFieldmarkMode(sw::FieldmarkMode, sw::ParagraphBreakMode);
+    sw::ParagraphBreakMode GetParagraphBreakMode() const { return m_ParagraphBreakMode; }
+    bool HasMergedParas() const;
 };
 
 inline tools::Long SwRootFrame::GetBrowseWidth() const

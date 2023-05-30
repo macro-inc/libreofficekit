@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2021-08-25 05:05+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2022-11-22 13:49+0000\n"
 "Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
 "Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/nn/>\n"
 "Language: nn\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1564508014.000000\n"
 
 #. i8Y7Z
@@ -240,11 +240,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Liste over datoar som er fridagar (feriar, heilagdagar, osv.)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Gjev tilbake verdien SANN dersom talet er eit partal"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr "Returnerer verdien «Sann» viss talet avkorta til heiltal er partal"
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -258,11 +258,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "Talet"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Gjev tilbake verdien SANN dersom talet er eit oddetal"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr "Returnerer verdien «Sann» viss talet avkorta til heiltal er oddetal"
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -426,11 +426,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "Talet som pi er multiplisert med"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Gjev eit vilkårleg heiltal mellom tala du oppgjev"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr "Returnerer eit tilfeldig heiltal mellom dei gjevne botn- og toppverdiane (begge inkluderte)"
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -438,11 +438,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Nedste"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Det minste heiltalet"
+msgid "The smallest integer that can be returned"
+msgstr "Det minste heiltalet som kan returnerast"
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -450,11 +450,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Øvste"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "Det største heiltalet"
+msgid "The largest integer that can be returned"
+msgstr "Det største heiltalet som kan returnerast"
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156

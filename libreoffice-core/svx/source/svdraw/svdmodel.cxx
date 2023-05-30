@@ -29,6 +29,7 @@
 #include <unotools/pathoptions.hxx>
 #include <svl/whiter.hxx>
 #include <svl/asiancfg.hxx>
+#include <svx/compatflags.hxx>
 #include <svx/xbtmpit.hxx>
 #include <svx/xlndsit.hxx>
 #include <svx/xlnedit.hxx>
@@ -38,7 +39,6 @@
 #include <svx/xlnstit.hxx>
 #include <editeng/editeng.hxx>
 #include <svx/xtable.hxx>
-#include <svx/svdtrans.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/svdlayer.hxx>
 #include <svx/svdundo.hxx>
@@ -70,27 +70,45 @@
 #include <libxml/xmlwriter.h>
 #include <sfx2/viewsh.hxx>
 #include <o3tl/enumrange.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/UnitConversion.hxx>
+#include <docmodel/theme/Theme.hxx>
 #include <svx/ColorSets.hxx>
+#include <svx/svditer.hxx>
+#include <svx/svdoashp.hxx>
+
 
 using namespace ::com::sun::star;
-using namespace ::com::sun::star::uno;
-using namespace ::com::sun::star::lang;
-
 
 struct SdrModelImpl
 {
     SfxUndoManager* mpUndoManager;
     SdrUndoFactory* mpUndoFactory;
     bool mbAnchoredTextOverflowLegacy; // tdf#99729 compatibility flag
-    std::unique_ptr<svx::Theme> mpTheme;
+    bool mbLegacySingleLineFontwork;   // tdf#148000 compatibility flag
+    bool mbConnectorUseSnapRect;       // tdf#149756 compatibility flag
+    bool mbIgnoreBreakAfterMultilineField; ///< tdf#148966 compatibility flag
+    std::shared_ptr<model::Theme> mpTheme;
 
     SdrModelImpl()
         : mpUndoManager(nullptr)
         , mpUndoFactory(nullptr)
         , mbAnchoredTextOverflowLegacy(false)
+        , mbLegacySingleLineFontwork(false)
+        , mbConnectorUseSnapRect(false)
+        , mbIgnoreBreakAfterMultilineField(false)
+        , mpTheme(new model::Theme("Office"))
     {}
+
+    void initTheme()
+    {
+        auto const* pColorSet = svx::ColorSets::get().getColorSet(u"LibreOffice");
+        if (pColorSet)
+        {
+            std::unique_ptr<model::ColorSet> pDefaultColorSet(new model::ColorSet(*pColorSet));
+            mpTheme->SetColorSet(std::move(pDefaultColorSet));
+        }
+    }
 };
 
 
@@ -110,6 +128,7 @@ SdrModel::SdrModel(SfxItemPool* pPool, comphelper::IEmbeddedHelper* pEmbeddedHel
     , m_pLinkManager(nullptr)
     , m_nUndoLevel(0)
     , m_bIsWriter(true)
+    , m_bThemedControls(true)
     , mbUndoEnabled(true)
     , mbChanged(false)
     , m_bPagNumsDirty(false)
@@ -121,6 +140,7 @@ SdrModel::SdrModel(SfxItemPool* pPool, comphelper::IEmbeddedHelper* pEmbeddedHel
     , m_bPasteResize(false)
     , m_bStarDrawPreviewMode(false)
     , mbDisableTextEditUsesCommonUndoManager(false)
+    , mbVOCInvalidationIsReliable(false)
     , m_nDefaultTabulator(0)
     , m_nMaxUndoCount(16)
     , m_pTextChain(new TextChain)
@@ -175,6 +195,8 @@ SdrModel::SdrModel(SfxItemPool* pPool, comphelper::IEmbeddedHelper* pEmbeddedHel
     ImpSetOutlinerDefaults(m_pChainingOutliner.get(), true);
 
     ImpCreateTables(bDisablePropertyFiles || utl::ConfigManager::IsFuzzing());
+
+    mpImpl->initTheme();
 }
 
 SdrModel::~SdrModel()
@@ -198,18 +220,12 @@ SdrModel::~SdrModel()
     // SdrObjectLifetimeWatchDog:
     if(!maAllIncarnatedObjects.empty())
     {
-        SAL_WARN("svx","SdrModel::~SdrModel: Not all incarnations of SdrObjects deleted, possible memory leak (!)");
-        const std::vector<const SdrObject*> maRemainingObjects(maAllIncarnatedObjects.begin(),
-                                                               maAllIncarnatedObjects.end());
-        for (auto pSdrObject : maRemainingObjects)
-        {
-            SdrObject* pCandidate(const_cast<SdrObject*>(pSdrObject));
-            // calling SdrObject::Free will change maAllIncarnatedObjects, and potentially remove
-            // more than one, so check if the candidate is still in the updated list before Free
-            if (maAllIncarnatedObjects.find(pSdrObject) != maAllIncarnatedObjects.end())
-                SdrObject::Free(pCandidate);
-        }
+        SAL_WARN("svx",
+            "SdrModel::~SdrModel: Not all incarnations of SdrObjects deleted, possible memory leak");
+        for (const auto & pObj : maAllIncarnatedObjects)
+            SAL_WARN("svx", "leaked instance of " << typeid(*pObj).name());
     }
+    assert(maAllIncarnatedObjects.empty());
 #endif
 
     m_pLayerAdmin.reset();
@@ -225,12 +241,12 @@ SdrModel::~SdrModel()
     // the DrawingEngine may need it in its destructor
     if( mxStyleSheetPool.is() )
     {
-        Reference< XComponent > xComponent( static_cast< cppu::OWeakObject* >( mxStyleSheetPool.get() ), UNO_QUERY );
+        uno::Reference<lang::XComponent> xComponent( static_cast< cppu::OWeakObject* >( mxStyleSheetPool.get() ), uno::UNO_QUERY );
         if( xComponent.is() ) try
         {
             xComponent->dispose();
         }
-        catch( RuntimeException& )
+        catch (uno::RuntimeException&)
         {
         }
         mxStyleSheetPool.clear();
@@ -1573,9 +1589,15 @@ void SdrModel::SetStarDrawPreviewMode(bool bPreview)
     }
 }
 
-void SdrModel::SetTheme(std::unique_ptr<svx::Theme> pTheme) { mpImpl->mpTheme = std::move(pTheme); }
+void SdrModel::setTheme(std::shared_ptr<model::Theme> const& pTheme)
+{
+    mpImpl->mpTheme = pTheme;
+}
 
-svx::Theme* SdrModel::GetTheme() { return mpImpl->mpTheme.get(); }
+std::shared_ptr<model::Theme> const& SdrModel::getTheme() const
+{
+    return mpImpl->mpTheme;
+}
 
 uno::Reference< uno::XInterface > const & SdrModel::getUnoModel()
 {
@@ -1585,7 +1607,7 @@ uno::Reference< uno::XInterface > const & SdrModel::getUnoModel()
     return mxUnoModel;
 }
 
-void SdrModel::setUnoModel( const css::uno::Reference< css::uno::XInterface >& xModel )
+void SdrModel::setUnoModel(const uno::Reference<uno::XInterface>& xModel)
 {
     mxUnoModel = xModel;
 }
@@ -1605,7 +1627,7 @@ void SdrModel::adaptSizeAndBorderForAllPages(
 uno::Reference< uno::XInterface > SdrModel::createUnoModel()
 {
     OSL_FAIL( "SdrModel::createUnoModel() - base implementation should not be called!" );
-    css::uno::Reference< css::uno::XInterface > xInt;
+    uno::Reference<uno::XInterface> xInt;
     return xInt;
 }
 
@@ -1636,7 +1658,7 @@ void SdrModel::MigrateItemSet( const SfxItemSet* pSourceSet, SfxItemSet* pDestSe
 
     while(nWhich)
     {
-        if(SfxItemState::SET == pSourceSet->GetItemState(nWhich, false, &pPoolItem))
+        if(SfxItemState::SET == aWhichIter.GetItemState(false, &pPoolItem))
         {
             std::unique_ptr<SfxPoolItem> pResultItem;
 
@@ -1668,10 +1690,7 @@ void SdrModel::MigrateItemSet( const SfxItemSet* pSourceSet, SfxItemSet* pDestSe
 
             // set item
             if( pResultItem )
-            {
-                pDestSet->Put(*pResultItem);
-                pResultItem.reset();
-            }
+                pDestSet->Put(std::move(pResultItem));
             else
                 pDestSet->Put(*pPoolItem);
         }
@@ -1719,14 +1738,40 @@ void SdrModel::SetAddExtLeading( bool bEnabled )
     }
 }
 
-void SdrModel::SetAnchoredTextOverflowLegacy(bool bEnabled)
+void SdrModel::SetCompatibilityFlag(SdrCompatibilityFlag eFlag, bool bEnabled)
 {
-    mpImpl->mbAnchoredTextOverflowLegacy = bEnabled;
+    switch (eFlag)
+    {
+        case SdrCompatibilityFlag::AnchoredTextOverflowLegacy:
+            mpImpl->mbAnchoredTextOverflowLegacy = bEnabled;
+            break;
+        case SdrCompatibilityFlag::LegacySingleLineFontwork:
+            mpImpl->mbLegacySingleLineFontwork = bEnabled;
+            break;
+        case SdrCompatibilityFlag::ConnectorUseSnapRect:
+            mpImpl->mbConnectorUseSnapRect = bEnabled;
+            break;
+        case SdrCompatibilityFlag::IgnoreBreakAfterMultilineField:
+            mpImpl->mbIgnoreBreakAfterMultilineField = bEnabled;
+            break;
+    }
 }
 
-bool SdrModel::IsAnchoredTextOverflowLegacy() const
+bool SdrModel::GetCompatibilityFlag(SdrCompatibilityFlag eFlag) const
 {
-    return mpImpl->mbAnchoredTextOverflowLegacy;
+    switch (eFlag)
+    {
+        case SdrCompatibilityFlag::AnchoredTextOverflowLegacy:
+            return mpImpl->mbAnchoredTextOverflowLegacy;
+        case SdrCompatibilityFlag::LegacySingleLineFontwork:
+            return mpImpl->mbLegacySingleLineFontwork;
+        case SdrCompatibilityFlag::ConnectorUseSnapRect:
+            return mpImpl->mbConnectorUseSnapRect;
+        case SdrCompatibilityFlag::IgnoreBreakAfterMultilineField:
+            return mpImpl->mbIgnoreBreakAfterMultilineField;
+        default:
+            return false;
+    }
 }
 
 void SdrModel::ReformatAllTextObjects()
@@ -1762,7 +1807,7 @@ SvxNumType SdrModel::GetPageNumType() const
     return SVX_NUM_ARABIC;
 }
 
-void SdrModel::ReadUserDataSequenceValue(const css::beans::PropertyValue* pValue)
+void SdrModel::ReadUserDataSequenceValue(const beans::PropertyValue* pValue)
 {
     if (pValue->Name == "AnchoredTextOverflowLegacy")
     {
@@ -1772,23 +1817,72 @@ void SdrModel::ReadUserDataSequenceValue(const css::beans::PropertyValue* pValue
             mpImpl->mbAnchoredTextOverflowLegacy = bBool;
         }
     }
+    else if (pValue->Name == "ConnectorUseSnapRect")
+    {
+        bool bBool = false;
+        if (pValue->Value >>= bBool)
+        {
+            mpImpl->mbConnectorUseSnapRect = bBool;
+        }
+    }
+    else if (pValue->Name == "LegacySingleLineFontwork")
+    {
+        bool bBool = false;
+        if (pValue->Value >>= bBool)
+        {
+            mpImpl->mbLegacySingleLineFontwork = bBool;
+            // tdf#148000 hack: reset all CustomShape geometry as they may depend on this property
+            // Ideally this ReadUserDataSequenceValue should be called before geometry creation
+            // Once the calling order will be fixed, this hack will not be needed.
+            for (size_t i = 0; i < maPages.size(); ++i)
+            {
+                if (const SdrPage* pPage = maPages[i].get())
+                {
+                    SdrObjListIter aIter(pPage, SdrIterMode::DeepWithGroups);
+                    while (aIter.IsMore())
+                    {
+                        SdrObject* pTempObj = aIter.Next();
+                        if (SdrObjCustomShape* pShape = dynamic_cast<SdrObjCustomShape*>(pTempObj))
+                        {
+                            pShape->InvalidateRenderGeometry();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if (pValue->Name == "IgnoreBreakAfterMultilineField")
+    {
+        bool bBool = false;
+        if (pValue->Value >>= bBool)
+        {
+            mpImpl->mbIgnoreBreakAfterMultilineField = bBool;
+        }
+    }
 }
 
 template <typename T>
-static void addPair(std::vector< std::pair< OUString, Any > >& aUserData, const OUString& name, const T val)
+static void addPair(std::vector< std::pair< OUString, uno::Any > >& aUserData, const OUString& name, const T val)
 {
-    aUserData.push_back(std::pair< OUString, Any >(name, css::uno::makeAny(val)));
+    aUserData.push_back(std::pair< OUString, uno::Any >(name, uno::Any(val)));
 }
 
-void SdrModel::WriteUserDataSequence(css::uno::Sequence < css::beans::PropertyValue >& rValues)
+void SdrModel::WriteUserDataSequence(uno::Sequence <beans::PropertyValue>& rValues)
 {
-    std::vector< std::pair< OUString, Any > > aUserData;
-    addPair(aUserData, "AnchoredTextOverflowLegacy", IsAnchoredTextOverflowLegacy());
+    std::vector< std::pair< OUString, uno::Any > > aUserData;
+    addPair(aUserData, "AnchoredTextOverflowLegacy",
+            GetCompatibilityFlag(SdrCompatibilityFlag::AnchoredTextOverflowLegacy));
+    addPair(aUserData, "LegacySingleLineFontwork",
+            GetCompatibilityFlag(SdrCompatibilityFlag::LegacySingleLineFontwork));
+    addPair(aUserData, "ConnectorUseSnapRect",
+            GetCompatibilityFlag(SdrCompatibilityFlag::ConnectorUseSnapRect));
+    addPair(aUserData, "IgnoreBreakAfterMultilineField",
+            GetCompatibilityFlag(SdrCompatibilityFlag::IgnoreBreakAfterMultilineField));
 
     const sal_Int32 nOldLength = rValues.getLength();
     rValues.realloc(nOldLength + aUserData.size());
 
-    css::beans::PropertyValue* pValue = &(rValues.getArray()[nOldLength]);
+    beans::PropertyValue* pValue = &(rValues.getArray()[nOldLength]);
 
     for (const auto &aIter : aUserData)
     {
@@ -1902,7 +1996,7 @@ void SdrModel::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterEndElement(pWriter);
 }
 
-const css::uno::Sequence< sal_Int8 >& SdrModel::getUnoTunnelId()
+const uno::Sequence<sal_Int8>& SdrModel::getUnoTunnelId()
 {
     static const comphelper::UnoIdInit theSdrModelUnoTunnelImplementationId;
     return theSdrModelUnoTunnelImplementationId.getSeq();

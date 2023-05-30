@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/safeint.hxx>
 #include <unotools/fontdefs.hxx>
 #include <unotools/fontcfg.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -225,6 +226,29 @@ OUString StripScriptFromName(const OUString& _aName)
     return aName;
 }
 
+//return true if the character is stripped from the string
+static bool toOnlyLowerAsciiOrStrip(sal_Unicode c, OUStringBuffer &rName, sal_Int32 nIndex, sal_Int32& rLen)
+{
+    // not lowercase Ascii
+    if (c < 'a' || c > 'z')
+    {
+        // To Lowercase-Ascii
+        if ( (c >= 'A') && (c <= 'Z') )
+        {
+            c += 'a' - 'A';
+            rName[nIndex] = c;
+        }
+        else if( ((c < '0') || (c > '9')) && (c != ';') && (c != '(') && (c != ')') ) // not 0-9, semicolon, or brackets
+        {
+            // Remove white spaces and special characters
+            rName.remove(nIndex, 1);
+            rLen--;
+            return true;
+        }
+    }
+    return false;
+}
+
 OUString GetEnglishSearchFontName(std::u16string_view rInName)
 {
     OUStringBuffer rName(rInName);
@@ -253,12 +277,9 @@ OUString GetEnglishSearchFontName(std::u16string_view rInName)
             if ( (c >= 0xFF00) && (c <= 0xFF5E) )
             {
                 c -= 0xFF00-0x0020;
-                // Upper to Lower
-                if ( (c >= 'A') && (c <= 'Z') )
-                    c += 'a' - 'A';
-
                 rName[ i ] = c;
-
+                if (toOnlyLowerAsciiOrStrip(c, rName, i, nLen))
+                   continue;
             }
             else
             {
@@ -266,23 +287,8 @@ OUString GetEnglishSearchFontName(std::u16string_view rInName)
                 bNeedTranslation = true;
             }
         }
-        // not lowercase Ascii
-        else if ( (c < 'a') || (c > 'z') )
-        {
-            // To Lowercase-Ascii
-            if ( (c >= 'A') && (c <= 'Z') )
-            {
-                c += 'a' - 'A';
-                rName[ i ] = c;
-            }
-            else if( ((c < '0') || (c > '9')) && (c != ';') && (c != '(') && (c != ')') ) // not 0-9, semicolon, or brackets
-            {
-                // Remove white spaces and special characters
-                rName.remove(i,1);
-                nLen--;
-                continue;
-            }
-        }
+        else if (toOnlyLowerAsciiOrStrip(c, rName, i, nLen))
+            continue;
 
         i++;
     }
@@ -290,7 +296,7 @@ OUString GetEnglishSearchFontName(std::u16string_view rInName)
     // translate normalized localized name to its normalized English ASCII name
     if( bNeedTranslation )
     {
-        typedef std::unordered_map<OUString, const char*> FontNameDictionary;
+        typedef std::unordered_map<OUString, OUString> FontNameDictionary;
         static FontNameDictionary const aDictionary = {
             {aBatang, "batang"},
             {aBatangChe, "batangche"},
@@ -451,25 +457,25 @@ OUString GetEnglishSearchFontName(std::u16string_view rInName)
 
         FontNameDictionary::const_iterator it = aDictionary.find( rNameStr );
         if( it != aDictionary.end() )
-            rNameStr = OUString::createFromAscii ( it->second );
+            rNameStr = it->second;
     }
 
     return rNameStr;
 }
 
-OUString GetNextFontToken( const OUString& rTokenStr, sal_Int32& rIndex )
+std::u16string_view GetNextFontToken( std::u16string_view rTokenStr, sal_Int32& rIndex )
 {
     // check for valid start index
-    sal_Int32 nStringLen = rTokenStr.getLength();
-    if( rIndex >= nStringLen )
+    size_t nStringLen = rTokenStr.size();
+    if( o3tl::make_unsigned(rIndex) >= nStringLen )
     {
         rIndex = -1;
-        return OUString();
+        return {};
     }
 
     // find the next token delimiter and return the token substring
-    const sal_Unicode* pStr = rTokenStr.getStr() + rIndex;
-    const sal_Unicode* pEnd = rTokenStr.getStr() + nStringLen;
+    const sal_Unicode* pStr = rTokenStr.data() + rIndex;
+    const sal_Unicode* pEnd = rTokenStr.data() + nStringLen;
     for(; pStr < pEnd; ++pStr )
         if( (*pStr == ';') || (*pStr == ',') )
             break;
@@ -478,7 +484,7 @@ OUString GetNextFontToken( const OUString& rTokenStr, sal_Int32& rIndex )
     sal_Int32 nTokenLen;
     if( pStr < pEnd )
     {
-        rIndex = sal::static_int_cast<sal_Int32>(pStr - rTokenStr.getStr());
+        rIndex = sal::static_int_cast<sal_Int32>(pStr - rTokenStr.data());
         nTokenLen = rIndex - nTokenStart;
         ++rIndex; // skip over token separator
     }
@@ -498,10 +504,10 @@ OUString GetNextFontToken( const OUString& rTokenStr, sal_Int32& rIndex )
         }
     }
 
-    return rTokenStr.copy( nTokenStart, nTokenLen );
+    return rTokenStr.substr( nTokenStart, nTokenLen );
 }
 
-static bool ImplIsFontToken( const OUString& rName, std::u16string_view rToken )
+static bool ImplIsFontToken( std::u16string_view rName, std::u16string_view rToken )
 {
     OUString      aTempName;
     sal_Int32  nIndex = 0;
@@ -531,7 +537,7 @@ void AddTokenFontName( OUString& rName, std::u16string_view rNewToken )
         ImplAppendFontToken( rName, rNewToken );
 }
 
-OUString GetSubsFontName( const OUString& rName, SubsFontFlags nFlags )
+OUString GetSubsFontName( std::u16string_view rName, SubsFontFlags nFlags )
 {
     OUString aName;
 
@@ -545,24 +551,25 @@ OUString GetSubsFontName( const OUString& rName, SubsFontFlags nFlags )
       ||  aOrgName == "opensymbol" ) )
         return aName;
 
-    const utl::FontNameAttr* pAttr = utl::FontSubstConfiguration::get().getSubstInfo( aOrgName );
-    if ( pAttr && (nFlags & SubsFontFlags::MS) )
+    if (nFlags & SubsFontFlags::MS)
     {
-        for( const auto& rSubstitution : pAttr->MSSubstitutions )
-            if( ! ImplIsFontToken( rName, rSubstitution ) )
-            {
-                ImplAppendFontToken( aName, rSubstitution );
-                if( nFlags & SubsFontFlags::ONLYONE )
+        const utl::FontNameAttr* pAttr = utl::FontSubstConfiguration::get().getSubstInfo( aOrgName );
+        if (pAttr)
+            for( const auto& rSubstitution : pAttr->MSSubstitutions )
+                if( ! ImplIsFontToken( rName, rSubstitution ) )
                 {
-                    break;
+                    ImplAppendFontToken( aName, rSubstitution );
+                    if( nFlags & SubsFontFlags::ONLYONE )
+                    {
+                        break;
+                    }
                 }
-            }
     }
 
     return aName;
 }
 
-bool IsStarSymbol(const OUString &rFontName)
+bool IsOpenSymbol(std::u16string_view rFontName)
 {
     sal_Int32 nIndex = 0;
     OUString sFamilyNm(GetNextFontToken(rFontName, nIndex));

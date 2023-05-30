@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_VCL_SOURCE_FILTER_WMF_WMFWR_HXX
-#define INCLUDED_VCL_SOURCE_FILTER_WMF_WMFWR_HXX
+#pragma once
 
 #include <vcl/gdimtf.hxx>
 #include <vcl/lineinfo.hxx>
@@ -142,11 +141,11 @@ private:
     void WMFRecord_DeleteObject(sal_uInt16 nObjectHandle);
     void WMFRecord_Ellipse(const tools::Rectangle& rRect);
     void WMFRecord_Escape( sal_uInt32 nEsc, sal_uInt32 nLen, const sal_Int8* pData );
-    bool WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& rStr, o3tl::span<const sal_Int32> pDXAry );
-    void WMFRecord_ExtTextOut(const Point& rPoint, const OUString& rString, o3tl::span<const sal_Int32> pDXAry);
+    bool WMFRecord_Escape_Unicode( const Point& rPoint, const OUString& rStr, KernArraySpan pDXAry );
+    void WMFRecord_ExtTextOut(const Point& rPoint, std::u16string_view rString, KernArraySpan pDXAry);
 
-    void TrueExtTextOut(const Point& rPoint, const OUString& rString,
-                        const OString& rByteString, o3tl::span<const sal_Int32> pDXAry);
+    void TrueExtTextOut(const Point& rPoint, std::u16string_view rString,
+                        const OString& rByteString, KernArraySpan pDXAry);
     void TrueTextOut(const Point& rPoint, const OString& rString);
     void WMFRecord_LineTo(const Point & rPoint);
     void WMFRecord_MoveTo(const Point & rPoint);
@@ -199,7 +198,5 @@ public:
     WMFWriter();
     bool WriteWMF(const GDIMetaFile & rMTF, SvStream & rTargetStream, FilterConfigItem const * pFilterConfigItem, bool bPlaceable);
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

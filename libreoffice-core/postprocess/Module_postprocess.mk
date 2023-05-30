@@ -13,6 +13,7 @@ $(eval $(call gb_Module_Module,postprocess))
 # is reused in Package_registry!
 
 $(eval $(call gb_Module_add_targets,postprocess,\
+    $(if $(ENABLE_CUSTOMTARGET_COMPONENTS),CustomTarget_components) \
 	CustomTarget_registry \
 	Rdb_services \
 ))
@@ -39,7 +40,7 @@ endif
 # contain content from at least one of external/more_fonts/fc_local.snippet
 # (conditional on MORE_FONTS in BUILD_TYPE) and
 # extras/source/truetype/symbol/fc_local.snippet (unconditional):
-ifneq ($(DISABLE_GUI)$(filter ANDROID,$(OS)),)
+ifneq ($(DISABLE_GUI)$(filter ANDROID EMSCRIPTEN,$(OS)),)
 $(eval $(call gb_Module_add_targets,postprocess, \
     CustomTarget_fontconfig \
     Package_fontconfig \

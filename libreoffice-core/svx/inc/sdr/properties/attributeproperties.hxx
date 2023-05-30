@@ -39,9 +39,6 @@ namespace sdr::properties
             void ImpRemoveStyleSheet();
 
         protected:
-            // the StyleSheet of this object
-            SfxStyleSheet*                                  mpStyleSheet;
-
             // create a new itemset
             virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) override;
 
@@ -49,7 +46,10 @@ namespace sdr::properties
             virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) override;
 
             // react on ItemSet changes
-            virtual void ItemSetChanged(const SfxItemSet*) override;
+            virtual void ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich) override;
+
+            // apply the correct SfyStyleSheet from SdrObject's SdrModel
+            virtual void applyDefaultStyleSheetFromSdrModel();
 
         public:
             // basic constructor
@@ -69,7 +69,8 @@ namespace sdr::properties
             virtual ~AttributeProperties() override;
 
             // set a new StyleSheet and broadcast
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) override;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) override;
 
             // get the installed StyleSheet
             virtual SfxStyleSheet* GetStyleSheet() const override;
@@ -82,6 +83,9 @@ namespace sdr::properties
             virtual void Notify(SfxBroadcaster& rBC, const SfxHint& rHint) override;
 
             virtual bool isUsedByModel() const override;
+        private:
+            // the StyleSheet of this object
+            SfxStyleSheet*                                  mpStyleSheet;
         };
 
 } // end of namespace sdr::properties

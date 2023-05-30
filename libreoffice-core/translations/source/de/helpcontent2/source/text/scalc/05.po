@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:19+0100\n"
-"PO-Revision-Date: 2022-07-01 16:23+0000\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-11-22 14:11+0000\n"
 "Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textscalc05/de/>\n"
 "Language: de\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: LibreOffice\n"
 "X-POOTLE-MTIME: 1565271401.000000\n"
 
 #. Cxzki
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>error codes;list of</bookmark_value>"
 msgstr "<bookmark_value>Fehlercodes; Liste</bookmark_value>"
 
-#. tQSnG
+#. EYAcn
 #: 02140000.xhp
 msgctxt ""
 "02140000.xhp\n"
 "hd_id3146797\n"
 "help.text"
-msgid "<link href=\"text/scalc/05/02140000.xhp\" name=\"Error Codes in %PRODUCTNAME Calc\">Error Codes in <item type=\"productname\">%PRODUCTNAME</item> Calc</link>"
-msgstr "<link href=\"text/scalc/05/02140000.xhp\" name=\"Fehlercodes in %PRODUCTNAME Calc\">Fehlercodes in <item type=\"productname\">%PRODUCTNAME</item> Calc</link>"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error Codes in <item type=\"productname\">%PRODUCTNAME</item> Calc</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Fehlercodes in <item type=\"productname\">%PRODUCTNAME</item> Calc</link>"
 
 #. B8xxG
 #: 02140000.xhp
@@ -50,7 +50,7 @@ msgctxt ""
 "par_id3150275\n"
 "help.text"
 msgid "The following table is an overview of the error messages for <item type=\"productname\">%PRODUCTNAME</item> Calc. If the error occurs in the cell that contains the cursor, the error message is displayed on the <emph>Status Bar</emph>."
-msgstr "Die folgende Tabelle zeigt die Fehlermeldungen für <item type=\"productname\">%PRODUCTNAME</item> Calc im Überblick. Wenn der Fehler in der Zelle auftritt, in der sich der Cursor befindet, wird die Fehlermeldung in der <emph>Statusleiste</emph> angezeigt."
+msgstr "Die folgende Tabelle zeigt eine Übersicht über die Fehlermeldungen für <item type=\"productname\">%PRODUCTNAME</item> Calc. Wenn der Fehler in der Zelle auftritt, in der sich der Cursor befindet, wird die Fehlermeldung in der <emph>Statusleiste</emph> angezeigt."
 
 #. if8BJ
 #: 02140000.xhp
@@ -140,7 +140,7 @@ msgctxt ""
 "par_id3169267\n"
 "help.text"
 msgid "This value is outside of limits valid for this format"
-msgstr "Dieser Wert liegt außerhalb der für dieses Format gültigen Grenzen"
+msgstr "Dieser Wert liegt außerhalb der für dieses Format gültigen Grenzen."
 
 #. ApVjg
 #: 02140000.xhp
@@ -239,7 +239,7 @@ msgctxt ""
 "par_id3149129\n"
 "help.text"
 msgid "Missing bracket, for example, closing brackets, but no opening brackets"
-msgstr "Es fehlt eine Klammer; es ist beispielsweise eine schließende Klammer vorhanden, aber keine öffnende"
+msgstr "Es fehlt eine Klammer; es ist beispielsweise eine schließende Klammer vorhanden, aber keine öffnende."
 
 #. iTRKB
 #: 02140000.xhp
@@ -320,7 +320,7 @@ msgctxt ""
 "par_id3147412\n"
 "help.text"
 msgid "String overflow"
-msgstr "Zeichenkette zu lang"
+msgstr "Zeichenfolge zu lang"
 
 #. XbagT
 #: 02140000.xhp
@@ -329,7 +329,7 @@ msgctxt ""
 "par_id3145635\n"
 "help.text"
 msgid "<emph>Compiler:</emph> an identifier in the formula exceeds 64 kB in size. <emph>Interpreter:</emph> a result of a string operation exceeds 64 kB in size."
-msgstr "<emph>Compiler:</emph> ein Bezeichner in der Formel überschreitet die Größe von 64 kB. <emph>Interpreter:</emph> ein Ergebnis einer Zeichenkettenverarbeitung überschreitet die Größe von 64 kB."
+msgstr "<emph>Compiler:</emph> Ein Bezeichner in der Formel überschreitet die Größe von 64 kB. <emph>Interpreter:</emph> Ein Ergebnis einer Zeichenfolgenverarbeitung überschreitet die Größe von 64 kB."
 
 #. E7ohJ
 #: 02140000.xhp
@@ -419,7 +419,7 @@ msgctxt ""
 "par_id3149545\n"
 "help.text"
 msgid "Variable is not available"
-msgstr "Variable ist nicht verfügbar"
+msgstr "Variable ist nicht verfügbar."
 
 #. 3Ewjd
 #: 02140000.xhp
@@ -617,7 +617,7 @@ msgctxt ""
 "par_id4152967\n"
 "help.text"
 msgid "No AddIn"
-msgstr "Kein Plug-In"
+msgstr "Kein Plug-in"
 
 #. zaCCw
 #: 02140000.xhp
@@ -626,7 +626,7 @@ msgctxt ""
 "par_id3149710\n"
 "help.text"
 msgid "<emph>Interpreter: </emph>AddIn not found."
-msgstr "<emph>Interpreter</emph>: Plug-In nicht gefunden."
+msgstr "<emph>Interpreter</emph>: Plug-in nicht gefunden."
 
 #. kAqvA
 #: 02140000.xhp
@@ -734,7 +734,7 @@ msgctxt ""
 "par_id881549825900965\n"
 "help.text"
 msgid "Happens if a function that requires (re)loading of external sources is encountered and the user hasn't confirmed reloading of external sources yet"
-msgstr "Passiert, wenn eine Funktion auftritt, die das (erneute) Laden externer Quellen erfordert und der Benutzer das erneute Laden externer Quellen noch nicht bestätigt hat"
+msgstr "Passiert, wenn eine Funktion auftritt, die das (erneute) Laden externer Quellen erfordert und der Benutzer das erneute Laden externer Quellen noch nicht bestätigt hat."
 
 #. f9Foc
 #: empty_cells.xhp
@@ -770,7 +770,7 @@ msgctxt ""
 "par_id8266853\n"
 "help.text"
 msgid "In older versions of the software, empty cells were forced to numeric 0 in some contexts and to empty string in others, except in direct comparison where =A1=0 and =A1=\"\" both resulted in TRUE if A1 was empty. Emptiness now is inherited until used, so both =VLOOKUP(...)=0 and =VLOOKUP(...)=\"\" give TRUE if the lookup resulted in an empty cell being returned."
-msgstr "In älteren Versionen der Software wurden leere Zellwerte je nach Kontext als Zahl 0 oder leere Zeichenkette aufgefasst. Nur der direkte Vergleich =A1=0 beziehungsweise =A1=\"\" ergab immer WAHR, falls A1 leer war. Ein leerer Inhalt wird jetzt weitergereicht, bis er verwendet wird. Deshalb ergibt =SVERWEIS(…)=0 und =SVERWEIS(…)=\"\" jeweils WAHR, falls sich der Verweis auf eine leere Zelle bezieht."
+msgstr "In älteren Versionen der Software wurden leere Zellwerte je nach Kontext als Zahl 0 oder leere Zeichenfolgen aufgefasst. Nur der direkte Vergleich =A1=0 beziehungsweise =A1=\"\" ergab immer WAHR, falls A1 leer war. Ein leerer Inhalt wird jetzt weitergereicht, bis er verwendet wird. Deshalb ergibt =SVERWEIS(…)=0 und =SVERWEIS(…)=\"\" jeweils WAHR, falls sich der Verweis auf eine leere Zelle bezieht."
 
 #. FKFTK
 #: empty_cells.xhp

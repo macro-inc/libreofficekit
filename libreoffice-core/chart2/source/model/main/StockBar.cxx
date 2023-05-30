@@ -24,7 +24,6 @@
 #include <PropertyHelper.hxx>
 #include <ModifyListenerHelper.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
-#include <tools/diagnose_ex.h>
 
 #include <algorithm>
 
@@ -109,8 +108,7 @@ namespace chart
 {
 
 StockBar::StockBar( bool bRisingCourse ) :
-        ::property::OPropertySet( m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {
     if( ! bRisingCourse )
     {
@@ -125,12 +123,20 @@ StockBar::StockBar( bool bRisingCourse ) :
 
 StockBar::StockBar( const StockBar & rOther ) :
         impl::StockBar_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 StockBar::~StockBar()
 {}
+
+// ____ XTypeProvider ____
+uno::Sequence< css::uno::Type > SAL_CALL StockBar::getTypes()
+{
+    return ::comphelper::concatSequences(
+        impl::StockBar_Base::getTypes(),
+        ::property::OPropertySet::getTypes());
+}
 
 // ____ XCloneable ____
 uno::Reference< util::XCloneable > SAL_CALL StockBar::createClone()
@@ -139,13 +145,14 @@ uno::Reference< util::XCloneable > SAL_CALL StockBar::createClone()
 }
 
 // ____ OPropertySet ____
-uno::Any StockBar::GetDefaultValue( sal_Int32 nHandle ) const
+void StockBar::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticStockBarDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL StockBar::getInfoHelper()
@@ -162,28 +169,12 @@ Reference< beans::XPropertySetInfo > SAL_CALL StockBar::getPropertySetInfo()
 // ____ XModifyBroadcaster ____
 void SAL_CALL StockBar::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL StockBar::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

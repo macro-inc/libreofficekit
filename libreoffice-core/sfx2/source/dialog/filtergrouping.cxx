@@ -18,6 +18,7 @@
  */
 
 #include "filtergrouping.hxx"
+#include <o3tl/safeint.hxx>
 #include <sfx2/fcontnr.hxx>
 #include <sfx2/filedlghelper.hxx>
 #include <sfx2/strings.hrc>
@@ -32,10 +33,11 @@
 #include <comphelper/sequenceashashmap.hxx>
 #include <comphelper/sequence.hxx>
 #include <comphelper/string.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 
 #include <list>
+#include <utility>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -196,8 +198,8 @@ namespace sfx2
         FilterClassReferrer&    m_aClassReferrer;
 
     public:
-        ReadGlobalFilter( const OConfigurationNode& _rClassesNode, FilterClassReferrer& _rClassesReferrer )
-            :m_aClassesNode     ( _rClassesNode )
+        ReadGlobalFilter( OConfigurationNode _aClassesNode, FilterClassReferrer& _rClassesReferrer )
+            :m_aClassesNode     (std::move( _aClassesNode ))
             ,m_aClassReferrer   ( _rClassesReferrer )
         {
         }
@@ -270,8 +272,8 @@ namespace sfx2
         FilterClassList&        m_rClasses;
 
     public:
-        ReadLocalFilter( const OConfigurationNode& _rClassesNode, FilterClassList& _rClasses )
-            :m_aClassesNode ( _rClassesNode )
+        ReadLocalFilter( OConfigurationNode _aClassesNode, FilterClassList& _rClasses )
+            :m_aClassesNode (std::move( _aClassesNode ))
             ,m_rClasses     ( _rClasses )
         {
         }
@@ -341,9 +343,9 @@ namespace sfx2
         FilterGroup::iterator       m_aClassPos;
 
     public:
-        ReferToFilterEntry( FilterGroupEntryReferrer& _rEntryReferrer, const FilterGroup::iterator& _rClassPos )
+        ReferToFilterEntry( FilterGroupEntryReferrer& _rEntryReferrer, FilterGroup::iterator  _aClassPos )
             :m_rEntryReferrer( _rEntryReferrer )
-            ,m_aClassPos( _rClassPos )
+            ,m_aClassPos(std::move( _aClassPos ))
         {
         }
 
@@ -413,7 +415,7 @@ namespace sfx2
 
         explicit CheckAppendSingleWildcard( OUString& _rBase ) : _rToBeExtended( _rBase ) { }
 
-        void operator() ( const OUString& _rWC )
+        void operator() ( std::u16string_view _rWC )
         {
             // check for double wildcards
             sal_Int32 nExistentPos = _rToBeExtended.indexOf( _rWC );
@@ -423,7 +425,7 @@ namespace sfx2
                     ||  ( s_cWildcardSeparator == _rToBeExtended[ nExistentPos - 1 ] )
                     )
                 {   // the wildcard really starts at this position (it starts at pos 0 or the previous character is a separator
-                    sal_Int32 nExistentWCEnd = nExistentPos + _rWC.getLength();
+                    sal_Int32 nExistentWCEnd = nExistentPos + _rWC.size();
                     if  (   ( _rToBeExtended.getLength() == nExistentWCEnd )
                         ||  ( s_cWildcardSeparator == _rToBeExtended[ nExistentWCEnd ] )
                         )
@@ -533,7 +535,7 @@ namespace sfx2
     struct FindGroupEntry
     {
         FilterGroupEntryReferrer::mapped_type aLookingFor;
-        explicit FindGroupEntry( FilterGroupEntryReferrer::mapped_type const & _rLookingFor ) : aLookingFor( _rLookingFor ) { }
+        explicit FindGroupEntry( FilterGroupEntryReferrer::mapped_type _aLookingFor ) : aLookingFor(std::move( _aLookingFor )) { }
 
         bool operator() ( const MapGroupEntry2GroupEntry::value_type& _rMapEntry )
         {
@@ -882,7 +884,7 @@ namespace sfx2
 
     std::shared_ptr<const SfxFilter> TSortedFilterList::impl_getFilter(sal_Int32 nIndex)
     {
-        if (nIndex<0 || nIndex>=static_cast<sal_Int32>(m_lFilters.size()))
+        if (nIndex<0 || o3tl::make_unsigned(nIndex)>=m_lFilters.size())
             return nullptr;
         const OUString& sFilterName = m_lFilters[nIndex];
         if (sFilterName.isEmpty())
@@ -894,7 +896,7 @@ namespace sfx2
     void appendFiltersForSave( TSortedFilterList& _rFilterMatcher,
                                const Reference< XFilterManager >& _rxFilterManager,
                                OUString& _rFirstNonEmpty, FileDialogHelper_Impl& _rFileDlgImpl,
-                               const OUString& _rFactory )
+                               std::u16string_view _rFactory )
     {
         DBG_ASSERT( _rxFilterManager.is(), "sfx2::appendFiltersForSave: invalid manager!" );
         if ( !_rxFilterManager.is() )
@@ -947,8 +949,8 @@ namespace sfx2
 
     struct ExportFilter
     {
-        ExportFilter( const OUString& _aUIName, const OUString& _aWildcard ) :
-            aUIName( _aUIName ), aWildcard( _aWildcard ) {}
+        ExportFilter( OUString _aUIName, OUString _aWildcard ) :
+            aUIName(std::move( _aUIName )), aWildcard(std::move( _aWildcard )) {}
 
         OUString aUIName;
         OUString aWildcard;

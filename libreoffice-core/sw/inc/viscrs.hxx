@@ -71,6 +71,11 @@ public:
 namespace sw::overlay { class OverlayRangesOutline; }
 class MapMode;
 
+/**
+ * SwSelPaintRects is a base class of SwShellCursor, which stores the overlay for the
+ * cursor/selection: a list of rectangles to be painted as an overlay. It is also capable of
+ * painting other overlays as needed (text input, content control).
+ */
 class SwSelPaintRects : public SwRects
 {
     friend void InitCore();
@@ -117,7 +122,7 @@ public:
 
     void SetShowContentControlOverlay(const bool bShow) { m_bShowContentControlOverlay = bShow; }
 
-    VclPtr<SwContentControlButton> GetContentControlButton() const;
+    const VclPtr<SwContentControlButton>& GetContentControlButton() const;
 
     const SwCursorShell* GetShell() const { return m_pCursorShell; }
     // check current MapMode of the shell and set possibly the static members.
@@ -128,6 +133,9 @@ public:
     std::optional<OString> getLOKPayload(int nType, int nViewId) const;
 };
 
+/// Represents the current text cursor of one opened edit window.
+///
+/// See SwShellTableCursor for a table cursor that extends this class.
 class SW_DLLPUBLIC SwShellCursor : public virtual SwCursor, public SwSelPaintRects
 {
 private:

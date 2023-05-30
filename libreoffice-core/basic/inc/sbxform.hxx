@@ -74,14 +74,14 @@ class SbxBasicFormater {
     // Constructor takes signs for decimal point, thousand separation sign
     // and necessary resource strings.
     SbxBasicFormater( sal_Unicode _cDecPoint, sal_Unicode _cThousandSep,
-                      const OUString& _sOnStrg,
-                      const OUString& _sOffStrg,
-                      const OUString& _sYesStrg,
-                      const OUString& _sNoStrg,
-                      const OUString& _sTrueStrg,
-                      const OUString& _sFalseStrg,
-                      const OUString& _sCurrencyStrg,
-                      const OUString& _sCurrencyFormatStrg );
+                      OUString _sOnStrg,
+                      OUString _sOffStrg,
+                      OUString _sYesStrg,
+                      OUString _sNoStrg,
+                      OUString _sTrueStrg,
+                      OUString _sFalseStrg,
+                      OUString _sCurrencyStrg,
+                      OUString _sCurrencyFormatStrg );
 
     /* Basic command: Format$( number,format-string )
 
@@ -93,9 +93,9 @@ class SbxBasicFormater {
         String containing the formatted output
     */
     OUString  BasicFormat( double dNumber, const OUString& sFormatStrg );
-    static OUString BasicFormatNull( const OUString& sFormatStrg );
+    static OUString BasicFormatNull( std::u16string_view sFormatStrg );
 
-    static  bool isBasicFormat( const OUString& sFormatStrg );
+    static  bool isBasicFormat( std::u16string_view sFormatStrg );
 
   private:
     static inline void ShiftString( OUStringBuffer& sStrg, sal_uInt16 nStartPos );
@@ -112,11 +112,11 @@ class SbxBasicFormater {
     short  GetDigitAtPosExpScan( double dNewExponent, short nPos,
                                                   bool& bFoundFirstDigit );
     short  GetDigitAtPosExpScan( short nPos, bool& bFoundFirstDigit );
-    static OUString GetPosFormatString( const OUString& sFormatStrg, bool & bFound );
-    static OUString GetNegFormatString( const OUString& sFormatStrg, bool & bFound );
-    static OUString Get0FormatString( const OUString& sFormatStrg, bool & bFound );
-    static OUString GetNullFormatString( const OUString& sFormatStrg, bool & bFound );
-    static void AnalyseFormatString( const OUString& sFormatStrg,
+    static OUString GetPosFormatString( std::u16string_view sFormatStrg, bool & bFound );
+    static OUString GetNegFormatString( std::u16string_view sFormatStrg, bool & bFound );
+    static OUString Get0FormatString( std::u16string_view sFormatStrg, bool & bFound );
+    static OUString GetNullFormatString( std::u16string_view sFormatStrg, bool & bFound );
+    static void AnalyseFormatString( std::u16string_view sFormatStrg,
                                                  short& nNoOfDigitsLeft, short& nNoOfDigitsRight,
                                                  short& nNoOfOptionalDigitsLeft,
                                                  short& nNoOfExponentDigits,
@@ -124,7 +124,7 @@ class SbxBasicFormater {
                                                  bool& bPercent, bool& bCurrency, bool& bScientific,
                                                  bool& bGenerateThousandSeparator,
                                                  short& nMultipleThousandSeparators );
-    void   ScanFormatString( double dNumber, const OUString& sFormatStrg,
+    void   ScanFormatString( double dNumber, std::u16string_view sFormatStrg,
                                               OUString& sReturnStrg, bool bCreateSign );
 
     //*** Data ***

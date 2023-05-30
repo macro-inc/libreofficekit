@@ -79,6 +79,9 @@
     {
         [NSWindow setAllowsAutomaticWindowTabbing:NO];
     }
+
+    // listen to dark mode change
+    [NSApp addObserver:self forKeyPath:@"effectiveAppearance" options: 0 context: nil];
 }
 
 -(void)sendEvent:(NSEvent*)pEvent
@@ -93,6 +96,17 @@
         NSWindow* pKeyWin = [NSApp keyWindow];
         if( pKeyWin && [pKeyWin isKindOfClass: [SalFrameWindow class]] )
         {
+            // Commit uncommitted text before dispatching key shortcuts. In
+            // certain cases such as pressing Command-Option-C in a Writer
+            // document while there is uncommitted text will call
+            // AquaSalFrame::EndExtTextInput() which will dispatch a
+            // SalEvent::EndExtTextInput event. Writer's handler for that event
+            // will delete the uncommitted text and then insert the committed
+            // text but LibreOffice will crash when deleting the uncommitted
+            // text because deletion of the text also removes and deletes the
+            // newly inserted comment.
+            [static_cast<SalFrameWindow*>(pKeyWin) endExtTextInput];
+
             AquaSalFrame* pFrame = [static_cast<SalFrameWindow*>(pKeyWin) getSalFrame];
             unsigned int nModMask = ([pEvent modifierFlags] & (NSEventModifierFlagShift|NSEventModifierFlagControl|NSEventModifierFlagOption|NSEventModifierFlagCommand));
             /*
@@ -325,6 +339,15 @@
     }
 
     return aReply;
+}
+
+-(void)observeValueForKeyPath: (NSString*) keyPath ofObject:(id)object
+                               change: (NSDictionary<NSKeyValueChangeKey, id>*)change
+                               context: (void*)context
+{
+    [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    if ([keyPath isEqualToString:@"effectiveAppearance"])
+        [self systemColorsChanged: nil];
 }
 
 -(void)systemColorsChanged: (NSNotification*) pNotification

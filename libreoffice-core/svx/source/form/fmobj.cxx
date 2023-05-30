@@ -21,6 +21,7 @@
 #include <fmprop.hxx>
 #include <fmvwimp.hxx>
 #include <fmpgeimp.hxx>
+#include <o3tl/string_view.hxx>
 #include <svx/fmview.hxx>
 #include <svx/fmpage.hxx>
 #include <svx/svdovirt.hxx>
@@ -36,7 +37,7 @@
 #include <comphelper/processfactory.hxx>
 #include <toolkit/awt/vclxdevice.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star::io;
 using namespace ::com::sun::star::uno;
@@ -166,7 +167,7 @@ void FmFormObj::impl_checkRefDevice_nothrow( bool _force )
             rtl::Reference<VCLXDevice> pUnoRefDevice = new VCLXDevice;
             pUnoRefDevice->SetOutputDevice( m_pLastKnownRefDevice );
             Reference< XDevice > xRefDevice( pUnoRefDevice );
-            xModelProps->setPropertyValue( sRefDevicePropName, makeAny( xRefDevice ) );
+            xModelProps->setPropertyValue( sRefDevicePropName, Any( xRefDevice ) );
         }
     }
     catch( const Exception& )
@@ -315,7 +316,7 @@ void FmFormObj::handlePageChange(SdrPage* pOldPage, SdrPage* pNewPage)
             }
 
             // and insert into the new container
-            xNewParent->insertByIndex(xNewParent->getCount(), makeAny(xMeAsFormComp));
+            xNewParent->insertByIndex(xNewParent->getCount(), Any(xMeAsFormComp));
 
             // transfer the events
             if (aNewEvents.hasElements())
@@ -357,10 +358,10 @@ SdrInventor FmFormObj::GetObjInventor()   const
 
 SdrObjKind FmFormObj::GetObjIdentifier() const
 {
-    return OBJ_UNO;
+    return SdrObjKind::UNO;
 }
 
-FmFormObj* FmFormObj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> FmFormObj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new FmFormObj(rTargetModel, *this);
 }
@@ -424,8 +425,8 @@ Reference< XInterface >  FmFormObj::ensureModelEnv(const Reference< XInterface >
     sal_Int32 nTokIndex = 0;
     do
     {
-        OUString aToken = sAccessPath.getToken( 0, '\\', nTokIndex );
-        sal_uInt16 nIndex = static_cast<sal_uInt16>(aToken.toInt32());
+        std::u16string_view aToken = o3tl::getToken(sAccessPath, 0, '\\', nTokIndex );
+        sal_uInt16 nIndex = static_cast<sal_uInt16>(o3tl::toInt32(aToken));
 
         // get the DSS of the source form (we have to find an equivalent for)
         DBG_ASSERT(nIndex<xSourceContainer->getCount(), "FmFormObj::ensureModelEnv : invalid access path !");
@@ -527,7 +528,7 @@ Reference< XInterface >  FmFormObj::ensureModelEnv(const Reference< XInterface >
                     ::comphelper::copyProperties( xCurrentSourceForm, xCurrentDestForm );
 
                     DBG_ASSERT(nCurrentDestIndex == xDestContainer->getCount(), "FmFormObj::ensureModelEnv : something went wrong with the numbers !");
-                    xDestContainer->insertByIndex(nCurrentDestIndex, makeAny(xCurrentDestForm));
+                    xDestContainer->insertByIndex(nCurrentDestIndex, Any(xCurrentDestForm));
 
                     ++nCurrentDestIndex;
                         // like nCurrentSourceIndex, nCurrentDestIndex now points 'behind' the form it actually means
@@ -618,7 +619,7 @@ bool FmFormObj::EndCreate( SdrDragStat& rStat, SdrCreateCmd eCmd )
                 FmFormPageImpl::setUniqueName( xContent, xParentForm );
 
                 if ( xFormToInsertInto.is() )
-                    xFormToInsertInto->insertByIndex( xFormToInsertInto->getCount(), makeAny( xContent ) );
+                    xFormToInsertInto->insertByIndex( xFormToInsertInto->getCount(), Any( xContent ) );
             }
             catch( const Exception& )
             {

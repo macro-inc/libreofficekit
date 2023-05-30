@@ -1,3 +1,6 @@
+# -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
+#
+# This file is part of the LibreOffice project.
 #
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -5,6 +8,7 @@
 #
 
 from uitest.framework import UITestCase
+from uitest.uihelper.common import get_url_for_data_file
 
 class WriterInsertPageHeader(UITestCase):
 
@@ -34,7 +38,7 @@ class WriterInsertPageHeader(UITestCase):
             document.StyleFamilies.PageStyles.Standard.HeaderIsOn, False)
 
     def test_header(self):
-        with self.ui_test.create_doc_in_start_center("writer") as document:
+        with self.ui_test.create_doc_in_start_center("writer"):
 
             self.insert_header()
 
@@ -58,4 +62,17 @@ class WriterInsertPageHeader(UITestCase):
 
             self.delete_header()
 
+    def test_tdf146248(self):
+        with self.ui_test.load_file(get_url_for_data_file("tdf146248.docx")):
 
+            self.delete_header()
+
+            # crashed before
+            self.xUITest.executeCommand(".uno:Undo")
+
+            document = self.ui_test.get_component()
+            self.assertEqual(
+                document.StyleFamilies.PageStyles.Standard.HeaderIsOn, True)
+
+
+# vim: set shiftwidth=4 softtabstop=4 expandtab:

@@ -22,7 +22,6 @@
 #include <memory>
 #include <sal/config.h>
 #include <sfx2/dllapi.h>
-#include <sal/types.h>
 #include <vcl/weld.hxx>
 
 class SfxTabPage;
@@ -30,7 +29,6 @@ class SfxBindings;
 class SfxChildWindow;
 struct SfxChildWinInfo;
 class SfxItemSet;
-class Timer;
 struct WhichRangesContainer;
 
 class SFX2_DLLPUBLIC SfxDialogController : public weld::GenericDialogController
@@ -50,7 +48,7 @@ public:
     // when the dialog has an associated SfxChildWin, typically for Modeless interaction
     virtual void ChildWinDispose() {} // called from the associated SfxChildWin dtor
     virtual void Close(); // called by the SfxChildWin when the dialog is closed
-    virtual void EndDialog(); // called by the SfxChildWin to close the dialog
+    virtual void EndDialog(int nResponse); // called by the SfxChildWin to close the dialog
 };
 
 class SfxModelessDialog_Impl;
@@ -75,7 +73,7 @@ public:
     void                    Initialize (SfxChildWinInfo const * pInfo);
     bool                    IsClosing() const;
     virtual void            Close() override;
-    virtual void            EndDialog() override;
+    virtual void            EndDialog(int nResponse) override;
     virtual void            Activate() override;
     virtual void            Deactivate() override;
     virtual void            ChildWinDispose() override;
@@ -108,6 +106,10 @@ public:
     SfxSingleTabDialogController(weld::Widget* pParent, const SfxItemSet* pOptionsSet,
         const OUString& rUIXMLDescription = OUString("sfx/ui/singletabdialog.ui"),
         const OString& rID = OString("SingleTabDialog"));
+
+    SfxSingleTabDialogController(weld::Widget* pParent, const SfxItemSet* pOptionsSet,
+        const OString& rContainerId, const OUString& rUIXMLDescription,
+        const OString& rID);
 
     weld::Container* get_content_area() { return m_xContainer.get(); }
 

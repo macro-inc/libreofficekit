@@ -35,6 +35,7 @@
 #include "ftpintreq.hxx"
 
 #include <memory>
+#include <utility>
 #include <vector>
 #include <string.h>
 #include "curl.hxx"
@@ -100,13 +101,13 @@ FTPContent::FTPContent( const Reference< XComponentContext >& rxContext,
 FTPContent::FTPContent( const Reference< XComponentContext >& rxContext,
                         FTPContentProvider* pProvider,
                         const Reference< XContentIdentifier >& Identifier,
-                        const ContentInfo& Info)
+                        ContentInfo Info)
     : ContentImplHelper(rxContext,pProvider,Identifier)
     , m_pFCP(pProvider)
     , m_aFTPURL(Identifier->getContentIdentifier(), pProvider)
     , m_bInserted(true)
     , m_bTitleSet(false)
-    , m_aInfo(Info)
+    , m_aInfo(std::move(Info))
 {
 }
 
@@ -526,7 +527,7 @@ Any SAL_CALL FTPContent::execute( const Command& aCommand,
                 ContentInfo aArg;
                 if (!(aCommand.Argument >>= aArg)) {
                     ucbhelper::cancelCommandExecution(
-                        makeAny(
+                        Any(
                             IllegalArgumentException(
                                 "Wrong argument type!",
                                 static_cast< cppu::OWeakObject * >(this),
@@ -745,7 +746,7 @@ Reference< XRow > FTPContent::getPropertyValues(
             xRow->appendString(rProp,aDirEntry.m_aName);
         else if(Name == "CreatableContentsInfo")
             xRow->appendObject(rProp,
-                               makeAny(queryCreatableContentsInfo()));
+                               Any(queryCreatableContentsInfo()));
         else if(aDirEntry.m_nMode != INETCOREFTP_FILEMODE_UNKNOWN) {
             if(Name == "ContentType")
                 xRow->appendString(rProp,

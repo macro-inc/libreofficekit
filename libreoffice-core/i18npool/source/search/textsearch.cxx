@@ -116,7 +116,7 @@ TextSearch::~TextSearch()
 
 void TextSearch::setOptions2( const SearchOptions2& rOptions )
 {
-    osl::MutexGuard g(m_aMutex);
+    std::unique_lock g(m_aMutex);
 
     aSrchPara = rOptions;
 
@@ -214,13 +214,6 @@ void TextSearch::setOptions2( const SearchOptions2& rOptions )
                     aSrchPara.searchString, 0, aSrchPara.searchString.getLength());
     }
 
-    // When start or end of search string is a complex script type, we need to
-    // make sure the result boundary is not located in the middle of cell.
-    checkCTLStart = (xBreak.is() && (xBreak->getScriptType(sSrchStr, 0) ==
-                ScriptType::COMPLEX));
-    checkCTLEnd = (xBreak.is() && (xBreak->getScriptType(sSrchStr,
-                    sSrchStr.getLength()-1) == ScriptType::COMPLEX));
-
     if ( bReplaceApostrophe )
         sSrchStr = sSrchStr.replace(u'\u2019', '\'');
 
@@ -264,8 +257,6 @@ void TextSearch::setOptions2( const SearchOptions2& rOptions )
 
 void TextSearch::setOptions( const SearchOptions& rOptions )
 {
-    osl::MutexGuard g(m_aMutex);
-
     sal_Int16 nAlgorithmType2;
     switch (rOptions.algorithmType)
     {
@@ -307,16 +298,9 @@ static sal_Int32 FindPosInSeq_Impl( const Sequence <sal_Int32>& rOff, sal_Int32 
     return static_cast<sal_Int32>(std::distance(rOff.begin(), pOff));
 }
 
-bool TextSearch::isCellStart(const OUString& searchStr, sal_Int32 nPos)
-{
-    sal_Int32 nDone;
-    return nPos == xBreak->previousCharacters(searchStr, nPos+1,
-            aSrchPara.Locale, CharacterIteratorMode::SKIPCELL, 1, nDone);
-}
-
 SearchResult TextSearch::searchForward( const OUString& searchStr, sal_Int32 startPos, sal_Int32 endPos )
 {
-    osl::MutexGuard g(m_aMutex);
+    std::unique_lock g(m_aMutex);
 
     SearchResult sres;
 
@@ -455,7 +439,7 @@ SearchResult TextSearch::searchForward( const OUString& searchStr, sal_Int32 sta
 
 SearchResult TextSearch::searchBackward( const OUString& searchStr, sal_Int32 startPos, sal_Int32 endPos )
 {
-    osl::MutexGuard g(m_aMutex);
+    std::unique_lock g(m_aMutex);
 
     SearchResult sres;
 
@@ -739,11 +723,6 @@ SearchResult TextSearch::NSrchFrwrd( const OUString& searchStr, sal_Int32 startP
             nCmpIdx <= nEnd;
             nCmpIdx += GetDiff( searchStr[nCmpIdx + sSearchKey.getLength()-1]))
     {
-        // if the match would be the completed cells, skip it.
-        if ( (checkCTLStart && !isCellStart( searchStr, nCmpIdx )) || (checkCTLEnd
-                    && !isCellStart( searchStr, nCmpIdx + sSearchKey.getLength())) )
-            continue;
-
         nSuchIdx = sSearchKey.getLength() - 1;
         while( nSuchIdx >= 0 && sSearchKey[nSuchIdx] == searchStr[nCmpIdx + nSuchIdx])
         {
@@ -806,47 +785,41 @@ SearchResult TextSearch::NSrchBkwrd( const OUString& searchStr, sal_Int32 startP
 
     while (nCmpIdx >= nEnd)
     {
-        // if the match would be the completed cells, skip it.
-        if ( (!checkCTLStart || isCellStart( searchStr, nCmpIdx -
-                        sSearchKey.getLength() )) && (!checkCTLEnd ||
-                    isCellStart( searchStr, nCmpIdx)))
+        nSuchIdx = 0;
+        while( nSuchIdx < sSearchKey.getLength() && sSearchKey[nSuchIdx] ==
+                searchStr[nCmpIdx + nSuchIdx - sSearchKey.getLength()] )
+            nSuchIdx++;
+        if( nSuchIdx >= sSearchKey.getLength() )
         {
-            nSuchIdx = 0;
-            while( nSuchIdx < sSearchKey.getLength() && sSearchKey[nSuchIdx] ==
-                    searchStr[nCmpIdx + nSuchIdx - sSearchKey.getLength()] )
-                nSuchIdx++;
-            if( nSuchIdx >= sSearchKey.getLength() )
+            if( SearchFlags::NORM_WORD_ONLY & aSrchPara.searchFlag )
             {
-                if( SearchFlags::NORM_WORD_ONLY & aSrchPara.searchFlag )
-                {
-                    sal_Int32 nFndStt = nCmpIdx - sSearchKey.getLength();
-                    bool bAtStart = !nFndStt;
-                    bool bAtEnd = nCmpIdx == startPos;
-                    bool bDelimBehind = bAtEnd || IsDelimiter( searchStr, nCmpIdx );
-                    bool bDelimBefore = bAtStart || // begin of paragraph
-                        IsDelimiter( searchStr, nFndStt-1 );
-                    //  *       1 -> only one word in the paragraph
-                    //  *       2 -> at begin of paragraph
-                    //  *       3 -> at end of paragraph
-                    //  *       4 -> inside the paragraph
-                    if( ( bAtStart && bAtEnd ) ||           // 1
-                            ( bAtStart && bDelimBehind ) ||     // 2
-                            ( bAtEnd && bDelimBefore ) ||       // 3
-                            ( bDelimBefore && bDelimBehind ))   // 4
-                    {
-                        aRet.subRegExpressions = 1;
-                        aRet.startOffset = { nCmpIdx };
-                        aRet.endOffset = { nCmpIdx - sSearchKey.getLength() };
-                        return aRet;
-                    }
-                }
-                else
+                sal_Int32 nFndStt = nCmpIdx - sSearchKey.getLength();
+                bool bAtStart = !nFndStt;
+                bool bAtEnd = nCmpIdx == startPos;
+                bool bDelimBehind = bAtEnd || IsDelimiter( searchStr, nCmpIdx );
+                bool bDelimBefore = bAtStart || // begin of paragraph
+                    IsDelimiter( searchStr, nFndStt-1 );
+                //  *       1 -> only one word in the paragraph
+                //  *       2 -> at begin of paragraph
+                //  *       3 -> at end of paragraph
+                //  *       4 -> inside the paragraph
+                if( ( bAtStart && bAtEnd ) ||           // 1
+                        ( bAtStart && bDelimBehind ) ||     // 2
+                        ( bAtEnd && bDelimBefore ) ||       // 3
+                        ( bDelimBefore && bDelimBehind ))   // 4
                 {
                     aRet.subRegExpressions = 1;
                     aRet.startOffset = { nCmpIdx };
                     aRet.endOffset = { nCmpIdx - sSearchKey.getLength() };
                     return aRet;
                 }
+            }
+            else
+            {
+                aRet.subRegExpressions = 1;
+                aRet.startOffset = { nCmpIdx };
+                aRet.endOffset = { nCmpIdx - sSearchKey.getLength() };
+                return aRet;
             }
         }
         nSuchIdx = GetDiff( searchStr[nCmpIdx - sSearchKey.getLength()] );
@@ -879,19 +852,19 @@ void TextSearch::RESrchPrepare( const css::util::SearchOptions2& rOptions)
         nIcuSearchFlags |= UREGEX_CASE_INSENSITIVE;
     UErrorCode nIcuErr = U_ZERO_ERROR;
     // assumption: transliteration didn't mangle regexp control chars
-    IcuUniString aIcuSearchPatStr( reinterpret_cast<const UChar*>(rPatternStr.getStr()), rPatternStr.getLength());
+    icu::UnicodeString aIcuSearchPatStr( reinterpret_cast<const UChar*>(rPatternStr.getStr()), rPatternStr.getLength());
 #ifndef DISABLE_WORDBOUND_EMULATION
     // for convenience specific syntax elements of the old regex engine are emulated
     // - by replacing \< with "word-break followed by a look-ahead word-char"
-    static const IcuUniString aChevronPatternB( "\\\\<", -1, IcuUniString::kInvariant);
-    static const IcuUniString aChevronReplaceB( "\\\\b(?=\\\\w)", -1, IcuUniString::kInvariant);
+    static const icu::UnicodeString aChevronPatternB( "\\\\<", -1, icu::UnicodeString::kInvariant);
+    static const icu::UnicodeString aChevronReplaceB( "\\\\b(?=\\\\w)", -1, icu::UnicodeString::kInvariant);
     static icu::RegexMatcher aChevronMatcherB( aChevronPatternB, 0, nIcuErr);
     aChevronMatcherB.reset( aIcuSearchPatStr);
     aIcuSearchPatStr = aChevronMatcherB.replaceAll( aChevronReplaceB, nIcuErr);
     aChevronMatcherB.reset();
     // - by replacing \> with "look-behind word-char followed by a word-break"
-    static const IcuUniString aChevronPatternE( "\\\\>", -1, IcuUniString::kInvariant);
-    static const IcuUniString aChevronReplaceE( "(?<=\\\\w)\\\\b", -1, IcuUniString::kInvariant);
+    static const icu::UnicodeString aChevronPatternE( "\\\\>", -1, icu::UnicodeString::kInvariant);
+    static const icu::UnicodeString aChevronReplaceE( "(?<=\\\\w)\\\\b", -1, icu::UnicodeString::kInvariant);
     static icu::RegexMatcher aChevronMatcherE( aChevronPatternE, 0, nIcuErr);
     aChevronMatcherE.reset( aIcuSearchPatStr);
     aIcuSearchPatStr = aChevronMatcherE.replaceAll( aChevronReplaceE, nIcuErr);
@@ -959,7 +932,7 @@ SearchResult TextSearch::RESrchFrwrd( const OUString& searchStr,
 
     // use the ICU RegexMatcher to find the matches
     UErrorCode nIcuErr = U_ZERO_ERROR;
-    const IcuUniString aSearchTargetStr(false, reinterpret_cast<const UChar*>(searchStr.getStr()),
+    const icu::UnicodeString aSearchTargetStr(false, reinterpret_cast<const UChar*>(searchStr.getStr()),
                                         searchStr.getLength());
     pRegexMatcher->reset( aSearchTargetStr);
     // search until there is a valid match
@@ -1016,7 +989,7 @@ SearchResult TextSearch::RESrchBkwrd( const OUString& searchStr,
     // TODO: use ICU's backward searching once it becomes available
     //       as its replacement using forward search is not as good as the real thing
     UErrorCode nIcuErr = U_ZERO_ERROR;
-    const IcuUniString aSearchTargetStr(false, reinterpret_cast<const UChar*>(searchStr.getStr()),
+    const icu::UnicodeString aSearchTargetStr(false, reinterpret_cast<const UChar*>(searchStr.getStr()),
                                         searchStr.getLength());
     pRegexMatcher->reset( aSearchTargetStr);
     if (!lcl_findRegex( pRegexMatcher, endPos, startPos, nIcuErr))

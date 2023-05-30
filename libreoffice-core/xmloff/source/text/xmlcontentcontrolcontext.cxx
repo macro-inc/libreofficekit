@@ -49,6 +49,7 @@ void XMLContentControlContext::startFastElement(
     for (auto& rIter : sax_fastparser::castToFastAttributeList(xAttrList))
     {
         bool bTmp = false;
+        sal_Int32 nTmp = 0;
 
         switch (rIter.getToken())
         {
@@ -151,6 +152,27 @@ void XMLContentControlContext::startFastElement(
                 m_aTag = rIter.toString();
                 break;
             }
+            case XML_ELEMENT(LO_EXT, XML_ID):
+            {
+                if (sax::Converter::convertNumber(nTmp, rIter.toView()))
+                {
+                    m_nId = nTmp;
+                }
+                break;
+            }
+            case XML_ELEMENT(LO_EXT, XML_TAB_INDEX):
+            {
+                if (sax::Converter::convertNumber(nTmp, rIter.toView()))
+                {
+                    m_nTabIndex = nTmp;
+                }
+                break;
+            }
+            case XML_ELEMENT(LO_EXT, XML_LOCK):
+            {
+                m_aLock = rIter.toString();
+                break;
+            }
             default:
                 XMLOFF_WARN_UNKNOWN("xmloff", rIter);
         }
@@ -190,24 +212,24 @@ void XMLContentControlContext::endFastElement(sal_Int32)
 
     if (m_bShowingPlaceHolder)
     {
-        xPropertySet->setPropertyValue("ShowingPlaceHolder", uno::makeAny(m_bShowingPlaceHolder));
+        xPropertySet->setPropertyValue("ShowingPlaceHolder", uno::Any(m_bShowingPlaceHolder));
     }
 
     if (m_bCheckbox)
     {
-        xPropertySet->setPropertyValue("Checkbox", uno::makeAny(m_bCheckbox));
+        xPropertySet->setPropertyValue("Checkbox", uno::Any(m_bCheckbox));
     }
     if (m_bChecked)
     {
-        xPropertySet->setPropertyValue("Checked", uno::makeAny(m_bChecked));
+        xPropertySet->setPropertyValue("Checked", uno::Any(m_bChecked));
     }
     if (!m_aCheckedState.isEmpty())
     {
-        xPropertySet->setPropertyValue("CheckedState", uno::makeAny(m_aCheckedState));
+        xPropertySet->setPropertyValue("CheckedState", uno::Any(m_aCheckedState));
     }
     if (!m_aUncheckedState.isEmpty())
     {
-        xPropertySet->setPropertyValue("UncheckedState", uno::makeAny(m_aUncheckedState));
+        xPropertySet->setPropertyValue("UncheckedState", uno::Any(m_aUncheckedState));
     }
     if (!m_aListItems.empty())
     {
@@ -260,6 +282,21 @@ void XMLContentControlContext::endFastElement(sal_Int32)
     if (!m_aTag.isEmpty())
     {
         xPropertySet->setPropertyValue("Tag", uno::Any(m_aTag));
+    }
+
+    if (m_nId)
+    {
+        xPropertySet->setPropertyValue("Id", uno::Any(m_nId));
+    }
+
+    if (m_nTabIndex)
+    {
+        xPropertySet->setPropertyValue("TabIndex", uno::Any(m_nTabIndex));
+    }
+
+    if (!m_aLock.isEmpty())
+    {
+        xPropertySet->setPropertyValue("Lock", uno::Any(m_aLock));
     }
 }
 

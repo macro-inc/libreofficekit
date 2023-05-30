@@ -39,12 +39,12 @@ namespace framework {
 class ConfigurationAccess_FactoryManager final : public ::cppu::WeakImplHelper< css::container::XContainerListener>
 {
     public:
-                      ConfigurationAccess_FactoryManager( const css::uno::Reference< css::uno::XComponentContext>& rxContext, const OUString& _sRoot );
+                      ConfigurationAccess_FactoryManager( const css::uno::Reference< css::uno::XComponentContext>& rxContext, OUString  _sRoot );
         virtual       ~ConfigurationAccess_FactoryManager() override;
 
         void          readConfigurationData();
 
-        OUString                           getFactorySpecifierFromTypeNameModule( std::u16string_view rType, const OUString& rName, std::u16string_view rModule ) const;
+        OUString                           getFactorySpecifierFromTypeNameModule( std::u16string_view rType, std::u16string_view rName, std::u16string_view rModule ) const;
         void                                    addFactorySpecifierToTypeNameModule( std::u16string_view rType, std::u16string_view rName, std::u16string_view rModule, const OUString& aServiceSpecifier );
         void                                    removeFactorySpecifierFromTypeNameModule( std::u16string_view rType, std::u16string_view rName, std::u16string_view rModule );
         css::uno::Sequence< css::uno::Sequence< css::beans::PropertyValue > >   getFactoriesDescription() const;

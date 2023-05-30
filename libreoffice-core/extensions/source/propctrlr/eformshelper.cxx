@@ -17,7 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <memory>
 #include <string_view>
 
 #include "eformshelper.hxx"
@@ -32,7 +31,7 @@
 #include <com/sun/star/xforms/XFormsUIHelper1.hpp>
 #include <com/sun/star/xsd/DataTypeClass.hpp>
 #include <com/sun/star/form/binding/XListEntrySink.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <algorithm>
 #include <o3tl/functional.hxx>
@@ -241,10 +240,10 @@ namespace pcr
     {
         if ( !_bDoListen )
         {
-            ::comphelper::OInterfaceIteratorHelper2 aListenerIterator = m_aPropertyListeners.createIterator();
+            ::comphelper::OInterfaceIteratorHelper3 aListenerIterator(m_aPropertyListeners);
             while ( aListenerIterator.hasMoreElements() )
             {
-                PropertyEventTranslation* pTranslator = dynamic_cast< PropertyEventTranslation* >( aListenerIterator.next() );
+                PropertyEventTranslation* pTranslator = dynamic_cast< PropertyEventTranslation* >( aListenerIterator.next().get() );
                 OSL_ENSURE( pTranslator, "EFormsHelper::impl_toggleBindingPropertyListening_throw: invalid listener element in my container!" );
                 if ( !pTranslator )
                     continue;
@@ -255,7 +254,7 @@ namespace pcr
                     if ( pTranslator->getDelegator() == _rxConcreteListenerOrNull )
                     {
                         impl_switchBindingListening_throw( false, xEventSourceTranslator );
-                        m_aPropertyListeners.removeListener( xEventSourceTranslator );
+                        m_aPropertyListeners.removeInterface( xEventSourceTranslator );
                         break;
                     }
                 }
@@ -270,17 +269,14 @@ namespace pcr
             if ( _rxConcreteListenerOrNull.is() )
             {
                 Reference< XPropertyChangeListener > xEventSourceTranslator( new PropertyEventTranslation( _rxConcreteListenerOrNull, m_xBindableControl ) );
-                m_aPropertyListeners.addListener( xEventSourceTranslator );
+                m_aPropertyListeners.addInterface( xEventSourceTranslator );
                 impl_switchBindingListening_throw( true, xEventSourceTranslator );
             }
             else
             {
-                ::comphelper::OInterfaceIteratorHelper2 aListenerIterator = m_aPropertyListeners.createIterator();
+                ::comphelper::OInterfaceIteratorHelper3 aListenerIterator(m_aPropertyListeners);
                 while ( aListenerIterator.hasMoreElements() )
-                {
-                    Reference< XPropertyChangeListener > xListener( aListenerIterator.next(), UNO_QUERY );
-                    impl_switchBindingListening_throw( true, xListener );
-                }
+                    impl_switchBindingListening_throw( true, aListenerIterator.next() );
             }
         }
     }
@@ -529,8 +525,8 @@ namespace pcr
                         xBinding = xModel->createBinding( );
                         if ( xBinding.is() )
                         {
-                            xBinding->setPropertyValue( PROPERTY_BINDING_ID, makeAny( _rBindingName ) );
-                            xModel->getBindings()->insert( makeAny( xBinding ) );
+                            xBinding->setPropertyValue( PROPERTY_BINDING_ID, Any( _rBindingName ) );
+                            xModel->getBindings()->insert( Any( xBinding ) );
                         }
                     }
                 }
@@ -551,7 +547,7 @@ namespace pcr
                         Reference< XNamed > xName( xBinding, UNO_QUERY_THROW );
                         xName->setName( sNewName );
                         // and insert into the model
-                        xModel->getBindings()->insert( makeAny( xBinding ) );
+                        xModel->getBindings()->insert( Any( xBinding ) );
                     }
                 }
             }
@@ -678,7 +674,7 @@ namespace pcr
                         xElement->getPropertyValue( PROPERTY_MODEL ) >>= xElementsModel;
                         OSL_ENSURE( xElementsModel == xModel, "EFormsHelper::getAllElementUINames: inconsistency in the model-element relationship!" );
                         if ( xElementsModel != xModel )
-                            xElement->setPropertyValue( PROPERTY_MODEL, makeAny( xModel ) );
+                            xElement->setPropertyValue( PROPERTY_MODEL, Any( xModel ) );
                     }
 #endif
                     OUString sElementName = ( _eType == Submission ) ? xHelper->getSubmissionName( xElement, true ) : xHelper->getBindingName( xElement, true );
@@ -702,7 +698,7 @@ namespace pcr
 
     void EFormsHelper::firePropertyChange( const OUString& _rName, const Any& _rOldValue, const Any& _rNewValue ) const
     {
-        if ( m_aPropertyListeners.empty() )
+        if ( m_aPropertyListeners.getLength() == 0 )
             return;
 
         if ( _rOldValue == _rNewValue )
@@ -717,7 +713,7 @@ namespace pcr
             aEvent.OldValue = _rOldValue;
             aEvent.NewValue = _rNewValue;
 
-            const_cast< EFormsHelper* >( this )->m_aPropertyListeners.notify( aEvent, &XPropertyChangeListener::propertyChange );
+            const_cast< EFormsHelper* >( this )->m_aPropertyListeners.notifyEach( &XPropertyChangeListener::propertyChange, aEvent );
         }
         catch( const Exception& )
         {
@@ -728,7 +724,7 @@ namespace pcr
 
     void EFormsHelper::firePropertyChanges( const Reference< XPropertySet >& _rxOldProps, const Reference< XPropertySet >& _rxNewProps, std::set< OUString >& _rFilter ) const
     {
-        if ( m_aPropertyListeners.empty() )
+        if ( m_aPropertyListeners.getLength() == 0 )
             return;
 
         try

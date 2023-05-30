@@ -17,11 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <sal/log.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <o3tl/safeint.hxx>
 
+#include <utility>
 #include <vcl/metaact.hxx>
 #include <vcl/gdimtf.hxx>
 #include <vcl/graph.hxx>
@@ -146,15 +148,15 @@ namespace slideshow::internal
             // redraw all view shapes, by calling their update() method
             ViewShape::RenderArgs renderArgs( getViewRenderArgs() );
             bool bVisible = isVisible();
-            if( ::std::count_if( maViewShapes.begin(),
+            if( o3tl::make_unsigned(::std::count_if( maViewShapes.begin(),
                                  maViewShapes.end(),
                                  [this, &bVisible, &renderArgs, &nUpdateFlags]
                                  ( const ViewShapeSharedPtr& pShape )
                                  { return pShape->update( this->mpCurrMtf,
                                                           renderArgs,
                                                           nUpdateFlags,
-                                                          bVisible ); } )
-                != static_cast<ViewShapeVector::difference_type>(maViewShapes.size()) )
+                                                          bVisible ); } ))
+                != maViewShapes.size() )
             {
                 // at least one of the ViewShape::update() calls did return
                 // false - update failed on at least one ViewLayer
@@ -392,14 +394,14 @@ namespace slideshow::internal
 
             prepareHyperlinkIndices();
 
-            if(mbContainsPageField && mpCurrMtf && !maBounds.isEmpty())
+            if(mbContainsPageField && !maBounds.isEmpty())
             {
                 // tdf#150402 Use mbContainsPageField that gets set in prepareHyperlinkIndices
                 // which has to be run anyways, so this will cause no harm in execution speed.
                 // It lets us detect the potential error case that a PageField is contained in
                 // the Text of the Shape. That is a hint that maBounds contains the wrong Range
                 // and needs to be corrected. The correct size is in the PrefSize of the metafile.
-                // For more backgrund information please refer to tdf#150402, Comment 16.
+                // For more background information please refer to tdf#150402, Comment 16.
                 const double fWidthDiff(fabs(mpCurrMtf->GetPrefSize().Width() - maBounds.getWidth()));
                 const double fHeightDiff(fabs(mpCurrMtf->GetPrefSize().Height() - maBounds.getHeight()));
 
@@ -414,12 +416,12 @@ namespace slideshow::internal
         }
 
         DrawShape::DrawShape( const uno::Reference< drawing::XShape >&      xShape,
-                              const uno::Reference< drawing::XDrawPage >&   xContainingPage,
+                              uno::Reference< drawing::XDrawPage > xContainingPage,
                               double                                        nPrio,
                               const Graphic&                                rGraphic,
                               const SlideShowContext&                       rContext ) :
             mxShape( xShape ),
-            mxPage( xContainingPage ),
+            mxPage(std::move( xContainingPage )),
             maAnimationFrames(),
             mnCurrFrame(0),
             mpCurrMtf(),
@@ -770,19 +772,19 @@ namespace slideshow::internal
                         {
                             const ::basegfx::B2DSize rShapeBorder( rViewShape->getAntialiasingBorder() );
 
-                            aAABorder.setX( ::std::max(
-                                    rShapeBorder.getX(),
-                                    aAABorder.getX() ) );
-                            aAABorder.setY( ::std::max(
-                                    rShapeBorder.getY(),
-                                    aAABorder.getY() ) );
+                            aAABorder.setWidth( ::std::max(
+                                    rShapeBorder.getWidth(),
+                                    aAABorder.getWidth() ) );
+                            aAABorder.setWidth( ::std::max(
+                                    rShapeBorder.getHeight(),
+                                    aAABorder.getHeight() ) );
                         }
 
                         // add calculated AA border to aBounds
-                        aBounds = ::basegfx::B2DRectangle( aBounds.getMinX() - aAABorder.getX(),
-                                                           aBounds.getMinY() - aAABorder.getY(),
-                                                           aBounds.getMaxX() + aAABorder.getX(),
-                                                           aBounds.getMaxY() + aAABorder.getY() );
+                        aBounds = ::basegfx::B2DRectangle( aBounds.getMinX() - aAABorder.getWidth(),
+                                                           aBounds.getMinY() - aAABorder.getHeight(),
+                                                           aBounds.getMaxX() + aAABorder.getWidth(),
+                                                           aBounds.getMaxY() + aAABorder.getHeight() );
                     }
                 }
             }

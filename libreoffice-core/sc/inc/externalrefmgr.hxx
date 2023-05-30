@@ -88,7 +88,7 @@ public:
         OUString maUpperName;
         OUString maRealName;
 
-        explicit TableName(const OUString& rUpper, const OUString& rReal);
+        explicit TableName(OUString aUpper, OUString aReal);
     };
 
     struct CellFormat
@@ -188,7 +188,7 @@ public:
     typedef std::unordered_map< OUString, size_t>
         TableNameIndexMap;
 
-    ScExternalRefCache();
+    ScExternalRefCache(const ScDocument& rDoc);
     ~ScExternalRefCache();
 
     const OUString* getRealTableName(sal_uInt16 nFileId, const OUString& rTabName) const;
@@ -304,8 +304,8 @@ public:
      */
     void clearCacheTables(sal_uInt16 nFileId);
 
-    // Get the fake doc used to pass to methods that need an ScDocument in order to do row/col validation
-    const ScDocument* getFakeDoc() const { return mxFakeDoc.get(); }
+    // Get the doc used to pass to methods that need an ScDocument in order to do row/col validation
+    const ScDocument& getDoc() const { return mrDoc; }
 
 private:
     struct RangeHash
@@ -364,7 +364,7 @@ private:
 private:
     mutable osl::Mutex maMtxDocs;
     mutable DocDataType maDocs;
-    ScDocumentUniquePtr mxFakeDoc; // just to have something to pass to the methods that need to validate columns/rows
+    const ScDocument& mrDoc;
 };
 
 class SC_DLLPUBLIC ScExternalRefManager final : public formula::ExternalReferenceHelper, public SfxListener
@@ -432,7 +432,7 @@ public:
         OUString maFilterName;
         OUString maFilterOptions;
 
-        void maybeCreateRealFileName(const OUString& rOwnDocName);
+        void maybeCreateRealFileName(std::u16string_view rOwnDocName);
     };
 
 public:

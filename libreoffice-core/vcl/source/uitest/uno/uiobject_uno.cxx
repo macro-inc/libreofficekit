@@ -19,6 +19,7 @@
 #include <comphelper/propertyvalue.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <tools/link.hxx>
+#include <vcl/scheduler.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/window.hxx>
@@ -138,7 +139,7 @@ void SAL_CALL UIObjectUnoObj::executeAction(const OUString& rAction, const css::
     };
 
     Notifier notifier;
-    ExecuteWrapper* pWrapper = new ExecuteWrapper(func, LINK(&notifier, Notifier, NotifyHdl));
+    ExecuteWrapper* pWrapper = new ExecuteWrapper(std::move(func), LINK(&notifier, Notifier, NotifyHdl));
     aIdle->SetInvokeHandler(LINK(pWrapper, ExecuteWrapper, ExecuteActionHdl));
     {
         SolarMutexGuard aGuard;
@@ -153,6 +154,7 @@ void SAL_CALL UIObjectUnoObj::executeAction(const OUString& rAction, const css::
 
     SolarMutexGuard aGuard;
     aIdle.reset();
+    Scheduler::ProcessEventsToIdle();
 }
 
 css::uno::Sequence<css::beans::PropertyValue> UIObjectUnoObj::getState()

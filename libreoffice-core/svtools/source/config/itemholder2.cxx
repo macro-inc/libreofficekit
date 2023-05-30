@@ -27,10 +27,9 @@
 
 #include <svtools/accessibilityoptions.hxx>
 #include <svtools/colorcfg.hxx>
-#include <svtools/printoptions.hxx>
 #include <unotools/options.hxx>
 #include <svtools/miscopt.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ref.hxx>
 
 namespace svtools {

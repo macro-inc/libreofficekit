@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface domain="cui">
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkBox" id="ColorConfigWindow">
@@ -23,18 +23,18 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
               <object class="GtkLabel" id="doccolor">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|doccolor">Document background</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">doccolor_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -66,7 +66,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="docboundaries_lb"/>
@@ -107,11 +108,11 @@
               <object class="GtkLabel" id="appback">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|appback">Application background</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">appback_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -142,7 +143,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="objboundaries_lb"/>
@@ -185,7 +187,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="tblboundaries_lb"/>
@@ -226,11 +229,11 @@
               <object class="GtkLabel" id="font">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|font">Font color</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">font_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -261,7 +264,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="unvisitedlinks_lb"/>
@@ -304,7 +308,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="visitedlinks_lb"/>
@@ -345,11 +350,11 @@
               <object class="GtkLabel" id="autospellcheck">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
-                <property name="label" translatable="yes" context="colorconfigwin|autospellcheck">AutoSpellcheck</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
+                <property name="label" translatable="yes" context="colorconfigwin|autospellcheck">Spelling mistakes</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">autospellcheck_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -378,11 +383,11 @@
               <object class="GtkLabel" id="smarttags">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|smarttags">Smart Tags</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">smarttags_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -413,7 +418,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="shadows_lb"/>
@@ -476,23 +482,23 @@
         <property name="label-xalign">0</property>
         <property name="shadow-type">none</property>
         <child>
-          <!-- n-columns=2 n-rows=8 -->
+          <!-- n-columns=2 n-rows=9 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
               <object class="GtkLabel" id="writergrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|writergrid">Grid</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">writergrid_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -524,7 +530,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="field_lb"/>
@@ -567,7 +574,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="index_lb"/>
@@ -608,15 +616,15 @@
               <object class="GtkLabel" id="script">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|script">Script Indicator</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">script_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">3</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
             <child>
@@ -634,7 +642,7 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">3</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
             <child>
@@ -643,7 +651,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="draw-indicator">True</property>
                 <accessibility>
                   <relation type="label-for" target="section_lb"/>
@@ -651,7 +660,7 @@
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
@@ -677,22 +686,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="hdft">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|hdft">Headers and Footer delimiter</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">hdft_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">5</property>
+                <property name="top-attach">6</property>
               </packing>
             </child>
             <child>
@@ -710,22 +719,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">5</property>
+                <property name="top-attach">6</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="pagebreak">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|pagebreak">Page and column breaks</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">pagebreak_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">6</property>
+                <property name="top-attach">7</property>
               </packing>
             </child>
             <child>
@@ -743,22 +752,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">6</property>
+                <property name="top-attach">7</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="direct">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|direct">Direct Cursor</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">direct_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">7</property>
+                <property name="top-attach">8</property>
               </packing>
             </child>
             <child>
@@ -776,7 +785,40 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">7</property>
+                <property name="top-attach">8</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="grammarcheck">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
+                <property name="label" translatable="yes" context="colorconfigwin|autospellcheck">Grammar mistakes</property>
+                <property name="use-underline">True</property>
+                <property name="mnemonic-widget">grammarcheck_lb</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkMenuButton" id="grammarcheck_lb">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">end</property>
+                <property name="xalign">0</property>
+                <property name="draw-indicator">True</property>
+                <property name="label" translatable="no"></property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
               </packing>
             </child>
           </object>
@@ -805,23 +847,23 @@
         <property name="label-xalign">0</property>
         <property name="shadow-type">none</property>
         <child>
-          <!-- n-columns=2 n-rows=12 -->
+          <!-- n-columns=2 n-rows=13 -->
           <object class="GtkGrid" id="gdCalc">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
               <object class="GtkLabel" id="calcgrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|calcgrid">Grid lines</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">calcgrid_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -851,11 +893,11 @@
               <object class="GtkLabel" id="brk">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|brk">Page breaks</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">brk_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -884,11 +926,11 @@
               <object class="GtkLabel" id="brkmanual">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|brkmanual">Manual page breaks</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">brkmanual_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -917,11 +959,11 @@
               <object class="GtkLabel" id="brkauto">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|brkauto">Automatic page breaks</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">brkauto_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -950,15 +992,15 @@
               <object class="GtkLabel" id="det">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|det">Detective</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">det_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
@@ -976,7 +1018,7 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">4</property>
+                <property name="top-attach">5</property>
               </packing>
             </child>
             <child>
@@ -994,22 +1036,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">5</property>
+                <property name="top-attach">6</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="deterror">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|deterror">Detective error</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">deterror_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">5</property>
+                <property name="top-attach">6</property>
               </packing>
             </child>
             <child>
@@ -1027,22 +1069,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">6</property>
+                <property name="top-attach">7</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="ref">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|ref">References</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">ref_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">6</property>
+                <property name="top-attach">7</property>
               </packing>
             </child>
             <child>
@@ -1060,22 +1102,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">7</property>
+                <property name="top-attach">8</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="notes">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|notes">Notes background</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">notes_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">7</property>
+                <property name="top-attach">8</property>
               </packing>
             </child>
             <child>
@@ -1093,22 +1135,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">8</property>
+                <property name="top-attach">9</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="values">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|values">Values</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">values_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">8</property>
+                <property name="top-attach">9</property>
               </packing>
             </child>
             <child>
@@ -1126,22 +1168,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">9</property>
+                <property name="top-attach">10</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="formulas">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|formulas">Formulas</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">formulas_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">9</property>
+                <property name="top-attach">10</property>
               </packing>
             </child>
             <child>
@@ -1159,22 +1201,22 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">10</property>
+                <property name="top-attach">11</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="text">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|text">Text</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">text_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">10</property>
+                <property name="top-attach">11</property>
               </packing>
             </child>
             <child>
@@ -1192,22 +1234,66 @@
               </object>
               <packing>
                 <property name="left-attach">1</property>
-                <property name="top-attach">11</property>
+                <property name="top-attach">12</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="protectedcells">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|protectedcells">Protected cells background</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">protectedcells_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
-                <property name="top-attach">11</property>
+                <property name="top-attach">12</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="hiddencolrow">
+                <property name="label" translatable="yes" context="colorconfigwin|hiddencolrow">Hidden columns/rows</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
+                <property name="draw-indicator">True</property>
+                <accessibility>
+                  <relation type="label-for" target="hiddencolrow_lb"/>
+                </accessibility>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkMenuButton" id="hiddencolrow_lb">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">end</property>
+                <property name="xalign">0</property>
+                <property name="draw-indicator">True</property>
+                <property name="label" translatable="no"></property>
+                <child>
+                  <placeholder/>
+                </child>
+                <accessibility>
+                  <relation type="labelled-by" target="hiddencolrow"/>
+                </accessibility>
+                <child internal-child="accessible">
+                  <object class="AtkObject" id="hiddencolrow_lb-atkobject">
+                    <property name="AtkObject::accessible-name" translatable="yes" context="colorconfigwin|hiddencolrow_lb">Hidden row/column color</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">4</property>
               </packing>
             </child>
           </object>
@@ -1241,7 +1327,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
@@ -1267,11 +1353,11 @@
               <object class="GtkLabel" id="drawgrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|drawgrid">Grid</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">drawgrid_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1309,7 +1395,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
@@ -1335,11 +1421,11 @@
               <object class="GtkLabel" id="basicid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basicid">Identifier</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basicid_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1368,11 +1454,11 @@
               <object class="GtkLabel" id="basiccomment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basiccomment">Comment</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basiccomment_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1401,11 +1487,11 @@
               <object class="GtkLabel" id="basicnumber">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basicnumber">Number</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basicnumber_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1434,11 +1520,11 @@
               <object class="GtkLabel" id="basicstring">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basicstring">String</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basicstring_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1467,11 +1553,11 @@
               <object class="GtkLabel" id="basicop">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">end</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basicop">Operator</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basicop_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1500,11 +1586,11 @@
               <object class="GtkLabel" id="basickeyword">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|basickeyword">Reserved expression</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">basickeyword_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1533,11 +1619,11 @@
               <object class="GtkLabel" id="error">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|error">Error</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">error_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1575,7 +1661,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
@@ -1601,11 +1687,11 @@
               <object class="GtkLabel" id="sqlid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlid">Identifier</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlid_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1634,11 +1720,11 @@
               <object class="GtkLabel" id="sqlnumber">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlnumber">Number</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlnumber_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1667,11 +1753,11 @@
               <object class="GtkLabel" id="sqlstring">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlstring">String</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlstring_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1700,11 +1786,11 @@
               <object class="GtkLabel" id="sqlop">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlop">Operator</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlop_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1733,11 +1819,11 @@
               <object class="GtkLabel" id="sqlkeyword">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlkeyword">Keyword</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlkeyword_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1766,11 +1852,11 @@
               <object class="GtkLabel" id="sqlparam">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlparam">Parameter</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlparam_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1799,11 +1885,11 @@
               <object class="GtkLabel" id="sqlcomment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sqlcomment">Comment</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sqlcomment_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1841,7 +1927,7 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
+            <property name="margin-end">12</property>
             <property name="row-spacing">3</property>
             <property name="column-spacing">6</property>
             <child>
@@ -1867,11 +1953,11 @@
               <object class="GtkLabel" id="sgml">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|sgml">SGML syntax highlighting</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">sgml_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1882,11 +1968,11 @@
               <object class="GtkLabel" id="htmlcomment">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|htmlcomment">Comment highlighting</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">htmlcomment_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1915,11 +2001,11 @@
               <object class="GtkLabel" id="htmlkeyword">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|htmlkeyword">Keyword highlighting</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">htmlkeyword_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -1948,11 +2034,11 @@
               <object class="GtkLabel" id="unknown">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">6</property>
+                <property name="halign">start</property>
+                <property name="valign">center</property>
                 <property name="label" translatable="yes" context="colorconfigwin|unknown">Text</property>
                 <property name="use-underline">True</property>
                 <property name="mnemonic-widget">unknown_lb</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>

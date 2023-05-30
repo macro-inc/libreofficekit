@@ -69,10 +69,10 @@ class ScOptSolverSave
     css::uno::Sequence<css::beans::PropertyValue> maProperties;
 
 public:
-            ScOptSolverSave( const OUString& rObjective, bool bMax, bool bMin, bool bValue,
-                             const OUString& rTarget, const OUString& rVariable,
+            ScOptSolverSave( OUString aObjective, bool bMax, bool bMin, bool bValue,
+                             OUString aTarget, OUString aVariable,
                              std::vector<ScOptConditionRow>&& rConditions,
-                             const OUString& rEngine,
+                             OUString aEngine,
                              const css::uno::Sequence<css::beans::PropertyValue>& rProperties );
 
     const OUString&   GetObjective() const    { return maObjective; }
@@ -145,7 +145,6 @@ private:
     std::unique_ptr<weld::Label> m_xFtCellRef; // labels are together with controls for the first row
     std::unique_ptr<ScCursorRefEdit> m_xEdLeft1;
     std::unique_ptr<formula::RefButton> m_xRBLeft1;
-    std::unique_ptr<weld::Label> m_xFtOperator;
     std::unique_ptr<weld::ComboBox> m_xLbOp1;
     std::unique_ptr<weld::Label> m_xFtConstraint;
     std::unique_ptr<ScCursorRefEdit> m_xEdRight1;

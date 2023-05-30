@@ -1,12 +1,14 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 
 from uitest.framework import UITestCase
-from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, select_pos
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file, select_pos, select_by_text
 from libreoffice.uno.propertyvalue import mkPropertyValues
 from libreoffice.calc.document import is_row_hidden
 
@@ -34,9 +36,9 @@ class ColorFilterTest(UITestCase):
                 xCond1 = xDialog.getChild("cond1")
 
                 # tdf#143103: Without the fix in place, this test would have failed with
-                # AssertionError: 'Text color' != ''
+                # AssertionError: 'Font color' != ''
                 self.assertEqual("Text color", get_state_as_dict(xField1)['DisplayText'])
-                self.assertEqual("Text color", get_state_as_dict(xCond1)['DisplayText'])
+                self.assertEqual("Font color", get_state_as_dict(xCond1)['DisplayText'])
 
                 xColor1 = xDialog.getChild("color1")
 
@@ -115,9 +117,7 @@ class ColorFilterTest(UITestCase):
 
                 self.assertEqual("Another", get_state_as_dict(xField1)['DisplayText'])
 
-                props = {"TEXT": "Background color"}
-                actionProps = mkPropertyValues(props)
-                xCond1.executeAction("SELECT", actionProps)
+                select_by_text(xCond1, "Background color")
                 self.assertEqual("Background color", get_state_as_dict(xCond1)['DisplayText'])
 
                 xColor1 = xDialog.getChild("color1")

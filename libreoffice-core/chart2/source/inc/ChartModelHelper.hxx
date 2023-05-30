@@ -20,6 +20,7 @@
 
 #include <com/sun/star/awt/Size.hpp>
 #include "charttoolsdllapi.hxx"
+#include <rtl/ref.hxx>
 
 #include <vector>
 
@@ -36,50 +37,50 @@ namespace com::sun::star::view { class XSelectionSupplier; }
 
 namespace chart
 {
+class BaseCoordinateSystem;
+class ChartType;
+class DataSeries;
+class Diagram;
+class InternalDataProvider;
 
 class OOO_DLLPUBLIC_CHARTTOOLS ChartModelHelper
 {
 public:
     static css::uno::Reference< css::chart2::data::XRangeHighlighter > createRangeHighlighter(
-            const css::uno::Reference< css::view::XSelectionSupplier >& xSelectionSupplier );
+            const rtl::Reference< ::chart::ChartModel >& xSelectionSupplier );
 
-    static css::uno::Reference< css::chart2::data::XDataProvider > createInternalDataProvider(
-            const css::uno::Reference< css::chart2::XChartDocument >& xChartDoc, bool bConnectToModel );
+    static rtl::Reference< InternalDataProvider > createInternalDataProvider(
+            const rtl::Reference<::chart::ChartModel>& xChartDoc, bool bConnectToModel );
 
-    static css::uno::Reference< css::chart2::XDiagram >
-        findDiagram( const css::uno::Reference< css::frame::XModel >& xModel );
+    static rtl::Reference< Diagram >
+        findDiagram( const rtl::Reference< ::chart::ChartModel >& xModel );
 
-    static css::uno::Reference< css::chart2::XDiagram >
-        findDiagram( const css::uno::Reference< css::chart2::XChartDocument >& xChartDoc );
+    static rtl::Reference< ::chart::BaseCoordinateSystem >
+        getFirstCoordinateSystem( const rtl::Reference<::chart::ChartModel>& xModel );
 
-    static css::uno::Reference< css::chart2::XCoordinateSystem >
-        getFirstCoordinateSystem( ChartModel& rModel );
+    static std::vector< rtl::Reference< ::chart::DataSeries > >
+            getDataSeries( const rtl::Reference< ::chart::ChartModel > & xModel );
 
-    static css::uno::Reference< css::chart2::XCoordinateSystem >
-        getFirstCoordinateSystem( const css::uno::Reference< css::frame::XModel >& xModel );
-
-    SAL_DLLPRIVATE static std::vector< css::uno::Reference< css::chart2::XDataSeries > >
-        getDataSeries( ChartModel& rModel );
-
-    SAL_DLLPRIVATE static std::vector< css::uno::Reference< css::chart2::XDataSeries > >
-            getDataSeries( const css::uno::Reference< css::chart2::XChartDocument > & xChartDoc );
-    static std::vector< css::uno::Reference< css::chart2::XDataSeries > >
-            getDataSeries( const css::uno::Reference< css::frame::XModel > & xModel );
-
-    static css::uno::Reference< css::chart2::XChartType >
+    static rtl::Reference< ChartType >
         getChartTypeOfSeries(
-            const css::uno::Reference< css::frame::XModel >& xModel
+            const rtl::Reference<::chart::ChartModel>& xModel
             , const css::uno::Reference< css::chart2::XDataSeries >& xGivenDataSeries );
+
+    static rtl::Reference< ChartType >
+        getChartTypeOfSeries(
+            const rtl::Reference<::chart::ChartModel>& xModel
+            , const rtl::Reference< ::chart::DataSeries >& xGivenDataSeries );
 
     static css::awt::Size getDefaultPageSize();
 
-    static css::awt::Size getPageSize( const css::uno::Reference< css::frame::XModel >& xModel );
+    static css::awt::Size getPageSize( const rtl::Reference<::chart::ChartModel>& xModel );
 
-    static void triggerRangeHighlighting( const css::uno::Reference< css::frame::XModel >& xModel );
+    static void triggerRangeHighlighting( const rtl::Reference<::chart::ChartModel>& xModel );
 
-    static bool isIncludeHiddenCells( const css::uno::Reference< css::frame::XModel >& xChartModel );
+    static bool isIncludeHiddenCells( const rtl::Reference<::chart::ChartModel>& xChartModel );
 
     static bool setIncludeHiddenCells( bool bIncludeHiddenCells, ChartModel& rModel);
+
 };
 
 } //namespace chart

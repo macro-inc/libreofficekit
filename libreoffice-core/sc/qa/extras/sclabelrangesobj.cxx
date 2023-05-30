@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xenumerationaccess.hxx>
 #include <test/container/xindexaccess.hxx>
@@ -31,7 +31,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScLabelRangesObj : public CalcUnoApiTest,
+class ScLabelRangesObj : public UnoApiTest,
                          public apitest::XElementAccess,
                          public apitest::XEnumerationAccess,
                          public apitest::XIndexAccess,
@@ -42,7 +42,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScLabelRangesObj);
 
@@ -62,13 +61,10 @@ public:
     CPPUNIT_TEST(testRemoveByIndex);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScLabelRangesObj::ScLabelRangesObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<sheet::XLabelRange>::get())
     , XIndexAccess(1)
 {
@@ -91,15 +87,9 @@ uno::Reference<uno::XInterface> ScLabelRangesObj::init()
 
 void ScLabelRangesObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScLabelRangesObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScLabelRangesObj);

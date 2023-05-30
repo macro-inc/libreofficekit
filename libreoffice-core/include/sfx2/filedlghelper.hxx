@@ -28,7 +28,7 @@
 #include <rtl/ustring.hxx>
 #include <comphelper/documentconstants.hxx>
 #include <tools/link.hxx>
-#include <vcl/errcode.hxx>
+#include <comphelper/errcode.hxx>
 #include <o3tl/typed_flags_set.hxx>
 
 #include <memory>
@@ -68,7 +68,7 @@ namespace o3tl {
     template<> struct typed_flags<FileDialogFlags> : is_typed_flags<FileDialogFlags, 0xFF> {};
 }
 
-#define FILEDIALOG_FILTER_ALL   "*.*"
+inline constexpr OUStringLiteral FILEDIALOG_FILTER_ALL = u"*.*";
 
 namespace sfx2 {
 
@@ -172,7 +172,7 @@ public:
                             FileDialogHelper(sal_Int16 nDialogType,
                                              FileDialogFlags nFlags,
                                              const OUString& aFilterUIName,
-                                             const OUString& aExtName,
+                                             std::u16string_view aExtName,
                                              const OUString& rStandardDir,
                                              const css::uno::Sequence< OUString >& rDenyList,
                                              weld::Window* pPreferredParent);
@@ -307,7 +307,7 @@ css::uno::Reference<css::ui::dialogs::XFolderPicker2> SFX2_DLLPUBLIC createFolde
 
 ErrCode RequestPassword(const std::shared_ptr<const SfxFilter>& pCurrentFilter, OUString const & aURL, SfxItemSet* pSet, const css::uno::Reference<css::awt::XWindow>& rParent);
 ErrCode SetPassword(const std::shared_ptr<const SfxFilter>& pCurrentFilter, SfxItemSet* pSet,
-                    const OUString& rPasswordToOpen, const OUString& rPasswordToModify,
+                    const OUString& rPasswordToOpen, std::u16string_view rPasswordToModify,
                     bool bAllowPasswordReset = false);
 bool IsOOXML(const std::shared_ptr<const SfxFilter>& pCurrentFilter);
 bool IsMSType(const std::shared_ptr<const SfxFilter>& pCurrentFilter);

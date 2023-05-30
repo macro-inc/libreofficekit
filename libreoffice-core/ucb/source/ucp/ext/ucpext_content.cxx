@@ -25,7 +25,6 @@
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <com/sun/star/lang/IllegalAccessException.hpp>
 #include <com/sun/star/sdbc/XRow.hpp>
-#include <com/sun/star/ucb/CommandAbortedException.hpp>
 #include <com/sun/star/ucb/XCommandInfo.hpp>
 #include <com/sun/star/ucb/OpenCommandArgument2.hpp>
 #include <com/sun/star/ucb/OpenMode.hpp>
@@ -37,7 +36,7 @@
 #include <ucbhelper/propertyvalueset.hxx>
 #include <ucbhelper/cancelcommandexecution.hxx>
 #include <ucbhelper/content.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/uri.hxx>
 #include <sal/macros.h>
@@ -55,7 +54,6 @@ namespace ucb::ucp::ext
     using ::com::sun::star::uno::UNO_SET_THROW;
     using ::com::sun::star::uno::Exception;
     using ::com::sun::star::uno::Any;
-    using ::com::sun::star::uno::makeAny;
     using ::com::sun::star::uno::Sequence;
     using ::com::sun::star::uno::XComponentContext;
     using ::com::sun::star::ucb::XContentIdentifier;
@@ -120,9 +118,9 @@ namespace ucb::ucp::ext
         }
         else
         {
-            const OUString sRelativeURL( sURL.copy( ContentProvider::getRootURL().getLength() ) );
-            const sal_Int32 nSepPos = sRelativeURL.indexOf( '/' );
-            if ( ( nSepPos == -1 ) || ( nSepPos == sRelativeURL.getLength() - 1 ) )
+            const std::u16string_view sRelativeURL( sURL.subView( ContentProvider::getRootURL().getLength() ) );
+            const size_t nSepPos = sRelativeURL.find( '/' );
+            if ( ( nSepPos == std::u16string_view::npos ) || ( nSepPos == sRelativeURL.size() - 1 ) )
             {
                 m_eExtContentType = E_EXTENSION_ROOT;
             }
@@ -181,7 +179,7 @@ namespace ucb::ucp::ext
             Sequence< Property > Properties;
             if ( !( aCommand.Argument >>= Properties ) )
             {
-                ::ucbhelper::cancelCommandExecution( makeAny( IllegalArgumentException(
+                ::ucbhelper::cancelCommandExecution( Any( IllegalArgumentException(
                     OUString(), *this, -1 ) ),
                     i_rEnvironment );
                 // unreachable
@@ -194,7 +192,7 @@ namespace ucb::ucp::ext
             Sequence< PropertyValue > aProperties;
             if ( !( aCommand.Argument >>= aProperties ) )
             {
-                ::ucbhelper::cancelCommandExecution( makeAny( IllegalArgumentException(
+                ::ucbhelper::cancelCommandExecution( Any( IllegalArgumentException(
                     OUString(), *this, -1 ) ),
                     i_rEnvironment );
                 // unreachable
@@ -202,7 +200,7 @@ namespace ucb::ucp::ext
 
             if ( !aProperties.hasElements() )
             {
-                ::ucbhelper::cancelCommandExecution( makeAny( IllegalArgumentException(
+                ::ucbhelper::cancelCommandExecution( Any( IllegalArgumentException(
                     OUString(), *this, -1 ) ),
                     i_rEnvironment );
                 // unreachable
@@ -225,7 +223,7 @@ namespace ucb::ucp::ext
             OpenCommandArgument2 aOpenCommand;
             if ( !( aCommand.Argument >>= aOpenCommand ) )
             {
-                ::ucbhelper::cancelCommandExecution( makeAny( IllegalArgumentException(
+                ::ucbhelper::cancelCommandExecution( Any( IllegalArgumentException(
                     OUString(), *this, -1 ) ),
                     i_rEnvironment );
                 // unreachable
@@ -247,13 +245,13 @@ namespace ucb::ucp::ext
             {
                 const OUString sPhysicalContentURL( getPhysicalURL() );
                 ::ucbhelper::Content aRequestedContent( sPhysicalContentURL, i_rEnvironment, m_xContext );
-                aRet = aRequestedContent.executeCommand( "open", makeAny( aOpenCommand ) );
+                aRet = aRequestedContent.executeCommand( "open", Any( aOpenCommand ) );
             }
         }
 
         else
         {
-            ::ucbhelper::cancelCommandExecution( makeAny( UnsupportedCommandException(
+            ::ucbhelper::cancelCommandExecution( Any( UnsupportedCommandException(
                 OUString(), *this ) ),
                 i_rEnvironment );
             // unreachable
@@ -281,16 +279,16 @@ namespace ucb::ucp::ext
     }
 
 
-    bool Content::denotesRootContent( const OUString& i_rContentIdentifier )
+    bool Content::denotesRootContent( std::u16string_view i_rContentIdentifier )
     {
         const OUString sRootURL( ContentProvider::getRootURL() );
         if ( i_rContentIdentifier == sRootURL )
             return true;
 
         // the root URL contains only two trailing /, but we also recognize 3 of them as denoting the root URL
-        if  (   i_rContentIdentifier.match( sRootURL )
-            &&  ( i_rContentIdentifier.getLength() == sRootURL.getLength() + 1 )
-            &&  ( i_rContentIdentifier[ i_rContentIdentifier.getLength() - 1 ] == '/' )
+        if  (   o3tl::starts_with(i_rContentIdentifier,  sRootURL )
+            &&  ( sal_Int32(i_rContentIdentifier.size()) == sRootURL.getLength() + 1 )
+            &&  ( i_rContentIdentifier[ i_rContentIdentifier.size() - 1 ] == '/' )
             )
             return true;
 

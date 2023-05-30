@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/container/xelementaccess.hxx>
 #include <test/container/xindexaccess.hxx>
 #include <test/container/xnameaccess.hxx>
@@ -32,7 +32,7 @@ using namespace css;
 
 namespace sc_apitest
 {
-class ScStyleFamilyObj : public CalcUnoApiTest,
+class ScStyleFamilyObj : public UnoApiTest,
                          public apitest::XElementAccess,
                          public apitest::XIndexAccess,
                          public apitest::XNameAccess,
@@ -45,7 +45,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScStyleFamilyObj);
 
@@ -78,9 +77,6 @@ public:
     CPPUNIT_TEST(testSupportsService);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> m_xComponent;
 };
 
 /* TODO: this c/should be derived/defined from the real style count, default
@@ -88,7 +84,7 @@ private:
 constexpr sal_Int32 kScStyleFamilyObjCount = 20;
 
 ScStyleFamilyObj::ScStyleFamilyObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XElementAccess(cppu::UnoType<style::XStyle>::get())
     , XIndexAccess(kScStyleFamilyObjCount)
     , XNameAccess("ScStyleFamilyObj")
@@ -100,38 +96,32 @@ ScStyleFamilyObj::ScStyleFamilyObj()
 
 uno::Reference<uno::XInterface> ScStyleFamilyObj::init()
 {
-    uno::Reference<sheet::XSpreadsheetDocument> xDoc(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<sheet::XSpreadsheetDocument> xDoc(mxComponent, uno::UNO_QUERY_THROW);
 
     uno::Reference<style::XStyleFamiliesSupplier> xSFS(xDoc, uno::UNO_QUERY_THROW);
     uno::Reference<container::XNameAccess> xNA(xSFS->getStyleFamilies(), uno::UNO_SET_THROW);
     uno::Reference<container::XIndexAccess> xIA(xNA, uno::UNO_QUERY_THROW);
     uno::Reference<container::XNameAccess> xNA_SF(xIA->getByIndex(0), uno::UNO_QUERY_THROW);
 
-    uno::Reference<lang::XMultiServiceFactory> xMSF(m_xComponent, uno::UNO_QUERY_THROW);
+    uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY_THROW);
     uno::Reference<uno::XInterface> xCS(xMSF->createInstance("com.sun.star.style.CellStyle"),
                                         uno::UNO_SET_THROW);
     // XNameContainer
-    XNameContainer::setElement(uno::makeAny(xMSF->createInstance("com.sun.star.style.CellStyle")));
+    XNameContainer::setElement(uno::Any(xMSF->createInstance("com.sun.star.style.CellStyle")));
     // XNameReplace
-    XNameReplace::setElement(uno::makeAny(xMSF->createInstance("com.sun.star.style.CellStyle")));
+    XNameReplace::setElement(uno::Any(xMSF->createInstance("com.sun.star.style.CellStyle")));
 
     uno::Reference<container::XNameContainer> xNC(xNA_SF, uno::UNO_QUERY_THROW);
-    xNC->insertByName("ScStyleFamilyObj", uno::makeAny(xCS));
+    xNC->insertByName("ScStyleFamilyObj", uno::Any(xCS));
 
     return xNA_SF;
 }
 
 void ScStyleFamilyObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create calc document
-    m_xComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScStyleFamilyObj::tearDown()
-{
-    closeDocument(m_xComponent);
-    CalcUnoApiTest::tearDown();
+    mxComponent = loadFromDesktop("private:factory/scalc");
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScStyleFamilyObj);

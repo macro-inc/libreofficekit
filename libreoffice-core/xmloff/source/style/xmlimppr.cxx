@@ -29,6 +29,7 @@
 #include <rtl/ustrbuf.hxx>
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
+#include <utility>
 #include <xmloff/xmlprmap.hxx>
 #include <xmloff/namespacemap.hxx>
 #include <xmloff/xmlimppr.hxx>
@@ -43,7 +44,6 @@
 #include <xmloff/maptype.hxx>
 
 #include <algorithm>
-#include <utility>
 #include <vector>
 
 using namespace ::com::sun::star::uno;
@@ -61,10 +61,10 @@ using ::com::sun::star::beans::PropertyVetoException;
 
 
 SvXMLImportPropertyMapper::SvXMLImportPropertyMapper(
-        const rtl::Reference< XMLPropertySetMapper >& rMapper,
+        rtl::Reference< XMLPropertySetMapper > xMapper,
         SvXMLImport& rImp ):
     rImport(rImp),
-    maPropMapper  ( rMapper )
+    maPropMapper  (std::move( xMapper ))
 {
 }
 

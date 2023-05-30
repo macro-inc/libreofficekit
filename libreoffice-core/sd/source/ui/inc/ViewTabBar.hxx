@@ -24,9 +24,8 @@
 #include <com/sun/star/drawing/framework/XToolBar.hpp>
 #include <com/sun/star/drawing/framework/XConfigurationChangeListener.hpp>
 #include <com/sun/star/lang/XUnoTunnel.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <vcl/InterimItemWindow.hxx>
-#include "MutexOwner.hxx"
 
 #include <vector>
 
@@ -46,7 +45,7 @@ namespace sd {
 class TabBarControl final : public InterimItemWindow
 {
 public:
-    TabBarControl(vcl::Window* pParentWindow, const ::rtl::Reference<ViewTabBar>& rpViewTabBar);
+    TabBarControl(vcl::Window* pParentWindow, ::rtl::Reference<ViewTabBar> pViewTabBar);
     virtual void dispose() override;
     virtual ~TabBarControl() override;
     weld::Notebook& GetNotebook() { return *mxTabControl; }
@@ -60,7 +59,7 @@ private:
     DECL_LINK(NotebookSizeAllocHdl, const Size&, void);
 };
 
-typedef ::cppu::WeakComponentImplHelper <
+typedef comphelper::WeakComponentImplHelper <
     css::drawing::framework::XToolBar,
     css::drawing::framework::XTabBar,
     css::drawing::framework::XConfigurationChangeListener,
@@ -70,8 +69,7 @@ typedef ::cppu::WeakComponentImplHelper <
 /** Tab control for switching between views in the center pane.
 */
 class ViewTabBar final
-    : private sd::MutexOwner,
-      public ViewTabBarInterfaceBase
+    : public ViewTabBarInterfaceBase
 {
 public:
     ViewTabBar (
@@ -79,7 +77,7 @@ public:
         const css::uno::Reference< css::frame::XController>& rxController);
     virtual ~ViewTabBar() override;
 
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     const VclPtr<TabBarControl>& GetTabControl() const { return mpTabControl; }
 

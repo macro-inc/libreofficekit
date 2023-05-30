@@ -41,9 +41,10 @@
 #include <com/sun/star/util/XModifyListener.hpp>
 #include <com/sun/star/util/XModifyBroadcaster.hpp>
 
-#include <tools/wintypes.hxx>
+#include <vcl/wintypes.hxx>
 #include <toolkit/controls/unocontrol.hxx>
 #include <toolkit/awt/vclxwindow.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/uno3.hxx>
 #include <cppuhelper/implbase.hxx>
@@ -72,7 +73,7 @@ public:
 // FmXModifyMultiplexer
 
 class SAL_WARN_UNUSED FmXModifyMultiplexer final : public OWeakSubObject
-                            ,public ::comphelper::OInterfaceContainerHelper2
+                            ,public ::comphelper::OInterfaceContainerHelper3<css::util::XModifyListener>
                             ,public css::util::XModifyListener
 {
 public:
@@ -95,7 +96,7 @@ public:
 // FmXUpdateMultiplexer
 
 class SAL_WARN_UNUSED FmXUpdateMultiplexer final : public OWeakSubObject,
-                             public ::comphelper::OInterfaceContainerHelper2,
+                             public ::comphelper::OInterfaceContainerHelper3<css::form::XUpdateListener>,
                              public css::form::XUpdateListener
 {
 public:
@@ -120,7 +121,7 @@ public:
 // FmXSelectionMultiplexer
 
 class SAL_WARN_UNUSED FmXSelectionMultiplexer final : public OWeakSubObject
-                                ,public ::comphelper::OInterfaceContainerHelper2
+                                ,public ::comphelper::OInterfaceContainerHelper3<css::view::XSelectionChangeListener>
                                 ,public css::view::XSelectionChangeListener
 {
 public:
@@ -144,7 +145,7 @@ public:
 // FmXGridControlMultiplexer
 
 class SAL_WARN_UNUSED FmXGridControlMultiplexer final : public OWeakSubObject
-                                ,public ::comphelper::OInterfaceContainerHelper2
+                                ,public ::comphelper::OInterfaceContainerHelper3<css::form::XGridControlListener>
                                 ,public css::form::XGridControlListener
 {
 public:
@@ -168,7 +169,7 @@ public:
 // FmXContainerMultiplexer
 
 class SAL_WARN_UNUSED FmXContainerMultiplexer final : public OWeakSubObject,
-                                public ::comphelper::OInterfaceContainerHelper2,
+                                public ::comphelper::OInterfaceContainerHelper3<css::container::XContainerListener>,
                                 public css::container::XContainerListener
 {
 public:
@@ -276,7 +277,7 @@ public:
     virtual css::uno::Sequence< css::uno::Any > SAL_CALL queryFieldData( sal_Int32 nRow, const css::uno::Type& xType ) override;
 
 // UnoControl
-    virtual OUString GetComponentServiceName() override;
+    virtual OUString GetComponentServiceName() const override;
 
 // css::util::XModifyBroadcaster
     virtual void SAL_CALL addModifyListener(const css::uno::Reference< css::util::XModifyListener >& l) override;
@@ -346,11 +347,11 @@ protected:
 private:
     css::uno::Reference< css::container::XIndexContainer >    m_xColumns;
     css::uno::Reference< css::sdbc::XRowSet >                 m_xCursor;
-    ::comphelper::OInterfaceContainerHelper2       m_aModifyListeners,
-                                            m_aUpdateListeners,
-                                            m_aContainerListeners,
-                                            m_aSelectionListeners,
-                                            m_aGridControlListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::util::XModifyListener> m_aModifyListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XUpdateListener> m_aUpdateListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::container::XContainerListener> m_aContainerListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::view::XSelectionChangeListener> m_aSelectionListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::form::XGridControlListener> m_aGridControlListeners;
 
     OUString                m_aMode;
     sal_Int32               m_nCursorListening;

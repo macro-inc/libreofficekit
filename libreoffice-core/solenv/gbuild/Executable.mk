@@ -75,6 +75,9 @@ $(call gb_Executable_get_runtime_target,$(1)) : $(call gb_Executable_get_target_
 $(call gb_Executable_get_clean_target,$(1)) : $(call gb_LinkTarget_get_clean_target,$(2))
 $(call gb_Executable_get_clean_target,$(1)) : AUXTARGETS :=
 $(call gb_Executable_Executable_platform,$(1),$(2),$(gb_Executable_BINDIR)/$(1).lib)
+ifeq ($(OS),EMSCRIPTEN)
+$(call gb_LinkTarget_get_target,$(call gb_Executable_get_linktarget,$(1))) : $(call gb_CustomTarget_get_workdir,static/emscripten_fs_image)/soffice.data.js.link
+endif
 
 $$(eval $$(call gb_Module_register_target,$(call gb_Executable_get_target,$(1)),$(call gb_Executable_get_clean_target,$(1))))
 $(call gb_Helper_make_userfriendly_targets,$(1),Executable)
@@ -82,7 +85,7 @@ $(call gb_Helper_make_userfriendly_targets,$(1),Executable)
 endef
 
 define gb_Executable_set_targettype_gui
-$(call gb_LinkTarget_get_target,$(call gb_Executable_get_linktarget,$(1))) : TARGETGUI := $(2)
+$(call gb_Executable_get_linktarget_target,$(1)) : TARGETGUI := $(2)
 endef
 
 # forward the call to the gb_LinkTarget implementation
@@ -154,8 +157,8 @@ gb_Executable_set_external_code = $(call gb_Executable__forward_to_Linktarget,$(
 gb_Executable_set_generated_cxx_suffix = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Executable_use_clang = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Executable_set_clang_precompiled_header = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
-gb_Executable_use_glxtest = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 gb_Executable_use_vclmain = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
+gb_Executable_add_prejs = $(call gb_Executable__forward_to_Linktarget,$(0),$(1),$(2),$(3))
 
 # Run-time use
 

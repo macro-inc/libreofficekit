@@ -11,11 +11,14 @@
 #pragma once
 
 #include <doc.hxx>
-#include "ModelTraverser.hxx"
 #include <svx/GenericCheckDialog.hxx>
 
 namespace sw
 {
+/**
+ * Class responsible to check if a graphic object violates the size
+ * constraints and store the results.
+ */
 class GraphicSizeViolation final
 {
 private:
@@ -31,7 +34,7 @@ public:
     GraphicSizeViolation(sal_Int32 nDPI, const SwGrfNode* pGraphicNode);
     bool check();
 
-    OUString getGraphicName();
+    const OUString& getGraphicName();
 
     bool isDPITooLow() { return m_nDPIX < m_nLowDPILimit || m_nDPIY < m_nLowDPILimit; }
 
@@ -42,6 +45,10 @@ public:
     sal_Int32 getDPIY() { return m_nDPIY; }
 };
 
+/**
+ * Run the graphic size checks for all the graphic objects in the DOM
+ * and store a list of violations.
+ */
 class GraphicSizeCheck final
 {
 private:
@@ -62,6 +69,7 @@ public:
     }
 };
 
+/** The UI part of the GraphicSizeViolation used by GenericCheckDialog */
 class GraphicSizeCheckGUIEntry : public svx::CheckData
 {
 private:
@@ -86,6 +94,10 @@ public:
     void runProperties() override;
 };
 
+/**
+ * The UI part presenting the graphic size check results, which is
+ * used by GenericCheckDialog
+ */
 class GraphicSizeCheckGUIResult : public svx::CheckDataCollection
 {
 public:

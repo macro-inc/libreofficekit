@@ -101,7 +101,7 @@ SwSortElement::~SwSortElement()
 {
 }
 
-double SwSortElement::StrToDouble( const OUString& rStr )
+double SwSortElement::StrToDouble( std::u16string_view rStr )
 {
     if( !pLclData )
         pLclData = new LocaleDataWrapper( LanguageTag( *pLocale ));
@@ -283,23 +283,23 @@ double SwSortBoxElement::GetValue( sal_uInt16 nKey ) const
 bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
 {
     // Check if Frame is in the Text
-    const SwPosition *pStart = rPaM.Start(), *pEnd = rPaM.End();
+    auto [pStart, pEnd] = rPaM.StartEnd(); // SwPosition*
 
     // Set index to the Selection's start
     for ( const auto *pFormat : *GetSpzFrameFormats() )
     {
         SwFormatAnchor const*const pAnchor = &pFormat->GetAnchor();
-        SwPosition const*const pAPos = pAnchor->GetContentAnchor();
+        SwNode const*const pAnchorNode = pAnchor->GetAnchorNode();
 
-        if (pAPos && (RndStdIds::FLY_AT_PARA == pAnchor->GetAnchorId()) &&
-            pStart->nNode <= pAPos->nNode && pAPos->nNode <= pEnd->nNode )
+        if (pAnchorNode && (RndStdIds::FLY_AT_PARA == pAnchor->GetAnchorId()) &&
+            pStart->GetNode() <= *pAnchorNode && *pAnchorNode <= pEnd->GetNode() )
             return false;
     }
 
     // Check if only TextNodes are within the Selection
     {
-        SwNodeOffset nStart = pStart->nNode.GetIndex(),
-                        nEnd = pEnd->nNode.GetIndex();
+        SwNodeOffset nStart = pStart->GetNodeIndex(),
+                        nEnd = pEnd->GetNodeIndex();
         while( nStart <= nEnd )
             // Iterate over a selected range
             if( !GetNodes()[ nStart++ ]->IsTextNode() )
@@ -319,10 +319,10 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
     // To-Do - add 'SwExtraRedlineTable' also ?
     if( getIDocumentRedlineAccess().IsRedlineOn() || (!getIDocumentRedlineAccess().IsIgnoreRedline() && !getIDocumentRedlineAccess().GetRedlineTable().empty() ))
     {
-        pRedlPam = new SwPaM( pStart->nNode, pEnd->nNode, SwNodeOffset(-1), SwNodeOffset(1) );
-        SwContentNode* pCNd = pRedlPam->GetContentNode( false );
+        pRedlPam = new SwPaM( pStart->GetNode(), pEnd->GetNode(), SwNodeOffset(-1), SwNodeOffset(1) );
+        SwContentNode* pCNd = pRedlPam->GetMarkContentNode();
         if( pCNd )
-            pRedlPam->GetMark()->nContent = pCNd->Len();
+            pRedlPam->GetMark()->SetContent( pCNd->Len() );
 
         if( getIDocumentRedlineAccess().IsRedlineOn() && !IDocumentRedlineAccess::IsShowOriginal( getIDocumentRedlineAccess().GetRedlineFlags() ) )
         {
@@ -332,19 +332,17 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
                 GetIDocumentUndoRedo().DoUndo(false);
             }
             // First copy the range
-            SwNodeIndex aEndIdx( pEnd->nNode, 1 );
-            SwNodeRange aRg( pStart->nNode, aEndIdx );
-            GetNodes().Copy_( aRg, aEndIdx );
+            SwNodeIndex aEndIdx( pEnd->GetNode(), 1 );
+            SwNodeRange aRg( pStart->GetNode(), aEndIdx.GetNode() );
+            GetNodes().Copy_( aRg, aEndIdx.GetNode() );
 
             // range is new from pEnd->nNode+1 to aEndIdx
             getIDocumentRedlineAccess().DeleteRedline( *pRedlPam, true, RedlineType::Any );
 
-            pRedlPam->GetMark()->nNode.Assign( pEnd->nNode.GetNode(), 1 );
-            pCNd = pRedlPam->GetContentNode( false );
-            pRedlPam->GetMark()->nContent.Assign( pCNd, 0 );
+            pRedlPam->GetMark()->Assign( pEnd->GetNode(), SwNodeOffset(1) );
 
-            pRedlPam->GetPoint()->nNode.Assign( aEndIdx.GetNode() );
-            pCNd = pRedlPam->GetContentNode();
+            pRedlPam->GetPoint()->Assign( aEndIdx.GetNode() );
+            pCNd = pRedlPam->GetPointContentNode();
             sal_Int32 nCLen = 0;
             if( !pCNd )
             {
@@ -352,10 +350,11 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
                 if( pCNd )
                 {
                     nCLen = pCNd->Len();
-                    pRedlPam->GetPoint()->nNode.Assign( *pCNd );
+                    pRedlPam->GetPoint()->Assign( *pCNd );
                 }
             }
-            pRedlPam->GetPoint()->nContent.Assign( pCNd, nCLen );
+            if (pCNd)
+                pRedlPam->GetPoint()->SetContent( nCLen );
 
             if( pRedlUndo )
                 pRedlUndo->SetValues( rPaM );
@@ -368,10 +367,10 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
         }
     }
 
-    SwNodeIndex aStart(pStart->nNode);
+    SwNodeIndex aStart(pStart->GetNode());
     SwSortElement::Init( this, rOpt );
     std::multiset<SwSortTextElement> aSortSet;
-    while( aStart <= pEnd->nNode )
+    while( aStart <= pEnd->GetNode() )
     {
         // Iterate over a selected range
         aSortSet.insert(SwSortTextElement(aStart));
@@ -379,7 +378,7 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
     }
 
     // Now comes the tricky part: Move Nodes (and always keep Undo in mind)
-    SwNodeOffset nBeg = pStart->nNode.GetIndex();
+    SwNodeOffset nBeg = pStart->GetNodeIndex();
     SwNodeRange aRg( aStart, aStart );
 
     if( bUndo && !pRedlUndo )
@@ -398,7 +397,7 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
         aRg.aEnd    = aRg.aStart.GetIndex() + 1;
 
         // Move Nodes
-        getIDocumentContentOperations().MoveNodeRange( aRg, aStart,
+        getIDocumentContentOperations().MoveNodeRange( aRg, aStart.GetNode(),
             SwMoveFlags::DEFAULT );
 
         // Insert Move in Undo
@@ -432,9 +431,7 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
 
         // pRedlPam points to nodes that may be deleted (hidden) by
         // AppendRedline, so adjust it beforehand to prevent ASSERT
-        pRedlPam->GetPoint()->nNode = aSttIdx;
-        SwContentNode* pCNd = aSttIdx.GetNode().GetContentNode();
-        pRedlPam->GetPoint()->nContent.Assign( pCNd, 0 );
+        pRedlPam->GetPoint()->Assign(aSttIdx);
 
         getIDocumentRedlineAccess().AppendRedline(pDeleteRedline, true);
 
@@ -443,11 +440,9 @@ bool SwDoc::SortText(const SwPaM& rPaM, const SwSortOptions& rOpt)
 
         if( pRedlUndo )
         {
-            SwNodeIndex aInsEndIdx( pRedlPam->GetMark()->nNode, -1 );
-            pRedlPam->GetMark()->nNode = aInsEndIdx;
-            SwContentNode *const pPrevNode =
-                pRedlPam->GetMark()->nNode.GetNode().GetContentNode();
-            pRedlPam->GetMark()->nContent.Assign( pPrevNode, pPrevNode->Len() );
+            SwNodeIndex aInsEndIdx( pRedlPam->GetMark()->GetNode(), -1 );
+            SwContentNode *const pContentNode = aInsEndIdx.GetNode().GetContentNode();
+            pRedlPam->GetMark()->Assign( *pContentNode, pContentNode->Len() );
 
             pRedlUndo->SetValues( *pRedlPam );
         }
@@ -698,7 +693,7 @@ void MoveCell(SwDoc* pDoc, const SwTableBox* pSource, const SwTableBox* pTar,
     // -> insert an empty Node and move the rest or the Mark
     // points to the first ContentNode
     if( pNd->StartOfSectionNode() == pSource->GetSttNd() )
-        pNd = pDoc->GetNodes().MakeTextNode( aRg.aStart,
+        pNd = pDoc->GetNodes().MakeTextNode( aRg.aStart.GetNode(),
                 pDoc->GetDfltTextFormatColl() );
     aRg.aEnd = *pNd->EndOfSectionNode();
 
@@ -723,7 +718,7 @@ void MoveCell(SwDoc* pDoc, const SwTableBox* pSource, const SwTableBox* pTar,
 
     // Insert the Source
     SwNodeIndex aIns( *pTar->GetSttNd()->EndOfSectionNode() );
-    pDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aIns,
+    pDoc->getIDocumentContentOperations().MoveNodeRange( aRg, aIns.GetNode(),
         SwMoveFlags::DEFAULT );
 
     // If first Node is empty -> delete it

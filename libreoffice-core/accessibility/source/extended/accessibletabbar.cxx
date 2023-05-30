@@ -27,9 +27,9 @@
 #include <com/sun/star/awt/XWindowPeer.hpp>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
 #include <i18nlangtag/languagetag.hxx>
+#include <o3tl/safeint.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <toolkit/awt/vclxfont.hxx>
@@ -112,29 +112,29 @@ namespace accessibility
     }
 
 
-    void AccessibleTabBar::FillAccessibleStateSet( utl::AccessibleStateSetHelper& rStateSet )
+    void AccessibleTabBar::FillAccessibleStateSet( sal_Int64& rStateSet )
     {
         if ( !m_pTabBar )
             return;
 
         if ( m_pTabBar->IsEnabled() )
         {
-            rStateSet.AddState( AccessibleStateType::ENABLED );
-            rStateSet.AddState( AccessibleStateType::SENSITIVE );
+            rStateSet |= AccessibleStateType::ENABLED;
+            rStateSet |= AccessibleStateType::SENSITIVE;
         }
 
-        rStateSet.AddState( AccessibleStateType::FOCUSABLE );
+        rStateSet |= AccessibleStateType::FOCUSABLE;
 
         if ( m_pTabBar->HasFocus() )
-            rStateSet.AddState( AccessibleStateType::FOCUSED );
+            rStateSet |= AccessibleStateType::FOCUSED;
 
-        rStateSet.AddState( AccessibleStateType::VISIBLE );
+        rStateSet |= AccessibleStateType::VISIBLE;
 
         if ( m_pTabBar->IsVisible() )
-            rStateSet.AddState( AccessibleStateType::SHOWING );
+            rStateSet |= AccessibleStateType::SHOWING;
 
         if ( m_pTabBar->GetStyle() & WB_SIZEABLE )
-            rStateSet.AddState( AccessibleStateType::RESIZABLE );
+            rStateSet |= AccessibleStateType::RESIZABLE;
     }
 
 
@@ -216,7 +216,7 @@ namespace accessibility
     // XAccessibleContext
 
 
-    sal_Int32 AccessibleTabBar::getAccessibleChildCount()
+    sal_Int64 AccessibleTabBar::getAccessibleChildCount()
     {
         OExternalLockGuard aGuard( this );
 
@@ -224,11 +224,11 @@ namespace accessibility
     }
 
 
-    Reference< XAccessible > AccessibleTabBar::getAccessibleChild( sal_Int32 i )
+    Reference< XAccessible > AccessibleTabBar::getAccessibleChild( sal_Int64 i )
     {
         OExternalLockGuard aGuard( this );
 
-        if ( i < 0 || i >= static_cast<sal_Int32>(m_aAccessibleChildren.size()) )
+        if ( i < 0 || o3tl::make_unsigned(i) >= m_aAccessibleChildren.size() )
             throw IndexOutOfBoundsException();
 
         Reference< XAccessible > xChild = m_aAccessibleChildren[i];
@@ -274,11 +274,11 @@ namespace accessibility
     }
 
 
-    sal_Int32 AccessibleTabBar::getAccessibleIndexInParent(  )
+    sal_Int64 AccessibleTabBar::getAccessibleIndexInParent(  )
     {
         OExternalLockGuard aGuard( this );
 
-        sal_Int32 nIndexInParent = -1;
+        sal_Int64 nIndexInParent = -1;
         if ( m_pTabBar )
         {
             vcl::Window* pParent = m_pTabBar->GetAccessibleParentWindow();
@@ -340,22 +340,22 @@ namespace accessibility
     }
 
 
-    Reference< XAccessibleStateSet > AccessibleTabBar::getAccessibleStateSet(  )
+    sal_Int64 AccessibleTabBar::getAccessibleStateSet(  )
     {
         OExternalLockGuard aGuard( this );
 
-        rtl::Reference<utl::AccessibleStateSetHelper> pStateSetHelper = new utl::AccessibleStateSetHelper;
+        sal_Int64 nStateSet = 0;
 
         if ( !rBHelper.bDisposed && !rBHelper.bInDispose )
         {
-            FillAccessibleStateSet( *pStateSetHelper );
+            FillAccessibleStateSet( nStateSet );
         }
         else
         {
-            pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+            nStateSet |= AccessibleStateType::DEFUNC;
         }
 
-        return pStateSetHelper;
+        return nStateSet;
     }
 
 

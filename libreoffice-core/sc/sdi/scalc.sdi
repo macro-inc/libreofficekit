@@ -3487,8 +3487,8 @@ SfxVoidItem JumpToTable SID_CURRENTTAB
     RecordAbsolute = FALSE,
     RecordPerSet;
 
-    AccelConfig = FALSE,
-    MenuConfig = FALSE,
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
     ToolBoxConfig = FALSE,
     GroupId = SfxGroupId::Navigator;
 ]
@@ -3583,6 +3583,23 @@ SfxVoidItem Move FID_TAB_MOVE
     GroupId = SfxGroupId::Edit;
 ]
 
+SfxVoidItem DuplicateSheet FID_TAB_DUPLICATE
+()
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
+    Toggle = FALSE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = FALSE,
+    GroupId = SfxGroupId::Edit;
+]
+
 
 SfxVoidItem Name FID_TAB_RENAME
 (SfxStringItem Name FID_TAB_RENAME,SfxUInt16Item Index FN_PARAM_1)
@@ -3595,8 +3612,8 @@ SfxVoidItem Name FID_TAB_RENAME
     RecordAbsolute = FALSE,
     RecordPerSet;
 
-    AccelConfig = TRUE,
-    MenuConfig = TRUE,
+    AccelConfig = FALSE,
+    MenuConfig = FALSE,
     ToolBoxConfig = FALSE,
     GroupId = SfxGroupId::Format;
 ]
@@ -6006,6 +6023,23 @@ SfxBoolItem ViewValueHighlighting FID_TOGGLESYNTAX
     GroupId = SfxGroupId::View;
 ]
 
+SfxBoolItem ViewHiddenColRow FID_TOGGLEHIDDENCOLROW
+
+[
+    AutoUpdate = FALSE,
+    FastCall = FALSE,
+    ReadOnlyDoc = TRUE,
+    Toggle = TRUE,
+    Container = FALSE,
+    RecordAbsolute = FALSE,
+    RecordPerSet;
+
+
+    AccelConfig = TRUE,
+    MenuConfig = TRUE,
+    ToolBoxConfig = TRUE,
+    GroupId = SfxGroupId::View;
+]
 
 SfxBoolItem Visible FID_TABLE_VISIBLE
 

@@ -16,11 +16,6 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef __com_sun_star_text_NumberingRules_idl__
-#define __com_sun_star_text_NumberingRules_idl__
-
-#include <com/sun/star/container/XIndexReplace.idl>
-#include <com/sun/star/beans/XPropertySet.idl>
 
 module com {  module sun {  module star {  module text {
 
@@ -36,7 +31,7 @@ published service NumberingRules
 
                 <p>The numbering rules are levels of property values. Each
                 level contains equal properties.</p>
-                @see NumberingLevel;@see NumberingLevel;
+                @see NumberingLevel
      */
         interface com::sun::star::container::XIndexReplace;
 
@@ -77,7 +72,5 @@ published service NumberingRules
 
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -33,9 +33,11 @@
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
 #include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <osl/diagnose.h>
 #include <svx/unoapi.hxx>
 #include <unotools/configmgr.hxx>
 #include <vcl/canvastools.hxx>
+#include <vcl/pdfextoutdevdata.hxx>
 #include <comphelper/lok.hxx>
 
 #include <memory>
@@ -207,33 +209,19 @@ namespace sdr::contact
             }
 
             // update local ViewInformation2D
-            const drawinglayer::geometry::ViewInformation2D aNewViewInformation2D(
-                basegfx::B2DHomMatrix(),
-                rTargetOutDev.GetViewTransformation(),
-                aViewRange,
-                GetXDrawPageForSdrPage(GetSdrPage()),
-                fCurrentTime);
+            drawinglayer::geometry::ViewInformation2D aNewViewInformation2D;
+            aNewViewInformation2D.setViewTransformation(rTargetOutDev.GetViewTransformation());
+            aNewViewInformation2D.setViewport(aViewRange);
+            aNewViewInformation2D.setVisualizedPage(GetXDrawPageForSdrPage(GetSdrPage()));
+            aNewViewInformation2D.setViewTime(fCurrentTime);
             updateViewInformation2D(aNewViewInformation2D);
 
-            // if there is something to show, use a primitive processor to render it. There
-            // is a choice between VCL and Canvas processors currently. The decision is made in
-            // createProcessor2DFromOutputDevice and takes into account things like the
-            // Target is a MetaFile, a VDev or something else. The Canvas renderer is triggered
-            // currently using the shown boolean. Canvas is not yet the default.
-
-            // prepare OutputDevice (historical stuff, maybe soon removed)
-            rDisplayInfo.ClearGhostedDrawMode(); // reset, else the VCL-paint with the processor will not do the right thing
-            pOutDev->SetLayoutMode(vcl::text::ComplexTextLayoutFlags::Default); // reset, default is no BiDi/RTL
-
-            // create renderer
-            std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor2D(
-                drawinglayer::processor2d::createProcessor2DFromOutputDevice(
-                    rTargetOutDev, getViewInformation2D()));
+            drawinglayer::primitive2d::Primitive2DContainer xPrimitiveSequence;
 
 #if HAVE_FEATURE_DESKTOP || defined( ANDROID )
             // get whole Primitive2DContainer; this will already make use of updated ViewInformation2D
             // and may use the MapMode from the Target OutDev in the DisplayInfo
-            rDrawPageVOContact.getPrimitive2DSequenceHierarchy(rDisplayInfo, *pProcessor2D);
+            rDrawPageVOContact.getPrimitive2DSequenceHierarchy(rDisplayInfo, xPrimitiveSequence);
 #else
             // Hmm, !HAVE_FEATURE_DESKTOP && !ANDROID means iOS,
             // right? But does it makes sense to use a different code
@@ -269,8 +257,25 @@ namespace sdr::contact
             if (bGetHierarchy)
                 // get whole Primitive2DContainer; this will already make use of updated ViewInformation2D
                 // and may use the MapMode from the Target OutDev in the DisplayInfo
-                rDrawPageVOContact.getPrimitive2DSequenceHierarchy(rDisplayInfo, *pProcessor2D);
+                rDrawPageVOContact.getPrimitive2DSequenceHierarchy(rDisplayInfo, xPrimitiveSequence);
 #endif
+
+            // if there is something to show, use a primitive processor to render it. There
+            // is a choice between VCL and Canvas processors currently. The decision is made in
+            // createProcessor2DFromOutputDevice and takes into account things like the
+            // Target is a MetaFile, a VDev or something else. The Canvas renderer is triggered
+            // currently using the shown boolean. Canvas is not yet the default.
+            if(!xPrimitiveSequence.empty())
+            {
+                // prepare OutputDevice (historical stuff, maybe soon removed)
+                rDisplayInfo.ClearGhostedDrawMode(); // reset, else the VCL-paint with the processor will not do the right thing
+                pOutDev->SetLayoutMode(vcl::text::ComplexTextLayoutFlags::Default); // reset, default is no BiDi/RTL
+                // create renderer
+                std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor2D(
+                    drawinglayer::processor2d::createProcessor2DFromOutputDevice(
+                        rTargetOutDev, getViewInformation2D()));
+                pProcessor2D->process(xPrimitiveSequence);
+            }
 
             // #114359# restore old ClipReghion
             if(bClipRegionPushed)
@@ -370,6 +375,32 @@ namespace sdr::contact
         bool ObjectContactOfPageView::isOutputToPDFFile() const
         {
             return OUTDEV_PDF == mrPageWindow.GetPaintWindow().GetOutputDevice().GetOutDevType();
+        }
+
+        bool ObjectContactOfPageView::isExportTaggedPDF() const
+        {
+            if (isOutputToPDFFile())
+            {
+                vcl::PDFExtOutDevData* pPDFExtOutDevData(dynamic_cast<vcl::PDFExtOutDevData*>(
+                    mrPageWindow.GetPaintWindow().GetOutputDevice().GetExtOutDevData()));
+
+                if (nullptr != pPDFExtOutDevData)
+                {
+                    return pPDFExtOutDevData->GetIsExportTaggedPDF();
+                }
+            }
+            return false;
+        }
+
+        ::vcl::PDFExtOutDevData const* ObjectContactOfPageView::GetPDFExtOutDevData() const
+        {
+            if (!isOutputToPDFFile())
+            {
+                return nullptr;
+            }
+            vcl::PDFExtOutDevData* pPDFExtOutDevData(dynamic_cast<vcl::PDFExtOutDevData*>(
+                mrPageWindow.GetPaintWindow().GetOutputDevice().GetExtOutDevData()));
+            return pPDFExtOutDevData;
         }
 
         // gray display mode

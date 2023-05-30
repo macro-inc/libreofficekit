@@ -27,33 +27,33 @@
 #include <com/sun/star/i18n/ParseResult.hpp>
 #include <com/sun/star/i18n/UnicodeScript.hpp>
 #include <com/sun/star/uno/Reference.hxx>
-#include <mutex>
 
 namespace com::sun::star::uno { class XComponentContext; }
 namespace com::sun::star::i18n { class XCharacterClassification; }
 
-const sal_Int32 nCharClassAlphaType =
+inline constexpr sal_Int32 nCharClassAlphaType =
     css::i18n::KCharacterType::UPPER |
     css::i18n::KCharacterType::LOWER |
     css::i18n::KCharacterType::TITLE_CASE;
 
-const sal_Int32 nCharClassAlphaTypeMask =
+inline constexpr sal_Int32 nCharClassAlphaTypeMask =
     nCharClassAlphaType |
+    css::i18n::KCharacterType::LETTER |     // Alpha is also always a LETTER
     css::i18n::KCharacterType::PRINTABLE |
     css::i18n::KCharacterType::BASE_FORM;
 
-const sal_Int32 nCharClassLetterType =
+inline constexpr sal_Int32 nCharClassLetterType =
     nCharClassAlphaType |
     css::i18n::KCharacterType::LETTER;
 
-const sal_Int32 nCharClassLetterTypeMask =
+inline constexpr sal_Int32 nCharClassLetterTypeMask =
     nCharClassAlphaTypeMask |
     css::i18n::KCharacterType::LETTER;
 
-const sal_Int32 nCharClassNumericType =
+inline constexpr sal_Int32 nCharClassNumericType =
     css::i18n::KCharacterType::DIGIT;
 
-const sal_Int32 nCharClassNumericTypeMask =
+inline constexpr sal_Int32 nCharClassNumericTypeMask =
     nCharClassNumericType |
     css::i18n::KCharacterType::PRINTABLE |
     css::i18n::KCharacterType::BASE_FORM;
@@ -70,11 +70,11 @@ public:
     /// Preferred ctor with service manager specified
     CharClass(
         const css::uno::Reference< css::uno::XComponentContext > & rxContext,
-        const LanguageTag& rLanguageTag );
+        LanguageTag aLanguageTag );
 
     /// Deprecated ctor, tries to get a process service manager or to load the
     /// library directly.
-    CharClass( const LanguageTag& rLanguageTag );
+    CharClass( LanguageTag aLanguageTag );
 
     ~CharClass();
 
@@ -82,19 +82,19 @@ public:
     const LanguageTag& getLanguageTag() const;
 
     /// isdigit() on ascii values of entire string
-    static bool isAsciiNumeric( const OUString& rStr );
+    static bool isAsciiNumeric( std::u16string_view rStr );
 
     /// isalpha() on ascii values of entire string
-    static bool isAsciiAlpha( const OUString& rStr );
+    static bool isAsciiAlpha( std::u16string_view rStr );
 
-    /// whether type is pure numeric or not, e.g. return of getStringType
+    /// whether type is pure numeric or not, e.g. return of getCharacterType()
     static bool isNumericType( sal_Int32 nType )
     {
         return ((nType & nCharClassNumericType) != 0) &&
             ((nType & ~nCharClassNumericTypeMask) == 0);
     }
 
-    /// whether type is pure alphanumeric or not, e.g. return of getStringType
+    /// whether type is pure alphanumeric or not, e.g. return of getCharacterType()
     static bool isAlphaNumericType( sal_Int32 nType )
     {
         return ((nType & (nCharClassAlphaType |
@@ -103,14 +103,14 @@ public:
             nCharClassNumericTypeMask)) == 0);
     }
 
-    /// whether type is pure letter or not, e.g. return of getStringType
+    /// whether type is pure letter or not, e.g. return of getCharacterType()
     static bool isLetterType( sal_Int32 nType )
     {
         return ((nType & nCharClassLetterType) != 0) &&
             ((nType & ~nCharClassLetterTypeMask) == 0);
     }
 
-    /// whether type is pure letternumeric or not, e.g. return of getStringType
+    /// whether type is pure letternumeric or not, e.g. return of getCharacterType()
     static bool isLetterNumericType( sal_Int32 nType )
     {
         return ((nType & (nCharClassLetterType |
@@ -142,7 +142,6 @@ public:
     css::i18n::DirectionProperty getCharacterDirection( const OUString& rStr, sal_Int32 nPos ) const;
     css::i18n::UnicodeScript getScript( const OUString& rStr, sal_Int32 nPos ) const;
     sal_Int32 getCharacterType( const OUString& rStr, sal_Int32 nPos ) const;
-    sal_Int32 getStringType( const OUString& rStr, sal_Int32 nPos, sal_Int32 nCount ) const;
 
     css::i18n::ParseResult parseAnyToken(
                                     const OUString& rStr,
@@ -168,9 +167,12 @@ public:
     bool isDigit( const OUString& rStr, sal_Int32 nPos ) const;
     bool isAlphaNumeric( const OUString& rStr, sal_Int32 nPos ) const;
     bool isLetterNumeric( const OUString& rStr, sal_Int32 nPos ) const;
+    bool isUpper( const OUString& rStr, sal_Int32 nPos ) const;
     bool isLetter( const OUString& rStr ) const;
     bool isNumeric( const OUString& rStr ) const;
     bool isLetterNumeric( const OUString& rStr ) const;
+
+    bool isUpper( const OUString& rStr, sal_Int32 nPos, sal_Int32 nCount ) const;
 
 private:
 

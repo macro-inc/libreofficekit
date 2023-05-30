@@ -20,6 +20,7 @@
 #include "LoggedResources.hxx"
 #include "TagLogger.hxx"
 #include <ooxml/QNameToString.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -27,8 +28,8 @@ namespace writerfilter
 {
 #ifdef DBG_UTIL
 
-LoggedResourcesHelper::LoggedResourcesHelper(const std::string& sPrefix)
-    : msPrefix(sPrefix)
+LoggedResourcesHelper::LoggedResourcesHelper(std::string sPrefix)
+    : msPrefix(std::move(sPrefix))
 {
 }
 
@@ -146,6 +147,10 @@ void LoggedStream::endShape()
     LoggedResourcesHelper::endElement();
 #endif
 }
+
+void LoggedStream::startTextBoxContent() { lcl_startTextBoxContent(); }
+
+void LoggedStream::endTextBoxContent() { lcl_endTextBoxContent(); }
 
 void LoggedStream::text(const sal_uInt8* data, size_t len)
 {
@@ -305,6 +310,20 @@ void LoggedStream::endGlossaryEntry()
 #endif
 
     lcl_endGlossaryEntry();
+
+#ifdef DBG_UTIL
+    LoggedResourcesHelper::endElement();
+#endif
+}
+
+void LoggedStream::checkId(const sal_Int32 nId)
+{
+#ifdef DBG_UTIL
+    mHelper.startElement("checkId");
+    LoggedResourcesHelper::chars(OUString::number(nId));
+#endif
+
+    lcl_checkId(nId);
 
 #ifdef DBG_UTIL
     LoggedResourcesHelper::endElement();

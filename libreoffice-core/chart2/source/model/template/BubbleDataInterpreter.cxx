@@ -17,13 +17,16 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <sal/config.h>
+
+#include <cstddef>
+
 #include "BubbleDataInterpreter.hxx"
 #include <DataSeries.hxx>
 #include <DataSeriesHelper.hxx>
 #include <CommonConverters.hxx>
-#include <com/sun/star/chart2/data/XDataSink.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -44,25 +47,25 @@ BubbleDataInterpreter::~BubbleDataInterpreter()
 }
 
 // ____ XDataInterpreter ____
-chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
+InterpretedData BubbleDataInterpreter::interpretDataSource(
     const Reference< chart2::data::XDataSource >& xSource,
     const Sequence< beans::PropertyValue >& aArguments,
-    const Sequence< Reference< XDataSeries > >& aSeriesToReUse )
+    const std::vector< rtl::Reference< DataSeries > >& aSeriesToReUse )
 {
     if( ! xSource.is())
         return InterpretedData();
 
-    Sequence< Reference< data::XLabeledDataSequence > > aData( xSource->getDataSequences() );
+    std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aData = DataInterpreter::getDataSequences(xSource);
 
-    Reference< data::XLabeledDataSequence > xValuesX;
-    vector< Reference< data::XLabeledDataSequence > > aYValuesVector;
-    vector< Reference< data::XLabeledDataSequence > > aSizeValuesVector;
+    uno::Reference< chart2::data::XLabeledDataSequence > xValuesX;
+    vector< uno::Reference< chart2::data::XLabeledDataSequence > > aYValuesVector;
+    vector< uno::Reference< chart2::data::XLabeledDataSequence > > aSizeValuesVector;
 
-    Reference< data::XLabeledDataSequence > xCategories;
+    uno::Reference< chart2::data::XLabeledDataSequence > xCategories;
     bool bHasCategories = HasCategories( aArguments, aData );
     bool bUseCategoriesAsX = UseCategoriesAsX( aArguments );
 
-    sal_Int32 nDataSeqCount = aData.getLength();
+    sal_Int32 nDataSeqCount = aData.size();
 
     bool bSetXValues = bHasCategories ? ( (nDataSeqCount-1) > 2 && (nDataSeqCount-1) % 2 != 0 )
                                  :( nDataSeqCount > 2 && nDataSeqCount % 2 != 0 );
@@ -75,7 +78,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
         {
             if( bHasCategories && !bCategoriesUsed )
             {
-                xCategories.set( aData[nDataIdx] );
+                xCategories = aData[nDataIdx];
                 if( xCategories.is())
                 {
                     SetRole( xCategories->getValues(), "categories");
@@ -89,7 +92,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
             }
             else if( !xValuesX.is() && bSetXValues )
             {
-                xValuesX.set( aData[nDataIdx] );
+                xValuesX = aData[nDataIdx];
                 if( xValuesX.is())
                     SetRole( xValuesX->getValues(), "values-x");
             }
@@ -115,8 +118,8 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
     }
 
     // create DataSeries
-    sal_Int32 nSeriesIndex = 0;
-    vector< Reference< XDataSeries > > aSeriesVec;
+    std::size_t nSeriesIndex = 0;
+    vector< rtl::Reference< DataSeries > > aSeriesVec;
     aSeriesVec.reserve( aSizeValuesVector.size());
 
     Reference< data::XLabeledDataSequence > xClonedXValues = xValuesX;
@@ -124,7 +127,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
 
     for( size_t nN = 0; nN < aSizeValuesVector.size(); ++nN, ++nSeriesIndex )
     {
-        vector< Reference< data::XLabeledDataSequence > > aNewData;
+        vector< uno::Reference< chart2::data::XLabeledDataSequence > > aNewData;
         if( xValuesX.is() )
         {
             if( nN > 0 && xCloneableX.is() )
@@ -135,51 +138,48 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::interpretDataSource(
             aNewData.push_back( aYValuesVector[nN] );
         aNewData.push_back(aSizeValuesVector[nN]);
 
-        Reference< XDataSeries > xSeries;
-        if( nSeriesIndex < aSeriesToReUse.getLength())
-            xSeries.set( aSeriesToReUse[nSeriesIndex] );
+        rtl::Reference< DataSeries > xSeries;
+        if( nSeriesIndex < aSeriesToReUse.size())
+            xSeries = aSeriesToReUse[nSeriesIndex];
         else
-            xSeries.set( new DataSeries );
-        OSL_ASSERT( xSeries.is() );
-        Reference< data::XDataSink > xSink( xSeries, uno::UNO_QUERY );
-        OSL_ASSERT( xSink.is() );
-        xSink->setData( comphelper::containerToSequence( aNewData ) );
+            xSeries = new DataSeries;
+        assert( xSeries.is() );
+        xSeries->setData( aNewData );
 
         aSeriesVec.push_back( xSeries );
     }
 
-    return InterpretedData( { comphelper::containerToSequence(aSeriesVec) }, xCategories );
+    return { { aSeriesVec }, xCategories };
 }
 
-chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
-    const chart2::InterpretedData& aInterpretedData )
+InterpretedData BubbleDataInterpreter::reinterpretDataSeries(
+    const InterpretedData& aInterpretedData )
 {
     InterpretedData aResult( aInterpretedData );
 
     sal_Int32 i=0;
-    Sequence< Reference< XDataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
-    const sal_Int32 nCount = aSeries.getLength();
+    std::vector< rtl::Reference< DataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
+    const sal_Int32 nCount = aSeries.size();
     for( ; i<nCount; ++i )
     {
         try
         {
-            Reference< data::XDataSource > xSeriesSource( aSeries[i], uno::UNO_QUERY_THROW );
-            Sequence< Reference< data::XLabeledDataSequence > > aNewSequences;
+            std::vector< uno::Reference< chart2::data::XLabeledDataSequence > > aNewSequences;
 
-            Reference< data::XLabeledDataSequence > xValuesSize(
-                DataSeriesHelper::getDataSequenceByRole( xSeriesSource, "values-size" ));
-            Reference< data::XLabeledDataSequence > xValuesY(
-                DataSeriesHelper::getDataSequenceByRole( xSeriesSource, "values-y" ));
-            Reference< data::XLabeledDataSequence > xValuesX(
-                DataSeriesHelper::getDataSequenceByRole( xSeriesSource, "values-x" ));
+            uno::Reference< chart2::data::XLabeledDataSequence > xValuesSize(
+                DataSeriesHelper::getDataSequenceByRole( aSeries[i], "values-size" ));
+            uno::Reference< chart2::data::XLabeledDataSequence > xValuesY(
+                DataSeriesHelper::getDataSequenceByRole( aSeries[i], "values-y" ));
+            uno::Reference< chart2::data::XLabeledDataSequence > xValuesX(
+                DataSeriesHelper::getDataSequenceByRole( aSeries[i], "values-x" ));
 
             if( ! xValuesX.is() ||
                 ! xValuesY.is() ||
                 ! xValuesSize.is() )
             {
-                vector< Reference< data::XLabeledDataSequence > > aValueSeqVec(
+                vector< uno::Reference< chart2::data::XLabeledDataSequence > > aValueSeqVec(
                     DataSeriesHelper::getAllDataSequencesByRole(
-                        xSeriesSource->getDataSequences(), "values" ));
+                        aSeries[i]->getDataSequences2(), "values" ));
                 if( xValuesX.is())
                     aValueSeqVec.erase( find( aValueSeqVec.begin(), aValueSeqVec.end(), xValuesX ));
                 if( xValuesY.is())
@@ -192,7 +192,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
                 if( ! xValuesSize.is() &&
                     aValueSeqVec.size() > nIndex )
                 {
-                    xValuesSize.set( aValueSeqVec[nIndex++] );
+                    xValuesSize = aValueSeqVec[nIndex++];
                     if( xValuesSize.is())
                         SetRole( xValuesSize->getValues(), "values-size");
                 }
@@ -200,7 +200,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
                 if( ! xValuesY.is() &&
                     aValueSeqVec.size() > nIndex )
                 {
-                    xValuesY.set( aValueSeqVec[nIndex++] );
+                    xValuesY = aValueSeqVec[nIndex++];
                     if( xValuesY.is())
                         SetRole( xValuesY->getValues(), "values-y");
                 }
@@ -208,7 +208,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
                 if( ! xValuesX.is() &&
                     aValueSeqVec.size() > nIndex )
                 {
-                    xValuesX.set( aValueSeqVec[nIndex++] );
+                    xValuesX = aValueSeqVec[nIndex++];
                     if( xValuesX.is())
                         SetRole( xValuesY->getValues(), "values-x");
                 }
@@ -232,8 +232,8 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
                 }
             }
 
-            const Sequence< Reference< data::XLabeledDataSequence > > aSeqs( xSeriesSource->getDataSequences());
-            if( aSeqs.getLength() != aNewSequences.getLength() )
+            const std::vector< uno::Reference< data::XLabeledDataSequence > > & aSeqs = aSeries[i]->getDataSequences2();
+            if( aSeqs.size() != aNewSequences.size() )
             {
 #if OSL_DEBUG_LEVEL > 0 && !defined NDEBUG
                 for( auto const & j : aSeqs )
@@ -241,8 +241,7 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
                     assert( (j == xValuesY || j == xValuesX || j == xValuesSize) && "All sequences should be used" );
                 }
 #endif
-                Reference< data::XDataSink > xSink( xSeriesSource, uno::UNO_QUERY_THROW );
-                xSink->setData( aNewSequences );
+                aSeries[i]->setData( aNewSequences );
             }
         }
         catch( const uno::Exception & )
@@ -254,17 +253,15 @@ chart2::InterpretedData SAL_CALL BubbleDataInterpreter::reinterpretDataSeries(
     return aResult;
 }
 
-sal_Bool SAL_CALL BubbleDataInterpreter::isDataCompatible(
-    const chart2::InterpretedData& aInterpretedData )
+bool BubbleDataInterpreter::isDataCompatible(
+    const InterpretedData& aInterpretedData )
 {
-    const Sequence< Reference< XDataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
-    for( Reference< XDataSeries >  const & dataSeries : aSeries )
+    const std::vector< rtl::Reference< DataSeries > > aSeries( FlattenSequence( aInterpretedData.Series ));
+    for( rtl::Reference< DataSeries >  const & dataSeries : aSeries )
     {
         try
         {
-            Reference< data::XDataSource > xSrc( dataSeries, uno::UNO_QUERY_THROW );
-            Sequence< Reference< data::XLabeledDataSequence > > aSeq( xSrc->getDataSequences());
-            if( aSeq.getLength() != 3 )
+            if( dataSeries->getDataSequences2().size() != 3 )
                 return false;
         }
         catch( const uno::Exception & )

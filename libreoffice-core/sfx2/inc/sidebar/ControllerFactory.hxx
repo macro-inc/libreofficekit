@@ -18,7 +18,6 @@
  */
 #pragma once
 
-#include <sfx2/dllapi.h>
 #include <com/sun/star/uno/Reference.hxx>
 #include <vcl/toolbox.hxx>
 
@@ -41,6 +40,10 @@ namespace sfx2::sidebar {
 class ControllerFactory
 {
 public:
+    static css::uno::Reference<css::lang::XComponent> CreateImageController(
+        const css::uno::Reference<css::frame::XFrame>& rxFrame,
+        const css::uno::Reference<css::awt::XWindow>& rxParentWindow);
+
     static css::uno::Reference<css::frame::XToolbarController> CreateToolBoxController(
         ToolBox* pToolBox,
         const ToolBoxItemId nItemId,

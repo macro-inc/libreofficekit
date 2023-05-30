@@ -25,7 +25,6 @@
 #include <svx/dialmgr.hxx>
 #include <svx/svditer.hxx>
 
-#include <stdlib.h>
 #include <svx/svdobjkind.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/scene3d.hxx>
@@ -39,7 +38,6 @@
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <svx/e3dsceneupdater.hxx>
 #include <svx/svdmodel.hxx>
-#include <rtl/ustrbuf.hxx>
 
 namespace {
 
@@ -295,7 +293,7 @@ sal_uInt32 E3dScene::RemapOrdNum(sal_uInt32 nNewOrdNum) const
 
 SdrObjKind E3dScene::GetObjIdentifier() const
 {
-    return E3D_SCENE_ID;
+    return SdrObjKind::E3D_Scene;
 }
 
 void E3dScene::SetBoundRectDirty()
@@ -410,7 +408,7 @@ void E3dScene::removeAllNonSelectedObjects()
         {
             bool bRemoveObject(false);
 
-            if(auto pScene = dynamic_cast<E3dScene*>(pObj))
+            if(E3dScene* pScene = DynCastE3dScene(pObj))
             {
                 // iterate over this sub-scene
                 pScene->removeAllNonSelectedObjects();
@@ -436,13 +434,12 @@ void E3dScene::removeAllNonSelectedObjects()
             {
                 NbcRemoveObject(pObj->GetOrdNum());
                 a--;
-                SdrObject::Free(pObj);
             }
         }
     }
 }
 
-E3dScene* E3dScene::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> E3dScene::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new E3dScene(rTargetModel, *this);
 }
@@ -654,7 +651,7 @@ void E3dScene::RecalcSnapRect()
 
         for(size_t a = 0; a < GetObjCount(); ++a)
         {
-            E3dObject* pCandidate(dynamic_cast< E3dObject* >(GetObj(a)));
+            E3dObject* pCandidate(DynCastE3dObject(GetObj(a)));
 
             if(pCandidate)
             {
@@ -688,7 +685,7 @@ bool E3dScene::BegCreate(SdrDragStat& rStat)
 {
     rStat.SetOrtho4Possible();
     tools::Rectangle aRect1(rStat.GetStart(), rStat.GetNow());
-    aRect1.Justify();
+    aRect1.Normalize();
     rStat.SetActionRect(aRect1);
     NbcSetSnapRect(aRect1);
     return true;
@@ -698,7 +695,7 @@ bool E3dScene::MovCreate(SdrDragStat& rStat)
 {
     tools::Rectangle aRect1;
     rStat.TakeCreateRect(aRect1);
-    aRect1.Justify();
+    aRect1.Normalize();
     rStat.SetActionRect(aRect1);
     NbcSetSnapRect(aRect1);
     SetBoundRectDirty();
@@ -710,7 +707,7 @@ bool E3dScene::EndCreate(SdrDragStat& rStat, SdrCreateCmd eCmd)
 {
     tools::Rectangle aRect1;
     rStat.TakeCreateRect(aRect1);
-    aRect1.Justify();
+    aRect1.Normalize();
     NbcSetSnapRect(aRect1);
     SetBoundAndSnapRectsDirty();
     return (eCmd==SdrCreateCmd::ForceEnd || rStat.GetPointCount()>=2);
@@ -732,7 +729,7 @@ void E3dScene::SetSelected(bool bNew)
 
     for(size_t a(0); a < GetObjCount(); a++)
     {
-        E3dObject* pCandidate(dynamic_cast< E3dObject* >(GetObj(a)));
+        E3dObject* pCandidate(DynCastE3dObject(GetObj(a)));
 
         if(pCandidate)
         {
@@ -744,7 +741,7 @@ void E3dScene::SetSelected(bool bNew)
 void E3dScene::NbcInsertObject(SdrObject* pObj, size_t nPos)
 {
     // Is it even a 3D object?
-    if(nullptr != dynamic_cast< const E3dObject* >(pObj))
+    if(DynCastE3dObject(pObj))
     {
         // Normal 3D object, insert means call parent
         SdrObjList::NbcInsertObject(pObj, nPos);
@@ -763,7 +760,7 @@ void E3dScene::NbcInsertObject(SdrObject* pObj, size_t nPos)
 void E3dScene::InsertObject(SdrObject* pObj, size_t nPos)
 {
     // Is it even a 3D object?
-    if(nullptr != dynamic_cast< const E3dObject* >(pObj))
+    if(DynCastE3dObject(pObj))
     {
         // call parent
         SdrObjList::InsertObject(pObj, nPos);
@@ -779,10 +776,10 @@ void E3dScene::InsertObject(SdrObject* pObj, size_t nPos)
     }
 }
 
-SdrObject* E3dScene::NbcRemoveObject(size_t nObjNum)
+rtl::Reference<SdrObject> E3dScene::NbcRemoveObject(size_t nObjNum)
 {
     // call parent
-    SdrObject* pRetval = SdrObjList::NbcRemoveObject(nObjNum);
+    rtl::Reference<SdrObject> pRetval = SdrObjList::NbcRemoveObject(nObjNum);
 
     InvalidateBoundVolume();
     StructureChanged();
@@ -790,10 +787,10 @@ SdrObject* E3dScene::NbcRemoveObject(size_t nObjNum)
     return pRetval;
 }
 
-SdrObject* E3dScene::RemoveObject(size_t nObjNum)
+rtl::Reference<SdrObject> E3dScene::RemoveObject(size_t nObjNum)
 {
     // call parent
-    SdrObject* pRetval(SdrObjList::RemoveObject(nObjNum));
+    rtl::Reference<SdrObject> pRetval(SdrObjList::RemoveObject(nObjNum));
 
     InvalidateBoundVolume();
     StructureChanged();
@@ -808,7 +805,7 @@ void E3dScene::SetBoundAndSnapRectsDirty(bool bNotMyself, bool bRecursive)
 
     for(size_t a = 0; a < GetObjCount(); ++a)
     {
-        E3dObject* pCandidate = dynamic_cast< E3dObject* >(GetObj(a));
+        E3dObject* pCandidate = DynCastE3dObject(GetObj(a));
 
         if(pCandidate)
         {
@@ -824,7 +821,7 @@ void E3dScene::NbcSetLayer(SdrLayerID nLayer)
 
     for(size_t a = 0; a < GetObjCount(); ++a)
     {
-        E3dObject* pCandidate = dynamic_cast< E3dObject* >(GetObj(a));
+        E3dObject* pCandidate = DynCastE3dObject(GetObj(a));
 
         if(pCandidate)
         {
@@ -843,7 +840,7 @@ void E3dScene::handlePageChange(SdrPage* pOldPage, SdrPage* pNewPage)
 
     for(size_t a(0); a < GetObjCount(); a++)
     {
-        E3dObject* pCandidate = dynamic_cast< E3dObject* >(GetObj(a));
+        E3dObject* pCandidate = DynCastE3dObject(GetObj(a));
 
         if(pCandidate)
         {
@@ -868,7 +865,7 @@ basegfx::B3DRange E3dScene::RecalcBoundVolume() const
 
     for(size_t a = 0; a < nObjCnt; ++a)
     {
-        const E3dObject* p3DObject = dynamic_cast< const E3dObject* >(GetObj(a));
+        const E3dObject* p3DObject = DynCastE3dObject(GetObj(a));
 
         if(p3DObject)
         {
@@ -888,7 +885,7 @@ void E3dScene::SetTransformChanged()
 
     for(size_t a = 0; a < GetObjCount(); ++a)
     {
-        E3dObject* pCandidate = dynamic_cast< E3dObject* >(GetObj(a));
+        E3dObject* pCandidate = DynCastE3dObject(GetObj(a));
 
         if(pCandidate)
         {

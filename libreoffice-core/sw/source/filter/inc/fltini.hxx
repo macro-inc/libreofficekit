@@ -62,11 +62,10 @@ public:
 
 // the special writers
 
-void GetWW8Writer(const OUString&, const OUString&, WriterRef&);
+void GetWW8Writer(std::u16string_view, const OUString&, WriterRef&);
 
 // Get size of fly (if 'automatic' in WW) and check if not too small
-SW_DLLPUBLIC void CalculateFlySize(SfxItemSet& rFlySet, const SwNodeIndex& rAnchor,
-                                   SwTwips nPageWidth);
+SW_DLLPUBLIC void CalculateFlySize(SfxItemSet& rFlySet, const SwNode& rAnchor, SwTwips nPageWidth);
 
 #endif
 

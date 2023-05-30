@@ -18,6 +18,7 @@
  */
 
 #include "CandleStickChart.hxx"
+#include <ChartType.hxx>
 #include <ShapeFactory.hxx>
 #include <CommonConverters.hxx>
 #include <ExplicitCategoriesProvider.hxx>
@@ -25,8 +26,7 @@
 #include "BarPositionHelper.hxx"
 #include <DateHelper.hxx>
 #include <com/sun/star/beans/XPropertySet.hpp>
-#include <com/sun/star/drawing/XShape.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 
 namespace chart
@@ -34,7 +34,7 @@ namespace chart
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
 
-CandleStickChart::CandleStickChart( const uno::Reference<XChartType>& xChartTypeModel
+CandleStickChart::CandleStickChart( const rtl::Reference<ChartType>& xChartTypeModel
                                     , sal_Int32 nDimensionCount )
         : VSeriesPlotter( xChartTypeModel, nDimensionCount )
         , m_pMainPosHelper( new BarPositionHelper() )
@@ -78,24 +78,24 @@ void CandleStickChart::createShapes()
     if( m_nDimension!=2 )
         return;
 
-    OSL_ENSURE(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is(),"CandleStickChart is not proper initialized");
-    if(!(m_pShapeFactory&&m_xLogicTarget.is()&&m_xFinalTarget.is()))
+    OSL_ENSURE(m_xLogicTarget.is()&&m_xFinalTarget.is(),"CandleStickChart is not proper initialized");
+    if(!(m_xLogicTarget.is()&&m_xFinalTarget.is()))
         return;
 
     //the text labels should be always on top of the other series shapes
     //therefore create an own group for the texts to move them to front
     //(because the text group is created after the series group the texts are displayed on top)
 
-    uno::Reference< drawing::XShapes > xSeriesTarget(
-        createGroupShape( m_xLogicTarget ));
-    uno::Reference< drawing::XShapes > xLossTarget(
+    rtl::Reference<SvxShapeGroupAnyD> xSeriesTarget =
+        createGroupShape( m_xLogicTarget );
+    rtl::Reference<SvxShapeGroupAnyD> xLossTarget =
         createGroupShape( m_xLogicTarget, ObjectIdentifier::createClassifiedIdentifier(
-            OBJECTTYPE_DATA_STOCK_LOSS, u"" )));
-    uno::Reference< drawing::XShapes > xGainTarget(
+            OBJECTTYPE_DATA_STOCK_LOSS, u"" ));
+    rtl::Reference<SvxShapeGroupAnyD> xGainTarget =
         createGroupShape( m_xLogicTarget, ObjectIdentifier::createClassifiedIdentifier(
-            OBJECTTYPE_DATA_STOCK_GAIN, u"" )));
-    uno::Reference< drawing::XShapes > xTextTarget(
-        m_pShapeFactory->createGroup2D( m_xFinalTarget ));
+            OBJECTTYPE_DATA_STOCK_GAIN, u"" ));
+    rtl::Reference< SvxShapeGroup > xTextTarget =
+        ShapeFactory::createGroup2D( m_xFinalTarget );
 
     //check necessary here that different Y axis can not be stacked in the same group? ... hm?
 
@@ -105,15 +105,15 @@ void CandleStickChart::createShapes()
     tAnySequence  aWhiteBox_Values, aBlackBox_Values;
     try
     {
-        if( m_xChartTypeModelProps.is() )
+        if( m_xChartTypeModel.is() )
         {
-            m_xChartTypeModelProps->getPropertyValue( "ShowFirst" ) >>= bShowFirst;
+            m_xChartTypeModel->getPropertyValue( "ShowFirst" ) >>= bShowFirst;
 
             uno::Reference< beans::XPropertySet > xWhiteDayProps;
             uno::Reference< beans::XPropertySet > xBlackDayProps;
-            m_xChartTypeModelProps->getPropertyValue( "Japanese" ) >>= bJapaneseStyle;
-            m_xChartTypeModelProps->getPropertyValue( "WhiteDay" ) >>= xWhiteDayProps;
-            m_xChartTypeModelProps->getPropertyValue( "BlackDay" ) >>= xBlackDayProps;
+            m_xChartTypeModel->getPropertyValue( "Japanese" ) >>= bJapaneseStyle;
+            m_xChartTypeModel->getPropertyValue( "WhiteDay" ) >>= xWhiteDayProps;
+            m_xChartTypeModel->getPropertyValue( "BlackDay" ) >>= xBlackDayProps;
 
             tPropertyNameValueMap aWhiteBox_Map;
             PropertyMapper::getValueMap( aWhiteBox_Map, PropertyMapper::getPropertyNameMapForFillAndLineProperties(), xWhiteDayProps );
@@ -201,30 +201,29 @@ void CandleStickChart::createShapes()
                     drawing::Position3D aPosMiddleMinimum( pPosHelper->transformScaledLogicToScene( fScaledX, fScaledY_Min ,0 ,true ) );
                     drawing::Position3D aPosMiddleMaximum( pPosHelper->transformScaledLogicToScene( fScaledX, fScaledY_Max ,0 ,true ) );
 
-                    uno::Reference< drawing::XShapes > xLossGainTarget( xGainTarget );
+                    rtl::Reference<SvxShapeGroupAnyD> xLossGainTarget( xGainTarget );
                     if(bBlack)
                         xLossGainTarget = xLossTarget;
 
                     uno::Reference< beans::XPropertySet > xPointProp( pSeries->getPropertiesOfPoint( nIndex ));
-                    uno::Reference< drawing::XShapes > xPointGroupShape_Shapes;
+                    rtl::Reference<SvxShapeGroupAnyD> xPointGroupShape_Shapes;
                     {
                         OUString aPointCID = ObjectIdentifier::createPointCID( pSeries->getPointCID_Stub(), nIndex );
-                        uno::Reference< drawing::XShapes > xSeriesGroupShape_Shapes( getSeriesGroupShape(pSeries.get(), xSeriesTarget) );
+                        rtl::Reference<SvxShapeGroupAnyD> xSeriesGroupShape_Shapes( getSeriesGroupShape(pSeries.get(), xSeriesTarget) );
                         xPointGroupShape_Shapes = createGroupShape(xSeriesGroupShape_Shapes,aPointCID);
                     }
 
                     //create min-max line
                     if( isValidPosition(aPosMiddleMinimum) && isValidPosition(aPosMiddleMaximum) )
                     {
-                        drawing::PolyPolygonShape3D aPoly;
-                        sal_Int32 nLineIndex =0;
-                        AddPointToPoly( aPoly, aPosMiddleMinimum, nLineIndex);
-                        AddPointToPoly( aPoly, aPosMiddleMaximum, nLineIndex);
+                        std::vector<std::vector<css::drawing::Position3D>> aPoly
+                        {
+                            { aPosMiddleMinimum, aPosMiddleMaximum }
+                        };
 
-                        uno::Reference< drawing::XShape > xShape =
-                            m_pShapeFactory->createLine2D( xPointGroupShape_Shapes,
-                                    PolyToPointSequence(aPoly));
-                        setMappedProperties( xShape, xPointProp, PropertyMapper::getPropertyNameMapForLineSeriesProperties() );
+                        rtl::Reference<SvxShapePolyPolygon> xShape =
+                            ShapeFactory::createLine2D( xPointGroupShape_Shapes, aPoly);
+                        PropertyMapper::setMappedProperties( *xShape, xPointProp, PropertyMapper::getPropertyNameMapForLineSeriesProperties() );
                     }
 
                     //create first-last shape
@@ -239,23 +238,19 @@ void CandleStickChart::createShapes()
                         tNameSequence aNames;
                         tAnySequence aValues;
 
-                        uno::Reference< drawing::XShape > xShape =
-                            m_pShapeFactory->createRectangle( xLossGainTarget,
+                        rtl::Reference<SvxShapeRect> xShape =
+                            ShapeFactory::createRectangle( xLossGainTarget,
                                     aAWTSize, Position3DToAWTPoint( aPosLeftFirst ),
                                     aNames, aValues);
 
-                        uno::Reference< beans::XPropertySet > xProp( xShape, uno::UNO_QUERY );
-                        if(xProp.is())
-                        {
-                            if(bBlack)
-                                PropertyMapper::setMultiProperties( aBlackBox_Names, aBlackBox_Values, xProp );
-                            else
-                                PropertyMapper::setMultiProperties( aWhiteBox_Names, aWhiteBox_Values, xProp );
-                        }
+                        if(bBlack)
+                            PropertyMapper::setMultiProperties( aBlackBox_Names, aBlackBox_Values, *xShape );
+                        else
+                            PropertyMapper::setMultiProperties( aWhiteBox_Names, aWhiteBox_Values, *xShape );
                     }
                     else
                     {
-                        drawing::PolyPolygonShape3D aPoly;
+                        std::vector<std::vector<css::drawing::Position3D>> aPoly;
 
                         sal_Int32 nLineIndex = 0;
                         if( bShowFirst &&  pPosHelper->isLogicVisible( fUnscaledX, fUnscaledY_First ,fLogicZ )
@@ -271,16 +266,11 @@ void CandleStickChart::createShapes()
                             AddPointToPoly( aPoly, aPosRightLast, nLineIndex );
                         }
 
-                        if( aPoly.SequenceX.hasElements() )
+                        if( !aPoly.empty() )
                         {
-                            uno::Reference< drawing::XShape > xShape =
-                                m_pShapeFactory->createLine2D( xPointGroupShape_Shapes,
-                                        PolyToPointSequence(aPoly) );
-                            uno::Reference< beans::XPropertySet > xProp( xShape, uno::UNO_QUERY );
-                            if(xProp.is())
-                            {
-                                setMappedProperties( xShape, xPointProp, PropertyMapper::getPropertyNameMapForLineSeriesProperties() );
-                            }
+                            rtl::Reference<SvxShapePolyPolygon> xShape =
+                                ShapeFactory::createLine2D( xPointGroupShape_Shapes, aPoly );
+                            PropertyMapper::setMappedProperties( *xShape, xPointProp, PropertyMapper::getPropertyNameMapForLineSeriesProperties() );
                         }
                     }
 

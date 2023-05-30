@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-07-04 18:05+0200\n"
-"PO-Revision-Date: 2022-07-26 09:21+0000\n"
-"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2022-10-24 10:35+0000\n"
+"Last-Translator: Annabelle Wübbelsmann <translowl@web.de>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_help-master/textswriter04/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: LibreOffice\n"
 "X-POOTLE-MTIME: 1524399701.000000\n"
 
 #. brcGC
@@ -34,14 +34,14 @@ msgctxt ""
 msgid "<bookmark_value>shortcut keys; in text documents</bookmark_value>         <bookmark_value>text documents; shortcut keys in</bookmark_value>"
 msgstr "<bookmark_value>Tastenkombinationen; Textdokumente</bookmark_value><bookmark_value>Textdokumente; Tastenkombinationen</bookmark_value>"
 
-#. 35yyT
+#. C9cjF
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "hd_id3145763\n"
 "help.text"
-msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Shortcut Keys for %PRODUCTNAME Writer\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
-msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\" name=\"Tastenkombinationen für %PRODUCTNAME Writer\">Tastenkombinationen für <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgid "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Shortcut Keys for <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
+msgstr "<variable id=\"text_keys\"><link href=\"text/swriter/04/01020000.xhp\">Tastenkombinationen für <item type=\"productname\">%PRODUCTNAME</item> Writer</link></variable>"
 
 #. qbPEo
 #: 01020000.xhp
@@ -52,14 +52,14 @@ msgctxt ""
 msgid "You can use shortcut keys to quickly perform common tasks in <item type=\"productname\">%PRODUCTNAME</item>. This section lists the default shortcut keys for <item type=\"productname\">%PRODUCTNAME</item> Writer."
 msgstr "Mit Hilfe von Tastenkombinationen können Sie schnell häufig durchgeführte Aufgaben in <item type=\"productname\">%PRODUCTNAME</item> erledigen. Hier finden Sie eine Liste der voreingestellten Tastenkombinationen für <item type=\"productname\">%PRODUCTNAME</item> Writer."
 
-#. NuaiP
+#. WkpSD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3145081\n"
 "help.text"
-msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\" name=\"general shortcut keys in %PRODUCTNAME\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
-msgstr "Zusätzlich gelten die allgemeinen <link href=\"text/shared/04/01010000.xhp\" name=\"Tastenkombinationen von %PRODUCTNAME\">Tastenkombinationen von <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgid "You can also use the <link href=\"text/shared/04/01010000.xhp\">general shortcut keys in <item type=\"productname\">%PRODUCTNAME</item></link>."
+msgstr "Zusätzlich gelten die allgemeinen <link href=\"text/shared/04/01010000.xhp\">Tastenkombinationen von <item type=\"productname\">%PRODUCTNAME</item></link>."
 
 #. dQtdg
 #: 01020000.xhp
@@ -104,7 +104,7 @@ msgctxt ""
 "par_id3143274\n"
 "help.text"
 msgid "Formula Bar"
-msgstr "Rechenleiste"
+msgstr "Rechenleiste ein/aus"
 
 #. 4ajxh
 #: 01020000.xhp
@@ -230,7 +230,7 @@ msgctxt ""
 "par_id191547122572675\n"
 "help.text"
 msgid "Moves the cursor to the position that it had when the document was last saved before it was last closed."
-msgstr "Bewegt den Cursor an die Position, die er hatte, als das Dokument vorm letzten Schließen zuletzt gespeichert wurde."
+msgstr "Bewegt den Cursor an die Position, die er beim letzten Speichern des Dokuments vor dem letzten Schließen hatte."
 
 #. GEWBz
 #: 01020000.xhp
@@ -707,7 +707,7 @@ msgctxt ""
 "par_id3147041\n"
 "help.text"
 msgid "Find and Replace"
-msgstr "Suchen und Ersetzen"
+msgstr "Suchen und ersetzen"
 
 #. Brwcz
 #: 01020000.xhp
@@ -716,7 +716,7 @@ msgctxt ""
 "hd_id3150940\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+P"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline> </switchinline>+Umschalt+P"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+P"
 
 #. EWHeR
 #: 01020000.xhp
@@ -806,7 +806,7 @@ msgctxt ""
 "par_idN10D39\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+0 (zero)"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline> +0 (null)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+0 (null)"
 
 #. 7uEYD
 #: 01020000.xhp
@@ -824,7 +824,7 @@ msgctxt ""
 "hd_id3151287\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+1"
-msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline> <defaultinline>Strg</defaultinline> </switchinline>+1"
+msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline> <defaultinline>Strg</defaultinline></switchinline>+1"
 
 #. oAKuu
 #: 01020000.xhp
@@ -842,7 +842,7 @@ msgctxt ""
 "hd_id3153751\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+2"
-msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline> </switchinline>+2"
+msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+2"
 
 #. iDPoL
 #: 01020000.xhp
@@ -896,7 +896,7 @@ msgctxt ""
 "hd_id3150849\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+5"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline> </switchinline>+5"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+5"
 
 #. xTs6C
 #: 01020000.xhp
@@ -950,7 +950,7 @@ msgctxt ""
 "hd_id3150732\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+minus sign (-)"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline> </switchinline>+Umschalt+Minus (-)"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+Minus (-)"
 
 #. bjRhb
 #: 01020000.xhp
@@ -1022,7 +1022,7 @@ msgctxt ""
 "hd_id3149422\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Enter"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline> </switchinline>+Eingabetaste"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Eingabetaste"
 
 #. AmExs
 #: 01020000.xhp
@@ -1085,7 +1085,7 @@ msgctxt ""
 "par_id3153798\n"
 "help.text"
 msgid "Insert a new paragraph directly before or after a section or table."
-msgstr ""
+msgstr "Fügt einen neuen Absatz direkt vor oder nach einem Bereich oder einer Tabelle ein."
 
 #. D2Ddu
 #: 01020000.xhp
@@ -1094,7 +1094,7 @@ msgctxt ""
 "par_id9535524\n"
 "help.text"
 msgid "For sections, the cursor must be placed at the first or last character. For tables, the cursor must be placed at the first character of the first cell or the last character of the last cell."
-msgstr ""
+msgstr "Für Bereiche muss der Textcursor am ersten oder letzten Zeichen platziert werden. Für Tabellen muss der Textcursor am ersten Zeichen der ersten Zelle oder am letzten Zeichen der letzten Zelle platziert werden."
 
 #. SAcMa
 #: 01020000.xhp
@@ -1130,7 +1130,7 @@ msgctxt ""
 "par_id3153963\n"
 "help.text"
 msgid "Move cursor with selection to the left"
-msgstr "Schreibmarke mit Auswahl nach links"
+msgstr "Bewegt den Textcursor mit der Auswahl nach links"
 
 #. qkLD6
 #: 01020000.xhp
@@ -1265,7 +1265,7 @@ msgctxt ""
 "hd_id3154750\n"
 "help.text"
 msgid "Shift+Arrow Up"
-msgstr "Umschalt+ Pfeil nach oben"
+msgstr "Umschalt+Pfeil nach oben"
 
 #. DbihF
 #: 01020000.xhp
@@ -1292,7 +1292,7 @@ msgctxt ""
 "par_id1764275\n"
 "help.text"
 msgid "Move cursor to beginning of paragraph. Next keystroke moves cursor to beginning of previous paragraph"
-msgstr "Bewegt den Cursor an den Anfang des Absatzes. Das nächste Drücken der Tasten bewegt den Cursor an den Anfang des vorherigen Absatzes"
+msgstr "Bewegt den Textcursor an den Anfang des Absatzes. Der nächste Tastendruck bewegt den Textcursor an den Anfang des vorherigen Absatzes"
 
 #. VEwNS
 #: 01020000.xhp
@@ -1310,7 +1310,7 @@ msgctxt ""
 "par_id1797235\n"
 "help.text"
 msgid "Select to beginning of paragraph. Next keystroke extends selection to beginning of previous paragraph"
-msgstr "Markiert bis zum Absatzanfang. Die nächste Tastatureingabe erweitert die Auswahl bis zum Anfang des vorherigen Absatzes."
+msgstr "Markiert bis zum Absatzanfang. Der nächste Tastendruck erweitert die Auswahl bis zum Anfang des vorherigen Absatzes."
 
 #. cbSpN
 #: 01020000.xhp
@@ -1319,7 +1319,7 @@ msgctxt ""
 "hd_id3153218\n"
 "help.text"
 msgid "Arrow Down"
-msgstr "Cursor unten"
+msgstr "Pfeil nach unten"
 
 #. HE4wg
 #: 01020000.xhp
@@ -1328,7 +1328,7 @@ msgctxt ""
 "par_id3153232\n"
 "help.text"
 msgid "Move cursor down one line"
-msgstr "Zeile nach unten"
+msgstr "Bewegt den Textcursor eine Zeile nach unten"
 
 #. PRQGC
 #: 01020000.xhp
@@ -1337,7 +1337,7 @@ msgctxt ""
 "hd_id3153317\n"
 "help.text"
 msgid "Shift+Arrow Down"
-msgstr "Umschalt+Cursor unten"
+msgstr "Umschalt+Pfeil nach unten"
 
 #. G2CEB
 #: 01020000.xhp
@@ -1364,7 +1364,7 @@ msgctxt ""
 "par_id6164433\n"
 "help.text"
 msgid "Move cursor to beginning of next paragraph."
-msgstr "Setzt den Cursor an den Anfang des nächsten Absatzes."
+msgstr "Bewegt den Cursor an den Anfang des nächsten Absatzes."
 
 #. vB7xy
 #: 01020000.xhp
@@ -1382,7 +1382,7 @@ msgctxt ""
 "par_id3729361\n"
 "help.text"
 msgid "Select to end of paragraph. Next keystroke extends selection to end of next paragraph"
-msgstr "Markiert bis zum Ende des Absatzes. Die nächste Tastatureingabe erweitert die Auswahl bis zum Ende des nächsten Absatzes."
+msgstr "Markiert bis zum Ende des Absatzes. Der nächste Tastendruck erweitert die Auswahl bis zum Ende des nächsten Absatzes."
 
 #. d6Zee
 #: 01020000.xhp
@@ -1409,7 +1409,7 @@ msgctxt ""
 "hd_id3154531\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Left</caseinline><defaultinline>Home</defaultinline></switchinline>+Shift"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach links</caseinline><defaultinline>Pos1</defaultinline></switchinline>+Umschalt"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach links</caseinline><defaultinline>Umschalt+Pos1</defaultinline></switchinline>"
 
 #. MyZhF
 #: 01020000.xhp
@@ -1418,7 +1418,7 @@ msgctxt ""
 "par_id3154544\n"
 "help.text"
 msgid "Go and select to the beginning of a line"
-msgstr "Zum Zeilenanfang springen und den dazwischen liegenden Inhalt auswählen"
+msgstr "Zum Zeilenanfang springen und den dazwischenliegenden Inhalt auswählen"
 
 #. mJCQW
 #: 01020000.xhp
@@ -1454,7 +1454,7 @@ msgctxt ""
 "par_id3151019\n"
 "help.text"
 msgid "Go and select to end of line"
-msgstr "Zum Zeilenende springen und den dazwischen liegenden Inhalt auswählen"
+msgstr "Zum Zeilenende springen und den dazwischenliegenden Inhalt auswählen"
 
 #. NqHFz
 #: 01020000.xhp
@@ -1481,7 +1481,7 @@ msgctxt ""
 "hd_id3151030\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Up</caseinline><defaultinline>Ctrl+Home</defaultinline></switchinline>+Shift"
-msgstr "Umschalt+<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach oben</caseinline><defaultinline>Strg+Pos1</defaultinline></switchinline>"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach oben</caseinline><defaultinline>Strg+Umschalt+Pos1</defaultinline></switchinline>"
 
 #. Soi4q
 #: 01020000.xhp
@@ -1517,7 +1517,7 @@ msgctxt ""
 "hd_id3149750\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command+Arrow Down</caseinline><defaultinline>Ctrl+End</defaultinline></switchinline>+Shift"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach unten</caseinline><defaultinline>Strg+Ende</defaultinline></switchinline>+Umschalt"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl+Pfeil nach unten</caseinline><defaultinline>Strg+Umschalt+Ende</defaultinline></switchinline>"
 
 #. HD7Wn
 #: 01020000.xhp
@@ -1744,14 +1744,14 @@ msgctxt ""
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Tab"
 msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Tab"
 
-#. SDvt2
+#. AFUgU
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3153577\n"
 "help.text"
-msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Bei <link href=\"text/shared/01/06040600.xhp\" name=\"automatischer Wortergänzung\">automatischer Wortergänzung</link>: nächster Vorschlag"
+msgid "Next suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Bei <link href=\"text/shared/01/06040600.xhp\">automatischer Wortergänzung</link>: nächster Vorschlag"
 
 #. qDiED
 #: 01020000.xhp
@@ -1760,16 +1760,16 @@ msgctxt ""
 "hd_id3147360\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
-msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline> <defaultinline>Strg</defaultinline> </switchinline>+Umschalt+Tab"
+msgstr "<switchinline select=\"sys\"> <caseinline select=\"MAC\">Befehl</caseinline> <defaultinline>Strg</defaultinline></switchinline>+Umschalt+Tab"
 
-#. aounX
+#. bVg3F
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id3147386\n"
 "help.text"
-msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\" name=\"Automatic Word Completion\">Automatic Word Completion</link>"
-msgstr "Bei <link href=\"text/shared/01/06040600.xhp\" name=\"automatischer Wortergänzung\">automatischer Wortergänzung</link>: voriger Vorschlag"
+msgid "Use previous suggestion with <link href=\"text/shared/01/06040600.xhp\">Automatic Word Completion</link>"
+msgstr "Bei <link href=\"text/shared/01/06040600.xhp\">automatischer Wortergänzung</link>: voriger Vorschlag"
 
 #. BqeEo
 #: 01020000.xhp
@@ -1823,7 +1823,7 @@ msgctxt ""
 "hd_id3150396\n"
 "help.text"
 msgid "Shortcut Keys for Paragraphs, List Paragraphs and Heading Levels"
-msgstr ""
+msgstr "Tastenkombinationen für Absätze, Listenabsätze und Überschriftenebenen"
 
 #. AGgt5
 #: 01020000.xhp
@@ -1895,7 +1895,7 @@ msgctxt ""
 "par_id3154672\n"
 "help.text"
 msgid "<variable id=\"beginning\">With the cursor positioned in front of a heading or list paragraph:</variable> The heading in format \"Heading X\" (X = 1-9) is moved down one level in the outline. For list paragraphs, the list level is moved down one level."
-msgstr ""
+msgstr "<variable id=\"beginning\">Wenn der Textcursor vor einer Überschrift oder vor einem Listenabsatz platziert ist:</variable> Die Überschrift im Format \"Überschrift X\" (X = 1-9) wird in der Gliederung um eine Ebene herabgestuft. Der Listenabsatz wird in der Gliederung um eine Ebene herabgestuft."
 
 #. AuZkE
 #: 01020000.xhp
@@ -1913,7 +1913,7 @@ msgctxt ""
 "par_id3155346\n"
 "help.text"
 msgid "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> The heading in format \"Heading X\" (X = 2-10) is moved up one level in the outline. For list paragraphs, the list level is moved up one level."
-msgstr ""
+msgstr "<embedvar href=\"text/swriter/04/01020000.xhp#beginning\"/> Die Überschrift im Format \"Überschrift X\" (X = 2-10) wird in der Gliederung um eine Ebene hochgestuft. Der Listenabsatz wird in der Gliederung um eine Ebene hochgestuft."
 
 #. TL5GS
 #: 01020000.xhp
@@ -1940,7 +1940,7 @@ msgctxt ""
 "par_id3155395\n"
 "help.text"
 msgid "With the cursor placed anywhere in a heading or list paragraph: Increases the alignment for all headings. For list paragraphs, increases the alignment for all paragraphs in the same list."
-msgstr ""
+msgstr "Wenn der Textcursor irgendwo in einer Überschrift oder in einem Listenabsatz platziert ist: Stuft die Ausrichtung aller Überschriften hoch. Für Listenabsätze wird die Ausrichtung aller Absätze der selben Liste hochgestuft."
 
 #. HKCQQ
 #: 01020000.xhp
@@ -1949,7 +1949,7 @@ msgctxt ""
 "par_id491655382453027\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Shift+Tab"
-msgstr ""
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+Tabulator"
 
 #. pARCd
 #: 01020000.xhp
@@ -1958,16 +1958,16 @@ msgctxt ""
 "par_id71655381890029\n"
 "help.text"
 msgid "With the cursor placed anywhere in a heading or list paragraph: Decreases the alignment for all headings. For list paragraphs, decreases the alignment for all paragraphs in the same list."
-msgstr ""
+msgstr "Wenn der Textcursor irgendwo in einer Überschrift oder in einem Listenabsatz platziert ist: Verringert die Ausrichtung aller Überschriften. Für Listenabsätze wird die Ausrichtung aller Absätze der selben Liste verringert."
 
-#. U2tpK
+#. wrjFD
 #: 01020000.xhp
 msgctxt ""
 "01020000.xhp\n"
 "par_id491655382900210\n"
 "help.text"
-msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\" name=\"Position\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
-msgstr ""
+msgid "To insert a tab at the beginning of a heading or list paragraph, use the <menuitem>Numbering followed by</menuitem> option in the <link href=\"text/shared/01/06050600.xhp\"><menuitem>Position</menuitem></link> tab in the <menuitem>Chapter Numbering</menuitem> or <menuitem>Bullets and Numbering</menuitem> dialog. Alternatively, a tab can be copied and then pasted at the beginning."
+msgstr "Um einen Tabulator am Anfang einer Überschrift oder eines Listenabsatzes einzufügen, verwenden Sie die Option <menuitem>Nummerierung gefolgt von</menuitem> im Register <link href=\"text/shared/01/06050600.xhp\"><menuitem>Position</menuitem></link> im Dialog <menuitem>Kapitelnummerierung</menuitem> oder <menuitem>Aufzählungszeichen und Nummerierung</menuitem>. Sie können auch einen Tabulator kopieren und ihn am Anfang einfügen."
 
 #. Vp3wR
 #: 01020000.xhp
@@ -2111,7 +2111,7 @@ msgctxt ""
 "hd_id3150793\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Arrow Keys"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Alt+Strg</defaultinline></switchinline>+Pfeiltasten"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Pfeiltasten"
 
 #. cs4En
 #: 01020000.xhp
@@ -2129,7 +2129,7 @@ msgctxt ""
 "hd_id3154451\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Ctrl+Alt</defaultinline></switchinline>+Shift+Arrow Keys"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Alt+Strg</defaultinline></switchinline>+Umschalt+Pfeiltasten"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Umschalt+Pfeiltasten"
 
 #. DEEkg
 #: 01020000.xhp
@@ -2174,7 +2174,7 @@ msgctxt ""
 "hd_id3147496\n"
 "help.text"
 msgid "Shift+<switchinline select=\"sys\"><caseinline select=\"MAC\">Command</caseinline><defaultinline>Ctrl</defaultinline></switchinline>+Del"
-msgstr "Umschalt+<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Entf"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Befehl</caseinline><defaultinline>Strg</defaultinline></switchinline>+Umschalt+Entf"
 
 #. DDBvE
 #: 01020000.xhp
@@ -2192,7 +2192,7 @@ msgctxt ""
 "par_id8539384\n"
 "help.text"
 msgid "If no whole cell is selected and the cursor is at the end of the table, the paragraph following the table will be deleted, unless it is the last paragraph in the document."
-msgstr "Wenn nicht die ganze Zelle ausgewählt ist und der Cursor am Ende der Tabelle platziert ist, wird der Absatz, der der Tabelle folgt, gelöscht – außer, es handelt sich um den letzten Absatz des Dokuments."
+msgstr "Wenn nicht die ganze Zelle ausgewählt ist und der Cursor am Ende der Tabelle platziert ist, wird der Absatz gelöscht, der der Tabelle folgt – außer, es handelt sich um den letzten Absatz des Dokuments."
 
 #. 5npCj
 #: 01020000.xhp
@@ -2300,7 +2300,7 @@ msgctxt ""
 "hd_id3151200\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Arrow Keys"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Alt+Strg</defaultinline></switchinline>+Pfeiltasten"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Pfeiltasten"
 
 #. e5FsB
 #: 01020000.xhp
@@ -2318,7 +2318,7 @@ msgctxt ""
 "hd_id3151246\n"
 "help.text"
 msgid "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Command</caseinline><defaultinline>Alt+Ctrl</defaultinline></switchinline>+Shift+Arrow Keys"
-msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Alt+Strg</defaultinline></switchinline>+Umschalt+Pfeiltasten"
+msgstr "<switchinline select=\"sys\"><caseinline select=\"MAC\">Option+Befehl</caseinline><defaultinline>Strg+Alt</defaultinline></switchinline>+Umschalt+Pfeiltasten"
 
 #. RFfKH
 #: 01020000.xhp
@@ -2345,4 +2345,4 @@ msgctxt ""
 "par_id3150154\n"
 "help.text"
 msgid "Selects the anchor of an object (in Edit Points mode)."
-msgstr "Wählt die Verankerung (im Punktbearbeitungsmodus) eines Objekts aus."
+msgstr "Wählt die Verankerung eines Objekts aus (im Punktbearbeitungsmodus)."

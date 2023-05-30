@@ -38,6 +38,7 @@
 #include <i18nutil/unicode.hxx>
 #include <unotools/ucbstreamhelper.hxx>
 #include <comphelper/processfactory.hxx>
+#include <utility>
 #include <vcl/GraphicObject.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/bigint.hxx>
@@ -1313,6 +1314,20 @@ SvxBoxItem::~SvxBoxItem()
 {
 }
 
+void SvxBoxItem::dumpAsXml(xmlTextWriterPtr pWriter) const
+{
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SvxBoxItem"));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("top-dist"),
+                                      BAD_CAST(OString::number(nTopDist).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("bottom-dist"),
+                                      BAD_CAST(OString::number(nBottomDist).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("left-dist"),
+                                      BAD_CAST(OString::number(nLeftDist).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("right-dist"),
+                                      BAD_CAST(OString::number(nRightDist).getStr()));
+    SfxPoolItem::dumpAsXml(pWriter);
+    (void)xmlTextWriterEndElement(pWriter);
+}
 
 boost::property_tree::ptree SvxBoxItem::dumpAsJSON() const
 {
@@ -1372,7 +1387,10 @@ table::BorderLine2 SvxBoxItem::SvxLineToLine(const SvxBorderLine* pLine, bool bC
         aLine.LineWidth      = sal_uInt32( bConvert ? convertTwipToMm100( pLine->GetWidth( ) ) : pLine->GetWidth( ) );
     }
     else
+    {
         aLine.Color          = aLine.InnerLineWidth = aLine.OuterLineWidth = aLine.LineDistance  = 0;
+        aLine.LineStyle = table::BorderLineStyle::NONE; // 0 is SOLID!
+    }
     return aLine;
 }
 
@@ -1380,7 +1398,7 @@ bool SvxBoxItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
 {
     bool bConvert = 0!=(nMemberId&CONVERT_TWIPS);
     table::BorderLine2 aRetLine;
-    sal_uInt16 nDist = 0;
+    sal_Int16 nDist = 0;
     bool bDistMember = false;
     nMemberId &= ~CONVERT_TWIPS;
     switch(nMemberId)
@@ -1560,7 +1578,7 @@ bool SvxBoxItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             {
                 // 4 Borders and 5 distances
                 const SvxBoxItemLine aBorders[] = { SvxBoxItemLine::LEFT, SvxBoxItemLine::RIGHT, SvxBoxItemLine::BOTTOM, SvxBoxItemLine::TOP };
-                for (int n(0); n != SAL_N_ELEMENTS(aBorders); ++n)
+                for (size_t n(0); n != std::size(aBorders); ++n)
                 {
                     if (!lcl_setLine(aSeq[n], *this, aBorders[n], bConvert))
                         return false;
@@ -1670,7 +1688,6 @@ bool SvxBoxItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
         if(!(rVal >>= nDist))
             return false;
 
-        if(nDist >= 0)
         {
             if( bConvert )
                 nDist = o3tl::toTwips(nDist, o3tl::Length::mm100);
@@ -1883,10 +1900,10 @@ void SvxBoxItem::ScaleMetrics( tools::Long nMult, tools::Long nDiv )
     if ( pBottom )  pBottom->ScaleMetrics( nMult, nDiv );
     if ( pLeft )    pLeft->ScaleMetrics( nMult, nDiv );
     if ( pRight )   pRight->ScaleMetrics( nMult, nDiv );
-    nTopDist = static_cast<sal_uInt16>(BigInt::Scale( nTopDist, nMult, nDiv ));
-    nBottomDist = static_cast<sal_uInt16>(BigInt::Scale( nBottomDist, nMult, nDiv ));
-    nLeftDist = static_cast<sal_uInt16>(BigInt::Scale( nLeftDist, nMult, nDiv ));
-    nRightDist = static_cast<sal_uInt16>(BigInt::Scale( nRightDist, nMult, nDiv ));
+    nTopDist = static_cast<sal_Int16>(BigInt::Scale( nTopDist, nMult, nDiv ));
+    nBottomDist = static_cast<sal_Int16>(BigInt::Scale( nBottomDist, nMult, nDiv ));
+    nLeftDist = static_cast<sal_Int16>(BigInt::Scale( nLeftDist, nMult, nDiv ));
+    nRightDist = static_cast<sal_Int16>(BigInt::Scale( nRightDist, nMult, nDiv ));
 }
 
 
@@ -1962,9 +1979,9 @@ sal_uInt16 SvxBoxItem::GetSmallestDistance() const
 }
 
 
-sal_uInt16 SvxBoxItem::GetDistance( SvxBoxItemLine nLine ) const
+sal_Int16 SvxBoxItem::GetDistance( SvxBoxItemLine nLine, bool bAllowNegative ) const
 {
-    sal_uInt16 nDist = 0;
+    sal_Int16 nDist = 0;
     switch ( nLine )
     {
         case SvxBoxItemLine::TOP:
@@ -1983,11 +2000,15 @@ sal_uInt16 SvxBoxItem::GetDistance( SvxBoxItemLine nLine ) const
             OSL_FAIL( "wrong line" );
     }
 
+    if (!bAllowNegative && nDist < 0)
+    {
+        nDist = 0;
+    }
     return nDist;
 }
 
 
-void SvxBoxItem::SetDistance( sal_uInt16 nNew, SvxBoxItemLine nLine )
+void SvxBoxItem::SetDistance( sal_Int16 nNew, SvxBoxItemLine nLine )
 {
     switch ( nLine )
     {
@@ -2036,10 +2057,10 @@ sal_uInt16 SvxBoxItem::CalcLineWidth( SvxBoxItemLine nLine ) const
     return nWidth;
 }
 
-sal_uInt16 SvxBoxItem::CalcLineSpace( SvxBoxItemLine nLine, bool bEvenIfNoLine ) const
+sal_Int16 SvxBoxItem::CalcLineSpace( SvxBoxItemLine nLine, bool bEvenIfNoLine, bool bAllowNegative ) const
 {
     SvxBorderLine* pTmp = nullptr;
-    sal_uInt16 nDist = 0;
+    sal_Int16 nDist = 0;
     switch ( nLine )
     {
     case SvxBoxItemLine::TOP:
@@ -2068,6 +2089,12 @@ sal_uInt16 SvxBoxItem::CalcLineSpace( SvxBoxItemLine nLine, bool bEvenIfNoLine )
     }
     else if( !bEvenIfNoLine )
         nDist = 0;
+
+    if (!bAllowNegative && nDist < 0)
+    {
+        nDist = 0;
+    }
+
     return nDist;
 }
 
@@ -2456,8 +2483,7 @@ void BorderDistanceFromWord(bool bFromEdge, sal_Int32& nMargin, sal_Int32& nBord
     }
     else if (nNewBorderDistance < 0)
     {
-        nNewMargin = std::max<sal_Int32>(nMargin - nBorderWidth, 0);
-        nNewBorderDistance = 0;
+        nNewMargin = nMargin;
     }
 
     nMargin = nNewMargin;
@@ -2481,10 +2507,10 @@ void BorderDistancesToWord(const SvxBoxItem& rBox, const WordPageMargins& rMargi
     WordBorderDistances& rDistances)
 {
     // Use signed sal_Int32 that can hold sal_uInt16, to prevent overflow at subtraction below
-    const sal_Int32 nT = rBox.GetDistance(SvxBoxItemLine::TOP);
-    const sal_Int32 nL = rBox.GetDistance(SvxBoxItemLine::LEFT);
-    const sal_Int32 nB = rBox.GetDistance(SvxBoxItemLine::BOTTOM);
-    const sal_Int32 nR = rBox.GetDistance(SvxBoxItemLine::RIGHT);
+    const sal_Int32 nT = rBox.GetDistance(SvxBoxItemLine::TOP, /*bAllowNegative=*/true);
+    const sal_Int32 nL = rBox.GetDistance(SvxBoxItemLine::LEFT, /*bAllowNegative=*/true);
+    const sal_Int32 nB = rBox.GetDistance(SvxBoxItemLine::BOTTOM, /*bAllowNegative=*/true);
+    const sal_Int32 nR = rBox.GetDistance(SvxBoxItemLine::RIGHT, /*bAllowNegative=*/true);
 
     // Only take into account existing borders
     const SvxBorderLine* pLnT = rBox.GetLine(SvxBoxItemLine::TOP);
@@ -2512,7 +2538,7 @@ void BorderDistancesToWord(const SvxBoxItem& rBox, const WordPageMargins& rMargi
 
     const sal_Int32 n32pt = 32 * 20;
     // 1. If all borders are in range of 31 pts from text
-    if (nT2BT < n32pt && nT2BL < n32pt && nT2BB < n32pt && nT2BR < n32pt)
+    if (nT2BT >= 0 && nT2BT < n32pt && nT2BL >= 0 && nT2BL < n32pt && nT2BB >= 0 && nT2BB < n32pt && nT2BR >= 0 && nT2BR < n32pt)
     {
         rDistances.bFromEdge = false;
     }
@@ -2583,7 +2609,7 @@ OUString SvxFormatBreakItem::GetValueTextByPos( sal_uInt16 nPos )
         RID_SVXITEMS_BREAK_PAGE_AFTER,
         RID_SVXITEMS_BREAK_PAGE_BOTH
     };
-    static_assert(SAL_N_ELEMENTS(RID_SVXITEMS_BREAK) == size_t(SvxBreak::End), "unexpected size");
+    static_assert(std::size(RID_SVXITEMS_BREAK) == size_t(SvxBreak::End), "unexpected size");
     assert(nPos < sal_uInt16(SvxBreak::End) && "enum overflow!");
     return EditResId(RID_SVXITEMS_BREAK[nPos]);
 }
@@ -2854,15 +2880,15 @@ SvxBrushItem::SvxBrushItem(const GraphicObject& rGraphicObj, SvxGraphicPosition 
     DBG_ASSERT( GPOS_NONE != ePos, "SvxBrushItem-Ctor with GPOS_NONE == ePos" );
 }
 
-SvxBrushItem::SvxBrushItem(const OUString& rLink, const OUString& rFilter,
+SvxBrushItem::SvxBrushItem(OUString aLink, OUString aFilter,
                            SvxGraphicPosition ePos, sal_uInt16 _nWhich)
     : SfxPoolItem(_nWhich)
     , aColor(COL_TRANSPARENT)
     , aFilterColor(COL_TRANSPARENT)
     , nShadingValue(ShadingPattern::CLEAR)
     , nGraphicTransparency(0)
-    , maStrLink(rLink)
-    , maStrFilter(rFilter)
+    , maStrLink(std::move(aLink))
+    , maStrFilter(std::move(aFilter))
     , eGraphicPos((GPOS_NONE != ePos) ? ePos : GPOS_MM)
     , bLoadAgain(true)
 {
@@ -3215,7 +3241,7 @@ const GraphicObject* SvxBrushItem::GetGraphicObject(OUString const & referer) co
                 std::unique_ptr<SvMemoryStream> const xMemStream(aGraphicURL.getData());
                 if (xMemStream)
                 {
-                    if (ERRCODE_NONE == GraphicFilter::GetGraphicFilter().ImportGraphic(aGraphic, "", *xMemStream))
+                    if (ERRCODE_NONE == GraphicFilter::GetGraphicFilter().ImportGraphic(aGraphic, u"", *xMemStream))
                     {
                         bGraphicLoaded = true;
 
@@ -3385,7 +3411,8 @@ TranslateId getFrmDirResId(size_t nIndex)
         RID_SVXITEMS_FRMDIR_VERT_TOP_RIGHT,
         RID_SVXITEMS_FRMDIR_VERT_TOP_LEFT,
         RID_SVXITEMS_FRMDIR_ENVIRONMENT,
-        RID_SVXITEMS_FRMDIR_VERT_BOT_LEFT
+        RID_SVXITEMS_FRMDIR_VERT_BOT_LEFT,
+        RID_SVXITEMS_FRMDIR_VERT_TOP_RIGHT90
     };
     return RID_SVXITEMS_FRMDIR[nIndex];
 }
@@ -3425,6 +3452,9 @@ bool SvxFrameDirectionItem::PutValue( const css::uno::Any& rVal,
             case text::WritingMode2::BT_LR:
                 SetValue( SvxFrameDirection::Vertical_LR_BT );
                 break;
+            case text::WritingMode2::TB_RL90:
+                SetValue(SvxFrameDirection::Vertical_RL_TB90);
+                break;
             case text::WritingMode2::PAGE:
                 SetValue( SvxFrameDirection::Environment );
                 break;
@@ -3460,6 +3490,9 @@ bool SvxFrameDirectionItem::QueryValue( css::uno::Any& rVal,
             break;
         case SvxFrameDirection::Vertical_LR_BT:
             nVal = text::WritingMode2::BT_LR;
+            break;
+        case SvxFrameDirection::Vertical_RL_TB90:
+            nVal = text::WritingMode2::TB_RL90;
             break;
         case SvxFrameDirection::Environment:
             nVal = text::WritingMode2::PAGE;

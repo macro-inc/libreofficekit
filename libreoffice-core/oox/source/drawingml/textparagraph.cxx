@@ -87,7 +87,8 @@ void TextParagraph::insertAt(
         const Reference < XTextCursor > &xAt,
         const TextCharacterProperties& rTextStyleProperties,
         const TextListStyle& rMasterTextListStyle,
-        const TextListStyle& rTextListStyle, bool bFirst, float nDefaultCharHeight) const
+        const TextListStyle& rTextListStyle, bool bFirst,
+        float nDefaultCharHeight) const
 {
     try {
         sal_Int32 nParagraphSize = 0;
@@ -108,8 +109,8 @@ void TextParagraph::insertAt(
 
             TextCharacterProperties aTextCharacterProps( aTextCharacterStyle );
             aTextCharacterProps.assignUsed( maEndProperties );
-            if ( aTextCharacterProps.moHeight.has() )
-                nCharHeight = nCharHeightFirst = aTextCharacterProps.moHeight.get();
+            if ( aTextCharacterProps.moHeight.has_value() )
+                nCharHeight = nCharHeightFirst = aTextCharacterProps.moHeight.value();
             aTextCharacterProps.pushToPropSet( aPropSet, rFilterBase );
         }
         else
@@ -145,9 +146,9 @@ void TextParagraph::insertAt(
 
             // bullets have same color as following texts by default
             if( !aioBulletList.hasProperty( PROP_BulletColor ) && !maRuns.empty()
-                && (*maRuns.begin())->getTextCharacterProperties().maFillProperties.moFillType.has() )
+                && (*maRuns.begin())->getTextCharacterProperties().maFillProperties.moFillType.has_value() )
                 aioBulletList.setProperty( PROP_BulletColor, (*maRuns.begin())->getTextCharacterProperties().maFillProperties.getBestSolidColor().getColor( rFilterBase.getGraphicHelper() ));
-            if( !aioBulletList.hasProperty( PROP_BulletColor ) && aTextCharacterStyle.maFillProperties.moFillType.has() )
+            if( !aioBulletList.hasProperty( PROP_BulletColor ) && aTextCharacterStyle.maFillProperties.moFillType.has_value() )
                 aioBulletList.setProperty( PROP_BulletColor, aTextCharacterStyle.maFillProperties.getBestSolidColor().getColor( rFilterBase.getGraphicHelper() ));
             if( !aioBulletList.hasProperty( PROP_GraphicSize ) && !maRuns.empty()
                 && aParaProp.getBulletList().maGraphic.hasValue())

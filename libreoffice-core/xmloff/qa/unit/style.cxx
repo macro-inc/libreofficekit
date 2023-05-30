@@ -9,61 +9,34 @@
 
 #include <sal/config.h>
 
-#include <string_view>
+#include <test/unoapixml_test.hxx>
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
-#include <test/xmltesttools.hxx>
-
-#include <com/sun/star/frame/Desktop.hpp>
-#include <com/sun/star/container/XNameContainer.hpp>
-#include <com/sun/star/frame/XStorable.hpp>
-#include <com/sun/star/packages/zip/ZipFileAccess.hpp>
+#include <com/sun/star/awt/ColorStop.hpp>
+#include <com/sun/star/awt/Gradient2.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
+#include <com/sun/star/container/XNameContainer.hpp>
+#include <com/sun/star/drawing/XDrawPagesSupplier.hpp>
+#include <com/sun/star/drawing/XShape.hpp>
+#include <com/sun/star/rendering/RGBColor.hpp>
 #include <com/sun/star/style/XStyleFamiliesSupplier.hpp>
 
-#include <comphelper/propertysequence.hxx>
 #include <officecfg/Office/Common.hxx>
-#include <unotools/mediadescriptor.hxx>
-#include <unotools/saveopt.hxx>
-#include <unotools/tempfile.hxx>
-#include <unotools/ucbstreamhelper.hxx>
 #include <rtl/character.hxx>
 
 using namespace ::com::sun::star;
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/xmloff/qa/unit/data/";
-
 /// Covers xmloff/source/style/ fixes.
-class XmloffStyleTest : public test::BootstrapFixture,
-                        public unotest::MacrosTest,
-                        public XmlTestTools
+class XmloffStyleTest : public UnoApiXmlTest
 {
-private:
-    uno::Reference<lang::XComponent> mxComponent;
-
 public:
-    void setUp() override;
-    void tearDown() override;
+    XmloffStyleTest();
     void registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx) override;
-    uno::Reference<lang::XComponent>& getComponent() { return mxComponent; }
-    void load(std::u16string_view rURL);
-    void save(const OUString& rFilterName, utl::TempFile& rTempFile);
+    uno::Reference<drawing::XShape> getShape(sal_uInt8 nShapeIndex);
 };
 
-void XmloffStyleTest::setUp()
+XmloffStyleTest::XmloffStyleTest()
+    : UnoApiXmlTest("/xmloff/qa/unit/data/")
 {
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
-}
-
-void XmloffStyleTest::tearDown()
-{
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
 }
 
 void XmloffStyleTest::registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx)
@@ -71,27 +44,22 @@ void XmloffStyleTest::registerNamespaces(xmlXPathContextPtr& pXmlXpathCtx)
     XmlTestTools::registerODFNamespaces(pXmlXpathCtx);
 }
 
-void XmloffStyleTest::load(std::u16string_view rFileName)
+uno::Reference<drawing::XShape> XmloffStyleTest::getShape(sal_uInt8 nShapeIndex)
 {
-    OUString aURL = m_directories.getURLFromSrc(DATA_DIRECTORY) + rFileName;
-    mxComponent = loadFromDesktop(aURL);
-}
-
-void XmloffStyleTest::save(const OUString& rFilterName, utl::TempFile& rTempFile)
-{
-    uno::Reference<frame::XStorable> xStorable(mxComponent, uno::UNO_QUERY);
-    utl::MediaDescriptor aMediaDescriptor;
-    aMediaDescriptor["FilterName"] <<= rFilterName;
-    rTempFile.EnableKillingFile();
-    xStorable->storeToURL(rTempFile.GetURL(), aMediaDescriptor.getAsConstPropertyValueList());
-    validate(rTempFile.GetFileName(), test::ODF);
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent,
+                                                                   uno::UNO_QUERY_THROW);
+    uno::Reference<drawing::XDrawPages> xDrawPages(xDrawPagesSupplier->getDrawPages());
+    uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPages->getByIndex(0), uno::UNO_QUERY_THROW);
+    uno::Reference<drawing::XShape> xShape(xDrawPage->getByIndex(nShapeIndex),
+                                           uno::UNO_QUERY_THROW);
+    return xShape;
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testFillImageBase64)
 {
     // Load a flat ODG that has base64-encoded bitmap as a fill style.
-    load(u"fill-image-base64.fodg");
-    uno::Reference<lang::XMultiServiceFactory> xFactory(getComponent(), uno::UNO_QUERY);
+    loadFromURL(u"fill-image-base64.fodg");
+    uno::Reference<lang::XMultiServiceFactory> xFactory(mxComponent, uno::UNO_QUERY);
     uno::Reference<container::XNameContainer> xBitmaps(
         xFactory->createInstance("com.sun.star.drawing.BitmapTable"), uno::UNO_QUERY);
 
@@ -122,24 +90,13 @@ struct XmlFont
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testFontSorting)
 {
     // Given an empty document with default fonts (Liberation Sans, Lucida Sans, etc):
-    getComponent() = loadFromDesktop("private:factory/swriter");
+    mxComponent = loadFromDesktop("private:factory/swriter");
 
     // When saving that document to ODT:
-    uno::Reference<frame::XStorable> xStorable(getComponent(), uno::UNO_QUERY);
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    uno::Sequence<beans::PropertyValue> aStoreProps = comphelper::InitPropertySequence({
-        { "FilterName", uno::makeAny(OUString("writer8")) },
-    });
-    xStorable->storeToURL(aTempFile.GetURL(), aStoreProps);
+    save("writer8");
 
     // Then make sure <style:font-face> elements are sorted (by style:name="..."):
-    uno::Reference<packages::zip::XZipFileAccess2> xNameAccess
-        = packages::zip::ZipFileAccess::createWithURL(mxComponentContext, aTempFile.GetURL());
-    uno::Reference<io::XInputStream> xInputStream(xNameAccess->getByName("content.xml"),
-                                                  uno::UNO_QUERY);
-    std::unique_ptr<SvStream> pStream(utl::UcbStreamHelper::CreateStream(xInputStream, true));
-    xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+    xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
     xmlXPathObjectPtr pXPath
         = getXPathNode(pXmlDoc, "/office:document-content/office:font-face-decls/style:font-face");
     xmlNodeSetPtr pXmlNodes = pXPath->nodesetval;
@@ -193,10 +150,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testRtlGutter)
 {
     // Given a document with a gutter margin and an RTL writing mode:
     // When loading that document from ODF:
-    load(u"rtl-gutter.fodt");
+    loadFromURL(u"rtl-gutter.fodt");
 
     // Then make sure the page style's RtlGutter property is true.
-    uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(getComponent(),
+    uno::Reference<style::XStyleFamiliesSupplier> xStyleFamiliesSupplier(mxComponent,
                                                                          uno::UNO_QUERY);
     uno::Reference<container::XNameAccess> xStyleFamilies
         = xStyleFamiliesSupplier->getStyleFamilies();
@@ -216,9 +173,7 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testWritingModeBTLR)
     // Load document. It has a frame style with writing-mode bt-lr.
     // In ODF 1.3 extended it is written as loext:writing-mode="bt-lr".
     // In ODF 1.3 strict, there must not be an attribute at all.
-    getComponent() = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                         + "tdf150407_WritingModeBTLR_style.odt",
-                                     "com.sun.star.text.TextDocument");
+    loadFromURL(u"tdf150407_WritingModeBTLR_style.odt");
 
     Resetter _([]() {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -234,12 +189,10 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testWritingModeBTLR)
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(3, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // With applied fix for tdf150407 still loext:writing-mode="bt-lr" has to be written.
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "styles.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
         assertXPath(pXmlDoc,
                     "/office:document-styles/office:styles/style:style[@style:name='FrameBTLR']/"
                     "style:graphic-properties[@loext:writing-mode]");
@@ -248,19 +201,19 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testWritingModeBTLR)
                     "style:graphic-properties",
                     "writing-mode", "bt-lr");
     }
+
+    loadFromURL(u"tdf150407_WritingModeBTLR_style.odt");
     // Save to ODF 1.3 strict.
     {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(10, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // Without the fix an faulty 'writing-mode="bt-lr"' attribute was written in productive build.
         // A debug build fails assertion in SvXMLNamespaceMap::GetQNameByKey().
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "styles.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
         assertXPathNoAttribute(pXmlDoc,
                                "/office:document-styles/office:styles/"
                                "style:style[@style:name='FrameBTLR']/style:graphic-properties",
@@ -273,9 +226,7 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelBottomMargin)
     // Load document. It has a frame position with vertical position relative to bottom margin.
     // In ODF 1.3 extended it is written as loext:vertical-rel="page-content-bottom".
     // In ODF 1.3 strict, there must not be an attribute at all.
-    getComponent() = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                         + "tdf150407_PosRelBottomMargin.docx",
-                                     "com.sun.star.text.TextDocument");
+    loadFromURL(u"tdf150407_PosRelBottomMargin.docx");
 
     Resetter _([]() {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -291,13 +242,11 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelBottomMargin)
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(3, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // With applied fix for tdf150407 still loext:vertical-rel="page-content-bottom" has to be
         // written.
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         assertXPath(
             pXmlDoc,
             "/office:document-content/office:automatic-styles/style:style[@style:name='gr1']/"
@@ -308,19 +257,19 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelBottomMargin)
             "style:graphic-properties",
             "vertical-rel", "page-content-bottom");
     }
+
+    loadFromURL(u"tdf150407_PosRelBottomMargin.docx");
     // Save to ODF 1.3 strict.
     {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(10, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // Without the fix an faulty 'vertical-rel="page-content-bottom"' attribute was written in
         // productive build. A debug build fails assertion in SvXMLNamespaceMap::GetQNameByKey().
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         assertXPathNoAttribute(pXmlDoc,
                                "/office:document-content/office:automatic-styles/"
                                "style:style[@style:name='gr1']/style:graphic-properties",
@@ -333,9 +282,7 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelTopMargin)
     // Load document. It has a frame position with vertical position relative to top margin.
     // In ODF 1.3 extended it is written as loext:vertical-rel="page-content-top".
     // In ODF 1.3 strict, there must not be an attribute at all.
-    getComponent() = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                         + "tdf150407_PosRelTopMargin.docx",
-                                     "com.sun.star.text.TextDocument");
+    loadFromURL(u"tdf150407_PosRelTopMargin.docx");
 
     Resetter _([]() {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
@@ -351,13 +298,11 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelTopMargin)
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(3, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // With applied fix for tdf150407 still loext:vertical-rel="page-content-top has to be
         // written.
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         assertXPath(
             pXmlDoc,
             "/office:document-content/office:automatic-styles/style:style[@style:name='gr1']/"
@@ -368,24 +313,211 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testPosRelTopMargin)
             "style:graphic-properties",
             "vertical-rel", "page-content-top");
     }
+
+    loadFromURL(u"tdf150407_PosRelTopMargin.docx");
     // Save to ODF 1.3 strict.
     {
         std::shared_ptr<comphelper::ConfigurationChanges> pBatch(
             comphelper::ConfigurationChanges::create());
         officecfg::Office::Common::Save::ODF::DefaultVersion::set(10, pBatch);
         pBatch->commit();
-        utl::TempFile aTempFile;
-        save("writer8", aTempFile);
+        save("writer8");
 
         // Without the fix an faulty 'vertical-rel="page-content-top"' attribute was written in
         // productive build. A debug build fails assertion in SvXMLNamespaceMap::GetQNameByKey().
-        std::unique_ptr<SvStream> pStream = parseExportStream(aTempFile, "content.xml");
-        xmlDocUniquePtr pXmlDoc = parseXmlStream(pStream.get());
+        xmlDocUniquePtr pXmlDoc = parseExport("content.xml");
         assertXPathNoAttribute(pXmlDoc,
                                "/office:document-content/office:automatic-styles/"
                                "style:style[@style:name='gr1']/style:graphic-properties",
                                "vertical-rel");
     }
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testMCGR_OldToNew)
+{
+    // The file contains a shape with linear gradient fill from red #ff0000 to yellow #ffff00,
+    // named 'red2yellow'
+    loadFromURL(u"MCGR_OldToNew.odg");
+
+    // saveAndReload includes validation and must not fail with the new elements and attributes.
+    saveAndReload("draw8");
+
+    // Examine file markup
+    // For compatibilty the file should still have the old attributes 'start-color' and 'end-color'
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    OString sPath = "/office:document-styles/office:styles/draw:gradient[@draw:name='red2yellow']";
+    assertXPath(pXmlDoc, sPath, "start-color", "#ff0000");
+    assertXPath(pXmlDoc, sPath, "end-color", "#ffff00");
+
+    // And it must have the new 'gradient-stop' elements.
+    // The prefix 'loext' needs to be adapted, when the element is available in ODF strict.
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "offset", "0");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "color-type", "rgb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "color-value", "#ff0000");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "offset", "1");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "color-type", "rgb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "color-value", "#ffff00");
+
+    // Examine reloaded file
+    uno::Reference<drawing::XShape> xShape(getShape(0));
+    CPPUNIT_ASSERT(xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+
+    // The old properties need to be still available, as they might be used in macros.
+    OUString sGradientName;
+    xShapeProperties->getPropertyValue("FillGradientName") >>= sGradientName;
+    CPPUNIT_ASSERT_EQUAL(OUString(u"red2yellow"), sGradientName);
+    awt::Gradient2 aGradient;
+    xShapeProperties->getPropertyValue("FillGradient") >>= aGradient;
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xFF0000), aGradient.StartColor);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xFFFF00), aGradient.EndColor);
+
+    // Test new properties
+    auto aColorStopSeq = aGradient.ColorStops;
+    awt::ColorStop aColorStop = aColorStopSeq[0];
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopOffset);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
+    aColorStop = aColorStopSeq[1];
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopOffset);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testMCGR_OldToNew_opacity)
+{
+    // The file contains a shape with solid fill and a radial transparency gradient with start 90%,
+    // end 0%, border 20% and center at 50%|50%. There is only one draw:opacity element in file.
+    loadFromURL(u"MCGR_OldToNew_opacity.odg");
+
+    // saveAndReload includes validation and must not fail with the new elements and attributes.
+    saveAndReload("draw8");
+
+    // Examine file markup
+    // For compatibilty the file should still have the old attributes.
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    OString sPath = "/office:document-styles/office:styles/draw:opacity";
+    assertXPath(pXmlDoc, sPath, "start", "10%"); // UI 90% transparency
+    assertXPath(pXmlDoc, sPath, "end", "100%"); // UI 0% transparency
+    assertXPath(pXmlDoc, sPath, "border", "20%");
+    assertXPath(pXmlDoc, sPath, "cx", "50%");
+    assertXPath(pXmlDoc, sPath, "cy", "50%");
+    assertXPath(pXmlDoc, sPath, "style", "radial");
+
+    // And it must have the new 'opacity-stop' elements.
+    // The prefix 'loext' needs to be adapted, when the element is available in ODF strict.
+    OString sFirstStop = sPath + "/loext:opacity-stop[1]";
+    assertXPath(pXmlDoc, sFirstStop, "offset", "0");
+    // Because of converting through color, the grade of opacity is not exact "0.1"
+    double fOpacity = getXPathContent(pXmlDoc, sFirstStop + "/@svg:stop-opacity").toDouble();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.1, fOpacity, 0.002);
+
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[2]", "offset", "1");
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[2]", "stop-opacity", "1");
+
+    // Examine reloaded file
+    uno::Reference<drawing::XShape> xShape(getShape(0));
+    CPPUNIT_ASSERT(xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+
+    // The old properties need to be still available, as they might be used in macros.
+    awt::Gradient2 aGradient;
+    xShapeProperties->getPropertyValue("FillTransparenceGradient") >>= aGradient;
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xE5E5E5), aGradient.StartColor);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0), aGradient.EndColor);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(20), aGradient.Border);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(50), aGradient.XOffset);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(50), aGradient.YOffset);
+    CPPUNIT_ASSERT_EQUAL(awt::GradientStyle_RADIAL, aGradient.Style);
+
+    // Test new properties
+    auto aColorStopSeq = aGradient.ColorStops;
+    awt::ColorStop aColorStop = aColorStopSeq[0];
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopOffset);
+    // Rounding error because of converting through color: 90% => 0.9 * 255 => 229
+    // 299.0 / 255.0 = 0.898039215686275
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.9, aColorStop.StopColor.Red, 0.002);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.9, aColorStop.StopColor.Green, 0.002);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.9, aColorStop.StopColor.Blue, 0.002);
+    aColorStop = aColorStopSeq[1];
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopOffset);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testMCGR_threeStops)
+{
+    // The file contains a shape with square gradient fill from red #ff0000 over teal #0099bb to
+    // yellow #ffff00, named 'threeStops'. It has 45deg rotation, center 0%|50%, border 10%.
+    loadFromURL(u"MCGR_threeStops.fodt");
+
+    // saveAndReload includes validation and must not fail with the new elements and attributes.
+    saveAndReload("draw8");
+
+    // Examine file markup
+    // For compatibilty the file should still have the old attributes 'start-color' and 'end-color'
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    OString sPath = "/office:document-styles/office:styles/draw:gradient[@draw:name='threeStops']";
+    assertXPath(pXmlDoc, sPath, "start-color", "#ff0000");
+    assertXPath(pXmlDoc, sPath, "end-color", "#ffff00");
+    assertXPath(pXmlDoc, sPath, "style", "square");
+    assertXPath(pXmlDoc, sPath, "cx", "0%");
+    assertXPath(pXmlDoc, sPath, "cy", "50%");
+    assertXPath(pXmlDoc, sPath, "angle", "45deg");
+    assertXPath(pXmlDoc, sPath, "border", "10%");
+
+    // And it must have the new 'gradient-stop' elements.
+    // The prefix 'loext' needs to be adapted, when the element is available in ODF strict.
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "offset", "0");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "color-type", "rgb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "color-value", "#ff0000");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "offset", "0.3");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "color-type", "rgb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "color-value", "#0099bb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[3]", "offset", "1");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[3]", "color-type", "rgb");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[3]", "color-value", "#ffff00");
+
+    // Examine reloaded file
+    uno::Reference<drawing::XShape> xShape(getShape(0));
+    CPPUNIT_ASSERT(xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+
+    // The old properties need to be still available, as they might be used in macros.
+    OUString sGradientName;
+    xShapeProperties->getPropertyValue("FillGradientName") >>= sGradientName;
+    CPPUNIT_ASSERT_EQUAL(OUString(u"threeStops"), sGradientName);
+    awt::Gradient2 aGradient;
+    xShapeProperties->getPropertyValue("FillGradient") >>= aGradient;
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xFF0000), aGradient.StartColor);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(0xFFFF00), aGradient.EndColor);
+    CPPUNIT_ASSERT_EQUAL(awt::GradientStyle_SQUARE, aGradient.Style);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(0), aGradient.XOffset);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(50), aGradient.YOffset);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(450), aGradient.Angle);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(10), aGradient.Border);
+
+    // Test new properties
+    auto aColorStopSeq = aGradient.ColorStops;
+    awt::ColorStop aColorStop = aColorStopSeq[0];
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopOffset);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
+    aColorStop = aColorStopSeq[1];
+    CPPUNIT_ASSERT_EQUAL(0.3, aColorStop.StopOffset);
+    // 0x99 = 153 => 153/255 = 0.6, 0xbb = 187 => 187/255 = 0.733...
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(0.6, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.733333333333333, aColorStop.StopColor.Blue, 0.0000001);
+    aColorStop = aColorStopSeq[2];
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopOffset);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Red);
+    CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Green);
+    CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

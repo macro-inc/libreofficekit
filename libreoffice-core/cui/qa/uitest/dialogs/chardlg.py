@@ -35,8 +35,8 @@ class Test(UITestCase):
                     xFontTransparency.executeAction("UP", tuple())
 
             # Verify the result.
-            drawPage = component.getDrawPages().getByIndex(0)
-            shape = drawPage.getByIndex(0)
+            drawPage = component.getDrawPages()[0]
+            shape = drawPage[0]
 
             # Without the accompanying fix in place, this test would have failed with:
             # AssertionError: 100 != 5
@@ -74,7 +74,7 @@ class Test(UITestCase):
                     0x000000,  # folHlink
                 ])
             })
-            master.Theme = theme
+            master.ThemeUnoRepresentation = theme
 
             # Select the title shape.
             editWin.executeAction("TYPE", mkPropertyValues({"KEYCODE": "TAB"}))
@@ -113,7 +113,7 @@ class Test(UITestCase):
             # Then make sure that '80% lighter' is lum-mod=2000 and lum-off=8000:
             # Without the accompanying fix in place, this test would have failed with:
             # AssertionError: 10000 != 2000
-            # i.e. the effects where not applied, luminancen modulation was the default instead of a
+            # i.e. the effects where not applied, luminance modulation was the default instead of a
             # custom value.
             self.assertEqual(portion.CharColorLumMod, 2000)
             self.assertEqual(portion.CharColorLumOff, 8000)

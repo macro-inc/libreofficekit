@@ -30,6 +30,7 @@
 #include <sal/log.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/stl_types.hxx>
+#include <unotools/charclass.hxx>
 
 #include <com/sun/star/sheet/XDimensionsSupplier.hpp>
 #include <com/sun/star/sheet/DataPilotFieldAutoShowInfo.hpp>
@@ -42,10 +43,11 @@
 #include <com/sun/star/sheet/XMembersSupplier.hpp>
 #include <com/sun/star/container/XNamed.hpp>
 #include <com/sun/star/util/XCloneable.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <unordered_map>
 #include <algorithm>
+#include <utility>
 
 using namespace com::sun::star;
 using namespace com::sun::star::sheet;
@@ -61,8 +63,8 @@ static void lcl_SetBoolProperty( const uno::Reference<beans::XPropertySet>& xPro
     xProp->setPropertyValue( rName, uno::Any( bValue ) );
 }
 
-ScDPSaveMember::ScDPSaveMember(const OUString& rName) :
-    aName( rName ),
+ScDPSaveMember::ScDPSaveMember(OUString _aName) :
+    aName(std::move( _aName )),
     nVisibleMode( SC_DPSAVEMODE_DONTKNOW ),
     nShowDetailsMode( SC_DPSAVEMODE_DONTKNOW )
 {
@@ -178,8 +180,8 @@ void ScDPSaveMember::Dump(int nIndent) const
 
 #endif
 
-ScDPSaveDimension::ScDPSaveDimension(const OUString& rName, bool bDataLayout) :
-    aName( rName ),
+ScDPSaveDimension::ScDPSaveDimension(OUString _aName, bool bDataLayout) :
+    aName(std::move( _aName )),
     bIsDataLayout( bDataLayout ),
     bDupFlag( false ),
     nOrientation( sheet::DataPilotFieldOrientation_HIDDEN ),
@@ -694,6 +696,7 @@ ScDPSaveData::ScDPSaveData() :
     nRepeatEmptyMode( SC_DPSAVEMODE_DONTKNOW ),
     bFilterButton( true ),
     bDrillDown( true ),
+    bExpandCollapse( false ),
     mbDimensionMembersBuilt(false)
 {
 }
@@ -705,6 +708,7 @@ ScDPSaveData::ScDPSaveData(const ScDPSaveData& r) :
     nRepeatEmptyMode( r.nRepeatEmptyMode ),
     bFilterButton( r.bFilterButton ),
     bDrillDown( r.bDrillDown ),
+    bExpandCollapse( r.bExpandCollapse ),
     mbDimensionMembersBuilt(r.mbDimensionMembersBuilt),
     mpGrandTotalName(r.mpGrandTotalName)
 {
@@ -783,7 +787,7 @@ public:
     void operator() (const ScDPSaveDimension* pDim)
     {
         size_t nRank = mrNames.size();
-        mrNames.emplace(pDim->GetName(), nRank);
+        mrNames.emplace(ScGlobal::getCharClass().uppercase(pDim->GetName()), nRank);
     }
 };
 
@@ -962,9 +966,9 @@ void ScDPSaveData::SetPosition( ScDPSaveDimension* pDim, tools::Long nNew )
         [&pDim](const std::unique_ptr<ScDPSaveDimension>& rxDim) { return pDim == rxDim.get(); });
     if (it != m_DimList.end())
     {
-        // Tell vector<unique_ptr> to give up ownership of this element.
-        // Don't delete this instance as it is re-inserted into the
-        // container later.
+        // Tell vector<unique_ptr> to give up ownership of this element.  Don't
+        // delete this instance as it is re-inserted into the container later.
+        // coverity[leaked_storage] - re-inserted into the container later
         it->release();
         m_DimList.erase(it);
     }
@@ -1008,6 +1012,11 @@ void ScDPSaveData::SetFilterButton(bool bSet)
 void ScDPSaveData::SetDrillDown(bool bSet)
 {
     bDrillDown = bSet;
+}
+
+void ScDPSaveData::SetExpandCollapse(bool bSet)
+{
+    bExpandCollapse = bSet;
 }
 
 static void lcl_ResetOrient( const uno::Reference<sheet::XDimensionsSupplier>& xSource )
@@ -1284,8 +1293,20 @@ void ScDPSaveData::SyncAllDimensionMembers(ScDPTableData* pData)
         for (size_t j = 0; j < nMemberCount; ++j)
         {
             const ScDPItemData* pMemberData = pData->GetMemberById(nDimIndex, rMembers[j]);
-            OUString aMemName = pData->GetFormattedString(nDimIndex, *pMemberData, false);
-            aMemNames.insert(aMemName);
+            // ScDPCache::GetItemDataById() (via
+            // ScDPTableData::GetMemberById(),
+            // ScDPGroupTableData::GetMemberById() through
+            // GetCacheTable().getCache()) may return nullptr.
+            if (pMemberData)
+            {
+                OUString aMemName = pData->GetFormattedString(nDimIndex, *pMemberData, false);
+                aMemNames.insert(aMemName);
+            }
+            else
+            {
+                SAL_WARN("sc.core", "No pMemberData for nDimIndex " << nDimIndex << ", rMembers[j] " << rMembers[j]
+                        << ", j " << j);
+            }
         }
 
         it->RemoveObsoleteMembers(aMemNames);

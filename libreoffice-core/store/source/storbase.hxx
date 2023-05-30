@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_STORE_SOURCE_STORBASE_HXX
-#define INCLUDED_STORE_SOURCE_STORBASE_HXX
+#pragma once
 
 #include <sal/config.h>
 #include <salhelper/simplereferenceobject.hxx>
@@ -290,7 +289,7 @@ struct PageData
             {
                 return new(page) T(nSize);
             }
-            return 0;
+            return nullptr;
         }
 
         bool allocate (void ** ppPage, sal_uInt16 * pnSize)
@@ -320,8 +319,8 @@ struct PageData
 
     class Deallocate {
     public:
-        explicit Deallocate(rtl::Reference<Allocator> const & allocator):
-            allocator_(allocator) {};
+        explicit Deallocate(rtl::Reference<Allocator> allocator):
+            allocator_(std::move(allocator)) {};
 
         void operator ()(void * page) const { allocator_->deallocate(page); }
 
@@ -406,13 +405,13 @@ class PageHolderObject
     template< class U >
     static U * dynamic_page_cast (PageData * p)
     {
-        return isA<U>(p) ? static_cast<U*>(p) : 0;
+        return isA<U>(p) ? static_cast<U*>(p) : nullptr;
     }
 
     template< class U >
     static U const * dynamic_page_cast (PageData const * p)
     {
-        return isA<U>(p) ? static_cast<U const *>(p) : 0;
+        return isA<U>(p) ? static_cast<U const *>(p) : nullptr;
     }
 
 public:
@@ -426,8 +425,8 @@ public:
         return bool(m_xPage);
     }
 
-    explicit PageHolderObject (std::shared_ptr<PageData> const & rxPage = std::shared_ptr<PageData>())
-        : m_xPage (rxPage)
+    explicit PageHolderObject (std::shared_ptr<PageData> xPage = std::shared_ptr<PageData>())
+        : m_xPage (std::move(xPage))
     {}
 
     void swap (PageHolderObject<T> & rhs)
@@ -548,8 +547,8 @@ protected:
 
     /** Construction.
      */
-    explicit OStorePageObject (std::shared_ptr<PageData> const & rxPage)
-        : m_xPage (rxPage), m_bDirty (false)
+    explicit OStorePageObject (std::shared_ptr<PageData>  rxPage)
+        : m_xPage (std::move(rxPage)), m_bDirty (false)
     {}
 
     /** Destruction.
@@ -604,7 +603,5 @@ inline sal_uInt32 OStorePageObject::location() const
 }
 
 } // namespace store
-
-#endif // INCLUDED_STORE_SOURCE_STORBASE_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

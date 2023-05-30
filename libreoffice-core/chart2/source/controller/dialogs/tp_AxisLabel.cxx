@@ -24,7 +24,6 @@
 
 #include <svx/chrtitem.hxx>
 #include <svx/sdangitm.hxx>
-#include <svl/intitem.hxx>
 #include <editeng/eeitem.hxx>
 #include <editeng/frmdiritem.hxx>
 
@@ -49,7 +48,6 @@ SchAxisLabelTabPage::SchAxisLabelTabPage(weld::Container* pPage, weld::DialogCon
     , m_xCbTextOverlap(m_xBuilder->weld_check_button("overlapCB"))
     , m_xCbTextBreak(m_xBuilder->weld_check_button("breakCB"))
     , m_xFtABCD(m_xBuilder->weld_label("labelABCD"))
-    , m_xFlOrient(m_xBuilder->weld_label("labelTextOrient"))
     , m_xFtRotate(m_xBuilder->weld_label("degreeL"))
     , m_xNfRotate(m_xBuilder->weld_metric_spin_button("OrientDegree", FieldUnit::DEGREE))
     , m_xCbStacked(m_xBuilder->weld_check_button("stackedCB"))
@@ -179,8 +177,8 @@ void SchAxisLabelTabPage::Reset( const SfxItemSet* rInAttrs )
         m_xCbStacked->set_state(TRISTATE_INDET);
     StackedToggleHdl(*m_xCbStacked);
 
-    if( rInAttrs->GetItemState( EE_PARA_WRITINGDIR, true, &pPoolItem ) == SfxItemState::SET )
-        m_xLbTextDirection->set_active_id( static_cast<const SvxFrameDirectionItem*>(pPoolItem)->GetValue() );
+    if( const SvxFrameDirectionItem* pDirectionItem = rInAttrs->GetItemIfSet( EE_PARA_WRITINGDIR ) )
+        m_xLbTextDirection->set_active_id( pDirectionItem->GetValue() );
 
     // Text overlap ----------
     aState = rInAttrs->GetItemState( SCHATTR_AXIS_LABEL_OVERLAP, false, &pPoolItem );
@@ -223,10 +221,9 @@ void SchAxisLabelTabPage::Reset( const SfxItemSet* rInAttrs )
     // text order ----------
     if( m_bShowStaggeringControls )
     {
-        aState = rInAttrs->GetItemState( SCHATTR_AXIS_LABEL_ORDER, false, &pPoolItem );
-        if( aState == SfxItemState::SET )
+        if( const SvxChartTextOrderItem* pOrderItem = rInAttrs->GetItemIfSet( SCHATTR_AXIS_LABEL_ORDER, false ) )
         {
-            SvxChartTextOrder eOrder = static_cast< const SvxChartTextOrderItem * >( pPoolItem )->GetValue();
+            SvxChartTextOrder eOrder = pOrderItem->GetValue();
 
             switch( eOrder )
             {

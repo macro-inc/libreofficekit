@@ -23,11 +23,15 @@ $(eval $(call gb_CppunitTest_add_exception_objects,sd_filter_eppt, \
 $(eval $(call gb_CppunitTest_use_libraries,sd_filter_eppt, \
     comphelper \
     cppu \
-    sdfilt \
+    cppuhelper \
+    docmodel \
+    sd \
     sal \
+    subsequenttest \
     test \
     unotest \
     utl \
+    tl \
 ))
 
 $(eval $(call gb_CppunitTest_use_sdk_api,sd_filter_eppt))
@@ -42,5 +46,9 @@ $(eval $(call gb_CppunitTest_use_custom_headers,sd_filter_eppt,\
 ))
 
 $(eval $(call gb_CppunitTest_use_configuration,sd_filter_eppt))
+
+$(eval $(call gb_CppunitTest_add_arguments,sd_filter_eppt, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

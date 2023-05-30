@@ -400,6 +400,7 @@ void ImplSmallBorderWindowView::Init( OutputDevice* pDev, tools::Long nWidth, to
 
     vcl::Window *pWin = mpOutDev->GetOwnerWindow();
     vcl::Window *pCtrl = nullptr;
+    vcl::Window *pSubEdit = nullptr;
     if (pWin)
         pCtrl = mpBorderWindow->GetWindow(GetWindowType::Client);
 
@@ -435,6 +436,7 @@ void ImplSmallBorderWindowView::Init( OutputDevice* pDev, tools::Long nWidth, to
                         {
                             aCtrlType = ControlType::Listbox;
                             mbNWFBorder = true;
+                            pSubEdit = static_cast<Edit*>(pCtrl)->GetSubEdit();
                         }
                         break;
                     case WindowType::LISTBOXWINDOW:
@@ -447,6 +449,7 @@ void ImplSmallBorderWindowView::Init( OutputDevice* pDev, tools::Long nWidth, to
                         {
                             aCtrlType = ControlType::Combobox;
                             mbNWFBorder = true;
+                            pSubEdit = static_cast<Edit*>(pCtrl)->GetSubEdit();
                         }
                         break;
                     case WindowType::MULTILINEEDIT:
@@ -466,6 +469,7 @@ void ImplSmallBorderWindowView::Init( OutputDevice* pDev, tools::Long nWidth, to
                             aCtrlType = ControlType::Spinbox;
                         else
                             aCtrlType = ControlType::Editbox;
+                        pSubEdit = static_cast<Edit*>(pCtrl)->GetSubEdit();
                         break;
                     default:
                         break;
@@ -501,7 +505,11 @@ void ImplSmallBorderWindowView::Init( OutputDevice* pDev, tools::Long nWidth, to
                         mpBorderWindow->SetPaintTransparent( true );
                         mpBorderWindow->SetBackground();
                         if (!pCtrl->IsControlBackground())
+                        {
                             pCtrl->SetPaintTransparent(true);
+                            if (pSubEdit)
+                                pSubEdit->SetPaintTransparent(true);
+                        }
 
                         vcl::Window* pCompoundParent = nullptr;
                         if( pWin->GetParent() && pWin->GetParent()->IsCompoundControl() )
@@ -662,26 +670,20 @@ void ImplSmallBorderWindowView::DrawWindow(vcl::RenderContext& rRenderContext, c
 
         if (!mpBorderWindow->IsEnabled())
             nState &= ~ControlState::ENABLED;
-        if (mpBorderWindow->HasFocus())
+        if (mpBorderWindow->HasFocus() || pCtrl->HasFocus() || pCtrl->HasChildPathFocus())
             nState |= ControlState::FOCUSED;
-        else if(mbNWFBorder)
-        {
-            // FIXME: this is currently only on macOS, see if other platforms can profit
 
-            // FIXME: for macOS focus rings all controls need to support GetNativeControlRegion
-            // for the dropdown style
-            if (pCtrl->HasFocus() || pCtrl->HasChildPathFocus())
-                nState |= ControlState::FOCUSED;
-        }
-
-        bool bMouseOver = false;
-        vcl::Window *pCtrlChild = pCtrl->GetWindow(GetWindowType::FirstChild);
-        while(pCtrlChild)
+        bool bMouseOver = pCtrl->IsMouseOver();
+        if (!bMouseOver)
         {
-            bMouseOver = pCtrlChild->IsMouseOver();
-            if (bMouseOver)
-                break;
-            pCtrlChild = pCtrlChild->GetWindow(GetWindowType::Next);
+            vcl::Window *pCtrlChild = pCtrl->GetWindow(GetWindowType::FirstChild);
+            while(pCtrlChild)
+            {
+                bMouseOver = pCtrlChild->IsMouseOver();
+                if (bMouseOver)
+                    break;
+                pCtrlChild = pCtrlChild->GetWindow(GetWindowType::Next);
+            }
         }
 
         if (bMouseOver)
@@ -1363,7 +1365,8 @@ void ImplStdBorderWindowView::DrawWindow(vcl::RenderContext& rRenderContext, con
     vcl::Region oldClipRgn(rRenderContext.GetClipRegion());
 
     // for popups, don't draw part of the frame
-    if (!(pData->mnTitleType & (BorderWindowTitleType::Normal | BorderWindowTitleType::Small)))
+    const bool bShowJunctionToLauncher = !(pData->mnTitleType & (BorderWindowTitleType::Normal | BorderWindowTitleType::Small));
+    if (bShowJunctionToLauncher && !ImplGetSVData()->maNWFData.mbNoFrameJunctionForPopups)
     {
         FloatingWindow* pWin = dynamic_cast<FloatingWindow*>(pData->mpBorderWindow->GetWindow(GetWindowType::Client));
         if (pWin)

@@ -37,7 +37,7 @@
 #include <com/sun/star/lang/XSingleServiceFactory.hpp>
 #include <com/sun/star/util/VetoException.hpp>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
@@ -443,7 +443,7 @@ namespace pcr
 
     Any SAL_CALL OPropertyBrowserController::getViewData(  )
     {
-        return makeAny( m_sPageSelection );
+        return Any( m_sPageSelection );
     }
 
 
@@ -956,7 +956,7 @@ namespace pcr
                 }
 
                 // append these properties to our "all properties" array
-                aProperties.reserve( aProperties.size() + aThisHandlersProperties.size() );
+                aProperties.reserve( std::max<size_t>(aProperties.size() + aThisHandlersProperties.size(), aProperties.size() * 2) );
                 for (const auto & aThisHandlersProperty : aThisHandlersProperties)
                 {
                     auto noPrevious = std::none_of(

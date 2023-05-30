@@ -65,6 +65,9 @@ RTFError RTFDocumentImpl::dispatchDestination(RTFKeyword nKeyword)
                 m_aStates.top().setDestination(Destination::FIELD);
                 m_aStates.top().setFieldLocked(false);
                 break;
+            case RTFKeyword::DOCVAR:
+                m_aStates.top().setDestination(Destination::DOCVAR);
+                break;
             case RTFKeyword::FLDINST:
             {
                 // Look for the field type
@@ -87,7 +90,7 @@ RTFError RTFDocumentImpl::dispatchDestination(RTFKeyword nKeyword)
                         bFoundCode = true;
                 }
 
-                if (aBuf.toString() == "INCLUDEPICTURE")
+                if (std::string_view(aBuf) == "INCLUDEPICTURE")
                 {
                     // Extract the field argument of INCLUDEPICTURE: we handle that
                     // at a tokenizer level, as DOCX has no such field.
@@ -99,8 +102,7 @@ RTFError RTFDocumentImpl::dispatchDestination(RTFKeyword nKeyword)
                             break;
                         aBuf.append(ch);
                     }
-                    OUString aFieldCommand
-                        = OStringToOUString(aBuf.toString(), RTL_TEXTENCODING_UTF8);
+                    OUString aFieldCommand = OStringToOUString(aBuf, RTL_TEXTENCODING_UTF8);
                     std::tuple<OUString, std::vector<OUString>, std::vector<OUString>> aResult
                         = writerfilter::dmapper::splitFieldCommand(aFieldCommand);
                     m_aPicturePath
@@ -368,7 +370,7 @@ RTFError RTFDocumentImpl::dispatchDestination(RTFKeyword nKeyword)
                             aAttributes.set(NS_ooxml::LN_CT_Comment_initials, pValue);
                         }
                         writerfilter::Reference<Properties>::Pointer_t pProperties
-                            = new RTFReferenceProperties(aAttributes);
+                            = new RTFReferenceProperties(std::move(aAttributes));
                         Mapper().props(pProperties);
                     }
                 }
@@ -619,8 +621,7 @@ RTFError RTFDocumentImpl::dispatchDestination(RTFKeyword nKeyword)
                         uno::Reference<drawing::XShape> xShape(xGroupShape, uno::UNO_QUERY);
                         // set default VertOrient before inserting
                         uno::Reference<beans::XPropertySet>(xShape, uno::UNO_QUERY_THROW)
-                            ->setPropertyValue("VertOrient",
-                                               uno::makeAny(text::VertOrientation::NONE));
+                            ->setPropertyValue("VertOrient", uno::Any(text::VertOrientation::NONE));
                         xDrawSupplier->getDrawPage()->add(xShape);
                     }
                     m_pSdrImport->pushParent(xGroupShape);

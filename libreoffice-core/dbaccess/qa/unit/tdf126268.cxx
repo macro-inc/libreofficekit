@@ -60,8 +60,9 @@ void Tdf126268Test::testNumbers()
     }
 
     // the migration requires the file to be writable
-    utl::TempFile const temp(createTempCopy(u"tdf126268.odb"));
-    uno::Reference<XOfficeDatabaseDocument> const xDocument = getDocumentForUrl(temp.GetURL());
+    createTempCopy(u"tdf126268.odb");
+    uno::Reference<XOfficeDatabaseDocument> const xDocument
+        = getDocumentForUrl(maTempFile.GetURL());
 
     uno::Reference<XConnection> xConnection = getConnectionForDocument(xDocument);
 
@@ -82,7 +83,6 @@ void Tdf126268Test::testNumbers()
     }
     CPPUNIT_ASSERT(!xRes->next());
 
-    closeDocument(uno::Reference<lang::XComponent>(xDocument, uno::UNO_QUERY));
     if (!oldValue)
     {
         std::shared_ptr<comphelper::ConfigurationChanges> xChanges(

@@ -17,20 +17,20 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_SVX_SOURCE_TBXCTRLS_COLORWINDOW_HXX
-#define INCLUDED_SVX_SOURCE_TBXCTRLS_COLORWINDOW_HXX
+#pragma once
 
 #include <svtools/toolbarmenu.hxx>
 #include <rtl/ustring.hxx>
 #include <svx/SvxColorValueSet.hxx>
 #include <svx/Palette.hxx>
-#include <vcl/toolbox.hxx>
+#include <vcl/toolboxid.hxx>
 
 typedef std::function<weld::Window*()> TopLevelParentFunction;
 
 namespace com::sun::star::frame { class XFrame; }
 
 class PaletteManager;
+class ToolBox;
 
 class SVXCORE_DLLPUBLIC ColorStatus
 {
@@ -39,7 +39,6 @@ class SVXCORE_DLLPUBLIC ColorStatus
     Color maBLTRColor;
 public:
     ColorStatus();
-    ~ColorStatus();
     void statusChanged( const css::frame::FeatureStateEvent& rEvent );
     Color GetColor();
 };
@@ -64,7 +63,7 @@ private:
     ToolBoxItemId m_nId;
 public:
     MenuOrToolMenuButton(weld::MenuButton* pMenuButton);
-    MenuOrToolMenuButton(weld::Toolbar* pToolbar, const OString& rIdent);
+    MenuOrToolMenuButton(weld::Toolbar* pToolbar, OString sIdent);
     MenuOrToolMenuButton(SvxColorToolBoxControl* pControl, ToolBox* pToolbar, ToolBoxItemId nId);
     ~MenuOrToolMenuButton();
 
@@ -111,14 +110,14 @@ private:
     NamedColor GetAutoColor() const;
 
 public:
-    ColorWindow(const OUString& rCommand,
-                std::shared_ptr<PaletteManager> const & rPaletteManager,
+    ColorWindow(OUString  rCommand,
+                std::shared_ptr<PaletteManager> xPaletteManager,
                 ColorStatus& rColorStatus,
                 sal_uInt16 nSlotId,
                 const css::uno::Reference<css::frame::XFrame>& rFrame,
                 const MenuOrToolMenuButton &rMenuButton,
-                TopLevelParentFunction const& rTopLevelParentFunction,
-                ColorSelectFunction const& rColorSelectFunction);
+                TopLevelParentFunction aTopLevelParentFunction,
+                ColorSelectFunction aColorSelectFunction);
     virtual ~ColorWindow() override;
     void                ShowNoneButton();
     void                SetNoSelection();
@@ -133,7 +132,5 @@ public:
 
     virtual void GrabFocus() override;
 };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -20,9 +20,9 @@
 
 #include <ObjectIdentifier.hxx>
 #include <sfx2/tabdlg.hxx>
+#include <vcl/graph.hxx>
 
 namespace com::sun::star::util { class XNumberFormatsSupplier; }
-class Graphic;
 
 namespace chart
 {
@@ -30,10 +30,10 @@ namespace chart
 class ObjectPropertiesDialogParameter final
 {
 public:
-    ObjectPropertiesDialogParameter( const OUString& rObjectCID );
+    ObjectPropertiesDialogParameter( OUString aObjectCID );
     ~ObjectPropertiesDialogParameter();
 
-    void            init( const css::uno::Reference< css::frame::XModel >& xModel );
+    void            init( const rtl::Reference<::chart::ChartModel>& xModel );
     ObjectType      getObjectType() const { return m_eObjectType;}
     const OUString& getLocalizedName() const { return m_aLocalizedName;}
 
@@ -57,7 +57,7 @@ public:
     bool IsSupportingCategoryPositioning() const { return m_bSupportingCategoryPositioning;}
     const css::uno::Sequence< OUString >& GetCategories() const { return m_aCategories;}
 
-    const css::uno::Reference< css::chart2::XChartDocument >&
+    const rtl::Reference<::chart::ChartModel>&
         getDocument() const { return m_xChartDocument;}
 
     bool IsComplexCategoriesAxis() const { return m_bComplexCategoriesAxis;}
@@ -92,7 +92,7 @@ private:
     bool m_bSupportingCategoryPositioning;
     css::uno::Sequence< OUString > m_aCategories;
 
-    css::uno::Reference< css::chart2::XChartDocument > m_xChartDocument;
+    rtl::Reference<::chart::ChartModel> m_xChartDocument;
 
     bool m_bComplexCategoriesAxis;
 
@@ -107,7 +107,7 @@ private:
 
 class ViewElementListProvider;
 
-class SchAttribTabDlg : public SfxTabDialogController
+class SchAttribTabDlg final : public SfxTabDialogController
 {
 private:
     const ObjectPropertiesDialogParameter * const        m_pParameter;
@@ -115,7 +115,7 @@ private:
     SvNumberFormatter* m_pNumberFormatter;
 
     std::optional<SfxItemSet>     m_oSymbolShapeProperties;
-    std::unique_ptr<Graphic>        m_pAutoSymbolGraphic;
+    std::optional<Graphic>        m_oAutoSymbolGraphic;
 
     double          m_fAxisMinorStepWidthForErrorBarDecimals;
     bool            m_bOKPressed;
@@ -133,7 +133,7 @@ public:
 
     //pSymbolShapeProperties: Properties to be set on the symbollist shapes
     //pAutoSymbolGraphic: Graphic to be shown if AutoSymbol gets selected
-    void setSymbolInformation( SfxItemSet&& rSymbolShapeProperties, std::unique_ptr<Graphic> pAutoSymbolGraphic );
+    void setSymbolInformation( SfxItemSet&& rSymbolShapeProperties, std::optional<Graphic> oAutoSymbolGraphic );
 
     void SetAxisMinorStepWidthForErrorBarDecimals( double fMinorStepWidth );
 

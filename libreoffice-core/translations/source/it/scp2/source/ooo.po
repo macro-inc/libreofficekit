@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-02-21 15:23+0100\n"
-"PO-Revision-Date: 2022-06-09 10:00+0000\n"
-"Last-Translator: Valter Mura <valtermura@gmail.com>\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-01-02 06:38+0000\n"
+"Last-Translator: Elisabetta Manuele <calembour@hotmail.it>\n"
 "Language-Team: Italian <https://translations.documentfoundation.org/projects/libo_ui-master/scp2sourceooo/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -2507,7 +2507,7 @@ msgctxt ""
 "STR_NAME_MODULE_LANGPACK_CKB\n"
 "LngText.text"
 msgid "Central Kurdish"
-msgstr "Curdo centrale (Soranî)"
+msgstr "Curdo centrale"
 
 #. NJJmC
 #: module_langpack.ulf
@@ -2516,7 +2516,7 @@ msgctxt ""
 "STR_DESC_MODULE_LANGPACK_CKB\n"
 "LngText.text"
 msgid "Installs the Central Kurdish user interface"
-msgstr "Installa l'interfaccia utente in lingua curda centrale"
+msgstr "Installa l'interfaccia utente in curdo centrale"
 
 #. 3CVmz
 #: module_langpack.ulf
@@ -3569,7 +3569,7 @@ msgctxt ""
 "STR_NAME_MODULE_LANGPACK_VEC\n"
 "LngText.text"
 msgid "Venetian"
-msgstr "Veneziano"
+msgstr "Veneto"
 
 #. daNwF
 #: module_langpack.ulf
@@ -3578,7 +3578,7 @@ msgctxt ""
 "STR_DESC_MODULE_LANGPACK_VEC\n"
 "LngText.text"
 msgid "Installs the Venetian user interface"
-msgstr "Installa l'interfaccia utente in lingua veneziana"
+msgstr "Installa l'interfaccia utente in lingua veneta"
 
 #. A8VRT
 #: module_langpack.ulf
@@ -4641,6 +4641,24 @@ msgctxt ""
 "LngText.text"
 msgid "Estonian spelling dictionary, and hyphenation rules"
 msgstr "Dizionario ortografico estone e regole di sillabazione"
+
+#. ccL3Z
+#: module_ooo.ulf
+msgctxt ""
+"module_ooo.ulf\n"
+"STR_NAME_MODULE_EXTENSION_DICTIONARY_FA\n"
+"LngText.text"
+msgid "Persian"
+msgstr "Persiano"
+
+#. FLaCv
+#: module_ooo.ulf
+msgctxt ""
+"module_ooo.ulf\n"
+"STR_DESC_MODULE_EXTENSION_DICTIONARY_FA\n"
+"LngText.text"
+msgid "Persian Spell Checking Dictionary"
+msgstr "Dizionario ortografico persiano"
 
 #. 5QqAr
 #: module_ooo.ulf

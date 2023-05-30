@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-08 14:37+0200\n"
-"PO-Revision-Date: 2022-08-19 12:58+0000\n"
-"Last-Translator: B. Antonio Fernández <bantoniof@gmail.com>\n"
-"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-master/scmessages/es/>\n"
+"POT-Creation-Date: 2022-12-19 15:00+0100\n"
+"PO-Revision-Date: 2023-03-09 11:34+0000\n"
+"Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
+"Language-Team: Spanish <https://translations.documentfoundation.org/projects/libo_ui-7-5/scmessages/es/>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1566031195.000000\n"
 
 #. kBovX
@@ -807,7 +807,7 @@ msgstr ") en la celda variable de todos modos?"
 #: sc/inc/globstr.hrc:141
 msgctxt "STR_TABLE_GRAND"
 msgid "Grand"
-msgstr "General"
+msgstr "Gran"
 
 #. nRMet
 #: sc/inc/globstr.hrc:142
@@ -1122,13 +1122,13 @@ msgstr "Mediana"
 #: sc/inc/globstr.hrc:194
 msgctxt "STR_FUN_TEXT_MAX"
 msgid "Max"
-msgstr "Máx"
+msgstr "Máximo"
 
 #. A8fBH
 #: sc/inc/globstr.hrc:195
 msgctxt "STR_FUN_TEXT_MIN"
 msgid "Min"
-msgstr "Mín"
+msgstr "Mínimo"
 
 #. oZVg5
 #: sc/inc/globstr.hrc:196
@@ -1140,13 +1140,13 @@ msgstr "Producto"
 #: sc/inc/globstr.hrc:197
 msgctxt "STR_FUN_TEXT_STDDEV"
 msgid "StDev"
-msgstr "DesvEst"
+msgstr "Desviación típica"
 
 #. NhH7q
 #: sc/inc/globstr.hrc:198
 msgctxt "STR_FUN_TEXT_VAR"
 msgid "Var"
-msgstr "Var"
+msgstr "Varianza"
 
 #. XyzD7
 #: sc/inc/globstr.hrc:199
@@ -1390,7 +1390,7 @@ msgstr "Filtrar"
 #: sc/inc/globstr.hrc:249
 msgctxt "STR_TARGETNOTFOUND"
 msgid "The target database range does not exist."
-msgstr "No existe el área de la base de datos destino."
+msgstr "No existe el intervalo de base de datos de destino."
 
 #. j8G3g
 #: sc/inc/globstr.hrc:250
@@ -1516,13 +1516,13 @@ msgstr "Importar archivos de Lotus"
 #: sc/inc/globstr.hrc:268
 msgctxt "STR_IMPORT_DBF"
 msgid "Import dBASE files"
-msgstr ""
+msgstr "Importar archivos de dBASE"
 
 #. uyTFS
 #: sc/inc/globstr.hrc:269
 msgctxt "STR_EXPORT_DBF"
 msgid "dBASE export"
-msgstr ""
+msgstr "Exportación a dBASE"
 
 #. CtHUj
 #: sc/inc/globstr.hrc:270
@@ -1894,7 +1894,7 @@ msgstr "Valores cero"
 #: sc/inc/globstr.hrc:330
 msgctxt "STR_SCATTR_PAGE_PRINTDIR"
 msgid "Print direction"
-msgstr "Dirección de impresión"
+msgstr "Sentido de impresión"
 
 #. oU39x
 #: sc/inc/globstr.hrc:331
@@ -1908,17 +1908,17 @@ msgctxt "STR_SCATTR_PAGE_SCALE"
 msgid "Reduce/enlarge printout"
 msgstr "Reducir/ampliar impresión"
 
-#. CXqDX
+#. jYSCo
 #: sc/inc/globstr.hrc:333
 msgctxt "STR_SCATTR_PAGE_SCALETOPAGES"
-msgid "Fit print range(s) on number of pages"
-msgstr "Ajustar zonas de impresión en números de páginas"
+msgid "Shrink print range(s) on number of pages"
+msgstr ""
 
-#. kDAZk
+#. P4CCx
 #: sc/inc/globstr.hrc:334
 msgctxt "STR_SCATTR_PAGE_SCALETO"
-msgid "Fit print range(s) to width/height"
-msgstr "Ajustar zonas de impresión a anchura/altura"
+msgid "Shrink print range(s) to width/height"
+msgstr ""
 
 #. fnrU6
 #: sc/inc/globstr.hrc:335
@@ -2000,11 +2000,11 @@ msgctxt "STR_ON"
 msgid "on"
 msgstr "el"
 
-#. NqkbD
+#. RryEg
 #: sc/inc/globstr.hrc:348
 msgctxt "STR_RELOAD_TABLES"
-msgid "Security Warning: Automatic update of external links has been disabled."
-msgstr "Alerta de seguridad: se desactivó la actualización automática de enlaces externos."
+msgid "Automatic update of external links has been disabled."
+msgstr "Se desactivó la actualización automática de enlaces externos."
 
 #. qkto7
 #: sc/inc/globstr.hrc:349
@@ -2134,7 +2134,7 @@ msgstr "Eliminar contenido"
 #: sc/inc/globstr.hrc:367
 msgctxt "STR_QUICKHELP_REF"
 msgid "%1 R  × %2 C"
-msgstr ""
+msgstr "%1 f. × %2 c."
 
 #. NJpDi
 #: sc/inc/globstr.hrc:368
@@ -2307,7 +2307,7 @@ msgstr "Adaptar área de matriz"
 #: sc/inc/globstr.hrc:395
 msgctxt "STR_TIP_RESIZEMATRIX"
 msgid "Array formula  %1 R × %2 C"
-msgstr ""
+msgstr "Fórmula matricial de %1 f. × %2 c."
 
 #. nkxuG
 #: sc/inc/globstr.hrc:396
@@ -3088,11 +3088,11 @@ msgctxt "STR_UNDO_FORMULA_TO_VALUE"
 msgid "Convert Formula To Value"
 msgstr "Convertir fórmula en valor"
 
-#. dsjqi
+#. BywKj
 #: sc/inc/globstr.hrc:515
 msgctxt "STR_UNQUOTED_STRING"
-msgid "Strings without quotes are interpreted as column/row labels."
-msgstr "Las cadenas no entrecomilladas se interpretan como etiquetas de columna/fila."
+msgid "Strings without quotes are interpreted as defined names or references or column/row labels."
+msgstr ""
 
 #. rHjns
 #: sc/inc/globstr.hrc:516
@@ -3905,7 +3905,7 @@ msgstr "Define el intervalo de celdas que contiene los criterios de búsqueda."
 #: sc/inc/scfuncs.hrc:122
 msgctxt "SC_OPCODE_DB_STD_DEV"
 msgid "Calculates the standard deviation of all cells in a data range whose contents match the search criteria."
-msgstr "Calcula la desviación predeterminada basándose en una muestra de las entradas seleccionadas de una base de datos."
+msgstr "Calcula la desviación típica de todas las celdas en un intervalo cuyo contenido coincide con los criterios de búsqueda."
 
 #. abeZd
 #: sc/inc/scfuncs.hrc:123
@@ -3947,7 +3947,7 @@ msgstr "Define el intervalo de celdas que contiene los criterios de búsqueda."
 #: sc/inc/scfuncs.hrc:134
 msgctxt "SC_OPCODE_DB_STD_DEV_P"
 msgid "Returns the standard deviation with regards to the population of all cells of a data range matching the search criteria."
-msgstr "Calcula la desviación predeterminada basándose en la población total de las entradas seleccionadas de una base de datos."
+msgstr "Calcula la desviación típica a partir de la población total de todas las celdas de un intervalo de datos que coincide con los criterios de búsqueda."
 
 #. pEAMu
 #: sc/inc/scfuncs.hrc:135
@@ -6870,11 +6870,11 @@ msgctxt "SC_OPCODE_RANDOM"
 msgid "Returns a random number between 0 and 1."
 msgstr "Devuelve un número aleatorio entre 0 y 1."
 
-#. QugqG
+#. Le6a5
 #: sc/inc/scfuncs.hrc:1064
 msgctxt "SC_OPCODE_IS_EVEN"
-msgid "Returns TRUE if value is an even integer."
-msgstr "Devuelve VERDADERO si el valor es un número par."
+msgid "Returns TRUE if the value truncated to integer is even."
+msgstr ""
 
 #. aEG3g
 #: sc/inc/scfuncs.hrc:1065
@@ -6888,11 +6888,11 @@ msgctxt "SC_OPCODE_IS_EVEN"
 msgid "The value to be tested."
 msgstr "El valor que se pondrá a prueba."
 
-#. M8AAF
+#. FXDi6
 #: sc/inc/scfuncs.hrc:1072
 msgctxt "SC_OPCODE_IS_ODD"
-msgid "Returns TRUE if value is an odd integer."
-msgstr "Devuelve VERDADERO si el valor es un número impar."
+msgid "Returns TRUE if the value truncated to integer is odd."
+msgstr ""
 
 #. 4scb6
 #: sc/inc/scfuncs.hrc:1073
@@ -7378,7 +7378,7 @@ msgstr "El ángulo en un radián"
 #: sc/inc/scfuncs.hrc:1278
 msgctxt "SC_OPCODE_RAD"
 msgid "Converts degrees to radians"
-msgstr "Convierte grados a radianes"
+msgstr "Convierte grados en radianes"
 
 #. n5GJL
 #: sc/inc/scfuncs.hrc:1279
@@ -8838,7 +8838,7 @@ msgstr "Valor 1; valor 2;… son argumentos que representan una población."
 #: sc/inc/scfuncs.hrc:1790
 msgctxt "SC_OPCODE_ST_DEV"
 msgid "Calculates the standard deviation based on a sample."
-msgstr "Calcula la desviación predeterminada de una muestra."
+msgstr "Calcula la desviación típica a partir de una muestra."
 
 #. 6ANXx
 #: sc/inc/scfuncs.hrc:1791
@@ -8856,7 +8856,7 @@ msgstr "Número 1, número 2,… son argumentos numéricos que representan la mu
 #: sc/inc/scfuncs.hrc:1798
 msgctxt "SC_OPCODE_ST_DEV_S"
 msgid "Calculates the standard deviation based on a sample."
-msgstr "Calcula la desviación predeterminada de una muestra."
+msgstr "Calcula la desviación típica a partir de una muestra."
 
 #. cGxRb
 #: sc/inc/scfuncs.hrc:1799
@@ -8874,7 +8874,7 @@ msgstr "Número 1, número 2,… son argumentos numéricos que representan la mu
 #: sc/inc/scfuncs.hrc:1806
 msgctxt "SC_OPCODE_ST_DEV_A"
 msgid "Returns the standard deviation based on a sample. Text is evaluated as zero."
-msgstr "Calcula la desviación predeterminada a partir de una muestra. El texto se valorará como cero."
+msgstr "Calcula la desviación típica a partir de una muestra. El texto se valorará como cero."
 
 #. Smbhk
 #: sc/inc/scfuncs.hrc:1807
@@ -8892,7 +8892,7 @@ msgstr "Valor 1; valor 2;… son argumentos que representan una muestra tomada d
 #: sc/inc/scfuncs.hrc:1814
 msgctxt "SC_OPCODE_ST_DEV_P"
 msgid "Calculates the standard deviation based on the entire population."
-msgstr "Calcula la desviación predeterminada de la población total determinada por los argumentos."
+msgstr "Calcula la desviación típica a partir de toda la población."
 
 #. h6Evi
 #: sc/inc/scfuncs.hrc:1815
@@ -8910,7 +8910,7 @@ msgstr "Número 1, número 2,… son argumentos numéricos que representan una p
 #: sc/inc/scfuncs.hrc:1822
 msgctxt "SC_OPCODE_ST_DEV_P_MS"
 msgid "Calculates the standard deviation based on the entire population."
-msgstr "Calcula la desviación predeterminada de la población total determinada por los argumentos."
+msgstr "Calcula la desviación típica a partir de toda la población."
 
 #. 4JaDC
 #: sc/inc/scfuncs.hrc:1823
@@ -8928,7 +8928,7 @@ msgstr "Número 1, número 2,… son argumentos numéricos que representan una p
 #: sc/inc/scfuncs.hrc:1830
 msgctxt "SC_OPCODE_ST_DEV_P_A"
 msgid "Returns the standard deviation based on the entire population. Text is evaluated as zero."
-msgstr "Calcula la desviación predeterminada a partir de la población total. El texto se valorará como cero."
+msgstr "Calcula la desviación típica a partir de toda la población. El texto se valorará como cero."
 
 #. XaMUA
 #: sc/inc/scfuncs.hrc:1831
@@ -10290,7 +10290,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2272
 msgctxt "SC_OPCODE_NORM_DIST"
 msgid "Standard deviation. The standard deviation of the normal distribution."
-msgstr "es la desviación predeterminada de la distribución."
+msgstr "Desviación típica. La desviación típica de la distribución normal."
 
 #. qMewn
 #: sc/inc/scfuncs.hrc:2273
@@ -10344,7 +10344,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2286
 msgctxt "SC_OPCODE_NORM_DIST_MS"
 msgid "Standard deviation. The standard deviation of the normal distribution."
-msgstr "es la desviación predeterminada de la distribución."
+msgstr "Desviación típica. La desviación típica de la distribución normal."
 
 #. CqHN6
 #: sc/inc/scfuncs.hrc:2287
@@ -10398,7 +10398,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2300
 msgctxt "SC_OPCODE_NORM_INV"
 msgid "Standard deviation. The standard deviation of the normal distribution."
-msgstr "es la desviación predeterminada de la distribución."
+msgstr "Desviación típica. La desviación típica de la distribución normal."
 
 #. wodEb
 #: sc/inc/scfuncs.hrc:2306
@@ -10440,7 +10440,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2312
 msgctxt "SC_OPCODE_NORM_INV_MS"
 msgid "Standard deviation. The standard deviation of the normal distribution."
-msgstr "es la desviación predeterminada de la distribución."
+msgstr "Desviación típica. La desviación típica de la distribución normal."
 
 #. yX9mS
 #: sc/inc/scfuncs.hrc:2318
@@ -10566,7 +10566,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2358
 msgctxt "SC_OPCODE_LOG_NORM_DIST"
 msgid "The standard deviation of the log normal distribution. It is set to 1 if omitted."
-msgstr "La desviación estándar es el registro de distribución normal. Este se establece si el 1 es omitido."
+msgstr "La desviación típica de la distribución logarítmica normal. Se establece a 1 si se omite."
 
 #. VsLsD
 #: sc/inc/scfuncs.hrc:2359
@@ -10620,7 +10620,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2372
 msgctxt "SC_OPCODE_LOG_NORM_DIST_MS"
 msgid "The standard deviation of the log normal distribution."
-msgstr "La desviación estándar de la distribución logarítmica normal."
+msgstr "La desviación típica de la distribución logarítmica normal."
 
 #. JeiQB
 #: sc/inc/scfuncs.hrc:2373
@@ -10650,7 +10650,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2382
 msgctxt "SC_OPCODE_LOG_INV"
 msgid "The probability value for which the inverse log normal distribution is to be calculated."
-msgstr "es una probabilidad asociada con la distribución logarítmico-normal."
+msgstr "El valor de probabilidad para el cual se debe calcular la distribución normal logarítmica inversa."
 
 #. DcZBh
 #: sc/inc/scfuncs.hrc:2383
@@ -10674,7 +10674,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2386
 msgctxt "SC_OPCODE_LOG_INV"
 msgid "Standard deviation. The standard deviation of the log normal distribution."
-msgstr "Desviación estándar. Es la desviación estándar del registro normal de distribución."
+msgstr "Desviación típica. La desviación típica de la distribución logarítmica normal."
 
 #. T4N5D
 #: sc/inc/scfuncs.hrc:2392
@@ -10692,7 +10692,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2394
 msgctxt "SC_OPCODE_LOG_INV_MS"
 msgid "The probability value for which the inverse log normal distribution is to be calculated."
-msgstr "El valor de probabilidad para calcular la inversa de la distribución normal logarítmica."
+msgstr "El valor de probabilidad para el cual se debe calcular la distribución normal logarítmica inversa."
 
 #. BgAcE
 #: sc/inc/scfuncs.hrc:2395
@@ -10716,7 +10716,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2398
 msgctxt "SC_OPCODE_LOG_INV_MS"
 msgid "Standard deviation. The standard deviation of the log normal distribution."
-msgstr "La desviación estándar de la distribución logarítmica normal."
+msgstr "Desviación típica. La desviación típica de la distribución logarítmica normal."
 
 #. 8wWP2
 #: sc/inc/scfuncs.hrc:2404
@@ -10734,7 +10734,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2406
 msgctxt "SC_OPCODE_EXP_DIST"
 msgid "The value to which the exponential distribution is to be calculated."
-msgstr "es el valor de la función."
+msgstr "El valor para el cual se debe calcular la distribución exponencial."
 
 #. VTtEt
 #: sc/inc/scfuncs.hrc:2407
@@ -10776,7 +10776,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2418
 msgctxt "SC_OPCODE_EXP_DIST_MS"
 msgid "The value to which the exponential distribution is to be calculated."
-msgstr "es el valor de la función."
+msgstr "El valor para el cual se debe calcular la distribución exponencial."
 
 #. U2dx6
 #: sc/inc/scfuncs.hrc:2419
@@ -10818,7 +10818,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2430
 msgctxt "SC_OPCODE_GAMMA_DIST"
 msgid "The value for which the gamma distribution is to be calculated."
-msgstr "es el valor al que desea evaluar la distribución."
+msgstr "El valor para el cual se debe calcular la distribución gamma."
 
 #. ptWdK
 #: sc/inc/scfuncs.hrc:2431
@@ -10830,7 +10830,7 @@ msgstr "Alfa"
 #: sc/inc/scfuncs.hrc:2432
 msgctxt "SC_OPCODE_GAMMA_DIST"
 msgid "The Alpha parameter of the Gamma distribution."
-msgstr "es un parámetro de la distribución."
+msgstr "El parámetro Alfa de la distribución gamma."
 
 #. LUBxW
 #: sc/inc/scfuncs.hrc:2433
@@ -10842,7 +10842,7 @@ msgstr "Beta"
 #: sc/inc/scfuncs.hrc:2434
 msgctxt "SC_OPCODE_GAMMA_DIST"
 msgid "The Beta parameter of the Gamma distribution."
-msgstr "es un parámetro de la distribución."
+msgstr "El parámetro Beta de la distribución gamma."
 
 #. MsyLG
 #: sc/inc/scfuncs.hrc:2435
@@ -10872,7 +10872,7 @@ msgstr "Número"
 #: sc/inc/scfuncs.hrc:2444
 msgctxt "SC_OPCODE_GAMMA_DIST_MS"
 msgid "The value for which the gamma distribution is to be calculated."
-msgstr "es el valor al que desea evaluar la distribución."
+msgstr "El valor para el cual se debe calcular la distribución gamma."
 
 #. VHMzm
 #: sc/inc/scfuncs.hrc:2445
@@ -10884,7 +10884,7 @@ msgstr "Alfa"
 #: sc/inc/scfuncs.hrc:2446
 msgctxt "SC_OPCODE_GAMMA_DIST_MS"
 msgid "The Alpha parameter of the Gamma distribution."
-msgstr "es un parámetro de la distribución."
+msgstr "El parámetro Alfa de la distribución gamma."
 
 #. 2XRcY
 #: sc/inc/scfuncs.hrc:2447
@@ -10896,7 +10896,7 @@ msgstr "Beta"
 #: sc/inc/scfuncs.hrc:2448
 msgctxt "SC_OPCODE_GAMMA_DIST_MS"
 msgid "The Beta parameter of the Gamma distribution."
-msgstr "es un parámetro de la distribución."
+msgstr "El parámetro Beta de la distribución gamma."
 
 #. KbAwa
 #: sc/inc/scfuncs.hrc:2449
@@ -12378,7 +12378,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2879
 msgctxt "SC_OPCODE_STANDARD"
 msgid "The standard deviation used for scaling."
-msgstr "La desviación estándar usada para la escala."
+msgstr "La desviación típica usada para la escala."
 
 #. bDxG9
 #: sc/inc/scfuncs.hrc:2885
@@ -12390,7 +12390,7 @@ msgstr "Devuelve la cantidad de permutaciones para un número dado de elementos 
 #: sc/inc/scfuncs.hrc:2886
 msgctxt "SC_OPCODE_PERMUT"
 msgid "Count 1"
-msgstr "Conteo 1"
+msgstr "Recuento 1"
 
 #. Mhy9M
 #: sc/inc/scfuncs.hrc:2887
@@ -12402,7 +12402,7 @@ msgstr "La cantidad total de elementos."
 #: sc/inc/scfuncs.hrc:2888
 msgctxt "SC_OPCODE_PERMUT"
 msgid "Count 2"
-msgstr "Conteo 2"
+msgstr "Recuento 2"
 
 #. B6kTa
 #: sc/inc/scfuncs.hrc:2889
@@ -12420,7 +12420,7 @@ msgstr "Devuelve la cantidad de permutaciones para un número dado de objetos (s
 #: sc/inc/scfuncs.hrc:2896
 msgctxt "SC_OPCODE_PERMUTATION_A"
 msgid "Count 1"
-msgstr "Conteo 1"
+msgstr "Recuento 1"
 
 #. fddDy
 #: sc/inc/scfuncs.hrc:2897
@@ -12432,7 +12432,7 @@ msgstr "La cantidad total de elementos."
 #: sc/inc/scfuncs.hrc:2898
 msgctxt "SC_OPCODE_PERMUTATION_A"
 msgid "Count 2"
-msgstr "Conteo 2"
+msgstr "Recuento 2"
 
 #. TRZcL
 #: sc/inc/scfuncs.hrc:2899
@@ -12468,7 +12468,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2909
 msgctxt "SC_OPCODE_CONFIDENCE"
 msgid "The standard deviation of the population."
-msgstr "es la desviación predeterminada de la población"
+msgstr "La desviación típica de la población."
 
 #. SfSN7
 #: sc/inc/scfuncs.hrc:2910
@@ -12498,7 +12498,7 @@ msgstr "Alfa"
 #: sc/inc/scfuncs.hrc:2919
 msgctxt "SC_OPCODE_CONFIDENCE_N"
 msgid "The level of the confidence interval."
-msgstr "es el nivel de significación empleado para calcular el nivel de confianza."
+msgstr "El nivel del intervalo de confianza."
 
 #. YJwYV
 #: sc/inc/scfuncs.hrc:2920
@@ -12510,7 +12510,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2921
 msgctxt "SC_OPCODE_CONFIDENCE_N"
 msgid "The standard deviation of the population."
-msgstr "es la desviación predeterminada de la población"
+msgstr "La desviación típica de la población."
 
 #. 5y2Nz
 #: sc/inc/scfuncs.hrc:2922
@@ -12522,7 +12522,7 @@ msgstr "Tamaño"
 #: sc/inc/scfuncs.hrc:2923
 msgctxt "SC_OPCODE_CONFIDENCE_N"
 msgid "The size of the population."
-msgstr "es el tamaño de la muestra."
+msgstr "El tamaño de la población."
 
 #. zAcVE
 #: sc/inc/scfuncs.hrc:2929
@@ -12540,7 +12540,7 @@ msgstr "Alfa"
 #: sc/inc/scfuncs.hrc:2931
 msgctxt "SC_OPCODE_CONFIDENCE_T"
 msgid "The level of the confidence interval."
-msgstr "es el nivel de significación empleado para calcular el nivel de confianza."
+msgstr "El nivel del intervalo de confianza."
 
 #. YGBES
 #: sc/inc/scfuncs.hrc:2932
@@ -12552,7 +12552,7 @@ msgstr "DESVEST"
 #: sc/inc/scfuncs.hrc:2933
 msgctxt "SC_OPCODE_CONFIDENCE_T"
 msgid "The standard deviation of the population."
-msgstr "es la desviación predeterminada de la población"
+msgstr "La desviación típica de la población."
 
 #. KrmhU
 #: sc/inc/scfuncs.hrc:2934
@@ -12582,7 +12582,7 @@ msgstr "Datos"
 #: sc/inc/scfuncs.hrc:2943
 msgctxt "SC_OPCODE_Z_TEST"
 msgid "The given sample, drawn from a normally distributed population."
-msgstr "La muestra dada, dibuja de una población distribuida normalmente."
+msgstr "La muestra dada, tomada de una población distribuida normalmente."
 
 #. j6cxd
 #: sc/inc/scfuncs.hrc:2944
@@ -12594,7 +12594,7 @@ msgstr "mu"
 #: sc/inc/scfuncs.hrc:2945
 msgctxt "SC_OPCODE_Z_TEST"
 msgid "The known mean of the population."
-msgstr "La media conocida de una población"
+msgstr "La media conocida de la población."
 
 #. ZngJE
 #: sc/inc/scfuncs.hrc:2946
@@ -12606,7 +12606,7 @@ msgstr "sigma"
 #: sc/inc/scfuncs.hrc:2947
 msgctxt "SC_OPCODE_Z_TEST"
 msgid "The known standard deviation of the population. If omitted, the standard deviation of the given sample is used."
-msgstr "La desviación estándar de una población conocida. Si es omitida, la desviación estándar de la muestra dada se usada."
+msgstr "La desviación típica conocida de la población. Si se omite, se usará la desviación típica de la muestra dada."
 
 #. wxJ43
 #: sc/inc/scfuncs.hrc:2953
@@ -12624,7 +12624,7 @@ msgstr "Datos"
 #: sc/inc/scfuncs.hrc:2955
 msgctxt "SC_OPCODE_Z_TEST_MS"
 msgid "The given sample, drawn from a normally distributed population."
-msgstr "La muestra dada, dibuja de una población distribuida normalmente."
+msgstr "La muestra dada, tomada de una población distribuida normalmente."
 
 #. Bj2P8
 #: sc/inc/scfuncs.hrc:2956
@@ -12636,7 +12636,7 @@ msgstr "mu"
 #: sc/inc/scfuncs.hrc:2957
 msgctxt "SC_OPCODE_Z_TEST_MS"
 msgid "The known mean of the population."
-msgstr "La media conocida de una población"
+msgstr "La media conocida de la población."
 
 #. Bxo8Y
 #: sc/inc/scfuncs.hrc:2958
@@ -12648,13 +12648,13 @@ msgstr "sigma"
 #: sc/inc/scfuncs.hrc:2959
 msgctxt "SC_OPCODE_Z_TEST_MS"
 msgid "The known standard deviation of the population. If omitted, the standard deviation of the given sample is used."
-msgstr "La desviación estándar conocida de la población. Si se omite, se usará la desviación estándar de la muestra dada."
+msgstr "La desviación típica conocida de la población. Si se omite, se usará la desviación típica de la muestra dada."
 
 #. msJXN
 #: sc/inc/scfuncs.hrc:2965
 msgctxt "SC_OPCODE_CHI_TEST"
 msgid "Returns the chi square independence test."
-msgstr "Devuelve la prueba de independencia."
+msgstr "Devuelve la prueba de independencia ji al cuadrado."
 
 #. ryBne
 #: sc/inc/scfuncs.hrc:2966
@@ -12684,7 +12684,7 @@ msgstr "La matriz de datos esperados."
 #: sc/inc/scfuncs.hrc:2975
 msgctxt "SC_OPCODE_CHI_TEST_MS"
 msgid "Returns the chi square independence test."
-msgstr "Devuelve la prueba de independencia."
+msgstr "Devuelve la prueba de independencia ji al cuadrado."
 
 #. yNywg
 #: sc/inc/scfuncs.hrc:2976
@@ -12714,7 +12714,7 @@ msgstr "La matriz de los datos esperados."
 #: sc/inc/scfuncs.hrc:2985
 msgctxt "SC_OPCODE_F_TEST"
 msgid "Calculates the F test."
-msgstr "Devuelve el resultado de una prueba F."
+msgstr "Calcula la prueba F."
 
 #. EeFFo
 #: sc/inc/scfuncs.hrc:2986
@@ -12744,7 +12744,7 @@ msgstr "La segunda matriz de registros."
 #: sc/inc/scfuncs.hrc:2995
 msgctxt "SC_OPCODE_F_TEST_MS"
 msgid "Calculates the F test."
-msgstr "Devuelve el resultado de una prueba F."
+msgstr "Calcula la prueba F."
 
 #. K37cV
 #: sc/inc/scfuncs.hrc:2996
@@ -12774,7 +12774,7 @@ msgstr "La segunda matriz de registros."
 #: sc/inc/scfuncs.hrc:3005
 msgctxt "SC_OPCODE_T_TEST"
 msgid "Calculates the T test."
-msgstr "Devuelve la probabilidad asociada con la prueba t de Student."
+msgstr "Calcula la prueba T."
 
 #. vU5V2
 #: sc/inc/scfuncs.hrc:3006
@@ -12828,7 +12828,7 @@ msgstr "El tipo de prueba T."
 #: sc/inc/scfuncs.hrc:3019
 msgctxt "SC_OPCODE_T_TEST_MS"
 msgid "Calculates the T test."
-msgstr "Devuelve la probabilidad asociada con la prueba t de Student."
+msgstr "Calcula la prueba T."
 
 #. 5fHC3
 #: sc/inc/scfuncs.hrc:3020
@@ -13002,7 +13002,7 @@ msgstr "La matriz de datos X"
 #: sc/inc/scfuncs.hrc:3073
 msgctxt "SC_OPCODE_PEARSON"
 msgid "Returns the Pearson product moment correlation coefficient."
-msgstr "Devuelve el coeficiente de correlación producto o momento r de Pearson.."
+msgstr "Devuelve el coeficiente de correlación producto-momento de Pearson."
 
 #. ZhepS
 #: sc/inc/scfuncs.hrc:3074
@@ -13164,7 +13164,7 @@ msgstr "Valor"
 #: sc/inc/scfuncs.hrc:3125
 msgctxt "SC_OPCODE_FORECAST"
 msgid "The X value for which the Y value on the regression linear is to be calculated."
-msgstr "es el dato cuyo valor desea predecir."
+msgstr "El valor X para el cual se debe calcular el valor Y en la recta de regresión."
 
 #. bxLgC
 #: sc/inc/scfuncs.hrc:3126
@@ -13752,7 +13752,7 @@ msgstr "Valor"
 #: sc/inc/scfuncs.hrc:3263
 msgctxt "SC_OPCODE_FORECAST_LIN"
 msgid "The X value for which the Y value on the regression linear is to be calculated."
-msgstr "El valor de X según el cual se calculará el valor de Y en la regresión lineal."
+msgstr "El valor X para el cual se debe calcular el valor Y en la recta de regresión."
 
 #. gZDa7
 #: sc/inc/scfuncs.hrc:3264
@@ -13914,7 +13914,7 @@ msgstr "La referencia a una celda o un intervalo."
 #: sc/inc/scfuncs.hrc:3315
 msgctxt "SC_OPCODE_ROW"
 msgid "Defines the internal row number of a reference."
-msgstr "Devuelve el número de fila de una referencia."
+msgstr "Define el número de fila interno de una referencia."
 
 #. 4jGH3
 #: sc/inc/scfuncs.hrc:3316
@@ -14016,7 +14016,7 @@ msgstr "Criterio de búsqueda"
 #: sc/inc/scfuncs.hrc:3357
 msgctxt "SC_OPCODE_H_LOOKUP"
 msgid "The value to be found in the first row."
-msgstr "El valor que se encontrará en la primera fila."
+msgstr "El valor que se debe encontrar en la primera fila."
 
 #. C2C5B
 #: sc/inc/scfuncs.hrc:3358
@@ -14328,7 +14328,7 @@ msgstr "Altura"
 #: sc/inc/scfuncs.hrc:3439
 msgctxt "SC_OPCODE_OFFSET"
 msgid "The number of rows of the moved reference."
-msgstr "La cantidad de filas de la referencia desplazada."
+msgstr "La cantidad de filas de la referencia movida."
 
 #. Y5Gux
 #: sc/inc/scfuncs.hrc:3440
@@ -14490,7 +14490,7 @@ msgstr "URL"
 #: sc/inc/scfuncs.hrc:3491
 msgctxt "SC_OPCODE_HYPERLINK"
 msgid "The clickable URL."
-msgstr "El URL accesible con el ratón."
+msgstr "El URL pulsable con el ratón."
 
 #. AufAt
 #: sc/inc/scfuncs.hrc:3492
@@ -14820,7 +14820,7 @@ msgstr "Valor"
 #: sc/inc/scfuncs.hrc:3611
 msgctxt "SC_OPCODE_SWITCH_MS"
 msgid "Value to compare against expression. If no result is given, then value is returned as default result."
-msgstr ""
+msgstr "Valor para comparar con la expresión. Si no se proporciona ningún resultado, el valor se devuelve como resultado predeterminado."
 
 #. dsARv
 #: sc/inc/scfuncs.hrc:3612
@@ -14922,7 +14922,7 @@ msgstr "Criterio 1, criterio 2… son los criterios que se aplicarán en los int
 #: sc/inc/scfuncs.hrc:3641
 msgctxt "SC_OPCODE_EXACT"
 msgid "Specifies whether two texts are identical."
-msgstr "Compara si dos textos son idénticos"
+msgstr "Indica si dos textos son idénticos."
 
 #. Mypx3
 #: sc/inc/scfuncs.hrc:3642
@@ -14934,7 +14934,7 @@ msgstr "Texto 1"
 #: sc/inc/scfuncs.hrc:3643
 msgctxt "SC_OPCODE_EXACT"
 msgid "The first text to be used for comparing texts."
-msgstr "es la primera cadena de texto, entre comillas."
+msgstr "El primer texto que se usará en la comparación textual."
 
 #. 2s4vu
 #: sc/inc/scfuncs.hrc:3644
@@ -14946,13 +14946,13 @@ msgstr "Texto 2"
 #: sc/inc/scfuncs.hrc:3645
 msgctxt "SC_OPCODE_EXACT"
 msgid "The second text for comparing texts."
-msgstr "es la segunda cadena de texto, entre comillas."
+msgstr "El segundo texto de la comparación."
 
 #. 8sCqL
 #: sc/inc/scfuncs.hrc:3651
 msgctxt "SC_OPCODE_FIND"
 msgid "Looks for a string of text within another (case sensitive)"
-msgstr "Busca un valor de texto dentro de otro tomando en cuenta las mayúsculas y minúsculas."
+msgstr "Busca una cadena de texto dentro de otra (distinguiendo la mayusculación)."
 
 #. 2CUai
 #: sc/inc/scfuncs.hrc:3652
@@ -14988,13 +14988,13 @@ msgstr "Posición"
 #: sc/inc/scfuncs.hrc:3657
 msgctxt "SC_OPCODE_FIND"
 msgid "The position in the text from which the search starts."
-msgstr "especifica el carácter a partir del que comenzará la búsqueda"
+msgstr "La posición en el texto a partir de la cual comenzará la búsqueda."
 
 #. XLB5s
 #: sc/inc/scfuncs.hrc:3663
 msgctxt "SC_OPCODE_SEARCH"
 msgid "Looks for one text value within another (not case-sensitive)."
-msgstr "Busca un valor de texto dentro de otro (sin reconocer mayúsculas o minúsculas)."
+msgstr "Busca una cadena de texto dentro de otra (sin distinguir la mayusculación)."
 
 #. q9HgD
 #: sc/inc/scfuncs.hrc:3664
@@ -15084,13 +15084,13 @@ msgstr "Texto"
 #: sc/inc/scfuncs.hrc:3693
 msgctxt "SC_OPCODE_UPPER"
 msgid "The text in which lower case letters are to be converted to capitals."
-msgstr "es el texto que se desea convertir en mayúsculas."
+msgstr "El texto cuyas minúsculas se transformarán en mayúsculas."
 
 #. CqaAp
 #: sc/inc/scfuncs.hrc:3699
 msgctxt "SC_OPCODE_LOWER"
 msgid "Converts text to lowercase."
-msgstr "Convierte todas las mayúsculas de una cadena de texto en minúsculas."
+msgstr "Convierte el texto en minúsculas."
 
 #. 3pTMV
 #: sc/inc/scfuncs.hrc:3700
@@ -15248,11 +15248,11 @@ msgctxt "SC_OPCODE_FIXED"
 msgid "Decimals"
 msgstr "Decimales"
 
-#. ACFqC
+#. CTmcM
 #: sc/inc/scfuncs.hrc:3751
 msgctxt "SC_OPCODE_FIXED"
-msgid "Decimal places. The number of fixed decimal places that are to be displayed."
-msgstr "es el número de dígitos a la derecha del separador decimal."
+msgid "Decimal places. The number of fixed decimal places that are to be displayed. Default 2."
+msgstr ""
 
 #. fdn6N
 #: sc/inc/scfuncs.hrc:3752
@@ -16521,11 +16521,11 @@ msgctxt "SC_OPCODE_RANDOM_NV"
 msgid "Returns a random number between 0 and 1, non-volatile."
 msgstr "Devuelve un número al azar no volátil, entre 0 y 1."
 
-#. op2W5
+#. fDQYY
 #: sc/inc/scfuncs.hrc:4147
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "Returns a random integer between the numbers you specify, non-volatile."
-msgstr "Devuelve un número entero al azar no volátil de entre los números que especifique."
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive), non-volatile."
+msgstr ""
 
 #. o3i8h
 #: sc/inc/scfuncs.hrc:4148
@@ -16533,11 +16533,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Bottom"
 msgstr "Inferior"
 
-#. HdKGo
+#. 7kUdh
 #: sc/inc/scfuncs.hrc:4149
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The smallest integer returned."
-msgstr "El entero más pequeño devuelto."
+msgid "The smallest integer that can be returned."
+msgstr ""
 
 #. 8s6nU
 #: sc/inc/scfuncs.hrc:4150
@@ -16545,11 +16545,11 @@ msgctxt "SC_OPCODE_RANDBETWEEN_NV"
 msgid "Top"
 msgstr "Superior"
 
-#. x9uuF
+#. AmoKE
 #: sc/inc/scfuncs.hrc:4151
 msgctxt "SC_OPCODE_RANDBETWEEN_NV"
-msgid "The largest integer returned."
-msgstr "El entero más grande devuelto."
+msgid "The largest integer that can be returned."
+msgstr ""
 
 #. pDDme
 #: sc/inc/scstyles.hrc:29
@@ -16678,124 +16678,112 @@ msgctxt "SCSTR_FILTER_CONDITION"
 msgid "Filter by Condition"
 msgstr "Filtrar por condición"
 
-#. 5LENV
-#: sc/inc/strings.hrc:41
-msgctxt "SCSTR_FILTER_TEXT_COLOR"
-msgid "Text Color"
-msgstr "Color de texto"
-
-#. BtGE4
-#: sc/inc/strings.hrc:42
-msgctxt "SCSTR_FILTER_BACKGROUND_COLOR"
-msgid "Background Color"
-msgstr "Color de fondo"
-
-#. td5Gr
+#. PWtxn
 #. This must match the translation of the same strings of standardfilterdialog|cond
-#: sc/inc/strings.hrc:44
+#: sc/inc/strings.hrc:42
 msgctxt "STANDARDFILTERDIALOG_COND"
-msgid "Text color"
-msgstr "Color de texto"
+msgid "Font color"
+msgstr "Color de letra"
 
 #. sGJCz
-#: sc/inc/strings.hrc:45
+#: sc/inc/strings.hrc:43
 msgctxt "STANDARDFILTERDIALOG_COND"
 msgid "Background color"
 msgstr "Color de fondo"
 
 #. teYGB
-#: sc/inc/strings.hrc:46
+#: sc/inc/strings.hrc:44
 msgctxt "SCSTR_FILTER_NO_FILL"
 msgid "No Fill"
 msgstr "Sin relleno"
 
 #. 8DPvA
-#: sc/inc/strings.hrc:47
+#: sc/inc/strings.hrc:45
 msgctxt "SCSTR_FILTER_AUTOMATIC_COLOR"
 msgid "Automatic"
 msgstr "Automático"
 
 #. Wgy7r
-#: sc/inc/strings.hrc:48
+#: sc/inc/strings.hrc:46
 msgctxt "SCSTR_NONAME"
 msgid "unnamed"
 msgstr "sin nombre"
 
 #. JAf3n
-#: sc/inc/strings.hrc:49
+#: sc/inc/strings.hrc:47
 msgctxt "SCSTR_INSERT_RTL"
 msgid "Shift cells left"
 msgstr "Desplazar celdas a la izquierda"
 
 #. CW4Wh
 #. "%1 is replaced to column letter, such as 'Column A'"
-#: sc/inc/strings.hrc:51
+#: sc/inc/strings.hrc:49
 msgctxt "SCSTR_COLUMN_LETTER"
 msgid "Column %1"
 msgstr "Columna %1"
 
 #. CJrpZ
-#: sc/inc/strings.hrc:52
+#: sc/inc/strings.hrc:50
 msgctxt "SCSTR_COLUMN"
 msgid "Column"
 msgstr "Columna"
 
 #. Bjnch
-#: sc/inc/strings.hrc:53
+#: sc/inc/strings.hrc:51
 msgctxt "SCSTR_ROW"
 msgid "Row"
 msgstr "Fila"
 
 #. 7p8BN
-#: sc/inc/strings.hrc:54
+#: sc/inc/strings.hrc:52
 msgctxt "SCSTR_TABLE"
 msgid "Sheet"
 msgstr "Hoja"
 
 #. ArnTD
-#: sc/inc/strings.hrc:55
+#: sc/inc/strings.hrc:53
 msgctxt "SCSTR_NAME"
 msgid "Name"
 msgstr "Nombre"
 
 #. BxrBH
-#: sc/inc/strings.hrc:56
+#: sc/inc/strings.hrc:54
 msgctxt "SCSTR_APDTABLE"
 msgid "Append Sheet"
-msgstr "Adjuntar hoja"
+msgstr "Anexar hoja"
 
 #. sba4F
-#: sc/inc/strings.hrc:57
+#: sc/inc/strings.hrc:55
 msgctxt "SCSTR_RENAMETAB"
 msgid "Rename Sheet"
 msgstr "Cambiar nombre de hoja"
 
 #. EEcgV
-#: sc/inc/strings.hrc:58
+#: sc/inc/strings.hrc:56
 msgctxt "SCSTR_SET_TAB_BG_COLOR"
 msgid "Tab Color"
 msgstr "Color de pestaña"
 
 #. sTank
-#: sc/inc/strings.hrc:59
+#: sc/inc/strings.hrc:57
 msgctxt "SCSTR_NO_TAB_BG_COLOR"
 msgid "Default"
 msgstr "Predeterminado"
 
 #. yEEuF
-#: sc/inc/strings.hrc:60
+#: sc/inc/strings.hrc:58
 msgctxt "SCSTR_RENAMEOBJECT"
 msgid "Name Object"
 msgstr "Nombre de objeto"
 
 #. 3FHKw
-#: sc/inc/strings.hrc:61
+#: sc/inc/strings.hrc:59
 msgctxt "STR_INSERTGRAPHIC"
 msgid "Insert Image"
 msgstr "Insertar imagen"
 
 #. bKv77
-#: sc/inc/strings.hrc:62
+#: sc/inc/strings.hrc:60
 msgctxt "SCSTR_TOTAL"
 msgid "One result found"
 msgid_plural "%1 results found"
@@ -16803,1782 +16791,1788 @@ msgstr[0] "Se encontró 1 resultado"
 msgstr[1] "Se encontraron %1 resultados"
 
 #. 7GkKi
-#: sc/inc/strings.hrc:63
+#: sc/inc/strings.hrc:61
 msgctxt "SCSTR_SKIPPED"
 msgid "(only %1 are listed)"
 msgstr "(solo aparecen %1)"
 
+#. khhRt
+#: sc/inc/strings.hrc:62
+msgctxt "SCSTR_RESULTS_CLAMPED"
+msgid "More than %1 results found (stopped counting)"
+msgstr "Se encontraron más de %1 resultados (se dejó de contar)"
+
 #. YxFpr
 #. Attribute
-#: sc/inc/strings.hrc:65
+#: sc/inc/strings.hrc:64
 msgctxt "SCSTR_PROTECTDOC"
 msgid "Protect Spreadsheet Structure"
 msgstr "Proteger estructura de libro"
 
 #. SQCpD
-#: sc/inc/strings.hrc:66
+#: sc/inc/strings.hrc:65
 msgctxt "SCSTR_UNPROTECTDOC"
 msgid "Unprotect Spreadsheet Structure"
 msgstr "Desproteger estructura de libro"
 
 #. rAV3G
-#: sc/inc/strings.hrc:67
+#: sc/inc/strings.hrc:66
 msgctxt "SCSTR_UNPROTECTTAB"
 msgid "Unprotect Sheet"
 msgstr "Desproteger hoja"
 
 #. K7w3B
-#: sc/inc/strings.hrc:68
+#: sc/inc/strings.hrc:67
 msgctxt "SCSTR_CHG_PROTECT"
 msgid "Protect Records"
 msgstr "Proteger registros"
 
 #. DLDBg
-#: sc/inc/strings.hrc:69
+#: sc/inc/strings.hrc:68
 msgctxt "SCSTR_CHG_UNPROTECT"
 msgid "Unprotect Records"
 msgstr "Desproteger registros"
 
 #. rFdAS
-#: sc/inc/strings.hrc:70
+#: sc/inc/strings.hrc:69
 msgctxt "SCSTR_PASSWORD"
 msgid "Password:"
 msgstr "Contraseña:"
 
 #. dd2wC
-#: sc/inc/strings.hrc:71
+#: sc/inc/strings.hrc:70
 msgctxt "SCSTR_PASSWORDOPT"
 msgid "Password (optional):"
 msgstr "Contraseña (opcional):"
 
 #. dTBug
-#: sc/inc/strings.hrc:72
+#: sc/inc/strings.hrc:71
 msgctxt "SCSTR_WRONGPASSWORD"
 msgid "Incorrect Password"
 msgstr "Contraseña incorrecta"
 
 #. bkGuJ
-#: sc/inc/strings.hrc:73
+#: sc/inc/strings.hrc:72
 msgctxt "SCSTR_END"
 msgid "~End"
 msgstr "~Fin"
 
 #. XNnTf
-#: sc/inc/strings.hrc:74
+#: sc/inc/strings.hrc:73
 msgctxt "SCSTR_UNKNOWN"
 msgid "Unknown"
 msgstr "Desconocido"
 
 #. NoEfk
-#: sc/inc/strings.hrc:75
+#: sc/inc/strings.hrc:74
 msgctxt "SCSTR_VALID_MINIMUM"
 msgid "~Minimum"
 msgstr "~Mínimo"
 
 #. gKahz
-#: sc/inc/strings.hrc:76
+#: sc/inc/strings.hrc:75
 msgctxt "SCSTR_VALID_MAXIMUM"
 msgid "~Maximum"
 msgstr "~Máximo"
 
 #. nmeHF
-#: sc/inc/strings.hrc:77
+#: sc/inc/strings.hrc:76
 msgctxt "SCSTR_VALID_VALUE"
 msgid "~Value"
 msgstr "~Valor"
 
 #. g8Cow
-#: sc/inc/strings.hrc:78
+#: sc/inc/strings.hrc:77
 msgctxt "SCSTR_VALID_FORMULA"
 msgid "~Formula"
 msgstr "~Fórmula"
 
 #. 6YEEk
-#: sc/inc/strings.hrc:79
+#: sc/inc/strings.hrc:78
 msgctxt "SCSTR_VALID_RANGE"
 msgid "~Source"
 msgstr "~Origen"
 
 #. FA84s
-#: sc/inc/strings.hrc:80
+#: sc/inc/strings.hrc:79
 msgctxt "SCSTR_VALID_LIST"
 msgid "~Entries"
 msgstr "~Entradas"
 
 #. vhcaA
 #. for dialogues:
-#: sc/inc/strings.hrc:82
+#: sc/inc/strings.hrc:81
 msgctxt "SCSTR_CHARSET_USER"
 msgid "System"
 msgstr "Sistema"
 
 #. 2tobg
-#: sc/inc/strings.hrc:83
+#: sc/inc/strings.hrc:82
 msgctxt "SCSTR_COLUMN_USER"
 msgid "Standard;Text;Date (DMY);Date (MDY);Date (YMD);US English;Hide"
 msgstr "Predeterminado;Texto;Fecha (DMA);Fecha (MDA);Fecha (AMD);Inglés (US);Ocultar"
 
 #. px75F
-#: sc/inc/strings.hrc:84
+#: sc/inc/strings.hrc:83
 msgctxt "SCSTR_FIELDSEP_TAB"
 msgid "Tab"
 msgstr "Tabuladores"
 
 #. ZGpGp
-#: sc/inc/strings.hrc:85
+#: sc/inc/strings.hrc:84
 msgctxt "SCSTR_FIELDSEP_SPACE"
 msgid "space"
 msgstr "espacio"
 
 #. C8dAj
-#: sc/inc/strings.hrc:86
+#: sc/inc/strings.hrc:85
 msgctxt "SCSTR_UNDO_GRAFFILTER"
 msgid "Image Filter"
 msgstr "Filtro de imagen"
 
 #. CfBRk
-#: sc/inc/strings.hrc:87
+#: sc/inc/strings.hrc:86
 msgctxt "STR_CAPTION_DEFAULT_TEXT"
 msgid "Text"
 msgstr "Texto"
 
 #. X6bVC
 #. Select tables dialog title
-#: sc/inc/strings.hrc:89
+#: sc/inc/strings.hrc:88
 msgctxt "STR_DLG_SELECTTABLES_TITLE"
 msgid "Select Sheets"
 msgstr "Seleccionar hojas"
 
 #. GYoSL
-#: sc/inc/strings.hrc:90
+#: sc/inc/strings.hrc:89
 msgctxt "STR_DLG_SELECTTABLE_TITLE"
 msgid "Go to Sheet"
 msgstr "Ir a la hoja"
 
 #. iHTDF
-#: sc/inc/strings.hrc:91
+#: sc/inc/strings.hrc:90
 msgctxt "STR_DLG_SELECTTABLE_MASK"
 msgid "~Type a Sheet Name"
 msgstr ""
 
 #. SEDS2
 #. Select tables dialog listbox
-#: sc/inc/strings.hrc:93
+#: sc/inc/strings.hrc:92
 msgctxt "STR_DLG_SELECTTABLES_LBNAME"
 msgid "~Selected sheets"
 msgstr "Hojas ~seleccionadas"
 
 #. szfzF
-#: sc/inc/strings.hrc:94
+#: sc/inc/strings.hrc:93
 msgctxt "STR_DLG_SELECTTABLE_LBNAME"
 msgid "~Sheets"
 msgstr "~Hojas"
 
 #. SfEhE
-#: sc/inc/strings.hrc:95
+#: sc/inc/strings.hrc:94
 msgctxt "STR_ACC_CSVRULER_NAME"
 msgid "Ruler"
 msgstr "Regla"
 
 #. 3VwsT
-#: sc/inc/strings.hrc:96
+#: sc/inc/strings.hrc:95
 msgctxt "STR_ACC_CSVRULER_DESCR"
 msgid "This ruler manages objects at fixed positions."
 msgstr "Esta regla gestiona objetos en posiciones fijas."
 
 #. 7Ream
-#: sc/inc/strings.hrc:97
+#: sc/inc/strings.hrc:96
 msgctxt "STR_ACC_CSVGRID_NAME"
 msgid "Preview"
 msgstr "Previsualización"
 
 #. uSKyF
-#: sc/inc/strings.hrc:98
+#: sc/inc/strings.hrc:97
 msgctxt "STR_ACC_CSVGRID_DESCR"
 msgid "This sheet shows how the data will be arranged in the document."
 msgstr "Esta hoja muestra cómo se organizarán los datos en el documento."
 
 #. MwTAm
-#: sc/inc/strings.hrc:99
+#: sc/inc/strings.hrc:98
 msgctxt "STR_ACC_DOC_NAME"
 msgid "Document view"
 msgstr "Visualización del documento"
 
 #. NFaas
-#: sc/inc/strings.hrc:100
+#: sc/inc/strings.hrc:99
 msgctxt "STR_ACC_TABLE_NAME"
 msgid "Sheet %1"
 msgstr "Hoja %1"
 
 #. 2qRJG
-#: sc/inc/strings.hrc:101
+#: sc/inc/strings.hrc:100
 msgctxt "STR_ACC_CELL_NAME"
 msgid "Cell %1"
 msgstr "Celda %1"
 
 #. KD4PA
-#: sc/inc/strings.hrc:102
+#: sc/inc/strings.hrc:101
 msgctxt "STR_ACC_LEFTAREA_NAME"
 msgid "Left area"
 msgstr "Área izquierda"
 
 #. 56AkM
-#: sc/inc/strings.hrc:103
+#: sc/inc/strings.hrc:102
 msgctxt "STR_ACC_PREVIEWDOC_NAME"
 msgid "Page preview"
 msgstr "Previsualización de página"
 
 #. RA4AS
-#: sc/inc/strings.hrc:104
+#: sc/inc/strings.hrc:103
 msgctxt "STR_ACC_CENTERAREA_NAME"
 msgid "Center area"
 msgstr "Área central"
 
 #. 2hpwq
-#: sc/inc/strings.hrc:105
+#: sc/inc/strings.hrc:104
 msgctxt "STR_ACC_RIGHTAREA_NAME"
 msgid "Right area"
 msgstr "Área derecha"
 
 #. FrXgq
-#: sc/inc/strings.hrc:106
+#: sc/inc/strings.hrc:105
 msgctxt "STR_ACC_HEADER_NAME"
 msgid "Header of page %1"
 msgstr "Cabecera de la página %1"
 
 #. BwF8D
-#: sc/inc/strings.hrc:107
+#: sc/inc/strings.hrc:106
 msgctxt "STR_ACC_FOOTER_NAME"
 msgid "Footer of page %1"
 msgstr "Pie de la página %1"
 
 #. 9T4c8
-#: sc/inc/strings.hrc:108
+#: sc/inc/strings.hrc:107
 msgctxt "STR_ACC_EDITLINE_NAME"
 msgid "Input line"
 msgstr "Cuadro de entrada"
 
 #. ejFak
-#: sc/inc/strings.hrc:109
+#: sc/inc/strings.hrc:108
 msgctxt "STR_ACC_EDITLINE_DESCR"
 msgid "This is where you enter or edit text, numbers and formulas."
 msgstr "Aquí puede introducir y editar texto, números y fórmulas."
 
 #. XX585
-#: sc/inc/strings.hrc:110
+#: sc/inc/strings.hrc:109
 msgctxt "SCSTR_MEDIASHELL"
 msgid "Media Playback"
 msgstr "Reproducción multimedia"
 
 #. SuAaA
-#: sc/inc/strings.hrc:111
+#: sc/inc/strings.hrc:110
 msgctxt "RID_SCSTR_ONCLICK"
 msgid "Mouse button pressed"
 msgstr "Botón del ratón presionado"
 
 #. 4prfv
-#: sc/inc/strings.hrc:112
+#: sc/inc/strings.hrc:111
 msgctxt "STR_ACC_TOOLBAR_FORMULA"
 msgid "Formula Tool Bar"
 msgstr "Barra de fórmulas"
 
 #. nAcNZ
-#: sc/inc/strings.hrc:113
+#: sc/inc/strings.hrc:112
 msgctxt "STR_ACC_DOC_SPREADSHEET"
 msgid "%PRODUCTNAME Spreadsheets"
 msgstr "Hojas de cálculo de %PRODUCTNAME"
 
 #. 8UMap
-#: sc/inc/strings.hrc:114
+#: sc/inc/strings.hrc:113
 msgctxt "STR_ACC_DOC_SPREADSHEET_READONLY"
 msgid "(read-only)"
 msgstr "(solo lectura)"
 
 #. fDxgL
-#: sc/inc/strings.hrc:115
+#: sc/inc/strings.hrc:114
 msgctxt "STR_ACC_DOC_PREVIEW_SUFFIX"
 msgid "(Preview mode)"
 msgstr "(Modo de previsualización)"
 
 #. ZwiH6
-#: sc/inc/strings.hrc:116
+#: sc/inc/strings.hrc:115
 msgctxt "SCSTR_PRINTOPT_PAGES"
 msgid "Pages:"
 msgstr "Páginas:"
 
 #. FYjDY
-#: sc/inc/strings.hrc:117
+#: sc/inc/strings.hrc:116
 msgctxt "SCSTR_PRINTOPT_SUPPRESSEMPTY"
 msgid "~Suppress output of empty pages"
 msgstr "~No imprimir páginas vacías"
 
 #. GQNVf
-#: sc/inc/strings.hrc:118
+#: sc/inc/strings.hrc:117
 msgctxt "SCSTR_PRINTOPT_ALLSHEETS"
 msgid "Print All Sheets"
 msgstr "Imprimir todas las hojas"
 
 #. xcKcm
-#: sc/inc/strings.hrc:119
+#: sc/inc/strings.hrc:118
 msgctxt "SCSTR_PRINTOPT_SELECTEDSHEETS"
 msgid "Print Selected Sheets"
 msgstr "Imprimir hojas seleccionadas"
 
 #. e7kTj
-#: sc/inc/strings.hrc:120
+#: sc/inc/strings.hrc:119
 msgctxt "SCSTR_PRINTOPT_SELECTEDCELLS"
 msgid "Print Selected Cells"
 msgstr "Imprimir celdas seleccionadas"
 
 #. z4DB6
-#: sc/inc/strings.hrc:121
+#: sc/inc/strings.hrc:120
 msgctxt "SCSTR_PRINTOPT_FROMWHICH"
 msgid "From which:"
 msgstr "De lo cual:"
 
 #. v5EK2
-#: sc/inc/strings.hrc:122
+#: sc/inc/strings.hrc:121
 msgctxt "SCSTR_PRINTOPT_PRINTALLPAGES"
 msgid "All ~Pages"
 msgstr "~Todas las páginas"
 
 #. cvNuW
-#: sc/inc/strings.hrc:123
+#: sc/inc/strings.hrc:122
 msgctxt "SCSTR_PRINTOPT_PRINTPAGES"
 msgid "Pa~ges:"
 msgstr ""
 
 #. Pw9Pu
-#: sc/inc/strings.hrc:124
+#: sc/inc/strings.hrc:123
 msgctxt "SCSTR_PRINTOPT_PRODNAME"
 msgid "%PRODUCTNAME %s"
 msgstr "%PRODUCTNAME %s"
 
 #. 4BEKq
-#: sc/inc/strings.hrc:125
+#: sc/inc/strings.hrc:124
 msgctxt "SCSTR_DDEDOC_NOT_LOADED"
 msgid "The following DDE source could not be updated possibly because the source document was not open. Please launch the source document and try again."
 msgstr "El siguiente origen DDE no pudo actualizarse probablemente porque el documento de origen no está abierto. Abra el documento origen e intente nuevamente."
 
 #. kGmko
-#: sc/inc/strings.hrc:126
+#: sc/inc/strings.hrc:125
 msgctxt "SCSTR_EXTDOC_NOT_LOADED"
 msgid "The following external file could not be loaded. Data linked from this file did not get updated."
 msgstr "El siguiente archivo externo no se pudo cargar. Los datos enlazados desde este archivo no se actualizaron."
 
 #. BvtFc
-#: sc/inc/strings.hrc:127
+#: sc/inc/strings.hrc:126
 msgctxt "SCSTR_UPDATE_EXTDOCS"
 msgid "Updating external links."
 msgstr "Actualizando los enlaces externos."
 
 #. MACSv
-#: sc/inc/strings.hrc:128
+#: sc/inc/strings.hrc:127
 msgctxt "SCSTR_FORMULA_SYNTAX_CALC_A1"
 msgid "Calc A1"
 msgstr "A1 de Calc"
 
 #. xEQCB
-#: sc/inc/strings.hrc:129
+#: sc/inc/strings.hrc:128
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_A1"
 msgid "Excel A1"
 msgstr "A1 de Excel"
 
 #. KLkBH
-#: sc/inc/strings.hrc:130
+#: sc/inc/strings.hrc:129
 msgctxt "SCSTR_FORMULA_SYNTAX_XL_R1C1"
 msgid "Excel R1C1"
 msgstr "R1C1 de Excel"
 
 #. pr4wW
-#: sc/inc/strings.hrc:131
+#: sc/inc/strings.hrc:130
 msgctxt "SCSTR_COL_LABEL"
 msgid "Range contains column la~bels"
 msgstr "El intervalo contiene etiquetas de ~columnas"
 
 #. mJyFP
-#: sc/inc/strings.hrc:132
+#: sc/inc/strings.hrc:131
 msgctxt "SCSTR_ROW_LABEL"
 msgid "Range contains ~row labels"
 msgstr "El intervalo contiene etiquetas de ~filas"
 
 #. ujjcx
-#: sc/inc/strings.hrc:133
+#: sc/inc/strings.hrc:132
 msgctxt "SCSTR_VALERR"
 msgid "Invalid value"
 msgstr "Valor no válido"
 
 #. SoLXN
-#: sc/inc/strings.hrc:134
+#: sc/inc/strings.hrc:133
 msgctxt "STR_NOFORMULASPECIFIED"
 msgid "No formula specified."
 msgstr "No se especificó ninguna fórmula."
 
 #. YFnCS
-#: sc/inc/strings.hrc:135
+#: sc/inc/strings.hrc:134
 msgctxt "STR_NOCOLROW"
 msgid "Neither row or column specified."
 msgstr "No se especificó ni la fila ni la columna."
 
 #. 6YQh2
-#: sc/inc/strings.hrc:136
+#: sc/inc/strings.hrc:135
 msgctxt "STR_WRONGFORMULA"
 msgid "Undefined name or range."
 msgstr "No se definió el nombre o el intervalo."
 
 #. 4aHCG
-#: sc/inc/strings.hrc:137
+#: sc/inc/strings.hrc:136
 msgctxt "STR_WRONGROWCOL"
 msgid "Undefined name or wrong cell reference."
 msgstr "No se definió el nombre o la referencia a la celda es incorrecta."
 
 #. G8KPr
-#: sc/inc/strings.hrc:138
+#: sc/inc/strings.hrc:137
 msgctxt "STR_NOCOLFORMULA"
 msgid "Formulas don't form a column."
 msgstr "Las fórmulas no forman una columna."
 
 #. uSxCb
-#: sc/inc/strings.hrc:139
+#: sc/inc/strings.hrc:138
 msgctxt "STR_NOROWFORMULA"
 msgid "Formulas don't form a row."
 msgstr "Las fórmulas no forman una fila."
 
 #. PknB5
-#: sc/inc/strings.hrc:140
+#: sc/inc/strings.hrc:139
 msgctxt "STR_ADD_AUTOFORMAT_TITLE"
 msgid "Add AutoFormat"
 msgstr "Añadir autoformato"
 
 #. 7KuSQ
-#: sc/inc/strings.hrc:141
+#: sc/inc/strings.hrc:140
 msgctxt "STR_RENAME_AUTOFORMAT_TITLE"
 msgid "Rename AutoFormat"
 msgstr "Cambiar nombre de formato automático"
 
 #. hqtgD
-#: sc/inc/strings.hrc:142
+#: sc/inc/strings.hrc:141
 msgctxt "STR_ADD_AUTOFORMAT_LABEL"
 msgid "Name"
 msgstr "Nombre"
 
 #. L9jQU
-#: sc/inc/strings.hrc:143
+#: sc/inc/strings.hrc:142
 msgctxt "STR_DEL_AUTOFORMAT_TITLE"
 msgid "Delete AutoFormat"
 msgstr "Eliminar autoformato"
 
 #. KCDoJ
-#: sc/inc/strings.hrc:144
+#: sc/inc/strings.hrc:143
 msgctxt "STR_DEL_AUTOFORMAT_MSG"
 msgid "Do you really want to delete the # AutoFormat?"
 msgstr "¿Quiere realmente eliminar el formato automático #?"
 
 #. GDdL3
-#: sc/inc/strings.hrc:145
+#: sc/inc/strings.hrc:144
 msgctxt "STR_BTN_AUTOFORMAT_CLOSE"
 msgid "~Close"
 msgstr "~Cerrar"
 
 #. DAuNm
-#: sc/inc/strings.hrc:146
+#: sc/inc/strings.hrc:145
 msgctxt "STR_JAN"
 msgid "Jan"
 msgstr "Ene"
 
 #. WWzNg
-#: sc/inc/strings.hrc:147
+#: sc/inc/strings.hrc:146
 msgctxt "STR_FEB"
 msgid "Feb"
 msgstr "Feb"
 
 #. CCC3U
-#: sc/inc/strings.hrc:148
+#: sc/inc/strings.hrc:147
 msgctxt "STR_MAR"
 msgid "Mar"
 msgstr "Mar"
 
 #. cr7Jq
-#: sc/inc/strings.hrc:149
+#: sc/inc/strings.hrc:148
 msgctxt "STR_NORTH"
 msgid "North"
 msgstr "Norte"
 
 #. wHYPw
-#: sc/inc/strings.hrc:150
+#: sc/inc/strings.hrc:149
 msgctxt "STR_MID"
 msgid "Mid"
 msgstr "Centro"
 
 #. sxDHC
-#: sc/inc/strings.hrc:151
+#: sc/inc/strings.hrc:150
 msgctxt "STR_SOUTH"
 msgid "South"
 msgstr "Sur"
 
 #. CWcdp
-#: sc/inc/strings.hrc:152
+#: sc/inc/strings.hrc:151
 msgctxt "STR_SUM"
 msgid "Total"
 msgstr "Total"
 
 #. MMCxb
-#: sc/inc/strings.hrc:153
+#: sc/inc/strings.hrc:152
 msgctxt "SCSTR_UNDO_PAGE_ANCHOR"
 msgid "Page Anchor"
 msgstr "Ancla de página"
 
 #. fFFQ8
-#: sc/inc/strings.hrc:154
+#: sc/inc/strings.hrc:153
 msgctxt "SCSTR_UNDO_CELL_ANCHOR"
 msgid "Cell Anchor"
 msgstr "Ancla de celda"
 
 #. rTGKc
-#: sc/inc/strings.hrc:155
+#: sc/inc/strings.hrc:154
 msgctxt "SCSTR_CONDITION"
 msgid "Condition "
 msgstr "Condición "
 
 #. 56Wmj
 #. content description strings are also use        d in ScLinkTargetsObj
-#: sc/inc/strings.hrc:158
+#: sc/inc/strings.hrc:157
 msgctxt "SCSTR_CONTENT_ROOT"
 msgid "Contents"
 msgstr "Contenido"
 
 #. wLN3J
-#: sc/inc/strings.hrc:159
+#: sc/inc/strings.hrc:158
 msgctxt "SCSTR_CONTENT_TABLE"
 msgid "Sheets"
 msgstr "Hojas"
 
 #. 3ZhJn
-#: sc/inc/strings.hrc:160
+#: sc/inc/strings.hrc:159
 msgctxt "SCSTR_CONTENT_RANGENAME"
 msgid "Range names"
 msgstr "Nombres de intervalos"
 
 #. jjQeD
-#: sc/inc/strings.hrc:161
+#: sc/inc/strings.hrc:160
 msgctxt "SCSTR_CONTENT_DBAREA"
 msgid "Database ranges"
 msgstr "Intervalos de base de datos"
 
 #. kbHfD
-#: sc/inc/strings.hrc:162
+#: sc/inc/strings.hrc:161
 msgctxt "SCSTR_CONTENT_GRAPHIC"
 msgid "Images"
 msgstr "Imágenes"
 
 #. 3imVs
-#: sc/inc/strings.hrc:163
+#: sc/inc/strings.hrc:162
 msgctxt "SCSTR_CONTENT_OLEOBJECT"
 msgid "OLE objects"
 msgstr "Objetos OLE"
 
 #. T28Cj
-#: sc/inc/strings.hrc:164
+#: sc/inc/strings.hrc:163
 msgctxt "SCSTR_CONTENT_NOTE"
 msgid "Comments"
 msgstr "Comentarios"
 
 #. 5UcFo
-#: sc/inc/strings.hrc:165
+#: sc/inc/strings.hrc:164
 msgctxt "SCSTR_CONTENT_AREALINK"
 msgid "Linked areas"
 msgstr "Áreas enlazadas"
 
 #. HzVgF
-#: sc/inc/strings.hrc:166
+#: sc/inc/strings.hrc:165
 msgctxt "SCSTR_CONTENT_DRAWING"
 msgid "Drawing objects"
 msgstr "Objetos de dibujo"
 
 #. sCafb
-#: sc/inc/strings.hrc:167
+#: sc/inc/strings.hrc:166
 msgctxt "SCSTR_ACTIVE"
 msgid "active"
 msgstr "activo"
 
 #. q6EmB
-#: sc/inc/strings.hrc:168
+#: sc/inc/strings.hrc:167
 msgctxt "SCSTR_NOTACTIVE"
 msgid "inactive"
 msgstr "inactivo"
 
 #. Gr6xn
-#: sc/inc/strings.hrc:169
+#: sc/inc/strings.hrc:168
 msgctxt "SCSTR_HIDDEN"
 msgid "hidden"
 msgstr "oculto"
 
 #. vnwQr
-#: sc/inc/strings.hrc:170
+#: sc/inc/strings.hrc:169
 msgctxt "SCSTR_ACTIVEWIN"
 msgid "Active Window"
 msgstr "Ventana activa"
 
 #. yo3cD
-#: sc/inc/strings.hrc:171
+#: sc/inc/strings.hrc:170
 msgctxt "SCSTR_QHLP_SCEN_LISTBOX"
 msgid "Scenario Name"
 msgstr "Nombre de escenario"
 
 #. oWz3B
-#: sc/inc/strings.hrc:172
+#: sc/inc/strings.hrc:171
 msgctxt "SCSTR_QHLP_SCEN_COMMENT"
 msgid "Comment"
 msgstr "Comentario"
 
 #. tNLKD
-#: sc/inc/strings.hrc:174
+#: sc/inc/strings.hrc:173
 msgctxt "STR_MENU_SORT_ASC"
 msgid "Sort Ascending"
 msgstr "Ordenar ascendentemente"
 
 #. S6kbN
-#: sc/inc/strings.hrc:175
+#: sc/inc/strings.hrc:174
 msgctxt "STR_MENU_SORT_DESC"
 msgid "Sort Descending"
 msgstr "Ordenar descendentemente"
 
 #. BDYHo
-#: sc/inc/strings.hrc:176
+#: sc/inc/strings.hrc:175
 msgctxt "STR_MENU_SORT_CUSTOM"
 msgid "Custom Sort"
 msgstr "Orden personalizado"
 
 #. bpBbA
-#: sc/inc/strings.hrc:178
+#: sc/inc/strings.hrc:177
 msgctxt "SCSTR_QHELP_POSWND"
 msgid "Name Box"
 msgstr "Cuadro de nombre"
 
 #. GeNTF
-#: sc/inc/strings.hrc:179
+#: sc/inc/strings.hrc:178
 msgctxt "SCSTR_QHELP_INPUTWND"
 msgid "Input line"
 msgstr "Línea de entrada"
 
 #. E6mnF
-#: sc/inc/strings.hrc:180
+#: sc/inc/strings.hrc:179
 msgctxt "SCSTR_QHELP_BTNCALC"
 msgid "Function Wizard"
 msgstr "Asistente de funciones"
 
 #. rU6xA
-#: sc/inc/strings.hrc:181
+#: sc/inc/strings.hrc:180
 msgctxt "SCSTR_QHELP_BTNOK"
 msgid "Accept"
 msgstr "Aplicar"
 
 #. NC6DB
-#: sc/inc/strings.hrc:182
+#: sc/inc/strings.hrc:181
 msgctxt "SCSTR_QHELP_BTNCANCEL"
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. 9JUCF
-#: sc/inc/strings.hrc:183
+#: sc/inc/strings.hrc:182
 msgctxt "SCSTR_QHELP_BTNSUM"
 msgid "Select Function"
 msgstr "Seleccione una función"
 
 #. kFqE4
-#: sc/inc/strings.hrc:184
+#: sc/inc/strings.hrc:183
 msgctxt "SCSTR_QHELP_BTNEQUAL"
 msgid "Formula"
 msgstr "Fórmula"
 
 #. dPqKq
-#: sc/inc/strings.hrc:185
+#: sc/inc/strings.hrc:184
 msgctxt "SCSTR_QHELP_EXPAND_FORMULA"
 msgid "Expand Formula Bar"
 msgstr "Expandir la barra de fórmulas"
 
 #. ENx2Q
-#: sc/inc/strings.hrc:186
+#: sc/inc/strings.hrc:185
 msgctxt "SCSTR_QHELP_COLLAPSE_FORMULA"
 msgid "Collapse Formula Bar"
 msgstr "Contraer la barra de fórmulas"
 
 #. nSD8r
-#: sc/inc/strings.hrc:188
+#: sc/inc/strings.hrc:187
 msgctxt "STR_UNKNOWN_USER_CONFLICT"
 msgid "Unknown User"
 msgstr "Usuario desconocido"
 
 #. HDiei
-#: sc/inc/strings.hrc:190
+#: sc/inc/strings.hrc:189
 msgctxt "STR_CHG_INSERT_COLS"
 msgid "Column inserted"
 msgstr "Columna insertada"
 
 #. brecA
-#: sc/inc/strings.hrc:191
+#: sc/inc/strings.hrc:190
 msgctxt "STR_CHG_INSERT_ROWS"
 msgid "Row inserted "
 msgstr "Fila insertada "
 
 #. nBf8B
-#: sc/inc/strings.hrc:192
+#: sc/inc/strings.hrc:191
 msgctxt "STR_CHG_INSERT_TABS"
 msgid "Sheet inserted "
 msgstr "Hoja insertada "
 
 #. Td8iF
-#: sc/inc/strings.hrc:193
+#: sc/inc/strings.hrc:192
 msgctxt "STR_CHG_DELETE_COLS"
 msgid "Column deleted"
 msgstr "Columna eliminada"
 
 #. 8Kopo
-#: sc/inc/strings.hrc:194
+#: sc/inc/strings.hrc:193
 msgctxt "STR_CHG_DELETE_ROWS"
 msgid "Row deleted"
 msgstr "Fila eliminada"
 
 #. DynWz
-#: sc/inc/strings.hrc:195
+#: sc/inc/strings.hrc:194
 msgctxt "STR_CHG_DELETE_TABS"
 msgid "Sheet deleted"
 msgstr "Hoja eliminada"
 
 #. 6f9S9
-#: sc/inc/strings.hrc:196
+#: sc/inc/strings.hrc:195
 msgctxt "STR_CHG_MOVE"
 msgid "Range moved"
 msgstr "Intervalo desplazado"
 
 #. UpHkf
-#: sc/inc/strings.hrc:197
+#: sc/inc/strings.hrc:196
 msgctxt "STR_CHG_CONTENT"
 msgid "Changed contents"
 msgstr "Modificación de contenido"
 
 #. cefNw
-#: sc/inc/strings.hrc:198
+#: sc/inc/strings.hrc:197
 msgctxt "STR_CHG_CONTENT_WITH_CHILD"
 msgid "Changed contents"
 msgstr "Modificación de contenido"
 
 #. DcsSq
-#: sc/inc/strings.hrc:199
+#: sc/inc/strings.hrc:198
 msgctxt "STR_CHG_CHILD_CONTENT"
 msgid "Changed to "
 msgstr "Cambiada a "
 
 #. naPuN
-#: sc/inc/strings.hrc:200
+#: sc/inc/strings.hrc:199
 msgctxt "STR_CHG_CHILD_ORGCONTENT"
 msgid "Original"
 msgstr "Original"
 
 #. cbtSw
-#: sc/inc/strings.hrc:201
+#: sc/inc/strings.hrc:200
 msgctxt "STR_CHG_REJECT"
 msgid "Changes rejected"
 msgstr "Cambios rechazados"
 
 #. rGkvk
-#: sc/inc/strings.hrc:202
+#: sc/inc/strings.hrc:201
 msgctxt "STR_CHG_ACCEPTED"
 msgid "Accepted"
 msgstr "Aceptadas"
 
 #. FRREF
-#: sc/inc/strings.hrc:203
+#: sc/inc/strings.hrc:202
 msgctxt "STR_CHG_REJECTED"
 msgid "Rejected"
 msgstr "Rechazadas"
 
 #. bG7Pb
-#: sc/inc/strings.hrc:204
+#: sc/inc/strings.hrc:203
 msgctxt "STR_CHG_NO_ENTRY"
 msgid "No Entry"
 msgstr "Ninguna entrada"
 
 #. i2doZ
-#: sc/inc/strings.hrc:205
+#: sc/inc/strings.hrc:204
 msgctxt "STR_CHG_EMPTY"
 msgid "<empty>"
 msgstr "<vacío>"
 
 #. dAt5Q
-#: sc/inc/strings.hrc:207
+#: sc/inc/strings.hrc:206
 msgctxt "STR_NOT_PROTECTED"
 msgid "Not protected"
 msgstr "No protegido"
 
 #. 3TDDs
-#: sc/inc/strings.hrc:208
+#: sc/inc/strings.hrc:207
 msgctxt "STR_NOT_PASS_PROTECTED"
 msgid "Not password-protected"
 msgstr "No protegido por contraseña"
 
 #. qBe6G
-#: sc/inc/strings.hrc:209
+#: sc/inc/strings.hrc:208
 msgctxt "STR_HASH_BAD"
 msgid "Hash incompatible"
 msgstr "Suma incompatible"
 
 #. XoAEE
-#: sc/inc/strings.hrc:210
+#: sc/inc/strings.hrc:209
 msgctxt "STR_HASH_GOOD"
 msgid "Hash compatible"
 msgstr "Suma compatible"
 
 #. MHDYB
-#: sc/inc/strings.hrc:211
+#: sc/inc/strings.hrc:210
 msgctxt "STR_RETYPE"
 msgid "Re-type"
 msgstr "Reescribir"
 
 #. bFjd9
 #. MovingAverageDialog
-#: sc/inc/strings.hrc:214
+#: sc/inc/strings.hrc:213
 msgctxt "STR_MOVING_AVERAGE_UNDO_NAME"
 msgid "Moving Average"
 msgstr "Media móvil"
 
 #. ZUkPQ
 #. ExponentialSmoothingDialog
-#: sc/inc/strings.hrc:216
+#: sc/inc/strings.hrc:215
 msgctxt "STR_EXPONENTIAL_SMOOTHING_UNDO_NAME"
 msgid "Exponential Smoothing"
 msgstr "Alisamiento exponencial"
 
 #. LAfqT
 #. AnalysisOfVarianceDialog
-#: sc/inc/strings.hrc:218
+#: sc/inc/strings.hrc:217
 msgctxt "STR_ANALYSIS_OF_VARIANCE_UNDO_NAME"
 msgid "Analysis of Variance"
 msgstr "Análisis de varianza"
 
 #. 8v4W5
-#: sc/inc/strings.hrc:219
+#: sc/inc/strings.hrc:218
 msgctxt "STR_LABEL_ANOVA"
 msgid "Analysis of Variance (ANOVA)"
 msgstr "Análisis de varianza (ANOVA)"
 
 #. NY8WD
-#: sc/inc/strings.hrc:220
+#: sc/inc/strings.hrc:219
 msgctxt "STR_ANOVA_SINGLE_FACTOR_LABEL"
 msgid "ANOVA - Single Factor"
 msgstr "ANOVA: factor único"
 
 #. AFnEZ
-#: sc/inc/strings.hrc:221
+#: sc/inc/strings.hrc:220
 msgctxt "STR_ANOVA_TWO_FACTOR_LABEL"
 msgid "ANOVA - Two Factor"
 msgstr "ANOVA: dos factores"
 
 #. hBPGD
-#: sc/inc/strings.hrc:222
+#: sc/inc/strings.hrc:221
 msgctxt "STR_ANOVA_LABEL_GROUPS"
 msgid "Groups"
 msgstr "Grupos"
 
 #. DiUWy
-#: sc/inc/strings.hrc:223
+#: sc/inc/strings.hrc:222
 msgctxt "STR_ANOVA_LABEL_BETWEEN_GROUPS"
 msgid "Between Groups"
 msgstr "Entre grupos"
 
 #. fBh3S
-#: sc/inc/strings.hrc:224
+#: sc/inc/strings.hrc:223
 msgctxt "STR_ANOVA_LABEL_WITHIN_GROUPS"
 msgid "Within Groups"
 msgstr "Dentro de los grupos"
 
 #. DFcw4
-#: sc/inc/strings.hrc:225
+#: sc/inc/strings.hrc:224
 msgctxt "STR_ANOVA_LABEL_SOURCE_OF_VARIATION"
 msgid "Source of Variation"
 msgstr "Origen de variaciones"
 
 #. KYbb8
-#: sc/inc/strings.hrc:226
+#: sc/inc/strings.hrc:225
 msgctxt "STR_ANOVA_LABEL_SS"
 msgid "SS"
 msgstr "SS"
 
 #. j7j6E
-#: sc/inc/strings.hrc:227
+#: sc/inc/strings.hrc:226
 msgctxt "STR_ANOVA_LABEL_DF"
 msgid "df"
 msgstr "df"
 
 #. 6QJED
-#: sc/inc/strings.hrc:228
+#: sc/inc/strings.hrc:227
 msgctxt "STR_ANOVA_LABEL_MS"
 msgid "MS"
 msgstr "MS"
 
 #. JcWo9
-#: sc/inc/strings.hrc:229
+#: sc/inc/strings.hrc:228
 msgctxt "STR_ANOVA_LABEL_F"
 msgid "F"
 msgstr "F"
 
 #. a43mP
-#: sc/inc/strings.hrc:230
+#: sc/inc/strings.hrc:229
 msgctxt "STR_ANOVA_LABEL_SIGNIFICANCE_F"
 msgid "Significance F"
 msgstr "Significatividad F"
 
 #. MMmsS
-#: sc/inc/strings.hrc:231
+#: sc/inc/strings.hrc:230
 msgctxt "STR_ANOVA_LABEL_P_VALUE"
 msgid "P-value"
 msgstr "Valor P"
 
 #. UoaCS
-#: sc/inc/strings.hrc:232
+#: sc/inc/strings.hrc:231
 msgctxt "STR_ANOVA_LABEL_F_CRITICAL"
 msgid "F critical"
 msgstr "F crítico"
 
 #. oJD9H
-#: sc/inc/strings.hrc:233
+#: sc/inc/strings.hrc:232
 msgctxt "STR_ANOVA_LABEL_TOTAL"
 msgid "Total"
 msgstr "Total"
 
 #. kvSFC
 #. CorrelationDialog
-#: sc/inc/strings.hrc:235
+#: sc/inc/strings.hrc:234
 msgctxt "STR_CORRELATION_UNDO_NAME"
 msgid "Correlation"
 msgstr "Correlación"
 
 #. WC4SJ
-#: sc/inc/strings.hrc:236
+#: sc/inc/strings.hrc:235
 msgctxt "STR_CORRELATION_LABEL"
 msgid "Correlations"
 msgstr "Correlaciones"
 
 #. AAb7T
 #. CovarianceDialog
-#: sc/inc/strings.hrc:238
+#: sc/inc/strings.hrc:237
 msgctxt "STR_COVARIANCE_UNDO_NAME"
 msgid "Covariance"
 msgstr "Covarianza"
 
 #. VyxUL
-#: sc/inc/strings.hrc:239
+#: sc/inc/strings.hrc:238
 msgctxt "STR_COVARIANCE_LABEL"
 msgid "Covariances"
 msgstr "Covarianzas"
 
 #. 8gmqu
 #. DescriptiveStatisticsDialog
-#: sc/inc/strings.hrc:241
+#: sc/inc/strings.hrc:240
 msgctxt "STR_DESCRIPTIVE_STATISTICS_UNDO_NAME"
 msgid "Descriptive Statistics"
 msgstr "Estadísticas descriptivas"
 
 #. FGXC5
-#: sc/inc/strings.hrc:242
+#: sc/inc/strings.hrc:241
 msgctxt "STRID_CALC_MEAN"
 msgid "Mean"
 msgstr "Media"
 
 #. 2sHVR
-#: sc/inc/strings.hrc:243
+#: sc/inc/strings.hrc:242
 msgctxt "STRID_CALC_STD_ERROR"
 msgid "Standard Error"
 msgstr "Error estándar"
 
 #. KrDBB
-#: sc/inc/strings.hrc:244
+#: sc/inc/strings.hrc:243
 msgctxt "STRID_CALC_MODE"
 msgid "Mode"
 msgstr "Moda"
 
 #. AAbEo
-#: sc/inc/strings.hrc:245
+#: sc/inc/strings.hrc:244
 msgctxt "STRID_CALC_MEDIAN"
 msgid "Median"
 msgstr "Mediana"
 
 #. h2HaP
-#: sc/inc/strings.hrc:246
+#: sc/inc/strings.hrc:245
 msgctxt "STRID_CALC_VARIANCE"
 msgid "Variance"
 msgstr "Varianza"
 
 #. 3uYMC
-#: sc/inc/strings.hrc:247
+#: sc/inc/strings.hrc:246
 msgctxt "STRID_CALC_STD_DEVIATION"
 msgid "Standard Deviation"
-msgstr "Desviación estándar"
+msgstr "Desviación típica"
 
 #. JTx7f
-#: sc/inc/strings.hrc:248
+#: sc/inc/strings.hrc:247
 msgctxt "STRID_CALC_KURTOSIS"
 msgid "Kurtosis"
 msgstr "Curtosis"
 
 #. EXJJt
-#: sc/inc/strings.hrc:249
+#: sc/inc/strings.hrc:248
 msgctxt "STRID_CALC_SKEWNESS"
 msgid "Skewness"
 msgstr "Asimetría"
 
 #. HkRYo
-#: sc/inc/strings.hrc:250
+#: sc/inc/strings.hrc:249
 msgctxt "STRID_CALC_RANGE"
 msgid "Range"
 msgstr "Intervalo"
 
 #. LHk8p
-#: sc/inc/strings.hrc:251
+#: sc/inc/strings.hrc:250
 msgctxt "STRID_CALC_MIN"
 msgid "Minimum"
 msgstr "Mínimo"
 
 #. LtMJs
-#: sc/inc/strings.hrc:252
+#: sc/inc/strings.hrc:251
 msgctxt "STRID_CALC_MAX"
 msgid "Maximum"
 msgstr "Máximo"
 
 #. Q5r5c
-#: sc/inc/strings.hrc:253
+#: sc/inc/strings.hrc:252
 msgctxt "STRID_CALC_SUM"
 msgid "Sum"
 msgstr "Suma"
 
 #. s8K23
-#: sc/inc/strings.hrc:254
+#: sc/inc/strings.hrc:253
 msgctxt "STRID_CALC_COUNT"
 msgid "Count"
 msgstr "Recuento"
 
 #. pU8QG
-#: sc/inc/strings.hrc:255
+#: sc/inc/strings.hrc:254
 msgctxt "STRID_CALC_FIRST_QUARTILE"
 msgid "First Quartile"
 msgstr "Primer cuartil"
 
 #. PGXzY
-#: sc/inc/strings.hrc:256
+#: sc/inc/strings.hrc:255
 msgctxt "STRID_CALC_THIRD_QUARTILE"
 msgid "Third Quartile"
 msgstr "Tercer cuartil"
 
 #. gABRP
 #. RandomNumberGeneratorDialog
-#: sc/inc/strings.hrc:258
+#: sc/inc/strings.hrc:257
 msgctxt "STR_UNDO_DISTRIBUTION_TEMPLATE"
 msgid "Random ($(DISTRIBUTION))"
 msgstr "Aleatorio ($(DISTRIBUTION))"
 
 #. A8Rc9
-#: sc/inc/strings.hrc:259
+#: sc/inc/strings.hrc:258
 msgctxt "STR_DISTRIBUTION_UNIFORM_REAL"
 msgid "Uniform"
 msgstr "Uniforme"
 
 #. 9ke8L
-#: sc/inc/strings.hrc:260
+#: sc/inc/strings.hrc:259
 msgctxt "STR_DISTRIBUTION_UNIFORM_INTEGER"
 msgid "Uniform Integer"
 msgstr "Entero uniforme"
 
 #. GC2LH
-#: sc/inc/strings.hrc:261
+#: sc/inc/strings.hrc:260
 msgctxt "STR_DISTRIBUTION_NORMAL"
 msgid "Normal"
 msgstr "Normal"
 
 #. XjQ2x
-#: sc/inc/strings.hrc:262
+#: sc/inc/strings.hrc:261
 msgctxt "STR_DISTRIBUTION_CAUCHY"
 msgid "Cauchy"
 msgstr "Cauchy"
 
 #. G5CqB
-#: sc/inc/strings.hrc:263
+#: sc/inc/strings.hrc:262
 msgctxt "STR_DISTRIBUTION_BERNOULLI"
 msgid "Bernoulli"
 msgstr "Bernoulli"
 
 #. GpJUB
-#: sc/inc/strings.hrc:264
+#: sc/inc/strings.hrc:263
 msgctxt "STR_DISTRIBUTION_BINOMIAL"
 msgid "Binomial"
 msgstr "Binómica"
 
 #. 6yJKm
-#: sc/inc/strings.hrc:265
+#: sc/inc/strings.hrc:264
 msgctxt "STR_DISTRIBUTION_NEGATIVE_BINOMIAL"
 msgid "Negative Binomial"
 msgstr "Binómica negativa"
 
 #. zzpmN
-#: sc/inc/strings.hrc:266
+#: sc/inc/strings.hrc:265
 msgctxt "STR_DISTRIBUTION_CHI_SQUARED"
 msgid "Chi Squared"
 msgstr "Ji al cuadrado"
 
 #. NGBzX
-#: sc/inc/strings.hrc:267
+#: sc/inc/strings.hrc:266
 msgctxt "STR_DISTRIBUTION_GEOMETRIC"
 msgid "Geometric"
 msgstr "Geométrica"
 
 #. BNZPE
-#: sc/inc/strings.hrc:268
+#: sc/inc/strings.hrc:267
 msgctxt "STR_RNG_PARAMETER_MINIMUM"
 msgid "Minimum"
 msgstr "Mínimo"
 
 #. EThhi
-#: sc/inc/strings.hrc:269
+#: sc/inc/strings.hrc:268
 msgctxt "STR_RNG_PARAMETER_MAXIMUM"
 msgid "Maximum"
 msgstr "Máximo"
 
 #. RPYEG
-#: sc/inc/strings.hrc:270
+#: sc/inc/strings.hrc:269
 msgctxt "STR_RNG_PARAMETER_MEAN"
 msgid "Mean"
 msgstr "Media"
 
 #. VeqrX
-#: sc/inc/strings.hrc:271
+#: sc/inc/strings.hrc:270
 msgctxt "STR_RNG_PARAMETER_STANDARD_DEVIATION"
 msgid "Standard Deviation"
-msgstr "Desviación estándar"
+msgstr "Desviación típica"
 
 #. ChwWE
-#: sc/inc/strings.hrc:272
+#: sc/inc/strings.hrc:271
 msgctxt "STR_RNG_PARAMETER_STANDARD_MEDIAN"
 msgid "Median"
 msgstr "Mediana"
 
 #. SzgEb
-#: sc/inc/strings.hrc:273
+#: sc/inc/strings.hrc:272
 msgctxt "STR_RNG_PARAMETER_STANDARD_SIGMA"
 msgid "Sigma"
 msgstr "Sigma"
 
 #. 94TBK
-#: sc/inc/strings.hrc:274
+#: sc/inc/strings.hrc:273
 msgctxt "STR_RNG_PARAMETER_STANDARD_PROBABILITY"
 msgid "p Value"
 msgstr "Valor p"
 
 #. AfUsB
-#: sc/inc/strings.hrc:275
+#: sc/inc/strings.hrc:274
 msgctxt "STR_RNG_PARAMETER_STANDARD_NUMBER_OF_TRIALS"
 msgid "Number of Trials"
 msgstr "N.º de intentos"
 
 #. DdfR6
-#: sc/inc/strings.hrc:276
+#: sc/inc/strings.hrc:275
 msgctxt "STR_RNG_PARAMETER_STANDARD_NU_VALUE"
 msgid "nu Value"
 msgstr "Valor nu"
 
 #. gygpC
 #. SamplingDialog
-#: sc/inc/strings.hrc:278
+#: sc/inc/strings.hrc:277
 msgctxt "STR_SAMPLING_UNDO_NAME"
 msgid "Sampling"
 msgstr "Muestreo"
 
 #. zLuBp
 #. Names of dialogs
-#: sc/inc/strings.hrc:280
+#: sc/inc/strings.hrc:279
 msgctxt "STR_FTEST"
 msgid "F-test"
 msgstr "Prueba F"
 
 #. bQEfv
-#: sc/inc/strings.hrc:281
+#: sc/inc/strings.hrc:280
 msgctxt "STR_FTEST_UNDO_NAME"
 msgid "F-test"
 msgstr "Prueba F"
 
 #. UdsVZ
-#: sc/inc/strings.hrc:282
+#: sc/inc/strings.hrc:281
 msgctxt "STR_TTEST"
 msgid "Paired t-test"
 msgstr "Prueba t pareada"
 
 #. A7xTa
-#: sc/inc/strings.hrc:283
+#: sc/inc/strings.hrc:282
 msgctxt "STR_TTEST_UNDO_NAME"
 msgid "Paired t-test"
 msgstr "Prueba t pareada"
 
 #. dWPSe
-#: sc/inc/strings.hrc:284
+#: sc/inc/strings.hrc:283
 msgctxt "STR_ZTEST"
 msgid "z-test"
 msgstr "Prueba z"
 
 #. QvZ7V
-#: sc/inc/strings.hrc:285
+#: sc/inc/strings.hrc:284
 msgctxt "STR_ZTEST_UNDO_NAME"
 msgid "z-test"
 msgstr "Prueba z"
 
 #. D6AqL
-#: sc/inc/strings.hrc:286
+#: sc/inc/strings.hrc:285
 msgctxt "STR_CHI_SQUARE_TEST"
 msgid "Test of Independence (Chi-Square)"
 msgstr "Prueba de independencia (ji al cuadrado)"
 
 #. PvFSb
-#: sc/inc/strings.hrc:287
+#: sc/inc/strings.hrc:286
 msgctxt "STR_REGRESSION_UNDO_NAME"
 msgid "Regression"
 msgstr "Regresión"
 
 #. NXrYh
-#: sc/inc/strings.hrc:288
+#: sc/inc/strings.hrc:287
 msgctxt "STR_REGRESSION"
 msgid "Regression"
 msgstr "Regresión"
 
 #. AM5WV
-#: sc/inc/strings.hrc:289
+#: sc/inc/strings.hrc:288
 msgctxt "STR_FOURIER_ANALYSIS_UNDO_NAME"
 msgid "Fourier Analysis"
 msgstr "Análisis de Fourier"
 
 #. hd6yJ
-#: sc/inc/strings.hrc:290
+#: sc/inc/strings.hrc:289
 msgctxt "STR_FOURIER_ANALYSIS"
 msgid "Fourier Analysis"
 msgstr "Análisis de Fourier"
 
 #. KNJ5s
 #. Common
-#: sc/inc/strings.hrc:292
+#: sc/inc/strings.hrc:291
 msgctxt "STR_COLUMN_LABEL_TEMPLATE"
 msgid "Column %NUMBER%"
 msgstr "Columna %NUMBER%"
 
 #. aTAGd
-#: sc/inc/strings.hrc:293
+#: sc/inc/strings.hrc:292
 msgctxt "STR_ROW_LABEL_TEMPLATE"
 msgid "Row %NUMBER%"
 msgstr "Fila %NUMBER%"
 
 #. nAbaC
-#: sc/inc/strings.hrc:294
+#: sc/inc/strings.hrc:293
 msgctxt "STR_LABEL_ALPHA"
 msgid "Alpha"
 msgstr "Alfa"
 
 #. FZZCu
-#: sc/inc/strings.hrc:295
+#: sc/inc/strings.hrc:294
 msgctxt "STR_VARIABLE_1_LABEL"
 msgid "Variable 1"
 msgstr "Variable 1"
 
 #. pnyaa
-#: sc/inc/strings.hrc:296
+#: sc/inc/strings.hrc:295
 msgctxt "STR_VARIABLE_2_LABEL"
 msgid "Variable 2"
 msgstr "Variable 2"
 
 #. LU4CC
-#: sc/inc/strings.hrc:297
+#: sc/inc/strings.hrc:296
 msgctxt "STR_HYPOTHESIZED_MEAN_DIFFERENCE_LABEL"
 msgid "Hypothesized Mean Difference"
 msgstr "Diferencia de media hipotética"
 
 #. sCNt9
-#: sc/inc/strings.hrc:298
+#: sc/inc/strings.hrc:297
 msgctxt "STR_OBSERVATIONS_LABEL"
 msgid "Observations"
 msgstr "Observaciones"
 
 #. arX5v
-#: sc/inc/strings.hrc:299
+#: sc/inc/strings.hrc:298
 msgctxt "STR_OBSERVED_MEAN_DIFFERENCE_LABEL"
 msgid "Observed Mean Difference"
 msgstr "Diferencia de media observada"
 
 #. dr3Gt
-#: sc/inc/strings.hrc:300
+#: sc/inc/strings.hrc:299
 msgctxt "STR_LABEL_RSQUARED"
 msgid "R^2"
 msgstr "R²"
 
 #. pnhCA
-#: sc/inc/strings.hrc:301
+#: sc/inc/strings.hrc:300
 msgctxt "STR_LABEL_ADJUSTED_RSQUARED"
 msgid "Adjusted R^2"
 msgstr "R² ajustado"
 
 #. ACsNA
-#: sc/inc/strings.hrc:302
+#: sc/inc/strings.hrc:301
 msgctxt "STR_LABEL_XVARIABLES_COUNT"
 msgid "Count of X variables"
 msgstr "Recuento de variables X"
 
 #. kEPsb
-#: sc/inc/strings.hrc:303
+#: sc/inc/strings.hrc:302
 msgctxt "STR_DEGREES_OF_FREEDOM_LABEL"
 msgid "df"
 msgstr "df"
 
 #. FYUYT
-#: sc/inc/strings.hrc:304
+#: sc/inc/strings.hrc:303
 msgctxt "STR_P_VALUE_LABEL"
 msgid "P-value"
 msgstr "Valor P"
 
 #. S3BHc
-#: sc/inc/strings.hrc:305
+#: sc/inc/strings.hrc:304
 msgctxt "STR_CRITICAL_VALUE_LABEL"
 msgid "Critical Value"
 msgstr "Valor crítico"
 
 #. wgpT3
-#: sc/inc/strings.hrc:306
+#: sc/inc/strings.hrc:305
 msgctxt "STR_TEST_STATISTIC_LABEL"
 msgid "Test Statistic"
 msgstr "Estadística de prueba"
 
 #. kTwBX
-#: sc/inc/strings.hrc:307
+#: sc/inc/strings.hrc:306
 msgctxt "STR_LABEL_LOWER"
 msgid "Lower"
 msgstr "Inferior"
 
 #. GgFPs
-#: sc/inc/strings.hrc:308
+#: sc/inc/strings.hrc:307
 msgctxt "STR_LABEL_Upper"
 msgid "Upper"
 msgstr "Superior"
 
 #. hkXzo
-#: sc/inc/strings.hrc:309
+#: sc/inc/strings.hrc:308
 msgctxt "STR_MESSAGE_INVALID_INPUT_RANGE"
 msgid "Input range is invalid."
 msgstr "El intervalo de entrada no es válido."
 
 #. rTFFF
-#: sc/inc/strings.hrc:310
+#: sc/inc/strings.hrc:309
 msgctxt "STR_MESSAGE_INVALID_OUTPUT_ADDR"
 msgid "Output address is not valid."
 msgstr "La dirección de salida no es válida."
 
 #. rtSox
 #. RegressionDialog
-#: sc/inc/strings.hrc:312
+#: sc/inc/strings.hrc:311
 msgctxt "STR_LABEL_LINEAR"
 msgid "Linear"
 msgstr "Lineal"
 
 #. kVG6g
-#: sc/inc/strings.hrc:313
+#: sc/inc/strings.hrc:312
 msgctxt "STR_LABEL_LOGARITHMIC"
 msgid "Logarithmic"
 msgstr "Logarítmica"
 
 #. wmyFW
-#: sc/inc/strings.hrc:314
+#: sc/inc/strings.hrc:313
 msgctxt "STR_LABEL_POWER"
 msgid "Power"
 msgstr "Potencia"
 
 #. GabFM
-#: sc/inc/strings.hrc:315
+#: sc/inc/strings.hrc:314
 msgctxt "STR_MESSAGE_XINVALID_RANGE"
 msgid "Independent variable(s) range is not valid."
 msgstr "El intervalo de variables independientes no es válido."
 
 #. 8x8DM
-#: sc/inc/strings.hrc:316
+#: sc/inc/strings.hrc:315
 msgctxt "STR_MESSAGE_YINVALID_RANGE"
 msgid "Dependent variable(s) range is not valid."
 msgstr "El intervalo de variables dependientes no es válido."
 
 #. E7BD2
-#: sc/inc/strings.hrc:317
+#: sc/inc/strings.hrc:316
 msgctxt "STR_MESSAGE_INVALID_CONFIDENCE_LEVEL"
 msgid "Confidence level must be in the interval (0, 1)."
 msgstr "El nivel de confianza debe estar en el intervalo (0, 1)."
 
 #. ZdyQs
-#: sc/inc/strings.hrc:318
+#: sc/inc/strings.hrc:317
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_COLUMN"
 msgid "Y variable range cannot have more than 1 column."
 msgstr "El intervalo de la variable Y no puede tener más de una columna."
 
 #. UpZqC
-#: sc/inc/strings.hrc:319
+#: sc/inc/strings.hrc:318
 msgctxt "STR_MESSAGE_YVARIABLE_MULTI_ROW"
 msgid "Y variable range cannot have more than 1 row."
 msgstr "El intervalo de la variable Y no puede tener más de una fila."
 
 #. DrsBe
-#: sc/inc/strings.hrc:320
+#: sc/inc/strings.hrc:319
 msgctxt "STR_MESSAGE_UNIVARIATE_NUMOBS_MISMATCH"
 msgid "Univariate regression : The observation count in X and Y must match."
 msgstr "Regresión univariante: la cantidad de observaciones de X y la de Y deben coincidir."
 
 #. KuttF
-#: sc/inc/strings.hrc:321
+#: sc/inc/strings.hrc:320
 msgctxt "STR_MESSAGE_MULTIVARIATE_NUMOBS_MISMATCH"
 msgid "Multivariate regression : The observation count in X and Y must match."
 msgstr "Regresión multivariante: la cantidad de observaciones de X y la de Y deben coincidir."
 
 #. 6Cghz
-#: sc/inc/strings.hrc:322
+#: sc/inc/strings.hrc:321
 msgctxt "STR_LABEL_REGRESSION_MODEL"
 msgid "Regression Model"
 msgstr "Modelo de regresión"
 
 #. bmR5w
-#: sc/inc/strings.hrc:323
+#: sc/inc/strings.hrc:322
 msgctxt "STR_LABEL_REGRESSION_STATISTICS"
 msgid "Regression Statistics"
 msgstr "Estadísticas de regresión"
 
 #. RNHCx
-#: sc/inc/strings.hrc:324
+#: sc/inc/strings.hrc:323
 msgctxt "STR_LABEL_RESIDUAL"
 msgid "Residual"
 msgstr "Residuo"
 
 #. 4DANj
-#: sc/inc/strings.hrc:325
+#: sc/inc/strings.hrc:324
 msgctxt "STR_LABEL_CONFIDENCE_LEVEL"
 msgid "Confidence level"
 msgstr "Nivel de confianza"
 
 #. 9LhbX
-#: sc/inc/strings.hrc:326
+#: sc/inc/strings.hrc:325
 msgctxt "STR_LABEL_COEFFICIENTS"
 msgid "Coefficients"
 msgstr "Coeficientes"
 
 #. nyH7s
-#: sc/inc/strings.hrc:327
+#: sc/inc/strings.hrc:326
 msgctxt "STR_LABEL_TSTATISTIC"
 msgid "t-Statistic"
 msgstr "Estadística t"
 
 #. PGno2
-#: sc/inc/strings.hrc:328
+#: sc/inc/strings.hrc:327
 msgctxt "STR_LABEL_INTERCEPT"
 msgid "Intercept"
 msgstr "Intersección"
 
 #. oa4Cm
-#: sc/inc/strings.hrc:329
+#: sc/inc/strings.hrc:328
 msgctxt "STR_LABEL_PREDICTEDY"
 msgid "Predicted Y"
 msgstr "Y predicho"
 
 #. QFEjs
-#: sc/inc/strings.hrc:330
+#: sc/inc/strings.hrc:329
 msgctxt "STR_LINEST_RAW_OUTPUT_TITLE"
 msgid "LINEST raw output"
 msgstr "Salida bruta de ESTIMACION.LINEAL"
 
 #. bk7FH
 #. F Test
-#: sc/inc/strings.hrc:332
+#: sc/inc/strings.hrc:331
 msgctxt "STR_FTEST_P_RIGHT_TAIL"
 msgid "P (F<=f) right-tail"
 msgstr "P (F<=f) lateral derecha"
 
 #. CkHJw
-#: sc/inc/strings.hrc:333
+#: sc/inc/strings.hrc:332
 msgctxt "STR_FTEST_F_CRITICAL_RIGHT_TAIL"
 msgid "F Critical right-tail"
 msgstr "F crítica, lateral derecha"
 
 #. J7yMZ
-#: sc/inc/strings.hrc:334
+#: sc/inc/strings.hrc:333
 msgctxt "STR_FTEST_P_LEFT_TAIL"
 msgid "P (F<=f) left-tail"
 msgstr "P (F<=f) lateral izquierda"
 
 #. R3BNC
-#: sc/inc/strings.hrc:335
+#: sc/inc/strings.hrc:334
 msgctxt "STR_FTEST_F_CRITICAL_LEFT_TAIL"
 msgid "F Critical left-tail"
 msgstr "F crítica, lateral izquierda"
 
 #. Bve5D
-#: sc/inc/strings.hrc:336
+#: sc/inc/strings.hrc:335
 msgctxt "STR_FTEST_P_TWO_TAIL"
 msgid "P two-tail"
 msgstr "P bilateral"
 
 #. 4YZrT
-#: sc/inc/strings.hrc:337
+#: sc/inc/strings.hrc:336
 msgctxt "STR_FTEST_F_CRITICAL_TWO_TAIL"
 msgid "F Critical two-tail"
 msgstr "F crítica bilateral"
 
 #. qaf4N
 #. t Test
-#: sc/inc/strings.hrc:339
+#: sc/inc/strings.hrc:338
 msgctxt "STR_TTEST_PEARSON_CORRELATION"
 msgid "Pearson Correlation"
 msgstr "Correlación de Pearson"
 
 #. C6BU8
-#: sc/inc/strings.hrc:340
+#: sc/inc/strings.hrc:339
 msgctxt "STR_TTEST_VARIANCE_OF_THE_DIFFERENCES"
 msgid "Variance of the Differences"
 msgstr "Varianza de las diferencias"
 
 #. j8NuP
-#: sc/inc/strings.hrc:341
+#: sc/inc/strings.hrc:340
 msgctxt "STR_TTEST_T_STAT"
 msgid "t Stat"
 msgstr "Estadística t"
 
 #. bKoeX
-#: sc/inc/strings.hrc:342
+#: sc/inc/strings.hrc:341
 msgctxt "STR_TTEST_P_ONE_TAIL"
 msgid "P (T<=t) one-tail"
 msgstr "P (T<=t) unilateral"
 
 #. dub8R
-#: sc/inc/strings.hrc:343
+#: sc/inc/strings.hrc:342
 msgctxt "STR_TTEST_T_CRITICAL_ONE_TAIL"
 msgid "t Critical one-tail"
 msgstr "t crítica unilateral"
 
 #. FrDDz
-#: sc/inc/strings.hrc:344
+#: sc/inc/strings.hrc:343
 msgctxt "STR_TTEST_P_TWO_TAIL"
 msgid "P (T<=t) two-tail"
 msgstr "P (T<=t) bilateral"
 
 #. RQqAd
-#: sc/inc/strings.hrc:345
+#: sc/inc/strings.hrc:344
 msgctxt "STR_TTEST_T_CRITICAL_TWO_TAIL"
 msgid "t Critical two-tail"
 msgstr "t crítica bilateral"
 
 #. kDCsZ
 #. Z Test
-#: sc/inc/strings.hrc:347
+#: sc/inc/strings.hrc:346
 msgctxt "STR_ZTEST_Z_VALUE"
 msgid "z"
 msgstr "z"
 
 #. CF8D5
-#: sc/inc/strings.hrc:348
+#: sc/inc/strings.hrc:347
 msgctxt "STR_ZTEST_KNOWN_VARIANCE"
 msgid "Known Variance"
 msgstr "Varianza conocida"
 
 #. cYWDr
-#: sc/inc/strings.hrc:349
+#: sc/inc/strings.hrc:348
 msgctxt "STR_ZTEST_P_ONE_TAIL"
 msgid "P (Z<=z) one-tail"
 msgstr "P (Z<=z) unilateral"
 
 #. DmEVf
-#: sc/inc/strings.hrc:350
+#: sc/inc/strings.hrc:349
 msgctxt "STR_ZTEST_Z_CRITICAL_ONE_TAIL"
 msgid "z Critical one-tail"
 msgstr "z crítica unilateral"
 
 #. G8PeP
-#: sc/inc/strings.hrc:351
+#: sc/inc/strings.hrc:350
 msgctxt "STR_ZTEST_P_TWO_TAIL"
 msgid "P (Z<=z) two-tail"
 msgstr "P (Z<=z) bilateral"
 
 #. rGBfK
-#: sc/inc/strings.hrc:352
+#: sc/inc/strings.hrc:351
 msgctxt "STR_ZTEST_Z_CRITICAL_TWO_TAIL"
 msgid "z Critical two-tail"
 msgstr "z crítica bilateral"
 
 #. mCsCB
 #. Fourier Analysis
-#: sc/inc/strings.hrc:354
+#: sc/inc/strings.hrc:353
 msgctxt "STR_FOURIER_TRANSFORM"
 msgid "Fourier Transform"
 msgstr "Transformada de Fourier"
 
 #. sc3hp
-#: sc/inc/strings.hrc:355
+#: sc/inc/strings.hrc:354
 msgctxt "STR_INVERSE_FOURIER_TRANSFORM"
 msgid "Inverse Fourier Transform"
 msgstr "Transformada de Fourier inversa"
 
 #. AtC94
-#: sc/inc/strings.hrc:356
+#: sc/inc/strings.hrc:355
 msgctxt "STR_REAL_PART"
 msgid "Real"
 msgstr "Real"
 
 #. SoyPr
-#: sc/inc/strings.hrc:357
+#: sc/inc/strings.hrc:356
 msgctxt "STR_IMAGINARY_PART"
 msgid "Imaginary"
 msgstr "Imaginaria"
 
 #. ymnyT
-#: sc/inc/strings.hrc:358
+#: sc/inc/strings.hrc:357
 msgctxt "STR_MAGNITUDE_PART"
 msgid "Magnitude"
 msgstr "Magnitud"
 
 #. NGmmD
-#: sc/inc/strings.hrc:359
+#: sc/inc/strings.hrc:358
 msgctxt "STR_PHASE_PART"
 msgid "Phase"
 msgstr "Fase"
 
 #. E7Eez
-#: sc/inc/strings.hrc:360
+#: sc/inc/strings.hrc:359
 msgctxt "STR_MESSAGE_INVALID_NUMCOLS"
 msgid "More than two columns selected in grouped by column mode."
 msgstr "Se seleccionaron más de dos columnas en el modo de agrupación por columnas."
 
 #. wF2RV
-#: sc/inc/strings.hrc:361
+#: sc/inc/strings.hrc:360
 msgctxt "STR_MESSAGE_INVALID_NUMROWS"
 msgid "More than two rows selected in grouped by row mode."
 msgstr "Se seleccionaron más de dos filas en el modo de agrupación por filas."
 
 #. DRbrH
-#: sc/inc/strings.hrc:362
+#: sc/inc/strings.hrc:361
 msgctxt "STR_MESSAGE_NODATA_IN_RANGE"
 msgid "No data in input range."
 msgstr "No hay datos en el intervalo de entrada."
 
 #. gjC2w
-#: sc/inc/strings.hrc:363
+#: sc/inc/strings.hrc:362
 msgctxt "STR_MESSAGE_OUTPUT_TOO_LONG"
 msgid "Output is too long to write into the sheet."
 msgstr "La salida es demasiado larga para guardarla en la hoja."
 
 #. SnGyL
-#: sc/inc/strings.hrc:364
+#: sc/inc/strings.hrc:363
 msgctxt "STR_INPUT_DATA_RANGE"
 msgid "Input data range"
 msgstr "Intervalo de datos de entrada"
 
 #. EaQGL
 #. infobar for allowing links to update or not
-#: sc/inc/strings.hrc:366
+#: sc/inc/strings.hrc:365
 msgctxt "STR_ENABLE_CONTENT"
 msgid "Allow updating"
 msgstr "Permitir actualización"
 
 #. aJDFG
 #. tooltip for the "Allow updating" infobar button
-#: sc/inc/strings.hrc:368
+#: sc/inc/strings.hrc:367
 msgctxt "STR_ENABLE_CONTENT_TOOLTIP"
 msgid "Only allow updating if you trust this document."
 msgstr "Solo permita actualizar si confía en este documento."
 
 #. w5Gd7
 #. Insert image dialog
-#: sc/inc/strings.hrc:370
+#: sc/inc/strings.hrc:369
 msgctxt "STR_ANCHOR_TO_CELL"
 msgid "To cell"
 msgstr "A la celda"
 
 #. itvXY
-#: sc/inc/strings.hrc:371
+#: sc/inc/strings.hrc:370
 msgctxt "STR_ANCHOR_TO_CELL_RESIZE"
 msgid "To cell (resize with cell)"
 msgstr "A la celda (redimensionar con la celda)"
 
 #. P8vG7
-#: sc/inc/strings.hrc:372
+#: sc/inc/strings.hrc:371
 msgctxt "STR_ANCHOR_TO_PAGE"
 msgid "To page"
 msgstr "A la página"
 
 #. SSc6B
-#: sc/inc/strings.hrc:374
+#: sc/inc/strings.hrc:373
 msgctxt "sharedocumentdlg|nouserdata"
 msgid "No user data available."
 msgstr "No hay datos de usuario disponibles."
 
 #. FFnfu
-#: sc/inc/strings.hrc:375
+#: sc/inc/strings.hrc:374
 msgctxt "sharedocumentdlg|exclusive"
 msgid "(exclusive access)"
 msgstr "(acceso exclusivo)"
 
 #. hitQA
-#: sc/inc/strings.hrc:376
+#: sc/inc/strings.hrc:375
 msgctxt "STR_NO_NAMED_RANGES_AVAILABLE"
 msgid "No named ranges available in the selected document"
 msgstr "No hay intervalos con nombre en el documento seleccionado"
 
 #. hnAZx
-#: sc/inc/strings.hrc:377
+#: sc/inc/strings.hrc:376
 msgctxt "STR_BORDER_HAIRLINE"
 msgid "Hairline (%s pt)"
 msgstr "Finísimo (%s pt)"
 
 #. E9Dhi
-#: sc/inc/strings.hrc:378
+#: sc/inc/strings.hrc:377
 msgctxt "STR_BORDER_VERY_THIN"
 msgid "Very thin (%s pt)"
 msgstr "Muy fino (%s pt)"
 
 #. KGVAw
-#: sc/inc/strings.hrc:379
+#: sc/inc/strings.hrc:378
 msgctxt "STR_BORDER_THIN"
 msgid "Thin (%s pt)"
 msgstr "Fino (%s pt)"
 
 #. V6PRY
-#: sc/inc/strings.hrc:380
+#: sc/inc/strings.hrc:379
 msgctxt "STR_BORDER_MEDIUM"
 msgid "Medium (%s pt)"
 msgstr "Mediano (%s pt)"
 
 #. GyeKi
-#: sc/inc/strings.hrc:381
+#: sc/inc/strings.hrc:380
 msgctxt "STR_BORDER_THICK"
 msgid "Thick (%s pt)"
 msgstr "Grueso (%s pt)"
 
 #. QvEAB
-#: sc/inc/strings.hrc:382
+#: sc/inc/strings.hrc:381
 msgctxt "STR_BORDER_EXTRA_THICK"
 msgid "Extra thick (%s pt)"
 msgstr "Muy grueso (%s pt)"
 
 #. v9kkb
-#: sc/inc/strings.hrc:383
+#: sc/inc/strings.hrc:382
 msgctxt "STR_BORDER_DOUBLE_1"
 msgid "Double Hairline (%s pt)"
 msgstr "Finísimo doble (%s pt)"
 
 #. KzKEy
-#: sc/inc/strings.hrc:384
+#: sc/inc/strings.hrc:383
 msgctxt "STR_BORDER_DOUBLE_2"
 msgid "Thin/Medium (%s pt)"
 msgstr "Fino/mediano (%s pt)"
 
 #. HD8tG
-#: sc/inc/strings.hrc:385
+#: sc/inc/strings.hrc:384
 msgctxt "STR_BORDER_DOUBLE_3"
 msgid "Medium/Hairline (%s pt)"
 msgstr "Mediano/finísimo (%s pt)"
 
 #. ygGcU
-#: sc/inc/strings.hrc:386
+#: sc/inc/strings.hrc:385
 msgctxt "STR_BORDER_DOUBLE_4"
 msgid "Medium/Medium (%s pt)"
 msgstr "Mediano/mediano (%s pt)"
@@ -18586,19 +18580,19 @@ msgstr "Mediano/mediano (%s pt)"
 #. z9YGZ
 #. accessibility descriptions that use %PRODUCTNAME, we set these explicitly because querying a11y descs
 #. in order to change %PRODUCTNAME at runtime is expensive, so limit doing that as much as possible.
-#: sc/inc/strings.hrc:390
+#: sc/inc/strings.hrc:389
 msgctxt "sortoptionspage|extended_tip|sortuserlb"
 msgid "Select the custom sort order that you want to apply. To define a custom sort order, choose Tools - Options - %PRODUCTNAME Calc - Sort Lists."
 msgstr ""
 
 #. T5A7R
-#: sc/inc/strings.hrc:391
+#: sc/inc/strings.hrc:390
 msgctxt "subtotaloptionspage|extended_tip|lbuserdef"
 msgid "Uses a custom sorting order that you defined in the Options dialog box at %PRODUCTNAME Calc - Sort Lists."
 msgstr ""
 
 #. gbz6Y
-#: sc/inc/strings.hrc:392
+#: sc/inc/strings.hrc:391
 msgctxt "extended_tip|annot"
 msgid "Specifies that a small rectangle in the top right corner of the cell indicates that a comment exists. The comment will be shown only when you enable tips under %PRODUCTNAME - General in the Options dialog box."
 msgstr "Especifica que se indique la existencia de un comentario mediante un pequeño rectángulo en la esquina superior derecha de la celda. El comentario solo se mostrará cuando se activen las descripciones en %PRODUCTNAME ▸ General en el cuadro de diálogo Opciones."
@@ -19318,37 +19312,37 @@ msgstr ""
 "Seleccione «Proteger hoja» en el menú «Herramientas»."
 
 #. bVREg
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:118
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:121
 msgctxt "cellprotectionpage|LabelProtection"
 msgid "Protection"
 msgstr "Protección"
 
 #. A5DFp
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:148
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:151
 msgctxt "cellprotectionpage|checkHidePrinting"
 msgid "Hide _when printing"
 msgstr "_Ocultar para la impresión"
 
 #. ZosAc
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:157
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:160
 msgctxt "cellprotectionpage|extended_tip|checkHidePrinting"
 msgid "Keeps the selected cells from being printed."
 msgstr "Impide que se impriman las celdas seleccionadas."
 
 #. QqUqE
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:172
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:175
 msgctxt "cellprotectionpage|label4"
 msgid "The cells selected will be omitted when printing."
 msgstr "Las celdas seleccionadas no se imprimirán."
 
 #. 8RuyP
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:188
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:194
 msgctxt "cellprotectionpage|label3"
 msgid "Print"
 msgstr "Imprimir"
 
 #. DPWp6
-#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:202
+#: sc/uiconfig/scalc/ui/cellprotectionpage.ui:208
 msgctxt "cellprotectionpage|extended_tip|CellProtectionPage"
 msgid "Defines protection options for selected cells."
 msgstr "Define las opciones de protección para las celdas seleccionadas."
@@ -20485,13 +20479,13 @@ msgstr "Muestra las áreas de celdas que se desea consolidar."
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:238
 msgctxt "consolidatedialog|extended_tip|lbdataarea"
 msgid "Specifies the cell range that you want to consolidate with the cell ranges listed in the Consolidation ranges box. Select a cell range in a sheet, and then click Add. You can also select the name of a predefined cell from the Source data range list."
-msgstr ""
+msgstr "Especifica el intervalo de celdas que desea consolidar con los intervalos de celdas enumerados en el cuadro Intervalos de consolidación. Seleccione un intervalo de celdas en una hoja y, a continuación, pulse en Añadir. También puede seleccionar el nombre de una celda predefinida de la lista Intervalo de datos de origen."
 
 #. 6x7He
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:257
 msgctxt "consolidatedialog|extended_tip|eddataarea"
 msgid "Specifies the cell range that you want to consolidate with the cell ranges listed in the Consolidation ranges box. Select a cell range in a sheet, and then click Add. You can also select the name of a predefined cell from the Source data range list."
-msgstr ""
+msgstr "Especifica el intervalo de celdas que desea consolidar con los intervalos de celdas enumerados en el cuadro Intervalos de consolidación. Seleccione un intervalo de celdas en una hoja y, a continuación, pulse en Añadir. También puede seleccionar el nombre de una celda predefinida de la lista Intervalo de datos de origen."
 
 #. N6jCs
 #: sc/uiconfig/scalc/ui/consolidatedialog.ui:276
@@ -21496,85 +21490,85 @@ msgid "Data Entry Form is a tool to make table data entry easy in spreadsheets."
 msgstr ""
 
 #. 6DQYr
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:25
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:22
 msgctxt "dataproviderdlg/okaybtn"
 msgid "Okay"
 msgstr "Aceptar"
 
 #. Ah2h8
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:38
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:35
 msgctxt "dataproviderdlg/cancelbtn"
 msgid "Cancel"
 msgstr "Cancelar"
 
 #. a7EFA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:88
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:86
 msgctxt "dataproviderdlg|db_name"
 msgid "Database Range:"
 msgstr "Intervalo de base de datos:"
 
 #. pSQ4F
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:113
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:111
 msgctxt "dataproviderdlg/provider"
 msgid "Data Provider:"
 msgstr "Proveedor de datos:"
 
 #. RGiXi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:138
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:136
 msgctxt "dataproviderdlg/url"
 msgid "URL:"
 msgstr "URL:"
 
 #. GKDQA
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:161
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:159
 msgctxt "dataproviderdlg/browse_btn"
 msgid "Browse"
 msgstr "Examinar"
 
 #. GABzG
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:175
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:173
 msgctxt "dataproviderdlg/id"
 msgid "Id / Xpath:"
 msgstr "Identificación/Xpath:"
 
 #. pwS4k
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:203
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:201
 msgctxt "dataproviderdlg/lbSource"
 msgid "Source"
 msgstr "Origen"
 
 #. fHfGq
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:237
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:236
 msgctxt "dataproviderdlg/transformation_add"
 msgid "Add"
 msgstr "Añadir"
 
 #. Smoiv
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:241
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:240
 msgctxt "dataproviderdlg/AddTransformation_tooltip"
 msgid "Add Transformations"
 msgstr "Añadir transformaciones"
 
 #. cSgeU
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:297
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:296
 msgctxt "dataproviderdlg/transformation"
 msgid "Transformations"
 msgstr "Transformaciones"
 
 #. gpeXB
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:353
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:352
 msgctxt "dataproviderdlg/apply"
 msgid "Apply"
 msgstr "Aplicar"
 
 #. bDVwi
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:357
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:356
 msgctxt "dataproviderdlg/apply_tooltiptext"
 msgid "Apply Changes"
 msgstr "Aplicar cambios"
 
 #. 6pCFs
-#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:376
+#: sc/uiconfig/scalc/ui/dataproviderdlg.ui:375
 msgctxt "dataproviderdlg/preview"
 msgid "Preview"
 msgstr "Previsualización"
@@ -22627,7 +22621,7 @@ msgstr "Escriba el URL del documento de origen en el sistema de archivos local o
 #: sc/uiconfig/scalc/ui/externaldata.ui:136
 msgctxt "externaldata|extended_tip|url"
 msgid "Enter the URL or the file name that contains the data that you want to insert, and then press Enter."
-msgstr ""
+msgstr "Introduzca el URL o el nombre del archivo que contenga los datos que quiere insertar y, a continuación, presione Intro."
 
 #. 2sbsJ
 #: sc/uiconfig/scalc/ui/externaldata.ui:148
@@ -22912,25 +22906,25 @@ msgid "Remove row"
 msgstr "Quitar fila"
 
 #. cd5X5
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:150
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:158
 msgctxt "filterdropdown|STR_EDIT_SEARCH_ITEMS"
 msgid "Search items..."
 msgstr "Buscar elementos…"
 
 #. zKwWE
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:184
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:192
 msgctxt "filterdropdown|STR_BTN_TOGGLE_ALL"
 msgid "All"
 msgstr "Todo"
 
 #. JsSz6
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:203
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:211
 msgctxt "filterdropdown|STR_BTN_SELECT_CURRENT"
 msgid "Show only the current item."
 msgstr "Mostrar solo el elemento actual."
 
 #. vBQYB
-#: sc/uiconfig/scalc/ui/filterdropdown.ui:218
+#: sc/uiconfig/scalc/ui/filterdropdown.ui:226
 msgctxt "filterdropdown|STR_BTN_UNSELECT_CURRENT"
 msgid "Hide only the current item."
 msgstr "Ocultar solo el elemento actual."
@@ -22941,17 +22935,17 @@ msgctxt "filtersubdropdown|background"
 msgid "Background Color"
 msgstr "Color de fondo"
 
-#. EZpYM
+#. ca9FH
 #: sc/uiconfig/scalc/ui/filtersubdropdown.ui:205
 msgctxt "filtersubdropdown|textcolor"
-msgid "Text Color"
-msgstr "Color de texto"
+msgid "Font Color"
+msgstr "Color de letra"
 
 #. XYJHx
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:28
 msgctxt "findreplace|label_action"
 msgid "Find Replace Action"
-msgstr "Acción Buscar/reemplazar"
+msgstr "Acción de Buscar/reemplazar"
 
 #. T9kUg
 #: sc/uiconfig/scalc/ui/findreplaceentry.ui:45
@@ -23309,106 +23303,100 @@ msgid "Produces the Fourier analysis of a data set by computing the Discrete Fou
 msgstr "Produce el análisis de Fourier de un conjunto de datos mediante el cálculo de la transformada de Fourier discreta (TFD) de un vector de números complejos de entrada, utilizando un par algoritmos de transformada de Fourier rápida (TFR)."
 
 #. FEwZR
-#: sc/uiconfig/scalc/ui/functionpanel.ui:63
+#: sc/uiconfig/scalc/ui/functionpanel.ui:54
 msgctxt "functionpanel|insert|tooltip_text"
 msgid "Insert Function into calculation sheet"
 msgstr "Insertar función en la hoja de cálculo"
 
 #. L79E6
-#: sc/uiconfig/scalc/ui/functionpanel.ui:78
+#: sc/uiconfig/scalc/ui/functionpanel.ui:69
 msgctxt "functionpanel|category"
 msgid "Last Used"
 msgstr "Usadas recientemente"
 
 #. uRXDm
-#: sc/uiconfig/scalc/ui/functionpanel.ui:79
+#: sc/uiconfig/scalc/ui/functionpanel.ui:70
 msgctxt "functionpanel|category"
 msgid "All"
 msgstr "Todas"
 
 #. Fk97C
-#: sc/uiconfig/scalc/ui/functionpanel.ui:80
+#: sc/uiconfig/scalc/ui/functionpanel.ui:71
 msgctxt "functionpanel|category"
 msgid "Database"
 msgstr "Base de datos"
 
 #. hCefc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:81
+#: sc/uiconfig/scalc/ui/functionpanel.ui:72
 msgctxt "functionpanel|category"
 msgid "Date&Time"
 msgstr "Fecha y hora"
 
 #. Cj6Vy
-#: sc/uiconfig/scalc/ui/functionpanel.ui:82
+#: sc/uiconfig/scalc/ui/functionpanel.ui:73
 msgctxt "functionpanel|category"
 msgid "Financial"
 msgstr "Financieras"
 
 #. gS2PB
-#: sc/uiconfig/scalc/ui/functionpanel.ui:83
+#: sc/uiconfig/scalc/ui/functionpanel.ui:74
 msgctxt "functionpanel|category"
 msgid "Information"
 msgstr "Información"
 
 #. rMqtg
-#: sc/uiconfig/scalc/ui/functionpanel.ui:84
+#: sc/uiconfig/scalc/ui/functionpanel.ui:75
 msgctxt "functionpanel|category"
 msgid "Logical"
 msgstr "Lógicas"
 
 #. 6cFkD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:85
+#: sc/uiconfig/scalc/ui/functionpanel.ui:76
 msgctxt "functionpanel|category"
 msgid "Mathematical"
 msgstr "Matemáticas"
 
 #. RdQeE
-#: sc/uiconfig/scalc/ui/functionpanel.ui:86
+#: sc/uiconfig/scalc/ui/functionpanel.ui:77
 msgctxt "functionpanel|category"
 msgid "Array"
 msgstr "Matriz"
 
 #. h4kRr
-#: sc/uiconfig/scalc/ui/functionpanel.ui:87
+#: sc/uiconfig/scalc/ui/functionpanel.ui:78
 msgctxt "functionpanel|category"
 msgid "Statistical"
 msgstr "Estadísticas"
 
 #. 6XCsS
-#: sc/uiconfig/scalc/ui/functionpanel.ui:88
+#: sc/uiconfig/scalc/ui/functionpanel.ui:79
 msgctxt "functionpanel|category"
 msgid "Spreadsheet"
 msgstr "Hoja de cálculo"
 
 #. DwfB5
-#: sc/uiconfig/scalc/ui/functionpanel.ui:89
+#: sc/uiconfig/scalc/ui/functionpanel.ui:80
 msgctxt "functionpanel|category"
 msgid "Text"
 msgstr "Texto"
 
 #. BCiyc
-#: sc/uiconfig/scalc/ui/functionpanel.ui:90
+#: sc/uiconfig/scalc/ui/functionpanel.ui:81
 msgctxt "functionpanel|category"
 msgid "Add-in"
 msgstr "Complemento"
 
 #. tDNFD
-#: sc/uiconfig/scalc/ui/functionpanel.ui:94
+#: sc/uiconfig/scalc/ui/functionpanel.ui:85
 msgctxt "functionpanel|extended_tip|category"
 msgid "Displays the available functions."
 msgstr "Muestra las funciones disponibles."
 
 #. V9ATp
-#: sc/uiconfig/scalc/ui/functionpanel.ui:141
+#: sc/uiconfig/scalc/ui/functionpanel.ui:133
 msgctxt "functionpanel|extended_tip|funclist"
 msgid "Displays the available functions."
 msgstr "Muestra las funciones disponibles."
-
-#. rmQie
-#: sc/uiconfig/scalc/ui/functionpanel.ui:175
-msgctxt "functionpanel|funcdesc"
-msgid "label"
-msgstr "etiqueta"
 
 #. dmA3u
 #: sc/uiconfig/scalc/ui/goalseekdlg.ui:8
@@ -23510,13 +23498,13 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:174
 msgctxt "gotosheetdialog|label-sheets"
 msgid "_Sheets"
-msgstr ""
+msgstr "_Hojas"
 
 #. F6iSH
 #: sc/uiconfig/scalc/ui/gotosheetdialog.ui:197
 msgctxt "gotosheetdialog|GoToSheetDialog"
 msgid "Displays a list of all visible sheets in your spreadsheet document."
-msgstr ""
+msgstr "Muestra una lista de todas las hojas visibles en su documento de hoja de cálculo."
 
 #. XMHEU
 #: sc/uiconfig/scalc/ui/groupbydate.ui:27
@@ -23849,55 +23837,55 @@ msgid "Use the buttons to change the font or insert field commands such as date,
 msgstr "Use los botones para modificar el tipo de letra o para insertar órdenes de campo como la fecha o la hora."
 
 #. WBsTf
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:503
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:506
 msgctxt "headerfootercontent|label1"
 msgid "Note"
 msgstr "Nota"
 
 #. X2HEK
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:525
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:528
 msgctxt "headerfootercontent|labelSTR_HF_NONE_IN_BRACKETS"
 msgid "(none)"
 msgstr "(ninguna)"
 
 #. RSazM
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:537
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:540
 msgctxt "headerfootercontent|labelSTR_PAGE"
 msgid "Page"
 msgstr "Página"
 
 #. CMDYZ
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:549
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:552
 msgctxt "headerfootercontent|labelSTR_HF_OF_QUESTION"
 msgid "of ?"
 msgstr "de ?"
 
 #. jQyGW
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:561
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:564
 msgctxt "headerfootercontent|labelSTR_HF_CONFIDENTIAL"
 msgid "Confidential"
 msgstr "Confidencial"
 
 #. EeAAh
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:573
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:576
 msgctxt "headerfootercontent|labelSTR_HF_CREATED_BY"
 msgid "Created by"
 msgstr "Creado por"
 
 #. CASF2
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:585
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:588
 msgctxt "headerfootercontent|labelSTR_HF_CUSTOMIZED"
 msgid "Customized"
 msgstr "Personalizado"
 
 #. wZN6q
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:597
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:600
 msgctxt "headerfootercontent|labelSTR_HF_OF"
 msgid "of"
 msgstr "de"
 
 #. SDx4X
-#: sc/uiconfig/scalc/ui/headerfootercontent.ui:614
+#: sc/uiconfig/scalc/ui/headerfootercontent.ui:617
 msgctxt "headerfootercontent|extended_tip|HeaderFooterContent"
 msgid "Defines or formats a header or footer for a Page Style."
 msgstr "Define o da formato a una cabecera o un pie de página de un estilo de página."
@@ -24200,7 +24188,7 @@ msgstr "_Crear nueva"
 #: sc/uiconfig/scalc/ui/insertsheet.ui:208
 msgctxt "insertsheet|extended_tip|new"
 msgid "Creates a new sheet. Enter a sheet name in the Name field. Allowed characters are letters, numbers, spaces, and the underline character."
-msgstr "Crea una hoja. En el campo Nombre, asigne un nombre a la hoja. Se permiten los caracteres alfabéticos, numéricos, los espacios y el carácter de subrayado. "
+msgstr "Crea una hoja. En el campo Nombre, asigne un nombre a la hoja. Se permiten los caracteres alfabéticos, numéricos, los espacios y el carácter de subrayado."
 
 #. whnDy
 #: sc/uiconfig/scalc/ui/insertsheet.ui:231
@@ -24734,7 +24722,7 @@ msgstr "Calcula la media móvil de una serie temporal"
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:8
 msgctxt "multipleoperationsdialog|MultipleOperationsDialog"
 msgid "Multiple operations"
-msgstr "Múltiples operaciones"
+msgstr "Operaciones múltiples"
 
 #. DsuEQ
 #: sc/uiconfig/scalc/ui/multipleoperationsdialog.ui:33
@@ -25163,177 +25151,177 @@ msgid "Fiel_d"
 msgstr "Ca_mpo"
 
 #. VCk9a
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5882
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5859
 msgctxt "CalcNotebookbar|InsertMenuButton"
 msgid "_Insert"
 msgstr "I_nsertar"
 
 #. HnjBi
-#: sc/uiconfig/scalc/ui/notebookbar.ui:5987
+#: sc/uiconfig/scalc/ui/notebookbar.ui:5964
 msgctxt "CalcNotebookbar|InsertLabel"
 msgid "~Insert"
 msgstr "I~nsertar"
 
 #. xmARL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6388
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6413
-#: sc/uiconfig/scalc/ui/notebookbar.ui:6841
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6365
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6390
+#: sc/uiconfig/scalc/ui/notebookbar.ui:6818
 msgctxt "CalcNotebookbar|objectalign|tooltip_text"
 msgid "Object Align"
 msgstr "Alineación de objetos"
 
 #. vruXQ
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7062
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7039
 msgctxt "CalcNotebookbar|LayoutMenuButton"
 msgid "_Layout"
 msgstr "_Disposición"
 
 #. eWinY
-#: sc/uiconfig/scalc/ui/notebookbar.ui:7146
+#: sc/uiconfig/scalc/ui/notebookbar.ui:7123
 msgctxt "CalcNotebookbar|PageLayoutLabel"
 msgid "~Layout"
 msgstr "~Disposición"
 
 #. pnWd5
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8423
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8400
 msgctxt "CalcNotebookbar|StatisticsMenuButton"
 msgid "_Statistics"
 msgstr "E_stadísticas"
 
 #. BiHBE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8474
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8451
 msgctxt "CalcNotebookbar|DataMenuButton"
 msgid "_Data"
 msgstr "Da_tos"
 
 #. xzx9j
-#: sc/uiconfig/scalc/ui/notebookbar.ui:8580
+#: sc/uiconfig/scalc/ui/notebookbar.ui:8557
 msgctxt "CalcNotebookbar|DataLabel"
 msgid "~Data"
 msgstr "Da~tos"
 
 #. CBEHA
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9383
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9360
 msgctxt "CalcNotebookbar|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Revisión"
 
 #. 7FXbr
-#: sc/uiconfig/scalc/ui/notebookbar.ui:9468
+#: sc/uiconfig/scalc/ui/notebookbar.ui:9445
 msgctxt "CalcNotebookbar|ReviewLabel"
 msgid "~Review"
 msgstr "~Revisión"
 
 #. NT37F
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10354
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10331
 msgctxt "CalcNotebookbar|ViewMenuButton"
 msgid "_View"
 msgstr "_Ver"
 
 #. rPdAq
-#: sc/uiconfig/scalc/ui/notebookbar.ui:10439
+#: sc/uiconfig/scalc/ui/notebookbar.ui:10416
 msgctxt "CalcNotebookbar|ViewLabel"
 msgid "~View"
 msgstr "~Ver"
 
 #. SAv6Z
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11548
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11525
 msgctxt "CalcNotebookbar|ImageMenuButton"
 msgid "Ima_ge"
 msgstr "Ima_gen"
 
 #. rwprK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:11669
+#: sc/uiconfig/scalc/ui/notebookbar.ui:11646
 msgctxt "CalcNotebookbar|ImageLabel"
 msgid "Ima~ge"
 msgstr "Ima~gen"
 
 #. EjbzV
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12850
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12827
 msgctxt "CalcNotebookbar|DrawMenuButton"
 msgid "_Draw"
 msgstr "Di_bujo"
 
 #. iagRv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:12957
+#: sc/uiconfig/scalc/ui/notebookbar.ui:12934
 msgctxt "CalcNotebookbar|DrawLabel"
 msgid "~Draw"
 msgstr "Di~bujo"
 
 #. EgeGL
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13415
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13392
 msgctxt "CalcNotebookbar|ConvertMenuButton"
 msgid "Convert"
 msgstr "Convertir"
 
 #. PRmbH
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13705
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13682
 msgctxt "CalcNotebookbar|ObjectMenuButton"
 msgid "_Object"
 msgstr "_Objeto"
 
 #. xTKVv
-#: sc/uiconfig/scalc/ui/notebookbar.ui:13812
+#: sc/uiconfig/scalc/ui/notebookbar.ui:13789
 msgctxt "CalcNotebookbar|FrameLabel"
 msgid "~Object"
 msgstr "~Objeto"
 
 #. cHyKz
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14371
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14348
 msgctxt "CalcNotebookbar|MediaMenuButton"
 msgid "_Media"
 msgstr "_Multimedia"
 
 #. CJ2qx
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14476
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14453
 msgctxt "CalcNotebookbar|MediaLabel"
 msgid "~Media"
 msgstr "~Multimedia"
 
 #. eQK6A
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14858
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14835
 msgctxt "CalcNotebookbar|PrintMenuButton"
 msgid "_Print"
 msgstr "_Imprimir"
 
 #. sCGyG
-#: sc/uiconfig/scalc/ui/notebookbar.ui:14941
+#: sc/uiconfig/scalc/ui/notebookbar.ui:14918
 msgctxt "CalcNotebookbar|PrintLabel"
 msgid "~Print"
 msgstr "~Imprimir"
 
 #. 5JVAt
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15749
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15726
 msgctxt "CalcNotebookbar|FormMenuButton"
 msgid "Fo_rm"
 msgstr "Formu_lario"
 
 #. CCEAK
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15833
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15810
 msgctxt "CalcNotebookbar|FormLabel"
 msgid "Fo~rm"
 msgstr "Formu~lario"
 
 #. DHeyE
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15890
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15867
 msgctxt "CalcNotebookbar|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_xtensión"
 
 #. 4ZDL7
-#: sc/uiconfig/scalc/ui/notebookbar.ui:15964
+#: sc/uiconfig/scalc/ui/notebookbar.ui:15941
 msgctxt "CalcNotebookbar|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~xtensión"
 
 #. 3Ec6T
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17153
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17130
 msgctxt "CalcNotebookbar|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Herramientas"
 
 #. 8HTEk
-#: sc/uiconfig/scalc/ui/notebookbar.ui:17237
+#: sc/uiconfig/scalc/ui/notebookbar.ui:17214
 msgctxt "CalcNotebookbar|ToolsLabel"
 msgid "~Tools"
 msgstr "~Herramientas"
@@ -25352,7 +25340,7 @@ msgstr "~Archivo"
 
 #. UWfVg
 #: sc/uiconfig/scalc/ui/notebookbar_compact.ui:3545
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6152
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6113
 msgctxt "notebookbar_compact|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Especifique los bordes de las celdas seleccionadas."
@@ -25376,163 +25364,163 @@ msgid "Fiel_d"
 msgstr "Ca_mpo"
 
 #. zveKA
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5637
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5598
 msgctxt "notebookbar_compact|InsertMenuButton"
 msgid "_Insert"
 msgstr "I_nsertar"
 
 #. CDXv3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5692
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:5653
 msgctxt "notebookbar_compact|InsertLabel"
 msgid "~Insert"
 msgstr "I~nsertar"
 
 #. EvytN
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6273
 msgctxt "notebookbar_compact|PageMenuButton"
 msgid "_Layout"
 msgstr "Dis_posición"
 
 #. TbQMa
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6364
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:6325
 msgctxt "notebookbar_compact|LayoutLabel"
 msgid "~Layout"
 msgstr "Dis~posición"
 
 #. QqjZP
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7199
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7160
 msgctxt "notebookbar_compact|Statistics"
 msgid "_Statistics"
 msgstr "E_stadísticas"
 
 #. GFZNz
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7264
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7225
 msgctxt "notebookbar_compact|DataMenuButton"
 msgid "_Data"
 msgstr "_Datos"
 
 #. TCt7E
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7315
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7276
 msgctxt "notebookbar_compact|DataLabel"
 msgid "~Data"
 msgstr "~Datos"
 
 #. jYD7j
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7997
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:7958
 msgctxt "notebookbar_compact|ReviewMenuButton"
 msgid "_Review"
 msgstr "_Revisión"
 
 #. Lbj5B
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8049
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8010
 msgctxt "notebookbar_compact|ReviewLabel"
 msgid "~Review"
 msgstr "~Revisión"
 
 #. 35kA2
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8716
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8677
 msgctxt "notebookbar_compact|ViewMenuButton"
 msgid "_View"
 msgstr "_Ver"
 
 #. ZGh8C
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8768
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:8729
 msgctxt "notebookbar_compact|ViewLabel"
 msgid "~View"
 msgstr "~Ver"
 
 #. dV94w
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10082
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10043
 msgctxt "notebookbar_compact|GraphicMenuButton"
 msgid "Im_age"
 msgstr "Ima_gen"
 
 #. ekWoX
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10134
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:10095
 msgctxt "notebookbar_compact|ImageLabel"
 msgid "Ima~ge"
 msgstr "Ima~gen"
 
 #. 8eQN8
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11504
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11465
 msgctxt "notebookbar_compact|DrawMenuButton"
 msgid "D_raw"
 msgstr "Di_bujo"
 
 #. FBf68
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11556
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:11517
 msgctxt "notebookbar_compact|ShapeLabel"
 msgid "~Draw"
 msgstr "Di~bujo"
 
 #. DoVwy
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12507
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12468
 msgctxt "notebookbar_compact|ObjectMenuButton"
 msgid "Object"
 msgstr "Objeto"
 
 #. JXKiY
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12559
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:12520
 msgctxt "notebookbar_compact|FrameLabel"
 msgid "~Object"
 msgstr "~Objeto"
 
 #. q8wnS
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13259
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13220
 msgctxt "notebookbar_compact|MediaButton"
 msgid "_Media"
 msgstr "_Multimedia"
 
 #. 7HDt3
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13312
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13273
 msgctxt "notebookbar_compact|MediaLabel"
 msgid "~Media"
 msgstr "~Multimedia"
 
 #. vSDok
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13871
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13832
 msgctxt "notebookbar_compact|PrintPreviewButton"
 msgid "Print"
 msgstr "Imprimir"
 
 #. goiqQ
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13923
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:13884
 msgctxt "notebookbar_compact|FormLabel"
 msgid "~Print"
 msgstr "~Imprimir"
 
 #. EBGs5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15237
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15198
 msgctxt "notebookbar_compact|FormButton"
 msgid "Fo_rm"
 msgstr "Formu_lario"
 
 #. EKA8X
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15289
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15250
 msgctxt "notebookbar_compact|FormLabel"
 msgid "Fo~rm"
 msgstr "Formu~lario"
 
 #. 8SvE5
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15368
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15329
 msgctxt "notebookbar_compact|ExtensionMenuButton"
 msgid "E_xtension"
 msgstr "E_xtensión"
 
 #. WH5NR
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15426
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:15387
 msgctxt "notebookbar_compact|ExtensionLabel"
 msgid "E~xtension"
 msgstr "E~xtensión"
 
 #. 8fhwb
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16427
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16388
 msgctxt "notebookbar_compact|ToolsMenuButton"
 msgid "_Tools"
 msgstr "_Herramientas"
 
 #. kpc43
-#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16479
+#: sc/uiconfig/scalc/ui/notebookbar_compact.ui:16440
 msgctxt "notebookbar_compact|DevLabel"
 msgid "~Tools"
 msgstr "~Herramientas"
@@ -26545,7 +26533,7 @@ msgstr "Especifica que se puede utilizar el texto de cualquier celda como etique
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:169
 msgctxt "optcalculatepage|generalprec"
 msgid "_Limit decimals for general number format"
-msgstr "Limitar los decimales para el formato numérico general"
+msgstr "_Limitar decimales en el formato numérico general"
 
 #. hufmT
 #: sc/uiconfig/scalc/ui/optcalculatepage.ui:177
@@ -27253,7 +27241,7 @@ msgstr "Párrafo"
 #: sc/uiconfig/scalc/ui/paradialog.ui:136
 msgctxt "paradialog|labelTP_PARA_STD"
 msgid "Indents & Spacing"
-msgstr "Sangría y espaciado"
+msgstr "Sangrías y espaciado"
 
 #. PRo68
 #: sc/uiconfig/scalc/ui/paradialog.ui:183
@@ -27421,13 +27409,13 @@ msgstr "Ejecutar de inmediato"
 #: sc/uiconfig/scalc/ui/pastespecial.ui:238
 msgctxt "pastespecial|extended_tip|cbImmediately"
 msgid "Check this option to run the preset immediately. Uncheck it to manipulate the options before clicking OK."
-msgstr ""
+msgstr "Marque esta opción para ejecutar la preconfiguración inmediatamente. Desmárquela para manipular las opciones antes de pulsar en Aceptar."
 
 #. YD43i
 #: sc/uiconfig/scalc/ui/pastespecial.ui:254
 msgctxt "pastespecial|frPresets"
 msgid "Presets"
-msgstr "Preajustes"
+msgstr "Preconfiguraciones"
 
 #. huhPQ
 #: sc/uiconfig/scalc/ui/pastespecial.ui:290
@@ -27547,7 +27535,7 @@ msgstr "Las celdas insertadas sustituyen a las celdas de destino."
 #: sc/uiconfig/scalc/ui/pastespecial.ui:498
 msgctxt "pastespecial|move_down"
 msgid "Down"
-msgstr ""
+msgstr "Hacia abajo"
 
 #. BNALN
 #: sc/uiconfig/scalc/ui/pastespecial.ui:507
@@ -27559,7 +27547,7 @@ msgstr ""
 #: sc/uiconfig/scalc/ui/pastespecial.ui:519
 msgctxt "pastespecial|move_right"
 msgid "Right"
-msgstr ""
+msgstr "A la derecha"
 
 #. GEFe7
 #: sc/uiconfig/scalc/ui/pastespecial.ui:528
@@ -27687,11 +27675,11 @@ msgctxt "pastespecial|label2"
 msgid "Operations"
 msgstr "Operaciones"
 
-#. ypkML
-#: sc/uiconfig/scalc/ui/pastespecial.ui:825
+#. cBodz
+#: sc/uiconfig/scalc/ui/pastespecial.ui:824
 msgctxt "pastespecial|extended_tip|PasteSpecial"
-msgid "Inserts the contents of the clipboard into the current file in a format that you can specify."
-msgstr "Inserta el contenido del portapapeles en el archivo actual, en un formato que puede especificarse."
+msgid "Inserts the contents of the clipboard into the current document in a format that you can specify."
+msgstr "Inserta el contenido del portapapeles en el documento actual en un formato que especifique."
 
 #. AqzPf
 #: sc/uiconfig/scalc/ui/pivotfielddialog.ui:16
@@ -28063,7 +28051,7 @@ msgstr "Filas totales"
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:672
 msgctxt "pivottablelayoutdialog|extended_tip|check-total-rows"
 msgid "Calculates and displays the grand total of the row calculation."
-msgstr "Calcula y muestra el total del cálculo de la fila."
+msgstr "Calcula y muestra el total general del cálculo de la fila."
 
 #. Br8BE
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:683
@@ -28075,7 +28063,7 @@ msgstr "Columnas totales"
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:691
 msgctxt "pivottablelayoutdialog|extended_tip|check-total-columns"
 msgid "Calculates and displays the grand total of the column calculation."
-msgstr "Calcula y muestra el total del cálculo de la columna."
+msgstr "Calcula y muestra el total general del cálculo de la columna."
 
 #. VXEdh
 #: sc/uiconfig/scalc/ui/pivottablelayoutdialog.ui:702
@@ -28575,11 +28563,11 @@ msgctxt "randomnumbergenerator|enable-rounding-check"
 msgid "Enable rounding"
 msgstr "Activar redondeo"
 
-#. 8n4v9
+#. 6cz4t
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:418
 msgctxt "randomnumbergenerator|extended_tip|enable-rounding-check"
-msgid "Truncate the number to a given number of Decimal Places."
-msgstr "Trunca el número la cantidad establecida de decimales."
+msgid "Round the number to a given number of Decimal Places."
+msgstr ""
 
 #. nRvWV
 #: sc/uiconfig/scalc/ui/randomnumbergenerator.ui:434
@@ -29296,38 +29284,26 @@ msgctxt "scgeneralpage|enter_paste_mode_cb"
 msgid "Press Enter to paste and clear clipboard"
 msgstr "Oprimir Intro para pegar y vaciar portapapeles"
 
-#. LFenu
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
-msgctxt "scgeneralpage|textfmtcb"
-msgid "Use printer metrics for text formatting"
-msgstr "Usar métricas de la impresora para formatear textos"
-
-#. ECUd7
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:385
-msgctxt "extended_tip|textfmtcb"
-msgid "Specifies that printer metrics are applied for printing and also for formatting the display on the screen."
-msgstr "Especifica que los parámetros de la impresora se apliquen para imprimir, así como para formatear la visualización en pantalla."
-
 #. zW9SZ
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:397
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:378
 msgctxt "scgeneralpage|markhdrcb"
 msgid "Highlight sele_ction in column/row headers"
 msgstr "Resaltar la sele_cción en cabeceras de filas y columnas"
 
 #. payBv
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:405
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:386
 msgctxt "extended_tip|markhdrcb"
 msgid "Specifies whether to highlight column and row headers in the selected columns or rows."
 msgstr "Especifica si se debe resaltar las cabeceras de columna y fila en las columnas o filas seleccionadas."
 
 #. KGWyE
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:417
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:398
 msgctxt "scgeneralpage|sortrefupdatecb"
 msgid "Update references when sorting range of cells"
 msgstr "Actualizar referencias al ordenar un intervalo de celdas"
 
 #. M9G8o
-#: sc/uiconfig/scalc/ui/scgeneralpage.ui:439
+#: sc/uiconfig/scalc/ui/scgeneralpage.ui:420
 msgctxt "scgeneralpage|label3"
 msgid "Input Settings"
 msgstr "Configuración de entrada de datos"
@@ -29663,19 +29639,19 @@ msgid "Note: Changes to formatting attributes like fonts, colors, and number for
 msgstr "Nota: no se guardarán los cambios a atributos de formato como tipos de letra, colores y formatos numéricos, y algunas funcionalidades como la edición de gráficos y dibujos no están disponibles en el modo compartido. Desactive el modo compartido para obtener el acceso exclusivo necesario para estos cambios y funcionalidades."
 
 #. dQz77
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:187
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:190
 msgctxt "sharedocumentdlg|name"
 msgid "Name"
 msgstr "Nombre"
 
 #. EC8AA
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:200
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:203
 msgctxt "sharedocumentdlg|accessed"
 msgid "Accessed"
 msgstr "Consultado"
 
 #. hHHJG
-#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:224
+#: sc/uiconfig/scalc/ui/sharedocumentdlg.ui:227
 msgctxt "sharedocumentdlg|label1"
 msgid "Users Currently Accessing This Spreadsheet"
 msgstr "Usuarios que tienen acceso a este libro ahora"
@@ -29908,17 +29884,17 @@ msgctxt "sheetprintpage|comboLB_SCALEMODE"
 msgid "Reduce/enlarge printout"
 msgstr "Reducir/ampliar impresión"
 
-#. GxZyi
+#. i7BEB
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:645
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) to width/height"
-msgstr "Ajustar intervalos de impresión a anchura/altura"
+msgid "Shrink print range(s) to width/height"
+msgstr ""
 
-#. Y2GhT
+#. KzA6v
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:646
 msgctxt "sheetprintpage|comboLB_SCALEMODE"
-msgid "Fit print range(s) on number of pages"
-msgstr "Ajustar zonas de impresión en números de páginas"
+msgid "Shrink print range(s) on number of pages"
+msgstr ""
 
 #. AzkrF
 #: sc/uiconfig/scalc/ui/sheetprintpage.ui:650
@@ -30029,97 +30005,97 @@ msgid "Displays a list of all hidden sheets in your spreadsheet document."
 msgstr "Muestra una lista de todas las hojas ocultas del libro."
 
 #. ktHTz
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:52
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:53
 msgctxt "sidebaralignment|horizontalalignment|tooltip_text"
 msgid "Horizontal Alignment"
 msgstr "Alineación horizontal"
 
 #. U8BWH
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:109
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:114
 msgctxt "sidebaralignment|verticalalignment|tooltip_text"
 msgid "Vertical Alignment"
 msgstr "Alineación vertical"
 
-#. etrVi
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:237
-msgctxt "sidebaralignment|leftindent|tooltip_text"
-msgid "Indents from the left edge."
-msgstr "Crea una sangría desde el borde izquierdo."
-
 #. qtoY5
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:266
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:243
 msgctxt "sidebaralignment|orientationlabel"
 msgid "Text _orientation:"
 msgstr "_Orientación de texto:"
 
 #. Ume2A
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:281
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:257
 msgctxt "sidebaralignment|orientationdegrees|tooltip_text"
 msgid "Select the angle for rotation."
 msgstr "Seleccione el ángulo de giro."
 
 #. KEG9k
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:308
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:270
 msgctxt "sidebaralignment|stacked"
 msgid "Vertically stacked"
 msgstr "Apilado verticalmente"
 
 #. ZE4wU
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:336
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:295
 msgctxt "sidebaralignment|bottom|tooltip_text"
 msgid "Text Extension From Lower Cell Border"
 msgstr "Expansión del texto a partir del borde inferior de la celda"
 
 #. CgVBh
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:312
 msgctxt "sidebaralignment|top|tooltip_text"
 msgid "Text Extension From Upper Cell Border"
 msgstr "Expansión del texto a partir del borde superior de la celda"
 
 #. TSALx
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:329
 msgctxt "sidebaralignment|standard|tooltip_text"
 msgid "Text Extension Inside Cell"
 msgstr "Expansión de texto dentro de la celda"
 
 #. xruhe
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:349
 msgctxt "sidebaralignment|wraptext"
 msgid "Wrap text"
 msgstr "Ajustar texto"
 
 #. uTKvq
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:402
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:353
 msgctxt "sidebaralignment|wraptext|tooltip_text"
 msgid "Wrap texts automatically."
 msgstr "Ajustar el texto automáticamente."
 
 #. Ae65n
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:415
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:366
 msgctxt "sidebaralignment|mergecells"
 msgid "Merge cells"
 msgstr "Combinar celdas"
 
 #. NK2BS
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:419
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:370
 msgctxt "sidebaralignment|mergecells|tooltip_text"
 msgid "Joins the selected cells into one."
 msgstr "Une las celdas seleccionadas en una sola."
 
+#. etrVi
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:385
+msgctxt "sidebaralignment|leftindent|tooltip_text"
+msgid "Indents from the left edge."
+msgstr "Crea una sangría desde el borde izquierdo."
+
 #. FdKBk
-#: sc/uiconfig/scalc/ui/sidebaralignment.ui:433
+#: sc/uiconfig/scalc/ui/sidebaralignment.ui:398
 msgctxt "sidebaralignment|leftindentlabel"
 msgid "_Indent:"
 msgstr "_Sangría:"
 
 #. BBGFK
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:23
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:22
 msgctxt "sidebarcellappearance|cellbackgroundlabel"
 msgid "_Background:"
 msgstr "_Fondo:"
 
 #. bjHWc
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:37
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:36
 msgctxt "sidebarcellappearance|cellbackgroundcolor|tooltip_text"
 msgid "Select the background color of the selected cells."
 msgstr "Seleccione el color de fondo de las celdas seleccionadas."
@@ -30131,199 +30107,199 @@ msgid "Select the background color of the selected cells."
 msgstr "Seleccione el color de fondo de las celdas seleccionadas."
 
 #. DKEkN
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:71
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:72
 msgctxt "sidebarcellappearance|bordertype|tooltip_text"
 msgid "Specify the borders of the selected cells."
 msgstr "Especifique los bordes de las celdas seleccionadas."
 
 #. D2TVi
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:92
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:93
 msgctxt "sidebarcellappearance|borderlinecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Seleccione el color de línea de los bordes."
 
 #. GqfZD
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:101
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:103
 msgctxt "sidebarcellappearance|linecolor|tooltip_text"
 msgid "Select the line color of the borders."
 msgstr "Seleccione el color de línea de los bordes."
 
 #. 8AUBs
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:111
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:113
 msgctxt "sidebarcellappearance|borderlinecolor-atkobject"
 msgid "Border Line Color"
 msgstr "Color de línea de borde"
 
 #. VgXDF
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:132
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:135
 msgctxt "sidebarcellappearance|linestyle|tooltip_text"
 msgid "Select the line style of the borders."
 msgstr "Seleccione el estilo de línea de los bordes."
 
 #. jaxhA
-#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:142
+#: sc/uiconfig/scalc/ui/sidebarcellappearance.ui:145
 msgctxt "sidebarcellappearance|borderlinestyle-atkobject"
 msgid "Border Line Style"
 msgstr "Estilo de línea de borde"
 
 #. CNqCC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:71
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
 msgctxt "sidebarnumberformat|numberformatcombobox|tooltip_text"
 msgid "Select a category of contents."
 msgstr "Seleccione una categoría de contenido."
 
 #. EeECn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:75
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:85
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "General"
 msgstr "General"
 
 #. SmpsG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:76
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:86
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Number"
 msgstr "Número"
 
 #. 8FGeM
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:77
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:87
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Percent"
 msgstr "Porcentaje"
 
 #. bHC79
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:78
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Currency"
 msgstr "Moneda"
 
 #. Lh2G6
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:79
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:89
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Date "
 msgstr "Fecha "
 
 #. EUCxB
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:80
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:90
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Time"
 msgstr "Hora"
 
 #. EukSF
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:81
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:91
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Scientific"
 msgstr "Científico"
 
 #. AQV5y
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:82
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:92
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Fraction"
 msgstr "Fracción"
 
 #. kQGBu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:83
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:93
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Boolean Value"
 msgstr "Valor booleano"
 
 #. Gv2sX
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:84
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:94
 msgctxt "sidebarnumberformat|numberformatcombobox"
 msgid "Text"
 msgstr "Texto"
 
 #. ypKG8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:88
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:98
 msgctxt "sidebarnumberformat|numberformatcombobox-atkobject"
 msgid "Category"
 msgstr "Categoría"
 
 #. FqFzG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:120
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:117
 msgctxt "sidebarnumberformat|decimalplaceslabel"
 msgid "_Decimal places:"
 msgstr "_Decimales:"
 
 #. xen2B
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:134
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:131
 msgctxt "sidebarnumberformat|denominatorplaceslabel"
 msgid "Den_ominator places:"
 msgstr "Dígitos den_ominadores:"
 
 #. cdFDC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:162
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:158
 msgctxt "sidebarnumberformat|denominatorplaces|tooltip_text"
 msgid "Enter the number of places for the denominator that you want to display."
 msgstr "Indique la cantidad de cifras del denominador que quiere mostrar."
 
 #. ySDGH
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:167
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:163
 msgctxt "sidebarnumberformat|denominatorplaces-atkobject"
 msgid "Denominator Places"
 msgstr "Dígitos denominadores"
 
 #. EaLbU
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:181
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:177
 msgctxt "sidebarnumberformat|decimalplaces|tooltip_text"
 msgid "Enter the number of decimal places that you want to display."
 msgstr "Escriba el número de decimales que quiere mostrar."
 
 #. 5tvJA
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:186
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:182
 msgctxt "sidebarnumberformat|decimalplaces-atkobject"
 msgid "Decimal Places"
 msgstr "Dígitos decimales"
 
 #. 4h3mG
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:219
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:202
 msgctxt "sidebarnumberformat|leadingzeroeslabel"
 msgid "Leading _zeroes:"
 msgstr "Ceros a la i_zquierda:"
 
 #. 35pSE
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:234
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:215
 msgctxt "sidebarnumberformat|leadingzeroes|tooltip_text"
 msgid "Enter the maximum number of zeroes to display before the decimal point."
 msgstr "Indique la cantidad máxima de ceros que mostrar antes del separador decimal."
 
 #. UFTBa
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:240
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:221
 msgctxt "sidebarnumberformat|leadingzeroes-atkobject"
 msgid "Leading Zeroes"
 msgstr "Ceros a la izquierda"
 
 #. jkDKD
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:259
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:232
 msgctxt "sidebarnumberformat|negativenumbersred"
 msgid "_Negative numbers in red"
 msgstr "_Números negativos en rojo"
 
 #. apRL8
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:263
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:236
 msgctxt "sidebarnumberformat|negativenumbersred|tooltip_text"
 msgid "Changes the font color of negative numbers to red."
 msgstr "Cambia el color de los números negativos a rojo."
 
 #. BJ9Gy
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:275
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:249
 msgctxt "sidebarnumberformat|thousandseparator"
 msgid "_Thousands separator"
 msgstr "_Separador de millares"
 
 #. ykEWn
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:279
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:253
 msgctxt "sidebarnumberformat|thousandseparator|tooltip_text"
 msgid "Inserts a separator between thousands."
 msgstr "Inserta un separador entre los millares."
 
 #. pGpRu
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:291
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:266
 msgctxt "sidebarnumberformat|engineeringnotation"
 msgid "_Engineering notation"
 msgstr "Notación _ingenieril"
 
 #. 9CEjC
-#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:294
+#: sc/uiconfig/scalc/ui/sidebarnumberformat.ui:269
 msgctxt "sidebarnumberformat|engineeringnotation|tooltip_text"
 msgid "Ensures that exponent is a multiple of 3."
 msgstr "Garantiza que el exponente sea un múltiplo de 3."
@@ -30364,11 +30340,11 @@ msgctxt "solverdlg|options"
 msgid "O_ptions..."
 msgstr "O_pciones..."
 
-#. UABF3
+#. 8BGxk
 #: sc/uiconfig/scalc/ui/solverdlg.ui:60
 msgctxt "solverdlg|extended_tip|options"
-msgid "Opens the Solver Options dialog."
-msgstr ""
+msgid "Opens the solver’s Options dialog."
+msgstr "Abre el cuadro de diálogo Opciones del Solver."
 
 #. 8hMNV
 #: sc/uiconfig/scalc/ui/solverdlg.ui:72
@@ -30803,25 +30779,25 @@ msgid "Left to right (sort columns)"
 msgstr "De izquierda a derecha (ordenar columnas)"
 
 #. vTci8
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:112
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:111
 msgctxt "sortcriteriapage|lbDirection"
 msgid "Direction:"
 msgstr "Dirección:"
 
 #. 6YQSB
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:122
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:121
 msgctxt "sortcriteriapage|header"
 msgid "Range contains..."
 msgstr "El intervalo contiene…"
 
 #. E9DMu
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:138
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:137
 msgctxt "sortcriteriapage|lbHeader"
 msgid "Headers:"
 msgstr "Cabeceras:"
 
 #. 5oaCb
-#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:155
+#: sc/uiconfig/scalc/ui/sortcriteriapage.ui:154
 msgctxt "sortcriteriapage|lbOptions"
 msgid "Sort Options"
 msgstr "Opciones de clasificación"
@@ -31132,181 +31108,181 @@ msgid "Series:"
 msgstr "Serie:"
 
 #. wBmc6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:283
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:285
 msgctxt "SparklineDialog|checkButton_Negative"
 msgid "Negative points:"
 msgstr "Puntos negativos:"
 
 #. ySwZA
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:319
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:323
 msgctxt "SparklineDialog|checkButton_High"
 msgid "High points:"
 msgstr "Puntos altos:"
 
 #. DJKw7
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:355
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:361
 msgctxt "SparklineDialog|checkButton_Low"
 msgid "Low points:"
 msgstr "Puntos bajos:"
 
 #. q5qaV
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:391
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:399
 msgctxt "SparklineDialog|checkButton_Marker"
 msgid "Marker:"
 msgstr "Marcador:"
 
 #. 4yLTi
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:427
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:437
 msgctxt "SparklineDialog|checkButton_First"
 msgid "First point:"
 msgstr "Primer punto:"
 
 #. EYEEJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:463
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:475
 msgctxt "SparklineDialog|checkButton_Last"
 msgid "Last point:"
 msgstr "Último punto:"
 
 #. mP9Uy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:503
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:517
 msgctxt "SparklineDialog|label_Colors"
 msgid "Colors"
 msgstr "Colores"
 
 #. a9F7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:537
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:551
 msgctxt "SparklineDialog|label_LineWidth"
 msgid "Line width:"
 msgstr "Anchura de línea:"
 
 #. ofAyv
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:552
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:566
 msgctxt "SparklineDialog|spinButton_LineWidth"
 msgid "1,00"
 msgstr ""
 
 #. 4ciyB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:570
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:584
 msgctxt "SparklineDialog|label_DisplayEmptyCellsAs"
 msgid "Display empty cells as:"
 msgstr "Mostrar celdas vacías como:"
 
 #. K3oCB
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:585
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:599
 msgctxt "SparklineDialog|optionEmpty_Gap"
 msgid "Gap"
-msgstr ""
+msgstr "Vacío"
 
 #. fzBds
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:586
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:600
 msgctxt "SparklineDialog|optionEmpty_Zero"
 msgid "Zero"
 msgstr "Cero"
 
 #. tGCDf
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:587
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:601
 msgctxt "SparklineDialog|optionEmpty_Span"
 msgid "Span"
-msgstr ""
+msgstr "Atravesar"
 
 #. fkB5s
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:597
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:611
 msgctxt "SparklineDialog|checkButton_Hidden"
 msgid "Display hidden"
 msgstr "Mostrar ocultas"
 
 #. gxx8E
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:612
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:626
 msgctxt "SparklineDialog|checkButton_RTL"
 msgid "Right-to-left"
 msgstr "De derecha a izquierda"
 
 #. GJfmJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:631
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
 msgctxt "SparklineDialog|optionType_Line"
 msgid "Line"
 msgstr "Línea"
 
 #. 2ZDbw
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:632
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:646
 msgctxt "SparklineDialog|optionType_Column"
 msgid "Column"
 msgstr "Columnas"
 
 #. UirXW
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:633
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:647
 msgctxt "SparklineDialog|optionType_Stacked"
 msgid "Stacked"
 msgstr "En pilas"
 
 #. zmCsJ
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:645
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:659
 msgctxt "SparklineDialog|label_Type"
 msgid "Type:"
 msgstr "Tipo:"
 
 #. o8rnM
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:661
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:675
 msgctxt "SparklineDialog|label_Properties"
 msgid "Properties"
 msgstr "Propiedades"
 
 #. uQaJH
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:694
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:708
 msgctxt "SparklineDialog|option_MinAxis_Individual"
 msgid "Individual"
 msgstr "Individual"
 
 #. BCX7t
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:695
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:709
 msgctxt "SparklineDialog|option_MinAxis_Group"
 msgid "Group"
 msgstr "Grupo"
 
 #. SubB5
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:696
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:710
 msgctxt "SparklineDialog|option_MinAxis_Custom"
 msgid "Custom"
 msgstr "Personalizado"
 
 #. T8Arr
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:724
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:738
 msgctxt "SparklineDialog|option_MaxAxis_Individual"
 msgid "Individual"
 msgstr "Individual"
 
 #. DDfCP
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:725
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:739
 msgctxt "SparklineDialog|option_MaxAxis_Group"
 msgid "Group"
 msgstr "Grupo"
 
 #. C2Huq
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:726
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:740
 msgctxt "SparklineDialog|option_MaxAxis_Custom"
 msgid "Custom"
 msgstr "Personalizado"
 
-#. JFSoc
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:753
+#. kiBE8
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:767
 msgctxt "SparklineDialog|label_AxisMaximum"
-msgid "Vertical maximum"
-msgstr "Máximo vertical"
+msgid "Vertical maximum:"
+msgstr "Máximo vertical:"
 
 #. MEvJy
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:768
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:782
 msgctxt "SparklineDialog|label_AxisMinimum"
 msgid "Vertical minimum:"
 msgstr "Mínimo vertical:"
 
 #. EMPn4
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:780
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:794
 msgctxt "SparklineDialog|checkBox_DisplayX"
 msgid "Display X axis"
 msgstr "Mostrar eje X"
 
 #. uAAF6
-#: sc/uiconfig/scalc/ui/sparklinedialog.ui:800
+#: sc/uiconfig/scalc/ui/sparklinedialog.ui:814
 msgctxt "SparklineDialog|label_Axes"
 msgid "Axes"
 msgstr "Ejes"
@@ -31599,14 +31575,14 @@ msgctxt "standardfilterdialog|cond"
 msgid "Does not end with"
 msgstr "No termina por"
 
-#. XCG8Q
+#. 3PahC
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:433
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:472
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:511
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:550
 msgctxt "standardfilterdialog|cond"
-msgid "Text color"
-msgstr "Color de texto"
+msgid "Font color"
+msgstr "Color de letra"
 
 #. 5Wa7m
 #: sc/uiconfig/scalc/ui/standardfilterdialog.ui:434
@@ -32605,13 +32581,13 @@ msgstr "S_incronizar hojas"
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:334
 msgctxt "extended_tip|synczoom"
 msgid "If checked, all sheets are shown with the same zoom factor. If not checked, each sheet can have its own zoom factor."
-msgstr "Si se activa la opción, todas las hojas mostrarán el mismo factor de escala. Si se desactiva, cada hoja puede tener su propio factor de escala."
+msgstr "Si se activa la opción, todas las hojas mostrarán el mismo factor de zum. Si se desactiva, cada hoja puede tener su propio factor de zum."
 
 #. pEFjC
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:343
 msgctxt "tpviewpage|label3"
 msgid "Zoom"
-msgstr "Escala"
+msgstr "Zum"
 
 #. ShHLd
 #: sc/uiconfig/scalc/ui/tpviewpage.ui:371
@@ -32674,127 +32650,127 @@ msgid "Specifies when grid lines will be displayed. Default is to display grid l
 msgstr "Especifica cuándo se mostrarán las líneas de cuadrícula. El valor predeterminado es mostrar las líneas de cuadrícula sólo en las celdas que no tienen un color de fondo. Puede elegir también mostrar las líneas de cuadrícula en las celdas con color de fondo, o ocultarlas."
 
 #. yajBD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:468
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:469
 msgctxt "extended_tip|color"
 msgid "Specifies a color for the grid lines in the current document."
 msgstr "Especifica un color para las líneas de la cuadrícula del documento actual."
 
 #. BpEmt
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:482
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:483
 msgctxt "tpviewpage|labelCursor"
 msgid "Pointe_r:"
 msgstr "Pun_tero:"
 
 #. AmbjZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:494
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:495
 msgctxt "tpviewpage|radiobuttonThemed"
 msgid "T_hemed"
 msgstr "Del _tema"
 
 #. xQTDE
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:498
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:499
 msgctxt "tpviewpage|radiobuttonThemedTip"
 msgid "Show the pointer as defined in the icon theme, typically as fat cross."
 msgstr "Mostrar el puntero como se define en el tema de iconos, generalmente como una cruz ancha."
 
 #. 3HxpG
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:510
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:511
 msgctxt "tpviewpage|radiobuttonSystem"
 msgid "S_ystem"
 msgstr "Siste_ma"
 
 #. weVdC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:514
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:515
 msgctxt "tpviewpage|radiobuttonSystemTip"
 msgid "Show the pointer as system default, typically an arrow pointer."
 msgstr "Mostrar el puntero predeterminado del sistema, generalmente como una punta de flecha."
 
 #. Cb4AM
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:530
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:531
 msgctxt "tpviewpage|label1"
 msgid "Visual Aids"
 msgstr "Auxiliares visuales"
 
 #. Qd5Rp
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:561
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:562
 msgctxt "tpviewpage|objgrf_label"
 msgid "Ob_jects/Images:"
 msgstr "Ob_jetos/imágenes:"
 
 #. vLBFR
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:575
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:576
 msgctxt "tpviewpage|diagram_label"
 msgid "Char_ts:"
 msgstr "_Gráficos:"
 
 #. q544D
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:589
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:590
 msgctxt "tpviewpage|draw_label"
 msgid "_Drawing objects:"
 msgstr "Objetos de _dibujo:"
 
 #. mpELg
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:604
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
 msgctxt "tpviewpage|objgrf"
 msgid "Show"
 msgstr "Mostrar"
 
 #. Kx6yJ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:605
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:606
 msgctxt "tpviewpage|objgrf"
 msgid "Hide"
 msgstr "Ocultar"
 
 #. oKpbX
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:609
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:610
 msgctxt "extended_tip|objgrf"
 msgid "Defines if objects and graphics are shown or hidden."
 msgstr "Define si se muestran u ocultan los objetos y las imágenes."
 
 #. wFBeZ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:623
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
 msgctxt "tpviewpage|diagram"
 msgid "Show"
 msgstr "Mostrar"
 
 #. H7MAB
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:624
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:625
 msgctxt "tpviewpage|diagram"
 msgid "Hide"
 msgstr "Ocultar"
 
 #. oVE9C
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:628
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:629
 msgctxt "extended_tip|diagram"
 msgid "Defines if charts in your document are shown or hidden."
 msgstr "Define si se muestran u ocultan los gráficos del documento."
 
 #. YaiTQ
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:642
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
 msgctxt "tpviewpage|draw"
 msgid "Show"
 msgstr "Mostrar"
 
 #. DST5a
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:643
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:644
 msgctxt "tpviewpage|draw"
 msgid "Hide"
 msgstr "Ocultar"
 
 #. FDGKD
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:647
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:648
 msgctxt "extended_tip|draw"
 msgid "Defines if drawing objects in your document are shown or hidden."
 msgstr "Define si se muestran u ocultan los objetos de dibujo del documento."
 
 #. E6GxC
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:662
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:663
 msgctxt "tpviewpage|label2"
 msgid "Objects"
 msgstr "Objetos"
 
 #. AnHPF
-#: sc/uiconfig/scalc/ui/tpviewpage.ui:686
+#: sc/uiconfig/scalc/ui/tpviewpage.ui:687
 msgctxt "extended_tip|TpViewPage"
 msgid "Defines which elements of the Calc main window are displayed. You can also show or hide highlighting of values in tables."
 msgstr "Define qué elementos de la ventana principal de Calc se muestran. También puede mostrar u ocultar el resalte de valores en las tablas."
@@ -32991,11 +32967,11 @@ msgctxt "validationcriteriapage|liststore2"
 msgid "invalid range"
 msgstr "intervalo no válido"
 
-#. 89CdB
+#. 8udun
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:84
 msgctxt "validationcriteriapage|extended_tip|data"
-msgid "Select the comparative operator that you want to use."
-msgstr "Seleccione el operador de comparación que desee usar."
+msgid "Select the comparison operator that you want to use."
+msgstr "Seleccione el operador de comparación que quiera utilizar."
 
 #. RCFrD
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:97
@@ -33007,7 +32983,7 @@ msgstr "_Mínimo:"
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:129
 msgctxt "validationcriteriapage|extended_tip|min"
 msgid "Enter the minimum value for the data validation option that you selected in the Allow box."
-msgstr "Escriba el valor mínimo para la opción de validación de datos seleccionada en el cuadro Permitirbox."
+msgstr "Introduzca el valor mínimo para la opción de validación de datos seleccionada en el cuadro Permitir."
 
 #. ywVMA
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:172
@@ -33037,7 +33013,7 @@ msgstr "En combinación con Herramientas ▸ Detective ▸ Marcar los datos inco
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:224
 msgctxt "validationcriteriapage|showlist"
 msgid "Show selection _list"
-msgstr "Mostrar la _lista de selección"
+msgstr "Mostrar _lista de selección"
 
 #. S8X7y
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:232
@@ -33061,16 +33037,16 @@ msgstr "Ordena la lista seleccionada en orden ascendente y filtra los duplicados
 #: sc/uiconfig/scalc/ui/validationcriteriapage.ui:266
 msgctxt "validationcriteriapage|hintft"
 msgid "A valid source can only consist of a contiguous selection of rows and columns, or a formula that results in an area or array."
-msgstr "Un origen válido puede consistir solo de una selección contigua de filas y columnas, o una fórmula que resulte en un área o una matriz."
+msgstr "Un origen válido puede ser una selección contigua de filas y columnas, o bien, una fórmula que devuelva un área o una matriz."
 
 #. 9v4Ah
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:286
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:289
 msgctxt "validationcriteriapage|extended_tip|max"
 msgid "Enter the maximum value for the data validation option that you selected in the Allow box."
 msgstr "Escriba el valor máximo para la opción de validación de datos seleccionada en el cuadro Permitir."
 
 #. 3HjmP
-#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:309
+#: sc/uiconfig/scalc/ui/validationcriteriapage.ui:312
 msgctxt "validationcriteriapage|extended_tip|ValidationCriteriaPage"
 msgid "Specify the validation rules for the selected cell(s)."
 msgstr "Especifique las reglas de validación de las celdas seleccionadas."

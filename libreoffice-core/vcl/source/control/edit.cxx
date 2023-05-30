@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/builder.hxx>
 #include <vcl/event.hxx>
 #include <vcl/cursor.hxx>
@@ -61,6 +62,7 @@
 #include <i18nlangtag/languagetag.hxx>
 #include <vcl/unohelp2.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
 #include <tools/json_writer.hxx>
 
@@ -119,14 +121,14 @@ struct Impl_IMEInfos
     bool          bCursor;
     bool          bWasCursorOverwrite;
 
-    Impl_IMEInfos(sal_Int32 nPos, const OUString& rOldTextAfterStartPos);
+    Impl_IMEInfos(sal_Int32 nPos, OUString aOldTextAfterStartPos);
 
     void        CopyAttribs(const ExtTextInputAttr* pA, sal_Int32 nL);
     void        DestroyAttribs();
 };
 
-Impl_IMEInfos::Impl_IMEInfos(sal_Int32 nP, const OUString& rOldTextAfterStartPos)
-    : aOldTextAfterStartPos(rOldTextAfterStartPos),
+Impl_IMEInfos::Impl_IMEInfos(sal_Int32 nP, OUString _aOldTextAfterStartPos)
+    : aOldTextAfterStartPos(std::move(_aOldTextAfterStartPos)),
     nPos(nP),
     nLen(0),
     bCursor(true),
@@ -431,7 +433,7 @@ OUString Edit::ImplGetText() const
             cEchoChar = mcEchoChar;
         else
             cEchoChar = u'\x2022';
-        OUStringBuffer aText;
+        OUStringBuffer aText(maText.getLength());
         comphelper::string::padToLength(aText, maText.getLength(), cEchoChar);
         return aText.makeStringAndClear();
     }
@@ -541,14 +543,14 @@ void Edit::ImplRepaint(vcl::RenderContext& rRenderContext, const tools::Rectangl
         vcl::Region aHighlightClipRegion;
         vcl::Region aNormalClipRegion;
         Selection aTmpSel(maSelection);
-        aTmpSel.Justify();
+        aTmpSel.Normalize();
         // selection is highlighted
         for(sal_Int32 i = 0; i < nLen; ++i)
         {
             tools::Rectangle aRect(aPos, Size(10, nTH));
             aRect.SetLeft( pDX[2 * i] + mnXOffset + ImplGetExtraXOffset() );
             aRect.SetRight( pDX[2 * i + 1] + mnXOffset + ImplGetExtraXOffset() );
-            aRect.Justify();
+            aRect.Normalize();
             bool bHighlight = false;
             if (i >= aTmpSel.Min() && i < aTmpSel.Max())
                 bHighlight = true;
@@ -626,7 +628,7 @@ void Edit::ImplRepaint(vcl::RenderContext& rRenderContext, const tools::Rectangl
                         tools::Rectangle aRect( aPos, Size( 10, nTH ) );
                         aRect.SetLeft( pDX[2 * (nIndex + mpIMEInfos->nPos)] + mnXOffset + ImplGetExtraXOffset() );
                         aRect.SetRight( pDX[2 * (nIndex + mpIMEInfos->nPos) + 1] + mnXOffset + ImplGetExtraXOffset() );
-                        aRect.Justify();
+                        aRect.Normalize();
                         aClip.Union(aRect);
                         nIndex++;
                     }
@@ -637,6 +639,8 @@ void Edit::ImplRepaint(vcl::RenderContext& rRenderContext, const tools::Rectangl
                         vcl::Font aFont = rRenderContext.GetFont();
                         if (nAttr & ExtTextInputAttr::Underline)
                             aFont.SetUnderline(LINESTYLE_SINGLE);
+                        else if (nAttr & ExtTextInputAttr::DoubleUnderline)
+                            aFont.SetUnderline(LINESTYLE_DOUBLE);
                         else if (nAttr & ExtTextInputAttr::BoldUnderline)
                             aFont.SetUnderline( LINESTYLE_BOLD);
                         else if (nAttr & ExtTextInputAttr::DottedUnderline)
@@ -683,7 +687,7 @@ void Edit::ImplDelete( const Selection& rSelection, sal_uInt8 nDirection, sal_uI
     ImplClearLayoutData();
 
     Selection aSelection( rSelection );
-    aSelection.Justify();
+    aSelection.Normalize();
 
     if ( !aSelection.Len() )
     {
@@ -692,12 +696,13 @@ void Edit::ImplDelete( const Selection& rSelection, sal_uInt8 nDirection, sal_uI
         {
             if ( nMode == EDIT_DELMODE_RESTOFWORD )
             {
-                i18n::Boundary aBoundary = xBI->getWordBoundary( maText.toString(), aSelection.Min(),
+                const OUString sText = maText.toString();
+                i18n::Boundary aBoundary = xBI->getWordBoundary( sText, aSelection.Min(),
                         GetSettings().GetLanguageTag().getLocale(), i18n::WordType::ANYWORD_IGNOREWHITESPACES, true );
                 auto startPos = aBoundary.startPos;
                 if ( startPos == aSelection.Min() )
                 {
-                    aBoundary = xBI->previousWord( maText.toString(), aSelection.Min(),
+                    aBoundary = xBI->previousWord( sText, aSelection.Min(),
                             GetSettings().GetLanguageTag().getLocale(), i18n::WordType::ANYWORD_IGNOREWHITESPACES );
                     startPos = std::max(aBoundary.startPos, sal_Int32(0));
                 }
@@ -786,7 +791,7 @@ bool Edit::ImplTruncateToMaxLen( OUString& rStr, sal_Int32 nSelectionLen ) const
 void Edit::ImplInsertText( const OUString& rStr, const Selection* pNewSel, bool bIsUserInput )
 {
     Selection aSelection( maSelection );
-    aSelection.Justify();
+    aSelection.Normalize();
 
     OUString aNewText( ImplGetValidString( rStr ) );
 
@@ -1303,7 +1308,7 @@ void Edit::ImplPaste( uno::Reference< datatransfer::clipboard::XClipboard > cons
         aData >>= aText;
 
         Selection aSelection(maSelection);
-        aSelection.Justify();
+        aSelection.Normalize();
         if (ImplTruncateToMaxLen(aText, aSelection.Len()))
             ShowTruncationWarning(GetFrameWeld());
 
@@ -1324,7 +1329,7 @@ void Edit::MouseButtonDown( const MouseEvent& rMEvt )
 
     sal_Int32 nCharPos = ImplGetCharPos( rMEvt.GetPosPixel() );
     Selection aSelection( maSelection );
-    aSelection.Justify();
+    aSelection.Normalize();
 
     if ( rMEvt.GetClicks() < 4 )
     {
@@ -1561,10 +1566,11 @@ bool Edit::ImplHandleKeyEvent( const KeyEvent& rKEvt )
                     {
                         if ( bWord )
                         {
-                            i18n::Boundary aBoundary = xBI->getWordBoundary( maText.toString(), aSel.Max(),
+                            const OUString sText = maText.toString();
+                            i18n::Boundary aBoundary = xBI->getWordBoundary( sText, aSel.Max(),
                                     GetSettings().GetLanguageTag().getLocale(), i18n::WordType::ANYWORD_IGNOREWHITESPACES, true );
                             if ( aBoundary.startPos == aSel.Max() )
-                                aBoundary = xBI->previousWord( maText.toString(), aSel.Max(),
+                                aBoundary = xBI->previousWord( sText, aSel.Max(),
                                         GetSettings().GetLanguageTag().getLocale(), i18n::WordType::ANYWORD_IGNOREWHITESPACES );
                             aSel.Max() = aBoundary.startPos;
                         }
@@ -1872,11 +1878,8 @@ void Edit::GetFocus()
 
         ImplShowCursor();
 
-        // FIXME: this is currently only on macOS
-        // check for other platforms that need similar handling
-        if( ImplGetSVData()->maNWFData.mbNoFocusRects &&
-            IsNativeWidgetEnabled() &&
-            IsNativeControlSupported( ControlType::Editbox, ControlPart::Entire ) )
+        if (IsNativeWidgetEnabled() &&
+            IsNativeControlSupported( ControlType::Editbox, ControlPart::Entire ))
         {
             ImplInvalidateOutermostBorder( mbIsSubEdit ? GetParent() : this );
         }
@@ -1899,11 +1902,8 @@ void Edit::LoseFocus()
 {
     if ( !mpSubEdit )
     {
-        // FIXME: this is currently only on macOS
-        // check for other platforms that need similar handling
-        if( ImplGetSVData()->maNWFData.mbNoFocusRects &&
-            IsNativeWidgetEnabled() &&
-            IsNativeControlSupported( ControlType::Editbox, ControlPart::Entire ) )
+        if (IsNativeWidgetEnabled() &&
+            IsNativeControlSupported(ControlType::Editbox, ControlPart::Entire))
         {
             ImplInvalidateOutermostBorder( mbIsSubEdit ? GetParent() : this );
         }
@@ -1913,6 +1913,28 @@ void Edit::LoseFocus()
     }
 
     Control::LoseFocus();
+}
+
+bool Edit::PreNotify(NotifyEvent& rNEvt)
+{
+    if (rNEvt.GetType() == NotifyEventType::MOUSEMOVE)
+    {
+        const MouseEvent* pMouseEvt = rNEvt.GetMouseEvent();
+        if (pMouseEvt && !pMouseEvt->GetButtons() && !pMouseEvt->IsSynthetic() && !pMouseEvt->IsModifierChanged())
+        {
+            // trigger redraw if mouse over state has changed
+            if (pMouseEvt->IsLeaveWindow() || pMouseEvt->IsEnterWindow())
+            {
+                if (IsNativeWidgetEnabled() &&
+                    IsNativeControlSupported(ControlType::Editbox, ControlPart::Entire))
+                {
+                    ImplInvalidateOutermostBorder(this);
+                }
+            }
+        }
+    }
+
+    return Control::PreNotify(rNEvt);
 }
 
 void Edit::Command( const CommandEvent& rCEvt )
@@ -2272,8 +2294,8 @@ void Edit::ImplHideDDCursor()
     }
 }
 
-TextFilter::TextFilter(const OUString &rForbiddenChars)
-    : sForbiddenChars(rForbiddenChars)
+TextFilter::TextFilter(OUString _aForbiddenChars)
+    : sForbiddenChars(std::move(_aForbiddenChars))
 {
 }
 
@@ -2497,7 +2519,7 @@ OUString Edit::GetSelected() const
     else
     {
         Selection aSelection( maSelection );
-        aSelection.Justify();
+        aSelection.Normalize();
         return OUString( maText.getStr() + aSelection.Min(), aSelection.Len() );
     }
 }
@@ -2727,7 +2749,7 @@ void Edit::dragGestureRecognized( const css::datatransfer::dnd::DragGestureEvent
         return;
 
     Selection aSel( maSelection );
-    aSel.Justify();
+    aSel.Normalize();
 
     // only if mouse in the selection...
     Point aMousePos( rDGE.DragOriginX, rDGE.DragOriginY );
@@ -2789,7 +2811,7 @@ void Edit::drop( const css::datatransfer::dnd::DropTargetDropEvent& rDTDE )
         ImplHideDDCursor();
 
         Selection aSel( maSelection );
-        aSel.Justify();
+        aSel.Normalize();
 
         if ( aSel.Len() && !mpDDInfo->bStarterOfDD )
             ImplDelete( aSel, EDIT_DEL_RIGHT, EDIT_DELMODE_SIMPLE );
@@ -2836,8 +2858,8 @@ void Edit::dragEnter( const css::datatransfer::dnd::DropTargetDragEnterEvent& rD
     mpDDInfo->bIsStringSupported = std::any_of(rFlavors.begin(), rFlavors.end(),
         [](const css::datatransfer::DataFlavor& rFlavor) {
             sal_Int32 nIndex = 0;
-            const OUString aMimetype = rFlavor.MimeType.getToken( 0, ';', nIndex );
-            return aMimetype == "text/plain";
+            const std::u16string_view aMimetype = o3tl::getToken(rFlavor.MimeType, 0, ';', nIndex );
+            return aMimetype == u"text/plain";
         });
 }
 
@@ -2867,7 +2889,7 @@ void Edit::dragOver( const css::datatransfer::dnd::DropTargetDragEvent& rDTDE )
     */
 
     Selection aSel( maSelection );
-    aSel.Justify();
+    aSel.Normalize();
 
     // Don't accept drop in selection or read-only field...
     if ( IsReadOnly() || aSel.Contains( mpDDInfo->nDropPos ) || ! mpDDInfo->bIsStringSupported )

@@ -102,7 +102,7 @@ const SwRect& SwFEShell::GetAnyCurRect( CurRectType eType, const Point* pPt,
             SwPosition aPos( *GetCursor()->GetPoint() );
             Point aPt( *pPt );
             GetLayout()->GetModelPositionForViewPoint( &aPos, aPt );
-            SwContentNode *pNd = aPos.nNode.GetNode().GetContentNode();
+            SwContentNode *pNd = aPos.GetNode().GetContentNode();
             std::pair<Point, bool> const tmp(*pPt, true);
             pFrame = pNd->getLayoutFrame(GetLayout(), nullptr, &tmp);
         }
@@ -243,7 +243,7 @@ FrameTypeFlags SwFEShell::GetFrameType( const Point *pPt, bool bStopAtFly ) cons
         SwPosition aPos( *GetCursor()->GetPoint() );
         Point aPt( *pPt );
         GetLayout()->GetModelPositionForViewPoint( &aPos, aPt );
-        SwContentNode *pNd = aPos.nNode.GetNode().GetContentNode();
+        SwContentNode *pNd = aPos.GetNode().GetContentNode();
         std::pair<Point, bool> const tmp(*pPt, true);
         pFrame = pNd->getLayoutFrame(GetLayout(), nullptr, &tmp);
     }
@@ -553,29 +553,28 @@ bool SwFEShell::Sort(const SwSortOptions& rOpt)
         {
             SwPaM* pPam = &rPaM;
 
-            SwPosition* pStart = pPam->Start();
-            SwPosition* pEnd   = pPam->End();
+            auto [pStart, pEnd] = pPam->StartEnd(); // SwPosition*
 
-            SwNodeIndex aPrevIdx( pStart->nNode, -1 );
-            SwNodeOffset nOffset = pEnd->nNode.GetIndex() - pStart->nNode.GetIndex();
-            const sal_Int32 nCntStt  = pStart->nContent.GetIndex();
+            SwNodeIndex aPrevIdx( pStart->GetNode(), -1 );
+            SwNodeOffset nOffset = pEnd->GetNodeIndex() - pStart->GetNodeIndex();
+            const sal_Int32 nCntStt  = pStart->GetContentIndex();
 
             // Sorting
             bRet = mxDoc->SortText(*pPam, rOpt);
 
             // put selection again
             pPam->DeleteMark();
-            pPam->GetPoint()->nNode.Assign( aPrevIdx.GetNode(), +1 );
-            SwContentNode* pCNd = pPam->GetContentNode();
+            pPam->GetPoint()->Assign( aPrevIdx.GetNode(), SwNodeOffset(+1) );
+            SwContentNode* pCNd = pPam->GetPointContentNode();
             sal_Int32 nLen = pCNd->Len();
             if( nLen > nCntStt )
                 nLen = nCntStt;
-            pPam->GetPoint()->nContent.Assign(pCNd, nLen );
+            pPam->GetPoint()->SetContent(nLen );
             pPam->SetMark();
 
-            pPam->GetPoint()->nNode += nOffset;
-            pCNd = pPam->GetContentNode();
-            pPam->GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+            pPam->GetPoint()->Adjust(nOffset);
+            pCNd = pPam->GetPointContentNode();
+            pPam->GetPoint()->SetContent( pCNd->Len() );
         }
     }
 
@@ -692,7 +691,7 @@ void SwFEShell::CalcBoundRect( SwRect& _orRect,
                                const RndStdIds _nAnchorId,
                                const sal_Int16 _eHoriRelOrient,
                                const sal_Int16 _eVertRelOrient,
-                               const SwPosition* _pToCharContentPos,
+                               const SwFormatAnchor* _pToCharContentPos,
                                const bool _bFollowTextFlow,
                                bool _bMirror,
                                Point* _opRef,
@@ -994,7 +993,7 @@ void SwFEShell::CalcBoundRect( SwRect& _orRect,
                     SwRect aChRect;
                     if ( _pToCharContentPos )
                     {
-                        pTextFrame->GetAutoPos( aChRect, *_pToCharContentPos );
+                        pTextFrame->GetAutoPos( aChRect, *_pToCharContentPos->GetContentAnchor() );
                     }
                     else
                     {
@@ -1008,7 +1007,7 @@ void SwFEShell::CalcBoundRect( SwRect& _orRect,
                 {
                     if ( _pToCharContentPos )
                     {
-                        pTextFrame->GetTopOfLine( nTop, *_pToCharContentPos );
+                        pTextFrame->GetTopOfLine( nTop, *_pToCharContentPos->GetContentAnchor() );
                     }
                     else
                     {
@@ -1038,7 +1037,7 @@ void SwFEShell::CalcBoundRect( SwRect& _orRect,
                 SwRect aChRect;
                 if ( _pToCharContentPos )
                 {
-                    pTextFrame->GetAutoPos( aChRect, *_pToCharContentPos );
+                    pTextFrame->GetAutoPos( aChRect, *_pToCharContentPos->GetContentAnchor() );
                 }
                 else
                 {

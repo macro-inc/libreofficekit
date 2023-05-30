@@ -32,7 +32,7 @@ class AreaChart : public VSeriesPlotter
 public:
     AreaChart() = delete;
 
-    AreaChart( const css::uno::Reference< css::chart2::XChartType >& xChartTypeModel
+    AreaChart( const rtl::Reference< ::chart::ChartType >& xChartTypeModel
              , sal_Int32 nDimensionCount
              , bool bCategoryXAxis, bool bNoArea=false
              );
@@ -52,16 +52,16 @@ public:
 private: //methods
     void impl_createSeriesShapes();
     bool impl_createArea( VDataSeries* pSeries
-                , css::drawing::PolyPolygonShape3D const * pSeriesPoly
-                , css::drawing::PolyPolygonShape3D const * pPreviousSeriesPoly
+                , std::vector<std::vector<css::drawing::Position3D>> const * pSeriesPoly
+                , std::vector<std::vector<css::drawing::Position3D>> const * pPreviousSeriesPoly
                 , PlottingPositionHelper const * pPosHelper );
     bool impl_createLine( VDataSeries* pSeries
-                , css::drawing::PolyPolygonShape3D const * pSeriesPoly
+                , std::vector<std::vector<css::drawing::Position3D>> const * pSeriesPoly
                 , PlottingPositionHelper* pPosHelper );
-    static bool create_stepped_line( css::drawing::PolyPolygonShape3D aStartPoly
+    static bool create_stepped_line( std::vector<std::vector<css::drawing::Position3D>> aStartPoly
                 , css::chart2::CurveStyle eCurveStyle
                 , PlottingPositionHelper const * pPosHelper
-                , css::drawing::PolyPolygonShape3D &aPoly );
+                , std::vector<std::vector<css::drawing::Position3D>> &aPoly );
 
 private: //member
     std::unique_ptr<PlottingPositionHelper>
@@ -76,10 +76,10 @@ private: //member
     sal_Int32                           m_nCurveResolution;
     sal_Int32                           m_nSplineOrder;
 
-    css::uno::Reference< css::drawing::XShapes > m_xSeriesTarget;
-    css::uno::Reference< css::drawing::XShapes > m_xErrorBarTarget;
-    css::uno::Reference< css::drawing::XShapes > m_xTextTarget;
-    css::uno::Reference< css::drawing::XShapes > m_xRegressionCurveEquationTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xSeriesTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xErrorBarTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xTextTarget;
+    rtl::Reference<SvxShapeGroupAnyD> m_xRegressionCurveEquationTarget;
 };
 } //namespace chart
 

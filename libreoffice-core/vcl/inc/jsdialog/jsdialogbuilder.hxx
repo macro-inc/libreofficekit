@@ -11,6 +11,7 @@
 
 #include <comphelper/string.hxx>
 #include <osl/mutex.hxx>
+#include <utility>
 #include <vcl/weld.hxx>
 #include <vcl/jsdialog/executor.hxx>
 #include <vcl/sysdata.hxx>
@@ -23,7 +24,7 @@
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/datatransfer/dnd/XDropTarget.hpp>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 
 #include <deque>
 #include <list>
@@ -39,6 +40,12 @@ class ComboBox;
 class VclMultiLineEdit;
 class SvTabListBox;
 class IconView;
+class VclScrolledWindow;
+
+namespace vcl
+{
+class ILibreOfficeKitNotifier;
+}
 
 typedef std::map<OString, weld::Widget*> WidgetMap;
 
@@ -80,7 +87,7 @@ public:
     JSDialogMessageInfo(jsdialog::MessageType eType, VclPtr<vcl::Window> pWindow,
                         std::unique_ptr<jsdialog::ActionDataMap> pData)
         : m_eType(eType)
-        , m_pWindow(pWindow)
+        , m_pWindow(std::move(pWindow))
         , m_pData(std::move(pData))
     {
     }
@@ -173,10 +180,9 @@ protected:
 };
 
 class JSDropTarget final
-    : public cppu::WeakComponentImplHelper<css::datatransfer::dnd::XDropTarget,
-                                           css::lang::XInitialization, css::lang::XServiceInfo>
+    : public comphelper::WeakComponentImplHelper<
+          css::datatransfer::dnd::XDropTarget, css::lang::XInitialization, css::lang::XServiceInfo>
 {
-    osl::Mutex m_aMutex;
     std::vector<css::uno::Reference<css::datatransfer::dnd::XDropTargetListener>> m_aListeners;
 
 public:
@@ -216,10 +222,16 @@ class JSInstanceBuilder final : public SalInstanceBuilder, public JSDialogSender
     std::string m_sTypeOfJSON;
     bool m_bHasTopLevelDialog;
     bool m_bIsNotebookbar;
+    /// used to detect when we have to send Full Update in container handler
+    bool m_bSentInitialUpdate;
+    /// is true for tabpages, prevents from closing parent window on destroy
+    bool m_bIsNestedBuilder;
     /// When LOKNotifier is set by jsdialogs code we need to release it
     VclPtr<vcl::Window> m_aWindowToRelease;
 
     friend class JSMessageDialog; // static message boxes have to be registered outside
+    friend class JSDialog;
+    friend class JSAssistant;
 
     friend VCL_DLLPUBLIC bool jsdialog::ExecuteAction(const std::string& nWindowId,
                                                       const OString& rWidget, StringMap& rData);
@@ -273,9 +285,12 @@ public:
     virtual ~JSInstanceBuilder() override;
     virtual std::unique_ptr<weld::MessageDialog> weld_message_dialog(const OString& id) override;
     virtual std::unique_ptr<weld::Dialog> weld_dialog(const OString& id) override;
+    virtual std::unique_ptr<weld::Assistant> weld_assistant(const OString& id) override;
     virtual std::unique_ptr<weld::Container> weld_container(const OString& id) override;
     virtual std::unique_ptr<weld::Label> weld_label(const OString& id) override;
     virtual std::unique_ptr<weld::Button> weld_button(const OString& id) override;
+    virtual std::unique_ptr<weld::LinkButton> weld_link_button(const OString& id) override;
+    virtual std::unique_ptr<weld::ToggleButton> weld_toggle_button(const OString& id) override;
     virtual std::unique_ptr<weld::Entry> weld_entry(const OString& id) override;
     virtual std::unique_ptr<weld::ComboBox> weld_combo_box(const OString& id) override;
     virtual std::unique_ptr<weld::Notebook> weld_notebook(const OString& id) override;
@@ -290,6 +305,8 @@ public:
     virtual std::unique_ptr<weld::TreeView> weld_tree_view(const OString& id) override;
     virtual std::unique_ptr<weld::Expander> weld_expander(const OString& id) override;
     virtual std::unique_ptr<weld::IconView> weld_icon_view(const OString& id) override;
+    virtual std::unique_ptr<weld::ScrolledWindow>
+    weld_scrolled_window(const OString& id, bool bUserManagedScrolling = false) override;
     virtual std::unique_ptr<weld::RadioButton> weld_radio_button(const OString& id) override;
     virtual std::unique_ptr<weld::Frame> weld_frame(const OString& id) override;
     virtual std::unique_ptr<weld::MenuButton> weld_menu_button(const OString& id) override;
@@ -298,10 +315,10 @@ public:
     virtual std::unique_ptr<weld::Widget> weld_widget(const OString& id) override;
     virtual std::unique_ptr<weld::Image> weld_image(const OString& id) override;
 
-    static weld::MessageDialog* CreateMessageDialog(weld::Widget* pParent,
-                                                    VclMessageType eMessageType,
-                                                    VclButtonsType eButtonType,
-                                                    const OUString& rPrimaryMessage);
+    static weld::MessageDialog*
+    CreateMessageDialog(weld::Widget* pParent, VclMessageType eMessageType,
+                        VclButtonsType eButtonType, const OUString& rPrimaryMessage,
+                        const vcl::ILibreOfficeKitNotifier* pNotifier = nullptr);
 
     static void AddChildWidget(const std::string& nWindowId, const OString& id,
                                weld::Widget* pWidget);
@@ -318,7 +335,7 @@ private:
     VclPtr<vcl::Window>& GetNotifierWindow();
 };
 
-class BaseJSWidget
+class SAL_LOPLUGIN_ANNOTATE("crosscast") BaseJSWidget
 {
 public:
     virtual ~BaseJSWidget() = default;
@@ -349,6 +366,14 @@ public:
     JSWidget(JSDialogSender* pSender, VclClass* pObject, SalInstanceBuilder* pBuilder,
              bool bTakeOwnership)
         : BaseInstanceClass(pObject, pBuilder, bTakeOwnership)
+        , m_bIsFreezed(false)
+        , m_pSender(pSender)
+    {
+    }
+
+    JSWidget(JSDialogSender* pSender, VclClass* pObject, SalInstanceBuilder* pBuilder,
+             bool bTakeOwnership, bool bUserManagedScrolling)
+        : BaseInstanceClass(pObject, pBuilder, bTakeOwnership, bUserManagedScrolling)
         , m_bIsFreezed(false)
         , m_pSender(pSender)
     {
@@ -463,6 +488,13 @@ public:
         if (!m_bIsFreezed && m_pSender)
             m_pSender->sendClosePopup(nWindowId);
     }
+
+    virtual void set_buildable_name(const OString& rName) override
+    {
+        SalInstanceWidget::set_buildable_name(rName);
+        assert(false); // we remember old name in GetLOKWeldWidgetsMap()
+        // TODO: implement renaming or avoid it for LOK
+    }
 };
 
 class JSDialog final : public JSWidget<SalInstanceDialog, ::Dialog>
@@ -474,6 +506,29 @@ public:
     virtual void collapse(weld::Widget* pEdit, weld::Widget* pButton) override;
     virtual void undo_collapse() override;
     virtual void response(int response) override;
+    virtual weld::Button* weld_widget_for_response(int response) override;
+    virtual int run() override;
+    virtual bool runAsync(std::shared_ptr<weld::DialogController> aOwner,
+                          const std::function<void(sal_Int32)>& rEndDialogFn) override;
+    virtual bool runAsync(std::shared_ptr<Dialog> const& rxSelf,
+                          const std::function<void(sal_Int32)>& func) override;
+};
+
+class JSAssistant final : public JSWidget<SalInstanceAssistant, vcl::RoadmapWizard>
+{
+public:
+    JSAssistant(JSDialogSender* pSender, vcl::RoadmapWizard* pDialog, SalInstanceBuilder* pBuilder,
+                bool bTakeOwnership);
+
+    virtual void set_current_page(int nPage) override;
+    virtual void set_current_page(const OString& rIdent) override;
+    virtual void response(int response) override;
+    virtual weld::Button* weld_widget_for_response(int response) override;
+    virtual int run() override;
+    virtual bool runAsync(std::shared_ptr<weld::DialogController> aOwner,
+                          const std::function<void(sal_Int32)>& rEndDialogFn) override;
+    virtual bool runAsync(std::shared_ptr<Dialog> const& rxSelf,
+                          const std::function<void(sal_Int32)>& func) override;
 };
 
 class JSContainer final : public JSWidget<SalInstanceContainer, vcl::Window>
@@ -481,6 +536,27 @@ class JSContainer final : public JSWidget<SalInstanceContainer, vcl::Window>
 public:
     JSContainer(JSDialogSender* pSender, vcl::Window* pContainer, SalInstanceBuilder* pBuilder,
                 bool bTakeOwnership);
+};
+
+class JSScrolledWindow final : public JSWidget<SalInstanceScrolledWindow, ::VclScrolledWindow>
+{
+public:
+    JSScrolledWindow(JSDialogSender* pSender, ::VclScrolledWindow* pWindow,
+                     SalInstanceBuilder* pBuilder, bool bTakeOwnership, bool bUserManagedScrolling);
+
+    virtual void vadjustment_configure(int value, int lower, int upper, int step_increment,
+                                       int page_increment, int page_size) override;
+    virtual void vadjustment_set_value(int value) override;
+    void vadjustment_set_value_no_notification(int value);
+    virtual void vadjustment_set_page_size(int size) override;
+    virtual void set_vpolicy(VclPolicyType eVPolicy) override;
+
+    virtual void hadjustment_configure(int value, int lower, int upper, int step_increment,
+                                       int page_increment, int page_size) override;
+    virtual void hadjustment_set_value(int value) override;
+    void hadjustment_set_value_no_notification(int value);
+    virtual void hadjustment_set_page_size(int size) override;
+    virtual void set_hpolicy(VclPolicyType eVPolicy) override;
 };
 
 class JSLabel final : public JSWidget<SalInstanceLabel, Control>
@@ -498,6 +574,20 @@ public:
              bool bTakeOwnership);
 };
 
+class JSLinkButton final : public JSWidget<SalInstanceLinkButton, ::FixedHyperlink>
+{
+public:
+    JSLinkButton(JSDialogSender* pSender, ::FixedHyperlink* pButton, SalInstanceBuilder* pBuilder,
+                 bool bTakeOwnership);
+};
+
+class JSToggleButton final : public JSWidget<SalInstanceToggleButton, ::PushButton>
+{
+public:
+    JSToggleButton(JSDialogSender* pSender, ::PushButton* pButton, SalInstanceBuilder* pBuilder,
+                   bool bTakeOwnership);
+};
+
 class JSEntry final : public JSWidget<SalInstanceEntry, ::Edit>
 {
 public:
@@ -505,6 +595,7 @@ public:
             bool bTakeOwnership);
     virtual void set_text(const OUString& rText) override;
     void set_text_without_notify(const OUString& rText);
+    virtual void replace_selection(const OUString& rText) override;
 };
 
 class JSListBox final : public JSWidget<SalInstanceComboBoxWithoutEdit, ::ListBox>
@@ -534,34 +625,12 @@ public:
 
 class JSNotebook final : public JSWidget<SalInstanceNotebook, ::TabControl>
 {
-    Link<const OString&, bool> m_aLeavePageOverridenHdl;
-    Link<const OString&, void> m_aEnterPageOverridenHdl;
-
-    DECL_LINK(LeaveHdl, const OString&, bool);
-    DECL_LINK(EnterHdl, const OString&, bool);
-
 public:
     JSNotebook(JSDialogSender* pSender, ::TabControl* pControl, SalInstanceBuilder* pBuilder,
                bool bTakeOwnership);
 
-    virtual void set_current_page(int nPage) override;
-
-    virtual void set_current_page(const OString& rIdent) override;
-
     virtual void remove_page(const OString& rIdent) override;
-
     virtual void insert_page(const OString& rIdent, const OUString& rLabel, int nPos) override;
-
-    void connect_leave_page(const Link<const OString&, bool>& rLink)
-    {
-        m_aLeavePageHdl = LINK(this, JSNotebook, LeaveHdl);
-        m_aLeavePageOverridenHdl = rLink;
-    }
-    void connect_enter_page(const Link<const OString&, void>& rLink)
-    {
-        m_aLeavePageHdl = LINK(this, JSNotebook, EnterHdl);
-        m_aEnterPageOverridenHdl = rLink;
-    }
 };
 
 class JSSpinButton final : public JSWidget<SalInstanceSpinButton, ::FormattedField>
@@ -570,7 +639,7 @@ public:
     JSSpinButton(JSDialogSender* pSender, ::FormattedField* pSpin, SalInstanceBuilder* pBuilder,
                  bool bTakeOwnership);
 
-    virtual void set_value(int value) override;
+    virtual void set_value(sal_Int64 value) override;
 };
 
 class JSMessageDialog final : public JSWidget<SalInstanceMessageDialog, ::MessageDialog>
@@ -599,6 +668,7 @@ public:
 
     virtual void response(int response) override;
 
+    virtual int run() override;
     // TODO: move to dialog class so we will not send json when built but on run
     bool runAsync(std::shared_ptr<weld::DialogController> aOwner,
                   const std::function<void(sal_Int32)>& rEndDialogFn) override;
@@ -646,6 +716,8 @@ public:
     JSTextView(JSDialogSender* pSender, ::VclMultiLineEdit* pTextView, SalInstanceBuilder* pBuilder,
                bool bTakeOwnership);
     virtual void set_text(const OUString& rText) override;
+    void set_text_without_notify(const OUString& rText);
+    virtual void replace_selection(const OUString& rText) override;
 };
 
 class JSTreeView final : public JSWidget<SalInstanceTreeView, ::SvTabListBox>
@@ -676,6 +748,10 @@ public:
 
     virtual void expand_row(const weld::TreeIter& rIter) override;
     virtual void collapse_row(const weld::TreeIter& rIter) override;
+
+    virtual void set_cursor(const weld::TreeIter& rIter) override;
+    void set_cursor_without_notify(const weld::TreeIter& rIter);
+    virtual void set_cursor(int pos) override;
 
     using SalInstanceTreeView::remove;
     virtual void remove(int pos) override;
@@ -781,6 +857,8 @@ class JSImage : public JSWidget<SalInstanceImage, FixedImage>
 public:
     JSImage(JSDialogSender* pSender, FixedImage* pImage, SalInstanceBuilder* pBuilder,
             bool bTakeOwnership);
+    virtual void set_image(VirtualDevice* pDevice) override;
+    virtual void set_image(const css::uno::Reference<css::graphic::XGraphic>& rImage) override;
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab cinoptions=b1,g0,N-s cinkeys+=0=break: */

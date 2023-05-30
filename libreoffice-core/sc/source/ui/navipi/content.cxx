@@ -75,16 +75,16 @@ const ScContentId pTypeList[int(ScContentId::LAST) + 1] =
     ScContentId::DRAWING
 };
 
-const std::u16string_view aContentBmps[]=
+constexpr rtl::OUStringConstExpr aContentBmps[]=
 {
-    u"" RID_BMP_CONTENT_TABLE,
-    u"" RID_BMP_CONTENT_RANGENAME,
-    u"" RID_BMP_CONTENT_DBAREA,
-    u"" RID_BMP_CONTENT_GRAPHIC,
-    u"" RID_BMP_CONTENT_OLEOBJECT,
-    u"" RID_BMP_CONTENT_NOTE,
-    u"" RID_BMP_CONTENT_AREALINK,
-    u"" RID_BMP_CONTENT_DRAWING
+    RID_BMP_CONTENT_TABLE,
+    RID_BMP_CONTENT_RANGENAME,
+    RID_BMP_CONTENT_DBAREA,
+    RID_BMP_CONTENT_GRAPHIC,
+    RID_BMP_CONTENT_OLEOBJECT,
+    RID_BMP_CONTENT_NOTE,
+    RID_BMP_CONTENT_AREALINK,
+    RID_BMP_CONTENT_DRAWING
 };
 
 ScDocShell* ScContentTree::GetManualOrCurrent()
@@ -793,19 +793,19 @@ void ScContentTree::GetDbNames()
     }
 }
 
-bool ScContentTree::IsPartOfType( ScContentId nContentType, sal_uInt16 nObjIdentifier )
+bool ScContentTree::IsPartOfType( ScContentId nContentType, SdrObjKind nObjIdentifier )
 {
     bool bRet = false;
     switch ( nContentType )
     {
         case ScContentId::GRAPHIC:
-            bRet = ( nObjIdentifier == OBJ_GRAF );
+            bRet = ( nObjIdentifier == SdrObjKind::Graphic );
             break;
         case ScContentId::OLEOBJECT:
-            bRet = ( nObjIdentifier == OBJ_OLE2 );
+            bRet = ( nObjIdentifier == SdrObjKind::OLE2 );
             break;
         case ScContentId::DRAWING:
-            bRet = ( nObjIdentifier != OBJ_GRAF && nObjIdentifier != OBJ_OLE2 );    // everything else
+            bRet = ( nObjIdentifier != SdrObjKind::Graphic && nObjIdentifier != SdrObjKind::OLE2 );    // everything else
             break;
         default:
             OSL_FAIL("unknown content type");
@@ -940,11 +940,7 @@ const ScAreaLink* ScContentTree::GetLink( sal_uLong nIndex )
 
 static OUString lcl_NoteString( const ScPostIt& rNote )
 {
-    OUString aText = rNote.GetText();
-    sal_Int32 nAt;
-    while ( (nAt = aText.indexOf( '\n' )) != -1 )
-        aText = aText.replaceAt( nAt, 1, u" " );
-    return aText;
+    return rNote.GetText().replace('\n', ' ');
 }
 
 void ScContentTree::GetNoteStrings()
@@ -1108,7 +1104,7 @@ static bool lcl_DoDragObject( ScDocShell* pSrcShell, std::u16string_view rName, 
     {
         bool bOle = ( nType == ScContentId::OLEOBJECT );
         bool bGraf = ( nType == ScContentId::GRAPHIC );
-        sal_uInt16 nDrawId = sal::static_int_cast<sal_uInt16>( bOle ? OBJ_OLE2 : ( bGraf ? OBJ_GRAF : OBJ_GRUP ) );
+        SdrObjKind nDrawId = bOle ? SdrObjKind::OLE2 : ( bGraf ? SdrObjKind::Graphic : SdrObjKind::Group );
         SCTAB nTab = 0;
         SdrObject* pObject = pModel->GetNamedObject( rName, nDrawId, nTab );
         if (pObject)
@@ -1124,7 +1120,7 @@ static bool lcl_DoDragObject( ScDocShell* pSrcShell, std::u16string_view rName, 
             // that the EmbeddedObjectContainer gets copied. We need no CheckOle
             // here, test is simpler.
             ScDocShellRef aDragShellRef;
-            if(OBJ_OLE2 == pObject->GetObjIdentifier())
+            if(SdrObjKind::OLE2 == pObject->GetObjIdentifier())
             {
                 aDragShellRef = new ScDocShell;     // DocShell needs a Ref immediately
                 aDragShellRef->DoInitNew();
@@ -1139,7 +1135,7 @@ static bool lcl_DoDragObject( ScDocShell* pSrcShell, std::u16string_view rName, 
             aObjDesc.maDisplayName = pSrcShell->GetMedium()->GetURLObject().GetURLNoPass();
             // maSize is set in ScDrawTransferObj ctor
 
-            rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pDragModel), pSrcShell, aObjDesc );
+            rtl::Reference<ScDrawTransferObj> pTransferObj = new ScDrawTransferObj( std::move(pDragModel), pSrcShell, std::move(aObjDesc) );
 
             pTransferObj->SetDragSourceObj( *pObject, nTab );
             pTransferObj->SetDragSourceFlags(ScDragSrc::Navigator);
@@ -1179,7 +1175,7 @@ static bool lcl_DoDragCells( ScDocShell* pSrcShell, const ScRange& rRange, ScDra
         aObjDesc.maDisplayName = pSrcShell->GetMedium()->GetURLObject().GetURLNoPass();
         // maSize is set in ScTransferObj ctor
 
-        rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), aObjDesc );
+        rtl::Reference<ScTransferObj> pTransferObj = new ScTransferObj( std::move(pClipDoc), std::move(aObjDesc) );
 
         pTransferObj->SetDragSource( pSrcShell, aMark );
         pTransferObj->SetDragSourceFlags( nFlags );
@@ -1548,7 +1544,7 @@ void ScContentTree::SelectEntryByName(const ScContentId nRoot, std::u16string_vi
     }
 }
 
-void ScContentTree::ApplyNavigatorSettings(bool bRestorePos, int nScrollPos)
+void ScContentTree::ApplyNavigatorSettings()
 {
     const ScNavigatorSettings* pSettings = ScNavigatorDlg::GetNavigatorSettings();
     if( !pSettings )
@@ -1589,9 +1585,6 @@ void ScContentTree::ApplyNavigatorSettings(bool bRestorePos, int nScrollPos)
             // select
             if( nRootSel == nEntry )
             {
-                if (bRestorePos)
-                    m_xTreeView->vadjustment_set_value(nScrollPos);
-
                 std::unique_ptr<weld::TreeIter> xEntry;
                 if (bExp && (nChildSel != SC_CONTENT_NOCHILD))
                 {

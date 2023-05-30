@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-08-24 12:29+0200\n"
-"PO-Revision-Date: 2022-02-03 17:38+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2022-11-02 09:22+0000\n"
 "Last-Translator: Dimitris Spingos <dmtrs32@gmail.com>\n"
 "Language-Team: Greek <https://translations.documentfoundation.org/projects/libo_ui-master/vclmessages/el/>\n"
 "Language: el\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1562572366.000000\n"
 
 #. k5jTM
@@ -1380,11 +1380,11 @@ msgctxt "STR_FONT_FEATURE_ID_FALT"
 msgid "Final Glyph on Line Alternates"
 msgstr "Τελική γλυφή σε εναλλακτικές γραμμές"
 
-#. rKM4e
+#. q3jvz
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:43
 msgctxt "STR_FONT_FEATURE_ID_FRAC"
-msgid "Fraction style:"
-msgstr "Τεχνοτροπία κλάσματος:"
+msgid "Fraction style"
+msgstr "Τεχνοτροπία κλάσματος"
 
 #. FA4Qr
 #: vcl/inc/font/OpenTypeFeatureStrings.hrc:44
@@ -1722,6 +1722,12 @@ msgctxt "STR_FONT_FEATURE_ID_ZERO"
 msgid "Slashed Zero"
 msgstr "Μηδενικά με διαγράμμιση"
 
+#. 8jmFo
+#: vcl/inc/font/OpenTypeFeatureStrings.hrc:100
+msgctxt "STR_FONT_FEATURE_PARAM_NONE"
+msgid "None"
+msgstr "Κανένα"
+
 #. TxdMF
 #: vcl/uiconfig/ui/aboutbox.ui:74
 msgctxt "aboutdialog|buildIdLink"
@@ -1835,6 +1841,62 @@ msgstr "Δεν βρέθηκε προεπιλεγμένος εκτυπωτής."
 msgctxt "errornoprinterdialog|ErrorNoPrinterDialog"
 msgid "Please choose a printer and try again."
 msgstr "Παρακαλούμε, επιλέξτε έναν εκτυπωτή και ξαναπροσπαθήστε."
+
+#. puBNZ
+#: vcl/uiconfig/ui/openlockedquerybox.ui:8
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Document in Use"
+msgstr "Έγγραφο σε χρήση"
+
+#. 4ZftN
+#: vcl/uiconfig/ui/openlockedquerybox.ui:76
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark image"
+msgstr "Εικόνα ερωτηματικού"
+
+#. LCYux
+#: vcl/uiconfig/ui/openlockedquerybox.ui:77
+msgctxt "openlockedquerybox|questionmark"
+msgid "Question mark icon for dialog box."
+msgstr "Εικονίδιο ερωτηματικού για το πλαίσιο διαλόγου."
+
+#. j4NGP
+#: vcl/uiconfig/ui/openlockedquerybox.ui:100
+msgctxt "openlockedquerybox|messagetext"
+msgid "This file has been locked by another user."
+msgstr "Αυτό το αρχείο έχει κλειδωθεί από άλλο χρήστη."
+
+#. sq7go
+#: vcl/uiconfig/ui/openlockedquerybox.ui:124
+msgctxt "openlockedquerybox|ReadOnlyMessage"
+msgid ""
+"You can open it read only  and\n"
+"receive a notification if ready."
+msgstr ""
+"Μπορείτε να το ανοίξετε μόνο για ανάγνωση και\n"
+"να λάβετε μια ειδοποίηση εάν είστε έτοιμοι."
+
+#. nFBTF
+#: vcl/uiconfig/ui/openlockedquerybox.ui:142
+msgctxt "openlockedquerybox|OpenCopyMessage"
+msgid ""
+"You can open a copy on your\n"
+"local system."
+msgstr ""
+"Μπορείτε να ανοίξετε ένα αντίγραφο στο δικό σας\n"
+"τοπικό σύστημα."
+
+#. W3Sbv
+#: vcl/uiconfig/ui/openlockedquerybox.ui:178
+msgctxt "openlockedquerybox|expandertext"
+msgid "_More Details"
+msgstr "_Περισσότερες λεπτομέρειες"
+
+#. jEGxc
+#: vcl/uiconfig/ui/openlockedquerybox.ui:264
+msgctxt "openlockedquerybox|OpenLockedQueryBox"
+msgid "Displays information about locked files and further steps to take when opening a locked file."
+msgstr "Εμφανίζει πληροφορίες σχετικά με κλειδωμένα αρχεία και περαιτέρω βήματα που πρέπει να ακολουθήσετε κατά το άνοιγμα ενός κλειδωμένου αρχείου."
 
 #. DUavz
 #: vcl/uiconfig/ui/printdialog.ui:64

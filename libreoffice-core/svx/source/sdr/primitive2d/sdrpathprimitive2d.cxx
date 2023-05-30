@@ -21,6 +21,7 @@
 #include <sdr/primitive2d/sdrdecompositiontools.hxx>
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/sdrdecompositiontools2d.hxx>
+#include <utility>
 
 
 using namespace com::sun::star;
@@ -115,18 +116,18 @@ namespace drawinglayer::primitive2d
                     getSdrLFSTAttribute().getShadow());
             }
 
-            rContainer.insert(rContainer.end(), aRetval.begin(), aRetval.end());
+            rContainer.append(std::move(aRetval));
         }
 
         SdrPathPrimitive2D::SdrPathPrimitive2D(
-            const basegfx::B2DHomMatrix& rTransform,
+            basegfx::B2DHomMatrix aTransform,
             const attribute::SdrLineFillEffectsTextAttribute& rSdrLFSTAttribute,
-            const basegfx::B2DPolyPolygon& rUnitPolyPolygon,
-            const basegfx::B2DPolyPolygon& rUnitDefinitionPolyPolygon)
-        :   maTransform(rTransform),
+            basegfx::B2DPolyPolygon aUnitPolyPolygon,
+            basegfx::B2DPolyPolygon aUnitDefinitionPolyPolygon)
+        :   maTransform(std::move(aTransform)),
             maSdrLFSTAttribute(rSdrLFSTAttribute),
-            maUnitPolyPolygon(rUnitPolyPolygon),
-            maUnitDefinitionPolyPolygon(rUnitDefinitionPolyPolygon)
+            maUnitPolyPolygon(std::move(aUnitPolyPolygon)),
+            maUnitDefinitionPolyPolygon(std::move(aUnitDefinitionPolyPolygon))
         {
         }
 

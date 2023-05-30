@@ -28,6 +28,9 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
+#include <o3tl/string_view.hxx>
+#include <ooxresid.hxx>
+#include <strings.hrc>
 
 using namespace ::oox::core;
 using namespace ::com::sun::star::uno;
@@ -41,7 +44,7 @@ HyperLinkContext::HyperLinkContext( ContextHandler2Helper const & rParent,
     , maProperties(aProperties)
 {
     OUString sURL, sHref;
-    OUString aRelId = rAttribs.getString( R_TOKEN( id ) ).get();
+    OUString aRelId = rAttribs.getStringDefaulted( R_TOKEN( id ) );
     if ( !aRelId.isEmpty() )
     {
         sHref = getRelations().getExternalTargetFromRelId( aRelId );
@@ -55,13 +58,13 @@ HyperLinkContext::HyperLinkContext( ContextHandler2Helper const & rParent,
             sURL = getRelations().getInternalTargetFromRelId( aRelId );
         }
     }
-    OUString sTooltip = rAttribs.getString( R_TOKEN( tooltip ) ).get();
+    OUString sTooltip = rAttribs.getStringDefaulted( R_TOKEN( tooltip ) );
     if ( !sTooltip.isEmpty() )
         maProperties.setProperty(PROP_Representation, sTooltip);
-    OUString sFrame = rAttribs.getString( R_TOKEN( tgtFrame ) ).get();
+    OUString sFrame = rAttribs.getStringDefaulted( R_TOKEN( tgtFrame ) );
     if( !sFrame.isEmpty() )
         maProperties.setProperty(PROP_TargetFrame, sFrame);
-    OUString aAction = rAttribs.getString( XML_action ).get();
+    OUString aAction = rAttribs.getStringDefaulted( XML_action );
     if ( !aAction.isEmpty() )
     {
         // reserved values of the unrestricted string aAction:
@@ -90,8 +93,8 @@ HyperLinkContext::HyperLinkContext( ContextHandler2Helper const & rParent,
                 static const OUStringLiteral sJump( u"jump=" );
                 if ( aPPAct.match( sJump, nIndex + 1 ) )
                 {
-                    OUString aDestination( aPPAct.copy( nIndex + 1 + sJump.getLength() ) );
-                    sURL += "#action?jump=" + aDestination;
+                    std::u16string_view aDestination( aPPAct.subView( nIndex + 1 + sJump.getLength() ) );
+                    sURL += OUString::Concat("#action?jump=") + aDestination;
                 }
             }
             else if ( aPPAction.match( "hlinksldjump" ) )
@@ -116,12 +119,12 @@ HyperLinkContext::HyperLinkContext( ContextHandler2Helper const & rParent,
                             break;
                         nLength++;
                     }
-                    sal_Int32 nPageNumber = sHref.copy( nIndex2, nLength ).toInt32();
+                    sal_Int32 nPageNumber = o3tl::toInt32(sHref.subView( nIndex2, nLength ));
                     if ( nPageNumber )
                     {
                         const OUString aSlideType( sHref.copy( 0, nIndex2 ) );
                         if ( aSlideType.match( "slide" ) )
-                            sURL = "#Slide " + OUString::number( nPageNumber );
+                            sURL = "#" + URLResId(STR_SLIDE_NAME) + " " + OUString::number( nPageNumber );
                         else if ( aSlideType.match( "notesSlide" ) )
                             sURL = "#Notes " + OUString::number( nPageNumber );
 //                      else: todo for other types such as notesMaster or slideMaster as they can't be referenced easily

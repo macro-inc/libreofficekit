@@ -1,23 +1,21 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
-from libreoffice.calc.document import get_cell_by_position
+from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+
 from libreoffice.uno.propertyvalue import mkPropertyValues
-from uitest.uihelper.common import get_url_for_data_file
-from uitest.uihelper.common import get_state_as_dict
+
 
 class tdf101894(UITestCase):
 
   def test_tdf101894(self):
     with self.ui_test.load_file(get_url_for_data_file("tdf101894.ods")) as calc_doc:
-        xCalcDoc = self.xUITest.getTopFocusWindow()
-        gridwin = xCalcDoc.getChild("grid_window")
-
-
         xChart = calc_doc.Sheets[0].Charts[0]
         xDataSeries = xChart.getEmbeddedObject().getFirstDiagram().CoordinateSystems[0].ChartTypes[0].DataSeries
 

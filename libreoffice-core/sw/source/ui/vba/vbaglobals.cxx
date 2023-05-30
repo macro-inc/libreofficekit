@@ -22,6 +22,8 @@
 
 #include <com/sun/star/beans/PropertyValue.hpp>
 #include <com/sun/star/frame/XModel.hpp>
+#include <comphelper/sequence.hxx>
+
 #include "vbaapplication.hxx"
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::uno;
@@ -125,6 +127,11 @@ SwVbaGlobals::getSelection()
     return getApplication()->getSelection();
 }
 
+uno::Reference<word::XGlobals> SwVbaGlobals::getWord()
+{
+    return uno::Reference<word::XGlobals>(this);
+}
+
 uno::Reference<word::XWordBasic> SAL_CALL SwVbaGlobals::getWordBasic()
 {
     assert(dynamic_cast<SwVbaApplication*>(getApplication().get()));
@@ -136,6 +143,51 @@ uno::Reference<word::XWordBasic> SAL_CALL SwVbaGlobals::getWordBasic()
 float SAL_CALL SwVbaGlobals::CentimetersToPoints( float Centimeters )
 {
     return getApplication()->CentimetersToPoints( Centimeters );
+}
+
+float SAL_CALL SwVbaGlobals::PointsToCentimeters( float Points )
+{
+    return getApplication()->PointsToCentimeters( Points );
+}
+
+float SAL_CALL SwVbaGlobals::PixelsToPoints( float Pixels, ::sal_Bool fVertical )
+{
+    return getApplication()->PixelsToPoints( Pixels, fVertical );
+}
+
+float SAL_CALL SwVbaGlobals::PointsToPixels( float Points, ::sal_Bool fVertical )
+{
+    return getApplication()->PointsToPixels( Points, fVertical );
+}
+
+float SAL_CALL SwVbaGlobals::InchesToPoints( float Inches )
+{
+    return getApplication()->InchesToPoints( Inches );
+}
+
+float SAL_CALL SwVbaGlobals::PointsToInches( float Points )
+{
+    return getApplication()->PointsToInches( Points );
+}
+
+float SAL_CALL SwVbaGlobals::MillimetersToPoints( float Millimeters )
+{
+    return getApplication()->MillimetersToPoints( Millimeters );
+}
+
+float SAL_CALL SwVbaGlobals::PointsToMillimeters( float Points )
+{
+    return getApplication()->PointsToMillimeters( Points );
+}
+
+float SAL_CALL SwVbaGlobals::PicasToPoints( float Picas )
+{
+    return getApplication()->PicasToPoints( Picas );
+}
+
+float SAL_CALL SwVbaGlobals::PointsToPicas( float Points )
+{
+    return getApplication()->PointsToPicas( Points );
 }
 
 OUString
@@ -153,15 +205,12 @@ SwVbaGlobals::getServiceNames()
 uno::Sequence< OUString >
 SwVbaGlobals::getAvailableServiceNames(  )
 {
-    static uno::Sequence< OUString > const serviceNames = [&]()
-    {
-        uno::Sequence< OUString > tmp = SwVbaGlobals_BASE::getAvailableServiceNames();
-        tmp.realloc( tmp.getLength() + 1 );
-        tmp.getArray()[ tmp.getLength() - 1 ] = "ooo.vba.word.Document";
-//            #FIXME #TODO make Application a proper service
-//            OUString( "ooo.vba.word.Application" ),
-        return tmp;
-    }();
+    static const uno::Sequence<OUString> serviceNames = comphelper::concatSequences(
+        SwVbaGlobals_BASE::getAvailableServiceNames(),
+        uno::Sequence<OUString>{ "ooo.vba.word.Document",
+                                 // "ooo.vba.word.Globals",
+                                 // "ooo.vba.word.WrapFormat",
+                                 "com.sun.star.script.vba.VBATextEventProcessor" });
     return serviceNames;
 }
 

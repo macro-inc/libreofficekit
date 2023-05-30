@@ -84,7 +84,7 @@ class OFileAccess : public FileAccessHelper
     /// @throws CommandAbortedException
     /// @throws Exception
     /// @throws RuntimeException
-    void transferImpl( const OUString& rSource, const OUString& rDest, bool bMoveData );
+    void transferImpl( const OUString& rSource, std::u16string_view rDest, bool bMoveData );
     /// @throws Exception
     bool createNewFile( const OUString & rParentURL,
                         const OUString & rTitle,
@@ -199,7 +199,7 @@ Reference< XProgressHandler > OCommandEnvironment::getProgressHandler()
 }
 
 void OFileAccess::transferImpl( const OUString& rSource,
-                                const OUString& rDest,
+                                std::u16string_view rDest,
                                 bool bMoveData )
 {
     // SfxContentHelper::Transfer_Impl
@@ -288,7 +288,7 @@ void OFileAccess::kill( const OUString& FileURL )
     ucbhelper::Content aCnt( aDeleteObj.GetMainURL( INetURLObject::DecodeMechanism::NONE ), mxEnvironment, comphelper::getProcessComponentContext() );
     try
     {
-        aCnt.executeCommand( "delete", makeAny( true ) );
+        aCnt.executeCommand( "delete", Any( true ) );
     }
     catch ( css::ucb::CommandFailedException const & )
     {

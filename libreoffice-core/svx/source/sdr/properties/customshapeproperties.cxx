@@ -73,6 +73,7 @@ namespace sdr::properties
                     SDRATTR_GRAF_FIRST, SDRATTR_CUSTOMSHAPE_LAST,
                     SDRATTR_GLOW_FIRST, SDRATTR_SOFTEDGE_LAST,
                     SDRATTR_TEXTCOLUMNS_FIRST, SDRATTR_TEXTCOLUMNS_LAST,
+                    SDRATTR_WRITINGMODE2, SDRATTR_WRITINGMODE2,
                     // Range from SdrTextObj:
                     EE_ITEMS_START, EE_ITEMS_END>);
         }
@@ -101,8 +102,7 @@ namespace sdr::properties
                     TextProperties::ClearObjectItemDirect( nWhich2 );
                     nWhich2 = aIter.NextWhich();
                 }
-                SfxItemSet aSet(GetSdrObject().GetObjectItemPool());
-                ItemSetChanged(&aSet);
+                ItemSetChanged({}, 0);
             }
             else
                 TextProperties::ClearObjectItem( nWhich );
@@ -124,10 +124,10 @@ namespace sdr::properties
                 TextProperties::ClearObjectItemDirect( nWhich );
         }
 
-        void CustomShapeProperties::ItemSetChanged(const SfxItemSet* pSet)
+        void CustomShapeProperties::ItemSetChanged(o3tl::span< const SfxPoolItem* const > aChangedItems, sal_uInt16 nDeletedWhich)
         {
             // call parent
-            TextProperties::ItemSetChanged(pSet);
+            TextProperties::ItemSetChanged(aChangedItems, nDeletedWhich);
 
             // update bTextFrame and RenderGeometry
             UpdateTextFrameStatus(true);
@@ -162,10 +162,11 @@ namespace sdr::properties
             UpdateTextFrameStatus(true);
         }
 
-        void CustomShapeProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr)
+        void CustomShapeProperties::SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast)
         {
             // call parent (always first thing to do, may create the SfxItemSet)
-            TextProperties::SetStyleSheet( pNewStyleSheet, bDontRemoveHardAttr );
+            TextProperties::SetStyleSheet( pNewStyleSheet, bDontRemoveHardAttr, bBroadcast );
 
             // update bTextFrame and RenderGeometry
             UpdateTextFrameStatus(true);

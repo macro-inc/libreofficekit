@@ -31,13 +31,14 @@
 #include <sdmod.hxx>
 #include <dlgfield.hxx>
 #include <DrawDocShell.hxx>
+#include <utility>
 
 /**
  * dialog to edit field commands
  */
-SdModifyFieldDlg::SdModifyFieldDlg(weld::Window* pWindow, const SvxFieldData* pInField, const SfxItemSet& rSet)
+SdModifyFieldDlg::SdModifyFieldDlg(weld::Window* pWindow, const SvxFieldData* pInField, SfxItemSet aSet)
     : GenericDialogController(pWindow, "modules/simpress/ui/dlgfield.ui", "EditFieldsDialog")
-    , m_aInputSet(rSet)
+    , m_aInputSet(std::move(aSet))
     , m_pField(pInField)
     , m_xRbtFix(m_xBuilder->weld_radio_button("fixedRB"))
     , m_xRbtVar(m_xBuilder->weld_radio_button("varRB"))
@@ -168,11 +169,11 @@ void SdModifyFieldDlg::FillFormatList()
         m_xLbFormat->append_text( aDateField.GetFormatted( *pNumberFormatter, eLangType ) );
         aDateField.SetFormat( SvxDateFormat::C );    // 13.Feb 1996
         m_xLbFormat->append_text( aDateField.GetFormatted( *pNumberFormatter, eLangType ) );
-        aDateField.SetFormat( SvxDateFormat::D );    // 13.Februar 1996
+        aDateField.SetFormat( SvxDateFormat::D );    // 13.February 1996
         m_xLbFormat->append_text( aDateField.GetFormatted( *pNumberFormatter, eLangType ) );
-        aDateField.SetFormat( SvxDateFormat::E );    // Die, 13.Februar 1996
+        aDateField.SetFormat( SvxDateFormat::E );    // Tue, 13.February 1996
         m_xLbFormat->append_text( aDateField.GetFormatted( *pNumberFormatter, eLangType ) );
-        aDateField.SetFormat( SvxDateFormat::F );    // Dienstag, 13.Februar 1996
+        aDateField.SetFormat( SvxDateFormat::F );    // Tuesday, 13.February 1996
         m_xLbFormat->append_text( aDateField.GetFormatted( *pNumberFormatter, eLangType ) );
 
         m_xLbFormat->set_active( static_cast<sal_uInt16>(pDateField->GetFormat()) - 2 );
@@ -264,9 +265,8 @@ void SdModifyFieldDlg::FillControls()
     m_xRbtFix->save_state();
     m_xRbtVar->save_state();
 
-    const SfxPoolItem* pItem;
-    if( SfxItemState::SET == m_aInputSet.GetItemState(EE_CHAR_LANGUAGE, true, &pItem ) )
-        m_xLbLanguage->set_active_id(static_cast<const SvxLanguageItem*>(pItem)->GetLanguage());
+    if( const SvxLanguageItem* pItem = m_aInputSet.GetItemIfSet(EE_CHAR_LANGUAGE ) )
+        m_xLbLanguage->set_active_id(pItem->GetLanguage());
 
     m_xLbLanguage->save_active_id();
 

@@ -19,12 +19,13 @@
 #include "vbatableofcontents.hxx"
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <ooo/vba/word/WdTabLeader.hpp>
+#include <utility>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaTableOfContents::SwVbaTableOfContents( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< text::XTextDocument >& xDoc, const uno::Reference< text::XDocumentIndex >& xDocumentIndex ) :
-    SwVbaTableOfContents_BASE( rParent, rContext ), mxTextDocument( xDoc ), mxDocumentIndex( xDocumentIndex )
+SwVbaTableOfContents::SwVbaTableOfContents( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< text::XTextDocument >  xDoc, uno::Reference< text::XDocumentIndex >  xDocumentIndex ) :
+    SwVbaTableOfContents_BASE( rParent, rContext ), mxTextDocument(std::move( xDoc )), mxDocumentIndex(std::move( xDocumentIndex ))
 {
     mxTocProps.set( mxDocumentIndex, uno::UNO_QUERY_THROW );
 }
@@ -42,7 +43,7 @@ SwVbaTableOfContents::~SwVbaTableOfContents()
 
 void SAL_CALL SwVbaTableOfContents::setLowerHeadingLevel( ::sal_Int32 _lowerheadinglevel )
 {
-    mxTocProps->setPropertyValue("Level", uno::makeAny( sal_Int8( _lowerheadinglevel ) ) );
+    mxTocProps->setPropertyValue("Level", uno::Any( sal_Int8( _lowerheadinglevel ) ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaTableOfContents::getTabLeader()
@@ -65,7 +66,7 @@ sal_Bool SAL_CALL SwVbaTableOfContents::getUseFields()
 
 void SAL_CALL SwVbaTableOfContents::setUseFields( sal_Bool _useFields )
 {
-    mxTocProps->setPropertyValue("CreateFromMarks", uno::makeAny( _useFields ) );
+    mxTocProps->setPropertyValue("CreateFromMarks", uno::Any( _useFields ) );
 }
 
 sal_Bool SAL_CALL SwVbaTableOfContents::getUseOutlineLevels()
@@ -77,7 +78,7 @@ sal_Bool SAL_CALL SwVbaTableOfContents::getUseOutlineLevels()
 
 void SAL_CALL SwVbaTableOfContents::setUseOutlineLevels( sal_Bool _useOutlineLevels )
 {
-    mxTocProps->setPropertyValue("CreateFromOutline", uno::makeAny( _useOutlineLevels ) );
+    mxTocProps->setPropertyValue("CreateFromOutline", uno::Any( _useOutlineLevels ) );
 }
 
 void SAL_CALL SwVbaTableOfContents::Delete(  )

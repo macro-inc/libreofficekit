@@ -53,7 +53,6 @@
 #include <com/sun/star/rdf/Literal.hpp>
 
 #include <rtl/ref.hxx>
-#include <rtl/strbuf.hxx>
 #include <rtl/ustrbuf.hxx>
 #include <rtl/ustring.hxx>
 #include <osl/diagnose.h>
@@ -66,6 +65,7 @@
 #include <comphelper/xmltools.hxx>
 
 #include <com/sun/star/embed/XEncryptionProtectedSource2.hpp>
+#include <utility>
 
 /**
     Implementation of the service com.sun.star.rdf.Repository.
@@ -184,15 +184,15 @@ public:
     struct URI : public Resource
     {
         OString const value;
-        explicit URI(OString const& i_rValue)
-            : value(i_rValue)
+        explicit URI(OString i_Value)
+            : value(std::move(i_Value))
         { }
     };
     struct BlankNode : public Resource
     {
         OString const value;
-        explicit BlankNode(OString const& i_rValue)
-            : value(i_rValue)
+        explicit BlankNode(OString i_Value)
+            : value(std::move(i_Value))
         { }
     };
     struct Literal : public Node
@@ -200,11 +200,11 @@ public:
         OString const value;
         OString const language;
         ::std::optional<OString> const type;
-        Literal(OString const& i_rValue, OString const& i_rLanguage,
-                ::std::optional<OString> const& i_rType)
-            : value(i_rValue)
-            , language(i_rLanguage)
-            , type(i_rType)
+        Literal(OString  i_rValue, OString i_Language,
+                ::std::optional<OString> i_Type)
+            : value(std::move(i_rValue))
+            , language(std::move(i_Language))
+            , type(std::move(i_Type))
         { }
     };
     struct Statement
@@ -212,19 +212,19 @@ public:
         std::shared_ptr<Resource> const pSubject;
         std::shared_ptr<URI> const pPredicate;
         std::shared_ptr<Node> const pObject;
-        Statement(std::shared_ptr<Resource> const& i_pSubject,
-                  std::shared_ptr<URI> const& i_pPredicate,
-                  std::shared_ptr<Node> const& i_pObject)
-            : pSubject(i_pSubject)
-            , pPredicate(i_pPredicate)
-            , pObject(i_pObject)
+        Statement(std::shared_ptr<Resource> i_pSubject,
+                  std::shared_ptr<URI> i_pPredicate,
+                  std::shared_ptr<Node> i_pObject)
+            : pSubject(std::move(i_pSubject))
+            , pPredicate(std::move(i_pPredicate))
+            , pObject(std::move(i_pObject))
         { }
     };
 
     librdf_TypeConverter(
-            uno::Reference< uno::XComponentContext > const & i_xContext,
+            uno::Reference< uno::XComponentContext > i_xContext,
             librdf_Repository &i_rRep)
-        : m_xContext(i_xContext)
+        : m_xContext(std::move(i_xContext))
         , m_rRep(i_rRep)
     { };
 
@@ -430,15 +430,15 @@ public:
 
     librdf_GraphResult(librdf_Repository *i_pRepository,
             std::mutex & i_rMutex,
-            std::shared_ptr<librdf_stream> const& i_pStream,
-            std::shared_ptr<librdf_node> const& i_pContext,
-            std::shared_ptr<librdf_query>  const& i_pQuery =
+            std::shared_ptr<librdf_stream> i_pStream,
+            std::shared_ptr<librdf_node> i_pContext,
+            std::shared_ptr<librdf_query> i_pQuery =
                 std::shared_ptr<librdf_query>() )
         : m_xRep(i_pRepository)
         , m_rMutex(i_rMutex)
-        , m_pQuery(i_pQuery)
-        , m_pContext(i_pContext)
-        , m_pStream(i_pStream)
+        , m_pQuery(std::move(i_pQuery))
+        , m_pContext(std::move(i_pContext))
+        , m_pStream(std::move(i_pStream))
     { };
 
     virtual ~librdf_GraphResult() override
@@ -515,7 +515,7 @@ librdf_GraphResult::nextElement()
         throw lang::WrappedTargetException(
             "librdf_GraphResult::nextElement: "
             "librdf_stream_get_object failed", *this,
-                uno::makeAny(e));
+                uno::Any(e));
     }
     // NB: pCtxt may be null here if this is result of a graph query
     if (pCtxt && isInternalContext(pCtxt)) {
@@ -525,7 +525,7 @@ librdf_GraphResult::nextElement()
         m_xRep->getTypeConverter().convertToStatement(pStmt, pCtxt) );
     // NB: this will invalidate current item.
     librdf_stream_next(m_pStream.get());
-    return uno::makeAny(Stmt);
+    return uno::Any(Stmt);
 }
 
 
@@ -569,7 +569,7 @@ librdf_GraphResult2::nextElement()
         m_nIndex = m_vStatements.size(); // avoid overflow
         throw container::NoSuchElementException();
     }
-    return uno::makeAny(m_vStatements[n]);
+    return uno::Any(m_vStatements[n]);
 }
 
 /** result of tuple queries ("SELECT").
@@ -582,13 +582,13 @@ public:
 
     librdf_QuerySelectResult(librdf_Repository *i_pRepository,
             std::mutex & i_rMutex,
-            std::shared_ptr<librdf_query>  const& i_pQuery,
-            std::shared_ptr<librdf_query_results> const& i_pQueryResult,
+            std::shared_ptr<librdf_query> i_pQuery,
+            std::shared_ptr<librdf_query_results> i_pQueryResult,
             uno::Sequence< OUString > const& i_rBindingNames )
         : m_xRep(i_pRepository)
         , m_rMutex(i_rMutex)
-        , m_pQuery(i_pQuery)
-        , m_pQueryResult(i_pQueryResult)
+        , m_pQuery(std::move(i_pQuery))
+        , m_pQueryResult(std::move(i_pQueryResult))
         , m_BindingNames(i_rBindingNames)
     { };
 
@@ -667,7 +667,7 @@ librdf_QuerySelectResult::nextElement()
         throw lang::WrappedTargetException(
             "librdf_QuerySelectResult::nextElement: "
             "librdf_query_results_get_bindings failed", *this,
-            uno::makeAny(e));
+            uno::Any(e));
     }
     uno::Sequence< uno::Reference< rdf::XNode > > ret(count);
     auto retRange = asNonConstRange(ret);
@@ -676,7 +676,7 @@ librdf_QuerySelectResult::nextElement()
     }
     // NB: this will invalidate current item.
     librdf_query_results_next(m_pQueryResult.get());
-    return uno::makeAny(ret);
+    return uno::Any(ret);
 }
 
 // css::rdf::XQuerySelectResult:
@@ -696,10 +696,10 @@ class librdf_NamedGraph:
 {
 public:
     librdf_NamedGraph(librdf_Repository * i_pRep,
-            uno::Reference<rdf::XURI> const & i_xName)
+            uno::Reference<rdf::XURI> i_xName)
         : m_wRep(i_pRep)
         , m_pRep(i_pRep)
-        , m_xName(i_xName)
+        , m_xName(std::move(i_xName))
     { };
 
     // css::rdf::XNode:
@@ -742,7 +742,7 @@ private:
 
     /// Querying is rather slow, so cache the results.
     std::map<OUString, std::vector<rdf::Statement>> m_aStatementsCache;
-    ::osl::Mutex m_CacheMutex;
+    std::mutex m_CacheMutex;
 };
 
 
@@ -784,7 +784,7 @@ void SAL_CALL librdf_NamedGraph::clear()
         throw lang::WrappedTargetRuntimeException( ex.Message,
                         *this, anyEx );
     }
-    ::osl::MutexGuard g(m_CacheMutex);
+    std::unique_lock g(m_CacheMutex);
     m_aStatementsCache.clear();
 }
 
@@ -799,7 +799,7 @@ void SAL_CALL librdf_NamedGraph::addStatement(
             "librdf_NamedGraph::addStatement: repository is gone", *this);
     }
     {
-        ::osl::MutexGuard g(m_CacheMutex);
+        std::unique_lock g(m_CacheMutex);
         m_aStatementsCache.clear();
     }
     m_pRep->addStatementGraph_NoLock(
@@ -817,7 +817,7 @@ void SAL_CALL librdf_NamedGraph::removeStatements(
             "librdf_NamedGraph::removeStatements: repository is gone", *this);
     }
     {
-        ::osl::MutexGuard g(m_CacheMutex);
+        std::unique_lock g(m_CacheMutex);
         m_aStatementsCache.clear();
     }
     m_pRep->removeStatementsGraph_NoLock(
@@ -846,7 +846,7 @@ librdf_NamedGraph::getStatements(
 {
     OUString cacheKey = createCacheKey_NoLock(i_xSubject, i_xPredicate, i_xObject);
     {
-        ::osl::MutexGuard g(m_CacheMutex);
+        std::unique_lock g(m_CacheMutex);
         auto it = m_aStatementsCache.find(cacheKey);
         if (it != m_aStatementsCache.end()) {
             return new librdf_GraphResult2(it->second);
@@ -862,10 +862,10 @@ librdf_NamedGraph::getStatements(
             i_xSubject, i_xPredicate, i_xObject, m_xName);
 
     {
-        ::osl::MutexGuard g(m_CacheMutex);
+        std::unique_lock g(m_CacheMutex);
         m_aStatementsCache.emplace(cacheKey, vStatements);
     }
-    return new librdf_GraphResult2(vStatements);
+    return new librdf_GraphResult2(std::move(vStatements));
 }
 
 
@@ -2016,7 +2016,7 @@ librdf_Repository::getStatementsGraph_NoLock(
             throw lang::WrappedTargetException(
                 "librdf_GraphResult::nextElement: "
                 "librdf_stream_get_object failed", *this,
-                    uno::makeAny(e));
+                    uno::Any(e));
         }
         // NB: pCtxt may be null here if this is result of a graph query
         if (pCtxt && isInternalContext(pCtxt)) {
@@ -2427,7 +2427,7 @@ librdf_TypeConverter::convertToXNode(librdf_node* i_pNode) const
         RTL_TEXTENCODING_UTF8) );
     if (lang) {
         const OUString langU( OStringToOUString(
-            std::string_view(reinterpret_cast<const char*>(lang)),
+            std::string_view(lang),
             RTL_TEXTENCODING_UTF8) );
         return rdf::Literal::createWithLanguage(m_xContext, valueU, langU);
     } else if (pType) {

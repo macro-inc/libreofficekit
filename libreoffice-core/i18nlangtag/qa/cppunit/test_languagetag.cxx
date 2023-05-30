@@ -35,11 +35,13 @@ public:
     void testAllTags();
     void testAllIsoLangEntries();
     void testDisplayNames();
+    void testLanguagesWithoutHyphenation();
 
     CPPUNIT_TEST_SUITE(TestLanguageTag);
     CPPUNIT_TEST(testAllTags);
     CPPUNIT_TEST(testAllIsoLangEntries);
     CPPUNIT_TEST(testDisplayNames);
+    CPPUNIT_TEST(testLanguagesWithoutHyphenation);
     CPPUNIT_TEST_SUITE_END();
 };
 
@@ -666,11 +668,11 @@ void TestLanguageTag::testAllTags()
         CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "qaa", &aCanonicalized) );
         CPPUNIT_ASSERT_EQUAL( OUString("qaa"), aCanonicalized );
         CPPUNIT_ASSERT( !LanguageTag::isValidBcp47( "unreg-and-bad", &aCanonicalized) );
-        CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "en-US", &aCanonicalized, true) );
+        CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "en-US", &aCanonicalized, LanguageTag::PrivateUse::DISALLOW) );
         CPPUNIT_ASSERT_EQUAL( OUString("en-US"), aCanonicalized );
-        CPPUNIT_ASSERT( !LanguageTag::isValidBcp47( "x-foobar", &aCanonicalized, true) );
+        CPPUNIT_ASSERT( !LanguageTag::isValidBcp47( "x-foobar", &aCanonicalized, LanguageTag::PrivateUse::DISALLOW) );
         CPPUNIT_ASSERT_EQUAL( OUString("x-foobar"), aCanonicalized );
-        CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "qaa", &aCanonicalized, true) );
+        CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "qaa", &aCanonicalized, LanguageTag::PrivateUse::DISALLOW) );
         CPPUNIT_ASSERT_EQUAL( OUString("qaa"), aCanonicalized );
         CPPUNIT_ASSERT( LanguageTag::isValidBcp47( "de-Latn-DE", &aCanonicalized) );
         CPPUNIT_ASSERT_EQUAL( OUString("de-DE"), aCanonicalized );
@@ -749,8 +751,13 @@ bool checkMapping( std::u16string_view rStr1, std::u16string_view rStr2 )
     if (rStr1 == u"cmn-CN"      ) return rStr2 == u"zh-CN";
     if (rStr1 == u"cmn-TW"      ) return rStr2 == u"zh-TW";
     if (rStr1 == u"kw-UK"       ) return rStr2 == u"kw-GB";
-    if (rStr1 == u"oc-FR-lengadoc" ) return rStr2 == u"oc-FR";
-    if (rStr1 == u"oc-ES-aranes" ) return rStr2 == u"oc-ES";
+    if (rStr1 == u"oc-FR"       ) return rStr2 == u"oc-FR-lengadoc";
+    if (rStr1 == u"oc-ES"       ) return rStr2 == u"oc-ES-aranes";
+    if (rStr1 == u"zh-Hans-CN"  ) return rStr2 == u"zh-CN";
+    if (rStr1 == u"zh-Hant-TW"  ) return rStr2 == u"zh-TW";
+    if (rStr1 == u"zh-Hans-SG"  ) return rStr2 == u"zh-SG";
+    if (rStr1 == u"zh-Hant-HK"  ) return rStr2 == u"zh-HK";
+    if (rStr1 == u"zh-Hant-MO"  ) return rStr2 == u"zh-MO";
     return rStr1 == rStr2;
 }
 
@@ -878,6 +885,99 @@ void TestLanguageTag::testDisplayNames()
 
     aStr = LanguageTagIcu::getDisplayName( LanguageTag("*"), LanguageTag("en"));
     CPPUNIT_ASSERT_EQUAL( OUString("*"), aStr);
+}
+
+void TestLanguageTag::testLanguagesWithoutHyphenation()
+{
+    // Arabic
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_PRIMARY_ONLY));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_ALGERIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_BAHRAIN));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_EGYPT));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_IRAQ));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_JORDAN));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_KUWAIT));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_LEBANON));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_LIBYA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_MOROCCO));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_OMAN));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_QATAR));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_SAUDI_ARABIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_SYRIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_TUNISIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_UAE));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_ARABIC_YEMEN));
+
+    // Pashto
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_PASHTO));
+
+    // Persian/Farsi
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_FARSI));
+
+    // Kashmiri
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KASHMIRI));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KASHMIRI_INDIA));
+
+    // Central Kurdish (Sorani), uses Arabic script, does not have hyphenation
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KURDISH_ARABIC_IRAQ));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KURDISH_ARABIC_LSO));
+
+    // Northern Kurdish (Kurmanji) -> uses Latin script, has hyphenation
+    CPPUNIT_ASSERT(MsLangId::usesHyphenation(LANGUAGE_USER_KURDISH_SYRIA));
+    CPPUNIT_ASSERT(MsLangId::usesHyphenation(LANGUAGE_USER_KURDISH_TURKEY));
+
+    // Southern Kurdish -> uses Arabic script, does not have hyphenation
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_KURDISH_SOUTHERN_IRAN));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_KURDISH_SOUTHERN_IRAQ));
+
+    // Punjabi
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_PUNJABI));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_PUNJABI_ARABIC_LSO));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_PUNJABI_PAKISTAN));
+
+    // Sindhi
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_SINDHI));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_SINDHI_ARABIC_LSO));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_SINDHI_PAKISTAN));
+
+    // Malai
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_MALAY_BRUNEI_DARUSSALAM));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_MALAY_MALAYSIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_MALAY_ARABIC_BRUNEI));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_MALAY_ARABIC_MALAYSIA));
+
+    // Somali
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_SOMALI));
+
+    // Swahili
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_SWAHILI));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_SWAHILI_TANZANIA));
+
+    // Urdu
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_URDU_INDIA));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_URDU_PAKISTAN));
+
+    // CJK
+    // Chinese
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_HONGKONG));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_LSO));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_MACAU));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_SIMPLIFIED));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_SIMPLIFIED_LEGACY));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_SINGAPORE));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_TRADITIONAL));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_CHINESE_TRADITIONAL_LSO));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_YUE_CHINESE_HONGKONG));
+    // Japanese
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_JAPANESE));
+    // Korean
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KOREAN));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_KOREAN_JOHAB));
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_USER_KOREAN_NORTH));
+
+    // Vietnamese
+    CPPUNIT_ASSERT(!MsLangId::usesHyphenation(LANGUAGE_VIETNAMESE));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestLanguageTag );

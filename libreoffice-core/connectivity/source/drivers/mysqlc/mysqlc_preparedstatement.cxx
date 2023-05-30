@@ -23,6 +23,7 @@
 #include "mysqlc_propertyids.hxx"
 #include "mysqlc_resultsetmetadata.hxx"
 
+#include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 
 #include <com/sun/star/sdbc/DataType.hpp>
@@ -492,9 +493,10 @@ void SAL_CALL OPreparedStatement::setBytes(sal_Int32 parameter, const Sequence<s
     checkParameterIndex(parameter);
 
     const sal_Int32 nIndex = parameter - 1;
-    m_binds[nIndex].buffer_type = MYSQL_TYPE_BLOB; // FIXME
-    mysqlc_sdbc_driver::resetSqlVar(&m_binds[nIndex].buffer, &x, MYSQL_TYPE_BLOB);
+    m_binds[nIndex].buffer_type = MYSQL_TYPE_BLOB;
+    mysqlc_sdbc_driver::resetSqlVar(&m_binds[nIndex].buffer, &x[0], MYSQL_TYPE_BLOB, x.getLength());
     m_bindMetas[nIndex].is_null = false;
+    m_bindMetas[nIndex].length = x.getLength();
 }
 
 void SAL_CALL OPreparedStatement::setCharacterStream(sal_Int32 parameter,
@@ -569,7 +571,7 @@ void OPreparedStatement::setFastPropertyValue_NoBroadcast(sal_Int32 nHandle, con
 
 void OPreparedStatement::checkParameterIndex(sal_Int32 column)
 {
-    if (column < 1 || column > static_cast<sal_Int32>(m_paramCount))
+    if (column < 1 || o3tl::make_unsigned(column) > m_paramCount)
     {
         throw SQLException("Parameter index out of range", *this, OUString(), 1, Any());
     }

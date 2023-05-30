@@ -34,7 +34,7 @@
 #include <sfx2/sfxresid.hxx>
 #include <sfx2/viewfrm.hxx>
 #include <tools/datetime.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unotools/datetime.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
@@ -385,10 +385,10 @@ void SfxClassificationHelper::Impl::parsePolicy()
     OUString aExtension(".xml");
     if (aPath.endsWith(aExtension) && m_bUseLocalized)
     {
-        OUString aBase = aPath.copy(0, aPath.getLength() - aExtension.getLength());
+        std::u16string_view aBase = aPath.subView(0, aPath.getLength() - aExtension.getLength());
         const LanguageTag& rLanguageTag = Application::GetSettings().GetLanguageTag();
         // Expected format is "<original path>_xx-XX.xml".
-        OUString aLocalized = aBase + "_" + rLanguageTag.getBcp47() + aExtension;
+        OUString aLocalized = OUString::Concat(aBase) + "_" + rLanguageTag.getBcp47() + aExtension;
         if (FStatHelper::IsDocument(aLocalized))
             aPath = aLocalized;
     }
@@ -458,9 +458,9 @@ void SfxClassificationHelper::Impl::pushToDocumentProperties()
             try
             {
                 if (lcl_containsProperty(aProperties, rLabel.first))
-                    xPropertySet->setPropertyValue(rLabel.first, uno::makeAny(rLabel.second));
+                    xPropertySet->setPropertyValue(rLabel.first, uno::Any(rLabel.second));
                 else
-                    xPropertyContainer->addProperty(rLabel.first, beans::PropertyAttribute::REMOVABLE, uno::makeAny(rLabel.second));
+                    xPropertyContainer->addProperty(rLabel.first, beans::PropertyAttribute::REMOVABLE, uno::Any(rLabel.second));
             }
             catch (const uno::Exception&)
             {
@@ -581,7 +581,7 @@ SfxClassificationHelper::SfxClassificationHelper(const uno::Reference<document::
                 continue;
 
             //TODO: Support abbreviated names(?)
-            if (rProperty.Name == OUStringConcatenation(aPrefix + PROP_BACNAME()))
+            if (rProperty.Name == Concat2View(aPrefix + PROP_BACNAME()))
                 m_pImpl->m_aCategory[eType].m_aName = aValue;
             else
                 m_pImpl->m_aCategory[eType].m_aLabels[rProperty.Name] = aValue;

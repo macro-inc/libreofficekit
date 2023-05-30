@@ -57,7 +57,7 @@
 #include "../table/accessiblecell.hxx"
 #include <editeng/editdata.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::accessibility;
@@ -87,8 +87,8 @@ namespace accessibility
         virtual ~AccessibleTextHelper_Impl() override;
 
         // XAccessibleContext child handling methods
-        sal_Int32 getAccessibleChildCount() const;
-        uno::Reference< XAccessible > getAccessibleChild( sal_Int32 i );
+        sal_Int64 getAccessibleChildCount() const;
+        uno::Reference< XAccessible > getAccessibleChild( sal_Int64 i );
 
         // XAccessibleEventBroadcaster child related methods
         void addAccessibleEventListener( const uno::Reference< XAccessibleEventListener >& xListener );
@@ -122,7 +122,7 @@ namespace accessibility
             return mnStartIndex;
         }
 
-        void SetAdditionalChildStates( VectorOfStates&& rChildStates );
+        void SetAdditionalChildStates( sal_Int64 nChildStates );
 
         void Dispose();
 
@@ -352,9 +352,9 @@ namespace accessibility
         }
     }
 
-    void AccessibleTextHelper_Impl::SetAdditionalChildStates( VectorOfStates&& rChildStates )
+    void AccessibleTextHelper_Impl::SetAdditionalChildStates( sal_Int64 nChildStates )
     {
-        maParaManager.SetAdditionalChildStates( std::move(rChildStates) );
+        maParaManager.SetAdditionalChildStates( nChildStates );
     }
 
     void AccessibleTextHelper_Impl::SetChildFocus( sal_Int32 nChild, bool bHaveFocus )
@@ -408,7 +408,7 @@ namespace accessibility
             {
                 AccessibleCell* pAccessibleCell = dynamic_cast< AccessibleCell* > ( mxFrontEnd.get() );
                 if ( !pAccessibleCell )
-                    GotPropertyEvent( uno::makeAny(AccessibleStateType::FOCUSED), AccessibleEventId::STATE_CHANGED );
+                    GotPropertyEvent( uno::Any(AccessibleStateType::FOCUSED), AccessibleEventId::STATE_CHANGED );
                 else    // the focus event on cell should be fired on table directly
                 {
                     AccessibleTableShape* pAccTable = pAccessibleCell->GetParentTable();
@@ -426,7 +426,7 @@ namespace accessibility
             {
                 AccessibleCell* pAccessibleCell = dynamic_cast< AccessibleCell* > ( mxFrontEnd.get() );
                 if ( !pAccessibleCell )
-                    FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::makeAny(AccessibleStateType::FOCUSED) );
+                    FireEvent( AccessibleEventId::STATE_CHANGED, uno::Any(), uno::Any(AccessibleStateType::FOCUSED) );
                 else
                 {
                     AccessibleTableShape* pAccTable = pAccessibleCell->GetParentTable();
@@ -523,8 +523,8 @@ namespace accessibility
                                 maParaManager.FireEvent( ::std::min( maLastSelection.nEndPara, nMaxValidParaIndex ),
                                                          ::std::min( maLastSelection.nEndPara, nMaxValidParaIndex )+1,
                                                          AccessibleEventId::CARET_CHANGED,
-                                                         uno::makeAny(static_cast<sal_Int32>(-1)),
-                                                         uno::makeAny(maLastSelection.nEndPos) );
+                                                         uno::Any(static_cast<sal_Int32>(-1)),
+                                                         uno::Any(maLastSelection.nEndPos) );
                             }
 
                             ChangeChildFocus( aSelection.nEndPara );
@@ -558,7 +558,7 @@ namespace accessibility
                         maParaManager.FireEvent( aSelection.nEndPara,
                                                  aSelection.nEndPara+1,
                                                  AccessibleEventId::CARET_CHANGED,
-                                                 uno::makeAny(aSelection.nEndPos),
+                                                 uno::Any(aSelection.nEndPos),
                                                  aOldCursor );
                     }
 
@@ -769,7 +769,7 @@ namespace accessibility
                     // child not yet created?
                     if (!maParaManager.HasCreatedChild(nCurrPara))
                     {
-                        GotPropertyEvent( uno::makeAny( maParaManager.CreateChild( nCurrPara - mnFirstVisibleChild,
+                        GotPropertyEvent( uno::Any( maParaManager.CreateChild( nCurrPara - mnFirstVisibleChild,
                                                                                    mxFrontEnd, GetEditSource(), nCurrPara ).first ),
                                           AccessibleEventId::CHILD );
                     }
@@ -844,7 +844,7 @@ namespace accessibility
             auto aHardRef( rPara.first.get() );
 
             if( aHardRef.is() )
-                mrImpl.FireEvent(AccessibleEventId::CHILD, uno::Any(), uno::makeAny<css::uno::Reference<css::accessibility::XAccessible>>(aHardRef) );
+                mrImpl.FireEvent(AccessibleEventId::CHILD, uno::Any(), uno::Any(css::uno::Reference<css::accessibility::XAccessible>(aHardRef)) );
         }
 
     private:
@@ -1055,7 +1055,7 @@ namespace accessibility
                 // #109864# Enforce creation of this paragraph
                 try
                 {
-                    GotPropertyEvent( uno::makeAny( getAccessibleChild( aFunctor.GetParaIndex() -
+                    GotPropertyEvent( uno::Any( getAccessibleChild( aFunctor.GetParaIndex() -
                                                                         mnFirstVisibleChild + GetStartIndex() ) ),
                                       AccessibleEventId::CHILD );
                 }
@@ -1089,7 +1089,7 @@ namespace accessibility
 
                 // #i61812# notification for removed para
                 if (xPara.is())
-                    FireEvent(AccessibleEventId::CHILD, uno::Any(), uno::makeAny( xPara) );
+                    FireEvent(AccessibleEventId::CHILD, uno::Any(), uno::Any( xPara) );
             }
 #ifdef DBG_UTIL
             else
@@ -1117,6 +1117,8 @@ namespace accessibility
             // no need for further updates later on
             bEverythingUpdated = true;
         }
+
+        bool bUpdatedBoundRectAndVisibleChildren(false);
 
         while( !maEventQueue.IsEmpty() )
         {
@@ -1252,14 +1254,22 @@ namespace accessibility
                         }
 
                         // in all cases, check visibility afterwards.
-                        UpdateVisibleChildren();
-                        UpdateBoundRect();
+                        if (!bUpdatedBoundRectAndVisibleChildren)
+                        {
+                            UpdateVisibleChildren();
+                            UpdateBoundRect();
+                            bUpdatedBoundRectAndVisibleChildren = true;
+                        }
                     }
-                    else if ( dynamic_cast<const SvxViewChangedHint*>( &rHint ) )
+                    else if (rHint.GetId() == SfxHintId::SvxViewChanged)
                     {
                         // just check visibility
-                        UpdateVisibleChildren();
-                        UpdateBoundRect();
+                        if (!bUpdatedBoundRectAndVisibleChildren)
+                        {
+                            UpdateVisibleChildren();
+                            UpdateBoundRect();
+                            bUpdatedBoundRectAndVisibleChildren = true;
+                        }
                     }
                     // it's VITAL to keep the SfxSimpleHint last! It's the base of some classes above!
                     else if( rHint.GetId() == SfxHintId::Dying)
@@ -1308,8 +1318,9 @@ namespace accessibility
                 // notification sequence.
                 maEventQueue.Append( *pSdrHint );
             }
-            else if( const SvxViewChangedHint* pViewHint = dynamic_cast<const SvxViewChangedHint*>( &rHint ) )
+            else if (rHint.GetId() == SfxHintId::SvxViewChanged)
             {
+                const SvxViewChangedHint* pViewHint = static_cast<const SvxViewChangedHint*>(&rHint);
                 // process visibility right away, if not within an
                 // open EE notification frame. Otherwise, event
                 // processing would be delayed until next EE
@@ -1412,22 +1423,18 @@ namespace accessibility
 
     void AccessibleTextHelper_Impl::FireEvent( const AccessibleEventObject& rEvent ) const
     {
-        // #102261# Call global queue for focus events
-        if( rEvent.EventId == AccessibleStateType::FOCUSED )
-            vcl::unohelper::NotifyAccessibleStateEventGlobally( rEvent );
-
         // #106234# Delegate to EventNotifier
         if (getNotifierClientId() != snNotifierClientRevoked)
             ::comphelper::AccessibleEventNotifier::addEvent( getNotifierClientId(), rEvent );
     }
 
     // XAccessibleContext
-    sal_Int32 AccessibleTextHelper_Impl::getAccessibleChildCount() const
+    sal_Int64 AccessibleTextHelper_Impl::getAccessibleChildCount() const
     {
         return mnLastVisibleChild - mnFirstVisibleChild + 1;
     }
 
-    uno::Reference< XAccessible > AccessibleTextHelper_Impl::getAccessibleChild( sal_Int32 i )
+    uno::Reference< XAccessible > AccessibleTextHelper_Impl::getAccessibleChild( sal_Int64 i )
     {
         i -= GetStartIndex();
 
@@ -1493,7 +1500,7 @@ namespace accessibility
         Point aLogPoint( GetViewForwarder().PixelToLogic( aPoint, rCacheTF.GetMapMode() ) );
 
         // iterate over all visible children (including those not yet created)
-        sal_Int32 nChild;
+        sal_Int64 nChild;
         for( nChild=mnFirstVisibleChild; nChild <= mnLastVisibleChild; ++nChild )
         {
             DBG_ASSERT(nChild >= 0,
@@ -1646,9 +1653,9 @@ namespace accessibility
 #endif
     }
 
-    void AccessibleTextHelper::SetAdditionalChildStates( VectorOfStates&& rChildStates )
+    void AccessibleTextHelper::SetAdditionalChildStates( sal_Int64 nChildStates )
     {
-        mpImpl->SetAdditionalChildStates( std::move(rChildStates) );
+        mpImpl->SetAdditionalChildStates( nChildStates );
     }
 
     void AccessibleTextHelper::UpdateChildren()
@@ -1689,14 +1696,14 @@ namespace accessibility
     }
 
     // XAccessibleContext
-    sal_Int32 AccessibleTextHelper::GetChildCount() const
+    sal_Int64 AccessibleTextHelper::GetChildCount() const
     {
         SolarMutexGuard aGuard;
 
 #ifdef DBG_UTIL
         mpImpl->CheckInvariants();
 
-        sal_Int32 nRet = mpImpl->getAccessibleChildCount();
+        sal_Int64 nRet = mpImpl->getAccessibleChildCount();
 
         mpImpl->CheckInvariants();
 
@@ -1706,7 +1713,7 @@ namespace accessibility
 #endif
     }
 
-    uno::Reference< XAccessible > AccessibleTextHelper::GetChild( sal_Int32 i )
+    uno::Reference< XAccessible > AccessibleTextHelper::GetChild( sal_Int64 i )
     {
         SolarMutexGuard aGuard;
 

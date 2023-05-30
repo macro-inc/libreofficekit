@@ -47,11 +47,11 @@ namespace cairocanvas
         TextLayout(const TextLayout&) = delete;
         const TextLayout& operator=(const TextLayout&) = delete;
 
-        TextLayout( const css::rendering::StringContext&              aText,
-                    sal_Int8                                          nDirection,
-                    sal_Int64                                         nRandomSeed,
-                    const CanvasFont::Reference&                      rFont,
-                    const SurfaceProviderRef&                         rRefDevice );
+        TextLayout( css::rendering::StringContext               aText,
+                    sal_Int8                                    nDirection,
+                    sal_Int64                                   nRandomSeed,
+                    CanvasFont::Reference                       rFont,
+                    SurfaceProviderRef                          rRefDevice );
 
         /// Dispose all internal references
         virtual void SAL_CALL disposing() override;
@@ -85,7 +85,7 @@ namespace cairocanvas
                    const css::rendering::ViewState&   viewState,
                    const css::rendering::RenderState& renderState ) const;
 
-        void setupTextOffsets( sal_Int32*                          outputOffsets,
+        KernArray setupTextOffsets(
                                const css::uno::Sequence< double >& inputOffsets,
                                const css::rendering::ViewState&    viewState,
                                const css::rendering::RenderState&  renderState     ) const;

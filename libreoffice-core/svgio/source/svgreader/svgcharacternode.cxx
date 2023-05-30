@@ -24,6 +24,10 @@
 #include <drawinglayer/primitive2d/textlayoutdevice.hxx>
 #include <drawinglayer/primitive2d/textbreakuphelper.hxx>
 #include <drawinglayer/primitive2d/textdecoratedprimitive2d.hxx>
+#include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
+#include <utility>
+#include <o3tl/string_view.hxx>
+#include <osl/diagnose.h>
 
 using namespace drawinglayer::primitive2d;
 
@@ -34,14 +38,14 @@ namespace svgio::svgreader
         {
         }
 
-        void SvgTextPositions::parseTextPositionAttributes(SVGToken aSVGToken, const OUString& aContent)
+        void SvgTextPositions::parseTextPositionAttributes(SVGToken aSVGToken, std::u16string_view aContent)
         {
             // parse own
             switch(aSVGToken)
             {
                 case SVGToken::X:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
                         SvgNumberVector aVector;
 
@@ -54,7 +58,7 @@ namespace svgio::svgreader
                 }
                 case SVGToken::Y:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
                         SvgNumberVector aVector;
 
@@ -67,7 +71,7 @@ namespace svgio::svgreader
                 }
                 case SVGToken::Dx:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
                         SvgNumberVector aVector;
 
@@ -80,7 +84,7 @@ namespace svgio::svgreader
                 }
                 case SVGToken::Dy:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
                         SvgNumberVector aVector;
 
@@ -93,7 +97,7 @@ namespace svgio::svgreader
                 }
                 case SVGToken::Rotate:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
                         SvgNumberVector aVector;
 
@@ -119,13 +123,13 @@ namespace svgio::svgreader
                 }
                 case SVGToken::LengthAdjust:
                 {
-                    if(!aContent.isEmpty())
+                    if(!aContent.empty())
                     {
-                        if(aContent.startsWith("spacing"))
+                        if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"spacing"))
                         {
                             setLengthAdjust(true);
                         }
-                        else if(aContent.startsWith("spacingAndGlyphs"))
+                        else if(o3tl::equalsIgnoreAsciiCase(o3tl::trim(aContent), u"spacingAndGlyphs"))
                         {
                             setLengthAdjust(false);
                         }
@@ -182,9 +186,9 @@ namespace svgio::svgreader
         SvgCharacterNode::SvgCharacterNode(
             SvgDocument& rDocument,
             SvgNode* pParent,
-            const OUString& rText)
+            OUString aText)
         :   SvgNode(SVGToken::Character, rDocument, pParent),
-            maText(rText)
+            maText(std::move(aText))
         {
         }
 
@@ -205,12 +209,12 @@ namespace svgio::svgreader
             }
         }
 
-        rtl::Reference<TextSimplePortionPrimitive2D> SvgCharacterNode::createSimpleTextPrimitive(
+        rtl::Reference<BasePrimitive2D> SvgCharacterNode::createSimpleTextPrimitive(
             SvgTextPosition& rSvgTextPosition,
             const SvgStyleAttributes& rSvgStyleAttributes) const
         {
             // prepare retval, index and length
-            rtl::Reference<TextSimplePortionPrimitive2D> pRetval;
+            rtl::Reference<BasePrimitive2D> pRetval;
             sal_uInt32 nLength(getText().getLength());
 
             if(nLength)
@@ -409,6 +413,13 @@ namespace svgio::svgreader
                 if(rSvgStyleAttributes.getFill())
                     aFill = *rSvgStyleAttributes.getFill();
 
+                // get fill opacity
+                double fFillOpacity = 1.0;
+                if (rSvgStyleAttributes.getFillOpacity().isSet())
+                {
+                    fFillOpacity = rSvgStyleAttributes.getFillOpacity().getNumber();
+                }
+
                 // prepare TextTransformation
                 basegfx::B2DHomMatrix aTextTransform;
 
@@ -449,6 +460,7 @@ namespace svgio::svgreader
                         nIndex,
                         nLength,
                         std::move(aTextArray),
+                        {},
                         aFontAttribute,
                         aLocale,
                         aFill,
@@ -477,9 +489,17 @@ namespace svgio::svgreader
                         nIndex,
                         nLength,
                         std::move(aTextArray),
+                        {},
                         aFontAttribute,
                         aLocale,
                         aFill);
+                }
+
+                if (fFillOpacity != 1.0)
+                {
+                    pRetval = new UnifiedTransparencePrimitive2D(
+                        drawinglayer::primitive2d::Primitive2DContainer{ pRetval },
+                        1.0 - fFillOpacity);
                 }
 
                 // advance current TextPosition
@@ -514,13 +534,12 @@ namespace svgio::svgreader
 
                 if(pCandidate)
                 {
-                    const localTextBreakupHelper alocalTextBreakupHelper(*pCandidate, rSvgTextPosition);
-                    const Primitive2DContainer& aResult(
-                        alocalTextBreakupHelper.getResult());
+                    localTextBreakupHelper alocalTextBreakupHelper(*pCandidate, rSvgTextPosition);
+                    Primitive2DContainer aResult = alocalTextBreakupHelper.extractResult();
 
                     if(!aResult.empty())
                     {
-                        rTarget.append(aResult);
+                        rTarget.append(std::move(aResult));
                     }
 
                     // also consume for the implied single space
@@ -535,19 +554,7 @@ namespace svgio::svgreader
 
         void SvgCharacterNode::whiteSpaceHandling()
         {
-            if (XmlSpace::Default == getXmlSpace())
-            {
-                maText = whiteSpaceHandlingDefault(maText);
-            }
-            else
-            {
-                maText = whiteSpaceHandlingPreserve(maText);
-            }
-        }
-
-        void SvgCharacterNode::addGap()
-        {
-            maText += " ";
+            maText = xmlSpaceHandling(maText, XmlSpace::Default == getXmlSpace());
         }
 
         void SvgCharacterNode::concatenate(std::u16string_view rText)

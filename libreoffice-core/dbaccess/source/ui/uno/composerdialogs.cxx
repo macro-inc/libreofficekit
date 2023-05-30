@@ -24,8 +24,9 @@
 #include <com/sun/star/sdbcx/XColumnsSupplier.hpp>
 #include <queryfilter.hxx>
 #include <queryorder.hxx>
+#include <strings.hxx>
 #include <connectivity/dbtools.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <osl/diagnose.h>
 #include <vcl/svapp.hxx>
 
@@ -185,9 +186,9 @@ constexpr OUStringLiteral PROPERTY_ROWSET = u"RowSet";
             aArguments[1] >>= xRowSet;
             Reference<css::awt::XWindow> xParentWindow;
             aArguments[2] >>= xParentWindow;
-            setPropertyValue( "QueryComposer", makeAny( xQueryComposer ) );
-            setPropertyValue( "RowSet",        makeAny( xRowSet ) );
-            setPropertyValue( "ParentWindow",  makeAny( xParentWindow ) );
+            setPropertyValue( "QueryComposer", Any( xQueryComposer ) );
+            setPropertyValue( "RowSet",        Any( xRowSet ) );
+            setPropertyValue( "ParentWindow",  Any( xParentWindow ) );
         }
         else
             ComposerDialog::initialize(aArguments);
@@ -238,13 +239,13 @@ constexpr OUStringLiteral PROPERTY_ROWSET = u"RowSet";
             aArguments[0] >>= xQueryComposer;
             Reference<css::beans::XPropertySet> xRowSet;
             aArguments[1] >>= xRowSet;
-            setPropertyValue( "QueryComposer", makeAny( xQueryComposer ) );
-            setPropertyValue( "RowSet",        makeAny( xRowSet ) );
+            setPropertyValue( "QueryComposer", Any( xQueryComposer ) );
+            setPropertyValue( "RowSet",        Any( xRowSet ) );
             if (aArguments.getLength() == 3)
             {
                 Reference<css::awt::XWindow> xParentWindow;
                 aArguments[2] >>= xParentWindow;
-                setPropertyValue("ParentWindow",  makeAny(xParentWindow));
+                setPropertyValue("ParentWindow",  Any(xParentWindow));
             }
         }
         else

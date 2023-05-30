@@ -24,8 +24,10 @@
 #include "ChildrenManagerImpl.hxx"
 #include <svx/ShapeTypeHandler.hxx>
 #include <svx/AccessibleControlShape.hxx>
+#include <svx/AccessibleShape.hxx>
 #include <svx/AccessibleShapeInfo.hxx>
 #include <svx/IAccessibleViewForwarder.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
@@ -65,15 +67,12 @@ void adjustIndexInParentOfShapes(ChildDescriptorListType& _rList)
 
 // AccessibleChildrenManager
 ChildrenManagerImpl::ChildrenManagerImpl (
-    const uno::Reference<XAccessible>& rxParent,
-    const uno::Reference<drawing::XShapes>& rxShapeList,
+    uno::Reference<XAccessible> xParent,
+    uno::Reference<drawing::XShapes> xShapeList,
     const AccessibleShapeTreeInfo& rShapeTreeInfo,
     AccessibleContextBase& rContext)
-    : ::cppu::WeakComponentImplHelper<
-          css::document::XEventListener,
-          css::view::XSelectionChangeListener>(m_aMutex),
-      mxShapeList (rxShapeList),
-      mxParent (rxParent),
+    : mxShapeList (std::move(xShapeList)),
+      mxParent (std::move(xParent)),
       maShapeTreeInfo (rShapeTreeInfo),
       mrContext (rContext),
       mpFocusedShape(nullptr)
@@ -83,8 +82,7 @@ ChildrenManagerImpl::ChildrenManagerImpl (
 
 ChildrenManagerImpl::~ChildrenManagerImpl()
 {
-    DBG_ASSERT (rBHelper.bDisposed || rBHelper.bInDispose,
-        "~AccessibleDrawDocumentView: object has not been disposed");
+    DBG_ASSERT (m_bDisposed, "~AccessibleDrawDocumentView: object has not been disposed");
 }
 
 
@@ -110,27 +108,27 @@ void ChildrenManagerImpl::Init()
 }
 
 
-tools::Long ChildrenManagerImpl::GetChildCount() const noexcept
+sal_Int64 ChildrenManagerImpl::GetChildCount() const noexcept
 {
     return maVisibleChildren.size();
 }
 
 
-css::uno::Reference<css::drawing::XShape> ChildrenManagerImpl::GetChildShape(tools::Long nIndex)
+const css::uno::Reference<css::drawing::XShape>& ChildrenManagerImpl::GetChildShape(sal_Int64 nIndex)
 {
-    uno::Reference<XAccessible> xAcc = GetChild(nIndex);
-    auto I = std::find_if(maVisibleChildren.begin(), maVisibleChildren.end(),
-        [&xAcc](const ChildDescriptor& rChild) { return rChild.mxAccessibleShape == xAcc; });
-    if (I != maVisibleChildren.end())
-        return I->mxShape;
-    return uno::Reference< drawing::XShape > ();
+    // Check whether the given index is valid.
+    if (nIndex < 0 || o3tl::make_unsigned(nIndex) >= maVisibleChildren.size())
+        throw lang::IndexOutOfBoundsException (
+            "no accessible child with index " + OUString::number(nIndex),
+            mxParent);
+    return maVisibleChildren[nIndex].mxShape;
 }
 
 /** Return the requested accessible child object.  Create it if it is not
     yet in the cache.
 */
 uno::Reference<XAccessible>
-    ChildrenManagerImpl::GetChild (tools::Long nIndex)
+    ChildrenManagerImpl::GetChild (sal_Int64 nIndex)
 {
     // Check whether the given index is valid.
     if (nIndex < 0 || o3tl::make_unsigned(nIndex) >= maVisibleChildren.size())
@@ -198,18 +196,20 @@ void ChildrenManagerImpl::Update (bool bCreateNewObjectsOnDemand)
     ChildDescriptorListType aChildList;
     CreateListOfVisibleShapes (aChildList);
 
-    // 2. Merge the information that is already known about the visible
-    // shapes from the current list into the new list.
-    MergeAccessibilityInformation (aChildList);
-
-    // 3. Replace the current list of visible shapes with the new one.  Do
+    // 2. Replace the current list of visible shapes with the new one.  Do
     // the same with the visible area.
     {
         SolarMutexGuard g;
-        adjustIndexInParentOfShapes(aChildList);
 
         // Use swap to copy the contents of the new list in constant time.
         maVisibleChildren.swap (aChildList);
+
+        // 3. Merge the information that is already known about the visible
+        // shapes from the previous list into the new list and identify
+        // old children that are now unused
+        std::vector<ChildDescriptor*> aUnusedChildList = MergeAccessibilityInformation (aChildList);
+
+        adjustIndexInParentOfShapes(maVisibleChildren);
 
         // aChildList now contains all the old children, while maVisibleChildren
         // contains all the current children
@@ -232,8 +232,9 @@ void ChildrenManagerImpl::Update (bool bCreateNewObjectsOnDemand)
         // to be fired, and so the operations will take place on
         // the list we are trying to replace
 
-        RemoveNonVisibleChildren (maVisibleChildren, aChildList);
+        RemoveNonVisibleChildren (aUnusedChildList);
 
+        aUnusedChildList.clear();
         aChildList.clear();
 
         maVisibleArea = aVisibleArea;
@@ -320,57 +321,99 @@ void ChildrenManagerImpl::CreateListOfVisibleShapes (
     }
 }
 
-void ChildrenManagerImpl::RemoveNonVisibleChildren (
-    const ChildDescriptorListType& rNewChildList,
-    ChildDescriptorListType& rOldChildList)
+namespace
 {
-    // Iterate over list of formerly visible children and remove those that
-    // are not visible anymore, i.e. member of the new list of visible
-    // children.
-    for (auto& rChild : rOldChildList)
+
+bool childDescriptorLess(const ChildDescriptor& lhs, const ChildDescriptor& rhs)
+{
+
+    auto pLhsShape = lhs.mxShape.get();
+    auto pRhsShape = rhs.mxShape.get();
+    if (pLhsShape || pRhsShape)
+        return pLhsShape < pRhsShape;
+    return lhs.mxAccessibleShape.get() < rhs.mxAccessibleShape.get();
+}
+
+bool childDescriptorPtrLess(const ChildDescriptor* lhs, const ChildDescriptor* rhs)
+{
+    return childDescriptorLess(*lhs, *rhs);
+}
+
+}
+    
+void ChildrenManagerImpl::RemoveNonVisibleChildren (
+    const std::vector<ChildDescriptor*>& rNonVisibleChildren)
+{
+    for (ChildDescriptor* pChild : rNonVisibleChildren)
     {
-        if (::std::find(rNewChildList.begin(), rNewChildList.end(), rChild) == rNewChildList.end())
+        // The child is disposed when there is a UNO shape from which
+        // the accessible shape can be created when the shape becomes
+        // visible again.  When there is no such UNO shape then simply
+        // reset the descriptor but keep the accessibility object.
+        if (pChild->mxShape.is())
         {
-            // The child is disposed when there is a UNO shape from which
-            // the accessible shape can be created when the shape becomes
-            // visible again.  When there is no such UNO shape then simply
-            // reset the descriptor but keep the accessibility object.
-            if (rChild.mxShape.is())
-            {
-                UnregisterAsDisposeListener (rChild.mxShape);
-                rChild.disposeAccessibleObject (mrContext);
-            }
-            else
-            {
-                AccessibleShape* pAccessibleShape = rChild.GetAccessibleShape();
-                pAccessibleShape->ResetState (AccessibleStateType::VISIBLE);
-                rChild.mxAccessibleShape = nullptr;
-            }
+            UnregisterAsDisposeListener (pChild->mxShape);
+            pChild->disposeAccessibleObject (mrContext);
+        }
+        else
+        {
+            AccessibleShape* pAccessibleShape = pChild->GetAccessibleShape();
+            pAccessibleShape->ResetState (AccessibleStateType::VISIBLE);
+            pChild->mxAccessibleShape = nullptr;
         }
     }
 }
 
-void ChildrenManagerImpl::MergeAccessibilityInformation (
-    ChildDescriptorListType& raNewChildList)
-{
-    ChildDescriptorListType::const_iterator aStartVisibleChildren = maVisibleChildren.begin();
-    ChildDescriptorListType::const_iterator aEndVisibleChildren = maVisibleChildren.end();
+std::vector<ChildDescriptor*> ChildrenManagerImpl::MergeAccessibilityInformation (
+    ChildDescriptorListType& raOldChildList)
 
-    for (auto& rChild : raNewChildList)
+{
+    // create a working copy of the vector of current children with pointers to elements,
+    // sort the old list and copy by mxShape, and then walk old/current lists in parallel,
+    // which avoids an O(n^2) loop
+    // (order of maVisibleChildren must remain unchanged to not randomly change a11y tree)
+    std::vector<ChildDescriptor*> aSortedVisibleChildren(maVisibleChildren.size());
+    std::transform(maVisibleChildren.begin(), maVisibleChildren.end(),
+                   aSortedVisibleChildren.begin(), [](auto& e) {return &e;});
+    std::sort(aSortedVisibleChildren.begin(), aSortedVisibleChildren.end(), childDescriptorPtrLess);
+
+    // old list can be reordered without problems
+    std::sort(raOldChildList.begin(), raOldChildList.end(), childDescriptorLess);
+
+    ChildDescriptorListType::const_iterator aOldChildDescriptor = raOldChildList.begin();
+    ChildDescriptorListType::const_iterator aEndOldChildren = raOldChildList.end();
+    for (ChildDescriptor* pChild : aSortedVisibleChildren)
     {
-        ChildDescriptorListType::const_iterator aOldChildDescriptor =
-            std::find(aStartVisibleChildren, aEndVisibleChildren, rChild);
+        while (aOldChildDescriptor != aEndOldChildren && childDescriptorLess(*aOldChildDescriptor, *pChild))
+        {
+            aOldChildDescriptor++;
+        }
 
         // Copy accessible shape if that exists in the old descriptor.
-        if (aOldChildDescriptor != aEndVisibleChildren &&
+        if (aOldChildDescriptor != aEndOldChildren && *aOldChildDescriptor == *pChild &&
             aOldChildDescriptor->mxAccessibleShape.is())
         {
-            rChild.mxAccessibleShape = aOldChildDescriptor->mxAccessibleShape;
-            rChild.mbCreateEventPending = false;
+            pChild->mxAccessibleShape = aOldChildDescriptor->mxAccessibleShape;
+            pChild->mbCreateEventPending = false;
         }
         else
-            RegisterAsDisposeListener (rChild.mxShape);
+            RegisterAsDisposeListener (pChild->mxShape);
     }
+
+    // collect list of children that are in the old, but not the new vector
+    std::vector<ChildDescriptor*> aObsoleteChildren;
+
+    auto newIt = aSortedVisibleChildren.begin();
+    auto newEnd = aSortedVisibleChildren.end();
+    for (ChildDescriptor& rOldChild : raOldChildList)
+    {
+        while (newIt != newEnd && childDescriptorLess(**newIt, rOldChild))
+            newIt++;
+        if (newIt == newEnd || !(**newIt == rOldChild) )
+            aObsoleteChildren.push_back(&rOldChild);
+    }
+
+    return aObsoleteChildren;
 }
 
 void ChildrenManagerImpl::SendVisibleAreaEvents (
@@ -403,7 +446,7 @@ void ChildrenManagerImpl::CreateAccessibilityObjects (
             rChild.mbCreateEventPending = false;
             mrContext.CommitChange (
                 AccessibleEventId::CHILD,
-                uno::makeAny(rChild.mxAccessibleShape),
+                uno::Any(uno::Reference<XAccessible>(rChild.mxAccessibleShape)),
                 uno::Any());
         }
         ++nPos;
@@ -451,7 +494,7 @@ void ChildrenManagerImpl::AddShape (const Reference<drawing::XShape>& rxShape)
 
     // Inform listeners about new child.
     uno::Any aNewShape;
-    aNewShape <<= rDescriptor.mxAccessibleShape;
+    aNewShape <<= uno::Reference<XAccessible>(rDescriptor.mxAccessibleShape);
     aGuard.clear();
     mrContext.CommitChange (
         AccessibleEventId::CHILD,
@@ -496,7 +539,7 @@ void ChildrenManagerImpl::SetShapeList (const css::uno::Reference<css::drawing::
 }
 
 
-void ChildrenManagerImpl::AddAccessibleShape (css::uno::Reference<css::accessibility::XAccessible> const & shape)
+void ChildrenManagerImpl::AddAccessibleShape (rtl::Reference<AccessibleShape> const & shape)
 {
     assert(shape.is());
     maAccessibleShapes.push_back (shape);
@@ -526,7 +569,7 @@ void ChildrenManagerImpl::ClearAccessibleShapeList()
     for (auto& rChild : aLocalVisibleChildren)
         if ( rChild.mxAccessibleShape.is() && rChild.mxShape.is() )
         {
-            ::comphelper::disposeComponent(rChild.mxAccessibleShape);
+            rChild.mxAccessibleShape->dispose();
             rChild.mxAccessibleShape = nullptr;
         }
 
@@ -535,7 +578,7 @@ void ChildrenManagerImpl::ClearAccessibleShapeList()
         if (rpShape.is())
         {
             // Dispose the object.
-            ::comphelper::disposeComponent(rpShape);
+            rpShape->dispose();
             rpShape = nullptr;
         }
 }
@@ -694,7 +737,7 @@ void ChildrenManagerImpl::impl_dispose()
 }
 
 
-void SAL_CALL ChildrenManagerImpl::disposing()
+void ChildrenManagerImpl::disposing(std::unique_lock<std::mutex>&)
 {
     impl_dispose();
 }
@@ -727,7 +770,7 @@ bool ChildrenManagerImpl::ReplaceChild (
         mrContext.CommitChange (
             AccessibleEventId::CHILD,
             uno::Any(),
-            uno::makeAny (I->mxAccessibleShape));
+            uno::Any (uno::Reference<XAccessible>(I->mxAccessibleShape)));
 
         // Replace with replacement and send an event about existence
         // of the new child.
@@ -743,7 +786,7 @@ bool ChildrenManagerImpl::ReplaceChild (
         I->mxAccessibleShape = pNewChild.get();
         mrContext.CommitChange (
             AccessibleEventId::CHILD,
-            uno::makeAny (I->mxAccessibleShape),
+            uno::Any (uno::Reference<XAccessible>(I->mxAccessibleShape)),
             uno::Any());
 
         return true;
@@ -757,8 +800,8 @@ bool ChildrenManagerImpl::ReplaceChild (
 // Add the impl method for IAccessibleParent interface
 AccessibleControlShape * ChildrenManagerImpl::GetAccControlShapeFromModel(css::beans::XPropertySet* pSet)
 {
-    sal_Int32 count = GetChildCount();
-    for (sal_Int32 index=0;index<count;index++)
+    sal_Int64 count = GetChildCount();
+    for (sal_Int64 index=0;index<count;index++)
     {
         AccessibleShape* pAccShape = maVisibleChildren[index].GetAccessibleShape();
         if (pAccShape && ::accessibility::ShapeTypeHandler::Instance().GetTypeId(pAccShape->GetXShape()) == DRAWING_CONTROL)
@@ -1005,7 +1048,7 @@ ChildDescriptor::ChildDescriptor (const Reference<drawing::XShape>& xShape)
 }
 
 
-ChildDescriptor::ChildDescriptor (const Reference<XAccessible>& rxAccessibleShape)
+ChildDescriptor::ChildDescriptor (const rtl::Reference<AccessibleShape>& rxAccessibleShape)
     : mxAccessibleShape (rxAccessibleShape),
       mbCreateEventPending (true)
 {
@@ -1013,11 +1056,6 @@ ChildDescriptor::ChildDescriptor (const Reference<XAccessible>& rxAccessibleShap
     // state set.
     AccessibleShape* pAccessibleShape = GetAccessibleShape();
     pAccessibleShape->SetState (AccessibleStateType::VISIBLE);
-}
-
-AccessibleShape* ChildDescriptor::GetAccessibleShape() const
-{
-    return static_cast<AccessibleShape*> (mxAccessibleShape.get());
 }
 
 void ChildDescriptor::setIndexAtAccessibleShape(sal_Int32 _nIndex)
@@ -1035,16 +1073,15 @@ void ChildDescriptor::disposeAccessibleObject (AccessibleContextBase& rParent)
 
     // Send event that the shape has been removed.
     uno::Any aOldValue;
-    aOldValue <<= mxAccessibleShape;
+    aOldValue <<= uno::Reference<XAccessible>(mxAccessibleShape);
     rParent.CommitChange (
         AccessibleEventId::CHILD,
         uno::Any(),
         aOldValue);
 
     // Dispose and remove the object.
-    Reference<lang::XComponent> xComponent (mxAccessibleShape, uno::UNO_QUERY);
-    if (xComponent.is())
-        xComponent->dispose ();
+    if (mxAccessibleShape.is())
+        mxAccessibleShape->dispose();
 
     mxAccessibleShape = nullptr;
 }

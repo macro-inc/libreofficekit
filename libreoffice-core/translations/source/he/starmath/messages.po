@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:51+0200\n"
-"PO-Revision-Date: 2021-09-05 11:22+0000\n"
+"POT-Creation-Date: 2022-10-10 13:36+0200\n"
+"PO-Revision-Date: 2023-03-06 12:32+0000\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
-"Language-Team: Hebrew <https://translations.documentfoundation.org/projects/libo_ui-master/starmathmessages/he/>\n"
+"Language-Team: Hebrew <https://translations.documentfoundation.org/projects/libo_ui-7-5/starmathmessages/he/>\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1525786572.000000\n"
 
 #. GrDhX
@@ -2711,7 +2711,7 @@ msgstr "יישור"
 #: starmath/uiconfig/smath/ui/alignmentdialog.ui:23
 msgctxt "alignmentdialog|default"
 msgid "_Default"
-msgstr "_בררת מחדל"
+msgstr "_ברירת מחדל"
 
 #. RK3fb
 #: starmath/uiconfig/smath/ui/alignmentdialog.ui:30
@@ -2816,21 +2816,15 @@ msgid "Unknown"
 msgstr "לא ידוע"
 
 #. znrh2
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:205
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:208
 msgctxt "catalogdialog|extended_tip|preview"
 msgid "Displays a preview of the current selection."
 msgstr ""
 
 #. DSYgZ
-#: starmath/uiconfig/smath/ui/catalogdialog.ui:246
+#: starmath/uiconfig/smath/ui/catalogdialog.ui:249
 msgctxt "catalogdialog|extended_tip|CatalogDialog"
 msgid "Opens the Symbols dialog, in which you can select a symbol to insert in the formula."
-msgstr ""
-
-#. P3rFo
-#: starmath/uiconfig/smath/ui/dockingelements.ui:24
-msgctxt "dockingelements|ElementCategories|tooltip_text"
-msgid "Element categories"
 msgstr ""
 
 #. 4SGdP
@@ -2897,7 +2891,7 @@ msgstr "גדלי גופנים"
 #: starmath/uiconfig/smath/ui/fontsizedialog.ui:61
 msgctxt "fontsizedialog|default"
 msgid "_Default"
-msgstr "_בררת מחדל"
+msgstr "_ברירת מחדל"
 
 #. BywFC
 #: starmath/uiconfig/smath/ui/fontsizedialog.ui:68
@@ -3055,7 +3049,7 @@ msgstr ""
 #: starmath/uiconfig/smath/ui/fonttypedialog.ui:123
 msgctxt "fonttypedialog|default"
 msgid "_Default"
-msgstr "_בררת מחדל"
+msgstr "_ברירת מחדל"
 
 #. gAvNx
 #: starmath/uiconfig/smath/ui/fonttypedialog.ui:130
@@ -3262,19 +3256,25 @@ msgstr "גודל"
 #: starmath/uiconfig/smath/ui/savedefaultsdialog.ui:7
 msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "Save defaults?"
-msgstr "לשמור כבררת מחדל?"
+msgstr "לשמור כברירת מחדל?"
 
 #. jCDCU
 #: starmath/uiconfig/smath/ui/savedefaultsdialog.ui:14
 msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "Should the changes be saved as defaults?"
-msgstr "האם לשמור את השינויים כבררת מחדל?"
+msgstr "האם לשמור את השינויים כברירת מחדל?"
 
 #. 7oNeH
 #: starmath/uiconfig/smath/ui/savedefaultsdialog.ui:15
 msgctxt "savedefaultsdialog|SaveDefaultsDialog"
 msgid "These changes will apply for all new formulas."
 msgstr "השינויים האלו יחולו על כל הנוסחאות החדשות."
+
+#. XBBFa
+#: starmath/uiconfig/smath/ui/sidebarelements_math.ui:24
+msgctxt "mathelementspanel|ElementCategories|tooltip_text"
+msgid "Element categories"
+msgstr ""
 
 #. 6EqHz
 #: starmath/uiconfig/smath/ui/smathsettings.ui:41
@@ -3487,7 +3487,7 @@ msgstr "ריווח"
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:145
 msgctxt "spacingdialog|default"
 msgid "_Default"
-msgstr "_בררת מחדל"
+msgstr "_ברירת מחדל"
 
 #. sGXwv
 #: starmath/uiconfig/smath/ui/spacingdialog.ui:159

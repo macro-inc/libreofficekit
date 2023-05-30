@@ -82,7 +82,7 @@ protected:
 
 private:
 
-    static css::uno::Reference< css::graphic::XGraphic > implLoadMemory( const OUString& rResourceURL );
+    static css::uno::Reference< css::graphic::XGraphic > implLoadMemory( std::u16string_view rResourceURL );
     static css::uno::Reference< css::graphic::XGraphic > implLoadRepositoryImage( std::u16string_view rResourceURL );
     static css::uno::Reference< css::graphic::XGraphic > implLoadBitmap( const css::uno::Reference< css::awt::XBitmap >& rBitmap );
     static css::uno::Reference< css::graphic::XGraphic > implLoadStandardImage( std::u16string_view rResourceURL );
@@ -122,14 +122,14 @@ uno::Sequence< sal_Int8 > SAL_CALL GraphicProvider::getImplementationId()
     return css::uno::Sequence<sal_Int8>();
 }
 
-uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadMemory( const OUString& rResourceURL )
+uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadMemory( std::u16string_view rResourceURL )
 {
     uno::Reference< ::graphic::XGraphic >   xRet;
     sal_Int32                               nIndex = 0;
 
-    if( rResourceURL.getToken( 0, '/', nIndex ) == "private:memorygraphic" )
+    if( o3tl::getToken(rResourceURL, 0, '/', nIndex ) == u"private:memorygraphic" )
     {
-        sal_Int64 nGraphicAddress = rResourceURL.getToken( 0, '/', nIndex ).toInt64();
+        sal_Int64 nGraphicAddress = o3tl::toInt64(o3tl::getToken(rResourceURL, 0, '/', nIndex ));
 
         if( nGraphicAddress )
         {
@@ -143,7 +143,6 @@ uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadMemory( const OUS
     return xRet;
 }
 
-
 uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadRepositoryImage( std::u16string_view rResourceURL )
 {
     uno::Reference< ::graphic::XGraphic >   xRet;
@@ -154,12 +153,13 @@ uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadRepositoryImage( 
         BitmapEx aBitmap;
         if ( vcl::ImageRepository::loadImage( OUString(sPathName), aBitmap ) )
         {
-            xRet = Graphic(aBitmap).GetXGraphic();
+            Graphic aGraphic(aBitmap);
+            aGraphic.setOriginURL(OUString(rResourceURL));
+            xRet = aGraphic.GetXGraphic();
         }
     }
     return xRet;
 }
-
 
 uno::Reference< ::graphic::XGraphic > GraphicProvider::implLoadStandardImage( std::u16string_view rResourceURL )
 {
@@ -401,10 +401,8 @@ uno::Reference< ::graphic::XGraphic > SAL_CALL GraphicProvider::queryGraphic( co
             aExtHeader.xExt = nExtWidth;
             aExtHeader.yExt = nExtHeight;
             aExtHeader.mapMode = nExtMapMode;
-            WmfExternal *pExtHeader = nullptr;
             if ( nExtMapMode > 0 )
             {
-                pExtHeader = &aExtHeader;
                 bLazyRead = false;
             }
 
@@ -416,8 +414,7 @@ uno::Reference< ::graphic::XGraphic > SAL_CALL GraphicProvider::queryGraphic( co
                     aVCLGraphic = aGraphic;
             }
             if (aVCLGraphic.IsNone())
-                error = rFilter.ImportGraphic(aVCLGraphic, aPath, *pIStm, GRFILTER_FORMAT_DONTKNOW,
-                                              nullptr, GraphicFilterImportFlags::NONE, pExtHeader);
+                error = rFilter.ImportGraphic(aVCLGraphic, aPath, *pIStm, GRFILTER_FORMAT_DONTKNOW, nullptr, GraphicFilterImportFlags::NONE);
 
             if( (error == ERRCODE_NONE ) &&
                 ( aVCLGraphic.GetType() != GraphicType::NONE ) )
@@ -441,8 +438,6 @@ uno::Reference< ::graphic::XGraphic > SAL_CALL GraphicProvider::queryGraphic( co
 
 uno::Sequence< uno::Reference<graphic::XGraphic> > SAL_CALL GraphicProvider::queryGraphics(const uno::Sequence< uno::Sequence<beans::PropertyValue> >& rMediaPropertiesSeq)
 {
-    SolarMutexGuard aGuard;
-
     // Turn properties into streams.
     std::vector< std::unique_ptr<SvStream> > aStreams;
     for (const auto& rMediaProperties : rMediaPropertiesSeq)
@@ -704,8 +699,6 @@ void ImplApplyFilterData( ::Graphic& rGraphic, const uno::Sequence< beans::Prope
 
 void SAL_CALL GraphicProvider::storeGraphic( const uno::Reference< ::graphic::XGraphic >& rxGraphic, const uno::Sequence< beans::PropertyValue >& rMediaProperties )
 {
-    SolarMutexGuard g;
-
     std::unique_ptr<SvStream> pOStm;
     OUString    aPath;
 

@@ -18,6 +18,7 @@
  */
 #pragma once
 
+#include <utility>
 #include <vbahelper/vbahelperinterface.hxx>
 #include "vbainterior.hxx"
 #include "vbafont.hxx"
@@ -40,8 +41,8 @@ typedef InheritedHelperInterfaceImpl< Ifc... > BaseClass;
 public:
     TitleImpl(  const css::uno::Reference< ov::XHelperInterface >& xParent,
                 const css::uno::Reference< css::uno::XComponentContext >& xContext,
-                const css::uno::Reference< css::drawing::XShape >& _xTitleShape )
-        : BaseClass( xParent, xContext ), xTitleShape( _xTitleShape ), m_Palette(nullptr)
+                css::uno::Reference< css::drawing::XShape >  _xTitleShape )
+        : BaseClass( xParent, xContext ), xTitleShape(std::move( _xTitleShape )), m_Palette(nullptr)
     {
         xShapePropertySet.set( xTitleShape, css::uno::UNO_QUERY_THROW );
         oShapeHelper.reset( new ov::ShapeHelper(xTitleShape) );
@@ -65,7 +66,7 @@ public:
     {
         try
         {
-            xShapePropertySet->setPropertyValue("String", css::uno::makeAny( Text ));
+            xShapePropertySet->setPropertyValue("String", css::uno::Any( Text ));
         }
         catch ( css::uno::Exception& )
         {
@@ -106,7 +107,7 @@ public:
     {
         try
         {
-            xShapePropertySet->setPropertyValue("TextRotation", css::uno::makeAny(_nOrientation*100));
+            xShapePropertySet->setPropertyValue("TextRotation", css::uno::Any(_nOrientation*100));
         }
         catch (css::uno::Exception& )
         {

@@ -28,6 +28,7 @@
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <unotools/accessiblerelationsethelper.hxx>
+#include <utility>
 #include <vcl/unohelp.hxx>
 #include <comphelper/accessibleeventnotifier.hxx>
 #include <vcl/svapp.hxx>
@@ -36,11 +37,11 @@ using namespace ::com::sun::star;
 using namespace ::com::sun::star::accessibility;
 
 ScAccessibleContextBase::ScAccessibleContextBase(
-                                                 const uno::Reference<XAccessible>& rxParent,
+                                                 uno::Reference<XAccessible> xParent,
                                                  const sal_Int16 aRole)
                                                  :
     ScAccessibleContextBaseWeakImpl(m_aMutex),
-    mxParent(rxParent),
+    mxParent(std::move(xParent)),
     mnClientId(0),
     maRole(aRole)
 {
@@ -221,14 +222,14 @@ sal_Int32 SAL_CALL ScAccessibleContextBase::getBackground(  )
 
 //=====  XAccessibleContext  ==================================================
 
-sal_Int32 SAL_CALL ScAccessibleContextBase::getAccessibleChildCount()
+sal_Int64 SAL_CALL ScAccessibleContextBase::getAccessibleChildCount()
 {
     OSL_FAIL("should be implemented in the abrevated class");
     return 0;
 }
 
 uno::Reference<XAccessible> SAL_CALL
-    ScAccessibleContextBase::getAccessibleChild(sal_Int32 /* nIndex */)
+    ScAccessibleContextBase::getAccessibleChild(sal_Int64 /* nIndex */)
 {
     OSL_FAIL("should be implemented in the abrevated class");
     return uno::Reference<XAccessible>();
@@ -240,7 +241,7 @@ uno::Reference<XAccessible> SAL_CALL
     return mxParent;
 }
 
-sal_Int32 SAL_CALL
+sal_Int64 SAL_CALL
        ScAccessibleContextBase::getAccessibleIndexInParent()
 {
     SolarMutexGuard aGuard;
@@ -248,7 +249,7 @@ sal_Int32 SAL_CALL
     //  Use a simple but slow solution for now.  Optimize later.
    //   Return -1 to indicate that this object's parent does not know about the
    //   object.
-    sal_Int32 nIndex(-1);
+    sal_Int64 nIndex(-1);
 
     //  Iterate over all the parent's children and search for this object.
     if (mxParent.is())
@@ -257,8 +258,8 @@ sal_Int32 SAL_CALL
             mxParent->getAccessibleContext());
         if (xParentContext.is())
         {
-            sal_Int32 nChildCount = xParentContext->getAccessibleChildCount();
-            for (sal_Int32 i=0; i<nChildCount; ++i)
+            sal_Int64 nChildCount = xParentContext->getAccessibleChildCount();
+            for (sal_Int64 i=0; i<nChildCount; ++i)
             {
                 uno::Reference<XAccessible> xChild (xParentContext->getAccessibleChild (i));
                 if (xChild.is() && xChild.get() == this)
@@ -333,10 +334,9 @@ uno::Reference<XAccessibleRelationSet> SAL_CALL
     return new utl::AccessibleRelationSetHelper();
 }
 
-uno::Reference<XAccessibleStateSet> SAL_CALL
-        ScAccessibleContextBase::getAccessibleStateSet()
+sal_Int64 SAL_CALL ScAccessibleContextBase::getAccessibleStateSet()
 {
-    return uno::Reference<XAccessibleStateSet>();
+    return 0;
 }
 
 lang::Locale SAL_CALL
@@ -474,8 +474,6 @@ void ScAccessibleContextBase::CommitFocusGained() const
     aEvent.NewValue <<= AccessibleStateType::FOCUSED;
 
     CommitChange(aEvent);
-
-    vcl::unohelper::NotifyAccessibleStateEventGlobally(aEvent);
 }
 
 void ScAccessibleContextBase::CommitFocusLost() const
@@ -486,8 +484,6 @@ void ScAccessibleContextBase::CommitFocusLost() const
     aEvent.OldValue <<= AccessibleStateType::FOCUSED;
 
     CommitChange(aEvent);
-
-    vcl::unohelper::NotifyAccessibleStateEventGlobally(aEvent);
 }
 
 tools::Rectangle ScAccessibleContextBase::GetBoundingBoxOnScreen() const

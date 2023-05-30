@@ -23,7 +23,6 @@
 #include <com/sun/star/datatransfer/XTransferable.hpp>
 #include <cppuhelper/weak.hxx>
 #include <rtl/ustring.hxx>
-#include <osl/mutex.hxx>
 #include <vcl/dllapi.h>
 #include <vcl/IDialogRenderable.hxx>
 
@@ -41,7 +40,7 @@ namespace vcl::unohelper {
         OUString        maText;
 
     public:
-                        TextDataObject( const OUString& rText );
+                        TextDataObject( OUString aText );
                         virtual ~TextDataObject() override;
 
         // css::uno::XInterface

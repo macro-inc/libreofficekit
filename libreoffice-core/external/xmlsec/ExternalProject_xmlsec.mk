@@ -51,7 +51,7 @@ $(call gb_ExternalProject_get_state_target,xmlsec,build) :
 		&& $(gb_RUN_CONFIGURE) ./configure \
 			--with-pic --disable-shared --disable-crypto-dl --without-libxslt --without-gnutls --without-gcrypt --disable-apps --disable-docs \
 			$(if $(verbose),--disable-silent-rules,--enable-silent-rules) \
-			CFLAGS="$(CFLAGS) $(if $(ENABLE_OPTIMIZED),$(gb_COMPILEROPTFLAGS),$(gb_COMPILERNOOPTFLAGS)) $(if $(debug),$(gb_DEBUGINFO_FLAGS)) $(gb_VISIBILITY_FLAGS)" \
+			CFLAGS="$(CFLAGS) $(call gb_ExternalProject_get_build_flags,xmlsec) $(gb_VISIBILITY_FLAGS)" \
 			$(if $(filter MACOSX,$(OS)),--prefix=/@.__________________________________________________OOO) \
 			$(if $(ENABLE_NSS), \
 				--without-openssl \
@@ -67,9 +67,9 @@ $(call gb_ExternalProject_get_state_target,xmlsec,build) :
 					), \
 					--without-openssl) \
 			) \
-			$(if $(CROSS_COMPILING),--build=$(BUILD_PLATFORM) --host=$(HOST_PLATFORM)) \
+			$(gb_CONFIGURE_PLATFORMS) \
 			$(if $(SYSBASE),CFLAGS="-I$(SYSBASE)/usr/include" \
-			LDFLAGS="-L$(SYSBASE)/usr/lib $(if $(filter-out LINUX FREEBSD,$(OS)),",-Wl$(COMMA)-z$(COMMA)origin -Wl$(COMMA)-rpath$(COMMA)\\"\$$\$$ORIGIN)) \
+			LDFLAGS="$(call gb_ExternalProject_get_link_flags,xmlsec) -L$(SYSBASE)/usr/lib $(if $(filter-out LINUX FREEBSD,$(OS)),",-Wl$(COMMA)-z$(COMMA)origin -Wl$(COMMA)-rpath$(COMMA)\\"\$$\$$ORIGIN)) \
 		&& $(MAKE) \
 	)
 	$(call gb_Trace_EndRange,xmlsec,EXTERNAL)

@@ -54,10 +54,6 @@ XMLHatchStyleImport::XMLHatchStyleImport( SvXMLImport& rImp )
 {
 }
 
-XMLHatchStyleImport::~XMLHatchStyleImport()
-{
-}
-
 void XMLHatchStyleImport::importXML(
     const uno::Reference< xml::sax::XFastAttributeList >& xAttrList,
     uno::Any& rValue,
@@ -91,7 +87,7 @@ void XMLHatchStyleImport::importXML(
                 break;
             case XML_ELEMENT(DRAW, XML_COLOR):
             case XML_ELEMENT(DRAW_OOO, XML_COLOR):
-                ::sax::Converter::convertColor(aHatch.Color, aIter.toString());
+                ::sax::Converter::convertColor(aHatch.Color, aIter.toView());
                 break;
             case XML_ELEMENT(DRAW, XML_DISTANCE):
             case XML_ELEMENT(DRAW_OOO, XML_DISTANCE):
@@ -124,10 +120,6 @@ void XMLHatchStyleImport::importXML(
 
 XMLHatchStyleExport::XMLHatchStyleExport( SvXMLExport& rExp )
     : rExport(rExp)
-{
-}
-
-XMLHatchStyleExport::~XMLHatchStyleExport()
 {
 }
 

@@ -10,7 +10,6 @@
 #include <sal/config.h>
 #include <test/unoapi_test.hxx>
 #include <com/sun/star/sdb/XOfficeDatabaseDocument.hpp>
-#include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/sdb/CommandType.hpp>
 #include <com/sun/star/sdbc/XConnection.hpp>
 #include <com/sun/star/sdbc/XResultSet.hpp>
@@ -50,9 +49,8 @@ void RowSetClones::test()
 {
     const OUString sFilePath(m_directories.getURLFromWorkdir(u"CppunitTest/RowSetClones.odb"));
 
-    uno::Reference< lang::XComponent > xComponent (loadFromDesktop(sFilePath));
-    uno::Reference< XOfficeDatabaseDocument > xDocument(xComponent, UNO_QUERY);
-    CPPUNIT_ASSERT(xDocument.is());
+    mxComponent = loadFromDesktop(sFilePath);
+    uno::Reference< XOfficeDatabaseDocument > xDocument(mxComponent, UNO_QUERY_THROW);
 
     uno::Reference< XDataSource > xDataSource = xDocument->getDataSource();
     CPPUNIT_ASSERT(xDataSource.is());
@@ -123,8 +121,6 @@ void RowSetClones::test()
     CPPUNIT_ASSERT(xResultSetClone->isLast());
     CPPUNIT_ASSERT(xResultSet->isFirst());
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), xRow->getInt(1));
-
-    closeDocument(uno::Reference<lang::XComponent>(xDocument, uno::UNO_QUERY));
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(RowSetClones);

@@ -22,7 +22,6 @@
 
 #include <clang/Rewrite/Core/Rewriter.h>
 
-#include "compat.hxx"
 #include "pluginhandler.hxx"
 
 using namespace clang;
@@ -66,6 +65,10 @@ public:
     enum { isSharedPlugin = false };
 protected:
     DiagnosticBuilder report( DiagnosticsEngine::Level level, StringRef message, SourceLocation loc = SourceLocation()) const;
+    // Look at the line containing location and the previous line for any comments that overlap
+    // either of those two lines and that contain "[-loplugin:<name>]" (with the name of this
+    // plugin), indicating that warnings from this plugin should be suppressed here:
+    bool suppressWarningAt(SourceLocation location) const;
     bool ignoreLocation( SourceLocation loc ) const
     { return handler.ignoreLocation(loc); }
     bool ignoreLocation( const Decl* decl ) const;
@@ -120,7 +123,7 @@ public:
     explicit FilteringPlugin( const InstantiationData& data ) : Plugin(data) {}
 
     bool TraverseNamespaceDecl(NamespaceDecl * decl) {
-        if (ignoreLocation(compat::getBeginLoc(decl)))
+        if (ignoreLocation(decl->getBeginLoc()))
             return true;
         return RecursiveASTVisitor<Derived>::TraverseNamespaceDecl(decl);
     }
@@ -220,15 +223,12 @@ bool Plugin::ignoreLocation( const Stmt* stmt ) const
 {
     // Invalid location can happen at least for ImplicitCastExpr of
     // ImplicitParam 'self' in Objective C method declarations:
-    return compat::getBeginLoc(stmt).isValid() && ignoreLocation( compat::getBeginLoc(stmt));
+    return stmt->getBeginLoc().isValid() && ignoreLocation( stmt->getBeginLoc());
 }
 
 inline bool Plugin::ignoreLocation(TypeLoc tloc) const
 {
-    // Invalid locations appear to happen at least with Clang 5.0.2 (but no longer with at least
-    // recent Clang 10 trunk):
-    auto const loc = tloc.getBeginLoc();
-    return loc.isValid() && ignoreLocation(loc);
+    return ignoreLocation(tloc.getBeginLoc());
 }
 
 template< typename T >
@@ -266,7 +266,7 @@ public:
     explicit FilteringRewritePlugin( const InstantiationData& data ) : RewritePlugin(data) {}
 
     bool TraverseNamespaceDecl(NamespaceDecl * decl) {
-        if (ignoreLocation(compat::getBeginLoc(decl)))
+        if (ignoreLocation(decl->getBeginLoc()))
             return true;
         return RecursiveASTVisitor<Derived>::TraverseNamespaceDecl(decl);
     }
@@ -281,6 +281,10 @@ bool hasPathnamePrefix(StringRef pathname, StringRef prefix);
 // Same as pathname == other, except on Windows, where pathname and other may
 // also contain backslashes:
 bool isSamePathname(StringRef pathname, StringRef other);
+
+// Check whether fullPathname is either SRCDIR/include/includePathname or
+// SDKDIR/include/includePathname:
+bool isSameUnoIncludePathname(StringRef fullPathname, StringRef includePathname);
 
 // It appears that, given a function declaration, there is no way to determine
 // the language linkage of the function's type, only of the function's name
@@ -306,6 +310,7 @@ int derivedFromCount(const CXXRecordDecl* subtypeRecord, const CXXRecordDecl* ba
 bool hasExternalLinkage(VarDecl const * decl);
 
 bool isSmartPointerType(const Expr*);
+bool isSmartPointerType(clang::QualType);
 
 const Decl* getFunctionDeclContext(ASTContext& context, const Stmt* stmt);
 

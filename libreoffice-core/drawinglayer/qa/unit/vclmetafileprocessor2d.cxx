@@ -12,21 +12,17 @@
 
 #include <vcl/virdev.hxx>
 #include <vcl/BitmapReadAccess.hxx>
-#include <vcl/canvastools.hxx>
 #include <vcl/graphicfilter.hxx>
 #include <vcl/metaact.hxx>
 #include <vcl/gdimtf.hxx>
 #include <tools/stream.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <cppcanvas/vclfactory.hxx>
 
-#include <com/sun/star/rendering/XBitmap.hpp>
 #include <com/sun/star/rendering/XCanvas.hpp>
-#include <com/sun/star/rendering/XBitmapCanvas.hpp>
-#include <com/sun/star/rendering/CompositeOperation.hpp>
 
 using namespace drawinglayer;
 using namespace com::sun::star;
@@ -87,7 +83,7 @@ public:
         metafile.Record(metadevice);
         drawinglayer::geometry::ViewInformation2D view;
         std::unique_ptr<processor2d::BaseProcessor2D> processor(
-            processor2d::createBaseProcessor2DFromOutputDevice(*metadevice, view));
+            processor2d::createProcessor2DFromOutputDevice(*metadevice, view));
         CPPUNIT_ASSERT(processor);
         // Match the values Impress uses.
         basegfx::B2DPolygon polygon = { { 15601, 0 }, { 15602, 5832 } };

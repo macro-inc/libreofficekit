@@ -88,6 +88,7 @@
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
 #include <osl/diagnose.h>
+#include <o3tl/unit_conversion.hxx>
 
 #include <PostItMgr.hxx>
 #include <FrameControlsManager.hxx>
@@ -116,6 +117,7 @@
 #include <UndoCore.hxx>
 #include <formatlinebreak.hxx>
 #include <formatcontentcontrol.hxx>
+#include <textcontentcontrol.hxx>
 
 using namespace sw::mark;
 using namespace com::sun::star;
@@ -140,7 +142,7 @@ static bool lcl_IsAllowed(const SwWrtShell* rSh)
 {
     if (rSh->GetViewOptions()->IsShowOutlineContentVisibilityButton() && rSh->IsEndPara())
     {
-        SwTextNode* pTextNode = rSh->GetCursor()->GetNode().GetTextNode();
+        SwTextNode* pTextNode = rSh->GetCursor()->GetPointNode().GetTextNode();
         if (pTextNode && pTextNode->IsOutline())
         {
             // disallow if this is an outline node having folded content
@@ -252,7 +254,7 @@ void SwWrtShell::Insert( const OUString &rStr )
         bStarted = true;
         Push();
         // let's interpret a selection within the same node as "replace"
-        bDeleted = DelRight(GetCursor()->GetPoint()->nNode == GetCursor()->GetMark()->nNode);
+        bDeleted = DelRight(GetCursor()->GetPoint()->GetNode() == GetCursor()->GetMark()->GetNode());
         Pop(SwCursorShell::PopMode::DeleteCurrent); // Restore selection (if tracking changes)
         NormalizePam(false); // tdf#127635 put point at the end of deletion
         ClearMark();
@@ -260,6 +262,19 @@ void SwWrtShell::Insert( const OUString &rStr )
 
     bCallIns ?
         SwEditShell::Insert2( rStr, bDeleted ) : SwEditShell::Overwrite( rStr );
+
+    // Check whether node is content control
+    SwTextContentControl* pTextContentControl = CursorInsideContentControl();
+    if (pTextContentControl)
+    {
+        std::shared_ptr<SwContentControl> pContentControl =
+            pTextContentControl->GetContentControl().GetContentControl();
+        if (pContentControl)
+        {
+            // Set showingPlcHdr to false as node has been edited
+            pContentControl->SetShowingPlaceHolder(false);
+        }
+    }
 
     if( bStarted )
     {
@@ -318,8 +333,8 @@ void SwWrtShell::InsertGraphic( const OUString &rPath, const OUString &rFilter,
         Size aSz( pFrameMgr->GetSize() );
         if ( !aSz.Width() || !aSz.Height() )
         {
-            aSz.setWidth(567);
-            aSz.setHeight( 567);
+            aSz.setWidth(o3tl::toTwips(1, o3tl::Length::cm));
+            aSz.setHeight(o3tl::toTwips(1, o3tl::Length::cm));
             pFrameMgr->SetSize( aSz );
         }
         else if ( aSz.Width() != DFLT_WIDTH && aSz.Height() != DFLT_HEIGHT )
@@ -538,7 +553,7 @@ bool SwWrtShell::InsertOleObject( const svt::EmbeddedObjectRef& xRef, SwFlyFrame
                 {
                     try
                     {
-                        xSet->setPropertyValue("Formula", uno::makeAny( aMathData ) );
+                        xSet->setPropertyValue("Formula", uno::Any( aMathData ) );
                         bActivate = false;
                     }
                     catch (const uno::Exception&)
@@ -602,9 +617,9 @@ bool SwWrtShell::InsertOleObject( const svt::EmbeddedObjectRef& xRef, SwFlyFrame
                  bDisableDataTableDialog )
             {
                 xProps->setPropertyValue("DisableDataTableDialog",
-                    uno::makeAny( false ) );
+                    uno::Any( false ) );
                 xProps->setPropertyValue("DisableComplexChartTypes",
-                    uno::makeAny( false ) );
+                    uno::Any( false ) );
                 uno::Reference< util::XModifiable > xModifiable( xProps, uno::UNO_QUERY );
                 if ( xModifiable.is() )
                 {
@@ -663,7 +678,7 @@ void SwWrtShell::LaunchOLEObj(sal_Int32 nVerb)
     {
         uno::Sequence<beans::PropertyValue> aArguments
             = { comphelper::makePropertyValue("ReadOnly", pCli->IsProtected()) };
-        xOLEInit->initialize({ uno::makeAny(aArguments) });
+        xOLEInit->initialize({ uno::Any(aArguments) });
     }
 
     static_cast<SwOleClient*>(pCli)->SetInDoVerb( true );
@@ -899,8 +914,13 @@ void SwWrtShell::CalcAndSetScale( svt::EmbeddedObjectRef& xObj,
     }
     else
     {
-        aArea.Width ( tools::Long( aArea.Width()  / pCli->GetScaleWidth() ) );
-        aArea.Height( tools::Long( aArea.Height() / pCli->GetScaleHeight() ) );
+        tools::Long nWidth(pCli->GetScaleWidth());
+        tools::Long nHeight(pCli->GetScaleHeight());
+        if (nWidth && nHeight)
+        {
+            aArea.Width ( aArea.Width()  / nWidth );
+            aArea.Height( aArea.Height() / nHeight );
+        }
     }
 
     pCli->SetObjAreaAndScale( aArea.SVRect(), aScaleWidth, aScaleHeight );
@@ -1114,13 +1134,12 @@ void SwWrtShell::InsertContentControl(SwContentControlType eType)
             {
                 SwCursor* pCursor = getShellCursor(true);
                 pCursor->DeleteMark();
-                const SwPosition* pAnchor = pFrameFormat->GetAnchor().GetContentAnchor();
-                pCursor->GetPoint()->nContent = pAnchor->nContent;
-                ++pCursor->GetPoint()->nContent;
+                const SwFormatAnchor& rFormatAnchor = pFrameFormat->GetAnchor();
+                pCursor->GetPoint()->Assign( *rFormatAnchor.GetAnchorContentNode(), rFormatAnchor.GetAnchorContentOffset() + 1);
             }
 
             // Select before the anchor position.
-            Left(CRSR_SKIP_CHARS, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+            Left(SwCursorSkipMode::Chars, /*bSelect=*/true, 1, /*bBasicCall=*/false);
             break;
         }
         case SwContentControlType::DATE:
@@ -1142,7 +1161,7 @@ void SwWrtShell::InsertContentControl(SwContentControlType eType)
     if (aPlaceholder.getLength())
     {
         Insert(aPlaceholder);
-        Left(CRSR_SKIP_CHARS, /*bSelect=*/true, aPlaceholder.getLength(),
+        Left(SwCursorSkipMode::Chars, /*bSelect=*/true, aPlaceholder.getLength(),
                 /*bBasicCall=*/false);
     }
     SwFormatContentControl aContentControl(pContentControl, RES_TXTATR_CONTENTCONTROL);
@@ -1175,7 +1194,7 @@ void SwWrtShell::InsertFootnote(const OUString &rStr, bool bEndNote, bool bEdit 
     if( bEdit )
     {
         // For editing the footnote text.
-        Left(CRSR_SKIP_CHARS, false, 1, false );
+        Left(SwCursorSkipMode::Chars, false, 1, false );
         GotoFootnoteText();
     }
     m_aNavigationMgr.addEntry(aPos);
@@ -1184,7 +1203,7 @@ void SwWrtShell::InsertFootnote(const OUString &rStr, bool bEndNote, bool bEdit 
 // tdf#141634
 static bool lcl_FoldedOutlineNodeEndOfParaSplit(SwWrtShell *pThis)
 {
-    SwTextNode* pTextNode = pThis->GetCursor()->GetNode().GetTextNode();
+    SwTextNode* pTextNode = pThis->GetCursor()->GetPointNode().GetTextNode();
     if (pTextNode && pTextNode->IsOutline())
     {
         bool bVisible = true;
@@ -1280,7 +1299,7 @@ static bool lcl_FoldedOutlineNodeEndOfParaSplit(SwWrtShell *pThis)
                 pDoc->GetIDocumentUndoRedo().ClearRedo();
                 pDoc->GetIDocumentUndoRedo().AppendUndo(std::make_unique<SwUndoInsert>(*pNd));
                 pDoc->GetIDocumentUndoRedo().AppendUndo(std::make_unique<SwUndoFormatColl>
-                                                        (*pNd, pNd->GetTextColl(), true, true));
+                                                        (SwPaM(*pNd), pNd->GetTextColl(), true, true));
             }
 
             pThis->SetModified();
@@ -1384,7 +1403,7 @@ void SwWrtShell::NumOrBulletOn(bool bNum)
                 // If not, let it been counted. Then it has to be checked,
                 // of the outline numbering has to be activated or continued.
                 SwTextNode const*const pTextNode = sw::GetParaPropsNode(
-                        *GetLayout(), GetCursor()->GetPoint()->nNode);
+                        *GetLayout(), GetCursor()->GetPoint()->GetNode());
                 if ( pTextNode && !pTextNode->IsCountedInList() )
                 {
                     // check, if numbering of the outline level of the paragraph
@@ -1491,7 +1510,7 @@ void SwWrtShell::NumOrBulletOn(bool bNum)
         if ( !bContinueFoundNumRule )
         {
             SwTextNode const*const pTextNode = sw::GetParaPropsNode(
-                    *GetLayout(), GetCursor()->GetPoint()->nNode);
+                    *GetLayout(), GetCursor()->GetPoint()->GetNode());
 
             if (pTextNode)
             {
@@ -1521,8 +1540,7 @@ void SwWrtShell::NumOrBulletOn(bool bNum)
                     aFormat.SetBulletChar( numfunc::GetBulletChar(static_cast<sal_uInt8>(nLevel)));
                     aFormat.SetNumberingType(SVX_NUM_CHAR_SPECIAL);
                     // #i93908# clear suffix for bullet lists
-                    aFormat.SetPrefix(OUString());
-                    aFormat.SetSuffix(OUString());
+                    aFormat.SetListFormat("", "", nLevel);
                 }
                 aNumRule.Set(o3tl::narrowing<sal_uInt16>(nLevel), aFormat);
             }
@@ -1556,11 +1574,11 @@ void SwWrtShell::NumOrBulletOn(bool bNum)
         }
 
         const SwTextNode *const pTextNode = sw::GetParaPropsNode(*GetLayout(),
-                GetCursor()->GetPoint()->nNode);
+                GetCursor()->GetPoint()->GetNode());
         const SwTwips nWidthOfTabs = pTextNode
                                      ? pTextNode->GetWidthOfLeadingTabs()
                                      : 0;
-        GetDoc()->getIDocumentContentOperations().RemoveLeadingWhiteSpace( *GetCursor()->GetPoint() );
+        GetDoc()->getIDocumentContentOperations().RemoveLeadingWhiteSpace(*GetCursor());
 
         const bool bHtml = dynamic_cast<SwWebDocShell*>( pDocSh ) !=  nullptr;
         const bool bRightToLeft = IsInRightToLeftText();
@@ -1580,8 +1598,7 @@ void SwWrtShell::NumOrBulletOn(bool bNum)
                 aFormat.SetBulletChar( numfunc::GetBulletChar(nLvl) );
                 aFormat.SetNumberingType(SVX_NUM_CHAR_SPECIAL);
                 // #i93908# clear suffix for bullet lists
-                aFormat.SetPrefix(OUString());
-                aFormat.SetSuffix(OUString());
+                aFormat.SetListFormat("", "", nLvl);
             }
 
             // #i95907#
@@ -1666,7 +1683,7 @@ void SwWrtShell::NumOrBulletOff()
         SwNumRule aNumRule(*pCurNumRule);
 
         SwTextNode * pTextNode =
-            sw::GetParaPropsNode(*GetLayout(), GetCursor()->GetPoint()->nNode);
+            sw::GetParaPropsNode(*GetLayout(), GetCursor()->GetPoint()->GetNode());
 
         if (pTextNode)
         {
@@ -1779,7 +1796,7 @@ SelectionType SwWrtShell::GetSelectionType() const
     if ( pNumRule )
     {
         const SwTextNode* pTextNd =
-            sw::GetParaPropsNode(*GetLayout(), GetCursor()->GetPoint()->nNode);
+            sw::GetParaPropsNode(*GetLayout(), GetCursor()->GetPoint()->GetNode());
 
         if ( pTextNd && pTextNd->IsInList() )
         {
@@ -1909,10 +1926,10 @@ void SwWrtShell::AutoUpdatePara(SwTextFormatColl* pColl, const SfxItemSet& rStyl
         if(!IsInvalidItem(pParaItem))
         {
             sal_uInt16 nWhich = pParaItem->Which();
-            if(SfxItemState::SET == aCoreSet.GetItemState(nWhich) &&
+            if(SfxItemState::SET == aParaIter.GetItemState() &&
                SfxItemState::SET == rStyleSet.GetItemState(nWhich))
             {
-                aCoreSet.ClearItem(nWhich);
+                aParaIter.ClearItem();
                 bReset = true;
             }
         }
@@ -1990,7 +2007,7 @@ SwWrtShell::SwWrtShell( SwWrtShell& rSh, vcl::Window *_pWin, SwView &rShell )
 
     // place the cursor on the first field...
     IFieldmark *pBM = nullptr;
-    if ( IsFormProtected() && ( pBM = GetFieldmarkAfter( ) ) !=nullptr ) {
+    if (IsFormProtected() && (pBM = GetFieldmarkAfter(/*bLoop=*/false)) !=nullptr) {
         GotoFieldmark(pBM);
     }
 }
@@ -2008,7 +2025,7 @@ SwWrtShell::SwWrtShell( SwDoc& rDoc, vcl::Window *_pWin, SwView &rShell,
 
     // place the cursor on the first field...
     IFieldmark *pBM = nullptr;
-    if ( IsFormProtected() && ( pBM = GetFieldmarkAfter( ) ) !=nullptr ) {
+    if (IsFormProtected() && (pBM = GetFieldmarkAfter(/*bLoop=*/false)) !=nullptr) {
         GotoFieldmark(pBM);
     }
 }
@@ -2025,13 +2042,13 @@ SwWrtShell::~SwWrtShell()
 
 bool SwWrtShell::Pop(SwCursorShell::PopMode const eDelete)
 {
-    ::std::unique_ptr<SwCallLink> pLink(::std::make_unique<SwCallLink>(*this));
-    return Pop(eDelete, ::std::move(pLink));
+    ::std::optional<SwCallLink> aLink(std::in_place, *this);
+    return Pop(eDelete, aLink);
 }
 
-bool SwWrtShell::Pop(SwCursorShell::PopMode const eDelete, ::std::unique_ptr<SwCallLink> pLink)
+bool SwWrtShell::Pop(SwCursorShell::PopMode const eDelete, ::std::optional<SwCallLink>& roLink)
 {
-    bool bRet = SwCursorShell::Pop(eDelete, ::std::move(pLink));
+    bool bRet = SwCursorShell::Pop(eDelete, roLink);
     if( bRet && IsSelection() )
     {
         if (!IsAddMode())
@@ -2256,16 +2273,16 @@ void SwWrtShell::InsertPostIt(SwFieldMgr& rFieldMgr, const SfxRequest& rReq)
             SwFlyFrame* pFly = GetSelectedFlyFrame();
 
             // Remember the anchor of the selected object before deletion.
-            std::unique_ptr<SwPosition> pAnchor;
+            std::optional<SwPosition> oAnchor;
             if (pFly)
             {
                 SwFrameFormat* pFormat = pFly->GetFormat();
                 if (pFormat)
                 {
                     RndStdIds eAnchorId = pFormat->GetAnchor().GetAnchorId();
-                    if ((eAnchorId == RndStdIds::FLY_AS_CHAR || eAnchorId == RndStdIds::FLY_AT_CHAR) && pFormat->GetAnchor().GetContentAnchor())
+                    if ((eAnchorId == RndStdIds::FLY_AS_CHAR || eAnchorId == RndStdIds::FLY_AT_CHAR) && pFormat->GetAnchor().GetAnchorNode())
                     {
-                        pAnchor.reset(new SwPosition(*pFormat->GetAnchor().GetContentAnchor()));
+                        oAnchor.emplace(*pFormat->GetAnchor().GetContentAnchor());
                     }
                 }
             }
@@ -2278,16 +2295,17 @@ void SwWrtShell::InsertPostIt(SwFieldMgr& rFieldMgr, const SfxRequest& rReq)
             // comment.
             if (pFly)
             {
-                *GetCurrentShellCursor().GetPoint() = *pAnchor;
+                if (oAnchor)
+                    *GetCurrentShellCursor().GetPoint() = *oAnchor;
                 SwFrameFormat* pFormat = pFly->GetFormat();
                 if (pFormat && pFormat->GetAnchor().GetAnchorId() == RndStdIds::FLY_AS_CHAR)
                 {
-                    Right(CRSR_SKIP_CELLS, /*bSelect=*/true, 1, /*bBasicCall=*/false, /*bVisual=*/true);
+                    Right(SwCursorSkipMode::Cells, /*bSelect=*/true, 1, /*bBasicCall=*/false, /*bVisual=*/true);
                 }
                 else if (pFormat && pFormat->GetAnchor().GetAnchorId() == RndStdIds::FLY_AT_CHAR)
                 {
-                    aData.m_pAnnotationRange.reset(new SwPaM(*GetCurrentShellCursor().Start(),
-                                                             *GetCurrentShellCursor().End()));
+                    aData.m_oAnnotationRange.emplace(*GetCurrentShellCursor().Start(),
+                                                     *GetCurrentShellCursor().End());
                 }
             }
         }
@@ -2295,7 +2313,7 @@ void SwWrtShell::InsertPostIt(SwFieldMgr& rFieldMgr, const SfxRequest& rReq)
         rFieldMgr.InsertField( aData );
 
         Push();
-        SwCursorShell::Left(1, CRSR_SKIP_CHARS);
+        SwCursorShell::Left(1, SwCursorSkipMode::Chars);
         pPostIt = static_cast<SwPostItField*>(rFieldMgr.GetCurField());
         Pop(SwCursorShell::PopMode::DeleteCurrent); // Restore cursor position
     }
@@ -2325,7 +2343,7 @@ bool SwWrtShell::IsOutlineContentVisible(const size_t nPos)
 
     // try the next node to determine if this outline node has visible content
     SwNodeIndex aIdx(*pOutlineNode, +1);
-    if (&aIdx.GetNode() == &aIdx.GetNodes().GetEndOfContent()) // end of regular content
+    if (aIdx.GetNode() == aIdx.GetNodes().GetEndOfContent()) // end of regular content
         return false;
 
     if (aIdx.GetNode().IsTextNode() || aIdx.GetNode().IsTableNode() ||
@@ -2364,7 +2382,55 @@ bool SwWrtShell::IsOutlineContentVisible(const size_t nPos)
     return true;
 }
 
-void SwWrtShell::MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible)
+void SwWrtShell::MakeOutlineLevelsVisible(const int nLevel)
+{
+    MakeAllOutlineContentTemporarilyVisible a(GetDoc());
+
+    m_rView.SetMaxOutlineLevelShown(nLevel);
+
+    bool bDocChanged = false;
+
+    const SwOutlineNodes& rOutlineNodes = GetNodes().GetOutLineNds();
+
+    // Make all missing frames.
+    for (SwOutlineNodes::size_type nPos = 0; nPos < rOutlineNodes.size(); ++nPos)
+    {
+        SwNode* pNode = rOutlineNodes[nPos];
+        if (!pNode->GetTextNode()->getLayoutFrame(GetLayout()))
+        {
+            SwNodeIndex aIdx(*pNode, +1);
+            // Make the outline paragraph frame
+            MakeFrames(GetDoc(), *pNode, aIdx.GetNode());
+            // Make the outline content visible but don't set the outline visible attribute and
+            // don't make outline content made visible not visible that have outline visible
+            // attribute false. Visibility will be taken care of when
+            // MakeAllOutlineContentTemporarilyVisible goes out of scope.
+            MakeOutlineContentVisible(nPos, true, false);
+            bDocChanged = true;
+        }
+    }
+    // Remove outline paragraph frame and outline content frames above given level.
+    for (SwOutlineNodes::size_type nPos = 0; nPos < rOutlineNodes.size(); ++nPos)
+    {
+        SwNode* pNode = rOutlineNodes[nPos];
+        auto nOutlineLevel = pNode->GetTextNode()->GetAttrOutlineLevel();
+        if (nOutlineLevel > nLevel)
+        {
+            // Remove the outline content but don't set the outline visible attribute. Visibility
+            // will be taken care of when MakeAllOutlineContentTemporarilyVisible goes out of scope.
+            MakeOutlineContentVisible(nPos, false, false);
+            // Remove the outline paragraph frame.
+            pNode->GetTextNode()->DelFrames(GetLayout());
+            bDocChanged = true;
+        }
+    }
+
+    // Broadcast DocChanged if document layout has changed so the Navigator will be updated.
+    if (bDocChanged)
+        GetDoc()->GetDocShell()->Broadcast(SfxHint(SfxHintId::DocChanged));
+}
+
+void SwWrtShell::MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible, bool bSetAttrOutlineVisibility)
 {
     const SwNodes& rNodes = GetNodes();
     const SwOutlineNodes& rOutlineNodes = rNodes.GetOutLineNds();
@@ -2380,9 +2446,11 @@ void SwWrtShell::MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible)
     {
         // get the last outline node to include (iPos)
         int nLevel = pSttNd->GetTextNode()->GetAttrOutlineLevel();
+        int nMaxOutlineLevelShown = m_rView.GetMaxOutlineLevelShown();
         SwOutlineNodes::size_type iPos = nPos;
         while (++iPos < rOutlineNodes.size() &&
-               rOutlineNodes[iPos]->GetTextNode()->GetAttrOutlineLevel() > nLevel);
+               rOutlineNodes[iPos]->GetTextNode()->GetAttrOutlineLevel() > nLevel &&
+               rOutlineNodes[iPos]->GetTextNode()->GetAttrOutlineLevel() <= nMaxOutlineLevelShown);
 
         // get the correct end node
         // the outline node may be in frames, headers, footers special section of doc model
@@ -2447,33 +2515,36 @@ void SwWrtShell::MakeOutlineContentVisible(const size_t nPos, bool bMakeVisible)
     {
         // reset the index marker and make frames
         aIdx.Assign(*pSttNd, +1);
-        MakeFrames(GetDoc(), aIdx, *pEndNd);
+        MakeFrames(GetDoc(), aIdx.GetNode(), *pEndNd);
 
-        pSttNd->GetTextNode()->SetAttrOutlineContentVisible(true);
-
-        // make outline content made visible that have outline visible attribute false not visible
-        while (aIdx != *pEndNd)
+        if (bSetAttrOutlineVisibility)
         {
-            SwNode* pNd = &aIdx.GetNode();
-            if (pNd->IsTextNode() && pNd->GetTextNode()->IsOutline())
+            pSttNd->GetTextNode()->SetAttrOutlineContentVisible(true);
+
+            // make outline content made visible that have outline visible attribute false not visible
+            while (aIdx != *pEndNd)
             {
-                SwTextNode* pTextNd = pNd->GetTextNode();
-                bool bOutlineContentVisibleAttr = true;
-                pTextNd->GetAttrOutlineContentVisible(bOutlineContentVisibleAttr);
-                if (!bOutlineContentVisibleAttr)
+                SwNode* pNd = &aIdx.GetNode();
+                if (pNd->IsTextNode() && pNd->GetTextNode()->IsOutline())
                 {
-                    SwOutlineNodes::size_type iPos;
-                    if (rOutlineNodes.Seek_Entry(pTextNd, &iPos))
+                    SwTextNode* pTextNd = pNd->GetTextNode();
+                    bool bOutlineContentVisibleAttr = true;
+                    pTextNd->GetAttrOutlineContentVisible(bOutlineContentVisibleAttr);
+                    if (!bOutlineContentVisibleAttr)
                     {
-                        if (pTextNd->getLayoutFrame(nullptr))
-                            MakeOutlineContentVisible(iPos, false);
+                        SwOutlineNodes::size_type iPos;
+                        if (rOutlineNodes.Seek_Entry(pTextNd, &iPos))
+                        {
+                            if (pTextNd->getLayoutFrame(nullptr))
+                                MakeOutlineContentVisible(iPos, false);
+                        }
                     }
                 }
+                aIdx++;
             }
-            aIdx++;
         }
     }
-    else
+    else if (bSetAttrOutlineVisibility)
         pSttNd->GetTextNode()->SetAttrOutlineContentVisible(false);
 }
 
@@ -2497,30 +2568,6 @@ void SwWrtShell::InvalidateOutlineContentVisibility()
 
 void SwWrtShell::MakeAllFoldedOutlineContentVisible(bool bMakeVisible)
 {
-    // deselect any drawing or frame and leave editing mode
-    SdrView* pSdrView = GetDrawView();
-    if (pSdrView && pSdrView->IsTextEdit() )
-    {
-        bool bLockView = IsViewLocked();
-        LockView(true);
-        EndTextEdit();
-        LockView(bLockView);
-    }
-
-    if (IsSelFrameMode() || IsObjSelected())
-    {
-        UnSelectFrame();
-        LeaveSelFrameMode();
-        GetView().LeaveDrawCreate();
-        EnterStdMode();
-        DrawSelChanged();
-        GetView().StopShellTimer();
-    }
-    else
-        EnterStdMode();
-
-    SwOutlineNodes::size_type nPos = GetOutlinePos();
-
     if (bMakeVisible)
     {
         // make all content visible
@@ -2554,19 +2601,46 @@ void SwWrtShell::MakeAllFoldedOutlineContentVisible(bool bMakeVisible)
     }
     else
     {
+        if (SdrView* pSdrView = GetDrawView(); pSdrView && pSdrView->IsTextEdit() )
+        {
+            bool bLockView = IsViewLocked();
+            LockView(true);
+            EndTextEdit();
+            LockView(bLockView);
+        }
+        if (IsSelFrameMode() || IsObjSelected())
+        {
+            UnSelectFrame();
+            LeaveSelFrameMode();
+            GetView().LeaveDrawCreate();
+            EnterStdMode();
+        }
+
+        // Get current frame in which the cursor is positioned for use in placing the cursor.
+        const SwFrame* pCurrFrame = GetCurrFrame(false);
+
+        SwOutlineNodes::size_type nPos = GetOutlinePos();
+
         StartAction();
         InvalidateOutlineContentVisibility();
         EndAction();
 
-        // If needed, find visible outline node to place cursor.
-        if (nPos != SwOutlineNodes::npos && !IsOutlineContentVisible(nPos))
+        // If needed, find visible outline node frame to place cursor.
+        if (!pCurrFrame || !pCurrFrame->isFrameAreaDefinitionValid() || pCurrFrame->IsInDtor() ||
+                (nPos != SwOutlineNodes::npos &&
+                 !GetNodes().GetOutLineNds()[nPos]->GetTextNode()->getLayoutFrame(nullptr)))
         {
-            while (nPos != SwOutlineNodes::npos && !GetNodes().GetOutLineNds()[nPos]->GetTextNode()->getLayoutFrame(nullptr))
+            while (nPos != SwOutlineNodes::npos &&
+                   !GetNodes().GetOutLineNds()[nPos]->GetTextNode()->getLayoutFrame(nullptr))
                 --nPos;
             if (nPos != SwOutlineNodes::npos)
+            {
+                EnterStdMode();
                 GotoOutline(nPos);
+            }
         }
     }
+    GetView().GetDocShell()->Broadcast(SfxHint(SfxHintId::DocChanged));
 }
 
 bool SwWrtShell::GetAttrOutlineContentVisible(const size_t nPos)
@@ -2574,6 +2648,59 @@ bool SwWrtShell::GetAttrOutlineContentVisible(const size_t nPos)
     bool bVisibleAttr = true;
     GetNodes().GetOutLineNds()[nPos]->GetTextNode()->GetAttrOutlineContentVisible(bVisibleAttr);
     return bVisibleAttr;
+}
+
+bool SwWrtShell::HasFoldedOutlineContentSelected()
+{
+    for(const SwPaM& rPaM : GetCursor()->GetRingContainer())
+    {
+        SwPaM aPaM(*rPaM.GetMark(), *rPaM.GetPoint());
+        aPaM.Normalize();
+        SwNodeIndex aPointIdx(aPaM.GetPoint()->GetNode());
+        SwNodeIndex aMarkIdx(aPaM.GetMark()->GetNode());
+        if (aPointIdx == aMarkIdx)
+            continue;
+        // Return true if any nodes in PaM are folded outline content nodes.
+        SwOutlineNodes::size_type nPos;
+        for (SwNodeIndex aIdx = aPointIdx; aIdx <= aMarkIdx; aIdx++)
+        {
+            if (GetDoc()->GetNodes().GetOutLineNds().Seek_Entry(&(aIdx.GetNode()), &nPos) &&
+                    !GetAttrOutlineContentVisible(nPos))
+                return true;
+        }
+    }
+    return false;
+}
+
+void SwWrtShell::InfoReadOnlyDialog(bool bAsync)
+{
+    if (bAsync)
+    {
+        auto xInfo = std::make_shared<weld::MessageDialogController>(
+                    GetView().GetFrameWeld(), "modules/swriter/ui/inforeadonlydialog.ui", "InfoReadonlyDialog");
+        if (GetViewOptions()->IsShowOutlineContentVisibilityButton() &&
+                HasFoldedOutlineContentSelected())
+        {
+            xInfo->set_primary_text(SwResId(STR_INFORODLG_FOLDED_PRIMARY));
+            xInfo->set_secondary_text(SwResId(STR_INFORODLG_FOLDED_SECONDARY));
+        }
+        weld::DialogController::runAsync(xInfo, [](int) {});
+    }
+    else
+    {
+        std::unique_ptr<weld::Builder>
+                xBuilder(Application::CreateBuilder(GetView().GetFrameWeld(),
+                                                    "modules/swriter/ui/inforeadonlydialog.ui"));
+        std::unique_ptr<weld::MessageDialog>
+                xInfo(xBuilder->weld_message_dialog("InfoReadonlyDialog"));
+        if (GetViewOptions()->IsShowOutlineContentVisibilityButton() &&
+                HasFoldedOutlineContentSelected())
+        {
+            xInfo->set_primary_text(SwResId(STR_INFORODLG_FOLDED_PRIMARY));
+            xInfo->set_secondary_text(SwResId(STR_INFORODLG_FOLDED_SECONDARY));
+        }
+        xInfo->run();
+    }
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

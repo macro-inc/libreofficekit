@@ -49,15 +49,15 @@ struct AdjustHandle
                                             pos;
 
     // depending to the type (polar or not):
-    OptValue< OUString >               gdRef1; // gdRefX   or gdRefR
-    OptValue< css::drawing::EnhancedCustomShapeParameter >
+    std::optional< OUString >               gdRef1; // gdRefX   or gdRefR
+    std::optional< css::drawing::EnhancedCustomShapeParameter >
                                             min1;   // minX     or minR
-    OptValue< css::drawing::EnhancedCustomShapeParameter >
+    std::optional< css::drawing::EnhancedCustomShapeParameter >
                                             max1;   // maxX     or maxR
-    OptValue< OUString >               gdRef2; // gdRefY   or gdRefAng
-    OptValue< css::drawing::EnhancedCustomShapeParameter >
+    std::optional< OUString >               gdRef2; // gdRefY   or gdRefAng
+    std::optional< css::drawing::EnhancedCustomShapeParameter >
                                             min2;   // minX     or minAng
-    OptValue< css::drawing::EnhancedCustomShapeParameter >
+    std::optional< css::drawing::EnhancedCustomShapeParameter >
                                             max2;   // maxY     or maxAng
 
     AdjustHandle( bool bPolar ) : polar( bPolar ) {};
@@ -98,7 +98,6 @@ public:
     CustomShapeProperties();
 
     void pushToPropSet( const css::uno::Reference < css::beans::XPropertySet > & xPropSet,
-                        const css::uno::Reference < css::drawing::XShape > & xShape,
                         const css::awt::Size &aSize );
 
     sal_Int32 getShapePresetType() const { return mnShapePresetType; }
@@ -111,18 +110,20 @@ public:
     std::vector< CustomShapeGuide >&    getGuideList(){ return maGuideList; };
     std::vector< AdjustHandle >&        getAdjustHandleList(){ return maAdjustHandleList; };
     std::vector< ConnectionSite >&      getConnectionSiteList(){ return maConnectionSiteList; };
-    OptValue< GeomRect >&               getTextRect(){ return maTextRect; };
+    std::optional< GeomRect >&          getTextRect(){ return maTextRect; };
     std::vector< Path2D >&              getPath2DList(){ return maPath2DList; };
     std::vector< css::drawing::EnhancedCustomShapeSegment >& getSegments(){ return maSegments; };
     void                                setMirroredX( bool bMirroredX ) { mbMirroredX = bMirroredX; };
     void                                setMirroredY( bool bMirroredY ) { mbMirroredY = bMirroredY; };
-    void                                setTextRotateAngle( sal_Int32 nAngle ) { mnTextRotateAngle = nAngle; };
+    void                                setTextPreRotateAngle( sal_Int32 nAngle ) { mnTextPreRotateAngle = nAngle; };
     void                                setTextCameraZRotateAngle( sal_Int32 nAngle ) { mnTextCameraZRotateAngle = nAngle; };
+    void                                setTextAreaRotateAngle(sal_Int32 nAngle) { moTextAreaRotateAngle = nAngle; };
 
     static sal_Int32 SetCustomShapeGuideValue( std::vector< CustomShapeGuide >& rGuideList, const CustomShapeGuide& rGuide );
     static sal_Int32 GetCustomShapeGuideValue( const std::vector< CustomShapeGuide >& rGuideList, std::u16string_view rFormulaName );
 
     sal_Int32 getArcNum() { return mnArcNum++; }
+    sal_Int32 countArcTo() { return mnArcNum; }
 
     /**
        Returns whether or not the current CustomShapeProperties
@@ -138,15 +139,16 @@ private:
     std::vector< CustomShapeGuide > maGuideList;
     std::vector< AdjustHandle >     maAdjustHandleList;
     std::vector< ConnectionSite >   maConnectionSiteList;
-    OptValue< GeomRect >            maTextRect;
+    std::optional< GeomRect >       maTextRect;
     std::vector< Path2D >           maPath2DList;
 
     std::vector< css::drawing::EnhancedCustomShapeSegment >
                                     maSegments;
     bool                            mbMirroredX;
     bool                            mbMirroredY;
-    sal_Int32                       mnTextRotateAngle;
+    sal_Int32                       mnTextPreRotateAngle; // TextPreRotateAngle
     sal_Int32                       mnTextCameraZRotateAngle;
+    std::optional< sal_Int32 >      moTextAreaRotateAngle; // TextRotateAngle
 
     typedef std::unordered_map< sal_Int32, PropertyMap > PresetDataMap;
 

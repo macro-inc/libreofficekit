@@ -18,7 +18,6 @@
  */
 
 #include "sortdynres.hxx"
-#include <comphelper/interfacecontainer2.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
 #include <com/sun/star/ucb/ContentResultSetCapability.hpp>
@@ -124,7 +123,7 @@ void SAL_CALL SortedDynamicResultSet::addEventListener(
 
     if ( !mpDisposeEventListeners )
         mpDisposeEventListeners.reset(
-                    new OInterfaceContainerHelper2( getContainerMutex() ) );
+                    new OInterfaceContainerHelper3<XEventListener>( getContainerMutex() ) );
 
     mpDisposeEventListeners->addInterface( Listener );
 }

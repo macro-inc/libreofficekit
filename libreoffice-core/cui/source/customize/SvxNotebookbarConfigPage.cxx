@@ -40,6 +40,7 @@
 #include <sfx2/notebookbar/SfxNotebookBar.hxx>
 #include <unotools/configmgr.hxx>
 #include <comphelper/processfactory.hxx>
+#include <o3tl/string_view.hxx>
 #include <com/sun/star/frame/theUICommandDescription.hpp>
 
 namespace uno = com::sun::star::uno;
@@ -70,13 +71,13 @@ static OUString charToString(const char* cString)
 static OUString getFileName(std::u16string_view aFileName)
 {
     if (aFileName == u"notebookbar.ui")
-        return CuiResId(RID_SVXSTR_TABBED);
+        return CuiResId(RID_CUISTR_TABBED);
     else if (aFileName == u"notebookbar_compact.ui")
-        return CuiResId(RID_SVXSTR_TABBED_COMPACT);
+        return CuiResId(RID_CUISTR_TABBED_COMPACT);
     else if (aFileName == u"notebookbar_groupedbar_full.ui")
-        return CuiResId(RID_SVXSTR_GROUPEDBAR);
+        return CuiResId(RID_CUISTR_GROUPEDBAR);
     else if (aFileName == u"notebookbar_groupedbar_compact.ui")
-        return CuiResId(RID_SVXSTR_GROUPEDBAR_COMPACT);
+        return CuiResId(RID_CUISTR_GROUPEDBAR_COMPACT);
     else
         return "None";
 }
@@ -154,7 +155,7 @@ void SvxNotebookbarConfigPage::Init()
     m_xSaveInListBox->append(sSaveInListBoxID, sScopeName);
     m_xSaveInListBox->set_active_id(sSaveInListBoxID);
 
-    m_xTopLevelListBox->append("NotebookBar", CuiResId(RID_SVXSTR_ALL_COMMANDS));
+    m_xTopLevelListBox->append("NotebookBar", CuiResId(RID_CUISTR_ALL_COMMANDS));
     m_xTopLevelListBox->set_active_id("NotebookBar");
     SelectElement();
 }
@@ -172,7 +173,7 @@ void SvxNotebookbarConfigPage::UpdateButtonStates() {}
 
 short SvxNotebookbarConfigPage::QueryReset()
 {
-    OUString msg = CuiResId(RID_SVXSTR_CONFIRM_TOOLBAR_RESET);
+    OUString msg = CuiResId(RID_CUISTR_CONFIRM_TOOLBAR_RESET);
 
     OUString saveInName = m_xSaveInListBox->get_active_text();
 
@@ -317,8 +318,9 @@ void SvxNotebookbarConfigPage::searchNodeandAttribute(std::vector<NotebookbarEnt
                     {
                         sal_Int32 rPos = 0;
                         aCategoryEntry.sDisplayName
-                            = aCurItemEntry.sDisplayName.getToken(rPos, ' ', rPos) + " | "
-                              + sUIItemId;
+                            = OUString::Concat(
+                                  o3tl::getToken(aCurItemEntry.sDisplayName, rPos, ' ', rPos))
+                              + " | " + sUIItemId;
                     }
                     aCategoryList.push_back(aCategoryEntry);
                     aCurItemEntry = aCategoryEntry;
@@ -433,11 +435,10 @@ void SvxNotebookbarConfigPage::SelectElement()
 
     aEntries = std::move(aTempEntries);
 
+    static_cast<SvxNotebookbarEntriesListBox*>(m_xContentsListBox.get())->GetTooltipMap().clear();
     weld::TreeView& rTreeView = m_xContentsListBox->get_widget();
     rTreeView.bulk_insert_for_each(
         aEntries.size(), [this, &rTreeView, &aEntries](weld::TreeIter& rIter, int nIdx) {
-            OUString sId(OUString::number(nIdx));
-            rTreeView.set_id(rIter, sId);
             if (aEntries[nIdx].sActionName != "Null")
             {
                 if (aEntries[nIdx].sVisibleValue == "True")
@@ -451,6 +452,13 @@ void SvxNotebookbarConfigPage::SelectElement()
             }
             InsertEntryIntoNotebookbarTabUI(aEntries[nIdx].sClassId, aEntries[nIdx].sDisplayName,
                                             aEntries[nIdx].sActionName, rTreeView, rIter);
+            if (aEntries[nIdx].sClassId != u"GtkSeparatorMenuItem"
+                && aEntries[nIdx].sClassId != u"GtkSeparator")
+            {
+                static_cast<SvxNotebookbarEntriesListBox*>(m_xContentsListBox.get())
+                    ->GetTooltipMap()[aEntries[nIdx].sDisplayName]
+                    = aEntries[nIdx].sActionName;
+            }
         });
 
     aEntries.clear();
@@ -465,6 +473,9 @@ SvxNotebookbarEntriesListBox::SvxNotebookbarEntriesListBox(std::unique_ptr<weld:
     m_xControl->connect_toggled(LINK(this, SvxNotebookbarEntriesListBox, CheckButtonHdl));
     m_xControl->connect_key_press(Link<const KeyEvent&, bool>());
     m_xControl->connect_key_press(LINK(this, SvxNotebookbarEntriesListBox, KeyInputHdl));
+    // remove the inherited connect_query_tooltip then add the new one
+    m_xControl->connect_query_tooltip(Link<const weld::TreeIter&, OUString>());
+    m_xControl->connect_query_tooltip(LINK(this, SvxNotebookbarEntriesListBox, QueryTooltip));
 }
 
 SvxNotebookbarEntriesListBox::~SvxNotebookbarEntriesListBox() {}
@@ -480,7 +491,7 @@ static void EditRegistryFile(std::u16string_view sUIItemId, const OUString& sSet
     for (int nIdx = 0; nIdx < aOldEntries.getLength(); nIdx++)
     {
         sal_Int32 rPos = 0;
-        OUString sFirstValue = aOldEntries[nIdx].getToken(rPos, ',', rPos);
+        std::u16string_view sFirstValue = o3tl::getToken(aOldEntries[nIdx], rPos, ',', rPos);
         if (sFirstValue == sUIItemId)
         {
             aOldEntries.getArray()[nIdx] = sSetEntry;
@@ -536,6 +547,21 @@ IMPL_LINK(SvxNotebookbarEntriesListBox, KeyInputHdl, const KeyEvent&, rKeyEvent,
         return true;
     }
     return SvxMenuEntriesListBox::KeyInputHdl(rKeyEvent);
+}
+
+IMPL_LINK(SvxNotebookbarEntriesListBox, QueryTooltip, const weld::TreeIter&, rIter, OUString)
+{
+    const OUString& rsCommand = m_aTooltipMap[m_xControl->get_id(rIter)];
+    if (rsCommand.isEmpty())
+        return OUString();
+    OUString aModuleName(vcl::CommandInfoProvider::GetModuleIdentifier(m_pPage->GetFrame()));
+    auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(rsCommand, aModuleName);
+    OUString sTooltipLabel = vcl::CommandInfoProvider::GetTooltipForCommand(rsCommand, aProperties,
+                                                                            m_pPage->GetFrame());
+    return CuiResId(RID_CUISTR_COMMANDLABEL) + ": "
+           + m_xControl->get_text(rIter).replaceFirst("~", "") + "\n"
+           + CuiResId(RID_CUISTR_COMMANDNAME) + ": " + rsCommand + "\n"
+           + CuiResId(RID_CUISTR_COMMANDTIP) + ": " + sTooltipLabel.replaceFirst("~", "");
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

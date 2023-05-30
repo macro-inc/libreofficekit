@@ -33,6 +33,7 @@
 #include <svl/poolitem.hxx>
 #include <svl/intitem.hxx>
 #include <svl/PasswordHelper.hxx>
+#include <comphelper/docpasswordhelper.hxx>
 
 #include <sfx2/strings.hrc>
 
@@ -44,18 +45,18 @@ namespace
 {
     enum RedliningMode  { RL_NONE, RL_WRITER, RL_CALC };
 
-    bool QueryState( sal_uInt16 _nSlot, bool& _rValue )
+    bool QueryState( TypedWhichId<SfxBoolItem> _nSlot, bool& _rValue )
     {
         bool bRet = false;
         SfxViewShell* pViewSh = SfxViewShell::Current();
         if (pViewSh)
         {
-            const SfxPoolItem* pItem;
+            const SfxBoolItem* pItem;
             SfxDispatcher* pDisp = pViewSh->GetDispatcher();
             SfxItemState nState = pDisp->QueryState( _nSlot, pItem );
             bRet = SfxItemState::DEFAULT <= nState;
             if (bRet)
-                _rValue = static_cast< const SfxBoolItem* >( pItem )->GetValue();
+                _rValue = pItem->GetValue();
         }
         return bRet;
     }
@@ -66,7 +67,7 @@ namespace
         bool bRet = false;
         if (_eMode != RL_NONE)
         {
-            sal_uInt16 nSlot = _eMode == RL_WRITER ? FN_REDLINE_PROTECT : SID_CHG_PROTECT;
+            TypedWhichId<SfxBoolItem> nSlot = _eMode == RL_WRITER ? FN_REDLINE_PROTECT : SID_CHG_PROTECT;
             bRet = QueryState( nSlot, _rValue );
         }
         return bRet;
@@ -78,7 +79,7 @@ namespace
         bool bRet = false;
         if (_eMode != RL_NONE)
         {
-            sal_uInt16 nSlot = _eMode == RL_WRITER ? FN_REDLINE_ON : FID_CHG_RECORD;
+            TypedWhichId<SfxBoolItem> nSlot = _eMode == RL_WRITER ? FN_REDLINE_ON : FID_CHG_RECORD;
             bRet = QueryState( nSlot, _rValue );
         }
         return bRet;
@@ -105,20 +106,39 @@ static bool lcl_GetPassword(
 }
 
 
-static bool lcl_IsPasswordCorrect( const OUString &rPassword )
+static bool lcl_IsPasswordCorrect( std::u16string_view rPassword )
 {
-    bool bRes = false;
-
     SfxObjectShell* pCurDocShell = SfxObjectShell::Current();
+    if (!pCurDocShell)
+        return false;
+
+    bool bRes = false;
     uno::Sequence< sal_Int8 >   aPasswordHash;
     pCurDocShell->GetProtectionHash( aPasswordHash );
 
     // check if supplied password was correct
-    uno::Sequence< sal_Int8 > aNewPasswd( aPasswordHash );
-    SvPasswordHelper::GetHashPassword( aNewPasswd, rPassword );
-    if (SvPasswordHelper::CompareHashPassword( aPasswordHash, rPassword ))
-        bRes = true;    // password was correct
+    if (aPasswordHash.getLength() == 1 && aPasswordHash[0] == 1)
+    {
+        // dummy RedlinePassword from OOXML import: get real password info
+        // from the grab-bag to verify the password
+        const css::uno::Sequence< css::beans::PropertyValue > aDocumentProtection =
+                                                pCurDocShell->GetDocumentProtectionFromGrabBag();
+        bRes =
+            // password is ok, if there is no DocumentProtection in the GrabBag,
+            // i.e. the dummy RedlinePassword imported from an OpenDocument file
+            !aDocumentProtection.hasElements() ||
+            // verify password with the password info imported from OOXML
+            ::comphelper::DocPasswordHelper::IsModifyPasswordCorrect( rPassword,
+                    ::comphelper::DocPasswordHelper::ConvertPasswordInfo ( aDocumentProtection ) );
+    }
     else
+    {
+        uno::Sequence< sal_Int8 > aNewPasswd( aPasswordHash );
+        SvPasswordHelper::GetHashPassword( aNewPasswd, rPassword );
+        bRes = SvPasswordHelper::CompareHashPassword( aPasswordHash, rPassword );
+    }
+
+    if ( !bRes )
     {
         std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(nullptr,
                                                       VclMessageType::Info, VclButtonsType::Ok,
@@ -181,7 +201,7 @@ bool SfxSecurityPage_Impl::FillItemSet_Impl()
     bool bModified = false;
 
     SfxObjectShell* pCurDocShell = SfxObjectShell::Current();
-    if (pCurDocShell&& !pCurDocShell->IsReadOnly())
+    if (pCurDocShell && !pCurDocShell->IsReadOnly())
     {
         if (m_eRedlingMode != RL_NONE )
         {
@@ -246,11 +266,11 @@ void SfxSecurityPage_Impl::Reset_Impl()
         SfxViewShell* pViewSh = SfxViewShell::Current();
         if (pViewSh)
         {
-            const SfxPoolItem* pItem;
+            const SfxUInt16Item* pItem;
             SfxDispatcher* pDisp = pViewSh->GetDispatcher();
             if (SfxItemState::DEFAULT <= pDisp->QueryState( SID_HTML_MODE, pItem ))
             {
-                sal_uInt16 nMode = static_cast< const SfxUInt16Item* >( pItem )->GetValue();
+                sal_uInt16 nMode = pItem->GetValue();
                 bIsHTMLDoc = ( ( nMode & HTMLMODE_ON ) != 0 );
             }
         }

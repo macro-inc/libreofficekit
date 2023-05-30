@@ -14,14 +14,12 @@ $(eval $(call gb_Library_use_external,io,boost_headers))
 $(eval $(call gb_Library_use_udk_api,io))
 
 $(eval $(call gb_Library_use_libraries,io,\
-    comphelper \
     cppu \
     cppuhelper \
     sal \
-    tl \
 ))
 
-$(eval $(call gb_Library_set_componentfile,io,io/source/io))
+$(eval $(call gb_Library_set_componentfile,io,io/source/io,ure/services))
 
 $(eval $(call gb_Library_set_include,io,\
 	-I$(SRCDIR)/io/source \

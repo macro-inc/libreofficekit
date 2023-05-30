@@ -22,7 +22,6 @@
 
 #include <editeng/editengdllapi.h>
 #include <svl/itemprop.hxx>
-#include <memory>
 #include <vector>
 
 namespace com::sun::star::beans { class XPropertySetInfo; }
@@ -37,7 +36,7 @@ class EDITENG_DLLPUBLIC SvxItemPropertySet
     SfxItemPool&                    mrItemPool;
 
 public:
-    SvxItemPropertySet( const SfxItemPropertyMapEntry *pMap, SfxItemPool& rPool );
+    SvxItemPropertySet( o3tl::span<const SfxItemPropertyMapEntry> pMap, SfxItemPool& rPool );
     ~SvxItemPropertySet();
 
     SvxItemPropertySet& operator=( SvxItemPropertySet const & ) = delete; // MSVC2015 workaround

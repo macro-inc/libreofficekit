@@ -21,6 +21,8 @@
 
 #include <o3tl/any.hxx>
 #include <o3tl/safeint.hxx>
+#include <o3tl/string_view.hxx>
+#include <o3tl/underlyingenumvalue.hxx>
 #include <osl/diagnose.h>
 #include <cppuhelper/implbase.hxx>
 #include <cppuhelper/supportsservice.hxx>
@@ -63,26 +65,26 @@ static double round( double aVal )
 }
 
 
-static bool getNumericValue( double & rfVal, const OUString & rStr )
+static bool getNumericValue( double & rfVal, std::u16string_view rStr )
 {
-    double fRet = rStr.toDouble();
+    double fRet = o3tl::toDouble(rStr);
     if (fRet == 0.0)
     {
-        sal_Int32 nLen = rStr.getLength();
+        size_t nLen = rStr.size();
         if (!nLen || (nLen == 1 && rStr[0] == '0')) // common case
         {
             rfVal = 0.0;
             return true;
         }
 
-        OUString trim( rStr.trim() );
+        std::u16string_view trim( o3tl::trim(rStr) );
 
         // try hex
-        sal_Int32 nX = trim.indexOf( 'x' );
-        if (nX < 0)
-            nX = trim.indexOf( 'X' );
+        size_t nX = trim.find( 'x' );
+        if (nX == std::u16string_view::npos)
+            nX = trim.find( 'X' );
 
-        if (nX > 0 && trim[nX-1] == '0') // 0x
+        if (nX > 0 && nX != std::u16string_view::npos && trim[nX-1] == '0') // 0x
         {
             bool bNeg = false;
             switch (nX)
@@ -99,7 +101,7 @@ static bool getNumericValue( double & rfVal, const OUString & rStr )
                 return false;
             }
 
-            OUString aHexRest( trim.copy( nX+1 ) );
+            OUString aHexRest( trim.substr( nX+1 ) );
             sal_uInt64 nRet = aHexRest.toUInt64( 16 );
 
             if (nRet == 0)
@@ -115,8 +117,8 @@ static bool getNumericValue( double & rfVal, const OUString & rStr )
             return true;
         }
 
-        nLen = trim.getLength();
-        sal_Int32 nPos = 0;
+        nLen = trim.size();
+        size_t nPos = 0;
 
         // skip +/-
         if (nLen && (trim[0] == '-' || trim[0] == '+'))
@@ -145,23 +147,23 @@ static bool getNumericValue( double & rfVal, const OUString & rStr )
 }
 
 
-static bool getHyperValue( sal_Int64 & rnVal, const OUString & rStr )
+static bool getHyperValue( sal_Int64 & rnVal, std::u16string_view rStr )
 {
-    sal_Int32 nLen = rStr.getLength();
+    size_t nLen = rStr.size();
     if (!nLen || (nLen == 1 && rStr[0] == '0')) // common case
     {
         rnVal = 0;
         return true;
     }
 
-    OUString trim( rStr.trim() );
+    std::u16string_view trim( o3tl::trim(rStr) );
 
     // try hex
-    sal_Int32 nX = trim.indexOf( 'x' );
-    if (nX < 0)
-        nX = trim.indexOf( 'X' );
+    size_t nX = trim.find( 'x' );
+    if (nX == std::u16string_view::npos)
+        nX = trim.find( 'X' );
 
-    if (nX >= 0)
+    if (nX != std::u16string_view::npos)
     {
         if (nX > 0 && trim[nX-1] == '0') // 0x
         {
@@ -180,7 +182,7 @@ static bool getHyperValue( sal_Int64 & rnVal, const OUString & rStr )
                 return false;
             }
 
-            OUString aHexRest( trim.copy( nX+1 ) );
+            OUString aHexRest( trim.substr( nX+1 ) );
             sal_uInt64 nRet = aHexRest.toUInt64( 16 );
 
             if (nRet == 0)
@@ -358,7 +360,7 @@ sal_Int64 TypeConverter_Impl::toHyper( const Any& rAny, sal_Int64 min, sal_uInt6
 
     default:
         throw CannotConvertException(
-            "TYPE is not supported!",
+            "Type " + OUString::number(o3tl::to_underlying(aDestinationClass)) + " is not supported!",
             Reference<XInterface>(), aDestinationClass, FailReason::TYPE_NOT_SUPPORTED, 0 );
     }
 
@@ -438,7 +440,7 @@ double TypeConverter_Impl::toDouble( const Any& rAny, double min, double max )
 
     default:
         throw CannotConvertException(
-            "TYPE is not supported!",
+            "Type " + OUString::number(o3tl::to_underlying(aDestinationClass)) + " is not supported!",
             Reference< XInterface >(), aDestinationClass, FailReason::TYPE_NOT_SUPPORTED, 0 );
     }
 
@@ -527,6 +529,17 @@ Any SAL_CALL TypeConverter_Impl::convertTo( const Any& rVal, const Type& aDestTy
 
             TypeDescription aSourceTD( aSourceType );
             TypeDescription aDestTD( aDestType );
+            // For a sequence type notation "[]...", SequenceTypeDescription in
+            // cppuhelper/source/typemanager.cxx resolves the "..." component type notation part
+            // only lazily, so it could happen here that bad user input (e.g., "[]" or "[]foo" from
+            // a Basic script CreateUnoValue call) leads to a bad but as-of-yet undetected
+            // aDestType, so check it here; this is less likely an issue for the non-sequence type
+            // classes, whose notation is not resolved lazily based on their syntax:
+            if (!aDestTD.is()) {
+                throw css::lang::IllegalArgumentException(
+                    "Bad XTypeConverter::convertTo destination " + aDestType.getTypeName(),
+                    static_cast<cppu::OWeakObject *>(this), 1);
+            }
             typelib_TypeDescription * pSourceElementTD = nullptr;
             TYPELIB_DANGER_GET(
                 &pSourceElementTD,

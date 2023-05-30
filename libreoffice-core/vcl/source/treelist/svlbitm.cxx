@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <utility>
 #include <vcl/toolkit/treelistbox.hxx>
 #include <vcl/toolkit/svlbitm.hxx>
 #include <vcl/toolkit/treelistentry.hxx>
@@ -74,11 +75,11 @@ SvBmp SvLBoxButtonData::GetIndex( SvItemStateFlags nItemState )
         nIdx = SvBmp::CHECKED;
     else if (nItemState == SvItemStateFlags::TRISTATE)
         nIdx = SvBmp::TRISTATE;
-    else if (nItemState == (SvItemStateFlags::UNCHECKED | SvItemStateFlags::HILIGHTED))
+    else if (nItemState == (SvItemStateFlags::UNCHECKED | SvItemStateFlags::HIGHLIGHTED))
         nIdx = SvBmp::HIUNCHECKED;
-    else if (nItemState == (SvItemStateFlags::CHECKED | SvItemStateFlags::HILIGHTED))
+    else if (nItemState == (SvItemStateFlags::CHECKED | SvItemStateFlags::HIGHLIGHTED))
         nIdx = SvBmp::HICHECKED;
-    else if (nItemState == (SvItemStateFlags::TRISTATE | SvItemStateFlags::HILIGHTED))
+    else if (nItemState == (SvItemStateFlags::TRISTATE | SvItemStateFlags::HIGHLIGHTED))
         nIdx = SvBmp::HITRISTATE;
     else
         nIdx = SvBmp::UNCHECKED;
@@ -167,11 +168,11 @@ bool SvLBoxButtonData::IsRadio() const {
 // ***************************************************************
 
 
-SvLBoxString::SvLBoxString(const OUString& rStr)
+SvLBoxString::SvLBoxString(OUString aStr)
     : mbEmphasized(false)
     , mbCustom(false)
     , mfAlign(0.0)
-    , maText(rStr)
+    , maText(std::move(aStr))
 {
 }
 
@@ -235,12 +236,12 @@ void SvLBoxString::Paint(
         else if (mfAlign == 0.5)
         {
             nStyle |= DrawTextFlags::Center;
-            aSize.setWidth(rDev.GetBoundingRect(&rEntry).getWidth());
+            aSize.setWidth(rDev.GetBoundingRect(&rEntry).getOpenWidth());
         }
         else if (mfAlign > 0.5)
         {
             nStyle |= DrawTextFlags::Right;
-            aSize.setWidth(rDev.GetBoundingRect(&rEntry).getWidth());
+            aSize.setWidth(rDev.GetBoundingRect(&rEntry).getOpenWidth());
         }
     }
     aSize.setHeight(GetHeight(&rDev, &rEntry));
@@ -364,7 +365,7 @@ void SvLBoxButton::Paint(
     const SvViewDataEntry* /*pView*/, const SvTreeListEntry& /*rEntry*/)
 {
     SvBmp nIndex = SvLBoxButtonData::GetIndex(nItemFlags);
-    DrawImageFlags nStyle = rDev.IsEnabled() ? DrawImageFlags::NONE : DrawImageFlags::Disable;
+    DrawImageFlags nStyle = (rDev.IsEnabled() && !mbDisabled) ? DrawImageFlags::NONE : DrawImageFlags::Disable;
 
     //Native drawing
     bool bNativeOK = false;
@@ -518,7 +519,7 @@ void SvLBoxContextBmp::Paint(
 
     bool _bSemiTransparent = bool( SvTLEntryFlags::SEMITRANSPARENT & rEntry.GetFlags( ) );
     // draw
-    DrawImageFlags nStyle = _rDev.IsEnabled() ? DrawImageFlags::NONE : DrawImageFlags::Disable;
+    DrawImageFlags nStyle = (_rDev.IsEnabled() && !mbDisabled) ? DrawImageFlags::NONE : DrawImageFlags::Disable;
     if (_bSemiTransparent)
         nStyle |= DrawImageFlags::SemiTransparent;
     rRenderContext.DrawImage(_rPos, rImage, nStyle);

@@ -28,6 +28,7 @@
 #ifndef UNX
 #include <unotools/transliterationwrapper.hxx>
 #endif
+#include <o3tl/string_view.hxx>
 #include <doc.hxx>
 #include <IDocumentFieldsAccess.hxx>
 #include <IDocumentMarkAccess.hxx>
@@ -57,30 +58,31 @@
 #include <authfld.hxx>
 #include <txtinet.hxx>
 #include <fmtcntnt.hxx>
+#include <utility>
 
 using namespace ::com::sun::star::uno;
 
 // the StartIndex can be supplied optionally (e.g. if it was queried before - is a virtual
 // method otherwise!)
 SetGetExpField::SetGetExpField(
-    const SwNodeIndex& rNdIdx,
+    const SwNode& rNdIdx,
     const SwTextField* pField,
-    const SwIndex* pIdx,
+    std::optional<sal_Int32> oContentIdx,
     sal_uInt16 const nPageNumber)
     : m_nPageNumber(nPageNumber)
 {
     m_eSetGetExpFieldType = TEXTFIELD;
     m_CNTNT.pTextField = pField;
     m_nNode = rNdIdx.GetIndex();
-    if( pIdx )
-        m_nContent = pIdx->GetIndex();
+    if( oContentIdx )
+        m_nContent = *oContentIdx;
     else if( pField )
         m_nContent = pField->GetStart();
     else
         m_nContent = 0;
 }
 
-SetGetExpField::SetGetExpField( const SwNodeIndex& rNdIdx,
+SetGetExpField::SetGetExpField( const SwNode& rNdIdx,
                             const SwTextINetFormat& rINet )
 {
     m_eSetGetExpFieldType = TEXTINET;
@@ -102,8 +104,8 @@ SetGetExpField::SetGetExpField( const SwSectionNode& rSectNd,
 
     if( pPos )
     {
-        m_nNode = pPos->nNode.GetIndex();
-        m_nContent = pPos->nContent.GetIndex();
+        m_nNode = pPos->GetNodeIndex();
+        m_nContent = pPos->GetContentIndex();
     }
     else
     {
@@ -122,13 +124,13 @@ SetGetExpField::SetGetExpField(::sw::mark::IBookmark const& rBookmark,
 
     if (pPos)
     {
-        m_nNode = pPos->nNode.GetIndex();
-        m_nContent = pPos->nContent.GetIndex();
+        m_nNode = pPos->GetNodeIndex();
+        m_nContent = pPos->GetContentIndex();
     }
     else
     {
-        m_nNode = rBookmark.GetMarkStart().nNode.GetIndex();
-        m_nContent = rBookmark.GetMarkStart().nContent.GetIndex();;
+        m_nNode = rBookmark.GetMarkStart().GetNodeIndex();
+        m_nContent = rBookmark.GetMarkStart().GetContentIndex();;
     }
 }
 
@@ -148,7 +150,7 @@ SetGetExpField::SetGetExpField( const SwTableBox& rTBox )
     }
 }
 
-SetGetExpField::SetGetExpField( const SwNodeIndex& rNdIdx,
+SetGetExpField::SetGetExpField( const SwNode& rNdIdx,
                                 const SwTextTOXMark& rTOX )
 {
     m_eSetGetExpFieldType = TEXTTOXMARK;
@@ -161,8 +163,8 @@ SetGetExpField::SetGetExpField( const SwPosition& rPos )
 {
     m_eSetGetExpFieldType = CRSRPOS;
     m_CNTNT.pPos = &rPos;
-    m_nNode = rPos.nNode.GetIndex();
-    m_nContent = rPos.nContent.GetIndex();
+    m_nNode = rPos.GetNodeIndex();
+    m_nContent = rPos.GetContentIndex();
 }
 
 SetGetExpField::SetGetExpField( const SwFlyFrameFormat& rFlyFormat,
@@ -172,8 +174,8 @@ SetGetExpField::SetGetExpField( const SwFlyFrameFormat& rFlyFormat,
     m_CNTNT.pFlyFormat = &rFlyFormat;
     if( pPos )
     {
-        m_nNode = pPos->nNode.GetIndex();
-        m_nContent = pPos->nContent.GetIndex();
+        m_nNode = pPos->GetNodeIndex();
+        m_nContent = pPos->GetContentIndex();
     }
     else
     {
@@ -191,13 +193,11 @@ void SetGetExpField::GetPosOfContent( SwPosition& rPos ) const
 
     if( pNd )
     {
-        rPos.nNode = *pNd;
-        rPos.nContent.Assign( const_cast<SwContentNode*>(static_cast<const SwContentNode*>(pNd)), GetCntPosFromContent() );
+        rPos.Assign( *static_cast<const SwContentNode*>(pNd), GetCntPosFromContent() );
     }
     else
     {
-        rPos.nNode = m_nNode;
-        rPos.nContent.Assign( rPos.nNode.GetNode().GetContentNode(), m_nContent );
+        rPos.Assign( m_nNode, m_nContent );
     }
 }
 
@@ -212,8 +212,8 @@ void SetGetExpField::SetBodyPos( const SwContentFrame& rFrame )
         SwPosition aPos( aIdx );
         bool const bResult = ::GetBodyTextNode( rDoc, aPos, rFrame );
         OSL_ENSURE(bResult, "Where is the field?");
-        m_nNode = aPos.nNode.GetIndex();
-        m_nContent = aPos.nContent.GetIndex();
+        m_nNode = aPos.GetNodeIndex();
+        m_nContent = aPos.GetContentIndex();
     }
 }
 
@@ -307,11 +307,11 @@ const SwNode* SetGetExpField::GetNodeFromContent() const
             break;
 
         case BOOKMARK:
-            pRet = &m_CNTNT.pBookmark->GetMarkStart().nNode.GetNode();
+            pRet = &m_CNTNT.pBookmark->GetMarkStart().GetNode();
             break;
 
         case CRSRPOS:
-            pRet = &m_CNTNT.pPos->nNode.GetNode();
+            pRet = &m_CNTNT.pPos->GetNode();
             break;
 
         case TEXTTOXMARK:
@@ -352,10 +352,10 @@ sal_Int32 SetGetExpField::GetCntPosFromContent() const
             nRet = m_CNTNT.pTextTOX->GetStart();
             break;
         case BOOKMARK:
-            nRet = m_CNTNT.pBookmark->GetMarkStart().nContent.GetIndex();
+            nRet = m_CNTNT.pBookmark->GetMarkStart().GetContentIndex();
             break;
         case CRSRPOS:
-            nRet =  m_CNTNT.pPos->nContent.GetIndex();
+            nRet =  m_CNTNT.pPos->GetContentIndex();
             break;
         default:
             break;
@@ -363,15 +363,15 @@ sal_Int32 SetGetExpField::GetCntPosFromContent() const
     return nRet;
 }
 
-HashStr::HashStr( const OUString& rName, const OUString& rText,
+HashStr::HashStr( const OUString& rName, OUString aText,
                     HashStr* pNxt )
-    : SwHash( rName ), aSetStr( rText )
+    : SwHash( rName ), aSetStr(std::move( aText ))
 {
     pNext.reset( pNxt );
 }
 
 /// Look up the Name, if it is present, return its String, otherwise return an empty String
-OUString LookString( SwHashTable<HashStr> const & rTable, std::u16string_view rName )
+OUString LookString( SwHashTable<HashStr> const & rTable, const OUString& rName )
 {
     HashStr* pFnd = rTable.Find( comphelper::string::strip(rName, ' ') );
     if( pFnd )
@@ -583,7 +583,7 @@ void SwDoc::AddUsedDBToList( std::vector<OUString>& rDBNameList, const OUString&
 
 #ifdef UNX
     for( const auto &sName : rDBNameList )
-        if( rDBName == sName.getToken(0, ';') )
+        if( rDBName == o3tl::getToken(sName, 0, ';') )
             return;
 #else
     const ::utl::TransliterationWrapper& rSCmp = GetAppCmpStrIgnore();
@@ -613,7 +613,7 @@ void SwDoc::ChangeDBFields( const std::vector<OUString>& rOldNames,
     sal_Int32 nIdx{ 0 };
     aNewDBData.sDataSource = rNewName.getToken(0, DB_DELIM, nIdx);
     aNewDBData.sCommand = rNewName.getToken(0, DB_DELIM, nIdx);
-    aNewDBData.nCommandType = rNewName.getToken(0, DB_DELIM, nIdx).toInt32();
+    aNewDBData.nCommandType = o3tl::toInt32(o3tl::getToken(rNewName, 0, DB_DELIM, nIdx));
 
     SwSectionFormats& rArr = GetSections();
     for (auto n = rArr.size(); n; )
@@ -839,7 +839,7 @@ void SwDocUpdateField::MakeFieldList_( SwDoc& rDoc, int eGetMode )
     // new version: walk all fields of the attribute pool
     m_pFieldSortList.reset(new SetGetExpFields);
 
-    // remembeer sections that were unhidden and need to be hidden again
+    // remember sections that were unhidden and need to be hidden again
     std::vector<std::reference_wrapper<SwSection>> aUnhiddenSections;
 
     // consider and unhide sections
@@ -926,7 +926,7 @@ void SwDocUpdateField::MakeFieldList_( SwDoc& rDoc, int eGetMode )
             assert(pBookmark);
             if (!pBookmark->GetHideCondition().isEmpty())
             {
-                GetBodyNodeGeneric((*it)->GetMarkStart().nNode.GetNode(), *pBookmark);
+                GetBodyNodeGeneric((*it)->GetMarkStart().GetNode(), *pBookmark);
             }
         }
     }
@@ -1067,7 +1067,7 @@ void SwDocUpdateField::GetBodyNode( const SwTextField& rTField, SwFieldIds nFiel
     Point aPt;
     std::pair<Point, bool> const tmp(aPt, false);
     // need pos to get the frame on the correct page
-    SwPosition const pos(const_cast<SwTextNode&>(rTextNd), rTField.GetStart());
+    SwPosition const pos(rTextNd, rTField.GetStart());
     const SwFrame* pFrame = rTextNd.getLayoutFrame(
         rDoc.getIDocumentLayoutAccess().GetCurrentLayout(), &pos, &tmp);
 
@@ -1076,9 +1076,7 @@ void SwDocUpdateField::GetBodyNode( const SwTextField& rTField, SwFieldIds nFiel
 
     if( !pFrame || pFrame->IsInDocBody() )
     {
-        // create index to determine the TextNode
-        SwNodeIndex aIdx( rTextNd );
-        bIsInBody = rDoc.GetNodes().GetEndOfExtras().GetIndex() < aIdx.GetIndex();
+        bIsInBody = rDoc.GetNodes().GetEndOfExtras().GetIndex() < rTextNd.GetIndex();
 
         // We don't want to update fields in redlines, or those
         // in frames whose anchor is in redline. However, we do want to update
@@ -1091,7 +1089,7 @@ void SwDocUpdateField::GetBodyNode( const SwTextField& rTField, SwFieldIds nFiel
         }
         if( (pFrame != nullptr) || bIsInBody )
         {
-            pNew.reset(new SetGetExpField(aIdx, &rTField, nullptr,
+            pNew.reset(new SetGetExpField(rTextNd, &rTField, std::nullopt,
                 pFrame ? pFrame->GetPhyPageNum() : 0));
         }
     }
@@ -1101,7 +1099,7 @@ void SwDocUpdateField::GetBodyNode( const SwTextField& rTField, SwFieldIds nFiel
         SwPosition aPos( rDoc.GetNodes().GetEndOfPostIts() );
         bool const bResult = GetBodyTextNode( rDoc, aPos, *pFrame );
         OSL_ENSURE(bResult, "where is the Field");
-        pNew.reset(new SetGetExpField(aPos.nNode, &rTField, &aPos.nContent,
+        pNew.reset(new SetGetExpField(aPos.GetNode(), &rTField, aPos.GetContentIndex(),
             pFrame->GetPhyPageNum()));
     }
 
@@ -1189,7 +1187,7 @@ void SwDocUpdateField::InsertFieldType( const SwFieldType& rType )
     SetFieldsDirty( true );
     // look up and remove from the hash table
     sFieldName = GetAppCharClass().lowercase( sFieldName );
-    sal_uInt16 n;
+    sal_uInt32 n;
 
     SwCalcFieldType* pFnd = GetFieldTypeTable().Find( sFieldName, &n );
 
@@ -1221,7 +1219,7 @@ void SwDocUpdateField::RemoveFieldType( const SwFieldType& rType )
     SetFieldsDirty( true );
     // look up and remove from the hash table
     sFieldName = GetAppCharClass().lowercase( sFieldName );
-    sal_uInt16 n;
+    sal_uInt32 n;
 
     SwCalcFieldType* pFnd = GetFieldTypeTable().Find( sFieldName, &n );
     if( !pFnd )

@@ -102,6 +102,7 @@ public:
     virtual void TableInfoCell( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
     virtual void TableInfoRow( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
     virtual void TableDefinition( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
+    void TablePositioning(SwFrameFormat* pFlyFormat);
     virtual void TableDefaultBorders( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
     virtual void TableBackgrounds( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
     virtual void TableRowRedline( ww8::WW8TableNodeInfoInner::Pointer_t pTableTextNodeInfo ) override;
@@ -126,7 +127,7 @@ public:
 
     /// Start of a style in the styles table.
     virtual void StartStyle( const OUString& rName, StyleType eType,
-            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwIdi, sal_uInt16 nId,
+            sal_uInt16 nBase, sal_uInt16 nNext, sal_uInt16 nLink, sal_uInt16 nWwIdi, sal_uInt16 nSlot,
             bool bAutoUpdate ) override;
 
     /// End of a style in the styles table.
@@ -438,6 +439,36 @@ protected:
 
     void TextLineBreak(const SwFormatLineBreak& rLineBreak) override;
 
+public:
+    explicit WW8AttributeOutput( WW8Export &rWW8Export )
+        : AttributeOutputBase(rWW8Export.GetWriter().GetMedia()->GetURLObject().GetMainURL(
+            INetURLObject::DecodeMechanism::NONE))
+        , m_rWW8Export(rWW8Export)
+        , m_nPOPosStdLen1(0)
+        , m_nPOPosStdLen2(0)
+        , m_nStyleStartSize(0)
+        , m_nStyleLenPos(0)
+        , m_nStyleCountPos(0)
+        , m_nFieldResults(0)
+        , mbOnTOXEnding(false)
+    {
+    }
+
+    /// Return the right export class.
+    virtual WW8Export& GetExport() override { return m_rWW8Export; }
+
+protected:
+    /// Output the bold etc. attributes
+    void OutputWW8Attribute( sal_uInt8 nId, bool bVal );
+
+    /// Output the bold etc. attributes, the Complex Text Layout version
+    void OutputWW8AttributeCTL( sal_uInt8 nId, bool bVal );
+
+    void TableCellBorders(
+        ww8::WW8TableNodeInfoInner::Pointer_t const & pTableTextNodeInfoInner );
+
+private:
+
     /// Reference to the export, where to get the data from
     WW8Export &m_rWW8Export;
 
@@ -445,7 +476,7 @@ protected:
     ///
     /// We have to remember these positions between the StartStyle() and
     /// EndStyle().
-    sal_uInt16 nPOPosStdLen1, nPOPosStdLen2;
+    sal_uInt16 m_nPOPosStdLen1, m_nPOPosStdLen2;
 
     /// For output of styles.
     ///
@@ -470,39 +501,8 @@ protected:
     std::multimap<sal_Int32, OUString> m_aBookmarksOfParagraphStart;
     std::multimap<sal_Int32, OUString> m_aBookmarksOfParagraphEnd;
 
-public:
-    explicit WW8AttributeOutput( WW8Export &rWW8Export )
-        : AttributeOutputBase(rWW8Export.GetWriter().GetMedia()->GetURLObject().GetMainURL(
-            INetURLObject::DecodeMechanism::NONE))
-        , m_rWW8Export(rWW8Export)
-        , nPOPosStdLen1(0)
-        , nPOPosStdLen2(0)
-        , m_nStyleStartSize(0)
-        , m_nStyleLenPos(0)
-        , m_nStyleCountPos(0)
-        , m_nFieldResults(0)
-        , mbOnTOXEnding(false)
-    {
-    }
-
-    /// Return the right export class.
-    virtual WW8Export& GetExport() override { return m_rWW8Export; }
-
-protected:
-    /// Output the bold etc. attributes
-    void OutputWW8Attribute( sal_uInt8 nId, bool bVal );
-
-    /// Output the bold etc. attributes, the Complex Text Layout version
-    void OutputWW8AttributeCTL( sal_uInt8 nId, bool bVal );
-
-    void TableCellBorders(
-        ww8::WW8TableNodeInfoInner::Pointer_t const & pTableTextNodeInfoInner );
-
-private:
-
     editeng::WordPageMargins m_pageMargins;
     bool m_bFromEdge = false;
-
 };
 
 #endif // INCLUDED_SW_SOURCE_FILTER_WW8_WW8ATTRIBUTEOUTPUT_HXX

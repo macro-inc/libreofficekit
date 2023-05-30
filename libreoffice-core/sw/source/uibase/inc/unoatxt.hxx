@@ -30,8 +30,7 @@
 #include <com/sun/star/text/XText.hpp>
 #include <svl/itemprop.hxx>
 #include <svl/lstner.hxx>
-#include <cppuhelper/basemutex.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <rtl/ref.hxx>
 #include <svtools/unoevent.hxx>
@@ -54,7 +53,7 @@ class SwXAutoTextContainer final : public cppu::WeakImplHelper
     css::lang::XServiceInfo
 >
 {
-    SwGlossaries *pGlossaries;
+    SwGlossaries *m_pGlossaries;
 
     virtual ~SwXAutoTextContainer() override;    // ref-counted objects are not to be deleted from outside -> protected dtor
 
@@ -95,9 +94,9 @@ class SwXAutoTextGroup final : public cppu::WeakImplHelper
     css::lang::XUnoTunnel
 >
 {
-    const SfxItemPropertySet* pPropSet;
-    SwGlossaries*           pGlossaries;
-    OUString                sName;
+    const SfxItemPropertySet* m_pPropSet;
+    SwGlossaries*           m_pGlossaries;
+    OUString                m_sName;
     OUString                m_sGroupName;   // prefix m_ to disambiguate from some local vars in the implementation
 
     virtual ~SwXAutoTextGroup() override;    // ref-counted objects are not to be deleted from outside -> protected dtor
@@ -152,8 +151,7 @@ public:
 
 class SwXAutoTextEntry final
         :public SfxListener
-        ,public cppu::BaseMutex
-        ,public cppu::WeakComponentImplHelper
+        ,public comphelper::WeakComponentImplHelper
         <
             css::text::XAutoTextEntry,
             css::lang::XServiceInfo,
@@ -162,10 +160,10 @@ class SwXAutoTextEntry final
             css::document::XEventsSupplier
         >
 {
-    SwGlossaries*   pGlossaries;
-    OUString        sGroupName;
-    OUString        sEntryName;
-    SwDocShellRef   xDocSh;
+    SwGlossaries*   m_pGlossaries;
+    OUString        m_sGroupName;
+    OUString        m_sEntryName;
+    SwDocShellRef   m_xDocSh;
     rtl::Reference<SwXBodyText>
                     mxBodyText;
 
@@ -176,7 +174,7 @@ class SwXAutoTextEntry final
     }
     void GetBodyText ();
 
-    void SAL_CALL disposing() override;
+    void disposing(std::unique_lock<std::mutex>&) override;
 
     /** ensure that the current content (which may only be in-memory so far) is flushed to the auto text group file
 
@@ -197,7 +195,7 @@ class SwXAutoTextEntry final
     virtual ~SwXAutoTextEntry() override;    // ref-counted objects are not to be deleted from outside -> protected dtor
 
 public:
-    SwXAutoTextEntry(SwGlossaries* , const OUString& rGroupName, const OUString& rEntryName);
+    SwXAutoTextEntry(SwGlossaries* , OUString aGroupName, OUString aEntryName);
 
     static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
 
@@ -230,16 +228,16 @@ public:
     // XEventsSupplier
     virtual css::uno::Reference< css::container::XNameReplace > SAL_CALL getEvents(  ) override;
 
-    void    Invalidate() {pGlossaries = nullptr;}
-    const SwGlossaries* GetGlossaries() const { return pGlossaries; }
-    const OUString&   GetGroupName() const {return sGroupName;}
-    const OUString&   GetEntryName() const {return sEntryName;}
+    void    Invalidate() {m_pGlossaries = nullptr;}
+    const SwGlossaries* GetGlossaries() const { return m_pGlossaries; }
+    const OUString&   GetGroupName() const {return m_sGroupName;}
+    const OUString&   GetEntryName() const {return m_sEntryName;}
 };
 
 /** Implement the XNameAccess for the AutoText events */
 class SwAutoTextEventDescriptor final : public SvBaseEventDescriptor
 {
-    SwXAutoTextEntry& rAutoTextEntry;
+    SwXAutoTextEntry& m_rAutoTextEntry;
 
     using SvBaseEventDescriptor::replaceByName;
     using SvBaseEventDescriptor::getByName;

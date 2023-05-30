@@ -25,17 +25,17 @@
 #include <com/sun/star/util/URLTransformer.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
 
+#include <utility>
 #include <vcl/window.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/commandevent.hxx>
-#include <osl/mutex.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
 namespace framework{
 
-WindowCommandDispatch::WindowCommandDispatch(const css::uno::Reference< css::uno::XComponentContext >& xContext ,
+WindowCommandDispatch::WindowCommandDispatch(css::uno::Reference< css::uno::XComponentContext >  xContext ,
                          const css::uno::Reference< css::frame::XFrame >&              xFrame)
-    : m_xContext    (xContext                    )
+    : m_xContext    (std::move(xContext                    ))
     , m_xFrame      (xFrame                      )
     , m_xWindow     (xFrame->getContainerWindow())
 {

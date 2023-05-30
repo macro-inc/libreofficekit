@@ -118,26 +118,6 @@ namespace o3tl
     template<> struct typed_flags<WindowBorderStyle> : is_typed_flags<WindowBorderStyle, 0x3033> {};
 }
 
-enum class WindowStateMask {
-    NONE             = 0x0000,
-    X                = 0x0001,
-    Y                = 0x0002,
-    Width            = 0x0004,
-    Height           = 0x0008,
-    State            = 0x0010,
-    Minimized        = 0x0020,
-    MaximizedX       = 0x0100,
-    MaximizedY       = 0x0200,
-    MaximizedWidth   = 0x0400,
-    MaximizedHeight  = 0x0800,
-    Pos              = X | Y,
-    All              = X | Y | Width | Height | MaximizedX | MaximizedY | MaximizedWidth | MaximizedHeight | State | Minimized
-};
-namespace o3tl
-{
-    template<> struct typed_flags<WindowStateMask> : is_typed_flags<WindowStateMask, 0x0f3f> {};
-}
-
 enum class TimeFormat
 {
     Hour12, Hour24
@@ -159,18 +139,6 @@ enum class ExtDateFieldFormat
     ShortDDMMYYYY, ShortMMDDYYYY, ShortYYYYMMDD,
     ShortYYMMDD_DIN5008, ShortYYYYMMDD_DIN5008,
     FORCE_EQUAL_SIZE=SAL_MAX_ENUM
-};
-
-// this appears to be a direct copy of css::awt::GradientStyle
-enum class GradientStyle
-{
-    Linear = 0,
-    Axial = 1,
-    Radial = 2,
-    Elliptical = 3,
-    Square = 4,
-    Rect = 5,
-    FORCE_EQUAL_SIZE = SAL_MAX_ENUM
 };
 
 enum class HatchStyle
@@ -298,24 +266,6 @@ enum class ToolBoxButtonSize
     Size32,
 };
 
-enum class WindowStateState {
-    NONE           = 0x0000,
-    Normal         = 0x0001,
-    Minimized      = 0x0002,
-    Maximized      = 0x0004,
-    // Rollup is no longer used, but retained because WindowStateState is serialized
-    // from/to strings describing window state that are stored in a users config
-    Rollup         = 0x0008,
-    MaximizedHorz  = 0x0010,
-    MaximizedVert  = 0x0020,
-    FullScreen     = 0x0040,
-    SystemMask     = 0xffff
-};
-namespace o3tl
-{
-    template<> struct typed_flags<WindowStateState> : is_typed_flags<WindowStateState, 0xffff> {};
-}
-
 namespace vcl
 {
     // The exact sizes of the icons in each size grouping are not necessarily
@@ -379,10 +329,11 @@ enum class FloatWinPopupFlags
     NoMouseUpClose       = 0x000200,
     GrabFocus            = 0x000400,
     NoHorzPlacement      = 0x000800,
+    MakeClientWindowVisibleBeforePopup  = 0x001000,
 };
 namespace o3tl
 {
-    template<> struct typed_flags<FloatWinPopupFlags> : is_typed_flags<FloatWinPopupFlags, 0x0fff> {};
+    template<> struct typed_flags<FloatWinPopupFlags> : is_typed_flags<FloatWinPopupFlags, 0x1fff> {};
 }
 
 // Flags for Window::Show()
@@ -411,6 +362,14 @@ namespace o3tl
 {
     template<> struct typed_flags<TrackingEventFlags> : is_typed_flags<TrackingEventFlags, 0x1107> {};
 }
+
+enum class ScrollType
+{
+    DontKnow,
+    LineUp, LineDown,
+    PageUp, PageDown,
+    Drag
+};
 
 #endif // INCLUDED_VCL_VCLENUM_HXX
 

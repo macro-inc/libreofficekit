@@ -20,12 +20,12 @@
 #include <sal/config.h>
 
 #include <accelerators/keymapping.hxx>
+#include <utility>
 #include <xml/acceleratorconfigurationwriter.hxx>
 
 #include <acceleratorconst.h>
 
 #include <com/sun/star/xml/sax/XExtendedDocumentHandler.hpp>
-#include <com/sun/star/xml/sax/XAttributeList.hpp>
 #include <com/sun/star/awt/KeyModifier.hpp>
 
 #include <comphelper/attributelist.hxx>
@@ -34,8 +34,8 @@
 namespace framework{
 
 AcceleratorConfigurationWriter::AcceleratorConfigurationWriter(const AcceleratorCache&                                       rContainer,
-                                                               const css::uno::Reference< css::xml::sax::XDocumentHandler >& xConfig   )
-    : m_xConfig     (xConfig                      )
+                                                               css::uno::Reference< css::xml::sax::XDocumentHandler >  xConfig   )
+    : m_xConfig     (std::move(xConfig                      ))
     , m_rContainer  (rContainer                   )
 {
 }

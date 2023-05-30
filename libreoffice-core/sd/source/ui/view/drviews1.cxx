@@ -33,11 +33,10 @@
 #include <svx/svdoole2.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/module.hxx>
-#include <vcl/scrbar.hxx>
 #include <svx/svdopage.hxx>
 #include <svx/fmshell.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/graphicfilter.hxx>
 
 #include <view/viewoverlaymanager.hxx>
@@ -71,7 +70,6 @@
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <vcl/uitest/logger.hxx>
 #include <vcl/uitest/eventdescription.hxx>
-#include <svl/intitem.hxx>
 
 using namespace com::sun::star;
 
@@ -81,13 +79,20 @@ void DrawViewShell::Activate(bool bIsMDIActivate)
 {
     ViewShell::Activate(bIsMDIActivate);
 
-    // When the mode is switched to normal the main view shell grabs focus.
-    // This is done for getting cut/copy/paste commands on slides in the left
-    // pane (slide sorter view shell) to work properly.
-    SfxShell* pTopViewShell = this->GetViewShellBase().GetViewShellManager()->GetTopViewShell();
-    if (pTopViewShell && pTopViewShell == this)
+    // tdf#150773: do not grab focus on loading
+    if (mbFirstTimeActivation)
+        mbFirstTimeActivation = false;
+    else
     {
-        this->GetActiveWindow()->GrabFocus();
+
+        // When the mode is switched to normal the main view shell grabs focus.
+        // This is done for getting cut/copy/paste commands on slides in the left
+        // pane (slide sorter view shell) to work properly.
+        SfxShell* pTopViewShell = GetViewShellBase().GetViewShellManager()->GetTopViewShell();
+        if (pTopViewShell == this)
+        {
+            GetActiveWindow()->GrabFocus();
+        }
     }
 }
 
@@ -168,14 +173,14 @@ void DrawViewShell::SelectionHasChanged()
             SdrObject* pObj = pMark->GetMarkedSdrObj();
 
             SdrInventor nInv        = pObj->GetObjInventor();
-            sal_uInt16  nSdrObjKind = pObj->GetObjIdentifier();
+            SdrObjKind  nSdrObjKind = pObj->GetObjIdentifier();
 
-            if (nInv == SdrInventor::Default && nSdrObjKind == OBJ_OLE2)
+            if (nInv == SdrInventor::Default && nSdrObjKind == SdrObjKind::OLE2)
             {
                 pOleObj = static_cast<SdrOle2Obj*>(pObj);
                 UpdateIMapDlg( pObj );
             }
-            else if (nSdrObjKind == OBJ_GRAF)
+            else if (nSdrObjKind == SdrObjKind::Graphic)
                 UpdateIMapDlg( pObj );
         }
     }
@@ -730,9 +735,9 @@ ErrCode DrawViewShell::DoVerb(sal_Int32 nVerb)
             SdrObject* pObj = pMark->GetMarkedSdrObj();
 
             SdrInventor nInv        = pObj->GetObjInventor();
-            sal_uInt16  nSdrObjKind = pObj->GetObjIdentifier();
+            SdrObjKind  nSdrObjKind = pObj->GetObjIdentifier();
 
-            if (nInv == SdrInventor::Default && nSdrObjKind == OBJ_OLE2)
+            if (nInv == SdrInventor::Default && nSdrObjKind == SdrObjKind::OLE2)
             {
                 ActivateObject( static_cast<SdrOle2Obj*>(pObj), nVerb);
             }

@@ -27,12 +27,13 @@
 
 #include <vcl/bitmap.hxx>
 
+#include <ios/iosinst.hxx>
 #include <quartz/salbmp.h>
 #include <quartz/salgdi.h>
 #include <quartz/salvd.h>
 #include <quartz/utils.h>
 
-#include "saldatabasic.hxx"
+#include <svdata.hxx>
 
 // From salbmp.cxx
 

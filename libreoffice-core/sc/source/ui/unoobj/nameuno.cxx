@@ -17,7 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <o3tl/safeint.hxx>
 #include <svl/hint.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/sheet/NamedRangeFlag.hpp>
@@ -46,25 +48,23 @@ using ::com::sun::star::uno::Any;
 
 #include <scui_def.hxx>
 
-static const SfxItemPropertyMapEntry* lcl_GetNamedRangeMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetNamedRangeMap()
 {
     static const SfxItemPropertyMapEntry aNamedRangeMap_Impl[] =
     {
-        {u"" SC_UNO_LINKDISPBIT,      0,  cppu::UnoType<awt::XBitmap>::get(), beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNO_LINKDISPNAME,     0,  cppu::UnoType<OUString>::get(),                beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_TOKENINDEX,   0,  cppu::UnoType<sal_Int32>::get(),                    beans::PropertyAttribute::READONLY, 0 },
-        {u"" SC_UNONAME_ISSHAREDFMLA, 0,  cppu::UnoType<bool>::get(),                          0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNO_LINKDISPBIT,      0,  cppu::UnoType<awt::XBitmap>::get(), beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNO_LINKDISPNAME,     0,  cppu::UnoType<OUString>::get(),                beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_TOKENINDEX,   0,  cppu::UnoType<sal_Int32>::get(),                    beans::PropertyAttribute::READONLY, 0 },
+        { SC_UNONAME_ISSHAREDFMLA, 0,  cppu::UnoType<bool>::get(),                          0, 0 },
     };
     return aNamedRangeMap_Impl;
 }
 
-static const SfxItemPropertyMapEntry* lcl_GetNamedRangesMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetNamedRangesMap()
 {
     static const SfxItemPropertyMapEntry aNamedRangesMap_Impl[] =
     {
-        {u"" SC_UNO_MODIFY_BROADCAST, 0,  cppu::UnoType<bool>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNO_MODIFY_BROADCAST, 0,  cppu::UnoType<bool>::get(), 0, 0 },
     };
     return aNamedRangesMap_Impl;
 }
@@ -82,10 +82,10 @@ static bool lcl_UserVisibleName(const ScRangeData& rData)
     return !rData.HasType(ScRangeData::Type::Database);
 }
 
-ScNamedRangeObj::ScNamedRangeObj( rtl::Reference< ScNamedRangesObj > const & xParent, ScDocShell* pDocSh, const OUString& rNm, Reference<container::XNamed> const & xSheet):
-    mxParent(xParent),
+ScNamedRangeObj::ScNamedRangeObj( rtl::Reference< ScNamedRangesObj > xParent, ScDocShell* pDocSh, OUString aNm, Reference<container::XNamed> const & xSheet):
+    mxParent(std::move(xParent)),
     pDocShell( pDocSh ),
-    aName( rNm ),
+    aName(std::move( aNm )),
     mxSheet( xSheet )
 {
     pDocShell->GetDocument().AddUnoObject(*this);
@@ -361,7 +361,6 @@ uno::Reference<table::XCellRange> SAL_CALL ScNamedRangeObj::getReferredCells()
 
 uno::Reference<beans::XPropertySetInfo> SAL_CALL ScNamedRangeObj::getPropertySetInfo()
 {
-    SolarMutexGuard aGuard;
     static uno::Reference< beans::XPropertySetInfo >  aRef(new SfxItemPropertySetInfo( lcl_GetNamedRangeMap() ));
     return aRef;
 }
@@ -369,7 +368,6 @@ uno::Reference<beans::XPropertySetInfo> SAL_CALL ScNamedRangeObj::getPropertySet
 void SAL_CALL ScNamedRangeObj::setPropertyValue(
                         const OUString& rPropertyName, const uno::Any& /*aValue*/ )
 {
-    SolarMutexGuard aGuard;
     if ( rPropertyName == SC_UNONAME_ISSHAREDFMLA )
     {
         // Ignore this.
@@ -608,12 +606,11 @@ uno::Any SAL_CALL ScNamedRangesObj::getByIndex( sal_Int32 nIndex )
     if ( !xRange.is() )
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xRange);
+    return uno::Any(xRange);
 }
 
 uno::Type SAL_CALL ScNamedRangesObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XNamedRange>::get();   // must be suitable for getByIndex
 }
 
@@ -659,7 +656,7 @@ uno::Any SAL_CALL ScNamedRangesObj::getByName( const OUString& aName )
     if ( !xRange.is() )
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xRange);
+    return uno::Any(xRange);
 }
 
 uno::Sequence<OUString> SAL_CALL ScNamedRangesObj::getElementNames()
@@ -832,9 +829,9 @@ SCTAB ScGlobalNamedRangesObj::GetTab_Impl()
     return -1;
 }
 
-ScLocalNamedRangesObj::ScLocalNamedRangesObj( ScDocShell* pDocSh, uno::Reference<container::XNamed> const & xSheet )
+ScLocalNamedRangesObj::ScLocalNamedRangesObj( ScDocShell* pDocSh, uno::Reference<container::XNamed> xSheet )
     : ScNamedRangesObj(pDocSh),
-    mxSheet(xSheet)
+    mxSheet(std::move(xSheet))
 {
 
 }
@@ -1090,7 +1087,7 @@ void SAL_CALL ScLabelRangesObj::removeByIndex( sal_Int32 nIndex )
         ScDocument& rDoc = pDocShell->GetDocument();
         ScRangePairList* pOldList = bColumn ? rDoc.GetColNameRanges() : rDoc.GetRowNameRanges();
 
-        if ( pOldList && nIndex >= 0 && nIndex < static_cast<sal_Int32>(pOldList->size()) )
+        if ( pOldList && nIndex >= 0 && o3tl::make_unsigned(nIndex) < pOldList->size() )
         {
             ScRangePairListRef xNewList(pOldList->Clone());
 
@@ -1143,14 +1140,12 @@ uno::Any SAL_CALL ScLabelRangesObj::getByIndex( sal_Int32 nIndex )
     if ( !xRange.is() )
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xRange);
+    return uno::Any(xRange);
 }
 
 uno::Type SAL_CALL ScLabelRangesObj::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XLabelRange>::get();   // must be suitable for getByIndex
-
 }
 
 sal_Bool SAL_CALL ScLabelRangesObj::hasElements()

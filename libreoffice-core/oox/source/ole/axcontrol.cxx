@@ -51,6 +51,7 @@
 #include <com/sun/star/table/CellRangeAddress.hpp>
 #include <rtl/tencinfo.h>
 #include <osl/diagnose.h>
+#include <utility>
 #include <vcl/font.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/settings.hxx>
@@ -62,7 +63,8 @@
 #include <oox/ole/axbinarywriter.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace oox::ole {
 
@@ -499,14 +501,14 @@ void ControlConverter::convertAxPicture( PropertyMap& rPropMap, const StreamData
 }
 
 void ControlConverter::convertAxState( PropertyMap& rPropMap,
-        const OUString& rValue, sal_Int32 nMultiSelect, ApiDefaultStateMode eDefStateMode, bool bAwtModel )
+        std::u16string_view rValue, sal_Int32 nMultiSelect, ApiDefaultStateMode eDefStateMode, bool bAwtModel )
 {
     bool bBooleanState = eDefStateMode == API_DEFAULTSTATE_BOOLEAN;
     bool bSupportsTriState = eDefStateMode == API_DEFAULTSTATE_TRISTATE;
 
     // state
     sal_Int16 nState = bSupportsTriState ? API_STATE_DONTKNOW : API_STATE_UNCHECKED;
-    if( rValue.getLength() == 1 ) switch( rValue[ 0 ] )
+    if( rValue.size() == 1 ) switch( rValue[ 0 ] )
     {
         case '0':   nState = API_STATE_UNCHECKED;   break;
         case '1':   nState = API_STATE_CHECKED;     break;
@@ -837,8 +839,8 @@ void AxControlModelBase::importProperty( sal_Int32 nPropId, const OUString& rVal
             OSL_ENSURE( nSepPos >= 0, "AxControlModelBase::importProperty - missing separator in 'Size' property" );
             if( nSepPos >= 0 )
             {
-                maSize.first = rValue.copy( 0, nSepPos ).toInt32();
-                maSize.second = rValue.copy( nSepPos + 1 ).toInt32();
+                maSize.first = o3tl::toInt32(rValue.subView( 0, nSepPos ));
+                maSize.second = o3tl::toInt32(rValue.subView( nSepPos + 1 ));
             }
         }
         break;
@@ -2578,20 +2580,20 @@ HtmlSelectModel::importBinaryModel( BinaryInputStream& rInStrm )
     // Ultra hacky parser for the info
     sal_Int32 nLineIdx {0};
     // first line will tell us if multiselect is enabled
-    if (data.getToken( 0, '\n', nLineIdx )=="<SELECT MULTIPLE")
+    if (o3tl::getToken(data, 0, '\n', nLineIdx ) == u"<SELECT MULTIPLE")
         mnMultiSelect = AX_SELECTION_MULTI;
     // skip first and last lines, no data there
     if (nLineIdx>0)
     {
         for (;;)
         {
-            OUString sLine( data.getToken( 0, '\n', nLineIdx ) );
+            std::u16string_view sLine( o3tl::getToken(data, 0, '\n', nLineIdx ) );
             if (nLineIdx<0)
                 break;  // skip last line
 
-            if ( !sLine.isEmpty() )
+            if ( !sLine.empty() )
             {
-                OUString displayValue  = sLine.getToken( 1, '>' );
+                OUString displayValue( o3tl::getToken(sLine, 1, '>' ) );
                 if ( displayValue.getLength() )
                 {
                     // Really we should be using a proper html parser
@@ -2601,7 +2603,7 @@ HtmlSelectModel::importBinaryModel( BinaryInputStream& rInStrm )
                     displayValue = displayValue.replaceAll( "&quot;", "\"" );
                     displayValue = displayValue.replaceAll( "&amp;", "&" );
                     listValues.push_back( displayValue );
-                    if( sLine.indexOf( "OPTION SELECTED" ) != -1 )
+                    if( sLine.find( u"OPTION SELECTED" ) != std::u16string_view::npos )
                         selectedIndices.push_back( static_cast< sal_Int16 >( listValues.size() ) - 1 );
                 }
             }
@@ -2653,28 +2655,28 @@ HtmlTextBoxModel::importBinaryModel( BinaryInputStream& rInStrm )
     return true;
 }
 
-EmbeddedControl::EmbeddedControl( const OUString& rName ) :
-    maName( rName )
+EmbeddedControl::EmbeddedControl( OUString aName ) :
+    maName(std::move( aName ))
 {
 }
 
-ControlModelBase* EmbeddedControl::createModelFromGuid( const OUString& rClassId )
+ControlModelBase* EmbeddedControl::createModelFromGuid( std::u16string_view rClassId )
 {
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_COMMANDBUTTON ) )     return &createModel< AxCommandButtonModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_LABEL ) )             return &createModel< AxLabelModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_IMAGE ) )             return &createModel< AxImageModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_TOGGLEBUTTON ) )      return &createModel< AxToggleButtonModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_CHECKBOX ) )          return &createModel< AxCheckBoxModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_OPTIONBUTTON ) )      return &createModel< AxOptionButtonModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_TEXTBOX ) )           return &createModel< AxTextBoxModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_LISTBOX ) )           return &createModel< AxListBoxModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_COMBOBOX ) )          return &createModel< AxComboBoxModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_SPINBUTTON ) )        return &createModel< AxSpinButtonModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_SCROLLBAR ) )         return &createModel< AxScrollBarModel >();
-    if( rClassId.equalsIgnoreAsciiCase( AX_GUID_FRAME ) )             return &createModel< AxFrameModel >();
-    if( rClassId.equalsIgnoreAsciiCase( COMCTL_GUID_SCROLLBAR_60 ) )  return &createModel< ComCtlScrollBarModel >( COMCTL_VERSION_60 );
-    if( rClassId.equalsIgnoreAsciiCase( HTML_GUID_SELECT ) )  return &createModel< HtmlSelectModel >();
-    if( rClassId.equalsIgnoreAsciiCase( HTML_GUID_TEXTBOX ) ) return &createModel< HtmlTextBoxModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_COMMANDBUTTON ) )     return &createModel< AxCommandButtonModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_LABEL ) )             return &createModel< AxLabelModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_IMAGE ) )             return &createModel< AxImageModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_TOGGLEBUTTON ) )      return &createModel< AxToggleButtonModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_CHECKBOX ) )          return &createModel< AxCheckBoxModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_OPTIONBUTTON ) )      return &createModel< AxOptionButtonModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_TEXTBOX ) )           return &createModel< AxTextBoxModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_LISTBOX ) )           return &createModel< AxListBoxModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_COMBOBOX ) )          return &createModel< AxComboBoxModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_SPINBUTTON ) )        return &createModel< AxSpinButtonModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_SCROLLBAR ) )         return &createModel< AxScrollBarModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" AX_GUID_FRAME ) )             return &createModel< AxFrameModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" COMCTL_GUID_SCROLLBAR_60 ) )  return &createModel< ComCtlScrollBarModel >( COMCTL_VERSION_60 );
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" HTML_GUID_SELECT ) )  return &createModel< HtmlSelectModel >();
+    if( o3tl::equalsIgnoreAsciiCase(rClassId,  u"" HTML_GUID_TEXTBOX ) ) return &createModel< HtmlTextBoxModel >();
 
     mxModel.reset();
     return nullptr;

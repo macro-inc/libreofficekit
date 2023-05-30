@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2022-03-15 14:37+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2023-02-06 18:34+0000\n"
 "Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
 "Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/ro/>\n"
 "Language: ro\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1507245868.000000\n"
 
 #. i8Y7Z
@@ -26,13 +26,13 @@ msgstr "Returnează numărul de serie al datei dinainte sau după un număr spec
 #: scaddins/inc/analysis.hrc:29
 msgctxt "ANALYSIS_Workday"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. VQvrc
 #: scaddins/inc/analysis.hrc:30
 msgctxt "ANALYSIS_Workday"
 msgid "The start date"
-msgstr "Data de start"
+msgstr "Data de început"
 
 #. yAENf
 #: scaddins/inc/analysis.hrc:31
@@ -44,7 +44,7 @@ msgstr "Zile"
 #: scaddins/inc/analysis.hrc:32
 msgctxt "ANALYSIS_Workday"
 msgid "The number of workdays before or after the start date"
-msgstr "Numărul de zile lucrătoare dinainte sau după data de start"
+msgstr "Numărul de zile lucrătoare dinainte sau după data de început"
 
 #. tDjjf
 #: scaddins/inc/analysis.hrc:33
@@ -68,13 +68,13 @@ msgstr "Returnează numărul de ani (incluzând partea fracție) între două da
 #: scaddins/inc/analysis.hrc:40
 msgctxt "ANALYSIS_Yearfrac"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. 7GV4n
 #: scaddins/inc/analysis.hrc:41
 msgctxt "ANALYSIS_Yearfrac"
 msgid "The start date"
-msgstr "Data de start"
+msgstr "Data de început"
 
 #. mEZVs
 #: scaddins/inc/analysis.hrc:42
@@ -104,19 +104,19 @@ msgstr "Baza indică convenția de numerotare a zilelor în calcule."
 #: scaddins/inc/analysis.hrc:50
 msgctxt "ANALYSIS_Edate"
 msgid "Returns the serial number of the date that is a specified number of months before or after the start date"
-msgstr "Returnează numărul de serie al datei care reprezintă un număr specificat de luni înainte sau după data de start."
+msgstr "Returnează numărul de serie al datei care este un număr specificat de luni înainte sau după data de început"
 
 #. 3ceHw
 #: scaddins/inc/analysis.hrc:51
 msgctxt "ANALYSIS_Edate"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. 7e2EC
 #: scaddins/inc/analysis.hrc:52
 msgctxt "ANALYSIS_Edate"
 msgid "The start date"
-msgstr "Data de start"
+msgstr "Data de început"
 
 #. uYXaX
 #: scaddins/inc/analysis.hrc:53
@@ -168,19 +168,19 @@ msgstr "Indică prima zi a săptămânii (1 = duminică, 2 = luni)"
 #: scaddins/inc/analysis.hrc:68
 msgctxt "ANALYSIS_Eomonth"
 msgid "Returns the serial number of the last day of the month that comes a certain number of months before or after the start date"
-msgstr "Returnează numărul de serie al ultimei zile a lunii care se găsește cu un anumit număr de luni înainte sau după data de start."
+msgstr "Returnează numărul de serie al ultimei zile a lunii care se găsește cu un anumit număr de luni înainte sau după data de început"
 
 #. uk8iG
 #: scaddins/inc/analysis.hrc:69
 msgctxt "ANALYSIS_Eomonth"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. FqaAT
 #: scaddins/inc/analysis.hrc:70
 msgctxt "ANALYSIS_Eomonth"
 msgid "The start date"
-msgstr "Data de start"
+msgstr "Data de început"
 
 #. h3ArQ
 #: scaddins/inc/analysis.hrc:71
@@ -208,13 +208,13 @@ msgstr ""
 #: scaddins/inc/analysis.hrc:78
 msgctxt "ANALYSIS_Networkdays"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. Czzcp
 #: scaddins/inc/analysis.hrc:79
 msgctxt "ANALYSIS_Networkdays"
 msgid "The start date"
-msgstr "Data de start"
+msgstr "Data de început"
 
 #. GRYzo
 #: scaddins/inc/analysis.hrc:80
@@ -240,11 +240,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Lista valorilor de date care reprezintă zile libere (vacanțe, sărbători, etc)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Returnează valoarea TRUE dacă numărul este par"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr ""
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -258,11 +258,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "Numărul"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Returnează valoarea TRUE dacă numărul este impar"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr ""
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -426,11 +426,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "Numărul cu care este înmulțit pi"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Returnează un număr întreg aleator între numerele specificate"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr ""
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -438,11 +438,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Jos"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Cel mai mic întreg întors"
+msgid "The smallest integer that can be returned"
+msgstr ""
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -450,11 +450,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Sus"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "Cel mai mare întreg întors"
+msgid "The largest integer that can be returned"
+msgstr ""
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156
@@ -1818,7 +1818,7 @@ msgstr "sae"
 #: scaddins/inc/analysis.hrc:592
 msgctxt "ANALYSIS_Accrint"
 msgid "Returns the accrued interest for a security that pays periodic interest"
-msgstr "Returnează dobânda cumulată pentru un titlu care plătește o dobândă periodică"
+msgstr "Returnează dobânda acumulată pentru un titlu care plătește dobândă periodică"
 
 #. DBFoH
 #: scaddins/inc/analysis.hrc:593
@@ -1842,7 +1842,7 @@ msgstr "Prima dobândă"
 #: scaddins/inc/analysis.hrc:596
 msgctxt "ANALYSIS_Accrint"
 msgid "First interest date of the security"
-msgstr "Prima dată a dobânzii titlului"
+msgstr "Data primei dobânzi a titlului"
 
 #. kCCar
 #: scaddins/inc/analysis.hrc:597
@@ -1908,7 +1908,7 @@ msgstr "Baza"
 #: scaddins/inc/analysis.hrc:611
 msgctxt "ANALYSIS_Accrintm"
 msgid "Returns the accrued interest for a security that pays interest at maturity"
-msgstr "Returnează dobânda cumulată pentru un titlu care plătește dobânda la termen"
+msgstr "Returnează dobânda acumulată pentru un titlu care plătește dobândă la scadență"
 
 #. D9wUf
 #: scaddins/inc/analysis.hrc:612
@@ -2082,7 +2082,7 @@ msgstr "Prețul"
 #: scaddins/inc/analysis.hrc:648
 msgctxt "ANALYSIS_Disc"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. rUAFp
 #: scaddins/inc/analysis.hrc:649
@@ -2106,7 +2106,7 @@ msgstr "Baza"
 #: scaddins/inc/analysis.hrc:656
 msgctxt "ANALYSIS_Duration"
 msgid "Returns the annual Macaulay duration of a security with periodic interest payments"
-msgstr "Returnează durata anuală Macaulaz pentru un titlu cu plăți periodice ale dobânzii"
+msgstr "Returnează durata Macaulay anuală a unui titlu cu plăți periodice de dobândă"
 
 #. Kt5tm
 #: scaddins/inc/analysis.hrc:657
@@ -2424,7 +2424,7 @@ msgstr "Venitul titlului"
 #: scaddins/inc/analysis.hrc:725
 msgctxt "ANALYSIS_Price"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. Dsfq5
 #: scaddins/inc/analysis.hrc:726
@@ -2502,7 +2502,7 @@ msgstr "Discontul"
 #: scaddins/inc/analysis.hrc:742
 msgctxt "ANALYSIS_Pricedisc"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. AeFr3
 #: scaddins/inc/analysis.hrc:743
@@ -2826,7 +2826,7 @@ msgstr "Prețul"
 #: scaddins/inc/analysis.hrc:820
 msgctxt "ANALYSIS_Yield"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. MA5gf
 #: scaddins/inc/analysis.hrc:821
@@ -2904,7 +2904,7 @@ msgstr "Prețul"
 #: scaddins/inc/analysis.hrc:837
 msgctxt "ANALYSIS_Yielddisc"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. FRLpH
 #: scaddins/inc/analysis.hrc:838
@@ -3210,7 +3210,7 @@ msgstr "Venitul titlului"
 #: scaddins/inc/analysis.hrc:908
 msgctxt "ANALYSIS_Oddfprice"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. ZzgKB
 #: scaddins/inc/analysis.hrc:909
@@ -3324,7 +3324,7 @@ msgstr "Prețul"
 #: scaddins/inc/analysis.hrc:931
 msgctxt "ANALYSIS_Oddfyield"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. hi8zV
 #: scaddins/inc/analysis.hrc:932
@@ -3426,7 +3426,7 @@ msgstr "Venitul titlului"
 #: scaddins/inc/analysis.hrc:952
 msgctxt "ANALYSIS_Oddlprice"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. hzzyo
 #: scaddins/inc/analysis.hrc:953
@@ -3528,7 +3528,7 @@ msgstr "Prețul"
 #: scaddins/inc/analysis.hrc:973
 msgctxt "ANALYSIS_Oddlyield"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. ZibYN
 #: scaddins/inc/analysis.hrc:974
@@ -3690,7 +3690,7 @@ msgstr "Investiția"
 #: scaddins/inc/analysis.hrc:1012
 msgctxt "ANALYSIS_Intrate"
 msgid "Redemption"
-msgstr "Recuperare"
+msgstr "Rambursare"
 
 #. 7xDcc
 #: scaddins/inc/analysis.hrc:1013
@@ -4139,7 +4139,7 @@ msgstr "Calculează numărul de săptămâni dintr-o anumită perioadă"
 #: scaddins/inc/datefunc.hrc:29
 msgctxt "DATE_FUNCDESC_DiffWeeks"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. cP4gN
 #: scaddins/inc/datefunc.hrc:30
@@ -4181,7 +4181,7 @@ msgstr "Determină numărul de luni dintr-o anumită perioadă."
 #: scaddins/inc/datefunc.hrc:40
 msgctxt "DATE_FUNCDESC_DiffMonths"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. joP95
 #: scaddins/inc/datefunc.hrc:41
@@ -4223,7 +4223,7 @@ msgstr "Calculează numărul de ani dintr-o perioadă specifică."
 #: scaddins/inc/datefunc.hrc:51
 msgctxt "DATE_FUNCDESC_DiffYears"
 msgid "Start date"
-msgstr "Data de start"
+msgstr "Dată de început"
 
 #. 86b9L
 #: scaddins/inc/datefunc.hrc:52
@@ -4331,7 +4331,7 @@ msgstr "Orice dată din anul dorit"
 #: scaddins/inc/datefunc.hrc:89
 msgctxt "DATE_FUNCDESC_Rot13"
 msgid "Encrypts or decrypts a text using the ROT13 algorithm"
-msgstr "Codifică sau decodifică un text folosind algoritmul ROT13"
+msgstr "Criptează sau decriptează un text folosind algoritmul ROT13"
 
 #. dZ8dq
 #: scaddins/inc/datefunc.hrc:90
@@ -4343,7 +4343,7 @@ msgstr "Text"
 #: scaddins/inc/datefunc.hrc:91
 msgctxt "DATE_FUNCDESC_Rot13"
 msgid "Text to be encrypted or text already encrypted"
-msgstr "Textul care trebuie codificat sau text deja codificat"
+msgstr "Text de criptat sau text deja criptat"
 
 #. GpdwB
 #: scaddins/inc/pricing.hrc:29

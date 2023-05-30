@@ -26,6 +26,8 @@
 #include "LegendEntryProvider.hxx"
 #include <basegfx/range/b2irectangle.hxx>
 #include <com/sun/star/drawing/Direction3D.hpp>
+#include <rtl/ref.hxx>
+#include <svx/unoshape.hxx>
 
 namespace com::sun::star::awt { struct Point; }
 namespace com::sun::star::chart2 { class XChartType; }
@@ -47,6 +49,7 @@ namespace com::sun::star {
 
 namespace chart {
 
+class ChartType;
 class NumberFormatterWrapper;
 
 class AxesNumberFormats
@@ -88,7 +91,7 @@ public:
 
     void calculateYMinAndMaxForCategory( sal_Int32 nCategoryIndex
                                             , bool bSeparateStackingForDifferentSigns
-                                            , double& rfMinimumY, double& rfMaximumY, sal_Int32 nAxisIndex );
+                                            , double& rfMinimumY, double& rfMaximumY, sal_Int32 nAxisIndex ) const;
     void calculateYMinAndMaxForCategoryRange( sal_Int32 nStartCategoryIndex, sal_Int32 nEndCategoryIndex
                                                 , bool bSeparateStackingForDifferentSigns
                                                 , double& rfMinimumY, double& rfMaximumY, sal_Int32 nAxisIndex );
@@ -184,8 +187,7 @@ public:
             const css::awt::Size& rEntryKeyAspectRatio,
             css::chart2::LegendPosition eLegendPosition,
             const css::uno::Reference< css::beans::XPropertySet >& xTextProperties,
-            const css::uno::Reference< css::drawing::XShapes >& xTarget,
-            const css::uno::Reference< css::lang::XMultiServiceFactory >& xShapeFactory,
+            const rtl::Reference<SvxShapeGroupAnyD>& xTarget,
             const css::uno::Reference< css::uno::XComponentContext >& xContext,
             ChartModel& rModel
                 ) override;
@@ -195,46 +197,41 @@ public:
 
     virtual css::uno::Any getExplicitSymbol( const VDataSeries& rSeries, sal_Int32 nPointIndex/*-1 for series symbol*/ );
 
-    css::uno::Reference< css::drawing::XShape > createLegendSymbolForSeries(
+    rtl::Reference<SvxShapeGroup> createLegendSymbolForSeries(
                   const css::awt::Size& rEntryKeyAspectRatio
                 , const VDataSeries& rSeries
-                , const css::uno::Reference< css::drawing::XShapes >& xTarget
-                , const css::uno::Reference< css::lang::XMultiServiceFactory >& xShapeFactory );
+                , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
-    css::uno::Reference< css::drawing::XShape > createLegendSymbolForPoint(
+    rtl::Reference< SvxShapeGroup > createLegendSymbolForPoint(
                   const css::awt::Size& rEntryKeyAspectRatio
                 , const VDataSeries& rSeries
                 , sal_Int32 nPointIndex
-                , const css::uno::Reference< css::drawing::XShapes >& xTarget
-                , const css::uno::Reference< css::lang::XMultiServiceFactory >& xShapeFactory );
+                , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
     std::vector< ViewLegendEntry > createLegendEntriesForSeries(
             const css::awt::Size& rEntryKeyAspectRatio,
             const VDataSeries& rSeries,
             const css::uno::Reference< css::beans::XPropertySet >& xTextProperties,
-            const css::uno::Reference< css::drawing::XShapes >& xTarget,
-            const css::uno::Reference< css::lang::XMultiServiceFactory >& xShapeFactory,
+            const rtl::Reference<SvxShapeGroupAnyD>& xTarget,
             const css::uno::Reference< css::uno::XComponentContext >& xContext
                 );
 
     std::vector<ViewLegendSymbol> createSymbols(
               const css::awt::Size& rEntryKeyAspectRatio
-            , const css::uno::Reference<css::drawing::XShapes>& xTarget
-            , const css::uno::Reference<css::lang::XMultiServiceFactory>& xShapeFactory
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget
             , const css::uno::Reference<css::uno::XComponentContext>& xContext);
 
     std::vector<ViewLegendSymbol> createSymbolsForSeries(
               const css::awt::Size& rEntryKeyAspectRatio
             , const VDataSeries& rSeries
-            , const css::uno::Reference<css::drawing::XShapes>& xTarget
-            , const css::uno::Reference<css::lang::XMultiServiceFactory>& xShapeFactory
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget
             , const css::uno::Reference<css::uno::XComponentContext>& xContext);
 
     std::vector<VDataSeries*> getAllSeries();
     std::vector<VDataSeries const*> getAllSeries() const;
 
     // This method creates a series plotter of the requested type; e.g. : return new PieChart...
-    static VSeriesPlotter* createSeriesPlotter( const css::uno::Reference< css::chart2::XChartType >& xChartTypeModel
+    static VSeriesPlotter* createSeriesPlotter( const rtl::Reference< ::chart::ChartType >& xChartTypeModel
                                 , sal_Int32 nDimensionCount
                                 , bool bExcludingPositioning /*for pie and donut charts labels and exploded segments are excluded from the given size*/);
 
@@ -251,7 +248,7 @@ public:
     ExplicitCategoriesProvider* getExplicitCategoriesProvider() { return m_pExplicitCategoriesProvider; }
 
     //get series names for the z axis labels
-    css::uno::Sequence< OUString > getSeriesNames() const;
+    css::uno::Sequence<OUString> getSeriesNames() const;
 
     //get all series names
     css::uno::Sequence<OUString> getAllSeriesNames() const;
@@ -280,35 +277,35 @@ public:
 
 protected:
 
-    VSeriesPlotter( const css::uno::Reference< css::chart2::XChartType >& xChartTypeModel
+    VSeriesPlotter( rtl::Reference< ::chart::ChartType > xChartTypeModel
                 , sal_Int32 nDimensionCount
                 , bool bCategoryXAxis=true );
 
     // Methods for group shapes.
 
-    css::uno::Reference< css::drawing::XShapes >
+    rtl::Reference<SvxShapeGroupAnyD>
         getSeriesGroupShape( VDataSeries* pDataSeries
-            , const css:: uno::Reference< css::drawing::XShapes >& xTarget );
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
     //the following group shapes will be created as children of SeriesGroupShape on demand
     //they can be used to assure that some parts of a series shape are always in front of others (e.g. symbols in front of lines)
     //parameter xTarget will be used as parent for the series group shape
-    css::uno::Reference< css::drawing::XShapes >
+    rtl::Reference<SvxShapeGroupAnyD>
         getSeriesGroupShapeFrontChild( VDataSeries* pDataSeries
-            , const css:: uno::Reference< css::drawing::XShapes >& xTarget );
-    css::uno::Reference< css::drawing::XShapes >
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
+    rtl::Reference<SvxShapeGroupAnyD>
         getSeriesGroupShapeBackChild( VDataSeries* pDataSeries
-            , const css:: uno::Reference< css::drawing::XShapes >& xTarget );
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
     /// This method creates a 2D group shape for containing all text shapes
     /// needed for this series; the group is added to the text target;
-    css::uno::Reference< css::drawing::XShapes >
+    static rtl::Reference<SvxShapeGroup>
         getLabelsGroupShape( VDataSeries& rDataSeries
-            , const css:: uno::Reference< css::drawing::XShapes >& xTarget );
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
-    css::uno::Reference< css::drawing::XShapes >
+    rtl::Reference<SvxShapeGroupAnyD>
         getErrorBarsGroupShape( VDataSeries& rDataSeries
-            , const css:: uno::Reference< css::drawing::XShapes >& xTarget, bool bYError );
+            , const rtl::Reference<SvxShapeGroupAnyD>& xTarget, bool bYError );
 
     /** This method creates a text shape for a label related to a data point
      *  and append it to the root text shape group (xTarget).
@@ -335,8 +332,8 @@ protected:
      *  @return
      *      a reference to the created text shape.
      */
-    css::uno::Reference< css::drawing::XShape >
-        createDataLabel( const css::uno::Reference< css::drawing::XShapes >& xTarget
+    rtl::Reference<SvxShapeText>
+        createDataLabel( const rtl::Reference<SvxShapeGroupAnyD>& xTarget
                 , VDataSeries& rDataSeries
                 , sal_Int32 nPointIndex
                 , double fValue
@@ -364,7 +361,7 @@ protected:
             for y-error bars this is true, for x-error-bars it is false.
      */
     void createErrorBar(
-          const css::uno::Reference< css::drawing::XShapes >& xTarget
+          const rtl::Reference<SvxShapeGroupAnyD>& xTarget
         , const css::drawing::Position3D & rPos
         , const css::uno::Reference< css::beans::XPropertySet > & xErrorBarProperties
         , const VDataSeries& rVDataSeries
@@ -377,42 +374,36 @@ protected:
           const css::drawing::Position3D& rUnscaledLogicPosition
         , VDataSeries& rVDataSeries
         , sal_Int32 nIndex
-        , const css::uno::Reference< css::drawing::XShapes >& rTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& rTarget
         , bool bUseXErrorData
         , bool bUseYErrorData
     );
 
-    void addErrorBorder(
+    static void addErrorBorder(
           const css::drawing::Position3D& rPos0
         , const css::drawing::Position3D& rPos1
-        , const css::uno::Reference< css::drawing::XShapes >& rTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& rTarget
         , const css::uno::Reference< css::beans::XPropertySet >& rErrorBorderProp );
 
     void createErrorBar_X( const css::drawing::Position3D& rUnscaledLogicPosition
         , VDataSeries& rVDataSeries, sal_Int32 nPointIndex
-        , const css::uno::Reference< css::drawing::XShapes >& xTarget );
+        , const rtl::Reference<SvxShapeGroupAnyD>& xTarget );
 
     void createErrorBar_Y( const css::drawing::Position3D& rUnscaledLogicPosition
         , VDataSeries& rVDataSeries, sal_Int32 nPointIndex
-        , const css::uno::Reference< css::drawing::XShapes >& xTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& xTarget
         , double const * pfScaledLogicX );
 
     void createRegressionCurvesShapes( VDataSeries const & rVDataSeries
-        , const css::uno::Reference< css::drawing::XShapes >& xTarget
-        , const css::uno::Reference< css::drawing::XShapes >& xEquationTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& xTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& xEquationTarget
         , bool bMaySkipPointsInRegressionCalculation );
 
     void createRegressionCurveEquationShapes( const OUString & rEquationCID
         , const css::uno::Reference< css::beans::XPropertySet > & xEquationProperties
-        , const css::uno::Reference< css::drawing::XShapes >& xEquationTarget
+        , const rtl::Reference<SvxShapeGroupAnyD>& xEquationTarget
         , const css::uno::Reference< css::chart2::XRegressionCurveCalculator > & xRegressionCurveCalculator
         , css::awt::Point aDefaultPos );
-
-    static void setMappedProperties(
-          const css::uno::Reference< css::drawing::XShape >& xTarget
-        , const css::uno::Reference< css::beans::XPropertySet >& xSource
-        , const tPropertyNameMap& rMap
-        , tPropertyNameValueMap const * pOverwriteMap=nullptr );
 
     virtual PlottingPositionHelper& getPlottingPositionHelper( sal_Int32 nAxisIndex ) const;//nAxisIndex indicates whether the position belongs to the main axis ( nAxisIndex==0 ) or secondary axis ( nAxisIndex==1 )
 
@@ -423,8 +414,7 @@ protected:
 protected:
     PlottingPositionHelper*    m_pMainPosHelper;
 
-    css::uno::Reference< css::chart2::XChartType >    m_xChartTypeModel;
-    css::uno::Reference< css::beans::XPropertySet >   m_xChartTypeModelProps;
+    rtl::Reference< ::chart::ChartType > m_xChartTypeModel;
 
     std::vector< std::vector< VDataSeriesGroup > >  m_aZSlots;
 

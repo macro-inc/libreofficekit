@@ -47,19 +47,31 @@
 #include <unotools/charclass.hxx>
 #include <charfmt.hxx>
 #include <docary.hxx>
+#include <fmtanchr.hxx>
 #include <redline.hxx>
 #include <calbck.hxx>
 #include <doc.hxx>
 #include <swscanner.hxx>
 #include <txatbase.hxx>
-#include <calc.hxx>
 #include <IDocumentRedlineAccess.hxx>
 #include <IDocumentSettingAccess.hxx>
 #include <IDocumentContentOperations.hxx>
-#include <IDocumentFieldsAccess.hxx>
 #include <IMark.hxx>
 #include <sortedobjs.hxx>
-#include <dcontact.hxx>
+#include <com/sun/star/frame/XModel.hpp>
+#include <com/sun/star/text/XBookmarksSupplier.hpp>
+#include <officecfg/Office/Common.hxx>
+#include <comphelper/processfactory.hxx>
+#include <docsh.hxx>
+#include <unobookmark.hxx>
+#include <unocrsrhelper.hxx>
+#include <vcl/kernarray.hxx>
+#include <com/sun/star/rdf/Statement.hpp>
+#include <com/sun/star/rdf/URI.hpp>
+#include <com/sun/star/rdf/URIs.hpp>
+#include <com/sun/star/rdf/XDocumentMetadataAccess.hpp>
+#include <com/sun/star/rdf/XLiteral.hpp>
+#include <com/sun/star/text/XTextContent.hpp>
 
 using namespace ::com::sun::star;
 using namespace i18n::ScriptType;
@@ -67,6 +79,34 @@ using namespace i18n::ScriptType;
 #include <unicode/ubidi.h>
 #include <i18nutil/scripttypedetector.hxx>
 #include <i18nutil/unicode.hxx>
+
+/*
+   https://www.khtt.net/en/page/1821/the-big-kashida-secret
+
+   the rules of priorities that govern the addition of kashidas in Arabic text
+   made ... for ... Explorer 5.5 browser.
+
+   The kashida justification is based on a connection priority scheme that
+   decides where kashidas are put automatically.
+
+   This is how the software decides on kashida-inserting priorities:
+   1. First it looks for characters with the highest priority in each word,
+   which means kashida-extensions will only been used in one position in each
+   word. Not more.
+   2. The kashida will be connected to the character with the highest priority.
+   3. If kashida connection opportunities are found with an equal level of
+   priority in one word, the kashida will be placed towards the end of the
+   word.
+
+   The priority list of characters and the positioning is as follows:
+   1. after a kashida that is manually placed in the text by the user,
+   2. after a Seen or Sad (initial and medial form),
+   3. before the final form of Taa Marbutah, Haa, Dal,
+   4. before the final form of Alef, Tah Lam, Kaf and Gaf,
+   5. before the preceding medial Baa of Ra, Ya and Alef Maqsurah,
+   6. before the final form of Waw, Ain, Qaf and Fa,
+   7. before the final form of other characters that can be connected.
+*/
 
 #define IS_JOINING_GROUP(c, g) ( u_getIntPropertyValue( (c), UCHAR_JOINING_GROUP ) == U_JG_##g )
 #define isAinChar(c)        IS_JOINING_GROUP((c), AIN)
@@ -92,7 +132,7 @@ using namespace i18n::ScriptType;
 #define isWawChar(c)        IS_JOINING_GROUP((c), WAW)
 #define isSeenOrSadChar(c)  (IS_JOINING_GROUP((c), SAD) || IS_JOINING_GROUP((c), SEEN))
 
-// Beh and charters that behave like Beh in medial form.
+// Beh and characters that behave like Beh in medial form.
 static bool isBehChar(sal_Unicode cCh)
 {
     bool bRet = false;
@@ -117,7 +157,7 @@ static bool isBehChar(sal_Unicode cCh)
     return bRet;
 }
 
-// Yeh and charters that behave like Yeh in final form.
+// Yeh and characters that behave like Yeh in final form.
 static bool isYehChar(sal_Unicode cCh)
 {
     bool bRet = false;
@@ -315,20 +355,25 @@ void SwLineLayout::CreateSpaceAdd( const tools::Long nInit )
     SetLLSpaceAdd( nInit, 0 );
 }
 
-// Returns true if there are only blanks in [nStt, nEnd[
+// #i3952# Returns true if there are only blanks in [nStt, nEnd[
+// Used to implement IgnoreTabsAndBlanksForLineCalculation compat flag
 static bool lcl_HasOnlyBlanks(std::u16string_view rText, TextFrameIndex nStt, TextFrameIndex nEnd)
 {
-    bool bBlankOnly = true;
     while ( nStt < nEnd )
     {
-        const sal_Unicode cChar = rText[ sal_Int32(nStt++) ];
-        if ( ' ' != cChar && CH_FULL_BLANK != cChar && CH_SIX_PER_EM != cChar )
+        switch (rText[sal_Int32(nStt++)])
         {
-            bBlankOnly = false;
-            break;
+        case 0x0020: // SPACE
+        case 0x2002: // EN SPACE
+        case 0x2003: // EM SPACE
+        case 0x2005: // FOUR-PER-EM SPACE
+        case 0x3000: // IDEOGRAPHIC SPACE
+            continue;
+        default:
+            return false;
         }
     }
-    return bBlankOnly;
+    return true;
 }
 
 // Swapped out from FormatLine()
@@ -390,6 +435,7 @@ void SwLineLayout::CalcLine( SwTextFormatter &rLine, SwTextFormatInfo &rInf )
 
                 // Null portions are eliminated. They can form if two FlyFrames
                 // overlap.
+                // coverity[deref_arg] - "Cut" means next "GetNextPortion" returns a different Portion
                 if( !pPos->Compress() )
                 {
                     // Only take over Height and Ascent if the rest of the line
@@ -612,14 +658,16 @@ void SwLineLayout::CalcLine( SwTextFormatter &rLine, SwTextFormatInfo &rInf )
         }
     }
 
-    // #i3952#
+    // #i3952# Whitespace does not increase line height
     if ( bHasBlankPortion && bHasOnlyBlankPortions )
     {
         sal_uInt16 nTmpAscent = GetAscent();
         sal_uInt16 nTmpHeight = Height();
         rLine.GetAttrHandler().GetDefaultAscentAndHeight( rInf.GetVsh(), *rInf.GetOut(), nTmpAscent, nTmpHeight );
-        SetAscent( nTmpAscent );
-        Height( nTmpHeight, false );
+        if (nTmpAscent < GetAscent() || GetAscent() <= 0)
+            SetAscent(nTmpAscent);
+        if (nTmpHeight < Height() || Height() <= 0)
+            Height(nTmpHeight, false);
     }
 
     // Robust:
@@ -770,20 +818,12 @@ void SwLineLayout::MaxAscentDescent( SwTwips& _orAscent,
     }
 }
 
-void SwLineLayout::dumpAsXml(xmlTextWriterPtr pWriter) const
+void SwLineLayout::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                             TextFrameIndex& nOffset) const
 {
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwLineLayout"));
-    (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("height"),
-                                      BAD_CAST(OString::number(Height()).getStr()));
-
-    const SwLinePortion* pFirstPor = GetFirstPortion();
-    pFirstPor->SwLinePortion::dumpAsXml(pWriter);
-    for (const SwLinePortion* pPor = pFirstPor->GetNextPortion(); pPor;
-         pPor = pPor->GetNextPortion())
-    {
-        pPor->dumpAsXml(pWriter);
-    }
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
 
     (void)xmlTextWriterEndElement(pWriter);
 }
@@ -869,19 +909,64 @@ SwFontScript SwScriptInfo::WhichFont(sal_Int32 nIdx, OUString const& rText)
     return lcl_ScriptToFont(nScript);
 }
 
+static Color getBookmarkColor(const SwTextNode& rNode, const sw::mark::IBookmark* pBookmark)
+{
+    // search custom color in metadata, otherwise use COL_TRANSPARENT;
+    Color c = COL_TRANSPARENT;
+
+    try
+    {
+        SwDoc& rDoc = const_cast<SwDoc&>(rNode.GetDoc());
+        const uno::Reference< text::XTextContent > xRef = SwXBookmark::CreateXBookmark(rDoc,
+                const_cast<sw::mark::IMark*>(static_cast<const sw::mark::IMark*>(pBookmark)));
+        const css::uno::Reference<css::rdf::XResource> xSubject(xRef, uno::UNO_QUERY);
+        uno::Reference<frame::XModel> xModel = rDoc.GetDocShell()->GetBaseModel();
+
+        static uno::Reference< uno::XComponentContext > xContext(
+            ::comphelper::getProcessComponentContext());
+
+        static uno::Reference< rdf::XURI > xODF_SHADING(
+            rdf::URI::createKnown(xContext, rdf::URIs::LO_EXT_SHADING), uno::UNO_SET_THROW);
+
+        uno::Reference<rdf::XDocumentMetadataAccess> xDocumentMetadataAccess(
+            rDoc.GetDocShell()->GetBaseModel(), uno::UNO_QUERY);
+        const uno::Reference<rdf::XRepository>& xRepository =
+            xDocumentMetadataAccess->getRDFRepository();
+        const uno::Reference<container::XEnumeration> xEnum(
+            xRepository->getStatements(xSubject, xODF_SHADING, nullptr), uno::UNO_SET_THROW);
+
+        rdf::Statement stmt;
+        if ( xEnum->hasMoreElements() && (xEnum->nextElement() >>= stmt) )
+        {
+            const uno::Reference<rdf::XLiteral> xObject(stmt.Object, uno::UNO_QUERY);
+            if ( xObject.is() )
+                c = Color::STRtoRGB(xObject->getValue());
+        }
+    }
+    catch (const lang::IllegalArgumentException&)
+    {
+    }
+
+    return c;
+}
+
 static void InitBookmarks(
     std::optional<std::vector<sw::Extent>::const_iterator> oPrevIter,
     std::vector<sw::Extent>::const_iterator iter,
     std::vector<sw::Extent>::const_iterator const end,
     TextFrameIndex nOffset,
     std::vector<std::pair<sw::mark::IBookmark const*, SwScriptInfo::MarkKind>> & rBookmarks,
-    std::vector<std::pair<TextFrameIndex, SwScriptInfo::MarkKind>> & o_rBookmarks)
+    std::vector<std::tuple<TextFrameIndex, SwScriptInfo::MarkKind, Color, OUString>> & o_rBookmarks)
 {
     SwTextNode const*const pNode(iter->pNode);
     for (auto const& it : rBookmarks)
     {
         assert(iter->pNode == pNode || pNode->GetIndex() < iter->pNode->GetIndex());
         assert(!oPrevIter || (*oPrevIter)->pNode->GetIndex() <= pNode->GetIndex());
+
+        // search for custom bookmark boundary mark color
+        Color c = getBookmarkColor(*pNode, it.first);
+
         switch (it.second)
         {
             case SwScriptInfo::MarkKind::Start:
@@ -897,39 +982,39 @@ static void InitBookmarks(
                 // assume "no" because the line break it contains isn't deleted.
                 SwPosition const& rStart(it.first->GetMarkStart());
                 SwPosition const& rEnd(it.first->GetMarkEnd());
-                assert(&rStart.nNode.GetNode() == pNode);
+                assert(&rStart.GetNode() == pNode);
                 while (iter != end)
                 {
-                    if (&rStart.nNode.GetNode() != iter->pNode // iter moved to next node
-                        || rStart.nContent.GetIndex() < iter->nStart)
+                    if (&rStart.GetNode() != iter->pNode // iter moved to next node
+                        || rStart.GetContentIndex() < iter->nStart)
                     {
-                        if (rEnd.nNode.GetIndex() < iter->pNode->GetIndex()
-                            || (&rEnd.nNode.GetNode() == iter->pNode && rEnd.nContent.GetIndex() <= iter->nStart))
+                        if (rEnd.GetNodeIndex() < iter->pNode->GetIndex()
+                            || (&rEnd.GetNode() == iter->pNode && rEnd.GetContentIndex() <= iter->nStart))
                         {
                             break; // deleted - skip it
                         }
                         else
                         {
-                            o_rBookmarks.emplace_back(nOffset, it.second);
+                            o_rBookmarks.emplace_back(nOffset, it.second, c, it.first->GetName());
                             break;
                         }
                     }
-                    else if (rStart.nContent.GetIndex() <= iter->nEnd)
+                    else if (rStart.GetContentIndex() <= iter->nEnd)
                     {
                         auto const iterNext(iter + 1);
-                        if (rStart.nContent.GetIndex() == iter->nEnd
+                        if (rStart.GetContentIndex() == iter->nEnd
                             && (iterNext == end
-                                ?   &rEnd.nNode.GetNode() == iter->pNode
-                                :  (rEnd.nNode.GetIndex() < iterNext->pNode->GetIndex()
-                                    || (&rEnd.nNode.GetNode() == iterNext->pNode && rEnd.nContent.GetIndex() < iterNext->nStart))))
+                                ?   &rEnd.GetNode() == iter->pNode
+                                :  (rEnd.GetNodeIndex() < iterNext->pNode->GetIndex()
+                                    || (&rEnd.GetNode() == iterNext->pNode && rEnd.GetContentIndex() < iterNext->nStart))))
                         {
                             break; // deleted - skip it
                         }
                         else
                         {
                             o_rBookmarks.emplace_back(
-                                nOffset + TextFrameIndex(rStart.nContent.GetIndex() - iter->nStart),
-                                it.second);
+                                nOffset + TextFrameIndex(rStart.GetContentIndex() - iter->nStart),
+                                it.second, c, it.first->GetName());
                             break;
                         }
                     }
@@ -942,13 +1027,13 @@ static void InitBookmarks(
                 }
                 if (iter == end)
                 {
-                    if (pNode->GetIndex() < rEnd.nNode.GetIndex()) // pNode is last node of merged
+                    if (pNode->GetIndex() < rEnd.GetNodeIndex()) // pNode is last node of merged
                     {
                         break; // deleted - skip it
                     }
                     else
                     {
-                        o_rBookmarks.emplace_back(nOffset, it.second);
+                        o_rBookmarks.emplace_back(nOffset, it.second, c, it.first->GetName());
                     }
                 }
                 break;
@@ -956,36 +1041,36 @@ static void InitBookmarks(
             case SwScriptInfo::MarkKind::End:
             {
                 SwPosition const& rEnd(it.first->GetMarkEnd());
-                assert(&rEnd.nNode.GetNode() == pNode);
+                assert(&rEnd.GetNode() == pNode);
                 while (true)
                 {
                     if (iter == end
-                        || &rEnd.nNode.GetNode() != iter->pNode // iter moved to next node
-                        || rEnd.nContent.GetIndex() <= iter->nStart)
+                        || &rEnd.GetNode() != iter->pNode // iter moved to next node
+                        || rEnd.GetContentIndex() <= iter->nStart)
                     {
                         SwPosition const& rStart(it.first->GetMarkStart());
                         // oPrevIter may point to pNode or a preceding node
                         if (oPrevIter
-                            ? ((*oPrevIter)->pNode->GetIndex() < rStart.nNode.GetIndex()
-                                || ((*oPrevIter)->pNode == &rStart.nNode.GetNode()
-                                    && ((iter != end && &rEnd.nNode.GetNode() == iter->pNode && rEnd.nContent.GetIndex() == iter->nStart)
-                                        ? (*oPrevIter)->nEnd < rStart.nContent.GetIndex()
-                                        : (*oPrevIter)->nEnd <= rStart.nContent.GetIndex())))
-                            : rStart.nNode == rEnd.nNode)
+                            ? ((*oPrevIter)->pNode->GetIndex() < rStart.GetNodeIndex()
+                                || ((*oPrevIter)->pNode == &rStart.GetNode()
+                                    && ((iter != end && &rEnd.GetNode() == iter->pNode && rEnd.GetContentIndex() == iter->nStart)
+                                        ? (*oPrevIter)->nEnd < rStart.GetContentIndex()
+                                        : (*oPrevIter)->nEnd <= rStart.GetContentIndex())))
+                            : rStart.GetNode() == rEnd.GetNode())
                         {
                             break; // deleted - skip it
                         }
                         else
                         {
-                            o_rBookmarks.emplace_back(nOffset, it.second);
+                            o_rBookmarks.emplace_back(nOffset, it.second, c, it.first->GetName());
                             break;
                         }
                     }
-                    else if (rEnd.nContent.GetIndex() <= iter->nEnd)
+                    else if (rEnd.GetContentIndex() <= iter->nEnd)
                     {
                         o_rBookmarks.emplace_back(
-                            nOffset + TextFrameIndex(rEnd.nContent.GetIndex() - iter->nStart),
-                            it.second);
+                            nOffset + TextFrameIndex(rEnd.GetContentIndex() - iter->nStart),
+                            it.second, c, it.first->GetName());
                         break;
                     }
                     else
@@ -1000,26 +1085,26 @@ static void InitBookmarks(
             case SwScriptInfo::MarkKind::Point:
             {
                 SwPosition const& rPos(it.first->GetMarkPos());
-                assert(&rPos.nNode.GetNode() == pNode);
+                assert(&rPos.GetNode() == pNode);
                 while (iter != end)
                 {
-                    if (&rPos.nNode.GetNode() != iter->pNode // iter moved to next node
-                        || rPos.nContent.GetIndex() < iter->nStart)
+                    if (&rPos.GetNode() != iter->pNode // iter moved to next node
+                        || rPos.GetContentIndex() < iter->nStart)
                     {
                         break; // deleted - skip it
                     }
-                    else if (rPos.nContent.GetIndex() <= iter->nEnd)
+                    else if (rPos.GetContentIndex() <= iter->nEnd)
                     {
-                        if (rPos.nContent.GetIndex() == iter->nEnd
-                            && rPos.nContent.GetIndex() != iter->pNode->Len())
+                        if (rPos.GetContentIndex() == iter->nEnd
+                            && rPos.GetContentIndex() != iter->pNode->Len())
                         {
                             break; // deleted - skip it
                         }
                         else
                         {
                             o_rBookmarks.emplace_back(
-                                nOffset + TextFrameIndex(rPos.nContent.GetIndex() - iter->nStart),
-                                it.second);
+                                nOffset + TextFrameIndex(rPos.GetContentIndex() - iter->nStart),
+                                it.second, c, it.first->GetName());
                         }
                         break;
                     }
@@ -1156,16 +1241,28 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
 
         for (auto const& it : bookmarks)
         {
+            // don't show __RefHeading__ bookmarks, which are hidden in Navigator, too
+            // (They are inserted automatically e.g. with the ToC at the beginning of
+            // the headings)
+            if (it.first->GetName().startsWith(
+                                    IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix()))
+            {
+                continue;
+            }
+
+            // search for custom bookmark boundary mark color
+            Color c = getBookmarkColor(rNode, it.first);
+
             switch (it.second)
             {
                 case MarkKind::Start:
-                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkStart().nContent.GetIndex()), it.second);
+                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkStart().GetContentIndex()), it.second, c, it.first->GetName());
                     break;
                 case MarkKind::End:
-                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkEnd().nContent.GetIndex()), it.second);
+                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkEnd().GetContentIndex()), it.second, c, it.first->GetName());
                     break;
                 case MarkKind::Point:
-                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkPos().nContent.GetIndex()), it.second);
+                    m_Bookmarks.emplace_back(TextFrameIndex(it.first->GetMarkPos().GetContentIndex()), it.second, c, it.first->GetName());
                     break;
             }
         }
@@ -1175,7 +1272,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
         {
             const Range& rRange = aHiddenMulti.GetRange( i );
             const sal_Int32 nStart = rRange.Min();
-            const sal_Int32 nEnd = rRange.Max() + 1;
+            const sal_Int32 nEnd = rRange.Max() + (rText.isEmpty() ? 0 : 1);
 
             m_HiddenChg.push_back( TextFrameIndex(nStart) );
             m_HiddenChg.push_back( TextFrameIndex(nEnd) );
@@ -1482,7 +1579,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                 [&rNode](sal_Int32 const nBegin, sal_uInt16 const script, bool const bNoChar)
                     { return rNode.GetLang(nBegin, bNoChar ? 0 : 1, script); });
             auto pGetLangOfChar(pMerged ? pGetLangOfCharM : pGetLangOfChar1);
-            SwScanner aScanner( pGetLangOfChar, rText, nullptr, ModelToViewHelper(),
+            SwScanner aScanner( std::move(pGetLangOfChar), rText, nullptr, ModelToViewHelper(),
                                 i18n::WordType::DICTIONARY_WORD,
                                 sal_Int32(nLastKashida), sal_Int32(nChg));
 
@@ -1491,10 +1588,9 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
             {
                 const OUString& rWord = aScanner.GetWord();
 
-                sal_Int32 nIdx = 0;
+                sal_Int32 nIdx = 0, nPrevIdx = 0;
                 sal_Int32 nKashidaPos = -1;
-                sal_Unicode cCh;
-                sal_Unicode cPrevCh = 0;
+                sal_Unicode cCh, cPrevCh = 0;
 
                 int nPriorityLevel = 7;    // 0..6 = level found
                                            // 7 not found
@@ -1542,7 +1638,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                             // check if character is connectable to previous character,
                             if ( lcl_ConnectToPrev( cCh, cPrevCh ) )
                             {
-                                nKashidaPos = aScanner.GetBegin() + nIdx - 1;
+                                nKashidaPos = aScanner.GetBegin() + nPrevIdx;
                                 nPriorityLevel = 2;
                             }
                         }
@@ -1563,7 +1659,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                             // check if character is connectable to previous character,
                             if ( lcl_ConnectToPrev( cCh, cPrevCh ) )
                             {
-                                nKashidaPos = aScanner.GetBegin() + nIdx - 1;
+                                nKashidaPos = aScanner.GetBegin() + nPrevIdx;
                                 nPriorityLevel = 3;
                             }
                         }
@@ -1583,7 +1679,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                                 // check if character is connectable to previous character,
                                 if ( lcl_ConnectToPrev( cCh, cPrevCh ) )
                                 {
-                                    nKashidaPos = aScanner.GetBegin() + nIdx - 1;
+                                    nKashidaPos = aScanner.GetBegin() + nPrevIdx;
                                     nPriorityLevel = 4;
                                 }
                             }
@@ -1605,7 +1701,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                             // check if character is connectable to previous character,
                             if ( lcl_ConnectToPrev( cCh, cPrevCh ) )
                             {
-                                nKashidaPos = aScanner.GetBegin() + nIdx - 1;
+                                nKashidaPos = aScanner.GetBegin() + nPrevIdx;
                                 nPriorityLevel = 5;
                             }
                         }
@@ -1621,7 +1717,7 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                             // check if character is connectable to previous character,
                             if ( lcl_ConnectToPrev( cCh, cPrevCh ) )
                             {
-                                nKashidaPos = aScanner.GetBegin() + nIdx - 1;
+                                nKashidaPos = aScanner.GetBegin() + nPrevIdx;
                                 nPriorityLevel = 6;
                             }
                         }
@@ -1630,7 +1726,10 @@ void SwScriptInfo::InitScriptInfo(const SwTextNode& rNode,
                     // Do not consider vowel marks when checking if a character
                     // can be connected to previous character.
                     if ( !isTransparentChar ( cCh) )
+                    {
                         cPrevCh = cCh;
+                        nPrevIdx = nIdx;
+                    }
 
                     ++nIdx;
                 } // end of current word
@@ -1852,29 +1951,47 @@ TextFrameIndex SwScriptInfo::NextBookmark(TextFrameIndex const nPos) const
 {
     for (auto const& it : m_Bookmarks)
     {
-        if (nPos < it.first)
+        if (nPos < std::get<0>(it))
         {
-            return it.first;
+            return std::get<0>(it);
         }
     }
     return TextFrameIndex(COMPLETE_STRING);
 }
 
-auto SwScriptInfo::GetBookmark(TextFrameIndex const nPos) const -> MarkKind
+std::vector<std::tuple<SwScriptInfo::MarkKind, Color, OUString>>
+                                    SwScriptInfo::GetBookmarks(TextFrameIndex const nPos)
 {
-    MarkKind ret{0};
+    std::vector<std::tuple<SwScriptInfo::MarkKind, Color, OUString>> aColors;
     for (auto const& it : m_Bookmarks)
     {
-        if (nPos == it.first)
+        if (nPos == std::get<0>(it))
         {
-            ret |= it.second;
+            const OUString& sName = std::get<3>(it);
+            // filter hidden bookmarks imported from OOXML
+            // TODO import them as hidden bookmarks
+            if ( !( sName.startsWith("_Toc") || sName.startsWith("_Ref") ) )
+                aColors.push_back(std::tuple<MarkKind, Color,
+                                    OUString>(std::get<1>(it), std::get<2>(it), std::get<3>(it)));
         }
-        else if (nPos < it.first)
+        else if (nPos < std::get<0>(it))
         {
             break;
         }
     }
-    return ret;
+
+    // sort bookmark boundary marks at the same position
+    // mark order: ] | [
+    // color order: [c1 [c2 [c3 ... c3] c2] c1]
+    sort(aColors.begin(), aColors.end(),
+                 [](std::tuple<MarkKind, Color, OUString> const a, std::tuple<MarkKind, Color, OUString> const b) {
+         return (MarkKind::End == std::get<0>(a) && MarkKind::End != std::get<0>(b)) ||
+             (MarkKind::Point == std::get<0>(a) && MarkKind::Start == std::get<0>(b)) ||
+             // if both are end or start, order by color
+             (MarkKind::End == std::get<0>(a) && MarkKind::End == std::get<0>(b) && std::get<1>(a) < std::get<1>(b)) ||
+             (MarkKind::Start == std::get<0>(a) && MarkKind::Start == std::get<0>(b) && std::get<1>(b) < std::get<1>(a));});
+
+    return aColors;
 }
 
 // Takes a string and replaced the hidden ranges with cChar.
@@ -2095,7 +2212,7 @@ size_t SwScriptInfo::HasKana(TextFrameIndex const nStart, TextFrameIndex const n
     return SAL_MAX_SIZE;
 }
 
-tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, TextFrameIndex nLen,
+tools::Long SwScriptInfo::Compress(KernArray& rKernArray, TextFrameIndex nIdx, TextFrameIndex nLen,
                              const sal_uInt16 nCompress, const sal_uInt16 nFontHeight,
                              bool bCenter,
                              Point* pPoint ) const
@@ -2131,7 +2248,7 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
         return 0;
 
     tools::Long nSub = 0;
-    tools::Long nLast = nI ? pKernArray[ nI - 1 ] : 0;
+    tools::Long nLast = nI ? rKernArray[ nI - 1 ] : 0;
     do
     {
         const CompType nType = GetCompType( nCompIdx );
@@ -2143,7 +2260,7 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
             nCompLen = nLen;
 
         // are we allowed to compress the character?
-        if ( pKernArray[ nI ] - nLast < nMinWidth )
+        if ( rKernArray[ nI ] - nLast < nMinWidth )
         {
             nIdx++; nI++;
         }
@@ -2154,7 +2271,7 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
                 SAL_WARN_IF( SwScriptInfo::NONE == nType, "sw.core", "None compression?!" );
 
                 // nLast is width of current character
-                nLast -= pKernArray[ nI ];
+                nLast -= rKernArray[ nI ];
 
                 nLast *= nCompress;
                 tools::Long nMove = 0;
@@ -2177,10 +2294,11 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
                 else
                     nLast /= 100000;
                 nSub -= nLast;
-                nLast = pKernArray[ nI ];
+                nLast = rKernArray[ nI ];
                 if( nI && nMove )
-                    pKernArray[ nI - 1 ] += nMove;
-                pKernArray[ nI++ ] -= nSub;
+                    rKernArray.adjust(nI - 1, nMove);
+                rKernArray.adjust(nI, -nSub);
+                ++nI;
                 ++nIdx;
             }
         }
@@ -2199,8 +2317,9 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
 
         while( nIdx < nTmpChg )
         {
-            nLast = pKernArray[ nI ];
-            pKernArray[ nI++ ] -= nSub;
+            nLast = rKernArray[ nI ];
+            rKernArray.adjust(nI, -nSub);
+            ++nI;
             ++nIdx;
         }
     } while( nIdx < nLen );
@@ -2212,7 +2331,8 @@ tools::Long SwScriptInfo::Compress(sal_Int32* pKernArray, TextFrameIndex nIdx, T
 // total number of kashida positions, or the number of kashida positions after some positions
 // have been dropped, depending on the state of the m_KashidaInvalid set.
 
-sal_Int32 SwScriptInfo::KashidaJustify( sal_Int32* pKernArray,
+sal_Int32 SwScriptInfo::KashidaJustify( KernArray* pKernArray,
+                                        sal_Bool* pKashidaArray,
                                         TextFrameIndex const nStt,
                                         TextFrameIndex const nLen,
                                         tools::Long nSpaceAdd ) const
@@ -2268,6 +2388,11 @@ sal_Int32 SwScriptInfo::KashidaJustify( sal_Int32* pKernArray,
         {
             TextFrameIndex nArrayPos = nIdx - nStt;
 
+            // mark Kashida insertion positions, code in VCL will use this
+            // array to know where to insert Kashida.
+            if (pKashidaArray)
+                pKashidaArray[sal_Int32(nArrayPos)] = true;
+
             // next kashida position
             ++nCntKash;
             while (nCntKash < nCntKashEnd && !IsKashidaValid(nCntKash))
@@ -2281,7 +2406,7 @@ sal_Int32 SwScriptInfo::KashidaJustify( sal_Int32* pKernArray,
 
             while ( nArrayPos < nArrayEnd )
             {
-                pKernArray[ sal_Int32(nArrayPos) ] += nKashAdd;
+                pKernArray->adjust(sal_Int32(nArrayPos), nKashAdd);
                 ++nArrayPos;
             }
             nKashAdd += nSpaceAdd;
@@ -2468,13 +2593,13 @@ void SwScriptInfo::MarkKashidasInvalid(sal_Int32 const nCnt,
     }
 }
 
-TextFrameIndex SwScriptInfo::ThaiJustify( const OUString& rText, sal_Int32* pKernArray,
+TextFrameIndex SwScriptInfo::ThaiJustify( std::u16string_view aText, KernArray* pKernArray,
                                      TextFrameIndex const nStt,
                                      TextFrameIndex const nLen,
                                      TextFrameIndex nNumberOfBlanks,
                                      tools::Long nSpaceAdd )
 {
-    SAL_WARN_IF( nStt + nLen > TextFrameIndex(rText.getLength()), "sw.core", "String in ThaiJustify too small" );
+    SAL_WARN_IF( nStt + nLen > TextFrameIndex(aText.size()), "sw.core", "String in ThaiJustify too small" );
 
     SwTwips nNumOfTwipsToDistribute = nSpaceAdd * sal_Int32(nNumberOfBlanks) /
                                       SPACING_PRECISION_FACTOR;
@@ -2484,7 +2609,7 @@ TextFrameIndex SwScriptInfo::ThaiJustify( const OUString& rText, sal_Int32* pKer
 
     for (sal_Int32 nI = 0; nI < sal_Int32(nLen); ++nI)
     {
-        const sal_Unicode cCh = rText[sal_Int32(nStt) + nI];
+        const sal_Unicode cCh = aText[sal_Int32(nStt) + nI];
 
         // check if character is not above or below base
         if ( ( 0xE34 > cCh || cCh > 0xE3A ) &&
@@ -2500,7 +2625,8 @@ TextFrameIndex SwScriptInfo::ThaiJustify( const OUString& rText, sal_Int32* pKer
             ++nCnt;
         }
 
-        if ( pKernArray ) pKernArray[ nI ] += nSpaceSum;
+        if (pKernArray)
+            pKernArray->adjust(nI, nSpaceSum);
     }
 
     return nCnt;
@@ -2574,16 +2700,12 @@ const SwDropPortion *SwParaPortion::FindDropPortion() const
     return nullptr;
 }
 
-void SwParaPortion::dumpAsXml(xmlTextWriterPtr pWriter) const
+void SwParaPortion::dumpAsXml(xmlTextWriterPtr pWriter, const OUString& rText,
+                              TextFrameIndex& nOffset) const
 {
     (void)xmlTextWriterStartElement(pWriter, BAD_CAST("SwParaPortion"));
-    (void)xmlTextWriterWriteFormatAttribute(pWriter, BAD_CAST("ptr"), "%p", this);
-
-    SwLineLayout::dumpAsXml(pWriter);
-    for (const SwLineLayout* pLine = GetNext(); pLine; pLine = pLine->GetNext())
-    {
-        pLine->dumpAsXml(pWriter);
-    }
+    dumpAsXmlAttributes(pWriter, rText, nOffset);
+    nOffset += GetLen();
 
     (void)xmlTextWriterEndElement(pWriter);
 }
@@ -2651,9 +2773,8 @@ void SwScriptInfo::selectHiddenTextProperty(const SwTextNode& rNode,
     assert((rNode.GetText().isEmpty() && rHiddenMulti.GetTotalRange().Len() == 1)
         || (rNode.GetText().getLength() == rHiddenMulti.GetTotalRange().Len()));
 
-    const SfxPoolItem* pItem = nullptr;
-    if( SfxItemState::SET == rNode.GetSwAttrSet().GetItemState( RES_CHRATR_HIDDEN, true, &pItem ) &&
-        static_cast<const SvxCharHiddenItem*>(pItem)->GetValue() )
+    const SvxCharHiddenItem* pItem = rNode.GetSwAttrSet().GetItemIfSet( RES_CHRATR_HIDDEN );
+    if( pItem && pItem->GetValue() )
     {
         rHiddenMulti.SelectAll();
     }
@@ -2679,7 +2800,7 @@ void SwScriptInfo::selectHiddenTextProperty(const SwTextNode& rNode,
         }
     }
 
-    for (const SwIndex* pIndex = rNode.GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
+    for (const SwContentIndex* pIndex = rNode.GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
     {
         const sw::mark::IMark* pMark = pIndex->GetMark();
         const sw::mark::IBookmark* pBookmark = dynamic_cast<const sw::mark::IBookmark*>(pMark);
@@ -2705,8 +2826,8 @@ void SwScriptInfo::selectHiddenTextProperty(const SwTextNode& rNode,
         {
             // intersect bookmark range with textnode range and add the intersection to rHiddenMulti
 
-            const sal_Int32 nSt =  pBookmark->GetMarkStart().nContent.GetIndex();
-            const sal_Int32 nEnd = pBookmark->GetMarkEnd().nContent.GetIndex();
+            const sal_Int32 nSt =  pBookmark->GetMarkStart().GetContentIndex();
+            const sal_Int32 nEnd = pBookmark->GetMarkEnd().GetContentIndex();
 
             if( nEnd > nSt )
             {
@@ -2732,7 +2853,7 @@ void SwScriptInfo::selectRedLineDeleted(const SwTextNode& rNode, MultiSelection 
     {
         const SwRangeRedline* pRed = rIDRA.GetRedlineTable()[ nAct ];
 
-        if (pRed->Start()->nNode > rNode.GetIndex())
+        if (pRed->Start()->GetNode() > rNode)
             break;
 
         if (pRed->GetType() != RedlineType::Delete)
@@ -2800,12 +2921,12 @@ TextFrameIndex SwScriptInfo::CountCJKCharacters(const OUString &rText,
     return nCount;
 }
 
-void SwScriptInfo::CJKJustify( const OUString& rText, sal_Int32* pKernArray,
+void SwScriptInfo::CJKJustify( const OUString& rText, KernArray& rKernArray,
                                      TextFrameIndex const nStt,
                                      TextFrameIndex const nLen, LanguageType aLang,
                                      tools::Long nSpaceAdd, bool bIsSpaceStop )
 {
-    assert( pKernArray != nullptr && sal_Int32(nStt) >= 0 );
+    assert( sal_Int32(nStt) >= 0 );
     if (sal_Int32(nLen) <= 0)
         return;
 
@@ -2823,7 +2944,7 @@ void SwScriptInfo::CJKJustify( const OUString& rText, sal_Int32* pKernArray,
             if (nNext < sal_Int32(nStt + nLen) || !bIsSpaceStop)
                 nSpaceSum += nSpaceAdd;
         }
-        pKernArray[ nI ] += nSpaceSum;
+        rKernArray.adjust(nI, nSpaceSum);
     }
 }
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -17,13 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-
-/**************************************************************************
-                                TODO
- **************************************************************************
-
- *************************************************************************/
-
 #include <vector>
 #include <com/sun/star/beans/Property.hpp>
 #include <com/sun/star/beans/XPropertyAccess.hpp>
@@ -33,11 +26,9 @@
 #include <com/sun/star/script/Converter.hpp>
 
 #include <osl/diagnose.h>
-#include <osl/mutex.hxx>
 #include <ucbhelper/propertyvalueset.hxx>
-#include <ucbhelper/macros.hxx>
+#include <o3tl/safeint.hxx>
 #include <o3tl/typed_flags_set.hxx>
-#include <cppuhelper/queryinterface.hxx>
 
 using namespace com::sun::star::beans;
 using namespace com::sun::star::container;
@@ -158,13 +149,13 @@ PropertyValueSet::~PropertyValueSet()
 template <class T, T ucbhelper_impl::PropertyValue::*_member_name_>
 T PropertyValueSet::getValue(PropsSet nTypeName, sal_Int32 columnIndex)
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     T aValue {};   /* default ctor */
 
     m_bWasNull = true;
 
-    if ( ( columnIndex < 1 ) || ( columnIndex > sal_Int32( m_pValues->size() ) ) )
+    if ( ( columnIndex < 1 ) || ( o3tl::make_unsigned(columnIndex) > m_pValues->size() ) )
     {
         OSL_FAIL( "PropertyValueSet - index out of range!" );
         return aValue;
@@ -352,14 +343,14 @@ Any SAL_CALL PropertyValueSet::getObject(
                                     sal_Int32 columnIndex,
                                          const Reference< XNameAccess >& )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     Any aValue;
 
     m_bWasNull = true;
 
     if ( ( columnIndex < 1 )
-         || ( columnIndex > sal_Int32( m_pValues->size() ) ) )
+         || ( o3tl::make_unsigned(columnIndex) > m_pValues->size() ) )
     {
         OSL_FAIL( "PropertyValueSet - index out of range!" );
     }
@@ -510,7 +501,7 @@ Reference< XArray > SAL_CALL PropertyValueSet::getArray( sal_Int32 columnIndex )
 // virtual
 sal_Int32 SAL_CALL PropertyValueSet::findColumn( const OUString& columnName )
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( !columnName.isEmpty() )
     {
@@ -530,7 +521,7 @@ sal_Int32 SAL_CALL PropertyValueSet::findColumn( const OUString& columnName )
 
 const Reference< XTypeConverter >& PropertyValueSet::getTypeConverter()
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     if ( !m_bTriedToGetTypeConverter && !m_xTypeConverter.is() )
     {
@@ -548,7 +539,7 @@ const Reference< XTypeConverter >& PropertyValueSet::getTypeConverter()
 template <class T, T ucbhelper_impl::PropertyValue::*_member_name_>
 void PropertyValueSet::appendValue(const OUString& rPropName, PropsSet nTypeName, const T& rValue)
 {
-    osl::MutexGuard aGuard( m_aMutex );
+    std::unique_lock aGuard( m_aMutex );
 
     ucbhelper_impl::PropertyValue aNewValue;
     aNewValue.sPropertyName = rPropName;

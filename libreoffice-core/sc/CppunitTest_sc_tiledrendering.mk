@@ -31,6 +31,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sc_tiledrendering, \
     sc \
     scfilt \
     scui \
+    subsequenttest \
     test \
     unotest \
     $(call gb_Helper_optional,SCRIPTING, \
@@ -60,5 +61,9 @@ $(eval $(call gb_CppunitTest_use_vcl,sc_tiledrendering))
 $(eval $(call gb_CppunitTest_use_rdb,sc_tiledrendering,services))
 
 $(eval $(call gb_CppunitTest_use_configuration,sc_tiledrendering))
+
+$(eval $(call gb_CppunitTest_add_arguments,sc_tiledrendering, \
+    -env:arg-env=$(gb_Helper_LIBRARY_PATH_VAR)"$$$${$(gb_Helper_LIBRARY_PATH_VAR)+=$$$$$(gb_Helper_LIBRARY_PATH_VAR)}" \
+))
 
 # vim: set noet sw=4 ts=4:

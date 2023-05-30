@@ -20,6 +20,7 @@
 #pragma once
 
 #include <i18nlangtag/lang.h>
+#include <unotools/resmgr.hxx>
 
 #define NC_(Context, String) TranslateId(Context, reinterpret_cast<char const *>(u8##String))
 
@@ -436,7 +437,9 @@ const std::pair<TranslateId, LanguageType> STR_ARR_SVT_LANGUAGE_TABLE[] =
     { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Klingon") , LANGUAGE_USER_KLINGON },
     { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "English (Israel)") , LANGUAGE_USER_ENGLISH_ISRAEL },
     { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Interslavic Latin") , LANGUAGE_USER_INTERSLAVIC_LATIN },
-    { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Interslavic Cyrillic") , LANGUAGE_USER_INTERSLAVIC_CYRILLIC }
+    { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Interslavic Cyrillic") , LANGUAGE_USER_INTERSLAVIC_CYRILLIC },
+    { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Pennsylvania Dutch") , LANGUAGE_USER_PENNSYLVANIA_DUTCH },
+    { NC_("STR_ARR_SVT_LANGUAGE_TABLE", "Portuguese (Mozambique)") , LANGUAGE_USER_PORTUGUESE_MOZAMBIQUE }
 };
 
 

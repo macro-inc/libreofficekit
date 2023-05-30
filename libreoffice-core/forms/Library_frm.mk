@@ -29,7 +29,7 @@ $(eval $(call gb_Library_use_libraries,frm,\
     comphelper \
     cppu \
     cppuhelper \
-    $(call gb_Helper_optional,DBCONNECTIVITY,dbtools) \
+    dbtools \
     editeng \
     i18nlangtag \
     sal \
@@ -53,7 +53,7 @@ $(eval $(call gb_Library_use_externals,frm,\
     libxml2 \
 ))
 
-$(eval $(call gb_Library_set_componentfile,frm,forms/util/frm))
+$(eval $(call gb_Library_set_componentfile,frm,forms/util/frm,services))
 
 $(eval $(call gb_Library_add_exception_objects,frm,\
     forms/source/component/Button \
@@ -106,7 +106,6 @@ $(eval $(call gb_Library_add_exception_objects,frm,\
     forms/source/misc/componenttools \
     forms/source/misc/InterfaceContainer \
     forms/source/misc/limitedformats \
-    forms/source/misc/listenercontainers \
     forms/source/misc/property \
     forms/source/resource/frm_resource \
     forms/source/richtext/attributedispatcher \

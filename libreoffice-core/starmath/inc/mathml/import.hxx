@@ -13,11 +13,11 @@
 #include "element.hxx"
 
 // XML tools
-#include <vcl/errcode.hxx>
+#include <utility>
+#include <comphelper/errcode.hxx>
 #include <xmloff/xmlimp.hxx>
 
 // Extras
-#include <com/sun/star/beans/PropertyAttribute.hpp>
 
 class SfxMedium;
 class SmDocShell;
@@ -40,8 +40,8 @@ public:
 public:
     /** Constructor
      */
-    explicit SmMLImportWrapper(css::uno::Reference<css::frame::XModel> const& rRef)
-        : m_xModel(rRef)
+    explicit SmMLImportWrapper(css::uno::Reference<css::frame::XModel> xRef)
+        : m_xModel(std::move(xRef))
         , m_pDocShell(nullptr)
         , m_pMlImport(nullptr)
     {

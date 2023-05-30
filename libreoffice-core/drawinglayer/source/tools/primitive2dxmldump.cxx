@@ -22,16 +22,19 @@
 #include <drawinglayer/primitive2d/drawinglayer_primitivetypes2d.hxx>
 #include <drawinglayer/primitive2d/Tools.hxx>
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokeArrowPrimitive2D.hxx>
+#include <drawinglayer/primitive2d/PolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonStrokePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/primitive2d/hiddengeometryprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
 #include <drawinglayer/primitive2d/textdecoratedprimitive2d.hxx>
 #include <primitive2d/textlineprimitive2d.hxx>
 #include <drawinglayer/primitive2d/textprimitive2d.hxx>
 #include <drawinglayer/primitive2d/maskprimitive2d.hxx>
 #include <drawinglayer/primitive2d/unifiedtransparenceprimitive2d.hxx>
 #include <drawinglayer/primitive2d/objectinfoprimitive2d.hxx>
+#include <drawinglayer/primitive2d/structuretagprimitive2d.hxx>
 #include <drawinglayer/primitive2d/svggradientprimitive2d.hxx>
 #include <drawinglayer/primitive2d/metafileprimitive2d.hxx>
 #include <drawinglayer/primitive2d/sceneprimitive2d.hxx>
@@ -41,6 +44,7 @@
 
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <basegfx/utils/gradienttools.hxx>
 #include <svx/sdr/primitive2d/svx_primitivetypes2d.hxx>
 #include <toolkit/helper/vclunohelper.hxx>
 
@@ -50,7 +54,6 @@
 #include <drawinglayer/primitive3d/sdrextrudeprimitive3d.hxx>
 #include <drawinglayer/attribute/sdrlightattribute3d.hxx>
 #include <drawinglayer/attribute/sdrfillattribute.hxx>
-#include <drawinglayer/attribute/fillgraphicattribute.hxx>
 #include <drawinglayer/attribute/fillhatchattribute.hxx>
 #include <drawinglayer/attribute/fillgradientattribute.hxx>
 #include <drawinglayer/attribute/sdrfillgraphicattribute.hxx>
@@ -166,8 +169,12 @@ void writeLineAttribute(::tools::XmlWriter& rWriter,
             rWriter.attribute("linejoin", "Bevel");
             break;
         case basegfx::B2DLineJoin::Miter:
+        {
             rWriter.attribute("linejoin", "Miter");
+            rWriter.attribute("miterangle",
+                              basegfx::rad2deg(rLineAttribute.getMiterMinimumAngle()));
             break;
+        }
         case basegfx::B2DLineJoin::Round:
             rWriter.attribute("linejoin", "Round");
             break;
@@ -190,6 +197,7 @@ void writeLineAttribute(::tools::XmlWriter& rWriter,
             rWriter.attribute("linecap", "Unknown");
             break;
     }
+
     rWriter.endElement();
 }
 
@@ -268,22 +276,23 @@ void writeSdrFillAttribute(::tools::XmlWriter& rWriter,
         rWriter.startElement("gradient");
         switch (rGradient.getStyle())
         {
-            case drawinglayer::attribute::GradientStyle::Linear:
+            default: // GradientStyle_MAKE_FIXED_SIZE
+            case css::awt::GradientStyle_LINEAR:
                 rWriter.attribute("style", "Linear");
                 break;
-            case drawinglayer::attribute::GradientStyle::Axial:
+            case css::awt::GradientStyle_AXIAL:
                 rWriter.attribute("style", "Axial");
                 break;
-            case drawinglayer::attribute::GradientStyle::Radial:
+            case css::awt::GradientStyle_RADIAL:
                 rWriter.attribute("style", "Radial");
                 break;
-            case drawinglayer::attribute::GradientStyle::Elliptical:
+            case css::awt::GradientStyle_ELLIPTICAL:
                 rWriter.attribute("style", "Elliptical");
                 break;
-            case drawinglayer::attribute::GradientStyle::Square:
+            case css::awt::GradientStyle_SQUARE:
                 rWriter.attribute("style", "Square");
                 break;
-            case drawinglayer::attribute::GradientStyle::Rect:
+            case css::awt::GradientStyle_RECT:
                 rWriter.attribute("style", "Rect");
                 break;
         }
@@ -292,8 +301,23 @@ void writeSdrFillAttribute(::tools::XmlWriter& rWriter,
         rWriter.attribute("offsetY", rGradient.getOffsetY());
         rWriter.attribute("angle", rGradient.getAngle());
         rWriter.attribute("steps", rGradient.getSteps());
-        rWriter.attribute("startColor", convertColorToString(rGradient.getStartColor()));
-        rWriter.attribute("endColor", convertColorToString(rGradient.getEndColor()));
+
+        auto const& rColorStops(rGradient.getColorStops());
+        for (size_t a(0); a < rColorStops.size(); a++)
+        {
+            if (0 == a)
+                rWriter.attribute("startColor",
+                                  convertColorToString(rColorStops[a].getStopColor()));
+            else if (rColorStops.size() == a + 1)
+                rWriter.attribute("endColor", convertColorToString(rColorStops[a].getStopColor()));
+            else
+            {
+                rWriter.startElement("colorStop");
+                rWriter.attribute("stopOffset", rColorStops[a].getStopOffset());
+                rWriter.attribute("stopColor", convertColorToString(rColorStops[a].getStopColor()));
+                rWriter.endElement();
+            }
+        }
         rWriter.endElement();
     }
 
@@ -642,10 +666,7 @@ void Primitive2dXmlDump::decomposeAndWrite(
 {
     for (size_t i = 0; i < rPrimitive2DSequence.size(); i++)
     {
-        drawinglayer::primitive2d::Primitive2DReference xPrimitive2DReference
-            = rPrimitive2DSequence[i];
-        const BasePrimitive2D* pBasePrimitive
-            = static_cast<const BasePrimitive2D*>(xPrimitive2DReference.get());
+        const BasePrimitive2D* pBasePrimitive = rPrimitive2DSequence[i].get();
         sal_uInt32 nId = pBasePrimitive->getPrimitive2DID();
         if (nId < maFilter.size() && maFilter[nId])
             continue;
@@ -661,7 +682,7 @@ void Primitive2dXmlDump::decomposeAndWrite(
                 rWriter.startElement("bitmap");
                 writeMatrix(rWriter, rBitmapPrimitive2D.getTransform());
 
-                const BitmapEx aBitmapEx(VCLUnoHelper::GetBitmap(rBitmapPrimitive2D.getXBitmap()));
+                const BitmapEx aBitmapEx(rBitmapPrimitive2D.getBitmap());
                 const Size& rSizePixel(aBitmapEx.GetSizePixel());
 
                 rWriter.attribute("height", rSizePixel.getHeight());
@@ -744,6 +765,49 @@ void Primitive2dXmlDump::decomposeAndWrite(
                 rWriter.endElement();
             }
             break;
+
+            case PRIMITIVE2D_ID_POLYGONSTROKEARROWPRIMITIVE2D:
+            {
+                const PolygonStrokeArrowPrimitive2D& rPolygonStrokeArrowPrimitive2D
+                    = dynamic_cast<const PolygonStrokeArrowPrimitive2D&>(*pBasePrimitive);
+                rWriter.startElement("polygonstrokearrow");
+
+                rWriter.startElement("polygon");
+                rWriter.content(basegfx::utils::exportToSvgPoints(
+                    rPolygonStrokeArrowPrimitive2D.getB2DPolygon()));
+                rWriter.endElement();
+
+                if (rPolygonStrokeArrowPrimitive2D.getStart().getB2DPolyPolygon().count())
+                {
+                    rWriter.startElement("linestartattribute");
+                    rWriter.attribute("width",
+                                      rPolygonStrokeArrowPrimitive2D.getStart().getWidth());
+                    rWriter.attribute("centered",
+                                      static_cast<sal_Int32>(
+                                          rPolygonStrokeArrowPrimitive2D.getStart().isCentered()));
+                    writePolyPolygon(rWriter,
+                                     rPolygonStrokeArrowPrimitive2D.getStart().getB2DPolyPolygon());
+                    rWriter.endElement();
+                }
+
+                if (rPolygonStrokeArrowPrimitive2D.getEnd().getB2DPolyPolygon().count())
+                {
+                    rWriter.startElement("lineendattribute");
+                    rWriter.attribute("width", rPolygonStrokeArrowPrimitive2D.getEnd().getWidth());
+                    rWriter.attribute("centered",
+                                      static_cast<sal_Int32>(
+                                          rPolygonStrokeArrowPrimitive2D.getEnd().isCentered()));
+                    writePolyPolygon(rWriter,
+                                     rPolygonStrokeArrowPrimitive2D.getEnd().getB2DPolyPolygon());
+                    rWriter.endElement();
+                }
+
+                writeLineAttribute(rWriter, rPolygonStrokeArrowPrimitive2D.getLineAttribute());
+                writeStrokeAttribute(rWriter, rPolygonStrokeArrowPrimitive2D.getStrokeAttribute());
+                rWriter.endElement();
+            }
+            break;
+
             case PRIMITIVE2D_ID_POLYGONSTROKEPRIMITIVE2D:
             {
                 const PolygonStrokePrimitive2D& rPolygonStrokePrimitive2D
@@ -897,6 +961,19 @@ void Primitive2dXmlDump::decomposeAndWrite(
                 rWriter.startElement("objectinfo");
 
                 decomposeAndWrite(rObjectInfoPrimitive2D.getChildren(), rWriter);
+                rWriter.endElement();
+            }
+            break;
+
+            case PRIMITIVE2D_ID_STRUCTURETAGPRIMITIVE2D:
+            {
+                const StructureTagPrimitive2D& rStructureTagPrimitive2D
+                    = dynamic_cast<const StructureTagPrimitive2D&>(*pBasePrimitive);
+                rWriter.startElement("structuretag");
+                rWriter.attribute("structureelement",
+                                  rStructureTagPrimitive2D.getStructureElement());
+
+                decomposeAndWrite(rStructureTagPrimitive2D.getChildren(), rWriter);
                 rWriter.endElement();
             }
             break;

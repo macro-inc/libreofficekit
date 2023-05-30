@@ -22,6 +22,7 @@
 #include <com/sun/star/sdbc/Deferrability.hpp>
 #include <com/sun/star/lang/XInitialization.hpp>
 #include <comphelper/sequence.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <sal/log.hxx>
 #include <rtl/ustrbuf.hxx>
@@ -160,7 +161,7 @@ sal_Bool SAL_CALL ODatabaseMetaData::supportsNonNullableColumns() { return true;
 
 OUString SAL_CALL ODatabaseMetaData::getCatalogTerm() { return "n/a"; }
 
-OUString SAL_CALL ODatabaseMetaData::getIdentifierQuoteString() { return "\""; }
+OUString SAL_CALL ODatabaseMetaData::getIdentifierQuoteString() { return "`"; }
 
 OUString SAL_CALL ODatabaseMetaData::getExtraNameCharacters() { return "#@"; }
 
@@ -564,7 +565,7 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getTableTypes()
         if (m_rConnection.getMysqlVersion() >= requiredVersion[i])
         {
             rRows.push_back(
-                { { Any(), makeAny(mysqlc_sdbc_driver::convert(table_types[i], encoding)) } });
+                { { Any(), Any(mysqlc_sdbc_driver::convert(table_types[i], encoding)) } });
         }
     }
     lcl_setRows_throw(xResultSet, 5, rRows);
@@ -584,17 +585,17 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getTypeInfo()
     while (mysqlc_types[i].typeName)
     {
         rRows.push_back(
-            { { Any(), makeAny(mysqlc_sdbc_driver::convert(mysqlc_types[i].typeName, encoding)),
-                makeAny(mysqlc_types[i].dataType), makeAny(mysqlc_types[i].precision),
-                makeAny(mysqlc_sdbc_driver::convert(mysqlc_types[i].literalPrefix, encoding)),
-                makeAny(mysqlc_sdbc_driver::convert(mysqlc_types[i].literalSuffix, encoding)),
-                makeAny(mysqlc_sdbc_driver::convert(mysqlc_types[i].createParams, encoding)),
-                makeAny(mysqlc_types[i].nullable), makeAny(mysqlc_types[i].caseSensitive),
-                makeAny(mysqlc_types[i].searchable), makeAny(mysqlc_types[i].isUnsigned),
-                makeAny(mysqlc_types[i].fixedPrecScale), makeAny(mysqlc_types[i].autoIncrement),
-                makeAny(mysqlc_sdbc_driver::convert(mysqlc_types[i].localTypeName, encoding)),
-                makeAny(mysqlc_types[i].minScale), makeAny(mysqlc_types[i].maxScale),
-                makeAny(sal_Int32(0)), makeAny(sal_Int32(0)), makeAny(sal_Int32(10)) } });
+            { { Any(), Any(mysqlc_sdbc_driver::convert(mysqlc_types[i].typeName, encoding)),
+                Any(mysqlc_types[i].dataType), Any(mysqlc_types[i].precision),
+                Any(mysqlc_sdbc_driver::convert(mysqlc_types[i].literalPrefix, encoding)),
+                Any(mysqlc_sdbc_driver::convert(mysqlc_types[i].literalSuffix, encoding)),
+                Any(mysqlc_sdbc_driver::convert(mysqlc_types[i].createParams, encoding)),
+                Any(mysqlc_types[i].nullable), Any(mysqlc_types[i].caseSensitive),
+                Any(mysqlc_types[i].searchable), Any(mysqlc_types[i].isUnsigned),
+                Any(mysqlc_types[i].fixedPrecScale), Any(mysqlc_types[i].autoIncrement),
+                Any(mysqlc_sdbc_driver::convert(mysqlc_types[i].localTypeName, encoding)),
+                Any(mysqlc_types[i].minScale), Any(mysqlc_types[i].maxScale), Any(sal_Int32(0)),
+                Any(sal_Int32(0)), Any(sal_Int32(10)) } });
 
         i++;
     }
@@ -618,14 +619,11 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getSchemas()
                                      UNO_QUERY);
     std::vector<std::vector<Any>> rRows;
 
-    OUString sSql
-        = m_rConnection.getMysqlVersion() > 49999
-              ? OUString{ "SELECT SCHEMA_NAME AS TABLE_SCHEM, CATALOG_NAME AS TABLE_CATALOG "
-                          "FROM INFORMATION_SCHEMA.SCHEMATA ORDER BY SCHEMA_NAME" }
-              : OUString{ "SHOW DATABASES" };
-
     Reference<XStatement> statement = m_rConnection.createStatement();
-    Reference<XInterface> executed = statement->executeQuery(sSql);
+    Reference<XInterface> executed = statement->executeQuery(
+        u"SELECT SCHEMA_NAME AS TABLE_SCHEM, CATALOG_NAME AS TABLE_CATALOG FROM INFORMATION_SCHEMA.SCHEMATA \
+       WHERE SCHEMA_NAME NOT IN ('information_schema', 'mysql', 'performance_schema') \
+       ORDER BY SCHEMA_NAME");
     Reference<XResultSet> rs(executed, UNO_QUERY_THROW);
     Reference<XResultSetMetaDataSupplier> supp(executed, UNO_QUERY_THROW);
     Reference<XResultSetMetaData> rs_meta = supp->getMetaData();
@@ -635,20 +633,12 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getSchemas()
     while (rs->next())
     {
         std::vector<Any> aRow{ Any() };
-        bool informationSchema = false;
         for (sal_uInt32 i = 1; i <= columns; i++)
         {
             OUString columnStringValue = xRow->getString(i);
-            if (i == 1)
-            { // TABLE_SCHEM
-                informationSchema = columnStringValue.equalsIgnoreAsciiCase("information_schema");
-            }
-            aRow.push_back(makeAny(columnStringValue));
+            aRow.push_back(Any(columnStringValue));
         }
-        if (!informationSchema)
-        {
-            rRows.push_back(aRow);
-        }
+        rRows.push_back(aRow);
     }
 
     lcl_setRows_throw(xResultSet, 1, rRows);
@@ -743,25 +733,25 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getColumns(const Any& /*catalo
         std::vector<Any> aRow{ Any() }; // 0. element is unused
 
         // catalog name
-        aRow.push_back(makeAny(xRow->getString(1)));
+        aRow.push_back(Any(xRow->getString(1)));
         // schema name
-        aRow.push_back(makeAny(xRow->getString(2)));
+        aRow.push_back(Any(xRow->getString(2)));
         // table name
-        aRow.push_back(makeAny(xRow->getString(3)));
+        aRow.push_back(Any(xRow->getString(3)));
         // column name
-        aRow.push_back(makeAny(xRow->getString(4)));
+        aRow.push_back(Any(xRow->getString(4)));
         // data type
         OUString sDataType = xRow->getString(5);
-        aRow.push_back(makeAny(mysqlc_sdbc_driver::mysqlStrToOOOType(sDataType)));
+        aRow.push_back(Any(mysqlc_sdbc_driver::mysqlStrToOOOType(sDataType)));
         // type name
-        aRow.push_back(makeAny(sDataType)); // TODO
+        aRow.push_back(Any(sDataType)); // TODO
         // column size
         sal_Int32 nColumnSize = 0;
         OUString sColumnType = xRow->getString(14);
         sal_Int32 nCharMaxLen = xRow->getShort(6);
         bool bIsCharMax = !xRow->wasNull();
         if (sDataType.equalsIgnoreAsciiCase("year"))
-            nColumnSize = sColumnType.copy(6, 1).toInt32(); // 'year(' length is 5
+            nColumnSize = o3tl::toInt32(sColumnType.subView(6, 1)); // 'year(' length is 5
         else if (sDataType.equalsIgnoreAsciiCase("date"))
             nColumnSize = 10;
         else if (sDataType.equalsIgnoreAsciiCase("time"))
@@ -773,34 +763,34 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getColumns(const Any& /*catalo
             nColumnSize = xRow->getShort(7); // numeric precision
         else
             nColumnSize = nCharMaxLen;
-        aRow.push_back(makeAny(nColumnSize));
+        aRow.push_back(Any(nColumnSize));
         aRow.push_back(Any()); // buffer length - unused
         // decimal digits (scale)
-        aRow.push_back(makeAny(xRow->getShort(8)));
+        aRow.push_back(Any(xRow->getShort(8)));
         // num_prec_radix
-        aRow.push_back(makeAny(sal_Int32(10)));
+        aRow.push_back(Any(sal_Int32(10)));
         // nullable
         OUString sIsNullable = xRow->getString(13);
         if (xRow->wasNull())
-            aRow.push_back(makeAny(ColumnValue::NULLABLE_UNKNOWN));
+            aRow.push_back(Any(ColumnValue::NULLABLE_UNKNOWN));
         else if (sIsNullable.equalsIgnoreAsciiCase("YES"))
-            aRow.push_back(makeAny(ColumnValue::NULLABLE));
+            aRow.push_back(Any(ColumnValue::NULLABLE));
         else
-            aRow.push_back(makeAny(ColumnValue::NO_NULLS));
+            aRow.push_back(Any(ColumnValue::NO_NULLS));
         // remarks
-        aRow.push_back(makeAny(xRow->getString(9)));
+        aRow.push_back(Any(xRow->getString(9)));
         // default
-        aRow.push_back(makeAny(xRow->getString(10)));
+        aRow.push_back(Any(xRow->getString(10)));
 
         aRow.push_back(Any{}); // sql_data_type - unused
         aRow.push_back(Any{}); // sql_datetime_sub - unused
 
         // character octet length
-        aRow.push_back(makeAny(xRow->getString(11)));
+        aRow.push_back(Any(xRow->getString(11)));
         // ordinal position
-        aRow.push_back(makeAny(xRow->getString(12)));
+        aRow.push_back(Any(xRow->getString(12)));
         // is nullable
-        aRow.push_back(makeAny(sIsNullable));
+        aRow.push_back(Any(sIsNullable));
         aRows.push_back(aRow);
     }
     lcl_setRows_throw(xResultSet, 1, aRows);
@@ -816,7 +806,8 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getTables(const Any& /*catalog
         "SELECT TABLE_CATALOG AS TABLE_CAT, TABLE_SCHEMA AS TABLE_SCHEM, TABLE_NAME,"
         "IF(STRCMP(TABLE_TYPE,'BASE TABLE'), TABLE_TYPE, 'TABLE') AS TABLE_TYPE, TABLE_COMMENT AS "
         "REMARKS "
-        "FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA  LIKE '?' AND TABLE_NAME LIKE '?' "
+        "FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA NOT IN ('information_schema', 'mysql', "
+        "'performance_schema') AND TABLE_SCHEMA LIKE '?' AND TABLE_NAME LIKE '?' "
     };
 
     if (types.getLength() == 1)
@@ -938,34 +929,34 @@ Reference<XResultSet> SAL_CALL ODatabaseMetaData::getImportedKeys(const Any& /*c
         std::vector<Any> aRow{ Any() }; // 0. element is unused
 
         // primary key catalog
-        aRow.push_back(makeAny(xRow->getString(3)));
+        aRow.push_back(Any(xRow->getString(3)));
         // primary key schema
-        aRow.push_back(makeAny(xRow->getString(4)));
+        aRow.push_back(Any(xRow->getString(4)));
         // primary key table
-        aRow.push_back(makeAny(xRow->getString(5)));
+        aRow.push_back(Any(xRow->getString(5)));
         // primary column name
-        aRow.push_back(makeAny(xRow->getString(6)));
+        aRow.push_back(Any(xRow->getString(6)));
 
         // fk table catalog
-        aRow.push_back(makeAny(xRow->getString(1)));
+        aRow.push_back(Any(xRow->getString(1)));
         // fk schema
-        aRow.push_back(makeAny(xRow->getString(11)));
+        aRow.push_back(Any(xRow->getString(11)));
         // fk table
-        aRow.push_back(makeAny(xRow->getString(10)));
+        aRow.push_back(Any(xRow->getString(10)));
         // fk column name
-        aRow.push_back(makeAny(xRow->getString(2)));
+        aRow.push_back(Any(xRow->getString(2)));
         // KEY_SEQ
-        aRow.push_back(makeAny(sal_Int32{ 0 })); // TODO
+        aRow.push_back(Any(sal_Int32{ 0 })); // TODO
         // update rule
-        aRow.push_back(makeAny(xRow->getShort(7)));
+        aRow.push_back(Any(xRow->getShort(7)));
         // delete rule
-        aRow.push_back(makeAny(xRow->getShort(8)));
+        aRow.push_back(Any(xRow->getShort(8)));
         // foreign key name
-        aRow.push_back(makeAny(xRow->getString(9)));
+        aRow.push_back(Any(xRow->getString(9)));
         // primary key name
-        aRow.push_back(makeAny(OUString{})); // TODO
+        aRow.push_back(Any(OUString{})); // TODO
         // deferrability
-        aRow.push_back(makeAny(Deferrability::NONE));
+        aRow.push_back(Any(Deferrability::NONE));
         aRows.push_back(aRow);
     }
     lcl_setRows_throw(xResultSet, 1, aRows);

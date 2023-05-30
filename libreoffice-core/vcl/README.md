@@ -45,9 +45,6 @@ VCL provides a graphical toolkit similar to gtk+, Qt, SWING etc.
 		+ generic/
 			+ raw X11 support
 
-		+ plugadapt/
-			+ pluggable framework to select correct unx backend
-
 		+ dtrans/
 			+ "data transfer" - clipboard handling
 			+ http://stackoverflow.com/questions/3261379/getting-html-source-or-rich-text-from-the-x-clipboard
@@ -58,9 +55,7 @@ VCL provides a graphical toolkit similar to gtk+, Qt, SWING etc.
 + How the platform abstraction works
 
 	+ InitVCL calls 'CreateSalInstance'
-		+ this is implemented by the compiled-in platform backend
-		+ it stores various bits of global state in the
-		  'SalData' (inc/saldatabasic.hxx) structure but:
+		+ this is implemented by the compiled platform backends
 	+ the SalInstance vtable is the primary outward facing gateway
 	  API for platform backends
 		+ It is a factory for:
@@ -74,6 +69,17 @@ developed by StarDivision. Nowadays it is not used by anything except
 LibreOffice (and OpenOffice).
 
 "svp" stands for "StarView Plugin".
+
+## SalData implementations
+
+Each backend must provide an implementation of the SalData class. There is no
+defined interface, so feel free to implement whatever suits your platform.
+
+If your platform does font handling based on Freetype and Fontconfig, it's
+highly recommended to use GenericUnixSalData as the base class; there isn't
+really much *nix stuff in it.
+
+Currently Windows, iOS and MacOSX have independent SalData implementations.
 
 ## COM Threading
 

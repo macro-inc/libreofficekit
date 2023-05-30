@@ -34,11 +34,14 @@ namespace
     /// returns NULL if no restrictions apply
     const SwStartNode* lcl_FindUnoCursorSection( const SwNode& rNode )
     {
-        const SwStartNode* pStartNode = rNode.StartOfSectionNode();
+        const SwStartNode* pStartNode = rNode.IsStartNode() ? rNode.GetStartNode() : rNode.StartOfSectionNode();
         while( ( pStartNode != nullptr ) &&
                ( pStartNode->StartOfSectionNode() != pStartNode ) &&
-               ( pStartNode->GetStartNodeType() == SwNormalStartNode ) )
+               // section node is only start node allowing overlapped delete
+               pStartNode->IsSectionNode() )
+        {
             pStartNode = pStartNode->StartOfSectionNode();
+        }
 
         return pStartNode;
     }
@@ -73,13 +76,14 @@ namespace
         const sal_Int32 nCntIdx)
     {
         for(int nb = 0; nb < 2; ++nb)
-            if(&(pPam->GetBound(bool(nb)).nNode.GetNode()) == pOldNode)
+        {
+            SwPosition & rPos = pPam->GetBound(bool(nb));
+            if(&rPos.GetNode() == pOldNode)
             {
-                pPam->GetBound(bool(nb)).nNode = rNewPos.nNode;
-                pPam->GetBound(bool(nb)).nContent.Assign(
-                    const_cast<SwIndexReg*>(rNewPos.nContent.GetIdxReg()),
-                    nCntIdx + pPam->GetBound(bool(nb)).nContent.GetIndex());
+                rPos.Assign(rNewPos.GetNode(), SwNodeOffset(0),
+                            nCntIdx + rPos.GetContentIndex());
             }
+        }
     }
 }
 
@@ -89,10 +93,9 @@ void PaMCorrAbs( const SwPaM& rRange,
     SwPosition const aStart( *rRange.Start() );
     SwPosition const aEnd( *rRange.End() );
     SwPosition const aNewPos( rNewPos );
-    SwDoc& rDoc = aStart.nNode.GetNode().GetDoc();
-    SwCursorShell *const pShell = rDoc.GetEditShell();
+    SwDoc& rDoc = aStart.GetNode().GetDoc();
 
-    if( pShell )
+    if (SwCursorShell *const pShell = rDoc.GetEditShell())
     {
         for(const SwViewShell& rShell : pShell->GetRingContainer())
         {
@@ -134,9 +137,9 @@ void PaMCorrAbs( const SwPaM& rRange,
         // section
         bool const bLeaveSection =
             pUnoCursor->IsRemainInSection() &&
-            ( lcl_FindUnoCursorSection( aNewPos.nNode.GetNode() ) !=
+            ( lcl_FindUnoCursorSection( aNewPos.GetNode() ) !=
                 lcl_FindUnoCursorSection(
-                    pUnoCursor->GetPoint()->nNode.GetNode() ) );
+                    pUnoCursor->GetPoint()->GetNode() ) );
 
         for(SwPaM& rPaM : pUnoCursor->GetRingContainer())
         {
@@ -165,16 +168,16 @@ void PaMCorrAbs( const SwPaM& rRange,
     }
 }
 
-void SwDoc::CorrAbs(const SwNodeIndex& rOldNode,
+void SwDoc::CorrAbs(const SwNode& rOldNode,
     const SwPosition& rNewPos,
     const sal_Int32 nOffset,
     bool bMoveCursor)
 {
-    SwContentNode *const pContentNode( rOldNode.GetNode().GetContentNode() );
+    const SwContentNode *const pContentNode( rOldNode.GetContentNode() );
     SwPaM const aPam(rOldNode, 0,
                      rOldNode, pContentNode ? pContentNode->Len() : 0);
     SwPosition aNewPos(rNewPos);
-    aNewPos.nContent += nOffset;
+    aNewPos.AdjustContent(nOffset);
 
     getIDocumentMarkAccess()->correctMarksAbsolute(rOldNode, rNewPos, nOffset);
     // fix redlines
@@ -212,10 +215,10 @@ void SwDoc::CorrAbs(
     const SwPosition& rNewPos,
     bool bMoveCursor )
 {
-    SwPosition aStart(*rRange.Start());
-    SwPosition aEnd(*rRange.End());
+    const SwPosition& aStart(*rRange.Start());
+    const SwPosition& aEnd(*rRange.End());
 
-    DelBookmarks( aStart.nNode, aEnd.nNode, nullptr, &aStart.nContent, &aEnd.nContent );
+    DelBookmarks( aStart.GetNode(), aEnd.GetNode(), nullptr, aStart.GetContentIndex(), aEnd.GetContentIndex() );
 
     if(bMoveCursor)
         ::PaMCorrAbs(rRange, rNewPos);
@@ -227,7 +230,7 @@ void SwDoc::CorrAbs(
     const SwPosition& rNewPos,
     bool bMoveCursor )
 {
-    DelBookmarks( rStartNode, rEndNode );
+    DelBookmarks( rStartNode.GetNode(), rEndNode.GetNode() );
 
     if(bMoveCursor)
     {
@@ -238,18 +241,17 @@ void SwDoc::CorrAbs(
     }
 }
 
-void PaMCorrRel( const SwNodeIndex &rOldNode,
+void PaMCorrRel( const SwNode &rOldNode,
                  const SwPosition &rNewPos,
                  const sal_Int32 nOffset )
 {
-    const SwNode* pOldNode = &rOldNode.GetNode();
+    const SwNode* pOldNode = &rOldNode;
     SwPosition aNewPos( rNewPos );
     const SwDoc& rDoc = pOldNode->GetDoc();
 
-    const sal_Int32 nCntIdx = rNewPos.nContent.GetIndex() + nOffset;
+    const sal_Int32 nCntIdx = rNewPos.GetContentIndex() + nOffset;
 
-    SwCursorShell const* pShell = rDoc.GetEditShell();
-    if( pShell )
+    if (SwCursorShell const* pShell = rDoc.GetEditShell())
     {
         for(const SwViewShell& rShell : pShell->GetRingContainer())
         {
@@ -302,7 +304,7 @@ void PaMCorrRel( const SwNodeIndex &rOldNode,
     }
 }
 
-void SwDoc::CorrRel(const SwNodeIndex& rOldNode,
+void SwDoc::CorrRel(const SwNode& rOldNode,
     const SwPosition& rNewPos,
     const sal_Int32 nOffset,
     bool bMoveCursor)
@@ -315,7 +317,7 @@ void SwDoc::CorrRel(const SwNodeIndex& rOldNode,
         for(SwRangeRedline* p : rTable)
         {
             // lies on the position ??
-            lcl_PaMCorrRel1( p, &rOldNode.GetNode(), aNewPos, aNewPos.nContent.GetIndex() + nOffset );
+            lcl_PaMCorrRel1( p, &rOldNode, aNewPos, aNewPos.GetContentIndex() + nOffset );
         }
 
         // To-Do - need to add here 'SwExtraRedlineTable' also ?

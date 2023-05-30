@@ -22,11 +22,10 @@
 
 #include <sal/config.h>
 
-#include <iosfwd>
 #include <vector>
 
-#include "common.hxx"
 #include "export.hxx"
+#include "po.hxx"
 
 #define LNG_OK              0x0000
 #define LNG_COULD_NOT_OPEN  0x0001
@@ -45,18 +44,18 @@ private:
     OString sSource;
     std::vector<OString> aLanguages;
 
-    static bool isNextGroup(OString &sGroup_out, const OString &sLine_in);
-    static void ReadLine(const OString &rLine_in,
+    static bool isNextGroup(OString &sGroup_out, std::string_view sLine_in);
+    static void ReadLine(std::string_view rLine_in,
         OStringHashMap &rText_inout);
     static void WritePO(PoOfstream &aPOStream, OStringHashMap &rText_inout,
         const OString &rActFileName, const OString &rID);
 public:
-    LngParser(const OString &rLngFile);
+    LngParser(OString sLngFile);
     ~LngParser();
 
     void CreatePO( const OString &rPOFile );
     void Merge(const OString &rPOFile, const OString &rDestinationFile,
-         const OString &rLanguage );
+         std::string_view rLanguage );
 };
 
 #endif // INCLUDED_L10NTOOLS_INC_LNGMERGE_HXX

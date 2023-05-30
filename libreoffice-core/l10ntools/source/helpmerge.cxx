@@ -20,21 +20,15 @@
 #include <sal/config.h>
 
 #include <fstream>
-#include <functional>
-#include <memory>
 
-#include <osl/file.hxx>
 #include <sal/log.hxx>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <helpmerge.hxx>
-#include <algorithm>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <iostream>
+#include <utility>
 #include <vector>
-#include <rtl/strbuf.hxx>
+
 #ifdef _WIN32
 #if !defined WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
@@ -73,8 +67,8 @@ void HelpParser::Dump(LangHashMap* rElem_in,const OString & sKey_in)
 }
 #endif
 
-HelpParser::HelpParser( const OString &rHelpFile )
-        : sHelpFile( rHelpFile )
+HelpParser::HelpParser( OString _sHelpFile )
+        : sHelpFile(std::move( _sHelpFile ))
           {};
 
 /*****************************************************************************/

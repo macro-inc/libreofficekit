@@ -230,7 +230,6 @@ public:
     void                GroupSelected();
 #if HAVE_FEATURE_SCRIPTING
     void                SelectMacro(const SfxMacroInfoItem*);
-    void                SelectMacro(std::u16string_view, const OUString&);
 #endif
     void                SetStylesInfo(SfxStylesInfo_Impl* pStyles);
 };
@@ -264,6 +263,8 @@ public:
 
     OUString    GetScriptURL() const;
     void        SetRunLabel();
+    void        SaveLastUsedMacro();
+    void        LoadLastUsedMacro();
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

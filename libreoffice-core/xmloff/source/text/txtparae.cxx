@@ -32,6 +32,7 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/XPropertyState.hpp>
+#include <com/sun/star/beans/UnknownPropertyException.hpp>
 #include <com/sun/star/graphic/XGraphic.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
 #include <com/sun/star/text/XTextSectionsSupplier.hpp>
@@ -181,6 +182,7 @@ constexpr OUStringLiteral gsVisitedCharStyleName(u"VisitedCharStyleName");
 constexpr OUStringLiteral gsWidth(u"Width");
 constexpr OUStringLiteral gsWidthType( u"WidthType"  );
 constexpr OUStringLiteral gsTextFieldStart( u"TextFieldStart"  );
+constexpr OUStringLiteral gsTextFieldSep(u"TextFieldSeparator");
 constexpr OUStringLiteral gsTextFieldEnd( u"TextFieldEnd"  );
 constexpr OUStringLiteral gsTextFieldStartEnd( u"TextFieldStartEnd"  );
 
@@ -279,6 +281,148 @@ namespace
 
             void ExportParameter(const OUString& sKey, const OUString& sValue);
     };
+
+    struct HyperlinkData
+    {
+        OUString href, name, targetFrame, ustyleName, vstyleName;
+        bool serverMap = false;
+        css::uno::Reference<css::container::XNameReplace> events;
+
+        HyperlinkData() = default;
+        HyperlinkData(const css::uno::Reference<css::beans::XPropertySet>& rPropSet);
+
+        bool operator==(const HyperlinkData&);
+        bool operator!=(const HyperlinkData& rOther) { return !operator==(rOther); }
+
+        bool addHyperlinkAttributes(SvXMLExport& rExport);
+        void exportEvents(SvXMLExport& rExport);
+    };
+
+    HyperlinkData::HyperlinkData(const css::uno::Reference<css::beans::XPropertySet>& rPropSet)
+    {
+        const css::uno::Reference<css::beans::XPropertyState> xPropState(rPropSet, UNO_QUERY);
+        const auto xPropSetInfo(rPropSet->getPropertySetInfo());
+        if (xPropSetInfo->hasPropertyByName(gsHyperLinkURL)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE == xPropState->getPropertyState(gsHyperLinkURL)))
+        {
+            rPropSet->getPropertyValue(gsHyperLinkURL) >>= href;
+        }
+
+        if (href.isEmpty())
+            return;
+
+        if (xPropSetInfo->hasPropertyByName(gsHyperLinkName)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE == xPropState->getPropertyState(gsHyperLinkName)))
+        {
+            rPropSet->getPropertyValue(gsHyperLinkName) >>= name;
+        }
+
+        if (xPropSetInfo->hasPropertyByName(gsHyperLinkTarget)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE == xPropState->getPropertyState(gsHyperLinkTarget)))
+        {
+            rPropSet->getPropertyValue(gsHyperLinkTarget) >>= targetFrame;
+        }
+
+        if (xPropSetInfo->hasPropertyByName(gsServerMap)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE == xPropState->getPropertyState(gsServerMap)))
+        {
+            serverMap = *o3tl::doAccess<bool>(rPropSet->getPropertyValue(gsServerMap));
+        }
+
+        if (xPropSetInfo->hasPropertyByName(gsUnvisitedCharStyleName)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE
+                       == xPropState->getPropertyState(gsUnvisitedCharStyleName)))
+        {
+            rPropSet->getPropertyValue(gsUnvisitedCharStyleName) >>= ustyleName;
+        }
+
+        if (xPropSetInfo->hasPropertyByName(gsVisitedCharStyleName)
+            && (!xPropState.is()
+                || PropertyState_DIRECT_VALUE
+                       == xPropState->getPropertyState(gsVisitedCharStyleName)))
+        {
+            rPropSet->getPropertyValue(gsVisitedCharStyleName) >>= vstyleName;
+        }
+
+        static constexpr OUStringLiteral sHyperLinkEvents(u"HyperLinkEvents");
+        if (xPropSetInfo->hasPropertyByName(sHyperLinkEvents))
+        {
+            events.set(rPropSet->getPropertyValue(sHyperLinkEvents), uno::UNO_QUERY);
+        }
+    }
+
+    bool HyperlinkData::operator==(const HyperlinkData& rOther)
+    {
+        if (href != rOther.href || name != rOther.name || targetFrame != rOther.targetFrame
+            || ustyleName != rOther.ustyleName || vstyleName != rOther.vstyleName
+            || serverMap != rOther.serverMap)
+            return false;
+
+        if (events == rOther.events)
+            return true;
+        if (!events || !rOther.events)
+            return false;
+
+        const css::uno::Sequence<OUString> aNames = events->getElementNames();
+        if (aNames != rOther.events->getElementNames())
+            return false;
+        for (const auto& rName : aNames)
+        {
+            const css::uno::Any aAny = events->getByName(rName);
+            const css::uno::Any aOtherAny = rOther.events->getByName(rName);
+            if (aAny != aOtherAny)
+                return false;
+        }
+        return true;
+    }
+
+    bool HyperlinkData::addHyperlinkAttributes(SvXMLExport& rExport)
+    {
+        if (href.isEmpty())
+        {
+            // hyperlink without a URL does not make sense
+            OSL_ENSURE(false, "hyperlink without a URL --> no export to ODF");
+            return false;
+        }
+
+        rExport.AddAttribute(XML_NAMESPACE_XLINK, XML_TYPE, XML_SIMPLE);
+        rExport.AddAttribute(XML_NAMESPACE_XLINK, XML_HREF, rExport.GetRelativeReference(href));
+
+        if (!name.isEmpty())
+            rExport.AddAttribute(XML_NAMESPACE_OFFICE, XML_NAME, name);
+
+        if (!targetFrame.isEmpty())
+        {
+            rExport.AddAttribute(XML_NAMESPACE_OFFICE, XML_TARGET_FRAME_NAME, targetFrame);
+            enum XMLTokenEnum eTok = targetFrame == "_blank" ? XML_NEW : XML_REPLACE;
+            rExport.AddAttribute(XML_NAMESPACE_XLINK, XML_SHOW, eTok);
+        }
+
+        if (serverMap)
+            rExport.AddAttribute(XML_NAMESPACE_OFFICE, XML_SERVER_MAP, XML_TRUE);
+
+        if (!ustyleName.isEmpty())
+            rExport.AddAttribute(XML_NAMESPACE_TEXT, XML_STYLE_NAME,
+                                 rExport.EncodeStyleName(ustyleName));
+
+        if (!vstyleName.isEmpty())
+            rExport.AddAttribute(XML_NAMESPACE_TEXT, XML_VISITED_STYLE_NAME,
+                                 rExport.EncodeStyleName(vstyleName));
+
+        return true;
+    }
+
+    void HyperlinkData::exportEvents(SvXMLExport& rExport)
+    {
+        // export events (if supported)
+        if (events)
+            rExport.GetEventExport().Export(events, false);
+    }
 }
 
 namespace xmloff
@@ -768,9 +912,8 @@ OUString XMLTextParagraphExport::Find(
     return sName;
 }
 
-OUString XMLTextParagraphExport::FindTextStyleAndHyperlink(
+OUString XMLTextParagraphExport::FindTextStyle(
            const Reference < XPropertySet > & rPropSet,
-        bool& rbHyperlink,
         bool& rbHasCharStyle,
         bool& rbHasAutoStyle,
         const XMLPropertyState** ppAddStates ) const
@@ -780,7 +923,7 @@ OUString XMLTextParagraphExport::FindTextStyleAndHyperlink(
 
     // Get parent and remove hyperlinks (they aren't of interest)
     OUString sName;
-    rbHyperlink = rbHasCharStyle = rbHasAutoStyle = false;
+    rbHasCharStyle = rbHasAutoStyle = false;
     sal_uInt16 nIgnoreProps = 0;
     rtl::Reference< XMLPropertySetMapper > xPM(xPropMapper->getPropertySetMapper());
     ::std::vector< XMLPropertyState >::iterator aFirstDel = aPropStates.end();
@@ -807,7 +950,6 @@ OUString XMLTextParagraphExport::FindTextStyleAndHyperlink(
             nIgnoreProps++;
             break;
         case CTF_HYPERLINK_URL:
-            rbHyperlink = true;
             i->mnIndex = -1;
             if( nIgnoreProps )
                 aSecondDel = i;
@@ -934,7 +1076,7 @@ void XMLTextParagraphExport::exportListChange(
                     {
                         if ( bExportODF &&
                             eODFDefaultVersion >= SvtSaveOptions::ODFSVER_012 &&
-                             !sListId.isEmpty() )
+                             !sListId.isEmpty() && !rNextInfo.IsListIdDefault() )
                         {
                             /* Property text:id at element <text:list> has to be
                                replaced by property xml:id (#i92221#)
@@ -953,7 +1095,7 @@ void XMLTextParagraphExport::exportListChange(
                                         mpTextListsHelper->GenerateNewListId() );
                         if ( bExportODF &&
                             eODFDefaultVersion >= SvtSaveOptions::ODFSVER_012 &&
-                             !sListId.isEmpty() )
+                             !sListId.isEmpty() && !rNextInfo.IsListIdDefault() )
                         {
                             /* Property text:id at element <text:list> has to be
                                replaced by property xml:id (#i92221#)
@@ -1281,7 +1423,7 @@ XMLTextParagraphExport::XMLTextParagraphExport(
     sal_Int32 nIndex = xTextPropMapper->getPropertySetMapper()->FindEntryIndex(
                                 "", XML_NAMESPACE_STYLE,
                                 GetXMLToken(XML_TEXT_COMBINE));
-    pFieldExport.reset( new XMLTextFieldExport( rExp, std::make_unique<XMLPropertyState>( nIndex, uno::makeAny(true) ) ) );
+    pFieldExport.reset( new XMLTextFieldExport( rExp, std::make_unique<XMLPropertyState>( nIndex, uno::Any(true) ) ) );
     PushNewTextListsHelper();
 }
 
@@ -2046,6 +2188,37 @@ void XMLTextParagraphExport::exportParagraph(
                 }
             }
         }
+
+        if (GetExport().getSaneDefaultVersion() & SvtSaveOptions::ODFSVER_EXTENDED)
+        {
+            try
+            {
+                // ParaMarkerAutoStyleSpan is a hidden property, just to pass the autostyle here
+                // See SwXParagraph::Impl::GetPropertyValues_Impl
+                css::uno::Any aVal = xPropSet->getPropertyValue("ParaMarkerAutoStyleSpan");
+                if (css::uno::Reference<css::beans::XPropertySet> xFakeSpan{ aVal, css::uno::UNO_QUERY })
+                {
+                    if (bAutoStyles)
+                    {
+                        Add(XmlStyleFamily::TEXT_TEXT, xFakeSpan);
+                    }
+                    else
+                    {
+                        bool bIsUICharStyle, bHasAutoStyle;
+                        OUString sStyle = FindTextStyle(xFakeSpan, bIsUICharStyle, bHasAutoStyle);
+                        if (!sStyle.isEmpty())
+                        {
+                            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_MARKER_STYLE_NAME,
+                                                     sStyle);
+                        }
+                    }
+                }
+            }
+            catch (const css::beans::UnknownPropertyException&)
+            {
+                // No problem
+            }
+        }
     }
 
     Reference < XEnumerationAccess > xEA( rTextContent, UNO_QUERY );
@@ -2122,11 +2295,28 @@ void XMLTextParagraphExport::exportTextRangeEnumeration(
      * bookmarks are used instead of fieldmarks. */
     FieldmarkType openFieldMark = NONE;
 
+    std::optional<SvXMLElementExport> oTextA;
+    HyperlinkData aHyperlinkData;
+
     while( rTextEnum->hasMoreElements() )
     {
         Reference<XPropertySet> xPropSet(rTextEnum->nextElement(), UNO_QUERY);
         Reference < XTextRange > xTxtRange(xPropSet, uno::UNO_QUERY);
         Reference<XPropertySetInfo> xPropInfo(xPropSet->getPropertySetInfo());
+
+        if (!bAutoStyles)
+        {
+            if (HyperlinkData aNewHyperlinkData(xPropSet); aNewHyperlinkData != aHyperlinkData)
+            {
+                aHyperlinkData = aNewHyperlinkData;
+                oTextA.reset();
+                if (aHyperlinkData.addHyperlinkAttributes(GetExport()))
+                {
+                    oTextA.emplace(GetExport(), true, XML_NAMESPACE_TEXT, XML_A, false, false);
+                    aHyperlinkData.exportEvents(GetExport());
+                }
+            }
+        }
 
         if (xPropInfo->hasPropertyByName(gsTextPortionType))
         {
@@ -2284,6 +2474,19 @@ void XMLTextParagraphExport::exportTextRangeEnumeration(
                     }
                 }
             }
+            else if (sType == gsTextFieldSep)
+            {
+                Reference<text::XFormField> const xFormField(xPropSet->getPropertyValue(gsBookmark), UNO_QUERY);
+                if (!bAutoStyles)
+                {
+                    if (GetExport().getSaneDefaultVersion() & SvtSaveOptions::ODFSVER_EXTENDED)
+                    {
+                        SvXMLElementExport aElem( GetExport(), !bAutoStyles,
+                            XML_NAMESPACE_FIELD, XML_FIELDMARK_SEPARATOR,
+                            false, false );
+                    }
+                }
+            }
             else if (sType == gsTextFieldEnd)
             {
                 if (!bAutoStyles)
@@ -2365,7 +2568,8 @@ void XMLTextParagraphExport::exportTextRangeEnumeration(
             }
             else if (sType == "LineBreak")
             {
-                exportTextLineBreak(xPropSet);
+                if (!bAutoStyles)
+                    exportTextLineBreak(xPropSet);
             }
             else {
                 OSL_FAIL("unknown text portion type");
@@ -2597,7 +2801,7 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
     {
         XMLAnchorTypePropHdl aAnchorTypeHdl;
         OUString sTmp;
-        aAnchorTypeHdl.exportXML( sTmp, uno::makeAny(eAnchor),
+        aAnchorTypeHdl.exportXML( sTmp, uno::Any(eAnchor),
                                   GetExport().GetMM100UnitConverter() );
         GetExport().AddAttribute( XML_NAMESPACE_TEXT, XML_ANCHOR_TYPE, sTmp );
     }
@@ -2668,6 +2872,45 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
 
     Reference< XPropertySetInfo > xPropSetInfo(rPropSet->getPropertySetInfo());
 
+    bool bSyncWidth = false;
+    if (xPropSetInfo->hasPropertyByName(gsIsSyncWidthToHeight))
+    {
+        bSyncWidth = *o3tl::doAccess<bool>(rPropSet->getPropertyValue(gsIsSyncWidthToHeight));
+    }
+    sal_Int16 nRelWidth = 0;
+    if (!bSyncWidth && xPropSetInfo->hasPropertyByName(gsRelativeWidth))
+    {
+        rPropSet->getPropertyValue(gsRelativeWidth) >>= nRelWidth;
+    }
+    bool bSyncHeight = false;
+    if (xPropSetInfo->hasPropertyByName(gsIsSyncHeightToWidth))
+    {
+        bSyncHeight = *o3tl::doAccess<bool>(rPropSet->getPropertyValue(gsIsSyncHeightToWidth));
+    }
+    sal_Int16 nRelHeight = 0;
+    if (!bSyncHeight && xPropSetInfo->hasPropertyByName(gsRelativeHeight))
+    {
+        rPropSet->getPropertyValue(gsRelativeHeight) >>= nRelHeight;
+    }
+    awt::Size aLayoutSize;
+    if ((nRelWidth > 0 || nRelHeight > 0) && xPropSetInfo->hasPropertyByName("LayoutSize"))
+    {
+        rPropSet->getPropertyValue("LayoutSize") >>= aLayoutSize;
+    }
+
+    bool bUseLayoutSize = true;
+    if (bSyncWidth && bSyncHeight)
+    {
+        // This is broken, width depends on height and height depends on width. Don't use the
+        // invalid layout size we got.
+        bUseLayoutSize = false;
+    }
+    if (aLayoutSize.Width <= 0 || aLayoutSize.Height <= 0)
+    {
+        // This is broken, Writer frames have a minimal size, see MINFLY.
+        bUseLayoutSize = false;
+    }
+
     // svg:width
     sal_Int16 nWidthType = SizeType::FIX;
     if( xPropSetInfo->hasPropertyByName( gsWidthType ) )
@@ -2693,6 +2936,13 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
         }
         else
         {
+            if ((nRelWidth > 0 || bSyncWidth) && bUseLayoutSize)
+            {
+                // Relative width: write the layout size for the fallback width.
+                sValue.setLength(0);
+                GetExport().GetMM100UnitConverter().convertMeasureToXML(sValue, aLayoutSize.Width);
+            }
+
             GetExport().AddAttribute( XML_NAMESPACE_SVG, XML_WIDTH,
                                       sValue.makeStringAndClear() );
             if(nullptr != pCenter)
@@ -2702,18 +2952,14 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
             }
         }
     }
-    bool bSyncWidth = false;
     if( xPropSetInfo->hasPropertyByName( gsIsSyncWidthToHeight ) )
     {
-        bSyncWidth = *o3tl::doAccess<bool>(rPropSet->getPropertyValue( gsIsSyncWidthToHeight ));
         if( bSyncWidth )
             GetExport().AddAttribute( XML_NAMESPACE_STYLE, XML_REL_WIDTH,
                                       XML_SCALE );
     }
     if( !bSyncWidth && xPropSetInfo->hasPropertyByName( gsRelativeWidth ) )
     {
-        sal_Int16 nRelWidth =  0;
-        rPropSet->getPropertyValue( gsRelativeWidth ) >>= nRelWidth;
         SAL_WARN_IF( nRelWidth < 0 || nRelWidth > 254, "xmloff",
                     "Got illegal relative width from API" );
         if( nRelWidth > 0 )
@@ -2729,16 +2975,6 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
     if( xPropSetInfo->hasPropertyByName( gsSizeType ) )
     {
         rPropSet->getPropertyValue( gsSizeType ) >>= nSizeType;
-    }
-    bool bSyncHeight = false;
-    if( xPropSetInfo->hasPropertyByName( gsIsSyncHeightToWidth ) )
-    {
-        bSyncHeight = *o3tl::doAccess<bool>(rPropSet->getPropertyValue( gsIsSyncHeightToWidth ));
-    }
-    sal_Int16 nRelHeight =  0;
-    if( !bSyncHeight && xPropSetInfo->hasPropertyByName( gsRelativeHeight ) )
-    {
-        rPropSet->getPropertyValue( gsRelativeHeight ) >>= nRelHeight;
     }
     if( xPropSetInfo->hasPropertyByName( gsHeight ) )
     {
@@ -2756,6 +2992,13 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
         }
         else
         {
+            if ((nRelHeight > 0 || bSyncHeight) && bUseLayoutSize)
+            {
+                // Relative height: write the layout size for the fallback height.
+                sValue.setLength(0);
+                GetExport().GetMM100UnitConverter().convertMeasureToXML(sValue, aLayoutSize.Height);
+            }
+
             GetExport().AddAttribute( XML_NAMESPACE_SVG, XML_HEIGHT,
                                       sValue.makeStringAndClear() );
             if(nullptr != pCenter)
@@ -2797,6 +3040,19 @@ XMLShapeExportFlags XMLTextParagraphExport::addTextFrameAttributes(
             GetExport().AddAttribute( XML_NAMESPACE_DRAW, XML_ZINDEX,
                                       OUString::number( nZIndex ) );
         }
+    }
+
+    // TODO remove
+    if (xPropSetInfo->hasPropertyByName("Decorative")
+        && rPropSet->getPropertyValue("Decorative").get<bool>())
+    {
+        GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_DECORATIVE, XML_TRUE);
+    }
+
+    if (xPropSetInfo->hasPropertyByName("IsSplitAllowed")
+        && rPropSet->getPropertyValue("IsSplitAllowed").get<bool>())
+    {
+        GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_MAY_BREAK_BETWEEN_PAGES, XML_TRUE);
     }
 
     return nShapeFeatures;
@@ -2841,7 +3097,8 @@ void XMLTextParagraphExport::exportAnyTextFrame(
         case FrameType::Shape:
             {
                 Reference < XShape > xShape( rTxtCntnt, UNO_QUERY );
-                GetExport().GetShapeExport()->collectShapeAutoStyles( xShape );
+                css::uno::Sequence<OUString> aAutoStylePropNames = GetAutoStylePool().GetPropertyNames();
+                GetExport().GetShapeExport()->collectShapeAutoStyles( xShape, aAutoStylePropNames );
             }
             break;
         default:
@@ -2851,7 +3108,6 @@ void XMLTextParagraphExport::exportAnyTextFrame(
     else
     {
         Reference< XPropertySetInfo > xPropSetInfo(xPropSet->getPropertySetInfo());
-        Reference< XPropertyState > xPropState( xPropSet, UNO_QUERY );
         {
             bool bAddCharStyles = pRangePropSet &&
                 lcl_txtpara_isBoundAsChar( xPropSet, xPropSetInfo );
@@ -2862,10 +3118,7 @@ void XMLTextParagraphExport::exportAnyTextFrame(
             OUString sStyle;
 
             if( bAddCharStyles )
-            {
-                bool bDummy;
-                sStyle = FindTextStyleAndHyperlink( *pRangePropSet, bDummy, bIsUICharStyle, bHasAutoStyle );
-            }
+                sStyle = FindTextStyle( *pRangePropSet, bIsUICharStyle, bHasAutoStyle );
             else
                 bIsUICharStyle = false;
 
@@ -2885,8 +3138,7 @@ void XMLTextParagraphExport::exportAnyTextFrame(
                 {
                     SvXMLElementExport aElement( GetExport(),
                         FrameType::Shape != eType &&
-                        addHyperlinkAttributes( xPropSet,
-                                                xPropState,xPropSetInfo ),
+                            HyperlinkData(xPropSet).addHyperlinkAttributes(GetExport()),
                         XML_NAMESPACE_DRAW, XML_A, false, false );
                     switch( eType )
                     {
@@ -3325,109 +3577,6 @@ void XMLTextParagraphExport::exportTitleAndDescription(
     }
 }
 
-bool XMLTextParagraphExport::addHyperlinkAttributes(
-    const Reference< XPropertySet > & rPropSet,
-    const Reference< XPropertyState > & rPropState,
-    const Reference< XPropertySetInfo > & rPropSetInfo )
-{
-    bool bExport = false;
-    OUString sHRef, sName, sTargetFrame, sUStyleName, sVStyleName;
-    bool bServerMap = false;
-
-    if( rPropSetInfo->hasPropertyByName( gsHyperLinkURL ) &&
-        ( !rPropState.is() || PropertyState_DIRECT_VALUE ==
-                    rPropState->getPropertyState( gsHyperLinkURL ) ) )
-    {
-        rPropSet->getPropertyValue( gsHyperLinkURL ) >>= sHRef;
-
-        if( !sHRef.isEmpty() )
-            bExport = true;
-    }
-
-    if ( sHRef.isEmpty() )
-    {
-        // hyperlink without a URL does not make sense
-        OSL_ENSURE( false, "hyperlink without a URL --> no export to ODF" );
-        return false;
-    }
-
-    if ( rPropSetInfo->hasPropertyByName( gsHyperLinkName )
-         && ( !rPropState.is()
-              || PropertyState_DIRECT_VALUE == rPropState->getPropertyState( gsHyperLinkName ) ) )
-    {
-        rPropSet->getPropertyValue( gsHyperLinkName ) >>= sName;
-        if( !sName.isEmpty() )
-            bExport = true;
-    }
-
-    if ( rPropSetInfo->hasPropertyByName( gsHyperLinkTarget )
-         && ( !rPropState.is()
-              || PropertyState_DIRECT_VALUE == rPropState->getPropertyState( gsHyperLinkTarget ) ) )
-    {
-        rPropSet->getPropertyValue( gsHyperLinkTarget ) >>= sTargetFrame;
-        if( !sTargetFrame.isEmpty() )
-            bExport = true;
-    }
-
-    if ( rPropSetInfo->hasPropertyByName( gsServerMap )
-         && ( !rPropState.is()
-              || PropertyState_DIRECT_VALUE == rPropState->getPropertyState( gsServerMap ) ) )
-    {
-        bServerMap = *o3tl::doAccess<bool>(rPropSet->getPropertyValue( gsServerMap ));
-        if ( bServerMap )
-            bExport = true;
-    }
-
-    if ( rPropSetInfo->hasPropertyByName( gsUnvisitedCharStyleName )
-         && ( !rPropState.is()
-              || PropertyState_DIRECT_VALUE == rPropState->getPropertyState( gsUnvisitedCharStyleName ) ) )
-    {
-        rPropSet->getPropertyValue( gsUnvisitedCharStyleName ) >>= sUStyleName;
-        if( !sUStyleName.isEmpty() )
-            bExport = true;
-    }
-
-    if ( rPropSetInfo->hasPropertyByName( gsVisitedCharStyleName )
-         && ( !rPropState.is()
-              || PropertyState_DIRECT_VALUE == rPropState->getPropertyState( gsVisitedCharStyleName ) ) )
-    {
-        rPropSet->getPropertyValue( gsVisitedCharStyleName ) >>= sVStyleName;
-        if( !sVStyleName.isEmpty() )
-            bExport = true;
-    }
-
-    if ( bExport )
-    {
-        GetExport().AddAttribute( XML_NAMESPACE_XLINK, XML_TYPE, XML_SIMPLE );
-        GetExport().AddAttribute( XML_NAMESPACE_XLINK, XML_HREF, GetExport().GetRelativeReference( sHRef ) );
-
-        if( !sName.isEmpty() )
-            GetExport().AddAttribute( XML_NAMESPACE_OFFICE, XML_NAME, sName );
-
-        if( !sTargetFrame.isEmpty() )
-        {
-            GetExport().AddAttribute( XML_NAMESPACE_OFFICE,
-                                      XML_TARGET_FRAME_NAME, sTargetFrame );
-            enum XMLTokenEnum eTok = sTargetFrame == "_blank" ? XML_NEW : XML_REPLACE;
-            GetExport().AddAttribute( XML_NAMESPACE_XLINK, XML_SHOW, eTok );
-        }
-
-        if( bServerMap  )
-            GetExport().AddAttribute( XML_NAMESPACE_OFFICE,
-                                      XML_SERVER_MAP, XML_TRUE );
-
-        if( !sUStyleName.isEmpty() )
-            GetExport().AddAttribute( XML_NAMESPACE_TEXT,
-              XML_STYLE_NAME, GetExport().EncodeStyleName( sUStyleName ) );
-
-        if( !sVStyleName.isEmpty() )
-            GetExport().AddAttribute( XML_NAMESPACE_TEXT,
-              XML_VISITED_STYLE_NAME, GetExport().EncodeStyleName( sVStyleName ) );
-    }
-
-    return bExport;
-}
-
 void XMLTextParagraphExport::exportTextRangeSpan(
     const css::uno::Reference< css::text::XTextRange > & rTextRange,
     Reference< XPropertySet > const & xPropSet,
@@ -3473,40 +3622,13 @@ void XMLTextParagraphExport::exportTextRange(
     }
     else
     {
-        bool bHyperlink = false;
         bool bIsUICharStyle = false;
         bool bHasAutoStyle = false;
         const OUString sStyle(
-            FindTextStyleAndHyperlink( xPropSet, bHyperlink, bIsUICharStyle, bHasAutoStyle ) );
+            FindTextStyle( xPropSet, bIsUICharStyle, bHasAutoStyle ) );
 
         Reference < XPropertySetInfo > xPropSetInfo;
-        bool bHyperlinkAttrsAdded = false;
-        if ( bHyperlink )
-        {
-            Reference< XPropertyState > xPropState( xPropSet, UNO_QUERY );
-            xPropSetInfo.set( xPropSet->getPropertySetInfo() );
-            bHyperlinkAttrsAdded = addHyperlinkAttributes( xPropSet, xPropState, xPropSetInfo );
-        }
-
-        if ( bHyperlink && bHyperlinkAttrsAdded )
-        {
-            SvXMLElementExport aElem( GetExport(), true, XML_NAMESPACE_TEXT, XML_A, false, false );
-
-            // export events (if supported)
-            OUString sHyperLinkEvents(
-                "HyperLinkEvents");
-            if (xPropSetInfo->hasPropertyByName(sHyperLinkEvents))
-            {
-                Reference< XNameReplace > xName( xPropSet->getPropertyValue( sHyperLinkEvents ), uno::UNO_QUERY );
-                GetExport().GetEventExport().Export( xName, false );
-            }
-
-            exportTextRangeSpan( rTextRange, xPropSet, xPropSetInfo, bIsUICharStyle, bHasAutoStyle, sStyle, rPrevCharIsSpace, openFieldMark );
-        }
-        else
-        {
-            exportTextRangeSpan( rTextRange, xPropSet, xPropSetInfo, bIsUICharStyle, bHasAutoStyle, sStyle, rPrevCharIsSpace, openFieldMark );
-        }
+        exportTextRangeSpan( rTextRange, xPropSet, xPropSetInfo, bIsUICharStyle, bHasAutoStyle, sStyle, rPrevCharIsSpace, openFieldMark );
     }
 }
 
@@ -3987,6 +4109,28 @@ void XMLTextParagraphExport::ExportContentControl(
         if (!aTag.isEmpty())
         {
             GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_TAG, aTag);
+        }
+
+        sal_Int32 nId = 0;
+        xPropertySet->getPropertyValue("Id") >>= nId;
+        if (nId)
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_ID, OUString::number(nId));
+        }
+
+        sal_uInt32 nTabIndex = 0;
+        xPropertySet->getPropertyValue("TabIndex") >>= nTabIndex;
+        if (nTabIndex)
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_TAB_INDEX,
+                                     OUString::number(nTabIndex));
+        }
+
+        OUString aLock;
+        xPropertySet->getPropertyValue("Lock") >>= aLock;
+        if (!aLock.isEmpty())
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_LOCK, aLock);
         }
     }
 

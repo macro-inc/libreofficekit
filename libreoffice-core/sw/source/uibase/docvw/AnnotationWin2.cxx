@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <sal/config.h>
 
 #include <cstddef>
@@ -65,6 +67,7 @@
 #include <docsh.hxx>
 #include <wrtsh.hxx>
 #include <doc.hxx>
+#include <docufld.hxx>
 #include <swmodule.hxx>
 
 #include <SwRewriter.hxx>
@@ -72,7 +75,8 @@
 #include <ndtxt.hxx>
 
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
+#include <osl/diagnose.h>
 #include <unotools/localedatawrapper.hxx>
 #include <unotools/syslocale.hxx>
 #include <memory>
@@ -120,7 +124,7 @@ void SwAnnotationWin::PaintTile(vcl::RenderContext& rRenderContext, const tools:
     m_xContainer->draw(rRenderContext, rRect.TopLeft(), GetSizePixel());
 
     const drawinglayer::geometry::ViewInformation2D aViewInformation;
-    std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(rRenderContext, aViewInformation));
+    std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(drawinglayer::processor2d::createProcessor2DFromOutputDevice(rRenderContext, aViewInformation));
 
     // drawinglayer sets the map mode to pixels, not needed here.
     rRenderContext.Pop();
@@ -213,7 +217,7 @@ void SwAnnotationWin::DrawForPage(OutputDevice* pDev, const Point& rPt)
 
     const drawinglayer::geometry::ViewInformation2D aNewViewInfos;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
-        drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(
+        drawinglayer::processor2d::createProcessor2DFromOutputDevice(
             *pDev, aNewViewInfos ));
 
     if (mpAnchor)
@@ -345,18 +349,22 @@ void SwAnnotationWin::InitControls()
     mxVScrollbar->connect_vadjustment_changed(LINK(this, SwAnnotationWin, ScrollHdl));
     mxVScrollbar->connect_mouse_move(LINK(this, SwAnnotationWin, MouseMoveHdl));
 
-    const SwViewOption* pVOpt = mrView.GetWrtShellPtr()->GetViewOptions();
     EEControlBits nCntrl = mpOutliner->GetControlWord();
     // TODO: crash when AUTOCOMPLETE enabled
     nCntrl |= EEControlBits::MARKFIELDS | EEControlBits::PASTESPECIAL | EEControlBits::AUTOCORRECT | EEControlBits::USECHARATTRIBS; // | EEControlBits::AUTOCOMPLETE;
-    if (SwViewOption::IsFieldShadings())
-        nCntrl |= EEControlBits::MARKFIELDS;
-    else
-        nCntrl &= ~EEControlBits::MARKFIELDS;
-    if (pVOpt->IsOnlineSpell())
-        nCntrl |= EEControlBits::ONLINESPELLING;
-    else
-        nCntrl &= ~EEControlBits::ONLINESPELLING;
+
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
+        if (pVOpt->IsFieldShadings())
+            nCntrl |= EEControlBits::MARKFIELDS;
+        else
+            nCntrl &= ~EEControlBits::MARKFIELDS;
+        if (pVOpt->IsOnlineSpell())
+            nCntrl |= EEControlBits::ONLINESPELLING;
+        else
+            nCntrl &= ~EEControlBits::ONLINESPELLING;
+    }
     mpOutliner->SetControlWord(nCntrl);
 
     std::size_t aIndex = SW_MOD()->InsertRedlineAuthor(GetAuthor());
@@ -450,7 +458,10 @@ void SwAnnotationWin::SetMenuButtonColors()
 
     mxMenuButton->set_background(mColorDark);
 
-    const Fraction& rFraction = mrView.GetWrtShellPtr()->GetOut()->GetMapMode().GetScaleY();
+    SwWrtShell* pWrtShell = mrView.GetWrtShellPtr();
+    if (!pWrtShell)
+        return;
+    const Fraction& rFraction = pWrtShell->GetOut()->GetMapMode().GetScaleY();
 
     ScopedVclPtrInstance<VirtualDevice> xVirDev;
     Size aSize(tools::Long(METABUTTON_WIDTH * rFraction),
@@ -458,7 +469,7 @@ void SwAnnotationWin::SetMenuButtonColors()
     tools::Rectangle aRect(Point(0, 0), aSize);
     xVirDev->SetOutputSizePixel(aSize);
 
-    Gradient aGradient(GradientStyle::Linear,
+    Gradient aGradient(css::awt::GradientStyle_LINEAR,
                              ColorFromAlphaColor(15, mColorAnchor, mColorDark),
                              ColorFromAlphaColor(80, mColorAnchor, mColorDark));
     xVirDev->DrawGradient(aRect, aGradient);
@@ -498,10 +509,13 @@ void SwAnnotationWin::Rescale()
 
     MapMode aMode = GetParent()->GetMapMode();
     aMode.SetOrigin( Point() );
-    mpOutliner->SetRefMapMode( aMode );
     SetMapMode( aMode );
     mxSidebarTextControl->SetMapMode( aMode );
-    const Fraction& rFraction = mrView.GetWrtShellPtr()->GetOut()->GetMapMode().GetScaleY();
+
+    SwWrtShell* pWrtShell = mrView.GetWrtShellPtr();
+    if (!pWrtShell)
+        return;
+    const Fraction& rFraction = pWrtShell->GetOut()->GetMapMode().GetScaleY();
 
     vcl::Font aFont = maLabelFont;
     sal_Int32 nHeight = tools::Long(aFont.GetFontHeight() * rFraction);
@@ -667,8 +681,7 @@ void SwAnnotationWin::SetPosAndSize()
             {
                 SwShellTableCursor* pTableCursor = new SwShellTableCursor( mrView.GetWrtShell(), aStartPos );
                 pTableCursor->SetMark();
-                pTableCursor->GetMark()->nNode = *pTextNode;
-                pTableCursor->GetMark()->nContent.Assign( pTextNode, pTextAnnotationField->GetStart()+1 );
+                pTableCursor->GetMark()->Assign( *pTextNode, pTextAnnotationField->GetStart()+1 );
                 pTableCursor->NewTableSelection();
                 pTmpCursor = pTableCursor;
             }
@@ -676,8 +689,7 @@ void SwAnnotationWin::SetPosAndSize()
             {
                 SwShellCursor* pCursor = new SwShellCursor( mrView.GetWrtShell(), aStartPos );
                 pCursor->SetMark();
-                pCursor->GetMark()->nNode = *pTextNode;
-                pCursor->GetMark()->nContent.Assign( pTextNode, pTextAnnotationField->GetStart()+1 );
+                pCursor->GetMark()->Assign(*pTextNode, pTextAnnotationField->GetStart()+1 );
                 pTmpCursor = pCursor;
             }
             std::unique_ptr<SwShellCursor> pTmpCursorForAnnotationTextRange( pTmpCursor );
@@ -930,17 +942,20 @@ void SwAnnotationWin::SetLanguage(const SvxLanguageItem& rNewItem)
     GetOutlinerView()->SetSelection(aOld);
     mpOutliner->SetModifyHdl( aLink );
 
-    const SwViewOption* pVOpt = mrView.GetWrtShellPtr()->GetViewOptions();
     EEControlBits nCntrl = mpOutliner->GetControlWord();
     // turn off
     nCntrl &= ~EEControlBits::ONLINESPELLING;
     mpOutliner->SetControlWord(nCntrl);
 
-    //turn back on
-    if (pVOpt->IsOnlineSpell())
-        nCntrl |= EEControlBits::ONLINESPELLING;
-    else
-        nCntrl &= ~EEControlBits::ONLINESPELLING;
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
+        //turn back on
+        if (pVOpt->IsOnlineSpell())
+            nCntrl |= EEControlBits::ONLINESPELLING;
+        else
+            nCntrl &= ~EEControlBits::ONLINESPELLING;
+    }
     mpOutliner->SetControlWord(nCntrl);
 
     mpOutliner->CompleteOnlineSpelling();
@@ -1009,7 +1024,8 @@ void SwAnnotationWin::ActivatePostIt()
     // when cursor out of visible area
     GetOutlinerView()->ShowCursor(false);
 
-    mpOutlinerView->GetEditView().SetInsertMode(mrView.GetWrtShellPtr()->IsInsMode());
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+        mpOutlinerView->GetEditView().SetInsertMode(pWrtShell->IsInsMode());
 
     if ( !Application::GetSettings().GetStyleSettings().GetHighContrastMode() )
         GetOutlinerView()->SetBackgroundColor(mColorDark);
@@ -1051,9 +1067,9 @@ void SwAnnotationWin::DeactivatePostIt()
     if ( !Application::GetSettings().GetStyleSettings().GetHighContrastMode() )
         GetOutlinerView()->SetBackgroundColor(COL_TRANSPARENT);
 
-    if (!mnEventId && !IsProtected() && mpOutliner->GetEditEngine().GetText().isEmpty())
+    if (!mnDeleteEventId && !IsProtected() && mpOutliner->GetEditEngine().GetText().isEmpty())
     {
-        mnEventId = Application::PostUserEvent( LINK( this, SwAnnotationWin, DeleteHdl), nullptr, true );
+        mnDeleteEventId = Application::PostUserEvent( LINK( this, SwAnnotationWin, DeleteHdl), nullptr, true );
     }
 }
 
@@ -1092,11 +1108,18 @@ void SwAnnotationWin::ExecuteCommand(sal_uInt16 nSlot)
                 mrMgr.SetActiveSidebarWin(nullptr);
             SwitchToFieldPos();
             mrView.GetViewFrame()->GetDispatcher()->Execute(FN_POSTIT);
+
+            if (nSlot == FN_REPLY)
+            {
+                // Get newly created SwPostItField and set its paraIdParent
+                auto pPostItField = mrMgr.GetLatestPostItField();
+                pPostItField->SetParentId(GetTopReplyNote()->GetParaId());
+            }
             break;
         }
         case FN_DELETE_COMMENT:
             //Delete(); // do not kill the parent of our open popup menu
-            mnEventId = Application::PostUserEvent( LINK( this, SwAnnotationWin, DeleteHdl), nullptr, true );
+            mnDeleteEventId = Application::PostUserEvent( LINK( this, SwAnnotationWin, DeleteHdl), nullptr, true );
             break;
         case FN_DELETE_COMMENT_THREAD:
             DeleteThread();
@@ -1215,7 +1238,7 @@ IMPL_LINK_NOARG(SwAnnotationWin, ModifyHdl, LinkParamNone*, void)
 
 IMPL_LINK_NOARG(SwAnnotationWin, DeleteHdl, void*, void)
 {
-    mnEventId = nullptr;
+    mnDeleteEventId = nullptr;
     Delete();
 }
 
@@ -1228,8 +1251,13 @@ void SwAnnotationWin::ResetAttributes()
 
 int SwAnnotationWin::GetPrefScrollbarWidth() const
 {
-    const Fraction& f(mrView.GetWrtShellPtr()->GetOut()->GetMapMode().GetScaleY());
-    return tools::Long(Application::GetSettings().GetStyleSettings().GetScrollBarSize() * f);
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const Fraction& f(pWrtShell->GetOut()->GetMapMode().GetScaleY());
+        return tools::Long(Application::GetSettings().GetStyleSettings().GetScrollBarSize() * f);
+    }
+    else
+        return tools::Long(Application::GetSettings().GetStyleSettings().GetScrollBarSize());
 }
 
 sal_Int32 SwAnnotationWin::GetMetaHeight() const
@@ -1256,22 +1284,30 @@ sal_Int32 SwAnnotationWin::GetMinimumSizeWithMeta() const
 
 sal_Int32 SwAnnotationWin::GetMinimumSizeWithoutMeta() const
 {
-    const Fraction& f(mrView.GetWrtShellPtr()->GetOut()->GetMapMode().GetScaleY());
-    return tools::Long(POSTIT_MINIMUMSIZE_WITHOUT_META * f);
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const Fraction& f(pWrtShell->GetOut()->GetMapMode().GetScaleY());
+        return tools::Long(POSTIT_MINIMUMSIZE_WITHOUT_META * f);
+    }
+    else
+        return tools::Long(POSTIT_MINIMUMSIZE_WITHOUT_META);
 }
 
 void SwAnnotationWin::SetSpellChecking()
 {
-    const SwViewOption* pVOpt = mrView.GetWrtShellPtr()->GetViewOptions();
-    EEControlBits nCntrl = mpOutliner->GetControlWord();
-    if (pVOpt->IsOnlineSpell())
-        nCntrl |= EEControlBits::ONLINESPELLING;
-    else
-        nCntrl &= ~EEControlBits::ONLINESPELLING;
-    mpOutliner->SetControlWord(nCntrl);
+    if (SwWrtShell* pWrtShell = mrView.GetWrtShellPtr())
+    {
+        const SwViewOption* pVOpt = pWrtShell->GetViewOptions();
+        EEControlBits nCntrl = mpOutliner->GetControlWord();
+        if (pVOpt->IsOnlineSpell())
+            nCntrl |= EEControlBits::ONLINESPELLING;
+        else
+            nCntrl &= ~EEControlBits::ONLINESPELLING;
+        mpOutliner->SetControlWord(nCntrl);
 
-    mpOutliner->CompleteOnlineSpelling();
-    Invalidate();
+        mpOutliner->CompleteOnlineSpelling();
+        Invalidate();
+    }
 }
 
 void SwAnnotationWin::SetViewState(ViewState bViewState)
@@ -1376,7 +1412,7 @@ void SwAnnotationWin::SwitchToFieldPos()
     GotoPos();
     sal_uInt32 aCount = MoveCaret();
     if (aCount)
-        mrView.GetDocShell()->GetWrtShell()->SwCursorShell::Right(aCount, 0);
+        mrView.GetDocShell()->GetWrtShell()->SwCursorShell::Right(aCount, SwCursorSkipMode::Chars);
     GrabFocusToDocument();
     collectUIInformation("LEAVE",get_id());
 }
@@ -1405,15 +1441,18 @@ bool SwAnnotationWin::IsScrollbarVisible() const
 
 void SwAnnotationWin::ChangeSidebarItem( SwSidebarItem const & rSidebarItem )
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     const bool bAnchorChanged = mpAnchorFrame != rSidebarItem.maLayoutInfo.mpAnchorFrame;
     if ( bAnchorChanged )
     {
         mrMgr.DisconnectSidebarWinFromFrame( *mpAnchorFrame, *this );
     }
+#endif
 
     mrSidebarItem = rSidebarItem;
     mpAnchorFrame = mrSidebarItem.maLayoutInfo.mpAnchorFrame;
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (mxSidebarWinAccessible)
         mxSidebarWinAccessible->ChangeSidebarItem( mrSidebarItem );
 
@@ -1423,10 +1462,12 @@ void SwAnnotationWin::ChangeSidebarItem( SwSidebarItem const & rSidebarItem )
                                       mrSidebarItem.GetFormatField(),
                                       *this );
     }
+#endif
 }
 
 css::uno::Reference< css::accessibility::XAccessible > SwAnnotationWin::CreateAccessible()
 {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     // This is rather dodgy code. Normally in CreateAccessible, if we want a custom
     // object, we return a custom object, but we do no override the default toolkit
     // window peer.
@@ -1434,6 +1475,7 @@ css::uno::Reference< css::accessibility::XAccessible > SwAnnotationWin::CreateAc
         mxSidebarWinAccessible = new SidebarWinAccessible( *this,
                                                           mrView.GetWrtShell(),
                                                           mrSidebarItem );
+#endif
     return mxSidebarWinAccessible;
 }
 

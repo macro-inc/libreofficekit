@@ -20,8 +20,10 @@
 #pragma once
 
 #include <tools/globname.hxx>
+#include <tools/solar.h>
 #include <sfx2/tabdlg.hxx>
 
+#include <utility>
 #include <vcl/customweld.hxx>
 #include <vcl/textfilter.hxx>
 #include <vcl/weld.hxx>
@@ -46,8 +48,8 @@ private:
     OUString m_sLastGoodText;
     OUString m_sNone;
 public:
-    TextFilterAutoConvert(const OUString &rNone)
-        : m_sNone(rNone)
+    TextFilterAutoConvert(OUString aNone)
+        : m_sNone(std::move(aNone))
     {
     }
     virtual OUString filter(const OUString &rText) override;
@@ -134,8 +136,8 @@ private:
 
     int m_nPrevSelectedEntry;
 
-    std::unique_ptr<SwFieldMgr> pMgr;
-    bool bHTMLMode;
+    std::unique_ptr<SwFieldMgr> m_pMgr;
+    bool m_bHTMLMode;
 
     TextFilterAutoConvert m_aTextFilter;
 

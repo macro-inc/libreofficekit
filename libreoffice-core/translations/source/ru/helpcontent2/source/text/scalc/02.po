@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 02\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-06-29 13:08+0200\n"
-"PO-Revision-Date: 2020-02-01 14:32+0000\n"
-"Last-Translator: kompilainenn <79045_79045@mail.ru>\n"
-"Language-Team: Russian <https://weblate.documentfoundation.org/projects/libo_help-master/textscalc02/ru/>\n"
+"POT-Creation-Date: 2022-12-07 19:22+0100\n"
+"PO-Revision-Date: 2023-02-12 17:02+0000\n"
+"Last-Translator: bormant <bormant@mail.ru>\n"
+"Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_help-master/textscalc02/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1542197347.000000\n"
 
 #. aSE5T
@@ -25,14 +25,14 @@ msgctxt ""
 msgid "Number format: Currency"
 msgstr "Числовой формат: денежный"
 
-#. qnxQS
+#. uC76y
 #: 02130000.xhp
 msgctxt ""
 "02130000.xhp\n"
 "hd_id3152892\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02130000.xhp\" name=\"Number format: Currency\">Number format: Currency</link>"
-msgstr "<link href=\"text/scalc/02/02130000.xhp\" name=\"Числовой формат: денежный\">Числовой формат: денежный</link>"
+msgid "<link href=\"text/scalc/02/02130000.xhp\">Number format: Currency</link>"
+msgstr "<link href=\"text/scalc/02/02130000.xhp\">Числовой формат: денежный</link>"
 
 #. mDBPb
 #: 02130000.xhp
@@ -61,14 +61,14 @@ msgctxt ""
 msgid "Number Format: Currency"
 msgstr "Числовой формат: денежный"
 
-#. CDopB
+#. NGRbJ
 #: 02130000.xhp
 msgctxt ""
 "02130000.xhp\n"
 "par_id3146776\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>."
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Формат - Ячейки - Числа</link>."
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Формат - Ячейки - Числа</link>."
 
 #. fjGg6
 #: 02140000.xhp
@@ -79,14 +79,14 @@ msgctxt ""
 msgid "Number format: Percent"
 msgstr "Числовой формат: проценты"
 
-#. vpFDA
+#. uZTmE
 #: 02140000.xhp
 msgctxt ""
 "02140000.xhp\n"
 "hd_id3156329\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02140000.xhp\" name=\"Number format: Percent\">Number format: Percent</link>"
-msgstr "<link href=\"text/scalc/02/02140000.xhp\" name=\"Числовой формат: проценты\">Числовой формат: проценты</link>"
+msgid "<link href=\"text/scalc/02/02140000.xhp\">Number format: Percent</link>"
+msgstr "<link href=\"text/scalc/02/02140000.xhp\">Числовой формат: проценты</link>"
 
 #. fzGGF
 #: 02140000.xhp
@@ -160,14 +160,14 @@ msgctxt ""
 msgid "1%% corresponds to 0.0001"
 msgstr "1%% соответствует 0,0001"
 
-#. DA27s
+#. a8EDH
 #: 02140000.xhp
 msgctxt ""
 "02140000.xhp\n"
 "par_id3159153\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>"
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Формат - Ячейки - Числа</link>"
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>"
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Формат - Ячейки - Числа</link>"
 
 #. bX9GB
 #: 02150000.xhp
@@ -178,14 +178,14 @@ msgctxt ""
 msgid "Number format: Default"
 msgstr "Числовой формат: по умолчанию"
 
-#. di5Pr
+#. C4AsN
 #: 02150000.xhp
 msgctxt ""
 "02150000.xhp\n"
 "hd_id3149182\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02150000.xhp\" name=\"Number format: Default\">Number format: Default</link>"
-msgstr "<link href=\"text/scalc/02/02150000.xhp\" name=\"Числовой формат: по умолчанию\">Числовой формат: по умолчанию</link>"
+msgid "<link href=\"text/scalc/02/02150000.xhp\">Number format: Default</link>"
+msgstr "<link href=\"text/scalc/02/02150000.xhp\">Числовой формат: по умолчанию</link>"
 
 #. CkVDA
 #: 02150000.xhp
@@ -214,14 +214,14 @@ msgctxt ""
 msgid "Number Format: Standard"
 msgstr "Числовой формат: стандартный"
 
-#. JDEfG
+#. 2JKys
 #: 02150000.xhp
 msgctxt ""
 "02150000.xhp\n"
 "par_id3154908\n"
 "help.text"
-msgid "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Format - Cells - Numbers</link>."
-msgstr "<link href=\"text/shared/01/05020300.xhp\" name=\"Format - Cells - Numbers\">Формат - Ячейки - Числа</link>."
+msgid "<link href=\"text/shared/01/05020300.xhp\">Format - Cells - Numbers</link>."
+msgstr "<link href=\"text/shared/01/05020300.xhp\">Формат - Ячейки - Числа</link>."
 
 #. BhR4Z
 #: 02160000.xhp
@@ -232,14 +232,14 @@ msgctxt ""
 msgid "Number Format: Add Decimal Place"
 msgstr "Числовой формат: добавить разрядность"
 
-#. VsEUD
+#. BdJjx
 #: 02160000.xhp
 msgctxt ""
 "02160000.xhp\n"
 "hd_id3150275\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02160000.xhp\" name=\"Number Format: Add Decimal Place\">Number Format: Add Decimal Place</link>"
-msgstr "<link href=\"text/scalc/02/02160000.xhp\" name=\"Числовой формат: добавить разрядность\">Числовой формат: добавить разрядность</link>"
+msgid "<link href=\"text/scalc/02/02160000.xhp\">Number Format: Add Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02160000.xhp\">Числовой формат: добавить разрядность</link>"
 
 #. jhPg6
 #: 02160000.xhp
@@ -277,14 +277,14 @@ msgctxt ""
 msgid "Number Format: Delete Decimal Place"
 msgstr "Числовой формат: убрать разрядность"
 
-#. ENVTM
+#. ixjiG
 #: 02170000.xhp
 msgctxt ""
 "02170000.xhp\n"
 "hd_id3149164\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/02170000.xhp\" name=\"Number Format: Delete Decimal Place\">Number Format: Delete Decimal Place</link>"
-msgstr "<link href=\"text/scalc/02/02170000.xhp\" name=\"Числовой формат: убрать разрядность\">Числовой формат: убрать разрядность</link>"
+msgid "<link href=\"text/scalc/02/02170000.xhp\">Number Format: Delete Decimal Place</link>"
+msgstr "<link href=\"text/scalc/02/02170000.xhp\">Числовой формат: убрать разрядность</link>"
 
 #. Eip8y
 #: 02170000.xhp
@@ -331,14 +331,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; sheet area names</bookmark_value><bookmark_value>sheet area names</bookmark_value><bookmark_value>showing; cell references</bookmark_value><bookmark_value>cell references; showing</bookmark_value>"
 msgstr "<bookmark_value>панель формул; имена областей листа</bookmark_value><bookmark_value>имена областей листа</bookmark_value><bookmark_value>отображение; ссылки ячеек</bookmark_value><bookmark_value>ссылки ячеек; отображение</bookmark_value>"
 
-#. zo9WM
+#. ywEet
 #: 06010000.xhp
 msgctxt ""
 "06010000.xhp\n"
 "hd_id3156326\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06010000.xhp\" name=\"Name Box\">Name Box</link>"
-msgstr "<link href=\"text/scalc/02/06010000.xhp\" name=\"Поле имён\">Поле имён</link>"
+msgid "<link href=\"text/scalc/02/06010000.xhp\">Name Box</link>"
+msgstr "<link href=\"text/scalc/02/06010000.xhp\">Поле имён</link>"
 
 #. bJypW
 #: 06010000.xhp
@@ -374,7 +374,7 @@ msgctxt ""
 "par_id3152596\n"
 "help.text"
 msgid "To jump to a particular cell, or to select a cell range, type the cell reference, or cell range reference in this box, for example, F1, or A1:C4. You can also enter full name of a sheet; the tooltip then changes to \"Go To Sheet\", and pressing Enter switches to that sheet."
-msgstr "Чтобы перейти к определенной ячейке или выбрать диапазон ячеек, введите ссылку на ячейку или ссылку на диапазон ячеек в этом поле, например, F1 или A1:C4. Вы также можете ввести полное имя листа, всплывающая подсказка изменится на «Перейти к листу», и нажатие клавиши «Enter» переключит на этот лист."
+msgstr "Чтобы перейти к определённой ячейке или выбрать диапазон ячеек, введите ссылку на ячейку или ссылку на диапазон ячеек в этом поле, например, F1 или A1:C4. Вы также можете ввести полное имя листа, всплывающая подсказка изменится на «Перейти к листу», и нажатие клавиши «Enter» переключит на этот лист."
 
 #. VFke2
 #: 06030000.xhp
@@ -394,14 +394,14 @@ msgctxt ""
 msgid "<bookmark_value>functions;sum function icon</bookmark_value>         <bookmark_value>formula bar;sum function</bookmark_value>         <bookmark_value>sum icon</bookmark_value>         <bookmark_value>AutoSum button, see sum icon</bookmark_value>"
 msgstr "<bookmark_value>функции;значок функции суммирования</bookmark_value>         <bookmark_value>панель формул;функция суммирования</bookmark_value>         <bookmark_value>значок суммирования</bookmark_value>         <bookmark_value>кнопка автоматического суммирования, см. значок суммирования</bookmark_value>"
 
-#. vYDYK
+#. CiNzL
 #: 06030000.xhp
 msgctxt ""
 "06030000.xhp\n"
 "hd_id3157909\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06030000.xhp\" name=\"Sum\">Select Function</link>"
-msgstr ""
+msgid "<link href=\"text/scalc/02/06030000.xhp\">Select Function</link>"
+msgstr "<link href=\"text/scalc/02/06030000.xhp\">Выбор функции</link>"
 
 #. KEkiG
 #: 06030000.xhp
@@ -410,7 +410,7 @@ msgctxt ""
 "par_id3150543\n"
 "help.text"
 msgid "<ahelp hid=\"HID_INSWIN_SUMME\">Insert a function of a cell range into the current cell. The function can be Sum, Average, Minimum, Maximum and Count. Click in a cell, click this icon, select the function in the drop down list and optionally adjust the cell range. Or select some cells into which the function value will be inserted, then click the icon. The function result is added at the bottom of the range.</ahelp>"
-msgstr ""
+msgstr "<ahelp hid=\"HID_INSWIN_SUMME\">Вставляет функцию диапазона ячеек в текущую ячейку. Функция может быть Сумма, Среднее, Минимум, Максимум и Количество. Щёлкните ячейку, щёлкните этот значок, выберите функцию в раскрывающемся списке и при необходимости настройте диапазон ячеек. Или выберите ячейки, в которые будет вставлено значение функции, а затем щёлкните значок. Результат функции добавляется под диапазоном.</ahelp>"
 
 #. KDxsW
 #: 06030000.xhp
@@ -419,7 +419,7 @@ msgctxt ""
 "par_id3153770\n"
 "help.text"
 msgid "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Icon Select Function</alt></image>"
-msgstr ""
+msgstr "<image id=\"img_id3147434\" src=\"cmd/sc_autosum.svg\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id3147434\">Значок Выбор функции</alt></image>"
 
 #. DaEgA
 #: 06030000.xhp
@@ -428,7 +428,7 @@ msgctxt ""
 "par_id3152577\n"
 "help.text"
 msgid "Select Function"
-msgstr ""
+msgstr "Выбор функции"
 
 #. SpBhw
 #: 06030000.xhp
@@ -437,7 +437,7 @@ msgctxt ""
 "hd_id161592658402954\n"
 "help.text"
 msgid "Select Function applied with no selected range"
-msgstr ""
+msgstr "«Выбор функции» применяется без выбора диапазона"
 
 #. 59eGX
 #: 06030000.xhp
@@ -446,7 +446,7 @@ msgctxt ""
 "par_id3156444\n"
 "help.text"
 msgid "$[officename] automatically suggests a cell range, provided that the spreadsheet contains data. If the cell range already contains a function, you can combine it with the new one to yield the function applied to the range data. If the range contains filters, the Subtotal function is inserted instead of the selected function."
-msgstr ""
+msgstr "$[officename] автоматически предлагает диапазон ячеек, когда электронная таблица содержит данные. Если диапазон ячеек уже содержит функцию, возможно объединить её с новой, чтобы получить применяемую к данным диапазона функцию. Если диапазон содержит фильтры, вместо выбранной функции вставляется функция Итог."
 
 #. vpnqf
 #: 06030000.xhp
@@ -455,7 +455,7 @@ msgctxt ""
 "par_id3153189\n"
 "help.text"
 msgid "Click the <emph>Accept</emph> icon to use the formula displayed in the input line or <emph>Cancel</emph>."
-msgstr ""
+msgstr "Щёлкните значок <emph>Принять</emph> для использования отображаемой в строке ввода формулы, либо щёлкните <emph>Отмена</emph>."
 
 #. TVD6h
 #: 06030000.xhp
@@ -464,7 +464,7 @@ msgctxt ""
 "par_id231592663499228\n"
 "help.text"
 msgid "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Accept Icon</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/sc_ok.svg\" id=\"img_id521592663499228\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id171592663499228\">Значок Принять</alt></image>"
 
 #. iHTEW
 #: 06030000.xhp
@@ -473,7 +473,7 @@ msgctxt ""
 "par_id481592663499228\n"
 "help.text"
 msgid "Accept"
-msgstr ""
+msgstr "Принять"
 
 #. VFj6u
 #: 06030000.xhp
@@ -482,7 +482,7 @@ msgctxt ""
 "par_id311592663828848\n"
 "help.text"
 msgid "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Icon Cancel</alt></image>"
-msgstr ""
+msgstr "<image src=\"cmd/sc_cancel.svg\" id=\"img_id641592663828848\" width=\"1cm\" height=\"1cm\"><alt id=\"alt_id111592663828848\">Значок Отмена</alt></image>"
 
 #. 7xGcL
 #: 06030000.xhp
@@ -491,7 +491,7 @@ msgctxt ""
 "par_id431592663828848\n"
 "help.text"
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #. GPtKR
 #: 06030000.xhp
@@ -500,7 +500,7 @@ msgctxt ""
 "hd_id261592658395518\n"
 "help.text"
 msgid "Select Function applied on a selected range"
-msgstr ""
+msgstr "«Выбор функции» применяется к выбранному диапазону"
 
 #. JPrPQ
 #: 06030000.xhp
@@ -509,7 +509,7 @@ msgctxt ""
 "par_id911592658130888\n"
 "help.text"
 msgid "When the selected range has two or more rows, the function is calculated for each column. The results are placed in empty cells on the first available row below the range, one result per column."
-msgstr ""
+msgstr "Если выбранный диапазон содержит две или более строк, функция вычисляется для каждого столбца. Результаты помещаются в пустые ячейки в первой доступной строке под диапазоном, по одному результату на столбец."
 
 #. iHksB
 #: 06030000.xhp
@@ -518,7 +518,7 @@ msgctxt ""
 "par_id991592658144387\n"
 "help.text"
 msgid "When the selected range has one row, the function result is placed in the first available cell on the right of the selected range."
-msgstr ""
+msgstr "Если выбранный диапазон содержит одну строка, результат помещается в первую доступную ячейку справа от выбранного диапазона."
 
 #. NYGR7
 #: 06040000.xhp
@@ -538,14 +538,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; functions</bookmark_value><bookmark_value>functions; formula bar icon</bookmark_value>"
 msgstr "<bookmark_value>панель формул; функции</bookmark_value><bookmark_value>функции; значок в панели формул</bookmark_value>"
 
-#. tnkP3
+#. ZGqd9
 #: 06040000.xhp
 msgctxt ""
 "06040000.xhp\n"
 "hd_id3150084\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06040000.xhp\" name=\"Function\">Function</link>"
-msgstr "<link href=\"text/scalc/02/06040000.xhp\" name=\"Функция\">Функция</link>"
+msgid "<link href=\"text/scalc/02/06040000.xhp\">Function</link>"
+msgstr "<link href=\"text/scalc/02/06040000.xhp\">Функция</link>"
 
 #. TnbLt
 #: 06040000.xhp
@@ -592,23 +592,23 @@ msgctxt ""
 msgid "Input line"
 msgstr "Строка ввода"
 
-#. CXdQo
+#. Vteqe
 #: 06050000.xhp
 msgctxt ""
 "06050000.xhp\n"
 "hd_id3153821\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06050000.xhp\" name=\"Input line\">Input line</link>"
-msgstr "<link href=\"text/scalc/02/06050000.xhp\" name=\"Строка ввода\">Строка ввода</link>"
+msgid "<link href=\"text/scalc/02/06050000.xhp\">Input line</link>"
+msgstr "<link href=\"text/scalc/02/06050000.xhp\">Строка ввода</link>"
 
-#. 4R8nP
+#. Dgf7D
 #: 06050000.xhp
 msgctxt ""
 "06050000.xhp\n"
 "par_id3155922\n"
 "help.text"
-msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\" name=\"Function Wizard\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
-msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Введите формулу, которую нужно добавить к текущей ячейке. Вы можете также щёлкнуть значок <link href=\"text/scalc/01/04060000.xhp\" name=\"Мастер функций\">Мастер функций</link>, чтобы вставить в формулу встроенную функцию.</ahelp>"
+msgid "<ahelp hid=\"HID_INSWIN_INPUT\">Enter the formula that you want to add to the current cell. You can also click the <link href=\"text/scalc/01/04060000.xhp\">Function Wizard</link> icon to insert a predefined function into the formula.</ahelp>"
+msgstr "<ahelp hid=\"HID_INSWIN_INPUT\">Введите формулу, которую нужно добавить к текущей ячейке. Вы можете также щёлкнуть значок <link href=\"text/scalc/01/04060000.xhp\">Мастер функций</link>, чтобы вставить в формулу встроенную функцию.</ahelp>"
 
 #. pBxxB
 #: 06060000.xhp
@@ -628,14 +628,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; canceling inputs</bookmark_value><bookmark_value>functions; canceling input icon</bookmark_value>"
 msgstr "<bookmark_value>панель формул; отмена ввода</bookmark_value><bookmark_value>функции; значок отмены ввода</bookmark_value>"
 
-#. nYGqw
+#. 4mACq
 #: 06060000.xhp
 msgctxt ""
 "06060000.xhp\n"
 "hd_id3154514\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06060000.xhp\" name=\"Cancel\">Cancel</link>"
-msgstr "<link href=\"text/scalc/02/06060000.xhp\" name=\"Отмена\">Отмена</link>"
+msgid "<link href=\"text/scalc/02/06060000.xhp\">Cancel</link>"
+msgstr "<link href=\"text/scalc/02/06060000.xhp\">Отмена</link>"
 
 #. uafDY
 #: 06060000.xhp
@@ -682,14 +682,14 @@ msgctxt ""
 msgid "<bookmark_value>formula bar; accepting inputs</bookmark_value><bookmark_value>functions; accepting input icon</bookmark_value>"
 msgstr "<bookmark_value>панель формул; принятие ввода</bookmark_value><bookmark_value>функции; значок принятия ввода</bookmark_value>"
 
-#. SK35g
+#. EnHFH
 #: 06070000.xhp
 msgctxt ""
 "06070000.xhp\n"
 "hd_id3143267\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06070000.xhp\" name=\"Accept\">Accept</link>"
-msgstr "<link href=\"text/scalc/02/06070000.xhp\" name=\"Принять\">Принять</link>"
+msgid "<link href=\"text/scalc/02/06070000.xhp\">Accept</link>"
+msgstr "<link href=\"text/scalc/02/06070000.xhp\">Принять</link>"
 
 #. BBvqG
 #: 06070000.xhp
@@ -727,14 +727,14 @@ msgctxt ""
 msgid "Theme Selection"
 msgstr "Выбор темы"
 
-#. 7zx5b
+#. nuJj7
 #: 06080000.xhp
 msgctxt ""
 "06080000.xhp\n"
 "hd_id3153087\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/06080000.xhp\" name=\"Theme Selection\">Theme Selection</link>"
-msgstr "<link href=\"text/scalc/02/06080000.xhp\" name=\"Выбор темы\">Выбор темы</link>"
+msgid "<link href=\"text/scalc/02/06080000.xhp\">Theme Selection</link>"
+msgstr "<link href=\"text/scalc/02/06080000.xhp\">Выбор темы</link>"
 
 #. rVKiP
 #: 06080000.xhp
@@ -781,14 +781,14 @@ msgctxt ""
 msgid "Position in document"
 msgstr "Положение в документе"
 
-#. RiLaz
+#. BNLiM
 #: 08010000.xhp
 msgctxt ""
 "08010000.xhp\n"
 "hd_id3145119\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/08010000.xhp\" name=\"Position in document\">Position in document</link>"
-msgstr "<link href=\"text/scalc/02/08010000.xhp\" name=\"Положение в документе\">Положение в документе</link>"
+msgid "<link href=\"text/scalc/02/08010000.xhp\">Position in document</link>"
+msgstr "<link href=\"text/scalc/02/08010000.xhp\">Положение в документе</link>"
 
 #. L7Xk5
 #: 08010000.xhp
@@ -817,14 +817,14 @@ msgctxt ""
 msgid "<bookmark_value>formulas;status bar</bookmark_value>"
 msgstr "<bookmark_value>формулы;строка состояния</bookmark_value>"
 
-#. MFGFm
+#. FVYfS
 #: 08080000.xhp
 msgctxt ""
 "08080000.xhp\n"
 "hd_id3147335\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/08080000.xhp\" name=\"Standard Formula, Date/Time, Error Warning\">Standard Formula, Date/Time, Error Warning</link>"
-msgstr "<link href=\"text/scalc/02/08080000.xhp\" name=\"Стандартная формула, дата/время, предупреждение об ошибке\">Стандартная формула, дата/время, предупреждение об ошибке</link>"
+msgid "<link href=\"text/scalc/02/08080000.xhp\">Standard Formula, Date/Time, Error Warning</link>"
+msgstr "<link href=\"text/scalc/02/08080000.xhp\">Стандартная формула, дата/время, предупреждение об ошибке</link>"
 
 #. gvyvx
 #: 08080000.xhp
@@ -844,14 +844,14 @@ msgctxt ""
 msgid "To change the default formula that is displayed, right-click the field, and then choose the formula that you want. The available formulas are: Average, count of values (COUNTA), count of numbers (COUNT), Maximum, Minimum, Sum, or None."
 msgstr "Чтобы изменить отображаемую стандартную формулу, щёлкните поле правой кнопкой мыши и выберите нужную формулу. Доступные формулы: \"Среднее значение\", \"Количество значений\", \"Количество значений\", \"Максимум\", \"Минимум\", \"Сумма\" и \"Нет\" (без формулы)."
 
-#. hAizh
+#. dC4rs
 #: 08080000.xhp
 msgctxt ""
 "08080000.xhp\n"
 "par_id3153969\n"
 "help.text"
-msgid "<link href=\"text/scalc/05/02140000.xhp\" name=\"Error codes\">Error codes</link>"
-msgstr "<link href=\"text/scalc/05/02140000.xhp\" name=\"Коды ошибок\">Коды ошибок</link>"
+msgid "<link href=\"text/scalc/05/02140000.xhp\">Error codes</link>"
+msgstr "<link href=\"text/scalc/05/02140000.xhp\">Коды ошибок</link>"
 
 #. 2fX5w
 #: 10050000.xhp
@@ -871,14 +871,14 @@ msgctxt ""
 msgid "<bookmark_value>page views; increasing scales</bookmark_value><bookmark_value>increasing scales in page view</bookmark_value><bookmark_value>zooming;enlarging page views</bookmark_value>"
 msgstr "<bookmark_value>виды страниц; увеличение масштаба</bookmark_value><bookmark_value>увеличение масштаба в виде страниц</bookmark_value><bookmark_value>масштабирование;увеличение вида страниц</bookmark_value>"
 
-#. XBiGZ
+#. GESuX
 #: 10050000.xhp
 msgctxt ""
 "10050000.xhp\n"
 "hd_id3148491\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/10050000.xhp\" name=\"Zoom In\">Zoom In</link>"
-msgstr "<link href=\"text/scalc/02/10050000.xhp\" name=\"Увеличить\">Увеличить</link>"
+msgid "<link href=\"text/scalc/02/10050000.xhp\">Zoom In</link>"
+msgstr "<link href=\"text/scalc/02/10050000.xhp\">Увеличить</link>"
 
 #. Uq4Tv
 #: 10050000.xhp
@@ -934,14 +934,14 @@ msgctxt ""
 msgid "<bookmark_value>page views;reducing scales</bookmark_value><bookmark_value>zooming;reducing page views</bookmark_value>"
 msgstr "<bookmark_value>виды страниц;уменьшение масштаба</bookmark_value><bookmark_value>масштабирование;уменьшение вида страниц</bookmark_value>"
 
-#. fwoCG
+#. Ffzbc
 #: 10060000.xhp
 msgctxt ""
 "10060000.xhp\n"
 "hd_id3153561\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/10060000.xhp\" name=\"Zoom Out\">Zoom Out</link>"
-msgstr "<link href=\"text/scalc/02/10060000.xhp\" name=\"Уменьшить\">Мельче</link>"
+msgid "<link href=\"text/scalc/02/10060000.xhp\">Zoom Out</link>"
+msgstr "<link href=\"text/scalc/02/10060000.xhp\">Мельче</link>"
 
 #. BgFbq
 #: 10060000.xhp
@@ -997,14 +997,14 @@ msgctxt ""
 msgid "<bookmark_value>inserting; objects, toolbar icon</bookmark_value>"
 msgstr "<bookmark_value>вставка; объекты, значок панели инструментов</bookmark_value>"
 
-#. nuhSb
+#. pM9zg
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3156329\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/18010000.xhp\" name=\"Insert\">Insert</link>"
-msgstr "<link href=\"text/scalc/02/18010000.xhp\" name=\"Вставлять\">Вставлять</link>"
+msgid "<link href=\"text/scalc/02/18010000.xhp\">Insert</link>"
+msgstr "<link href=\"text/scalc/02/18010000.xhp\">Вставлять</link>"
 
 #. UfEHG
 #: 18010000.xhp
@@ -1051,59 +1051,59 @@ msgctxt ""
 msgid "You can select the following icons:"
 msgstr "Можно выбрать следующие значки:"
 
-#. mimKi
+#. CCP2V
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id4283883\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04160500.xhp\" name=\"Floating Frame\">Floating Frame</link>"
-msgstr "<link href=\"text/shared/01/04160500.xhp\" name=\"Плавающий фрейм\">Плавающий фрейм</link>"
+msgid "<link href=\"text/shared/01/04160500.xhp\">Floating Frame</link>"
+msgstr "<link href=\"text/shared/01/04160500.xhp\">Фрейм</link>"
 
-#. hJCq8
+#. gdmkZ
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3149410\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04100000.xhp\" name=\"Special Character\">Special Character</link>"
-msgstr "<link href=\"text/shared/01/04100000.xhp\" name=\"Специальный символ\">Специальный символ</link>"
+msgid "<link href=\"text/shared/01/04100000.xhp\">Special Character</link>"
+msgstr "<link href=\"text/shared/01/04100000.xhp\">Выбор символа</link>"
 
-#. 9YdEG
+#. FDin8
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3151117\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04140000.xhp\" name=\"From File\">From File</link>"
-msgstr "<link href=\"text/shared/01/04140000.xhp\" name=\"Из файла\">Из файла</link>"
+msgid "<link href=\"text/shared/01/04140000.xhp\">From File</link>"
+msgstr "<link href=\"text/shared/01/04140000.xhp\">Из файла</link>"
 
-#. kBXFP
+#. UKJsG
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id3633533\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04160300.xhp\" name=\"Formula\">Formula</link>"
-msgstr "<link href=\"text/shared/01/04160300.xhp\" name=\"Формула\">Формула</link>"
+msgid "<link href=\"text/shared/01/04160300.xhp\">Formula</link>"
+msgstr "<link href=\"text/shared/01/04160300.xhp\">Формула</link>"
 
-#. MABzX
+#. sCB8B
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "par_idN10769\n"
 "help.text"
-msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Insert Chart\">Chart</link>"
-msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\" name=\"Вставить диаграмму\">Диаграмма</link>"
+msgid "<link href=\"text/schart/01/wiz_chart_type.xhp\">Chart</link>"
+msgstr "<link href=\"text/schart/01/wiz_chart_type.xhp\">Диаграмма</link>"
 
-#. 98CKi
+#. zc6Yi
 #: 18010000.xhp
 msgctxt ""
 "18010000.xhp\n"
 "hd_id7581408\n"
 "help.text"
-msgid "<link href=\"text/shared/01/04150100.xhp\" name=\"OLE Object\">OLE Object</link>"
-msgstr "<link href=\"text/shared/01/04150100.xhp\" name=\"Объект OLE\">Объект OLE</link>"
+msgid "<link href=\"text/shared/01/04150100.xhp\">OLE Object</link>"
+msgstr "<link href=\"text/shared/01/04150100.xhp\">Объект OLE</link>"
 
 #. QMjWB
 #: 18020000.xhp
@@ -1112,7 +1112,7 @@ msgctxt ""
 "tit\n"
 "help.text"
 msgid "Insert Cells"
-msgstr "Вставка ячеек"
+msgstr "Вставить ячейки"
 
 #. h3979
 #: 18020000.xhp
@@ -1123,14 +1123,14 @@ msgctxt ""
 msgid "<bookmark_value>inserting; cells, toolbar icon</bookmark_value>"
 msgstr "<bookmark_value>вставка; ячейки, значок панели инструментов</bookmark_value>"
 
-#. CMJXh
+#. RysCQ
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3150275\n"
 "help.text"
-msgid "<link href=\"text/scalc/02/18020000.xhp\" name=\"Insert Cells\">Insert Cells</link>"
-msgstr "<link href=\"text/scalc/02/18020000.xhp\" name=\"Вставка ячеек\">Вставка ячеек</link>"
+msgid "<link href=\"text/scalc/02/18020000.xhp\">Insert Cells</link>"
+msgstr "<link href=\"text/scalc/02/18020000.xhp\">Вставка ячеек</link>"
 
 #. iTWkf
 #: 18020000.xhp
@@ -1159,38 +1159,38 @@ msgctxt ""
 msgid "You can select the following icons:"
 msgstr "Можно выбрать следующие значки:"
 
-#. m2qTa
+#. JPhcE
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3150439\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Insert Cells Down\">Insert Cells Down</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Вставить ячейки снизу\">Вставить ячейки снизу</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Down</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Вставить ячейки снизу</link>"
 
-#. CLMtB
+#. c3Xmu
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3146119\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Insert Cells Right\">Insert Cells Right</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Вставить ячейки справа\">Вставить ячейки справа</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Insert Cells Right</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Вставить ячейки справа</link>"
 
-#. nv4or
+#. XXyxu
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3153190\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Rows\">Rows</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Строки\">Строки</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Rows</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Строки</link>"
 
-#. ojZTY
+#. i4ifJ
 #: 18020000.xhp
 msgctxt ""
 "18020000.xhp\n"
 "hd_id3153726\n"
 "help.text"
-msgid "<link href=\"text/scalc/01/04020000.xhp\" name=\"Columns\">Columns</link>"
-msgstr "<link href=\"text/scalc/01/04020000.xhp\" name=\"Столбцы\">Столбцы</link>"
+msgid "<link href=\"text/scalc/01/04020000.xhp\">Columns</link>"
+msgstr "<link href=\"text/scalc/01/04020000.xhp\">Столбцы</link>"

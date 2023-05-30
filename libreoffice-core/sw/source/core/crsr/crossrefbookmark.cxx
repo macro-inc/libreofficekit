@@ -24,6 +24,7 @@
 #include <IDocumentMarkAccess.hxx>
 #include <crossrefbookmark.hxx>
 #include <ndtxt.hxx>
+#include <o3tl/string_view.hxx>
 
 namespace
 {
@@ -45,15 +46,15 @@ namespace sw::mark
                     "- creation of cross-reference bookmark with an illegal PaM that does not expand over exactly one whole paragraph.");
         if(rName.isEmpty())
             m_aName = MarkBase::GenerateNewName(rPrefix);
-        assert(!m_pPos2);
+        assert(!m_oPos2);
     }
 
     void CrossRefBookmark::SetMarkPos(const SwPosition& rNewPos)
     {
-        assert(rNewPos.nNode.GetNode().GetTextNode() &&
+        assert(rNewPos.GetNode().GetTextNode() &&
             "<sw::mark::CrossRefBookmark::SetMarkPos(..)>"
             " - new bookmark position for cross-reference bookmark doesn't mark text node");
-        assert(rNewPos.nContent.GetIndex() == 0 &&
+        assert(rNewPos.GetContentIndex() == 0 &&
             "<sw::mark::CrossRefBookmark::SetMarkPos(..)>"
             " - new bookmark position for cross-reference bookmark doesn't mark start of text node");
         MarkBase::SetMarkPos(rNewPos);
@@ -70,12 +71,12 @@ namespace sw::mark
     CrossRefHeadingBookmark::CrossRefHeadingBookmark(const SwPaM& rPaM,
         const vcl::KeyCode& rCode,
         const OUString& rName)
-        : CrossRefBookmark(rPaM, rCode, rName, OUStringConcatenation(IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix()+"_Toc"))
+        : CrossRefBookmark(rPaM, rCode, rName, Concat2View(IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix()+"_Toc"))
     { }
 
-    bool CrossRefHeadingBookmark::IsLegalName(const OUString& rName)
+    bool CrossRefHeadingBookmark::IsLegalName(std::u16string_view rName)
     {
-        return rName.match(IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix());
+        return o3tl::starts_with(rName, IDocumentMarkAccess::GetCrossRefHeadingBookmarkNamePrefix());
     }
 
     CrossRefNumItemBookmark::CrossRefNumItemBookmark(const SwPaM& rPaM,
@@ -84,9 +85,9 @@ namespace sw::mark
         : CrossRefBookmark(rPaM, rCode, rName, CrossRefNumItemBookmark_NamePrefix)
     { }
 
-    bool CrossRefNumItemBookmark::IsLegalName(const OUString& rName)
+    bool CrossRefNumItemBookmark::IsLegalName(std::u16string_view rName)
     {
-        return rName.match(CrossRefNumItemBookmark_NamePrefix);
+        return o3tl::starts_with(rName, CrossRefNumItemBookmark_NamePrefix);
     }
 }
 

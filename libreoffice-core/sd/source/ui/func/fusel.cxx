@@ -55,6 +55,7 @@
 #include <svx/svdundo.hxx>
 
 #include <svx/sdrhittesthelper.hxx>
+#include <svx/diagram/IDiagramHelper.hxx>
 
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <comphelper/lok.hxx>
@@ -247,12 +248,12 @@ bool FuSelection::MouseButtonDown(const MouseEvent& rMEvt)
             }
             else if ( bTextEdit )
             {
-                sal_uInt16 nSdrObjKind = aVEvt.mpObj->GetObjIdentifier();
+                SdrObjKind nSdrObjKind = aVEvt.mpObj->GetObjIdentifier();
 
                 if (aVEvt.mpObj->GetObjInventor() == SdrInventor::Default &&
-                    (nSdrObjKind == OBJ_TEXT ||
-                     nSdrObjKind == OBJ_TITLETEXT ||
-                     nSdrObjKind == OBJ_OUTLINETEXT ||
+                    (nSdrObjKind == SdrObjKind::Text ||
+                     nSdrObjKind == SdrObjKind::TitleText ||
+                     nSdrObjKind == SdrObjKind::OutlineText ||
                      !aVEvt.mpObj->IsEmptyPresObj()))
                 {
                     // Seamless Editing: branch to text input
@@ -271,6 +272,9 @@ bool FuSelection::MouseButtonDown(const MouseEvent& rMEvt)
                       aVEvt.meEvent == SdrEventKind::ExecuteUrl )
              {
                 mpWindow->ReleaseMouse();
+
+                if (!aVEvt.mpURLField)
+                    return true;
 
                 // If tiled rendering, let client handles URL execution and early returns.
                 if (comphelper::LibreOfficeKit::isActive())
@@ -323,7 +327,7 @@ bool FuSelection::MouseButtonDown(const MouseEvent& rMEvt)
 
                     if (!bReturn
                         && (dynamic_cast<const SdrObjGroup*>(pObj) != nullptr
-                            || dynamic_cast<const E3dScene*>(pObj) != nullptr))
+                            || DynCastE3dScene(pObj)))
                     {
                         if (rMEvt.GetClicks() == 1)
                         {
@@ -674,7 +678,7 @@ bool FuSelection::MouseButtonUp(const MouseEvent& rMEvt)
             }
 
             mpView->SetDragWithCopy(bDragWithCopy);
-            mpView->EndDragObj( mpView->IsDragWithCopy() );
+            bool bWasDragged(mpView->EndDragObj( mpView->IsDragWithCopy() ));
 
             mpView->ForceMarkedToAnotherPage();
 
@@ -695,9 +699,8 @@ bool FuSelection::MouseButtonUp(const MouseEvent& rMEvt)
                     mpView->MarkObj(pObj,pPV);
                     return true;
                 }
-                /**************************************************************
-                * Toggle between selection and rotation
-                **************************************************************/
+
+                // check for single object selected
                 SdrObject* pSingleObj = nullptr;
 
                 if (mpView->GetMarkedObjectList().GetMarkCount()==1)
@@ -705,6 +708,24 @@ bool FuSelection::MouseButtonUp(const MouseEvent& rMEvt)
                     pSingleObj = mpView->GetMarkedObjectList().GetMark(0)->GetMarkedSdrObj();
                 }
 
+                // Check for click on svx::diagram::DiagramFrameHdl
+                // - if we hit a SdrHdl
+                // - if it was not moved
+                // - if single object is selected
+                //   - and it is a Diagram
+                if(pHdl && !bWasDragged && nullptr != pSingleObj && pSingleObj->isDiagram())
+                {
+                    svx::diagram::DiagramFrameHdl* pDiagramFrameHdl(dynamic_cast<svx::diagram::DiagramFrameHdl*>(pHdl));
+                    if(nullptr != pDiagramFrameHdl)
+                    {
+                        // let the DiagramFrameHdl decide what to do
+                        svx::diagram::DiagramFrameHdl::clicked(aPnt);
+                    }
+                }
+
+                /**************************************************************
+                * Toggle between selection and rotation
+                **************************************************************/
                 if (nSlotId == SID_OBJECT_SELECT
                     && !comphelper::LibreOfficeKit::isActive()
                     && mpView->IsRotateAllowed()
@@ -841,7 +862,7 @@ bool FuSelection::MouseButtonUp(const MouseEvent& rMEvt)
               !mpView->IsShearAllowed() && !mpView->IsDistortAllowed() ) ||
              ( nSlotId==SID_CONVERT_TO_3D_LATHE && pSingleObj &&
               (pSingleObj->GetObjInventor() != SdrInventor::Default         ||
-               pSingleObj->GetObjIdentifier() == OBJ_MEASURE) ) )
+               pSingleObj->GetObjIdentifier() == SdrObjKind::Measure) ) )
         {
             bReturn = true;
             ForcePointer(&rMEvt);

@@ -24,7 +24,7 @@ usage()
 {
     git
     echo
-    echo "Usage: g [options] [git (checkout|clone|fetch|grep|pull|push|reset) [git options/args..]]"
+    echo "Usage: g [options] [git (checkout|clone|fetch|gc|grep|pull|push|reset) [git options/args..]]"
     echo ""
     echo " -z restore the git hooks and do other sanity checks"
 }
@@ -91,13 +91,16 @@ refresh_all_hooks()
     local hook
 
     pushd "${COREDIR?}" > /dev/null
-    for hook_name in "${COREDIR?}/.git-hooks"/* ; do
-        hook=".git/hooks/${hook_name##*/}"
-        if [ ! -e "${hook?}" ] || [ -L "${hook?}" ] ; then
-            rm -f "${hook?}"
-            ln -sf "${hook_name}" "${hook?}"
-        fi
-    done
+    # There's no ".git" e.g. in a secondary worktree
+    if [ -d ".git" ]; then
+        for hook_name in "${COREDIR?}/.git-hooks"/* ; do
+            hook=".git/hooks/${hook_name##*/}"
+            if [ ! -e "${hook?}" ] || [ -L "${hook?}" ] ; then
+                rm -f "${hook?}"
+                ln -sf "${hook_name}" "${hook?}"
+            fi
+        done
+    fi
 
     for repo in ${SUBMODULES_ALL?} ; do
         refresh_submodule_hooks "$repo"
@@ -361,6 +364,9 @@ case "$COMMAND" in
     fetch)
         (git fetch "$@" && git submodule foreach git fetch "$@" ) && git submodule update --progress
 
+        ;;
+    gc)
+         (git gc "$@" && git submodule foreach git gc "$@" )
         ;;
     grep)
         KEEP_GOING="||:"

@@ -24,7 +24,6 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <cppuhelper/implbase2.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <comphelper/sequence.hxx>
 #include <drawinglayer/geometry/viewinformation2d.hxx>
 #include <basegfx/numeric/ftools.hxx>
 #include <vcl/bitmapex.hxx>
@@ -133,7 +132,7 @@ namespace drawinglayer::unorenderer
                     const primitive2d::Primitive2DReference xEmbedRef(
                         new primitive2d::TransformPrimitive2D(
                             aEmbedding,
-                            comphelper::sequenceToContainer<primitive2d::Primitive2DContainer>(aPrimitive2DSequence)));
+                            aPrimitive2DSequence));
                     primitive2d::Primitive2DContainer xEmbedSeq { xEmbedRef };
 
                     BitmapEx aBitmapEx(

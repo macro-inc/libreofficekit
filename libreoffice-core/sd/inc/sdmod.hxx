@@ -24,12 +24,14 @@
 
 #include <sot/storage.hxx>
 #include "sddllapi.h"
+#include <svl/itemprop.hxx>
 #include <svl/lstner.hxx>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <sfx2/app.hxx>
 #include <sfx2/module.hxx>
 #include <sal/types.h>
 #include <vcl/virdev.hxx>
+#include <o3tl/span.hxx>
 #include <map>
 #include <memory>
 #include <string_view>
@@ -41,9 +43,9 @@ class SdTransferable;
 class SvNumberFormatter;
 class SfxErrorHandler;
 class SfxFrame;
-struct SfxItemPropertyMapEntry;
 class VclSimpleEvent;
 namespace svtools { class ColorConfig; }
+enum class SdrObjKind : sal_uInt16;
 
 namespace com::sun::star::frame {
     class XFrame;
@@ -55,8 +57,18 @@ enum class SdOptionStreamMode
     Store = 1
 };
 
-typedef std::map< SfxItemPropertyMapEntry const * , css::uno::Reference<css::beans::XPropertySetInfo> > SdExtPropertySetInfoCache;
-typedef std::map< sal_uInt32, css::uno::Sequence< css::uno::Type> > SdTypesCache;
+struct SdExtPropertySetInfoCacheCompare
+{
+    bool operator()(const o3tl::span<SfxItemPropertyMapEntry const>& lhs, const o3tl::span<SfxItemPropertyMapEntry const>& rhs) const
+    {
+        return lhs.data() < rhs.data();
+    }
+};
+typedef std::map<
+            o3tl::span<SfxItemPropertyMapEntry const>,
+            css::uno::Reference<css::beans::XPropertySetInfo>,
+            SdExtPropertySetInfoCacheCompare > SdExtPropertySetInfoCache;
+typedef std::map< SdrObjKind, css::uno::Sequence< css::uno::Type> > SdTypesCache;
 
 /*
 

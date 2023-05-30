@@ -40,6 +40,7 @@
 #include <toolkit/helper/property.hxx>
 #include <rtl/math.hxx>
 #include <sal/log.hxx>
+#include <utility>
 #include <vcl/toolkit/floatwin.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/window.hxx>
@@ -54,7 +55,7 @@
 #include <vcl/settings.hxx>
 #include <vcl/commandevent.hxx>
 #include <comphelper/flagguard.hxx>
-#include <comphelper/interfacecontainer2.hxx>
+#include <comphelper/interfacecontainer3.hxx>
 #include <comphelper/profilezone.hxx>
 #include "stylesettings.hxx"
 #include <tools/urlobj.hxx>
@@ -96,8 +97,8 @@ private:
     bool                            mbDirectVisible;
 
     ::osl::Mutex                        maListenerContainerMutex;
-    ::comphelper::OInterfaceContainerHelper2   maWindow2Listeners;
-    ::comphelper::OInterfaceContainerHelper2   maDockableWindowListeners;
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XWindowListener2>  maWindow2Listeners;
+    ::comphelper::OInterfaceContainerHelper3<XDockableWindowListener> maDockableWindowListeners;
     EventListenerMultiplexer            maEventListeners;
     FocusListenerMultiplexer            maFocusListeners;
     WindowListenerMultiplexer           maWindowListeners;
@@ -171,8 +172,8 @@ public:
 
     /** returns the container of registered XWindowListener2 listeners
     */
-    ::comphelper::OInterfaceContainerHelper2&   getWindow2Listeners()       { return maWindow2Listeners; }
-    ::comphelper::OInterfaceContainerHelper2&   getDockableWindowListeners(){ return maDockableWindowListeners; }
+    ::comphelper::OInterfaceContainerHelper3<css::awt::XWindowListener2>& getWindow2Listeners() { return maWindow2Listeners; }
+    ::comphelper::OInterfaceContainerHelper3<XDockableWindowListener>& getDockableWindowListeners() { return maDockableWindowListeners; }
     EventListenerMultiplexer&            getEventListeners()         { return maEventListeners; }
     FocusListenerMultiplexer&            getFocusListeners()         { return maFocusListeners; }
     WindowListenerMultiplexer&           getWindowListeners()        { return maWindowListeners; }
@@ -404,10 +405,10 @@ namespace
 {
     struct CallWindow2Listener
     {
-        CallWindow2Listener( ::comphelper::OInterfaceContainerHelper2& i_rWindow2Listeners, const bool i_bEnabled, const EventObject& i_rEvent )
+        CallWindow2Listener( ::comphelper::OInterfaceContainerHelper3<css::awt::XWindowListener2>& i_rWindow2Listeners, const bool i_bEnabled, EventObject i_Event )
             :m_rWindow2Listeners( i_rWindow2Listeners )
             ,m_bEnabled( i_bEnabled )
-            ,m_aEvent( i_rEvent )
+            ,m_aEvent(std::move( i_Event ))
         {
         }
 
@@ -416,7 +417,7 @@ namespace
             m_rWindow2Listeners.notifyEach( m_bEnabled ? &XWindowListener2::windowEnabled : &XWindowListener2::windowDisabled, m_aEvent );
         }
 
-        ::comphelper::OInterfaceContainerHelper2&  m_rWindow2Listeners;
+        ::comphelper::OInterfaceContainerHelper3<css::awt::XWindowListener2>&  m_rWindow2Listeners;
         const bool                          m_bEnabled;
         const EventObject                   m_aEvent;
     };
@@ -784,10 +785,10 @@ void VCLXWindow::ProcessWindowEvent( const VclWindowEvent& rVclWindowEvent )
                     aEvent.bInteractive = true;
 
                     Reference< XDockableWindowListener > xFirstListener;
-                    ::comphelper::OInterfaceIteratorHelper2 aIter( mpImpl->getDockableWindowListeners() );
+                    ::comphelper::OInterfaceIteratorHelper3 aIter( mpImpl->getDockableWindowListeners() );
                     while ( aIter.hasMoreElements() && !xFirstListener.is() )
                     {
-                        xFirstListener.set( aIter.next(), UNO_QUERY );
+                        xFirstListener = aIter.next();
                     }
 
                     css::awt::DockingData aDockingData =
@@ -826,10 +827,10 @@ void VCLXWindow::ProcessWindowEvent( const VclWindowEvent& rVclWindowEvent )
                 aEvent.Source = static_cast<cppu::OWeakObject*>(this);
 
                 Reference< XDockableWindowListener > xFirstListener;
-                ::comphelper::OInterfaceIteratorHelper2 aIter( mpImpl->getDockableWindowListeners() );
+                ::comphelper::OInterfaceIteratorHelper3 aIter( mpImpl->getDockableWindowListeners() );
                 while ( aIter.hasMoreElements() && !xFirstListener.is() )
                 {
-                    xFirstListener.set( aIter.next(), UNO_QUERY );
+                    xFirstListener = aIter.next();
                 }
 
                 *p_bFloating = xFirstListener->prepareToggleFloatingMode( aEvent );
@@ -1348,12 +1349,12 @@ void VCLXWindow::GetPropertyIds( std::vector< sal_uInt16 >& _out_rIds )
     return ImplGetPropertyIds( _out_rIds, mpImpl->mbWithDefaultProps );
 }
 
-::comphelper::OInterfaceContainerHelper2& VCLXWindow::GetContainerListeners()
+::comphelper::OInterfaceContainerHelper3<css::awt::XVclContainerListener>& VCLXWindow::GetContainerListeners()
 {
     return mpImpl->getContainerListeners();
 }
 
-::comphelper::OInterfaceContainerHelper2& VCLXWindow::GetTopWindowListeners()
+::comphelper::OInterfaceContainerHelper3<css::awt::XTopWindowListener>& VCLXWindow::GetTopWindowListeners()
 {
     return mpImpl->getTopWindowListeners();
 }
@@ -1701,6 +1702,46 @@ void VCLXWindow::setProperty( const OUString& PropertyName, const css::uno::Any&
                     pWindow->GetOutDev()->SetLineColor( nColor );
             }
         break;
+        case BASEPROPERTY_HIGHLIGHT_COLOR:
+        {
+            Color nColor = 0;
+            if ( bVoid )
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+
+            AllSettings aSettings(pWindow->GetSettings());
+            StyleSettings aStyle(aSettings.GetStyleSettings());
+            aStyle.SetHighlightColor(nColor);
+            aSettings.SetStyleSettings(aStyle);
+            pWindow->SetSettings(aSettings);
+        }
+        break;
+        case BASEPROPERTY_HIGHLIGHT_TEXT_COLOR:
+        {
+            Color nColor = 0;
+            if (bVoid)
+            {
+                nColor = Application::GetSettings().GetStyleSettings().GetHighlightTextColor();
+            }
+            else
+            {
+                if (!(Value >>= nColor))
+                    break;
+            }
+
+            AllSettings aSettings(pWindow->GetSettings());
+            StyleSettings aStyle(aSettings.GetStyleSettings());
+            aStyle.SetHighlightTextColor(nColor);
+            aSettings.SetStyleSettings(aStyle);
+            pWindow->SetSettings(aSettings);
+        }
+        break;
         case BASEPROPERTY_BORDER:
         {
             WinBits nStyle = pWindow->GetStyle();
@@ -2025,6 +2066,12 @@ css::uno::Any VCLXWindow::getProperty( const OUString& PropertyName )
             break;
             case BASEPROPERTY_LINECOLOR:
                 aProp <<= GetWindow()->GetOutDev()->GetLineColor();
+            break;
+            case BASEPROPERTY_HIGHLIGHT_COLOR:
+                aProp <<= GetWindow()->GetSettings().GetStyleSettings().GetHighlightColor();
+            break;
+            case BASEPROPERTY_HIGHLIGHT_TEXT_COLOR:
+                aProp <<= GetWindow()->GetSettings().GetStyleSettings().GetHighlightTextColor();
             break;
             case BASEPROPERTY_BORDER:
             {

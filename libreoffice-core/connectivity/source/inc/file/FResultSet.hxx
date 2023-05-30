@@ -40,6 +40,7 @@
 #include <TSortIndex.hxx>
 #include <TSkipDeletedSet.hxx>
 #include <com/sun/star/lang/XEventListener.hpp>
+#include <o3tl/safeint.hxx>
 
 namespace connectivity::file
     {
@@ -247,7 +248,7 @@ namespace connectivity::file
             virtual sal_Int32 SAL_CALL findColumn( const OUString& columnName ) override;
             // css::lang::XUnoTunnel
             virtual sal_Int64 SAL_CALL getSomething( const css::uno::Sequence< sal_Int8 >& aIdentifier ) override;
-            static css::uno::Sequence< sal_Int8 > getUnoTunnelId();
+            static const css::uno::Sequence< sal_Int8 > & getUnoTunnelId();
             //XEventlistener
             virtual void SAL_CALL disposing( const css::lang::EventObject& Source ) override;
 
@@ -292,7 +293,7 @@ namespace connectivity::file
 
             OSL_ENSURE(column > 0, "file::OResultSet::mapColumn: invalid column index!");
             // the first column (index 0) is for convenience only. The first real select column is number 1.
-            if ((column > 0) && (column < static_cast<sal_Int32>(m_aColMapping.size())))
+            if ((column > 0) && (o3tl::make_unsigned(column) < m_aColMapping.size()))
                 map = m_aColMapping[column];
 
             return map;

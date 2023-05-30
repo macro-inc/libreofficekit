@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-08-02 21:51+0000\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
+"PO-Revision-Date: 2022-12-07 12:12+0000\n"
 "Last-Translator: Kolbjørn Stuestøl <kolbjoern@stuestoel.no>\n"
 "Language-Team: Norwegian Nynorsk <https://translations.documentfoundation.org/projects/libo_ui-master/dbaccessmessages/nn/>\n"
 "Language: nn\n"
@@ -1895,11 +1895,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "Sti til reknearket"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "Namn på ODBC-datakjelda"
+msgid "Name of the ODBC data source"
+msgstr "Namnet på ODBC-datakjelda"
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -2143,7 +2143,7 @@ msgstr "Ny database"
 #: dbaccess/inc/strings.hrc:375
 msgctxt "STR_MYSQLJDBC_HEADERTEXT"
 msgid "Set up connection to a MySQL/MariaDB database using JDBC"
-msgstr ""
+msgstr "Set opp tilkopling til ein MySQL/MariaDB-database med JDBC"
 
 #. tqpeM
 #: dbaccess/inc/strings.hrc:376
@@ -2152,12 +2152,15 @@ msgid ""
 "Please enter the required information to connect to a MySQL/MariaDB database using JDBC. Note that a JDBC driver class must be installed on your system and registered with %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
+"Oppgje informasjonen som trengst for å kopla til ein MySQL/MariaDB-database med JDBC. Legg merkje til at ein JDBC-drivarklasse må vera installert på systemet og registrert med %PRODUCTNAME.\n"
+"\n"
+"Kontakt systemadministratoren dersom du er usikker på dei følgjande innstillingane."
 
 #. Lrd3G
 #: dbaccess/inc/strings.hrc:377
 msgctxt "STR_MYSQL_DRIVERCLASSTEXT"
 msgid "MySQL/MariaDB JDBC d~river class:"
-msgstr ""
+msgstr "MySQL/MariaDB JDBC d~rivarklasse:"
 
 #. cBiSe
 #: dbaccess/inc/strings.hrc:378
@@ -2225,23 +2228,22 @@ msgstr ""
 "Trykk på «Bla gjennom» for å setja opp innstillingar spesielt for tilbydaren.\n"
 "Kontakt systemadministratoren dersom du er usikker på dei følgjande innstillingane."
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "Set opp ei tilkopling til ein ODBC-database"
+msgid "Set up a connection to an ODBC data source"
+msgstr "Set opp ei tilkopling til ei ODBC-datakjelde"
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"Oppgje namnet på den ODBC-databasen du vil kopla til.\n"
-"Trykk på «Bla gjennom» for å velja ein ODBC-database som er registrert frå før i %PRODUCTNAME.\n"
-"Kontakt systemadministratoren dersom du er usikker på dei følgjande innstillingane."
+"Skriv inn namnet på ODBC-datakjelda du vil bruka. \n"
+"Klikk på «Bla gjennom …» for å velja ei ODBC-datakjelde som er registrert i %PRODUCTNAME frå før. Kontakt systemansvarleg viss du er usikker på dei følgjande innstillingane."
 
 #. dmi7n
 #: dbaccess/inc/strings.hrc:390
@@ -2423,158 +2425,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "Detaljar"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr "Legg til brukar"
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr "Slett brukar"
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr "Endra passord"
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "Er du sikker på at du vil sletta brukaren?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "Databasen støttar ikkje brukaradministrasjon."
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "Passorda er ulike. Skriv inn passordet på nytt."
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "Legg merkje til at enkelte databasar kanskje ikkje støttar denne typen samanslåing."
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "Ta berre med postar der innhaldet i dei relaterte felta i begge tabellane er identisk."
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "Inneheld ALLE postane frå tabellen «%1», men berre postar frå tabellen «%2» der verdiane i dei relaterte felta passar."
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "Inneheld ALLE postane frå «%1» og frå «%2»."
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr "Inneheld det kartesiske produktet av ALLE postane frå «%1» og frå «%2»."
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr "Måldatabasen støttar ikkje visingar."
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr "Måldatabasen støttar ikkje primærnøklar."
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr "Fann ingen skildrar for datatilgang, eller ingen skildrar som gav all informasjonen som trengdest."
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr "Berre tabellar og spørjingar er støtta."
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr "Resultatsettet til kopikjelda må støtta bokmerke."
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr "Kolonnetypen $type$ i kolonneposisjon $pos$ er ikkje støtta."
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr "Ugyldig tal på oppstartparametrar."
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr "Det oppstod ein feil under oppstarten."
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr "Ikkje-støtta innstilling i deskriptoren for kopikjelde: $name$."
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr "For å kopiera ei spørjing, må tilkoplinga støtta spørjingar."
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr "Den gjevne handsaminga for samhandling er ugyldig."
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr "Denne relasjonen finst frå før. Vil du redigera han eller laga ein ny?"
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "Rediger …"
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "Lag …"
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " – %PRODUCTNAME Base: Relasjonsutforming"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "Databasen støttar ikkje relasjonar."
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "Dersom du slettar denne tabellen, vert òg alle dei tilhøyrande relasjonane sletta. Vil du halda fram?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2824,67 +2844,67 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr "Endra breidda på radene som er merkte av, eller berre der skrivemerket står."
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Sti til dBASE-filene:"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr "Lag _ny"
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "_Bla gjennom …"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "Generelt"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "_Brukarnamn:"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "Krev passord"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "Brukarautentisering"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "_JDBC-drivarklasse:"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "Testklasse"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "JDBC-eigenskapar"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
 msgstr "Test tilkoplinga"
@@ -3022,19 +3042,19 @@ msgid "label"
 msgstr "etikett"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Sti til dBASE-filene:"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr "Lag _ny"
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Bla gjennom …"
@@ -3065,7 +3085,7 @@ msgstr "Kopla til med JDBC (Java Database Connectivity)"
 #: dbaccess/uiconfig/ui/dbwizmysqlintropage.ui:93
 msgctxt "dbwizmysqlintropage|directly"
 msgid "Connect directly (using MariaDB C connector)"
-msgstr ""
+msgstr "Kopla direkte (ved hjelp av MariaDB C-kopling)"
 
 #. C9PFE
 #: dbaccess/uiconfig/ui/dbwizmysqlintropage.ui:112
@@ -3077,19 +3097,19 @@ msgstr "Korleis vil du kopla til MySQL-databasen?"
 #: dbaccess/uiconfig/ui/dbwizmysqlintropage.ui:128
 msgctxt "dbwizmysqlintropage|header"
 msgid "Set Up a Connection to a MySQL/MariaDB Database"
-msgstr ""
+msgstr "Set opp ei tilkopling til ein MySQL/MariaDB-database"
 
 #. 3cSEi
 #: dbaccess/uiconfig/ui/dbwizmysqlnativepage.ui:35
 msgctxt "dbwizmysqlnativepage|helptext"
 msgid "Please enter the required information to connect to a MySQL/MariaDB database."
-msgstr ""
+msgstr "Skriv inn informasjonen som er nødvendig for ei tilkopling til ein MySQL/MariaDB-database."
 
 #. 4uetU
 #: dbaccess/uiconfig/ui/dbwizmysqlnativepage.ui:70
 msgctxt "dbwizmysqlnativepage|header"
 msgid "Set Up a Connection to a MySQL/MariaDB Database"
-msgstr ""
+msgstr "Set opp ei tilkopling til ein MySQL/MariaDB-database"
 
 #. AEty7
 #: dbaccess/uiconfig/ui/dbwizspreadsheetpage.ui:55
@@ -3149,7 +3169,7 @@ msgstr "Køyr SQL-uttrykk"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:99
 msgctxt "directsqldialog|extended_tip|sql"
 msgid "Enter the SQL administration command that you want to run."
-msgstr ""
+msgstr "Skriv inn SQL-administrasjonskommandoen du vil køyra."
 
 #. QCHBC
 #: dbaccess/uiconfig/ui/directsqldialog.ui:116
@@ -3167,7 +3187,7 @@ msgstr "Køyr ein SQL-kommando direkte"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:142
 msgctxt "directsqldialog|extended_tip|directsql"
 msgid "Execute the SQL command directly without escape processing."
-msgstr ""
+msgstr "Utfør SQL-kommandoen direkte utan escape-handsaming."
 
 #. gpXeL
 #: dbaccess/uiconfig/ui/directsqldialog.ui:154
@@ -3179,7 +3199,7 @@ msgstr "_Vis resultat frå «select»-uttrykk"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:162
 msgctxt "directsqldialog|extended_tip|showoutput"
 msgid "Show the result of the SQL SELECT command in the Output box."
-msgstr ""
+msgstr "Vis resultatet av SQL SELECT-kommandoen i resultatboksen."
 
 #. xJT2B
 #: dbaccess/uiconfig/ui/directsqldialog.ui:173
@@ -3191,7 +3211,7 @@ msgstr "_Køyr"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:198
 msgctxt "directsqldialog|extended_tip|sqlhistory"
 msgid "Lists the previously executed SQL commands. To run a command again, click the command, and then click Execute."
-msgstr ""
+msgstr "Viser dei tidlegare utførte SQL-kommandoane. For å køyra ein kommando igjen, trykk på kommandoen og deretter på «Utfør»."
 
 #. FoYMP
 #: dbaccess/uiconfig/ui/directsqldialog.ui:211
@@ -3209,7 +3229,7 @@ msgstr "SQL-kommando"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:260
 msgctxt "directsqldialog|extended_tip|status"
 msgid "Displays the results, including errors, of the SQL command that you ran."
-msgstr ""
+msgstr "Viser resultata, inkludert feil, for SQL-kommandoen du køyrde."
 
 #. iUSnR
 #: dbaccess/uiconfig/ui/directsqldialog.ui:271
@@ -3221,7 +3241,7 @@ msgstr "Status"
 #: dbaccess/uiconfig/ui/directsqldialog.ui:304
 msgctxt "directsqldialog|extended_tip|output"
 msgid "Displays the results of the SQL command that you ran."
-msgstr ""
+msgstr "Viser resultata av SQL-kommandoen du køyrde."
 
 #. DYZA5
 #: dbaccess/uiconfig/ui/directsqldialog.ui:315
@@ -3659,25 +3679,25 @@ msgid "Path to the dBASE files:"
 msgstr "Sti til dBASE-filene:"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr "Lag _ny"
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Bla gjennom …"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "_JDBC-d_rivarklasse:"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
 msgstr "_Testklasse"
@@ -4640,13 +4660,15 @@ msgstr "Spesifiser sorteringskriteria for visinga av data."
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:24
 msgctxt "specialjdbcconnectionpage|header"
 msgid "Set up connection to a MySQL/MariaDB database using JDBC"
-msgstr ""
+msgstr "Set opp tilkopling til ein MySQL/MariaDB-database med JDBC"
 
 #. EVDCG
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:39
 msgctxt "specialjdbcconnectionpage|helpLabel"
 msgid "Please enter the required information to connect to a MySQL/MariaDB database using JDBC. Note that a JDBC driver class must be installed on your system and registered with %PRODUCTNAME. Please contact your system administrator if you are unsure about the following settings. "
 msgstr ""
+"Oppgje informasjonen som trengst for å kopla til ein MySQL/MariaDB-database med JDBC. Legg merkje til at ein JDBC-drivarklasse må vera installert på systemet og registrert med %PRODUCTNAME.\n"
+"Kontakt systemadministratoren dersom du er usikker på dei følgjande innstillingane. "
 
 #. GchzZ
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:64
@@ -4676,7 +4698,7 @@ msgstr "Standard: 3306"
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:188
 msgctxt "specialjdbcconnectionpage|jdbcDriverLabel"
 msgid "MySQL/MariaDB JDBC d_river class:"
-msgstr ""
+msgstr "MySQL/MariaDB JDBC d_rivarklasse:"
 
 #. 8oG6P
 #: dbaccess/uiconfig/ui/specialjdbcconnectionpage.ui:212
@@ -5195,37 +5217,25 @@ msgid "User Settings"
 msgstr "Brukarinnstillingar"
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "_Brukar:"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "_Legg til brukar …"
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "_Byt passord …"
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "_Slett brukar …"
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Handsam"
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "Brukarval"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"
 msgstr "Tilgangsrettar for vald brukar"

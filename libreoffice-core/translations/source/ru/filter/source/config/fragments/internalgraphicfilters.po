@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:19+0100\n"
-"PO-Revision-Date: 2022-01-16 02:08+0000\n"
-"Last-Translator: kompilainenn <79045_79045@mail.ru>\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2022-11-25 12:34+0000\n"
+"Last-Translator: Timon <kaktebyavirubit@gmail.com>\n"
 "Language-Team: Russian <https://translations.documentfoundation.org/projects/libo_ui-master/filtersourceconfigfragmentsinternalgraphicfilters/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1482606942.000000\n"
 
 #. s5fY3
@@ -44,7 +44,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "DXF - AutoCAD Interchange Format"
-msgstr "DXF - AutoCAD Interchange Format"
+msgstr "DXF - формат обмена данными AutoCAD"
 
 #. qGZFH
 #: emf_Export.xcu
@@ -66,6 +66,26 @@ msgctxt ""
 msgid "EMF - Enhanced Metafile"
 msgstr "EMF - Enhanced Metafile"
 
+#. A9KkM
+#: emz_Export.xcu
+msgctxt ""
+"emz_Export.xcu\n"
+"emz_Export\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr "EMZ - Сжатый улучшенный метафайл"
+
+#. LEu3Z
+#: emz_Import.xcu
+msgctxt ""
+"emz_Import.xcu\n"
+"emz_Import\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr "EMZ - Сжатый улучшенный метафайл"
+
 #. zAAmY
 #: eps_Export.xcu
 msgctxt ""
@@ -74,7 +94,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "EPS - Encapsulated PostScript"
-msgstr "EPS - Encapsulated PostScript"
+msgstr "EPS - инкапсулированный PostScript"
 
 #. 5FiGM
 #: eps_Import.xcu
@@ -84,7 +104,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "EPS - Encapsulated PostScript"
-msgstr "EPS - Encapsulated PostScript"
+msgstr "EPS - инкапсулированный PostScript"
 
 #. 8aCLy
 #: gif_Export.xcu
@@ -144,7 +164,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "MOV - QuickTime File Format"
-msgstr "MOV - файл QuickTime"
+msgstr "MOV - файл формата QuickTime"
 
 #. 8tBQm
 #: pbm_Import.xcu
@@ -306,6 +326,26 @@ msgctxt ""
 msgid "SVG - Scalable Vector Graphics"
 msgstr "SVG - Scalable Vector Graphics"
 
+#. ECGzG
+#: svgz_Export.xcu
+msgctxt ""
+"svgz_Export.xcu\n"
+"svgz_Export\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr "SVGZ - Сжатый Scalable Vector Graphics"
+
+#. 6eXxZ
+#: svgz_Import.xcu
+msgctxt ""
+"svgz_Import.xcu\n"
+"svgz_Import\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr "SVGZ - Сжатый Scalable Vector Graphics"
+
 #. J66y9
 #: svm_Export.xcu
 msgctxt ""
@@ -344,7 +384,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "TIFF - Tagged Image File Format"
-msgstr "TIFF - Tagged Image File Format"
+msgstr "TIFF - файл формата Tagged Image"
 
 #. rBL3E
 #: tif_Import.xcu
@@ -354,7 +394,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "TIFF - Tagged Image File Format"
-msgstr "TIFF - Tagged Image File Format"
+msgstr "TIFF - файл формата Tagged Image"
 
 #. NCR2v
 #: webp_Export.xcu
@@ -364,7 +404,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "WEBP - WebP Image"
-msgstr ""
+msgstr "WEBP - WebP Image"
 
 #. ZABzk
 #: webp_Import.xcu
@@ -374,7 +414,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "WEBP - WebP Image"
-msgstr ""
+msgstr "WEBP - WebP Image"
 
 #. fUdGf
 #: wmf_Export.xcu
@@ -384,7 +424,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "WMF - Windows Metafile"
-msgstr "WMF - Windows Metafile"
+msgstr "WMF - Метафайл Windows"
 
 #. XScQb
 #: wmf_Import.xcu
@@ -394,7 +434,27 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "WMF - Windows Metafile"
-msgstr "WMF - Windows Metafile"
+msgstr "WMF - Метафайл Windows"
+
+#. aGXZP
+#: wmz_Export.xcu
+msgctxt ""
+"wmz_Export.xcu\n"
+"wmz_Export\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr "WMZ - Сжатый метафайл Windows"
+
+#. mDjFD
+#: wmz_Import.xcu
+msgctxt ""
+"wmz_Import.xcu\n"
+"wmz_Import\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr "WMZ - Сжатый метафайл Windows"
 
 #. 86GGm
 #: xbm_Import.xcu

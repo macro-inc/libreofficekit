@@ -19,6 +19,7 @@
 
 #include <bookmarkcontainer.hxx>
 
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/enumhelper.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
@@ -96,10 +97,8 @@ void SAL_CALL OBookmarkContainer::insertByName( const OUString& _rName, const An
     // notify the listeners
     if (m_aContainerListeners.getLength())
     {
-        ContainerEvent aEvent(*this, makeAny(_rName), makeAny(sNewLink), Any());
-        OInterfaceIteratorHelper2 aListenerIterator(m_aContainerListeners);
-        while (aListenerIterator.hasMoreElements())
-            static_cast< XContainerListener* >(aListenerIterator.next())->elementInserted(aEvent);
+        ContainerEvent aEvent(*this, Any(_rName), Any(sNewLink), Any());
+        m_aContainerListeners.notifyEach( &XContainerListener::elementInserted, aEvent );
     }
 }
 
@@ -126,10 +125,8 @@ void SAL_CALL OBookmarkContainer::removeByName( const OUString& _rName )
     // notify the listeners
     if (m_aContainerListeners.getLength())
     {
-        ContainerEvent aEvent(*this, makeAny(_rName), makeAny(sOldBookmark), Any());
-        OInterfaceIteratorHelper2 aListenerIterator(m_aContainerListeners);
-        while (aListenerIterator.hasMoreElements())
-            static_cast< XContainerListener* >(aListenerIterator.next())->elementRemoved(aEvent);
+        ContainerEvent aEvent(*this, Any(_rName), Any(sOldBookmark), Any());
+        m_aContainerListeners.notifyEach( &XContainerListener::elementRemoved, aEvent );
     }
 }
 
@@ -161,10 +158,8 @@ void SAL_CALL OBookmarkContainer::replaceByName( const OUString& _rName, const A
     aGuard.clear();
     if (m_aContainerListeners.getLength())
     {
-        ContainerEvent aEvent(*this, makeAny(_rName), makeAny(sNewLink), makeAny(sOldLink));
-        OInterfaceIteratorHelper2 aListenerIterator(m_aContainerListeners);
-        while (aListenerIterator.hasMoreElements())
-            static_cast< XContainerListener* >(aListenerIterator.next())->elementReplaced(aEvent);
+        ContainerEvent aEvent(*this, Any(_rName), Any(sNewLink), Any(sOldLink));
+        m_aContainerListeners.notifyEach( &XContainerListener::elementReplaced, aEvent );
     }
 }
 
@@ -185,7 +180,6 @@ void SAL_CALL OBookmarkContainer::removeContainerListener( const Reference< XCon
 // XElementAccess
 Type SAL_CALL OBookmarkContainer::getElementType( )
 {
-    MutexGuard aGuard(m_rMutex);
     return ::cppu::UnoType<OUString>::get();
 }
 
@@ -213,10 +207,10 @@ Any SAL_CALL OBookmarkContainer::getByIndex( sal_Int32 _nIndex )
 {
     MutexGuard aGuard(m_rMutex);
 
-    if ((_nIndex < 0) || (_nIndex >= static_cast<sal_Int32>(m_aBookmarksIndexed.size())))
+    if ((_nIndex < 0) || (o3tl::make_unsigned(_nIndex) >= m_aBookmarksIndexed.size()))
         throw IndexOutOfBoundsException();
 
-    return makeAny(m_aBookmarksIndexed[_nIndex]->second);
+    return Any(m_aBookmarksIndexed[_nIndex]->second);
 }
 
 Any SAL_CALL OBookmarkContainer::getByName( const OUString& _rName )
@@ -226,7 +220,7 @@ Any SAL_CALL OBookmarkContainer::getByName( const OUString& _rName )
     if (!checkExistence(_rName))
         throw NoSuchElementException();
 
-    return makeAny(m_aBookmarks[_rName]);
+    return Any(m_aBookmarks[_rName]);
 }
 
 Sequence< OUString > SAL_CALL OBookmarkContainer::getElementNames(  )

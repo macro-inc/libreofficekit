@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-01-31 18:19+0100\n"
-"PO-Revision-Date: 2022-05-10 13:18+0000\n"
-"Last-Translator: JO3EMC <jo3emc@jarl.com>\n"
+"POT-Creation-Date: 2022-10-10 13:35+0200\n"
+"PO-Revision-Date: 2023-01-23 11:30+0000\n"
+"Last-Translator: AAAA <addr_2610@ymail.ne.jp>\n"
 "Language-Team: Japanese <https://translations.documentfoundation.org/projects/libo_ui-master/filtersourceconfigfragmentsinternalgraphicfilters/ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1526205805.000000\n"
 
 #. s5fY3
@@ -65,6 +65,26 @@ msgctxt ""
 "value.text"
 msgid "EMF - Enhanced Metafile"
 msgstr "EMF - 拡張メタファイル"
+
+#. A9KkM
+#: emz_Export.xcu
+msgctxt ""
+"emz_Export.xcu\n"
+"emz_Export\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr "EMZ - 圧縮拡張メタファイル"
+
+#. LEu3Z
+#: emz_Import.xcu
+msgctxt ""
+"emz_Import.xcu\n"
+"emz_Import\n"
+"UIName\n"
+"value.text"
+msgid "EMZ - Compressed Enhanced Metafile"
+msgstr "EMZ - 圧縮拡張メタファイル"
 
 #. zAAmY
 #: eps_Export.xcu
@@ -194,7 +214,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "PCT - Mac Pict"
-msgstr "PCT - Mac Pict形式"
+msgstr "PCT - Mac Pict"
 
 #. XqQHD
 #: pcx_Import.xcu
@@ -294,7 +314,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "SVG - Scalable Vector Graphics"
-msgstr "SVG - Scalable Vector Graphics"
+msgstr "SVG - スケーラブル ベクター グラフィックス"
 
 #. DFeqX
 #: svg_Import.xcu
@@ -304,7 +324,27 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "SVG - Scalable Vector Graphics"
-msgstr "SVG - Scalable Vector Graphics"
+msgstr "SVG - スケーラブル ベクター グラフィックス"
+
+#. ECGzG
+#: svgz_Export.xcu
+msgctxt ""
+"svgz_Export.xcu\n"
+"svgz_Export\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr "SVGZ - 圧縮スケーラブル ベクター グラフィックス"
+
+#. 6eXxZ
+#: svgz_Import.xcu
+msgctxt ""
+"svgz_Import.xcu\n"
+"svgz_Import\n"
+"UIName\n"
+"value.text"
+msgid "SVGZ - Compressed Scalable Vector Graphics"
+msgstr "SVGZ - 圧縮スケーラブル ベクター グラフィックス"
 
 #. J66y9
 #: svm_Export.xcu
@@ -314,7 +354,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "SVM - StarView Metafile"
-msgstr "SVM - StarView Metafile"
+msgstr "SVM - StarViewメタファイル"
 
 #. LKKGd
 #: svm_Import.xcu
@@ -324,7 +364,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "SVM - StarView Metafile"
-msgstr "SVM - StarView Metafile"
+msgstr "SVM - StarViewメタファイル"
 
 #. DNXBL
 #: tga_Import.xcu
@@ -395,6 +435,26 @@ msgctxt ""
 "value.text"
 msgid "WMF - Windows Metafile"
 msgstr "WMF - Windowsメタファイル"
+
+#. aGXZP
+#: wmz_Export.xcu
+msgctxt ""
+"wmz_Export.xcu\n"
+"wmz_Export\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr "WMZ - 圧縮Windowsメタファイル"
+
+#. mDjFD
+#: wmz_Import.xcu
+msgctxt ""
+"wmz_Import.xcu\n"
+"wmz_Import\n"
+"UIName\n"
+"value.text"
+msgid "WMZ - Compressed Windows Metafile"
+msgstr "WMZ - 圧縮Windowsメタファイル"
 
 #. 86GGm
 #: xbm_Import.xcu

@@ -49,12 +49,7 @@
 #include <svl/stritem.hxx>
 #include <svl/undo.hxx>
 #include <svl/whiter.hxx>
-#include <editeng/editstat.hxx>
-#include <editeng/eeitem.hxx>
-#include <editeng/fhgtitem.hxx>
-#include <editeng/fontitem.hxx>
 #include <vcl/mapmod.hxx>
-#include <vcl/svapp.hxx>
 #include <vcl/virdev.hxx>
 #include <tools/mapunit.hxx>
 #include <vcl/settings.hxx>
@@ -63,6 +58,7 @@
 #include <action.hxx>
 #include <dialog.hxx>
 #include <format.hxx>
+#include <parse.hxx>
 #include <starmath.hrc>
 #include <strings.hrc>
 #include <smmod.hxx>
@@ -78,7 +74,7 @@
 #include <mathmlexport.hxx>
 #include <svx/svxids.hrc>
 #include <cursor.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <visitors.hxx>
 #include "accessibility.hxx"
 #include <cfgitem.hxx>
@@ -154,7 +150,7 @@ void SmDocShell::SetText(const OUString& rBuffer)
     Parse();
 
     SmViewShell *pViewSh = SmGetActiveView();
-    if( pViewSh )
+    if (pViewSh)
     {
         pViewSh->GetViewFrame()->GetBindings().Invalidate(SID_TEXT);
         if ( SfxObjectCreateMode::EMBEDDED == GetCreateMode() )
@@ -251,8 +247,7 @@ void SmDocShell::ArrangeFormula()
     // if necessary get another OutputDevice for which we format
     if (!pOutDev)
     {
-        SmViewShell *pView = SmGetActiveView();
-        if (pView)
+        if (SmViewShell *pView = SmGetActiveView())
             pOutDev = &pView->GetGraphicWidget().GetDrawingArea()->get_ref_device();
         else
         {
@@ -537,8 +532,7 @@ void SmDocShell::Repaint()
 
     Size aVisSize = GetSize();
     SetVisAreaSize(aVisSize);
-    SmViewShell* pViewSh = SmGetActiveView();
-    if (pViewSh)
+    if (SmViewShell* pViewSh = SmGetActiveView())
         pViewSh->GetGraphicWidget().Invalidate();
 
     if (bIsEnabled)

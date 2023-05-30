@@ -34,7 +34,7 @@
 #include <vcl/svapp.hxx>
 
 namespace {
-    bool loadPng( const OUString & rPath, BitmapEx &rBitmap)
+    bool loadPng( std::u16string_view rPath, BitmapEx &rBitmap)
     {
         INetURLObject aObj( rPath );
         SvFileStream aStrm( aObj.PathToFileName(), StreamMode::STD_READ );
@@ -48,17 +48,17 @@ namespace {
     }
     bool tryLoadPng( std::u16string_view rBaseDir, std::u16string_view rName, BitmapEx& rBitmap )
     {
-        return loadPng( OUString::Concat(rBaseDir) + "/" LIBO_ETC_FOLDER + rName, rBitmap);
+        return loadPng( rtl::Concat2View(OUString::Concat(rBaseDir) + "/" LIBO_ETC_FOLDER + rName), rBitmap);
     }
 }
 
-bool Application::LoadBrandBitmap (const char* pName, BitmapEx &rBitmap)
+bool Application::LoadBrandBitmap (std::u16string_view pName, BitmapEx &rBitmap)
 {
     // TODO - if we want more flexibility we could add a branding path
     // in an rc file perhaps fallback to "about.bmp"
     OUString aBaseDir( "$BRAND_BASE_DIR");
     rtl::Bootstrap::expandMacros( aBaseDir );
-    OUString aBaseName( "/" + OUString::createFromAscii( pName ) );
+    OUString aBaseName(OUStringChar('/') + pName);
     OUString aPng( ".png" );
 
     rtl_Locale *pLoc = nullptr;
@@ -68,11 +68,11 @@ bool Application::LoadBrandBitmap (const char* pName, BitmapEx &rBitmap)
     ::std::vector< OUString > aFallbacks( aLanguageTag.getFallbackStrings( true));
     for (const OUString & aFallback : aFallbacks)
     {
-        if (tryLoadPng( aBaseDir, OUStringConcatenation(aBaseName + "-" + aFallback + aPng), rBitmap))
+        if (tryLoadPng( aBaseDir, Concat2View(aBaseName + "-" + aFallback + aPng), rBitmap))
             return true;
     }
 
-    return tryLoadPng( aBaseDir, OUStringConcatenation(aBaseName + aPng), rBitmap);
+    return tryLoadPng( aBaseDir, Concat2View(aBaseName + aPng), rBitmap);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

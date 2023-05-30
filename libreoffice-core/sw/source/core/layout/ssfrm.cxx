@@ -17,10 +17,13 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <pagefrm.hxx>
 #include <rootfrm.hxx>
 #include <dcontact.hxx>
 #include <flyfrm.hxx>
+#include <tabfrm.hxx>
 #include <txtfrm.hxx>
 #include <cellfrm.hxx>
 #include <swtable.hxx>
@@ -329,12 +332,14 @@ void SwFrame::DestroyImpl()
 
     // accessible objects for fly and cell frames have been already disposed
     // by the destructors of the derived classes.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     if (IsAccessibleFrame() && !(IsFlyFrame() || IsCellFrame())
         && (GetDep() || IsTextFrame())) // sw_redlinehide: text frame may not have Dep!
     {
         assert(!IsTextFrame() || GetDep() || static_cast<SwTextFrame*>(this)->GetMergedPara());
+        const bool bInDocDtor = IsTabFrame() && static_cast<SwTabFrame*>(this)->GetFormat()->GetDoc()->IsInDtor();
         SwRootFrame *pRootFrame = getRootFrame();
-        if( pRootFrame && pRootFrame->IsAnyShellAccessible() )
+        if( !bInDocDtor && pRootFrame && pRootFrame->IsAnyShellAccessible() )
         {
             SwViewShell *pVSh = pRootFrame->GetCurrShell();
             if( pVSh && pVSh->Imp() )
@@ -344,6 +349,7 @@ void SwFrame::DestroyImpl()
             }
         }
     }
+#endif
 
     if (!m_pDrawObjs)
         return;
@@ -458,8 +464,8 @@ void SwTextFrame::RegisterToNode(SwTextNode & rNode, bool const isForceNodeAsFir
             rNode.GetDoc().getIDocumentMarkAccess()->getFieldmarksBegin(),
             rNode.GetDoc().getIDocumentMarkAccess()->getFieldmarksEnd(),
             [this](::sw::mark::IMark const*const pMark) {
-                return pMark->GetMarkStart().nNode == *m_pMergedPara->pFirstNode
-                    && pMark->GetMarkEnd().nNode != *m_pMergedPara->pFirstNode;
+                return pMark->GetMarkStart().GetNode() == *m_pMergedPara->pFirstNode
+                    && pMark->GetMarkEnd().GetNode() != *m_pMergedPara->pFirstNode;
             }) == rNode.GetDoc().getIDocumentMarkAccess()->getFieldmarksEnd());
     }
     assert(&rNode != GetDep());

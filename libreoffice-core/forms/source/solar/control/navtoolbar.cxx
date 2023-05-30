@@ -29,6 +29,7 @@
 
 #include <svx/labelitemwindow.hxx>
 
+#include <utility>
 #include <vcl/commandinfoprovider.hxx>
 #include <vcl/toolbox.hxx>
 
@@ -44,7 +45,7 @@ namespace frm
 {
 
 
-    using ::com::sun::star::uno::makeAny;
+    using ::com::sun::star::uno::Any;
     namespace FormFeature = ::com::sun::star::form::runtime::FormFeature;
 
 
@@ -90,7 +91,6 @@ namespace frm
             if ( pAsciiCommandName != nullptr )
                 return ".uno:" + OUString::createFromAscii( pAsciiCommandName );
 
-            OSL_FAIL( "lcl_getCommandURL: unknown FormFeature!" );
             return OUString();
         }
     }
@@ -134,14 +134,14 @@ namespace frm
     }
 
     NavigationToolBar::NavigationToolBar( vcl::Window* _pParent, WinBits _nStyle,
-                                          const PCommandImageProvider& _pImageProvider,
-                                          const OUString & sModuleId )
+                                          PCommandImageProvider _pImageProvider,
+                                          OUString sModuleId )
         :Window( _pParent, _nStyle )
         ,m_pDispatcher( nullptr )
-        ,m_pImageProvider( _pImageProvider )
+        ,m_pImageProvider(std::move( _pImageProvider ))
         ,m_eImageSize( eSmall )
         ,m_pToolbar( nullptr )
-        ,m_sModuleId( sModuleId )
+        ,m_sModuleId(std::move( sModuleId ))
     {
         implInit( );
     }
@@ -278,13 +278,12 @@ namespace frm
             {   // it's _not_ a separator
 
                 // insert the entry
-                m_pToolbar->InsertItem( ToolBoxItemId(pSupportedFeatures->nId), OUString(), pSupportedFeatures->bRepeat ? ToolBoxItemBits::REPEAT : ToolBoxItemBits::NONE );
+                OUString sCommandURL( lcl_getCommandURL( pSupportedFeatures->nId ) );
+                m_pToolbar->InsertItem( ToolBoxItemId(pSupportedFeatures->nId), OUString(), sCommandURL, pSupportedFeatures->bRepeat ? ToolBoxItemBits::REPEAT : ToolBoxItemBits::NONE );
                 m_pToolbar->SetQuickHelpText( ToolBoxItemId(pSupportedFeatures->nId), OUString() );  // TODO
 
                 if ( !isArtificialItem( pSupportedFeatures->nId ) )
                 {
-                    OUString sCommandURL( lcl_getCommandURL( pSupportedFeatures->nId ) );
-                    m_pToolbar->SetItemCommand( ToolBoxItemId(pSupportedFeatures->nId), sCommandURL );
                     auto aProperties = vcl::CommandInfoProvider::GetCommandProperties(sCommandURL, m_sModuleId);
                     m_pToolbar->SetQuickHelpText(ToolBoxItemId(pSupportedFeatures->nId),
                             vcl::CommandInfoProvider::GetLabelForCommand(aProperties));
@@ -634,7 +633,7 @@ namespace frm
     {
         if (!m_pDispatcher)
             return;
-        m_pDispatcher->dispatchWithArgument( FormFeature::MoveAbsolute, "Position", makeAny( static_cast<sal_Int32>(nRecord) ) );
+        m_pDispatcher->dispatchWithArgument( FormFeature::MoveAbsolute, "Position", Any( static_cast<sal_Int32>(nRecord) ) );
     }
 
 }   // namespace frm

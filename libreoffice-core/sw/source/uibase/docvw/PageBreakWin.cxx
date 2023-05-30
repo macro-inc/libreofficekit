@@ -38,10 +38,10 @@
 #include <basegfx/range/b2drectangle.hxx>
 #include <drawinglayer/primitive2d/discretebitmapprimitive2d.hxx>
 #include <drawinglayer/primitive2d/modifiedcolorprimitive2d.hxx>
-#include <drawinglayer/primitive2d/polygonprimitive2d.hxx>
+#include <drawinglayer/primitive2d/PolygonHairlinePrimitive2D.hxx>
 #include <drawinglayer/primitive2d/PolyPolygonColorPrimitive2D.hxx>
 #include <drawinglayer/processor2d/baseprocessor2d.hxx>
-#include <drawinglayer/processor2d/processorfromoutputdevice.hxx>
+#include <drawinglayer/processor2d/processor2dtools.hxx>
 #include <editeng/formatbreakitem.hxx>
 #include <sfx2/dispatch.hxx>
 #include <sfx2/viewfrm.hxx>
@@ -174,7 +174,7 @@ void SwPageBreakWin::PaintButton()
     const ::tools::Rectangle aRect(::tools::Rectangle(Point(0, 0), m_xVirDev->PixelToLogic(GetSizePixel())));
 
     // Properly paint the control
-    BColor aColor = SwViewOption::GetPageBreakColor().getBColor();
+    BColor aColor = SwViewOption::GetCurrentViewOptions().GetPageBreakColor().getBColor();
 
     BColor aHslLine = rgb2hsl(aColor);
     double nLuminance = aHslLine.getZ();
@@ -201,7 +201,7 @@ void SwPageBreakWin::PaintButton()
     aSeq[0].set(new drawinglayer::primitive2d::PolyPolygonColorPrimitive2D(
                                         B2DPolyPolygon(aPolygon), aOtherColor));
     aSeq[1].set(new drawinglayer::primitive2d::PolygonHairlinePrimitive2D(
-                                        aPolygon, aColor));
+                                        std::move(aPolygon), aColor));
 
     // Create the primitive for the image
     BitmapEx aBmpEx(RID_BMP_PAGE_BREAK);
@@ -211,9 +211,9 @@ void SwPageBreakWin::PaintButton()
     aSeq[2].set(new drawinglayer::primitive2d::DiscreteBitmapPrimitive2D(
                                         aBmpEx, B2DPoint(nImgOfstX, 1.0)));
 
-    double nTop = double(aRect.getHeight()) / 2.0;
+    double nTop = double(aRect.getOpenHeight()) / 2.0;
     double nBottom = nTop + 4.0;
-    double nLeft = aRect.getWidth() - ARROW_WIDTH - 6.0;
+    double nLeft = aRect.getOpenWidth() - ARROW_WIDTH - 6.0;
     if (bRtl)
         nLeft = ARROW_WIDTH - 2.0;
     double nRight = nLeft + 8.0;
@@ -243,7 +243,7 @@ void SwPageBreakWin::PaintButton()
     // Create the processor and process the primitives
     const drawinglayer::geometry::ViewInformation2D aNewViewInfos;
     std::unique_ptr<drawinglayer::processor2d::BaseProcessor2D> pProcessor(
-        drawinglayer::processor2d::createBaseProcessor2DFromOutputDevice(*m_xVirDev, aNewViewInfos));
+        drawinglayer::processor2d::createProcessor2DFromOutputDevice(*m_xVirDev, aNewViewInfos));
 
     pProcessor->process(aGhostedSeq);
 
@@ -311,7 +311,7 @@ void SwBreakDashedLine::execute(std::string_view rIdent)
             rSh.Push( );
             rSh.ClearMark();
 
-            rSh.SetSelection( rNd );
+            rSh.SetSelection( SwPaM(rNd) );
 
             SfxStringItem aItem(m_pEditWin->GetView().GetPool().GetWhich(FN_FORMAT_TABLE_DLG), "textflow");
             m_pEditWin->GetView().GetViewFrame()->GetDispatcher()->ExecuteList(
@@ -325,7 +325,7 @@ void SwBreakDashedLine::execute(std::string_view rIdent)
         {
             SwPaM aPaM( rNd );
             SwPaMItem aPaMItem( m_pEditWin->GetView().GetPool( ).GetWhich( FN_PARAM_PAM ), &aPaM );
-            SfxStringItem aItem( m_pEditWin->GetView().GetPool( ).GetWhich( SID_PARA_DLG ), "textflow" );
+            SfxStringItem aItem( SID_PARA_DLG, "textflow" );
             m_pEditWin->GetView().GetViewFrame()->GetDispatcher()->ExecuteList(
                     SID_PARA_DLG,
                     SfxCallMode::SYNCHRON | SfxCallMode::RECORD,

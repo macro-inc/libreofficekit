@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <sal/log.hxx>
 
 #include <animationfactory.hxx>
@@ -36,6 +36,7 @@
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 
 #include <box2dtools.hxx>
+#include <utility>
 
 using namespace ::com::sun::star;
 
@@ -136,13 +137,12 @@ namespace slideshow::internal
                     ENSURE_OR_RETURN_FALSE( mpAttrLayer && mpShape,
                                        "TupleAnimation::operator(): Invalid ShapeAttributeLayer" );
 
-                    ValueT aValue( rValue.getX(),
-                                   rValue.getY() );
+                    ValueT aValue(rValue.getX(), rValue.getY());
 
                     // Activities get values from the expression parser,
                     // which returns _relative_ sizes/positions.
                     // Convert back relative to reference coordinate system
-                    aValue *= maReferenceSize;
+                    aValue *= basegfx::B2DPoint(maReferenceSize);
 
                     ((*mpAttrLayer).*mpSetValueFunc)( aValue );
 
@@ -162,19 +162,20 @@ namespace slideshow::internal
                     // deviated from the (*shared_ptr).*mpFuncPtr
                     // notation here, since gcc does not seem to parse
                     // that as a member function call anymore.
+                    basegfx::B2DPoint aPoint(maDefaultValue);
                     aRetVal.setX( (mpAttrLayer.get()->*mpIs1stValidFunc)() ?
                                   (mpAttrLayer.get()->*mpGet1stValueFunc)() :
-                                  maDefaultValue.getX() );
+                                  aPoint.getX() );
                     aRetVal.setY( (mpAttrLayer.get()->*mpIs2ndValidFunc)() ?
                                   (mpAttrLayer.get()->*mpGet2ndValueFunc)() :
-                                  maDefaultValue.getY() );
+                                  aPoint.getY() );
 
                     // Activities get values from the expression
                     // parser, which returns _relative_
                     // sizes/positions.  Convert start value to the
                     // same coordinate space (i.e. relative to given
                     // reference size).
-                    aRetVal /= maReferenceSize;
+                    aRetVal /= basegfx::B2DPoint(maReferenceSize);
 
                     return aRetVal;
                 }
@@ -200,23 +201,23 @@ namespace slideshow::internal
             class PathAnimation : public NumberAnimation
             {
             public:
-                PathAnimation( const OUString&       rSVGDPath,
+                PathAnimation( std::u16string_view          rSVGDPath,
                                sal_Int16                    nAdditive,
                                const ShapeManagerSharedPtr& rShapeManager,
                                const ::basegfx::B2DVector&  rSlideSize,
                                int                          nFlags,
-                               const box2d::utils::Box2DWorldSharedPtr& pBox2DWorld ) :
+                               box2d::utils::Box2DWorldSharedPtr  pBox2DWorld ) :
                     maPathPoly(),
                     mpShape(),
                     mpAttrLayer(),
                     mpShapeManager( rShapeManager ),
-                    maPageSize( rSlideSize ),
+                    maPageSize( rSlideSize.getX(), rSlideSize.getY() ),
                     maShapeOrig(),
                     mnFlags( nFlags ),
                     mbAnimationStarted( false ),
                     mbAnimationFirstUpdate( true ),
                     mnAdditive( nAdditive ),
-                    mpBox2DWorld( pBox2DWorld )
+                    mpBox2DWorld(std::move( pBox2DWorld ))
                 {
                     ENSURE_OR_THROW( rShapeManager,
                                       "PathAnimation::PathAnimation(): Invalid ShapeManager" );
@@ -310,7 +311,7 @@ namespace slideshow::internal
                     // absolute, or shape-relative.
 
                     // interpret path as page-relative. Scale up with page size
-                    rOutPos *= maPageSize;
+                    rOutPos *= basegfx::B2DPoint(maPageSize);
 
                     // TODO(F1): Determine whether the path origin is
                     // absolute, or shape-relative.
@@ -367,7 +368,7 @@ namespace slideshow::internal
             class PhysicsAnimation : public NumberAnimation
             {
             public:
-                PhysicsAnimation( const ::box2d::utils::Box2DWorldSharedPtr& pBox2DWorld,
+                PhysicsAnimation( ::box2d::utils::Box2DWorldSharedPtr pBox2DWorld,
                                     const double                 fDuration,
                                     const ShapeManagerSharedPtr& rShapeManager,
                                     const ::basegfx::B2DVector&  rSlideSize,
@@ -382,7 +383,7 @@ namespace slideshow::internal
                     mnFlags( nFlags ),
                     mbAnimationStarted( false ),
                     mpBox2DBody(),
-                    mpBox2DWorld( pBox2DWorld ),
+                    mpBox2DWorld(std::move( pBox2DWorld )),
                     mfDuration(fDuration),
                     maStartVelocity(rStartVelocity),
                     mfDensity(fDensity),
@@ -424,7 +425,7 @@ namespace slideshow::internal
                     {
                         mbAnimationStarted = true;
 
-                        mpBox2DWorld->alertPhysicsAnimationStart(maPageSize, mpShapeManager);
+                        mpBox2DWorld->alertPhysicsAnimationStart(basegfx::B2DVector(maPageSize.getWidth(), maPageSize.getHeight()), mpShapeManager);
                         mpBox2DBody = mpBox2DWorld->makeShapeDynamic( mpShape->getXShape(), maStartVelocity, mfDensity, mfBounciness );
 
                         if( !(mnFlags & AnimationFactory::FLAG_NO_SPRITE) )
@@ -578,13 +579,13 @@ namespace slideshow::internal
                 GenericAnimation( const ShapeManagerSharedPtr&          rShapeManager,
                                   int                                   nFlags,
                                   bool           (ShapeAttributeLayer::*pIsValid)() const,
-                                  const ValueT&                         rDefaultValue,
+                                  ValueT                                aDefaultValue,
                                   ValueT         (ShapeAttributeLayer::*pGetValue)() const,
                                   void           (ShapeAttributeLayer::*pSetValue)( const ValueT& ),
                                   const ModifierFunctor&                rGetterModifier,
                                   const ModifierFunctor&                rSetterModifier,
                                   const AttributeType                   eAttrType,
-                                  const box2d::utils::Box2DWorldSharedPtr& pBox2DWorld ) :
+                                  box2d::utils::Box2DWorldSharedPtr  pBox2DWorld ) :
                     mpShape(),
                     mpAttrLayer(),
                     mpShapeManager( rShapeManager ),
@@ -594,11 +595,11 @@ namespace slideshow::internal
                     maGetterModifier( rGetterModifier ),
                     maSetterModifier( rSetterModifier ),
                     mnFlags( nFlags ),
-                    maDefaultValue(rDefaultValue),
+                    maDefaultValue(std::move(aDefaultValue)),
                     mbAnimationStarted( false ),
                     mbAnimationFirstUpdate( true ),
                     meAttrType( eAttrType ),
-                    mpBox2DWorld ( pBox2DWorld )
+                    mpBox2DWorld (std::move( pBox2DWorld ))
                 {
                     ENSURE_OR_THROW( rShapeManager,
                                       "GenericAnimation::GenericAnimation(): Invalid ShapeManager" );
@@ -1333,8 +1334,8 @@ namespace slideshow::internal
                             // Theoretically, our AttrLayer is way down the stack, and
                             // we only have to consider _that_ value, not the one from
                             // the top of the stack as returned by Shape::getBounds()
-                            rBounds.getRange(),
-                            rBounds.getRange(),
+                            basegfx::B2DSize(rBounds.getRange().getX(), rBounds.getRange().getY()),
+                            basegfx::B2DSize(rBounds.getRange().getX(), rBounds.getRange().getY()),
                             &ShapeAttributeLayer::getWidth,
                             &ShapeAttributeLayer::getHeight,
                             &ShapeAttributeLayer::setSize );
@@ -1350,7 +1351,7 @@ namespace slideshow::internal
                             // we only have to consider _that_ value, not the one from
                             // the top of the stack as returned by Shape::getBounds()
                             rBounds.getCenter(),
-                            rSlideSize,
+                            basegfx::B2DSize(rSlideSize.getX(), rSlideSize.getY()),
                             &ShapeAttributeLayer::getPosX,
                             &ShapeAttributeLayer::getPosY,
                             &ShapeAttributeLayer::setPosition );

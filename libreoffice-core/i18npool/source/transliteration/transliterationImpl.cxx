@@ -27,6 +27,7 @@
 
 #include <comphelper/sequence.hxx>
 #include <cppuhelper/supportsservice.hxx>
+#include <o3tl/string_view.hxx>
 #include <rtl/ustring.hxx>
 
 #include <algorithm>
@@ -64,22 +65,44 @@ TMList const TMlist[] = {                //      Modules      ModulesNew
 // No enum define for this trans. application has to use impl name to load it
 //  TmItem1 (IGNORE_CASE_SIMPLE),                       // (1<<11      1024) (66)
 
-  TmItem1 (IgnoreTraditionalKanji_ja_JP),       // 3. (1<<12      4096) (10)
-  TmItem1 (IgnoreTraditionalKana_ja_JP),        // 4. (1<<13      8192) (11)
-  TmItem1 (IgnoreMinusSign_ja_JP),              // 5. (1<<13     16384) (12)
-  TmItem1 (IgnoreIterationMark_ja_JP),          // 6. (1<<14     32768) (13)
-  TmItem1 (IgnoreSeparator_ja_JP),              // 7. (1<<15     65536) (14)
-  TmItem1 (IgnoreSize_ja_JP),                   // 15. (1<<23  16777216) (22)
-  TmItem1 (IgnoreMiddleDot_ja_JP),              // 17. (1<<25  67108864) (24)
-  TmItem1 (IgnoreSpace_ja_JP),                  // 18. (1<<26 134217728) (25)
-  TmItem1 (IgnoreZiZu_ja_JP),                   // 8. (1<<16    131072) (15)
-  TmItem1 (IgnoreBaFa_ja_JP),                   // 9. (1<<17    262144) (16)
-  TmItem1 (IgnoreTiJi_ja_JP),                   // 10. (1<<18    524288) (17)
-  TmItem1 (IgnoreHyuByu_ja_JP),                 // 11. (1<<19   1048576) (18)
-  TmItem1 (IgnoreSeZe_ja_JP),                   // 12. (1<<20   2097152) (19)
-  TmItem1 (IgnoreIandEfollowedByYa_ja_JP),      // 13. (1<<21   4194304) (20)
-  TmItem1 (IgnoreKiKuFollowedBySa_ja_JP),       // 14. (1<<22   8388608) (21)
-  TmItem1 (IgnoreProlongedSoundMark_ja_JP),     // 16. (1<<24  33554432) (23)
+  {TransliterationModules_IgnoreTraditionalKanji_ja_JP,
+   TransliterationModulesNew_IgnoreTraditionalKanji_ja_JP, "ignoreTraditionalKanji_ja_JP"},
+                                                // 3. (1<<12      4096) (10)
+  {TransliterationModules_IgnoreTraditionalKana_ja_JP,
+   TransliterationModulesNew_IgnoreTraditionalKana_ja_JP, "ignoreTraditionalKana_ja_JP"},
+                                                // 4. (1<<13      8192) (11)
+  {TransliterationModules_IgnoreMinusSign_ja_JP, TransliterationModulesNew_IgnoreMinusSign_ja_JP,
+   "ignoreMinusSign_ja_JP"},                    // 5. (1<<13     16384) (12)
+  {TransliterationModules_IgnoreIterationMark_ja_JP,
+   TransliterationModulesNew_IgnoreIterationMark_ja_JP, "ignoreIterationMark_ja_JP"},
+                                                // 6. (1<<14     32768) (13)
+  {TransliterationModules_IgnoreSeparator_ja_JP, TransliterationModulesNew_IgnoreSeparator_ja_JP,
+   "ignoreSeparator_ja_JP"},                    // 7. (1<<15     65536) (14)
+  {TransliterationModules_IgnoreSize_ja_JP, TransliterationModulesNew_IgnoreSize_ja_JP,
+   "ignoreSize_ja_JP"},                         // 15. (1<<23  16777216) (22)
+  {TransliterationModules_IgnoreMiddleDot_ja_JP, TransliterationModulesNew_IgnoreMiddleDot_ja_JP,
+   "ignoreMiddleDot_ja_JP"},                    // 17. (1<<25  67108864) (24)
+  {TransliterationModules_IgnoreSpace_ja_JP, TransliterationModulesNew_IgnoreSpace_ja_JP,
+   "ignoreSpace_ja_JP"},                        // 18. (1<<26 134217728) (25)
+  {TransliterationModules_IgnoreZiZu_ja_JP, TransliterationModulesNew_IgnoreZiZu_ja_JP,
+   "ignoreZiZu_ja_JP"},                         // 8. (1<<16    131072) (15)
+  {TransliterationModules_IgnoreBaFa_ja_JP, TransliterationModulesNew_IgnoreBaFa_ja_JP,
+   "ignoreBaFa_ja_JP"},                         // 9. (1<<17    262144) (16)
+  {TransliterationModules_IgnoreTiJi_ja_JP, TransliterationModulesNew_IgnoreTiJi_ja_JP,
+   "ignoreTiJi_ja_JP"},                         // 10. (1<<18    524288) (17)
+  {TransliterationModules_IgnoreHyuByu_ja_JP, TransliterationModulesNew_IgnoreHyuByu_ja_JP,
+   "ignoreHyuByu_ja_JP"},                       // 11. (1<<19   1048576) (18)
+  {TransliterationModules_IgnoreSeZe_ja_JP, TransliterationModulesNew_IgnoreSeZe_ja_JP,
+   "ignoreSeZe_ja_JP"},                         // 12. (1<<20   2097152) (19)
+  {TransliterationModules_IgnoreIandEfollowedByYa_ja_JP,
+   TransliterationModulesNew_IgnoreIandEfollowedByYa_ja_JP, "ignoreIandEfollowedByYa_ja_JP"},
+                                                // 13. (1<<21   4194304) (20)
+  {TransliterationModules_IgnoreKiKuFollowedBySa_ja_JP,
+   TransliterationModulesNew_IgnoreKiKuFollowedBySa_ja_JP, "ignoreKiKuFollowedBySa_ja_JP"},
+                                                // 14. (1<<22   8388608) (21)
+  {TransliterationModules_IgnoreProlongedSoundMark_ja_JP,
+   TransliterationModulesNew_IgnoreProlongedSoundMark_ja_JP, "ignoreProlongedSoundMark_ja_JP"},
+                                                // 16. (1<<24  33554432) (23)
 
   TmItem1 (UPPERCASE_LOWERCASE),        // 19. (1) (1)
   TmItem1 (LOWERCASE_UPPERCASE),        // 20. (2) (2)
@@ -88,8 +111,10 @@ TMList const TMlist[] = {                //      Modules      ModulesNew
   TmItem1 (KATAKANA_HIRAGANA),          // 23. (5) (5)
   TmItem1 (HIRAGANA_KATAKANA),          // 24. (6) (6)
 
-  TmItem1 (SmallToLarge_ja_JP),         // 25. (1<<27 268435456) (26)
-  TmItem1 (LargeToSmall_ja_JP),         // 26. (1<<28 536870912) (27)
+  {TransliterationModules_SmallToLarge_ja_JP, TransliterationModulesNew_SmallToLarge_ja_JP,
+   "smallToLarge_ja_JP"},               // 25. (1<<27 268435456) (26)
+  {TransliterationModules_LargeToSmall_ja_JP, TransliterationModulesNew_LargeToSmall_ja_JP,
+   "largeToSmall_ja_JP"},               // 26. (1<<28 536870912) (27)
   TmItem2 (NumToTextLower_zh_CN),       // 27. () (28)
   TmItem2 (NumToTextUpper_zh_CN),       // 28. () (29)
   TmItem2 (NumToTextLower_zh_TW),       // 29. () (30)
@@ -203,11 +228,11 @@ TransliterationImpl::loadModule( TransliterationModules modType, const Locale& r
         // additional transliterations from TransliterationModulesExtra (we cannot extend TransliterationModules)
         if (bool(modType & TransliterationModules(TransliterationModulesExtra::IGNORE_DIACRITICS_CTL)))
         {
-            if (loadModuleByName("ignoreDiacritics_CTL", bodyCascade[numCascade], rLocale))
+            if (loadModuleByName(u"ignoreDiacritics_CTL", bodyCascade[numCascade], rLocale))
                 numCascade++;
         }
         if (bool(modType & TransliterationModules(TransliterationModulesExtra::IGNORE_KASHIDA_CTL)))
-            if (loadModuleByName("ignoreKashida_CTL", bodyCascade[numCascade], rLocale))
+            if (loadModuleByName(u"ignoreKashida_CTL", bodyCascade[numCascade], rLocale))
                 numCascade++;
 
     } else if (bool(modType & TransliterationModules_NON_IGNORE_MASK)) {
@@ -294,8 +319,6 @@ TransliterationImpl::transliterate( const OUString& inStr, sal_Int32 startPos, s
     if (numCascade == 0)
         return inStr;
 
-    if (offset.getLength() != nCount)
-        offset.realloc(nCount);
     if (numCascade == 1)
     {
         if ( startPos == 0 && nCount == inStr.getLength() )
@@ -600,17 +623,17 @@ void TransliterationImpl::loadBody( OUString const &implName, Reference<XExtende
 }
 
 bool
-TransliterationImpl::loadModuleByName( const OUString& implName,
+TransliterationImpl::loadModuleByName( std::u16string_view implName,
         Reference<XExtendedTransliteration>& body, const Locale& rLocale)
 {
-    OUString cname = TRLT_IMPLNAME_PREFIX + implName;
+    OUString cname = OUString::Concat(TRLT_IMPLNAME_PREFIX) + implName;
     loadBody(cname, body);
     if (body.is()) {
         body->loadModule(TransliterationModules(0), rLocale); // toUpper/toLoad need rLocale
 
         // if the module is ignore case/kana/width, load caseignore for equals/compareString mothed
         for (sal_Int16 i = 0; i < 3; i++) {
-            if (implName.equalsAscii(TMlist[i].implName)) {
+            if (o3tl::equalsAscii(implName, TMlist[i].implName)) {
                 if (i == 0) // current module is caseignore
                     body->loadModule(TMlist[0].tm, rLocale); // caseignore need to setup module name
                 if (! caseignore.is()) {

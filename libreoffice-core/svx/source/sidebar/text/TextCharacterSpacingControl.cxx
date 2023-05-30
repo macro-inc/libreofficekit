@@ -67,7 +67,30 @@ TextCharacterSpacingControl::TextCharacterSpacingControl(TextCharacterSpacingPop
 
 void TextCharacterSpacingControl::GrabFocus()
 {
-    mxVeryTight->grab_focus();
+    tools::Long nKerning = mxEditKerning->get_value(FieldUnit::NONE);
+    switch (nKerning)
+    {
+        case SPACING_VERY_TIGHT:
+            mxVeryTight->grab_focus();
+            break;
+        case SPACING_TIGHT:
+            mxTight->grab_focus();
+            break;
+        case SPACING_NORMAL:
+            mxNormal->grab_focus();
+            break;
+        case SPACING_LOOSE:
+            mxLoose->grab_focus();
+            break;
+        case SPACING_VERY_LOOSE:
+            mxVeryLoose->grab_focus();
+            break;
+        default:
+            if (nKerning == mnCustomKern)
+                mxLastCustom->grab_focus();
+            else
+                mxEditKerning->grab_focus();
+    }
 }
 
 TextCharacterSpacingControl::~TextCharacterSpacingControl()
@@ -76,17 +99,17 @@ TextCharacterSpacingControl::~TextCharacterSpacingControl()
     {
         SvtViewOptions aWinOpt(EViewType::Window, SIDEBAR_SPACING_GLOBAL_VALUE);
         css::uno::Sequence<css::beans::NamedValue> aSeq
-            { { "Spacing", css::uno::makeAny(OUString::number(mnCustomKern)) } };
+            { { "Spacing", css::uno::Any(OUString::number(mnCustomKern)) } };
         aWinOpt.SetUserData(aSeq);
     }
 }
 
 void TextCharacterSpacingControl::Initialize()
 {
-    const SfxPoolItem* pItem;
-    SfxItemState eState = SfxViewFrame::Current()->GetBindings().GetDispatcher()->QueryState(SID_ATTR_CHAR_KERNING, pItem);
+    const SvxKerningItem* pKerningItem(nullptr);
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    SfxItemState eState = pViewFrm ? pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_CHAR_KERNING, pKerningItem) : SfxItemState::UNKNOWN;
 
-    const SvxKerningItem* pKerningItem = static_cast<const SvxKerningItem*>(pItem);
     tools::Long nKerning = 0;
 
     if(pKerningItem)
@@ -141,8 +164,11 @@ void TextCharacterSpacingControl::ExecuteCharacterSpacing(tools::Long nValue, bo
 
     SvxKerningItem aKernItem(nSign * nKern, SID_ATTR_CHAR_KERNING);
 
-    SfxViewFrame::Current()->GetBindings().GetDispatcher()->ExecuteList(SID_ATTR_CHAR_KERNING,
-        SfxCallMode::RECORD, { &aKernItem });
+    if (SfxViewFrame* pViewFrm = SfxViewFrame::Current())
+    {
+        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(SID_ATTR_CHAR_KERNING,
+            SfxCallMode::RECORD, { &aKernItem });
+    }
 
     if (bClose)
         mxControl->EndPopupMode();

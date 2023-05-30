@@ -17,7 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#if defined __GNUC__ && !defined __clang_ && __GNUC__ == 10
+#if defined __GNUC__ && !defined __clang__ && __GNUC__ == 10
 // gcc 10.2.0 gets unhappy about one of the OString inside PrintFont at line 656 (while at least a
 // recent GCC 12 trunk is happy);
 // I have to turn it off here because the warning actually occurs inside rtl::OString
@@ -40,11 +40,12 @@
 #include <i18nutil/unicode.hxx>
 #include <rtl/strbuf.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
 #include <officecfg/Office/Common.hxx>
 #include <org/freedesktop/PackageKit/SyncDbusSessionHelper.hpp>
+#include <config_fonts.h>
 
 using namespace psp;
 
@@ -53,6 +54,7 @@ using namespace psp;
 #include <cstdio>
 
 #include <unotools/configmgr.hxx>
+#include <unotools/syslocaleoptions.hxx>
 
 #include <osl/process.h>
 
@@ -305,7 +307,14 @@ FcFontSet* FontCfgWrapper::getFontSet()
     if( !m_pFontSet )
     {
         m_pFontSet = FcFontSetCreate();
-        addFontSet( FcSetSystem );
+        bool bRestrictFontSetToApplicationFonts = false;
+#if HAVE_MORE_FONTS
+        bRestrictFontSetToApplicationFonts = [] {
+            return getenv("SAL_NON_APPLICATION_FONT_USE") != nullptr;
+        }();
+#endif
+        if (!bRestrictFontSetToApplicationFonts)
+            addFontSet( FcSetSystem );
         addFontSet( FcSetApplication );
 
         std::stable_sort(m_pFontSet->fonts,m_pFontSet->fonts+m_pFontSet->nfont,SortFont());
@@ -434,13 +443,9 @@ FcResult FontCfgWrapper::LocalizedElementFromPattern(FcPattern const * pPattern,
                 ++k;
             }
 
-            //possible to-do, sort by UILocale instead of process locale
             if (!m_pLanguageTag)
-            {
-                rtl_Locale* pLoc = nullptr;
-                osl_getProcessLocale(&pLoc);
-                m_pLanguageTag.reset( new LanguageTag(*pLoc) );
-            }
+                m_pLanguageTag.reset(new LanguageTag(SvtSysLocaleOptions().GetRealUILanguageTag()));
+
             *element = bestname(lang_and_elements, *m_pLanguageTag);
 
             //if this element is a fontname, map the other names to this best-name
@@ -579,7 +584,7 @@ namespace
     }
 }
 
-void PrintFontManager::countFontconfigFonts( std::unordered_map<OString, int>& o_rVisitedPaths )
+void PrintFontManager::countFontconfigFonts()
 {
     int nFonts = 0;
     FontCfgWrapper& rWrapper = FontCfgWrapper::get();
@@ -648,8 +653,6 @@ void PrintFontManager::countFontconfigFonts( std::unordered_map<OString, int>& o
             aOrgPath = optionalFcSysroot() + aOrgPath;
             OString aDir, aBase;
             splitPath( aOrgPath, aDir, aBase );
-
-            o_rVisitedPaths[aDir] = 1;
 
             int nDirID = getDirectoryAtom( aDir );
             SAL_INFO("vcl.fonts.detail", "file " << aBase << " not cached");
@@ -961,7 +964,7 @@ namespace
         OStringBuffer aBuf(unicode::getExemplarLanguageForUScriptCode(eScript));
         if (const char* pScriptCode = uscript_getShortName(eScript))
             aBuf.append('-').append(pScriptCode);
-        return OStringToOUString(aBuf.makeStringAndClear(), RTL_TEXTENCODING_UTF8);
+        return OStringToOUString(aBuf, RTL_TEXTENCODING_UTF8);
     }
 }
 
@@ -1003,10 +1006,13 @@ void PrintFontManager::Substitute(vcl::font::FontSelectPattern &rPattern, OUStri
     LanguageTag aLangTag(rPattern.meLanguage);
     OString aLangAttrib = mapToFontConfigLangTag(aLangTag);
 
+    bool bMissingJustBullet = false;
+
     // Add required Unicode characters, if any
     if ( !rMissingCodes.isEmpty() )
     {
         FcCharSet *codePoints = FcCharSetCreate();
+        bMissingJustBullet = rMissingCodes.getLength() == 1 && rMissingCodes[0] == 0xb7;
         for( sal_Int32 nStrIndex = 0; nStrIndex < rMissingCodes.getLength(); )
         {
             // also handle unicode surrogates
@@ -1178,6 +1184,26 @@ void PrintFontManager::Substitute(vcl::font::FontSelectPattern &rPattern, OUStri
     SAL_INFO("vcl.fonts", "PrintFontManager::Substitute: replacing missing font: '"
                               << rPattern.maTargetName << "' with '" << rPattern.maSearchName
                               << "'");
+
+    static const bool bAbortOnFontSubstitute = [] {
+        const char* pEnv = getenv("SAL_NON_APPLICATION_FONT_USE");
+        return pEnv && strcmp(pEnv, "abort") == 0;
+    }();
+    if (bAbortOnFontSubstitute && rPattern.maTargetName != rPattern.maSearchName)
+    {
+        if (bMissingJustBullet)
+        {
+            // Some fonts exist in "more_fonts", but have no U+00B7 MIDDLE DOT
+            // so will always glyph fallback on measuring mnBulletOffset in
+            // ImplFontMetricData::ImplInitTextLineSize
+            return;
+        }
+        if (rPattern.maTargetName == "Linux Libertine G" && rPattern.maSearchName == "Linux Libertine O")
+            return;
+        SAL_WARN("vcl.fonts", "PrintFontManager::Substitute: missing font: '" << rPattern.maTargetName <<
+                              "' try: " << rPattern.maSearchName << " instead");
+        std::abort();
+    }
 }
 
 FontConfigFontOptions::~FontConfigFontOptions()

@@ -9,10 +9,10 @@
 
 #include <test/bootstrapfixture.hxx>
 
-#include <com/sun/star/awt/UnoControlDialog.hpp>
 #include <com/sun/star/awt/XControlModel.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XNameContainer.hpp>
+#include <com/sun/star/lang/XComponent.hpp>
 #include <com/sun/star/lang/XMultiComponentFactory.hpp>
 #include <com/sun/star/script/ScriptEventDescriptor.hpp>
 #include <com/sun/star/script/XScriptEventsSupplier.hpp>
@@ -63,10 +63,10 @@ CPPUNIT_TEST_FIXTURE(EventContainerTest, testInsertOrder)
     script::ScriptEventDescriptor descr2;
     script::ScriptEventDescriptor descr3;
     script::ScriptEventDescriptor descr4;
-    xEvents->insertByName("b", makeAny(descr1));
-    xEvents->insertByName("a", makeAny(descr2));
-    xEvents->insertByName("1", makeAny(descr3));
-    xEvents->insertByName("A", makeAny(descr4));
+    xEvents->insertByName("b", Any(descr1));
+    xEvents->insertByName("a", Any(descr2));
+    xEvents->insertByName("1", Any(descr3));
+    xEvents->insertByName("A", Any(descr4));
 
     Sequence<OUString> aEventNames(xEvents->getElementNames());
     sal_Int32 nEventCount = aEventNames.getLength();

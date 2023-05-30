@@ -114,9 +114,9 @@ DocPasswordHelper::GenerateNewModifyPasswordInfoOOXML(std::u16string_view aPassw
     if (!aPassword.empty())
     {
         uno::Sequence<sal_Int8> aSalt = GenerateRandomByteSequence(16);
-        OUStringBuffer aBuffer;
+        OUStringBuffer aBuffer(22);
         comphelper::Base64::encode(aBuffer, aSalt);
-        OUString sSalt = aBuffer.toString();
+        OUString sSalt = aBuffer.makeStringAndClear();
 
         sal_Int32 const nIterationCount = 100000;
         OUString sAlgorithm("SHA-512");
@@ -131,6 +131,63 @@ DocPasswordHelper::GenerateNewModifyPasswordInfoOOXML(std::u16string_view aPassw
                         comphelper::makePropertyValue("iteration-count", nIterationCount),
                         comphelper::makePropertyValue("hash", sHash) };
         }
+    }
+
+    return aResult;
+}
+
+
+uno::Sequence< beans::PropertyValue > DocPasswordHelper::ConvertPasswordInfo( const uno::Sequence< beans::PropertyValue >& aInfo )
+{
+    uno::Sequence< beans::PropertyValue > aResult;
+    OUString sAlgorithm, sHash, sSalt, sCount;
+    sal_Int32 nAlgorithm = 0;
+
+    for ( const auto & prop : aInfo )
+    {
+        if ( prop.Name == "cryptAlgorithmSid" )
+        {
+            prop.Value >>= sAlgorithm;
+            nAlgorithm = sAlgorithm.toInt32();
+        }
+        else if ( prop.Name == "salt" )
+            prop.Value >>= sSalt;
+        else if ( prop.Name == "cryptSpinCount" )
+            prop.Value >>= sCount;
+        else if ( prop.Name == "hash" )
+            prop.Value >>= sHash;
+    }
+
+    if (nAlgorithm == 1)
+        sAlgorithm = "MD2";
+    else if (nAlgorithm == 2)
+        sAlgorithm = "MD4";
+    else if (nAlgorithm == 3)
+        sAlgorithm = "MD5";
+    else if (nAlgorithm == 4)
+        sAlgorithm = "SHA-1";
+    else if (nAlgorithm == 5)
+        sAlgorithm = "MAC";
+    else if (nAlgorithm == 6)
+        sAlgorithm = "RIPEMD";
+    else if (nAlgorithm == 7)
+        sAlgorithm = "RIPEMD-160";
+    else if (nAlgorithm == 9)
+        sAlgorithm = "HMAC";
+    else if (nAlgorithm == 12)
+        sAlgorithm = "SHA-256";
+    else if (nAlgorithm == 13)
+        sAlgorithm = "SHA-384";
+    else if (nAlgorithm == 14)
+        sAlgorithm = "SHA-512";
+
+    if ( !sCount.isEmpty() )
+    {
+        sal_Int32 nCount = sCount.toInt32();
+        aResult = { comphelper::makePropertyValue("algorithm-name", sAlgorithm),
+                    comphelper::makePropertyValue("salt", sSalt),
+                    comphelper::makePropertyValue("iteration-count", nCount),
+                    comphelper::makePropertyValue("hash", sHash) };
     }
 
     return aResult;
@@ -197,7 +254,7 @@ bool DocPasswordHelper::IsModifyPasswordCorrect( std::u16string_view aPassword, 
 
 
 sal_uInt32 DocPasswordHelper::GetWordHashAsUINT32(
-                const OUString& aUString )
+                std::u16string_view aUString )
 {
     static const sal_uInt16 pInitialCode[] = {
         0xE1F0, // 1
@@ -236,7 +293,7 @@ sal_uInt32 DocPasswordHelper::GetWordHashAsUINT32(
     };
 
     sal_uInt32 nResult = 0;
-    sal_uInt32 nLen = aUString.getLength();
+    size_t nLen = aUString.size();
 
     if ( nLen )
     {
@@ -246,7 +303,7 @@ sal_uInt32 DocPasswordHelper::GetWordHashAsUINT32(
         sal_uInt16 nHighResult = pInitialCode[nLen - 1];
         sal_uInt16 nLowResult = 0;
 
-        for ( sal_uInt32 nInd = 0; nInd < nLen; nInd++ )
+        for ( size_t nInd = 0; nInd < nLen; nInd++ )
         {
             // NO Encoding during conversion!
             // The specification says that the low byte should be used in case it is not NULL
@@ -330,13 +387,13 @@ std::vector<unsigned char> DocPasswordHelper::GetOoxHashAsVector(
 
 css::uno::Sequence<sal_Int8> DocPasswordHelper::GetOoxHashAsSequence(
         const OUString& rPassword,
-        const OUString& rSaltValue,
+        std::u16string_view rSaltValue,
         sal_uInt32 nSpinCount,
         comphelper::Hash::IterCount eIterCount,
         std::u16string_view rAlgorithmName)
 {
     std::vector<unsigned char> aSaltVec;
-    if (!rSaltValue.isEmpty())
+    if (!rSaltValue.empty())
     {
         css::uno::Sequence<sal_Int8> aSaltSeq;
         comphelper::Base64::decode( aSaltSeq, rSaltValue);
@@ -350,7 +407,7 @@ css::uno::Sequence<sal_Int8> DocPasswordHelper::GetOoxHashAsSequence(
 
 OUString DocPasswordHelper::GetOoxHashAsBase64(
         const OUString& rPassword,
-        const OUString& rSaltValue,
+        std::u16string_view rSaltValue,
         sal_uInt32 nSpinCount,
         comphelper::Hash::IterCount eIterCount,
         std::u16string_view rAlgorithmName)
@@ -376,15 +433,15 @@ OUString DocPasswordHelper::GetOoxHashAsBase64(
 }
 
 
-/*static*/ uno::Sequence< sal_Int8 > DocPasswordHelper::GenerateStd97Key( const OUString& aPassword, const uno::Sequence< sal_Int8 >& aDocId )
+/*static*/ uno::Sequence< sal_Int8 > DocPasswordHelper::GenerateStd97Key( std::u16string_view aPassword, const uno::Sequence< sal_Int8 >& aDocId )
 {
     uno::Sequence< sal_Int8 > aResultKey;
-    if ( !aPassword.isEmpty() && aDocId.getLength() == 16 )
+    if ( !aPassword.empty() && aDocId.getLength() == 16 )
     {
         sal_uInt16 pPassData[16] = {};
 
-        sal_Int32 nPassLen = std::min< sal_Int32 >( aPassword.getLength(), 15 );
-        memcpy( pPassData, aPassword.getStr(), nPassLen * sizeof(pPassData[0]) );
+        sal_Int32 nPassLen = std::min< sal_Int32 >( aPassword.size(), 15 );
+        memcpy( pPassData, aPassword.data(), nPassLen * sizeof(pPassData[0]) );
 
         aResultKey = GenerateStd97Key( pPassData, aDocId );
     }

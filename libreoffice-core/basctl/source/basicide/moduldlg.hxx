@@ -24,7 +24,6 @@
 #include <string_view>
 
 #include <bastype2.hxx>
-#include <tools/solar.h>
 #include <vcl/weld.hxx>
 #include <com/sun/star/task/XInteractionHandler.hpp>
 
@@ -151,6 +150,8 @@ public:
     ObjectPage(weld::Container* pParent, const OString& rName, BrowseMode nMode, OrganizeDialog* pDialog);
     virtual ~ObjectPage() override;
 
+    void                SetCurrentEntry(const EntryDescriptor& rDesc) { m_xBasicBox->SetCurrentEntry(rDesc); }
+
     virtual void        ActivatePage() override;
 };
 
@@ -207,8 +208,10 @@ private:
 
     DECL_LINK(ActivatePageHdl, const OString&, void);
 
+    void SetCurrentEntry(const css::uno::Reference<css::frame::XFrame>& xDocFrame);
+
 public:
-    OrganizeDialog(weld::Window* pParent, sal_Int16 tabId);
+    OrganizeDialog(weld::Window* pParent, const css::uno::Reference<css::frame::XFrame>& xDocFrame, sal_Int16 tabId);
     virtual ~OrganizeDialog() override;
 };
 

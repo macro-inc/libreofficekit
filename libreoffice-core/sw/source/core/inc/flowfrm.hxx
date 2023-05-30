@@ -30,6 +30,7 @@ class SwPageFrame;
 class SwRect;
 class SwBorderAttrs;
 class SwDoc;
+class SwNode;
 class SwNodeIndex;
 
 /** Base class that provides the general functionalities for frames that are
@@ -55,7 +56,7 @@ class SwNodeIndex;
     FlowFrame can work with the reference to the SwFrame instead of working with
     its own this-pointer.
  */
-class SwFlowFrame
+class SAL_LOPLUGIN_ANNOTATE("crosscast") SwFlowFrame
 {
     // PrepareMake is allowed to lock/unlock (robustness)
     friend inline void PrepareLock  ( SwFlowFrame * );
@@ -69,7 +70,7 @@ class SwFlowFrame
     // TableSel is allowed to reset the follow-bit
     friend inline void UnsetFollow( SwFlowFrame *pFlow );
 
-    friend void MakeFrames( SwDoc *, const SwNodeIndex &, const SwNodeIndex & );
+    friend void MakeFrames( SwDoc *, SwNode &, SwNode & );
 
     friend class SwNode2LayImpl;
 

@@ -44,9 +44,10 @@
 #include <comphelper/namedvaluecollection.hxx>
 #include <comphelper/property.hxx>
 #include <svx/svdundo.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <PropertyForward.hxx>
 #include <UndoEnv.hxx>
+#include <utility>
 
 namespace rptui
 {
@@ -62,75 +63,74 @@ SdrObjKind OObjectBase::getObjectType(const uno::Reference< report::XReportCompo
 {
     uno::Reference< lang::XServiceInfo > xServiceInfo( _xComponent , uno::UNO_QUERY );
     OSL_ENSURE(xServiceInfo.is(),"Who deletes the XServiceInfo interface!");
-    if ( xServiceInfo.is() )
+    if ( !xServiceInfo )
+        return SdrObjKind::NONE;
+
+    if ( xServiceInfo->supportsService( SERVICE_FIXEDTEXT ))
+        return SdrObjKind::ReportDesignFixedText;
+    if ( xServiceInfo->supportsService( SERVICE_FIXEDLINE ))
     {
-        if ( xServiceInfo->supportsService( SERVICE_FIXEDTEXT ))
-            return OBJ_RD_FIXEDTEXT;
-        if ( xServiceInfo->supportsService( SERVICE_FIXEDLINE ))
-        {
-            uno::Reference< report::XFixedLine> xFixedLine(_xComponent,uno::UNO_QUERY);
-            return xFixedLine->getOrientation() ? OBJ_RD_HFIXEDLINE : OBJ_RD_VFIXEDLINE;
-        }
-        if ( xServiceInfo->supportsService( SERVICE_IMAGECONTROL))
-            return OBJ_RD_IMAGECONTROL;
-        if ( xServiceInfo->supportsService( SERVICE_FORMATTEDFIELD ))
-            return OBJ_RD_FORMATTEDFIELD;
-        if ( xServiceInfo->supportsService("com.sun.star.drawing.OLE2Shape") )
-            return OBJ_OLE2;
-        if ( xServiceInfo->supportsService( SERVICE_SHAPE ))
-            return OBJ_CUSTOMSHAPE;
-        if ( xServiceInfo->supportsService( SERVICE_REPORTDEFINITION ) )
-            return OBJ_RD_SUBREPORT;
-        return OBJ_OLE2;
+        uno::Reference< report::XFixedLine> xFixedLine(_xComponent,uno::UNO_QUERY);
+        return xFixedLine->getOrientation() ? SdrObjKind::ReportDesignHorizontalFixedLine : SdrObjKind::ReportDesignVerticalFixedLine;
     }
-    return OBJ_NONE;
+    if ( xServiceInfo->supportsService( SERVICE_IMAGECONTROL))
+        return SdrObjKind::ReportDesignImageControl;
+    if ( xServiceInfo->supportsService( SERVICE_FORMATTEDFIELD ))
+        return SdrObjKind::ReportDesignFormattedField;
+    if ( xServiceInfo->supportsService("com.sun.star.drawing.OLE2Shape") )
+        return SdrObjKind::OLE2;
+    if ( xServiceInfo->supportsService( SERVICE_SHAPE ))
+        return SdrObjKind::CustomShape;
+    if ( xServiceInfo->supportsService( SERVICE_REPORTDEFINITION ) )
+        return SdrObjKind::ReportDesignSubReport;
+    return SdrObjKind::OLE2;
 }
 
-SdrObject* OObjectBase::createObject(
+rtl::Reference<SdrObject> OObjectBase::createObject(
     SdrModel& rTargetModel,
     const uno::Reference< report::XReportComponent>& _xComponent)
 {
-    SdrObject* pNewObj = nullptr;
+    rtl::Reference<SdrObject> pNewObj;
     SdrObjKind nType = OObjectBase::getObjectType(_xComponent);
     switch( nType )
     {
-        case OBJ_RD_FIXEDTEXT:
+        case SdrObjKind::ReportDesignFixedText:
             {
-                OUnoObject* pUnoObj = new OUnoObject(
+                rtl::Reference<OUnoObject> pUnoObj = new OUnoObject(
                     rTargetModel,
                     _xComponent,
                     OUString("com.sun.star.form.component.FixedText"),
-                    OBJ_RD_FIXEDTEXT);
+                    SdrObjKind::ReportDesignFixedText);
                 pNewObj = pUnoObj;
 
                 uno::Reference<beans::XPropertySet> xControlModel(pUnoObj->GetUnoControlModel(),uno::UNO_QUERY);
                 if ( xControlModel.is() )
-                    xControlModel->setPropertyValue( PROPERTY_MULTILINE,uno::makeAny(true));
+                    xControlModel->setPropertyValue( PROPERTY_MULTILINE,uno::Any(true));
             }
             break;
-        case OBJ_RD_IMAGECONTROL:
+        case SdrObjKind::ReportDesignImageControl:
             pNewObj = new OUnoObject(
                 rTargetModel,
                 _xComponent,
                 OUString("com.sun.star.form.component.DatabaseImageControl"),
-                OBJ_RD_IMAGECONTROL);
+                SdrObjKind::ReportDesignImageControl);
             break;
-        case OBJ_RD_FORMATTEDFIELD:
+        case SdrObjKind::ReportDesignFormattedField:
             pNewObj = new OUnoObject(
                 rTargetModel,
                 _xComponent,
                 OUString("com.sun.star.form.component.FormattedField"),
-                OBJ_RD_FORMATTEDFIELD);
+                SdrObjKind::ReportDesignFormattedField);
             break;
-        case OBJ_RD_HFIXEDLINE:
-        case OBJ_RD_VFIXEDLINE:
+        case SdrObjKind::ReportDesignHorizontalFixedLine:
+        case SdrObjKind::ReportDesignVerticalFixedLine:
             pNewObj = new OUnoObject(
                 rTargetModel,
                 _xComponent,
                 OUString("com.sun.star.awt.UnoControlFixedLineModel"),
                 nType);
             break;
-        case OBJ_CUSTOMSHAPE:
+        case SdrObjKind::CustomShape:
             pNewObj = OCustomShape::Create(
                 rTargetModel,
                 _xComponent);
@@ -145,8 +145,8 @@ SdrObject* OObjectBase::createObject(
                 DBG_UNHANDLED_EXCEPTION("reportdesign");
             }
             break;
-        case OBJ_RD_SUBREPORT:
-        case OBJ_OLE2:
+        case SdrObjKind::ReportDesignSubReport:
+        case SdrObjKind::OLE2:
             pNewObj = OOle2Obj::Create(
                 rTargetModel,
                 _xComponent,
@@ -159,8 +159,6 @@ SdrObject* OObjectBase::createObject(
 
     if ( pNewObj )
         pNewObj->SetDoNotInsertIntoPageAutomatically( true );
-
-    ensureSdrObjectOwnership( _xComponent );
 
     return pNewObj;
 }
@@ -223,11 +221,11 @@ namespace
     };
 }
 
-const TPropertyNamePair& getPropertyNameMap(sal_uInt16 _nObjectId)
+const TPropertyNamePair& getPropertyNameMap(SdrObjKind _nObjectId)
 {
     switch(_nObjectId)
     {
-        case OBJ_RD_IMAGECONTROL:
+        case SdrObjKind::ReportDesignImageControl:
             {
                 static TPropertyNamePair s_aNameMap = []()
                 {
@@ -241,7 +239,7 @@ const TPropertyNamePair& getPropertyNameMap(sal_uInt16 _nObjectId)
                 return s_aNameMap;
             }
 
-        case OBJ_RD_FIXEDTEXT:
+        case SdrObjKind::ReportDesignFixedText:
             {
                 static TPropertyNamePair s_aNameMap = []()
                 {
@@ -263,7 +261,7 @@ const TPropertyNamePair& getPropertyNameMap(sal_uInt16 _nObjectId)
                 }();
                 return s_aNameMap;
             }
-        case OBJ_RD_FORMATTEDFIELD:
+        case SdrObjKind::ReportDesignFormattedField:
             {
                 static TPropertyNamePair s_aNameMap = []()
                 {
@@ -285,7 +283,7 @@ const TPropertyNamePair& getPropertyNameMap(sal_uInt16 _nObjectId)
                 return s_aNameMap;
             }
 
-        case OBJ_CUSTOMSHAPE:
+        case SdrObjKind::CustomShape:
             {
                 static TPropertyNamePair s_aNameMap = []()
                 {
@@ -312,8 +310,8 @@ OObjectBase::OObjectBase(const uno::Reference< report::XReportComponent>& _xComp
     m_xReportComponent = _xComponent;
 }
 
-OObjectBase::OObjectBase(const OUString& _sComponentName)
-:m_sComponentName(_sComponentName)
+OObjectBase::OObjectBase(OUString _sComponentName)
+:m_sComponentName(std::move(_sComponentName))
 ,m_bIsListening(false)
 {
 }
@@ -389,8 +387,8 @@ void OObjectBase::SetPropsFromRect(const tools::Rectangle& _rRect)
     if ( pPage && !_rRect.IsEmpty() )
     {
         const uno::Reference<report::XSection>& xSection = pPage->getSection();
-        assert(_rRect.getHeight() >= 0);
-        const sal_uInt32 newHeight( ::std::max(tools::Long(0), _rRect.getHeight()+_rRect.Top()) );
+        assert(_rRect.getOpenHeight() >= 0);
+        const sal_uInt32 newHeight( ::std::max(tools::Long(0), _rRect.getOpenHeight()+_rRect.Top()) );
         if ( xSection.is() && ( newHeight > xSection->getHeight() ) )
             xSection->setHeight( newHeight );
 
@@ -415,27 +413,6 @@ bool OObjectBase::supportsService( const OUString& _sServiceName ) const
 }
 
 
-void OObjectBase::ensureSdrObjectOwnership( const uno::Reference< uno::XInterface >& _rxShape )
-{
-    // UNDO in the report designer is implemented at the level of the XShapes, not
-    // at the level of SdrObjects. That is, if an object is removed from the report
-    // design, then this happens by removing the XShape from the UNO DrawPage, and
-    // putting this XShape (resp. the ReportComponent which wraps it) into an UNDO
-    // action.
-    // Unfortunately, the SvxDrawPage implementation usually deletes SdrObjects
-    // which are removed from it, which is deadly for us. To prevent this,
-    // we give the XShape implementation the ownership of the SdrObject, which
-    // ensures the SvxDrawPage won't delete it.
-    SvxShape* pShape = comphelper::getFromUnoTunnel<SvxShape>( _rxShape );
-    OSL_ENSURE( pShape, "OObjectBase::ensureSdrObjectOwnership: can't access the SvxShape!" );
-    if ( pShape )
-    {
-        OSL_ENSURE( !pShape->HasSdrObjectOwnership(), "OObjectBase::ensureSdrObjectOwnership: called twice?" );
-        pShape->TakeSdrObjectOwnership();
-    }
-}
-
-
 uno::Reference< drawing::XShape > OObjectBase::getUnoShapeOf( SdrObject& _rSdrObject )
 {
     uno::Reference< drawing::XShape > xShape( _rSdrObject.getWeakUnoShape() );
@@ -445,8 +422,6 @@ uno::Reference< drawing::XShape > OObjectBase::getUnoShapeOf( SdrObject& _rSdrOb
     xShape = _rSdrObject.SdrObject::getUnoShape();
     if ( !xShape.is() )
         return xShape;
-
-    ensureSdrObjectOwnership( xShape );
 
     m_xKeepShapeAlive = xShape;
     return xShape;
@@ -458,7 +433,7 @@ OCustomShape::OCustomShape(
 :   SdrObjCustomShape(rSdrModel)
     ,OObjectBase(_xComponent)
 {
-    impl_setUnoShape( uno::Reference< drawing::XShape >(_xComponent,uno::UNO_QUERY_THROW) );
+    setUnoShape( uno::Reference< drawing::XShape >(_xComponent,uno::UNO_QUERY_THROW) );
     m_bIsListening = true;
 }
 
@@ -478,7 +453,7 @@ OCustomShape::~OCustomShape()
 
 SdrObjKind OCustomShape::GetObjIdentifier() const
 {
-    return OBJ_CUSTOMSHAPE;
+    return SdrObjKind::CustomShape;
 }
 
 SdrInventor OCustomShape::GetObjInventor() const
@@ -563,9 +538,9 @@ uno::Reference< drawing::XShape > OCustomShape::getUnoShape()
     return xShape;
 }
 
-void OCustomShape::impl_setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
+void OCustomShape::setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
 {
-    SdrObjCustomShape::impl_setUnoShape( rxUnoShape );
+    SdrObjCustomShape::setUnoShape( rxUnoShape );
     releaseUnoShape();
     m_xReportComponent.clear();
 }
@@ -593,12 +568,16 @@ OUnoObject::OUnoObject(
     // tdf#119067
     ,m_bSetDefaultLabel(rSource.m_bSetDefaultLabel)
 {
-    if ( !rSource.getUnoControlModelTypeName().isEmpty() )
-        impl_initializeModel_nothrow();
-    Reference<XPropertySet> xSource(const_cast<OUnoObject&>(rSource).getUnoShape(), uno::UNO_QUERY);
-    Reference<XPropertySet> xDest(getUnoShape(), uno::UNO_QUERY);
-    if ( xSource.is() && xDest.is() )
-        comphelper::copyProperties(xSource, xDest);
+    osl_atomic_increment(&m_refCount); // getUnoShape will ref-count this
+    {
+        if ( !rSource.getUnoControlModelTypeName().isEmpty() )
+            impl_initializeModel_nothrow();
+        Reference<XPropertySet> xSource(const_cast<OUnoObject&>(rSource).getUnoShape(), uno::UNO_QUERY);
+        Reference<XPropertySet> xDest(getUnoShape(), uno::UNO_QUERY);
+        if ( xSource.is() && xDest.is() )
+            comphelper::copyProperties(xSource, xDest);
+    }
+    osl_atomic_decrement(&m_refCount);
 }
 
 OUnoObject::OUnoObject(
@@ -612,7 +591,7 @@ OUnoObject::OUnoObject(
     // tdf#119067
     ,m_bSetDefaultLabel(false)
 {
-    impl_setUnoShape( uno::Reference< drawing::XShape >( _xComponent, uno::UNO_QUERY_THROW ) );
+    setUnoShape( uno::Reference< drawing::XShape >( _xComponent, uno::UNO_QUERY_THROW ) );
 
     if ( !rModelName.isEmpty() )
         impl_initializeModel_nothrow();
@@ -631,7 +610,7 @@ void OUnoObject::impl_initializeModel_nothrow()
         if ( xFormatted.is() )
         {
             const Reference< XPropertySet > xModelProps( GetUnoControlModel(), UNO_QUERY_THROW );
-            xModelProps->setPropertyValue( "TreatAsNumber", makeAny( false ) );
+            xModelProps->setPropertyValue( "TreatAsNumber", Any( false ) );
             xModelProps->setPropertyValue( PROPERTY_VERTICALALIGN,m_xReportComponent->getPropertyValue(PROPERTY_VERTICALALIGN));
         }
     }
@@ -857,7 +836,7 @@ void OUnoObject::CreateMediator(bool _bReverse)
             {
                 m_xReportComponent->setPropertyValue(
                     PROPERTY_LABEL,
-                    uno::makeAny(GetDefaultName(this)));
+                    uno::Any(GetDefaultName(this)));
             }
         }
         catch(const uno::Exception&)
@@ -894,13 +873,13 @@ uno::Reference< drawing::XShape > OUnoObject::getUnoShape()
     return OObjectBase::getUnoShapeOf( *this );
 }
 
-void OUnoObject::impl_setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
+void OUnoObject::setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
 {
-    SdrUnoObj::impl_setUnoShape( rxUnoShape );
+    SdrUnoObj::setUnoShape( rxUnoShape );
     releaseUnoShape();
 }
 
-OUnoObject* OUnoObject::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> OUnoObject::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new OUnoObject(rTargetModel, *this);
 }
@@ -915,7 +894,7 @@ OOle2Obj::OOle2Obj(
     ,m_nType(_nType)
     ,m_bOnlyOnce(true)
 {
-    impl_setUnoShape( uno::Reference< drawing::XShape >( _xComponent, uno::UNO_QUERY_THROW ) );
+    setUnoShape( uno::Reference< drawing::XShape >( _xComponent, uno::UNO_QUERY_THROW ) );
     m_bIsListening = true;
 }
 
@@ -1090,9 +1069,9 @@ uno::Reference< drawing::XShape > OOle2Obj::getUnoShape()
     return xShape;
 }
 
-void OOle2Obj::impl_setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
+void OOle2Obj::setUnoShape( const uno::Reference< drawing::XShape >& rxUnoShape )
 {
-    SdrOle2Obj::impl_setUnoShape( rxUnoShape );
+    SdrOle2Obj::setUnoShape( rxUnoShape );
     releaseUnoShape();
     m_xReportComponent.clear();
 }
@@ -1114,7 +1093,7 @@ static uno::Reference< chart2::data::XDatabaseDataProvider > lcl_getDataProvider
 }
 
 // Clone() should make a complete copy of the object.
-OOle2Obj* OOle2Obj::CloneSdrObject(SdrModel& rTargetModel) const
+rtl::Reference<SdrObject> OOle2Obj::CloneSdrObject(SdrModel& rTargetModel) const
 {
     return new OOle2Obj(rTargetModel, *this);
 }
@@ -1157,7 +1136,7 @@ void OOle2Obj::initializeOle()
         uno::Reference< beans::XPropertySet > xChartProps( xCompSupp->getComponent(), uno::UNO_QUERY );
         if ( xChartProps.is() )
             xChartProps->setPropertyValue("NullDate",
-                uno::makeAny(util::DateTime(0,0,0,0,30,12,1899,false)));
+                uno::Any(util::DateTime(0,0,0,0,30,12,1899,false)));
     }
 }
 
@@ -1184,10 +1163,10 @@ void OOle2Obj::initializeChart( const uno::Reference< frame::XModel>& _xModel)
     rRptModel.GetUndoEnv().AddElement(lcl_getDataProvider(xObj));
 
     ::comphelper::NamedValueCollection aArgs;
-    aArgs.put( "CellRangeRepresentation", uno::makeAny( OUString( "all" ) ) );
-    aArgs.put( "HasCategories", uno::makeAny( true ) );
-    aArgs.put( "FirstCellAsLabel", uno::makeAny( true ) );
-    aArgs.put( "DataRowSource", uno::makeAny( chart::ChartDataRowSource_COLUMNS ) );
+    aArgs.put( "CellRangeRepresentation", uno::Any( OUString( "all" ) ) );
+    aArgs.put( "HasCategories", uno::Any( true ) );
+    aArgs.put( "FirstCellAsLabel", uno::Any( true ) );
+    aArgs.put( "DataRowSource", uno::Any( chart::ChartDataRowSource_COLUMNS ) );
     xReceiver->setArguments( aArgs.getPropertyValues() );
 
     if( xChartModel.is() )

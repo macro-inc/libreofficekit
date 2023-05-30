@@ -17,11 +17,6 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef __com_sun_star_accessibility_AccessibleTableModelChangeType_idl__
-#define __com_sun_star_accessibility_AccessibleTableModelChangeType_idl__
-
-#include <com/sun/star/uno/XInterface.idl>
-
 module com { module sun { module star { module accessibility {
 
 /** Type of a change made to a table model.
@@ -30,11 +25,13 @@ module com { module sun { module star { module accessibility {
         AccessibleTableModelChange structure to specify the
         type of change that has been made to a table model.</p>
 
-        <p>Two of the constants,
-        AccessibleTableModelChangeType::INSERT and
-        AccessibleTableModelChangeType::DELETE describe
-        changes to the table's geometry.  One or more rows and/or columns have
-        been inserted or deleted.  In contrast, the remaining constant
+        <p>Four of the constants,
+        AccessibleTableModelChangeType::ROWS_INSERTED,
+        AccessibleTableModelChangeType::COLUMNS_INSERTED,
+        AccessibleTableModelChangeType::ROWS_REMOVED and
+        AccessibleTableModelChangeType::COLUMNS_REMOVED describe
+        changes to the table's geometry.  One or more rows or columns have
+        been inserted or removed.  In contrast, the remaining constant
         AccessibleTabelModelChangeType::UPDATE specifies a
         change of the table's content.</p>
 
@@ -42,21 +39,6 @@ module com { module sun { module star { module accessibility {
 */
 constants AccessibleTableModelChangeType
 {
-    /** One or more rows and/or columns have been inserted.
-
-        <p>Use the fields of the AccessibleTableModelChange
-        structure to determine the indices of the rows and/or columns that
-        have been inserted.</p>
-    */
-    const short INSERT = 1;
-
-    /** One or more rows and/or columns have been deleted.
-
-        <p>The affected area of the table is stored in the fields of the
-        AccessibleTableModelChange structure.</p>
-     */
-    const short DELETE = 2;
-
     /** Some of the table data has changed.
 
         <p>The number of rows and columns remains unchanged.  Only (some of)
@@ -65,10 +47,52 @@ constants AccessibleTableModelChangeType
         been changed.</p>
     */
     const short UPDATE = 3;
+
+    /** One or more rows have been inserted.
+
+        <p>Use the fields of the AccessibleTableModelChange
+        structure to determine the indices of the rows that
+        have been inserted.
+        Column indices should be set to -1.</p>
+
+        @since LibreOffice 7.4
+    */
+    const short ROWS_INSERTED = 4;
+
+    /** One or more columns have been inserted.
+
+        <p>Use the fields of the AccessibleTableModelChange
+        structure to determine the indices of the columns that
+        have been inserted.
+        Row indices should be set to -1.</p>
+
+        @since LibreOffice 7.4
+    */
+    const short COLUMNS_INSERTED = 5;
+
+    /** One or more rows have been removed.
+
+        <p>Use the fields of the AccessibleTableModelChange
+        structure to determine the indices of the rows that
+        have been removed.
+        Column indices should be set to -1.</p>
+
+        @since LibreOffice 7.4
+    */
+    const short ROWS_REMOVED = 6;
+
+    /** One or more columns have been removed.
+
+        <p>Use the fields of the AccessibleTableModelChange
+        structure to determine the indices of the columns that
+        have been removed.
+        Row indices should be set to -1.</p>
+
+        @since LibreOffice 7.4
+    */
+    const short COLUMNS_REMOVED = 7;
 };
 
 }; }; }; };
-
-#endif
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

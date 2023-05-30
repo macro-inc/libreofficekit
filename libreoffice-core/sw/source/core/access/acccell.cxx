@@ -17,12 +17,10 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <osl/mutex.hxx>
 #include <sal/log.hxx>
 #include <com/sun/star/accessibility/AccessibleRole.hpp>
 #include <com/sun/star/accessibility/AccessibleStateType.hpp>
 #include <com/sun/star/accessibility/AccessibleEventId.hpp>
-#include <unotools/accessiblestatesethelper.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/typeprovider.hxx>
 #include <vcl/svapp.hxx>
@@ -75,7 +73,7 @@ bool SwAccessibleCell::IsSelected()
     return bRet;
 }
 
-void SwAccessibleCell::GetStates( ::utl::AccessibleStateSetHelper& rStateSet )
+void SwAccessibleCell::GetStates( sal_Int64& rStateSet )
 {
     SwAccessibleContext::GetStates( rStateSet );
 
@@ -83,9 +81,9 @@ void SwAccessibleCell::GetStates( ::utl::AccessibleStateSetHelper& rStateSet )
     const SwViewShell *pVSh = GetMap()->GetShell();
     assert(pVSh);
     if( dynamic_cast<const SwCursorShell*>( pVSh) !=  nullptr )
-        rStateSet.AddState( AccessibleStateType::SELECTABLE );
+        rStateSet |= AccessibleStateType::SELECTABLE;
     //Add resizable state to table cell.
-    rStateSet.AddState( AccessibleStateType::RESIZABLE );
+    rStateSet |= AccessibleStateType::RESIZABLE;
 
     if (IsDisposing()) // tdf#135098
         return;
@@ -93,7 +91,7 @@ void SwAccessibleCell::GetStates( ::utl::AccessibleStateSetHelper& rStateSet )
     // SELECTED
     if( IsSelected() )
     {
-        rStateSet.AddState( AccessibleStateType::SELECTED );
+        rStateSet |= AccessibleStateType::SELECTED;
         SAL_WARN_IF(!m_bIsSelected, "sw.a11y", "bSelected out of sync");
         ::rtl::Reference < SwAccessibleContext > xThis( this );
         GetMap()->SetCursorContext( xThis );
@@ -370,28 +368,6 @@ uno::Any SwAccessibleCell::getMinimumIncrement(  )
     return uno::Any();
 }
 
-static OUString ReplaceOneChar(const OUString& oldOUString, std::u16string_view replacedChar, std::u16string_view replaceStr)
-{
-    int iReplace = oldOUString.lastIndexOf(replacedChar);
-    OUString aRet = oldOUString;
-    while(iReplace > -1)
-    {
-        aRet = aRet.replaceAt(iReplace,1, replaceStr);
-        iReplace = aRet.lastIndexOf(replacedChar,iReplace);
-    }
-    return aRet;
-}
-
-static OUString ReplaceFourChar(const OUString& oldOUString)
-{
-    OUString aRet = ReplaceOneChar(oldOUString, u"\\", u"\\\\");
-    aRet = ReplaceOneChar(aRet, u";", u"\\;");
-    aRet = ReplaceOneChar(aRet, u"=", u"\\=");
-    aRet = ReplaceOneChar(aRet, u",", u"\\,");
-    aRet = ReplaceOneChar(aRet, u":", u"\\:");
-    return aRet;
-}
-
 css::uno::Any SAL_CALL SwAccessibleCell::getExtendedAttributes()
 {
     SolarMutexGuard g;
@@ -402,7 +378,12 @@ css::uno::Any SAL_CALL SwAccessibleCell::getExtendedAttributes()
 
     const SwTableBoxFormula& tbl_formula = pFrameFormat->GetTableBoxFormula();
 
-    OUString strFormula = ReplaceFourChar(tbl_formula.GetFormula());
+    OUString strFormula = tbl_formula.GetFormula()
+                              .replaceAll(u"\\", u"\\\\")
+                              .replaceAll(u";", u"\\;")
+                              .replaceAll(u"=", u"\\=")
+                              .replaceAll(u",", u"\\,")
+                              .replaceAll(u":", u"\\:");
     OUString strFor = "Formula:" + strFormula + ";";
     strRet <<= strFor;
 
@@ -433,13 +414,13 @@ sal_Int32 SAL_CALL SwAccessibleCell::getBackground()
 
 // XAccessibleSelection
 void SwAccessibleCell::selectAccessibleChild(
-    sal_Int32 nChildIndex )
+    sal_Int64 nChildIndex )
 {
     m_aSelectionHelper.selectAccessibleChild(nChildIndex);
 }
 
 sal_Bool SwAccessibleCell::isAccessibleChildSelected(
-    sal_Int32 nChildIndex )
+    sal_Int64 nChildIndex )
 {
     return m_aSelectionHelper.isAccessibleChildSelected(nChildIndex);
 }
@@ -453,19 +434,19 @@ void SwAccessibleCell::selectAllAccessibleChildren(  )
     m_aSelectionHelper.selectAllAccessibleChildren();
 }
 
-sal_Int32 SwAccessibleCell::getSelectedAccessibleChildCount(  )
+sal_Int64 SwAccessibleCell::getSelectedAccessibleChildCount(  )
 {
     return m_aSelectionHelper.getSelectedAccessibleChildCount();
 }
 
 uno::Reference<XAccessible> SwAccessibleCell::getSelectedAccessibleChild(
-    sal_Int32 nSelectedChildIndex )
+    sal_Int64 nSelectedChildIndex )
 {
     return m_aSelectionHelper.getSelectedAccessibleChild(nSelectedChildIndex);
 }
 
 void SwAccessibleCell::deselectAccessibleChild(
-    sal_Int32 nSelectedChildIndex )
+    sal_Int64 nSelectedChildIndex )
 {
     m_aSelectionHelper.deselectAccessibleChild(nSelectedChildIndex);
 }

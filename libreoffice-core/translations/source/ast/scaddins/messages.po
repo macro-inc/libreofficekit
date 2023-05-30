@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-10 23:12+0200\n"
-"PO-Revision-Date: 2022-07-06 16:25+0000\n"
+"POT-Creation-Date: 2022-11-14 14:36+0100\n"
+"PO-Revision-Date: 2022-12-07 12:12+0000\n"
 "Last-Translator: Adolfo Jayme Barrientos <fito@libreoffice.org>\n"
 "Language-Team: Asturian <https://translations.documentfoundation.org/projects/libo_ui-master/scaddinsmessages/ast/>\n"
 "Language: ast\n"
@@ -237,11 +237,11 @@ msgctxt "ANALYSIS_Networkdays"
 msgid "List of date values representing days off (vacation, holidays, etc.)"
 msgstr "Llista de valores de data que representen los díes festivos (vacaciones, fiestes, etc.)"
 
-#. VSGPy
+#. Y3Tor
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Devuelve'l valor «verdaderu» si'l númberu ye par"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr ""
 
 #. CrmYv
 #: scaddins/inc/analysis.hrc:89
@@ -255,11 +255,11 @@ msgctxt "ANALYSIS_Iseven"
 msgid "The number"
 msgstr "El númberu"
 
-#. itBzA
+#. CuWEq
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Devuelve'l valor «verdaderu» si'l númberu ye impar"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr ""
 
 #. EjqfP
 #: scaddins/inc/analysis.hrc:96
@@ -423,11 +423,11 @@ msgctxt "ANALYSIS_Sqrtpi"
 msgid "The number by which pi is multiplied"
 msgstr "El númberu pol que se multiplica pi"
 
-#. G3e4h
+#. PxcZV
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Devuelve un enteru al debalu ente los númberos conseñaos"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr ""
 
 #. F9bnf
 #: scaddins/inc/analysis.hrc:148
@@ -435,11 +435,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Bottom"
 msgstr "Inferior"
 
-#. YnrHL
+#. DvQA5
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "El menor enteru devueltu"
+msgid "The smallest integer that can be returned"
+msgstr "L'enteru más pequeñu que pue devolvese"
 
 #. WaokD
 #: scaddins/inc/analysis.hrc:150
@@ -447,11 +447,11 @@ msgctxt "ANALYSIS_Randbetween"
 msgid "Top"
 msgstr "Superior"
 
-#. Bm3ys
+#. uEjk5
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "El mayor enteru devueltu"
+msgid "The largest integer that can be returned"
+msgstr ""
 
 #. 8CDCk
 #: scaddins/inc/analysis.hrc:156
@@ -521,7 +521,7 @@ msgstr "N"
 #: scaddins/inc/analysis.hrc:174
 msgctxt "ANALYSIS_Besseli"
 msgid "The order of the Bessel function"
-msgstr "Orde de la función Bessel"
+msgstr "L'orde de la función Bessel"
 
 #. xnyXW
 #: scaddins/inc/analysis.hrc:179
@@ -551,7 +551,7 @@ msgstr "N"
 #: scaddins/inc/analysis.hrc:183
 msgctxt "ANALYSIS_Besselj"
 msgid "The order of the Bessel function"
-msgstr "Orde de la función Bessel"
+msgstr "L'orde de la función Bessel"
 
 #. YfNtp
 #: scaddins/inc/analysis.hrc:188
@@ -581,7 +581,7 @@ msgstr "N"
 #: scaddins/inc/analysis.hrc:192
 msgctxt "ANALYSIS_Besselk"
 msgid "The order of the Bessel function"
-msgstr "Orde de la función Bessel"
+msgstr "L'orde de la función Bessel"
 
 #. x97R8
 #: scaddins/inc/analysis.hrc:197
@@ -611,7 +611,7 @@ msgstr "N"
 #: scaddins/inc/analysis.hrc:201
 msgctxt "ANALYSIS_Bessely"
 msgid "The order of the Bessel function"
-msgstr "Orde de la función Bessel"
+msgstr "L'orde de la función Bessel"
 
 #. MAteU
 #: scaddins/inc/analysis.hrc:206

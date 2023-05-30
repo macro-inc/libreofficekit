@@ -25,11 +25,12 @@
 #include <com/sun/star/beans/XPropertyContainer.hpp>
 #include <ooo/vba/word/WdBuiltInProperty.hpp>
 #include <ooo/vba/office/MsoDocProperties.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <memory>
 #include "wordvbahelper.hxx"
 #include <fesh.hxx>
 #include <docsh.hxx>
+#include <utility>
 using namespace ::ooo::vba;
 using namespace css;
 
@@ -69,7 +70,7 @@ protected:
     uno::Reference< frame::XModel > m_xModel;
     uno::Reference<document::XDocumentProperties> m_xDocProps;
 public:
-    explicit PropertGetSetHelper( const uno::Reference< frame::XModel >& xModel ):m_xModel( xModel )
+    explicit PropertGetSetHelper( uno::Reference< frame::XModel >  xModel ):m_xModel(std::move( xModel ))
     {
         uno::Reference<document::XDocumentPropertiesSupplier> const
             xDocPropSupp(m_xModel, uno::UNO_QUERY_THROW);
@@ -97,55 +98,55 @@ public:
         if ( rPropName == "EditingDuration" )
         {
             sal_Int32 const nSecs = m_xDocProps->getEditingDuration();
-            return uno::makeAny( nSecs/60 ); // minutes
+            return uno::Any( nSecs/60 ); // minutes
         }
         else if ("Title" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getTitle());
+            return uno::Any(m_xDocProps->getTitle());
         }
         else if ("Subject" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getSubject());
+            return uno::Any(m_xDocProps->getSubject());
         }
         else if ("Author" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getAuthor());
+            return uno::Any(m_xDocProps->getAuthor());
         }
         else if ("Keywords" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getKeywords());
+            return uno::Any(m_xDocProps->getKeywords());
         }
         else if ("Description" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getDescription());
+            return uno::Any(m_xDocProps->getDescription());
         }
         else if ("Template" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getTemplateName());
+            return uno::Any(m_xDocProps->getTemplateName());
         }
         else if ("ModifiedBy" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getModifiedBy());
+            return uno::Any(m_xDocProps->getModifiedBy());
         }
         else if ("Generator" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getGenerator());
+            return uno::Any(m_xDocProps->getGenerator());
         }
         else if ("PrintDate" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getPrintDate());
+            return uno::Any(m_xDocProps->getPrintDate());
         }
         else if ("CreationDate" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getCreationDate());
+            return uno::Any(m_xDocProps->getCreationDate());
         }
         else if ("ModifyDate" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getModificationDate());
+            return uno::Any(m_xDocProps->getModificationDate());
         }
         else if ("AutoloadURL" == rPropName)
         {
-            return uno::makeAny(m_xDocProps->getAutoloadURL());
+            return uno::Any(m_xDocProps->getAutoloadURL());
         }
         else
         {
@@ -311,11 +312,8 @@ public:
         {
             if ( mpDocShell )
             {
-                SwFEShell* pFEShell = mpDocShell->GetFEShell();
-                if(pFEShell)
-                {
+                if (SwFEShell* pFEShell = mpDocShell->GetFEShell())
                     aReturn <<= pFEShell->GetLineCount();
-                }
             }
         }
         else
@@ -451,7 +449,7 @@ class SwVbaBuiltInDocumentProperty : public SwVbaDocumentProperty_BASE
 protected:
     DocPropInfo mPropInfo;
 public:
-    SwVbaBuiltInDocumentProperty(  const uno::Reference< ov::XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const DocPropInfo& rInfo );
+    SwVbaBuiltInDocumentProperty(  const uno::Reference< ov::XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, DocPropInfo  rInfo );
     // XDocumentProperty
     virtual void SAL_CALL Delete(  ) override;
     virtual OUString SAL_CALL getName(  ) override;
@@ -542,7 +540,7 @@ SwVbaCustomDocumentProperty::Delete(  )
     xContainer->removeProperty( getName() );
 }
 
-SwVbaBuiltInDocumentProperty::SwVbaBuiltInDocumentProperty( const uno::Reference< ov::XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const DocPropInfo& rInfo ) : SwVbaDocumentProperty_BASE( xParent, xContext ), mPropInfo( rInfo )
+SwVbaBuiltInDocumentProperty::SwVbaBuiltInDocumentProperty( const uno::Reference< ov::XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, DocPropInfo  rInfo ) : SwVbaDocumentProperty_BASE( xParent, xContext ), mPropInfo(std::move( rInfo ))
 {
 }
 
@@ -660,7 +658,7 @@ public:
     {
         if ( !hasMoreElements() )
             throw container::NoSuchElementException();
-        return uno::makeAny( mIt++->second );
+        return uno::Any( mIt++->second );
     }
 };
 
@@ -680,7 +678,7 @@ protected:
     DocPropsByName mNamedDocProps;
 
     public:
-    BuiltInPropertiesImpl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< frame::XModel >& xModel ) : m_xModel( xModel )
+    BuiltInPropertiesImpl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, uno::Reference< frame::XModel >  xModel ) : m_xModel(std::move( xModel ))
     {
         BuiltInIndexHelper builtIns( m_xModel );
         for ( sal_Int32 index = word::WdBuiltInProperty::wdPropertyTitle; index <= word::WdBuiltInProperty::wdPropertyCharsWSpaces; ++index )
@@ -700,7 +698,7 @@ protected:
         DocProps::iterator it = mDocProps.find( ++Index );
         if ( it == mDocProps.end() )
             throw lang::IndexOutOfBoundsException();
-        return uno::makeAny( it->second  );
+        return uno::Any( it->second  );
     }
     virtual uno::Any SAL_CALL getByName( const OUString& aName ) override
     {
@@ -805,7 +803,7 @@ class CustomPropertiesImpl : public PropertiesImpl_BASE
     uno::Reference< beans::XPropertySet > mxUserDefinedProp;
     std::shared_ptr< PropertGetSetHelper > mpPropGetSetHelper;
 public:
-    CustomPropertiesImpl( const uno::Reference< XHelperInterface >& xParent, const uno::Reference< uno::XComponentContext >& xContext, const uno::Reference< frame::XModel >& xModel ) : m_xParent( xParent ), m_xContext( xContext ), m_xModel( xModel )
+    CustomPropertiesImpl( uno::Reference< XHelperInterface >  xParent, uno::Reference< uno::XComponentContext > xContext, uno::Reference< frame::XModel >  xModel ) : m_xParent(std::move( xParent )), m_xContext(std::move( xContext )), m_xModel(std::move( xModel ))
     {
         // suck in the document( custom ) properties
         mpPropGetSetHelper = std::make_shared<CustomPropertyGetSetHelper>( m_xModel );
@@ -825,7 +823,7 @@ public:
             throw lang::IndexOutOfBoundsException();
         // How to determine type e.g Date? ( com.sun.star.util.DateTime )
         DocPropInfo aPropInfo = DocPropInfo::createDocPropInfo( aProps[ Index ].Name, aProps[ Index ].Name, mpPropGetSetHelper );
-        return uno::makeAny( uno::Reference< XDocumentProperty >( new SwVbaCustomDocumentProperty( m_xParent, m_xContext, aPropInfo ) ) );
+        return uno::Any( uno::Reference< XDocumentProperty >( new SwVbaCustomDocumentProperty( m_xParent, m_xContext, aPropInfo ) ) );
     }
 
     virtual uno::Any SAL_CALL getByName( const OUString& aName ) override
@@ -834,7 +832,7 @@ public:
             throw container::NoSuchElementException();
 
         DocPropInfo aPropInfo = DocPropInfo::createDocPropInfo( aName, aName, mpPropGetSetHelper );
-        return uno::makeAny( uno::Reference< XDocumentProperty >( new SwVbaCustomDocumentProperty( m_xParent, m_xContext, aPropInfo ) ) );
+        return uno::Any( uno::Reference< XDocumentProperty >( new SwVbaCustomDocumentProperty( m_xParent, m_xContext, aPropInfo ) ) );
     }
 
     virtual uno::Sequence< OUString > SAL_CALL getElementNames(  ) override

@@ -34,7 +34,7 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include <comphelper/interaction.hxx>
 #include <framework/interaction.hxx>
@@ -54,7 +54,6 @@
 #include <svx/svdograf.hxx>
 #include <svx/xoutbmp.hxx>
 #include <vcl/graphicfilter.hxx>
-#include <svx/unoapi.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/svdmodel.hxx>
 #include <svx/fmview.hxx>
@@ -64,6 +63,9 @@
 #include <svx/xlineit0.hxx>
 #include <editeng/flditem.hxx>
 #include <svtools/optionsdrawinglayer.hxx>
+#include <comphelper/sequenceashashmap.hxx>
+#include <comphelper/propertysequence.hxx>
+#include <comphelper/sequence.hxx>
 #include "UnoGraphicExporter.hxx"
 #include <memory>
 
@@ -232,9 +234,10 @@ class ImplExportCheckVisisbilityRedirector : public sdr::contact::ViewObjectCont
 public:
     explicit ImplExportCheckVisisbilityRedirector( SdrPage* pCurrentPage );
 
-    virtual drawinglayer::primitive2d::Primitive2DContainer createRedirectedPrimitive2DSequence(
+    virtual void createRedirectedPrimitive2DSequence(
         const sdr::contact::ViewObjectContact& rOriginal,
-        const sdr::contact::DisplayInfo& rDisplayInfo) override;
+        const sdr::contact::DisplayInfo& rDisplayInfo,
+        drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor) override;
 
 private:
     SdrPage*    mpCurrentPage;
@@ -245,9 +248,10 @@ ImplExportCheckVisisbilityRedirector::ImplExportCheckVisisbilityRedirector( SdrP
 {
 }
 
-drawinglayer::primitive2d::Primitive2DContainer ImplExportCheckVisisbilityRedirector::createRedirectedPrimitive2DSequence(
+void ImplExportCheckVisisbilityRedirector::createRedirectedPrimitive2DSequence(
     const sdr::contact::ViewObjectContact& rOriginal,
-    const sdr::contact::DisplayInfo& rDisplayInfo)
+    const sdr::contact::DisplayInfo& rDisplayInfo,
+    drawinglayer::primitive2d::Primitive2DDecompositionVisitor& rVisitor)
 {
     SdrObject* pObject = rOriginal.GetViewContact().TryToGetSdrObject();
 
@@ -262,15 +266,15 @@ drawinglayer::primitive2d::Primitive2DContainer ImplExportCheckVisisbilityRedire
 
         if( (pPage == nullptr) || pPage->checkVisibility(rOriginal, rDisplayInfo, false) )
         {
-            return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo);
+            return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo, rVisitor);
         }
 
-        return drawinglayer::primitive2d::Primitive2DContainer();
+        return;
     }
     else
     {
         // not an object, maybe a page
-        return sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo);
+        sdr::contact::ViewObjectContactRedirector::createRedirectedPrimitive2DSequence(rOriginal, rDisplayInfo, rVisitor);
     }
 }
 
@@ -400,8 +404,39 @@ VclPtr<VirtualDevice> GraphicExporter::CreatePageVDev( SdrPage* pPage, tools::Lo
     return pVDev;
 }
 
-void GraphicExporter::ParseSettings( const Sequence< PropertyValue >& aDescriptor, ExportSettings& rSettings )
+void GraphicExporter::ParseSettings(const Sequence<PropertyValue>& rDescriptor,
+                                    ExportSettings& rSettings)
 {
+    Sequence<PropertyValue> aDescriptor = rDescriptor;
+    if (aDescriptor.hasElements())
+    {
+        comphelper::SequenceAsHashMap aMap(aDescriptor);
+        Sequence<PropertyValue> aFilterData;
+        OUString aFilterOptions;
+        auto it = aMap.find("FilterData");
+        if (it != aMap.end())
+        {
+            it->second >>= aFilterData;
+        }
+        it = aMap.find("FilterOptions");
+        if (it != aMap.end())
+        {
+            it->second >>= aFilterOptions;
+        }
+        if (!aFilterData.hasElements() && !aFilterOptions.isEmpty())
+        {
+            // Allow setting filter data keys from the cmdline.
+            std::vector<PropertyValue> aData
+                = comphelper::JsonToPropertyValues(aFilterOptions.toUtf8());
+            aFilterData = comphelper::containerToSequence(aData);
+            if (aFilterData.hasElements())
+            {
+                aMap["FilterData"] <<= aFilterData;
+                aDescriptor = aMap.getAsConstPropertyValueList();
+            }
+        }
+    }
+
     for( const PropertyValue& rValue : aDescriptor )
     {
         if ( rValue.Name == "FilterName" )
@@ -575,7 +610,7 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
     EEControlBits nCntrl = nOldCntrl & ~EEControlBits::ONLINESPELLING;
     rOutl.SetControlWord(nCntrl);
 
-    SdrObject* pTempBackgroundShape = nullptr;
+    rtl::Reference<SdrObject> pTempBackgroundShape;
     std::vector< SdrObject* > aShapes;
     bool bRet = true;
 
@@ -594,7 +629,7 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
                 pTempBackgroundShape->SetMergedItemSet(pCorrectProperties->GetItemSet());
                 pTempBackgroundShape->SetMergedItem(XLineStyleItem(drawing::LineStyle_NONE));
                 pTempBackgroundShape->NbcSetStyleSheet(pCorrectProperties->GetStyleSheet(), true);
-                aShapes.push_back(pTempBackgroundShape);
+                aShapes.push_back(pTempBackgroundShape.get());
             }
         }
         else
@@ -802,7 +837,7 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
             else if( rSettings.mbScrollText )
             {
                 SdrObject* pObj = aShapes.front();
-                auto pTextObj = dynamic_cast<SdrTextObj*>( pObj);
+                auto pTextObj = DynCastSdrTextObj( pObj);
                 if( pTextObj && pTextObj->HasText() )
                 {
                     tools::Rectangle aScrollRectangle;
@@ -869,7 +904,7 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
                 for( SdrObject* pObj : aShapes )
                 {
                     drawinglayer::primitive2d::Primitive2DContainer aSequence;
-                    aSequence = pObj->GetViewContact().getViewIndependentPrimitive2DContainer();
+                    pObj->GetViewContact().getViewIndependentPrimitive2DContainer(aSequence);
                     aBound.expand(aSequence.getB2DRange(aViewInformation2D));
                 }
             }
@@ -916,8 +951,8 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
             {
                 // more effective way to paint a vector of SdrObjects. Hand over the processed page
                 // to have it in the
-                sdr::contact::ObjectContactOfObjListPainter aMultiObjectPainter(*aOut, std::move(aShapes), mpCurrentPage);
                 ImplExportCheckVisisbilityRedirector aCheckVisibilityRedirector(mpCurrentPage);
+                sdr::contact::ObjectContactOfObjListPainter aMultiObjectPainter(*aOut, std::move(aShapes), mpCurrentPage);
                 aMultiObjectPainter.SetViewObjectContactRedirector(&aCheckVisibilityRedirector);
 
                 aMultiObjectPainter.ProcessDisplay(aDisplayInfo);
@@ -927,10 +962,16 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
             aMtf.WindStart();
 
             // tdf#126319 Immediately add needed size to target's PrefSize
+            // tdf#150102 Checked that in aBound is indeed the size - 1 (probably
+            // due to old integer stuff using Size()/Rectangle() and getWidth()/GetWidth()
+            // with the old one-less paradigm somewhere), so just correct to the
+            // correct size. Be aware that checking of tdf#126319 is needed, but
+            // looks good in my tests. Still: Changing the central UNO API Metafile
+            // export is always a risky thing, so it will have to show if this will
+            // not influence something else.
             const Size aBoundSize(
-                basegfx::fround(aBound.getWidth() + aHalfPixelInMtf.getWidth()),
-                basegfx::fround(aBound.getHeight() + aHalfPixelInMtf.getHeight()));
-
+                basegfx::fround(aBound.getWidth() + 1),
+                basegfx::fround(aBound.getHeight() + 1));
             aMtf.SetPrefMapMode( aMap );
             aMtf.SetPrefSize( aBoundSize );
 
@@ -946,10 +987,7 @@ bool GraphicExporter::GetGraphic( ExportSettings const & rSettings, Graphic& aGr
         }
     }
 
-    if(pTempBackgroundShape)
-    {
-        SdrObject::Free(pTempBackgroundShape);
-    }
+    pTempBackgroundShape.clear();
 
     rOutl.SetCalcFieldValueHdl( maOldCalcFieldValueHdl );
 
@@ -1033,7 +1071,7 @@ sal_Bool SAL_CALL GraphicExporter::filter( const Sequence< PropertyValue >& aDes
                 // SvOutputStream, or adapt the graphic filter to not seek anymore.
                 SvMemoryStream aStream( 1024, 1024 );
 
-                nStatus = rFilter.ExportGraphic( aGraphic,"", aStream, nFilter, &aSettings.maFilterData );
+                nStatus = rFilter.ExportGraphic( aGraphic, u"", aStream, nFilter, &aSettings.maFilterData );
 
                 // copy temp stream to XOutputStream
                 SvOutputStream aOutputStream( aSettings.mxOutputStream );

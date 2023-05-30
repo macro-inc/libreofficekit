@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <cassert>
 
+#include <utility>
 #include <vcl/errinf.hxx>
 #include <ucbhelper/content.hxx>
 #include <vcl/svapp.hxx>
@@ -46,13 +47,13 @@
 #include <com/sun/star/sdbc/XRow.hpp>
 #include <com/sun/star/ucb/ContentCreationException.hpp>
 #include <com/sun/star/ucb/XContentAccess.hpp>
-#include <com/sun/star/ui/dialogs/FolderPicker.hpp>
 #include <com/sun/star/ui/dialogs/XAsynchronousExecutableDialog.hpp>
 #include <dialmgr.hxx>
 #include <strings.hrc>
 #include <svx/dialmgr.hxx>
 #include <svx/strings.hrc>
 #include <osl/diagnose.h>
+#include <o3tl/string_view.hxx>
 
 using namespace ::ucbhelper;
 using namespace ::cppu;
@@ -65,11 +66,11 @@ using namespace ::com::sun::star::uno;
 
 SearchThread::SearchThread(SearchProgress* pProgress,
                            TPGalleryThemeProperties* pBrowser,
-                           const INetURLObject& rStartURL)
+                           INetURLObject aStartURL)
     : Thread("cuiSearchThread")
     , mpProgress(pProgress)
     , mpBrowser(pBrowser)
-    , maStartURL(rStartURL)
+    , maStartURL(std::move(aStartURL))
 {
 }
 
@@ -188,9 +189,9 @@ void SearchThread::ImplSearch( const INetURLObject& rStartURL,
     }
 }
 
-SearchProgress::SearchProgress(weld::Window* pParent, TPGalleryThemeProperties* pTabPage, const INetURLObject& rStartURL)
+SearchProgress::SearchProgress(weld::Window* pParent, TPGalleryThemeProperties* pTabPage, INetURLObject aStartURL)
     : GenericDialogController(pParent, "cui/ui/gallerysearchprogress.ui", "GallerySearchProgress")
-    , startUrl_(rStartURL)
+    , startUrl_(std::move(aStartURL))
     , m_pTabPage(pTabPage)
     , m_xFtSearchDir(m_xBuilder->weld_label("dir"))
     , m_xFtSearchType(m_xBuilder->weld_label("file"))
@@ -335,7 +336,8 @@ IMPL_LINK_NOARG(TakeProgress, CleanUpHdl, void*, void)
         if( !aRemoveEntries[ i ] )
             aRemainingVector.push_back( m_pTabPage->aFoundList[i] );
 
-    m_pTabPage->aFoundList = std::move(aRemainingVector);
+    std::swap(m_pTabPage->aFoundList, aRemainingVector);
+    aRemainingVector.clear();
 
     // refill list box
     for( i = 0, nCount = aRemoveEntries.size(); i < nCount; ++i )
@@ -343,10 +345,8 @@ IMPL_LINK_NOARG(TakeProgress, CleanUpHdl, void*, void)
             aRemainingVector.push_back(m_pTabPage->m_xLbxFound->get_text(i));
 
     m_pTabPage->m_xLbxFound->clear();
-
     for( i = 0, nCount = aRemainingVector.size(); i < nCount; ++i )
         m_pTabPage->m_xLbxFound->append_text(aRemainingVector[i]);
-
     aRemainingVector.clear();
 
     m_pTabPage->m_xLbxFound->thaw();
@@ -457,7 +457,7 @@ IMPL_LINK_NOARG(GalleryIdDialog, ClickOkHdl, weld::Button&, void)
 
         if ((pInfo->GetId() == nId) && (pInfo->GetThemeName() != m_pThm->GetName()))
         {
-            OUString aStr = CuiResId( RID_SVXSTR_GALLERY_ID_EXISTS ) +
+            OUString aStr = CuiResId( RID_CUISTR_GALLERY_ID_EXISTS ) +
                 " (" + pInfo->GetThemeName() + ")";
 
             std::unique_ptr<weld::MessageDialog> xInfoBox(Application::CreateMessageDialog(m_xDialog.get(),
@@ -487,7 +487,7 @@ GalleryThemeProperties::GalleryThemeProperties(weld::Widget* pParent,
     OUString aText = m_xDialog->get_title().replaceFirst( "%1",  pData->pTheme->GetName() );
 
     if (pData->pTheme->IsReadOnly())
-        aText +=  " " + CuiResId( RID_SVXSTR_GALLERY_READONLY );
+        aText +=  " " + CuiResId( RID_CUISTR_GALLERY_READONLY );
 
     m_xDialog->set_title(aText);
 }
@@ -518,7 +518,7 @@ void TPGalleryThemeGeneral::SetXChgData( ExchangeData* _pData )
 
     GalleryTheme*       pThm = pData->pTheme;
     OUString            aOutStr( OUString::number(pThm->GetObjectCount()) );
-    OUString            aObjStr( CuiResId( RID_SVXSTR_GALLERYPROPS_OBJECT ) );
+    OUString            aObjStr( CuiResId( RID_CUISTR_GALLERYPROPS_OBJECT ) );
     OUString            aAccess;
     OUString            aType( SvxResId( RID_SVXSTR_GALLERYPROPS_GALTHEME ) );
     bool            bReadOnly = pThm->IsReadOnly();
@@ -528,7 +528,7 @@ void TPGalleryThemeGeneral::SetXChgData( ExchangeData* _pData )
     m_xEdtMSName->set_sensitive(!bReadOnly);
 
     if( pThm->IsReadOnly() )
-        aType += CuiResId( RID_SVXSTR_GALLERY_READONLY );
+        aType += CuiResId( RID_CUISTR_GALLERY_READONLY );
 
     m_xFtMSShowType->set_label(aType);
     m_xFtMSShowPath->set_label(pThm->getThemeURL().GetMainURL(INetURLObject::DecodeMechanism::Unambiguous));
@@ -611,7 +611,7 @@ void TPGalleryThemeProperties::SetXChgData( ExchangeData* _pData )
     m_xCbbFileType->connect_changed(LINK(this, TPGalleryThemeProperties, SelectFileTypeHdl));
     m_xLbxFound->connect_row_activated(LINK(this, TPGalleryThemeProperties, DClickFoundHdl));
     m_xLbxFound->connect_changed(LINK(this, TPGalleryThemeProperties, SelectFoundHdl));
-    m_xLbxFound->append_text(CuiResId(RID_SVXSTR_GALLERY_NOFILES));
+    m_xLbxFound->append_text(CuiResId(RID_CUISTR_GALLERY_NOFILES));
     m_xLbxFound->show();
 
     FillFilterList();
@@ -621,7 +621,7 @@ void TPGalleryThemeProperties::SetXChgData( ExchangeData* _pData )
     m_xCbxPreview->set_sensitive(false);
 }
 
-void TPGalleryThemeProperties::StartSearchFiles( const OUString& _rFolderURL, short _nDlgResult )
+void TPGalleryThemeProperties::StartSearchFiles( std::u16string_view _rFolderURL, short _nDlgResult )
 {
     if ( RET_OK == _nDlgResult )
     {
@@ -756,7 +756,7 @@ void TPGalleryThemeProperties::FillFilterList()
         {
             if ( !aExtensions.isEmpty() )
                 aExtensions += ";";
-            aExtensions += aWildcard + aFilter.second.getToken( 0, ';', nIndex );
+            aExtensions += OUString::Concat(aWildcard) + o3tl::getToken(aFilter.second, 0, ';', nIndex );
         }
     }
 #endif
@@ -767,7 +767,7 @@ void TPGalleryThemeProperties::FillFilterList()
 #endif
 
     std::unique_ptr<FilterEntry> pFilterEntry(new FilterEntry);
-    pFilterEntry->aFilterName = CuiResId(RID_SVXSTR_GALLERY_ALLFILES);
+    pFilterEntry->aFilterName = CuiResId(RID_CUISTR_GALLERY_ALLFILES);
     pFilterEntry->aFilterName = addExtension(pFilterEntry->aFilterName, aExtensions);
     m_xCbbFileType->insert_text(0, pFilterEntry->aFilterName);
     m_xCbbFileType->set_active(0);
@@ -909,7 +909,7 @@ IMPL_LINK_NOARG(TPGalleryThemeProperties, ClickTakeHdl, weld::Button&, void)
 
     if (!m_xLbxFound->count_selected_rows() || !bEntriesFound)
     {
-        SvxOpenGraphicDialog aDlg(CuiResId(RID_SVXSTR_KEY_GALLERY_DIR), GetFrameWeld());
+        SvxOpenGraphicDialog aDlg(CuiResId(RID_CUISTR_KEY_GALLERY_DIR), GetFrameWeld());
         aDlg.EnableLink(false);
         aDlg.AsLink(false);
 
@@ -991,7 +991,7 @@ void TPGalleryThemeProperties::EndSearchProgressHdl(sal_Int32 /*nResult*/)
   }
   else
   {
-      m_xLbxFound->append_text(CuiResId(RID_SVXSTR_GALLERY_NOFILES));
+      m_xLbxFound->append_text(CuiResId(RID_CUISTR_GALLERY_NOFILES));
       m_xBtnTakeAll->set_sensitive(false);
       m_xCbxPreview->set_sensitive(false);
       bEntriesFound = false;

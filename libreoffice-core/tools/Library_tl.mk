@@ -81,6 +81,12 @@ $(eval $(call gb_Library_add_exception_objects,tl,\
     tools/source/xml/XmlWalker \
 ))
 
+ifneq ($(SYSTEM_LIBFIXMATH),TRUE)
+$(eval $(call gb_Library_add_exception_objects,tl,\
+    tools/source/misc/fix16 \
+))
+endif
+
 ifeq ($(OS),WNT)
 $(eval $(call gb_Library_add_exception_objects,tl, \
     tools/source/stream/strmwnt \
@@ -104,6 +110,12 @@ $(eval $(call gb_Library_use_externals,tl,\
 ifeq ($(OS),LINUX)
 $(eval $(call gb_Library_add_libs,tl,\
         -lrt \
+))
+endif
+
+ifeq ($(SYSTEM_LIBFIXMATH),TRUE)
+$(eval $(call gb_Library_add_libs,tl,\
+	-llibfixmath \
 ))
 endif
 

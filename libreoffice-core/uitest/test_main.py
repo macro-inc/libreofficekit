@@ -13,8 +13,6 @@ import importlib
 import importlib.machinery
 import types
 
-import uitest.config
-
 from uitest.framework import UITestCase
 
 from libreoffice.connection import OfficeConnection
@@ -22,8 +20,8 @@ from libreoffice.connection import OfficeConnection
 test_name_limit_found = False
 
 def parseArgs(argv):
-    (optlist,args) = getopt.getopt(argv[1:], "hdr",
-            ["help", "debug", "soffice=", "userdir=", "dir=", "file=", "gdb"])
+    (optlist,args) = getopt.getopt(argv[1:], "hr",
+            ["help", "soffice=", "userdir=", "dir=", "file=", "gdb"])
     return (dict(optlist), args)
 
 def usage():
@@ -47,6 +45,9 @@ def find_test_files(dir_path):
 
         if os.path.splitext(file_path)[1] == ".swp":
             continue # ignore VIM swap files
+
+        if file_path[-1:] == "~":
+            continue # ignore backup files
 
         # fail on any non .py files
         if not os.path.splitext(file_path)[1] == ".py":
@@ -77,7 +78,7 @@ def add_tests_for_file(test_file, test_suite):
 
     loader = importlib.machinery.SourceFileLoader(module_name, test_file)
     # exec_module was only introduced in 3.4
-    if sys.version_info[1] < 4:
+    if sys.version_info < (3,4):
         mod = loader.load_module()
     else:
         mod = types.ModuleType(loader.name)
@@ -128,9 +129,6 @@ if __name__ == '__main__':
     else:
         usage()
         sys.exit()
-
-    if "-d" in opts or "--debug" in opts:
-        uitest.config.use_sleep = True
 
     result = unittest.TextTestRunner(stream=sys.stdout, verbosity=2).run(test_suite)
     print("Tests run: %d" % result.testsRun)

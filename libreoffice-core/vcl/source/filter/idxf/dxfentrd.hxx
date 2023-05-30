@@ -17,8 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_FILTER_SOURCE_GRAPHICFILTER_IDXF_DXFENTRD_HXX
-#define INCLUDED_FILTER_SOURCE_GRAPHICFILTER_IDXF_DXFENTRD_HXX
+#pragma once
 
 #include "dxfgrprd.hxx"
 #include "dxfvec.hxx"
@@ -416,7 +415,6 @@ public:
     std::vector<std::unique_ptr<DXFEdgeType>> aEdges;
 
     DXFBoundaryPathData();
-    ~DXFBoundaryPathData();
 
     bool EvaluateGroup( DXFGroupReader & rDGR );
 };
@@ -430,7 +428,7 @@ class DXFHatchEntity : public DXFBasicEntity
 
         sal_Int32   nFlags;                         // 70 (solid fill = 1, pattern fill = 0)
         sal_Int32   nAssociativityFlag;             // 71 (associative = 1, non-associative = 0)
-        sal_Int32   nBoundaryPathCount;             // 91
+        sal_Int32   nMaxBoundaryPathCount;          // 91
         sal_Int32   nHatchStyle;                    // 75 (odd parity = 0, outmost area = 1, entire area = 2 )
         sal_Int32   nHatchPatternType;              // 76 (user defined = 0, predefined = 1, custom = 2)
         double      fHatchPatternAngle;             // 52 (pattern fill only)
@@ -440,7 +438,7 @@ class DXFHatchEntity : public DXFBasicEntity
         double      fPixelSize;                     // 47
         sal_Int32   nNumberOfSeedPoints;            // 98
 
-        std::unique_ptr<DXFBoundaryPathData[]> pBoundaryPathData;
+        std::vector<DXFBoundaryPathData> aBoundaryPathData;
 
         DXFHatchEntity();
 
@@ -532,8 +530,5 @@ public:
     void Clear();
         // deletes all entities
 };
-
-#endif
-
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

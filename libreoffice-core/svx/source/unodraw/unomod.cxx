@@ -27,8 +27,8 @@
 #include <svl/itempool.hxx>
 #include <svtools/unoevent.hxx>
 #include <comphelper/sequence.hxx>
+#include <o3tl/string_view.hxx>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/debug.hxx>
 
 #include <cppuhelper/implbase.hxx>
 #include <svx/unofill.hxx>
@@ -168,13 +168,12 @@ css::uno::Reference<css::uno::XInterface> create(
 {
     if( rServiceSpecifier.startsWith("com.sun.star.drawing.") )
     {
-        sal_uInt32 nType = UHashMap::getId( rServiceSpecifier );
-        if( nType != UHASHMAP_NOTFOUND )
+        std::optional<SdrObjKind> nType = UHashMap::getId( rServiceSpecifier );
+        if( nType )
         {
-            sal_uInt16 nT = static_cast<sal_uInt16>(nType & ~E3D_INVENTOR_FLAG);
-            SdrInventor nI = (nType & E3D_INVENTOR_FLAG) ? SdrInventor::E3d : SdrInventor::Default;
+            SdrInventor nI = IsInventorE3D(*nType) ? SdrInventor::E3d : SdrInventor::Default;
 
-            return uno::Reference< uno::XInterface >( static_cast<drawing::XShape*>(SvxDrawPage::CreateShapeByTypeAndInventor( nT, nI, nullptr, nullptr, referer ).get()) );
+            return uno::Reference< uno::XInterface >( static_cast<drawing::XShape*>(SvxDrawPage::CreateShapeByTypeAndInventor( *nType, nI, nullptr, nullptr, referer ).get()) );
         }
     }
     else if (rServiceSpecifier == "com.sun.star.document.ImportGraphicStorageHandler")
@@ -379,68 +378,68 @@ uno::Reference< uno::XInterface > SAL_CALL SvxUnoDrawingModel::createInstance( c
     {
         SvxShape* pShape = nullptr;
 
-        sal_uInt16 nType = OBJ_TEXT;
-        OUString aTypeName = aServiceSpecifier.copy( aPackagePrefix.getLength() );
+        SdrObjKind nType = SdrObjKind::Text;
+        std::u16string_view aTypeName = aServiceSpecifier.subView( aPackagePrefix.getLength() );
         // create a shape wrapper
-        if( aTypeName.startsWith("TitleTextShape") )
+        if( o3tl::starts_with(aTypeName, u"TitleTextShape") )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "OutlinerShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"OutlinerShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "SubtitleShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"SubtitleShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "GraphicObjectShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"GraphicObjectShape" ) )
         {
-            nType = OBJ_GRAF;
+            nType = SdrObjKind::Graphic;
         }
-        else if( aTypeName.startsWith( "PageShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"PageShape" ) )
         {
-            nType = OBJ_PAGE;
+            nType = SdrObjKind::Page;
         }
-        else if( aTypeName.startsWith( "OLE2Shape" ) )
+        else if( o3tl::starts_with(aTypeName, u"OLE2Shape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aTypeName.startsWith( "ChartShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"ChartShape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aTypeName.startsWith( "OrgChartShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"OrgChartShape" ) )
         {
-            nType = OBJ_OLE2;
+            nType = SdrObjKind::OLE2;
         }
-        else if( aTypeName.startsWith( "NotesShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"NotesShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "HandoutShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"HandoutShape" ) )
         {
-            nType = OBJ_PAGE;
+            nType = SdrObjKind::Page;
         }
-        else if( aTypeName.startsWith( "FooterShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"FooterShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "HeaderShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"HeaderShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "SlideNumberShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"SlideNumberShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "DateTimeShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"DateTimeShape" ) )
         {
-            nType = OBJ_TEXT;
+            nType = SdrObjKind::Text;
         }
-        else if( aTypeName.startsWith( "TableShape" ) )
+        else if( o3tl::starts_with(aTypeName, u"TableShape" ) )
         {
-            nType = OBJ_TABLE;
+            nType = SdrObjKind::Table;
         }
         else
         {

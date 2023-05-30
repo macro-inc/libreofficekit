@@ -23,10 +23,16 @@
 #include <com/sun/star/uno/XComponentContext.hpp>
 #include <i18nlangtag/lang.h>
 #include <tools/link.hxx>
+#include <svl/nfkeytab.hxx>
+#include <svl/ondemand.hxx>
 #include <svl/zforlist.hxx>
 #include <unotools/charclass.hxx>
-#include <optional>
 
+#include <map>
+
+class Color;
+class ImpSvNumberformatScan;
+class ImpSvNumberInputScan;
 class SvNumberFormatterRegistry_Impl;
 class NfCurrencyTable;
 
@@ -197,7 +203,7 @@ public:
         in the filtering condition now), instead of the EditFormat string
         (e.g a not rounded value, which is visible during editing).*/
     void GetInputLineString(const double& fOutNumber, sal_uInt32 nFIndex, OUString& rOutString,
-                            bool bFiltering = false);
+                            bool bFiltering = false, bool bForceSystemLocale = false);
 
     /** Format a number according to a format code string to be scanned.
         @return
@@ -300,9 +306,16 @@ public:
         should not be used otherwise. */
     sal_uInt32 GuessDateTimeFormat(SvNumFormatType& rType, double fNumber, LanguageType eLnge);
 
-    /** Return the corresponding edit format of a format. */
+    /** Return the corresponding edit format of a format.
+
+        nFIndex, eType and pFormat (if not nullptr) are assumed to match each
+        other / be of one format. The locale to use is obtained from pFormat,
+        if nullptr then LANGUAGE_SYSTEM is used. This can be overridden by
+        specifying eForLocale other than LANGUAGE_DONTKNOW.
+     */
     sal_uInt32 GetEditFormat(double fNumber, sal_uInt32 nFIndex, SvNumFormatType eType,
-                             LanguageType eLnge, SvNumberformat const* pFormat);
+                             SvNumberformat const* pFormat,
+                             LanguageType eForLocale = LANGUAGE_DONTKNOW);
 
     /// Return the reference date
     const Date& GetNullDate() const;
@@ -476,7 +489,7 @@ public:
              else <NULL/>.
      */
     static const NfCurrencyEntry* GetCurrencyEntry(bool& bFoundBank, std::u16string_view rSymbol,
-                                                   const OUString& rExtension,
+                                                   std::u16string_view rExtension,
                                                    LanguageType eFormatLanguage,
                                                    bool bOnlyStringLanguage = false);
 

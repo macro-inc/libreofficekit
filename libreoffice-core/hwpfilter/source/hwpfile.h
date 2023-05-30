@@ -130,6 +130,7 @@ class DLLEXPORT HWPFile
  * Reads two byte from HIODev
  */
         bool Read2b(unsigned short &out);
+        bool Read2b(char16_t &out);
 /**
  * Reads four byte from HIODev
  */
@@ -202,7 +203,6 @@ class DLLEXPORT HWPFile
             A3Paper = 8
         };
 
-        void AddBox(FBox *);
         void AddPage(){ m_nCurrentPage++;}
         void AddColumnInfo();
         void SetColumnDef(std::shared_ptr<ColumnDef> const &);
@@ -286,8 +286,6 @@ class DLLEXPORT HWPFile
         // import is complete to avoid dangling references
         // elsewhere
         std::vector<std::unique_ptr<HWPPara>> pfailedlist;
-        // floating box list
-        std::vector<FBox*> blist;
         // embedded picture list(tag data)
         std::vector<std::unique_ptr<EmPicture>> emblist;
         std::vector<std::unique_ptr<HyperText>> hyperlist;

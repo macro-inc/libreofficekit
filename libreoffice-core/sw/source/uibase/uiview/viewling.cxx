@@ -168,9 +168,9 @@ void SwView::ExecLingu(SfxRequest &rReq)
 
                             // remember cursor position data for later restoration of the cursor
                             const SwPosition *pPoint = m_pWrtShell->GetCursor()->GetPoint();
-                            bool bRestoreCursor = pPoint->nNode.GetNode().IsTextNode();
-                            const SwNodeIndex aPointNodeIndex( pPoint->nNode );
-                            sal_Int32 nPointIndex = pPoint->nContent.GetIndex();
+                            bool bRestoreCursor = pPoint->GetNode().IsTextNode();
+                            const SwNodeIndex aPointNodeIndex( pPoint->GetNode() );
+                            sal_Int32 nPointIndex = pPoint->GetContentIndex();
 
                             // since this conversion is not interactive the whole converted
                             // document should be undone in a single undo step.
@@ -186,10 +186,11 @@ void SwView::ExecLingu(SfxRequest &rReq)
                                 // check for unexpected error case
                                 OSL_ENSURE(pTextNode && pTextNode->GetText().getLength() >= nPointIndex,
                                     "text missing: corrupted node?" );
-                                if (!pTextNode || pTextNode->GetText().getLength() < nPointIndex)
-                                    nPointIndex = 0;
                                 // restore cursor to its original position
-                                m_pWrtShell->GetCursor()->GetPoint()->nContent.Assign( pTextNode, nPointIndex );
+                                if (!pTextNode || pTextNode->GetText().getLength() < nPointIndex)
+                                    m_pWrtShell->GetCursor()->GetPoint()->Assign( aPointNodeIndex );
+                                else
+                                    m_pWrtShell->GetCursor()->GetPoint()->Assign( *pTextNode, nPointIndex );
                             }
 
                             // enable all, restore view and cursor position
@@ -492,7 +493,7 @@ void SwView::InsertThesaurusSynonym( const OUString &rSynonmText, const OUString
     if( !bSelection )
     {
         if(m_pWrtShell->IsEndWrd())
-            m_pWrtShell->Left(CRSR_SKIP_CELLS, false, 1, false );
+            m_pWrtShell->Left(SwCursorSkipMode::Cells, false, 1, false );
 
         m_pWrtShell->SelWrd();
 
@@ -511,8 +512,8 @@ void SwView::InsertThesaurusSynonym( const OUString &rSynonmText, const OUString
 
         // adjust existing selection
         SwPaM *pCursor = m_pWrtShell->GetCursor();
-        pCursor->GetPoint()->nContent -= nRight;
-        pCursor->GetMark()->nContent += nLeft;
+        pCursor->GetPoint()->AdjustContent(-nRight);
+        pCursor->GetMark()->AdjustContent(nLeft);
     }
 
     m_pWrtShell->Insert( rSynonmText );
@@ -635,13 +636,14 @@ bool SwView::ExecSpellPopup(const Point& rPt)
         {
             const bool bOldViewLock = m_pWrtShell->IsViewLocked();
             m_pWrtShell->LockView( true );
-            m_pWrtShell->Push();
+            if (!comphelper::LibreOfficeKit::isActive())
+                m_pWrtShell->Push();
             SwRect aToFill;
 
             SwCursorShell *pCursorShell = m_pWrtShell.get();
             SwPaM *pCursor = pCursorShell->GetCursor();
             SwPosition aPoint(*pCursor->GetPoint());
-            const SwTextNode *pNode = aPoint.nNode.GetNode().GetTextNode();
+            const SwTextNode *pNode = aPoint.GetNode().GetTextNode();
 
             // Spell-check in case the idle jobs haven't had a chance to kick in.
             // This makes it possible to suggest spelling corrections for
@@ -651,13 +653,13 @@ bool SwView::ExecSpellPopup(const Point& rPt)
                 !pCursor->HasMark() && !pCursor->IsMultiSelection())
             {
                 std::pair<Point, bool> const tmp(rPt, false);
-                SwContentFrame *const pContentFrame = pCursor->GetContentNode()->getLayoutFrame(
+                SwContentFrame *const pContentFrame = pCursor->GetPointContentNode()->getLayoutFrame(
                                         pCursorShell->GetLayout(),
                                         &aPoint, &tmp);
                 if (pContentFrame)
                 {
                     SwRect aRepaint(static_cast<SwTextFrame*>(pContentFrame)->AutoSpell_(
-                        *pCursor->GetContentNode()->GetTextNode(), 0));
+                        *pCursor->GetPointContentNode()->GetTextNode(), 0));
                     if (aRepaint.HasArea())
                         m_pWrtShell->InvalidateWindows(aRepaint);
                 }
@@ -722,21 +724,24 @@ bool SwView::ExecSpellPopup(const Point& rPt)
                 aEvent.SourceWindow = VCLUnoHelper::GetInterface( m_pEditWin );
                 aEvent.ExecutePosition.X = aPixPos.X();
                 aEvent.ExecutePosition.Y = aPixPos.Y();
-                ScopedVclPtr<Menu> pMenu;
+                css::uno::Reference<css::awt::XPopupMenu> xMenu;
 
                 OUString sMenuName = bUseGrammarContext ?
                     OUString("private:resource/GrammarContextMenu") : OUString("private:resource/SpellContextMenu");
-                if (TryContextMenuInterception(xPopup->GetMenu(), sMenuName, pMenu, aEvent))
+                auto xMenuInterface = xPopup->CreateMenuInterface();
+                if (TryContextMenuInterception(xMenuInterface, sMenuName, xMenu, aEvent))
                 {
                     //! happy hacking for context menu modifying extensions of this
                     //! 'custom made' menu... *sigh* (code copied from sfx2 and framework)
-                    if ( pMenu )
+                    if (xMenu.is())
                     {
-                        const sal_uInt16 nId = static_cast<PopupMenu*>(pMenu.get())->Execute(m_pEditWin, aPixPos);
-                        OUString aCommand = static_cast<PopupMenu*>(pMenu.get())->GetItemCommand(nId);
+                        css::uno::Reference<css::awt::XWindowPeer> xParent(aEvent.SourceWindow, css::uno::UNO_QUERY);
+                        const sal_uInt16 nId = xMenu->execute(xParent, css::awt::Rectangle(aPixPos.X(), aPixPos.Y(), 1, 1),
+                                                              css::awt::PopupMenuDirection::EXECUTE_DOWN);
+                        OUString aCommand = xMenu->getCommand(nId);
                         if (aCommand.isEmpty() )
                         {
-                            if (!ExecuteMenuCommand(dynamic_cast<PopupMenu&>(*pMenu), *GetViewFrame(), nId))
+                            if (!ExecuteMenuCommand(xMenu, *GetViewFrame(), nId))
                                 xPopup->Execute(nId);
                         }
                         else
@@ -779,7 +784,7 @@ bool SwView::ExecSpellPopup(const Point& rPt)
                         {
                             if (SfxViewShell* pViewShell = SfxViewShell::Current())
                             {
-                                boost::property_tree::ptree aMenu = SfxDispatcher::fillPopupMenu(&xPopup->GetMenu());
+                                boost::property_tree::ptree aMenu = SfxDispatcher::fillPopupMenu(xMenuInterface);
                                 boost::property_tree::ptree aRoot;
                                 aRoot.add_child("menu", aMenu);
 

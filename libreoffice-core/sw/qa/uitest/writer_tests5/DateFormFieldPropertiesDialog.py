@@ -1,18 +1,20 @@
 # -*- tab-width: 4; indent-tabs-mode: nil; py-indent-offset: 4 -*-
 #
+# This file is part of the LibreOffice project.
+#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 from uitest.framework import UITestCase
 from uitest.uihelper.common import get_state_as_dict, get_url_for_data_file
+from libreoffice.uno.propertyvalue import mkPropertyValues
 
 class dateFormFieldDialog(UITestCase):
 
     def test_setting_date_format(self):
         # open a file with a date form field
-        with self.ui_test.load_file(get_url_for_data_file("date_form_field.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.load_file(get_url_for_data_file("date_form_field.odt")):
 
             # open the dialog (cursor is at the field)
             with self.ui_test.execute_dialog_through_command(".uno:ControlProperties") as xDialog:
@@ -36,8 +38,7 @@ class dateFormFieldDialog(UITestCase):
 
     def test_date_field_with_custom_format(self):
         # open a file with a date form field
-        with self.ui_test.load_file(get_url_for_data_file("date_form_field_custom_format.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
+        with self.ui_test.load_file(get_url_for_data_file("date_form_field_custom_format.odt")):
 
             # open the dialog (cursor is at the field)
             with self.ui_test.execute_dialog_through_command(".uno:ControlProperties") as xDialog:
@@ -59,7 +60,6 @@ class dateFormFieldDialog(UITestCase):
     def test_date_reformat(self):
         # open a file with a date form field
         with self.ui_test.load_file(get_url_for_data_file("date_form_field.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             self.assertEqual(writer_doc.getText().getString(), "07/17/19")
 
             # open the dialog (cursor is at the field)
@@ -82,7 +82,6 @@ class dateFormFieldDialog(UITestCase):
     def test_date_field_with_placeholder(self):
         # open a file with a date form field
         with self.ui_test.load_file(get_url_for_data_file("date_form_field_with_placeholder.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             self.assertEqual(writer_doc.getText().getString(), "[select date]")
 
             # open the dialog (cursor is at the field)
@@ -108,7 +107,6 @@ class dateFormFieldDialog(UITestCase):
 
         # open a file with a date form field
         with self.ui_test.load_file(get_url_for_data_file("date_form_field_without_current_date.odt")) as writer_doc:
-            xWriterDoc = self.xUITest.getTopFocusWindow()
             self.assertEqual(writer_doc.getText().getString(), "07/17/19")
 
             # open the dialog (cursor is at the field)
@@ -127,5 +125,19 @@ class dateFormFieldDialog(UITestCase):
 
             # a placeholder text is not changed by format change
             self.assertEqual(writer_doc.getText().getString(), "Jul 17, 2019")
+
+    def test_date_picker_drop_down(self):
+        with self.ui_test.load_file(get_url_for_data_file("date_picker.docx")) as writer_doc:
+            xWriterDoc = self.xUITest.getTopFocusWindow()
+            xWriterEdit = xWriterDoc.getChild("writer_edit")
+
+            xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RIGHT"}))
+            xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "RIGHT"}))
+
+            # open the dialog (cursor is at the field)
+            xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "ALT+DOWN"}))
+            xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "ESC"}))
+            xWriterEdit.executeAction("TYPE", mkPropertyValues({"KEYCODE": "UP"}))
+            self.assertEqual(writer_doc.getText().getString(), "\nClick to choose a date")
 
 # vim: set shiftwidth=4 softtabstop=4 expandtab:

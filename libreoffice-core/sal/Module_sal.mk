@@ -11,17 +11,19 @@ $(eval $(call gb_Module_Module,sal))
 
 $(eval $(call gb_Module_add_targets,sal,\
 	$(if $(CROSS_COMPILING),,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),,Executable_cppunittester)) \
-	$(if $(filter $(OS),ANDROID), \
+	$(if $(filter $(OS),ANDROID EMSCRIPTEN), \
 		Library_lo-bootstrap) \
 	Library_sal \
-	$(if $(filter $(OS),ANDROID),,$(if $(filter TRUE,$(DISABLE_DYNLOADING)),,Library_sal_textenc)) \
+    $(call gb_CondLibSalTextenc,Library_sal_textenc) \
 ))
 
 ifneq (,$(filter DESKTOP,$(BUILD_TYPE)))
 
+ifneq (EMSCRIPTEN,$(OS))
 $(eval $(call gb_Module_add_targets,sal,\
 	Executable_osl_process_child \
 ))
+endif
 
 $(eval $(call gb_Module_add_check_targets,sal,\
 	$(if $(filter TRUE,$(DISABLE_DYNLOADING)),,CppunitTest_Module_DLL) \

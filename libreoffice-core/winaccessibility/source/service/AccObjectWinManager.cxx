@@ -46,8 +46,6 @@
 
 
 using namespace com::sun::star::accessibility;
-using namespace com::sun::star::accessibility::AccessibleRole;
-using namespace com::sun::star::accessibility::AccessibleStateType;
 using namespace com::sun::star::uno;
 
 /**
@@ -79,10 +77,6 @@ AccObjectWinManager::~AccObjectWinManager()
     HwndXAcc.clear();
     XResIdAccList.clear();
     XHWNDDocList.clear();
-#ifdef ACC_DEBUG
-
-    fclose( pFile );
-#endif
 }
 
 
@@ -152,10 +146,10 @@ AccObject* AccObjectWinManager::GetTopWindowAccObj(HWND hWnd)
 /**
    * Simulate MSAA event via XAccessible interface and event type.
    * @param pXAcc XAccessible interface.
-   * @param state Customize Interface
+   * @param eEvent event type
    * @return The terminate result that identifies if the call is successful.
    */
-bool AccObjectWinManager::NotifyAccEvent(XAccessible* pXAcc,short state)
+bool AccObjectWinManager::NotifyAccEvent(XAccessible* pXAcc, UnoMSAAEvent eEvent)
 {
     Reference< XAccessibleContext > pRContext;
 
@@ -176,9 +170,9 @@ bool AccObjectWinManager::NotifyAccEvent(XAccessible* pXAcc,short state)
     long dChildID = selfAccObj->GetResID();
     HWND hAcc = selfAccObj->GetParentHWND();
 
-    switch(state)
+    switch(eEvent)
     {
-    case UM_EVENT_STATE_FOCUSED:
+    case UnoMSAAEvent::STATE_FOCUSED:
         {
             UpdateAccFocus(pXAcc);
             selfAccObj->UpdateDefaultAction( );
@@ -186,124 +180,129 @@ bool AccObjectWinManager::NotifyAccEvent(XAccessible* pXAcc,short state)
             NotifyWinEvent( EVENT_OBJECT_FOCUS,hAcc, OBJID_CLIENT,dChildID  );
             break;
         }
-    case UM_EVENT_STATE_BUSY:
+    case UnoMSAAEvent::STATE_BUSY:
         NotifyWinEvent( EVENT_OBJECT_STATECHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_STATE_CHECKED:
+    case UnoMSAAEvent::STATE_CHECKED:
         NotifyWinEvent( EVENT_OBJECT_STATECHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_STATE_PRESSED:
+    case UnoMSAAEvent::STATE_PRESSED:
         NotifyWinEvent( EVENT_OBJECT_STATECHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
 
     //Removed fire out selected event
-    //case UM_EVENT_STATE_SELECTED:
+    //case UnoMSAAEvent::STATE_SELECTED:
     //  NotifyWinEvent( EVENT_OBJECT_STATECHANGE,hAcc, OBJID_CLIENT,dChildID  );
     //  break;
-    case UM_EVENT_STATE_ARMED:
+    case UnoMSAAEvent::STATE_ARMED:
         UpdateAccFocus(pXAcc);
         NotifyWinEvent( EVENT_OBJECT_FOCUS,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_MENU_START:
+    case UnoMSAAEvent::STATE_SHOWING:
+        // send EVENT_SYSTEM_ALERT when notification gets shown
+        if (pRContext->getAccessibleRole() == AccessibleRole::NOTIFICATION)
+            NotifyWinEvent(EVENT_SYSTEM_ALERT, hAcc, OBJID_CLIENT, dChildID);
+        break;
+    case UnoMSAAEvent::MENU_START:
         NotifyWinEvent( EVENT_SYSTEM_MENUSTART,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_MENU_END:
+    case UnoMSAAEvent::MENU_END:
         NotifyWinEvent( EVENT_SYSTEM_MENUEND,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_MENUPOPUPSTART:
+    case UnoMSAAEvent::MENUPOPUPSTART:
         NotifyWinEvent( EVENT_SYSTEM_MENUPOPUPSTART,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_MENUPOPUPEND:
+    case UnoMSAAEvent::MENUPOPUPEND:
         NotifyWinEvent( EVENT_SYSTEM_MENUPOPUPEND,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SELECTION_CHANGED:
+    case UnoMSAAEvent::SELECTION_CHANGED:
         NotifyWinEvent( EVENT_OBJECT_SELECTION,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SELECTION_CHANGED_ADD:
+    case UnoMSAAEvent::SELECTION_CHANGED_ADD:
         NotifyWinEvent( EVENT_OBJECT_SELECTIONADD,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SELECTION_CHANGED_REMOVE:
+    case UnoMSAAEvent::SELECTION_CHANGED_REMOVE:
         NotifyWinEvent( EVENT_OBJECT_SELECTIONREMOVE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SELECTION_CHANGED_WITHIN:
+    case UnoMSAAEvent::SELECTION_CHANGED_WITHIN:
         NotifyWinEvent( EVENT_OBJECT_SELECTIONWITHIN,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_VALUECHANGE:
+    case UnoMSAAEvent::OBJECT_VALUECHANGE:
         UpdateValue(pXAcc);
         NotifyWinEvent( EVENT_OBJECT_VALUECHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_NAMECHANGE:
+    case UnoMSAAEvent::OBJECT_NAMECHANGE:
         NotifyWinEvent( EVENT_OBJECT_NAMECHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_DESCRIPTIONCHANGE:
+    case UnoMSAAEvent::OBJECT_DESCRIPTIONCHANGE:
         NotifyWinEvent( EVENT_OBJECT_DESCRIPTIONCHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_DEFACTIONCHANGE:
+    case UnoMSAAEvent::OBJECT_DEFACTIONCHANGE:
         NotifyWinEvent( IA2_EVENT_ACTION_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_CARETCHANGE:
+    case UnoMSAAEvent::OBJECT_CARETCHANGE:
         NotifyWinEvent( IA2_EVENT_TEXT_CARET_MOVED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_TEXTCHANGE:
+    case UnoMSAAEvent::OBJECT_TEXTCHANGE:
         NotifyWinEvent( IA2_EVENT_TEXT_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_ACTIVE_DESCENDANT_CHANGED:
+    case UnoMSAAEvent::ACTIVE_DESCENDANT_CHANGED:
         UpdateAccFocus(pXAcc);
         NotifyWinEvent( EVENT_OBJECT_FOCUS,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_BOUNDRECT_CHANGED:
+    case UnoMSAAEvent::BOUNDRECT_CHANGED:
         NotifyWinEvent( EVENT_OBJECT_LOCATIONCHANGE,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_VISIBLE_DATA_CHANGED:
+    case UnoMSAAEvent::VISIBLE_DATA_CHANGED:
         NotifyWinEvent( IA2_EVENT_VISIBLE_DATA_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SHOW :
+    case UnoMSAAEvent::SHOW :
         NotifyWinEvent( EVENT_OBJECT_SHOW,hAcc, OBJID_CLIENT,dChildID  );
         NotifyWinEvent( EVENT_SYSTEM_FOREGROUND,hAcc, OBJID_CLIENT,dChildID  );
     break;
-    case UM_EVENT_TABLE_CAPTION_CHANGED:
+    case UnoMSAAEvent::TABLE_CAPTION_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_CAPTION_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_COLUMN_DESCRIPTION_CHANGED:
+    case UnoMSAAEvent::TABLE_COLUMN_DESCRIPTION_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_COLUMN_DESCRIPTION_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_COLUMN_HEADER_CHANGED:
+    case UnoMSAAEvent::TABLE_COLUMN_HEADER_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_COLUMN_HEADER_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_MODEL_CHANGED:
+    case UnoMSAAEvent::TABLE_MODEL_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_MODEL_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_ROW_HEADER_CHANGED:
+    case UnoMSAAEvent::TABLE_ROW_HEADER_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_ROW_HEADER_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_SUMMARY_CHANGED:
+    case UnoMSAAEvent::TABLE_SUMMARY_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_SUMMARY_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TABLE_ROW_DESCRIPTION_CHANGED:
+    case UnoMSAAEvent::TABLE_ROW_DESCRIPTION_CHANGED:
         NotifyWinEvent( IA2_EVENT_TABLE_ROW_DESCRIPTION_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_REORDER:
+    case UnoMSAAEvent::OBJECT_REORDER:
         NotifyWinEvent( EVENT_OBJECT_REORDER,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_PAGE_CHANGED:
+    case UnoMSAAEvent::PAGE_CHANGED:
         NotifyWinEvent( IA2_EVENT_PAGE_CHANGED,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_CHILD_REMOVED:
+    case UnoMSAAEvent::CHILD_REMOVED:
         NotifyWinEvent( EVENT_OBJECT_DESTROY,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_CHILD_ADDED:
+    case UnoMSAAEvent::CHILD_ADDED:
         NotifyWinEvent( EVENT_OBJECT_CREATE ,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_OBJECT_PAGECHANGED:
+    case UnoMSAAEvent::OBJECT_PAGECHANGED:
         NotifyWinEvent( IA2_EVENT_PAGE_CHANGED ,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_TEXT_SELECTION_CHANGED:
+    case UnoMSAAEvent::TEXT_SELECTION_CHANGED:
         NotifyWinEvent( IA2_EVENT_TEXT_SELECTION_CHANGED ,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_SECTION_CHANGED:
+    case UnoMSAAEvent::SECTION_CHANGED:
         NotifyWinEvent( IA2_EVENT_SECTION_CHANGED ,hAcc, OBJID_CLIENT,dChildID  );
         break;
-    case UM_EVENT_COLUMN_CHANGED:
+    case UnoMSAAEvent::COLUMN_CHANGED:
         NotifyWinEvent( IA2_EVENT_TEXT_COLUMN_CHANGED ,hAcc, OBJID_CLIENT,dChildID  );
         break;
     default:
@@ -371,85 +370,6 @@ void AccObjectWinManager::UpdateAccFocus(XAccessible* newFocus)
         if (pAccObjOld && pAccObjOld != pAccObjNew)
             pAccObjOld->unsetFocus();
     }
-}
-
-/**
-   * Update selected object by new focused XAccessible interface.
-   * @param pXAcc XAccessible interface that has selected child changed.
-   * @return Selected children count.
-   */
-int AccObjectWinManager::UpdateAccSelection(XAccessible* pXAcc)
-{
-    Reference< XAccessibleContext > pRContext;
-
-    if( pXAcc == nullptr)
-        return 0;
-
-    pRContext = pXAcc->getAccessibleContext();
-    if( !pRContext.is() )
-        return 0;
-
-    Reference< XAccessibleSelection > pRSelection(pRContext,UNO_QUERY);
-    if( !pRSelection.is() )
-        return 0;
-
-    AccObject* pAccObj = GetAccObjByXAcc(pXAcc);
-    if(pAccObj==nullptr)
-        return 0;
-
-    Reference<XAccessible> pRChild;
-    AccObject* pAccChildObj = nullptr;
-    int selectNum= pRSelection->getSelectedAccessibleChildCount();
-
-    IAccSelectionList oldSelection = pAccObj->GetSelection();
-
-    if(selectNum > 4)//for selected.
-        return selectNum;
-    if(selectNum == 1 && oldSelection.size() == 0)
-        return 1;
-
-    for (int i=0;i<selectNum;i++)
-    {
-        pRChild = pRSelection->getSelectedAccessibleChild(i);
-        if(!pRChild.is())
-        {
-            continue;
-        }
-        Reference<XAccessibleContext> pRChildContext = pRChild->getAccessibleContext();
-        if(!pRChildContext.is())
-        {
-            continue;
-        }
-        long index = pRChildContext->getAccessibleIndexInParent();
-        IAccSelectionList::iterator temp = oldSelection.find(index);
-        if ( temp != oldSelection.end() )
-        {
-            oldSelection.erase(index);
-            continue;
-        }
-
-        pAccChildObj = GetAccObjByXAcc(pRChild.get());
-        if(!pAccChildObj)
-        {
-            InsertAccObj(pRChild.get(), pXAcc,pAccObj->GetParentHWND());
-            pAccChildObj = GetAccObjByXAcc(pRChild.get());
-        }
-
-        pAccObj->AddSelect(index, pAccChildObj);
-
-        if(pAccChildObj != nullptr)
-            NotifyWinEvent(EVENT_OBJECT_SELECTIONADD,pAccObj->GetParentHWND(), OBJID_CLIENT,pAccChildObj->GetResID());
-    }
-
-    for (const auto& rEntry : oldSelection)
-    {
-        pAccObj->GetSelection().erase(rEntry.first);
-        pAccChildObj = rEntry.second;
-        if(pAccChildObj != nullptr)
-            NotifyWinEvent(EVENT_OBJECT_SELECTIONREMOVE,pAccObj->GetParentHWND(), OBJID_CLIENT,pAccChildObj->GetResID());
-    }
-    return 0;
-
 }
 
 /**
@@ -534,10 +454,10 @@ void AccObjectWinManager::DeleteAccObj( XAccessible* pXAcc )
     assert(i != 0);
     (void) i;
     DeleteFromHwndXAcc(pXAcc);
-    if( accObj.GetRole() == DOCUMENT ||
-        accObj.GetRole() == DOCUMENT_PRESENTATION ||
-        accObj.GetRole() == DOCUMENT_SPREADSHEET ||
-        accObj.GetRole() == DOCUMENT_TEXT )
+    if (accObj.GetRole() == AccessibleRole::DOCUMENT ||
+        accObj.GetRole() == AccessibleRole::DOCUMENT_PRESENTATION ||
+        accObj.GetRole() == AccessibleRole::DOCUMENT_SPREADSHEET ||
+        accObj.GetRole() == AccessibleRole::DOCUMENT_TEXT)
     {
         XHWNDDocList.erase(accObj.GetParentHWND());
     }
@@ -601,8 +521,8 @@ bool AccObjectWinManager::InsertChildrenAccObj( css::accessibility::XAccessible*
         }
     }
 
-    int count = pRContext->getAccessibleChildCount();
-    for (int i=0;i<count;i++)
+    const sal_Int64 nCount = pRContext->getAccessibleChildCount();
+    for (sal_Int64 i = 0; i < nCount; i++)
     {
         Reference<XAccessible> mxAccessible
         = pRContext->getAccessibleChild(i);
@@ -699,10 +619,10 @@ bool AccObjectWinManager::InsertAccObj( XAccessible* pXAcc,XAccessible* pParentX
     pObj.SetParentHWND( pWnd );
 
     //for file name support
-    if( pObj.GetRole() == DOCUMENT ||
-        pObj.GetRole() == DOCUMENT_PRESENTATION ||
-        pObj.GetRole() == DOCUMENT_SPREADSHEET ||
-        pObj.GetRole() == DOCUMENT_TEXT )
+    if (pObj.GetRole() == AccessibleRole::DOCUMENT ||
+        pObj.GetRole() == AccessibleRole::DOCUMENT_PRESENTATION ||
+        pObj.GetRole() == AccessibleRole::DOCUMENT_SPREADSHEET ||
+        pObj.GetRole() == AccessibleRole::DOCUMENT_TEXT)
     {
         XHWNDToDocumentHash::iterator aIter = XHWNDDocList.find(pWnd);
         if ( aIter != XHWNDDocList.end() )
@@ -769,94 +689,95 @@ AccObjectWinManager::CreateAccEventListener(XAccessible* pXAcc)
     {
         switch( xContext->getAccessibleRole() )
         {
-        case /*AccessibleRole::*/DIALOG:
+        case AccessibleRole::DIALOG:
             pRet = new AccDialogEventListener(pXAcc,pAgent);
             break;
-        case /*AccessibleRole::*/FRAME:
+        case AccessibleRole::FRAME:
             pRet = new AccFrameEventListener(pXAcc,pAgent);
             break;
-        case /*AccessibleRole::*/WINDOW:
+        case AccessibleRole::WINDOW:
             pRet = new AccWindowEventListener(pXAcc,pAgent);
             break;
-        case /*AccessibleRole::*/ROOT_PANE:
+        case AccessibleRole::ROOT_PANE:
             pRet = new AccFrameEventListener(pXAcc,pAgent);
             break;
             //Container
-        case /*AccessibleRole::*/CANVAS:
-        case /*AccessibleRole::*/COMBO_BOX:
-        case /*AccessibleRole::*/DOCUMENT:
-        case /*AccessibleRole::*/DOCUMENT_PRESENTATION:
-        case /*AccessibleRole::*/DOCUMENT_SPREADSHEET:
-        case /*AccessibleRole::*/DOCUMENT_TEXT:
-        case /*AccessibleRole::*/END_NOTE:
-        case /*AccessibleRole::*/FILLER:
-        case /*AccessibleRole::*/FOOTNOTE:
-        case /*AccessibleRole::*/FOOTER:
-        case /*AccessibleRole::*/HEADER:
-        case /*AccessibleRole::*/LAYERED_PANE:
-        case /*AccessibleRole::*/MENU_BAR:
-        case /*AccessibleRole::*/POPUP_MENU:
-        case /*AccessibleRole::*/OPTION_PANE:
-        case /*AccessibleRole::*/PAGE_TAB:
-        case /*AccessibleRole::*/PAGE_TAB_LIST:
-        case /*AccessibleRole::*/PANEL:
-        case /*AccessibleRole::*/SCROLL_PANE:
-        case /*AccessibleRole::*/SPLIT_PANE:
-        case /*AccessibleRole::*/STATUS_BAR:
-        case /*AccessibleRole::*/TABLE_CELL:
-        case /*AccessibleRole::*/TOOL_BAR:
-        case /*AccessibleRole::*/VIEW_PORT:
+        case AccessibleRole::CANVAS:
+        case AccessibleRole::COMBO_BOX:
+        case AccessibleRole::DOCUMENT:
+        case AccessibleRole::DOCUMENT_PRESENTATION:
+        case AccessibleRole::DOCUMENT_SPREADSHEET:
+        case AccessibleRole::DOCUMENT_TEXT:
+        case AccessibleRole::END_NOTE:
+        case AccessibleRole::FILLER:
+        case AccessibleRole::FOOTNOTE:
+        case AccessibleRole::FOOTER:
+        case AccessibleRole::HEADER:
+        case AccessibleRole::LAYERED_PANE:
+        case AccessibleRole::MENU_BAR:
+        case AccessibleRole::POPUP_MENU:
+        case AccessibleRole::OPTION_PANE:
+        case AccessibleRole::PAGE_TAB:
+        case AccessibleRole::PAGE_TAB_LIST:
+        case AccessibleRole::PANEL:
+        case AccessibleRole::SCROLL_PANE:
+        case AccessibleRole::SPLIT_PANE:
+        case AccessibleRole::STATUS_BAR:
+        case AccessibleRole::TABLE_CELL:
+        case AccessibleRole::TOOL_BAR:
+        case AccessibleRole::VIEW_PORT:
             pRet = new AccContainerEventListener(pXAcc,pAgent);
             break;
-        case /*AccessibleRole::*/PARAGRAPH:
-        case /*AccessibleRole::*/HEADING:
+        case AccessibleRole::PARAGRAPH:
+        case AccessibleRole::HEADING:
             pRet = new AccParagraphEventListener(pXAcc,pAgent);
             break;
             //Component
-        case /*AccessibleRole::*/CHECK_BOX:
-        case /*AccessibleRole::*/ICON:
-        case /*AccessibleRole::*/LABEL:
-        case /*AccessibleRole::*/STATIC:
-        case /*AccessibleRole::*/MENU_ITEM:
-        case /*AccessibleRole::*/CHECK_MENU_ITEM:
-        case /*AccessibleRole::*/RADIO_MENU_ITEM:
-        case /*AccessibleRole::*/PUSH_BUTTON:
-        case /*AccessibleRole::*/RADIO_BUTTON:
-        case /*AccessibleRole::*/SCROLL_BAR:
-        case /*AccessibleRole::*/SEPARATOR:
-        case /*AccessibleRole::*/TOGGLE_BUTTON:
-        case /*AccessibleRole::*/BUTTON_DROPDOWN:
-        case /*AccessibleRole::*/TOOL_TIP:
-        case /*AccessibleRole::*/SPIN_BOX:
-        case DATE_EDITOR:
+        case AccessibleRole::CHECK_BOX:
+        case AccessibleRole::ICON:
+        case AccessibleRole::LABEL:
+        case AccessibleRole::STATIC:
+        case AccessibleRole::NOTIFICATION:
+        case AccessibleRole::MENU_ITEM:
+        case AccessibleRole::CHECK_MENU_ITEM:
+        case AccessibleRole::RADIO_MENU_ITEM:
+        case AccessibleRole::PUSH_BUTTON:
+        case AccessibleRole::RADIO_BUTTON:
+        case AccessibleRole::SCROLL_BAR:
+        case AccessibleRole::SEPARATOR:
+        case AccessibleRole::TOGGLE_BUTTON:
+        case AccessibleRole::BUTTON_DROPDOWN:
+        case AccessibleRole::TOOL_TIP:
+        case AccessibleRole::SPIN_BOX:
+        case AccessibleRole::DATE_EDITOR:
             pRet = new AccComponentEventListener(pXAcc,pAgent);
             break;
             //text component
-        case /*AccessibleRole::*/TEXT:
+        case AccessibleRole::TEXT:
             pRet = new AccTextComponentEventListener(pXAcc,pAgent);
             break;
             //menu
-        case /*AccessibleRole::*/MENU:
+        case AccessibleRole::MENU:
             pRet = new AccMenuEventListener(pXAcc,pAgent);
             break;
             //object container
-        case /*AccessibleRole::*/SHAPE:
+        case AccessibleRole::SHAPE:
 
-        case /*AccessibleRole::*/EMBEDDED_OBJECT:
-        case /*AccessibleRole::*/GRAPHIC:
-        case /*AccessibleRole::*/TEXT_FRAME:
+        case AccessibleRole::EMBEDDED_OBJECT:
+        case AccessibleRole::GRAPHIC:
+        case AccessibleRole::TEXT_FRAME:
             pRet = new AccObjectContainerEventListener(pXAcc,pAgent);
             break;
             //descendmanager
-        case /*AccessibleRole::*/LIST:
+        case AccessibleRole::LIST:
             pRet = new AccListEventListener(pXAcc,pAgent);
             break;
-        case /*AccessibleRole::*/TREE:
+        case AccessibleRole::TREE:
             pRet = new AccTreeEventListener(pXAcc,pAgent);
             break;
             //special
-        case /*AccessibleRole::*/COLUMN_HEADER:
-        case /*AccessibleRole::*/TABLE:
+        case AccessibleRole::COLUMN_HEADER:
+        case AccessibleRole::TABLE:
             pRet = new AccTableEventListener(pXAcc,pAgent);
             break;
         default:
@@ -875,11 +796,11 @@ AccObjectWinManager::CreateAccEventListener(XAccessible* pXAcc)
    * @param pState Changed state.
    * @return
    */
-void AccObjectWinManager::DecreaseState( XAccessible* pXAcc,unsigned short pState )
+void AccObjectWinManager::DecreaseState(XAccessible* pXAcc, sal_Int64 nState)
 {
     AccObject* pAccObj = GetAccObjByXAcc( pXAcc );
     if( pAccObj )
-        pAccObj->DecreaseState( pState );
+        pAccObj->DecreaseState(nState);
 }
 
 /**
@@ -890,11 +811,11 @@ void AccObjectWinManager::DecreaseState( XAccessible* pXAcc,unsigned short pStat
    * @param pState Changed state.
    * @return
    */
-void AccObjectWinManager::IncreaseState( XAccessible* pXAcc,unsigned short pState )
+void AccObjectWinManager::IncreaseState(XAccessible* pXAcc, sal_Int64 nState)
 {
     AccObject* pAccObj = GetAccObjByXAcc( pXAcc );
     if( pAccObj )
-        pAccObj->IncreaseState( pState );
+        pAccObj->IncreaseState(nState);
 }
 
 void  AccObjectWinManager::UpdateState( css::accessibility::XAccessible* pXAcc )
@@ -922,21 +843,6 @@ void  AccObjectWinManager::UpdateAction( XAccessible* pXAcc )
     AccObject* pAccObj = GetAccObjByXAcc( pXAcc );
     if( pAccObj )
         pAccObj->UpdateAction();
-}
-
-/**
-   * Set corresponding com object's accessible location via XAccessible interface and new
-   * location.
-   * @param pXAcc XAccessible interface.
-   * @return
-   */
-void  AccObjectWinManager::SetLocation( XAccessible* pXAcc, long /*top*/, long /*left*/, long /*width*/, long /*height*/ )
-{
-    AccObject* pObj = GetAccObjByXAcc( pXAcc );
-    //get the location from XComponent.
-    Reference< XAccessibleContext > pRContext = pXAcc->getAccessibleContext();
-    if( pObj )
-        pObj->UpdateLocation();
 }
 
 /**
@@ -978,19 +884,6 @@ void  AccObjectWinManager::SetAccName( XAccessible* pXAcc, Any newName)
 }
 
 /**
-   * Set corresponding com object's role via XAccessible interface and new role.
-   * @param pXAcc XAccessible interface.
-   * @param Role new role
-   * @return
-   */
-void  AccObjectWinManager::SetRole( XAccessible* pXAcc, long Role )
-{
-    AccObject* pAccObj = GetAccObjByXAcc( pXAcc );
-    if( pAccObj )
-        pAccObj->SetRole( static_cast<short>(Role) );
-}
-
-/**
    * Judge if a XAccessible object is a container object.
    * @param pAccessible XAccessible interface.
    * @return If XAccessible object is container.
@@ -1006,46 +899,46 @@ bool AccObjectWinManager::IsContainer(XAccessible* pAccessible)
             {
                 switch( xContext->getAccessibleRole() )
                 {
-                case /*AccessibleRole::*/DIALOG:
-                case /*AccessibleRole::*/FRAME:
-                case /*AccessibleRole::*/WINDOW:
-                case /*AccessibleRole::*/ROOT_PANE:
-                case /*AccessibleRole::*/CANVAS:
-                case /*AccessibleRole::*/COMBO_BOX:
-                case /*AccessibleRole::*/DOCUMENT:
-                case /*AccessibleRole::*/DOCUMENT_PRESENTATION:
-                case /*AccessibleRole::*/DOCUMENT_SPREADSHEET:
-                case /*AccessibleRole::*/DOCUMENT_TEXT:
-                case /*AccessibleRole::*/EMBEDDED_OBJECT:
-                case /*AccessibleRole::*/END_NOTE:
-                case /*AccessibleRole::*/FILLER:
-                case /*AccessibleRole::*/FOOTNOTE:
-                case /*AccessibleRole::*/FOOTER:
-                case /*AccessibleRole::*/GRAPHIC:
-                case /*AccessibleRole::*/GROUP_BOX:
-                case /*AccessibleRole::*/HEADER:
-                case /*AccessibleRole::*/LAYERED_PANE:
-                case /*AccessibleRole::*/MENU_BAR:
-                case /*AccessibleRole::*/POPUP_MENU:
-                case /*AccessibleRole::*/OPTION_PANE:
-                case /*AccessibleRole::*/PAGE_TAB:
-                case /*AccessibleRole::*/PAGE_TAB_LIST:
-                case /*AccessibleRole::*/PANEL:
-                case /*AccessibleRole::*/SCROLL_PANE:
-                case /*AccessibleRole::*/SPLIT_PANE:
-                case /*AccessibleRole::*/STATUS_BAR:
-                case /*AccessibleRole::*/TABLE_CELL:
-                case /*AccessibleRole::*/TEXT_FRAME:
-                case /*AccessibleRole::*/TOOL_BAR:
-                case /*AccessibleRole::*/VIEW_PORT:
-                case /*AccessibleRole::*/SHAPE:
+                case AccessibleRole::DIALOG:
+                case AccessibleRole::FRAME:
+                case AccessibleRole::WINDOW:
+                case AccessibleRole::ROOT_PANE:
+                case AccessibleRole::CANVAS:
+                case AccessibleRole::COMBO_BOX:
+                case AccessibleRole::DOCUMENT:
+                case AccessibleRole::DOCUMENT_PRESENTATION:
+                case AccessibleRole::DOCUMENT_SPREADSHEET:
+                case AccessibleRole::DOCUMENT_TEXT:
+                case AccessibleRole::EMBEDDED_OBJECT:
+                case AccessibleRole::END_NOTE:
+                case AccessibleRole::FILLER:
+                case AccessibleRole::FOOTNOTE:
+                case AccessibleRole::FOOTER:
+                case AccessibleRole::GRAPHIC:
+                case AccessibleRole::GROUP_BOX:
+                case AccessibleRole::HEADER:
+                case AccessibleRole::LAYERED_PANE:
+                case AccessibleRole::MENU_BAR:
+                case AccessibleRole::POPUP_MENU:
+                case AccessibleRole::OPTION_PANE:
+                case AccessibleRole::PAGE_TAB:
+                case AccessibleRole::PAGE_TAB_LIST:
+                case AccessibleRole::PANEL:
+                case AccessibleRole::SCROLL_PANE:
+                case AccessibleRole::SPLIT_PANE:
+                case AccessibleRole::STATUS_BAR:
+                case AccessibleRole::TABLE_CELL:
+                case AccessibleRole::TEXT_FRAME:
+                case AccessibleRole::TOOL_BAR:
+                case AccessibleRole::VIEW_PORT:
+                case AccessibleRole::SHAPE:
                     return true;
-                case /*AccessibleRole::*/COLUMN_HEADER:
-                case /*AccessibleRole::*/TABLE:
+                case AccessibleRole::COLUMN_HEADER:
+                case AccessibleRole::TABLE:
                     if(!IsStateManageDescendant(pAccessible))
                         return true;
                     break;
-                case /*AccessibleRole::*/MENU:
+                case AccessibleRole::MENU:
                     return true;
                 default:
                     return false;
@@ -1072,17 +965,8 @@ bool AccObjectWinManager::IsStateManageDescendant(XAccessible* pAccessible)
         Reference<XAccessibleContext> xContext = pAccessible->getAccessibleContext();
         if(xContext.is())
         {
-            Reference< XAccessibleStateSet > pRState = xContext->getAccessibleStateSet();
-            if( !pRState.is() )
-                return false;
-
-            Sequence<short> pStates = pRState->getStates();
-            int count = pStates.getLength();
-            for( int iIndex = 0;iIndex < count;iIndex++ )
-            {
-                if(pStates[iIndex] == /*AccessibleStateType::*/MANAGES_DESCENDANTS)
-                    return true;
-            }
+            sal_Int64 nRState = xContext->getAccessibleStateSet();
+            return nRState & AccessibleStateType::MANAGES_DESCENDANTS;
         }
     }
     return false;
@@ -1145,8 +1029,8 @@ void AccObjectWinManager::UpdateChildState(css::accessibility::XAccessible* pAcc
     {
         return;
     }
-    sal_Int32 nCount = xContext->getAccessibleChildCount();
-    for (sal_Int32 i = 0 ; i < nCount ; ++i)
+    const sal_Int64 nCount = xContext->getAccessibleChildCount();
+    for (sal_Int64 i = 0 ; i < nCount; ++i)
     {
         Reference<css::accessibility::XAccessible> xChild = xContext->getAccessibleChild(i);
         if (xChild.is())
@@ -1161,16 +1045,16 @@ void AccObjectWinManager::UpdateChildState(css::accessibility::XAccessible* pAcc
 }
 
 
-bool AccObjectWinManager::IsSpecialToolboItem(css::accessibility::XAccessible* pXAcc)
+bool AccObjectWinManager::IsSpecialToolbarItem(css::accessibility::XAccessible* pXAcc)
 {
     if (pXAcc && oldFocus != pXAcc)
     {
-        if(GetParentRole(pXAcc) == TOOL_BAR)
+        if (GetParentRole(pXAcc) == AccessibleRole::TOOL_BAR)
         {
             Reference< XAccessibleContext > pRContext(pXAcc->getAccessibleContext());
             if (pRContext.is())
             {
-                if(pRContext->getAccessibleRole() == TOGGLE_BUTTON)
+                if (pRContext->getAccessibleRole() == AccessibleRole::TOGGLE_BUTTON)
                 {
                     return true;
                 }

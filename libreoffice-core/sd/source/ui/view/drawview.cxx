@@ -66,7 +66,7 @@ DrawView::DrawView(
     ,mpDrawViewShell(pShell)
     ,mnPOCHSmph(0)
 {
-    SetCurrentObj(OBJ_RECT);
+    SetCurrentObj(SdrObjKind::Rectangle);
 }
 
 DrawView::~DrawView()
@@ -153,7 +153,7 @@ bool DrawView::SetAttributes(const SfxItemSet& rSet,
 
             if (nInv == SdrInventor::Default)
             {
-                sal_uInt16 eObjKind = pEditObject->GetObjIdentifier();
+                SdrObjKind eObjKind = pEditObject->GetObjIdentifier();
                 PresObjKind ePresObjKind = rPage.GetPresObjKind(pEditObject);
 
                 if ( ePresObjKind == PresObjKind::Title ||
@@ -175,7 +175,7 @@ bool DrawView::SetAttributes(const SfxItemSet& rSet,
                     pSheet->Broadcast(SfxHint(SfxHintId::DataChanged));
                     bOk = true;
                 }
-                else if (eObjKind == OBJ_OUTLINETEXT)
+                else if (eObjKind == SdrObjKind::OutlineText)
                 {
                     // Presentation object outline
                     OutlinerView* pOV   = GetTextEditOutlinerView();
@@ -298,9 +298,9 @@ void DrawView::SetMasterAttributes( SdrObject* pObject, const SdPage& rPage, Sfx
     if (nInv != SdrInventor::Default)
         return;
 
-    sal_uInt16 eObjKind = pObject->GetObjIdentifier();
+    SdrObjKind eObjKind = pObject->GetObjIdentifier();
     PresObjKind ePresObjKind = rPage.GetPresObjKind(pObject);
-    if (bSlide && eObjKind == OBJ_TEXT)
+    if (bSlide && eObjKind == SdrObjKind::Text)
     {
         // Presentation object (except outline)
         SfxStyleSheet* pSheet = rPage.GetTextStyleSheetForObject(pObject);
@@ -339,7 +339,7 @@ void DrawView::SetMasterAttributes( SdrObject* pObject, const SdPage& rPage, Sfx
         pSheet->Broadcast(SfxHint(SfxHintId::DataChanged));
         bOk = true;
     }
-    else if (eObjKind == OBJ_OUTLINETEXT)
+    else if (eObjKind == SdrObjKind::OutlineText)
     {
         // tdf#127900: do not forget to apply master style to placeholders
         if (!rSet.HasItem(EE_PARA_NUMBULLET) || bMaster)
@@ -363,7 +363,7 @@ void DrawView::SetMasterAttributes( SdrObject* pObject, const SdPage& rPage, Sfx
                     sal_uInt16 nWhich(aWhichIter.FirstWhich());
                     while( nWhich )
                     {
-                        if( SfxItemState::SET == rSet.GetItemState( nWhich ) )
+                        if( SfxItemState::SET == aWhichIter.GetItemState() )
                             aTempSet.ClearItem( nWhich );
                         nWhich = aWhichIter.NextWhich();
                     }
@@ -390,7 +390,7 @@ void DrawView::SetMasterAttributes( SdrObject* pObject, const SdPage& rPage, Sfx
             sal_uInt16 nWhich(aWhichIter.FirstWhich());
             while( nWhich )
             {
-                if( SfxItemState::SET == rSet.GetItemState( nWhich ) )
+                if( SfxItemState::SET == aWhichIter.GetItemState() )
                     pObject->ClearMergedItem( nWhich );
                 nWhich = aWhichIter.NextWhich();
             }
@@ -498,8 +498,6 @@ bool DrawView::SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAtt
 
 void DrawView::CompleteRedraw(OutputDevice* pOutDev, const vcl::Region& rReg, sdr::contact::ViewObjectContactRedirector* pRedirector /*=0*/)
 {
-    bool bStandardPaint = true;
-
     SdDrawDocument* pDoc = mpDocShell->GetDoc();
     if( pDoc && pDoc->GetDocumentType() == DocumentType::Impress)
     {
@@ -511,15 +509,12 @@ void DrawView::CompleteRedraw(OutputDevice* pOutDev, const vcl::Region& rReg, sd
             {
                 if( pShowWindow == pOutDev && mpViewSh )
                     xSlideshow->paint();
-                bStandardPaint = false;
+                return;
             }
         }
     }
 
-    if(bStandardPaint)
-    {
-        ::sd::View::CompleteRedraw(pOutDev, rReg, pRedirector);
-    }
+    ::sd::View::CompleteRedraw(pOutDev, rReg, pRedirector);
 }
 
 /**
@@ -593,7 +588,7 @@ void DrawView::DeleteMarked()
                     default:
                         break;
                     }
-                    SdrTextObj* pTextObj = dynamic_cast< SdrTextObj* >( pObj );
+                    SdrTextObj* pTextObj = DynCastSdrTextObj( pObj );
                     bool bVertical = pTextObj && pTextObj->IsVerticalWriting();
                     ::tools::Rectangle aRect( pObj->GetLogicRect() );
                     SdrObject* pNewObj = pPage->InsertAutoLayoutShape( nullptr, ePresObjKind, bVertical, aRect, true );

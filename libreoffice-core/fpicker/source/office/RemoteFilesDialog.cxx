@@ -12,16 +12,14 @@
 #include "fpsmartcontent.hxx"
 #include "QueryFolderName.hxx"
 #include "RemoteFilesDialog.hxx"
-#include <fpsofficeResMgr.hxx>
+#include <fpicker/fpsofficeResMgr.hxx>
 #include <fpicker/strings.hrc>
 #include <strings.hrc>
 #include <comphelper/docpasswordrequest.hxx>
-#include <comphelper/stillreadwriteinteraction.hxx>
 #include <com/sun/star/task/InteractionHandler.hpp>
 #include <com/sun/star/task/PasswordContainer.hpp>
 #include <svtools/PlaceEditDialog.hxx>
 #include <tools/debug.hxx>
-#include <ucbhelper/commandenvironment.hxx>
 #include <unotools/ucbhelper.hxx>
 #include <vcl/errinf.hxx>
 #include <officecfg/Office/Common.hxx>
@@ -126,7 +124,7 @@ RemoteFilesDialog::~RemoteFilesDialog()
     if( !m_sIniKey.isEmpty() )
     {
         SvtViewOptions aDlgOpt( EViewType::Dialog, m_sIniKey );
-        aDlgOpt.SetWindowState(OStringToOUString(m_xDialog->get_window_state(WindowStateMask::All), RTL_TEXTENCODING_UTF8));
+        aDlgOpt.SetWindowState(OStringToOUString(m_xDialog->get_window_state(vcl::WindowDataMask::All), RTL_TEXTENCODING_UTF8));
 
         Size aSize(m_xDialog->get_size());
 
@@ -135,11 +133,11 @@ RemoteFilesDialog::~RemoteFilesDialog()
 
         OUString sUserData = m_xFileView->GetConfigString();
         aDlgOpt.SetUserItem( "UserData",
-                             makeAny( sSize + sUserData ) );
+                             Any( sSize + sUserData ) );
     }
 
     // save services
-    std::shared_ptr< comphelper::ConfigurationChanges > batch( comphelper::ConfigurationChanges::create( m_xContext ) );
+    std::shared_ptr< comphelper::ConfigurationChanges > batch( comphelper::ConfigurationChanges::create() );
 
     officecfg::Office::Common::Misc::FilePickerLastService::set( m_sLastServiceUrl, batch );
 
@@ -250,7 +248,7 @@ void RemoteFilesDialog::InitSize()
         sal_Int32 nPos2{ sCfgStr.indexOf('|', nPos1+1 ) };
         if (nPos2<0)
             return;
-        m_xFileView->SetConfigString( sCfgStr.copy(nPos2+1) );
+        m_xFileView->SetConfigString( sCfgStr.subView(nPos2+1) );
     }
 }
 
@@ -260,13 +258,13 @@ void RemoteFilesDialog::FillServicesListbox()
     m_aServices.clear();
 
     // Load from user settings
-    Sequence< OUString > placesUrlsList( officecfg::Office::Common::Misc::FilePickerPlacesUrls::get( m_xContext ) );
-    Sequence< OUString > placesNamesList( officecfg::Office::Common::Misc::FilePickerPlacesNames::get( m_xContext ) );
+    Sequence< OUString > placesUrlsList( officecfg::Office::Common::Misc::FilePickerPlacesUrls::get() );
+    Sequence< OUString > placesNamesList( officecfg::Office::Common::Misc::FilePickerPlacesNames::get() );
 
     unsigned int nPos = 0;
     unsigned int i = 0;
 
-    m_sLastServiceUrl = officecfg::Office::Common::Misc::FilePickerLastService::get( m_xContext );
+    m_sLastServiceUrl = officecfg::Office::Common::Misc::FilePickerLastService::get();
 
     for( sal_Int32 nPlace = 0; nPlace < placesUrlsList.getLength() && nPlace < placesNamesList.getLength(); ++nPlace )
     {

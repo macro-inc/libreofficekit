@@ -18,7 +18,7 @@
  */
 
 
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <animatedsprite.hxx>
 
@@ -30,16 +30,17 @@
 #include <basegfx/point/b2dpoint.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/numeric/ftools.hxx>
+#include <utility>
 
 
 using namespace ::com::sun::star;
 
 namespace slideshow::internal
 {
-        AnimatedSprite::AnimatedSprite( const ViewLayerSharedPtr&   rViewLayer,
+        AnimatedSprite::AnimatedSprite( ViewLayerSharedPtr          xViewLayer,
                                         const ::basegfx::B2DSize&   rSpriteSizePixel,
                                         double                      nSpritePrio ) :
-            mpViewLayer( rViewLayer ),
+            mpViewLayer(std::move( xViewLayer )),
             mpSprite(),
             maEffectiveSpriteSizePixel( rSpriteSizePixel ),
             maContentPixelOffset(),
@@ -78,8 +79,8 @@ namespace slideshow::internal
             // aLinearTransform.translate(), since, as said above, the
             // last column of aLinearTransform is assumed [0 0 1]
             ::basegfx::B2DHomMatrix aLinearTransform( mpViewLayer->getTransformation() );
-            aLinearTransform.set( 0, 2, maContentPixelOffset.getX() );
-            aLinearTransform.set( 1, 2, maContentPixelOffset.getY() );
+            aLinearTransform.set( 0, 2, maContentPixelOffset.getWidth() );
+            aLinearTransform.set( 1, 2, maContentPixelOffset.getHeight() );
 
             // apply linear part of canvas view transformation to sprite canvas
             pContentCanvas->setTransformation( aLinearTransform );
@@ -101,19 +102,19 @@ namespace slideshow::internal
             ::basegfx::B2DSize  aNewSize( maEffectiveSpriteSizePixel );
             bool                bNeedResize( false );
 
-            if( rSpriteSizePixel.getX() > maEffectiveSpriteSizePixel.getX() ||
-                rSpriteSizePixel.getX() < 0.5*maEffectiveSpriteSizePixel.getX() )
+            if( rSpriteSizePixel.getWidth() > maEffectiveSpriteSizePixel.getWidth() ||
+                rSpriteSizePixel.getWidth() < 0.5 * maEffectiveSpriteSizePixel.getWidth() )
             {
                 // enlarge or shrink width
-                aNewSize.setX( ::canvas::tools::nextPow2( ::basegfx::fround(rSpriteSizePixel.getX()) ) );
+                aNewSize.setWidth( ::canvas::tools::nextPow2( ::basegfx::fround(rSpriteSizePixel.getWidth()) ) );
                 bNeedResize = true;
             }
 
-            if( rSpriteSizePixel.getY() > maEffectiveSpriteSizePixel.getY() ||
-                rSpriteSizePixel.getY() < 0.5*maEffectiveSpriteSizePixel.getY() )
+            if( rSpriteSizePixel.getHeight() > maEffectiveSpriteSizePixel.getHeight() ||
+                rSpriteSizePixel.getHeight() < 0.5*maEffectiveSpriteSizePixel.getHeight() )
             {
                 // enlarge or shrink height, by doubling it
-                aNewSize.setY( ::canvas::tools::nextPow2( ::basegfx::fround(rSpriteSizePixel.getY()) ) );
+                aNewSize.setHeight( ::canvas::tools::nextPow2( ::basegfx::fround(rSpriteSizePixel.getHeight()) ) );
                 bNeedResize = true;
             }
 

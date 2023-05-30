@@ -28,7 +28,7 @@
 #include <unotools/pathoptions.hxx>
 #include <tools/urlobj.hxx>
 #include <tools/debug.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <ucbhelper/content.hxx>
@@ -78,6 +78,7 @@ using namespace ::ucbhelper;
 #include <svtools/templatefoldercache.hxx>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 
@@ -144,7 +145,7 @@ private:
 
 public:
                         RegionData_Impl( const SfxDocTemplate_Impl* pParent,
-                                         const OUString& rTitle );
+                                         OUString aTitle );
 
     void                SetHierarchyURL( const OUString& rURL) { maOwnURL = rURL; }
 
@@ -461,40 +462,41 @@ OUString SfxDocumentTemplates::GetTemplateTargetURLFromComponent( std::u16string
 */
 OUString SfxDocumentTemplates::ConvertResourceString(const OUString& rString)
 {
-    static const std::u16string_view aTemplateNames[] =
+    static constexpr rtl::OUStringConstExpr aTemplateNames[] =
     {
-        u"" STR_TEMPLATE_NAME1_DEF,
-        u"" STR_TEMPLATE_NAME2_DEF,
-        u"" STR_TEMPLATE_NAME3_DEF,
-        u"" STR_TEMPLATE_NAME4_DEF,
-        u"" STR_TEMPLATE_NAME5_DEF,
-        u"" STR_TEMPLATE_NAME6_DEF,
-        u"" STR_TEMPLATE_NAME7_DEF,
-        u"" STR_TEMPLATE_NAME8_DEF,
-        u"" STR_TEMPLATE_NAME9_DEF,
-        u"" STR_TEMPLATE_NAME10_DEF,
-        u"" STR_TEMPLATE_NAME11_DEF,
-        u"" STR_TEMPLATE_NAME12_DEF,
-        u"" STR_TEMPLATE_NAME13_DEF,
-        u"" STR_TEMPLATE_NAME14_DEF,
-        u"" STR_TEMPLATE_NAME15_DEF,
-        u"" STR_TEMPLATE_NAME16_DEF,
-        u"" STR_TEMPLATE_NAME17_DEF,
-        u"" STR_TEMPLATE_NAME18_DEF,
-        u"" STR_TEMPLATE_NAME19_DEF,
-        u"" STR_TEMPLATE_NAME20_DEF,
-        u"" STR_TEMPLATE_NAME21_DEF,
-        u"" STR_TEMPLATE_NAME22_DEF,
-        u"" STR_TEMPLATE_NAME23_DEF,
-        u"" STR_TEMPLATE_NAME24_DEF,
-        u"" STR_TEMPLATE_NAME25_DEF,
-        u"" STR_TEMPLATE_NAME26_DEF,
-        u"" STR_TEMPLATE_NAME27_DEF,
-        u"" STR_TEMPLATE_NAME28_DEF,
-        u"" STR_TEMPLATE_NAME29_DEF,
-        u"" STR_TEMPLATE_NAME30_DEF,
-        u"" STR_TEMPLATE_NAME31_DEF,
-        u"" STR_TEMPLATE_NAME32_DEF,
+        STR_TEMPLATE_NAME1_DEF,
+        STR_TEMPLATE_NAME2_DEF,
+        STR_TEMPLATE_NAME3_DEF,
+        STR_TEMPLATE_NAME4_DEF,
+        STR_TEMPLATE_NAME5_DEF,
+        STR_TEMPLATE_NAME6_DEF,
+        STR_TEMPLATE_NAME7_DEF,
+        STR_TEMPLATE_NAME8_DEF,
+        STR_TEMPLATE_NAME9_DEF,
+        STR_TEMPLATE_NAME10_DEF,
+        STR_TEMPLATE_NAME11_DEF,
+        STR_TEMPLATE_NAME12_DEF,
+        STR_TEMPLATE_NAME13_DEF,
+        STR_TEMPLATE_NAME14_DEF,
+        STR_TEMPLATE_NAME15_DEF,
+        STR_TEMPLATE_NAME16_DEF,
+        STR_TEMPLATE_NAME17_DEF,
+        STR_TEMPLATE_NAME18_DEF,
+        STR_TEMPLATE_NAME19_DEF,
+        STR_TEMPLATE_NAME20_DEF,
+        STR_TEMPLATE_NAME21_DEF,
+        STR_TEMPLATE_NAME22_DEF,
+        STR_TEMPLATE_NAME23_DEF,
+        STR_TEMPLATE_NAME24_DEF,
+        STR_TEMPLATE_NAME25_DEF,
+        STR_TEMPLATE_NAME26_DEF,
+        STR_TEMPLATE_NAME27_DEF,
+        STR_TEMPLATE_NAME28_DEF,
+        STR_TEMPLATE_NAME29_DEF,
+        STR_TEMPLATE_NAME30_DEF,
+        STR_TEMPLATE_NAME31_DEF,
+        STR_TEMPLATE_NAME32_DEF,
+        STR_TEMPLATE_NAME33_DEF
     };
 
     TranslateId STR_TEMPLATE_NAME[] =
@@ -531,6 +533,7 @@ OUString SfxDocumentTemplates::ConvertResourceString(const OUString& rString)
         STR_TEMPLATE_NAME30,
         STR_TEMPLATE_NAME31,
         STR_TEMPLATE_NAME32,
+        STR_TEMPLATE_NAME33
     };
 
     static_assert(SAL_N_ELEMENTS(aTemplateNames) == SAL_N_ELEMENTS(STR_TEMPLATE_NAME));
@@ -712,7 +715,7 @@ bool SfxDocumentTemplates::CopyTo
 (
     sal_uInt16          nRegion,    //  Region of the template to be exported
     sal_uInt16          nIdx,       //  Index of the template to be exported
-    const OUString&     rName       /*  File name under which the template is to
+    std::u16string_view rName       /*  File name under which the template is to
                                     be created */
 )   const
 
@@ -765,7 +768,7 @@ bool SfxDocumentTemplates::CopyTo
         aTransferInfo.NewTitle = aTitle;
         aTransferInfo.NameClash = NameClash::RENAME;
 
-        Any aArg = makeAny( aTransferInfo );
+        Any aArg( aTransferInfo );
         aTarget.executeCommand( COMMAND_TRANSFER, aArg );
     }
     catch ( ContentCreationException& )
@@ -1147,7 +1150,7 @@ bool SfxDocumentTemplates::GetFull
 
 bool SfxDocumentTemplates::GetLogicNames
 (
-    const OUString &rPath,            // Full Path to the template
+    std::u16string_view rPath,        // Full Path to the template
     OUString &rRegion,                // Out: Region name
     OUString &rName                   // Out: Template name
 ) const
@@ -1298,8 +1301,8 @@ const OUString& DocTempl_EntryData_Impl::GetTargetURL()
 
 
 RegionData_Impl::RegionData_Impl( const SfxDocTemplate_Impl* pParent,
-                                  const OUString& rTitle )
-                                  : mpParent(pParent), maTitle(rTitle)
+                                  OUString aTitle )
+                                  : mpParent(pParent), maTitle(std::move(aTitle))
 {
 }
 
@@ -1521,10 +1524,16 @@ void SfxDocTemplate_Impl::CreateFromHierarchy( Content &rTemplRoot )
 
     try
     {
-        Sequence< NumberedSortingInfo >     aSortingInfo(1);
-        aSortingInfo.getArray()->ColumnIndex = 1;
-        aSortingInfo.getArray()->Ascending = true;
-        xResultSet = rTemplRoot.createSortedCursor( aProps, aSortingInfo, m_rCompareFactory, INCLUDE_FOLDERS_ONLY );
+        xResultSet = rTemplRoot.createSortedCursor(
+                         aProps,
+                         { // Sequence
+                              { // NumberedSortingInfo
+                                  /* ColumnIndex */ 1, /* Ascending */ true
+                              }
+                         },
+                         m_rCompareFactory,
+                         INCLUDE_FOLDERS_ONLY
+                     );
     }
     catch ( Exception& ) {}
 

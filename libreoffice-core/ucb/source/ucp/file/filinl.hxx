@@ -18,6 +18,10 @@
  */
 #pragma once
 
+#include "filtask.hxx"
+
+using namespace fileaccess;
+
 inline const bool& TaskManager::MyProperty::IsNative() const
 {
     return isNative;
@@ -42,9 +46,9 @@ inline const sal_Int16& TaskManager::MyProperty::getAttributes() const
 {
     return Attributes;
 }
-inline void TaskManager::MyProperty::setValue( const css::uno::Any& theValue ) const
+inline void TaskManager::MyProperty::setValue( css::uno::Any theValue ) const
 {
-    const_cast<MyProperty*>(this)->Value = theValue;
+    const_cast<MyProperty*>(this)->Value = std::move(theValue);
 }
 inline void TaskManager::MyProperty::setState( const css::beans::PropertyState& theState ) const
 {

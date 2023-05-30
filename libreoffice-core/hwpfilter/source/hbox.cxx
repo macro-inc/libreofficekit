@@ -29,7 +29,10 @@
 #include "hcode.h"
 #include "datecode.h"
 
+#include <o3tl/sprintf.hxx>
 #include <rtl/character.hxx>
+#include <rtl/strbuf.hxx>
+#include <rtl/string.hxx>
 
 int HBox::boxCount = 0;
 
@@ -148,7 +151,7 @@ hchar_string DateCode::GetString()
     format[DATE_SIZE - 1] = 0;
     fmt = format[0] ? format : defaultform;
 
-    for (; *fmt && (static_cast<int>(ret.size()) < DATE_SIZE); fmt++)
+    for (; *fmt && (ret.size() < DATE_SIZE); fmt++)
     {
         form = add_zero ? "%02d" : "%d";
 
@@ -285,7 +288,7 @@ hchar_string DateCode::GetString()
             ret.push_back(*fmt);
         }
         if (num != -1)
-            sprintf(cbuf, form, num);
+            o3tl::sprintf(cbuf, form, num);
         for (i = 0; 0 != cbuf[i]; i++)
         {
             ret.push_back(*(cbuf + i));
@@ -464,7 +467,7 @@ static hchar olHanglJaso(int num, int type)
 
 static const hchar *GetOutlineStyleChars(int style)
 {
-    static const hchar out_bul_style_entry[5][8] =      // extern
+    static const hchar out_bul_style_entry[5][MAX_OUTLINE_LEVEL+1] = // extern
     {
         {                                         // 0 OLSTY_BULLET1
             0x2f18, 0x2f12, 0x2f08, 0x2f02, 0x2f06, 0x2f00, 0x2043, 0x0000
@@ -479,7 +482,7 @@ static const hchar *GetOutlineStyleChars(int style)
             0x2f18, 0x2f16, 0x2f12, 0x2f10, 0x2f06, 0x2f00, 0x2043, 0x0000
         },
         {
-            0xAC61, 0xB677, 0xB861, 0xB8F7, 0xB781, 0x0000
+            0xAC61, 0xB677, 0xB861, 0xB8F7, 0xB781, 0x0000, 0x0000, 0x0000
         },
     };
     if (style >= OLSTY_BULLET1 && style <= OLSTY_BULLET5)
@@ -519,9 +522,9 @@ static void getOutlineNumStr(int style, int level, int num, hchar * hstr)
         *hstr++ = '(';
     if (fmt & NUM)
     {
-        sprintf(buf, "%d", num);
-        str2hstr(buf, hstr);
-        hstr += strlen(buf);
+        auto const numbuf = OString::number(num);
+        str2hstr(numbuf.getStr(), hstr);
+        hstr += numbuf.length;
     }
     else if (fmt & (U_ROM | L_ROM))
     {
@@ -561,7 +564,7 @@ enum
    number has the value. ex) '1.2.1' has '1,2,1'
    style has the value which starts from 1 according to the definition in hbox.h
  */
-hchar_string Outline::GetUnicode() const
+OUString Outline::GetUnicode() const
 {
     const hchar *p;
     hchar buffer[255];
@@ -575,130 +578,131 @@ hchar_string Outline::GetUnicode() const
             case OLSTY_NUMS1:
             case OLSTY_NUMS2:
             {
-                char cur_num_str[10], buf[80];
-                int i;
-
-                buf[0] = 0;
-                for (i = 0; i <= level; i++)
+                OStringBuffer buf;
+                for (unsigned int i = 0; i <= level; ++i)
                 {
+                    if (i >= std::size(number))
+                        break;
+
                     levelnum = ((number[i] < 1) ? 1 : number[i]);
-                    if (shape == OLSTY_NUMS2 && i && i == level)
-                        sprintf(cur_num_str, "%d%c", levelnum, 0);
-                    else
-                        sprintf(cur_num_str, "%d%c", levelnum, '.');
-                    strcat(buf, cur_num_str);
+                    buf.append(OString::number(levelnum));
+                    if (!(shape == OLSTY_NUMS2 && i && i == level))
+                        buf.append('.');
                 }
-                str2hstr(buf, buffer);
-                return hstr2ucsstr(buffer);
+                str2hstr(buf.getStr(), buffer);
+                return hstr2OUString(buffer);
             }
             case OLSTY_NUMSIG1:
             case OLSTY_NUMSIG2:
             case OLSTY_NUMSIG3:
-                {
-                getOutlineNumStr(shape, level, number[level], buffer);
-                return hstr2ucsstr(buffer);
-                }
+            {
+                if (level < std::size(number))
+                    getOutlineNumStr(shape, level, number[level], buffer);
+                return hstr2OUString(buffer);
+            }
             case OLSTY_BULLET1:
             case OLSTY_BULLET2:
             case OLSTY_BULLET3:
             case OLSTY_BULLET4:
             case OLSTY_BULLET5:
+            {
+                if (level < MAX_OUTLINE_LEVEL)
                 {
-                p = GetOutlineStyleChars(shape);
-                buffer[0] = p[level];
-                buffer[1] = 0;
-                return hstr2ucsstr(buffer);
+                    p = GetOutlineStyleChars(shape);
+                    buffer[0] = p[level];
+                    buffer[1] = 0;
                 }
+                return hstr2OUString(buffer);
+            }
             case OLSTY_USER:
             case OLSTY_BULUSER:
                 {
                     char dest[80];
                     int l = 0;
-                    int i = level;
-                    if( deco[i][0] ){
+                    unsigned i = level;
+                    if (i < std::size(deco) && deco[i][0]) {
                         buffer[l++] = deco[i][0];
                     }
-/* level starts from zero. ex) '1.1.1.' is the level 2.
-   number has the value. ex) '1.2.1' has '1,2,1'
-   style has the value which starts from 1 according to the definition in hbox.h
- */
-                    switch( user_shape[i] )
+                    if (i < std::size(user_shape))
                     {
-                        case 0:
-                            buffer[l++] = '1' + number[i] - 1;
-                            break;
-                        case 1: /* Uppercase Roman */
-                        case 2: /* Lowercase Roman */
-                            num2roman(number[i], dest);
-                            if( user_shape[i] == 1 ){
-                                char *ptr = dest;
-                                while( *ptr )
-                                {
-                                    *ptr = sal::static_int_cast<char>(rtl::toAsciiUpperCase(static_cast<unsigned char>(*ptr)));
-                                    ptr++;
-                                }
-                            }
-                            str2hstr(dest, buffer + l);
-                            l += strlen(dest);
-                            break;
-                        case 3:
-                            buffer[l++] = 'A' + number[i] -1;
-                            break;
-                        case 4:
-                            buffer[l++] = 'a' + number[i] -1;
-                            break;
-                        case 5:
-                            buffer[l++] = olHanglJaso(number[i] -1, OL_HANGL_KANATA);
-                            break;
-                        case 6:
-                            buffer[l++] = olHanglJaso(number[i] -1, OL_HANGL_JASO);
-                            break;
-                        case 7: /* Chinese numbers: the number represented by the general */
-                            buffer[l++] = '1' + number[i] -1;
-                            break;
-                        case 8: /* Circled numbers */
-                            buffer[l++] = 0x2e00 + number[i];
-                            break;
-                        case 9: /* Circled lowercase alphabet */
-                            buffer[l++] = 0x2c20 + number[i];
-                            break;
-                        case 10: /* Circled Korean Alphabet */
-                            buffer[l++] = 0x2c50 + number[i] -1;
-                            break;
-                        case 11: /* Circled Korean Characters */
-                            buffer[l++] = 0x2c40 + number[i] -1;
-                            break;
-                        case 12: /* Sequenced numbers. */
+                        /* level starts from zero. ex) '1.1.1.' is the level 2.
+                           number has the value. ex) '1.2.1' has '1,2,1'
+                           style has the value which starts from 1 according to the definition in hbox.h */
+                        switch( user_shape[i] )
                         {
-                             char cur_num_str[10],buf[80];
-                             int j;
-                             buf[0] = 0;
-                             for (j = 0; j <= level; j++)
-                             {
-                                  levelnum = ((number[j] < 1) ? 1 : number[j]);
-                                  if ((j && j == level) || (j == level && deco[i][1]))
-                                        sprintf(cur_num_str, "%d%c", levelnum, 0);
-                                  else
-                                        sprintf(cur_num_str, "%d%c", levelnum, '.');
-                                  strcat(buf, cur_num_str);
-                             }
-                             str2hstr(buf, buffer + l);
-                             l += strlen(buf);
-                             break;
+                            case 0:
+                                buffer[l++] = '1' + number[i] - 1;
+                                break;
+                            case 1: /* Uppercase Roman */
+                            case 2: /* Lowercase Roman */
+                                num2roman(number[i], dest);
+                                if( user_shape[i] == 1 ){
+                                    char *ptr = dest;
+                                    while( *ptr )
+                                    {
+                                        *ptr = sal::static_int_cast<char>(rtl::toAsciiUpperCase(static_cast<unsigned char>(*ptr)));
+                                        ptr++;
+                                    }
+                                }
+                                str2hstr(dest, buffer + l);
+                                l += strlen(dest);
+                                break;
+                            case 3:
+                                buffer[l++] = 'A' + number[i] -1;
+                                break;
+                            case 4:
+                                buffer[l++] = 'a' + number[i] -1;
+                                break;
+                            case 5:
+                                buffer[l++] = olHanglJaso(number[i] -1, OL_HANGL_KANATA);
+                                break;
+                            case 6:
+                                buffer[l++] = olHanglJaso(number[i] -1, OL_HANGL_JASO);
+                                break;
+                            case 7: /* Chinese numbers: the number represented by the general */
+                                buffer[l++] = '1' + number[i] -1;
+                                break;
+                            case 8: /* Circled numbers */
+                                buffer[l++] = 0x2e00 + number[i];
+                                break;
+                            case 9: /* Circled lowercase alphabet */
+                                buffer[l++] = 0x2c20 + number[i];
+                                break;
+                            case 10: /* Circled Korean Alphabet */
+                                buffer[l++] = 0x2c50 + number[i] -1;
+                                break;
+                            case 11: /* Circled Korean Characters */
+                                buffer[l++] = 0x2c40 + number[i] -1;
+                                break;
+                            case 12: /* Sequenced numbers. */
+                            {
+                                 OStringBuffer buf;
+                                 int j;
+                                 for (j = 0; j <= level; j++)
+                                 {
+                                      levelnum = ((number[j] < 1) ? 1 : number[j]);
+                                      buf.append(OString::number(levelnum));
+                                      if (!((j && j == level) || (j == level && deco[i][1])))
+                                            buf.append('.');
+                                 }
+                                 str2hstr(buf.getStr(), buffer + l);
+                                 l += buf.getLength();
+                                 break;
+                            }
+                            default:
+                                buffer[l++] = user_shape[i];
+                                break;
                         }
-                        default:
-                            buffer[l++] = user_shape[i];
-                            break;
                     }
-                    if( deco[i][1] ){
+                    if (i < std::size(deco) && deco[i][1]) {
                         buffer[l++] = deco[i][1];
                     }
                     buffer[l] = 0;
-                    return hstr2ucsstr(buffer);
+                    return hstr2OUString(buffer);
                 }
         }
     }
-    return hstr2ucsstr(buffer);
+    return hstr2OUString(buffer);
 }
 
 

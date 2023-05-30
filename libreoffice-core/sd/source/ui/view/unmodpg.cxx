@@ -34,6 +34,7 @@
 #include <sdresid.hxx>
 #include <unokywds.hxx>
 #include <drawdoc.hxx>
+#include <utility>
 
 
 ModifyPageUndoAction::ModifyPageUndoAction(
@@ -117,8 +118,12 @@ void ModifyPageUndoAction::Undo()
     }
 
     // Redisplay
-    SfxViewFrame::Current()->GetDispatcher()->Execute(
-        SID_SWITCHPAGE, SfxCallMode::ASYNCHRON | SfxCallMode::RECORD );
+    SfxViewFrame* pCurrent = SfxViewFrame::Current();
+    if( pCurrent )
+    {
+        pCurrent->GetDispatcher()->Execute(
+            SID_SWITCHPAGE, SfxCallMode::ASYNCHRON | SfxCallMode::RECORD );
+    }
 }
 
 void ModifyPageUndoAction::Redo()
@@ -160,8 +165,12 @@ void ModifyPageUndoAction::Redo()
     }
 
     // Redisplay
-    SfxViewFrame::Current()->GetDispatcher()->Execute(
-        SID_SWITCHPAGE, SfxCallMode::ASYNCHRON | SfxCallMode::RECORD );
+    SfxViewFrame* pCurrent = SfxViewFrame::Current();
+    if( pCurrent )
+    {
+        pCurrent->GetDispatcher()->Execute(
+            SID_SWITCHPAGE, SfxCallMode::ASYNCHRON | SfxCallMode::RECORD );
+    }
 }
 
 ModifyPageUndoAction::~ModifyPageUndoAction()
@@ -170,11 +179,11 @@ ModifyPageUndoAction::~ModifyPageUndoAction()
 
 RenameLayoutTemplateUndoAction::RenameLayoutTemplateUndoAction(
     SdDrawDocument* pDocument,
-    const OUString& rOldLayoutName,
-    const OUString& rNewLayoutName)
+    OUString aOldLayoutName,
+    OUString aNewLayoutName)
     : SdUndoAction(pDocument)
-    , maOldName(rOldLayoutName)
-    , maNewName(rNewLayoutName)
+    , maOldName(std::move(aOldLayoutName))
+    , maNewName(std::move(aNewLayoutName))
     , maComment(SdResId(STR_TITLE_RENAMESLIDE))
 {
     sal_Int32 nPos = maOldName.indexOf(SD_LT_SEPARATOR);
@@ -184,13 +193,13 @@ RenameLayoutTemplateUndoAction::RenameLayoutTemplateUndoAction(
 
 void RenameLayoutTemplateUndoAction::Undo()
 {
-    OUString aLayoutName(maNewName + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE);
+    OUString aLayoutName(maNewName + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE);
     mpDoc->RenameLayoutTemplate( aLayoutName, maOldName );
 }
 
 void RenameLayoutTemplateUndoAction::Redo()
 {
-    OUString aLayoutName(maOldName + SD_LT_SEPARATOR STR_LAYOUT_OUTLINE);
+    OUString aLayoutName(maOldName + SD_LT_SEPARATOR + STR_LAYOUT_OUTLINE);
     mpDoc->RenameLayoutTemplate( aLayoutName, maNewName );
 }
 

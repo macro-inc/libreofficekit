@@ -17,16 +17,18 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include "ChartType.hxx"
+#include <ChartType.hxx>
 #include <CartesianCoordinateSystem.hxx>
+#include <Axis.hxx>
 #include <AxisHelper.hxx>
 #include <CloneHelper.hxx>
 #include <AxisIndexDefines.hxx>
 #include <ModifyListenerHelper.hxx>
+#include <DataSeries.hxx>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/chart2/AxisType.hpp>
 #include <com/sun/star/container/NoSuchElementException.hpp>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 
@@ -38,20 +40,19 @@ namespace chart
 {
 
 ChartType::ChartType() :
-        ::property::OPropertySet( m_aMutex ),
-        m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        m_xModifyEventForwarder( new ModifyEventForwarder() ),
         m_bNotifyChanges( true )
 {}
 
 ChartType::ChartType( const ChartType & rOther ) :
         impl::ChartType_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder()),
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() ),
     m_bNotifyChanges( true )
 {
     {
         SolarMutexGuard g; // access to rOther.m_aDataSeries
-        CloneHelper::CloneRefVector<css::chart2::XDataSeries>(
+        CloneHelper::CloneRefVector(
                 rOther.m_aDataSeries, m_aDataSeries);
     }
     ModifyListenerHelper::addListenerToAllElements( m_aDataSeries, m_xModifyEventForwarder );
@@ -67,12 +68,18 @@ ChartType::~ChartType()
 Reference< chart2::XCoordinateSystem > SAL_CALL
     ChartType::createCoordinateSystem( ::sal_Int32 DimensionCount )
 {
-    Reference< chart2::XCoordinateSystem > xResult(
-        new CartesianCoordinateSystem( DimensionCount ));
+    return createCoordinateSystem2(DimensionCount);
+}
+
+rtl::Reference< BaseCoordinateSystem >
+    ChartType::createCoordinateSystem2( ::sal_Int32 DimensionCount )
+{
+    rtl::Reference< CartesianCoordinateSystem > xResult =
+        new CartesianCoordinateSystem( DimensionCount );
 
     for( sal_Int32 i=0; i<DimensionCount; ++i )
     {
-        Reference< chart2::XAxis > xAxis( xResult->getAxisByDimension( i, MAIN_AXIS_INDEX ) );
+        rtl::Reference< Axis > xAxis = xResult->getAxisByDimension2( i, MAIN_AXIS_INDEX );
         if( !xAxis.is() )
         {
             OSL_FAIL("a created coordinate system should have an axis for each dimension");
@@ -117,7 +124,7 @@ OUString SAL_CALL ChartType::getRoleOfSequenceForSeriesLabel()
 }
 
 void ChartType::impl_addDataSeriesWithoutNotification(
-        const Reference< chart2::XDataSeries >& xDataSeries )
+        const rtl::Reference< DataSeries >& xDataSeries )
 {
     if( std::find( m_aDataSeries.begin(), m_aDataSeries.end(), xDataSeries )
         != m_aDataSeries.end())
@@ -130,6 +137,13 @@ void ChartType::impl_addDataSeriesWithoutNotification(
 // ____ XDataSeriesContainer ____
 void SAL_CALL ChartType::addDataSeries( const Reference< chart2::XDataSeries >& xDataSeries )
 {
+    rtl::Reference<DataSeries> xTmp = dynamic_cast<DataSeries*>(xDataSeries.get());
+    assert(xTmp);
+    addDataSeries(xTmp);
+}
+
+void ChartType::addDataSeries( const rtl::Reference< DataSeries >& xDataSeries )
+{
     SolarMutexGuard g;
 
     impl_addDataSeriesWithoutNotification( xDataSeries );
@@ -138,13 +152,19 @@ void SAL_CALL ChartType::addDataSeries( const Reference< chart2::XDataSeries >& 
 
 void SAL_CALL ChartType::removeDataSeries( const Reference< chart2::XDataSeries >& xDataSeries )
 {
+    rtl::Reference<DataSeries> xTmp = dynamic_cast<DataSeries*>(xDataSeries.get());
+    assert(xTmp);
+    removeDataSeries(xTmp);
+}
+
+void ChartType::removeDataSeries( const rtl::Reference< DataSeries >& xDataSeries )
+{
     if( !xDataSeries.is())
         throw container::NoSuchElementException();
 
     SolarMutexGuard g;
 
-    tDataSeriesContainerType::iterator aIt(
-            std::find( m_aDataSeries.begin(), m_aDataSeries.end(), xDataSeries ) );
+    auto aIt = std::find( m_aDataSeries.begin(), m_aDataSeries.end(), xDataSeries );
 
     if( aIt == m_aDataSeries.end())
         throw container::NoSuchElementException(
@@ -160,18 +180,29 @@ Sequence< Reference< chart2::XDataSeries > > SAL_CALL ChartType::getDataSeries()
 {
     SolarMutexGuard g;
 
-    return comphelper::containerToSequence( m_aDataSeries );
+    return comphelper::containerToSequence< Reference< chart2::XDataSeries > >( m_aDataSeries );
 }
 
 void SAL_CALL ChartType::setDataSeries( const Sequence< Reference< chart2::XDataSeries > >& aDataSeries )
+{
+    std::vector< rtl::Reference<DataSeries> > aTmp;
+    for (auto const & i : aDataSeries)
+    {
+        auto p = dynamic_cast<DataSeries*>(i.get());
+        assert(p);
+        aTmp.push_back(p);
+    }
+    setDataSeries(aTmp);
+}
+
+void ChartType::setDataSeries( const std::vector< rtl::Reference< DataSeries > >& aDataSeries )
 {
     SolarMutexGuard g;
 
     m_bNotifyChanges = false;
     try
     {
-        const Sequence< Reference< chart2::XDataSeries > > aOldSeries( getDataSeries() );
-        for( auto const & i : aOldSeries )
+        for( auto const & i : m_aDataSeries )
             ModifyListenerHelper::removeListener( i, m_xModifyEventForwarder );
         m_aDataSeries.clear();
 
@@ -188,9 +219,9 @@ void SAL_CALL ChartType::setDataSeries( const Sequence< Reference< chart2::XData
 }
 
 // ____ OPropertySet ____
-uno::Any ChartType::GetDefaultValue( sal_Int32 /* nHandle */ ) const
+void ChartType::GetDefaultValue( sal_Int32 /* nHandle */, uno::Any& rAny ) const
 {
-    return uno::Any();
+    rAny.clear();
 }
 
 namespace
@@ -242,8 +273,7 @@ void SAL_CALL ChartType::addModifyListener( const uno::Reference< util::XModifyL
 {
     try
     {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
+        m_xModifyEventForwarder->addModifyListener( aListener );
     }
     catch( const uno::Exception & )
     {
@@ -255,8 +285,7 @@ void SAL_CALL ChartType::removeModifyListener( const uno::Reference< util::XModi
 {
     try
     {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
+        m_xModifyEventForwarder->removeModifyListener( aListener );
     }
     catch( const uno::Exception & )
     {

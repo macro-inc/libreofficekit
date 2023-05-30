@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <config_vclplug.h>
+
 #include <QtCore/QPoint>
 #include <QtCore/QRect>
 #include <QtCore/QSize>
@@ -178,5 +180,11 @@ inline std::basic_ostream<charT, traits>& operator<<(std::basic_ostream<charT, t
 {
     return stream << toPoint(rPoint);
 }
+
+#define CHECK_QT5_USING_X11 (QT_VERSION < QT_VERSION_CHECK(6, 0, 0) && QT5_USING_X11)
+
+#define CHECK_QT6_USING_X11 (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0) && QT6_USING_X11)
+
+#define CHECK_ANY_QT_USING_X11 CHECK_QT5_USING_X11 || CHECK_QT6_USING_X11
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -24,7 +24,7 @@
 #include <svx/IAccessibleParent.hxx>
 #include <svx/AccessibleShapeTreeInfo.hxx>
 #include <editeng/AccessibleContextBase.hxx>
-#include <cppuhelper/compbase.hxx>
+#include <comphelper/compbase.hxx>
 #include <tools/gen.hxx>
 #include <vector>
 #include <com/sun/star/drawing/XShape.hpp>
@@ -72,8 +72,7 @@ typedef ::std::vector<ChildDescriptor> ChildDescriptorListType;
     @see ChildrenManager
 */
 class ChildrenManagerImpl final
-    :   public cppu::BaseMutex,
-        public cppu::WeakComponentImplHelper<
+    :   public comphelper::WeakComponentImplHelper<
             css::document::XEventListener,
             css::view::XSelectionChangeListener>,
         public IAccessibleViewForwarderListener,
@@ -97,8 +96,8 @@ public:
             for new and deleted children, i.e. that holds a list of
             listeners to be informed.
     */
-    ChildrenManagerImpl (const css::uno::Reference<css::accessibility::XAccessible>& rxParent,
-        const css::uno::Reference<css::drawing::XShapes>& rxShapeList,
+    ChildrenManagerImpl (css::uno::Reference<css::accessibility::XAccessible> xParent,
+        css::uno::Reference<css::drawing::XShapes> xShapeList,
         const AccessibleShapeTreeInfo& rShapeTreeInfo,
         AccessibleContextBase& rContext);
 
@@ -116,11 +115,11 @@ public:
         @return
             If there are no children a 0 is returned.
     */
-    tools::Long GetChildCount() const noexcept;
+    sal_Int64 GetChildCount() const noexcept;
 
     /// @throws css::uno::RuntimeException
     /// @throws css::lang::IndexOutOfBoundsException
-    css::uno::Reference<css::drawing::XShape> GetChildShape(tools::Long nIndex);
+    const css::uno::Reference<css::drawing::XShape>& GetChildShape(sal_Int64 nIndex);
     /** Return the requested accessible child or throw and
         IndexOutOfBoundsException if the given index is invalid.
         @param nIndex
@@ -135,7 +134,7 @@ public:
             Throws an IndexOutOfBoundsException if the index is not valid.
     */
     css::uno::Reference<css::accessibility::XAccessible>
-        GetChild (tools::Long nIndex);
+        GetChild (sal_Int64 nIndex);
 
     /** Return the requested accessible child.
         @param aChildDescriptor
@@ -183,7 +182,7 @@ public:
             The new shape that is added to the list of accessible shapes; must
             be non-null.
     */
-    void AddAccessibleShape (css::uno::Reference<css::accessibility::XAccessible> const & shape);
+    void AddAccessibleShape (rtl::Reference<AccessibleShape> const & shape);
 
     /** Clear the lists of accessible shapes and that of visible accessible
         shapes.  The list of UNO shapes is not modified.
@@ -290,7 +289,7 @@ private:
     /** This list of additional accessible shapes that can or shall not be
         created by the shape factory.
     */
-    typedef std::vector< css::uno::Reference< css::accessibility::XAccessible> > AccessibleShapeList;
+    typedef std::vector< rtl::Reference< AccessibleShape> > AccessibleShapeList;
     AccessibleShapeList maAccessibleShapes;
 
     /** Rectangle that describes the visible area in which a shape has to lie
@@ -316,7 +315,7 @@ private:
     /** This method is called from the component helper base class while
         disposing.
     */
-    virtual void SAL_CALL disposing() override;
+    virtual void disposing(std::unique_lock<std::mutex>&) override;
 
     void impl_dispose();
 
@@ -350,16 +349,19 @@ private:
             is compared.
     */
     void RemoveNonVisibleChildren (
-        const ChildDescriptorListType& raNewChildList,
-        ChildDescriptorListType& raOldChildList);
+        const std::vector<ChildDescriptor*>& rNonVisibleChildren);
 
     /** Merge the information that is already known about the visible shapes
-        from the current list into the new list.
+        from the old list into the current list, and return a list of
+        children that are in the old list, but not the current one.
         @param raChildList
-            Information is merged from the current list of visible children
-            to this list.
+            Information is merged to the current list of visible children
+            from this list. The old list can get reordered.
+        @return
+            Vector of children that are in the old list, but not the current
+            one.
     */
-    void MergeAccessibilityInformation (ChildDescriptorListType& raChildList);
+    std::vector<ChildDescriptor*> MergeAccessibilityInformation (ChildDescriptorListType& raChildList);
 
     /** If the visible area has changed then send events that signal a
         change of their bounding boxes for all shapes that are members of
@@ -427,7 +429,7 @@ public:
         empty and only replaced by a reference to a new object when that is
         requested from the outside.
     */
-    css::uno::Reference<css::accessibility::XAccessible> mxAccessibleShape;
+    rtl::Reference<AccessibleShape> mxAccessibleShape;
 
     /** Return a pointer to the implementation object of the accessible
         shape of this descriptor.
@@ -436,7 +438,7 @@ public:
             shape is empty or it can not be transformed into a pointer to
             the desired class.
     */
-    AccessibleShape* GetAccessibleShape() const;
+    AccessibleShape* GetAccessibleShape() const { return mxAccessibleShape.get(); }
 
     /** set the index _nIndex at the accessible shape
         @param  _nIndex
@@ -460,7 +462,7 @@ public:
     /** Create a new descriptor for the specified shape with empty reference
         to the original shape.
     */
-    explicit ChildDescriptor (const css::uno::Reference<css::accessibility::XAccessible>& rxAccessibleShape);
+    explicit ChildDescriptor (const rtl::Reference<AccessibleShape>& rxAccessibleShape);
 
     /** Dispose the accessible object of this descriptor.  If that object
         does not exist then do nothing.

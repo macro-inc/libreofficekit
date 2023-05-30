@@ -38,7 +38,7 @@ class ScDocShell;
 
 #define SC_LINKTARGETTYPE_COUNT     3
 
-#define SCLINKTARGET_SERVICE        "com.sun.star.document.LinkTarget"
+inline constexpr OUStringLiteral SCLINKTARGET_SERVICE = u"com.sun.star.document.LinkTarget";
 
 //! Graphic / OleObject (need separate collections!)
 
@@ -122,7 +122,7 @@ private:
     css::uno::Reference< css::container::XNameAccess >            xCollection;
 
 public:
-                            ScLinkTargetsObj( const css::uno::Reference< css::container::XNameAccess > & rColl );
+                            ScLinkTargetsObj( css::uno::Reference< css::container::XNameAccess > xColl );
     virtual                 ~ScLinkTargetsObj() override;
 
                             // css::container::XNameAccess

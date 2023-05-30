@@ -19,7 +19,6 @@
 #include <comphelper/propertysequence.hxx>
 #include <svl/srchitem.hxx>
 #include <vcl/scheduler.hxx>
-#include <comphelper/propertyvalue.hxx>
 
 #include <docsh.hxx>
 #include <unotxdoc.hxx>
@@ -27,16 +26,19 @@
 #include <ndtxt.hxx>
 #include <formatcontentcontrol.hxx>
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sw/qa/core/crsr/data/";
-
 /// Covers sw/source/core/crsr/ fixes.
 class SwCoreCrsrTest : public SwModelTestBase
 {
+public:
+    SwCoreCrsrTest()
+        : SwModelTestBase("/sw/qa/core/crsr/data/")
+    {
+    }
 };
 
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testFindReplace)
 {
-    loadURL("private:factory/swriter", nullptr);
+    createSwDoc();
 
     // Given: a document with two "foo" in it, the second followed by a formatted soft hyphen.
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
@@ -55,14 +57,14 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testFindReplace)
     xViewCursor->goLeft(/*nCount=*/6, /*bExpand=*/false);
     xViewCursor->goLeft(/*nCount=*/1, /*bExpand=*/true);
     uno::Reference<beans::XPropertySet> xViewCursorProps(xViewCursor, uno::UNO_QUERY);
-    xViewCursorProps->setPropertyValue("CharWeight", uno::makeAny(awt::FontWeight::BOLD));
+    xViewCursorProps->setPropertyValue("CharWeight", uno::Any(awt::FontWeight::BOLD));
     xViewCursor->gotoStart(/*bExpand=*/false);
 
     // When: doing search & replace 3 times.
     uno::Sequence<beans::PropertyValue> aArgs(comphelper::InitPropertySequence({
-        { "SearchItem.SearchString", uno::makeAny(OUString("foo")) },
-        { "SearchItem.ReplaceString", uno::makeAny(OUString("bar")) },
-        { "SearchItem.Command", uno::makeAny(static_cast<sal_Int16>(SvxSearchCmd::REPLACE)) },
+        { "SearchItem.SearchString", uno::Any(OUString("foo")) },
+        { "SearchItem.ReplaceString", uno::Any(OUString("bar")) },
+        { "SearchItem.Command", uno::Any(static_cast<sal_Int16>(SvxSearchCmd::REPLACE)) },
     }));
     // Find the first foo.
     dispatchCommand(mxComponent, ".uno:ExecuteSearch", aArgs);
@@ -87,7 +89,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testFindReplace)
 
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testSelAllStartsWithTable)
 {
-    load(DATA_DIRECTORY, "sel-all-starts-with-table.odt");
+    createSwDoc("sel-all-starts-with-table.odt");
     SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
     SwDocShell* pDocShell = pTextDoc->GetDocShell();
     SwDoc* pDoc = pDocShell->GetDoc();
@@ -110,7 +112,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testSelAllStartsWithTable)
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlLineBreak)
 {
     // Given a document with a (rich text) content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -126,11 +129,11 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlLineBreak)
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->SttEndDoc(/*bStt=*/true);
     // Go after "t".
-    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 2, /*bBasicCall=*/false);
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 2, /*bBasicCall=*/false);
     dispatchCommand(mxComponent, ".uno:InsertPara", {});
 
     // Then make sure that we only insert a line break, not a new paragraph:
-    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetMark()->nNode.GetNode().GetTextNode();
+    SwTextNode* pTextNode = pWrtShell->GetCursor()->GetMark()->GetNode().GetTextNode();
     // Without the accompanying fix in place, this test would have failed with:
     // - Expected: t\nest
     // - Actual  : est
@@ -141,7 +144,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlLineBreak)
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlReadOnly)
 {
     // Given a document with a checkbox content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     uno::Reference<lang::XMultiServiceFactory> xMSF(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XTextDocument> xTextDocument(mxComponent, uno::UNO_QUERY);
     uno::Reference<text::XText> xText = xTextDocument->getText();
@@ -158,7 +162,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlReadOnly)
     // When entering the content control:
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->SttEndDoc(/*bStt=*/true);
-    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
 
     // Then make sure that the cursor is read-only:
     // Without the accompanying fix in place, this test would have failed, it was possible to type
@@ -166,16 +170,37 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlReadOnly)
     CPPUNIT_ASSERT(pWrtShell->HasReadonlySel());
 }
 
+CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testTdf135451)
+{
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+
+    // Insert narrow no-break space and move the cursor right before it
+    pWrtShell->Insert(u"a" + OUStringChar(CHAR_NNBSP) + "b");
+    pWrtShell->EndPara(/*bSelect=*/false);
+    pWrtShell->Left(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->GoPrevWord();
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/true, 1, /*bBasicCall=*/false);
+
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: a
+    // - Actual  : CHAR_NNBSP
+    // i.e., the cursor did not move over the narrow no-break space (CHAR_NNBSP)
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pWrtShell->GetSelText());
+}
+
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testDropdownContentControl)
 {
     // Given a document with a dropdown content control:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DROP_DOWN_LIST);
 
     // When entering the content control:
     pWrtShell->SttEndDoc(/*bStt=*/true);
-    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
 
     // Then make sure that the cursor is read-only:
     // Without the accompanying fix in place, this test would have failed, it was possible to type
@@ -186,7 +211,8 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testDropdownContentControl)
 CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlProtectedSection)
 {
     // Given a document with a date content control in a protected section:
-    SwDoc* pDoc = createSwDoc();
+    createSwDoc();
+    SwDoc* pDoc = getSwDoc();
     SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
     pWrtShell->InsertContentControl(SwContentControlType::DATE);
     pWrtShell->SelAll();
@@ -197,7 +223,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreCrsrTest, testContentControlProtectedSection)
 
     // When entering the content control:
     pWrtShell->SttEndDoc(/*bStt=*/true);
-    pWrtShell->Right(CRSR_SKIP_CHARS, /*bSelect=*/false, 1, /*bBasicCall=*/false);
+    pWrtShell->Right(SwCursorSkipMode::Chars, /*bSelect=*/false, 1, /*bBasicCall=*/false);
 
     // Then make sure that the cursor is read-only:
     // Without the accompanying fix in place, this test would have failed, it was not possible to

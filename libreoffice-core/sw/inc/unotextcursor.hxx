@@ -76,6 +76,7 @@ private:
     const CursorType            m_eType;
     const css::uno::Reference< css::text::XText > m_xParentText;
     sw::UnoCursorPointer m_pUnoCursor;
+    SetAttrMode m_nAttrMode = SetAttrMode::DEFAULT;
 
     SwUnoCursor& GetCursorOrThrow() {
         if(!m_pUnoCursor)
@@ -89,12 +90,12 @@ public:
 
     SwXTextCursor(
             SwDoc & rDoc,
-            css::uno::Reference< css::text::XText > const& xParent,
+            css::uno::Reference< css::text::XText > xParent,
             const CursorType eType,
             SwPosition const& rPos,
             SwPosition const*const pMark = nullptr);
     SwXTextCursor(
-            css::uno::Reference< css::text::XText > const& xParent,
+            css::uno::Reference< css::text::XText > xParent,
             SwPaM const& rSourceCursor,
             const CursorType eType = CursorType::All);
 
@@ -102,9 +103,7 @@ public:
     bool IsAtEndOfMeta() const;
     bool IsAtEndOfContentControl() const;
 
-    void DeleteAndInsert(OUString const& rText,
-                const bool bForceExpandHints);
-
+    void DeleteAndInsert(std::u16string_view aText, ::sw::DeleteAndInsertMode eMode);
     // OTextCursorHelper
     virtual const SwPaM*        GetPaM() const override;
     virtual SwPaM*              GetPaM() override;

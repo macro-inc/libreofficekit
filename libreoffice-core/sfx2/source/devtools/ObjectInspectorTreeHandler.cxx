@@ -12,17 +12,16 @@
 
 #include <sfx2/devtools/ObjectInspectorTreeHandler.hxx>
 #include <sfx2/sfxresid.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include "DevToolsStrings.hrc"
 
 #include <com/sun/star/beans/theIntrospection.hpp>
 #include <com/sun/star/beans/XIntrospection.hpp>
 #include <com/sun/star/beans/XIntrospectionAccess.hpp>
-#include <com/sun/star/beans/Property.hpp>
 #include <com/sun/star/beans/PropertyConcept.hpp>
 #include <com/sun/star/beans/PropertyAttribute.hpp>
 #include <com/sun/star/beans/MethodConcept.hpp>
-#include <com/sun/star/beans/XPropertySet.hpp>
 
 #include <com/sun/star/reflection/theCoreReflection.hpp>
 #include <com/sun/star/reflection/XIdlReflection.hpp>
@@ -45,6 +44,9 @@
 
 #include <comphelper/processfactory.hxx>
 #include <comphelper/extract.hxx>
+
+#include <vcl/settings.hxx>
+#include <i18nlangtag/languagetag.hxx>
 
 using namespace css;
 
@@ -351,7 +353,7 @@ OUString lclAppendNode(const std::unique_ptr<weld::TreeView>& pTree,
                        ObjectInspectorNodeInterface* pEntry)
 {
     OUString sName = pEntry->getObjectName();
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+    OUString sId(weld::toId(pEntry));
     std::unique_ptr<weld::TreeIter> pCurrent = pTree->make_iterator();
     pTree->insert(nullptr, -1, &sName, &sId, nullptr, nullptr, pEntry->shouldShowExpander(),
                   pCurrent.get());
@@ -370,7 +372,7 @@ OUString lclAppendNodeToParent(const std::unique_ptr<weld::TreeView>& pTree,
                                const weld::TreeIter* pParent, ObjectInspectorNodeInterface* pEntry)
 {
     OUString sName = pEntry->getObjectName();
-    OUString sId(OUString::number(reinterpret_cast<sal_Int64>(pEntry)));
+    OUString sId(weld::toId(pEntry));
     std::unique_ptr<weld::TreeIter> pCurrent = pTree->make_iterator();
     pTree->insert(pParent, -1, &sName, &sId, nullptr, nullptr, pEntry->shouldShowExpander(),
                   pCurrent.get());
@@ -391,8 +393,8 @@ protected:
     OUString msName;
 
 public:
-    SimpleStringNode(OUString const& rName)
-        : msName(rName)
+    SimpleStringNode(OUString sName)
+        : msName(std::move(sName))
     {
     }
 
@@ -411,8 +413,8 @@ private:
     uno::Reference<reflection::XIdlMethod> mxMethod;
 
 public:
-    MethodNode(uno::Reference<reflection::XIdlMethod> const& xMethod)
-        : mxMethod(xMethod)
+    MethodNode(uno::Reference<reflection::XIdlMethod> xMethod)
+        : mxMethod(std::move(xMethod))
     {
     }
 
@@ -502,8 +504,8 @@ private:
     }
 
 public:
-    ClassNode(uno::Reference<reflection::XIdlClass> const& xClass)
-        : mxClass(xClass)
+    ClassNode(uno::Reference<reflection::XIdlClass> xClass)
+        : mxClass(std::move(xClass))
     {
     }
 
@@ -541,12 +543,12 @@ protected:
     createNodeObjectForAny(OUString const& rName, const uno::Any& rAny, OUString const& mrInfo);
 
 public:
-    BasicValueNode(OUString const& rName, uno::Any const& rAny, OUString const& rInfo,
-                   uno::Reference<uno::XComponentContext> const& xContext)
+    BasicValueNode(OUString const& rName, uno::Any aAny, OUString aInfo,
+                   uno::Reference<uno::XComponentContext> xContext)
         : SimpleStringNode(rName)
-        , maAny(rAny)
-        , mrInfo(rInfo)
-        , mxContext(xContext)
+        , maAny(std::move(aAny))
+        , mrInfo(std::move(aInfo))
+        , mxContext(std::move(xContext))
     {
     }
 
@@ -640,7 +642,6 @@ public:
         for (int i = 0; i < nLength; i++)
         {
             uno::Any aArrayValue = mxIdlArray->get(maAny, i);
-            uno::Reference<uno::XInterface> xCurrent;
 
             auto* pObjectInspectorNode
                 = createNodeObjectForAny(OUString::number(i), aArrayValue, "");
@@ -903,7 +904,7 @@ ObjectInspectorNodeInterface* getSelectedNode(weld::TreeView const& rTreeView)
     if (sID.isEmpty())
         return nullptr;
 
-    if (auto* pNode = reinterpret_cast<ObjectInspectorNodeInterface*>(sID.toInt64()))
+    if (auto* pNode = weld::fromId<ObjectInspectorNodeInterface*>(sID))
         return pNode;
 
     return nullptr;
@@ -931,6 +932,7 @@ ObjectInspectorTreeHandler::ObjectInspectorTreeHandler(
     std::unique_ptr<ObjectInspectorWidgets>& pObjectInspectorWidgets)
     : mpObjectInspectorWidgets(pObjectInspectorWidgets)
     , mxContext(comphelper::getProcessComponentContext())
+    , mxSorter(mxContext, Application::GetSettings().GetLanguageTag().getLocale())
 {
     mpObjectInspectorWidgets->mpInterfacesTreeView->connect_expanding(
         LINK(this, ObjectInspectorTreeHandler, ExpandingHandlerInterfaces));
@@ -957,6 +959,11 @@ ObjectInspectorTreeHandler::ObjectInspectorTreeHandler(
     mpObjectInspectorWidgets->mpServicesTreeView->make_sorted();
     mpObjectInspectorWidgets->mpPropertiesTreeView->make_sorted();
     mpObjectInspectorWidgets->mpMethodsTreeView->make_sorted();
+
+    setSortFunction(mpObjectInspectorWidgets->mpInterfacesTreeView);
+    setSortFunction(mpObjectInspectorWidgets->mpServicesTreeView);
+    setSortFunction(mpObjectInspectorWidgets->mpPropertiesTreeView);
+    setSortFunction(mpObjectInspectorWidgets->mpMethodsTreeView);
 
     mpObjectInspectorWidgets->mpInterfacesTreeView->connect_column_clicked(
         LINK(this, ObjectInspectorTreeHandler, HeaderBarClick));
@@ -990,7 +997,27 @@ ObjectInspectorTreeHandler::ObjectInspectorTreeHandler(
                                      static_cast<int>(nMethodsDigitWidth * 50) };
     mpObjectInspectorWidgets->mpMethodsTreeView->set_column_fixed_widths(aMethodsWidths);
 
-    pObjectInspectorWidgets->mpPaned->set_position(160);
+    mpObjectInspectorWidgets->mpPaned->set_position(160);
+}
+
+void ObjectInspectorTreeHandler::setSortFunction(std::unique_ptr<weld::TreeView>& pTreeView)
+{
+    pTreeView->set_sort_func(
+        [this, &pTreeView](const weld::TreeIter& rLeft, const weld::TreeIter& rRight) {
+            return compare(pTreeView, rLeft, rRight);
+        });
+}
+
+sal_Int32 ObjectInspectorTreeHandler::compare(std::unique_ptr<weld::TreeView>& pTreeView,
+                                              const weld::TreeIter& rLeft,
+                                              const weld::TreeIter& rRight)
+{
+    int nSortColumn = pTreeView->get_sort_column();
+
+    OUString sLeft = pTreeView->get_text(rLeft, nSortColumn);
+    OUString sRight = pTreeView->get_text(rRight, nSortColumn);
+    sal_Int32 nCompare = mxSorter.compare(sLeft, sRight);
+    return nCompare;
 }
 
 void ObjectInspectorTreeHandler::handleExpanding(std::unique_ptr<weld::TreeView>& pTreeView,
@@ -1001,7 +1028,7 @@ void ObjectInspectorTreeHandler::handleExpanding(std::unique_ptr<weld::TreeView>
         return;
 
     clearObjectInspectorChildren(pTreeView, rParent);
-    auto* pNode = reinterpret_cast<ObjectInspectorNodeInterface*>(sID.toInt64());
+    auto* pNode = weld::fromId<ObjectInspectorNodeInterface*>(sID);
     pNode->fillChildren(pTreeView, &rParent);
 }
 
@@ -1207,7 +1234,7 @@ void ObjectInspectorTreeHandler::clearObjectInspectorChildren(
             {
                 clearObjectInspectorChildren(pTreeView, *pChild);
                 OUString sID = pTreeView->get_id(*pChild);
-                auto* pEntry = reinterpret_cast<ObjectInspectorNodeInterface*>(sID.toInt64());
+                auto* pEntry = weld::fromId<ObjectInspectorNodeInterface*>(sID);
                 delete pEntry;
                 pTreeView->remove(*pChild);
             }
@@ -1221,7 +1248,7 @@ void ObjectInspectorTreeHandler::clearAll(std::unique_ptr<weld::TreeView>& pTree
     // destroy all ObjectInspectorNodes from the tree
     pTreeView->all_foreach([&pTreeView](weld::TreeIter& rEntry) {
         OUString sID = pTreeView->get_id(rEntry);
-        auto* pEntry = reinterpret_cast<ObjectInspectorNodeInterface*>(sID.toInt64());
+        auto* pEntry = weld::fromId<ObjectInspectorNodeInterface*>(sID);
         delete pEntry;
         return false;
     });

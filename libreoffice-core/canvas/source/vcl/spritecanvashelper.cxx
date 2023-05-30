@@ -24,7 +24,7 @@
 
 #include <basegfx/range/b2drectangle.hxx>
 #include <rtl/math.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <vcl/canvastools.hxx>
 #include <vcl/outdev.hxx>
 #include <vcl/window.hxx>
@@ -60,7 +60,7 @@ namespace vclcanvas
 
         double calcNumPixel( const ::canvas::Sprite::Reference& rSprite )
         {
-            const ::basegfx::B2DSize& rSize(
+            const ::basegfx::B2DVector& rSize(
                 ::boost::polymorphic_downcast< Sprite* >(rSprite.get())->getSizePixel() );
 
             return rSize.getX() * rSize.getY();

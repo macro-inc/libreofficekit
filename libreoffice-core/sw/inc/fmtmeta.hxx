@@ -22,7 +22,7 @@
 
 #include "calbck.hxx"
 
-#include <cppuhelper/weakref.hxx>
+#include <unotools/weakref.hxx>
 
 #include <svl/poolitem.hxx>
 #include <sfx2/Metadatable.hxx>
@@ -108,7 +108,7 @@ private:
 
 public:
     /// takes ownership
-    explicit SwFormatMeta( std::shared_ptr< ::sw::Meta > const & i_pMeta,
+    explicit SwFormatMeta( std::shared_ptr< ::sw::Meta > i_pMeta,
                         const sal_uInt16 i_nWhich );
     virtual ~SwFormatMeta() override;
 
@@ -131,8 +131,7 @@ class Meta
     friend class ::SwFormatMeta; ///< SetFormatMeta, NotifyChangeTextNode
     friend class ::SwXMeta;   ///< GetTextNode, GetTextAttr, Get/SetXMeta
 
-    css::uno::WeakReference<
-        css::rdf::XMetadatable> m_wXMeta;
+    unotools::WeakReference<SwXMeta> m_wXMeta;
 
     SwFormatMeta * m_pFormat;
     SwTextNode * m_pTextNode;
@@ -147,10 +146,9 @@ protected:
 
     void NotifyChangeTextNode(SwTextNode *const pTextNode);
 
-    css::uno::WeakReference<css::rdf::XMetadatable> const& GetXMeta() const
+    unotools::WeakReference<SwXMeta> const& GetXMeta() const
             { return m_wXMeta; }
-    void SetXMeta(css::uno::Reference<css::rdf::XMetadatable> const& xMeta)
-            { m_wXMeta = xMeta; }
+    void SetXMeta(rtl::Reference<SwXMeta> const& xMeta);
 
     virtual void SwClientNotify(const SwModify&, const SfxHint&) override;
 
@@ -177,7 +175,7 @@ private:
     sal_uInt32 m_nNumberFormat;
     bool       m_bIsFixedLanguage;
 
-    sal_uInt32 GetNumberFormat(OUString const & rContent) const;
+    sal_uInt32 GetNumberFormat(std::u16string_view aContent) const;
     void SetNumberFormat(sal_uInt32 nNumberFormat);
     bool IsFixedLanguage() const    { return m_bIsFixedLanguage; }
     void SetIsFixedLanguage(bool b) { m_bIsFixedLanguage = b; }

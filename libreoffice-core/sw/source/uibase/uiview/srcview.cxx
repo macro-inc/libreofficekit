@@ -29,7 +29,6 @@
 #include <vcl/svapp.hxx>
 #include <svl/intitem.hxx>
 #include <svl/stritem.hxx>
-#include <unotools/pathoptions.hxx>
 #include <svl/undo.hxx>
 #include <svl/eitem.hxx>
 #include <svl/whiter.hxx>
@@ -46,6 +45,7 @@
 #include <sfx2/request.hxx>
 #include <sfx2/docfile.hxx>
 #include <svx/srchdlg.hxx>
+#include <svx/statusitem.hxx>
 #include <svl/srchitem.hxx>
 #include <sfx2/sfxhtml.hxx>
 #include <swtypes.hxx>
@@ -159,9 +159,7 @@ static rtl_TextEncoding lcl_GetStreamCharSet(rtl_TextEncoding eLoadEncoding)
     rtl_TextEncoding eRet = eLoadEncoding;
     if(RTL_TEXTENCODING_DONTKNOW == eRet)
     {
-        const char *pCharSet =
-            rtl_getBestMimeCharsetFromTextEncoding( SvxHtmlOptions::GetTextEncoding() );
-        eRet = rtl_getTextEncodingFromMimeCharset( pCharSet );
+        eRet = RTL_TEXTENCODING_UTF8;
     }
     return eRet;
 }
@@ -429,7 +427,7 @@ void SwSrcView::GetState(SfxItemSet& rSet)
                 aPos += " : " +
                     SwResId(STR_SRCVIEW_COL);
                 aPos += OUString::number( aSel.GetEnd().GetIndex()+1 );
-                SfxStringItem aItem( nWhich, aPos );
+                SvxStatusItem aItem( SID_TABLE_CELL, aPos, StatusCategory::RowColumn );
                 rSet.Put( aItem );
             }
             break;
@@ -751,9 +749,7 @@ void SwSrcView::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
 
 void SwSrcView::Load(SwDocShell* pDocShell)
 {
-    const char *pCharSet =
-        rtl_getBestMimeCharsetFromTextEncoding( SvxHtmlOptions::GetTextEncoding() );
-    rtl_TextEncoding eDestEnc = rtl_getTextEncodingFromMimeCharset( pCharSet );
+    rtl_TextEncoding eDestEnc = RTL_TEXTENCODING_UTF8;
 
     m_aEditWin->SetReadonly(pDocShell->IsReadOnly());
     m_aEditWin->SetTextEncoding(eDestEnc);
@@ -799,7 +795,7 @@ void SwSrcView::Load(SwDocShell* pDocShell)
     }
     else
     {
-        utl::TempFile aTempFile;
+        utl::TempFileNamed aTempFile;
         aTempFile.EnableKillingFile();
         const OUString sFileURL( aTempFile.GetURL() );
 
@@ -807,7 +803,7 @@ void SwSrcView::Load(SwDocShell* pDocShell)
             SfxMedium aMedium( sFileURL,StreamMode::READWRITE );
             SwWriter aWriter( aMedium, *pDocShell->GetDoc() );
             WriterRef xWriter;
-            ::GetHTMLWriter(OUString(), aMedium.GetBaseURL( true ), xWriter);
+            ::GetHTMLWriter(std::u16string_view(), aMedium.GetBaseURL( true ), xWriter);
             const OUString sWriteName = pDocShell->HasName()
                 ? pMedium->GetName()
                 : sFileURL;

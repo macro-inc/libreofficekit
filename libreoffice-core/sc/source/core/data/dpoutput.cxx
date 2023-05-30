@@ -59,10 +59,14 @@
 #include <com/sun/star/sheet/XLevelsSupplier.hpp>
 #include <com/sun/star/sheet/XMembersAccess.hpp>
 #include <com/sun/star/sheet/XMembersSupplier.hpp>
+#include <com/sun/star/sheet/DataPilotFieldLayoutInfo.hpp>
+#include <com/sun/star/sheet/DataPilotFieldLayoutMode.hpp>
 
 #include <limits>
 #include <string_view>
+#include <utility>
 #include <vector>
+#include <iostream>
 
 using namespace com::sun::star;
 using ::std::vector;
@@ -93,9 +97,9 @@ struct ScDPOutLevelData
     bool                                mbPageDim:1;
 
     ScDPOutLevelData(tools::Long nDim, tools::Long nHier, tools::Long nLevel, tools::Long nDimPos, sal_uInt32 nSrcNumFmt, const uno::Sequence<sheet::MemberResult>  &aResult,
-                       const OUString &aName, const OUString &aCaption, bool bHasHiddenMember, bool bDataLayout, bool bPageDim) :
+                       OUString aName, OUString aCaption, bool bHasHiddenMember, bool bDataLayout, bool bPageDim) :
         mnDim(nDim), mnHier(nHier), mnLevel(nLevel), mnDimPos(nDimPos), mnSrcNumFmt(nSrcNumFmt), maResult(aResult),
-        maName(aName), maCaption(aCaption), mbHasHiddenMember(bHasHiddenMember), mbDataLayout(bDataLayout),
+        maName(std::move(aName)), maCaption(std::move(aCaption)), mbHasHiddenMember(bHasHiddenMember), mbDataLayout(bDataLayout),
         mbPageDim(bPageDim)
     {
     }
@@ -493,7 +497,7 @@ uno::Sequence<sheet::MemberResult> getVisiblePageMembersAsResults( const uno::Re
         }
     }
 
-    if (aNames.getLength() == static_cast<sal_Int32>(aRes.size()))
+    if (o3tl::make_unsigned(aNames.getLength()) == aRes.size())
         // All members are visible.  Return empty result.
         return uno::Sequence<sheet::MemberResult>();
 
@@ -502,14 +506,15 @@ uno::Sequence<sheet::MemberResult> getVisiblePageMembersAsResults( const uno::Re
 
 }
 
-ScDPOutput::ScDPOutput( ScDocument* pD, const uno::Reference<sheet::XDimensionsSupplier>& xSrc,
-                        const ScAddress& rPos, bool bFilter ) :
+ScDPOutput::ScDPOutput( ScDocument* pD, uno::Reference<sheet::XDimensionsSupplier> xSrc,
+                        const ScAddress& rPos, bool bFilter, bool bExpandCollapse ) :
     pDoc( pD ),
-    xSource( xSrc ),
+    xSource(std::move( xSrc )),
     aStartPos( rPos ),
     nColFmtCount( 0 ),
     nRowFmtCount( 0 ),
     nSingleNumFmt( 0 ),
+    nRowDims( 0 ),
     nColCount(0),
     nRowCount(0),
     nHeaderSize(0),
@@ -517,7 +522,9 @@ ScDPOutput::ScDPOutput( ScDocument* pD, const uno::Reference<sheet::XDimensionsS
     bResultsError(false),
     bSizesValid(false),
     bSizeOverflow(false),
-    mbHeaderLayout(false)
+    mbHeaderLayout(false),
+    mbHasCompactRowField(false),
+    mbExpandCollapse(bExpandCollapse)
 {
     nTabStartCol = nMemberStartCol = nDataStartCol = nTabEndCol = 0;
     nTabStartRow = nMemberStartRow = nDataStartRow = nTabEndRow = 0;
@@ -600,12 +607,26 @@ ScDPOutput::ScDPOutput( ScDocument* pD, const uno::Reference<sheet::XDimensionsS
                                     case sheet::DataPilotFieldOrientation_ROW:
                                     {
                                         uno::Sequence<sheet::MemberResult> aResult = xLevRes->getResults();
+                                        ++nRowDims;
                                         if (!lcl_MemberEmpty(aResult))
                                         {
+                                            bool bFieldCompact = false;
+                                            try
+                                            {
+                                                sheet::DataPilotFieldLayoutInfo aLayoutInfo;
+                                                xPropSet->getPropertyValue( SC_UNO_DP_LAYOUT ) >>= aLayoutInfo;
+                                                bFieldCompact = (aLayoutInfo.LayoutMode == sheet::DataPilotFieldLayoutMode::COMPACT_LAYOUT);
+                                            }
+                                            catch (uno::Exception&)
+                                            {
+                                            }
                                             ScDPOutLevelData tmp(nDim, nHierarchy, nLev, nDimPos, nNumFmt, aResult, aName,
                                                                    aCaption, bHasHiddenMember, bIsDataLayout, false);
                                             pRowFields.push_back(tmp);
+                                            aRowCompactFlags.push_back(bFieldCompact);
+                                            mbHasCompactRowField |= bFieldCompact;
                                         }
+
                                     }
                                     break;
                                     case sheet::DataPilotFieldOrientation_PAGE:
@@ -791,6 +812,26 @@ void ScDPOutput::HeaderCell( SCCOL nCol, SCROW nRow, SCTAB nTab,
     }
 }
 
+void ScDPOutput::MultiFieldCell(SCCOL nCol, SCROW nRow, SCTAB nTab, bool bRowField)
+{
+    pDoc->SetString(nCol, nRow, nTab, ScResId(bRowField ? STR_PIVOT_ROW_LABELS : STR_PIVOT_COL_LABELS));
+
+    ScMF nMergeFlag = ScMF::Button;
+    for (auto& rData : pRowFields)
+    {
+        if (rData.mbHasHiddenMember)
+        {
+            nMergeFlag |= ScMF::HiddenMember;
+            break;
+        }
+    }
+
+    nMergeFlag |= ScMF::ButtonPopup2;
+
+    pDoc->ApplyFlagsTab(nCol, nRow, nCol, nRow, nTab, nMergeFlag);
+    lcl_SetStyleById( pDoc, nTab, nCol, nRow, nCol, nRow, STR_PIVOT_STYLENAME_FIELDNAME );
+}
+
 void ScDPOutput::FieldCell(
     SCCOL nCol, SCROW nRow, SCTAB nTab, const ScDPOutLevelData& rData, bool bInTable)
 {
@@ -832,6 +873,22 @@ static void lcl_DoFilterButton( ScDocument* pDoc, SCCOL nCol, SCROW nRow, SCTAB 
     pDoc->ApplyFlagsTab(nCol, nRow, nCol, nRow, nTab, ScMF::Button);
 }
 
+SCCOL ScDPOutput::GetColumnsForRowFields() const
+{
+    if (!mbHasCompactRowField)
+        return static_cast<SCCOL>(pRowFields.size());
+
+    SCCOL nNum = 0;
+    for (const auto bCompact: aRowCompactFlags)
+        if (!bCompact)
+            ++nNum;
+
+    if (aRowCompactFlags.back())
+        ++nNum;
+
+    return nNum;
+}
+
 void ScDPOutput::CalcSizes()
 {
     if (bSizesValid)
@@ -869,7 +926,7 @@ void ScDPOutput::CalcSizes()
     nTabStartRow = aStartPos.Row() + static_cast<SCROW>(nPageSize);          // below page fields
     nMemberStartCol = nTabStartCol;
     nMemberStartRow = nTabStartRow + static_cast<SCROW>(nHeaderSize);
-    nDataStartCol = nMemberStartCol + static_cast<SCCOL>(pRowFields.size());
+    nDataStartCol = nMemberStartCol + GetColumnsForRowFields();
     nDataStartRow = nMemberStartRow + static_cast<SCROW>(pColFields.size());
     if ( nColCount > 0 )
         nTabEndCol = nDataStartCol + static_cast<SCCOL>(nColCount) - 1;
@@ -998,10 +1055,14 @@ void ScDPOutput::Output()
     ScDPOutputImpl outputimp( pDoc, nTab,
         nTabStartCol, nTabStartRow,
         nDataStartCol, nDataStartRow, nTabEndCol, nTabEndRow );
-    for (size_t nField=0; nField<pColFields.size(); nField++)
+    size_t nNumColFields = pColFields.size();
+    for (size_t nField=0; nField<nNumColFields; nField++)
     {
         SCCOL nHdrCol = nDataStartCol + static_cast<SCCOL>(nField);              //TODO: check for overflow
-        FieldCell(nHdrCol, nTabStartRow, nTab, pColFields[nField], true);
+        if (!mbHasCompactRowField || nNumColFields == 1)
+            FieldCell(nHdrCol, nTabStartRow, nTab, pColFields[nField], true);
+        else if (!nField)
+            MultiFieldCell(nHdrCol, nTabStartRow, nTab, false /* bRowField */);
 
         SCROW nRowPos = nMemberStartRow + static_cast<SCROW>(nField);                //TODO: check for overflow
         const uno::Sequence<sheet::MemberResult> rSequence = pColFields[nField].maResult;
@@ -1048,23 +1109,32 @@ void ScDPOutput::Output()
     //  output row headers:
     std::vector<bool> vbSetBorder;
     vbSetBorder.resize( nTabEndRow - nDataStartRow + 1, false );
-    for (size_t nField=0; nField<pRowFields.size(); nField++)
+    size_t nFieldColOffset = 0;
+    size_t nFieldIndentLevel = 0; // To calulate indent level for fields packed in a column.
+    size_t nNumRowFields = pRowFields.size();
+    for (size_t nField=0; nField<nNumRowFields; nField++)
     {
+        const bool bCompactField = aRowCompactFlags[nField];
         SCCOL nHdrCol = nTabStartCol + static_cast<SCCOL>(nField);                   //TODO: check for overflow
         SCROW nHdrRow = nDataStartRow - 1;
-        FieldCell(nHdrCol, nHdrRow, nTab, pRowFields[nField], true);
+        if (!mbHasCompactRowField || nNumRowFields == 1)
+            FieldCell(nHdrCol, nHdrRow, nTab, pRowFields[nField], true);
+        else if (!nField)
+            MultiFieldCell(nHdrCol, nHdrRow, nTab, true /* bRowField */);
 
-        SCCOL nColPos = nMemberStartCol + static_cast<SCCOL>(nField);                //TODO: check for overflow
+        SCCOL nColPos = nMemberStartCol + static_cast<SCCOL>(nFieldColOffset);          //TODO: check for overflow
         const uno::Sequence<sheet::MemberResult> rSequence = pRowFields[nField].maResult;
         const sheet::MemberResult* pArray = rSequence.getConstArray();
         sal_Int32 nThisRowCount = rSequence.getLength();
         OSL_ENSURE( nThisRowCount == nRowCount, "count mismatch" );     //TODO: ???
         for (sal_Int32 nRow=0; nRow<nThisRowCount; nRow++)
         {
+            const sheet::MemberResult& rData = pArray[nRow];
+            const bool bHasMember = (rData.Flags & sheet::MemberResultFlags::HASMEMBER);
+            const bool bSubtotal = (rData.Flags & sheet::MemberResultFlags::SUBTOTAL);
             SCROW nRowPos = nDataStartRow + static_cast<SCROW>(nRow);                //TODO: check for overflow
-            HeaderCell( nColPos, nRowPos, nTab, pArray[nRow], false, nField );
-            if ( ( pArray[nRow].Flags & sheet::MemberResultFlags::HASMEMBER ) &&
-                !( pArray[nRow].Flags & sheet::MemberResultFlags::SUBTOTAL ) )
+            HeaderCell( nColPos, nRowPos, nTab, rData, false, nFieldColOffset );
+            if (bHasMember && !bSubtotal)
             {
                 if ( nField+1 < pRowFields.size() )
                 {
@@ -1083,16 +1153,45 @@ void ScDPOutput::Output()
                     if ( nField == pRowFields.size() - 2 )
                         outputimp.OutputBlockFrame( nColPos+1, nRowPos, nColPos+1, nEndRowPos );
 
-                    lcl_SetStyleById( pDoc, nTab, nColPos,nRowPos, nDataStartCol-1,nEndRowPos, STR_PIVOT_STYLENAME_CATEGORY );
+                    lcl_SetStyleById( pDoc, nTab, nColPos, nRowPos, nDataStartCol-1,nEndRowPos, STR_PIVOT_STYLENAME_CATEGORY );
                 }
                 else
-                    lcl_SetStyleById( pDoc, nTab, nColPos,nRowPos, nDataStartCol-1,nRowPos, STR_PIVOT_STYLENAME_CATEGORY );
+                {
+                    lcl_SetStyleById( pDoc, nTab, nColPos, nRowPos, nDataStartCol-1,nRowPos, STR_PIVOT_STYLENAME_CATEGORY );
+                }
+
+                // Set flags for collapse/expand buttons and indent field header text
+                {
+                    bool bLast = nRowDims == (nField + 1);
+                    size_t nMinIndentLevel = mbExpandCollapse ? 1 : 0;
+                    tools::Long nIndent = o3tl::convert(13 * (bLast ? nFieldIndentLevel : nMinIndentLevel + nFieldIndentLevel), o3tl::Length::px, o3tl::Length::twip);
+                    bool bHasContinue = (!bLast && nRow + 1 < nThisRowCount
+                        && (pArray[nRow + 1].Flags & sheet::MemberResultFlags::CONTINUE));
+                    if (nIndent)
+                        pDoc->ApplyAttr(nColPos, nRowPos, nTab, ScIndentItem(nIndent));
+                    if (mbExpandCollapse && !bLast)
+                    {
+                        pDoc->ApplyFlagsTab(nColPos, nRowPos, nColPos, nRowPos, nTab,
+                            bHasContinue ? ScMF::DpCollapse : ScMF::DpExpand);
+                    }
+                }
             }
-            else if (  pArray[nRow].Flags & sheet::MemberResultFlags::SUBTOTAL )
+            else if ( bSubtotal )
                 outputimp.AddRow( nRowPos );
 
             // Apply the same number format as in data source.
             pDoc->ApplyAttr(nColPos, nRowPos, nTab, SfxUInt32Item(ATTR_VALUE_FORMAT, pRowFields[nField].mnSrcNumFmt));
+        }
+
+        if (!bCompactField)
+        {
+            // Next field should be placed in next column only if current field has a non-compact layout.
+            ++nFieldColOffset;
+            nFieldIndentLevel = 0; // Reset indent level.
+        }
+        else
+        {
+            ++nFieldIndentLevel;
         }
     }
 
@@ -1283,6 +1382,83 @@ void lcl_GetTableVars( sal_Int32& rGrandTotalCols, sal_Int32& rGrandTotalRows, s
 
 }
 
+void ScDPOutput::GetRowFieldRange(SCCOL nCol, sal_Int32& nRowFieldStart, sal_Int32& nRowFieldEnd) const
+{
+    if (!mbHasCompactRowField)
+    {
+        nRowFieldStart = nCol;
+        nRowFieldEnd = nCol + 1;
+        return;
+    }
+
+    if (nCol >= static_cast<SCCOL>(aRowCompactFlags.size()))
+    {
+        nRowFieldStart = nRowFieldEnd = 0;
+        return;
+    }
+
+    nRowFieldStart = -1;
+    nRowFieldEnd = -1;
+    SCCOL nCurCol = 0;
+    sal_Int32 nField = 0;
+
+    for (const auto bCompact: aRowCompactFlags)
+    {
+        if (nCurCol == nCol && nRowFieldStart == -1)
+            nRowFieldStart = nField;
+
+        if (!bCompact)
+            ++nCurCol;
+
+        ++nField;
+
+        if (nCurCol == (nCol + 1) && nRowFieldStart != -1 && nRowFieldEnd == -1)
+        {
+            nRowFieldEnd = nField;
+            break;
+        }
+    }
+
+    if (nRowFieldStart != -1 && nRowFieldEnd == -1 && nCurCol == nCol)
+        nRowFieldEnd = static_cast<sal_Int32>(aRowCompactFlags.size());
+
+    if (nRowFieldStart == -1 || nRowFieldEnd == -1)
+    {
+        SAL_WARN("sc.core", "ScDPOutput::GetRowFieldRange : unable to find field range for nCol = " << nCol);
+        nRowFieldStart = nRowFieldEnd = 0;
+    }
+}
+
+sal_Int32 ScDPOutput::GetRowFieldCompact(SCCOL nColQuery, SCROW nRowQuery) const
+{
+    if (!mbHasCompactRowField)
+        return nColQuery - nTabStartCol;
+
+    SCCOL nCol = nColQuery - nTabStartCol;
+    sal_Int32 nStartField = 0;
+    sal_Int32 nEndField = 0;
+    GetRowFieldRange(nCol, nStartField, nEndField);
+
+    for (sal_Int32 nField = nEndField - 1; nField >= nStartField; --nField)
+    {
+        const uno::Sequence<sheet::MemberResult> rSequence = pRowFields[nField].maResult;
+        const sheet::MemberResult* pArray = rSequence.getConstArray();
+        sal_Int32 nThisRowCount = rSequence.getLength();
+        SCROW nRow = nRowQuery - nDataStartRow;
+        if (nRow >= 0 && nRow < nThisRowCount)
+        {
+            const sheet::MemberResult& rData = pArray[nRow];
+            if ((rData.Flags & sheet::MemberResultFlags::HASMEMBER)
+                && !(rData.Flags & sheet::MemberResultFlags::SUBTOTAL))
+            {
+                return nField;
+            }
+        }
+    }
+
+    return -1;
+}
+
 void ScDPOutput::GetPositionData(const ScAddress& rPos, DataPilotTablePositionData& rPosData)
 {
     using namespace ::com::sun::star::sheet;
@@ -1358,7 +1534,7 @@ void ScDPOutput::GetPositionData(const ScAddress& rPos, DataPilotTablePositionDa
         }
         case DataPilotTablePositionType::ROW_HEADER:
         {
-            tools::Long nField = nCol - nTabStartCol;
+            tools::Long nField = GetRowFieldCompact(nCol, nRow);
             if (nField < 0)
                 break;
 

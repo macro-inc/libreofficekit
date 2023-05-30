@@ -49,8 +49,8 @@
           <object class="GtkGrid" id="grid2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">5</property>
-            <property name="margin_right">5</property>
+            <property name="margin_start">5</property>
+            <property name="margin_end">5</property>
             <property name="margin_top">5</property>
             <property name="margin_bottom">5</property>
             <property name="row_spacing">6</property>
@@ -74,7 +74,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
-                <property name="margin_right">5</property>
+                <property name="margin_end">5</property>
                 <property name="label" translatable="yes" context="optdeeplpage|label3">Authentication key:</property>
                 <property name="use_underline">True</property>
                 <property name="mnemonic_widget">authkey</property>

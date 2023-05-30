@@ -32,6 +32,7 @@
 #include <com/sun/star/container/XContainer.hpp>
 
 #include <comphelper/propertysequence.hxx>
+#include <utility>
 
 //  Defines
 
@@ -53,12 +54,12 @@ static OUString getHashKeyFromStrings(
 
 //  XInterface, XTypeProvider
 
-ConfigurationAccess_ControllerFactory::ConfigurationAccess_ControllerFactory( const Reference< XComponentContext >& rxContext, const OUString& _sRoot ) :
+ConfigurationAccess_ControllerFactory::ConfigurationAccess_ControllerFactory( const Reference< XComponentContext >& rxContext, OUString _sRoot ) :
     m_aPropCommand( "Command" ),
     m_aPropModule( "Module" ),
     m_aPropController( "Controller" ),
     m_aPropValue( "Value" ),
-    m_sRoot(_sRoot),
+    m_sRoot(std::move(_sRoot)),
     m_bConfigAccessInitialized( false )
 {
     m_xConfigProvider = configuration::theDefaultProvider::get( rxContext );
@@ -262,23 +263,23 @@ bool ConfigurationAccess_ControllerFactory::impl_getElementProps( const Any& aEl
     Reference< XPropertySet > xPropertySet;
     aElement >>= xPropertySet;
 
-    if ( xPropertySet.is() )
+    if ( !xPropertySet.is() )
+        return true;
+
+    try
     {
-        try
-        {
-            xPropertySet->getPropertyValue( m_aPropCommand ) >>= aCommand;
-            xPropertySet->getPropertyValue( m_aPropModule ) >>= aModule;
-            xPropertySet->getPropertyValue( m_aPropController ) >>= aServiceSpecifier;
-            xPropertySet->getPropertyValue( m_aPropValue ) >>= aValue;
-        }
-        catch ( const css::beans::UnknownPropertyException& )
-        {
-            return false;
-        }
-        catch ( const css::lang::WrappedTargetException& )
-        {
-            return false;
-        }
+        xPropertySet->getPropertyValue( m_aPropCommand ) >>= aCommand;
+        xPropertySet->getPropertyValue( m_aPropModule ) >>= aModule;
+        xPropertySet->getPropertyValue( m_aPropController ) >>= aServiceSpecifier;
+        xPropertySet->getPropertyValue( m_aPropValue ) >>= aValue;
+    }
+    catch ( const css::beans::UnknownPropertyException& )
+    {
+        return false;
+    }
+    catch ( const css::lang::WrappedTargetException& )
+    {
+        return false;
     }
 
     return true;

@@ -19,8 +19,10 @@
 
 #include "EnhancedCustomShapeFontWork.hxx"
 #include <svl/itemset.hxx>
+#include <svx/compatflags.hxx>
 #include <svx/svddef.hxx>
 #include <svx/svdopath.hxx>
+#include <vcl/kernarray.hxx>
 #include <vcl/metric.hxx>
 #include <svx/sdasitm.hxx>
 #include <svx/sdtfsitm.hxx>
@@ -35,13 +37,13 @@
 #include <editeng/charscaleitem.hxx>
 #include <svx/svdoashp.hxx>
 #include <svx/sdshitm.hxx>
+#include <svx/svdmodel.hxx>
 #include <editeng/outlobj.hxx>
 #include <editeng/editobj.hxx>
 #include <o3tl/numeric.hxx>
 #include <vector>
 #include <numeric>
 #include <algorithm>
-#include <memory>
 #include <comphelper/processfactory.hxx>
 #include <com/sun/star/i18n/BreakIterator.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
@@ -49,6 +51,8 @@
 #include <basegfx/polygon/b2dpolygontools.hxx>
 #include <sal/log.hxx>
 #include <rtl/math.hxx>
+#include <unotools/configmgr.hxx>
+#include <comphelper/string.hxx>
 
 using namespace com::sun::star;
 using namespace com::sun::star::uno;
@@ -115,27 +119,59 @@ static bool InitializeFontWorkData(
         if ( pParaObj )
         {
             const EditTextObject& rTextObj = pParaObj->GetTextObject();
-            sal_Int32 nParagraphsLeft = rTextObj.GetParagraphCount();
+            sal_Int32 nParagraphsCount = rTextObj.GetParagraphCount();
 
-            rFWData.nMaxParagraphsPerTextArea = ( ( nParagraphsLeft - 1 ) / nTextAreaCount ) + 1;
-            sal_Int32 j = 0;
-            while( nParagraphsLeft && nTextAreaCount )
+            // Collect all the lines from all paragraphs
+            std::vector<int> aLineParaID;      // which para this line is in
+            std::vector<int> aLineStart;       // where this line start in that para
+            std::vector<int> aLineLength;
+            std::vector<OUString> aParaText;
+            for (sal_Int32 nPara = 0; nPara < nParagraphsCount; ++nPara)
+            {
+                aParaText.push_back(rTextObj.GetText(nPara));
+                sal_Int32 nPos = 0;
+                sal_Int32 nPrevPos = 0;
+                do
+                {
+                    // search line break.
+                    if (!rSdrObjCustomShape.getSdrModelFromSdrObject().GetCompatibilityFlag(
+                            SdrCompatibilityFlag::LegacySingleLineFontwork))
+                        nPos = aParaText[nPara].indexOf(sal_Unicode(u'\1'), nPrevPos);
+                    else
+                        nPos = -1; // tdf#148000: ignore line breaks in legacy fontworks
+
+                    aLineParaID.push_back(nPara);
+                    aLineStart.push_back(nPrevPos);
+                    aLineLength.push_back((nPos >= 0 ? nPos : aParaText[nPara].getLength())
+                                          - nPrevPos);
+                    nPrevPos = nPos + 1;
+                } while (nPos >= 0);
+            }
+
+            sal_Int32 nLinesLeft = aLineParaID.size();
+
+            rFWData.nMaxParagraphsPerTextArea = ((nLinesLeft - 1) / nTextAreaCount) + 1;
+            sal_Int32 nLine = 0;
+            while (nLinesLeft && nTextAreaCount)
             {
                 FWTextArea aTextArea;
-                sal_Int32 i, nParagraphs = ( ( nParagraphsLeft - 1 ) / nTextAreaCount ) + 1;
-                for ( i = 0; i < nParagraphs; ++i, ++j )
+                sal_Int32 nLinesInPara = ((nLinesLeft - 1) / nTextAreaCount) + 1;
+                for (sal_Int32 i = 0; i < nLinesInPara; ++i, ++nLine)
                 {
                     FWParagraphData aParagraphData;
-                    aParagraphData.aString = rTextObj.GetText( j );
+                    aParagraphData.aString = aParaText[aLineParaID[nLine]].subView(
+                        aLineStart[nLine], aLineLength[nLine]);
 
-                    const SfxItemSet& rParaSet = rTextObj.GetParaAttribs( j );  // retrieving some paragraph attributes
-                    aParagraphData.nFrameDirection = rParaSet.Get( EE_PARA_WRITINGDIR ).GetValue();
-                    aTextArea.vParagraphs.push_back( aParagraphData );
+                    // retrieving some paragraph attributes
+                    const SfxItemSet& rParaSet = rTextObj.GetParaAttribs(aLineParaID[nLine]);
+                    aParagraphData.nFrameDirection = rParaSet.Get(EE_PARA_WRITINGDIR).GetValue();
+                    aTextArea.vParagraphs.push_back(aParagraphData);
                 }
-                rFWData.vTextAreas.push_back( aTextArea );
-                nParagraphsLeft -= nParagraphs;
+                rFWData.vTextAreas.push_back(aTextArea);
+                nLinesLeft -= nLinesInPara;
                 nTextAreaCount--;
             }
+
             bNoErr = true;
         }
     }
@@ -363,7 +399,7 @@ static void GetTextAreaOutline(
             }
             else
             {
-                std::vector<sal_Int32> aDXArry;
+                KernArray aDXArry;
                 if ( ( nCharScaleWidth != 100 ) && nCharScaleWidth )
                 {   // applying character spacing
                     pVirDev->GetTextArray( rText, &aDXArry);
@@ -374,6 +410,46 @@ static void GetTextAreaOutline(
                 FWCharacterData aCharacterData;
                 if ( pVirDev->GetTextOutlines( aCharacterData.vOutlines, rText, 0, 0, -1, nWidth, aDXArry ) )
                 {
+                    rParagraph.vCharacters.push_back( aCharacterData );
+                }
+                else
+                {
+                    // GetTextOutlines failed what usually means that it is
+                    // not implemented. To make FontWork not fail (it is
+                    // dependent of graphic content to get a Range) create
+                    // a rectangle substitution for now
+                    pVirDev->GetTextArray( rText, &aDXArry);
+                    aCharacterData.vOutlines.clear();
+
+                    if(aDXArry.size())
+                    {
+                        for(size_t a(0); a < aDXArry.size(); a++)
+                        {
+                            const basegfx::B2DPolygon aPolygon(
+                                basegfx::utils::createPolygonFromRect(
+                                basegfx::B2DRange(
+                                    0 == a ? 0 : aDXArry[a - 1],
+                                    0,
+                                    aDXArry[a],
+                                    aFont.GetFontHeight()
+                                )));
+                            aCharacterData.vOutlines.push_back(tools::PolyPolygon(tools::Polygon(aPolygon)));
+                        }
+                    }
+                    else
+                    {
+                        const basegfx::B2DPolygon aPolygon(
+                            basegfx::utils::createPolygonFromRect(
+                            basegfx::B2DRange(
+                                0,
+                                0,
+                                aDXArry.empty() ? 10 : aDXArry.back(),
+                                aFont.GetFontHeight()
+                            )));
+                        aCharacterData.vOutlines.push_back(tools::PolyPolygon(tools::Polygon(aPolygon)));
+                    }
+
+
                     rParagraph.vCharacters.push_back( aCharacterData );
                 }
             }
@@ -813,11 +889,11 @@ static void FitTextOutlinesToShapeOutlines( const tools::PolyPolygon& aOutlines2
     }
 }
 
-static SdrObject* CreateSdrObjectFromParagraphOutlines(
+static rtl::Reference<SdrObject> CreateSdrObjectFromParagraphOutlines(
     const FWData& rFWData,
     const SdrObjCustomShape& rSdrObjCustomShape)
 {
-    SdrObject* pRet = nullptr;
+    rtl::Reference<SdrObject> pRet;
     basegfx::B2DPolyPolygon aPolyPoly;
     if ( !rFWData.vTextAreas.empty() )
     {
@@ -837,8 +913,8 @@ static SdrObject* CreateSdrObjectFromParagraphOutlines(
 
         pRet = new SdrPathObj(
             rSdrObjCustomShape.getSdrModelFromSdrObject(),
-            OBJ_POLY,
-            aPolyPoly);
+            SdrObjKind::Polygon,
+            std::move(aPolyPoly));
 
         SfxItemSet aSet(rSdrObjCustomShape.GetMergedItemSet());
         aSet.ClearItem( SDRATTR_TEXTDIRECTION );    //SJ: vertical writing is not required, by removing this item no outliner is created
@@ -861,11 +937,15 @@ Reference < i18n::XBreakIterator > const & EnhancedCustomShapeFontWork::GetBreak
     return mxBreakIterator;
 }
 
-SdrObject* EnhancedCustomShapeFontWork::CreateFontWork(
+rtl::Reference<SdrObject> EnhancedCustomShapeFontWork::CreateFontWork(
     const SdrObject* pShape2d,
     const SdrObjCustomShape& rSdrObjCustomShape)
 {
-    SdrObject* pRet = nullptr;
+    rtl::Reference<SdrObject> pRet;
+
+    // calculating scaling factor is too slow
+    if (utl::ConfigManager::IsFuzzing())
+        return pRet;
 
     tools::PolyPolygon aOutlines2d( GetOutlinesFromShape2d( pShape2d ) );
     sal_uInt16 nOutlinesCount2d = aOutlines2d.Count();

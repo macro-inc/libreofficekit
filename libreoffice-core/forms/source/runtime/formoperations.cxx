@@ -52,7 +52,7 @@
 #include <vcl/svapp.hxx>
 #include <vcl/stdtext.hxx>
 #include <vcl/weld.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <comphelper/container.hxx>
 #include <comphelper/property.hxx>
 #include <comphelper/namedvaluecollection.hxx>
@@ -105,7 +105,6 @@ namespace frm
     using namespace ::com::sun::star::sdb;
     using ::com::sun::star::form::XReset;
     using ::com::sun::star::beans::XMultiPropertySet;
-    using ::com::sun::star::uno::makeAny;
     using ::com::sun::star::lang::WrappedTargetException;
     using ::com::sun::star::ui::dialogs::XExecutableDialog;
     using ::com::sun::star::beans::NamedValue;
@@ -430,26 +429,25 @@ namespace frm
         // returns false if parent should *abort* (user pressed cancel)
         bool checkConfirmation(bool &needConfirmation, bool &shouldCommit)
         {
-            if(needConfirmation)
-            {
-                // TODO: shouldn't this be done with an interaction handler?
-                std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(nullptr,
-                                                               VclMessageType::Question, VclButtonsType::YesNo,
-                                                               ResourceManager::loadString(RID_STR_QUERY_SAVE_MODIFIED_ROW)));
-                xQueryBox->add_button(GetStandardText(StandardButtonType::Cancel), RET_CANCEL);
-                xQueryBox->set_default_response(RET_YES);
+            if(!needConfirmation)
+                return true;
+            // TODO: shouldn't this be done with an interaction handler?
+            std::unique_ptr<weld::MessageDialog> xQueryBox(Application::CreateMessageDialog(nullptr,
+                                                           VclMessageType::Question, VclButtonsType::YesNo,
+                                                           ResourceManager::loadString(RID_STR_QUERY_SAVE_MODIFIED_ROW)));
+            xQueryBox->add_button(GetStandardText(StandardButtonType::Cancel), RET_CANCEL);
+            xQueryBox->set_default_response(RET_YES);
 
-                switch (xQueryBox->run())
-                {
-                    case RET_NO:
-                        shouldCommit = false;
-                        [[fallthrough]]; // don't ask again!
-                    case RET_YES:
-                        needConfirmation = false;
-                        return true;
-                    case RET_CANCEL:
-                        return false;
-                }
+            switch (xQueryBox->run())
+            {
+                case RET_NO:
+                    shouldCommit = false;
+                    [[fallthrough]]; // don't ask again!
+                case RET_YES:
+                    needConfirmation = false;
+                    return true;
+                case RET_CANCEL:
+                    return false;
             }
             return true;
         }
@@ -741,7 +739,7 @@ namespace frm
                     // simply toggle the value
                     bool bApplied = false;
                     m_xCursorProperties->getPropertyValue( PROPERTY_APPLYFILTER ) >>= bApplied;
-                    m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, makeAny( !bApplied ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, Any( !bApplied ) );
 
                     // and reload
                     weld::WaitObject aWO(Application::GetFrameWeld(GetDialogParent()));
@@ -1547,12 +1545,12 @@ namespace frm
             m_xParser->setOrder( OUString() );
 
             impl_appendOrderByColumn_throw aAction(this, xBoundField, _bUp);
-            impl_doActionInSQLContext_throw(aAction, RID_STR_COULD_NOT_SET_ORDER );
+            impl_doActionInSQLContext_throw(std::move(aAction), RID_STR_COULD_NOT_SET_ORDER );
 
             weld::WaitObject aWO(Application::GetFrameWeld(GetDialogParent()));
             try
             {
-                m_xCursorProperties->setPropertyValue( PROPERTY_SORT, makeAny( m_xParser->getOrder() ) );
+                m_xCursorProperties->setPropertyValue( PROPERTY_SORT, Any( m_xParser->getOrder() ) );
                 m_xLoadableForm->reload();
             }
             catch( const Exception& )
@@ -1566,7 +1564,7 @@ namespace frm
                 try
                 {
                     m_xParser->setOrder( sOriginalSort );
-                    m_xCursorProperties->setPropertyValue( PROPERTY_SORT, makeAny( m_xParser->getOrder() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_SORT, Any( m_xParser->getOrder() ) );
                     m_xLoadableForm->reload();
                 }
                 catch( const Exception& )
@@ -1618,14 +1616,14 @@ namespace frm
             }
 
             impl_appendFilterByColumn_throw aAction(this, m_xParser, xBoundField);
-            impl_doActionInSQLContext_throw( aAction, RID_STR_COULD_NOT_SET_FILTER );
+            impl_doActionInSQLContext_throw( std::move(aAction), RID_STR_COULD_NOT_SET_FILTER );
 
             weld::WaitObject aWO(Application::GetFrameWeld(GetDialogParent()));
             try
             {
-                m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       makeAny( m_xParser->getFilter() ) );
-                m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, makeAny( m_xParser->getHavingClause() ) );
-                m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, makeAny( true ) );
+                m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       Any( m_xParser->getFilter() ) );
+                m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, Any( m_xParser->getHavingClause() ) );
+                m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, Any( true ) );
 
                 m_xLoadableForm->reload();
             }
@@ -1641,9 +1639,9 @@ namespace frm
                 {
                     m_xParser->setFilter      ( sOriginalFilter );
                     m_xParser->setHavingClause( sOriginalHaving );
-                    m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, makeAny( bApplied ) );
-                    m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       makeAny( m_xParser->getFilter() ) );
-                    m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, makeAny( m_xParser->getHavingClause() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_APPLYFILTER, Any( bApplied ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       Any( m_xParser->getFilter() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, Any( m_xParser->getHavingClause() ) );
                     m_xLoadableForm->reload();
                 }
                 catch( const Exception& )
@@ -1710,11 +1708,11 @@ namespace frm
                 weld::WaitObject aWO(Application::GetFrameWeld(xDialogParent));
                 if ( _bFilter )
                 {
-                    m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       makeAny( m_xParser->getFilter() ) );
-                    m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, makeAny( m_xParser->getHavingClause() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_FILTER,       Any( m_xParser->getFilter() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_HAVINGCLAUSE, Any( m_xParser->getHavingClause() ) );
                 }
                 else
-                    m_xCursorProperties->setPropertyValue( PROPERTY_SORT, makeAny( m_xParser->getOrder() ) );
+                    m_xCursorProperties->setPropertyValue( PROPERTY_SORT, Any( m_xParser->getOrder() ) );
                 m_xLoadableForm->reload();
             }
 

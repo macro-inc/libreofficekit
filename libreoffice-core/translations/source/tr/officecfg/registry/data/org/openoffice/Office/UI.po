@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-08-19 12:58+0000\n"
-"Last-Translator: sabri ünal <libreajans@gmail.com>\n"
-"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/tr/>\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-02-28 22:08+0000\n"
+"Last-Translator: Ayhan YALÇINSOY <ayhanyalcinsoy@gmail.com>\n"
+"Language-Team: Turkish <https://translations.documentfoundation.org/projects/libo_ui-7-5/officecfgregistrydataorgopenofficeofficeui/tr/>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1554880250.000000\n"
 
 #. W5ukN
@@ -434,7 +434,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset Filter"
-msgstr "Filtreyi Sil"
+msgstr "Süzgeci Sıfırla"
 
 #. YF5sR
 #: CalcCommands.xcu
@@ -544,7 +544,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Remove Precedents"
-msgstr "~Örnekleri Sil"
+msgstr "~Emsalleri Sil"
 
 #. jDtxy
 #: CalcCommands.xcu
@@ -644,7 +644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Trace ~Precedent"
-msgstr "Öncekini ~İzle"
+msgstr "Emsali ~İzle"
 
 #. Eob2h
 #: CalcCommands.xcu
@@ -654,7 +654,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Remove Precedent"
-msgstr "Öncekinin ~Sil"
+msgstr "Emsali ~Sil"
 
 #. fWMFQ
 #: CalcCommands.xcu
@@ -2106,15 +2106,15 @@ msgctxt ""
 msgid "Sparklines"
 msgstr "Mini Grafikler"
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
-msgstr "Mini Grafik Ekle..."
+msgid "Sparkline..."
+msgstr "Mini Grafik..."
 
 #. CoZgJ
 #: CalcCommands.xcu
@@ -2644,7 +2644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset Scale"
-msgstr "Ölçeklendirmeyi Kaldır"
+msgstr "Ölçeklendirmeyi Sıfırla"
 
 #. DEHZ9
 #: CalcCommands.xcu
@@ -3664,7 +3664,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Rename S~heet..."
-msgstr "Ç~alışma Sayfasını Yeniden Adlandır..."
+msgstr "Sayfayı Yeniden ~Adlandır..."
 
 #. dRbma
 #: CalcCommands.xcu
@@ -4184,7 +4184,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Email as ~Microsoft Excel..."
-msgstr "Microsoft Excel olarak gönder..."
+msgstr "~Microsoft Excel olarak gönder..."
 
 #. ZiTq5
 #: CalcCommands.xcu
@@ -5776,6 +5776,16 @@ msgctxt ""
 msgid "Y Error ~Bars..."
 msgstr "Y Hata ~Çubukları..."
 
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr "Veri Tablosu..."
+
 #. EfDfA
 #: ChartCommands.xcu
 msgctxt ""
@@ -6535,6 +6545,26 @@ msgctxt ""
 "value.text"
 msgid "Format Single Data Label..."
 msgstr "Tek Veri Etiketini Biçimlendir..."
+
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr "Veri Tablosu Ekle"
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr "Veri Tablosunu Sil"
 
 #. 3wU84
 #: ChartCommands.xcu
@@ -8194,7 +8224,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Te~xt Attributes..."
-msgstr "Metin Öznitelikleri..."
+msgstr "Me~tin Öznitelikleri..."
 
 #. GR6Sf
 #: DrawImpressCommands.xcu
@@ -9514,7 +9544,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Views Tab ~Bar"
-msgstr "Görünümler Sekmesi Çubuğu"
+msgstr "~Görünümler Sekmesi Çubuğu"
 
 #. wmwio
 #: DrawImpressCommands.xcu
@@ -10644,7 +10674,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Column Width"
-msgstr "Asgari sütun genişliği"
+msgstr "Asgari Sütun Genişliği"
 
 #. GubJq
 #: DrawImpressCommands.xcu
@@ -22198,26 +22228,6 @@ msgctxt ""
 msgid "Delete C~ontents..."
 msgstr "İçe~rikleri Sil..."
 
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr "Emoji"
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr "Emoji Ekle"
-
 #. tEjpF
 #: GenericCommands.xcu
 msgctxt ""
@@ -23477,6 +23487,36 @@ msgctxt ""
 "value.text"
 msgid "Toggle Automatic Spell Checking"
 msgstr "Otomatik İmla Denetimine Geç"
+
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr "Otomatik Erişilebilirlik Denetimi"
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr "Otomatik ~Erişebilirlik Denetimi"
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr "Otomatik Erişebilirlik Denetimini Aç/Kapat"
 
 #. 4DCmg
 #: GenericCommands.xcu
@@ -26256,7 +26296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Anchor Menu"
-msgstr ""
+msgstr "Çapa Menüsü"
 
 #. oNBG8
 #: GenericCommands.xcu
@@ -26276,7 +26316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Nesne için bir çapa seçin"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -27176,7 +27216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Styles Deck"
-msgstr "Biçemler   Penceresini Aç"
+msgstr "Biçemler Penceresini Aç"
 
 #. X4FoZ
 #: GenericCommands.xcu
@@ -28026,7 +28066,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~AutoUpdate Display"
-msgstr "Görüntüyü Otomatik Güncelle"
+msgstr "Görüntüyü ~Otomatik Güncelle"
 
 #. VafA5
 #: MathCommands.xcu
@@ -28337,6 +28377,16 @@ msgctxt ""
 "value.text"
 msgid "~Others"
 msgstr "~Diğerleri"
+
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr "Ögeler Sekmesini aç"
 
 #. uXvss
 #: MathWindowState.xcu
@@ -30528,14 +30578,14 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Değişiklikleri İzlemeyi Göster"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
+msgid "Show Tracked ~Changes"
 msgstr "İzlenen ~Değişiklikleri Göster"
 
 #. sMgCx
@@ -30601,6 +30651,16 @@ msgstr ""
 "başlıkların ve alt başlıkların yanında bir düğme \n"
 "gösterir. Düğme olmadan bile Gezgin ile anahat \n"
 "daraltma yapabilirsiniz."
+
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr "Seviyeye Kadar Anahat İçeriğini Göster..."
 
 #. C5mHk
 #: WriterCommands.xcu
@@ -30981,6 +31041,26 @@ msgctxt ""
 "value.text"
 msgid "Insert Date Content Control"
 msgstr "Veri İçerik Kontrolü Ekle"
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr "Düz Metin İçerik Denetimi Ekle"
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
+msgstr "Birleşik Giriş Kutusu İçerik Denetimi Ekle"
 
 #. HxFAE
 #: WriterCommands.xcu
@@ -32082,6 +32162,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Kapak Sayfası..."
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr "Çevir..."
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32482,6 +32572,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Yukarıya ~Satırlar"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Yukarı satırlar ekle"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32501,6 +32601,16 @@ msgctxt ""
 "value.text"
 msgid "Rows ~Below"
 msgstr "Aşağıya S~atırlar"
+
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Aşağı satırlar ekle"
 
 #. bxCPN
 #: WriterCommands.xcu
@@ -32522,15 +32632,25 @@ msgctxt ""
 msgid "Insert Columns Before"
 msgstr "Öncesine Sütunlar Ekle"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
-msgstr "~Öncesine Sütunlar"
+msgid "Columns B~efore"
+msgstr "Önc~esine Sütunlar"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Öncesine sütunlar ekle"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32542,15 +32662,25 @@ msgctxt ""
 msgid "Insert Columns After"
 msgstr "Sonrasına Sütunlar Ekle"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
-msgstr "S~onrasına Sütunlar"
+msgid "Columns A~fter"
+msgstr "Sonra~sına Sütunlar"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Sonrasına sütunlar ekle"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -34791,6 +34921,166 @@ msgctxt ""
 "value.text"
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
 msgstr "Biçimlendirmeyi Çoğalt (çift tıklayın ve Ctrl veya Cmd ile davranışı değiştirin)"
+
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Yakınlaştır"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr "Değişiklikleri İzlemeyi Yönet"
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr "Karakter"
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr "Paragraf"
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr "Tablo Özellikleri"
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Konum ve Boyut"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr "Görüntü Özellikleri"
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr "Çerçeve Özellikleri"
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr "OLE Nesnesi Özellikleri"
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr "Metin Dağılımı"
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Kenarlık"
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr "Kenarlıklar"
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Alan"
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr "Alan"
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Satır"
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr "Satır"
 
 #. 7PCFf
 #: WriterCommands.xcu
@@ -38531,6 +38821,116 @@ msgctxt ""
 "value.text"
 msgid "Standard (Single Mode)"
 msgstr "Standart (Tekil Kip)"
+
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr "Standart (Tekli Kip) - Açıklama"
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr "Standart (Tekil Kip) - Şekil"
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr "Standart (Tekil Kip) - Şekil Metni"
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr "Standart (Tekil Kip) - Form Denetimi"
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr "Standart (Tekil Kip) - Çerçeve"
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr "Standart (Tekil Kip) - Görüntü"
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr "Standart (Tekil Kip) - Medya"
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr "Standart (Tekil Kip) - OLE Nesnesi"
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr "Standart (Tekil Kip) - Baskı Önizleme"
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr "Standart (Tekil Kip) - Tablo"
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr "Standart (Tekil Kip) - Metin"
 
 #. h6gRt
 #: WriterWindowState.xcu

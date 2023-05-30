@@ -66,9 +66,9 @@ namespace sdr::properties
 //                      OleProperties
 //                  CellProperties
 //                  TableProperties
-//          GroupProperties
+//      GroupProperties
 //      EmptyProperties
-//          PageProperties
+//      PageProperties
 
 namespace sdr::properties
     {
@@ -80,34 +80,10 @@ namespace sdr::properties
             SdrObject&                                      mrObject;
 
         protected:
-            // apply the correct SfyStyleSheet from SdrObject's SdrModel
-            virtual void applyDefaultStyleSheetFromSdrModel();
-
-            // create a new object specific itemset with object specific ranges.
-            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) = 0;
-
             // internal access to SdrObject
             const SdrObject& GetSdrObject() const;
 
             SdrObject& GetSdrObject();
-
-            // Test changeability for a single item. If an implementation wants to prevent
-            // changing an item it should override this method.
-            virtual bool AllowItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) const = 0;
-
-            // Do the internal ItemChange. If only nWhich is given, the item needs to be cleared.
-            // Also needs to handle if nWhich and pNewItem is 0, which means to clear all items.
-            virtual void ItemChange(const sal_uInt16 nWhich, const SfxPoolItem* pNewItem = nullptr) = 0;
-
-            // Called after ItemChange() is done for all items. Allows local reactions on
-            // specific item changes
-            virtual void PostItemChange(const sal_uInt16 nWhich) = 0;
-
-            // Internally react on ItemSet changes. The given ItemSet contains all changed items, the new ones.
-            virtual void ItemSetChanged(const SfxItemSet*) = 0;
-            // Subclasses need to return true if they want the ItemSetChanged() callback to actually have a non-zero pointer.
-            // We do this because creating the temporary item set is expensive and seldom used.
-            virtual bool WantItemSetInItemSetChanged() const { return false; }
 
         public:
             // basic constructor, used from SdrObject.
@@ -115,6 +91,8 @@ namespace sdr::properties
 
             // destructor
             virtual ~BaseProperties();
+
+            virtual SfxItemSet CreateObjectSpecificItemSet(SfxItemPool& pPool) = 0;
 
             // Clone() operator, normally just calls the local copy constructor,
             // see above.
@@ -165,7 +143,8 @@ namespace sdr::properties
 
             // Set a new StyleSheet. Registers as listener at the StyleSheet to get knowledge
             // of StyleSheet changes.
-            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr) = 0;
+            virtual void SetStyleSheet(SfxStyleSheet* pNewStyleSheet, bool bDontRemoveHardAttr,
+                bool bBroadcast) = 0;
 
             // Get the installed StyleSheet.
             virtual SfxStyleSheet* GetStyleSheet() const = 0;

@@ -23,13 +23,14 @@
 
 #include <comphelper/propertyvalue.hxx>
 #include <osl/file.hxx>
-#include <editeng/outlobj.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/request.hxx>
 #include <sfx2/docfilt.hxx>
 #include <sfx2/fcontnr.hxx>
 #include <sfx2/docfile.hxx>
 #include <sfx2/sfxsids.hrc>
+#include <vcl/outdev.hxx>
+#include <vcl/pdfread.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/weld.hxx>
 #include <svx/svdpagv.hxx>
@@ -60,6 +61,7 @@
 #include <com/sun/star/embed/Aspects.hpp>
 #include <com/sun/star/embed/NoVisualAreaSizeException.hpp>
 #include <com/sun/star/embed/XEmbeddedObject.hpp>
+#include <com/sun/star/media/XPlayer.hpp>
 #include <svtools/soerr.hxx>
 #include <sfx2/ipclient.hxx>
 #include <tools/debug.hxx>
@@ -80,7 +82,7 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
     mnAction = rAction;
 
     // Is there an object at the position rPos?
-    SdrGrafObj*     pNewGrafObj = nullptr;
+    rtl::Reference<SdrGrafObj> pNewGrafObj;
     SdrPageView*    pPV = GetSdrPageView();
     SdrObject*      pPickObj = pObj;
     const bool bOnMaster = pPV && pPV->GetPage() && pPV->GetPage()->IsMasterPage();
@@ -113,7 +115,7 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
         if( bIsGraphic )
         {
             // We fill the object with the Bitmap
-            pNewGrafObj = static_cast<SdrGrafObj*>( pPickObj->CloneSdrObject(pPickObj->getSdrModelFromSdrObject()) );
+            pNewGrafObj = SdrObject::Clone(static_cast<SdrGrafObj&>(*pPickObj), pPickObj->getSdrModelFromSdrObject());
             pNewGrafObj->SetGraphic(rGraphic);
         }
         else
@@ -136,14 +138,14 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
         if (pPage && pPage->IsPresObj(pPickObj))
         {
             // Insert new PresObj into the list
-            pPage->InsertPresObj( pNewGrafObj, PresObjKind::Graphic );
+            pPage->InsertPresObj( pNewGrafObj.get(), PresObjKind::Graphic );
             pNewGrafObj->SetUserCall(pPickObj->GetUserCall());
         }
 
         if (pImageMap)
             pNewGrafObj->AppendUserData(std::unique_ptr<SdrObjUserData>(new SvxIMapInfo(*pImageMap)));
 
-        ReplaceObjectAtView(pPickObj, *pPV, pNewGrafObj); // maybe ReplaceObjectAtView
+        ReplaceObjectAtView(pPickObj, *pPV, pNewGrafObj.get()); // maybe ReplaceObjectAtView
 
         if( IsUndoEnabled() )
             EndUndo();
@@ -197,6 +199,10 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
         }
 
         sal_Int32 nPreferredDPI = mrDoc.getImagePreferredDPI();
+
+        if (rGraphic.GetGfxLink().GetType() == GfxLinkType::NativePdf && nPreferredDPI == 0 && vcl::PDF_INSERT_MAGIC_SCALE_FACTOR > 1)
+            nPreferredDPI = Application::GetDefaultDevice()->GetDPIX() * vcl::PDF_INSERT_MAGIC_SCALE_FACTOR;
+
         if (nPreferredDPI > 0)
         {
             auto nWidth = o3tl::convert(aSizePixel.Width() / double(nPreferredDPI), o3tl::Length::in, o3tl::Length::mm100);
@@ -263,7 +269,7 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
                 BegUndo(SdResId(STR_UNDO_DRAGDROP));
             pNewGrafObj->NbcSetLayer(pPickObj->GetLayer());
             SdrPage* pP = pPV->GetPage();
-            pP->InsertObject(pNewGrafObj);
+            pP->InsertObject(pNewGrafObj.get());
             if( bUndo )
             {
                 AddUndo(mrDoc.GetSdrUndoFactory().CreateUndoNewObject(*pNewGrafObj));
@@ -275,15 +281,11 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
             {
                 EndUndo();
             }
-            else
-            {
-                SdrObject::Free(pPickObj);
-            }
             mnAction = DND_ACTION_COPY;
         }
         else
         {
-            bool bSuccess = InsertObjectAtView(pNewGrafObj, *pPV, nOptions);
+            bool bSuccess = InsertObjectAtView(pNewGrafObj.get(), *pPV, nOptions);
             if (!bSuccess)
                 pNewGrafObj = nullptr;
             else if (pImageMap)
@@ -293,7 +295,7 @@ SdrGrafObj* View::InsertGraphic( const Graphic& rGraphic, sal_Int8& rAction,
 
     rAction = mnAction;
 
-    return pNewGrafObj;
+    return pNewGrafObj.get();
 }
 
 void View::InsertMediaURL( const OUString& rMediaURL, sal_Int8& rAction,
@@ -326,7 +328,7 @@ SdrMediaObj* View::InsertMediaObj( const OUString& rMediaURL, const OUString& rM
     SdrEndTextEdit();
     mnAction = rAction;
 
-    SdrMediaObj*    pNewMediaObj = nullptr;
+    rtl::Reference<SdrMediaObj> pNewMediaObj;
     SdrPageView*    pPV = GetSdrPageView();
     SdrObject*      pPickObj = GetEmptyPresentationObject( PresObjKind::Media );
 
@@ -338,11 +340,11 @@ SdrMediaObj* View::InsertMediaObj( const OUString& rMediaURL, const OUString& rM
 
     if( mnAction == DND_ACTION_LINK && pPV && dynamic_cast< SdrMediaObj *>( pPickObj ) )
     {
-        pNewMediaObj = static_cast< SdrMediaObj* >( pPickObj->CloneSdrObject(pPickObj->getSdrModelFromSdrObject()) );
+        pNewMediaObj = SdrObject::Clone(static_cast<SdrMediaObj&>(*pPickObj), pPickObj->getSdrModelFromSdrObject());
         pNewMediaObj->setURL( rMediaURL, ""/*TODO?*/, rMimeType );
 
         BegUndo(SdResId(STR_UNDO_DRAGDROP));
-        ReplaceObjectAtView(pPickObj, *pPV, pNewMediaObj);
+        ReplaceObjectAtView(pPickObj, *pPV, pNewMediaObj.get());
         EndUndo();
     }
     else if( pPV )
@@ -366,15 +368,15 @@ SdrMediaObj* View::InsertMediaObj( const OUString& rMediaURL, const OUString& rM
             bIsPres = pPage && pPage->IsPresObj(pPickObj);
             if( bIsPres )
             {
-                pPage->InsertPresObj( pNewMediaObj, PresObjKind::Media );
+                pPage->InsertPresObj( pNewMediaObj.get(), PresObjKind::Media );
             }
         }
 
         if( pPickObj )
-            ReplaceObjectAtView(pPickObj, *pPV, pNewMediaObj);
+            ReplaceObjectAtView(pPickObj, *pPV, pNewMediaObj.get());
         else
         {
-            if (!InsertObjectAtView(pNewMediaObj, *pPV, SdrInsertFlags::SETDEFLAYER))
+            if (!InsertObjectAtView(pNewMediaObj.get(), *pPV, SdrInsertFlags::SETDEFLAYER))
                 pNewMediaObj = nullptr;
         }
 
@@ -399,7 +401,7 @@ SdrMediaObj* View::InsertMediaObj( const OUString& rMediaURL, const OUString& rM
 
     rAction = mnAction;
 
-    return pNewMediaObj;
+    return pNewMediaObj.get();
 }
 
 /**
@@ -420,7 +422,7 @@ IMPL_LINK_NOARG(View, DropInsertFileHdl, Timer *, void)
     {
         OUString aCurrentDropFile( *aIter );
         INetURLObject   aURL( aCurrentDropFile );
-        bool            bOK = false;
+        bool bHandled = false;
 
         if( aURL.GetProtocol() == INetProtocol::NotValid )
         {
@@ -453,9 +455,9 @@ IMPL_LINK_NOARG(View, DropInsertFileHdl, Timer *, void)
                 if( aIter == maDropFileVector.begin() )
                     mnAction = nTempAction;
 
-                bOK = true;
+                bHandled = true;
             }
-            if( !bOK )
+            if (!bHandled)
             {
                 std::shared_ptr<const SfxFilter> pFoundFilter;
                 SfxMedium               aSfxMedium( aCurrentDropFile, StreamMode::READ | StreamMode::SHARE_DENYNONE );
@@ -488,36 +490,48 @@ IMPL_LINK_NOARG(View, DropInsertFileHdl, Timer *, void)
                         aReq.AppendItem( aItem1 );
                         aReq.AppendItem( aItem2 );
                         FuInsertFile::Create( mpViewSh, pWin, this, &mrDoc, aReq );
-                        bOK = true;
+                        bHandled = true;
                     }
                 }
             }
         }
 
-        if( !bOK )
-        {
 #if HAVE_FEATURE_AVMEDIA
-            Size aPrefSize;
-
-            if( ::avmedia::MediaWindow::isMediaURL( aCurrentDropFile, ""/*TODO?*/ ) &&
-                ::avmedia::MediaWindow::isMediaURL( aCurrentDropFile, ""/*TODO?*/, true, &aPrefSize ) )
+        if (!bHandled)
+        {
+            bool bShallowDetect = ::avmedia::MediaWindow::isMediaURL(aCurrentDropFile, ""/*TODO?*/);
+            if (bShallowDetect)
             {
-                if( aPrefSize.Width() && aPrefSize.Height() )
-                {
-                    ::sd::Window* pWin = mpViewSh->GetActiveWindow();
+                mxDropMediaSizeListener.set(new avmedia::PlayerListener(
+                    [this, aCurrentDropFile](const css::uno::Reference<css::media::XPlayer>& rPlayer){
+                        SolarMutexGuard g;
 
-                    if( pWin )
-                        aPrefSize = pWin->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
-                    else
-                        aPrefSize = Application::GetDefaultDevice()->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
-                }
-                else
-                    aPrefSize  = Size( 5000, 5000 );
+                        css::awt::Size aSize = rPlayer->getPreferredPlayerWindowSize();
+                        Size aPrefSize(aSize.Width, aSize.Height);
 
-                InsertMediaURL( aCurrentDropFile, mnAction, maDropPos, aPrefSize, true ) ;
+                        if (aPrefSize.Width() && aPrefSize.Height())
+                        {
+                            ::sd::Window* pWin = mpViewSh->GetActiveWindow();
+
+                            if( pWin )
+                                aPrefSize = pWin->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
+                            else
+                                aPrefSize = Application::GetDefaultDevice()->PixelToLogic(aPrefSize, MapMode(MapUnit::Map100thMM));
+                        }
+                        else
+                            aPrefSize  = Size( 5000, 5000 );
+
+                        InsertMediaURL(aCurrentDropFile, mnAction, maDropPos, aPrefSize, true);
+
+                        mxDropMediaSizeListener.clear();
+                    }));
             }
-            else
+            bHandled = bShallowDetect && ::avmedia::MediaWindow::isMediaURL(aCurrentDropFile, ""/*TODO?*/, true, mxDropMediaSizeListener);
+        }
 #endif
+
+        if (!bHandled)
+        {
             if( mnAction & DND_ACTION_LINK )
                 static_cast< DrawViewShell* >( mpViewSh )->InsertURLButton( aCurrentDropFile, aCurrentDropFile, OUString(), &maDropPos );
             else
@@ -563,7 +577,7 @@ IMPL_LINK_NOARG(View, DropInsertFileHdl, Timer *, void)
 
                             aRect = ::tools::Rectangle( maDropPos, aSize );
 
-                            SdrOle2Obj* pOleObj = new SdrOle2Obj(
+                            rtl::Reference<SdrOle2Obj> pOleObj = new SdrOle2Obj(
                                 getSdrModelFromSdrView(),
                                 svt::EmbeddedObjectRef(xObj, nAspect),
                                 aName,
@@ -579,7 +593,7 @@ IMPL_LINK_NOARG(View, DropInsertFileHdl, Timer *, void)
                                     nOptions |= SdrInsertFlags::DONTMARK;
                             }
 
-                            if (InsertObjectAtView( pOleObj, *GetSdrPageView(), nOptions ))
+                            if (InsertObjectAtView( pOleObj.get(), *GetSdrPageView(), nOptions ))
                                 pOleObj->SetLogicRect( aRect );
                             aSz.Width = aRect.GetWidth();
                             aSz.Height = aRect.GetHeight();

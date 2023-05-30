@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-05-25 12:36+0200\n"
-"PO-Revision-Date: 2022-07-26 09:17+0000\n"
-"Last-Translator: Mister Update <mr.update@yahoo.de>\n"
+"POT-Creation-Date: 2022-11-25 13:48+0100\n"
+"PO-Revision-Date: 2023-01-23 11:30+0000\n"
+"Last-Translator: Christian Kühl <kuehl.christian@googlemail.com>\n"
 "Language-Team: German <https://translations.documentfoundation.org/projects/libo_ui-master/dbaccessmessages/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -62,7 +62,7 @@ msgstr "_Löschen"
 #. YspCj
 msgctxt "stock"
 msgid "_Edit"
-msgstr "_Bearbeiten"
+msgstr "_Bearbeiten…"
 
 #. imQxr
 msgctxt "stock"
@@ -72,7 +72,7 @@ msgstr "_Hilfe"
 #. RbjyB
 msgctxt "stock"
 msgid "_New"
-msgstr "Ne_u"
+msgstr "Ne_u…"
 
 #. dx2yy
 msgctxt "stock"
@@ -127,7 +127,7 @@ msgstr "Die Verbindung zur externen Datenquelle konnte nicht hergestellt werden.
 #: dbaccess/inc/strings.hrc:30
 msgctxt "RID_STR_COULDNOTLOAD_MANAGER"
 msgid "The connection to the external data source could not be established. The SDBC driver manager could not be loaded."
-msgstr "Die Verbindung zur externen Datenquelle konnte nicht hergestellt werden. Der SDBC-Treiber-Manager konnte nicht geladen werden."
+msgstr "Die Verbindung zur externen Datenquelle konnte nicht hergestellt werden. Die SDBC-Treiber-Verwaltung konnte nicht geladen werden."
 
 #. PzEVD
 #: dbaccess/inc/strings.hrc:31
@@ -167,13 +167,13 @@ msgstr "Es wurden keine Werte verändert."
 #: dbaccess/inc/strings.hrc:36
 msgctxt "RID_STR_NO_XROWUPDATE"
 msgid "Values could not be inserted. The XRowUpdate interface is not supported by ResultSet."
-msgstr "Es konnten keine Werte eingefügt werden. Die XRowUpdate-Schnittstelle wird nicht vom ResultSet unterstützt."
+msgstr "Es konnten keine Werte eingefügt werden. Die Schnittstelle \"XRowUpdate\" wird nicht von \"ResultSet\" unterstützt."
 
 #. PQPVY
 #: dbaccess/inc/strings.hrc:37
 msgctxt "RID_STR_NO_XRESULTSETUPDATE"
 msgid "Values could not be inserted. The XResultSetUpdate interface is not supported by ResultSet."
-msgstr "Es konnten keine Werte eingefügt werden. Die XResultSetUpdate-Schnittstelle wird nicht vom ResultSet unterstützt."
+msgstr "Es konnten keine Werte eingefügt werden. Die Schnittstelle \"XResultSetUpdate\" wird nicht von \"ResultSet\" unterstützt."
 
 #. EAkm5
 #: dbaccess/inc/strings.hrc:38
@@ -493,7 +493,7 @@ msgstr "Es wurde eine Verbindung zur URL \"$name$\" angefordert."
 #: dbaccess/inc/strings.hrc:88
 msgctxt "RID_STR_MISSING_EXTENSION"
 msgid "The extension is not installed."
-msgstr "Die Extension ist nicht installiert."
+msgstr "Die Erweiterung ist nicht installiert."
 
 #. CvFBA
 #: dbaccess/inc/strings.hrc:90
@@ -1351,7 +1351,7 @@ msgid ""
 "If the field is not to have a default value, select the empty string."
 msgstr ""
 "Wählen Sie einen Wert aus, der in jedem neu eingefügten Datensatz als Standard erscheinen soll.\n"
-"Wählen Sie die leere Zeichenkette aus, wenn das Feld keinen solchen Standardwert haben soll."
+"Wählen Sie die leere Zeichenfolge aus, wenn das Feld keinen solchen Standardwert haben soll."
 
 #. AbZU4
 #: dbaccess/inc/strings.hrc:244
@@ -1363,7 +1363,7 @@ msgid ""
 msgstr ""
 "Geben Sie hier einen Standardwert für das Feld an.\n"
 "\n"
-"Wenn Sie später Daten in die Tabelle eingeben, wird in jedem neuen Datensatz diese Zeichenkette für das ausgewählte Feld verwendet. Sie sollte deshalb der weiter unten einzugebenden Zellenformatierung genügen."
+"Wenn Sie später Daten in die Tabelle eingeben, wird in jedem neuen Datensatz diese Zeichenfolge für das ausgewählte Feld verwendet. Sie sollte deshalb der weiter unten einzugebenden Zellenformatierung genügen."
 
 #. hwwVA
 #: dbaccess/inc/strings.hrc:245
@@ -1791,13 +1791,13 @@ msgstr ""
 #: dbaccess/inc/strings.hrc:312
 msgctxt "RID_STR_EXTENSION_NOT_PRESENT"
 msgid "The report, \"$file$\", requires the Report Builder feature."
-msgstr "Der Bericht \"$file$\" benötigt die Funktion Bericht-Designer."
+msgstr "Der Bericht \"$file$\" benötigt die Funktion Berichtdesigner."
 
 #. oC8Px
 #: dbaccess/inc/strings.hrc:314
 msgctxt "STR_COULDNOTCREATE_DRIVERMANAGER"
 msgid "Cannot connect to the SDBC driver manager (#servicename#)."
-msgstr "Es konnte keine Verbindung zum SDBC-Treiber-Manager (#servicename#) hergestellt werden."
+msgstr "Es konnte keine Verbindung zur SDBC-Treiber-Verwaltung (#servicename#) hergestellt werden."
 
 #. aym6r
 #: dbaccess/inc/strings.hrc:315
@@ -1895,11 +1895,11 @@ msgctxt "STR_CALC_PATH_OR_FILE"
 msgid "Path to the spreadsheet document"
 msgstr "Pfad zum Tabellendokument:"
 
-#. qxbA7
+#. H3cem
 #: dbaccess/inc/strings.hrc:333
 msgctxt "STR_NAME_OF_ODBC_DATASOURCE"
-msgid "Name of the ODBC data source on your system"
-msgstr "Name der ODBC-Datenquelle auf Ihrem System"
+msgid "Name of the ODBC data source"
+msgstr "Name der ODBC-Datenquelle"
 
 #. mGJE9
 #: dbaccess/inc/strings.hrc:334
@@ -2227,23 +2227,23 @@ msgstr ""
 "Klicken Sie auf »Durchsuchen…«, um Hersteller-spezifische Einstellungen vorzunehmen.\n"
 "Fragen Sie Ihren Systemadministrator, wenn Sie sich bei den folgenden Einstellungen unsicher sind."
 
-#. PRyfo
+#. CE5Rv
 #: dbaccess/inc/strings.hrc:388
 msgctxt "STR_ODBC_HEADERTEXT"
-msgid "Set up a connection to an ODBC database"
-msgstr "Verbindung zu einer ODBC-Datenquelle einrichten"
+msgid "Set up a connection to an ODBC data source"
+msgstr "Richten Sie eine Verbindung zu einer ODBC-Datenquelle ein"
 
-#. CBVtz
+#. BELnF
 #: dbaccess/inc/strings.hrc:389
 msgctxt "STR_ODBC_HELPTEXT"
 msgid ""
-"Enter the name of the ODBC database you want to connect to.\n"
-"Click 'Browse...' to select an ODBC database that is already registered in %PRODUCTNAME.\n"
+"Enter the name of the ODBC data source you want to use.\n"
+"Click 'Browse...' to select an ODBC data source that is already registered in %PRODUCTNAME.\n"
 "Please contact your system administrator if you are unsure about the following settings."
 msgstr ""
-"Bitte geben Sie den Namen der ODBC-Datenquelle ein, um eine Verbindung herzustellen.\n"
-"Klicken Sie auf »Durchsuchen…«, um eine %PRODUCTNAME bekannte ODBC-Datenquelle auszuwählen.\n"
-"Fragen Sie Ihren Systemadministrator, wenn Sie sich bei den folgenden Einstellungen unsicher sind."
+"Geben Sie den Namen der ODBC-Datenquelle ein, die Sie verwenden möchten.\n"
+"Klicken Sie auf »Durchsuchen…«, um eine ODBC-Datenquelle auszuwählen, die bereits in %PRODUCTNAME registriert ist.\n"
+"Bitte wenden Sie sich an Ihren Systemadministrator, wenn Sie sich bezüglich der folgenden Einstellungen nicht sicher sind."
 
 #. dmi7n
 #: dbaccess/inc/strings.hrc:390
@@ -2425,158 +2425,176 @@ msgctxt "STR_EXCEPTION_DETAILS"
 msgid "Details"
 msgstr "Details"
 
-#. Avmtu
+#. CXpeS
 #: dbaccess/inc/strings.hrc:423
+msgctxt "STR_ADD_USER"
+msgid "Add User"
+msgstr "Benutzer hinzufügen"
+
+#. YG5iB
+#: dbaccess/inc/strings.hrc:424
+msgctxt "STR_DELETE_USER"
+msgid "Delete User"
+msgstr "Benutzer löschen"
+
+#. mDe9f
+#: dbaccess/inc/strings.hrc:425
+msgctxt "STR_CHANGE_PASSWORD"
+msgid "Change Password"
+msgstr "Kennwort ändern"
+
+#. Avmtu
+#: dbaccess/inc/strings.hrc:426
 msgctxt "STR_QUERY_USERADMIN_DELETE_USER"
 msgid "Do you really want to delete the user?"
 msgstr "Soll der Benutzer wirklich gelöscht werden?"
 
 #. yeKZF
-#: dbaccess/inc/strings.hrc:424
+#: dbaccess/inc/strings.hrc:427
 msgctxt "STR_USERADMIN_NOT_AVAILABLE"
 msgid "The database does not support user administration."
 msgstr "Die Datenbank unterstützt keine Benutzerverwaltung."
 
 #. 4CVtX
-#: dbaccess/inc/strings.hrc:425
+#: dbaccess/inc/strings.hrc:428
 msgctxt "STR_ERROR_PASSWORDS_NOT_IDENTICAL"
 msgid "The passwords do not match. Please enter the password again."
 msgstr "Die Kennwörter stimmen nicht überein. Bitte geben Sie diese noch einmal ein."
 
 #. iu64w
-#: dbaccess/inc/strings.hrc:427
+#: dbaccess/inc/strings.hrc:430
 msgctxt "STR_JOIN_TYPE_HINT"
 msgid "Please note that some databases may not support this join type."
 msgstr "Bitte beachten Sie, dass einige Datenbanken eventuell diese Art der Verknüpfung nicht unterstützen."
 
 #. Khmn9
-#: dbaccess/inc/strings.hrc:428
+#: dbaccess/inc/strings.hrc:431
 msgctxt "STR_QUERY_INNER_JOIN"
 msgid "Includes only records for which the contents of the related fields of both tables are identical."
 msgstr "Beinhaltet nur die Datensätze, bei denen die Inhalte der verknüpften Felder beider Tabellen gleich sind."
 
 #. JUyyK
-#: dbaccess/inc/strings.hrc:429
+#: dbaccess/inc/strings.hrc:432
 msgctxt "STR_QUERY_LEFTRIGHT_JOIN"
 msgid "Contains ALL records from table '%1' but only records from table '%2' where the values in the related fields are matching."
 msgstr "Beinhaltet ALLE Datensätze aus '%1' und nur die Datensätze aus '%2', bei denen die Inhalte der verknüpften Felder beider Tabellen gleich sind."
 
 #. EdhCU
-#: dbaccess/inc/strings.hrc:430
+#: dbaccess/inc/strings.hrc:433
 msgctxt "STR_QUERY_FULL_JOIN"
 msgid "Contains ALL records from '%1' and from '%2'."
 msgstr "Beinhaltet ALLE Datensätze aus '%1' und aus '%2'."
 
 #. c9PsZ
-#: dbaccess/inc/strings.hrc:431
+#: dbaccess/inc/strings.hrc:434
 msgctxt "STR_QUERY_CROSS_JOIN"
 msgid "Contains the Cartesian product of ALL records from '%1' and from '%2'."
 msgstr "Beinhaltet das kartesische Produkt ALLER Datensätze aus '%1' und '%2'."
 
 #. KyLuN
-#: dbaccess/inc/strings.hrc:433
+#: dbaccess/inc/strings.hrc:436
 msgctxt "STR_CTW_NO_VIEWS_SUPPORT"
 msgid "The destination database does not support views."
 msgstr "Die Zieldatenbank unterstützt keine Sichten."
 
 #. RaJQd
-#: dbaccess/inc/strings.hrc:434
+#: dbaccess/inc/strings.hrc:437
 msgctxt "STR_CTW_NO_PRIMARY_KEY_SUPPORT"
 msgid "The destination database does not support primary keys."
 msgstr "Die Zieldatenbank unterstützt keine Primärschlüssel."
 
 #. JBBmY
-#: dbaccess/inc/strings.hrc:435
+#: dbaccess/inc/strings.hrc:438
 msgctxt "STR_CTW_INVALID_DATA_ACCESS_DESCRIPTOR"
 msgid "no data access descriptor found, or no data access descriptor able to provide all necessary information"
 msgstr "Kein DataAccess-Deskriptor gefunden oder kein DataAccess-Desriptor verfügbar, der alle benötigten Informationen zur Verfügung stellen kann"
 
 #. Z4JFe
-#: dbaccess/inc/strings.hrc:436
+#: dbaccess/inc/strings.hrc:439
 msgctxt "STR_CTW_ONLY_TABLES_AND_QUERIES_SUPPORT"
 msgid "Only tables and queries are supported at the moment."
 msgstr "Zur Zeit werden nur Tabellen und Abfragen unterstützt."
 
 #. KvUFb
-#: dbaccess/inc/strings.hrc:437
+#: dbaccess/inc/strings.hrc:440
 msgctxt "STR_CTW_COPY_SOURCE_NEEDS_BOOKMARKS"
 msgid "The copy source's result set must support bookmarks."
 msgstr "Das ResultSet der Quelle für die Kopieroperation muss Lesezeichen unterstützen."
 
 #. XVb6E
-#: dbaccess/inc/strings.hrc:438
+#: dbaccess/inc/strings.hrc:441
 msgctxt "STR_CTW_UNSUPPORTED_COLUMN_TYPE"
 msgid "Unsupported source column type ($type$) at column position $pos$."
 msgstr "Nicht unterstützter Spaltentyp ($type$) bei Quell-Spalte an Position $pos$."
 
 #. 7pnvE
-#: dbaccess/inc/strings.hrc:439
+#: dbaccess/inc/strings.hrc:442
 msgctxt "STR_CTW_ILLEGAL_PARAMETER_COUNT"
 msgid "Illegal number of initialization parameters."
 msgstr "Ungültige Anzahl von Initialisierungsparametern."
 
 #. z3h9J
-#: dbaccess/inc/strings.hrc:440
+#: dbaccess/inc/strings.hrc:443
 msgctxt "STR_CTW_ERROR_DURING_INITIALIZATION"
 msgid "An error occurred during initialization."
 msgstr "Während der Initialisierung ist ein Fehler aufgetreten."
 
 #. Qpda7
-#: dbaccess/inc/strings.hrc:441
+#: dbaccess/inc/strings.hrc:444
 msgctxt "STR_CTW_ERROR_UNSUPPORTED_SETTING"
 msgid "Unsupported setting in the copy source descriptor: $name$."
 msgstr "Nicht unterstützte Einstellung im Deskriptor der Kopierquelle: $name$."
 
 #. BsP8j
-#: dbaccess/inc/strings.hrc:442
+#: dbaccess/inc/strings.hrc:445
 msgctxt "STR_CTW_ERROR_NO_QUERY"
 msgid "To copy a query, your connection must be able to provide queries."
 msgstr "Um eine Abfrage zu kopieren, muss Ihre Quelle Abfragen zur Verfügung stellen können."
 
 #. QYh2y
-#: dbaccess/inc/strings.hrc:443
+#: dbaccess/inc/strings.hrc:446
 msgctxt "STR_CTW_ERROR_INVALID_INTERACTIONHANDLER"
 msgid "The given interaction handler is invalid."
 msgstr "Der angegebene Interaktions-Handler ist ungültig."
 
 #. ixrDD
-#: dbaccess/inc/strings.hrc:445
+#: dbaccess/inc/strings.hrc:448
 msgctxt "STR_QUERY_REL_EDIT_RELATION"
 msgid "This relation already exists. Do you want to edit it or create a new one?"
 msgstr "Diese Relation existiert bereits. Möchten Sie diese bearbeiten oder eine neue Relation erstellen?"
 
 #. nFRsS
-#: dbaccess/inc/strings.hrc:446
+#: dbaccess/inc/strings.hrc:449
 msgctxt "STR_QUERY_REL_EDIT"
 msgid "Edit..."
 msgstr "Bearbeiten…"
 
 #. yRkFG
-#: dbaccess/inc/strings.hrc:447
+#: dbaccess/inc/strings.hrc:450
 msgctxt "STR_QUERY_REL_CREATE"
 msgid "Create..."
 msgstr "Erstellen…"
 
 #. VWBJF
-#: dbaccess/inc/strings.hrc:448
+#: dbaccess/inc/strings.hrc:451
 msgctxt "STR_RELATIONDESIGN"
 msgid " - %PRODUCTNAME Base: Relation design"
 msgstr " – %PRODUCTNAME Base: Beziehungsdesign"
 
 #. ZCd5X
-#: dbaccess/inc/strings.hrc:449
+#: dbaccess/inc/strings.hrc:452
 msgctxt "STR_RELATIONDESIGN_NOT_AVAILABLE"
 msgid "The database does not support relations."
 msgstr "Die Datenbank unterstützt keine Relationen."
 
 #. CG2Pd
-#: dbaccess/inc/strings.hrc:450
+#: dbaccess/inc/strings.hrc:453
 msgctxt "STR_QUERY_REL_DELETE_WINDOW"
 msgid "When you delete this table all corresponding relations will be deleted as well. Continue?"
 msgstr "Wenn Sie diese Tabelle löschen werden alle zugehörigen Relationen ebenfalls gelöscht. Fortfahren?"
 
 #. Wzf9T
-#: dbaccess/inc/strings.hrc:451
+#: dbaccess/inc/strings.hrc:454
 msgctxt "STR_QUERY_REL_COULD_NOT_CREATE"
 msgid ""
 "The database could not create the relation. Maybe foreign keys for this kind of table aren't supported.\n"
@@ -2826,67 +2844,67 @@ msgid "Changes the width of the current column, or the selected columns."
 msgstr "Ändert die Breite der aktuellen Spalte oder der ausgewählten Spalten."
 
 #. zBVS9
-#: dbaccess/uiconfig/ui/connectionpage.ui:37
+#: dbaccess/uiconfig/ui/connectionpage.ui:36
 msgctxt "connectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Pfad zu den dBASE-Dateien:"
 
 #. Xmumk
-#: dbaccess/uiconfig/ui/connectionpage.ui:48
+#: dbaccess/uiconfig/ui/connectionpage.ui:51
 msgctxt "connectionpage|create"
 msgid "_Create New"
 msgstr "_Neu erstellen"
 
 #. zvUpu
-#: dbaccess/uiconfig/ui/connectionpage.ui:61
+#: dbaccess/uiconfig/ui/connectionpage.ui:64
 msgctxt "connectionpage|browse"
 msgid "_Browse…"
 msgstr "_Durchsuchen…"
 
 #. PxXFZ
-#: dbaccess/uiconfig/ui/connectionpage.ui:111
+#: dbaccess/uiconfig/ui/connectionpage.ui:115
 msgctxt "connectionpage|generalLabel"
 msgid "General"
 msgstr "Allgemein"
 
 #. BvLEW
-#: dbaccess/uiconfig/ui/connectionpage.ui:147
+#: dbaccess/uiconfig/ui/connectionpage.ui:151
 msgctxt "connectionpage|userNameLabel"
 msgid "_User name:"
 msgstr "_Benutzername:"
 
 #. VM8W3
-#: dbaccess/uiconfig/ui/connectionpage.ui:171
+#: dbaccess/uiconfig/ui/connectionpage.ui:175
 msgctxt "connectionpage|passCheckbutton"
 msgid "Password required"
 msgstr "Kennwort erforderlich"
 
 #. rG2VU
-#: dbaccess/uiconfig/ui/connectionpage.ui:192
+#: dbaccess/uiconfig/ui/connectionpage.ui:196
 msgctxt "connectionpage|userlabel"
 msgid "User Authentication"
 msgstr "Benutzerauthentifizierung"
 
 #. jtAGx
-#: dbaccess/uiconfig/ui/connectionpage.ui:226
+#: dbaccess/uiconfig/ui/connectionpage.ui:230
 msgctxt "connectionpage|javaDriverLabel"
 msgid "_JDBC driver class:"
 msgstr "_JDBC-Treiberklasse:"
 
 #. iv6Vk
-#: dbaccess/uiconfig/ui/connectionpage.ui:252
+#: dbaccess/uiconfig/ui/connectionpage.ui:256
 msgctxt "connectionpage|driverButton"
 msgid "Test Class"
 msgstr "Klasse testen"
 
 #. uzAzE
-#: dbaccess/uiconfig/ui/connectionpage.ui:269
+#: dbaccess/uiconfig/ui/connectionpage.ui:273
 msgctxt "connectionpage|JDBCLabel"
 msgid "JDBC Properties"
 msgstr "JDBC-Eigenschaften"
 
 #. UgDTb
-#: dbaccess/uiconfig/ui/connectionpage.ui:284
+#: dbaccess/uiconfig/ui/connectionpage.ui:288
 msgctxt "connectionpage|connectionButton"
 msgid "Test Connection"
 msgstr "Verbindung testen"
@@ -3024,19 +3042,19 @@ msgid "label"
 msgstr "Beschriftung"
 
 #. hDn8s
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:59
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:58
 msgctxt "dbwizconnectionpage|browseurllabel"
 msgid "Path to the dBASE files:"
 msgstr "Pfad zu den dBASE-Dateien:"
 
 #. AiYtB
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:70
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:73
 msgctxt "dbwizconnectionpage|create"
 msgid "_Create New"
 msgstr "_Neu erstellen"
 
 #. PDgBn
-#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:83
+#: dbaccess/uiconfig/ui/dbwizconnectionpage.ui:86
 msgctxt "dbwizconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Durchsuchen…"
@@ -3667,25 +3685,25 @@ msgid "Path to the dBASE files:"
 msgstr "Pfad zu den dBASE-Dateien:"
 
 #. WuCxz
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:69
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:73
 msgctxt "jdbcconnectionpage|create"
 msgid "_Create New"
 msgstr "_Neu erstellen"
 
 #. D3Tg7
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:82
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:86
 msgctxt "jdbcconnectionpage|browse"
 msgid "_Browse…"
 msgstr "_Durchsuchen…"
 
 #. DDHsx
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:147
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:152
 msgctxt "jdbcconnectionpage|jdbcLabel"
 msgid "JDBC d_river class:"
 msgstr "JDBC-_Treiberklasse:"
 
 #. SfoBB
-#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:179
+#: dbaccess/uiconfig/ui/jdbcconnectionpage.ui:184
 msgctxt "jdbcconnectionpage|jdbcButton"
 msgid "_Test Class"
 msgstr "K_lasse testen"
@@ -4504,7 +4522,7 @@ msgstr "_Automatisch"
 #: dbaccess/uiconfig/ui/rowheightdialog.ui:137
 msgctxt "rowheightdialog|extended_tip|automatic"
 msgid "Adjusts the row height to the size based on the default template. Existing contents may be shown vertically cropped. The height no longer increases automatically when you enter larger contents."
-msgstr "Passt die Zeilenhöhe an die Größe der Standardvorlage an. Existierender Inhalt wird wahrscheinlich vertikal abgeschnitten angezeigt. Die Höhe steigt nicht länger automatisch an, wenn Sie mehr Inhalt eingeben."
+msgstr "Passt die Zeilenhöhe an die Größe der standardmäßigen Dokumentvorlage an. Existierender Inhalt wird wahrscheinlich vertikal abgeschnitten angezeigt. Die Höhe steigt nicht länger automatisch an, wenn Sie mehr Inhalt eingeben."
 
 #. qEa9T
 #: dbaccess/uiconfig/ui/rowheightdialog.ui:168
@@ -5203,37 +5221,25 @@ msgid "User Settings"
 msgstr "Benutzereinstellungen"
 
 #. Jvnnk
-#: dbaccess/uiconfig/ui/useradminpage.ui:41
+#: dbaccess/uiconfig/ui/useradminpage.ui:46
 msgctxt "useradminpage|label3"
 msgid "Us_er:"
 msgstr "_Benutzer:"
 
-#. ZQhyG
-#: dbaccess/uiconfig/ui/useradminpage.ui:78
-msgctxt "useradminpage|add"
-msgid "_Add User..."
-msgstr "Benutzer _hinzufügen…"
-
-#. L7EVW
-#: dbaccess/uiconfig/ui/useradminpage.ui:92
-msgctxt "useradminpage|changepass"
-msgid "Change _Password..."
-msgstr "_Kennwort ändern…"
-
-#. vDFqX
-#: dbaccess/uiconfig/ui/useradminpage.ui:106
-msgctxt "useradminpage|delete"
-msgid "_Delete User..."
-msgstr "Benut_zer löschen…"
+#. DF5YC
+#: dbaccess/uiconfig/ui/useradminpage.ui:70
+msgctxt "templatedlg|action_menu|label"
+msgid "_Manage"
+msgstr "_Verwalten"
 
 #. gMJwT
-#: dbaccess/uiconfig/ui/useradminpage.ui:131
+#: dbaccess/uiconfig/ui/useradminpage.ui:102
 msgctxt "useradminpage|label1"
 msgid "User Selection"
 msgstr "Benutzerauswahl"
 
 #. ADQpm
-#: dbaccess/uiconfig/ui/useradminpage.ui:171
+#: dbaccess/uiconfig/ui/useradminpage.ui:144
 msgctxt "useradminpage|label2"
 msgid "Access Rights for Selected User"
 msgstr "Zugriffsrechte für ausgewählten Benutzer"

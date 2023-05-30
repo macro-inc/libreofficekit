@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbaselection.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include "vbarange.hxx"
 #include "vbafind.hxx"
@@ -60,12 +61,13 @@
 #include "vbastyle.hxx"
 #include <docsh.hxx>
 #include <tblenum.hxx>
+#include <sal/log.hxx>
 #include <fesh.hxx>
 
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaSelection::SwVbaSelection( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< frame::XModel >& rModel ) : SwVbaSelection_BASE( rParent, rContext ), mxModel( rModel )
+SwVbaSelection::SwVbaSelection( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< frame::XModel > xModel ) : SwVbaSelection_BASE( rParent, rContext ), mxModel(std::move( xModel ))
 {
     mxTextViewCursor = word::getXTextViewCursor( mxModel );
 }
@@ -406,7 +408,7 @@ SwVbaSelection::MoveRight(const uno::Any& _unit, const uno::Any& _count, const u
 
     if( nCount < 0 )
     {
-        MoveLeft( _unit, uno::makeAny( -nCount ), _extend );
+        MoveLeft( _unit, uno::Any( -nCount ), _extend );
         return;
     }
 
@@ -425,7 +427,7 @@ SwVbaSelection::MoveLeft(const uno::Any& _unit, const uno::Any& _count, const un
 
     if( nCount < 0 )
     {
-        MoveRight( _unit, uno::makeAny( -nCount ), _extend );
+        MoveRight( _unit, uno::Any( -nCount ), _extend );
         return;
     }
 
@@ -445,7 +447,7 @@ SwVbaSelection::MoveDown(const uno::Any& _unit, const uno::Any& _count, const un
 
     if( nCount < 0 )
     {
-        MoveUp( _unit, uno::makeAny( -nCount ), _extend );
+        MoveUp( _unit, uno::Any( -nCount ), _extend );
         return;
     }
 
@@ -465,7 +467,7 @@ SwVbaSelection::MoveUp(const uno::Any& _unit, const uno::Any& _count, const uno:
 
     if( nCount < 0 )
     {
-        MoveDown( _unit, uno::makeAny( -nCount ), _extend );
+        MoveDown( _unit, uno::Any( -nCount ), _extend );
         return;
     }
 
@@ -518,7 +520,16 @@ uno::Reference< word::XFind > SAL_CALL
 SwVbaSelection::getFind()
 {
     uno::Reference< text::XTextRange > xTextRange = GetSelectedRange();
-    return uno::Reference< word::XFind >( new SwVbaFind( this, mxContext, mxModel, xTextRange ) );
+    uno::Reference< text::XTextRange > xStart = xTextRange->getStart();
+    uno::Reference< text::XTextRange > xEnd = xTextRange->getEnd();
+    uno::Reference< text::XTextRangeCompare > xTRC( xTextRange->getText(), uno::UNO_QUERY_THROW );
+    int n = xTRC->compareRegionStarts( xStart, xEnd);
+    if( n == 0 )
+    {
+        WholeStory();
+        xTextRange = GetSelectedRange();
+    }
+    return SwVbaFind::GetOrCreateFind(this, mxContext, mxModel, xTextRange);
 }
 
 uno::Any SAL_CALL
@@ -815,7 +826,7 @@ SwVbaSelection::Fields( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaFields( mxParent, mxContext, mxModel ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Reference< word::XHeaderFooter > SAL_CALL
@@ -851,7 +862,7 @@ SwVbaSelection::ShapeRange( )
     uno::Reference< drawing::XDrawPageSupplier > xDrawPageSupplier( mxModel, uno::UNO_QUERY_THROW );
     uno::Reference< drawing::XDrawPage > xDrawPage = xDrawPageSupplier->getDrawPage();
     uno::Reference< container::XIndexAccess > xShapesAccess( xShapes, uno::UNO_QUERY_THROW );
-    return uno::makeAny( uno::Reference< msforms::XShapeRange >( new ScVbaShapeRange( this, mxContext, xShapesAccess, xDrawPage, mxModel ) ) );
+    return uno::Any( uno::Reference< msforms::XShapeRange >( new ScVbaShapeRange( this, mxContext, xShapesAccess, xDrawPage, mxModel ) ) );
 }
 
 ::sal_Int32 SAL_CALL SwVbaSelection::getStart()
@@ -908,7 +919,7 @@ uno::Any SAL_CALL SwVbaSelection::Rows( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaRows( this, mxContext, xTextTable, xTextTable->getRows(), nStartRow, nEndRow ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL SwVbaSelection::Columns( const uno::Any& index )
@@ -934,7 +945,7 @@ uno::Any SAL_CALL SwVbaSelection::Columns( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaColumns( this, mxContext, xTextTable, xTextTable->getColumns(), nStartColumn, nEndColumn ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Reference< text::XTextTable > SwVbaSelection::GetXTextTable() const
@@ -1019,7 +1030,7 @@ uno::Any SAL_CALL SwVbaSelection::Cells( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaCells( this, mxContext, xTextTable, nLeft, nTop, nRight, nBottom ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 void SAL_CALL SwVbaSelection::Copy(  )
@@ -1104,11 +1115,8 @@ void SAL_CALL SwVbaSelection::SplitTable()
     SwDocShell* pDocShell = word::getDocShell( mxModel );
     if( pDocShell )
     {
-        SwFEShell* pFEShell = pDocShell->GetFEShell();
-        if( pFEShell )
-        {
+        if (SwFEShell* pFEShell = pDocShell->GetFEShell())
             pFEShell->SplitTable( SplitTable_HeadlineOption::ContentCopy );
-        }
     }
 }
 

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <rtl/ustring.hxx>
 #include <sal/log.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/urlobj.hxx>
 #include "XmlFilterAdaptor.hxx"
 #include <com/sun/star/io/XActiveDataSource.hpp>
@@ -42,6 +42,8 @@
 #include <cppuhelper/supportsservice.hxx>
 #include <unotools/pathoptions.hxx>
 #include <xmloff/xmlimp.hxx>
+
+#include <strings.hrc>
 
 using namespace comphelper;
 using namespace com::sun::star::uno;
@@ -67,7 +69,7 @@ bool XmlFilterAdaptor::importImpl( const Sequence< css::beans::PropertyValue >& 
         utl::MediaDescriptor::PROP_STATUSINDICATOR, Reference< XStatusIndicator >()));
 
     if (xStatusIndicator.is()){
-        xStatusIndicator->start( "Loading :", 4);
+        xStatusIndicator->start(FilterResId(STR_FILTER_DOC_LOADING), 4);
     }
 
     OUString aBaseURI;
@@ -80,18 +82,17 @@ bool XmlFilterAdaptor::importImpl( const Sequence< css::beans::PropertyValue >& 
     }
 
     // create an XProperty set to configure the exporter for pretty printing
-    PropertyMapEntry aImportInfoMap[] =
+    static const PropertyMapEntry aImportInfoMap[] =
     {
         { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(), PropertyAttribute::MAYBEVOID, 0},
         { OUString("BuildId"), 0, ::cppu::UnoType<OUString>::get(), PropertyAttribute::MAYBEVOID, 0 },
         { OUString("DefaultDocumentSettings"), 0,
           ::cppu::UnoType<Sequence<PropertyValue>>::get(), PropertyAttribute::MAYBEVOID, 0 },
-        { OUString(), 0, css::uno::Type(), 0, 0 }
     };
 
     Reference< XPropertySet > xInfoSet(
             GenericPropertySet_CreateInstance( new PropertySetInfo( aImportInfoMap ) ) );
-    xInfoSet->setPropertyValue( "BaseURI", makeAny( aBaseURI ));
+    xInfoSet->setPropertyValue( "BaseURI", Any( aBaseURI ));
 
     OUString aFilterName;
     auto It = aMediaMap.find(OUString("FilterName"));
@@ -101,7 +102,7 @@ bool XmlFilterAdaptor::importImpl( const Sequence< css::beans::PropertyValue >& 
         PropertyValue EmptyDbFieldHidesPara("EmptyDbFieldHidesPara", 0, Any(false),
                                             PropertyState::PropertyState_DIRECT_VALUE);
         Sequence<PropertyValue> aSettings{ EmptyDbFieldHidesPara };
-        xInfoSet->setPropertyValue("DefaultDocumentSettings", makeAny(aSettings));
+        xInfoSet->setPropertyValue("DefaultDocumentSettings", Any(aSettings));
     }
     Sequence< Any > aAnys{ Any(xInfoSet) };
 
@@ -234,7 +235,7 @@ bool XmlFilterAdaptor::exportImpl( const Sequence< css::beans::PropertyValue >& 
         utl::MediaDescriptor::PROP_STATUSINDICATOR, Reference< XStatusIndicator >()));
 
     if (xStatusIndicator.is())
-       xStatusIndicator->start( "Saving :", 3);
+       xStatusIndicator->start(FilterResId(STR_FILTER_DOC_SAVING), 3);
 
     // Set up converter bridge.
     Reference< css::xml::XExportFilter > xConverter(mxContext->getServiceManager()->createInstanceWithContext( udConvertClass, mxContext ), UNO_QUERY);
@@ -280,21 +281,20 @@ bool XmlFilterAdaptor::exportImpl( const Sequence< css::beans::PropertyValue >& 
         }
 
         // create an XProperty set to configure the exporter for pretty printing
-        PropertyMapEntry aImportInfoMap[] =
+        static const PropertyMapEntry aImportInfoMap[] =
          {
              { OUString("UsePrettyPrinting"), 0, cppu::UnoType<sal_Bool>::get(), PropertyAttribute::MAYBEVOID, 0},
              { OUString("ExportTextNumberElement"), 0, cppu::UnoType<sal_Bool>::get(), PropertyAttribute::MAYBEVOID, 0},
              { OUString("BaseURI"), 0, ::cppu::UnoType<OUString>::get(), PropertyAttribute::MAYBEVOID, 0},
-             { OUString(), 0, css::uno::Type(), 0, 0 }
          };
 
         Reference< XPropertySet > xInfoSet(
             GenericPropertySet_CreateInstance( new PropertySetInfo( aImportInfoMap ) ) );
-        xInfoSet->setPropertyValue("UsePrettyPrinting", makeAny( bPrettyPrint ));
+        xInfoSet->setPropertyValue("UsePrettyPrinting", Any( bPrettyPrint ));
         xInfoSet->setPropertyValue(
                         "ExportTextNumberElement",
-                        makeAny( bExportTextNumberElementForListItems ));
-        xInfoSet->setPropertyValue("BaseURI", makeAny( aBaseURI ));
+                        Any( bExportTextNumberElementForListItems ));
+        xInfoSet->setPropertyValue("BaseURI", Any( aBaseURI ));
         Sequence < Any > aAnys{ Any(xConverter), Any(xInfoSet) };
 
         Reference< XExporter > xExporter( mxContext->getServiceManager()->createInstanceWithArgumentsAndContext(

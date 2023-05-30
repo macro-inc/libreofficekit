@@ -78,7 +78,7 @@ static void lcl_CreatePortions(
     uno::Reference< text::XText > const& i_xParentText,
     SwUnoCursor* pUnoCursor,
     FrameClientSortList_t & i_rFrames,
-    const sal_Int32 i_nStartPos, const sal_Int32 i_nEndPos );
+    const sal_Int32 i_nStartPos, const sal_Int32 i_nEndPos, bool bOnlyTextFields );
 
 namespace
 {
@@ -92,16 +92,16 @@ namespace
         BkmType                     nBkmType;
         const SwPosition            aPosition;
 
-        SwXBookmarkPortion_Impl(uno::Reference<text::XTextContent> const& xMark,
-                const BkmType nType, SwPosition const& rPosition)
-        : xBookmark ( xMark )
+        SwXBookmarkPortion_Impl(uno::Reference<text::XTextContent> xMark,
+                const BkmType nType, SwPosition _aPosition)
+        : xBookmark (std::move( xMark ))
         , nBkmType  ( nType )
-        , aPosition ( rPosition )
+        , aPosition (std::move( _aPosition ))
         {
         }
         sal_Int32 getIndex () const
         {
-            return aPosition.nContent.GetIndex();
+            return aPosition.GetContentIndex();
         }
     };
     typedef std::shared_ptr < SwXBookmarkPortion_Impl > SwXBookmarkPortion_ImplSharedPtr;
@@ -128,13 +128,13 @@ namespace
     };
     typedef std::multiset < SwXBookmarkPortion_ImplSharedPtr, BookmarkCompareStruct > SwXBookmarkPortion_ImplList;
 
-    /// Inserts pBkmk to rBkmArr in case it starts or ends at nOwnNode
-    void lcl_FillBookmark(sw::mark::IMark* const pBkmk, const SwNodeIndex& nOwnNode, SwDoc& rDoc, SwXBookmarkPortion_ImplList& rBkmArr)
+    /// Inserts pBkmk to rBkmArr in case it starts or ends at rOwnNode
+    void lcl_FillBookmark(sw::mark::IMark* const pBkmk, const SwNode& rOwnNode, SwDoc& rDoc, SwXBookmarkPortion_ImplList& rBkmArr)
     {
         bool const hasOther = pBkmk->IsExpanded();
 
         const SwPosition& rStartPos = pBkmk->GetMarkStart();
-        if(rStartPos.nNode == nOwnNode)
+        if(rStartPos.GetNode() == rOwnNode)
         {
             // #i109272#: cross reference marks: need special handling!
             ::sw::mark::CrossRefBookmark *const pCrossRefMark(dynamic_cast< ::sw::mark::CrossRefBookmark*>(pBkmk));
@@ -146,10 +146,10 @@ namespace
         }
 
         const SwPosition& rEndPos = pBkmk->GetMarkEnd();
-        if(rEndPos.nNode != nOwnNode)
+        if(rEndPos.GetNode() != rOwnNode)
             return;
 
-        unique_ptr<SwPosition> pCrossRefEndPos;
+        std::optional<SwPosition> oCrossRefEndPos;
         const SwPosition* pEndPos = nullptr;
         ::sw::mark::CrossRefBookmark *const pCrossRefMark(dynamic_cast< ::sw::mark::CrossRefBookmark*>(pBkmk));
         if(hasOther)
@@ -159,9 +159,9 @@ namespace
         else if (pCrossRefMark)
         {
             // Crossrefbookmarks only remember the start position but have to span the whole paragraph
-            pCrossRefEndPos = std::make_unique<SwPosition>(rEndPos);
-            pCrossRefEndPos->nContent = pCrossRefEndPos->nNode.GetNode().GetTextNode()->Len();
-            pEndPos = pCrossRefEndPos.get();
+            SwTextNode& rEndNd = *rEndPos.GetNode().GetTextNode();
+            oCrossRefEndPos.emplace(rEndNd, rEndNd.Len());
+            pEndPos = &*oCrossRefEndPos;
         }
         if(pEndPos)
         {
@@ -177,12 +177,11 @@ namespace
         if(!pMarkAccess->getBookmarksCount())
             return;
 
-        const SwNodeIndex nOwnNode = rUnoCursor.GetPoint()->nNode;
-        SwTextNode* pTextNode = nOwnNode.GetNode().GetTextNode();
+        SwTextNode* pTextNode = rUnoCursor.GetPoint()->GetNode().GetTextNode();
         assert(pTextNode);
         // A text node already knows its marks via its SwIndexes.
         o3tl::sorted_vector<const sw::mark::IMark*> aSeenMarks;
-        for (const SwIndex* pIndex = pTextNode->GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
+        for (const SwContentIndex* pIndex = pTextNode->GetFirstIndex(); pIndex; pIndex = pIndex->GetNext())
         {
             // Need a non-cost mark here, as we'll create a UNO wrapper around it.
             sw::mark::IMark* pBkmk = const_cast<sw::mark::IMark*>(pIndex->GetMark());
@@ -196,7 +195,7 @@ namespace
             // Only handle bookmarks once, if they start and end at this node as well.
             if (!aSeenMarks.insert(pBkmk).second)
                 continue;
-            lcl_FillBookmark(pBkmk, nOwnNode, rDoc, rBkmArr);
+            lcl_FillBookmark(pBkmk, *pTextNode, rDoc, rBkmArr);
         }
     }
 
@@ -207,16 +206,16 @@ namespace
         const SwPosition maPosition;
 
         SwAnnotationStartPortion_Impl(
-            uno::Reference< text::XTextField > const& xAnnotationField,
-            SwPosition const& rPosition)
-        : mxAnnotationField ( xAnnotationField )
-        , maPosition ( rPosition )
+            uno::Reference< text::XTextField > xAnnotationField,
+            SwPosition aPosition)
+        : mxAnnotationField (std::move( xAnnotationField ))
+        , maPosition (std::move( aPosition ))
         {
         }
 
         sal_Int32 getIndex () const
         {
-            return maPosition.nContent.GetIndex();
+            return maPosition.GetContentIndex();
         }
     };
     typedef std::shared_ptr < SwAnnotationStartPortion_Impl > SwAnnotationStartPortion_ImplSharedPtr;
@@ -243,13 +242,13 @@ namespace
         }
 
         // no need to consider annotation marks starting after aEndOfPara
-        SwPosition aEndOfPara(*rUnoCursor.GetPoint());
-        aEndOfPara.nContent = aEndOfPara.nNode.GetNode().GetTextNode()->Len();
+        SwContentNode& rPtNd = *rUnoCursor.GetPoint()->GetNode().GetContentNode();
+        SwPosition aEndOfPara( rPtNd, rPtNd.Len() );
         const IDocumentMarkAccess::const_iterator_t pCandidatesEnd =
             pMarkAccess->findFirstAnnotationStartsAfter(aEndOfPara);
 
         // search for all annotation marks that have its start position in this paragraph
-        const SwNodeIndex nOwnNode = rUnoCursor.GetPoint()->nNode;
+        const SwNode& rOwnNode = rUnoCursor.GetPoint()->GetNode();
         for( IDocumentMarkAccess::const_iterator_t ppMark = pMarkAccess->getAnnotationMarksBegin();
              ppMark != pCandidatesEnd;
              ++ppMark )
@@ -261,7 +260,7 @@ namespace
                 continue;
 
             const SwPosition& rStartPos = pAnnotationMark->GetMarkStart();
-            if (rStartPos.nNode != nOwnNode)
+            if (rStartPos.GetNode() != rOwnNode)
                 continue;
 
             const SwFormatField* pAnnotationFormatField = pAnnotationMark->GetAnnotationFormatField();
@@ -312,18 +311,19 @@ SwXTextPortionEnumeration::SwXTextPortionEnumeration(
         SwPaM& rParaCursor,
         uno::Reference< XText > const & xParentText,
         const sal_Int32 nStart,
-        const sal_Int32 nEnd )
+        const sal_Int32 nEnd,
+        bool bOnlyTextFields)
 {
     m_pUnoCursor = rParaCursor.GetDoc().CreateUnoCursor(*rParaCursor.GetPoint());
 
     OSL_ENSURE(nEnd == -1 || (nStart <= nEnd &&
-        nEnd <= m_pUnoCursor->Start()->nNode.GetNode().GetTextNode()->GetText().getLength()),
+        nEnd <= m_pUnoCursor->Start()->GetNode().GetTextNode()->GetText().getLength()),
             "start or end value invalid!");
 
     // find all frames, graphics and OLEs that are bound AT character in para
     FrameClientSortList_t frames;
-    ::CollectFrameAtNode(m_pUnoCursor->GetPoint()->nNode, frames, true);
-    lcl_CreatePortions(m_Portions, xParentText, &*m_pUnoCursor, frames, nStart, nEnd);
+    ::CollectFrameAtNode(m_pUnoCursor->GetPoint()->GetNode(), frames, true);
+    lcl_CreatePortions(m_Portions, xParentText, &*m_pUnoCursor, frames, nStart, nEnd, bOnlyTextFields);
 }
 
 SwXTextPortionEnumeration::SwXTextPortionEnumeration(
@@ -337,7 +337,11 @@ SwXTextPortionEnumeration::SwXTextPortionEnumeration(
 SwXTextPortionEnumeration::~SwXTextPortionEnumeration()
 {
     SolarMutexGuard aGuard;
-    m_pUnoCursor.reset(nullptr);
+    if( m_pUnoCursor )
+    {
+        m_pUnoCursor->GetDoc().cleanupUnoCursorTable();
+        m_pUnoCursor.reset(nullptr);
+    }
 }
 
 sal_Bool SwXTextPortionEnumeration::hasMoreElements()
@@ -365,7 +369,7 @@ lcl_FillFieldMarkArray(std::deque<sal_Int32> & rFieldMarks, SwUnoCursor const & 
         const sal_Int32 i_nStartPos)
 {
     const SwTextNode * const pTextNode =
-        rUnoCursor.GetPoint()->nNode.GetNode().GetTextNode();
+        rUnoCursor.GetPoint()->GetNode().GetTextNode();
     if (!pTextNode) return;
 
     const sal_Unicode fld[] = {
@@ -387,8 +391,8 @@ lcl_ExportFieldMark(
     uno::Reference<text::XTextRange> xRef;
     SwDoc& rDoc = pUnoCursor->GetDoc();
     // maybe it's a good idea to add a special hint to the hints array and rely on the hint segmentation...
-    const sal_Int32 start = pUnoCursor->Start()->nContent.GetIndex();
-    OSL_ENSURE(pUnoCursor->End()->nContent.GetIndex() == start,
+    const sal_Int32 start = pUnoCursor->Start()->GetContentIndex();
+    OSL_ENSURE(pUnoCursor->End()->GetContentIndex() == start,
                "hmm --- why is this different");
 
     pUnoCursor->Right(1);
@@ -676,8 +680,8 @@ struct SwXRedlinePortion_Impl
 
     sal_Int32 getRealIndex () const
     {
-        return m_bStart ? m_pRedline->Start()->nContent.GetIndex()
-                        : m_pRedline->End()  ->nContent.GetIndex();
+        return m_bStart ? m_pRedline->Start()->GetContentIndex()
+                        : m_pRedline->End()  ->GetContentIndex();
     }
 };
 
@@ -1070,7 +1074,7 @@ static void lcl_MoveCursor( SwUnoCursor * const pUnoCursor,
     const sal_Int32 nNextMarkIndex,
     const sal_Int32 nEndPos )
 {
-    sal_Int32 nMovePos = pUnoCursor->GetContentNode()->Len();
+    sal_Int32 nMovePos = pUnoCursor->GetPointContentNode()->Len();
 
     if ((nEndPos >= 0) && (nEndPos < nMovePos))
     {
@@ -1099,7 +1103,7 @@ static void lcl_MoveCursor( SwUnoCursor * const pUnoCursor,
 
     if (nMovePos > nCurrentIndex)
     {
-        pUnoCursor->GetPoint()->nContent = nMovePos;
+        pUnoCursor->GetPoint()->SetContent( nMovePos );
     }
 }
 
@@ -1115,17 +1119,17 @@ static void lcl_FillRedlineArray(
         return;
 
     const SwPosition* pStart = rUnoCursor.GetPoint();
-    const SwNodeIndex nOwnNode = pStart->nNode;
+    const SwNode& rOwnNode = pStart->GetNode();
 
-    for(size_t nRed = 0; nRed < nRedTableCount; ++nRed)
+    SwRedlineTable::size_type nRed = rDoc.getIDocumentRedlineAccess().GetRedlinePos(rOwnNode, RedlineType::Any);
+    for(; nRed < nRedTableCount; ++nRed)
     {
         const SwRangeRedline* pRedline = rRedTable[nRed];
-        const SwPosition* pRedStart = pRedline->Start();
-        const SwNodeIndex nRedNode = pRedStart->nNode;
-        if ( nOwnNode == nRedNode )
+        auto [pRedStart, pRedEnd]= pRedline->StartEnd();
+        if ( rOwnNode == pRedStart->GetNode() )
             rRedArr.insert( std::make_shared<SwXRedlinePortion_Impl>(
                 pRedline, true ) );
-        if( pRedline->HasMark() && pRedline->End()->nNode == nOwnNode )
+        if( pRedline->HasMark() && pRedEnd->GetNode() == rOwnNode )
             rRedArr.insert( std::make_shared<SwXRedlinePortion_Impl>(
                 pRedline, false ) );
     }
@@ -1136,7 +1140,7 @@ static void lcl_FillSoftPageBreakArray(
     SwSoftPageBreakList& rBreakArr )
 {
     const SwTextNode *pTextNode =
-        rUnoCursor.GetPoint()->nNode.GetNode().GetTextNode();
+        rUnoCursor.GetPoint()->GetNode().GetTextNode();
     if( pTextNode )
         pTextNode->fillSoftPageBreakList( rBreakArr );
 }
@@ -1266,11 +1270,10 @@ static void lcl_ExtractFramePositions(FrameClientSortList_t& rFrames, sal_Int32 
 
         auto& rFormat = *const_cast<SwFrameFormat*>(pFrame);
         const SwFormatAnchor& rAnchor = rFormat.GetAnchor();
-        const SwPosition* pPosition = rAnchor.GetContentAnchor();
-        if (!pPosition)
+        if (!rAnchor.GetAnchorNode())
             continue;
 
-        rFramePositions.insert(pPosition->nContent.GetIndex());
+        rFramePositions.insert(rAnchor.GetAnchorContentOffset());
     }
 }
 
@@ -1340,18 +1343,19 @@ static void lcl_CreatePortions(
         SwUnoCursor * const pUnoCursor,
         FrameClientSortList_t & i_rFrames,
         const sal_Int32 i_nStartPos,
-        const sal_Int32 i_nEndPos )
+        const sal_Int32 i_nEndPos,
+        bool bOnlyTextFields )
 {
     if (!pUnoCursor)
         return;
 
     // set the start if a selection should be exported
     if ((i_nStartPos > 0) &&
-        (pUnoCursor->Start()->nContent.GetIndex() != i_nStartPos))
+        (pUnoCursor->Start()->GetContentIndex() != i_nStartPos))
     {
         pUnoCursor->DeleteMark();
-        OSL_ENSURE(pUnoCursor->Start()->nNode.GetNode().GetTextNode() &&
-            (i_nStartPos <= pUnoCursor->Start()->nNode.GetNode().GetTextNode()->
+        OSL_ENSURE(pUnoCursor->Start()->GetNode().GetTextNode() &&
+            (i_nStartPos <= pUnoCursor->Start()->GetNode().GetTextNode()->
                         GetText().getLength()), "Incorrect start position" );
         // ??? should this be i_nStartPos - current position ?
         pUnoCursor->Right(i_nStartPos);
@@ -1360,19 +1364,24 @@ static void lcl_CreatePortions(
     SwDoc& rDoc = pUnoCursor->GetDoc();
 
     std::deque<sal_Int32> FieldMarks;
-    lcl_FillFieldMarkArray(FieldMarks, *pUnoCursor, i_nStartPos);
+    if (!bOnlyTextFields)
+        lcl_FillFieldMarkArray(FieldMarks, *pUnoCursor, i_nStartPos);
 
     SwXBookmarkPortion_ImplList Bookmarks;
-    lcl_FillBookmarkArray(rDoc, *pUnoCursor, Bookmarks);
+    if (!bOnlyTextFields)
+        lcl_FillBookmarkArray(rDoc, *pUnoCursor, Bookmarks);
 
     SwXRedlinePortion_ImplList Redlines;
-    lcl_FillRedlineArray(rDoc, *pUnoCursor, Redlines);
+    if (!bOnlyTextFields)
+        lcl_FillRedlineArray(rDoc, *pUnoCursor, Redlines);
 
     SwSoftPageBreakList SoftPageBreaks;
-    lcl_FillSoftPageBreakArray(*pUnoCursor, SoftPageBreaks);
+    if (!bOnlyTextFields)
+        lcl_FillSoftPageBreakArray(*pUnoCursor, SoftPageBreaks);
 
     SwAnnotationStartPortion_ImplList AnnotationStarts;
-    lcl_FillAnnotationStartArray( rDoc, *pUnoCursor, AnnotationStarts );
+    if (!bOnlyTextFields)
+        lcl_FillAnnotationStartArray( rDoc, *pUnoCursor, AnnotationStarts );
 
     PortionStack_t PortionStack;
     PortionStack.push( PortionList_t(&i_rPortions, nullptr) );
@@ -1386,7 +1395,7 @@ static void lcl_CreatePortions(
             pUnoCursor->DeleteMark();
         }
 
-        SwTextNode * const pTextNode = pUnoCursor->GetNode().GetTextNode();
+        SwTextNode * const pTextNode = pUnoCursor->GetPointNode().GetTextNode();
         if (!pTextNode)
         {
             OSL_FAIL("lcl_CreatePortions: no TextNode - what now ?");
@@ -1395,7 +1404,7 @@ static void lcl_CreatePortions(
 
         SwpHints * const pHints = pTextNode->GetpSwpHints();
         const sal_Int32 nCurrentIndex =
-            pUnoCursor->GetPoint()->nContent.GetIndex();
+            pUnoCursor->GetPoint()->GetContentIndex();
         // this contains the portion which consumes the character in the
         // text at nCurrentIndex; i.e. it must be set _once_ per iteration
         uno::Reference< XTextRange > xRef;
@@ -1503,6 +1512,26 @@ static void lcl_CreatePortions(
             // special case: for an empty paragraph, we better put out a
             // text portion because there may be a hyperlink attribute
             xRef = new SwXTextPortion(pUnoCursor, i_xParentText, PORTION_TEXT);
+        }
+        else if (bAtEnd && !xRef.is() && pHints)
+        {
+            // See if there is an empty autofmt at the paragraph end. If so, export it, since that
+            // affects the formatting of number portions.
+            for (size_t i = 0; i < pHints->Count(); ++i)
+            {
+                const SwTextAttr* pHint = pHints->GetSortedByEnd(i);
+                if (pHint->GetStart() < pTextNode->Len())
+                {
+                    break;
+                }
+                if (pHint->Which() == RES_TXTATR_AUTOFMT && pHint->GetEnd()
+                    && pHint->GetStart() == *pHint->GetEnd()
+                    && pHint->GetStart() == pTextNode->Len())
+                {
+                    xRef = new SwXTextPortion(pUnoCursor, i_xParentText, PORTION_TEXT);
+                    break;
+                }
+            }
         }
 
         if (xRef.is())

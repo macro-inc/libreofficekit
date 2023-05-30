@@ -7,7 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/calc_unoapi_test.hxx>
+#include <test/unoapi_test.hxx>
 #include <test/beans/xpropertyset.hxx>
 #include <test/lang/xserviceinfo.hxx>
 #include <test/sheet/tablevalidation.hxx>
@@ -30,7 +30,7 @@ using namespace com::sun::star;
 
 namespace sc_apitest
 {
-class ScTableValidationObj : public CalcUnoApiTest,
+class ScTableValidationObj : public UnoApiTest,
                              public apitest::TableValidation,
                              public apitest::XMultiFormulaTokens,
                              public apitest::XPropertySet,
@@ -42,7 +42,6 @@ public:
 
     virtual uno::Reference<uno::XInterface> init() override;
     virtual void setUp() override;
-    virtual void tearDown() override;
 
     CPPUNIT_TEST_SUITE(ScTableValidationObj);
 
@@ -72,13 +71,10 @@ public:
     CPPUNIT_TEST(testGetSetSourcePosition);
 
     CPPUNIT_TEST_SUITE_END();
-
-private:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
 ScTableValidationObj::ScTableValidationObj()
-    : CalcUnoApiTest("/sc/qa/extras/testdocuments")
+    : UnoApiTest("/sc/qa/extras/testdocuments")
     , XPropertySet({ "Type", "ErrorAlertStyle" })
     , XServiceInfo("ScTableValidationObj", "com.sun.star.sheet.TableValidation")
 {
@@ -104,15 +100,9 @@ uno::Reference<uno::XInterface> ScTableValidationObj::init()
 
 void ScTableValidationObj::setUp()
 {
-    CalcUnoApiTest::setUp();
+    UnoApiTest::setUp();
     // create a calc document
     mxComponent = loadFromDesktop("private:factory/scalc");
-}
-
-void ScTableValidationObj::tearDown()
-{
-    closeDocument(mxComponent);
-    CalcUnoApiTest::tearDown();
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ScTableValidationObj);

@@ -32,15 +32,17 @@
 #include <iostream>
 #endif
 #include <connectivity/PColumn.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <TConnection.hxx>
 #include <comphelper/types.hxx>
 #include <connectivity/dbmetadata.hxx>
 #include <com/sun/star/sdb/SQLFilterOperator.hpp>
+#include <o3tl/safeint.hxx>
 #include <sal/log.hxx>
 
 #include <iterator>
 #include <memory>
+#include <utility>
 
 using namespace ::comphelper;
 using namespace ::connectivity;
@@ -119,9 +121,9 @@ namespace connectivity
         OUString                         m_sForbiddenQueryName;
 
     public:
-        ForbidQueryName( OSQLParseTreeIteratorImpl& _rIteratorImpl, const OUString& _rForbiddenQueryName )
+        ForbidQueryName( OSQLParseTreeIteratorImpl& _rIteratorImpl, OUString _aForbiddenQueryName )
             :m_rpAllForbiddenNames( _rIteratorImpl.m_pForbiddenQueryNames )
-            ,m_sForbiddenQueryName( _rForbiddenQueryName )
+            ,m_sForbiddenQueryName(std::move( _aForbiddenQueryName ))
         {
             if ( !m_rpAllForbiddenNames )
                 m_rpAllForbiddenNames = std::make_shared<QueryNameSet>();
@@ -274,7 +276,7 @@ namespace
             sComposedName.clear();
 
             Reference< XResultSet> xRes = _rxDBMeta->getTables(
-                !_rCatalog.isEmpty() ? makeAny( _rCatalog ) : Any(), !_rSchema.isEmpty() ? _rSchema : s_sWildcard, _rTableName, sTableTypes );
+                !_rCatalog.isEmpty() ? Any( _rCatalog ) : Any(), !_rSchema.isEmpty() ? _rSchema : s_sWildcard, _rTableName, sTableTypes );
 
             Reference< XRow > xCurrentRow( xRes, UNO_QUERY );
             if ( xCurrentRow.is() && xRes->next() )
@@ -823,7 +825,6 @@ void OSQLParseTreeIterator::traverseCreateColumns(const OSQLParseNode* pSelectNo
                 pColumn->setFunction(false);
                 pColumn->setRealName(aColumnName);
 
-                Reference< XPropertySet> xCol = pColumn;
                 m_aCreateColumns->push_back(pColumn);
             }
         }
@@ -1759,7 +1760,7 @@ void OSQLParseTreeIterator::setOrderByColumnName(const OUString & rColumnName, O
     else
     {
         sal_Int32 nId = rColumnName.toInt32();
-        if ( nId > 0 && nId < static_cast<sal_Int32>(m_aSelectColumns->size()) )
+        if ( nId > 0 && o3tl::make_unsigned(nId) < m_aSelectColumns->size() )
             m_aOrderColumns->push_back( new OOrderColumn( (*m_aSelectColumns)[nId-1], isCaseSensitive(), bAscending ) );
     }
 
@@ -1780,7 +1781,7 @@ void OSQLParseTreeIterator::setGroupByColumnName(const OUString & rColumnName, O
     else
     {
         sal_Int32 nId = rColumnName.toInt32();
-        if ( nId > 0 && nId < static_cast<sal_Int32>(m_aSelectColumns->size()) )
+        if ( nId > 0 && o3tl::make_unsigned(nId) < m_aSelectColumns->size() )
             m_aGroupColumns->push_back(new OParseColumn((*m_aSelectColumns)[nId-1],isCaseSensitive()));
     }
 

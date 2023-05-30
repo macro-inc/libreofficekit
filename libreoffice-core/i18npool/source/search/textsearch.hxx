@@ -26,6 +26,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 #include <unicode/regex.h>
 #include <unicode/unistr.h>
@@ -37,8 +38,6 @@ namespace com::sun::star::i18n { class XExtendedTransliteration; }
 namespace com::sun::star::uno { class XComponentContext; }
 
 
-typedef U_ICU_NAMESPACE::UnicodeString IcuUniString;
-
 class WLevDistance;
 typedef ::std::map< sal_Unicode, sal_Int32 > TextSearchJumpTable;
 
@@ -48,7 +47,7 @@ class TextSearch: public cppu::WeakImplHelper
     css::lang::XServiceInfo
 >
 {
-    osl::Mutex m_aMutex;
+    std::mutex m_aMutex;
     css::uno::Reference < css::uno::XComponentContext > m_xContext;
 
     css::util::SearchOptions2 aSrchPara;
@@ -130,10 +129,6 @@ class TextSearch: public cppu::WeakImplHelper
                                 sal_Int32 startPos, sal_Int32 endPos );
 
     bool IsDelimiter( const OUString& rStr, sal_Int32 nPos ) const;
-
-    bool checkCTLStart, checkCTLEnd;
-    /// @throws css::uno::RuntimeException
-    bool isCellStart(const OUString& searchStr, sal_Int32 nPos);
 
 public:
     explicit TextSearch(

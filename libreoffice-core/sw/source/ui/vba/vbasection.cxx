@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 #include "vbasection.hxx"
+#include <utility>
 #include <vbahelper/vbahelper.hxx>
 #include "vbapagesetup.hxx"
 #include "vbaheadersfooters.hxx"
@@ -24,8 +25,8 @@
 using namespace ::ooo::vba;
 using namespace ::com::sun::star;
 
-SwVbaSection::SwVbaSection( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, const uno::Reference< frame::XModel >& xModel, const uno::Reference< beans::XPropertySet >& xProps ) :
-    SwVbaSection_BASE( rParent, rContext ), mxModel( xModel ), mxPageProps( xProps )
+SwVbaSection::SwVbaSection( const uno::Reference< ooo::vba::XHelperInterface >& rParent, const uno::Reference< uno::XComponentContext >& rContext, uno::Reference< frame::XModel >  xModel, uno::Reference< beans::XPropertySet >  xProps ) :
+    SwVbaSection_BASE( rParent, rContext ), mxModel(std::move( xModel )), mxPageProps(std::move( xProps ))
 {
 }
 
@@ -47,7 +48,7 @@ uno::Any SAL_CALL SwVbaSection::Headers( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaHeadersFooters( this, mxContext, mxModel, mxPageProps, true ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL SwVbaSection::Footers( const uno::Any& index )
@@ -55,13 +56,13 @@ uno::Any SAL_CALL SwVbaSection::Footers( const uno::Any& index )
     uno::Reference< XCollection > xCol( new SwVbaHeadersFooters( this, mxContext, mxModel, mxPageProps, false ) );
     if ( index.hasValue() )
         return xCol->Item( index, uno::Any() );
-    return uno::makeAny( xCol );
+    return uno::Any( xCol );
 }
 
 uno::Any SAL_CALL
 SwVbaSection::PageSetup( )
 {
-    return uno::makeAny( uno::Reference< word::XPageSetup >( new SwVbaPageSetup( this, mxContext, mxModel, mxPageProps ) ) );
+    return uno::Any( uno::Reference< word::XPageSetup >( new SwVbaPageSetup( this, mxContext, mxModel, mxPageProps ) ) );
 }
 
 OUString

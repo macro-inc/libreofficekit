@@ -578,7 +578,7 @@ void SbiImage::MakeStrings( short nSize )
 // growing in 1K-Steps
 void SbiImage::AddString( const OUString& r )
 {
-    if( nStringIdx >= short(mvStringOffsets.size()) )
+    if( nStringIdx >= mvStringOffsets.size() )
     {
         bError = true;
     }
@@ -606,7 +606,7 @@ void SbiImage::AddString( const OUString& r )
         memcpy( pStrings.get() + nStringOff, r.getStr(), len * sizeof( sal_Unicode ) );
         nStringOff = nStringOff + len;
         // Last String? The update the size of the buffer
-        if( nStringIdx >= short(mvStringOffsets.size()) )
+        if( nStringIdx >= mvStringOffsets.size() )
         {
             nStringSize = nStringOff;
         }
@@ -643,14 +643,14 @@ void SbiImage::AddEnum(SbxObject* pObject) // Register enum type
 }
 
 // Note: IDs start with 1
-OUString SbiImage::GetString( short nId, SbxDataType *eType ) const
+OUString SbiImage::GetString( sal_uInt32 nId, SbxDataType *eType ) const
 {
-    if( nId && nId <= short(mvStringOffsets.size()) )
+    if( nId && nId <= mvStringOffsets.size() )
     {
         sal_uInt32 nOff = mvStringOffsets[ nId - 1 ];
         sal_Unicode* pStr = pStrings.get() + nOff;
 
-        sal_uInt32 nNextOff = (nId < short(mvStringOffsets.size())) ? mvStringOffsets[ nId ] : nStringSize;
+        sal_uInt32 nNextOff = (nId < mvStringOffsets.size()) ? mvStringOffsets[ nId ] : nStringSize;
         sal_uInt32 nLen = nNextOff - nOff - 1;
         // #i42467: Special treatment for vbNullChar
         if (*pStr == 0)

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <svl/setitem.hxx>
 #include <svl/itemset.hxx>
 #include <svl/languageoptions.hxx>
@@ -26,7 +28,6 @@
 #include <editeng/svxenum.hxx>
 #include "scdllapi.h"
 #include "fonthelper.hxx"
-#include <memory>
 
 namespace vcl { class Font; }
 class OutputDevice;
@@ -61,11 +62,12 @@ public:
                             ScPatternAttr(SfxItemPool* pItemPool);
                             ScPatternAttr(const ScPatternAttr& rPatternAttr);
 
-                            virtual ~ScPatternAttr() override;
-
     virtual ScPatternAttr*  Clone( SfxItemPool *pPool = nullptr ) const override;
 
     virtual bool            operator==(const SfxPoolItem& rCmp) const override;
+    // Class cannot be IsSortable() because it's mutable, implement at least Lookup().
+    virtual bool            HasLookup() const override { return true; }
+    virtual lookup_iterator Lookup(lookup_iterator begin, lookup_iterator end ) const override;
 
     const SfxPoolItem&      GetItem( sal_uInt16 nWhichP ) const
                                         { return GetItemSet().Get(nWhichP); }
@@ -144,6 +146,14 @@ public:
 
     void                    SetKey(sal_uInt64 nKey);
     sal_uInt64              GetKey() const;
+
+    static std::optional<bool> FastEqualPatternSets( const SfxItemSet& rSet1, const SfxItemSet& rSet2 );
+
+    // TODO: tdf#135215: This is a band-aid to detect changes and invalidate the hash,
+    // a proper way would be probably to override SfxItemSet::Changed(), but 6cb400f41df0dd10
+    // hardcoded SfxSetItem to contain SfxItemSet.
+    SfxItemSet& GetItemSet() { mxHashCode.reset(); return SfxSetItem::GetItemSet(); }
+    using SfxSetItem::GetItemSet;
 
 private:
     void                    CalcHashCode() const;

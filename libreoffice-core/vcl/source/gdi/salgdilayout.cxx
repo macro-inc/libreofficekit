@@ -23,15 +23,14 @@
 #include <config_features.h>
 #include <sal/log.hxx>
 #include <font/PhysicalFontFace.hxx>
-#include <fontsubset.hxx>
 #include <salgdi.hxx>
 #include <salframe.hxx>
-#include <sft.hxx>
 #include <basegfx/matrix/b2dhommatrix.hxx>
 #include <basegfx/matrix/b2dhommatrixtools.hxx>
 #include <FileDefinitionWidgetDraw.hxx>
 #include <rtl/math.hxx>
 #include <comphelper/lok.hxx>
+#include <toolbarvalue.hxx>
 
 // The only common SalFrame method
 
@@ -42,8 +41,8 @@ SalFrameGeometry SalFrame::GetGeometry() const
     if( pParent && AllSettings::GetLayoutRTL() )
     {
         SalFrameGeometry aGeom = maGeometry;
-        int parent_x = aGeom.nX - pParent->maGeometry.nX;
-        aGeom.nX = pParent->maGeometry.nX + pParent->maGeometry.nWidth - maGeometry.nWidth - parent_x;
+        const int nParentX = aGeom.x() - pParent->maGeometry.x();
+        aGeom.setX(pParent->maGeometry.x() + pParent->maGeometry.width() - maGeometry.width() - nParentX);
         return aGeom;
     }
     else
@@ -52,11 +51,9 @@ SalFrameGeometry SalFrame::GetGeometry() const
 
 SalGraphics::SalGraphics()
 :   m_nLayout( SalLayoutFlags::NONE ),
-    m_aLastMirrorW(0),
-    m_nLastMirrorDeviceLTRButBiDiRtlTranslate(0),
-    m_bLastMirrorDeviceLTRButBiDiRtlSet(false),
-    m_bAntiAlias(false),
-    m_bTextRenderModeForResolutionIndependentLayout(false)
+    m_eLastMirrorMode(MirrorMode::NONE),
+    m_nLastMirrorTranslation(0),
+    m_bAntiAlias(false)
 {
     // read global RTL settings
     if( AllSettings::GetLayoutRTL() )
@@ -270,50 +267,90 @@ basegfx::B2DPolyPolygon SalGraphics::mirror( const basegfx::B2DPolyPolygon& i_rP
     }
 }
 
+SalGraphics::MirrorMode SalGraphics::GetMirrorMode(const OutputDevice& rOutDev) const
+{
+    if (rOutDev.ImplIsAntiparallel())
+    {
+        if (m_nLayout & SalLayoutFlags::BiDiRtl)
+            return MirrorMode::AntiparallelBiDi;
+        else
+            return MirrorMode::Antiparallel;
+    }
+    else if (m_nLayout & SalLayoutFlags::BiDiRtl)
+        return MirrorMode::BiDi;
+    return MirrorMode::NONE;
+}
+
 const basegfx::B2DHomMatrix& SalGraphics::getMirror( const OutputDevice& i_rOutDev ) const
 {
     // get mirroring transformation
-    const tools::Long w = GetDeviceWidth(i_rOutDev);
-    SAL_WARN_IF( !w, "vcl", "missing graphics width" );
+    MirrorMode eNewMirrorMode = GetMirrorMode(i_rOutDev);
+    tools::Long nTranslate(0);
 
-    const bool bMirrorDeviceLTRButBiDiRtlSet = !i_rOutDev.IsRTLEnabled();
-    tools::Long nMirrorDeviceLTRButBiDiRtlTranslate(0);
-    if (bMirrorDeviceLTRButBiDiRtlSet)
-        nMirrorDeviceLTRButBiDiRtlTranslate = w - i_rOutDev.GetOutputWidthPixel() - (2 * i_rOutDev.GetOutOffXPixel());
-
-    // if the device width, or mirror state of the device changed, then m_aLastMirror is invalid
-    bool bLastMirrorValid = w == m_aLastMirrorW && bMirrorDeviceLTRButBiDiRtlSet == m_bLastMirrorDeviceLTRButBiDiRtlSet;
-    if (bLastMirrorValid && bMirrorDeviceLTRButBiDiRtlSet)
+    switch (eNewMirrorMode)
     {
-        // if the device is in the unusual mode of a LTR device, but layout flags of SalLayoutFlags::BiDiRtl are
-        // in use, then the m_aLastMirror is invalid if the distance it should translate has changed
-        bLastMirrorValid = nMirrorDeviceLTRButBiDiRtlTranslate == m_nLastMirrorDeviceLTRButBiDiRtlTranslate;
+        case MirrorMode::AntiparallelBiDi:
+        {
+            const tools::Long w = GetDeviceWidth(i_rOutDev);
+            SAL_WARN_IF(!w, "vcl", "missing graphics width");
+            nTranslate = w - i_rOutDev.GetOutputWidthPixel() - (2 * i_rOutDev.GetOutOffXPixel());
+            break;
+        }
+        case MirrorMode::Antiparallel:
+        {
+            nTranslate = i_rOutDev.GetOutputWidthPixel() + (2 * i_rOutDev.GetOutOffXPixel()) - 1;
+            break;
+        }
+        case MirrorMode::BiDi:
+        {
+            const tools::Long w = GetDeviceWidth(i_rOutDev);
+            SAL_WARN_IF(!w, "vcl", "missing graphics width");
+            nTranslate = w - 1;
+            break;
+        }
+        case MirrorMode::NONE:
+            break;
     }
 
+    // if the translation (due to device width), or mirror state of the device changed, then m_aLastMirror is invalid
+    bool bLastMirrorValid = eNewMirrorMode == m_eLastMirrorMode && nTranslate == m_nLastMirrorTranslation;
     if (!bLastMirrorValid)
     {
-        const_cast<SalGraphics*>(this)->m_aLastMirrorW = w;
-        const_cast<SalGraphics*>(this)->m_bLastMirrorDeviceLTRButBiDiRtlSet = bMirrorDeviceLTRButBiDiRtlSet;
-        const_cast<SalGraphics*>(this)->m_nLastMirrorDeviceLTRButBiDiRtlTranslate = nMirrorDeviceLTRButBiDiRtlTranslate;
+        const_cast<SalGraphics*>(this)->m_nLastMirrorTranslation = nTranslate;
+        const_cast<SalGraphics*>(this)->m_eLastMirrorMode = eNewMirrorMode;
 
-        if(w)
+        switch (eNewMirrorMode)
         {
-            if (bMirrorDeviceLTRButBiDiRtlSet)
+            // mirror this window back
+            case MirrorMode::AntiparallelBiDi:
             {
                 /* This path gets exercised in calc's RTL UI (e.g. SAL_RTL_ENABLED=1)
                    with its LTR horizontal scrollbar */
 
                 // Original code was:
-                //      // mirror this window back
                 //      double devX = w-i_rOutDev.GetOutputWidthPixel()-i_rOutDev.GetOutOffXPixel();   // re-mirrored mnOutOffX
                 //      aRet.setX( devX + (i_rPoint.getX() - i_rOutDev.GetOutOffXPixel()) );
-                // I do not really understand the comment 'mirror this window back', so cannot guarantee
-                // that this works as before, but I have reduced this (by re-placing and re-formatting) to
-                // a simple translation:
                 const_cast<SalGraphics*>(this)->m_aLastMirror = basegfx::utils::createTranslateB2DHomMatrix(
-                    nMirrorDeviceLTRButBiDiRtlTranslate, 0.0);
+                   nTranslate, 0.0);
+                break;
             }
-            else
+            case MirrorMode::Antiparallel:
+            {
+                /* This path gets exercised in writers's LTR UI with a RTL horizontal
+                   scrollbar, cross-reference dialog populated from contents from a
+                   RTL document tdf#131725 */
+
+                // Original code was;
+                //      tools::Long devX = rOutDev.GetOutOffXPixel();   // re-mirrored mnOutOffX
+                //      x = rOutDev.GetOutputWidthPixel() - (x - devX) + rOutDev.GetOutOffXPixel() - 1;
+                const_cast<SalGraphics*>(this)->m_aLastMirror = basegfx::utils::createScaleTranslateB2DHomMatrix(
+                    -1.0,
+                    1.0,
+                    nTranslate,
+                    0.0);
+                break;
+            }
+            case MirrorMode::BiDi:
             {
                 // Original code was:
                 //      aRet.setX( w-1-i_rPoint.getX() );
@@ -323,13 +360,13 @@ const basegfx::B2DHomMatrix& SalGraphics::getMirror( const OutputDevice& i_rOutD
                 const_cast<SalGraphics*>(this)->m_aLastMirror = basegfx::utils::createScaleTranslateB2DHomMatrix(
                     -1.0,
                     1.0,
-                    w-1,
+                    nTranslate,
                     0.0);
+                break;
             }
-        }
-        else
-        {
-            const_cast<SalGraphics*>(this)->m_aLastMirror.identity();
+            case MirrorMode::NONE:
+                const_cast<SalGraphics*>(this)->m_aLastMirror.identity();
+                break;
         }
     }
 
@@ -889,159 +926,11 @@ OUString SalGraphics::getRenderBackendName() const
     return OUString();
 }
 
-void SalGraphics::GetGlyphWidths(const vcl::AbstractTrueTypeFont& rTTF,
-                                 const vcl::font::PhysicalFontFace& rFontFace, const bool bVertical,
-                                 std::vector<sal_Int32>& rWidths, Ucs2UIntMap& rUnicodeEnc)
+bool SalGraphics::ShouldDownscaleIconsAtSurface(double* pScaleOut) const
 {
-    rWidths.clear();
-    rUnicodeEnc.clear();
-
-    const int nGlyphCount = rTTF.glyphCount();
-    if (nGlyphCount <= 0)
-        return;
-
-    FontCharMapRef xFCMap = rFontFace.GetFontCharMap();
-    if (!xFCMap.is() || !xFCMap->GetCharCount())
-    {
-        SAL_WARN("vcl.fonts", "no charmap");
-        return;
-    }
-
-    rWidths.resize(nGlyphCount);
-    std::vector<sal_uInt16> aGlyphIds(nGlyphCount);
-    for (int i = 0; i < nGlyphCount; i++)
-        aGlyphIds[i] = static_cast<sal_uInt16>(i);
-
-    std::unique_ptr<sal_uInt16[]> pGlyphMetrics
-        = GetTTSimpleGlyphMetrics(&rTTF, aGlyphIds.data(), nGlyphCount, bVertical);
-    if (pGlyphMetrics)
-    {
-        for (int i = 0; i < nGlyphCount; ++i)
-            rWidths[i] = pGlyphMetrics[i];
-        pGlyphMetrics.reset();
-    }
-
-    int nCharCount = xFCMap->GetCharCount();
-    sal_uInt32 nChar = xFCMap->GetFirstChar();
-    for (; --nCharCount >= 0; nChar = xFCMap->GetNextChar(nChar))
-    {
-        if (nChar > 0xFFFF)
-            continue;
-
-        sal_Ucs nUcsChar = static_cast<sal_Ucs>(nChar);
-        sal_uInt32 nGlyph = xFCMap->GetGlyphIndex(nUcsChar);
-        if (nGlyph > 0)
-            rUnicodeEnc[nUcsChar] = nGlyph;
-    }
-}
-
-bool SalGraphics::CreateTTFfontSubset(vcl::AbstractTrueTypeFont& rTTF, const OString& rSysPath,
-                                   const bool bVertical, const sal_GlyphId* pGlyphIds,
-                                   const sal_uInt8* pEncoding, sal_Int32* pGlyphWidths,
-                                   const int nOrigGlyphCount)
-{
-    // Multiple questions:
-    // - Why is there a glyph limit?
-    //   MacOS used to handle 257 glyphs...
-    //   Also the much more complex PrintFontManager variant has this limit.
-    //   Also the very first implementation has the limit in
-    //   commit 8789ed701e98031f2a1657ea0dfd6f7a0b050992
-    // - Why doesn't the PrintFontManager care about the fake glyph? It
-    //   is used on all unx platforms to create the subset font.
-    // - Should the SAL_WARN actually be asserts, like on MacOS?
-    if (nOrigGlyphCount > 256)
-    {
-        SAL_WARN("vcl.fonts", "too many glyphs for subsetting");
-        return false;
-    }
-
-    int nGlyphCount = nOrigGlyphCount;
-    sal_uInt16 aShortIDs[256];
-    sal_uInt8 aTempEncs[256];
-
-    // handle the undefined / first font glyph
-    int nNotDef = -1, i;
-    for (i = 0; i < nGlyphCount; ++i)
-    {
-        aTempEncs[i] = pEncoding[i];
-        aShortIDs[i] = static_cast<sal_uInt16>(pGlyphIds[i]);
-        if (!aShortIDs[i])
-            if (nNotDef < 0)
-                nNotDef = i;
-    }
-
-    // nNotDef glyph must be in pos 0 => swap glyphids
-    if (nNotDef != 0)
-    {
-        if (nNotDef < 0)
-        {
-            if (nGlyphCount == 256)
-            {
-                SAL_WARN("vcl.fonts", "too many glyphs for subsetting");
-                return false;
-            }
-            nNotDef = nGlyphCount++;
-        }
-
-        aShortIDs[nNotDef] = aShortIDs[0];
-        aTempEncs[nNotDef] = aTempEncs[0];
-        aShortIDs[0] = 0;
-        aTempEncs[0] = 0;
-    }
-
-    std::unique_ptr<sal_uInt16[]> pMetrics
-        = GetTTSimpleGlyphMetrics(&rTTF, aShortIDs, nGlyphCount, bVertical);
-    if (!pMetrics)
-        return false;
-
-    sal_uInt16 nNotDefAdv = pMetrics[0];
-    pMetrics[0] = pMetrics[nNotDef];
-    pMetrics[nNotDef] = nNotDefAdv;
-    for (i = 0; i < nOrigGlyphCount; ++i)
-        pGlyphWidths[i] = pMetrics[i];
-    pMetrics.reset();
-
-    // write subset into destination file
-    return (CreateTTFromTTGlyphs(&rTTF, rSysPath.getStr(), aShortIDs, aTempEncs, nGlyphCount)
-            == vcl::SFErrCodes::Ok);
-}
-
-bool SalGraphics::CreateCFFfontSubset(const unsigned char* pFontBytes, int nByteLength,
-                                      const OString& rSysPath, const sal_GlyphId* pGlyphIds,
-                                      const sal_uInt8* pEncoding, sal_Int32* pGlyphWidths,
-                                      int nGlyphCount, FontSubsetInfo& rInfo)
-{
-    FILE* pOutFile = fopen(rSysPath.getStr(), "wb");
-    if (!pOutFile)
-        return false;
-    rInfo.LoadFont(FontType::CFF_FONT, pFontBytes, nByteLength);
-    bool bRet = rInfo.CreateFontSubset(FontType::TYPE1_PFB, pOutFile, nullptr, pGlyphIds, pEncoding,
-                                       nGlyphCount, pGlyphWidths);
-    fclose(pOutFile);
-    return bRet;
-}
-
-void SalGraphics::FillFontSubsetInfo(const vcl::TTGlobalFontInfo& rTTInfo, const OUString& pPSName,
-                                     FontSubsetInfo& rInfo)
-{
-    rInfo.m_aPSName = pPSName;
-    rInfo.m_nFontType = FontType::SFNT_TTF;
-    rInfo.m_aFontBBox
-        = tools::Rectangle(Point(rTTInfo.xMin, rTTInfo.yMin), Point(rTTInfo.xMax, rTTInfo.yMax));
-    rInfo.m_nCapHeight = rTTInfo.yMax; // Well ...
-    rInfo.m_nAscent = rTTInfo.winAscent;
-    rInfo.m_nDescent = rTTInfo.winDescent;
-
-    // mac fonts usually do not have an OS2-table
-    // => get valid ascent/descent values from other tables
-    if (!rInfo.m_nAscent)
-        rInfo.m_nAscent = +rTTInfo.typoAscender;
-    if (!rInfo.m_nAscent)
-        rInfo.m_nAscent = +rTTInfo.ascender;
-    if (!rInfo.m_nDescent)
-        rInfo.m_nDescent = +rTTInfo.typoDescender;
-    if (!rInfo.m_nDescent)
-        rInfo.m_nDescent = -rTTInfo.descender;
+    if (pScaleOut)
+        *pScaleOut = comphelper::LibreOfficeKit::getDPIScale();
+    return comphelper::LibreOfficeKit::isActive();
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

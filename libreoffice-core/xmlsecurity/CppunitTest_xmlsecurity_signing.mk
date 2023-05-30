@@ -13,7 +13,6 @@ $(eval $(call gb_CppunitTest_CppunitTest,xmlsecurity_signing))
 
 $(eval $(call gb_CppunitTest_add_exception_objects,xmlsecurity_signing, \
 	xmlsecurity/qa/unit/signing/signing \
-	xmlsecurity/qa/unit/signing/signing2 \
 ))
 
 $(eval $(call gb_CppunitTest_use_libraries,xmlsecurity_signing, \
@@ -24,6 +23,7 @@ $(eval $(call gb_CppunitTest_use_libraries,xmlsecurity_signing, \
 	sax \
 	sfx \
 	svx \
+	subsequenttest \
 	test \
 	tl \
 	unotest \
@@ -72,7 +72,7 @@ endif
 ifeq ($(OS),LINUX)
 # reset the LD_LIBRARY_PATH for spawned GPG processes
 $(call gb_CppunitTest_get_target,xmlsecurity_signing): \
-    EXTRA_ENV_VARS := \
+    EXTRA_ENV_VARS += \
         LIBO_LD_PATH=$$LD_LIBRARY_PATH
 endif
 

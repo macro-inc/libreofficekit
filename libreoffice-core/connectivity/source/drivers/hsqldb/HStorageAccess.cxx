@@ -22,7 +22,7 @@
 #include <hsqldb/HStorageMap.hxx>
 #include "accesslog.hxx"
 #include <osl/diagnose.h>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 #include <string.h>
 
@@ -148,28 +148,28 @@ jint read_from_storage_stream( JNIEnv * env, jstring name, jstring key )
     std::shared_ptr<StreamHelper> pHelper = StorageContainer::getRegisteredStream(env,name,key);
     Reference< XInputStream> xIn = pHelper ? pHelper->getInputStream() : Reference< XInputStream>();
     OSL_ENSURE(xIn.is(),"Input stream is NULL!");
-    if ( xIn.is() )
-    {
-        Sequence< ::sal_Int8 > aData(1);
-        sal_Int32 nBytesRead = -1;
-        try
-        {
-            nBytesRead = xIn->readBytes(aData,1);
-        }
-        catch(const Exception& e)
-        {
-            StorageContainer::throwJavaException(e,env);
-            return -1;
+    if ( !xIn.is() )
+        return -1;
 
-        }
-        if (nBytesRead <= 0)
-        {
-            return -1;
-        }
-        else
-        {
-            return static_cast<unsigned char>(aData[0]);
-        }
+    Sequence< ::sal_Int8 > aData(1);
+    sal_Int32 nBytesRead = -1;
+    try
+    {
+        nBytesRead = xIn->readBytes(aData,1);
+    }
+    catch(const Exception& e)
+    {
+        StorageContainer::throwJavaException(e,env);
+        return -1;
+
+    }
+    if (nBytesRead <= 0)
+    {
+        return -1;
+    }
+    else
+    {
+        return static_cast<unsigned char>(aData[0]);
     }
     return -1;
 }
@@ -341,10 +341,15 @@ extern "C" SAL_JNI_EXPORT void JNICALL Java_com_sun_star_sdbcx_comp_hsqldb_Nativ
 #endif
 
     std::shared_ptr<StreamHelper> pHelper = StorageContainer::getRegisteredStream(env,name,key);
-    Reference< XSeekable> xSeek = pHelper ? pHelper->getSeek() : Reference< XSeekable>();
 
-    OSL_ENSURE(xSeek.is(),"No Seekable stream!");
-    if ( !xSeek.is() )
+    OSL_ENSURE(pHelper, "No StreamHelper!");
+    if (!pHelper)
+        return;
+
+    Reference< XSeekable> xSeek = pHelper->getSeek();
+
+    OSL_ENSURE(xSeek.is(), "No Seekable stream!");
+    if (!xSeek)
         return;
 
 #ifdef HSQLDB_DBG

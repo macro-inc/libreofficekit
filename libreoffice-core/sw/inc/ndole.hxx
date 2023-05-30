@@ -28,7 +28,7 @@ class SwGrfFormatColl;
 class SwDoc;
 class SwOLENode;
 class SwOLEListener_Impl;
-class SwEmbedObjectLink;
+namespace sfx2 { class SvBaseLink; }
 class DeflateData;
 
 class SW_DLLPUBLIC SwOLEObj
@@ -46,6 +46,7 @@ class SW_DLLPUBLIC SwOLEObj
     // eventually buffered data if it is a chart OLE
     drawinglayer::primitive2d::Primitive2DContainer     m_aPrimitive2DSequence;
     basegfx::B2DRange                                   m_aRange;
+    sal_uInt32                                          m_nGraphicVersion;
     std::unique_ptr<DeflateData>                        m_pDeflateData;
 
     SwOLEObj( const SwOLEObj& rObj ) = delete;
@@ -56,7 +57,7 @@ class SW_DLLPUBLIC SwOLEObj
 
 public:
     SwOLEObj( const svt::EmbeddedObjectRef& pObj );
-    SwOLEObj( const OUString &rName, sal_Int64 nAspect );
+    SwOLEObj( OUString aName, sal_Int64 nAspect );
     ~SwOLEObj() COVERITY_NOEXCEPT_FALSE;
 
     bool UnloadObject();
@@ -93,15 +94,15 @@ class SW_DLLPUBLIC SwOLENode final: public SwNoTextNode
     bool   mbOLESizeInvalid; /**< Should be considered at SwDoc::PrtOLENotify
                                    (e.g. copied). Is not persistent. */
 
-    SwEmbedObjectLink*  mpObjectLink;
+    sfx2::SvBaseLink*  mpObjectLink;
     OUString maLinkURL;
 
-    SwOLENode(  const SwNodeIndex &rWhere,
+    SwOLENode(  SwNode& rWhere,
                 const svt::EmbeddedObjectRef&,
                 SwGrfFormatColl *pGrfColl,
                 SwAttrSet const * pAutoAttr );
 
-    SwOLENode(  const SwNodeIndex &rWhere,
+    SwOLENode(  SwNode& rWhere,
                 const OUString &rName,
                 sal_Int64 nAspect,
                 SwGrfFormatColl *pGrfColl,
@@ -117,7 +118,7 @@ public:
     virtual ~SwOLENode() override;
 
     /// Is in ndcopy.cxx.
-    virtual SwContentNode* MakeCopy(SwDoc&, const SwNodeIndex&, bool bNewFrames) const override;
+    virtual SwContentNode* MakeCopy(SwDoc&, SwNode& rWhere, bool bNewFrames) const override;
 
     virtual Size GetTwipSize() const override;
 

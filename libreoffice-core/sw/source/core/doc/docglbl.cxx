@@ -240,7 +240,7 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
     OUString sLeading(aEntry.GetBase());
     aEntry.removeSegment();
     OUString sPath = aEntry.GetMainURL( INetURLObject::DecodeMechanism::NONE );
-    utl::TempFile aTemp(sLeading, true, &sExt, &sPath);
+    utl::TempFileNamed aTemp(sLeading, true, sExt, &sPath);
     aTemp.EnableKillingFile();
 
     DateTime aTmplDate( DateTime::SYSTEM );
@@ -306,9 +306,8 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                         pDoc->SetOutlineNumRule( *mpOutlineRule );
 
                     SwNodeRange aRg( *pStartNd, SwNodeOffset(0), aEndIdx.GetNode() );
-                    SwNodeIndex aTmpIdx( pDoc->GetNodes().GetEndOfContent() );
                     GetDocumentContentOperationsManager().CopyWithFlyInFly(
-                            aRg, aTmpIdx, nullptr, false, false);
+                            aRg, pDoc->GetNodes().GetEndOfContent(), nullptr, false, false);
 
                     // Delete the initial TextNode
                     SwNodeIndex aIdx( pDoc->GetNodes().GetEndOfExtras(), 2 );
@@ -316,8 +315,7 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                         pDoc->GetNodes().GetEndOfContent().GetIndex() )
                         pDoc->GetNodes().Delete( aIdx );
 
-                    utl::TempFile aTempFile2(sLeading, true, &sExt, &sPath);
-                    sFileName = aTempFile2.GetURL();
+                    sFileName = utl::CreateTempURL(sLeading, true, sExt, &sPath);
                     SfxMedium* pTmpMed = new SfxMedium( sFileName,
                                                 StreamMode::STD_READWRITE );
                     pTmpMed->SetFilter( pFilter );
@@ -353,10 +351,8 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                         if( nNodeDiff )
                         {
                             SwPaM aTmp( *pStartNd, aEndIdx.GetNode(), SwNodeOffset(1), SwNodeOffset(-1) );
-                            aTmp.GetPoint()->nContent.Assign( nullptr, 0 );
-                            aTmp.GetMark()->nContent.Assign( nullptr, 0 );
-                            SwNodeIndex aSIdx( aTmp.GetMark()->nNode );
-                            SwNodeIndex aEIdx( aTmp.GetPoint()->nNode );
+                            SwNodeIndex aSIdx( aTmp.GetMark()->GetNode() );
+                            SwNodeIndex aEIdx( aTmp.GetPoint()->GetNode() );
 
                             // Try to move past the end
                             if( !aTmp.Move( fnMoveForward, GoInNode ) )
@@ -376,13 +372,13 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                             {
                                 SwFrameFormat* pFly = (*GetSpzFrameFormats())[n];
                                 const SwFormatAnchor* pAnchor = &pFly->GetAnchor();
-                                SwPosition const*const pAPos =
-                                    pAnchor->GetContentAnchor();
-                                if (pAPos &&
+                                SwNode const*const pAnchorNode =
+                                    pAnchor->GetAnchorNode();
+                                if (pAnchorNode &&
                                     ((RndStdIds::FLY_AT_PARA == pAnchor->GetAnchorId()) ||
                                      (RndStdIds::FLY_AT_CHAR == pAnchor->GetAnchorId())) &&
-                                    aSIdx <= pAPos->nNode &&
-                                    pAPos->nNode < aEIdx )
+                                    aSIdx <= *pAnchorNode &&
+                                    *pAnchorNode < aEIdx.GetNode() )
                                 {
                                     getIDocumentLayoutAccess().DelLayoutFormat( pFly );
                                     --n;
@@ -437,7 +433,7 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                             {
                                 SwNodeRange aRg( *pStartNd, *pSectEnd );
                                 SwNodeIndex aIdx( *pSectEnd, 1 );
-                                GetNodes().MoveNodes( aRg, GetNodes(), aIdx );
+                                GetNodes().MoveNodes( aRg, GetNodes(), aIdx.GetNode() );
                             }
                             pSectNd = pStartNd->FindSectionNode();
                         }
@@ -450,9 +446,8 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
                             // they are fully enclosed in [pSectNd,aEndIdx].
                             if( aEndIdx < pSectNd->EndOfSectionIndex() )
                             {
-                                SwNodeRange aRg( *pSectNd, SwNodeOffset(1), aEndIdx, SwNodeOffset(1) );
-                                SwNodeIndex aIdx( *pSectNd );
-                                GetNodes().MoveNodes( aRg, GetNodes(), aIdx );
+                                SwNodeRange aRg( *pSectNd, SwNodeOffset(1), aEndIdx.GetNode(), SwNodeOffset(1) );
+                                GetNodes().MoveNodes( aRg, GetNodes(), *pSectNd );
                             }
 
                             pSectNd = pStartNd->FindSectionNode();
@@ -464,13 +459,13 @@ bool SwDoc::SplitDoc( sal_uInt16 eDocType, const OUString& rPath, bool bOutline,
 
                         if (aEndIdx >= aStartIdx)
                         {
-                            pSectNd = GetNodes().InsertTextSection(aStartIdx,
-                                *pFormat, aSectData, nullptr, &aEndIdx, false);
+                            pSectNd = GetNodes().InsertTextSection(aStartIdx.GetNode(),
+                                *pFormat, aSectData, nullptr, &aEndIdx.GetNode(), false);
                         }
                         else
                         {
-                            pSectNd = GetNodes().InsertTextSection(aEndIdx,
-                                *pFormat, aSectData, nullptr, &aStartIdx, false);
+                            pSectNd = GetNodes().InsertTextSection(aEndIdx.GetNode(),
+                                *pFormat, aSectData, nullptr, &aStartIdx.GetNode(), false);
                         }
                         // <- #i26762#
 

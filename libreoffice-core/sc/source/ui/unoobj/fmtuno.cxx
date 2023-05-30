@@ -19,8 +19,10 @@
 
 #include <sal/config.h>
 
+#include <o3tl/safeint.hxx>
 #include <osl/diagnose.h>
 #include <svl/style.hxx>
+#include <utility>
 #include <vcl/svapp.hxx>
 #include <com/sun/star/lang/IndexOutOfBoundsException.hpp>
 #include <com/sun/star/sheet/ConditionOperator2.hpp>
@@ -42,21 +44,20 @@ using namespace ::formula;
 
 //  map only for PropertySetInfo
 
-static const SfxItemPropertyMapEntry* lcl_GetValidatePropertyMap()
+static o3tl::span<const SfxItemPropertyMapEntry> lcl_GetValidatePropertyMap()
 {
     static const SfxItemPropertyMapEntry aValidatePropertyMap_Impl[] =
     {
-        {u"" SC_UNONAME_ERRALSTY, 0,  cppu::UnoType<sheet::ValidationAlertStyle>::get(),  0, 0},
-        {u"" SC_UNONAME_ERRMESS,  0,  cppu::UnoType<OUString>::get(),                0, 0},
-        {u"" SC_UNONAME_ERRTITLE, 0,  cppu::UnoType<OUString>::get(),                0, 0},
-        {u"" SC_UNONAME_IGNOREBL, 0,  cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNONAME_INPMESS,  0,  cppu::UnoType<OUString>::get(),                0, 0},
-        {u"" SC_UNONAME_INPTITLE, 0,  cppu::UnoType<OUString>::get(),                0, 0},
-        {u"" SC_UNONAME_SHOWERR,  0,  cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNONAME_SHOWINP,  0,  cppu::UnoType<bool>::get(),                          0, 0},
-        {u"" SC_UNONAME_SHOWLIST, 0,  cppu::UnoType<sal_Int16>::get(),                    0, 0},
-        {u"" SC_UNONAME_TYPE,     0,  cppu::UnoType<sheet::ValidationType>::get(),        0, 0},
-        { u"", 0, css::uno::Type(), 0, 0 }
+        { SC_UNONAME_ERRALSTY, 0,  cppu::UnoType<sheet::ValidationAlertStyle>::get(),  0, 0},
+        { SC_UNONAME_ERRMESS,  0,  cppu::UnoType<OUString>::get(),                0, 0},
+        { SC_UNONAME_ERRTITLE, 0,  cppu::UnoType<OUString>::get(),                0, 0},
+        { SC_UNONAME_IGNOREBL, 0,  cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNONAME_INPMESS,  0,  cppu::UnoType<OUString>::get(),                0, 0},
+        { SC_UNONAME_INPTITLE, 0,  cppu::UnoType<OUString>::get(),                0, 0},
+        { SC_UNONAME_SHOWERR,  0,  cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNONAME_SHOWINP,  0,  cppu::UnoType<bool>::get(),                          0, 0},
+        { SC_UNONAME_SHOWLIST, 0,  cppu::UnoType<sal_Int16>::get(),                    0, 0},
+        { SC_UNONAME_TYPE,     0,  cppu::UnoType<sheet::ValidationType>::get(),        0, 0},
     };
     return aValidatePropertyMap_Impl;
 }
@@ -342,7 +343,7 @@ void SAL_CALL ScTableConditionalFormat::removeByIndex( sal_Int32 nIndex )
 {
     SolarMutexGuard aGuard;
 
-    if (nIndex < static_cast<sal_Int32>(maEntries.size()) && nIndex >= 0)
+    if (nIndex >= 0 && o3tl::make_unsigned(nIndex) < maEntries.size())
     {
         maEntries.erase(maEntries.begin()+nIndex);
     }
@@ -377,12 +378,11 @@ uno::Any SAL_CALL ScTableConditionalFormat::getByIndex( sal_Int32 nIndex )
     if (!xEntry.is())
         throw lang::IndexOutOfBoundsException();
 
-    return uno::makeAny(xEntry);
+    return uno::Any(xEntry);
 }
 
 uno::Type SAL_CALL ScTableConditionalFormat::getElementType()
 {
-    SolarMutexGuard aGuard;
     return cppu::UnoType<sheet::XSheetConditionalEntry>::get();
 }
 
@@ -417,7 +417,7 @@ uno::Any SAL_CALL ScTableConditionalFormat::getByName( const OUString& aName )
     if (!xEntry.is())
         throw container::NoSuchElementException();
 
-    return uno::makeAny(xEntry);
+    return uno::Any(xEntry);
 }
 
 uno::Sequence<OUString> SAL_CALL ScTableConditionalFormat::getElementNames()
@@ -449,8 +449,8 @@ sal_Bool SAL_CALL ScTableConditionalFormat::hasByName( const OUString& aName )
 
 UNO3_GETIMPLEMENTATION_IMPL(ScTableConditionalFormat);
 
-ScTableConditionalEntry::ScTableConditionalEntry(const ScCondFormatEntryItem& aItem) :
-    aData( aItem )
+ScTableConditionalEntry::ScTableConditionalEntry(ScCondFormatEntryItem  aItem) :
+    aData(std::move( aItem ))
 {
     // #i113668# only store the settings, keep no reference to parent object
 }
@@ -544,7 +544,7 @@ void SAL_CALL ScTableConditionalEntry::setStyleName( const OUString& aStyleName 
     aData.maStyle = ScStyleNameConversion::ProgrammaticToDisplayName( aStyleName, SfxStyleFamily::Para );
 }
 
-ScTableValidationObj::ScTableValidationObj(const ScDocument& rDoc, sal_uLong nKey,
+ScTableValidationObj::ScTableValidationObj(const ScDocument& rDoc, sal_uInt32 nKey,
                                            const formula::FormulaGrammar::Grammar eGrammar) :
     aPropSet( lcl_GetValidatePropertyMap() )
 {

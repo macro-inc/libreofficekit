@@ -145,7 +145,8 @@ const short ROLE_TABLE[][2] =
         {DOCUMENT_PRESENTATION,     ROLE_SYSTEM_DOCUMENT },
         {DOCUMENT_SPREADSHEET,      ROLE_SYSTEM_DOCUMENT },
         {DOCUMENT_TEXT,             ROLE_SYSTEM_DOCUMENT },
-        {STATIC,                    ROLE_SYSTEM_STATICTEXT }
+        {STATIC,                    ROLE_SYSTEM_STATICTEXT },
+        {NOTIFICATION,              ROLE_SYSTEM_ALERT}
     };
 
 
@@ -432,14 +433,8 @@ OUString AccObject::GetMAccessibleValueFromAny(Any pAny)
         Sequence< OUString > val;
         if (pAny >>= val)
         {
-
-            int count = val.getLength();
-
-            for( int iIndex = 0;iIndex < count;iIndex++ )
-            {
-                strValue += val[iIndex];
-            }
-
+            for (const OUString& rElem : val)
+                strValue += rElem;
         }
     }
     else if(pAny.getValueType() == cppu::UnoType<double>::get())
@@ -486,18 +481,6 @@ void  AccObject::SetName( Any pAny)
 }
 
 /**
-   * Set role property via pAny
-   * @param Role New accessible role.
-   * @return
-   */
-void  AccObject::SetRole( short Role )
-{
-    if( nullptr == m_pIMAcc )
-        return ;
-    m_pIMAcc->Put_XAccRole( Role );
-}
-
-/**
 * Get role property via pAny
 * @param
 * @return accessible role
@@ -509,10 +492,10 @@ short AccObject::GetRole() const
 
 /**
    * Get MSAA state from UNO state
-   * @Role xState UNO state.
+   * @Role nState UNO state.
    * @return
    */
-DWORD AccObject::GetMSAAStateFromUNO(short xState)
+DWORD AccObject::GetMSAAStateFromUNO(sal_Int64 nState)
 {
     DWORD IState = UNO_MSAA_UNMAPPING;
 
@@ -523,7 +506,7 @@ DWORD AccObject::GetMSAAStateFromUNO(short xState)
     }
     short Role = m_accRole;
 
-    switch( xState )
+    switch( nState )
     {
     case  BUSY:
         IState = STATE_SYSTEM_BUSY;
@@ -632,7 +615,7 @@ DWORD AccObject::GetMSAAStateFromUNO(short xState)
    * @param xState The lost state.
    * @return
    */
-void  AccObject::DecreaseState( short xState )
+void  AccObject::DecreaseState( sal_Int64 xState )
 {
     if( nullptr == m_pIMAcc )
     {
@@ -675,7 +658,7 @@ void  AccObject::DecreaseState( short xState )
    * @param xState The new state.
    * @return
    */
-void AccObject::IncreaseState( short xState )
+void AccObject::IncreaseState( sal_Int64 xState )
 {
     if( nullptr == m_pIMAcc )
     {
@@ -784,12 +767,7 @@ void AccObject::UpdateState()
     }
 
     XAccessibleContext* pContext  = m_xAccContextRef.get();
-    Reference< XAccessibleStateSet > pRState = pContext->getAccessibleStateSet();
-    if( !pRState.is() )
-    {
-        assert(false);
-        return ;
-    }
+    sal_Int64 nRState = pContext->getAccessibleStateSet();
 
     m_pIMAcc->SetState(0);
 
@@ -798,29 +776,30 @@ void AccObject::UpdateState()
         return;
     }
 
-    Sequence<short> pStates = pRState->getStates();
-    int count = pStates.getLength();
-
     bool isEnable = false;
     bool isShowing = false;
     bool isEditable = false;
     bool isVisible = false;
     bool isFocusable = false;
 
-    for( int iIndex = 0;iIndex < count;iIndex++ )
+    for (int i=0; i<63; ++i)
     {
-        if( pStates[iIndex] == ENABLED )
+        sal_Int64 nState = sal_Int64(1) << i;
+        if (!(nState & nRState))
+            continue;
+        if (nState == ENABLED)
             isEnable = true;
-        else if( pStates[iIndex] == SHOWING)
+        else if (nState == SHOWING)
             isShowing = true;
-        else if( pStates[iIndex] == VISIBLE)
+        else if (nState == VISIBLE)
             isVisible = true;
-        else if( pStates[iIndex] == EDITABLE )
+        else if (nState == EDITABLE)
             isEditable = true;
-        else if (pStates[iIndex] == FOCUSABLE)
+        else if (nState == FOCUSABLE)
             isFocusable = true;
-        IncreaseState( pStates[iIndex]);
+        IncreaseState(nState);
     }
+
     bool bIsMenuItem = m_accRole == MENU_ITEM || m_accRole == RADIO_MENU_ITEM || m_accRole == CHECK_MENU_ITEM;
 
     if(bIsMenuItem)
@@ -843,6 +822,7 @@ void AccObject::UpdateState()
     {
     case LABEL:
     case STATIC:
+    case NOTIFICATION:
         m_pIMAcc->IncreaseState( STATE_SYSTEM_READONLY );
         break;
     case TEXT:
@@ -881,7 +861,7 @@ void AccObject::UpdateState()
         if(!(Role == FILLER || Role == END_NOTE || Role == FOOTER || Role == FOOTNOTE || Role == GROUP_BOX || Role == RULER
                 || Role == HEADER || Role == ICON || Role == INTERNAL_FRAME || Role == LABEL || Role == LAYERED_PANE
                 || Role == SCROLL_BAR || Role == SCROLL_PANE || Role == SPLIT_PANE || Role == STATIC || Role == STATUS_BAR
-                || Role == TOOL_TIP))
+                || Role == TOOL_TIP || Role == NOTIFICATION))
         {
             if( SEPARATOR == Role  )
             {
@@ -950,40 +930,11 @@ void AccObject::UpdateState()
 }
 
 /**
-   * update location information from uno to com
-   * @param
-   * @return
-   */
-void AccObject::UpdateLocation()
-{
-    if (!m_pIMAcc)
-    {
-        return;
-    }
-    XAccessibleContext* pContext  = m_xAccContextRef.get();
-
-    Reference< XAccessibleComponent > pRComponent(pContext,UNO_QUERY);
-    if( pRComponent.is() )
-    {
-        css::awt::Point pCPoint = pRComponent->getLocationOnScreen();
-        css::awt::Size pCSize = pRComponent->getSize();
-        Location tempLocation;
-        tempLocation.m_dLeft = pCPoint.X;
-        tempLocation.m_dTop =  pCPoint.Y;
-        tempLocation.m_dWidth = pCSize.Width;
-        tempLocation.m_dHeight = pCSize.Height;
-        m_pIMAcc->Put_XAccLocation( tempLocation );
-    }
-
-}
-
-
-/**
    * Public method to mapping information between MSAA and UNO.
    * @param
    * @return If the method is correctly processed.
    */
-bool AccObject:: UpdateAccessibleInfoFromUnoToMSAA ( )
+bool AccObject::UpdateAccessibleInfoFromUnoToMSAA()
 {
     if( nullptr == m_pIMAcc || !m_xAccContextRef.is()  )
     {
@@ -999,26 +950,9 @@ bool AccObject:: UpdateAccessibleInfoFromUnoToMSAA ( )
 
     UpdateRole();
 
-    UpdateLocation();
-
     UpdateState();
 
     return true;
-}
-
-/*
-   * Add a child selected element.
-   * @param pAccObj Child object pointer.
-   * @return
-   */
-void AccObject::AddSelect( long index, AccObject* accObj)
-{
-    m_selectionList.emplace(index,accObj);
-}
-
-IAccSelectionList& AccObject::GetSelection()
-{
-    return m_selectionList;
 }
 
 
@@ -1061,26 +995,12 @@ void AccObject::GetExpandedState( sal_Bool* isExpandable, sal_Bool* isExpanded)
     {
         return;
     }
-    Reference< XAccessibleStateSet > pRState = m_xAccContextRef->getAccessibleStateSet();
-    if( !pRState.is() )
-    {
-        return;
-    }
+    sal_Int64 nRState = m_xAccContextRef->getAccessibleStateSet();
 
-    Sequence<short> pStates = pRState->getStates();
-    int count = pStates.getLength();
-
-    for( int iIndex = 0;iIndex < count;iIndex++ )
-    {
-        if( EXPANDED == pStates[iIndex]  )
-        {
-            *isExpanded = true;
-        }
-        else if( EXPANDABLE == pStates[iIndex]  )
-        {
-            *isExpandable = true;
-        }
-    }
+    if (nRState & EXPANDED)
+        *isExpanded = true;
+    if (nRState & EXPANDABLE)
+        *isExpandable = true;
 }
 
 void AccObject::NotifyDestroy()

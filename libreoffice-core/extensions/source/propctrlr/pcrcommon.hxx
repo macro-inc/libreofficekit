@@ -24,14 +24,9 @@
 
 #include <sal/config.h>
 
-#include <string_view>
-
 #include <com/sun/star/uno/Sequence.hxx>
 #include <com/sun/star/beans/XPropertyChangeListener.hpp>
-#include <com/sun/star/beans/PropertyChangeEvent.hpp>
-
-#include <comphelper/listenernotification.hxx>
-
+#include <comphelper/interfacecontainer3.hxx>
 
 namespace pcr
 {
@@ -45,8 +40,7 @@ namespace pcr
 
     //= types
 
-    typedef ::comphelper::OSimpleListenerContainer  <   css::beans::XPropertyChangeListener
-                                                    ,   css::beans::PropertyChangeEvent
+    typedef ::comphelper::OInterfaceContainerHelper3  <   css::beans::XPropertyChangeListener
                                                     >   PropertyChangeListeners;
 
 
@@ -67,8 +61,8 @@ namespace pcr
     class HelpIdUrl
     {
     public:
-        static OString getHelpId( const OUString& _rHelpURL );
-        static OUString getHelpURL( const OUString& );
+        static OString getHelpId( std::u16string_view _rHelpURL );
+        static OUString getHelpURL( std::u16string_view );
     };
 
 

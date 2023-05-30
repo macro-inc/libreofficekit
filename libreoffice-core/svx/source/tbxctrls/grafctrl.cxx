@@ -20,6 +20,7 @@
 #include <sal/config.h>
 
 #include <comphelper/propertyvalue.hxx>
+#include <o3tl/string_view.hxx>
 #include <vcl/toolbox.hxx>
 #include <vcl/idle.hxx>
 #include <svl/intitem.hxx>
@@ -155,13 +156,14 @@ namespace {
 struct CommandToRID
 {
     const char* pCommand;
-    const char* sResId;
+    rtl::OUStringConstExpr sResId;
 };
 
 }
 
-static OUString ImplGetRID( const OUString& aCommand )
+static OUString ImplGetRID( std::u16string_view aCommand )
 {
+    static constexpr OUStringLiteral EMPTY = u"";
     static const CommandToRID aImplCommandToResMap[] =
     {
         { ".uno:GrafRed",           RID_SVXBMP_GRAF_RED             },
@@ -171,7 +173,7 @@ static OUString ImplGetRID( const OUString& aCommand )
         { ".uno:GrafContrast",      RID_SVXBMP_GRAF_CONTRAST        },
         { ".uno:GrafGamma",         RID_SVXBMP_GRAF_GAMMA           },
         { ".uno:GrafTransparence",  RID_SVXBMP_GRAF_TRANSPARENCE    },
-        { nullptr, "" }
+        { nullptr, EMPTY }
     };
 
     OUString sRID;
@@ -179,9 +181,9 @@ static OUString ImplGetRID( const OUString& aCommand )
     sal_Int32 i( 0 );
     while ( aImplCommandToResMap[ i ].pCommand )
     {
-        if ( aCommand.equalsAscii( aImplCommandToResMap[ i ].pCommand ))
+        if ( o3tl::equalsAscii( aCommand, aImplCommandToResMap[ i ].pCommand ))
         {
-            sRID = OUString::createFromAscii(aImplCommandToResMap[i].sResId);
+            sRID = aImplCommandToResMap[i].sResId;
             break;
         }
         ++i;
@@ -649,8 +651,8 @@ void SvxGrafAttrHelper::ExecuteGrafAttr( SfxRequest& rReq, SdrView& rView )
                     SfxAbstractDialogFactory* pFact = SfxAbstractDialogFactory::Create();
                     ::CreateTabPage fnCreatePage = pFact->GetTabPageCreatorFunc( RID_SVXPAGE_GRFCROP );
                     std::unique_ptr<SfxTabPage> xTabPage = (*fnCreatePage)(aCropDialog.get_content_area(), &aCropDialog, &aCropDlgAttr);
-                    OUString sPreferredDPI = OUString::number(rView.getSdrModelFromSdrView().getImagePreferredDPI());
-                    xTabPage->SetUserData(sPreferredDPI);
+                    sal_Int32 nPreferredDPI = rView.getSdrModelFromSdrView().getImagePreferredDPI();
+                    xTabPage->getAdditionalProperties().emplace("PreferredDPI", css::uno::Any(nPreferredDPI));
                     xTabPage->SetPageTitle(aCropStr);
                     aCropDialog.SetTabPage(std::move(xTabPage));
 
@@ -676,7 +678,7 @@ void SvxGrafAttrHelper::ExecuteGrafAttr( SfxRequest& rReq, SdrView& rView )
                             if( SfxItemState::SET <= pOutAttr->GetItemState( SID_ATTR_GRAF_FRMSIZE ) )
                             {
                                 Point       aNewOrigin( pObj->GetLogicRect().TopLeft() );
-                                const Size& rGrfSize = static_cast<const SvxSizeItem&>( pOutAttr->Get( SID_ATTR_GRAF_FRMSIZE ) ).GetSize();
+                                const Size& rGrfSize = pOutAttr->Get( SID_ATTR_GRAF_FRMSIZE ).GetSize();
                                 Size aNewGrfSize = o3tl::convert(rGrfSize, o3tl::Length::twip, o3tl::Length::mm100);
                                 Size        aOldGrfSize( pObj->GetLogicRect().GetSize() );
 

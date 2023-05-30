@@ -24,10 +24,9 @@
 
  *************************************************************************/
 
-#include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <cppuhelper/factory.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/weak.hxx>
+#include <utility>
 
 #include "tdoc_documentcontentfactory.hxx"
 
@@ -39,8 +38,8 @@ using namespace tdoc_ucp;
 
 
 DocumentContentFactory::DocumentContentFactory(
-            const uno::Reference< uno::XComponentContext >& rxContext )
-: m_xContext( rxContext )
+            uno::Reference< uno::XComponentContext > xContext )
+: m_xContext(std::move( xContext ))
 {
 }
 

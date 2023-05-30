@@ -7,25 +7,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <test/bootstrapfixture.hxx>
-#include <unotest/macros_test.hxx>
+#include "../helper/qahelper.hxx"
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <svx/svdpage.hxx>
 #include <unotools/syslocaleoptions.hxx>
-#include <unotools/tempfile.hxx>
 #include <vcl/keycodes.hxx>
 #include <vcl/scheduler.hxx>
 
+#include <comphelper/processfactory.hxx>
 #include <comphelper/propertysequence.hxx>
-#include <comphelper/propertyvalue.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <com/sun/star/awt/Key.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
+#include <com/sun/star/sheet/GlobalSheetSettings.hpp>
 #include <com/sun/star/text/XTextRange.hpp>
 #include <conditio.hxx>
-#include <dbfunc.hxx>
+#include <dbdata.hxx>
 #include <document.hxx>
-#include <docuno.hxx>
 #include <docsh.hxx>
 #include <dpobject.hxx>
 #include <drwlayer.hxx>
@@ -38,94 +36,86 @@
 
 using namespace ::com::sun::star;
 
-class ScUiCalcTest : public test::BootstrapFixture, public unotest::MacrosTest
+class ScUiCalcTest : public ScModelTestBase
 {
 public:
-    virtual void setUp() override;
-
-    virtual void tearDown() override;
-
-    ScModelObj* createDoc(const char* pName);
-    ScModelObj* saveAndReload(css::uno::Reference<css::lang::XComponent>& xComponent,
-                              const OUString& rFilter);
+    ScUiCalcTest();
     void goToCell(const OUString& rCell);
-    void insertStringToCell(ScModelObj& rModelObj, const OUString& rCell, const std::string& rStr,
-                            bool bUseReturn = true);
-    void insertArrayToCell(ScModelObj& rModelObj, const OUString& rCell, const std::string& rStr);
+    void typeString(const std::u16string_view& rStr);
+    void insertStringToCell(const OUString& rCell, const std::u16string_view& rStr);
+    void insertArrayToCell(const OUString& rCell, const std::u16string_view& rStr);
     void insertNewSheet(ScDocument& rDoc);
-
-protected:
-    uno::Reference<lang::XComponent> mxComponent;
 };
 
-void ScUiCalcTest::setUp()
+ScUiCalcTest::ScUiCalcTest()
+    : ScModelTestBase("sc/qa/unit/uicalc/data")
 {
-    test::BootstrapFixture::setUp();
-
-    mxDesktop.set(frame::Desktop::create(mxComponentContext));
 }
 
-void ScUiCalcTest::tearDown()
+static void lcl_AssertCurrentCursorPosition(ScDocShell& rDocSh, std::u16string_view rStr)
 {
-    if (mxComponent.is())
-        mxComponent->dispose();
-
-    test::BootstrapFixture::tearDown();
+    ScAddress aAddr;
+    sal_Int32 nOffset = 0;
+    ScRangeStringConverter::GetAddressFromString(aAddr, rStr, rDocSh.GetDocument(),
+                                                 formula::FormulaGrammar::CONV_OOO, nOffset);
+    ScTabViewShell* pViewShell = rDocSh.GetBestViewShell(false);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        OUString(OUString::Concat("Incorrect Column in position ") + rStr).toUtf8().getStr(),
+        aAddr.Col(), pViewShell->GetViewData().GetCurX());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+        OUString(OUString::Concat("Incorrect Row in position ") + rStr).toUtf8().getStr(),
+        aAddr.Row(), pViewShell->GetViewData().GetCurY());
 }
 
-static void lcl_AssertCurrentCursorPosition(SCCOL nCol, SCROW nRow)
+static void lcl_SelectObjectByName(ScTabViewShell& rViewShell, std::u16string_view rObjName)
 {
-    CPPUNIT_ASSERT_EQUAL(sal_Int16(nCol), ScDocShell::GetViewData()->GetCurX());
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(nRow), ScDocShell::GetViewData()->GetCurY());
-}
-
-static void lcl_SelectObjectByName(std::u16string_view rObjName)
-{
-    ScTabViewShell* pViewShell = ScDocShell::GetViewData()->GetViewShell();
-    CPPUNIT_ASSERT(pViewShell);
-
-    bool bFound = pViewShell->SelectObject(rObjName);
+    bool bFound = rViewShell.SelectObject(rObjName);
     CPPUNIT_ASSERT_MESSAGE(
         OString(OUStringToOString(rObjName, RTL_TEXTENCODING_UTF8) + " not found.").getStr(),
         bFound);
 
-    CPPUNIT_ASSERT(ScDocShell::GetViewData()->GetScDrawView()->AreObjectsMarked());
+    CPPUNIT_ASSERT(rViewShell.GetViewData().GetScDrawView()->AreObjectsMarked());
 }
 
 void ScUiCalcTest::goToCell(const OUString& rCell)
 {
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "ToPoint", uno::makeAny(rCell) } });
+        = comphelper::InitPropertySequence({ { "ToPoint", uno::Any(rCell) } });
     dispatchCommand(mxComponent, ".uno:GoToCell", aArgs);
 }
 
-void ScUiCalcTest::insertStringToCell(ScModelObj& rModelObj, const OUString& rCell,
-                                      const std::string& rStr, bool bUseReturn)
+void ScUiCalcTest::typeString(const std::u16string_view& rStr)
 {
-    goToCell(rCell);
-
-    for (const char c : rStr)
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    for (const char16_t c : rStr)
     {
-        rModelObj.postKeyEvent(LOK_KEYEVENT_KEYINPUT, c, 0);
-        rModelObj.postKeyEvent(LOK_KEYEVENT_KEYUP, c, 0);
-        Scheduler::ProcessEventsToIdle();
-    }
-
-    if (bUseReturn)
-    {
-        rModelObj.postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
-        rModelObj.postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
+        pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, c, 0);
+        pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, c, 0);
         Scheduler::ProcessEventsToIdle();
     }
 }
 
-void ScUiCalcTest::insertArrayToCell(ScModelObj& rModelObj, const OUString& rCell,
-                                     const std::string& rStr)
+void ScUiCalcTest::insertStringToCell(const OUString& rCell, const std::u16string_view& rStr)
 {
-    insertStringToCell(rModelObj, rCell, rStr, false);
+    goToCell(rCell);
 
-    rModelObj.postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_MOD1 | KEY_SHIFT | awt::Key::RETURN);
-    rModelObj.postKeyEvent(LOK_KEYEVENT_KEYUP, 0, KEY_MOD1 | KEY_SHIFT | awt::Key::RETURN);
+    typeString(rStr);
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
+    Scheduler::ProcessEventsToIdle();
+}
+
+void ScUiCalcTest::insertArrayToCell(const OUString& rCell, const std::u16string_view& rStr)
+{
+    goToCell(rCell);
+
+    typeString(rStr);
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_MOD1 | KEY_SHIFT | awt::Key::RETURN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, KEY_MOD1 | KEY_SHIFT | awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 }
 
@@ -140,49 +130,539 @@ void ScUiCalcTest::insertNewSheet(ScDocument& rDoc)
     CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(nTabs + 1), rDoc.GetTableCount());
 }
 
-constexpr OUStringLiteral DATA_DIRECTORY = u"/sc/qa/unit/uicalc/data/";
-
-ScModelObj* ScUiCalcTest::createDoc(const char* pName)
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf100847)
 {
-    if (mxComponent.is())
-        mxComponent->dispose();
-    mxComponent = loadFromDesktop(m_directories.getURLFromSrc(DATA_DIRECTORY)
-                                      + OUString::createFromAscii(pName),
-                                  "com.sun.star.sheet.SpreadsheetDocument");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    return pModelObj;
+    createScDoc();
+
+    // Save the document
+    save("calc8");
+
+    // Open a new document
+    createScDoc();
+    getScDoc();
 }
 
-ScModelObj* ScUiCalcTest::saveAndReload(css::uno::Reference<css::lang::XComponent>& xComponent,
-                                        const OUString& rFilter)
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf142854_GridVisibilityImportXlsxInHeadlessMode)
 {
-    utl::TempFile aTempFile;
-    aTempFile.EnableKillingFile();
-    css::uno::Sequence aArgs{ comphelper::makePropertyValue("FilterName", rFilter) };
-    css::uno::Reference<css::frame::XStorable> xStorable(xComponent, css::uno::UNO_QUERY_THROW);
-    xStorable->storeAsURL(aTempFile.GetURL(), aArgs);
-    css::uno::Reference<css::util::XCloseable> xCloseable(xComponent, css::uno::UNO_QUERY_THROW);
-    xCloseable->close(true);
+    // Tests are running in Headless mode
+    // Import an ods file with 'Hide' global grid visibility setting.
+    createScDoc("tdf126541_GridOffGlobally.ods");
+    ScDocument* pDoc = getScDoc();
+    CPPUNIT_ASSERT(!pDoc->GetViewOptions().GetOption(VOPT_GRID));
 
-    mxComponent = loadFromDesktop(aTempFile.GetURL(), "com.sun.star.sheet.SpreadsheetDocument");
+    // To avoid regression, in headless mode leave the bug tdf126541
+    // It means Sheet based grid line visibility setting will overwrite the global setting.
+    // If there is only 1 sheet in the document, it will not result visible problems.
+    createScDoc("tdf126541_GridOff.xlsx");
+    pDoc = getScDoc();
+    CPPUNIT_ASSERT(!pDoc->GetViewOptions().GetOption(VOPT_GRID));
+}
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testExternalReferences)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"2015");
+    insertStringToCell("A2", u"2015");
+    insertStringToCell("A3", u"2015");
+
+    insertStringToCell("B1", u"1");
+    insertStringToCell("B2", u"1");
+    insertStringToCell("B3", u"2");
+
+    insertStringToCell("C1", u"10");
+    insertStringToCell("C2", u"20");
+    insertStringToCell("C3", u"5");
+
+    insertStringToCell("D1", u"BIG FISH");
+    insertStringToCell("D2", u"FISHFISH");
+    insertStringToCell("D3", u"FISHY");
+
+    // Save the document
+    save("calc8");
+
+    // Open a new document
+    createScDoc();
+    pDoc = getScDoc();
+
+    // Insert the references to the external document
+    {
+        // tdf#115162
+        OUString aFormula = "=SUMIFS('" + maTempFile.GetURL() + "'#$Sheet1.C1:C3,'"
+                            + maTempFile.GetURL() + "'#$Sheet1.B1:B3,1,'" + maTempFile.GetURL()
+                            + "'#$Sheet1.A1:A3,2015)";
+        insertStringToCell("A1", aFormula);
+
+        // tdf#115162: Without the fix in place, this test would have failed with
+        // - Expected: 30
+        // - Actual  : Err:504
+        CPPUNIT_ASSERT_EQUAL(OUString("30"), pDoc->GetString(ScAddress(0, 0, 0)));
+    }
+
+    {
+        // tdf#114820
+        OUString aFormula = "=VLOOKUP('" + maTempFile.GetURL() + "'#$Sheet1.A1;'"
+                            + maTempFile.GetURL() + "'#$Sheet1.A1:B3,2,0)";
+        insertStringToCell("A1", aFormula);
+
+        // Without the fix in place, this test would have failed with
+        // - Expected: 1
+        // - Actual  : Err:504
+        CPPUNIT_ASSERT_EQUAL(OUString("1"), pDoc->GetString(ScAddress(0, 0, 0)));
+    }
+
+    {
+        // tdf#116149
+        OUString aFormula = "=VAR('" + maTempFile.GetURL() + "'#$Sheet1.C1;'" + maTempFile.GetURL()
+                            + "'#$Sheet1.C2)";
+        insertStringToCell("A1", aFormula);
+
+        // Without the fix in place, this test would have failed with
+        // - Expected: 50
+        // - Actual  : Err:504
+        CPPUNIT_ASSERT_EQUAL(OUString("50"), pDoc->GetString(ScAddress(0, 0, 0)));
+    }
+
+    {
+        // tdf#100847
+        // Use an empty cell
+        OUString aFormula = "=+'" + maTempFile.GetURL() + "'#$Sheet1.A1000";
+        insertStringToCell("A1", aFormula);
+
+        aFormula = "=+'" + maTempFile.GetURL() + "'#$Sheet1.A1000*1";
+        insertStringToCell("B1", aFormula);
+
+        aFormula = "=+N('" + maTempFile.GetURL() + "'#$Sheet1.A1000)*1";
+        insertStringToCell("C1", aFormula);
+
+        CPPUNIT_ASSERT_EQUAL(OUString("0"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+        // Without the fix in place, this test would have failed with
+        // - Expected: 0
+        // - Actual  : #VALUE!
+        CPPUNIT_ASSERT_EQUAL(OUString("0"), pDoc->GetString(ScAddress(1, 0, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString("0"), pDoc->GetString(ScAddress(2, 0, 0)));
+    }
+
+    {
+        //tdf#36387
+        OUString aAndFormula = "=AND('" + maTempFile.GetURL() + "'#$Sheet1.A1:C1)";
+        insertStringToCell("A1", aAndFormula);
+
+        OUString aOrFormula = "=OR('" + maTempFile.GetURL() + "'#$Sheet1.A1:C1)";
+        insertStringToCell("B1", aOrFormula);
+
+        // Without the fix in place, this test would have failed with
+        // - Expected: TRUE
+        // - Actual  : Err:504
+        CPPUNIT_ASSERT_EQUAL(OUString("TRUE"), pDoc->GetString(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString("TRUE"), pDoc->GetString(ScAddress(1, 0, 0)));
+    }
+
+    {
+        //tdf#113898
+        OUString aAndFormula = "=SUMPRODUCT(NOT(ISERROR(FIND(\"FISH\";'" + maTempFile.GetURL()
+                               + "'#$Sheet1.D1:D3))))";
+        insertStringToCell("A1", aAndFormula);
+
+        // Without the fix in place, this test would have failed with
+        // - Expected: 3
+        // - Actual  : 1
+        CPPUNIT_ASSERT_EQUAL(3.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf103994)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"1");
+    insertStringToCell("B1", u"2");
+
+    // Save the document
+    save("calc8");
+
+    // Open a new document
+    createScDoc();
+    pDoc = getScDoc();
+
+    // Insert the reference to the external document
+    OUString aFormula = "='" + maTempFile.GetURL() + "'#$Sheet1.A1";
+    insertStringToCell("A1", aFormula);
+
+    CPPUNIT_ASSERT_EQUAL(aFormula, pDoc->GetFormula(0, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+
+    goToCell("A1");
+
+    dispatchCommand(mxComponent, ".uno:Cut", {});
+    Scheduler::ProcessEventsToIdle();
+
+    goToCell("B1");
+
+    dispatchCommand(mxComponent, ".uno:Paste", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: ='file:///tmp/lu124171irlmb.tmp'#$Sheet1.A1
+    // - Actual  : ='file:///tmp/lu124171irlmb.tmp'#$Sheet1.B1
+    CPPUNIT_ASSERT_EQUAL(aFormula, pDoc->GetFormula(1, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(1, 0, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf113541)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"50");
+
+    // Save the document
+    save("calc8");
+
+    // Open a new document
+    createScDoc();
+    pDoc = getScDoc();
+
+    // Change grammar to Excel A1
+    pDoc->SetGrammar(formula::FormulaGrammar::GRAM_ENGLISH_XL_A1);
+
+    // Insert the reference to the external document
+    OUString aFormula = "=['" + maTempFile.GetURL() + "']Sheet1!A1";
+    insertStringToCell("A1", aFormula);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 50
+    // - Actual  : Err:507
+    CPPUNIT_ASSERT_EQUAL(OUString("50"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+    // Change grammar to default
+    pDoc->SetGrammar(formula::FormulaGrammar::GRAM_ENGLISH);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126577)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("A1:A20");
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "FillDir", uno::Any(OUString("B")) },
+                                           { "FillCmd", uno::Any(OUString("L")) },
+                                           { "FillStep", uno::Any(OUString("1")) },
+                                           { "FillDateCmd", uno::Any(OUString("D")) },
+                                           { "FillStart", uno::Any(OUString("1")) },
+                                           { "FillMax", uno::Any(OUString("10")) } }));
+    dispatchCommand(mxComponent, ".uno:FillSeries", aArgs);
+
+    for (size_t i = 0; i < 10; ++i)
+    {
+        CPPUNIT_ASSERT_EQUAL(OUString(OUString::number(i + 1)),
+                             pDoc->GetString(ScAddress(0, i, 0)));
+    }
+
+    for (size_t i = 10; i < 20; ++i)
+    {
+        // Without the fix in place, this test would have failed with
+        // - Expected:
+        // - Actual  : #NUM!
+        CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, i, 0)));
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf107869)
+{
+    // Without the fix in place, this test would have crashed
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"A");
+    insertStringToCell("A2", u"B");
+
+    // Add a new comment to A1 and A2
+    uno::Sequence<beans::PropertyValue> aArgs
+        = comphelper::InitPropertySequence({ { "Text", uno::Any(OUString("Comment")) } });
+
+    goToCell("A1");
+    dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
+    Scheduler::ProcessEventsToIdle();
+
+    goToCell("A2");
+    dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_MESSAGE("There should be a note on A1", pDoc->HasNote(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_MESSAGE("There should be a note on A2", pDoc->HasNote(ScAddress(0, 1, 0)));
+
+    goToCell("A1");
+
+    dispatchCommand(mxComponent, ".uno:SelectRow", {});
+    Scheduler::ProcessEventsToIdle();
+
+    dispatchCommand(mxComponent, ".uno:DeleteRows", {});
+    Scheduler::ProcessEventsToIdle();
+
+    for (size_t i = 0; i < 10; ++i)
+    {
+        CPPUNIT_ASSERT_EQUAL(OUString("B"), pDoc->GetString(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be a note on A1", pDoc->HasNote(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be no note on A2", !pDoc->HasNote(ScAddress(0, 1, 0)));
+
+        dispatchCommand(mxComponent, ".uno:Undo", {});
+        Scheduler::ProcessEventsToIdle();
+
+        CPPUNIT_ASSERT_EQUAL(OUString("A"), pDoc->GetString(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString("B"), pDoc->GetString(ScAddress(0, 1, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be a note on A1", pDoc->HasNote(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be a note on A2", pDoc->HasNote(ScAddress(0, 1, 0)));
+
+        dispatchCommand(mxComponent, ".uno:Redo", {});
+        Scheduler::ProcessEventsToIdle();
+    }
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    goToCell("A1:A2");
+
+    dispatchCommand(mxComponent, ".uno:SelectRow", {});
+    Scheduler::ProcessEventsToIdle();
+
+    dispatchCommand(mxComponent, ".uno:DeleteRows", {});
+    Scheduler::ProcessEventsToIdle();
+
+    for (size_t i = 0; i < 10; ++i)
+    {
+        CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 1, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be no note on A1", !pDoc->HasNote(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be no note on A2", !pDoc->HasNote(ScAddress(0, 1, 0)));
+
+        dispatchCommand(mxComponent, ".uno:Undo", {});
+        Scheduler::ProcessEventsToIdle();
+
+        CPPUNIT_ASSERT_EQUAL(OUString("A"), pDoc->GetString(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_EQUAL(OUString("B"), pDoc->GetString(ScAddress(0, 1, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be a note on A1", pDoc->HasNote(ScAddress(0, 0, 0)));
+        CPPUNIT_ASSERT_MESSAGE("There should be a note on A2", pDoc->HasNote(ScAddress(0, 1, 0)));
+
+        dispatchCommand(mxComponent, ".uno:Redo", {});
+        Scheduler::ProcessEventsToIdle();
+    }
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf63805)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"2012-10-31");
+
+    goToCell("A1:A20");
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "FillDir", uno::Any(OUString("B")) },
+                                           { "FillCmd", uno::Any(OUString("D")) },
+                                           { "FillStep", uno::Any(OUString("1")) },
+                                           { "FillDateCmd", uno::Any(OUString("M")) },
+                                           { "FillStart", uno::Any(OUString("41213")) } }));
+    dispatchCommand(mxComponent, ".uno:FillSeries", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2012-10-31"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 2012-11-30
+    // - Actual  : 2012-12-01
+    CPPUNIT_ASSERT_EQUAL(OUString("2012-11-30"), pDoc->GetString(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2012-12-31"), pDoc->GetString(ScAddress(0, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-01-31"), pDoc->GetString(ScAddress(0, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-02-28"), pDoc->GetString(ScAddress(0, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-03-31"), pDoc->GetString(ScAddress(0, 5, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-04-30"), pDoc->GetString(ScAddress(0, 6, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-05-31"), pDoc->GetString(ScAddress(0, 7, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-06-30"), pDoc->GetString(ScAddress(0, 8, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-07-31"), pDoc->GetString(ScAddress(0, 9, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-08-31"), pDoc->GetString(ScAddress(0, 10, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-09-30"), pDoc->GetString(ScAddress(0, 11, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-10-31"), pDoc->GetString(ScAddress(0, 12, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-11-30"), pDoc->GetString(ScAddress(0, 13, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2013-12-31"), pDoc->GetString(ScAddress(0, 14, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2014-01-31"), pDoc->GetString(ScAddress(0, 15, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2014-02-28"), pDoc->GetString(ScAddress(0, 16, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2014-03-31"), pDoc->GetString(ScAddress(0, 17, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2014-04-30"), pDoc->GetString(ScAddress(0, 18, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("2014-05-31"), pDoc->GetString(ScAddress(0, 19, 0)));
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2012-10-31"), pDoc->GetString(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 1, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf147894)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    //Select the first row
+    goToCell("1:1");
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "FillDir", uno::Any(OUString("R")) },
+                                           { "FillCmd", uno::Any(OUString("L")) },
+                                           { "FillStep", uno::Any(OUString("1")) },
+                                           { "FillDateCmd", uno::Any(OUString("D")) },
+                                           { "FillStart", uno::Any(OUString("1")) } }));
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:FillSeries", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(16384.0, pDoc->GetValue(ScAddress(16383, 0, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf94208)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"=COUNTA(B:B)");
+    insertStringToCell("A3", u"Range");
+    insertStringToCell("A4", u"Range");
+    insertStringToCell("A5", u"Range");
+    insertStringToCell("A6", u"Range");
+    insertStringToCell("A7", u"Range");
+    insertStringToCell("A8", u"Range");
+    insertStringToCell("B6", u"Test");
+
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+
+    goToCell("A3:A8");
+
+    dispatchCommand(mxComponent, ".uno:SelectRow", {});
+    Scheduler::ProcessEventsToIdle();
+
+    //type Control-D/Fill Down
+    dispatchCommand(mxComponent, ".uno:FillDown", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 1
+    // - Actual  : 0
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 0, 0)));
+
+    for (SCROW i = 2; i < 8; ++i)
+    {
+        CPPUNIT_ASSERT_EQUAL(OUString("Range"), pDoc->GetString(ScAddress(0, i, 0)));
+    }
+
+    CPPUNIT_ASSERT_EQUAL(OUString("Test"), pDoc->GetString(ScAddress(1, 5, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf37623)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("A3:A4");
+
+    dispatchCommand(mxComponent, ".uno:HideRow", {});
+
+    insertStringToCell("A2", u"1");
+
+    goToCell("A2:A6");
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "FillDir", uno::Any(OUString("B")) },
+                                           { "FillCmd", uno::Any(OUString("A")) },
+                                           { "FillStep", uno::Any(OUString("1")) },
+                                           { "FillDateCmd", uno::Any(OUString("M")) } }));
+    dispatchCommand(mxComponent, ".uno:FillSeries", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(2.0, pDoc->GetValue(ScAddress(0, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(3.0, pDoc->GetValue(ScAddress(0, 5, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf144308)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    css::uno::Reference<css::sheet::XGlobalSheetSettings> xGlobalSheetSettings
+        = css::sheet::GlobalSheetSettings::create(::comphelper::getProcessComponentContext());
+    bool bOldValue = xGlobalSheetSettings->getDoAutoComplete();
+
+    xGlobalSheetSettings->setDoAutoComplete(true);
+
+    insertStringToCell("A1", u"ABC");
+
+    insertStringToCell("A2", u"A");
+
+    CPPUNIT_ASSERT_EQUAL(OUString("ABC"), pDoc->GetString(ScAddress(0, 1, 0)));
+
+    xGlobalSheetSettings->setDoAutoComplete(false);
+
+    insertStringToCell("A3", u"A");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: A
+    // - Actual  : ABC
+    CPPUNIT_ASSERT_EQUAL(OUString("A"), pDoc->GetString(ScAddress(0, 2, 0)));
+
+    // Restore the previous value
+    xGlobalSheetSettings->setDoAutoComplete(bOldValue);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf56036)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("A1");
+
+    typeString(u"=SUM( 1 + 2 ");
+
+    // Insert Newline
     ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    return pModelObj;
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_MOD1 | awt::Key::RETURN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, KEY_MOD1 | awt::Key::RETURN);
+    Scheduler::ProcessEventsToIdle();
+
+    typeString(u"+ 3)");
+
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 6
+    // - Actual  : Err:501
+    CPPUNIT_ASSERT_EQUAL(OUString("6"), pDoc->GetString(ScAddress(0, 0, 0)));
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119162)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "Test", /*bUseReturn*/ false);
+    goToCell("A1");
+
+    typeString(u"Test");
 
     // Insert Newline
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_MOD1 | awt::Key::RETURN);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, KEY_MOD1 | awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
@@ -210,11 +690,66 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119162)
                          pDoc->GetString(ScAddress(0, 0, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf90579)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"2300");
+    insertStringToCell("A2", u"Libre");
+    insertStringToCell("B1", u"10");
+    insertStringToCell("B2", u"Office");
+    insertStringToCell("C1", u"=SUM(A1:B1)");
+    insertStringToCell("C2", u"=A2&B2");
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2310"), pDoc->GetString(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("LibreOffice"), pDoc->GetString(ScAddress(2, 1, 0)));
+
+    goToCell("C1:C2");
+
+    dispatchCommand(mxComponent, ".uno:ConvertFormulaToValue", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2310"), pDoc->GetString(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("LibreOffice"), pDoc->GetString(ScAddress(2, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetFormula(2, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetFormula(2, 1, 0));
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2310"), pDoc->GetString(ScAddress(2, 0, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("LibreOffice"), pDoc->GetString(ScAddress(2, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("=SUM(A1:B1)"), pDoc->GetFormula(2, 0, 0));
+    CPPUNIT_ASSERT_EQUAL(OUString("=A2&B2"), pDoc->GetFormula(2, 1, 0));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124820)
+{
+    createScDoc("tdf124820.xlsx");
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("B2");
+
+    dispatchCommand(mxComponent, ".uno:Strikeout", {});
+    Scheduler::ProcessEventsToIdle();
+
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
+
+    vcl::Font aFont;
+    const ScPatternAttr* pPattern = pDoc->GetPattern(1, 1, 0);
+    pPattern->GetFont(aFont, SC_AUTOCOL_RAW);
+
+    // Without the fix in place, this test would have failed here
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("font should be striked out", STRIKEOUT_SINGLE,
+                                 aFont.GetStrikeout());
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119155)
 {
-    ScModelObj* pModelObj = createDoc("tdf119155.xlsx");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf119155.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     goToCell("C2:C14");
 
@@ -228,11 +763,98 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119155)
                          pDoc->GetString(ScAddress(2, 13, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf146795)
+{
+    createScDoc("tdf146795.ods");
+    ScDocument* pDoc = getScDoc();
+
+    // Disable replace cell warning
+    ScModule* pMod = SC_MOD();
+    ScInputOptions aInputOption = pMod->GetInputOptions();
+    bool bOldStatus = aInputOption.GetReplaceCellsWarn();
+    aInputOption.SetReplaceCellsWarn(false);
+    pMod->SetInputOptions(aInputOption);
+
+    goToCell("B2");
+
+    dispatchCommand(mxComponent, ".uno:Copy", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Move to B3
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Select the three following cells
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:Paste", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pDoc->GetString(ScAddress(1, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pDoc->GetString(ScAddress(1, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pDoc->GetString(ScAddress(1, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("44"), pDoc->GetString(ScAddress(1, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("44"), pDoc->GetString(ScAddress(1, 5, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pDoc->GetString(ScAddress(1, 6, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("a"), pDoc->GetString(ScAddress(1, 7, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("44"), pDoc->GetString(ScAddress(1, 8, 0)));
+
+    // Restore previous status
+    aInputOption.SetReplaceCellsWarn(bOldStatus);
+    pMod->SetInputOptions(aInputOption);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf147744)
+{
+    createScDoc("tdf147744.ods");
+    ScDocument* pDoc = getScDoc();
+
+    // Disable replace cell warning
+    ScModule* pMod = SC_MOD();
+    ScInputOptions aInputOption = pMod->GetInputOptions();
+    bool bOldStatus = aInputOption.GetReplaceCellsWarn();
+    aInputOption.SetReplaceCellsWarn(false);
+    pMod->SetInputOptions(aInputOption);
+
+    goToCell("A2");
+
+    dispatchCommand(mxComponent, ".uno:Copy", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Move to A3
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Select the following cell
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:Paste", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 1, 0)));
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(1.0, pDoc->GetValue(ScAddress(0, 5, 0)));
+    CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(0, 6, 0)));
+
+    // Restore previous status
+    aInputOption.SetReplaceCellsWarn(bOldStatus);
+    pMod->SetInputOptions(aInputOption);
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138432)
 {
-    ScModelObj* pModelObj = createDoc("tdf138432.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf138432.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Set the system locale to Hungarian
     SvtSysLocaleOptions aOptions;
@@ -254,13 +876,12 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138432)
 
     goToCell("A2");
 
-    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, '=', 0);
-    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, '=', 0);
-    Scheduler::ProcessEventsToIdle();
+    typeString(u"=");
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
     Scheduler::ProcessEventsToIdle();
 
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
@@ -273,19 +894,15 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138432)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf143896)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A2000", "Test");
+    insertStringToCell("A2000", u"Test");
 
     CPPUNIT_ASSERT_EQUAL(OUString("Test"), pDoc->GetString(ScAddress(0, 1999, 0)));
 
-    pModelObj = saveAndReload(mxComponent, "Calc Office Open XML");
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    saveAndReload("Calc Office Open XML");
+    pDoc = getScDoc();
 
     // Without the fix in place, this test would have failed with
     // - Expected: Test
@@ -295,13 +912,10 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf143896)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf145085)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertArrayToCell(*pModelObj, "A1", "=HYPERLINK(\"a\";\"b\")");
+    insertArrayToCell("A1", u"=HYPERLINK(\"a\";\"b\")");
 
     CPPUNIT_ASSERT_EQUAL(OUString("b"), pDoc->GetString(ScAddress(0, 0, 0)));
 
@@ -311,11 +925,59 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf145085)
     CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 1, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf148863)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertArrayToCell("A1", u"=TRANSPOSE(IF({0|0|0}=0;RANDBETWEEN.NV(1;1000000)))");
+
+    double nA1 = pDoc->GetValue(ScAddress(0, 0, 0));
+    double nB1 = pDoc->GetValue(ScAddress(1, 0, 0));
+    double nC1 = pDoc->GetValue(ScAddress(2, 0, 0));
+
+    // Without the fix in place, this test would have failed here
+    CPPUNIT_ASSERT(nA1 != nB1);
+    CPPUNIT_ASSERT(nA1 != nC1);
+    CPPUNIT_ASSERT(nB1 != nC1);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf144244)
+{
+    createScDoc("tdf144244.ods");
+    ScDocument* pDoc = getScDoc();
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    uno::Reference<drawing::XDrawPage> xPage(pModelObj->getDrawPages()->getByIndex(0),
+                                             uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xPage->getCount());
+
+    // Select column A and B
+    goToCell("A:B");
+
+    dispatchCommand(mxComponent, ".uno:DeleteColumns", {});
+
+    CPPUNIT_ASSERT_EQUAL(OUString("x"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+    // FIXME: validation fails with
+    // Error: unexpected attribute "drawooo:display"
+    skipValidation();
+
+    // Without the fix in place, this test would have crashed
+    saveAndReload("calc8");
+    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("x"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+    xPage.set(pModelObj->getDrawPages()->getByIndex(0), uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xPage->getCount());
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf100582)
 {
-    ScModelObj* pModelObj = createDoc("tdf100582.xls");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf100582.xls");
+    ScDocument* pDoc = getScDoc();
 
     // Disable replace cell warning
     ScModule* pMod = SC_MOD();
@@ -332,9 +994,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf100582)
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
 
-    pModelObj = saveAndReload(mxComponent, "MS Excel 97");
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    saveAndReload("MS Excel 97");
+    pDoc = getScDoc();
 
     OUString aFormula = pDoc->GetFormula(3, 10, 0);
 
@@ -358,9 +1019,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf100582)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf145640)
 {
-    ScModelObj* pModelObj = createDoc("tdf145640.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf145640.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Enable sorting with update reference
     ScModule* pMod = SC_MOD();
@@ -394,9 +1054,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf145640)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf97215)
 {
-    ScModelObj* pModelObj = createDoc("tdf97215.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf97215.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Enable sorting with update reference
     ScModule* pMod = SC_MOD();
@@ -427,9 +1086,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf97215)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf92963)
 {
-    ScModelObj* pModelObj = createDoc("tdf92963.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf92963.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Disable replace cell warning
     ScModule* pMod = SC_MOD();
@@ -456,84 +1114,97 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf92963)
     pMod->SetInputOptions(aInputOption);
 }
 
+#if !defined(MACOSX) && !defined(_WIN32) //FIXME
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf140151)
 {
-#if !defined(MACOSX) && !defined(_WIN32) //FIXME
-    ScModelObj* pModelObj = createDoc("tdf140151.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf140151.ods");
+    ScDocShell* pDocSh = getScDocShell();
 
     // Focus is already on the button
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 
     // Without the fix in place, the current cursor position wouldn't have changed
-    lcl_AssertCurrentCursorPosition(1, 110);
-#endif
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B111");
 }
+#endif
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf68290)
 {
-    ScModelObj* pModelObj = createDoc("tdf68290.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf68290.ods");
+    ScDocShell* pDocSh = getScDocShell();
 
-    const std::vector<SCROW> aExpectedRows{ 2, 5, 8, 9, 10, 12, 14 };
+    const std::vector<OUString> aExpectedAddresses{ "L3", "L6", "L9", "L10", "L11", "L13", "L15" };
 
-    for (const auto& rRow : aExpectedRows)
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    for (const auto& rAddress : aExpectedAddresses)
     {
-        lcl_AssertCurrentCursorPosition(11, rRow);
+        lcl_AssertCurrentCursorPosition(*pDocSh, rAddress);
 
         pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
         Scheduler::ProcessEventsToIdle();
     }
 
-    lcl_AssertCurrentCursorPosition(12, 2);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"M3");
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf132057)
+{
+    createScDoc("tdf132057.ods");
+    ScDocShell* pDocSh = getScDocShell();
+
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"AU43");
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_RETURN);
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, the cursor would have jumped to cell BM1
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"G39");
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf122232)
 {
-    ScModelObj* pModelObj = createDoc("tdf122232.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf122232.ods");
+    ScDocShell* pDocSh = getScDocShell();
 
     //Start with from C6. Press tabulator to reach G6.
-    lcl_AssertCurrentCursorPosition(2, 5);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"C6");
 
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_TAB);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_TAB);
     Scheduler::ProcessEventsToIdle();
-    lcl_AssertCurrentCursorPosition(6, 5);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"G6");
 
     //without the fix, cursor would jump to C29 instead of C7.
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
-    lcl_AssertCurrentCursorPosition(2, 6);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"C7");
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf123052)
 {
-    ScModelObj* pModelObj = createDoc("tdf123052.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf123052.ods");
+    ScDocShell* pDocSh = getScDocShell();
 
-    std::vector<ScAddress> aExpectedAddresses{ ScAddress(5, 2, 0), ScAddress(3, 4, 0),
-                                               ScAddress(4, 4, 0), ScAddress(5, 5, 0),
-                                               ScAddress(0, 7, 0), ScAddress(4, 8, 0) };
+    std::vector<OUString> aExpectedAddresses{ "F3", "D5", "E5", "F6", "A8", "E9" };
 
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     for (const auto& rAddress : aExpectedAddresses)
     {
         pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::TAB);
         pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::TAB);
         Scheduler::ProcessEventsToIdle();
 
-        lcl_AssertCurrentCursorPosition(rAddress.Col(), rAddress.Row());
+        lcl_AssertCurrentCursorPosition(*pDocSh, rAddress);
     }
 
     aExpectedAddresses.pop_back();
 
-    for (std::vector<ScAddress>::reverse_iterator it = aExpectedAddresses.rbegin();
+    for (std::vector<OUString>::reverse_iterator it = aExpectedAddresses.rbegin();
          it != aExpectedAddresses.rend(); ++it)
     {
         pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | awt::Key::TAB);
@@ -541,15 +1212,14 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf123052)
         Scheduler::ProcessEventsToIdle();
 
         // Without the fix in place, this test would have failed here
-        lcl_AssertCurrentCursorPosition((*it).Col(), (*it).Row());
+        lcl_AssertCurrentCursorPosition(*pDocSh, *it);
     }
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf120660)
 {
-    ScModelObj* pModelObj = createDoc("tdf120660.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf120660.ods");
+    ScDocument* pDoc = getScDoc();
 
     // Disable replace cell warning
     ScModule* pMod = SC_MOD();
@@ -599,16 +1269,73 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf120660)
     pMod->SetInputOptions(aInputOption);
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf146994)
+{
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
+
+    goToCell("B3");
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B3");
+
+    dispatchCommand(mxComponent, ".uno:Copy", {});
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_RIGHT);
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_RIGHT);
+    Scheduler::ProcessEventsToIdle();
+
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"D3");
+
+    dispatchCommand(mxComponent, ".uno:Paste", {});
+
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    ScRangeList aMarkedArea = getViewShell()->GetViewData().GetMarkData().GetMarkedRanges();
+    OUString aMarkedAreaString;
+    ScDocument* pDoc = getScDoc();
+    ScRangeStringConverter::GetStringFromRangeList(aMarkedAreaString, &aMarkedArea, pDoc,
+                                                   formula::FormulaGrammar::CONV_OOO);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: Sheet1.D3:Sheet1.D4
+    // - Actual  : Sheet1.A2:Sheet1.D3
+    CPPUNIT_ASSERT_EQUAL(OUString("Sheet1.D3:Sheet1.D4"), aMarkedAreaString);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf45020)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("A2:A3");
+
+    dispatchCommand(mxComponent, ".uno:HideRow", {});
+
+    goToCell("A1");
+
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
+    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_SHIFT | KEY_DOWN);
+    Scheduler::ProcessEventsToIdle();
+
+    ScRangeList aMarkedArea = getViewShell()->GetViewData().GetMarkData().GetMarkedRanges();
+    OUString aMarkedAreaString;
+    ScRangeStringConverter::GetStringFromRangeList(aMarkedAreaString, &aMarkedArea, pDoc,
+                                                   formula::FormulaGrammar::CONV_OOO);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: Sheet1.A1:Sheet1.A4
+    // - Actual  : Sheet1.A1:Sheet1.A2
+    CPPUNIT_ASSERT_EQUAL(OUString("Sheet1.A1:Sheet1.A4"), aMarkedAreaString);
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117706)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
 
-    insertStringToCell(*pModelObj, "A1", "A1");
-    insertStringToCell(*pModelObj, "A3", "A3");
+    insertStringToCell("A1", u"A1");
+    insertStringToCell("A3", u"A3");
 
     // Use Adding Selection
     dispatchCommand(mxComponent, ".uno:StatusSelectionModeExp", {});
@@ -620,21 +1347,16 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117706)
 
     dispatchCommand(mxComponent, ".uno:GoDown", {});
     dispatchCommand(mxComponent, ".uno:GoDown", {});
-    lcl_AssertCurrentCursorPosition(0, 2);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A3");
 
     dispatchCommand(mxComponent, ".uno:SelectRow", {});
     Scheduler::ProcessEventsToIdle();
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
 
-    mxComponent->dispose();
-
     // Open a new document
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
 
@@ -646,11 +1368,42 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117706)
     CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 2, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf86166)
+{
+    createScDoc("tdf86166.ods");
+    ScDocument* pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(2), pDoc->GetTableCount());
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "Index", uno::Any(sal_uInt16(0)) } }));
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:Remove", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(1), pDoc->GetTableCount());
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf149502_HangOnDeletingSheet1)
+{
+    createScDoc("tdf149502_HangOnDeletingSheet1.ods");
+    ScDocument* pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(4), pDoc->GetTableCount());
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "Index", uno::Any(sal_uInt16(0)) } }));
+
+    // Before the fix in place, this test frozen here
+    dispatchCommand(mxComponent, ".uno:Remove", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(3), pDoc->GetTableCount());
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf149503)
 {
-    ScModelObj* pModelObj = createDoc("tdf149503.xls");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf149503.xls");
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:SelectAll", {});
     Scheduler::ProcessEventsToIdle();
@@ -666,17 +1419,36 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf149503)
     CPPUNIT_ASSERT_EQUAL(size_t(1), pDPs->GetCount());
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf108292)
+{
+    createScDoc("tdf108292.ods");
+    ScDocument* pDoc = getScDoc();
+
+    dispatchCommand(mxComponent, ".uno:SelectAll", {});
+    Scheduler::ProcessEventsToIdle();
+
+    dispatchCommand(mxComponent, ".uno:Copy", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Open a new document
+    createScDoc();
+    pDoc = getScDoc();
+
+    // Without the fix in place, this test would have crashed
+    dispatchCommand(mxComponent, ".uno:Paste", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("2D"), pDoc->GetString(ScAddress(26, 0, 0)));
+}
+
 // Inspired from testTdf117706, test columns instead of rows
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testMultiRangeCol)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
 
-    insertStringToCell(*pModelObj, "A1", "A1");
-    insertStringToCell(*pModelObj, "C1", "C1");
+    insertStringToCell("A1", u"A1");
+    insertStringToCell("C1", u"C1");
 
     // Use Adding Selection
     dispatchCommand(mxComponent, ".uno:StatusSelectionModeExp", {});
@@ -688,21 +1460,16 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testMultiRangeCol)
 
     dispatchCommand(mxComponent, ".uno:GoRight", {});
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(2, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"C1");
 
     dispatchCommand(mxComponent, ".uno:SelectColumn", {});
     Scheduler::ProcessEventsToIdle();
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
 
-    mxComponent->dispose();
-
     // Open a new document
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
 
@@ -715,20 +1482,17 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testMultiRangeCol)
 // Note: the transpose functionality is tested in ucalc
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testPasteTransposed)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "a");
-    insertStringToCell(*pModelObj, "A3", "=A1");
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"a");
+    insertStringToCell("A3", u"=A1");
 
     // Add a note to A1
     goToCell("A1");
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "Text", uno::makeAny(OUString("Note in A1")) } });
+        = comphelper::InitPropertySequence({ { "Text", uno::Any(OUString("Note in A1")) } });
     dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
 
     // Set A2 bold
@@ -746,14 +1510,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testPasteTransposed)
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
 
-    mxComponent->dispose();
-
     // Open a new document
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:PasteTransposed", {});
 
@@ -775,23 +1534,20 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testPasteTransposed)
 }
 
 // Test the call of .uno:PasteAsLink (tdf#90101)
-// Note: the paste as link functionaly is tested in ucalc
+// Note: the paste as link functionality is tested in ucalc
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testPasteAsLink)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "a");
-    insertStringToCell(*pModelObj, "A3", "=A1");
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"a");
+    insertStringToCell("A3", u"=A1");
 
     // Add a note to A1
     goToCell("A1");
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "Text", uno::makeAny(OUString("Note in A1")) } });
+        = comphelper::InitPropertySequence({ { "Text", uno::Any(OUString("Note in A1")) } });
     dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
 
     // Set A2 bold
@@ -832,13 +1588,10 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testPasteAsLink)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf131442)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertArrayToCell(*pModelObj, "A1:A5", "={6;4;2;5;3}");
+    insertArrayToCell("A1:A5", u"={6;4;2;5;3}");
 
     CPPUNIT_ASSERT_EQUAL(OUString("6"), pDoc->GetString(ScAddress(0, 0, 0)));
     CPPUNIT_ASSERT_EQUAL(OUString("4"), pDoc->GetString(ScAddress(0, 1, 0)));
@@ -868,25 +1621,23 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf131442)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117458)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
 
     ScModule* pMod = SC_MOD();
     ScInputOptions aInputOption = pMod->GetInputOptions();
     sal_uInt16 bOldStatus = aInputOption.GetMoveDir();
 
-    lcl_AssertCurrentCursorPosition(0, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A1");
 
     aInputOption.SetMoveDir(DIR_BOTTOM);
     pMod->SetInputOptions(aInputOption);
 
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 
-    lcl_AssertCurrentCursorPosition(0, 1);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A2");
 
     aInputOption.SetMoveDir(DIR_TOP);
     pMod->SetInputOptions(aInputOption);
@@ -894,7 +1645,7 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117458)
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 
-    lcl_AssertCurrentCursorPosition(0, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A1");
 
     aInputOption.SetMoveDir(DIR_RIGHT);
     pMod->SetInputOptions(aInputOption);
@@ -902,7 +1653,7 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117458)
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 
-    lcl_AssertCurrentCursorPosition(1, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B1");
 
     aInputOption.SetMoveDir(DIR_LEFT);
     pMod->SetInputOptions(aInputOption);
@@ -910,18 +1661,37 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf117458)
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
 
-    lcl_AssertCurrentCursorPosition(0, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A1");
 
     // Restore previous status
     aInputOption.SetMoveDir(bOldStatus);
     pMod->SetInputOptions(aInputOption);
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf90694)
+{
+    createScDoc("tdf90694.ods");
+    ScDocument* pDoc = getScDoc();
+
+    // Select row 30 to 60
+    goToCell("30:60");
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:DeleteRows", {});
+
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 29, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 59, 0)));
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+
+    CPPUNIT_ASSERT_EQUAL(OUString("#REF!"), pDoc->GetString(ScAddress(0, 29, 0)));
+    CPPUNIT_ASSERT_EQUAL(OUString("#REF!"), pDoc->GetString(ScAddress(0, 59, 0)));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138710)
 {
-    ScModelObj* pModelObj = createDoc("tdf138710.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf138710.ods");
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:SelectAll", {});
 
@@ -945,9 +1715,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138710)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf128914)
 {
-    ScModelObj* pModelObj = createDoc("tdf128914.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf128914.ods");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(6.0, pDoc->GetValue(ScAddress(3, 1, 0)));
 
@@ -985,9 +1754,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf128914)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf108654)
 {
-    ScModelObj* pModelObj = createDoc("tdf108654.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf108654.ods");
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:SelectAll", {});
 
@@ -1013,11 +1781,46 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf108654)
     CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(1), pDoc->GetTableCount());
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf150219)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertNewSheet(*pDoc);
+
+    insertStringToCell("A1", u"=$Sheet1.A1");
+    goToCell("A1");
+
+    CPPUNIT_ASSERT_EQUAL(OUString("0"), pDoc->GetString(ScAddress(0, 0, 1)));
+
+    dispatchCommand(mxComponent, ".uno:ShowPrecedents", {});
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:Cut", {});
+
+    CPPUNIT_ASSERT_EQUAL(OUString(""), pDoc->GetString(ScAddress(0, 0, 1)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf150499)
+{
+    createScDoc("tdf150499.xls");
+    ScDocument* pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(2), pDoc->GetTableCount());
+
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "Index", uno::Any(sal_uInt16(0)) } }));
+
+    // Without the fix in place, this test would have crashed here
+    dispatchCommand(mxComponent, ".uno:Remove", aArgs);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SCTAB>(1), pDoc->GetTableCount());
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf133326)
 {
-    ScModelObj* pModelObj = createDoc("tdf133326.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf133326.ods");
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:SelectAll", {});
 
@@ -1064,10 +1867,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf133326)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126685)
 {
-    ScModelObj* pModelObj = createDoc("tdf126685.ods");
+    createScDoc("tdf126685.ods");
 
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    ScDocument* pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:SelectAll", {}); // test should crash here without the fix
     Scheduler::ProcessEventsToIdle();
@@ -1082,8 +1884,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126685)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119793)
 {
-    ScModelObj* pModelObj = createDoc("tdf119793.ods");
+    createScDoc("tdf119793.ods");
 
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     uno::Reference<drawing::XDrawPage> xPage(pModelObj->getDrawPages()->getByIndex(0),
                                              uno::UNO_QUERY_THROW);
     uno::Reference<drawing::XShape> xShape(xPage->getByIndex(0), uno::UNO_QUERY_THROW);
@@ -1092,7 +1895,7 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119793)
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1381), xShape->getPosition().Y);
 
     // Move the shape to the right
-    lcl_SelectObjectByName(u"Shape 1");
+    lcl_SelectObjectByName(*getViewShell(), u"Shape 1");
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_RIGHT);
     Scheduler::ProcessEventsToIdle();
 
@@ -1101,9 +1904,7 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf119793)
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1381), xShape->getPosition().Y);
 
     // Type into the shape
-    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 'x', 0);
-    pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 'x', 0);
-    Scheduler::ProcessEventsToIdle();
+    typeString(u"x");
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, KEY_ESCAPE);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, KEY_ESCAPE);
     Scheduler::ProcessEventsToIdle();
@@ -1135,37 +1936,36 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf131455)
 {
     // Note that tdf#131455 and tdf#126904 were actually incorrect,
     // but keep the test with a fixed version of the document.
-    ScModelObj* pModelObj = createDoc("tdf131455-fixed.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf131455-fixed.ods");
+    ScDocShell* pDocSh = getScDocShell();
 
-    lcl_AssertCurrentCursorPosition(0, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(1, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(4, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"E5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(5, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"F5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(8, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"I5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(9, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"J5");
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(12, 4);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"M5");
 
     //Cursor can't move forward to the right
     for (size_t i = 0; i < 5; ++i)
     {
         dispatchCommand(mxComponent, ".uno:GoRight", {});
-        lcl_AssertCurrentCursorPosition(13, 4);
+        lcl_AssertCurrentCursorPosition(*pDocSh, u"N5");
     }
 
-    CPPUNIT_ASSERT_EQUAL(sal_Int16(0), ScDocShell::GetViewData()->GetTabNo());
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getViewShell()->GetViewData().GetTabNo());
 
     dispatchCommand(mxComponent, ".uno:JumpToNextTable", {});
 
-    CPPUNIT_ASSERT_EQUAL(sal_Int16(1), ScDocShell::GetViewData()->GetTabNo());
-    lcl_AssertCurrentCursorPosition(0, 3);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(1), getViewShell()->GetViewData().GetTabNo());
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A4");
 
     // Go to row 9
     for (size_t i = 0; i < 6; ++i)
@@ -1173,35 +1973,64 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf131455)
         dispatchCommand(mxComponent, ".uno:GoDown", {});
     }
 
-    lcl_AssertCurrentCursorPosition(0, 9);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A10");
 
     dispatchCommand(mxComponent, ".uno:SelectRow", {});
     dispatchCommand(mxComponent, ".uno:DeleteRows", {});
 
     dispatchCommand(mxComponent, ".uno:JumpToPrevTable", {});
 
-    CPPUNIT_ASSERT_EQUAL(sal_Int16(0), ScDocShell::GetViewData()->GetTabNo());
-    lcl_AssertCurrentCursorPosition(13, 4);
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(0), getViewShell()->GetViewData().GetTabNo());
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"N5");
 
     //Cursor can't move forward to the right
     for (size_t i = 0; i < 5; ++i)
     {
         dispatchCommand(mxComponent, ".uno:GoRight", {});
-        lcl_AssertCurrentCursorPosition(13, 4);
+        lcl_AssertCurrentCursorPosition(*pDocSh, u"N5");
     }
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124818)
+{
+    createScDoc("tdf124818.xls");
+    ScDocument* pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(2), getViewShell()->GetViewData().GetTabNo());
+
+    dispatchCommand(mxComponent, ".uno:JumpToPrevTable", {});
+
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(1), getViewShell()->GetViewData().GetTabNo());
+
+    ScDrawLayer* pDrawLayer = pDoc->GetDrawLayer();
+    SdrPage* pPage = pDrawLayer->GetPage(1);
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pPage->GetObjCount());
+
+    dispatchCommand(mxComponent, ".uno:SelectAll", {});
+    Scheduler::ProcessEventsToIdle();
+
+    dispatchCommand(mxComponent, ".uno:Cut", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(0), pPage->GetObjCount());
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), pPage->GetObjCount());
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124816)
 {
-    ScModelObj* pModelObj = createDoc("tdf124816.xlsx");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf124816.xlsx");
+    ScDocShell* pDocSh = getScDocShell();
+    ScDocument* pDoc = getScDoc();
 
     // The actual result is completely unrelated to this test and behaviour of
     // OFFSET() was changed as of tdf#85551 and here result of that test
     // document is now Err:502 instead of 0.
     const OUString aExpectedResult("Err:502");
-    lcl_AssertCurrentCursorPosition(3, 9);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"D10");
     CPPUNIT_ASSERT_EQUAL(aExpectedResult, pDoc->GetString(ScAddress(3, 9, 0)));
 
     //Without the fix, it would crash
@@ -1213,11 +2042,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124816)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124815)
 {
-    ScModelObj* pModelObj = createDoc("tdf124815.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf124815.ods");
 
-    lcl_AssertCurrentCursorPosition(0, 0);
+    ScDocument* pDoc = getScDoc();
     CPPUNIT_ASSERT_EQUAL(OUString("Rakennukset"), pDoc->GetString(ScAddress(2, 0, 0)));
 
     //Without the fix, it would crash
@@ -1229,9 +2056,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124815)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf142010)
 {
-    ScModelObj* pModelObj = createDoc("tdf142010.xls");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf142010.xls");
+    ScDocument* pDoc = getScDoc();
 
     goToCell("A1");
 
@@ -1256,11 +2082,25 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf142010)
     CPPUNIT_ASSERT_EQUAL(5.0, pDoc->GetValue(ScAddress(5, 71, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf154061)
+{
+    createScDoc("simpleTable.xlsx");
+    ScDocument* pDoc = getScDoc();
+    CPPUNIT_ASSERT_EQUAL(OUString("Column2"), pDoc->GetString(ScAddress(1, 0, 0)));
+
+    goToCell("B1");
+
+    // Without the fix in place, it would crash here due to an out of bounds array access
+    dispatchCommand(mxComponent, ".uno:InsertColumnsBefore", {});
+    CPPUNIT_ASSERT_EQUAL(OUString("Column2"), pDoc->GetString(ScAddress(2, 0, 0)));
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    CPPUNIT_ASSERT_EQUAL(OUString("Column2"), pDoc->GetString(ScAddress(1, 0, 0)));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf132431)
 {
-    ScModelObj* pModelObj = createDoc("tdf132431.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf132431.ods");
+    ScDocument* pDoc = getScDoc();
 
     OUString aFormula = pDoc->GetFormula(7, 219, 0);
     CPPUNIT_ASSERT_EQUAL(OUString("=SUMIFS($H$2:$H$198,B$2:B$198,G220)"), aFormula);
@@ -1269,7 +2109,7 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf132431)
     // Without the fix in place, it would crash here with
     // uncaught exception of type std::exception (or derived).
     // - vector::_M_fill_insert
-    insertStringToCell(*pModelObj, "H220", "=SUMIFS($H$2:$DB$198,B$2:B$198,G220)");
+    insertStringToCell("H220", u"=SUMIFS($H$2:$DB$198,B$2:B$198,G220)");
 
     aFormula = pDoc->GetFormula(7, 219, 0);
     CPPUNIT_ASSERT_EQUAL(OUString("=SUMIFS($H$2:$DB$198,B$2:B$198,G220)"), aFormula);
@@ -1277,19 +2117,62 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf132431)
     CPPUNIT_ASSERT_EQUAL(OUString("Err:502"), pDoc->GetString(ScAddress(7, 219, 0)));
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf131073)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    for (SCCOLROW nColRow = 0; nColRow < 3; nColRow++)
+    {
+        pDoc->SetString(ScAddress(0, nColRow, 0), "Hello World");
+        pDoc->SetRowHeight(0, nColRow, 1000 * (nColRow + 1));
+        pDoc->SetString(ScAddress(nColRow, 0, 0), "Hello World");
+        pDoc->SetColWidth(nColRow, 0, 1000 * (nColRow + 1));
+    }
+
+    // Check rows
+    pDoc->SetRowHidden(1, 1, 0, true);
+    goToCell("A1:A3");
+    dispatchCommand(
+        mxComponent, ".uno:SetOptimalRowHeight",
+        comphelper::InitPropertySequence({ { "aExtraHeight", uno::Any(sal_uInt16(0)) } }));
+
+    CPPUNIT_ASSERT(!pDoc->RowHidden(0, 0));
+    // tdf#131073: Without the fix in place, the second row would not be hidden
+    CPPUNIT_ASSERT(pDoc->RowHidden(1, 0));
+    CPPUNIT_ASSERT(!pDoc->RowHidden(2, 0));
+    const sal_uInt16 nStdRowHeight = pDoc->GetRowHeight(4, 0);
+    CPPUNIT_ASSERT_EQUAL(nStdRowHeight, pDoc->GetRowHeight(0, 0));
+    CPPUNIT_ASSERT_EQUAL(nStdRowHeight, pDoc->GetRowHeight(1, SCTAB(0), false));
+    CPPUNIT_ASSERT_EQUAL(nStdRowHeight, pDoc->GetRowHeight(2, 0));
+
+    // Check columns
+    pDoc->SetColHidden(1, 1, 0, true);
+    goToCell("A1:C1");
+    dispatchCommand(
+        mxComponent, ".uno:SetOptimalColumnWidth",
+        comphelper::InitPropertySequence({ { "aExtraWidth", uno::Any(sal_uInt16(0)) } }));
+
+    CPPUNIT_ASSERT(!pDoc->ColHidden(0, 0));
+    // tdf#131073: Without the fix in place, the second column would not be hidden
+    CPPUNIT_ASSERT(pDoc->ColHidden(1, 0));
+    CPPUNIT_ASSERT(!pDoc->ColHidden(2, 0));
+    const sal_uInt16 nStdColWidth = pDoc->GetColWidth(0, 0);
+    CPPUNIT_ASSERT_EQUAL(nStdColWidth, pDoc->GetColWidth(0, 0));
+    CPPUNIT_ASSERT_EQUAL(nStdColWidth, pDoc->GetColWidth(1, SCTAB(0), false));
+    CPPUNIT_ASSERT_EQUAL(nStdColWidth, pDoc->GetColWidth(2, 0));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf83901)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
 
-    lcl_AssertCurrentCursorPosition(0, 0);
-    insertStringToCell(*pModelObj, "A2", "=ROW(A3)");
+    insertStringToCell("A2", u"=ROW(A3)");
+    ScDocument* pDoc = getScDoc();
     CPPUNIT_ASSERT_EQUAL(3.0, pDoc->GetValue(ScAddress(0, 1, 0)));
 
-    lcl_AssertCurrentCursorPosition(0, 2);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"A3");
     dispatchCommand(mxComponent, ".uno:SelectRow", {});
     dispatchCommand(mxComponent, ".uno:InsertRowsBefore", {});
 
@@ -1302,10 +2185,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf83901)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124822)
 {
-    ScModelObj* pModelObj = createDoc("tdf124822.xls");
+    createScDoc("tdf124822.xls");
 
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(OUString("X"), pDoc->GetString(ScAddress(0, 0, 2)));
 
@@ -1324,24 +2206,18 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124822)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf118189)
 {
-    ScModelObj* pModelObj = createDoc("tdf118189.xlsx");
+    createScDoc("tdf118189.xlsx");
 
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    ScDocument* pDoc = getScDoc();
 
     // Select column A
     goToCell("A:A");
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
 
-    mxComponent->dispose();
-
     // Open a new document
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    pDoc = getScDoc();
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
 
@@ -1363,10 +2239,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf118189)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf118207)
 {
-    ScModelObj* pModelObj = createDoc("tdf118189.xlsx");
+    createScDoc("tdf118189.xlsx");
 
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    ScDocument* pDoc = getScDoc();
 
     // Disable replace cell warning
     ScModule* pMod = SC_MOD();
@@ -1424,17 +2299,24 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf118207)
     pMod->SetInputOptions(aInputOption);
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf148669)
+{
+    // Without the fix in place, this test would have failed with an assert
+    createScDoc("tdf148669.xlsx");
+
+    ScDocument* pDoc = getScDoc();
+
+    CPPUNIT_ASSERT_MESSAGE("There should be a note", pDoc->HasNote(ScAddress(701, 0, 0)));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124778)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
     // Add a new comment
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "Text", uno::makeAny(OUString("Comment")) } });
+        = comphelper::InitPropertySequence({ { "Text", uno::Any(OUString("Comment")) } });
     dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
     Scheduler::ProcessEventsToIdle();
 
@@ -1454,27 +2336,23 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf124778)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138428)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
-
-    lcl_AssertCurrentCursorPosition(0, 0);
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
 
     // Add a new comment
     uno::Sequence<beans::PropertyValue> aArgs
-        = comphelper::InitPropertySequence({ { "Text", uno::makeAny(OUString("Comment")) } });
+        = comphelper::InitPropertySequence({ { "Text", uno::Any(OUString("Comment")) } });
     dispatchCommand(mxComponent, ".uno:InsertAnnotation", aArgs);
     Scheduler::ProcessEventsToIdle();
 
+    ScDocument* pDoc = getScDoc();
     CPPUNIT_ASSERT_MESSAGE("There should be a note on A1", pDoc->HasNote(ScAddress(0, 0, 0)));
     CPPUNIT_ASSERT_MESSAGE("There shouldn't be a note on B1", !pDoc->HasNote(ScAddress(1, 0, 0)));
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
 
     dispatchCommand(mxComponent, ".uno:GoRight", {});
-    lcl_AssertCurrentCursorPosition(1, 0);
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B1");
 
     dispatchCommand(mxComponent, ".uno:Paste", {});
 
@@ -1509,51 +2387,45 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf138428)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf136113)
 {
-    ScModelObj* pModelObj = createDoc("tdf136113.xlsx");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf136113.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     ScDrawLayer* pDrawLayer = pDoc->GetDrawLayer();
     SdrPage* pPage = pDrawLayer->GetPage(0);
     SdrObject* pObj = pPage->GetObj(0);
 
-    CPPUNIT_ASSERT_EQUAL(tools::Long(18160), pObj->GetSnapRect().Left());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(18142), pObj->GetSnapRect().Left());
     CPPUNIT_ASSERT_EQUAL(tools::Long(1709), pObj->GetSnapRect().Top());
 
-    lcl_SelectObjectByName(u"Arrow");
+    lcl_SelectObjectByName(*getViewShell(), u"Arrow");
 
     // Move the shape up
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::UP);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::UP);
     Scheduler::ProcessEventsToIdle();
 
-    CPPUNIT_ASSERT_EQUAL(tools::Long(18160), pObj->GetSnapRect().Left());
+    CPPUNIT_ASSERT_EQUAL(tools::Long(18142), pObj->GetSnapRect().Left());
     CPPUNIT_ASSERT_EQUAL(tools::Long(1609), pObj->GetSnapRect().Top());
 
     // Without the fix in place, this test would have failed here
-    ScDocShell* pDocSh = ScDocShell::GetViewData()->GetDocShell();
+    ScDocShell* pDocSh = getScDocShell();
     CPPUNIT_ASSERT(pDocSh->IsModified());
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf130614)
 {
-    ScModelObj* pModelObj = createDoc("tdf130614.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf130614.ods");
+    ScDocument* pDoc = getScDoc();
 
-    lcl_SelectObjectByName(u"Object 1");
+    lcl_SelectObjectByName(*getViewShell(), u"Object 1");
 
     dispatchCommand(mxComponent, ".uno:Copy", {});
     Scheduler::ProcessEventsToIdle();
 
-    mxComponent->dispose();
-
     // Open a new document
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    pDoc = getScDoc();
 
     // Without the fix in place, this test would have crashed here
     dispatchCommand(mxComponent, ".uno:Paste", {});
@@ -1566,9 +2438,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf130614)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf112735)
 {
-    ScModelObj* pModelObj = createDoc("tdf112735.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf112735.ods");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(OUString("(empty)"), pDoc->GetString(ScAddress(1, 0, 0)));
 
@@ -1584,9 +2455,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf112735)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf112884)
 {
-    ScModelObj* pModelObj = createDoc("tdf112884.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf112884.ods");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(OUString("0.5"), pDoc->GetString(ScAddress(6, 2, 0)));
     CPPUNIT_ASSERT_EQUAL(OUString("0.666666666666667"), pDoc->GetString(ScAddress(6, 3, 0)));
@@ -1608,9 +2478,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf112884)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf133342)
 {
-    ScModelObj* pModelObj = createDoc("tdf133342.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf133342.ods");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(OUString("12,35 %"), pDoc->GetString(ScAddress(0, 0, 0)));
     //Add decimals
@@ -1632,14 +2501,11 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf133342)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf71339)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A2", "1");
-    insertStringToCell(*pModelObj, "A3", "1");
+    insertStringToCell("A2", u"1");
+    insertStringToCell("A3", u"1");
 
     goToCell("A1:A3");
 
@@ -1657,21 +2523,19 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf71339)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf116421)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "1");
-    insertStringToCell(*pModelObj, "A3", "1");
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"1");
+    insertStringToCell("A3", u"1");
 
     goToCell("A4");
 
     dispatchCommand(mxComponent, ".uno:AutoSum", {});
 
     // Use RETURN key to exit autosum edit view
+    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYINPUT, 0, awt::Key::RETURN);
     pModelObj->postKeyEvent(LOK_KEYEVENT_KEYUP, 0, awt::Key::RETURN);
     Scheduler::ProcessEventsToIdle();
@@ -1688,16 +2552,14 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf116421)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf86305)
 {
-    ScModelObj* pModelObj = createDoc("tdf86305.ods");
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf86305.ods");
+    ScDocument* pDoc = getScDoc();
 
     OUString aFormula = pDoc->GetFormula(1, 6, 0);
     CPPUNIT_ASSERT_EQUAL(OUString("{=IF(SUM(B2:B4) > 0, SUM(B2:B4*D2:D4/C2:C4), 0)}"), aFormula);
     CPPUNIT_ASSERT_EQUAL(0.0, pDoc->GetValue(ScAddress(1, 6, 0)));
 
-    insertStringToCell(*pModelObj, "B3", "50");
+    insertStringToCell("B3", u"50");
     CPPUNIT_ASSERT_EQUAL(50.0, pDoc->GetValue(ScAddress(1, 2, 0)));
 
     aFormula = pDoc->GetFormula(1, 6, 0);
@@ -1711,10 +2573,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf86305)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf81351)
 {
-    ScModelObj* pModelObj = createDoc("tdf81351.ods");
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf81351.ods");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(OUString(".uno:Paste"), pDoc->GetString(ScAddress(0, 1, 0)));
     CPPUNIT_ASSERT_EQUAL(OUString(".uno:Bold"), pDoc->GetString(ScAddress(0, 2, 0)));
@@ -1781,16 +2641,13 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf81351)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf123202)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "2");
-    insertStringToCell(*pModelObj, "A3", "3");
-    insertStringToCell(*pModelObj, "A4", "4");
+    insertStringToCell(u"A1", u"1");
+    insertStringToCell(u"A2", u"2");
+    insertStringToCell(u"A3", u"3");
+    insertStringToCell(u"A4", u"4");
 
     goToCell("A3");
 
@@ -1822,12 +2679,9 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf123202)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf134675)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
-    insertStringToCell(*pModelObj, "A1", "A");
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+    insertStringToCell("A1", u"A");
 
     // Select column A
     goToCell("A:A");
@@ -1852,15 +2706,12 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf134675)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf116215)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "1");
-    insertStringToCell(*pModelObj, "B1", "1");
-    insertStringToCell(*pModelObj, "B2", "1");
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"1");
+    insertStringToCell("B1", u"1");
+    insertStringToCell("B2", u"1");
     goToCell("A1:C3");
     dispatchCommand(mxComponent, ".uno:AutoSum", {});
 
@@ -1886,31 +2737,105 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf116215)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf99913)
 {
-    ScModelObj* pModelObj = createDoc("tdf99913.xlsx");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf99913.xlsx");
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT(pDoc->RowFiltered(2, 0));
 }
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126540_GridToggleModifiesTheDocument)
 {
-    ScModelObj* pModelObj = createDoc("tdf99913.xlsx");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf99913.xlsx");
 
     // Toggling the grid of a sheet, must set the document modified state
-    ScDocShell* pDocSh = ScDocShell::GetViewData()->GetDocShell();
+    ScDocShell* pDocSh = getScDocShell();
     CPPUNIT_ASSERT(!pDocSh->IsModified());
     dispatchCommand(mxComponent, ".uno:ToggleSheetGrid", {});
     CPPUNIT_ASSERT(pDocSh->IsModified());
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf118983)
+{
+    createScDoc("tdf118983.ods");
+    ScDocument* pDoc = getScDoc();
+
+    css::uno::Reference<css::sheet::XGlobalSheetSettings> xGlobalSheetSettings
+        = css::sheet::GlobalSheetSettings::create(::comphelper::getProcessComponentContext());
+    bool bOldValue = xGlobalSheetSettings->getExpandReferences();
+
+    xGlobalSheetSettings->setExpandReferences(true);
+
+    const ScRangeData* pRD = pDoc->GetRangeName()->findByUpperName("TEST");
+    CPPUNIT_ASSERT(pRD);
+    CPPUNIT_ASSERT_EQUAL(OUString("$Test.$A$3:$D$7"), pRD->GetSymbol());
+
+    //Select columns E to G
+    goToCell("E:G");
+
+    dispatchCommand(mxComponent, ".uno:InsertColumnsBefore", {});
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: $Test.$A$3:$D$7
+    // - Actual  : $Test.$A$3:$G$7
+    CPPUNIT_ASSERT_EQUAL(OUString("$Test.$A$3:$D$7"), pRD->GetSymbol());
+
+    xGlobalSheetSettings->setExpandReferences(bOldValue);
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf107952)
+{
+    createScDoc();
+    ScDocShell* pDocSh = getScDocShell();
+
+    insertStringToCell("B1", u"=SUM(A1:A2)");
+
+    goToCell("D10");
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 1
+    // - Actual  : 3
+    // - Incorrect Column in position B1
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B1");
+
+    goToCell("D10");
+
+    dispatchCommand(mxComponent, ".uno:Redo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    lcl_AssertCurrentCursorPosition(*pDocSh, u"B1");
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf150766)
+{
+    createScDoc("tdf150766.ods");
+    ScDocument* pDoc = getScDoc();
+
+    goToCell("A3:C6");
+
+    dispatchCommand(mxComponent, ".uno:SortDescending", {});
+
+    insertStringToCell("B3", u"10");
+
+    CPPUNIT_ASSERT_EQUAL(12.0, pDoc->GetValue(ScAddress(2, 2, 0)));
+    CPPUNIT_ASSERT_EQUAL(13.0, pDoc->GetValue(ScAddress(2, 3, 0)));
+    CPPUNIT_ASSERT_EQUAL(14.0, pDoc->GetValue(ScAddress(2, 4, 0)));
+    CPPUNIT_ASSERT_EQUAL(15.0, pDoc->GetValue(ScAddress(2, 5, 0)));
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: 16
+    // - Actual  : 7
+    CPPUNIT_ASSERT_EQUAL(16.0, pDoc->GetValue(ScAddress(2, 6, 0)));
+    CPPUNIT_ASSERT_EQUAL(17.0, pDoc->GetValue(ScAddress(2, 7, 0)));
+    CPPUNIT_ASSERT_EQUAL(18.0, pDoc->GetValue(ScAddress(2, 8, 0)));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf144022)
 {
-    ScModelObj* pModelObj = createDoc("tdf144022.ods");
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc("tdf144022.ods");
+    ScDocument* pDoc = getScDoc();
 
     goToCell("A5:B79");
 
@@ -1930,18 +2855,112 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf144022)
     }
 }
 
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf99386)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("B1", u"This");
+    insertStringToCell("B2", u"=B1");
+
+    goToCell("A1:B1");
+
+    dispatchCommand(mxComponent, ".uno:ToggleMergeCells", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("0"), pDoc->GetString(ScAddress(1, 1, 0)));
+
+    dispatchCommand(mxComponent, ".uno:Undo", {});
+    Scheduler::ProcessEventsToIdle();
+
+    CPPUNIT_ASSERT_EQUAL(OUString("This"), pDoc->GetString(ScAddress(1, 0, 0)));
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: This
+    // - Actual  : 0
+    CPPUNIT_ASSERT_EQUAL(OUString("This"), pDoc->GetString(ScAddress(1, 1, 0)));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf149378)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"=MINVERSE(A1:C3)");
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: {=MINVERSE(A1:C3)}
+    // - Actual  : =MINVERSE(A1:C3)
+    CPPUNIT_ASSERT_EQUAL(OUString("{=MINVERSE(A1:C3)}"), pDoc->GetFormula(0, 0, 0));
+
+    insertStringToCell("B1", u"={1;2}");
+    CPPUNIT_ASSERT_EQUAL(OUString("{={1;2}}"), pDoc->GetFormula(1, 0, 0));
+
+    insertStringToCell("C1", u"={1;2}+3");
+    CPPUNIT_ASSERT_EQUAL(OUString("{={1;2}+3}"), pDoc->GetFormula(2, 0, 0));
+
+    insertStringToCell("D1", u"={1;2}+{3;4}");
+    CPPUNIT_ASSERT_EQUAL(OUString("{={1;2}+{3;4}}"), pDoc->GetFormula(3, 0, 0));
+
+    insertStringToCell("E1", u"={1;2}+A1");
+    CPPUNIT_ASSERT_EQUAL(OUString("{={1;2}+A1}"), pDoc->GetFormula(4, 0, 0));
+
+    insertStringToCell("F1", u"={1;2}+A1:A2");
+    CPPUNIT_ASSERT_EQUAL(OUString("={1;2}+A1:A2"), pDoc->GetFormula(5, 0, 0));
+
+    insertStringToCell("G1", u"=SUM(MUNIT(3))");
+    CPPUNIT_ASSERT_EQUAL(OUString("=SUM(MUNIT(3))"), pDoc->GetFormula(6, 0, 0));
+
+    insertStringToCell("H1", u"=SUM({1;2})");
+    CPPUNIT_ASSERT_EQUAL(OUString("=SUM({1;2})"), pDoc->GetFormula(7, 0, 0));
+
+    insertStringToCell("I1", u"=ABS({-1;-2})");
+    CPPUNIT_ASSERT_EQUAL(OUString("{=ABS({-1;-2})}"), pDoc->GetFormula(8, 0, 0));
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf152014)
+{
+    createScDoc();
+
+    insertStringToCell("A1", u"=MATCH(1,A2,0)");
+    insertStringToCell("A2", u"1");
+
+    ScDocument* pDoc = getScDoc();
+    CPPUNIT_ASSERT_EQUAL(OUString("1"), pDoc->GetString(ScAddress(0, 0, 0)));
+
+    goToCell("A1");
+
+    dispatchCommand(mxComponent, ".uno:Copy", {});
+    Scheduler::ProcessEventsToIdle();
+
+    // Create a second document
+    mxComponent2 = loadFromDesktop("private:factory/scalc");
+
+    uno::Reference<frame::XFrames> xFrames = mxDesktop->getFrames();
+    CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(2), xFrames->getCount());
+
+    dispatchCommand(mxComponent2, ".uno:Paste", {});
+    Scheduler::ProcessEventsToIdle();
+
+    ScModelObj* pModelObj2 = dynamic_cast<ScModelObj*>(mxComponent2.get());
+    CPPUNIT_ASSERT(pModelObj2);
+    ScDocument* pDoc2 = pModelObj2->GetDocument();
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: #N/A
+    // - Actual  : 1
+    CPPUNIT_ASSERT_EQUAL(OUString("#N/A"), pDoc2->GetString(ScAddress(0, 0, 0)));
+}
+
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126926)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
-    insertStringToCell(*pModelObj, "A1", "1");
-    insertStringToCell(*pModelObj, "A2", "2");
-    insertStringToCell(*pModelObj, "B1", "3");
-    insertStringToCell(*pModelObj, "B2", "4");
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"2");
+    insertStringToCell("B1", u"3");
+    insertStringToCell("B2", u"4");
 
     ScDBData* pDBData = new ScDBData("testDB", 0, 0, 0, 1, 1);
     bool bInserted
@@ -1958,11 +2977,8 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf126926)
 
 CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testUnallocatedColumnsAttributes)
 {
-    mxComponent = loadFromDesktop("private:factory/scalc");
-    ScModelObj* pModelObj = dynamic_cast<ScModelObj*>(mxComponent.get());
-    CPPUNIT_ASSERT(pModelObj);
-    ScDocument* pDoc = pModelObj->GetDocument();
-    CPPUNIT_ASSERT(pDoc);
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
 
     CPPUNIT_ASSERT_EQUAL(INITIALCOLCOUNT, pDoc->GetAllocatedColumnsCount(0));
 
@@ -1995,6 +3011,30 @@ CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testUnallocatedColumnsAttributes)
     CPPUNIT_ASSERT_EQUAL_MESSAGE("font should not be bold", WEIGHT_NORMAL, aFont.GetWeight());
     pDoc->GetPattern(100, 2, 0)->GetFont(aFont, SC_AUTOCOL_RAW);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("font should be bold", WEIGHT_BOLD, aFont.GetWeight());
+}
+
+CPPUNIT_TEST_FIXTURE(ScUiCalcTest, testTdf152577)
+{
+    createScDoc();
+    ScDocument* pDoc = getScDoc();
+
+    insertStringToCell("A1", u"1");
+    insertStringToCell("A2", u"2");
+    insertStringToCell("B1", u"3");
+    insertStringToCell("B2", u"4");
+
+    ScDBData* pDBData = new ScDBData("testDB", 0, 0, 0, 1, 1);
+    bool bInserted
+        = pDoc->GetDBCollection()->getNamedDBs().insert(std::unique_ptr<ScDBData>(pDBData));
+    CPPUNIT_ASSERT(bInserted);
+
+    insertNewSheet(*pDoc);
+    uno::Sequence<beans::PropertyValue> aArgs(
+        comphelper::InitPropertySequence({ { "Index", uno::Any(sal_uInt16(2)) } }));
+    dispatchCommand(mxComponent, ".uno:Remove", aArgs);
+
+    ScDBCollection* pDBs = pDoc->GetDBCollection();
+    CPPUNIT_ASSERT(!pDBs->empty());
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2020-10-27 12:31+0100\n"
-"PO-Revision-Date: 2020-10-14 19:35+0000\n"
+"POT-Creation-Date: 2022-12-12 14:06+0100\n"
+"PO-Revision-Date: 2022-12-21 15:34+0000\n"
 "Last-Translator: Dimitris Spingos <dmtrs32@gmail.com>\n"
-"Language-Team: Greek <https://weblate.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/el/>\n"
+"Language-Team: Greek <https://translations.documentfoundation.org/projects/libo_ui-master/wizardssourceresources/el/>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: LibreOffice\n"
+"X-Generator: Weblate 4.12.2\n"
 "X-POOTLE-MTIME: 1557298581.000000\n"
 
 #. 8UKfi
@@ -25,50 +25,50 @@ msgctxt ""
 msgid "The directory '%1' could not be created.<BR>There may not be enough space left on your hard disk."
 msgstr "Αδυναμία δημιουργίας του καταλόγου '%1'.<BR>Ίσως δεν υπάρχει αρκετός χώρος στον σκληρό δίσκο σας."
 
-#. zDuJi
+#. YDL7z
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_1\n"
 "property.text"
-msgid "The text document could not be created.<BR>Please check if the module 'PRODUCTNAME Writer' is installed."
-msgstr "Αδυναμία δημιουργίας του εγγράφου κειμένου.<BR>Ελέγξτε εάν το άρθρωμα 'PRODUCTNAME Writer' έχει εγκατασταθεί."
+msgid "The text document could not be created.<BR>Please check if the module '%PRODUCTNAME Writer' is installed."
+msgstr "Αδυναμία δημιουργίας του εγγράφου κειμένου.<BR>Ελέγξτε εάν έχει εγκατασταθεί η λειτουργική μονάδα '%PRODUCTNAME Writer'."
 
-#. BydGz
+#. ovyQD
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_2\n"
 "property.text"
-msgid "The spreadsheet could not be created.<BR>Please check if the module 'PRODUCTNAME Calc' is installed."
-msgstr "Αδυναμία δημιουργίας του υπολογιστικού φύλλου.<BR>Ελέγξτε εάν το άρθρωμα 'PRODUCTNAME Calc' έχει εγκατασταθεί."
+msgid "The spreadsheet could not be created.<BR>Please check if the module '%PRODUCTNAME Calc' is installed."
+msgstr "Αδυναμία δημιουργίας του υπολογιστικού φύλλου.<BR>Ελέγξτε εάν έχει εγκατασταθεί η λειτουργική μονάδα '%PRODUCTNAME Calc'."
 
-#. jAyjL
+#. XoWgV
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_3\n"
 "property.text"
-msgid "The presentation could not be created.<BR>Please check if the module 'PRODUCTNAME Impress' is installed."
-msgstr "Αδυναμία δημιουργίας της παρουσίασης.<BR>Ελέγξτε εάν το άρθρωμα 'PRODUCTNAME Impress' έχει εγκατασταθεί."
+msgid "The presentation could not be created.<BR>Please check if the module '%PRODUCTNAME Impress' is installed."
+msgstr "Αδυναμία δημιουργίας της παρουσίασης.<BR>Ελέγξτε εάν έχει εγκατασταθεί η λειτουργική μονάδα '%PRODUCTNAME Impress'."
 
-#. 3mrBG
+#. 86ERo
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_4\n"
 "property.text"
-msgid "The drawing could not be created.<BR>Please check if the module 'PRODUCTNAME Draw' is installed."
-msgstr "Αδυναμία δημιουργίας του σχεδίου.<BR>Ελέγξτε εάν το άρθρωμα 'PRODUCTNAME Draw' έχει εγκατασταθεί."
+msgid "The drawing could not be created.<BR>Please check if the module '%PRODUCTNAME Draw' is installed."
+msgstr "Αδυναμία δημιουργίας του σχεδίου.<BR>Ελέγξτε εάν έχει εγκατασταθεί η λειτουργική μονάδα '%PRODUCTNAME Draw'."
 
-#. rMsgf
+#. oGc3c
 #: resources_en_US.properties
 msgctxt ""
 "resources_en_US.properties\n"
 "RID_COMMON_5\n"
 "property.text"
-msgid "The formula could not be created.<BR>Please check if the module 'PRODUCTNAME Math' is installed."
-msgstr "Αδυναμία δημιουργίας του τύπου.<BR>Ελέγξτε εάν το άρθρωμα 'PRODUCTNAME Math' έχει εγκατασταθεί."
+msgid "The formula could not be created.<BR>Please check if the module '%PRODUCTNAME Math' is installed."
+msgstr "Αδευναμία δημιουργίας του τύπου.<BR>Ελέγξτε εάν έχει εγκατασταθεί η λειτουργική μονάδα '%PRODUCTNAME Math'."
 
 #. j5GzW
 #: resources_en_US.properties
@@ -3840,6 +3840,15 @@ msgctxt ""
 "property.text"
 msgid "Lithuanian Litas"
 msgstr "Λίτας Λιθουανίας"
+
+#. Zw9FF
+#: resources_en_US.properties
+msgctxt ""
+"resources_en_US.properties\n"
+"CURRENCIES_19\n"
+"property.text"
+msgid "Croatian Kuna"
+msgstr "Κροατική κούνα"
 
 #. eDjBr
 #: resources_en_US.properties

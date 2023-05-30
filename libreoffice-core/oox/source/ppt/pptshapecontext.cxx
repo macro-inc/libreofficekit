@@ -31,6 +31,7 @@
 #include <oox/token/namespaces.hxx>
 #include <oox/token/properties.hxx>
 #include <oox/token/tokens.hxx>
+#include <utility>
 
 using namespace oox::core;
 using namespace ::com::sun::star;
@@ -40,9 +41,9 @@ using namespace ::com::sun::star::text;
 namespace oox::ppt {
 
 // CT_Shape
-PPTShapeContext::PPTShapeContext( ContextHandler2Helper const & rParent, const SlidePersistPtr& rSlidePersistPtr, const oox::drawingml::ShapePtr& pMasterShapePtr, const oox::drawingml::ShapePtr& pShapePtr )
+PPTShapeContext::PPTShapeContext( ContextHandler2Helper const & rParent, SlidePersistPtr pSlidePersistPtr, const oox::drawingml::ShapePtr& pMasterShapePtr, const oox::drawingml::ShapePtr& pShapePtr )
 : oox::drawingml::ShapeContext( rParent, pMasterShapePtr, pShapePtr )
-, mpSlidePersistPtr( rSlidePersistPtr )
+, mpSlidePersistPtr(std::move( pSlidePersistPtr ))
 {
 }
 
@@ -59,14 +60,14 @@ ContextHandlerRef PPTShapeContext::onCreateContext( sal_Int32 aElementToken, con
         case PPT_TOKEN( cNvPr ):
         {
             mpShapePtr->setHidden( rAttribs.getBool( XML_hidden, false ) );
-            mpShapePtr->setId( rAttribs.getString( XML_id ).get() );
-            mpShapePtr->setName( rAttribs.getString( XML_name ).get() );
+            mpShapePtr->setId( rAttribs.getStringDefaulted( XML_id ) );
+            mpShapePtr->setName( rAttribs.getStringDefaulted( XML_name ) );
             break;
         }
         case PPT_TOKEN( ph ):
         {
             SlidePersistPtr pMasterPersist( mpSlidePersistPtr->getMasterPersist() );
-            OptValue< sal_Int32 > oSubType( rAttribs.getToken( XML_type) );
+            std::optional< sal_Int32 > oSubType( rAttribs.getToken( XML_type) );
             sal_Int32 nSubType( rAttribs.getToken( XML_type, XML_obj ) );
             oox::drawingml::ShapePtr pTmpPlaceholder;
 
@@ -74,10 +75,10 @@ ContextHandlerRef PPTShapeContext::onCreateContext( sal_Int32 aElementToken, con
 
             if( rAttribs.hasAttribute( XML_idx ) )
             {
-                sal_Int32 nSubTypeIndex = rAttribs.getString( XML_idx ).get().toInt32();
+                sal_Int32 nSubTypeIndex = rAttribs.getInteger( XML_idx, 0 );
                 mpShapePtr->setSubTypeIndex( nSubTypeIndex );
 
-                if(!oSubType.has() && pMasterPersist)
+                if(!oSubType.has_value() && pMasterPersist)
                 {
                     pTmpPlaceholder = PPTShape::findPlaceholderByIndex( nSubTypeIndex, pMasterPersist->getShapes()->getChildren() );
 

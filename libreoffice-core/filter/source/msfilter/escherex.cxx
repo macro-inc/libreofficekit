@@ -19,6 +19,7 @@
 
 #include "eschesdo.hxx"
 #include <o3tl/any.hxx>
+#include <o3tl/string_view.hxx>
 #include <svx/svdxcgv.hxx>
 #include <svx/svdomedia.hxx>
 #include <svx/xflftrit.hxx>
@@ -30,6 +31,7 @@
 #include <svx/svdoole2.hxx>
 #include <svx/sdtfsitm.hxx>
 #include <editeng/outlobj.hxx>
+#include <utility>
 #include <vcl/graph.hxx>
 #include <vcl/cvtgrf.hxx>
 #include <vcl/svapp.hxx>
@@ -91,6 +93,7 @@
 #include <sal/log.hxx>
 #include <basegfx/polygon/b2dpolypolygontools.hxx>
 #include <basegfx/polygon/b2dpolygontools.hxx>
+#include <basegfx/numeric/ftools.hxx>
 #include <osl/diagnose.h>
 
 #include <algorithm>
@@ -206,12 +209,12 @@ void EscherPropertyContainer::AddOpt(
 
 void EscherPropertyContainer::AddOpt(
     sal_uInt16 nPropID,
-    const OUString& rString)
+    std::u16string_view rString)
 {
     std::vector<sal_uInt8> aBuf;
-    aBuf.reserve(rString.getLength() * 2 + 2);
+    aBuf.reserve(rString.size() * 2 + 2);
 
-    for(sal_Int32 i(0); i < rString.getLength(); i++)
+    for(size_t i(0); i < rString.size(); i++)
     {
         const sal_Unicode nUnicode(rString[i]);
         aBuf.push_back(static_cast<sal_uInt8>(nUnicode));
@@ -405,7 +408,7 @@ void EscherPropertyContainer::CreateGradientProperties(
             nFillType = ESCHER_FillShadeScale;
             nAngle = (rGradient.Angle * 0x10000) / 10;
             nFillFocus = (sal::static_int_cast<int>(rGradient.Style) ==
-                          sal::static_int_cast<int>(GradientStyle::Linear)) ? 0 : 50;
+                          sal::static_int_cast<int>(css::awt::GradientStyle_LINEAR)) ? 0 : 50;
         }
         break;
         case awt::GradientStyle_RADIAL :
@@ -928,16 +931,16 @@ bool EscherPropertyContainer::GetLineArrow( const bool bLineStart,
                 if ( !bIsMapped && comphelper::string::getTokenCount(aArrowStartName, ' ') == 2 )
                 {
                     sal_Int32 nIdx{ 0 };
-                    OUString aArrowName( aArrowStartName.getToken( 0, ' ', nIdx ) );
-                    if (  aArrowName == "msArrowEnd" )
+                    std::u16string_view aArrowName( o3tl::getToken(aArrowStartName, 0, ' ', nIdx ) );
+                    if (  aArrowName == u"msArrowEnd" )
                         reLineEnd = ESCHER_LineArrowEnd;
-                    else if (  aArrowName == "msArrowOpenEnd" )
+                    else if (  aArrowName == u"msArrowOpenEnd" )
                         reLineEnd = ESCHER_LineArrowOpenEnd;
-                    else if ( aArrowName == "msArrowStealthEnd" )
+                    else if ( aArrowName == u"msArrowStealthEnd" )
                         reLineEnd = ESCHER_LineArrowStealthEnd;
-                    else if ( aArrowName == "msArrowDiamondEnd" )
+                    else if ( aArrowName == u"msArrowDiamondEnd" )
                         reLineEnd = ESCHER_LineArrowDiamondEnd;
-                    else if ( aArrowName == "msArrowOvalEnd" )
+                    else if ( aArrowName == u"msArrowOvalEnd" )
                         reLineEnd = ESCHER_LineArrowOvalEnd;
                     else
                         nIdx = -1;
@@ -945,8 +948,8 @@ bool EscherPropertyContainer::GetLineArrow( const bool bLineStart,
                     // now we have the arrow, and try to determine the arrow size;
                     if ( nIdx>0 )
                     {
-                        OUString aArrowSize( aArrowStartName.getToken( 0, ' ', nIdx ) );
-                        sal_Int32 nArrowSize = aArrowSize.toInt32();
+                        std::u16string_view aArrowSize = o3tl::getToken(aArrowStartName, 0, ' ', nIdx );
+                        sal_Int32 nArrowSize = o3tl::toInt32(aArrowSize);
                         rnArrowWidth = ( nArrowSize - 1 ) / 3;
                         rnArrowLength = nArrowSize - ( rnArrowWidth * 3 ) - 1;
                     }
@@ -1339,8 +1342,7 @@ bool EscherPropertyContainer::CreateOLEGraphicProperties(const uno::Reference<dr
             const Graphic* pGraphic = pOle2Obj->GetGraphic();
             if (pGraphic)
             {
-                Graphic aGraphic(*pGraphic);
-                GraphicObject aGraphicObject(aGraphic);
+                GraphicObject aGraphicObject(*pGraphic);
                 bRetValue = CreateGraphicProperties(rXShape, aGraphicObject);
             }
         }
@@ -1415,10 +1417,10 @@ void EscherPropertyContainer::CreateEmbeddedBitmapProperties(
     uno::Reference<graphic::XGraphic> xGraphic(rxBitmap, uno::UNO_QUERY);
     if (!xGraphic.is())
         return;
-    const Graphic aGraphic(xGraphic);
+    Graphic aGraphic(xGraphic);
     if (aGraphic.IsNone())
         return;
-    const GraphicObject aGraphicObject(aGraphic);
+    GraphicObject aGraphicObject(std::move(aGraphic));
     if (aGraphicObject.GetType() == GraphicType::NONE)
         return;
     if (ImplCreateEmbeddedBmp(aGraphicObject))
@@ -1464,7 +1466,7 @@ void EscherPropertyContainer::CreateEmbeddedHatchProperties(const drawing::Hatch
 {
     const tools::Rectangle aRect(pShapeBoundRect ? *pShapeBoundRect : tools::Rectangle(Point(0,0), Size(28000, 21000)));
     Graphic aGraphic(lclDrawHatch(rHatch, rBackColor, bFillBackground, aRect));
-    GraphicObject aGraphicObject(aGraphic);
+    GraphicObject aGraphicObject(std::move(aGraphic));
 
     if (ImplCreateEmbeddedBmp(aGraphicObject))
         AddOpt( ESCHER_Prop_fillType, ESCHER_FillTexture );
@@ -1631,7 +1633,9 @@ bool EscherPropertyContainer::CreateGraphicProperties(const uno::Reference<beans
                   nFormat != GraphicFileFormat::TIF &&
                   nFormat != GraphicFileFormat::PCT &&
                   nFormat != GraphicFileFormat::WMF &&
-                  nFormat != GraphicFileFormat::EMF) )
+                  nFormat != GraphicFileFormat::WMZ &&
+                  nFormat != GraphicFileFormat::EMF &&
+                  nFormat != GraphicFileFormat::EMZ) )
             {
                 std::unique_ptr<SvStream> pIn(::utl::UcbStreamHelper::CreateStream(
                     aTmp.GetMainURL( INetURLObject::DecodeMechanism::NONE ), StreamMode::READ ));
@@ -1773,7 +1777,7 @@ bool EscherPropertyContainer::CreateGraphicProperties(const uno::Reference<beans
                 {
                     EscherGraphicProvider aProvider;
                     SvMemoryStream aMemStrm;
-                    GraphicObject aGraphicObject(aGraphic);
+                    GraphicObject aGraphicObject(std::move(aGraphic));
 
                     if (aProvider.GetBlibID(aMemStrm, aGraphicObject, nullptr, pGraphicAttr.get(), bOOxmlExport))
                     {
@@ -1997,47 +2001,45 @@ bool EscherPropertyContainer::CreatePolygonProperties(
         }
     }
 
-    if(0 != nTotalPoints && aSegments.size() >= 6 && aVertices.size() >= 6)
-    {
-        // Little endian
-        aVertices[0] = static_cast<sal_uInt8>(nTotalPoints);
-        aVertices[1] = static_cast<sal_uInt8>(nTotalPoints >> 8);
-        aVertices[2] = static_cast<sal_uInt8>(nTotalPoints);
-        aVertices[3] = static_cast<sal_uInt8>(nTotalPoints >> 8);
+    if(0 == nTotalPoints || aSegments.size() < 6 || aVertices.size() < 6)
+        return false;
 
-        aSegments.push_back(static_cast<sal_uInt8>(0));
-        aSegments.push_back(static_cast<sal_uInt8>(0x80));
+    // Little endian
+    aVertices[0] = static_cast<sal_uInt8>(nTotalPoints);
+    aVertices[1] = static_cast<sal_uInt8>(nTotalPoints >> 8);
+    aVertices[2] = static_cast<sal_uInt8>(nTotalPoints);
+    aVertices[3] = static_cast<sal_uInt8>(nTotalPoints >> 8);
 
-        const sal_uInt32 nSegmentBufSize(aSegments.size() - 6);
-        aSegments[0] = static_cast<sal_uInt8>(nSegmentBufSize >> 1);
-        aSegments[1] = static_cast<sal_uInt8>(nSegmentBufSize >> 9);
-        aSegments[2] = static_cast<sal_uInt8>(nSegmentBufSize >> 1);
-        aSegments[3] = static_cast<sal_uInt8>(nSegmentBufSize >> 9);
+    aSegments.push_back(static_cast<sal_uInt8>(0));
+    aSegments.push_back(static_cast<sal_uInt8>(0x80));
 
-        AddOpt(
-            ESCHER_Prop_geoRight,
-            rGeoRect.Width);
-        AddOpt(
-            ESCHER_Prop_geoBottom,
-            rGeoRect.Height);
-        AddOpt(
-            ESCHER_Prop_shapePath,
-            ESCHER_ShapeComplex);
-        AddOpt(
-            ESCHER_Prop_pVertices,
-            true,
-            aVertices.size() - 6,
-            aVertices);
-        AddOpt(
-            ESCHER_Prop_pSegmentInfo,
-            true,
-            aSegments.size(),
-            aSegments);
+    const sal_uInt32 nSegmentBufSize(aSegments.size() - 6);
+    aSegments[0] = static_cast<sal_uInt8>(nSegmentBufSize >> 1);
+    aSegments[1] = static_cast<sal_uInt8>(nSegmentBufSize >> 9);
+    aSegments[2] = static_cast<sal_uInt8>(nSegmentBufSize >> 1);
+    aSegments[3] = static_cast<sal_uInt8>(nSegmentBufSize >> 9);
 
-        return true;
-    }
+    AddOpt(
+        ESCHER_Prop_geoRight,
+        rGeoRect.Width);
+    AddOpt(
+        ESCHER_Prop_geoBottom,
+        rGeoRect.Height);
+    AddOpt(
+        ESCHER_Prop_shapePath,
+        ESCHER_ShapeComplex);
+    AddOpt(
+        ESCHER_Prop_pVertices,
+        true,
+        aVertices.size() - 6,
+        aVertices);
+    AddOpt(
+        ESCHER_Prop_pSegmentInfo,
+        true,
+        aSegments.size(),
+        aSegments);
 
-    return false;
+    return true;
 }
 
 
@@ -2452,13 +2454,13 @@ static void ConvertEnhancedCustomShapeEquation(
     sal_Int32 i;
     for ( i = 0; i < nEquationSourceCount; i++ )
     {
-        EnhancedCustomShape2d aCustoShape2d(
+        EnhancedCustomShape2d aCustomShape2d(
             const_cast< SdrObjCustomShape& >(rSdrObjCustomShape));
         try
         {
             std::shared_ptr< EnhancedCustomShape::ExpressionNode > aExpressNode(
                 EnhancedCustomShape::FunctionParser::parseFunction(
-                    sEquationSource[ i ], aCustoShape2d));
+                    sEquationSource[ i ], aCustomShape2d));
             drawing::EnhancedCustomShapeParameter aPara( aExpressNode->fillNode( rEquations, nullptr, 0 ) );
             if ( aPara.Type != drawing::EnhancedCustomShapeParameterType::EQUATION )
             {
@@ -2517,7 +2519,7 @@ bool EscherPropertyContainer::IsDefaultObject(
 {
     switch(eShapeType)
     {
-        // if the custom shape is not default shape of ppt, return sal_Fasle;
+        // if the custom shape is not default shape of ppt, return false;
         case mso_sptTearDrop:
             return false;
 
@@ -2860,7 +2862,11 @@ void EscherPropertyContainer::CreateCustomShapeProperties( const MSO_SPT eShapeT
                     {
                         double fExtrusionShininess = 0;
                         if ( rrProp.Value >>= fExtrusionShininess )
-                            AddOpt( DFF_Prop_c3DShininess, static_cast<sal_Int32>( fExtrusionShininess * 655.36 ) );
+                        {
+                            // ODF to MS Office conversion invers to msdffimp.cxx
+                            fExtrusionShininess = basegfx::fround(fExtrusionShininess / 10.0);
+                            AddOpt( DFF_Prop_c3DShininess, static_cast<sal_Int32>(fExtrusionShininess) );
+                        }
                     }
                     else if ( rrProp.Name == "Skew" )
                     {
@@ -2877,7 +2883,7 @@ void EscherPropertyContainer::CreateCustomShapeProperties( const MSO_SPT eShapeT
                     {
                         double fExtrusionSpecularity = 0;
                         if ( rrProp.Value >>= fExtrusionSpecularity )
-                            AddOpt( DFF_Prop_c3DSpecularAmt, static_cast<sal_Int32>( fExtrusionSpecularity * 1333 ) );
+                            AddOpt( DFF_Prop_c3DSpecularAmt, static_cast<sal_Int32>( fExtrusionSpecularity * 655.36 ) );
                     }
                     else if ( rrProp.Name == "ProjectionMode" )
                     {
@@ -3714,8 +3720,7 @@ MSO_SPT EscherPropertyContainer::GetCustomShapeType( const uno::Reference< drawi
                                 // In case of VML export, try to handle the
                                 // ooxml- prefix in rShapeType. If that fails,
                                 // just do the same as the binary export.
-                                OString aType = OUStringToOString(rShapeType, RTL_TEXTENCODING_UTF8);
-                                eShapeType = msfilter::util::GETVMLShapeType(aType);
+                                eShapeType = msfilter::util::GETVMLShapeType(rShapeType);
                                 if (eShapeType == mso_sptNil)
                                     eShapeType = EnhancedCustomShapeTypeNames::Get(rShapeType);
                             }
@@ -3751,22 +3756,22 @@ bool EscherPropertyContainer::CreateBlipPropertiesforOLEControl(const uno::Refer
                                                                 const uno::Reference<drawing::XShape> & rXShape)
 {
     SdrObject* pShape = SdrObject::getSdrObjectFromXShape(rXShape);
-    if ( pShape )
-    {
-        const Graphic aGraphic(SdrExchangeView::GetObjGraphic(*pShape));
-        const GraphicObject aGraphicObject(aGraphic);
+    if ( !pShape )
+        return false;
 
-        if (!aGraphicObject.GetUniqueID().isEmpty())
+    Graphic aGraphic(SdrExchangeView::GetObjGraphic(*pShape));
+    const GraphicObject aGraphicObject(std::move(aGraphic));
+
+    if (!aGraphicObject.GetUniqueID().isEmpty())
+    {
+        if ( pGraphicProvider && pPicOutStrm && pShapeBoundRect )
         {
-            if ( pGraphicProvider && pPicOutStrm && pShapeBoundRect )
+            sal_uInt32 nBlibId = pGraphicProvider->GetBlibID(*pPicOutStrm, aGraphicObject);
+            if ( nBlibId )
             {
-                sal_uInt32 nBlibId = pGraphicProvider->GetBlibID(*pPicOutStrm, aGraphicObject);
-                if ( nBlibId )
-                {
-                    AddOpt( ESCHER_Prop_pib, nBlibId, true );
-                    ImplCreateGraphicAttributes( rXPropSet, nBlibId, false );
-                    return true;
-                }
+                AddOpt( ESCHER_Prop_pib, nBlibId, true );
+                ImplCreateGraphicAttributes( rXPropSet, nBlibId, false );
+                return true;
             }
         }
     }
@@ -4197,7 +4202,7 @@ sal_uInt32 EscherGraphicProvider::GetBlibID( SvStream& rPicOutStrm, GraphicObjec
                     SvMemoryStream  aGIFStream;
                     const char* const pString = "MSOFFICE9.0";
                     aGIFStream.WriteBytes(pString, strlen(pString));
-                    nErrCode = rFilter.ExportGraphic( aGraphic, OUString(), aGIFStream,
+                    nErrCode = rFilter.ExportGraphic( aGraphic, u"", aGIFStream,
                         rFilter.GetExportFormatNumberForShortName( u"GIF" ) );
                     SAL_WARN_IF(
                         nErrCode != ERRCODE_NONE, "filter.ms",
@@ -4216,7 +4221,7 @@ sal_uInt32 EscherGraphicProvider::GetBlibID( SvStream& rPicOutStrm, GraphicObjec
                         aFilterProp.Name = "AdditionalChunks";
                         aFilterProp.Value <<= aAdditionalChunkSequence;
                         uno::Sequence<beans::PropertyValue> aFilterData{ aFilterProp };
-                        nErrCode = rFilter.ExportGraphic( aGraphic, OUString(), aStream,
+                        nErrCode = rFilter.ExportGraphic( aGraphic, u"", aStream,
                                                           rFilter.GetExportFormatNumberForShortName( u"PNG" ), &aFilterData );
                     }
                 }
@@ -4370,8 +4375,8 @@ struct EscherShapeListEntry
     uno::Reference<drawing::XShape>aXShape;
     sal_uInt32 n_EscherId;
 
-    EscherShapeListEntry(const uno::Reference<drawing::XShape> & rShape, sal_uInt32 nId)
-        : aXShape(rShape)
+    EscherShapeListEntry(uno::Reference<drawing::XShape> xShape, sal_uInt32 nId)
+        : aXShape(std::move(xShape))
         , n_EscherId(nId)
     {}
 };
@@ -4560,7 +4565,7 @@ sal_uInt32 EscherConnectorListEntry::GetConnectorRule( bool bFirst )
                 else if ( nGluePointType == drawing::EnhancedCustomShapeGluePointType::SEGMENTS )
                 {
                     tools::PolyPolygon aPolyPoly;
-                    SdrObjectUniquePtr pTemporaryConvertResultObject(pSdrObjCustomShape->DoConvertToPolyObj(true, true));
+                    rtl::Reference<SdrObject> pTemporaryConvertResultObject(pSdrObjCustomShape->DoConvertToPolyObj(true, true));
                     SdrPathObj* pSdrPathObj(dynamic_cast< SdrPathObj* >(pTemporaryConvertResultObject.get()));
 
                     if(pSdrPathObj)
@@ -4571,7 +4576,7 @@ sal_uInt32 EscherConnectorListEntry::GetConnectorRule( bool bFirst )
                     }
 
                     // do *not* forget to delete the temporary used SdrObject - possible memory leak (!)
-                    pTemporaryConvertResultObject.reset();
+                    pTemporaryConvertResultObject.clear();
                     pSdrPathObj = nullptr;
 
                     if(0 != aPolyPoly.Count())
@@ -4859,10 +4864,9 @@ public:
 
 }
 
-EscherEx::EscherEx(const std::shared_ptr<EscherExGlobal>& rxGlobal, SvStream* pOutStrm, bool bOOXML)
-    : mxGlobal(rxGlobal)
+EscherEx::EscherEx(std::shared_ptr<EscherExGlobal> xGlobal, SvStream* pOutStrm, bool bOOXML)
+    : mxGlobal(std::move(xGlobal))
     , mpOutStrm(pOutStrm)
-    , mbOwnsStrm(false)
     , mnCurrentDg(0)
     , mnCountOfs(0)
     , mnGroupLevel(0)
@@ -4873,8 +4877,8 @@ EscherEx::EscherEx(const std::shared_ptr<EscherExGlobal>& rxGlobal, SvStream* pO
 {
     if (!mpOutStrm)
     {
-        mpOutStrm = new SvNullStream();
-        mbOwnsStrm = true;
+        mxOwnStrm = std::make_unique<SvNullStream>();
+        mpOutStrm = mxOwnStrm.get();
     }
     mnStrmStartOfs = mpOutStrm->Tell();
     mpImplEESdrWriter.reset( new ImplEESdrWriter( *this ) );
@@ -4882,8 +4886,6 @@ EscherEx::EscherEx(const std::shared_ptr<EscherExGlobal>& rxGlobal, SvStream* pO
 
 EscherEx::~EscherEx()
 {
-    if (mbOwnsStrm)
-        delete mpOutStrm;
 }
 
 void EscherEx::Flush( SvStream* pPicStreamMergeBSE /* = NULL */ )

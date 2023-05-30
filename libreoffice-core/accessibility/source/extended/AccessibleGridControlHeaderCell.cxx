@@ -39,40 +39,36 @@ AccessibleGridControlHeaderCell::AccessibleGridControlHeaderCell(sal_Int32 _nCol
 , m_nColumnRowId(_nColumnRowId)
 {
 }
-/** Creates a new AccessibleStateSetHelper and fills it with states of the
-    current object.
-    @return
-        A filled AccessibleStateSetHelper.
+/** Return a bitset of states of the current object.
 */
-rtl::Reference<::utl::AccessibleStateSetHelper> AccessibleGridControlHeaderCell::implCreateStateSetHelper()
+sal_Int64 AccessibleGridControlHeaderCell::implCreateStateSet()
 {
-    rtl::Reference<::utl::AccessibleStateSetHelper>
-        pStateSetHelper = new ::utl::AccessibleStateSetHelper;
+    sal_Int64 nStateSet = 0;
 
     if( isAlive() )
     {
         // SHOWING done with mxParent
         if( implIsShowing() )
-            pStateSetHelper->AddState( AccessibleStateType::SHOWING );
+            nStateSet |= AccessibleStateType::SHOWING;
 
-        pStateSetHelper->AddState( AccessibleStateType::VISIBLE );
-        pStateSetHelper->AddState( AccessibleStateType::FOCUSABLE );
-        pStateSetHelper->AddState( AccessibleStateType::TRANSIENT );
-        pStateSetHelper->AddState( AccessibleStateType::SELECTABLE );
+        nStateSet |= AccessibleStateType::VISIBLE;
+        nStateSet |= AccessibleStateType::FOCUSABLE;
+        nStateSet |= AccessibleStateType::TRANSIENT;
+        nStateSet |= AccessibleStateType::SELECTABLE;
 
         if ( m_aTable.IsRowSelected(m_nColumnRowId) )
-            pStateSetHelper->AddState( AccessibleStateType::SELECTED );
+            nStateSet |= AccessibleStateType::SELECTED;
     }
     else
-        pStateSetHelper->AddState( AccessibleStateType::DEFUNC );
+        nStateSet |= AccessibleStateType::DEFUNC;
 
-    return pStateSetHelper;
+    return nStateSet;
 }
 
 /** @return
         The count of visible children.
 */
-sal_Int32 SAL_CALL AccessibleGridControlHeaderCell::getAccessibleChildCount()
+sal_Int64 SAL_CALL AccessibleGridControlHeaderCell::getAccessibleChildCount()
 {
     return 0;
 }
@@ -81,7 +77,7 @@ sal_Int32 SAL_CALL AccessibleGridControlHeaderCell::getAccessibleChildCount()
 /** @return
         The XAccessible interface of the specified child.
 */
-Reference<XAccessible > SAL_CALL AccessibleGridControlHeaderCell::getAccessibleChild( sal_Int32 )
+Reference<XAccessible > SAL_CALL AccessibleGridControlHeaderCell::getAccessibleChild( sal_Int64 )
 {
     throw IndexOutOfBoundsException();
 }
@@ -152,13 +148,12 @@ tools::Rectangle AccessibleGridControlHeaderCell::implGetBoundingBoxOnScreen()
     return tools::Rectangle(Point(aGridRect.Left()+aCellRect.Left(),aGridRect.Top()+aCellRect.Top()), aCellRect.GetSize());
 }
 
-sal_Int32 SAL_CALL AccessibleGridControlHeaderCell::getAccessibleIndexInParent()
+sal_Int64 SAL_CALL AccessibleGridControlHeaderCell::getAccessibleIndexInParent()
 {
     SolarMutexGuard g;
 
     ensureIsAlive();
-    sal_Int32 nIndex = m_nColumnRowId;
-    return nIndex;
+    return m_nColumnRowId;
 }
 
 } // namespace accessibility

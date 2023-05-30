@@ -44,7 +44,7 @@ private:
     std::unique_ptr<SfxObjectFactory_Impl> pImpl;      // Additional Data
 
 public:
-    SfxObjectFactory( const SvGlobalName &rName, const OUString& sFactoryName );
+    SfxObjectFactory( const SvGlobalName &rName, OUString sFactoryName );
     ~SfxObjectFactory();
 
     const SvGlobalName& GetClassId() const;
@@ -63,7 +63,7 @@ public:
 
     // Filter
     std::shared_ptr<const SfxFilter> GetTemplateFilter() const;
-    static OUString GetStandardTemplate( const OUString& rServiceName );
+    static OUString GetStandardTemplate( std::u16string_view rServiceName );
     static void     SetStandardTemplate( const OUString& rServiceName, const OUString& rTemplateName );
     static void     SetSystemTemplate( const OUString& rServiceName, const OUString& rTemplateName );
 

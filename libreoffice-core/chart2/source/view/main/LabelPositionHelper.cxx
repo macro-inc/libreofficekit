@@ -24,9 +24,9 @@
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/drawing/TextVerticalAdjust.hpp>
 #include <com/sun/star/drawing/TextHorizontalAdjust.hpp>
-#include <com/sun/star/drawing/XShape.hpp>
 
 #include <cmath>
+#include <utility>
 
 namespace chart
 {
@@ -35,11 +35,9 @@ using namespace ::com::sun::star::chart2;
 
 LabelPositionHelper::LabelPositionHelper(
                       sal_Int32 nDimensionCount
-                    , const uno::Reference< drawing::XShapes >& xLogicTarget
-                    , ShapeFactory* pShapeFactory )
+                    , rtl::Reference<SvxShapeGroupAnyD> xLogicTarget)
                     : m_nDimensionCount(nDimensionCount)
-                    , m_xLogicTarget(xLogicTarget)
-                    , m_pShapeFactory(pShapeFactory)
+                    , m_xLogicTarget(std::move(xLogicTarget))
 {
 }
 
@@ -50,7 +48,7 @@ LabelPositionHelper::~LabelPositionHelper()
 awt::Point LabelPositionHelper::transformSceneToScreenPosition( const drawing::Position3D& rScenePosition3D ) const
 {
     return PlottingPositionHelper::transformSceneToScreenPosition(
-                  rScenePosition3D, m_xLogicTarget, m_pShapeFactory, m_nDimensionCount );
+                  rScenePosition3D, m_xLogicTarget, m_nDimensionCount );
 }
 
 void LabelPositionHelper::changeTextAdjustment( tAnySequence& rPropValues, const tNameSequence& rPropNames, LabelAlignment eAlignment)
@@ -414,7 +412,7 @@ void lcl_correctRotation_Right_Bottom( double& rfXCorrection, double& rfYCorrect
 
 }//end anonymous namespace
 
-void LabelPositionHelper::correctPositionForRotation( const uno::Reference< drawing::XShape >& xShape2DText
+void LabelPositionHelper::correctPositionForRotation( const rtl::Reference<SvxShapeText>& xShape2DText
                      , LabelAlignment eLabelAlignment, const double fRotationAngle, bool bRotateAroundCenter )
 {
     if( !xShape2DText.is() )

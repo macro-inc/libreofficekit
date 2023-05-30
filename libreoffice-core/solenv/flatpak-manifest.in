@@ -1,10 +1,10 @@
 {
     "id": "org.libreoffice.LibreOffice",
     "runtime": "org.freedesktop.Platform",
-    "runtime-version": "21.08",
+    "runtime-version": "22.08",
     "sdk": "org.freedesktop.Sdk",
     "sdk-extensions": [
-        "org.freedesktop.Sdk.Extension.openjdk11"
+        "org.freedesktop.Sdk.Extension.openjdk17"
     ],
     "command": "libreoffice",
     "modules": [
@@ -12,14 +12,14 @@
             "name": "openjdk",
             "buildsystem": "simple",
             "build-commands": [
-                "/usr/lib/sdk/openjdk11/install.sh"
+                "/usr/lib/sdk/openjdk17/install.sh"
             ]
         },
         {
             "name": "gvfs",
             "buildsystem": "meson",
             "config-opts": [ "-Dsystemduserunitdir=no", "-Dtmpfilesdir=no", "-Dinstalled_tests=true",
-            "-Ddbus_service_dir=/usr/share/dbus-1/services", "-Dadmin=false", "-Dafc=false", "-Dafp=false",
+            "-Dadmin=false", "-Dafc=false", "-Dafp=false",
             "-Darchive=false", "-Dcdda=false", "-Ddnssd=false", "-Dgoa=false", "-Dgoogle=false",
             "-Dgphoto2=false", "-Dhttp=false", "-Dmtp=false", "-Dnfs=false", "-Dsftp=false", "-Dsmb=false",
             "-Dudisks2=false", "-Dbluray=false", "-Dfuse=false", "-Dgcr=false", "-Dgcrypt=false",
@@ -27,8 +27,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://download.gnome.org/sources/gvfs/1.38/gvfs-1.38.1.tar.xz",
-                    "sha256": "ed136a842c996d25c835da405c4775c77106b46470e75bdc242bdd59ec0d61a0"
+                    "url": "https://gitlab.gnome.org/GNOME/gvfs/-/archive/1.50.4/gvfs-1.50.4.tar.gz",
+                    "sha256": "c67bba49c5b1dbe0b8b8f53b45eab545f6a6ce36fcdf3c11ac92464732b60ea5"
                 }
             ]
         },
@@ -48,8 +48,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://kerberos.org/dist/krb5/1.16/krb5-1.16.2.tar.gz",
-                    "sha256": "9f721e1fe593c219174740c71de514c7228a97d23eb7be7597b2ae14e487f027"
+                    "url": "https://kerberos.org/dist/krb5/1.20/krb5-1.20.1.tar.gz",
+                    "sha256": "704aed49b19eb5a7178b34b2873620ec299db08752d6a8574f95d41879ab8851"
                 }
             ]
         },
@@ -64,8 +64,8 @@
                 },
                 {
                     "type": "archive",
-                    "url": "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.5-bin.tar.xz",
-                    "sha256": "cebb705dbbe26a41d359b8be08ec066caba4e8686670070ce44bbf2b57ae113f",
+                    "url": "https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.13-bin.tar.xz",
+                    "sha512": "26e56bf670c22c8093fe51ec952fa51e813b1ab4200cb09fcd68fa291c5f6f626d7c6a42b4d3358b38111466e249d4bc6089b8c4093383759d6f8a08d39bc32d",
                     "dest": "ant"
                 },
                 {
@@ -80,13 +80,6 @@
                     "type": "file",
                     "dest": "external/tarballs",
                     "dest-filename": "@PDFIUM_TARBALL@"
-                },
-                {
-                    "url": "https://dev-www.libreoffice.org/src/@UCPP_TARBALL@",
-                    "sha256": "@UCPP_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@UCPP_TARBALL@"
                 },
                 {
                     "url": "https://dev-www.libreoffice.org/src/@XMLSEC_TARBALL@",
@@ -145,32 +138,11 @@
                     "dest-filename": "@FONT_LINLIBERTINEG_TARBALL@"
                 },
                 {
-                    "url": "https://dev-www.libreoffice.org/src/@FONT_SOURCECODE_TARBALL@",
-                    "sha256": "@FONT_SOURCECODE_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@FONT_SOURCECODE_TARBALL@"
-                },
-                {
                     "url": "https://dev-www.libreoffice.org/src/@FONT_SOURCESANS_TARBALL@",
                     "sha256": "@FONT_SOURCESANS_SHA256SUM@",
                     "type": "file",
                     "dest": "external/tarballs",
                     "dest-filename": "@FONT_SOURCESANS_TARBALL@"
-                },
-                {
-                    "url": "https://dev-www.libreoffice.org/src/@FONT_SOURCESERIF_TARBALL@",
-                    "sha256": "@FONT_SOURCESERIF_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@FONT_SOURCESERIF_TARBALL@"
-                },
-                {
-                    "url": "https://dev-www.libreoffice.org/src/@FONT_EMOJIONE_COLOR_TARBALL@",
-                    "sha256": "@FONT_EMOJIONE_COLOR_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@FONT_EMOJIONE_COLOR_TARBALL@"
                 },
                 {
                     "url": "https://dev-www.libreoffice.org/src/@BOOST_TARBALL@",
@@ -404,13 +376,6 @@
                     "dest-filename": "@MDDS_TARBALL@"
                 },
                 {
-                    "url": "https://dev-www.libreoffice.org/src/@NEON_TARBALL@",
-                    "sha256": "@NEON_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@NEON_TARBALL@"
-                },
-                {
                     "url": "https://dev-www.libreoffice.org/src/@FONT_NOTO_TARBALL@",
                     "sha256": "@FONT_NOTO_SHA256SUM@",
                     "type": "file",
@@ -528,13 +493,6 @@
                     "type": "file",
                     "dest": "external/tarballs",
                     "dest-filename": "@FONT_SCHEHERAZADE_TARBALL@"
-                },
-                {
-                    "url": "https://dev-www.libreoffice.org/src/@FONT_KACST_TARBALL@",
-                    "sha256": "@FONT_KACST_SHA256SUM@",
-                    "type": "file",
-                    "dest": "external/tarballs",
-                    "dest-filename": "@FONT_KACST_TARBALL@"
                 },
                 {
                     "url": "https://dev-www.libreoffice.org/src/@BSH_TARBALL@",
@@ -656,6 +614,20 @@
                     "dest-filename": "@LIBATOMIC_OPS_TARBALL@"
                 },
                 {
+                    "url": "https://dev-www.libreoffice.org/src/@SKIA_TARBALL@",
+                    "sha256": "@SKIA_SHA256SUM@",
+                    "type": "file",
+                    "dest": "external/tarballs",
+                    "dest-filename": "@SKIA_TARBALL@"
+                },
+                {
+                    "url": "https://dev-www.libreoffice.org/src/@DRAGONBOX_TARBALL@",
+                    "sha256": "@DRAGONBOX_SHA256SUM@",
+                    "type": "file",
+                    "dest": "external/tarballs",
+                    "dest-filename": "@DRAGONBOX_TARBALL@"
+                },
+                {
                     "url": "https://dev-www.libreoffice.org/src/@DTOA_TARBALL@",
                     "sha256": "@DTOA_SHA256SUM@",
                     "type": "file",
@@ -693,7 +665,7 @@
             "buildsystem": "simple",
             "build-commands": [
                 "./autogen.sh --prefix=/run/build/libreoffice/inst --with-distro=LibreOfficeFlatpak",
-                "make $(if test \"$FLATPAK_ARCH\" = i386; then printf build-nocheck; fi)",
+                "make check",
                 "make distro-pack-install",
                 "make cmd cmd='$(SRCDIR)/solenv/bin/assemble-flatpak.sh'",
                 "printf '<?xml version=\"1.0\"?>\\n<oor:data xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:oor=\"http://openoffice.org/2001/registry\"><dependency file=\"main\"/><oor:component-data oor:name=\"Common\" oor:package=\"org.openoffice.Office\"><node oor:name=\"Misc\"><prop oor:name=\"UseOpenCL\"><value>false</value></prop></node></oor:component-data></oor:data>' >/app/libreoffice/share/registry/flatpak.xcd"
@@ -722,6 +694,7 @@
         "--socket=pulseaudio",
         "--device=dri",
         "--filesystem=xdg-config/gtk-3.0",
+        "--filesystem=xdg-config/fontconfig:ro",
         "--filesystem=xdg-run/gvfsd",
         "--filesystem=host",
         "--env=GIO_EXTRA_MODULES=/app/lib/gio/modules",

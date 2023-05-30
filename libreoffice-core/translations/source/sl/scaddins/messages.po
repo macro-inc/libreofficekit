@@ -1,10 +1,10 @@
 #. extracted from scaddins/inc
 msgid ""
 msgstr ""
-"Project-Id-Version: LibreOffice 7.2\n"
+"Project-Id-Version: LibreOffice 7.5\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2021-09-27 09:53+0200\n"
-"PO-Revision-Date: 2021-03-02 22:18+0200\n"
+"POT-Creation-Date: 2022-11-19 09:54+0100\n"
+"PO-Revision-Date: 2022-11-05 12:30+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: sl.libreoffice.org\n"
 "MIME-Version: 1.0\n"
@@ -207,8 +207,8 @@ msgstr "Seznam datumskih vrednosti, ki predstavljajo proste dni (dopusti, prazni
 
 #: scaddins/inc/analysis.hrc:88
 msgctxt "ANALYSIS_Iseven"
-msgid "Returns the value 'true' if the number is even"
-msgstr "Vrne vrednost »true«, če je število sodo"
+msgid "Returns the value 'true' if the number truncated to integer is even"
+msgstr "Vrne vrednost »true«, če je število, okrajšano na celo število, sodo."
 
 #: scaddins/inc/analysis.hrc:89
 msgctxt "ANALYSIS_Iseven"
@@ -222,8 +222,8 @@ msgstr "Število"
 
 #: scaddins/inc/analysis.hrc:95
 msgctxt "ANALYSIS_Isodd"
-msgid "Returns the value 'true' if the number is odd"
-msgstr "Vrne vrednost »true«, če je število liho"
+msgid "Returns the value 'true' if the number truncated to integer is odd"
+msgstr "Vrne vrednost »true«, če je število, okrajšano na celo število, liho."
 
 #: scaddins/inc/analysis.hrc:96
 msgctxt "ANALYSIS_Isodd"
@@ -362,8 +362,8 @@ msgstr "Število, s katerim je pomnožen pi"
 
 #: scaddins/inc/analysis.hrc:147
 msgctxt "ANALYSIS_Randbetween"
-msgid "Returns a random integer between the numbers you specify"
-msgstr "Vrne naključno celo število med navedenima številoma"
+msgid "Returns a random integer between the specified Bottom and Top values (both inclusive)"
+msgstr "Vrne naključno celo število med podanima vrednostma Spodaj in Zgoraj (vključno z obema)."
 
 #: scaddins/inc/analysis.hrc:148
 msgctxt "ANALYSIS_Randbetween"
@@ -372,8 +372,8 @@ msgstr "Spodaj"
 
 #: scaddins/inc/analysis.hrc:149
 msgctxt "ANALYSIS_Randbetween"
-msgid "The smallest integer returned"
-msgstr "Najmanjše vrnjeno celo število"
+msgid "The smallest integer that can be returned"
+msgstr "Najmanjše celo število, ki je lahko vrnjeno."
 
 #: scaddins/inc/analysis.hrc:150
 msgctxt "ANALYSIS_Randbetween"
@@ -382,8 +382,8 @@ msgstr "Zgoraj"
 
 #: scaddins/inc/analysis.hrc:151
 msgctxt "ANALYSIS_Randbetween"
-msgid "The largest integer returned"
-msgstr "Največje vrnjeno celo število"
+msgid "The largest integer that can be returned"
+msgstr "Največje celo število, ki je lahko vrnjeno."
 
 #: scaddins/inc/analysis.hrc:156
 msgctxt "ANALYSIS_Gcd"

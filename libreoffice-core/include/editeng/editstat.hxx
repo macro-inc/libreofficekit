@@ -22,6 +22,7 @@
 
 #include <rtl/ustring.hxx>
 #include <o3tl/typed_flags_set.hxx>
+#include <utility>
 
 enum class EEControlBits
 {
@@ -49,10 +50,11 @@ enum class EEControlBits
     AUTOPAGESIZE       = (AUTOPAGESIZEX | AUTOPAGESIZEY),
     FORMAT100          = 0x01000000,  // Always format to 100%
     ULSPACESUMMATION   = 0x02000000,  // MS Compat: sum SA and SB, not maximum value
+    SINGLELINE         = 0x04000000,  // One line for all text
 };
 namespace o3tl
 {
-    template<> struct typed_flags<EEControlBits> : is_typed_flags<EEControlBits, 0x037afff9> {};
+    template<> struct typed_flags<EEControlBits> : is_typed_flags<EEControlBits, 0x07ffffff> {};
 }
 
 enum class EVControlBits
@@ -126,8 +128,8 @@ struct SpellCallbackInfo
     SpellCallbackCommand nCommand;
     OUString        aWord;
 
-    SpellCallbackInfo( SpellCallbackCommand nCMD, const OUString& rWord )
-        : aWord( rWord )
+    SpellCallbackInfo( SpellCallbackCommand nCMD, OUString _aWord )
+        : aWord(std::move( _aWord ))
     {
         nCommand = nCMD;
     }

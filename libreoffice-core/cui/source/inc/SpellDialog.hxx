@@ -130,7 +130,7 @@ private:
     OUString        m_sTitleSpellingGrammar;
 
     Link<SpellUndoAction_Impl&,void> aDialogUndoLink;
-
+    ImplSVEvent *   m_pInitHdlEvent;
     bool            bFocusLocked;
 
     svx::SpellDialogChildWindow& rParent;
@@ -143,7 +143,6 @@ private:
     std::unique_ptr<weld::Label> m_xAltTitle;
     std::unique_ptr<weld::Label> m_xResumeFT;
     std::unique_ptr<weld::Label> m_xNoSuggestionsFT;
-    std::unique_ptr<weld::Label> m_xIgnoreOnceFT;
     std::unique_ptr<weld::Label> m_xLanguageFT;
     std::unique_ptr<SvxLanguageBox> m_xLanguageLB;
     std::unique_ptr<weld::Label> m_xExplainFT;
@@ -166,6 +165,7 @@ private:
     std::unique_ptr<weld::Button> m_xClosePB;
     std::unique_ptr<weld::Toolbar> m_xToolbar;
     std::unique_ptr<weld::CustomWeld> m_xSentenceEDWeld;
+    std::shared_ptr<SfxSingleTabDialogController> m_xOptionsDlg;
 
     DECL_LINK(ChangeHdl, weld::Button&, void);
     DECL_LINK(DoubleClickChangeHdl, weld::TreeView&, bool);

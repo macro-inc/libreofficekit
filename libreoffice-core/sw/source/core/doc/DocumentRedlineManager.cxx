@@ -53,17 +53,17 @@ using namespace com::sun::star;
         // 2. check that position is valid and doesn't point after text
         void lcl_CheckPosition( const SwPosition* pPos )
         {
-            assert(dynamic_cast<SwIndexReg*>(&pPos->nNode.GetNode())
-                    == pPos->nContent.GetIdxReg());
+            assert(dynamic_cast<SwContentIndexReg*>(&pPos->GetNode())
+                    == pPos->GetContentNode());
 
-            SwTextNode* pTextNode = pPos->nNode.GetNode().GetTextNode();
+            SwTextNode* pTextNode = pPos->GetNode().GetTextNode();
             if( pTextNode == nullptr )
             {
-                assert(pPos->nContent == 0);
+                assert(pPos->GetContentIndex() == 0);
             }
             else
             {
-                assert(pPos->nContent >= 0 && pPos->nContent <= pTextNode->Len());
+                assert(pPos->GetContentIndex() >= 0 && pPos->GetContentIndex() <= pTextNode->Len());
             }
         }
 
@@ -145,16 +145,16 @@ void UpdateFramesForAddDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
     }
     // no need to call UpdateFootnoteNums for FTNNUM_PAGE:
     // the AppendFootnote/RemoveFootnote will do it by itself!
-    rDoc.GetFootnoteIdxs().UpdateFootnote(rPam.Start()->nNode);
+    rDoc.GetFootnoteIdxs().UpdateFootnote(rPam.Start()->GetNode());
     SwPosition currentStart(*rPam.Start());
-    SwTextNode * pStartNode(rPam.Start()->nNode.GetNode().GetTextNode());
+    SwTextNode * pStartNode(rPam.Start()->GetNode().GetTextNode());
     while (!pStartNode)
     {
         // note: branch only taken for redlines, not fieldmarks
         SwStartNode *const pTableOrSectionNode(
-            currentStart.nNode.GetNode().IsTableNode()
-                ? static_cast<SwStartNode*>(currentStart.nNode.GetNode().GetTableNode())
-                : static_cast<SwStartNode*>(currentStart.nNode.GetNode().GetSectionNode()));
+            currentStart.GetNode().IsTableNode()
+                ? static_cast<SwStartNode*>(currentStart.GetNode().GetTableNode())
+                : static_cast<SwStartNode*>(currentStart.GetNode().GetSectionNode()));
         if ( !pTableOrSectionNode )
         {
             SAL_WARN("sw.core", "UpdateFramesForAddDeleteRedline:: known pathology (or ChangesInRedline mode)");
@@ -178,15 +178,20 @@ void UpdateFramesForAddDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
                 }
             }
         }
-        currentStart.nNode = pTableOrSectionNode->EndOfSectionIndex() + 1;
-        currentStart.nContent.Assign(currentStart.nNode.GetNode().GetContentNode(), 0);
-        pStartNode = currentStart.nNode.GetNode().GetTextNode();
+        currentStart.Assign( pTableOrSectionNode->EndOfSectionIndex() + 1 );
+        pStartNode = currentStart.GetNode().GetTextNode();
     }
     if (currentStart < *rPam.End())
     {
         SwTextNode * pNode(pStartNode);
         do
         {
+            // deleted text node: remove it from "hidden" list
+            // to update numbering in Show Changes mode
+            SwPosition aPos( *pNode, pNode->Len() );
+            if ( pNode->GetNumRule() && aPos < *rPam.End() )
+                pNode->RemoveFromListRLHidden();
+
             std::vector<SwTextFrame*> frames;
             SwIterator<SwTextFrame, SwTextNode, sw::IteratorMode::UnwrapMulti> aIter(*pNode);
             for (SwTextFrame * pFrame = aIter.First(); pFrame; pFrame = aIter.Next())
@@ -234,7 +239,7 @@ void UpdateFramesForAddDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
             // skip over hidden sections!
             pNode = static_cast<SwTextNode*>(pLast->GetNodes().GoNextSection(&tmp, /*bSkipHidden=*/true, /*bSkipProtect=*/false));
         }
-        while (pNode && pNode->GetIndex() <= rPam.End()->nNode.GetIndex());
+        while (pNode && pNode->GetIndex() <= rPam.End()->GetNodeIndex());
     }
     // fields last - SwGetRefField::UpdateField requires up-to-date frames
     UpdateFieldsForRedline(rDoc.getIDocumentFieldsAccess()); // after footnotes
@@ -252,16 +257,16 @@ void UpdateFramesForRemoveDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
         return;
     }
     bool isAppendObjsCalled(false);
-    rDoc.GetFootnoteIdxs().UpdateFootnote(rPam.Start()->nNode);
+    rDoc.GetFootnoteIdxs().UpdateFootnote(rPam.Start()->GetNode());
     SwPosition currentStart(*rPam.Start());
-    SwTextNode * pStartNode(rPam.Start()->nNode.GetNode().GetTextNode());
+    SwTextNode * pStartNode(rPam.Start()->GetNode().GetTextNode());
     while (!pStartNode)
     {
         // note: branch only taken for redlines, not fieldmarks
-        SwStartNode const*const pTableOrSectionNode(
-            currentStart.nNode.GetNode().IsTableNode()
-                ? static_cast<SwStartNode*>(currentStart.nNode.GetNode().GetTableNode())
-                : static_cast<SwStartNode*>(currentStart.nNode.GetNode().GetSectionNode()));
+        SwStartNode *const pTableOrSectionNode(
+            currentStart.GetNode().IsTableNode()
+                ? static_cast<SwStartNode*>(currentStart.GetNode().GetTableNode())
+                : static_cast<SwStartNode*>(currentStart.GetNode().GetSectionNode()));
         assert(pTableOrSectionNode); // known pathology
         for (SwNodeOffset j = pTableOrSectionNode->GetIndex(); j <= pTableOrSectionNode->EndOfSectionIndex(); ++j)
         {
@@ -271,19 +276,23 @@ void UpdateFramesForRemoveDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
         {
             // note: this will also create frames for all currently hidden flys
             // because it calls AppendAllObjs
-            SwNodeIndex const end(*pTableOrSectionNode->EndOfSectionNode());
-            ::MakeFrames(&rDoc, currentStart.nNode, end);
+            ::MakeFrames(&rDoc, currentStart.GetNode(), *pTableOrSectionNode->EndOfSectionNode());
             isAppendObjsCalled = true;
         }
-        currentStart.nNode = pTableOrSectionNode->EndOfSectionIndex() + 1;
-        currentStart.nContent.Assign(currentStart.nNode.GetNode().GetContentNode(), 0);
-        pStartNode = currentStart.nNode.GetNode().GetTextNode();
+        currentStart.Assign( pTableOrSectionNode->EndOfSectionIndex() + 1 );
+        pStartNode = currentStart.GetNode().GetTextNode();
     }
     if (currentStart < *rPam.End())
     {
         SwTextNode * pNode(pStartNode);
         do
         {
+            // undeleted text node: add it to the "hidden" list
+            // to update numbering in Show Changes mode
+            SwPosition aPos( *pNode, pNode->Len() );
+            if ( pNode->GetNumRule() && aPos < *rPam.End() )
+                pNode->AddToListRLHidden();
+
             std::vector<SwTextFrame*> frames;
             SwIterator<SwTextFrame, SwTextNode, sw::IteratorMode::UnwrapMulti> aIter(*pNode);
             for (SwTextFrame * pFrame = aIter.First(); pFrame; pFrame = aIter.Next())
@@ -310,7 +319,7 @@ void UpdateFramesForRemoveDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
             }
 
             // no nodes can be unmerged by this - skip MakeFrames() etc.
-            if (rPam.GetPoint()->nNode == rPam.GetMark()->nNode)
+            if (rPam.GetPoint()->GetNode() == rPam.GetMark()->GetNode())
             {
                 break; // continue with AppendAllObjs()
             }
@@ -345,7 +354,7 @@ void UpdateFramesForRemoveDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
                 SwNodeIndex const end(*pLast, +1); // end is exclusive
                 // note: this will also create frames for all currently hidden flys
                 // both on first and non-first nodes because it calls AppendAllObjs
-                ::MakeFrames(&rDoc, start, end);
+                ::MakeFrames(&rDoc, start.GetNode(), end.GetNode());
                 isAppendObjsCalled = true;
                 // re-use this to move flys that are now on the wrong frame, with end
                 // of redline as "second" node; the nodes between start and end should
@@ -356,7 +365,7 @@ void UpdateFramesForRemoveDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
             // skip over hidden sections!
             pNode = static_cast<SwTextNode*>(pLast->GetNodes().GoNextSection(&tmp, /*bSkipHidden=*/true, /*bSkipProtect=*/false));
         }
-        while (pNode && pNode->GetIndex() <= rPam.End()->nNode.GetIndex());
+        while (pNode && pNode->GetIndex() <= rPam.End()->GetNodeIndex());
     }
 
     if (!isAppendObjsCalled)
@@ -385,19 +394,19 @@ namespace
     bool IsPrevPos( const SwPosition & rPos1, const SwPosition & rPos2 )
     {
         const SwContentNode* pCNd;
-        if( 0 != rPos2.nContent.GetIndex() )
+        if( 0 != rPos2.GetContentIndex() )
             return false;
-        if( rPos2.nNode.GetIndex() - 1 != rPos1.nNode.GetIndex() )
+        if( rPos2.GetNodeIndex() - 1 != rPos1.GetNodeIndex() )
             return false;
-        pCNd = rPos1.nNode.GetNode().GetContentNode();
-        return pCNd && rPos1.nContent.GetIndex() == pCNd->Len();
+        pCNd = rPos1.GetNode().GetContentNode();
+        return pCNd && rPos1.GetContentIndex() == pCNd->Len();
     }
 
     // copy style or return with SwRedlineExtra_FormatColl with reject data of the upcoming copy
     SwRedlineExtraData_FormatColl* lcl_CopyStyle( const SwPosition & rFrom, const SwPosition & rTo, bool bCopy = true )
     {
-        SwTextNode* pToNode = rTo.nNode.GetNode().GetTextNode();
-        SwTextNode* pFromNode = rFrom.nNode.GetNode().GetTextNode();
+        SwTextNode* pToNode = rTo.GetNode().GetTextNode();
+        SwTextNode* pFromNode = rFrom.GetNode().GetTextNode();
         if (pToNode != nullptr && pFromNode != nullptr && pToNode != pFromNode)
         {
             const SwPaM aPam(*pToNode);
@@ -444,7 +453,7 @@ namespace
     // delete the empty tracked table row (i.e. if it's last tracked deletion was accepted)
     void lcl_DeleteTrackedTableRow ( const SwPosition* pPos )
     {
-        const SwTableBox* pBox = pPos->nNode.GetNode().GetTableBox();
+        const SwTableBox* pBox = pPos->GetNode().GetTableBox();
         if ( !pBox )
             return;
 
@@ -472,7 +481,7 @@ namespace
     // (also at accepting the last redline insertion of a tracked table row insertion)
     void lcl_RemoveTrackingOfTableRow( const SwPosition* pPos, bool bRejectDeletion )
     {
-        const SwTableBox* pBox = pPos->nNode.GetNode().GetTableBox();
+        const SwTableBox* pBox = pPos->GetNode().GetTableBox();
         if ( !pBox )
             return;
 
@@ -557,7 +566,7 @@ namespace
                 case SwComparePosition::Equal:
                     {
                         bool bInsert = RedlineType::Insert == pRedl->GetType();
-                        SwPosition aPos(pRedl->Start()->nNode);
+                        SwPosition aPos(pRedl->Start()->GetNode());
                         rArr.DeleteAndDestroy( rPos-- );
 
                         // remove tracking of the table row, if needed
@@ -627,13 +636,13 @@ namespace
                 if( pDelStt && pDelEnd )
                 {
                     SwPaM aPam( *pDelStt, *pDelEnd );
-                    SwContentNode* pCSttNd = pDelStt->nNode.GetNode().GetContentNode();
-                    SwContentNode* pCEndNd = pDelEnd->nNode.GetNode().GetContentNode();
+                    SwContentNode* pCSttNd = pDelStt->GetNode().GetContentNode();
+                    SwContentNode* pCEndNd = pDelEnd->GetNode().GetContentNode();
                     pRStt = pRedl->Start();
                     pREnd = pRedl->End();
 
                     // keep style of the empty paragraph after deletion of wholly paragraphs
-                    if( pCSttNd && pCEndNd && pRStt && pREnd && pRStt->nContent == 0 )
+                    if( pCSttNd && pCEndNd && pRStt && pREnd && pRStt->GetContentIndex() == 0 )
                         lcl_CopyStyle(*pREnd, *pRStt);
 
                     if( bDelRedl )
@@ -748,8 +757,8 @@ namespace
                 {
                     SwPaM aPam( *pDelStt, *pDelEnd );
 
-                    SwContentNode* pCSttNd = pDelStt->nNode.GetNode().GetContentNode();
-                    SwContentNode* pCEndNd = pDelEnd->nNode.GetNode().GetContentNode();
+                    SwContentNode* pCSttNd = pDelStt->GetNode().GetContentNode();
+                    SwContentNode* pCEndNd = pDelEnd->GetNode().GetContentNode();
 
                     if( bDelRedl )
                         delete pRedl;
@@ -766,11 +775,11 @@ namespace
                         {
                             aPam.GetBound().nContent.Assign( nullptr, 0 );
                             aPam.GetBound( false ).nContent.Assign( nullptr, 0 );
-                            if (aPam.End()->nNode.GetNode().IsStartNode())
+                            if (aPam.End()->GetNode().IsStartNode())
                             {   // end node will be deleted too! see nNodeDiff+1
-                                --aPam.End()->nNode;
+                                aPam.End()->Adjust(SwNodeOffset(-1));
                             }
-                            assert(!aPam.End()->nNode.GetNode().IsStartNode());
+                            assert(!aPam.End()->GetNode().IsStartNode());
                             rDoc.getIDocumentContentOperations().DelFullPara( aPam );
                         }
                     else
@@ -902,7 +911,7 @@ namespace
                     // handle paragraph formatting changes
                     // (range is only a full paragraph or a part of it)
                     const SwPosition* pStt = pRedl->Start();
-                    SwTextNode* pTNd = pStt->nNode.GetNode().GetTextNode();
+                    SwTextNode* pTNd = pStt->GetNode().GetTextNode();
                     if( pTNd )
                     {
                         // expand range to the whole paragraph
@@ -1011,31 +1020,30 @@ namespace
         // The Selection is only in the ContentSection. If there are Redlines
         // to Non-ContentNodes before or after that, then the Selections
         // expand to them.
-        SwPosition* pStt = rPam.Start(),
-                  * pEnd = rPam.End();
+        auto [pStt, pEnd] = rPam.StartEnd(); // SwPosition*
         SwDoc& rDoc = rPam.GetDoc();
-        if( !pStt->nContent.GetIndex() &&
-            !rDoc.GetNodes()[ pStt->nNode.GetIndex() - 1 ]->IsContentNode() )
+        if( !pStt->GetContentIndex() &&
+            !rDoc.GetNodes()[ pStt->GetNodeIndex() - 1 ]->IsContentNode() )
         {
             const SwRangeRedline* pRedl = rDoc.getIDocumentRedlineAccess().GetRedline( *pStt, nullptr );
             if( pRedl )
             {
                 const SwPosition* pRStt = pRedl->Start();
-                if( !pRStt->nContent.GetIndex() && pRStt->nNode.GetIndex() ==
-                    pStt->nNode.GetIndex() - 1 )
+                if( !pRStt->GetContentIndex() && pRStt->GetNodeIndex() ==
+                    pStt->GetNodeIndex() - 1 )
                     *pStt = *pRStt;
             }
         }
-        if( pEnd->nNode.GetNode().IsContentNode() &&
-            !rDoc.GetNodes()[ pEnd->nNode.GetIndex() + 1 ]->IsContentNode() &&
-            pEnd->nContent.GetIndex() == pEnd->nNode.GetNode().GetContentNode()->Len()    )
+        if( pEnd->GetNode().IsContentNode() &&
+            !rDoc.GetNodes()[ pEnd->GetNodeIndex() + 1 ]->IsContentNode() &&
+            pEnd->GetContentIndex() == pEnd->GetNode().GetContentNode()->Len()    )
         {
             const SwRangeRedline* pRedl = rDoc.getIDocumentRedlineAccess().GetRedline( *pEnd, nullptr );
             if( pRedl )
             {
                 const SwPosition* pREnd = pRedl->End();
-                if( !pREnd->nContent.GetIndex() && pREnd->nNode.GetIndex() ==
-                    pEnd->nNode.GetIndex() + 1 )
+                if( !pREnd->GetContentIndex() && pREnd->GetNodeIndex() ==
+                    pEnd->GetNodeIndex() + 1 )
                     *pEnd = *pREnd;
             }
         }
@@ -1057,9 +1065,9 @@ namespace
             {
                 m_pCursor->SetMark();
                 *m_pCursor->GetMark() = *m_rRedline.GetMark();
-                *m_rRedline.GetMark() = SwPosition(rDoc.GetNodes().GetEndOfContent());
+                m_rRedline.GetMark()->Assign(rDoc.GetNodes().GetEndOfContent());
             }
-            *m_rRedline.GetPoint() = SwPosition(rDoc.GetNodes().GetEndOfContent());
+            m_rRedline.GetPoint()->Assign(rDoc.GetNodes().GetEndOfContent());
         }
         ~TemporaryRedlineUpdater()
         {
@@ -1281,41 +1289,40 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         }
     }
 
-    SwPosition* pStt = pNewRedl->Start(),
-              * pEnd = pNewRedl->End();
+    auto [pStt, pEnd] = pNewRedl->StartEnd(); // SwPosition*
     {
-        SwTextNode* pTextNode = pStt->nNode.GetNode().GetTextNode();
+        SwTextNode* pTextNode = pStt->GetNode().GetTextNode();
         if( pTextNode == nullptr )
         {
-            if( pStt->nContent > 0 )
+            if( pStt->GetContentIndex() > 0 )
             {
                 OSL_ENSURE( false, "Redline start: non-text-node with content" );
-                pStt->nContent = 0;
+                pStt->SetContent( 0 );
             }
         }
         else
         {
-            if( pStt->nContent > pTextNode->Len() )
+            if( pStt->GetContentIndex() > pTextNode->Len() )
             {
                 OSL_ENSURE( false, "Redline start: index after text" );
-                pStt->nContent = pTextNode->Len();
+                pStt->SetContent( pTextNode->Len() );
             }
         }
-        pTextNode = pEnd->nNode.GetNode().GetTextNode();
+        pTextNode = pEnd->GetNode().GetTextNode();
         if( pTextNode == nullptr )
         {
-            if( pEnd->nContent > 0 )
+            if( pEnd->GetContentIndex() > 0 )
             {
                 OSL_ENSURE( false, "Redline end: non-text-node with content" );
-                pEnd->nContent = 0;
+                pEnd->SetContent(0);
             }
         }
         else
         {
-            if( pEnd->nContent > pTextNode->Len() )
+            if( pEnd->GetContentIndex() > pTextNode->Len() )
             {
                 OSL_ENSURE( false, "Redline end: index after text" );
-                pEnd->nContent = pTextNode->Len();
+                pEnd->SetContent( pTextNode->Len() );
             }
         }
     }
@@ -1330,6 +1337,7 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
     // look up the first Redline for the starting position
     if( !GetRedline( *pStt, &n ) && n )
         --n;
+    const SwRedlineTable::size_type nStartPos = n;
     bool bDec = false;
 
     for( ; pNewRedl && n < maRedlineTable.size(); bDec ? n : ++n )
@@ -1337,8 +1345,7 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         bDec = false;
 
         SwRangeRedline* pRedl = maRedlineTable[ n ];
-        SwPosition* pRStt = pRedl->Start(),
-                  * pREnd = pRedl->End();
+        auto [pRStt, pREnd] = pRedl->StartEnd();
 
         // #i8518# remove empty redlines while we're at it
         if( ( *pRStt == *pREnd ) &&
@@ -1349,6 +1356,9 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         }
 
         SwComparePosition eCmpPos = ComparePosition( *pStt, *pEnd, *pRStt, *pREnd );
+
+        if ( SwComparePosition::Before == eCmpPos && !IsPrevPos( *pEnd, *pRStt ))
+            break;
 
         switch( pNewRedl->GetType() )
         {
@@ -1667,7 +1677,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                     break;
 
                 case SwComparePosition::CollideEnd:
-                    if (pRStt->nContent != 0)
+                    if (pRStt->GetContentIndex() != 0
+                        && pRStt->GetNode() != pREnd->GetNode())
                     {   // tdf#147466 HACK: don't combine in this case to avoid the tdf#119571 code from *undeleting* section nodes
                         break;
                     }
@@ -1727,7 +1738,10 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                 // even if they are not allowed to be combined
                 RedlineFlags eOld = meRedlineFlags;
                 if( !( eOld & RedlineFlags::DontCombineRedlines ) &&
-                    pRedl->IsOwnRedline( *pNewRedl ) )
+                    pRedl->IsOwnRedline( *pNewRedl ) &&
+                    // tdf#116084 tdf#121176 don't combine anonymized deletion
+                    // and anonymized insertion, i.e. with the same dummy timestamp
+                    !pRedl->GetRedlineData(0).IsAnonymized() )
                 {
 
                     // Set to NONE, so that the Delete::Redo merges the Redline data correctly!
@@ -1750,12 +1764,10 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                             // For this case, we completely delete the
                             // paragraphs (if, of course, we also start on
                             // a paragraph boundary).
-                            if( (pStt->nContent == 0) &&
-                                pEnd->nNode.GetNode().IsEndNode() )
+                            if( (pStt->GetContentIndex() == 0) &&
+                                pEnd->GetNode().IsEndNode() )
                             {
-                                pEnd->nNode--;
-                                pEnd->nContent.Assign(
-                                    pEnd->nNode.GetNode().GetTextNode(), 0);
+                                pEnd->Adjust(SwNodeOffset(-1));
                                 m_rDoc.getIDocumentContentOperations().DelFullPara( *pNewRedl );
                             }
                             else
@@ -1763,18 +1775,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
 
                             bCompress = true;
                         }
-                        if( !bCallDelete && !bDec && *pEnd == *pREnd )
-                        {
-                            m_rDoc.getIDocumentContentOperations().DeleteAndJoin( *pNewRedl );
-                            bCompress = true;
-                        }
-                        else if ( bCallDelete || !bDec )
-                        {
-                            // delete new redline, except in some cases of fallthrough from previous
-                            // case ::Equal (eg. same portion w:del in w:ins in OOXML import)
-                            delete pNewRedl;
-                            pNewRedl = nullptr;
-                        }
+                        delete pNewRedl;
+                        pNewRedl = nullptr;
                         break;
 
                     case SwComparePosition::Outside:
@@ -2221,7 +2223,7 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         {
             if ( bCallDelete && RedlineType::Delete == pNewRedl->GetType() )
             {
-                if ( pStt->nContent != 0 )
+                if ( pStt->GetContentIndex() != 0 )
                 {
                     // tdf#119571 update the style of the joined paragraph
                     // after a partially deleted paragraph to show its correct style
@@ -2230,10 +2232,10 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                     // to avoid text insertion with bad style in the deleted
                     // area later (except paragraphs of the removed tables).
 
-                    SwContentNode* pDelNd = pStt->nNode.GetNode().GetContentNode();
+                    SwContentNode* pDelNd = pStt->GetNode().GetContentNode();
                     // start copying the style of the first paragraph from the end of the range
-                    SwContentNode* pTextNd = pEnd->nNode.GetNode().GetContentNode();
-                    SwNodeIndex aIdx( pEnd->nNode.GetNode() );
+                    SwContentNode* pTextNd = pEnd->GetNode().GetContentNode();
+                    SwNodeIndex aIdx( pEnd->GetNode() );
                     bool bFirst = true;
 
                     while (pTextNd != nullptr && pDelNd->GetIndex() < pTextNd->GetIndex())
@@ -2320,8 +2322,8 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
                 // this doesn't work for selections with multiple tables
                 if ( m_rDoc.GetIDocumentUndoRedo().DoesUndo() )
                 {
-                    SwNodeIndex aSttIdx( pStt->nNode.GetNode() );
-                    SwNodeIndex aEndIdx( pEnd->nNode.GetNode() );
+                    SwNodeIndex aSttIdx( pStt->GetNode() );
+                    SwNodeIndex aEndIdx( pEnd->GetNode() );
                     while ( aSttIdx < aEndIdx )
                     {
                         if ( aSttIdx.GetNode().IsTableNode() )
@@ -2344,7 +2346,7 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
     }
 
     if( bCompress )
-        CompressRedlines();
+        CompressRedlines(nStartPos);
 
     CHECK_REDLINE( *this )
 
@@ -2437,7 +2439,7 @@ bool DocumentRedlineManager::AppendTableCellRedline( SwTableCellRedline* pNewRed
     return nullptr != pNewRedl;
 }
 
-void DocumentRedlineManager::CompressRedlines()
+void DocumentRedlineManager::CompressRedlines(size_t nStartIndex)
 {
     CHECK_REDLINE( *this )
 
@@ -2449,18 +2451,19 @@ void DocumentRedlineManager::CompressRedlines()
         pFnc = &SwRangeRedline::Hide;
 
     // Try to merge identical ones
-    for( SwRedlineTable::size_type n = 1; n < maRedlineTable.size(); ++n )
+    if (nStartIndex == 0)
+        nStartIndex = 1;
+    for( SwRedlineTable::size_type n = nStartIndex; n < maRedlineTable.size(); ++n )
     {
         SwRangeRedline* pPrev = maRedlineTable[ n-1 ],
                     * pCur = maRedlineTable[ n ];
-        const SwPosition* pPrevStt = pPrev->Start(),
-                        * pPrevEnd = pPrev->End();
-        const SwPosition* pCurStt = pCur->Start(),
-                        * pCurEnd = pCur->End();
+        auto [pPrevStt,pPrevEnd] = pPrev->StartEnd();
+        auto [pCurStt, pCurEnd] = pCur->StartEnd();
+
         if( *pPrevEnd == *pCurStt && pPrev->CanCombine( *pCur ) &&
-            pPrevStt->nNode.GetNode().StartOfSectionNode() ==
-            pCurEnd->nNode.GetNode().StartOfSectionNode() &&
-            !pCurEnd->nNode.GetNode().StartOfSectionNode()->IsTableNode() )
+            pPrevStt->GetNode().StartOfSectionNode() ==
+            pCurEnd->GetNode().StartOfSectionNode() &&
+            !pCurEnd->GetNode().StartOfSectionNode()->IsTableNode() )
         {
             // we then can merge them
             SwRedlineTable::size_type nPrevIndex = n-1;
@@ -2482,17 +2485,14 @@ void DocumentRedlineManager::CompressRedlines()
 bool DocumentRedlineManager::SplitRedline( const SwPaM& rRange )
 {
     bool bChg = false;
+    auto [pStt, pEnd] = rRange.StartEnd(); // SwPosition*
     SwRedlineTable::size_type n = 0;
-    const SwPosition* pStt = rRange.Start();
-    const SwPosition* pEnd = rRange.End();
-    GetRedline( *pStt, &n );
+    //FIXME overlapping problem GetRedline( *pStt, &n );
     for ( ; n < maRedlineTable.size(); ++n)
     {
         SwRangeRedline * pRedline = maRedlineTable[ n ];
-        SwPosition *const pRedlineStart = pRedline->Start();
-        SwPosition *const pRedlineEnd = pRedline->End();
-        if (*pRedlineStart <= *pStt && *pStt <= *pRedlineEnd &&
-            *pRedlineStart <= *pEnd && *pEnd <= *pRedlineEnd)
+        auto [pRedlineStart, pRedlineEnd] = pRedline->StartEnd();
+        if (*pRedlineStart <= *pStt && *pEnd <= *pRedlineEnd)
         {
             bChg = true;
             int nn = 0;
@@ -2558,8 +2558,7 @@ bool DocumentRedlineManager::DeleteRedline( const SwPaM& rRange, bool bSaveInUnd
         }
     }
 
-    const SwPosition* pStt = rRange.Start(),
-                    * pEnd = rRange.End();
+    auto [pStt, pEnd] = rRange.StartEnd(); // SwPosition*
     SwRedlineTable::size_type n = 0;
     GetRedline( *pStt, &n );
     for( ; n < maRedlineTable.size() ; ++n )
@@ -2568,8 +2567,7 @@ bool DocumentRedlineManager::DeleteRedline( const SwPaM& rRange, bool bSaveInUnd
         if( RedlineType::Any != nDelType && nDelType != pRedl->GetType() )
             continue;
 
-        SwPosition* pRStt = pRedl->Start(),
-                  * pREnd = pRedl->End();
+        auto [pRStt, pREnd] = pRedl->StartEnd(); // SwPosition*
         switch( ComparePosition( *pStt, *pEnd, *pRStt, *pREnd ) )
         {
         case SwComparePosition::Equal:
@@ -2686,13 +2684,14 @@ SwRedlineTable::size_type DocumentRedlineManager::GetRedlinePos( const SwNode& r
         auto it = std::lower_bound(maRedlineTable.begin(), maRedlineTable.end(), rNd,
             [&nNdIdx](const SwRangeRedline* lhs, const SwNode& /*rhs*/)
             {
-                return lhs->End()->nNode.GetIndex() < nNdIdx;
+                return lhs->End()->GetNodeIndex() < nNdIdx;
             });
         for( ; it != maRedlineTable.end(); ++it)
         {
             const SwRangeRedline* pTmp = *it;
-            SwNodeOffset nStart = pTmp->Start()->nNode.GetIndex(),
-                      nEnd = pTmp->End()->nNode.GetIndex();
+            auto [pStart, pEnd] = pTmp->StartEnd(); // SwPosition*
+            SwNodeOffset nStart = pStart->GetNodeIndex(),
+                         nEnd = pEnd->GetNodeIndex();
 
             if( ( RedlineType::Any == nType || nType == pTmp->GetType()) &&
                 nStart <= nNdIdx && nNdIdx <= nEnd )
@@ -2707,9 +2706,10 @@ SwRedlineTable::size_type DocumentRedlineManager::GetRedlinePos( const SwNode& r
         for( SwRedlineTable::size_type n = 0; n < maRedlineTable.size() ; ++n )
         {
             const SwRangeRedline* pTmp = maRedlineTable[ n ];
-            SwNodeOffset nPt = pTmp->GetPoint()->nNode.GetIndex(),
-                  nMk = pTmp->GetMark()->nNode.GetIndex();
-            if( nPt < nMk ) { SwNodeOffset nTmp = nMk; nMk = nPt; nPt = nTmp; }
+            SwNodeOffset nPt = pTmp->GetPoint()->GetNodeIndex(),
+                  nMk = pTmp->GetMark()->GetNodeIndex();
+            if( nPt < nMk )
+                std::swap( nMk, nPt );
 
             if( ( RedlineType::Any == nType || nType == pTmp->GetType()) &&
                 nMk <= nNdIdx && nNdIdx <= nPt )
@@ -2728,14 +2728,14 @@ bool DocumentRedlineManager::HasRedline( const SwPaM& rPam, RedlineType nType, b
 {
     SwPosition currentStart(*rPam.Start());
     SwPosition currentEnd(*rPam.End());
-    SwNodeIndex pEndNodeIndex(currentEnd.nNode.GetNode());
+    const SwNode& rEndNode(currentEnd.GetNode());
 
-    for( SwRedlineTable::size_type n = GetRedlinePos( rPam.Start()->nNode.GetNode(), nType );
+    for( SwRedlineTable::size_type n = GetRedlinePos( rPam.Start()->GetNode(), nType );
                     n < maRedlineTable.size(); ++n )
     {
         const SwRangeRedline* pTmp = maRedlineTable[ n ];
 
-        if ( pTmp->Start()->nNode > pEndNodeIndex )
+        if ( pTmp->Start()->GetNode() > rEndNode )
             break;
 
         if( RedlineType::Any != nType && nType != pTmp->GetType() )
@@ -2764,8 +2764,7 @@ const SwRangeRedline* DocumentRedlineManager::GetRedline( const SwPosition& rPos
         {
             nM = nU + ( nO - nU ) / 2;
             const SwRangeRedline* pRedl = maRedlineTable[ nM ];
-            const SwPosition* pStt = pRedl->Start();
-            const SwPosition* pEnd = pRedl->End();
+            auto [pStt, pEnd] = pRedl->StartEnd();
             if( pEnd == pStt
                     ? *pStt == rPos
                     : ( *pStt <= rPos && rPos < *pEnd ) )
@@ -2942,18 +2941,18 @@ bool DocumentRedlineManager::AcceptRedline( const SwPaM& rPam, bool bCallDelete 
 
 void DocumentRedlineManager::AcceptRedlineParagraphFormatting( const SwPaM &rPam )
 {
-    const SwPosition* pStt = rPam.Start(),
-                    * pEnd = rPam.End();
+    auto [pStt, pEnd] = rPam.StartEnd(); // SwPosition*
 
-    const SwNodeOffset nSttIdx = pStt->nNode.GetIndex();
-    const SwNodeOffset nEndIdx = pEnd->nNode.GetIndex();
+    const SwNodeOffset nSttIdx = pStt->GetNodeIndex();
+    const SwNodeOffset nEndIdx = pEnd->GetNodeIndex();
 
     for( SwRedlineTable::size_type n = 0; n < maRedlineTable.size() ; ++n )
     {
         const SwRangeRedline* pTmp = maRedlineTable[ n ];
-        SwNodeOffset nPt = pTmp->GetPoint()->nNode.GetIndex(),
-              nMk = pTmp->GetMark()->nNode.GetIndex();
-        if( nPt < nMk ) { SwNodeOffset nTmp = nMk; nMk = nPt; nPt = nTmp; }
+        SwNodeOffset nPt = pTmp->GetPoint()->GetNodeIndex(),
+              nMk = pTmp->GetMark()->GetNodeIndex();
+        if( nPt < nMk )
+            std::swap( nMk, nPt );
 
         if( RedlineType::ParagraphFormat == pTmp->GetType() &&
             ( (nSttIdx <= nMk && nMk <= nEndIdx) || (nSttIdx <= nPt && nPt <= nEndIdx) ) )
@@ -3133,12 +3132,12 @@ const SwRangeRedline* DocumentRedlineManager::SelNextRedline( SwPaM& rPam ) cons
     if( pFnd )
     {
         const SwPosition* pEnd = pFnd->End();
-        if( !pEnd->nNode.GetNode().IsContentNode() )
+        if( !pEnd->GetNode().IsContentNode() )
         {
-            SwNodeIndex aTmp( pEnd->nNode );
+            SwNodeIndex aTmp( pEnd->GetNode() );
             SwContentNode* pCNd = SwNodes::GoPrevSection( &aTmp );
-            if( !pCNd || ( aTmp == rSttPos.nNode &&
-                pCNd->Len() == rSttPos.nContent.GetIndex() ))
+            if( !pCNd || ( aTmp == rSttPos.GetNode() &&
+                pCNd->Len() == rSttPos.GetContentIndex() ))
                 pFnd = nullptr;
         }
         if( pFnd )
@@ -3192,14 +3191,14 @@ const SwRangeRedline* DocumentRedlineManager::SelNextRedline( SwPaM& rPam ) cons
             const SwRangeRedline* pSaveFnd = pFnd;
 
             SwContentNode* pCNd;
-            SwNodeIndex* pIdx = &rPam.GetMark()->nNode;
-            if( !pIdx->GetNode().IsContentNode() )
+            SwPosition* pPos = rPam.GetMark();
+            if( !pPos->GetNode().IsContentNode() )
             {
-                pCNd = m_rDoc.GetNodes().GoNextSection( pIdx );
+                pCNd = m_rDoc.GetNodes().GoNextSection( pPos );
                 if( pCNd )
                 {
-                    if( *pIdx <= rPam.GetPoint()->nNode )
-                        rPam.GetMark()->nContent.Assign( pCNd, 0 );
+                    if( pPos->GetNode() <= rPam.GetPoint()->GetNode() )
+                        pPos->Assign( *pCNd, 0 );
                     else
                         pFnd = nullptr;
                 }
@@ -3207,14 +3206,14 @@ const SwRangeRedline* DocumentRedlineManager::SelNextRedline( SwPaM& rPam ) cons
 
             if( pFnd )
             {
-                pIdx = &rPam.GetPoint()->nNode;
-                if( !pIdx->GetNode().IsContentNode() )
+                pPos = rPam.GetPoint();
+                if( !pPos->GetNode().IsContentNode() )
                 {
-                    pCNd = SwNodes::GoPrevSection( pIdx );
+                    pCNd = SwNodes::GoPrevSection( pPos );
                     if( pCNd )
                     {
-                        if( *pIdx >= rPam.GetMark()->nNode )
-                            rPam.GetPoint()->nContent.Assign( pCNd, pCNd->Len() );
+                        if( pPos->GetNode() >= rPam.GetMark()->GetNode() )
+                            pPos->Assign( *pCNd, pCNd->Len() );
                         else
                             pFnd = nullptr;
                     }
@@ -3259,12 +3258,12 @@ const SwRangeRedline* DocumentRedlineManager::SelPrevRedline( SwPaM& rPam ) cons
     if( pFnd )
     {
         const SwPosition* pStt = pFnd->Start();
-        if( !pStt->nNode.GetNode().IsContentNode() )
+        if( !pStt->GetNode().IsContentNode() )
         {
-            SwNodeIndex aTmp( pStt->nNode );
+            SwNodeIndex aTmp( pStt->GetNode() );
             SwContentNode* pCNd = m_rDoc.GetNodes().GoNextSection( &aTmp );
-            if( !pCNd || ( aTmp == rSttPos.nNode &&
-                !rSttPos.nContent.GetIndex() ))
+            if( !pCNd || ( aTmp == rSttPos.GetNode() &&
+                !rSttPos.GetContentIndex() ))
                 pFnd = nullptr;
         }
         if( pFnd )
@@ -3319,14 +3318,14 @@ const SwRangeRedline* DocumentRedlineManager::SelPrevRedline( SwPaM& rPam ) cons
             const SwRangeRedline* pSaveFnd = pFnd;
 
             SwContentNode* pCNd;
-            SwNodeIndex* pIdx = &rPam.GetMark()->nNode;
-            if( !pIdx->GetNode().IsContentNode() )
+            SwPosition* pPos = rPam.GetMark();
+            if( !pPos->GetNode().IsContentNode() )
             {
-                pCNd = SwNodes::GoPrevSection( pIdx );
+                pCNd = SwNodes::GoPrevSection( pPos );
                 if( pCNd )
                 {
-                    if( *pIdx >= rPam.GetPoint()->nNode )
-                        rPam.GetMark()->nContent.Assign( pCNd, pCNd->Len() );
+                    if( pPos->GetNode() >= rPam.GetPoint()->GetNode() )
+                        pPos->Assign( *pCNd, pCNd->Len() );
                     else
                         pFnd = nullptr;
                 }
@@ -3334,14 +3333,14 @@ const SwRangeRedline* DocumentRedlineManager::SelPrevRedline( SwPaM& rPam ) cons
 
             if( pFnd )
             {
-                pIdx = &rPam.GetPoint()->nNode;
-                if( !pIdx->GetNode().IsContentNode() )
+                pPos = rPam.GetPoint();
+                if( !pPos->GetNode().IsContentNode() )
                 {
-                    pCNd = m_rDoc.GetNodes().GoNextSection( pIdx );
+                    pCNd = m_rDoc.GetNodes().GoNextSection( pPos );
                     if( pCNd )
                     {
-                        if( *pIdx <= rPam.GetMark()->nNode )
-                            rPam.GetPoint()->nContent.Assign( pCNd, 0 );
+                        if( pPos->GetNode() <= rPam.GetMark()->GetNode() )
+                            pPos->Assign( *pCNd, 0 );
                         else
                             pFnd = nullptr;
                     }
@@ -3374,8 +3373,7 @@ const SwRangeRedline* DocumentRedlineManager::SelPrevRedline( SwPaM& rPam ) cons
 bool DocumentRedlineManager::SetRedlineComment( const SwPaM& rPaM, const OUString& rS )
 {
     bool bRet = false;
-    const SwPosition* pStt = rPaM.Start(),
-                    * pEnd = rPaM.End();
+    auto [pStt, pEnd] = rPaM.StartEnd(); // SwPosition*
     SwRedlineTable::size_type n = 0;
     if( GetRedlineTable().FindAtPosition( *pStt, n ) )
     {

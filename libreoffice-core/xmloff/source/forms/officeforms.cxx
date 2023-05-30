@@ -28,7 +28,7 @@
 #include <xmloff/namespacemap.hxx>
 #include <com/sun/star/frame/XModel.hpp>
 #include <comphelper/extract.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include "strings.hxx"
 
 namespace xmloff
@@ -83,7 +83,7 @@ namespace xmloff
         // set the property
         if (_rxPropInfo->hasPropertyByName(_rPropName))
         {
-            _rxProps->setPropertyValue(_rPropName, makeAny(bValue));
+            _rxProps->setPropertyValue(_rPropName, Any(bValue));
         }
     }
 

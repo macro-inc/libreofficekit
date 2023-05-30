@@ -21,10 +21,11 @@
 #define INCLUDED_UCBHELPER_RESULTSETHELPER_HXX
 
 #include <memory>
-#include <osl/mutex.hxx>
+#include <mutex>
 #include <com/sun/star/lang/XServiceInfo.hpp>
 #include <com/sun/star/ucb/XDynamicResultSet.hpp>
 #include <com/sun/star/ucb/OpenCommandArgument2.hpp>
+#include <comphelper/interfacecontainer4.hxx>
 #include <cppuhelper/implbase.hxx>
 #include <ucbhelper/ucbhelperdllapi.h>
 
@@ -37,7 +38,7 @@ namespace cppu {
 namespace ucbhelper {
 
 
-#define DYNAMICRESULTSET_SERVICE_NAME "com.sun.star.ucb.DynamicResultSet"
+inline constexpr OUStringLiteral DYNAMICRESULTSET_SERVICE_NAME = u"com.sun.star.ucb.DynamicResultSet";
 
 
 /**
@@ -54,12 +55,12 @@ class UCBHELPER_DLLPUBLIC ResultSetImplHelper :
                     css::lang::XServiceInfo,
                     css::ucb::XDynamicResultSet>
 {
-    std::unique_ptr<cppu::OInterfaceContainerHelper> m_pDisposeEventListeners;
+    comphelper::OInterfaceContainerHelper4<css::lang::XEventListener> m_aDisposeEventListeners;
     bool                         m_bStatic;
     bool                         m_bInitDone;
 
 protected:
-    osl::Mutex                                                 m_aMutex;
+    std::mutex                                                 m_aMutex;
     css::ucb::OpenCommandArgument2                             m_aCommand;
     css::uno::Reference< css::uno::XComponentContext >         m_xContext;
     // Resultset #1
@@ -117,9 +118,9 @@ public:
       *        this resultset.
       */
     ResultSetImplHelper(
-            const css::uno::Reference<
-                css::uno::XComponentContext >& rxContext,
-            const css::ucb::OpenCommandArgument2& rCommand );
+            css::uno::Reference<
+                css::uno::XComponentContext > xContext,
+            css::ucb::OpenCommandArgument2 aCommand );
 
     /**
       * Destructor.

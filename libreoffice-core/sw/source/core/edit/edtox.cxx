@@ -57,8 +57,7 @@ void SwEditShell::Insert(const SwTOXMark& rMark)
     StartAllAction();
     for(SwPaM& rPaM : GetCursor()->GetRingContainer())
     {
-        const SwPosition *pStt = rPaM.Start(),
-                         *pEnd = rPaM.End();
+        auto [pStt, pEnd] = rPaM.StartEnd(); // SwPosition*
         if( bInsAtPos )
         {
             SwPaM aTmp( *pStt );
@@ -316,9 +315,9 @@ void SwEditShell::ApplyAutoMark()
                             SearchAlgorithms2::ABSOLUTE,
                             '\\' );
 
+        OStringBuffer aRdLine;
         while (rStrm.good())
         {
-            OString aRdLine;
             rStrm.ReadLine( aRdLine );
 
             // # -> comment
@@ -364,7 +363,7 @@ void SwEditShell::ApplyAutoMark()
                     bool bCancel;
 
                     // todo/mba: assuming that notes shouldn't be searched
-                    sal_uLong nRet = Find_Text(aSearchOpt, false/*bSearchInNotes*/, SwDocPositions::Start, SwDocPositions::End, bCancel,
+                    sal_Int32 nRet = Find_Text(aSearchOpt, false/*bSearchInNotes*/, SwDocPositions::Start, SwDocPositions::End, bCancel,
                                     FindRanges::InSelAll );
 
                     if(nRet)

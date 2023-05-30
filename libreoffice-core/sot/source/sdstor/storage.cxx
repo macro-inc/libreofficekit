@@ -31,7 +31,7 @@
 #include <sot/formats.hxx>
 #include <sot/exchange.hxx>
 #include <unotools/ucbstreamhelper.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 #include <tools/debug.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/ucbhelper.hxx>
@@ -69,12 +69,12 @@ SotTempStream::SotTempStream( const OUString & rName, StreamMode nMode )
 
 SotTempStream::~SotTempStream()
 {
-    Flush();
+    FlushBuffer();
 }
 
 void SotTempStream::CopyTo( SotTempStream * pDestStm )
 {
-    Flush(); // write all data
+    FlushBuffer(); // write all data
 
     sal_uInt64 nPos = Tell();    // save position
     Seek( 0 );
@@ -678,7 +678,7 @@ SotStorage* SotStorage::OpenOLEStorage( const css::uno::Reference < css::embed::
         {
             uno::Reference < beans::XPropertySet > xStreamProps( xStream, uno::UNO_QUERY_THROW );
             xStreamProps->setPropertyValue( "MediaType",
-                                            uno::makeAny( OUString(  "application/vnd.sun.star.oleobject"  ) ) );
+                                            uno::Any( OUString(  "application/vnd.sun.star.oleobject"  ) ) );
         }
 
         pStream = utl::UcbStreamHelper::CreateStream( xStream );

@@ -23,6 +23,7 @@
 #include <sfx2/tabdlg.hxx>
 #include <sfx2/basedlgs.hxx>
 #include <svx/xtable.hxx>
+#include <unotools/resmgr.hxx>
 #include "sdtreelb.hxx"
 
 #include <vector>
@@ -81,9 +82,9 @@ private:
     void                    SetActualClickAction( css::presentation::ClickAction eCA );
     void                    SetEditText( OUString const & rStr );
     OUString                GetEditText( bool bURL = false );
-    static TranslateId      GetClickActionSdResId(css::presentation::ClickAction eCA);
-
 public:
+    SD_DLLPUBLIC static TranslateId GetClickActionSdResId(css::presentation::ClickAction eCA);
+
     SdTPAction(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
     virtual ~SdTPAction() override;
 

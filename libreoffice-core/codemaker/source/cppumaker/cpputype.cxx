@@ -27,6 +27,7 @@
 #include <set>
 #include <string_view>
 #include <memory>
+#include <utility>
 #include <vector>
 #include <iostream>
 
@@ -143,19 +144,16 @@ bool isBootstrapType(OUString const & name)
         "com.sun.star.uno.XWeak",
         "com.sun.star.util.XMacroExpander" };
         // cf. cppuhelper/unotypes/Makefile UNOTYPES (plus missing dependencies)
-    for (std::size_t i = 0; i < SAL_N_ELEMENTS(names); ++i) {
-        if (name.equalsAscii(names[i])) {
-            return true;
-        }
-    }
-    return false;
+    auto const pred = [&name](const char* aName) {
+            return name.equalsAscii(aName);
+    };
+    return std::any_of(std::begin(names), std::end(names), pred);
 }
 
 class CppuType
 {
 public:
-    CppuType(
-        OUString const & name, rtl::Reference< TypeManager > const & typeMgr);
+    CppuType(OUString name, rtl::Reference< TypeManager > const & typeMgr);
 
     virtual ~CppuType() {}
 
@@ -275,12 +273,12 @@ private:
 };
 
 CppuType::CppuType(
-    OUString const & name, rtl::Reference< TypeManager > const & typeMgr):
+    OUString name, rtl::Reference< TypeManager > const & typeMgr):
     m_inheritedMemberCount(0)
     , m_cppuTypeLeak(false)
     , m_cppuTypeDynamic(true)
     , m_indentLength(0)
-    , name_(name)
+    , name_(std::move(name))
     , id_(name_.copy(name_.lastIndexOf('.') + 1))
     , m_typeMgr(typeMgr)
     , m_dependencies(typeMgr, name_)
@@ -1053,9 +1051,9 @@ class BaseOffset
 {
 public:
     BaseOffset(
-        rtl::Reference< TypeManager > const & manager,
+        rtl::Reference< TypeManager > manager,
         rtl::Reference< unoidl::InterfaceTypeEntity > const & entity):
-        manager_(manager), offset_(0) {
+        manager_(std::move(manager)), offset_(0) {
         calculateBases(entity);
     }
     BaseOffset(const BaseOffset&) = delete;
@@ -1186,7 +1184,7 @@ void InterfaceType::dumpHppFile(
     out << "\n";
     addDefaultHxxIncludes(includes);
     includes.dump(out, &name_, !(m_cppuTypeLeak || m_cppuTypeDynamic));
-    out << "\n";
+    out << "\n#if defined LIBO_INTERNAL_ONLY\n#include <type_traits>\n#endif\n\n";
     dumpGetCppuType(out);
     out << "\n::css::uno::Type const & "
         << codemaker::cpp::scopedCppName(u2b(name_))
@@ -1196,7 +1194,15 @@ void InterfaceType::dumpHppFile(
     dumpType(out, name_, false, false, true);
     out << " >::get();\n";
     dec();
-    out << "}\n\n#endif // "<< headerDefine << "\n";
+    out << "}\n\n#if defined LIBO_INTERNAL_ONLY\nnamespace cppu::detail {\n";
+    if (name_ == "com.sun.star.uno.XInterface") {
+        out << "template<typename> struct IsUnoInterfaceType: ::std::false_type {};\n"
+               "template<typename T> inline constexpr auto isUnoInterfaceType ="
+                   " sizeof (T) && IsUnoInterfaceType<T>::value;\n";
+    }
+    out << "template<> struct IsUnoInterfaceType<";
+    dumpType(out, name_, false, false, true);
+    out << ">: ::std::true_type {};\n}\n#endif\n\n#endif // "<< headerDefine << "\n";
 }
 
 void InterfaceType::dumpAttributes(FileStream & out) const
@@ -2088,33 +2094,33 @@ void PlainStructType::dumpComprehensiveGetCppuType(FileStream & out)
 bool PlainStructType::dumpBaseMembers(
     FileStream & out, OUString const & base, bool withType)
 {
-    bool hasMember = false;
-    if (!base.isEmpty()) {
-        rtl::Reference< unoidl::Entity > ent;
-        codemaker::UnoType::Sort sort = m_typeMgr->getSort(base, &ent);
-        if (sort != codemaker::UnoType::Sort::PlainStruct) {
-            throw CannotDumpException(
-                "plain struct type base " + base
-                + " is not a plain struct type");
+    if (base.isEmpty())
+        return false;
+
+    rtl::Reference< unoidl::Entity > ent;
+    codemaker::UnoType::Sort sort = m_typeMgr->getSort(base, &ent);
+    if (sort != codemaker::UnoType::Sort::PlainStruct) {
+        throw CannotDumpException(
+            "plain struct type base " + base
+            + " is not a plain struct type");
+    }
+    rtl::Reference< unoidl::PlainStructTypeEntity > ent2(
+        dynamic_cast< unoidl::PlainStructTypeEntity * >(ent.get()));
+    assert(ent2.is());
+    if (!ent2.is()) {
+        return false;
+    }
+    bool hasMember = dumpBaseMembers(out, ent2->getDirectBase(), withType);
+    for (const unoidl::PlainStructTypeEntity::Member& member : ent2->getDirectMembers()) {
+        if (hasMember) {
+            out << ", ";
         }
-        rtl::Reference< unoidl::PlainStructTypeEntity > ent2(
-            dynamic_cast< unoidl::PlainStructTypeEntity * >(ent.get()));
-        assert(ent2.is());
-        if (!ent2.is()) {
-            return false;
+        if (withType) {
+            dumpType(out, member.type, true, true);
+            out << " ";
         }
-        hasMember = dumpBaseMembers(out, ent2->getDirectBase(), withType);
-        for (const unoidl::PlainStructTypeEntity::Member& member : ent2->getDirectMembers()) {
-            if (hasMember) {
-                out << ", ";
-            }
-            if (withType) {
-                dumpType(out, member.type, true, true);
-                out << " ";
-            }
-            out << member.name << "_";
-            hasMember = true;
-        }
+        out << member.name << "_";
+        hasMember = true;
     }
     return hasMember;
 }
@@ -2871,7 +2877,7 @@ void ExceptionType::dumpHppFile(
         out << "\n#if defined LIBO_USE_SOURCE_LOCATION\n";
         out << "    if (!Message.isEmpty())\n";
         out << "        Message += \" \";\n";
-        out << "    Message += o3tl::runtimeToOUString(location.file_name()) + \":\" + OUString::number(location.line());\n";
+        out << "    Message += \"at \" + o3tl::runtimeToOUString(location.file_name()) + \":\" + OUString::number(location.line());\n";
         out << "#endif\n";
     }
     out << "}\n\n";
@@ -2924,7 +2930,7 @@ void ExceptionType::dumpHppFile(
             out << "\n#if defined LIBO_USE_SOURCE_LOCATION\n";
             out << "    if (!Message.isEmpty())\n";
             out << "        Message += \" \";\n";
-            out << "    Message += o3tl::runtimeToOUString(location.file_name()) + \":\" + OUString::number(location.line());\n";
+            out << "    Message += \"at \" + o3tl::runtimeToOUString(location.file_name()) + \":\" + OUString::number(location.line());\n";
             out << "#endif\n";
         }
         out << "}\n\n";
@@ -3198,45 +3204,46 @@ void ExceptionType::dumpDeclaration(FileStream & out)
 bool ExceptionType::dumpBaseMembers(
     FileStream & out, OUString const & base, bool withType, bool eligibleForDefaults)
 {
+    if (base.isEmpty())
+        return false;
+
     bool hasMember = false;
-    if (!base.isEmpty()) {
-        rtl::Reference< unoidl::Entity > ent;
-        codemaker::UnoType::Sort sort = m_typeMgr->getSort(base, &ent);
-        if (sort != codemaker::UnoType::Sort::Exception) {
-            throw CannotDumpException(
-                "exception type base " + base + " is not an exception type");
+    rtl::Reference< unoidl::Entity > ent;
+    codemaker::UnoType::Sort sort = m_typeMgr->getSort(base, &ent);
+    if (sort != codemaker::UnoType::Sort::Exception) {
+        throw CannotDumpException(
+            "exception type base " + base + " is not an exception type");
+    }
+    rtl::Reference< unoidl::ExceptionTypeEntity > ent2(
+        dynamic_cast< unoidl::ExceptionTypeEntity * >(ent.get()));
+    assert(ent2.is());
+    if (!ent2.is()) {
+        return false;
+    }
+    hasMember = dumpBaseMembers( out, ent2->getDirectBase(), withType,
+                                 eligibleForDefaults && ent2->getDirectMembers().empty() );
+    int memberCount = 0;
+    for (const unoidl::ExceptionTypeEntity::Member& member : ent2->getDirectMembers()) {
+        if (hasMember) {
+            out << ", ";
         }
-        rtl::Reference< unoidl::ExceptionTypeEntity > ent2(
-            dynamic_cast< unoidl::ExceptionTypeEntity * >(ent.get()));
-        assert(ent2.is());
-        if (!ent2.is()) {
-            return false;
+        if (withType) {
+            dumpType(out, member.type, true, true);
+            out << " ";
         }
-        hasMember = dumpBaseMembers( out, ent2->getDirectBase(), withType,
-                                     eligibleForDefaults && ent2->getDirectMembers().empty() );
-        int memberCount = 0;
-        for (const unoidl::ExceptionTypeEntity::Member& member : ent2->getDirectMembers()) {
-            if (hasMember) {
-                out << ", ";
-            }
-            if (withType) {
-                dumpType(out, member.type, true, true);
-                out << " ";
-            }
-            out << member.name << "_";
-            // We want to provide a default parameter value for uno::Exception subtype
-            // constructors, since most of the time we don't pass a Context object in to the exception
-            // throw sites.
-            if (eligibleForDefaults
-                && base == "com.sun.star.uno.Exception"
-                && memberCount == 1
-                && member.name == "Context"
-                && member.type == "com.sun.star.uno.XInterface") {
-                out << " = ::css::uno::Reference< ::css::uno::XInterface >()";
-            }
-            hasMember = true;
-            ++memberCount;
+        out << member.name << "_";
+        // We want to provide a default parameter value for uno::Exception subtype
+        // constructors, since most of the time we don't pass a Context object in to the exception
+        // throw sites.
+        if (eligibleForDefaults
+            && base == "com.sun.star.uno.Exception"
+            && memberCount == 1
+            && member.name == "Context"
+            && member.type == "com.sun.star.uno.XInterface") {
+            out << " = ::css::uno::Reference< ::css::uno::XInterface >()";
         }
+        hasMember = true;
+        ++memberCount;
     }
     return hasMember;
 }

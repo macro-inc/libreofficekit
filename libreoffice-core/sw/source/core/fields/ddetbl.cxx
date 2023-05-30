@@ -21,7 +21,7 @@
 #include <IDocumentSettingAccess.hxx>
 #include <IDocumentFieldsAccess.hxx>
 #include <IDocumentLayoutAccess.hxx>
-#include <index.hxx>
+#include <contentindex.hxx>
 #include <ndtxt.hxx>
 #include <swtable.hxx>
 #include <swddetbl.hxx>
@@ -97,8 +97,9 @@ void SwDDETable::SwClientNotify(const SwModify& rModify, const SfxHint& rHint)
                 SwTable::SwClientNotify(rModify, rHint);
         }
     }
-    else if(auto pFieldHint = dynamic_cast<const SwFieldHint*>(&rHint))
+    else if (rHint.GetId() == SfxHintId::SwField)
     {
+        auto pFieldHint = static_cast<const SwFieldHint*>(&rHint);
         pFieldHint->m_pPaM->DeleteMark(); // TODO: this is really hackish
         // replace DDETable by real table
         NoDDETable();
@@ -158,7 +159,7 @@ void SwDDETable::ChangeContent()
             SwNodeIndex aNdIdx( *pBox->GetSttNd(), 1 );
             SwTextNode* pTextNode = aNdIdx.GetNode().GetTextNode();
             OSL_ENSURE( pTextNode, "No Node" );
-            SwIndex aCntIdx( pTextNode, 0 );
+            SwContentIndex aCntIdx( pTextNode, 0 );
             pTextNode->EraseText( aCntIdx );
             pTextNode->InsertText( aLine.getToken( 0, '\t', nLineTokenPos ), aCntIdx );
 

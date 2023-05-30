@@ -23,11 +23,10 @@
 #include <ViewElementListProvider.hxx>
 #include <dlg_ShapeFont.hxx>
 #include <dlg_ShapeParagraph.hxx>
+#include <ChartModel.hxx>
 #include <chartview/DrawModelWrapper.hxx>
-#include <com/sun/star/drawing/XDrawPage.hpp>
 #include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/frame/CommandGroup.hpp>
-#include <com/sun/star/frame/XStorable.hpp>
 
 #include <vcl/svapp.hxx>
 #include <editeng/formatbreakitem.hxx>
@@ -38,7 +37,7 @@
 #include <editeng/spltitem.hxx>
 #include <svx/svxdlg.hxx>
 #include <editeng/widwitem.hxx>
-#include <tools/diagnose_ex.h>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::frame;
@@ -79,7 +78,7 @@ FeatureState ShapeController::getState( const OUString& rCommand )
     bool bWritable = false;
     if ( m_pChartController )
     {
-        Reference< frame::XStorable > xStorable( m_pChartController->getModel(), uno::UNO_QUERY );
+        rtl::Reference< ChartModel > xStorable = m_pChartController->getChartModel();
         if ( xStorable.is() )
         {
             bWritable = !xStorable->isReadonly();
@@ -290,7 +289,7 @@ void ShapeController::executeDispatch_FormatArea()
     }
     SvxAbstractDialogFactory* pFact = SvxAbstractDialogFactory::Create();
     ScopedVclPtr< AbstractSvxAreaTabDialog > pDlg(
-            pFact->CreateSvxAreaTabDialog(pChartWindow, &aAttr, &pDrawModelWrapper->getSdrModel(), true));
+            pFact->CreateSvxAreaTabDialog(pChartWindow, &aAttr, &pDrawModelWrapper->getSdrModel(), true, false));
     if ( pDlg->Execute() == RET_OK )
     {
         const SfxItemSet* pOutAttr = pDlg->GetOutputItemSet();
@@ -351,7 +350,7 @@ void ShapeController::executeDispatch_TransformDialog()
         return;
 
     SdrObject* pSelectedObj = pDrawViewWrapper->getSelectedObject();
-    if ( pSelectedObj && pSelectedObj->GetObjIdentifier() == OBJ_CAPTION )
+    if ( pSelectedObj && pSelectedObj->GetObjIdentifier() == SdrObjKind::Caption )
     {
         // item set for caption
         SfxItemSet aAttr( pDrawViewWrapper->GetModel()->GetItemPool() );
@@ -561,14 +560,13 @@ SdrObject* ShapeController::getFirstAdditionalShape()
         if ( pDrawModelWrapper )
         {
             Reference< drawing::XShape > xFirstShape;
-            Reference< drawing::XDrawPage > xDrawPage( pDrawModelWrapper->getMainDrawPage() );
-            Reference< drawing::XShapes > xDrawPageShapes( xDrawPage, uno::UNO_QUERY_THROW );
+            rtl::Reference<SvxDrawPage> xDrawPage( pDrawModelWrapper->getMainDrawPage() );
             Reference< drawing::XShapes > xChartRoot( DrawModelWrapper::getChartRootShape( xDrawPage ) );
-            sal_Int32 nCount = xDrawPageShapes->getCount();
+            sal_Int32 nCount = xDrawPage->getCount();
             for ( sal_Int32 i = 0; i < nCount; ++i )
             {
                 Reference< drawing::XShape > xShape;
-                if ( xDrawPageShapes->getByIndex( i ) >>= xShape )
+                if ( xDrawPage->getByIndex( i ) >>= xShape )
                 {
                     if ( xShape.is() && xShape != xChartRoot )
                     {
@@ -601,14 +599,13 @@ SdrObject* ShapeController::getLastAdditionalShape()
         if ( pDrawModelWrapper )
         {
             Reference< drawing::XShape > xLastShape;
-            Reference< drawing::XDrawPage > xDrawPage( pDrawModelWrapper->getMainDrawPage() );
-            Reference< drawing::XShapes > xDrawPageShapes( xDrawPage, uno::UNO_QUERY_THROW );
+            rtl::Reference<SvxDrawPage> xDrawPage( pDrawModelWrapper->getMainDrawPage() );
             Reference< drawing::XShapes > xChartRoot( DrawModelWrapper::getChartRootShape( xDrawPage ) );
-            sal_Int32 nCount = xDrawPageShapes->getCount();
+            sal_Int32 nCount = xDrawPage->getCount();
             for ( sal_Int32 i = nCount - 1; i >= 0; --i )
             {
                 Reference< drawing::XShape > xShape;
-                if ( xDrawPageShapes->getByIndex( i ) >>= xShape )
+                if ( xDrawPage->getByIndex( i ) >>= xShape )
                 {
                     if ( xShape.is() && xShape != xChartRoot )
                     {

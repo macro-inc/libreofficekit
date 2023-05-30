@@ -117,7 +117,7 @@ bool SwFiltersTest::filter(const OUString &rFilter, const OUString &rURL,
 
     bool bSaved;
     {
-        utl::TempFile aTempFile;
+        utl::TempFileNamed aTempFile;
         aTempFile.EnableKillingFile();
         SfxMedium aDstMed(aTempFile.GetURL(), StreamMode::STD_WRITE);
         aDstMed.SetFilter(pExportFilter);
@@ -147,6 +147,10 @@ void SwFiltersTest::testCVEs()
     testDir("MS Word 97",
             m_directories.getURLFromSrc(u"/sw/qa/core/data/ww8/"),
             FILTER_WW8);
+
+    testDir("MS WinWord 6.0",
+            m_directories.getURLFromSrc(u"/sw/qa/core/data/ww6/"),
+            sWW6);
 
     testDir("MS WinWord 5",
             m_directories.getURLFromSrc(u"/sw/qa/core/data/ww5/"),

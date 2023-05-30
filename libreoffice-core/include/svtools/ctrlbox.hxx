@@ -20,6 +20,7 @@
 #pragma once
 
 #include <svtools/svtdllapi.h>
+#include <svtools/toolbarmenu.hxx>
 #include <editeng/borderline.hxx>
 #include <vcl/idle.hxx>
 #include <vcl/metric.hxx>
@@ -198,7 +199,7 @@ inline Color sameDistColor( Color /*rMain*/, Color rDefault )
 
 class ValueSet;
 
-class SVT_DLLPUBLIC SvtLineListBox
+class SVT_DLLPUBLIC SvtLineListBox final : public WeldToolbarPopup
 {
 public:
     typedef Color (*ColorFunc)(Color);
@@ -244,28 +245,19 @@ public:
 
     void            set_sensitive(bool bSensitive) { m_xControl->set_sensitive(bSensitive); }
 
+    virtual void    GrabFocus() override;
+
 private:
 
     SVT_DLLPRIVATE void         ImpGetLine( tools::Long nLine1, tools::Long nLine2, tools::Long nDistance,
                                     Color nColor1, Color nColor2, Color nColorDist,
                                     SvxBorderLineStyle nStyle, BitmapEx& rBmp );
 
-    void            UpdatePaintLineColor();       // returns sal_True if maPaintCol has changed
     DECL_DLLPRIVATE_LINK(ValueSelectHdl, ValueSet*, void);
-    DECL_DLLPRIVATE_LINK(FocusHdl, weld::Widget&, void);
     DECL_DLLPRIVATE_LINK(ToggleHdl, weld::Toggleable&, void);
     DECL_DLLPRIVATE_LINK(NoneHdl, weld::Button&, void);
 
     void            UpdateEntries();
-    sal_Int32       GetStylePos(sal_Int32 nListPos) const;
-
-    const Color&    GetPaintColor() const
-    {
-        return maPaintCol;
-    }
-    Color   GetColorLine1( sal_Int32  nPos );
-    Color   GetColorLine2( sal_Int32  nPos );
-    Color   GetColorDist( sal_Int32  nPos );
 
     void UpdatePreview();
 
@@ -273,8 +265,6 @@ private:
     SvtLineListBox&    operator =( const SvtLineListBox& ) = delete;
 
     std::unique_ptr<weld::MenuButton> m_xControl;
-    std::unique_ptr<weld::Builder> m_xBuilder;
-    std::unique_ptr<weld::Widget> m_xTopLevel;
     std::unique_ptr<weld::Button> m_xNoneButton;
     std::unique_ptr<ValueSet> m_xLineSet;
     std::unique_ptr<weld::CustomWeld> m_xLineSetWin;
@@ -283,7 +273,6 @@ private:
     tools::Long            m_nWidth;
     ScopedVclPtr<VirtualDevice>   aVirDev;
     Color           aColor;
-    Color           maPaintCol;
     FieldUnit       eSourceUnit;
     Link<SvtLineListBox&,void> maSelectHdl;
 };
@@ -405,11 +394,13 @@ class SVT_DLLPUBLIC FontStyleBox
 public:
     FontStyleBox(std::unique_ptr<weld::ComboBox> p);
 
-    void Fill(const OUString& rName, const FontList* pList);
+    void Fill(std::u16string_view rName, const FontList* pList);
 
     void connect_changed(const Link<weld::ComboBox&, void>& rLink) { m_xComboBox->connect_changed(rLink); }
     OUString get_active_text() const { return m_xComboBox->get_active_text(); }
     void set_active_text(const OUString& rText) { m_xComboBox->set_active_text(rText); }
+    void set_size_request(int nWidth, int nHeight) {  m_xComboBox->set_size_request(nWidth, nHeight); }
+
     void append_text(const OUString& rStr) { m_xComboBox->append_text(rStr); }
     void set_sensitive(bool bSensitive) { m_xComboBox->set_sensitive(bSensitive); }
     void save_value() { m_xComboBox->save_value(); }
@@ -479,6 +470,8 @@ public:
     OUString get_active_text() const { return m_xComboBox->get_active_text(); }
     void set_active_or_entry_text(const OUString& rText);
     void set_sensitive(bool bSensitive) { m_xComboBox->set_sensitive(bSensitive); }
+    void set_size_request(int nWidth, int nHeight) { m_xComboBox->set_size_request(nWidth, nHeight); }
+
     int get_active() const { return m_xComboBox->get_active(); }
     int get_value() const;
     void set_value(int nValue);

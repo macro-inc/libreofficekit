@@ -23,6 +23,7 @@
 
 #include <cstddef>
 #include <map>
+#include <mutex>
 #include <vector>
 
 #include <com/sun/star/bridge/XBridge.hpp>
@@ -70,11 +71,11 @@ class Bridge:
 public:
     Bridge(
         rtl::Reference< BridgeFactory > const & factory,
-        OUString const & name,
+        OUString name,
         com::sun::star::uno::Reference<
             com::sun::star::connection::XConnection > const & connection,
         com::sun::star::uno::Reference<
-            com::sun::star::bridge::XInstanceProvider > const & provider);
+            com::sun::star::bridge::XInstanceProvider > provider);
 
     void start();
 
@@ -257,7 +258,7 @@ private:
         // decrementActiveCalls, without an intervening exception
     osl::Condition terminated_;
 
-    osl::Mutex mutex_;
+    std::mutex mutex_;
     State state_;
     Listeners listeners_;
     uno_ThreadPool threadPool_;

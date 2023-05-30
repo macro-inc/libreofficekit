@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <vcl/DocWindow.hxx>
 #include <vcl/transfer.hxx>
 #include "viewutil.hxx"
 #include "viewdata.hxx"
@@ -26,6 +27,7 @@
 #include "checklistmenu.hxx"
 #include <com/sun/star/sheet/DataPilotFieldOrientation.hpp>
 #include <o3tl/deleter.hxx>
+#include <vcl/window.hxx>
 
 #include <memory>
 #include <vector>
@@ -83,8 +85,9 @@ class ScLokRTLContext;
 namespace sdr::overlay { class OverlayObjectList; }
 
 class ScFilterListBox;
+struct ScDPLabelData;
 
-class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::Window, public DropTargetHelper, public DragSourceHelper
+class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::DocWindow, public DropTargetHelper, public DragSourceHelper
 {
     // ScFilterListBox is always used for selection list
     friend class ScFilterListBox;
@@ -224,7 +227,8 @@ class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::Window, public DropTargetHel
 
     bool            DoPageFieldSelection( SCCOL nCol, SCROW nRow );
     bool            DoAutoFilterButton( SCCOL nCol, SCROW nRow, const MouseEvent& rMEvt );
-    void DoPushPivotButton( SCCOL nCol, SCROW nRow, const MouseEvent& rMEvt, bool bButton, bool bPopup );
+    void DoPushPivotButton( SCCOL nCol, SCROW nRow, const MouseEvent& rMEvt, bool bButton, bool bPopup, bool bMultiField );
+    void DoPushPivotToggle( SCCOL nCol, SCROW nRow, const MouseEvent& rMEvt );
 
     void            DPMouseMove( const MouseEvent& rMEvt );
     void            DPMouseButtonUp( const MouseEvent& rMEvt );
@@ -237,8 +241,15 @@ class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::Window, public DropTargetHel
      *         mouse event handling is necessary, false otherwise.
      */
     bool DPTestFieldPopupArrow(const MouseEvent& rMEvt, const ScAddress& rPos, const ScAddress& rDimPos, ScDPObject* pDPObj);
+    bool DPTestMultiFieldPopupArrow(const MouseEvent& rMEvt, const ScAddress& rPos, ScDPObject* pDPObj);
 
+    void DPPopulateFieldMembers(const ScDPLabelData& rLabelData);
+    void DPSetupFieldPopup(std::unique_ptr<ScCheckListMenuControl::ExtendedData> pDPData, bool bDimOrientNotPage,
+                           ScDPObject* pDPObj, bool bMultiField = false);
+    void DPConfigFieldPopup();
     void DPLaunchFieldPopupMenu(const Point& rScrPos, const Size& rScrSize, const ScAddress& rPos, ScDPObject* pDPObj);
+    void DPLaunchMultiFieldPopupMenu(const Point& rScrPos, const Size& rScrSize, ScDPObject* pDPObj,
+                                     css::sheet::DataPilotFieldOrientation nOrient);
 
     void            RFMouseMove( const MouseEvent& rMEvt, bool bUp );
 
@@ -277,26 +288,17 @@ class SAL_DLLPUBLIC_RTTI ScGridWindow : public vcl::Window, public DropTargetHel
     void            DrawAfterScroll();
     tools::Rectangle       GetListValButtonRect( const ScAddress& rButtonPos );
 
+    void            DrawHiddenIndicator( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext);
     void            DrawPagePreview( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2, vcl::RenderContext& rRenderContext);
 
     bool            GetEditUrl( const Point& rPos,
                                 OUString* pName=nullptr, OUString* pUrl=nullptr, OUString* pTarget=nullptr );
-
-    bool IsSpellErrorAtPos( const Point& rPos, SCCOL nCol1, SCROW nRow );
 
     bool            HitRangeFinder( const Point& rMouse, RfCorner& rCorner, sal_uInt16* pIndex,
                                     SCCOL* pAddX, SCROW* pAddY );
 
     sal_uInt16      HitPageBreak( const Point& rMouse, ScRange* pSource,
                                   SCCOLROW* pBreak, SCCOLROW* pPrev );
-
-    /** The cell may be covered by text that overflows from a previous cell.
-
-        @return if true, the given cell is covered by (overflowing) text and
-        rTextStartPosX returns the column where the text that overflows
-        starts.
-    */
-    bool            IsCellCoveredByText(SCCOL nPosX, SCROW nPosY, SCTAB nTab, SCCOL &rTextStartPosX);
 
     void            PasteSelection( const Point& rPosPixel );
 
@@ -334,10 +336,11 @@ public:
     enum class AutoFilterMode
     {
         Normal,
-        Top10,
-        Custom,
         Empty,
         NonEmpty,
+        Top10,
+        Bottom10,
+        Custom,
         TextColor,
         BackgroundColor,
         SortAscending,
@@ -418,7 +421,7 @@ public:
                                 tools::Long nDimIndex, ScDPObject* pDPObj);
 
     void DrawButtons(SCCOL nX1, SCCOL nX2, const ScTableInfo& rTabInfo, OutputDevice* pContentDev,
-                     ScLokRTLContext* pLokRTLContext);
+                     const ScLokRTLContext* pLokRTLContext);
 
     using Window::Draw;
     void            Draw( SCCOL nX1, SCROW nY1, SCCOL nX2, SCROW nY2,
@@ -450,6 +453,7 @@ public:
 
     void            CheckNeedsRepaint();
 
+    void            UpdateDPPopupMenuForFieldChange();
     void            UpdateDPFromFieldPopupMenu();
     bool            UpdateVisibleRange();
 

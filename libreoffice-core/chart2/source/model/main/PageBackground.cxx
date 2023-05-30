@@ -26,7 +26,6 @@
 
 #include <com/sun/star/drawing/LineStyle.hpp>
 #include <cppuhelper/supportsservice.hxx>
-#include <tools/diagnose_ex.h>
 
 #include <vector>
 #include <algorithm>
@@ -112,18 +111,25 @@ namespace chart
 {
 
 PageBackground::PageBackground() :
-    ::property::OPropertySet( m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 PageBackground::PageBackground( const PageBackground & rOther ) :
         impl::PageBackground_Base(rOther),
-        ::property::OPropertySet( rOther, m_aMutex ),
-    m_xModifyEventForwarder( ModifyListenerHelper::createModifyEventForwarder())
+        ::property::OPropertySet( rOther ),
+    m_xModifyEventForwarder( new ModifyEventForwarder() )
 {}
 
 PageBackground::~PageBackground()
 {}
+
+// ____ XTypeProvider ____
+uno::Sequence< css::uno::Type > SAL_CALL PageBackground::getTypes()
+{
+    return ::comphelper::concatSequences(
+        impl::PageBackground_Base::getTypes(),
+        ::property::OPropertySet::getTypes());
+}
 
 // ____ XCloneable ____
 uno::Reference< util::XCloneable > SAL_CALL PageBackground::createClone()
@@ -132,13 +138,14 @@ uno::Reference< util::XCloneable > SAL_CALL PageBackground::createClone()
 }
 
 // ____ OPropertySet ____
-uno::Any PageBackground::GetDefaultValue( sal_Int32 nHandle ) const
+void PageBackground::GetDefaultValue( sal_Int32 nHandle, uno::Any& rAny ) const
 {
     const tPropertyValueMap& rStaticDefaults = *StaticPageBackgroundDefaults::get();
     tPropertyValueMap::const_iterator aFound( rStaticDefaults.find( nHandle ) );
     if( aFound == rStaticDefaults.end() )
-        return uno::Any();
-    return (*aFound).second;
+        rAny.clear();
+    else
+        rAny = (*aFound).second;
 }
 
 ::cppu::IPropertyArrayHelper & SAL_CALL PageBackground::getInfoHelper()
@@ -155,28 +162,12 @@ uno::Reference< beans::XPropertySetInfo > SAL_CALL PageBackground::getPropertySe
 // ____ XModifyBroadcaster ____
 void SAL_CALL PageBackground::addModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->addModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->addModifyListener( aListener );
 }
 
 void SAL_CALL PageBackground::removeModifyListener( const uno::Reference< util::XModifyListener >& aListener )
 {
-    try
-    {
-        uno::Reference< util::XModifyBroadcaster > xBroadcaster( m_xModifyEventForwarder, uno::UNO_QUERY_THROW );
-        xBroadcaster->removeModifyListener( aListener );
-    }
-    catch( const uno::Exception & )
-    {
-        DBG_UNHANDLED_EXCEPTION("chart2");
-    }
+    m_xModifyEventForwarder->removeModifyListener( aListener );
 }
 
 // ____ XModifyListener ____

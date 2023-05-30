@@ -23,8 +23,10 @@
 #include "unolayer.hxx"
 
 #include <comphelper/extract.hxx>
+#include <editeng/unoipset.hxx>
+#include <osl/diagnose.h>
+#include <svl/itemprop.hxx>
 #include <svx/svdpagv.hxx>
-#include <svx/unoshape.hxx>
 #include <svx/svdobj.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -67,7 +69,6 @@ static const SvxItemPropertySet* ImplGetSdLayerPropertySet()
         { u"" UNO_NAME_LAYER_NAME,        WID_LAYER_NAME,     ::cppu::UnoType<OUString>::get(), 0, 0 },
         { u"Title",                    WID_LAYER_TITLE,    ::cppu::UnoType<OUString>::get(), 0, 0 },
         { u"Description",              WID_LAYER_DESC,     ::cppu::UnoType<OUString>::get(), 0, 0 },
-        { u"", 0, css::uno::Type(), 0, 0 }
     };
     static SvxItemPropertySet aSDLayerPropertySet_Impl( aSdLayerPropertyMap_Impl, SdrObject::GetGlobalDrawObjectItemPool() );
     return &aSDLayerPropertySet_Impl;

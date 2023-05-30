@@ -69,6 +69,7 @@
 
 #include <algorithm>
 #include <string_view>
+#include <utility>
 
 namespace {
 
@@ -188,8 +189,8 @@ private:
 
 struct test_name_compare
 {
-    explicit test_name_compare(const std::string& rName):
-        maName(rName)
+    explicit test_name_compare(std::string aName):
+        maName(std::move(aName))
     {
     }
 
@@ -357,16 +358,16 @@ double get_time(timeval* time)
     return nTime;
 }
 
-OString generateTestName(const OUString& rPath)
+OString generateTestName(std::u16string_view rPath)
 {
-    sal_Int32 nPathSep = rPath.lastIndexOf("/");
-    OUString aTestName = rPath.copy(nPathSep+1);
+    size_t nPathSep = rPath.rfind('/');
+    std::u16string_view aTestName = rPath.substr(nPathSep+1);
     return OUStringToOString(aTestName, RTL_TEXTENCODING_UTF8);
 }
 
-void reportResourceUsage(const OUString& rPath)
+void reportResourceUsage(std::u16string_view rPath)
 {
-    OUString aFullPath = rPath + ".resource.log";
+    OUString aFullPath = OUString::Concat(rPath) + ".resource.log";
     rusage resource_usage;
     getrusage(RUSAGE_SELF, &resource_usage);
 
@@ -488,46 +489,44 @@ static bool main2()
 #if defined(_WIN32) && defined(_DEBUG)
 
 //Prints stack trace based on exception context record
-static void printStack( CONTEXT* ctx )
+static void printStack( PCONTEXT ctx )
 {
-    constexpr int MaxNameLen = 256;
-    bool    result;
-    HANDLE  process;
-    HANDLE  thread;
-    HMODULE hModule;
-    STACKFRAME64        stack;
-    ULONG               frame;
-    DWORD64             displacement;
-    DWORD disp;
-    char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-    char module[MaxNameLen];
-    PSYMBOL_INFO pSymbol = reinterpret_cast<PSYMBOL_INFO>(buffer);
+    HANDLE process = GetCurrentProcess();
+    HANDLE thread = GetCurrentThread();
 
-    memset( &stack, 0, sizeof( STACKFRAME64 ) );
-
-    process                = GetCurrentProcess();
-    thread                 = GetCurrentThread();
-    displacement           = 0;
-#if !defined(_M_AMD64)
-    stack.AddrPC.Offset    = (*ctx).Eip;
+    STACKFRAME64        stack {};
     stack.AddrPC.Mode      = AddrModeFlat;
-    stack.AddrStack.Offset = (*ctx).Esp;
     stack.AddrStack.Mode   = AddrModeFlat;
-    stack.AddrFrame.Offset = (*ctx).Ebp;
     stack.AddrFrame.Mode   = AddrModeFlat;
+#ifdef _M_AMD64
+    stack.AddrPC.Offset    = ctx->Rip;
+    stack.AddrStack.Offset = ctx->Rsp;
+    stack.AddrFrame.Offset = ctx->Rsp;
+#else
+    stack.AddrPC.Offset    = ctx->Eip;
+    stack.AddrStack.Offset = ctx->Esp;
+    stack.AddrFrame.Offset = ctx->Ebp;
 #endif
+
+    DWORD symOptions = SymGetOptions();
+    symOptions |= SYMOPT_LOAD_LINES;
+    symOptions |= SYMOPT_FAIL_CRITICAL_ERRORS;
+    symOptions = SymSetOptions(symOptions);
 
     SymInitialize( process, nullptr, TRUE ); //load symbols
 
-    std::unique_ptr<IMAGEHLP_LINE64> line(new IMAGEHLP_LINE64);
-    line->SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+    IMAGEHLP_LINE64 line{};
+    line.SizeOfStruct = sizeof(line);
 
-    for( frame = 0; ; frame++ )
+    char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
+    PSYMBOL_INFO pSymbol = reinterpret_cast<PSYMBOL_INFO>(buffer);
+
+    for (;;)
     {
         //get next call from stack
-        result = StackWalk64
+        bool result = StackWalk64
         (
-#if defined(_M_AMD64)
+#ifdef _M_AMD64
             IMAGE_FILE_MACHINE_AMD64,
 #else
             IMAGE_FILE_MACHINE_I386,
@@ -547,27 +546,32 @@ static void printStack( CONTEXT* ctx )
 
         //get symbol name for address
         pSymbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-        pSymbol->MaxNameLen = MAX_SYM_NAME;
-        SymFromAddr(process, static_cast< ULONG64 >(stack.AddrPC.Offset), &displacement, pSymbol);
+        pSymbol->MaxNameLen = MAX_SYM_NAME + 1;
+        if (SymFromAddr(process, stack.AddrPC.Offset, nullptr, pSymbol))
+            printf("\tat %s", pSymbol->Name);
+        else
+            printf("\tat unknown (Error in SymFromAddr=%#08lx)", GetLastError());
 
+        DWORD disp;
         //try to get line
-        if (SymGetLineFromAddr64(process, stack.AddrPC.Offset, &disp, line.get()))
+        if (SymGetLineFromAddr64(process, stack.AddrPC.Offset, &disp, &line))
         {
-            printf("\tat %s in %s: line: %lu: address: 0x%0I64X\n", pSymbol->Name, line->FileName, line->LineNumber, pSymbol->Address);
+            printf(" in %s: line: %lu:\n", line.FileName, line.LineNumber);
         }
         else
         {
             //failed to get line
-            printf("\tat %s, address 0x%0I64X.\n", pSymbol->Name, pSymbol->Address);
-            hModule = nullptr;
-            lstrcpyA(module,"");
+            printf(", address 0x%0I64X", stack.AddrPC.Offset);
+            HMODULE hModule = nullptr;
             GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                 reinterpret_cast<LPCTSTR>(stack.AddrPC.Offset), &hModule);
 
+            char sModule[256];
             //at least print module name
-            if(hModule != nullptr)GetModuleFileNameA(hModule,module,MaxNameLen);
+            if (hModule != nullptr)
+                GetModuleFileNameA(hModule, sModule, std::size(sModule));
 
-            printf ("in %s\n",module);
+            printf (" in %s\n", sModule);
         }
     }
 }

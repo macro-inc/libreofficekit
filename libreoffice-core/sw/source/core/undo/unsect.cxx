@@ -20,6 +20,7 @@
 #include <memory>
 #include <UndoSection.hxx>
 
+#include <editeng/protitem.hxx>
 #include <osl/diagnose.h>
 #include <comphelper/scopeguard.hxx>
 #include <sfx2/linkmgr.hxx>
@@ -76,7 +77,7 @@ static std::optional<SfxItemSet> lcl_GetAttrSet( const SwSection& rSect )
 SwUndoInsSection::SwUndoInsSection(
         SwPaM const& rPam, SwSectionData const& rNewData,
         SfxItemSet const*const pSet,
-        std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode> const*const pTOXBase)
+        std::tuple<SwTOXBase const*, sw::RedlineMode, sw::FieldmarkMode, sw::ParagraphBreakMode> const*const pTOXBase)
     : SwUndo( SwUndoId::INSSECTION, &rPam.GetDoc() ), SwUndRng( rPam )
     , m_pSectionData(new SwSectionData(rNewData))
     , m_pAttrSet( (pSet && pSet->Count()) ? new SfxItemSet( *pSet ) : nullptr )
@@ -89,7 +90,8 @@ SwUndoInsSection::SwUndoInsSection(
         m_xTOXBase.emplace(
             std::make_unique<SwTOXBase>(*std::get<0>(*pTOXBase)),
             std::get<1>(*pTOXBase),
-            std::get<2>(*pTOXBase));
+            std::get<2>(*pTOXBase),
+            std::get<3>(*pTOXBase));
 
     SwDoc& rDoc = rPam.GetDoc();
     if( rDoc.getIDocumentRedlineAccess().IsRedlineOn() )
@@ -105,10 +107,10 @@ SwUndoInsSection::SwUndoInsSection(
     if( rPam.HasMark() )
         return;
 
-    const SwContentNode* pCNd = rPam.GetPoint()->nNode.GetNode().GetContentNode();
+    const SwContentNode* pCNd = rPam.GetPoint()->GetNode().GetContentNode();
     if( pCNd && pCNd->HasSwAttrSet() && (
-        !rPam.GetPoint()->nContent.GetIndex() ||
-        rPam.GetPoint()->nContent.GetIndex() == pCNd->Len() ))
+        !rPam.GetPoint()->GetContentIndex() ||
+        rPam.GetPoint()->GetContentIndex() == pCNd->Len() ))
     {
         SfxItemSet aBrkSet( rDoc.GetAttrPool(), aBreakSetRange );
         aBrkSet.Put( *pCNd->GetpSwAttrSet() );
@@ -166,7 +168,7 @@ void SwUndoInsSection::UndoImpl(::sw::UndoRedoContext & rContext)
 
     if (m_bUpdateFootnote)
     {
-        rDoc.GetFootnoteIdxs().UpdateFootnote( aIdx );
+        rDoc.GetFootnoteIdxs().UpdateFootnote( aIdx.GetNode() );
     }
 
     AddUndoRedoPaM(rContext);
@@ -186,18 +188,20 @@ void SwUndoInsSection::RedoImpl(::sw::UndoRedoContext & rContext)
         SwRootFrame const* pLayout(nullptr);
         SwRootFrame * pLayoutToReset(nullptr);
         sw::FieldmarkMode eFieldmarkMode{};
+        sw::ParagraphBreakMode eParagraphBreakMode{};
         comphelper::ScopeGuard g([&]() {
                 if (pLayoutToReset)
                 {
                     pLayoutToReset->SetHideRedlines(std::get<1>(*m_xTOXBase) == sw::RedlineMode::Shown);
-                    pLayoutToReset->SetFieldmarkMode(eFieldmarkMode);
+                    pLayoutToReset->SetFieldmarkMode(eFieldmarkMode, eParagraphBreakMode);
                 }
             });
         o3tl::sorted_vector<SwRootFrame *> layouts(rDoc.GetAllLayouts());
         for (SwRootFrame const*const p : layouts)
         {
             if ((std::get<1>(*m_xTOXBase) == sw::RedlineMode::Hidden) == p->IsHideRedlines()
-                && std::get<2>(*m_xTOXBase) == p->GetFieldmarkMode())
+                && std::get<2>(*m_xTOXBase) == p->GetFieldmarkMode()
+                && std::get<3>(*m_xTOXBase) == p->GetParagraphBreakMode())
             {
                 pLayout = p;
                 break;
@@ -208,8 +212,9 @@ void SwUndoInsSection::RedoImpl(::sw::UndoRedoContext & rContext)
             assert(!layouts.empty()); // must have one layout
             pLayoutToReset = *layouts.begin();
             eFieldmarkMode = pLayoutToReset->GetFieldmarkMode();
+            eParagraphBreakMode = pLayoutToReset->GetParagraphBreakMode();
             pLayoutToReset->SetHideRedlines(std::get<1>(*m_xTOXBase) == sw::RedlineMode::Hidden);
-            pLayoutToReset->SetFieldmarkMode(std::get<2>(*m_xTOXBase));
+            pLayoutToReset->SetFieldmarkMode(std::get<2>(*m_xTOXBase), std::get<3>(*m_xTOXBase));
             pLayout = pLayoutToReset;
         }
         pUpdateTOX = rDoc.InsertTableOf( *rPam.GetPoint(),
@@ -248,8 +253,7 @@ void SwUndoInsSection::RedoImpl(::sw::UndoRedoContext & rContext)
     if( pUpdateTOX )
     {
         // initiate formatting
-        SwEditShell* pESh = rDoc.GetEditShell();
-        if( pESh )
+        if (SwEditShell* pESh = rDoc.GetEditShell())
             pESh->CalcLayout();
 
         // insert page numbers
@@ -282,15 +286,12 @@ void SwUndoInsSection::Join( SwDoc& rDoc, SwNodeOffset nNode )
     {
         RemoveIdxRel(
             nNode + 1,
-            SwPosition( aIdx, SwIndex( pTextNd, pTextNd->GetText().getLength() ) ) );
+            SwPosition( aIdx, pTextNd, pTextNd->GetText().getLength() ) );
     }
     pTextNd->JoinNext();
 
     if (m_pHistory)
-    {
-        SwIndex aCntIdx( pTextNd, 0 );
-        pTextNd->RstTextAttr( aCntIdx, pTextNd->Len(), 0, nullptr, true );
-    }
+        pTextNd->RstTextAttr( 0, pTextNd->Len(), 0, nullptr, true );
 }
 
 void
@@ -379,12 +380,12 @@ void SwUndoDelSection::UndoImpl(::sw::UndoRedoContext & rContext)
         /// OD 04.10.2002 #102894#
         /// remember inserted section node for further calculations
         SwSectionNode* pInsertedSectNd = rDoc.GetNodes().InsertTextSection(
-                aStt, *pFormat, *m_pSectionData, nullptr, & aEnd);
+                aStt.GetNode(), *pFormat, *m_pSectionData, nullptr, & aEnd.GetNode() );
 
         if( SfxItemState::SET == pFormat->GetItemState( RES_FTN_AT_TXTEND ) ||
             SfxItemState::SET == pFormat->GetItemState( RES_END_AT_TXTEND ))
         {
-            rDoc.GetFootnoteIdxs().UpdateFootnote( aStt );
+            rDoc.GetFootnoteIdxs().UpdateFootnote( aStt.GetNode() );
         }
 
         /// OD 04.10.2002 #102894#
@@ -474,9 +475,8 @@ void SwUndoUpdateSection::UndoImpl(::sw::UndoRedoContext & rContext)
     if (m_oAttrSet)
     {
         // The Content and Protect items must persist
-        const SfxPoolItem* pItem;
         m_oAttrSet->Put( pFormat->GetFormatAttr( RES_CNTNT ));
-        if( SfxItemState::SET == pFormat->GetItemState( RES_PROTECT, true, &pItem ))
+        if( const SvxProtectItem* pItem = pFormat->GetItemIfSet( RES_PROTECT ))
         {
             m_oAttrSet->Put( *pItem );
         }
@@ -554,9 +554,11 @@ SwUndoUpdateIndex::~SwUndoUpdateIndex() = default;
 
 void SwUndoUpdateIndex::TitleSectionInserted(SwSectionFormat & rFormat)
 {
+#ifndef NDEBUG
     SwNodeIndex const tmp(rFormat.GetDoc()->GetNodes(), m_nStartIndex); // title inserted before empty node
     assert(tmp.GetNode().IsSectionNode());
     assert(tmp.GetNode().GetSectionNode()->GetSection().GetFormat() == &rFormat);
+#endif
     m_pTitleSectionUpdated.reset(static_cast<SwUndoDelSection*>(MakeUndoDelSection(rFormat).release()));
 }
 
@@ -573,13 +575,13 @@ void SwUndoUpdateIndex::UndoImpl(::sw::UndoRedoContext & rContext)
     assert(last.GetNode().IsTextNode());
     // dummy node so that SaveSection doesn't remove ToX section...
     SwTextNode *const pDeletionPrevention = rDoc.GetNodes().MakeTextNode(
-        SwNodeIndex(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode()),
+        *rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode(),
         rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool(RES_POOLCOLL_TEXT));
     m_pSaveSectionUpdated->SaveSection(SwNodeRange(first, last), false);
-    m_pSaveSectionOriginal->RestoreSection(&rDoc, first, true);
+    m_pSaveSectionOriginal->RestoreSection(&rDoc, first.GetNode(), true);
     // delete before restoring nested undo, so its node indexes match
     SwNodeIndex const del(*pDeletionPrevention);
-    SwDoc::CorrAbs(del, del, SwPosition(SwNodeIndex(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode())), true);
+    SwDoc::CorrAbs(del, del, SwPosition(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode(), SwNodeOffset(0)), true);
     rDoc.GetNodes().Delete(del);
     // original title section will be restored by next Undo, see ctor!
 }
@@ -594,13 +596,13 @@ void SwUndoUpdateIndex::RedoImpl(::sw::UndoRedoContext & rContext)
     assert(last.GetNode().IsTextNode());
     // dummy node so that SaveSection doesn't remove ToX section...
     SwTextNode *const pDeletionPrevention = rDoc.GetNodes().MakeTextNode(
-        SwNodeIndex(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode()),
+        *rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode(),
         rDoc.getIDocumentStylePoolAccess().GetTextCollFromPool(RES_POOLCOLL_TEXT));
     m_pSaveSectionOriginal->SaveSection(SwNodeRange(first, last), false);
-    m_pSaveSectionUpdated->RestoreSection(&rDoc, first, true);
+    m_pSaveSectionUpdated->RestoreSection(&rDoc, first.GetNode(), true);
     // delete before restoring nested undo, so its node indexes match
     SwNodeIndex const del(*pDeletionPrevention);
-    SwDoc::CorrAbs(del, del, SwPosition(SwNodeIndex(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode())), true);
+    SwDoc::CorrAbs(del, del, SwPosition(*rDoc.GetNodes()[m_nStartIndex]->EndOfSectionNode(), SwNodeOffset(0)), true);
     rDoc.GetNodes().Delete(del);
     if (m_pTitleSectionUpdated)
     {

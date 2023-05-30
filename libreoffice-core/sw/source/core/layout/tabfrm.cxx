@@ -17,6 +17,8 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <config_wasm_strip.h>
+
 #include <pagefrm.hxx>
 #include <rootfrm.hxx>
 #include <IDocumentFieldsAccess.hxx>
@@ -1085,6 +1087,22 @@ bool SwTabFrame::Split( const SwTwips nCutPos, bool bTryToSplit, bool bTableRowK
         bTryToSplit = false;
     }
 
+    SwFlyFrame* pFly = FindFlyFrame();
+    if (bSplitRowAllowed && pFly && pFly->IsFlySplitAllowed())
+    {
+        // The remaining size is less than the minimum row height, then don't even try to split the
+        // row, just move it forward.
+        const SwFormatFrameSize& rRowSize = pRow->GetFormat()->GetFrameSize();
+        if (rRowSize.GetHeightSizeType() == SwFrameSize::Minimum)
+        {
+            SwTwips nMinHeight = rRowSize.GetHeight();
+            if (nMinHeight > nRemainingSpaceForLastRow)
+            {
+                bSplitRowAllowed = false;
+            }
+        }
+    }
+
     // #i29771#
     // To avoid loops, we do some checks before actually trying to split
     // the row. Maybe we should keep the next row in this table.
@@ -1095,9 +1113,16 @@ bool SwTabFrame::Split( const SwTwips nCutPos, bool bTryToSplit, bool bTableRowK
         // First case: One of the repeated headline does not fit to the page anymore.
         // tdf#88496 Disable repeated headline (like for #i44910#) to avoid loops and
         // to fix interoperability problems (very long tables only with headline)
+        // tdf#150149 except in multi-column sections, where it's possible to enlarge
+        // the height of the section frame instead of using this fallback
         OSL_ENSURE( !GetIndPrev(), "Table is supposed to be at beginning" );
-        m_pTable->SetRowsToRepeat(0);
-        return false;
+        if ( !IsInSct() )
+        {
+            m_pTable->SetRowsToRepeat(0);
+            return false;
+        }
+        else
+            bKeepNextRow = true;
     }
     else if ( !GetIndPrev() && nRepeat == nRowCount )
     {
@@ -1946,7 +1971,7 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
     const SwBorderAttrs *pAttrs = oAccess->Get();
 
     // All rows should keep together
-    const bool bDontSplit = !IsFollow() &&
+    bool bDontSplit = !IsFollow() &&
                             ( !GetFormat()->GetLayoutSplit().GetValue() );
 
     // The number of repeated headlines
@@ -1958,7 +1983,21 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
 
     // Indicates that two individual rows may keep together, based on the keep
     // attribute set at the first paragraph in the first cell.
-    const bool bTableRowKeep = !bDontSplit && GetFormat()->GetDoc()->GetDocumentSettingManager().get(DocumentSettingId::TABLE_ROW_KEEP);
+    bool bTableRowKeep = !bDontSplit && GetFormat()->GetDoc()->GetDocumentSettingManager().get(DocumentSettingId::TABLE_ROW_KEEP);
+    if (SwFlyFrame* pFly = FindFlyFrame())
+    {
+        if (pFly->IsFlySplitAllowed())
+        {
+            // Ignore the above text node -> row inheritance for floating tables.
+            bTableRowKeep = false;
+        }
+        else if (!pFly->GetNextLink())
+        {
+            // If the fly is not allowed to split and is not chained, then it makes no sense to
+            // split the table.
+            bDontSplit = true;
+        }
+    }
 
     // The Magic Move: Used for the table row keep feature.
     // If only the last row of the table wants to keep (implicitly by setting
@@ -2387,7 +2426,9 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                 }
                 else if (m_bONECalcLowers)
                 {
-                    lcl_RecalcRow(*static_cast<SwRowFrame*>(Lower()), LONG_MAX);
+                    // tdf#147526 is a case of a macro which results in a null Lower() result
+                    if (SwRowFrame* pLower = static_cast<SwRowFrame*>(Lower()))
+                        lcl_RecalcRow(*pLower, LONG_MAX);
                     m_bONECalcLowers = false;
                 }
             }
@@ -2467,7 +2508,14 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
             if ( pFirstNonHeadlineRow->GetNext() || bTryToSplit )
             {
                 SwTwips nDeadLine = aRectFnSet.GetPrtBottom(*GetUpper());
-                if( IsInSct() || GetUpper()->IsInTab() ) // TABLE IN TABLE)
+                bool bFlySplit = false;
+                if (GetUpper()->IsFlyFrame())
+                {
+                    // See if this is a split fly that can also grow.
+                    auto pUpperFly = static_cast<SwFlyFrame*>(GetUpper());
+                    bFlySplit = pUpperFly->IsFlySplitAllowed();
+                }
+                if( IsInSct() || GetUpper()->IsInTab() || bFlySplit )
                     nDeadLine = aRectFnSet.YInc( nDeadLine,
                                         GetUpper()->Grow( LONG_MAX, true ) );
 
@@ -2654,6 +2702,7 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                                     }
                                 }
                             }
+
                             --nStack;
                         }
                         else if ( GetFollow() == GetNext() )
@@ -3268,8 +3317,6 @@ SwTwips SwTabFrame::GrowFrame( SwTwips nDist, bool bTst, bool bInfo )
 
     if ( GetUpper() )
     {
-        SwRect aOldFrame( getFrameArea() );
-
         //The upper only grows as far as needed. nReal provides the distance
         //which is already available.
         SwTwips nReal = aRectFnSet.GetHeight(GetUpper()->getFramePrintArea());
@@ -3298,12 +3345,15 @@ SwTwips SwTabFrame::GrowFrame( SwTwips nDist, bool bTst, bool bInfo )
                 aRectFnSet.AddBottom( aFrm, nDist );
             }
 
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
             SwRootFrame *pRootFrame = getRootFrame();
             if( pRootFrame && pRootFrame->IsAnyShellAccessible() &&
                 pRootFrame->GetCurrShell() )
             {
+                SwRect aOldFrame( getFrameArea() );
                 pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( this, aOldFrame );
             }
+#endif
         }
     }
 
@@ -3330,7 +3380,7 @@ SwTwips SwTabFrame::GrowFrame( SwTwips nDist, bool bTst, bool bInfo )
         SetComplete();
 
         std::unique_ptr<SvxBrushItem> aBack = GetFormat()->makeBackgroundBrushItem();
-        const SvxGraphicPosition ePos = aBack ? aBack->GetGraphicPos() : GPOS_NONE;
+        const SvxGraphicPosition ePos = aBack->GetGraphicPos();
         if ( GPOS_NONE != ePos && GPOS_TILED != ePos )
             SetCompletePaint();
     }
@@ -3787,6 +3837,7 @@ void SwTabFrame::Cut()
     {
         OSL_ENSURE( !pUp->IsFootnoteFrame(), "Table in Footnote." );
         SwSectionFrame *pSct = nullptr;
+        SwFlyFrame *pFly = nullptr;
         // #126020# - adjust check for empty section
         // #130797# - correct fix #126020#
         if ( !pUp->Lower() && pUp->IsInSct() &&
@@ -3797,6 +3848,24 @@ void SwTabFrame::Cut()
             {
                 pSct->DelEmpty( false );
                 pSct->InvalidateSize_();
+            }
+        }
+        else if (!pUp->Lower() && pUp->IsInFly() &&
+                !(pFly = pUp->FindFlyFrame())->ContainsContent() &&
+                !pFly->ContainsAny())
+        {
+            bool bSplitFly = pFly->IsFlySplitAllowed();
+            if (!bSplitFly && pFly->IsFlyAtContentFrame())
+            {
+                // If the fly is not allowed to split, it's still possible that it was allowed to
+                // split. That is definitely the case when the fly is a follow.
+                auto pFlyAtContent = static_cast<SwFlyAtContentFrame*>(pFly);
+                bSplitFly = pFlyAtContent->IsFollow();
+            }
+            if (pUp == pFly && bSplitFly)
+            {
+                auto pFlyAtContent = static_cast<SwFlyAtContentFrame*>(pFly);
+                pFlyAtContent->DelEmpty();
             }
         }
         // table-in-footnote: delete empty footnote frames (like SwContentFrame::Cut)
@@ -4107,7 +4176,12 @@ tools::Long CalcHeightWithFlys( const SwFrame *pFrame )
                         bIsFarAway &&
                         bFollowTextFlow && bIsAnchoredToTmpFrm;
                     bool bWrapThrough = rFrameFormat.GetSurround().GetValue() == text::WrapTextMode_THROUGH;
-                    if (pFrame->IsInTab() && bFollowTextFlow && bWrapThrough)
+                    bool bInBackground = !rFrameFormat.GetOpaque().GetValue();
+                    // Legacy render requires in-background setting, the new mode does not.
+                    bool bConsiderFollowTextFlow = bInBackground
+                                                   || !rFrameFormat.getIDocumentSettingAccess().get(
+                                                       DocumentSettingId::USE_FORMER_TEXT_WRAPPING);
+                    if (pFrame->IsInTab() && bFollowTextFlow && bWrapThrough && bConsiderFollowTextFlow)
                     {
                         // Ignore wrap-through objects when determining the cell height.
                         // Normally FollowTextFlow requires a resize of the cell, but not in case of
@@ -4262,7 +4336,34 @@ static SwTwips lcl_CalcMinRowHeight( const SwRowFrame* _pRow,
         // this frame's minimal height, because the rest will go to follow frame.
         else if ( !_pRow->IsInSplit() && rSz.GetHeightSizeType() == SwFrameSize::Minimum )
         {
-            nHeight = rSz.GetHeight() - lcl_calcHeightOfRowBeforeThisFrame(*_pRow);
+            bool bSplitFly = false;
+            if (_pRow->IsInFly())
+            {
+                // See if we're in a split fly that is anchored on a page that has enough space to
+                // host this row with its minimum row height.
+                const SwFlyFrame* pFly = _pRow->FindFlyFrame();
+                if (pFly->IsFlySplitAllowed())
+                {
+                    SwFrame* pAnchor = const_cast<SwFlyFrame*>(pFly)->FindAnchorCharFrame();
+                    if (pAnchor)
+                    {
+                        if (pAnchor->FindPageFrame()->getFramePrintArea().Height() > rSz.GetHeight())
+                        {
+                            bSplitFly = true;
+                        }
+                    }
+                }
+            }
+
+            if (bSplitFly)
+            {
+                // Split fly: enforce minimum row height for the master and follows.
+                nHeight = rSz.GetHeight();
+            }
+            else
+            {
+                nHeight = rSz.GetHeight() - lcl_calcHeightOfRowBeforeThisFrame(*_pRow);
+            }
         }
     }
 
@@ -4619,9 +4720,10 @@ void SwRowFrame::AdjustCells( const SwTwips nHeight, const bool bHeight )
     SwFrame *pFrame = Lower();
     if ( bHeight )
     {
-        SwRootFrame *pRootFrame = getRootFrame();
         SwRectFnSet aRectFnSet(this);
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         SwRect aOldFrame;
+#endif
 
         while ( pFrame )
         {
@@ -4688,7 +4790,9 @@ void SwRowFrame::AdjustCells( const SwTwips nHeight, const bool bHeight )
             const tools::Long nDiff = nSumRowHeight - aRectFnSet.GetHeight(pToAdjust->getFrameArea());
             if ( nDiff )
             {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
                 aOldFrame = pToAdjust->getFrameArea();
+#endif
                 SwFrameAreaDefinition::FrameAreaWriteAccess aFrm(*pToAdjust);
                 aRectFnSet.AddBottom( aFrm, nDiff );
                 pNotify = pToAdjust;
@@ -4696,8 +4800,11 @@ void SwRowFrame::AdjustCells( const SwTwips nHeight, const bool bHeight )
 
             if ( pNotify )
             {
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
+                SwRootFrame *pRootFrame = getRootFrame();
                 if( pRootFrame && pRootFrame->IsAnyShellAccessible() && pRootFrame->GetCurrShell() )
                     pRootFrame->GetCurrShell()->Imp()->MoveAccessibleFrame( pNotify, aOldFrame );
+#endif
 
                 pNotify->InvalidatePrt_();
             }
@@ -4943,9 +5050,8 @@ SwCellFrame::SwCellFrame(const SwTableBox &rBox, SwFrame* pSib, bool bInsertCont
 
     //If a StartIdx is available, ContentFrames are added in the cell, otherwise
     //Rows have to be present and those are added.
-    if ( rBox.GetSttIdx() )
+    if ( SwNodeOffset nIndex = rBox.GetSttIdx() )
     {
-        SwNodeOffset nIndex = rBox.GetSttIdx();
         ::InsertCnt_( this, rBox.GetFrameFormat()->GetDoc(), ++nIndex );
     }
     else
@@ -4968,12 +5074,14 @@ void SwCellFrame::DestroyImpl()
     {
         // At this stage the lower frames aren't destroyed already,
         // therefore we have to do a recursive dispose.
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         SwRootFrame *pRootFrame = getRootFrame();
         if( pRootFrame && pRootFrame->IsAnyShellAccessible() &&
             pRootFrame->GetCurrShell() )
         {
             pRootFrame->GetCurrShell()->Imp()->DisposeAccessibleFrame( this, true );
         }
+#endif
 
         pMod->Remove( this );
         if( !pMod->HasWriterListeners() )
@@ -5553,10 +5661,10 @@ void SwCellFrame::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
             case RES_ATTRSET_CHG:
             {
                 auto& rChgSet = *static_cast<const SwAttrSetChg*>(pLegacy->m_pNew)->GetChgSet();
-                rChgSet.GetItemState(RES_VERT_ORIENT, false, &pVertOrientItem);
-                rChgSet.GetItemState(RES_PROTECT, false, &pProtectItem);
-                rChgSet.GetItemState(RES_FRAMEDIR, false, &pFrameDirItem);
-                rChgSet.GetItemState(RES_BOX, false, &pBoxItem);
+                pVertOrientItem = rChgSet.GetItemIfSet(RES_VERT_ORIENT, false);
+                pProtectItem = rChgSet.GetItemIfSet(RES_PROTECT, false);
+                pFrameDirItem = rChgSet.GetItemIfSet(RES_FRAMEDIR, false);
+                pBoxItem = rChgSet.GetItemIfSet(RES_BOX, false);
                 break;
             }
             case RES_VERT_ORIENT:
@@ -5588,12 +5696,14 @@ void SwCellFrame::SwClientNotify(const SwModify& rMod, const SfxHint& rHint)
                 InvalidatePrt();
             }
         }
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
         if(pProtectItem)
         {
             SwViewShell* pSh = getRootFrame()->GetCurrShell();
             if(pSh && pSh->GetLayout()->IsAnyShellAccessible())
                 pSh->Imp()->InvalidateAccessibleEditableState(true, this);
         }
+#endif
         if(pFrameDirItem)
         {
             SetDerivedVert(false);
@@ -5735,6 +5845,7 @@ void SwCellFrame::dumpAsXmlAttributes(xmlTextWriterPtr pWriter) const
 void SwCellFrame::Cut()
 {
     // notification for accessibility
+#if !ENABLE_WASM_STRIP_ACCESSIBILITY
     {
         SwRootFrame *pRootFrame = getRootFrame();
         if( pRootFrame && pRootFrame->IsAnyShellAccessible() )
@@ -5746,6 +5857,7 @@ void SwCellFrame::Cut()
             }
         }
     }
+#endif
 
     SwLayoutFrame::Cut();
 }

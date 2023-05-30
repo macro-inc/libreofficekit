@@ -20,6 +20,7 @@
 #include "FontTable.hxx"
 #include <o3tl/deleter.hxx>
 #include <ooxml/resourceids.hxx>
+#include <utility>
 #include <vector>
 #include <sal/log.hxx>
 #include <rtl/tencinfo.h>
@@ -78,7 +79,7 @@ void FontTable::lcl_attribute(Id Name, Value & val)
             if( m_pImpl->pCurrentEntry->nTextEncoding == RTL_TEXTENCODING_DONTKNOW )
             {
                 m_pImpl->pCurrentEntry->nTextEncoding = rtl_getTextEncodingFromWindowsCharset( nIntValue );
-                if( IsStarSymbol( m_pImpl->pCurrentEntry->sFontName ))
+                if( IsOpenSymbol( m_pImpl->pCurrentEntry->sFontName ))
                     m_pImpl->pCurrentEntry->nTextEncoding = RTL_TEXTENCODING_SYMBOL;
             }
             break;
@@ -88,7 +89,7 @@ void FontTable::lcl_attribute(Id Name, Value & val)
             sValue.convertToString( &tmp, RTL_TEXTENCODING_ASCII_US, OUSTRING_TO_OSTRING_CVTFLAGS );
             m_pImpl->pCurrentEntry->nTextEncoding = rtl_getTextEncodingFromMimeCharset( tmp.getStr() );
             // Older LO versions used to write incorrect character set for OpenSymbol, fix.
-            if( IsStarSymbol( m_pImpl->pCurrentEntry->sFontName ))
+            if( IsOpenSymbol( m_pImpl->pCurrentEntry->sFontName ))
                 m_pImpl->pCurrentEntry->nTextEncoding = RTL_TEXTENCODING_SYMBOL;
             break;
         }
@@ -233,10 +234,10 @@ void FontTable::addEmbeddedFont(const css::uno::Reference<css::io::XInputStream>
     m_pImpl->xEmbeddedFontHelper->addEmbeddedFont(stream, fontName, extra, key);
 }
 
-EmbeddedFontHandler::EmbeddedFontHandler(FontTable& rFontTable, const OUString& _fontName, const char* _style )
+EmbeddedFontHandler::EmbeddedFontHandler(FontTable& rFontTable, OUString _fontName, const char* _style )
 : LoggedProperties("EmbeddedFontHandler")
 , fontTable( rFontTable )
-, fontName( _fontName )
+, fontName(std::move( _fontName ))
 , style( _style )
 {
 }

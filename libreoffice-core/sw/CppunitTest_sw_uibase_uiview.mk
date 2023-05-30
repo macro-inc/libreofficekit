@@ -23,6 +23,7 @@ $(eval $(call gb_CppunitTest_use_libraries,sw_uibase_uiview, \
     cppuhelper \
     sal \
     sfx \
+    subsequenttest \
     svxcore \
     sw \
     swqahelper \
@@ -63,7 +64,8 @@ $(eval $(call gb_CppunitTest_use_custom_headers,sw_uibase_uiview,\
     officecfg/registry \
 ))
 
-$(eval $(call gb_CppunitTest_use_configuration,sw_uibase_uiview))
+$(eval $(call gb_CppunitTest_use_instdir_configuration,sw_uibase_uiview))
+$(eval $(call gb_CppunitTest_use_common_configuration,sw_uibase_uiview))
 
 $(eval $(call gb_CppunitTest_use_uiconfigs,sw_uibase_uiview, \
     modules/swriter \

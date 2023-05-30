@@ -41,6 +41,7 @@
 #include <sfx2/viewfrm.hxx>
 #include <sfx2/viewfac.hxx>
 #include <o3tl/unit_conversion.hxx>
+#include <o3tl/string_view.hxx>
 
 #include <drwlayer.hxx>
 #include <prevwsh.hxx>
@@ -118,16 +119,14 @@ void ScPreviewShell::Construct( vcl::Window* pParent )
 
     eZoom = SvxZoomType::WHOLEPAGE;
 
-    pCorner = VclPtr<ScrollBarBox>::Create( pParent, WB_SIZEABLE );
-
-    pHorScroll = VclPtr<ScrollBar>::Create(pParent, WB_HSCROLL );
-    pVerScroll = VclPtr<ScrollBar>::Create(pParent, WB_VSCROLL);
+    pHorScroll = VclPtr<ScrollAdaptor>::Create(pParent, true);
+    pVerScroll = VclPtr<ScrollAdaptor>::Create(pParent, false);
 
     // RTL: no mirroring for horizontal scrollbars
     pHorScroll->EnableRTL( false );
 
-    pHorScroll->SetEndScrollHdl( LINK( this, ScPreviewShell, ScrollHandler ) );
-    pVerScroll->SetEndScrollHdl( LINK( this, ScPreviewShell, ScrollHandler ) );
+    pHorScroll->SetScrollHdl(LINK(this, ScPreviewShell, HorzScrollHandler));
+    pVerScroll->SetScrollHdl(LINK(this, ScPreviewShell, VertScrollHandler));
 
     pPreview = VclPtr<ScPreview>::Create( pParent, pDocShell, this );
 
@@ -141,7 +140,6 @@ void ScPreviewShell::Construct( vcl::Window* pParent )
 
     pHorScroll->Show( false );
     pVerScroll->Show( false );
-    pCorner->Show();
     SetName("Preview");
 }
 
@@ -151,29 +149,12 @@ ScPreviewShell::ScPreviewShell( SfxViewFrame* pViewFrame,
     pDocShell( static_cast<ScDocShell*>(pViewFrame->GetObjectShell()) ),
     mpFrameWindow(nullptr),
     nSourceDesignMode( TRISTATE_INDET ),
-    nMaxVertPos(0)
+    nMaxVertPos(0),
+    nPrevHThumbPos(0),
+    nPrevVThumbPos(0)
 {
     Construct( &pViewFrame->GetWindow() );
-
-    try
-    {
-        SfxShell::SetContextBroadcasterEnabled(true);
-        SfxShell::SetContextName(
-            vcl::EnumContext::GetContextName(vcl::EnumContext::Context::Printpreview));
-        SfxShell::BroadcastContextForActivation(true);
-    }
-    catch (const css::uno::RuntimeException& e)
-    {
-        // tdf#130559: allow BackingComp to fail adding listener when opening document
-        css::uno::Reference<css::lang::XServiceInfo> xServiceInfo(e.Context, css::uno::UNO_QUERY);
-        if (!xServiceInfo || !xServiceInfo->supportsService("com.sun.star.frame.StartModule"))
-            throw;
-        SAL_WARN("sc.ui", "Opening file from StartModule straight into print preview");
-    }
-
-    auto& pNotebookBar = pViewFrame->GetWindow().GetSystemWindow()->GetNotebookBar();
-    if (pNotebookBar)
-        pNotebookBar->ControlListenerForCurrentController(false); // stop listening
+    SfxShell::SetContextName(vcl::EnumContext::GetContextName(vcl::EnumContext::Context::Printpreview));
 
     if ( auto pTabViewShell = dynamic_cast<ScTabViewShell*>( pOldSh) )
     {
@@ -201,9 +182,6 @@ ScPreviewShell::~ScPreviewShell()
     if (mpFrameWindow)
         mpFrameWindow->SetCloseHdl(Link<SystemWindow&,void>()); // Remove close handler.
 
-    if (auto& pBar = GetViewFrame()->GetWindow().GetSystemWindow()->GetNotebookBar())
-        pBar->ControlListenerForCurrentController(true); // let it start listening now
-
     // #108333#; notify Accessibility that Shell is dying and before destroy all
     BroadcastAccessibility( SfxHint( SfxHintId::Dying ) );
     pAccessibilityBroadcaster.reset();
@@ -218,7 +196,6 @@ ScPreviewShell::~ScPreviewShell()
     pPreview.disposeAndClear();
     pHorScroll.disposeAndClear();
     pVerScroll.disposeAndClear();
-    pCorner.disposeAndClear();
 
     //  normal mode of operation is switching back to default view in the same frame,
     //  so there's no need to activate any other window here anymore
@@ -336,8 +313,6 @@ void ScPreviewShell::UpdateNeededScrollBars( bool bFromZoom )
                                  Size( aWindowPixelSize.Width(), nBarH ) );
     pVerScroll->SetPosSizePixel( Point( aPos.X() + aWindowPixelSize.Width(), aPos.Y() ),
                                  Size( nBarW, aWindowPixelSize.Height() ) );
-    pCorner->SetPosSizePixel( Point( aPos.X() + aWindowPixelSize.Width(), aPos.Y() + aWindowPixelSize.Height() ),
-                              Size( nBarW, nBarH ) );
     UpdateScrollBars();
 }
 
@@ -379,6 +354,7 @@ void ScPreviewShell::UpdateScrollBars()
             pPreview->SetXOffset(nMaxPos);
         }
         pHorScroll->SetThumbPos( aOfs.X() );
+        nPrevHThumbPos = pHorScroll->GetThumbPos();
     }
 
     if( !pVerScroll )
@@ -415,12 +391,22 @@ void ScPreviewShell::UpdateScrollBars()
         pPreview->SetYOffset( nMaxVertPos );
         pVerScroll->SetThumbPos( aOfs.Y() );
     }
+    nPrevVThumbPos = pVerScroll->GetThumbPos();
 }
 
-IMPL_LINK( ScPreviewShell, ScrollHandler, ScrollBar*, pScroll, void )
+IMPL_LINK_NOARG(ScPreviewShell, HorzScrollHandler, weld::Scrollbar&, void)
+{
+    ScrollHandler(pHorScroll);
+}
+
+IMPL_LINK_NOARG(ScPreviewShell, VertScrollHandler, weld::Scrollbar&, void)
+{
+    ScrollHandler(pVerScroll);
+}
+
+void ScPreviewShell::ScrollHandler(ScrollAdaptor* pScroll)
 {
     tools::Long nPos           = pScroll->GetThumbPos();
-    tools::Long nDelta         = pScroll->GetDelta();
     tools::Long nMaxRange      = pScroll->GetRangeMax();
     tools::Long nTotalPages    = pPreview->GetTotalPages();
     tools::Long nPageNo        = 0;
@@ -441,6 +427,9 @@ IMPL_LINK( ScPreviewShell, ScrollHandler, ScrollBar*, pScroll, void )
     }
 
     bool bHoriz = ( pScroll == pHorScroll );
+
+    tools::Long nDelta = bHoriz ? (pHorScroll->GetThumbPos() - nPrevHThumbPos)
+                                : (pVerScroll->GetThumbPos() - nPrevVThumbPos);
 
     if( bHoriz )
         pPreview->SetXOffset( nPos );
@@ -499,17 +488,17 @@ bool ScPreviewShell::ScrollCommand( const CommandEvent& rCEvt )
     const CommandWheelData* pData = rCEvt.GetWheelData();
     if ( pData && pData->GetMode() == CommandWheelMode::ZOOM )
     {
-        tools::Long nOld = pPreview->GetZoom();
-        tools::Long nNew;
+        sal_uInt16 nOld = pPreview->GetZoom();
+        sal_uInt16 nNew;
         if ( pData->GetDelta() < 0 )
-            nNew = std::max( tools::Long(MINZOOM), basegfx::zoomtools::zoomOut( nOld ));
+            nNew = std::max( MINZOOM, basegfx::zoomtools::zoomOut( nOld ));
         else
-            nNew = std::min( tools::Long(MAXZOOM), basegfx::zoomtools::zoomIn( nOld ));
+            nNew = std::min( MAXZOOM, basegfx::zoomtools::zoomIn( nOld ));
 
         if ( nNew != nOld )
         {
             eZoom = SvxZoomType::PERCENT;
-            pPreview->SetZoom( static_cast<sal_uInt16>(nNew) );
+            pPreview->SetZoom( nNew );
         }
 
         bDone = true;
@@ -559,6 +548,8 @@ void ScPreviewShell::Activate(bool bMDI)
         if ( pInputHdl )
             pInputHdl->NotifyChange( nullptr );
     }
+
+    SfxShell::Activate(bMDI);
 }
 
 void ScPreviewShell::Execute( SfxRequest& rReq )
@@ -705,11 +696,11 @@ void ScPreviewShell::Execute( SfxRequest& rReq )
             break;
         case SID_ATTR_ZOOMSLIDER:
             {
-                const SfxPoolItem* pItem;
+                const SvxZoomSliderItem* pItem;
                 eZoom = SvxZoomType::PERCENT;
-                if( pReqArgs && SfxItemState::SET == pReqArgs->GetItemState( SID_ATTR_ZOOMSLIDER, true, &pItem ) )
+                if( pReqArgs && (pItem = pReqArgs->GetItemIfSet( SID_ATTR_ZOOMSLIDER )) )
                 {
-                    const sal_uInt16 nCurrentZoom = static_cast<const SvxZoomSliderItem*>(pItem)->GetValue();
+                    const sal_uInt16 nCurrentZoom = pItem->GetValue();
                     if( nCurrentZoom )
                     {
                         pPreview->SetZoom( nCurrentZoom );
@@ -720,16 +711,16 @@ void ScPreviewShell::Execute( SfxRequest& rReq )
             break;
         case SID_PREVIEW_SCALINGFACTOR:
             {
-                const SfxPoolItem* pItem;
+                const SvxZoomSliderItem* pItem;
                 SCTAB nTab                      = pPreview->GetTab();
                 OUString aOldName               = pDocShell->GetDocument().GetPageStyle( pPreview->GetTab() );
                 ScStyleSheetPool* pStylePool    = pDocShell->GetDocument().GetStyleSheetPool();
                 SfxStyleSheetBase* pStyleSheet  = pStylePool->Find( aOldName, SfxStyleFamily::Page );
                 OSL_ENSURE( pStyleSheet, "PageStyle not found! :-/" );
 
-                if ( pReqArgs && pStyleSheet && SfxItemState::SET == pReqArgs->GetItemState( SID_PREVIEW_SCALINGFACTOR, true, &pItem ) )
+                if ( pReqArgs && pStyleSheet && (pItem = pReqArgs->GetItemIfSet( SID_PREVIEW_SCALINGFACTOR )) )
                 {
-                    const sal_uInt16 nCurrentZoom   = static_cast<const SvxZoomSliderItem *>(pItem)->GetValue();
+                    const sal_uInt16 nCurrentZoom   = pItem->GetValue();
                     SfxItemSet& rSet            = pStyleSheet->GetItemSet();
                     rSet.Put( SfxUInt16Item( ATTR_PAGE_SCALE, nCurrentZoom ) );
                     ScPrintFunc aPrintFunc( pDocShell, pDocShell->GetPrinter(), nTab );
@@ -921,8 +912,8 @@ void ScPreviewShell::ReadUserData(const OUString& rData, bool /* bBrowse */)
     if (!rData.isEmpty())
     {
         sal_Int32 nIndex = 0;
-        pPreview->SetZoom(static_cast<sal_uInt16>(rData.getToken(0, SC_USERDATA_SEP, nIndex).toInt32()));
-        pPreview->SetPageNo(rData.getToken(0, SC_USERDATA_SEP, nIndex).toInt32());
+        pPreview->SetZoom(static_cast<sal_uInt16>(o3tl::toInt32(o3tl::getToken(rData, 0, SC_USERDATA_SEP, nIndex))));
+        pPreview->SetPageNo(o3tl::toInt32(o3tl::getToken(rData, 0, SC_USERDATA_SEP, nIndex)));
         eZoom = SvxZoomType::PERCENT;
     }
 }
@@ -1129,6 +1120,7 @@ void ScPreviewShell::DoScroll( sal_uInt16 nMode )
         if( aCurPos.Y() != aPrevPos.Y() )
         {
             pVerScroll->SetThumbPos( aCurPos.Y() );
+            nPrevVThumbPos = pVerScroll->GetThumbPos();
             pPreview->SetYOffset( aCurPos.Y() );
         }
     }
@@ -1136,6 +1128,7 @@ void ScPreviewShell::DoScroll( sal_uInt16 nMode )
     if( aCurPos.X() != aPrevPos.X() )
     {
         pHorScroll->SetThumbPos( aCurPos.X() );
+        nPrevHThumbPos = pHorScroll->GetThumbPos();
         pPreview->SetXOffset( aCurPos.X() );
     }
 

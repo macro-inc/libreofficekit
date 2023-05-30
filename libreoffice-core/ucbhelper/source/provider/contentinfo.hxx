@@ -22,11 +22,10 @@
 
 #include <optional>
 #include <com/sun/star/ucb/XCommandInfo.hpp>
-#include <com/sun/star/lang/XTypeProvider.hpp>
 #include <com/sun/star/beans/XPropertySetInfo.hpp>
 #include <cppuhelper/implbase.hxx>
 
-#include <osl/mutex.hxx>
+#include <mutex>
 
 namespace com::sun::star::ucb { class XCommandEnvironment; }
 
@@ -50,26 +49,23 @@ class PropertySetInfo :
                                 m_xEnv;
     std::optional<css::uno::Sequence< css::beans::Property >>
                                 m_xProps;
-    osl::Mutex                  m_aMutex;
+    std::mutex                  m_aMutex;
     ContentImplHelper*          m_pContent;
 
 private:
     bool queryProperty( std::u16string_view rName,
                             css::beans::Property& rProp );
+    const css::uno::Sequence< css::beans::Property > & getPropertiesImpl();
 
 public:
-    PropertySetInfo( const css::uno::Reference< css::ucb::XCommandEnvironment >& rxEnv,
+    PropertySetInfo( css::uno::Reference< css::ucb::XCommandEnvironment > xEnv,
                      ContentImplHelper* pContent );
     virtual ~PropertySetInfo() override;
 
     // XPropertySetInfo
-    virtual css::uno::Sequence<
-                css::beans::Property > SAL_CALL
-    getProperties() override;
-    virtual css::beans::Property SAL_CALL
-    getPropertyByName( const OUString& aName ) override;
-    virtual sal_Bool SAL_CALL
-    hasPropertyByName( const OUString& Name ) override;
+    virtual css::uno::Sequence< css::beans::Property > SAL_CALL getProperties() override;
+    virtual css::beans::Property SAL_CALL getPropertyByName( const OUString& aName ) override;
+    virtual sal_Bool SAL_CALL hasPropertyByName( const OUString& Name ) override;
 
     // Non-Interface methods.
     void reset();
@@ -90,7 +86,7 @@ class CommandProcessorInfo :
                                 m_xEnv;
     std::optional<css::uno::Sequence< css::ucb::CommandInfo >>
                                 m_xCommands;
-    osl::Mutex                  m_aMutex;
+    std::mutex                  m_aMutex;
     ContentImplHelper*          m_pContent;
 
 private:
@@ -98,24 +94,19 @@ private:
                            css::ucb::CommandInfo& rCommand );
     bool queryCommand( sal_Int32 nHandle,
                            css::ucb::CommandInfo& rCommand );
+    const css::uno::Sequence< css::ucb::CommandInfo > & getCommandsImpl();
 
 public:
-    CommandProcessorInfo( const css::uno::Reference< css::ucb::XCommandEnvironment >& rxEnv,
+    CommandProcessorInfo( css::uno::Reference< css::ucb::XCommandEnvironment > xEnv,
                          ContentImplHelper* pContent );
     virtual ~CommandProcessorInfo() override;
 
     // XCommandInfo
-    virtual css::uno::Sequence<
-                css::ucb::CommandInfo > SAL_CALL
-    getCommands() override;
-    virtual css::ucb::CommandInfo SAL_CALL
-    getCommandInfoByName( const OUString& Name ) override;
-    virtual css::ucb::CommandInfo SAL_CALL
-    getCommandInfoByHandle( sal_Int32 Handle ) override;
-    virtual sal_Bool SAL_CALL
-    hasCommandByName( const OUString& Name ) override;
-    virtual sal_Bool SAL_CALL
-    hasCommandByHandle( sal_Int32 Handle ) override;
+    virtual css::uno::Sequence< css::ucb::CommandInfo > SAL_CALL getCommands() override;
+    virtual css::ucb::CommandInfo SAL_CALL getCommandInfoByName( const OUString& Name ) override;
+    virtual css::ucb::CommandInfo SAL_CALL getCommandInfoByHandle( sal_Int32 Handle ) override;
+    virtual sal_Bool SAL_CALL hasCommandByName( const OUString& Name ) override;
+    virtual sal_Bool SAL_CALL hasCommandByHandle( sal_Int32 Handle ) override;
 
     // Non-Interface methods.
     void reset();

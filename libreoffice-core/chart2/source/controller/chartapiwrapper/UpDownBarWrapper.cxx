@@ -19,17 +19,18 @@
 
 #include "UpDownBarWrapper.hxx"
 #include "Chart2ModelContact.hxx"
+#include <ChartType.hxx>
 #include <DiagramHelper.hxx>
 #include <servicenames_charttypes.hxx>
 #include <cppuhelper/supportsservice.hxx>
 #include <cppuhelper/propshlp.hxx>
-#include <com/sun/star/chart2/XChartType.hpp>
 #include <comphelper/sequence.hxx>
 
 #include <LinePropertiesHelper.hxx>
 #include <FillProperties.hxx>
 #include <UserDefinedProperties.hxx>
-#include <tools/diagnose_ex.h>
+#include <utility>
+#include <comphelper/diagnose_ex.hxx>
 
 using namespace ::com::sun::star;
 using namespace ::com::sun::star::chart2;
@@ -123,8 +124,8 @@ namespace chart::wrapper
 {
 
 UpDownBarWrapper::UpDownBarWrapper(
-    bool bUp, const std::shared_ptr<Chart2ModelContact>& spChart2ModelContact)
-        : m_spChart2ModelContact( spChart2ModelContact )
+    bool bUp, std::shared_ptr<Chart2ModelContact> spChart2ModelContact)
+        : m_spChart2ModelContact(std::move( spChart2ModelContact ))
         , m_aEventListenerContainer( m_aMutex )
         , m_aPropertySetName( bUp ? OUString( "WhiteDay" ) : OUString( "BlackDay" ))
 {
@@ -162,17 +163,13 @@ void SAL_CALL UpDownBarWrapper::setPropertyValue( const OUString& rPropertyName,
 {
     Reference< beans::XPropertySet > xPropSet;
 
-    const Sequence< Reference< chart2::XChartType > > aTypes(
-            ::chart::DiagramHelper::getChartTypesFromDiagram( m_spChart2ModelContact->getChart2Diagram() ) );
-    for( Reference< chart2::XChartType > const & xType : aTypes )
+    const std::vector< rtl::Reference< ChartType > > aTypes(
+            ::chart::DiagramHelper::getChartTypesFromDiagram( m_spChart2ModelContact->getDiagram() ) );
+    for( rtl::Reference< ChartType > const & xType : aTypes )
     {
         if( xType->getChartType() == CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK )
         {
-            Reference< beans::XPropertySet > xTypeProps( xType, uno::UNO_QUERY );
-            if(xTypeProps.is())
-            {
-                xTypeProps->getPropertyValue( m_aPropertySetName ) >>= xPropSet;
-            }
+            xType->getPropertyValue( m_aPropertySetName ) >>= xPropSet;
         }
     }
     if(xPropSet.is())
@@ -184,17 +181,13 @@ uno::Any SAL_CALL UpDownBarWrapper::getPropertyValue( const OUString& rPropertyN
 
     Reference< beans::XPropertySet > xPropSet;
 
-    const Sequence< Reference< chart2::XChartType > > aTypes(
-            ::chart::DiagramHelper::getChartTypesFromDiagram( m_spChart2ModelContact->getChart2Diagram() ) );
-    for( Reference< chart2::XChartType > const & xType : aTypes )
+    const std::vector< rtl::Reference< ChartType > > aTypes(
+            ::chart::DiagramHelper::getChartTypesFromDiagram( m_spChart2ModelContact->getDiagram() ) );
+    for( rtl::Reference<ChartType > const & xType : aTypes )
     {
         if( xType->getChartType() == CHART2_SERVICE_NAME_CHARTTYPE_CANDLESTICK )
         {
-            Reference< beans::XPropertySet > xTypeProps( xType, uno::UNO_QUERY );
-            if(xTypeProps.is())
-            {
-                xTypeProps->getPropertyValue( m_aPropertySetName ) >>= xPropSet;
-            }
+            xType->getPropertyValue( m_aPropertySetName ) >>= xPropSet;
         }
     }
     if(xPropSet.is())

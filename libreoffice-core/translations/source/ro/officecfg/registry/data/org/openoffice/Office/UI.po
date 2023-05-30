@@ -3,17 +3,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.libreoffice.org/enter_bug.cgi?product=LibreOffice&bug_status=UNCONFIRMED&component=UI\n"
-"POT-Creation-Date: 2022-06-09 11:50+0200\n"
-"PO-Revision-Date: 2022-08-19 12:58+0000\n"
+"POT-Creation-Date: 2022-11-22 14:44+0100\n"
+"PO-Revision-Date: 2023-03-01 01:56+0000\n"
 "Last-Translator: Secară Cristian <cristi@secarica.ro>\n"
-"Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-master/officecfgregistrydataorgopenofficeofficeui/ro/>\n"
+"Language-Team: Romanian <https://translations.documentfoundation.org/projects/libo_ui-7-5/officecfgregistrydataorgopenofficeofficeui/ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
 "X-Accelerator-Marker: ~\n"
-"X-Generator: Weblate 4.12.2\n"
+"X-Generator: Weblate 4.15.2\n"
 "X-POOTLE-MTIME: 1542024687.000000\n"
 
 #. W5ukN
@@ -104,7 +104,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Line Numbers"
-msgstr "Numerele rândurilor"
+msgstr "Numere rânduri"
 
 #. jKn8k
 #: BasicIDECommands.xcu
@@ -234,7 +234,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Run"
-msgstr "~Execută"
+msgstr "~Execuție"
 
 #. MeFAF
 #: BasicIDECommands.xcu
@@ -284,7 +284,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Macro"
-msgstr "Macro-comandă"
+msgstr "Macrocomandă"
 
 #. GRgnr
 #: BasicIDEWindowState.xcu
@@ -424,7 +424,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "AutoFilter"
-msgstr "Filtrare automată"
+msgstr "Filtru automat"
 
 #. Zi7du
 #: BibliographyCommands.xcu
@@ -434,7 +434,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset Filter"
-msgstr "Resetează filtrele"
+msgstr "Restabilește filtrul"
 
 #. YF5sR
 #: CalcCommands.xcu
@@ -714,7 +714,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Mark Invalid Data"
-msgstr "~Marchează datele nevalide"
+msgstr "~Marchează datele care nu sunt valide"
 
 #. tZSSA
 #: CalcCommands.xcu
@@ -804,7 +804,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Input Line"
-msgstr "Linia de introducere"
+msgstr "Linie de introducere"
 
 #. DKmdT
 #: CalcCommands.xcu
@@ -1204,7 +1204,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Goal Seek..."
-msgstr "~Caută valori destinație..."
+msgstr "~Căutare rezultat..."
 
 #. qtbpy
 #: CalcCommands.xcu
@@ -1254,7 +1254,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Go to Sheet..."
-msgstr ""
+msgstr "~Mergi la foaia..."
 
 #. 79aNB
 #: CalcCommands.xcu
@@ -1474,7 +1474,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Manage..."
-msgstr "Supraveghere..."
+msgstr "Gestionare..."
 
 #. jsKhi
 #: CalcCommands.xcu
@@ -1484,7 +1484,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Manage Conditional Formatting..."
-msgstr ""
+msgstr "Gestionare formatare condițională..."
 
 #. qAuk5
 #: CalcCommands.xcu
@@ -2106,14 +2106,14 @@ msgctxt ""
 msgid "Sparklines"
 msgstr ""
 
-#. aTBPM
+#. A3aEa
 #: CalcCommands.xcu
 msgctxt ""
 "CalcCommands.xcu\n"
 "..CalcCommands.UserInterface.Commands..uno:InsertSparkline\n"
 "Label\n"
 "value.text"
-msgid "Insert Sparkline..."
+msgid "Sparkline..."
 msgstr ""
 
 #. CoZgJ
@@ -2614,7 +2614,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Adjust Scale"
-msgstr "Ajustează scala"
+msgstr "Ajustează scara"
 
 #. SEBZW
 #: CalcCommands.xcu
@@ -2644,7 +2644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset Scale"
-msgstr "Restabilește scala"
+msgstr "Restabilește scara"
 
 #. DEHZ9
 #: CalcCommands.xcu
@@ -2854,7 +2854,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Shee~t from File..."
-msgstr "Inserează o foaie din ~fișier..."
+msgstr "Inserează o foaie din~tr-un fișier..."
 
 #. yAKU2
 #: CalcCommands.xcu
@@ -3474,7 +3474,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select ~Range..."
-msgstr ""
+msgstr "Selectare inte~rval..."
 
 #. LGT6z
 #: CalcCommands.xcu
@@ -3574,7 +3574,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Auto~Filter"
-msgstr "~Filtrare automată"
+msgstr "~Filtru automat"
 
 #. XBEpr
 #: CalcCommands.xcu
@@ -3584,7 +3584,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Reset Filter"
-msgstr "~Resetează filtrele"
+msgstr "~Restabilește filtrul"
 
 #. iXKVq
 #: CalcCommands.xcu
@@ -3634,7 +3634,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Hide AutoFilter"
-msgstr "~Ascunde filtrarea automată"
+msgstr "~Ascunde filtrul automat"
 
 #. 9zoJF
 #: CalcCommands.xcu
@@ -3854,7 +3854,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Number Format"
-msgstr "Format număr"
+msgstr "Format de număr"
 
 #. fja5D
 #: CalcCommands.xcu
@@ -4334,7 +4334,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Named Ranges and Expressions"
-msgstr "Interval ~numit sau expresie"
+msgstr "I~ntervale și expresii denumite"
 
 #. BFRiL
 #: CalcCommands.xcu
@@ -4454,7 +4454,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Cell ~Comments"
-msgstr "~Comentarii celule"
+msgstr "~Comentariile celulei"
 
 #. yqd4v
 #: CalcCommands.xcu
@@ -4474,7 +4474,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Prin~t Ranges"
-msgstr "In~tervale de imprimare"
+msgstr "Intervale de ~tipărire"
 
 #. EpoiD
 #: CalcCommands.xcu
@@ -4494,7 +4494,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Assign Macro..."
-msgstr "Atribuie o macro-comandă..."
+msgstr "Atribuie o macrocomandă..."
 
 #. pTEEk
 #: CalcCommands.xcu
@@ -4504,7 +4504,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Mark Precedents"
-msgstr "Precedențele lui Mark"
+msgstr "Marchează precedentele"
 
 #. CFuUE
 #: CalcCommands.xcu
@@ -4514,7 +4514,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Mark Dependents"
-msgstr "Dependințe de Mark"
+msgstr "Marchează dependențele"
 
 #. RwEGH
 #: CalcCommands.xcu
@@ -4524,7 +4524,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Current Date"
-msgstr "Inserare dată curentă"
+msgstr "Inserează dată curentă"
 
 #. LhmoB
 #: CalcCommands.xcu
@@ -4544,7 +4544,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Current Time"
-msgstr "Inserare timp curent"
+msgstr "Inserează ora curentă"
 
 #. gcqjX
 #: CalcCommands.xcu
@@ -4554,7 +4554,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~Time"
-msgstr "~Timp"
+msgstr "~Oră"
 
 #. Hii4m
 #: CalcCommands.xcu
@@ -4584,7 +4584,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste Only Formula"
-msgstr "Lipește numai formulă"
+msgstr "Lipește numai formula"
 
 #. BXhXV
 #: CalcCommands.xcu
@@ -4604,7 +4604,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste Only Text"
-msgstr "Lipește numai text"
+msgstr "Lipește numai textul"
 
 #. 53gVc
 #: CalcCommands.xcu
@@ -4624,7 +4624,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste Only Numbers"
-msgstr "Lipește numai numere"
+msgstr "Lipește numai numerele"
 
 #. t3djG
 #: CalcCommands.xcu
@@ -4644,7 +4644,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste Transposed"
-msgstr ""
+msgstr "Lipește transpus"
 
 #. EbDtX
 #: CalcCommands.xcu
@@ -4654,7 +4654,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Trans~pose"
-msgstr ""
+msgstr "Trans~pune"
 
 #. JG27R
 #: CalcCommands.xcu
@@ -4664,7 +4664,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Paste As Link"
-msgstr ""
+msgstr "Lipește ca link"
 
 #. f7yoE
 #: CalcCommands.xcu
@@ -4674,7 +4674,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "As ~Link"
-msgstr ""
+msgstr "Ca ~link"
 
 #. 4DJpG
 #: CalcCommands.xcu
@@ -4684,7 +4684,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Use Text Import Dialog"
-msgstr ""
+msgstr "Utilizează dialogul de import de text"
 
 #. yombs
 #: CalcCommands.xcu
@@ -4724,7 +4724,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Insert..."
-msgstr "~Inserează..."
+msgstr "~Inserare..."
 
 #. iwgdc
 #: CalcCommands.xcu
@@ -4744,7 +4744,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Default"
-msgstr ""
+msgstr "Implicit"
 
 #. uh4sC
 #: CalcCommands.xcu
@@ -4754,7 +4754,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Default Cell Style"
-msgstr ""
+msgstr "Stil de celulă implicit"
 
 #. 9tAAv
 #: CalcCommands.xcu
@@ -4774,7 +4774,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Accent 1"
-msgstr ""
+msgstr "Accent 1"
 
 #. dLRub
 #: CalcCommands.xcu
@@ -4784,7 +4784,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accent 1 Cell Style"
-msgstr ""
+msgstr "Stil de celulă Accent 1"
 
 #. XDFxR
 #: CalcCommands.xcu
@@ -4804,7 +4804,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Accent 2"
-msgstr ""
+msgstr "Accent 2"
 
 #. E8VxX
 #: CalcCommands.xcu
@@ -4814,7 +4814,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accent 2 Cell Style"
-msgstr ""
+msgstr "Stil de celulă Accent 2"
 
 #. QQAeT
 #: CalcCommands.xcu
@@ -4834,7 +4834,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Accent 3"
-msgstr ""
+msgstr "Accent 3"
 
 #. QuZbq
 #: CalcCommands.xcu
@@ -4844,7 +4844,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Accent 3 Cell Style"
-msgstr ""
+msgstr "Stil de celulă Accent 3"
 
 #. 6EYGx
 #: CalcCommands.xcu
@@ -4854,7 +4854,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Heading 1"
-msgstr "Antet 1"
+msgstr "Titlu 1"
 
 #. xGZQE
 #: CalcCommands.xcu
@@ -4864,7 +4864,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Heading 1"
-msgstr ""
+msgstr "Titlu 1"
 
 #. CmDKW
 #: CalcCommands.xcu
@@ -4874,7 +4874,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Heading 1 Cell Style"
-msgstr ""
+msgstr "Stil de celulă Titlu 1"
 
 #. N9gg5
 #: CalcCommands.xcu
@@ -4884,7 +4884,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Heading 2"
-msgstr "Antet 2"
+msgstr "Titlu 2"
 
 #. NwSni
 #: CalcCommands.xcu
@@ -4894,7 +4894,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Heading 2"
-msgstr ""
+msgstr "Titlu 2"
 
 #. YE3co
 #: CalcCommands.xcu
@@ -4904,7 +4904,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Heading 2 Cell Style"
-msgstr ""
+msgstr "Stil de celulă Titlu 2"
 
 #. 6Wxq6
 #: CalcCommands.xcu
@@ -4914,7 +4914,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Bad"
-msgstr "Rea"
+msgstr "Prost"
 
 #. r2VmV
 #: CalcCommands.xcu
@@ -4924,7 +4924,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Bad"
-msgstr ""
+msgstr "Prost"
 
 #. CYM7D
 #: CalcCommands.xcu
@@ -4934,7 +4934,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Bad Cell Style"
-msgstr ""
+msgstr "Stil de celulă Prost"
 
 #. rHqpo
 #: CalcCommands.xcu
@@ -4954,7 +4954,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Error"
-msgstr ""
+msgstr "Eroare"
 
 #. WXjfD
 #: CalcCommands.xcu
@@ -4964,7 +4964,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Error Cell Style"
-msgstr ""
+msgstr "Stil de celulă Eroare"
 
 #. N5ZbD
 #: CalcCommands.xcu
@@ -4984,7 +4984,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Good"
-msgstr ""
+msgstr "Bun"
 
 #. Yv3pB
 #: CalcCommands.xcu
@@ -4994,7 +4994,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Good Cell Style"
-msgstr ""
+msgstr "Stil de celulă Bun"
 
 #. rBmFm
 #: CalcCommands.xcu
@@ -5014,7 +5014,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Neutral"
-msgstr ""
+msgstr "Neutru"
 
 #. Qb5FY
 #: CalcCommands.xcu
@@ -5024,7 +5024,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Neutral Cell Style"
-msgstr ""
+msgstr "Stil de celulă Neutru"
 
 #. 8fV8a
 #: CalcCommands.xcu
@@ -5044,7 +5044,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Warning"
-msgstr ""
+msgstr "Avertisment"
 
 #. 8ZYgN
 #: CalcCommands.xcu
@@ -5054,7 +5054,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Warning Cell Style"
-msgstr ""
+msgstr "Stil de celulă Avertisment"
 
 #. cs3zA
 #: CalcCommands.xcu
@@ -5074,7 +5074,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Footnote"
-msgstr ""
+msgstr "Notă de subsol"
 
 #. AaFN2
 #: CalcCommands.xcu
@@ -5084,7 +5084,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Footnote Cell Style"
-msgstr ""
+msgstr "Stil de celulă Notă de subsol"
 
 #. RNKWD
 #: CalcCommands.xcu
@@ -5114,7 +5114,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Note Cell Style"
-msgstr ""
+msgstr "Stil de celulă Notă"
 
 #. Rea3m
 #: CalcCommands.xcu
@@ -5124,7 +5124,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Functions Deck"
-msgstr ""
+msgstr "Deschide panoul de funcții"
 
 #. 7wktD
 #: CalcWindowState.xcu
@@ -5214,7 +5214,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Formula Bar"
-msgstr ""
+msgstr "Bară de formule"
 
 #. 4KM2t
 #: CalcWindowState.xcu
@@ -5244,7 +5244,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Notebookbar"
-msgstr "Notebookbar"
+msgstr "Bară notebook"
 
 #. vH4ii
 #: CalcWindowState.xcu
@@ -5284,7 +5284,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Print Preview"
-msgstr "Previzualizare imprimare"
+msgstr "Previzualizare tipărire"
 
 #. Mu9NE
 #: CalcWindowState.xcu
@@ -5294,7 +5294,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Row Header"
-msgstr "Antet rând"
+msgstr "Antet de rând"
 
 #. oueah
 #: CalcWindowState.xcu
@@ -5304,7 +5304,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Sheet Tabs Bar"
-msgstr "File foi de calcul"
+msgstr "Bară cu file de foi"
 
 #. 7PDab
 #: CalcWindowState.xcu
@@ -5324,7 +5324,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Curves and Polygons"
-msgstr ""
+msgstr "Curbe și poligoane"
 
 #. MFCJ8
 #: CalcWindowState.xcu
@@ -5394,7 +5394,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Text Box Formatting"
-msgstr "Formatare a zonei de text"
+msgstr "Formatarea casetei de text"
 
 #. hCe45
 #: CalcWindowState.xcu
@@ -5404,7 +5404,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Filter"
-msgstr "Filtru de formulare"
+msgstr "Filtru de formular"
 
 #. wrFFt
 #: CalcWindowState.xcu
@@ -5414,7 +5414,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Navigation"
-msgstr "Navigare pentru formulare"
+msgstr "Navigare prin formular"
 
 #. 3iCYb
 #: CalcWindowState.xcu
@@ -5424,7 +5424,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Form Controls"
-msgstr "Controale pentru formulare"
+msgstr "Controale pentru formular"
 
 #. GBGYS
 #: CalcWindowState.xcu
@@ -5775,6 +5775,16 @@ msgctxt ""
 "value.text"
 msgid "Y Error ~Bars..."
 msgstr "~Barele de eroare Y..."
+
+#. b8a7g
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertMenuDataTable\n"
+"Label\n"
+"value.text"
+msgid "Data Table..."
+msgstr ""
 
 #. EfDfA
 #: ChartCommands.xcu
@@ -6184,7 +6194,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Format Legend..."
-msgstr "Formatează legendă..."
+msgstr "Formatare legendă..."
 
 #. xBCAR
 #: ChartCommands.xcu
@@ -6536,6 +6546,26 @@ msgctxt ""
 msgid "Format Single Data Label..."
 msgstr "Formatează o singura etichetă date..."
 
+#. J5NGA
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:InsertDataTable\n"
+"Label\n"
+"value.text"
+msgid "Insert Data Table"
+msgstr ""
+
+#. PFPqW
+#: ChartCommands.xcu
+msgctxt ""
+"ChartCommands.xcu\n"
+"..ChartCommands.UserInterface.Commands..uno:DeleteDataTable\n"
+"Label\n"
+"value.text"
+msgid "Delete Data Table"
+msgstr ""
+
 #. 3wU84
 #: ChartCommands.xcu
 msgctxt ""
@@ -6564,7 +6594,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset Data Point"
-msgstr "Resetează Punctul din Șirul de Date"
+msgstr "Restabilește punctul de date"
 
 #. DqHdr
 #: ChartCommands.xcu
@@ -6574,7 +6604,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Reset all Data Points"
-msgstr "Resetează tot Șirul de Date"
+msgstr "Restabilește toate punctele de date"
 
 #. JqAfR
 #: ChartCommands.xcu
@@ -6634,7 +6664,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Automatic Layout"
-msgstr "Aranjament automat"
+msgstr "Dispunere automată"
 
 #. iNGBX
 #: ChartCommands.xcu
@@ -8654,7 +8684,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Master Slide"
-msgstr "~Diapozitiv principal"
+msgstr "~Diapozitiv master"
 
 #. ffjrk
 #: DrawImpressCommands.xcu
@@ -8664,7 +8694,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "M~aster Notes"
-msgstr "Notițe princip~ale"
+msgstr "Note m~aster"
 
 #. 5jAWW
 #: DrawImpressCommands.xcu
@@ -9244,7 +9274,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To ~Polygon"
-msgstr "În ~poligon"
+msgstr "La ~poligon"
 
 #. oVmXK
 #: DrawImpressCommands.xcu
@@ -9314,7 +9344,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Slide ~Layout"
-msgstr "Asp~ect diapozitiv"
+msgstr "~Dispunere diapozitiv"
 
 #. XAoDe
 #: DrawImpressCommands.xcu
@@ -9374,7 +9404,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Master"
-msgstr "~Principal"
+msgstr "~Master"
 
 #. EsUfw
 #: DrawImpressCommands.xcu
@@ -9484,7 +9514,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Slide Layout"
-msgstr "Aranjament diapozitiv"
+msgstr "Dispunere diapozitiv"
 
 #. BBXTY
 #: DrawImpressCommands.xcu
@@ -9594,7 +9624,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Layout"
-msgstr "Aspect"
+msgstr "Dispunere"
 
 #. BBXg7
 #: DrawImpressCommands.xcu
@@ -10284,7 +10314,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "New Master"
-msgstr "Document principal nou"
+msgstr "Master nou"
 
 #. MeNp3
 #: DrawImpressCommands.xcu
@@ -10294,7 +10324,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Master"
-msgstr "Șterge documentul principal"
+msgstr "Șterge masterul"
 
 #. UF5mS
 #: DrawImpressCommands.xcu
@@ -10304,7 +10334,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Rename Master"
-msgstr "Redenumește documentul principal"
+msgstr "Redenumește masterul"
 
 #. E7WHo
 #: DrawImpressCommands.xcu
@@ -10344,7 +10374,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom & Pan"
-msgstr ""
+msgstr "Zoom și panoramare"
 
 #. GPG85
 #: DrawImpressCommands.xcu
@@ -10354,7 +10384,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Zoom & Pan (Ctrl to Zoom Out, Shift to Pan)"
-msgstr ""
+msgstr "Zoom și panoramare (Ctrl pentru micșorare, Shift pentru panoramare)"
 
 #. BRCmr
 #: DrawImpressCommands.xcu
@@ -10494,7 +10524,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Master"
-msgstr "~Principal"
+msgstr "~Master"
 
 #. FE22A
 #: DrawImpressCommands.xcu
@@ -10504,7 +10534,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Master Lay~outs"
-msgstr "~Aranjamente principale"
+msgstr "~Dispuneri principale"
 
 #. SqMAZ
 #: DrawImpressCommands.xcu
@@ -10524,7 +10554,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Master Notes Layout..."
-msgstr ""
+msgstr "Dispunerea notelor principale..."
 
 #. FzmHt
 #: DrawImpressCommands.xcu
@@ -10534,7 +10564,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Master Handout Layout..."
-msgstr ""
+msgstr "Dispunerea prospectului principal..."
 
 #. n3pZ9
 #: DrawImpressCommands.xcu
@@ -10944,7 +10974,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to First Page"
-msgstr "Salt la prima pagină"
+msgstr "Mergi la prima pagină"
 
 #. pK2xk
 #: DrawImpressCommands.xcu
@@ -10964,7 +10994,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to First Slide"
-msgstr "Salt la primul diapozitiv"
+msgstr "Mergi la primul diapozitiv"
 
 #. tpZpD
 #: DrawImpressCommands.xcu
@@ -10984,7 +11014,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Previous Page"
-msgstr "Salt la pagina precedentă"
+msgstr "Mergi la pagina precedentă"
 
 #. GXaQT
 #: DrawImpressCommands.xcu
@@ -11004,7 +11034,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Previous Slide"
-msgstr "Salt la diapozitivul precedent"
+msgstr "Mergi la diapozitivul precedent"
 
 #. RmTdY
 #: DrawImpressCommands.xcu
@@ -11024,7 +11054,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Next Page"
-msgstr "Salt la următoarea pagină"
+msgstr "Mergi la pagina următoare"
 
 #. ELGDQ
 #: DrawImpressCommands.xcu
@@ -11044,7 +11074,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Next Slide"
-msgstr "Salt la diapozitivul următor"
+msgstr "Mergi la diapozitivul următor"
 
 #. o87Bi
 #: DrawImpressCommands.xcu
@@ -11064,7 +11094,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Last Page"
-msgstr "Salt la ultima pagină"
+msgstr "Mergi la ultima pagină"
 
 #. RG79F
 #: DrawImpressCommands.xcu
@@ -11084,7 +11114,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Last Slide"
-msgstr "Salt la ultimul diapozitiv"
+msgstr "Mergi la ultimul diapozitiv"
 
 #. FkaGn
 #: DrawImpressCommands.xcu
@@ -11334,7 +11364,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Title, 2 Content and Content"
-msgstr "Titlu, 2 conținuturi și un conținut"
+msgstr "Titlu, 2 conținuturi și conținut"
 
 #. go4sD
 #: DrawImpressCommands.xcu
@@ -11424,7 +11454,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Layout"
-msgstr "Aspect"
+msgstr "Dispunere"
 
 #. RWwkb
 #: DrawImpressCommands.xcu
@@ -11564,7 +11594,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Open the Master Slides Deck"
-msgstr ""
+msgstr "Deschide pachetul de diapozitive master"
 
 #. ESt3w
 #: DrawWindowState.xcu
@@ -11784,7 +11814,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Page Master Pane"
-msgstr ""
+msgstr "Panoul paginii master"
 
 #. hMUvt
 #: DrawWindowState.xcu
@@ -11794,7 +11824,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Page Master Pane (no selection)"
-msgstr "Panou de pagină principală (fără selecție)"
+msgstr "Panoul paginii master (fără selecție)"
 
 #. SvG2a
 #: DrawWindowState.xcu
@@ -12074,7 +12104,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Curves and Polygons"
-msgstr ""
+msgstr "Curbe și poligoane"
 
 #. XG7mG
 #: DrawWindowState.xcu
@@ -12134,7 +12164,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Zoom"
-msgstr "Lupă"
+msgstr "Zoom"
 
 #. AkJdM
 #: DrawWindowState.xcu
@@ -12524,7 +12554,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Lupă"
+msgstr "Zoom"
 
 #. aihBG
 #: Effects.xcu
@@ -12774,7 +12804,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Fade in and Zoom"
-msgstr "Apariție progresivă și apropiere"
+msgstr "Apariție progresivă și zoom"
 
 #. 26GwM
 #: Effects.xcu
@@ -13474,7 +13504,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Lupă"
+msgstr "Zoom"
 
 #. ipZZC
 #: Effects.xcu
@@ -17958,14 +17988,13 @@ msgstr "Anulează"
 
 #. TszTz
 #: GenericCommands.xcu
-#, fuzzy
 msgctxt ""
 "GenericCommands.xcu\n"
 "..GenericCommands.UserInterface.Commands..uno:ToggleControlFocus\n"
 "Label\n"
 "value.text"
 msgid "Control Focus"
-msgstr "Focalizare de control"
+msgstr "Focalizare a controlului"
 
 #. b5G8R
 #: GenericCommands.xcu
@@ -18085,7 +18114,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Enable Watch"
-msgstr "Activează observatorul"
+msgstr "Activează observarea"
 
 #. Lo2Sc
 #: GenericCommands.xcu
@@ -18115,7 +18144,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Macro..."
-msgstr ""
+msgstr "Selectați o macrocomandă..."
 
 #. EEBZY
 #: GenericCommands.xcu
@@ -18205,7 +18234,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Module..."
-msgstr ""
+msgstr "Selectați un modul..."
 
 #. R7qZd
 #: GenericCommands.xcu
@@ -18515,7 +18544,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Find Parenthesis"
-msgstr "Caută parantezele"
+msgstr "Caută paranteze"
 
 #. mmxND
 #: GenericCommands.xcu
@@ -18525,7 +18554,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Macros..."
-msgstr "Editare macrouri..."
+msgstr "Editare macrocomenzi..."
 
 #. Ws9jQ
 #: GenericCommands.xcu
@@ -18755,7 +18784,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Zoom"
-msgstr "Lupă"
+msgstr "Zoom"
 
 #. cG9KB
 #: GenericCommands.xcu
@@ -19285,7 +19314,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Fit to Cell Size"
-msgstr ""
+msgstr "~Potrivește la dimensiunea celulei"
 
 #. iDVCU
 #: GenericCommands.xcu
@@ -19325,7 +19354,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Manage Templates"
-msgstr "Administrează șabloanele"
+msgstr "Gestionează șabloanele"
 
 #. spfFL
 #: GenericCommands.xcu
@@ -19460,26 +19489,24 @@ msgstr "Extrage"
 
 #. gKxBN
 #: GenericCommands.xcu
-#, fuzzy
 msgctxt ""
 "GenericCommands.xcu\n"
 "..GenericCommands.UserInterface.Commands..uno:CancelCheckOut\n"
 "Label\n"
 "value.text"
 msgid "Cancel Checkout..."
-msgstr "Anulează descărcarea..."
+msgstr ""
 
 #. This is the action to merge a private working copy            of the document on a server. It shows a dialog to input some information on            the new version to create on the server.
 #. aQBxJ
 #: GenericCommands.xcu
-#, fuzzy
 msgctxt ""
 "GenericCommands.xcu\n"
 "..GenericCommands.UserInterface.Commands..uno:CheckIn\n"
 "Label\n"
 "value.text"
 msgid "Check In..."
-msgstr "Încarcă..."
+msgstr "Înregistrare pentru copia de lucru..."
 
 #. C6h8G
 #: GenericCommands.xcu
@@ -20069,7 +20096,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Text from File..."
-msgstr ""
+msgstr "Text din fișier..."
 
 #. YGBc4
 #: GenericCommands.xcu
@@ -20279,7 +20306,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Manage St~yles"
-msgstr ""
+msgstr "~Gestionare stiluri"
 
 #. GGfAj
 #: GenericCommands.xcu
@@ -20529,7 +20556,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Time Field"
-msgstr "Câmp timp"
+msgstr "Câmp de timp"
 
 #. r8N23
 #: GenericCommands.xcu
@@ -20639,7 +20666,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Currency Field"
-msgstr "Câmp de valută"
+msgstr "Câmp valutar"
 
 #. g8GB6
 #: GenericCommands.xcu
@@ -20689,7 +20716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Pattern Field"
-msgstr "Câmp model"
+msgstr "Câmp de model"
 
 #. 6xPxf
 #: GenericCommands.xcu
@@ -20699,7 +20726,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "File Selection"
-msgstr "Selecție fișier"
+msgstr "Selecție de fișier"
 
 #. 58dms
 #: GenericCommands.xcu
@@ -20829,7 +20856,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Object Zoom"
-msgstr "Panoramare obiect"
+msgstr "Zoom asupra obiectelor"
 
 #. kpKCn
 #: GenericCommands.xcu
@@ -21159,7 +21186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Preview Dialog"
-msgstr "Dialog previzualizare"
+msgstr "Dialog de previzualizare"
 
 #. fNSZd
 #: GenericCommands.xcu
@@ -21379,7 +21406,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Footnote and Endno~te"
-msgstr "No~tă de subsol și sfârșit"
+msgstr "No~tă de subsol și de sfârșit"
 
 #. ugArR
 #: GenericCommands.xcu
@@ -21509,7 +21536,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Auto~Format Styles..."
-msgstr "Stiluri ~formatare automată..."
+msgstr "Stiluri de ~formatare automată..."
 
 #. XdHHU
 #: GenericCommands.xcu
@@ -21589,7 +21616,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Character Spacing"
-msgstr "Spațiere caracter"
+msgstr "Spațiere caractere"
 
 #. iHFPY
 #: GenericCommands.xcu
@@ -22119,7 +22146,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Clone Formatting (double click for multi-selection)"
-msgstr "Copiere formatare (dublu clic pentru selecție multiplă)"
+msgstr "Clonează formatarea (dublu clic pentru selecție multiplă)"
 
 #. Kx4N5
 #: GenericCommands.xcu
@@ -22200,26 +22227,6 @@ msgctxt ""
 "value.text"
 msgid "Delete C~ontents..."
 msgstr "Ștergere c~onținut..."
-
-#. TBAWe
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"Label\n"
-"value.text"
-msgid "Emoji"
-msgstr ""
-
-#. 6SnVd
-#: GenericCommands.xcu
-msgctxt ""
-"GenericCommands.xcu\n"
-"..GenericCommands.UserInterface.Commands..uno:EmojiControl\n"
-"TooltipLabel\n"
-"value.text"
-msgid "Insert Emoji"
-msgstr ""
 
 #. tEjpF
 #: GenericCommands.xcu
@@ -22389,7 +22396,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To File End"
-msgstr "La sfârșitul fiierului"
+msgstr "La sfârșitul fișierului"
 
 #. wKTWE
 #: GenericCommands.xcu
@@ -22479,7 +22486,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Interrupt Macro"
-msgstr "Întrerupere macro"
+msgstr "Întrerupe execuția macrocomenzii"
 
 #. feLj3
 #: GenericCommands.xcu
@@ -22889,7 +22896,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~AutoCorrect Options..."
-msgstr "~Setări Auto Corectare..."
+msgstr "Opțiuni de corectare ~automată..."
 
 #. R9Lcg
 #: GenericCommands.xcu
@@ -23189,7 +23196,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Clear"
-msgstr ""
+msgstr "Șterge"
 
 #. AqQCJ
 #: GenericCommands.xcu
@@ -23279,7 +23286,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Curves and Polygons"
-msgstr ""
+msgstr "Curbe și poligoane"
 
 #. QjB43
 #: GenericCommands.xcu
@@ -23481,6 +23488,36 @@ msgctxt ""
 msgid "Toggle Automatic Spell Checking"
 msgstr "Comută verificarea ortografică automată"
 
+#. oFCYw
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"Label\n"
+"value.text"
+msgid "Automatic Accessibility Checking"
+msgstr ""
+
+#. XYGPG
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"ContextLabel\n"
+"value.text"
+msgid "Automatic A~ccessibility Checking"
+msgstr ""
+
+#. DGCFi
+#: GenericCommands.xcu
+msgctxt ""
+"GenericCommands.xcu\n"
+"..GenericCommands.UserInterface.Commands..uno:AccessibilityCheckOnline\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Toggle Automatic Accessibility Checking"
+msgstr ""
+
 #. 4DCmg
 #: GenericCommands.xcu
 msgctxt ""
@@ -23619,7 +23656,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Record Macro"
-msgstr "Înregistrează macro"
+msgstr "Înregistrează o macrocomandă"
 
 #. EVyF6
 #: GenericCommands.xcu
@@ -24019,7 +24056,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "%PRODUCTNAME Credits"
-msgstr ""
+msgstr "Credite %PRODUCTNAME"
 
 #. 98scE
 #: GenericCommands.xcu
@@ -24039,7 +24076,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Macro Toolbar On/Off"
-msgstr "Arată/ascunde bara de instrumente macro"
+msgstr "Arată/ascunde bara de instrumente de macrocomenzi"
 
 #. GEk4v
 #: GenericCommands.xcu
@@ -24059,7 +24096,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Import BASIC..."
-msgstr ""
+msgstr "Importă BASIC..."
 
 #. zCkAf
 #: GenericCommands.xcu
@@ -24079,7 +24116,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Export Dialog..."
-msgstr ""
+msgstr "Exportă dialogul..."
 
 #. wcyCu
 #: GenericCommands.xcu
@@ -24089,7 +24126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Import Dialog..."
-msgstr ""
+msgstr "Importă un dialog..."
 
 #. mkYcT
 #: GenericCommands.xcu
@@ -24149,7 +24186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Basic..."
-msgstr ""
+msgstr "~BASIC..."
 
 #. 6NozA
 #: GenericCommands.xcu
@@ -24169,7 +24206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Organize Macros"
-msgstr "~Organizare macrouri"
+msgstr "~Organizare macrocomenzi"
 
 #. yGrMV
 #: GenericCommands.xcu
@@ -24339,7 +24376,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Table Control"
-msgstr "Control de tabl"
+msgstr "Control de tabel"
 
 #. uxkbv
 #: GenericCommands.xcu
@@ -24359,7 +24396,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "File Selection"
-msgstr "Selecție fișier"
+msgstr "Selecție de fișier"
 
 #. AAWcZ
 #: GenericCommands.xcu
@@ -24889,7 +24926,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "AutoFilter"
-msgstr "Filtrare automată"
+msgstr "Filtru automat"
 
 #. kesYU
 #: GenericCommands.xcu
@@ -24959,7 +24996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Refresh document layout"
-msgstr ""
+msgstr "Reîmprospătează dispunerea documentului"
 
 #. V8JAY
 #: GenericCommands.xcu
@@ -24979,7 +25016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Form Control Wizards"
-msgstr ""
+msgstr "Asistenți de control de formular"
 
 #. sJG6W
 #: GenericCommands.xcu
@@ -24989,7 +25026,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Control Wizards"
-msgstr ""
+msgstr "Asistenți de control"
 
 #. FPifj
 #: GenericCommands.xcu
@@ -25239,7 +25276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Automatic Control Focus"
-msgstr "Control automat de focus"
+msgstr "Focalizare automată a controlului"
 
 #. KrqXs
 #: GenericCommands.xcu
@@ -26059,7 +26096,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Macros"
-msgstr "~Macrouri"
+msgstr "~Macrocomenzi"
 
 #. MwNhh
 #: GenericCommands.xcu
@@ -26279,7 +26316,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Select anchor for object"
-msgstr ""
+msgstr "Selectați ancora pentru obiect"
 
 #. vBrBs
 #: GenericCommands.xcu
@@ -26439,7 +26476,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Left-to-right Mark"
-msgstr ""
+msgstr "Marcare stânga-~la-dreapta"
 
 #. prtF2
 #: GenericCommands.xcu
@@ -26449,7 +26486,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Right-to-left Mark"
-msgstr ""
+msgstr "Marcare d~reapta-la-stânga"
 
 #. o6CJp
 #: GenericCommands.xcu
@@ -26479,7 +26516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Columns"
-msgstr ""
+msgstr "Șterge coloane"
 
 #. AG4Qy
 #: GenericCommands.xcu
@@ -26499,7 +26536,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected columns"
-msgstr ""
+msgstr "Șterge coloanele selectate"
 
 #. VL8Wa
 #: GenericCommands.xcu
@@ -26509,7 +26546,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Delete Rows"
-msgstr ""
+msgstr "Șterge rânduri"
 
 #. uAPr9
 #: GenericCommands.xcu
@@ -26529,7 +26566,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Delete selected rows"
-msgstr ""
+msgstr "Șterge rândurile selectate"
 
 #. poXFa
 #: GenericCommands.xcu
@@ -26539,7 +26576,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Manage Language"
-msgstr "Gestionează limba"
+msgstr "Gestionare limbă"
 
 #. EGC4P
 #: GenericCommands.xcu
@@ -26629,7 +26666,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Set Focus in Combo Box"
-msgstr "Cursorul în lista combinată"
+msgstr "Stabilește focalizarea în lista de selecție"
 
 #. 5xbCG
 #: GenericCommands.xcu
@@ -26639,7 +26676,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Basic Macro Organizer..."
-msgstr ""
+msgstr "Organizator de macrocomenzi de bază..."
 
 #. ahLAz
 #: GenericCommands.xcu
@@ -26649,7 +26686,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Email as ~Microsoft Format..."
-msgstr ""
+msgstr "E-mail în format ~Microsoft..."
 
 #. BrAfB
 #: GenericCommands.xcu
@@ -26659,7 +26696,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Email as ~OpenDocument Format..."
-msgstr ""
+msgstr "E-mail în format ~OpenDocument"
 
 #. kJNVF
 #: GenericCommands.xcu
@@ -26699,7 +26736,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Apply document classification"
-msgstr ""
+msgstr "Aplică clasificarea documentelor"
 
 #. owQR2
 #: GenericCommands.xcu
@@ -26709,7 +26746,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Manage Document Classification"
-msgstr ""
+msgstr "Gestionare clasificare document"
 
 #. SFcbr
 #: GenericCommands.xcu
@@ -26719,7 +26756,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Manage Paragraph Classification"
-msgstr ""
+msgstr "Gestionare clasificare paragraf"
 
 #. N6XvZ
 #: GenericCommands.xcu
@@ -26729,7 +26766,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select"
-msgstr "Selectează"
+msgstr "Selectare"
 
 #. qjFMU
 #: GenericCommands.xcu
@@ -26769,7 +26806,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Give a label to identify an object"
-msgstr ""
+msgstr "Atribuiți o etichetă pentru a identifica un obiect"
 
 #. k5bGq
 #: GenericCommands.xcu
@@ -26789,7 +26826,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Add descriptions of non-text content (for accessibility)"
-msgstr ""
+msgstr "Adăugați descrieri ale conținutului non-text (pentru accesibilitate)"
 
 #. YwMhY
 #: GenericCommands.xcu
@@ -26799,7 +26836,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Restart in Safe Mode..."
-msgstr "~Repornire în modul sigur..."
+msgstr "~Repornește în modul de siguranță..."
 
 #. JCCDn
 #: GenericCommands.xcu
@@ -26829,7 +26866,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Signatu~re Line..."
-msgstr ""
+msgstr "Linie de semnătu~ră..."
 
 #. azmKp
 #: GenericCommands.xcu
@@ -26839,7 +26876,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Edit Signature ~Line..."
-msgstr ""
+msgstr "Editare ~linie de semnătură..."
 
 #. wRPGr
 #: GenericCommands.xcu
@@ -26849,7 +26886,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Sign Signature Line..."
-msgstr ""
+msgstr "~Semnare linie de semnătură..."
 
 #. KRKbu
 #: GenericCommands.xcu
@@ -26859,7 +26896,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "QR and ~Barcode..."
-msgstr ""
+msgstr "QR și cod de ~bare..."
 
 #. FCYvB
 #: GenericCommands.xcu
@@ -26869,7 +26906,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Edit Barcode..."
-msgstr ""
+msgstr "~Editare cod de bare..."
 
 #. HhCdv
 #: GenericCommands.xcu
@@ -26879,7 +26916,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Additions..."
-msgstr ""
+msgstr "~Adăugiri..."
 
 #. bFKmR
 #: GenericCommands.xcu
@@ -26889,7 +26926,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "~Additional Extensions..."
-msgstr ""
+msgstr "Extensii ~adiționale..."
 
 #. UqjzD
 #: GenericCommands.xcu
@@ -26899,7 +26936,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Additional Extensions"
-msgstr ""
+msgstr "Extensii adiționale"
 
 #. YpeR4
 #: GenericCommands.xcu
@@ -26989,7 +27026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Horizontally Left"
-msgstr ""
+msgstr "Distribuie orizontal în stânga"
 
 #. gjrG6
 #: GenericCommands.xcu
@@ -26999,7 +27036,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Horizontally ~Left"
-msgstr ""
+msgstr "Orizonta~l în stânga"
 
 #. BBazW
 #: GenericCommands.xcu
@@ -27009,7 +27046,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Horizontally Center"
-msgstr ""
+msgstr "Distribuie orizontal în centru"
 
 #. SqFTB
 #: GenericCommands.xcu
@@ -27019,7 +27056,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Horizontally ~Center"
-msgstr ""
+msgstr "Orizontal în ~centru"
 
 #. QXntz
 #: GenericCommands.xcu
@@ -27029,7 +27066,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Horizontally Spacing"
-msgstr ""
+msgstr "Distribuie orizontal spațiat"
 
 #. GQEXJ
 #: GenericCommands.xcu
@@ -27039,7 +27076,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Horizontally ~Spacing"
-msgstr ""
+msgstr "Orizontal ~spațiat"
 
 #. Smk23
 #: GenericCommands.xcu
@@ -27049,7 +27086,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Horizontally Right"
-msgstr ""
+msgstr "Distribuie orizontal în dreapta"
 
 #. SDkHd
 #: GenericCommands.xcu
@@ -27059,7 +27096,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Horizontally ~Right"
-msgstr ""
+msgstr "Orizontal în d~reapta"
 
 #. iJB7y
 #: GenericCommands.xcu
@@ -27069,7 +27106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Vertically Top"
-msgstr ""
+msgstr "Distribuie vertical în sus"
 
 #. 9wa7z
 #: GenericCommands.xcu
@@ -27079,7 +27116,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Vertically ~Top"
-msgstr ""
+msgstr "Ver~tical în sus"
 
 #. FAkxM
 #: GenericCommands.xcu
@@ -27089,7 +27126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Vertically Center"
-msgstr ""
+msgstr "Distribuie vertical în centru"
 
 #. PaLDT
 #: GenericCommands.xcu
@@ -27099,7 +27136,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Vertically C~enter"
-msgstr ""
+msgstr "Vertical în c~entru"
 
 #. jwLqM
 #: GenericCommands.xcu
@@ -27109,7 +27146,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Vertically Spacing"
-msgstr ""
+msgstr "Distribuie vertical spațiat"
 
 #. 2RAqA
 #: GenericCommands.xcu
@@ -27119,7 +27156,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Vertically S~pacing"
-msgstr ""
+msgstr "Vertical s~pațiat"
 
 #. ELgnZ
 #: GenericCommands.xcu
@@ -27129,7 +27166,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Distribute Vertically Bottom"
-msgstr ""
+msgstr "Distribuie vertical în jos"
 
 #. rankC
 #: GenericCommands.xcu
@@ -27139,7 +27176,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "Vertically ~Bottom"
-msgstr ""
+msgstr "Vertical în ~jos"
 
 #. PT2x4
 #: GenericCommands.xcu
@@ -27149,7 +27186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Inspect Object"
-msgstr ""
+msgstr "Inspectează obiectul"
 
 #. WxZYJ
 #: GenericCommands.xcu
@@ -27429,18 +27466,17 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Master Slide Sorter/Pane"
-msgstr ""
+msgstr "Sortator/panou de diapozitiv master"
 
 #. FzNvJ
 #: ImpressWindowState.xcu
-#, fuzzy
 msgctxt ""
 "ImpressWindowState.xcu\n"
 "..ImpressWindowState.UIElements.States.private:resource/popupmenu/pagepanenoselmaster\n"
 "UIName\n"
 "value.text"
 msgid "Master Slide Sorter/Pane (no selection)"
-msgstr "Organizator de diapozitive/panou (neselectat)"
+msgstr "Sortator/panou de diapozitiv master (fără selecție)"
 
 #. D3FGq
 #: ImpressWindowState.xcu
@@ -27680,7 +27716,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Curves and Polygons"
-msgstr ""
+msgstr "Curbe și poligoane"
 
 #. zMESy
 #: ImpressWindowState.xcu
@@ -27860,7 +27896,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Zoom"
-msgstr "Lupă"
+msgstr "Zoom"
 
 #. pvbBN
 #: ImpressWindowState.xcu
@@ -28274,7 +28310,6 @@ msgstr "~Relații"
 
 #. xE5UF
 #: MathCommands.xcu
-#, fuzzy
 msgctxt ""
 "MathCommands.xcu\n"
 "..MathCommands.UserInterface.Popups..uno:SetOperationsMenu\n"
@@ -28342,6 +28377,16 @@ msgctxt ""
 "value.text"
 msgid "~Others"
 msgstr "~Altele"
+
+#. 3BnCF
+#: MathCommands.xcu
+msgctxt ""
+"MathCommands.xcu\n"
+"..MathCommands.UserInterface.Popups..uno:SidebarDeck.ElementsDeck\n"
+"Label\n"
+"value.text"
+msgid "Open the Elements Deck"
+msgstr ""
 
 #. uXvss
 #: MathWindowState.xcu
@@ -28451,7 +28496,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Conditional Formatting..."
-msgstr "Formatare ~condiționată..."
+msgstr "Formatare ~condițională..."
 
 #. ExGip
 #: ReportCommands.xcu
@@ -28961,7 +29006,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Master Slides"
-msgstr "Diapozitiv principal"
+msgstr "Diapozitive master"
 
 #. AfH6t
 #: Sidebar.xcu
@@ -29021,7 +29066,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Manage Changes"
-msgstr "Gestionează modificările"
+msgstr "Gestionare modificări"
 
 #. rtuWS
 #: Sidebar.xcu
@@ -29201,7 +29246,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Position and Size"
-msgstr "Poziție și mărime"
+msgstr "Poziție și dimensiune"
 
 #. BZBXi
 #: Sidebar.xcu
@@ -29261,7 +29306,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Layouts"
-msgstr "Aspect"
+msgstr "Dispuneri"
 
 #. RXZGB
 #: Sidebar.xcu
@@ -29291,7 +29336,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Available for Use"
-msgstr "Altele care pot fi folosite"
+msgstr "Disponibile pentru a fi folosite"
 
 #. n7BmE
 #: Sidebar.xcu
@@ -29351,7 +29396,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Cell Appearance"
-msgstr "Afișare celulă"
+msgstr "Aspect celulă"
 
 #. uZmEG
 #: Sidebar.xcu
@@ -29361,7 +29406,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Number Format"
-msgstr "Format număr"
+msgstr "Format de număr"
 
 #. DiLQa
 #: Sidebar.xcu
@@ -29431,7 +29476,7 @@ msgctxt ""
 "Title\n"
 "value.text"
 msgid "Manage Changes"
-msgstr "Gestionează modificările"
+msgstr "Gestionare modificări"
 
 #. DC8Ky
 #: Sidebar.xcu
@@ -30061,7 +30106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Preview Zoom"
-msgstr "Zoom"
+msgstr "Zoom de previzualizare"
 
 #. BAjyc
 #: WriterCommands.xcu
@@ -30485,14 +30530,13 @@ msgstr "În~registrează"
 
 #. fUFWw
 #: WriterCommands.xcu
-#, fuzzy
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:TrackChanges\n"
 "TooltipLabel\n"
 "value.text"
 msgid "Record Track Changes"
-msgstr "Arată bare de urmărire modificări"
+msgstr "Înregistrează șirul modificărilor"
 
 #. uTnAC
 #: WriterCommands.xcu
@@ -30512,7 +30556,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show Track Changes Functions"
-msgstr ""
+msgstr "Arată funcțiile de urmărire a modificărilor"
 
 #. Qvz6V
 #: WriterCommands.xcu
@@ -30534,15 +30578,15 @@ msgctxt ""
 msgid "Show Track Changes"
 msgstr "Arată urmărirea modificărilor"
 
-#. Et46z
+#. DjViC
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:ViewTrackChanges\n"
 "Label\n"
 "value.text"
-msgid "Show ~Tracked Changes"
-msgstr "Ara~tă urmărirea modificărilor"
+msgid "Show Tracked ~Changes"
+msgstr "Arată modifi~cările urmărite"
 
 #. sMgCx
 #: WriterCommands.xcu
@@ -30552,7 +30596,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "T~ooltips"
-msgstr ""
+msgstr "~Indicii de instrumente"
 
 #. EitKc
 #: WriterCommands.xcu
@@ -30562,7 +30606,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show change authorship in tooltips"
-msgstr ""
+msgstr "Arată statutul de autor al modificării în indiciile de instrumente"
 
 #. rYNAa
 #: WriterCommands.xcu
@@ -30604,6 +30648,16 @@ msgctxt ""
 msgid "Shows a button next to headings and subheadings to help with outline folding. Even without the button, you can do outline folding with the Navigator."
 msgstr "Arată un buton lângă titluri și subtitluri pentru a ajuta la plierea conturului. Chiar și fără buton, puteți face plierea conturului cu navigatorul."
 
+#. zAgZU
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:OutlineLevelsShown\n"
+"Label\n"
+"value.text"
+msgid "Show Outline Content up to Level..."
+msgstr ""
+
 #. C5mHk
 #: WriterCommands.xcu
 msgctxt ""
@@ -30612,7 +30666,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show tracked deletions in margin"
-msgstr "Arată urmărirea ștergerilor în margine"
+msgstr "Arată la margine ștergerile urmărite"
 
 #. 3GVrG
 #: WriterCommands.xcu
@@ -30622,7 +30676,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Show tracked deletions in margin"
-msgstr "Arată urmărirea ștergerilor în margine"
+msgstr "Arată la margine ștergerile urmărite"
 
 #. QFi68
 #: WriterCommands.xcu
@@ -30632,7 +30686,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go t~o Page..."
-msgstr "~Deplasare la pagina..."
+msgstr "~Mergi la pagina..."
 
 #. FFXsF
 #: WriterCommands.xcu
@@ -30682,7 +30736,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Manage..."
-msgstr "~Administrare..."
+msgstr "~Gestionare..."
 
 #. ZtAC3
 #: WriterCommands.xcu
@@ -30856,14 +30910,13 @@ msgstr "Legendă..."
 
 #. cCPCa
 #: WriterCommands.xcu
-#, fuzzy
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertCaptionDialog\n"
 "TooltipLabel\n"
 "value.text"
 msgid "Insert Caption"
-msgstr "Inserează legendă..."
+msgstr "Inserare legendă"
 
 #. pJhA6
 #: WriterCommands.xcu
@@ -30873,7 +30926,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Insert Caption..."
-msgstr "Inserează legendă..."
+msgstr "Inserare legendă..."
 
 #. KZGYh
 #: WriterCommands.xcu
@@ -30883,7 +30936,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "F~ootnote or Endnote..."
-msgstr "N~otă de subsol și sfârșit..."
+msgstr "N~otă de subsol și de sfârșit..."
 
 #. tAWA5
 #: WriterCommands.xcu
@@ -30983,6 +31036,26 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Date Content Control"
+msgstr ""
+
+#. tumfQ
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertPlainTextContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Plain Text Content Control"
+msgstr ""
+
+#. X4bBh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertComboBoxContentControl\n"
+"Label\n"
+"value.text"
+msgid "Insert Combo Box Content Control"
 msgstr ""
 
 #. HxFAE
@@ -31173,7 +31246,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show All Changes Inline"
-msgstr "Arată toate modificările pe text"
+msgstr "Arată toate modificările direct în text"
 
 #. jVPG7
 #: WriterCommands.xcu
@@ -31183,7 +31256,7 @@ msgctxt ""
 "ContextLabel\n"
 "value.text"
 msgid "All ~Changes Inline"
-msgstr ""
+msgstr "Toate modifi~cările direct în text"
 
 #. JQmVz
 #: WriterCommands.xcu
@@ -31193,7 +31266,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show Deletions In Margin"
-msgstr "Arată ștergerile în margine"
+msgstr "Arată ștergerile la margine"
 
 #. Mo6US
 #: WriterCommands.xcu
@@ -31213,7 +31286,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Show Insertions In Margin"
-msgstr "Arată inserările în margine"
+msgstr "Arată inserările la margine"
 
 #. hCo6p
 #: WriterCommands.xcu
@@ -31253,7 +31326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Mail Merge Wi~zard..."
-msgstr "Asistent pentru corespondența în s~erie..."
+msgstr "Asistent pentru corespondență în s~erie..."
 
 #. 4GmoX
 #: WriterCommands.xcu
@@ -31783,7 +31856,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select to Begin of Previous Page"
-msgstr "Selectează până la începutul paginii anterioare"
+msgstr "Selectează până la începutul paginii precedente"
 
 #. nqYEW
 #: WriterCommands.xcu
@@ -31793,7 +31866,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select to End of Previous Page"
-msgstr "Selectează până la sfârșitul paginii anterioare"
+msgstr "Selectează până la sfârșitul paginii precedente"
 
 #. w5B5i
 #: WriterCommands.xcu
@@ -31933,7 +32006,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select to Next Sentence"
-msgstr "Selectare până la următoarea propoziție"
+msgstr "Selectează până la propoziția următoare"
 
 #. iZDCN
 #: WriterCommands.xcu
@@ -32085,6 +32158,16 @@ msgctxt ""
 msgid "Title Page..."
 msgstr "Pagină de titlu..."
 
+#. mUpHd
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Translate\n"
+"Label\n"
+"value.text"
+msgid "Translate..."
+msgstr ""
+
 #. JrZD4
 #: WriterCommands.xcu
 msgctxt ""
@@ -32103,7 +32186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Drop Caps"
-msgstr "Inițiale"
+msgstr "Letrine"
 
 #. 26bn9
 #: WriterCommands.xcu
@@ -32193,7 +32276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Footnotes and Endnotes..."
-msgstr "Note de subsol și s~fârșit..."
+msgstr "Note de subsol și de s~fârșit..."
 
 #. ZPvDo
 #: WriterCommands.xcu
@@ -32293,7 +32376,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Print document"
-msgstr "Imprimare document"
+msgstr "Tipărește documentul"
 
 #. gBS8B
 #: WriterCommands.xcu
@@ -32485,6 +32568,16 @@ msgctxt ""
 msgid "Rows ~Above"
 msgstr "Rând dea~supra"
 
+#. Hu7hs
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows above"
+msgstr "Inserează rânduri deasupra"
+
 #. zPPVF
 #: WriterCommands.xcu
 msgctxt ""
@@ -32505,6 +32598,16 @@ msgctxt ""
 msgid "Rows ~Below"
 msgstr "Rând ~dedesubt"
 
+#. XEjuR
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertRowsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert rows below"
+msgstr "Inserează rânduri dedesubt"
+
 #. bxCPN
 #: WriterCommands.xcu
 msgctxt ""
@@ -32523,17 +32626,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Columns Before"
-msgstr ""
+msgstr "Inserează coloane înainte"
 
-#. Q4jKn
+#. FSTZ9
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~Before"
-msgstr "Coloane î~nainte"
+msgid "Columns B~efore"
+msgstr "Coloane înaint~e"
+
+#. G9zT9
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsBefore\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns before"
+msgstr "Inserează coloane înainte"
 
 #. oY3As
 #: WriterCommands.xcu
@@ -32543,17 +32656,27 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Insert Columns After"
-msgstr ""
+msgstr "Inserează coloane după"
 
-#. ZAewq
+#. 9TFB2
 #: WriterCommands.xcu
 msgctxt ""
 "WriterCommands.xcu\n"
 "..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
 "ContextLabel\n"
 "value.text"
-msgid "Columns ~After"
+msgid "Columns A~fter"
 msgstr "Coloane ~după"
+
+#. crDFB
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:InsertColumnsAfter\n"
+"TooltipLabel\n"
+"value.text"
+msgid "Insert columns after"
+msgstr "Inserează coloane după"
 
 #. B44pP
 #: WriterCommands.xcu
@@ -32593,7 +32716,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "~Nested Table"
-msgstr ""
+msgstr "Tabel ~imbricat"
 
 #. jWjL7
 #: WriterCommands.xcu
@@ -32613,7 +32736,7 @@ msgctxt ""
 "PopupLabel\n"
 "value.text"
 msgid "Rows ~Above"
-msgstr ""
+msgstr "Rânduri de~asupra"
 
 #. fmNGn
 #: WriterCommands.xcu
@@ -32723,7 +32846,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Index Entry..."
-msgstr "~Intrare Index..."
+msgstr "~Intrare de index..."
 
 #. W4PVB
 #: WriterCommands.xcu
@@ -32873,7 +32996,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Line Below"
-msgstr "La linia de dedesupt"
+msgstr "La linia de mai jos"
 
 #. CDTJM
 #: WriterCommands.xcu
@@ -32893,7 +33016,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Run Macro Field"
-msgstr "Execută câmpul macro-comenzii"
+msgstr "Execută câmpul macrocomenzii"
 
 #. aQg38
 #: WriterCommands.xcu
@@ -32903,7 +33026,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Protect Cells"
-msgstr "Protejare celule"
+msgstr "Protejează celulele"
 
 #. Mgs5r
 #: WriterCommands.xcu
@@ -32983,7 +33106,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level"
-msgstr ""
+msgstr "Retrogradează nivelul schiței"
 
 #. jzcmc
 #: WriterCommands.xcu
@@ -33003,7 +33126,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level"
-msgstr ""
+msgstr "Promovează nivelul schiței"
 
 #. MdLME
 #: WriterCommands.xcu
@@ -33023,7 +33146,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Previous Paragraph in Level"
-msgstr "La paragraful anterior de pe nivel"
+msgstr "La paragraful precedent din nivel"
 
 #. HrGCz
 #: WriterCommands.xcu
@@ -33033,7 +33156,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To End of Next Page"
-msgstr "Ls sfârșitul paginii următoare"
+msgstr "La sfârșitul paginii următoare"
 
 #. PRoBm
 #: WriterCommands.xcu
@@ -33053,7 +33176,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Paragraph in Level"
-msgstr "La următorul paragraf de pe nivel"
+msgstr "La următorul paragraf din nivel"
 
 #. Hkz96
 #: WriterCommands.xcu
@@ -33063,7 +33186,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up"
-msgstr ""
+msgstr "Mută elementul mai sus"
 
 #. F6Rc7
 #: WriterCommands.xcu
@@ -33083,7 +33206,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down"
-msgstr ""
+msgstr "Mută elementul mai jos"
 
 #. 2GyQ4
 #: WriterCommands.xcu
@@ -33153,7 +33276,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Demote Outline Level with Subpoints"
-msgstr ""
+msgstr "Retrogradează nivelul schiței cu subpuncte"
 
 #. 8u4SF
 #: WriterCommands.xcu
@@ -33173,7 +33296,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Promote Outline Level with Subpoints"
-msgstr ""
+msgstr "Promovează nivelul schiței cu subpuncte"
 
 #. LiMgw
 #: WriterCommands.xcu
@@ -33183,7 +33306,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Up with Subpoints"
-msgstr ""
+msgstr "Mută elementul mai sus cu subpuncte"
 
 #. GCegb
 #: WriterCommands.xcu
@@ -33203,7 +33326,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Move Item Down with Subpoints"
-msgstr ""
+msgstr "Mută elementul mai jos cu subpuncte"
 
 #. JF2Ui
 #: WriterCommands.xcu
@@ -33223,7 +33346,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Update Input Fields"
-msgstr "Actualizare câmpuri de introducere"
+msgstr "Actualizează câmpurile de introducere"
 
 #. wCXQw
 #: WriterCommands.xcu
@@ -33283,7 +33406,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Input Field"
-msgstr "La următorul câmp de introducere"
+msgstr "La câmpul de introducere următor"
 
 #. jyqXF
 #: WriterCommands.xcu
@@ -33303,7 +33426,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Previous Input Field"
-msgstr "La câmpul anterior de introducere"
+msgstr "La câmpul de introducere precedent"
 
 #. jYNdN
 #: WriterCommands.xcu
@@ -33423,7 +33546,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Jump To Specific Page"
-msgstr "Salt la anumită pagină"
+msgstr "Salt la o anumită pagină"
 
 #. 8PWBf
 #: WriterCommands.xcu
@@ -33523,7 +33646,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "~Footnote or Endnote..."
-msgstr "Note de subsol sau s~fârșit..."
+msgstr "Note de subsol sau de s~fârșit..."
 
 #. 65L8a
 #: WriterCommands.xcu
@@ -33613,7 +33736,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Object"
-msgstr "La următorul obiect"
+msgstr "La obiectul următor"
 
 #. G3GcR
 #: WriterCommands.xcu
@@ -34093,7 +34216,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Column Width"
-msgstr ""
+msgstr "Lățimea minimă a coloanei"
 
 #. TEEVY
 #: WriterCommands.xcu
@@ -34103,7 +34226,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Column Width: Adjust width of selected columns to fit content"
-msgstr ""
+msgstr "Lățimea minimă a coloanei: ajustați lățimea coloanelor selectate pentru a se potrivi conținutului"
 
 #. vGAT7
 #: WriterCommands.xcu
@@ -34133,7 +34256,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Minimal Row Height"
-msgstr ""
+msgstr "Înălțimea minimă a rândului"
 
 #. wJUJV
 #: WriterCommands.xcu
@@ -34143,7 +34266,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Minimal Row Height: Adjust height of selected rows to fit content"
-msgstr ""
+msgstr "Înălțimea minimă a rândului: ajustați înălțimea rândurilor selectate pentru a se potrivi conținutului"
 
 #. 9RUey
 #: WriterCommands.xcu
@@ -34213,7 +34336,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Row to ~Break Across Pages"
-msgstr ""
+msgstr "Rândul se întrerupe între pagini"
 
 #. 9bfa7
 #: WriterCommands.xcu
@@ -34233,7 +34356,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Select Cycle"
-msgstr ""
+msgstr "Selectează ciclul"
 
 #. GzD2B
 #: WriterCommands.xcu
@@ -34243,7 +34366,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Paragraph"
-msgstr "La următorul paragraf"
+msgstr "La paragraful următor"
 
 #. Wi6MN
 #: WriterCommands.xcu
@@ -34253,7 +34376,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "To Next Placeholder"
-msgstr "La următorul simbol de substituire"
+msgstr "La simbolul de substituire următor"
 
 #. 4nDXh
 #: WriterCommands.xcu
@@ -34343,7 +34466,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Next Index Mark"
-msgstr "Mergi la următorul marcaj de index"
+msgstr "Mergi la marcajul de index următor"
 
 #. TEFFJ
 #: WriterCommands.xcu
@@ -34353,7 +34476,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to Previous Index Mark"
-msgstr "Mergi la marcajul precedent de index"
+msgstr "Mergi la marcajul de index precedent"
 
 #. 3FES4
 #: WriterCommands.xcu
@@ -34363,7 +34486,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to next table formula"
-msgstr "Mergi la următoarea formulă din tabel"
+msgstr "Mergi la formula de tabel următoare"
 
 #. EcSGG
 #: WriterCommands.xcu
@@ -34373,7 +34496,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to previous table formula"
-msgstr "Mergi la formula anterioară din tabel"
+msgstr "Mergi la formula de tabel precedentă"
 
 #. L98F7
 #: WriterCommands.xcu
@@ -34383,7 +34506,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to next faulty table formula"
-msgstr "Mergi la următoarea formulă greșită din tabel"
+msgstr "Mergi la formula de tabel incorectă următoare"
 
 #. 27XxB
 #: WriterCommands.xcu
@@ -34393,7 +34516,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Go to previous faulty table formula"
-msgstr "Mergi la formula anterioară greșită din tabel"
+msgstr "Mergi la formula de tabel incorectă precedentă"
 
 #. KxPWA
 #: WriterCommands.xcu
@@ -34663,7 +34786,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Calculat~e"
-msgstr "Calcul~ează"
+msgstr "Calcular~e"
 
 #. AjNLg
 #: WriterCommands.xcu
@@ -34793,6 +34916,166 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Clone Formatting (double click and Ctrl or Cmd to alter behavior)"
+msgstr "Clonează formatarea (dublu clic și Ctrl sau Cmd pentru a modifica comportamentul)"
+
+#. VToen
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:Zoom-more\n"
+"Label\n"
+"value.text"
+msgid "Zoom"
+msgstr "Zoom"
+
+#. pmDD4
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:AcceptTrackedChanges-more\n"
+"Label\n"
+"value.text"
+msgid "Manage Track Changes"
+msgstr ""
+
+#. 69yiD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FontDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Character"
+msgstr ""
+
+#. tTiVu
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ParagraphDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Paragraph"
+msgstr ""
+
+#. 5F4Qn
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TableDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Table Properties"
+msgstr ""
+
+#. 2ZGwA
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TransformDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Position and Size"
+msgstr "Poziție și dimensiune"
+
+#. ArKzw
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:GraphicDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Image Properties"
+msgstr ""
+
+#. KEZCp
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FrameDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Frame Properties"
+msgstr ""
+
+#. mZb2Y
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:ObjectDialog-more\n"
+"Label\n"
+"value.text"
+msgid "OLE Object Properties"
+msgstr ""
+
+#. zVZJg
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:TextWrap-more\n"
+"Label\n"
+"value.text"
+msgid "Text Wrap"
+msgstr ""
+
+#. jZZZD
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-more\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr ""
+
+#. M4kEt
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:BorderDialog-label\n"
+"Label\n"
+"value.text"
+msgid "Borders"
+msgstr ""
+
+#. jH8wk
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-more\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr ""
+
+#. fNArh
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatArea-label\n"
+"Label\n"
+"value.text"
+msgid "Area"
+msgstr ""
+
+#. VHFdG
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-more\n"
+"Label\n"
+"value.text"
+msgid "Line"
+msgstr ""
+
+#. sCm9G
+#: WriterCommands.xcu
+msgctxt ""
+"WriterCommands.xcu\n"
+"..WriterCommands.UserInterface.Commands..uno:FormatLine-label\n"
+"Label\n"
+"value.text"
+msgid "Line"
 msgstr ""
 
 #. 7PCFf
@@ -35423,7 +35706,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Default ~Character"
-msgstr ""
+msgstr "~Caracter implicit"
 
 #. ZAcM8
 #: WriterCommands.xcu
@@ -35433,7 +35716,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "No ~Character Style"
-msgstr ""
+msgstr "Fără stil de ~caractere"
 
 #. w8bFj
 #: WriterCommands.xcu
@@ -35443,7 +35726,7 @@ msgctxt ""
 "TooltipLabel\n"
 "value.text"
 msgid "Remove applied character style"
-msgstr ""
+msgstr "Elimină stilul de caractere aplicat"
 
 #. idpKA
 #: WriterCommands.xcu
@@ -35773,7 +36056,7 @@ msgctxt ""
 "Label\n"
 "value.text"
 msgid "Default Table Style"
-msgstr ""
+msgstr "Stilul implicit de tabel"
 
 #. 4AbSB
 #: WriterCommands.xcu
@@ -36233,7 +36516,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Drawing Object Properties"
-msgstr "Proprietățile desenului"
+msgstr "Proprietățile obiectului de desen"
 
 #. oZKsf
 #: WriterFormWindowState.xcu
@@ -36723,7 +37006,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Drawing Object Properties"
-msgstr "Proprietățile desenului"
+msgstr "Proprietățile obiectului de desen"
 
 #. MavEo
 #: WriterGlobalWindowState.xcu
@@ -37233,7 +37516,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Drawing Object Properties"
-msgstr "Proprietățile desenului"
+msgstr "Proprietățile obiectului de desen"
 
 #. ifLHA
 #: WriterReportWindowState.xcu
@@ -37733,7 +38016,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Drawing Object Properties"
-msgstr "Proprietățile desenului"
+msgstr "Proprietățile obiectului de desen"
 
 #. AVubD
 #: WriterWebWindowState.xcu
@@ -38153,7 +38436,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Curves and Polygons"
-msgstr ""
+msgstr "Curbe și poligoane"
 
 #. JACSD
 #: WriterWindowState.xcu
@@ -38535,6 +38818,116 @@ msgctxt ""
 msgid "Standard (Single Mode)"
 msgstr "Standard (mod individual)"
 
+#. S4dvi
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-annotation\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Comment"
+msgstr ""
+
+#. ZLJUa
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-draw\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape"
+msgstr ""
+
+#. CfEPF
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-drawtext\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Shape Text"
+msgstr ""
+
+#. 5Jwe7
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-form\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Form Control"
+msgstr ""
+
+#. HyeGA
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-frame\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Frame"
+msgstr ""
+
+#. HJA7z
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-graphic\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Image"
+msgstr ""
+
+#. EGnPq
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-media\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Media"
+msgstr ""
+
+#. MZDAw
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-ole\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - OLE Object"
+msgstr ""
+
+#. BEJMZ
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-printpreview\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Print Preview"
+msgstr ""
+
+#. a4rcu
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-table\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Table"
+msgstr ""
+
+#. LNNfy
+#: WriterWindowState.xcu
+msgctxt ""
+"WriterWindowState.xcu\n"
+"..WriterWindowState.UIElements.States.private:resource/toolbar/singlemode-text\n"
+"UIName\n"
+"value.text"
+msgid "Standard (Single Mode) - Text"
+msgstr ""
+
 #. h6gRt
 #: WriterWindowState.xcu
 msgctxt ""
@@ -38733,7 +39126,7 @@ msgctxt ""
 "UIName\n"
 "value.text"
 msgid "Drawing Object Properties"
-msgstr "Proprietățile desenului"
+msgstr "Proprietățile obiectului de desen"
 
 #. GYYzn
 #: XFormsWindowState.xcu

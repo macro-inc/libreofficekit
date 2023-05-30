@@ -47,14 +47,6 @@ public:
 
     HRESULT BindDC(HDC hDC, tools::Rectangle const & rRect = tools::Rectangle(0, 0, 1, 1));
 
-    bool BindFont(HDC hDC) /*override*/;
-    bool ReleaseFont() /*override*/;
-
-    std::vector<tools::Rectangle>  GetGlyphInkBoxes(uint16_t const * pGid, uint16_t const * pGidEnd) const /*override*/;
-    ID2D1RenderTarget * GetRenderTarget() const { return mpRT; }
-    IDWriteFontFace   * GetFontFace() const { return mpFontFace; }
-    float               GetEmHeight() const { return mlfEmHeight; }
-
     HRESULT CreateRenderTarget(bool bRenderingModeNatural);
 
     bool Ready() const;
@@ -68,18 +60,14 @@ private:
     D2DWriteTextOutRenderer(const D2DWriteTextOutRenderer &) = delete;
     D2DWriteTextOutRenderer & operator = (const D2DWriteTextOutRenderer &) = delete;
 
-    bool GetDWriteFaceFromHDC(HDC hDC, IDWriteFontFace ** ppFontFace, float * lfSize) const;
+    IDWriteFontFace* GetDWriteFace(const WinFontInstance& rWinFont, float * lfSize) const;
     bool performRender(GenericSalLayout const &rLayout, SalGraphics &rGraphics, HDC hDC, bool& bRetry, bool bRenderingModeNatural);
 
     ID2D1Factory        * mpD2DFactory;
     IDWriteFactory      * mpDWriteFactory;
-    IDWriteGdiInterop   * mpGdiInterop;
     ID2D1DCRenderTarget * mpRT;
     const D2D1_RENDER_TARGET_PROPERTIES mRTProps;
 
-    IDWriteFontFace * mpFontFace;
-    float             mlfEmHeight;
-    HDC               mhDC;
     bool mbRenderingModeNatural;
     D2DTextAntiAliasMode meTextAntiAliasMode;
 };
