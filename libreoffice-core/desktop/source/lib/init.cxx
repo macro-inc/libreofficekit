@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
 #include "sfx2/lokhelper.hxx"
 #include <config_buildconfig.h>
@@ -1231,6 +1232,7 @@ static void doc_setGraphicSelection (LibreOfficeKitDocument* pThis,
 static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput);
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -1464,6 +1466,7 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->resetSelection = doc_resetSelection;
         m_pDocumentClass->getCommandValues = doc_getCommandValues;
         m_pDocumentClass->gotoOutline = doc_gotoOutline;
+        m_pDocumentClass->saveToMemory = doc_saveToMemory;
         m_pDocumentClass->setClientZoom = doc_setClientZoom;
         m_pDocumentClass->setClientVisibleArea = doc_setClientVisibleArea;
         m_pDocumentClass->setOutlineState = doc_setOutlineState;
@@ -2578,6 +2581,8 @@ static void lo_dumpState(LibreOfficeKit* pThis, const char* pOptions, char** pSt
 
 static void* lo_getXComponentContext(LibreOfficeKit* pThis);
 
+static void* lo_loadFromMemory(LibreOfficeKit* pThis, char *data, size_t size);
+
 LibLibreOffice_Impl::LibLibreOffice_Impl()
     : m_pOfficeClass( gOfficeClass.lock() )
     , maThread(nullptr)
@@ -2608,6 +2613,7 @@ LibLibreOffice_Impl::LibLibreOffice_Impl()
         m_pOfficeClass->extractRequest = lo_extractRequest;
         m_pOfficeClass->trimMemory = lo_trimMemory;
         m_pOfficeClass->getXComponentContext = lo_getXComponentContext;
+        m_pOfficeClass->loadFromMemory = lo_loadFromMemory;
         unov8_init(m_pOfficeClass->uno_v8);
 
         gOfficeClass = m_pOfficeClass;
@@ -4684,6 +4690,40 @@ static void lo_setOption(LibreOfficeKit* /*pThis*/, const char *pOption, const c
     }
 }
 
+static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t size)
+{
+    if (!xContext.is())
+    {
+        SAL_WARN("lok", "ComponentContext is not available");
+        return nullptr;
+    }
+
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+
+    if (!xComponentLoader.is())
+    {
+        SAL_WARN("lok", "ComponentLoader is not available");
+        return nullptr;
+    }
+
+    auto aData = Sequence<sal_Int8>(reinterpret_cast<const sal_Int8*>(data), size);
+
+    uno::Reference<io::XInputStream> aInputStream(new comphelper::SequenceInputStream(aData));
+
+    utl::MediaDescriptor aMediaDescriptor;
+    aMediaDescriptor["FilterName"] <<= OUString("writer8"); // just hardcode this for now
+    aMediaDescriptor["InputStream"] <<= aInputStream;
+
+    uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL("private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
+
+    if (!xComponent.is()) {
+        SAL_WARN("lok", "Could not load in memory doc");
+        return nullptr;
+    }
+
+    return xComponent.get();
+}
+
 static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, char** pState)
 {
     if (!pState)
@@ -6263,6 +6303,62 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
     pDoc->gotoOutline(aJsonWriter, idx);
 
     return aJsonWriter.extractData();
+}
+
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
+{
+    comphelper::ProfileZone aZone("doc_saveToMemory");
+    OUString filterName("writer8");
+
+    SolarMutexGuard aGuard;
+    SetLastExceptionMsg();
+    try
+    {
+        LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+
+        if(!pDocument)
+        {
+            SetLastExceptionMsg("Unable to static_cast LibreOfficeKitDocument* to LibLODocument_Impl*");
+            return -1;
+        }
+
+        uno::Reference<frame::XStorable> xStorable(pDocument->mxComponent, uno::UNO_QUERY_THROW);
+
+        SvMemoryStream aOutStream;
+        uno::Reference<io::XOutputStream> xOut = new utl::OOutputStreamWrapper(aOutStream);
+
+        utl::MediaDescriptor aMediaDescriptor;
+        switch (doc_getDocumentType(pThis))
+        {
+            case LOK_DOCTYPE_TEXT:
+                aMediaDescriptor["FilterName"] <<= filterName;
+                break;
+            default:
+                SAL_WARN("lok", "Failed to save to in-memory stream: Document type is not supported");
+        }
+        aMediaDescriptor["OutputStream"] <<= xOut;
+
+        xStorable->storeToURL("private:stream", aMediaDescriptor.getAsConstPropertyValueList());
+
+        if (pOutput)
+        {
+            const size_t nOutputSize = aOutStream.GetEndOfData();
+
+            *pOutput = static_cast<char*>(malloc(nOutputSize));
+            if (*pOutput)
+            {
+                std::memcpy(*pOutput, aOutStream.GetData(), nOutputSize);
+                return nOutputSize;
+            }
+        }
+    }
+    catch (const uno::Exception& exception)
+    {
+        css::uno::Any exAny( cppu::getCaughtException() );
+        SetLastExceptionMsg(exception.Message);
+        SAL_WARN("lok", "Failed to to in-memory stream: " + exceptionToString(exAny));
+    }
+    return 0;
 }
 
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis, int nTilePixelWidth, int nTilePixelHeight,

@@ -497,6 +497,16 @@ public:
     }
 
     /**
+     * Saves the document to a memory buffer
+     * @param pOutput the data of the file
+     * @return size_t the size of the data
+    */
+    size_t saveToMemory(char** pOutput)
+    {
+        return mpDoc->pClass->saveToMemory(mpDoc,pOutput);
+    }
+
+    /**
      * Save the client's view so that we can compute the right zoom level
      * for the mouse events. This only affects CALC.
      * @param nTilePixelWidth - tile width in pixels
@@ -1136,6 +1146,17 @@ public:
     void setOption(const char* pOption, const char* pValue)
     {
         mpThis->pClass->setOption(mpThis, pOption, pValue);
+    }
+
+    /**
+     * Loads a document from an array buffer
+     * @param data the array buffer of the files contents
+     * @param size the size of the array buffer
+     * @return XTextDocument
+    */
+    void* loadFromMemory(char *data, size_t size)
+    {
+        return mpThis->pClass->loadFromMemory(mpThis, data, size);
     }
 
     /**

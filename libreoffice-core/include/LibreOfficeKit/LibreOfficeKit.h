@@ -126,6 +126,9 @@ struct _LibreOfficeKitClass
 
     void* (*getXComponentContext) (LibreOfficeKit* pThis);
 
+    /// @see lok::Office::loadFromMemory().
+    void* (*loadFromMemory) (LibreOfficeKit* pThis, char *data, size_t size);
+  
     /** @see lok::Office::extractRequest.
      */
     char* (*extractRequest) (LibreOfficeKit* pThis,
@@ -262,6 +265,9 @@ struct _LibreOfficeKitDocumentClass
 
     /// @see lok::Document::gotoOutline().
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
+
+    /// @see lok::Document::saveToMemory().
+    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput);
 
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
