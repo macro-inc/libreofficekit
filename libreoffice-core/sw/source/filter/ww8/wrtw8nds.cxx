@@ -1435,7 +1435,7 @@ int SwWW8AttrIter::OutAttrWithRange(const SwTextNode& rNode, sal_Int32 nPos)
                     pEnd = pHt->End();
                     if (nPos == *pEnd && nPos == pHt->GetStart())
                     {   // special case: empty must be handled here
-                        if (m_rExport.AttrOutput().EndURL(nPos == m_rNode.Len()))
+                        if (m_rExport.AttrOutput().EndURL(nPos == m_rNode.Len())) {
                             --nRet;
                         }
                     }

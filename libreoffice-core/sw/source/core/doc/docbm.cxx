@@ -684,7 +684,7 @@ namespace sw::mark
         pMark->InitDoc(m_rDoc, eMode, pSepPos);
 
         if (eType == IDocumentMarkAccess::MarkType::UNO_BOOKMARK){
-            if ( const SwpHints* pTextAttrs = rPaM.GetNode().GetTextNode()->GetpSwpHints() ) {
+            if ( const SwpHints* pTextAttrs = rPaM.GetPointNode().GetTextNode()->GetpSwpHints() ) {
                 for (size_t i = 0; i < pTextAttrs->Count(); ++i) {
                     const SwTextAttr* pHt = pTextAttrs->GetSortedByEnd(i);
                     const SfxPoolItem* pItem = &pHt->GetAttr();
