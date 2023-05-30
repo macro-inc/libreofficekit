@@ -5954,7 +5954,6 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
         uno::Reference<io::XOutputStream> xOut = new utl::OOutputStreamWrapper(aOutStream);
 
         utl::MediaDescriptor aMediaDescriptor;
-        SAL_WARN("doc_saveToMemory", doc_getDocumentType(pThis));
         switch (doc_getDocumentType(pThis))
         {
             case LOK_DOCTYPE_TEXT:
