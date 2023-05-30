@@ -9,12 +9,8 @@
 
 $(eval $(call gb_Package_Package,readlicense_oo_license,$(call gb_CustomTarget_get_workdir,readlicense_oo/license)))
 
-ifeq ($(OS),WNT)
-$(eval $(call gb_Package_add_file,readlicense_oo_license,license.txt,license.txt))
-else
 $(eval $(call gb_Package_add_file,readlicense_oo_license,LICENSE,LICENSE))
-endif
 
-$(eval $(call gb_Package_add_file,readlicense_oo_license,LICENSE.html,LICENSE.html))
+#$(eval $(call gb_Package_add_file,readlicense_oo_license,LICENSE.html,LICENSE.html))
 
 # vim: set noet sw=4 ts=4:

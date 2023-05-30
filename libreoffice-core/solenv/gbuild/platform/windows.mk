@@ -10,7 +10,7 @@
 # to block heavy exception handling that try to acquire the solarmutex
 export LO_LEAN_EXCEPTION=1
 
-gb_LICENSE := license.txt
+gb_LICENSE := LICENSE
 gb_README = readme_$(1).txt
 
 gb_Helper_get_rcfile = $(1).ini
