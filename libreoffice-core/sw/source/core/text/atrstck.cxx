@@ -52,6 +52,7 @@
 #include <txtinet.hxx>
 #include <IDocumentSettingAccess.hxx>
 #include <viewsh.hxx>
+#include "macro_internal.hxx"
 
 /**
  * Attribute to Stack Mapping
@@ -207,21 +208,27 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
     if (rAttr.Which() == RES_TXTATR_INETFMT) {
         const SwFormatINetFormat& rINetFormat = static_cast<const SwFormatINetFormat&>(rAttr.GetAttr());
         OUString aDestinationURL = rINetFormat.GetValue();
-        OUString termUrl = "term://";
-        OUString termRefUrl = "termref://";
-        OUString sectionUrl = "section://";
-        OUString sectionRefUrl = "sectionref://";
-        if(aDestinationURL.startsWith(termUrl)){
-            *pColor = COL_PIP_TERM;
+
+        if(aDestinationURL.startsWith(macro_internal::TERM_URL)){
+            if(pColor)
+            {
+                *pColor = COL_PIP_TERM;
+            }
             return true;
-        } else if (aDestinationURL.startsWith(termRefUrl)) {
-            *pColor = COL_PIP_TERM_REF;
+        } else if (aDestinationURL.startsWith(macro_internal::TERM_REF_URL)) {
+            if(pColor)
+            {
+                *pColor = COL_PIP_TERM_REF;
+            }
             return true;
-        } else if(aDestinationURL.startsWith(sectionUrl)){
+        } else if(aDestinationURL.startsWith(macro_internal::SECTION_URL)){
             // Sections are by default not highlighted a particular color
             return false;
-        } else if (aDestinationURL.startsWith(sectionRefUrl)) {
-            *pColor = COL_PIP_SECTION_REF;
+        } else if (aDestinationURL.startsWith(macro_internal::SECTION_URL)) {
+            if(pColor)
+            {
+                *pColor = COL_PIP_SECTION_REF;
+            }
             return true;
         }
     }

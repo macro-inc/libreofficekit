@@ -78,6 +78,7 @@ $(eval $(call gb_Library_use_externals,msword,\
 $(eval $(call gb_Library_add_exception_objects,msword,\
     sw/source/filter/docx/swdocxreader \
     sw/source/filter/rtf/swparrtf \
+    sw/source/core/text/macro_internal \
     sw/source/filter/ww8/docxattributeoutput \
     sw/source/filter/ww8/docxexport \
     sw/source/filter/ww8/docxexportfilter \

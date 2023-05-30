@@ -158,6 +158,7 @@
 
 #include <toolkit/helper/vclunohelper.hxx>
 #include <unicode/regex.h>
+#include <../../core/text/macro_internal.hxx>
 
 using ::editeng::SvxBorderLine;
 
@@ -7984,6 +7985,11 @@ void DocxAttributeOutput::CharHighlight( const SvxBrushItem& rHighlight )
 
 void DocxAttributeOutput::TextINetFormat( const SwFormatINetFormat& rLink )
 {
+    // Ignore styling if the hyperlink is one of ours
+    if(macro_internal::isTemporaryURL(rLink.GetValue())){
+        return;
+    }
+
     const SwCharFormat* pFormat = m_rExport.m_rDoc.FindCharFormatByName(rLink.GetINetFormat());
     if (pFormat)
     {
