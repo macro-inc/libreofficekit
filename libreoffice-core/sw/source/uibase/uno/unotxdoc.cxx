@@ -3745,10 +3745,6 @@ void SwXTextDocument::initializeForTiledRendering(const css::uno::Sequence<css::
 
     aViewOption.SetPostIts(comphelper::LibreOfficeKit::isTiledAnnotations());
 
-    // disable doc and table boundaries by default
-    aViewOption.SetAppearanceFlag(ViewOptFlags::DocBoundaries, false, false);
-    aViewOption.SetAppearanceFlag(ViewOptFlags::TableBoundaries, false, false);
-
     pViewShell->ApplyViewOptions(aViewOption);
 
     // position the pages again after setting view options. Eg: if postit
