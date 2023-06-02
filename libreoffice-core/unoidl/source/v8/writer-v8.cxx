@@ -174,7 +174,7 @@ void V8Writer::writeDeclarations() {
     }
 
     out("namespace unoclass {\n");
-    out("void MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err);\n");
+    out("bool MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err);\n");
 
     for (auto& i : interfaces) {
         writeInterfaceDeclaration(i.first, i.second);
@@ -208,12 +208,12 @@ void V8Writer::writeSimpleTypeConverter() {
     out(R"(
 namespace unoclass {
 
-void MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err) {
-if (err == nullptr) return;
+bool MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err) {
+if (err == nullptr) return false;
 auto v8_err = v8::String::NewFromTwoByte(isolate, (uint16_t*)(err->buffer), v8::NewStringType::kNormal, err->length).ToLocalChecked();
 electron::office::OfficeClient::GetUnoV8().rtl.uString_release(err);
 isolate->ThrowException(v8::Exception::Error(v8_err));
-// isolate->TerminateExecution();
+return true;
 }
 
 class Type : public gin::Wrappable<Type> {
@@ -1454,7 +1454,11 @@ void V8Writer::writeInterfaceMethods(OUString const& name, OUString const& class
 
         writeMethodParamsDestructors(i);
 
-        out("MaybeThrowErr(isolate, err);\n");
+        if (i.returnType == "void") {
+            out("if (MaybeThrowErr(isolate, err)) return;\n");
+        } else {
+            out("if (MaybeThrowErr(isolate, err)) return {};\n");
+        }
         if (i.returnType != "void") {
             writeMethodReturn(resolveTypedef(i.returnType));
         }
@@ -1474,11 +1478,13 @@ void V8Writer::writeInterface(OUString const& name,
                               rtl::Reference<unoidl::InterfaceTypeEntity> entity) {
     out("gin::Handle<" + cName(name) + "> " + cName(name)
         + "::Create(v8::Isolate* isolate, void *inst) {\n");
-    out("auto *t = new " + cName(name) + "();\n");
+    out("if (!inst) return {};\n");
     out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
     out("auto *type_ref = unov8_.type.interfaceTypeFromId(convert::hash(\""
         + simplifyNamespace(name) + "\"));\n");
     out("void *new_inst = unov8_.interface.queryInterface(inst, type_ref);\n");
+    out("if (!new_inst) return {};\n");
+    out("auto *t = new " + cName(name) + "();\n");
     out("t->inst_ = new_inst;\n");
     out("unov8_.interface.acquire(new_inst);\n");
     out("return CreateHandle(isolate, t);\n");
