@@ -6307,6 +6307,11 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
 
 static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
 {
+    if (!pOutput)
+    {
+        SAL_WARN("lok", "pOutput is not set");
+        return -1;
+    }
     comphelper::ProfileZone aZone("doc_saveToMemory");
     OUString filterName("writer8");
 
@@ -6316,9 +6321,9 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
     {
         LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
-        if(!pDocument)
+        if (!pDocument->mxComponent.is())
         {
-            SetLastExceptionMsg("Unable to static_cast LibreOfficeKitDocument* to LibLODocument_Impl*");
+            SAL_WARN("lok", "Document destroyed before saving to memory");
             return -1;
         }
 
@@ -6335,28 +6340,30 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
                 break;
             default:
                 SAL_WARN("lok", "Failed to save to in-memory stream: Document type is not supported");
+                return -1;
         }
         aMediaDescriptor["OutputStream"] <<= xOut;
 
         xStorable->storeToURL("private:stream", aMediaDescriptor.getAsConstPropertyValueList());
 
-        if (pOutput)
-        {
-            const size_t nOutputSize = aOutStream.GetEndOfData();
+        const size_t nOutputSize = aOutStream.GetEndOfData();
 
-            *pOutput = static_cast<char*>(malloc(nOutputSize));
-            if (*pOutput)
-            {
-                std::memcpy(*pOutput, aOutStream.GetData(), nOutputSize);
-                return nOutputSize;
-            }
+        *pOutput = static_cast<char*>(malloc(nOutputSize));
+
+        if (!*pOutput)
+        {
+            SAL_WARN("lok", "Unable to allocate memory");
+            return -1;
         }
+
+        std::memcpy(*pOutput, aOutStream.GetData(), nOutputSize);
+        return nOutputSize;
     }
     catch (const uno::Exception& exception)
     {
         css::uno::Any exAny( cppu::getCaughtException() );
         SetLastExceptionMsg(exception.Message);
-        SAL_WARN("lok", "Failed to to in-memory stream: " + exceptionToString(exAny));
+        SAL_WARN("lok", "Failed to save to in-memory stream: " + exceptionToString(exAny));
     }
     return 0;
 }
