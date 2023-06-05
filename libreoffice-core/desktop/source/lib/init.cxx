@@ -4713,8 +4713,13 @@ static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t siz
     utl::MediaDescriptor aMediaDescriptor;
     aMediaDescriptor["FilterName"] <<= OUString("writer8"); // just hardcode this for now
     aMediaDescriptor["InputStream"] <<= aInputStream;
+    aMediaDescriptor["MacroExecutionMode"] <<= document::MacroExecMode::NEVER_EXECUTE;
+    aMediaDescriptor["Silent"] <<= true;
+    aMediaDescriptor["Hidden"] <<= true;
 
-    uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL("private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
+    Application::SetDialogCancelMode(DialogCancelMode::LOKSilent);
+    uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL(
+        "private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
 
     if (!xComponent.is()) {
         SAL_WARN("lok", "Could not load in memory doc");
