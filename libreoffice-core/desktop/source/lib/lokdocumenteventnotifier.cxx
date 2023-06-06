@@ -1,90 +1,48 @@
 #include "lokdocumenteventnotifier.hxx"
-#include <com/sun/star/document/XDocumentEventBroadcaster.hpp>
 #include <com/sun/star/document/XDocumentEventListener.hpp>
 #include "LibreOfficeKit/LibreOfficeKitEnums.h"
 #include "sal/log.hxx"
+#include "vcl/svapp.hxx"
 
-#include <com/sun/star/frame/XModel3.hpp>
-#include <osl/mutex.hxx>
+namespace doceventnotifier
+{
 
-doceventnotifier::LokDocumentEventNotifier::LokDocumentEventNotifier(
-    const css::uno::Reference<css::lang::XComponent>& rxContext,
-    const css::uno::Reference<css::uno::XInterface>& xOwner,
+LokDocumentEventNotifier::LokDocumentEventNotifier(
+    const css::uno::Reference<css::document::XDocumentEventBroadcaster>& xOwner,
     const LibreOfficeKitCallback& pCallback, void* pData)
-    : ::cppu::BaseMutex()
-    , m_xContext(rxContext)
+    : cppu::BaseMutex()
+    , m_xOwner(xOwner)
     , m_pCallback(pCallback)
     , m_pData(pData)
+    , m_bDisposed(false)
 {
-    // SYNCHRONIZED ->
-    {
-        osl::MutexGuard aLock(m_aMutex);
-        m_xOwner = xOwner;
-    }
-    // <- SYNCHRONIZED
+    xOwner->addDocumentEventListener(static_cast<css::document::XDocumentEventListener*>(this));
+}
 
-    css::uno::Reference<css::frame::XModel> xModel(xOwner, css::uno::UNO_QUERY);
-    if (xModel.is())
-    {
-        SAL_WARN("lokdocumenteventnotifier", "impl_startListeningForModel");
-        impl_startListeningForModel(xModel);
+LokDocumentEventNotifier::~LokDocumentEventNotifier()
+{
+}
+
+void LokDocumentEventNotifier::disable() {
+    if (m_bDisposed)
         return;
-    }
+    m_bDisposed = true;
 }
 
-void doceventnotifier::LokDocumentEventNotifier::setCallbacks(
-    const LibreOfficeKitCallback& pCallback, void* pData)
+void SAL_CALL LokDocumentEventNotifier::disposing(const css::lang::EventObject& aEvent)
 {
-    this->m_pCallback = pCallback;
-    this->m_pData = pData;
-}
+    if (m_bDisposed)
+        return;
+    SAL_WARN("lokdocumenteventnotifier", "Disposing");
+    m_bDisposed = true;
 
-doceventnotifier::LokDocumentEventNotifier::~LokDocumentEventNotifier(){}
+    if (m_xOwner.is() && aEvent.Source == m_xOwner) m_xOwner.clear();
+}
 
 void SAL_CALL
-doceventnotifier::LokDocumentEventNotifier::disposing(const css::lang::EventObject& aEvent)
+LokDocumentEventNotifier::documentEventOccured(const css::document::DocumentEvent& aEvent)
 {
-    css::uno::Reference<css::uno::XInterface> xOwner;
-
-    // SYNCHRONIZED ->
-    {
-        osl::MutexGuard aLock(m_aMutex);
-
-        xOwner = m_xOwner;
-    }
-
-    if (!xOwner.is())
-        return;
-
-    if (xOwner != aEvent.Source)
-        return;
-
-    {
-        osl::MutexGuard aLock(m_aMutex);
-
-        m_xOwner.clear();
-        m_pCallback = nullptr;
-        m_pData = nullptr;
-    }
-}
-
-void doceventnotifier::LokDocumentEventNotifier::impl_startListeningForModel(
-    const css::uno::Reference<css::frame::XModel>& xModel)
-{
-    css::uno::Reference<css::document::XDocumentEventBroadcaster> xBroadcaster(xModel,
-                                                                               css::uno::UNO_QUERY);
-
-    if (!xBroadcaster.is())
-        return;
-
-    xBroadcaster->addDocumentEventListener(
-        static_cast<css::document::XDocumentEventListener*>(this));
-}
-
-void SAL_CALL doceventnotifier::LokDocumentEventNotifier::documentEventOccured(
-    const css::document::DocumentEvent& aEvent)
-{
-    if (m_pCallback == nullptr || m_pData == nullptr)
+    if (m_bDisposed || m_pCallback == nullptr || m_pData == nullptr)
         return;
 
     if (!aEvent.EventName.equalsIgnoreAsciiCase("OnNew")
@@ -103,16 +61,7 @@ void SAL_CALL doceventnotifier::LokDocumentEventNotifier::documentEventOccured(
         return;
     }
 
-    css::uno::Reference<css::frame::XModel> xOwner;
-    // SYNCHRONIZED ->
-    {
-        osl::MutexGuard aLock(m_aMutex);
-
-        xOwner.set(m_xOwner.get(), css::uno::UNO_QUERY);
-    }
-    // <- SYNCHRONIZED
-
-    if (aEvent.Source != xOwner && !xOwner.is())
+    if (!m_xOwner.is() || aEvent.Source != m_xOwner)
     {
         SAL_WARN("lokdocumenteventnotifier", "Owner does not match event source");
         return;
@@ -150,4 +99,6 @@ void SAL_CALL doceventnotifier::LokDocumentEventNotifier::documentEventOccured(
     {
         m_pCallback(LOK_DOC_CALLBACK_ON_MODE_CHANGED, nullptr, m_pData);
     }
+}
+
 }

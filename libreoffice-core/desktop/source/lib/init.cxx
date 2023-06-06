@@ -1419,7 +1419,6 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
     m_pDocumentClass = gDocumentClass.lock();
 
     // Setting LokDocumentEventNotifier for a given document
-    uno::Reference<css::lang::XComponent> mxOwner(mxComponent, uno::UNO_QUERY);
     m_lokDocEventNotifier = nullptr;
 
     if (!m_pDocumentClass)
@@ -4240,9 +4239,10 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
 
     if (pCallback != nullptr)
     {
-        uno::Reference<css::lang::XComponent> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
+        uno::Reference<css::document::XDocumentEventBroadcaster> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
 
-        pDocument->m_lokDocEventNotifier = std::make_unique<doceventnotifier::LokDocumentEventNotifier>(pDocument->mxComponent, mxOwner, pCallback, pData);
+        if (mxOwner.is())
+            pDocument->m_lokDocEventNotifier = new doceventnotifier::LokDocumentEventNotifier(std::move(mxOwner), pCallback, pData);
 
         for (const auto& pair : pDocument->mpCallbackFlushHandlers)
         {
@@ -4278,7 +4278,8 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     else
     {
         if (pDocument->m_lokDocEventNotifier) {
-            pDocument->m_lokDocEventNotifier.reset(nullptr);
+            pDocument->m_lokDocEventNotifier->disable();
+            pDocument->m_lokDocEventNotifier = nullptr;
         }
         if (SfxViewShell* pViewShell = SfxViewShell::Current())
         {

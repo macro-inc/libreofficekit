@@ -9,54 +9,38 @@
 
 #include <com/sun/star/uno/Reference.hxx>
 #include <com/sun/star/document/XDocumentEventListener.hpp>
+#include <com/sun/star/document/XDocumentEventBroadcaster.hpp>
 #include <cppuhelper/basemutex.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <cppuhelper/implbase.hxx>
 
-using namespace css;
-using namespace css::uno;
-using namespace css::frame;
-
-namespace com { namespace sun { namespace star { namespace frame { class XController; } } } }
-namespace com { namespace sun { namespace star { namespace uno { class XComponentContext; } } } }
-namespace com { namespace sun { namespace star { namespace uno { class XComponentContext; } } } }
-namespace com { namespace sun { namespace star { namespace frame { class XModel3; } } } }
-namespace com { namespace sun { namespace star { namespace uno { class XInterface; } } } }
-
 namespace doceventnotifier
 {
 class LokDocumentEventNotifier final
-    : private ::cppu::BaseMutex,
-      public ::cppu::WeakImplHelper<css::document::XDocumentEventListener>
+    : private cppu::BaseMutex,
+      public cppu::WeakImplHelper<css::document::XDocumentEventListener>
 {
 public:
-    LokDocumentEventNotifier(const css::uno::Reference<css::lang::XComponent>& rxContext,
-                             const css::uno::Reference<css::uno::XInterface>& xOwner,
+    LokDocumentEventNotifier(const css::uno::Reference<css::document::XDocumentEventBroadcaster>& xOwner,
                              const LibreOfficeKitCallback& pCallback, void* pData);
 
-    void setCallbacks(const LibreOfficeKitCallback& pCallback, void* pData);
-
     virtual ~LokDocumentEventNotifier() override;
+
+    void disable();
+
     /** @see css.document.XDocumentEventListener */
     virtual void SAL_CALL documentEventOccured(const css::document::DocumentEvent& aEvent) override;
 
     /** @see css.lang.XEventListener */
     virtual void SAL_CALL disposing(const css::lang::EventObject& aEvent) override;
 
-    // internal
 private:
-    void impl_startListeningForModel(const css::uno::Reference<css::frame::XModel>& xModel);
-
-    // member
-private:
-    /** points to the global uno service manager. */
-    css::uno::Reference<css::lang::XComponent> m_xContext;
-
     /** reference to the outside UNO class using this helper. */
-    css::uno::WeakReference<css::uno::XInterface> m_xOwner;
+    css::uno::Reference<css::document::XDocumentEventBroadcaster> m_xOwner;
 
     LibreOfficeKitCallback m_pCallback;
     void* m_pData;
+    bool m_bDisposed;
 
 }; // LokDocumentEventNotifier
 
