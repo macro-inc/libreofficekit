@@ -93,7 +93,7 @@ Before running any build commands, you may have to adjust your path to prefer th
 ./autogen.sh --with-distro=LOKit-Mac
 ```
 
-- Run `make build-nocheck`
+- Run `make build`
 
 The result will be in `instdir`
 
