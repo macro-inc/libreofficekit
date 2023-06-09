@@ -4712,22 +4712,32 @@ static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t siz
     uno::Reference<io::XInputStream> aInputStream(new comphelper::SequenceInputStream(aData));
 
     utl::MediaDescriptor aMediaDescriptor;
-    aMediaDescriptor["FilterName"] <<= OUString("writer8"); // just hardcode this for now
+    aMediaDescriptor["FilterName"] <<= OUString("MS Word 2007 XML"); // just hardcode this for now
     aMediaDescriptor["InputStream"] <<= aInputStream;
     aMediaDescriptor["MacroExecutionMode"] <<= document::MacroExecMode::NEVER_EXECUTE;
     aMediaDescriptor["Silent"] <<= true;
     aMediaDescriptor["Hidden"] <<= true;
 
-    Application::SetDialogCancelMode(DialogCancelMode::LOKSilent);
-    uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL(
-        "private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
+    {
+        SolarMutexGuard aGuard;
+        int nOrigViewId = SfxLokHelper::getView();
+        Application::SetDialogCancelMode(DialogCancelMode::LOKSilent);
+        static int nDocumentIdCounter = -1;
+        const int nThisDocumentId = nDocumentIdCounter--;
+        SfxViewShell::SetCurrentDocId(ViewShellDocId(nThisDocumentId));
+        uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL(
+            "private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
+        int nViewId = SfxLokHelper::getView();
+        if (nOrigViewId != nViewId)
+        SAL_WARN("lok", "view id dont match" << nOrigViewId << " view id " << nViewId);
 
-    if (!xComponent.is()) {
-        SAL_WARN("lok", "Could not load in memory doc");
-        return nullptr;
+        if (!xComponent.is()) {
+            SAL_WARN("lok", "Could not load in memory doc");
+            return nullptr;
+        }
+
+        return xComponent.get();
     }
-
-    return xComponent.get();
 }
 
 static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, char** pState)
@@ -6319,7 +6329,7 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
         return -1;
     }
     comphelper::ProfileZone aZone("doc_saveToMemory");
-    OUString filterName("writer8");
+    OUString filterName("MS Word 2007 XML");
 
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
