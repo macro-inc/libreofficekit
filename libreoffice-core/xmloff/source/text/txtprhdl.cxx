@@ -56,7 +56,7 @@
 #include <XMLFillBitmapSizePropertyHandler.hxx>
 #include <XMLBitmapLogicalSizePropertyHandler.hxx>
 #include <XMLBitmapRepeatOffsetPropertyHandler.hxx>
-#include <XMLThemeColorHandler.hxx>
+#include <XMLComplexColorHandler.hxx>
 #include <vcl/graph.hxx>
 
 using namespace ::com::sun::star;
@@ -1413,8 +1413,8 @@ static const XMLPropertyHandler *GetPropertyHandler
     case XML_TYPE_GRAPHIC:
         pHdl = new XMLGraphicPropertyHandler;
         break;
-    case XML_TYPE_THEME_COLOR:
-        pHdl = new XMLThemeColorHandler;
+    case XML_TYPE_COMPLEX_COLOR:
+        pHdl = new XMLComplexColorHandler;
         break;
     default:
     {

@@ -27,7 +27,7 @@
 #include <xmloff/XMLEventsImportContext.hxx>
 #include <XMLShapePropertySetContext.hxx>
 #include <XMLTextColumnsContext.hxx>
-#include <XMLThemeColorContext.hxx>
+#include <XMLComplexColorContext.hxx>
 #include <XMLBackgroundImageContext.hxx>
 #include <xmloff/txtprmap.hxx>
 #include <xmloff/xmltypes.hxx>
@@ -90,8 +90,8 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLTextShapePropertySe
                                                    rProperties );
         break;
 
-    case CTF_THEME_COLOR:
-        return new XMLThemeColorContext(GetImport(), nElement, xAttrList, rProp, rProperties);
+    case CTF_COMPLEX_COLOR:
+        return new XMLComplexColorContext(GetImport(), nElement, xAttrList, rProp, rProperties);
 
     case CTF_BACKGROUND_URL:
         DBG_ASSERT( rProp.mnIndex >= 3 &&

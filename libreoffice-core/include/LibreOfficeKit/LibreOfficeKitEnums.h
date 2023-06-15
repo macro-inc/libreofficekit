@@ -967,7 +967,18 @@ typedef enum
     LOK_DOC_CALLBACK_ON_UNLOAD= 67 << 2,
     LOK_DOC_CALLBACK_ON_TITLE_CHANGED= 68 << 2,
     LOK_DOC_CALLBACK_ON_MODE_CHANGED= 69 << 2,
+
     /** End Document Events Section **/
+    /**
+     * Informs the LibreOfficeKit client that the color palettes have changed.
+    */
+    LOK_CALLBACK_COLOR_PALETTES = 65,
+
+    /**
+     * Informs that the document password has been succesfully changed.
+     * The payload contains the the new password and the type.
+    */
+    LOK_CALLBACK_DOCUMENT_PASSWORD_RESET = 66
 }
 LibreOfficeKitCallbackType;
 
@@ -1146,6 +1157,10 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_DOC_CALLBACK_ON_MODE_CHANGED";
     default:
         return "LOK_CALLBACK_UNKNOWN";
+    case LOK_CALLBACK_COLOR_PALETTES:
+        return "LOK_CALLBACK_COLOR_PALETTES";
+    case LOK_CALLBACK_DOCUMENT_PASSWORD_RESET:
+        return "LOK_CALLBACK_DOCUMENT_PASSWORD_RESET";
     }
 
     return nullptr;

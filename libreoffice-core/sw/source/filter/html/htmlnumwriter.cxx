@@ -53,7 +53,7 @@ void SwHTMLWriter::FillNextNumInfo()
             // numbering level during import.
             if( bTable &&
                 m_pNextNumRuleInfo->GetNumRule()==GetNumInfo().GetNumRule() &&
-                !m_pNextNumRuleInfo->IsRestart() )
+                !m_pNextNumRuleInfo->IsRestart(GetNumInfo()) )
             {
                 m_pNextNumRuleInfo->SetDepth( GetNumInfo().GetDepth() );
             }
@@ -84,52 +84,14 @@ void SwHTMLWriter::SetNextNumInfo( std::unique_ptr<SwHTMLNumRuleInfo> pNxt )
 }
 
 Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
-                                 const SwHTMLNumRuleInfo& rInfo,
-                                 bool& rAtLeastOneNumbered )
+                                 const SwHTMLNumRuleInfo& rInfo )
 {
     SwHTMLNumRuleInfo& rPrevInfo = rWrt.GetNumInfo();
     bool bSameRule = rPrevInfo.GetNumRule() == rInfo.GetNumRule();
     if( bSameRule && rPrevInfo.GetDepth() >= rInfo.GetDepth() &&
-        !rInfo.IsRestart() )
+        !rInfo.IsRestart(rPrevInfo) )
     {
         return rWrt;
-    }
-
-    if (rWrt.mbXHTML && !rInfo.IsNumbered())
-    {
-        // If the list only consists of non-numbered text nodes, then don't start the list.
-        bool bAtLeastOneNumbered = false;
-        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() + 1;
-        SwNumRule* pNumRule = nullptr;
-        while (true)
-        {
-            const SwNode* pNode = rWrt.m_pDoc->GetNodes()[nPos];
-            if (!pNode->IsTextNode())
-            {
-                break;
-            }
-
-            const SwTextNode* pTextNode = pNode->GetTextNode();
-            if (!pTextNode->GetNumRule() || (pNumRule && pTextNode->GetNumRule() != pNumRule))
-            {
-                // Node is not in the same numbering as the previous one.
-                break;
-            }
-
-            pNumRule = pTextNode->GetNumRule();
-            if (pTextNode->IsNumbered())
-            {
-                bAtLeastOneNumbered = true;
-                break;
-            }
-            ++nPos;
-        }
-
-        rAtLeastOneNumbered = bAtLeastOneNumbered;
-        if (!bAtLeastOneNumbered)
-        {
-            return rWrt;
-        }
     }
 
     bool bStartValue = false;
@@ -205,7 +167,7 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
     OSL_ENSURE( rWrt.m_nLastParaToken == HtmlTokenId::NONE,
                 "<PRE> was not closed before <OL>." );
     sal_uInt16 nPrevDepth =
-        (bSameRule && !rInfo.IsRestart()) ? rPrevInfo.GetDepth() : 0;
+        (bSameRule && !rInfo.IsRestart(rPrevInfo)) ? rPrevInfo.GetDepth() : 0;
 
     for( sal_uInt16 i=nPrevDepth; i<rInfo.GetDepth(); i++ )
     {
@@ -213,8 +175,9 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
 
         rWrt.m_aBulletGrfs[i].clear();
         OString sOut = "<" + rWrt.GetNamespace();
-        if (rWrt.mbXHTML && (nPrevDepth != 0 || i != 0))
+        if (rWrt.mbXHTML && i != nPrevDepth)
         {
+            // for all skipped sublevels, add a li
             sOut += OOO_STRING_SVTOOLS_HTML_li "><" + rWrt.GetNamespace();
         }
         const SwNumFormat& rNumFormat = rInfo.GetNumRule()->Get( i );
@@ -261,8 +224,10 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
 
             // determine the type by the format
             char cType = 0;
-            switch( eType )
+            if (!rWrt.mbReqIF) // No 'type' attribute in ReqIF
             {
+                switch (eType)
+                {
                 case SVX_NUM_CHARS_UPPER_LETTER:
                 case SVX_NUM_CHARS_UPPER_LETTER_N:
                     cType = 'A';
@@ -277,6 +242,7 @@ Writer& OutHTML_NumberBulletListStart( SwHTMLWriter& rWrt,
                 case SVX_NUM_ROMAN_LOWER:
                     cType = 'i';
                     break;
+                }
             }
             if( cType )
             {
@@ -321,44 +287,11 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
 {
     SwHTMLNumRuleInfo& rInfo = rWrt.GetNumInfo();
     bool bSameRule = rNextInfo.GetNumRule() == rInfo.GetNumRule();
-    bool bListEnd = !bSameRule || rNextInfo.GetDepth() < rInfo.GetDepth() || rNextInfo.IsRestart();
+    bool bListEnd = !bSameRule || rNextInfo.GetDepth() < rInfo.GetDepth() || rNextInfo.IsRestart(rInfo);
+    bool bNextIsSubitem = !bListEnd && rNextInfo.GetDepth() > rInfo.GetDepth();
 
-    std::optional<bool> oAtLeastOneNumbered;
-    if (!rInfo.IsNumbered())
-    {
-        oAtLeastOneNumbered = false;
-        SwNodeOffset nPos = rWrt.m_pCurrentPam->GetPoint()->GetNodeIndex() - 1;
-        SwNumRule* pNumRule = nullptr;
-        while (true)
-        {
-            const SwNode* pNode = rWrt.m_pDoc->GetNodes()[nPos];
-            if (!pNode->IsTextNode())
-            {
-                break;
-            }
-
-            const SwTextNode* pTextNode = pNode->GetTextNode();
-            if (!pTextNode->GetNumRule() || (pNumRule && pTextNode->GetNumRule() != pNumRule))
-            {
-                // Node is not in the same numbering as the next one.
-                break;
-            }
-
-            pNumRule = pTextNode->GetNumRule();
-            if (pTextNode->IsNumbered())
-            {
-                oAtLeastOneNumbered = true;
-                break;
-            }
-            --nPos;
-        }
-    }
-
-    // The list is numbered if the previous text node is numbered or any other previous text
-    // node is numbered.
-    bool bPrevIsNumbered = rInfo.IsNumbered() || *oAtLeastOneNumbered;
     // XHTML </li> for the list item content, if there is an open <li>.
-    if ((bListEnd && bPrevIsNumbered) || (!bListEnd && rNextInfo.IsNumbered()))
+    if (bListEnd || (!bNextIsSubitem && rNextInfo.IsNumbered()))
     {
         HTMLOutFuncs::Out_AsciiTag(
             rWrt.Strm(), Concat2View(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
@@ -370,19 +303,10 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
         return rWrt;
     }
 
-    if (rWrt.mbXHTML && !rInfo.IsNumbered())
-    {
-        // If the list only consisted of non-numbered text nodes, then don't end the list.
-        if (!*oAtLeastOneNumbered)
-        {
-            return rWrt;
-        }
-    }
-
     OSL_ENSURE( rWrt.m_nLastParaToken == HtmlTokenId::NONE,
                 "<PRE> was not closed before </OL>." );
     sal_uInt16 nNextDepth =
-        (bSameRule && !rNextInfo.IsRestart()) ? rNextInfo.GetDepth() : 0;
+        (bSameRule && !rNextInfo.IsRestart(rInfo)) ? rNextInfo.GetDepth() : 0;
 
     // MIB 23.7.97: We must loop backwards, to get the right order of </OL>/</UL>
     for( sal_uInt16 i=rInfo.GetDepth(); i>nNextDepth; i-- )
@@ -399,8 +323,9 @@ Writer& OutHTML_NumberBulletListEnd( SwHTMLWriter& rWrt,
         else
             aTag = OOO_STRING_SVTOOLS_HTML_orderlist;
         HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rWrt.GetNamespace() + aTag), false );
-        if (rWrt.mbXHTML && (nNextDepth != 0 || i != 1))
+        if (rWrt.mbXHTML && i != nNextDepth + 1)
         {
+            // for all skipped sublevels, close a li
             HTMLOutFuncs::Out_AsciiTag(
                 rWrt.Strm(), Concat2View(rWrt.GetNamespace() + OOO_STRING_SVTOOLS_HTML_li),
                 /*bOn=*/false);

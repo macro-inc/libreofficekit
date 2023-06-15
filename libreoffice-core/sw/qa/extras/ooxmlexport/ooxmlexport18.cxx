@@ -16,6 +16,7 @@
 #include <com/sun/star/drawing/XShapes.hpp>
 #include <com/sun/star/frame/XStorable.hpp>
 #include <com/sun/star/text/GraphicCrop.hpp>
+#include <com/sun/star/text/RelOrientation.hpp>
 #include <com/sun/star/text/WritingMode2.hpp>
 #include <com/sun/star/text/XFootnotesSupplier.hpp>
 #include <com/sun/star/text/XTextDocument.hpp>
@@ -133,15 +134,45 @@ DECLARE_OOXMLEXPORT_TEST(testTdf104394_lostTextbox, "tdf104394_lostTextbox.docx"
     CPPUNIT_ASSERT_EQUAL(2, getPages());
 }
 
-DECLARE_OOXMLEXPORT_TEST(testTdf146984_anchorInShape, "tdf146984_anchorInShape.docx")
+DECLARE_OOXMLEXPORT_TEST(testTdf154129_framePr1, "tdf154129_framePr1.docx")
 {
-    // This was only one page b/c the page break was missing.
-    CPPUNIT_ASSERT_EQUAL(2, getPages());
+    for (size_t i = 1; i < 4; ++i)
+    {
+        uno::Reference<drawing::XShape> xTextFrame = getShape(i);
+        // The anchor is defined in the style, and only the first style was checked, not the parents
+        auto nAnchor = getProperty<sal_Int16>(xTextFrame, "HoriOrientRelation");
+        CPPUNIT_ASSERT_EQUAL(text::RelOrientation::PAGE_FRAME, nAnchor);
+        nAnchor = getProperty<sal_Int16>(xTextFrame, "VertOrientRelation");
+        CPPUNIT_ASSERT_EQUAL(text::RelOrientation::PAGE_FRAME, nAnchor);
+    }
+}
 
-    const auto& pLayout = parseLayoutDump();
-    // There are shapes on both pages - these should be non-zero numbers
-    //assertXPath(pLayout, "//page[1]//anchored", 3);
-    //assertXPath(pLayout, "//page[2]//anchored", 2);
+DECLARE_OOXMLEXPORT_TEST(testTdf154703_framePr, "tdf154703_framePr.docx")
+{
+    // the frame conversion had been failing, so it imported as plain text only.
+    CPPUNIT_ASSERT_EQUAL(1, getShapes());
+}
+
+DECLARE_OOXMLEXPORT_TEST(testTdf154703_framePr2, "tdf154703_framePr2.rtf")
+{
+    // framePr frames are always imported as fully transparent
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(100), getProperty<sal_Int16>(getShape(1), "FillTransparence"));
+
+    if (!isExported())
+    {
+        // Fill the frame with a red background. It should be transferred on export to the paragraph
+        uno::Reference<beans::XPropertySet> xFrame(getShape(1), uno::UNO_QUERY);
+        xFrame->setPropertyValue("FillColor", uno::Any(COL_RED));
+        xFrame->setPropertyValue("FillTransparence", uno::Any(static_cast<sal_Int32>(0)));
+
+        return;
+    }
+
+    // exported: framed paragraphs without a background should now have a red background
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    assertXPath(pXmlDoc, "//w:body/w:p[1]/w:pPr/w:shd", "fill", "800000");
+    assertXPath(pXmlDoc, "//w:body/w:p[2]/w:pPr/w:shd", "fill", "548DD4"); // was blue already, no change
+    assertXPath(pXmlDoc, "//w:body/w:p[3]/w:pPr/w:shd", "fill", "800000");
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf153613_anchoredAfterPgBreak, "tdf153613_anchoredAfterPgBreak.docx")
@@ -373,6 +404,24 @@ CPPUNIT_TEST_FIXTURE(Test, testNumberPortionFormatFromODT)
     // - XPath '//w:pPr/w:rPr/w:sz' number of nodes is incorrect
     // i.e. <w:sz> was missing under <w:pPr>'s <w:rPr>.
     assertXPath(pXmlDoc, "//w:pPr/w:rPr/w:sz", "val", "48");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testParaStyleCharPosition)
+{
+    // Given a loaded document where the Normal paragraph style has <w:position w:val="-1">:
+    createSwDoc("para-style-char-position.docx");
+
+    // When saving it back to DOCX:
+    save("Office Open XML Text");
+
+    // Then make sure that is not turned into a normal subscript text:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/styles.xml");
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 1
+    // - Actual  : 0
+    // - XPath '/w:styles/w:style[@w:styleId='Normal']/w:rPr/w:position' number of nodes is incorrect
+    // i.e. we wrote <w:vertAlign w:val="subscript"> instead of <w:position>.
+    assertXPath(pXmlDoc, "/w:styles/w:style[@w:styleId='Normal']/w:rPr/w:position", "val", "-1");
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf150966_regularInset)

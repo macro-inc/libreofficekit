@@ -51,6 +51,8 @@ public:
     [[nodiscard]] ScopedJsonWriterArray startArray(const char*);
     [[nodiscard]] ScopedJsonWriterStruct startStruct();
 
+    void put(const OUString& pPropName, const OUString& rPropValue);
+
     void put(const char* pPropName, const OUString& rPropValue);
     // Assumes utf-8 property value encoding
     void put(const char* pPropName, std::string_view rPropValue);
@@ -162,5 +164,5 @@ class ScopedJsonWriterStruct
 public:
     ~ScopedJsonWriterStruct() { mrWriter.endStruct(); }
 };
-};
+}
 /* vim:set shiftwidth=4 softtabstop=4 expandtab cinoptions=b1,g0,N-s cinkeys+=0=break: */

@@ -80,10 +80,38 @@ void ExtCfRuleContext::onStartElement( const AttributeList& rAttribs )
             xRule->importCfvo( rAttribs );
             xRule->getModel().mbIsLower = mbFirstEntry;
             mbFirstEntry = false;
+            mpRule = xRule;
             break;
         }
         default:
             break;
+    }
+}
+
+void ExtCfRuleContext::onCharacters( const OUString& rChars )
+{
+    switch( getCurrentElement() )
+    {
+        case XM_TOKEN( f ):
+        {
+            if (mpRule)
+            {
+                mpRule->getModel().msScaleTypeValue = rChars;
+            }
+        }
+        break;
+    }
+}
+
+void ExtCfRuleContext::onEndElement()
+{
+    switch( getCurrentElement() )
+    {
+        case XLS14_TOKEN( cfvo ):
+        {
+            mpRule.reset();
+            break;
+        }
     }
 }
 
@@ -137,11 +165,23 @@ ContextHandlerRef ExtConditionalFormattingContext::onCreateContext(sal_Int32 nEl
         if (aType == "dataBar")
         {
             // an ext entry does not need to have an existing corresponding entry
+            ScDataBarFormatData* pInfo;
             ExtLst::const_iterator aExt = getExtLst().find( aId );
-            if(aExt == getExtLst().end())
-                return nullptr;
+            if (aExt == getExtLst().end())
+            {
+                pInfo = new ScDataBarFormatData();
+                if (pInfo)
+                {
+                    auto pFormat = std::make_unique<ScDataBarFormat>(&getScDocument());
+                    pFormat->SetDataBarData(pInfo);
+                    maEntries.push_back(std::move(pFormat));
+                }
+            }
+            else
+            {
+                pInfo = aExt->second;
+            }
 
-            ScDataBarFormatData* pInfo = aExt->second;
             if (!pInfo)
             {
                 return nullptr;
@@ -246,6 +286,12 @@ void ExtConditionalFormattingContext::onEndElement()
         break;
         case XLS14_TOKEN( cfRule ):
         {
+            if (IsSpecificTextCondMode(maModel.eOperator) && nFormulaCount == 1)
+            {
+                maModel.aFormula = aChars;
+                maModel.eOperator = ScConditionMode::Direct;
+            }
+
             getStyles().getExtDxfs().forEachMem( &Dxf::finalizeImport );
             maModel.aStyle = getStyles().createExtDxfStyle(rStyleIdx);
             rStyleIdx++;

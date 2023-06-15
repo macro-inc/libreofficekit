@@ -78,6 +78,7 @@ public:
     ScFiltersTest();
 
     //ods, xls, xlsx filter tests
+    void testTdf155321_CondFormatColor_XLSX();
     void testTdf138601_CondFormatXLSX();
     void testContentODS();
     void testContentXLS();
@@ -147,6 +148,7 @@ public:
     void testCondFormatImportCellIs();
     void testCondFormatThemeColor2XLSX(); // negative bar color and axis color
     void testCondFormatThemeColor3XLSX(); // theme index 2 and 3 are switched
+    void testCondFormatCfvoScaleValueXLSX();
     void testComplexIconSetsXLSX();
     void testTdf101104();
     void testTdf64401();
@@ -210,6 +212,7 @@ public:
     void testForcepoint107();
 
     CPPUNIT_TEST_SUITE(ScFiltersTest);
+    CPPUNIT_TEST(testTdf155321_CondFormatColor_XLSX);
     CPPUNIT_TEST(testTdf138601_CondFormatXLSX);
     CPPUNIT_TEST(testContentODS);
     CPPUNIT_TEST(testContentXLS);
@@ -287,6 +290,7 @@ public:
     CPPUNIT_TEST(testCondFormatImportCellIs);
     CPPUNIT_TEST(testCondFormatThemeColor2XLSX);
     CPPUNIT_TEST(testCondFormatThemeColor3XLSX);
+    CPPUNIT_TEST(testCondFormatCfvoScaleValueXLSX);
     CPPUNIT_TEST(testComplexIconSetsXLSX);
     CPPUNIT_TEST(testTdf101104);
     CPPUNIT_TEST(testTdf64401);
@@ -419,6 +423,17 @@ void testContentImpl(ScDocument& rDoc, bool bCheckMergedCells)
 
     //add additional checks here
 }
+}
+
+void ScFiltersTest::testTdf155321_CondFormatColor_XLSX()
+{
+    createScDoc("xlsx/tdf155321.xlsx");
+
+    ScDocument* pDoc = getScDoc();
+    ScConditionalFormat* pCondFormat = pDoc->GetCondFormat(0, 0, 0);
+    ScRefCellValue aCellB1(*pDoc, ScAddress(1, 0, 0));
+    Color aColor = pCondFormat->GetData(aCellB1, ScAddress(1, 0, 0)).mxColorScale.value();
+    CPPUNIT_ASSERT_EQUAL(Color(99, 190, 123), aColor);
 }
 
 void ScFiltersTest::testTdf138601_CondFormatXLSX()
@@ -2591,6 +2606,27 @@ void ScFiltersTest::testCondFormatThemeColor2XLSX()
     CPPUNIT_ASSERT(pDataBarFormatData->mxNegativeColor);
     CPPUNIT_ASSERT_EQUAL(Color(217, 217, 217), *pDataBarFormatData->mxNegativeColor);
     CPPUNIT_ASSERT_EQUAL(Color(197, 90, 17), pDataBarFormatData->maAxisColor);
+}
+
+void ScFiltersTest::testCondFormatCfvoScaleValueXLSX()
+{
+    createScDoc("xlsx/condformat_databar.xlsx");
+
+    ScDocument* pDoc = getScDoc();
+    ScConditionalFormat* pFormat = pDoc->GetCondFormat(0, 0, 0);
+    const ScFormatEntry* pEntry = pFormat->GetEntry(0);
+    CPPUNIT_ASSERT(pEntry);
+    CPPUNIT_ASSERT_EQUAL(ScFormatEntry::Type::Databar, pEntry->GetType());
+    const ScDataBarFormat* pDataBar = static_cast<const ScDataBarFormat*>(pEntry);
+    const ScDataBarFormatData* pDataBarFormatData = pDataBar->GetDataBarData();
+    const ScColorScaleEntry* pLower = pDataBarFormatData->mpLowerLimit.get();
+    const ScColorScaleEntry* pUpper = pDataBarFormatData->mpUpperLimit.get();
+
+    CPPUNIT_ASSERT_EQUAL(COLORSCALE_VALUE, pLower->GetType());
+    CPPUNIT_ASSERT_EQUAL(COLORSCALE_VALUE, pUpper->GetType());
+
+    CPPUNIT_ASSERT_EQUAL(double(0.0), pLower->GetValue());
+    CPPUNIT_ASSERT_EQUAL(double(1.0), pUpper->GetValue());
 }
 
 namespace

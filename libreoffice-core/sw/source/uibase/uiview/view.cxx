@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <hintids.hxx>
 #include <comphelper/string.hxx>
+#include <comphelper/lok.hxx>
 #include <o3tl/any.hxx>
 #include <o3tl/string_view.hxx>
 #include <officecfg/Office/Common.hxx>
@@ -100,7 +101,7 @@
 #include <PostItMgr.hxx>
 #include <annotsh.hxx>
 #include <swruler.hxx>
-
+#include <svx/theme/ThemeColorPaletteManager.hxx>
 #include <com/sun/star/document/XDocumentProperties.hpp>
 #include <com/sun/star/document/XDocumentPropertiesSupplier.hpp>
 
@@ -1145,7 +1146,14 @@ SwView::~SwView()
     m_pViewImpl->Invalidate();
     EndListening(*GetViewFrame());
     EndListening(*GetDocShell());
+
+    // tdf#155410 speedup shutdown, prevent unnecessary broadcasting during teardown of draw model
+    auto pDrawModel = GetWrtShell().getIDocumentDrawModelAccess().GetDrawModel();
+    const bool bWasLocked = pDrawModel->isLocked();
+    pDrawModel->setLock(true);
     m_pWrtShell.reset(); // reset here so that it is not accessible by the following dtors.
+    pDrawModel->setLock(bWasLocked);
+
     m_pHScrollbar.disposeAndClear();
     m_pVScrollbar.disposeAndClear();
     m_pHRuler.disposeAndClear();
@@ -1160,6 +1168,22 @@ SwView::~SwView()
     m_pEditWin.disposeAndClear();
 
     m_pFormatClipboard.reset();
+}
+
+void SwView::afterCallbackRegistered()
+{
+    if (!comphelper::LibreOfficeKit::isActive())
+        return;
+
+    // common tasks
+    SfxViewShell::afterCallbackRegistered();
+
+    auto* pDocShell = GetDocShell();
+    if (pDocShell)
+    {
+        svx::ThemeColorPaletteManager aManager(pDocShell->GetThemeColors());
+        libreOfficeKitViewCallback(LOK_CALLBACK_COLOR_PALETTES, aManager.generateJSON().getStr());
+    }
 }
 
 SwDocShell* SwView::GetDocShell()

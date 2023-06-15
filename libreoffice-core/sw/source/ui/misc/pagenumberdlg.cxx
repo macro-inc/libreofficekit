@@ -18,6 +18,7 @@
  */
 
 #include <pagenumberdlg.hxx>
+#include <svx/SvxNumOptionsTabPageHelper.hxx>
 #include <vcl/bitmap.hxx>
 #include <vcl/graph.hxx>
 #include <vcl/BitmapTools.hxx>
@@ -29,15 +30,25 @@ SwPageNumberDlg::SwPageNumberDlg(weld::Window* pParent)
     , m_xCancel(m_xBuilder->weld_button("cancel"))
     , m_xPageNumberPosition(m_xBuilder->weld_combo_box("positionCombo"))
     , m_xPageNumberAlignment(m_xBuilder->weld_combo_box("alignmentCombo"))
+    , m_xMirrorOnEvenPages(m_xBuilder->weld_check_button("mirrorCheckbox"))
+    , m_xIncludePageTotal(m_xBuilder->weld_check_button("pagetotalCheckbox"))
+    , m_xPageNumberTypeLB(new SvxPageNumberListBox(m_xBuilder->weld_combo_box("numfmtlb")))
     , m_xPreviewImage(m_xBuilder->weld_image("previewImage"))
-    , m_aPageNumberPosition(1)
-    , m_aPageNumberAlignment(0)
+    , m_aPageNumberPosition(1) // bottom
+    , m_aPageNumberAlignment(1) // center
+    , m_nPageNumberType(SVX_NUM_CHARS_UPPER_LETTER)
 {
     m_xOk->connect_clicked(LINK(this, SwPageNumberDlg, OkHdl));
     m_xPageNumberPosition->connect_changed(LINK(this, SwPageNumberDlg, PositionSelectHdl));
     m_xPageNumberAlignment->connect_changed(LINK(this, SwPageNumberDlg, AlignmentSelectHdl));
     m_xPageNumberPosition->set_active(m_aPageNumberPosition);
     m_xPageNumberAlignment->set_active(m_aPageNumberAlignment);
+    m_xMirrorOnEvenPages->set_sensitive(false);
+    m_xMirrorOnEvenPages->set_state(TRISTATE_TRUE);
+    m_xIncludePageTotal->set_state(TRISTATE_FALSE);
+    SvxNumOptionsTabPageHelper::GetI18nNumbering(m_xPageNumberTypeLB->get_widget(),
+                                                 ::std::numeric_limits<sal_uInt16>::max());
+    m_xPageNumberTypeLB->connect_changed(LINK(this, SwPageNumberDlg, NumberTypeSelectHdl));
     updateImage();
 }
 
@@ -58,6 +69,33 @@ IMPL_LINK_NOARG(SwPageNumberDlg, AlignmentSelectHdl, weld::ComboBox&, void)
 {
     m_aPageNumberAlignment = m_xPageNumberAlignment->get_active();
     updateImage();
+
+    if (m_aPageNumberAlignment == 1) // centered
+        m_xMirrorOnEvenPages->set_sensitive(false);
+    else
+        m_xMirrorOnEvenPages->set_sensitive(true);
+}
+
+IMPL_LINK_NOARG(SwPageNumberDlg, NumberTypeSelectHdl, weld::ComboBox&, void)
+{
+    m_nPageNumberType = m_xPageNumberTypeLB->get_active_id();
+}
+
+bool SwPageNumberDlg::GetMirrorOnEvenPages()
+{
+    return m_xMirrorOnEvenPages->get_sensitive()
+           && m_xMirrorOnEvenPages->get_state() == TRISTATE_TRUE;
+}
+
+bool SwPageNumberDlg::GetIncludePageTotal()
+{
+    return m_xIncludePageTotal->get_state() == TRISTATE_TRUE;
+}
+
+void SwPageNumberDlg::SetPageNumberType(SvxNumType nSet)
+{
+    m_nPageNumberType = nSet;
+    m_xPageNumberTypeLB->set_active_id(nSet);
 }
 
 void SwPageNumberDlg::updateImage()

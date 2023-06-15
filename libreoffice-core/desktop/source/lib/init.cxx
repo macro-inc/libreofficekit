@@ -411,7 +411,7 @@ std::vector<beans::PropertyValue> desktop::jsonToPropertyValuesVector(const char
     return aArguments;
 }
 
-static bool extractLinks(const uno::Reference< container::XNameAccess >& xLinks, bool subcontent, OUStringBuffer& jsonText)
+static void extractLinks(const uno::Reference< container::XNameAccess >& xLinks, bool subcontent, tools::JsonWriter& aJson)
 {
     const uno::Sequence< OUString > aNames( xLinks->getElementNames() );
 
@@ -452,45 +452,27 @@ static bool extractLinks(const uno::Reference< container::XNameAccess >& xLinks,
 
                 if (subcontent)
                 {
-                    jsonText.append("\"");
-                    jsonText.append(aStrDisplayname);
-                    jsonText.append("\": \"");
-                    jsonText.append(aLink);
-                    jsonText.append("\"");
-                    if (i < nLinks-1)
-                    {
-                        jsonText.append(", ");
-                    }
+                    aJson.put(aStrDisplayname, aLink);
                 }
                 else
                 {
                     uno::Reference< lang::XServiceInfo > xSI( xTarget, uno::UNO_QUERY );
                     bIsTarget = xSI->supportsService( aProp_LinkTarget );
-                    if (i != 0)
-                    {
-                        if (!bIsTarget)
-                            jsonText.append("}");
-                        if (i < nLinks)
-                        {
-                            jsonText.append(", ");
-                        }
-                    }
-                    jsonText.append("\"");
-                    jsonText.append(aStrDisplayname);
-                    jsonText.append("\": ");
 
                     if (bIsTarget)
                     {
-                        jsonText.append("true");
+                        aJson.put(aStrDisplayname, aLink);
                         continue;
                     }
-                    jsonText.append("{");
-                }
+                    else
+                    {
+                        std::unique_ptr<char[], o3tl::free_delete> pName(convertOUString(aStrDisplayname));
+                        auto aNode = aJson.startNode(pName.get());
 
-                uno::Reference< document::XLinkTargetSupplier > xLTS( xTarget, uno::UNO_QUERY );
-                if( xLTS.is() )
-                {
-                    extractLinks(xLTS->getLinks(), true, jsonText);
+                        uno::Reference< document::XLinkTargetSupplier > xLTS( xTarget, uno::UNO_QUERY );
+                        if( xLTS.is() )
+                            extractLinks(xLTS->getLinks(), true, aJson);
+                    }
                 }
             }
             catch(...)
@@ -499,7 +481,6 @@ static bool extractLinks(const uno::Reference< container::XNameAccess >& xLinks,
             }
         }
     }
-    return bIsTarget;
 }
 
 static void unoAnyToJson(tools::JsonWriter& rJson, const char * pNodeName, const uno::Any& anyItem)
@@ -1825,6 +1806,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
         case LOK_CALLBACK_A11Y_FOCUS_CHANGED:
         case LOK_CALLBACK_A11Y_CARET_CHANGED:
         case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
+        case LOK_CALLBACK_COLOR_PALETTES:
         {
             const auto& pos = std::find(m_queue1.rbegin(), m_queue1.rend(), type);
             auto pos2 = toQueue2(pos);
@@ -1886,6 +1868,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
             case LOK_CALLBACK_A11Y_FOCUS_CHANGED:
             case LOK_CALLBACK_A11Y_CARET_CHANGED:
             case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
+            case LOK_CALLBACK_COLOR_PALETTES:
             {
                 if (removeAll(type))
                     SAL_INFO("lok", "Removed dups of [" << type << "]: [" << aCallbackData.getPayload() << "].");
@@ -3132,15 +3115,12 @@ static char* lo_extractRequest(LibreOfficeKit* /*pThis*/, const char* pFilePath)
 
                 if( xLTS.is() )
                 {
-                    OUStringBuffer jsonText;
-                    jsonText.append("{ \"Targets\": { ");
-                    bool lastParentheses = extractLinks(xLTS->getLinks(), false, jsonText);
-                    jsonText.append("} }");
-                    if (!lastParentheses)
-                        jsonText.append(" }");
-
-                    OUString res(jsonText.makeStringAndClear());
-                    return convertOUString(res);
+                    tools::JsonWriter aJson;
+                    {
+                        auto aNode = aJson.startNode("Targets");
+                        extractLinks(xLTS->getLinks(), false, aJson);
+                    }
+                    return aJson.extractData();
                 }
                 xComp->dispose();
             }
@@ -3476,6 +3456,8 @@ static void doc_iniUnoCommands ()
         OUString(".uno:NumberFormatCurrency"),
         OUString(".uno:NumberFormatPercent"),
         OUString(".uno:NumberFormatDecimal"),
+        OUString(".uno:NumberFormatIncDecimals"),
+        OUString(".uno:NumberFormatDecDecimals"),
         OUString(".uno:NumberFormatDate"),
         OUString(".uno:EditHeaderAndFooter"),
         OUString(".uno:FrameLineColor"),
@@ -7102,7 +7084,6 @@ static void doc_setViewTimezone(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*p
 static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, int nId, bool nEnabled)
 {
     SolarMutexGuard aGuard;
-    SetLastExceptionMsg();
 
     int nDocType = getDocumentType(pThis);
     if (nDocType != LOK_DOCTYPE_TEXT)
@@ -7322,7 +7303,7 @@ static void lo_status_indicator_callback(void *data, comphelper::LibreOfficeKit:
 }
 
 /// Used by preloadData (LibreOfficeKit) for providing different shortcuts for different languages.
-void preLoadShortCutAccelerators()
+static void preLoadShortCutAccelerators()
 {
     std::unordered_map<OUString, css::uno::Reference<com::sun::star::ui::XAcceleratorConfiguration>>& acceleratorConfs = SfxLokHelper::getAcceleratorConfs();
     css::uno::Sequence<OUString> installedLocales(officecfg::Setup::Office::InstalledLocales::get()->getElementNames());
@@ -7330,29 +7311,18 @@ void preLoadShortCutAccelerators()
 
     for (sal_Int32 i = 0; i < installedLocales.getLength(); i++)
     {
-        OUString language = LanguageTag(installedLocales[i]).getLocale().Language;
+        // Set the UI language to current one, before creating the accelerator.
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+        officecfg::Setup::L10N::ooLocale::set(installedLocales[i], batch);
+        batch->commit();
 
-        if (!comphelper::LibreOfficeKit::isAllowlistedLanguage(language))
+        // Supported module names: Writer, Calc, Draw, Impress
+        std::vector<OUString> supportedModuleNames = { "com.sun.star.text.TextDocument", "com.sun.star.sheet.SpreadsheetDocument", "com.sun.star.drawing.DrawingDocument", "com.sun.star.presentation.PresentationDocument" };
+        // Create the accelerators.
+        for (std::size_t j = 0; j < supportedModuleNames.size(); j++)
         {
-            // Language is listed by COOL and also installed in core. We can create the short cut accelerator.
-
-            // Set the UI language to current one, before creating the accelerator.
-            std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
-            officecfg::Setup::L10N::ooLocale::set(installedLocales[i], batch);
-            batch->commit();
-
-            // Supported module names: Writer, Calc, Draw, Impress
-            std::vector<OUString> supportedModuleNames = { "com.sun.star.text.TextDocument", "com.sun.star.sheet.SpreadsheetDocument", "com.sun.star.drawing.DrawingDocument", "com.sun.star.presentation.PresentationDocument" };
-            // Create the accelerators.
-            for (std::size_t j = 0; j < supportedModuleNames.size(); j++)
-            {
-                OUString key = supportedModuleNames[j] + installedLocales[i];
-                acceleratorConfs[key] = svt::AcceleratorExecute::lok_createNewAcceleratorConfiguration(::comphelper::getProcessComponentContext(), supportedModuleNames[j]);
-            }
-        }
-        else
-        {
-            std::cerr << "Language is installed in core but not in the list of COOL languages: " << language << "\n";
+            OUString key = supportedModuleNames[j] + installedLocales[i];
+            acceleratorConfs[key] = svt::AcceleratorExecute::lok_createNewAcceleratorConfiguration(::comphelper::getProcessComponentContext(), supportedModuleNames[j]);
         }
     }
 

@@ -921,7 +921,7 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testThemeExport)
     uno::Reference<beans::XPropertySet> xPageProps(xDrawPage, uno::UNO_QUERY);
 
     auto pTheme = std::make_shared<model::Theme>("My Theme");
-    std::unique_ptr<model::ColorSet> pColorSet(new model::ColorSet("My Color Scheme"));
+    auto pColorSet = std::make_shared<model::ColorSet>("My Color Scheme");
     pColorSet->add(model::ThemeColorType::Dark1, 0x101010);
     pColorSet->add(model::ThemeColorType::Light1, 0x202020);
     pColorSet->add(model::ThemeColorType::Dark2, 0x303030);
@@ -934,7 +934,7 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testThemeExport)
     pColorSet->add(model::ThemeColorType::Accent6, 0xa0a0a0);
     pColorSet->add(model::ThemeColorType::Hyperlink, 0xb0b0b0);
     pColorSet->add(model::ThemeColorType::FollowedHyperlink, 0xc0c0c0);
-    pTheme->SetColorSet(std::move(pColorSet));
+    pTheme->setColorSet(pColorSet);
 
     uno::Reference<util::XTheme> xTheme = model::theme::createXTheme(pTheme);
     xPageProps->setPropertyValue("Theme", uno::Any(xTheme));
@@ -944,19 +944,14 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testThemeExport)
 
     // Check if the 12 colors are written in the XML:
     xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color", 12);
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[1]", "name",
-                "dk1");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[1]", "color",
-                "#101010");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[2]", "name",
-                "lt1");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[2]", "color",
-                "#202020");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[12]", "name",
-                "folHlink");
-    assertXPath(pXmlDoc, "//office:styles/loext:theme/loext:color-table/loext:color[12]", "color",
-                "#c0c0c0");
+    OString aThemePath = "//office:styles/loext:theme/loext:theme-colors/loext:color";
+    assertXPath(pXmlDoc, aThemePath, 12);
+    assertXPath(pXmlDoc, aThemePath + "[1]", "name", "dark1");
+    assertXPath(pXmlDoc, aThemePath + "[1]", "color", "#101010");
+    assertXPath(pXmlDoc, aThemePath + "[2]", "name", "light1");
+    assertXPath(pXmlDoc, aThemePath + "[2]", "color", "#202020");
+    assertXPath(pXmlDoc, aThemePath + "[12]", "name", "followed-hyperlink");
+    assertXPath(pXmlDoc, aThemePath + "[12]", "color", "#c0c0c0");
 }
 
 CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testFloatingTableExport)

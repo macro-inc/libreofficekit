@@ -116,15 +116,18 @@ void SetCfvoData( ColorScaleRuleModelEntry* pEntry, const AttributeList& rAttrib
     OUString aType = rAttribs.getString( XML_type, OUString() );
     OUString aVal = rAttribs.getString(XML_val, OUString());
 
-    double nVal = 0.0;
-    bool bVal = isValue(aVal, nVal);
-    if( !bVal || aType == "formula" )
+    if (aVal != "\"\"")
     {
-        pEntry->maFormula = aVal;
-    }
-    else
-    {
-        pEntry->mnVal = nVal;
+        double nVal = 0.0;
+        bool bVal = isValue(aVal, nVal);
+        if( !bVal || aType == "formula" )
+        {
+            pEntry->maFormula = aVal;
+        }
+        else
+        {
+            pEntry->mnVal = nVal;
+        }
     }
 
     if (aType == "num")
@@ -1096,6 +1099,12 @@ CondFormat::CondFormat( const WorksheetHelper& rHelper ) :
 {
 }
 
+CondFormat::~CondFormat()
+{
+    if (!mbReadyForFinalize && mpFormat)
+        delete mpFormat;
+}
+
 void CondFormat::importConditionalFormatting( const AttributeList& rAttribs )
 {
     getAddressConverter().convertToCellRangeList( maModel.maRanges, rAttribs.getString( XML_sqref, OUString() ), getSheetIndex(), true );
@@ -1107,7 +1116,6 @@ CondFormatRuleRef CondFormat::importCfRule( const AttributeList& rAttribs )
 {
     CondFormatRuleRef xRule = createRule();
     xRule->importCfRule( rAttribs );
-    insertRule( xRule );
     return xRule;
 }
 
@@ -1135,10 +1143,16 @@ void CondFormat::finalizeImport()
     ScDocument& rDoc = getScDocument();
     mpFormat->SetRange(maModel.maRanges);
     maRules.forEachMem( &CondFormatRule::finalizeImport );
-    SCTAB nTab = maModel.maRanges.GetTopLeftCorner().Tab();
-    sal_Int32 nIndex = getScDocument().AddCondFormat(std::unique_ptr<ScConditionalFormat>(mpFormat), nTab);
 
-    rDoc.AddCondFormatData( maModel.maRanges, nTab, nIndex );
+    if (mpFormat->size() > 0)
+    {
+        SCTAB nTab = maModel.maRanges.GetTopLeftCorner().Tab();
+        sal_Int32 nIndex = getScDocument().AddCondFormat(std::unique_ptr<ScConditionalFormat>(mpFormat), nTab);
+
+        rDoc.AddCondFormatData( maModel.maRanges, nTab, nIndex );
+    }
+    else
+        mbReadyForFinalize = false;
 }
 
 CondFormatRuleRef CondFormat::createRule()
@@ -1197,6 +1211,41 @@ public:
 
 }
 
+void CondFormatBuffer::updateImport(const ScDataBarFormatData* pTarget)
+{
+    for ( const auto& rRule : maCfRules )
+    {
+        if ( rRule && rRule->GetDataBarData() == pTarget )
+            rRule->finalizeImport();
+    }
+}
+
+bool CondFormatBuffer::insertRule(CondFormatRef const & xCondFmt, CondFormatRuleRef const & xRule)
+{
+    CondFormatRef xFoundFmt;
+    ScRangeList aRanges = xCondFmt->getRanges();
+
+    for (auto& rCondFmt : maCondFormats)
+    {
+        if (xCondFmt == rCondFmt)
+            continue;
+
+        if (aRanges == rCondFmt->getRanges())
+        {
+            xFoundFmt = rCondFmt;
+            break;
+        }
+    }
+
+    if (xFoundFmt)
+    {
+        xRule->mpFormat = xFoundFmt->mpFormat;
+        xFoundFmt->insertRule(xRule);
+    }
+
+    return (bool)xFoundFmt;
+}
+
 void CondFormatBuffer::finalizeImport()
 {
     std::unordered_set<size_t> aDoneExtCFs;
@@ -1224,6 +1273,8 @@ void CondFormatBuffer::finalizeImport()
             for (const auto& rxEntry : rEntries)
             {
                 CondFormatRuleRef xRule = rCondFormat.createRule();
+                if (ScDataBarFormat *pData = dynamic_cast<ScDataBarFormat*>(rxEntry.get()))
+                    updateImport(pData->GetDataBarData());
                 ScFormatEntry* pNewEntry = rxEntry->Clone(pDoc);
                 sal_Int32 nPriority = rPriorities[nEntryIdx];
                 if (nPriority == -1)
@@ -1434,6 +1485,19 @@ void ExtCfDataBarRule::finalizeImport()
                 pEntry->SetType(COLORSCALE_PERCENT);
             else if (maModel.maColorScaleType == "formula")
                 pEntry->SetType(COLORSCALE_FORMULA);
+            else if (maModel.maColorScaleType == "num")
+                pEntry->SetType(COLORSCALE_VALUE);
+
+            if (!maModel.msScaleTypeValue.isEmpty())
+            {
+                sal_Int32 nSize = 0;
+                rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
+                double fValue = rtl::math::stringToDouble(maModel.msScaleTypeValue, '.', '\0', &eStatus, &nSize);
+                if (eStatus == rtl_math_ConversionStatus_Ok && nSize == maModel.msScaleTypeValue.getLength())
+                {
+                    pEntry->SetValue(fValue);
+                }
+            }
             break;
         }
         case UNKNOWN: // nothing to do

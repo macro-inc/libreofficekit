@@ -16,8 +16,8 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#ifndef INCLUDED_SVX_PALETTE_HXX
-#define INCLUDED_SVX_PALETTE_HXX
+
+#pragma once
 
 #include <sal/config.h>
 
@@ -27,14 +27,12 @@
 #include <tools/color.hxx>
 #include <svx/svxdllapi.h>
 
+#include <docmodel/color/ComplexColor.hxx>
+#include <docmodel/theme/ThemeColorType.hxx>
+
 class SvxColorValueSet;
 
-typedef std::pair<Color, OUString> NamedColor;
-
-namespace svx
-{
-/// A color with an optional name and other theming-related properties.
-struct SVXCORE_DLLPUBLIC NamedThemedColor
+struct SVXCORE_DLLPUBLIC NamedColor
 {
     Color m_aColor;
     OUString m_aName;
@@ -42,13 +40,37 @@ struct SVXCORE_DLLPUBLIC NamedThemedColor
     sal_Int16 m_nLumMod = 10000;
     sal_Int16 m_nLumOff = 0;
 
-    static NamedThemedColor FromNamedColor(const NamedColor& rNamedColor);
+    NamedColor() = default;
 
-    NamedColor ToNamedColor() const;
+    NamedColor(Color const& rColor, OUString const& rName)
+        : m_aColor(rColor)
+        , m_aName(rName)
+    {}
+
+    model::ComplexColor getComplexColor()
+    {
+        model::ComplexColor aComplexColor;
+
+        auto eThemeColorType = model::convertToThemeColorType(m_nThemeIndex);
+
+        if (eThemeColorType != model::ThemeColorType::Unknown)
+        {
+            aComplexColor.setSchemeColor(eThemeColorType);
+
+            if (m_nLumMod != 10000)
+                aComplexColor.addTransformation({model::TransformationType::LumMod, m_nLumMod});
+
+            if (m_nLumMod != 0)
+                aComplexColor.addTransformation({model::TransformationType::LumOff, m_nLumOff});
+        }
+
+        aComplexColor.setFinalColor(m_aColor);
+
+        return aComplexColor;
+    }
 };
-}
 
-typedef std::function<void(const OUString&, const svx::NamedThemedColor&)> ColorSelectFunction;
+typedef std::function<void(const OUString&, const NamedColor&)> ColorSelectFunction;
 
 class Palette
 {
@@ -66,7 +88,5 @@ public:
 
     virtual Palette*            Clone() const = 0;
 };
-
-#endif // INCLUDED_SVX_PALETTE_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

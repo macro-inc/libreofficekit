@@ -148,6 +148,7 @@ private:
 /** Represents a single rule in a conditional formatting. */
 class CondFormatRule final : public WorksheetHelper
 {
+friend class CondFormatBuffer;
 public:
     explicit            CondFormatRule( const CondFormat& rCondFormat, ScConditionalFormat* pFormat );
 
@@ -201,6 +202,7 @@ class CondFormat final : public WorksheetHelper
 friend class CondFormatBuffer;
 public:
     explicit            CondFormat( const WorksheetHelper& rHelper );
+    ~CondFormat();
 
     /** Imports settings from the conditionalFormatting element. */
     void                importConditionalFormatting( const AttributeList& rAttribs );
@@ -219,9 +221,9 @@ public:
     const ScRangeList& getRanges() const { return maModel.maRanges; }
 
     void                setReadyForFinalize() { mbReadyForFinalize = true; }
+    void                insertRule( CondFormatRuleRef const & xRule );
 private:
     CondFormatRuleRef   createRule();
-    void                insertRule( CondFormatRuleRef const & xRule );
 
 private:
     typedef RefMap< sal_Int32, CondFormatRule > CondFormatRuleMap;
@@ -242,6 +244,7 @@ struct ExCfRuleModel
     ::Color mnNegativeColor;
     OUString maAxisPosition; // DataBar
     OUString maColorScaleType; // Cfvo
+    OUString msScaleTypeValue; // Cfvo
     bool mbGradient; // DataBar
     bool mbIsLower; // Cfvo
 };
@@ -270,6 +273,7 @@ public:
     void importAxisColor(  const AttributeList& rAttribs );
     void importCfvo(  const AttributeList& rAttribs );
     ExCfRuleModel& getModel() { return maModel; }
+    const ScDataBarFormatData* GetDataBarData() { return mpTarget; }
 };
 
 class ExtCfCondFormat
@@ -308,8 +312,11 @@ public:
     static sal_Int32    convertToApiOperator( sal_Int32 nToken );
     static ScConditionMode convertToInternalOperator( sal_Int32 nToken );
     void                finalizeImport();
+    bool                insertRule(CondFormatRef const & xCondFmt, CondFormatRuleRef const & xRule);
+
 private:
     CondFormatRef       createCondFormat();
+    void                updateImport(const ScDataBarFormatData* pTarget);
 
 private:
     typedef RefVector< CondFormat > CondFormatVec;

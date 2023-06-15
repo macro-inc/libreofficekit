@@ -37,6 +37,7 @@
 #include <svx/hlnkitem.hxx>
 #include <svx/svxdlg.hxx>
 #include <osl/diagnose.h>
+#include <fmthdft.hxx>
 #include <fmtinfmt.hxx>
 #include <fldwrap.hxx>
 #include <redline.hxx>
@@ -55,12 +56,16 @@
 #include <doc.hxx>
 #include <PostItMgr.hxx>
 #include <swmodule.hxx>
+
+#include <editeng/ulspitem.hxx>
 #include <xmloff/odffields.hxx>
 #include <IDocumentContentOperations.hxx>
 #include <IDocumentRedlineAccess.hxx>
 #include <IDocumentUndoRedo.hxx>
 #include <svl/zforlist.hxx>
 #include <svl/zformat.hxx>
+#include <svx/xfillit0.hxx>
+#include <svx/pageitem.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <IMark.hxx>
 #include <officecfg/Office/Compatibility.hxx>
@@ -1027,6 +1032,10 @@ FIELD_INSERT:
         VclPtr<AbstractSwPageNumberDlg> pDlg(
                 pFact->CreateSwPageNumberDlg(GetView().GetFrameWeld()));
         auto pShell = GetShellPtr();
+
+        const SwPageDesc& rCurrDesc = rSh.GetPageDesc(rSh.GetCurPageDesc());
+        pDlg->SetPageNumberType(rCurrDesc.GetNumType().GetNumberingType());
+
         pDlg->StartExecuteAsync([pShell, &rSh, pDlg](int nResult) {
             if ( nResult == RET_OK )
             {
@@ -1037,16 +1046,151 @@ FIELD_INSERT:
                 rSh.SwCursorShell::Push();
                 rDoc->GetIDocumentUndoRedo().StartUndo(SwUndoId::INSERT_PAGE_NUMBER, nullptr);
 
+                const size_t nPageDescIndex = rSh.GetCurPageDesc();
+                const SwPageDesc& rDesc = rSh.GetPageDesc(nPageDescIndex);
+                const bool bHeader = !pDlg->GetPageNumberPosition();
+                const bool bHeaderAlreadyOn = rDesc.GetMaster().GetHeader().IsActive();
+                const bool bFooterAlreadyOn = rDesc.GetMaster().GetFooter().IsActive();
+                const bool bIsSinglePage = rDesc.GetFollow() != &rDesc;
+                const size_t nMirrorPagesNeeded = rDesc.IsFirstShared() ? 2 : 3;
+                const OUString sBookmarkName = OUString::Concat("PageNumWizard_")
+                    + (bHeader ? "HEADER" : "FOOTER") + "_" + rDesc.GetName();
+                IDocumentMarkAccess& rIDMA = *rSh.getIDocumentMarkAccess();
+
+                // Allow wizard to be re-run: delete previously wizard-inserted page number.
+                // Try before creating non-shared header: avoid copying ODD bookmark onto EVEN page.
+                IDocumentMarkAccess::const_iterator_t ppMark = rIDMA.findMark(
+                    sBookmarkName + OUString::number(rSh.GetVirtPageNum()));
+                if (ppMark != rIDMA.getAllMarksEnd() && *ppMark)
+                {
+                    SwPaM aDeleteOldPageNum((*ppMark)->GetMarkStart(), (*ppMark)->GetMarkEnd());
+                    rDoc->getIDocumentContentOperations().DeleteAndJoin(aDeleteOldPageNum);
+                }
+
+                SwPageDesc aNewDesc(rDesc);
+                bool bChangePageDesc = false;
+                if (pDlg->GetPageNumberType() != aNewDesc.GetNumType().GetNumberingType())
+                {
+                    bChangePageDesc = true;
+                    SvxNumberType aNewType(rDesc.GetNumType());
+                    aNewType.SetNumberingType(pDlg->GetPageNumberType());
+                    aNewDesc.SetNumType(aNewType);
+                }
+
                 // Insert header/footer
-                bool bFooter = (pDlg->GetPageNumberPosition() == 1);
-                sal_uInt16 nPageNumberPosition = bFooter ?
-                    FN_INSERT_PAGEFOOTER : FN_INSERT_PAGEHEADER;
-                SfxBoolItem aItem(FN_PARAM_1, true);
-                rSh.GetView().GetDispatcher().ExecuteList(
-                    nPageNumberPosition,
-                    SfxCallMode::API | SfxCallMode::SYNCHRON,
-                    {&aItem}
-                );
+                if ((bHeader && !bHeaderAlreadyOn) || (!bHeader && !bFooterAlreadyOn))
+                {
+                    bChangePageDesc = true;
+                    SwFrameFormat &rMaster = aNewDesc.GetMaster();
+                    if (bHeader)
+                        rMaster.SetFormatAttr(SwFormatHeader(/*On=*/true));
+                    else
+                        rMaster.SetFormatAttr(SwFormatFooter(/*On=*/true));
+
+                    // Init copied from ChangeHeaderOrFooter: keep in sync
+                    constexpr tools::Long constTwips_5mm = o3tl::toTwips(5, o3tl::Length::mm);
+                    const SvxULSpaceItem aUL(bHeader ? 0 : constTwips_5mm,
+                                             bHeader ? constTwips_5mm : 0,
+                                             RES_UL_SPACE);
+                    const XFillStyleItem aFill(drawing::FillStyle_NONE);
+                    SwFrameFormat& rFormat
+                        = bHeader
+                              ? const_cast<SwFrameFormat&>(*rMaster.GetHeader().GetHeaderFormat())
+                              : const_cast<SwFrameFormat&>(*rMaster.GetFooter().GetFooterFormat());
+                    rFormat.SetFormatAttr(aUL);
+                    rFormat.SetFormatAttr(aFill);
+
+                    // Might as well turn on margin mirroring too - if appropriate
+                    if (pDlg->GetMirrorOnEvenPages() && !bHeaderAlreadyOn && !bFooterAlreadyOn
+                        && !bIsSinglePage
+                        && (aNewDesc.ReadUseOn() & UseOnPage::Mirror) == UseOnPage::All)
+                    {
+                        aNewDesc.WriteUseOn(rDesc.ReadUseOn() | UseOnPage::Mirror);
+                    }
+                }
+
+                const bool bCreateMirror = !bIsSinglePage && pDlg->GetMirrorOnEvenPages()
+                    && nMirrorPagesNeeded <= rSh.GetPageCnt();
+                if (bCreateMirror)
+                {
+                    // Use different left/right header/footer
+                    if ((bHeader && rDesc.IsHeaderShared()) || (!bHeader && rDesc.IsFooterShared()))
+                    {
+                        bChangePageDesc = true;
+                        if (bHeader)
+                            aNewDesc.ChgHeaderShare(/*Share=*/false);
+                        else
+                            aNewDesc.ChgFooterShare(/*Share=*/false);
+                    }
+                }
+
+                if (bChangePageDesc)
+                    rSh.ChgPageDesc(nPageDescIndex, aNewDesc);
+
+                // Go to the header or footer insert position
+                bool bInHF = false;
+                bool bSkipMirror = true;
+                size_t nEvenPage = 0;
+                if (bCreateMirror || !rSh.GetCurrFrame())
+                {
+                    // Come here if Currframe can't be found, otherwise Goto*Text will crash.
+                    // Get*PageNum will also be invalid (0), so we have no idea where we are.
+                    // (Since not asking for mirror, the likelihood is that the bHeader is shared,
+                    // in which case it doesn't matter anyway, and we just hope for the best.)
+                    // Read the code in this block assuming that bCreateMirror is true.
+
+                    // There are enough pages that there probably is a valid odd page.
+                    // However, that is not guaranteed: perhaps the page style switched,
+                    // or a blank page was forced, or some other complexity.
+                    bInHF = rSh.SetCursorInHdFt(nPageDescIndex, bHeader, /*Even=*/true);
+                    if (bInHF)
+                    {
+                        // Remember valid EVEN page. Mirror it if also a valid ODD or FIRST page
+                        nEvenPage = rSh.GetVirtPageNum();
+                        assert (nEvenPage && "couldn't find page number. Use a bool instead");
+                    }
+
+                    bInHF = rSh.SetCursorInHdFt(nPageDescIndex, bHeader, /*Even=*/false);
+                    if (bInHF && nEvenPage)
+                    {
+                        // Even though the cursor may be on a FIRST page,
+                        // the user requested mirrored pages, and we have both ODD and EVEN,
+                        // so set page numbers on these two pages, and leave FIRST alone.
+                        bSkipMirror = false;
+                    }
+                    if (!bInHF)
+                    {
+                        // no ODD page, look for FIRST page
+                        bInHF = rSh.SetCursorInHdFt(nPageDescIndex, bHeader, false, /*First=*/true);
+                        if (bInHF && nEvenPage)
+                        {
+                            // Unlikely but valid situation: EVEN and FIRST pages, but no ODD page.
+                            // In this case, the first header gets the specified page number
+                            // and the even header is mirrored, with an empty odd header,
+                            // as the user (somewhat) requested.
+                            bSkipMirror = false;
+                        }
+                    }
+                    assert((bInHF || nEvenPage) && "Impossible - why couldn't the move happen?");
+                    assert((bInHF || nEvenPage == rSh.GetVirtPageNum()) && "Unexpected move");
+                }
+                else
+                {
+                    if (bHeader)
+                        bInHF = rSh.GotoHeaderText();
+                    else
+                        bInHF = rSh.GotoFooterText();
+                    assert(bInHF && "shouldn't have a problem going to text when no mirroring");
+                }
+
+                // Allow wizard to be re-run: delete previously wizard-inserted page number.
+                // Now that the cursor may have moved to a different page, try delete again.
+                ppMark = rIDMA.findMark(sBookmarkName + OUString::number(rSh.GetVirtPageNum()));
+                if (ppMark != rIDMA.getAllMarksEnd() && *ppMark)
+                {
+                    SwPaM aDeleteOldPageNum((*ppMark)->GetMarkStart(), (*ppMark)->GetMarkEnd());
+                    rDoc->getIDocumentContentOperations().DeleteAndJoin(aDeleteOldPageNum);
+                }
 
                 SwTextNode* pTextNode = rSh.GetCursor()->GetPoint()->GetNode().GetTextNode();
 
@@ -1054,13 +1198,13 @@ FIELD_INSERT:
                 if (pTextNode && !pTextNode->GetText().isEmpty())
                 {
                     rDoc->getIDocumentContentOperations().SplitNode(*rSh.GetCursor()->GetPoint(), false);
-                }
 
-                // Go back to start of header/footer
-                if (bFooter)
-                    rSh.GotoFooterText();
-                else
-                    rSh.GotoHeaderText();
+                    // Go back to start of header/footer
+                    if (bHeader)
+                        rSh.GotoHeaderText();
+                    else
+                        rSh.GotoFooterText();
+                }
 
                 // Set alignment for the new line
                 switch (pDlg->GetPageNumberAlignment())
@@ -1085,11 +1229,86 @@ FIELD_INSERT:
                     }
                 }
 
+                sal_Int32 nStartContentIndex = rSh.GetCursor()->Start()->GetContentIndex();
+                assert(!nStartContentIndex && "earlier split node if not empty, but not zero?");
+
                 // Insert page number
                 SwFieldMgr aMgr(pShell);
                 SwInsertField_Data aData(SwFieldTypesEnum::PageNumber, 0,
                             OUString(), OUString(), SVX_NUM_PAGEDESC);
                 aMgr.InsertField(aData);
+                if (pDlg->GetIncludePageTotal())
+                {
+                    rDoc->getIDocumentContentOperations().InsertString(*rSh.GetCursor(), " / ");
+                    SwInsertField_Data aPageTotalData(SwFieldTypesEnum::DocumentStatistics, DS_PAGE,
+                                                      OUString(), OUString(), SVX_NUM_PAGEDESC);
+                    aMgr.InsertField(aPageTotalData);
+                }
+
+                // Mark inserted fields with a bookmark - so it can be found/removed if re-run
+                SwPaM aNewBookmarkPaM(*rSh.GetCursor()->Start());
+                aNewBookmarkPaM.SetMark();
+                assert(aNewBookmarkPaM.GetPointContentNode() && "only SetContent on content node");
+                aNewBookmarkPaM.Start()->SetContent(nStartContentIndex);
+                rIDMA.makeMark(aNewBookmarkPaM,
+                               sBookmarkName + OUString::number(rSh.GetVirtPageNum()),
+                               IDocumentMarkAccess::MarkType::BOOKMARK,
+                               sw::mark::InsertMode::New);
+
+                // Mirror on the even pages
+                if (!bSkipMirror && bCreateMirror
+                    && rSh.SetCursorInHdFt(nPageDescIndex, bHeader, /*Even=*/true))
+                {
+                    assert(nEvenPage && "what? no even page and yet we got here?");
+                    ppMark = rIDMA.findMark(sBookmarkName + OUString::number(rSh.GetVirtPageNum()));
+                    if (ppMark != rIDMA.getAllMarksEnd() && *ppMark)
+                    {
+                        SwPaM aDeleteOldPageNum((*ppMark)->GetMarkStart(), (*ppMark)->GetMarkEnd());
+                        rDoc->getIDocumentContentOperations().DeleteAndJoin(aDeleteOldPageNum);
+                    }
+
+                    pTextNode = rSh.GetCursor()->GetPoint()->GetNode().GetTextNode();
+
+                    // Insert new line if there is already text in header/footer
+                    if (pTextNode && !pTextNode->GetText().isEmpty())
+                    {
+                        rDoc->getIDocumentContentOperations().SplitNode(
+                            *rSh.GetCursor()->GetPoint(), false);
+                        // Go back to start of header/footer
+                        rSh.SetCursorInHdFt(nPageDescIndex, bHeader, /*Even=*/true);
+                    }
+
+                    // mirror the adjustment
+                    assert(pDlg->GetPageNumberAlignment() != 1 && "cannot have Center and bMirror");
+                    SvxAdjust eAdjust = SvxAdjust::Left;
+                    if (!pDlg->GetPageNumberAlignment())
+                        eAdjust = SvxAdjust::Right;
+                    SvxAdjustItem aMirrorAdjustItem(eAdjust, RES_PARATR_ADJUST);
+                    rSh.SetAttrItem(aMirrorAdjustItem);
+
+                    nStartContentIndex = rSh.GetCursor()->Start()->GetContentIndex();
+
+                    // Insert page number
+                    SwFieldMgr aEvenMgr(pShell);
+                    aEvenMgr.InsertField(aData);
+                    if (pDlg->GetIncludePageTotal())
+                    {
+                        rDoc->getIDocumentContentOperations().InsertString(*rSh.GetCursor(), " / ");
+                        SwInsertField_Data aPageTotalData(SwFieldTypesEnum::DocumentStatistics,
+                                                          DS_PAGE, OUString(), OUString(),
+                                                          SVX_NUM_PAGEDESC);
+                        aMgr.InsertField(aPageTotalData);
+                    }
+
+                    // Mark inserted fields with a bookmark - so it can be found/removed if re-run
+                    SwPaM aNewEvenBookmarkPaM(*rSh.GetCursor()->Start());
+                    aNewEvenBookmarkPaM.SetMark();
+                    aNewEvenBookmarkPaM.Start()->SetContent(nStartContentIndex);
+                    rIDMA.makeMark(aNewEvenBookmarkPaM,
+                                   sBookmarkName + OUString::number(rSh.GetVirtPageNum()),
+                                   IDocumentMarkAccess::MarkType::BOOKMARK,
+                                   sw::mark::InsertMode::New);
+                }
 
                 rSh.SwCursorShell::Pop(SwCursorShell::PopMode::DeleteCurrent);
                 rSh.EndAllAction();

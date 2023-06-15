@@ -25,6 +25,7 @@
 #include <editeng/colritem.hxx>
 #include <editeng/editview.hxx>
 #include <editeng/fhgtitem.hxx>
+#include <editeng/brushitem.hxx>
 #include <sfx2/bindings.hxx>
 #include <sfx2/printer.hxx>
 #include <vcl/cursor.hxx>
@@ -34,6 +35,7 @@
 
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <comphelper/lok.hxx>
+#include <comphelper/scopeguard.hxx>
 #include <sfx2/lokhelper.hxx>
 #include <sfx2/lokcomponenthelpers.hxx>
 
@@ -1119,7 +1121,21 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
                             tools::Long nScreenY = aOutputData.nScrY;
 
                             rDevice.SetLineColor();
-                            rDevice.SetFillColor(pOtherEditView->GetBackgroundColor());
+                            SfxViewShell* pSfxViewShell = SfxViewShell::Current();
+                            ScTabViewShell* pCurrentViewShell = dynamic_cast<ScTabViewShell*>(pSfxViewShell);
+                            if (pCurrentViewShell)
+                            {
+                                const ScViewData& pViewData = pCurrentViewShell->GetViewData();
+                                const ScViewOptions& aViewOptions = pViewData.GetOptions();
+                                const ScPatternAttr* pPattern = rDoc.GetPattern( nCol1, nRow1, nTab );
+                                Color aCellColor = pPattern->GetItem(ATTR_BACKGROUND).GetColor();
+                                if (aCellColor.IsTransparent())
+                                {
+                                    aCellColor = aViewOptions.GetDocColor();
+                                }
+                                rDevice.SetFillColor(aCellColor);
+                                pOtherEditView->SetBackgroundColor(aCellColor);
+                            }
                             Point aStart = mrViewData.GetScrPos( nCol1, nRow1, eOtherWhich );
                             Point aEnd = mrViewData.GetScrPos( nCol2+1, nRow2+1, eOtherWhich );
 
@@ -1192,6 +1208,11 @@ void ScGridWindow::DrawContent(OutputDevice &rDevice, const ScTableInfo& rTableI
                             // Avoid sending wrong cursor/selection messages by the 'other' view, as the output-area is going
                             // to be tweaked temporarily to match the current view's zoom.
                             SuppressEditViewMessagesGuard aGuard(*pOtherEditView);
+                            comphelper::ScopeGuard aOutputGuard(
+                                [pOtherEditView, aOrigOutputArea, bLokRTL] {
+                                    if (bLokRTL && aOrigOutputArea != pOtherEditView->GetOutputArea())
+                                        pOtherEditView->SetOutputArea(aOrigOutputArea);
+                                });
 
                             aEditRect = rDevice.PixelToLogic(aEditRect);
                             if (bIsTiledRendering)
@@ -1525,7 +1546,8 @@ namespace
 void ScGridWindow::PaintTile( VirtualDevice& rDevice,
                               int nOutputWidth, int nOutputHeight,
                               int nTilePosX, int nTilePosY,
-                              tools::Long nTileWidth, tools::Long nTileHeight )
+                              tools::Long nTileWidth, tools::Long nTileHeight,
+                              SCCOL nTiledRenderingAreaEndCol, SCROW nTiledRenderingAreaEndRow )
 {
     Fraction origZoomX = mrViewData.GetZoomX();
     Fraction origZoomY = mrViewData.GetZoomY();
@@ -1611,9 +1633,8 @@ void ScGridWindow::PaintTile( VirtualDevice& rDevice,
     }
 
     // size of the document including drawings, charts, etc.
-    SCCOL nEndCol = 0;
-    SCROW nEndRow = 0;
-    rDoc.GetTiledRenderingArea(nTab, nEndCol, nEndRow);
+    SCCOL nEndCol = nTiledRenderingAreaEndCol;
+    SCROW nEndRow = nTiledRenderingAreaEndRow;
 
     if (nEndCol < nBottomRightTileCol)
         nEndCol = nBottomRightTileCol;

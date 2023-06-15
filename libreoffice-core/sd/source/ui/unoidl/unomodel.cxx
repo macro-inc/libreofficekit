@@ -139,6 +139,14 @@ using namespace ::cppu;
 using namespace ::com::sun::star;
 using namespace ::sd;
 
+const TranslateId aTypeResIds[SdLinkTargetType::Count] =
+{
+    STR_SD_PAGE,            // SdLinkTargetType::Page
+    STR_NOTES_MODE,         // SdLinkTargetType::Notes
+    STR_HANDOUT,            // SdLinkTargetType::Handout
+    STR_MASTERPAGE_NAME,    // SdLinkTargetType::MasterPage
+};
+
 TranslateId SdTPAction::GetClickActionSdResId( presentation::ClickAction eCA )
 {
     switch( eCA )
@@ -1597,15 +1605,28 @@ static void ImplPDFExportComments( const uno::Reference< drawing::XDrawPage >& x
             uno::Reference< office::XAnnotation > xAnnotation( xAnnotationEnumeration->nextElement() );
 
             geometry::RealPoint2D aRealPoint2D( xAnnotation->getPosition() );
+            geometry::RealSize2D aRealSize2D(xAnnotation->getSize());
             uno::Reference< text::XText > xText( xAnnotation->getTextRange() );
 
             vcl::PDFNote aNote;
             aNote.Title = xAnnotation->getAuthor();
             aNote.Contents = xText->getString();
             aNote.maModificationDate = xAnnotation->getDateTime();
+            auto* pAnnotation = dynamic_cast<sd::Annotation*>(xAnnotation.get());
+            aNote.isFreeText = pAnnotation && pAnnotation->isFreeText();
+            if (pAnnotation && pAnnotation->hasCustomAnnotationMarker())
+            {
+                aNote.maPolygons = pAnnotation->getCustomAnnotationMarker().maPolygons;
+                aNote.annotColor = pAnnotation->getCustomAnnotationMarker().maLineColor;
+                aNote.interiorColor = pAnnotation->getCustomAnnotationMarker().maFillColor;
+            }
 
-            rPDFExtOutDevData.CreateNote( ::tools::Rectangle( Point( static_cast< ::tools::Long >( aRealPoint2D.X * 100 ),
-                static_cast< ::tools::Long >( aRealPoint2D.Y * 100 ) ), Size( 1000, 1000 ) ), aNote );
+            rPDFExtOutDevData.CreateNote(
+                ::tools::Rectangle(Point(static_cast<::tools::Long>(aRealPoint2D.X * 100),
+                                         static_cast<::tools::Long>(aRealPoint2D.Y * 100)),
+                                   Size(static_cast<::tools::Long>(aRealSize2D.Width * 100),
+                                        static_cast<::tools::Long>(aRealSize2D.Height * 100))),
+                aNote);
         }
     }
     catch (const uno::Exception&)
@@ -2292,11 +2313,14 @@ void SdXImpressDocument::paintTile( VirtualDevice& rDevice,
     // Draw Form controls
     SdrView* pDrawView = pViewSh->GetDrawView();
     SdrPageView* pPageView = pDrawView->GetSdrPageView();
-    SdrPage* pPage = pPageView->GetPage();
-    ::sd::Window* pActiveWin = pViewSh->GetActiveWindow();
-    ::tools::Rectangle aTileRect(Point(nTilePosX, nTilePosY), Size(nTileWidth, nTileHeight));
-    Size aOutputSize(nOutputWidth, nOutputHeight);
-    LokControlHandler::paintControlTile(pPage, pDrawView, *pActiveWin, rDevice, aOutputSize, aTileRect);
+    if (pPageView != nullptr)
+    {
+        SdrPage* pPage = pPageView->GetPage();
+        ::sd::Window* pActiveWin = pViewSh->GetActiveWindow();
+        ::tools::Rectangle aTileRect(Point(nTilePosX, nTilePosY), Size(nTileWidth, nTileHeight));
+        Size aOutputSize(nOutputWidth, nOutputHeight);
+        LokControlHandler::paintControlTile(pPage, pDrawView, *pActiveWin, rDevice, aOutputSize, aTileRect);
+    }
 
     comphelper::LibreOfficeKit::setTiledPainting(false);
 }
@@ -2338,7 +2362,8 @@ OUString SdXImpressDocument::getPartInfo(int nPart)
     if (!pViewSh)
         return OUString();
 
-    const bool bIsVisible = pViewSh->IsVisible(nPart);
+    const SdPage* pSdPage = mpDoc->GetSdPage(nPart, pViewSh->GetPageKind());
+    const bool bIsVisible = pSdPage && !pSdPage->IsExcluded();
     const bool bIsSelected = pViewSh->IsSelected(nPart);
     const sal_Int16 nMasterPageCount= pViewSh->GetDoc()->GetMasterSdPageCount(pViewSh->GetPageKind());
 
@@ -2622,6 +2647,11 @@ void SdXImpressDocument::postMouseEvent(int nType, int nX, int nY, int nCount, i
     SdrPageView* pPageView = pDrawView->GetSdrPageView();
     SdrPage* pPage = pPageView->GetPage();
     ::sd::Window* pActiveWin = pViewShell->GetActiveWindow();
+    if (!pActiveWin)
+    {
+        return;
+    }
+
     if (LokControlHandler::postMouseEvent(pPage, pDrawView, *pActiveWin, nType, aPointHMM, nCount, nButtons, nModifier))
             return;
 
@@ -3364,6 +3394,8 @@ uno::Sequence< OUString > SAL_CALL SdMasterPagesAccess::getSupportedServiceNames
 SdDocLinkTargets::SdDocLinkTargets( SdXImpressDocument& rMyModel ) noexcept
 : mpModel( &rMyModel )
 {
+    for (sal_uInt16 i=0; i < SdLinkTargetType::Count; i++)
+        aNames[i] = SdResId(aTypeResIds[i]);
 }
 
 SdDocLinkTargets::~SdDocLinkTargets() noexcept
@@ -3389,84 +3421,31 @@ void SAL_CALL SdDocLinkTargets::removeEventListener( const uno::Reference< lang:
 // XNameAccess
 uno::Any SAL_CALL SdDocLinkTargets::getByName( const OUString& aName )
 {
-    ::SolarMutexGuard aGuard;
+    if (mpModel)
+    {
+        for (sal_uInt16 i=0; i < SdLinkTargetType::Count; i++)
+            if ( aNames[i] == aName )
+                return uno::Any(uno::Reference< beans::XPropertySet >(new SdDocLinkTargetType( mpModel, i )));
+    }
 
-    if( nullptr == mpModel )
-        throw lang::DisposedException();
-
-    SdPage* pPage = FindPage( aName );
-
-    if( pPage == nullptr )
-        throw container::NoSuchElementException();
-
-    uno::Any aAny;
-
-    uno::Reference< beans::XPropertySet > xProps( pPage->getUnoPage(), uno::UNO_QUERY );
-    if( xProps.is() )
-        aAny <<= xProps;
-
-    return aAny;
+    throw container::NoSuchElementException();
 }
 
 uno::Sequence< OUString > SAL_CALL SdDocLinkTargets::getElementNames()
 {
-    ::SolarMutexGuard aGuard;
-
-    if( nullptr == mpModel )
-        throw lang::DisposedException();
-
-    SdDrawDocument* pDoc = mpModel->GetDoc();
-    if( pDoc == nullptr )
-    {
-        return { };
-    }
-
-    if( pDoc->GetDocumentType() == DocumentType::Draw )
-    {
-        const sal_uInt16 nMaxPages = pDoc->GetSdPageCount( PageKind::Standard );
-        const sal_uInt16 nMaxMasterPages = pDoc->GetMasterSdPageCount( PageKind::Standard );
-
-        uno::Sequence< OUString > aSeq( nMaxPages + nMaxMasterPages );
-        OUString* pStr = aSeq.getArray();
-
-        sal_uInt16 nPage;
-        // standard pages
-        for( nPage = 0; nPage < nMaxPages; nPage++ )
-            *pStr++ = pDoc->GetSdPage( nPage, PageKind::Standard )->GetName();
-
-        // master pages
-        for( nPage = 0; nPage < nMaxMasterPages; nPage++ )
-            *pStr++ = pDoc->GetMasterSdPage( nPage, PageKind::Standard )->GetName();
-        return aSeq;
-    }
-    else
-    {
-        const sal_uInt16 nMaxPages = pDoc->GetPageCount();
-        const sal_uInt16 nMaxMasterPages = pDoc->GetMasterPageCount();
-
-        uno::Sequence< OUString > aSeq( nMaxPages + nMaxMasterPages );
-        OUString* pStr = aSeq.getArray();
-
-        sal_uInt16 nPage;
-        // standard pages
-        for( nPage = 0; nPage < nMaxPages; nPage++ )
-            *pStr++ = static_cast<SdPage*>(pDoc->GetPage( nPage ))->GetName();
-
-        // master pages
-        for( nPage = 0; nPage < nMaxMasterPages; nPage++ )
-            *pStr++ = static_cast<SdPage*>(pDoc->GetMasterPage( nPage ))->GetName();
-        return aSeq;
-    }
+    uno::Sequence<OUString> aRet(SdLinkTargetType::Count);
+    OUString* pArray = aRet.getArray();
+    for (sal_uInt16 i=0; i < SdLinkTargetType::Count; i++)
+        pArray[i] = aNames[i];
+    return aRet;
 }
 
 sal_Bool SAL_CALL SdDocLinkTargets::hasByName( const OUString& aName )
 {
-    ::SolarMutexGuard aGuard;
-
-    if( nullptr == mpModel )
-        throw lang::DisposedException();
-
-    return FindPage( aName ) != nullptr;
+    for (const auto & i : aNames)
+        if ( i == aName )
+            return true;
+    return false;
 }
 
 // container::XElementAccess
@@ -3477,15 +3456,10 @@ uno::Type SAL_CALL SdDocLinkTargets::getElementType()
 
 sal_Bool SAL_CALL SdDocLinkTargets::hasElements()
 {
-    ::SolarMutexGuard aGuard;
-
-    if( nullptr == mpModel )
-        throw lang::DisposedException();
-
-    return mpModel->GetDoc() != nullptr;
+    return true;
 }
 
-SdPage* SdDocLinkTargets::FindPage( std::u16string_view rName ) const
+SdPage* SdDocLinkTarget::FindPage( std::u16string_view rName ) const
 {
     SdDrawDocument* pDoc = mpModel->GetDoc();
     if( pDoc == nullptr )
@@ -3530,6 +3504,236 @@ sal_Bool SAL_CALL SdDocLinkTargets::supportsService( const OUString& ServiceName
 }
 
 uno::Sequence< OUString > SAL_CALL SdDocLinkTargets::getSupportedServiceNames()
+{
+    return { "com.sun.star.document.LinkTargets" };
+}
+
+SdDocLinkTargetType::SdDocLinkTargetType(SdXImpressDocument* pModel, sal_uInt16 nT) noexcept
+    : mpModel(pModel)
+    , mnType(nT)
+{
+    maName = SdResId(aTypeResIds[nT]);
+}
+
+// beans::XPropertySet
+
+uno::Reference< beans::XPropertySetInfo > SAL_CALL SdDocLinkTargetType::getPropertySetInfo()
+{
+    static uno::Reference< beans::XPropertySetInfo > aRef;//(new SfxItemPropertySetInfo( lcl_GetLinkTargetMap() ));
+    return aRef;
+}
+
+void SAL_CALL SdDocLinkTargetType::setPropertyValue(const OUString& /* aPropertyName */,
+            const uno::Any& /* aValue */)
+{
+    //  everything is read-only
+}
+
+uno::Any SAL_CALL SdDocLinkTargetType::getPropertyValue(const OUString& PropertyName)
+{
+    uno::Any aRet;
+    if ( PropertyName == "LinkDisplayName" )
+        aRet <<= maName;
+
+    return aRet;
+}
+
+void SAL_CALL SdDocLinkTargetType::addPropertyChangeListener( const OUString&,
+                            const uno::Reference<beans::XPropertyChangeListener>&)
+{ OSL_FAIL("not implemented"); }
+
+void SAL_CALL SdDocLinkTargetType::removePropertyChangeListener( const OUString&,
+                        const uno::Reference<beans::XPropertyChangeListener>&)
+{ OSL_FAIL("not implemented"); }
+
+void SAL_CALL SdDocLinkTargetType::addVetoableChangeListener( const OUString&,
+                        const uno::Reference<beans::XVetoableChangeListener>&)
+{ OSL_FAIL("not implemented"); }
+
+void SAL_CALL SdDocLinkTargetType::removeVetoableChangeListener( const OUString&,
+                        const uno::Reference<beans::XVetoableChangeListener>&)
+{ OSL_FAIL("not implemented"); }
+
+// document::XLinkTargetSupplier
+
+uno::Reference< container::XNameAccess > SAL_CALL SdDocLinkTargetType::getLinks()
+{
+    return new SdDocLinkTarget( mpModel, mnType );
+}
+
+// XServiceInfo
+OUString SAL_CALL SdDocLinkTargetType::getImplementationName()
+{
+    return "SdDocLinkTargetType";
+}
+
+sal_Bool SAL_CALL SdDocLinkTargetType::supportsService( const OUString& ServiceName )
+{
+    return cppu::supportsService( this, ServiceName );
+}
+
+uno::Sequence< OUString > SAL_CALL SdDocLinkTargetType::getSupportedServiceNames()
+{
+    return { "com.sun.star.document.LinkTargetSupplier" };
+}
+
+SdDocLinkTarget::SdDocLinkTarget( SdXImpressDocument* pModel, sal_uInt16 nT )
+    : mpModel(pModel)
+    , mnType(nT)
+{
+}
+
+// container::XNameAccess
+
+uno::Any SAL_CALL SdDocLinkTarget::getByName(const OUString& aName)
+{
+    ::SolarMutexGuard aGuard;
+
+    if( nullptr == mpModel )
+        throw lang::DisposedException();
+
+    SdPage* pPage = FindPage( aName );
+
+    if( pPage == nullptr )
+        throw container::NoSuchElementException();
+
+    uno::Any aAny;
+
+    uno::Reference< beans::XPropertySet > xProps( pPage->getUnoPage(), uno::UNO_QUERY );
+    if( xProps.is() )
+        aAny <<= xProps;
+
+    return aAny;
+}
+
+uno::Sequence<OUString> SAL_CALL SdDocLinkTarget::getElementNames()
+{
+    ::SolarMutexGuard aGuard;
+
+    if( nullptr == mpModel )
+        throw lang::DisposedException();
+
+    SdDrawDocument* pDoc = mpModel->GetDoc();
+    if( pDoc == nullptr )
+    {
+        return { };
+    }
+
+    if( pDoc->GetDocumentType() == DocumentType::Draw )
+    {
+        const sal_uInt16 nMaxPages = pDoc->GetSdPageCount( PageKind::Standard );
+        const sal_uInt16 nMaxMasterPages = pDoc->GetMasterSdPageCount( PageKind::Standard );
+
+        uno::Sequence< OUString > aSeq( mnType == SdLinkTargetType::Page ? nMaxPages : nMaxMasterPages );
+        OUString* pStr = aSeq.getArray();
+
+        sal_uInt16 nPage;
+        if (mnType == SdLinkTargetType::Page)
+        {
+            // standard pages
+            for( nPage = 0; nPage < nMaxPages; nPage++ )
+                *pStr++ = pDoc->GetSdPage( nPage, PageKind::Standard )->GetName();
+        }
+        else
+        {
+            // master pages
+            for( nPage = 0; nPage < nMaxMasterPages; nPage++ )
+                *pStr++ = pDoc->GetMasterSdPage( nPage, PageKind::Standard )->GetName();
+        }
+        return aSeq;
+    }
+    else
+    {
+        PageKind eKind;
+        switch (mnType)
+        {
+            case SdLinkTargetType::Notes:
+                eKind = PageKind::Notes;
+                break;
+            case SdLinkTargetType::Handout:
+                eKind = PageKind::Handout;
+                break;
+            default:
+                eKind = PageKind::Standard;
+                break;
+        }
+        const sal_uInt16 nMaxPages = pDoc->GetSdPageCount( eKind );
+        const sal_uInt16 nMaxMasterPages = pDoc->GetMasterPageCount();
+
+        uno::Sequence< OUString > aSeq( mnType == SdLinkTargetType::MasterPage ? nMaxMasterPages : nMaxPages );
+        OUString* pStr = aSeq.getArray();
+
+        sal_uInt16 nPage;
+        switch (mnType)
+        {
+            case SdLinkTargetType::Page:
+            {
+                for( nPage = 0; nPage < nMaxPages; nPage++ )
+                    *pStr++ = pDoc->GetSdPage( nPage, PageKind::Standard )->GetName();
+                break;
+            }
+            case SdLinkTargetType::Notes:
+            {
+                for( nPage = 0; nPage < nMaxPages; nPage++ )
+                    *pStr++ = pDoc->GetSdPage( nPage, PageKind::Notes )->GetName();
+                break;
+            }
+            case SdLinkTargetType::Handout:
+            {
+                for( nPage = 0; nPage < nMaxPages; nPage++ )
+                    *pStr++ = pDoc->GetSdPage( nPage, PageKind::Handout )->GetName();
+                break;
+            }
+            case SdLinkTargetType::MasterPage:
+            {
+                for( nPage = 0; nPage < nMaxMasterPages; nPage++ )
+                    *pStr++ = static_cast<SdPage*>(pDoc->GetMasterPage( nPage ))->GetName();
+                break;
+            }
+        }
+        return aSeq;
+    }
+}
+
+sal_Bool SAL_CALL SdDocLinkTarget::hasByName(const OUString& aName)
+{
+    ::SolarMutexGuard aGuard;
+
+    if( nullptr == mpModel )
+        throw lang::DisposedException();
+
+    return FindPage( aName ) != nullptr;
+}
+
+// container::XElementAccess
+
+uno::Type SAL_CALL SdDocLinkTarget::getElementType()
+{
+    return cppu::UnoType<beans::XPropertySet>::get();
+}
+
+sal_Bool SAL_CALL SdDocLinkTarget::hasElements()
+{
+    ::SolarMutexGuard aGuard;
+
+    if( nullptr == mpModel )
+        throw lang::DisposedException();
+
+    return mpModel->GetDoc() != nullptr;
+}
+
+// XServiceInfo
+OUString SAL_CALL SdDocLinkTarget::getImplementationName()
+{
+    return "SdDocLinkTarget";
+}
+
+sal_Bool SAL_CALL SdDocLinkTarget::supportsService( const OUString& ServiceName )
+{
+    return cppu::supportsService( this, ServiceName );
+}
+
+uno::Sequence< OUString > SAL_CALL SdDocLinkTarget::getSupportedServiceNames()
 {
     return { "com.sun.star.document.LinkTargets" };
 }

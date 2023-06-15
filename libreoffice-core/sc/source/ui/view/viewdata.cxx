@@ -1527,6 +1527,7 @@ void ScViewData::SetEditEngine( ScSplitPos eWhich,
     bool bLOKActive = comphelper::LibreOfficeKit::isActive();
     bool bLOKPrintTwips = bLOKActive && comphelper::LibreOfficeKit::isCompatFlagSet(
             comphelper::LibreOfficeKit::Compat::scPrintTwipsMsgs);
+    bool bLOKLayoutRTL = bLOKActive && bLayoutRTL;
 
     bool bWasThere = false;
     if (pEditView[eWhich])
@@ -1624,6 +1625,9 @@ void ScViewData::SetEditEngine( ScSplitPos eWhich,
         else
             pEditView[eWhich]->SetLOKSpecialOutputArea(aPTwipsRect);
     }
+
+    if (bLOKLayoutRTL)
+        pEditView[eWhich]->SetLOKSpecialFlags(LOKSpecialFlags::LayoutRTL);
 
     tools::Rectangle aOutputArea = pWin->PixelToLogic( aPixRect, GetLogicMode() );
     pEditView[eWhich]->SetOutputArea( aOutputArea );
@@ -3940,7 +3944,7 @@ void ScViewData::ReadUserDataSequence(const uno::Sequence <beans::PropertyValue>
             if ( rSetting.Value >>= nTemp16 )
                 maOptions.SetObjMode(VOBJ_TYPE_DRAW, (nTemp16 == 1) ? VOBJ_MODE_HIDE : VOBJ_MODE_SHOW);
         }
-        else if ( sName == SC_UNO_VALUEHIGH )
+        else if ( sName == SC_UNO_VALUEHIGH && !comphelper::LibreOfficeKit::isActive() )
             maOptions.SetOption(VOPT_SYNTAX, ScUnoHelpFunctions::GetBoolFromAny(rSetting.Value));
         else
         {

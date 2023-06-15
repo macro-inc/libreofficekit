@@ -224,11 +224,14 @@ public:
     virtual ~ScColorFormat() override;
 
     const ScRangeList& GetRange() const;
+    void SetCache(const std::vector<double>& aValues);
+    std::vector<double> GetCache() const;
 
     virtual void SetParent(ScConditionalFormat* pParent) override;
 
     virtual void startRendering() override;
     virtual void endRendering() override;
+    virtual void updateValues() override;
 
 protected:
     std::vector<double>& getValues() const;
@@ -309,6 +312,8 @@ public:
     void SetDataBarData( ScDataBarFormatData* pData );
     const ScDataBarFormatData* GetDataBarData() const;
     ScDataBarFormatData* GetDataBarData();
+
+    bool IsEqual(const ScFormatEntry& r, bool bIgnoreSrcPos) const override;
 
     virtual void UpdateReference( sc::RefUpdateContext& rCxt ) override;
     virtual void UpdateInsertTab( sc::RefUpdateInsertTabContext& rCxt ) override;

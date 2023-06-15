@@ -124,7 +124,9 @@ void setSvxBrushItemAsFillAttributesToTargetSet(const SvxBrushItem& rBrush, SfxI
         const Color aColor(rBrush.GetColor().GetRGBColor());
 
         rToSet.Put(XFillStyleItem(drawing::FillStyle_SOLID));
-        rToSet.Put(XFillColorItem(OUString(), aColor));
+        XFillColorItem aFillColorItem(OUString(), aColor);
+        aFillColorItem.setComplexColor(rBrush.getComplexColor());
+        rToSet.Put(aFillColorItem);
 
         // #125189# nTransparency is in range [0..254], convert to [0..100] which is used in
         // XFillTransparenceItem (caution with the range which is in an *item-specific* range)
@@ -141,10 +143,11 @@ void setSvxBrushItemAsFillAttributesToTargetSet(const SvxBrushItem& rBrush, SfxI
         // is needed when e.g. first transparency is set to 0xff and then a Graphic gets set.
         // When not changing the FillStyle, the next getSvxBrushItemFromSourceSet *will* return
         // to drawing::FillStyle_SOLID with the rescued color.
-        const Color aColor(rBrush.GetColor().GetRGBColor());
+        const Color aColor = rBrush.GetColor().GetRGBColor();
 
         rToSet.Put(XFillStyleItem(drawing::FillStyle_NONE));
-        rToSet.Put(XFillColorItem(OUString(), aColor));
+        XFillColorItem aFillColorItem(OUString(), aColor);
+        rToSet.Put(aFillColorItem);
     }
 }
 
@@ -156,7 +159,7 @@ static sal_uInt16 getTransparenceForSvxBrushItem(const SfxItemSet& rSourceSet, b
     if((pGradientItem = rSourceSet.GetItemIfSet(XATTR_FILLFLOATTRANSPARENCE, bSearchInParents))
         && pGradientItem->IsEnabled())
     {
-        const XGradient& rGradient = pGradientItem->GetGradientValue();
+        const basegfx::BGradient& rGradient = pGradientItem->GetGradientValue();
         const sal_uInt16 nStartLuminance(Color(rGradient.GetColorStops().front().getStopColor()).GetLuminance());
         const sal_uInt16 nEndLuminance(Color(rGradient.GetColorStops().back().getStopColor()).GetLuminance());
 
@@ -169,7 +172,9 @@ static sal_uInt16 getTransparenceForSvxBrushItem(const SfxItemSet& rSourceSet, b
 
 static std::unique_ptr<SvxBrushItem> getSvxBrushItemForSolid(const SfxItemSet& rSourceSet, bool bSearchInParents, sal_uInt16 nBackgroundID)
 {
-    Color aFillColor(rSourceSet.Get(XATTR_FILLCOLOR, bSearchInParents).GetColorValue());
+    auto const& rFillColorItem = rSourceSet.Get(XATTR_FILLCOLOR, bSearchInParents);
+    model::ComplexColor aFillComplexColor = rFillColorItem.getComplexColor();
+    Color aFillColor = rFillColorItem.GetColorValue();
 
     // get evtl. mixed transparence
     const sal_uInt16 nFillTransparence(getTransparenceForSvxBrushItem(rSourceSet, bSearchInParents));
@@ -184,7 +189,7 @@ static std::unique_ptr<SvxBrushItem> getSvxBrushItemForSolid(const SfxItemSet& r
         aFillColor.SetAlpha(255 - aTargetTrans);
     }
 
-    return std::make_unique<SvxBrushItem>(aFillColor, nBackgroundID);
+    return std::make_unique<SvxBrushItem>(aFillColor, aFillComplexColor, nBackgroundID);
 }
 
 std::unique_ptr<SvxBrushItem> getSvxBrushItemFromSourceSet(const SfxItemSet& rSourceSet, sal_uInt16 nBackgroundID, bool bSearchInParents, bool bXMLImportHack)
@@ -223,9 +228,9 @@ std::unique_ptr<SvxBrushItem> getSvxBrushItemFromSourceSet(const SfxItemSet& rSo
         case drawing::FillStyle_GRADIENT:
         {
             // cannot be directly supported, but do the best possible
-            const XGradient aXGradient(rSourceSet.Get(XATTR_FILLGRADIENT).GetGradientValue());
-            const basegfx::BColor aStartColor(aXGradient.GetColorStops().front().getStopColor() * (aXGradient.GetStartIntens() * 0.01));
-            const basegfx::BColor aEndColor(aXGradient.GetColorStops().back().getStopColor() * (aXGradient.GetEndIntens() * 0.01));
+            const basegfx::BGradient aBGradient(rSourceSet.Get(XATTR_FILLGRADIENT).GetGradientValue());
+            const basegfx::BColor aStartColor(aBGradient.GetColorStops().front().getStopColor() * (aBGradient.GetStartIntens() * 0.01));
+            const basegfx::BColor aEndColor(aBGradient.GetColorStops().back().getStopColor() * (aBGradient.GetEndIntens() * 0.01));
 
             // use half/half mixed color from gradient start and end
             Color aMixedColor((aStartColor + aEndColor) * 0.5);

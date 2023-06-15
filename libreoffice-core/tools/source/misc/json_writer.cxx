@@ -156,6 +156,15 @@ static char getEscapementChar(char ch)
 
 static bool writeEscapedSequence(sal_uInt32 ch, char*& pos)
 {
+    // control characters
+    if (ch <= 0x1f)
+    {
+        int written = sprintf(pos, "\\u%.4x", ch);
+        if (written > 0)
+            pos += written;
+        return true;
+    }
+
     switch (ch)
     {
         case '\b':
@@ -227,6 +236,32 @@ void JsonWriter::writeEscapedOUString(const OUString& rPropVal)
             ++mPos;
         }
     }
+
+    validate();
+}
+
+void JsonWriter::put(const OUString& pPropName, const OUString& rPropVal)
+{
+    auto nPropNameLength = pPropName.getLength();
+    // But values can be any UTF-8,
+    // if the string only contains of 0x2028, it will be expanded 6 times (see writeEscapedSequence)
+    auto nWorstCasePropValLength = rPropVal.getLength() * 6;
+    ensureSpace(nPropNameLength + nWorstCasePropValLength + 8);
+
+    addCommaBeforeField();
+
+    *mPos = '"';
+    ++mPos;
+
+    writeEscapedOUString(pPropName);
+
+    memcpy(mPos, "\": \"", 4);
+    mPos += 4;
+
+    writeEscapedOUString(rPropVal);
+
+    *mPos = '"';
+    ++mPos;
 
     validate();
 }

@@ -77,8 +77,9 @@
 #include <editeng/charreliefitem.hxx>
 #include <editeng/itemtype.hxx>
 #include <editeng/eerdll.hxx>
-#include <docmodel/uno/UnoThemeColor.hxx>
-#include <docmodel/theme/ThemeColorJSON.hxx>
+#include <docmodel/color/ComplexColorJSON.hxx>
+#include <docmodel/uno/UnoComplexColor.hxx>
+#include <docmodel/color/ComplexColor.hxx>
 #include <libxml/xmlwriter.h>
 
 using namespace ::com::sun::star;
@@ -938,7 +939,8 @@ void SvxFontHeightItem::dumpAsXml(xmlTextWriterPtr pWriter) const
 // class SvxTextLineItem ------------------------------------------------
 
 SvxTextLineItem::SvxTextLineItem( const FontLineStyle eSt, const sal_uInt16 nId )
-    : SfxEnumItem( nId, eSt ), mColor( COL_TRANSPARENT )
+    : SfxEnumItem(nId, eSt)
+    , maColor(COL_TRANSPARENT)
 {
 }
 
@@ -980,8 +982,8 @@ bool SvxTextLineItem::GetPresentation
 )   const
 {
     rText = GetValueTextByPos( GetValue() );
-    if( !mColor.IsTransparent() )
-        rText += cpDelim + ::GetColorString( mColor );
+    if( !maColor.IsTransparent() )
+        rText += cpDelim + ::GetColorString(maColor);
     return true;
 }
 
@@ -1004,14 +1006,19 @@ bool SvxTextLineItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
         rVal <<= static_cast<sal_Int16>(GetValue());
         break;
     case MID_TL_COLOR:
-        rVal <<= mColor;
+        rVal <<= maColor;
         break;
+    case MID_TL_COMPLEX_COLOR:
+    {
+        auto xComplexColor = model::color::createXComplexColor(maComplexColor);
+        rVal <<= xComplexColor;
+        break;
+    }
     case MID_TL_HASCOLOR:
-        rVal <<= mColor.GetAlpha() == 255;
+        rVal <<= maColor.GetAlpha() == 255;
         break;
     }
     return true;
-
 }
 
 bool SvxTextLineItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
@@ -1041,14 +1048,24 @@ bool SvxTextLineItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
         {
             // Keep transparence, because it contains the information
             // whether the font color or the stored color should be used
-            sal_uInt8 nAlpha = mColor.GetAlpha();
-            mColor = nCol;
-            mColor.SetAlpha( nAlpha );
+            sal_uInt8 nAlpha = maColor.GetAlpha();
+            maColor = nCol;
+            maColor.SetAlpha( nAlpha );
         }
     }
     break;
+    case MID_TL_COMPLEX_COLOR:
+    {
+        css::uno::Reference<css::util::XComplexColor> xComplexColor;
+        if (!(rVal >>= xComplexColor))
+            return false;
+
+        if (xComplexColor.is())
+            maComplexColor = model::color::getFromXComplexColor(xComplexColor);
+    }
+    break;
     case MID_TL_HASCOLOR:
-        mColor.SetAlpha( Any2Bool( rVal ) ? 255 : 0 );
+        maColor.SetAlpha( Any2Bool( rVal ) ? 255 : 0 );
     break;
     }
     return bRet;
@@ -1057,7 +1074,8 @@ bool SvxTextLineItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
 bool SvxTextLineItem::operator==( const SfxPoolItem& rItem ) const
 {
     return SfxEnumItem::operator==( rItem ) &&
-           GetColor() == static_cast<const SvxTextLineItem&>(rItem).GetColor();
+           maColor == static_cast<const SvxTextLineItem&>(rItem).maColor &&
+           maComplexColor == static_cast<const SvxTextLineItem&>(rItem).maComplexColor;
 }
 
 // class SvxUnderlineItem ------------------------------------------------
@@ -1368,10 +1386,10 @@ SvxColorItem::SvxColorItem( const Color& rCol, const sal_uInt16 nId ) :
 {
 }
 
-SvxColorItem::SvxColorItem(Color const& rColor, model::ThemeColor const& rThemeColor, const sal_uInt16 nId)
+SvxColorItem::SvxColorItem(Color const& rColor, model::ComplexColor const& rComplexColor, const sal_uInt16 nId)
     : SfxPoolItem(nId)
     , mColor(rColor)
-    , maThemeColor(rThemeColor)
+    , maComplexColor(rComplexColor)
 {
 }
 
@@ -1385,7 +1403,7 @@ bool SvxColorItem::operator==( const SfxPoolItem& rAttr ) const
     const SvxColorItem& rColorItem = static_cast<const SvxColorItem&>(rAttr);
 
     return mColor == rColorItem.mColor &&
-           maThemeColor == rColorItem.maThemeColor;
+           maComplexColor == rColorItem.maComplexColor;
 }
 
 bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
@@ -1406,13 +1424,13 @@ bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
         }
         case MID_COLOR_THEME_INDEX:
         {
-            rVal <<= sal_Int16(maThemeColor.getType());
+            rVal <<= sal_Int16(maComplexColor.meSchemeType);
             break;
         }
         case MID_COLOR_TINT_OR_SHADE:
         {
             sal_Int16 nValue = 0;
-            for (auto const& rTransform : maThemeColor.getTransformations())
+            for (auto const& rTransform : maComplexColor.getTransformations())
             {
                 if (rTransform.meType == model::TransformationType::Tint)
                     nValue = rTransform.mnValue;
@@ -1425,7 +1443,7 @@ bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
         case MID_COLOR_LUM_MOD:
         {
             sal_Int16 nValue = 10000;
-            for (auto const& rTransform : maThemeColor.getTransformations())
+            for (auto const& rTransform : maComplexColor.getTransformations())
             {
                 if (rTransform.meType == model::TransformationType::LumMod)
                     nValue = rTransform.mnValue;
@@ -1436,7 +1454,7 @@ bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
         case MID_COLOR_LUM_OFF:
         {
             sal_Int16 nValue = 0;
-            for (auto const& rTransform : maThemeColor.getTransformations())
+            for (auto const& rTransform : maComplexColor.getTransformations())
             {
                 if (rTransform.meType == model::TransformationType::LumOff)
                     nValue = rTransform.mnValue;
@@ -1444,15 +1462,15 @@ bool SvxColorItem::QueryValue( uno::Any& rVal, sal_uInt8 nMemberId ) const
             rVal <<= nValue;
             break;
         }
-        case MID_COLOR_THEME_REFERENCE:
+        case MID_COMPLEX_COLOR_JSON:
         {
-            auto xThemeColor = model::theme::createXThemeColor(maThemeColor);
-            rVal <<= xThemeColor;
+            rVal <<= OStringToOUString(model::color::convertToJSON(maComplexColor), RTL_TEXTENCODING_UTF8);
             break;
         }
-        case MID_COLOR_THEME_REFERENCE_JSON:
+        case MID_COMPLEX_COLOR:
         {
-            rVal <<= OStringToOUString(model::theme::convertToJSON(maThemeColor), RTL_TEXTENCODING_UTF8);
+            auto xComplexColor = model::color::createXComplexColor(maComplexColor);
+            rVal <<= xComplexColor;
             break;
         }
         case MID_COLOR_RGB:
@@ -1491,7 +1509,7 @@ bool SvxColorItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             sal_Int16 nIndex = -1;
             if (!(rVal >>= nIndex))
                 return false;
-            maThemeColor.setType(model::convertToThemeColorType(nIndex));
+            maComplexColor.setSchemeColor(model::convertToThemeColorType(nIndex));
         }
         break;
         case MID_COLOR_TINT_OR_SHADE:
@@ -1500,15 +1518,15 @@ bool SvxColorItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             if (!(rVal >>= nTintShade))
                 return false;
 
-            maThemeColor.removeTransformations(model::TransformationType::Tint);
-            maThemeColor.removeTransformations(model::TransformationType::Shade);
+            maComplexColor.removeTransformations(model::TransformationType::Tint);
+            maComplexColor.removeTransformations(model::TransformationType::Shade);
 
             if (nTintShade > 0)
-                maThemeColor.addTransformation({model::TransformationType::Tint, nTintShade});
+                maComplexColor.addTransformation({model::TransformationType::Tint, nTintShade});
             else if (nTintShade < 0)
             {
                 sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-nTintShade);
-                maThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+                maComplexColor.addTransformation({model::TransformationType::Shade, nShade});
             }
         }
         break;
@@ -1517,8 +1535,8 @@ bool SvxColorItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             sal_Int16 nLumMod = 10000;
             if (!(rVal >>= nLumMod))
                 return false;
-            maThemeColor.removeTransformations(model::TransformationType::LumMod);
-            maThemeColor.addTransformation({model::TransformationType::LumMod, nLumMod});
+            maComplexColor.removeTransformations(model::TransformationType::LumMod);
+            maComplexColor.addTransformation({model::TransformationType::LumMod, nLumMod});
         }
         break;
         case MID_COLOR_LUM_OFF:
@@ -1526,42 +1544,39 @@ bool SvxColorItem::PutValue( const uno::Any& rVal, sal_uInt8 nMemberId )
             sal_Int16 nLumOff = 0;
             if (!(rVal >>= nLumOff))
                 return false;
-            maThemeColor.removeTransformations(model::TransformationType::LumOff);
-            maThemeColor.addTransformation({model::TransformationType::LumOff, nLumOff});
+            maComplexColor.removeTransformations(model::TransformationType::LumOff);
+            maComplexColor.addTransformation({model::TransformationType::LumOff, nLumOff});
         }
         break;
-        case MID_COLOR_THEME_REFERENCE:
+        case MID_COMPLEX_COLOR_JSON:
         {
-            css::uno::Reference<css::util::XThemeColor> xThemeColor;
-            if (!(rVal >>= xThemeColor))
+            OUString sComplexColorJson;
+            if (!(rVal >>= sComplexColorJson))
                 return false;
 
-            if (xThemeColor.is())
-            {
-                model::theme::setFromXThemeColor(maThemeColor, xThemeColor);
-            }
+            if (sComplexColorJson.isEmpty())
+                return false;
+
+            OString aJSON = OUStringToOString(sComplexColorJson, RTL_TEXTENCODING_ASCII_US);
+            if (!model::color::convertFromJSON(aJSON, maComplexColor))
+                return false;
         }
         break;
-
-        case MID_COLOR_THEME_REFERENCE_JSON:
+        case MID_COMPLEX_COLOR:
         {
-            OUString sThemeJson;
-            if (!(rVal >>= sThemeJson))
+            css::uno::Reference<css::util::XComplexColor> xComplexColor;
+            if (!(rVal >>= xComplexColor))
                 return false;
 
-            if (sThemeJson.isEmpty())
-            {
-                return false;
-            }
-            OString aJSON = OUStringToOString(sThemeJson, RTL_TEXTENCODING_ASCII_US);
-            model::theme::convertFromJSON(aJSON, maThemeColor);
+            if (xComplexColor.is())
+                maComplexColor = model::color::getFromXComplexColor(xComplexColor);
         }
         break;
-
         case MID_COLOR_RGB:
         default:
         {
-            return rVal >>= mColor;
+            if (!(rVal >>= mColor))
+                return false;
         }
         break;
     }
@@ -1599,12 +1614,12 @@ void SvxColorItem::dumpAsXml(xmlTextWriterPtr pWriter) const
     GetPresentation( SfxItemPresentation::Complete, MapUnit::Map100thMM, MapUnit::Map100thMM, aStr, aIntlWrapper);
     (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("presentation"), BAD_CAST(OUStringToOString(aStr, RTL_TEXTENCODING_UTF8).getStr()));
 
-    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("theme-color"));
+    (void)xmlTextWriterStartElement(pWriter, BAD_CAST("complex-color"));
 
-    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("theme-index"),
-                                      BAD_CAST(OString::number(sal_Int16(maThemeColor.getType())).getStr()));
+    (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("type"),
+                                      BAD_CAST(OString::number(sal_Int16(maComplexColor.meType)).getStr()));
 
-    for (auto const& rTransform : maThemeColor.getTransformations())
+    for (auto const& rTransform : maComplexColor.getTransformations())
     {
         (void)xmlTextWriterStartElement(pWriter, BAD_CAST("transformation"));
         (void)xmlTextWriterWriteAttribute(pWriter, BAD_CAST("type"),
@@ -1617,11 +1632,6 @@ void SvxColorItem::dumpAsXml(xmlTextWriterPtr pWriter) const
     (void)xmlTextWriterEndElement(pWriter);
 
     (void)xmlTextWriterEndElement(pWriter);
-}
-
-void SvxColorItem::SetValue( const Color& rNewCol )
-{
-    mColor = rNewCol;
 }
 
 // class SvxKerningItem --------------------------------------------------

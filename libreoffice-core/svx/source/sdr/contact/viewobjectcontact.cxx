@@ -31,6 +31,7 @@
 #include <drawinglayer/primitive2d/transformprimitive2d.hxx>
 #include <drawinglayer/primitive2d/structuretagprimitive2d.hxx>
 #include <svx/svdobj.hxx>
+#include <svx/svdomedia.hxx>
 #include <svx/svdmodel.hxx>
 #include <svx/svdpage.hxx>
 #include <svx/svdotext.hxx>
@@ -166,10 +167,14 @@ ViewObjectContact::ViewObjectContact(ObjectContact& rObjectContact, ViewContact&
 
 ViewObjectContact::~ViewObjectContact()
 {
-    // invalidate in view
-    if(!getObjectRange().isEmpty())
+    // if the object range is empty, then we have never had the primitive range change, so nothing to invalidate
+    if (!maObjectRange.isEmpty())
     {
-        GetObjectContact().InvalidatePartOfView(maObjectRange);
+        // invalidate in view
+        if(!getObjectRange().isEmpty())
+        {
+            GetObjectContact().InvalidatePartOfView(maObjectRange);
+        }
     }
 
     // delete PrimitiveAnimation
@@ -340,6 +345,11 @@ void ViewObjectContact::createPrimitive2DSequence(const DisplayInfo& rDisplayInf
     rVisitor.visit(xRetval);
 }
 
+bool ViewObjectContact::isExportPDFTags() const
+{
+    return GetObjectContact().isExportTaggedPDF();
+}
+
 drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPrimitive2DSequence(const DisplayInfo& rDisplayInfo) const
 {
     // only some of the top-level apps are any good at reliably invalidating us (e.g. writer is not)
@@ -386,7 +396,7 @@ drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPr
 
     // Check if we need to embed to a StructureTagPrimitive2D, too. This
     // was done at ImplRenderPaintProc::createRedirectedPrimitive2DSequence before
-    if (!xNewPrimitiveSequence.empty() && GetObjectContact().isExportTaggedPDF())
+    if (!xNewPrimitiveSequence.empty() && isExportPDFTags())
     {
         if (nullptr != pSdrObj)
         {
@@ -434,7 +444,8 @@ drawinglayer::primitive2d::Primitive2DContainer const & ViewObjectContact::getPr
                     }
 
                     ::std::vector<sal_Int32> annotIds;
-                    if (eElement == vcl::PDFWriter::Annot)
+                    if (eElement == vcl::PDFWriter::Annot
+                        && !static_cast<SdrMediaObj*>(pSdrObj)->getURL().isEmpty())
                     {
                         auto const pPDFExtOutDevData(GetObjectContact().GetPDFExtOutDevData());
                         assert(pPDFExtOutDevData);

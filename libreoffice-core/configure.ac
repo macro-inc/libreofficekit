@@ -9,7 +9,7 @@ dnl in order to create a configure script.
 # several non-alphanumeric characters, those are split off and used only for the
 # ABOUTBOXPRODUCTVERSIONSUFFIX in openoffice.lst. Why that is necessary, no idea.
 
-AC_INIT([LibreOfficeKit],[23.05.0.1],[],[],[https://github.com/coparse-inc/libreofficekit])
+AC_INIT([Macro],[23.05.0.5],[],[],[https://github.com/coparse-inc/libreofficekit])
 
 dnl libnumbertext needs autoconf 2.68, but that can pick up autoconf268 just fine if it is installed
 dnl whereas aclocal (as run by autogen.sh) insists on using autoconf and fails hard
@@ -14699,6 +14699,7 @@ dnl ===================================================================
 
 AC_MSG_CHECKING([MPL subset])
 MPL_SUBSET=
+LICENSE="LGPL"
 
 if test "$enable_mpl_subset" = "yes"; then
     warn_report=false
@@ -14740,12 +14741,14 @@ if test "$enable_mpl_subset" = "yes"; then
     fi
 
     MPL_SUBSET="TRUE"
+    LICENSE="MPL-2.0"
     AC_DEFINE(MPL_HAVE_SUBSET)
     AC_MSG_RESULT([only])
 else
     AC_MSG_RESULT([no restrictions])
 fi
 AC_SUBST(MPL_SUBSET)
+AC_SUBST(LICENSE)
 
 dnl ===================================================================
 

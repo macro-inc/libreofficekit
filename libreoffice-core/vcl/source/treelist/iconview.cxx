@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <vcl/filter/PngImageWriter.hxx>
 #include <vcl/toolkit/treelistentry.hxx>
 #include <vcl/toolkit/viewdataentry.hxx>
 #include <iconview.hxx>
@@ -28,6 +29,7 @@
 #include <tools/stream.hxx>
 #include <vcl/cvtgrf.hxx>
 #include <comphelper/base64.hxx>
+#include <comphelper/propertyvalue.hxx>
 
 namespace
 {
@@ -262,7 +264,13 @@ static OString extractPngString(const SvLBoxContextBmp* pBmpItem)
 {
     BitmapEx aImage = pBmpItem->GetBitmap1().GetBitmapEx();
     SvMemoryStream aOStm(65535, 65535);
-    if (GraphicConverter::Export(aOStm, aImage, ConvertDataFormat::PNG) == ERRCODE_NONE)
+    // Use fastest compression "1"
+    css::uno::Sequence<css::beans::PropertyValue> aFilterData{
+        comphelper::makePropertyValue("Compression", sal_Int32(1)),
+    };
+    vcl::PngImageWriter aPNGWriter(aOStm);
+    aPNGWriter.setParameters(aFilterData);
+    if (aPNGWriter.write(aImage))
     {
         css::uno::Sequence<sal_Int8> aSeq(static_cast<sal_Int8 const*>(aOStm.GetData()),
                                           aOStm.Tell());
@@ -274,8 +282,7 @@ static OString extractPngString(const SvLBoxContextBmp* pBmpItem)
     return "";
 }
 
-static void lcl_DumpEntryAndSiblings(tools::JsonWriter& rJsonWriter, SvTreeListEntry* pEntry,
-                                     const SvTreeListBox* pTabListBox)
+void IconView::DumpEntryAndSiblings(tools::JsonWriter& rJsonWriter, SvTreeListEntry* pEntry)
 {
     while (pEntry)
     {
@@ -286,24 +293,30 @@ static void lcl_DumpEntryAndSiblings(tools::JsonWriter& rJsonWriter, SvTreeListE
         if (pIt)
             rJsonWriter.put("text", static_cast<const SvLBoxString*>(pIt)->GetText());
 
-        pIt = pEntry->GetFirstItem(SvLBoxItemType::ContextBmp);
-        if (pIt)
+        const bool bHandled
+            = maDumpElemToPropertyTreeHdl.IsSet()
+              && maDumpElemToPropertyTreeHdl.Call(json_prop_query(rJsonWriter, pEntry, "image"));
+        if (!bHandled)
         {
-            const SvLBoxContextBmp* pBmpItem = static_cast<const SvLBoxContextBmp*>(pIt);
-            if (pBmpItem)
-                rJsonWriter.put("image", extractPngString(pBmpItem));
+            pIt = pEntry->GetFirstItem(SvLBoxItemType::ContextBmp);
+            if (pIt)
+            {
+                const SvLBoxContextBmp* pBmpItem = static_cast<const SvLBoxContextBmp*>(pIt);
+                if (pBmpItem)
+                    rJsonWriter.put("image", extractPngString(pBmpItem));
+            }
         }
 
-        if (const OUString tooltip = pTabListBox->GetEntryTooltip(pEntry); !tooltip.isEmpty())
+        if (const OUString tooltip = GetEntryTooltip(pEntry); !tooltip.isEmpty())
             rJsonWriter.put("tooltip", tooltip);
 
-        if (pTabListBox->IsSelected(pEntry))
+        if (IsSelected(pEntry))
             rJsonWriter.put("selected", true);
 
         if (pEntry->GetFlags() & SvTLEntryFlags::IS_SEPARATOR)
             rJsonWriter.put("separator", true);
 
-        rJsonWriter.put("row", pTabListBox->GetModel()->GetAbsPos(pEntry));
+        rJsonWriter.put("row", GetModel()->GetAbsPos(pEntry));
 
         pEntry = pEntry->NextSibling();
     }
@@ -315,7 +328,7 @@ void IconView::DumpAsPropertyTree(tools::JsonWriter& rJsonWriter)
     rJsonWriter.put("type", "iconview");
     rJsonWriter.put("singleclickactivate", GetActivateOnSingleClick());
     auto aNode = rJsonWriter.startArray("entries");
-    lcl_DumpEntryAndSiblings(rJsonWriter, First(), this);
+    DumpEntryAndSiblings(rJsonWriter, First());
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

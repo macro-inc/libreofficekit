@@ -21,10 +21,12 @@
 
 #include <com/sun/star/uno/Any.hxx>
 #include <com/sun/star/uno/Sequence.hxx>
+#include <svtools/colorcfg.hxx>
 
 #include <global.hxx>
 #include <viewopti.hxx>
 #include <sc.hrc>
+#include <scmod.hxx>
 #include <miscuno.hxx>
 
 using namespace utl;
@@ -112,6 +114,8 @@ void ScViewOptions::SetDefaults()
 
     aGridCol     = SC_STD_GRIDCOLOR;
 
+    aDocCol      = SC_MOD()->GetColorConfig().GetColorValue(svtools::DOCCOLOR).nColor;
+
     aGridOpt.SetDefaults();
 }
 
@@ -136,6 +140,7 @@ bool ScViewOptions::operator==( const ScViewOptions& rOpt ) const
     bEqual = bEqual && (aGridCol       == rOpt.aGridCol);
     bEqual = bEqual && (aGridColName   == rOpt.aGridColName);
     bEqual = bEqual && (aGridOpt       == rOpt.aGridOpt);
+    bEqual = bEqual && (aDocCol        == rOpt.aDocCol);
 
     return bEqual;
 }

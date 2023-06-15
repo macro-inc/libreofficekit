@@ -22,6 +22,7 @@
 
 #include <officecfg/Office/Common.hxx>
 #include <rtl/character.hxx>
+#include <unotools/saveopt.hxx>
 
 using namespace ::com::sun::star;
 
@@ -518,6 +519,144 @@ CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testMCGR_threeStops)
     CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Red);
     CPPUNIT_ASSERT_EQUAL(1.0, aColorStop.StopColor.Green);
     CPPUNIT_ASSERT_EQUAL(0.0, aColorStop.StopColor.Blue);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testBorderRestoration)
+{
+    // Load document. It has a shape with color gradient build from color stop yellow at offset 0.5
+    // and color stop red at offset 1.0. For better backward compatibility such gradient has to be
+    // exported to ODF with a border of 50%.
+    // When gradient-stops are integrated in ODF strict, the test needs to be adapted.
+
+    loadFromURL(u"MCGR_Border_restoration.pptx");
+
+    // Backup original ODF default version
+    const SvtSaveOptions::ODFDefaultVersion nCurrentODFVersion(GetODFDefaultVersion());
+
+    // Save to ODF_LATEST which is currently ODF 1.3 extended. Make sure gradient-stop elements have
+    // offsets 0 and 1, and border is written as 50%.
+    SetODFDefaultVersion(SvtSaveOptions::ODFDefaultVersion::ODFVER_LATEST);
+    save("impress8");
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    OString sPath
+        = "/office:document-styles/office:styles/draw:gradient[@draw:name='Gradient_20_1']";
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "color-value", "#ff0000");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[2]", "offset", "1");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "color-value", "#ffff00");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop[1]", "offset", "0");
+    assertXPath(pXmlDoc, sPath, "border", "50%");
+
+    // Save to ODF 1.3 strict and make sure border, start-color and end-color are suitable set.
+    SetODFDefaultVersion(SvtSaveOptions::ODFDefaultVersion::ODFVER_013);
+    save("impress8");
+    pXmlDoc = parseExport("styles.xml");
+    assertXPath(pXmlDoc, sPath + "/loext:gradient-stop", 0);
+    assertXPath(pXmlDoc, sPath, "start-color", "#ffff00");
+    assertXPath(pXmlDoc, sPath, "end-color", "#ff0000");
+    assertXPath(pXmlDoc, sPath, "border", "50%");
+
+    // Set back to original ODF default version.
+    SetODFDefaultVersion(nCurrentODFVersion);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testTransparencyBorderRestoration)
+{
+    // Load document. It has a shape with transparency gradient build from transparency 100% at
+    // offset 0, transparency 100% at offset 0.4 and transparency 10% at offset 1.0. For better
+    // backward compatibility such gradient is exported with a border of 40% in the transparency
+    // gradient. The color itself is the same for all gradient stops.
+    // When transparency gradient-stops are integrated in ODF strict, the test needs to be adapted.
+    loadFromURL(u"MCGR_TransparencyBorder_restoration.pptx");
+
+    // Backup original ODF default version
+    const SvtSaveOptions::ODFDefaultVersion nCurrentODFVersion(GetODFDefaultVersion());
+
+    // Save to ODF_LATEST which is currently ODF 1.3 extended. Make sure transparency gradient-stop
+    //elements are written with offset 0 and 1, and border is written as 40%.
+    SetODFDefaultVersion(SvtSaveOptions::ODFDefaultVersion::ODFVER_LATEST);
+    save("impress8");
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    OString sPath = "/office:document-styles/office:styles/draw:opacity[1]";
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[2]", "stop-opacity", "0.9");
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[2]", "offset", "1");
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[1]", "stop-opacity", "0");
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop[1]", "offset", "0");
+    assertXPath(pXmlDoc, sPath, "border", "40%");
+
+    // Save to ODF 1.3 strict and make sure border, start and end opacity are suitable set.
+    SetODFDefaultVersion(SvtSaveOptions::ODFDefaultVersion::ODFVER_013);
+    save("impress8");
+    pXmlDoc = parseExport("styles.xml");
+    assertXPath(pXmlDoc, sPath + "/loext:opacity-stop", 0);
+    assertXPath(pXmlDoc, sPath, "start", "0%");
+    assertXPath(pXmlDoc, sPath, "end", "90%");
+    assertXPath(pXmlDoc, sPath, "border", "40%");
+
+    // Set back to original ODF default version.
+    SetODFDefaultVersion(nCurrentODFVersion);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAxialGradientCompatible)
+{
+    // tdf#155549. An axial gradient with Border, StartColor A and EndColor B is exported to OOXML as
+    // symmetrical linear gradient with three stops, colors B A B. After the changes for multi-color
+    // gradients (MCGR) this is imported as linear gradient with colors B A B. So a consumer not able
+    // of MCGR would get a linear gradient with start and end color B. For better compatibility
+    // ODF export writes an axial gradient. with colors A and B.
+    // This test needs to be adapted when color stops are available in ODF strict and widely
+    // supported in even older LibreOffice versions.
+    loadFromURL(u"tdf155549_MCGR_AxialGradientCompatible.odt");
+
+    //Round-trip through OOXML.
+    // FixMe tdf#153183. Here "Attribute 'ID' is not allowed to appear in element 'v:rect'".
+    skipValidation();
+    saveAndReload("Office Open XML Text");
+    saveAndReload("writer8");
+
+    // Examine reloaded file
+    uno::Reference<drawing::XShape> xShape(getShape(0));
+    CPPUNIT_ASSERT_MESSAGE("No shape", xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+
+    // Without fix these would have failed with Style=0 (=LINEAR), StartColor=0xFFFF00 and Border=0.
+    awt::Gradient2 aGradient;
+    xShapeProperties->getPropertyValue("FillGradient") >>= aGradient;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("gradient style", awt::GradientStyle_AXIAL, aGradient.Style);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("EndColor", sal_Int32(0xFFFF00), aGradient.EndColor);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("StartColor", sal_Int32(0x1E90FF), aGradient.StartColor);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Border", sal_Int16(20), aGradient.Border);
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffStyleTest, testAxialTransparencyCompatible)
+{
+    // tdf#155549. The shape in the document has a solid color and an axial transparency gradient
+    // with 'Transition start 60%', 'Start value 10%' and 'End value 80%'. The gradient is exported
+    // to OOXML as linear symmetrical gradient with three gradient stops. After the changes for
+    // multi-color gradients (MCGR) this is imported as linear transparency gradient. For better
+    // compatibility with consumers not able to use MCGR, the ODF export writes the transparency as
+    // axial transparency gradient that is same as in the original document.
+    // This test needs to be adapted when color stops are available in ODF strict and widely
+    // supported in even older LibreOffice versions.
+    loadFromURL(u"tdf155549_MCGR_AxialTransparencyCompatible.odt");
+
+    //Round-trip through OOXML.
+    // FixMe tdf#153183, and error in charSpace and in CharacterSet
+    skipValidation();
+    saveAndReload("Office Open XML Text");
+    saveAndReload("writer8");
+
+    // Examine reloaded file
+    uno::Reference<drawing::XShape> xShape(getShape(0));
+    CPPUNIT_ASSERT(xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+
+    // Without fix these would have failed with Style=LINEAR, StartColor=0xCCCCCC and wrong Border.
+    awt::Gradient2 aTransGradient;
+    xShapeProperties->getPropertyValue("FillTransparenceGradient") >>= aTransGradient;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("gradient style", awt::GradientStyle_AXIAL, aTransGradient.Style);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("EndColor", sal_Int32(0xCCCCCC), aTransGradient.EndColor);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("StartColor", sal_Int32(0x191919), aTransGradient.StartColor);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Border", sal_Int16(60), aTransGradient.Border);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

@@ -16,8 +16,10 @@
 #include <drawdoc.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <svx/svdpage.hxx>
-#include <docmodel/uno/UnoThemeColor.hxx>
+#include <docmodel/uno/UnoComplexColor.hxx>
 #include <docmodel/theme/Theme.hxx>
+#include <ThemeColorChanger.hxx>
+#include <svx/ColorSets.hxx>
 
 using namespace css;
 
@@ -38,11 +40,22 @@ CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testThemeColorInHeading)
     SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
-    auto xThemeColor = getProperty<uno::Reference<util::XThemeColor>>(getParagraph(1),
-                                                                      "CharColorThemeReference");
-    model::ThemeColor aThemeColor;
-    model::theme::setFromXThemeColor(aThemeColor, xThemeColor);
-    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent1, aThemeColor.getType());
+    auto xComplexColor
+        = getProperty<uno::Reference<util::XComplexColor>>(getParagraph(1), "CharComplexColor");
+    auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
+    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent1, aComplexColor.getSchemeType());
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testThemeColorInHeadingODT)
+{
+    createSwDoc("ThemeColorInHeading.fodt");
+    SwDoc* pDoc = getSwDoc();
+    CPPUNIT_ASSERT(pDoc);
+
+    auto xComplexColor
+        = getProperty<uno::Reference<util::XComplexColor>>(getParagraph(1), "CharComplexColor");
+    auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
+    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent1, aComplexColor.getSchemeType());
 }
 
 void checkFillStyles(std::vector<model::FillStyle> const& rStyleList)
@@ -54,8 +67,8 @@ void checkFillStyles(std::vector<model::FillStyle> const& rStyleList)
         CPPUNIT_ASSERT(rFillStyle.mpFill);
         CPPUNIT_ASSERT_EQUAL(model::FillType::Solid, rFillStyle.mpFill->meType);
         auto* pSolidFill = static_cast<model::SolidFill*>(rFillStyle.mpFill.get());
-        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColorDefinition.meType);
-        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColorDefinition.maTransformations.size());
+        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColor.meType);
+        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColor.maTransformations.size());
     }
 
     // Fill style 2
@@ -238,8 +251,8 @@ void checkLineStyles(std::vector<model::LineStyle> const& rStyleList)
         CPPUNIT_ASSERT(rFillStyle.mpFill);
         CPPUNIT_ASSERT_EQUAL(model::FillType::Solid, rFillStyle.mpFill->meType);
         auto* pSolidFill = static_cast<model::SolidFill*>(rFillStyle.mpFill.get());
-        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColorDefinition.meType);
-        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColorDefinition.maTransformations.size());
+        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColor.meType);
+        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColor.maTransformations.size());
     }
 
     // Line style 2
@@ -257,8 +270,8 @@ void checkLineStyles(std::vector<model::LineStyle> const& rStyleList)
         CPPUNIT_ASSERT(rFillStyle.mpFill);
         CPPUNIT_ASSERT_EQUAL(model::FillType::Solid, rFillStyle.mpFill->meType);
         auto* pSolidFill = static_cast<model::SolidFill*>(rFillStyle.mpFill.get());
-        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColorDefinition.meType);
-        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColorDefinition.maTransformations.size());
+        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColor.meType);
+        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColor.maTransformations.size());
     }
 
     // Line style 3
@@ -276,8 +289,8 @@ void checkLineStyles(std::vector<model::LineStyle> const& rStyleList)
         CPPUNIT_ASSERT(rFillStyle.mpFill);
         CPPUNIT_ASSERT_EQUAL(model::FillType::Solid, rFillStyle.mpFill->meType);
         auto* pSolidFill = static_cast<model::SolidFill*>(rFillStyle.mpFill.get());
-        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColorDefinition.meType);
-        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColorDefinition.maTransformations.size());
+        CPPUNIT_ASSERT_EQUAL(model::ColorType::Placeholder, pSolidFill->maColor.meType);
+        CPPUNIT_ASSERT_EQUAL(size_t(0), pSolidFill->maColor.maTransformations.size());
     }
 }
 
@@ -329,7 +342,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testDrawPageThemeExistsDOCX)
     CPPUNIT_ASSERT(pTheme);
     CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
 
-    model::ColorSet* pColorSet = pTheme->GetColorSet();
+    auto pColorSet = pTheme->getColorSet();
     CPPUNIT_ASSERT(pColorSet);
     CPPUNIT_ASSERT_EQUAL(OUString(u"Orange"), pColorSet->getName());
 
@@ -367,7 +380,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testDrawPageThemeExistsDOCX)
 
 CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testDrawPageThemeExistsODT)
 {
-    createSwDoc("ThemeColorInHeading.odt");
+    createSwDoc("ThemeColorInHeading.fodt");
     SwDoc* pDoc = getSwDoc();
     CPPUNIT_ASSERT(pDoc);
 
@@ -376,7 +389,7 @@ CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testDrawPageThemeExistsODT)
     CPPUNIT_ASSERT(pTheme);
     CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
 
-    model::ColorSet* pColorSet = pTheme->GetColorSet();
+    auto pColorSet = pTheme->getColorSet();
     CPPUNIT_ASSERT(pColorSet);
     CPPUNIT_ASSERT_EQUAL(OUString(u"Orange"), pColorSet->getName());
 
@@ -390,6 +403,82 @@ CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testDrawPageThemeExistsODT)
     CPPUNIT_ASSERT_EQUAL(Color(0x637052), pTheme->GetColor(model::ThemeColorType::Dark2));
     CPPUNIT_ASSERT_EQUAL(Color(0xFFFFFF), pTheme->GetColor(model::ThemeColorType::Light1));
     CPPUNIT_ASSERT_EQUAL(Color(0xCCDDEA), pTheme->GetColor(model::ThemeColorType::Light2));
+}
+
+CPPUNIT_TEST_FIXTURE(SwCoreThemeTest, testThemeChanging)
+{
+    createSwDoc("ThemeColorInHeading.docx");
+    SwDoc* pDoc = getSwDoc();
+    CPPUNIT_ASSERT(pDoc);
+    SwWrtShell* pWrtShell = pDoc->GetDocShell()->GetWrtShell();
+    CPPUNIT_ASSERT(pWrtShell);
+    SdrPage* pPage = pDoc->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+    CPPUNIT_ASSERT(pPage);
+
+    // Check current theme colors
+    {
+        auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+        CPPUNIT_ASSERT(pTheme);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
+
+        auto pColorSet = pTheme->getColorSet();
+        CPPUNIT_ASSERT(pColorSet);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Orange"), pColorSet->getName());
+        CPPUNIT_ASSERT_EQUAL(Color(0xE48312), pTheme->GetColor(model::ThemeColorType::Accent1));
+    }
+
+    // Change theme colors
+    {
+        auto const& rColorSets = svx::ColorSets::get();
+        auto pNewColorSet = std::make_shared<model::ColorSet>(rColorSets.getColorSet(0));
+        // check that the theme colors are as expected
+        CPPUNIT_ASSERT_EQUAL(OUString(u"LibreOffice"), pNewColorSet->getName());
+
+        sw::ThemeColorChanger aChanger(pDoc->GetDocShell());
+        aChanger.apply(pNewColorSet);
+    }
+
+    // Check new theme colors
+    {
+        auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+        CPPUNIT_ASSERT(pTheme);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
+
+        auto pColorSet = pTheme->getColorSet();
+        CPPUNIT_ASSERT(pColorSet);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"LibreOffice"), pColorSet->getName());
+        CPPUNIT_ASSERT_EQUAL(Color(0x18A303), pTheme->GetColor(model::ThemeColorType::Accent1));
+    }
+
+    // Undo
+    pWrtShell->Undo();
+
+    // Check theme colors have been reverted
+    {
+        auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+        CPPUNIT_ASSERT(pTheme);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
+
+        auto pColorSet = pTheme->getColorSet();
+        CPPUNIT_ASSERT(pColorSet);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Orange"), pColorSet->getName());
+        CPPUNIT_ASSERT_EQUAL(Color(0xE48312), pTheme->GetColor(model::ThemeColorType::Accent1));
+    }
+
+    // Redo
+    pWrtShell->Redo();
+
+    // Check theme colors have been applied again
+    {
+        auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+        CPPUNIT_ASSERT(pTheme);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"Office Theme"), pTheme->GetName());
+
+        auto pColorSet = pTheme->getColorSet();
+        CPPUNIT_ASSERT(pColorSet);
+        CPPUNIT_ASSERT_EQUAL(OUString(u"LibreOffice"), pColorSet->getName());
+        CPPUNIT_ASSERT_EQUAL(Color(0x18A303), pTheme->GetColor(model::ThemeColorType::Accent1));
+    }
 }
 
 } // end anonymous namnespace

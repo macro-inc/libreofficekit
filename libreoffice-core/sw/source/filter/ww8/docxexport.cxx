@@ -48,10 +48,13 @@
 #include <oox/export/vmlexport.hxx>
 #include <oox/export/chartexport.hxx>
 #include <oox/export/shapes.hxx>
+#include <oox/export/ThemeExport.hxx>
 #include <oox/helper/propertyset.hxx>
 #include <oox/token/relationship.hxx>
 #include <oox/ole/olestorage.hxx>
 #include <oox/ole/olehelper.hxx>
+
+#include <svx/svdpage.hxx>
 
 #include <map>
 #include <algorithm>
@@ -62,6 +65,7 @@
 #include <IDocumentSettingAccess.hxx>
 #include <IDocumentLayoutAccess.hxx>
 #include <IDocumentStylePoolAccess.hxx>
+#include <IDocumentDrawModelAccess.hxx>
 #include <docsh.hxx>
 #include <ndtxt.hxx>
 #include "wrtww8.hxx"
@@ -74,6 +78,7 @@
 #include <poolfmt.hxx>
 #include <redline.hxx>
 #include <swdbdata.hxx>
+#include <drawdoc.hxx>
 
 #include <editeng/unoprnms.hxx>
 #include <editeng/editobj.hxx>
@@ -1001,7 +1006,8 @@ static auto
 WriteCompat(SwDoc const& rDoc, ::sax_fastparser::FSHelperPtr const& rpFS,
         sal_Int32 & rTargetCompatibilityMode) -> void
 {
-    if (!rDoc.getIDocumentSettingAccess().get(DocumentSettingId::ADD_EXT_LEADING))
+    const IDocumentSettingAccess& rIDSA = rDoc.getIDocumentSettingAccess();
+    if (!rIDSA.get(DocumentSettingId::ADD_EXT_LEADING))
     {
         rpFS->singleElementNS(XML_w, XML_noLeading);
         if (rTargetCompatibilityMode > 14)
@@ -1010,13 +1016,19 @@ WriteCompat(SwDoc const& rDoc, ::sax_fastparser::FSHelperPtr const& rpFS,
         }
     }
     // Do not justify lines with manual break
-    if (rDoc.getIDocumentSettingAccess().get(DocumentSettingId::DO_NOT_JUSTIFY_LINES_WITH_MANUAL_BREAK))
+    if (rIDSA.get(DocumentSettingId::DO_NOT_JUSTIFY_LINES_WITH_MANUAL_BREAK))
     {
         rpFS->singleElementNS(XML_w, XML_doNotExpandShiftReturn);
     }
     // tdf#146515 export "Use printer metrics for document formatting"
-    if (!rDoc.getIDocumentSettingAccess().get(DocumentSettingId::USE_VIRTUAL_DEVICE))
+    if (!rIDSA.get(DocumentSettingId::USE_VIRTUAL_DEVICE))
         rpFS->singleElementNS(XML_w, XML_usePrinterMetrics);
+
+    if (rIDSA.get(DocumentSettingId::DO_NOT_BREAK_WRAPPED_TABLES))
+    {
+        // Map the DoNotBreakWrappedTables compat flag to <w:doNotBreakWrappedTables>.
+        rpFS->singleElementNS(XML_w, XML_doNotBreakWrappedTables);
+    }
 }
 
 void DocxExport::WriteSettings()
@@ -1457,35 +1469,15 @@ void DocxExport::WriteSettings()
 
 void DocxExport::WriteTheme()
 {
-    uno::Reference< beans::XPropertySet > xPropSet( m_rDoc.GetDocShell()->GetBaseModel(), uno::UNO_QUERY_THROW );
-
-    uno::Reference< beans::XPropertySetInfo > xPropSetInfo = xPropSet->getPropertySetInfo();
-    OUString aName = UNO_NAME_MISC_OBJ_INTEROPGRABBAG;
-    if ( !xPropSetInfo->hasPropertyByName( aName ) )
+    SdrPage* pPage = m_rDoc.getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+    auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+    if (!pTheme)
         return;
 
-    uno::Reference<xml::dom::XDocument> themeDom;
-    uno::Sequence< beans::PropertyValue > propList;
-    xPropSet->getPropertyValue( aName ) >>= propList;
-    auto pProp = std::find_if(std::cbegin(propList), std::cend(propList),
-        [](const beans::PropertyValue& rProp) { return rProp.Name == "OOXTheme"; });
-    if (pProp != std::cend(propList))
-        pProp->Value >>= themeDom;
+    m_rFilter.addRelation(m_pDocumentFS->getOutputStream(), oox::getRelationship(Relationship::THEME), u"theme/theme1.xml" );
 
-    // no theme dom to write
-    if ( !themeDom.is() )
-        return;
-
-    m_rFilter.addRelation( m_pDocumentFS->getOutputStream(),
-            oox::getRelationship(Relationship::THEME),
-            u"theme/theme1.xml" );
-
-    uno::Reference< xml::sax::XSAXSerializable > serializer( themeDom, uno::UNO_QUERY );
-    uno::Reference< xml::sax::XWriter > writer = xml::sax::Writer::create( comphelper::getProcessComponentContext() );
-    writer->setOutputStream( GetFilter().openFragmentStream( "word/theme/theme1.xml",
-        "application/vnd.openxmlformats-officedocument.theme+xml" ) );
-    serializer->serialize( uno::Reference< xml::sax::XDocumentHandler >( writer, uno::UNO_QUERY_THROW ),
-        uno::Sequence< beans::StringPair >() );
+    oox::ThemeExport aThemeExport(&m_rFilter, oox::drawingml::DOCUMENT_DOCX);
+    aThemeExport.write(u"word/theme/theme1.xml", *pTheme);
 }
 
 // See OOXMLDocumentImpl::resolveGlossaryStream

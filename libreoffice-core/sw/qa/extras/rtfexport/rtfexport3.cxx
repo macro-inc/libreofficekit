@@ -28,6 +28,7 @@
 #include <wrtsh.hxx>
 #include <fmtpdsc.hxx>
 #include <IDocumentContentOperations.hxx>
+#include <IDocumentSettingAccess.hxx>
 
 using namespace css;
 
@@ -108,6 +109,12 @@ DECLARE_RTFEXPORT_TEST(testTdf130817, "tdf130817.rtf")
     xEndnotes->getByIndex(1) >>= xEndnoteText2;
     CPPUNIT_ASSERT_EQUAL(OUString("Titolo 2"), xEndnoteText2->getString().trim());
     CPPUNIT_ASSERT_EQUAL(OUString("$"), xEndnote1->getAnchor()->getString());
+}
+
+DECLARE_RTFEXPORT_TEST(testTdf154129_transparentFrame, "tdf154129_transparentFrame.rtf")
+{
+    // Without the fix, this was zero, and the text frame with "Visible" just looks white.
+    CPPUNIT_ASSERT_EQUAL(sal_Int16(100), getProperty<sal_Int16>(getShape(1), "FillTransparence"));
 }
 
 DECLARE_RTFEXPORT_TEST(testTdf137683_charHighlightNone, "tdf137683_charHighlightNone.rtf")
@@ -422,6 +429,28 @@ DECLARE_RTFEXPORT_TEST(testTdf128428_dntblnsbdb, "tdf128428_dntblnsbdb.rtf")
 {
     // still 1 here
     CPPUNIT_ASSERT_EQUAL(1, getPages());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testDontBreakWrappedTables)
+{
+    // Given a document with no DO_NOT_BREAK_WRAPPED_TABLES compat mode enabled:
+    createSwDoc();
+    {
+        SwDoc* pDoc = getSwDoc();
+        IDocumentSettingAccess& rIDSA = pDoc->getIDocumentSettingAccess();
+        rIDSA.set(DocumentSettingId::DO_NOT_BREAK_WRAPPED_TABLES, true);
+    }
+
+    // When saving to rtf:
+    reload(mpFilter, "dont-break-wrapped-tables.rtf");
+
+    // Then make sure \nobrkwrptbl is not written:
+    SwDoc* pDoc = getSwDoc();
+    IDocumentSettingAccess& rIDSA = pDoc->getIDocumentSettingAccess();
+    bool bDontBreakWrappedTables = rIDSA.get(DocumentSettingId::DO_NOT_BREAK_WRAPPED_TABLES);
+    // Without the accompanying fix in place, this test would have failed, the compat flag was not
+    // set.
+    CPPUNIT_ASSERT(bDontBreakWrappedTables);
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testRtlGutter)

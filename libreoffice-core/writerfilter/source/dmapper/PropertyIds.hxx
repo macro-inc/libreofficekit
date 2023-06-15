@@ -54,7 +54,7 @@ enum PropertyIds
         ,PROP_CHAR_CASE_MAP
         ,PROP_CHAR_CHAR_KERNING
         ,PROP_CHAR_COLOR
-        ,PROP_CHAR_COLOR_THEME_REFERENCE
+        ,PROP_CHAR_COMPLEX_COLOR
         ,PROP_CHAR_COMBINE_IS_ON
         ,PROP_CHAR_COMBINE_PREFIX
         ,PROP_CHAR_COMBINE_SUFFIX
@@ -366,7 +366,7 @@ enum PropertyIds
     };
 
 //Returns the UNO string equivalent to eId.
-OUString getPropertyName(PropertyIds eId);
+const OUString & getPropertyName(PropertyIds eId);
 
 bool isCharacterProperty(const PropertyIds eId);
 

@@ -74,9 +74,9 @@ ConditionColorWrapper::ConditionColorWrapper(Condition* pControl, sal_uInt16 nSl
 }
 
 void ConditionColorWrapper::operator()(
-    [[maybe_unused]] const OUString& /*rCommand*/, const svx::NamedThemedColor& rNamedColor)
+    [[maybe_unused]] const OUString& /*rCommand*/, const NamedColor& rNamedColor)
 {
-    mpControl->ApplyCommand(mnSlotId, rNamedColor.ToNamedColor());
+    mpControl->ApplyCommand(mnSlotId, rNamedColor);
 }
 
 // = Condition
@@ -200,7 +200,7 @@ IMPL_LINK(Condition, OnConditionAction, weld::Button&, rClickedButton, void)
 
 void Condition::ApplyCommand( sal_uInt16 _nCommandId, const NamedColor& rNamedColor )
 {
-    m_rAction.applyCommand( m_nCondIndex, _nCommandId, rNamedColor.first );
+    m_rAction.applyCommand(m_nCondIndex, _nCommandId, rNamedColor.m_aColor);
 }
 
 IMPL_LINK_NOARG( Condition, OnTypeSelected, weld::ComboBox&, void )

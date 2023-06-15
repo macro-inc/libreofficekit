@@ -38,16 +38,16 @@ Color ColorSet::getColor(model::ThemeColorType eType) const
     return maColors[size_t(eType)];
 }
 
-Color ColorSet::resolveColor(model::ThemeColor const& rThemeColor) const
+Color ColorSet::resolveColor(model::ComplexColor const& rComplexColor) const
 {
-    auto eType = rThemeColor.getType();
-    if (eType == model::ThemeColorType::Unknown)
+    auto eSchemeType = rComplexColor.meSchemeType;
+    if (eSchemeType == model::ThemeColorType::Unknown)
     {
         SAL_WARN("svx", "ColorSet::resolveColor with ThemeColorType::Unknown");
         return COL_AUTO;
     }
-    Color aColor = getColor(eType);
-    return rThemeColor.applyTransformations(aColor);
+    Color aColor = getColor(eSchemeType);
+    return rComplexColor.applyTransformations(aColor);
 }
 
 void ColorSet::dumpAsXml(xmlTextWriterPtr pWriter) const

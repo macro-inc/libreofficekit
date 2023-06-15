@@ -276,9 +276,9 @@ void ListLevel::AddParaProperties( uno::Sequence< beans::PropertyValue >* props 
 {
     uno::Sequence< beans::PropertyValue >& aProps = *props;
 
-    OUString sFirstLineIndent = getPropertyName(
+    const OUString & sFirstLineIndent = getPropertyName(
             PROP_FIRST_LINE_INDENT );
-    OUString sIndentAt = getPropertyName(
+    const OUString & sIndentAt = getPropertyName(
             PROP_INDENT_AT );
 
     bool hasFirstLineIndent = lcl_findProperty( aProps, sFirstLineIndent );
@@ -287,14 +287,14 @@ void ListLevel::AddParaProperties( uno::Sequence< beans::PropertyValue >* props 
     if( hasFirstLineIndent && hasIndentAt )
         return; // has them all, nothing to add
 
-    const uno::Sequence< beans::PropertyValue > aParaProps = m_pParaStyle->pProperties->GetPropertyValues( );
+    const uno::Sequence< beans::PropertyValue > aParaProps = m_pParaStyle->m_pProperties->GetPropertyValues( );
 
     // ParaFirstLineIndent -> FirstLineIndent
     // ParaLeftMargin -> IndentAt
 
-    OUString sParaIndent = getPropertyName(
+    const OUString & sParaIndent = getPropertyName(
             PROP_PARA_FIRST_LINE_INDENT );
-    OUString sParaLeftMargin = getPropertyName(
+    const OUString & sParaLeftMargin = getPropertyName(
             PROP_PARA_LEFT_MARGIN );
 
     for ( const auto& rParaProp : aParaProps )
@@ -498,7 +498,7 @@ sal_uInt16 ListDef::GetChapterNumberingWeight() const
         const StyleSheetEntryPtr pParaStyle = pAbsLevel->GetParaStyle();
         if (!pParaStyle)
             continue;
-        const StyleSheetPropertyMap& rProps = *pParaStyle->pProperties;
+        const StyleSheetPropertyMap& rProps = *pParaStyle->m_pProperties;
         // In LO, the level's paraStyle outlineLevel always matches this listLevel.
         // An undefined listLevel is treated as the first level.
         sal_Int8 nListLevel = std::clamp<sal_Int8>(rProps.GetListLevel(), 0, 9);
@@ -510,7 +510,7 @@ sal_uInt16 ListDef::GetChapterNumberingWeight() const
             // Arbitrarily chosen weighting factors - trying to round-trip LO choices if possible.
             // LibreOffice always saves Outline rule (usually containing heading styles) as numId 1.
             sal_uInt16 nWeightingFactor = GetId() == 1 ? 8 : 1;
-            if (pParaStyle->sStyleIdentifierD.startsWith("Heading") )
+            if (pParaStyle->m_sStyleIdentifierD.startsWith("Heading") )
                 ++nWeightingFactor;
             nWeight += nWeightingFactor;
         }
@@ -605,8 +605,8 @@ void ListDef::CreateNumberingRules( DomainMapper& rDMapper,
                     xOutlines->getChapterNumberingRules( );
 
                 StyleSheetEntryPtr pParaStyle = pAbsLevel->GetParaStyle( );
-                pParaStyle->bAssignedAsChapterNumbering = true;
-                aLvlProps.push_back(comphelper::makePropertyValue(getPropertyName(PROP_HEADING_STYLE_NAME), pParaStyle->sConvertedStyleName));
+                pParaStyle->m_bAssignedAsChapterNumbering = true;
+                aLvlProps.push_back(comphelper::makePropertyValue(getPropertyName(PROP_HEADING_STYLE_NAME), pParaStyle->m_sConvertedStyleName));
 
                 xOutlineRules->replaceByIndex(nLevel, uno::Any(comphelper::containerToSequence(aLvlProps)));
             }
@@ -615,7 +615,7 @@ void ListDef::CreateNumberingRules( DomainMapper& rDMapper,
         }
 
         // Create the numbering style for these rules
-        OUString sNumRulesName = getPropertyName( PROP_NUMBERING_RULES );
+        const OUString & sNumRulesName = getPropertyName( PROP_NUMBERING_RULES );
         xStyle->setPropertyValue( sNumRulesName, uno::Any( m_xNumRules ) );
     }
     catch( const lang::IllegalArgumentException& )
@@ -1130,7 +1130,7 @@ AbstractListDef::Pointer ListsManager::GetAbstractList( sal_Int32 nId )
                     pStylesTable->FindStyleSheetByISTD(listDef->GetNumStyleLink() );
 
                 const StyleSheetPropertyMap* pStyleSheetProperties =
-                    pStyleSheetEntry ? pStyleSheetEntry->pProperties.get() : nullptr;
+                    pStyleSheetEntry ? pStyleSheetEntry->m_pProperties.get() : nullptr;
 
                 if( pStyleSheetProperties && pStyleSheetProperties->props().GetListId() >= 0 )
                 {

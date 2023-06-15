@@ -594,6 +594,24 @@ OString DocxAttributeOutput::convertToOOXMLHoriOrientRel(sal_Int16 nOrientRel)
     }
 }
 
+void FramePrHelper::SetFrame(ww8::Frame* pFrame)
+{
+    assert(!pFrame || !m_pFrame);
+    m_pFrame = pFrame;
+    if (m_pFrame)
+    {
+        m_bUseFrameBackground = true;
+    }
+}
+
+bool FramePrHelper::UseFrameBackground()
+{
+    if (!m_pFrame)
+        return false;
+
+    return m_bUseFrameBackground;
+}
+
 void SdtBlockHelper::DeleteAndResetTheLists()
 {
     if (m_pTokenChildren.is() )
@@ -1143,9 +1161,9 @@ void DocxAttributeOutput::EndParagraph( ww8::WW8TableNodeInfoInner::Pointer_t pT
     for ( const auto & pFrame : aFramePrTextbox )
     {
         DocxTableExportContext aTableExportContext(*this);
-        m_pCurrentFrame = pFrame.get();
+        m_aFramePr.SetFrame(pFrame.get());
         m_rExport.SdrExporter().writeOnlyTextOfFrame(pFrame.get());
-        m_pCurrentFrame = nullptr;
+        m_aFramePr.SetFrame(nullptr);
     }
 
     m_pSerializer->mergeTopMarks(Tag_StartParagraph_2, sax_fastparser::MergeMarks::PREPEND);
@@ -1398,6 +1416,7 @@ void DocxAttributeOutput::WriteCollectedParagraphProperties()
     {
         rtl::Reference<FastAttributeList> xAttrList = std::move( m_pBackgroundAttrList );
         m_pSerializer->singleElementNS( XML_w, XML_shd, xAttrList );
+        m_aFramePr.SetUseFrameBackground(false);
     }
 }
 
@@ -1522,16 +1541,34 @@ void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMar
     m_pSerializer->mergeTopMarks(Tag_InitCollectedRunProperties);
     m_pSerializer->endElementNS( XML_w, XML_rPr );
 
-    if (!m_bWritingHeaderFooter && m_pCurrentFrame)
+    if (!m_bWritingHeaderFooter && m_aFramePr.Frame())
     {
-        const SwFrameFormat& rFrameFormat = m_pCurrentFrame->GetFrameFormat();
-        const SvxBoxItem& rBox = rFrameFormat.GetBox();
-        if (TextBoxIsFramePr(rFrameFormat))
+        const SwFrameFormat& rFrameFormat = m_aFramePr.Frame()->GetFrameFormat();
+        assert(TextBoxIsFramePr(rFrameFormat) && "by definition, because Frame()");
+
+        const Size aSize = m_aFramePr.Frame()->GetSize();
+        PopulateFrameProperties(&rFrameFormat, aSize);
+        FormatBox(rFrameFormat.GetBox());
+
+        if (m_aFramePr.UseFrameBackground())
         {
-            const Size aSize = m_pCurrentFrame->GetSize();
-            PopulateFrameProperties(&rFrameFormat, aSize);
-            FormatBox(rBox);
+            // The frame is usually imported as 100% transparent. Ignore in that case.
+            // Background only exports as fully opaque. Emulate - ignore transparency more than 50%
+            const SwAttrSet& rSet = rFrameFormat.GetAttrSet();
+            const XFillStyleItem* pFillStyle(rSet.GetItem<XFillStyleItem>(XATTR_FILLSTYLE));
+            if (pFillStyle && pFillStyle->GetValue() != drawing::FillStyle_NONE)
+            {
+                std::unique_ptr<SvxBrushItem> pBrush(
+                    getSvxBrushItemFromSourceSet(rSet, RES_BACKGROUND));
+                if (pBrush->GetColor().GetAlpha() > 127) // more opaque than transparent
+                {
+                    FormatBackground(*pBrush);
+                    WriteCollectedParagraphProperties();
+                }
+            }
         }
+        // reset to true in preparation for the next paragraph in the frame
+        m_aFramePr.SetUseFrameBackground(true);
     }
 
     m_pSerializer->endElementNS( XML_w, XML_pPr );
@@ -7524,10 +7561,27 @@ void DocxAttributeOutput::CharCaseMap( const SvxCaseMapItem& rCaseMap )
     }
 }
 
-void DocxAttributeOutput::CharColor( const SvxColorItem& rColor )
+void DocxAttributeOutput::CharColor(const SvxColorItem& rColorItem)
 {
-    const Color aColor( rColor.GetValue() );
-    OString aColorString = msfilter::util::ConvertColor( aColor );
+    static std::unordered_map<model::ThemeColorType, const char*> constThemeColorTypeTokenMap = {
+        { model::ThemeColorType::Dark1, "dark1" },
+        { model::ThemeColorType::Light1, "light1" },
+        { model::ThemeColorType::Dark2, "dark2" },
+        { model::ThemeColorType::Light2, "light2" },
+        { model::ThemeColorType::Accent1, "accent1" },
+        { model::ThemeColorType::Accent2, "accent2" },
+        { model::ThemeColorType::Accent3, "accent3" },
+        { model::ThemeColorType::Accent4, "accent4" },
+        { model::ThemeColorType::Accent5, "accent5" },
+        { model::ThemeColorType::Accent6, "accent6" },
+        { model::ThemeColorType::Hyperlink, "hyperlink" },
+        { model::ThemeColorType::FollowedHyperlink, "followedHyperlink" }
+    };
+
+    const Color aColor = rColorItem.getColor();
+    const model::ComplexColor aComplexColor = rColorItem.getComplexColor();
+
+    OString aColorString = msfilter::util::ConvertColor(aColor);
 
     std::string_view pExistingValue;
     if (m_pColorAttrList.is() && m_pColorAttrList->getAsView(FSNS(XML_w, XML_val), pExistingValue))
@@ -7536,7 +7590,77 @@ void DocxAttributeOutput::CharColor( const SvxColorItem& rColor )
         return;
     }
 
-    AddToAttrList( m_pColorAttrList, FSNS( XML_w, XML_val ), aColorString.getStr() );
+    if (aComplexColor.getType() == model::ColorType::Scheme &&
+        aComplexColor.getSchemeType() != model::ThemeColorType::Unknown)
+    {
+        OString sSchemeType = constThemeColorTypeTokenMap[aComplexColor.getSchemeType()];
+        if (aComplexColor.meThemeColorUsage == model::ThemeColorUsage::Text)
+        {
+            if (aComplexColor.getSchemeType() == model::ThemeColorType::Dark1)
+                sSchemeType = "text1";
+            else if (aComplexColor.getSchemeType() == model::ThemeColorType::Dark2)
+                sSchemeType = "text2";
+        }
+        else if (aComplexColor.meThemeColorUsage == model::ThemeColorUsage::Background)
+        {
+            if (aComplexColor.getSchemeType() == model::ThemeColorType::Light1)
+                sSchemeType = "background1";
+            else if (aComplexColor.getSchemeType() == model::ThemeColorType::Light2)
+                sSchemeType = "background2";
+        }
+        AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeColor), sSchemeType.getStr());
+
+        sal_Int16 nLumMod = 10'000;
+        sal_Int16 nLumOff = 0;
+        sal_Int16 nTint = 0;
+        sal_Int16 nShade = 0;
+
+        for (auto const& rTransform : aComplexColor.getTransformations())
+        {
+            if (rTransform.meType == model::TransformationType::LumMod)
+                nLumMod = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::LumOff)
+                nLumOff = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::Tint)
+                nTint = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::Shade)
+                nShade = rTransform.mnValue;
+        }
+        if (nLumMod == 10'000 && nLumOff == 0)
+        {
+            if (nTint != 0)
+            {
+                // Convert from 0-100 into 0-255
+                sal_Int16 nTint255 = std::round(255.0 - (double(nTint) / 10000.0) * 255.0);
+                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeTint), OString::number(nTint255, 16).getStr());
+            }
+            else if (nShade != 0)
+            {
+                // Convert from 0-100 into 0-255
+                sal_Int16 nShade255 = std::round(255.0 - (double(nShade) / 10000.0) * 255.0);
+                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeShade), OString::number(nShade255, 16).getStr());
+            }
+        }
+        else
+        {
+            double nPercentage = 0.0;
+
+            if (nLumOff > 0)
+                nPercentage = double(nLumOff) / 100.0;
+            else
+                nPercentage = (-10'000 + double(nLumMod)) / 100.0;
+
+            // Convert from 0-100 into 0-255
+            sal_Int16 nTintShade255 = std::round(255.0 - (std::abs(nPercentage) / 100.0) * 255.0);
+
+            if (nPercentage > 0)
+                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeTint), OString::number(nTintShade255, 16).getStr());
+            else if (nPercentage < 0)
+                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeShade), OString::number(nTintShade255, 16).getStr());
+        }
+    }
+
+    AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_val), aColorString.getStr());
     m_nCharTransparence = 255 - aColor.GetAlpha();
 }
 
@@ -7570,8 +7694,14 @@ void DocxAttributeOutput::CharEscapement( const SvxEscapementItem& rEscapement )
     OString sIss;
     short nEsc = rEscapement.GetEsc(), nProp = rEscapement.GetProportionalHeight();
 
+    bool bParaStyle = false;
+    if (m_rExport.m_bStyDef && m_rExport.m_pCurrentStyle)
+    {
+        bParaStyle = m_rExport.m_pCurrentStyle->Which() == RES_TXTFMTCOLL;
+    }
+
     // Simplify styles to avoid impossible complexity. Import and export as defaults only
-    if ( m_rExport.m_bStyDef && nEsc )
+    if ( m_rExport.m_bStyDef && nEsc && !(bParaStyle && nEsc < 0))
     {
         nProp = DFLT_ESC_PROP;
         nEsc = (nEsc > 0) ? DFLT_ESC_AUTO_SUPER : DFLT_ESC_AUTO_SUB;
@@ -9348,7 +9478,7 @@ void DocxAttributeOutput::FormatFillGradient( const XFillGradientItem& rFillGrad
     {
         AddToAttrList( m_rExport.SdrExporter().getFlyFillAttrList(), XML_type, "gradient" );
 
-        const XGradient& rGradient = rFillGradient.GetGradientValue();
+        const basegfx::BGradient& rGradient = rFillGradient.GetGradientValue();
         OString sStartColor = msfilter::util::ConvertColor(Color(rGradient.GetColorStops().front().getStopColor()));
         OString sEndColor = msfilter::util::ConvertColor(Color(rGradient.GetColorStops().back().getStopColor()));
 
@@ -9792,7 +9922,6 @@ void DocxAttributeOutput::CharGrabBag( const SfxGrabBagItem& rItem )
     bool bWriteCSTheme = true;
     bool bWriteAsciiTheme = true;
     bool bWriteEastAsiaTheme = true;
-    bool bWriteThemeFontColor = true;
     OUString sOriginalValue;
     for ( const auto & rGrabBagElement : rMap )
     {
@@ -9813,12 +9942,6 @@ void DocxAttributeOutput::CharGrabBag( const SfxGrabBagItem& rItem )
             if ( rGrabBagElement.second >>= sOriginalValue )
                 bWriteEastAsiaTheme =
                         ( m_pFontsAttrList->getOptionalValue( FSNS( XML_w, XML_eastAsia ) ) == sOriginalValue );
-        }
-        else if ( m_pColorAttrList.is() && rGrabBagElement.first == "CharThemeOriginalColor" )
-        {
-            if ( rGrabBagElement.second >>= sOriginalValue )
-                bWriteThemeFontColor =
-                        ( m_pColorAttrList->getOptionalValue( FSNS( XML_w, XML_val ) ) == sOriginalValue );
         }
     }
 
@@ -9850,24 +9973,6 @@ void DocxAttributeOutput::CharGrabBag( const SfxGrabBagItem& rItem )
         {
             rGrabBagElement.second >>= str;
             AddToAttrList( m_pFontsAttrList, FSNS( XML_w, XML_hAnsiTheme ),
-                    OUStringToOString( str, RTL_TEXTENCODING_UTF8 ).getStr() );
-        }
-        else if ( rGrabBagElement.first == "CharThemeColor" && bWriteThemeFontColor )
-        {
-            rGrabBagElement.second >>= str;
-            AddToAttrList( m_pColorAttrList, FSNS( XML_w, XML_themeColor ),
-                    OUStringToOString( str, RTL_TEXTENCODING_UTF8 ).getStr() );
-        }
-        else if ( rGrabBagElement.first == "CharThemeColorShade" )
-        {
-            rGrabBagElement.second >>= str;
-            AddToAttrList( m_pColorAttrList, FSNS( XML_w, XML_themeShade ),
-                    OUStringToOString( str, RTL_TEXTENCODING_UTF8 ).getStr() );
-        }
-        else if ( rGrabBagElement.first == "CharThemeColorTint" )
-        {
-            rGrabBagElement.second >>= str;
-            AddToAttrList( m_pColorAttrList, FSNS( XML_w, XML_themeTint ),
                     OUStringToOString( str, RTL_TEXTENCODING_UTF8 ).getStr() );
         }
         else if( rGrabBagElement.first == "CharThemeFontNameCs"   ||
@@ -9933,7 +10038,6 @@ DocxAttributeOutput::DocxAttributeOutput( DocxExport &rExport, const FSHelperPtr
       m_nNextAnnotationMarkId( 0 ),
       m_nEmbedFlyLevel(0),
       m_pMoveRedlineData(nullptr),
-      m_pCurrentFrame( nullptr ),
       m_bParagraphOpened( false ),
       m_bParagraphFrameOpen( false ),
       m_bIsFirstParagraph( true ),

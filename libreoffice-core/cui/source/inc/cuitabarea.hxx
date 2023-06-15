@@ -170,7 +170,7 @@ class SvxTransparenceTabPage : public SfxTabPage
     std::unique_ptr<weld::CustomWeld> m_xCtlXRectPreview;
 
     // MCGR: Preserve in-between ColorStops until we have an UI to edit these
-    basegfx::ColorStops maColorStops;
+    basegfx::BColorStops maColorStops;
 
     DECL_LINK(ClickTransOffHdl_Impl, weld::Toggleable&, void);
     DECL_LINK(ClickTransLinearHdl_Impl, weld::Toggleable&, void);
@@ -188,7 +188,7 @@ class SvxTransparenceTabPage : public SfxTabPage
     void InvalidatePreview (bool bEnable = true );
 
     // MCGR: Preserve in-between ColorStops until we have an UI to edit these
-    basegfx::ColorStops createColorStops();
+    basegfx::BColorStops createColorStops();
 
 public:
     SvxTransparenceTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
@@ -368,7 +368,7 @@ private:
     SfxItemSet&         m_rXFSet;
 
     // MCGR: Preserve in-between ColorStops until we have an UI to edit these
-    basegfx::ColorStops m_aColorStops;
+    basegfx::BColorStops m_aColorStops;
 
     SvxXRectPreview m_aCtlPreview;
     std::unique_ptr<weld::ComboBox> m_xLbGradientType;
@@ -410,7 +410,7 @@ private:
     sal_Int32 SearchGradientList(std::u16string_view rGradientName);
 
     // MCGR: Preserve in-between ColorStops until we have an UI to edit these
-    basegfx::ColorStops createColorStops();
+    basegfx::BColorStops createColorStops();
 
 public:
     SvxGradientTabPage(weld::Container* pPage, weld::DialogController* pController, const SfxItemSet& rInAttrs);
@@ -657,8 +657,8 @@ private:
 
     ColorModel          eCM;
 
-    Color               aPreviousColor;
-    svx::NamedThemedColor aCurrentColor;
+    Color m_aPreviousColor;
+    NamedColor m_aCurrentColor;
 
     PaletteManager maPaletteManager;
     SvxXRectPreview m_aCtlPreviewOld;
@@ -714,7 +714,7 @@ private:
     DECL_LINK(SelectPaletteLBHdl, weld::ComboBox&, void);
     DECL_LINK( SelectValSetHdl_Impl, ValueSet*, void );
     DECL_LINK( SelectColorModeHdl_Impl, weld::Toggleable&, void );
-    void ChangeColor(const svx::NamedThemedColor &rNewColor, bool bUpdatePreset = true);
+    void ChangeColor(const NamedColor &rNewColor, bool bUpdatePreset = true);
     void SetColorModel(ColorModel eModel);
     void ChangeColorModel();
     void UpdateColorValues( bool bUpdatePreset = true );
