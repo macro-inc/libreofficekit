@@ -202,6 +202,15 @@ void CondFormatContext::onEndElement()
             if(mxCondFmt)
                 mxCondFmt->setReadyForFinalize();
             break;
+        case XLS_TOKEN( cfRule ):
+            if (mxCondFmt && mxRule)
+            {
+                ScRangeList aRanges = mxCondFmt->getRanges();
+                if ((aRanges.size() == 1 && aRanges.GetCellCount() == 1) ||
+                    !getCondFormats().insertRule(mxCondFmt, mxRule))
+                    mxCondFmt->insertRule(mxRule);
+            }
+        break;
     }
 }
 

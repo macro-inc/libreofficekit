@@ -378,6 +378,9 @@ ScColorScaleFormat::ScColorScaleFormat(ScDocument* pDoc, const ScColorScaleForma
     {
         maColorScales.emplace_back(new ScColorScaleEntry(pDoc, *rxEntry));
     }
+
+    auto aCache = rFormat.GetCache();
+    SetCache(aCache);
 }
 
 ScColorFormat* ScColorScaleFormat::Clone(ScDocument* pDoc) const
@@ -457,6 +460,18 @@ const ScRangeList& ScColorFormat::GetRange() const
     return mpParent->GetRange();
 }
 
+std::vector<double> ScColorFormat::GetCache() const
+{
+    std::vector<double> empty;
+    return mpCache ? mpCache->maValues : empty;
+}
+
+void ScColorFormat::SetCache(const std::vector<double>& aValues)
+{
+    mpCache.reset(new ScColorFormatCache);
+    mpCache->maValues = aValues;
+}
+
 std::vector<double>& ScColorFormat::getValues() const
 {
     if(!mpCache)
@@ -527,6 +542,12 @@ void ScColorFormat::startRendering()
 void ScColorFormat::endRendering()
 {
     mpCache.reset();
+}
+
+void ScColorFormat::updateValues()
+{
+    getMinValue();
+    getMaxValue();
 }
 
 namespace {
@@ -636,11 +657,15 @@ std::optional<Color> ScColorScaleFormat::GetColor( const ScAddress& rAddr ) cons
     double nValMax = CalcValue(nMin, nMax, itr);
     Color rColMax = (*itr)->GetColor();
 
+    // tdf#155321 for the last percentile value, use always the end of the color scale,
+    // i.e. not the first possible color in the case of repeating values
+    bool bEqual = COLORSCALE_PERCENTILE == (*itr)->GetType() && nVal == nMax && nVal == nValMax;
+
     ++itr;
-    while(itr != end() && nVal > nValMax)
+    while(itr != end() && (nVal > nValMax || bEqual))
     {
         rColMin = rColMax;
-        nValMin = nValMax;
+        nValMin = !bEqual ? nValMax : nValMax - 1;
         rColMax = (*itr)->GetColor();
         nValMax = CalcValue(nMin, nMax, itr);
         ++itr;
@@ -779,6 +804,41 @@ void ScDataBarFormat::SetParent(ScConditionalFormat* pFormat)
 ScFormatEntry::Type ScDataBarFormat::GetType() const
 {
     return Type::Databar;
+}
+
+bool ScDataBarFormat::IsEqual(const ScFormatEntry& rOther, bool /*bIgnoreSrcPos*/) const
+{
+    if (GetType() != rOther.GetType())
+        return false;
+
+    const ScDataBarFormat& r = static_cast<const ScDataBarFormat&>(rOther);
+
+    bool bEq = (mpFormatData->maAxisColor.IsRGBEqual(r.mpFormatData->maAxisColor)
+                && mpFormatData->maPositiveColor.IsRGBEqual(r.mpFormatData->maPositiveColor)
+                && mpFormatData->mxNegativeColor == r.mpFormatData->mxNegativeColor
+                && mpFormatData->meAxisPosition == r.mpFormatData->meAxisPosition
+                && mpFormatData->mbGradient == r.mpFormatData->mbGradient
+                && mpFormatData->mbOnlyBar == r.mpFormatData->mbOnlyBar);
+
+    if (mpFormatData->mpUpperLimit->GetType() == r.mpFormatData->mpUpperLimit->GetType()
+        && bEq)
+    {
+        bEq = (mpFormatData->mpUpperLimit->GetColor().IsRGBEqual(
+                   r.mpFormatData->mpUpperLimit->GetColor())
+               && mpFormatData->mpUpperLimit->GetValue()
+                      == r.mpFormatData->mpUpperLimit->GetValue());
+    }
+
+    if (mpFormatData->mpLowerLimit->GetType() == r.mpFormatData->mpLowerLimit->GetType()
+        && bEq)
+    {
+        bEq = (mpFormatData->mpLowerLimit->GetColor().IsRGBEqual(
+                   r.mpFormatData->mpLowerLimit->GetColor())
+               && mpFormatData->mpLowerLimit->GetValue()
+                      == r.mpFormatData->mpLowerLimit->GetValue());
+    }
+
+    return bEq;
 }
 
 void ScDataBarFormat::UpdateReference( sc::RefUpdateContext& rCxt )

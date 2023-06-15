@@ -1036,9 +1036,8 @@ Writer& OutHTML_SwTableNode( Writer& rWrt, SwTableNode & rNode,
         if( aLRItem.GetLeft() > 0 && rHTMLWrt.m_nDefListMargin > 0 &&
             ( !rHTMLWrt.GetNumInfo().GetNumRule() ||
               ( rHTMLWrt.GetNextNumInfo() &&
-                (rHTMLWrt.GetNextNumInfo()->IsRestart() ||
-                 rHTMLWrt.GetNumInfo().GetNumRule() !=
-                    rHTMLWrt.GetNextNumInfo()->GetNumRule()) ) ) )
+                (rHTMLWrt.GetNumInfo().GetNumRule() != rHTMLWrt.GetNextNumInfo()->GetNumRule() ||
+                 rHTMLWrt.GetNextNumInfo()->IsRestart(rHTMLWrt.GetNumInfo())) ) ) )
         {
             // If the paragraph before the table is not numbered or the
             // paragraph after the table starts with a new numbering or with
@@ -1116,10 +1115,21 @@ Writer& OutHTML_SwTableNode( Writer& rWrt, SwTableNode & rNode,
         }
         else
         {
-            OStringLiteral sOut = OOO_STRING_SVTOOLS_HTML_division
-                " " OOO_STRING_SVTOOLS_HTML_O_align "=\""
-                OOO_STRING_SVTOOLS_HTML_AL_right "\"";
-            HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + sOut) );
+            if (rHTMLWrt.mbReqIF)
+            {
+                // In ReqIF, div cannot have an 'align' attribute. For now, use 'style' only
+                // for ReqIF; maybe it makes sense to use it in both cases?
+                static constexpr char sOut[] = OOO_STRING_SVTOOLS_HTML_division
+                    " style=\"display: flex; flex-direction: column; align-items: flex-end\"";
+                HTMLOutFuncs::Out_AsciiTag(rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + sOut));
+            }
+            else
+            {
+                static constexpr char sOut[] = OOO_STRING_SVTOOLS_HTML_division
+                    " " OOO_STRING_SVTOOLS_HTML_O_align "=\""
+                    OOO_STRING_SVTOOLS_HTML_AL_right "\"";
+                HTMLOutFuncs::Out_AsciiTag( rWrt.Strm(), Concat2View(rHTMLWrt.GetNamespace() + sOut) );
+            }
         }
         rHTMLWrt.IncIndentLevel();  // indent content of <CENTER>
         rHTMLWrt.m_bLFPossible = true;
@@ -1186,9 +1196,8 @@ Writer& OutHTML_SwTableNode( Writer& rWrt, SwTableNode & rNode,
     rHTMLWrt.m_bOutTable = false;
 
     if( rHTMLWrt.GetNextNumInfo() &&
-        !rHTMLWrt.GetNextNumInfo()->IsRestart() &&
-        rHTMLWrt.GetNextNumInfo()->GetNumRule() ==
-            rHTMLWrt.GetNumInfo().GetNumRule() )
+        rHTMLWrt.GetNextNumInfo()->GetNumRule() == rHTMLWrt.GetNumInfo().GetNumRule() &&
+        !rHTMLWrt.GetNextNumInfo()->IsRestart(rHTMLWrt.GetNumInfo()) )
     {
         // If the paragraph after the table is numbered with the same rule as the
         // one before, then the NumInfo of the next paragraph holds the level of

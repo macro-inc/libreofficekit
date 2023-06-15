@@ -73,6 +73,7 @@
 #include <LibreOfficeKit/LibreOfficeKitEnums.h>
 #include <editeng/editview.hxx>
 #include <tools/svborder.hxx>
+#include <o3tl/unreachable.hxx>
 
 #include <fubullet.hxx>
 #include <drawview.hxx>
@@ -1013,6 +1014,14 @@ void ViewShellBase::setEditMode(int nMode)
     }
 }
 
+void ViewShellBase::afterCallbackRegistered()
+{
+    // common tasks
+    SfxViewShell::afterCallbackRegistered();
+
+    // TODO: Add theme color palette changed callback
+}
+
 void ViewShellBase::NotifyCursor(SfxViewShell* pOtherShell) const
 {
     ViewShell* pThisShell = framework::FrameworkHelper::Instance(*const_cast<ViewShellBase*>(this))->GetViewShell(FrameworkHelper::msCenterPaneURL).get();
@@ -1054,6 +1063,32 @@ void ViewShellBase::NotifyCursor(SfxViewShell* pOtherShell) const
         // Graphic selection.
         pDrawView->AdjustMarkHdl(pOtherShell);
     }
+}
+
+::Color ViewShellBase::GetColorConfigColor(svtools::ColorConfigEntry nColorType) const
+{
+    if (DrawViewShell* pCurrentDrawShell = dynamic_cast<DrawViewShell*>(GetMainViewShell().get()))
+    {
+        const SdViewOptions& rViewOptions = pCurrentDrawShell->GetViewOptions();
+        switch (nColorType)
+        {
+            case svtools::ColorConfigEntry::DOCCOLOR:
+            {
+                return rViewOptions.mnDocBackgroundColor;
+            }
+            // Should never be called for an unimplemented color type
+            default:
+            {
+                O3TL_UNREACHABLE;
+            }
+        }
+    }
+    else
+    {
+        SAL_WARN("sd", "dynamic_cast to DrawViewShell failed");
+    }
+
+    return {};
 }
 
 //===== ViewShellBase::Implementation =========================================

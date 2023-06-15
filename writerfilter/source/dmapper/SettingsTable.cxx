@@ -108,6 +108,7 @@ struct SettingsTable_Impl
     std::shared_ptr<DocumentProtection> m_pDocumentProtection;
     std::shared_ptr<WriteProtection> m_pWriteProtection;
     bool m_bGutterAtTop = false;
+    bool m_bDoNotBreakWrappedTables = false;
 
     SettingsTable_Impl() :
       m_nDefaultTabStop( 720 ) //default is 1/2 in
@@ -152,6 +153,7 @@ SettingsTable::SettingsTable(const DomainMapper& rDomainMapper)
         m_pImpl->m_bDoNotUseHTMLParagraphAutoSpacing = true;
         // Longer space sequence is opt-in for RTF, and not in OOXML.
         m_pImpl->m_bLongerSpaceSequence = true;
+        m_pImpl->m_bDoNotBreakWrappedTables = true;
     }
     m_pImpl->m_pDocumentProtection = std::make_shared<DocumentProtection>();
     m_pImpl->m_pWriteProtection = std::make_shared<WriteProtection>();
@@ -396,6 +398,9 @@ void SettingsTable::lcl_sprm(Sprm& rSprm)
     case NS_ooxml::LN_CT_Settings_gutterAtTop:
         m_pImpl->m_bGutterAtTop = nIntValue != 0;
         break;
+    case NS_ooxml::LN_CT_Compat_doNotBreakWrappedTables:
+        m_pImpl->m_bDoNotBreakWrappedTables = nIntValue != 0;
+        break;
     default:
     {
 #ifdef DBG_UTIL
@@ -626,6 +631,12 @@ void SettingsTable::ApplyProperties(uno::Reference<text::XTextDocument> const& x
 
             xMaster->setPropertyValue(getPropertyName(PROP_CONTENT), uno::Any(docVar.second));
         }
+    }
+
+    if (m_pImpl->m_bDoNotBreakWrappedTables)
+    {
+        // Map <w:doNotBreakWrappedTables> to the DoNotBreakWrappedTables compat flag.
+        xDocumentSettings->setPropertyValue("DoNotBreakWrappedTables", uno::Any(true));
     }
 
     // Auto hyphenation: turns on hyphenation by default, <w:suppressAutoHyphens/> may still disable it at a paragraph level.

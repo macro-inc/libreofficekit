@@ -532,59 +532,37 @@ uno::Reference< container::XNameContainer > SvxUnoXGradientTable_createInstance(
 // SvxUnoXPropertyTable
 uno::Any SvxUnoXGradientTable::getAny( const XPropertyEntry* pEntry ) const noexcept
 {
-    const XGradient& aXGradient = static_cast<const XGradientEntry*>(pEntry)->GetGradient();
+    const basegfx::BGradient& aBGradient = static_cast<const XGradientEntry*>(pEntry)->GetGradient();
     awt::Gradient2 aGradient;
 
     // standard values
-    aGradient.Style = aXGradient.GetGradientStyle();
-    // aGradient.StartColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().front().getStopColor()));
-    // aGradient.EndColor = static_cast<sal_Int32>(Color(aXGradient.GetColorStops().back().getStopColor()));
-    aGradient.Angle = static_cast<short>(aXGradient.GetAngle());
-    aGradient.Border = aXGradient.GetBorder();
-    aGradient.XOffset = aXGradient.GetXOffset();
-    aGradient.YOffset = aXGradient.GetYOffset();
-    aGradient.StartIntensity = aXGradient.GetStartIntens();
-    aGradient.EndIntensity = aXGradient.GetEndIntens();
-    aGradient.StepCount = aXGradient.GetSteps();
+    aGradient.Style = aBGradient.GetGradientStyle();
+    aGradient.Angle = static_cast<short>(aBGradient.GetAngle());
+    aGradient.Border = aBGradient.GetBorder();
+    aGradient.XOffset = aBGradient.GetXOffset();
+    aGradient.YOffset = aBGradient.GetYOffset();
+    aGradient.StartIntensity = aBGradient.GetStartIntens();
+    aGradient.EndIntensity = aBGradient.GetEndIntens();
+    aGradient.StepCount = aBGradient.GetSteps();
 
     // for compatibility, still set StartColor/EndColor
-    const basegfx::ColorStops& rColorStops(aXGradient.GetColorStops());
-    aGradient.StartColor = static_cast<sal_Int32>(Color(rColorStops.front().getStopColor()));
-    aGradient.EndColor = static_cast<sal_Int32>(Color(rColorStops.back().getStopColor()));
+    const basegfx::BColorStops& rBColorStops(aBGradient.GetColorStops());
+    aGradient.StartColor = static_cast<sal_Int32>(Color(rBColorStops.front().getStopColor()));
+    aGradient.EndColor = static_cast<sal_Int32>(Color(rBColorStops.back().getStopColor()));
 
     // fill ColorStops to extended Gradient2
-    basegfx::utils::fillColorStopSequenceFromColorStops(aGradient.ColorStops, rColorStops);
+    aGradient.ColorStops = rBColorStops.getAsColorStopSequence();
 
     return uno::Any(aGradient);
 }
 
 std::unique_ptr<XPropertyEntry> SvxUnoXGradientTable::createEntry(const OUString& rName, const uno::Any& rAny) const
 {
-    awt::Gradient aGradient;
-    if(!(rAny >>= aGradient))
+    if (!rAny.has<css::awt::Gradient>() || !rAny.has<css::awt::Gradient2>())
         return std::unique_ptr<XPropertyEntry>();
 
-    XGradient aXGradient(
-        basegfx::utils::createColorStopsFromStartEndColor(
-            Color(ColorTransparency, aGradient.StartColor).getBColor(),
-            Color(ColorTransparency, aGradient.EndColor).getBColor()));
-
-    aXGradient.SetGradientStyle( aGradient.Style );
-    aXGradient.SetAngle( Degree10(aGradient.Angle) );
-    aXGradient.SetBorder( aGradient.Border );
-    aXGradient.SetXOffset( aGradient.XOffset );
-    aXGradient.SetYOffset( aGradient.YOffset );
-    aXGradient.SetStartIntens( aGradient.StartIntensity );
-    aXGradient.SetEndIntens( aGradient.EndIntensity );
-    aXGradient.SetSteps( aGradient.StepCount );
-
-    // check if we have a awt::Gradient2 with a ColorStopSequence
-    basegfx::ColorStops aColorStops;
-    basegfx::utils::fillColorStopsFromAny(aColorStops, rAny);
-    if (!aColorStops.empty())
-        aXGradient.SetColorStops(aColorStops);
-
-    return std::make_unique<XGradientEntry>(aXGradient, rName);
+    const basegfx::BGradient aBGradient(rAny);
+    return std::make_unique<XGradientEntry>(aBGradient, rName);
 }
 
 // XElementAccess

@@ -69,7 +69,7 @@
 #include <com/sun/star/text/FontEmphasis.hpp>
 #include <com/sun/star/awt/CharSet.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
-#include <com/sun/star/util/XThemeColor.hpp>
+#include <com/sun/star/util/XComplexColor.hpp>
 #include <comphelper/types.hxx>
 #include <comphelper/storagehelper.hxx>
 #include <comphelper/sequence.hxx>
@@ -1788,7 +1788,7 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
             if ( IsStyleSheetImport() )
             {
                 const StyleSheetEntryPtr pCurrStyle = GetStyleSheetTable()->GetCurrentEntry();
-                if ( pCurrStyle && pCurrStyle->nStyleTypeCode == STYLE_TYPE_CHAR )
+                if ( pCurrStyle && pCurrStyle->m_nStyleTypeCode == STYLE_TYPE_CHAR )
                     break;
             }
 
@@ -1992,6 +1992,13 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
             else if (!m_pImpl->IsDocDefaultsImport())
             {
                 // For some undocumented reason, MS Word seems to ignore this in docDefaults
+
+                const StyleSheetEntryPtr pCurrStyle = GetStyleSheetTable()->GetCurrentEntry();
+                if (pCurrStyle && pCurrStyle->m_nStyleTypeCode == STYLE_TYPE_PARA && nIntValue < 0)
+                {
+                    m_pImpl->deferCharacterProperty(nSprmId, uno::Any(nIntValue));
+                    break;
+                }
 
                 // DON'T FIXME: Truly calculating this for Character Styles will be tricky,
                 // because it depends on the final fontsize - regardless of
@@ -2216,22 +2223,26 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
                 auto eType = TDefTableHandler::getThemeColorTypeIndex(pThemeColorHandler->mnIndex);
                 if (eType != model::ThemeColorType::Unknown)
                 {
-                    model::ThemeColor aThemeColor;
-                    aThemeColor.setType(eType);
+
+                    model::ComplexColor aComplexColor;
+                    aComplexColor.setSchemeColor(eType);
+
+                    auto eUsage = TDefTableHandler::getThemeColorUsage(pThemeColorHandler->mnIndex);
+                    aComplexColor.meThemeColorUsage = eUsage;
 
                     if (pThemeColorHandler->mnTint > 0 )
                     {
-                        sal_Int16 nTint = sal_Int16((256 - pThemeColorHandler->mnTint) * 10000 / 256);
-                        aThemeColor.addTransformation({model::TransformationType::Tint, nTint});
+                        sal_Int16 nTint = sal_Int16((255 - pThemeColorHandler->mnTint) * 10000 / 255);
+                        aComplexColor.addTransformation({model::TransformationType::Tint, nTint});
                     }
                     if (pThemeColorHandler->mnShade > 0)
                     {
-                        sal_Int16 nShade = sal_Int16((256 - pThemeColorHandler->mnShade) * 10000 / 256);
-                        aThemeColor.addTransformation({model::TransformationType::Shade, nShade});
+                        sal_Int16 nShade = sal_Int16((255 - pThemeColorHandler->mnShade) * 10000 / 255);
+                        aComplexColor.addTransformation({model::TransformationType::Shade, nShade});
                     }
 
-                    auto xThemeColor = model::theme::createXThemeColor(aThemeColor);
-                    m_pImpl->GetTopContext()->Insert(PROP_CHAR_COLOR_THEME_REFERENCE, uno::Any(xThemeColor));
+                    auto xComplexColor = model::color::createXComplexColor(aComplexColor);
+                    m_pImpl->GetTopContext()->Insert(PROP_CHAR_COMPLEX_COLOR, uno::Any(xComplexColor));
                 }
 
                 uno::Any aColorAny(msfilter::util::ConvertColorOU(Color(ColorTransparency, pThemeColorHandler->mnColor)));
@@ -2512,7 +2523,7 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
 
             // First check if the style exists in the document.
             StyleSheetEntryPtr pEntry = m_pImpl->GetStyleSheetTable( )->FindStyleSheetByConvertedStyleName( sConvertedName );
-            bool bExists = pEntry && ( pEntry->nStyleTypeCode == STYLE_TYPE_CHAR );
+            bool bExists = pEntry && ( pEntry->m_nStyleTypeCode == STYLE_TYPE_CHAR );
             // Add the property if the style exists, but do not add it elements in TOC:
             // they will receive later another style references from TOC
             if ( bExists && m_pImpl->GetTopContext() && !m_pImpl->IsInTOC())
@@ -3166,17 +3177,6 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
     {
         if (m_pImpl->hasTableManager())
         {
-            if (m_pImpl->getTableManager().IsFloating())
-            {
-                // We're starting a new table, but the previous table was floating. Insert a dummy
-                // paragraph to ensure that the floating table is not anchored inside the next
-                // table.
-                finishParagraph();
-            }
-        }
-
-        if (m_pImpl->hasTableManager())
-        {
             bool bTableStartsAtCellStart = m_pImpl->m_nTableDepth > 0 && m_pImpl->m_nTableCellDepth > m_pImpl->m_nLastTableCellParagraphDepth + 1;
             m_pImpl->getTableManager().setTableStartsAtCellStart(bTableStartsAtCellStart);
         }
@@ -3206,9 +3206,9 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
                 if( !sStyleName.isEmpty() && GetStyleSheetTable() )
                     pStyle = GetStyleSheetTable()->FindStyleSheetByConvertedStyleName( sStyleName );
 
-                if( pStyle && pStyle->pProperties
-                    && pStyle->pProperties->isSet(PROP_BREAK_TYPE)
-                    && pStyle->pProperties->getProperty(PROP_BREAK_TYPE)->second == aBreakType )
+                if( pStyle && pStyle->m_pProperties
+                    && pStyle->m_pProperties->isSet(PROP_BREAK_TYPE)
+                    && pStyle->m_pProperties->getProperty(PROP_BREAK_TYPE)->second == aBreakType )
                 {
                     pParagraphProps->Insert(PROP_BREAK_TYPE, aBreakType);
                 }
@@ -3455,9 +3455,19 @@ void DomainMapper::sprmWithProps( Sprm& rSprm, const PropertyMapPtr& rContext )
     }
 }
 
-void DomainMapper::processDeferredCharacterProperties( const std::map< sal_Int32, uno::Any >& deferredCharacterProperties )
+void DomainMapper::ProcessDeferredStyleCharacterProperties()
 {
-    assert( m_pImpl->GetTopContextType() == CONTEXT_CHARACTER );
+    assert(m_pImpl->GetTopContextType() == CONTEXT_STYLESHEET);
+    m_pImpl->processDeferredCharacterProperties(false);
+}
+
+void DomainMapper::processDeferredCharacterProperties(
+    const std::map<sal_Int32, uno::Any>& deferredCharacterProperties, bool bCharContext)
+{
+    if (bCharContext)
+    {
+        assert(m_pImpl->GetTopContextType() == CONTEXT_CHARACTER);
+    }
     PropertyMapPtr rContext = m_pImpl->GetTopContext();
     for( const auto& rProp : deferredCharacterProperties )
     {
@@ -4756,15 +4766,6 @@ void DomainMapper::finishParagraph(const bool bRemove, const bool bNoNumbering)
     if (m_pImpl->m_pSdtHelper->getControlType() == SdtControlType::datePicker)
         m_pImpl->m_pSdtHelper->createDateContentControl();
     m_pImpl->finishParagraph(m_pImpl->GetTopContextOfType(CONTEXT_PARAGRAPH), bRemove, bNoNumbering);
-    if (m_pImpl->m_nTableDepth == 0)
-    {
-        if (m_pImpl->hasTableManager())
-        {
-            // Non-table content, possibly after a table. Forget that such a previous table was
-            // floating.
-            m_pImpl->getTableManager().SetFloating(false);
-        }
-    }
 }
 
 void DomainMapper::commentProps(const OUString& sId, const CommentProperties& rProps)

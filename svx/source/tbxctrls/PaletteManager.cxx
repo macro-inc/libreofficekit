@@ -17,9 +17,9 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#include <memory>
 #include <svx/PaletteManager.hxx>
 
+#include <basegfx/color/bcolortools.hxx>
 #include <comphelper/propertyvalue.hxx>
 #include <tools/urlobj.hxx>
 #include <osl/file.hxx>
@@ -29,36 +29,29 @@
 #include <svx/strings.hrc>
 #include <svx/svxids.hrc>
 #include <svx/dialmgr.hxx>
+
 #include <tbxcolorupdate.hxx>
 #include <vcl/svapp.hxx>
 #include <vcl/settings.hxx>
 #include <comphelper/sequence.hxx>
-#include <stack>
-#include <set>
 #include <officecfg/Office/Common.hxx>
 #include <com/sun/star/frame/XDispatchProvider.hpp>
 #include <com/sun/star/frame/XDispatch.hpp>
 #include <com/sun/star/frame/Desktop.hpp>
 #include <com/sun/star/util/XURLTransformer.hpp>
 #include <com/sun/star/util/URLTransformer.hpp>
-#include <docmodel/theme/ThemeColor.hxx>
-#include <docmodel/theme/ThemeColorJSON.hxx>
+#include <docmodel/color/ComplexColor.hxx>
+#include <docmodel/color/ComplexColorJSON.hxx>
 #include <editeng/colritem.hxx>
 #include <svx/svxids.hrc>
 #include <editeng/memberids.h>
 
 #include <palettes.hxx>
 
-namespace
-{
-// Luminance modulation for the 6 effect presets.
-// 10000 is the default.
-sal_Int16 g_aLumMods[] = { 10000, 2000, 4000, 6000, 7500, 5000 };
-
-// Luminance offset for the 6 effect presets.
-// 0 is the default.
-sal_Int16 g_aLumOffs[] = { 0, 8000, 6000, 4000, 0, 0 };
-}
+#include <memory>
+#include <array>
+#include <stack>
+#include <set>
 
 PaletteManager::PaletteManager() :
     mnMaxRecentColors(Application::GetSettings().GetStyleSettings().GetColorValueSetColumnCount()),
@@ -67,6 +60,7 @@ PaletteManager::PaletteManager() :
     mnColorCount(0),
     mpBtnUpdater(nullptr),
     maColorSelectFunction(PaletteManager::DispatchColorCommand)
+
 {
     SfxObjectShell* pDocSh = SfxObjectShell::Current();
     if(pDocSh)
@@ -166,19 +160,33 @@ bool PaletteManager::IsThemePaletteSelected() const
     return mnCurrentPalette == mnNumOfPalettes - 2;
 }
 
-void PaletteManager::GetThemeIndexLumModOff(sal_uInt16 nItemId, sal_Int16& rThemeIndex,
-                                            sal_Int16& rLumMod, sal_Int16& rLumOff)
+bool PaletteManager::GetThemeAndEffectIndex(sal_uInt16 nItemId, sal_uInt16& rThemeIndex, sal_uInt16& rEffectIndex)
 {
-    // Each column is the same color with different effects.
+     // Each column is the same color with different effects.
     rThemeIndex = nItemId % 12;
 
-    // Each row is the same effect with different colors.
-    rLumMod = g_aLumMods[nItemId / 12];
-    rLumOff = g_aLumOffs[nItemId / 12];
+    rEffectIndex = nItemId / 12;
+    if (rEffectIndex > 5)
+        return false;
+    return true;
+}
+
+bool PaletteManager::GetLumModOff(sal_uInt16 nThemeIndex, sal_uInt16 nEffect, sal_Int16& rLumMod, sal_Int16& rLumOff)
+{
+    if (!moThemePaletteCollection)
+        return false;
+
+    auto const& aThemeColorData = moThemePaletteCollection->maColors[nThemeIndex];
+
+    rLumMod = aThemeColorData.getLumMod(nEffect);
+    rLumOff = aThemeColorData.getLumOff(nEffect);
+
+    return true;
 }
 
 void PaletteManager::ReloadColorSet(SvxColorValueSet &rColorSet)
 {
+    moThemePaletteCollection.reset();
     if( mnCurrentPalette == 0)
     {
         rColorSet.Clear();
@@ -197,46 +205,22 @@ void PaletteManager::ReloadColorSet(SvxColorValueSet &rColorSet)
         SfxObjectShell* pObjectShell = SfxObjectShell::Current();
         if (pObjectShell)
         {
-            std::vector<Color> aColors = pObjectShell->GetThemeColors();
-            mnColorCount = aColors.size();
+            auto pColorSet = pObjectShell->GetThemeColors();
+            mnColorCount = 12;
             rColorSet.Clear();
-            if (aColors.size() >= 12)
+            sal_uInt16 nItemId = 0;
+
+            svx::ThemeColorPaletteManager aThemeColorManager(pColorSet);
+            moThemePaletteCollection = aThemeColorManager.generate();
+
+            // Each row is one effect type (no effect + each type).
+            for (size_t nEffect : {0, 1, 2, 3, 4, 5})
             {
-                std::vector<OUString> aEffectNames = {
-                    SvxResId(RID_SVXSTR_THEME_EFFECT1),  SvxResId(RID_SVXSTR_THEME_EFFECT2),
-                    SvxResId(RID_SVXSTR_THEME_EFFECT3),  SvxResId(RID_SVXSTR_THEME_EFFECT4),
-                    SvxResId(RID_SVXSTR_THEME_EFFECT5),
-                };
-
-                std::vector<OUString> aColorNames = {
-                    SvxResId(RID_SVXSTR_THEME_COLOR1),  SvxResId(RID_SVXSTR_THEME_COLOR2),
-                    SvxResId(RID_SVXSTR_THEME_COLOR3),  SvxResId(RID_SVXSTR_THEME_COLOR4),
-                    SvxResId(RID_SVXSTR_THEME_COLOR5),  SvxResId(RID_SVXSTR_THEME_COLOR6),
-                    SvxResId(RID_SVXSTR_THEME_COLOR7),  SvxResId(RID_SVXSTR_THEME_COLOR8),
-                    SvxResId(RID_SVXSTR_THEME_COLOR9),  SvxResId(RID_SVXSTR_THEME_COLOR10),
-                    SvxResId(RID_SVXSTR_THEME_COLOR11), SvxResId(RID_SVXSTR_THEME_COLOR12),
-                };
-
-                sal_uInt16 nItemId = 0;
-                // Each row is one effect type (no effect + each type).
-                for (size_t nEffect = 0; nEffect < aEffectNames.size() + 1; ++nEffect)
+                // Each column is one color type.
+                for (auto const& rColorData : moThemePaletteCollection->maColors)
                 {
-                    // Each column is one color type.
-                    for (size_t nColor = 0; nColor < aColorNames.size(); ++nColor)
-                    {
-                        Color aColor = aColors[nColor];
-                        aColor.ApplyLumModOff(g_aLumMods[nEffect], g_aLumOffs[nEffect]);
-                        OUString aColorName;
-                        if (nEffect == 0)
-                        {
-                            aColorName = aColorNames[nColor];
-                        }
-                        else
-                        {
-                            aColorName = aEffectNames[nEffect - 1].replaceAll("%1", aColorNames[nColor]);
-                        }
-                        rColorSet.InsertItem(nItemId++, aColor, aColorName);
-                    }
+                    auto const& rEffect = rColorData.maEffects[nEffect];
+                    rColorSet.InsertItem(nItemId++, rEffect.maColor, rEffect.maColorName);
                 }
             }
         }
@@ -366,7 +350,7 @@ void PaletteManager::AddRecentColor(const Color& rRecentColor, const OUString& r
 {
     auto itColor = std::find_if(maRecentColors.begin(),
                                 maRecentColors.end(),
-                                [rRecentColor] (const NamedColor &a) { return a.first == rRecentColor; });
+                                [rRecentColor] (const NamedColor &aColor) { return aColor.m_aColor == rRecentColor; });
     // if recent color to be added is already in list, remove it
     if( itColor != maRecentColors.end() )
         maRecentColors.erase( itColor );
@@ -374,7 +358,7 @@ void PaletteManager::AddRecentColor(const Color& rRecentColor, const OUString& r
     if (maRecentColors.size() == mnMaxRecentColors)
         maRecentColors.pop_back();
     if (bFront)
-        maRecentColors.push_front(std::make_pair(rRecentColor, rName));
+        maRecentColors.emplace_front(rRecentColor, rName);
     else
         maRecentColors.emplace_back(rRecentColor, rName);
     css::uno::Sequence< sal_Int32 > aColorList(maRecentColors.size());
@@ -383,8 +367,8 @@ void PaletteManager::AddRecentColor(const Color& rRecentColor, const OUString& r
     auto aColorNameListRange = asNonConstRange(aColorNameList);
     for (size_t i = 0; i < maRecentColors.size(); ++i)
     {
-        aColorListRange[i] = static_cast<sal_Int32>(maRecentColors[i].first);
-        aColorNameListRange[i] = maRecentColors[i].second;
+        aColorListRange[i] = static_cast<sal_Int32>(maRecentColors[i].m_aColor);
+        aColorNameListRange[i] = maRecentColors[i].m_aName;
     }
     std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
     officecfg::Office::Common::UserColors::RecentColor::set(aColorList, batch);
@@ -414,16 +398,16 @@ void PaletteManager::PopupColorPicker(weld::Window* pParent, const OUString& aCo
         {
             Color aLastColor = m_pColorDlg->GetColor();
             OUString sColorName = "#" + aLastColor.AsRGBHexString().toAsciiUpperCase();
-            NamedColor aNamedColor = std::make_pair(aLastColor, sColorName);
+            NamedColor aNamedColor(aLastColor, sColorName);
             if (mpBtnUpdater)
                 mpBtnUpdater->Update(aNamedColor);
             AddRecentColor(aLastColor, sColorName);
-            maColorSelectFunction(aCommandCopy, svx::NamedThemedColor::FromNamedColor(aNamedColor));
+            maColorSelectFunction(aCommandCopy, aNamedColor);
         }
     });
 }
 
-void PaletteManager::DispatchColorCommand(const OUString& aCommand, const svx::NamedThemedColor& rColor)
+void PaletteManager::DispatchColorCommand(const OUString& aCommand, const NamedColor& rColor)
 {
     using namespace css;
     using namespace css::uno;
@@ -444,19 +428,21 @@ void PaletteManager::DispatchColorCommand(const OUString& aCommand, const svx::N
         comphelper::makePropertyValue(aObj.GetURLPath()+ ".Color", sal_Int32(rColor.m_aColor)),
     };
 
+    printf ("Sending: %s\n", aObj.GetURLPath().toUtf8().getStr());
+
     if (rColor.m_nThemeIndex != -1)
     {
-        model::ThemeColor aThemeColor;
-        aThemeColor.setType(model::convertToThemeColorType(rColor.m_nThemeIndex));
+        model::ComplexColor aComplexColor;
+        aComplexColor.setSchemeColor(model::convertToThemeColorType(rColor.m_nThemeIndex));
         if (rColor.m_nLumMod != 10000)
-            aThemeColor.addTransformation({model::TransformationType::LumMod, rColor.m_nLumMod});
+            aComplexColor.addTransformation({model::TransformationType::LumMod, rColor.m_nLumMod});
         if (rColor.m_nLumMod != 0)
-            aThemeColor.addTransformation({model::TransformationType::LumOff, rColor.m_nLumOff});
+            aComplexColor.addTransformation({model::TransformationType::LumOff, rColor.m_nLumOff});
 
         uno::Any aAny;
-        aAny <<= OStringToOUString(model::theme::convertToJSON(aThemeColor), RTL_TEXTENCODING_UTF8);
+        aAny <<= OStringToOUString(model::color::convertToJSON(aComplexColor), RTL_TEXTENCODING_UTF8);
 
-        aArgs.push_back(comphelper::makePropertyValue(aObj.GetURLPath() + ".ThemeReferenceJSON", aAny));
+        aArgs.push_back(comphelper::makePropertyValue(aObj.GetURLPath() + ".ComplexColorJSON", aAny));
     }
 
     URL aTargetURL;

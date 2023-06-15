@@ -137,14 +137,6 @@ void SwLayoutWriter2::CheckRedlineCharAttributesHidden()
                 "portion", "foobaz");
 }
 
-CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf100680_as_char_wrap)
-{
-    createSwDoc("tdf100680.docx");
-    auto pDump = parseLayoutDump();
-    assertXPath(pDump, "/root/page/header/txt/SwParaPortion/SwLineLayout[3]");
-    // If the third line missing that assert will fire, as was before the fix.
-}
-
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testRedlineCharAttributes)
 {
     createSwDoc("redline_charatr.fodt");
@@ -1627,7 +1619,7 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf129054)
               "/metafile/push[1]/push[1]/push[1]/push[4]/push[1]/push[4]/polyline[1]/point[31]",
               "y")
               .toInt32();
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(4810, nYTop - nYBottom, 5);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4615, nYTop - nYBottom, 5);
 }
 
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf129173)
@@ -1680,7 +1672,7 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf137116)
     // - Actual  : -225
     // - Delta   : 100
     // i.e. the second data label appeared inside the pie slice.
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(1229, nX2 - nX4, 100);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1117, nX2 - nX4, 100);
 }
 
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf137154)
@@ -2813,6 +2805,37 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf138124)
     assertXPath(pXml,
                 "/root/page/ftncont/ftn/txt//SwFieldPortion[@type='PortionType::FootnoteNum']", 1);
     assertXPath(pXml, "/root/page/ftncont/ftn/txt//SwLinePortion[@type='PortionType::FlyCnt']", 1);
+}
+
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf155611)
+{
+    createSwDoc("tdf155611_table_and_nested_section.fodt");
+    Scheduler::ProcessEventsToIdle();
+
+    xmlDocUniquePtr pXml = parseLayoutDump();
+    CPPUNIT_ASSERT(pXml);
+
+    // Check the layout: single page, two section frames (no section frames after the one for Inner
+    // section), correct table structure and content in the first section frame, including nested
+    // table in the last cell, and the last section text.
+    assertXPath(pXml, "/root/page");
+    // Without the fix in place, this would fail with
+    // - Expected: 2
+    // - Actual  : 3
+    assertXPath(pXml, "/root/page/body/section", 2);
+    assertXPath(pXml, "/root/page/body/section[1]/tab");
+    assertXPath(pXml, "/root/page/body/section[1]/tab/row");
+    assertXPath(pXml, "/root/page/body/section[1]/tab/row/cell", 2);
+    assertXPath(pXml, "/root/page/body/section[1]/tab/row/cell[1]/txt/SwParaPortion/SwLineLayout/"
+                      "SwParaPortion[@portion='foo']");
+    assertXPath(pXml, "/root/page/body/section[1]/tab/row/cell[2]/txt/SwParaPortion/SwLineLayout/"
+                      "SwParaPortion[@portion='bar']");
+    assertXPath(pXml, "/root/page/body/section[1]/tab/row/cell[2]/tab/row/cell/txt/SwParaPortion/"
+                      "SwLineLayout/SwParaPortion[@portion='baz']");
+    assertXPath(pXml, "/root/page/body/section[2]/txt[1]/SwParaPortion/SwLineLayout/"
+                      "SwParaPortion[@portion='abc']");
+
+    // Also must not crash on close because of a frame that accidentally fell off of the layout
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

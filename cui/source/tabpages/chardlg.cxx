@@ -1572,7 +1572,7 @@ bool SvxCharEffectsPage::FillItemSetColor_Impl( SfxItemSet& rSet )
     sal_uInt16 nWhich = GetWhich( SID_ATTR_CHAR_COLOR );
     const SfxItemSet& rOldSet = GetItemSet();
 
-    svx::NamedThemedColor aSelectedColor;
+    NamedColor aSelectedColor;
     bool bChanged = m_bNewFontColor;
 
     if (bChanged)
@@ -1600,10 +1600,11 @@ bool SvxCharEffectsPage::FillItemSetColor_Impl( SfxItemSet& rSet )
         model::ThemeColorType eType = model::convertToThemeColorType(aSelectedColor.m_nThemeIndex);
         if (eType != model::ThemeColorType::Unknown)
         {
-            aItem.GetThemeColor().setType(eType);
-            aItem.GetThemeColor().clearTransformations();
-            aItem.GetThemeColor().addTransformation({model::TransformationType::LumMod, aSelectedColor.m_nLumMod});
-            aItem.GetThemeColor().addTransformation({model::TransformationType::LumOff, aSelectedColor.m_nLumOff});
+            model::ComplexColor aComplexColor;
+            aComplexColor.setSchemeColor(eType);
+            aComplexColor.addTransformation({model::TransformationType::LumMod, aSelectedColor.m_nLumMod});
+            aComplexColor.addTransformation({model::TransformationType::LumOff, aSelectedColor.m_nLumOff});
+            aItem.setComplexColor(aComplexColor);
         }
 
         rSet.Put(aItem);
@@ -2094,21 +2095,26 @@ bool SvxCharEffectsPage::FillItemSet( SfxItemSet* rSet )
         //! item-state in the 'rOldSet' will be invalid. In this case
         //! changing the underline style will be allowed if a style is
         //! selected in the listbox.
-        bool bAllowChg = nPos != -1  &&
+        bool bAllowChange = nPos != -1  &&
                          SfxItemState::DEFAULT > rOldSet.GetItemState( nWhich );
 
         const SvxUnderlineItem& rItem = *static_cast<const SvxUnderlineItem*>(pOld);
-        if ( rItem.GetValue() == eUnder &&
-             ( LINESTYLE_NONE == eUnder || rItem.GetColor() == m_xUnderlineColorLB->GetSelectEntryColor() ) &&
-             ! bAllowChg )
+        if (rItem.GetValue() == eUnder &&
+             (LINESTYLE_NONE == eUnder || (rItem.GetColor() == m_xUnderlineColorLB->GetSelectEntryColor() &&
+                                           rItem.getComplexColor() == m_xUnderlineColorLB->GetSelectedEntry().getComplexColor())) &&
+             !bAllowChange)
+        {
             bChanged = false;
+        }
     }
 
     if ( bChanged )
     {
         SvxUnderlineItem aNewItem( eUnder, nWhich );
-        aNewItem.SetColor( m_xUnderlineColorLB->GetSelectEntryColor() );
-        rSet->Put( aNewItem );
+        auto aNamedColor = m_xUnderlineColorLB->GetSelectedEntry();
+        aNewItem.SetColor(aNamedColor.m_aColor);
+        aNewItem.setComplexColor(aNamedColor.getComplexColor());
+        rSet->Put(aNewItem);
         bModified = true;
     }
     else if ( SfxItemState::DEFAULT == rOldSet.GetItemState( nWhich, false ) )
@@ -2128,21 +2134,26 @@ bool SvxCharEffectsPage::FillItemSet( SfxItemSet* rSet )
         //! item-state in the 'rOldSet' will be invalid. In this case
         //! changing the underline style will be allowed if a style is
         //! selected in the listbox.
-        bool bAllowChg = nPos != -1 &&
+        bool bAllowChange = nPos != -1 &&
                          SfxItemState::DEFAULT > rOldSet.GetItemState( nWhich );
 
         const SvxOverlineItem& rItem = *static_cast<const SvxOverlineItem*>(pOld);
-        if ( rItem.GetValue() == eOver &&
-             ( LINESTYLE_NONE == eOver || rItem.GetColor() == m_xOverlineColorLB->GetSelectEntryColor() ) &&
-             ! bAllowChg )
+        if (rItem.GetValue() == eOver &&
+             (LINESTYLE_NONE == eOver || (rItem.GetColor() == m_xOverlineColorLB->GetSelectEntryColor() &&
+                                           rItem.getComplexColor() == m_xOverlineColorLB->GetSelectedEntry().getComplexColor())) &&
+             !bAllowChange)
+        {
             bChanged = false;
+        }
     }
 
     if ( bChanged )
     {
         SvxOverlineItem aNewItem( eOver, nWhich );
-        aNewItem.SetColor( m_xOverlineColorLB->GetSelectEntryColor() );
-        rSet->Put( aNewItem );
+        auto aNamedColor = m_xOverlineColorLB->GetSelectedEntry();
+        aNewItem.SetColor(aNamedColor.m_aColor);
+        aNewItem.setComplexColor(aNamedColor.getComplexColor());
+        rSet->Put(aNewItem);
         bModified = true;
     }
     else if ( SfxItemState::DEFAULT == rOldSet.GetItemState( nWhich, false ) )

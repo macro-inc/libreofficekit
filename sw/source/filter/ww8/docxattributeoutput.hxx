@@ -124,6 +124,26 @@ struct TableReference
     }
 };
 
+/** Using framePr, a paragraph can be enclosed in a frame described by its pPr paragraph settings,
+ *  and therefore it needs to apply the frame's properties when exporting the paragraph properties.
+ */
+class FramePrHelper
+{
+    ww8::Frame* m_pFrame;
+    bool m_bUseFrameBackground;
+
+public:
+    FramePrHelper()
+        : m_pFrame(nullptr)
+        , m_bUseFrameBackground(true)
+    {}
+
+    ww8::Frame* Frame() { return m_pFrame; }
+    void SetFrame(ww8::Frame* pSet);
+    bool UseFrameBackground();
+    void SetUseFrameBackground(bool bSet) { m_bUseFrameBackground = bSet; }
+};
+
 class SdtBlockHelper
 {
 public:
@@ -892,7 +912,7 @@ private:
     /// The current table helper
     std::unique_ptr<SwWriteTable> m_xTableWrt;
 
-    ww8::Frame* m_pCurrentFrame;
+    FramePrHelper m_aFramePr;
 
     bool m_bParagraphOpened;
     bool m_bParagraphFrameOpen;

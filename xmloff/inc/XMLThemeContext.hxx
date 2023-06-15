@@ -38,18 +38,18 @@ public:
         const css::uno::Reference<css::xml::sax::XFastAttributeList>& xAttribs) override;
 };
 
-/// Imports the color table of a theme
-class XMLColorTableContext : public SvXMLImportContext
+/// Imports the theme colors of a theme
+class XMLThemeColorsContext : public SvXMLImportContext
 {
     model::Theme& mrTheme;
-    std::unique_ptr<model::ColorSet> mpColorSet;
+    std::shared_ptr<model::ColorSet> m_pColorSet;
     std::vector<css::util::Color> m_aColorScheme;
 
 public:
-    XMLColorTableContext(SvXMLImport& rImport,
-                         css::uno::Reference<css::xml::sax::XFastAttributeList> const& xAttrList,
-                         model::Theme& mrTheme);
-    ~XMLColorTableContext();
+    XMLThemeColorsContext(SvXMLImport& rImport,
+                          css::uno::Reference<css::xml::sax::XFastAttributeList> const& xAttrList,
+                          model::Theme& mrTheme);
+    ~XMLThemeColorsContext();
 
     css::uno::Reference<css::xml::sax::XFastContextHandler> SAL_CALL createFastChildContext(
         sal_Int32 nElement,
@@ -62,7 +62,7 @@ class XMLColorContext : public SvXMLImportContext
 public:
     XMLColorContext(SvXMLImport& rImport,
                     css::uno::Reference<css::xml::sax::XFastAttributeList> const& xAttrList,
-                    std::unique_ptr<model::ColorSet>& rpColorSet);
+                    std::shared_ptr<model::ColorSet>& rpColorSet);
 };
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

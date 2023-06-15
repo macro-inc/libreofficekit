@@ -44,6 +44,7 @@
 #include <editeng/flditem.hxx>
 #include <comphelper/processfactory.hxx>
 #include <comphelper/propertyvalue.hxx>
+#include <comphelper/scopeguard.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 #include <i18nlangtag/lang.h>
 #include <svl/numformat.hxx>
@@ -670,7 +671,7 @@ bool SVGFilter::implExportImpressOrDraw( const Reference< XOutputStream >& rxOSt
 
     if( rxOStm.is() )
     {
-        if( !mSelectedPages.empty() && !mMasterPageTargets.empty() )
+        if (!mSelectedPages.empty())
         {
             ::rtl::Reference< ::utl::OStreamWrapper > aTempStmWrapper = new ::utl::OStreamWrapper( aTempStm );
             Reference< XDocumentHandler > xDocHandler = implCreateExportDocumentHandler( aTempStmWrapper );
@@ -860,7 +861,17 @@ bool SVGFilter::implExportWriterTextGraphic( const Reference< view::XSelectionSu
     if(pSvxDrawPage == nullptr || pSvxDrawPage->GetSdrPage() == nullptr)
         return false;
 
-    rtl::Reference<SdrGrafObj> pGraphicObj = new SdrGrafObj(pSvxDrawPage->GetSdrPage()->getSdrModelFromSdrPage(), aGraphic, tools::Rectangle( aPos, aSize ));
+    SdrModel& rModel = pSvxDrawPage->GetSdrPage()->getSdrModelFromSdrPage();
+    const bool bUndoEnable = rModel.IsUndoEnabled();
+    if (bUndoEnable)
+        rModel.EnableUndo(false);
+    comphelper::ScopeGuard guard([bUndoEnable, &rModel]() {
+        // restore when leaving
+        if (bUndoEnable)
+            rModel.EnableUndo(false);
+    });
+
+    rtl::Reference<SdrGrafObj> pGraphicObj = new SdrGrafObj(rModel, aGraphic, tools::Rectangle( aPos, aSize ));
     uno::Reference< drawing::XShape > xShape = GetXShapeForSdrObject(pGraphicObj.get());
     uno::Reference< XPropertySet > xShapePropSet(xShape, uno::UNO_QUERY);
     xShapePropSet->setPropertyValue("Graphic", uno::Any(xGraphic));
@@ -1024,7 +1035,7 @@ bool SVGFilter::implExportDocument()
                 mpSVGWriter->SetPreviewMode();
 
             // #i124608# export a given object selection, so no MasterPage export at all
-            if (!mbExportShapeSelection)
+            if (!mbExportShapeSelection && !mMasterPageTargets.empty())
                 implExportMasterPages( mMasterPageTargets, 0, mMasterPageTargets.size() - 1 );
             implExportDrawPages( mSelectedPages, 0, nLastPage );
 
@@ -2329,7 +2340,8 @@ bool SVGFilter::implCreateObjects()
             if( xPropSet.is() )
             {
                 Reference< XPropertySet > xBackground;
-                xPropSet->getPropertyValue( "Background" ) >>= xBackground;
+                if (xPropSet->getPropertySetInfo()->hasPropertyByName("Background"))
+                    xPropSet->getPropertyValue( "Background" ) >>= xBackground;
                 if( xBackground.is() )
                 {
                     drawing::FillStyle aFillStyle;
@@ -2380,7 +2392,8 @@ bool SVGFilter::implCreateObjectsFromShape( const Reference< css::drawing::XDraw
 
         if( pObj )
         {
-            Graphic aGraphic(SdrExchangeView::GetObjGraphic(*pObj));
+            // tdf#155479 need to signal SVG export
+            Graphic aGraphic(SdrExchangeView::GetObjGraphic(*pObj, true));
 
             // Writer graphic shapes are handled differently
             if( mbWriterFilter && aGraphic.GetType() == GraphicType::NONE )

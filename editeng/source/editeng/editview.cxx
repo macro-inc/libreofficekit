@@ -719,6 +719,7 @@ void EditView::MoveParagraphs( tools::Long nDiff )
 void EditView::SetBackgroundColor( const Color& rColor )
 {
     pImpEditView->SetBackgroundColor( rColor );
+    pImpEditView->pEditEngine->SetBackgroundColor( rColor );
 }
 
 Color const & EditView::GetBackgroundColor() const
@@ -1724,6 +1725,11 @@ tools::Rectangle EditView::GetLOKSpecialVisArea() const
 bool EditView::HasLOKSpecialPositioning() const
 {
     return pImpEditView->HasLOKSpecialPositioning();
+}
+
+void EditView::SetLOKSpecialFlags(LOKSpecialFlags eFlags)
+{
+    pImpEditView->SetLOKSpecialFlags(eFlags);
 }
 
 void EditView::SuppressLOKMessages(bool bSet)

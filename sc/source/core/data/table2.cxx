@@ -529,7 +529,10 @@ void ScTable::CopyToClip(
         for (SCCOL i = nCol1; i <= nCol2; i++)
             pTable->aCol[i].RemoveProtected(nRow1, nRow2);
 
+    mpCondFormatList->startRendering();
+    mpCondFormatList->updateValues();
     pTable->mpCondFormatList.reset(new ScConditionalFormatList(pTable->rDocument, *mpCondFormatList));
+    mpCondFormatList->endRendering();
 }
 
 void ScTable::CopyToClip(
@@ -2904,8 +2907,7 @@ namespace
         std::vector<ScAttrEntry> aData(rOrigData);
         for (size_t nIdx = 0; nIdx < aData.size(); ++nIdx)
         {
-            ScPatternAttr aNewPattern(*aData[nIdx].pPattern);
-            aData[nIdx].pPattern = &rDocument.GetPool()->Put(aNewPattern);
+            aData[nIdx].pPattern = &rDocument.GetPool()->Put(*aData[nIdx].pPattern);
         }
         return aData;
     }

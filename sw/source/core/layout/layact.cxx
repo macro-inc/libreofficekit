@@ -2352,10 +2352,11 @@ SwLayIdle::SwLayIdle( SwRootFrame *pRt, SwViewShellImp *pI ) :
                 bool bUnlock = false;
                 if ( pViewImp->HasPaintRegion() )
                 {
+                    SAL_INFO("sw.idle", "Disappointing full document invalidation");
                     pViewImp->DeletePaintRegion();
 
                     // Cause a repaint with virtual device.
-                    rSh.LockPaint();
+                    rSh.LockPaint(LockPaintReason::SwLayIdle);
                     bUnlock = true;
                 }
 

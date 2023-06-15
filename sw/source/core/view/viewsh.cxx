@@ -475,17 +475,17 @@ void SwViewShell::ImplStartAction()
 
 void SwViewShell::ImplLockPaint()
 {
-    if ( GetWin() && GetWin()->IsVisible() )
+    if ( GetWin() && GetWin()->IsVisible() && !comphelper::LibreOfficeKit::isActive())
         GetWin()->EnablePaint( false ); //Also cut off the controls.
     Imp()->LockPaint();
 }
 
-void SwViewShell::ImplUnlockPaint( bool bVirDev )
+void SwViewShell::ImplUnlockPaint(std::vector<LockPaintReason>& rReasons, bool bVirDev)
 {
     CurrShell aCurr( this );
     if ( GetWin() && GetWin()->IsVisible() )
     {
-        if ( (bInSizeNotify || bVirDev ) && VisArea().HasArea() )
+        if ( (bInSizeNotify || bVirDev ) && VisArea().HasArea() && !comphelper::LibreOfficeKit::isActive())
         {
             //Refresh with virtual device to avoid flickering.
             VclPtrInstance<VirtualDevice> pVout( *mpOut );
@@ -522,7 +522,7 @@ void SwViewShell::ImplUnlockPaint( bool bVirDev )
             {
                 Imp()->UnlockPaint();
                 GetWin()->EnablePaint( true );
-                GetWin()->Invalidate( InvalidateFlags::Children );
+                InvalidateAll(rReasons);
             }
             pVout.disposeAndClear();
         }
@@ -530,11 +530,71 @@ void SwViewShell::ImplUnlockPaint( bool bVirDev )
         {
             Imp()->UnlockPaint();
             GetWin()->EnablePaint( true );
-            GetWin()->Invalidate( InvalidateFlags::Children );
+            InvalidateAll(rReasons);
         }
     }
     else
         Imp()->UnlockPaint();
+}
+
+namespace
+{
+    std::string_view to_string(LockPaintReason eReason)
+    {
+        switch(eReason)
+        {
+            case LockPaintReason::ViewLayout:
+                return "ViewLayout";
+            case LockPaintReason::OuterResize:
+                return "OuterResize";
+            case LockPaintReason::Undo:
+                return "Undo";
+            case LockPaintReason::Redo:
+                return "Redo";
+            case LockPaintReason::OutlineFolding:
+                return "OutlineFolding";
+            case LockPaintReason::EndSdrCreate:
+                return "EndSdrCreate";
+            case LockPaintReason::SwLayIdle:
+                return "SwLayIdle";
+            case LockPaintReason::InvalidateLayout:
+                return "InvalidateLayout";
+            case LockPaintReason::StartDrag:
+                return "StartDrag";
+            case LockPaintReason::DataChanged:
+                return "DataChanged";
+            case LockPaintReason::InsertFrame:
+                return "InsertFrame";
+            case LockPaintReason::GotoPage:
+                return "GotoPage";
+            case LockPaintReason::InsertGraphic:
+                return "InsertGraphic";
+            case LockPaintReason::SetZoom:
+                return "SetZoom";
+            case LockPaintReason::ExampleFrame:
+                return "ExampleFram";
+        }
+        return "";
+    };
+}
+
+void SwViewShell::InvalidateAll(std::vector<LockPaintReason>& rReasons)
+{
+    assert(!rReasons.empty() && "there must be a reason to InvalidateAll");
+
+    for (const auto& reason : rReasons)
+        SAL_INFO("sw.core", "InvalidateAll because of: " << to_string(reason));
+
+    if (comphelper::LibreOfficeKit::isActive())
+    {
+        // https://github.com/CollaboraOnline/online/issues/6379
+        // ditch OuterResize as a reason to invalidate all in the online case
+        rReasons.erase(std::remove(rReasons.begin(), rReasons.end(), LockPaintReason::OuterResize), rReasons.end());
+    }
+
+    if (!rReasons.empty())
+        GetWin()->Invalidate(InvalidateFlags::Children);
+    rReasons.clear();
 }
 
 bool SwViewShell::AddPaintRect( const SwRect & rRect )
@@ -1280,7 +1340,7 @@ void SwViewShell::VisPortChgd( const SwRect &rRect)
                     return;
                 maVisArea.Pos() = rRect.Pos();
             }
-            else
+            else if (!comphelper::LibreOfficeKit::isActive())
                 GetWin()->Invalidate( aRect );
         }
         else if ( !mnLockPaint ) //will be released in Unlock
@@ -2125,7 +2185,7 @@ void SwViewShell::InvalidateLayout( bool bSizeChanged )
         return;
     }
 
-    LockPaint();
+    LockPaint(LockPaintReason::InvalidateLayout);
     StartAction();
 
     SwPageFrame *pPg = static_cast<SwPageFrame*>(GetLayout()->Lower());

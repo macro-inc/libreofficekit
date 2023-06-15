@@ -74,6 +74,10 @@ void ScFormatEntry::endRendering()
 {
 }
 
+void ScFormatEntry::updateValues()
+{
+}
+
 static bool lcl_HasRelRef( ScDocument* pDoc, const ScTokenArray* pFormula, sal_uInt16 nRecursion = 0 )
 {
     if (pFormula)
@@ -474,6 +478,7 @@ void ScConditionEntry::SetFormula1( const ScTokenArray& rArray )
     if( rArray.GetLen() > 0 )
     {
         pFormula1.reset( new ScTokenArray( rArray ) );
+        SimplifyCompiledFormula(pFormula1, nVal1, bIsStr1, aStrVal1);
         bRelRef1 = lcl_HasRelRef( mpDoc, pFormula1.get() );
     }
 
@@ -486,6 +491,7 @@ void ScConditionEntry::SetFormula2( const ScTokenArray& rArray )
     if( rArray.GetLen() > 0 )
     {
         pFormula2.reset( new ScTokenArray( rArray ) );
+        SimplifyCompiledFormula(pFormula2, nVal2, bIsStr2, aStrVal2);
         bRelRef2 = lcl_HasRelRef( mpDoc, pFormula2.get() );
     }
 
@@ -2051,6 +2057,14 @@ void ScConditionalFormat::endRendering()
     }
 }
 
+void ScConditionalFormat::updateValues()
+{
+    for(auto& rxEntry : maEntries)
+    {
+        rxEntry->updateValues();
+    }
+}
+
 void ScConditionalFormat::CalcAll()
 {
     for(const auto& rxEntry : maEntries)
@@ -2295,6 +2309,14 @@ void ScConditionalFormatList::endRendering()
     for (auto const& it : m_ConditionalFormats)
     {
         it->endRendering();
+    }
+}
+
+void ScConditionalFormatList::updateValues()
+{
+    for (auto const& it : m_ConditionalFormats)
+    {
+        it->updateValues();
     }
 }
 

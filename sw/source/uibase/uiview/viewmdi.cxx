@@ -89,7 +89,7 @@ void SwView::SetZoom_( const Size &rEditSize, SvxZoomType eZoomType,
 {
     bool bUnLockView = !m_pWrtShell->IsViewLocked();
     m_pWrtShell->LockView( true );
-    m_pWrtShell->LockPaint();
+    m_pWrtShell->LockPaint(LockPaintReason::SetZoom);
 
     { // start of SwActContext scope
     SwActContext aActContext(m_pWrtShell.get());
@@ -121,14 +121,15 @@ void SwView::SetZoom_( const Size &rEditSize, SvxZoomType eZoomType,
         const MapMode aTmpMap( MapUnit::MapTwip );
         const Size aWindowSize( GetEditWin().PixelToLogic( rEditSize, aTmpMap ) );
 
-        if( UseOnPage::Mirror == rDesc.GetUseOn() )    // mirrored pages
-        {
-            const SvxLRSpaceItem &rLeftLRSpace = rDesc.GetLeft().GetLRSpace();
-            aPageSize.AdjustWidth(std::abs( rLeftLRSpace.GetLeft() - rLRSpace.GetLeft() ) );
-        }
-
         if( SvxZoomType::OPTIMAL == eZoomType )
         {
+            // unclear if this is useful for OPTIMAL, or completely useless?
+            if( UseOnPage::Mirror == rDesc.GetUseOn() )    // mirrored pages
+            {
+                const SvxLRSpaceItem &rLeftLRSpace = rDesc.GetLeft().GetLRSpace();
+                aPageSize.AdjustWidth(std::abs( rLeftLRSpace.GetLeft() - rLRSpace.GetLeft() ) );
+            }
+
             if (!pPostItMgr->HasNotes() || !pPostItMgr->ShowNotes())
                 aPageSize.AdjustWidth( -( rLRSpace.GetLeft() + rLRSpace.GetRight() + nLeftOfst * 2 ) );
             lLeftMargin = rLRSpace.GetLeft() + DOCUMENTBORDER + nLeftOfst;
@@ -225,7 +226,7 @@ void SwView::SetViewLayout( sal_uInt16 nColumns, bool bBookMode, bool bViewOnly 
 {
     const bool bUnLockView = !m_pWrtShell->IsViewLocked();
     m_pWrtShell->LockView( true );
-    m_pWrtShell->LockPaint();
+    m_pWrtShell->LockPaint(LockPaintReason::ViewLayout);
 
     {
 
