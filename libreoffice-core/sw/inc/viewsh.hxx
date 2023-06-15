@@ -82,7 +82,8 @@ enum class LockPaintReason
     GotoPage,
     InsertGraphic,
     SetZoom,
-    ExampleFrame
+    ExampleFrame,
+    BatchUpdate
 };
 
 namespace vcl

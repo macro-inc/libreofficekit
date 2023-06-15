@@ -2481,7 +2481,7 @@ void SAL_CALL SwXTextDocument::startBatchUpdate() {
     SwView* pWorkView = static_cast<SwView*>(m_pDocShell->GetViewShell());
     SwWrtShell* pWorkWrtShell = pWorkView->GetWrtShellPtr();
     auto* win = pWorkWrtShell->GetWin();
-    pWorkWrtShell->LockPaint();
+    pWorkWrtShell->LockPaint(LockPaintReason::BatchUpdate);
     pWorkWrtShell->LockView(true);
     if (win) {
         win->Hide();
