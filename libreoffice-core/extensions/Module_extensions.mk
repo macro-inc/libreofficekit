@@ -13,18 +13,18 @@ $(eval $(call gb_Module_add_l10n_targets,extensions,\
 	AllLangMoTarget_pcr \
 ))
 
-ifeq (,$(DISABLE_DYNLOADING))
-$(eval $(call gb_Module_add_targets,extensions,\
-	Library_abp \
-	Library_scn \
-	$(if $(filter WNT,$(OS)), \
-		Library_WinUserInfoBe \
-		$(if $(filter TRUE,$(BUILD_X86)),Executable_twain32shim) \
-	) \
-	UIConfig_sabpilot \
-	UIConfig_scanner \
-))
-endif
+#ifeq (,$(DISABLE_DYNLOADING))
+#$(eval $(call gb_Module_add_targets,extensions,\
+#	Library_abp \
+#	Library_scn \
+#	$(if $(filter WNT,$(OS)), \
+#		Library_WinUserInfoBe \
+#		$(if $(filter TRUE,$(BUILD_X86)),Executable_twain32shim) \
+#	) \
+#	UIConfig_sabpilot \
+#	UIConfig_scanner \
+#))
+#endif
 
 ifneq ($(filter-out iOS,$(OS)),)
 $(eval $(call gb_Module_add_targets,extensions,\
