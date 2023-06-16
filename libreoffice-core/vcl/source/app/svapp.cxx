@@ -53,6 +53,7 @@
 #include <vcl/scheduler.hxx>
 #include <vcl/skia/SkiaHelper.hxx>
 
+#include <sal/backtrace.hxx>
 #include <salinst.hxx>
 #include <graphic/Manager.hxx>
 #include <salframe.hxx>
@@ -256,25 +257,26 @@ void Application::Exception( ExceptionCategory nCategory )
     }
 }
 
+namespace {
+
+OUString backtraceAsString(sal_uInt32 maxDepth)
+{
+    std::unique_ptr<sal::BacktraceState> backtrace = sal::backtrace_get( maxDepth );
+    return sal::backtrace_to_string( backtrace.get());
+}
+}
+
+
 void Application::Abort( const OUString& rErrorText )
 {
     //HACK: Dump core iff --norestore command line argument is given (assuming
     // this process is run by developers who are interested in cores, vs. end
     // users who are not):
-#if OSL_DEBUG_LEVEL > 0
-    bool dumpCore = true;
-#else
-    bool dumpCore = false;
-    sal_uInt16 n = GetCommandLineParamCount();
-    for (sal_uInt16 i = 0; i != n; ++i) {
-        if (GetCommandLineParam(i) == "--norestore") {
-            dumpCore = true;
-            break;
-        }
-    }
-#endif
+    try {
+        SAL_WARN("exception", "Unhandled exception at:\n" << backtraceAsString(25));
+    } catch (...) {}
 
-    SalAbort( rErrorText, dumpCore );
+    SalAbort( rErrorText, true );
 }
 
 size_t Application::GetReservedKeyCodeCount()

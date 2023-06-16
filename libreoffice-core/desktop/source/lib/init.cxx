@@ -4787,6 +4787,11 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     int nView = SfxLokHelper::getView();
     if (nView < 0)
         return;
+    if (gImpl && aCommand == ".uno:TestCrash")
+    {
+        volatile int* p = 0;
+        *p = 0;
+    }
 
     if (gImpl && aCommand == ".uno:CreateTable")
     {
