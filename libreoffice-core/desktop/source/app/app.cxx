@@ -1313,7 +1313,7 @@ int Desktop::Main()
 
     SetSplashScreenProgress(25);
 
-#if HAVE_FEATURE_DESKTOP && !defined(EMSCRIPTEN)
+#if HAVE_FEATURE_DESKTOP && !defined(EMSCRIPTEN) && !defined(HAVE_FEATURE_UI)
     // check user installation directory for lockfile so we can be sure
     // there is no other instance using our data files from a remote host
 
