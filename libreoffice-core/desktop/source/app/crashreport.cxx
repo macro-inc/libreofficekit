@@ -7,7 +7,93 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "rtl/ustrbuf.hxx"
+#include "sal/log.hxx"
 #include <desktop/crashreport.hxx>
+namespace {
+
+void backtraceLog(OUStringBuffer& buffer, const std::u16string_view header, std::deque<std::string> items)
+{
+    buffer.append(header);
+    int i = 0;
+    for (std::string& command : items)
+    {
+        buffer.append('#');
+        buffer.append(i++);
+        buffer.append(' ');
+        buffer.append(OUString::fromUtf8(command));
+        buffer.append('\n');
+    }
+}
+
+void backtraceLog(OUStringBuffer& buffer, const std::u16string_view header, std::deque<std::string_view> ns, std::deque<std::string_view> funcs)
+{
+    buffer.append(header);
+    int i = 0;
+    auto begin = ns.begin();
+    for (auto& func : funcs)
+    {
+        buffer.append('#');
+        buffer.append(i++);
+        buffer.append(' ');
+        buffer.append(OUString::fromUtf8(*(begin++)));
+        buffer.append('_');
+        buffer.append(OUString::fromUtf8(func));
+        buffer.append('\n');
+    }
+}
+}
+
+std::deque<std::string> CrashReporter::unoCommands;
+std::deque<std::string> CrashReporter::commandValues;
+std::deque<std::string_view> CrashReporter::unoV8Class;
+std::deque<std::string_view> CrashReporter::unoV8Func;
+
+void CrashReporter::warnForBacktrace() {
+    OUStringBuffer b3;
+    b3.append('\n');
+    backtraceLog(b3, u"Last postUnoCommands:\n", unoCommands);
+    if (!commandValues.empty()) {
+        b3.append('\n');
+        backtraceLog(b3, u"Last commandValues:\n", commandValues);
+    }
+    if (!unoV8Func.empty()) {
+        b3.append('\n');
+        backtraceLog(b3, u"Last UNO-V8:\n", unoV8Class, unoV8Func);
+    }
+    SAL_WARN("exception", b3.makeStringAndClear());
+}
+
+namespace {
+void logStringView(std::deque<std::string>& buffer, std::string_view item) {
+    static constexpr size_t nMaxLogged = 5;
+    if (buffer.size() == nMaxLogged)
+        buffer.pop_front();
+    buffer.push_back(std::string(item));
+}
+}
+
+void CrashReporter::logUnoCommand(std::string_view command) {
+    logStringView(unoCommands, command);
+}
+
+void CrashReporter::logCommandValues(std::string_view command) {
+    logStringView(commandValues, command);
+}
+
+void CrashReporter::logUnoV8(const std::string_view& ns, const std::string_view& func) {
+    static constexpr size_t nMaxLogged = 5;
+    if (unoV8Func.size() == nMaxLogged) {
+        unoV8Func.pop_front();
+        unoV8Class.pop_front();
+    }
+    unoV8Func.push_back(func);
+    unoV8Class.push_back(ns);
+}
+
+
+#if HAVE_FEATURE_BREAKPAD
+
 #include <rtl/bootstrap.hxx>
 #include <osl/file.hxx>
 #include <comphelper/processfactory.hxx>
@@ -15,16 +101,11 @@
 #include <unotools/bootstrap.hxx>
 #include <o3tl/char16_t2wchar_t.hxx>
 #include <desktop/minidump.hxx>
-#include <rtl/ustrbuf.hxx>
 
 #include <config_version.h>
 #include <config_folders.h>
 
-#include <string>
 #include <regex>
-
-
-#if HAVE_FEATURE_BREAKPAD
 
 #include <fstream>
 #if defined( UNX ) && !defined MACOSX && !defined IOS && !defined ANDROID

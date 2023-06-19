@@ -218,6 +218,9 @@ public:
 
 private:
     void writeName(OUString const& name);
+    void writeInterfaceStaticName(OUString const& name,
+                               rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef,
+                               std::unordered_set<int>& declared);
     void writeInterfaceMethods(OUString const& name,
                                rtl::Reference<unoidl::InterfaceTypeEntity> entity, bool isRef,
                                std::unordered_set<int>& declared);

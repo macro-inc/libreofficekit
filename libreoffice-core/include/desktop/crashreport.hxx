@@ -22,11 +22,10 @@
 #include <vector>
 #include <deque>
 #include <string>
+#include <string_view>
 
 namespace google_breakpad
-{
-class ExceptionHandler;
-}
+{ class ExceptionHandler; }
 
 /**
  * Provides access to the crash reporter service.
@@ -111,6 +110,19 @@ private:
         return OUString();
     }
 #endif // HAVE_FEATURE_BREAKPAD
+public:
+    static void logUnoCommand(std::string_view command);
+
+    static void logCommandValues(std::string_view command);
+
+    static void logUnoV8(const std::string_view& ns, const std::string_view& func);
+
+    static void warnForBacktrace();
+private:
+    static std::deque<std::string> unoCommands;
+    static std::deque<std::string> commandValues;
+    static std::deque<std::string_view> unoV8Class;
+    static std::deque<std::string_view> unoV8Func;
 };
 
 #endif // INCLUDED_DESKTOP_CRASHREPORT_HXX

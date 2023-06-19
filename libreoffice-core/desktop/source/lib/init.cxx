@@ -9,9 +9,11 @@
 
 #include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
+#include "sal/backtrace.hxx"
 #include "sfx2/lokhelper.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
+#include <desktop/crashreport.hxx>
 
 #include <stdio.h>
 #include <string.h>
@@ -4771,7 +4773,9 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     SetLastExceptionMsg();
 
     SfxObjectShell* pDocSh = SfxObjectShell::Current();
-    OUString aCommand(pCommand, strlen(pCommand), RTL_TEXTENCODING_UTF8);
+    const std::string_view svCommand(pCommand);
+    CrashReporter::logUnoCommand(svCommand);
+    OUString aCommand = std::move(OUString::fromUtf8(svCommand));
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     std::vector<beans::PropertyValue> aPropertyValuesVector(jsonToPropertyValuesVector(pArguments));
@@ -6103,6 +6107,7 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     SetLastExceptionMsg();
 
     const std::string_view aCommand(pCommand);
+    CrashReporter::logCommandValues(aCommand);
     static constexpr OStringLiteral aViewRowColumnHeaders(".uno:ViewRowColumnHeaders");
     static constexpr OStringLiteral aSheetGeometryData(".uno:SheetGeometryData");
     static constexpr OStringLiteral aCellCursor(".uno:CellCursor");

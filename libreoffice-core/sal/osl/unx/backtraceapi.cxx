@@ -74,7 +74,7 @@ struct FrameData
 
 typedef o3tl::lru_map<void*, OString> FrameCache;
 std::mutex frameCacheMutex;
-FrameCache frameCache(256);
+FrameCache frameCache(64);
 
 std::string_view basename(std::string_view path)
 {
@@ -328,8 +328,11 @@ OUString sal::backtrace_to_string(BacktraceState* backtraceState)
         if (frameData[i].file.empty())
             continue;
         if (i != offset)
-            b3.append("\n");
-        b3.append("#" + OUString::number(i - offset) + " ");
+            b3.append('\n');
+        b3.append('#');
+        b3.append(i - offset);
+        b3.append(' ');
+
         if (!frameData[i].info.isEmpty())
             b3.append(o3tl::runtimeToOUString(frameData[i].info.getStr()));
     }

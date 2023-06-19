@@ -132,6 +132,7 @@ $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
 # LibreOfficeKit bits
 ifneq ($(filter $(OS),ANDROID iOS MACOSX WNT),)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
+    desktop/source/app/crashreport \
 	desktop/source/lib/init \
 	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
@@ -146,6 +147,7 @@ $(if $(filter-out $(OS),IOS), \
 else
 ifneq ($(filter TRUE,$(USING_X11) $(DISABLE_GUI))($filter EMSCRIPTEN,$(OS)),)
 $(eval $(call gb_Library_add_exception_objects,sofficeapp,\
+    desktop/source/app/crashreport \
 	desktop/source/lib/init \
 	desktop/source/lib/lokdocumenteventnotifier \
 	desktop/source/lib/lokinteractionhandler \
