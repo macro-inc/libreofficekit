@@ -91,6 +91,7 @@ jobs:
           PARALLELISM: 4
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          md C:\external-tar
           cd lok/libreoffice-core
           C:\cygwin\bin\bash.exe --login
           C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=LOKit-Win64 --with-external-tar="C:\external-tar"'
