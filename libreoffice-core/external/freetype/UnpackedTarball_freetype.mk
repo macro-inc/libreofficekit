@@ -14,9 +14,6 @@ $(eval $(call gb_UnpackedTarball_set_tarball,freetype,$(FREETYPE_TARBALL),,freet
 $(eval $(call gb_UnpackedTarball_add_patches,freetype,\
 	external/freetype/freetype-2.6.5.patch.1 \
 	external/freetype/ubsan.patch \
-	$(if $(filter WNT,$(OS)), \
-		external/freetype/freetype-preconfigure.patch.1 \
-	) \
 ))
 
 $(eval $(call gb_UnpackedTarball_set_patchlevel,freetype,0))
