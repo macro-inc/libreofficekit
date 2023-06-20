@@ -20,6 +20,7 @@ $(call gb_ExternalProject_get_state_target,freetype,build) :
 		'$(DEVENV)' "builds/windows/vc2010/freetype.sln" -upgrade && \
 		unset UCRTVersion && \
 		sed -i 's/MultiThreaded</MultiThreadedDLL</g' builds/windows/vc2010/freetype.vcxproj && \
+		sed -i 's/FT2_BUILD_LIBRARY;/FT2_BUILD_LIBRARY;Z_PREFIX;/g' builds/windows/vc2010/freetype.vcxproj && \
 		'$(DEVENV)' "builds/windows/vc2010/freetype.sln" -build "Release Static|x64" && \
 		mkdir -p "$(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)" && \
 		cp -rf "objs/x64/Release Static/freetype.lib" "$(call gb_UnpackedTarball_get_dir,freetype/instdir/lib)" && \
