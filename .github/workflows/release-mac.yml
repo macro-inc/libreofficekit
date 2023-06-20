@@ -36,11 +36,14 @@ jobs:
           make build
           tar -cJf ../libreofficekit-mac-${{ matrix.arch }}.tar.xz instdir
           cd ..
+          ./scripts/extract-symbols-mac.sh
+          (cd workdir && /usr/bin/tar -cJf ../debug-symbols-mac-${{ matrix.arch }}.tar.xz debug)
           shasum -a 256 libreofficekit-mac-${{ matrix.arch }}.tar.xz > libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum
+          shasum -a 256 debug-symbols-mac-${{ matrix.arch }}.tar.xz > debug-symbols-mac-${{ matrix.arch }}.tar.xz.sha256sum
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "libreofficekit-mac-${{ matrix.arch }}.tar.xz,libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum"
+          artifacts: "libreofficekit-mac-${{ matrix.arch }}.tar.xz,libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum,debug-symbols-mac-${{ matrix.arch }}.tar.xz,debug-symbols-mac-${{ matrix.arch }}.tar.xz.sha256sum"
           allowUpdates: true
           artifactErrorsFailBuild: true
           name: ${{ needs.check_version.outputs.version }}

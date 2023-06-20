@@ -10,7 +10,7 @@ rm -rf "${D:?}/*"
 for i in "$I"/program/*; do
   echo -n "$i"
   debug_name="$(basename "$i").debug" 
-  objcopy --only-keep-debug --compress-debug-sections "$i" "$D/$debug_name"
+  objcopy --only-keep-debug "$i" "$D/$debug_name"
   echo -n "."
   strip --discard-all --strip-debug --preserve-dates "$i"
   echo -n "."
