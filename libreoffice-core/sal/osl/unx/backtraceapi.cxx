@@ -131,7 +131,7 @@ void process_file_addr2line(std::string_view file, std::vector<FrameData>& frame
             if (!frame.file.empty() && file == frame.file)
             {
                 frame.info
-                    = "[+0x" + OString::number(frame.offset, 16) + "]" + OString(basename(file));
+                    = "[+0x" + OString::number(frame.offset, 16) + "](" + OString(basename(file)) + ")";
                 std::lock_guard guard(frameCacheMutex);
                 frameCache.insert({ frame.addr, frame.info });
             }
@@ -243,7 +243,7 @@ void process_file_addr2line(std::string_view file, std::vector<FrameData>& frame
                     linesPos++;
                 ++linesPos;
                 frame.info
-                    = "[+0x" + OString::number(frame.offset, 16) + "](" + OString(basename(file)) ")";
+                    = "[+0x" + OString::number(frame.offset, 16) + "](" + OString(basename(file)) + ")";
                 std::lock_guard guard(frameCacheMutex);
                 frameCache.insert({ frame.addr, frame.info });
                 continue;

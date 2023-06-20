@@ -7,7 +7,7 @@ D="$W/debug"
 echo "Preparing debug symbols for macOS..."
 mkdir -p "$D"
 rm -rf "${D:?}/*"
-[ "$(uname -m)" == 'arm64' ]; then
+if [ "$(uname -m)" == 'arm64' ]; then
   I="$I/aarch64"
 else
   I="$I/x64"
