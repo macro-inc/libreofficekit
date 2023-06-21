@@ -19,7 +19,7 @@ void backtraceLog(OUStringBuffer& buffer, const std::u16string_view header, std:
     for (std::string& command : items)
     {
         buffer.append('#');
-        buffer.append(i++);
+        buffer.append(static_cast<sal_Int32>(i++));
         buffer.append(' ');
         buffer.append(OUString::fromUtf8(command));
         buffer.append('\n');
@@ -34,7 +34,7 @@ void backtraceLog(OUStringBuffer& buffer, const std::u16string_view header, std:
     for (auto& func : funcs)
     {
         buffer.append('#');
-        buffer.append(i++);
+        buffer.append(static_cast<sal_Int32>(i++));
         buffer.append(' ');
         buffer.append(OUString::fromUtf8(*(begin++)));
         buffer.append('_');
