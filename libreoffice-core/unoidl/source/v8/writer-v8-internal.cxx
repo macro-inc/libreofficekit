@@ -26,6 +26,23 @@ void V8WriterInternal::writeMethodParams(const unoidl::InterfaceTypeEntity::Meth
     }
 }
 
+void V8WriterInternal::writeInterfaceStaticName(OUString const& name,
+                                             rtl::Reference<unoidl::InterfaceTypeEntity> entity,
+                                             bool isRef, std::unordered_set<int>& declared) {
+    if (declared.find(name.hashCode()) != declared.end())
+        return;
+    out("inline constexpr std::string_view __" + cName(name) + " = \"" + cName(name) + "\";\n");
+    declared.emplace(name.hashCode());
+    for (auto& i : entity->getDirectMandatoryBases()) {
+        // acquire/release are handled on object create/destroy
+        if (i.name == "com.sun.star.uno.XInterface")
+            continue;
+
+        auto* base_ent = static_cast<unoidl::InterfaceTypeEntity*>(entities_[i.name]->entity.get());
+        writeInterfaceStaticName(i.name, base_ent, isRef, declared);
+    }
+}
+
 void V8WriterInternal::writeInterfaceMethods(OUString const& name,
                                              rtl::Reference<unoidl::InterfaceTypeEntity> entity,
                                              bool isRef, std::unordered_set<int>& declared) {
@@ -52,6 +69,8 @@ void V8WriterInternal::writeInterfaceMethods(OUString const& name,
             continue;
         }
         out("{\n");
+        out("static constexpr std::string_view __name = \"" + m.name + "\";\n");
+        out("CrashReporter::logUnoV8(__" + cName(name) + ", __name);\n");
         auto returnType = resolveTypedef(m.returnType);
         bool isVoid = returnType == "void";
         auto entity__ = entities_.find(returnType);
@@ -345,6 +364,7 @@ void V8WriterInternal::writeInternalHeader() {
 #ifndef UNOV8_INTERNAL_HXX_
 #define UNOV8_INTERNAL_HXX_
 #include <cppu/unotype.hxx>
+#include <desktop/crashreport.hxx>
 #include "unov8.h"
 )");
 
@@ -490,6 +510,12 @@ namespace methods {
 )");
 
     std::unordered_set<int> declared{};
+    for (const auto& i : interfaces) {
+        std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
+        auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());
+        writeInterfaceStaticName(i, entity, false, declared);
+    }
+    declared.clear();
     for (const auto& i : interfaces) {
         std::map<OUString, writer::Entity*>::iterator j(entities_.find(i));
         auto* entity = static_cast<unoidl::InterfaceTypeEntity*>(j->second->entity.get());

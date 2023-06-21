@@ -119,17 +119,22 @@ jobs:
           cd /lok/libreoffice-core
           ./autogen.sh --with-distro=LOKit-Linux --with-external-tar="/external-tar"
           make build
+          cd /lok
+          ./scripts/extract-symbols.sh
       - name: Make artifact
         run: |
           cd /lok/libreoffice-core
           /usr/bin/tar -cJf libreofficekit.tar.xz instdir
           cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-linux.tar.xz
+          (cd workdir && /usr/bin/tar -cJf ../debug-symbols.tar.xz debug)
+          cp debug-symbols.tar.xz $GITHUB_WORKSPACE/debug-symbols-linux.tar.xz
           cd $GITHUB_WORKSPACE
           sha256sum libreofficekit-linux.tar.xz > libreofficekit-linux.tar.xz.sha256sum
+          sha256sum debug-symbols-linux.tar.xz > debug-symbols-linux.tar.xz.sha256sum
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "libreofficekit-linux.tar.xz,libreofficekit-linux.tar.xz.sha256sum"
+          artifacts: "libreofficekit-linux.tar.xz,libreofficekit-linux.tar.xz.sha256sum,debug-symbols-linux.tar.xz,debug-symbols-linux.tar.xz.sha256sum"
           allowUpdates: true
           artifactErrorsFailBuild: true
           name: ${{ needs.check_version.outputs.version }}

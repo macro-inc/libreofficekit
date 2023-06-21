@@ -1128,6 +1128,7 @@ void Desktop::Exception(ExceptionCategory nCategory)
 {
     // protect against recursive calls
     static bool bInException = false;
+    CrashReporter::warnForBacktrace();
 
 #if HAVE_FEATURE_BREAKPAD
     CrashReporter::removeExceptionHandler(); // disallow re-entry
