@@ -37,7 +37,7 @@ jobs:
           tar -cJf ../libreofficekit-mac-${{ matrix.arch }}.tar.xz instdir
           cd ..
           ./scripts/extract-symbols-mac.sh
-          (cd workdir && /usr/bin/tar -cJf ../debug-symbols-mac-${{ matrix.arch }}.tar.xz debug)
+          (cd libreoffice-core/workdir && /usr/bin/tar -cJf ../../debug-symbols-mac-${{ matrix.arch }}.tar.xz debug)
           shasum -a 256 libreofficekit-mac-${{ matrix.arch }}.tar.xz > libreofficekit-mac-${{ matrix.arch }}.tar.xz.sha256sum
           shasum -a 256 debug-symbols-mac-${{ matrix.arch }}.tar.xz > debug-symbols-mac-${{ matrix.arch }}.tar.xz.sha256sum
       - name: Create release
