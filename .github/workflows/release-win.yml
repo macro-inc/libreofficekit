@@ -169,14 +169,26 @@ jobs:
         run: |
           cd /c/lok/libreoffice-core
           /usr/bin/tar -cJf libreofficekit.tar.xz instdir
+          mkdir debug
+          for i in instdir/program/*.dll; do
+            n="$(basename $i)"
+            p="${n%.*}.pdb"
+            t="workdir/LinkTarget/Library/$p"
+            if [ -e "$t" ]; then
+              cp "$t" "debug/$p"
+            fi
+          done
+          /usr/bin/tar -cJf debug-symbols.tar.xz debug
           cp libreofficekit.tar.xz $GITHUB_WORKSPACE/libreofficekit-win.tar.xz
+          cp debug-symbols.tar.xz $GITHUB_WORKSPACE/debug-symbols-win.tar.xz
           cd $GITHUB_WORKSPACE
           sha256sum libreofficekit-win.tar.xz > libreofficekit-win.tar.xz.sha256sum
+          sha256sum debug-symbols-win.tar.xz > debug-symbols-win.tar.xz.sha256sum
         shell: bash
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "libreofficekit-win.tar.xz,libreofficekit-win.tar.xz.sha256sum"
+          artifacts: "libreofficekit-win.tar.xz,libreofficekit-win.tar.xz.sha256sum,debug-symbols-win.tar.xz,debug-symbols-win.tar.xz.sha256sum"
           allowUpdates: true
           artifactErrorsFailBuild: true
           name: ${{ needs.check_version.outputs.version }}

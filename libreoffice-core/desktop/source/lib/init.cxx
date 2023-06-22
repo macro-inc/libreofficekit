@@ -9,7 +9,7 @@
 
 #include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
-#include "sal/backtrace.hxx"
+#include <sal/backtrace.hxx>
 #include "sfx2/lokhelper.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>

@@ -9,7 +9,9 @@
 
 #include "rtl/ustrbuf.hxx"
 #include "sal/log.hxx"
+#include "sal/types.h"
 #include <desktop/crashreport.hxx>
+#include <iostream>
 namespace {
 
 void backtraceLog(OUStringBuffer& buffer, const std::u16string_view header, std::deque<std::string> items)
