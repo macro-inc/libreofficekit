@@ -6,3 +6,4 @@ libreoffice-core/diag.json
 libreoffice-core/vs-code-template.code-workspace
 
 .DS_Store
+libreoffice-core/debug

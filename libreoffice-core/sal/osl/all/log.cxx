@@ -27,6 +27,7 @@
 #include <sal/types.h>
 #include <backtraceasstring.hxx>
 #include <salusesyslog.hxx>
+#include <string_view>
 
 #if defined ANDROID
 #include <android/log.h>
@@ -327,8 +328,17 @@ void sal_detail_log(
     } else {
         // avoid calling getLogFile() more than once
         static std::ofstream * logFile = getLogFile();
+        static constexpr std::string_view specialException = "exception";
         if (logFile) {
             *logFile << s.str() << std::endl;
+            if (specialException == area) {
+                logFile->flush();
+#ifdef _WIN32
+                OutputDebugStringA(s.str().c_str());
+#endif
+                std::fputs(s.str().c_str(), stderr);
+                std::fflush(stderr);
+            }
         }
         else {
             s << '\n';
