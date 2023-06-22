@@ -11,7 +11,7 @@ jobs:
   fetch:
     needs: [check_version]
     if: ${{ needs.check_version.outputs.should_run != 'false' }}
-    runs-on: windows-2019
+    runs-on: windows-2019-beefy
     name: Fetch external projects
     steps:
       - name: Turn off line ending conversion in git
@@ -100,7 +100,7 @@ jobs:
   build:
     needs: [check_version, fetch]
     if: ${{ needs.check_version.outputs.should_run != 'false' }}
-    runs-on: windows-2019
+    runs-on: windows-2019-beefy
     name: Build
     steps:
       - name: Turn off line ending conversion in git
