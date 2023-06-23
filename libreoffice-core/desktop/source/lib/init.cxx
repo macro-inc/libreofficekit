@@ -1215,7 +1215,7 @@ static void doc_setGraphicSelection (LibreOfficeKitDocument* pThis,
 static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
-static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput);
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size));
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -6313,7 +6313,7 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
     return aJsonWriter.extractData();
 }
 
-static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size))
 {
     if (!pOutput)
     {
@@ -6356,7 +6356,7 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput)
 
         const size_t nOutputSize = aOutStream.GetEndOfData();
 
-        *pOutput = static_cast<char*>(malloc(nOutputSize));
+        *pOutput = static_cast<char*>(chrome_malloc(nOutputSize));
 
         if (!*pOutput)
         {
