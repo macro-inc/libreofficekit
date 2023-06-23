@@ -501,9 +501,9 @@ public:
      * @param pOutput the data of the file
      * @return size_t the size of the data
     */
-    size_t saveToMemory(char** pOutput)
+    size_t saveToMemory(char** pOutput, void *(*chrome_malloc)(size_t size))
     {
-        return mpDoc->pClass->saveToMemory(mpDoc,pOutput);
+        return mpDoc->pClass->saveToMemory(mpDoc,pOutput,chrome_malloc);
     }
 
     /**
