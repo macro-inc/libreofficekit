@@ -128,7 +128,7 @@ struct _LibreOfficeKitClass
 
     /// @see lok::Office::loadFromMemory().
     void* (*loadFromMemory) (LibreOfficeKit* pThis, char *data, size_t size);
-  
+
     /** @see lok::Office::extractRequest.
      */
     char* (*extractRequest) (LibreOfficeKit* pThis,
@@ -267,7 +267,7 @@ struct _LibreOfficeKitDocumentClass
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
 
     /// @see lok::Document::saveToMemory().
-    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput);
+    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size));
 
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
