@@ -219,7 +219,6 @@
 #include <unotools/useroptions.hxx>
 #include <unotools/viewoptions.hxx>
 #include <vcl/settings.hxx>
-#include "lokdocumenteventnotifier.hxx"
 
 #include <officecfg/Setup.hxx>
 #include <com/sun/star/ui/XAcceleratorConfiguration.hpp>
@@ -1400,9 +1399,6 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
     assert(nDocumentId != -1 && "Cannot set mnDocumentId to -1");
 
     m_pDocumentClass = gDocumentClass.lock();
-
-    // Setting LokDocumentEventNotifier for a given document
-    m_lokDocEventNotifier = nullptr;
 
     if (!m_pDocumentClass)
     {
@@ -4225,9 +4221,6 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     {
         uno::Reference<css::document::XDocumentEventBroadcaster> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
 
-        if (mxOwner.is())
-            pDocument->m_lokDocEventNotifier = new doceventnotifier::LokDocumentEventNotifier(std::move(mxOwner), pCallback, pData);
-
         for (const auto& pair : pDocument->mpCallbackFlushHandlers)
         {
             if (pair.first == nId)
@@ -4261,10 +4254,6 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     }
     else
     {
-        if (pDocument->m_lokDocEventNotifier) {
-            pDocument->m_lokDocEventNotifier->disable();
-            pDocument->m_lokDocEventNotifier = nullptr;
-        }
         if (SfxViewShell* pViewShell = SfxViewShell::Current())
         {
             pViewShell->setLibreOfficeKitViewCallback(nullptr);
