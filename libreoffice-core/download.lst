@@ -75,8 +75,8 @@ CPPUNIT_TARBALL := cppunit-1.15.1.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-CURL_SHA256SUM := 0a381cd82f4d00a9a334438b8ca239afea5bfefcfa9a1025f2bf118e79e0b5f0
-CURL_TARBALL := curl-8.0.1.tar.xz
+CURL_SHA256SUM := 31b1118eb8bfd43cd95d9a3f146f814ff874f6ed3999b29d94f4d1e7dbac5ef6
+CURL_TARBALL := curl-8.1.2.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -456,8 +456,8 @@ MYTHES_TARBALL := mythes-1.2.5.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-NSS_SHA256SUM := fcfa26d2738ec5b0cf72ab4be784eac832a75132cda2e295799c04d62a93607a
-NSS_TARBALL := nss-3.88.1-with-nspr-4.35.tar.gz
+NSS_SHA256SUM := f78ab1d911cae8bbc94758fb3bd0f731df4087423a4ff5db271ba65381f6b739
+NSS_TARBALL := nss-3.90-with-nspr-4.35.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -482,8 +482,8 @@ OPENLDAP_TARBALL := openldap-2.4.59.tgz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-OPENSSL_SHA256SUM := 6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e
-OPENSSL_TARBALL := openssl-3.0.8.tar.gz
+OPENSSL_SHA256SUM := eb1ab04781474360f77c318ab89d8c5a03abc38e63d65a603cabbf1b00a1dc90
+OPENSSL_TARBALL := openssl-3.0.9.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -529,8 +529,8 @@ POSTGRESQL_TARBALL := postgresql-13.10.tar.bz2
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-PYTHON_SHA256SUM := d85dbb3774132473d8081dcb158f34a10ccad7a90b96c7e50ea4bb61f5ce4562
-PYTHON_TARBALL := Python-3.8.16.tar.xz
+PYTHON_SHA256SUM := 2e54b0c68191f16552f6de2e97a2396540572a219f6bbb28591a137cecc490a9
+PYTHON_TARBALL := Python-3.8.17.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts

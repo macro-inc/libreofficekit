@@ -135,6 +135,24 @@ CPPUNIT_TEST_FIXTURE(Test, testSymbol)
     assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor", "color", "#00d000");
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testTdf155819)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/tdf155819.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/polypolygonstroke/line", 1);
+    assertXPath(pDocument, "/primitive2D/transform/polypolygonstroke/polypolygon", 1);
+    // Without the fix in place, this test would have failed with
+    // - Expected: 4
+    // - Actual  : 0
+    assertXPath(pDocument, "/primitive2D/transform/transform", 4);
+}
+
 CPPUNIT_TEST_FIXTURE(Test, testTdf87309)
 {
     Primitive2DSequence aSequenceTdf87309 = parseSvg(u"/svgio/qa/cppunit/data/tdf87309.svg");
@@ -255,6 +273,24 @@ CPPUNIT_TEST_FIXTURE(Test, testFontsizeRelative)
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[2]", "familyname", "serif");
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testTdf145896)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/tdf145896.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    // Without the fix in place, this test would have failed with
+    // - Expected: #ffff00
+    // - Actual  : #000000
+    assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor[1]", "color", "#ffff00");
+    assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor[2]", "color", "#008000");
+    assertXPath(pDocument, "/primitive2D/transform/polypolygoncolor[3]", "color", "#0000ff");
+}
+
 CPPUNIT_TEST_FIXTURE(Test, testMarkerOrient)
 {
     Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/MarkerOrient.svg");
@@ -364,6 +400,19 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf45771)
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "text", "Sample");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "height", "32");
     assertXPath(pDocument, "/primitive2D/transform/textsimpleportion[1]", "familyname", "Times New Roman");
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf155833)
+{
+    Primitive2DSequence aSequence = parseSvg(u"/svgio/qa/cppunit/data/tdf155833.svg");
+    CPPUNIT_ASSERT_EQUAL(1, static_cast<int>(aSequence.getLength()));
+
+    drawinglayer::Primitive2dXmlDump dumper;
+    xmlDocUniquePtr pDocument = dumper.dumpAndParse(aSequence);
+
+    CPPUNIT_ASSERT (pDocument);
+
+    assertXPath(pDocument, "/primitive2D/transform/mask/transform/transform/transform/transform/transform/bitmap", 1);
 }
 
 CPPUNIT_TEST_FIXTURE(Test, testTdf97941)

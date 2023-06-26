@@ -1150,7 +1150,7 @@ namespace svgio::svgreader
             if(SVGToken::Path == mrOwner.getType() ||         // path
                 SVGToken::Polygon == mrOwner.getType() ||     // polygon, polyline
                 SVGToken::Line == mrOwner.getType() ||        // line
-                getCssStyleParent())
+                SVGToken::Style == mrOwner.getType())        // tdf#150323
             {
                 // try to add markers
                 add_markers(rPath, rTarget, pHelpPointIndices);
@@ -1877,7 +1877,8 @@ namespace svgio::svgreader
                 }
                 case SVGToken::Marker:
                 {
-                    if(getCssStyleParent())
+                    // tdf#155819: Using the marker property from a style sheet is equivalent to using all three (start, mid, end).
+                    if(mrOwner.getType() == SVGToken::Style)
                     {
                         readLocalUrl(aContent, maMarkerEndXLink);
                         maMarkerStartXLink = maMarkerMidXLink = maMarkerEndXLink;
@@ -2866,7 +2867,7 @@ namespace svgio::svgreader
 
                 if(!aClipPath.isEmpty())
                 {
-                    const_cast< SvgStyleAttributes* >(this)->mpClipPathXLink = dynamic_cast< const SvgClipPathNode* >(mrOwner.getDocument().findSvgNodeById(aClipPath));
+                    return dynamic_cast< const SvgClipPathNode* >(mrOwner.getDocument().findSvgNodeById(aClipPath));
                 }
             }
 
@@ -2901,7 +2902,7 @@ namespace svgio::svgreader
 
                 if(!aMask.isEmpty())
                 {
-                    const_cast< SvgStyleAttributes* >(this)->mpMaskXLink = dynamic_cast< const SvgMaskNode* >(mrOwner.getDocument().findSvgNodeById(aMask));
+                    return dynamic_cast< const SvgMaskNode* >(mrOwner.getDocument().findSvgNodeById(aMask));
                 }
             }
 
@@ -2936,7 +2937,7 @@ namespace svgio::svgreader
 
                 if(!aMarker.isEmpty())
                 {
-                    const_cast< SvgStyleAttributes* >(this)->mpMarkerStartXLink = dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerStartXLink()));
+                    return dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerStartXLink()));
                 }
             }
 
@@ -2971,7 +2972,7 @@ namespace svgio::svgreader
 
                 if(!aMarker.isEmpty())
                 {
-                    const_cast< SvgStyleAttributes* >(this)->mpMarkerMidXLink = dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerMidXLink()));
+                    return dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerMidXLink()));
                 }
             }
 
@@ -3006,7 +3007,7 @@ namespace svgio::svgreader
 
                 if(!aMarker.isEmpty())
                 {
-                    const_cast< SvgStyleAttributes* >(this)->mpMarkerEndXLink = dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerEndXLink()));
+                    return dynamic_cast< const SvgMarkerNode* >(mrOwner.getDocument().findSvgNodeById(getMarkerEndXLink()));
                 }
             }
 

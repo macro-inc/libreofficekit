@@ -267,7 +267,7 @@ static ::Color IndexedColors[] = {
     else if (rAttribs.hasAttribute(XML_indexed))
     {
         sal_uInt32 nIndexed = rAttribs.getUnsigned(XML_indexed, 0);
-        if (nIndexed < sizeof(IndexedColors))
+        if (nIndexed < std::size(IndexedColors))
             nColor = IndexedColors[nIndexed];
     }
 
@@ -1486,16 +1486,17 @@ void ExtCfDataBarRule::finalizeImport()
             else if (maModel.maColorScaleType == "formula")
                 pEntry->SetType(COLORSCALE_FORMULA);
             else if (maModel.maColorScaleType == "num")
-                pEntry->SetType(COLORSCALE_VALUE);
-
-            if (!maModel.msScaleTypeValue.isEmpty())
             {
-                sal_Int32 nSize = 0;
-                rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
-                double fValue = rtl::math::stringToDouble(maModel.msScaleTypeValue, '.', '\0', &eStatus, &nSize);
-                if (eStatus == rtl_math_ConversionStatus_Ok && nSize == maModel.msScaleTypeValue.getLength())
+                pEntry->SetType(COLORSCALE_VALUE);
+                if (!maModel.msScaleTypeValue.isEmpty())
                 {
-                    pEntry->SetValue(fValue);
+                    sal_Int32 nSize = 0;
+                    rtl_math_ConversionStatus eStatus = rtl_math_ConversionStatus_Ok;
+                    double fValue = rtl::math::stringToDouble(maModel.msScaleTypeValue, '.', '\0', &eStatus, &nSize);
+                    if (eStatus == rtl_math_ConversionStatus_Ok && nSize == maModel.msScaleTypeValue.getLength())
+                    {
+                        pEntry->SetValue(fValue);
+                    }
                 }
             }
             break;
