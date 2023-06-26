@@ -362,7 +362,13 @@ void SwTextFrame::MakePos()
             }
             // Possibly this fly was positioned relative to us, invalidate its position now that our
             // position is changed.
-            pFly->UnlockPosition();
+            SwPageFrame* pPageFrame = pFly->FindPageFrame();
+            if (pPageFrame && pFly->getFrameArea().Pos() == pPageFrame->getFrameArea().Pos())
+            {
+                // The position was just adjusted to be be inside the page frame, so not really
+                // positioned, unlock the position once to allow a recalc.
+                pFly->UnlockPosition();
+            }
             pFly->InvalidatePos();
         }
     }
@@ -642,6 +648,12 @@ void SwTextFrame::AdjustFollow_( SwTextFormatter &rLine,
 
             JoinFrame();
         }
+    }
+
+    if (IsEmptyMasterWithSplitFly())
+    {
+        // A split fly is anchored to us, don't move content from the follow frame to this one.
+        return;
     }
 
     // The Offset moved
@@ -2031,6 +2043,18 @@ void SwTextFrame::Format( vcl::RenderContext* pRenderContext, const SwBorderAttr
                 pPre->GetAttrSet()->GetKeep().GetValue() )
             {
                 pPre->InvalidatePos();
+            }
+
+            if (IsEmptyMasterWithSplitFly())
+            {
+                // A fly is anchored to us, reduce size, so we definitely still fit the current
+                // page.
+                SwFrameAreaDefinition::FrameAreaWriteAccess aFrm(*this);
+                aRectFnSet.SetHeight(aFrm, 0);
+
+                SwFrameAreaDefinition::FramePrintAreaWriteAccess aPrt(*this);
+                aRectFnSet.SetTop(aPrt, 0);
+                aRectFnSet.SetHeight(aPrt, 0);
             }
         }
     }
