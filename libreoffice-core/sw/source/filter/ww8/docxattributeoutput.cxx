@@ -286,7 +286,108 @@ OUString NumberToHexBinary(sal_Int32 n)
     return aBuf.makeStringAndClear();
 }
 
+void lclAddThemeValuesToCustomAttributes(
+    rtl::Reference<sax_fastparser::FastAttributeList>& pAttrList, model::ComplexColor const& rComplexColor,
+    sal_Int32 nThemeAttrId, sal_Int32 nThemeTintAttrId, sal_Int32 nThemeShadeAttrId)
+{
+    static std::unordered_map<model::ThemeColorType, const char*> constThemeColorTypeTokenMap = {
+        { model::ThemeColorType::Dark1, "dark1" },
+        { model::ThemeColorType::Light1, "light1" },
+        { model::ThemeColorType::Dark2, "dark2" },
+        { model::ThemeColorType::Light2, "light2" },
+        { model::ThemeColorType::Accent1, "accent1" },
+        { model::ThemeColorType::Accent2, "accent2" },
+        { model::ThemeColorType::Accent3, "accent3" },
+        { model::ThemeColorType::Accent4, "accent4" },
+        { model::ThemeColorType::Accent5, "accent5" },
+        { model::ThemeColorType::Accent6, "accent6" },
+        { model::ThemeColorType::Hyperlink, "hyperlink" },
+        { model::ThemeColorType::FollowedHyperlink, "followedHyperlink" }
+    };
+
+    if (rComplexColor.getType() == model::ColorType::Scheme &&
+        rComplexColor.getSchemeType() != model::ThemeColorType::Unknown)
+    {
+        OString sSchemeType = constThemeColorTypeTokenMap[rComplexColor.getSchemeType()];
+        if (rComplexColor.meThemeColorUsage == model::ThemeColorUsage::Text)
+        {
+            if (rComplexColor.getSchemeType() == model::ThemeColorType::Dark1)
+                sSchemeType = "text1";
+            else if (rComplexColor.getSchemeType() == model::ThemeColorType::Dark2)
+                sSchemeType = "text2";
+        }
+        else if (rComplexColor.meThemeColorUsage == model::ThemeColorUsage::Background)
+        {
+            if (rComplexColor.getSchemeType() == model::ThemeColorType::Light1)
+                sSchemeType = "background1";
+            else if (rComplexColor.getSchemeType() == model::ThemeColorType::Light2)
+                sSchemeType = "background2";
+        }
+
+        DocxAttributeOutput::AddToAttrList(pAttrList, FSNS(XML_w, nThemeAttrId), sSchemeType.getStr());
+
+        sal_Int16 nLumMod = 10'000;
+        sal_Int16 nLumOff = 0;
+        sal_Int16 nTint = 0;
+        sal_Int16 nShade = 0;
+
+        for (auto const& rTransform : rComplexColor.getTransformations())
+        {
+            if (rTransform.meType == model::TransformationType::LumMod)
+                nLumMod = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::LumOff)
+                nLumOff = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::Tint)
+                nTint = rTransform.mnValue;
+            if (rTransform.meType == model::TransformationType::Shade)
+                nShade = rTransform.mnValue;
+        }
+        if (nLumMod == 10'000 && nLumOff == 0)
+        {
+            if (nTint != 0)
+            {
+                // Convert from 0-100 into 0-255
+                sal_Int16 nTint255 = std::round(255.0 - (double(nTint) / 10000.0) * 255.0);
+                DocxAttributeOutput::AddToAttrList(pAttrList, FSNS(XML_w, nThemeTintAttrId), OString::number(nTint255, 16).getStr());
+            }
+            else if (nShade != 0)
+            {
+                // Convert from 0-100 into 0-255
+                sal_Int16 nShade255 = std::round(255.0 - (double(nShade) / 10000.0) * 255.0);
+                DocxAttributeOutput::AddToAttrList(pAttrList, FSNS(XML_w, nThemeShadeAttrId), OString::number(nShade255, 16).getStr());
+            }
+        }
+        else
+        {
+            double nPercentage = 0.0;
+
+            if (nLumOff > 0)
+                nPercentage = double(nLumOff) / 100.0;
+            else
+                nPercentage = (-10'000 + double(nLumMod)) / 100.0;
+
+            // Convert from 0-100 into 0-255
+            sal_Int16 nTintShade255 = std::round(255.0 - (std::abs(nPercentage) / 100.0) * 255.0);
+
+            if (nPercentage > 0)
+                DocxAttributeOutput::AddToAttrList(pAttrList, FSNS(XML_w, nThemeTintAttrId), OString::number(nTintShade255, 16).getStr());
+            else if (nPercentage < 0)
+                DocxAttributeOutput::AddToAttrList(pAttrList, FSNS(XML_w, nThemeShadeAttrId), OString::number(nTintShade255, 16).getStr());
+        }
+    }
 }
+
+void lclAddThemeFillColorAttributes(rtl::Reference<sax_fastparser::FastAttributeList>& pAttrList, model::ComplexColor const& rComplexColor)
+{
+    lclAddThemeValuesToCustomAttributes(pAttrList, rComplexColor, XML_themeFill, XML_themeFillTint, XML_themeFillShade);
+}
+
+void lclAddThemeColorAttributes(rtl::Reference<sax_fastparser::FastAttributeList>& pAttrList, model::ComplexColor const& rComplexColor)
+{
+    lclAddThemeValuesToCustomAttributes(pAttrList, rComplexColor, XML_themeColor, XML_themeTint, XML_themeShade);
+}
+
+} // end anonymous namespace
 
 void DocxAttributeOutput::RTLAndCJKState( bool bIsRTL, sal_uInt16 /*nScript*/ )
 {
@@ -4166,7 +4267,10 @@ static void impl_borderLine( FSHelperPtr const & pSerializer, sal_Int32 elementT
 
         // Get the color code as an RRGGBB hex value
         OString sColor( msfilter::util::ConvertColor( pBorderLine->GetColor( ) ) );
-        pAttr->add( FSNS( XML_w, XML_color ), sColor );
+        pAttr->add( FSNS(XML_w, XML_color), sColor);
+
+        model::ComplexColor const& rComplexColor = pBorderLine->getComplexColor();
+        lclAddThemeColorAttributes(pAttr, rComplexColor);
     }
 
     if (bWriteShadow)
@@ -7563,21 +7667,6 @@ void DocxAttributeOutput::CharCaseMap( const SvxCaseMapItem& rCaseMap )
 
 void DocxAttributeOutput::CharColor(const SvxColorItem& rColorItem)
 {
-    static std::unordered_map<model::ThemeColorType, const char*> constThemeColorTypeTokenMap = {
-        { model::ThemeColorType::Dark1, "dark1" },
-        { model::ThemeColorType::Light1, "light1" },
-        { model::ThemeColorType::Dark2, "dark2" },
-        { model::ThemeColorType::Light2, "light2" },
-        { model::ThemeColorType::Accent1, "accent1" },
-        { model::ThemeColorType::Accent2, "accent2" },
-        { model::ThemeColorType::Accent3, "accent3" },
-        { model::ThemeColorType::Accent4, "accent4" },
-        { model::ThemeColorType::Accent5, "accent5" },
-        { model::ThemeColorType::Accent6, "accent6" },
-        { model::ThemeColorType::Hyperlink, "hyperlink" },
-        { model::ThemeColorType::FollowedHyperlink, "followedHyperlink" }
-    };
-
     const Color aColor = rColorItem.getColor();
     const model::ComplexColor aComplexColor = rColorItem.getComplexColor();
 
@@ -7590,75 +7679,7 @@ void DocxAttributeOutput::CharColor(const SvxColorItem& rColorItem)
         return;
     }
 
-    if (aComplexColor.getType() == model::ColorType::Scheme &&
-        aComplexColor.getSchemeType() != model::ThemeColorType::Unknown)
-    {
-        OString sSchemeType = constThemeColorTypeTokenMap[aComplexColor.getSchemeType()];
-        if (aComplexColor.meThemeColorUsage == model::ThemeColorUsage::Text)
-        {
-            if (aComplexColor.getSchemeType() == model::ThemeColorType::Dark1)
-                sSchemeType = "text1";
-            else if (aComplexColor.getSchemeType() == model::ThemeColorType::Dark2)
-                sSchemeType = "text2";
-        }
-        else if (aComplexColor.meThemeColorUsage == model::ThemeColorUsage::Background)
-        {
-            if (aComplexColor.getSchemeType() == model::ThemeColorType::Light1)
-                sSchemeType = "background1";
-            else if (aComplexColor.getSchemeType() == model::ThemeColorType::Light2)
-                sSchemeType = "background2";
-        }
-        AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeColor), sSchemeType.getStr());
-
-        sal_Int16 nLumMod = 10'000;
-        sal_Int16 nLumOff = 0;
-        sal_Int16 nTint = 0;
-        sal_Int16 nShade = 0;
-
-        for (auto const& rTransform : aComplexColor.getTransformations())
-        {
-            if (rTransform.meType == model::TransformationType::LumMod)
-                nLumMod = rTransform.mnValue;
-            if (rTransform.meType == model::TransformationType::LumOff)
-                nLumOff = rTransform.mnValue;
-            if (rTransform.meType == model::TransformationType::Tint)
-                nTint = rTransform.mnValue;
-            if (rTransform.meType == model::TransformationType::Shade)
-                nShade = rTransform.mnValue;
-        }
-        if (nLumMod == 10'000 && nLumOff == 0)
-        {
-            if (nTint != 0)
-            {
-                // Convert from 0-100 into 0-255
-                sal_Int16 nTint255 = std::round(255.0 - (double(nTint) / 10000.0) * 255.0);
-                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeTint), OString::number(nTint255, 16).getStr());
-            }
-            else if (nShade != 0)
-            {
-                // Convert from 0-100 into 0-255
-                sal_Int16 nShade255 = std::round(255.0 - (double(nShade) / 10000.0) * 255.0);
-                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeShade), OString::number(nShade255, 16).getStr());
-            }
-        }
-        else
-        {
-            double nPercentage = 0.0;
-
-            if (nLumOff > 0)
-                nPercentage = double(nLumOff) / 100.0;
-            else
-                nPercentage = (-10'000 + double(nLumMod)) / 100.0;
-
-            // Convert from 0-100 into 0-255
-            sal_Int16 nTintShade255 = std::round(255.0 - (std::abs(nPercentage) / 100.0) * 255.0);
-
-            if (nPercentage > 0)
-                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeTint), OString::number(nTintShade255, 16).getStr());
-            else if (nPercentage < 0)
-                AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_themeShade), OString::number(nTintShade255, 16).getStr());
-        }
-    }
+    lclAddThemeColorAttributes(m_pColorAttrList, aComplexColor);
 
     AddToAttrList(m_pColorAttrList, FSNS(XML_w, XML_val), aColorString.getStr());
     m_nCharTransparence = 255 - aColor.GetAlpha();
@@ -7865,10 +7886,14 @@ void DocxAttributeOutput::CharUnderline( const SvxUnderlineItem& rUnderline )
     bool  bUnderlineHasColor = !aUnderlineColor.IsTransparent();
     if (bUnderlineHasColor)
     {
+        model::ComplexColor const& rComplexColor = rUnderline.getComplexColor();
         // Underline has a color
-        m_pSerializer->singleElementNS( XML_w, XML_u,
-                                        FSNS( XML_w, XML_val ), pUnderlineValue,
-                                        FSNS( XML_w, XML_color ), msfilter::util::ConvertColor(aUnderlineColor) );
+        rtl::Reference<FastAttributeList> pAttrList = FastSerializerHelper::createAttrList();
+        pAttrList->add(FSNS(XML_w, XML_val), pUnderlineValue);
+        pAttrList->add(FSNS(XML_w, XML_color), msfilter::util::ConvertColor(aUnderlineColor));
+        lclAddThemeColorAttributes(pAttrList, rComplexColor);
+        m_pSerializer->singleElementNS(XML_w, XML_u, pAttrList);
+
     }
     else
     {
@@ -9393,6 +9418,7 @@ static std::optional<sal_Int32> lcl_getDmlAlpha(const SvxBrushItem& rBrush)
 void DocxAttributeOutput::FormatBackground( const SvxBrushItem& rBrush )
 {
     const Color aColor = rBrush.GetColor();
+    model::ComplexColor const& rComplexColor = rBrush.getComplexColor();
     OString sColor = msfilter::util::ConvertColor( aColor.GetRGBColor() );
     std::optional<sal_Int32> oAlpha = lcl_getDmlAlpha(rBrush);
     if (m_rExport.SdrExporter().getTextFrameSyntax())
@@ -9410,6 +9436,7 @@ void DocxAttributeOutput::FormatBackground( const SvxBrushItem& rBrush )
 
         sColor = "#" + sColor;
         AddToAttrList( m_rExport.SdrExporter().getFlyAttrList(), XML_fillcolor, sColor.getStr() );
+        lclAddThemeFillColorAttributes(m_rExport.SdrExporter().getFlyAttrList(), rComplexColor);
     }
     else if (m_rExport.SdrExporter().getDMLTextFrameSyntax())
     {

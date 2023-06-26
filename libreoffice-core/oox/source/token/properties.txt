@@ -24,6 +24,7 @@ BackGraphicLocation
 BackGraphic
 Background
 BackgroundColor
+BackgroundComplexColor
 BasicLibraries
 BlackDay
 BlockIncrement
@@ -34,6 +35,7 @@ BorderStyle
 BorderTransparency
 BorderWidth
 BottomBorder
+BottomBorderComplexColor
 BottomBorderDistance
 BottomMargin
 BuiltInUnit
@@ -51,6 +53,7 @@ CenterHorizontally
 CenterVertically
 Change
 CharBackColor
+CharBackgroundComplexColor
 CharCaseMap
 CharColor
 CharContoured
@@ -90,6 +93,7 @@ CharStyleName
 CharTransparence
 CharUnderline
 CharUnderlineColor
+CharUnderlineComplexColor
 CharUnderlineHasColor
 CharWeight
 CharWeightAsian
@@ -309,6 +313,7 @@ LabelFillColor
 CustomLabelFields
 LayoutInfo
 LeftBorder
+LeftBorderComplexColor
 LeftBorderDistance
 LeftMargin
 LeftPageFooterContent
@@ -444,6 +449,7 @@ RepeatDelay
 Representation
 RightAngledAxes
 RightBorder
+RightBorderComplexColor
 RightBorderDistance
 RightMargin
 RightPageFooterContent
@@ -570,6 +576,7 @@ Title
 Toggle
 TokenIndex
 TopBorder
+TopBorderComplexColor
 TopBorderDistance
 TopMargin
 TotalsRow

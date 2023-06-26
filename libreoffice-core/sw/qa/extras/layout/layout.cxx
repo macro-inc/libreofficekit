@@ -1202,6 +1202,77 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter, testRedlineFlysInHeader)
     }
 }
 
+#if !defined(MACOSX)
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter, TestTdf150606)
+{
+    createSwDoc("tdf150606-1-min.odt");
+
+    SwXTextDocument* pTextDoc = dynamic_cast<SwXTextDocument*>(mxComponent.get());
+    CPPUNIT_ASSERT(pTextDoc);
+    SwWrtShell* pWrtShell = pTextDoc->GetDocShell()->GetWrtShell();
+
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column", 2);
+    // on page 5 the table is split across balanced columns
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page", 5);
+
+    pWrtShell->Down(false, 1);
+    dispatchCommand(mxComponent, ".uno:DeleteTable", {});
+
+    discardDumpedLayout();
+    pXmlDoc = parseLayoutDump();
+
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column/body/tab", 0);
+    assertXPath(pXmlDoc, "/root/page", 1);
+
+    pWrtShell->Undo();
+    Scheduler::ProcessEventsToIdle();
+
+    discardDumpedLayout();
+    pXmlDoc = parseLayoutDump();
+
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[1]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[2]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[3]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[4]/body/section/column", 2);
+    // on page 5 the table is split across balanced columns
+    // (problem was that there were empty pages and table was on page 10)
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column[1]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column[2]/body/tab", 1);
+    assertXPath(pXmlDoc, "/root/page[5]/body/section/column", 2);
+    assertXPath(pXmlDoc, "/root/page", 5);
+}
+#endif
+
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter, TestTdf152983)
+{
+    //just care it doesn't crash/assert
+    createSwDoc("tdf152983-1-min.docx");
+}
+
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter, TestTdf137025)
 {
     // Check the padding of the textbox
@@ -3629,21 +3700,21 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter, testTdf122878)
 {
     createSwDoc("tdf122878.docx");
     xmlDocUniquePtr pXmlDoc = parseLayoutDump();
-    // FIXME: the XPath should be adjusted when the proper floating table would be imported
     const sal_Int32 nTblTop
         = getXPath(pXmlDoc, "/root/page[1]/footer/txt/anchored/fly/tab/infos/bounds", "top")
               .toInt32();
-    const sal_Int32 nFirstPageParaCount
-        = getXPathContent(pXmlDoc, "count(/root/page[1]/body/txt)").toInt32();
-    CPPUNIT_ASSERT_EQUAL(sal_Int32(30), nFirstPageParaCount);
-    for (sal_Int32 i = 1; i <= nFirstPageParaCount; ++i)
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = dynamic_cast<SwPageFrame*>(pLayout->Lower());
+    CPPUNIT_ASSERT(pPage1);
+    SwFrame* pBody = pPage1->FindBodyCont();
+    for (SwFrame* pFrame = pBody->GetLower(); pFrame; pFrame = pFrame->GetNext())
     {
-        const OString xPath = "/root/page[1]/body/txt[" + OString::number(i) + "]/infos/bounds";
-        const sal_Int32 nTxtBottom = getXPath(pXmlDoc, xPath.getStr(), "top").toInt32()
-                                     + getXPath(pXmlDoc, xPath.getStr(), "height").toInt32();
+        const sal_Int32 nTxtBottom = pFrame->getFrameArea().Bottom();
         // No body paragraphs should overlap the table in the footer
-        CPPUNIT_ASSERT_MESSAGE(OString("testing paragraph #" + OString::number(i)).getStr(),
-                               nTxtBottom <= nTblTop);
+        CPPUNIT_ASSERT_MESSAGE(
+            OString("testing paragraph #" + OString::number(pFrame->GetFrameId())).getStr(),
+            nTxtBottom <= nTblTop);
     }
 }
 
