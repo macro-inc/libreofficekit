@@ -877,6 +877,9 @@ void ExecuteMarginLRChange(
             SfxCallMode::RECORD, { pPageLRMarginItem });
 }
 
+
+
+
 // Adjusts page margins for Writer doc. Needed by ToggleOrientation
 void ExecuteMarginULChange(
         const tools::Long nPageTopMargin,
@@ -1211,6 +1214,7 @@ static void doc_setTextSelection (LibreOfficeKitDocument* pThis,
                                   int nX,
                                   int nY);
 static char* doc_getPageMargins(LibreOfficeKitDocument* pThis);
+static char* doc_getPageSize(LibreOfficeKitDocument* pThis);
 static char* doc_getTextSelection(LibreOfficeKitDocument* pThis,
                                   const char* pMimeType,
                                   char** pUsedMimeType);
@@ -1466,6 +1470,7 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->setWindowTextSelection = doc_setWindowTextSelection;
         m_pDocumentClass->getTextSelection = doc_getTextSelection;
         m_pDocumentClass->getPageMargins = doc_getPageMargins;
+        m_pDocumentClass->getPageSize = doc_getPageSize;
         m_pDocumentClass->getSelectionType = doc_getSelectionType;
         m_pDocumentClass->getSelectionTypeAndText = doc_getSelectionTypeAndText;
         m_pDocumentClass->getClipboard = doc_getClipboard;
@@ -5362,7 +5367,28 @@ static bool getFromTransferable(
     return true;
 }
 
-static char* doc_getPageMargins(LibreOfficeKitDocument* pThis)
+static char* doc_getPageSize(LibreOfficeKitDocument* _pThis)
+{
+    tools::JsonWriter aJson;
+
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+        return nullptr;
+
+    std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
+
+    aJson.put("Width", pPageSizeItem->GetSize().Width());
+    aJson.put("Height", pPageSizeItem->GetSize().Height());
+
+    OString res = aJson.extractAsOString();
+
+    return convertOString(res);
+}
+
+static char* doc_getPageMargins(LibreOfficeKitDocument* _pThis)
 {
     tools::JsonWriter aJson;
 
@@ -5370,7 +5396,6 @@ static char* doc_getPageMargins(LibreOfficeKitDocument* pThis)
 
     if (!pViewFrm) {
         SetLastExceptionMsg("No view frame");
-        return nullptr;
     }
 
     const SvxLongLRSpaceItem* pLRSpaceItem;

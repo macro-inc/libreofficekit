@@ -361,6 +361,11 @@ public:
         return mpDoc->pClass->getPageMargins(mpDoc);
     }
 
+    char* getPageSize()
+    {
+        return mpDoc->pClass->getPageSize(mpDoc);
+    }
+
     /**
      * Gets the currently selected text.
      *
