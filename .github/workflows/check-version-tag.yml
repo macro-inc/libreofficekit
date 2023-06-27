@@ -22,7 +22,7 @@ jobs:
         continue-on-error: true
         name: check latest commit is less than a day
         run: |
-          git clone --no-checkout --depth=1 --sparse --filter=blob:none https://github.com/${{ github.repository }} lok
+          git clone --no-checkout --depth=1 --sparse --filter=blob:none -b ${{ github.ref_name }} --single-branch https://github.com/${{ github.repository }} lok
           cd lok
           git checkout
           echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
