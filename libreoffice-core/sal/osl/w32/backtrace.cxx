@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "sal/types.h"
 #include <sal/config.h>
 
 #include <limits>
@@ -35,43 +36,6 @@ template <typename T> T clampToULONG(T n)
     return n > maxUlong ? static_cast<T>(maxUlong) : n;
 }
 
-// Start stack_trace_win code
-// Copyright 2012 The Chromium Authors
-// Use of this source code is governed by a BSD-style license that can be
-// found in the Chromium LICENSE file.
-
-// Start stack_trace_win code
-
-bool g_initialized_symbols = false;
-DWORD g_init_error = ERROR_SUCCESS;
-// STATUS_INFO_LENGTH_MISMATCH is declared in <ntstatus.h>, but including that
-// header creates a conflict with base/win/windows_types.h, so re-declaring it
-// here.
-constexpr DWORD kStatusInfoLengthMismatch = 0xC0000004;
-constexpr size_t kSymInitializeRetryCount = 3;
-
-// A wrapper for SymInitialize. SymInitialize seems to occasionally fail
-// because of an internal race condition. So  wrap it and retry a finite
-// number of times.
-bool SymInitializeWrapper(HANDLE handle, BOOL invade_process)
-{
-    SymSetOptions(SYMOPT_DEFERRED_LOADS |
-            SYMOPT_UNDNAME |
-            SYMOPT_LOAD_LINES);
-    for (size_t i = 0; i < kSymInitializeRetryCount; ++i)
-    {
-        if (SymInitialize(handle, nullptr, invade_process)) {
-            g_initialized_symbols = true;
-            return true;
-        }
-
-        g_init_error = GetLastError();
-        if (g_init_error != kStatusInfoLengthMismatch)
-            return false;
-    }
-    return false;
-}
-
 std::string_view basename(const std::string_view& file)
 {
     size_t i = file.find_last_of("\\/");
@@ -85,7 +49,61 @@ std::string_view basename(const std::string_view& file)
     }
 }
 
-// End stack_trace_win code
+std::wstring_view basename(const std::wstring_view& file)
+{
+    size_t i = file.find_last_of(L"\\/");
+    if (i == std::wstring_view::npos)
+    {
+        return file;
+    }
+    else
+    {
+        return file.substr(i + 1);
+    }
+}
+
+constexpr DWORD kStatusInfoLengthMismatch = 0xC0000004;
+constexpr size_t kSymInitializeRetryCount = 3;
+const size_t PATH_MAX = 1024;
+
+// sets relative paths for PDB adjacent to process EXE/DLLs and LOK DLLs, its okay if any part of this fails
+void SymSetPath(HANDLE handle) {
+    wchar_t path[PATH_MAX];
+    if (!::SymGetSearchPathW(handle, path, PATH_MAX)) return;
+    std::wstring new_path(path);
+    
+    if (GetModuleFileNameW( NULL, path, PATH_MAX )) {
+        std::wstring_view base = basename(path);
+        new_path += L";";
+        new_path += base;
+        new_path += L";";
+        new_path += base;
+        new_path += L"\\libreofficekit";
+    }
+
+    ::SymSetSearchPathW(handle, new_path.c_str());
+}
+
+bool SymInitializeWrapper(HANDLE handle, BOOL invade_process)
+{
+    SymSetOptions(SYMOPT_DEFERRED_LOADS |
+            SYMOPT_UNDNAME |
+            SYMOPT_LOAD_LINES);
+    for (size_t i = 0; i < kSymInitializeRetryCount; ++i)
+    {
+        if (SymInitialize(handle, nullptr, invade_process)) {
+            SymSetPath(handle);
+            return true;
+        }
+
+        DWORD init_error = GetLastError();
+        if (init_error != kStatusInfoLengthMismatch)
+            return false;
+    }
+
+    return false;
+}
+
 }
 
 OUString osl::detail::backtraceAsString(sal_uInt32 maxDepth)
@@ -136,11 +154,11 @@ OUString sal::backtrace_to_string(BacktraceState* backtraceState)
     constexpr int offset = 11;
     for (int i = offset; i < nFrames; i++)
     {
-        DWORD64 addr = reinterpret_cast<DWORD64>(backtraceState->buffer[i]);
-        DWORD64 modAddr = 0;
+        HMODULE addr = reinterpret_cast<HMODULE>(backtraceState->buffer[i]);
+        HMODULE modAddr = 0;
         // We have a symbol with filename and location
-        if (SymFromAddr(hProcess, addr, nullptr,
-                        pSymbol) && SymGetLineFromAddr64(hProcess, addr, &line_displacement, &line))
+        if (::SymFromAddr(hProcess, (DWORD64)addr, nullptr,
+                        pSymbol) && SymGetLineFromAddr64(hProcess, (DWORD64)addr, &line_displacement, &line))
         {
             aBuf.append('#');
             aBuf.append(static_cast<sal_Int32>(i - offset));
@@ -152,17 +170,17 @@ OUString sal::backtrace_to_string(BacktraceState* backtraceState)
             aBuf.append(static_cast<sal_Int32>(line.LineNumber));
             aBuf.append("\n");
         }
-        else if ((modAddr = SymGetModuleBase64(hProcess, addr))) {
+        else if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(addr), &modAddr)) {
             aBuf.append('#');
             aBuf.append(static_cast<sal_Int32>(i - offset));
             aBuf.append(" [+0x");
-            aBuf.append(static_cast<sal_Int64>(addr - modAddr), 16);
+            aBuf.append(OUString::number(reinterpret_cast<sal_uInt64>(addr) - reinterpret_cast<sal_uInt64>(modAddr), 16));
             aBuf.append("](");
-            if (GetModuleFileNameA((HMODULE)modAddr, module, MAX_PATH))
+            if (GetModuleFileNameA(modAddr, module, MAX_PATH))
             {
                 aBuf.append(OUString::fromUtf8(basename(module)));
             } else {
-                aBuf.append("???");
+                aBuf.append("???\n");
             }
             aBuf.append(")\n");
         } else {
