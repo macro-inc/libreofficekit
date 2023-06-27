@@ -356,6 +356,11 @@ public:
         mpDoc->pClass->setTextSelection(mpDoc, nType, nX, nY);
     }
 
+    char* getPageMargins()
+    {
+        return mpDoc->pClass->getPageMargins(mpDoc);
+    }
+
     /**
      * Gets the currently selected text.
      *
