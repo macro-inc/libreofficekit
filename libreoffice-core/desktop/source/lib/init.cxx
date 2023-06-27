@@ -4843,7 +4843,28 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     }
 
     // handle potential interaction
-    if (gImpl && aCommand == ".uno:Save")
+    if (gImpl && aCommand == ".uno:SaveAs")
+    {
+        OUString aURL;
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "URL")
+            {
+                aURL = rPropValue.Value.get<OUString>();
+            }
+        }
+
+        OString aURLUtf8 = OUStringToOString(aURL, RTL_TEXTENCODING_UTF8);
+        if(pDocSh && pDocSh->IsModified()) {
+            bool bResult = doc_saveAs(pThis, aURLUtf8.getStr(), "docx", nullptr);
+            tools::JsonWriter aJson;
+            aJson.put("commandName", pCommand);
+            aJson.put("success", bResult);
+            pDocument->mpCallbackFlushHandlers[nView]->queue(LOK_CALLBACK_UNO_COMMAND_RESULT, aJson.extractData());
+            return;
+        }
+    }
+    else if (gImpl && aCommand == ".uno:Save")
     {
         // Check if saving a PDF file
         OUString aMimeType = lcl_getCurrentDocumentMimeType(pDocument);
