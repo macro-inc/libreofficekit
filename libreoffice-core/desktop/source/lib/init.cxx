@@ -889,6 +889,61 @@ void ExecuteMarginULChange(
                                                           SfxCallMode::RECORD, { pPageULMarginItem });
 }
 
+void setPageMargins(
+    const tools::Long PageLeft,
+    const tools::Long PageRight,
+    const tools::Long PageTop,
+    const tools::Long PageBottom
+)
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+
+    if (!pViewFrm)
+        return;
+
+    SvxLongLRSpaceItem* pLRSpaceItem = new SvxLongLRSpaceItem();
+    pLRSpaceItem->SetLeft(PageLeft);
+    pLRSpaceItem->SetRight(PageRight);
+
+    SvxLongULSpaceItem* pULSpaceItem = new SvxLongULSpaceItem();
+    pULSpaceItem->SetUpper(PageTop);
+    pULSpaceItem->SetLower(PageBottom);
+
+    ExecuteMarginLRChange(PageLeft, PageRight, pLRSpaceItem);
+    ExecuteMarginULChange(PageTop, PageBottom, pULSpaceItem);
+}
+
+/// Returns json representations of the current page margins
+char* getPageMargins()
+{
+    tools::JsonWriter aJson;
+
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    const SvxLongLRSpaceItem* pLRSpaceItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
+    std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
+
+    const SvxLongULSpaceItem* pULSpaceItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
+    std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
+
+    if (!pULSpaceItem)
+        SAL_WARN("sw::getPageMargins:", " pULSpaceItem is null");
+        return aJson.extractData();
+
+    if (!pLRSpaceItem)
+        SAL_WARN("sw::getPageMargins:", " pLRSpaceItem is null");
+        return aJson.extractData();
+
+
+    aJson.put("left", pPageLRMarginItem->GetLeft());
+    aJson.put("right", pPageLRMarginItem->GetRight());
+    aJson.put("top", pPageULMarginItem->GetUpper());
+    aJson.put("bottom", pPageULMarginItem->GetLower());
+
+    return aJson.extractData();
+}
+
 // Main function which toggles page orientation of the Writer doc. Needed by ToggleOrientation
 void ExecuteOrientationChange()
 {
@@ -3498,6 +3553,8 @@ static void doc_iniUnoCommands ()
         OUString(".uno:Watermark"),
         OUString(".uno:ResetAttributes"),
         OUString(".uno:Orientation"),
+        OUString(".uno:SetPageMargins"),
+        OUString(".uno:GetPageMargins"),
         OUString(".uno:ObjectAlignLeft"),
         OUString(".uno:ObjectAlignRight"),
         OUString(".uno:AlignCenter"),
@@ -4842,6 +4899,59 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         return;
     }
 
+    if (gImpl && aCommand == ".uno:SetPageMargins")
+    {
+        long pageLeft;
+        long pageRight;
+        long pageTop;
+        long pageBottom;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "PageLeft")
+            {
+                 pageLeft = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "PageRight")
+            {
+                pageRight = rPropValue.Value.get<long>();
+            }
+
+            if (rPropValue.Name == "PageTop")
+            {
+                pageTop = rPropValue.Value.get<long>();
+            }
+
+            if (rPropValue.Name == "PageBottom")
+            {
+                pageBottom = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (pageLeft == 0) {
+            SetLastExceptionMsg("Missing PageLeft value in pArguments");
+            return;
+        }
+
+        if (pageRight == 0) {
+            SetLastExceptionMsg("Missing PageRight value in pArguments");
+            return;
+        }
+
+        if (pageTop == 0) {
+            SetLastExceptionMsg("Missing PageTop value in pArguments");
+            return;
+        }
+
+        if (pageBottom == 0) {
+            SetLastExceptionMsg("Missing PageBottom value in pArguments");
+            return;
+        }
+
+        setPageMargins(pageLeft, pageRight, pageTop, pageBottom);
+        return;
+    }
+
     // handle potential interaction
     if (gImpl && aCommand == ".uno:Save")
     {
@@ -6131,6 +6241,10 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
     else if (!strcmp(pCommand, ".uno:StyleApply"))
     {
         return getStyles(pThis, pCommand);
+    }
+    else if (aCommand == ".uno:GetPageMargins")
+    {
+        return getPageMargins();
     }
     else if (aCommand == ".uno:Undo")
     {
