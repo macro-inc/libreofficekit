@@ -892,6 +892,24 @@ void ExecuteMarginULChange(
                                                           SfxCallMode::RECORD, { pPageULMarginItem });
 }
 
+void setPageSize(
+    const tools::Long Width,
+    const tools::Long Height
+)
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+
+    if (!pViewFrm)
+        return;
+
+
+    SfxDispatcher* pDispatcher = pViewFrm->GetDispatcher();
+    const SvxSizeItem* pSizeItem = new SvxSizeItem( SID_ATTR_PAGE_SIZE, Size(Width, Height));
+
+    pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem });
+}
+
+
 void setPageMargins(
     const tools::Long PageLeft,
     const tools::Long PageRight,
@@ -4926,6 +4944,37 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         }
 
         setPageMargins(pageLeft, pageRight, pageTop, pageBottom);
+        return;
+    }
+
+    if (gImpl && aCommand == ".uno:SetPageSize")
+    {
+        long width;
+        long height;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Height")
+            {
+                 height = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "Width")
+            {
+                width = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (height == 0) {
+            SetLastExceptionMsg("Missing PageTop value in pArguments");
+            return;
+        }
+
+        if (width == 0) {
+            SetLastExceptionMsg("Missing PageBottom value in pArguments");
+            return;
+        }
+
+        setPageSize(width, height);
         return;
     }
 
