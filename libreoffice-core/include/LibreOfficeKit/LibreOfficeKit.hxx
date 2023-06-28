@@ -356,6 +356,11 @@ public:
         mpDoc->pClass->setTextSelection(mpDoc, nType, nX, nY);
     }
 
+    char* getPageColor()
+    {
+        return mpDoc->pClass->getPageColor(mpDoc);
+    }
+
     char* getPageMargins()
     {
         return mpDoc->pClass->getPageMargins(mpDoc);

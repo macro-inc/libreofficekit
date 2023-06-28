@@ -245,6 +245,7 @@ struct _LibreOfficeKitDocumentClass
                                const char* pMimeType,
                                char** pUsedMimeType);
 
+    char* (*getPageColor) (LibreOfficeKitDocument* pThis);
     char* (*getPageMargins) (LibreOfficeKitDocument* pThis);
     char* (*getPageOrientation) (LibreOfficeKitDocument* pThis);
     char* (*getPageSize) (LibreOfficeKitDocument* pThis);

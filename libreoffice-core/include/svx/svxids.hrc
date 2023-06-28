@@ -992,7 +992,7 @@ class XFillGradientItem;
 // 1153 is used by editeng (SID_ATTR_CHAR_BACK_COLOR)
 #define SID_ATTR_PAGE_GRADIENT                          TypedWhichId<XFillGradientItem>( SID_SVX_START + 1154 )
 #define SID_ATTR_PAGE_HATCH                             ( SID_SVX_START + 1155 )
-#define SID_ATTR_PAGE_BITMAP                            ( SID_SVX_START + 1156 )
+#define SID_ATTR_PAGE_BITMAP                            TypedWhichId<SfxItemSet>( SID_SVX_START + 1156 )
 #define SID_ATTR_PAGE_FILLSTYLE                         ( SID_SVX_START + 1157 )
 
 #define SID_EDIT_POSTIT                                 ( SID_SVX_START + 1158 )

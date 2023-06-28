@@ -12,6 +12,7 @@
 #include <sal/backtrace.hxx>
 #include "sfx2/lokhelper.hxx"
 #include "svx/algitem.hxx"
+#include "svx/xbtmpit.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
 #include <desktop/crashreport.hxx>
@@ -192,6 +193,7 @@
 #include <editeng/sizeitem.hxx>
 #include <svx/rulritem.hxx>
 #include <svx/pageitem.hxx>
+#include <svx/xflclit.hxx>
 
 #include <app.hxx>
 
@@ -1243,6 +1245,7 @@ static void doc_setTextSelection (LibreOfficeKitDocument* pThis,
                                   int nX,
                                   int nY);
 static char* doc_getPageMargins(LibreOfficeKitDocument* pThis);
+static char* doc_getPageColor(LibreOfficeKitDocument* pThis);
 static char* doc_getPageOrientation(LibreOfficeKitDocument *pThis);
 static char* doc_getPageSize(LibreOfficeKitDocument* pThis);
 static char* doc_getTextSelection(LibreOfficeKitDocument* pThis,
@@ -1500,7 +1503,8 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->setWindowTextSelection = doc_setWindowTextSelection;
         m_pDocumentClass->getTextSelection = doc_getTextSelection;
         m_pDocumentClass->getPageMargins = doc_getPageMargins;
-        m_pDocumentClass->getPageOrientation = doc_getPageOrientation;;
+        m_pDocumentClass->getPageColor = doc_getPageColor;
+        m_pDocumentClass->getPageOrientation = doc_getPageOrientation;
         m_pDocumentClass->getPageSize = doc_getPageSize;
         m_pDocumentClass->getSelectionType = doc_getSelectionType;
         m_pDocumentClass->getSelectionTypeAndText = doc_getSelectionTypeAndText;
@@ -5428,6 +5432,27 @@ static bool getFromTransferable(
 
     return true;
 }
+
+static char* doc_getPageColor(LibreOfficeKitDocument* _pThis)
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+    {
+        return nullptr;
+    }
+
+    const OUString defaultColorHex = "#ffffff";
+
+    const SfxItemSet* pSetItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_BITMAP, pSetItem);
+    if (const auto pItem = pSetItem->GetItem<XFillColorItem>(XATTR_FILLCOLOR, false))
+    {
+        OUString aColorHex = pItem->GetColorValue().AsRGBHEXString();
+        return convertOUString(aColorHex);
+    }
+    return convertOUString(defaultColorHex);
+}
+
 
 static char* doc_getPageSize(LibreOfficeKitDocument* _pThis)
 {
