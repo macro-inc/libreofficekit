@@ -895,6 +895,44 @@ void ExecuteMarginULChange(
                                                           SfxCallMode::RECORD, { pPageULMarginItem });
 }
 
+
+void setPageColor(const char* ColorHex)
+{
+
+    SfxViewShell* pViewShell = SfxViewShell::Current();
+    pViewShell->GetViewShell()->GetViewFrame();
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+    {
+        return;
+    }
+
+    std::string hexString(ColorHex);
+
+    // remove leading #
+    hexString.erase(0, 1);
+
+    Color pColor;
+    if (!hexString.empty())
+    {
+        unsigned int hexValue;
+        std::stringstream ss;
+        ss << std::hex << hexString;
+        ss >> hexValue;
+
+        int red = (hexValue & 0xFF0000) >> 16;
+        int green = (hexValue & 0x00FF00) >> 8;
+        int blue = hexValue & 0x0000FF;
+
+        pColor = Color(red, green, blue);
+    }
+
+    // Set the page color
+    XFillColorItem aFillColorItem(OUString(), pColor);
+    pViewFrm->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aFillColorItem });
+}
+
+
 void setPageSize(
     const tools::Long Width,
     const tools::Long Height
@@ -3566,6 +3604,7 @@ static void doc_iniUnoCommands ()
         OUString(".uno:ResetAttributes"),
         OUString(".uno:Orientation"),
         OUString(".uno:SetPageMargins"),
+        OUString(".uno:SetPageColor"),
         OUString(".uno:GetPageMargins"),
         OUString(".uno:ObjectAlignLeft"),
         OUString(".uno:ObjectAlignRight"),
@@ -4992,6 +5031,24 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         }
 
         setPageSize(width, height);
+        return;
+    }
+
+    if (gImpl && aCommand == ".uno:SetPageColor")
+    {
+        char* ColorHex;
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "ColorHex")
+            {
+                 ColorHex = convertOUString(rPropValue.Value.get<OUString>());
+            }
+        }
+        if (ColorHex == nullptr) {
+            SetLastExceptionMsg("Missing ColorHex value in pArguments");
+            return;
+        }
+        setPageColor(ColorHex);
         return;
     }
 
