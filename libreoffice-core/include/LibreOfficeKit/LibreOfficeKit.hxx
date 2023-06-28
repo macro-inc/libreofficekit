@@ -361,6 +361,11 @@ public:
         return mpDoc->pClass->getPageMargins(mpDoc);
     }
 
+    char* getPageOrientation()
+    {
+        return mpDoc->pClass->getPageOrientation(mpDoc);
+    }
+
     char* getPageSize()
     {
         return mpDoc->pClass->getPageSize(mpDoc);

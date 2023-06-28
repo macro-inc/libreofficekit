@@ -11,6 +11,7 @@
 #include "lib/unov8.hxx"
 #include <sal/backtrace.hxx>
 #include "sfx2/lokhelper.hxx"
+#include "svx/algitem.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
 #include <desktop/crashreport.hxx>
@@ -902,11 +903,21 @@ void setPageSize(
     if (!pViewFrm)
         return;
 
-
     SfxDispatcher* pDispatcher = pViewFrm->GetDispatcher();
     const SvxSizeItem* pSizeItem = new SvxSizeItem( SID_ATTR_PAGE_SIZE, Size(Width, Height));
 
-    pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem });
+    std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+
+    if (Width >= Height)
+    {
+        pPageItem->SetLandscape(true);
+    }
+    else
+    {
+        pPageItem->SetLandscape(false);
+    }
+
+    pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem, pPageItem.get()});
 }
 
 
@@ -1232,6 +1243,7 @@ static void doc_setTextSelection (LibreOfficeKitDocument* pThis,
                                   int nX,
                                   int nY);
 static char* doc_getPageMargins(LibreOfficeKitDocument* pThis);
+static char* doc_getPageOrientation(LibreOfficeKitDocument *pThis);
 static char* doc_getPageSize(LibreOfficeKitDocument* pThis);
 static char* doc_getTextSelection(LibreOfficeKitDocument* pThis,
                                   const char* pMimeType,
@@ -1488,6 +1500,7 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->setWindowTextSelection = doc_setWindowTextSelection;
         m_pDocumentClass->getTextSelection = doc_getTextSelection;
         m_pDocumentClass->getPageMargins = doc_getPageMargins;
+        m_pDocumentClass->getPageOrientation = doc_getPageOrientation;;
         m_pDocumentClass->getPageSize = doc_getPageSize;
         m_pDocumentClass->getSelectionType = doc_getSelectionType;
         m_pDocumentClass->getSelectionTypeAndText = doc_getSelectionTypeAndText;
@@ -5422,7 +5435,9 @@ static char* doc_getPageSize(LibreOfficeKitDocument* _pThis)
 
     SfxViewFrame* pViewFrm = SfxViewFrame::Current();
     if (!pViewFrm)
+    {
         return nullptr;
+    }
 
     std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
     const SvxSizeItem* pSizeItem;
@@ -5437,6 +5452,21 @@ static char* doc_getPageSize(LibreOfficeKitDocument* _pThis)
     return convertOString(res);
 }
 
+static char* doc_getPageOrientation (LibreOfficeKitDocument* _pThis)
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+    {
+        return nullptr;
+    }
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+
+    bool bIsLandscape = (pSizeItem->GetSize().Width() >= pSizeItem->GetSize().Height());
+
+    return convertOString(bIsLandscape ? "landscape" : "portrait");
+}
+
 static char* doc_getPageMargins(LibreOfficeKitDocument* _pThis)
 {
     tools::JsonWriter aJson;
@@ -5444,7 +5474,7 @@ static char* doc_getPageMargins(LibreOfficeKitDocument* _pThis)
     SfxViewFrame* pViewFrm = SfxViewFrame::Current();
 
     if (!pViewFrm) {
-        SetLastExceptionMsg("No view frame");
+        return nullptr;
     }
 
     const SvxLongLRSpaceItem* pLRSpaceItem;
