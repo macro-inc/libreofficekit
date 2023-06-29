@@ -222,7 +222,6 @@
 #include <unotools/useroptions.hxx>
 #include <unotools/viewoptions.hxx>
 #include <vcl/settings.hxx>
-#include "lokdocumenteventnotifier.hxx"
 
 #include <officecfg/Setup.hxx>
 #include <com/sun/star/ui/XAcceleratorConfiguration.hpp>
@@ -1483,9 +1482,6 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
     assert(nDocumentId != -1 && "Cannot set mnDocumentId to -1");
 
     m_pDocumentClass = gDocumentClass.lock();
-
-    // Setting LokDocumentEventNotifier for a given document
-    m_lokDocEventNotifier = nullptr;
 
     if (!m_pDocumentClass)
     {
@@ -4311,9 +4307,6 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     {
         uno::Reference<css::document::XDocumentEventBroadcaster> mxOwner(pDocument->mxComponent, uno::UNO_QUERY);
 
-        if (mxOwner.is())
-            pDocument->m_lokDocEventNotifier = new doceventnotifier::LokDocumentEventNotifier(std::move(mxOwner), pCallback, pData);
-
         for (const auto& pair : pDocument->mpCallbackFlushHandlers)
         {
             if (pair.first == nId)
@@ -4347,10 +4340,6 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
     }
     else
     {
-        if (pDocument->m_lokDocEventNotifier) {
-            pDocument->m_lokDocEventNotifier->disable();
-            pDocument->m_lokDocEventNotifier = nullptr;
-        }
         if (SfxViewShell* pViewShell = SfxViewShell::Current())
         {
             pViewShell->setLibreOfficeKitViewCallback(nullptr);
@@ -5031,7 +5020,28 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     }
 
     // handle potential interaction
-    if (gImpl && aCommand == ".uno:Save")
+    if (gImpl && aCommand == ".uno:SaveAs")
+    {
+        OUString aURL;
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "URL")
+            {
+                aURL = rPropValue.Value.get<OUString>();
+            }
+        }
+
+        OString aURLUtf8 = OUStringToOString(aURL, RTL_TEXTENCODING_UTF8);
+        if(pDocSh && pDocSh->IsModified()) {
+            bool bResult = doc_saveAs(pThis, aURLUtf8.getStr(), "docx", nullptr);
+            tools::JsonWriter aJson;
+            aJson.put("commandName", pCommand);
+            aJson.put("success", bResult);
+            pDocument->mpCallbackFlushHandlers[nView]->queue(LOK_CALLBACK_UNO_COMMAND_RESULT, aJson.extractData());
+            return;
+        }
+    }
+    else if (gImpl && aCommand == ".uno:Save")
     {
         // Check if saving a PDF file
         OUString aMimeType = lcl_getCurrentDocumentMimeType(pDocument);
