@@ -429,6 +429,12 @@ namespace
 
                         fStart = fTextWidth - fStart;
                         fEnd = fTextWidth - fEnd;
+
+                        // tdf#151968
+                        // if start < end, OutputDevice::DrawWaveLine() will
+                        // think it is a rotated line, so we swap fStart and
+                        // fEnd to avoid this.
+                        std::swap(fStart, fEnd);
                     }
 
                     // need to take FontScaling out of values; it's already part of
