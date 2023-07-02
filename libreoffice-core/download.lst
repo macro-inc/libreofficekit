@@ -338,8 +338,8 @@ LIBJPEG_TURBO_TARBALL := libjpeg-turbo-2.1.5.1.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-LANGTAGREG_SHA256SUM := e2d9224e0e50fc8ad12a3cf47396bbcadf45b2515839d4770432653a88972c00
-LANGTAGREG_TARBALL := language-subtag-registry-2022-08-08.tar.bz2
+LANGTAGREG_SHA256SUM := 9042b64cd473bf36073513b474046f13778107b57c2ac47fb2633104120d69da
+LANGTAGREG_TARBALL := language-subtag-registry-2023-05-11.tar.bz2
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -456,8 +456,8 @@ MYTHES_TARBALL := mythes-1.2.5.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-NSS_SHA256SUM := f78ab1d911cae8bbc94758fb3bd0f731df4087423a4ff5db271ba65381f6b739
-NSS_TARBALL := nss-3.90-with-nspr-4.35.tar.gz
+NSS_SHA256SUM := fcfa26d2738ec5b0cf72ab4be784eac832a75132cda2e295799c04d62a93607a
+NSS_TARBALL := nss-3.88.1-with-nspr-4.35.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -497,8 +497,8 @@ PAGEMAKER_TARBALL := libpagemaker-0.0.4.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-PDFIUM_SHA256SUM := 7db59b1e91f2bc0ab4c5e19d1a4f881e6a47dbb0d3b7e980a7358225b12a0f35
-PDFIUM_TARBALL := pdfium-5408.tar.bz2
+PDFIUM_SHA256SUM := b1052ff24e9ffb11af017c444bb0f6ad508d64c9a0fb88cacb0e8210245dde06
+PDFIUM_TARBALL := pdfium-5778.tar.bz2
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -512,8 +512,8 @@ LIBPNG_TARBALL := libpng-1.6.39.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-LIBTIFF_SHA256SUM := dafac979c5e7b6c650025569c5a4e720995ba5f17bc17e6276d1f12427be267c
-LIBTIFF_TARBALL := tiff-4.5.0rc3.tar.xz
+LIBTIFF_SHA256SUM := 3c080867114c26edab3129644a63b708028a90514b7fe3126e38e11d24f9f88a
+LIBTIFF_TARBALL := tiff-4.5.1.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
