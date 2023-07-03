@@ -191,6 +191,7 @@
 #include <editeng/sizeitem.hxx>
 #include <svx/rulritem.hxx>
 #include <svx/pageitem.hxx>
+#include <svx/xflclit.hxx>
 
 #include <app.hxx>
 
@@ -876,6 +877,9 @@ void ExecuteMarginLRChange(
             SfxCallMode::RECORD, { pPageLRMarginItem });
 }
 
+
+
+
 // Adjusts page margins for Writer doc. Needed by ToggleOrientation
 void ExecuteMarginULChange(
         const tools::Long nPageTopMargin,
@@ -887,6 +891,113 @@ void ExecuteMarginULChange(
     SfxViewShell::Current()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_ULSPACE,
                                                           SfxCallMode::RECORD, { pPageULMarginItem });
 }
+
+
+void setPageColor(LibreOfficeKitDocument* pThis, const OUString rColorHex)
+{
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
+        if (!pViewFrm)
+        {
+            return;
+        }
+
+        // must be at least 6 (FF00FF) or 7 (#FF00FF)
+        if (rColorHex.getLength() < 6 || rColorHex.getLength() > 7) {
+            SetLastExceptionMsg("invalid hex string");
+            return;
+        }
+
+        Color pColor = Color::STRtoRGB(rColorHex);
+
+        // Set the page color
+        XFillColorItem aFillColorItem(OUString(), pColor);
+
+        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aFillColorItem});
+    }
+
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+
+void setPageSize(
+    LibreOfficeKitDocument* pThis,
+    const tools::Long Width,
+    const tools::Long Height
+)
+{
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
+
+        if (!pViewFrm)
+            return;
+
+        SfxDispatcher* pDispatcher = pViewShell->GetDispatcher();
+        const SvxSizeItem* pSizeItem = new SvxSizeItem( SID_ATTR_PAGE_SIZE, Size(Width, Height));
+
+        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+
+        if (Width >= Height)
+        {
+            pPageItem->SetLandscape(true);
+        }
+        else
+        {
+            pPageItem->SetLandscape(false);
+        }
+
+        pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem, pPageItem.get()});
+    }
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+
+void setPageMargins(
+    LibreOfficeKitDocument* pThis,
+    const tools::Long PageLeft,
+    const tools::Long PageRight,
+    const tools::Long PageTop,
+    const tools::Long PageBottom
+)
+{
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+
+        if (!pViewFrm)
+            return;
+
+        SvxLongLRSpaceItem* pLRSpaceItem = new SvxLongLRSpaceItem();
+        pLRSpaceItem->SetLeft(PageLeft);
+        pLRSpaceItem->SetRight(PageRight);
+
+        SvxLongULSpaceItem* pULSpaceItem = new SvxLongULSpaceItem();
+        pULSpaceItem->SetUpper(PageTop);
+        pULSpaceItem->SetLower(PageBottom);
+
+        ExecuteMarginLRChange(PageLeft, PageRight, pLRSpaceItem);
+        ExecuteMarginULChange(PageTop, PageBottom, pULSpaceItem);
+    }
+
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+
+
+
 
 // Main function which toggles page orientation of the Writer doc. Needed by ToggleOrientation
 void ExecuteOrientationChange()
@@ -986,6 +1097,20 @@ void ExecuteOrientationChange()
 
     if ( mxUndoManager.is() )
         mxUndoManager->leaveUndoContext();
+}
+
+void toggleOrientation(
+    LibreOfficeKitDocument* pThis
+)
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+        return;
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
+
+    setPageSize(pThis, pSizeItem->GetSize().Height(), pSizeItem->GetSize().Width());
 }
 
 void setupSidebar(std::u16string_view sidebarDeckId = u"")
@@ -3494,6 +3619,9 @@ static void doc_iniUnoCommands ()
         OUString(".uno:Watermark"),
         OUString(".uno:ResetAttributes"),
         OUString(".uno:Orientation"),
+        OUString(".uno:SetPageMargins"),
+        OUString(".uno:SetPageColor"),
+        OUString(".uno:GetPageMargins"),
         OUString(".uno:ObjectAlignLeft"),
         OUString(".uno:ObjectAlignRight"),
         OUString(".uno:AlignCenter"),
@@ -4828,7 +4956,109 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
 
     if (gImpl && aCommand == ".uno:ToggleOrientation")
     {
-        ExecuteOrientationChange();
+        toggleOrientation(pThis);
+        return;
+    }
+
+    if (gImpl && aCommand == ".uno:SetPageMargins")
+    {
+        long pageLeft;
+        long pageRight;
+        long pageTop;
+        long pageBottom;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "PageLeft")
+            {
+                 pageLeft = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "PageRight")
+            {
+                pageRight = rPropValue.Value.get<long>();
+            }
+
+            if (rPropValue.Name == "PageTop")
+            {
+                pageTop = rPropValue.Value.get<long>();
+            }
+
+            if (rPropValue.Name == "PageBottom")
+            {
+                pageBottom = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (pageLeft == 0) {
+            SetLastExceptionMsg("Missing PageLeft value in pArguments");
+            return;
+        }
+
+        if (pageRight == 0) {
+            SetLastExceptionMsg("Missing PageRight value in pArguments");
+            return;
+        }
+
+        if (pageTop == 0) {
+            SetLastExceptionMsg("Missing PageTop value in pArguments");
+            return;
+        }
+
+        if (pageBottom == 0) {
+            SetLastExceptionMsg("Missing PageBottom value in pArguments");
+            return;
+        }
+
+        setPageMargins(pThis, pageLeft, pageRight, pageTop, pageBottom);
+        return;
+    }
+
+    if (gImpl && aCommand == ".uno:SetPageSize")
+    {
+        long width;
+        long height;
+
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Height")
+            {
+                 height = rPropValue.Value.get<long>();
+            }
+            if (rPropValue.Name == "Width")
+            {
+                width = rPropValue.Value.get<long>();
+            }
+        }
+
+        if (height == 0) {
+            SetLastExceptionMsg("Missing PageTop value in pArguments");
+            return;
+        }
+
+        if (width == 0) {
+            SetLastExceptionMsg("Missing PageBottom value in pArguments");
+            return;
+        }
+
+        setPageSize(pThis, width, height);
+        return;
+    }
+
+    if (gImpl && aCommand == ".uno:SetPageColor")
+    {
+        OUString ColorHex;
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "ColorHex")
+            {
+                 ColorHex = rPropValue.Value.get<OUString>();
+            }
+        }
+        if (ColorHex.isEmpty()) {
+            SetLastExceptionMsg("Missing ColorHex value in pArguments");
+            return;
+        }
+        setPageColor(pThis, ColorHex);
         return;
     }
 
@@ -5289,6 +5519,103 @@ static bool getFromTransferable(
     }
 
     return true;
+}
+
+namespace {
+    char* leakyStrDup(const std::string_view& view) {
+        char* pMemory = static_cast<char*>(malloc(view.size() + 1));
+        assert(pMemory); // don't tolerate failed allocations.
+        std::memcpy(pMemory, view.data(), view.size());
+        pMemory[view.size()] = '\0';
+        return pMemory;
+    }
+}
+
+static char* getPageColor()
+{
+    SfxViewShell* pViewShell = SfxViewShell::Current();
+    SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
+    if (!pViewFrm)
+    {
+        return nullptr;
+    }
+
+    static constexpr std::string_view defaultColorHex = "\"#ffffff\"";
+
+    std::unique_ptr<SfxPoolItem> pState;
+    const SfxItemState eState (pViewFrm->GetBindings().QueryState(SID_ATTR_PAGE_COLOR, pState));
+    if (eState < SfxItemState::DEFAULT) {
+        return leakyStrDup(defaultColorHex);
+    }
+    if (pState)
+    {
+        OUString aColorHex = u"\"" + static_cast<XFillColorItem*>(pState->Clone())->GetColorValue().AsRGBHEXString() + u"\"";
+        return convertOUString(aColorHex);
+    }
+    return leakyStrDup(defaultColorHex);
+}
+
+
+static char* getPageSize()
+{
+    tools::JsonWriter aJson;
+
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+    {
+        return nullptr;
+    }
+
+    std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
+
+    aJson.put("Width", pPageSizeItem->GetSize().Width());
+    aJson.put("Height", pPageSizeItem->GetSize().Height());
+
+    return aJson.extractData();
+}
+
+static char* getPageOrientation ()
+{
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+    {
+        return nullptr;
+    }
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+
+    bool bIsLandscape = (pSizeItem->GetSize().Width() >= pSizeItem->GetSize().Height());
+
+    return bIsLandscape ? leakyStrDup("\"landscape\"") : leakyStrDup("\"portrait\"");
+}
+
+static char* getPageMargins()
+{
+    tools::JsonWriter aJson;
+
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+
+    if (!pViewFrm) {
+        return nullptr;
+    }
+
+    const SvxLongLRSpaceItem* pLRSpaceItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
+    std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
+
+    const SvxLongULSpaceItem* pULSpaceItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
+    std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
+
+    aJson.put("PageLeft", pPageLRMarginItem->GetLeft());
+    aJson.put("PageRight", pPageLRMarginItem->GetRight());
+    aJson.put("PageTop", pPageULMarginItem->GetUpper());
+    aJson.put("PageBottom", pPageULMarginItem->GetLower());
+
+    return aJson.extractData();
 }
 
 static char* doc_getTextSelection(LibreOfficeKitDocument* pThis, const char* pMimeType, char** pUsedMimeType)
@@ -6131,6 +6458,22 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
         return nullptr;
     }
 
+    if (!strcmp(pCommand, ".uno:PageColor"))
+    {
+        return getPageColor();
+    }
+    if (!strcmp(pCommand, ".uno:PageSize"))
+    {
+        return getPageSize();
+    }
+    if (!strcmp(pCommand, ".uno:PageMargins"))
+    {
+        return getPageMargins();
+    }
+    if (!strcmp(pCommand, ".uno:PageOrientation"))
+    {
+        return getPageOrientation();
+    }
     if (!strcmp(pCommand, ".uno:LanguageStatus"))
     {
         return getLanguages(pThis, pCommand);
