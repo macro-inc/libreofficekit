@@ -8,14 +8,9 @@
  */
 
 #include "comphelper/seqstream.hxx"
-#include "editeng/editids.hrc"
-#include "editeng/formatbreakitem.hxx"
 #include "lib/unov8.hxx"
 #include <sal/backtrace.hxx>
-#include "sfx2/QuerySaveDocument.hxx"
 #include "sfx2/lokhelper.hxx"
-#include "svx/algitem.hxx"
-#include "svx/xbtmpit.hxx"
 #include <config_buildconfig.h>
 #include <config_features.h>
 #include <desktop/crashreport.hxx>
