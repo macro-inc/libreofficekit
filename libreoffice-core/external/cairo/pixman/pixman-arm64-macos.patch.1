@@ -1,6 +1,6 @@
-From 734d05b646ae531aee19230f8c8a4b38d1d85fe6 Mon Sep 17 00:00:00 2001
+From 411dd90e86233b5d497d4dc1d587d555a735f77b Mon Sep 17 00:00:00 2001
 From: Heiko Lewin <hlewin@worldiety.de>
-Date: Tue, 16 May 2023 14:33:35 +0200
+Date: Fri, 9 Jun 2023 15:10:51 +0200
 Subject: [PATCH] pixman-arma64: Adjustments to build with llvm integrated
  assembler
 
@@ -9,17 +9,22 @@ This enables building the aarch64 assembly with clang. Changes:
 2. Prefix macro arg names with `\`
 3. Use `\()` instead of `&`
 4. Always use commas to separate macro arguments
- 5 files changed, 936 insertions(+), 921 deletions(-)
+
+pixman-arma64: Adjustments to build with llvm integrated assembler
+---
+ pixman/pixman-arm-asm.h                  |  23 +-
+ pixman/pixman-arma64-neon-asm-bilinear.S | 421 ++++++-------
+ pixman/pixman-arma64-neon-asm.S          | 720 +++++++++++------------
+ pixman/pixman-arma64-neon-asm.h          | 686 ++++++++++-----------
+ test/utils/utils.h                       |   2 +-
+ 5 files changed, 933 insertions(+), 919 deletions(-)
 
 diff --git a/pixman/pixman-arm-asm.h b/pixman/pixman-arm-asm.h
-index ee785410..bed78134 100644
+index ee785410..1a3f9ce7 100644
 --- a/pixman/pixman-arm-asm.h
 +++ b/pixman/pixman-arm-asm.h
-@@ -25,13 +25,27 @@
-  *
-  */
-
-+
+@@ -27,11 +27,24 @@
+ 
  /* Supplementary macro for setting function attributes */
  .macro pixman_asm_function fname
 -	.func fname
@@ -49,7 +54,7 @@ index ee785410..bed78134 100644
 -fname:
  .endm
 diff --git a/pixman/pixman-arma64-neon-asm-bilinear.S b/pixman/pixman-arma64-neon-asm-bilinear.S
-index 31d103d1..3cd76b93 100644
+index 31d103d1..7303bdcd 100644
 --- a/pixman/pixman-arma64-neon-asm-bilinear.S
 +++ b/pixman/pixman-arma64-neon-asm-bilinear.S
 @@ -77,50 +77,50 @@
@@ -61,7 +66,7 @@ index 31d103d1..3cd76b93 100644
 +    ld1       {\()\reg1\().2s}, [TMP1], STRIDE
 +    ld1       {\()\reg2\().2s}, [TMP1]
  .endm
-
+ 
  .macro bilinear_load_0565 reg1, reg2, tmp
      asr       WTMP1, X, #16
      add       X, X, UX
@@ -73,10 +78,10 @@ index 31d103d1..3cd76b93 100644
 +    ld1       {\()\reg2\().s}[1], [TMP1]
 +    convert_four_0565_to_x888_packed \reg2, \reg1, \reg2, \tmp
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_two_8888 \
                      acc1, acc2, reg1, reg2, reg3, reg4, tmp1, tmp2
-
+ 
 -    bilinear_load_8888 reg1, reg2, tmp1
 -    umull     &acc1&.8h, &reg1&.8b, v28.8b
 -    umlal     &acc1&.8h, &reg2&.8b, v29.8b
@@ -90,12 +95,12 @@ index 31d103d1..3cd76b93 100644
 +    umull     \()\acc2\().8h, \()\reg3\().8b, v28.8b
 +    umlal     \()\acc2\().8h, \()\reg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_four_8888 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi \
 +                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi, \
                  yacc1, yacc2, yreg1, yreg2, yreg3, yreg4, yacc2lo, yacc2hi
-
+ 
      bilinear_load_and_vertical_interpolate_two_8888 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi
 +                \xacc1, \xacc2, \xreg1, \xreg2, \xreg3, \xreg4, \xacc2lo, xacc2hi
@@ -103,25 +108,25 @@ index 31d103d1..3cd76b93 100644
 -                yacc1, yacc2, yreg1, yreg2, yreg3, yreg4, yacc2lo, yacc2hi
 +                \yacc1, \yacc2, \yreg1, \yreg2, \yreg3, \yreg4, \yacc2lo, \yacc2hi
  .endm
-
+ 
  .macro vzip reg1, reg2
 -    zip1      v24.8b, reg1, reg2
 -    zip2      reg2,   reg1, reg2
 -    mov       reg1,   v24.8b
 +    zip1      v24.8b, \reg1, \reg2
-+    zip2      \reg2,   \reg1, \reg2
-+    mov       \reg1,   v24.8b
++    zip2      \reg2,  \reg1, \reg2
++    mov       \reg1,  v24.8b
  .endm
-
+ 
  .macro vuzp reg1, reg2
 -    uzp1     v24.8b, reg1, reg2
 -    uzp2     reg2,   reg1, reg2
 -    mov      reg1,   v24.8b
 +    uzp1     v24.8b, \reg1, \reg2
-+    uzp2     \reg2,   \reg1, \reg2
-+    mov      \reg1,   v24.8b
++    uzp2     \reg2,  \reg1, \reg2
++    mov      \reg1,  v24.8b
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_two_0565 \
 @@ -131,23 +131,23 @@
      asr       WTMP2, X, #16
@@ -154,12 +159,12 @@ index 31d103d1..3cd76b93 100644
 +    umull     \()\acc2\().8h, \()\reg3\().8b, v28.8b
 +    umlal     \()\acc2\().8h, \()\reg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_four_0565 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi \
 +                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi, \
                  yacc1, yacc2, yreg1, yreg2, yreg3, yreg4, yacc2lo, yacc2hi
-
+ 
      asr       WTMP1, X, #16
 @@ -156,49 +156,49 @@
      asr       WTMP2, X, #16
@@ -224,7 +229,7 @@ index 31d103d1..3cd76b93 100644
 +    umull     \()\yacc2\().8h, \()\yreg3\().8b, v28.8b
 +    umlal     \()\yacc2\().8h, \()\yreg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_store_8888 numpix, tmp1, tmp2
 -.if numpix == 4
 +.if \numpix == 4
@@ -240,7 +245,7 @@ index 31d103d1..3cd76b93 100644
 +    .error bilinear_store_8888 \numpix is unsupported
  .endif
  .endm
-
+ 
 @@ -207,15 +207,15 @@
      vuzp    v2.8b, v3.8b
      vuzp    v1.8b, v3.8b
@@ -261,10 +266,10 @@ index 31d103d1..3cd76b93 100644
 +    .error bilinear_store_0565 \numpix is unsupported
  .endif
  .endm
-
+ 
 @@ -228,20 +228,20 @@
  .endm
-
+ 
  .macro bilinear_load_mask_8 numpix, mask
 -.if numpix == 4
 -    ld1         {&mask&.s}[0], [MASK], #4
@@ -283,18 +288,18 @@ index 31d103d1..3cd76b93 100644
 +    .error bilinear_load_mask_8 \numpix is unsupported
  .endif
 -    prfm        PREFETCH_MODE, [MASK, #prefetch_offset]
-+    prfum        PREFETCH_MODE, [MASK, #(prefetch_offset)]
++    prfum       PREFETCH_MODE, [MASK, #(prefetch_offset)]
  .endm
-
+ 
  .macro bilinear_load_mask mask_fmt, numpix, mask
 -    bilinear_load_mask_&mask_fmt numpix, mask
 +    bilinear_load_mask_\mask_fmt \numpix, \mask
  .endm
-
-
+ 
+ 
 @@ -256,30 +256,30 @@
  .endm
-
+ 
  .macro bilinear_load_dst_8888 numpix, dst0, dst1, dst01
 -.if numpix == 4
 -    ld1         {&dst0&.2s, &dst1&.2s}, [OUT]
@@ -318,26 +323,26 @@ index 31d103d1..3cd76b93 100644
 +    mov         \()\dst01\().d[1], \()\dst1\().d[0]
      prfm        PREFETCH_MODE, [OUT, #(prefetch_offset * 4)]
  .endm
-
+ 
  .macro bilinear_load_dst_8888_over numpix, dst0, dst1, dst01
 -    bilinear_load_dst_8888 numpix, dst0, dst1, dst01
 +    bilinear_load_dst_8888 \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_load_dst_8888_add numpix, dst0, dst1, dst01
 -    bilinear_load_dst_8888 numpix, dst0, dst1, dst01
 +    bilinear_load_dst_8888 \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_load_dst dst_fmt, op, numpix, dst0, dst1, dst01
 -    bilinear_load_dst_&dst_fmt&_&op numpix, dst0, dst1, dst01
 +    bilinear_load_dst_\()\dst_fmt\()_\()\op \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  /*
 @@ -298,19 +298,19 @@
  .endm
-
+ 
  .macro bilinear_duplicate_mask_8 numpix, mask
 -.if numpix == 4
 -    dup         &mask&.2s, &mask&.s[0]
@@ -356,12 +361,12 @@ index 31d103d1..3cd76b93 100644
 +    .error bilinear_duplicate_\mask_8 is unsupported
  .endif
  .endm
-
+ 
  .macro bilinear_duplicate_mask mask_fmt, numpix, mask
 -    bilinear_duplicate_mask_&mask_fmt numpix, mask
 +    bilinear_duplicate_mask_\()\mask_fmt \numpix, \mask
  .endm
-
+ 
  /*
 @@ -318,14 +318,14 @@
   * Interleave should be done when maks is enabled or operator is 'over'.
@@ -384,58 +389,58 @@ index 31d103d1..3cd76b93 100644
 +    mov        \()\dst01\().d[1], \()\dst1\().d[0]
 +    mov        \()\dst01\().d[0], \()\dst0\().d[0]
  .endm
-
+ 
  .macro bilinear_interleave_src_dst_x_src \
 @@ -335,37 +335,38 @@
  .macro bilinear_interleave_src_dst_x_over \
                  numpix, src0, src1, src01, dst0, dst1, dst01
-
+ 
 -    bilinear_interleave src0, src1, src01, dst0, dst1, dst01
 +    bilinear_interleave \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_interleave_src_dst_x_add \
                  numpix, src0, src1, src01, dst0, dst1, dst01
 -    bilinear_interleave src0, src1, src01, dst0, dst1, dst01
-+
++                
 +    bilinear_interleave \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_interleave_src_dst_8_src \
                  numpix, src0, src1, src01, dst0, dst1, dst01
-
+ 
 -    bilinear_interleave src0, src1, src01, dst0, dst1, dst01
 +    bilinear_interleave \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_interleave_src_dst_8_over \
                  numpix, src0, src1, src01, dst0, dst1, dst01
-
+ 
 -    bilinear_interleave src0, src1, src01, dst0, dst1, dst01
 +    bilinear_interleave \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_interleave_src_dst_8_add \
                  numpix, src0, src1, src01, dst0, dst1, dst01
-
+ 
 -    bilinear_interleave src0, src1, src01, dst0, dst1, dst01
 +    bilinear_interleave \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_interleave_src_dst \
                  mask_fmt, op, numpix, src0, src1, src01, dst0, dst1, dst01
-
+ 
 -    bilinear_interleave_src_dst_&mask_fmt&_&op \
 -                numpix, src0, src1, src01, dst0, dst1, dst01
 +    bilinear_interleave_src_dst_\()\mask_fmt\()_\()\op \
 +                \numpix, \src0, \src1, \src01, \dst0, \dst1, \dst01
  .endm
-
-
+ 
+ 
 @@ -383,25 +384,25 @@
                  numpix, src0, src1, src01, mask, \
                  tmp01, tmp23, tmp45, tmp67
-
+ 
 -    umull           &tmp01&.8h, &src0&.8b, &mask&.8b
 -    umull           &tmp23&.8h, &src1&.8b, &mask&.8b
 +    umull           \()\tmp01\().8h, \()\src0\().8b, \()\mask\().8b
@@ -455,11 +460,11 @@ index 31d103d1..3cd76b93 100644
 +    mov             \()\src01\().d[0], \()\src0\().d[0]
 +    mov             \()\src01\().d[1], \()\src1\().d[0]
  .endm
-
+ 
  .macro bilinear_apply_mask_to_src \
                  mask_fmt, numpix, src0, src1, src01, mask, \
                  tmp01, tmp23, tmp45, tmp67
-
+ 
 -    bilinear_apply_mask_to_src_&mask_fmt \
 -                numpix, src0, src1, src01, mask, \
 -                tmp01, tmp23, tmp45, tmp67
@@ -467,12 +472,12 @@ index 31d103d1..3cd76b93 100644
 +                \numpix, \src0, \src1, \src01, \mask, \
 +                \tmp01, \tmp23, \tmp45, \tmp67
  .endm
-
-
+ 
+ 
 @@ -418,90 +419,90 @@
                  numpix, src0, src1, src01, dst0, dst1, dst01, \
                  tmp01, tmp23, tmp45, tmp67, tmp8
-
+ 
 -    dup         &tmp8&.2s, &src1&.s[1]
 +    dup         \()\tmp8\().2s, \()\src1\().s[1]
      /* bubbles */
@@ -508,11 +513,11 @@ index 31d103d1..3cd76b93 100644
 +    mov         \()\src01\().d[0], \()\src0\().d[0]
 +    mov         \()\src01\().d[1], \()\src1\().d[0]
  .endm
-
+ 
  .macro bilinear_combine_add \
                  numpix, src0, src1, src01, dst0, dst1, dst01, \
                  tmp01, tmp23, tmp45, tmp67, tmp8
-
+ 
 -    uqadd       &src0&.8b, &dst0&.8b, &src0&.8b
 -    uqadd       &src1&.8b, &dst1&.8b, &src1&.8b
 -    mov         &src01&.d[0], &src0&.d[0]
@@ -522,11 +527,11 @@ index 31d103d1..3cd76b93 100644
 +    mov         \()\src01\().d[0], \()\src0\().d[0]
 +    mov         \()\src01\().d[1], \()\src1\().d[0]
  .endm
-
+ 
  .macro bilinear_combine \
                  op, numpix, src0, src1, src01, dst0, dst1, dst01, \
                  tmp01, tmp23, tmp45, tmp67, tmp8
-
+ 
 -    bilinear_combine_&op \
 -                numpix, src0, src1, src01, dst0, dst1, dst01, \
 -                tmp01, tmp23, tmp45, tmp67, tmp8
@@ -534,7 +539,7 @@ index 31d103d1..3cd76b93 100644
 +                \numpix, \src0, \src1, \src01, \dst0, \dst1, \dst01, \
 +                \tmp01, \tmp23, \tmp45, \tmp67, \tmp8
  .endm
-
+ 
  /*
   * Macros for final deinterleaving of destination pixels if needed.
   */
@@ -549,41 +554,41 @@ index 31d103d1..3cd76b93 100644
 +    mov        \()\dst01\().d[0], \()\dst0\().d[0]
 +    mov        \()\dst01\().d[1], \()\dst1\().d[0]
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_x_src numpix, dst0, dst1, dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_x_over numpix, dst0, dst1, dst01
 -    bilinear_deinterleave numpix, dst0, dst1, dst01
 +    bilinear_deinterleave \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_x_add numpix, dst0, dst1, dst01
 -    bilinear_deinterleave numpix, dst0, dst1, dst01
 +    bilinear_deinterleave \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_8_src numpix, dst0, dst1, dst01
 -    bilinear_deinterleave numpix, dst0, dst1, dst01
 +    bilinear_deinterleave \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_8_over numpix, dst0, dst1, dst01
 -    bilinear_deinterleave numpix, dst0, dst1, dst01
 +    bilinear_deinterleave \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst_8_add numpix, dst0, dst1, dst01
 -    bilinear_deinterleave numpix, dst0, dst1, dst01
 +    bilinear_deinterleave \numpix, \dst0, \dst1, \dst01
  .endm
-
+ 
  .macro bilinear_deinterleave_dst mask_fmt, op, numpix, dst0, dst1, dst01
 -    bilinear_deinterleave_dst_&mask_fmt&_&op numpix, dst0, dst1, dst01
 +    bilinear_deinterleave_dst_\()\mask_fmt\()_\()\op \numpix, \dst0, \dst1, \dst01
  .endm
-
-
+ 
+ 
  .macro bilinear_interpolate_last_pixel src_fmt, mask_fmt, dst_fmt, op
 -    bilinear_load_&src_fmt v0, v1, v2
 -    bilinear_load_mask mask_fmt, 1, v4
@@ -620,7 +625,7 @@ index 31d103d1..3cd76b93 100644
 +    bilinear_deinterleave_dst \mask_fmt, \op, 1, v0, v1, v0
 +    bilinear_store_\()\dst_fmt 1, v17, v18
  .endm
-
+ 
  .macro bilinear_interpolate_two_pixels src_fmt, mask_fmt, dst_fmt, op
 -    bilinear_load_and_vertical_interpolate_two_&src_fmt \
 +    bilinear_load_and_vertical_interpolate_two_\()\src_fmt \
@@ -657,7 +662,7 @@ index 31d103d1..3cd76b93 100644
 +    bilinear_deinterleave_dst \mask_fmt, \op, 2, v0, v1, v0
 +    bilinear_store_\()\dst_fmt 2, v16, v17
  .endm
-
+ 
  .macro bilinear_interpolate_four_pixels src_fmt, mask_fmt, dst_fmt, op
 -    bilinear_load_and_vertical_interpolate_four_&src_fmt \
 -                v1, v11, v4,  v5,  v6,  v7,  v22, v23 \
@@ -696,12 +701,12 @@ index 31d103d1..3cd76b93 100644
 +    bilinear_deinterleave_dst \mask_fmt, \op, 4, v0, v1, v0
 +    bilinear_store_\()\dst_fmt 4, v6, v7
  .endm
-
+ 
  .set BILINEAR_FLAG_USE_MASK,        1
 @@ -636,14 +637,14 @@
      prefetch_distance, \
      flags
-
+ 
 -pixman_asm_function fname
 -.if pixblock_size == 8
 -.elseif pixblock_size == 4
@@ -711,7 +716,7 @@ index 31d103d1..3cd76b93 100644
  .else
      .error unsupported pixblock size
  .endif
-
+ 
 -.if ((flags) & BILINEAR_FLAG_USE_MASK) == 0
 +.if ((\flags) & BILINEAR_FLAG_USE_MASK) == 0
      OUT       .req    x0
@@ -720,20 +725,20 @@ index 31d103d1..3cd76b93 100644
 @@ -699,7 +700,7 @@ pixman_asm_function fname
      STRIDE    .req      x15
      DUMMY     .req      x30
-
+ 
 -    .set prefetch_offset, prefetch_distance
 +    .set prefetch_offset, \prefetch_distance
-
+ 
      stp      x29, x30, [sp, -16]!
      mov      x29, sp
 @@ -714,7 +715,7 @@ pixman_asm_function fname
      sub      sp, sp, 120
  .endif
-
+ 
 -    mov      WTMP1, #prefetch_distance
 +    mov      WTMP1, #\prefetch_distance
      umull    PF_OFFS, WTMP1, UX
-
+ 
      sub      STRIDE, BOTTOM, TOP
 @@ -735,11 +736,11 @@ pixman_asm_function fname
      /* ensure good destination alignment  */
@@ -750,7 +755,7 @@ index 31d103d1..3cd76b93 100644
  100:
      add       v13.8h, v13.8h, v13.8h
 @@ -748,50 +749,50 @@ pixman_asm_function fname
-
+ 
      cmp       WIDTH, #2
      blt       100f
 -    tst       OUT, #(1 << (dst_bpp_shift + 1))
@@ -811,7 +816,7 @@ index 31d103d1..3cd76b93 100644
 -    bilinear_process_last_pixel
 +    \bilinear_process_last_pixel
  300:
-
+ 
 -.if ((flags) & BILINEAR_FLAG_USE_MASK) == 0
 +.if ((\flags) & BILINEAR_FLAG_USE_MASK) == 0
      sub       x29, x29, 64
@@ -825,14 +830,14 @@ index 31d103d1..3cd76b93 100644
 +.if ((\flags) & BILINEAR_FLAG_USE_MASK) != 0
      .unreq    MASK
  .endif
-
+ 
 -.endfunc
 +pixman_end_asm_function
-
+ 
  .endm
-
+ 
 diff --git a/pixman/pixman-arma64-neon-asm.S b/pixman/pixman-arma64-neon-asm.S
-index 774d98d3..e1e5c3c5 100644
+index 774d98d3..17da755a 100644
 --- a/pixman/pixman-arma64-neon-asm.S
 +++ b/pixman/pixman-arma64-neon-asm.S
 @@ -267,54 +267,54 @@
@@ -914,7 +919,7 @@ index 774d98d3..e1e5c3c5 100644
      raddhn      v22.8b, v12.8h, v18.8h
          st1         {v14.8h}, [DST_W], #16
 @@ -474,32 +474,32 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_src_8888_0565_process_pixblock_tail_head
          sri         v14.8h, v8.8h, #5
 -                                    PF add PF_X, PF_X, #8
@@ -962,7 +967,7 @@ index 774d98d3..e1e5c3c5 100644
      ushll       v9.8h, v0.8b, #7
      sli         v9.8h, v9.8h, #1
 @@ -566,31 +566,31 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_add_8_8_process_pixblock_tail_head
      fetch_src_pixblock
 -                                    PF add PF_X, PF_X, #32
@@ -1014,7 +1019,7 @@ index 774d98d3..e1e5c3c5 100644
      uqadd       v29.8b, v1.8b, v5.8b
      uqadd       v30.8b, v2.8b, v6.8b
 @@ -612,31 +612,31 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_add_8888_8888_process_pixblock_tail_head
      fetch_src_pixblock
 -                                    PF add PF_X, PF_X, #8
@@ -1252,7 +1257,7 @@ index 774d98d3..e1e5c3c5 100644
          st4         {v28.8b, v29.8b, v30.8b, v31.8b}, [DST_W], #32
  .endm
 @@ -917,18 +917,18 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_over_reverse_n_8888_process_pixblock_tail_head
          urshr       v14.8h, v8.8h, #8
 -                                    PF add PF_X, PF_X, #8
@@ -1310,7 +1315,7 @@ index 774d98d3..e1e5c3c5 100644
      umull       v11.8h, v22.8b, v7.8b
  .endm
 @@ -1410,35 +1410,35 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_src_n_8_8888_process_pixblock_tail_head
      fetch_mask_pixblock
 -                                    PF add PF_X, PF_X, #8
@@ -1363,7 +1368,7 @@ index 774d98d3..e1e5c3c5 100644
          st4        {v28.8b, v29.8b, v30.8b, v31.8b}, [DST_W], #32
      ursra       v8.8h, v8.8h, #8
 @@ -1491,35 +1491,35 @@ generate_composite_function \
-
+ 
  .macro pixman_composite_src_n_8_8_process_pixblock_tail_head
      fetch_mask_pixblock
 -                                    PF add PF_X, PF_X, #8
@@ -1562,7 +1567,7 @@ index 774d98d3..e1e5c3c5 100644
 +                                    PF add, PF_SRC, PF_SRC, #1
  10:
  .endm
-
+ 
 @@ -2749,11 +2749,11 @@ generate_composite_function \
          urshr       v13.8h, v10.8h, #8
      fetch_src_pixblock
@@ -1606,7 +1611,7 @@ index 774d98d3..e1e5c3c5 100644
 +                                    PF add, PF_SRC, PF_SRC, #1
  10:
  .endm
-
+ 
 @@ -3131,53 +3131,53 @@ generate_composite_function_nearest_scanline \
      asr       TMP1, X, #16
      add       X, X, UX
@@ -1616,7 +1621,7 @@ index 774d98d3..e1e5c3c5 100644
 +    ld1       {\()\reg1\().2s}, [TMP1], STRIDE
 +    ld1       {\()\reg2\().2s}, [TMP1]
  .endm
-
+ 
  .macro bilinear_load_0565 reg1, reg2, tmp
      asr       TMP1, X, #16
      add       X, X, UX
@@ -1628,10 +1633,10 @@ index 774d98d3..e1e5c3c5 100644
 +    ld1       {\()\reg2\().s}[1], [TMP1]
 +    convert_four_0565_to_x888_packed \reg2, \reg1, \reg2, \tmp
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_two_8888 \
                      acc1, acc2, reg1, reg2, reg3, reg4, tmp1, tmp2
-
+ 
 -    bilinear_load_8888 reg1, reg2, tmp1
 -    umull     &acc1&.8h, &reg1&.8b, v28.8b
 -    umlal     &acc1&.8h, &reg2&.8b, v29.8b
@@ -1645,12 +1650,12 @@ index 774d98d3..e1e5c3c5 100644
 +    umull     \()\acc2\().8h, \()\reg3\().8b, v28.8b
 +    umlal     \()\acc2\().8h, \()\reg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_four_8888 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi \
 +                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi, \
                  yacc1, yacc2, yreg1, yreg2, yreg3, yreg4, yacc2lo, yacc2hi
-
+ 
      bilinear_load_and_vertical_interpolate_two_8888 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi
 +                \xacc1, \xacc2, \xreg1, \xreg2, \xreg3, \xreg4, \xacc2lo, xacc2hi
@@ -1658,29 +1663,29 @@ index 774d98d3..e1e5c3c5 100644
 -                yacc1, yacc2, yreg1, yreg2, yreg3, yreg4, yacc2lo, yacc2hi
 +                \yacc1, \yacc2, \yreg1, \yreg2, \yreg3, \yreg4, \yacc2lo, \yacc2hi
  .endm
-
+ 
  .macro vzip reg1, reg2
      umov      TMP4, v31.d[0]
 -    zip1      v31.8b, reg1, reg2
 -    zip2      reg2,   reg1, reg2
 -    mov       reg1,   v31.8b
 +    zip1      v31.8b, \reg1, \reg2
-+    zip2      \reg2,   \reg1, \reg2
-+    mov       \reg1,   v31.8b
++    zip2      \reg2,  \reg1, \reg2
++    mov       \reg1,  v31.8b
      mov       v31.d[0], TMP4
  .endm
-
+ 
  .macro vuzp reg1, reg2
      umov      TMP4, v31.d[0]
 -    uzp1      v31.8b, reg1, reg2
 -    uzp2      reg2,   reg1, reg2
 -    mov       reg1,   v31.8b
 +    uzp1      v31.8b, \reg1, \reg2
-+    uzp2      \reg2,   \reg1, \reg2
-+    mov       \reg1,   v31.8b
++    uzp2      \reg2,  \reg1, \reg2
++    mov       \reg1,  v31.8b
      mov       v31.d[0], TMP4
  .endm
-
+ 
 @@ -3189,23 +3189,23 @@ generate_composite_function_nearest_scanline \
      asr       TMP2, X, #16
      add       X, X, UX
@@ -1712,7 +1717,7 @@ index 774d98d3..e1e5c3c5 100644
 +    umull     \()\acc2\().8h, \()\reg3\().8b, v28.8b
 +    umlal     \()\acc2\().8h, \()\reg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_load_and_vertical_interpolate_four_0565 \
 -                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi \
 +                xacc1, xacc2, xreg1, xreg2, xreg3, xreg4, xacc2lo, xacc2hi, \
@@ -1782,7 +1787,7 @@ index 774d98d3..e1e5c3c5 100644
 +    umull     \()\yacc2\().8h, \()\yreg3\().8b, v28.8b
 +    umlal     \()\yacc2\().8h, \()\yreg4\().8b, v29.8b
  .endm
-
+ 
  .macro bilinear_store_8888 numpix, tmp1, tmp2
 -.if numpix == 4
 +.if \numpix == 4
@@ -1798,7 +1803,7 @@ index 774d98d3..e1e5c3c5 100644
 +    .error bilinear_store_8888 \numpix is unsupported
  .endif
  .endm
-
+ 
 @@ -3264,20 +3264,20 @@ generate_composite_function_nearest_scanline \
      vuzp      v2.8b, v3.8b
      vuzp      v1.8b, v3.8b
@@ -1819,7 +1824,7 @@ index 774d98d3..e1e5c3c5 100644
 +    .error bilinear_store_0565 \numpix is unsupported
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_last_pixel src_fmt, dst_fmt
 -    bilinear_load_&src_fmt v0, v1, v2
 +    bilinear_load_\()\src_fmt v0, v1, v2
@@ -1833,7 +1838,7 @@ index 774d98d3..e1e5c3c5 100644
 -    bilinear_store_&dst_fmt 1, v3, v4
 +    bilinear_store_\()\dst_fmt 1, v3, v4
  .endm
-
+ 
  .macro bilinear_interpolate_two_pixels src_fmt, dst_fmt
 -    bilinear_load_and_vertical_interpolate_two_&src_fmt \
 +    bilinear_load_and_vertical_interpolate_two_\()\src_fmt \
@@ -1847,7 +1852,7 @@ index 774d98d3..e1e5c3c5 100644
 -    bilinear_store_&dst_fmt 2, v3, v4
 +    bilinear_store_\()\dst_fmt 2, v3, v4
  .endm
-
+ 
  .macro bilinear_interpolate_four_pixels src_fmt, dst_fmt
 -    bilinear_load_and_vertical_interpolate_four_&src_fmt \
 -                v1, v11, v14, v20, v16, v17, v22, v23 \
@@ -1863,7 +1868,7 @@ index 774d98d3..e1e5c3c5 100644
 -    bilinear_store_&dst_fmt 4, v3, v4
 +    bilinear_store_\()\dst_fmt 4, v3, v4
  .endm
-
+ 
  .macro bilinear_interpolate_four_pixels_head src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt&_head
@@ -1874,7 +1879,7 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels \src_fmt, \dst_fmt
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_four_pixels_tail src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt&_tail
@@ -1882,7 +1887,7 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels_\()\src_fmt\()_\()\dst_fmt\()_tail
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_four_pixels_tail_head src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_four_pixels_&src_fmt&_&dst_fmt&_tail_head
@@ -1893,7 +1898,7 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels \src_fmt, \dst_fmt
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_eight_pixels_head src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt&_head
@@ -1906,7 +1911,7 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels_tail_head \src_fmt, \dst_fmt
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_eight_pixels_tail src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt&_tail
@@ -1917,7 +1922,7 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels_tail \src_fmt, \dst_fmt
  .endif
  .endm
-
+ 
  .macro bilinear_interpolate_eight_pixels_tail_head src_fmt, dst_fmt
 -.ifdef have_bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt
 -    bilinear_interpolate_eight_pixels_&src_fmt&_&dst_fmt&_tail_head
@@ -1930,11 +1935,11 @@ index 774d98d3..e1e5c3c5 100644
 +    bilinear_interpolate_four_pixels_tail_head \src_fmt, \dst_fmt
  .endif
  .endm
-
+ 
 @@ -3410,7 +3410,7 @@ generate_composite_function_nearest_scanline \
                                         src_bpp_shift, dst_bpp_shift, \
                                         prefetch_distance, flags
-
+ 
 -pixman_asm_function fname
 +pixman_asm_function \fname
      OUT       .req      x0
@@ -1943,11 +1948,11 @@ index 774d98d3..e1e5c3c5 100644
 @@ -3442,7 +3442,7 @@ pixman_asm_function fname
      stp       x10, x11, [x29, -96]
      stp       x12, x13, [x29, -112]
-
+ 
 -    mov       PF_OFFS, #prefetch_distance
 +    mov       PF_OFFS, #\prefetch_distance
      mul       PF_OFFS, PF_OFFS, UX
-
+ 
      subs      STRIDE, BOTTOM, TOP
 @@ -3463,11 +3463,11 @@ pixman_asm_function fname
      /* ensure good destination alignment  */
@@ -1964,7 +1969,7 @@ index 774d98d3..e1e5c3c5 100644
  100:
      add       v13.8h, v13.8h, v13.8h
 @@ -3476,62 +3476,62 @@ pixman_asm_function fname
-
+ 
      cmp       WIDTH, #2
      blt       100f
 -    tst       OUT, #(1 << (dst_bpp_shift + 1))
@@ -2048,46 +2053,46 @@ index 774d98d3..e1e5c3c5 100644
      .unreq    STRIDE
 -.endfunc
 +pixman_end_asm_function
-
+ 
  .endm
-
+ 
 diff --git a/pixman/pixman-arma64-neon-asm.h b/pixman/pixman-arma64-neon-asm.h
-index 5d931721..594a6847 100644
+index 5d931721..79697f5c 100644
 --- a/pixman/pixman-arma64-neon-asm.h
 +++ b/pixman/pixman-arma64-neon-asm.h
 @@ -80,146 +80,146 @@
   */
-
+ 
  .macro pixldst1 op, elem_size, reg1, mem_operand, abits
 -    op {v&reg1&.&elem_size}, [&mem_operand&], #8
 +    \op {v\()\reg1\().\()\elem_size}, [\()\mem_operand\()], #8
  .endm
-
+ 
  .macro pixldst2 op, elem_size, reg1, reg2, mem_operand, abits
 -    op {v&reg1&.&elem_size, v&reg2&.&elem_size}, [&mem_operand&], #16
 +    \op {v\()\reg1\().\()\elem_size, v\()\reg2\().\()\elem_size}, [\()\mem_operand\()], #16
  .endm
-
+ 
  .macro pixldst4 op, elem_size, reg1, reg2, reg3, reg4, mem_operand, abits
 -    op {v&reg1&.&elem_size, v&reg2&.&elem_size, v&reg3&.&elem_size, v&reg4&.&elem_size}, [&mem_operand&], #32
 +    \op {v\()\reg1\().\()\elem_size, v\()\reg2\().\()\elem_size, v\()\reg3\().\()\elem_size, v\()\reg4\().\()\elem_size}, [\()\mem_operand\()], #32
  .endm
-
+ 
  .macro pixldst0 op, elem_size, reg1, idx, mem_operand, abits, bytes
 -    op {v&reg1&.&elem_size}[idx], [&mem_operand&], #&bytes&
 +    \op {v\()\reg1\().\()\elem_size}[\idx], [\()\mem_operand\()], #\()\bytes\()
  .endm
-
+ 
  .macro pixldst3 op, elem_size, reg1, reg2, reg3, mem_operand
 -    op {v&reg1&.&elem_size, v&reg2&.&elem_size, v&reg3&.&elem_size}, [&mem_operand&], #24
 +    \op {v\()\reg1\().\()\elem_size, v\()\reg2\().\()\elem_size, v\()\reg3\().\()\elem_size}, [\()\mem_operand\()], #24
  .endm
-
+ 
  .macro pixldst30 op, elem_size, reg1, reg2, reg3, idx, mem_operand
 -    op {v&reg1&.&elem_size, v&reg2&.&elem_size, v&reg3&.&elem_size}[idx], [&mem_operand&], #3
 +    \op {v\()\reg1\().\()\elem_size, v\()\reg2\().\()\elem_size, v\()\reg3\().\()\elem_size}[\idx], [\()\mem_operand\()], #3
  .endm
-
+ 
  .macro pixldst numbytes, op, elem_size, basereg, mem_operand, abits
 -.if numbytes == 32
 -    .if elem_size==32
@@ -2180,7 +2185,7 @@ index 5d931721..594a6847 100644
 +    .error "unsupported size: \numbytes"
  .endif
  .endm
-
+ 
  .macro pixld numpix, bpp, basereg, mem_operand, abits=0
 -.if bpp > 0
 -.if (bpp == 32) && (numpix == 8) && (DEINTERLEAVE_32BPP_ENABLED != 0)
@@ -2220,7 +2225,7 @@ index 5d931721..594a6847 100644
  .endif
  .endif
  .endm
-
+ 
  .macro pixst numpix, bpp, basereg, mem_operand, abits=0
 -.if bpp > 0
 -.if (bpp == 32) && (numpix == 8) && (DEINTERLEAVE_32BPP_ENABLED != 0)
@@ -2268,7 +2273,7 @@ index 5d931721..594a6847 100644
  .endif
  .endif
  .endm
-
+ 
  .macro pixld_a numpix, bpp, basereg, mem_operand
 -.if (bpp * numpix) <= 128
 -    pixld numpix, bpp, basereg, mem_operand, %(bpp * numpix)
@@ -2279,7 +2284,7 @@ index 5d931721..594a6847 100644
 +    pixld \numpix, \bpp, \basereg, \mem_operand, 128
  .endif
  .endm
-
+ 
  .macro pixst_a numpix, bpp, basereg, mem_operand
 -.if (bpp * numpix) <= 128
 -    pixst numpix, bpp, basereg, mem_operand, %(bpp * numpix)
@@ -2290,7 +2295,7 @@ index 5d931721..594a6847 100644
 +    pixst \numpix, \bpp, \basereg, \mem_operand, 128
  .endif
  .endm
-
+ 
 @@ -228,96 +228,96 @@
   * aliases to be defined)
   */
@@ -2363,7 +2368,7 @@ index 5d931721..594a6847 100644
      .error "unsupported"
  .endif
  .endm
-
+ 
  .macro pixld2_s elem_size, reg1, reg2, mem_operand
 -.if 0 /* elem_size == 32 */
 +.if 0 /* \elem_size == 32 */
@@ -2398,7 +2403,7 @@ index 5d931721..594a6847 100644
 +    pixld1_s \elem_size, \reg2, \mem_operand
  .endif
  .endm
-
+ 
  .macro pixld0_s elem_size, reg1, idx, mem_operand
 -.if elem_size == 16
 +.if \elem_size == 16
@@ -2427,7 +2432,7 @@ index 5d931721..594a6847 100644
 +    ld1     {v\()\reg1\().s}[\idx], [TMP1]
  .endif
  .endm
-
+ 
  .macro pixld_s_internal numbytes, elem_size, basereg, mem_operand
 -.if numbytes == 32
 -    pixld2_s elem_size, %(basereg+4), %(basereg+5), mem_operand
@@ -2488,7 +2493,7 @@ index 5d931721..594a6847 100644
 +    .error "unsupported size: \numbytes"
  .endif
  .endm
-
+ 
  .macro pixld_s numpix, bpp, basereg, mem_operand
 -.if bpp > 0
 -    pixld_s_internal %(numpix * bpp / 8), %(bpp), basereg, mem_operand
@@ -2496,7 +2501,7 @@ index 5d931721..594a6847 100644
 +    pixld_s_internal %(\numpix * \bpp / 8), %(\bpp), \basereg, \mem_operand
  .endif
  .endm
-
+ 
  .macro vuzp8 reg1, reg2
      umov DUMMY, v16.d[0]
 -    uzp1 v16.8b,     v&reg1&.8b, v&reg2&.8b
@@ -2507,7 +2512,7 @@ index 5d931721..594a6847 100644
 +    mov  v\()\reg1\().8b, v16.8b
      mov  v16.d[0], DUMMY
  .endm
-
+ 
  .macro vzip8 reg1, reg2
      umov DUMMY, v16.d[0]
 -    zip1 v16.8b,     v&reg1&.8b, v&reg2&.8b
@@ -2518,7 +2523,7 @@ index 5d931721..594a6847 100644
 +    mov  v\()\reg1\().8b, v16.8b
      mov  v16.d[0], DUMMY
  .endm
-
+ 
  /* deinterleave B, G, R, A channels for eight 32bpp pixels in 4 registers */
  .macro pixdeinterleave bpp, basereg
 -.if (bpp == 32) && (DEINTERLEAVE_32BPP_ENABLED != 0)
@@ -2533,7 +2538,7 @@ index 5d931721..594a6847 100644
 +    vuzp8 %(\basereg+0), %(\basereg+2)
  .endif
  .endm
-
+ 
  /* interleave B, G, R, A channels for eight 32bpp pixels in 4 registers */
  .macro pixinterleave bpp, basereg
 -.if (bpp == 32) && (DEINTERLEAVE_32BPP_ENABLED != 0)
@@ -2548,7 +2553,7 @@ index 5d931721..594a6847 100644
 +    vzip8 %(\basereg+0), %(\basereg+1)
  .endif
  .endm
-
+ 
 @@ -437,52 +437,52 @@
   */
  .macro PF a, x:vararg
@@ -2557,7 +2562,7 @@ index 5d931721..594a6847 100644
 +    \a \x
  .endif
  .endm
-
+ 
  .macro cache_preload std_increment, boost_increment
  .if (src_bpp_shift >= 0) || (dst_r_bpp != 0) || (mask_bpp_shift >= 0)
 -.if std_increment != 0
@@ -2630,7 +2635,7 @@ index 5d931721..594a6847 100644
  72:
  .endif
 @@ -521,21 +521,21 @@
-
+ 
  .if src_bpp > 0 || mask_bpp > 0 || dst_r_bpp > 0
  .irp lowbit, 1, 2, 4, 8, 16
 -local skip1
@@ -2664,17 +2669,17 @@ index 5d931721..594a6847 100644
 @@ -544,23 +544,23 @@ local skip1
      pixdeinterleave mask_bpp, mask_basereg
      pixdeinterleave dst_r_bpp, dst_r_basereg
-
+ 
 -    process_pixblock_head
 +    \process_pixblock_head
      cache_preload 0, pixblock_size
      cache_preload_simple
 -    process_pixblock_tail
 +    \process_pixblock_tail
-
+ 
 -    pixinterleave dst_w_bpp, dst_w_basereg
 +    pixinterleave  dst_w_bpp, dst_w_basereg
-
+ 
  .irp lowbit, 1, 2, 4, 8, 16
 -.if (dst_w_bpp <= (lowbit * 8)) && ((lowbit * 8) < (pixblock_size * dst_w_bpp))
 -.if lowbit < 16 /* we don't need more than 16-byte alignment */
@@ -2724,7 +2729,7 @@ index 5d931721..594a6847 100644
 @@ -613,21 +613,21 @@ local skip1
      pixdeinterleave mask_bpp, mask_basereg
      pixdeinterleave dst_r_bpp, dst_r_basereg
-
+ 
 -    process_pixblock_head
 -.if cache_preload_flag != 0
 +    \process_pixblock_head
@@ -2758,12 +2763,12 @@ index 5d931721..594a6847 100644
 -    bge         start_of_loop_label
 +    bge         \start_of_loop_label
  .endm
-
+ 
  /*
 @@ -687,7 +687,7 @@ local skip1
                                     src_basereg_   = 0, \
                                     mask_basereg_  = 24
-
+ 
 -    pixman_asm_function fname
 +    pixman_asm_function \fname
      stp         x29, x30, [sp, -16]!
@@ -2781,7 +2786,7 @@ index 5d931721..594a6847 100644
 +        ((\src_bpp_ == 24) || (\mask_bpp_ == 24) || (\dst_w_bpp_ == 24))
      .set PREFETCH_TYPE_CURRENT, PREFETCH_TYPE_SIMPLE
  .endif
-
+ 
 @@ -723,17 +723,17 @@ local skip1
   * Make some macro arguments globally visible and accessible
   * from other macros
@@ -2802,17 +2807,17 @@ index 5d931721..594a6847 100644
 +    .set dst_r_basereg, \dst_r_basereg_
 +    .set src_basereg, \src_basereg_
 +    .set mask_basereg, \mask_basereg_
-
+ 
      .macro pixld_src x:vararg
 -        pixld x
-+        pixld  \x
++        pixld \x
      .endm
      .macro fetch_src_pixblock
          pixld_src   pixblock_size, src_bpp, \
 @@ -810,22 +810,22 @@ local skip1
      .error "requested dst bpp (dst_w_bpp) is not supported"
  .endif
-
+ 
 -.if (((flags) & FLAG_DST_READWRITE) != 0)
 +.if (((\flags) & FLAG_DST_READWRITE) != 0)
      .set dst_r_bpp, dst_w_bpp
@@ -2825,17 +2830,17 @@ index 5d931721..594a6847 100644
  .else
      .set DEINTERLEAVE_32BPP_ENABLED, 0
  .endif
-
+ 
 -.if prefetch_distance < 0 || prefetch_distance > 15
 -    .error "invalid prefetch distance (prefetch_distance)"
 +.if \prefetch_distance < 0 || \prefetch_distance > 15
 +    .error "invalid prefetch distance (\prefetch_distance)"
  .endif
-
+ 
 -    PF mov      PF_X, #0
-+    PF  mov,      PF_X, #0
++    PF mov,     PF_X, #0
      mov         DST_R, DST_W
-
+ 
  .if src_bpp == 24
 @@ -844,15 +844,15 @@ local skip1
  /*
@@ -2862,7 +2867,7 @@ index 5d931721..594a6847 100644
      subs        H, H, #1
      mov         ORIG_W, W
      blt         9f
-@@ -863,42 +863,42 @@ local skip1
+@@ -863,9 +863,9 @@ local skip1
   * long scanlines
   */
  0:
@@ -2872,36 +2877,35 @@ index 5d931721..594a6847 100644
 +    ensure_destination_ptr_alignment \process_pixblock_head, \
 +                                     \process_pixblock_tail, \
 +                                     \process_pixblock_tail_head
-
+ 
      /* Implement "head (tail_head) ... (tail_head) tail" loop pattern */
      pixld_a     pixblock_size, dst_r_bpp, \
-                 (dst_r_basereg - pixblock_size * dst_r_bpp / 64), DST_R
+@@ -873,32 +873,32 @@ local skip1
      fetch_src_pixblock
--    pixld       pixblock_size, mask_bpp, \
-+    pixld        pixblock_size, mask_bpp, \
+     pixld       pixblock_size, mask_bpp, \
                  (mask_basereg - pixblock_size * mask_bpp / 64), MASK
 -    PF add      PF_X, PF_X, #pixblock_size
 -    process_pixblock_head
-+    PF  add,      PF_X, PF_X, #pixblock_size
++    PF add,     PF_X, PF_X, #pixblock_size
 +    \process_pixblock_head
      cache_preload 0, pixblock_size
      cache_preload_simple
      subs        W, W, #(pixblock_size * 2)
      blt         200f
-
+ 
  100:
 -    process_pixblock_tail_head
 +    \process_pixblock_tail_head
      cache_preload_simple
      subs        W, W, #pixblock_size
      bge         100b
-
+ 
  200:
 -    process_pixblock_tail
 +    \process_pixblock_tail
      pixst_a     pixblock_size, dst_w_bpp, \
                  (dst_w_basereg - pixblock_size * dst_w_bpp / 64), DST_W
-
+ 
      /* Process the remaining trailing pixels in the scanline */
      process_trailing_pixels 1, 1, \
 -                            process_pixblock_head, \
@@ -2911,7 +2915,7 @@ index 5d931721..594a6847 100644
 +                            \process_pixblock_tail, \
 +                            \process_pixblock_tail_head
      advance_to_next_scanline 0b
-
+ 
 -    cleanup
 +    \cleanup
  1000:
@@ -2973,16 +2977,16 @@ index 5d931721..594a6847 100644
 -    .endfunc
 +    pixman_end_asm_function
  .endm
-
+ 
  /*
 @@ -1019,23 +1019,23 @@ local skip1
                                                     src_basereg_   = 0, \
                                                     mask_basereg_  = 24
-
+ 
 -    pixman_asm_function fname
 +    pixman_asm_function \fname
      .set PREFETCH_TYPE_CURRENT, PREFETCH_TYPE_NONE
-
+ 
  /*
   * Make some macro arguments globally visible and accessible
   * from other macros
@@ -3012,26 +3016,26 @@ index 5d931721..594a6847 100644
       */
 @@ -1052,7 +1052,7 @@ local skip1
      DUMMY       .req        x30
-
+ 
      .macro pixld_src x:vararg
 -        pixld_s x
 +        pixld_s \x
      .endm
-
+ 
      sxtw        x0, w0
 @@ -1080,7 +1080,7 @@ local skip1
      DUMMY       .req        x30
-
+ 
      .macro pixld_src x:vararg
 -        pixld x
-+        pixld  \x
++        pixld \x
      .endm
-
+ 
      sxtw        x0, w0
 @@ -1093,12 +1093,12 @@ local skip1
      st1         {v12.8b, v13.8b, v14.8b, v15.8b}, [x29], 32
  .endif
-
+ 
 -.if (((flags) & FLAG_DST_READWRITE) != 0)
 +.if (((\flags) & FLAG_DST_READWRITE) != 0)
      .set dst_r_bpp, dst_w_bpp
@@ -3046,29 +3050,26 @@ index 5d931721..594a6847 100644
 @@ -1109,15 +1109,15 @@ local skip1
                      (src_basereg - pixblock_size * src_bpp / 64), SRC
      .endm
-
+ 
 -    init
 +    \init
      mov         DST_R, DST_W
-
+ 
      cmp         W, #pixblock_size
      blt         800f
-
+ 
 -    ensure_destination_ptr_alignment process_pixblock_head, \
 -                                     process_pixblock_tail, \
 -                                     process_pixblock_tail_head
 +    ensure_destination_ptr_alignment \process_pixblock_head, \
 +                                     \process_pixblock_tail, \
 +                                     \process_pixblock_tail_head
-
+ 
      subs        W, W, #pixblock_size
      blt         700f
-@@ -1126,28 +1126,28 @@ local skip1
-     pixld_a     pixblock_size, dst_r_bpp, \
-                 (dst_r_basereg - pixblock_size * dst_r_bpp / 64), DST_R
+@@ -1128,26 +1128,26 @@ local skip1
      fetch_src_pixblock
--    pixld       pixblock_size, mask_bpp, \
-+    pixld        pixblock_size, mask_bpp, \
+     pixld       pixblock_size, mask_bpp, \
                  (mask_basereg - pixblock_size * mask_bpp / 64), MASK
 -    process_pixblock_head
 +    \process_pixblock_head
@@ -3093,7 +3094,7 @@ index 5d931721..594a6847 100644
 +                            \process_pixblock_head, \
 +                            \process_pixblock_tail, \
 +                            \process_pixblock_tail_head
-
+ 
 -    cleanup
 -.if use_nearest_scaling != 0
 +    \cleanup
@@ -3111,7 +3112,7 @@ index 5d931721..594a6847 100644
 +                            \process_pixblock_head, \
 +                            \process_pixblock_tail, \
 +                            \process_pixblock_tail_head
-
+ 
 -    cleanup
 -.if use_nearest_scaling != 0
 +    \cleanup
@@ -3122,21 +3123,21 @@ index 5d931721..594a6847 100644
 @@ -1213,15 +1213,15 @@ local skip1
      .purgem     fetch_src_pixblock
      .purgem     pixld_src
-
+ 
 -    .endfunc
 +    pixman_end_asm_function
  .endm
-
+ 
  .macro generate_composite_function_single_scanline x:vararg
 -    generate_composite_function_scanline 0, x
 +    generate_composite_function_scanline 0, \x
  .endm
-
+ 
  .macro generate_composite_function_nearest_scanline x:vararg
 -    generate_composite_function_scanline 1, x
 +    generate_composite_function_scanline 1, \x
  .endm
-
+ 
  /* Default prologue/epilogue, nothing special needs to be done */
 @@ -1255,22 +1255,22 @@ local skip1
   *          value (in) is lost.
@@ -3157,7 +3158,7 @@ index 5d931721..594a6847 100644
 +    sri         \()\out_g\().8b, \()\out_g\().8b, #6
 +    shrn        \()\out_b\().8b, \()\in\().8h,    #2
  .endm
-
+ 
  .macro convert_0565_to_x888 in, out_r, out_g, out_b
 -    shrn        &out_r&.8b, &in&.8h,    #8
 -    shrn        &out_g&.8b, &in&.8h,    #3
@@ -3172,7 +3173,7 @@ index 5d931721..594a6847 100644
 +    sri         \()\out_g\().8b, \()\out_g\().8b, #6
 +    shrn        \()\out_b\().8b, \()\in\().8h,    #2
  .endm
-
+ 
  /*
 @@ -1280,14 +1280,14 @@ local skip1
   * registers (tmp1, tmp2)
@@ -3195,7 +3196,7 @@ index 5d931721..594a6847 100644
 +    sri         \()\out\().8h, \()\tmp1\().8h, #5
 +    sri         \()\out\().8h, \()\tmp2\().8h, #11
  .endm
-
+ 
  /*
 @@ -1297,14 +1297,14 @@ local skip1
   * value from 'in' is lost
@@ -3222,6 +3223,19 @@ index 5d931721..594a6847 100644
 +    zip2        \()\out1\().4h, \()\out0\().4h, \()\out1\().4h
 +    mov         \()\out0\().d[0], \()\tmp\().d[0]
  .endm
---
+diff --git a/test/utils/utils.h b/test/utils/utils.h
+index d3e1ba41..07126af9 100644
+--- a/test/utils/utils.h
++++ b/test/utils/utils.h
+@@ -3,7 +3,7 @@
+ #endif
+ 
+ #include <assert.h>
+-#include "pixman-private.h" /* For 'inline' definition */
++#include "pixman-compiler.h" /* For 'inline' definition */
+ #include "utils-prng.h"
+ 
+ #if defined(_MSC_VER)
+-- 
 GitLab
 
