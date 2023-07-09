@@ -976,29 +976,31 @@ void setPageMargins(
     {
         pThis->pClass->setPart(pThis, i);
         SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-
         if (!pViewFrm)
             return;
 
-        SvxLongLRSpaceItem* pLRSpaceItem = new SvxLongLRSpaceItem();
-        pLRSpaceItem->SetLeft(PageLeft);
-        pLRSpaceItem->SetRight(PageRight);
+        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
 
-        SvxLongULSpaceItem* pULSpaceItem = new SvxLongULSpaceItem();
-        pULSpaceItem->SetUpper(PageTop);
-        pULSpaceItem->SetLower(PageBottom);
+        const SvxSizeItem* pSizeItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+        std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
 
-        ExecuteMarginLRChange(PageLeft, PageRight, pLRSpaceItem);
-        ExecuteMarginULChange(PageTop, PageBottom, pULSpaceItem);
+        const SvxLongLRSpaceItem* pLRSpaceItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
+        std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
+
+        const SvxLongULSpaceItem* pULSpaceItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
+        std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
+
+        ExecuteMarginLRChange(PageLeft, PageRight, pPageLRMarginItem.get());
+        ExecuteMarginULChange(PageTop, PageBottom, pPageULMarginItem.get());
     }
 
     pThis->pClass->setPart(pThis, pOriginalPart);
 }
 
-
-
-
-
+//
 // Main function which toggles page orientation of the Writer doc. Needed by ToggleOrientation
 void ExecuteOrientationChange()
 {
