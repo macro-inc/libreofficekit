@@ -1348,6 +1348,21 @@ DECLARE_OOXMLEXPORT_TEST(testTdf146346, "tdf146346.docx")
 {
     // This was 2 (by bad docDefault vertical margins around tables in footnotes)
     CPPUNIT_ASSERT_EQUAL(1, getPages());
+
+    // only first page has table
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+
+    // check first page: all tables on the first page
+    assertXPath(pXmlDoc, "/root/page[1]//anchored/fly", 8);
+    assertXPath(pXmlDoc, "/root/page[1]//anchored/fly/tab", 8);
+
+    // No second page.
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: 0
+    // - Actual  : 1
+    // i.e. unwanted lower margin in the floating table's anchor paragraph in the footnote created a
+    // second page.
+    assertXPath(pXmlDoc, "/root/page[2]", 0);
 }
 #endif
 

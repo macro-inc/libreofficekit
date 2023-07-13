@@ -541,8 +541,6 @@ inline constexpr OUStringLiteral UNO_NAME_SEPARATOR_LINE_VERTIVAL_ALIGNMENT
 inline constexpr OUStringLiteral UNO_NAME_SEPARATOR_LINE_IS_ON = u"SeparatorLineIsOn";
 inline constexpr OUStringLiteral UNO_NAME_IS_SKIP_HIDDEN_TEXT = u"IsSkipHiddenText";
 inline constexpr OUStringLiteral UNO_NAME_IS_SKIP_PROTECTED_TEXT = u"IsSkipProtectedText";
-inline constexpr OUStringLiteral UNO_NAME_RESET_PARAGRAPH_LIST_ATTRIBUTES
-    = u"ResetParagraphListAttributes";
 inline constexpr OUStringLiteral UNO_NAME_NO_FORMAT_ATTR = u"NoFormatAttr";
 inline constexpr OUStringLiteral UNO_NAME_DOCUMENT_INDEX_MARKS = u"DocumentIndexMarks";
 inline constexpr OUStringLiteral UNO_NAME_FOOTNOTE_IS_COLLECT_AT_TEXT_END
@@ -901,6 +899,7 @@ inline constexpr OUStringLiteral UNO_NAME_DOC_INTEROP_GRAB_BAG = u"InteropGrabBa
 inline constexpr OUStringLiteral UNO_NAME_FRAME_INTEROP_GRAB_BAG = u"FrameInteropGrabBag";
 inline constexpr OUStringLiteral UNO_NAME_CHAR_HIGHLIGHT = u"CharHighlight";
 inline constexpr OUStringLiteral UNO_NAME_STYLE_INTEROP_GRAB_BAG = u"StyleInteropGrabBag";
+inline constexpr OUStringLiteral UNO_NAME_LEVEL_IS_LEGAL = u"IsLegal";
 inline constexpr OUStringLiteral UNO_NAME_CHAR_INTEROP_GRAB_BAG = u"CharInteropGrabBag";
 inline constexpr OUStringLiteral UNO_NAME_TEXT_VERT_ADJUST = u"TextVerticalAdjust";
 inline constexpr OUStringLiteral UNO_NAME_CELL_INTEROP_GRAB_BAG = u"CellInteropGrabBag";

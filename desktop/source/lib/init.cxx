@@ -9,6 +9,7 @@
 
 #include "sfx2/lokhelper.hxx"
 #include <config_buildconfig.h>
+#include <config_cairo_rgba.h>
 #include <config_features.h>
 
 #include <stdio.h>
@@ -117,6 +118,7 @@
 #include <com/sun/star/linguistic2/LanguageGuessing.hpp>
 #include <com/sun/star/linguistic2/LinguServiceManager.hpp>
 #include <com/sun/star/linguistic2/XSpellChecker.hpp>
+#include <com/sun/star/linguistic2/XProofreader.hpp>
 #include <com/sun/star/i18n/LocaleCalendar2.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
@@ -3942,9 +3944,11 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
 #if defined(IOS)
     double fDPIScale = 1.0;
 
+    // Onine uses the LOK_TILEMODE_RGBA by default so flip the normal flags
+    // to kCGImageAlphaPremultipliedLast | kCGImageByteOrder32Big
     CGContextRef pCGContext = CGBitmapContextCreate(pBuffer, nCanvasWidth, nCanvasHeight, 8,
                                                     nCanvasWidth * 4, CGColorSpaceCreateDeviceRGB(),
-                                                    kCGImageAlphaPremultipliedFirst | kCGImageByteOrder32Little);
+                                                    kCGImageAlphaPremultipliedLast | kCGImageByteOrder32Big);
 
     CGContextTranslateCTM(pCGContext, 0, nCanvasHeight);
     CGContextScaleCTM(pCGContext, fDPIScale, -fDPIScale);
@@ -4212,7 +4216,11 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
 static int doc_getTileMode(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/)
 {
     SetLastExceptionMsg();
+#if ENABLE_CAIRO_RGBA || defined IOS
+    return LOK_TILEMODE_RGBA;
+#else
     return LOK_TILEMODE_BGRA;
+#endif
 }
 
 static void doc_getDocumentSize(LibreOfficeKitDocument* pThis,
@@ -5596,132 +5604,6 @@ static void doc_setGraphicSelection(LibreOfficeKitDocument* pThis, int nType, in
     pDoc->setGraphicSelection(nType, nX, nY);
 }
 
-static void getDocLanguages(LibreOfficeKitDocument* pThis, uno::Sequence<lang::Locale>& rSeq)
-{
-    SfxViewFrame* pViewFrame = SfxViewFrame::Current();
-    if (!pViewFrame)
-        return;
-
-    SfxDispatcher* pDispatcher = pViewFrame->GetBindings().GetDispatcher();
-    if (!pDispatcher)
-        return;
-
-    css::uno::Any aLangStatus;
-    pDispatcher->QueryState(SID_LANGUAGE_STATUS, aLangStatus);
-
-    OUString sCurrent;
-    OUString sKeyboard;
-    OUString sGuessText;
-    SvtScriptType eScriptType = SvtScriptType::LATIN | SvtScriptType::ASIAN
-        | SvtScriptType::COMPLEX;
-
-    Sequence<OUString> aSeqLang;
-    if (aLangStatus >>= aSeqLang)
-    {
-        if (aSeqLang.getLength() == 4)
-        {
-            sCurrent = aSeqLang[0];
-            eScriptType = static_cast<SvtScriptType>(aSeqLang[1].toInt32());
-            sKeyboard = aSeqLang[1];
-            sGuessText = aSeqLang[2];
-        }
-    }
-    else
-    {
-        aLangStatus >>= sCurrent;
-    }
-
-    LanguageType nLangType;
-    std::set<LanguageType> aLangItems;
-
-    if (!sCurrent.isEmpty())
-    {
-        nLangType = SvtLanguageTable::GetLanguageType(sCurrent);
-        if (nLangType != LANGUAGE_DONTKNOW)
-        {
-            aLangItems.insert(nLangType);
-        }
-    }
-
-    const AllSettings& rAllSettings = Application::GetSettings();
-    nLangType = rAllSettings.GetLanguageTag().getLanguageType();
-    if (nLangType != LANGUAGE_DONTKNOW &&
-        (eScriptType & SvtLanguageOptions::GetScriptTypeOfLanguage(nLangType)))
-    {
-        aLangItems.insert(nLangType);
-    }
-
-    nLangType = rAllSettings.GetUILanguageTag().getLanguageType();
-    if (nLangType != LANGUAGE_DONTKNOW &&
-        (eScriptType & SvtLanguageOptions::GetScriptTypeOfLanguage(nLangType)))
-    {
-        aLangItems.insert(nLangType);
-    }
-
-    if (!sKeyboard.isEmpty())
-    {
-        nLangType = SvtLanguageTable::GetLanguageType(sKeyboard);
-        if (nLangType != LANGUAGE_DONTKNOW &&
-            (eScriptType & SvtLanguageOptions::GetScriptTypeOfLanguage(nLangType)))
-        {
-            aLangItems.insert(nLangType);
-        }
-    }
-
-    if (!sGuessText.isEmpty())
-    {
-        Reference<linguistic2::XLanguageGuessing> xLangGuesser;
-        try
-        {
-            xLangGuesser = linguistic2::LanguageGuessing::create(xContext);
-        }
-        catch(...)
-        {
-        }
-
-        if (xLangGuesser.is())
-        {
-            lang::Locale aLocale = xLangGuesser->guessPrimaryLanguage(sGuessText, 0,
-                                                                      sGuessText.getLength());
-            LanguageTag aLanguageTag(aLocale);
-            nLangType = aLanguageTag.getLanguageType(false);
-            if (nLangType != LANGUAGE_DONTKNOW &&
-                (eScriptType & SvtLanguageOptions::GetScriptTypeOfLanguage(nLangType)))
-            {
-                aLangItems.insert(nLangType);
-            }
-        }
-    }
-
-    LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
-    Reference<document::XDocumentLanguages> xDocumentLanguages(pDocument->mxComponent, UNO_QUERY);
-    if (xDocumentLanguages.is())
-    {
-        const Sequence<lang::Locale> aLocales(xDocumentLanguages->getDocumentLanguages(
-                                                  static_cast<sal_Int16>(eScriptType), 64));
-
-        for (const lang::Locale& aLocale : aLocales)
-        {
-            nLangType = SvtLanguageTable::GetLanguageType(aLocale.Language);
-            if (nLangType != LANGUAGE_DONTKNOW &&
-                (eScriptType & SvtLanguageOptions::GetScriptTypeOfLanguage(nLangType)))
-            {
-                aLangItems.insert(nLangType);
-            }
-        }
-    }
-
-    int nLocale = 0;
-    Sequence<lang::Locale> aLocales(aLangItems.size());
-    auto pLocales = aLocales.getArray();
-    for (const LanguageType& itLang : aLangItems)
-    {
-        pLocales[nLocale++] = LanguageTag::convertToLocale(itLang);
-    }
-
-    rSeq = aLocales;
-}
-
 static void doc_resetSelection(LibreOfficeKitDocument* pThis)
 {
     comphelper::ProfileZone aZone("doc_resetSelection");
@@ -5739,12 +5621,28 @@ static void doc_resetSelection(LibreOfficeKitDocument* pThis)
     pDoc->resetSelection();
 }
 
-static char* getLanguages(LibreOfficeKitDocument* pThis, const char* pCommand)
+static void addLocale(boost::property_tree::ptree& rValues, css::lang::Locale const & rLocale)
+{
+    boost::property_tree::ptree aChild;
+    OUString sLanguage;
+    const LanguageTag aLanguageTag( rLocale );
+    sLanguage = SvtLanguageTable::GetLanguageString(aLanguageTag.getLanguageType());
+    if (sLanguage.endsWith("}"))
+        return;
+
+    sLanguage += ";" + aLanguageTag.getBcp47(false);
+    aChild.put("", sLanguage.toUtf8());
+    rValues.push_back(std::make_pair("", aChild));
+}
+
+static char* getLanguages(const char* pCommand)
 {
     css::uno::Sequence< css::lang::Locale > aLocales;
+    css::uno::Sequence< css::lang::Locale > aGrammarLocales;
 
     if (xContext.is())
     {
+        // SpellChecker
         css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv = css::linguistic2::LinguServiceManager::create(xContext);
         if (xLangSrv.is())
         {
@@ -5753,33 +5651,25 @@ static char* getLanguages(LibreOfficeKitDocument* pThis, const char* pCommand)
                 aLocales = xSpell->getLocales();
         }
 
-        /* FIXME: To obtain the document languages the spell checker can be disabled,
-           so a future re-work of the getLanguages function is needed in favor to use
-           getDocLanguages */
-        if (!aLocales.hasElements())
+        // LanguageTool
+        SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
+        if (rLanguageOpts.getEnabled())
         {
-            uno::Sequence< css::lang::Locale > aSeq;
-            getDocLanguages(pThis, aSeq);
-            aLocales = aSeq;
+            uno::Reference< linguistic2::XProofreader > xGC(
+                    xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", xContext),
+                    uno::UNO_QUERY_THROW );
+            uno::Reference< linguistic2::XSupportedLocales > xSuppLoc( xGC, uno::UNO_QUERY_THROW );
+            aGrammarLocales = xSuppLoc->getLocales();
         }
     }
 
     boost::property_tree::ptree aTree;
     aTree.put("commandName", pCommand);
     boost::property_tree::ptree aValues;
-    boost::property_tree::ptree aChild;
-    OUString sLanguage;
-    for ( css::lang::Locale const & locale : std::as_const(aLocales) )
-    {
-        const LanguageTag aLanguageTag( locale );
-        sLanguage = SvtLanguageTable::GetLanguageString(aLanguageTag.getLanguageType());
-        if (sLanguage.startsWith("{") && sLanguage.endsWith("}"))
-            continue;
-
-        sLanguage += ";" + aLanguageTag.getBcp47(false);
-        aChild.put("", sLanguage.toUtf8());
-        aValues.push_back(std::make_pair("", aChild));
-    }
+    for ( css::lang::Locale const & rLocale : std::as_const(aLocales) )
+        addLocale(aValues, rLocale);
+    for ( css::lang::Locale const & rLocale : std::as_const(aGrammarLocales) )
+        addLocale(aValues, rLocale);
     aTree.add_child("commandValues", aValues);
     std::stringstream aStream;
     boost::property_tree::write_json(aStream, aTree);
@@ -6118,7 +6008,7 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
 
     if (!strcmp(pCommand, ".uno:LanguageStatus"))
     {
-        return getLanguages(pThis, pCommand);
+        return getLanguages(pCommand);
     }
     else if (!strcmp(pCommand, ".uno:CharFontName"))
     {
@@ -6592,8 +6482,9 @@ static void doc_paintWindowForView(LibreOfficeKitDocument* pThis, unsigned nLOKW
     comphelper::LibreOfficeKit::setDPIScale(fDPIScale);
 
 #if defined(IOS)
-
-    CGContextRef cgc = CGBitmapContextCreate(pBuffer, nWidth, nHeight, 8, nWidth*4, CGColorSpaceCreateDeviceRGB(), kCGImageAlphaNoneSkipFirst | kCGImageByteOrder32Little);
+    // Onine uses the LOK_TILEMODE_RGBA by default so flip the normal flags
+    // to kCGImageAlphaNoneSkipLast | kCGImageByteOrder32Big
+    CGContextRef cgc = CGBitmapContextCreate(pBuffer, nWidth, nHeight, 8, nWidth*4, CGColorSpaceCreateDeviceRGB(), kCGImageAlphaNoneSkipLast | kCGImageByteOrder32Big);
 
     CGContextTranslateCTM(cgc, 0, nHeight);
     CGContextScaleCTM(cgc, fDPIScale, -fDPIScale);
@@ -7243,6 +7134,8 @@ static void preLoadShortCutAccelerators()
     batch->commit();
 }
 
+void setLanguageToolConfig();
+
 /// Used only by LibreOfficeKit when used by Online to pre-initialize
 static void preloadData()
 {
@@ -7260,6 +7153,9 @@ static void preloadData()
     bool bAbort = desktop::Desktop::CheckExtensionDependencies();
     if(bAbort)
         std::cerr << "CheckExtensionDependencies failed" << std::endl;
+
+    // setup LanguageTool config before spell checking init
+    setLanguageToolConfig();
 
     // preload all available dictionaries
     css::uno::Reference<css::linguistic2::XLinguServiceManager> xLngSvcMgr =
@@ -7489,11 +7385,19 @@ void setLanguageToolConfig()
                 if (xSpell.is())
                 {
                     Sequence<OUString> aEmpty;
+                    static constexpr OUStringLiteral cSpell(SN_SPELLCHECKER);
                     Sequence<css::lang::Locale> aLocales = xSpell->getLocales();
+
+                    uno::Reference<linguistic2::XProofreader> xGC(
+                        xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", xContext),
+                        uno::UNO_QUERY_THROW);
+                    uno::Reference<linguistic2::XSupportedLocales> xSuppLoc(xGC, uno::UNO_QUERY_THROW);
 
                     for (int itLocale = 0; itLocale < aLocales.getLength(); itLocale++)
                     {
-                        xLangSrv->setConfiguredServices(SN_SPELLCHECKER, aLocales[itLocale], aEmpty);
+                        // turn off spell checker if LanguageTool supports the locale already
+                        if (xSuppLoc->hasLocale(aLocales[itLocale]))
+                            xLangSrv->setConfiguredServices(cSpell, aLocales[itLocale], aEmpty);
                     }
                 }
             }
