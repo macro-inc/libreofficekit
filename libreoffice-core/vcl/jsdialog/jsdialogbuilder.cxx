@@ -1069,6 +1069,20 @@ std::unique_ptr<weld::SpinButton> JSInstanceBuilder::weld_spin_button(const OStr
     return pWeldWidget;
 }
 
+std::unique_ptr<weld::FormattedSpinButton>
+JSInstanceBuilder::weld_formatted_spin_button(const OString& id)
+{
+    FormattedField* pSpinButton = m_xBuilder->get<FormattedField>(id);
+    auto pWeldWidget = pSpinButton
+                           ? std::make_unique<JSFormattedSpinButton>(this, pSpinButton, this, false)
+                           : nullptr;
+
+    if (pWeldWidget)
+        RememberWidget(id, pWeldWidget.get());
+
+    return pWeldWidget;
+}
+
 std::unique_ptr<weld::CheckButton> JSInstanceBuilder::weld_check_button(const OString& id)
 {
     CheckBox* pCheckButton = m_xBuilder->get<CheckBox>(id);
@@ -1254,6 +1268,19 @@ std::unique_ptr<weld::Image> JSInstanceBuilder::weld_image(const OString& id)
     FixedImage* pImage = m_xBuilder->get<FixedImage>(id);
 
     auto pWeldWidget = pImage ? std::make_unique<JSImage>(this, pImage, this, false) : nullptr;
+
+    if (pWeldWidget)
+        RememberWidget(id, pWeldWidget.get());
+
+    return pWeldWidget;
+}
+
+std::unique_ptr<weld::Calendar> JSInstanceBuilder::weld_calendar(const OString& id)
+{
+    ::Calendar* pCalendar = m_xBuilder->get<::Calendar>(id);
+
+    auto pWeldWidget
+        = pCalendar ? std::make_unique<JSCalendar>(this, pCalendar, this, false) : nullptr;
 
     if (pWeldWidget)
         RememberWidget(id, pWeldWidget.get());
@@ -1672,6 +1699,24 @@ void JSSpinButton::set_value(sal_Int64 value)
     (*pMap)[ACTION_TYPE] = "setText";
     (*pMap)["text"] = OUString::number(m_rFormatter.GetValue());
     sendAction(std::move(pMap));
+}
+
+JSFormattedSpinButton::JSFormattedSpinButton(JSDialogSender* pSender, ::FormattedField* pSpin,
+                                             SalInstanceBuilder* pBuilder, bool bTakeOwnership)
+    : JSWidget<SalInstanceFormattedSpinButton, ::FormattedField>(pSender, pSpin, pBuilder,
+                                                                 bTakeOwnership)
+{
+}
+
+void JSFormattedSpinButton::set_text(const OUString& rText)
+{
+    SalInstanceFormattedSpinButton::set_text(rText);
+    sendUpdate();
+}
+
+void JSFormattedSpinButton::set_text_without_notify(const OUString& rText)
+{
+    SalInstanceFormattedSpinButton::set_text(rText);
 }
 
 JSMessageDialog::JSMessageDialog(JSDialogSender* pSender, ::MessageDialog* pDialog,
@@ -2244,6 +2289,12 @@ void JSImage::set_image(const css::uno::Reference<css::graphic::XGraphic>& rImag
 {
     SalInstanceImage::set_image(rImage);
     sendUpdate();
+}
+
+JSCalendar::JSCalendar(JSDialogSender* pSender, ::Calendar* pCalendar, SalInstanceBuilder* pBuilder,
+                       bool bTakeOwnership)
+    : JSWidget<SalInstanceCalendar, ::Calendar>(pSender, pCalendar, pBuilder, bTakeOwnership)
+{
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab cinoptions=b1,g0,N-s cinkeys+=0=break: */

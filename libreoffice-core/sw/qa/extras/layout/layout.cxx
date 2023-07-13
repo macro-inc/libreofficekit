@@ -123,6 +123,18 @@ void SwLayoutWriter::CheckRedlineSectionsHidden()
                 "portion", "folah");
 }
 
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter, testTdf156077)
+{
+    createSwDoc("s4_min2.fodt");
+
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Number of pages does not match!", 3, getPages());
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+    assertXPath(pXmlDoc, "/root/page[1]/anchored/fly", 3);
+    assertXPath(pXmlDoc, "/root/page[2]/anchored/fly", 1);
+    // this was 0, the at-page anchored flys were not displayed
+    assertXPath(pXmlDoc, "/root/page[3]/anchored/fly", 3);
+}
+
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter, testRedlineFootnotes)
 {
     createSwDoc("redline_footnotes.odt");
@@ -3493,6 +3505,7 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter, testTdf109137)
         { "FilterName", uno::Any(OUString("writer8")) },
     }));
     xStorable->storeToURL(maTempFile.GetURL(), aDescriptor);
+    mxComponent->dispose();
     mxComponent = loadFromDesktop(maTempFile.GetURL(), "com.sun.star.text.TextDocument");
     xmlDocUniquePtr pXmlDoc = parseLayoutDump();
     // This was 0, the blue rectangle moved from the 1st to the 2nd page.

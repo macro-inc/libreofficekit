@@ -598,6 +598,37 @@ CPPUNIT_TEST_FIXTURE(Test, testTdf155945)
     CPPUNIT_ASSERT_EQUAL(sal_Int32(0), getProperty<sal_Int32>(getParagraph(2), "ParaBottomMargin"));
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testTdf133560)
+{
+    createSwDoc("lastEmptyLineWithDirectFormatting.docx");
+
+    CPPUNIT_ASSERT_EQUAL(4, getParagraphs());
+    // Without a fix in place, this would fail with
+    // - Expected: 12
+    // - Actual  : 48
+    CPPUNIT_ASSERT_EQUAL(12.0f, getProperty<float>(getParagraph(4), "CharHeight"));
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testTdf150408_isLvl_RoundTrip)
+{
+    loadAndSave("listWithLgl.docx");
+
+    // Second level's numbering should use Arabic numbers for first level reference
+    auto xPara = getParagraph(1);
+    CPPUNIT_ASSERT_EQUAL(OUString("CH I"), getProperty<OUString>(xPara, "ListLabelString"));
+    xPara = getParagraph(2);
+    CPPUNIT_ASSERT_EQUAL(OUString("Sect 1.01"), getProperty<OUString>(xPara, "ListLabelString"));
+    xPara = getParagraph(3);
+    CPPUNIT_ASSERT_EQUAL(OUString("CH II"), getProperty<OUString>(xPara, "ListLabelString"));
+    xPara = getParagraph(4);
+    CPPUNIT_ASSERT_EQUAL(OUString("Sect 2.01"), getProperty<OUString>(xPara, "ListLabelString"));
+
+    xmlDocUniquePtr pXml = parseExport("word/numbering.xml");
+    assertXPath(pXml, "/w:numbering/w:abstractNum"); // Only one list
+    // The second list level must keep the isLgl element
+    assertXPath(pXml, "/w:numbering/w:abstractNum/w:lvl[2]/w:isLgl");
+}
+
 CPPUNIT_PLUGIN_IMPLEMENT();
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

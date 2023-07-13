@@ -597,42 +597,41 @@ OUString ObjectNameProvider::getHelpText( std::u16string_view rObjectCID, const 
                             if ( !(xEqProp->getPropertyValue( "YName") >>= aYName) )
                                 aYName = "f(x)";
                         }
-                        xCalculator->setRegressionProperties(aDegree, bForceIntercept, aInterceptValue, 2, aMovingType);
+                        xCalculator->setRegressionProperties(aDegree, bForceIntercept, aInterceptValue, aPeriod, aMovingType);
                         xCalculator->setXYNames ( aXName, aYName );
                         RegressionCurveHelper::initializeCurveCalculator( xCalculator, xSeries, xChartModel );
 
                         // change text for Moving Average
-                        OUString aWildcard( "%PERIOD" );
-                        sal_Int32 nIndex = xCalculator->getRepresentation().indexOf( aWildcard );
-                        if( nIndex != -1 )
-                        {  // replace period
-                                aRet = xCalculator->getRepresentation();
-                                aRet = aRet.replaceAt( nIndex, aWildcard.getLength(), OUString::number(aPeriod) );
-                        }
-
-                        // replace formula
-                        aWildcard = "%FORMULA";
-                        nIndex = aRet.indexOf( aWildcard );
-                        if( nIndex != -1 )
+                        if ( RegressionCurveHelper::getRegressionType( xCurve ) == SvxChartRegress::MovingAverage )
                         {
-                            OUString aFormula ( xCalculator->getRepresentation() );
-                            if ( cDecSeparator != '.' )
+                            aRet = xCalculator->getRepresentation();
+                        }
+                        else
+                        {
+                            // replace formula
+                            OUString aWildcard = "%FORMULA";
+                            sal_Int32 nIndex = aRet.indexOf( aWildcard );
+                            if( nIndex != -1 )
                             {
-                                aFormula = aFormula.replace( '.', cDecSeparator );
+                                OUString aFormula ( xCalculator->getRepresentation() );
+                                if ( cDecSeparator != '.' )
+                                {
+                                    aFormula = aFormula.replace( '.', cDecSeparator );
+                                }
+                                aRet = aRet.replaceAt( nIndex, aWildcard.getLength(), aFormula );
                             }
-                            aRet = aRet.replaceAt( nIndex, aWildcard.getLength(), aFormula );
-                        }
 
-                        // replace r^2
-                        aWildcard = "%RSQUARED";
-                        nIndex = aRet.indexOf( aWildcard );
-                        if( nIndex != -1 )
-                        {
-                            double fR( xCalculator->getCorrelationCoefficient());
-                            aRet = aRet.replaceAt(
-                                nIndex, aWildcard.getLength(),
-                                ::rtl::math::doubleToUString(
-                                    fR*fR, rtl_math_StringFormat_G, 4, cDecSeparator, true ));
+                            // replace r^2
+                            aWildcard = "%RSQUARED";
+                            nIndex = aRet.indexOf( aWildcard );
+                            if( nIndex != -1 )
+                            {
+                                double fR( xCalculator->getCorrelationCoefficient());
+                                aRet = aRet.replaceAt(
+                                    nIndex, aWildcard.getLength(),
+                                    ::rtl::math::doubleToUString(
+                                        fR*fR, rtl_math_StringFormat_G, 4, cDecSeparator, true ));
+                            }
                         }
                     }
                     catch( const uno::Exception & )
