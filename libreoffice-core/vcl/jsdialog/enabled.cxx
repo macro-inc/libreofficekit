@@ -174,6 +174,7 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"modules/swriter/ui/footnoteareapage.ui"
         || rUIFile == u"modules/swriter/ui/footnotepage.ui"
         || rUIFile == u"modules/swriter/ui/footnotesendnotestabpage.ui"
+        || rUIFile == u"modules/swriter/ui/formatsectiondialog.ui"
         || rUIFile == u"modules/swriter/ui/formattablepage.ui"
         || rUIFile == u"modules/swriter/ui/frmaddpage.ui"
         || rUIFile == u"modules/swriter/ui/frmurlpage.ui"
@@ -284,6 +285,7 @@ bool isBuilderEnabledForPopup(std::u16string_view rUIFile)
         || rUIFile == u"modules/scalc/ui/floatingborderstyle.ui"
         || rUIFile == u"modules/scalc/ui/floatinglinestyle.ui"
         // svt
+        || rUIFile == u"svt/ui/datewindow.ui"
         || rUIFile == u"svt/ui/linewindow.ui"
         // svx
         || rUIFile == u"svx/ui/colorwindow.ui"
