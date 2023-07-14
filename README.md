@@ -6,15 +6,15 @@
     - Select the `Windows Development with C++` workload
     - Add the following Individual Components:
         - .NET Framework 4.8 SDK
-        - Windows Universal C Runtime 
+        - Windows Universal C Runtime
 - Install cygwin with MSVC make and nasm using PowerShell:
 
   ```powershell
   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-  
+
   Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
   & C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
-  
+
   Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
   Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile C:\cygwin\nasm.zip
   Expand-Archive -LiteralPath C:\cygwin\nasm.zip -DestinationPath C:\cygwin
@@ -22,7 +22,7 @@
   ```
 
 - Add `C:\cygwin\vs-cygwin.bat` containing:
-  
+
   ```
   @echo off
   setlocal enableextensions
@@ -34,7 +34,7 @@
   ```
 
 - Create a shortcut to `vc-cygwin.bat` called and change the `Start in:` location to `libreofficekit\libreoffice-core`
-  
+
   **For all development purposes, use this shortcut, otherwise things won't work as expected**
 
 ## Linux
@@ -84,7 +84,7 @@ Before running any build commands, you may have to adjust your path to prefer th
   After making changes, you can just use `make`
 
 ## Linux
-  
+
   ```shell
   ./autogen.sh --with-distro=LOKit-Linux
   make
@@ -102,6 +102,17 @@ Before running any build commands, you may have to adjust your path to prefer th
   After making changes, you can just use `make`
 
 The result will be in `instdir`
+
+# Convert Service
+
+- Apply the following patch to add in the `SA_ONSTACK` flag which prevents a crash
+  ```shell
+  git apply ./patches/convert-service-flag.patch
+  ```
+- Build the docker image
+  ```shell
+  docker build -t hutchery-lok:${LOK_VERSION} .
+  ```
 
 # Documentation
 
