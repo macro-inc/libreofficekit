@@ -1,0 +1,13 @@
+diff --git a/libreoffice-core/sal/osl/unx/signal.cxx b/libreoffice-core/sal/osl/unx/signal.cxx
+index 91cf59ff1d..394215368f 100644
+--- a/libreoffice-core/sal/osl/unx/signal.cxx
++++ b/libreoffice-core/sal/osl/unx/signal.cxx
+@@ -175,7 +175,7 @@ bool onInitSignal()
+ 
+     struct sigaction act;
+     act.sa_sigaction = signalHandlerFunction;
+-    act.sa_flags = SA_RESTART | SA_SIGINFO;
++    act.sa_flags = SA_RESTART | SA_SIGINFO | SA_ONSTACK;
+ 
+     sigfillset(&(act.sa_mask));
+ 
