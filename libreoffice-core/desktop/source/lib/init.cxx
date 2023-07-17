@@ -3389,17 +3389,7 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
             aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex)) + aFilterOptions.subView(bIndex+16);
         }
 
-        std::u16string_view sExportNotesInMargin;
-        if ((aIndex = aFilterOptions.indexOf(",ExportNotesInMargin=")) >= 0)
-        {
-            int bIndex = aFilterOptions.indexOf("EXPORTNOTESINMARGINEND");
-            sExportNotesInMargin = aFilterOptions.subView(aIndex+21, bIndex-(aIndex+21));
-            aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex)) + aFilterOptions.subView(bIndex+22);
-        }
-
         bool bFullSheetPreview = sFullSheetPreview == u"true";
-
-        bool bExportNotesInMargin = sExportNotesInMargin == u"true";
 
         // Select a pdf version if specified a valid one. If not specified then ignore.
         // If invalid then fail.
@@ -3471,11 +3461,6 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
         if (pdfVer)
             aFilterDataMap["SelectPdfVersion"] <<= pdfVer;
 
-        if (bExportNotesInMargin) {
-            aFilterDataMap["ExportNotes"] <<= false;
-            aFilterDataMap["ExportNotesInMargin"] <<= true;
-        }
-
         if (!aFilterDataMap.empty())
         {
             aSaveMediaDescriptor["FilterData"] <<= aFilterDataMap.getAsConstPropertyValueList();
@@ -3491,7 +3476,6 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
 
             aSaveMediaDescriptor[MediaDescriptor::PROP_INTERACTIONHANDLER] <<= xInteraction;
         }
-
 
         if (bTakeOwnership)
             xStorable->storeAsURL(aURL, aSaveMediaDescriptor.getAsConstPropertyValueList());
