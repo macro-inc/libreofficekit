@@ -1,0 +1,14 @@
+diff --git a/libreoffice-core/sw/source/uibase/docvw/AnnotationWin2.cxx b/libreoffice-core/sw/source/uibase/docvw/AnnotationWin2.cxx
+index cfc42e0a5a..b27e75f293 100644
+--- a/libreoffice-core/sw/source/uibase/docvw/AnnotationWin2.cxx
++++ b/libreoffice-core/sw/source/uibase/docvw/AnnotationWin2.cxx
+@@ -816,9 +816,6 @@ void SwAnnotationWin::DoResize()
+ 
+ void SwAnnotationWin::SetSizePixel( const Size& rNewSize )
+ {
+-    if (comphelper::LibreOfficeKit::isActive())
+-        return;
+-
+     InterimItemWindow::SetSizePixel(rNewSize);
+ 
+     if (mpShadow)
