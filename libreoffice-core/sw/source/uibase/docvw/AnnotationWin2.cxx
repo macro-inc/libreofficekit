@@ -816,8 +816,9 @@ void SwAnnotationWin::DoResize()
 
 void SwAnnotationWin::SetSizePixel( const Size& rNewSize )
 {
-    if (comphelper::LibreOfficeKit::isActive())
-        return;
+    // Disabled ONLY for compare tool, since without this the cursor jumps every time a new comment is made
+    // if (comphelper::LibreOfficeKit::isActive())
+    //     return;
 
     InterimItemWindow::SetSizePixel(rNewSize);
 
