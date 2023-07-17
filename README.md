@@ -108,6 +108,7 @@ The result will be in `instdir`
 - Apply the following patch to add in the `SA_ONSTACK` flag which prevents a crash
   ```shell
   git apply ./patches/convert-service-flag.patch
+  git apply ./patches/convert-service-comments-in-margin.patch
   ```
 - Build the docker image
   ```shell
