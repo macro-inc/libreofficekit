@@ -1550,7 +1550,7 @@ namespace //local functions originally from docfmt.cxx
                             pUndo->SaveRedlineData( aPam, true );
 
                         if( rDoc.getIDocumentRedlineAccess().IsRedlineOn() )
-                            rDoc.getIDocumentRedlineAccess().AppendRedline( new SwRangeRedline( RedlineType::Insert, aPam ), true);
+                            rDoc.getIDocumentRedlineAccess().AppendRedline(new SwRangeRedline(RedlineType::Insert, aPam), true);
                         else
                             rDoc.getIDocumentRedlineAccess().SplitRedline( aPam );
                     }
@@ -4120,9 +4120,7 @@ bool DocumentContentOperationsManager::DeleteAndJoinWithRedlineImpl(SwPaM & rPam
     {
         auto pRedline(std::make_unique<SwRangeRedline>(RedlineType::Delete, rPam));
         if (pRedline->HasValidRange())
-        {
             redlines.push_back(std::move(pRedline));
-        }
         else // sigh ... why is such a selection even possible...
         {    // split it up so we get one SwUndoRedlineDelete per inserted RL
             redlines = GetAllValidRanges(std::move(pRedline));

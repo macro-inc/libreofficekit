@@ -1274,6 +1274,13 @@ DocumentRedlineManager::AppendRedline(SwRangeRedline* pNewRedl, bool const bCall
         return AppendResult::IGNORED;
     }
 
+    // MACRO-1266 - Do not create a delete redline for a comment
+    if(pNewRedl->IsAnnotation()) {
+        delete pNewRedl;
+        pNewRedl = nullptr;
+        CHECK_REDLINE( *this )
+        return AppendResult::IGNORED;
+    }
 
     bool bMerged = false;
 
