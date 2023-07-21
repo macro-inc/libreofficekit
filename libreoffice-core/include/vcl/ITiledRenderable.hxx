@@ -146,6 +146,11 @@ public:
     virtual void initializeForTiledRendering(const css::uno::Sequence<css::beans::PropertyValue>& rArguments) = 0;
 
     /**
+     * Sets the author for the document
+     */
+    virtual void setAuthor(OUString sAuthor) = 0;
+
+    /**
      * Posts a keyboard event on the document.
      *
      * @see lok::Document::postKeyEvent().
