@@ -240,6 +240,14 @@ public:
     }
 
     /**
+     * Sets the author for the document
+     */
+    void setAuthor(const char* sAuthor)
+    {
+        mpDoc->pClass->setAuthor(mpDoc, sAuthor);
+    }
+
+    /**
      * Registers a callback. LOK will invoke this function when it wants to
      * inform the client about events.
      *

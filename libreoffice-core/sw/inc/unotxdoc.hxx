@@ -417,6 +417,8 @@ public:
     virtual VclPtr<vcl::Window> getDocWindow() override;
     /// @see vcl::ITiledRenderable::initializeForTiledRendering().
     virtual void initializeForTiledRendering(const css::uno::Sequence<css::beans::PropertyValue>& rArguments) override;
+    /// @see vcl::ITiledRenderable::setAuthor().
+    virtual void setAuthor(OUString sAuthor) override;
     /// @see vcl::ITiledRenderable::postKeyEvent().
     virtual void postKeyEvent(int nType, int nCharCode, int nKeyCode) override;
     /// @see vcl::ITiledRenderable::postMouseEvent().
