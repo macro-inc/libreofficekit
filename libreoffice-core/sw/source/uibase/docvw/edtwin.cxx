@@ -623,16 +623,20 @@ void SwEditWin::UpdatePointer(const Point &rLPt, sal_uInt16 nModifier )
         }
 
         // which kind of text pointer have we to show - horz / vert - ?
-        if( PointerStyle::Text == eStyle && rSh.IsInVerticalText( &rLPt ))
-            eStyle = PointerStyle::TextVertical;
-        else if (rSh.GetViewOptions()->CanHideWhitespace() &&
-                 rSh.GetLayout()->IsBetweenPages(rLPt))
-        {
-            if (rSh.GetViewOptions()->IsHideWhitespaceMode())
-                eStyle = PointerStyle::ShowWhitespace;
-            else
-                eStyle = PointerStyle::HideWhitespace;
-        }
+
+
+        // [MACRO-1280]: fix rendering issues caused by clicking between pages
+
+        /* if( PointerStyle::Text == eStyle && rSh.IsInVerticalText( &rLPt )) */
+        /*     eStyle = PointerStyle::TextVertical; */
+        /* else if (rSh.GetViewOptions()->CanHideWhitespace() && */
+        /*          rSh.GetLayout()->IsBetweenPages(rLPt)) */
+        /* { */
+        /*     if (rSh.GetViewOptions()->IsHideWhitespaceMode()) */
+        /*         eStyle = PointerStyle::ShowWhitespace; */
+        /*     else */
+        /*         eStyle = PointerStyle::HideWhitespace; */
+        /* } */
 
         SetPointer( eStyle );
     }
@@ -3031,18 +3035,20 @@ void SwEditWin::MouseButtonDown(const MouseEvent& _rMEvt)
         }
 
         // Toggle Hide-Whitespace if between pages.
-        if (rSh.GetViewOptions()->CanHideWhitespace() &&
-            rSh.GetLayout()->IsBetweenPages(aDocPos))
-        {
-            if (_rMEvt.GetClicks() >= 2)
-            {
-                SwViewOption aOpt(*rSh.GetViewOptions());
-                aOpt.SetHideWhitespaceMode(!aOpt.IsHideWhitespaceMode());
-                rSh.ApplyViewOptions(aOpt);
-            }
+        // [MACRO-1280]: fix rendering issues caused by clicking between pages
 
-            return;
-        }
+        /* if (rSh.GetViewOptions()->CanHideWhitespace() && */
+        /*     rSh.GetLayout()->IsBetweenPages(aDocPos)) */
+        /* { */
+        /*     if (_rMEvt.GetClicks() >= 1) */
+        /*     { */
+        /*         SwViewOption aOpt(*rSh.GetViewOptions()); */
+        /*         aOpt.SetHideWhitespaceMode(!aOpt.IsHideWhitespaceMode()); */
+        /*         rSh.ApplyViewOptions(aOpt); */
+        /*     } */
+
+        /*     return; */
+        /* } */
     }
 
     if ( IsChainMode() )
