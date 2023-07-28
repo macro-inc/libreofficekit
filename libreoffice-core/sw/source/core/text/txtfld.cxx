@@ -772,7 +772,7 @@ SwNumberPortion *SwTextFormatter::NewNumberPortion( SwTextFormatInfo &rInf ) con
                             // show also original number after the actual one enclosed in [ and ],
                             // and replace tabulator with space to avoid messy indentation
                             // resulted by the longer numbering, e.g. "1.[2.]" instead of "1.".
-                            aText = aText +  "[" + aHiddenText + "]"
+                            aText = "[" + aHiddenText + "] " + aText
                                      + pTextNd->GetLabelFollowedBy().replaceAll("\t", " ");
                         }
                         else if (!aText.isEmpty())
