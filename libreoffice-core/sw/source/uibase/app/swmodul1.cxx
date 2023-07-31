@@ -473,10 +473,10 @@ static void lcl_FillAuthorAttr( std::size_t nAuthor, SfxItemSet &rSet,
 
     if( rAttr.m_nColor == COL_TRANSPARENT ) {
         if(nAuthor == 0) {
-            aCol = COL_BLUE;
+            aCol = COL_BLUE_CLASSIC;
         }
         else if(nAuthor == 1) {
-            aCol = COL_RED;
+            aCol = COL_RED_CLASSIC;
         }
         else {
             aCol = lcl_GetAuthorColor(nAuthor);

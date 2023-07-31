@@ -500,6 +500,8 @@ inline constexpr ::Color COL_AUTHOR_TABLE_DEL        ( 0xFC, 0xE6, 0xF4 );
 inline constexpr ::Color COL_PIP_TERM                ( 0x14, 0x46, 0xA3 );
 inline constexpr ::Color COL_PIP_TERM_REF            ( 0x14, 0x46, 0xA3 );
 inline constexpr ::Color COL_PIP_SECTION_REF         ( 0x4C, 0xAF, 0x50 );
+inline constexpr ::Color COL_RED_CLASSIC             ( 0xFF, 0x00, 0x00 );
+inline constexpr ::Color COL_BLUE_CLASSIC            ( 0x00, 0x00, 0xFF );
 
 template<typename charT, typename traits>
 inline std::basic_ostream<charT, traits>& operator <<(std::basic_ostream<charT, traits>& rStream, const Color& rColor)
