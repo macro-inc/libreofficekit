@@ -208,6 +208,10 @@ struct _LibreOfficeKitDocumentClass
     void (*initializeForRendering) (LibreOfficeKitDocument* pThis,
                                     const char* pArguments);
 
+    /// @see lok::Document::setAuthor().
+    void (*setAuthor) (LibreOfficeKitDocument* pThis,
+                                    const char* sAuthor);
+
     /// @see lok::Document::registerCallback().
     void (*registerCallback) (LibreOfficeKitDocument* pThis,
                               LibreOfficeKitCallback pCallback,
