@@ -1982,7 +1982,8 @@ const SwRedlineData & SwRangeRedline::GetRedlineData(const sal_uInt16 nPos) cons
         nP--;
     }
 
-    SAL_WARN_IF( nP != 0, "sw.core", "Pos " << nPos << " is " << nP << " too big");
+    // This is commonly called in LOK and is in fact, not in error
+    // SAL_WARN_IF( nP != 0, "sw.core", "Pos " << nPos << " is " << nP << " too big");
 
     return *pCur;
 }
