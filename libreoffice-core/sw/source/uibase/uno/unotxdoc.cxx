@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <chrono>
 #include <sal/config.h>
 #include <officecfg/Office/Common.hxx>
 #include <comphelper/string.hxx>
@@ -3390,36 +3391,48 @@ void SwXTextDocument::getTrackedChanges(tools::JsonWriter& rJson)
         = m_pDocShell->GetDoc()->getIDocumentRedlineAccess().GetRedlineTable();
     for (SwRedlineTable::size_type i = 0; i < rRedlineTable.size(); ++i)
     {
+        SwRangeRedline* pR = rRedlineTable[i];
         auto redlineNode = rJson.startStruct();
-        rJson.put("index", rRedlineTable[i]->GetId());
-        rJson.put("author", rRedlineTable[i]->GetAuthorString(1));
+        rJson.put("index", pR->GetId());
+        rJson.put("author", pR->GetAuthorString(1));
+        const SwRedlineData& pD = pR->GetRedlineData();
         rJson.put("type", SwRedlineTypeToOUString(
-                                       rRedlineTable[i]->GetRedlineData().GetType()));
+                                       pD.GetType()));
         rJson.put("comment",
-                           rRedlineTable[i]->GetRedlineData().GetComment());
-        rJson.put("description", rRedlineTable[i]->GetDescr());
+                           pD.GetComment());
+        rJson.put("description", pR->GetDescr());
         OUString sDateTime = utl::toISO8601(
-            rRedlineTable[i]->GetRedlineData().GetTimeStamp().GetUNODateTime());
+            pD.GetTimeStamp().GetUNODateTime());
         rJson.put("dateTime", sDateTime);
 
-        SwContentNode* pContentNd = rRedlineTable[i]->GetPointContentNode();
-        SwView* pView = dynamic_cast<SwView*>(SfxViewShell::Current());
-        if (pView && pContentNd)
+        SwContentNode* pContentNd = pR->GetPointContentNode();
+        SwDocShell* pDocSh = pR->GetDoc().GetDocShell();
+        if (!pDocSh) {
+            rJson.put("textRange", OString());
+            continue;
+        }
+        SwView* pView = pDocSh->GetView();
+        if (!pView) {
+            rJson.put("textRange", OString());
+            continue;
+        }
+
+        std::vector<OString> aRects;
         {
-            SwShellCursor aCursor(pView->GetWrtShell(), *(rRedlineTable[i]->Start()));
+            CurrShell aCurr( pDocSh->GetWrtShell() );
+            SwShellCursor aCursor(pView->GetWrtShell(), *(pR->Start()));
             aCursor.SetMark();
-            aCursor.GetMark()->Assign(*pContentNd, rRedlineTable[i]->End()->GetContentIndex());
+            aCursor.GetMark()->Assign(*pContentNd, pR->End()->GetContentIndex());
 
             aCursor.FillRects();
-
             SwRects* pRects(&aCursor);
-            std::vector<OString> aRects;
+
             for (const SwRect& rNextRect : *pRects)
                 aRects.push_back(rNextRect.SVRect().toString());
-
-            const OString sRects = comphelper::string::join("; ", aRects);
-            rJson.put("textRange", sRects);
         }
+
+        const OString sRects = comphelper::string::join("; ", aRects);
+        rJson.put("textRange", sRects);
     }
 }
 

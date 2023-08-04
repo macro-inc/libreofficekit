@@ -18,8 +18,11 @@
  */
 
 #include "IDocumentOutlineNodes.hxx"
+#include "IDocumentRedlineAccess.hxx"
 #include "itabenum.hxx"
 #include "ndtxt.hxx"
+#include "redline.hxx"
+#include "swundo.hxx"
 #include "txtfrm.hxx"
 #include "wrtsh.hxx"
 #include <iostream>
@@ -577,6 +580,32 @@ void SwXTextDocument::createTable(int row, int col)
     const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
 
     mrSh->InsertTable(aInsertTableOptions, row, col);
+}
+
+// MACRO-1212: batch track change updates in a single action
+void SwXTextDocument::batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& rArguments, bool accept)
+{
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+    SwDoc *pDoc = mrSh->GetDoc();
+    SwUndoId undoId = accept ? SwUndoId::ACCEPT_REDLINE : SwUndoId::REJECT_REDLINE;
+    // make batch update a single undo/redo and layout action
+    mrSh->StartUndo(undoId, nullptr);
+    mrSh->StartAction();
+
+    for (sal_uInt32 id : rArguments) {
+        const SwRedlineTable& rRedlineTable = pDoc->getIDocumentRedlineAccess().GetRedlineTable();
+        bool found = false;
+        for (SwRedlineTable::size_type i = 0; !found && i < rRedlineTable.size(); ++i)
+        {
+            if (id == rRedlineTable[i]->GetId()) {
+                found = true;
+                mrSh->AcceptRedline(i);
+            }
+        }
+    }
+
+    mrSh->EndAction();
+    mrSh->EndUndo(undoId, nullptr);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -398,6 +398,12 @@ public:
      * eg. 'PD' - P for non-printing-characters, D for dark-mode.
      */
     virtual OString getViewRenderState() { return rtl::OString(); }
+
+    /**
+    * Accept/reject a series of track change ids
+    * For MACRO-1212
+    */
+    virtual void batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& /*rArguments*/, bool /*accept*/) {}
 };
 } // namespace vcl
 

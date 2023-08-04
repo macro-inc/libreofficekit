@@ -4826,6 +4826,21 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         *p = 0;
     }
 
+    // MACRO-1212: batch track change updates in a single action
+    if (gImpl && aCommand == ".uno:BatchTrackChange")
+    {
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Accept" || rPropValue.Name == "Reject")
+            {
+                ITiledRenderable* pDoc = getTiledRenderable(pThis);
+                pDoc->batchUpdateTrackChange(rPropValue.Value.get<css::uno::Sequence<sal_uInt32>>(), rPropValue.Name == "Accept");
+                return;
+            }
+        }
+        return;
+    }
+
     if (gImpl && aCommand == ".uno:CreateTable")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
