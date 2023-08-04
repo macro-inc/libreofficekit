@@ -17,8 +17,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - arch: x86_64
-            runner: macro-x641
+          # - arch: x86_64
+          #   runner: macro-x641
           - arch: arm64
             runner: macro-arm1
     steps:
