@@ -440,10 +440,12 @@ void SwView::GetState(SfxItemSet &rSet)
                     rSet.DisableItem(nWhich);
                 if (comphelper::LibreOfficeKit::isActive())
                 {
-                    OString aPayload(".uno:TrackedChangeIndex=");
+                    OString aPayload(".uno:CurrentTrackedChangeId=");
                     SwRedlineTable::size_type nRedline = 0;
-                    if (pDoc->getIDocumentRedlineAccess().GetRedline(*pCursor->Start(), &nRedline))
-                        aPayload += OString::number(nRedline);
+                    const SwRangeRedline* pR = pDoc->getIDocumentRedlineAccess().GetRedline(*pCursor->Start(), &nRedline);
+                    if (pR) {
+                        aPayload += OString::number(pR->GetId());
+                    }
                     libreOfficeKitViewCallback(LOK_CALLBACK_STATE_CHANGED, aPayload.getStr());
                 }
             }
