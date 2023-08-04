@@ -72,7 +72,7 @@ jobs:
   build:
     needs: [check_version, fetch]
     if: ${{ needs.check_version.outputs.should_run != 'false' }}
-    runs-on: ubuntu-22.04
+    runs-on: linux-beefy
     name: Build
     steps:
       - name: Remove .NET/Haskell/Android to free up space (~30 GiB)
