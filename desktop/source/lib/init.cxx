@@ -7,7 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "sal/types.h"
 #include "sfx2/lokhelper.hxx"
+#include "svx/sdr/contact/viewcontact.hxx"
+#include "svx/svdpage.hxx"
+#include "svx/svdpagv.hxx"
 #include <config_buildconfig.h>
 #include <config_cairo_rgba.h>
 #include <config_features.h>
@@ -3151,6 +3155,37 @@ static char* lo_extractRequest(LibreOfficeKit* /*pThis*/, const char* pFilePath)
 static void lo_trimMemory(LibreOfficeKit* /* pThis */, int nTarget)
 {
     vcl::lok::trimMemory(nTarget);
+
+    if (nTarget > 2000)
+    {
+        SolarMutexGuard aGuard;
+
+        // Flush all buffered VOC primitives from the pages.
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        if (pViewShell)
+        {
+            const SdrView* pView = pViewShell->GetDrawView();
+            if (pView)
+            {
+                SdrPageView* pPageView = pView->GetSdrPageView();
+                if (pPageView)
+                {
+                    SdrPage* pCurPage = pPageView->GetPage();
+                    if (pCurPage)
+                    {
+                        SdrModel& sdrModel = pCurPage->getSdrModelFromSdrPage();
+                        for (sal_uInt16 i = 0; i < sdrModel.GetPageCount(); ++i)
+                        {
+                            SdrPage* pPage = sdrModel.GetPage(i);
+                            if (pPage)
+                                pPage->GetViewContact().flushViewObjectContacts();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (nTarget > 1000)
     {
 #ifdef HAVE_MALLOC_TRIM
@@ -3273,6 +3308,23 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
 
         bool bFullSheetPreview = sFullSheetPreview == u"true";
 
+        OUString filePassword;
+        if ((aIndex = aFilterOptions.indexOf(",Password=")) >= 0)
+        {
+            int bIndex = aFilterOptions.indexOf("PASSWORDEND");
+            filePassword = aFilterOptions.subView(aIndex + 10, bIndex - (aIndex + 10));
+            aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex))
+                             + aFilterOptions.subView(bIndex + 11);
+        }
+        OUString filePasswordToModify;
+        if ((aIndex = aFilterOptions.indexOf(",PasswordToModify=")) >= 0)
+        {
+            int bIndex = aFilterOptions.indexOf("PASSWORDTOMODIFYEND");
+            filePassword = aFilterOptions.subView(aIndex + 18, bIndex - (aIndex + 18));
+            aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex))
+                             + aFilterOptions.subView(bIndex + 19);
+        }
+
         // Select a pdf version if specified a valid one. If not specified then ignore.
         // If invalid then fail.
         sal_Int32 pdfVer = 0;
@@ -3347,6 +3399,10 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
         {
             aSaveMediaDescriptor["FilterData"] <<= aFilterDataMap.getAsConstPropertyValueList();
         }
+        if (!filePassword.isEmpty())
+            aSaveMediaDescriptor["Password"] <<= filePassword;
+        if (!filePasswordToModify.isEmpty())
+            aSaveMediaDescriptor["PasswordToModify"] <<= filePasswordToModify;
 
         // add interaction handler too
         if (gImpl)
@@ -3588,6 +3644,9 @@ static void doc_iniUnoCommands ()
         OUString(".uno:GroupSparklines"),
         OUString(".uno:UngroupSparklines"),
         OUString(".uno:FormatSparklineMenu"),
+        OUString(".uno:DataDataPilotRun"),
+        OUString(".uno:RecalcPivotTable"),
+        OUString(".uno:DeletePivotTable"),
         OUString(".uno:Protect"),
         OUString(".uno:UnsetCellsReadOnly"),
         OUString(".uno:ContentControlProperties"),
@@ -4097,6 +4156,8 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
         int nViewId = nOrigViewId;
         int nLastNonEditorView = -1;
         int nViewMatchingMode = -1;
+        SfxViewShell* pCurrentViewShell = SfxViewShell::Current();
+
         if (!isText)
         {
             // Check if just switching to another view is enough, that has
@@ -4108,11 +4169,16 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
                 {
                     bool bIsInEdit = pViewShell->GetDrawView() &&
                         pViewShell->GetDrawView()->GetTextEditOutliner();
-                    if (!bIsInEdit)
+
+                    OString sCurrentViewRenderState = pDoc->getViewRenderState(pCurrentViewShell);
+                    OString sNewRenderState = pDoc->getViewRenderState(pViewShell);
+
+                    if (sCurrentViewRenderState == sNewRenderState && !bIsInEdit)
                         nLastNonEditorView = pViewShell->GetViewShellId().get();
 
                     if (pViewShell->getPart() == nPart &&
                         pViewShell->getEditMode() == nMode &&
+                        sCurrentViewRenderState == sNewRenderState &&
                         !bIsInEdit)
                     {
                         nViewId = pViewShell->GetViewShellId().get();
@@ -4121,7 +4187,7 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
                         doc_setView(pThis, nViewId);
                         break;
                     }
-                    else if (pViewShell->getEditMode() == nMode && !bIsInEdit)
+                    else if (pViewShell->getEditMode() == nMode && sCurrentViewRenderState == sNewRenderState && !bIsInEdit)
                     {
                         nViewMatchingMode = pViewShell->GetViewShellId().get();
                     }
@@ -4133,7 +4199,6 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
             // if not found view with correct part
             // - at least avoid rendering active textbox, This is for Impress.
             // - prefer view with the same mode
-            SfxViewShell* pCurrentViewShell = SfxViewShell::Current();
             if (nViewMatchingMode >= 0 && nViewMatchingMode != nViewId)
             {
                 nViewId = nViewMatchingMode;
