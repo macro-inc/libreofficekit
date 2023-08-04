@@ -1206,7 +1206,7 @@ void ScTiledRenderingTest::testInvalidateOnInserRowCol()
     dispatchCommand(mxComponent, ".uno:InsertRows", aArgs);
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(aView.m_bInvalidateTiles);
-    CPPUNIT_ASSERT_EQUAL(size_t(2), aView.m_aInvalidations.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(1), aView.m_aInvalidations.size());
     CPPUNIT_ASSERT_EQUAL(tools::Rectangle(-75, 51240, 32212230, 63990), aView.m_aInvalidations[0]);
 
     // move on the right
@@ -1223,7 +1223,7 @@ void ScTiledRenderingTest::testInvalidateOnInserRowCol()
     dispatchCommand(mxComponent, ".uno:InsertColumns", aArgs);
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(aView.m_bInvalidateTiles);
-    CPPUNIT_ASSERT_EQUAL(size_t(2), aView.m_aInvalidations.size());
+    CPPUNIT_ASSERT_EQUAL(size_t(1), aView.m_aInvalidations.size());
     CPPUNIT_ASSERT_EQUAL(tools::Rectangle(254925, -15, 32212230, 63990), aView.m_aInvalidations[0]);
 }
 
@@ -2062,7 +2062,8 @@ void ScTiledRenderingTest::testJumpToLastRowInvalidation()
     Scheduler::ProcessEventsToIdle();
     CPPUNIT_ASSERT(aView1.m_bInvalidateTiles);
     CPPUNIT_ASSERT_EQUAL(size_t(1), aView1.m_aInvalidations.size());
-    CPPUNIT_ASSERT_EQUAL(tools::Rectangle(0, 13005, 26775, 267386880), aView1.m_aInvalidations[0]);
+    // 261375 because we limit how far we jump into empty space in online, 267386880 if we don't limit
+    CPPUNIT_ASSERT_EQUAL(tools::Rectangle(0, 13005, 26775, 261375), aView1.m_aInvalidations[0]);
 }
 
 // We need to ensure that views are not perterbed by rendering (!?) hmm ...
