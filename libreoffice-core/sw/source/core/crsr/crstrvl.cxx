@@ -368,6 +368,8 @@ void SwCursorShell::GotoTOXMarkBase()
     // Take the 1. and get the index type. Ask it for the actual index.
     const SwTOXType* pType = aMarks[0]->GetTOXType();
     auto pContentFrame = pType->FindContentFrame(*GetDoc(), *GetLayout());
+    if(!pContentFrame)
+        return;
     SwCallLink aLk(*this); // watch Cursor-Moves
     SwCursorSaveState aSaveState(*m_pCurrentCursor);
     assert(pContentFrame->IsTextFrame());
@@ -1466,8 +1468,17 @@ bool SwCursorShell::GetContentAtPos( const Point& rPt,
         && !rNds.GetOutLineNds().empty() )
     {
         // only for nodes in outline nodes
-        SwOutlineNodes::size_type nPos;
-        if(rNds.GetOutLineNds().Seek_Entry(pTextNd, &nPos))
+        SwOutlineNodes::size_type nPos = 0;
+        bool bFoundOutline = rNds.GetOutLineNds().Seek_Entry(pTextNd, &nPos);
+        if (!bFoundOutline && nPos && (IsAttrAtPos::AllowContaining & rContentAtPos.eContentAtPos))
+        {
+            // nPos points to the first found outline node not before pTextNd, or to end();
+            // when bFoundOutline is false, and nPos is not 0, it means that there were
+            // outline nodes before pTextNd, and nPos-1 points to the last of those.
+            pTextNd = rNds.GetOutLineNds()[nPos - 1]->GetTextNode();
+            bFoundOutline = true;
+        }
+        if (bFoundOutline)
         {
             rContentAtPos.eContentAtPos = IsAttrAtPos::Outline;
             rContentAtPos.sStr = sw::GetExpandTextMerged(GetLayout(), *pTextNd, true, false, ExpandMode::ExpandFootnote);

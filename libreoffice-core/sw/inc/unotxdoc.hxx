@@ -468,7 +468,7 @@ public:
     void getCommandValues(tools::JsonWriter& rJsonWriter, std::string_view rCommand) override;
 
     /// @see vcl::ITiledRenderable::getViewRenderState().
-    OString getViewRenderState() override;
+    OString getViewRenderState(SfxViewShell* pViewShell = nullptr) override;
 
     /// @see vcl::ITiledRenderable::supportsCommand().
     bool supportsCommand(std::u16string_view rCommand) override;
@@ -478,6 +478,10 @@ public:
 
     /// @see vcl::ITiledRenderable::createTable().
     void createTable(int row, int col) override;
+
+    // For MACRO-1212
+    /// @see vcl::ITiledRenderable::batchUpdateTrackChange().
+    void batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& rArguments, bool accept) override;
 
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);

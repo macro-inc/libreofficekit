@@ -1692,12 +1692,8 @@ void PDFWriterImpl::newPage( double nPageWidth, double nPageHeight, PDFWriter::O
     m_nCurrentPage = m_aPages.size();
     m_aPages.emplace_back(this, nPageWidth, nPageHeight, eOrientation );
 
-    sal_Int32 nUserUnit = m_aPages.back().m_nUserUnit;
-    if (nUserUnit > 1)
-    {
-        m_aMapMode = MapMode(MapUnit::MapPoint, Point(), Fraction(nUserUnit, pointToPixel(1)),
-                             Fraction(nUserUnit, pointToPixel(1)));
-    }
+    const Fraction frac(m_aPages.back().m_nUserUnit, pointToPixel(1));
+    m_aMapMode = MapMode(MapUnit::MapPoint, Point(), frac, frac);
 
     m_aPages.back().beginStream();
 
@@ -1930,10 +1926,10 @@ const char* PDFWriterImpl::getAttributeValueTag( PDFWriter::StructAttributeValue
         aValueStrings[ PDFWriter::Header ]                  = "Header";
         aValueStrings[ PDFWriter::Footer ]                  = "Footer";
         aValueStrings[ PDFWriter::Watermark ]               = "Watermark";
-        aValueStrings[ PDFWriter::Rb ]                      = "Rb";
-        aValueStrings[ PDFWriter::Cb ]                      = "Cb";
-        aValueStrings[ PDFWriter::Pb ]                      = "Pb";
-        aValueStrings[ PDFWriter::Tv ]                      = "Tv";
+        aValueStrings[ PDFWriter::Rb ]                      = "rb";
+        aValueStrings[ PDFWriter::Cb ]                      = "cb";
+        aValueStrings[ PDFWriter::Pb ]                      = "pb";
+        aValueStrings[ PDFWriter::Tv ]                      = "tv";
         aValueStrings[ PDFWriter::Disc ]                    = "Disc";
         aValueStrings[ PDFWriter::Circle ]                  = "Circle";
         aValueStrings[ PDFWriter::Square ]                  = "Square";
@@ -3644,7 +3640,7 @@ bool PDFWriterImpl::emitScreenAnnotations()
         // End Action dictionary.
         aLine.append("/OP 0 >>");
 
-        if (0 < rScreen.m_nStructParent)
+        if (-1 != rScreen.m_nStructParent)
         {
             aLine.append("\n/StructParent ");
             aLine.append(rScreen.m_nStructParent);
@@ -3877,7 +3873,7 @@ we check in the following sequence:
             }
             aLine.append( ">>\n" );
         }
-        if( rLink.m_nStructParent > 0 )
+        if (rLink.m_nStructParent != -1)
         {
             aLine.append( "/StructParent " );
             aLine.append( rLink.m_nStructParent );
@@ -4720,7 +4716,7 @@ bool PDFWriterImpl::emitWidgetAnnotations()
                     iRectMargin = 1;
                 }
 
-                if (0 < rWidget.m_nStructParent)
+                if (-1 != rWidget.m_nStructParent)
                 {
                     aLine.append("/StructParent ");
                     aLine.append(rWidget.m_nStructParent);

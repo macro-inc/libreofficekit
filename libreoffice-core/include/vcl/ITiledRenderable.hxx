@@ -11,6 +11,7 @@
 #pragma once
 
 #include "i18nutil/widthfolding.hxx"
+#include <sfx2/viewsh.hxx>
 #include <tools/gen.hxx>
 #include <rtl/ustring.hxx>
 #include <vcl/dllapi.h>
@@ -396,8 +397,15 @@ public:
     /**
      * Returns an opaque string reflecting the render state of a component
      * eg. 'PD' - P for non-printing-characters, D for dark-mode.
+     * @param pViewShell the view to get the options from, if nullptr the current view shell is used
      */
-    virtual OString getViewRenderState() { return rtl::OString(); }
+    virtual OString getViewRenderState(SfxViewShell* = nullptr) { return rtl::OString(); }
+
+    /**
+    * Accept/reject a series of track change ids
+    * For MACRO-1212
+    */
+    virtual void batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& /*rArguments*/, bool /*accept*/) {}
 };
 } // namespace vcl
 

@@ -10,7 +10,11 @@
 #include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
 #include <sal/backtrace.hxx>
+#include "sal/types.h"
 #include "sfx2/lokhelper.hxx"
+#include "svx/sdr/contact/viewcontact.hxx"
+#include "svx/svdpage.hxx"
+#include "svx/svdpagv.hxx"
 #include <config_buildconfig.h>
 #include <config_cairo_rgba.h>
 #include <config_features.h>
@@ -186,9 +190,6 @@
 #include <vcl/uitest/uiobject.hxx>
 #include <vcl/jsdialog/executor.hxx>
 
-// Needed for getUndoManager()
-#include <com/sun/star/document/XUndoManager.hpp>
-#include <com/sun/star/document/XUndoManagerSupplier.hpp>
 #include <com/sun/star/document/XLinkTargetSupplier.hpp>
 #include <editeng/sizeitem.hxx>
 #include <svx/rulritem.hxx>
@@ -850,23 +851,6 @@ OUString lcl_getCurrentDocumentMimeType(const LibLODocument_Impl* pDocument)
     return pFilter->GetMimeType();
 }
 
-// Gets an undo manager to enter and exit undo context. Needed by ToggleOrientation
-css::uno::Reference< css::document::XUndoManager > getUndoManager( const css::uno::Reference< css::frame::XFrame >& rxFrame )
-{
-    const css::uno::Reference< css::frame::XController >& xController = rxFrame->getController();
-    if ( xController.is() )
-    {
-        const css::uno::Reference< css::frame::XModel >& xModel = xController->getModel();
-        if ( xModel.is() )
-        {
-            const css::uno::Reference< css::document::XUndoManagerSupplier > xSuppUndo( xModel, css::uno::UNO_QUERY_THROW );
-            return css::uno::Reference< css::document::XUndoManager >( xSuppUndo->getUndoManager(), css::uno::UNO_SET_THROW );
-        }
-    }
-
-    return css::uno::Reference< css::document::XUndoManager > ();
-}
-
 // Adjusts page margins for Writer doc. Needed by ToggleOrientation
 void ExecuteMarginLRChange(
     const tools::Long nPageLeftMargin,
@@ -1000,107 +984,6 @@ void setPageMargins(
     }
 
     pThis->pClass->setPart(pThis, pOriginalPart);
-}
-
-//
-// Main function which toggles page orientation of the Writer doc. Needed by ToggleOrientation
-void ExecuteOrientationChange()
-{
-    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-    if (!pViewFrm)
-        return;
-
-    std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
-
-    // 1mm in twips rounded
-    // This should be in sync with MINBODY in sw/source/uibase/sidebar/PageMarginControl.hxx
-    constexpr tools::Long MINBODY = o3tl::toTwips(1, o3tl::Length::mm);
-
-    css::uno::Reference< css::document::XUndoManager > mxUndoManager(
-                getUndoManager( pViewFrm->GetFrame().GetFrameInterface() ) );
-
-    if ( mxUndoManager.is() )
-        mxUndoManager->enterUndoContext( "" );
-
-
-    const SvxSizeItem* pSizeItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
-    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
-
-    const SvxLongLRSpaceItem* pLRSpaceItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
-    std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
-
-    const SvxLongULSpaceItem* pULSpaceItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
-    std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
-
-    {
-        bool bIsLandscape = false;
-        if ( pPageSizeItem->GetSize().Width() > pPageSizeItem->GetSize().Height())
-            bIsLandscape = true;
-
-        // toggle page orientation
-        pPageItem->SetLandscape(!bIsLandscape);
-
-
-        // swap the width and height of the page size
-        const tools::Long nRotatedWidth = pPageSizeItem->GetSize().Height();
-        const tools::Long nRotatedHeight = pPageSizeItem->GetSize().Width();
-        pPageSizeItem->SetSize(Size(nRotatedWidth, nRotatedHeight));
-
-
-        // apply changed attributes
-        if (SfxViewShell::Current())
-        {
-            SfxViewShell::Current()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_SIZE,
-                SfxCallMode::RECORD, { pPageSizeItem.get(), pPageItem.get() });
-        }
-    }
-
-
-    // check, if margin values still fit to the changed page size.
-    // if not, adjust margin values
-    {
-        const tools::Long nML = pPageLRMarginItem->GetLeft();
-        const tools::Long nMR = pPageLRMarginItem->GetRight();
-        const tools::Long nTmpPW = nML + nMR + MINBODY;
-
-        const tools::Long nPW  = pPageSizeItem->GetSize().Width();
-
-        if ( nTmpPW > nPW )
-        {
-            if ( nML <= nMR )
-            {
-                ExecuteMarginLRChange( pPageLRMarginItem->GetLeft(), nMR - (nTmpPW - nPW ), pPageLRMarginItem.get() );
-            }
-            else
-            {
-                ExecuteMarginLRChange( nML - (nTmpPW - nPW ), pPageLRMarginItem->GetRight(), pPageLRMarginItem.get() );
-            }
-        }
-
-        const tools::Long nMT = pPageULMarginItem->GetUpper();
-        const tools::Long nMB = pPageULMarginItem->GetLower();
-        const tools::Long nTmpPH = nMT + nMB + MINBODY;
-
-        const tools::Long nPH  = pPageSizeItem->GetSize().Height();
-
-        if ( nTmpPH > nPH )
-        {
-            if ( nMT <= nMB )
-            {
-                ExecuteMarginULChange( pPageULMarginItem->GetUpper(), nMB - ( nTmpPH - nPH ), pPageULMarginItem.get() );
-            }
-            else
-            {
-                ExecuteMarginULChange( nMT - ( nTmpPH - nPH ), pPageULMarginItem->GetLower(), pPageULMarginItem.get() );
-            }
-        }
-    }
-
-    if ( mxUndoManager.is() )
-        mxUndoManager->leaveUndoContext();
 }
 
 void toggleOrientation(
@@ -1238,6 +1121,7 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
 static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
                               unsigned char* pBuffer,
                               const int nPart,
+                              const int nMode,
                               const int nCanvasWidth, const int nCanvasHeight,
                               const int nTilePosX, const int nTilePosY,
                               const int nTileWidth, const int nTileHeight);
@@ -3269,6 +3153,37 @@ static char* lo_extractRequest(LibreOfficeKit* /*pThis*/, const char* pFilePath)
 static void lo_trimMemory(LibreOfficeKit* /* pThis */, int nTarget)
 {
     vcl::lok::trimMemory(nTarget);
+
+    if (nTarget > 2000)
+    {
+        SolarMutexGuard aGuard;
+
+        // Flush all buffered VOC primitives from the pages.
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        if (pViewShell)
+        {
+            const SdrView* pView = pViewShell->GetDrawView();
+            if (pView)
+            {
+                SdrPageView* pPageView = pView->GetSdrPageView();
+                if (pPageView)
+                {
+                    SdrPage* pCurPage = pPageView->GetPage();
+                    if (pCurPage)
+                    {
+                        SdrModel& sdrModel = pCurPage->getSdrModelFromSdrPage();
+                        for (sal_uInt16 i = 0; i < sdrModel.GetPageCount(); ++i)
+                        {
+                            SdrPage* pPage = sdrModel.GetPage(i);
+                            if (pPage)
+                                pPage->GetViewContact().flushViewObjectContacts();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (nTarget > 1000)
     {
 #ifdef HAVE_MALLOC_TRIM
@@ -3391,6 +3306,23 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
 
         bool bFullSheetPreview = sFullSheetPreview == u"true";
 
+        OUString filePassword;
+        if ((aIndex = aFilterOptions.indexOf(",Password=")) >= 0)
+        {
+            int bIndex = aFilterOptions.indexOf("PASSWORDEND");
+            filePassword = aFilterOptions.subView(aIndex + 10, bIndex - (aIndex + 10));
+            aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex))
+                             + aFilterOptions.subView(bIndex + 11);
+        }
+        OUString filePasswordToModify;
+        if ((aIndex = aFilterOptions.indexOf(",PasswordToModify=")) >= 0)
+        {
+            int bIndex = aFilterOptions.indexOf("PASSWORDTOMODIFYEND");
+            filePassword = aFilterOptions.subView(aIndex + 18, bIndex - (aIndex + 18));
+            aFilterOptions = OUString::Concat(aFilterOptions.subView(0, aIndex))
+                             + aFilterOptions.subView(bIndex + 19);
+        }
+
         // Select a pdf version if specified a valid one. If not specified then ignore.
         // If invalid then fail.
         sal_Int32 pdfVer = 0;
@@ -3465,6 +3397,10 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
         {
             aSaveMediaDescriptor["FilterData"] <<= aFilterDataMap.getAsConstPropertyValueList();
         }
+        if (!filePassword.isEmpty())
+            aSaveMediaDescriptor["Password"] <<= filePassword;
+        if (!filePasswordToModify.isEmpty())
+            aSaveMediaDescriptor["PasswordToModify"] <<= filePasswordToModify;
 
         // add interaction handler too
         if (gImpl)
@@ -3709,6 +3645,9 @@ static void doc_iniUnoCommands ()
         OUString(".uno:GroupSparklines"),
         OUString(".uno:UngroupSparklines"),
         OUString(".uno:FormatSparklineMenu"),
+        OUString(".uno:DataDataPilotRun"),
+        OUString(".uno:RecalcPivotTable"),
+        OUString(".uno:DeletePivotTable"),
         OUString(".uno:Protect"),
         OUString(".uno:UnsetCellsReadOnly"),
         OUString(".uno:ContentControlProperties"),
@@ -4108,6 +4047,7 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
 static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
                               unsigned char* pBuffer,
                               const int nPart,
+                              const int nMode,
                               const int nCanvasWidth, const int nCanvasHeight,
                               const int nTilePosX, const int nTilePosY,
                               const int nTileWidth, const int nTileHeight)
@@ -4117,13 +4057,20 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
-    SAL_INFO( "lok.tiledrendering", "paintPartTile: painting @ " << nPart << " ["
+    SAL_INFO( "lok.tiledrendering", "paintPartTile: painting @ " << nPart << " : " << nMode << " ["
                << nTileWidth << "x" << nTileHeight << "]@("
                << nTilePosX << ", " << nTilePosY << ") to ["
                << nCanvasWidth << "x" << nCanvasHeight << "]px" );
 
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
     int nOrigViewId = doc_getView(pThis);
+
+    ITiledRenderable* pDoc = getTiledRenderable(pThis);
+    if (!pDoc)
+    {
+        SetLastExceptionMsg("Document doesn't support tiled rendering");
+        return;
+    }
 
     if (nOrigViewId < 0)
     {
@@ -4157,39 +4104,66 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
         int nOrigPart = 0;
         const int aType = doc_getDocumentType(pThis);
         const bool isText = (aType == LOK_DOCTYPE_TEXT);
+        const bool isCalc = (aType == LOK_DOCTYPE_SPREADSHEET);
+        int nOrigEditMode = 0;
+        bool bPaintTextEdit = true;
         int nViewId = nOrigViewId;
-        int nLastNonEditorView = nViewId;
+        int nLastNonEditorView = -1;
+        int nViewMatchingMode = -1;
+        SfxViewShell* pCurrentViewShell = SfxViewShell::Current();
+
         if (!isText)
         {
             // Check if just switching to another view is enough, that has
             // less side-effects.
-            if (nPart != doc_getPart(pThis))
+            if (nPart != doc_getPart(pThis) || nMode != pDoc->getEditMode())
             {
                 SfxViewShell* pViewShell = SfxViewShell::GetFirst();
                 while (pViewShell)
                 {
                     bool bIsInEdit = pViewShell->GetDrawView() &&
                         pViewShell->GetDrawView()->GetTextEditOutliner();
-                    if (!bIsInEdit)
+
+                    OString sCurrentViewRenderState = pDoc->getViewRenderState(pCurrentViewShell);
+                    OString sNewRenderState = pDoc->getViewRenderState(pViewShell);
+
+                    if (sCurrentViewRenderState == sNewRenderState && !bIsInEdit)
                         nLastNonEditorView = pViewShell->GetViewShellId().get();
 
-                    if (pViewShell->getPart() == nPart && !bIsInEdit)
+                    if (pViewShell->getPart() == nPart &&
+                        pViewShell->getEditMode() == nMode &&
+                        sCurrentViewRenderState == sNewRenderState &&
+                        !bIsInEdit)
                     {
                         nViewId = pViewShell->GetViewShellId().get();
+                        nViewMatchingMode = nViewId;
                         nLastNonEditorView = nViewId;
                         doc_setView(pThis, nViewId);
                         break;
                     }
+                    else if (pViewShell->getEditMode() == nMode && sCurrentViewRenderState == sNewRenderState && !bIsInEdit)
+                    {
+                        nViewMatchingMode = pViewShell->GetViewShellId().get();
+                    }
+
                     pViewShell = SfxViewShell::GetNext(*pViewShell);
                 }
             }
 
-            // if not found view with correct part - at least avoid rendering active textbox
-            SfxViewShell* pCurrentViewShell = SfxViewShell::Current();
-            if (pCurrentViewShell && pCurrentViewShell->GetDrawView() &&
+            // if not found view with correct part
+            // - at least avoid rendering active textbox, This is for Impress.
+            // - prefer view with the same mode
+            if (nViewMatchingMode >= 0 && nViewMatchingMode != nViewId)
+            {
+                nViewId = nViewMatchingMode;
+                doc_setView(pThis, nViewId);
+            }
+            else if (!isCalc && nLastNonEditorView >= 0 && nLastNonEditorView != nViewId &&
+                pCurrentViewShell && pCurrentViewShell->GetDrawView() &&
                 pCurrentViewShell->GetDrawView()->GetTextEditOutliner())
             {
-                doc_setView(pThis, nLastNonEditorView);
+                nViewId = nLastNonEditorView;
+                doc_setView(pThis, nViewId);
             }
 
             // Disable callbacks while we are painting - after setting the view
@@ -4205,36 +4179,44 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
             {
                 doc_setPartImpl(pThis, nPart, false);
             }
-        }
 
-        ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        if (!pDoc)
-        {
-            SetLastExceptionMsg("Document doesn't support tiled rendering");
-            return;
-        }
+            nOrigEditMode = pDoc->getEditMode();
+            if (nOrigEditMode != nMode)
+            {
+                SfxLokHelper::setEditMode(nMode, pDoc);
+            }
 
-        bool bPaintTextEdit = nPart == nOrigPart;
-        pDoc->setPaintTextEdit( bPaintTextEdit );
+            bPaintTextEdit = (nPart == nOrigPart && nMode == nOrigEditMode);
+            pDoc->setPaintTextEdit(bPaintTextEdit);
+        }
 
         doc_paintTile(pThis, pBuffer, nCanvasWidth, nCanvasHeight, nTilePosX, nTilePosY, nTileWidth, nTileHeight);
 
-        pDoc->setPaintTextEdit( true );
+        if (!isText)
+        {
+            pDoc->setPaintTextEdit(true);
 
-        if (!isText && nPart != nOrigPart)
-        {
-            doc_setPartImpl(pThis, nOrigPart, false);
-        }
-        if (!isText && nViewId != nOrigViewId)
-        {
-            if (nViewId >= 0)
+            if (nMode != nOrigEditMode)
             {
-                const auto handlerIt = pDocument->mpCallbackFlushHandlers.find(nViewId);
-                if (handlerIt != pDocument->mpCallbackFlushHandlers.end())
-                    handlerIt->second->enableCallbacks();
+                SfxLokHelper::setEditMode(nOrigEditMode, pDoc);
             }
 
-            doc_setView(pThis, nOrigViewId);
+            if (nPart != nOrigPart)
+            {
+                doc_setPartImpl(pThis, nOrigPart, false);
+            }
+
+            if (nViewId != nOrigViewId)
+            {
+                if (nViewId >= 0)
+                {
+                    const auto handlerIt = pDocument->mpCallbackFlushHandlers.find(nViewId);
+                    if (handlerIt != pDocument->mpCallbackFlushHandlers.end())
+                        handlerIt->second->enableCallbacks();
+                }
+
+                doc_setView(pThis, nOrigViewId);
+            }
         }
     }
     catch (const std::exception&)
@@ -4945,6 +4927,21 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     {
         volatile int* p = 0;
         *p = 0;
+    }
+
+    // MACRO-1212: batch track change updates in a single action
+    if (gImpl && aCommand == ".uno:BatchTrackChange")
+    {
+        for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
+        {
+            if (rPropValue.Name == "Accept" || rPropValue.Name == "Reject")
+            {
+                ITiledRenderable* pDoc = getTiledRenderable(pThis);
+                pDoc->batchUpdateTrackChange(rPropValue.Value.get<css::uno::Sequence<sal_uInt32>>(), rPropValue.Name == "Accept");
+                return;
+            }
+        }
+        return;
     }
 
     if (gImpl && aCommand == ".uno:CreateTable")

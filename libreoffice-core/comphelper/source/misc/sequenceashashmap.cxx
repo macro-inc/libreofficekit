@@ -356,6 +356,19 @@ std::vector<css::beans::PropertyValue> JsonToPropertyValues(const OString& rJson
                 aValue.Value <<= aSeqByte;
             }
         }
+        else if (rType == "[]uint32")
+        {
+            aNodeValue = rPair.second.get_child("value", aNodeNull);
+            if (aNodeValue != aNodeNull && !aNodeValue.empty())
+            {
+                std::vector<sal_uInt32> aSeqUint32;
+                for (const auto& item : aNodeValue)
+                {
+                    aSeqUint32.push_back(item.second.get_value<sal_uInt32>());
+                }
+                aValue.Value <<= comphelper::containerToSequence(aSeqUint32);
+            }
+        }
         else if (rType == "[]any")
         {
             aNodeValue = rPair.second.get_child("value", aNodeNull);
