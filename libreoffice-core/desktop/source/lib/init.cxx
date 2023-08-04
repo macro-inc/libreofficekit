@@ -186,9 +186,6 @@
 #include <vcl/uitest/uiobject.hxx>
 #include <vcl/jsdialog/executor.hxx>
 
-// Needed for getUndoManager()
-#include <com/sun/star/document/XUndoManager.hpp>
-#include <com/sun/star/document/XUndoManagerSupplier.hpp>
 #include <com/sun/star/document/XLinkTargetSupplier.hpp>
 #include <editeng/sizeitem.hxx>
 #include <svx/rulritem.hxx>
@@ -850,23 +847,6 @@ OUString lcl_getCurrentDocumentMimeType(const LibLODocument_Impl* pDocument)
     return pFilter->GetMimeType();
 }
 
-// Gets an undo manager to enter and exit undo context. Needed by ToggleOrientation
-css::uno::Reference< css::document::XUndoManager > getUndoManager( const css::uno::Reference< css::frame::XFrame >& rxFrame )
-{
-    const css::uno::Reference< css::frame::XController >& xController = rxFrame->getController();
-    if ( xController.is() )
-    {
-        const css::uno::Reference< css::frame::XModel >& xModel = xController->getModel();
-        if ( xModel.is() )
-        {
-            const css::uno::Reference< css::document::XUndoManagerSupplier > xSuppUndo( xModel, css::uno::UNO_QUERY_THROW );
-            return css::uno::Reference< css::document::XUndoManager >( xSuppUndo->getUndoManager(), css::uno::UNO_SET_THROW );
-        }
-    }
-
-    return css::uno::Reference< css::document::XUndoManager > ();
-}
-
 // Adjusts page margins for Writer doc. Needed by ToggleOrientation
 void ExecuteMarginLRChange(
     const tools::Long nPageLeftMargin,
@@ -1000,107 +980,6 @@ void setPageMargins(
     }
 
     pThis->pClass->setPart(pThis, pOriginalPart);
-}
-
-//
-// Main function which toggles page orientation of the Writer doc. Needed by ToggleOrientation
-void ExecuteOrientationChange()
-{
-    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-    if (!pViewFrm)
-        return;
-
-    std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
-
-    // 1mm in twips rounded
-    // This should be in sync with MINBODY in sw/source/uibase/sidebar/PageMarginControl.hxx
-    constexpr tools::Long MINBODY = o3tl::toTwips(1, o3tl::Length::mm);
-
-    css::uno::Reference< css::document::XUndoManager > mxUndoManager(
-                getUndoManager( pViewFrm->GetFrame().GetFrameInterface() ) );
-
-    if ( mxUndoManager.is() )
-        mxUndoManager->enterUndoContext( "" );
-
-
-    const SvxSizeItem* pSizeItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
-    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
-
-    const SvxLongLRSpaceItem* pLRSpaceItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
-    std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
-
-    const SvxLongULSpaceItem* pULSpaceItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
-    std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
-
-    {
-        bool bIsLandscape = false;
-        if ( pPageSizeItem->GetSize().Width() > pPageSizeItem->GetSize().Height())
-            bIsLandscape = true;
-
-        // toggle page orientation
-        pPageItem->SetLandscape(!bIsLandscape);
-
-
-        // swap the width and height of the page size
-        const tools::Long nRotatedWidth = pPageSizeItem->GetSize().Height();
-        const tools::Long nRotatedHeight = pPageSizeItem->GetSize().Width();
-        pPageSizeItem->SetSize(Size(nRotatedWidth, nRotatedHeight));
-
-
-        // apply changed attributes
-        if (SfxViewShell::Current())
-        {
-            SfxViewShell::Current()->GetDispatcher()->ExecuteList(SID_ATTR_PAGE_SIZE,
-                SfxCallMode::RECORD, { pPageSizeItem.get(), pPageItem.get() });
-        }
-    }
-
-
-    // check, if margin values still fit to the changed page size.
-    // if not, adjust margin values
-    {
-        const tools::Long nML = pPageLRMarginItem->GetLeft();
-        const tools::Long nMR = pPageLRMarginItem->GetRight();
-        const tools::Long nTmpPW = nML + nMR + MINBODY;
-
-        const tools::Long nPW  = pPageSizeItem->GetSize().Width();
-
-        if ( nTmpPW > nPW )
-        {
-            if ( nML <= nMR )
-            {
-                ExecuteMarginLRChange( pPageLRMarginItem->GetLeft(), nMR - (nTmpPW - nPW ), pPageLRMarginItem.get() );
-            }
-            else
-            {
-                ExecuteMarginLRChange( nML - (nTmpPW - nPW ), pPageLRMarginItem->GetRight(), pPageLRMarginItem.get() );
-            }
-        }
-
-        const tools::Long nMT = pPageULMarginItem->GetUpper();
-        const tools::Long nMB = pPageULMarginItem->GetLower();
-        const tools::Long nTmpPH = nMT + nMB + MINBODY;
-
-        const tools::Long nPH  = pPageSizeItem->GetSize().Height();
-
-        if ( nTmpPH > nPH )
-        {
-            if ( nMT <= nMB )
-            {
-                ExecuteMarginULChange( pPageULMarginItem->GetUpper(), nMB - ( nTmpPH - nPH ), pPageULMarginItem.get() );
-            }
-            else
-            {
-                ExecuteMarginULChange( nMT - ( nTmpPH - nPH ), pPageULMarginItem->GetLower(), pPageULMarginItem.get() );
-            }
-        }
-    }
-
-    if ( mxUndoManager.is() )
-        mxUndoManager->leaveUndoContext();
 }
 
 void toggleOrientation(
