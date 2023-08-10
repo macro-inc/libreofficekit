@@ -975,6 +975,41 @@ CPPUNIT_TEST_FIXTURE(Test, testSplitFlyNoFooterOverlap)
     const SwSortedObjs& rPage2Objs = *pPage2->GetSortedObjs();
     CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rPage2Objs.size());
 }
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyGrowFromBottom)
+{
+    // Given a document with a floating table that grows from the bottom:
+    createSwDoc("floattable-from-bottom.docx");
+
+    // When calculating the layout:
+    calcLayout();
+
+    // Then make sure that such a floating table is not split, matching Word:
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = dynamic_cast<SwPageFrame*>(pLayout->Lower());
+    CPPUNIT_ASSERT(pPage1);
+    CPPUNIT_ASSERT(pPage1->GetSortedObjs());
+    const SwSortedObjs& rPage1Objs = *pPage1->GetSortedObjs();
+    const auto pFly = dynamic_cast<SwFlyAtContentFrame*>(rPage1Objs[0]);
+    // Without the accompanying fix in place, this test would have failed, we tried to split the fly
+    // frame on page 1 even when it would fit, and this lead to a crash on export later.
+    CPPUNIT_ASSERT(!pFly->GetFollow());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyIntoTable)
+{
+    // Given a document with a floating table, then an inline table on the next page:
+    createSwDoc("floattable-then-table.doc");
+
+    // When inserting a page break:
+    // Then make sure the layout doesn't crash:
+    SwWrtShell* pWrtShell = getSwDocShell()->GetWrtShell();
+    pWrtShell->InsertPageBreak();
+    // Without the accompanying fix in place, this test would have crashed, we tried to insert the
+    // second part of a floating table into a table on the next page, not before that table.
+    calcLayout();
+}
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
