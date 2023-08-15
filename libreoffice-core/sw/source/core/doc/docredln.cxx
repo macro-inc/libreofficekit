@@ -342,15 +342,13 @@ bool lcl_LOKRedlineNotificationEnabled()
 /// Emits LOK notification about one addition / removal of a redline item.
 void SwRedlineTable::LOKRedlineNotification(RedlineNotification nType, SwRangeRedline* pRedline)
 {
-    // do not notify for documents that don't have a shell/view
-    SwDocShell* pDocSh = pRedline->GetDoc().GetDocShell();
-    if (!pDocSh) {
+    /* // do not notify for documents that don't have a shell/view */
+    SwView* pView = dynamic_cast<SwView*>(SfxViewShell::Current());
+    if (!pView)
         return;
-    }
-    SwView* pView = pDocSh->GetView();
-    if (!pView) {
+    SwDocShell* pDocSh = pView->GetDocShell();
+    if (!pDocSh)
         return;
-    }
 
     // Disable since usability is very low beyond some small number of changes.
     if (!lcl_LOKRedlineNotificationEnabled())
