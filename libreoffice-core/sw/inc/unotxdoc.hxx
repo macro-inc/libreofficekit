@@ -483,6 +483,9 @@ public:
     /// @see vcl::ITiledRenderable::batchUpdateTrackChange().
     void batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& rArguments, bool accept) override;
 
+    // MACRO-1392: Request layout updates for redlines
+    void updateRedlines( const css::uno::Sequence<sal_uInt32>& rArguments) override;
+
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
     SwXDocumentPropertyHelper * GetPropertyHelper ();
