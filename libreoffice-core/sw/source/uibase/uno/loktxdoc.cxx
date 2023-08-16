@@ -612,4 +612,21 @@ void SwXTextDocument::batchUpdateTrackChange( const css::uno::Sequence<sal_uInt3
     mrSh->EndUndo(undoId, nullptr);
 }
 
+// MACRO-1392: Request layout updates for redlines
+void SwXTextDocument::updateRedlines( const css::uno::Sequence<sal_uInt32>& rArguments) {
+    SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
+    SwDoc *pDoc = mrSh->GetDoc();
+
+    for (sal_uInt32 id : rArguments) {
+        const SwRedlineTable& rRedlineTable = pDoc->getIDocumentRedlineAccess().GetRedlineTable();
+        bool found = false;
+        for (SwRedlineTable::size_type i = 0; !found && i < rRedlineTable.size(); ++i)
+        {
+            if (id == rRedlineTable[i]->GetId()) {
+                found = true;
+                SwRedlineTable::LOKRedlineNotification(RedlineNotification::Modify, rRedlineTable[i]);
+            }
+        }
+    }
+}
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
