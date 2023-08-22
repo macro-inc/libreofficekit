@@ -72,6 +72,7 @@ $(eval $(call gb_Library_use_libraries,sc,\
     dbtools \
     drawinglayercore \
     drawinglayer \
+    docmodel \
     editeng \
     for \
     forui \
@@ -539,6 +540,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/ui/StatisticsDialogs/TableFillingAndNavigationTools \
     sc/source/ui/StatisticsDialogs/TTestDialog \
     sc/source/ui/StatisticsDialogs/ZTestDialog \
+    sc/source/ui/theme/ThemeColorChanger \
     sc/source/ui/uitest/uiobject \
     sc/source/ui/undo/areasave \
     sc/source/ui/undo/refundo \
