@@ -8,7 +8,6 @@
  */
 
 #include <svx/dialog/ThemeDialog.hxx>
-#include <svx/dialog/ThemeColorEditDialog.hxx>
 #include <docmodel/theme/ColorSet.hxx>
 #include <docmodel/theme/Theme.hxx>
 #include <svx/ColorSets.hxx>
@@ -44,7 +43,11 @@ ThemeDialog::ThemeDialog(weld::Window* pParent, model::Theme* pTheme)
     }
 }
 
-ThemeDialog::~ThemeDialog() = default;
+ThemeDialog::~ThemeDialog()
+{
+    if (mxSubDialog)
+        mxSubDialog->response(RET_CANCEL);
+}
 
 void ThemeDialog::initColorSets()
 {
@@ -85,15 +88,19 @@ IMPL_LINK_NOARG(ThemeDialog, SelectItem, ValueSet*, void)
 
 void ThemeDialog::runThemeColorEditDialog()
 {
-    auto pDialog = std::make_shared<svx::ThemeColorEditDialog>(mpWindow, *mpCurrentColorSet);
-    std::shared_ptr<DialogController> xKeepAlive(shared_from_this());
-    weld::DialogController::runAsync(pDialog, [this, xKeepAlive, pDialog](sal_uInt32 nResult) {
+    if (mxSubDialog)
+        return;
+
+    mxSubDialog = std::make_shared<svx::ThemeColorEditDialog>(mpWindow, *mpCurrentColorSet);
+
+    weld::DialogController::runAsync(mxSubDialog, [this](sal_uInt32 nResult) {
         if (nResult != RET_OK)
         {
             mxAdd->set_sensitive(true);
+            mxSubDialog = nullptr;
             return;
         }
-        auto aColorSet = pDialog->getColorSet();
+        auto aColorSet = mxSubDialog->getColorSet();
         if (!aColorSet.getName().isEmpty())
         {
             ColorSets::get().insert(aColorSet, ColorSets::IdenticalNameAction::AutoRename);
@@ -107,15 +114,16 @@ void ThemeDialog::runThemeColorEditDialog()
                 = std::make_shared<model::ColorSet>(maColorSets[maColorSets.size() - 1]);
         }
         mxAdd->set_sensitive(true);
+        mxSubDialog = nullptr;
     });
 }
 
 IMPL_LINK(ThemeDialog, ButtonClicked, weld::Button&, rButton, void)
 {
+    mxAdd->set_sensitive(false);
     if (mpCurrentColorSet && mxAdd.get() == &rButton)
     {
         runThemeColorEditDialog();
-        mxAdd->set_sensitive(false);
     }
 }
 
