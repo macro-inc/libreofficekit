@@ -38,12 +38,16 @@
 
 namespace sw
 {
+
+namespace {
+constexpr sal_uInt64 kDebounceRateMilliseconds = 350;
+}
+
 DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
     : m_rDoc(i_rSwdoc)
     , m_nIdleBlockCount(0)
     , m_bStartOnUnblock(false)
     , m_aDocIdle(i_rSwdoc, "sw::DocumentTimerManager m_aDocIdle")
-    , m_aFireIdleJobsTimer("sw::DocumentTimerManager m_aFireIdleJobsTimer")
     , m_bWaitForLokInit(true)
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
@@ -54,20 +58,16 @@ void DocumentTimerManager::StartIdling()
 {
     if (m_bWaitForLokInit && comphelper::LibreOfficeKit::isActive())
     {
-        // Start the idle jobs only after a certain delay.
         StopIdling();
         return;
     }
 
     m_bWaitForLokInit = false;
     m_bStartOnUnblock = true;
+    // debounce
     if (0 == m_nIdleBlockCount)
     {
-        if (!m_aDocIdle.IsActive()) {
-            SAL_INFO("lok.load","START IDLE");
-            m_aDocIdle.Start();
-        } else
-            Scheduler::Wakeup();
+        m_aDocIdle.Start();
     }
 }
 
@@ -76,6 +76,7 @@ void DocumentTimerManager::StopIdling()
     // SAL_INFO("lok.load","STOP IDLE");
     m_bStartOnUnblock = false;
     m_aDocIdle.Stop();
+    m_aDocIdle.SetTimeout(kDebounceRateMilliseconds);
 }
 
 void DocumentTimerManager::BlockIdling()
@@ -92,10 +93,7 @@ void DocumentTimerManager::UnblockIdling()
 
     if (0 == osl_atomic_decrement(&m_nIdleBlockCount) && m_bStartOnUnblock)
     {
-        if (!m_aDocIdle.IsActive())
-            m_aDocIdle.Start();
-        else
-            Scheduler::Wakeup();
+        m_aDocIdle.Start();
     }
 }
 
@@ -165,9 +163,7 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         for ( auto pLayout : m_rDoc.GetAllLayouts() )
             if( pLayout->IsIdleFormat() )
             {
-                SAL_INFO("lok.load","Start Layout Idle");
                 pLayout->GetCurrShell()->LayoutIdle();
-                SAL_INFO("lok.load","Stop Layout Idle");
                 break;
             }
          break;
@@ -223,9 +219,13 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
 
 DocumentTimerManager::~DocumentTimerManager() {}
 
-void DocumentTimerManager::MarkLOKInitialized()
+void DocumentTimerManager::MarkLOKIdle()
 {
-    // m_bWaitForLokInit = false;
+    bool wasWaiting = m_bWaitForLokInit;
+    if (wasWaiting && !m_aDocIdle.IsActive()) {
+        m_aDocIdle.SetTimeout(kDebounceRateMilliseconds);
+    }
+    m_bWaitForLokInit = false;
 }
 
 }

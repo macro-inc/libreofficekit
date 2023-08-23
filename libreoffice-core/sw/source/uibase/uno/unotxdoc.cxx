@@ -3169,7 +3169,7 @@ void SAL_CALL SwXTextDocument::render(
         m_pRenderData.reset();
         m_pPrintUIOptions.reset();
     }
-    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKInitialized();
+    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKIdle();
 }
 
 // xforms::XFormsSupplier
@@ -3238,7 +3238,7 @@ void SwXTextDocument::paintTile( VirtualDevice &rDevice,
                                  tools::Long nTileWidth, tools::Long nTileHeight )
 {
     SwViewShell* pViewShell = m_pDocShell->GetWrtShell();
-    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKInitialized();
+    m_pDocShell->GetDoc()->getIDocumentTimerAccess().MarkLOKIdle();
     pViewShell->PaintTile(rDevice, nOutputWidth, nOutputHeight,
                           nTilePosX, nTilePosY, nTileWidth, nTileHeight);
 

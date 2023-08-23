@@ -19,7 +19,7 @@
 #ifndef INCLUDED_SW_INC_SWDOCIDLE_HXX
 #define INCLUDED_SW_INC_SWDOCIDLE_HXX
 
-#include <vcl/idle.hxx>
+#include <vcl/timer.hxx>
 
 class SwDoc;
 
@@ -33,7 +33,7 @@ namespace sw
  * quite probably not a problem, as busy documents have a high chance to have
  * generated idle tasks.
  */
-class SwDocIdle final : public Idle
+class SwDocIdle final : public Timer
 {
 private:
     SwDoc& m_rDoc;
