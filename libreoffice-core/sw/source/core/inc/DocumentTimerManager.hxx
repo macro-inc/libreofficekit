@@ -56,8 +56,7 @@ public:
 
     bool IsDocIdle() const override;
 
-    void MarkLOKInitialized() override;
-
+    void MarkLOKIdle() override;
 private:
     DocumentTimerManager(DocumentTimerManager const&) = delete;
     DocumentTimerManager& operator=(DocumentTimerManager const&) = delete;
@@ -71,7 +70,6 @@ private:
     oslInterlockedCount m_nIdleBlockCount; ///< Don't run the Idle, if > 0
     bool m_bStartOnUnblock; ///< true, if the last unblock should start the timer
     SwDocIdle m_aDocIdle;
-    Timer m_aFireIdleJobsTimer;
     bool m_bWaitForLokInit; ///< true if we waited for LOK to initialize already.
 };
 

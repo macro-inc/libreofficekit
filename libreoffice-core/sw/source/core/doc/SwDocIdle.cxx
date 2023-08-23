@@ -30,32 +30,33 @@
 namespace sw
 {
 
-sal_uInt64 SwDocIdle::UpdateMinPeriod( sal_uInt64 /* nTimeNow */ ) const
+sal_uInt64 SwDocIdle::UpdateMinPeriod(sal_uInt64 nTimeNow) const
 {
     bool bReadyForSchedule = true;
 
     SwView* pView = m_rDoc.GetDocShell() ? m_rDoc.GetDocShell()->GetView() : nullptr;
-    if( pView )
+    if (pView)
     {
         SwWrtShell& rWrtShell = pView->GetWrtShell();
         bReadyForSchedule = rWrtShell.GetViewOptions()->IsIdle();
     }
 
-    if( bReadyForSchedule && !m_rDoc.getIDocumentTimerAccess().IsDocIdle() )
+    if (bReadyForSchedule && !m_rDoc.getIDocumentTimerAccess().IsDocIdle())
         bReadyForSchedule = false;
 
-    return bReadyForSchedule
-        ? Scheduler::ImmediateTimeoutMs : Scheduler::InfiniteTimeoutMs;
+    if (!bReadyForSchedule)
+        return Scheduler::InfiniteTimeoutMs;
+
+    return Timer::UpdateMinPeriod(nTimeNow);
 }
 
-SwDocIdle::SwDocIdle( SwDoc &doc, const char * pDebugIdleName )
-    : Idle(pDebugIdleName), m_rDoc( doc )
+SwDocIdle::SwDocIdle(SwDoc& doc, const char* pDebugIdleName)
+    : Timer(pDebugIdleName)
+    , m_rDoc(doc)
 {
 }
 
-SwDocIdle::~SwDocIdle()
-{
-}
+SwDocIdle::~SwDocIdle() {}
 
 }
 
