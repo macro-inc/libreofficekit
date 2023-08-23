@@ -224,7 +224,7 @@ static bool lcl_ChgHyperLinkColor( const SwTextAttr& rAttr,
         } else if(aDestinationURL.startsWith(macro_internal::SECTION_URL)){
             // Sections are by default not highlighted a particular color
             return false;
-        } else if (aDestinationURL.startsWith(macro_internal::SECTION_URL)) {
+        } else if (aDestinationURL.startsWith(macro_internal::SECTION_REF_URL)) {
             if(pColor)
             {
                 *pColor = COL_PIP_SECTION_REF;
