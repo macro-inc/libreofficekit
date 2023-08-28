@@ -370,7 +370,7 @@ void SwRedlineTable::LOKRedlineNotification(RedlineNotification nType, SwRangeRe
     aRedline.put("author", pRedline->GetAuthorString(1).toUtf8().getStr());
     aRedline.put("type", SwRedlineTypeToOUString(pRedline->GetRedlineData().GetType()).toUtf8().getStr());
     aRedline.put("comment", pRedline->GetRedlineData().GetComment().toUtf8().getStr());
-    aRedline.put("description", pRedline->GetDescr().toUtf8().getStr());
+    aRedline.put("description", pRedline->GetDescr(true).toUtf8().getStr());
     OUString sDateTime = utl::toISO8601(pRedline->GetRedlineData().GetTimeStamp().GetUNODateTime());
     aRedline.put("dateTime", sDateTime.toUtf8().getStr());
 
@@ -1996,8 +1996,22 @@ const SwRedlineData & SwRangeRedline::GetRedlineData(const sal_uInt16 nPos) cons
 
 OUString SwRangeRedline::GetDescr(bool bSimplified)
 {
-    // get description of redline data (e.g.: "insert $1")
-    OUString aResult = GetRedlineData().GetDescr();
+    switch (GetType()) {
+        case RedlineType::Insert:
+        case RedlineType::Delete:
+            break;
+        case RedlineType::Format:
+        case RedlineType::FmtColl:
+        case RedlineType::Table:
+        case RedlineType::ParagraphFormat:
+        case RedlineType::TableRowInsert:
+        case RedlineType::TableRowDelete:
+        case RedlineType::TableCellInsert:
+        case RedlineType::TableCellDelete:
+        case RedlineType::None:
+        case RedlineType::Any:
+            return OUString(GetRedlineData().GetDescr());
+    }
 
     SwPaM * pPaM = nullptr;
     bool bDeletePaM = false;
@@ -2024,13 +2038,16 @@ OUString SwRangeRedline::GetDescr(bool bSimplified)
         }
     }
 
+    // get description of redline data (e.g.: "insert $1")
+    OUString aResult;
+
     // replace $1 in description by description of the redlines text
     if (!bSimplified)
     {
         SwRewriter aRewriter;
         aRewriter.AddRule(UndoArg1, sDescr);
 
-        aResult = aRewriter.Apply(aResult);
+        aResult = aRewriter.Apply(GetRedlineData().GetDescr());
     }
     else
     {
