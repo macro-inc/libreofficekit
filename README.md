@@ -50,10 +50,10 @@
 
 ## macOS
 
-- [Download and install Xcode 13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip)
+- [Download and install Xcode 13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip). Note that you should have two versions of Xcode, and the 13.4.1 version should be named Xcode13.4.1 (according to the `DEVELOPER_DIR` env variable)
   ```shell
   # Accept the Xcode license:
-  sudo xcodebuild -license
+  sudo xcodebuild -license accept
   # Always the DEVELOPER_DIR before building
   export DEVELOPER_DIR=/Applications/Xcode13.4.1.app/Contents/Developer
   ```
@@ -62,7 +62,7 @@
 - Install dependencies using MacPorts:
 
   ```shell
-  sudo port install nasm autoconf automake gperf gpatch flex bison gmake
+  sudo port install nasm autoconf automake gperf gpatch flex bison gmake gettext
   ```
 
 Before running any build commands, you may have to adjust your path to prefer the `port`-installed versions (such as make):
