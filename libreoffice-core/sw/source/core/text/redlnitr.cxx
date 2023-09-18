@@ -871,14 +871,14 @@ void SwRedlineItr::FillHints( std::size_t nAuthor, RedlineType eType )
     switch ( eType )
     {
         case RedlineType::Insert:
-            SW_MOD()->GetInsertAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetInsertAuthorAttr(*m_pSet);
             break;
         case RedlineType::Delete:
-            SW_MOD()->GetDeletedAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetDeletedAuthorAttr(*m_pSet);
             break;
         case RedlineType::Format:
         case RedlineType::FmtColl:
-            SW_MOD()->GetFormatAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetFormatAuthorAttr(*m_pSet);
             break;
         default:
             break;

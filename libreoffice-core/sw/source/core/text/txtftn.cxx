@@ -1015,9 +1015,9 @@ SwNumberPortion *SwTextFormatter::NewFootnoteNumPortion( SwTextFormatInfo const 
                     : pRedline->GetAuthor();
 
             if ( RedlineType::Delete == pRedline->GetType() )
-                SW_MOD()->GetDeletedAuthorAttr(aAuthor, aSet);
+                SW_MOD()->GetDeletedAuthorAttr(aSet);
             else
-                SW_MOD()->GetInsertAuthorAttr(aAuthor, aSet);
+                SW_MOD()->GetInsertAuthorAttr(aSet);
 
             if (const SvxColorItem* pItem = aSet.GetItemIfSet(RES_CHRATR_COLOR))
                 pNumFnt->SetColor(pItem->GetValue());

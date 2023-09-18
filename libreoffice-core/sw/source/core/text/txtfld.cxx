@@ -628,9 +628,9 @@ static bool lcl_setRedlineAttr( SwTextFormatInfo &rInf, const SwTextNode& rTextN
             : pRedlineNum->GetAuthor();
 
     if ( RedlineType::Delete == pRedlineNum->GetType() )
-        SW_MOD()->GetDeletedAuthorAttr(aAuthor, aSet);
+        SW_MOD()->GetDeletedAuthorAttr(aSet);
     else
-        SW_MOD()->GetInsertAuthorAttr(aAuthor, aSet);
+        SW_MOD()->GetInsertAuthorAttr(aSet);
 
     if (const SvxColorItem* pItem = aSet.GetItemIfSet(RES_CHRATR_COLOR))
         pNumFnt->SetColor(pItem->GetValue());
