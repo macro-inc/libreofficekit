@@ -508,12 +508,12 @@ static void lcl_FillAuthorAttr( Color aCol, SfxItemSet &rSet, const AuthorCharAt
 
 void SwModule::GetInsertAuthorAttr(SfxItemSet &rSet)
 {
-    lcl_FillAuthorAttr( COL_BLUE, rSet, m_pModuleConfig->GetInsertAuthorAttr());
+    lcl_FillAuthorAttr( COL_BLUE_CLASSIC, rSet, m_pModuleConfig->GetInsertAuthorAttr());
 }
 
 void SwModule::GetDeletedAuthorAttr(SfxItemSet &rSet)
 {
-    lcl_FillAuthorAttr( COL_RED, rSet, m_pModuleConfig->GetDeletedAuthorAttr());
+    lcl_FillAuthorAttr( COL_RED_CLASSIC, rSet, m_pModuleConfig->GetDeletedAuthorAttr());
 }
 
 // For future extension:

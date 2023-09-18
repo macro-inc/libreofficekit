@@ -1010,10 +1010,6 @@ SwNumberPortion *SwTextFormatter::NewFootnoteNumPortion( SwTextFormatInfo const 
             SwAttrPool& rPool = pDoc->GetAttrPool();
             SfxItemSetFixed<RES_CHRATR_BEGIN, RES_CHRATR_END-1> aSet(rPool);
 
-            std::size_t aAuthor = (1 < pRedline->GetStackCount())
-                    ? pRedline->GetAuthor( 1 )
-                    : pRedline->GetAuthor();
-
             if ( RedlineType::Delete == pRedline->GetType() )
                 SW_MOD()->GetDeletedAuthorAttr(aSet);
             else
