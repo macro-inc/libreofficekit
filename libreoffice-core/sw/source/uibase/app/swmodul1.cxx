@@ -428,18 +428,6 @@ void SwModule::ClearRedlineAuthors()
     m_pAuthorNames.clear();
 }
 
-static Color lcl_GetAuthorColor(std::size_t nPos)
-{
-    static const Color aColArr[] =
-    {
-        COL_AUTHOR1_DARK, COL_AUTHOR2_DARK, COL_AUTHOR3_DARK,
-        COL_AUTHOR4_DARK, COL_AUTHOR5_DARK, COL_AUTHOR6_DARK,
-        COL_AUTHOR7_DARK, COL_AUTHOR8_DARK, COL_AUTHOR9_DARK
-    };
-
-    return aColArr[nPos % SAL_N_ELEMENTS(aColArr)];
-}
-
 /// Returns a JSON representation of a redline author.
 void SwModule::GetRedlineAuthorInfo(tools::JsonWriter& rJsonWriter)
 {
@@ -449,7 +437,6 @@ void SwModule::GetRedlineAuthorInfo(tools::JsonWriter& rJsonWriter)
         auto authorNode = rJsonWriter.startStruct();
         rJsonWriter.put("index", static_cast<sal_Int64>(nAuthor));
         rJsonWriter.put("name", m_pAuthorNames[nAuthor]);
-        rJsonWriter.put("color", sal_uInt32(lcl_GetAuthorColor(nAuthor)));
     }
 }
 
