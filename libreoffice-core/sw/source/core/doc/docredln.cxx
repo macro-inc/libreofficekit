@@ -1999,8 +1999,8 @@ OUString SwRangeRedline::GetDescr(bool bSimplified)
     switch (GetType()) {
         case RedlineType::Insert:
         case RedlineType::Delete:
-            break;
         case RedlineType::Format:
+            break;
         case RedlineType::FmtColl:
         case RedlineType::Table:
         case RedlineType::ParagraphFormat:
@@ -2011,6 +2011,40 @@ OUString SwRangeRedline::GetDescr(bool bSimplified)
         case RedlineType::None:
         case RedlineType::Any:
             return OUString(GetRedlineData().GetDescr());
+    }
+
+    if(GetType() == RedlineType::Format)
+    {
+        SAL_WARN("SwRangeRedline::GetDescr", "I AM HERE");
+        // TODO: Create custom way to get formatting
+        const SwRedlineExtraData* data = GetExtraData();
+        const SwRedlineExtraData_FormatColl* castedData = static_cast<const SwRedlineExtraData_FormatColl*>(data);
+        if (castedData)
+        {
+            SAL_WARN("SwRangeRedline::GetDescr", "castedData I AM HERE");
+            SfxItemSet* itemSet = castedData->GetItemSet();
+
+            if (itemSet)
+            {
+                SAL_WARN("SwRangeRedline::GetDescr", "itemSet I AM HERE");
+                sal_uInt16 count = itemSet->Count();
+
+                SAL_WARN("SwRangeRedline::GetDescr", "ITEM COUNT: " << count);
+                for (sal_uInt16 i = 0; i < count; ++i) {
+                    // Hypothetical GetItem() method
+                    SAL_WARN("SwRangeRedline::GetDescr", "GETTING ITEM: " << i);
+                    const SfxPoolItem* item = itemSet->GetItem(i);
+                    SAL_WARN("SwRangeRedline::GetDescr", "GOT ITEM");
+                    if(!item)
+                    {
+                        SAL_WARN("SwRangeRedline::GetDescr", "ITEM IS NOT THERE");
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return OUString(GetRedlineData().GetDescr());
     }
 
     SwPaM * pPaM = nullptr;
