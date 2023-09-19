@@ -792,9 +792,8 @@ short SwRedlineItr::Seek(SwFont& rFnt,
                         m_pSet = std::make_unique<SfxItemSetFixed<RES_CHRATR_BEGIN, RES_CHRATR_END-1>>(rPool);
                     }
 
-                    if( 1 < pRed->GetStackCount() )
-                        FillHints( pRed->GetAuthor( 1 ), pRed->GetType( 1 ) );
-                    FillHints( pRed->GetAuthor(), pRed->GetType() );
+
+                    FillHints( pRed->GetType() );
 
                     SfxWhichIter aIter( *m_pSet );
 
@@ -866,19 +865,19 @@ short SwRedlineItr::Seek(SwFont& rFnt,
     return nRet + EnterExtend(rFnt, nNode, nNew);
 }
 
-void SwRedlineItr::FillHints( std::size_t nAuthor, RedlineType eType )
+void SwRedlineItr::FillHints( RedlineType eType )
 {
     switch ( eType )
     {
         case RedlineType::Insert:
-            SW_MOD()->GetInsertAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetInsertAuthorAttr(*m_pSet);
             break;
         case RedlineType::Delete:
-            SW_MOD()->GetDeletedAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetDeletedAuthorAttr(*m_pSet);
             break;
         case RedlineType::Format:
         case RedlineType::FmtColl:
-            SW_MOD()->GetFormatAuthorAttr(nAuthor, *m_pSet);
+            SW_MOD()->GetFormatAuthorAttr(*m_pSet);
             break;
         default:
             break;

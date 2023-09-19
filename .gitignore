@@ -7,3 +7,5 @@ libreoffice-core/vs-code-template.code-workspace
 
 .DS_Store
 libreoffice-core/debug
+.vscode/**/*
+.idea/**/*

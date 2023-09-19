@@ -204,9 +204,9 @@ public:
     std::size_t         InsertRedlineAuthor(const OUString& rAuthor);
     void                SetRedlineAuthor(const OUString& rAuthor); // for unit tests
 
-    void                GetInsertAuthorAttr(std::size_t nAuthor, SfxItemSet &rSet);
-    void                GetDeletedAuthorAttr(std::size_t nAuthor, SfxItemSet &rSet);
-    void                GetFormatAuthorAttr(std::size_t nAuthor, SfxItemSet &rSet);
+    void                GetInsertAuthorAttr(SfxItemSet &rSet);
+    void                GetDeletedAuthorAttr(SfxItemSet &rSet);
+    void                GetFormatAuthorAttr(SfxItemSet &rSet);
 
     sal_uInt16              GetRedlineMarkPos() const;
     const Color&            GetRedlineMarkColor() const;
