@@ -728,6 +728,7 @@ static bool lcl_isViewCallbackType(const int type)
         case LOK_CALLBACK_GRAPHIC_VIEW_SELECTION:
         case LOK_CALLBACK_INVALIDATE_VIEW_CURSOR:
         case LOK_CALLBACK_TEXT_VIEW_SELECTION:
+        case LOK_CALLBACK_CONTEXT_MENU:
         case LOK_CALLBACK_VIEW_CURSOR_VISIBLE:
             return true;
 
@@ -1575,6 +1576,7 @@ CallbackFlushHandler::CallbackFlushHandler(LibreOfficeKitDocument* pDocument, Li
     m_states.emplace(LOK_CALLBACK_GRAPHIC_SELECTION, "NIL");
     m_states.emplace(LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR, "NIL");
     m_states.emplace(LOK_CALLBACK_STATE_CHANGED, "NIL");
+    m_states.emplace(LOK_CALLBACK_CONTEXT_MENU, "NIL");
     m_states.emplace(LOK_CALLBACK_MOUSE_POINTER, "NIL");
     m_states.emplace(LOK_CALLBACK_CELL_CURSOR, "NIL");
     m_states.emplace(LOK_CALLBACK_CELL_FORMULA, "NIL");
@@ -1741,6 +1743,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
         // We don't want to suppress everything here on the wrong assumption
         // that no new events are fired during painting.
         if (type != LOK_CALLBACK_STATE_CHANGED &&
+            type != LOK_CALLBACK_CONTEXT_MENU &&
             type != LOK_CALLBACK_INVALIDATE_TILES &&
             type != LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR &&
             type != LOK_CALLBACK_CURSOR_VISIBLE &&
@@ -1801,6 +1804,7 @@ void CallbackFlushHandler::queue(const int type, CallbackData& aCallbackData)
         case LOK_CALLBACK_INVALIDATE_VISIBLE_CURSOR:
         case LOK_CALLBACK_INVALIDATE_VIEW_CURSOR:
         case LOK_CALLBACK_STATE_CHANGED:
+        case LOK_CALLBACK_CONTEXT_MENU:
         case LOK_CALLBACK_MOUSE_POINTER:
         case LOK_CALLBACK_CELL_CURSOR:
         case LOK_CALLBACK_CELL_VIEW_CURSOR:
