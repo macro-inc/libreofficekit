@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include "i18nlangtag/lang.h"
 #include <SwRewriter.hxx>
 #include <cmdid.h>
 #include <strings.hrc>
@@ -291,22 +292,25 @@ SwSpellPopup::SwSpellPopup(
 
     m_xPopupMenu->EnableItem(m_nCorrectMenuId, bEnable);
 
-    uno::Reference< linguistic2::XLanguageGuessing > xLG = SW_MOD()->GetLanguageGuesser();
-    LanguageType nGuessLangWord = LANGUAGE_NONE;
-    LanguageType nGuessLangPara = LANGUAGE_NONE;
-    if (m_xSpellAlt.is() && xLG.is())
-    {
-        nGuessLangWord = EditView::CheckLanguage( m_xSpellAlt->getWord(), ::GetSpellChecker(), xLG, false );
-        nGuessLangPara = EditView::CheckLanguage( rParaText, ::GetSpellChecker(), xLG, true );
-    }
-    if (nGuessLangWord != LANGUAGE_NONE || nGuessLangPara != LANGUAGE_NONE)
-    {
-        // make sure LANGUAGE_NONE gets not used as menu entry
-        if (nGuessLangWord == LANGUAGE_NONE)
-            nGuessLangWord = nGuessLangPara;
-        if (nGuessLangPara == LANGUAGE_NONE)
-            nGuessLangPara = nGuessLangWord;
-    }
+    // NOTE: [MACRO-1497] Language Guessing Breaks SpellPopUp
+    // since we currently only support english just turning it off
+
+    /* uno::Reference< linguistic2::XLanguageGuessing > xLG = SW_MOD()->GetLanguageGuesser(); */
+    /* LanguageType nGuessLangWord = LANGUAGE_NONE; */
+    /* LanguageType nGuessLangPara = LANGUAGE_NONE; */
+    /* if (m_xSpellAlt.is() && xLG.is()) */
+    /* { */
+    /*     nGuessLangWord = EditView::CheckLanguage( m_xSpellAlt->getWord(), ::GetSpellChecker(), xLG, false ); */
+    /*     nGuessLangPara = EditView::CheckLanguage( rParaText, ::GetSpellChecker(), xLG, true ); */
+    /* } */
+    /* if (nGuessLangWord != LANGUAGE_NONE || nGuessLangPara != LANGUAGE_NONE) */
+    /* { */
+    /*     // make sure LANGUAGE_NONE gets not used as menu entry */
+    /*     if (nGuessLangWord == LANGUAGE_NONE) */
+    /*         nGuessLangWord = nGuessLangPara; */
+    /*     if (nGuessLangPara == LANGUAGE_NONE) */
+    /*         nGuessLangPara = nGuessLangWord; */
+    /* } */
 
     pMenu = m_xPopupMenu->GetPopupMenu(m_nAddMenuId);
     pMenu->SetMenuFlags(MenuFlags::NoAutoMnemonics);     //! necessary to retrieve the correct dictionary name in 'Execute' below
@@ -363,36 +367,37 @@ SwSpellPopup::SwSpellPopup(
     m_xPopupMenu->EnableItem(m_nAddMenuId, (nItemId - MN_DICTIONARIES_START) > 1);
     m_xPopupMenu->EnableItem(m_nAddId, (nItemId - MN_DICTIONARIES_START) == 1);
 
-    //ADD NEW LANGUAGE MENU ITEM
+    // NOTE: [MACRO-1497] Language Guessing Breaks SpellPopUp
+    // since we currently only support english just turning it off
 
-    OUString aScriptTypesInUse( OUString::number( static_cast<int>(pWrtSh->GetScriptType()) ) );
+    /* OUString aScriptTypesInUse( OUString::number( static_cast<int>(pWrtSh->GetScriptType()) ) ); */
 
-    // get keyboard language
-    OUString aKeyboardLang;
-    SwEditWin& rEditWin = pWrtSh->GetView().GetEditWin();
-    LanguageType nLang = rEditWin.GetInputLanguage();
-    if (nLang != LANGUAGE_DONTKNOW && nLang != LANGUAGE_SYSTEM)
-        aKeyboardLang = SvtLanguageTable::GetLanguageString( nLang );
+    /* // get keyboard language */
+    /* OUString aKeyboardLang; */
+    /* SwEditWin& rEditWin = pWrtSh->GetView().GetEditWin(); */
+    /* LanguageType nLang = rEditWin.GetInputLanguage(); */
+    /* if (nLang != LANGUAGE_DONTKNOW && nLang != LANGUAGE_SYSTEM) */
+    /*     aKeyboardLang = SvtLanguageTable::GetLanguageString( nLang ); */
 
-    // get the language that is in use
-    OUString aCurrentLang("*");
-    nLang = SwLangHelper::GetCurrentLanguage( *pWrtSh );
-    if (nLang != LANGUAGE_DONTKNOW)
-        aCurrentLang = SvtLanguageTable::GetLanguageString( nLang );
+    /* // get the language that is in use */
+    /* OUString aCurrentLang("*"); */
+    /* nLang = SwLangHelper::GetCurrentLanguage( *pWrtSh ); */
+    /* if (nLang != LANGUAGE_DONTKNOW) */
+    /*     aCurrentLang = SvtLanguageTable::GetLanguageString( nLang ); */
 
-    // build sequence for status value
-    uno::Sequence< OUString > aSeq{ aCurrentLang,
-                                    aScriptTypesInUse,
-                                    aKeyboardLang,
-                                    SvtLanguageTable::GetLanguageString(nGuessLangWord) };
+    /* // build sequence for status value */
+    /* uno::Sequence< OUString > aSeq{ aCurrentLang, */
+    /*                                 aScriptTypesInUse, */
+    /*                                 aKeyboardLang, */
+    /*                                 SvtLanguageTable::GetLanguageString(nGuessLangWord) }; */
 
-    pMenu = m_xPopupMenu->GetPopupMenu(m_nLangSelectionMenuId);
-    fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_SELECTION_START, aSeq, pWrtSh, m_aLangTable_Text );
-    m_xPopupMenu->EnableItem(m_nLangSelectionMenuId);
+    /* pMenu = m_xPopupMenu->GetPopupMenu(m_nLangSelectionMenuId); */
+    /* fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_SELECTION_START, aSeq, pWrtSh, m_aLangTable_Text ); */
+    /* m_xPopupMenu->EnableItem(m_nLangSelectionMenuId); */
 
-    pMenu = m_xPopupMenu->GetPopupMenu(m_nLangParaMenuId);
-    fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_PARAGRAPH_START, aSeq, pWrtSh, m_aLangTable_Paragraph );
-    m_xPopupMenu->EnableItem(m_nLangParaMenuId);
+    /* pMenu = m_xPopupMenu->GetPopupMenu(m_nLangParaMenuId); */
+    /* fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_PARAGRAPH_START, aSeq, pWrtSh, m_aLangTable_Paragraph ); */
+    /* m_xPopupMenu->EnableItem(m_nLangParaMenuId); */
 
     if (bUseImagesInMenus)
         m_xPopupMenu->SetItemImage(m_nSpellDialogId,
@@ -501,55 +506,51 @@ SwSpellPopup::SwSpellPopup(
     m_xPopupMenu->EnableItem(m_nCorrectMenuId, false);
     m_xPopupMenu->EnableItem(m_nCorrectDialogId, false);
 
-    uno::Reference< linguistic2::XLanguageGuessing > xLG = SW_MOD()->GetLanguageGuesser();
-    LanguageType nGuessLangWord = LANGUAGE_NONE;
-    LanguageType nGuessLangPara = LANGUAGE_NONE;
-    if (xLG.is())
-    {
-        nGuessLangPara = EditView::CheckLanguage( rParaText, ::GetSpellChecker(), xLG, true );
-    }
-    if (nGuessLangWord != LANGUAGE_NONE || nGuessLangPara != LANGUAGE_NONE)
-    {
-        // make sure LANGUAGE_NONE gets not used as menu entry
-        if (nGuessLangWord == LANGUAGE_NONE)
-            nGuessLangWord = nGuessLangPara;
-        if (nGuessLangPara == LANGUAGE_NONE)
-            nGuessLangPara = nGuessLangWord;
-    }
+    /* uno::Reference< linguistic2::XLanguageGuessing > xLG = SW_MOD()->GetLanguageGuesser(); */
+    /* LanguageType nGuessLangWord = LANGUAGE_ENGLISH; */
+    /* LanguageType nGuessLangPara = LANGUAGE_ENGLISH; */
+    /* if (nGuessLangWord != LANGUAGE_NONE || nGuessLangPara != LANGUAGE_NONE) */
+    /* { */
+    /*     // make sure LANGUAGE_NONE gets not used as menu entry */
+    /*     if (nGuessLangWord == LANGUAGE_NONE) */
+    /*         nGuessLangWord = nGuessLangPara; */
+    /*     if (nGuessLangPara == LANGUAGE_NONE) */
+    /*         nGuessLangPara = nGuessLangWord; */
+    /* } */
 
-    m_xPopupMenu->EnableItem(m_nAddMenuId, false);
-    m_xPopupMenu->EnableItem(m_nAddId, false);
+    /* m_xPopupMenu->EnableItem(m_nAddMenuId, false); */
+    /* m_xPopupMenu->EnableItem(m_nAddId, false); */
 
-    //ADD NEW LANGUAGE MENU ITEM
+    /* //ADD NEW LANGUAGE MENU ITEM */
 
-    OUString aScriptTypesInUse( OUString::number( static_cast<int>(pWrtSh->GetScriptType()) ) );
+    /* OUString aScriptTypesInUse( OUString::number( static_cast<int>(pWrtSh->GetScriptType()) ) ); */
 
-    // get keyboard language
-    OUString aKeyboardLang;
-    SwEditWin& rEditWin = pWrtSh->GetView().GetEditWin();
-    LanguageType nLang = rEditWin.GetInputLanguage();
-    if (nLang != LANGUAGE_DONTKNOW && nLang != LANGUAGE_SYSTEM)
-        aKeyboardLang = SvtLanguageTable::GetLanguageString( nLang );
+    /* // get keyboard language */
+    /* OUString aKeyboardLang; */
+    /* SwEditWin& rEditWin = pWrtSh->GetView().GetEditWin(); */
+    /* LanguageType nLang = rEditWin.GetInputLanguage(); */
+    /* if (nLang != LANGUAGE_DONTKNOW && nLang != LANGUAGE_SYSTEM) */
+    /*     aKeyboardLang = SvtLanguageTable::GetLanguageString( nLang ); */
 
-    // get the language that is in use
-    OUString aCurrentLang("*");
-    nLang = SwLangHelper::GetCurrentLanguage( *pWrtSh );
-    if (nLang != LANGUAGE_DONTKNOW)
-        aCurrentLang = SvtLanguageTable::GetLanguageString( nLang );
+    /* // get the language that is in use */
+    /* OUString aCurrentLang("*"); */
+    /* nLang = SwLangHelper::GetCurrentLanguage( *pWrtSh ); */
+    /* if (nLang != LANGUAGE_DONTKNOW) */
+    /*     aCurrentLang = SvtLanguageTable::GetLanguageString( nLang ); */
 
-    // build sequence for status value
-    uno::Sequence< OUString > aSeq{ aCurrentLang,
-                                    aScriptTypesInUse,
-                                    aKeyboardLang,
-                                    SvtLanguageTable::GetLanguageString(nGuessLangWord) };
+    /* // build sequence for status value */
+    /* uno::Sequence< OUString > aSeq{ aCurrentLang, */
+    /*                                 aScriptTypesInUse, */
+    /*                                 aKeyboardLang, */
+    /*                                 SvtLanguageTable::GetLanguageString(nGuessLangWord) }; */
 
-    PopupMenu *pMenu = m_xPopupMenu->GetPopupMenu(m_nLangSelectionMenuId);
-    fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_SELECTION_START, aSeq, pWrtSh, m_aLangTable_Text );
-    m_xPopupMenu->EnableItem(m_nLangSelectionMenuId);
+    /* PopupMenu *pMenu = m_xPopupMenu->GetPopupMenu(m_nLangSelectionMenuId); */
+    /* fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_SELECTION_START, aSeq, pWrtSh, m_aLangTable_Text ); */
+    /* m_xPopupMenu->EnableItem(m_nLangSelectionMenuId); */
 
-    pMenu = m_xPopupMenu->GetPopupMenu(m_nLangParaMenuId);
-    fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_PARAGRAPH_START, aSeq, pWrtSh, m_aLangTable_Paragraph );
-    m_xPopupMenu->EnableItem(m_nLangParaMenuId);
+    /* pMenu = m_xPopupMenu->GetPopupMenu(m_nLangParaMenuId); */
+    /* fillLangPopupMenu( pMenu, MN_SET_LANGUAGE_PARAGRAPH_START, aSeq, pWrtSh, m_aLangTable_Paragraph ); */
+    /* m_xPopupMenu->EnableItem(m_nLangParaMenuId); */
 
     if (bUseImagesInMenus)
         m_xPopupMenu->SetItemImage(m_nSpellDialogId,
