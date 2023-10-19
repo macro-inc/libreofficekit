@@ -244,6 +244,9 @@ struct _LibreOfficeKitDocumentClass
                               int nX,
                               int nY);
 
+    void (*setBackupPath) (LibreOfficeKitDocument* pThis,
+                           const char* pBackupPath);
+
     /// @see lok::Document::getTextSelection
     char* (*getTextSelection) (LibreOfficeKitDocument* pThis,
                                const char* pMimeType,

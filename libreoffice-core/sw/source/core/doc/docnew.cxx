@@ -651,6 +651,16 @@ SfxObjectShell* SwDoc::GetPersist() const
     return mpDocShell ? mpDocShell : getIDocumentLinksAdministration().GetLinkManager().GetPersist();
 }
 
+const OUString& SwDoc::GetBackupPath() const
+{
+    return m_sBackupPath;
+}
+
+void SwDoc::SetBackupPath(const OUString& rPath)
+{
+    m_sBackupPath = rPath;
+}
+
 void SwDoc::ClearDoc()
 {
     GetIDocumentUndoRedo().DelAllUndoObj();

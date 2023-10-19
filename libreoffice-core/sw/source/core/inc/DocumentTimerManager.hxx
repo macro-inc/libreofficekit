@@ -21,6 +21,7 @@
 #define INCLUDED_SW_SOURCE_CORE_INC_DOCUMENTTIMERMANAGER_HXX
 
 #include "osl/interlck.h"
+#include "rtl/ustring.hxx"
 #include <IDocumentTimerAccess.hxx>
 #include <SwDocIdle.hxx>
 
@@ -41,9 +42,10 @@ public:
         Grammar,
         Layout,
         Fields,
+        AutoBackup,
     };
 
-    DocumentTimerManager(SwDoc& i_rSwdoc);
+    DocumentTimerManager(SwDoc& i_rSwdoc, const OUString& rBackupPath);
     virtual ~DocumentTimerManager() override;
 
     void StartIdling() override;
@@ -71,6 +73,7 @@ private:
     bool m_bStartOnUnblock; ///< true, if the last unblock should start the timer
     SwDocIdle m_aDocIdle;
     bool m_bWaitForLokInit; ///< true if we waited for LOK to initialize already.
+    OUString m_aBackupPath;
 };
 
 inline bool DocumentTimerManager::IsDocIdle() const

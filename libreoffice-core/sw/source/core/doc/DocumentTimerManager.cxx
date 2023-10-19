@@ -16,6 +16,8 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include "sfx2/docfile.hxx"
+#include "tools/stream.hxx"
 #include <DocumentTimerManager.hxx>
 
 #include <doc.hxx>
@@ -43,12 +45,13 @@ namespace {
 constexpr sal_uInt64 kDebounceRateMilliseconds = 350;
 }
 
-DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
+DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc, const OUString& rBackupPath)
     : m_rDoc(i_rSwdoc)
     , m_nIdleBlockCount(0)
     , m_bStartOnUnblock(false)
     , m_aDocIdle(i_rSwdoc, "sw::DocumentTimerManager m_aDocIdle")
     , m_bWaitForLokInit(true)
+    , m_aBackupPath(rBackupPath)
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
     m_aDocIdle.SetInvokeHandler(LINK(this, DocumentTimerManager, DoIdleJobs));
@@ -100,6 +103,16 @@ void DocumentTimerManager::UnblockIdling()
 DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
 {
     SwRootFrame* pTmpRoot = m_rDoc.getIDocumentLayoutAccess().GetCurrentLayout();
+
+    bool bNeedsBackup = false;
+    auto m_nLastBackupTimestamp = m_rDoc.GetLastBackupTimestamp();
+    sal_Int64 nCurrentTimestamp = std::time(nullptr);
+    if (!m_nLastBackupTimestamp) {
+        bNeedsBackup = true;
+    } else if ((nCurrentTimestamp - m_nLastBackupTimestamp) > 60) {
+        bNeedsBackup = true;
+    }
+
     if( pTmpRoot &&
         !SfxProgress::GetActiveProgress( m_rDoc.GetDocShell() ) )
     {
@@ -107,6 +120,10 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
         for(const SwViewShell& rSh : pShell->GetRingContainer())
             if( rSh.ActionPend() )
                 return IdleJob::Busy;
+
+        if (bNeedsBackup) {
+            return IdleJob::AutoBackup;
+        }
 
         if( pTmpRoot->IsNeedGrammarCheck() )
         {
@@ -200,6 +217,23 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().SetFieldsDirty( false );
         break;
     }
+    case IdleJob::AutoBackup:
+    {
+        SwDocShell* pDocShell = m_rDoc.GetDocShell();
+        auto m_sBackupPath = m_rDoc.GetBackupPath();
+        sal_Int64 nCurrentTimestamp = std::time(nullptr);
+
+        if (pDocShell && !m_sBackupPath.isEmpty())
+        {
+            return;
+
+        }
+
+        std::unique_ptr<SfxMedium> pMedium(new SfxMedium(m_sBackupPath, StreamMode::WRITE));
+        pDocShell->DoSaveAs(*pMedium);
+        m_rDoc.SetLastBackupTimestamp(nCurrentTimestamp);
+    }
+    break;
 
     case IdleJob::Busy:
         break;

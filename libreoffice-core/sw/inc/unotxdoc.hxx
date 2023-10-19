@@ -429,6 +429,7 @@ public:
     virtual css::uno::Reference<css::datatransfer::XTransferable> getSelection() override;
     /// @see vcl::ITiledRenderable::setGraphicSelection().
     virtual void setGraphicSelection(int nType, int nX, int nY) override;
+    virtual void setBackupPath(const OUString& rBackupPath);
     /// @see vcl::ITiledRenderable::resetSelection().
     virtual void resetSelection() override;
     /// @see vcl::ITiledRenderable::getPartPageRectangles().

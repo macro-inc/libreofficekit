@@ -1449,6 +1449,7 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->sendDialogEvent = doc_sendDialogEvent;
         m_pDocumentClass->postUnoCommand = doc_postUnoCommand;
         m_pDocumentClass->setTextSelection = doc_setTextSelection;
+        m_pDocumentClass->setBackupPath = nullptr;
         m_pDocumentClass->setWindowTextSelection = doc_setWindowTextSelection;
         m_pDocumentClass->getTextSelection = doc_getTextSelection;
         m_pDocumentClass->getSelectionType = doc_getSelectionType;
