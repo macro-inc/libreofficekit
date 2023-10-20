@@ -489,7 +489,8 @@ public:
     /// MACRO-1653/MACRO-1598: Colorize and overlays
     void colorize() override;
     void cancelColorize() override;
-    void applyOverlays( const std::string& payload ) override;
+    void applyOverlays( const std::string_view payload ) override;
+    void jumpToOverlay( const std::string_view payload ) override;
     void removeOverlays() override;
     void cleanupOverlays() override;
 

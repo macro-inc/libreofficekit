@@ -4930,7 +4930,13 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     if (gImpl && svCommand == ".uno:ApplyOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->applyOverlays(std::string(pArguments));
+        pDoc->applyOverlays(std::string_view(pArguments));
+        return;
+    }
+    if (gImpl && svCommand == ".uno:JumpToOverlay")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->jumpToOverlay(std::string_view(pArguments));
         return;
     }
     if (gImpl && svCommand == ".uno:RemoveOverlays")

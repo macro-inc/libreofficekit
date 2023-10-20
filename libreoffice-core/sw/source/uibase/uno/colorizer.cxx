@@ -39,6 +39,7 @@
 #include <mutex>
 #include <atomic>
 #include <view.hxx>
+#include <string>
 #include <viewsh.hxx>
 
 namespace colorizer
@@ -106,19 +107,19 @@ void emitCallback(SwXTextDocument* doc, LibreOfficeKitCallbackType type, const c
 void emitError(SwXTextDocument* doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
-                 "{type:\"error\"}");
+                 "{\"type\":\"error\"}");
 }
 
 void emitCancelled(SwXTextDocument* doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
-                 "{type:\"cancelled\"}");
+                 "{\"type\":\"cancelled\"}");
 }
 
 void emitFinished(SwXTextDocument* doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
-                 "{type:\"finished\"}");
+                 "{\"type\":\"finished\"}");
 }
 
 struct HexData
@@ -172,14 +173,14 @@ void jumpToOverlay(SwXTextDocument* doc, const std::string& hex, HexTextRangeMap
     auto it = map.find(hex);
     if (it == map.end())
     {
-        return emitError(doc);
+        return emitError(doc, true);
     }
 
     uno::Reference<text::XTextViewCursorSupplier> xCursorSupplier(doc->getCurrentController(),
                                                                   uno::UNO_QUERY);
     if (!xCursorSupplier)
     {
-        return emitError(doc);
+        return emitError(doc, true);
     }
 
     uno::Reference<text::XTextViewCursor> xCursor = xCursorSupplier->getViewCursor();
@@ -381,13 +382,13 @@ void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCu
         refCursor->gotoRange(cursor->getEnd(), true);
 
         std::string refStartHex = state->ref->first;
-        makeLink(refCursor, u"termref://" + OUString::createFromAscii(refStartHex));
+        makeLink(refCursor, u"termref://" + OUString::createFromAscii(state->ref->second.refHex));
 
         uno::Reference<text::XTextRange> textRange(refCursor, uno::UNO_QUERY);
         if (!textRange)
             return;
 
-        appliedOverlay.term[refStartHex] = textRange;
+        appliedOverlay.termRef[refStartHex] = textRange;
 
         // reset
         state->refTextRange.clear();
@@ -424,7 +425,7 @@ void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCu
         if (!textRange)
             return;
 
-        appliedOverlay.term[anomalyStartHex] = textRange;
+        appliedOverlay.anomaly[anomalyStartHex] = textRange;
 
         // reset
         state->anomalyTextRange.clear();
@@ -484,7 +485,7 @@ void CancelColorize(SwXTextDocument* doc)
     CancelFlagSingleton::getInstance().getFlag(doc) = false;
 }
 
-void ApplyOverlays(SwXTextDocument* doc, const std::string& json)
+void ApplyOverlays(SwXTextDocument* doc, const std::string_view json)
 {
     if (!doc)
         return;
@@ -507,7 +508,7 @@ void ApplyOverlays(SwXTextDocument* doc, const std::string& json)
 
     using boost::property_tree::ptree;
     ptree pt;
-    std::istringstream jsonStream(json);
+    std::istringstream jsonStream(json.data());
     read_json(jsonStream, pt);
     OverlayData payload;
 
@@ -630,7 +631,7 @@ void ClearOverlays(SwXTextDocument* doc)
     maps->erase(doc);
 }
 
-void JumpToOverlay(SwXTextDocument* doc, const std::string& hex, OverlayType type)
+void JumpToOverlay(SwXTextDocument* doc, const std::string_view json )
 {
     if (!doc)
         return;
@@ -641,6 +642,13 @@ void JumpToOverlay(SwXTextDocument* doc, const std::string& hex, OverlayType typ
     {
         return emitError(doc);
     }
+
+    using boost::property_tree::ptree;
+    ptree pt;
+    std::istringstream jsonStream(json.data());
+    read_json(jsonStream, pt);
+    std::string hex = pt.get<std::string>("hex");
+    OverlayType type = (OverlayType)pt.get<sal_Int32>("type");
 
     switch (type)
     {

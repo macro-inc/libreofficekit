@@ -638,8 +638,11 @@ void SwXTextDocument::colorize() {
 void SwXTextDocument::cancelColorize() {
     colorizer::CancelColorize(this);
 }
-void SwXTextDocument::applyOverlays( const std::string& payload ) {
+void SwXTextDocument::applyOverlays( const std::string_view payload ) {
     colorizer::ApplyOverlays(this, payload);
+}
+void SwXTextDocument::jumpToOverlay( const std::string_view payload ) {
+    colorizer::JumpToOverlay(this, payload);
 }
 void SwXTextDocument::removeOverlays() {
     colorizer::ClearOverlays(this);

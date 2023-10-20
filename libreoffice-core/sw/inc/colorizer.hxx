@@ -28,9 +28,9 @@ enum OverlayType {
 void Colorize(SwXTextDocument* doc);
 void CancelColorize(SwXTextDocument* doc);
 
-void ApplyOverlays(SwXTextDocument* doc, const std::string& json);
+void ApplyOverlays(SwXTextDocument* doc, const std::string_view json);
 void ClearOverlays(SwXTextDocument* doc);
-void JumpToOverlay(SwXTextDocument* doc, const std::string& hex, OverlayType type );
+void JumpToOverlay(SwXTextDocument* doc, const std::string_view json );
 
 // Makes sure that there are no dangling references to the doc, only call when the document should be closed
 void Cleanup(SwXTextDocument* doc);
