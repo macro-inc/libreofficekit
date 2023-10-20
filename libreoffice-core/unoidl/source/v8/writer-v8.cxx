@@ -1780,11 +1780,5 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
 }
 
 void V8Writer::writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::Method& method) {
-    for (auto& a : method.parameters) {
-        OUString type = resolveTypedef(a.type);
-        if (type == "string") {
-            out("unov8_.rtl.uString_release(" + a.name + ");\n");
-        }
-    }
 }
 }
