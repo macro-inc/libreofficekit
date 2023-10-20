@@ -1011,7 +1011,51 @@ typedef enum
      *   the user got in from the outer to the inner; row/column span default
      *   value is 1; paragraph is the cell text content.
      */
-    LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED = 67
+    LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED = 67,
+
+    /**
+     * Colorizer event
+     * The payload is a json with the following structure.
+     *
+     *   {
+     *       "type": "error"
+     *   }
+     *
+     *   or
+     *
+     *   {
+     *       "type": "cancelled"
+     *   }
+     *
+     *   or
+     *
+     *   {
+     *       "type": "finished"
+     *   }
+     */
+    LOK_CALLBACK_MACRO_COLORIZER = 100,
+
+    /**
+     * Overlay event
+     * The payload is a json with the following structure.
+     *
+     *   {
+     *       "type": "error"
+     *   }
+     *
+     *   or
+     *
+     *   {
+     *       "type": "cancelled"
+     *   }
+     *
+     *   or
+     *
+     *   {
+     *       "type": "finished"
+     *   }
+     */
+    LOK_CALLBACK_MACRO_OVERLAY = 101
 }
 LibreOfficeKitCallbackType;
 
@@ -1196,6 +1240,8 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_DOCUMENT_PASSWORD_RESET";
     case LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED:
         return "LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED";
+    case LOK_CALLBACK_MACRO_COLORIZER:
+        return "LOK_CALLBACK_MACRO_COLORIZER";
     }
 
     return nullptr;

@@ -19,6 +19,7 @@
 
 #include "IDocumentOutlineNodes.hxx"
 #include "IDocumentRedlineAccess.hxx"
+#include "colorizer.hxx"
 #include "itabenum.hxx"
 #include "ndtxt.hxx"
 #include "redline.hxx"
@@ -629,4 +630,22 @@ void SwXTextDocument::updateRedlines( const css::uno::Sequence<sal_uInt32>& rArg
         }
     }
 }
+
+// MACRO-1653/MACRO-1598: Colorize and overlays
+void SwXTextDocument::colorize() {
+    colorizer::Colorize(this);
+}
+void SwXTextDocument::cancelColorize() {
+    colorizer::CancelColorize(this);
+}
+void SwXTextDocument::applyOverlays( const std::string& payload ) {
+    colorizer::ApplyOverlays(this, payload);
+}
+void SwXTextDocument::removeOverlays() {
+    colorizer::ClearOverlays(this);
+}
+void SwXTextDocument::cleanupOverlays() {
+    colorizer::Cleanup(this);
+}
+
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

@@ -409,6 +409,13 @@ public:
 
     /// MACRO-1392: Request layout updates for redlines
     virtual void updateRedlines( const css::uno::Sequence<sal_uInt32>& /*rArguments*/) {}
+
+    /// MACRO-1653/MACRO-1598: Colorize and overlays
+    virtual void colorize() {};
+    virtual void cancelColorize() {};
+    virtual void applyOverlays( const std::string& /* payload*/ ) {};
+    virtual void removeOverlays() {};
+    virtual void cleanupOverlays() {};
 };
 } // namespace vcl
 
