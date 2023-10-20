@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <svl/colorizer.hxx>
 #include <svl/stylepool.hxx>
 #include <svl/itemiter.hxx>
 #include <svl/itempool.hxx>
@@ -111,6 +112,13 @@ namespace {
     Node* Node::findChildNode( const SfxPoolItem& rItem,
                                const bool bIsItemIgnorable )
     {
+        // MACRO-1598: Colorizer slow
+        if (colorizer::IsPoolingBlocked()) {
+            auto pNextNode = new Node( rItem, this, bIsItemIgnorable );
+            mChildren.emplace_back( pNextNode );
+            return pNextNode;
+        }
+
         for( auto const & rChild : mChildren )
         {
             if( rItem.Which() == rChild->mpItem->Which() &&

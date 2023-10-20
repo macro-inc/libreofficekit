@@ -8,6 +8,13 @@
  *
  */
 // MACRO-1653/MACRO-1598: Colorize and overlays
+#include <hintids.hxx>
+#include <svl/colorizer.hxx>
+#include <svx/swframetypes.hxx>
+#include <editeng/colritem.hxx>
+#include <IDocumentContentOperations.hxx>
+#include <comphelper/servicehelper.hxx>
+#include <unotextcursor.hxx>
 #include <wrtsh.hxx>
 #include <com/sun/star/beans/XMultiPropertySet.hpp>
 #include <com/sun/star/beans/XMultiPropertyStates.hpp>
@@ -199,7 +206,7 @@ void makeLink(uno::Reference<text::XTextCursor> textCursor, const OUString& link
     xProps->setPropertyValues(aProperties, aValues);
 }
 
-void unsetLink(SwXTextDocument* doc, uno::Reference<text::XTextRange> range)
+void unsetLink(uno::Reference<text::XTextRange> range)
 {
     uno::Reference<beans::XMultiPropertyStates> xProps(
         range->getText()->createTextCursorByRange(range), uno::UNO_QUERY);
@@ -244,7 +251,7 @@ struct OverlayState
 
 // returns true if finished
 bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
-                void (*callback)(sal_Int32 color, uno::Reference<text::XWordCursor> word,
+                void (*callback)(SwDoc* doc, sal_Int32 color, uno::Reference<text::XWordCursor> word,
                                  OverlayState* overlayState))
 {
     uno::Reference<container::XEnumerationAccess> xParaAcess(doc->getText(), uno::UNO_QUERY);
@@ -259,6 +266,8 @@ bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
     auto& cancelled = CancelFlagSingleton::getInstance().getFlag(doc);
 
     sal_Int32 nColor = 0x0;
+
+    SwDoc* pDoc = doc->GetDocShell()->GetDoc();
 
     while (!cancelled && xParaIter->hasMoreElements())
     {
@@ -290,7 +299,7 @@ bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
             xWordCursor->gotoStartOfWord(false);
             xWordCursor->gotoEndOfWord(true);
 
-            callback(nColor++, xWordCursor, overlayState);
+            callback(pDoc, nColor++, xWordCursor, overlayState);
             xWordCursor->gotoNextWord(false);
         } while (!cancelled
                  && isWordBeforeEndOfParagraph(xRangeCompare, xWordCursor, xParaTextRange));
@@ -299,7 +308,7 @@ bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
 }
 
 // TODO: a lot of repeated code, will refactor at some point
-void applyOverlays(sal_Int32 color, uno::Reference<text::XWordCursor> cursor, OverlayState* state)
+void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCursor> cursor, OverlayState* state)
 {
     const OverlayData& overlay = *state->overlay;
     AppliedOverlayData& appliedOverlay = *state->appliedOverlay;
@@ -423,6 +432,7 @@ void applyOverlays(sal_Int32 color, uno::Reference<text::XWordCursor> cursor, Ov
         state->anomalyEndHex.clear();
     }
 }
+
 }
 
 void Colorize(SwXTextDocument* doc)
@@ -435,21 +445,27 @@ void Colorize(SwXTextDocument* doc)
     pDoc->getIDocumentTimerAccess().BlockIdling();
     pDoc->getIDocumentTimerAccess().StopIdling();
     pDoc->GetUndoManager().DoUndo(false);
+    pDocSh->EnableSetModified(false); // don't broadcast attribute changes
     doc->lockControllers();
     doc->setPropertyValue(UNO_NAME_SHOW_CHANGES, uno::Any(false));
     doc->setPropertyValue(UNO_NAME_RECORD_CHANGES, uno::Any(false));
 
-    bool finished
-        = visitWords(doc, nullptr,
-                     [](sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
-                        OverlayState* overlayState) -> void
-                     {
-                         // color it
-                         uno::Reference<beans::XPropertySet> xProps(cursor, uno::UNO_QUERY);
-                         if (!xProps)
-                             return;
-                         xProps->setPropertyValue(UNO_NAME_CHAR_COLOR, uno::Any(color));
-                     });
+    SetBlockPooling(true);
+
+    bool finished = visitWords(
+        doc, nullptr,
+        [](SwDoc* pSwDoc, sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
+           OverlayState* /*overlayState*/) -> void
+        {
+            SwXTextCursor* const pInternalCursor
+                = comphelper::getFromUnoTunnel<SwXTextCursor>(cursor);
+            SvxColorItem sColor(color, RES_CHRATR_COLOR);
+            pSwDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(), sColor);
+        });
+    // WARN: this is hacky, restores SfxItemPool::PutImpl behavior
+    pDoc->GetAttrPool().SetItemInfos(aSlotTab);
+
+    SetBlockPooling(false);
 
     doc->unlockControllers();
 
@@ -596,11 +612,11 @@ void ClearOverlays(SwXTextDocument* doc)
     {
         for (const auto& term : it->second.termRef)
         {
-            unsetLink(doc, term.second);
+            unsetLink(term.second);
         }
         for (const auto& term : it->second.term)
         {
-            unsetLink(doc, term.second);
+            unsetLink(term.second);
         }
     }
 
@@ -645,6 +661,7 @@ void Cleanup(SwXTextDocument* doc)
     getAppliedOverlayMaps()->erase(doc);
     CancelFlagSingleton::getInstance().cleanup(doc);
 }
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */
