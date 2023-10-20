@@ -16,7 +16,9 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include "sal/log.hxx"
 #include "sfx2/docfile.hxx"
+#include <sal/log.hxx>
 #include "tools/stream.hxx"
 #include <DocumentTimerManager.hxx>
 
@@ -45,13 +47,12 @@ namespace {
 constexpr sal_uInt64 kDebounceRateMilliseconds = 350;
 }
 
-DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc, const OUString& rBackupPath)
+DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
     : m_rDoc(i_rSwdoc)
     , m_nIdleBlockCount(0)
     , m_bStartOnUnblock(false)
     , m_aDocIdle(i_rSwdoc, "sw::DocumentTimerManager m_aDocIdle")
     , m_bWaitForLokInit(true)
-    , m_aBackupPath(rBackupPath)
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
     m_aDocIdle.SetInvokeHandler(LINK(this, DocumentTimerManager, DoIdleJobs));
@@ -107,9 +108,9 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
     bool bNeedsBackup = false;
     auto m_nLastBackupTimestamp = m_rDoc.GetLastBackupTimestamp();
     sal_Int64 nCurrentTimestamp = std::time(nullptr);
-    if (!m_nLastBackupTimestamp) {
+    if (!m_nLastBackupTimestamp.has_value()) {
         bNeedsBackup = true;
-    } else if ((nCurrentTimestamp - m_nLastBackupTimestamp) > 60) {
+    } else if ((nCurrentTimestamp - m_nLastBackupTimestamp.value_or(0)) > 60) {
         bNeedsBackup = true;
     }
 
@@ -223,13 +224,15 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         auto m_sBackupPath = m_rDoc.GetBackupPath();
         sal_Int64 nCurrentTimestamp = std::time(nullptr);
 
-        if (pDocShell && !m_sBackupPath.isEmpty())
+        if (!pDocShell || m_sBackupPath.isEmpty())
         {
+            SAL_WARN("sw.core", "not writing backup");
             return;
 
         }
 
-        std::unique_ptr<SfxMedium> pMedium(new SfxMedium(m_sBackupPath, StreamMode::WRITE));
+        OUString sBackupPath = "file://" + m_sBackupPath + "backup" + OUString::number(nCurrentTimestamp) + ".docx";
+        std::unique_ptr<SfxMedium> pMedium(new SfxMedium(sBackupPath, StreamMode::WRITE));
         pDocShell->DoSaveAs(*pMedium);
         m_rDoc.SetLastBackupTimestamp(nCurrentTimestamp);
     }

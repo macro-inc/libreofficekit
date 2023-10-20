@@ -102,6 +102,7 @@
 #include <strings.hrc>
 #include <bitmaps.hlst>
 #include "IDocumentUndoRedo.hxx"
+#include "sal/log.hxx"
 #include "unodefaults.hxx"
 #include "SwXDocumentSettings.hxx"
 #include <doc.hxx>
@@ -3919,9 +3920,8 @@ void SwXTextDocument::setTextSelection(int nType, int nX, int nY)
     }
 }
 
-void SwXTextDocument::setBackupPath(const OUString& rBackupPath)
+void SwXTextDocument::setBackupPath(const char* rBackupPath)
 {
-    SolarMutexGuard aGuard;
     SwDoc* pDoc = m_pDocShell->GetDoc();
     pDoc->SetBackupPath(rBackupPath);
 }

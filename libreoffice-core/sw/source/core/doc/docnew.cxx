@@ -74,6 +74,7 @@
 #include <laycache.hxx>
 #include <mvsave.hxx>
 #include <istyleaccess.hxx>
+#include "rtl/textenc.h"
 #include "swstylemanager.hxx"
 #include <GrammarContact.hxx>
 #include <OnlineAccessibilityCheck.hxx>
@@ -656,9 +657,11 @@ const OUString& SwDoc::GetBackupPath() const
     return m_sBackupPath;
 }
 
-void SwDoc::SetBackupPath(const OUString& rPath)
+void SwDoc::SetBackupPath(const char* rPath)
 {
-    m_sBackupPath = rPath;
+
+    OUString sPath(rPath, strlen(rPath), RTL_TEXTENCODING_UTF8);
+    m_sBackupPath = sPath;
 }
 
 void SwDoc::ClearDoc()

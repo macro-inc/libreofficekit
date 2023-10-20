@@ -504,6 +504,11 @@ public:
         return mpDoc->pClass->gotoOutline(mpDoc,idx);
     }
 
+    void setBackupPath(const char* pBackupPath)
+    {
+        mpDoc->pClass->setBackupPath(mpDoc, pBackupPath);
+    }
+
     /**
      * Saves the document to a memory buffer
      * @param pOutput the data of the file

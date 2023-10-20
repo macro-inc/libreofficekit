@@ -573,6 +573,11 @@ void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
     rJsonWriter.put("destRect", destRect.SVRect().toString());
 }
 
+/* void SwXTextDocument::setBackupPath(const char* path) */
+/* { */
+/*     m_pDocShell->GetDoc()->SetBackupPath(path); */
+/* } */
+
 void SwXTextDocument::createTable(int row, int col)
 {
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();

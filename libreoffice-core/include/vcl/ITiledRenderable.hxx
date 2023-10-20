@@ -113,6 +113,8 @@ public:
         return OUString();
     }
 
+    virtual void setBackupPath(const char* rBackupPath) = 0;
+
     /**
      * Get the vcl::Window for the document being edited
      */

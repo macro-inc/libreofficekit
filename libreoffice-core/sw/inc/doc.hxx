@@ -331,7 +331,7 @@ private:
 
     OUString m_sBackupPath;
 
-    sal_Int64 m_nLastBackupTimestamp;
+    std::optional<sal_Int64> m_nLastBackupTimestamp;
 
     enum MissingDictionary { False = -1, Undefined = 0, True = 1 };
     MissingDictionary meDictionaryMissing;
@@ -467,10 +467,10 @@ public:
     const IDocumentMarkAccess* getIDocumentMarkAccess() const;
 
     const OUString& GetBackupPath() const;
-    void SetBackupPath(const OUString& rPath);
+    void SetBackupPath(const char* rPath);
 
-    const sal_Int64& GetLastBackupTimestamp() const;
-    void SetLastBackupTimestamp(const sal_Int64& rTimestamp);
+    std::optional<sal_Int64> GetLastBackupTimestamp() const;
+    void SetLastBackupTimestamp(const sal_Int64 rTimestamp);
 
     // IDocumentRedlineAccess
     IDocumentRedlineAccess const& getIDocumentRedlineAccess() const;

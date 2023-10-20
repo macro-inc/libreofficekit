@@ -128,6 +128,16 @@ sal_Int32 SwDoc::getReferenceCount() const
     return mReferenceCount;
 }
 
+std::optional<sal_Int64> SwDoc::GetLastBackupTimestamp() const
+{
+    return m_nLastBackupTimestamp;
+}
+
+void SwDoc::SetLastBackupTimestamp( sal_Int64 const nTimestamp )
+{
+    m_nLastBackupTimestamp = nTimestamp;
+}
+
 ::sw::MetaFieldManager & SwDoc::GetMetaFieldManager()
 {
     return *m_pMetaFieldManager;
