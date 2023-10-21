@@ -17,6 +17,7 @@
 #include <vcl/dllapi.h>
 #include <vcl/ptrstyle.hxx>
 #include <vcl/vclptr.hxx>
+#include <string_view>
 #include <map>
 #include <com/sun/star/datatransfer/XTransferable.hpp>
 #include <basegfx/range/b2drange.hxx>
@@ -409,6 +410,14 @@ public:
 
     /// MACRO-1392: Request layout updates for redlines
     virtual void updateRedlines( const css::uno::Sequence<sal_uInt32>& /*rArguments*/) {}
+
+    /// MACRO-1653/MACRO-1598: Colorize and overlays
+    virtual void colorize() {};
+    virtual void cancelColorize() {};
+    virtual void applyOverlays( const std::string_view /* payload*/ ) {};
+    virtual void jumpToOverlay( const std::string_view /* payload*/ ) {};
+    virtual void removeOverlays() {};
+    virtual void cleanupOverlays() {};
 };
 } // namespace vcl
 

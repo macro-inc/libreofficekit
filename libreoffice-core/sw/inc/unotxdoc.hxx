@@ -486,6 +486,14 @@ public:
     // MACRO-1392: Request layout updates for redlines
     void updateRedlines( const css::uno::Sequence<sal_uInt32>& rArguments) override;
 
+    /// MACRO-1653/MACRO-1598: Colorize and overlays
+    void colorize() override;
+    void cancelColorize() override;
+    void applyOverlays( const std::string_view payload ) override;
+    void jumpToOverlay( const std::string_view payload ) override;
+    void removeOverlays() override;
+    void cleanupOverlays() override;
+
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
     SwXDocumentPropertyHelper * GetPropertyHelper ();
