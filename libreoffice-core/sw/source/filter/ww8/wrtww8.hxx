@@ -642,6 +642,9 @@ public:
     /// Find the bookmark name.
     OUString GetBookmarkName( sal_uInt16 nTyp, const OUString* pName, sal_uInt16 nSeqNo );
 
+    /// Find out which style we should use in OOXML
+    OUString GetStyleRefName(const OUString& rName);
+
     /// Use OutputItem() on an item set according to the parameters.
     void OutputItemSet( const SfxItemSet& rSet, bool bPapFormat, bool bChpFormat, sal_uInt16 nScript, bool bExportParentItemSet );
 
@@ -1645,6 +1648,8 @@ public:
 
     /// Get styleId of the nSlot-th style (nSlot is its position in m_aStyles).
     OString const & GetStyleId(sal_uInt16 nSlot) const;
+    /// the awful TOC field references names, not styleIds
+    OUString GetStyleWWName(SwFormat const* pFormat) const;
 
     const SwFormat* GetSwFormat(sal_uInt16 nSlot) const { return m_aStyles[nSlot].format; }
     /// Get numbering rule of the nSlot-th style

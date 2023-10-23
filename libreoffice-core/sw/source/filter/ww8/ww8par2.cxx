@@ -58,6 +58,7 @@
 #include <fmtanchr.hxx>
 #include <fmtrowsplt.hxx>
 #include <fmtfollowtextflow.hxx>
+#include <formatflysplit.hxx>
 #include <numrule.hxx>
 #include "sprmids.hxx"
 #include <wwstyles.hxx>
@@ -167,14 +168,38 @@ sal_uInt32 wwSectionManager::GetWWPageTopMargin() const
     return !maSegments.empty() ? maSegments.back().maSep.dyaTop : 0;
 }
 
+namespace
+{
+bool IsInSplitFly(SwPaM& rPaM)
+{
+    SwNode& rNode = rPaM.GetPoint()->GetNode();
+    SwNodeOffset nNodeIndex = rNode.GetIndex();
+    SwNodes& rNodes = rNode.GetNodes();
+    if (nNodeIndex >= rNodes.GetEndOfAutotext().GetIndex()
+        || nNodeIndex < rNodes.GetEndOfInserts().GetIndex())
+    {
+        return false;
+    }
+
+    SwFrameFormat* pFlyFormat = rNode.StartOfSectionNode()->GetFlyFormat();
+    if (!pFlyFormat)
+    {
+        return false;
+    }
+
+    return pFlyFormat->GetFlySplit().GetValue();
+}
+}
+
 sal_uInt16 SwWW8ImplReader::End_Footnote()
 {
     /*
     Ignoring Footnote outside of the normal Text. People will put footnotes
     into field results and field commands.
     */
-    if (m_bIgnoreText ||
-        m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras())
+    bool bSplitFly = IsInSplitFly(*m_pPaM);
+    if (m_bIgnoreText
+        || (m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras() && !bSplitFly))
     {
         return 0;
     }
@@ -301,8 +326,9 @@ tools::Long SwWW8ImplReader::Read_Footnote(WW8PLCFManResult* pRes)
     Ignoring Footnote outside of the normal Text. People will put footnotes
     into field results and field commands.
     */
-    if (m_bIgnoreText ||
-        m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras())
+    bool bSplitFly = IsInSplitFly(*m_pPaM);
+    if (m_bIgnoreText
+        || (m_pPaM->GetPoint()->GetNode() < m_rDoc.GetNodes().GetEndOfExtras() && !bSplitFly))
     {
         return 0;
     }
@@ -3429,8 +3455,8 @@ bool SwWW8ImplReader::StartTable(WW8_CP nStartCp)
                     m_aSectionManager.GetTextAreaWidth(),
                     m_nIniFlyDx, m_nIniFlyDy);
 
-                // #i45301# - anchor nested table Writer fly frame at-character
-                eAnchor = RndStdIds::FLY_AT_CHAR;
+                // #i45301# - anchor nested table Writer fly frame
+                eAnchor = RndStdIds::FLY_AT_PARA;
             }
         }
     }
@@ -3448,7 +3474,7 @@ bool SwWW8ImplReader::StartTable(WW8_CP nStartCp)
     {
         int nNewInTable = m_nInTable + 1;
 
-        if ((eAnchor == RndStdIds::FLY_AT_CHAR)
+        if ((eAnchor == RndStdIds::FLY_AT_PARA)
             && !m_aTableStack.empty() && !InEqualApo(nNewInTable) )
         {
             m_xTableDesc->m_pParentPos = new SwPosition(*m_pPaM->GetPoint());
@@ -3473,9 +3499,12 @@ bool SwWW8ImplReader::StartTable(WW8_CP nStartCp)
             if ( pTableWFlyPara && pTableSFlyPara )
             {
                 WW8FlySet aFlySet( *this, pTableWFlyPara.get(), pTableSFlyPara, false );
-                SwFormatAnchor aAnchor( RndStdIds::FLY_AT_CHAR );
+                // At-para, so it can split in the multi-page case.
+                SwFormatAnchor aAnchor(RndStdIds::FLY_AT_PARA);
                 aAnchor.SetAnchor( m_xTableDesc->m_pParentPos );
                 aFlySet.Put( aAnchor );
+                // Map a positioned inner table to a split fly.
+                aFlySet.Put(SwFormatFlySplit(true));
                 m_xTableDesc->m_pFlyFormat->SetFormatAttr( aFlySet );
             }
             else

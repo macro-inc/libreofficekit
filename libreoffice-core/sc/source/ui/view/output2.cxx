@@ -1481,13 +1481,21 @@ tools::Rectangle ScOutputData::LayoutStrings(bool bPixelToLogic, bool bPaint, co
 {
     bool bOrigIsInLayoutStrings = mpDoc->IsInLayoutStrings();
     mpDoc->SetLayoutStrings(true);
-    comphelper::ScopeGuard g([this, bOrigIsInLayoutStrings] {
-        mpDoc->SetLayoutStrings(bOrigIsInLayoutStrings);
-    });
 
     OSL_ENSURE( mpDev == mpRefDevice ||
                 mpDev->GetMapMode().GetMapUnit() == mpRefDevice->GetMapMode().GetMapUnit(),
                 "LayoutStrings: different MapUnits ?!?!" );
+
+    vcl::text::ComplexTextLayoutFlags eTextLayout = mpDev->GetLayoutMode();
+    comphelper::ScopeGuard g([this, bOrigIsInLayoutStrings, eTextLayout] {
+        mpDoc->SetLayoutStrings(bOrigIsInLayoutStrings);
+
+        if (mpDev->GetLayoutMode() != eTextLayout)
+            mpDev->SetLayoutMode(eTextLayout);
+    });
+
+    if (mpDev->GetLayoutMode() != vcl::text::ComplexTextLayoutFlags::Default)
+        mpDev->SetLayoutMode(vcl::text::ComplexTextLayoutFlags::Default);
 
     sc::IdleSwitch aIdleSwitch(*mpDoc, false);
 
@@ -2160,6 +2168,7 @@ std::unique_ptr<ScFieldEditEngine> ScOutputData::CreateOutputEditEngine()
 {
     std::unique_ptr<ScFieldEditEngine> pEngine(new ScFieldEditEngine(mpDoc, mpDoc->GetEnginePool()));
     pEngine->SetUpdateLayout( false );
+    pEngine->EnableUndo( false ); // dont need undo for painting purposes
     // a RefDevice always has to be set, otherwise EditEngine would create a VirtualDevice
     pEngine->SetRefDevice( pFmtDevice );
     EEControlBits nCtrl = pEngine->GetControlWord();

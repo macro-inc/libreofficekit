@@ -343,6 +343,7 @@ constexpr OUStringLiteral gsPropertyItems(u"Items");
 constexpr OUStringLiteral gsPropertyLevel(u"Level");
 constexpr OUStringLiteral gsPropertyMeasureKind(u"Kind");
 constexpr OUStringLiteral gsPropertyName(u"Name");
+constexpr OUStringLiteral gsPropertyParentName(u"ParentName");
 constexpr OUStringLiteral gsPropertyNumberFormat(u"NumberFormat");
 constexpr OUStringLiteral gsPropertyNumberingSeparator(u"NumberingSeparator");
 constexpr OUStringLiteral gsPropertyNumberingType(u"NumberingType");
@@ -563,6 +564,9 @@ enum FieldIdEnum XMLTextFieldExport::MapFieldName(
                 case ReferenceFieldSource::ENDNOTE:
                     nToken = FIELD_ID_REF_ENDNOTE;
                     break;
+                case ReferenceFieldSource::STYLE:
+                    nToken = FIELD_ID_REF_STYLE;
+                    break;
                 default:
                     nToken = FIELD_ID_UNKNOWN;
                     break;
@@ -703,6 +707,7 @@ bool XMLTextFieldExport::IsStringField(
     case FIELD_ID_REF_BOOKMARK:
     case FIELD_ID_REF_FOOTNOTE:
     case FIELD_ID_REF_ENDNOTE:
+    case FIELD_ID_REF_STYLE:
     case FIELD_ID_MACRO:
     case FIELD_ID_TEMPLATE_NAME:
     case FIELD_ID_CHAPTER:
@@ -914,6 +919,7 @@ void XMLTextFieldExport::ExportFieldAutoStyle(
     case FIELD_ID_REF_BOOKMARK:
     case FIELD_ID_REF_FOOTNOTE:
     case FIELD_ID_REF_ENDNOTE:
+    case FIELD_ID_REF_STYLE:
     case FIELD_ID_MACRO:
     case FIELD_ID_REFPAGE_SET:
     case FIELD_ID_REFPAGE_GET:
@@ -1646,6 +1652,30 @@ void XMLTextFieldExport::ExportFieldHelper(
             sPresentation);
         break;
 
+    case FIELD_ID_REF_STYLE:
+    {
+        ProcessString(XML_REFERENCE_FORMAT,
+                      MapReferenceType(GetInt16Property(gsPropertyReferenceFieldPart, rPropSet)),
+                      XML_TEMPLATE);
+        ProcessString(XML_REF_NAME, GetStringProperty(gsPropertySourceName, rPropSet));
+        if (xPropSetInfo->hasPropertyByName(gsPropertyReferenceFieldLanguage)
+            && GetExport().getSaneDefaultVersion() & SvtSaveOptions::ODFSVER_EXTENDED)
+        {
+            // export text:reference-language attribute, if not empty
+            ProcessString(XML_REFERENCE_LANGUAGE,
+                          GetStringProperty(gsPropertyReferenceFieldLanguage, rPropSet), true,
+                          XML_NAMESPACE_LO_EXT);
+        }
+        SvXMLElementExport aElem(
+            GetExport(),
+            XML_NAMESPACE_LO_EXT,
+            MapReferenceSource(GetInt16Property(gsPropertyReferenceFieldSource, rPropSet)),
+            false,
+            false);
+        GetExport().Characters(sPresentation);
+        break;
+    }
+
     case FIELD_ID_DDE:
         // name from field master
          ProcessString(XML_CONNECTION_NAME,
@@ -1729,6 +1759,14 @@ void XMLTextFieldExport::ExportFieldHelper(
         {
             GetExport().AddAttribute(XML_NAMESPACE_OFFICE, XML_NAME, aName);
         }
+
+        OUString aParentName;
+        rPropSet->getPropertyValue(gsPropertyParentName) >>= aParentName;
+        if (!aParentName.isEmpty())
+        {
+            GetExport().AddAttribute(XML_NAMESPACE_LO_EXT, XML_PARENT_NAME, aParentName);
+        }
+
         SvtSaveOptions::ODFSaneDefaultVersion eVersion = rExport.getSaneDefaultVersion();
         if (eVersion & SvtSaveOptions::ODFSVER_EXTENDED)
         {
@@ -3149,6 +3187,9 @@ enum XMLTokenEnum XMLTextFieldExport::MapReferenceSource(sal_Int16 nType)
         case ReferenceFieldSource::FOOTNOTE:
         case ReferenceFieldSource::ENDNOTE:
             eElement = XML_NOTE_REF;
+            break;
+        case ReferenceFieldSource::STYLE:
+            eElement = XML_STYLE_REF;
             break;
         default:
             OSL_FAIL("unknown reference source");

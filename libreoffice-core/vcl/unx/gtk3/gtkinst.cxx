@@ -16720,6 +16720,9 @@ public:
         g_signal_handler_disconnect(m_pTreeView, m_nRowActivatedSignalId);
         g_signal_handler_disconnect(gtk_tree_view_get_selection(m_pTreeView), m_nChangedSignalId);
 
+        if (g_DragSource == this)
+            g_DragSource = nullptr;
+
         GValue value = G_VALUE_INIT;
         g_value_init(&value, G_TYPE_POINTER);
         g_value_set_pointer(&value, static_cast<gpointer>(nullptr));
@@ -17456,11 +17459,6 @@ public:
     virtual void set_font(const vcl::Font& rFont) override
     {
         m_aCustomFont.use_custom_font(&rFont, u"spinbutton");
-    }
-
-    void set_update_policy_if_valid()
-    {
-        gtk_spin_button_set_update_policy(m_pButton, GTK_UPDATE_IF_VALID);
     }
 
     virtual void disable_notify_events() override
@@ -24309,13 +24307,7 @@ public:
 
     virtual std::unique_ptr<weld::MetricSpinButton> weld_metric_spin_button(const OString& id, FieldUnit eUnit) override
     {
-        std::unique_ptr<weld::SpinButton> xButton(weld_spin_button(id));
-        if (xButton)
-        {
-            GtkInstanceSpinButton& rButton = dynamic_cast<GtkInstanceSpinButton&>(*xButton);
-            rButton.set_update_policy_if_valid();
-        }
-        return std::make_unique<weld::MetricSpinButton>(std::move(xButton), eUnit);
+        return std::make_unique<weld::MetricSpinButton>(weld_spin_button(id), eUnit);
     }
 
     virtual std::unique_ptr<weld::FormattedSpinButton> weld_formatted_spin_button(const OString &id) override

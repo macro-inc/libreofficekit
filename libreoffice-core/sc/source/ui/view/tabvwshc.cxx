@@ -48,6 +48,7 @@
 #include <markdata.hxx>
 #include <reffact.hxx>
 #include <condformatdlg.hxx>
+#include <condformateasydlg.hxx>
 #include <xmlsourcedlg.hxx>
 #include <condformatdlgitem.hxx>
 #include <formdata.hxx>
@@ -322,6 +323,11 @@ std::shared_ptr<SfxModelessDialogController> ScTabViewShell::CreateRefDialogCont
             xResult = std::make_shared<ScConsolidateDlg>(pB, pCW, pParent, aArgSet);
             break;
         }
+        case SID_EASY_CONDITIONAL_FORMAT_DIALOG:
+        {
+            xResult = std::make_shared<sc::ConditionalFormatEasyDialog>(pB, pCW, pParent, &GetViewData());
+            break;
+        }
         case SID_FILTER:
         {
 
@@ -514,11 +520,6 @@ void ScTabViewShell::NotifyCursor(SfxViewShell* pOtherShell) const
     }
 
     return {};
-}
-
-OUString ScTabViewShell::GetColorConfigName() const
-{
-    return GetViewData().GetOptions().GetColorSchemeName();
 }
 
 css::uno::Reference<css::datatransfer::XTransferable2> ScTabViewShell::GetClipData(vcl::Window* pWin)

@@ -67,7 +67,7 @@ public:
     void test();
     void testDefaultFontHeight();
     void testTdf139167();
-    void testTdf113271();
+    void testFontColorWithMultipleAttributesDefined();
     void testTdf139394();
     void testExtCondFormatXLSX();
     void testTdf90104();
@@ -98,6 +98,7 @@ public:
     void testBuiltinRangesXLSX();
     void testRichTextExportODS();
     void testRichTextCellFormatXLSX();
+    void testWrapText();
     void testFormulaRefSheetNameODS();
 
     void testCellValuesExportODS();
@@ -188,7 +189,7 @@ public:
     CPPUNIT_TEST(test);
     CPPUNIT_TEST(testDefaultFontHeight);
     CPPUNIT_TEST(testTdf139167);
-    CPPUNIT_TEST(testTdf113271);
+    CPPUNIT_TEST(testFontColorWithMultipleAttributesDefined);
     CPPUNIT_TEST(testTdf139394);
     CPPUNIT_TEST(testExtCondFormatXLSX);
     CPPUNIT_TEST(testTdf90104);
@@ -219,6 +220,7 @@ public:
     CPPUNIT_TEST(testBuiltinRangesXLSX);
     CPPUNIT_TEST(testRichTextExportODS);
     CPPUNIT_TEST(testRichTextCellFormatXLSX);
+    CPPUNIT_TEST(testWrapText);
     CPPUNIT_TEST(testFormulaRefSheetNameODS);
     CPPUNIT_TEST(testCellValuesExportODS);
     CPPUNIT_TEST(testCellNoteExportODS);
@@ -352,8 +354,13 @@ void ScExportTest::testTdf139167()
                 "FFFFFF00");
 }
 
-void ScExportTest::testTdf113271()
+void ScExportTest::testFontColorWithMultipleAttributesDefined()
 {
+    // Related: TDF #113271
+    // Test font color where "rgb" and "theme" attribute is defined and
+    // is imported and exported correctly. Theme should have priority,
+    // so LO is fine to ignore "rgb" at export.
+
     createScDoc("xlsx/tdf113271.xlsx");
 
     save("Calc Office Open XML");
@@ -362,10 +369,11 @@ void ScExportTest::testTdf113271()
 
     assertXPath(pDoc, "/x:styleSheet/x:fonts", "count", "6");
 
-    // Without the fix in place, this test would have failed with
-    // - Expected: FF000000
-    // - Actual  : FFFFFFFF
-    assertXPath(pDoc, "/x:styleSheet/x:fonts/x:font[1]/x:color", "rgb", "FF000000");
+    // Expect "theme" attribute to be set correctly
+    assertXPath(pDoc, "/x:styleSheet/x:fonts/x:font[1]/x:color", "theme", "1");
+    // We don't export "rgb" attribute
+    assertXPathNoAttribute(pDoc, "/x:styleSheet/x:fonts/x:font[1]/x:color", "rgb");
+    // Just making sure the checked font is the correct one
     assertXPath(pDoc, "/x:styleSheet/x:fonts/x:font[1]/x:name", "val", "Calibri");
 }
 
@@ -2044,6 +2052,26 @@ void ScExportTest::testRichTextCellFormatXLSX()
     // that font should be bold
     const OString aXPath3("/x:styleSheet/x:fonts/x:font[" + nFontIdx + "]/x:b");
     assertXPath(pStyles, aXPath3, "val", "true");
+}
+
+void ScExportTest::testWrapText()
+{
+    createScDoc("xlsx/wrap-text.xlsx");
+
+    save("Calc Office Open XML");
+
+    xmlDocUniquePtr pStyles = parseExport("xl/styles.xml");
+    CPPUNIT_ASSERT(pStyles);
+
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs", "count", "7");
+
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[1]/x:alignment", "wrapText", "false");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[2]/x:alignment", "wrapText", "false");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[3]/x:alignment", "wrapText", "false");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[4]/x:alignment", "wrapText", "false");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[5]/x:alignment", "wrapText", "true");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[6]/x:alignment", "wrapText", "true");
+    assertXPath(pStyles, "/x:styleSheet/x:cellXfs/x:xf[7]/x:alignment", "wrapText", "true");
 }
 
 void ScExportTest::testFormulaRefSheetNameODS()
@@ -3849,8 +3877,7 @@ void ScExportTest::testPreserveTextWhitespace2XLSX()
     xmlDocUniquePtr pDoc = parseExport("xl/sharedStrings.xml");
     CPPUNIT_ASSERT(pDoc);
     assertXPath(pDoc, "/x:sst/x:si[1]/x:t", "space", "preserve");
-    assertXPath(pDoc, "/x:sst/x:si[2]/x:r[1]/x:t", "space", "preserve");
-    assertXPath(pDoc, "/x:sst/x:si[2]/x:r[2]/x:t", "space", "preserve");
+    assertXPath(pDoc, "/x:sst/x:si[2]/x:t", "space", "preserve");
 }
 
 void ScExportTest::testHiddenShapeXLS()

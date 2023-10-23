@@ -686,6 +686,12 @@ bool SwFlyFrame::IsFlySplitAllowed() const
         return false;
     }
 
+    if (pFlyAnchor && pFlyAnchor->IsInFootnote())
+    {
+        // No split in footnotes.
+        return false;
+    }
+
     const SwFlyFrameFormat* pFormat = GetFormat();
     const SwFormatVertOrient& rVertOrient = pFormat->GetVertOrient();
     if (rVertOrient.GetVertOrient() == text::VertOrientation::BOTTOM)
@@ -1436,7 +1442,7 @@ void SwFlyFrame::Format( vcl::RenderContext* /*pRenderContext*/, const SwBorderA
                 SwTwips nDeadline = GetFlyAnchorBottom(this, *pAnchor);
                 SwTwips nTop = aRectFnSet.GetTop(getFrameArea());
                 SwTwips nBottom = aRectFnSet.GetTop(getFrameArea()) + nRemaining;
-                if (nBottom > nDeadline)
+                if (nBottom > nDeadline && nDeadline > nTop)
                 {
                     nRemaining = nDeadline - nTop;
                 }
@@ -1842,7 +1848,12 @@ void CalcContent( SwLayoutFrame *pLay, bool bNoColl )
                 {
                     assert(static_cast<SwTabFrame*>(pFrame)->IsFollow());
                     static_cast<SwTabFrame*>(pFrame)->m_bLockBackMove = false;
-                    pFrame->InvalidatePos();
+                    // tdf#150606 encourage it to move back in FormatLayout()
+                    if (static_cast<SwTabFrame*>(pFrame)->m_bWantBackMove)
+                    {
+                        static_cast<SwTabFrame*>(pFrame)->m_bWantBackMove = false;
+                        pFrame->InvalidatePos();
+                    }
                 }
             }
 

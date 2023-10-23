@@ -293,7 +293,8 @@ Color::Color() :
     mnC1( 0 ),
     mnC2( 0 ),
     mnC3( 0 ),
-    mnAlpha( MAX_PERCENT )
+    mnAlpha( MAX_PERCENT ),
+    meThemeColorType( model::ThemeColorType::Unknown )
 {
 }
 
@@ -432,10 +433,18 @@ void Color::addChartTintTransformation( double fTint )
         maTransforms.emplace_back( XML_tint, MAX_PERCENT - nValue );
 }
 
-void Color::addExcelTintTransformation( double fTint )
+void Color::addExcelTintTransformation(double fTint)
 {
-    sal_Int32 nValue = getLimitedValue< sal_Int32, double >( fTint * MAX_PERCENT + 0.5, -MAX_PERCENT, MAX_PERCENT );
-    maTransforms.emplace_back( XLS_TOKEN( tint ), nValue );
+    sal_Int32 nValue = std::round(std::abs(fTint) * 100'000.0);
+    if (fTint > 0.0)
+    {
+        maTransforms.emplace_back(XML_lumMod, 100'000 - nValue);
+        maTransforms.emplace_back(XML_lumOff, nValue);
+    }
+    else if (fTint < 0.0)
+    {
+        maTransforms.emplace_back(XML_lumMod, 100'000 - nValue);
+    }
 }
 
 void Color::clearTransformations()
@@ -609,8 +618,7 @@ sal_Int16 Color::getLumOff() const
 
 model::ComplexColor Color::getComplexColor() const
 {
-    model::ComplexColor aComplexColor;
-    aComplexColor.setSchemeColor(model::convertToThemeColorType(getSchemeColorIndex()));
+    auto aComplexColor = model::ComplexColor::Theme(model::convertToThemeColorType(getSchemeColorIndex()));
 
     if (getTintOrShade() > 0)
     {
@@ -721,23 +729,6 @@ model::ComplexColor Color::getComplexColor() const
                         mnC3 = static_cast< sal_Int32 >( MAX_PERCENT - (MAX_PERCENT - mnC3) * fFactor );
                     }
                 break;
-                case XLS_TOKEN( tint ):
-                    // Excel tint: move luminance relative to current value
-                    toHsl();
-                    OSL_ENSURE( (-MAX_PERCENT <= transform.mnValue) && (transform.mnValue <= MAX_PERCENT), "Color::getColor - invalid tint value" );
-                    if( (-MAX_PERCENT <= transform.mnValue) && (transform.mnValue < 0) )
-                    {
-                        // negative: luminance towards 0% (black)
-                        lclModValue( mnC3, transform.mnValue + MAX_PERCENT );
-                    }
-                    else if( (0 < transform.mnValue) && (transform.mnValue <= MAX_PERCENT) )
-                    {
-                        // positive: luminance towards 100% (white)
-                        mnC3 = MAX_PERCENT - mnC3;
-                        lclModValue( mnC3, MAX_PERCENT - transform.mnValue );
-                        mnC3 = MAX_PERCENT - mnC3;
-                    }
-                break;
 
                 case XML_gray:
                     // change color to gray, weighted RGB: 22% red, 72% green, 6% blue
@@ -825,34 +816,49 @@ model::ComplexColor Color::createComplexColor(const GraphicHelper& /*rGraphicHel
     if (meMode == COLOR_PH)
     {
         auto eTheme = model::convertToThemeColorType(nPhClrTheme);
-        aNewComplexColor.setSchemeColor(eTheme);
+        aNewComplexColor.setThemeColor(eTheme);
     }
     else if (meMode == COLOR_SCHEME)
     {
         auto eTheme = getThemeColorType();
-        aNewComplexColor.setSchemeColor(eTheme);
+        aNewComplexColor.setThemeColor(eTheme);
+    }
+    else if (meMode == COLOR_RGB)
+    {
+        ::Color aColor(ColorTransparency, lclRgbComponentsToRgb(mnC1, mnC2, mnC3));
+        aNewComplexColor = model::ComplexColor::RGB(aColor);
     }
     else
     {
-        // TODO
+        // TODO - Add other options
         return aNewComplexColor;
     }
 
-    if (getLumMod() != 10000)
-        aNewComplexColor.addTransformation({model::TransformationType::LumMod, getLumMod()});
-
-    if (getLumOff() != 0)
-        aNewComplexColor.addTransformation({model::TransformationType::LumOff, getLumOff()});
-
-    if (getTintOrShade() > 0)
+    for(auto const& aTransform : maTransforms)
     {
-        aNewComplexColor.addTransformation({model::TransformationType::Tint, getTintOrShade()});
+        sal_Int16 nValue = sal_Int16(aTransform.mnValue / 10);
+
+        switch (aTransform.mnToken)
+        {
+            case XML_lumMod:
+                if (nValue != 10'000)
+                    aNewComplexColor.addTransformation({model::TransformationType::LumMod, nValue});
+                break;
+            case XML_lumOff:
+                if (nValue != 0)
+                    aNewComplexColor.addTransformation({model::TransformationType::LumOff, nValue});
+                break;
+            case XML_tint:
+                if (nValue != 0)
+                    aNewComplexColor.addTransformation({model::TransformationType::Tint, nValue});
+                break;
+            case XML_shade:
+                if (nValue != 0)
+                    aNewComplexColor.addTransformation({model::TransformationType::Shade, nValue});
+                break;
+        }
     }
-    else if (getTintOrShade() < 0)
-    {
-        sal_Int16 nShade = o3tl::narrowing<sal_Int16>(-getTintOrShade());
-        aNewComplexColor.addTransformation({model::TransformationType::Shade, nShade});
-    }
+
     return aNewComplexColor;
 }
 

@@ -129,6 +129,22 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     LOKTrigger::trigger_changed(*pCombobox);
                     return true;
                 }
+                else if (sAction == "render_entry")
+                {
+                    auto pJSCombobox = dynamic_cast<JSComboBox*>(pWidget);
+                    if (pJSCombobox)
+                    {
+                        // pos;dpix;dpiy
+                        const OUString& sParams = rData["data"];
+                        const OUString aPos = sParams.getToken(0, ';');
+                        const OUString aDpiScaleX = sParams.getToken(1, ';');
+                        const OUString aDpiScaleY = sParams.getToken(2, ';');
+
+                        pJSCombobox->render_entry(o3tl::toInt32(aPos), o3tl::toInt32(aDpiScaleX),
+                                                  o3tl::toInt32(aDpiScaleY));
+                    }
+                    return true;
+                }
             }
         }
         else if (sControlType == "pushbutton")
@@ -455,9 +471,14 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                     pTreeView->unselect_all();
 
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
-                    pTreeView->get_iter_abs_pos(*itEntry, nAbsPos);
-                    pTreeView->select(*itEntry);
-                    pTreeView->set_cursor_without_notify(*itEntry);
+                    if (pTreeView->get_iter_abs_pos(*itEntry, nAbsPos))
+                    {
+                        pTreeView->select(*itEntry);
+                        pTreeView->set_cursor_without_notify(*itEntry);
+                    }
+                    else
+                        SAL_WARN("vcl",
+                                 "No absolute position found for " << nAbsPos << " in treeview");
                     pTreeView->grab_focus();
                     LOKTrigger::trigger_changed(*pTreeView);
                     return true;
@@ -468,9 +489,14 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
 
                     pTreeView->unselect_all();
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
-                    pTreeView->get_iter_abs_pos(*itEntry, nRow);
-                    pTreeView->select(nRow);
-                    pTreeView->set_cursor_without_notify(*itEntry);
+                    if (pTreeView->get_iter_abs_pos(*itEntry, nRow))
+                    {
+                        pTreeView->select(nRow);
+                        pTreeView->set_cursor_without_notify(*itEntry);
+                    }
+                    else
+                        SAL_WARN("vcl",
+                                 "No absolute position found for " << nRow << " in treeview");
                     pTreeView->grab_focus();
                     LOKTrigger::trigger_changed(*pTreeView);
                     LOKTrigger::trigger_row_activated(*pTreeView);
@@ -480,20 +506,30 @@ bool ExecuteAction(const std::string& nWindowId, const OString& rWidget, StringM
                 {
                     sal_Int32 nAbsPos = o3tl::toInt32(rData["data"]);
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
-                    pTreeView->get_iter_abs_pos(*itEntry, nAbsPos);
-                    pTreeView->set_cursor_without_notify(*itEntry);
-                    pTreeView->grab_focus();
-                    pTreeView->expand_row(*itEntry);
+                    if (pTreeView->get_iter_abs_pos(*itEntry, nAbsPos))
+                    {
+                        pTreeView->set_cursor_without_notify(*itEntry);
+                        pTreeView->grab_focus();
+                        pTreeView->expand_row(*itEntry);
+                    }
+                    else
+                        SAL_WARN("vcl",
+                                 "No absolute position found for " << nAbsPos << " in treeview");
                     return true;
                 }
                 else if (sAction == "collapse")
                 {
                     sal_Int32 nAbsPos = o3tl::toInt32(rData["data"]);
                     std::unique_ptr<weld::TreeIter> itEntry(pTreeView->make_iterator());
-                    pTreeView->get_iter_abs_pos(*itEntry, nAbsPos);
-                    pTreeView->set_cursor_without_notify(*itEntry);
-                    pTreeView->grab_focus();
-                    pTreeView->collapse_row(*itEntry);
+                    if (pTreeView->get_iter_abs_pos(*itEntry, nAbsPos))
+                    {
+                        pTreeView->set_cursor_without_notify(*itEntry);
+                        pTreeView->grab_focus();
+                        pTreeView->collapse_row(*itEntry);
+                    }
+                    else
+                        SAL_WARN("vcl",
+                                 "No absolute position found for " << nAbsPos << " in treeview");
                     return true;
                 }
                 else if (sAction == "dragstart")

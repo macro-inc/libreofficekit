@@ -488,9 +488,15 @@ ScNavigatorDlg::~ScNavigatorDlg()
 
 void ScNavigatorDlg::Notify( SfxBroadcaster&, const SfxHint& rHint )
 {
-    if (const SfxEventHint* pHint = dynamic_cast<const SfxEventHint*>(&rHint))
+    if (rHint.GetId() == SfxHintId::ThisIsAnSfxEventHint)
     {
-        if (pHint->GetEventId() == SfxEventHintId::ActivateDoc)
+        // This is for when the document might change and the navigator
+        // wants to update for the new document, which isn't a scenario
+        // that happens in online.
+        if (comphelper::LibreOfficeKit::isActive())
+            return;
+        const SfxEventHint& rEventHint = static_cast<const SfxEventHint&>(rHint);
+        if (rEventHint.GetEventId() == SfxEventHintId::ActivateDoc)
         {
             UpdateSheetLimits();
             bool bRefreshed = m_xLbEntries->ActiveDocChanged();

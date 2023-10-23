@@ -168,8 +168,7 @@ namespace {
             const OString sRects = comphelper::string::join("; ", aRects);
 
             aAnnotation.put("id", pField->GetPostItId());
-            aAnnotation.put("parent", pWin->CalcParent());
-            aAnnotation.put("paraIdParent", pField->GetParentId());
+            aAnnotation.put("parentId", pField->GetParentPostItId());
             aAnnotation.put("author", pField->GetPar1().toUtf8().getStr());
             aAnnotation.put("text", pField->GetPar2().toUtf8().getStr());
             aAnnotation.put("resolved", pField->GetResolved() ? "true" : "false");
@@ -340,9 +339,10 @@ void SwPostItMgr::RemoveItem( SfxBroadcaster* pBroadcast )
 
 void SwPostItMgr::Notify( SfxBroadcaster& rBC, const SfxHint& rHint )
 {
-    if ( const SfxEventHint* pSfxEventHint = dynamic_cast<const SfxEventHint*>(&rHint) )
+    if (rHint.GetId() == SfxHintId::ThisIsAnSfxEventHint)
     {
-        if ( pSfxEventHint->GetEventId() == SfxEventHintId::SwEventLayoutFinished )
+        const SfxEventHint& rSfxEventHint = static_cast<const SfxEventHint&>(rHint);
+        if (rSfxEventHint.GetEventId() == SfxEventHintId::SwEventLayoutFinished)
         {
             if ( !mbWaitingForCalcRects && !mvPostItFields.empty())
             {
@@ -747,7 +747,7 @@ void SwPostItMgr::LayoutPostIts()
                             pItem->mpPostIt = pPostIt;
                             if (mpAnswer)
                             {
-                                if (static_cast<bool>(pPostIt->CalcParent())) //do we really have another note in front of this one
+                                if (pPostIt->GetPostItField()->GetParentPostItId() != 0) //do we really have another note in front of this one
                                     pPostIt->InitAnswer(*mpAnswer);
                                 mpAnswer.reset();
                             }
@@ -757,7 +757,9 @@ void SwPostItMgr::LayoutPostIts()
                             pItem->mLayoutStatus,
                             GetColorAnchor(pItem->maLayoutInfo.mRedlineAuthor));
                         pPostIt->SetSidebarPosition(pPage->eSidebarPosition);
-                        pPostIt->SetFollow(static_cast<bool>(pPostIt->CalcParent()));
+
+                        if (pPostIt->GetPostItField()->GetParentPostItId() != 0)
+                            pPostIt->SetFollow(true);
 
                         tools::Long aPostItHeight = 0;
                         if (bShowNotes)
@@ -1336,6 +1338,30 @@ void SwPostItMgr::AddPostIts(const bool bCheckExistence, const bool bFocus)
     SwFieldType* pType = mpView->GetDocShell()->GetDoc()->getIDocumentFieldsAccess().GetFieldType(SwFieldIds::Postit, OUString(),false);
     std::vector<SwFormatField*> vFormatFields;
     pType->CollectPostIts(vFormatFields, rIDRA, mpWrtShell->GetLayout()->IsHideRedlines());
+
+    for (std::vector<SwFormatField*>::iterator i = vFormatFields.begin(); i != vFormatFields.end(); i++)
+    {
+        SwPostItField *pChildPostIt = static_cast<SwPostItField*>((*i)->GetField());
+
+        if (pChildPostIt->GetParentId() != 0 || !pChildPostIt->GetParentName().isEmpty())
+        {
+            for (std::vector<SwFormatField*>::iterator j = vFormatFields.begin(); j != vFormatFields.end(); j++)
+            {
+                SwPostItField *pParentPostIt = static_cast<SwPostItField*>((*j)->GetField());
+                if (pChildPostIt->GetParentId() != 0 && pParentPostIt->GetParaId() == pChildPostIt->GetParentId())
+                {
+                    pChildPostIt->SetParentPostItId(pParentPostIt->GetPostItId());
+                    pChildPostIt->SetParentName(pParentPostIt->GetName());
+                }
+                else if (!pParentPostIt->GetName().isEmpty() && pParentPostIt->GetName() == pChildPostIt->GetParentName())
+                {
+                    pChildPostIt->SetParentPostItId(pParentPostIt->GetPostItId());
+                    pChildPostIt->SetParentName(pParentPostIt->GetName());
+                }
+            }
+        }
+    }
+
     for(auto pFormatField : vFormatFields)
         InsertItem(pFormatField, bCheckExistence, bFocus);
     // if we just added the first one we have to update the view for centering

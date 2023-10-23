@@ -240,7 +240,8 @@ class SvxZoomSliderItem;
 #define SID_FOURIER_ANALYSIS_DIALOG         (SC_MESSAGE_START + 88)
 #define SID_SPARKLINE_DIALOG                (SC_MESSAGE_START + 89)
 #define SID_SPARKLINE_DATA_RANGE_DIALOG     (SC_MESSAGE_START + 90)
-
+#define SID_POPUP_EASY_CONDITIONAL_FORMAT   (SC_MESSAGE_START + 91)
+#define SID_EASY_CONDITIONAL_FORMAT_DIALOG  (SC_MESSAGE_START + 92)
 
 // functions
 
@@ -621,6 +622,7 @@ static_assert(SID_PREVIEW_END < SID_KEYFUNC_START, "calc slots ids trampling inf
 #define SID_GROUP_SPARKLINES        (SID_NEW_SLOTS+114)
 #define SID_UNGROUP_SPARKLINES      (SID_NEW_SLOTS+115)
 #define SID_EDIT_SPARKLINE          (SID_NEW_SLOTS+116)
+#define SID_SC_OPT_LINKS            TypedWhichId<SfxBoolItem>(SID_NEW_SLOTS + 117)
 
 // idl parameter
 

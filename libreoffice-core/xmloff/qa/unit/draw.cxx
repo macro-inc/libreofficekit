@@ -238,7 +238,58 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeImport)
                          pColorSet->getColor(model::ThemeColorType::FollowedHyperlink));
 }
 
-CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
+namespace
+{
+void checkFillAndLineComplexColors(uno::Reference<drawing::XShape> const& xShape)
+{
+    CPPUNIT_ASSERT(xShape.is());
+    uno::Reference<beans::XPropertySet> xShapeProperties(xShape, uno::UNO_QUERY);
+    {
+        uno::Reference<util::XComplexColor> xComplexColor;
+        xShapeProperties->getPropertyValue("FillComplexColor") >>= xComplexColor;
+        CPPUNIT_ASSERT(xComplexColor.is());
+        auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getThemeColorType());
+        CPPUNIT_ASSERT_EQUAL(size_t(2), aComplexColor.getTransformations().size());
+        auto const& rTrans1 = aComplexColor.getTransformations()[0];
+        CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
+        CPPUNIT_ASSERT_EQUAL(sal_Int16(4000), rTrans1.mnValue);
+        auto const& rTrans2 = aComplexColor.getTransformations()[1];
+        CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumOff, rTrans2.meType);
+        CPPUNIT_ASSERT_EQUAL(sal_Int16(6000), rTrans2.mnValue);
+    }
+    {
+        uno::Reference<util::XComplexColor> xComplexColor;
+        xShapeProperties->getPropertyValue("LineComplexColor") >>= xComplexColor;
+        CPPUNIT_ASSERT(xComplexColor.is());
+        auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getThemeColorType());
+        CPPUNIT_ASSERT_EQUAL(size_t(2), aComplexColor.getTransformations().size());
+        auto const& rTrans1 = aComplexColor.getTransformations()[0];
+        CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
+        CPPUNIT_ASSERT_EQUAL(sal_Int16(6000), rTrans1.mnValue);
+        auto const& rTrans2 = aComplexColor.getTransformations()[1];
+        CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumOff, rTrans2.meType);
+        CPPUNIT_ASSERT_EQUAL(sal_Int16(4000), rTrans2.mnValue);
+    }
+}
+
+} // end anonymous ns
+
+CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testFillAndLineThemeColorExportImport)
+{
+    loadFromURL(u"FillAndStrokeThemeColorTest.fodp");
+
+    checkFillAndLineComplexColors(getShape(0));
+
+    save("impress8");
+
+    load(maTempFile.GetURL());
+
+    checkFillAndLineComplexColors(getShape(0));
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testTextAndFillThemeColorExportImport)
 {
     // Given a document that refers to a theme color:
     loadFromURL(u"Reference-ThemeColors-TextAndFill.pptx");
@@ -311,7 +362,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xShapeProperties->getPropertyValue("FillComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getThemeColorType());
         CPPUNIT_ASSERT_EQUAL(size_t(2), aComplexColor.getTransformations().size());
         auto const& rTrans1 = aComplexColor.getTransformations()[0];
         CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
@@ -328,7 +379,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xShapeProperties->getPropertyValue("FillComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getThemeColorType());
         CPPUNIT_ASSERT_EQUAL(size_t(2), aComplexColor.getTransformations().size());
         auto const& rTrans1 = aComplexColor.getTransformations()[0];
         CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
@@ -345,7 +396,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xShapeProperties->getPropertyValue("FillComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent2, aComplexColor.getThemeColorType());
         CPPUNIT_ASSERT_EQUAL(size_t(1), aComplexColor.getTransformations().size());
         auto const& rTrans1 = aComplexColor.getTransformations()[0];
         CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
@@ -364,7 +415,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xPortion->getPropertyValue("CharComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getThemeColorType());
         auto const& rTransforms = aComplexColor.getTransformations();
         CPPUNIT_ASSERT_EQUAL(size_t(2), rTransforms.size());
         auto const& rTrans1 = rTransforms[0];
@@ -385,7 +436,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xPortion->getPropertyValue("CharComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getThemeColorType());
         auto const& rTransforms = aComplexColor.getTransformations();
         CPPUNIT_ASSERT_EQUAL(size_t(2), rTransforms.size());
         auto const& rTrans1 = rTransforms[0];
@@ -406,7 +457,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColorExportImport)
         xPortion->getPropertyValue("CharComplexColor") >>= xComplexColor;
         CPPUNIT_ASSERT(xComplexColor.is());
         auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getSchemeType());
+        CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent3, aComplexColor.getThemeColorType());
         CPPUNIT_ASSERT_EQUAL(size_t(1), aComplexColor.getTransformations().size());
         auto const& rTrans1 = aComplexColor.getTransformations()[0];
         CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod, rTrans1.meType);
@@ -429,7 +480,7 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testThemeColor_ShapeFill)
     xShapeProperties->getPropertyValue("FillComplexColor") >>= xComplexColor;
     CPPUNIT_ASSERT(xComplexColor.is());
     auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent6, aComplexColor.getSchemeType());
+    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Accent6, aComplexColor.getThemeColorType());
     CPPUNIT_ASSERT_EQUAL(size_t(1), aComplexColor.getTransformations().size());
     CPPUNIT_ASSERT_EQUAL(model::TransformationType::LumMod,
                          aComplexColor.getTransformations()[0].meType);
@@ -674,6 +725,96 @@ CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testTextRotationPlusPre)
     // This should already catch the format error, but does not, see tdf#149567
     // But reload catches it.
     saveAndReload("writer8");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testTdf156975_ThemeExport)
+{
+    // It tests, that a theme is written to master page in Draw documents.
+    // Without fix for tdf#156975 it was not written at all.
+    // The test needs to be adapted, when themes are available in ODF.
+
+    mxComponent = loadFromDesktop("private:factory/sdraw");
+    // generate a theme to be sure we have got one and know the values
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XMasterPageTarget> xDrawPage(
+        xDrawPagesSupplier->getDrawPages()->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xMasterPageProps(xDrawPage->getMasterPage(),
+                                                         uno::UNO_QUERY);
+
+    auto pTheme = std::make_shared<model::Theme>("Custom");
+    auto pColorSet = std::make_shared<model::ColorSet>("My Colors");
+    pColorSet->add(model::ThemeColorType::Dark1, 0x000000);
+    pColorSet->add(model::ThemeColorType::Light1, 0xffff11);
+    pColorSet->add(model::ThemeColorType::Dark2, 0x002200);
+    pColorSet->add(model::ThemeColorType::Light2, 0xff33ff);
+    pColorSet->add(model::ThemeColorType::Accent1, 0x440000);
+    pColorSet->add(model::ThemeColorType::Accent2, 0x005500);
+    pColorSet->add(model::ThemeColorType::Accent3, 0x000066);
+    pColorSet->add(model::ThemeColorType::Accent4, 0x777700);
+    pColorSet->add(model::ThemeColorType::Accent5, 0x880088);
+    pColorSet->add(model::ThemeColorType::Accent6, 0x009999);
+    pColorSet->add(model::ThemeColorType::Hyperlink, 0x0a0a0a);
+    pColorSet->add(model::ThemeColorType::FollowedHyperlink, 0xb0b0b0);
+    pTheme->setColorSet(pColorSet);
+
+    uno::Reference<util::XTheme> xTheme = model::theme::createXTheme(pTheme);
+    xMasterPageProps->setPropertyValue("Theme", uno::Any(xTheme));
+
+    // save as odg
+    save("draw8");
+
+    // and check the markup.
+    xmlDocUniquePtr pXmlDoc = parseExport("styles.xml");
+    static constexpr OStringLiteral sThemePath
+        = "//office:master-styles/style:master-page/loext:theme";
+    assertXPath(pXmlDoc, sThemePath, 1);
+    assertXPath(pXmlDoc, sThemePath + "[@loext:name='Custom']");
+
+    const OString sThemeColorsPath = sThemePath + "/loext:theme-colors";
+    assertXPath(pXmlDoc, sThemeColorsPath, 1);
+    assertXPath(pXmlDoc, sThemeColorsPath + "[@loext:name='My Colors']");
+
+    const OString sThemeColorPath = sThemeColorsPath + "/loext:color";
+    assertXPath(pXmlDoc, sThemeColorPath, 12);
+    assertXPath(pXmlDoc, sThemeColorPath + "[3]", "name", "dark2");
+    assertXPath(pXmlDoc, sThemeColorPath + "[3]", "color", "#002200");
+    assertXPath(pXmlDoc, sThemeColorPath + "[9]", "name", "accent5");
+    assertXPath(pXmlDoc, sThemeColorPath + "[9]", "color", "#880088");
+    assertXPath(pXmlDoc, sThemeColorPath + "[12]", "name", "followed-hyperlink");
+    assertXPath(pXmlDoc, sThemeColorPath + "[12]", "color", "#b0b0b0");
+}
+
+CPPUNIT_TEST_FIXTURE(XmloffDrawTest, testTdf157018_ThemeImportDraw)
+{
+    // Similar to testThemeImport but for Draw.
+    // Load document with custom color theme
+    loadFromURL(u"tdf157018_CustomTheme.fodg");
+
+    // First make sure the doc model has a master page with a theme:
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XMasterPageTarget> xDrawPage(
+        xDrawPagesSupplier->getDrawPages()->getByIndex(0), uno::UNO_QUERY);
+    uno::Reference<beans::XPropertySet> xMasterpage(xDrawPage->getMasterPage(), uno::UNO_QUERY);
+
+    uno::Reference<util::XTheme> xTheme;
+    xMasterpage->getPropertyValue("Theme") >>= xTheme;
+    CPPUNIT_ASSERT(xTheme.is());
+
+    // Then make sure it is the custom color theme
+    auto* pUnoTheme = dynamic_cast<UnoTheme*>(xTheme.get());
+    CPPUNIT_ASSERT(pUnoTheme);
+    auto pTheme = pUnoTheme->getTheme();
+    CPPUNIT_ASSERT(pTheme);
+
+    CPPUNIT_ASSERT_EQUAL(OUString("Custom"), pTheme->GetName());
+    auto pColorSet = pTheme->getColorSet();
+    CPPUNIT_ASSERT(pColorSet);
+    CPPUNIT_ASSERT_EQUAL(OUString("My Colors"), pColorSet->getName());
+
+    // and test some colors
+    CPPUNIT_ASSERT_EQUAL(Color(0xFFFF11), pColorSet->getColor(model::ThemeColorType::Light1));
+    CPPUNIT_ASSERT_EQUAL(Color(0x0A0A0A), pColorSet->getColor(model::ThemeColorType::Hyperlink));
+    CPPUNIT_ASSERT_EQUAL(Color(0x440000), pColorSet->getColor(model::ThemeColorType::Accent1));
 }
 CPPUNIT_PLUGIN_IMPLEMENT();
 

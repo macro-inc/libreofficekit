@@ -7,12 +7,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#include <XMLComplexColorExport.hxx>
+#include <xmloff/XMLComplexColorExport.hxx>
 
 #include <sal/config.h>
 
 #include <docmodel/uno/UnoComplexColor.hxx>
-#include <xmloff/xmltoken.hxx>
 #include <xmloff/xmlnamespace.hxx>
 #include <xmloff/xmluconv.hxx>
 #include <xmloff/xmlexp.hxx>
@@ -34,24 +33,19 @@ constexpr const std::array<XMLTokenEnum, 12> constThemeColorTypeToToken{
 };
 }
 
-void XMLComplexColorExport::exportXML(const uno::Any& rAny, sal_uInt16 nPrefix,
-                                      const OUString& rLocalName)
+void XMLComplexColorExport::doExport(model::ComplexColor const& rComplexColor, sal_uInt16 nPrefix,
+                                     const OUString& rLocalName)
 {
-    uno::Reference<util::XComplexColor> xComplexColor;
-    rAny >>= xComplexColor;
-    if (!xComplexColor.is())
+    auto eThemeType = rComplexColor.getThemeColorType();
+    if (eThemeType == model::ThemeColorType::Unknown)
         return;
 
-    model::ComplexColor aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-    if (aComplexColor.getSchemeType() == model::ThemeColorType::Unknown)
-        return;
-
-    XMLTokenEnum nToken = constThemeColorTypeToToken[sal_Int16(aComplexColor.getSchemeType())];
+    XMLTokenEnum nToken = constThemeColorTypeToToken[sal_Int16(eThemeType)];
     mrExport.AddAttribute(XML_NAMESPACE_LO_EXT, XML_THEME_TYPE, nToken);
     mrExport.AddAttribute(XML_NAMESPACE_LO_EXT, XML_COLOR_TYPE, "theme");
     SvXMLElementExport aComplexColorElement(mrExport, nPrefix, rLocalName, true, true);
 
-    for (auto const& rTransform : aComplexColor.getTransformations())
+    for (auto const& rTransform : rComplexColor.getTransformations())
     {
         OUString aType;
         switch (rTransform.meType)
@@ -80,6 +74,24 @@ void XMLComplexColorExport::exportXML(const uno::Any& rAny, sal_uInt16 nPrefix,
                                                  true, true);
         }
     }
+}
+
+void XMLComplexColorExport::exportComplexColor(model::ComplexColor const& rComplexColor,
+                                               sal_uInt16 nPrefix, XMLTokenEnum nToken)
+{
+    doExport(rComplexColor, nPrefix, GetXMLToken(nToken));
+}
+
+void XMLComplexColorExport::exportXML(const uno::Any& rAny, sal_uInt16 nPrefix,
+                                      const OUString& rLocalName)
+{
+    uno::Reference<util::XComplexColor> xComplexColor;
+    rAny >>= xComplexColor;
+    if (!xComplexColor.is())
+        return;
+
+    model::ComplexColor aComplexColor = model::color::getFromXComplexColor(xComplexColor);
+    doExport(aComplexColor, nPrefix, rLocalName);
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

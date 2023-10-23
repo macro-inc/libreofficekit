@@ -79,6 +79,7 @@ SwTabFrame::SwTabFrame( SwTable &rTab, SwFrame* pSib )
     , m_bCalcLowers(false)
     , m_bLowersFormatted(false)
     , m_bLockBackMove(false)
+    , m_bWantBackMove(false)
     , m_bResizeHTMLTable(false)
     , m_bONECalcLowers(false)
     , m_bHasFollowFlowLine(false)
@@ -124,6 +125,7 @@ SwTabFrame::SwTabFrame( SwTabFrame &rTab )
     , m_bCalcLowers(false)
     , m_bLowersFormatted(false)
     , m_bLockBackMove(false)
+    , m_bWantBackMove(false)
     , m_bResizeHTMLTable(false)
     , m_bONECalcLowers(false)
     , m_bHasFollowFlowLine(false)
@@ -1712,6 +1714,8 @@ static void lcl_RecalcRow(SwRowFrame & rRow, tools::Long const nBottom)
 
         if( bCheck )
         {
+            SwFrameDeleteGuard g(&rRow);
+
             // #115759# - force another format of the
             // lowers, if at least one of it was invalid.
             bCheck = SwContentFrame::CalcLowers(rRow, *rRow.GetUpper(), nBottom, true);
@@ -2303,7 +2307,9 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
             if ( !bSplit && GetFollow() )
             {
                 bool bDummy;
-                if ( GetFollow()->ShouldBwdMoved( GetUpper(), bDummy ) )
+                if (!(HasFollowFlowLine()
+                        && GetFollow()->GetFirstNonHeadlineRow()->IsDeleteForbidden())
+                    && GetFollow()->ShouldBwdMoved(GetUpper(), bDummy))
                 {
                     SwFrame *pTmp = GetUpper();
                     SwTwips nDeadLine = aRectFnSet.GetPrtBottom(*pTmp);
@@ -2315,6 +2321,50 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                         // when the upper has no space, but the follow is
                         // empty.
                         bFits = aRectFnSet.BottomDist(getFrameArea(), nDeadLine) >= 0;
+
+                    if (bFits)
+                    {
+                        // The follow table's wants to move backwards, see if the first row has a
+                        // split fly anchored in it that would have more space than what we have:
+                        SwRowFrame* pRow = GetFollow()->GetFirstNonHeadlineRow();
+                        if (pRow)
+                        {
+                            SwPageFrame* pPage = GetFollow()->FindPageFrame();
+                            SwSortedObjs* pPageObjs = pPage->GetSortedObjs();
+                            if (pPageObjs)
+                            {
+                                bool bSplitFly = false;
+                                for (size_t i = 0; i < pPageObjs->size(); ++i)
+                                {
+                                    SwAnchoredObject* pAnchoredObj = (*pPage->GetSortedObjs())[i];
+                                    auto pFly = pAnchoredObj->DynCastFlyFrame();
+                                    if (!pFly || !pFly->IsFlySplitAllowed())
+                                    {
+                                        continue;
+                                    }
+
+                                    SwFrame* pFlyAnchor = pFly->FindAnchorCharFrame();
+                                    if (!pFlyAnchor || !pRow->IsAnLower(pFlyAnchor))
+                                    {
+                                        continue;
+                                    }
+
+                                    bSplitFly = true;
+                                    break;
+                                }
+                                SwTwips nFollowFirstRowHeight = aRectFnSet.GetHeight(pRow->getFrameArea());
+                                SwTwips nSpace = aRectFnSet.BottomDist(getFrameArea(), nDeadLine);
+                                if (bSplitFly && nFollowFirstRowHeight > 0 && nSpace < nFollowFirstRowHeight)
+                                {
+                                    // The row has at least one split fly and the row would not fit
+                                    // to our remaining space, when also taking flys into account,
+                                    // so that's not a fit.
+                                    bFits = false;
+                                }
+                            }
+                        }
+                    }
+
                     if (bFits)
                     {
                         // First, we remove an existing follow flow line.
@@ -2822,6 +2872,15 @@ void SwTabFrame::MakeAll(vcl::RenderContext* pRenderContext)
                 RemoveFollowFlowLine();
             if ( GetFollow() )
                 Join();
+        }
+        else if (!GetNext() && !HasFollowFlowLine() && GetFollow()
+                 && (getFrameArea().Bottom() + GetFollow()->getFrameArea().Height())
+                        < GetUpper()->getFrameArea().Bottom())
+        {
+            // We're the last lower of the upper, no split row and we have a follow.  That follow
+            // fits our upper, still.  Prefer joining that follow in the next iteration, instead of
+            // trying to split the current table.
+            bSplit = false;
         }
 
         if ( bMovedBwd && GetUpper() )
@@ -3805,9 +3864,17 @@ bool SwTabFrame::ShouldBwdMoved( SwLayoutFrame *pNewUpper, bool &rReformat )
             }
             else if (!m_bLockBackMove)
                 bMoveAnyway = true;
+            else
+            {
+                m_bWantBackMove = true;
+            }
         }
         else if (!m_bLockBackMove)
             bMoveAnyway = true;
+        else
+        {
+            m_bWantBackMove = true;
+        }
 
         if ( bMoveAnyway )
         {
@@ -3820,7 +3887,7 @@ bool SwTabFrame::ShouldBwdMoved( SwLayoutFrame *pNewUpper, bool &rReformat )
             // This frame fits into pNewUpper in case it has no space, but this
             // frame is empty.
             bFits = nSpace >= 0;
-        if (!m_bLockBackMove && bFits)
+        if (bFits)
         {
             // #i26945# - check, if follow flow line
             // contains frame, which are moved forward due to its object
@@ -3839,7 +3906,17 @@ bool SwTabFrame::ShouldBwdMoved( SwLayoutFrame *pNewUpper, bool &rReformat )
             // 'return nHeight <= nSpace' to 'return nTmpHeight < nSpace'.
             // This obviously results in problems with table frames in
             // sections. Remember: Every twip is sacred.
-            return nTmpHeight <= nSpace;
+            if (nTmpHeight <= nSpace)
+            {
+                if (m_bLockBackMove)
+                {
+                    m_bWantBackMove = true;
+                }
+                else
+                {
+                    return true;
+                }
+            }
         }
     }
     return false;

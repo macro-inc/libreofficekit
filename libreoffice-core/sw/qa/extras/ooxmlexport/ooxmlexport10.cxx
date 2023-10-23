@@ -158,6 +158,40 @@ DECLARE_OOXMLEXPORT_TEST(testWpsOnly, "wps-only.docx")
     CPPUNIT_ASSERT_EQUAL(false, getProperty<bool>(getShape(2), "Opaque"));
 }
 
+CPPUNIT_TEST_FIXTURE(Test, testFloattableNestedDOCXExport)
+{
+    // Given a document with nested floating tables:
+    createSwDoc("floattable-nested.odt");
+
+    // When exporting to DOCX:
+    save("Office Open XML Text");
+
+    // Then make sure both floating table is exported:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with
+    // - Expected: 2
+    // - Actual  : 1
+    // i.e. the inner floating table was lost.
+    assertXPath(pXmlDoc, "//w:tblpPr", 2);
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testFloattableNestedCellStartDOCXExport)
+{
+    // Given a document with a nested floating table at cell start:
+    createSwDoc("floattable-nested-cell-start.odt");
+
+    // When exporting to DOCX:
+    save("Office Open XML Text");
+
+    // Then make sure both floating table is exported at the right position:
+    xmlDocUniquePtr pXmlDoc = parseExport("word/document.xml");
+    // Without the accompanying fix in place, this test would have failed with
+    // - Expected: 1
+    // - Actual  : 0
+    // i.e. the inner <w:tbl> was between the two <w:tr>, not inside the C1 cell.
+    assertXPath(pXmlDoc, "//w:tc/w:tbl/w:tblPr/w:tblpPr", 1);
+}
+
 DECLARE_OOXMLEXPORT_TEST(testWpgOnly, "wpg-only.docx")
 {
     uno::Reference<drawing::XShape> xShape = getShape(1);
@@ -958,6 +992,12 @@ DECLARE_OOXMLEXPORT_TEST(testTdf87460, "tdf87460.docx")
     uno::Reference<container::XIndexAccess> xEndnotes = xEndnotesSupplier->getEndnotes();
     // This was 0: endnote was lost on import.
     CPPUNIT_ASSERT_EQUAL(static_cast<sal_Int32>(1), xEndnotes->getCount());
+
+    // Also make sure that <w:tblpPr> is mapped to a text frame (hosting the table):
+    uno::Reference<text::XTextFramesSupplier> xTextFramesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xTextFrames = xTextFramesSupplier->getTextFrames();
+    // Without the fix in place, this test would have failed, the table was inline.
+    CPPUNIT_ASSERT(xTextFrames->hasByName("Frame1"));
 }
 
 DECLARE_OOXMLEXPORT_TEST(testTdf90611, "tdf90611.docx")

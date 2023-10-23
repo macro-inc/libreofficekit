@@ -193,6 +193,8 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
     // If true, this means that the anchored object is a split fly frame and it's not a master but
     // one of the follows.
     bool bFollowSplitFly = false;
+    // The anchored object is a fly that is allowed to split.
+    bool bSplitFly = false;
     {
         // if object is at-character anchored, determine character-rectangle
         // and frame, position has to be oriented at.
@@ -257,6 +259,7 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
                     // Anchored object has a precede, so it's a follow.
                     bFollowSplitFly = true;
                 }
+                bSplitFly = true;
             }
         }
     }
@@ -422,7 +425,10 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
             // the frame, the object is oriented at.
             // #i28701# - correction: adjust relative position,
             // only if the floating screen object has to follow the text flow.
-            if ( DoesObjFollowsTextFlow() && pOrientFrame != &rAnchorTextFrame )
+            // Also don't do this for split flys: pOrientFrame already points to the follow anchor,
+            // so pOrientFrame is not the anchor text frame anymore, and that would lead to an
+            // additional, unwanted increase of nRelPosY.
+            if (DoesObjFollowsTextFlow() && pOrientFrame != &rAnchorTextFrame && !bFollowSplitFly)
             {
                 // #i11860# - use new method <GetTopForObjPos>
                 // to get top of frame for object positioning.
@@ -486,11 +492,13 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
             // same page as <pOrientFrame> and the vertical position isn't aligned
             // automatic at the anchor character or the top of the line of the
             // anchor character, the anchor frame determines the vertical position.
+            // Split fly follows: always let the anchor char frame determine the vertical position.
+            // This gives us a vertical cut position between the master and the follow.
             if ( &rAnchorTextFrame == pOrientFrame ||
                  ( rAnchorTextFrame.FindPageFrame() == pOrientFrame->FindPageFrame() &&
                    aVert.GetVertOrient() == text::VertOrientation::NONE &&
                    aVert.GetRelationOrient() != text::RelOrientation::CHAR &&
-                   aVert.GetRelationOrient() != text::RelOrientation::TEXT_LINE ) )
+                   aVert.GetRelationOrient() != text::RelOrientation::TEXT_LINE && !bFollowSplitFly ) )
             {
                 pUpperOfOrientFrame = rAnchorTextFrame.GetUpper();
                 pAnchorFrameForVertPos = &rAnchorTextFrame;
@@ -949,7 +957,9 @@ void SwToContentAnchoredObjectPosition::CalcPosition()
                     }
                 }
             }
-            else
+            // Don't move split flys around for follow text flow purposes; if they don't fit their
+            // parent anymore, they will shrink and part of the content will move to the follow fly.
+            else if (!bSplitFly)
             {
                 // follow text flow
                 const bool bInFootnote = rAnchorTextFrame.IsInFootnote();
@@ -1202,6 +1212,14 @@ void SwToContentAnchoredObjectPosition::CalcOverlap(const SwTextFrame* pAnchorFr
         // At least for split flys we need to consider objects on the same page, but anchored in
         // different text frames.
         bSplitFly = true;
+
+        SwFrame* pFlyFrameAnchor = pFlyFrame->GetAnchorFrameContainingAnchPos();
+        if (pFlyFrameAnchor && pFlyFrameAnchor->IsInFly())
+        {
+            // An inner fly overlapping with its outer fly is fine.
+            return;
+        }
+
         const SwPageFrame* pPageFrame = pAnchorFrameForVertPos->FindPageFrame();
         if (pPageFrame)
         {
@@ -1229,10 +1247,26 @@ void SwToContentAnchoredObjectPosition::CalcOverlap(const SwTextFrame* pAnchorFr
         }
 
         SwFlyFrame* pAnchoredObjFly = pAnchoredObj->DynCastFlyFrame();
-        if (bSplitFly && !pAnchoredObjFly)
+        if (bSplitFly)
         {
-            // This is a split fly, then overlap is only checked against other split flys.
-            continue;
+            if (!pAnchoredObjFly)
+            {
+                // This is a split fly, then overlap is only checked against other split flys.
+                continue;
+            }
+
+            if (pAnchoredObjFly->getRootFrame()->IsInFlyDelList(pAnchoredObjFly))
+            {
+                // A fly overlapping with a to-be-deleted fly is fine.
+                continue;
+            }
+
+            SwFrame* pAnchoredObjFlyAnchor = pAnchoredObjFly->GetAnchorFrameContainingAnchPos();
+            if (pAnchoredObjFlyAnchor && pAnchoredObjFlyAnchor->IsInFly())
+            {
+                // An inner fly overlapping with its outer fly is fine.
+                continue;
+            }
         }
 
         css::text::WrapTextMode eWrap = pAnchoredObj->GetFrameFormat().GetSurround().GetSurround();
