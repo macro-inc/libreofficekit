@@ -537,9 +537,9 @@ bool DrawingML::WriteSchemeColor(OUString const& rPropertyName, const uno::Refer
         return false;
 
     auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-    if (aComplexColor.getSchemeType() == model::ThemeColorType::Unknown)
+    if (aComplexColor.getThemeColorType() == model::ThemeColorType::Unknown)
         return false;
-    const char* pColorName = g_aPredefinedClrNames[sal_Int16(aComplexColor.getSchemeType())];
+    const char* pColorName = g_aPredefinedClrNames[sal_Int16(aComplexColor.getThemeColorType())];
     mpFS->startElementNS(XML_a, XML_solidFill);
     mpFS->startElementNS(XML_a, XML_schemeClr, XML_val, pColorName);
     for (auto const& rTransform : aComplexColor.getTransformations())
@@ -1428,6 +1428,10 @@ OUString GraphicExport::writeToStorage(const Graphic& rGraphic , bool bRelPathTo
             case GfxLinkType::NativePng:
                 sMediaType = "image/png";
                 pExtension = ".png";
+                break;
+            case GfxLinkType::NativeSvg:
+                sMediaType = "image/svg";
+                pExtension = ".svg";
                 break;
             case GfxLinkType::NativeTif:
                 sMediaType = "image/tiff";
@@ -4901,8 +4905,8 @@ bool DrawingML::WriteCustomGeometrySegment(
             rCustomShape2d.GetParameter(fY4, rPairs[rnPairIndex + 3].Second, false,
                                         bReplaceGeoHeight);
             // calculate ellipse parameter
-            const double fWR = (fX2 - fX1) / 2.0;
-            const double fHR = (fY2 - fY1) / 2.0;
+            const double fWR = (std::max(fX1, fX2) - std::min(fX1, fX2)) / 2.0;
+            const double fHR = (std::max(fY1, fY2) - std::min(fY1, fY2)) / 2.0;
             const double fCx = (fX1 + fX2) / 2.0;
             const double fCy = (fY1 + fY2) / 2.0;
             // calculate start angle

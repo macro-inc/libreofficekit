@@ -186,6 +186,12 @@
 #include <controller/SlsPageSelector.hxx>
 #include <tools/GraphicSizeCheck.hxx>
 
+#include <theme/ThemeColorChanger.hxx>
+#include <svx/dialog/ThemeDialog.hxx>
+#include <svx/theme/ThemeColorPaletteManager.hxx>
+#include <sfx2/lokhelper.hxx>
+#include <LibreOfficeKit/LibreOfficeKitEnums.h>
+
 #include <ViewShellBase.hxx>
 #include <memory>
 
@@ -592,35 +598,6 @@ public:
                 basegfx::BGradient aGradient = basegfx::BGradient::fromJSON(pJSON->GetValue());
                 XFillGradientItem aItem(aGradient);
                 pArgs->Put(aItem);
-            }
-        }
-
-        if (nSlot == SID_ATTR_FILL_COLOR)
-        {
-            // Merge the color parameters to the color itself.
-            const XFillColorItem* pColorItem = static_cast<const XFillColorItem*>(pArgs->GetItem(SID_ATTR_FILL_COLOR));
-            if (pColorItem)
-            {
-                XFillColorItem aColorItem(*pColorItem);
-                model::ComplexColor aComplexColor = aColorItem.getComplexColor();
-
-                if (pArgs->GetItemState(SID_ATTR_COLOR_THEME_INDEX, false, &pItem) == SfxItemState::SET)
-                {
-                    auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aComplexColor.setSchemeColor(model::convertToThemeColorType(pIntItem->GetValue()));
-                }
-                if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_MOD, false, &pItem) == SfxItemState::SET)
-                {
-                    auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aComplexColor.addTransformation({model::TransformationType::LumMod, pIntItem->GetValue()});
-                }
-                if (pArgs->GetItemState(SID_ATTR_COLOR_LUM_OFF, false, &pItem) == SfxItemState::SET)
-                {
-                    auto pIntItem = static_cast<const SfxInt16Item*>(pItem);
-                    aComplexColor.addTransformation({model::TransformationType::LumOff, pIntItem->GetValue()});
-                }
-                aColorItem.setComplexColor(aComplexColor);
-                pArgs->Put(aColorItem);
             }
         }
     }
@@ -3575,6 +3552,36 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
             pDlg->Execute();
             Cancel();
             rReq.Ignore ();
+        }
+        break;
+
+        case SID_THEME_DIALOG:
+        {
+            SdrPage* pMasterPage = &GetActualPage()->TRG_GetMasterPage();
+            auto pTheme = pMasterPage->getSdrPageProperties().getTheme();
+            auto pDialog = std::make_shared<svx::ThemeDialog>(GetFrameWeld(), pTheme.get());
+            auto* pDocShell = GetDocSh();
+            weld::DialogController::runAsync(pDialog, [pDialog, pMasterPage, pDocShell](sal_uInt32 nResult)
+            {
+                if (RET_OK != nResult)
+                    return;
+
+                auto pColorSet = pDialog->getCurrentColorSet();
+                if (pColorSet)
+                {
+                    sd::ThemeColorChanger aChanger(pMasterPage, pDocShell);
+                    aChanger.apply(pColorSet);
+
+                    if (comphelper::LibreOfficeKit::isActive())
+                    {
+                        svx::ThemeColorPaletteManager aManager(pColorSet);
+                        SfxLokHelper::notifyAllViews(LOK_CALLBACK_COLOR_PALETTES, aManager.generateJSON());
+                    }
+                }
+            });
+
+            Cancel();
+            rReq.Ignore();
         }
         break;
 

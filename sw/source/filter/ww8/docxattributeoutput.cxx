@@ -304,22 +304,21 @@ void lclAddThemeValuesToCustomAttributes(
         { model::ThemeColorType::FollowedHyperlink, "followedHyperlink" }
     };
 
-    if (rComplexColor.getType() == model::ColorType::Scheme &&
-        rComplexColor.getSchemeType() != model::ThemeColorType::Unknown)
+    if (rComplexColor.isValidThemeType())
     {
-        OString sSchemeType = constThemeColorTypeTokenMap[rComplexColor.getSchemeType()];
-        if (rComplexColor.meThemeColorUsage == model::ThemeColorUsage::Text)
+        OString sSchemeType = constThemeColorTypeTokenMap[rComplexColor.getThemeColorType()];
+        if (rComplexColor.getThemeColorUsage() == model::ThemeColorUsage::Text)
         {
-            if (rComplexColor.getSchemeType() == model::ThemeColorType::Dark1)
+            if (rComplexColor.getThemeColorType() == model::ThemeColorType::Dark1)
                 sSchemeType = "text1";
-            else if (rComplexColor.getSchemeType() == model::ThemeColorType::Dark2)
+            else if (rComplexColor.getThemeColorType() == model::ThemeColorType::Dark2)
                 sSchemeType = "text2";
         }
-        else if (rComplexColor.meThemeColorUsage == model::ThemeColorUsage::Background)
+        else if (rComplexColor.getThemeColorUsage() == model::ThemeColorUsage::Background)
         {
-            if (rComplexColor.getSchemeType() == model::ThemeColorType::Light1)
+            if (rComplexColor.getThemeColorType() == model::ThemeColorType::Light1)
                 sSchemeType = "background1";
-            else if (rComplexColor.getSchemeType() == model::ThemeColorType::Light2)
+            else if (rComplexColor.getThemeColorType() == model::ThemeColorType::Light2)
                 sSchemeType = "background2";
         }
 
@@ -435,6 +434,9 @@ void DocxAttributeOutput::WriteFloatingTable(ww8::Frame const* pParentFrame)
     //Save data here and restore when out of scope
     ExportDataSaveRestore aDataGuard(GetExport(), nStt, nEnd, pParentFrame);
 
+    // Stash away info about the current table, so m_tableReference is clean.
+    DocxTableExportContext aTableExportContext(*this);
+
     // set a floatingTableFrame AND unset parent frame,
     // otherwise exporter thinks we are still in a frame
     m_rExport.SetFloatingTableFrame(pParentFrame);
@@ -514,13 +516,6 @@ sal_Int32 DocxAttributeOutput::StartParagraph(ww8::WW8TableNodeInfo::Pointer_t p
     if ( !m_aFramesOfParagraph.size() || !m_nTextFrameLevel )
         m_aFramesOfParagraph.push(std::vector<ww8::Frame>());
 
-    // look ahead for floating tables that were put into a frame during import
-    // floating tables in shapes are not supported: exclude this case
-    if (!pTextNodeInfo && !m_rExport.SdrExporter().IsDMLAndVMLDrawingOpen())
-    {
-        checkAndWriteFloatingTables(*this);
-    }
-
     if ( m_nColBreakStatus == COLBRK_POSTPONE )
         m_nColBreakStatus = COLBRK_WRITE;
 
@@ -566,6 +561,15 @@ sal_Int32 DocxAttributeOutput::StartParagraph(ww8::WW8TableNodeInfo::Pointer_t p
                 m_tableReference->m_nTableDepth = nCurrentDepth;
             }
         }
+    }
+
+    // look ahead for floating tables that were put into a frame during import
+    // floating tables in shapes are not supported: exclude this case
+    if (!m_rExport.SdrExporter().IsDMLAndVMLDrawingOpen())
+    {
+        // Do this after opening table/row/cell, so floating tables anchored at cell start go inside
+        // the cell, not outside.
+        checkAndWriteFloatingTables(*this);
     }
 
     // Look up the "sdt end before this paragraph" property early, when it
@@ -2675,7 +2679,11 @@ void DocxAttributeOutput::WriteContentControlStart()
         m_pSerializer->endElementNS(XML_w, XML_date);
     }
 
-    if (m_pContentControl->GetPlainText())
+    if (!m_pContentControl->GetMultiLine().isEmpty())
+    {
+        m_pSerializer->singleElementNS(XML_w, XML_text, FSNS(XML_w, XML_multiLine), m_pContentControl->GetMultiLine());
+    }
+    else if (m_pContentControl->GetPlainText())
     {
         m_pSerializer->singleElementNS(XML_w, XML_text);
     }

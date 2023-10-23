@@ -486,10 +486,7 @@ public:
     void SetTreatSubOutlineLevelsAsContent(bool b)
     { m_nCoreOptions.bTreatSubOutlineLevelsAsContent = b; }
 
-    bool IsShowHiddenChar(bool bHard = false) const
-    { return !m_bReadonly && m_nCoreOptions.bCharHidden &&
-                            (m_nCoreOptions.bViewMetachars || bHard); }
-
+    bool IsShowHiddenChar(bool bHard = false) const;
     void SetShowHiddenChar( bool b )
     { m_nCoreOptions.bCharHidden = b; }
 
@@ -857,7 +854,7 @@ public:
 
 inline bool SwViewOption::operator==( const SwViewOption &rOpt ) const
 {
-    return IsEqualFlags( rOpt ) && m_nZoom == rOpt.GetZoom() && m_aColorConfig == rOpt.m_aColorConfig && m_sThemeName == rOpt.m_sThemeName;
+    return IsEqualFlags( rOpt ) && m_nZoom == rOpt.GetZoom() && m_aColorConfig == rOpt.m_aColorConfig;
 }
 
 inline void SwViewOption::SetUIOptions( const SwViewOption& rVOpt )

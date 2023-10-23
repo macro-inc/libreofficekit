@@ -20,16 +20,21 @@
 #include <charatr.hxx>
 #include <paratr.hxx>
 #include <frmatr.hxx>
+#include <wrtsh.hxx>
+
 #include <DocumentContentOperationsManager.hxx>
 #include <IDocumentDrawModelAccess.hxx>
 #include <IDocumentUndoRedo.hxx>
 #include <UndoThemeChange.hxx>
+#include <UndoManager.hxx>
 
 #include <svx/xflclit.hxx>
 
+#include <svl/undo.hxx>
 #include <sal/config.h>
 #include <svx/svdpage.hxx>
 #include <svx/svditer.hxx>
+#include <svx/theme/ThemeColorChangerCommon.hxx>
 #include <docmodel/uno/UnoComplexColor.hxx>
 #include <docmodel/theme/Theme.hxx>
 #include <editeng/unoprnms.hxx>
@@ -49,15 +54,11 @@ bool changeBorderLine(editeng::SvxBorderLine* pBorderLine, model::ColorSet const
         return false;
 
     model::ComplexColor const& rComplexColor = pBorderLine->getComplexColor();
-    if (rComplexColor.meType == model::ColorType::Scheme)
+    if (rComplexColor.isValidThemeType())
     {
-        auto eThemeType = rComplexColor.meSchemeType;
-        if (eThemeType != model::ThemeColorType::Unknown)
-        {
-            Color aColor = rColorSet.resolveColor(rComplexColor);
-            pBorderLine->SetColor(aColor);
-            return true;
-        }
+        Color aColor = rColorSet.resolveColor(rComplexColor);
+        pBorderLine->SetColor(aColor);
+        return true;
     }
     return false;
 }
@@ -72,11 +73,13 @@ bool changeBorderLine(editeng::SvxBorderLine* pBorderLine, model::ColorSet const
 class ThemeColorHandler : public sw::ModelTraverseHandler
 {
     SwDoc& mrDocument;
+    SwDocShell* mpDocShell;
     model::ColorSet const& mrColorSet;
 
 public:
-    ThemeColorHandler(SwDoc& rDocument, model::ColorSet const& rColorSet)
+    ThemeColorHandler(SwDoc& rDocument, SwDocShell* pDocShell, model::ColorSet const& rColorSet)
         : mrDocument(rDocument)
+        , mpDocShell(pDocShell)
         , mrColorSet(rColorSet)
     {
     }
@@ -99,8 +102,7 @@ public:
                 if (const SvxColorItem* pItem = pStyleHandle->GetItemIfSet(RES_CHRATR_COLOR))
                 {
                     model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-                    auto eSchemeType = rComplexColor.meSchemeType;
-                    if (eSchemeType != model::ThemeColorType::Unknown)
+                    if (rComplexColor.isValidThemeType())
                     {
                         Color aNewColor = mrColorSet.resolveColor(rComplexColor);
                         auto pNew = pItem->Clone();
@@ -114,8 +116,7 @@ public:
                     = pStyleHandle->GetItemIfSet(RES_CHRATR_UNDERLINE))
                 {
                     model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-                    auto eSchemeType = rComplexColor.meSchemeType;
-                    if (eSchemeType != model::ThemeColorType::Unknown)
+                    if (rComplexColor.isValidThemeType())
                     {
                         Color aNewColor = mrColorSet.resolveColor(rComplexColor);
                         auto pNew = pItem->Clone();
@@ -128,8 +129,7 @@ public:
                 if (const SvxOverlineItem* pItem = pStyleHandle->GetItemIfSet(RES_CHRATR_OVERLINE))
                 {
                     model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-                    auto eSchemeType = rComplexColor.meSchemeType;
-                    if (eSchemeType != model::ThemeColorType::Unknown)
+                    if (rComplexColor.isValidThemeType())
                     {
                         Color aNewColor = mrColorSet.resolveColor(rComplexColor);
                         auto pNew = pItem->Clone();
@@ -153,64 +153,48 @@ public:
         if (const SvxColorItem* pItem = aAttrSet.GetItemIfSet(RES_CHRATR_COLOR, false))
         {
             model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-            if (rComplexColor.meType == model::ColorType::Scheme)
+            if (rComplexColor.isValidThemeType())
             {
-                auto eSchemeType = rComplexColor.meSchemeType;
-                if (eSchemeType != model::ThemeColorType::Unknown)
-                {
-                    Color aNewColor = mrColorSet.resolveColor(rComplexColor);
-                    std::unique_ptr<SvxColorItem> pNewItem(pItem->Clone());
-                    pNewItem->setColor(aNewColor);
-                    pTextNode->SetAttr(*pNewItem);
-                }
+                Color aNewColor = mrColorSet.resolveColor(rComplexColor);
+                std::unique_ptr<SvxColorItem> pNewItem(pItem->Clone());
+                pNewItem->setColor(aNewColor);
+                pTextNode->SetAttr(*pNewItem);
             }
         }
 
         if (const SvxUnderlineItem* pItem = aAttrSet.GetItemIfSet(RES_CHRATR_UNDERLINE, false))
         {
             model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-            if (rComplexColor.meType == model::ColorType::Scheme)
+            if (rComplexColor.isValidThemeType())
             {
-                auto eSchemeType = rComplexColor.meSchemeType;
-                if (eSchemeType != model::ThemeColorType::Unknown)
-                {
-                    Color aNewColor = mrColorSet.resolveColor(rComplexColor);
-                    std::unique_ptr<SvxUnderlineItem> pNewItem(pItem->Clone());
-                    pNewItem->SetColor(aNewColor);
-                    pTextNode->SetAttr(*pNewItem);
-                }
+                Color aNewColor = mrColorSet.resolveColor(rComplexColor);
+                std::unique_ptr<SvxUnderlineItem> pNewItem(pItem->Clone());
+                pNewItem->SetColor(aNewColor);
+                pTextNode->SetAttr(*pNewItem);
             }
         }
 
         if (const SvxOverlineItem* pItem = aAttrSet.GetItemIfSet(RES_CHRATR_OVERLINE, false))
         {
             model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-            if (rComplexColor.meType == model::ColorType::Scheme)
+            if (rComplexColor.isValidThemeType())
             {
-                auto eSchemeType = rComplexColor.meSchemeType;
-                if (eSchemeType != model::ThemeColorType::Unknown)
-                {
-                    Color aNewColor = mrColorSet.resolveColor(rComplexColor);
-                    std::unique_ptr<SvxOverlineItem> pNewItem(pItem->Clone());
-                    pNewItem->SetColor(aNewColor);
-                    pTextNode->SetAttr(*pNewItem);
-                }
+                Color aNewColor = mrColorSet.resolveColor(rComplexColor);
+                std::unique_ptr<SvxOverlineItem> pNewItem(pItem->Clone());
+                pNewItem->SetColor(aNewColor);
+                pTextNode->SetAttr(*pNewItem);
             }
         }
 
         if (const XFillColorItem* pItem = aAttrSet.GetItemIfSet(XATTR_FILLCOLOR, false))
         {
             model::ComplexColor const& rComplexColor = pItem->getComplexColor();
-            if (rComplexColor.meType == model::ColorType::Scheme)
+            if (rComplexColor.isValidThemeType())
             {
-                auto eSchemeType = rComplexColor.meSchemeType;
-                if (eSchemeType != model::ThemeColorType::Unknown)
-                {
-                    Color aNewColor = mrColorSet.resolveColor(rComplexColor);
-                    std::unique_ptr<XFillColorItem> pNewItem(pItem->Clone());
-                    pNewItem->SetColorValue(aNewColor);
-                    pTextNode->SetAttr(*pNewItem);
-                }
+                Color aNewColor = mrColorSet.resolveColor(rComplexColor);
+                std::unique_ptr<XFillColorItem> pNewItem(pItem->Clone());
+                pNewItem->SetColorValue(aNewColor);
+                pTextNode->SetAttr(*pNewItem);
             }
         }
 
@@ -243,8 +227,13 @@ public:
 
     void handleSdrObject(SdrObject* pObject) override
     {
+        SwWrtShell* pWrtShell = mpDocShell->GetWrtShell();
+        SdrView* pView = pWrtShell->GetDrawView();
+
+        SfxUndoManager* pManager = &mrDocument.GetUndoManager();
+
         // update current object
-        svx::theme::updateSdrObject(mrColorSet, pObject);
+        svx::theme::updateSdrObject(mrColorSet, pObject, pView, pManager);
 
         // update child objects
         SdrObjList* pList = pObject->GetSubList();
@@ -253,7 +242,7 @@ public:
             SdrObjListIter aIter(pList, SdrIterMode::DeepWithGroups);
             while (aIter.IsMore())
             {
-                svx::theme::updateSdrObject(mrColorSet, aIter.Next());
+                svx::theme::updateSdrObject(mrColorSet, aIter.Next(), pView, pManager);
             }
         }
     }
@@ -264,10 +253,7 @@ bool changeOverlineColor(SwAttrSet const& rSet, SfxItemSet& rNewSet,
 {
     SvxOverlineItem aItem(rSet.Get(RES_CHRATR_OVERLINE, false));
     model::ComplexColor const& rComplexColor = aItem.getComplexColor();
-    if (rComplexColor.meType != model::ColorType::Scheme)
-        return false;
-    auto eThemeType = rComplexColor.meSchemeType;
-    if (eThemeType == model::ThemeColorType::Unknown)
+    if (!rComplexColor.isValidThemeType())
         return false;
     Color aColor = rColorSet.resolveColor(rComplexColor);
     aItem.SetColor(aColor);
@@ -280,10 +266,7 @@ bool changeUnderlineColor(SwAttrSet const& rSet, SfxItemSet& rNewSet,
 {
     SvxUnderlineItem aItem(rSet.Get(RES_CHRATR_UNDERLINE, false));
     model::ComplexColor const& rComplexColor = aItem.getComplexColor();
-    if (rComplexColor.meType != model::ColorType::Scheme)
-        return false;
-    auto eThemeType = rComplexColor.meSchemeType;
-    if (eThemeType == model::ThemeColorType::Unknown)
+    if (!rComplexColor.isValidThemeType())
         return false;
     Color aColor = rColorSet.resolveColor(rComplexColor);
     aItem.SetColor(aColor);
@@ -295,10 +278,7 @@ bool changeColor(SwAttrSet const& rSet, SfxItemSet& rNewSet, model::ColorSet con
 {
     SvxColorItem aColorItem(rSet.GetColor(false));
     model::ComplexColor const& rComplexColor = aColorItem.getComplexColor();
-    if (rComplexColor.meType != model::ColorType::Scheme)
-        return false;
-    auto eThemeType = rComplexColor.meSchemeType;
-    if (eThemeType == model::ThemeColorType::Unknown)
+    if (!rComplexColor.isValidThemeType())
         return false;
     Color aColor = rColorSet.resolveColor(rComplexColor);
     aColorItem.SetValue(aColor);
@@ -310,10 +290,7 @@ bool changeBackground(SwAttrSet const& rSet, SfxItemSet& rNewSet, model::ColorSe
 {
     XFillColorItem aFillItem(rSet.Get(XATTR_FILLCOLOR, false));
     model::ComplexColor const& rComplexColor = aFillItem.getComplexColor();
-    if (rComplexColor.meType != model::ColorType::Scheme)
-        return false;
-    auto eThemeType = rComplexColor.getSchemeType();
-    if (eThemeType == model::ThemeColorType::Unknown)
+    if (!rComplexColor.isValidThemeType())
         return false;
     Color aColor = rColorSet.resolveColor(rComplexColor);
     aFillItem.SetColorValue(aColor);
@@ -353,13 +330,13 @@ void ThemeColorChanger::apply(std::shared_ptr<model::ColorSet> const& pColorSet)
 
     pDocument->GetIDocumentUndoRedo().StartUndo(SwUndoId::EMPTY, nullptr);
 
-    SdrPage* pPage = pDocument->getIDocumentDrawModelAccess().GetDrawModel()->GetPage(0);
+    SdrModel* pModel = pDocument->getIDocumentDrawModelAccess().GetDrawModel();
 
-    auto pTheme = pPage->getSdrPageProperties().GetTheme();
+    auto pTheme = pModel->getTheme();
     if (!pTheme)
     {
         pTheme = std::make_shared<model::Theme>("Office");
-        pPage->getSdrPageProperties().SetTheme(pTheme);
+        pModel->setTheme(pTheme);
     }
 
     std::shared_ptr<model::ColorSet> pNewColorSet = pColorSet;
@@ -456,7 +433,7 @@ void ThemeColorChanger::apply(std::shared_ptr<model::ColorSet> const& pColorSet)
     }
 
     // Direct format change
-    auto pHandler = std::make_shared<ThemeColorHandler>(*pDocument, *pColorSet);
+    auto pHandler = std::make_shared<ThemeColorHandler>(*pDocument, mpDocSh, *pColorSet);
     sw::ModelTraverser aModelTraverser(pDocument);
     aModelTraverser.addNodeHandler(pHandler);
     aModelTraverser.traverse();

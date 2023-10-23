@@ -24,9 +24,13 @@ public:
                     bool bEditExisting);
 
     virtual short run() override;
+    static bool runAsync(const std::shared_ptr<QrCodeGenDialog>& rController,
+                         const std::function<void(sal_Int32)>& rFunc);
 
-protected:
     void Apply();
+#if ENABLE_ZXING
+    weld::Widget* GetParent() { return mpParent; }
+#endif
 
 private:
     css::uno::Reference<css::frame::XModel> m_xModel;
@@ -34,6 +38,7 @@ private:
     std::unique_ptr<weld::RadioButton> m_xECC[4];
     std::unique_ptr<weld::SpinButton> m_xSpinBorder;
     std::unique_ptr<weld::ComboBox> m_xComboType;
+
 #if ENABLE_ZXING
     weld::Widget* mpParent;
 #endif

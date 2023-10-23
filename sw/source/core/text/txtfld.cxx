@@ -244,7 +244,14 @@ SwExpandPortion *SwTextFormatter::NewFieldPortion( SwTextFormatInfo &rInf,
             bPlaceHolder = true;
             break;
         case SwFieldIds::GetRef:
+        {
             subType = static_cast<SwGetRefField*>(pField)->GetSubType();
+            if (!bName && subType == REF_STYLE)
+            {
+                static_cast<SwGetRefField*>(pField)->UpdateField(
+                    static_txtattr_cast<SwTextField const*>(pHint), pFrame);
+            }
+
             {
                 OUString const str( bName
                     ? pField->GetFieldName()
@@ -255,7 +262,8 @@ SwExpandPortion *SwTextFormatter::NewFieldPortion( SwTextFormatInfo &rInf,
                 static_cast<SwFieldPortion*>(pRet)->m_nAttrFieldType = ATTR_BOOKMARKFLD;
             else if( subType == REF_SETREFATTR )
                 static_cast<SwFieldPortion*>(pRet)->m_nAttrFieldType = ATTR_SETREFATTRFLD;
-            break;
+        }
+        break;
         case SwFieldIds::DateTime:
             subType = static_cast<SwDateTimeField*>(pField)->GetSubType();
             {

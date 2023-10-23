@@ -30,6 +30,7 @@
 #include <cellfrm.hxx>
 #include <ndtxt.hxx>
 #include <dflyobj.hxx>
+#include <IDocumentSettingAccess.hxx>
 
 namespace
 {
@@ -1009,6 +1010,216 @@ CPPUNIT_TEST_FIXTURE(Test, testSplitFlyIntoTable)
     // Without the accompanying fix in place, this test would have crashed, we tried to insert the
     // second part of a floating table into a table on the next page, not before that table.
     calcLayout();
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyFromAsCharAnchor)
+{
+    // Given a document with a footnote that has a table (imported in an as-char anchored frame in
+    // Writer):
+    createSwDoc("table-in-footnote.docx");
+
+    // When changing the anchor type of that frame to to-para:
+    // Then make sure we don't crash:
+    selectShape(1);
+    // Without the accompanying fix in place, this test would have crashed, we tried to split a
+    // frame+table inside a footnote.
+    dispatchCommand(mxComponent, ".uno:SetAnchorToPara", {});
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyNested)
+{
+    // Given a document with a nested, multi-page floating table:
+    // When calculating the layout:
+    createSwDoc("floattable-nested.odt");
+    calcLayout();
+
+    // Then make sure we don't crash:
+    // Without the accompanying fix in place, this test would have crashed.
+    // Check that we have exactly 4 fly frames, all of them on the expected pages: master outer,
+    // follow outer, master inner and follow inner.
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = pLayout->Lower()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage1);
+    CPPUNIT_ASSERT(pPage1->GetSortedObjs());
+    SwSortedObjs& rPage1Objs = *pPage1->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rPage1Objs.size());
+    auto pPage1Fly1 = rPage1Objs[0]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage1Fly1);
+    CPPUNIT_ASSERT(pPage1Fly1->GetAnchorFrameContainingAnchPos()->IsInFly());
+    CPPUNIT_ASSERT(pPage1Fly1->GetFollow());
+    auto pPage1Fly2 = rPage1Objs[1]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage1Fly2);
+    CPPUNIT_ASSERT(!pPage1Fly2->GetAnchorFrameContainingAnchPos()->IsInFly());
+    CPPUNIT_ASSERT(pPage1Fly2->GetFollow());
+    auto pPage2 = pPage1->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage2);
+    CPPUNIT_ASSERT(pPage2->GetSortedObjs());
+    SwSortedObjs& rPage2Objs = *pPage2->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rPage2Objs.size());
+    auto pPage2Fly1 = rPage2Objs[0]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage2Fly1);
+    CPPUNIT_ASSERT(pPage2Fly1->GetAnchorFrameContainingAnchPos()->IsInFly());
+    CPPUNIT_ASSERT(pPage2Fly1->GetPrecede());
+
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected greater than: 6204
+    // - Actual  : 1725
+    // i.e. the inner follow fly had a bad position, it was outside the page rectangle, it was not
+    // rendered and this way the inner anchor had no fly portion, either.
+    CPPUNIT_ASSERT_GREATER(pPage2->getFrameArea().Top(), pPage2Fly1->getFrameArea().Top());
+
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected less than: 12523
+    // - Actual  : 15312
+    // i.e. the inner follow fly was not "moved back" to its place to have the wanted 4400 position,
+    // which makes the "Inner A2" text visible.
+    CPPUNIT_ASSERT_LESS(pPage2->getFrameArea().Right(), pPage2Fly1->getFrameArea().Right());
+
+    auto pPage2Fly2 = rPage2Objs[1]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage2Fly2);
+    CPPUNIT_ASSERT(!pPage2Fly2->GetAnchorFrameContainingAnchPos()->IsInFly());
+    CPPUNIT_ASSERT(pPage2Fly2->GetPrecede());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyNestedOverlap)
+{
+    // Given a document with a nested, multi-page floating table, enabling the "don't overlap" logic:
+    // When calculating the layout:
+    createSwDoc("floattable-nested-overlap.odt");
+    calcLayout();
+
+    // Then make sure we get 2 pages (2 flys on each page):
+    // Without the accompanying fix in place, this test would have failed with a layout loop.
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = pLayout->Lower()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage1);
+    CPPUNIT_ASSERT(pPage1->GetSortedObjs());
+    SwSortedObjs& rPage1Objs = *pPage1->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rPage1Objs.size());
+    auto pPage2 = pPage1->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage2);
+    CPPUNIT_ASSERT(pPage2->GetSortedObjs());
+    SwSortedObjs& rPage2Objs = *pPage2->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), rPage2Objs.size());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyMoveMaster)
+{
+    // Given a document with a multi-page floating table on pages 1 -> 2 -> 3:
+    createSwDoc("floattable-move-master.docx");
+
+    // When adding an empty para before the table, so the table gets shifted to pages 2 -> 3:
+    SwWrtShell* pWrtShell = getSwDocShell()->GetWrtShell();
+    pWrtShell->SttEndDoc(/*bStt=*/true);
+    pWrtShell->Down(/*bSelect=*/false, /*nCount=*/4);
+    pWrtShell->SplitNode();
+
+    // Then make sure page 1 has no flys, page 2 and 3 has the split fly and no flys on page 4:
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = pLayout->Lower()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage1);
+    // Without the accompanying fix in place, this test would have failed, the start of the fly was
+    // still on page 1 instead of page 2.
+    CPPUNIT_ASSERT(!pPage1->GetSortedObjs());
+    auto pPage2 = pPage1->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage2);
+    CPPUNIT_ASSERT(pPage2->GetSortedObjs());
+    SwSortedObjs& rPage2Objs = *pPage2->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rPage2Objs.size());
+    auto pPage2Fly = rPage2Objs[0]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage2Fly);
+    CPPUNIT_ASSERT(!pPage2Fly->GetPrecede());
+    CPPUNIT_ASSERT(pPage2Fly->HasFollow());
+    auto pPage3 = pPage2->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage3);
+    CPPUNIT_ASSERT(pPage3->GetSortedObjs());
+    SwSortedObjs& rPage3Objs = *pPage3->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rPage3Objs.size());
+    auto pPage3Fly = rPage3Objs[0]->DynCastFlyFrame()->DynCastFlyAtContentFrame();
+    CPPUNIT_ASSERT(pPage3Fly);
+    CPPUNIT_ASSERT(pPage3Fly->GetPrecede());
+    CPPUNIT_ASSERT(!pPage3Fly->GetFollow());
+    auto pPage4 = pPage3->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage4);
+    CPPUNIT_ASSERT(!pPage4->GetSortedObjs());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyDelEmpty)
+{
+    // Given a document with multiple floating tables and 7 pages:
+    // When loading that document:
+    // Without the accompanying fix in place, this test would have crashed due to a
+    // heap-use-after-free problem (visible with e.g. MALLOC_PERTURB_=153).
+    createSwDoc("floattable-del-empty.docx");
+
+    // Then make sure that the page count matches Word:
+    CPPUNIT_ASSERT_EQUAL(7, getPages());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyInTableInSection)
+{
+    // Given a document where page 2 and page 3 has a floating table inside an inline table, inside
+    // a section:
+    // Without the accompanying fix in place, this test would have crashed, we created a follow
+    // anchor which was marked as "in table", but had no table parent.
+    createSwDoc("floattable-in-inltbl-in-sect.docx");
+
+    // Then make sure that the floating table is on page 2 and page 3:
+    SwDoc* pDoc = getSwDoc();
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = pLayout->Lower()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage1);
+    CPPUNIT_ASSERT(!pPage1->GetSortedObjs());
+    auto pPage2 = pPage1->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage2);
+    CPPUNIT_ASSERT(pPage2->GetSortedObjs());
+    SwSortedObjs& rPage2Objs = *pPage2->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rPage2Objs.size());
+    auto pPage3 = pPage2->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage3);
+    CPPUNIT_ASSERT(pPage3->GetSortedObjs());
+    SwSortedObjs& rPage3Objs = *pPage3->GetSortedObjs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), rPage3Objs.size());
+}
+
+CPPUNIT_TEST_FIXTURE(Test, testSplitFlyWrapOnAllPages)
+{
+    // Given a document where we want to wrap on all pages, around a split floating table:
+    createSwDoc("floattable-wrap-on-all-pages.docx");
+    SwDoc* pDoc = getSwDoc();
+    pDoc->getIDocumentSettingAccess().set(DocumentSettingId::ALLOW_TEXT_AFTER_FLOATING_TABLE_BREAK,
+                                          true);
+
+    // When formatting that document:
+    SwWrtShell* pWrtShell = getSwDocShell()->GetWrtShell();
+    pWrtShell->Reformat();
+
+    // Then make sure that the anchor text is also split between page 1 and page 2:
+    SwRootFrame* pLayout = pDoc->getIDocumentLayoutAccess().GetCurrentLayout();
+    auto pPage1 = pLayout->Lower()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage1);
+    auto pPage1Anchor = pPage1->FindLastBodyContent()->DynCastTextFrame();
+    CPPUNIT_ASSERT(pPage1Anchor);
+    OUString aAnchor1Text(pPage1Anchor->GetText().subView(
+        static_cast<sal_Int32>(pPage1Anchor->GetOffset()),
+        static_cast<sal_Int32>(pPage1Anchor->GetFollow()->GetOffset()
+                               - pPage1Anchor->GetOffset())));
+    // Without the accompanying fix in place, this test would have failed with:
+    // - Expected: He heard quiet steps behind him. That
+    // - Actual  :
+    // i.e. the first page had no anchor text, only the second.
+    CPPUNIT_ASSERT_EQUAL(OUString("He heard quiet steps behind him. That "), aAnchor1Text);
+    auto pPage2 = pPage1->GetNext()->DynCastPageFrame();
+    CPPUNIT_ASSERT(pPage2);
+    auto pPage2Anchor = pPage2->FindLastBodyContent()->DynCastTextFrame();
+    CPPUNIT_ASSERT(pPage2Anchor);
+    OUString aAnchor2Text(
+        pPage2Anchor->GetText().subView(static_cast<sal_Int32>(pPage2Anchor->GetOffset())));
+    CPPUNIT_ASSERT(!pPage2Anchor->GetFollow());
+    CPPUNIT_ASSERT_EQUAL(OUString("didn't bode well."), aAnchor2Text);
 }
 }
 

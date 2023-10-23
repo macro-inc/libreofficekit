@@ -401,10 +401,11 @@ void ViewShellBase::Notify(SfxBroadcaster& rBC, const SfxHint& rHint)
 {
     SfxViewShell::Notify(rBC, rHint);
 
-    const SfxEventHint* pEventHint = dynamic_cast<const SfxEventHint*>(&rHint);
-    if (pEventHint)
+    const SfxHintId nHintId = rHint.GetId();
+
+    if (nHintId == SfxHintId::ThisIsAnSfxEventHint)
     {
-        switch (pEventHint->GetEventId())
+        switch (static_cast<const SfxEventHint&>(rHint).GetEventId())
         {
             case SfxEventHintId::OpenDoc:
                 if( GetDocument() && GetDocument()->IsStartWithPresentation() )
@@ -423,8 +424,7 @@ void ViewShellBase::Notify(SfxBroadcaster& rBC, const SfxHint& rHint)
     }
     else
     {
-        const SfxHintId nSlot = rHint.GetId();
-        switch ( nSlot )
+        switch (nHintId)
         {
             case SfxHintId::LanguageChanged:
             {
@@ -1088,18 +1088,6 @@ void ViewShellBase::NotifyCursor(SfxViewShell* pOtherShell) const
         SAL_WARN("sd", "dynamic_cast to DrawViewShell failed");
     }
 
-    return {};
-}
-
-OUString ViewShellBase::GetColorConfigName() const
-{
-    if (DrawViewShell* pCurrentDrawShell = dynamic_cast<DrawViewShell*>(GetMainViewShell().get()))
-    {
-        const SdViewOptions& rViewOptions = pCurrentDrawShell->GetViewOptions();
-        return rViewOptions.msColorSchemeName;
-    }
-
-    SAL_WARN("sd", "dynamic_cast to DrawViewShell failed");
     return {};
 }
 

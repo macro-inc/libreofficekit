@@ -28,6 +28,7 @@
 #include <com/sun/star/table/BorderLine2.hpp>
 #include <comphelper/extract.hxx>
 #include <xmloff/xmlprcon.hxx>
+#include <xmloff/XMLComplexColorContext.hxx>
 #include "XMLTableHeaderFooterContext.hxx"
 #include "XMLConverter.hxx"
 #include "XMLTableShapeImportHelper.hxx"
@@ -42,6 +43,10 @@
 #include <document.hxx>
 #include <conditio.hxx>
 #include <rangelst.hxx>
+
+#include <xmloff/xmltypes.hxx>
+#include <xmloff/contextid.hxx>
+#include <xmloff/txtprmap.hxx>
 
 #define XML_LINE_LEFT 0
 #define XML_LINE_RIGHT 1
@@ -296,30 +301,37 @@ css::uno::Reference< css::xml::sax::XFastContextHandler > XMLTableCellPropsConte
     sal_Int32 nElement,
     const css::uno::Reference< css::xml::sax::XFastAttributeList >& xAttrList,
     ::std::vector< XMLPropertyState > &rProperties,
-    const XMLPropertyState& rProp )
+    const XMLPropertyState& rProperty)
 {
-    // no need for a custom context or indeed a SvXMLTokenMap to grab just the
-    // single attribute ( href ) that we are interested in.
-    // still though, we will check namespaces etc.
-    if (nElement == XML_ELEMENT(STYLE, XML_HYPERLINK) ||
-        nElement == XML_ELEMENT(LO_EXT, XML_HYPERLINK) )
+    switch (mxMapper->getPropertySetMapper()->GetEntryContextId(rProperty.mnIndex))
     {
-        OUString sURL;
-        for (auto &aIter : sax_fastparser::castToFastAttributeList( xAttrList ))
+        case CTF_COMPLEX_COLOR:
         {
-            if ( aIter.getToken() == XML_ELEMENT(XLINK, XML_HREF) )
-                sURL = aIter.toString();
-            else
-                XMLOFF_WARN_UNKNOWN("sc", aIter);
+            return new XMLPropertyComplexColorContext(GetImport(), nElement, xAttrList, rProperty, rProperties);
         }
-        if ( !sURL.isEmpty() )
+        break;
+        case CTF_SC_HYPERLINK:
         {
-            XMLPropertyState aProp( rProp );
-            aProp.maValue <<=  sURL;
-            rProperties.push_back( aProp );
+            OUString sURL;
+            for (auto &aIter : sax_fastparser::castToFastAttributeList( xAttrList ))
+            {
+                if ( aIter.getToken() == XML_ELEMENT(XLINK, XML_HREF) )
+                    sURL = aIter.toString();
+                else
+                    XMLOFF_WARN_UNKNOWN("sc", aIter);
+            }
+            if ( !sURL.isEmpty() )
+            {
+                XMLPropertyState aProp(rProperty);
+                aProp.maValue <<=  sURL;
+                rProperties.push_back( aProp );
+            }
         }
+        break;
+        default:
+            break;
     }
-    return SvXMLPropertySetContext::createFastChildContext( nElement, xAttrList, rProperties, rProp );
+    return SvXMLPropertySetContext::createFastChildContext(nElement, xAttrList, rProperties, rProperty);
 }
 
 namespace {

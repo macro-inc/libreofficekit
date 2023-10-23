@@ -225,19 +225,11 @@ std::shared_ptr<model::ColorSet> ScDocShell::GetThemeColors()
     if (!pShell)
         return {};
 
-    ScTabView* pTabView = pShell->GetViewData().GetView();
-    if (!pTabView)
+    SdrModel* pSdrModel = GetDocument().GetDrawLayer();
+    if (!pSdrModel)
         return {};
 
-    ScDrawView* pView = pTabView->GetScDrawView();
-    if (!pView)
-        return {};
-
-    SdrPage* pPage = pView->GetSdrPageView()->GetPage();
-    if (!pPage)
-        return {};
-
-    auto const& pTheme = pPage->getSdrPageProperties().GetTheme();
+    auto const& pTheme = pSdrModel->getTheme();
     if (!pTheme)
         return {};
 
@@ -716,11 +708,9 @@ void ScDocShell::Notify( SfxBroadcaster&, const SfxHint& rHint )
             m_pAutoStyleList.reset( new ScAutoStyleList(this) );
         m_pAutoStyleList->AddInitial( aRange, aName1, nTimeout, aName2 );
     }
-    else if ( auto pEventHint = dynamic_cast<const SfxEventHint*>(&rHint) )
+    else if (rHint.GetId() == SfxHintId::ThisIsAnSfxEventHint)
     {
-        SfxEventHintId nEventId = pEventHint->GetEventId();
-
-        switch ( nEventId )
+        switch (static_cast<const SfxEventHint&>(rHint).GetEventId())
         {
             case SfxEventHintId::LoadFinished:
                 {
@@ -1090,11 +1080,10 @@ void ScDocShell::Notify( SfxBroadcaster&, const SfxHint& rHint )
         }
     }
 
-    const SfxEventHint* pSfxEventHint = dynamic_cast<const SfxEventHint*>(&rHint);
-    if (!pSfxEventHint)
+    if (rHint.GetId() != SfxHintId::ThisIsAnSfxEventHint)
         return;
 
-    switch( pSfxEventHint->GetEventId() )
+    switch(static_cast<const SfxEventHint&>(rHint).GetEventId())
     {
        case SfxEventHintId::CreateDoc:
             {

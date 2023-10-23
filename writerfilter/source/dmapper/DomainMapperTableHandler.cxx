@@ -90,8 +90,7 @@ DomainMapperTableHandler::DomainMapperTableHandler(
             css::uno::Reference<css::text::XTextAppendAndConvert> xText,
             DomainMapper_Impl& rDMapper_Impl)
     : m_xText(std::move(xText)),
-        m_rDMapper_Impl( rDMapper_Impl ),
-        m_bHadFootOrEndnote(false)
+        m_rDMapper_Impl( rDMapper_Impl )
 {
 }
 
@@ -1363,7 +1362,7 @@ static void lcl_convertFormulaRanges(const uno::Reference<text::XTextTable> & xT
     }
 }
 
-void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel, bool bTableStartsAtCellStart)
+void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel)
 {
 #ifdef DBG_UTIL
     TagLogger::getInstance().startElement("tablehandler.endTable");
@@ -1549,8 +1548,7 @@ void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel, bool bTab
         }
 
         // If we have a table with a start and an end position, we should make it a floating one.
-        // Unless the table had a foot or endnote, as Writer doesn't support those in TextFrames.
-        if (xTable.is() && xStart.is() && xEnd.is() && !m_bHadFootOrEndnote)
+        if (xTable.is() && xStart.is() && xEnd.is())
         {
             uno::Reference<beans::XPropertySet> xTableProperties(xTable, uno::UNO_QUERY);
             bool bIsRelative = false;
@@ -1592,12 +1590,8 @@ void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel, bool bTab
                     comphelper::makePropertyValue("IsFollowingTextFlow", true));
             }
 
-            if (nestedTableLevel <= 1)
-            {
-                // A text frame created for floating tables is allowed to split if it's a toplevel
-                // table.
-                aFrameProperties.push_back(comphelper::makePropertyValue("IsSplitAllowed", true));
-            }
+            // A text frame created for floating tables is always allowed to split.
+            aFrameProperties.push_back(comphelper::makePropertyValue("IsSplitAllowed", true));
 
             sal_Int32 nTableWidth = 0;
             m_aTableProperties->getValue(TablePropertyMap::TABLE_WIDTH, nTableWidth);
@@ -1605,11 +1599,8 @@ void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel, bool bTab
             m_aTableProperties->getValue(TablePropertyMap::TABLE_WIDTH_TYPE, nTableWidthType);
             // m_xText points to the body text, get the current xText from m_rDMapper_Impl, in case e.g. we would be in a header.
             uno::Reference<text::XTextAppendAndConvert> xTextAppendAndConvert(m_rDMapper_Impl.GetTopTextAppend(), uno::UNO_QUERY);
-            // Don't execute the conversion for nested tables anchored at a cell start: that
-            // currently invalidates the cell start / end references and the outer table conversion
-            // would fail.
             uno::Reference<beans::XPropertySet> xFrameAnchor;
-            if (xTextAppendAndConvert.is() && !(nestedTableLevel >= 2 && bTableStartsAtCellStart))
+            if (xTextAppendAndConvert.is())
             {
                 std::deque<css::uno::Any> aFramedRedlines = m_rDMapper_Impl.m_aStoredRedlines[StoredRedlines::FRAME];
                 std::vector<sal_Int32> redPos, redLen;
@@ -1678,7 +1669,6 @@ void DomainMapperTableHandler::endTable(unsigned int nestedTableLevel, bool bTab
     m_aTableProperties.clear();
     m_aCellProperties.clear();
     m_aRowProperties.clear();
-    m_bHadFootOrEndnote = false;
 
 #ifdef DBG_UTIL
     TagLogger::getInstance().endElement();
@@ -1753,11 +1743,6 @@ void DomainMapperTableHandler::endCell(const css::uno::Reference< css::text::XTe
         xEnd = end->getEnd();
     m_aCellRange.push_back(xEnd);
     m_aRowRanges.push_back(comphelper::containerToSequence(m_aCellRange));
-}
-
-void DomainMapperTableHandler::setHadFootOrEndnote(bool bHadFootOrEndnote)
-{
-    m_bHadFootOrEndnote = bHadFootOrEndnote;
 }
 
 DomainMapper_Impl& DomainMapperTableHandler::getDomainMapperImpl()

@@ -1956,9 +1956,11 @@ void SAL_CALL SfxBaseModel::load(   const Sequence< beans::PropertyValue >& seqA
                 xHandler->handle( aRequest.GetRequest() );
                 if( aRequest.isApproved() )
                 {
+                    // lok: we want to overwrite file in jail, so don't use template flag
+                    bool bIsLOK = comphelper::LibreOfficeKit::isActive();
                     // broken package: try second loading and allow repair
                     pMedium->GetItemSet()->Put( SfxBoolItem( SID_REPAIRPACKAGE, true ) );
-                    pMedium->GetItemSet()->Put( SfxBoolItem( SID_TEMPLATE, true ) );
+                    pMedium->GetItemSet()->Put( SfxBoolItem( SID_TEMPLATE, !bIsLOK ) );
                     pMedium->GetItemSet()->Put( SfxStringItem( SID_DOCINFO_TITLE, aDocName ) );
 
                     // the error must be reset and the storage must be reopened in new mode
@@ -2846,12 +2848,10 @@ void SfxBaseModel::Notify(          SfxBroadcaster& rBC     ,
 
     if ( rHint.GetId() == SfxHintId::DocChanged )
         changing();
-
-    const SfxEventHint* pNamedHint = dynamic_cast<const SfxEventHint*>(&rHint);
-    if ( pNamedHint )
+    else if (rHint.GetId() == SfxHintId::ThisIsAnSfxEventHint)
     {
-
-        switch ( pNamedHint->GetEventId() )
+        const SfxEventHint& rNamedHint = static_cast<const SfxEventHint&>(rHint);
+        switch (rNamedHint.GetEventId())
         {
         case SfxEventHintId::StorageChanged:
         {
@@ -2919,10 +2919,9 @@ void SfxBaseModel::Notify(          SfxBroadcaster& rBC     ,
         if (const SfxPrintingHint* pPrintingHint = dynamic_cast<const SfxPrintingHint*>(&rHint))
             aSupplement <<= pPrintingHint->GetWhich();
         const SfxViewEventHint* pViewHint = dynamic_cast<const SfxViewEventHint*>(&rHint);
-        postEvent_Impl( pNamedHint->GetEventName(), pViewHint ? pViewHint->GetController() : Reference< frame::XController2 >(), aSupplement );
+        postEvent_Impl( rNamedHint.GetEventName(), pViewHint ? pViewHint->GetController() : Reference< frame::XController2 >(), aSupplement );
     }
-
-    if ( rHint.GetId() == SfxHintId::TitleChanged )
+    else if ( rHint.GetId() == SfxHintId::TitleChanged )
     {
         addTitle_Impl( m_pData->m_seqArguments, m_pData->m_pObjectShell->GetTitle() );
         postEvent_Impl( GlobalEventConfig::GetEventName( GlobalEventId::TITLECHANGED ) );

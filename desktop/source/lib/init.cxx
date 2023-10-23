@@ -53,6 +53,7 @@
 #include <memory>
 #include <iostream>
 #include <string_view>
+#include <queue>
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string.hpp>
@@ -87,9 +88,11 @@
 #include <comphelper/propertyvalue.hxx>
 #include <comphelper/scopeguard.hxx>
 #include <comphelper/threadpool.hxx>
+#include <comphelper/types.hxx>
 #include <comphelper/servicehelper.hxx>
 #include <comphelper/sequenceashashmap.hxx>
 
+#include <com/sun/star/connection/XConnection.hpp>
 #include <com/sun/star/document/MacroExecMode.hpp>
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/container/XNameAccess.hpp>
@@ -112,6 +115,10 @@
 #include <com/sun/star/text/TextContentAnchorType.hpp>
 #include <com/sun/star/document/XRedlinesSupplier.hpp>
 #include <com/sun/star/ui/GlobalAcceleratorConfiguration.hpp>
+#include <com/sun/star/bridge/BridgeFactory.hpp>
+#include <com/sun/star/bridge/XBridgeFactory.hpp>
+#include <com/sun/star/bridge/XBridge.hpp>
+#include <com/sun/star/uno/XNamingService.hpp>
 
 #include <com/sun/star/xml/crypto/SEInitializer.hpp>
 #include <com/sun/star/xml/crypto/XSEInitializer.hpp>
@@ -126,6 +133,7 @@
 #include <com/sun/star/i18n/LocaleCalendar2.hpp>
 #include <com/sun/star/i18n/ScriptType.hpp>
 #include <com/sun/star/lang/DisposedException.hpp>
+#include <com/sun/star/lang/XMultiServiceFactory.hpp>
 
 #include <editeng/flstitem.hxx>
 #ifdef IOS
@@ -209,6 +217,7 @@
 #include "lokclipboard.hxx"
 #include <officecfg/Office/Common.hxx>
 #include <officecfg/Office/Impress.hxx>
+#include <officecfg/Office/UI/ToolbarMode.hxx>
 #include <unotools/optionsdlg.hxx>
 #include <svl/ctloptions.hxx>
 #include <svtools/accessibilityoptions.hxx>
@@ -233,6 +242,9 @@ using namespace css;
 using namespace vcl;
 using namespace desktop;
 using namespace utl;
+using namespace bridge;
+using namespace uno;
+using namespace lang;
 
 static LibLibreOffice_Impl *gImpl = nullptr;
 static bool lok_preinit_2_called = false;
@@ -2572,6 +2584,13 @@ static char* lo_extractRequest(LibreOfficeKit* pThis,
 
 static void lo_trimMemory(LibreOfficeKit* pThis, int nTarget);
 
+static void*
+lo_startURP(LibreOfficeKit* pThis, void* pReceiveURPFromLOContext, void* pSendURPToLOContext,
+            int (*fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen),
+            int (*fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen));
+
+static void lo_stopURP(LibreOfficeKit* pThis, void* pSendURPToLOContext);
+
 static void lo_runLoop(LibreOfficeKit* pThis,
                        LibreOfficeKitPollCallback pPollCallback,
                        LibreOfficeKitWakeCallback pWakeCallback,
@@ -2614,6 +2633,8 @@ LibLibreOffice_Impl::LibLibreOffice_Impl()
         m_pOfficeClass->dumpState = lo_dumpState;
         m_pOfficeClass->extractRequest = lo_extractRequest;
         m_pOfficeClass->trimMemory = lo_trimMemory;
+        m_pOfficeClass->startURP = lo_startURP;
+        m_pOfficeClass->stopURP = lo_stopURP;
 
         gOfficeClass = m_pOfficeClass;
     }
@@ -3196,6 +3217,173 @@ static void lo_trimMemory(LibreOfficeKit* /* pThis */, int nTarget)
     }
 }
 
+namespace
+{
+class FunctionBasedURPInstanceProvider
+    : public ::cppu::WeakImplHelper<css::bridge::XInstanceProvider>
+{
+private:
+    css::uno::Reference<css::uno::XComponentContext> m_rContext;
+
+public:
+    FunctionBasedURPInstanceProvider(
+        const css::uno::Reference<css::uno::XComponentContext>& rxContext);
+
+    // XInstanceProvider
+    virtual css::uno::Reference<css::uno::XInterface>
+        SAL_CALL getInstance(const OUString& aName) override;
+};
+
+// InstanceProvider
+FunctionBasedURPInstanceProvider::FunctionBasedURPInstanceProvider(
+    const Reference<XComponentContext>& rxContext)
+    : m_rContext(rxContext)
+{
+}
+
+Reference<XInterface> FunctionBasedURPInstanceProvider::getInstance(const OUString& aName)
+{
+    Reference<XInterface> rInstance;
+
+    if (aName == "StarOffice.ServiceManager")
+    {
+        rInstance.set(m_rContext->getServiceManager());
+    }
+    else if (aName == "StarOffice.ComponentContext")
+    {
+        rInstance = m_rContext;
+    }
+    else if (aName == "StarOffice.NamingService")
+    {
+        Reference<XNamingService> rNamingService(
+            m_rContext->getServiceManager()->createInstanceWithContext(
+                "com.sun.star.uno.NamingService", m_rContext),
+            UNO_QUERY);
+        if (rNamingService.is())
+        {
+            rNamingService->registerObject("StarOffice.ServiceManager",
+                                           m_rContext->getServiceManager());
+            rNamingService->registerObject("StarOffice.ComponentContext", m_rContext);
+            rInstance = rNamingService;
+        }
+    }
+    return rInstance;
+}
+
+class FunctionBasedURPConnection : public cppu::WeakImplHelper<css::connection::XConnection>
+{
+public:
+    explicit FunctionBasedURPConnection(void*, int (*)(void* pContext, const signed char* pBuffer, int nLen),
+                                        void*, int (*)(void* pContext, signed char* pBuffer, int nLen));
+    ~FunctionBasedURPConnection();
+
+    // These overridden member functions use "read" and "write" from the point of view of LO,
+    // i.e. the opposite to how startURP() uses them.
+    virtual sal_Int32 SAL_CALL read(Sequence<sal_Int8>& rReadBytes,
+                                    sal_Int32 nBytesToRead) override;
+    virtual void SAL_CALL write(const Sequence<sal_Int8>& aData) override;
+    virtual void SAL_CALL flush() override;
+    virtual void SAL_CALL close() override;
+    virtual OUString SAL_CALL getDescription() override;
+    void setBridge(Reference<XBridge>);
+    void* getContext();
+    inline static int g_connectionCount = 0;
+
+private:
+    void* m_pRecieveFromLOContext;
+    void* m_pSendURPToLOContext;
+    int (*m_fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen);
+    int (*m_fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen);
+    Reference<XBridge> m_URPBridge;
+};
+
+FunctionBasedURPConnection::FunctionBasedURPConnection(
+    void* pRecieveFromLOContext,
+    int (*fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen),
+    void* pSendURPToLOContext,
+    int (*fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen))
+    : m_pRecieveFromLOContext(pRecieveFromLOContext)
+    , m_pSendURPToLOContext(pSendURPToLOContext)
+    , m_fnReceiveURPFromLO(fnReceiveURPFromLO)
+    , m_fnSendURPToLO(fnSendURPToLO)
+{
+    g_connectionCount++;
+}
+
+FunctionBasedURPConnection::~FunctionBasedURPConnection()
+{
+    Reference<XComponent> xComp(m_URPBridge, UNO_QUERY_THROW);
+    xComp->dispose(); // TODO: check this doesn't deadlock
+}
+
+void* FunctionBasedURPConnection::getContext() { return this; }
+
+sal_Int32 FunctionBasedURPConnection::read(Sequence<sal_Int8>& rReadBytes, sal_Int32 nBytesToRead)
+{
+    if (nBytesToRead < 0)
+        return 0;
+
+    if (rReadBytes.getLength() != nBytesToRead)
+        rReadBytes.realloc(nBytesToRead);
+
+    // As with osl::StreamPipe, we must always read nBytesToRead...
+    return m_fnSendURPToLO(m_pSendURPToLOContext, rReadBytes.getArray(), nBytesToRead);
+}
+
+void FunctionBasedURPConnection::write(const Sequence<sal_Int8>& rData)
+{
+    m_fnReceiveURPFromLO(m_pRecieveFromLOContext, rData.getConstArray(), rData.getLength());
+}
+
+void FunctionBasedURPConnection::flush() {}
+
+void FunctionBasedURPConnection::close()
+{
+    SAL_INFO("lok.urp", "Requested to close FunctionBasedURPConnection");
+}
+
+OUString FunctionBasedURPConnection::getDescription() { return ""; }
+
+void FunctionBasedURPConnection::setBridge(Reference<XBridge> xBridge) { m_URPBridge = xBridge; }
+}
+
+static void*
+lo_startURP(LibreOfficeKit* /* pThis */, void* pRecieveFromLOContext, void* pSendToLOContext,
+            int (*fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen),
+            int (*fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen))
+{
+    // Here we will roughly do what desktop LO does when one passes a command-line switch like
+    // --accept=socket,port=nnnn;urp;StarOffice.ServiceManager. Except that no listening socket will
+    // be created. The communication to the URP will be through the nReceiveURPFromLO and nSendURPToLO
+    // functions.
+
+    rtl::Reference<FunctionBasedURPConnection> connection(
+        new FunctionBasedURPConnection(pRecieveFromLOContext, fnReceiveURPFromLO,
+                                       pSendToLOContext, fnSendURPToLO));
+
+    Reference<XBridgeFactory> xBridgeFactory = css::bridge::BridgeFactory::create(xContext);
+
+    Reference<XInstanceProvider> xInstanceProvider(new FunctionBasedURPInstanceProvider(xContext));
+
+    Reference<XBridge> xBridge(xBridgeFactory->createBridge(
+        "functionurp" + OUString::number(FunctionBasedURPConnection::g_connectionCount), "urp",
+        connection, xInstanceProvider));
+
+    connection->setBridge(std::move(xBridge));
+
+    return connection->getContext();
+}
+
+/**
+ * Stop a function based URP connection that you started with lo_startURP above
+ *
+ * @param pSendToLOContext a pointer to the context returned by lo_startURP */
+static void lo_stopURP(LibreOfficeKit* /* pThis */,
+                       void* pFunctionBasedURPConnection/* FunctionBasedURPConnection* */)
+{
+    static_cast<FunctionBasedURPConnection*>(pFunctionBasedURPConnection)->close();
+}
+
 static void lo_registerCallback (LibreOfficeKit* pThis,
                                  LibreOfficeKitCallback pCallback,
                                  void* pData)
@@ -3658,7 +3846,8 @@ static void doc_iniUnoCommands ()
         OUString(".uno:InsertDropdownContentControl"),
         OUString(".uno:InsertPlainTextContentControl"),
         OUString(".uno:InsertPictureContentControl"),
-        OUString(".uno:DataFilterAutoFilter")
+        OUString(".uno:DataFilterAutoFilter"),
+        OUString(".uno:CellProtection")
     };
 
     util::URL aCommandURL;
@@ -4759,9 +4948,18 @@ static void lcl_sendDialogEvent(unsigned long long int nWindowId, const char* pA
     try
     {
         OString sControlId = OUStringToOString(aMap["id"], RTL_TEXTENCODING_ASCII_US);
+        std::string sWindowId = std::to_string(nWindowId);
+
+        // special values for window id
+        if (nWindowId == static_cast<unsigned long long int>(-1))
+            sWindowId = std::to_string(nCurrentShellId) + "sidebar";
+        if (nWindowId == static_cast<unsigned long long int>(-2))
+            sWindowId = std::to_string(nCurrentShellId) + "notebookbar";
+        if (nWindowId == static_cast<unsigned long long int>(-3))
+            sWindowId = std::to_string(nCurrentShellId) + "formulabar";
 
         // dialogs send own id but notebookbar and sidebar controls are remembered by SfxViewShell id
-        bool bFoundWeldedControl = jsdialog::ExecuteAction(std::to_string(nWindowId), sControlId, aMap);
+        bool bFoundWeldedControl = jsdialog::ExecuteAction(sWindowId, sControlId, aMap);
         if (!bFoundWeldedControl)
             bFoundWeldedControl = jsdialog::ExecuteAction(std::to_string(nCurrentShellId) + "sidebar", sControlId, aMap);
         if (!bFoundWeldedControl)
@@ -5702,6 +5900,35 @@ static void addLocale(boost::property_tree::ptree& rValues, css::lang::Locale co
     rValues.push_back(std::make_pair("", aChild));
 }
 
+static char* getDocReadOnly(LibreOfficeKitDocument* pThis)
+{
+    LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+    if (!pDocument)
+        return nullptr;
+
+    SfxBaseModel* pBaseModel = dynamic_cast<SfxBaseModel*>(pDocument->mxComponent.get());
+    if (!pBaseModel)
+        return nullptr;
+
+    SfxObjectShell* pObjectShell = pBaseModel->GetObjectShell();
+    if (!pObjectShell)
+        return nullptr;
+
+    boost::property_tree::ptree aTree;
+    aTree.put("commandName", ".uno:ReadOnly");
+    aTree.put("success", pObjectShell->IsLoadReadonly());
+
+    std::stringstream aStream;
+    boost::property_tree::write_json(aStream, aTree);
+    char* pJson = static_cast<char*>(malloc(aStream.str().size() + 1));
+    if (!pJson)
+        return nullptr;
+
+    strcpy(pJson, aStream.str().c_str());
+    pJson[aStream.str().size()] = '\0';
+    return pJson;
+}
+
 static char* getLanguages(const char* pCommand)
 {
     css::uno::Sequence< css::lang::Locale > aLocales;
@@ -6073,7 +6300,11 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
         return nullptr;
     }
 
-    if (!strcmp(pCommand, ".uno:LanguageStatus"))
+    if (!strcmp(pCommand, ".uno:ReadOnly"))
+    {
+        return getDocReadOnly(pThis);
+    }
+    else if (!strcmp(pCommand, ".uno:LanguageStatus"))
     {
         return getLanguages(pCommand);
     }
@@ -6952,7 +7183,7 @@ static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocumen
     SolarMutexGuard aGuard;
 
     int nDocType = getDocumentType(pThis);
-    if (nDocType != LOK_DOCTYPE_TEXT)
+    if (!(nDocType == LOK_DOCTYPE_TEXT || nDocType == LOK_DOCTYPE_PRESENTATION))
         return;
 
     SfxLokHelper::setAccessibilityState(nId, nEnabled);
@@ -7346,7 +7577,23 @@ static void activateNotebookbar(std::u16string_view rApp)
 
     if (aAppNode.isValid())
     {
-        aAppNode.setNodeValue("Active", Any(OUString("notebookbar_online.ui")));
+        OUString sNoteBookbarName("notebookbar_online.ui");
+        aAppNode.setNodeValue("Active", Any(sNoteBookbarName));
+
+        const utl::OConfigurationNode aImplsNode = aAppNode.openNode("Modes");
+        const Sequence<OUString> aModeNodeNames( aImplsNode.getNodeNames() );
+
+        for (const auto& rModeNodeName : aModeNodeNames)
+        {
+            const utl::OConfigurationNode aImplNode(aImplsNode.openNode(rModeNodeName));
+            if (!aImplNode.isValid())
+                continue;
+
+            OUString aCommandArg = comphelper::getString(aImplNode.getNodeValue("CommandArg"));
+            if (aCommandArg == "notebookbar.ui")
+                aImplNode.setNodeValue("CommandArg", Any(sNoteBookbarName));
+        }
+
         aAppNode.commit();
     }
 }
@@ -7803,6 +8050,13 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
 
     if (bNotebookbar)
     {
+        std::shared_ptr<comphelper::ConfigurationChanges> batch(comphelper::ConfigurationChanges::create());
+        officecfg::Office::UI::ToolbarMode::ActiveWriter::set("notebookbar_online.ui", batch);
+        officecfg::Office::UI::ToolbarMode::ActiveCalc::set("notebookbar_online.ui", batch);
+        officecfg::Office::UI::ToolbarMode::ActiveImpress::set("notebookbar_online.ui", batch);
+        officecfg::Office::UI::ToolbarMode::ActiveDraw::set("notebookbar_online.ui", batch);
+        batch->commit();
+
         activateNotebookbar(u"Writer");
         activateNotebookbar(u"Calc");
         activateNotebookbar(u"Impress");

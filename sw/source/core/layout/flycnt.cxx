@@ -1554,6 +1554,12 @@ SwLayoutFrame *SwFrame::GetNextFlyLeaf( MakePageType eMakePage )
     assert(pFly && "GetNextFlyLeaf: missing fly frame");
     assert(pFly->IsFlySplitAllowed() && "GetNextFlyLeaf: fly split not allowed");
 
+    if (pFly->HasFollow())
+    {
+        // If we already have a follow, then no need to create a new one, just use it.
+        return pFly->GetFollow();
+    }
+
     SwTextFrame* pFlyAnchor = pFly->FindAnchorCharFrame();
 
     if (!pFlyAnchor)
@@ -1573,11 +1579,30 @@ SwLayoutFrame *SwFrame::GetNextFlyLeaf( MakePageType eMakePage )
     SwLayoutFrame *pLayLeaf = nullptr;
     // Look up the first candidate.
     SwSectionFrame* pFlyAnchorSection = pFlyAnchor ? pFlyAnchor->FindSctFrame() : nullptr;
+    bool bNesting = false;
     if (pFlyAnchorSection)
     {
-        // We can't just move the split anchor to the next page, that would be outside the section.
-        // Rather split that section as well.
-        pLayLeaf = pFlyAnchorSection->GetNextSctLeaf(eMakePage);
+        // The anchor is in a section.
+        if (pFlyAnchor)
+        {
+            SwTabFrame* pFlyAnchorTab = pFlyAnchor->FindTabFrame();
+            if (pFlyAnchorTab)
+            {
+                // The anchor is in table as well.
+                if (pFlyAnchorTab->FindSctFrame() == pFlyAnchorSection)
+                {
+                    // We're in a table-in-section, no anchor move in this case, because that would
+                    // mean we're not in a table anymore.
+                    bNesting = true;
+                }
+            }
+        }
+        if (!bNesting)
+        {
+            // We can't just move the split anchor to the next page, that would be outside the section.
+            // Rather split that section as well.
+            pLayLeaf = pFlyAnchorSection->GetNextSctLeaf(eMakePage);
+        }
     }
     else if (IsTabFrame())
     {
@@ -1609,6 +1634,19 @@ SwLayoutFrame *SwFrame::GetNextFlyLeaf( MakePageType eMakePage )
                     bSameBody = true;
                 }
             }
+
+            if (bLeftFly && pFlyAnchor && pFlyAnchor->IsInTab()
+                && FindTabFrame() == pLayLeaf->FindTabFrame())
+            {
+                // This is an inner fly (parent is an inline or a floating table), then the follow
+                // anchor will be just next to us.
+                SwLayoutFrame* pFlyAnchorUpper = pFlyAnchor->GetUpper();
+                pOldLayLeaf = pLayLeaf;
+                pLayLeaf = pFlyAnchorUpper;
+                bLeftFly = false;
+                bNesting = true;
+            }
+
             if (bLeftBody || bLeftFly || bSameBody)
             {
                 // The above conditions are not held, reject.
@@ -1650,8 +1688,12 @@ SwLayoutFrame *SwFrame::GetNextFlyLeaf( MakePageType eMakePage )
             // Split the anchor at char 0: all the content goes to the follow of the anchor.
             pFlyAnchor->SplitFrame(TextFrameIndex(0));
             auto pNext = static_cast<SwTextFrame*>(pFlyAnchor->GetNext());
-            // Move the new anchor frame, before the first child of pLayLeaf.
-            pNext->MoveSubTree(pLayLeaf, pLayLeaf->Lower());
+            // The nesting case just splits the inner fly; the outer fly will split and move.
+            if (!bNesting)
+            {
+                // Move the new anchor frame, before the first child of pLayLeaf.
+                pNext->MoveSubTree(pLayLeaf, pLayLeaf->Lower());
+            }
 
             // Now create the follow of the fly and anchor it in the master of the anchor.
             pNew = new SwFlyAtContentFrame(*pFly);
@@ -1681,6 +1723,16 @@ void SwRootFrame::DeleteEmptyFlys_()
             SwFrame::DestroyFrame(pFly);
         }
     }
+}
+
+bool SwRootFrame::IsInFlyDelList( SwFlyFrame* pFly ) const
+{
+    if (!mpFlyDestroy)
+    {
+        return false;
+    }
+
+    return mpFlyDestroy->find(pFly) != mpFlyDestroy->end();
 }
 
 const SwFlyAtContentFrame* SwFlyAtContentFrame::GetPrecede() const
@@ -1730,6 +1782,24 @@ void SwFlyAtContentFrame::DelEmpty()
     {
         getRootFrame()->InsertEmptyFly(this);
     }
+}
+
+bool SwFlyAtContentFrame::IsWrapOnAllPages() const
+{
+    const SwRootFrame* pRootFrame = getRootFrame();
+    if (!pRootFrame)
+    {
+        return false;
+    }
+
+    const SwFrameFormat* pFormat = pRootFrame->GetFormat();
+    if (!pFormat)
+    {
+        return false;
+    }
+
+    const IDocumentSettingAccess& rIDSA = pFormat->getIDocumentSettingAccess();
+    return rIDSA.get(DocumentSettingId::ALLOW_TEXT_AFTER_FLOATING_TABLE_BREAK);
 }
 
 void SwRootFrame::InsertEmptyFly(SwFlyFrame* pDel)

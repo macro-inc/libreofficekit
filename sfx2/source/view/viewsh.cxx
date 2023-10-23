@@ -67,6 +67,7 @@
 #include <com/sun/star/awt/FontSlant.hpp>
 
 #include <comphelper/diagnose_ex.hxx>
+#include <editeng/unoprnms.hxx>
 #include <tools/urlobj.hxx>
 #include <unotools/tempfile.hxx>
 #include <svtools/soerr.hxx>
@@ -266,6 +267,28 @@ bool isFocused(const accessibility::AccessibleEventObject& aEvent)
     return hasState(aEvent, accessibility::AccessibleStateType::FOCUSED);
 }
 
+sal_Int16 getParentRole(const uno::Reference<accessibility::XAccessible>& xAccObject)
+{
+    if (!xAccObject.is())
+        return 0;
+
+    uno::Reference<accessibility::XAccessibleContext> xContext(xAccObject, uno::UNO_QUERY);
+    if (xContext.is())
+    {
+        uno::Reference<accessibility::XAccessible> xParent = xContext->getAccessibleParent();
+        if (xParent.is())
+        {
+            uno::Reference<accessibility::XAccessibleContext> xParentContext(xParent,
+                                                                             uno::UNO_QUERY);
+            if (xParentContext.is())
+            {
+                return xParentContext->getAccessibleRole();
+            }
+        }
+    }
+    return 0;
+}
+
 // Put in rAncestorList all ancestors of xTable up to xAncestorTable or
 // up to the first not-a-table ancestor if xAncestorTable is not an ancestor.
 // xTable is included in the list, xAncestorTable is not included.
@@ -359,6 +382,16 @@ void aboutEvent(std::string msg, const accessibility::AccessibleEventObject& aEv
                         << "\n  parent: " << xContext->getAccessibleParent().get()
                         << "\n  child count: " << xContext->getAccessibleChildCount());
             }
+            else
+            {
+                SAL_INFO("lok.a11y", msg << ": event id: " << aEvent.EventId
+                                         << ", no accessible context!");
+            }
+        }
+        else
+        {
+            SAL_INFO("lok.a11y", msg << ": event id: " << aEvent.EventId
+                                     << ", no accessible source!");
         }
         uno::Reference< accessibility::XAccessible > xOldValue;
         aEvent.OldValue >>= xOldValue;
@@ -403,6 +436,42 @@ void aboutEvent(std::string msg, const accessibility::AccessibleEventObject& aEv
     {
         SAL_WARN("lok.a11y", "Focused object has invalid index in parent");
     }
+}
+
+sal_Int32 getListPrefixSize(const uno::Reference<css::accessibility::XAccessibleText>& xAccText)
+{
+    if (!xAccText.is())
+        return 0;
+
+    OUString sText = xAccText->getText();
+    sal_Int32 nLength = sText.getLength();
+    if (nLength <= 0)
+        return 0;
+
+    css::uno::Sequence< css::beans::PropertyValue > aRunAttributeList;
+    css::uno::Sequence< OUString > aRequestedAttributes = {UNO_NAME_NUMBERING_LEVEL, UNO_NAME_NUMBERING};
+    aRunAttributeList = xAccText->getCharacterAttributes(0, aRequestedAttributes);
+
+    sal_Int16 nLevel = -1;
+    bool bIsCounted = false;
+    for (const auto& attribute: aRunAttributeList)
+    {
+        if (attribute.Name.isEmpty())
+            continue;
+        if (attribute.Name == UNO_NAME_NUMBERING_LEVEL)
+           attribute.Value >>= nLevel;
+        else if (attribute.Name == UNO_NAME_NUMBERING)
+           attribute.Value >>= bIsCounted;
+    }
+    if (nLevel < 0 || !bIsCounted)
+        return 0;
+
+    css::accessibility::TextSegment aTextSegment =
+        xAccText->getTextAtIndex(0, css::accessibility::AccessibleTextType::ATTRIBUTE_RUN);
+
+    SAL_INFO("lok.a11y", "getListPrefixSize: prefix: " << aTextSegment.SegmentText << ", level: " << nLevel);
+
+    return aTextSegment.SegmentEnd;
 }
 
 void aboutTextFormatting(std::string msg, const uno::Reference<css::accessibility::XAccessibleText>& xAccText)
@@ -479,6 +548,22 @@ void aboutTextFormatting(std::string msg, const uno::Reference<css::accessibilit
                     attribute.Value >>= nValue;
                     sValue = OUString::number(nValue);
                 }
+                else if (attribute.Name == UNO_NAME_NUMBERING_LEVEL)
+                {
+                    sal_Int16 nValue(-1);
+                    attribute.Value >>= nValue;
+                    sValue = OUString::number(nValue);
+                }
+                else if (attribute.Name == UNO_NAME_NUMBERING)
+                {
+                    bool bValue(false);
+                    attribute.Value >>= bValue;
+                    sValue = OUString::boolean(bValue);
+                }
+                else if (attribute.Name == UNO_NAME_NUMBERING_RULES)
+                {
+                    attribute.Value >>= sValue;
+                }
 
                 if (!sValue.isEmpty())
                 {
@@ -498,12 +583,14 @@ void aboutTextFormatting(std::string msg, const uno::Reference<css::accessibilit
 }
 
 void aboutParagraph(std::string msg, const OUString& rsParagraphContent, sal_Int32 nCaretPosition,
-                    sal_Int32 nSelectionStart, sal_Int32 nSelectionEnd, bool force = false)
+                    sal_Int32 nSelectionStart, sal_Int32 nSelectionEnd, sal_Int32 nlistPrefixLength,
+                    bool force = false)
 {
     SAL_INFO("lok.a11y", msg << ": "
             << "\n text content: \"" << rsParagraphContent << "\""
             << "\n caret pos: " << nCaretPosition
             << "\n selection: start: " << nSelectionStart << ", end: " << nSelectionEnd
+            << "\n list prefix length: " << nlistPrefixLength
             << "\n force: " << force
             );
 }
@@ -518,7 +605,8 @@ void aboutParagraph(std::string msg, const uno::Reference<css::accessibility::XA
     sal_Int32 nCaretPosition = xAccText->getCaretPosition();
     sal_Int32 nSelectionStart = xAccText->getSelectionStart();
     sal_Int32 nSelectionEnd = xAccText->getSelectionEnd();
-    aboutParagraph(msg, sText, nCaretPosition, nSelectionStart, nSelectionEnd, force);
+    sal_Int32 nlistPrefixLength = getListPrefixSize(xAccText);
+    aboutParagraph(msg, sText, nCaretPosition, nSelectionStart, nSelectionEnd, nlistPrefixLength, force);
 }
 
 void aboutFocusedCellChanged(sal_Int32 nOutCount, const std::vector<TableSizeType>& aInList,
@@ -554,6 +642,7 @@ class LOKDocumentFocusListener :
     sal_Int32 m_nCaretPosition;
     sal_Int32 m_nSelectionStart;
     sal_Int32 m_nSelectionEnd;
+    sal_Int32 m_nListPrefixLength;
     uno::Reference<accessibility::XAccessibleTable> m_xLastTable;
     OUString m_sSelectedText;
     bool m_bIsEditingCell;
@@ -618,7 +707,6 @@ public:
     void notifyFocusedParagraphChanged(bool force = false);
     void notifyCaretChanged();
     void notifyTextSelectionChanged();
-    void notifyTablePositionChanged();
     void notifyFocusedCellChanged(sal_Int32 nOutCount, const std::vector<TableSizeType>& aInList, sal_Int32 nRow, sal_Int32 nCol, sal_Int32 nRowSpan, sal_Int32 nColSpan);
 
     OUString getFocusedParagraph() const;
@@ -631,6 +719,7 @@ private:
                              bool force, std::string msg = "");
     void updateAndNotifyParagraph(const uno::Reference<css::accessibility::XAccessibleText>& xAccText,
                                   bool force, std::string msg = "");
+    void resetParagraphInfo();
 };
 
 LOKDocumentFocusListener::LOKDocumentFocusListener(const SfxViewShell* pViewShell)
@@ -638,6 +727,7 @@ LOKDocumentFocusListener::LOKDocumentFocusListener(const SfxViewShell* pViewShel
     , m_nCaretPosition(0)
     , m_nSelectionStart(0)
     , m_nSelectionEnd(0)
+    , m_nListPrefixLength(0)
     , m_bIsEditingCell(false)
 {
 }
@@ -649,6 +739,8 @@ void LOKDocumentFocusListener::paragraphPropertiesToTree(boost::property_tree::p
     aPayloadTree.put("position", m_nCaretPosition);
     aPayloadTree.put("start", bLeftToRight ? m_nSelectionStart : m_nSelectionEnd);
     aPayloadTree.put("end", bLeftToRight ? m_nSelectionEnd : m_nSelectionStart);
+    if (m_nListPrefixLength > 0)
+        aPayloadTree.put("listPrefixLength", m_nListPrefixLength);
     if (force)
         aPayloadTree.put("force", 1);
 }
@@ -666,7 +758,8 @@ OUString LOKDocumentFocusListener::getFocusedParagraph() const
 {
     aboutView("LOKDocumentFocusListener::getFocusedParagraph", this, m_pViewShell);
     aboutParagraph("LOKDocumentFocusListener::getFocusedParagraph",
-            m_sFocusedParagraph, m_nCaretPosition, m_nSelectionStart, m_nSelectionEnd);
+                   m_sFocusedParagraph, m_nCaretPosition,
+                   m_nSelectionStart, m_nSelectionEnd, m_nListPrefixLength);
 
     std::string aPayload;
     paragraphPropertiesToJson(aPayload);
@@ -699,7 +792,7 @@ int LOKDocumentFocusListener::getCaretPosition() const
 //  is skipped until the composition is over.
 //  On the contrary the composition would be aborted, making dictation not possible.
 //  Anyway when the text change has been performed by another view we are in due
-//  to upadate the clipboard content even if the user is in the middle of a composition.
+//  to update the clipboard content even if the user is in the middle of a composition.
 void LOKDocumentFocusListener::notifyFocusedParagraphChanged(bool force)
 {
     aboutView("LOKDocumentFocusListener::notifyFocusedParagraphChanged", this, m_pViewShell);
@@ -708,7 +801,8 @@ void LOKDocumentFocusListener::notifyFocusedParagraphChanged(bool force)
     if (m_pViewShell)
     {
         aboutParagraph("LOKDocumentFocusListener::notifyFocusedParagraphChanged",
-                m_sFocusedParagraph, m_nCaretPosition, m_nSelectionStart, m_nSelectionEnd, force);
+                       m_sFocusedParagraph, m_nCaretPosition,
+                       m_nSelectionStart, m_nSelectionEnd, m_nListPrefixLength, force);
 
         m_pViewShell->libreOfficeKitViewCallback(LOK_CALLBACK_A11Y_FOCUS_CHANGED, aPayload.c_str());
     }
@@ -824,6 +918,21 @@ bool LOKDocumentFocusListener::updateParagraphInfo(const uno::Reference<css::acc
         m_nCaretPosition = nCaretPosition;
         m_nSelectionStart = xAccText->getSelectionStart();
         m_nSelectionEnd = xAccText->getSelectionEnd();
+        m_nListPrefixLength = getListPrefixSize(xAccText);
+
+        // Inside a text shape when there is no selection, selection-start and selection-end are
+        // set to current caret position instead of -1. Moreover, inside a text shape pressing
+        // delete or backspace with an empty selection really deletes text and not only the empty
+        // selection as it occurs in a text paragraph in Writer.
+        // So whenever selection-start == selection-end, and we are inside a shape we need
+        // to set these parameters to -1 in order to have the client to handle delete and
+        // backspace properly.
+        if (m_nSelectionStart == m_nSelectionEnd && m_nSelectionStart != -1)
+        {
+            uno::Reference<accessibility::XAccessible> xAccObject(xAccText, uno::UNO_QUERY);
+            if (getParentRole(xAccObject) == accessibility::AccessibleRole::SHAPE)
+                m_nSelectionStart = m_nSelectionEnd = -1;
+        }
 
         // In case only caret position or text selection are different we can rely on specific events.
         if (m_sFocusedParagraph != sText)
@@ -854,6 +963,15 @@ void LOKDocumentFocusListener::updateAndNotifyParagraph(
         notifyFocusedParagraphChanged(force);
 }
 
+void LOKDocumentFocusListener::resetParagraphInfo()
+{
+    m_sFocusedParagraph = "";
+    m_nCaretPosition = 0;
+    m_nSelectionStart = -1;
+    m_nSelectionEnd = -1;
+    m_nListPrefixLength = 0;
+}
+
 void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventObject& aEvent )
 {
     aboutView("LOKDocumentFocusListener::notifyEvent", this, m_pViewShell);
@@ -869,10 +987,20 @@ void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventO
                 uno::Reference< accessibility::XAccessible > xAccessibleObject = getAccessible(aEvent);
                 sal_Int64 nState = accessibility::AccessibleStateType::INVALID;
                 aEvent.NewValue >>= nState;
+                sal_Int64 nOldState = accessibility::AccessibleStateType::INVALID;
+                aEvent.OldValue >>= nOldState;
                 SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: "
-                        << "STATE_CHANGED: nState: " << stateSetToString(nState));
+                        << "STATE_CHANGED: nNewState: " << stateSetToString(nState)
+                        << " , STATE_CHANGED: nOldState: " << stateSetToString(nOldState));
 
-                if( accessibility::AccessibleStateType::FOCUSED == nState )
+                if (accessibility::AccessibleStateType::ACTIVE == nState &&
+                    getParentRole(xAccessibleObject) == accessibility::AccessibleRole::SHAPE)
+                {
+                    uno::Reference<css::accessibility::XAccessibleText> xAccText(xAccessibleObject, uno::UNO_QUERY);
+                    updateParagraphInfo(xAccText, true, "STATE_CHANGED: ACTIVE");
+                    notifyFocusedParagraphChanged(true);
+                }
+                else if( accessibility::AccessibleStateType::FOCUSED == nState )
                 {
                     SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: FOCUSED");
                     uno::Reference<css::accessibility::XAccessibleText> xAccText(xAccessibleObject, uno::UNO_QUERY);
@@ -1025,14 +1153,8 @@ void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventO
                         // So we could need to notify a new focused paragraph changed message.
                         if (!isFocused(aEvent))
                         {
-                            OUString sText = xAccText->getText();
-                            if (m_sFocusedParagraph != sText)
-                            {
-                                m_sFocusedParagraph = sText;
-                                m_nSelectionStart = xAccText->getSelectionStart();
-                                m_nSelectionEnd = xAccText->getSelectionEnd();
-                                notifyFocusedParagraphChanged(true);
-                            }
+                            if (updateParagraphInfo(xAccText, false, "CARET_CHANGED"))
+                                 notifyFocusedParagraphChanged(true);
                         }
                         else
                         {
@@ -1087,9 +1209,7 @@ void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventO
                     // if a text selection object exists or not. That's needed because of the odd behavior
                     // occurring when <backspace>/<delete> are hit and a text selection is empty but it still exists.
                     // Such keys delete the empty selection instead of the previous/next char.
-                    m_nSelectionStart = xAccText->getSelectionStart();
-                    m_nSelectionEnd = xAccText->getSelectionEnd();
-                    m_nCaretPosition = xAccText->getCaretPosition();
+                    updateParagraphInfo(xAccText, false, "TEXT_SELECTION_CHANGED");
 
                     // Calc: when editing a formula send the update content
                     if (m_bIsEditingCell && !m_sSelectedCellAddress.isEmpty()
@@ -1118,8 +1238,24 @@ void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventO
                     {
                         OUString sName = xContext->getAccessibleName();
                         SAL_INFO("lok.a11y", "LOKDocumentFocusListener::notifyEvent: SELECTION_CHANGED: this: " << this
-                                << ", selected cell address: >" << sName << "<"
+                                << ", selected object: >" << sName << "<"
                                 << ", m_bIsEditingCell: " << m_bIsEditingCell);
+                        if (xContext->getAccessibleRole() == accessibility::AccessibleRole::SHAPE)
+                        {
+                            if (xContext->getAccessibleChildCount() > 0)
+                            {
+                                uno::Reference<accessibility::XAccessible> xAccChild =
+                                   xContext->getAccessibleChild(0);
+                                uno::Reference<css::accessibility::XAccessibleText> xAccText(xAccChild, uno::UNO_QUERY);
+                                if (xAccText.is())
+                                {
+                                    // At present when a shape is selected screen reader reports editable area content
+                                    // on caret navigation even if shape editing is not active
+                                    resetParagraphInfo();
+                                    notifyFocusedParagraphChanged(true);
+                                }
+                            }
+                        }
                         if (m_bIsEditingCell && !sName.isEmpty())
                         {
                             m_sSelectedCellAddress = sName;
@@ -1134,6 +1270,37 @@ void LOKDocumentFocusListener::notifyEvent(const accessibility::AccessibleEventO
                             {
                                 notifyFocusedParagraphChanged();
                                 notifyTextSelectionChanged();
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case accessibility::AccessibleEventId::SELECTION_CHANGED_REMOVE:
+            {
+                uno::Reference< accessibility::XAccessible > xNewValue;
+                aEvent.NewValue >>= xNewValue;
+                if (xNewValue.is())
+                {
+                    uno::Reference<accessibility::XAccessibleContext> xContext
+                        = xNewValue->getAccessibleContext();
+
+                    if (xContext.is())
+                    {
+                        if (xContext->getAccessibleRole() == accessibility::AccessibleRole::SHAPE)
+                        {
+                            if (xContext->getAccessibleChildCount() > 0)
+                            {
+                                uno::Reference<accessibility::XAccessible> xAccChild
+                                    = xContext->getAccessibleChild(0);
+                                uno::Reference<css::accessibility::XAccessibleText> xAccText(
+                                    xAccChild, uno::UNO_QUERY);
+                                if (xAccText.is())
+                                {
+                                    // see SELECTION_CHANGED case
+                                    resetParagraphInfo();
+                                    notifyFocusedParagraphChanged(true);
+                                }
                             }
                         }
                     }
@@ -2552,9 +2719,11 @@ SfxViewShell* SfxViewShell::GetNext
 void SfxViewShell::Notify( SfxBroadcaster& rBC,
                             const SfxHint& rHint )
 {
-    const SfxEventHint* pEventHint = dynamic_cast<const SfxEventHint*>(&rHint);
-    if ( !(pEventHint && pEventHint->GetEventId() == SfxEventHintId::LoadFinished) )
+    if (rHint.GetId() != SfxHintId::ThisIsAnSfxEventHint ||
+        static_cast<const SfxEventHint&>(rHint).GetEventId() != SfxEventHintId::LoadFinished)
+    {
         return;
+    }
 
     if ( !GetController().is() )
         return;
@@ -2803,12 +2972,6 @@ vcl::Window* SfxViewShell::GetEditWindowForActiveOLEObj() const
 ::Color SfxViewShell::GetColorConfigColor(svtools::ColorConfigEntry /*nColorType*/) const
 {
     SAL_WARN("sfx.view", "SfxViewShell::GetColorConfigColor not overriden!");
-    return {};
-}
-
-OUString SfxViewShell::GetColorConfigName() const
-{
-    SAL_WARN("sfx.view", "SfxViewShell::GetColorConfigName not overriden!");
     return {};
 }
 

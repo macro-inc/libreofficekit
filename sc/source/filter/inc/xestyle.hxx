@@ -30,6 +30,7 @@
 #include <memory>
 #include <utility>
 #include <vector>
+#include <docmodel/color/ComplexColor.hxx>
 
 /* ============================================================================
 - Buffers for style records (PALETTE, FONT, FORMAT, XF, STYLE).
@@ -220,7 +221,7 @@ public:
     sal_uInt16          Insert(const XclFontData& rFontData, XclExpColorType eColorType, bool bAppFont = false );
     /** Inserts the SvxFont into the buffer if not present, e.g. where escapements are used.
         @return  The resulting Excel font index. */
-    sal_uInt16          Insert(const SvxFont& rFont, Color const& rColor, XclExpColorType eColorType);
+    sal_uInt16 Insert(const SvxFont& rFont, model::ComplexColor const& rComplexColor, XclExpColorType eColorType);
     /** Inserts the font contained in the passed item set into the buffer, if not present.
         @param nScript  The script type of the font properties to be used.
         @param bAppFont  true = Sets the application font; false = Inserts a new font.
@@ -338,13 +339,19 @@ struct XclExpCellAlign : public XclCellAlign
     @descr  Provides functions to fill from item sets and to fill to Excel record data. */
 struct XclExpCellBorder : public XclCellBorder
 {
-    sal_uInt32          mnLeftColorId;      /// Color ID for left line.
-    sal_uInt32          mnRightColorId;     /// Color ID for right line.
-    sal_uInt32          mnTopColorId;       /// Color ID for top line.
-    sal_uInt32          mnBottomColorId;    /// Color ID for bottom line.
-    sal_uInt32          mnDiagColorId;      /// Color ID for diagonal line(s).
+    sal_uInt32 mnLeftColorId;   /// Color ID for left line.
+    sal_uInt32 mnRightColorId;  /// Color ID for right line.
+    sal_uInt32 mnTopColorId;    /// Color ID for top line.
+    sal_uInt32 mnBottomColorId; /// Color ID for bottom line.
+    sal_uInt32 mnDiagColorId;   /// Color ID for diagonal line(s).
 
-    explicit            XclExpCellBorder();
+    model::ComplexColor maComplexColorLeft;
+    model::ComplexColor maComplexColorRight;
+    model::ComplexColor maComplexColorTop;
+    model::ComplexColor maComplexColorBottom;
+    model::ComplexColor maComplexColorDiagonal;
+
+    explicit XclExpCellBorder();
 
     /** Fills the border attributes from the passed item set.
         @descr  Fills only the attributes exported in the passed BIFF version.
@@ -375,6 +382,9 @@ struct XclExpCellArea : public XclCellArea
     Color maForeColor; // Actual foreground color
     Color maBackColor; // Actual background color
 
+    model::ComplexColor maForegroundComplexColor;
+    model::ComplexColor maBackgroundComplexColor;
+
     explicit XclExpCellArea();
     explicit XclExpCellArea(Color aForeColor, Color aBackColor);
 
@@ -400,6 +410,7 @@ struct XclExpCellArea : public XclCellArea
 struct XclExpColor
 {
     Color maColor;
+    model::ComplexColor maComplexColor;
 
     bool FillFromItemSet( const SfxItemSet& rItemSet );
 
@@ -751,7 +762,7 @@ public:
 
     sal_Int32 GetDxfId(const OUString& rName) const;
     sal_Int32 GetDxfByColor(Color aColor) const;
-    void AddColor(Color aColor);
+    void addColor(Color aColor);
 
     virtual void SaveXml( XclExpXmlStream& rStrm) override;
     void Finalize();

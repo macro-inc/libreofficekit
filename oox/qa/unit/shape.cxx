@@ -307,7 +307,7 @@ CPPUNIT_TEST_FIXTURE(OoxShapeTest, testTdf54095_SmartArtThemeTextColor)
     xPortion->getPropertyValue("CharComplexColor") >>= xComplexColor;
     CPPUNIT_ASSERT(xComplexColor.is());
     auto aComplexColor = model::color::getFromXComplexColor(xComplexColor);
-    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Dark2, aComplexColor.getSchemeType());
+    CPPUNIT_ASSERT_EQUAL(model::ThemeColorType::Dark2, aComplexColor.getThemeColorType());
 
     if (!bUseGroup)
     {
@@ -316,6 +316,18 @@ CPPUNIT_TEST_FIXTURE(OoxShapeTest, testTdf54095_SmartArtThemeTextColor)
         officecfg::Office::Common::Filter::Microsoft::Import::SmartArtToShapes::set(false, pChange);
         pChange->commit();
     }
+}
+
+CPPUNIT_TEST_FIXTURE(OoxShapeTest, testGlowOnGroup)
+{
+    // The document contains a group of two shapes. A glow-effect is set on the group.
+    // Without the fix, the children of the group were not imported at all.
+    loadFromURL(u"tdf156902_GlowOnGroup.docx");
+    uno::Reference<drawing::XDrawPagesSupplier> xDrawPagesSupplier(mxComponent, uno::UNO_QUERY);
+    uno::Reference<drawing::XDrawPage> xDrawPage(xDrawPagesSupplier->getDrawPages()->getByIndex(0),
+                                                 uno::UNO_QUERY);
+    uno::Reference<container::XIndexAccess> xGroup(xDrawPage->getByIndex(0), uno::UNO_QUERY);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(2), xGroup->getCount());
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

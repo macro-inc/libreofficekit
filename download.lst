@@ -75,8 +75,8 @@ CPPUNIT_TARBALL := cppunit-1.15.1.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-CURL_SHA256SUM := dd322f6bd0a20e6cebdfd388f69e98c3d183bed792cf4713c8a7ef498cba4894
-CURL_TARBALL := curl-8.2.1.tar.xz
+CURL_SHA256SUM := 16c62a9c4af0f703d28bda6d7bbf37ba47055ad3414d70dec63e2e6336f2a82d
+CURL_TARBALL := curl-8.4.0.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -308,6 +308,11 @@ ICU_DATA_TARBALL := icu4c-72_1-data.zip
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
+JAVA_WEBSOCKET_SHA256SUM := a6828b35d1f938fee2335945f3d3c563cbbfa58ce7eb0bf72778d0fa7a550720
+JAVA_WEBSOCKET_TARBALL := Java-WebSocket-1.5.4.tar.gz
+# three static lines
+# so that git cherry-pick
+# will not run into conflicts
 JFREEREPORT_FLOW_ENGINE_SHA256SUM := 233f66e8d25c5dd971716d4200203a612a407649686ef3b52075d04b4c9df0dd
 JFREEREPORT_FLOW_ENGINE_TARBALL := ba2930200c9f019c2d93a8c88c651a0f-flow-engine-0.9.4.zip
 JFREEREPORT_FLUTE_SHA256SUM := 1b5b24f7bc543c0362b667692f78db8bab4ed6dafc6172f104d0bd3757d8a133
@@ -388,13 +393,13 @@ LIBNUMBERTEXT_TARBALL := libnumbertext-1.0.11.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-LIBTOMMATH_SHA256SUM := 083daa92d8ee6f4af96a6143b12d7fc8fe1a547e14f862304f7281f8f7347483
-LIBTOMMATH_TARBALL := ltm-1.0.zip
+LIBTOMMATH_SHA256SUM := 986025d7b374276fee2e30e99f3649e4ac0db8a02257a37ee10eae72abed0d1f
+LIBTOMMATH_TARBALL := ltm-1.2.1.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-LIBWEBP_SHA256SUM := b3779627c2dfd31e3d8c4485962c2efe17785ef975e2be5c8c0c9e6cd3c4ef66
-LIBWEBP_TARBALL := libwebp-1.3.1.tar.gz
+LIBWEBP_SHA256SUM := 2a499607df669e40258e53d0ade8035ba4ec0175244869d1025d460562aa09b4
+LIBWEBP_TARBALL := libwebp-1.3.2.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -482,8 +487,8 @@ OPENLDAP_TARBALL := openldap-2.4.59.tgz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-OPENSSL_SHA256SUM := eb1ab04781474360f77c318ab89d8c5a03abc38e63d65a603cabbf1b00a1dc90
-OPENSSL_TARBALL := openssl-3.0.9.tar.gz
+OPENSSL_SHA256SUM := 1761d4f5b13a1028b9b6f3d4b8e17feb0cedc9370f6afe61d7193d2cdce83323
+OPENSSL_TARBALL := openssl-3.0.10.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -517,10 +522,10 @@ LIBTIFF_TARBALL := tiff-4.5.1.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-POPPLER_SHA256SUM := d9aa9cacdfbd0f8e98fc2b3bb008e645597ed480685757c3e7bc74b4278d15c0
-POPPLER_TARBALL := poppler-22.12.0.tar.xz
-POPPLER_DATA_SHA256SUM := 2cec05cd1bb03af98a8b06a1e22f6e6e1a65b1e2f3816cb3069bb0874825f08c
-POPPLER_DATA_TARBALL := poppler-data-0.4.11.tar.gz
+POPPLER_SHA256SUM := 80d1d44dd8bdf4ac1a47d56c5065075eb9991790974b1ed7d14b972acde88e55
+POPPLER_TARBALL := poppler-23.09.0.tar.xz
+POPPLER_DATA_SHA256SUM := c835b640a40ce357e1b83666aabd95edffa24ddddd49b8daff63adb851cdab74
+POPPLER_DATA_TARBALL := poppler-data-0.4.12.tar.gz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
@@ -529,8 +534,8 @@ POSTGRESQL_TARBALL := postgresql-13.10.tar.bz2
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
-PYTHON_SHA256SUM := 2e54b0c68191f16552f6de2e97a2396540572a219f6bbb28591a137cecc490a9
-PYTHON_TARBALL := Python-3.8.17.tar.xz
+PYTHON_SHA256SUM := 3ffb71cd349a326ba7b2fadc7e7df86ba577dd9c4917e52a8401adbda7405e3f
+PYTHON_TARBALL := Python-3.8.18.tar.xz
 # three static lines
 # so that git cherry-pick
 # will not run into conflicts
