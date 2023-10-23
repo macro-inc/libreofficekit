@@ -21,10 +21,10 @@
 #define INCLUDED_SW_SOURCE_CORE_INC_DOCUMENTTIMERMANAGER_HXX
 
 #include "osl/interlck.h"
-#include "rtl/ustring.hxx"
 #include <IDocumentTimerAccess.hxx>
 #include <SwDocIdle.hxx>
 
+#include <optional>
 #include <sal/types.h>
 #include <tools/link.hxx>
 
@@ -59,6 +59,9 @@ public:
     bool IsDocIdle() const override;
 
     void MarkLOKIdle() override;
+
+    // MACRO-1671: Autorecovery and backup
+    void SetBackupPath(const OUString& path) override;
 private:
     DocumentTimerManager(DocumentTimerManager const&) = delete;
     DocumentTimerManager& operator=(DocumentTimerManager const&) = delete;
@@ -73,6 +76,10 @@ private:
     bool m_bStartOnUnblock; ///< true, if the last unblock should start the timer
     SwDocIdle m_aDocIdle;
     bool m_bWaitForLokInit; ///< true if we waited for LOK to initialize already.
+
+    // MACRO-1671: Autorecovery and backup
+    OUString m_sBackupPath;
+    std::optional<std::chrono::time_point<std::chrono::steady_clock>> m_aLastBackup;
 };
 
 inline bool DocumentTimerManager::IsDocIdle() const

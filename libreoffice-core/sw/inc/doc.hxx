@@ -329,10 +329,6 @@ private:
     bool mbColumnSelection       : 1;    //< TRUE: this content has been created by a column selection (clipboard docs only)
     bool mbIsPrepareSelAll       : 1;
 
-    OUString m_sBackupPath;
-
-    std::optional<sal_Int64> m_nLastBackupTimestamp;
-
     enum MissingDictionary { False = -1, Undefined = 0, True = 1 };
     MissingDictionary meDictionaryMissing;
 
@@ -465,12 +461,6 @@ public:
     // IDocumentMarkAccess
     IDocumentMarkAccess* getIDocumentMarkAccess();
     const IDocumentMarkAccess* getIDocumentMarkAccess() const;
-
-    const OUString& GetBackupPath() const;
-    void SetBackupPath(const char* rPath);
-
-    std::optional<sal_Int64> GetLastBackupTimestamp() const;
-    void SetLastBackupTimestamp(const sal_Int64 rTimestamp);
 
     // IDocumentRedlineAccess
     IDocumentRedlineAccess const& getIDocumentRedlineAccess() const;

@@ -19,6 +19,7 @@
 
 #include "IDocumentOutlineNodes.hxx"
 #include "IDocumentRedlineAccess.hxx"
+#include "IDocumentTimerAccess.hxx"
 #include "colorizer.hxx"
 #include "itabenum.hxx"
 #include "ndtxt.hxx"
@@ -48,6 +49,9 @@
 #include <txtrfmrk.hxx>
 #include <ndtxt.hxx>
 #include <wrtsh.hxx>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace ::com::sun::star;
 
@@ -650,6 +654,18 @@ void SwXTextDocument::removeOverlays() {
 }
 void SwXTextDocument::cleanupOverlays() {
     colorizer::Cleanup(this);
+}
+
+// MACRO-1671: Autorecovery and backup
+void SwXTextDocument::setBackupPath(const char* payload)
+{
+    using boost::property_tree::ptree;
+    ptree pt;
+    std::istringstream jsonStream(payload);
+    read_json(jsonStream, pt);
+
+    GetDocShell()->GetDoc()->getIDocumentTimerAccess().SetBackupPath(
+            OUString::fromUtf8(pt.get<std::string>("path")));
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

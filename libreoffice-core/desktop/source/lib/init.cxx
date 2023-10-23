@@ -1230,7 +1230,6 @@ static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
 static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size));
-static void doc_setBackupPath(LibreOfficeKitDocument* pThis, const char* backupPath);
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -1450,7 +1449,6 @@ LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xC
         m_pDocumentClass->sendDialogEvent = doc_sendDialogEvent;
         m_pDocumentClass->postUnoCommand = doc_postUnoCommand;
         m_pDocumentClass->setTextSelection = doc_setTextSelection;
-        m_pDocumentClass->setBackupPath = doc_setBackupPath;
         m_pDocumentClass->setWindowTextSelection = doc_setWindowTextSelection;
         m_pDocumentClass->getTextSelection = doc_getTextSelection;
         m_pDocumentClass->getSelectionType = doc_getSelectionType;
@@ -4919,7 +4917,7 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
 
     SfxObjectShell* pDocSh = SfxObjectShell::Current();
     CrashReporter::logUnoCommand(svCommand);
-    OUString aCommand = std::move(OUString::fromUtf8(svCommand));
+    OUString aCommand = OUString::fromUtf8(svCommand);
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     // MACRO-1653/MACRO-1598: Colorize and overlays
@@ -4929,28 +4927,34 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         pDoc->colorize();
         return;
     }
-    if (gImpl && svCommand == ".uno:ApplyOverlays")
+    else if (gImpl && svCommand == ".uno:ApplyOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->applyOverlays(std::string_view(pArguments));
         return;
     }
-    if (gImpl && svCommand == ".uno:JumpToOverlay")
+    else if (gImpl && svCommand == ".uno:JumpToOverlay")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->jumpToOverlay(std::string_view(pArguments));
         return;
     }
-    if (gImpl && svCommand == ".uno:RemoveOverlays")
+    else if (gImpl && svCommand == ".uno:RemoveOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->removeOverlays();
         return;
     }
-    if (gImpl && svCommand == ".uno:CleanupOverlays")
+    else if (gImpl && svCommand == ".uno:CleanupOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->cleanupOverlays();
+        return;
+    }
+    // MACRO-1671: Autorecovery and backup
+    else if (gImpl && svCommand == ".uno:SetBackupPath") {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->setBackupPath(pArguments);
         return;
     }
 
@@ -6635,12 +6639,6 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
     pDoc->gotoOutline(aJsonWriter, idx);
 
     return aJsonWriter.extractData();
-}
-
-static void doc_setBackupPath(LibreOfficeKitDocument* pThis, const char* backupPath)
-{
-    ITiledRenderable* pDoc = getTiledRenderable(pThis);
-    pDoc->setBackupPath(backupPath);
 }
 
 static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size))

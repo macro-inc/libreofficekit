@@ -74,7 +74,6 @@
 #include <laycache.hxx>
 #include <mvsave.hxx>
 #include <istyleaccess.hxx>
-#include "rtl/textenc.h"
 #include "swstylemanager.hxx"
 #include <GrammarContact.hxx>
 #include <OnlineAccessibilityCheck.hxx>
@@ -650,18 +649,6 @@ uno::Reference < embed::XStorage > SwDoc::GetDocStorage()
 SfxObjectShell* SwDoc::GetPersist() const
 {
     return mpDocShell ? mpDocShell : getIDocumentLinksAdministration().GetLinkManager().GetPersist();
-}
-
-const OUString& SwDoc::GetBackupPath() const
-{
-    return m_sBackupPath;
-}
-
-void SwDoc::SetBackupPath(const char* rPath)
-{
-
-    OUString sPath(rPath, strlen(rPath), RTL_TEXTENCODING_UTF8);
-    m_sBackupPath = sPath;
 }
 
 void SwDoc::ClearDoc()

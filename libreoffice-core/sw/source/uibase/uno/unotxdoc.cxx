@@ -3920,12 +3920,6 @@ void SwXTextDocument::setTextSelection(int nType, int nX, int nY)
     }
 }
 
-void SwXTextDocument::setBackupPath(const char* rBackupPath)
-{
-    SwDoc* pDoc = m_pDocShell->GetDoc();
-    pDoc->SetBackupPath(rBackupPath);
-}
-
 uno::Reference<datatransfer::XTransferable> SwXTextDocument::getSelection()
 {
     SolarMutexGuard aGuard;

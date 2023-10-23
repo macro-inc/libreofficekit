@@ -429,8 +429,6 @@ public:
     virtual css::uno::Reference<css::datatransfer::XTransferable> getSelection() override;
     /// @see vcl::ITiledRenderable::setGraphicSelection().
     virtual void setGraphicSelection(int nType, int nX, int nY) override;
-    /// @see vcl::ITiledRenderable::setBackupPath().
-    virtual void setBackupPath(const char* rBackupPath) override;
     /// @see vcl::ITiledRenderable::resetSelection().
     virtual void resetSelection() override;
     /// @see vcl::ITiledRenderable::getPartPageRectangles().
@@ -495,6 +493,9 @@ public:
     void jumpToOverlay( const std::string_view payload ) override;
     void removeOverlays() override;
     void cleanupOverlays() override;
+
+    // MACRO-1671: Autorecovery and backup
+    void setBackupPath(const char* payload ) override;
 
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);

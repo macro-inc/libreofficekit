@@ -16,12 +16,10 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
-#include "sal/log.hxx"
-#include "sfx2/docfile.hxx"
-#include <sal/log.hxx>
-#include "tools/stream.hxx"
+#include "comphelper/diagnose_ex.hxx"
 #include <DocumentTimerManager.hxx>
 
+#include <chrono>
 #include <doc.hxx>
 #include <DocumentSettingManager.hxx>
 #include <IDocumentFieldsAccess.hxx>
@@ -39,6 +37,9 @@
 #include <vcl/scheduler.hxx>
 #include <comphelper/lok.hxx>
 #include <editsh.hxx>
+#include <com/sun/star/frame/XStorable.hpp>
+#include <com/sun/star/uno/Reference.hxx>
+#include <unotools/mediadescriptor.hxx>
 
 namespace sw
 {
@@ -53,6 +54,8 @@ DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
     , m_bStartOnUnblock(false)
     , m_aDocIdle(i_rSwdoc, "sw::DocumentTimerManager m_aDocIdle")
     , m_bWaitForLokInit(true)
+    , m_sBackupPath()
+    , m_aLastBackup()
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
     m_aDocIdle.SetInvokeHandler(LINK(this, DocumentTimerManager, DoIdleJobs));
@@ -105,14 +108,6 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
 {
     SwRootFrame* pTmpRoot = m_rDoc.getIDocumentLayoutAccess().GetCurrentLayout();
 
-    bool bNeedsBackup = false;
-    auto m_nLastBackupTimestamp = m_rDoc.GetLastBackupTimestamp();
-    sal_Int64 nCurrentTimestamp = std::time(nullptr);
-    if (!m_nLastBackupTimestamp.has_value()) {
-        bNeedsBackup = true;
-    } else if ((nCurrentTimestamp - m_nLastBackupTimestamp.value_or(0)) > 60) {
-        bNeedsBackup = true;
-    }
 
     if( pTmpRoot &&
         !SfxProgress::GetActiveProgress( m_rDoc.GetDocShell() ) )
@@ -122,6 +117,9 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
             if( rSh.ActionPend() )
                 return IdleJob::Busy;
 
+        auto aCurrentClock = std::chrono::steady_clock::now();
+        bool bNeedsBackup = !m_aLastBackup.has_value() ||
+            (aCurrentClock - m_aLastBackup.value()) > std::chrono::seconds(60);
         if (bNeedsBackup) {
             return IdleJob::AutoBackup;
         }
@@ -159,6 +157,11 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
     }
 
     return IdleJob::None;
+}
+
+void DocumentTimerManager::SetBackupPath(const OUString& path)
+{
+    m_sBackupPath = path;
 }
 
 IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
@@ -220,21 +223,33 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
     }
     case IdleJob::AutoBackup:
     {
+        if (m_sBackupPath.isEmpty()) return;
+
         SwDocShell* pDocShell = m_rDoc.GetDocShell();
-        auto m_sBackupPath = m_rDoc.GetBackupPath();
-        sal_Int64 nCurrentTimestamp = std::time(nullptr);
+        auto aCurrentTime = std::chrono::steady_clock::now();
+        OUString sCurrentTimestamp = OUString::number(aCurrentTime.time_since_epoch().count());
 
-        if (!pDocShell || m_sBackupPath.isEmpty())
+        if (!pDocShell)
         {
-            SAL_WARN("sw.core", "not writing backup");
             return;
-
         }
 
-        OUString sBackupPath = "file://" + m_sBackupPath + "backup" + OUString::number(nCurrentTimestamp) + ".docx";
-        std::unique_ptr<SfxMedium> pMedium(new SfxMedium(sBackupPath, StreamMode::WRITE));
-        pDocShell->DoSaveAs(*pMedium);
-        m_rDoc.SetLastBackupTimestamp(nCurrentTimestamp);
+        try
+        {
+            uno::Reference<frame::XStorable> xStorable(pDocShell->GetModel(), uno::UNO_QUERY_THROW);
+            utl::MediaDescriptor aSaveMediaDescriptor;
+            OUString aFilterName = "MS Word 2007 XML";
+            aSaveMediaDescriptor["Overwrite"] <<= true;
+            aSaveMediaDescriptor["FilterName"] <<= aFilterName;
+            OUString sBackupURL = "file:///" + m_sBackupPath + "backup" + sCurrentTimestamp + ".docx";
+            xStorable->storeToURL(sBackupURL, aSaveMediaDescriptor.getAsConstPropertyValueList());
+            m_aLastBackup = aCurrentTime;
+        }
+        catch (const uno::Exception& /* exception */)
+        {
+            css::uno::Any exAny( cppu::getCaughtException() );
+            SAL_WARN("macro.autobackup", "Failed to make backup: " << exceptionToString(exAny));
+        }
     }
     break;
 
