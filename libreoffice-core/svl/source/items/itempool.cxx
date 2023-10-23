@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <svl/colorizer.hxx>
 #include <svl/itempool.hxx>
 #include <svl/setitem.hxx>
 
@@ -668,7 +669,8 @@ const SfxPoolItem& SfxItemPool::PutImpl( const SfxPoolItem& rItem, sal_uInt16 nW
 
     // Is this a 'poolable' item - ie. should we re-use and return
     // the same underlying item for equivalent (==) SfxPoolItems?
-    if ( IsItemPoolable_Impl( nIndex ) )
+    // MACRO-1598: Colorizer slow
+    if ( !colorizer::IsPoolingBlocked() && IsItemPoolable_Impl( nIndex ) )
     {
         // if is already in a pool, then it is worth checking if it is in this one.
         if ( IsPooledItem(&rItem) )

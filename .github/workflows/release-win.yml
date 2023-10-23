@@ -55,35 +55,13 @@ jobs:
             external-tar--${{ hashFiles('lok/libreoffice-core/external/**/*') }}
             external-tar--
             external-tar-
-      - name: Cache cygwin packages
-        if: steps.cache-external-tar.outputs.cache-hit != 'true'
-        id: cache-cygwin-packages
-        uses: actions/cache@v3
-        with:
-          path: C:\cygwin-packages
-          key: cygwin-packages
-      - name: Fetch Cygwin installer
-        if: steps.cache-external-tar.outputs.cache-hit != 'true'
-        run: |
-          Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
-        shell: powershell
       - name: Install Cygwin
         if: steps.cache-external-tar.outputs.cache-hit != 'true'
         run: |
-          C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P ^
-          autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,^
-          git,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,^
-          openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,^
-          zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
-        shell: cmd
-      - name: Install MSVC make v4.2.1 and nasm v2.11.06
-        if: steps.cache-external-tar.outputs.cache-hit != 'true'
-        run: |
-          Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
-          Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile $env:RUNNER_TEMP\nasm.zip
-          Expand-Archive -LiteralPath $env:RUNNER_TEMP\nasm.zip -DestinationPath $env:RUNNER_TEMP
-          Move-Item -Path $env:RUNNER_TEMP\nasm-2.11.06\nasm.exe -Destination C:\cygwin\usr\local\bin\nasm.exe
-        shell: powershell
+          curl -LO https://github.com/coparse-inc/libreofficekit/releases/download/cygdevenv/cygwin-snapshot.tar.xz
+          tar -xJf cygwin-snapshot.tar.xz -C /c &>/dev/null || true
+          MSYS=winsymlinks:lnk tar -xJf cygwin-snapshot.tar.xz -C /c || true
+        shell: bash
       - name: Configure LOKit and Fetch Tarballs
         if: steps.cache-external-tar.outputs.cache-hit != 'true'
         env:
@@ -103,6 +81,11 @@ jobs:
     runs-on: windows-2019-beefy
     name: Build
     steps:
+      - name: Remove Strawberry Perl from PATH (https://github.com/actions/runner-images/issues/8598 8622)
+        run: |
+          $env:PATH = $env:PATH -replace "C:\\Strawberry\\c\\bin;", "" 
+          "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: powershell
       - name: Turn off line ending conversion in git
         run: |
           git config --global core.autocrlf false
@@ -118,31 +101,12 @@ jobs:
         run: |
           echo "Adding GNU tar to PATH"
           echo C:\Program Files\Git\usr\bin>>"%GITHUB_PATH%"
-      - name: Cache cygwin packages
-        id: cache-cygwin-packages
-        uses: actions/cache@v3
-        with:
-          path: C:\cygwin-packages
-          key: cygwin-packages
-      - name: Fetch Cygwin installer
-        run: |
-          Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\setup.exe
-        shell: powershell
       - name: Install Cygwin
         run: |
-          C:\setup.exe -BNqdDLXgnO -s http://mirrors.kernel.org/sourceware/cygwin/ -l C:\cygwin-packages -R C:\cygwin -P ^
-          autoconf,automake,bison,cabextract,doxygen,flex,gettext-devel,^
-          git,gnupg,gperf,libxml2-devel,libpng12-devel,make,mintty,openssh,^
-          openssl,patch,perl,pkg-config,readline,rsync,unzip,wget,^
-          zip,perl-Archive-Zip,perl-Font-TTF,perl-IO-String,python,python3
-        shell: cmd
-      - name: Install MSVC make v4.2.1 and nasm v2.11.06
-        run: |
-          Invoke-WebRequest https://dev-www.libreoffice.org/bin/cygwin/make-4.2.1-msvc.exe -OutFile C:\cygwin\usr\local\bin\make.exe
-          Invoke-WebRequest https://www.nasm.us/pub/nasm/releasebuilds/2.11.06/win32/nasm-2.11.06-win32.zip -OutFile $env:RUNNER_TEMP\nasm.zip
-          Expand-Archive -LiteralPath $env:RUNNER_TEMP\nasm.zip -DestinationPath $env:RUNNER_TEMP
-          Move-Item -Path $env:RUNNER_TEMP\nasm-2.11.06\nasm.exe -Destination C:\cygwin\usr\local\bin\nasm.exe
-        shell: powershell
+          curl -LO https://github.com/coparse-inc/libreofficekit/releases/download/cygdevenv/cygwin-snapshot.tar.xz
+          tar -xJf cygwin-snapshot.tar.xz -C /c &>/dev/null || true
+          MSYS=winsymlinks:lnk tar -xJf cygwin-snapshot.tar.xz -C /c || true
+        shell: bash
       - name: Cache external tarballs
         id: cache-external-tar
         uses: actions/cache@v3
@@ -161,9 +125,7 @@ jobs:
           cd /d C:\lok\libreoffice-core
           C:\cygwin\bin\bash.exe --login
           C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && ./autogen.sh --with-distro=LOKit-Win64 --with-external-tar='C:\external-tar'"
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv Module_zlib Module_libpng Module_freetype Module_expat Module_fontconfig Module_cairo Module_icu Module_openssl Module_libffi Module_python3 Module_boost"
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make Module_nss || make Module_nss"
-          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make build"
+          C:\cygwin\bin\bash.exe --login -c "cd /cygdrive/c/lok/libreoffice-core && make solenv Module_zlib Module_libpng Module_freetype Module_expat Module_fontconfig Module_cairo Module_icu Module_openssl Module_libffi Module_python3 Module_boost && make Module_nss || make Module_nss && make"
         shell: cmd
       - name: Make artifact
         run: |

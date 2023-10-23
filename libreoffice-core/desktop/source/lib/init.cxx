@@ -4904,15 +4904,55 @@ void LibLibreOffice_Impl::dumpState(rtl::OStringBuffer &rState)
 static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pCommand, const char* pArguments, bool bNotifyWhenFinished)
 {
     comphelper::ProfileZone aZone("doc_postUnoCommand");
+    const std::string_view svCommand(pCommand);
+    // MACRO-1653/MACRO-1598: Colorize and overlays
+    if (gImpl && svCommand == ".uno:CancelColorize") // thread safe, don't need mutex guard
+    {
+        SetLastExceptionMsg();
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->cancelColorize();
+        return;
+    }
 
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
     SfxObjectShell* pDocSh = SfxObjectShell::Current();
-    const std::string_view svCommand(pCommand);
     CrashReporter::logUnoCommand(svCommand);
     OUString aCommand = std::move(OUString::fromUtf8(svCommand));
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+
+    // MACRO-1653/MACRO-1598: Colorize and overlays
+    if (gImpl && svCommand == ".uno:Colorize")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->colorize();
+        return;
+    }
+    if (gImpl && svCommand == ".uno:ApplyOverlays")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->applyOverlays(std::string_view(pArguments));
+        return;
+    }
+    if (gImpl && svCommand == ".uno:JumpToOverlay")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->jumpToOverlay(std::string_view(pArguments));
+        return;
+    }
+    if (gImpl && svCommand == ".uno:RemoveOverlays")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->removeOverlays();
+        return;
+    }
+    if (gImpl && svCommand == ".uno:CleanupOverlays")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->cleanupOverlays();
+        return;
+    }
 
     std::vector<beans::PropertyValue> aPropertyValuesVector(jsonToPropertyValuesVector(pArguments));
 
