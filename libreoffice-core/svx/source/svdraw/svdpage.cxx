@@ -45,7 +45,6 @@
 #include <svx/svdundo.hxx>
 #include <svx/xfillit0.hxx>
 #include <svx/fmdpage.hxx>
-#include <svx/theme/ThemeColorChanger.hxx>
 #include <svx/ColorSets.hxx>
 
 #include <sdr/contact/viewcontactofsdrpage.hxx>
@@ -796,7 +795,9 @@ void SdrObjList::ImplReformatAllEdgeObjects(const SdrObjList& rObjList)
         const bool bIsGroup(nullptr != pChildren);
         if(!bIsGroup)
         {
-            if (pSdrObject->GetObjIdentifier() == SdrObjKind::Edge)
+            // Check IsVirtualObj because sometimes we get SwDrawVirtObj here
+            if (pSdrObject->GetObjIdentifier() == SdrObjKind::Edge
+               && !pSdrObject->IsVirtualObj())
             {
                 SdrEdgeObj* pSdrEdgeObj = static_cast< SdrEdgeObj* >(pSdrObject);
                 pSdrEdgeObj->Reformat();
@@ -1223,17 +1224,6 @@ SdrPageProperties::SdrPageProperties(SdrPage& rSdrPage)
     {
         maProperties.Put(XFillStyleItem(drawing::FillStyle_NONE));
     }
-
-    //if (rSdrPage.getSdrModelFromSdrPage().IsWriter() || rSdrPage.IsMasterPage())
-    {
-        mpTheme.reset(new model::Theme("Office Theme"));
-        auto const* pColorSet = svx::ColorSets::get().getColorSet(u"LibreOffice");
-        if (pColorSet)
-        {
-            std::shared_ptr<model::ColorSet> pDefaultColorSet(new model::ColorSet(*pColorSet));
-            mpTheme->setColorSet(pDefaultColorSet);
-        }
-    }
 }
 
 SdrPageProperties::~SdrPageProperties()
@@ -1302,33 +1292,33 @@ void SdrPageProperties::SetStyleSheet(SfxStyleSheet* pStyleSheet)
     ImpPageChange(*mpSdrPage);
 }
 
-void SdrPageProperties::SetTheme(std::shared_ptr<model::Theme> const& pTheme)
+void SdrPageProperties::setTheme(std::shared_ptr<model::Theme> const& pTheme)
 {
-    if (mpTheme == pTheme)
+    if (!mpSdrPage)
         return;
 
-    mpTheme = pTheme;
+    // Only set the theme on a master page, else set it on the model
 
-    if (mpTheme && mpTheme->getColorSet() && mpSdrPage->IsMasterPage())
+    if (mpSdrPage->IsMasterPage())
     {
-        SdrModel& rModel = mpSdrPage->getSdrModelFromSdrPage();
-        sal_uInt16 nPageCount = rModel.GetPageCount();
-        for (sal_uInt16 nPage = 0; nPage < nPageCount; ++nPage)
-        {
-            SdrPage* pPage = rModel.GetPage(nPage);
-            if (!pPage->TRG_HasMasterPage() || &pPage->TRG_GetMasterPage() != mpSdrPage)
-            {
-                continue;
-            }
-
-            svx::ThemeColorChanger aChanger(pPage);
-            aChanger.apply(mpTheme->getColorSet());
-        }
+        if (mpTheme != pTheme)
+            mpTheme = pTheme;
+    }
+    else
+    {
+        mpSdrPage->getSdrModelFromSdrPage().setTheme(pTheme);
     }
 }
 
-std::shared_ptr<model::Theme> const& SdrPageProperties::GetTheme() const
+std::shared_ptr<model::Theme> const& SdrPageProperties::getTheme() const
 {
+    // if set - page theme has priority
+    if (mpTheme)
+        return mpTheme;
+    // else the model theme
+    else if (mpSdrPage)
+        return mpSdrPage->getSdrModelFromSdrPage().getTheme();
+    // else return empty shared_ptr
     return mpTheme;
 }
 

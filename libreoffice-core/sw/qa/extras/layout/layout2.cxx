@@ -2426,6 +2426,63 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf109077)
     CPPUNIT_ASSERT_LESS(static_cast<sal_Int32>(15), nTextBoxTop - nShapeTop);
 }
 
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf155177)
+{
+    createSwDoc("tdf155177-1-min.odt");
+
+    uno::Reference<beans::XPropertySet> xStyle(getStyles("ParagraphStyles")->getByName("Text Body"),
+                                               uno::UNO_QUERY_THROW);
+    CPPUNIT_ASSERT_EQUAL(sal_Int32(210), getProperty<sal_Int32>(xStyle, "ParaTopMargin"));
+
+    {
+        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt", 6);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[6]/SwParaPortion/SwLineLayout", 2);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[6]/SwParaPortion/SwLineLayout[2]", "portion",
+                    "long as two lines.");
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout", 3);
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout[1]", "portion",
+                    "This paragraph is even longer so that ");
+        discardDumpedLayout();
+    }
+
+    // this should bring one line back
+    xStyle->setPropertyValue("ParaTopMargin", uno::Any(sal_Int32(200)));
+
+    Scheduler::ProcessEventsToIdle();
+
+    {
+        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt", 7);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[7]/SwParaPortion/SwLineLayout", 1);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[7]/SwParaPortion/SwLineLayout[1]", "portion",
+                    "This paragraph is even longer so that ");
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout", 2);
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout[1]", "portion",
+                    "it is now three lines long though ");
+        discardDumpedLayout();
+    }
+
+    // this should bring second line back
+    xStyle->setPropertyValue("ParaTopMargin", uno::Any(sal_Int32(120)));
+
+    Scheduler::ProcessEventsToIdle();
+
+    {
+        xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt", 7);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[7]/SwParaPortion/SwLineLayout", 2);
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[7]/SwParaPortion/SwLineLayout[1]", "portion",
+                    "This paragraph is even longer so that ");
+        assertXPath(pXmlDoc, "/root/page[2]/body/txt[7]/SwParaPortion/SwLineLayout[2]", "portion",
+                    "it is now three lines long though ");
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout", 1);
+        assertXPath(pXmlDoc, "/root/page[3]/body/txt[1]/SwParaPortion/SwLineLayout[1]", "portion",
+                    "containing a single sentence.");
+        discardDumpedLayout();
+    }
+}
+
 CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testUserFieldTypeLanguage)
 {
     // Set the system locale to German, the document will be English.
@@ -2839,6 +2896,27 @@ CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf155611)
                       "SwParaPortion[@portion='abc']");
 
     // Also must not crash on close because of a frame that accidentally fell off of the layout
+}
+
+CPPUNIT_TEST_FIXTURE(SwLayoutWriter2, testTdf156725)
+{
+    createSwDoc("tdf156725.fodt");
+
+    xmlDocUniquePtr pXmlDoc = parseLayoutDump();
+    assertXPath(pXmlDoc, "/root/page", 2);
+    // the fly has 2 columns, the section in it has 2 columns, and is split
+    // across the fly columns => 4 columns with 1 text frame each
+    assertXPath(pXmlDoc, "/root/page[2]/body/txt/anchored/fly/column", 2);
+    assertXPath(pXmlDoc, "/root/page[2]/body/txt/anchored/fly/column[1]/body/section/column", 2);
+    assertXPath(pXmlDoc,
+                "/root/page[2]/body/txt/anchored/fly/column[1]/body/section/column[1]/body/txt", 1);
+    assertXPath(pXmlDoc,
+                "/root/page[2]/body/txt/anchored/fly/column[1]/body/section/column[2]/body/txt", 1);
+    assertXPath(pXmlDoc, "/root/page[2]/body/txt/anchored/fly/column[2]/body/section/column", 2);
+    assertXPath(pXmlDoc,
+                "/root/page[2]/body/txt/anchored/fly/column[2]/body/section/column[1]/body/txt", 1);
+    assertXPath(pXmlDoc,
+                "/root/page[2]/body/txt/anchored/fly/column[2]/body/section/column[2]/body/txt", 1);
 }
 
 CPPUNIT_PLUGIN_IMPLEMENT();

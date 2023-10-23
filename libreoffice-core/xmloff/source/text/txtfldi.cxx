@@ -106,6 +106,7 @@ constexpr OUStringLiteral sAPI_content  = u"Content";
 constexpr OUStringLiteral sAPI_author   = u"Author";
 constexpr OUStringLiteral sAPI_hint     = u"Hint";
 constexpr OUStringLiteral sAPI_name     = u"Name";
+constexpr OUStringLiteral sAPI_parent_name = u"ParentName";
 constexpr OUStringLiteral sAPI_sub_type = u"SubType";
 constexpr OUStringLiteral sAPI_date_time_value = u"DateTimeValue";
 constexpr OUStringLiteral sAPI_number_format = u"NumberFormat";
@@ -406,6 +407,7 @@ XMLTextFieldImportContext::CreateTextFieldImportContext(
         case XML_ELEMENT(TEXT, XML_BOOKMARK_REF):
         case XML_ELEMENT(TEXT, XML_NOTE_REF):
         case XML_ELEMENT(TEXT, XML_SEQUENCE_REF):
+        case XML_ELEMENT(LO_EXT, XML_STYLE_REF):
             pContext = new XMLReferenceFieldImportContext( rImport, rHlp, nToken );
             break;
 
@@ -2508,6 +2510,9 @@ void XMLReferenceFieldImportContext::startFastElement(
         case XML_ELEMENT(TEXT, XML_SEQUENCE_REF):
             nSource = ReferenceFieldSource::SEQUENCE_FIELD;
             break;
+        case XML_ELEMENT(LO_EXT, XML_STYLE_REF):
+            nSource = ReferenceFieldSource::STYLE;
+            break;
         default:
             XMLOFF_WARN_UNKNOWN_ELEMENT("xmloff", nElementToken);
             bTypeOK = false;
@@ -2576,6 +2581,7 @@ void XMLReferenceFieldImportContext::PrepareField(
     {
         case XML_ELEMENT(TEXT, XML_REFERENCE_REF):
         case XML_ELEMENT(TEXT, XML_BOOKMARK_REF):
+        case XML_ELEMENT(LO_EXT, XML_STYLE_REF):
             xPropertySet->setPropertyValue("SourceName", Any(sName));
             break;
 
@@ -3146,6 +3152,8 @@ void XMLAnnotationImportContext::ProcessAttribute(
         aName = OUString::fromUtf8(sAttrValue);
     else if (nAttrToken == XML_ELEMENT(LO_EXT, XML_RESOLVED))
         aResolved = OUString::fromUtf8(sAttrValue);
+    else if (nAttrToken == XML_ELEMENT(LO_EXT, XML_PARENT_NAME))
+        aParentName = OUString::fromUtf8(sAttrValue);
     else
         XMLOFF_WARN_UNKNOWN_ATTR("xmloff", nAttrToken, sAttrValue);
 }
@@ -3334,6 +3342,9 @@ void XMLAnnotationImportContext::PrepareField(
 
     if (!aName.isEmpty())
         xPropertySet->setPropertyValue(sAPI_name, Any(aName));
+
+    if (!aParentName.isEmpty())
+        xPropertySet->setPropertyValue(sAPI_parent_name, Any(aParentName));
 }
 
 

@@ -47,6 +47,7 @@ inline constexpr OUStringLiteral SC_UNO_ROWLABELRNG          = u"RowLabelRanges"
 inline constexpr OUStringLiteral SC_UNO_SHEETLINKS           = u"SheetLinks";
 inline constexpr OUStringLiteral SC_UNO_FORBIDDEN            = u"ForbiddenCharacters";
 inline constexpr OUStringLiteral SC_UNO_HASDRAWPAGES         = u"HasDrawPages";
+inline constexpr OUStringLiteral SC_UNO_THEME                = u"Theme";
 
 //  CharacterProperties
 inline constexpr OUStringLiteral SC_UNONAME_CCOLOR           = u"CharColor";
@@ -132,6 +133,11 @@ inline constexpr OUStringLiteral SC_UNONAME_BOTTBORDER2      = u"BottomBorder2";
 inline constexpr OUStringLiteral SC_UNONAME_LEFTBORDER2      = u"LeftBorder2";
 inline constexpr OUStringLiteral SC_UNONAME_RIGHTBORDER2     = u"RightBorder2";
 inline constexpr OUStringLiteral SC_UNONAME_TOPBORDER2       = u"TopBorder2";
+
+inline constexpr OUStringLiteral SC_UNONAME_BOTTOM_BORDER_COMPLEX_COLOR = u"BottomBorderComplexColor";
+inline constexpr OUStringLiteral SC_UNONAME_LEFT_BORDER_COMPLEX_COLOR = u"LeftBorderComplexColor";
+inline constexpr OUStringLiteral SC_UNONAME_RIGHT_BORDER_COMPLEX_COLOR = u"RightBorderComplexColor";
+inline constexpr OUStringLiteral SC_UNONAME_TOP_BORDER_COMPLEX_COLOR = u"TopBorderComplexColor";
 
 inline constexpr OUStringLiteral SC_UNONAME_DIAGONAL_TLBR    = u"DiagonalTLBR";
 inline constexpr OUStringLiteral SC_UNONAME_DIAGONAL_BLTR    = u"DiagonalBLTR";

@@ -40,13 +40,6 @@
 #include <o3tl/string_view.hxx>
 #include <vcl/settings.hxx>
 
-#define REFFLDFLAG          0x4000
-#define REFFLDFLAG_BOOKMARK 0x4800
-#define REFFLDFLAG_FOOTNOTE 0x5000
-#define REFFLDFLAG_ENDNOTE  0x6000
-// #i83479#
-#define REFFLDFLAG_HEADING  0x7100
-#define REFFLDFLAG_NUMITEM  0x7200
 
 static sal_uInt16 nFieldDlgFormatSel = 0;
 
@@ -67,6 +60,9 @@ SwFieldRefPage::SwFieldRefPage(weld::Container* pPage, weld::DialogController* p
     , m_xNameED(m_xBuilder->weld_entry("name"))
     , m_xValueED(m_xBuilder->weld_entry("value"))
     , m_xFilterED(m_xBuilder->weld_entry("filter"))
+    , m_xStylerefFlags(m_xBuilder->weld_widget("stylerefflagsframe"))
+    , m_xStylerefFromBottomCB(m_xBuilder->weld_check_button("stylereffrombottomcheckbox"))
+    , m_xStylerefHideNonNumericalCB(m_xBuilder->weld_check_button("stylerefhidenonnumericalcheckbox"))
 {
     m_xSelectionLB->make_sorted();
     // #i83479#
@@ -82,6 +78,7 @@ SwFieldRefPage::SwFieldRefPage(weld::Container* pPage, weld::DialogController* p
     // #i83479#
     m_sHeadingText = m_xTypeLB->get_text(3);
     m_sNumItemText = m_xTypeLB->get_text(4);
+    m_sStyleText = m_xTypeLB->get_text(5);
 
     auto nHeight = m_xTypeLB->get_height_rows(8);
     auto nWidth = m_xTypeLB->get_approximate_digit_width() * FIELD_COLUMN_WIDTH;
@@ -239,6 +236,9 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
         m_xTypeLB->append(OUString::number(REFFLDFLAG_ENDNOTE), m_sEndnoteText);
     }
 
+    // stylerefs
+    m_xTypeLB->append(OUString::number(REFFLDFLAG_STYLE), m_sStyleText);
+
     m_xTypeLB->thaw();
 
     // select old Pos
@@ -274,7 +274,7 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
         }
     }
     TypeHdl(*m_xTypeLB);
-    if (nFormatBoxPosition < m_xFormatLB->n_children())
+    if (!IsFieldEdit() && nFormatBoxPosition < m_xFormatLB->n_children())
     {
         m_xFormatLB->select(nFormatBoxPosition);
     }
@@ -286,6 +286,8 @@ void SwFieldRefPage::Reset(const SfxItemSet* )
         m_xNameED->save_value();
         m_xValueED->save_value();
         m_xFilterED->set_text(OUString());
+        m_xStylerefFromBottomCB->save_state();
+        m_xStylerefHideNonNumericalCB->save_state();
     }
 }
 
@@ -354,6 +356,17 @@ IMPL_LINK_NOARG(SwFieldRefPage, TypeHdl, weld::TreeView&, void)
                         sName = pRefField->GetSetRefName();
                     }
                     nFlag = REFFLDFLAG;
+                    break;
+                }
+
+                case REF_STYLE:
+                {
+                    SwGetRefField const*const pRefField(dynamic_cast<SwGetRefField*>(GetCurField()));
+                    if (pRefField)
+                    {
+                        sName = pRefField->GetPar1();
+                    }
+                    nFlag = REFFLDFLAG_STYLE;
                     break;
                 }
             }
@@ -445,6 +458,8 @@ IMPL_LINK_NOARG(SwFieldRefPage, SubTypeListBoxHdl, weld::TreeView&, void)
 void SwFieldRefPage::SubTypeHdl()
 {
     sal_uInt16 nTypeId = m_xTypeLB->get_id(GetTypeSel()).toUInt32();
+
+    m_xStylerefFlags->set_visible(nTypeId == REFFLDFLAG_STYLE);
 
     switch(nTypeId)
     {
@@ -610,7 +625,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     m_xSelectionToolTipLB->append(sId,
                         pIDoc->getOutlineText(nOutlIdx, pSh->GetLayout(), true, true, false));
                     if ((IsFieldEdit() && pRefField
-                            && pRefField->GetReferencedTextNode() == maOutlineNodes[nOutlIdx])
+                            && pRefField->GetReferencedTextNode(nullptr, nullptr) == maOutlineNodes[nOutlIdx])
                         || mpSavedSelectedTextNode == maOutlineNodes[nOutlIdx])
                     {
                         m_sSelectionToolTipLBId = sId;
@@ -645,7 +660,7 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                     m_xSelectionToolTipLB->append(sId,
                         pIDoc->getListItemText(*maNumItems[nNumItemIdx], *pSh->GetLayout()));
                     if ((IsFieldEdit() && pRefField
-                            && pRefField->GetReferencedTextNode() == maNumItems[nNumItemIdx]->GetTextNode())
+                            && pRefField->GetReferencedTextNode(nullptr, nullptr) == maNumItems[nNumItemIdx]->GetTextNode())
                         || mpSavedSelectedTextNode == maNumItems[nNumItemIdx]->GetTextNode())
                     {
                         m_sSelectionToolTipLBId = sId;
@@ -658,6 +673,35 @@ void SwFieldRefPage::UpdateSubType(const OUString& filterString)
                         sOldSel.clear();
                     }
                 }
+            }
+        }
+        else if (nTypeId == REFFLDFLAG_STYLE)
+        {
+            const IDocumentOutlineNodes* pIDoc(pSh->getIDocumentOutlineNodesAccess());
+            pIDoc->getOutlineNodes(maOutlineNodes);
+
+            SfxStyleSheetBasePool* pStyleSheetPool
+                = pSh->GetDoc()->GetDocShell()->GetStyleSheetPool();
+            auto stylesheetIterator
+                = pStyleSheetPool->CreateIterator(SfxStyleFamily::Para, SfxStyleSearchBits::Used);
+
+            SfxStyleSheetBase* pStyle = stylesheetIterator->First();
+            while (pStyle != nullptr)
+            {
+                bool isSubstring = MatchSubstring(pStyle->GetName(), filterString);
+
+                if (isSubstring)
+                {
+                    m_xSelectionLB->append_text(pStyle->GetName());
+                }
+
+                pStyle = stylesheetIterator->Next();
+            }
+
+            if (IsFieldEdit() && pRefField) {
+                sOldSel = pRefField->GetPar1();
+                m_xStylerefFromBottomCB->set_active((pRefField->GetFlags() & REFFLDFLAG_STYLE_FROM_BOTTOM) == REFFLDFLAG_STYLE_FROM_BOTTOM);
+                m_xStylerefHideNonNumericalCB->set_active((pRefField->GetFlags() & REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL) == REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL);
             }
         }
         else
@@ -803,6 +847,7 @@ sal_Int32 SwFieldRefPage::FillFormatLB(sal_uInt16 nTypeId)
 
     // reference has less that the annotation
     sal_uInt16 nSize( 0 );
+    sal_uInt16 nOffset( 0 );
     bool bAddCrossRefFormats( false );
     switch (nTypeId)
     {
@@ -817,6 +862,11 @@ sal_Int32 SwFieldRefPage::FillFormatLB(sal_uInt16 nTypeId)
         case REFFLDFLAG_FOOTNOTE:
         case REFFLDFLAG_ENDNOTE:
             nSize = FMT_REF_PAGE_PGDSC_IDX + 1;
+            break;
+        case REFFLDFLAG_STYLE:
+            nOffset = FMT_REF_TEXT_IDX;
+            nSize = FMT_REF_UPDOWN_IDX + 1 - nOffset;
+            bAddCrossRefFormats = true;
             break;
 
         default:
@@ -837,7 +887,7 @@ sal_Int32 SwFieldRefPage::FillFormatLB(sal_uInt16 nTypeId)
         nTypeId = static_cast<sal_uInt16>(SwFieldTypesEnum::GetRef);
 
     SwFieldTypesEnum nFieldType = static_cast<SwFieldTypesEnum>(nTypeId);
-    for (sal_uInt16 i = 0; i < nSize; i++)
+    for (sal_uInt16 i = nOffset; i < nSize + nOffset; i++)
     {
         OUString sId(OUString::number(GetFieldMgr().GetFormatId( nFieldType, i )));
         m_xFormatLB->append(sId, GetFieldMgr().GetFormatStr(nFieldType, i));
@@ -1077,6 +1127,29 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
                 }
             }
         }
+        else if (nTypeId == REFFLDFLAG_STYLE)
+        {
+            int nEntry = m_xSelectionLB->get_selected_index();
+            if (nEntry != -1)
+            {
+                aName = m_xSelectionLB->get_text(nEntry);
+                nTypeId = static_cast<sal_uInt16>(SwFieldTypesEnum::GetRef);
+                nSubType = REF_STYLE;
+                sal_uInt16 nVal = REFFLDFLAG_STYLE;
+
+                if (m_xStylerefFromBottomCB->get_active()) {
+                    nVal |= REFFLDFLAG_STYLE_FROM_BOTTOM;
+                }
+
+                if (m_xStylerefHideNonNumericalCB->get_active()) {
+                    nVal |= REFFLDFLAG_STYLE_HIDE_NON_NUMERICAL;
+                }
+
+                aVal = OUString::number(nVal);
+            } else {
+                SAL_WARN("sw.ui", "<SwFieldRefPage::FillItemSet(..)> no entry selected in selection listbox!");
+            }
+        }
         else                                // SequenceFields
         {
             // get fields for Seq-FieldType:
@@ -1117,7 +1190,9 @@ bool SwFieldRefPage::FillItemSet(SfxItemSet* )
         m_xValueED->get_value_changed_from_saved() ||
         m_xTypeLB->get_value_changed_from_saved() ||
         m_xSelectionLB->get_value_changed_from_saved() ||
-        m_xFormatLB->get_value_changed_from_saved())
+        m_xFormatLB->get_value_changed_from_saved() ||
+        (nSubType == REF_STYLE
+         && (m_xStylerefFromBottomCB->get_state_changed_from_saved() || m_xStylerefHideNonNumericalCB->get_state_changed_from_saved())))
     {
         InsertField( static_cast<SwFieldTypesEnum>(nTypeId), nSubType, aName, aVal, nFormat );
     }

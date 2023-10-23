@@ -209,6 +209,7 @@ struct ScFilterEntries;
 typedef o3tl::sorted_vector<sal_uInt32> ScCondFormatIndexes;
 struct ScSheetLimits;
 struct ScDataAreaExtras;
+enum class ScConditionMode;
 
 
 namespace sc {
@@ -424,6 +425,7 @@ private:
     std::unique_ptr<ScExtDocOptions> pExtDocOptions;    // for import etc.
     std::unique_ptr<ScClipOptions> mpClipOptions;       // clipboard options
     std::unique_ptr<ScConsolidateParam> pConsolidateDlgData;
+    std::unique_ptr<ScConditionMode> pConditionalFormatDialogMode;
 
     std::unique_ptr<ScAutoNameCache> pAutoNameCache;    // for automatic name lookup during CompileXML
 
@@ -651,6 +653,8 @@ public:
 
     void                        SetConsolidateDlgData( std::unique_ptr<ScConsolidateParam> pData );
     const ScConsolidateParam*   GetConsolidateDlgData() const { return pConsolidateDlgData.get(); }
+    void                        SetEasyConditionalFormatDialogData(std::unique_ptr<ScConditionMode> pMode);
+    const ScConditionMode*      GetEasyConditionalFormatDialogData() const { return pConditionalFormatDialogMode.get(); }
 
     void                        Clear( bool bFromDestructor = false );
 
@@ -2186,7 +2190,7 @@ public:
     SfxPrinter*                 GetPrinter( bool bCreateIfNotExist = true );
     void                        SetPrinter( VclPtr<SfxPrinter> const & pNewPrinter );
     VirtualDevice*              GetVirtualDevice_100th_mm();
-    SC_DLLPUBLIC OutputDevice*  GetRefDevice(); // WYSIWYG: Printer, otherwise VirtualDevice...
+    SC_DLLPUBLIC OutputDevice*  GetRefDevice(bool bForceVirtDev = false); // WYSIWYG: Printer, otherwise VirtualDevice...
 
     bool            GetNextSpellingCell( SCCOL& nCol, SCROW& nRow, SCTAB nTab,
                                          bool bInSel, const ScMarkData& rMark) const;
@@ -2698,6 +2702,8 @@ public:
     const ScTable* FetchTable( SCTAB nTab ) const;
 
     ScRefCellValue GetRefCellValue( const ScAddress& rPos );
+
+    void SharePooledResources( const ScDocument* pSrcDoc );
 private:
     ScRefCellValue GetRefCellValue( const ScAddress& rPos, sc::ColumnBlockPosition& rBlockPos );
 
@@ -2706,8 +2712,6 @@ private:
     SCSIZE GetPatternCount( SCTAB nTab, SCCOL nCol ) const;
     SCSIZE GetPatternCount( SCTAB nTab, SCCOL nCol, SCROW nRow1, SCROW nRow2 ) const;
     void   ReservePatternCount( SCTAB nTab, SCCOL nCol, SCSIZE nReserve );
-
-    void SharePooledResources( const ScDocument* pSrcDoc );
 
     void EndListeningIntersectedGroup(
         sc::EndListeningContext& rCxt, const ScAddress& rPos, std::vector<ScAddress>* pGroupPos );

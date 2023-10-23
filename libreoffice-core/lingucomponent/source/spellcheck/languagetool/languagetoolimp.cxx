@@ -231,13 +231,13 @@ ProofreadingResult SAL_CALL LanguageToolGrammarChecker::doProofreading(
         = std::min(xRes.nStartOfNextSentencePosition, aText.getLength());
 
     OString langTag(LanguageTag::convertToBcp47(aLocale, false).toUtf8());
-    OString postData = encodeTextForLanguageTool(aText);
+    OString postData;
     if (rLanguageOpts.getRestProtocol() == sDuden)
     {
         std::stringstream aStream;
         boost::property_tree::ptree aTree;
         aTree.put("text-language", langTag.getStr());
-        aTree.put("text", postData.getStr());
+        aTree.put("text", aText.toUtf8()); // We don't encode the text in Duden Corrector tool case.
         aTree.put("hyphenation", false);
         aTree.put("spellchecking-level", 3);
         aTree.put("correction-proposals", true);
@@ -246,7 +246,7 @@ ProofreadingResult SAL_CALL LanguageToolGrammarChecker::doProofreading(
     }
     else
     {
-        postData = "text=" + postData + "&language=" + langTag;
+        postData = "text=" + encodeTextForLanguageTool(aText) + "&language=" + langTag;
     }
 
     if (auto cachedResult = mCachedResults.find(postData); cachedResult != mCachedResults.end())
@@ -354,17 +354,28 @@ void LanguageToolGrammarChecker::parseProofreadingJSONResponse(ProofreadingResul
     boost::property_tree::ptree root;
     std::stringstream aStream(aJSONBody.data());
     boost::property_tree::read_json(aStream, root);
-    boost::property_tree::ptree& matches = root.get_child("matches");
-    size_t matchSize = matches.size();
+    boost::property_tree::ptree* matches;
+    size_t matchSize;
 
-    if (matchSize <= 0)
+    if (root.find("matches") == root.not_found())
     {
+        SAL_WARN("Language Services", "'matches' property doesn't exist in JSON object.");
         return;
     }
+    else
+    {
+        matches = &root.get_child("matches");
+
+        if (matches->size() <= 0)
+            return;
+        else
+            matchSize = matches->size();
+    }
+
     Sequence<SingleProofreadingError> aErrors(matchSize);
     auto pErrors = aErrors.getArray();
     size_t i = 0;
-    for (auto it1 = matches.begin(); it1 != matches.end(); it1++, i++)
+    for (auto it1 = matches->begin(); it1 != matches->end(); it1++, i++)
     {
         const boost::property_tree::ptree& match = it1->second;
         int offset = match.get<int>("offset");

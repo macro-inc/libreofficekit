@@ -396,6 +396,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/ui/condformat/condformatdlg \
     sc/source/ui/condformat/condformatdlgentry \
     sc/source/ui/condformat/condformatdlgitem \
+    sc/source/ui/condformat/condformateasydlg \
     sc/source/ui/condformat/condformathelper \
     sc/source/ui/condformat/colorformat \
     sc/source/ui/dataprovider/csvdataprovider \
@@ -567,6 +568,7 @@ $(eval $(call gb_Library_add_exception_objects,sc,\
     sc/source/ui/undo/UndoUngroupSparklines \
     sc/source/ui/undo/UndoGroupSparklines \
     sc/source/ui/undo/UndoEditSparkline \
+    sc/source/ui/undo/UndoThemeChange \
     sc/source/ui/unoobj/ChartRangeSelectionListener \
     sc/source/ui/unoobj/addruno \
     sc/source/ui/unoobj/afmtuno \

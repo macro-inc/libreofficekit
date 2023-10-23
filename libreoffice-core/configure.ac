@@ -9,7 +9,7 @@ dnl in order to create a configure script.
 # several non-alphanumeric characters, those are split off and used only for the
 # ABOUTBOXPRODUCTVERSIONSUFFIX in openoffice.lst. Why that is necessary, no idea.
 
-AC_INIT([Macro],[23.05.2.3],[],[],[https://github.com/coparse-inc/libreofficekit])
+AC_INIT([Macro],[23.05.5.2],[],[],[https://github.com/coparse-inc/libreofficekit])
 
 dnl libnumbertext needs autoconf 2.68, but that can pick up autoconf268 just fine if it is installed
 dnl whereas aclocal (as run by autogen.sh) insists on using autoconf and fails hard
@@ -1177,7 +1177,7 @@ darwin*|macos*) # macOS
     _os=Darwin
     INSTROOTBASESUFFIX=/x64
     # See comment above the case "$host_os"
-    LINKFLAGSSHL="-dynamiclib -single_module"
+    LINKFLAGSSHL="-dynamiclib"
 
     # -fPIC is default
     PICSWITCH=""
@@ -1220,7 +1220,7 @@ ios*) # iOS
         host=x86_64-apple-darwin
     fi
     # See "Default values, as such probably valid just for Linux" comment above the case "$host_os"
-    LINKFLAGSSHL="-dynamiclib -single_module"
+    LINKFLAGSSHL="-dynamiclib"
 
     # -fPIC is default
     PICSWITCH=""
@@ -2312,6 +2312,13 @@ AC_ARG_WITH(galleries,
          or to disable them ("no")]),
 )
 
+AC_ARG_WITH(templates,
+    AS_HELP_STRING([--with-templates],
+        [Specify we build with or without template files. It is possible either to
+         build with templates ("yes"),
+         or to disable them ("no")]),
+)
+
 AC_ARG_WITH(theme,
     AS_HELP_STRING([--with-theme="theme1 theme2..."],
         [Choose which themes to include. By default those themes with an '*' are included.
@@ -3260,6 +3267,7 @@ if test "$enable_wasm_strip" = "yes"; then
     test_libzmf=no
     test_webdav=no
     with_galleries=no
+    with_templates=no
     with_webdav=no
     with_x=no
 
@@ -3411,6 +3419,30 @@ fi
 AC_SUBST(WITH_GALLERY_BUILD)
 
 dnl ===================================================================
+dnl  Sort out various templates compilation options
+dnl ===================================================================
+WITH_TEMPLATES=TRUE
+AC_MSG_CHECKING([build with or without template files])
+if test -n "${with_templates}"; then
+    if test "$with_templates" = "yes"; then
+        AC_MSG_RESULT([enable all templates])
+    elif test "$with_templates" = "no"; then
+        WITH_TEMPLATES=
+        AC_MSG_RESULT([disable non-internal templates])
+    else
+        AC_MSG_ERROR([unknown value --with-templates=$with_templates])
+    fi
+else
+    if test $_os != iOS -a $_os != Android -a $_os != Emscripten; then
+        AC_MSG_RESULT([enable all templates])
+    else
+        WITH_TEMPLATES=
+        AC_MSG_RESULT([disable non-internal templates])
+    fi
+fi
+AC_SUBST(WITH_TEMPLATES)
+
+dnl ===================================================================
 dnl  Checks if ccache is available
 dnl ===================================================================
 CCACHE_DEPEND_MODE=
@@ -3506,8 +3538,9 @@ AC_SUBST(CCACHE_DEPEND_MODE)
 # sccache defaults are good enough
 if test "$CCACHE" != "" -a -z "$SCCACHE"; then
     # e.g. (/home/rene/.config/ccache/ccache.conf) max_size = 20.0G
+    # or (...) max_size = 20.0 G
     # -p works with both 4.2 and 4.4
-    ccache_size_msg=$([$CCACHE -p | $AWK /max_size/'{ print $4 }' | sed -e 's/\.[0-9]*//'])
+    ccache_size_msg=$([$CCACHE -p | $AWK /max_size/'{ print $4 $5 }' | sed -e 's/\.[0-9]*//'])
     ccache_size=$(echo "$ccache_size_msg" | grep "G" | sed -e 's/G.*$//')
     if test "$ccache_size" = ""; then
         ccache_size=$(echo "$ccache_size_msg" | grep "M" | sed -e 's/\ M.*$//')
@@ -5889,6 +5922,7 @@ if test "$cross_compiling" = "yes"; then
     fi
     test -n "$TARFILE_LOCATION" && sub_conf_opts="$sub_conf_opts --with-external-tar=$TARFILE_LOCATION"
     test "$with_galleries" = "no" -o -z "$WITH_GALLERY_BUILD" && sub_conf_opts="$sub_conf_opts --with-galleries=no --disable-database-connectivity"
+    test "$with_templates" = "no" -o -z "$WITH_TEMPLATES" && sub_conf_opts="$sub_conf_opts --with-templates=no"
     test -n "$with_help" -a "$with_help" != "no" && sub_conf_opts="$sub_conf_opts --with-help=$with_help"
     test "$enable_extensions" = yes || sub_conf_opts="$sub_conf_opts --disable-extensions"
     test "${enable_ld+set}" = set -a "$build_cpu" = "$host_cpu" && sub_conf_opts="$sub_conf_opts --enable-ld=${enable_ld}"
@@ -10158,7 +10192,7 @@ if test \( "$cross_compiling" = yes -a -z "$PYTHON_FOR_BUILD" \) -o "$enable_pyt
     SYSTEM_PYTHON=
     PYTHON_VERSION_MAJOR=3
     PYTHON_VERSION_MINOR=8
-    PYTHON_VERSION=${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.17
+    PYTHON_VERSION=${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.18
     if ! grep -q -i python.*${PYTHON_VERSION} ${SRC_ROOT}/download.lst; then
         AC_MSG_ERROR([PYTHON_VERSION ${PYTHON_VERSION} but no matching file in download.lst])
     fi
@@ -12822,6 +12856,18 @@ AC_SUBST(LIBASSUAN_CFLAGS)
 AC_SUBST(LIBASSUAN_LIBS)
 AC_SUBST(GPGMEPP_CFLAGS)
 AC_SUBST(GPGMEPP_LIBS)
+
+AC_MSG_CHECKING([whether to build Java Websocket for the UNO remote websocket client])
+if test "$with_java" != "no"; then
+    AC_MSG_RESULT([yes])
+    ENABLE_JAVA_WEBSOCKET=TRUE
+    BUILD_TYPE="$BUILD_TYPE JAVA_WEBSOCKET"
+    NEED_ANT=TRUE
+else
+    AC_MSG_RESULT([no])
+    ENABLE_JAVA_WEBSOCKET=
+fi
+AC_SUBST(ENABLE_JAVA_WEBSOCKET)
 
 AC_MSG_CHECKING([whether to build the Wiki Publisher extension])
 if test "x$enable_ext_wiki_publisher" = "xyes" -a "x$enable_extension_integration" != "xno" -a "$with_java" != "no"; then

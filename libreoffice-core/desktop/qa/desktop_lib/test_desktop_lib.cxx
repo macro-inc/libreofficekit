@@ -209,7 +209,6 @@ public:
     void testComplexSelection();
     void testSpellcheckerMultiView();
     void testDialogPaste();
-    void testShowHideDialog();
     void testDialogInput();
     void testCalcSaveAs();
     void testControlState();
@@ -281,7 +280,6 @@ public:
     CPPUNIT_TEST(testComplexSelection);
     CPPUNIT_TEST(testSpellcheckerMultiView);
     CPPUNIT_TEST(testDialogPaste);
-    CPPUNIT_TEST(testShowHideDialog);
     CPPUNIT_TEST(testDialogInput);
     CPPUNIT_TEST(testCalcSaveAs);
     CPPUNIT_TEST(testControlState);
@@ -2173,7 +2171,6 @@ public:
     boost::property_tree::ptree m_aCommentCallbackResult;
     boost::property_tree::ptree m_aCallbackWindowResult;
     boost::property_tree::ptree m_aColorPaletteCallbackResult;
-    bool m_bWindowHidden;
 
     ViewCallback(LibLODocument_Impl* pDocument)
         : mpDocument(pDocument),
@@ -2230,16 +2227,6 @@ public:
             m_aCommentCallbackResult = m_aCommentCallbackResult.get_child("comment");
         }
         break;
-        case LOK_CALLBACK_WINDOW:
-        {
-            m_aCallbackWindowResult.clear();
-            std::stringstream aStream(pPayload);
-            boost::property_tree::read_json(aStream, m_aCallbackWindowResult);
-
-            std::string sAction = m_aCallbackWindowResult.get<std::string>("action");
-            if (sAction == "hide")
-                m_bWindowHidden = true;
-        }
         break;
         case LOK_CALLBACK_CELL_FORMULA:
         {
@@ -2451,7 +2438,7 @@ void DesktopLOKTest::testCommentsWriter()
         // This is a reply comment
         else if (rComment.second.get<std::string>("text") == "Reply to Comment 2")
         {
-            CPPUNIT_ASSERT_EQUAL(nComment2Id, rComment.second.get<int>("parent"));
+            CPPUNIT_ASSERT_EQUAL(nComment2Id, rComment.second.get<int>("parentId"));
         }
     }
 
@@ -2593,8 +2580,8 @@ void DesktopLOKTest::testCommentsCallbacksWriter()
     // We received a LOK_CALLBACK_COMMENT callback with comment 'Add' action and linked to its parent comment
     CPPUNIT_ASSERT_EQUAL(std::string("Add"), aView1.m_aCommentCallbackResult.get<std::string>("action"));
     CPPUNIT_ASSERT_EQUAL(std::string("Add"), aView2.m_aCommentCallbackResult.get<std::string>("action"));
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parent"));
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parent"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parentId"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parentId"));
     CPPUNIT_ASSERT_EQUAL(std::string("Reply comment"), aView1.m_aCommentCallbackResult.get<std::string>("text"));
     CPPUNIT_ASSERT_EQUAL(std::string("Reply comment"), aView2.m_aCommentCallbackResult.get<std::string>("text"));
     int nCommentId2 = aView1.m_aCommentCallbackResult.get<int>("id");
@@ -2608,8 +2595,8 @@ void DesktopLOKTest::testCommentsCallbacksWriter()
     CPPUNIT_ASSERT_EQUAL(std::string("Modify"), aView1.m_aCommentCallbackResult.get<std::string>("action"));
     CPPUNIT_ASSERT_EQUAL(std::string("Modify"), aView2.m_aCommentCallbackResult.get<std::string>("action"));
     // parent is unchanged still
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parent"));
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parent"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parentId"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parentId"));
     CPPUNIT_ASSERT_EQUAL(std::string("Edited comment"), aView1.m_aCommentCallbackResult.get<std::string>("text"));
     CPPUNIT_ASSERT_EQUAL(std::string("Edited comment"), aView2.m_aCommentCallbackResult.get<std::string>("text"));
 
@@ -2632,8 +2619,8 @@ void DesktopLOKTest::testCommentsCallbacksWriter()
     // We received a LOK_CALLBACK_COMMENT callback with comment 'Add' action and linked to its parent comment
     CPPUNIT_ASSERT_EQUAL(std::string("Add"), aView1.m_aCommentCallbackResult.get<std::string>("action"));
     CPPUNIT_ASSERT_EQUAL(std::string("Add"), aView2.m_aCommentCallbackResult.get<std::string>("action"));
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parent"));
-    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parent"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView1.m_aCommentCallbackResult.get<int>("parentId"));
+    CPPUNIT_ASSERT_EQUAL(nCommentId1, aView2.m_aCommentCallbackResult.get<int>("parentId"));
     CPPUNIT_ASSERT_EQUAL(std::string("Reply comment again"), aView1.m_aCommentCallbackResult.get<std::string>("text"));
     CPPUNIT_ASSERT_EQUAL(std::string("Reply comment again"), aView2.m_aCommentCallbackResult.get<std::string>("text"));
 
@@ -3075,31 +3062,6 @@ void DesktopLOKTest::testDialogPaste()
     CPPUNIT_ASSERT(pCtrlFocused);
     CPPUNIT_ASSERT_EQUAL(WindowType::COMBOBOX, pCtrlFocused->GetType());
     CPPUNIT_ASSERT_EQUAL(OUString("www.softwarelibre.org.bo"), pCtrlFocused->GetText());
-
-    static_cast<SystemWindow*>(pWindow.get())->Close();
-    Scheduler::ProcessEventsToIdle();
-}
-
-void DesktopLOKTest::testShowHideDialog()
-{
-
-    LibLODocument_Impl* pDocument = loadDoc("blank_text.odt");
-
-    pDocument->m_pDocumentClass->initializeForRendering(pDocument, "{}");
-    ViewCallback aView(pDocument);
-
-    pDocument->pClass->postUnoCommand(pDocument, ".uno:HyperlinkDialog", nullptr, false);
-    Scheduler::ProcessEventsToIdle();
-
-    VclPtr<vcl::Window> pWindow(Application::GetActiveTopWindow());
-    CPPUNIT_ASSERT(pWindow);
-
-    aView.m_bWindowHidden = false;
-
-    pWindow->Hide();
-    Scheduler::ProcessEventsToIdle();
-
-    CPPUNIT_ASSERT_EQUAL(true, aView.m_bWindowHidden);
 
     static_cast<SystemWindow*>(pWindow.get())->Close();
     Scheduler::ProcessEventsToIdle();
@@ -3680,10 +3642,12 @@ void DesktopLOKTest::testABI()
     CPPUNIT_ASSERT_EQUAL(classOffset(15), offsetof(struct _LibreOfficeKitClass, dumpState));
     CPPUNIT_ASSERT_EQUAL(classOffset(16), offsetof(struct _LibreOfficeKitClass, extractRequest));
     CPPUNIT_ASSERT_EQUAL(classOffset(17), offsetof(struct _LibreOfficeKitClass, trimMemory));
+    CPPUNIT_ASSERT_EQUAL(classOffset(18), offsetof(struct _LibreOfficeKitClass, startURP));
+    CPPUNIT_ASSERT_EQUAL(classOffset(19), offsetof(struct _LibreOfficeKitClass, stopURP));
 
     // When extending LibreOfficeKit with a new function pointer,  add new assert for the offsetof the
     // new function pointer and bump this assert for the size of the class.
-    CPPUNIT_ASSERT_EQUAL(classOffset(18), sizeof(struct _LibreOfficeKitClass));
+    CPPUNIT_ASSERT_EQUAL(classOffset(20), sizeof(struct _LibreOfficeKitClass));
 
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(0), offsetof(struct _LibreOfficeKitDocumentClass, destroy));
     CPPUNIT_ASSERT_EQUAL(documentClassOffset(1), offsetof(struct _LibreOfficeKitDocumentClass, saveAs));

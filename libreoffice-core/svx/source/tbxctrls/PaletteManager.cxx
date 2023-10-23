@@ -162,7 +162,11 @@ bool PaletteManager::IsThemePaletteSelected() const
 
 bool PaletteManager::GetThemeAndEffectIndex(sal_uInt16 nItemId, sal_uInt16& rThemeIndex, sal_uInt16& rEffectIndex)
 {
-     // Each column is the same color with different effects.
+    // tdf#157034, nItemId begins with 1 but list of themes begin with 0
+    // so decrement nItemId
+    --nItemId;
+
+    // Each column is the same color with different effects.
     rThemeIndex = nItemId % 12;
 
     rEffectIndex = nItemId / 12;
@@ -431,12 +435,10 @@ void PaletteManager::DispatchColorCommand(const OUString& aCommand, const NamedC
         comphelper::makePropertyValue(aObj.GetURLPath()+ ".Color", sal_Int32(rColor.m_aColor)),
     };
 
-    printf ("Sending: %s\n", aObj.GetURLPath().toUtf8().getStr());
-
     if (rColor.m_nThemeIndex != -1)
     {
         model::ComplexColor aComplexColor;
-        aComplexColor.setSchemeColor(model::convertToThemeColorType(rColor.m_nThemeIndex));
+        aComplexColor.setThemeColor(model::convertToThemeColorType(rColor.m_nThemeIndex));
         if (rColor.m_nLumMod != 10000)
             aComplexColor.addTransformation({model::TransformationType::LumMod, rColor.m_nLumMod});
         if (rColor.m_nLumMod != 0)

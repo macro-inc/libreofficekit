@@ -616,11 +616,18 @@ void SfxLokHelper::notifyWindow(const SfxViewShell* pThisView,
 
 void SfxLokHelper::notifyInvalidation(SfxViewShell const* pThisView, tools::Rectangle const* pRect)
 {
+    // -1 means all parts
+    const int nPart = comphelper::LibreOfficeKit::isPartInInvalidation() ? pThisView->getPart() : INT_MIN;
+    SfxLokHelper::notifyInvalidation(pThisView, nPart, pRect);
+}
+
+void SfxLokHelper::notifyInvalidation(SfxViewShell const* pThisView, const int nInPart, tools::Rectangle const* pRect)
+{
     if (DisableCallbacks::disabled())
         return;
 
     const int nPart = comphelper::LibreOfficeKit::isPartInInvalidation() ? pThisView->getPart() : INT_MIN;
-    const int nMode = comphelper::LibreOfficeKit::isPartInInvalidation() ? pThisView->getEditMode() : 0;
+    const int nMode = pThisView->getEditMode();
     pThisView->libreOfficeKitViewInvalidateTilesCallback(pRect, nPart, nMode);
 }
 

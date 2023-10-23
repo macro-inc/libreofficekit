@@ -813,6 +813,17 @@ UUIInteractionHelper::handleRequest_impl(
                 return true;
             }
 
+            OUString aFileName;
+            beans::NamedValue aLoadReadOnlyRequest;
+            if ((aAnyRequest >>= aLoadReadOnlyRequest) &&
+                aLoadReadOnlyRequest.Name == "LoadReadOnlyRequest" &&
+                (aLoadReadOnlyRequest.Value >>= aFileName))
+            {
+                handleLoadReadOnlyRequest(aFileName,
+                                          rRequest->getContinuations());
+                return true;
+            }
+
             // Last chance: interaction handlers registered in the configuration
 
 
@@ -939,7 +950,7 @@ executeMessageBox(
     SolarMutexGuard aGuard;
 
     std::unique_ptr<weld::MessageDialog> xBox(Application::CreateMessageDialog(pParent, eMessageType,
-        eMessageType == VclMessageType::Question ? VclButtonsType::YesNo : VclButtonsType::Ok, rMessage));
+        eMessageType == VclMessageType::Question ? VclButtonsType::YesNo : VclButtonsType::Ok, rMessage, GetpApp()));
     xBox->set_title(rTitle);
 
     short nMessResult = xBox->run();

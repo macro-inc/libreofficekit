@@ -2850,7 +2850,7 @@ void DomainMapper_Impl::appendTextPortion( const OUString& rString, const Proper
         // If we are in comments, then disable CharGrabBag, comment text doesn't support that.
         uno::Sequence< beans::PropertyValue > aValues = pPropertyMap->GetPropertyValues(/*bCharGrabBag=*/!m_bIsInComments);
 
-        if (m_bStartTOC || m_bStartIndex || m_bStartBibliography)
+        if (IsInTOC() || m_bStartIndex || m_bStartBibliography)
             for( auto& rValue : asNonConstRange(aValues) )
             {
                 if (rValue.Name == "CharHidden")
@@ -3261,6 +3261,14 @@ void DomainMapper_Impl::fillEmptyFrameProperties(std::vector<beans::PropertyValu
             PROP_TOP_MARGIN,    PROP_TOP_BORDER_DISTANCE };
     for (size_t i = 0; i < aMarginIds.size(); ++i)
         rFrameProperties.push_back(comphelper::makePropertyValue(getPropertyName(aMarginIds[i]), static_cast<sal_Int32>(0)));
+}
+
+bool DomainMapper_Impl::IsInTOC() const
+{
+    if (IsInHeaderFooter())
+        return m_bStartTOCHeaderFooter;
+    else
+        return m_bStartTOC;
 }
 
 void DomainMapper_Impl::ConvertHeaderFooterToTextFrame(bool bDynamicHeightTop, bool bDynamicHeightBottom)
@@ -5699,7 +5707,7 @@ static const FieldConversionMap_t & lcl_GetFieldConversion()
         {"SEQ",             {"SetExpression",           FIELD_SEQ           }},
         {"SET",             {"SetExpression",           FIELD_SET           }},
 //      {"SKIPIF",          {"",                        FIELD_SKIPIF        }},
-//      {"STYLEREF",        {"",                        FIELD_STYLEREF      }},
+        {"STYLEREF",        {"GetReference",            FIELD_STYLEREF      }},
         {"SUBJECT",         {"DocInfo.Subject",         FIELD_SUBJECT       }},
         {"SYMBOL",          {"",                        FIELD_SYMBOL        }},
         {"TEMPLATE",        {"TemplateName",            FIELD_TEMPLATE      }},
@@ -6977,7 +6985,7 @@ void DomainMapper_Impl::CloseFieldCommand()
                 break;
             }
             }
-            if (m_bStartTOC && (aIt->second.eFieldId == FIELD_PAGEREF) )
+            if (IsInTOC() && (aIt->second.eFieldId == FIELD_PAGEREF))
             {
                 bCreateField = false;
             }
@@ -7365,9 +7373,11 @@ void DomainMapper_Impl::CloseFieldCommand()
                 break;
                 case FIELD_PAGEREF:
                 case FIELD_REF:
-                if (xFieldProperties.is() && !m_bStartTOC)
+                case FIELD_STYLEREF:
+                if (xFieldProperties.is() && !IsInTOC())
                 {
                     bool bPageRef = aIt->second.eFieldId == FIELD_PAGEREF;
+                    bool bStyleRef = aIt->second.eFieldId == FIELD_STYLEREF;
 
                     // Do we need a GetReference (default) or a GetExpression field?
                     uno::Reference< text::XTextFieldsSupplier > xFieldsSupplier( GetTextDocument(), uno::UNO_QUERY );
@@ -7377,12 +7387,50 @@ void DomainMapper_Impl::CloseFieldCommand()
                             "com.sun.star.text.FieldMaster.SetExpression."
                             + sFirstParam))
                     {
-                        xFieldProperties->setPropertyValue(
-                            getPropertyName(PROP_REFERENCE_FIELD_SOURCE),
-                            uno::Any( sal_Int16(text::ReferenceFieldSource::BOOKMARK)) );
-                        xFieldProperties->setPropertyValue(
-                            getPropertyName(PROP_SOURCE_NAME),
-                            uno::Any(sFirstParam) );
+                        if (bStyleRef)
+                        {
+                            xFieldProperties->setPropertyValue(
+                                getPropertyName(PROP_REFERENCE_FIELD_SOURCE),
+                                uno::Any(sal_Int16(text::ReferenceFieldSource::STYLE)));
+
+                            OUString sStyleSheetName
+                                = GetStyleSheetTable()->ConvertStyleName(sFirstParam, true);
+
+                            uno::Any aStyleDisplayName;
+
+                            uno::Reference<style::XStyleFamiliesSupplier> xStylesSupplier(
+                                GetTextDocument(), uno::UNO_QUERY_THROW);
+                            uno::Reference<container::XNameAccess> xStyleFamilies
+                                = xStylesSupplier->getStyleFamilies();
+                            uno::Reference<container::XNameAccess> xStyles;
+                            xStyleFamilies->getByName(getPropertyName(PROP_PARAGRAPH_STYLES))
+                                >>= xStyles;
+                            uno::Reference<css::beans::XPropertySet> xStyle;
+
+                            try
+                            {
+                                xStyles->getByName(sStyleSheetName) >>= xStyle;
+                                aStyleDisplayName = xStyle->getPropertyValue("DisplayName");
+                            }
+                            catch (css::container::NoSuchElementException)
+                            {
+                                aStyleDisplayName <<= sStyleSheetName;
+                            }
+
+                            xFieldProperties->setPropertyValue(
+                                getPropertyName(PROP_SOURCE_NAME), aStyleDisplayName);
+                        }
+                        else
+                        {
+                            xFieldProperties->setPropertyValue(
+                                getPropertyName(PROP_REFERENCE_FIELD_SOURCE),
+                                uno::Any( sal_Int16(text::ReferenceFieldSource::BOOKMARK)) );
+
+                            xFieldProperties->setPropertyValue(
+                                getPropertyName(PROP_SOURCE_NAME),
+                                uno::Any(sFirstParam));
+                        }
+
                         sal_Int16 nFieldPart = (bPageRef ? text::ReferenceFieldPart::PAGE : text::ReferenceFieldPart::TEXT);
                         OUString sValue;
                         if( lcl_FindInCommand( pContext->GetCommand(), 'p', sValue ))
@@ -7477,7 +7525,6 @@ void DomainMapper_Impl::CloseFieldCommand()
                     handleFieldSet(pContext, xFieldInterface, xFieldProperties);
                 break;
                 case FIELD_SKIPIF       : break;
-                case FIELD_STYLEREF     : break;
                 case FIELD_SUBJECT      :
                 {
                     if (!sFirstParam.isEmpty())
@@ -8047,9 +8094,9 @@ void DomainMapper_Impl::PopFieldContext()
                 else
                 {
                     xToInsert.set(pContext->GetTC(), uno::UNO_QUERY);
-                    if( !xToInsert.is() && !m_bStartTOC && !m_bStartIndex && !m_bStartBibliography )
+                    if (!xToInsert.is() && !IsInTOC() && !m_bStartIndex && !m_bStartBibliography)
                         xToInsert = pContext->GetTextField();
-                    if( xToInsert.is() && !m_bStartTOC && !m_bStartIndex && !m_bStartBibliography)
+                    if (xToInsert.is() && !IsInTOC() && !m_bStartIndex && !m_bStartBibliography)
                     {
                         PropertyMap aMap;
                         // Character properties of the field show up here the
@@ -8123,7 +8170,8 @@ void DomainMapper_Impl::PopFieldContext()
                                 if (!pContext->GetHyperlinkTarget().isEmpty())
                                     xCrsrProperties->setPropertyValue("HyperLinkTarget", uno::Any(pContext->GetHyperlinkTarget()));
 
-                                if (m_bStartTOC) {
+                                if (IsInTOC())
+                                {
                                     OUString sDisplayName("Index Link");
                                     xCrsrProperties->setPropertyValue("VisitedCharStyleName",uno::Any(sDisplayName));
                                     xCrsrProperties->setPropertyValue("UnvisitedCharStyleName",uno::Any(sDisplayName));
@@ -9173,7 +9221,6 @@ void DomainMapper_Impl::substream(Id rName,
     {
     case NS_ooxml::LN_footnote:
     case NS_ooxml::LN_endnote:
-        m_pTableHandler->setHadFootOrEndnote(true);
         m_bHasFtn = true;
         break;
     }

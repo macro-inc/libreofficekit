@@ -46,6 +46,9 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"cui/ui/formatnumberdialog.ui"
         || rUIFile == u"cui/ui/gradientpage.ui"
         || rUIFile == u"cui/ui/hatchpage.ui"
+        || rUIFile == u"cui/ui/hyperlinkdialog.ui"
+        || rUIFile == u"cui/ui/hyperlinkinternetpage.ui"
+        || rUIFile == u"cui/ui/hyperlinkmailpage.ui"
         || rUIFile == u"cui/ui/imagetabpage.ui"
         || rUIFile == u"cui/ui/linedialog.ui"
         || rUIFile == u"cui/ui/lineendstabpage.ui"
@@ -85,6 +88,7 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"cui/ui/transparencytabpage.ui"
         || rUIFile == u"cui/ui/twolinespage.ui"
         || rUIFile == u"cui/ui/widgettestdialog.ui"
+        || rUIFile == u"cui/ui/qrcodegen.ui"
         // formula
         || rUIFile == u"formula/ui/formuladialog.ui"
         || rUIFile == u"formula/ui/functionpage.ui"
@@ -149,8 +153,9 @@ bool isBuilderEnabled(std::u16string_view rUIFile, bool bMobile)
         || rUIFile == u"modules/schart/ui/smoothlinesdlg.ui"
         || rUIFile == u"modules/schart/ui/steppedlinesdlg.ui"
         || rUIFile == u"modules/schart/ui/tp_ChartType.ui"
-        || rUIFile == u"modules/schart/ui/tp_RangeChooser.ui"
         || rUIFile == u"modules/schart/ui/tp_DataSource.ui"
+        || rUIFile == u"modules/schart/ui/tp_RangeChooser.ui"
+        || rUIFile == u"modules/schart/ui/tp_Trendline.ui"
         || rUIFile == u"modules/schart/ui/wizelementspage.ui"
         // sdraw
         || rUIFile == u"modules/sdraw/ui/drawchardialog.ui"
@@ -372,7 +377,10 @@ bool isBuilderEnabledForSidebar(std::u16string_view rUIFile)
 
 bool isInterimBuilderEnabledForNotebookbar(std::u16string_view rUIFile)
 {
-    if (rUIFile == u"modules/scalc/ui/numberbox.ui" || rUIFile == u"svx/ui/stylespreview.ui")
+    if (rUIFile == u"modules/scalc/ui/numberbox.ui"
+        || rUIFile == u"svx/ui/fontnamebox.ui"
+        || rUIFile == u"svx/ui/fontsizebox.ui"
+        || rUIFile == u"svx/ui/stylespreview.ui")
     {
         return true;
     }

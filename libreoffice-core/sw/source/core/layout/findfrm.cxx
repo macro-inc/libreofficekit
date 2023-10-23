@@ -180,7 +180,7 @@ bool SwLayoutFrame::ContainsDeleteForbiddenLayFrame() const
             continue;
         }
         SwLayoutFrame const*const pLay(static_cast<SwLayoutFrame const*>(pFrame));
-        if (pLay->ContainsDeleteForbiddenLayFrame())
+        if (pLay->ContainsDeleteForbiddenLayFrame() || pLay->IsColLocked())
         {
             return true;
         }
@@ -1932,6 +1932,16 @@ SwTextFrame* SwFrame::DynCastTextFrame()
 const SwTextFrame* SwFrame::DynCastTextFrame() const
 {
     return IsTextFrame() ? static_cast<const SwTextFrame*>(this) : nullptr;
+}
+
+SwPageFrame* SwFrame::DynCastPageFrame()
+{
+    return IsPageFrame() ? static_cast<SwPageFrame*>(this) : nullptr;
+}
+
+const SwPageFrame* SwFrame::DynCastPageFrame() const
+{
+    return IsPageFrame() ? static_cast<const SwPageFrame*>(this) : nullptr;
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

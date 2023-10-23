@@ -1305,8 +1305,11 @@ std::unique_ptr<OSQLParseNode> OSQLParser::predicateTree(OUString& rErrorMessage
 }
 
 
-OSQLParser::OSQLParser(css::uno::Reference< css::uno::XComponentContext > xContext, const IParseContext* _pContext)
+OSQLParser::OSQLParser(css::uno::Reference< css::uno::XComponentContext > xContext,
+                       const IParseContext* _pContext,
+                       const IParseContext* _pNeutral)
     :m_pContext(_pContext)
+    ,m_pNeutral(_pNeutral)
     ,m_pData( new OSQLParser_Data )
     ,m_nFormatKey(0)
     ,m_nDateFormatKey(0)
@@ -2494,7 +2497,7 @@ void OSQLParseNode::parseLeaf(OUStringBuffer& rString, const SQLParseNodeParamet
 
 sal_Int32 OSQLParser::getFunctionReturnType(std::u16string_view _sFunctionName, const IParseContext* pContext)
 {
-    sal_Int32 nType = DataType::VARCHAR;
+    sal_Int32 nType = DataType::SQLNULL;
     OString sFunctionName(OUStringToOString(_sFunctionName,RTL_TEXTENCODING_UTF8));
 
     if(sFunctionName.equalsIgnoreAsciiCase(TokenIDToStr(SQL_TOKEN_ASCII,pContext)))                     nType = DataType::INTEGER;

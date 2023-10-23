@@ -977,6 +977,11 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
             <rng:ref name="boolean"/>
           </rng:attribute>
         </rng:optional>
+        <rng:optional>
+          <rng:attribute name="loext:parent-name">
+            <rng:ref name="string"/>
+          </rng:attribute>
+        </rng:optional>
       </rng:interleave>
     </rng:define>
 
@@ -1714,6 +1719,46 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
                     <rng:ref name="color"/>
                   </rng:attribute>
                 </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-series-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-negative-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-axis-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-markers-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-first-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-last-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-high-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
+                <rng:optional>
+                    <rng:element name="calcext:sparkline-low-complex-color">
+                        <rng:ref name="loext-complex-color-definition"/>
+                    </rng:element>
+                </rng:optional>
                 <rng:element name="calcext:sparklines">
                   <rng:oneOrMore>
                     <rng:element name="calcext:sparkline">
@@ -2015,6 +2060,29 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
         <rng:ref name="boolean"/>
       </rng:attribute>
     </rng:element>
+  </rng:define>
+
+    <!-- TODO no proposal -->
+  <rng:define name="loext-style-reference">
+    <rng:element name="loext:style-ref">
+      <rng:interleave>
+        <rng:ref name="text-common-ref-content"/>
+        <rng:optional>
+          <rng:attribute name="text:reference-format">
+            <rng:choice>
+              <rng:value>text</rng:value>
+              <rng:value>direction</rng:value>
+              <rng:value>number</rng:value>
+              <rng:value>number-no-superior</rng:value>
+              <rng:value>number-all-superior</rng:value>
+            </rng:choice>
+          </rng:attribute>
+        </rng:optional>
+      </rng:interleave>
+    </rng:element>
+  </rng:define>
+  <rng:define name="paragraph-content" combine="choice">
+    <rng:ref name="loext-style-reference"/>
   </rng:define>
 
   <rng:define name="loext-qrcode">
@@ -3412,7 +3480,7 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
     </rng:choice>
   </rng:define>
 
-  <!-- TODO no proposal -->
+  <!-- TODO no proposal - Document Themes -->
   <rng:define name="loext-transformation">
     <rng:element name="loext:transformation">
         <rng:attribute name="loext:type">
@@ -3424,6 +3492,7 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
     </rng:element>
   </rng:define>
 
+  <!-- TODO no proposal - Document Themes -->
   <rng:define name="loext-complex-color-attlist">
     <rng:interleave>
       <rng:attribute name="loext:color-type">
@@ -3437,21 +3506,32 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
     </rng:interleave>
   </rng:define>
 
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-complex-color-definition">
+    <rng:ref name="loext-complex-color-attlist"/>
+    <rng:zeroOrMore>
+      <rng:ref name="loext-transformation"/>
+    </rng:zeroOrMore>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
   <rng:define name="loext-char-complex-color">
     <rng:element name="loext:char-complex-color">
-      <rng:ref name="loext-complex-color-attlist"/>
-      <rng:zeroOrMore>
-        <rng:ref name="loext-transformation"/>
-      </rng:zeroOrMore>
+      <rng:ref name="loext-complex-color-definition"/>
     </rng:element>
   </rng:define>
 
+  <!-- TODO no proposal - Document Themes -->
   <rng:define name="loext-fill-complex-color">
     <rng:element name="loext:fill-complex-color">
-      <rng:ref name="loext-complex-color-attlist"/>
-      <rng:zeroOrMore>
-        <rng:ref name="loext-transformation"/>
-      </rng:zeroOrMore>
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-stroke-complex-color">
+    <rng:element name="loext:stroke-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
     </rng:element>
   </rng:define>
 
@@ -3465,7 +3545,64 @@ xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.
   <!-- TODO no proposal -->
   <rng:define name="style-graphic-properties-elements" combine="interleave">
     <rng:optional>
+        <rng:ref name="loext-stroke-complex-color"/>
+    </rng:optional>
+    <rng:optional>
         <rng:ref name="loext-fill-complex-color"/>
+    </rng:optional>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-background-complex-color">
+    <rng:element name="loext:background-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-border-bottom-complex-color">
+    <rng:element name="loext:border-bottom-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-border-top-complex-color">
+    <rng:element name="loext:border-top-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-border-left-complex-color">
+    <rng:element name="loext:border-left-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes -->
+  <rng:define name="loext-border-right-complex-color">
+    <rng:element name="loext:border-right-complex-color">
+      <rng:ref name="loext-complex-color-definition"/>
+    </rng:element>
+  </rng:define>
+
+  <!-- TODO no proposal - Document Themes-->
+  <rng:define name="style-table-cell-properties-elements" combine="interleave">
+    <rng:optional>
+        <rng:ref name="loext-background-complex-color"/>
+    </rng:optional>
+    <rng:optional>
+        <rng:ref name="loext-border-bottom-complex-color"/>
+    </rng:optional>
+    <rng:optional>
+        <rng:ref name="loext-border-top-complex-color"/>
+    </rng:optional>
+    <rng:optional>
+        <rng:ref name="loext-border-left-complex-color"/>
+    </rng:optional>
+    <rng:optional>
+        <rng:ref name="loext-border-right-complex-color"/>
     </rng:optional>
   </rng:define>
 

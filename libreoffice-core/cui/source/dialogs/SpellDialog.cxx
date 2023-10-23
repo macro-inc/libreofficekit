@@ -1705,6 +1705,8 @@ void SentenceEditWindow_Impl::MoveErrorMarkTo(sal_Int32 nStart, sal_Int32 nEnd, 
     if (!bCurrentSelectionInRange)
     {
         m_xEditView->SetSelection(ESelection(0, nStart));
+        // tdf#157148 ensure current location is auto-scrolled to be visible
+        m_xEditView->ShowCursor();
     }
 
     Invalidate();
@@ -1999,7 +2001,7 @@ svx::SpellPortions SentenceEditWindow_Impl::CreateSpellPortions() const
                 aPortion2.sText = aLeftOverText.makeStringAndClear();
                 aRet.push_back( aPortion2 );
             }
-            else
+            else if (!aLeftOverText.isEmpty() && !aRet.empty())
             {   // we just need to append the left-over text to the last portion (which had no errors)
                 aRet[ aRet.size() - 1 ].sText += aLeftOverText;
             }

@@ -37,12 +37,13 @@
 #include <svx/xdef.hxx>
 #include <svx/svdoutl.hxx>
 #include <svx/svdouno.hxx>
+#include <svx/svdpagv.hxx>
 #include <svx/fmshell.hxx>
 #include <svl/cjkoptions.hxx>
-
 #include <app.hrc>
 
 #include <sdmod.hxx>
+#include <sdpage.hxx>
 #include <stlsheet.hxx>
 #include <drawview.hxx>
 #include <drawdoc.hxx>

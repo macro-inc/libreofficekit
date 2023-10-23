@@ -963,8 +963,16 @@ bool SwContentControlPortion::DescribePDFControl(const SwTextPaintInfo& rInf) co
         return false;
     }
 
-    // Check if this is the first content control portion of this content control.
     SwTextNode* pTextNode = pContentControl->GetTextNode();
+    SwDoc& rDoc = pTextNode->GetDoc();
+    if (rDoc.IsInHeaderFooter(*pTextNode))
+    {
+        // Form control in header/footer makes no sense, would allow multiple values for the same
+        // control.
+        return false;
+    }
+
+    // Check if this is the first content control portion of this content control.
     sal_Int32 nStart = m_pTextContentControl->GetStart();
     sal_Int32 nEnd = *m_pTextContentControl->GetEnd();
     TextFrameIndex nViewStart = rInf.GetTextFrame()->MapModelToView(pTextNode, nStart);
@@ -2752,13 +2760,42 @@ void SwTextFormatter::CalcFlyWidth( SwTextFormatInfo &rInf )
 
     aLine.Left( rInf.X() + nLeftMar );
     bool bForced = false;
+    bool bSplitFly = false;
+    for (const auto& pObj : *rTextFly.GetAnchoredObjList())
+    {
+        auto pFlyFrame = pObj->DynCastFlyFrame();
+        if (!pFlyFrame)
+        {
+            continue;
+        }
+
+        if (!pFlyFrame->IsFlySplitAllowed())
+        {
+            continue;
+        }
+
+        bSplitFly = true;
+        break;
+    }
     if( aInter.Left() <= nLeftMin )
     {
         SwTwips nFrameLeft = GetTextFrame()->getFrameArea().Left();
-        if( GetTextFrame()->getFramePrintArea().Left() < 0 )
+        SwTwips nFramePrintAreaLeft = GetTextFrame()->getFramePrintArea().Left();
+        if( nFramePrintAreaLeft < 0 )
             nFrameLeft += GetTextFrame()->getFramePrintArea().Left();
         if( aInter.Left() < nFrameLeft )
+        {
             aInter.Left( nFrameLeft );
+            if (bSplitFly && nFramePrintAreaLeft > 0 && nFramePrintAreaLeft < aInter.Width())
+            {
+                // We wrap around a split fly, the fly portion is on the
+                // left of the paragraph and we have a positive
+                // paragraph margin. Don't take space twice in this case
+                // (margin, fly portion), decrease the width of the fly
+                // portion accordingly.
+                aInter.Right(aInter.Right() - nFramePrintAreaLeft);
+            }
+        }
 
         tools::Long nAddMar = 0;
         if ( m_pFrame->IsRightToLeft() )
@@ -2787,8 +2824,15 @@ void SwTextFormatter::CalcFlyWidth( SwTextFormatInfo &rInf )
     {
         // Word style: if there is minimal space remaining, then handle that similar to a full line
         // and put the actual empty paragraph below the fly.
-        bFullLine = std::abs(aLine.Left() - aInter.Left()) < TEXT_MIN_SMALL
-                    && std::abs(aLine.Right() - aInter.Right()) < TEXT_MIN_SMALL;
+        SwTwips nLimit = MINLAY;
+        if (bSplitFly)
+        {
+            // We wrap around a floating table, that has a larger minimal wrap distance.
+            nLimit = TEXT_MIN_SMALL;
+        }
+
+        bFullLine = std::abs(aLine.Left() - aInter.Left()) < nLimit
+                    && std::abs(aLine.Right() - aInter.Right()) < nLimit;
     }
 
     // Although no text is left, we need to format another line,

@@ -138,6 +138,17 @@ struct _LibreOfficeKitClass
     /// @since LibreOffice 7.6
     void (*trimMemory) (LibreOfficeKit* pThis, int nTarget);
 
+    /// @see lok::Office::startURP
+    void* (*startURP)(LibreOfficeKit* pThis,
+                    void* pReceiveURPFromLOContext, void* pSendURPToLOContext,
+                    int (*fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen),
+                    int (*fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen));
+
+    /// @see lok::Office::stopURP
+    void (*stopURP)(LibreOfficeKit* pThis, void* pSendURPToLOContext);
+
+
+    /// UNO-V8 binding hooks
     UnoV8 uno_v8;
 };
 
