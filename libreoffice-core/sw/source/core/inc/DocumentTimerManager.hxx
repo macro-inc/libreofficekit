@@ -27,6 +27,7 @@
 #include <optional>
 #include <sal/types.h>
 #include <tools/link.hxx>
+#include <chrono>
 
 class SwDoc;
 
