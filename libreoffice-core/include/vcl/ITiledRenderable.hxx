@@ -418,6 +418,9 @@ public:
     virtual void jumpToOverlay( const std::string_view /* payload*/ ) {};
     virtual void removeOverlays() {};
     virtual void cleanupOverlays() {};
+
+    // MACRO-1671: Autorecovery and backup
+    virtual void setBackupPath(const char* /* payload */ ) {};
 };
 } // namespace vcl
 

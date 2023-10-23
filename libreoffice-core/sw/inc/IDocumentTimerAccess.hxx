@@ -20,6 +20,8 @@
 #ifndef INCLUDED_SW_INC_IDOCUMENTTIMERACCESS_HXX
 #define INCLUDED_SW_INC_IDOCUMENTTIMERACCESS_HXX
 
+#include <rtl/ustring.hxx>
+
 /**
  * Handle the background jobs of a Writer document.
  *
@@ -29,6 +31,8 @@
  *  * grammar checking
  *  * field updating
  *  * document layouting
+ *  MACRO-1671: Autorecovery and backup
+ *  * autobackup
  */
 class IDocumentTimerAccess
 {
@@ -66,6 +70,9 @@ public:
     virtual bool IsDocIdle() const = 0;
 
     virtual void MarkLOKIdle() = 0;
+
+    // MACRO-1671: Autorecovery and backup
+    virtual void SetBackupPath(const OUString& path) = 0;
 protected:
     virtual ~IDocumentTimerAccess(){};
 };

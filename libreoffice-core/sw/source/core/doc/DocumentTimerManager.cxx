@@ -16,8 +16,10 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include "comphelper/diagnose_ex.hxx"
 #include <DocumentTimerManager.hxx>
 
+#include <chrono>
 #include <doc.hxx>
 #include <DocumentSettingManager.hxx>
 #include <IDocumentFieldsAccess.hxx>
@@ -35,6 +37,9 @@
 #include <vcl/scheduler.hxx>
 #include <comphelper/lok.hxx>
 #include <editsh.hxx>
+#include <com/sun/star/frame/XStorable.hpp>
+#include <com/sun/star/uno/Reference.hxx>
+#include <unotools/mediadescriptor.hxx>
 
 namespace sw
 {
@@ -49,6 +54,8 @@ DocumentTimerManager::DocumentTimerManager(SwDoc& i_rSwdoc)
     , m_bStartOnUnblock(false)
     , m_aDocIdle(i_rSwdoc, "sw::DocumentTimerManager m_aDocIdle")
     , m_bWaitForLokInit(true)
+    , m_sBackupPath()
+    , m_aLastBackup()
 {
     m_aDocIdle.SetPriority(TaskPriority::LOWEST);
     m_aDocIdle.SetInvokeHandler(LINK(this, DocumentTimerManager, DoIdleJobs));
@@ -100,6 +107,8 @@ void DocumentTimerManager::UnblockIdling()
 DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
 {
     SwRootFrame* pTmpRoot = m_rDoc.getIDocumentLayoutAccess().GetCurrentLayout();
+
+
     if( pTmpRoot &&
         !SfxProgress::GetActiveProgress( m_rDoc.GetDocShell() ) )
     {
@@ -107,6 +116,13 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
         for(const SwViewShell& rSh : pShell->GetRingContainer())
             if( rSh.ActionPend() )
                 return IdleJob::Busy;
+
+        auto aCurrentClock = std::chrono::steady_clock::now();
+        bool bNeedsBackup = !m_aLastBackup.has_value() ||
+            (aCurrentClock - m_aLastBackup.value()) > std::chrono::seconds(60);
+        if (bNeedsBackup) {
+            return IdleJob::AutoBackup;
+        }
 
         if( pTmpRoot->IsNeedGrammarCheck() )
         {
@@ -141,6 +157,11 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
     }
 
     return IdleJob::None;
+}
+
+void DocumentTimerManager::SetBackupPath(const OUString& path)
+{
+    m_sBackupPath = path;
 }
 
 IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
@@ -200,6 +221,37 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().SetFieldsDirty( false );
         break;
     }
+    case IdleJob::AutoBackup:
+    {
+        if (m_sBackupPath.isEmpty()) return;
+
+        SwDocShell* pDocShell = m_rDoc.GetDocShell();
+        auto aCurrentTime = std::chrono::steady_clock::now();
+        OUString sCurrentTimestamp = OUString::number(aCurrentTime.time_since_epoch().count());
+
+        if (!pDocShell)
+        {
+            return;
+        }
+
+        try
+        {
+            uno::Reference<frame::XStorable> xStorable(pDocShell->GetModel(), uno::UNO_QUERY_THROW);
+            utl::MediaDescriptor aSaveMediaDescriptor;
+            OUString aFilterName = "MS Word 2007 XML";
+            aSaveMediaDescriptor["Overwrite"] <<= true;
+            aSaveMediaDescriptor["FilterName"] <<= aFilterName;
+            OUString sBackupURL = "file:///" + m_sBackupPath + "backup" + sCurrentTimestamp + ".docx";
+            xStorable->storeToURL(sBackupURL, aSaveMediaDescriptor.getAsConstPropertyValueList());
+            m_aLastBackup = aCurrentTime;
+        }
+        catch (const uno::Exception& /* exception */)
+        {
+            css::uno::Any exAny( cppu::getCaughtException() );
+            SAL_WARN("macro.autobackup", "Failed to make backup: " << exceptionToString(exAny));
+        }
+    }
+    break;
 
     case IdleJob::Busy:
         break;

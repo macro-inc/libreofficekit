@@ -494,6 +494,9 @@ public:
     void removeOverlays() override;
     void cleanupOverlays() override;
 
+    // MACRO-1671: Autorecovery and backup
+    void setBackupPath(const char* payload ) override;
+
     void                        Invalidate();
     void                        Reactivate(SwDocShell* pNewDocShell);
     SwXDocumentPropertyHelper * GetPropertyHelper ();

@@ -102,6 +102,7 @@
 #include <strings.hrc>
 #include <bitmaps.hlst>
 #include "IDocumentUndoRedo.hxx"
+#include "sal/log.hxx"
 #include "unodefaults.hxx"
 #include "SwXDocumentSettings.hxx"
 #include <doc.hxx>
