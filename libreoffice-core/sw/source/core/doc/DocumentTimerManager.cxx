@@ -19,7 +19,6 @@
 #include "comphelper/diagnose_ex.hxx"
 #include <DocumentTimerManager.hxx>
 
-#include <chrono>
 #include <doc.hxx>
 #include <DocumentSettingManager.hxx>
 #include <IDocumentFieldsAccess.hxx>
