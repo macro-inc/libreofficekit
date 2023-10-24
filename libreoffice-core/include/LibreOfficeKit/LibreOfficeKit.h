@@ -127,7 +127,7 @@ struct _LibreOfficeKitClass
     void* (*getXComponentContext) (LibreOfficeKit* pThis);
 
     /// @see lok::Office::loadFromMemory().
-    void* (*loadFromMemory) (LibreOfficeKit* pThis, char *data, size_t size);
+    LibreOfficeKitDocument* (*loadFromMemory) (LibreOfficeKit* pThis, char *data, size_t size);
 
     /** @see lok::Office::extractRequest.
      */

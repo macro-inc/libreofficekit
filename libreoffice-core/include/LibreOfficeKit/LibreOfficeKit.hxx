@@ -1163,9 +1163,16 @@ public:
      * @param size the size of the array buffer
      * @return XTextDocument
     */
-    void* loadFromMemory(char *data, size_t size)
+    Document* loadFromMemory(char *data, size_t size)
     {
-        return mpThis->pClass->loadFromMemory(mpThis, data, size);
+        LibreOfficeKitDocument* pDoc = NULL;
+
+        pDoc = mpThis->pClass->loadFromMemory(mpThis, data, size);
+        if (pDoc == NULL) {
+            return NULL;
+        }
+
+        return new Document(pDoc);
     }
 
     /**

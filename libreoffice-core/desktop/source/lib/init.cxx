@@ -2598,7 +2598,7 @@ static void lo_dumpState(LibreOfficeKit* pThis, const char* pOptions, char** pSt
 
 static void* lo_getXComponentContext(LibreOfficeKit* pThis);
 
-static void* lo_loadFromMemory(LibreOfficeKit* pThis, char *data, size_t size);
+static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* pThis, char *data, size_t size);
 
 LibLibreOffice_Impl::LibLibreOffice_Impl()
     : m_pOfficeClass( gOfficeClass.lock() )
@@ -2671,6 +2671,7 @@ void setFormatSpecificFilterData(std::u16string_view sFormat, comphelper::Sequen
 static uno::Reference<css::uno::XComponentContext> xContext;
 static uno::Reference<css::lang::XMultiServiceFactory> xSFactory;
 static uno::Reference<css::lang::XMultiComponentFactory> xFactory;
+static int nDocumentIdCounter = 0;
 
 static LibreOfficeKitDocument* lo_documentLoad(LibreOfficeKit* pThis, const char* pURL)
 {
@@ -2682,8 +2683,6 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
     comphelper::ProfileZone aZone("lo_documentLoadWithOptions");
 
     SolarMutexGuard aGuard;
-
-    static int nDocumentIdCounter = 0;
 
     LibLibreOffice_Impl* pLib = static_cast<LibLibreOffice_Impl*>(pThis);
     pLib->maLastExceptionMsg.clear();
@@ -5007,7 +5006,7 @@ static void lo_setOption(LibreOfficeKit* /*pThis*/, const char *pOption, const c
     }
 }
 
-static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t size)
+static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t size)
 {
     if (!xContext.is())
     {
@@ -5036,24 +5035,29 @@ static void* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t siz
 
     {
         SolarMutexGuard aGuard;
-        int nOrigViewId = SfxLokHelper::getView();
-        Application::SetDialogCancelMode(DialogCancelMode::LOKSilent);
-        static int nDocumentIdCounter = -1;
-        const int nThisDocumentId = nDocumentIdCounter--;
-        SfxViewShell::SetCurrentDocId(ViewShellDocId(nThisDocumentId));
-        uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL(
-            "private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
-        int nViewId = SfxLokHelper::getView();
-        if (nOrigViewId != nViewId)
-        SAL_WARN("lok", "view id dont match" << nOrigViewId << " view id " << nViewId);
+        try
+        {
+            Application::SetDialogCancelMode(DialogCancelMode::LOKSilent);
+            const int nThisDocumentId = nDocumentIdCounter++;
+            SfxViewShell::SetCurrentDocId(ViewShellDocId(nThisDocumentId));
+            uno::Reference<lang::XComponent> xComponent = xComponentLoader->loadComponentFromURL(
+                "private:stream", "_blank", 0, aMediaDescriptor.getAsConstPropertyValueList());
 
-        if (!xComponent.is()) {
-            SAL_WARN("lok", "Could not load in memory doc");
-            return nullptr;
+            if (!xComponent.is()) {
+                SAL_WARN("lok", "Could not load in memory doc");
+                return nullptr;
+            }
+
+            return new LibLODocument_Impl(xComponent, nThisDocumentId);
         }
-
-        return xComponent.get();
+        catch (const uno::Exception& exception)
+        {
+            css::uno::Any exAny( cppu::getCaughtException() );
+            SetLastExceptionMsg(exception.Message);
+            SAL_WARN("lok", "Failed to load to in-memory stream: " + exceptionToString(exAny));
+        }
     }
+    return nullptr;
 }
 
 static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, char** pState)
