@@ -20,7 +20,7 @@ jobs:
           git config --global core.eol lf
       - name: Sparse Checkout
         run: |
-          git clone --no-checkout --depth=1 --filter=blob:none --sparse https://github.com/${{ github.repository }} lok
+          git clone --no-checkout --depth=1 --filter=blob:none --sparse --branch=${{ github.ref_name }} --single-branch https://github.com/${{ github.repository }} lok
           cd lok
           git config --local gc.auto 0
           tee .git/info/sparse-checkout <<EOF
@@ -92,7 +92,7 @@ jobs:
           git config --global core.eol lf
       - name: Checkout
         run: |
-          git -c protocol.version=2 clone --depth=1 https://github.com/${{ github.repository }} /c/lok
+          git -c protocol.version=2 clone --depth=1 --branch=${{github.ref_name}} --single-branch https://github.com/${{ github.repository }} /c/lok
           cd /c/lok
           git config --local gc.auto 0
         shell: bash
