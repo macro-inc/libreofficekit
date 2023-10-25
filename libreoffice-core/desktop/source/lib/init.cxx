@@ -1241,7 +1241,7 @@ static void doc_setGraphicSelection (LibreOfficeKitDocument* pThis,
 static void doc_resetSelection (LibreOfficeKitDocument* pThis);
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand);
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx);
-static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size));
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size), const char* pFormat);
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis,
                                     int nTilePixelWidth,
                                     int nTilePixelHeight,
@@ -6876,7 +6876,7 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
     return aJsonWriter.extractData();
 }
 
-static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size))
+static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size), const char* pFormat)
 {
     if (!pOutput)
     {
@@ -6884,7 +6884,7 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, vo
         return -1;
     }
     comphelper::ProfileZone aZone("doc_saveToMemory");
-    OUString filterName("MS Word 2007 XML");
+    OUString filterName(pFormat == nullptr ? u"MS Word 2007 XML": OUString::fromUtf8(pFormat));
 
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
