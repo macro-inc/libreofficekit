@@ -106,7 +106,6 @@ namespace sw::mark {
                     { return m_wXBookmark; }
             void SetXBookmark(rtl::Reference<SwXBookmark> const& xBkmk);
 
-            static OUString GenerateNewName(std::u16string_view rPrefix);
         protected:
             // SwClient
             void SwClientNotify(const SwModify&, const SfxHint&) override;
@@ -115,6 +114,7 @@ namespace sw::mark {
             std::optional<SwPosition> m_oPos1;
             std::optional<SwPosition> m_oPos2;
             OUString m_aName;
+            static OUString GenerateNewName(std::u16string_view rPrefix);
 
             unotools::WeakReference<SwXBookmark> m_wXBookmark;
         };

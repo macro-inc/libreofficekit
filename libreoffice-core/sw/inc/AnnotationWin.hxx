@@ -30,7 +30,6 @@
 #include "swrect.hxx"
 #include "SidebarWindowsTypes.hxx"
 #include <optional>
-#include <annotationmark.hxx>
 
 class EditView;
 class PopupMenu;
@@ -77,10 +76,11 @@ class SAL_DLLPUBLIC_RTTI SwAnnotationWin final : public InterimItemWindow
         OUString GetAuthor() const;
         Date     GetDate() const;
         tools::Time GetTime() const;
-        void GeneratePostItName();
 
         sal_uInt32 MoveCaret();
 
+        /// Calculate parent postit id of current annotation window
+        sal_uInt32 CalcParent();
         void       InitAnswer(OutlinerParaObject const & rText);
 
         bool IsProtected() const;
@@ -194,7 +194,6 @@ class SAL_DLLPUBLIC_RTTI SwAnnotationWin final : public InterimItemWindow
 
         // Get annotation paraId or generate one if it doesn't exist
         sal_uInt32 GetParaId();
-        sal_uInt32 GetPostItId();
         // Used to generate a unique paraId
         static sal_uInt32 CreateUniqueParaId();
 
