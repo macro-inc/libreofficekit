@@ -282,7 +282,7 @@ struct _LibreOfficeKitDocumentClass
     char* (*gotoOutline) (LibreOfficeKitDocument* pThis, int idx);
 
     /// @see lok::Document::saveToMemory().
-    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size));
+    size_t (*saveToMemory) (LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size), const char* pFormat);
 
     /// @see lok::Document::setClientZoom().
     void (*setClientZoom) (LibreOfficeKitDocument* pThis,
