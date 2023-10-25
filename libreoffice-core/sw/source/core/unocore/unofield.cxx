@@ -1044,7 +1044,6 @@ struct SwFieldProperties_Impl
     OUString    sPar4;
     OUString    sPar5;
     OUString    sPar6;
-    OUString    sPar7;
     Date            aDate;
     double          fDouble;
     uno::Sequence<beans::PropertyValue> aPropSeq;
@@ -1396,9 +1395,7 @@ void SAL_CALL SwXTextField::attach(
                         m_pImpl->m_pProps->bBool1, // resolvedflag
                         0, // id
                         nParentId, // parent id
-                        nImportedId, // imported para id
-                        0, // PostIt Parent ID.
-                        m_pImpl->m_pProps->sPar7
+                        nImportedId // imported para id
                     );
                     if ( m_pImpl->m_xTextObject.is() )
                     {
@@ -2239,9 +2236,6 @@ SwXTextField::setPropertyValue(
         case FIELD_PROP_PAR4:
             rValue >>= m_pImpl->m_pProps->sPar4;
             break;
-        case FIELD_PROP_PAR7:
-            rValue >>= m_pImpl->m_pProps->sPar7;
-            break;
         case FIELD_PROP_PAR5:
             rValue >>= m_pImpl->m_pProps->sPar5;
             break;
@@ -2447,9 +2441,6 @@ uno::Any SAL_CALL SwXTextField::getPropertyValue(const OUString& rPropertyName)
                 break;
             case FIELD_PROP_PAR4:
                 aRet <<= m_pImpl->m_pProps->sPar4;
-                break;
-            case FIELD_PROP_PAR7:
-                aRet <<= m_pImpl->m_pProps->sPar7;
                 break;
             case FIELD_PROP_PAR5:
                 aRet <<= m_pImpl->m_pProps->sPar5;
