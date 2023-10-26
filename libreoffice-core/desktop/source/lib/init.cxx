@@ -5108,9 +5108,14 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     // MACRO-1653/MACRO-1598: Colorize and overlays
     if (gImpl && svCommand == ".uno:CancelColorize") // thread safe, don't need mutex guard
     {
-        SetLastExceptionMsg();
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->cancelColorize();
+        return;
+    }
+    if (gImpl && svCommand == ".uno:Colorize")
+    {
+        ITiledRenderable* pDoc = getTiledRenderable(pThis);
+        pDoc->colorize();
         return;
     }
 
@@ -5123,34 +5128,22 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     // MACRO-1653/MACRO-1598: Colorize and overlays
-    if (gImpl && svCommand == ".uno:Colorize")
+    if (gImpl && svCommand == ".uno:ApplyOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->colorize();
-        return;
-    }
-    else if (gImpl && svCommand == ".uno:ApplyOverlays")
-    {
-        ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->applyOverlays(std::string_view(pArguments));
+        pDoc->applyOverlays(pArguments);
         return;
     }
     else if (gImpl && svCommand == ".uno:JumpToOverlay")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->jumpToOverlay(std::string_view(pArguments));
+        pDoc->jumpToOverlay(pArguments);
         return;
     }
     else if (gImpl && svCommand == ".uno:RemoveOverlays")
     {
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->removeOverlays();
-        return;
-    }
-    else if (gImpl && svCommand == ".uno:CleanupOverlays")
-    {
-        ITiledRenderable* pDoc = getTiledRenderable(pThis);
-        pDoc->cleanupOverlays();
+        pDoc->removeOverlays(pArguments);
         return;
     }
     // MACRO-1671: Autorecovery and backup

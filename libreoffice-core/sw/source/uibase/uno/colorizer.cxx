@@ -8,6 +8,8 @@
  *
  */
 // MACRO-1653/MACRO-1598: Colorize and overlays
+#include <comphelper/threadpool.hxx>
+#include <cppuhelper/weakref.hxx>
 #include <hintids.hxx>
 #include <svl/colorizer.hxx>
 #include <svx/swframetypes.hxx>
@@ -41,46 +43,31 @@
 #include <view.hxx>
 #include <string>
 #include <viewsh.hxx>
+#include <unordered_map>
+#include <unordered_set>
+
+namespace std
+{
+
+template <typename T> struct hash<::uno::WeakReference<T>>
+{
+    std::size_t operator()(::uno::WeakReference<T> const& s) const
+    {
+        uno::Reference<T> strongRef(s.get());
+        return std::size_t(strongRef.is() ? strongRef.get() : nullptr);
+    }
+};
+
+} // namespace std
 
 namespace colorizer
 {
 
-class CancelFlagSingleton
-{
-private:
-    std::unordered_map<rtl::Reference<SwXTextDocument>, std::atomic<bool>> atomic_map;
-    std::mutex mtx;
-    CancelFlagSingleton() {}
-
-public:
-    static CancelFlagSingleton& getInstance()
-    {
-        static CancelFlagSingleton instance;
-        return instance;
-    }
-
-    std::atomic<bool>& getFlag(const rtl::Reference<SwXTextDocument>& doc)
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        auto it = atomic_map.find(doc);
-        if (it == atomic_map.end())
-        {
-            atomic_map.emplace(doc, false);
-            return atomic_map[doc];
-        }
-        return it->second;
-    }
-
-    void cleanup(const rtl::Reference<SwXTextDocument>& doc)
-    {
-        std::lock_guard<std::mutex> lock(mtx);
-        atomic_map.erase(doc);
-    }
-};
-
 namespace
 {
-void emitCallback(SwXTextDocument* doc, LibreOfficeKitCallbackType type, const char* event)
+
+void emitCallback(rtl::Reference<SwXTextDocument> doc, LibreOfficeKitCallbackType type,
+                  const char* event)
 {
     if (!doc)
     {
@@ -104,23 +91,155 @@ void emitCallback(SwXTextDocument* doc, LibreOfficeKitCallbackType type, const c
     pView->libreOfficeKitViewCallback(type, event);
 }
 
-void emitError(SwXTextDocument* doc, bool forOverlays = false)
+void emitError(rtl::Reference<SwXTextDocument> doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
                  "{\"type\":\"error\"}");
 }
 
-void emitCancelled(SwXTextDocument* doc, bool forOverlays = false)
+void emitCancelled(rtl::Reference<SwXTextDocument> doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
                  "{\"type\":\"cancelled\"}");
 }
 
-void emitFinished(SwXTextDocument* doc, bool forOverlays = false)
+void emitFinished(rtl::Reference<SwXTextDocument> doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
                  "{\"type\":\"finished\"}");
 }
+
+using WeakDocRef = uno::WeakReference<uno::XInterface>;
+
+template <typename T,
+          typename = typename std::enable_if<std::is_default_constructible<T>::value>::type>
+class WeakDocumentMap : public std::unordered_map<WeakDocRef, T>,
+                        public cppu::WeakImplHelper<lang::XEventListener>
+{
+private:
+    std::mutex mtx;
+    using base_map = std::unordered_map<WeakDocRef, T>;
+    using base_iterator = typename base_map::iterator;
+
+public:
+    std::pair<WeakDocRef, T&> set(uno::Reference<SwXTextDocument> doc, T item)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        uno::WeakReference<uno::XInterface> lookup(doc);
+        auto res = this->insert_or_assign(lookup, item);
+        // this allows automatic cleanup of entries when the source document is disposed
+        if (res.second)
+        {
+            if (doc.is())
+            {
+                doc->addEventListener(this);
+            }
+        }
+        base_iterator it = res.first;
+        return { it->first, it->second };
+    }
+
+    base_iterator find(uno::Reference<SwXTextDocument> doc)
+    {
+        uno::WeakReference<uno::XInterface> lookup(doc);
+        return this->base_map::find(lookup);
+    }
+
+    void SAL_CALL disposing(lang::EventObject const& rEvt) override
+    {
+        if (!dynamic_cast<SwXTextDocument*>(rEvt.Source.get()))
+        {
+            return;
+        }
+        uno::WeakReference<uno::XInterface> lookup(rEvt.Source);
+        this->erase(lookup);
+    }
+};
+
+using CancelFlag = std::atomic<bool>;
+
+using CancellableCallback = void (*)(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc);
+
+class CancellableTask : public comphelper::ThreadTask
+{
+private:
+    CancellableCallback m_func;
+    rtl::Reference<SwXTextDocument> m_doc;
+    std::atomic<bool>& m_cancelFlag;
+
+public:
+    CancellableTask(CancellableCallback func, rtl::Reference<SwXTextDocument> doc,
+                    CancelFlag& cancelFlag)
+        : comphelper::ThreadTask(comphelper::ThreadPool::createThreadTaskTag())
+        , m_func(func)
+        , m_doc(doc)
+        , m_cancelFlag(cancelFlag)
+    {
+    }
+
+    virtual void doWork() override { m_func(m_cancelFlag, m_doc); }
+};
+
+class CancellableTaskManager
+{
+private:
+    std::unordered_map<std::size_t, CancelFlag> cancelFlags;
+    std::mutex mtx;
+
+public:
+    void startThread(rtl::Reference<SwXTextDocument> doc, CancellableCallback func)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        std::size_t id = std::size_t(doc.get());
+
+        // Cancel existing thread with the same id if any
+        auto it = cancelFlags.find(id);
+        if (it != cancelFlags.end())
+        {
+            it->second = true; // Signal cancellation
+            cancelFlags.erase(it); // Remove from map
+        }
+
+        // Add new cancellation flag
+        cancelFlags[id] = false;
+
+        // Create and schedule new task
+        comphelper::ThreadPool::getSharedOptimalPool().pushTask(
+            std::make_unique<CancellableTask>(func, doc, cancelFlags[id]));
+    }
+
+    bool cancelThread(rtl::Reference<SwXTextDocument> doc)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        auto it = cancelFlags.find(std::size_t(doc.get()));
+        if (it == cancelFlags.end())
+        {
+            return false;
+        }
+
+        it->second = true; // Signal cancellation
+        cancelFlags.erase(it); // Remove from map
+        return true;
+    }
+};
+
+class ColorizerTaskManager : CancellableTaskManager
+{
+private:
+    static CancellableTaskManager& getInstance()
+    {
+        static CancellableTaskManager singleton{};
+        return singleton;
+    }
+
+public:
+    static void start(rtl::Reference<SwXTextDocument> doc, CancellableCallback callback)
+    {
+        getInstance().startThread(doc, callback);
+    }
+
+    static void cancel(rtl::Reference<SwXTextDocument> doc) { getInstance().cancelThread(doc); }
+};
 
 struct HexData
 {
@@ -150,11 +269,11 @@ struct AppliedOverlayData
     HexTextRangeMap anomaly;
 };
 
-using AppliedOverlayMaps = std::unordered_map<rtl::Reference<SwXTextDocument>, AppliedOverlayData>;
+using AppliedOverlayMaps = WeakDocumentMap<AppliedOverlayData>;
 
-std::unique_ptr<AppliedOverlayMaps>& getAppliedOverlayMaps()
+AppliedOverlayMaps& getAppliedOverlayMaps()
 {
-    static std::unique_ptr<AppliedOverlayMaps> maps = std::make_unique<AppliedOverlayMaps>();
+    static AppliedOverlayMaps maps{};
     return maps;
 }
 
@@ -168,7 +287,8 @@ inline bool isWordBeforeEndOfParagraph(const uno::Reference<text::XTextRangeComp
     return rangeCompare->compareRegionStarts(wordCursor, paragraphTextRange->getEnd()) == 1;
 }
 
-void jumpToOverlay(SwXTextDocument* doc, const std::string& hex, HexTextRangeMap& map)
+void jumpToOverlay(rtl::Reference<SwXTextDocument> doc, const std::string& hex,
+                   HexTextRangeMap& map)
 {
     auto it = map.find(hex);
     if (it == map.end())
@@ -251,8 +371,10 @@ struct OverlayState
 };
 
 // returns true if finished
-bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
-                void (*callback)(SwDoc* doc, sal_Int32 color, uno::Reference<text::XWordCursor> word,
+bool visitWords(rtl::Reference<SwXTextDocument> doc, OverlayState* overlayState,
+                std::atomic<bool>& cancelled,
+                void (*callback)(SwDoc* doc, sal_Int32 color,
+                                 uno::Reference<text::XWordCursor> word,
                                  OverlayState* overlayState))
 {
     uno::Reference<container::XEnumerationAccess> xParaAcess(doc->getText(), uno::UNO_QUERY);
@@ -263,8 +385,6 @@ bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
     }
 
     uno::Reference<container::XEnumeration> xParaIter = xParaAcess->createEnumeration();
-
-    auto& cancelled = CancelFlagSingleton::getInstance().getFlag(doc);
 
     sal_Int32 nColor = 0x0;
 
@@ -309,7 +429,8 @@ bool visitWords(SwXTextDocument* doc, OverlayState* overlayState,
 }
 
 // TODO: a lot of repeated code, will refactor at some point
-void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCursor> cursor, OverlayState* state)
+void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
+                   OverlayState* state)
 {
     const OverlayData& overlay = *state->overlay;
     AppliedOverlayData& appliedOverlay = *state->appliedOverlay;
@@ -434,9 +555,7 @@ void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCu
     }
 }
 
-}
-
-void Colorize(SwXTextDocument* doc)
+void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 {
     if (!doc)
         return;
@@ -453,16 +572,17 @@ void Colorize(SwXTextDocument* doc)
 
     SetBlockPooling(true);
 
-    bool finished = visitWords(
-        doc, nullptr,
-        [](SwDoc* pSwDoc, sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
-           OverlayState* /*overlayState*/) -> void
-        {
-            SwXTextCursor* const pInternalCursor
-                = comphelper::getFromUnoTunnel<SwXTextCursor>(cursor);
-            SvxColorItem sColor(color, RES_CHRATR_COLOR);
-            pSwDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(), sColor);
-        });
+    bool finished
+        = visitWords(doc, nullptr, cancelFlag,
+                     [](SwDoc* pSwDoc, sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
+                        OverlayState* /*overlayState*/) -> void
+                     {
+                         SwXTextCursor* const pInternalCursor
+                             = comphelper::getFromUnoTunnel<SwXTextCursor>(cursor);
+                         SvxColorItem sColor(color, RES_CHRATR_COLOR);
+                         pSwDoc->getIDocumentContentOperations().InsertPoolItem(
+                             *pInternalCursor->GetPaM(), sColor);
+                     });
     // WARN: this is hacky, restores SfxItemPool::PutImpl behavior
     pDoc->GetAttrPool().SetItemInfos(aSlotTab);
 
@@ -480,15 +600,78 @@ void Colorize(SwXTextDocument* doc)
     }
 }
 
-void CancelColorize(SwXTextDocument* doc)
+void clearOverlays(rtl::Reference<SwXTextDocument> doc, std::set<OverlayType> skipTypes,
+                   bool keepRanges)
 {
-    CancelFlagSingleton::getInstance().getFlag(doc) = false;
+    SwDocShell* pDocSh = doc->GetDocShell();
+    if (!pDocSh)
+        return;
+    SwWrtShell* pWrtShell = pDocSh->GetWrtShell();
+    SwViewShell* pViewShell = pWrtShell;
+    if (!pViewShell)
+        return emitError(doc, true);
+    pWrtShell->StartUndo(SwUndoId::START, nullptr);
+    pViewShell->StartAction();
+
+    bool bStateChanged = false;
+    if (pDocSh->IsEnableSetModified())
+    {
+        pDocSh->EnableSetModified(false);
+        bStateChanged = true;
+    }
+
+    AppliedOverlayMaps& maps = getAppliedOverlayMaps();
+    auto it = maps.find(doc);
+    if (it != maps.end())
+    {
+        if (skipTypes.find(OverlayType::TERMREF_OVERLAY) == skipTypes.end())
+        {
+            for (const auto& termref : it->second.termRef)
+            {
+                unsetLink(termref.second);
+            }
+            if (!keepRanges)
+            {
+                it->second.termRef.clear();
+            }
+        }
+
+        if (skipTypes.find(OverlayType::TERM_OVERLAY) == skipTypes.end())
+        {
+            for (const auto& term : it->second.term)
+            {
+                unsetLink(term.second);
+            }
+            if (!keepRanges) {
+                it->second.term.clear();
+            }
+        }
+
+        if (skipTypes.find(OverlayType::ANOMALY_OVERLAY) == skipTypes.end() && !keepRanges)
+        {
+            it->second.anomaly.clear();
+        }
+    }
+
+    if (bStateChanged)
+        pDocSh->EnableSetModified();
+
+    pViewShell->SwViewShell::UpdateFields(true);
+    pViewShell->EndAction();
+    pWrtShell->EndUndo(SwUndoId::END, nullptr);
 }
 
-void ApplyOverlays(SwXTextDocument* doc, const std::string_view json)
+} // namespace
+
+void Colorize(rtl::Reference<SwXTextDocument> doc) { ColorizerTaskManager::start(doc, colorize); }
+
+void CancelColorize(rtl::Reference<SwXTextDocument> doc) { ColorizerTaskManager::cancel(doc); }
+
+void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
-    if (!doc)
+    if (!doc || !json)
         return;
+
     SwDocShell* pDocSh = doc->GetDocShell();
     if (!pDocSh)
         return;
@@ -508,39 +691,64 @@ void ApplyOverlays(SwXTextDocument* doc, const std::string_view json)
 
     using boost::property_tree::ptree;
     ptree pt;
-    std::istringstream jsonStream(json.data());
+    std::istringstream jsonStream(json);
     read_json(jsonStream, pt);
     OverlayData payload;
+    std::set<OverlayType> skippedTypes;
 
-    for (const auto& item : pt.get_child("term"))
+    auto terms = pt.get_child_optional("term");
+    if (terms)
     {
-        HexData data;
-        data.endHex = item.second.get<std::string>("endHex");
-        payload.term[item.first] = data;
-    }
-
-    for (const auto& item : pt.get_child("termRef"))
-    {
-        HexWithRef data;
-        data.endHex = item.second.get<std::string>("endHex");
-        if (item.second.get_optional<std::string>("refHex"))
+        for (const auto& item : *terms)
         {
-            data.refHex = item.second.get<std::string>("refHex");
+            HexData data;
+            data.endHex = item.second.get<std::string>("endHex");
+            payload.term[item.first] = data;
         }
-        payload.termRef[item.first] = data;
+    }
+    else
+    {
+        skippedTypes.emplace(OverlayType::TERM_OVERLAY);
     }
 
-    for (const auto& item : pt.get_child("anomaly"))
+    auto termrefs = pt.get_child_optional("termRef");
+    if (termrefs)
     {
-        HexData data;
-        data.endHex = item.second.get<std::string>("endHex");
-        payload.anomaly[item.first] = data;
+        for (const auto& item : *termrefs)
+        {
+            HexWithRef data;
+            data.endHex = item.second.get<std::string>("endHex");
+            if (item.second.get_optional<std::string>("refHex"))
+            {
+                data.refHex = item.second.get<std::string>("refHex");
+            }
+            payload.termRef[item.first] = data;
+        }
+    }
+    else
+    {
+        skippedTypes.emplace(OverlayType::TERMREF_OVERLAY);
+    }
+
+    auto anomalies = pt.get_child_optional("anomaly");
+    if (anomalies)
+    {
+        for (const auto& item : *anomalies)
+        {
+            HexData data;
+            data.endHex = item.second.get<std::string>("endHex");
+            payload.anomaly[item.first] = data;
+        }
+    }
+    else
+    {
+        skippedTypes.emplace(OverlayType::ANOMALY_OVERLAY);
     }
 
     // clear any existing overlays
-    ClearOverlays(doc);
+    clearOverlays(doc, skippedTypes, false);
 
-    std::unique_ptr<AppliedOverlayMaps>& maps = getAppliedOverlayMaps();
+    AppliedOverlayMaps& maps = getAppliedOverlayMaps();
 
     AppliedOverlayData overlays{};
     OverlayState overlayState{};
@@ -548,15 +756,18 @@ void ApplyOverlays(SwXTextDocument* doc, const std::string_view json)
     overlayState.appliedOverlay = &overlays;
     overlayState.def = payload.term.end();
     overlayState.ref = payload.termRef.end();
+    CancelFlag dummy_flag;
 
-    bool finished = visitWords(doc, &overlayState, applyOverlays);
+    bool finished = visitWords(doc, &overlayState, dummy_flag, applyOverlays);
 
     if (bStateChanged)
+    {
         pDocSh->EnableSetModified();
+    }
     pViewShell->EndAction();
     pWrtShell->EndUndo(SwUndoId::END, nullptr);
 
-    maps->emplace(doc, overlays);
+    maps.set(doc, overlays);
 
     if (overlayState.defCounter > 0)
     {
@@ -583,69 +794,55 @@ void ApplyOverlays(SwXTextDocument* doc, const std::string_view json)
     }
 }
 
-void ClearOverlays(SwXTextDocument* doc)
-{
-    if (!doc)
-        return;
-    SwDocShell* pDocSh = doc->GetDocShell();
-    if (!pDocSh)
-        return;
-    SwWrtShell* pWrtShell = pDocSh->GetWrtShell();
-    SwViewShell* pViewShell = pWrtShell;
-    if (!pViewShell)
-        return emitError(doc, true);
-    pWrtShell->StartUndo(SwUndoId::START, nullptr);
-    pViewShell->StartAction();
-
-    bool bStateChanged = false;
-    if (pDocSh->IsEnableSetModified())
-    {
-        pDocSh->EnableSetModified(false);
-        bStateChanged = true;
-    }
-
-    // actually just cancels applying overlays
-    CancelColorize(doc);
-
-    auto& maps = getAppliedOverlayMaps();
-    auto it = maps->find(doc);
-    if (it != maps->end())
-    {
-        for (const auto& term : it->second.termRef)
-        {
-            unsetLink(term.second);
-        }
-        for (const auto& term : it->second.term)
-        {
-            unsetLink(term.second);
-        }
-    }
-
-    if (bStateChanged)
-        pDocSh->EnableSetModified();
-
-    pViewShell->SwViewShell::UpdateFields(true);
-    pViewShell->EndAction();
-    pWrtShell->EndUndo(SwUndoId::END, nullptr);
-
-    maps->erase(doc);
-}
-
-void JumpToOverlay(SwXTextDocument* doc, const std::string_view json )
+void ClearOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
     if (!doc)
         return;
 
-    std::unique_ptr<AppliedOverlayMaps>& maps = getAppliedOverlayMaps();
-    AppliedOverlayMaps::iterator it = maps->find(doc);
-    if (it == maps->end())
+    if (json == nullptr)
     {
-        return emitError(doc);
+        return clearOverlays(doc, {}, false);
     }
 
     using boost::property_tree::ptree;
     ptree pt;
-    std::istringstream jsonStream(json.data());
+    std::istringstream jsonStream(json);
+    read_json(jsonStream, pt);
+
+    std::set<OverlayType> skippedTypes;
+
+    auto skip = pt.get_child_optional("skip");
+    if (skip)
+    {
+        for (const auto& item : *skip)
+        {
+            auto maybeType = item.second.get_value<sal_Int32>();
+            if (maybeType > OverlayType::START && maybeType < OverlayType::END)
+            {
+                skippedTypes.emplace((OverlayType)maybeType);
+            }
+        }
+    }
+
+    bool keepRanges = pt.get<bool>("keepRanges", false);
+    clearOverlays(doc, skippedTypes, keepRanges);
+}
+
+void JumpToOverlay(rtl::Reference<SwXTextDocument> doc, const char* json)
+{
+    if (!doc || !json)
+        return;
+
+    AppliedOverlayMaps& maps = getAppliedOverlayMaps();
+    AppliedOverlayMaps::iterator it = maps.find(doc);
+    if (it == maps.end())
+    {
+        return emitError(doc, true);
+    }
+
+    using boost::property_tree::ptree;
+    ptree pt;
+    std::istringstream jsonStream(json);
     read_json(jsonStream, pt);
     std::string hex = pt.get<std::string>("hex");
     OverlayType type = (OverlayType)pt.get<sal_Int32>("type");
@@ -661,15 +858,12 @@ void JumpToOverlay(SwXTextDocument* doc, const std::string_view json )
         case ANOMALY_OVERLAY:
             jumpToOverlay(doc, hex, it->second.anomaly);
             break;
+        case START:
+        case END:
+            break;
     }
 }
 
-void Cleanup(SwXTextDocument* doc)
-{
-    getAppliedOverlayMaps()->erase(doc);
-    CancelFlagSingleton::getInstance().cleanup(doc);
-}
-
-}
+} // namespace colorizer
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

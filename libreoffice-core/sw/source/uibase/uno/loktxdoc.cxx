@@ -643,17 +643,14 @@ void SwXTextDocument::colorize() {
 void SwXTextDocument::cancelColorize() {
     colorizer::CancelColorize(this);
 }
-void SwXTextDocument::applyOverlays( const std::string_view payload ) {
+void SwXTextDocument::applyOverlays( const char* payload ) {
     colorizer::ApplyOverlays(this, payload);
 }
-void SwXTextDocument::jumpToOverlay( const std::string_view payload ) {
+void SwXTextDocument::jumpToOverlay( const char* payload ) {
     colorizer::JumpToOverlay(this, payload);
 }
-void SwXTextDocument::removeOverlays() {
-    colorizer::ClearOverlays(this);
-}
-void SwXTextDocument::cleanupOverlays() {
-    colorizer::Cleanup(this);
+void SwXTextDocument::removeOverlays( const char* payload ) {
+    colorizer::ClearOverlays(this, payload);
 }
 
 // MACRO-1671: Autorecovery and backup
