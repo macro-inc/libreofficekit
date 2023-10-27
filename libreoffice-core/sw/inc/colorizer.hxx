@@ -17,23 +17,24 @@
 #include <unotxdoc.hxx>
 #include <doc.hxx>
 
-namespace colorizer {
+namespace colorizer
+{
 
-enum OverlayType {
+enum OverlayType
+{
+    START = 0,
     TERM_OVERLAY = 1,
     TERMREF_OVERLAY = 2,
     ANOMALY_OVERLAY = 3,
+    END = 4
 };
 
-void Colorize(SwXTextDocument* doc);
-void CancelColorize(SwXTextDocument* doc);
+void Colorize(rtl::Reference<SwXTextDocument> doc);
+void CancelColorize(rtl::Reference<SwXTextDocument> doc);
 
-void ApplyOverlays(SwXTextDocument* doc, const std::string_view json);
-void ClearOverlays(SwXTextDocument* doc);
-void JumpToOverlay(SwXTextDocument* doc, const std::string_view json );
-
-// Makes sure that there are no dangling references to the doc, only call when the document should be closed
-void Cleanup(SwXTextDocument* doc);
+void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json);
+void ClearOverlays(rtl::Reference<SwXTextDocument> doc, const char* json);
+void JumpToOverlay(rtl::Reference<SwXTextDocument> doc, const char* json);
 
 }
 

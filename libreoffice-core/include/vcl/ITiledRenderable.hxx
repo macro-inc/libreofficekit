@@ -414,10 +414,9 @@ public:
     /// MACRO-1653/MACRO-1598: Colorize and overlays
     virtual void colorize() {};
     virtual void cancelColorize() {};
-    virtual void applyOverlays( const std::string_view /* payload*/ ) {};
-    virtual void jumpToOverlay( const std::string_view /* payload*/ ) {};
-    virtual void removeOverlays() {};
-    virtual void cleanupOverlays() {};
+    virtual void applyOverlays( const char* /* payload*/ ) {};
+    virtual void jumpToOverlay( const char* /* payload*/ ) {};
+    virtual void removeOverlays( const char* /* payload*/ ) {};
 
     // MACRO-1671: Autorecovery and backup
     virtual void setBackupPath(const char* /* payload */ ) {};
