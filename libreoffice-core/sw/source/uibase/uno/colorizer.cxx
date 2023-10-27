@@ -111,10 +111,29 @@ void emitFinished(rtl::Reference<SwXTextDocument> doc, bool forOverlays = false)
 
 using WeakDocRef = uno::WeakReference<uno::XInterface>;
 
+class WeakDisposer
+{
+public:
+    virtual void dispose(uno::Reference<uno::XInterface> ref) = 0;
+};
+
+struct WeakDocumentMapDisposal final : public cppu::WeakImplHelper<lang::XEventListener>
+{
+    WeakDisposer& m_disposer;
+    WeakDocumentMapDisposal(WeakDisposer& disposer)
+        : m_disposer(disposer)
+    {
+    }
+
+    virtual void SAL_CALL disposing(lang::EventObject const& rEvt) override
+    {
+        m_disposer.dispose(rEvt.Source);
+    }
+};
+
 template <typename T,
           typename = typename std::enable_if<std::is_default_constructible<T>::value>::type>
-class WeakDocumentMap : public std::unordered_map<WeakDocRef, T>,
-                        public cppu::WeakImplHelper<lang::XEventListener>
+class WeakDocumentMap : public std::unordered_map<WeakDocRef, T>, public WeakDisposer
 {
 private:
     std::mutex mtx;
@@ -124,15 +143,17 @@ private:
 public:
     std::pair<WeakDocRef, T&> set(uno::Reference<SwXTextDocument> doc, T item)
     {
-        std::lock_guard<std::mutex> lock(mtx);
         uno::WeakReference<uno::XInterface> lookup(doc);
+        std::lock_guard<std::mutex> lock(mtx);
         auto res = this->insert_or_assign(lookup, item);
         // this allows automatic cleanup of entries when the source document is disposed
         if (res.second)
         {
             if (doc.is())
             {
-                doc->addEventListener(this);
+                rtl::Reference<WeakDocumentMapDisposal> listener(
+                    new WeakDocumentMapDisposal(*this));
+                doc->addEventListener(listener);
             }
         }
         base_iterator it = res.first;
@@ -142,16 +163,18 @@ public:
     base_iterator find(uno::Reference<SwXTextDocument> doc)
     {
         uno::WeakReference<uno::XInterface> lookup(doc);
+        std::lock_guard<std::mutex> lock(mtx);
         return this->base_map::find(lookup);
     }
 
-    void SAL_CALL disposing(lang::EventObject const& rEvt) override
+    void dispose(uno::Reference<uno::XInterface> ref) override
     {
-        if (!dynamic_cast<SwXTextDocument*>(rEvt.Source.get()))
+        if (ref.is() && !dynamic_cast<SwXTextDocument*>(ref.get()))
         {
             return;
         }
-        uno::WeakReference<uno::XInterface> lookup(rEvt.Source);
+        uno::WeakReference<uno::XInterface> lookup(ref);
+        std::lock_guard<std::mutex> lock(mtx);
         this->erase(lookup);
     }
 };
@@ -642,7 +665,8 @@ void clearOverlays(rtl::Reference<SwXTextDocument> doc, std::set<OverlayType> sk
             {
                 unsetLink(term.second);
             }
-            if (!keepRanges) {
+            if (!keepRanges)
+            {
                 it->second.term.clear();
             }
         }
