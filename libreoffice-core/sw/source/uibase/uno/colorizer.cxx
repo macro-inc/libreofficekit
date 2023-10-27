@@ -285,10 +285,12 @@ struct OverlayData
 };
 
 using HexTextRangeMap = std::unordered_map<std::string, uno::Reference<text::XTextRange>>;
+using HexRefTextRangeMap
+    = std::unordered_map<std::string, std::pair<OUString, uno::Reference<text::XTextRange>>>;
 struct AppliedOverlayData
 {
     HexTextRangeMap term;
-    HexTextRangeMap termRef;
+    HexRefTextRangeMap termRef;
     HexTextRangeMap anomaly;
 };
 
@@ -330,6 +332,28 @@ void jumpToOverlay(rtl::Reference<SwXTextDocument> doc, const std::string& hex,
     doc->resetSelection();
     xCursor->gotoRange(it->second->getStart(), false);
     xCursor->gotoRange(it->second->getEnd(), true);
+}
+
+void jumpToOverlay(rtl::Reference<SwXTextDocument> doc, const std::string& hex,
+                   HexRefTextRangeMap& map)
+{
+    auto it = map.find(hex);
+    if (it == map.end())
+    {
+        return emitError(doc, true);
+    }
+
+    uno::Reference<text::XTextViewCursorSupplier> xCursorSupplier(doc->getCurrentController(),
+                                                                  uno::UNO_QUERY);
+    if (!xCursorSupplier)
+    {
+        return emitError(doc, true);
+    }
+
+    uno::Reference<text::XTextViewCursor> xCursor = xCursorSupplier->getViewCursor();
+    doc->resetSelection();
+    xCursor->gotoRange(it->second.second->getStart(), false);
+    xCursor->gotoRange(it->second.second->getEnd(), true);
 }
 
 void makeLink(uno::Reference<text::XTextCursor> textCursor, const OUString& link)
@@ -526,13 +550,14 @@ void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCu
         refCursor->gotoRange(cursor->getEnd(), true);
 
         std::string refStartHex = state->ref->first;
-        makeLink(refCursor, u"termref://" + OUString::createFromAscii(state->ref->second.refHex));
+        OUString refTargetHex = OUString::createFromAscii(state->ref->second.refHex);
+        makeLink(refCursor, u"termref://" + refTargetHex);
 
         uno::Reference<text::XTextRange> textRange(refCursor, uno::UNO_QUERY);
         if (!textRange)
             return;
 
-        appliedOverlay.termRef[refStartHex] = textRange;
+        appliedOverlay.termRef[refStartHex] = std::make_pair(refTargetHex, textRange);
 
         // reset
         state->refTextRange.clear();
@@ -623,6 +648,28 @@ void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
     }
 }
 
+void reapplyOverlays(rtl::Reference<SwXTextDocument> doc)
+{
+    AppliedOverlayMaps& maps = getAppliedOverlayMaps();
+    auto it = maps.find(doc);
+    if (it != maps.end())
+    {
+        for (const auto& termref : it->second.termRef)
+        {
+            uno::Reference<text::XTextCursor> defCursor
+                = termref.second.second->getText()->createTextCursorByRange(termref.second.second);
+            makeLink(defCursor, u"termref://" + termref.second.first);
+        }
+
+        for (const auto& term : it->second.term)
+        {
+            uno::Reference<text::XTextCursor> defCursor
+                = term.second->getText()->createTextCursorByRange(term.second);
+            makeLink(defCursor, u"term://" + OUString::fromUtf8(term.first));
+        }
+    }
+}
+
 void clearOverlays(rtl::Reference<SwXTextDocument> doc, std::set<OverlayType> skipTypes,
                    bool keepRanges)
 {
@@ -651,7 +698,7 @@ void clearOverlays(rtl::Reference<SwXTextDocument> doc, std::set<OverlayType> sk
         {
             for (const auto& termref : it->second.termRef)
             {
-                unsetLink(termref.second);
+                unsetLink(termref.second.second);
             }
             if (!keepRanges)
             {
@@ -693,7 +740,7 @@ void CancelColorize(rtl::Reference<SwXTextDocument> doc) { ColorizerTaskManager:
 
 void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
-    if (!doc || !json)
+    if (!doc)
         return;
 
     SwDocShell* pDocSh = doc->GetDocShell();
@@ -711,6 +758,22 @@ void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
     {
         pDocSh->EnableSetModified(false);
         bStateChanged = true;
+    }
+
+    // simply re-apply link styling for existing ranges
+    if (!json)
+    {
+        reapplyOverlays(doc);
+
+        if (bStateChanged)
+        {
+            pDocSh->EnableSetModified();
+        }
+        pViewShell->EndAction();
+        pWrtShell->EndUndo(SwUndoId::END, nullptr);
+
+        emitFinished(doc, true);
+        return;
     }
 
     using boost::property_tree::ptree;
