@@ -72,7 +72,7 @@ jobs:
           md C:\external-tar
           cd lok/libreoffice-core
           C:\cygwin\bin\bash.exe --login
-          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=LOKit-Win64 --with-external-tar="C:\external-tar"'
+          C:\cygwin\bin\bash.exe --login -c './autogen.sh --with-distro=LOKit-Win64 --with-fonts=yes --with-external-tar="C:\external-tar"'
           C:\cygwin\bin\bash.exe --login -c 'make fetch'
         shell: cmd
   build:
