@@ -433,7 +433,7 @@ bool visitWords(rtl::Reference<SwXTextDocument> doc, OverlayState* overlayState,
 
     uno::Reference<container::XEnumeration> xParaIter = xParaAcess->createEnumeration();
 
-    sal_Int32 nColor = 0x0;
+    sal_Int32 nColor = 0x000007; // 0 is the "unset" color and 7 is a lucky number
 
     SwDoc* pDoc = doc->GetDocShell()->GetDoc();
 
@@ -468,7 +468,17 @@ bool visitWords(rtl::Reference<SwXTextDocument> doc, OverlayState* overlayState,
             xWordCursor->gotoEndOfWord(true);
 
             callback(pDoc, nColor++, xWordCursor, overlayState);
-            xWordCursor->gotoNextWord(false);
+
+            // color anything in between
+            xWordCursor->collapseToEnd();
+            xWordCursor->gotoNextWord(true);
+
+            callback(pDoc, nColor++, xWordCursor, overlayState);
+
+            if (isWordBeforeEndOfParagraph(xRangeCompare, xWordCursor, xParaTextRange))
+            {
+                xWordCursor->goRight(1, false);
+            }
         } while (!cancelled
                  && isWordBeforeEndOfParagraph(xRangeCompare, xWordCursor, xParaTextRange));
     }
@@ -603,6 +613,98 @@ void applyOverlays(SwDoc* /*doc*/, sal_Int32 color, uno::Reference<text::XWordCu
     }
 }
 
+// this makes sure that all text we can touch is 0x000000 hidden by default
+// anything thats difficult to modify is hidden
+void resetColors(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
+{
+    SwDocShell* pDocSh = doc->GetDocShell();
+    SwDoc* pDoc = pDocSh->GetDoc();
+
+    uno::Reference<text::XTextCursor> xBodyCursor = doc->getText()->createTextCursor();
+    xBodyCursor->gotoStart(false);
+    xBodyCursor->gotoEnd(true);
+
+    SwXTextCursor* pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
+    SvxColorItem sResetColor(0, RES_CHRATR_COLOR);
+    pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(), sResetColor);
+
+    uno::Reference<container::XIndexAccess> xSections(doc->getTextSections(), uno::UNO_QUERY);
+
+    if (xSections.is())
+    {
+        sal_Int32 nCount = xSections->getCount();
+        for (sal_Int32 i = 0; !cancelFlag && i < nCount; i++)
+        {
+            if (cancelFlag)
+                break;
+
+            css::uno::Reference<css::text::XTextSection> xSection;
+            xSections->getByIndex(i) >>= xSection;
+
+            css::uno::Reference<css::text::XText> xText = xSection->getAnchor()->getText();
+            uno::Reference<text::XTextCursor> xSectionCursor
+                = xSection->getAnchor()->getText()->createTextCursor();
+            xSectionCursor->gotoRange(xSection->getAnchor(), true);
+            pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
+            if (!pInternalCursor)
+                continue;
+            pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(),
+                                                                 sResetColor);
+        }
+    }
+
+    // instead of resetting the colors in the headers/footers, just turn them off
+    uno::Reference<container::XIndexAccess> xPageStyles(
+        doc->getStyleFamilies()->getByName("PageStyles"), css::uno::UNO_QUERY);
+    if (xPageStyles.is())
+    {
+        sal_Int32 nStyles = xPageStyles->getCount();
+        for (sal_Int32 i = 0; !cancelFlag && i < nStyles; ++i)
+        {
+            css::uno::Reference<css::beans::XPropertySet> xPropertySet;
+            xPageStyles->getByIndex(i) >>= xPropertySet;
+            if (xPropertySet.is()) {
+                xPropertySet->setPropertyValue("HeaderIsOn", uno::Any(false));
+                xPropertySet->setPropertyValue("FooterIsOn", uno::Any(false));
+            }
+        }
+    }
+
+    // TODO: colorize tables?
+    uno::Reference<container::XIndexAccess> xTables(doc->getTextTables(), uno::UNO_QUERY);
+    if (!xTables.is())
+        return;
+    sal_Int32 nTables = xTables->getCount();
+
+    for (sal_Int32 i = 0; !cancelFlag && i < nTables; ++i)
+    {
+        css::uno::Reference<css::text::XTextTable> xTable;
+        xTables->getByIndex(i) >>= xTable;
+        if (!xTable.is())
+            continue;
+
+        css::uno::Sequence<OUString> cellNames = xTable->getCellNames();
+        for (const auto& cellName : cellNames)
+        {
+            if (cancelFlag)
+                break;
+
+            css::uno::Reference<css::table::XCell> xCell = xTable->getCellByName(cellName);
+            css::uno::Reference<css::text::XText> xCellText(xCell, css::uno::UNO_QUERY);
+            if (!xCellText.is())
+                continue;
+            uno::Reference<text::XTextCursor> xTableCursor = xCellText->createTextCursor();
+            xTableCursor->gotoStart(false);
+            xTableCursor->gotoEnd(true);
+            pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
+            if (!pInternalCursor)
+                continue;
+            pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(),
+                                                                 sResetColor);
+        }
+    }
+}
+
 void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 {
     if (!doc)
@@ -619,20 +721,20 @@ void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
     doc->setPropertyValue(UNO_NAME_RECORD_CHANGES, uno::Any(false));
 
     SetBlockPooling(true);
+    resetColors(cancelFlag, doc);
 
     bool finished
         = visitWords(doc, nullptr, cancelFlag,
                      [](SwDoc* pSwDoc, sal_Int32 color, uno::Reference<text::XWordCursor> cursor,
                         OverlayState* /*overlayState*/) -> void
                      {
+                         unsetLink(cursor);
                          SwXTextCursor* const pInternalCursor
                              = comphelper::getFromUnoTunnel<SwXTextCursor>(cursor);
                          SvxColorItem sColor(color, RES_CHRATR_COLOR);
                          pSwDoc->getIDocumentContentOperations().InsertPoolItem(
                              *pInternalCursor->GetPaM(), sColor);
                      });
-    // WARN: this is hacky, restores SfxItemPool::PutImpl behavior
-    pDoc->GetAttrPool().SetItemInfos(aSlotTab);
 
     SetBlockPooling(false);
 
