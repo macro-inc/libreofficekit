@@ -220,7 +220,7 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
     }
     case IdleJob::AutoBackup:
     {
-        if (m_sBackupPath.isEmpty()) return;
+        if (m_sBackupPath.isEmpty()) break;
 
         SwDocShell* pDocShell = m_rDoc.GetDocShell();
         auto aCurrentTime = std::chrono::steady_clock::now();
