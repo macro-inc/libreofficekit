@@ -107,7 +107,6 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
 {
     SwRootFrame* pTmpRoot = m_rDoc.getIDocumentLayoutAccess().GetCurrentLayout();
 
-
     if( pTmpRoot &&
         !SfxProgress::GetActiveProgress( m_rDoc.GetDocShell() ) )
     {
@@ -119,7 +118,7 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
         auto aCurrentClock = std::chrono::steady_clock::now();
         bool bNeedsBackup = !m_aLastBackup.has_value() ||
             (aCurrentClock - m_aLastBackup.value()) > std::chrono::seconds(60);
-        if (bNeedsBackup) {
+        if (bNeedsBackup && !m_sBackupPath.isEmpty()) {
             return IdleJob::AutoBackup;
         }
 
@@ -143,14 +142,13 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
             }
         }
 
-        SwFieldUpdateFlags nFieldUpdFlag = m_rDoc.GetDocumentSettingManager().getFieldUpdateFlags(true);
-        if( ( AUTOUPD_FIELD_ONLY == nFieldUpdFlag
-                    || AUTOUPD_FIELD_AND_CHARTS == nFieldUpdFlag )
-                && m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsFieldsDirty() )
+        if(m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsFieldsDirty() )
         {
             if( m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsInUpdateFields()
                     || m_rDoc.getIDocumentFieldsAccess().IsExpFieldsLocked() )
+            {
                 return IdleJob::Busy;
+            }
             return IdleJob::Fields;
         }
     }
@@ -230,7 +228,7 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
 
         if (!pDocShell)
         {
-            return;
+            break;
         }
 
         try
@@ -251,7 +249,6 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         }
     }
     break;
-
     case IdleJob::Busy:
         break;
     case IdleJob::None:
