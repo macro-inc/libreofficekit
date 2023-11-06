@@ -2014,7 +2014,7 @@ void Desktop::OpenClients()
         }
         catch(const css::uno::Exception&)
         {
-            TOOLS_WARN_EXCEPTION( "desktop.app", "Could not disable AutoRecovery.");
+            // TOOLS_WARN_EXCEPTION( "desktop.app", "Could not disable AutoRecovery.");
         }
     }
     else
