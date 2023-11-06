@@ -49,6 +49,11 @@
 #include <txtrfmrk.hxx>
 #include <ndtxt.hxx>
 #include <wrtsh.hxx>
+#include <swmodule.hxx>
+#include <view.hxx>
+#include <docsh.hxx>
+#include <IDocumentFieldsAccess.hxx>
+#include <docfld.hxx>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -291,7 +296,8 @@ void GetOutline(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell)
 
         // We need to explicitly get the text here in case there are special characters
         // Using textNode->GetText() will result in a failure to convert the result to JSON in the DocumentClient::GetCommandValues in electron-libreoffice
-        const OUString& rEntry = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(i, mrSh->GetLayout(), true, false, false );
+        const OUString& rEntry = mrSh->getIDocumentOutlineNodesAccess()->getOutlineText(
+            i, mrSh->GetLayout(), true, false, false);
 
         rJsonWriter.put("id", nOutlineId);
         rJsonWriter.put("parent", nParent);
@@ -379,7 +385,8 @@ void GetFields(tools::JsonWriter& rJsonWriter, SwDocShell* pDocShell,
     }
     // Sort the refmarks based on their start position.
     std::sort(aRefMarks.begin(), aRefMarks.end(),
-              [](const SwFormatRefMark* pMark1, const SwFormatRefMark* pMark2) -> bool {
+              [](const SwFormatRefMark* pMark1, const SwFormatRefMark* pMark2) -> bool
+              {
                   const SwTextRefMark* pTextRefMark1 = pMark1->GetTextRefMark();
                   const SwTextRefMark* pTextRefMark2 = pMark2->GetTextRefMark();
                   SwPosition aPos1(pTextRefMark1->GetTextNode(), pTextRefMark1->GetStart());
@@ -488,7 +495,7 @@ bool SwXTextDocument::supportsCommand(std::u16string_view rCommand)
     static const std::initializer_list<std::u16string_view> vForward
         = { u"TextFormFields", u"TextFormField", u"SetDocumentProperties",
             u"Bookmarks",      u"Fields",        u"Sections",
-            u"Bookmark",       u"Field", u"GetOutline" };
+            u"Bookmark",       u"Field",         u"GetOutline" };
 
     return std::find(vForward.begin(), vForward.end(), rCommand) != vForward.end();
 }
@@ -578,36 +585,42 @@ void SwXTextDocument::gotoOutline(tools::JsonWriter& rJsonWriter, int idx)
     rJsonWriter.put("destRect", destRect.SVRect().toString());
 }
 
-
 void SwXTextDocument::createTable(int row, int col)
 {
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
 
-    const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,/*nRowsToRepeat=*/0);
+    const SwInsertTableOptions aInsertTableOptions(SwInsertTableFlags::DefaultBorder,
+                                                   /*nRowsToRepeat=*/0);
 
     mrSh->InsertTable(aInsertTableOptions, row, col);
 }
 
 // MACRO-1212: batch track change updates in a single action
-void SwXTextDocument::batchUpdateTrackChange( const css::uno::Sequence<sal_uInt32>& rArguments, bool accept)
+void SwXTextDocument::batchUpdateTrackChange(const css::uno::Sequence<sal_uInt32>& rArguments,
+                                             bool accept)
 {
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
-    SwDoc *pDoc = mrSh->GetDoc();
+    SwDoc* pDoc = mrSh->GetDoc();
     SwUndoId undoId = accept ? SwUndoId::ACCEPT_REDLINE : SwUndoId::REJECT_REDLINE;
     // make batch update a single undo/redo and layout action
     mrSh->StartUndo(undoId, nullptr);
     mrSh->StartAllAction();
 
-    for (sal_uInt32 id : rArguments) {
+    for (sal_uInt32 id : rArguments)
+    {
         const SwRedlineTable& rRedlineTable = pDoc->getIDocumentRedlineAccess().GetRedlineTable();
         bool found = false;
         for (SwRedlineTable::size_type i = 0; !found && i < rRedlineTable.size(); ++i)
         {
-            if (id == rRedlineTable[i]->GetId()) {
+            if (id == rRedlineTable[i]->GetId())
+            {
                 found = true;
-                if (accept) {
+                if (accept)
+                {
                     mrSh->AcceptRedline(i);
-                } else {
+                }
+                else
+                {
                     mrSh->RejectRedline(i);
                 }
             }
@@ -619,37 +632,40 @@ void SwXTextDocument::batchUpdateTrackChange( const css::uno::Sequence<sal_uInt3
 }
 
 // MACRO-1392: Request layout updates for redlines
-void SwXTextDocument::updateRedlines( const css::uno::Sequence<sal_uInt32>& rArguments) {
+void SwXTextDocument::updateRedlines(const css::uno::Sequence<sal_uInt32>& rArguments)
+{
     SwWrtShell* mrSh = m_pDocShell->GetWrtShell();
-    SwDoc *pDoc = mrSh->GetDoc();
+    SwDoc* pDoc = mrSh->GetDoc();
 
-    for (sal_uInt32 id : rArguments) {
+    for (sal_uInt32 id : rArguments)
+    {
         const SwRedlineTable& rRedlineTable = pDoc->getIDocumentRedlineAccess().GetRedlineTable();
         bool found = false;
         for (SwRedlineTable::size_type i = 0; !found && i < rRedlineTable.size(); ++i)
         {
-            if (id == rRedlineTable[i]->GetId()) {
+            if (id == rRedlineTable[i]->GetId())
+            {
                 found = true;
-                SwRedlineTable::LOKRedlineNotification(RedlineNotification::Modify, rRedlineTable[i]);
+                SwRedlineTable::LOKRedlineNotification(RedlineNotification::Modify,
+                                                       rRedlineTable[i]);
             }
         }
     }
 }
 
 // MACRO-1653/MACRO-1598: Colorize and overlays
-void SwXTextDocument::colorize() {
-    colorizer::Colorize(this);
-}
-void SwXTextDocument::cancelColorize() {
-    colorizer::CancelColorize(this);
-}
-void SwXTextDocument::applyOverlays( const char* payload ) {
+void SwXTextDocument::colorize() { colorizer::Colorize(this); }
+void SwXTextDocument::cancelColorize() { colorizer::CancelColorize(this); }
+void SwXTextDocument::applyOverlays(const char* payload)
+{
     colorizer::ApplyOverlays(this, payload);
 }
-void SwXTextDocument::jumpToOverlay( const char* payload ) {
+void SwXTextDocument::jumpToOverlay(const char* payload)
+{
     colorizer::JumpToOverlay(this, payload);
 }
-void SwXTextDocument::removeOverlays( const char* payload ) {
+void SwXTextDocument::removeOverlays(const char* payload)
+{
     colorizer::ClearOverlays(this, payload);
 }
 
@@ -662,7 +678,32 @@ void SwXTextDocument::setBackupPath(const char* payload)
     read_json(jsonStream, pt);
 
     GetDocShell()->GetDoc()->getIDocumentTimerAccess().SetBackupPath(
-            OUString::fromUtf8(pt.get<std::string>("path")));
+        OUString::fromUtf8(pt.get<std::string>("path")));
+}
+
+// MACRO-1165: Set author
+void SwXTextDocument::setAuthor(OUString sAuthor)
+{
+    SAL_WARN("setauthor", "starts");
+    SolarMutexGuard aGuard;
+
+    SwView* pView = m_pDocShell->GetView();
+    if (!pView)
+        return;
+
+    OUString sOrigAuthor = SW_MOD()->GetRedlineAuthor(SW_MOD()->GetRedlineAuthor());
+    // Let the actual author name pick up the value from the current
+    // view, which would normally happen only during the next view
+    // switch.
+    pView->SetRedlineAuthor(sAuthor);
+    m_pDocShell->SetView(pView);
+
+    if (sAuthor != sOrigAuthor)
+    {
+        // be lazy, just mark them dirty unlike when initializing
+        m_pDocShell->GetDoc()->getIDocumentFieldsAccess().GetUpdateFields().SetFieldsDirty(true);
+    }
+    SAL_WARN("setauthor", "ends");
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

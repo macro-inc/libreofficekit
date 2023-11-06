@@ -3823,37 +3823,6 @@ void SwXTextDocument::initializeForTiledRendering(const css::uno::Sequence<css::
     SwEditShell::GetAutoFormatFlags()->bAFormatByInpDelSpacesAtSttEnd = false;
 }
 
-void SwXTextDocument::setAuthor(OUString sAuthor)
-{
-    SolarMutexGuard aGuard;
-
-    SwView* pView = m_pDocShell->GetView();
-    if (!pView)
-        return;
-
-    OUString sOrigAuthor = SW_MOD()->GetRedlineAuthor(SW_MOD()->GetRedlineAuthor());
-    // Store the author name in the view.
-    pView->SetRedlineAuthor(sAuthor);
-    // Let the actual author name pick up the value from the current
-    // view, which would normally happen only during the next view
-    // switch.
-    pView->SetRedlineAuthor(sAuthor);
-    m_pDocShell->SetView(pView);
-
-    if (sAuthor != sOrigAuthor)
-    {
-        SwView* pFirstView = static_cast<SwView*>(SfxViewShell::GetFirst());
-        if (pFirstView && SfxViewShell::GetNext(*pFirstView) == nullptr)
-        {
-            if (SwEditShell* pShell = &pFirstView->GetWrtShell())
-            {
-                pShell->SwViewShell::UpdateFields(true);
-                pShell->ResetModified();
-            }
-        }
-    }
-}
-
 void SwXTextDocument::postKeyEvent(int nType, int nCharCode, int nKeyCode)
 {
     SolarMutexGuard aGuard;
