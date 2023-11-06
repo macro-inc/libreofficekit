@@ -171,26 +171,21 @@ namespace {
 
 bool IsSystemFileLockingUsed()
 {
-#if HAVE_FEATURE_MACOSX_SANDBOX
-    return true;
-#else
-    return officecfg::Office::Common::Misc::UseDocumentSystemFileLocking::get();
-#endif
+    // MACRO-1726: Disable lock files
+    return false;
 }
 
 
 bool IsOOoLockFileUsed()
 {
-#if HAVE_FEATURE_MACOSX_SANDBOX
+    // MACRO-1726: Disable lock files
     return false;
-#else
-    return officecfg::Office::Common::Misc::UseDocumentOOoLockFile::get();
-#endif
 }
 
 bool IsLockingUsed()
 {
-    return officecfg::Office::Common::Misc::UseLocking::get();
+    // MACRO-1726: Disable lock files
+    return false;
 }
 
 #endif
@@ -198,7 +193,8 @@ bool IsLockingUsed()
 #if HAVE_FEATURE_MULTIUSER_ENVIRONMENT
 bool IsWebDAVLockingUsed()
 {
-    return officecfg::Office::Common::Misc::UseWebDAVFileLocking::get();
+    // MACRO-1726: Disable lock files
+    return false;
 }
 #endif
 
