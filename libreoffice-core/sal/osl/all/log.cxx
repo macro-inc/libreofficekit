@@ -402,6 +402,8 @@ unsigned char sal_detail_log_report(sal_detail_LogLevel level, char const * area
     static constexpr std::string_view default_disabled_areas[]{
         "writerfilter",
         "legacy.osl",
+        "legacy.tools",
+        "sal.textenc",
     };
     if (envEnv == defaultEnv) {
         std::string_view svArea(area);
