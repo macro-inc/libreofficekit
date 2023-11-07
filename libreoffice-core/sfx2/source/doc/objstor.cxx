@@ -2720,28 +2720,30 @@ bool SfxObjectShell::CommonSaveAs_Impl(const INetURLObject& aURL, const OUString
         return false;
     }
 
-    if ( aURL != INetURLObject( u"private:stream" ) )
-    {
-        // Is there already a Document with this name?
-        SfxObjectShell* pDoc = nullptr;
-        for ( SfxObjectShell* pTmp = SfxObjectShell::GetFirst();
-                pTmp && !pDoc;
-                pTmp = SfxObjectShell::GetNext(*pTmp) )
-        {
-            if( ( pTmp != this ) && pTmp->GetMedium() )
-            {
-                INetURLObject aCompare( pTmp->GetMedium()->GetName() );
-                if ( aCompare == aURL )
-                    pDoc = pTmp;
-            }
-        }
-        if ( pDoc )
-        {
-            // Then error message: "already opened"
-            SetError(ERRCODE_SFX_ALREADYOPEN);
-            return false;
-        }
-    }
+    // WARNING: We handled things poorly, fix save overwriting even if open
+    // TODO: REVERT THIS!!!
+    // if ( aURL != INetURLObject( u"private:stream" ) )
+    // {
+    //     // Is there already a Document with this name?
+    //     SfxObjectShell* pDoc = nullptr;
+    //     for ( SfxObjectShell* pTmp = SfxObjectShell::GetFirst();
+    //             pTmp && !pDoc;
+    //             pTmp = SfxObjectShell::GetNext(*pTmp) )
+    //     {
+    //         if( ( pTmp != this ) && pTmp->GetMedium() )
+    //         {
+    //             INetURLObject aCompare( pTmp->GetMedium()->GetName() );
+    //             if ( aCompare == aURL )
+    //                 pDoc = pTmp;
+    //         }
+    //     }
+    //     if ( pDoc )
+    //     {
+    //         // Then error message: "already opened"
+    //         SetError(ERRCODE_SFX_ALREADYOPEN);
+    //         return false;
+    //     }
+    // }
 
     DBG_ASSERT( aURL.GetProtocol() != INetProtocol::NotValid, "Illegal URL!" );
     DBG_ASSERT( rItemSet.Count() != 0, "Incorrect Parameter");
