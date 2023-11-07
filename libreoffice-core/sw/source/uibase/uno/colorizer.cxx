@@ -726,7 +726,7 @@ void resetColors(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 {
 
-    SolarMutexGuard aGuard;
+    // TODO: Make thread safe? SolarMutexGuard locks out the cancel flag, so this isn't simple
 
     if (!doc)
         return;
