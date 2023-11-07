@@ -390,12 +390,27 @@ unsigned char sal_detail_log_report(sal_detail_LogLevel level, char const * area
         return SAL_DETAIL_LOG_ACTION_LOG;
     }
     assert(area != nullptr);
+    // MACRO: logging is really noisy by default, this changes it so that default
+    // disabled areas are skipped unless the env variable SAL_LOG is set
+    static constexpr const char* defaultEnv = "+WARN";
     static char const* const envEnv = [] {
         char const* pResult =  getLogLevelEnvVar();
         if (!pResult)
-            pResult = "+WARN";
+            pResult = defaultEnv;
         return pResult;
     }();
+    static constexpr std::string_view default_disabled_areas[]{
+        "writerfilter",
+        "legacy.osl",
+        "legacy.tools",
+        "sal.textenc",
+    };
+    if (envEnv == defaultEnv) {
+        std::string_view svArea(area);
+        for (auto& disabled_area : default_disabled_areas) {
+            if (svArea == disabled_area) return SAL_DETAIL_LOG_ACTION_IGNORE;
+        }
+    }
     char const* const env = (pLogSelector == nullptr ? envEnv : pLogSelector);
     std::size_t areaLen = std::strlen(area);
     enum Sense { POSITIVE = 0, NEGATIVE = 1 };

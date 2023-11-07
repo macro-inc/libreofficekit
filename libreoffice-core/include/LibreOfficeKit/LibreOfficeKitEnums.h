@@ -961,17 +961,6 @@ typedef enum
      */
     LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED = 64,
 
-    /** Document Events Section **/
-    LOK_DOC_CALLBACK_ON_NEW = 61 << 2,
-    LOK_DOC_CALLBACK_ON_LOAD= 62 << 2,
-    LOK_DOC_CALLBACK_ON_SAVE= 63 << 2,
-    LOK_DOC_CALLBACK_ON_SAVE_DONE= 64 << 2,
-    LOK_DOC_CALLBACK_ON_SAVE_AS= 65 << 2,
-    LOK_DOC_CALLBACK_ON_SAVE_AS_DONE= 66 << 2,
-    LOK_DOC_CALLBACK_ON_UNLOAD= 67 << 2,
-    LOK_DOC_CALLBACK_ON_TITLE_CHANGED= 68 << 2,
-    LOK_DOC_CALLBACK_ON_MODE_CHANGED= 69 << 2,
-
     /** End Document Events Section **/
     /**
      * Informs the LibreOfficeKit client that the color palettes have changed.
@@ -1216,34 +1205,20 @@ static inline const char* lokCallbackTypeToString(int nType)
         return "LOK_CALLBACK_A11Y_CARET_CHANGED";
     case LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED:
         return "LOK_CALLBACK_A11Y_TEXT_SELECTION_CHANGED";
-    case LOK_DOC_CALLBACK_ON_NEW:
-        return "LOK_DOC_CALLBACK_ON_NEW";
-    case LOK_DOC_CALLBACK_ON_LOAD:
-        return "LOK_DOC_CALLBACK_ON_LOAD";
-    case LOK_DOC_CALLBACK_ON_SAVE:
-        return "LOK_DOC_CALLBACK_ON_SAVE";
-    case LOK_DOC_CALLBACK_ON_SAVE_DONE:
-        return "LOK_DOC_CALLBACK_ON_SAVE_DONE";
-    case LOK_DOC_CALLBACK_ON_SAVE_AS:
-        return "LOK_DOC_CALLBACK_ON_SAVE_AS";
-    case LOK_DOC_CALLBACK_ON_SAVE_AS_DONE:
-        return "LOK_DOC_CALLBACK_ON_SAVE_AS_DONE";
-    case LOK_DOC_CALLBACK_ON_UNLOAD:
-        return "LOK_DOC_CALLBACK_ON_UNLOAD";
-    case LOK_DOC_CALLBACK_ON_TITLE_CHANGED:
-        return "LOK_DOC_CALLBACK_ON_TITLE_CHANGED";
-    case LOK_DOC_CALLBACK_ON_MODE_CHANGED:
-        return "LOK_DOC_CALLBACK_ON_MODE_CHANGED";
-    default:
-        return "LOK_CALLBACK_UNKNOWN";
     case LOK_CALLBACK_COLOR_PALETTES:
         return "LOK_CALLBACK_COLOR_PALETTES";
     case LOK_CALLBACK_DOCUMENT_PASSWORD_RESET:
         return "LOK_CALLBACK_DOCUMENT_PASSWORD_RESET";
+
+    //
+    // MACRO
+    //
     case LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED:
         return "LOK_CALLBACK_A11Y_FOCUSED_CELL_CHANGED";
     case LOK_CALLBACK_MACRO_COLORIZER:
         return "LOK_CALLBACK_MACRO_COLORIZER";
+    default:
+        return "LOK_CALLBACK_UNKNOWN";
     }
 
     return nullptr;
