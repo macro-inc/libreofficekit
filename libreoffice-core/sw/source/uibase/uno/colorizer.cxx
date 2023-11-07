@@ -74,16 +74,9 @@ void emitCallback(rtl::Reference<SwXTextDocument> doc, LibreOfficeKitCallbackTyp
         return;
     }
 
-    // MACRO-1384: prevent crash on load for some comment edgecases
-    SwView* pCurView = dynamic_cast<SwView*>(SfxViewShell::Current());
-    if (!pCurView)
-    {
-        return;
-    }
-
     SwDocShell* pDocSh = doc->GetDocShell();
     SwView* pView = pDocSh->GetView();
-    if (!pView || pView != pCurView)
+    if (!pView)
     {
         return;
     }
