@@ -173,6 +173,11 @@ void V8Writer::writeDeclarations() {
         }
     }
 
+    out(R"(namespace UnoV8Instance {
+    void Set(UnoV8* inst);
+    UnoV8& Get();
+}
+)");
     out("namespace unoclass {\n");
     out("bool MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err);\n");
 
@@ -206,12 +211,24 @@ uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::Value> v
 
 void V8Writer::writeSimpleTypeConverter() {
     out(R"(
+namespace UnoV8Instance {
+    namespace {
+        UnoV8* g_unov8ptr = nullptr;
+    }
+    void Set(UnoV8* inst) {
+        g_unov8ptr = inst;
+    }
+    UnoV8& Get() {
+        return *g_unov8ptr;
+    }
+}
+
 namespace unoclass {
 
 bool MaybeThrowErr(v8::Isolate* isolate, rtl_uString* err) {
 if (err == nullptr) return false;
 auto v8_err = v8::String::NewFromTwoByte(isolate, (uint16_t*)(err->buffer), v8::NewStringType::kNormal, err->length).ToLocalChecked();
-electron::office::OfficeClient::GetUnoV8().rtl.uString_release(err);
+UnoV8Instance::Get().rtl.uString_release(err);
 isolate->ThrowException(v8::Exception::Error(v8_err));
 return true;
 }
@@ -227,7 +244,7 @@ class Type : public gin::Wrappable<Type> {
 
         static gin::Handle<Type> Create(v8::Isolate* isolate, typelib_TypeDescriptionReference* type) {
             auto *t = new Type();
-            electron::office::OfficeClient::GetUnoV8().type.acquire(type);
+            UnoV8Instance::Get().type.acquire(type);
             t->type_ = type;
             return CreateHandle(isolate, t);
         }
@@ -235,7 +252,7 @@ class Type : public gin::Wrappable<Type> {
     protected:
         Type() : type_(nullptr) {}
         ~Type() {
-            electron::office::OfficeClient::GetUnoV8().type.release(type_);
+            UnoV8Instance::Get().type.release(type_);
         };
 
     private:
@@ -391,7 +408,7 @@ rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
         return nullptr;
     }
     v8::Local<v8::String> str = v8::Local<v8::String>::Cast(val);
-    rtl_uString* result = electron::office::OfficeClient::GetUnoV8().rtl.uString_alloc(str->Length());
+    rtl_uString* result = UnoV8Instance::Get().rtl.uString_alloc(str->Length());
     if (!result) {
         ThrowTypeError(isolate, "unable to allocate UNO UString string");
         return nullptr;
@@ -403,7 +420,7 @@ rtl_uString* String(v8::Isolate* isolate, v8::Local<v8::Value> val) {
 
 v8::Local<v8::Value> String(v8::Isolate* isolate, rtl_uString* val) {
     auto result = v8::String::NewFromTwoByte(isolate, (uint16_t*)(val->buffer), v8::NewStringType::kNormal, val->length).ToLocalChecked().As<v8::Value>();
-    electron::office::OfficeClient::GetUnoV8().rtl.uString_release(val);
+    UnoV8Instance::Get().rtl.uString_release(val);
     return result;
 }
 
@@ -510,7 +527,7 @@ constexpr uint32_t hash(const std::string_view key) noexcept {
 }
 
 void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
-    auto& api = electron::office::OfficeClient::GetUnoV8();
+    auto& api = UnoV8Instance::Get();
     void *c_value = nullptr;
     typelib_TypeDescriptionReference* c_type = nullptr;
     typelib_TypeClass typeClass = typelib_TypeClass_VOID;
@@ -566,7 +583,7 @@ void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
         out("*static_cast<void**>(c_value) = static_cast<unoclass::" + cName(i.first)
             + "*>(obj->GetAlignedPointerFromInternalField(gin::kEncodedValueIndex))->Get();\n");
         out("c_type = "
-            "electron::office::OfficeClient::GetUnoV8().type.interfaceTypeFromId(convert::hash(\""
+            "UnoV8Instance::Get().type.interfaceTypeFromId(convert::hash(\""
             + simplifyNamespace(i.first) + "\"));\n");
         out("} else ");
     }
@@ -582,7 +599,7 @@ void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
         ThrowTypeError(isolate, "unable to convert value to uno_Any, unexpected type");
         return;
     }
-    electron::office::OfficeClient::GetUnoV8().any.construct(dest, c_value, c_type);
+    UnoV8Instance::Get().any.construct(dest, c_value, c_type);
     switch (typeClass) {
         case typelib_TypeClass_BOOLEAN:
             delete static_cast<sal_Bool*>(c_value);
@@ -610,7 +627,7 @@ void Any(v8::Isolate* isolate, v8::Local<v8::Value> val, uno_Any* dest) {
 }
 
 v8::Local<v8::Value> AnyStructValue(v8::Isolate* isolate, void* val, rtl_uString* typeName) {
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     rtl_String* utf8Name = unov8_.rtl.uStringToUtf8(typeName);
     switch (hash(std::string_view(utf8Name->buffer, utf8Name->length))) {
 )");
@@ -665,7 +682,7 @@ v8::Local<v8::Value> AnyInterfaceValueWithSimplifiedType(v8::Isolate* isolate, v
 }
 
 v8::Local<v8::Value> AnyInterfaceValue(v8::Isolate* isolate, void* const* val, rtl_uString* typeName) {
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     rtl_String* utf8Name = unov8_.rtl.uStringToUtf8(typeName);
     return AnyInterfaceValue_(isolate, val, std::string_view(utf8Name->buffer, utf8Name->length));
 }
@@ -696,7 +713,7 @@ bool IsValueClassType(v8::Isolate* isolate, v8::Local<v8::Value> val, typelib_Ty
 }
 
 uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, typelib_TypeDescriptionReference* elTypeRef) {
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     if (!val->IsArray()) {
         convert::ThrowTypeError(isolate, "Attempted to convert a non-array into a UNO sequence");
         return nullptr;
@@ -735,7 +752,7 @@ uno_Sequence* Sequence(v8::Isolate* isolate, v8::Local<v8::Value> val, typelib_T
 }
 
 uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::Value> val) {
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     if (!val->IsObject()) {
         convert::ThrowTypeError(isolate, "Attempted to convert a non-array into a UNO sequence of property values");
         return nullptr;
@@ -793,7 +810,7 @@ uno_Sequence* PropertyValueSequence(v8::Isolate* isolate, v8::Local<v8::Value> v
 }
 
 v8::Local<v8::Value> Sequence(v8::Isolate* isolate, uno_Sequence* val, typelib_TypeDescriptionReference *typeRef) {
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     int len = val->nElements;
     v8::Local<v8::Array> result = v8::Array::New(isolate, len);
 
@@ -932,7 +949,7 @@ v8::Local<v8::Value> Any(v8::Isolate* isolate, uno_Any* val) {
 v8::Local<v8::Value> As(v8::Isolate* isolate, void* inst, std::string_view typeName) {
     if (!inst) return v8::Undefined(isolate);
 
-    auto& unov8_ = electron::office::OfficeClient::GetUnoV8();
+    auto& unov8_ = UnoV8Instance::Get();
     typelib_TypeDescriptionReference* type_ref = unov8_.type.interfaceType(typeName.data(), typeName.length());
     if (!type_ref) return v8::Undefined(isolate);
     void *new_inst = unov8_.interface.queryInterface(inst, type_ref);
@@ -1107,7 +1124,7 @@ void V8Writer::writePlainStruct(OUString const& name,
         OUString nucl(decomposeType(resolveTypedef(m.type), &rank, &args, &isEntity));
         if (rank > 0) {
             if (!has_unov8) {
-                out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
+                out("auto& unov8_ = UnoV8Instance::Get();\n");
                 has_unov8 = true;
             }
             out("{\n");
@@ -1209,7 +1226,7 @@ void V8Writer::writePlainStruct(OUString const& name,
         if (rank > 0) {
             // TODO: add proper support for rank > 1
             if (!has_unov8 && rank == 1) {
-                out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
+                out("auto& unov8_ = UnoV8Instance::Get();\n");
                 has_unov8 = true;
             }
             if (rank > 1) {
@@ -1431,7 +1448,7 @@ void V8Writer::writeInterfaceMethods(OUString const& name, OUString const& class
         }
         out(") {\n");
         out("rtl_uString* err;\n");
-        out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
+        out("auto& unov8_ = UnoV8Instance::Get();\n");
 
         if (i.returnType != "void") {
             writeType(i.returnType);
@@ -1479,7 +1496,7 @@ void V8Writer::writeInterface(OUString const& name,
     out("gin::Handle<" + cName(name) + "> " + cName(name)
         + "::Create(v8::Isolate* isolate, void *inst) {\n");
     out("if (!inst) return {};\n");
-    out("auto& unov8_ = electron::office::OfficeClient::GetUnoV8();\n");
+    out("auto& unov8_ = UnoV8Instance::Get();\n");
     out("auto *type_ref = unov8_.type.interfaceTypeFromId(convert::hash(\""
         + simplifyNamespace(name) + "\"));\n");
     out("void *new_inst = unov8_.interface.queryInterface(inst, type_ref);\n");
@@ -1519,7 +1536,7 @@ void V8Writer::writeInterface(OUString const& name,
 )");
 
     out(cName(name) + "::~" + cName(name)
-        + "() { electron::office::OfficeClient::GetUnoV8().interface.release(inst_); }\n");
+        + "() { UnoV8Instance::Get().interface.release(inst_); }\n");
 }
 
 void V8Writer::writeTypedef(OUString const& name, rtl::Reference<unoidl::TypedefEntity> entity) {
@@ -1732,7 +1749,7 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
             } else {
                 out("{\n");
                 out("typelib_TypeDescriptionReference* el_type_ref_ = "
-                    "*electron::office::OfficeClient::GetUnoV8().type.getByTypeClass(typelib_"
+                    "*UnoV8Instance::Get().type.getByTypeClass(typelib_"
                     "TypeClass_"
                     + translateSimpleTypeAsTypeClassPostfix(nucl) + ");\n");
                 out(a.name + " = convert::Sequence(isolate, v8_" + a.name + ", el_type_ref_);\n");
@@ -1779,6 +1796,5 @@ void V8Writer::writeMethodParamsConstructors(const unoidl::InterfaceTypeEntity::
     }
 }
 
-void V8Writer::writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::Method& method) {
-}
+void V8Writer::writeMethodParamsDestructors(const unoidl::InterfaceTypeEntity::Method& method) {}
 }

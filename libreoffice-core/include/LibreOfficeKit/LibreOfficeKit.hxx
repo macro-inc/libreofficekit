@@ -1195,9 +1195,9 @@ public:
         return mpThis->pClass->getXComponentContext(mpThis);
     }
 
-    ::UnoV8& getUnoV8()
+    ::UnoV8* getUnoV8()
     {
-        return mpThis->pClass->uno_v8;
+        return &mpThis->pClass->uno_v8;
     }
 
     char* extractRequest(const char* pFilePath)
