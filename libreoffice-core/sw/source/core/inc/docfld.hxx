@@ -175,14 +175,12 @@ public:
     void SetInUpdateFields( bool b )      { m_bInUpdateFields = b; }
 
     bool IsFieldsDirty() const          { return m_bFieldsDirty; }
-    void SetFieldsDirty( bool b )
+    void SetFieldsDirty( bool b, bool bStartIdle = true)
     {
         m_bFieldsDirty = b;
 
-        if (b)
-        {
+        if ( b && bStartIdle)
             m_rDoc.getIDocumentTimerAccess().StartIdling();
-        }
     }
 
     SwHashTable<SwCalcFieldType> const& GetFieldTypeTable() const { return m_FieldTypeTable; }

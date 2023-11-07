@@ -47,8 +47,8 @@ private:
 public:
 
     LanguageAndLocale()
-        : maLanguageTag(LANGUAGE_NONE)
-        , maLocaleLanguageTag(LANGUAGE_NONE)
+        : maLanguageTag("en-US")
+        , maLocaleLanguageTag("en-US")
     {}
 
     const LanguageTag& getLanguage() const
