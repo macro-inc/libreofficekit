@@ -16,6 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
+#include "IDocumentState.hxx"
 #include "comphelper/diagnose_ex.hxx"
 #include <DocumentTimerManager.hxx>
 
@@ -107,7 +108,6 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
 {
     SwRootFrame* pTmpRoot = m_rDoc.getIDocumentLayoutAccess().GetCurrentLayout();
 
-
     if( pTmpRoot &&
         !SfxProgress::GetActiveProgress( m_rDoc.GetDocShell() ) )
     {
@@ -119,7 +119,7 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
         auto aCurrentClock = std::chrono::steady_clock::now();
         bool bNeedsBackup = !m_aLastBackup.has_value() ||
             (aCurrentClock - m_aLastBackup.value()) > std::chrono::seconds(60);
-        if (bNeedsBackup) {
+        if (bNeedsBackup && !m_sBackupPath.isEmpty() && m_rDoc.getIDocumentState().IsModified()) {
             return IdleJob::AutoBackup;
         }
 
@@ -143,14 +143,13 @@ DocumentTimerManager::IdleJob DocumentTimerManager::GetNextIdleJob() const
             }
         }
 
-        SwFieldUpdateFlags nFieldUpdFlag = m_rDoc.GetDocumentSettingManager().getFieldUpdateFlags(true);
-        if( ( AUTOUPD_FIELD_ONLY == nFieldUpdFlag
-                    || AUTOUPD_FIELD_AND_CHARTS == nFieldUpdFlag )
-                && m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsFieldsDirty() )
+        if(m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsFieldsDirty() )
         {
             if( m_rDoc.getIDocumentFieldsAccess().GetUpdateFields().IsInUpdateFields()
                     || m_rDoc.getIDocumentFieldsAccess().IsExpFieldsLocked() )
+            {
                 return IdleJob::Busy;
+            }
             return IdleJob::Fields;
         }
     }
@@ -222,7 +221,7 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
     }
     case IdleJob::AutoBackup:
     {
-        if (m_sBackupPath.isEmpty()) return;
+        if (m_sBackupPath.isEmpty()) break;
 
         SwDocShell* pDocShell = m_rDoc.GetDocShell();
         auto aCurrentTime = std::chrono::steady_clock::now();
@@ -230,7 +229,7 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
 
         if (!pDocShell)
         {
-            return;
+            break;
         }
 
         try
@@ -251,7 +250,6 @@ IMPL_LINK_NOARG( DocumentTimerManager, DoIdleJobs, Timer*, void )
         }
     }
     break;
-
     case IdleJob::Busy:
         break;
     case IdleJob::None:

@@ -16,6 +16,7 @@
  *   except in compliance with the License. You may obtain a copy of
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
 */
+#include "docfld.hxx"
 #include <DocumentRedlineManager.hxx>
 #include <frmfmt.hxx>
 #include <rootfrm.hxx>
@@ -123,7 +124,7 @@ using namespace com::sun::star;
 
 namespace sw {
 
-static void UpdateFieldsForRedline(IDocumentFieldsAccess & rIDFA)
+static void UpdateFieldsForRedline(IDocumentFieldsAccess & rIDFA, bool bUpdateRefFields=true)
 {
     auto const pAuthType(static_cast<SwAuthorityFieldType*>(rIDFA.GetFieldType(
         SwFieldIds::TableOfAuthorities, OUString(), false)));
@@ -134,7 +135,8 @@ static void UpdateFieldsForRedline(IDocumentFieldsAccess & rIDFA)
     rIDFA.GetFieldType(SwFieldIds::RefPageGet, OUString(), false)->UpdateFields();
     rIDFA.GetSysFieldType(SwFieldIds::Chapter)->UpdateFields();
     rIDFA.UpdateExpFields(nullptr, false);
-    rIDFA.UpdateRefFields();
+    if (bUpdateRefFields)
+        rIDFA.UpdateRefFields();
 }
 
 void UpdateFramesForAddDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
@@ -242,7 +244,8 @@ void UpdateFramesForAddDeleteRedline(SwDoc & rDoc, SwPaM const& rPam)
         while (pNode && pNode->GetIndex() <= rPam.End()->GetNodeIndex());
     }
     // fields last - SwGetRefField::UpdateField requires up-to-date frames
-    UpdateFieldsForRedline(rDoc.getIDocumentFieldsAccess()); // after footnotes
+    UpdateFieldsForRedline(rDoc.getIDocumentFieldsAccess(), false); // after footnotes
+    rDoc.getIDocumentFieldsAccess().GetUpdateFields().SetFieldsDirty(true, false);
 
     // update SwPostItMgr / notes in the margin
     rDoc.GetDocShell()->Broadcast(
