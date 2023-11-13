@@ -524,6 +524,131 @@
         <value oor:external="com.sun.star.configuration.backend.DesktopBackend SourceViewFontHeight"/>
       </prop>
     </node>
+    <node oor:name="Substitution">
+      <prop oor:name="Replacement" oor:type="xs:boolean">
+        <value>true</value>
+      </prop>
+      <!--
+        See vcl/source/outdev/font.cxx AddCustomMacroFonts()
+        We want to replace funky rendering fonts (Calibri, Cambria) with better
+        metric-compatible ones. We are going to give them _MACRO affices behind
+        the scenes so they don't collide with any fonts on the system
+      -->
+      <node oor:name="FontPairs">
+        <node oor:name="CalibriToCarlito" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Calibri</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Carlito_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CalibriToCarlitoBold" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Calibri-Bold</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Carlito-Bold_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CalibriToCarlitoItalic" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Calibri-Italic</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Carlito-Italic_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CalibriToCarlitoBoldItalic" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Calibri-BoldItalic</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Carlito-BoldItalic_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CambriaToCaladea" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Cambria</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Caladea_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CambriaToCaladeaBold" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Cambria-Bold</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Caladea-Bold_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CambriaToCaladeaItalic" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Cambria-Italic</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Caladea-Italic_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+        <node oor:name="CambriaToCaladeaBoldItalic" oor:op="fuse">
+          <prop oor:name="ReplaceFont" oor:type="xs:string">
+            <value>Cambria-BoldItalic</value>
+          </prop>
+          <prop oor:name="SubstituteFont" oor:type="xs:string">
+            <value>Caladea-BoldItalic_MACRO</value>
+          </prop>
+          <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+          <prop oor:name="Always" oor:type="xs:boolean">
+            <value>true</value>
+          </prop>
+        </node>
+      </node>
+    </node>
   </node>
   <node oor:name="PackageKit">
       <prop oor:name="EnableFontInstallation" oor:type="xs:boolean">

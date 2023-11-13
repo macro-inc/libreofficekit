@@ -1156,6 +1156,7 @@ public:
                                                    const OUString& rReplaceFontName,
                                                    AddFontSubstituteFlags nFlags );
     static void                 RemoveFontsSubstitute();
+    static void                 AddCustomMacroFonts();
 
     static vcl::Font            GetDefaultFont( DefaultFontType nType,
                                                 LanguageType eLang,
@@ -1164,6 +1165,7 @@ public:
 
     SAL_DLLPRIVATE void         ImplInitFontList() const;
     SAL_DLLPRIVATE void         ImplUpdateFontData();
+    SAL_DLLPRIVATE void         ImplAddCustomMacroFonts();
 
     //drop font data for all outputdevices.
     //If bNewFontLists is true then empty lists of system fonts

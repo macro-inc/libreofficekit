@@ -384,6 +384,44 @@ void OutputDevice::BeginFontSubstitution()
     pSVData->maGDIData.mbFontSubChanged = false;
 }
 
+void OutputDevice::AddCustomMacroFonts()
+{
+    OutputDevice* pDevice = Application::GetDefaultDevice();
+    pDevice->ImplAddCustomMacroFonts();
+}
+
+void OutputDevice::ImplAddCustomMacroFonts()
+{
+    std::list<std::string> fontNames = {
+        "Carlito",
+        "Carlito-Bold",
+        "Carlito-Italic",
+        "Carlito-BoldItalic",
+        "Caladea",
+        "Caladea-Bold",
+        "Caladea-Italic",
+        "Caladea-BoldItalic"
+    };
+
+    std::string basePath = "file://Users/alex/Desktop/";
+    std::string extension = ".ttf";
+    std::string affix = "_MACRO";
+
+    bool allLoaded = true;
+    for (std::string name : fontNames) {
+        OUString filePath = OUString::createFromAscii(
+            (basePath + name + extension).data()
+        );
+        OUString customName = OUString::createFromAscii(
+            (name + affix).data()
+        );
+        OutputDevice::AddTempDevFont(
+            filePath,
+            customName
+        );
+    }
+}
+
 void OutputDevice::EndFontSubstitution()
 {
     ImplSVData* pSVData = ImplGetSVData();
