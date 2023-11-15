@@ -49,6 +49,9 @@
 #include <salgdi.hxx>
 #include <svdata.hxx>
 
+#include <unx/helper.hxx>
+#include <config_folders.h>
+
 #include <unicode/uchar.h>
 
 #include <strings.hrc>
@@ -403,19 +406,31 @@ void OutputDevice::ImplAddCustomMacroFonts()
         "Caladea-BoldItalic"
     };
 
-    // get proper build link here
-    std::string basePath = "file://tk";
+    OUString installationRootPath(
+        getOfficePath(psp::whichOfficePath::InstallationRootPath)
+    );
     std::string extension = ".ttf";
+
+    // This affix needs to match the defined substitute font name in the
+    // Common.xcu FontList to avoid colliding with system-installed variants
+    // which are not always trustworthy.
     std::string affix = "_MACRO";
 
-    bool allLoaded = true;
+    OUStringBuffer basePathBuffer(256);
+    basePathBuffer.appendAscii("file://");
+    basePathBuffer.append(installationRootPath);
+    basePathBuffer.appendAscii("/");
+    basePathBuffer.append(LIBO_SHARE_RESOURCE_FOLDER);
+    basePathBuffer.append("/macro_fonts/");
+    OUString basePath = basePathBuffer.makeStringAndClear();
+
     for (std::string name : fontNames) {
-        OUString filePath = OUString::createFromAscii(
-            (basePath + name + extension).data()
-        );
-        OUString customName = OUString::createFromAscii(
-            (name + affix).data()
-        );
+        OUStringBuffer fontPathBuffer(256);
+        fontPathBuffer.append(basePath);
+        fontPathBuffer.appendAscii(name.data());
+        fontPathBuffer.appendAscii(extension.data());
+        OUString filePath = fontPathBuffer.makeStringAndClear();
+        OUString customName = OUString::createFromAscii((name + affix).data());
         OutputDevice::AddTempDevFont(
             filePath,
             customName
