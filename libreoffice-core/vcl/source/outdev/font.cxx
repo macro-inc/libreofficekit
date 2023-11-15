@@ -403,7 +403,8 @@ void OutputDevice::ImplAddCustomMacroFonts()
         "Caladea-BoldItalic"
     };
 
-    std::string basePath = "file://Users/alex/Desktop/";
+    // get proper build link here
+    std::string basePath = "file://tk";
     std::string extension = ".ttf";
     std::string affix = "_MACRO";
 
