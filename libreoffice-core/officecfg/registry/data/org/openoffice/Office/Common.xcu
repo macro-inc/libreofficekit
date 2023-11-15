@@ -530,9 +530,6 @@
       </prop>
       <!--
         See vcl/source/outdev/font.cxx AddCustomMacroFonts()
-        We want to replace funky rendering fonts (Calibri, Cambria) with better
-        metric-compatible ones. We are going to give them _MACRO affices behind
-        the scenes so they don't collide with any fonts on the system
       -->
       <node oor:name="FontPairs">
         <node oor:name="CalibriToCarlito" oor:op="fuse">
@@ -540,7 +537,7 @@
             <value>Calibri</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Carlito_MACRO</value>
+            <value>Carlito</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -554,7 +551,7 @@
             <value>Calibri-Bold</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Carlito-Bold_MACRO</value>
+            <value>Carlito-Bold</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -568,7 +565,7 @@
             <value>Calibri-Italic</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Carlito-Italic_MACRO</value>
+            <value>Carlito-Italic</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -582,7 +579,7 @@
             <value>Calibri-BoldItalic</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Carlito-BoldItalic_MACRO</value>
+            <value>Carlito-BoldItalic</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -596,7 +593,7 @@
             <value>Cambria</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Caladea_MACRO</value>
+            <value>Caladea</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -610,7 +607,7 @@
             <value>Cambria-Bold</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Caladea-Bold_MACRO</value>
+            <value>Caladea-Bold</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -624,7 +621,7 @@
             <value>Cambria-Italic</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Caladea-Italic_MACRO</value>
+            <value>Caladea-Italic</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>
@@ -638,7 +635,7 @@
             <value>Cambria-BoldItalic</value>
           </prop>
           <prop oor:name="SubstituteFont" oor:type="xs:string">
-            <value>Caladea-BoldItalic_MACRO</value>
+            <value>Caladea-BoldItalic</value>
           </prop>
           <prop oor:name="OnScreenOnly" oor:type="xs:boolean">
             <value>true</value>

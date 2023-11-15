@@ -411,11 +411,6 @@ void OutputDevice::ImplAddCustomMacroFonts()
     );
     std::string extension = ".ttf";
 
-    // This affix needs to match the defined substitute font name in the
-    // Common.xcu FontList to avoid colliding with system-installed variants
-    // which are not always trustworthy.
-    std::string affix = "_MACRO";
-
     OUStringBuffer basePathBuffer(256);
     basePathBuffer.appendAscii("file://");
     basePathBuffer.append(installationRootPath);
@@ -430,11 +425,8 @@ void OutputDevice::ImplAddCustomMacroFonts()
         fontPathBuffer.appendAscii(name.data());
         fontPathBuffer.appendAscii(extension.data());
         OUString filePath = fontPathBuffer.makeStringAndClear();
-        OUString customName = OUString::createFromAscii((name + affix).data());
-        OutputDevice::AddTempDevFont(
-            filePath,
-            customName
-        );
+        OUString fontName = OUString::createFromAscii(name);
+        OutputDevice::AddTempDevFont(filePath, fontName);
     }
 }
 
