@@ -1156,6 +1156,8 @@ public:
                                                    const OUString& rReplaceFontName,
                                                    AddFontSubstituteFlags nFlags );
     static void                 RemoveFontsSubstitute();
+
+    // MACRO-1518: Fix Calibri and Cambria display
     static void                 AddCustomMacroFonts();
 
     static vcl::Font            GetDefaultFont( DefaultFontType nType,

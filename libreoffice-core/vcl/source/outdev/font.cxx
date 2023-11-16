@@ -51,6 +51,7 @@
 
 #include <unx/helper.hxx>
 #include <config_folders.h>
+#include "rtl/bootstrap.hxx"
 
 #include <unicode/uchar.h>
 
@@ -387,6 +388,7 @@ void OutputDevice::BeginFontSubstitution()
     pSVData->maGDIData.mbFontSubChanged = false;
 }
 
+// MACRO-1518: Fix Calibri and Cambria display {
 void OutputDevice::AddCustomMacroFonts()
 {
     OutputDevice* pDevice = Application::GetDefaultDevice();
@@ -395,40 +397,34 @@ void OutputDevice::AddCustomMacroFonts()
 
 void OutputDevice::ImplAddCustomMacroFonts()
 {
-    std::list<std::string> fontNames = {
-        "Carlito",
-        "Carlito-Bold",
-        "Carlito-Italic",
-        "Carlito-BoldItalic",
-        "Caladea",
-        "Caladea-Bold",
-        "Caladea-Italic",
-        "Caladea-BoldItalic"
+    static constexpr OUStringLiteral carlito = u"Carlito";
+    static constexpr OUStringLiteral carlitoBold = u"Carlito-Bold";
+    static constexpr OUStringLiteral carlitoItalic = u"Carlito-Italic";
+    static constexpr OUStringLiteral carlitoBoldItalic = u"Carlito-BoldItalic";
+    static constexpr OUStringLiteral caladea = u"Caladea";
+    static constexpr OUStringLiteral caladeaBold = u"Caladea-Bold";
+    static constexpr OUStringLiteral caladeaItalic = u"Caladea-Italic";
+    static constexpr OUStringLiteral caladeaBoldItalic = u"Caladea-BoldItalic";
+
+    std::list<OUString> fontNames = {
+        carlito,
+        carlitoBold,
+        carlitoItalic,
+        carlitoBoldItalic,
+        caladea,
+        caladeaBold,
+        caladeaItalic,
+        caladeaBoldItalic
     };
 
-    OUString installationRootPath(
-        getOfficePath(psp::whichOfficePath::InstallationRootPath)
-    );
-    std::string extension = ".ttf";
+    OUString basePath("$BRAND_BASE_DIR/" LIBO_SHARE_RESOURCE_FOLDER "/macro_fonts/");
+    rtl::Bootstrap::expandMacros(basePath);
 
-    OUStringBuffer basePathBuffer(256);
-    basePathBuffer.appendAscii("file://");
-    basePathBuffer.append(installationRootPath);
-    basePathBuffer.appendAscii("/");
-    basePathBuffer.append(LIBO_SHARE_RESOURCE_FOLDER);
-    basePathBuffer.append("/macro_fonts/");
-    OUString basePath = basePathBuffer.makeStringAndClear();
-
-    for (std::string name : fontNames) {
-        OUStringBuffer fontPathBuffer(256);
-        fontPathBuffer.append(basePath);
-        fontPathBuffer.appendAscii(name.data());
-        fontPathBuffer.appendAscii(extension.data());
-        OUString filePath = fontPathBuffer.makeStringAndClear();
-        OUString fontName = OUString::createFromAscii(name);
-        OutputDevice::AddTempDevFont(filePath, fontName);
+    for (auto& name : fontNames) {
+        OutputDevice::AddTempDevFont(basePath + name + u".ttf", name);
     }
 }
+// } MACRO-1518: Fix Calibri and Cambria display
 
 void OutputDevice::EndFontSubstitution()
 {

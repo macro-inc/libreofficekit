@@ -524,6 +524,7 @@
         <value oor:external="com.sun.star.configuration.backend.DesktopBackend SourceViewFontHeight"/>
       </prop>
     </node>
+    <!-- MACRO-1518: Fix Calibri and Cambria display { -->
     <node oor:name="Substitution">
       <prop oor:name="Replacement" oor:type="xs:boolean">
         <value>true</value>
@@ -646,6 +647,7 @@
         </node>
       </node>
     </node>
+    <!-- } MACRO-1518: Fix Calibri and Cambria display -->
   </node>
   <node oor:name="PackageKit">
       <prop oor:name="EnableFontInstallation" oor:type="xs:boolean">
