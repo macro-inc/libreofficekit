@@ -845,18 +845,12 @@ jtransform_request_workspace (j_decompress_ptr srcinfo,
     info->num_components = srcinfo->num_components;
 
   /* Compute output image dimensions and related values. */
-
-// libjpeg and turbo-jpeg are being annoying on Mac
-// this might well be my (awallace) mixup on brew/port/$PATH
-// but it works fine on older versions or whatever so...
-// ...lets just ignore >= 84 versions?
-//
-// #if JPEG_LIB_VERSION >= 84
-//   jpeg_core_output_dimensions(srcinfo);
-// #else
+#if JPEG_LIB_VERSION >= 84
+  jpeg_core_output_dimensions(srcinfo);
+#else
   srcinfo->output_width = srcinfo->image_width;
   srcinfo->output_height = srcinfo->image_height;
-//#endif
+#endif
 
   /* Return right away if -perfect is given and transformation is not perfect.
    */
