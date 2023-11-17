@@ -27,5 +27,5 @@ jobs:
           git checkout
           echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
           if git ls-remote --tags --exit-code -q https://github.com/${{ github.repository }} "refs/tags/$(cat VERSION)"; then
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
+          #            echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
