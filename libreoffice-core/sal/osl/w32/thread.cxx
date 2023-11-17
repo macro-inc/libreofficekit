@@ -46,6 +46,8 @@ typedef struct
     sal_Int32           m_nTerminationRequested;
     oslWorkerFunction   m_WorkerFunction;
     void*               m_pData;
+    // MACRO: track origin threads
+    DWORD               m_OriginThreadId;     /* identifier for parent thread */
 
 } osl_TThreadImpl;
 
@@ -53,9 +55,17 @@ typedef struct
 
 static oslThread oslCreateThread(oslWorkerFunction pWorker, void* pThreadData, sal_uInt32 nFlags);
 
+// MACRO: track origin threads {
+namespace {
+static thread_local oslThreadIdentifier tl_OriginThread = 0;
+}
+// MACRO: track origin threads }
+
 static DWORD WINAPI oslWorkerWrapperFunction(_In_ LPVOID pData)
 {
     osl_TThreadImpl* pThreadImpl= static_cast<osl_TThreadImpl*>(pData);
+    // MACRO: track origin threads
+    tl_OriginThread = pThreadImpl->m_OriginThreadId;
 
     /* Initialize COM - Multi Threaded Apartment (MTA) for all threads */
     sal::systools::CoInitializeGuard aGuard(COINIT_MULTITHREADED, false,
@@ -87,6 +97,12 @@ static oslThread oslCreateThread(oslWorkerFunction pWorker,
     pThreadImpl->m_WorkerFunction= pWorker;
     pThreadImpl->m_pData= pThreadData;
     pThreadImpl->m_nTerminationRequested= 0;
+    // MACRO: track origin threads {
+    if (!tl_OriginThread) {
+        tl_OriginThread = static_cast<oslThreadIdentifier>(GetCurrentThreadId());
+    }
+    // MACRO: track origin threads }
+    pThreadImpl->m_OriginThreadId= tl_OriginThread;
 
     pThreadImpl->m_hThread= CreateThread(
                                nullptr,                     /* no security */
@@ -537,5 +553,12 @@ rtl_TextEncoding SAL_CALL osl_setThreadTextEncoding( rtl_TextEncoding Encoding )
     getThreadTextEncodingImpl() = Encoding;
     return oldEncoding;
 }
+
+// MACRO: track origin threads {
+oslThreadIdentifier osl_getOriginIdentifier()
+{
+    return tl_OriginThread ? tl_OriginThread : static_cast<oslThreadIdentifier>(GetCurrentThreadId());
+}
+// MACRO: track origin threads }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

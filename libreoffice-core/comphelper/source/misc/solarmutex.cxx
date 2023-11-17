@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <comphelper/originthread.hxx>
 #include <sal/config.h>
 
 #include <comphelper/solarmutex.hxx>
@@ -24,16 +25,19 @@
 
 #include <assert.h>
 #include <cstdlib>
+#include <sal/log.hxx>
 
 namespace comphelper {
 
 namespace {
-    SolarMutex* g_pSolarMutex = nullptr;
+    comphelper::originthread::Key g_pSolarMutex_key("g_pSolarMutex");
+    static thread_local comphelper::originthread::OriginPtr<SolarMutex> g_pSolarMutex(g_pSolarMutex_key);
 }
 
 SolarMutex *SolarMutex::get()
 {
-    return g_pSolarMutex;
+    SAL_WARN("start", "origin: " << comphelper::originthread::originHint()  << " self: " << osl_getThreadIdentifier(NULL));
+    return g_pSolarMutex.get();
 }
 
 SolarMutex::SolarMutex()
@@ -41,12 +45,12 @@ SolarMutex::SolarMutex()
     , m_aBeforeReleaseHandler( nullptr )
 {
     assert(!g_pSolarMutex);
-    g_pSolarMutex = this;
+    g_pSolarMutex.reset(this);
 }
 
 SolarMutex::~SolarMutex()
 {
-    g_pSolarMutex = nullptr;
+    g_pSolarMutex.reset();
 }
 
 void SolarMutex::doAcquire( const sal_uInt32 nLockCount )

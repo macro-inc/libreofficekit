@@ -7,6 +7,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+#include "comphelper/originthread.hxx" // MACRO: multiple thread instance
 #include "comphelper/seqstream.hxx"
 #include "lib/unov8.hxx"
 #include <sal/backtrace.hxx>
@@ -245,8 +246,12 @@ using namespace bridge;
 using namespace uno;
 using namespace lang;
 
-static LibLibreOffice_Impl *gImpl = nullptr;
-static bool lok_preinit_2_called = false;
+// MACRO: multiple thread instance {
+comphelper::originthread::Key gImpl_key("gImpl");
+static thread_local comphelper::originthread::OriginPtr<LibLibreOffice_Impl> gImpl(gImpl_key);
+static thread_local bool lok_preinit_2_called = false;
+// MACRO: multiple thread instance }
+
 static std::weak_ptr< LibreOfficeKitClass > gOfficeClass;
 static std::weak_ptr< LibreOfficeKitDocumentClass > gDocumentClass;
 
@@ -890,128 +895,6 @@ void ExecuteMarginULChange(
                                                           SfxCallMode::RECORD, { pPageULMarginItem });
 }
 
-
-void setPageColor(LibreOfficeKitDocument* pThis, const OUString rColorHex)
-{
-    int pNumParts = pThis->pClass->getParts(pThis);
-    int pOriginalPart = pThis->pClass->getPart(pThis);
-    for (int i = 0; i < pNumParts; i++)
-    {
-        pThis->pClass->setPart(pThis, i);
-        SfxViewShell* pViewShell = SfxViewShell::Current();
-        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
-        if (!pViewFrm)
-        {
-            return;
-        }
-
-        // must be at least 6 (FF00FF) or 7 (#FF00FF)
-        if (rColorHex.getLength() < 6 || rColorHex.getLength() > 7) {
-            SetLastExceptionMsg("invalid hex string");
-            return;
-        }
-
-        Color pColor = Color::STRtoRGB(rColorHex);
-
-        // Set the page color
-        XFillColorItem aFillColorItem(OUString(), pColor);
-
-        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aFillColorItem});
-    }
-
-    pThis->pClass->setPart(pThis, pOriginalPart);
-}
-
-
-void setPageSize(
-    LibreOfficeKitDocument* pThis,
-    const tools::Long Width,
-    const tools::Long Height
-)
-{
-    int pNumParts = pThis->pClass->getParts(pThis);
-    int pOriginalPart = pThis->pClass->getPart(pThis);
-    for (int i = 0; i < pNumParts; i++)
-    {
-        pThis->pClass->setPart(pThis, i);
-        SfxViewShell* pViewShell = SfxViewShell::Current();
-        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
-
-        if (!pViewFrm)
-            return;
-
-        SfxDispatcher* pDispatcher = pViewShell->GetDispatcher();
-        const SvxSizeItem* pSizeItem = new SvxSizeItem( SID_ATTR_PAGE_SIZE, Size(Width, Height));
-
-        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
-
-        if (Width >= Height)
-        {
-            pPageItem->SetLandscape(true);
-        }
-        else
-        {
-            pPageItem->SetLandscape(false);
-        }
-
-        pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem, pPageItem.get()});
-    }
-    pThis->pClass->setPart(pThis, pOriginalPart);
-}
-
-
-void setPageMargins(
-    LibreOfficeKitDocument* pThis,
-    const tools::Long PageLeft,
-    const tools::Long PageRight,
-    const tools::Long PageTop,
-    const tools::Long PageBottom
-)
-{
-    int pNumParts = pThis->pClass->getParts(pThis);
-    int pOriginalPart = pThis->pClass->getPart(pThis);
-    for (int i = 0; i < pNumParts; i++)
-    {
-        pThis->pClass->setPart(pThis, i);
-        SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-        if (!pViewFrm)
-            return;
-
-        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
-
-        const SvxSizeItem* pSizeItem;
-        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
-        std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
-
-        const SvxLongLRSpaceItem* pLRSpaceItem;
-        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
-        std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
-
-        const SvxLongULSpaceItem* pULSpaceItem;
-        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
-        std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
-
-        ExecuteMarginLRChange(PageLeft, PageRight, pPageLRMarginItem.get());
-        ExecuteMarginULChange(PageTop, PageBottom, pPageULMarginItem.get());
-    }
-
-    pThis->pClass->setPart(pThis, pOriginalPart);
-}
-
-void toggleOrientation(
-    LibreOfficeKitDocument* pThis
-)
-{
-    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
-    if (!pViewFrm)
-        return;
-    const SvxSizeItem* pSizeItem;
-    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
-    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
-
-    setPageSize(pThis, pSizeItem->GetSize().Height(), pSizeItem->GetSize().Width());
-}
-
 void setupSidebar(std::u16string_view sidebarDeckId = u"")
 {
     SfxViewShell* pViewShell = SfxViewShell::Current();
@@ -1419,10 +1302,13 @@ static int getDocumentType (LibreOfficeKitDocument* pThis)
 
 } // anonymous namespace
 
-LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xComponent, int nDocumentId)
+// MACRO: multiple thread instance {
+LibLODocument_Impl::LibLODocument_Impl(uno::Reference <css::lang::XComponent> xComponent, int nDocumentId, oslThreadIdentifier originThreadId)
     : mxComponent(std::move(xComponent))
     , mnDocumentId(nDocumentId)
+    , mOriginThreadId(originThreadId)
 {
+// MACRO: multiple thread instance }
     assert(nDocumentId != -1 && "Cannot set mnDocumentId to -1");
 
     m_pDocumentClass = gDocumentClass.lock();
@@ -2667,11 +2553,33 @@ void setFormatSpecificFilterData(std::u16string_view sFormat, comphelper::Sequen
 
 } // anonymous namespace
 
-// Wonder global state ...
-static uno::Reference<css::uno::XComponentContext> xContext;
-static uno::Reference<css::lang::XMultiServiceFactory> xSFactory;
-static uno::Reference<css::lang::XMultiComponentFactory> xFactory;
-static int nDocumentIdCounter = 0;
+// MACRO: multiple thread instance {
+namespace {
+using comphelper::originthread::OriginReference;
+using comphelper::originthread::originHint;
+using comphelper::originthread::Key;
+Key xContext_key("xContext");
+static thread_local OriginReference<css::uno::XComponentContext> ot_xContext(xContext_key);
+Key xSFactory_key("xSFactory");
+static thread_local OriginReference<css::lang::XMultiServiceFactory> ot_xSFactory(xSFactory_key);
+Key xFactory_key("xFactory");
+static thread_local OriginReference<css::lang::XMultiComponentFactory> ot_xFactory(xFactory_key);
+std::atomic<int> nDocumentIdCounter = 0;
+
+static void setOrigin(LibreOfficeKit* pThis)
+{
+    LibLibreOffice_Impl* pLib = static_cast<LibLibreOffice_Impl*>(pThis);
+    originHint(pLib->maThreadId);
+}
+
+static void setOriginDoc(LibreOfficeKitDocument* pThis)
+{
+    LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
+    originHint(pDocument->mOriginThreadId);
+}
+
+}
+// MACRO: multiple thread instance }
 
 static LibreOfficeKitDocument* lo_documentLoad(LibreOfficeKit* pThis, const char* pURL)
 {
@@ -2680,6 +2588,7 @@ static LibreOfficeKitDocument* lo_documentLoad(LibreOfficeKit* pThis, const char
 
 static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis, const char* pURL, const char* pOptions)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_documentLoadWithOptions");
 
     SolarMutexGuard aGuard;
@@ -2697,14 +2606,16 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
 
     pLib->maLastExceptionMsg.clear();
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
     {
         pLib->maLastExceptionMsg = "ComponentContext is not available";
         SAL_INFO("lok", "ComponentContext is not available");
         return nullptr;
     }
 
-    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(ot_xContext);
 
     if (!xComponentLoader.is())
     {
@@ -2723,7 +2634,8 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
 
         if (!aLanguage.isEmpty() && isValidLangTag)
         {
-            static bool isLoading = true;
+            // MACRO: multiple thread instance
+            static thread_local bool isLoading = true;
             if (isLoading)
             {
                 // Capture the language used to load the document.
@@ -2837,11 +2749,12 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
         if (!xComponent.is())
         {
             pLib->maLastExceptionMsg = "loadComponentFromURL returned an empty reference";
-            SAL_INFO("lok", "Document can't be loaded - " << pLib->maLastExceptionMsg);
+            SAL_WARN("lok", "Document can't be loaded - " << pLib->maLastExceptionMsg);
             return nullptr;
         }
 
-        LibLODocument_Impl* pDocument = new LibLODocument_Impl(xComponent, nThisDocumentId);
+        // MACRO: multiple thread instance
+        LibLODocument_Impl* pDocument = new LibLODocument_Impl(xComponent, nThisDocumentId, pLib->maThreadId);
 
         // After loading the document, its initial view is the "current" view.
         if (pLib->mpCallback)
@@ -2960,6 +2873,7 @@ static LibreOfficeKitDocument* lo_documentLoadWithOptions(LibreOfficeKit* pThis,
 
 static int lo_runMacro(LibreOfficeKit* pThis, const char *pURL)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_runMacro");
 
     SolarMutexGuard aGuard;
@@ -2984,7 +2898,8 @@ static int lo_runMacro(LibreOfficeKit* pThis, const char *pURL)
 
     pLib->maLastExceptionMsg.clear();
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
     {
         pLib->maLastExceptionMsg = "ComponentContext is not available";
         SAL_INFO("lok", "ComponentContext is not available");
@@ -2994,12 +2909,14 @@ static int lo_runMacro(LibreOfficeKit* pThis, const char *pURL)
     util::URL aURL;
     aURL.Complete = sURL;
 
-    uno::Reference < util::XURLTransformer > xParser( util::URLTransformer::create( xContext ) );
+    // MACRO: multiple thread instance
+    uno::Reference < util::XURLTransformer > xParser( util::URLTransformer::create( ot_xContext ) );
 
     if( xParser.is() )
         xParser->parseStrict( aURL );
 
-    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(ot_xContext);
 
     if (!xComponentLoader.is())
     {
@@ -3008,13 +2925,15 @@ static int lo_runMacro(LibreOfficeKit* pThis, const char *pURL)
         return false;
     }
 
-    xFactory = xContext->getServiceManager();
+    // MACRO: multiple thread instance (this was overwriting a global repeatedly) {
+    uno::Reference<css::lang::XMultiComponentFactory> xFactory = ot_xContext->getServiceManager();
 
-    if (!xFactory)
+    if (!xFactory.is())
         return false;
 
     uno::Reference<frame::XDispatchProvider> xDP;
-    xSFactory.set(xFactory, uno::UNO_QUERY_THROW);
+    uno::Reference<css::lang::XMultiServiceFactory> xSFactory(xFactory, uno::UNO_QUERY_THROW);
+    // MACRO: multiple thread instance }
     xDP.set( xSFactory->createInstance("com.sun.star.comp.sfx2.SfxMacroLoader"), uno::UNO_QUERY );
     uno::Reference<frame::XDispatch> xD = xDP->queryDispatch( aURL, OUString(), 0);
 
@@ -3045,20 +2964,23 @@ static int lo_runMacro(LibreOfficeKit* pThis, const char *pURL)
     return true;
 }
 
-static bool lo_signDocument(LibreOfficeKit* /*pThis*/,
+// MACRO: multiple thread instance
+static bool lo_signDocument(LibreOfficeKit* pThis,
                             const char* pURL,
                             const unsigned char* pCertificateBinary,
                             const int nCertificateBinarySize,
                             const unsigned char* pPrivateKeyBinary,
                             const int nPrivateKeyBinarySize)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_signDocument");
 
     OUString aURL(getAbsoluteURL(pURL));
     if (aURL.isEmpty())
        return false;
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
         return false;
 
     uno::Sequence<sal_Int8> aCertificateSequence;
@@ -3090,7 +3012,8 @@ static bool lo_signDocument(LibreOfficeKit* /*pThis*/,
         std::copy(pPrivateKeyBinary, pPrivateKeyBinary + nPrivateKeyBinarySize, aPrivateKeySequence.getArray());
     }
 
-    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(ot_xContext);
     uno::Reference<xml::crypto::XXMLSecurityContext> xSecurityContext = xSEInitializer->createSecurityContext(OUString());
     if (!xSecurityContext.is())
         return false;
@@ -3113,9 +3036,11 @@ static bool lo_signDocument(LibreOfficeKit* /*pThis*/,
     return true;
 }
 
-static char* lo_extractRequest(LibreOfficeKit* /*pThis*/, const char* pFilePath)
+// MACRO: multiple thread instance
+static char* lo_extractRequest(LibreOfficeKit* pThis, const char* pFilePath)
 {
-    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+    setOrigin(pThis); // MACRO: multiple thread access
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(ot_xContext);
     uno::Reference< css::lang::XComponent > xComp;
     OUString aURL(getAbsoluteURL(pFilePath));
     OUString result;
@@ -3172,8 +3097,10 @@ static char* lo_extractRequest(LibreOfficeKit* /*pThis*/, const char* pFilePath)
     return convertOUString(result);
 }
 
-static void lo_trimMemory(LibreOfficeKit* /* pThis */, int nTarget)
+// MACRO: multiple thread instance
+static void lo_trimMemory(LibreOfficeKit* pThis, int nTarget)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     vcl::lok::trimMemory(nTarget);
 
     if (nTarget > 2000)
@@ -3284,7 +3211,8 @@ public:
     virtual OUString SAL_CALL getDescription() override;
     void setBridge(Reference<XBridge>);
     void* getContext();
-    inline static int g_connectionCount = 0;
+    // MACRO: multiple thread instance
+    inline static thread_local int g_connectionCount = 0;
 
 private:
     void* m_pRecieveFromLOContext;
@@ -3344,11 +3272,13 @@ OUString FunctionBasedURPConnection::getDescription() { return ""; }
 void FunctionBasedURPConnection::setBridge(Reference<XBridge> xBridge) { m_URPBridge = xBridge; }
 }
 
+// MACRO: multiple thread instance
 static void*
-lo_startURP(LibreOfficeKit* /* pThis */, void* pRecieveFromLOContext, void* pSendToLOContext,
+lo_startURP(LibreOfficeKit* pThis, void* pRecieveFromLOContext, void* pSendToLOContext,
             int (*fnReceiveURPFromLO)(void* pContext, const signed char* pBuffer, int nLen),
             int (*fnSendURPToLO)(void* pContext, signed char* pBuffer, int nLen))
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     // Here we will roughly do what desktop LO does when one passes a command-line switch like
     // --accept=socket,port=nnnn;urp;StarOffice.ServiceManager. Except that no listening socket will
     // be created. The communication to the URP will be through the nReceiveURPFromLO and nSendURPToLO
@@ -3358,9 +3288,11 @@ lo_startURP(LibreOfficeKit* /* pThis */, void* pRecieveFromLOContext, void* pSen
         new FunctionBasedURPConnection(pRecieveFromLOContext, fnReceiveURPFromLO,
                                        pSendToLOContext, fnSendURPToLO));
 
-    Reference<XBridgeFactory> xBridgeFactory = css::bridge::BridgeFactory::create(xContext);
+    // MACRO: multiple thread instance
+    Reference<XBridgeFactory> xBridgeFactory = css::bridge::BridgeFactory::create(ot_xContext);
 
-    Reference<XInstanceProvider> xInstanceProvider(new FunctionBasedURPInstanceProvider(xContext));
+    // MACRO: multiple thread instance
+    Reference<XInstanceProvider> xInstanceProvider(new FunctionBasedURPInstanceProvider(ot_xContext));
 
     Reference<XBridge> xBridge(xBridgeFactory->createBridge(
         "functionurp" + OUString::number(FunctionBasedURPConnection::g_connectionCount), "urp",
@@ -3375,9 +3307,11 @@ lo_startURP(LibreOfficeKit* /* pThis */, void* pRecieveFromLOContext, void* pSen
  * Stop a function based URP connection that you started with lo_startURP above
  *
  * @param pSendToLOContext a pointer to the context returned by lo_startURP */
-static void lo_stopURP(LibreOfficeKit* /* pThis */,
+// MACRO: multiple thread instance
+static void lo_stopURP(LibreOfficeKit* pThis ,
                        void* pFunctionBasedURPConnection/* FunctionBasedURPConnection* */)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     static_cast<FunctionBasedURPConnection*>(pFunctionBasedURPConnection)->close();
 }
 
@@ -3385,6 +3319,7 @@ static void lo_registerCallback (LibreOfficeKit* pThis,
                                  LibreOfficeKitCallback pCallback,
                                  void* pData)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
 
     Application* pApp = GetpApp();
@@ -3399,6 +3334,7 @@ static void lo_registerCallback (LibreOfficeKit* pThis,
 
 static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const char* pFormat, const char* pFilterOptions)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_saveAs");
 
     SolarMutexGuard aGuard;
@@ -3594,9 +3530,10 @@ static int doc_saveAs(LibreOfficeKitDocument* pThis, const char* sUrl, const cha
         // add interaction handler too
         if (gImpl)
         {
+            // MACRO: multiple thread instance
             // gImpl does not have to exist when running from a unit test
             rtl::Reference<LOKInteractionHandler> const pInteraction(
-                    new LOKInteractionHandler("saveas", gImpl, pDocument));
+                    new LOKInteractionHandler("saveas", gImpl.get(), pDocument));
             uno::Reference<task::XInteractionHandler2> const xInteraction(pInteraction);
 
             aSaveMediaDescriptor[MediaDescriptor::PROP_INTERACTIONHANDLER] <<= xInteraction;
@@ -3861,16 +3798,19 @@ static void doc_iniUnoCommands ()
         return;
     }
 
-    if (!xContext.is())
-        xContext = comphelper::getProcessComponentContext();
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
+        ot_xContext = comphelper::getProcessComponentContext();
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
     {
         SAL_WARN("lok", "iniUnoCommands: Component context is not available");
         return;
     }
 
 #if !defined IOS && !defined ANDROID && !defined __EMSCRIPTEN__
-    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(ot_xContext);
     if (!xSEInitializer.is())
     {
         SAL_WARN("lok", "iniUnoCommands: XSEInitializer is not available");
@@ -3886,7 +3826,8 @@ static void doc_iniUnoCommands ()
 #endif
 
     SfxSlotPool& rSlotPool = SfxSlotPool::GetSlotPool(pViewFrame);
-    uno::Reference<util::XURLTransformer> xParser(util::URLTransformer::create(xContext));
+    // MACRO: multiple thread instance
+    uno::Reference<util::XURLTransformer> xParser(util::URLTransformer::create(ot_xContext));
 
     for (const auto & sUnoCommand : sUnoCommands)
     {
@@ -3905,6 +3846,7 @@ static void doc_iniUnoCommands ()
 
 static int doc_getDocumentType (LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getDocumentType");
 
     SolarMutexGuard aGuard;
@@ -3913,6 +3855,7 @@ static int doc_getDocumentType (LibreOfficeKitDocument* pThis)
 
 static int doc_getParts (LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getParts");
 
     SolarMutexGuard aGuard;
@@ -3929,6 +3872,7 @@ static int doc_getParts (LibreOfficeKitDocument* pThis)
 
 static int doc_getPart (LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getPart");
 
     SolarMutexGuard aGuard;
@@ -3946,6 +3890,7 @@ static int doc_getPart (LibreOfficeKitDocument* pThis)
 
 static void doc_setPartImpl(LibreOfficeKitDocument* pThis, int nPart, bool bAllowChangeFocus = true)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setPart");
 
     SolarMutexGuard aGuard;
@@ -3963,11 +3908,13 @@ static void doc_setPartImpl(LibreOfficeKitDocument* pThis, int nPart, bool bAllo
 
 static void doc_setPart(LibreOfficeKitDocument* pThis, int nPart)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     doc_setPartImpl(pThis, nPart, true);
 }
 
 static char* doc_getPartInfo(LibreOfficeKitDocument* pThis, int nPart)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getPartInfo");
 
     SolarMutexGuard aGuard;
@@ -3983,6 +3930,7 @@ static char* doc_getPartInfo(LibreOfficeKitDocument* pThis, int nPart)
 
 static void doc_selectPart(LibreOfficeKitDocument* pThis, int nPart, int nSelect)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     if (gImpl)
         gImpl->maLastExceptionMsg.clear();
@@ -3999,6 +3947,7 @@ static void doc_selectPart(LibreOfficeKitDocument* pThis, int nPart, int nSelect
 
 static void doc_moveSelectedParts(LibreOfficeKitDocument* pThis, int nPosition, bool bDuplicate)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     if (gImpl)
         gImpl->maLastExceptionMsg.clear();
@@ -4015,6 +3964,7 @@ static void doc_moveSelectedParts(LibreOfficeKitDocument* pThis, int nPosition, 
 
 static char* doc_getPartPageRectangles(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getPartPageRectangles");
 
     SolarMutexGuard aGuard;
@@ -4032,6 +3982,7 @@ static char* doc_getPartPageRectangles(LibreOfficeKitDocument* pThis)
 
 static char* doc_getA11yFocusedParagraph(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
@@ -4052,6 +4003,7 @@ static char* doc_getA11yFocusedParagraph(LibreOfficeKitDocument* pThis)
 
 static int  doc_getA11yCaretPosition(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
@@ -4072,6 +4024,7 @@ static int  doc_getA11yCaretPosition(LibreOfficeKitDocument* pThis)
 
 static char* doc_getPartName(LibreOfficeKitDocument* pThis, int nPart)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getPartName");
 
     SolarMutexGuard aGuard;
@@ -4089,6 +4042,7 @@ static char* doc_getPartName(LibreOfficeKitDocument* pThis, int nPart)
 
 static char* doc_getPartHash(LibreOfficeKitDocument* pThis, int nPart)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getPartHash");
 
     SolarMutexGuard aGuard;
@@ -4104,9 +4058,10 @@ static char* doc_getPartHash(LibreOfficeKitDocument* pThis, int nPart)
     return convertOUString(pDoc->getPartHash(nPart));
 }
 
-static void doc_setPartMode(LibreOfficeKitDocument* pThis,
-                            int nPartMode)
+// MACRO: multiple thread instance
+static void doc_setPartMode(LibreOfficeKitDocument* pThis, int nPartMode)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setPartMode");
 
     SolarMutexGuard aGuard;
@@ -4149,6 +4104,7 @@ static void doc_paintTile(LibreOfficeKitDocument* pThis,
                           const int nTilePosX, const int nTilePosY,
                           const int nTileWidth, const int nTileHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_paintTile");
 
     SolarMutexGuard aGuard;
@@ -4242,6 +4198,7 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
                               const int nTilePosX, const int nTilePosY,
                               const int nTileWidth, const int nTileHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_paintPartTile");
 
     SolarMutexGuard aGuard;
@@ -4422,8 +4379,10 @@ static void doc_paintPartTile(LibreOfficeKitDocument* pThis,
     }
 }
 
-static int doc_getTileMode(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/)
+// MACRO: multiple thread instance
+static int doc_getTileMode(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SetLastExceptionMsg();
 #if ENABLE_CAIRO_RGBA || defined IOS
     return LOK_TILEMODE_RGBA;
@@ -4436,6 +4395,7 @@ static void doc_getDocumentSize(LibreOfficeKitDocument* pThis,
                                 long* pWidth,
                                 long* pHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getDocumentSize");
 
     SolarMutexGuard aGuard;
@@ -4459,6 +4419,7 @@ static void doc_getDataArea(LibreOfficeKitDocument* pThis,
                             long* pCol,
                             long* pRow)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getDataArea");
 
     SolarMutexGuard aGuard;
@@ -4480,6 +4441,7 @@ static void doc_getDataArea(LibreOfficeKitDocument* pThis,
 static void doc_initializeForRendering(LibreOfficeKitDocument* pThis,
                                        const char* pArguments)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_initializeForRendering");
 
     SolarMutexGuard aGuard;
@@ -4497,6 +4459,7 @@ static void doc_initializeForRendering(LibreOfficeKitDocument* pThis,
 static void doc_setAuthor(LibreOfficeKitDocument* pThis,
                                        const char* sAuthor)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setAuthor");
 
     SolarMutexGuard aGuard;
@@ -4517,6 +4480,7 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
                                  LibreOfficeKitCallback pCallback,
                                  void* pData)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
@@ -4598,6 +4562,7 @@ static void doc_registerCallback(LibreOfficeKitDocument* pThis,
 /// Returns the JSON representation of all the comments in the document
 static char* getPostIts(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SetLastExceptionMsg();
     ITiledRenderable* pDoc = getTiledRenderable(pThis);
     if (!pDoc)
@@ -4613,6 +4578,7 @@ static char* getPostIts(LibreOfficeKitDocument* pThis)
 /// Returns the JSON representation of the positions of all the comments in the document
 static char* getPostItsPos(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SetLastExceptionMsg();
     ITiledRenderable* pDoc = getTiledRenderable(pThis);
     if (!pDoc)
@@ -4627,6 +4593,7 @@ static char* getPostItsPos(LibreOfficeKitDocument* pThis)
 
 static char* getRulerState(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SetLastExceptionMsg();
     ITiledRenderable* pDoc = getTiledRenderable(pThis);
     if (!pDoc)
@@ -4641,6 +4608,7 @@ static char* getRulerState(LibreOfficeKitDocument* pThis)
 
 static void doc_postKeyEvent(LibreOfficeKitDocument* pThis, int nType, int nCharCode, int nKeyCode)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postKeyEvent");
 
     SolarMutexGuard aGuard;
@@ -4664,14 +4632,17 @@ static void doc_postKeyEvent(LibreOfficeKitDocument* pThis, int nType, int nChar
     }
 }
 
-static void doc_setBlockedCommandList(LibreOfficeKitDocument* /*pThis*/, int nViewId, const char* blockedCommandList)
+// MACRO: multiple thread instance
+static void doc_setBlockedCommandList(LibreOfficeKitDocument* pThis, int nViewId, const char* blockedCommandList)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SfxLokHelper::setBlockedCommandList(nViewId, blockedCommandList);
 }
 
 static void doc_postWindowExtTextInputEvent(LibreOfficeKitDocument* pThis, unsigned nWindowId, int nType, const char* pText)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postWindowExtTextInputEvent");
 
     SolarMutexGuard aGuard;
@@ -4702,6 +4673,7 @@ static void doc_postWindowExtTextInputEvent(LibreOfficeKitDocument* pThis, unsig
 
 static void doc_removeTextContext(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, int nCharBefore, int nCharAfter)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     VclPtr<vcl::Window> pWindow;
     if (nLOKWindowId == 0)
@@ -4755,8 +4727,10 @@ static void doc_removeTextContext(LibreOfficeKitDocument* pThis, unsigned nLOKWi
     }
 }
 
-static void doc_postWindowKeyEvent(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId, int nType, int nCharCode, int nKeyCode)
+// MACRO: multiple thread instance
+static void doc_postWindowKeyEvent(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, int nType, int nCharCode, int nKeyCode)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postWindowKeyEvent");
 
     SolarMutexGuard aGuard;
@@ -4787,6 +4761,7 @@ static void doc_postWindowKeyEvent(LibreOfficeKitDocument* /*pThis*/, unsigned n
 
 static size_t doc_renderShapeSelection(LibreOfficeKitDocument* pThis, char** pOutput)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_renderShapeSelection");
 
     SolarMutexGuard aGuard;
@@ -4957,19 +4932,25 @@ static void lcl_sendDialogEvent(unsigned long long int nWindowId, const char* pA
 }
 
 
-static void doc_sendDialogEvent(LibreOfficeKitDocument* /*pThis*/, unsigned long long int nWindowId, const char* pArguments)
+// MACRO: multiple thread instance
+static void doc_sendDialogEvent(LibreOfficeKitDocument* pThis, unsigned long long int nWindowId, const char* pArguments)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     lcl_sendDialogEvent(nWindowId, pArguments);
 }
 
-static void lo_sendDialogEvent(LibreOfficeKit* /*pThis*/, unsigned long long int nWindowId, const char* pArguments)
+// MACRO: multiple thread instance
+static void lo_sendDialogEvent(LibreOfficeKit* pThis, unsigned long long int nWindowId, const char* pArguments)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     lcl_sendDialogEvent(nWindowId, pArguments);
 }
 
-static void lo_setOption(LibreOfficeKit* /*pThis*/, const char *pOption, const char* pValue)
+// MACRO: multiple thread instance
+static void lo_setOption(LibreOfficeKit* pThis, const char *pOption, const char* pValue)
 {
-    static char* pCurrentSalLogOverride = nullptr;
+    setOrigin(pThis); // MACRO: multiple thread access
+    static thread_local char* pCurrentSalLogOverride = nullptr;
 
     if (strcmp(pOption, "traceeventrecording") == 0)
     {
@@ -5006,21 +4987,26 @@ static void lo_setOption(LibreOfficeKit* /*pThis*/, const char *pOption, const c
     }
 }
 
-static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char *data, size_t size)
+// MACRO: multiple thread instance
+static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* pThis, char *data, size_t size)
 {
-    if (!xContext.is())
+    setOrigin(pThis); // MACRO: multiple thread access
+    if (!ot_xContext.is()) // MACRO: multiple thread instance
     {
         SAL_WARN("lok", "ComponentContext is not available");
         return nullptr;
     }
 
-    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<frame::XDesktop2> xComponentLoader = frame::Desktop::create(ot_xContext);
 
     if (!xComponentLoader.is())
     {
         SAL_WARN("lok", "ComponentLoader is not available");
         return nullptr;
     }
+    // MACRO: multiple thread instance
+    LibLibreOffice_Impl* pLib = static_cast<LibLibreOffice_Impl*>(pThis);
 
     auto aData = Sequence<sal_Int8>(reinterpret_cast<const sal_Int8*>(data), size);
 
@@ -5048,7 +5034,8 @@ static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char
                 return nullptr;
             }
 
-            return new LibLODocument_Impl(xComponent, nThisDocumentId);
+            // MACRO: multiple thread instance
+            return new LibLODocument_Impl(xComponent, nThisDocumentId, pLib->maThreadId);
         }
         catch (const uno::Exception& exception)
         {
@@ -5062,6 +5049,7 @@ static LibreOfficeKitDocument* lo_loadFromMemory(LibreOfficeKit* /*pThis*/, char
 
 static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, char** pState)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     if (!pState)
         return;
 
@@ -5081,8 +5069,8 @@ static void lo_dumpState (LibreOfficeKit* pThis, const char* /* pOptions */, cha
 
 static void* lo_getXComponentContext(LibreOfficeKit* pThis)
 {
-    (void)pThis; // avoid unused warning on class method
-    return xContext.is() ? xContext.get() : nullptr;
+    setOrigin(pThis); // MACRO: multiple thread access
+    return ot_xContext.is() ? ot_xContext.get() : nullptr;
 }
 
 void LibLibreOffice_Impl::dumpState(rtl::OStringBuffer &rState)
@@ -5101,8 +5089,140 @@ void LibLibreOffice_Impl::dumpState(rtl::OStringBuffer &rState)
     vcl::lok::dumpState(rState);
 }
 
+// MACRO: page setup {
+namespace {
+
+void setPageColor(LibreOfficeKitDocument* pThis, const OUString rColorHex)
+{
+    setOriginDoc(pThis); // MACRO: multiple thread access
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
+        if (!pViewFrm)
+        {
+            return;
+        }
+
+        // must be at least 6 (FF00FF) or 7 (#FF00FF)
+        if (rColorHex.getLength() < 6 || rColorHex.getLength() > 7) {
+            SetLastExceptionMsg("invalid hex string");
+            return;
+        }
+
+        Color pColor = Color::STRtoRGB(rColorHex);
+
+        // Set the page color
+        XFillColorItem aFillColorItem(OUString(), pColor);
+
+        pViewFrm->GetBindings().GetDispatcher()->ExecuteList(SID_ATTR_PAGE_COLOR, SfxCallMode::RECORD, { &aFillColorItem});
+    }
+
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+
+void setPageSize(
+    LibreOfficeKitDocument* pThis,
+    const tools::Long Width,
+    const tools::Long Height
+)
+{
+    setOriginDoc(pThis); // MACRO: multiple thread access
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewShell* pViewShell = SfxViewShell::Current();
+        SfxViewFrame* pViewFrm = pViewShell ? pViewShell->GetViewFrame() : nullptr;
+
+        if (!pViewFrm)
+            return;
+
+        SfxDispatcher* pDispatcher = pViewShell->GetDispatcher();
+        const SvxSizeItem* pSizeItem = new SvxSizeItem( SID_ATTR_PAGE_SIZE, Size(Width, Height));
+
+        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+
+        if (Width >= Height)
+        {
+            pPageItem->SetLandscape(true);
+        }
+        else
+        {
+            pPageItem->SetLandscape(false);
+        }
+
+        pDispatcher->ExecuteList(SID_ATTR_PAGE_SIZE, SfxCallMode::RECORD, { pSizeItem, pPageItem.get()});
+    }
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+
+void setPageMargins(
+    LibreOfficeKitDocument* pThis,
+    const tools::Long PageLeft,
+    const tools::Long PageRight,
+    const tools::Long PageTop,
+    const tools::Long PageBottom
+)
+{
+    setOriginDoc(pThis); // MACRO: multiple thread access
+    int pNumParts = pThis->pClass->getParts(pThis);
+    int pOriginalPart = pThis->pClass->getPart(pThis);
+    for (int i = 0; i < pNumParts; i++)
+    {
+        pThis->pClass->setPart(pThis, i);
+        SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+        if (!pViewFrm)
+            return;
+
+        std::unique_ptr<SvxPageItem> pPageItem(new SvxPageItem(SID_ATTR_PAGE));
+
+        const SvxSizeItem* pSizeItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+        std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
+
+        const SvxLongLRSpaceItem* pLRSpaceItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_LRSPACE, pLRSpaceItem);
+        std::unique_ptr<SvxLongLRSpaceItem> pPageLRMarginItem(pLRSpaceItem->Clone());
+
+        const SvxLongULSpaceItem* pULSpaceItem;
+        pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_ULSPACE, pULSpaceItem);
+        std::unique_ptr<SvxLongULSpaceItem> pPageULMarginItem(pULSpaceItem->Clone());
+
+        ExecuteMarginLRChange(PageLeft, PageRight, pPageLRMarginItem.get());
+        ExecuteMarginULChange(PageTop, PageBottom, pPageULMarginItem.get());
+    }
+
+    pThis->pClass->setPart(pThis, pOriginalPart);
+}
+
+void toggleOrientation(
+    LibreOfficeKitDocument* pThis
+)
+{
+    setOriginDoc(pThis); // MACRO: multiple thread access
+    SfxViewFrame* pViewFrm = SfxViewFrame::Current();
+    if (!pViewFrm)
+        return;
+    const SvxSizeItem* pSizeItem;
+    pViewFrm->GetBindings().GetDispatcher()->QueryState(SID_ATTR_PAGE_SIZE, pSizeItem);
+    std::unique_ptr<SvxSizeItem> pPageSizeItem(pSizeItem->Clone());
+
+    setPageSize(pThis, pSizeItem->GetSize().Height(), pSizeItem->GetSize().Width());
+}
+
+} // namespace
+// MACRO: page setup }
+
 static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pCommand, const char* pArguments, bool bNotifyWhenFinished)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postUnoCommand");
     const std::string_view svCommand(pCommand);
     // MACRO-1653/MACRO-1598: Colorize and overlays
@@ -5114,6 +5234,7 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
     }
     if (gImpl && svCommand == ".uno:Colorize")
     {
+        SAL_WARN("start", "running colorizer uno command");
         ITiledRenderable* pDoc = getTiledRenderable(pThis);
         pDoc->colorize();
         return;
@@ -5249,10 +5370,10 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
 
     if (gImpl && aCommand == ".uno:SetPageMargins")
     {
-        long pageLeft;
-        long pageRight;
-        long pageTop;
-        long pageBottom;
+        long pageLeft = 0;
+        long pageRight = 0;
+        long pageTop = 0;
+        long pageBottom = 0;
 
         for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
         {
@@ -5302,8 +5423,8 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
 
     if (gImpl && aCommand == ".uno:SetPageSize")
     {
-        long width;
-        long height;
+        long width = 0;
+        long height = 0;
 
         for (beans::PropertyValue& rPropValue : aPropertyValuesVector)
         {
@@ -5394,8 +5515,9 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
         }
 
 
+        // MACRO: multiple thread instance
         rtl::Reference<LOKInteractionHandler> const pInteraction(
-            new LOKInteractionHandler("save", gImpl, pDocument));
+            new LOKInteractionHandler("save", gImpl.get(), pDocument));
         uno::Reference<task::XInteractionHandler2> const xInteraction(pInteraction);
 
         beans::PropertyValue aValue;
@@ -5547,6 +5669,7 @@ static void doc_postUnoCommand(LibreOfficeKitDocument* pThis, const char* pComma
 
 static void doc_postMouseEvent(LibreOfficeKitDocument* pThis, int nType, int nX, int nY, int nCount, int nButtons, int nModifier)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postMouseEvent");
 
     SolarMutexGuard aGuard;
@@ -5569,8 +5692,10 @@ static void doc_postMouseEvent(LibreOfficeKitDocument* pThis, int nType, int nX,
     }
 }
 
-static void doc_postWindowMouseEvent(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId, int nType, int nX, int nY, int nCount, int nButtons, int nModifier)
+// MACRO: multiple thread instance
+static void doc_postWindowMouseEvent(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, int nType, int nX, int nY, int nCount, int nButtons, int nModifier)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postWindowMouseEvent");
 
     SolarMutexGuard aGuard;
@@ -5606,8 +5731,10 @@ static void doc_postWindowMouseEvent(LibreOfficeKitDocument* /*pThis*/, unsigned
     }
 }
 
-static void doc_postWindowGestureEvent(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId, const char* pType, int nX, int nY, int nOffset)
+// MACRO: multiple thread instance
+static void doc_postWindowGestureEvent(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, const char* pType, int nX, int nY, int nOffset)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postWindowGestureEvent");
 
     SolarMutexGuard aGuard;
@@ -5643,6 +5770,7 @@ static void doc_postWindowGestureEvent(LibreOfficeKitDocument* /*pThis*/, unsign
 
 static void doc_setTextSelection(LibreOfficeKitDocument* pThis, int nType, int nX, int nY)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setTextSelection");
 
     SolarMutexGuard aGuard;
@@ -5658,8 +5786,10 @@ static void doc_setTextSelection(LibreOfficeKitDocument* pThis, int nType, int n
     pDoc->setTextSelection(nType, nX, nY);
 }
 
-static void doc_setWindowTextSelection(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId, bool swap, int nX, int nY)
+// MACRO: multiple thread instance
+static void doc_setWindowTextSelection(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, bool swap, int nX, int nY)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setWindowTextSelection");
 
     SolarMutexGuard aGuard;
@@ -5907,6 +6037,7 @@ static char* getPageMargins()
 
 static char* doc_getTextSelection(LibreOfficeKitDocument* pThis, const char* pMimeType, char** pUsedMimeType)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getTextSelection");
 
     SolarMutexGuard aGuard;
@@ -5948,6 +6079,7 @@ static char* doc_getTextSelection(LibreOfficeKitDocument* pThis, const char* pMi
 
 static int doc_getSelectionType(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getSelectionType");
 
     SolarMutexGuard aGuard;
@@ -5984,6 +6116,7 @@ static int doc_getSelectionType(LibreOfficeKitDocument* pThis)
 
 static int doc_getSelectionTypeAndText(LibreOfficeKitDocument* pThis, const char* pMimeType, char** pText, char** pUsedMimeType)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     // The purpose of this function is to avoid double call to pDoc->getSelection(),
     // which may be expensive.
     comphelper::ProfileZone aZone("doc_getSelectionTypeAndText");
@@ -6045,6 +6178,7 @@ static int doc_getClipboard(LibreOfficeKitDocument* pThis,
                             size_t     **pOutSizes,
                             char      ***pOutStreams)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
 #ifdef IOS
     (void) pThis;
     (void) pMimeTypes;
@@ -6142,6 +6276,7 @@ static int doc_setClipboard(LibreOfficeKitDocument* pThis,
                             const size_t  *pInSizes,
                             const char   **pInStreams)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
 #ifdef IOS
     (void) pThis;
     (void) nInCount;
@@ -6179,6 +6314,7 @@ static int doc_setClipboard(LibreOfficeKitDocument* pThis,
 
 static bool doc_paste(LibreOfficeKitDocument* pThis, const char* pMimeType, const char* pData, size_t nSize)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_paste");
 
     SolarMutexGuard aGuard;
@@ -6209,6 +6345,7 @@ static bool doc_paste(LibreOfficeKitDocument* pThis, const char* pMimeType, cons
 
 static void doc_setGraphicSelection(LibreOfficeKitDocument* pThis, int nType, int nX, int nY)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setGraphicSelection");
 
     SolarMutexGuard aGuard;
@@ -6226,6 +6363,7 @@ static void doc_setGraphicSelection(LibreOfficeKitDocument* pThis, int nType, in
 
 static void doc_resetSelection(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_resetSelection");
 
     SolarMutexGuard aGuard;
@@ -6257,6 +6395,7 @@ static void addLocale(boost::property_tree::ptree& rValues, css::lang::Locale co
 
 static char* getDocReadOnly(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
     if (!pDocument)
         return nullptr;
@@ -6289,10 +6428,12 @@ static char* getLanguages(const char* pCommand)
     css::uno::Sequence< css::lang::Locale > aLocales;
     css::uno::Sequence< css::lang::Locale > aGrammarLocales;
 
-    if (xContext.is())
+    // MACRO: multiple thread instance
+    if (ot_xContext.is())
     {
         // SpellChecker
-        css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv = css::linguistic2::LinguServiceManager::create(xContext);
+        // MACRO: multiple thread instance
+        css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv = css::linguistic2::LinguServiceManager::create(ot_xContext);
         if (xLangSrv.is())
         {
             css::uno::Reference<css::linguistic2::XSpellChecker> xSpell = xLangSrv->getSpellChecker();
@@ -6304,8 +6445,9 @@ static char* getLanguages(const char* pCommand)
         SvxLanguageToolOptions& rLanguageOpts = SvxLanguageToolOptions::Get();
         if (rLanguageOpts.getEnabled())
         {
+            // MACRO: multiple thread instance
             uno::Reference< linguistic2::XProofreader > xGC(
-                    xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", xContext),
+                    ot_xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", ot_xContext),
                     uno::UNO_QUERY_THROW );
             uno::Reference< linguistic2::XSupportedLocales > xSuppLoc( xGC, uno::UNO_QUERY_THROW );
             aGrammarLocales = xSuppLoc->getLocales();
@@ -6407,6 +6549,7 @@ static char* getFontSubset (std::string_view aFontName)
 
 static char* getStyles(LibreOfficeKitDocument* pThis, const char* pCommand)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     boost::property_tree::ptree aTree;
@@ -6541,6 +6684,7 @@ enum class UndoOrRedo
 /// Returns the JSON representation of either an undo or a redo stack.
 static char* getUndoOrRedo(LibreOfficeKitDocument* pThis, UndoOrRedo eCommand)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     auto pBaseModel = dynamic_cast<SfxBaseModel*>(pDocument->mxComponent.get());
@@ -6567,6 +6711,7 @@ static char* getUndoOrRedo(LibreOfficeKitDocument* pThis, UndoOrRedo eCommand)
 /// Returns the JSON representation of the redline stack.
 static char* getTrackedChanges(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
     uno::Reference<document::XRedlinesSupplier> xRedlinesSupplier(pDocument->mxComponent, uno::UNO_QUERY);
@@ -6624,6 +6769,7 @@ static char* getTrackedChanges(LibreOfficeKitDocument* pThis)
 /// Returns the JSON representation of the redline author table.
 static char* getTrackedChangeAuthors(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     ITiledRenderable* pDoc = getTiledRenderable(pThis);
     if (!pDoc)
     {
@@ -6637,6 +6783,7 @@ static char* getTrackedChangeAuthors(LibreOfficeKitDocument* pThis)
 
 static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCommand)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getCommandValues");
 
     SolarMutexGuard aGuard;
@@ -6850,6 +6997,7 @@ static char* doc_getCommandValues(LibreOfficeKitDocument* pThis, const char* pCo
 
 static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_gotoOutline");
 
     SolarMutexGuard aGuard;
@@ -6871,6 +7019,7 @@ static char* doc_gotoOutline(LibreOfficeKitDocument* pThis, int idx)
 
 static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, void *(*chrome_malloc)(size_t size), const char* pFormat)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     if (!pOutput)
     {
         SAL_WARN("lok", "pOutput is not set");
@@ -6935,6 +7084,7 @@ static size_t doc_saveToMemory(LibreOfficeKitDocument* pThis, char** pOutput, vo
 static void doc_setClientZoom(LibreOfficeKitDocument* pThis, int nTilePixelWidth, int nTilePixelHeight,
         int nTileTwipWidth, int nTileTwipHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setClientZoom");
 
     SolarMutexGuard aGuard;
@@ -6952,6 +7102,7 @@ static void doc_setClientZoom(LibreOfficeKitDocument* pThis, int nTilePixelWidth
 
 static void doc_setClientVisibleArea(LibreOfficeKitDocument* pThis, int nX, int nY, int nWidth, int nHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setClientVisibleArea");
 
     SolarMutexGuard aGuard;
@@ -6970,6 +7121,7 @@ static void doc_setClientVisibleArea(LibreOfficeKitDocument* pThis, int nX, int 
 
 static void doc_setOutlineState(LibreOfficeKitDocument* pThis, bool bColumn, int nLevel, int nIndex, bool bHidden)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setOutlineState");
 
     SolarMutexGuard aGuard;
@@ -6988,6 +7140,7 @@ static void doc_setOutlineState(LibreOfficeKitDocument* pThis, bool bColumn, int
 static int doc_createViewWithOptions(LibreOfficeKitDocument* pThis,
                                      const char* pOptions)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_createView");
 
     SolarMutexGuard aGuard;
@@ -7025,8 +7178,10 @@ static int doc_createView(LibreOfficeKitDocument* pThis)
     return doc_createViewWithOptions(pThis, nullptr); // No options.
 }
 
-static void doc_destroyView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, int nId)
+// MACRO: multiple thread instance
+static void doc_destroyView(LibreOfficeKitDocument* pThis, int nId)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_destroyView");
 
     SolarMutexGuard aGuard;
@@ -7042,8 +7197,10 @@ static void doc_destroyView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, 
     vcl::lok::numberOfViewsChanged(SfxLokHelper::getViewsCount(pDocument->mnDocumentId));
 }
 
-static void doc_setView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/, int nId)
+// MACRO: multiple thread instance
+static void doc_setView(LibreOfficeKitDocument* pThis, int nId)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setView");
 
     SolarMutexGuard aGuard;
@@ -7052,8 +7209,10 @@ static void doc_setView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/, 
     SfxLokHelper::setView(nId);
 }
 
-static int doc_getView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/)
+// MACRO: multiple thread instance
+static int doc_getView(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getView");
 
     SolarMutexGuard aGuard;
@@ -7062,8 +7221,10 @@ static int doc_getView(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/)
     return SfxLokHelper::getView();
 }
 
-static int doc_getViewsCount(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis)
+// MACRO: multiple thread instance
+static int doc_getViewsCount(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getViewsCount");
 
     SolarMutexGuard aGuard;
@@ -7073,8 +7234,10 @@ static int doc_getViewsCount(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis)
     return SfxLokHelper::getViewsCount(pDocument->mnDocumentId);
 }
 
-static bool doc_getViewIds(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, int* pArray, size_t nSize)
+// MACRO: multiple thread instance
+static bool doc_getViewIds(LibreOfficeKitDocument* pThis, int* pArray, size_t nSize)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getViewsIds");
 
     SolarMutexGuard aGuard;
@@ -7084,8 +7247,10 @@ static bool doc_getViewIds(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, i
     return SfxLokHelper::getViewIds(pDocument->mnDocumentId, pArray, nSize);
 }
 
-static void doc_setViewLanguage(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/, int nId, const char* language)
+// MACRO: multiple thread instance
+static void doc_setViewLanguage(LibreOfficeKitDocument* pThis, int nId, const char* language)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setViewLanguage");
 
     SolarMutexGuard aGuard;
@@ -7105,13 +7270,15 @@ unsigned char* doc_renderFont(LibreOfficeKitDocument* pThis,
     return doc_renderFontOrientation(pThis, pFontName, pChar, pFontWidth, pFontHeight, 0);
 }
 
-unsigned char* doc_renderFontOrientation(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/,
+// MACRO: multiple thread instance
+unsigned char* doc_renderFontOrientation(LibreOfficeKitDocument* pThis,
                               const char* pFontName,
                               const char* pChar,
                               int* pFontWidth,
                               int* pFontHeight,
                               int pOrientation)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_renderFont");
 
     SolarMutexGuard aGuard;
@@ -7216,6 +7383,7 @@ static void doc_paintWindowForView(LibreOfficeKitDocument* pThis, unsigned nLOKW
                                    const int nWidth, const int nHeight,
                                    const double fDPIScale, int viewId)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_paintWindowDPI");
 
     SolarMutexGuard aGuard;
@@ -7280,8 +7448,10 @@ static void doc_paintWindowForView(LibreOfficeKitDocument* pThis, unsigned nLOKW
     comphelper::LibreOfficeKit::setDialogPainting(false);
 }
 
-static void doc_postWindow(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId, int nAction, const char* pData)
+// MACRO: multiple thread instance
+static void doc_postWindow(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId, int nAction, const char* pData)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_postWindow");
 
     SolarMutexGuard aGuard;
@@ -7334,9 +7504,11 @@ static bool doc_insertCertificate(LibreOfficeKitDocument* pThis,
                                   const unsigned char* pCertificateBinary, const int nCertificateBinarySize,
                                   const unsigned char* pPrivateKeyBinary, const int nPrivateKeySize)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_insertCertificate");
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
         return false;
 
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
@@ -7353,7 +7525,8 @@ static bool doc_insertCertificate(LibreOfficeKitDocument* pThis,
     if (!pObjectShell)
         return false;
 
-    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(ot_xContext);
     uno::Reference<xml::crypto::XXMLSecurityContext> xSecurityContext = xSEInitializer->createSecurityContext(OUString());
     if (!xSecurityContext.is())
         return false;
@@ -7406,9 +7579,11 @@ static bool doc_insertCertificate(LibreOfficeKitDocument* pThis,
 static bool doc_addCertificate(LibreOfficeKitDocument* pThis,
                                   const unsigned char* pCertificateBinary, const int nCertificateBinarySize)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_addCertificate");
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
         return false;
 
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
@@ -7425,7 +7600,8 @@ static bool doc_addCertificate(LibreOfficeKitDocument* pThis,
     if (!pObjectShell)
         return false;
 
-    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(xContext);
+    // MACRO: multiple thread instance
+    uno::Reference<xml::crypto::XSEInitializer> xSEInitializer = xml::crypto::SEInitializer::create(ot_xContext);
     uno::Reference<xml::crypto::XXMLSecurityContext> xSecurityContext = xSEInitializer->createSecurityContext(OUString());
     if (!xSecurityContext.is())
         return false;
@@ -7463,6 +7639,7 @@ static bool doc_addCertificate(LibreOfficeKitDocument* pThis,
 
 static int doc_getSignatureState(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_getSignatureState");
 
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
@@ -7485,9 +7662,11 @@ static int doc_getSignatureState(LibreOfficeKitDocument* pThis)
     return int(pObjectShell->GetDocumentSignatureState());
 }
 
-static void doc_resizeWindow(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWindowId,
+// MACRO: multiple thread instance
+static void doc_resizeWindow(LibreOfficeKitDocument* pThis, unsigned nLOKWindowId,
                              const int nWidth, const int nHeight)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     if (gImpl)
         gImpl->maLastExceptionMsg.clear();
@@ -7504,6 +7683,7 @@ static void doc_resizeWindow(LibreOfficeKitDocument* /*pThis*/, unsigned nLOKWin
 
 static void doc_completeFunction(LibreOfficeKitDocument* pThis, const char* pFunctionName)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
@@ -7520,6 +7700,7 @@ static void doc_completeFunction(LibreOfficeKitDocument* pThis, const char* pFun
 
 static void doc_sendFormFieldEvent(LibreOfficeKitDocument* pThis, const char* pArguments)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
 
     // Supported in Writer only
@@ -7548,6 +7729,7 @@ static bool doc_renderSearchResult(LibreOfficeKitDocument* pThis,
                                      const char* pSearchResult, unsigned char** pBitmapBuffer,
                                      int* pWidth, int* pHeight, size_t* pByteSize)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     if (doc_getDocumentType(pThis) != LOK_DOCTYPE_TEXT)
         return false;
 
@@ -7596,6 +7778,7 @@ static bool doc_renderSearchResult(LibreOfficeKitDocument* pThis,
 
 static void doc_sendContentControlEvent(LibreOfficeKitDocument* pThis, const char* pArguments)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
 
     // Supported in Writer only
@@ -7624,6 +7807,7 @@ static void doc_sendContentControlEvent(LibreOfficeKitDocument* pThis, const cha
 
 static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     LibLODocument_Impl* pDocument = static_cast<LibLODocument_Impl*>(pThis);
 
@@ -7632,9 +7816,11 @@ static void* doc_getXComponent(LibreOfficeKitDocument* pThis)
     return pDocument->mxComponent.get();
 }
 
-static void doc_setViewTimezone(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*pThis*/, int nId,
+// MACRO: multiple thread instance
+static void doc_setViewTimezone(LibreOfficeKitDocument* pThis, int nId,
                                 const char* pTimezone)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("doc_setViewTimezone");
 
     SolarMutexGuard aGuard;
@@ -7648,8 +7834,10 @@ static void doc_setViewTimezone(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* /*p
     }
 }
 
-static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocument* pThis, int nId, bool nEnabled)
+// MACRO: multiple thread instance
+static void doc_setAccessibilityState(LibreOfficeKitDocument* pThis, int nId, bool nEnabled)
 {
+    setOriginDoc(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
 
     int nDocType = getDocumentType(pThis);
@@ -7661,6 +7849,7 @@ static void doc_setAccessibilityState(SAL_UNUSED_PARAMETER LibreOfficeKitDocumen
 
 static char* lo_getError (LibreOfficeKit *pThis)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_getError");
 
     SolarMutexGuard aGuard;
@@ -7676,21 +7865,24 @@ static void lo_freeError(char* pFree)
 
 static char* lo_getFilterTypes(LibreOfficeKit* pThis)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     SolarMutexGuard aGuard;
     SetLastExceptionMsg();
 
     LibLibreOffice_Impl* pImpl = static_cast<LibLibreOffice_Impl*>(pThis);
 
-    if (!xSFactory.is())
-        xSFactory = comphelper::getProcessServiceFactory();
+    // MACRO: multiple thread instance {
+    if (!ot_xSFactory.is())
+        ot_xSFactory = comphelper::getProcessServiceFactory();
 
-    if (!xSFactory.is())
+    if (!ot_xSFactory.is())
     {
         pImpl->maLastExceptionMsg = "Service factory is not available";
         return nullptr;
     }
 
-    uno::Reference<container::XNameAccess> xTypeDetection(xSFactory->createInstance("com.sun.star.document.TypeDetection"), uno::UNO_QUERY);
+    uno::Reference<container::XNameAccess> xTypeDetection(ot_xSFactory->createInstance("com.sun.star.document.TypeDetection"), uno::UNO_QUERY);
+    // MACRO: multiple thread instance }
     const uno::Sequence<OUString> aTypes = xTypeDetection->getElementNames();
     tools::JsonWriter aJson;
     for (const OUString& rType : aTypes)
@@ -7713,6 +7905,7 @@ static char* lo_getFilterTypes(LibreOfficeKit* pThis)
 
 static void lo_setOptionalFeatures(LibreOfficeKit* pThis, unsigned long long const features)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_setOptionalFeatures");
 
     SolarMutexGuard aGuard;
@@ -7733,6 +7926,7 @@ static void lo_setOptionalFeatures(LibreOfficeKit* pThis, unsigned long long con
 static void lo_setDocumentPassword(LibreOfficeKit* pThis,
         const char* pURL, const char* pPassword)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     comphelper::ProfileZone aZone("lo_setDocumentPassword");
 
     SolarMutexGuard aGuard;
@@ -7745,8 +7939,10 @@ static void lo_setDocumentPassword(LibreOfficeKit* pThis,
     pLib->mInteractionMap.find(OString(pURL))->second->SetPassword(pPassword);
 }
 
-static char* lo_getVersionInfo(SAL_UNUSED_PARAMETER LibreOfficeKit* /*pThis*/)
+// MACRO: multiple thread instance
+static char* lo_getVersionInfo(LibreOfficeKit* pThis)
 {
+    setOrigin(pThis); // MACRO: multiple thread access
     SetLastExceptionMsg();
     return convertOUString(ReplaceStringHookProc(
         "{ "
@@ -7773,31 +7969,41 @@ static bool initialize_uno(const OUString& aAppProgramURL)
 #ifdef IOS
     // For iOS we already hardcode the inifile as "rc" in the .app directory.
     rtl::Bootstrap::setIniFilename(aAppProgramURL + "/" SAL_CONFIGFILE("fundamental"));
-    xContext = cppu::defaultBootstrap_InitialComponentContext(aAppProgramURL + "/rc");
+    // MACRO: multiple thread instance
+    ot_xContext = cppu::defaultBootstrap_InitialComponentContext(aAppProgramURL + "/rc");
 #else
     rtl::Bootstrap::setIniFilename(aAppProgramURL + "/" SAL_CONFIGFILE("soffice"));
-    xContext = cppu::defaultBootstrap_InitialComponentContext();
+    // MACRO: multiple thread instance
+    ot_xContext = cppu::defaultBootstrap_InitialComponentContext();
 #endif
+    SAL_WARN("start", "xContext hint: " << comphelper::originthread::originHint());
 
-    if (!xContext.is())
+    // MACRO: multiple thread instance
+    if (!ot_xContext.is())
     {
         SetLastExceptionMsg("XComponentContext could not be created");
-        SAL_INFO("lok", "XComponentContext could not be created");
+        SAL_WARN("start", "XComponentContext could not be created");
         return false;
     }
 
-    xFactory = xContext->getServiceManager();
-    if (!xFactory.is())
+    // MACRO: multiple thread instance
+    ot_xFactory = ot_xContext->getServiceManager();
+    if (!ot_xFactory.is())
     {
         SetLastExceptionMsg("XMultiComponentFactory could not be created");
-        SAL_INFO("lok", "XMultiComponentFactory could not be created");
+        SAL_WARN("start", "XMultiComponentFactory could not be created");
         return false;
     }
 
-    xSFactory.set(xFactory, uno::UNO_QUERY_THROW);
+    // MACRO: multiple thread instance {
+    uno::Reference<css::lang::XMultiComponentFactory> xFactory(ot_xFactory.get());
+    uno::Reference<css::lang::XMultiServiceFactory> xSFactory(xFactory, uno::UNO_QUERY_THROW);
+    ot_xSFactory = xSFactory;
+    // MACRO: multiple thread instance }
     comphelper::setProcessServiceFactory(xSFactory);
 
-    SAL_INFO("lok", "Uno initialized  - " <<  xContext.is());
+    // MACRO: multiple thread instance
+    SAL_INFO("start", "Uno initialized  - " <<  ot_xContext.is());
 
     // set UserInstallation to user profile dir in test/user-template
 //    rtl::Bootstrap aDefaultVars;
@@ -7808,9 +8014,14 @@ static bool initialize_uno(const OUString& aAppProgramURL)
 }
 
 // pre-unipoll version.
-static void lo_startmain(void*)
+// MACRO: multiple thread instance {
+static void lo_startmain(void* pThis)
 {
     osl_setThreadName("lo_startmain");
+    LibLibreOffice_Impl* pLib = static_cast<LibLibreOffice_Impl*>(pThis);
+    pLib->maThreadId = osl_getOriginIdentifier();
+    SAL_WARN("start", "instance started on " << pLib->maThreadId);
+    // MACRO: multiple thread instance }
 
     if (comphelper::SolarMutex::get())
         Application::GetSolarMutex().tryToAcquire();
@@ -7845,7 +8056,8 @@ static void lo_runLoop(LibreOfficeKit* /*pThis*/,
 #endif
 }
 
-static bool bInitialized = false;
+// MACRO: multiple thread instance
+static thread_local bool bInitialized = false;
 
 static void lo_status_indicator_callback(void *data, comphelper::LibreOfficeKit::statusIndicatorCallbackType type, int percent, const char* pText)
 {
@@ -7979,7 +8191,8 @@ static void preloadData()
     std::cerr << "Preload fonts\n";
 
     // Initialize fonts.
-    css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv = css::linguistic2::LinguServiceManager::create(xContext);
+    // MACRO: multiple thread instance
+    css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv = css::linguistic2::LinguServiceManager::create(ot_xContext);
     if (xLangSrv.is())
     {
         css::uno::Reference<css::linguistic2::XSpellChecker> xSpell = xLangSrv->getSpellChecker();
@@ -8040,7 +8253,8 @@ static void activateNotebookbar(std::u16string_view rApp)
 {
     OUString aPath = OUString::Concat("org.openoffice.Office.UI.ToolbarMode/Applications/") + rApp;
 
-    const utl::OConfigurationTreeRoot aAppNode(xContext, aPath, true);
+    // MACRO: multiple thread instance
+    const utl::OConfigurationTreeRoot aAppNode(ot_xContext, aPath, true);
 
     if (aAppNode.isValid())
     {
@@ -8158,8 +8372,9 @@ void setLanguageToolConfig()
                 rLanguageOpts.setApiKey(aApiKey);
             }
 
+            // MACRO: multiple thread instance
             css::uno::Reference<css::linguistic2::XLinguServiceManager2> xLangSrv =
-                css::linguistic2::LinguServiceManager::create(xContext);
+                css::linguistic2::LinguServiceManager::create(ot_xContext);
             if (xLangSrv.is())
             {
                 css::uno::Reference<css::linguistic2::XSpellChecker> xSpell = xLangSrv->getSpellChecker();
@@ -8169,8 +8384,9 @@ void setLanguageToolConfig()
                     static constexpr OUStringLiteral cSpell(SN_SPELLCHECKER);
                     Sequence<css::lang::Locale> aLocales = xSpell->getLocales();
 
+                    // MACRO: multiple thread instance
                     uno::Reference<linguistic2::XProofreader> xGC(
-                        xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", xContext),
+                        ot_xContext->getServiceManager()->createInstanceWithContext("org.openoffice.lingu.LanguageToolGrammarChecker", ot_xContext),
                         uno::UNO_QUERY_THROW);
                     uno::Reference<linguistic2::XSupportedLocales> xSuppLoc(xGC, uno::UNO_QUERY_THROW);
 
@@ -8199,11 +8415,13 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
         FULL_INIT     // do a standard complete init.
     } eStage;
 
+    // MACRO: multiple thread instance {
     // Did we do a pre-initialize
-    static bool bPreInited = false;
-    static bool bUnipoll = false;
-    static bool bProfileZones = false;
-    static bool bNotebookbar = false;
+    static thread_local bool bPreInited = false;
+    static thread_local bool bUnipoll = false;
+    static thread_local bool bProfileZones = false;
+    static thread_local bool bNotebookbar = false;
+    // MACRO: multiple thread instance }
 
     { // cf. string lifetime for preinit
         std::vector<OUString> aOpts;
@@ -8236,7 +8454,8 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
         if (lok_preinit_2_called)
         {
             SAL_INFO("lok", "Create libreoffice object");
-            gImpl = new LibLibreOffice_Impl();
+            // MACRO: multiple thread instance
+            gImpl.reset(new LibLibreOffice_Impl());
         }
     }
     else if (bPreInited)
@@ -8411,11 +8630,13 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
                 }
 
                 // pre-load all component libraries.
-                if (!xContext.is())
+                // MACRO: multiple thread instance
+                if (!ot_xContext.is())
                     throw css::uno::DeploymentException("preInit: XComponentContext is not created");
 
                 css::uno::Reference< css::uno::XInterface > xService;
-                xContext->getValueByName("/singletons/com.sun.star.lang.theServiceManager") >>= xService;
+                // MACRO: multiple thread instance
+                ot_xContext->getValueByName("/singletons/com.sun.star.lang.theServiceManager") >>= xService;
                 if (!xService.is())
                     throw css::uno::DeploymentException("preInit: XMultiComponentFactory is not created");
 
@@ -8470,7 +8691,7 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
             if (!bUnipoll)
             {
                 // Start the main thread only in non-unipoll mode (i.e. multithreaded).
-                pLib->maThread = osl_createThread(lo_startmain, nullptr);
+                pLib->maThread = osl_createThread(lo_startmain, pLib); // MACRO: multiple thread instance
                 SAL_INFO("lok", "Waiting for RequestHandler");
                 RequestHandler::WaitForReady();
                 SAL_INFO("lok", "RequestHandler ready -- continuing");
@@ -8496,6 +8717,7 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
 
     if (eStage == PRE_INIT)
     {
+        SAL_WARN("start", "Thread pool destroyed");
         comphelper::ThreadPool::getSharedOptimalPool().shutdown();
     }
 
@@ -8540,7 +8762,8 @@ static int lo_initialize(LibreOfficeKit* pThis, const char* pAppPath, const char
 SAL_JNI_EXPORT
 LibreOfficeKit *libreofficekit_hook_2(const char* install_path, const char* user_profile_url)
 {
-    static bool alreadyCalled = false;
+    // MACRO: multiple thread instance
+    static thread_local bool alreadyCalled = false;
 
     if ((!lok_preinit_2_called && !gImpl) || (lok_preinit_2_called && !alreadyCalled))
     {
@@ -8549,15 +8772,19 @@ LibreOfficeKit *libreofficekit_hook_2(const char* install_path, const char* user
         if (!lok_preinit_2_called)
         {
             SAL_INFO("lok", "Create libreoffice object");
-            gImpl = new LibLibreOffice_Impl();
+            // MACRO: multiple thread instance
+            gImpl.reset(new LibLibreOffice_Impl());
         }
 
-        if (!lo_initialize(gImpl, install_path, user_profile_url))
+
+        // MACRO: multiple thread instance {
+        if (!lo_initialize(gImpl.get(), install_path, user_profile_url))
         {
-            lo_destroy(gImpl);
+            lo_destroy(gImpl.get());
         }
+        // MACRO: multiple thread instance }
     }
-    return static_cast<LibreOfficeKit*>(gImpl);
+    return static_cast<LibreOfficeKit*>(gImpl.get());
 }
 
 SAL_JNI_EXPORT
@@ -8578,18 +8805,20 @@ int lok_preinit_2(const char* install_path, const char* user_profile_url, LibreO
     lok_preinit_2_called = true;
     int result = lo_initialize(nullptr, install_path, user_profile_url);
     if (kit != nullptr)
-        *kit = gImpl;
+        *kit = gImpl.get(); // MACRO: multiple thread instance
     return result;
 }
 
 static void lo_destroy(LibreOfficeKit* pThis)
 {
+    setOrigin(pThis);
     SolarMutexClearableGuard aGuard;
 
     LibLibreOffice_Impl* pLib = static_cast<LibLibreOffice_Impl*>(pThis);
-    gImpl = nullptr;
 
     SAL_INFO("lok", "LO Destroy");
+    // TOOD: FIX THIS!
+    /*
 
     comphelper::LibreOfficeKit::setStatusIndicatorCallback(nullptr, nullptr);
     uno::Reference <frame::XDesktop2> xDesktop = frame::Desktop::create ( ::comphelper::getProcessComponentContext() );
@@ -8606,14 +8835,15 @@ static void lo_destroy(LibreOfficeKit* pThis)
     {
         Application::Quit();
     }
+    */
 
     aGuard.clear();
 
-    osl_joinWithThread(pLib->maThread);
+    // osl_joinWithThread(pLib->maThread);
     osl_destroyThread(pLib->maThread);
 
-    delete pLib;
-    bInitialized = false;
+    // gImpl.reset();
+    // bInitialized = false;
     SAL_INFO("lok", "LO Destroy Done");
 }
 

@@ -95,6 +95,8 @@ typedef struct osl_thread_impl_st
     void*               m_pData;
     pthread_mutex_t     m_Lock;
     pthread_cond_t      m_Cond;
+    // MACRO: track origin thread
+    oslThreadIdentifier m_OriginIdent; /* @@@ see TODO @@@ */
 } Thread_Impl;
 
 #if !defined NO_PTHREAD_PRIORITY
@@ -225,6 +227,14 @@ static void osl_thread_cleanup_Impl (Thread_Impl * pImpl)
     }
 }
 
+///
+// MACRO: track origin thread
+namespace {
+static thread_local oslThreadIdentifier tl_OriginThread = 0;
+}
+// MACRO: track origin thread
+///
+
 static void* osl_thread_start_Impl (void* pData)
 {
     bool terminate;
@@ -236,6 +246,9 @@ static void* osl_thread_start_Impl (void* pData)
 
     /* request oslThreadIdentifier @@@ see TODO @@@ */
     pImpl->m_Ident = insertThreadId (pImpl->m_hThread);
+    // MACRO: track origin thread {
+    tl_OriginThread = pImpl->m_OriginIdent;
+    // MACRO: track origin thread }
 
     /* signal change from STARTUP to ACTIVE state */
     pImpl->m_Flags &= ~THREADIMPL_FLAGS_STARTUP;
@@ -293,6 +306,13 @@ static oslThread osl_thread_create_Impl (
     pImpl->m_WorkerFunction = pWorker;
     pImpl->m_pData = pThreadData;
     pImpl->m_Flags = nFlags | THREADIMPL_FLAGS_STARTUP;
+
+    // MACRO: track origin thread {
+    if (!tl_OriginThread) {
+        tl_OriginThread = osl_getThreadIdentifier(nullptr);
+    }
+    pImpl->m_OriginIdent = tl_OriginThread;
+    // MACRO: track origin thread }
 
     pthread_mutex_lock (&(pImpl->m_Lock));
 
@@ -1098,5 +1118,13 @@ rtl_TextEncoding osl_setThreadTextEncoding(rtl_TextEncoding Encoding)
 
     return oldThreadEncoding;
 }
+
+// MACRO: track origin thread {
+oslThreadIdentifier osl_getOriginIdentifier()
+{
+    // the only case where tl_OriginThread is not set is before the main thread is started
+    return tl_OriginThread ? tl_OriginThread : osl_getThreadIdentifier(nullptr);
+}
+// MACRO: track origin thread }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

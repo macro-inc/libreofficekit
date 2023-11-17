@@ -19,6 +19,7 @@
 
 #include <mutex>
 #include <comphelper/processfactory.hxx>
+#include <comphelper/originthread.hxx> // MACRO: multiple thread instance
 
 #include <com/sun/star/beans/XPropertySet.hpp>
 #include <com/sun/star/lang/XMultiServiceFactory.hpp>
@@ -37,31 +38,32 @@ namespace comphelper
 
 namespace {
 
+// MACRO: multiple thread instance {
+comphelper::originthread::Key xProcessFactory_key("xProcessFactory");
+static thread_local originthread::OriginReference<css::lang::XMultiServiceFactory> ot_xProcessFactory(xProcessFactory_key);
+// MACRO: multiple thread instance }
 class LocalProcessFactory {
 public:
     void set( const Reference< XMultiServiceFactory >& xSMgr )
     {
         std::unique_lock aGuard( maMutex );
 
-        xProcessFactory = xSMgr;
+        // MACRO: multiple thread instance
+        ot_xProcessFactory = xSMgr;
     }
 
     Reference< XMultiServiceFactory > get() const
     {
         std::unique_lock aGuard( maMutex );
 
-        return xProcessFactory;
+        // MACRO: multiple thread instance
+        return Reference<css::lang::XMultiServiceFactory>(ot_xProcessFactory.get(), uno::UNO_QUERY);
     }
 
 private:
     mutable std::mutex maMutex;
-    Reference< XMultiServiceFactory > xProcessFactory;
 };
 
-/*
-    This var preserves only that the above xProcessFactory variable will not be create when
-    the library is loaded.
-*/
 LocalProcessFactory localProcessFactory;
 
 }

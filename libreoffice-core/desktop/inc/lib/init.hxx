@@ -251,9 +251,12 @@ namespace desktop {
         std::map<size_t, std::shared_ptr<CallbackFlushHandler>> mpCallbackFlushHandlers;
         const int mnDocumentId;
         std::set<OUString> maFontsMissing;
+        // MACRO: track origin thread {
+        oslThreadIdentifier mOriginThreadId;
 
         explicit LibLODocument_Impl(css::uno::Reference<css::lang::XComponent> xComponent,
-                                    int nDocumentId);
+                                    int nDocumentId, oslThreadIdentifier originThreadId);
+        // MACRO: track origin thread }
         ~LibLODocument_Impl();
     };
 
@@ -262,6 +265,8 @@ namespace desktop {
         OUString maLastExceptionMsg;
         std::shared_ptr< LibreOfficeKitClass > m_pOfficeClass;
         oslThread maThread;
+        // MACRO: track origin thread
+        oslThreadIdentifier maThreadId;
         LibreOfficeKitCallback mpCallback;
         void *mpCallbackData;
         int64_t mOptionalFeatures;

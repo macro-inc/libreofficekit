@@ -17,6 +17,7 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
+#include <atomic>
 #include <config_features.h>
 
 #include <sal/config.h>
@@ -45,6 +46,7 @@
 
 extern "C" {
 
+std::atomic<bool> g_bTimerSet = false;
 void sal_detail_initialize(int argc, char ** argv) {
     if (argc == sal::detail::InitializeSoffice)
     {
@@ -80,7 +82,10 @@ void sal_detail_initialize(int argc, char ** argv) {
             close(fd);
     }
 #endif
+if (!g_bTimerSet) {
     sal_initGlobalTimer();
+    g_bTimerSet = true;
+}
 #if HAVE_SYSLOG_H
     const char *use_syslog = getenv("SAL_LOG_SYSLOG");
     sal_use_syslog = use_syslog != nullptr && !strcmp(use_syslog, "1");

@@ -223,6 +223,10 @@ SAL_DLLPUBLIC rtl_TextEncoding SAL_CALL osl_getThreadTextEncoding(void);
 */
 SAL_DLLPUBLIC rtl_TextEncoding SAL_CALL osl_setThreadTextEncoding(rtl_TextEncoding Encoding);
 
+// MACRO: track origin thread
+/** Get the thread identifier for the thread lineage starting in LO */
+SAL_DLLPUBLIC oslThreadIdentifier SAL_CALL osl_getOriginIdentifier();
+
 #ifdef __cplusplus
 }
 #endif

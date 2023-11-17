@@ -167,6 +167,7 @@ UDK_3_0_0 {
         osl_setThreadKeyData;
         osl_setThreadPriority;
         osl_setThreadTextEncoding;
+        osl_getOriginIdentifier;
         osl_shutdownSocket;
         osl_suspendThread;
         osl_terminateProcess;
