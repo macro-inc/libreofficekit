@@ -397,31 +397,22 @@ void OutputDevice::AddCustomMacroFonts()
 
 void OutputDevice::ImplAddCustomMacroFonts()
 {
-    static constexpr OUStringLiteral carlito = u"Carlito";
-    static constexpr OUStringLiteral carlitoBold = u"Carlito-Bold";
-    static constexpr OUStringLiteral carlitoItalic = u"Carlito-Italic";
-    static constexpr OUStringLiteral carlitoBoldItalic = u"Carlito-BoldItalic";
-    static constexpr OUStringLiteral caladea = u"Caladea";
-    static constexpr OUStringLiteral caladeaBold = u"Caladea-Bold";
-    static constexpr OUStringLiteral caladeaItalic = u"Caladea-Italic";
-    static constexpr OUStringLiteral caladeaBoldItalic = u"Caladea-BoldItalic";
-
-    std::list<OUString> fontNames = {
-        carlito,
-        carlitoBold,
-        carlitoItalic,
-        carlitoBoldItalic,
-        caladea,
-        caladeaBold,
-        caladeaItalic,
-        caladeaBoldItalic
+    static constexpr std::u16string_view fontNames[] = {
+        u"Carlito",
+        u"Carlito-Bold",
+        u"Carlito-Italic",
+        u"Carlito-BoldItalic",
+        u"Caladea",
+        u"Caladea-Bold",
+        u"Caladea-Italic",
+        u"Caladea-BoldItalic"
     };
 
     OUString basePath("$BRAND_BASE_DIR/" LIBO_SHARE_RESOURCE_FOLDER "/macro_fonts/");
     rtl::Bootstrap::expandMacros(basePath);
 
     for (auto& name : fontNames) {
-        OutputDevice::AddTempDevFont(basePath + name + u".ttf", name);
+        OutputDevice::AddTempDevFont(basePath + name + u".ttf", OUString(name.data()));
     }
 }
 // } MACRO-1518: Fix Calibri and Cambria display
