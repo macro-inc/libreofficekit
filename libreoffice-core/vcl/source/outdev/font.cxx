@@ -397,11 +397,13 @@ void OutputDevice::AddCustomMacroFonts()
 
 void OutputDevice::ImplAddCustomMacroFonts()
 {
-    static constexpr std::u16string_view fontNames[] = {
+    static constexpr std::u16string_view carlitoFontNames[] = {
         u"Carlito",
         u"Carlito-Bold",
         u"Carlito-Italic",
         u"Carlito-BoldItalic",
+    };
+    static constexpr std::u16string_view caladeaFontNames[] = {
         u"Caladea",
         u"Caladea-Bold",
         u"Caladea-Italic",
@@ -411,8 +413,11 @@ void OutputDevice::ImplAddCustomMacroFonts()
     OUString basePath("$BRAND_BASE_DIR/" LIBO_SHARE_RESOURCE_FOLDER "/macro_fonts/");
     rtl::Bootstrap::expandMacros(basePath);
 
-    for (auto& name : fontNames) {
-        OutputDevice::AddTempDevFont(basePath + name + u".ttf", OUString(name.data()));
+    for (auto& name : carlitoFontNames) {
+        OutputDevice::AddTempDevFont(basePath + name + u".ttf", u"Carlito");
+    }
+    for (auto& name : caladeaFontNames) {
+        OutputDevice::AddTempDevFont(basePath + name + u".ttf", u"Caladea");
     }
 }
 // } MACRO-1518: Fix Calibri and Cambria display
