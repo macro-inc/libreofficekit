@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - awallace/include-goog-ttf
 
 jobs:
   check_version:
