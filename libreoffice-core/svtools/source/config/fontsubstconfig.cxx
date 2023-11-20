@@ -57,10 +57,6 @@ bool IsFontSubstitutionsEnabled()
 
 std::vector<SubstitutionStruct> GetFontSubstitutions()
 {
-    // This will load in the custom .ttf metric-compatible fonts.
-    // Do not remove; this gets executed once here.
-    OutputDevice::AddCustomMacroFonts();
-
     Reference<css::container::XHierarchicalNameAccess> xHierarchyAccess = utl::ConfigManager::acquireTree(u"Office.Common/Font/Substitution");
 
     const Sequence<OUString> aNodeNames = utl::ConfigItem::GetNodeNames(xHierarchyAccess, cFontPairs, utl::ConfigNameFormat::LocalPath);
