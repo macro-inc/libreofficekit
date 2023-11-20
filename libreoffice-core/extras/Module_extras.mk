@@ -36,6 +36,7 @@ $(eval $(call gb_Module_add_targets,extras,\
 	Package_palettes \
 	Package_tplwizdesktop \
 	Package_wordbook \
+	Package_custom_macro_fonts \
 ))
 
 $(eval $(call gb_Module_add_l10n_targets,extras,\
