@@ -49,10 +49,6 @@
 #include <salgdi.hxx>
 #include <svdata.hxx>
 
-#include <unx/helper.hxx>
-#include <config_folders.h>
-#include "rtl/bootstrap.hxx"
-
 #include <unicode/uchar.h>
 
 #include <strings.hrc>
@@ -387,40 +383,6 @@ void OutputDevice::BeginFontSubstitution()
     ImplSVData* pSVData = ImplGetSVData();
     pSVData->maGDIData.mbFontSubChanged = false;
 }
-
-// MACRO-1518: Fix Calibri and Cambria display {
-void OutputDevice::AddCustomMacroFonts()
-{
-    OutputDevice* pDevice = Application::GetDefaultDevice();
-    pDevice->ImplAddCustomMacroFonts();
-}
-
-void OutputDevice::ImplAddCustomMacroFonts()
-{
-    static constexpr std::u16string_view carlitoFontNames[] = {
-        u"Carlito",
-        u"Carlito-Bold",
-        u"Carlito-Italic",
-        u"Carlito-BoldItalic",
-    };
-    static constexpr std::u16string_view caladeaFontNames[] = {
-        u"Caladea",
-        u"Caladea-Bold",
-        u"Caladea-Italic",
-        u"Caladea-BoldItalic"
-    };
-
-    OUString basePath("$BRAND_BASE_DIR/" LIBO_SHARE_RESOURCE_FOLDER "/macro_fonts/");
-    rtl::Bootstrap::expandMacros(basePath);
-
-    for (auto& name : carlitoFontNames) {
-        OutputDevice::AddTempDevFont(basePath + name + u".ttf", u"Carlito");
-    }
-    for (auto& name : caladeaFontNames) {
-        OutputDevice::AddTempDevFont(basePath + name + u".ttf", u"Caladea");
-    }
-}
-// } MACRO-1518: Fix Calibri and Cambria display
 
 void OutputDevice::EndFontSubstitution()
 {
