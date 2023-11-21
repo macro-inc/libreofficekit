@@ -131,6 +131,7 @@ void V8Writer::writeHeaderIncludes() {
 #include "v8/include/v8-exception.h"
 #include "gin/wrappable.h"
 #include "gin/per_isolate_data.h"
+#include "gin/object_template_builder.h"
 #include "LibreOfficeKit/UnoV8.h"
 #include "office/office_client.h"
     )");
