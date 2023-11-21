@@ -845,7 +845,7 @@ jtransform_request_workspace (j_decompress_ptr srcinfo,
     info->num_components = srcinfo->num_components;
 
   /* Compute output image dimensions and related values. */
-#if JPEG_LIB_VERSION >= 80
+#if JPEG_LIB_VERSION >= 84
   jpeg_core_output_dimensions(srcinfo);
 #else
   srcinfo->output_width = srcinfo->image_width;

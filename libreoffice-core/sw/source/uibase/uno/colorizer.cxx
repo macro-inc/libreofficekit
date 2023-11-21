@@ -8,6 +8,7 @@
  *
  */
 // MACRO-1653/MACRO-1598: Colorize and overlays
+#include "ndtxt.hxx"
 #include <comphelper/threadpool.hxx>
 #include <cppuhelper/weakref.hxx>
 #include <hintids.hxx>
@@ -74,16 +75,9 @@ void emitCallback(rtl::Reference<SwXTextDocument> doc, LibreOfficeKitCallbackTyp
         return;
     }
 
-    // MACRO-1384: prevent crash on load for some comment edgecases
-    SwView* pCurView = dynamic_cast<SwView*>(SfxViewShell::Current());
-    if (!pCurView)
-    {
-        return;
-    }
-
     SwDocShell* pDocSh = doc->GetDocShell();
     SwView* pView = pDocSh->GetView();
-    if (!pView || pView != pCurView)
+    if (!pView)
     {
         return;
     }
@@ -107,6 +101,22 @@ void emitFinished(rtl::Reference<SwXTextDocument> doc, bool forOverlays = false)
 {
     emitCallback(doc, forOverlays ? LOK_CALLBACK_MACRO_OVERLAY : LOK_CALLBACK_MACRO_COLORIZER,
                  "{\"type\":\"finished\"}");
+}
+
+void UpdateTextColorDirectly(SwDoc* pSwDoc, SwPaM* pInternalCursor, const SvxColorItem& color)
+{
+    if (!pSwDoc || !pInternalCursor) return;
+
+        SwTextNode* pTextNode = pInternalCursor->GetPoint()->nNode.GetNode().GetTextNode();
+        if (!pTextNode) return;
+
+            SfxItemSet aSet(pSwDoc->GetAttrPool(), RES_CHRATR_COLOR, RES_CHRATR_COLOR);
+            aSet.Put(color);
+            const sal_Int32 nStart = pInternalCursor->GetPoint()->nContent.GetIndex();
+            const sal_Int32 nEnd = pInternalCursor->GetMark()->nContent.GetIndex();
+            pTextNode->SetAttr(aSet, nStart, nEnd);
+
+
 }
 
 using WeakDocRef = uno::WeakReference<uno::XInterface>;
@@ -626,7 +636,7 @@ void resetColors(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 
     SwXTextCursor* pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
     SvxColorItem sResetColor(0, RES_CHRATR_COLOR);
-    pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(), sResetColor);
+    UpdateTextColorDirectly(pDoc, pInternalCursor->GetPaM(), sResetColor);
 
     uno::Reference<container::XIndexAccess> xSections(doc->getTextSections(), uno::UNO_QUERY);
 
@@ -648,8 +658,7 @@ void resetColors(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
             pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
             if (!pInternalCursor)
                 continue;
-            pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(),
-                                                                 sResetColor);
+            UpdateTextColorDirectly(pDoc, pInternalCursor->GetPaM(), sResetColor);
         }
     }
 
@@ -699,14 +708,19 @@ void resetColors(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
             pInternalCursor = comphelper::getFromUnoTunnel<SwXTextCursor>(xBodyCursor);
             if (!pInternalCursor)
                 continue;
-            pDoc->getIDocumentContentOperations().InsertPoolItem(*pInternalCursor->GetPaM(),
-                                                                 sResetColor);
+            UpdateTextColorDirectly(pDoc, pInternalCursor->GetPaM(), sResetColor);
         }
     }
 }
 
+
+
+
 void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 {
+
+    // TODO: Make thread safe? SolarMutexGuard locks out the cancel flag, so this isn't simple
+
     if (!doc)
         return;
 
@@ -732,8 +746,7 @@ void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
                          SwXTextCursor* const pInternalCursor
                              = comphelper::getFromUnoTunnel<SwXTextCursor>(cursor);
                          SvxColorItem sColor(color, RES_CHRATR_COLOR);
-                         pSwDoc->getIDocumentContentOperations().InsertPoolItem(
-                             *pInternalCursor->GetPaM(), sColor);
+                         UpdateTextColorDirectly(pSwDoc, pInternalCursor->GetPaM(), sColor);
                      });
 
     SetBlockPooling(false);
@@ -752,6 +765,7 @@ void colorize(CancelFlag& cancelFlag, rtl::Reference<SwXTextDocument> doc)
 
 void reapplyOverlays(rtl::Reference<SwXTextDocument> doc)
 {
+    SolarMutexGuard aGuard;
     AppliedOverlayMaps& maps = getAppliedOverlayMaps();
     auto it = maps.find(doc);
     if (it != maps.end())
@@ -842,6 +856,8 @@ void CancelColorize(rtl::Reference<SwXTextDocument> doc) { ColorizerTaskManager:
 
 void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
+    SolarMutexGuard aGuard;
+
     if (!doc)
         return;
 
@@ -985,6 +1001,7 @@ void ApplyOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 
 void ClearOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
+    SolarMutexGuard aGuard;
     if (!doc)
         return;
 
@@ -1019,6 +1036,7 @@ void ClearOverlays(rtl::Reference<SwXTextDocument> doc, const char* json)
 
 void JumpToOverlay(rtl::Reference<SwXTextDocument> doc, const char* json)
 {
+    SolarMutexGuard aGuard;
     if (!doc || !json)
         return;
 

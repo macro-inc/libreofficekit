@@ -29,8 +29,11 @@ SvpSalGraphics::SvpSalGraphics()
     : m_aTextRenderImpl(*this)
     , m_pBackend(new SvpGraphicsBackend(m_aCairoCommon))
 {
-    bool bLOKActive = comphelper::LibreOfficeKit::isActive();
-    initWidgetDrawBackends(bLOKActive);
+    //MACRO-1802: expensive, effectively dead code removed
+    /**
+     * initWidgetDrawBackends instantiated FileDefinitionWidgetDraw which
+     * repeatedly fails to load a theme that hasn't existed for 4+ years.
+     */
 }
 
 SvpSalGraphics::~SvpSalGraphics()
