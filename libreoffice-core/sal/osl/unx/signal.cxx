@@ -61,9 +61,9 @@ struct SignalAction
     bool siginfo; // Handler's type is Handler2
 } Signals[] =
 {
-    { SIGHUP,    ACT_HIDE,   SIG_DFL, false }, /* hangup */
-    { SIGINT,    ACT_EXIT,   SIG_DFL, false }, /* interrupt (rubout) */
-    { SIGQUIT,   ACT_EXIT,   SIG_DFL, false }, /* quit (ASCII FS) */
+    { SIGHUP,    ACT_SYSTEM,   SIG_DFL, false }, /* hangup */
+    { SIGINT,    ACT_SYSTEM,   SIG_DFL, false }, /* interrupt (rubout) */
+    { SIGQUIT,   ACT_SYSTEM,   SIG_DFL, false }, /* quit (ASCII FS) */
     { SIGILL,    ACT_SYSTEM, SIG_DFL, false }, /* illegal instruction (not reset when caught) */
 /* changed from ACT_ABOUT to ACT_SYSTEM to try and get collector to run*/
     { SIGTRAP,   ACT_ABORT,  SIG_DFL, false }, /* trace trap (not reset when caught) */
@@ -96,33 +96,33 @@ plan to have the new handler use this signal*/
 #if defined(FORCE_DEFAULT_SIGNAL)
     { SIGALRM,   ACT_SYSTEM, SIG_DFL, false }, /* alarm clock */
 #else
-    { SIGALRM,   ACT_EXIT,   SIG_DFL, false }, /* alarm clock */
+    { SIGALRM,   ACT_SYSTEM,   SIG_DFL, false }, /* alarm clock */
 #endif
-    { SIGTERM,   ACT_EXIT,   SIG_DFL, false }, /* software termination signal from kill */
+    { SIGTERM,   ACT_SYSTEM,   SIG_DFL, false }, /* software termination signal from kill */
     { SIGUSR1,   ACT_SYSTEM, SIG_DFL, false }, /* user defined signal 1 */
     { SIGUSR2,   ACT_SYSTEM, SIG_DFL, false }, /* user defined signal 2 */
     { SIGCHLD,   ACT_SYSTEM, SIG_DFL, false }, /* child status change */
 #ifdef SIGPWR
     { SIGPWR,    ACT_IGNORE, SIG_DFL, false }, /* power-fail restart */
 #endif
-    { SIGWINCH,  ACT_IGNORE, SIG_DFL, false }, /* window size change */
-    { SIGURG,    ACT_EXIT,   SIG_DFL, false }, /* urgent socket condition */
+    { SIGWINCH,  ACT_SYSTEM, SIG_DFL, false }, /* window size change */
+    { SIGURG,    ACT_SYSTEM,   SIG_DFL, false }, /* urgent socket condition */
 #ifdef SIGPOLL
-    { SIGPOLL,   ACT_EXIT,   SIG_DFL, false }, /* pollable event occurred */
+    { SIGPOLL,   ACT_SYSTEM,   SIG_DFL, false }, /* pollable event occurred */
 #endif
     { SIGSTOP,   ACT_SYSTEM, SIG_DFL, false }, /* stop (cannot be caught or ignored) */
     { SIGTSTP,   ACT_SYSTEM, SIG_DFL, false }, /* user stop requested from tty */
     { SIGCONT,   ACT_SYSTEM, SIG_DFL, false }, /* stopped process has been continued */
     { SIGTTIN,   ACT_SYSTEM, SIG_DFL, false }, /* background tty read attempted */
     { SIGTTOU,   ACT_SYSTEM, SIG_DFL, false }, /* background tty write attempted */
-    { SIGVTALRM, ACT_EXIT,   SIG_DFL, false }, /* virtual timer expired */
+    { SIGVTALRM, ACT_SYSTEM,   SIG_DFL, false }, /* virtual timer expired */
     { SIGPROF,   ACT_SYSTEM, SIG_DFL, false }, /* profiling timer expired */
 /*Change from ACT_EXIT to ACT_SYSTEM for SIGPROF is so that profiling signals do
 not get taken by the new handler - the new handler does not pass on context
 information which causes 'collect' to crash. This is a way of avoiding
 what looks like a bug in the new handler*/
-    { SIGXCPU,   ACT_ABORT,  SIG_DFL, false }, /* exceeded cpu limit */
-    { SIGXFSZ,   ACT_ABORT,  SIG_DFL, false }  /* exceeded file size limit */
+    { SIGXCPU,   ACT_SYSTEM,  SIG_DFL, false }, /* exceeded cpu limit */
+    { SIGXFSZ,   ACT_SYSTEM,  SIG_DFL, false }  /* exceeded file size limit */
 };
 const int NoSignals = SAL_N_ELEMENTS(Signals);
 
@@ -163,7 +163,7 @@ bool onInitSignal()
         bSetSEGVHandler = true;
 
         // WORKAROUND FOR WINCH HANDLER (SEE ABOVE)
-        bSetWINCHHandler = true;
+        // bSetWINCHHandler = true;
 
         // WORKAROUND FOR ILLEGAL INSTRUCTION HANDLER (SEE ABOVE)
         bSetILLHandler = true;
