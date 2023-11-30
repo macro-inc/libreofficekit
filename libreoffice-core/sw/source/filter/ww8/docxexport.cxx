@@ -157,43 +157,49 @@ bool DocxExport::CollapseScriptsforWordOk( sal_uInt16 nScript, sal_uInt16 nWhich
     return true;
 }
 
+// MACRO-1786: O(1) lookup, fail fast without match {
 void DocxExport::AppendBookmarks( const SwTextNode& rNode, sal_Int32 nCurrentPos, sal_Int32 nLen, const SwRedlineData* pRedlineData )
 {
-    std::vector< OUString > aStarts;
-    std::vector< OUString > aEnds;
+    auto sIt = m_NodeToBookmarksStarts.find(std::make_pair(rNode.GetIndex().get(), nCurrentPos));
+    auto eIt = m_NodeToBookmarksEnds.find(std::make_pair(rNode.GetIndex().get(), nCurrentPos));
+    if (sIt == m_NodeToBookmarksStarts.end() && eIt == m_NodeToBookmarksEnds.end()) return;
 
-    IMarkVector aMarks;
-    if ( GetBookmarks( rNode, nCurrentPos, nCurrentPos + nLen, aMarks ) )
-    {
-        for ( IMark* pMark : aMarks )
+    const bool bIsFinal = rNode.GetText().getLength() == nCurrentPos;
+    const sal_Int32 nStt = nCurrentPos;
+    const sal_Int32 nEnd = nCurrentPos + nLen;
+    if (sIt != m_NodeToBookmarksStarts.end()) {
+        for (auto result = std::begin(sIt->second); result != std::end(sIt->second); ++result)
         {
-            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
+            const IMark* pMark = *result;
+            const auto& rStart = pMark->GetMarkStart();
+            const sal_Int32 nBStart = rStart.GetContentIndex();
 
-            if ( nStart == nCurrentPos )
-                aStarts.push_back( pMark->GetName() );
-
-            if ( nEnd == nCurrentPos )
-                aEnds.push_back( pMark->GetName() );
+            if ( nBStart == nCurrentPos && ( nBStart >= nStt ) && ( nBStart <= nEnd ) && rStart.GetNode() == rNode)
+                m_pAttrOutput->WriteBookmark_Impl( pMark->GetName(), /* isEnd */ false, /* isFinal */ bIsFinal, pRedlineData);
         }
     }
 
-    const OUString& aStr( rNode.GetText() );
-    const sal_Int32 nEnd = aStr.getLength();
+    if (eIt != m_NodeToBookmarksEnds.end()) {
+        for (auto result = std::begin(eIt->second); result != std::end(eIt->second); ++result)
+        {
+            const IMark* pMark = *result;
+            const auto& rEnd = pMark->GetMarkEnd();
+            const sal_Int32 nBEnd = pMark->GetMarkEnd().GetContentIndex();
 
-    if ( nCurrentPos == nEnd )
-        m_pAttrOutput->WriteFinalBookmarks_Impl( aStarts, aEnds );
-    else
-        m_pAttrOutput->WriteBookmarks_Impl( aStarts, aEnds, pRedlineData );
+            if ( nBEnd == nCurrentPos && ( nEnd >= nStt ) && ( nBEnd <= nEnd ) && rEnd.GetNode() == rNode)
+                m_pAttrOutput->WriteBookmark_Impl( pMark->GetName(), /* isEnd */ true, /* isFinal */ bIsFinal, pRedlineData);
+        }
+    }
 }
+// MACRO-1786 }
 
+// MACRO-1786: O(1) lookup, fail fast without match {
 void DocxExport::AppendBookmark( const OUString& rName )
 {
-    std::vector< OUString > aStarts { rName };
-    std::vector< OUString > aEnds { rName };
-
-    m_pAttrOutput->WriteBookmarks_Impl( aStarts, aEnds );
+    m_pAttrOutput->WriteBookmark_Impl(rName, false, false);
+    m_pAttrOutput->WriteBookmark_Impl(rName, true, false);
 }
+// }
 
 void DocxExport::AppendAnnotationMarks( const SwWW8AttrIter& rAttrs, sal_Int32 nCurrentPos, sal_Int32 nLen )
 {

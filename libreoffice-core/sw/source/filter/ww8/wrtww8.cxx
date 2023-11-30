@@ -3511,6 +3511,7 @@ ErrCode MSWordExportBase::ExportDocument( bool bWriteAll )
     if ( m_rDoc.getIDocumentDrawModelAccess().GetDrawModel() )
         m_rDoc.getIDocumentDrawModelAccess().GetDrawModel()->GetPage( 0 )->RecalcObjOrdNums();
 
+    InitBookmarkLookup(); // MACRO-1786
     ErrCode err = ExportDocument_Impl();
 
     m_aFrames.clear();

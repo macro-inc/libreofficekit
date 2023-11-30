@@ -168,6 +168,7 @@ $(eval $(call gb_Library_add_exception_objects,comphelper,\
     comphelper/source/xml/attributelist \
     comphelper/source/xml/ofopxmlhelper \
     comphelper/source/xml/xmltools \
+    comphelper/source/misc/inthash \
 ))
 
 # vim: set noet sw=4 ts=4:
