@@ -1914,9 +1914,55 @@ void MSWordExportBase::UpdatePosition( SwWW8AttrIter* aAttrIter, sal_Int32 nCurr
         aAttrIter->NextPos();
 }
 
-bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
-                    sal_Int32 nEnd, IMarkVector& rArr )
+// MACRO-1786: bookmark lookup should be either O(1) or O(log(n)), never based on doc length {
+void MSWordExportBase::InitBookmarkLookup()
 {
+    IDocumentMarkAccess* const pMarkAccess = m_rDoc.getIDocumentMarkAccess();
+    m_NodeToBookmarksStarts.reserve(pMarkAccess->getBookmarksCount());
+    m_NodeToBookmarksEnds.reserve(pMarkAccess->getBookmarksCount());
+    pMarkAccess->assureSortedMarkContainers();
+    std::for_each(
+        pMarkAccess->getAllMarksBegin(), pMarkAccess->getAllMarksEnd(),
+        [this](const ::sw::mark::IMark* const pMark)
+        {
+            switch (IDocumentMarkAccess::GetType(*pMark))
+            {
+                case IDocumentMarkAccess::MarkType::UNO_BOOKMARK:
+                case IDocumentMarkAccess::MarkType::DDE_BOOKMARK:
+                case IDocumentMarkAccess::MarkType::ANNOTATIONMARK:
+                case IDocumentMarkAccess::MarkType::TEXT_FIELDMARK:
+                case IDocumentMarkAccess::MarkType::CHECKBOX_FIELDMARK:
+                case IDocumentMarkAccess::MarkType::DROPDOWN_FIELDMARK:
+                case IDocumentMarkAccess::MarkType::DATE_FIELDMARK:
+                case IDocumentMarkAccess::MarkType::NAVIGATOR_REMINDER:
+                    return; // ignore irrelevant marks
+                case IDocumentMarkAccess::MarkType::BOOKMARK:
+                case IDocumentMarkAccess::MarkType::CROSSREF_HEADING_BOOKMARK:
+                case IDocumentMarkAccess::MarkType::CROSSREF_NUMITEM_BOOKMARK:
+                    break;
+            }
+            m_NodeToBookmarksStarts[std::make_pair(pMark->GetMarkStart().GetNode().GetIndex().get(),
+                                                   pMark->GetMarkStart().GetContentIndex())]
+                .emplace_back(pMark);
+
+            m_NodeToBookmarksEnds[std::make_pair(pMark->GetMarkEnd().GetNode().GetIndex().get(),
+                                                 pMark->GetMarkEnd().GetContentIndex())]
+                .emplace_back(pMark);
+            m_NodeToBookmarksContentStarts[pMark->GetMarkStart().GetNode().GetIndex().get()]
+                .emplace(pMark->GetMarkStart().GetContentIndex(), pMark);
+            m_NodeToBookmarksContentEnds[pMark->GetMarkEnd().GetNode().GetIndex().get()]
+                .emplace(pMark->GetMarkEnd().GetContentIndex(), pMark);
+        });
+}
+// MACRO-1786 }
+
+// MACRO-1786 {
+// Originally, it went through all marks (should be just bookmarks), filtering only on nodes that start or end with this node, then filters if the content index is between nStt and nEnd
+// However, vector allocations, linear access lookups, and the way this was called in AppendBookmarks is inefficient
+// This simply returns false for now, since RTF file export still requires this method to compile
+bool MSWordExportBase::GetBookmarks( const SwTextNode&, sal_Int32, sal_Int32, IMarkVector&)
+{
+/*
     IDocumentMarkAccess* const pMarkAccess = m_rDoc.getIDocumentMarkAccess();
 
     const sal_Int32 nMarks = pMarkAccess->getAllMarksCount();
@@ -1949,6 +1995,15 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
             const sal_Int32 nBStart = pMark->GetMarkStart().GetContentIndex();
             const sal_Int32 nBEnd = pMark->GetMarkEnd().GetContentIndex();
 
+            // either starts or ends at this node
+            // whose content index is between nCurrentPos and nCurrentPos + nLen
+
+            if ( ( nBStart > nStt ) && nBStart > nStt && (pMark->GetMarkStart().GetNode() == rNd) )
+                aSortedStart.push_back( pMark );
+
+            if ( ( nBEnd > nStt ) && nBEnd > nStt && (pMark->GetMarkEnd().GetNode() == rNd) )
+                aSortedEnd.push_back( pMark );
+
             // Keep only the bookmarks starting or ending in the snippet
             bool bIsStartOk = ( pMark->GetMarkStart().GetNode() == rNd ) && ( nBStart >= nStt ) && ( nBStart <= nEnd );
             bool bIsEndOk = ( pMark->GetMarkEnd().GetNode() == rNd ) && ( nBEnd >= nStt ) && ( nBEnd <= nEnd );
@@ -1961,7 +2016,10 @@ bool MSWordExportBase::GetBookmarks( const SwTextNode& rNd, sal_Int32 nStt,
         }
     }
     return ( !rArr.empty() );
+*/
+    return false;
 }
+// MACRO-1786 }
 
 bool MSWordExportBase::GetAnnotationMarks( const SwWW8AttrIter& rAttrs, sal_Int32 nStt,
                     sal_Int32 nEnd, IMarkVector& rArr )
@@ -2029,10 +2087,11 @@ bool MSWordExportBase::NearestBookmark( sal_Int32& rNearest, const sal_Int32 nCu
 {
     bool bHasBookmark = false;
 
-    if ( !m_rSortedBookmarksStart.empty() )
+// MACRO-1786 {
+    if ( m_rSortedBookmarkStart )
     {
-        IMark* pMarkStart = m_rSortedBookmarksStart.front();
-        const sal_Int32 nNext = pMarkStart->GetMarkStart().GetContentIndex();
+        const sal_Int32 nNext = m_rSortedBookmarkStart->GetMarkStart().GetContentIndex();
+// MACRO-1786 }
         if( !bNextPositionOnly || (nNext > nCurrentPos ))
         {
             rNearest = nNext;
@@ -2040,10 +2099,11 @@ bool MSWordExportBase::NearestBookmark( sal_Int32& rNearest, const sal_Int32 nCu
         }
     }
 
-    if ( !m_rSortedBookmarksEnd.empty() )
+// MACRO-1786 {
+    if ( m_rSortedBookmarkEnd )
     {
-        IMark* pMarkEnd = m_rSortedBookmarksEnd[0];
-        const sal_Int32 nNext = pMarkEnd->GetMarkEnd().GetContentIndex();
+        const sal_Int32 nNext = m_rSortedBookmarkEnd->GetMarkEnd().GetContentIndex();
+// MACRO-1786 }
         if( !bNextPositionOnly || nNext > nCurrentPos )
         {
             if ( !bHasBookmark )
@@ -2120,38 +2180,45 @@ void MSWordExportBase::GetSortedAnnotationMarks( const SwWW8AttrIter& rAttrs, sa
     }
 }
 
+// MACRO-1786: O(1) node lookup, Θ(1) O(n - m) nearest content lookup {
 void MSWordExportBase::GetSortedBookmarks( const SwTextNode& rNode, sal_Int32 nCurrentPos, sal_Int32 nLen )
 {
-    IMarkVector aMarksStart;
-    if ( GetBookmarks( rNode, nCurrentPos, nCurrentPos + nLen, aMarksStart ) )
+    m_rSortedBookmarkStart = nullptr;
+    m_rSortedBookmarkEnd = nullptr;
+    auto sIt = m_NodeToBookmarksContentStarts.find(rNode.GetIndex().get());
+    auto eIt = m_NodeToBookmarksContentEnds.find(rNode.GetIndex().get());
+    if (sIt == m_NodeToBookmarksContentStarts.end() && eIt == m_NodeToBookmarksContentEnds.end())
     {
-        IMarkVector aSortedEnd;
-        IMarkVector aSortedStart;
-        for ( IMark* pMark : aMarksStart )
-        {
-            // Remove the positions equal to the current pos
-            const sal_Int32 nStart = pMark->GetMarkStart().GetContentIndex();
-            const sal_Int32 nEnd = pMark->GetMarkEnd().GetContentIndex();
-
-            if ( nStart > nCurrentPos && (pMark->GetMarkStart().GetNode() == rNode) )
-                aSortedStart.push_back( pMark );
-
-            if ( nEnd > nCurrentPos && nEnd <= ( nCurrentPos + nLen ) && (pMark->GetMarkEnd().GetNode() == rNode) )
-                aSortedEnd.push_back( pMark );
-        }
-
-        // Sort the bookmarks by end position
-        std::sort( aSortedEnd.begin(), aSortedEnd.end(), CompareMarksEnd() );
-
-        m_rSortedBookmarksStart.swap( aSortedStart );
-        m_rSortedBookmarksEnd.swap( aSortedEnd );
+        return;
     }
-    else
+
+    if (sIt != m_NodeToBookmarksContentStarts.end())
     {
-        m_rSortedBookmarksStart.clear( );
-        m_rSortedBookmarksEnd.clear( );
+        auto& startMap = sIt->second;
+        for (auto it = startMap.upper_bound(nCurrentPos); it != startMap.end(); it++)
+        {
+            if (it->second->GetMarkStart().GetNode() == rNode)
+            {
+                m_rSortedBookmarkStart = it->second;
+                break;
+            }
+        }
+    }
+    if (eIt != m_NodeToBookmarksContentEnds.end())
+    {
+        auto& endMap = eIt->second;
+        for (auto it = endMap.upper_bound(nCurrentPos); it != endMap.end(); it++)
+        {
+            const sal_Int32 nEnd = it->second->GetMarkEnd().GetContentIndex();
+            if (nEnd <= ( nCurrentPos + nLen ) && it->second->GetMarkEnd().GetNode() == rNode)
+            {
+                m_rSortedBookmarkEnd = it->second;
+                break;
+            }
+        }
     }
 }
+// MACRO-1786 }
 
 bool MSWordExportBase::NeedSectionBreak( const SwNode& rNd ) const
 {

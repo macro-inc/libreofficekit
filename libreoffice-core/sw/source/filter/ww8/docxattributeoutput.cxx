@@ -8485,6 +8485,30 @@ void DocxAttributeOutput::WriteBookmarks_Impl( std::vector< OUString >& rStarts,
     rEnds.clear();
 }
 
+// MACRO-1786: remove unncessary vector allocation {
+void DocxAttributeOutput::WriteBookmark_Impl( const OUString& rName, const bool bIsEnd, const bool bIsFinal, const SwRedlineData* pRedlineData )
+{
+    auto& rPermissions = bIsEnd ? m_rPermissionsEnd : m_rPermissionsStart;
+    auto& rBookmarks =
+        bIsFinal ?
+            bIsEnd ? m_rFinalBookmarksEnd : m_rFinalBookmarksStart
+            : bIsEnd ? m_rBookmarksEnd : m_rBookmarksStart;
+    if (rName.startsWith(u"permission-for-group:") ||
+        rName.startsWith(u"permission-for-user:"))
+    {
+        rPermissions.push_back(rName);
+    }
+    else
+    {
+        rBookmarks.push_back(rName);
+        if (!bIsEnd && !bIsFinal)
+        {
+            m_pMoveRedlineData = const_cast<SwRedlineData*>(pRedlineData);
+        }
+    }
+}
+// MACRO-1786 }
+
 void DocxAttributeOutput::WriteFinalBookmarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds )
 {
     for ( const OUString & name : rStarts )

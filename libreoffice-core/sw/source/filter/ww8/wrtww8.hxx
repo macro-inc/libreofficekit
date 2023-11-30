@@ -29,6 +29,7 @@
 
 #include <shellio.hxx>
 
+#include <comphelper/inthash.hxx> // MACRO-1786
 #include "ww8struc.hxx"
 #include "ww8scan.hxx"
 #include "types.hxx"
@@ -584,8 +585,14 @@ public:
 
     /// Used to split the runs according to the bookmarks start and ends
     typedef std::vector< ::sw::mark::IMark* > IMarkVector;
-    IMarkVector m_rSortedBookmarksStart;
-    IMarkVector m_rSortedBookmarksEnd;
+
+    // MACRO-1786: only the first element of previous vectors were ever used {
+    // tracks the next nearest mark start, nullptr means unset
+    const ::sw::mark::IMark* m_rSortedBookmarkStart = nullptr;
+    // tracks the next nearest mark end, nullptr means unset
+    const ::sw::mark::IMark* m_rSortedBookmarkEnd = nullptr;
+    // MACRO-1786 }
+
     IMarkVector m_rSortedAnnotationMarksStart;
     IMarkVector m_rSortedAnnotationMarksEnd;
 
@@ -923,6 +930,23 @@ protected:
 
     std::vector<const Graphic*> m_vecBulletPic; ///< Vector to record all the graphics of bullets
 
+    // MACRO-1786 {
+    /// Node index-content index pair to mark, O(1) lookup for exact match
+    using NodeIndexContentIndexPair = std::pair<sal_Int32, sal_Int32>;
+    std::unordered_map<NodeIndexContentIndexPair,
+                       std::vector<const ::sw::mark::IMark*>,
+                       comphelper::IntPairHash<NodeIndexContentIndexPair>> m_NodeToBookmarksStarts;
+    std::unordered_map<NodeIndexContentIndexPair,
+                       std::vector<const ::sw::mark::IMark*>,
+                       comphelper::IntPairHash<NodeIndexContentIndexPair>> m_NodeToBookmarksEnds;
+    // Node index to a map of content index to mark, used for seeking the next nearest mark
+    // O(1) node lookup, Θ(1) O(n - m) nearest content lookup
+    std::unordered_map<sal_Int32,
+                       std::multimap<sal_Int32, const ::sw::mark::IMark*>> m_NodeToBookmarksContentStarts;
+    std::unordered_map<sal_Int32,
+                       std::multimap<sal_Int32, const ::sw::mark::IMark*>> m_NodeToBookmarksContentEnds;
+    // MACRO-1786 }
+
 public:
     MSWordExportBase(SwDoc& rDocument, std::shared_ptr<SwUnoCursor> & pCurrentPam, SwPaM* pOriginalPam);
     virtual ~MSWordExportBase();
@@ -937,6 +961,8 @@ public:
 private:
     MSWordExportBase( const MSWordExportBase& ) = delete;
     MSWordExportBase& operator=( const MSWordExportBase& ) = delete;
+
+    void InitBookmarkLookup(); // MACRO-1786
 
     std::unordered_map<OUString, OUString> m_aBookmarkToWord;
     o3tl::sorted_vector<OUString> m_aWordBookmarks;

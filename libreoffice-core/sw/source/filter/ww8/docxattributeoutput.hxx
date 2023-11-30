@@ -425,6 +425,9 @@ public:
             OUString const* pBookmarkName = nullptr);
     void WriteFormData_Impl( const ::sw::mark::IFieldmark& rFieldmark );
 
+    // MACRO-1786: remove unncessary vector allocation {
+    void WriteBookmark_Impl( const OUString& rName, const bool bIsEnd, const bool bIsFinal, const SwRedlineData* pRedlineData = nullptr );
+    // MACRO-1786 }
     void WriteBookmarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds, const SwRedlineData* pRedlineData = nullptr );
     void WriteFinalBookmarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds );
     void WriteAnnotationMarks_Impl( std::vector< OUString >& rStarts, std::vector< OUString >& rEnds );
