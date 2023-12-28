@@ -48,6 +48,7 @@
 #include <windowdev.hxx>
 #include <units.hrc>
 #include <print.h>
+#include <rtl/no_destructor.hxx>
 
 #include <com/sun/star/accessibility/MSAAService.hpp>
 
@@ -62,8 +63,6 @@ using namespace com::sun::star::awt;
 
 namespace
 {
-    struct private_aImplSVData :
-        public rtl::Static<ImplSVData, private_aImplSVData> {};
     /// Default instance ensures that ImplSVData::mpHelpData is never null.
     struct private_aImplSVHelpData :
         public rtl::Static<ImplSVHelpData, private_aImplSVHelpData> {};
@@ -75,7 +74,8 @@ namespace
 }
 
 ImplSVData* ImplGetSVData() {
-    return &private_aImplSVData::get();
+    static rtl::NoDestructor<ImplSVData> instance;
+    return instance.get();
 }
 
 SalSystem* ImplGetSalSystem()
