@@ -5720,6 +5720,11 @@ static bool encodeTextAsHTML(
     if (!getFromTransferable(xTransferable, aMimeType, aRet))
         return false;
 
+    // MACRO-1919: do not encode an empty string as HTML {
+    if (aRet.getLength() == 0)
+        return false;
+    // MACRO-1919: }
+
     // Embed in HTML - FIXME: needs some escaping.
     aRet = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n"
         "<html><head>"
